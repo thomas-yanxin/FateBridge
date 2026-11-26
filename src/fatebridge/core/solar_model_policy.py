@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 from typing import Any, Dict, Tuple
 
-from fatebridge.core.analytic_solar import MODEL_ID, profile
+from fatebridge.core.analytic_solar import MODEL_ID, loaded_sha256
 
 ENVIRONMENT_NAME = "FATEBRIDGE_SOLAR_TERM_MODEL"
 MODES = frozenset(
@@ -23,16 +23,6 @@ def solar_model_policy() -> str:
             f"{ENVIRONMENT_NAME} must be auto, native, swiss, analytic, spk, de440, aa1996, or vsop2013"
         )
     return mode
-
-
-def analytic_selected(year: int, native_model: str) -> bool:
-    mode = solar_model_policy()
-    if mode != "analytic":
-        return False
-    inside = VALIDATED_SOFTWARE_YEARS[0] <= year <= VALIDATED_SOFTWARE_YEARS[1]
-    if mode == "analytic" and not inside:
-        raise ValueError("Explicit analytic solar mode currently covers1800..2200")
-    return inside
 
 
 def de440_selected(year: int) -> bool:
@@ -87,9 +77,15 @@ def solar_context_input_years(year: int) -> tuple[int, int]:
 
 
 def solar_model_cache_key(*, year: int | None = None) -> Tuple[Any, ...]:
-    # The hash identifies loaded coefficients, as the clock cache identifies
-    # its loaded tables. It is not an atomic filesystem-read certificate.
+    # Keys bind immutable packaged source identities or configured native data.
+    # The selected calculation verifies the bytes it uses.
     mode = solar_model_policy()
+    if (
+        mode == "analytic"
+        and year is not None
+        and not VALIDATED_SOFTWARE_YEARS[0] <= year <= VALIDATED_SOFTWARE_YEARS[1]
+    ):
+        raise ValueError("Explicit analytic solar mode currently covers1800..2200")
     if mode in {"native", "swiss"}:
         if (
             mode == "swiss"
@@ -103,40 +99,20 @@ def solar_model_cache_key(*, year: int | None = None) -> Tuple[Any, ...]:
 
         if configured_jpl_file() is not None:
             return mode, "native_strict_jpl"
-        from .de441_solar import MODEL_ID as DE441_MODEL
-        from .de441_solar import model_details as de441_details
+        from .de441_solar import CACHE_IDENTITY
 
-        details = de441_details()
-        return (
-            mode,
-            "native_swiss_runtime",
-            DE441_MODEL,
-            details["coefficient_sha256"],
-            details["frame_coefficient_sha256"],
-            details["nutation_coefficient_sha256"],
-            details["tdb_coefficient_sha256"],
-        )
+        return mode, "native_swiss_runtime", *CACHE_IDENTITY
     if mode == "auto":
         from .jpl_ephemeris import configured_jpl_file
 
         if configured_jpl_file() is not None:
             return mode, "native_strict_jpl"
     if year is not None and mode in {"auto", "de440"} and not de440_selected(year):
-        # Only the requested model's source is a dependency of this year.
+        # Use the native source policy outside the packaged year grid.
         # Explicit de440 has already rejected an out-of-range year above.
-        from .de441_solar import MODEL_ID as DE441_MODEL
-        from .de441_solar import model_details as de441_details
+        from .de441_solar import CACHE_IDENTITY
 
-        details = de441_details()
-        return (
-            mode,
-            "native_outside_packaged_years",
-            DE441_MODEL,
-            details["coefficient_sha256"],
-            details["frame_coefficient_sha256"],
-            details["nutation_coefficient_sha256"],
-            details["tdb_coefficient_sha256"],
-        )
+        return mode, "native_outside_packaged_years", *CACHE_IDENTITY
     if mode == "vsop2013":
         if (
             year is not None
@@ -175,7 +151,7 @@ def solar_model_cache_key(*, year: int | None = None) -> Tuple[Any, ...]:
                 else de440_cache_key(selected)
             ),
         )
-    return mode, MODEL_ID, str(profile()["loaded_sha256"])
+    return mode, MODEL_ID, loaded_sha256()
 
 
 def solar_model_environment_receipt(

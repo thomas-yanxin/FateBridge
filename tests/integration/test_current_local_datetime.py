@@ -32,6 +32,8 @@ def frozen_now(monkeypatch, request):
             # Model a UTC server even when the developer's machine uses Shanghai.
             if tz is None:
                 return instant.replace(tzinfo=None)
+            else:
+                pass
             return instant.astimezone(tz)
 
     monkeypatch.setattr(almanac, "datetime", FrozenDatetime)
@@ -52,7 +54,7 @@ def test_anchored_to_default_timezone_not_server_clock(frozen_now) -> None:
 
 
 @pytest.mark.parametrize("timezone_name", ["UTC", "America/New_York"])
-def test_honours_explicit_timezone(frozen_now, timezone_name) -> None:
+def test_honours_explicit_timezone(frozen_now, timezone_name: str) -> None:
     """An explicit timezone overrides the default so callers that already carry
     an analysis timezone (e.g. the subject's birth timezone) stay consistent."""
     got = current_local_datetime(timezone_name)

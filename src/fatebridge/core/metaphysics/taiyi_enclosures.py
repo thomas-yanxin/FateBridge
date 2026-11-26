@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from fatebridge.core.metaphysics.taiyi_geometry import PALACE_ORDER, PALACES, RING
+
 SOURCE = "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷03#推提挟法"
 FACSIMILE = "https://commons.wikimedia.org/wiki/File:NCL-06604_太乙金鏡式經.pdf#page=51"
 PAIR_PROFILE = "taojin_same_side_general_pair_v1"
@@ -29,7 +31,6 @@ def principal_enclosures(core: dict[str, Any]) -> list[dict[str, Any]]:
     sides. NCL p51: 艮(主大三), 卯(始击/客大四), 巽(太乙九).
     A central general has no bearing and cannot serve as an endpoint.
     """
-    from fatebridge.core.metaphysics.taiyi_geometry import PALACE_ORDER, PALACES
 
     ring = [PALACES[n] for n in PALACE_ORDER]
     taiyi = core["taiyi_palace"]
@@ -87,7 +88,6 @@ def general_pair_enclosures(core: dict[str, Any]) -> list[dict[str, Any]]:
     midpoint 坤: never collapse it to a gate sector or require equal distance.
     No cross-side endpoint pair or same-side eye is inferred from this rule.
     """
-    from fatebridge.core.metaphysics.taiyi_geometry import PALACE_ORDER, PALACES, RING
 
     ring = [PALACES[n] for n in PALACE_ORDER]
     patterns = []

@@ -41,7 +41,9 @@ def synthetic_download_catalog(monkeypatch):
         ([2024, 9999, 2024], ["18", "96"]),
     ],
 )
-def test_segments_follow_reference_file_table_with_adjacent_year_guard(years, segments):
+def test_segments_follow_reference_file_table_with_adjacent_year_guard(
+    years, segments
+) -> None:
     expected = tuple(
         name for code in segments for name in [f"sepl_{code}.se1", f"semo_{code}.se1"]
     )
@@ -49,7 +51,7 @@ def test_segments_follow_reference_file_table_with_adjacent_year_guard(years, se
 
 
 @pytest.mark.parametrize("years", [[], [0], [-1], [10000], [True], [2024.0], ["2024"]])
-def test_invalid_year_plans_fail_before_downloading(years):
+def test_invalid_year_plans_fail_before_downloading(years) -> None:
     with pytest.raises(ValueError):
         ephemeris_files_for_years(years)
 
@@ -66,8 +68,8 @@ def test_invalid_year_plans_fail_before_downloading(years):
     ],
 )
 def test_cli_downloads_the_actual_selected_segments(
-    tmp_path, monkeypatch, flags, expected
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, flags, expected
+) -> None:
     requested = []
     monkeypatch.setattr(
         fetch_ephe, "_download", lambda url: requested.append(url) or b"SW-test"
@@ -77,7 +79,9 @@ def test_cli_downloads_the_actual_selected_segments(
     assert {p.name for p in tmp_path.iterdir()} == set(expected)
 
 
-def test_custom_directory_requires_explicit_runtime_path(tmp_path, monkeypatch, capsys):
+def test_custom_directory_requires_explicit_runtime_path(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     monkeypatch.setattr(fetch_ephe, "_download", lambda url: b"SW-test")
     assert fetch_ephe.main(["--dest", str(tmp_path), "--years", "9999"]) == 0
     output = capsys.readouterr().out
@@ -95,7 +99,9 @@ def test_custom_directory_requires_explicit_runtime_path(tmp_path, monkeypatch, 
         ["--years", "2024", "--year-range", "2024", "2025"],
     ],
 )
-def test_invalid_cli_selection_never_downloads(monkeypatch, flags):
+def test_invalid_cli_selection_never_downloads(
+    monkeypatch: pytest.MonkeyPatch, flags
+) -> None:
     def forbidden(*a, **kw):
         raise AssertionError("Invalid selection must not start a network request")
 

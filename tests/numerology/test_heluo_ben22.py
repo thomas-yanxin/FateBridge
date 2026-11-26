@@ -2,7 +2,7 @@
 
 import pytest
 
-from fatebridge.core.heluo import yao_text
+from fatebridge.core.heluo.heluo import yao_text
 from fatebridge.services.knowledge import calculate_knowledge_read
 from tests.support.transports import rest as shared_rest
 
@@ -15,7 +15,7 @@ def actual_calendar(monkeypatch):
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
 
 
-def test_annual_dayu_reference_keeps_whole_parent_and_does_not_invent_a_line():
+def test_annual_dayu_reference_keeps_whole_parent_and_does_not_invent_a_line() -> None:
     t = yao_text("山火賁", 2)
     r = t["commentary_cross_references"][0]
     assert r["target_hexagram"] == "山天大畜" and r["target_line"] is None

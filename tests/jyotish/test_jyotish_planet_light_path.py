@@ -9,7 +9,7 @@ import pytest
 
 from fatebridge.core import compressed_ephemeris as context
 from fatebridge.core import ephemeris_runtime as e
-from tests.jyotish.test_jyotish_sources import restore_runtime  # noqa: F401
+from tests.unit_test.fixtures.jyotish_sources import restore_runtime  # noqa: F401
 
 
 def tt(year):
@@ -23,6 +23,8 @@ def tt(year):
 def requested_epoch(epoch, operation):
     if operation == "calc":
         return epoch
+    else:
+        pass
     result = epoch
     for _ in range(8):
         result = epoch - e.swe.deltat_ex(result, e.swe.FLG_SWIEPH)
@@ -33,7 +35,9 @@ def requested_epoch(epoch, operation):
 @pytest.mark.parametrize("body", range(2, 10))
 @pytest.mark.parametrize("operation", ["calc", "calc_ut"])
 @pytest.mark.parametrize("frame", ["tropical", "lahiri", "equatorial", "icrf"])
-def test_original_request_keeps_one_physical_light_path(year, body, operation, frame):
+def test_original_request_keeps_one_physical_light_path(
+    year: int, body, operation: str, frame: str
+) -> None:
     e.configure_ephemeris_path(str(Path(__file__).resolve().parents[2] / "ephe"))
     flags = (
         e.swe.FLG_SWIEPH
@@ -75,7 +79,9 @@ def test_original_request_keeps_one_physical_light_path(year, body, operation, f
 
 
 @pytest.mark.parametrize("flag", [16, 16384, 8, 32768, 1048576])
-def test_other_observer_and_position_definitions_do_not_claim_geocentric_fix(flag):
+def test_other_observer_and_position_definitions_do_not_claim_geocentric_fix(
+    flag: int,
+) -> None:
     def forbidden(*args):
         raise AssertionError(
             "Unsupported observer must not invoke a geometric preflight"
@@ -89,7 +95,9 @@ def test_other_observer_and_position_definitions_do_not_claim_geocentric_fix(fla
 
 
 @pytest.mark.parametrize("body", range(2, 10))
-def test_empty_data_directory_keeps_actual_analytical_fallback(tmp_path, body):
+def test_empty_data_directory_keeps_actual_analytical_fallback(
+    tmp_path: Path, body
+) -> None:
     e.configure_ephemeris_path(str(tmp_path))
     flags = e.swe.FLG_SWIEPH | e.swe.FLG_SPEED | e.swe.FLG_SIDEREAL
     e.swe.set_ephe_path(str(tmp_path))
@@ -104,7 +112,9 @@ def test_empty_data_directory_keeps_actual_analytical_fallback(tmp_path, body):
 
 
 @pytest.mark.parametrize("body", [2, 3, 4])
-def test_reception_only_files_keep_native_retarded_fallback(tmp_path, body):
+def test_reception_only_files_keep_native_retarded_fallback(
+    tmp_path: Path, body: int
+) -> None:
     root = Path(__file__).resolve().parents[2] / "ephe"
     for name in ["sepl_18.se1", "semo_18.se1"]:
         shutil.copy2(root / name, tmp_path / name)

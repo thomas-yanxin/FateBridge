@@ -1,17 +1,18 @@
 """Twelve sectional solar months; a January date can belong to the prior year."""
 
-from datetime import datetime, timezone
-from typing import Any, Dict, Optional
+from datetime import datetime
+from typing import Any
 
 from fatebridge.core import almanac
-from fatebridge.utils.timezones import parse_timezone_name
-
-from .calendar import (
+from fatebridge.core.fengshui.calendar import (
     MOSHIER_BOUNDARY_GUARD_SECONDS,
     boundary_model_policy,
     boundary_uncertainty_reason,
+    seasonal_query_clock,
+    solar_term_receipt,
     solar_term_resolution,
 )
+from fatebridge.utils.timezones import parse_timezone_name
 
 JIE = (
     "立春",
@@ -36,61 +37,57 @@ def _next_month(year: int, month: int, step: int) -> tuple[int, int]:
     return y, m + 1
 
 
-def _boundary(year: int, month: int, zone: str) -> Dict[str, Any]:
+def _boundary(
+    year: int, month: int, zone: str, *, term: almanac.SolarTerm | None = None
+) -> dict[str, Any]:
     name = JIE[month - 1]
     civil_year = year + int(month == 12)
+    resolution = (
+        solar_term_receipt(term)
+        if term is not None
+        else solar_term_resolution(civil_year, name, zone)
+    )
     return {
         "term_name": name,
         "civil_year": civil_year,
-        **solar_term_resolution(civil_year, name, zone),
+        **resolution,
     }
 
 
 def solar_month_context(
-    effective_year: Optional[int],
-    month_number: Optional[int],
-    moment: Optional[datetime],
+    effective_year: int | None,
+    month_number: int | None,
+    moment: datetime | None,
     zone: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     tz = parse_timezone_name(zone)
     local = moment.astimezone(tz) if moment is not None else None
-    result: Dict[str, Any] = {
+    result: dict[str, Any] = {
         "effective_solar_year": None,
         "solar_month_number": None,
         "month_branch": None,
         "timezone_name": zone,
-        "local_moment": local.isoformat() if local is not None else None,
+        **seasonal_query_clock(local),
         "year_boundary": "lichun",
         "month_boundary": "twelve_jie_instants_not_zhongqi_lunar_or_gregorian_months",
         "interval_policy": "start_inclusive_end_exclusive",
     }
     if effective_year is None and local is None:
         return {**result, "input_basis": "missing"}
+    start_term = end_term = None
     if local is not None:
-        # Sorting and membership use actual instants, never repeated wall-clock
-        # labels or the civil month number. Include December on either side.
-        boundaries = []
-        for civil_year in range(local.year - 1, local.year + 2):
-            for term in almanac.get_solar_terms_for_year(civil_year, zone):
-                if term.name in JIE:
-                    month = JIE.index(term.name) + 1
-                    boundaries.append(
-                        (
-                            term.moment.astimezone(timezone.utc),
-                            civil_year - int(month == 12),
-                            month,
-                        )
-                    )
-        boundaries.sort()
-        _, effective_year, month_number = next(
-            row
-            for row in reversed(boundaries)
-            if row[0] <= local.astimezone(timezone.utc)
-        )
+        start_term, end_term = almanac.get_jie_boundaries(local, zone)
+        month_number = JIE.index(start_term.name) + 1
+        source_year = start_term.source_grid_year
+        if source_year is None:
+            # Direct calendar fixtures may supply a defined projection only.
+            assert start_term.has_defined_local_clock
+            source_year = start_term.calendar.local_parts[0]
+        effective_year = source_year - int(month_number == 12)
     assert effective_year is not None and month_number is not None
     next_year, next_month = _next_month(effective_year, month_number, 1)
-    start = _boundary(effective_year, month_number, zone)
-    end = _boundary(next_year, next_month, zone)
+    start = _boundary(effective_year, month_number, zone, term=start_term)
+    end = _boundary(next_year, next_month, zone, term=end_term)
     result.update(
         effective_solar_year=effective_year,
         solar_month_number=month_number,
@@ -99,7 +96,11 @@ def solar_month_context(
         valid_from=start["moment"],
         valid_until=end["moment"],
         timing={
-            "provider": "fatebridge.core.almanac.get_solar_terms_for_year",
+            "provider": (
+                "fatebridge.core.almanac.get_jie_boundaries"
+                if local is not None
+                else "fatebridge.core.almanac.get_solar_terms_for_year"
+            ),
             "start_resolution": start,
             "end_resolution": end,
             "precision_scope": "engine_computed_not_arbitrary_year_second_certification",
@@ -136,7 +137,7 @@ def solar_month_context(
                 (next_year, next_month): end,
             }
 
-            def endpoint(year: int, month: int) -> Dict[str, Any]:
+            def endpoint(year: int, month: int) -> dict[str, Any]:
                 key = (year, month)
                 if key not in resolutions:
                     resolutions[key] = _boundary(year, month, zone)

@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
 
 REFERENCE = json.loads(
     (
@@ -16,10 +16,12 @@ REFERENCE = json.loads(
 PROFILE = "hinoo_t1299_host27"
 
 
-def test_conditional_candidates_are_declared_and_typed_in_shared_output_schema():
+def test_conditional_candidates_are_declared_and_typed_in_shared_output_schema() -> (
+    None
+):
     from pydantic import ValidationError
 
-    from fatebridge.core.output_reference import SukuyoDay
+    from fatebridge.core.contracts.output_reference import SukuyoDay
 
     assert "candidate_mansion_days" in SukuyoDay.model_json_schema()["properties"]
     SukuyoDay.model_validate(
@@ -42,7 +44,9 @@ def calendar(date="2024-08-04", part=None, **kwargs):
     )
 
 
-def test_unresolved_half_retains_both_personal_days_and_actual_source_witnesses():
+def test_unresolved_half_retains_both_personal_days_and_actual_source_witnesses() -> (
+    None
+):
     context = calendar()
     before = copy.deepcopy(context)
     day = day_evidence(context, "室", "travel")
@@ -97,6 +101,8 @@ def test_unresolved_half_retains_both_personal_days_and_actual_source_witnesses(
                 assert rule["locator"] in text
                 if rule.get("topic_condition"):
                     assert rule["topic_condition"] in text
+                else:
+                    pass
     assert "未代入未定主宿或顶层事项" in text
 
 
@@ -113,17 +119,21 @@ def test_unresolved_half_retains_both_personal_days_and_actual_source_witnesses(
         None,
     ],
 )
-def test_every_activity_uses_the_existing_explicit_half_selectors(activity):
+def test_every_activity_uses_the_existing_explicit_half_selectors(
+    activity: str | None,
+) -> None:
     day = day_evidence(calendar(), "室", activity)
     for row, half in zip(day["candidate_mansion_days"], ["first_half", "second_half"]):
         resolved = day_evidence(calendar(part=half), "室", activity)
         assert row["activity_assessment"] == resolved["activity_assessment"]
         if activity == "clothing":
             assert row["clothing_reference"] == resolved["clothing_reference"]
+        else:
+            pass
         assert resolved["candidate_mansion_days"] == []
 
 
-def test_leap_overlap_retains_each_model_and_half_without_choosing_priority():
+def test_leap_overlap_retains_each_model_and_half_without_choosing_priority() -> None:
     for part in [None, "first_half"]:
         context = calendar("1957-09-24", part)
         day = day_evidence(context, "室", "travel", ["personal_departure"])
@@ -140,12 +150,14 @@ def test_leap_overlap_retains_each_model_and_half_without_choosing_priority():
                 assert condition["calculation"]["direct_mansion"] == row["day_mansion"]
                 if part:
                     assert condition["calendar_day_part"] == part
+                else:
+                    pass
         assert not context["profile_calculation"]["short_month_assignment"][
             "leap_short_month_precedence"
         ]["source_rule_priority_established"]
 
 
-def test_date_branches_keep_their_own_half_branches_and_unknown_clock():
+def test_date_branches_keep_their_own_half_branches_and_unknown_clock() -> None:
     context = calendar_mansion(
         "2024-08-04", zone="Asia/Tokyo", calendar_profile=PROFILE
     )
@@ -162,7 +174,7 @@ def test_date_branches_keep_their_own_half_branches_and_unknown_clock():
     assert day["day_mansion"] is None and day["personal_day"] is None
 
 
-def test_incomplete_default_leap_candidate_is_not_promoted_to_complete():
+def test_incomplete_default_leap_candidate_is_not_promoted_to_complete() -> None:
     context = calendar_mansion("2023-03-22", "09:00:00", "+08:00")
     day = day_evidence(context, "室", "study")
     assert day["day_mansion"] is None
@@ -173,7 +185,7 @@ def test_incomplete_default_leap_candidate_is_not_promoted_to_complete():
     assert branch["applied_to_primary"] is False
 
 
-def test_candidate_mutation_cannot_leak_into_other_results_or_input():
+def test_candidate_mutation_cannot_leak_into_other_results_or_input() -> None:
     context = calendar()
     first = day_evidence(context, "室", "travel")
     first["candidate_mansion_days"][0]["personal_day"]["upper_volume"][

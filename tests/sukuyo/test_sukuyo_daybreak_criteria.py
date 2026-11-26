@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo_waterclock import (
+from fatebridge.core.sukuyo.sukuyo_waterclock import (
     source_specific_time_lines,
     source_specific_time_reference,
 )
@@ -15,7 +15,7 @@ from fatebridge.core.sukuyo_waterclock import (
 FIXTURE = Path(__file__).parents[1] / "data/sukuyo-daybreak-before-production-v75.json"
 
 
-def test_new_source_layer_matches_entire_before_code_reference():
+def test_new_source_layer_matches_entire_before_code_reference() -> None:
     expected = json.loads(FIXTURE.read_bytes())
     reference = source_specific_time_reference()["daybreak_source_comparison"]
     assert reference["source_data"] == expected["source_bundle"]
@@ -26,7 +26,7 @@ def test_new_source_layer_matches_entire_before_code_reference():
     assert reference["modern_seconds_before_sunrise"] is None
 
 
-def test_full_native_text_delivers_source_layers_and_unresolved_mapping():
+def test_full_native_text_delivers_source_layers_and_unresolved_mapping() -> None:
     text = "\n".join(source_specific_time_lines(source_specific_time_reference()))
     for phrase in (
         "五十",
@@ -58,8 +58,8 @@ def test_full_native_text_delivers_source_layers_and_unresolved_mapping():
         "renamed_source",
     ],
 )
-def test_corrupted_source_controls_are_rejected(change):
-    from fatebridge.core.sukuyo_daybreak_criteria import validate_reference
+def test_corrupted_source_controls_are_rejected(change: str) -> None:
+    from fatebridge.core.sukuyo.sukuyo_daybreak_criteria import validate_reference
 
     data = copy.deepcopy(json.loads(FIXTURE.read_bytes())["source_bundle"])
     if change == "fifty_to_five":
@@ -92,7 +92,7 @@ def test_corrupted_source_controls_are_rejected(change):
         validate_reference(data)
 
 
-def test_old_electronic_waterclock_bundle_not_rewritten():
+def test_old_electronic_waterclock_bundle_not_rewritten() -> None:
     raw = (
         Path(__file__).parents[2] / "src/fatebridge/data/sukuyo_waterclock_sources.json"
     ).read_bytes()
@@ -102,7 +102,7 @@ def test_old_electronic_waterclock_bundle_not_rewritten():
     )
 
 
-def test_all_selected_apparatus_records_delivered_without_folding_layers():
+def test_all_selected_apparatus_records_delivered_without_folding_layers() -> None:
     reference = source_specific_time_reference()["daybreak_source_comparison"]
     records = reference["selected_apparatus"]
     raw = json.dumps(
@@ -116,7 +116,7 @@ def test_all_selected_apparatus_records_delivered_without_folding_layers():
     assert {row["kind"] for row in records["records"]} == {"note", "app"}
 
 
-def test_xml_layout_anchors_without_ids_do_not_hide_addressable_records():
+def test_xml_layout_anchors_without_ids_do_not_hide_addressable_records() -> None:
     from xml.etree import ElementTree as E
 
     from scripts.sukuyo.check_sukuyo_daybreak import anchor_lines
@@ -127,7 +127,7 @@ def test_xml_layout_anchors_without_ids_do_not_hide_addressable_records():
     assert anchor_lines(tree, "T") == ({"kept": "1093b22"}, 2)
 
 
-def test_native_attribution_delivers_headers_aliases_and_quoted_source_scope():
+def test_native_attribution_delivers_headers_aliases_and_quoted_source_scope() -> None:
     reference = source_specific_time_reference()["daybreak_source_comparison"]
     header = reference["header_attribution"]
     raw = json.dumps(
@@ -154,7 +154,7 @@ def test_native_attribution_delivers_headers_aliases_and_quoted_source_scope():
         assert phrase in text
 
 
-def test_full_native_delivers_body_roles_and_unobtained_shisong_source():
+def test_full_native_delivers_body_roles_and_unobtained_shisong_source() -> None:
     text = "\n".join(source_specific_time_lines(source_specific_time_reference()))
     for literal in (
         "弘麗羅峰校",

@@ -4,15 +4,14 @@ from __future__ import annotations
 
 from typing import Any
 
-from fatebridge.core.metaphysics.liureng_relation_tables import GOD_ELEMENTS
-from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
-
-from .common import (
+from fatebridge.core.metaphysics.common import (
     SEXAGENARY_INDEX,
     branch_element_text,
     kongwang_for_ganzhi,
     stem_element_text,
 )
+from fatebridge.core.metaphysics.liureng_relation_tables import GOD_ELEMENTS
+from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
 
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 MONTH_PARTITION = {

@@ -1,19 +1,28 @@
-"""Qualify geographic-pole angle conventions without discarding computed sky.
+"""Qualify geographic and selected-model pole conventions.
 
-USNO's altitude equation loses its hour-angle term at latitude +/-90 degrees:
-a fixed celestial direction has no daily rise/set there. Swiss Ephemeris
-nevertheless returns an ecliptic/horizon intersection using a near-pole limit
-and the supplied meridian (general documentation 6.3-6.4; swehouse.c CalcH).
+The frozen USNO altitude model loses its hour-angle term at a rotation-axis
+latitude of +/-90 degrees. A geographic pole has that property in the default
+zero-polar-motion convention; selected EOP can separate those directions.
+Swiss near-pole limits and the supplied meridian remain a distinct convention
+(general documentation 6.3-6.4; swehouse.c CalcH).
 """
 
 from __future__ import annotations
 
 import math
 import sys
-from typing import Any, Dict, Optional
+from collections.abc import Mapping
+from typing import Any
 
 from fatebridge.core.astro import runtime
-from fatebridge.core.astro.earth_attitude import earth_attitude
+from fatebridge.core.astro.earth_attitude import earth_attitude, physical_equator
+from fatebridge.core.astro.iers_ut1 import active_ut1
+from fatebridge.core.astro.terrestrial_observer import (
+    TerrestrialFrame,
+    terrestrial_frame,
+)
+from fatebridge.core.astro.tt_epoch import TTInstant
+from fatebridge.core.astro.ut1_epoch import UT1Instant
 
 # R is the length of the horizon normal projected onto the ecliptic plane.
 # Normalizing the intersection amplifies perturbations by roughly 1/R. Below
@@ -21,11 +30,53 @@ from fatebridge.core.astro.earth_attitude import earth_attitude
 # diagnostics, not bounds on observation, clock, location or model errors.
 INTERSECTION_CONDITION_THRESHOLD = math.sqrt(sys.float_info.epsilon)
 INTERSECTION_RESOLUTION_GUARD = 64 * sys.float_info.epsilon
+_UNRESOLVED_ASCENDANT_STATUSES = frozenset(
+    {
+        "ecliptic_horizon_numerically_unresolved",
+        "underdetermined_ascendant",
+        "underdetermined_reference_geometry",
+    }
+)
+
+
+def is_ascendant_resolved(source: object) -> bool:
+    """Return whether a chart, subject, reference, or angle_definition resolves ASC."""
+    if source is None:
+        return True
+    if isinstance(source, Mapping):
+        if "geometric_ascendant_resolved" in source:
+            return source.get("geometric_ascendant_resolved") is not False
+        if source.get("status") in _UNRESOLVED_ASCENDANT_STATUSES:
+            return False
+        for key in ("angle_definition", "calculation_basis", "chart_profile"):
+            nested = source.get(key)
+            if isinstance(nested, Mapping) and not is_ascendant_resolved(nested):
+                return False
+        angles = source.get("angles")
+        if isinstance(angles, Mapping):
+            asc = angles.get("ascendant")
+            if isinstance(asc, Mapping) and not is_ascendant_resolved(asc):
+                return False
+        ascendant = source.get("ascendant")
+        if isinstance(ascendant, Mapping) and not is_ascendant_resolved(ascendant):
+            return False
+        if (
+            ("absolute_degree" in source or "longitude" in source)
+            and source.get("absolute_degree") is None
+            and source.get("longitude") is None
+        ):
+            return False
+        return True
+    for attr in ("calculation_basis", "chart_profile", "angle_definition"):
+        nested = getattr(source, attr, None)
+        if isinstance(nested, Mapping) and not is_ascendant_resolved(nested):
+            return False
+    return True
 
 
 def ecliptic_horizon_angle_definition(
     *, latitude: float, armc: float, obliquity: float, angle_method: str
-) -> Optional[Dict[str, Any]]:
+) -> dict[str, Any] | None:
     """Qualify a nearly coincident horizon/ecliptic in the actual angle model.
 
     USNO altitude equation, with zero ecliptic latitude, gives
@@ -101,36 +152,60 @@ def ecliptic_horizon_angle_definition(
 
 def native_ecliptic_horizon_angle_definition(
     *,
-    julian_day_ut1: float,
+    julian_day_ut1: float | UT1Instant,
     latitude: float,
+    longitude: float,
     armc: float,
-    julian_day_tt: float | None = None,
-) -> Optional[Dict[str, Any]]:
+    julian_day_tt: float | TTInstant | None = None,
+) -> dict[str, Any] | None:
     """Use the managed house equator and its exact selected epoch.
 
     |A| alone lower-bounds R, so ordinary charts need no extra reduction.
     The longitude origin does not change the intersection's conditioning.
     """
-    if abs(math.cos(math.radians(latitude)) * math.cos(math.radians(armc))) > (
-        INTERSECTION_CONDITION_THRESHOLD
+    geographic_latitude = latitude
+    observed = active_ut1.get() is not None
+    if (
+        not observed
+        and abs(math.cos(math.radians(latitude)) * math.cos(math.radians(armc)))
+        > INTERSECTION_CONDITION_THRESHOLD
     ):
         return None
     if runtime.swe is None:
         raise ValueError("Native angle conditioning requires Swiss Ephemeris")
+    if observed:
+        equator = physical_equator(
+            runtime.swe, julian_day_ut1, julian_day_tt=julian_day_tt
+        )
+        _, latitude = terrestrial_frame(
+            equator, longitude=longitude, latitude=latitude
+        ).equatorial_site()
+        if abs(math.cos(math.radians(latitude)) * math.cos(math.radians(armc))) > (
+            INTERSECTION_CONDITION_THRESHOLD
+        ):
+            return None
     attitude = earth_attitude(runtime.swe, julian_day_ut1, julian_day_tt=julian_day_tt)
-    return ecliptic_horizon_angle_definition(
+    definition = ecliptic_horizon_angle_definition(
         latitude=latitude,
         armc=armc,
         obliquity=attitude.reduction.house_obliquity,
         angle_method="swisseph",
     )
+    if observed and definition is not None:
+        definition["geometry_inputs"].update(
+            geographic_latitude=geographic_latitude,
+            rotation_axis_latitude=latitude,
+        )
+    return definition
 
 
-def geographic_pole_angle_definition(latitude: float) -> Optional[Dict[str, Any]]:
+def geographic_pole_angle_definition(
+    latitude: float, *, frame: TerrestrialFrame | None = None
+) -> dict[str, Any] | None:
     """Exact poles only; do not classify nearby, well-defined latitudes as poles."""
     if abs(latitude) != 90.0:
         return None
-    return {
+    result: dict[str, object] = {
         "status": "geographic_pole_meridian_convention",
         "ascendant_definition": "eastern_ecliptic_horizon_intersection_relative_to_supplied_meridian",
         "fixed_direction_diurnal_rising_defined": False,
@@ -152,3 +227,21 @@ def geographic_pole_angle_definition(latitude: float) -> Optional[Dict[str, Any]
             "https://aa.usno.navy.mil/faq/alt_az",
         ],
     }
+    if frame is not None:
+        _, rotation_latitude = frame.equatorial_site()
+        result["geometry_inputs"] = {
+            "geographic_latitude": latitude,
+            "rotation_axis_latitude": rotation_latitude,
+            "frame": "selected_model_vertical_relative_to_CIP",
+        }
+        if abs(rotation_latitude) != 90:
+            result.update(
+                status="geographic_pole_distinct_from_rotation_pole",
+                fixed_direction_diurnal_rising_defined=None,
+                note_zh=(
+                    "输入位于地理极点，但所选极移模型的当地竖直不与天极重合；"
+                    "不能仅凭地理纬度断言固定方向没有每日升落。"
+                    "本记录只说明地理坐标约定，实际高度与交点按所选地平模型读取。"
+                ),
+            )
+    return result

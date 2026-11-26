@@ -4,7 +4,7 @@
 
 生成玄空数字宅盘，需要有依据的历史宅运与坐向。调用者可以追溯规则版本、核对九宫计算，并在资料支持时启用有限解释，用于空间咨询或应用集成。
 
-`fengshui_xuankong_natal` 的 REST 入口为 `POST /api/fengshui/xuankong_natal`，MCP 与 CLI 同名。选定版本 `xuankong_zhongzhou_v1@1.4.0` 完整计算九宫运星、山星、向星，支持下卦和中州派兼向替星。与 `layers.annual_stars` 独立；查询年份变化不改变历史宅盘。基础三法合同见[家居风水](fengshui.md)。
+`fengshui_xuankong_natal` 的 REST 入口为 `POST /api/fengshui/xuankong-house-chart`，MCP 与 CLI 同名。选定版本 `xuankong_zhongzhou_v1@1.4.0` 完整计算九宫运星、山星、向星，支持下卦和中州派兼向替星。与 `layers.annual_stars` 独立；查询年份变化不改变历史宅盘。基础三法合同见[家居风水](fengshui.md)。
 
 调用时先准备[历史定运与角度资料](#定运校验与角区实现)，再运行[三端示例](#三端调用)。已有数字盘需要进一步解释时，单独启用[有限解释](#显式启用有限解释)；维护者可从[独立验证](#独立验证与复现)追溯固定样本及版本分歧。
 
@@ -43,9 +43,9 @@ curl -X POST http://localhost:8010/api/fengshui/xuankong_natal \
   -H 'Content-Type: application/json' \
   --data-binary @docs/examples/fengshui-xuankong.json
 
-uv run --locked --extra dev fatebridge fengshui_xuankong_natal --request-file docs/examples/fengshui-xuankong.json
+uv run --locked --extra dev fatebridge fengshui_xuankong_house_chart --request-file docs/examples/fengshui-xuankong.json
 uv run --locked --extra dev fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json
-uv run --locked --extra dev fatebridge describe fengshui_xuankong_natal
+uv run --locked --extra dev fatebridge describe fengshui_xuankong_house_chart
 ```
 
 MCP `fengshui_xuankong_natal` 的参数就是上面 JSON 对象。认证设置与其他REST端点一致；工具目录、发现接口、JSON输出schema、错误、字段投影和运行元数据均来自共用目录。CLI也支持 `--house '{...}' --period '{...}'`；请求文件保留未知字段供模型拒绝，不静默删除。
@@ -81,7 +81,7 @@ MCP `fengshui_xuankong_natal` 的参数就是上面 JSON 对象。认证设置�
 虚构示例 [4°±1°宅向支持](examples/fengshui-bearing-support.json) 返回唯一子向下卦，同时保留中央九度 `[3,9/2]` 与同宫同阴阳兼向 `[9/2,5]` 两段依据：
 
 ```bash
-uv run --locked --extra dev fatebridge fengshui_xuankong_natal \
+uv run --locked --extra dev fatebridge fengshui_xuankong_house_chart \
   --request-file docs/examples/fengshui-bearing-support.json \
   --fields layers.xuankong_natal.chart.bearing_support rulesets rule_trace --strict-fields
 ```
@@ -95,7 +95,7 @@ uv run --locked --extra dev fatebridge fengshui_xuankong_natal \
 固定事实样本（本地数据：`../tests/fixtures/xuankong-reference.json`） 保留逐宫数字与出处，生产引擎不生成公开盘例预期值：
 
 - X2的3套下卦：七运午子、八运甲庚、七运卯酉；4套替卦：八运甲庚兼寅申、七运午子兼丙壬、七运乾巽兼戌辰、七运卯酉兼甲庚。七套全部九宫27个数字吻合，包含五黄不替与替后仍按原阴阳飞布。
-- Apache-2.0 [YuanZHAO321/FengShuiCalculators固定提交](https://github.com/YuanZHAO321/FengShuiCalculators/blob/2eacd85b9878452469c6669e7fff05d2c6226c97/docs/js/flyingstars.js) 独立生成9运×24山＝216套下卦，保存提交ID和两个文件SHA-256。168套无五黄的盘全部一致；含向五黄的24套也一致；192套吻合、24套山五黄不同。参考实现向五黄直接借物理向山阴阳，未采用本版本的借宅运追踪；这些盘的向山与宅运本宫恰互为相对山，元龙和阴阳相同，所以数值吻合不能证明其借法表述一致。
+- Apache-2.0 [YuanZHAO321/FengShuiCalculators固定提交](https://github.com/YuanZHAO321/FengShuiCalculators) 独立生成9运×24山＝216套下卦，保存提交ID和两个文件SHA-256。168套无五黄的盘全部一致；含向五黄的24套也一致；192套吻合、24套山五黄不同。参考实现向五黄直接借物理向山阴阳，未采用本版本的借宅运追踪；这些盘的向山与宅运本宫恰互为相对山，元龙和阴阳相同，所以数值吻合不能证明其借法表述一致。
 - 独立抄录X1同元龙山和阴阳表，以X2五黄规则、X3所载二／六／七运阴阳模式交叉核对，再展开48项固定五黄顺逆数字断言（24山盘、24向盘）；这些是独立阴阳表的规则验证，不冒称48幅出版盘图。未调用生产阴阳表或飞布函数生成预期值。
 - 外部山五黄分支直接用 `!facing.yang`，相对本版本借宅运同元龙阴阳发生取反。保持原外部结果；[离线回归](../tests/fengshui/test_xuankong.py)核对固定夹具中的逐盘差异、元龙、借山、阴阳及逆向数列，不修改参考引擎强求216套一致，也不称其支持替星。
 

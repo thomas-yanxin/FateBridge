@@ -12,10 +12,10 @@ import pytest
 from fatebridge.core import almanac, de441_solar, ephemeris_runtime, spk_solar
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.bazi.test_bazi_year_contract import TOPICS
 from tests.support.transports import SPECS, business, inputs, native
 from tests.support.transports import rest as _shared_rest
 from tests.support.transports import surface_calls
+from tests.unit_test.fixtures.bazi_year_cases import TOPICS
 
 rest = _shared_rest
 
@@ -24,6 +24,8 @@ FIXTURE = ROOT / "tests/data/bazi_boundary_decisions_v1"
 KERNEL = ROOT / "ephe/solar-de440.bsp"
 if not KERNEL.exists():
     KERNEL = Path("/tmp/fatebridge-fengshui-calendar-v10/de440.bsp")
+else:
+    pass
 KERNEL_SHA = "a4ce9bf9b3282becc9f4b2ac3cebe03a2ae7599981aabd7265fd8482fff7c4b5"
 
 
@@ -33,6 +35,8 @@ def selected_spk(monkeypatch, tmp_path):
     pytest.importorskip("jplephem", reason="optional jpl extra not installed")
     if not KERNEL.exists():
         pytest.skip("Declared official external DE440 kernel not present")
+    else:
+        pass
     assert hashlib.sha256(KERNEL.read_bytes()).hexdigest() == KERNEL_SHA
     monkeypatch.setattr(
         ephemeris_runtime, "_configured_path", ephemeris_runtime._configured_path
@@ -44,7 +48,9 @@ def selected_spk(monkeypatch, tmp_path):
     yield
 
 
-def test_spk_is_explicit_and_cannot_relabel_a_native_control(selected_spk, monkeypatch):
+def test_spk_is_explicit_and_cannot_relabel_a_native_control(
+    selected_spk, monkeypatch: pytest.MonkeyPatch
+) -> None:
     first = almanac.get_solar_terms_for_year(2022, "UTC")
     for term in first:
         assert term.resolution_provider == "jpl_spk"
@@ -71,7 +77,7 @@ def test_spk_is_explicit_and_cannot_relabel_a_native_control(selected_spk, monke
 
 def test_all_four_known_analytic_month_minute_counterexamples_are_corrected(
     selected_spk,
-):
+) -> None:
     probes = json.loads((FIXTURE / "probes.json").read_text())["rows"]
     for identifier in [
         "1922-清明-floor",
@@ -93,8 +99,8 @@ def test_all_four_known_analytic_month_minute_counterexamples_are_corrected(
 
 
 def test_explicit_missing_invalid_and_out_of_range_kernel_never_falls_back(
-    selected_spk, monkeypatch, tmp_path
-):
+    selected_spk, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_SPK_FILE", str(tmp_path / "missing.bsp"))
     with pytest.raises(EphemerisSourceError, match="unavailable"):
         almanac.get_solar_terms_for_year(2022, "UTC")
@@ -109,8 +115,8 @@ def test_explicit_missing_invalid_and_out_of_range_kernel_never_falls_back(
 
 
 def test_spk_uses_its_own_source_and_does_not_need_a_native_sun_probe(
-    selected_spk, monkeypatch
-):
+    selected_spk, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setattr(almanac, "_solar_term_utc_via_swe", lambda *a, **k: None)
     assert all(
         t.resolution_provider == "jpl_spk"
@@ -118,7 +124,9 @@ def test_spk_uses_its_own_source_and_does_not_need_a_native_sun_probe(
     )
 
 
-def test_a_different_spk_frame_cannot_be_mislabelled_as_bcrs(selected_spk, monkeypatch):
+def test_a_different_spk_frame_cannot_be_mislabelled_as_bcrs(
+    selected_spk, monkeypatch: pytest.MonkeyPatch
+) -> None:
     from jplephem.spk import SPK
 
     original = SPK.open
@@ -136,8 +144,8 @@ def test_a_different_spk_frame_cannot_be_mislabelled_as_bcrs(selected_spk, monke
 
 
 def test_receipt_identifies_loaded_modules_when_installed_metadata_disappears(
-    selected_spk, monkeypatch
-):
+    selected_spk, monkeypatch: pytest.MonkeyPatch
+) -> None:
     before = spk_solar.source_receipt()
 
     def missing(*args, **kwargs):
@@ -149,8 +157,12 @@ def test_receipt_identifies_loaded_modules_when_installed_metadata_disappears(
 
 @pytest.mark.parametrize("key", ["bazi_birth", "liuri_analysis"])
 def test_missing_selected_spk_is_a_structured_error_on_three_protocols(
-    key, selected_spk, monkeypatch, tmp_path, surface_calls
-):
+    key: str,
+    selected_spk,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    surface_calls,
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_SPK_FILE", str(tmp_path / "missing.bsp"))
     spec = SPECS[key]
     payload = inputs(spec)
@@ -163,8 +175,8 @@ def test_missing_selected_spk_is_a_structured_error_on_three_protocols(
 
 
 def test_source_change_and_path_alias_are_observed_without_manual_cache_clear(
-    selected_spk, monkeypatch, tmp_path
-):
+    selected_spk, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     copy = tmp_path / "de440-copy.bsp"
     shutil.copy2(KERNEL, copy)
     monkeypatch.setenv("FATEBRIDGE_SOLAR_SPK_FILE", str(copy))
@@ -185,8 +197,8 @@ def test_source_change_and_path_alias_are_observed_without_manual_cache_clear(
 
 
 def test_transient_source_aba_cannot_cache_another_kernel_under_the_original_key(
-    selected_spk, monkeypatch, tmp_path
-):
+    selected_spk, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     second = tmp_path / "second.bsp"
     shutil.copy2(KERNEL, second)
     with second.open("r+b") as handle:
@@ -202,6 +214,8 @@ def test_transient_source_aba_cannot_cache_another_kernel_under_the_original_key
         calls += 1
         if calls != 1:
             return original(*args, **kwargs)
+        else:
+            pass
         monkeypatch.setenv("FATEBRIDGE_SOLAR_SPK_FILE", str(second))
         try:
             return original(*args, **kwargs)
@@ -222,7 +236,7 @@ def test_transient_source_aba_cannot_cache_another_kernel_under_the_original_key
 @pytest.mark.parametrize("topic", TOPICS)
 def test_all_ten_bazi_calendar_views_return_actual_spk_on_three_protocols(
     topic, selected_spk, surface_calls
-):
+) -> None:
     spec = SPECS["bazi_" + topic]
     payload = {**inputs(spec), "use_true_solar_time": False}
     key = "bazi_birth" if topic == "birth" else topic + "_analysis"
@@ -264,8 +278,8 @@ def test_all_ten_bazi_calendar_views_return_actual_spk_on_three_protocols(
     ],
 )
 def test_shared_timing_and_divination_consumers_preserve_spk_identity(
-    key, selected_spk, surface_calls
-):
+    key: str, selected_spk, surface_calls
+) -> None:
     spec = SPECS[key]
     payload = inputs(spec)
     # All inputs here are existing fictional test fixtures, not user birth data.

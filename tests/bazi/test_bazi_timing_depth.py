@@ -18,9 +18,13 @@ from fatebridge.core.almanac import (
 from fatebridge.core.timing import TimingAnalysis
 from fatebridge.core.timing_interactions import analyze_timing_interactions
 from fatebridge.services.birth_context import build_birth_computation_context
-from fatebridge.services.timing_state import build_current_timing_state
+from fatebridge.services.timing_state import (
+    build_current_timing_state,
+    serialize_element_effects,
+)
 from fatebridge.utils.birth_input import create_person_info
 from fatebridge.utils.civil_time import ZonedCalendar
+from tests.support.synthetic_dayun import synthetic_dayun_start
 
 NATAL = {
     "year": ("甲", "子"),
@@ -43,8 +47,10 @@ def fixed_jie(monkeypatch, birth, elapsed):
     monkeypatch.setattr(timing, "get_bazi_year", lambda *args: 2000)
 
 
-def test_three_days_conversion_matches_one_year_nine_months_example(monkeypatch):
-    # 三命通会·论大运: five days + three two-hour periods -> 630 nominal
+def test_three_days_conversion_matches_one_year_nine_months_example(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # 三命通会·论大运 -> None: five days + three two-hour periods -> 630 nominal
     # days -> one year nine months. This expected offset is not engine output.
     birth = datetime(2000, 5, 1)
     fixed_jie(monkeypatch, birth, timedelta(days=5, hours=6))
@@ -68,8 +74,8 @@ def test_three_days_conversion_matches_one_year_nine_months_example(monkeypatch)
     ],
 )
 def test_dayun_starts_at_boundary_without_waiting_for_birthday(
-    monkeypatch, delta, status, period
-):
+    monkeypatch: pytest.MonkeyPatch, delta, status: str | None, period: int | None
+) -> None:
     birth = datetime(2000, 5, 1)
     fixed_jie(monkeypatch, birth, timedelta(days=5, hours=6))
     result = TimingEffectsAnalysis.analyze_dayun_effects(
@@ -79,10 +85,14 @@ def test_dayun_starts_at_boundary_without_waiting_for_birthday(
     if period is not None:
         assert result["dayun_info"]["period"] == period
         assert result["age_info"]["selection_basis"] == "civil_calendar_moment"
+    else:
+        pass
 
 
 @pytest.mark.parametrize("offset,period", [(-1, 1), (0, 2), (1, 2)])
-def test_exact_decade_boundary_uses_half_open_intervals(monkeypatch, offset, period):
+def test_exact_decade_boundary_uses_half_open_intervals(
+    monkeypatch: pytest.MonkeyPatch, offset, period: int
+) -> None:
     birth = datetime(2000, 5, 1)
     fixed_jie(monkeypatch, birth, timedelta(days=5, hours=6))
     moment = datetime(2012, 2, 1) + timedelta(microseconds=offset)
@@ -102,7 +112,9 @@ def test_exact_decade_boundary_uses_half_open_intervals(monkeypatch, offset, per
     assert same["dayun_info"] == result["dayun_info"]
 
 
-def test_age_reference_does_not_round_before_period_selection(monkeypatch):
+def test_age_reference_does_not_round_before_period_selection(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     birth = datetime(2000, 5, 1)
     fixed_jie(monkeypatch, birth, timedelta(days=3.012))  # 1.004 reference years
     result = TimingEffectsAnalysis.analyze_dayun_effects(NATAL, birth, "男", 11)
@@ -111,8 +123,8 @@ def test_age_reference_does_not_round_before_period_selection(monkeypatch):
 
 
 def test_moment_and_explicit_age_are_separate_and_old_eighty_year_limit_is_gone(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     birth = datetime(2000, 5, 1)
     fixed_jie(monkeypatch, birth, timedelta(days=5, hours=6))
     by_age = TimingEffectsAnalysis.analyze_dayun_effects(NATAL, birth, "男", 1)
@@ -129,7 +141,9 @@ def test_moment_and_explicit_age_are_separate_and_old_eighty_year_limit_is_gone(
     )
 
 
-def test_all_shared_date_consumers_select_new_dayun_before_next_birthday(monkeypatch):
+def test_all_shared_date_consumers_select_new_dayun_before_next_birthday(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     person = create_person_info(2000, 5, 1, 0, gender="男", use_true_solar_time=False)
     context = build_birth_computation_context(person)
     fixed_jie(monkeypatch, datetime(2000, 5, 1), timedelta(days=5, hours=6))
@@ -141,34 +155,27 @@ def test_all_shared_date_consumers_select_new_dayun_before_next_birthday(monkeyp
     assert override["dayun_analysis"]["dayun_info"]["period"] == 1
 
 
-def test_shared_point_year_uses_lichun_not_civil_january():
+def test_shared_point_year_uses_lichun_not_civil_january() -> None:
     result = TimingEffectsAnalysis.analyze_liunian_effects(
         NATAL, 2026, moment=datetime(2026, 1, 20), timezone_name="Asia/Shanghai"
     )
     assert result["liunian_info"]["pillar"] == "乙巳"
 
 
-@pytest.mark.parametrize("god", ["正印", "七杀", "食神", "伤官", "正财", "偏财"])
-def test_ten_god_label_does_not_establish_fortune_or_financial_advice(god):
-    facts = TimingAnalysis._analyze_liuyue_fortune(god, [], {"nayin": "海中金"})
-    assert facts["fortune_score"] is None
-    assert facts["overall_fortune"] == "未判定"
-    advice = TimingAnalysis._generate_liuyue_suggestions(god, [], facts)
-    assert not any(
-        word in "".join(advice) for word in ("财运不错", "投资理财", "宜保守", "好时机")
-    )
-
-
-def test_combine_and_clash_never_receive_fixed_good_or_bad_score():
-    for left, right in (("子", "丑"), ("子", "午"), ("子", "卯")):
+def test_branch_pair_preserves_relation_and_assessment_scope() -> None:
+    for left, right, expected in (
+        ("子", "丑", "六合"),
+        ("子", "午", "六冲"),
+        ("子", "卯", "普通"),
+    ):
         result = TimingEffectsAnalysis._analyze_branch_combination(
             left, right, "流年", "大运"
         )
-        assert result["total_impact_score"] is None
+        assert [relation["type"] for relation in result["relations"]] == [expected]
         assert result["assessment_status"] == "context_required"
 
 
-def test_percentage_redistribution_is_not_a_strength_measure():
+def test_percentage_redistribution_is_not_a_strength_measure() -> None:
     result = TimingEffectsAnalysis.analyze_element_strength_changes(
         NATAL, {"liunian": {"stem": "甲", "branch": "子"}}
     )
@@ -178,7 +185,39 @@ def test_percentage_redistribution_is_not_a_strength_measure():
     assert result["method_id"] == "structural_element_share_v1"
 
 
-def test_suiyun_repeat_keeps_positions_and_has_no_event_or_fortune_claim():
+def test_timing_share_direction_comes_from_the_unrounded_difference() -> None:
+    natal = dict(zip(NATAL, (("戊", "寅"), ("己", "未"), ("癸", "亥"), ("戊", "午"))))
+    timing_pillars = {"liunian": {"stem": "辛", "branch": "未"}}
+    effects = TimingEffectsAnalysis.analyze_element_strength_changes(
+        natal, timing_pillars
+    )
+
+    # 地支本气和藏干以半单位计。土 11/26 -> 14/33，差为 50/429 个百分点。
+    assert effects["element_changes"]["土"] == {
+        "original": 550 / 13,
+        "new": 1400 / 33,
+        "change": 50 / 429,
+        "change_type": "占比上升",
+    }
+
+
+def test_timing_share_omits_an_exactly_unchanged_proportion() -> None:
+    natal = dict(zip(NATAL, (("丙", "寅"), ("庚", "寅"), ("庚", "寅"), ("壬", "午"))))
+    timing_pillars = {"liunian": {"stem": "甲", "branch": "午"}}
+    effects = TimingEffectsAnalysis.analyze_element_strength_changes(
+        natal, timing_pillars
+    )
+
+    assert effects["element_changes"]["木"] == {
+        "original": 100 / 3,
+        "new": 100 / 3,
+        "change": 0.0,
+        "change_type": "占比不变",
+    }
+    assert "木" not in serialize_element_effects(effects)["element_changes"]
+
+
+def test_suiyun_repeat_keeps_positions_and_has_no_event_or_fortune_claim() -> None:
     timing_pillars = {
         "dayun": {"stem": "甲", "branch": "子"},
         "liunian": {"stem": "甲", "branch": "子"},
@@ -193,7 +232,9 @@ def test_suiyun_repeat_keeps_positions_and_has_no_event_or_fortune_claim():
     assert result["assessment_status"] == "structural_evidence_only"
 
 
-def test_dynamic_completion_requires_three_distinct_branches_and_keeps_competing_clash():
+def test_dynamic_completion_requires_three_distinct_branches_and_keeps_competing_clash() -> (
+    None
+):
     # Natal 子辰 plus timing 申 completes a water triad, while natal 寅
     # simultaneously clashes with 申. Neither match erases the other.
     result = analyze_timing_interactions(
@@ -214,7 +255,7 @@ def test_dynamic_completion_requires_three_distinct_branches_and_keeps_competing
     assert not any(e["rule_id"] == "triple_combination" for e in result["relations"])
 
 
-def test_partial_punishment_is_not_reported_as_complete():
+def test_partial_punishment_is_not_reported_as_complete() -> None:
     partial = analyze_timing_interactions(
         NATAL, {"liunian": {"stem": "乙", "branch": "巳"}}
     )
@@ -239,7 +280,7 @@ def test_partial_punishment_is_not_reported_as_complete():
     )
 
 
-def test_timing_ten_gods_and_roots_are_facts_about_the_day_master():
+def test_timing_ten_gods_and_roots_are_facts_about_the_day_master() -> None:
     result = analyze_timing_interactions(
         NATAL, {"liunian": {"stem": "甲", "branch": "子"}}
     )
@@ -252,7 +293,7 @@ def test_timing_ten_gods_and_roots_are_facts_about_the_day_master():
     }
 
 
-def test_all_timing_relations_have_a_moving_participant_and_unique_id():
+def test_all_timing_relations_have_a_moving_participant_and_unique_id() -> None:
     result = analyze_timing_interactions(
         NATAL,
         {
@@ -268,7 +309,7 @@ def test_all_timing_relations_have_a_moving_participant_and_unique_id():
     assert len({e["id"] for e in result["relations"]}) == len(result["relations"])
 
 
-def test_invalid_ganzhi_is_rejected_instead_of_becoming_false_evidence():
+def test_invalid_ganzhi_is_rejected_instead_of_becoming_false_evidence() -> None:
     with pytest.raises(ValueError, match="六十甲子"):
         analyze_timing_interactions(NATAL, {"liunian": {"stem": "甲", "branch": "丑"}})
 
@@ -279,7 +320,7 @@ HKO = json.loads(
 
 
 @pytest.mark.parametrize("case", HKO["cases"], ids=lambda case: case["term"])
-def test_solar_terms_against_independent_hko_published_minutes(case):
+def test_solar_terms_against_independent_hko_published_minutes(case) -> None:
     terms = {
         term.name: term for term in get_solar_terms_for_year(2026, HKO["timezone"])
     }
@@ -308,30 +349,26 @@ def test_solar_terms_against_independent_hko_published_minutes(case):
     ],
 )
 def test_civil_dayun_boundary_dst_gap_and_fold_are_explicit(
-    monkeypatch, birth, zone, seconds, expected
-):
+    monkeypatch: pytest.MonkeyPatch, birth, zone: str, seconds: int, expected: str
+) -> None:
     monkeypatch.setattr(
         TimingAnalysis,
-        "calculate_dayun_start_details",
-        lambda *args: {
-            "elapsed_seconds": seconds,
-            "year_stem": "甲",
-            "start_age_unrounded": seconds / 86400 / 3,
-        },
+        "resolve_dayun_start",
+        lambda birth, gender, zone: synthetic_dayun_start(
+            birth, zone, seconds, forward=True
+        ),
     )
     result = TimingAnalysis.calculate_dayun_timeline(birth, "男", ("丙", "寅"), zone)
     assert result["start_at"] == expected
 
 
-def test_decades_do_not_accumulate_leap_day_clipping(monkeypatch):
+def test_decades_do_not_accumulate_leap_day_clipping(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(
         TimingAnalysis,
-        "calculate_dayun_start_details",
-        lambda *args: {
-            "elapsed_seconds": 0,
-            "year_stem": "甲",
-            "start_age_unrounded": 0,
-        },
+        "resolve_dayun_start",
+        lambda birth, gender, zone: synthetic_dayun_start(birth, zone, 0, forward=True),
     )
     result = TimingAnalysis.calculate_dayun_timeline(
         datetime(2024, 2, 29), "男", ("丙", "寅")

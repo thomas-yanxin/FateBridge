@@ -12,7 +12,7 @@ from types import SimpleNamespace
 
 import pytest
 
-import fatebridge.core.output_charts as outputs
+import fatebridge.core.contracts.output_charts as outputs
 from fatebridge.core.astro import position_motion, runtime
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.utils.errors import EphemerisSourceError
@@ -37,7 +37,7 @@ def reduction():
         pytest.fail("The checked decimal source-reduction service is missing")
 
 
-def test_reference_producer_and_original_failed_rows_remain_sealed():
+def test_reference_producer_and_original_failed_rows_remain_sealed() -> None:
     verify_source_files(FIXTURE)
     assert REFERENCE["candidate_imports"] is False
     assert REFERENCE["independent_ephemeris"] is False
@@ -52,7 +52,9 @@ def test_reference_producer_and_original_failed_rows_remain_sealed():
     REFERENCE["rows"],
     ids=lambda r: f"{r['body']}-{r['julian_day_tt']}-{r['frame']}",
 )
-def test_complete_motion_matches_the_sealed_source_model_and_retains_old_attempts(row):
+def test_complete_motion_matches_the_sealed_source_model_and_retains_old_attempts(
+    row,
+) -> None:
     swe = runtime.swe
     sidereal = row["frame"] == "Sidereal"
     runtime.ephemeris_call("set_sid_mode", swe.SIDM_LAHIRI, 0, 0)
@@ -93,11 +95,13 @@ def test_complete_motion_matches_the_sealed_source_model_and_retains_old_attempt
         assert receipt["precision_decimal_digits"] == 50
         assert receipt["displayed_native_position_changed"] is False
         assert receipt["independent_astronomical_accuracy_certified"] is False
+    else:
+        pass
     outputs.CompletePositionMotion.model_validate(policy)
     trace.finish()
 
 
-def test_stable_vector_identities_retain_exact_small_separations():
+def test_stable_vector_identities_retain_exact_small_separations() -> None:
     service = reduction()
     t = Fraction(1, 10**12)
     qx, qy = (1 - t * t) / (1 + t * t), 2 * t / (1 + t * t)
@@ -138,8 +142,8 @@ def setup_source():
     ],
 )
 def test_decimal_auxiliary_calls_retain_native_flag_value_and_model_guards(
-    fault, reason, monkeypatch
-):
+    fault: str, reason: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     service = reduction()
     epoch, trace, center = setup_source()
     original = runtime.ephemeris_call
@@ -148,6 +152,8 @@ def test_decimal_auxiliary_calls_retain_native_flag_value_and_model_guards(
         result = original(*args, **kwargs)
         if args[0] != "calc":
             return result
+        else:
+            pass
         values, returned = result
         if fault == "frame":
             returned &= ~runtime.swe.FLG_EQUATORIAL
@@ -175,7 +181,7 @@ def test_decimal_auxiliary_calls_retain_native_flag_value_and_model_guards(
     assert caught.value.reason == reason
 
 
-def test_decimal_auxiliary_calls_reject_changed_physical_context():
+def test_decimal_auxiliary_calls_reject_changed_physical_context() -> None:
     service = reduction()
     epoch, trace, center = setup_source()
     wrong = {**center, "file_ids": ["changed"]}
@@ -192,7 +198,9 @@ def test_decimal_auxiliary_calls_reject_changed_physical_context():
     assert caught.value.reason == "dependency_source_window_incoherent"
 
 
-def test_solar_mass_profile_cannot_be_silently_replaced(monkeypatch):
+def test_solar_mass_profile_cannot_be_silently_replaced(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     service = reduction()
     monkeypatch.setattr(
         service,
@@ -213,7 +221,9 @@ def test_solar_mass_profile_cannot_be_silently_replaced(monkeypatch):
         "independent_astronomical_accuracy_certified",
     ],
 )
-def test_receipt_cannot_claim_an_unperformed_position_or_accuracy_change(field):
+def test_receipt_cannot_claim_an_unperformed_position_or_accuracy_change(
+    field: str,
+) -> None:
     model = getattr(outputs, "DecimalApparentReduction", None)
     assert model is not None
     with pytest.raises(ValueError):

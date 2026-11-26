@@ -1,5 +1,7 @@
 """Verify bounded structured rendering and service snapshot round-tripping."""
 
+from copy import deepcopy
+
 from fatebridge.services.bazi import calculate_bazi_marriage, calculate_bazi_wealth
 from fatebridge.services.compatibility import calculate_compatibility_analysis
 from fatebridge.services.structured_snapshot import (
@@ -20,7 +22,7 @@ def _person(name: str, year: int) -> PersonInfo:
     )
 
 
-def test_renderer_emits_sectioned_format_and_translates_scalars():
+def test_renderer_emits_sectioned_format_and_translates_scalars() -> None:
     text = render_structured_snapshot_text(
         {"score": 88, "has_storage": True, "notes": ["稳健"]}, title="测试"
     )
@@ -31,7 +33,7 @@ def test_renderer_emits_sectioned_format_and_translates_scalars():
     assert "[说明]" in text  # notes -> 说明 section
 
 
-def test_renderer_bounds_deep_and_long_structures():
+def test_renderer_bounds_deep_and_long_structures() -> None:
     deep = {"a": {"b": {"c": {"d": {"e": {"f": 1}}}}}}
     assert "略" in render_structured_snapshot_text(deep, title="d")
 
@@ -42,7 +44,26 @@ def test_renderer_bounds_deep_and_long_structures():
     assert len(text.splitlines()) < 40
 
 
-def test_bazi_dimension_services_emit_roundtripping_snapshot():
+def test_public_filter_precedes_empty_inline_and_depth_rendering() -> None:
+    digest = "a" * 64
+    raw = {
+        "source_sha256": digest,
+        "empty": {"hash_scope": "internal"},
+        "items": [{"source_sha256": digest, "label": digest, "angle": -0.0}],
+        "deep": {"a": {"b": {"c": {"d": {"source_sha256": digest, "label": digest}}}}},
+    }
+    original = deepcopy(raw)
+    text = render_structured_snapshot_text(raw, title="公开事实")
+    assert text == (
+        "[概要]\n类型：公开事实\n\n"
+        f"[items]\n- label={digest}，angle=-0.0\n\n"
+        "[deep]\na：\n  b：\n    c：\n      d：\n        （1 项，略）"
+    )
+    assert raw == original
+    assert raw["items"][0]["angle"].hex() == (-0.0).hex()
+
+
+def test_bazi_dimension_services_emit_roundtripping_snapshot() -> None:
     for service in (calculate_bazi_marriage, calculate_bazi_wealth):
         result = service(_person("甲", 1990))
         assert "error" not in result
@@ -50,7 +71,7 @@ def test_bazi_dimension_services_emit_roundtripping_snapshot():
         assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 
-def test_compatibility_service_emits_roundtripping_snapshot():
+def test_compatibility_service_emits_roundtripping_snapshot() -> None:
     result = calculate_compatibility_analysis(_person("甲", 1990), _person("乙", 1992))
     assert "error" not in result
     assert result["snapshot_text"]

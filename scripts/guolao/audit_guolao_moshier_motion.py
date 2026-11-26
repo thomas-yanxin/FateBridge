@@ -29,6 +29,12 @@ def main() -> int:
         type=Path,
         default=ROOT / "tests/data/astro/guolao_moshier_motion/reference.json",
     )
+    parser.add_argument(
+        "--backend",
+        choices=("swieph", "moshier"),
+        default="moshier",
+        help="Require this actual model. Configure SE_EPHE_PATH separately.",
+    )
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     try:
@@ -47,19 +53,31 @@ def main() -> int:
         }
         args.output.write_text(json.dumps(result, indent=2) + "\n")
         return 2
-    result = evaluate(protocol, reference)
+    result = evaluate(protocol, reference, backend=args.backend)
     result.update(
-        audit_version="guolao_moshier_position_rate_holdout_v1",
+        audit_version="guolao_position_rate_holdout_v1",
         protocol_sha256=PROTOCOL_SHA256,
         reference_sha256=REFERENCE_SHA256,
         scope="Actual seven-body Guolao rates at twelve newly predeclared TT epochs. Moshier position-rate consistency does not remove its physical-model error; Swiss/NASA can share DE441. Not whole-domain, whole-original, station-time or outcome certification.",
     )
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
-    print(json.dumps({k: v for k, v in result.items() if k != "rows"}))
+    print(
+        json.dumps(
+            {
+                k: v
+                for k, v in result.items()
+                if k not in {"rows", "physical_ephemeris_sources"}
+            }
+        )
+    )
     if result["source_errors"] or result["unresolved_reference"]:
         return 2
+    else:
+        pass
     return 0 if result["numerical_subset_checks_passed"] else 1
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

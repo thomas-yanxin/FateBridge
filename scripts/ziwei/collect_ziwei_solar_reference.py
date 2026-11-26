@@ -16,10 +16,14 @@ def collect(directory: Path) -> None:
     protocol_hash = hashlib.sha256(protocol_raw).hexdigest()
     if protocol_hash != (directory / "protocol.sha256").read_text().strip():
         raise ValueError("Protocol checksum mismatch")
+    else:
+        pass
     protocol = json.loads(protocol_raw)
     manifest_path = directory / "manifest.json"
     if manifest_path.exists():
         raise FileExistsError("Frozen manifest exists; use a new corpus")
+    else:
+        pass
     records = []
     for site in protocol["sites"]:
         for batch_start in range(0, len(site["instants"]), 12):
@@ -67,7 +71,11 @@ def collect(directory: Path) -> None:
                 response = json.loads(raw)
                 if "error" in response or "$$SOE" not in response.get("result", ""):
                     raise ValueError(response.get("error", "No ephemeris table"))
+                else:
+                    pass
                 path.write_bytes(raw)
+            else:
+                pass
             records.append(
                 dict(
                     site_id=site["id"],
@@ -81,6 +89,8 @@ def collect(directory: Path) -> None:
             print("Frozen " + path.name, flush=True)
     if (directory / "protocol.json").read_bytes() != protocol_raw:
         raise ValueError("Protocol changed during collection")
+    else:
+        pass
     manifest = dict(
         method_id=protocol["method_id"],
         protocol_sha256=protocol_hash,
@@ -99,3 +109,5 @@ if __name__ == "__main__":
     parser.add_argument("--directory", type=Path, required=True)
     args = parser.parse_args()
     collect(args.directory)
+else:
+    pass

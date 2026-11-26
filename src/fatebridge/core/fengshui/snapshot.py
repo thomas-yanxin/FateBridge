@@ -1,6 +1,6 @@
 """Readable facts preserve the same method/subject scopes as structured JSON."""
 
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 from fatebridge.core.aa1996_solar import MODEL_ID as AA1996_SOLAR_MODEL
 from fatebridge.core.analytic_solar import MODEL_ID as ANALYTIC_SOLAR_MODEL
@@ -9,13 +9,12 @@ from fatebridge.core.de440_solar import (
 )
 from fatebridge.core.de440_solar import MODEL_ID as DE440_SOLAR_MODEL
 from fatebridge.core.de441_solar import MODEL_ID as DE441_SOLAR_MODEL
+from fatebridge.core.fengshui.host_guest import statements as host_guest_statements
+from fatebridge.core.fengshui.source_comparison import comparison_statements
 from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_SOLAR_MODEL
 
-from .host_guest import statements as host_guest_statements
-from .source_comparison import comparison_statements
 
-
-def _bazhai_scope(entry: Dict[str, Any]) -> str:
+def _bazhai_scope(entry: dict[str, Any]) -> str:
     subject = f"{entry['subject_kind']}:{entry['subject_id']}"
     if entry["subject_kind"] == "occupant":
         subject += f" 起法{entry['gender_convention']}"
@@ -28,7 +27,7 @@ def _bazhai_scope(entry: Dict[str, Any]) -> str:
     )
 
 
-def _bazhai_application(entry: Dict[str, Any]) -> str:
+def _bazhai_application(entry: dict[str, Any]) -> str:
     relation, trace = entry["palace_star_relationship"], entry["you_nian_trace"]
     star = entry["star"]
     return (
@@ -39,9 +38,9 @@ def _bazhai_application(entry: Dict[str, Any]) -> str:
     )
 
 
-def _calendar_cautions(layer: Dict[str, Any]) -> List[str]:
+def _calendar_cautions(layer: dict[str, Any]) -> list[str]:
     """Render actual clock policies without changing year or natal results."""
-    stack: List[Any] = [layer]
+    stack: list[Any] = [layer]
     historical = future = moshier = analytic = guarded_de440 = aa1996 = False
     vsop2013 = de441 = False
     while stack:
@@ -97,7 +96,7 @@ def _calendar_cautions(layer: Dict[str, Any]) -> List[str]:
     return lines
 
 
-def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
+def sections(result: dict[str, Any]) -> list[tuple[str, list[str]]]:
     output = [("起盘信息", [result["summary"], f"覆盖状态：{result['status']}"])]
     if "method_policy" in result:
         policy = result["method_policy"]
@@ -173,8 +172,13 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                         else "候选年跨运，尚不能选定唯一历史宅盘。"
                     )
                     lines.append(f"事件有效年待确认：{years}；{conclusion}")
-            lines.append(f"候选数：{len(layer['candidates'])}；状态：{layer['status']}")
-            for chart in layer["candidates"]:
+            charts = (
+                [layer["chart"]]
+                if layer.get("chart") is not None
+                else layer["candidates"]
+            )
+            lines.append(f"候选数：{len(charts)}；状态：{layer['status']}")
+            for chart in charts:
                 lines.append(
                     f"{chart['candidate_id']} {chart['sitting']['name']}山{chart['facing']['name']}向；{chart['chart_mode']}；{chart['mode_reason']}"
                 )
@@ -243,7 +247,12 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                 )
             comparison = layer.get("source_comparison")
             if comparison is not None:
-                lines.extend(text for _, text in comparison_statements(comparison))
+                lines.extend(
+                    text
+                    for _, text in comparison_statements(
+                        comparison, result["source_catalog"]
+                    )
+                )
             interpretation = layer.get("interpretation")
             if interpretation is not None:
                 lines.append(
@@ -645,9 +654,12 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
         (
             "规则来源",
             [
-                f"{ruleset['ruleset_id']}@{ruleset['version']} {source['source_id']} {source['title']} {source['url']}；范围：{source['scope']}"
+                f"{ruleset['ruleset_id']}@{ruleset['version']}：{'、'.join(ruleset['source_ids'])}"
                 for ruleset in result["rulesets"]
-                for source in ruleset["sources"]
+            ]
+            + [
+                f"{source_id} {source['title']} {source['url']}"
+                for source_id, source in result["source_catalog"].items()
             ],
         )
     )

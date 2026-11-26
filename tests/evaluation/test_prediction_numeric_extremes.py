@@ -6,8 +6,8 @@ from decimal import Decimal, localcontext
 
 import pytest
 
-from fatebridge.validation.predictions import evaluate_study
-from tests.evaluation.test_prediction_validation import AS_OF, forecast, outcome, plan
+from tests.unit_test.fixtures.prediction_study import AS_OF, forecast, outcome, plan
+from validation.predictions import evaluate_study
 
 
 def evaluate(baseline, probability):
@@ -24,8 +24,8 @@ def evaluate(baseline, probability):
     [(1e-200, 0.0, 1.0), (1e-200, 5e-201, 0.75), (1e-160, 5e-161, 0.75)],
 )
 def test_squared_loss_underflow_does_not_erase_an_identifiable_skill_ratio(
-    baseline, probability, expected
-):
+    baseline: float, probability: float, expected: float
+) -> None:
     result = evaluate(baseline, probability)
     with localcontext() as context:
         context.prec = 80
@@ -43,7 +43,9 @@ def test_squared_loss_underflow_does_not_erase_an_identifiable_skill_ratio(
 
 
 @pytest.mark.parametrize("baseline", [1e-160, 1e-200])
-def test_unrepresentably_bad_skill_is_explicit_and_never_passes_a_gate(baseline):
+def test_unrepresentably_bad_skill_is_explicit_and_never_passes_a_gate(
+    baseline: float,
+) -> None:
     result = evaluate(baseline, 1.0)
     metric = result["metrics"]
     assert metric["brier_skill_score"] is None
@@ -55,7 +57,7 @@ def test_unrepresentably_bad_skill_is_explicit_and_never_passes_a_gate(baseline)
     json.dumps(result, allow_nan=False)
 
 
-def test_zero_baseline_error_and_positive_underflow_remain_distinct():
+def test_zero_baseline_error_and_positive_underflow_remain_distinct() -> None:
     zero = evaluate(0.0, 0.0)["metrics"]
     tiny = evaluate(1e-200, 0.0)["metrics"]
     assert zero["brier_skill_score_status"] == "undefined_zero_baseline_loss"
@@ -68,7 +70,9 @@ def test_zero_baseline_error_and_positive_underflow_remain_distinct():
     )
 
 
-def test_ordinary_brier_ratio_keeps_its_existing_arithmetic_and_fixed_thresholds():
+def test_ordinary_brier_ratio_keeps_its_existing_arithmetic_and_fixed_thresholds() -> (
+    None
+):
     result = evaluate(0.5, 0.8)
     assert result["metrics"]["brier_skill_score"] == 1 - (0.8**2) / (0.5**2)
     assert result["metrics"]["brier_skill_score_status"] == "defined"

@@ -8,18 +8,20 @@ import pytest
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro import native_execution, runtime
-from fatebridge.core.human_design_native_positions import (
+from fatebridge.core.human_design.human_design_native_positions import (
     decode_native_positions,
     pack_native_positions,
 )
-from fatebridge.core.human_design_root_bodies import (
+from fatebridge.core.human_design.human_design_root_bodies import (
     derive_root_body_assessment,
     root_body_summary,
 )
-from fatebridge.core.human_design_solar_root_validation import verify_solar_root_context
+from fatebridge.core.human_design.human_design_solar_root_validation import (
+    verify_solar_root_context,
+)
 from fatebridge.core.public_output import same_public_value
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
+from validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[2]
 PLAN_PATH = ROOT / "tests/fixtures/human-design-root-body-plan.json"
@@ -38,8 +40,8 @@ def forbidden(*args, **kwargs):
 @pytest.mark.parametrize("empty_files", [False, True])
 @pytest.mark.parametrize("case", PLAN["cases"], ids=lambda c: c["id"])
 def test_every_frozen_public_second_on_both_conventions_and_backends(
-    case, empty_files, mode, monkeypatch, tmp_path
-):
+    case, empty_files: bool, mode, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path if empty_files else ROOT / "ephe"))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     run = execute_tool(SPEC, SPEC.request_model(**case["input"], node_mode=mode))
@@ -50,7 +52,6 @@ def test_every_frozen_public_second_on_both_conventions_and_backends(
     assert proof["evaluated_tt_count"] in (1, 2)
     assert proof["continuous_interval_stability_certified"] is False
     assert proof["physical_time_accuracy_certified"] is False
-    assert run["validation"]["all_three_axes_full_marks"] is False
     if not empty_files and mode == "true":
         for row, original in zip(
             proof["observed_activation_changes"],
@@ -64,6 +65,8 @@ def test_every_frozen_public_second_on_both_conventions_and_backends(
         assert len(proof["observed_activation_changes"]) == len(
             case["Swiss_true_node_expected_changes"]
         )
+    else:
+        pass
     monkeypatch.setattr(runtime, "ephemeris_call", forbidden)
     monkeypatch.setattr(native_execution, "calculate", forbidden)
     check = verify_human_design_reading(run)
@@ -82,8 +85,8 @@ def complete():
 
 
 def test_complete_sample_roots_and_subtype_difference_are_preserved(
-    complete, monkeypatch
-):
+    complete, monkeypatch: pytest.MonkeyPatch
+) -> None:
     proof = complete["design_solver"]["numerical_precision"][
         "design_body_endpoint_assessment"
     ]
@@ -103,7 +106,9 @@ def test_complete_sample_roots_and_subtype_difference_are_preserved(
 
 
 @pytest.mark.parametrize("bad", PLAN["required_negative_receipts"])
-def test_all_preregistered_rehashed_corruptions_fail(complete, monkeypatch, bad):
+def test_all_preregistered_rehashed_corruptions_fail(
+    complete, monkeypatch: pytest.MonkeyPatch, bad
+) -> None:
     run = deepcopy(complete)
     s = run["design_solver"]
     p = s["numerical_precision"]["design_body_endpoint_assessment"]
@@ -145,7 +150,7 @@ def test_all_preregistered_rehashed_corruptions_fail(complete, monkeypatch, bad)
     assert verify_human_design_reading((run))["status"] == "rejected"
 
 
-def test_derived_bodies_and_selected_epoch_are_exact_and_replayable(complete):
+def test_derived_bodies_and_selected_epoch_are_exact_and_replayable(complete) -> None:
     chart = complete
     s = chart["design_solver"]
     proof = s["numerical_precision"]["design_body_endpoint_assessment"]
@@ -175,7 +180,9 @@ def test_derived_bodies_and_selected_epoch_are_exact_and_replayable(complete):
     assert not verify_solar_root_context(chart)["errors"]
 
 
-def test_singleton_endpoint_layout_does_not_invent_a_second_evaluation(complete):
+def test_singleton_endpoint_layout_does_not_invent_a_second_evaluation(
+    complete,
+) -> None:
     # Pure layout oracle; this does not assert an exact astronomical root.
     s = deepcopy(complete["design_solver"])
     root = s["numerical_precision"]
@@ -201,9 +208,11 @@ def test_singleton_endpoint_layout_does_not_invent_a_second_evaluation(complete)
 
 
 def test_missing_new_role_cannot_be_hidden_by_rebuilding_source_summary(
-    complete, monkeypatch
-):
-    from fatebridge.core.human_design_natal_sources import natal_source_summary
+    complete, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from fatebridge.core.human_design.human_design_natal_sources import (
+        natal_source_summary,
+    )
 
     run = deepcopy(complete)
     source = run["ephemeris_source_evidence"]

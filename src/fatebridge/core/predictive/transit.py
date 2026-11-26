@@ -4,19 +4,19 @@ from __future__ import annotations
 
 from collections import Counter
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 from fatebridge.core.astro.birth import AstroBirthInfo
-from fatebridge.utils.timezones import parse_timezone_name
-
-from ._common import (
+from fatebridge.core.predictive._common import (
     TRANSIT_POINT_NAMES,
     build_subject,
     collect_aspect_hits,
     extract_named_longitudes,
     extract_named_points,
 )
-from .native_chart import NativeSubject
+from fatebridge.core.predictive.native_chart import NativeSubject
+from fatebridge.utils.civil_time import ZonedCalendar, utc_calendar
+from fatebridge.utils.timezones import format_local_time_or_utc, parse_timezone_name
 
 
 def build_transit_payload(
@@ -30,8 +30,10 @@ def build_transit_payload(
     house_system: str = "P",
     zodiac_type: str = "Tropic",
     orb_limit: float = 1.5,
-) -> Dict[str, Any]:
-    analysis_local = analysis_datetime.astimezone(parse_timezone_name(transit_timezone))
+) -> dict[str, Any]:
+    analysis_local = ZonedCalendar(
+        utc_calendar(analysis_datetime), parse_timezone_name(transit_timezone)
+    ).require_datetime()
     transit_subject = build_subject(
         name=f"{birth_info.name}-transit",
         local_datetime=analysis_local,
@@ -73,7 +75,7 @@ def build_transit_payload(
     )[:12]
     return {
         "calculation_basis": transit_subject.calculation_basis,
-        "analysis_datetime": analysis_local.isoformat(),
+        "analysis_datetime": format_local_time_or_utc(analysis_local),
         "location": {
             "longitude": transit_longitude,
             "latitude": transit_latitude,
@@ -83,7 +85,9 @@ def build_transit_payload(
         "exact_orb_limit": exact_orb_limit,
         "sun": transit_reference["sun"],
         "moon": transit_reference["moon"],
-        "ascendant": transit_reference["ascendant"],
+        "ascendant": (
+            transit_reference["ascendant"] if "Ascendant" in source_longitudes else None
+        ),
         "medium_coeli": transit_reference["medium_coeli"],
         "transit_reference": transit_reference,
         "natal_reference": natal_reference,

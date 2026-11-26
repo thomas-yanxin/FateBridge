@@ -2,14 +2,16 @@
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
 from fatebridge.services.divination import calculate_sukuyo_compatibility
 
 HISTORICAL = "japanese_naoj_historical_utc09"
 
 
 @pytest.mark.parametrize("civil", ["1346-08-30", "1346-08-29"])
-def test_heart_source_restriction_is_retained_beside_general_favorable_day(civil):
+def test_heart_source_restriction_is_retained_beside_general_favorable_day(
+    civil: str,
+) -> None:
     c = calendar_mansion(
         civil,
         time_text="23:30:00" if civil.endswith("29") else "12:00:00",
@@ -23,7 +25,9 @@ def test_heart_source_restriction_is_retained_beside_general_favorable_day(civil
 
 
 @pytest.mark.parametrize("part", [None, "first_half"])
-def test_unresolved_mansion_retains_conditional_rasetsu_meaning(part):
+def test_unresolved_mansion_retains_conditional_rasetsu_meaning(
+    part: str | None,
+) -> None:
     c = calendar_mansion(
         "1341-05-24",
         time_text="12:00:00",
@@ -39,7 +43,9 @@ def test_unresolved_mansion_retains_conditional_rasetsu_meaning(part):
     assert "未形成事项汇总" in d["reading_text"]
 
 
-def test_pair_native_preserves_input_uncovered_day_and_resolved_palace_sublayer():
+def test_pair_native_preserves_input_uncovered_day_and_resolved_palace_sublayer() -> (
+    None
+):
     r = calculate_sukuyo_compatibility(
         person1_name="甲",
         person1_date="1346-07-17",

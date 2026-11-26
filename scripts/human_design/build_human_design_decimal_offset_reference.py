@@ -31,6 +31,8 @@ def build(source: Path, compiler: str) -> dict:
         n: hashlib.sha256((source / n).read_bytes()).hexdigest() for n in SOURCE_FILES
     } != SOURCE_SHA256:
         raise ValueError("SOFA source differs from the pinned official release")
+    else:
+        pass
     raw_plan = (FIXTURE / "plan.json").read_bytes()
     plan = json.loads(raw_plan)
     expected_clocks = []
@@ -42,6 +44,8 @@ def build(source: Path, compiler: str) -> dict:
             micros = hours * Decimal(3600000000)
             if abs(hours) > 15 or micros != micros.to_integral_exact():
                 raise ValueError("Planned decimal offset cannot be represented exactly")
+            else:
+                pass
             local = datetime(
                 *(
                     values["birth_" + k]
@@ -58,6 +62,8 @@ def build(source: Path, compiler: str) -> dict:
                 raise ValueError(
                     "Frozen plan disagrees with independent Decimal arithmetic"
                 )
+            else:
+                pass
             expected_clocks.append(utc)
     cases = []
     with tempfile.TemporaryDirectory(prefix="fatebridge-decimal-sofa-") as directory:
@@ -82,6 +88,8 @@ def build(source: Path, compiler: str) -> dict:
                 "SOFA reference compiler failed: "
                 + result.stderr.decode(errors="replace")
             )
+        else:
+            pass
         sofa = ctypes.CDLL(str(library))
         number = ctypes.c_double
         pointer = ctypes.POINTER(number)
@@ -103,6 +111,8 @@ def build(source: Path, compiler: str) -> dict:
                 )
                 if status != 0:
                     raise ValueError("SOFA rejected a planned civil calendar label")
+                else:
+                    pass
                 exact = (
                     Fraction(a.value)
                     + Fraction(b.value)
@@ -141,6 +151,8 @@ def build(source: Path, compiler: str) -> dict:
                 )
                 if any(status < 0 for status in statuses):
                     raise ValueError("SOFA rejected a planned UTC label")
+                else:
+                    pass
                 fact = {
                     "axis": "UTC_TAI_TT",
                     "tt_jd1": e.value,
@@ -173,9 +185,13 @@ def main() -> None:
             raise SystemExit(
                 "Frozen decimal/SOFA reference differs; retain and investigate"
             )
+        else:
+            pass
     else:
         target.write_text(result)
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

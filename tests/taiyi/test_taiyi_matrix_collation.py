@@ -1,6 +1,7 @@
 """Source integrity and safeguards against turning column text into accuracy."""
 
 import shutil
+from pathlib import Path
 
 import pytest
 
@@ -12,7 +13,7 @@ from scripts.taiyi.audit_taiyi_matrix_collation import (
 )
 
 
-def test_source_index_does_not_resolve_six_differences_or_fill_blanks():
+def test_source_index_does_not_resolve_six_differences_or_fill_blanks() -> None:
     report = audit()
     assert report["recorded_physical_columns"] == 32
     assert report["required_target_cells"] == 128
@@ -47,7 +48,9 @@ def test_source_index_does_not_resolve_six_differences_or_fill_blanks():
     ]
 
 
-def test_repeated_text_in_parallel_strands_keeps_both_locations_without_palaces():
+def test_repeated_text_in_parallel_strands_keeps_both_locations_without_palaces() -> (
+    None
+):
     data = source_data()
     column = next(c for c in data["columns"]["columns"] if c["id"] == "巳-second")
     found = literal_locations(column, "門具將發")
@@ -72,7 +75,9 @@ def test_repeated_text_in_parallel_strands_keeps_both_locations_without_palaces(
         "correction-manifest.json",
     ],
 )
-def test_frozen_images_readings_and_correction_cannot_be_replaced(tmp_path, name):
+def test_frozen_images_readings_and_correction_cannot_be_replaced(
+    tmp_path: Path, name: str
+) -> None:
     copied = tmp_path / "corpus"
     shutil.copytree(CORPUS, copied)
     (copied / name).write_bytes(b"changed")

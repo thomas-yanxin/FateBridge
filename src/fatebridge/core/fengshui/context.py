@@ -4,18 +4,18 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, cast
+from typing import Any, Dict, Iterable, cast
 
-from .context_inputs import EnvironmentalContext
+from fatebridge.core.fengshui.context_inputs import EnvironmentalContext
 
 
 @lru_cache(maxsize=1)
-def _bundle() -> Dict[str, Any]:
+def _bundle() -> dict[str, Any]:
     path = Path(__file__).parents[2] / "data" / "fengshui" / "expert-policy-v1.json"
     return cast(Dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
-def expert_context_provenance() -> Dict[str, Any]:
+def expert_context_provenance() -> dict[str, Any]:
     data = _bundle()
     result = deepcopy(data["ruleset"])
     result["sources"] = [
@@ -26,11 +26,11 @@ def expert_context_provenance() -> Dict[str, Any]:
     return cast(Dict[str, Any], result)
 
 
-def _rule(key: str) -> Dict[str, Any]:
+def _rule(key: str) -> dict[str, Any]:
     return cast(Dict[str, Any], deepcopy(_bundle()["rules"][key]))
 
 
-def _association_scope(methods: Iterable[str], household_scope: str) -> Dict[str, Any]:
+def _association_scope(methods: Iterable[str], household_scope: str) -> dict[str, Any]:
     applicable = ["annual_stars", "monthly_stars", "xuankong_natal", "jinsuo"]
     selected = [method for method in methods if method in applicable]
     return {
@@ -48,7 +48,7 @@ def _association_scope(methods: Iterable[str], household_scope: str) -> Dict[str
 
 def _association(
     palace: str, kind: str, ready: bool, methods: Iterable[str], household_scope: str
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     data = _bundle()
     opposite = data["opposite_palaces"][palace]
     return {
@@ -66,11 +66,11 @@ def _association(
 
 
 def analyze_environmental_context(
-    context: Optional[EnvironmentalContext],
+    context: EnvironmentalContext | None,
     selected_methods: Iterable[str],
     *,
     non_directional_scope: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Review confirmed context without recalculating or grading any chart.
 
     ``confirmed_suitable`` is an explicit supplied assessment with evidence,
@@ -78,7 +78,7 @@ def analyze_environmental_context(
     of another suitable floor only under the complete, confirmed conditions.
     """
     methods = list(selected_methods)
-    result: Dict[str, Any] = {
+    result: dict[str, Any] = {
         "status": "not_requested" if context is None else "complete",
         "ruleset": expert_context_provenance(),
         "separation_policy": {
@@ -113,7 +113,7 @@ def analyze_environmental_context(
 
     supported = 0
     unsupported = 0
-    missing: List[str] = []
+    missing: list[str] = []
     trace_keys = ["separation"]
     orientation = context.orientation
     ready = orientation is not None and orientation.ready_for_sectors()
@@ -415,11 +415,6 @@ def analyze_environmental_context(
                     else "confirmed_fact_without_specific_taboo_rule"
                 ),
                 "priority": "low" if modern else "unranked_without_rule",
-                "recommendation": (
-                    "轻度提示，结合现代使用需要抓大放小；不据此要求拆改"
-                    if modern and observation.present
-                    else None
-                ),
                 "direction_inferred": False,
                 "action_required": False,
                 "evidence": observation.evidence,

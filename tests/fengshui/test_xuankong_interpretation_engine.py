@@ -103,7 +103,9 @@ def _assert_candidate_facts(original, interpreted, current):
         )
 
 
-def test_all_periods_mountains_lower_replacement_and_current_periods_preserve_chart():
+def test_all_periods_mountains_lower_replacement_and_current_periods_preserve_chart() -> (
+    None
+):
     # 9 natal periods × 24 mountains × centre/left/right × 9 evaluation periods.
     # This exercises 5,832 independent evaluations in one test, including five
     # yellow and replacement charts, without regenerating any numeric oracle.
@@ -145,7 +147,9 @@ def test_all_periods_mountains_lower_replacement_and_current_periods_preserve_ch
     assert evaluated == 5832
 
 
-def test_all_mountain_boundaries_keep_each_candidate_separate_with_complete_forms():
+def test_all_mountain_boundaries_keep_each_candidate_separate_with_complete_forms() -> (
+    None
+):
     config = _config(9)
     saw_distinct = False
     for natal_period in range(1, 10):
@@ -174,7 +178,7 @@ def test_all_mountain_boundaries_keep_each_candidate_separate_with_complete_form
     assert saw_distinct
 
 
-def test_every_returned_rule_and_source_resolves_to_the_versioned_bundle():
+def test_every_returned_rule_and_source_resolves_to_the_versioned_bundle() -> None:
     bundle = json.loads(
         (
             Path(__file__).parents[2]
@@ -197,6 +201,8 @@ def test_every_returned_rule_and_source_resolves_to_the_versioned_bundle():
                 assert set(value["source_ids"]) <= set(bundle["sources"])
                 assert value["conditions"]
                 observed_rules.add(value["rule_id"])
+            else:
+                pass
             for rule_id in value.get("related_rule_ids", []):
                 assert rule_id in registered
                 observed_rules.add(rule_id)
@@ -205,6 +211,8 @@ def test_every_returned_rule_and_source_resolves_to_the_versioned_bundle():
         elif isinstance(value, list):
             for child in value:
                 visit(child)
+        else:
+            pass
 
     visit(result)
     assert observed_rules == registered
@@ -213,7 +221,9 @@ def test_every_returned_rule_and_source_resolves_to_the_versioned_bundle():
     assert all(source["url"].startswith("https://") for source in sources)
 
 
-def test_new_crossfield_schema_rejects_runtime_invalid_whitespace_and_duplicate_sectors():
+def test_new_crossfield_schema_rejects_runtime_invalid_whitespace_and_duplicate_sectors() -> (
+    None
+):
     validator = Draft202012Validator(XuankongInterpretationRequest.model_json_schema())
     duplicate = _config(9).model_dump(mode="json")
     duplicate["external_forms"] = duplicate["external_forms"][:1] * 2

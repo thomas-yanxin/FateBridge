@@ -9,7 +9,7 @@ import pytest
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
+from validation.human_design import verify_human_design_reading
 
 FIXTURE = Path(__file__).parents[1] / "data/human_design/decimal_offset"
 PLAN = json.loads((FIXTURE / "plan.json").read_text())
@@ -22,7 +22,9 @@ SPEC = next(s for s in CATALOG if s.key == "human_design")
     list(zip(PLAN["valid_cases"], REFERENCE["cases"])),
     ids=[r["id"] for r in PLAN["valid_cases"]],
 )
-def test_every_original_case_matches_the_frozen_sofa_axis_and_full_reading(case, fact):
+def test_every_original_case_matches_the_frozen_sofa_axis_and_full_reading(
+    case, fact
+) -> None:
     assert case["id"] == fact["id"]
     value = execute_tool(SPEC, SPEC.request_model(**case["input"]))
     assert "error" not in value, value
@@ -41,5 +43,7 @@ def test_every_original_case_matches_the_frozen_sofa_axis_and_full_reading(case,
             value["time_scales"]["personality"]["future_leap_seconds_assumed_unchanged"]
             is True
         )
+    else:
+        pass
     check = verify_human_design_reading(value)
     assert check["status"] == "verified_fixed_template_reading", check

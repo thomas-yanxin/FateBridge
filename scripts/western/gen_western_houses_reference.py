@@ -32,6 +32,8 @@ def axes(armc, latitude, obliquity):
     horizon_crossing = np.cross(pole, zenith)
     if np.dot(horizon_crossing, east) < 0:
         horizon_crossing = -horizon_crossing
+    else:
+        pass
     meridian_crossing = np.cross(east, pole)
 
     def longitude(point):
@@ -53,6 +55,8 @@ def axes(armc, latitude, obliquity):
 def generate(protocol_path, executable):
     if importlib.metadata.version("pyerfa") != "2.0.1.5" or np.__version__ != "2.5.4":
         raise RuntimeError("Pinned pyerfa 2.0.1.5 and NumPy 2.5.4 required")
+    else:
+        pass
     protocol = json.loads(protocol_path.read_text())
     rows = []
     for epoch in protocol["epochs"]:
@@ -147,3 +151,5 @@ if __name__ == "__main__":
         len(report["cases"]),
         "sky geometries; all 13 method outputs retained",
     )
+else:
+    pass

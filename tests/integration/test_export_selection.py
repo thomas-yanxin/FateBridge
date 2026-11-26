@@ -1,14 +1,17 @@
 """Explicit export selections never broaden to unrequested sections."""
 
 import pytest
+from fastapi.testclient import TestClient
 
+from fatebridge.api import app
 from fatebridge.core.export_contracts import normalize_planet_info_setting
 from fatebridge.core.export_parser import parse_export_content
+from tests.fixtures.surface_payloads import REST_POST_CASES
 
 CONTENT = "[秘密]\nprivate\n\n[公开]\npublic"
 
 
-def test_unmatched_explicit_export_selection_returns_empty_text():
+def test_unmatched_explicit_export_selection_returns_empty_text() -> None:
     result = parse_export_content(
         technique="generic", content=CONTENT, selected_sections=["不存在"]
     )
@@ -17,19 +20,43 @@ def test_unmatched_explicit_export_selection_returns_empty_text():
     assert not any(section["included"] for section in result["sections"])
 
 
-def test_matching_export_selection_only_contains_requested_section():
+def test_matching_export_selection_only_contains_requested_section() -> None:
     result = parse_export_content(
         technique="generic", content=CONTENT, selected_sections=["公开"]
     )
     assert result["export_text"] == "[公开]\npublic"
 
 
-def test_empty_default_selection_keeps_existing_preset_behavior():
+def test_empty_default_selection_keeps_existing_preset_behavior() -> None:
     result = parse_export_content(technique="generic", content=CONTENT)
     assert result["export_text"] == CONTENT
 
 
-def test_unmatched_selection_excludes_untitled_preamble():
+def test_implicit_analysis_receipt_is_in_default_timing_export() -> None:
+    receipt = "[分析时刻依据]\n本次分析民用瞬间：2025-02-04T12:37:49.123456+08:00；UTC：2025-02-04T04:37:49.123456+00:00。"
+    query = "[查询信息]\n固定快照"
+    content = query + "\n\n" + receipt
+    for selected in (None, []):
+        parsed = parse_export_content(
+            technique="liushi_analysis", content=content, selected_sections=selected
+        )
+        assert parsed["export_text"] == content
+        assert parsed["unknown_detected_sections"] == []
+        assert (
+            parsed["settings_used"]["sections"]["liushi_analysis"][-1] == "分析时刻依据"
+        )
+    persisted = ["查询信息", "流时信息", "影响摘要", "来源"]
+    parsed = parse_export_content(
+        technique="liushi_analysis", content=content, selected_sections=persisted
+    )
+    assert parsed["selected_sections"] == persisted
+    assert parsed["export_text"] == query
+    absent = parse_export_content(technique="liushi_analysis", content=query)
+    assert absent["export_text"] == query
+    assert absent["missing_selected_sections"] == [*persisted[1:], "分析时刻依据"]
+
+
+def test_unmatched_selection_excludes_untitled_preamble() -> None:
     result = parse_export_content(
         technique="generic",
         content="private preamble\n[公开]\npublic",
@@ -39,7 +66,7 @@ def test_unmatched_selection_excludes_untitled_preamble():
     assert not any(section["included"] for section in result["sections"])
 
 
-def test_matching_selection_excludes_untitled_preamble():
+def test_matching_selection_excludes_untitled_preamble() -> None:
     result = parse_export_content(
         technique="generic",
         content="private preamble\n[公开]\npublic",
@@ -49,7 +76,7 @@ def test_matching_selection_excludes_untitled_preamble():
     assert result["sections"][0]["included"] is False
 
 
-def test_no_explicit_selection_preserves_untitled_preamble():
+def test_no_explicit_selection_preserves_untitled_preamble() -> None:
     content = "private preamble\n[公开]\npublic"
     result = parse_export_content(technique="generic", content=content)
     assert "private preamble" in result["export_text"]
@@ -84,7 +111,9 @@ def test_no_explicit_selection_preserves_untitled_preamble():
         ("sixyao", "卦辞", "卦辞与断语"),
     ],
 )
-def test_export_titles_match_exactly_without_former_aliases(technique, former, current):
+def test_export_titles_match_exactly_without_former_aliases(
+    technique: str, former: str, current: str
+) -> None:
     result = parse_export_content(
         technique=technique,
         content=f"[{former}]\nformer text\n\n[{current}]\ncurrent text",
@@ -104,7 +133,7 @@ def test_export_titles_match_exactly_without_former_aliases(technique, former, c
     assert former_selection["export_text"] == ""
 
 
-def test_planet_setting_uses_only_current_keys():
+def test_planet_setting_uses_only_current_keys() -> None:
     assert normalize_planet_info_setting({"showHouse": True, "showRuler": True}) == {
         "showHouse": 1,
         "showRuler": 1,
@@ -118,19 +147,16 @@ def test_planet_setting_uses_only_current_keys():
 @pytest.mark.parametrize(
     ("path", "technique"),
     [
-        ("/api/divination/tongshefa", "tongshefa"),
-        ("/api/divination/sixyao", "sixyao"),
-        ("/api/divination/sanshiunited", "sanshiunited"),
-        ("/api/cn/liureng/gods", "liureng"),
-        ("/api/cn/qimen", "qimen"),
+        ("/api/divination/combine-four-gua", "tongshefa"),
+        ("/api/divination/liuyao", "sixyao"),
+        ("/api/divination/sanshi", "sanshiunited"),
+        ("/api/liuren/chart", "liureng"),
+        ("/api/qimen", "qimen"),
     ],
 )
-def test_current_snapshot_producers_use_registered_section_titles(path, technique):
-    from fastapi.testclient import TestClient
-
-    from fatebridge.api import app
-    from tests.fixtures.surface_payloads import REST_POST_CASES
-
+def test_current_snapshot_producers_use_registered_section_titles(
+    path: str, technique: str
+) -> None:
     with TestClient(app) as client:
         response = client.post(path, json=REST_POST_CASES[path]())
     assert response.status_code == 200, response.text

@@ -3,6 +3,7 @@
 import asyncio
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -12,6 +13,8 @@ import fatebridge.api as api
 from fatebridge.application.examples import suggested_fields
 from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_chinese import Taiyi
+from fatebridge.core.contracts.output_taiyi_counts import TaiyiCountReading
 from fatebridge.core.metaphysics.taiyi_counts import (
     contextual_harmony,
     count_assessment,
@@ -19,20 +22,18 @@ from fatebridge.core.metaphysics.taiyi_counts import (
     counts_text,
 )
 from fatebridge.core.metaphysics.taiyi_year import count_categories, cyclic_core
-from fatebridge.core.output_chinese import Taiyi
-from fatebridge.core.output_taiyi_counts import TaiyiCountReading
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_count_readings import CORPUS, audit
 from tests.support.reference_data import resolve
-from tests.taiyi.test_taiyi_enclosures import transport_payload
-from tests.taiyi.test_taiyi_transports import _same_run_payload
+from tests.support.transports import SPECS, call_calculation
+from tests.unit_test.fixtures.taiyi import same_run_payload, transport_payload
 
 CASES = json.loads((CORPUS / "numeric-cases.json").read_text())["cases"]
 
 
-def test_all_five_source_profiles_and_unresolved_words_remain_visible():
+def test_all_five_source_profiles_and_unresolved_words_remain_visible() -> None:
     report = audit()
     assert report["source_numeric_domain"] == 40 and report["source_profiles"] == 5
     assert report["catalogue_transcriptions_match"] is True
@@ -45,7 +46,7 @@ def test_all_five_source_profiles_and_unresolved_words_remain_visible():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: str(c["count"]))
-def test_complete_frozen_domain_not_only_easy_or_harmonious_values(case):
+def test_complete_frozen_domain_not_only_easy_or_harmonious_values(case) -> None:
     n = case["count"]
     row = count_reading(n)
     assert count_categories(n) == case["expected_labels"]
@@ -58,14 +59,16 @@ def test_complete_frozen_domain_not_only_easy_or_harmonious_values(case):
 
 
 @pytest.mark.parametrize("value", [0, 41, 44, 48, True, False, 15.0, "15"])
-def test_invalid_count_is_not_coerced_or_extended_to_fit_source_variants(value):
+def test_invalid_count_is_not_coerced_or_extended_to_fit_source_variants(
+    value: bool | float | int | str,
+) -> None:
     with pytest.raises(ValueError):
         count_reading(value)
     with pytest.raises(ValueError):
         count_categories(value)
 
 
-def test_all_5120_same_core_context_combinations_use_their_own_reference():
+def test_all_5120_same_core_context_combinations_use_their_own_reference() -> None:
     # Literal physical and polarity maps, independent of production constants.
     palaces = {1: "乾", 2: "午", 3: "艮", 4: "卯", 6: "酉", 7: "坤", 8: "子", 9: "巽"}
     numbers = {1: "阴", 2: "阴", 3: "阳", 4: "阳", 6: "阴", 7: "阴", 8: "阳", 9: "阳"}
@@ -110,18 +113,18 @@ def test_all_5120_same_core_context_combinations_use_their_own_reference():
     assert total == 5120
 
 
-def test_unmapped_reference_remains_unknown_not_automatically_yin():
+def test_unmapped_reference_remains_unknown_not_automatically_yin() -> None:
     for ref, value in [("太乙", 5), ("文昌", "中"), ("始击", "未知")]:
         c = contextual_harmony(15, reference=ref, field="test", value=value)
         assert c["polarity"] is c["is_harmonious"] is None
 
 
-def test_boolean_reference_cannot_be_coerced_into_palace_one():
+def test_boolean_reference_cannot_be_coerced_into_palace_one() -> None:
     with pytest.raises(ValueError):
         contextual_harmony(15, reference="太乙", field="test", value=True)
 
 
-def test_literal_tiers_are_not_contextual_harmony_or_negative_membership():
+def test_literal_tiers_are_not_contextual_harmony_or_negative_membership() -> None:
     a = count_reading(23)
     assert a["literal_rank_status"] == "different_source_ranks"
     assert a["literal_rank_consensus"] is None
@@ -145,7 +148,7 @@ def test_literal_tiers_are_not_contextual_harmony_or_negative_membership():
     assert count_reading(15)["three_talents_inferred"] is False
 
 
-def test_actual_snapshot_and_all_assessment_projection_leaves_are_typed():
+def test_actual_snapshot_and_all_assessment_projection_leaves_are_typed() -> None:
     r = calculate_taiyi_analysis(**transport_payload("taiyi", 1915))
     b = r["taiyi"]
     a = b["count_assessment"]
@@ -172,8 +175,8 @@ def test_actual_snapshot_and_all_assessment_projection_leaves_are_typed():
     "mutation", ["drop_count", "edit_source_tier", "erase_out_of_range", "image"]
 )
 def test_expected_values_source_variants_and_images_cannot_be_erased(
-    tmp_path, mutation
-):
+    tmp_path: Path, mutation: str
+) -> None:
     target = tmp_path / "corpus"
     shutil.copytree(CORPUS, target)
     if mutation == "image":
@@ -196,8 +199,8 @@ def test_expected_values_source_variants_and_images_cannot_be_erased(
 
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 def test_actual_rest_mcp_cli_same_counts_source_gaps_and_corrected_labels(
-    key, monkeypatch, capsys
-):
+    key: str, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     fields = [
         "taiyi.core_board.main_count_des",
@@ -229,7 +232,8 @@ def test_actual_rest_mcp_cli_same_counts_source_gaps_and_corrected_labels(
         out = {}
         async with Client(create_mcp_app()) as c:
             for year in rest:
-                r = await c.call_tool(
+                r = await call_calculation(
+                    c,
                     spec.tool_name,
                     {
                         **transport_payload(key, year),
@@ -246,7 +250,13 @@ def test_actual_rest_mcp_cli_same_counts_source_gaps_and_corrected_labels(
 
     native = asyncio.run(mcp())
     for year in rest:
-        args = [key, "--strict-fields", "--no-use-true-solar-time", "--fields", *fields]
+        args = [
+            SPECS[key].tool_name,
+            "--strict-fields",
+            "--no-use-true-solar-time",
+            "--fields",
+            *fields,
+        ]
         for name, value in transport_payload(key, year).items():
             if name != "use_true_solar_time":
                 args.extend(
@@ -255,25 +265,30 @@ def test_actual_rest_mcp_cli_same_counts_source_gaps_and_corrected_labels(
                         json.dumps(value) if isinstance(value, dict) else str(value),
                     ]
                 )
+            else:
+                pass
         assert run(args) == 0
         cli = json.loads(capsys.readouterr().out)["taiyi"]
         assert rest[year] == native[year] == cli
         if year == 1908:
             assert "杜塞（淘金歌）" in cli["core_board"]["guest_count_des"]
             assert "三才足数" not in cli["core_board"]["guest_count_des"]
+        else:
+            pass
 
 
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 def test_published_count_view_preserves_every_requested_business_field_at_default_budget(
-    key,
-):
+    key: str,
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     view = "counts" if key == "taiyi" else "taiyi_counts"
 
     async def call():
         async with Client(create_mcp_app()) as c:
             for year in [1908, 1922, 1915]:
-                r = await c.call_tool(
+                r = await call_calculation(
+                    c,
                     spec.tool_name,
                     {
                         **transport_payload(key, year),
@@ -283,7 +298,7 @@ def test_published_count_view_preserves_every_requested_business_field_at_defaul
                     },
                     raise_on_error=False,
                 )
-                await _same_run_payload(c, r, require_business_inline=True)
+                await same_run_payload(c, r, require_business_inline=True)
                 a = r.structured_content["taiyi"]["count_assessment"]
                 assert len(a["entries"]) == 2
                 assert len(a["sources"]) == 5

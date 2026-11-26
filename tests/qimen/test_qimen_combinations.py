@@ -1,12 +1,20 @@
 """Conjunctive rules, retained source exceptions and frozen scan observations."""
 
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
 
-from fatebridge.validation.qimen import audit_scan_examples
-from tests.qimen.test_qimen_depth import fixed_board
+from fatebridge.core.almanac import SolarTerm
+from fatebridge.core.local_techniques.qimen import _render_qimen_pattern_line
+from fatebridge.core.metaphysics import qimen as engine
+from fatebridge.core.qimen import qimen_evidence
+from fatebridge.services.divination import calculate_sanshiunited_analysis
+from fatebridge.services.metaphysics import calculate_qimen_analysis
+from fatebridge.utils.civil_time import ZonedCalendar
+from tests.unit_test.fixtures.qimen import fixed_board, seed
+from validation.qimen import audit_scan_examples
 
 BUNDLE = Path(__file__).parents[1] / "fixtures/qimen_classical_v2"
 SCAN = json.loads((BUNDLE / "sources-and-cases.json").read_text())
@@ -17,7 +25,7 @@ def patterns(board, name):
 
 
 @pytest.mark.parametrize("case", SCAN["cases"], ids=lambda c: c["id"])
-def test_scan_observations_keep_the_disagreement_visible(case):
+def test_scan_observations_keep_the_disagreement_visible(case) -> None:
     report = audit_scan_examples(BUNDLE)
     row = next(r for r in report["rows"] if r["id"] == case["id"])
     if case["id"] == "de-shi-yin3-renchen":
@@ -38,7 +46,9 @@ def test_scan_observations_keep_the_disagreement_visible(case):
 
 
 @pytest.mark.parametrize("hour", ["庚午", "己卯", "戊子", "丁酉", "丙午", "乙卯"])
-def test_jade_gate_reads_actual_value_door_and_earth_ding(monkeypatch, hour):
+def test_jade_gate_reads_actual_value_door_and_earth_ding(
+    monkeypatch: pytest.MonkeyPatch, hour: str
+) -> None:
     b = fixed_board(monkeypatch, {"dun": "阳遁", "ju": 1, "hour": hour})
     p = patterns(b, "玉女守门")
     assert len(p) == 1 and p[0]["palace"] == "兑七宫"
@@ -48,7 +58,9 @@ def test_jade_gate_reads_actual_value_door_and_earth_ding(monkeypatch, hour):
     assert p[0]["qualification"]["outcome_inference_allowed"] is False
 
 
-def test_arbitrary_door_or_heaven_ding_is_not_jade_gate(monkeypatch):
+def test_arbitrary_door_or_heaven_ding_is_not_jade_gate(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     b = fixed_board(monkeypatch, {"dun": "阳遁", "ju": 1, "hour": "丁卯"})
     assert any(
         "丁" in p["heaven_stems"] or "丁" in p["earth_stems"] for p in b["palaces"]
@@ -56,7 +68,9 @@ def test_arbitrary_door_or_heaven_ding_is_not_jade_gate(monkeypatch):
     assert not patterns(b, "玉女守门")
 
 
-def test_de_shi_does_not_erase_adverse_pair_or_required_condition(monkeypatch):
+def test_de_shi_does_not_erase_adverse_pair_or_required_condition(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     b = fixed_board(monkeypatch, {"dun": "阳遁", "ju": 9, "hour": "庚午"})
     de = next(
         p
@@ -70,7 +84,9 @@ def test_de_shi_does_not_erase_adverse_pair_or_required_condition(monkeypatch):
     assert any(p["palace"] == de["palace"] for p in patterns(b, "青龙逃走"))
 
 
-def test_same_xun_leader_exception_is_observed_from_its_real_hosted_palace(monkeypatch):
+def test_same_xun_leader_exception_is_observed_from_its_real_hosted_palace(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # 阳三局，甲申庚在中，天禽寄地乙于坤；辛卯随时干至乾，
     # 乙与寄庚同到地辛宫，乙辛得使/逃走结构与本旬天禽同宫。
     b = fixed_board(monkeypatch, {"dun": "阳遁", "ju": 3, "hour": "辛卯"})
@@ -97,15 +113,17 @@ def test_same_xun_leader_exception_is_observed_from_its_real_hosted_palace(monke
     ],
 )
 def test_three_dun_structures_match_the_selected_scan_examples(
-    monkeypatch, ju, hour, name, palace
-):
+    monkeypatch: pytest.MonkeyPatch, ju, hour: str, name: str, palace: str
+) -> None:
     b = fixed_board(
         monkeypatch, {"dun": "阳遁" if ju > 0 else "阴遁", "ju": abs(ju), "hour": hour}
     )
     assert any(p["palace"] == palace for p in patterns(b, name))
 
 
-def test_heaven_dun_example_does_not_hide_its_door_pressure(monkeypatch):
+def test_heaven_dun_example_does_not_hide_its_door_pressure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     b = fixed_board(monkeypatch, {"dun": "阳遁", "ju": 4, "hour": "乙酉"})
     p = next(p for p in patterns(b, "天遁") if p["palace"] == "坎一宫")
     assert p["qualification"]["blocking_rule_names"] == ["门迫"]
@@ -113,14 +131,16 @@ def test_heaven_dun_example_does_not_hide_its_door_pressure(monkeypatch):
     assert p["qualification"]["outcome_inference_allowed"] is False
 
 
-def test_corrupt_frozen_scan_cannot_be_used_as_verified_reference(tmp_path):
+def test_corrupt_frozen_scan_cannot_be_used_as_verified_reference(
+    tmp_path: Path,
+) -> None:
     (tmp_path / "sources-and-cases.json").write_text(json.dumps(SCAN))
     (tmp_path / SCAN["scan"]["excerpt_file"]).write_bytes(b"changed bytes")
     with pytest.raises(ValueError, match="指纹"):
         audit_scan_examples(tmp_path)
 
 
-def test_scan_case_ledger_cannot_be_reduced_to_only_matching_examples():
+def test_scan_case_ledger_cannot_be_reduced_to_only_matching_examples() -> None:
     report = audit_scan_examples(BUNDLE)
     assert report["case_count"] == 19
     assert report["matched_case_count"] == 18
@@ -137,8 +157,9 @@ def test_scan_case_ledger_cannot_be_reduced_to_only_matching_examples():
     assert report["status"] == "incomplete"
 
 
-def test_snapshot_keeps_the_adverse_pair_and_unmet_condition(monkeypatch):
-    from fatebridge.core.local_techniques.qimen import _render_qimen_pattern_line
+def test_snapshot_keeps_the_adverse_pair_and_unmet_condition(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     b = fixed_board(monkeypatch, {"dun": "阳遁", "ju": 9, "hour": "庚午"})
     p = next(p for p in patterns(b, "三奇得使") if p["facts"]["heaven_stem"] == "乙")
@@ -147,8 +168,9 @@ def test_snapshot_keeps_the_adverse_pair_and_unmet_condition(monkeypatch):
     assert "仍须合看全局" in line
 
 
-def test_known_source_door_disagreement_stays_in_pattern_and_snapshot(monkeypatch):
-    from fatebridge.core.local_techniques.qimen import _render_qimen_pattern_line
+def test_known_source_door_disagreement_stays_in_pattern_and_snapshot(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     b = fixed_board(monkeypatch, {"dun": "阴遁", "ju": 3, "hour": "壬辰"})
     p = next(p for p in patterns(b, "三奇得使") if p["palace"] == "离九宫")
@@ -158,13 +180,9 @@ def test_known_source_door_disagreement_stays_in_pattern_and_snapshot(monkeypatc
     assert "原文杜门，本盘开门" in line
 
 
-def test_provider_provenance_includes_the_next_year_at_late_zi(monkeypatch):
-    from datetime import datetime
-    from types import SimpleNamespace
-
-    from fatebridge.core import qimen_evidence
-    from fatebridge.core.metaphysics import qimen as engine
-    from tests.qimen.test_qimen_depth import seed
+def test_provider_provenance_uses_actual_anchors_at_late_zi(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     monkeypatch.setattr(
         engine,
@@ -176,19 +194,25 @@ def test_provider_provenance_includes_the_next_year_at_late_zi(monkeypatch):
             "ju_number": 1,
         },
     )
+    # Calendar/provider facts only, not astronomical dates or a ju oracle.
+    # Late-Zi's effective year does not add a fourth solar dependency.
+    anchors = tuple(
+        SolarTerm(
+            name,
+            ZonedCalendar.from_datetime(datetime(year, month, 1, tzinfo=timezone.utc)),
+            resolution_provider=provider,
+        )
+        for name, year, month, provider in (
+            ("大雪", 2025, 12, "linear_1900_fallback"),
+            ("芒种", 2026, 6, "swisseph"),
+            ("大雪", 2026, 12, "swisseph"),
+        )
+    )
     monkeypatch.setattr(
-        qimen_evidence,
-        "get_solar_terms_for_year",
-        lambda year, *args: (
-            SimpleNamespace(
-                resolution_provider=(
-                    "linear_1900_fallback" if year == 2027 else "swisseph"
-                )
-            ),
-        ),
+        qimen_evidence, "zhirun_calendar_anchors", lambda *args: anchors
     )
     b = engine.build_qimen_board(seed(moment=datetime(2026, 12, 31, 23)))
-    assert 2027 in b["calendar_policy"]["term_grid_years_observed"]
+    assert b["calendar_policy"]["term_grid_years_observed"] == [2025, 2026]
     assert b["calendar_policy"]["precision_status"] == "approximate"
     assert b["calendar_policy"]["solar_term_providers"] == [
         "linear_1900_fallback",
@@ -204,8 +228,14 @@ def test_provider_provenance_includes_the_next_year_at_late_zi(monkeypatch):
     ],
 )
 def test_other_two_classical_de_shi_exceptions_keep_the_adverse_match(
-    monkeypatch, ju, hour, sky, earth, conflict, at
-):
+    monkeypatch: pytest.MonkeyPatch,
+    ju,
+    hour: str,
+    sky: str,
+    earth: str,
+    conflict: str,
+    at: str,
+) -> None:
     b = fixed_board(monkeypatch, {"dun": "阴遁", "ju": abs(ju), "hour": hour})
     de = next(
         p
@@ -219,9 +249,7 @@ def test_other_two_classical_de_shi_exceptions_keep_the_adverse_match(
     assert any(p["palace"] == at for p in patterns(b, conflict))
 
 
-def test_sanshi_snapshot_preserves_qimen_conflict_and_qualification():
-    from fatebridge.services.divination import calculate_sanshiunited_analysis
-    from fatebridge.services.metaphysics import calculate_qimen_analysis
+def test_sanshi_snapshot_preserves_qimen_conflict_and_qualification() -> None:
 
     aggregate = calculate_sanshiunited_analysis(
         date="2026-01-25",

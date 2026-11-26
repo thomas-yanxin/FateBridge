@@ -4,14 +4,17 @@ import hashlib
 import json
 import os
 import shutil
-from contextlib import nullcontext
+from contextlib import contextmanager, nullcontext
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import pytest
 
-from fatebridge.core import ephemeris_runtime, guolao, suzhan_astronomy
+from fatebridge.core import ephemeris_runtime
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
+from fatebridge.core.guolao import guolao
+from fatebridge.core.sukuyo import suzhan_astronomy
 
 pytestmark = pytest.mark.skipif(runtime.swe is None, reason="Swiss Ephemeris required")
 
@@ -53,8 +56,8 @@ def birth():
 
 @pytest.mark.parametrize("replacement_suffix", [b"\n", b"not valid JSON"])
 def test_metadata_fingerprint_is_from_the_bytes_read_before_calculation(
-    catalogue, monkeypatch, replacement_suffix
-):
+    catalogue, monkeypatch: pytest.MonkeyPatch, replacement_suffix: bytes
+) -> None:
     metadata = catalogue / "sources.json"
     original_bytes = metadata.read_bytes()
     expected = hashlib.sha256(original_bytes).hexdigest()
@@ -78,8 +81,8 @@ def test_metadata_fingerprint_is_from_the_bytes_read_before_calculation(
 
 @pytest.mark.parametrize("restore_during_lookup", [False, True])
 def test_native_lookup_cannot_switch_catalogue_after_its_hash_was_validated(
-    catalogue, monkeypatch, restore_during_lookup
-):
+    catalogue, monkeypatch: pytest.MonkeyPatch, restore_during_lookup: bool
+) -> None:
     original_bytes = (catalogue / "sefstars.txt").read_bytes()
     expected = suzhan_astronomy.build_equatorial_mansions(birth())
     replacement = original_bytes.replace(
@@ -101,6 +104,10 @@ def test_native_lookup_cannot_switch_catalogue_after_its_hash_was_validated(
                 replaced = True
             elif native_calls == 2 and restore_during_lookup:
                 (catalogue / "sefstars.txt").write_bytes(original_bytes)
+            else:
+                pass
+        else:
+            pass
         return original_call(name, *args, **kwargs)
 
     monkeypatch.setattr(runtime, "ephemeris_call", replace_catalogue_before_native_read)
@@ -121,33 +128,47 @@ def test_native_lookup_cannot_switch_catalogue_after_its_hash_was_validated(
 
 
 @pytest.mark.parametrize("fail_inside", [False, True])
-def test_captured_path_retains_auxiliary_search_order_and_cleans_up(
-    catalogue, tmp_path, fail_inside
-):
-    from fatebridge.core.fixed_star_paths import fixed_star_search_path
+def test_catalogue_snapshot_closes_before_cleanup_and_restores_operator_path(
+    catalogue, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fail_inside: bool
+) -> None:
+    from fatebridge.core import fixed_star_paths
 
     operator = tmp_path / "operator"
     operator.mkdir()
     captured_bytes = (catalogue / "sefstars.txt").read_bytes()
     cwd = Path.cwd()
-    environment = os.environ.get("SE_EPHE_PATH")
+    environment = str(operator)
+    monkeypatch.setenv("SE_EPHE_PATH", environment)
+    set_ephe_path = runtime.swe.set_ephe_path
+    applied = []
     captured_path = None
+
+    @contextmanager
+    def observe_cleanup(**kwargs):
+        with TemporaryDirectory(**kwargs) as directory:
+            nonlocal captured_path
+            captured_path = Path(directory)
+            yield directory
+            assert (captured_path / "sefstars.txt").read_bytes() == captured_bytes
+            assert applied[-1] == (environment, environment)
+
+    def observe_path(path):
+        applied.append((path, os.environ.get("SE_EPHE_PATH")))
+        return set_ephe_path(path)
+
+    monkeypatch.setattr(fixed_star_paths, "TemporaryDirectory", observe_cleanup)
+    monkeypatch.setattr(runtime.swe, "set_ephe_path", observe_path)
     error_context = (
         pytest.raises(RuntimeError, match="synthetic") if fail_inside else nullcontext()
     )
     with error_context:
-        with fixed_star_search_path(
-            catalogue, str(operator), catalogue_bytes=captured_bytes
-        ) as search:
-            directories = [Path(p).resolve() for p in search.split(os.pathsep)]
-            assert directories[1:] == [catalogue.resolve(), operator.resolve()]
-            assert len(os.fsencode(search)) <= 242
-            captured_path = directories[0]
-            assert captured_path != catalogue.resolve()
-            (catalogue / "sefstars.txt").write_bytes(b"changed after capture")
-            assert (captured_path / "sefstars.txt").read_bytes() == captured_bytes
+        with fixed_star_paths.fixed_star_catalogue(runtime.swe, captured_bytes):
+            assert applied[0] == (str(captured_path), None)
+            assert captured_path is not None and not captured_path.exists()
             if fail_inside:
                 raise RuntimeError("synthetic native failure")
+            else:
+                pass
     assert captured_path is not None and not captured_path.exists()
     assert Path.cwd() == cwd
     assert os.environ.get("SE_EPHE_PATH") == environment
@@ -155,7 +176,7 @@ def test_captured_path_retains_auxiliary_search_order_and_cleans_up(
 
 def test_next_consistently_updated_bundle_gets_new_receipts_without_stale_cache(
     catalogue,
-):
+) -> None:
     original = suzhan_astronomy.build_equatorial_mansions(birth())
     changed = (catalogue / "sefstars.txt").read_bytes() + b"\n# synthetic version B\n"
     (catalogue / "sefstars.txt").write_bytes(changed)

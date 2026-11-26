@@ -1,193 +1,34 @@
-"""Jinjing monthly and hourly frames, with explicit modern clock conventions.
-
-The classical rules and the calendar adapter are separate: resolved Jie/solstice
-instants are astronomical, while civil-clock vs apparent-solar double hours are
-named conventions. Neither is relabelled as a reconstructed Tang calendar.
-"""
+"""Build Taiyi month and hour boards from their selected calendar frames."""
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List
+from datetime import date
+from typing import Any
 
-from fatebridge.core.almanac import (
-    SolarTerm,
-    _solar_terms_for_context_year,
-    get_solar_terms_for_year,
-    is_calculated_solar_term,
-    localize_datetime,
-)
+from fatebridge.core.almanac import elapsed_seconds_between, localize_datetime
+from fatebridge.core.metaphysics.common import MetaphysicsSeed
+from fatebridge.core.metaphysics.taiyi_board import assemble_board, calendar_summary
+from fatebridge.core.metaphysics.taiyi_clock import SOLAR_ANCHOR_SCOPE
+from fatebridge.core.metaphysics.taiyi_gates import attach_gate_board
 from fatebridge.core.metaphysics.taiyi_geometry import BRANCHES, SOURCES
-from fatebridge.core.solar_model_policy import solar_context_input_years
-from fatebridge.utils.solar_time import calculate_equation_of_time_minutes
-
-from .common import MetaphysicsSeed
-from .taiyi_hour import (
+from fatebridge.core.metaphysics.taiyi_historical import source_date_reference
+from fatebridge.core.metaphysics.taiyi_hour import (
     DEFAULT_HOUR_PROFILE,
-    HOUR_PROFILES,
     KEY_HOUR_PROFILE,
     KEY_SOURCE,
+    double_hour_slot,
 )
-from .taiyi_hour import double_hour_slot as _slot
-from .taiyi_hour import key_hour_origin
-from .taiyi_month import (
+from fatebridge.core.metaphysics.taiyi_month import (
     DEFAULT_MONTH_PROFILE,
     KEY_MONTH_PROFILE,
-    MONTH_PROFILES,
-    jinjing_month_origin,
-    key_month_origin,
     month_calendar_reference,
 )
-from .taiyi_origin_selection import winter_origin_selection
-from .taiyi_year import assemble_board, calendar_summary, cyclic_core
+from fatebridge.core.metaphysics.taiyi_origin_selection import winter_origin_selection
+from fatebridge.core.metaphysics.taiyi_period_frame import period_frame as period_frame
+from fatebridge.core.metaphysics.taiyi_year import cyclic_core
+from fatebridge.utils.civil_time import gregorian_date_parts
 
-JIE_ORDER = (
-    "大雪",
-    "小寒",
-    "立春",
-    "惊蛰",
-    "清明",
-    "立夏",
-    "芒种",
-    "小暑",
-    "立秋",
-    "白露",
-    "寒露",
-    "立冬",
-)
 MODE_LABELS = {"month": "月计", "hour": "时计"}
-SOLAR_ANCHOR_SCOPE = (
-    "记录本次实际采用的节气对象；resolution_provider是接口来源，ephemeris_model才是实际轨道模型。"
-    "对象日名按其所标时区，不代替本盘所选钟面日名。"
-    "钟时沿用声明的现代时标政策，1960年前为所选UT1/ΔT模型标签，1960—1971按已声明的漂移UTC适配；微秒输出不认证实测精度或原书古历。"
-)
-
-
-def _previous_term(instant: datetime, names: tuple[str, ...]) -> SolarTerm:
-    """Compare UTC instants, including year and timezone/DST transitions."""
-    utc = instant.astimezone(timezone.utc)
-    # Source coverage belongs to the resolved civil input year, before UTC
-    # or apparent-solar clock conversion. An endpoint input still needs the
-    # previous year's winter/Jie; reuse the almanac's private guard without
-    # authorizing a standalone request for that outside year.
-    context_year = instant.year
-    low, high = solar_context_input_years(context_year)
-    candidates: List[SolarTerm] = []
-    for year in range(max(1, context_year - 1), min(9999, context_year + 1) + 1):
-        terms = (
-            _solar_terms_for_context_year(year, "UTC", context_year)
-            if low <= context_year <= high and not low <= year <= high
-            else get_solar_terms_for_year(year, "UTC")
-        )
-        candidates.extend(t for t in terms if t.name in names and t.moment <= utc)
-    if not candidates:
-        raise ValueError("无法取得起盘之前的太乙节气锚点")
-    term = max(candidates, key=lambda t: t.moment)
-    if not is_calculated_solar_term(term):
-        raise ValueError("太乙月/日/时计要求天文节气实刻，不能使用线性近似回退")
-    return term
-
-
-def _clock(moment: datetime, seed: MetaphysicsSeed) -> datetime:
-    if seed.applied_true_solar:
-        if seed.longitude is None:
-            raise ValueError("太乙真太阳时计需要明确经度")
-        utc = moment.astimezone(timezone.utc)
-        # A local apparent clock is independent of the timezone representation
-        # and of summer-time folds/gaps: UTC + longitude + equation of time.
-        return utc.replace(tzinfo=None) + timedelta(
-            minutes=4 * seed.longitude + calculate_equation_of_time_minutes(utc)
-        )
-    return moment.astimezone(
-        localize_datetime(seed.input_datetime, seed.timezone).tzinfo
-    ).replace(tzinfo=None)
-
-
-def period_frame(
-    seed: MetaphysicsSeed,
-    mode: str,
-    hour_profile: str | None = None,
-    month_profile: str | None = None,
-) -> Dict[str, Any]:
-    if month_profile is not None and (
-        mode != "month"
-        or not isinstance(month_profile, str)
-        or month_profile not in MONTH_PROFILES
-    ):
-        raise ValueError("month_profile仅用于month，须选择已发布月计配置")
-    if hour_profile is not None and (
-        mode != "hour"
-        or not isinstance(hour_profile, str)
-        or hour_profile not in HOUR_PROFILES
-    ):
-        raise ValueError("hour_profile仅用于hour计法，须明确选择已发布时计配置")
-    instant = localize_datetime(seed.input_datetime, seed.timezone)
-    from .taiyi_clock import validate_seed_civil_clock
-
-    validate_seed_civil_clock(seed)
-    if mode == "month":
-        term = _previous_term(instant, JIE_ORDER)
-        month_offset = JIE_ORDER.index(term.name)
-        # Adapt vol.1's six year classes to the Gregorian year of 大雪.
-        # This existing year-label choice is explicit in month_origin;
-        # it does not adjudicate the source's 前十一月 wording.
-        # January 小寒 belongs to the preceding 大雪-to-大雪 counting year.
-        cycle_year = (
-            term.moment.year
-            if term.name == "大雪"
-            else term.moment.year - int(term.name == "小寒")
-        )
-        if term.name not in ("大雪", "小寒"):
-            cycle_year -= 1
-        origin = jinjing_month_origin(cycle_year, month_offset)
-        accumulation = origin["accumulation"]
-        if month_profile == KEY_MONTH_PROFILE:
-            origin = key_month_origin(cycle_year, month_offset)
-            accumulation = origin["accumulation"]
-        return {
-            "accumulation": accumulation,
-            "yin": False,
-            "ruler_branch": BRANCHES[month_offset],
-            "anchor": term,
-            "cycle_year": cycle_year,
-            "month_offset": month_offset,
-            "month_origin": origin,
-        }
-    if mode != "hour":
-        raise ValueError(
-            "本节月/时计入口仅支持month/hour；其他计法请调用build_taiyi_board"
-        )
-    term = _previous_term(instant, ("冬至", "夏至"))
-    anchor_clock = _clock(term.moment, seed)
-    target_clock = _clock(instant, seed)
-    if hour_profile == KEY_HOUR_PROFILE:
-        winter = _previous_term(instant, ("冬至",))
-        origin = key_hour_origin(_clock(winter.moment, seed), target_clock)
-        origin.update(
-            winter_anchor_utc=winter.moment.astimezone(timezone.utc).isoformat(),
-            winter_anchor_provider=winter.resolution_provider,
-        )
-        return {
-            "accumulation": origin["accumulation"],
-            "yin": term.name == "夏至",
-            "ruler_branch": BRANCHES[_slot(target_clock) % 12],
-            "anchor": term,
-            "anchor_clock": anchor_clock,
-            "target_clock": target_clock,
-            "hour_origin": origin,
-            "winter_anchor": winter,
-        }
-    accumulation = _slot(target_clock) - _slot(anchor_clock) + 1
-    if accumulation < 1:
-        raise ValueError("太乙时计的时钟序列早于所选至点，不能静默倒推")
-    return {
-        "accumulation": accumulation,
-        "yin": term.name == "夏至",
-        "ruler_branch": BRANCHES[_slot(target_clock) % 12],
-        "anchor": term,
-        "anchor_clock": anchor_clock,
-        "target_clock": target_clock,
-    }
 
 
 def build_period_board(
@@ -196,14 +37,20 @@ def build_period_board(
     mode: str,
     hour_profile: str | None = None,
     month_profile: str | None = None,
-) -> Dict[str, Any]:
-    from .taiyi_gates import attach_gate_board
+    *,
+    shiji_profile: str | None = None,
+) -> dict[str, Any]:
 
     instant = localize_datetime(seed.input_datetime, seed.timezone)
     frame = period_frame(seed, mode, hour_profile, month_profile)
     is_key_month = mode == "month" and month_profile == KEY_MONTH_PROFILE
     is_key_hour = mode == "hour" and hour_profile == KEY_HOUR_PROFILE
-    core = cyclic_core(frame["accumulation"], yin=frame["yin"])
+    hour_clock_basis = (
+        "local_apparent_solar" if seed.applied_true_solar else "civil_wall_clock"
+    )
+    core = cyclic_core(
+        frame["accumulation"], yin=frame["yin"], shiji_profile=shiji_profile
+    )
     ruler = frame["ruler_branch"]
     # A month/hour branch is a time label, not the annual 太岁. Do not put it
     # in suijun or render the annual name on a monthly/hourly board.
@@ -213,7 +60,7 @@ def build_period_board(
     # uses the day: vol. 1's 庚申日/戊寅时 worked example explicitly gives 巳.
     he_anchor = seed.pillars["day"][1] if mode == "hour" and not is_key_hour else ruler
     core["heshen"] = BRANCHES[(1 - BRANCHES.index(he_anchor)) % 12]
-    board: Dict[str, Any] = assemble_board(core, calculation_mode=mode)
+    board: dict[str, Any] = assemble_board(core, calculation_mode=mode)
     term = frame["anchor"]
     label = MODE_LABELS[mode]
     profile = DEFAULT_MONTH_PROFILE if mode == "month" else "jinjing_hour_solstice_v1"
@@ -237,7 +84,7 @@ def build_period_board(
         ).isoformat(),
         "timezone": seed.timezone,
         "anchor_name": term.name,
-        "anchor_utc": term.moment.astimezone(timezone.utc).isoformat(),
+        "anchor_utc": term.calendar.utc.isoformat(),
         "anchor_provider": term.resolution_provider,
         "counter": frame["accumulation"],
         "boundary_instant_basis": "civil_utc_instant",
@@ -249,10 +96,8 @@ def build_period_board(
         ),
         "counter_rule_source": SOURCES["1"]
         + ("#推六紀月建法" if mode == "month" else "#推冬夏二至以後太乙所在法"),
-        "anchor_precision": "按秒返回的天文求解；独立年历按分钟验收，不认证亚秒实测精度",
-        "seconds_from_anchor": (
-            instant.astimezone(timezone.utc) - term.moment
-        ).total_seconds(),
+        "anchor_precision": "以保留民用主点选锚并计算距锚秒数；独立年历按分钟验收",
+        "seconds_from_anchor": elapsed_seconds_between(term.point, instant),
     }
     if mode == "month":
         calendar.update(
@@ -287,14 +132,11 @@ def build_period_board(
                 + frame["month_origin"]["scope"],
             )
     else:
+        target_hour_slot = double_hour_slot(frame["target_clock"])
         calendar.update(
             {
                 "hour_profile": hour_profile or DEFAULT_HOUR_PROFILE,
-                "clock_basis": (
-                    "local_apparent_solar"
-                    if seed.applied_true_solar
-                    else "civil_wall_clock"
-                ),
+                "clock_basis": hour_clock_basis,
                 "anchor_clock": frame["anchor_clock"].isoformat(),
                 "target_clock": frame["target_clock"].isoformat(),
                 "double_hour_start": "23:00_Zi",
@@ -306,12 +148,11 @@ def build_period_board(
                     else "钟表标签按IANA时区重复或跳过；不是恒定UTC历时计数"
                 ),
                 "counter_formula": "target_slot - anchor_slot + 1",
-                "target_slot": _slot(frame["target_clock"]),
-                "anchor_slot": _slot(frame["anchor_clock"]),
+                "target_slot": target_hour_slot,
+                "anchor_slot": double_hour_slot(frame["anchor_clock"]),
             }
         )
         if is_key_hour:
-            from .taiyi_historical import source_date_reference
 
             calendar.update(
                 input_calendar="proleptic_gregorian",
@@ -322,17 +163,20 @@ def build_period_board(
                 initial_interval="积时从冬至前甲子日子初连续计算；二至仅换遁，夏至不把积时归一",
                 modern_conventions="冬至前甲子日计数取所选现代钟面，23时子初换日；不等同原书古历夜半或完整唐历时实",
             )
-            reference = source_date_reference(
-                datetime.fromisoformat(
-                    frame["hour_origin"]["target_effective_date"]
-                ).date(),
-                "hour",
-                frame["accumulation"],
-                frame["hour_origin"]["target_day_ganzhi"],
-                ruler,
+            year, month, day = gregorian_date_parts(target_hour_slot // 12)
+            historical_reference = (
+                source_date_reference(
+                    date(year, month, day),
+                    "hour",
+                    frame["accumulation"],
+                    frame["hour_origin"]["target_day_ganzhi"],
+                    ruler,
+                )
+                if 1 <= year <= 9999
+                else None
             )
-            if reference:
-                calendar["historical_date_reference"] = reference
+            if historical_reference:
+                calendar["historical_date_reference"] = historical_reference
     board.update(
         {
             "style_label": f"太乙金镜式经·{label}",
@@ -426,7 +270,7 @@ def build_period_board(
         board["winter_origin_selection"] = winter_origin_selection(
             frame["hour_origin"],
             board["solar_anchors"]["winter_origin"],
-            calendar["clock_basis"],
+            hour_clock_basis,
         )
     board["long_cycles"] = {
         "status": "not_computed_for_selected_mode",

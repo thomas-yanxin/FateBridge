@@ -23,13 +23,13 @@ AUTHOR = (
 
 
 @pytest.mark.parametrize("argument", [0, -4, Q(22, 7), 1000000, -1000000])
-def test_sine_encloses_numerical_replay_without_using_libm_as_a_bound(argument):
+def test_sine_encloses_numerical_replay_without_using_libm_as_a_bound(argument) -> None:
     a, b = sine(I(argument)).bounds()
     assert a <= b and b - a < Q("1e-60")
     assert abs(float((a + b) / 2) - math.sin(float(argument))) < 1e-15
 
 
-def test_author_native_full_series_replays_enclosed_implicit_models():
+def test_author_native_full_series_replays_enclosed_implicit_models() -> None:
     raw = AUTHOR.read_bytes()
     native = NativeModel(raw)
     try:
@@ -43,7 +43,7 @@ def test_author_native_full_series_replays_enclosed_implicit_models():
         native.close()
 
 
-def test_extrapolation_keeps_its_documented_accuracy_scope():
+def test_extrapolation_keeps_its_documented_accuracy_scope() -> None:
     raw = AUTHOR.read_bytes()
     assert prediction(Q(2451545), MODELS[0], raw)["model_accuracy_scope"].startswith(
         "documented_1950"
@@ -55,7 +55,7 @@ def test_extrapolation_keeps_its_documented_accuracy_scope():
         coefficients(raw + b"\n")
 
 
-def test_disjoint_incomplete_and_unavailable_clocks_cannot_be_promoted():
+def test_disjoint_incomplete_and_unavailable_clocks_cannot_be_promoted() -> None:
     pred = {"predicted_JD_TDB": ["10", "11"]}
     inv = {
         "status": "bracketed",

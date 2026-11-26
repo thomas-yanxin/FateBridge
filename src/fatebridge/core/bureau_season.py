@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import Any, Mapping, Tuple
+from typing import Any, Mapping
 
 from fatebridge.core.element_presence import SOURCE as BOOK_SOURCE
 from fatebridge.utils.data import (
@@ -33,7 +33,7 @@ KNOWN_PHASE_GATES = {
 
 
 def build_bureau_season_reference(
-    pillars: Mapping[str, Tuple[str, str]], assessment: Mapping[str, Any]
+    pillars: Mapping[str, tuple[str, str]], assessment: Mapping[str, Any]
 ) -> dict[str, Any]:
     """Do not recompute a missing assessment or replace its relation decisions."""
     month = pillars["month"][1]

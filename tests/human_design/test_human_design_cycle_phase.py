@@ -8,9 +8,12 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core.human_design_cycles import PHASE_METHOD, derive_body_contacts
+from fatebridge.core.human_design.human_design_cycles import (
+    PHASE_METHOD,
+    derive_body_contacts,
+)
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
+from validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[2]
 PLAN_PATH = ROOT / "tests/fixtures/human-design-cycle-phase-plan.json"
@@ -31,7 +34,9 @@ def direct_residual(longitude, natal, target):
 
 
 @pytest.mark.parametrize("birth,natal,body", CASES)
-def test_all_24_known_analytic_roots_remain_in_the_reported_bracket(birth, natal, body):
+def test_all_24_known_analytic_roots_remain_in_the_reported_bracket(
+    birth, natal, body
+) -> None:
     rate = Fraction(body["target_arc"], body["target_offset_days"])
     original = Fraction(natal)
     origin = Fraction(birth)
@@ -84,7 +89,7 @@ def complete():
 
 def test_real_contacts_have_direct_source_bound_residuals_and_no_phase_assignment(
     complete,
-):
+) -> None:
     context = complete["cycle_context"]
     assert [len(row["contacts"]) for row in context["bodies"]] == [1, 3, 3]
     for row in context["bodies"]:
@@ -122,8 +127,8 @@ def test_real_contacts_have_direct_source_bound_residuals_and_no_phase_assignmen
     ],
 )
 def test_forged_residual_and_precision_claims_are_rejected_even_after_rehash(
-    complete, tamper
-):
+    complete, tamper: str
+) -> None:
     value = deepcopy(complete)
     row = value["cycle_context"]["bodies"][0]
     event = row["contacts"][0]

@@ -4,6 +4,7 @@ import asyncio
 import json
 from copy import deepcopy
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -11,7 +12,7 @@ from pydantic import ValidationError
 import fatebridge.application.execution as execution
 from fatebridge.application.examples import suggested_fields
 from fatebridge.core.classical_passage import build_passage_evidence
-from fatebridge.core.output_passage_relations import PassageRelationContext
+from fatebridge.core.contracts.output_passage_relations import PassageRelationContext
 from fatebridge.core.passage_relations import build_passage_relation_context
 from tests.bazi.test_bazi_complete_anchors import TOOLS, base, projection
 from tests.support.result_delivery import reconstruct
@@ -53,11 +54,15 @@ def controlled(assessment=None):
                 },
             ],
         }
+    else:
+        pass
     passage = build_passage_evidence(pillars, assessment)
     return build_passage_relation_context(passage, assessment)
 
 
-def test_visible_combination_does_not_bind_hidden_stems_and_zero_remaining_root_keeps_context():
+def test_visible_combination_does_not_bind_hidden_stems_and_zero_remaining_root_keeps_context() -> (
+    None
+):
     c = controlled()
     PassageRelationContext.model_validate(c)
     nodes = {n["node_id"]: n for n in c["nodes"]}
@@ -71,7 +76,9 @@ def test_visible_combination_does_not_bind_hidden_stems_and_zero_remaining_root_
     assert c["effective_passage"] == "not_adjudicated"
 
 
-def test_missing_and_supplied_empty_receipts_are_distinct_and_partial_reads_remain_valid():
+def test_missing_and_supplied_empty_receipts_are_distinct_and_partial_reads_remain_valid() -> (
+    None
+):
     missing = controlled({})
     empty = controlled({"relations": [], "hidden_stem_ledger": []})
     assert missing["events"] is None and missing["source_relation_count"] is None
@@ -89,7 +96,7 @@ def test_missing_and_supplied_empty_receipts_are_distinct_and_partial_reads_rema
                 )
 
 
-def test_unknown_event_kind_is_retained_without_guessing_plane_or_effect():
+def test_unknown_event_kind_is_retained_without_guessing_plane_or_effect() -> None:
     c = controlled(
         {
             "relations": [
@@ -107,7 +114,7 @@ def test_unknown_event_kind_is_retained_without_guessing_plane_or_effect():
     assert c["effective_passage"] == "not_adjudicated"
 
 
-def test_returned_receipts_do_not_share_mutable_event_objects_with_assessment():
+def test_returned_receipts_do_not_share_mutable_event_objects_with_assessment() -> None:
     a = {
         "relations": [
             {
@@ -127,7 +134,7 @@ def test_returned_receipts_do_not_share_mutable_event_objects_with_assessment():
 @pytest.mark.parametrize("fault", range(11))
 def test_suppressed_pending_conditions_wrong_planes_and_invented_effects_are_rejected(
     fault,
-):
+) -> None:
     c = controlled()
     if fault == 0:
         c["events"][0]["plane"] = "branch"
@@ -157,8 +164,8 @@ def test_suppressed_pending_conditions_wrong_planes_and_invented_effects_are_rej
 
 @pytest.mark.parametrize("tool", TOOLS)
 def test_all_actual_surfaces_return_same_relation_context_and_partial_schema(
-    tool, rest, tmp_path, capsys
-):
+    tool, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     spec = SPECS[tool]
     fields = suggested_fields(spec, view="passage_relations")
     payload = base(tool)["arguments"]
@@ -198,8 +205,12 @@ def test_all_actual_surfaces_return_same_relation_context_and_partial_schema(
 
 @pytest.mark.parametrize("tool", TOOLS)
 def test_new_version_missing_context_fails_before_unrelated_projection(
-    tool, rest, tmp_path, capsys, monkeypatch
-):
+    tool,
+    rest,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     spec = SPECS[tool]
     original = execution.execute_spec
 
@@ -222,6 +233,8 @@ def test_new_version_missing_context_fails_before_unrelated_projection(
                 return result
 
             actual = replace(actual, bind=lambda _: (missing, (), {}))
+        else:
+            pass
         return original(actual, parsed)
 
     monkeypatch.setattr(execution, "execute_spec", corrupt)
@@ -247,12 +260,14 @@ def test_new_version_missing_context_fails_before_unrelated_projection(
     if spec.rest_path is not None:
         http = rest.post(spec.rest_path, json=payload, params=opts)
         assert http.status_code == 500 and http.json()["error_code"] == "internal_error"
+    else:
+        pass
 
 
 @pytest.mark.parametrize("tool", TOOLS)
 def test_small_budget_restores_exact_same_run_relation_context_without_recalculation(
     tool, store
-):
+) -> None:
     spec = SPECS[tool]
     fields = suggested_fields(spec, view="passage_relations")
     result = asyncio.run(

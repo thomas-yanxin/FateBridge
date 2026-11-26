@@ -8,11 +8,11 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.core.contracts.output_chinese import JinkouRelations
 from fatebridge.core.metaphysics.jinkou_relations import structural_relations
-from fatebridge.core.output_chinese import JinkouRelations
 from fatebridge.services.metaphysics import calculate_jinkou_analysis
-from tests.ren.test_ren_classical_depth import AUDIT as CLASSICAL
-from tests.ren.test_ren_transports import PAYLOAD
+from scripts.ren import audit_ren_classical
+from tests.unit_test.fixtures.ren_protocol import REN_PROTOCOL_PAYLOAD
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -23,7 +23,7 @@ AUDIT = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(AUDIT)
 
 
-def test_complete_source_rule_matrices_keep_true_and_false_relations():
+def test_complete_source_rule_matrices_keep_true_and_false_relations() -> None:
     report = AUDIT.audit()
     assert report["totals"] == {"si_jue": 720, "si_bai_seats": 180, "calendar": 1296}
     assert report["selected_rule_checks_passed"]
@@ -38,8 +38,8 @@ def test_complete_source_rule_matrices_keep_true_and_false_relations():
 
 @pytest.mark.parametrize("god,general,phase", [("午", "亥", "火"), ("巳", "子", "水")])
 def test_scan_corrects_swapped_transcription_phases_without_changing_pairs(
-    god, general, phase
-):
+    god: str, general: str, phase: str
+) -> None:
     rows = AUDIT.literal_rows(dict(人元="甲", 贵神=god, 将神=general, 地分="辰"))
     result = structural_relations(
         rows, year_branch="午", day_branch="申", hour_branch="酉"
@@ -56,7 +56,9 @@ def test_scan_corrects_swapped_transcription_phases_without_changing_pairs(
     assert primary["original_pdf_page"] == variant["original_pdf_page"] == 109
 
 
-def test_generic_twelve_stage_extinction_is_not_substituted_for_the_named_pairs():
+def test_generic_twelve_stage_extinction_is_not_substituted_for_the_named_pairs() -> (
+    None
+):
     # A wood phase with 申 is not sufficient: this chapter names 卯申, not 寅申.
     rows = AUDIT.literal_rows(dict(人元="甲", 贵神="寅", 将神="申", 地分="辰"))
     result = structural_relations(
@@ -68,8 +70,8 @@ def test_generic_twelve_stage_extinction_is_not_substituted_for_the_named_pairs(
     assert missing["status"] == "missing_birth_branch"
 
 
-def test_existing_book_rows_and_use_are_preserved_with_new_relations():
-    board = CLASSICAL.observe_jinkou(
+def test_existing_book_rows_and_use_are_preserved_with_new_relations() -> None:
+    board = audit_ren_classical.observe_jinkou(
         dict(day="丙申", hour="丑", ground="巳", general="子")
     )
     assert (
@@ -82,9 +84,11 @@ def test_existing_book_rows_and_use_are_preserved_with_new_relations():
     assert board["ruleset"]["classical_acceptance_passed"] is False
 
 
-def test_snapshot_and_selected_shensha_export_use_only_actual_matched_relations():
+def test_snapshot_and_selected_shensha_export_use_only_actual_matched_relations() -> (
+    None
+):
     result = calculate_jinkou_analysis(
-        **PAYLOAD, di_fen="酉", selected_sections=["四位神煞"]
+        **REN_PROTOCOL_PAYLOAD, di_fen="酉", selected_sections=["四位神煞"]
     )
     assert "error" not in result
     relations = result["jinkou"]["relations"]
@@ -93,6 +97,8 @@ def test_snapshot_and_selected_shensha_export_use_only_actual_matched_relations(
             if row["matched"]:
                 assert row["basis"] in result["snapshot_text"]
                 assert row["basis"] in result["snapshot_export"]["export_text"]
+            else:
+                pass
     assert "大绝未计算" in result["snapshot_export"]["export_text"]
     invalid = deepcopy(relations)
     invalid["si_jue"]["checks"][0]["matched"] = "false"
@@ -100,7 +106,7 @@ def test_snapshot_and_selected_shensha_export_use_only_actual_matched_relations(
         JinkouRelations.model_validate(invalid)
 
 
-def test_primary_source_manifest_rejects_changed_phase_labels(tmp_path):
+def test_primary_source_manifest_rejects_changed_phase_labels(tmp_path: Path) -> None:
     target = tmp_path / "relations"
     shutil.copytree(AUDIT.CORPUS, target)
     path = target / "reference.json"

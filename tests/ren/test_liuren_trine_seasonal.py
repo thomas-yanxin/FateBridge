@@ -5,15 +5,18 @@ import hashlib
 import json
 import shutil
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
+from fatebridge.core.contracts.output_chinese import Liuren
+from fatebridge.core.contracts.output_liuren_trine_seasonal import (
+    LiurenNominalTrineSeasonal,
+)
 from fatebridge.core.metaphysics.liureng import build_liureng_board
 from fatebridge.core.metaphysics.liureng_trine_seasonal import nominal_seasonal_evidence
-from fatebridge.core.output_chinese import Liuren
-from fatebridge.core.output_liuren_trine_seasonal import LiurenNominalTrineSeasonal
 from scripts.ren.audit_liuren_seasonal import seed_for
 from scripts.ren.audit_liuren_trine_seasonal import CORPUS, FIELD, audit, reference
 from tests.fixtures.ren_anchors import ANCHOR_PAYLOADS as PAYLOADS
@@ -33,8 +36,8 @@ def source_board():
     "fault", ["data", "manifest", "missing", "extra", "joint_rewrite"]
 )
 def test_literal_reference_and_full_triple_inventory_cannot_be_rewritten(
-    fault, tmp_path
-):
+    fault: str, tmp_path: Path
+) -> None:
     target = tmp_path / "ref"
     shutil.copytree(CORPUS, target)
     p = target / "reference.json"
@@ -46,6 +49,8 @@ def test_literal_reference_and_full_triple_inventory_cannot_be_rewritten(
             m = json.loads((target / "freeze.json").read_text())
             m[p.name] = hashlib.sha256(p.read_bytes()).hexdigest()
             (target / "freeze.json").write_text(json.dumps(m))
+        else:
+            pass
     elif fault == "manifest":
         (target / "freeze.json").write_text("{}")
     elif fault == "missing":
@@ -56,7 +61,7 @@ def test_literal_reference_and_full_triple_inventory_cannot_be_rewritten(
         reference(target)
 
 
-def test_all_ordered_triples_and_months_match_literal_nominal_powers():
+def test_all_ordered_triples_and_months_match_literal_nominal_powers() -> None:
     r = audit()
     assert r["selected_component_checks_passed"] and not r["failures"]
     assert r["counts"] == dict(
@@ -72,7 +77,9 @@ def test_all_ordered_triples_and_months_match_literal_nominal_powers():
     )
 
 
-def test_summer_wood_example_keeps_water_wood_and_earth_as_separate_raw_phases():
+def test_summer_wood_example_keeps_water_wood_and_earth_as_separate_raw_phases() -> (
+    None
+):
     b = source_board()
     Liuren.model_validate(b)
     assert [
@@ -107,7 +114,9 @@ def test_summer_wood_example_keeps_water_wood_and_earth_as_separate_raw_phases()
         {"nominal_element": "木", "nominal_power": "休"},
     ],
 )
-def test_missing_month_or_nominal_phase_stays_unknown_without_inventing_data(value):
+def test_missing_month_or_nominal_phase_stays_unknown_without_inventing_data(
+    value,
+) -> None:
     assert (
         LiurenNominalTrineSeasonal.model_validate(value).model_dump(exclude_unset=True)
         == value
@@ -115,14 +124,16 @@ def test_missing_month_or_nominal_phase_stays_unknown_without_inventing_data(val
 
 
 @pytest.mark.parametrize("value", [True, 0, 1, None])
-def test_component_does_not_gain_a_full_named_course_certificate(value):
+def test_component_does_not_gain_a_full_named_course_certificate(
+    value: bool | int | None,
+) -> None:
     with pytest.raises(ValidationError):
         LiurenNominalTrineSeasonal.model_validate(
             {"full_named_course_adjudicated": value}
         )
 
 
-def test_no_nominal_earth_trine_is_invented():
+def test_no_nominal_earth_trine_is_invented() -> None:
     with pytest.raises(ValueError):
         nominal_seasonal_evidence("午", "土")
     with pytest.raises(ValidationError):
@@ -138,7 +149,9 @@ def test_no_nominal_earth_trine_is_invented():
         ("month_branch", "子"),
     ],
 )
-def test_own_board_month_phase_and_source_bind_every_present_context(field, value):
+def test_own_board_month_phase_and_source_bind_every_present_context(
+    field: str, value: str
+) -> None:
     b = source_board()
     bad = copy.deepcopy(b)
     e = next(
@@ -151,7 +164,9 @@ def test_own_board_month_phase_and_source_bind_every_present_context(field, valu
         Liuren.model_validate(bad)
 
 
-def test_root_month_anchor_rejects_coherent_foreign_month_even_without_other_raw_anchors():
+def test_root_month_anchor_rejects_coherent_foreign_month_even_without_other_raw_anchors() -> (
+    None
+):
     b = source_board()
     trines = copy.deepcopy(b["transmission_relations"]["trines"])
     e = next(t for t in trines if t["branches_complete"])
@@ -165,7 +180,9 @@ def test_root_month_anchor_rejects_coherent_foreign_month_even_without_other_raw
         )
 
 
-def test_coarse_same_group_cannot_mask_a_wrong_literal_power(monkeypatch):
+def test_coarse_same_group_cannot_mask_a_wrong_literal_power(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from fatebridge.core.metaphysics.liureng_seasonal import POWERS
 
     monkeypatch.setitem(POWERS["春"], "金", "死")
@@ -178,8 +195,8 @@ def test_coarse_same_group_cannot_mask_a_wrong_literal_power(monkeypatch):
     "key", ["liureng_gods", "liureng_runyear", "jinkou", "sanshiunited"]
 )
 def test_all_four_entrypoints_deliver_new_context_identically_on_three_ports(
-    key, surface_calls
-):
+    key: str, surface_calls
+) -> None:
     spec = SPECS[key]
     fields = [
         "liureng.transmission_relations.trines",
@@ -202,8 +219,8 @@ def test_all_four_entrypoints_deliver_new_context_identically_on_three_ports(
 @pytest.mark.parametrize("fault", ["delete", "forge"])
 @pytest.mark.parametrize("project", [False, True])
 def test_full_result_cannot_hide_missing_or_forged_new_evidence_before_projection(
-    fault, project, monkeypatch, surface_calls
-):
+    fault: str, project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     spec = SPECS["liureng_gods"]
     fn, args, kwargs = spec.bind(
         spec.request_model.model_validate(PAYLOADS["liureng_gods"])
@@ -230,6 +247,8 @@ def test_full_result_cannot_hide_missing_or_forged_new_evidence_before_projectio
             actual = replace(
                 actual, bind=lambda _: (lambda: copy.deepcopy(bad), (), {})
             )
+        else:
+            pass
         return original(actual, request)
 
     monkeypatch.setattr(execution, "execute_spec", broken)
@@ -241,6 +260,8 @@ def test_full_result_cannot_hide_missing_or_forged_new_evidence_before_projectio
         params.update(fields="analysis_type", strict_fields="true")
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
         options.update(fields=fields, strict_fields=True)
+    else:
+        pass
     http, mcp, code, cli = surface_calls(
         spec,
         PAYLOADS["liureng_gods"],

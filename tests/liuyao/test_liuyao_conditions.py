@@ -8,56 +8,25 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.liuyao_judgment import (
+from fatebridge.core.liuyao.liuyao_judgment import (
     MANIFEST,
     STAGES,
     build_conditional_analysis,
+    clash,
     kinship,
     month_strength,
     role_against_focus,
 )
-from fatebridge.core.local_techniques.sixyao import (
-    _build_sixyao_enrichment,
-    _lines_from_codes,
-    build_sixyao_result,
-)
+from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from fatebridge.core.requests.divination import SixYaoRequest
-from fatebridge.utils.timezones import parse_timezone_name
+from tests.unit_test.fixtures.liuyao import conditional_case, mounted_lines
 
 ROOT = Path(__file__).parents[1] / "fixtures"
 REFERENCE = json.loads((ROOT / "liuyao-conditional-reference-v2.json").read_text())
 INPUT = {"date": "2026-10-22", "time": "12:00:00", "zone": "Asia/Shanghai"}
 
 
-def mounted(code, changed):
-    info, enrichment = _build_sixyao_enrichment(code, changed, "甲")
-    lines = _lines_from_codes(code, changed)
-    for line, extra in zip(lines, enrichment):
-        line.update(extra)
-        if line["change"]:
-            line["changed_branch"] = extra["changed_branch"] or extra["branch"]
-    return info, lines
-
-
-def conditional_case(case, **overrides):
-    info, lines = mounted(case["base_code"], case["changed_code"])
-    # No civil date was provided by these excerpts. Timing is disabled in
-    # source comparisons; this clock is test infrastructure, not a recovered date.
-    args = dict(
-        lines=lines,
-        hidden=[],
-        month=case["month_branch"],
-        day_ganzhi=case["day_ganzhi"],
-        palace=info["current_palace_element"],
-        moment=datetime(2026, 10, 22, 12, tzinfo=parse_timezone_name("Asia/Shanghai")),
-        focus_line=case["focus_line"],
-        focus_kinship=None,
-        timing_days=0,
-    )
-    return build_conditional_analysis(**{**args, **overrides})
-
-
-def test_frozen_depth_sources_match_runtime_revision_hashes():
+def test_frozen_depth_sources_match_runtime_revision_hashes() -> None:
     raw = json.loads((ROOT / "liuyao-zengshan-depth-v2.json").read_text())
     for record in raw["chapters"]:
         assert (
@@ -70,7 +39,7 @@ def test_frozen_depth_sources_match_runtime_revision_hashes():
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"], ids=lambda case: case["id"])
-def test_classical_structures_and_conditional_edges(case):
+def test_classical_structures_and_conditional_edges(case) -> None:
     result = conditional_case(case)
     assert result["focus"]["selected"]["branch"] == case["expected_focus_branch"]
     roles = {str(r["position"]): r["role"] for r in result["focus"]["roles"]}
@@ -88,8 +57,12 @@ def test_classical_structures_and_conditional_edges(case):
             base_edges[tuple(case["expected_held_edge"])]["effect_status"]
             == "combination_holds_outgoing_candidate"
         )
+    else:
+        pass
     if "expected_base_edge" in case:
         assert tuple(case["expected_base_edge"]) in base_edges
+    else:
+        pass
     for pair in case.get("expected_base_edges", []):
         assert tuple(pair) in base_edges
     for edge in result["interaction_edges"]:
@@ -101,6 +74,10 @@ def test_classical_structures_and_conditional_edges(case):
                     edge["relation"]
                     == case["expected_transform_parent"][str(edge["source_position"])]
                 )
+            else:
+                pass
+        else:
+            pass
     if "expected_hidden_moving_position" in case:
         row = result["lines"][case["expected_hidden_moving_position"] - 1]
         assert row["monthly_strength"]["category"] == "休囚"
@@ -108,11 +85,13 @@ def test_classical_structures_and_conditional_edges(case):
         assert row["supporting_moving_positions"] == [
             case["expected_supporting_position"]
         ]
+    else:
+        pass
     assert all(row["efficacy"] == "not_adjudicated" for row in result["lines"])
     assert result["timing_candidates"]["status"] == "not_requested"
 
 
-def test_chapter9_combination_release_changes_permission_not_external_outcome():
+def test_chapter9_combination_release_changes_permission_not_external_outcome() -> None:
     case = REFERENCE["cases"][0]
     held = conditional_case(case)
     released = conditional_case(case, day_ganzhi="乙丑")  # 丑冲未
@@ -131,16 +110,23 @@ def test_chapter9_combination_release_changes_permission_not_external_outcome():
 
 
 @pytest.mark.parametrize("month", "子丑寅卯辰巳午未申酉戌亥")
-def test_month_strength_keeps_clash_above_same_element(month):
-    from fatebridge.core.liuyao_judgment import clash
+def test_month_strength_keeps_clash_above_same_element(month) -> None:
 
     assert month_strength(month, month)["category"] == "临月建"
     assert month_strength(clash(month), month)["category"] == "月破"
     assert not month_strength(clash(month), month)["monthly_supported"]
 
 
-def test_four_earth_months_and_residual_qi_follow_excerpt_not_three_month_seasons():
+def test_four_earth_months_and_residual_qi_follow_excerpt_not_three_month_seasons() -> (
+    None
+):
     assert month_strength("申", "辰")["category"] == "相"
+    for branch in ("寅", "卯"):
+        strength = month_strength(branch, "辰")
+        assert strength["category"] == "休囚"
+        assert strength["monthly_supported"] is False
+        assert strength["residual_qi"] is True
+    assert month_strength("酉", "戌")["residual_qi"] is False
     assert month_strength("午", "未")["category"] == "休囚"
     assert month_strength("午", "未")["residual_qi"]
     assert month_strength("亥", "丑")["residual_qi"]
@@ -148,8 +134,29 @@ def test_four_earth_months_and_residual_qi_follow_excerpt_not_three_month_season
         month_strength("巳", "寅")["category"] == "相"
     )  # transcription's repeated 火 typo is disclosed
 
+    result = conditional_case(
+        {
+            "base_code": "111011",
+            "changed_code": "111011",
+            "month_branch": "辰",
+            "day_ganzhi": "辛亥",
+            "focus_line": 2,
+        }
+    )
+    for index in (1, 5):
+        row = result["void_conditions"]["lines"][index]
+        empty = {rule["rule_id"]: rule["matched"] for rule in row["empty_conditions"]}
+        nonempty = {
+            rule["rule_id"]: rule["matched"] for rule in row["not_empty_conditions"]
+        }
+        assert row["is_xunkong"] is True
+        assert empty["qi_static"] is True and nonempty["day_generate"] is True
+        assert row["classification"] == "conflicting_or_unresolved_conditions"
+        assert row["is_true_void"] is None
+        assert row["is_permanently_void"] is None
 
-def test_all_five_element_focus_roles_are_not_palace_kinship_labels():
+
+def test_all_five_element_focus_roles_are_not_palace_kinship_labels() -> None:
     # Columns 金木水火土; rows focus 金木水火土. Hand-derived from chapter9.
     elements = "金木水火土"
     expected = [
@@ -165,7 +172,7 @@ def test_all_five_element_focus_roles_are_not_palace_kinship_labels():
     assert role_against_focus("木", "金") == "仇神"
 
 
-def test_focus_is_explicit_and_multiple_visible_candidates_stay_open():
+def test_focus_is_explicit_and_multiple_visible_candidates_stay_open() -> None:
     unresolved = build_sixyao_result(
         **INPUT, gua_code="111111", focus_kinship="父母", timing_days=12
     )
@@ -189,7 +196,7 @@ def test_focus_is_explicit_and_multiple_visible_candidates_stay_open():
     )
 
 
-def test_day_month_candidates_take_priority_over_hidden_when_kinship_absent():
+def test_day_month_candidates_take_priority_over_hidden_when_kinship_absent() -> None:
     case = {
         "base_code": "100000",
         "changed_code": "100000",
@@ -207,8 +214,8 @@ def test_day_month_candidates_take_priority_over_hidden_when_kinship_absent():
     assert result["focus"]["selected"] is None
 
 
-def test_stage_names_preserve_elemental_conflicts_and_do_not_mean_effective():
-    info, lines = mounted("111111", "111111")
+def test_stage_names_preserve_elemental_conflicts_and_do_not_mean_effective() -> None:
+    info, lines = mounted_lines("111111", "111111")
     result = build_conditional_analysis(
         lines=lines,
         hidden=[],
@@ -228,7 +235,7 @@ def test_stage_names_preserve_elemental_conflicts_and_do_not_mean_effective():
     assert STAGES["土"] == STAGES["水"]
 
 
-def test_day_level_candidates_cross_xun_at_23_hours_without_event_ranking():
+def test_day_level_candidates_cross_xun_at_23_hours_without_event_ranking() -> None:
     # Shared standard day calendar: 2000-01-07 甲子. The test checks the
     # candidate-window boundary, not an empirical event.
     result = build_sixyao_result(
@@ -251,7 +258,7 @@ def test_day_level_candidates_cross_xun_at_23_hours_without_event_ranking():
     assert all("probability" not in w and "score" not in w for w in timing["windows"])
 
 
-def test_late_zi_and_offset_timezone_produce_same_effective_day_windows():
+def test_late_zi_and_offset_timezone_produce_same_effective_day_windows() -> None:
     args = dict(date="2000-01-16", gua_code="111111", focus_line=6, timing_days=3)
     before = build_sixyao_result(**args, time="22:59:59", zone="+08:00")
     after = build_sixyao_result(**args, time="23:00:00", zone="Asia/Shanghai")
@@ -268,14 +275,14 @@ def test_late_zi_and_offset_timezone_produce_same_effective_day_windows():
 @pytest.mark.parametrize(
     "date,time", [("2026-03-08", "02:30:00"), ("2026-11-01", "01:30:00")]
 )
-def test_unqualified_dst_gap_and_fold_are_rejected(date, time):
+def test_unqualified_dst_gap_and_fold_are_rejected(date: str, time: str) -> None:
     with pytest.raises(ValueError, match="nonexistent local time|ambiguous local time"):
         build_sixyao_result(
             date=date, time=time, zone="America/New_York", gua_code="111111"
         )
 
 
-def test_explicit_offset_disambiguates_repeated_hour_without_changing_instant():
+def test_explicit_offset_disambiguates_repeated_hour_without_changing_instant() -> None:
     result = build_sixyao_result(
         date="2026-11-01",
         time="01:30:00-04:00",
@@ -288,7 +295,9 @@ def test_explicit_offset_disambiguates_repeated_hour_without_changing_instant():
     )
 
 
-def test_civil_day_candidate_keeps_dst_offset_and_rechecks_changed_solar_month():
+def test_civil_day_candidate_keeps_dst_offset_and_rechecks_changed_solar_month() -> (
+    None
+):
     dst = build_sixyao_result(
         date="2000-04-01",
         time="12:00:00",
@@ -325,7 +334,7 @@ def test_civil_day_candidate_keeps_dst_offset_and_rechecks_changed_solar_month()
     assert crossing["requires_month_reassessment"]
 
 
-def test_snapshot_and_replay_inputs_preserve_explicit_analysis_premise():
+def test_snapshot_and_replay_inputs_preserve_explicit_analysis_premise() -> None:
     result = build_sixyao_result(
         **INPUT, gua_code="111111", focus_line=3, focus_kinship="父母", timing_days=12
     )
@@ -353,7 +362,7 @@ def test_snapshot_and_replay_inputs_preserve_explicit_analysis_premise():
         {"focus_line": 3, "timing_days": 1.5},
     ],
 )
-def test_invalid_or_conflicting_focus_requests_fail_closed(bad):
+def test_invalid_or_conflicting_focus_requests_fail_closed(bad) -> None:
     with pytest.raises(ValueError):
         build_sixyao_result(**INPUT, gua_code="111111", **bad)
 
@@ -368,6 +377,6 @@ def test_invalid_or_conflicting_focus_requests_fail_closed(bad):
         {"timing_days": 2},
     ],
 )
-def test_focus_and_window_request_contract_does_not_coerce(bad):
+def test_focus_and_window_request_contract_does_not_coerce(bad) -> None:
     with pytest.raises(ValidationError):
         SixYaoRequest.model_validate({**INPUT, **bad})

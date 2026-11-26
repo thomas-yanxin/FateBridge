@@ -7,9 +7,8 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator
 
-from fatebridge.analysis.career import CareerAnalysis
 from fatebridge.application.examples import suggested_fields
-from fatebridge.core.bazi_evidence import build_natal_evidence
+from fatebridge.core.bazi.bazi_evidence import build_natal_evidence
 from tests.support.transports import SPECS, business, rest, surface_calls
 
 FIXTURE = Path(__file__).parents[1] / "data/bazi_classical_routes_v1/reference.json"
@@ -20,7 +19,9 @@ def pillars(values):
     return dict(zip(("year", "month", "day", "hour"), map(tuple, values)))
 
 
-def test_source_observations_remain_frozen_and_distinct_from_global_adjudication():
+def test_source_observations_remain_frozen_and_distinct_from_global_adjudication() -> (
+    None
+):
     assert (
         hashlib.sha256(FIXTURE.read_bytes()).hexdigest()
         == FIXTURE.with_suffix(".sha256").read_text().strip()
@@ -30,7 +31,7 @@ def test_source_observations_remain_frozen_and_distinct_from_global_adjudication
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"], ids=lambda c: c["id"])
-def test_original_positions_and_roots(case):
+def test_original_positions_and_roots(case) -> None:
     evidence = build_natal_evidence(pillars(case["pillars"]))
     graph = evidence["classical_routes"]
     expected = case["expected"]
@@ -50,6 +51,10 @@ def test_original_positions_and_roots(case):
                 expected["rooted_helper"]
                 in route["helper_root_context"]["with_hidden_root"]
             )
+        else:
+            pass
+    else:
+        pass
     for expectation, actual in (
         ("shared_root", "output_wealth_shared_roots"),
         ("separation", "wealth_seal_positions"),
@@ -62,11 +67,13 @@ def test_original_positions_and_roots(case):
                 )
                 for row in graph[actual]
             )
+        else:
+            pass
     # The finite source observations do not supply missing whole-chart force.
     assert all(r["formation_status"] == "not_adjudicated" for r in graph["routes"])
 
 
-def test_every_edge_is_resolvable_to_actual_evidence_in_the_same_output():
+def test_every_edge_is_resolvable_to_actual_evidence_in_the_same_output() -> None:
     for case in REFERENCE["cases"]:
         evidence = build_natal_evidence(pillars(case["pillars"]))
         ids = {
@@ -82,7 +89,7 @@ def test_every_edge_is_resolvable_to_actual_evidence_in_the_same_output():
                 assert {edge["from_star"], edge["to_star"]} <= ids
 
 
-def test_selected_officer_is_not_replaced_by_the_first_hidden_candidate():
+def test_selected_officer_is_not_replaced_by_the_first_hidden_candidate() -> None:
     evidence = build_natal_evidence(pillars(["壬戌", "丁未", "戊申", "乙卯"]))
     month = evidence["month_command"]
     assert month["candidates"][0]["ten_god"] == "劫财"
@@ -98,7 +105,9 @@ def test_selected_officer_is_not_replaced_by_the_first_hidden_candidate():
     )
 
 
-def test_food_month_with_killer_is_not_confused_with_an_unselected_food_pattern():
+def test_food_month_with_killer_is_not_confused_with_an_unselected_food_pattern() -> (
+    None
+):
     shu = build_natal_evidence(pillars(["丁亥", "壬子", "辛巳", "丁酉"]))
     check = next(
         r for r in shu["structure_checks"] if r["id"] == "food_controls_killer"
@@ -116,10 +125,11 @@ def test_food_month_with_killer_is_not_confused_with_an_unselected_food_pattern(
         if r["id"] == "food_generates_wealth"
     )
     assert route["edges"]  # the elemental relation really exists
-    assert route["status"] == "not_applicable_to_selected_month"
+    assert route["status"] == "month_use_not_observed"
+    assert route["month_use_match"]["status"] == "not_observed"
 
 
-def test_multiple_matching_stems_do_not_get_arbitrarily_combined_away():
+def test_multiple_matching_stems_do_not_get_arbitrarily_combined_away() -> None:
     evidence = build_natal_evidence(pillars(["庚寅", "乙酉", "甲子", "乙亥"]))
     route = next(
         r
@@ -136,7 +146,7 @@ def test_multiple_matching_stems_do_not_get_arbitrarily_combined_away():
     assert route["formation_status"] == "not_adjudicated"
 
 
-def test_shared_month_root_disappears_when_the_actual_root_is_removed():
+def test_shared_month_root_disappears_when_the_actual_root_is_removed() -> None:
     chart = pillars(["己卯", "丁丑", "丙寅", "庚寅"])
     before = build_natal_evidence(chart)["classical_routes"][
         "output_wealth_shared_roots"
@@ -149,9 +159,9 @@ def test_shared_month_root_disappears_when_the_actual_root_is_removed():
     assert not any(r["is_month_command"] for r in after)
 
 
-def test_career_counts_include_day_hidden_stems_and_preserve_all_top_ties():
+def test_career_counts_include_day_hidden_stems_and_preserve_all_top_ties() -> None:
     chart = pillars(["甲子", "丙寅", "戊申", "壬戌"])
-    result = CareerAnalysis._analyze_dominant_ten_gods(chart, "戊")
+    stars = build_natal_evidence(chart)["ten_gods"]
     # Manually counted non-day stems and four branches; not engine-generated.
     expected = {
         "比肩": 1.5,
@@ -165,35 +175,16 @@ def test_career_counts_include_day_hidden_stems_and_preserve_all_top_ties():
         "偏印": 1.5,
         "正印": 0.5,
     }
-    assert result["weighted_counts"] == expected
-    assert {g["ten_god"] for g in result["top_gods"]} == {
-        "比肩",
-        "偏财",
-        "七杀",
-        "偏印",
-    }
-    assert set(result["tied_primary_gods"]) == {"比肩", "偏财", "七杀", "偏印"}
-    assert result["counting_basis"]["excluded_pillars"] == []
-    assert result["primary_career_type"].startswith("并列：")
-
-
-def test_career_signals_and_entrepreneurship_use_the_same_observed_day_stars():
-    chart = pillars(["辛酉", "甲午", "甲子", "丙寅"])
-    result = CareerAnalysis.analyze_career(chart)
-    assert result["dominant_ten_gods"]["weighted_counts"]["正印"] == 0.5
-    assert any(
-        r["label"] == "官印相生" for r in result["career_structure"]["rule_signals"]
-    )
-    counts = result["entrepreneurship"]["weighted_counts"]
-    assert counts["正印"] == 0.5
-    assert result["career_structure"]["score_kind"] == "uncalibrated_rule_index"
-    assert result["career_structure"]["level"].startswith("规则索引")
+    assert {
+        god: sum(1 if row["location"] == "天干" else 0.5 for row in rows)
+        for god, rows in stars.items()
+    } == expected
 
 
 @pytest.mark.parametrize("key", ["bazi_career", "bazi_wealth", "bazi_birth"])
 def test_classical_route_evidence_has_the_same_schema_and_facts_on_all_surfaces(
-    key, surface_calls
-):
+    key: str, surface_calls
+) -> None:
     spec = SPECS[key]
     args = {
         "birth_year": 1990,
@@ -240,7 +231,9 @@ def test_classical_route_evidence_has_the_same_schema_and_facts_on_all_surfaces(
         "romance",
     ],
 )
-def test_published_classical_view_preserves_resolvable_star_references(topic, rest):
+def test_published_classical_view_preserves_resolvable_star_references(
+    topic: str, rest
+) -> None:
     spec = SPECS["bazi_" + topic]
     args = {
         "birth_year": 1990,

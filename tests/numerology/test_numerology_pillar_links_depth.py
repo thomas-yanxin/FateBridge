@@ -7,16 +7,18 @@ from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
+from pytest import MonkeyPatch
 
-import fatebridge.core.numerology_pillars as source
+import fatebridge.core.numerology.numerology_pillars as source
 from fatebridge.core.calendar import BaZiCalendar
-from fatebridge.core.heluo import calculate, four_pillar_number_totals
-from fatebridge.core.local_techniques.heluo import build_heluo_result
-from fatebridge.core.output_numerology import (
+from fatebridge.core.contracts.output_numerology import (
     NumerologyPillarLink,
     NumerologyPillarLinks,
 )
+from fatebridge.core.heluo.heluo import calculate, four_pillar_number_totals
+from fatebridge.core.local_techniques.heluo import build_heluo_result
 from fatebridge.utils.errors import NumerologySourceError
+from scripts.numerology import audit_numerology as audit
 
 ROOT = Path(__file__).parents[1] / "fixtures/numerology_pillar_links_v1"
 REFERENCE = json.loads((ROOT / "reference.json").read_text())
@@ -32,7 +34,9 @@ def _valid(target, basis_stem, branch, expected_stem):
 
 
 @pytest.mark.parametrize("target", ["month", "hour"])
-def test_120_valid_links_and_480_same_parity_wrong_links_per_formula(target):
+def test_120_valid_links_and_480_same_parity_wrong_links_per_formula(
+    target: str,
+) -> None:
     # Ten directly printed paired-stem groups yield 240 distinct valid links,
     # not 240 original birth examples. Wrong alternatives stay valid Ganzhi.
     total = wrong = 0
@@ -53,6 +57,8 @@ def test_120_valid_links_and_480_same_parity_wrong_links_per_formula(target):
                 for alt in source.GAN:
                     if alt == expected or alt + branch not in source.CYCLE:
                         continue
+                    else:
+                        pass
                     bad = {**p, target: alt + branch}
                     with pytest.raises(ValueError, match="衔接不一致"):
                         source.require_pillar_links(bad)
@@ -60,7 +66,9 @@ def test_120_valid_links_and_480_same_parity_wrong_links_per_formula(target):
     assert total == 120 and wrong == 480
 
 
-def test_shared_calendar_month_and_hour_methods_follow_the_independent_source_heads():
+def test_shared_calendar_month_and_hour_methods_follow_the_independent_source_heads() -> (
+    None
+):
     for group in REFERENCE["month_heads"]:
         for stem in group["basis_stems"]:
             year = 1984 + source.GAN.index(stem)
@@ -96,7 +104,7 @@ def test_shared_calendar_month_and_hour_methods_follow_the_independent_source_he
 )
 def test_fixed_pillar_birth_entry_rejects_individually_valid_but_incompatible_pillars(
     p,
-):
+) -> None:
     assert all(v in source.CYCLE for v in p.values())
     with pytest.raises(ValueError, match="衔接不一致"):
         calculate(
@@ -108,7 +116,9 @@ def test_fixed_pillar_birth_entry_rejects_individually_valid_but_incompatible_pi
         )
 
 
-def test_literal_introductory_source_example_is_preserved_as_arithmetic_not_a_birth_chart():
+def test_literal_introductory_source_example_is_preserved_as_arithmetic_not_a_birth_chart() -> (
+    None
+):
     c = REFERENCE["literal_source_conflict"]
     p = dict(zip(("year", "month", "day", "hour"), c["pillars"]))
     e = source.pillar_link_evidence(p)
@@ -164,13 +174,15 @@ def test_literal_introductory_source_example_is_preserved_as_arithmetic_not_a_bi
     ],
 )
 def test_actual_selected_year_and_day_are_not_replaced_with_civil_labels(
-    inp, year, day, hour
-):
+    inp, year: str, day: str | None, hour: str | None
+) -> None:
     r = build_heluo_result(**inp, zone="+08:00", gender="男")
     e = r["numerology_evidence"]["pillar_links"]
     assert e["pillars"]["year"] == year
     if day:
         assert e["pillars"]["day"] == day and e["pillars"]["hour"] == hour
+    else:
+        pass
     assert e["all_links_match"] is True and e["complete_calendar_assessment"] is False
     assert e["links"][0]["basis_pillar"] == year
     assert e["links"][1]["basis_pillar"] == e["pillars"]["day"]
@@ -199,7 +211,7 @@ def test_actual_selected_year_and_day_are_not_replaced_with_civil_labels(
         {"matches": "true"},
     ],
 )
-def test_typed_evidence_rejects_wrong_basis_head_steps_and_matches(patch):
+def test_typed_evidence_rejects_wrong_basis_head_steps_and_matches(patch) -> None:
     e = source.require_pillar_links(
         dict(year="甲子", month="丙寅", day="甲子", hour="甲子")
     )
@@ -208,7 +220,7 @@ def test_typed_evidence_rejects_wrong_basis_head_steps_and_matches(patch):
         NumerologyPillarLinks.model_validate(e)
 
 
-def test_typed_global_match_and_known_field_projection():
+def test_typed_global_match_and_known_field_projection() -> None:
     e = source.require_pillar_links(
         dict(year="甲子", month="丙寅", day="甲子", hour="甲子")
     )
@@ -222,7 +234,9 @@ def test_typed_global_match_and_known_field_projection():
 
 
 @pytest.mark.parametrize("target", ["month", "hour"])
-def test_internally_computed_conflict_is_not_reported_as_a_user_birth_fault(target):
+def test_internally_computed_conflict_is_not_reported_as_a_user_birth_fault(
+    target: str,
+) -> None:
     p = dict(year="甲子", month="丙寅", day="甲子", hour="甲子")
     p[target] = "甲寅" if target == "month" else "丙子"
     with pytest.raises(NumerologySourceError) as err:
@@ -239,7 +253,9 @@ def test_internally_computed_conflict_is_not_reported_as_a_user_birth_fault(targ
         {"hour_heads": []},
     ],
 )
-def test_source_data_fault_is_rejected_before_comparison(tmp_path, monkeypatch, change):
+def test_source_data_fault_is_rejected_before_comparison(
+    tmp_path: Path, monkeypatch: MonkeyPatch, change
+) -> None:
     d = json.loads(source.SOURCE_PATH.read_text())
     d.update(change)
     p = tmp_path / "source.json"
@@ -256,7 +272,7 @@ def test_source_data_fault_is_rejected_before_comparison(tmp_path, monkeypatch, 
         source._source.cache_clear()
 
 
-def test_witnesses_and_prior_references_are_not_rewritten_to_make_links_match():
+def test_witnesses_and_prior_references_are_not_rewritten_to_make_links_match() -> None:
     for w in REFERENCE["witnesses"]:
         assert (
             hashlib.sha256((ROOT / w["file"]).read_bytes()).hexdigest() == w["sha256"]
@@ -275,8 +291,9 @@ def test_witnesses_and_prior_references_are_not_rewritten_to_make_links_match():
     )
 
 
-def test_audit_cannot_erase_the_retained_original_conflict(monkeypatch):
-    from scripts.numerology import audit_numerology as audit
+def test_audit_cannot_erase_the_retained_original_conflict(
+    monkeypatch: MonkeyPatch,
+) -> None:
 
     original = audit.pillar_link_evidence
     literal = REFERENCE["literal_source_conflict"]["pillars"]
@@ -287,6 +304,8 @@ def test_audit_cannot_erase_the_retained_original_conflict(monkeypatch):
             result["all_links_match"] = True
             result["links"][0]["expected_pillar"] = result["links"][0]["actual_pillar"]
             result["links"][0]["matches"] = True
+        else:
+            pass
         return result
 
     monkeypatch.setattr(audit, "pillar_link_evidence", hide_conflict)

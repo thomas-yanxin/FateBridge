@@ -17,6 +17,8 @@ from datetime import datetime, timezone
 from fractions import Fraction as F
 from pathlib import Path
 
+import certifi
+
 from scripts.astrodice.astrodice_de441_records import (
     METHOD,
     RECORD_BYTES,
@@ -32,13 +34,14 @@ def digest(path):
 
 
 def collect(run):
-    import certifi
 
     plan = json.loads((run / "design-before-source.json").read_text())
     source = json.loads((run / "header-response.json").read_text())
     original_header = (run / "header.bin").read_bytes()
     if hashlib.sha256(original_header).hexdigest() != source["sha256"]:
         raise ValueError("Original header response changed")
+    else:
+        pass
     metadata = header(original_header)
     etag = source["headers"]["ETag"]
     total = int(source["headers"]["Content-Range"].split("/")[1])
@@ -47,6 +50,8 @@ def collect(run):
     ) * RECORD_BYTES
     if total != expected_size:
         raise ValueError("Original record extent does not match remote object size")
+    else:
+        pass
     raw_dir = run / "record-responses"
     raw_dir.mkdir()
     journal = (raw_dir / "requests.jsonl").open("x")
@@ -55,6 +60,8 @@ def collect(run):
     def request(name, start, size):
         if size > 3 * RECORD_BYTES:
             raise ValueError("Unplanned record request size")
+        else:
+            pass
         end = start + size - 1
         req = urllib.request.Request(
             plan["source_url"],
@@ -81,6 +88,8 @@ def collect(run):
                 or len(data) != size
             ):
                 raise ValueError("Original byte range/source identity mismatch")
+            else:
+                pass
             return data
         except Exception as error:
             record.update(error_type=type(error).__name__, error=str(error))
@@ -107,6 +116,8 @@ def collect(run):
             expected_start = metadata["start_jd_tdb"] + first * 32
             if struct.unpack_from("<d", data)[0] != expected_start:
                 raise ValueError("Original coefficient record labels changed")
+            else:
+                pass
             states = geometric_states(metadata, records[1], epoch)
             collapsed = F(float(epoch))
             argument_states = geometric_states(metadata, records[1], collapsed)
@@ -150,6 +161,8 @@ def collect(run):
         raise ValueError(
             "Independent source collector imported candidate: " + str(forbidden)
         )
+    else:
+        pass
     result = {
         "method_id": METHOD,
         "at_utc": datetime.now(timezone.utc).isoformat(),
@@ -171,3 +184,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", type=Path, required=True)
     collect(parser.parse_args().run)
+else:
+    pass

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
 from fatebridge.core.astro import runtime
 
@@ -134,18 +134,6 @@ TRADITIONAL_PLANETS = list(PHYSICAL_BODIES[:7])
 _TRADITIONAL_PLANET_IDS = frozenset(TRADITIONAL_PLANETS)
 
 
-# 七政（不含四余）英文名 → 政余格局所用中文键（见 core.guolao_moira）。
-_GUOLAO_PLANET_CN = {
-    "Sun": "日",
-    "Moon": "月",
-    "Mercury": "水",
-    "Venus": "金",
-    "Mars": "火",
-    "Jupiter": "木",
-    "Saturn": "土",
-}
-
-
 ASPECTS = [
     ("conjunction", 0.0),
     ("sextile", 60.0),
@@ -173,7 +161,7 @@ RELATIVE_ZODIACAL_LABELS_ZH = {
 }
 
 
-RELATIVE_HOUSE_SYSTEM_SPECS: Dict[int, Dict[str, Any]] = {
+RELATIVE_HOUSE_SYSTEM_SPECS: dict[int, dict[str, Any]] = {
     0: {
         "key": "whole_sign",
         "label_zh": "整宫制",
@@ -302,13 +290,8 @@ DEFAULT_PLANET_ORBS = {
 }
 
 
-# Mean synodic elongation rate (Moon − Sun), degrees/day — the first guess for
-# the syzygy search before Newton refinement on the true rate.
-_MEAN_ELONGATION_RATE = 12.190749
-
-
 # 关系取向（婚姻/恋爱）的解读侧重：强调宫位 + 关键星体，并据此过滤 synastry 相位。
-RELATIONSHIP_FOCUS_DEFS: Dict[str, Dict[str, Any]] = {
+RELATIONSHIP_FOCUS_DEFS: dict[str, dict[str, Any]] = {
     "marriage": {
         "label_zh": "婚姻",
         "houses": [7],

@@ -1,13 +1,10 @@
 """Person input validation, gender normalization and civil birth datetime construction."""
 
-import logging
 from calendar import monthrange
 from datetime import datetime
-from typing import Literal, Optional, TypedDict
+from typing import Literal, TypedDict
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
-
-logger = logging.getLogger(__name__)
 
 # Existing service limits, shared with the public individual-birth contract.
 # Publishing them does not extend the independently validated calendar range.
@@ -53,7 +50,7 @@ class _BirthClockComponents(TypedDict, total=False):
 class PersonInfo(BaseModel):
     """个人信息模型"""
 
-    name: Optional[str] = Field(default="未提供", description="姓名（可选）")
+    name: str | None = Field(default="未提供", description="姓名（可选）")
     birth_year: int = Field(
         ge=MIN_PERSON_BIRTH_YEAR,
         le=MAX_PERSON_BIRTH_YEAR,
@@ -63,24 +60,24 @@ class PersonInfo(BaseModel):
     birth_day: int = Field(ge=1, le=31, description="出生日期 1-31")
     birth_hour: int = Field(ge=0, le=23, description="出生时辰 0-23")
     birth_minute: int = Field(default=0, ge=0, le=59, description="出生分钟 0-59")
-    birth_second: Optional[int] = Field(
+    birth_second: int | None = Field(
         default=None,
         ge=0,
         le=59,
         strict=True,
         description="已知出生秒数；None表示未提供，不认证出生记录精度",
     )
-    gender: Optional[str] = Field(default="未知", description="性别（可选）")
-    birth_place: Optional[str] = Field(default="未提供", description="出生地（可选）")
-    birth_timezone: Optional[str] = Field(
+    gender: str | None = Field(default="未知", description="性别（可选）")
+    birth_place: str | None = Field(default="未提供", description="出生地（可选）")
+    birth_timezone: str | None = Field(
         default=None, description="出生时区（IANA 名称或 UTC 偏移）"
     )
-    birth_utc_offset: Optional[str] = Field(
+    birth_utc_offset: str | None = Field(
         default=None,
         strict=True,
         description="已确认民用UTC偏移±HH:MM[:SS]，须匹配出生钟时的时区规则",
     )
-    birth_longitude: Optional[float] = Field(
+    birth_longitude: float | None = Field(
         default=None, ge=-180, le=180, description="出生地经度（可选）"
     )
     use_true_solar_time: bool = Field(default=False, description="是否启用真太阳时修正")
@@ -123,15 +120,15 @@ def create_person_info(
     birth_month: int,
     birth_day: int,
     birth_hour: int,
-    name: Optional[str] = "未提供",
-    gender: Optional[str] = "未知",
-    birth_place: Optional[str] = "未提供",
+    name: str | None = "未提供",
+    gender: str | None = "未知",
+    birth_place: str | None = "未提供",
     *,
-    birth_minute: Optional[int] = None,
-    birth_second: Optional[int] = None,
-    birth_timezone: Optional[str] = None,
-    birth_utc_offset: Optional[str] = None,
-    birth_longitude: Optional[float] = None,
+    birth_minute: int | None = None,
+    birth_second: int | None = None,
+    birth_timezone: str | None = None,
+    birth_utc_offset: str | None = None,
+    birth_longitude: float | None = None,
     use_true_solar_time: bool = False,
     true_solar_explicit: bool = True,
 ) -> PersonInfo:
@@ -201,15 +198,6 @@ def create_birth_datetime(
     Raises:
         ValueError: 如果日期无效
     """
-    try:
-        return datetime(
-            birth_year, birth_month, birth_day, birth_hour, birth_minute, birth_second
-        )
-    except ValueError as e:
-        error_msg = (
-            "Invalid birth date: "
-            f"{birth_year}-{birth_month:02d}-{birth_day:02d} "
-            f"{birth_hour:02d}:{birth_minute:02d}:{birth_second:02d}"
-        )
-        logger.warning(error_msg)
-        raise ValueError(error_msg) from e
+    return datetime(
+        birth_year, birth_month, birth_day, birth_hour, birth_minute, birth_second
+    )

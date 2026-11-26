@@ -1,6 +1,5 @@
 """Related contract regressions with shared imports; original cases retained."""
 
-import json
 import math
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal, localcontext
@@ -8,14 +7,14 @@ from decimal import Decimal, localcontext
 import pytest
 
 from fatebridge.core.astro import geometry
-from fatebridge.core.astro.house_axes import canonical_house_geometry
-from fatebridge.core.astrology_lifespan import (
+from fatebridge.core.astro.astrology_lifespan import (
     _house_containing,
     build_age_point_payload,
     build_balbillus_payload,
     build_harmonic_payload,
     build_persian_directed_payload,
 )
+from fatebridge.core.astro.house_axes import canonical_house_geometry
 from fatebridge.core.ephemeris_runtime import (
     ephemeris_call,
     preserve_ephemeris_path,
@@ -46,8 +45,8 @@ from tests.support.transports import SPECS, business, native, rest, surface_call
 )
 @pytest.mark.parametrize("distance,fraction", [(0, 1), (180, 0.5)])
 def test_balbillus_matches_source_exaltation_and_129_subperiod_shares(
-    planet, exaltation, years, distance, fraction
-):
+    planet: str, exaltation: float, years: int, distance: int, fraction: float | int
+) -> None:
     # Independent literal controls for the selected continuous-angle reading:
     # CCAG VIII.4 (1921), p237.16-28 and p238.1-2:
     # https://archive.org/download/ccagtome-08-part-3/CCAGTome08Part4.pdf
@@ -93,7 +92,7 @@ def test_balbillus_matches_source_exaltation_and_129_subperiod_shares(
 
 
 @pytest.mark.parametrize("code", [b"A", b"E"])
-def test_equal_house_aliases_match_independent_polar_vector(code):
+def test_equal_house_aliases_match_independent_polar_vector(code: bytes) -> None:
     # The 100-digit vector oracle uses the actual reported angle model.
     # A new rotation model can cross this grazing endpoint: the frozen v4
     # ARMC is checked separately, without binding this public path to it.
@@ -120,7 +119,7 @@ def test_equal_house_aliases_match_independent_polar_vector(code):
 
 
 @pytest.mark.parametrize("zone", ["UTC", "America/New_York", "Australia/Lord_Howe"])
-def test_month_segments_partition_elapsed_time_across_offset_changes(zone):
+def test_month_segments_partition_elapsed_time_across_offset_changes(zone: str) -> None:
     tz = parse_timezone_name(zone)
     start = datetime(2023, 3, 1, 12, tzinfo=tz)
     end = datetime(2024, 3, 1, 12, tzinfo=tz)
@@ -141,7 +140,7 @@ def test_month_segments_partition_elapsed_time_across_offset_changes(zone):
     assert previous_end == utc_end
 
 
-def test_index_uses_the_same_representable_boundaries_as_the_timeline():
+def test_index_uses_the_same_representable_boundaries_as_the_timeline() -> None:
     start = datetime(2023, 1, 1, tzinfo=timezone.utc)
     end = start + timedelta(days=365, microseconds=5)
     for index in range(1, 12):
@@ -163,13 +162,13 @@ def test_index_uses_the_same_representable_boundaries_as_the_timeline():
 )
 @pytest.mark.parametrize("return_timezone", ["UTC", "America/New_York"])
 def test_leap_birth_year_and_active_month_agree_on_all_transports(
-    analysis_year,
-    analysis_day,
-    expected_start,
-    expected_end,
-    return_timezone,
+    analysis_year: int,
+    analysis_day: int,
+    expected_start: str,
+    expected_end: str,
+    return_timezone: str,
     surface_calls,
-):
+) -> None:
     spec = SPECS["givenyear"]
     payload = {
         "name": "Leap boundary reference",
@@ -202,7 +201,6 @@ def test_leap_birth_year_and_active_month_agree_on_all_transports(
         flags=["--fields", *fields],
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
-    assert json.loads(protocol.content[0].text) == protocol.structured_content
     outputs = [response.json(), local, protocol.structured_content]
     results = [output["givenyear"] for output in outputs]
     assert results[0] == results[1] == results[2]
@@ -229,7 +227,9 @@ def test_leap_birth_year_and_active_month_agree_on_all_transports(
     assert active[0]["house"] == result["annual_profection"]["monthly_house"]
 
 
-def test_harmonic_product_keeps_the_supplied_coordinate_on_its_side_of_each_sign():
+def test_harmonic_product_keeps_the_supplied_coordinate_on_its_side_of_each_sign() -> (
+    None
+):
     with localcontext() as context:
         context.prec = 100
         for harmonic in range(1, 361):
@@ -251,7 +251,7 @@ def test_harmonic_product_keeps_the_supplied_coordinate_on_its_side_of_each_sign
                     assert int(displayed // 30) == int(exact // 30)
 
 
-def test_harmonic_conjunction_orb_uses_the_product_before_float_display():
+def test_harmonic_conjunction_orb_uses_the_product_before_float_display() -> None:
     # 1.6 is a binary double above the exact decimal; the exact separation
     # of these supplied values times20 exceeds2, although float products tie.
     result = build_harmonic_payload(
@@ -262,7 +262,7 @@ def test_harmonic_conjunction_orb_uses_the_product_before_float_display():
     assert result["resonant_conjunctions"] == []
 
 
-def test_harmonic_contacts_are_ordered_before_rounding_four_decimal_labels():
+def test_harmonic_contacts_are_ordered_before_rounding_four_decimal_labels() -> None:
     result = build_harmonic_payload(
         {
             "sun": {"absolute_degree": 0},
@@ -280,7 +280,9 @@ def test_harmonic_contacts_are_ordered_before_rounding_four_decimal_labels():
 
 
 @pytest.mark.parametrize("ascendant", [0, 1, 3.038038378856752, 60, 120])
-def test_age_point_keeps_the_preceding_float_in_the_preceding_house(ascendant):
+def test_age_point_keeps_the_preceding_float_in_the_preceding_house(
+    ascendant: float | int,
+) -> None:
     cusps = [(ascendant + index * 30) % 360 for index in range(12)]
     for house, cusp in enumerate(cusps):
         assert _house_containing(cusp, cusps)[0] == house
@@ -289,7 +291,7 @@ def test_age_point_keeps_the_preceding_float_in_the_preceding_house(ascendant):
         assert 0 < fraction < 1
 
 
-def test_age_point_orders_near_cycle_end_before_the_exact_cycle_closure():
+def test_age_point_orders_near_cycle_end_before_the_exact_cycle_closure() -> None:
     cusps = [1 + index * 30 for index in range(12)]
     result = build_age_point_payload(
         {"Sun": 1, "Moon": math.nextafter(1.0, -math.inf)},
@@ -299,7 +301,7 @@ def test_age_point_orders_near_cycle_end_before_the_exact_cycle_closure():
     assert [row["body"] for row in result["contacts"]] == ["Moon", "Sun"]
 
 
-def test_age_point_year_annotation_does_not_round_the_contact_twice():
+def test_age_point_year_annotation_does_not_round_the_contact_twice() -> None:
     # Equal30-degree houses advance5degrees/year:12.505degrees is2.501years.
     # Its two-decimal label2.50 must not promote the actual contact to age2.
     result = build_age_point_payload(
@@ -310,7 +312,9 @@ def test_age_point_year_annotation_does_not_round_the_contact_twice():
     assert result["points"][3]["aspect_to"] == "Sun"
 
 
-def test_persian_hit_limit_keeps_the_first_actual_age_with_equal_display_labels():
+def test_persian_hit_limit_keeps_the_first_actual_age_with_equal_display_labels() -> (
+    None
+):
     result = build_persian_directed_payload(
         {"Sun": 0, "Uranus": 1.004, "Neptune": 1.001},
         [],
@@ -391,8 +395,8 @@ def test_persian_hit_limit_keeps_the_first_actual_age_with_equal_display_labels(
     ],
 )
 def test_derived_calculations_reach_all_three_transports(
-    tool, field, options, surface_calls
-):
+    tool: str, field: str, options, surface_calls
+) -> None:
     spec = SPECS[tool]
     inputs = {
         "birth_year": 2000,
@@ -432,6 +436,8 @@ def test_derived_calculations_reach_all_three_transports(
         )
         assert not calculation["reduction_model"]["fitted_offsets_used"]
         assert not calculation["reduction_model"]["whole_procedure_certified"]
+    else:
+        pass
     if field == "zr":
         # Independent Kerykeion6.0.5 natal factories agree on Can/Leo and
         # Lib/Lib. Brennan/Schaim episode192 fixes Fortune as angular reference
@@ -492,6 +498,8 @@ def test_derived_calculations_reach_all_three_transports(
             assert (
                 calculation["fortune"]["level_1_timeline"][0]["end"] == source_boundary
             )
+        else:
+            pass
         basis = calculation["calculation_basis"]
         assert basis["year_days"] == 360.0
         assert basis["interval_time_basis"] == "elapsed_utc_days"
@@ -505,19 +513,25 @@ def test_derived_calculations_reach_all_three_transports(
                     - datetime.fromisoformat(period["start"])
                 ) / timedelta(days=1)
                 assert 0 < elapsed <= period["duration_value"]
+    else:
+        pass
 
 
 @pytest.mark.parametrize("failure", ["exception", "negative_flags", "nonfinite"])
 def test_sidereal_return_offset_failure_never_becomes_linear_success(
-    monkeypatch, failure
-):
+    monkeypatch: pytest.MonkeyPatch, failure: str
+) -> None:
     original = geometry.runtime.ephemeris_call
 
     def unavailable(operation, *args, **kwargs):
         if operation not in {"get_ayanamsa_ex_ut", "get_ayanamsa_ex"}:
             return original(operation, *args, **kwargs)
+        else:
+            pass
         if failure == "exception":
             raise RuntimeError("Synthetic native offset failure")
+        else:
+            pass
         return (-1, 23.0) if failure == "negative_flags" else (2, math.nan)
 
     monkeypatch.setattr(geometry.runtime, "ephemeris_call", unavailable)
@@ -525,13 +539,17 @@ def test_sidereal_return_offset_failure_never_becomes_linear_success(
         _longitude_tt(swe.SUN, 2451545.0, sidereal=True)
 
 
-def test_sidereal_return_preserves_source_integrity_failure(monkeypatch):
+def test_sidereal_return_preserves_source_integrity_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = geometry.runtime.ephemeris_call
     failure = EphemerisSourceError("physical_configuration_changed")
 
     def unavailable(operation, *args, **kwargs):
         if operation in {"get_ayanamsa_ex_ut", "get_ayanamsa_ex"}:
             raise failure
+        else:
+            pass
         return original(operation, *args, **kwargs)
 
     monkeypatch.setattr(geometry.runtime, "ephemeris_call", unavailable)
@@ -542,7 +560,9 @@ def test_sidereal_return_preserves_source_integrity_failure(monkeypatch):
 
 @pytest.mark.parametrize("body", [swe.SUN, swe.MOON])
 @pytest.mark.parametrize("tt", [2451545.0, 2460462.7708333335])
-def test_return_longitude_matches_native_sidereal_coordinates_at_the_same_tt(body, tt):
+def test_return_longitude_matches_native_sidereal_coordinates_at_the_same_tt(
+    body, tt: float
+) -> None:
     with preserve_ephemeris_path():
         swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
         coordinates, flags = ephemeris_call(

@@ -2,12 +2,12 @@
 
 from pydantic import BaseModel, JsonValue, TypeAdapter
 
-from .directions import rule_data
-from .models import AssessRequest
-from .natal_interpretation import _ordered_relationship
-from .spatial_angles import CompassDirection
-from .spatial_outputs import EvaluatedGeometry
-from .timeliness import classify_timeliness
+from fatebridge.core.fengshui.directions import rule_data
+from fatebridge.core.fengshui.models import AssessRequest
+from fatebridge.core.fengshui.natal_interpretation import _ordered_relationship
+from fatebridge.core.fengshui.spatial_angles import CompassDirection
+from fatebridge.core.fengshui.spatial_outputs import EvaluatedGeometry
+from fatebridge.core.fengshui.timeliness import classify_timeliness
 
 
 class StarFacts(BaseModel):

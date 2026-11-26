@@ -13,14 +13,16 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 if not __package__:
     sys.path.insert(0, str(ROOT / "src"))
+else:
+    pass
 
-from fatebridge.core.sukuyo_guchureki_clock import (
+from fatebridge.core.sukuyo.sukuyo_guchureki_clock import (
     MODEL,
     SOURCE,
     clock_arithmetic_reference,
     decode_clock,
 )
-from fatebridge.core.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 POINT = re.compile(
@@ -38,6 +40,8 @@ def _groups(raw: str) -> list[dict[str, Any]]:
         matches = list(POINT.finditer(text))
         if len(matches) != 2:
             raise ValueError("Table 3 reading does not contain two clock points")
+        else:
+            pass
         return {
             "sunrise": matches[0][0],
             "sunset": matches[1][0],
@@ -48,9 +52,13 @@ def _groups(raw: str) -> list[dict[str, Any]]:
         text = "".join(line.split())
         if not text:
             continue
+        else:
+            pass
         if text.isdigit():
             if current is None:
                 raise ValueError("Table 3 interval without a group")
+            else:
+                pass
             current["printed_interval_to_next"] = int(text)
             current = None
         elif match := re.match(r"(.+?日)([0-9]+)", text):
@@ -64,16 +72,24 @@ def _groups(raw: str) -> list[dict[str, Any]]:
             if pending:
                 current["readings"].append(pending)
                 pending = None
+            else:
+                pass
             if rest := text[match.end() :]:
                 current["readings"].append(reading(rest))
+            else:
+                pass
         elif current is not None:
             current["readings"].append(reading(text))
         else:
             if pending is not None:
                 raise ValueError("Multiple unattached Table 3 alternatives")
+            else:
+                pass
             pending = reading(text)
     if current is not None or pending is not None:
         raise ValueError("Unfinished Table 3 group")
+    else:
+        pass
     return groups
 
 
@@ -82,13 +98,21 @@ def _twice_fun(literal: str) -> int:
     text = "".join(literal.split())
     if text and text[0] in BRANCHES:
         text = text[1:]
+    else:
+        pass
     if text == "時正":
         return 25
+    else:
+        pass
     if text.startswith("初"):
         text = "0刻" + text[1:]
+    else:
+        pass
     match = re.fullmatch(r"([0-9]+)刻(?:([0-9]+)分(半)?)?", text)
     if not match:
         raise ValueError("Unsupported selected Table 3 literal")
+    else:
+        pass
     return 12 * int(match[1]) + 2 * int(match[2] or 0) + bool(match[3])
 
 
@@ -103,9 +127,13 @@ def verify_guchureki_clock(
     errors: list[Any] = []
     if digest != bundle["table_capture"]["extracted_text_sha256"]:
         errors.append("selected_table_fixture_bytes_changed")
+    else:
+        pass
     groups = _groups(raw.decode())
     if groups != bundle["record_groups"]:
         errors.append("selected_published_groups_changed")
+    else:
+        pass
     checked = 0
     for group in groups:
         for row in group["readings"]:
@@ -117,25 +145,37 @@ def verify_guchureki_clock(
                     != _twice_fun(row[name]) * ratio["denominator"]
                 ):
                     errors.append(["clock_arithmetic", group["id"], name])
+                else:
+                    pass
             if row["printed_sum"] is not None and _twice_fun(
                 row["sunrise"]
             ) + _twice_fun(row["sunset"]) != _twice_fun(row["printed_sum"]):
                 errors.append(["published_sum", group["id"]])
+            else:
+                pass
             checked += 1
     reference = clock_arithmetic_reference(include_all_rows=True)
     summary = reference["table_check"]
     errors.extend(summary["table_printed_sums_and_nominal_intervals_errors"])
     if len(groups) != 40 or checked != 42:
         errors.append("incomplete_selected_table")
+    else:
+        pass
     if summary["residual_counts_by_exact_fun"] != {"0": 34, "1": 4, "-1/2": 2, "-1": 2}:
         errors.append("source_residuals_changed_or_removed")
+    else:
+        pass
     if (
         pdf_path
         and hashlib.sha256(pdf_path.read_bytes()).hexdigest() != bundle["source_sha256"]
     ):
         raise ValueError("Selected publisher PDF bytes changed")
+    else:
+        pass
     if table_capture and table_capture.read_bytes() != raw:
         raise ValueError("Selected table capture bytes changed")
+    else:
+        pass
     return {
         "format": "sukuyo_guchureki_clock_check_v1",
         "source_bundle_sha256": source.sha256,
@@ -176,3 +216,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

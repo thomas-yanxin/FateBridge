@@ -5,24 +5,31 @@ import json
 import shutil
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import Any
 
 import pytest
 
 from fatebridge.core.almanac import get_solar_terms_for_year
 from fatebridge.core.local_techniques.sanshi import _build_taiyi_with_options
+from fatebridge.core.metaphysics import taiyi_period_frame as frames
 from fatebridge.core.metaphysics import taiyi_periods as periods
+from fatebridge.core.metaphysics.taiyi_hour import double_hour_slot
 from fatebridge.core.metaphysics.taiyi_year import cyclic_core, structural_patterns
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.metaphysics import (
-    _build_analysis_seed,
     calculate_taiyi_analysis,
 )
-from fatebridge.utils.civil_time import ZonedCalendar
+from fatebridge.utils.civil_time import NominalClockLabel, ZonedCalendar
 from scripts.taiyi.audit_taiyi_classical import (
     DEPTH_CORPUS,
     audit_yin,
     verify_depth_sources,
 )
+from tests.support.ephemeris_case_runtime import (
+    native_ephemeris_files_module as native_ephemeris_files_module,
+)
+from tests.unit_test.fixtures.taiyi import seed_at
 
 CALENDAR = json.loads((DEPTH_CORPUS / "calendar-cases.json").read_text())
 WORKED = json.loads((DEPTH_CORPUS / "worked-cases.json").read_text())
@@ -30,26 +37,21 @@ YIN = json.loads((DEPTH_CORPUS / "yin-cases.json").read_text())
 DISPUTED = {11, 15, 25, 26, 27, 43, 44, 46, 70}
 
 
-def seed_at(moment: datetime, *, zone="Asia/Shanghai", solar=False, longitude=None):
-    return _build_analysis_seed(
-        analysis_year=moment.year,
-        analysis_month=moment.month,
-        analysis_day=moment.day,
-        analysis_hour=moment.hour,
-        analysis_minute=moment.minute,
-        analysis_second=moment.second,
-        analysis_timezone=zone,
-        use_true_solar_time=solar,
-        analysis_longitude=longitude,
+def board_at(
+    moment: datetime,
+    mode: str,
+    *,
+    zone: str = "Asia/Shanghai",
+    solar: bool = False,
+    longitude: float | None = None,
+) -> dict[str, Any]:
+    return periods.build_period_board(
+        seed_at(moment, zone=zone, solar=solar, longitude=longitude), "未知", mode
     )
 
 
-def board_at(moment: datetime, mode: str, **kwargs):
-    return periods.build_period_board(seed_at(moment, **kwargs), "未知", mode)
-
-
 @pytest.mark.parametrize("case", YIN, ids=lambda c: c["id"])
-def test_full_yin_table_includes_disagreements(case):
+def test_full_yin_table_includes_disagreements(case) -> None:
     actual = cyclic_core(case["accumulation"], yin=True)
     checks = [actual[k] == v for k, v in case["expected"].items()]
     # A green test means the audit preserved the known failure; it does not
@@ -57,7 +59,7 @@ def test_full_yin_table_includes_disagreements(case):
     assert all(checks) is (case["accumulation"] not in DISPUTED)
 
 
-def test_yin_audit_keeps_all_failed_fields_and_facsimile_readings():
+def test_yin_audit_keeps_all_failed_fields_and_facsimile_readings() -> None:
     report = audit_yin()
     assert (report["total_cases"], report["matching_cases"]) == (72, 63)
     assert (report["checked_fields"], report["matching_fields"]) == (144, 135)
@@ -74,7 +76,7 @@ def test_yin_audit_keeps_all_failed_fields_and_facsimile_readings():
     } == readings
 
 
-def test_alternate_manuscript_constants_are_kept_separate_by_edition():
+def test_alternate_manuscript_constants_are_kept_separate_by_edition() -> None:
     verify_depth_sources()
     variants = json.loads((DEPTH_CORPUS / "calendar-variants.json").read_text())
     by_name = {v["name"]: v for v in variants["variants"]}
@@ -99,15 +101,17 @@ def test_alternate_manuscript_constants_are_kept_separate_by_edition():
         {"rotation": []},
     ],
 )
-def test_malformed_sanshi_options_are_parameter_errors_not_server_exceptions(option):
+def test_malformed_sanshi_options_are_parameter_errors_not_server_exceptions(
+    option,
+) -> None:
     with pytest.raises(ValueError):
         _build_taiyi_with_options(seed_at(datetime(2026, 6, 21, 17)), option)
 
 
 @pytest.mark.parametrize("attempt", ["source", "drop_case", "drop_field"])
 def test_depth_oracle_tampering_fails_even_if_manifest_hash_is_updated(
-    tmp_path, attempt
-):
+    tmp_path: Path, attempt: str
+) -> None:
     corpus = tmp_path / "taiyi_jinjing_v2"
     shutil.copytree(DEPTH_CORPUS, corpus)
     shutil.copytree(
@@ -118,6 +122,8 @@ def test_depth_oracle_tampering_fails_even_if_manifest_hash_is_updated(
         with pytest.raises(ValueError, match="指纹"):
             verify_depth_sources(corpus)
         return
+    else:
+        pass
     path = corpus / "yin-cases.json"
     cases = json.loads(path.read_text())
     if attempt == "drop_case":
@@ -130,13 +136,15 @@ def test_depth_oracle_tampering_fails_even_if_manifest_hash_is_updated(
     for item in manifest["source_files"]:
         if item["file"] == path.name:
             item["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+        else:
+            pass
     manifest_path.write_text(json.dumps(manifest))
     with pytest.raises(ValueError, match="72|每局必须"):
         audit_yin(corpus)
 
 
 @pytest.mark.parametrize("case", WORKED, ids=lambda c: c["id"])
-def test_six_ji_initial_configurations_from_volume_one(case):
+def test_six_ji_initial_configurations_from_volume_one(case) -> None:
     if "modern_example_date" in case:
         board = board_at(
             datetime.fromisoformat(case["modern_example_date"] + "T12:00:00"), "month"
@@ -157,10 +165,14 @@ def test_six_ji_initial_configurations_from_volume_one(case):
             # has no day, and the source gives no year to reconstruct one.
             assert case["id"] == "volume-one-taiyi-dangshi-yin27"
             continue
+        else:
+            pass
         assert actual[field] == expected
 
 
-def test_dangshi_heshen_uses_explicit_given_day_not_the_hour(monkeypatch):
+def test_dangshi_heshen_uses_explicit_given_day_not_the_hour(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     seed = seed_at(datetime(2026, 6, 21, 17))
     seed = replace(seed, pillars={**seed.pillars, "day": "庚申", "hour": "戊寅"})
     frame = periods.period_frame(seed, "hour")
@@ -174,6 +186,7 @@ def test_dangshi_heshen_uses_explicit_given_day_not_the_hour(monkeypatch):
     assert board["calendar_rules"]["heshen_branch_basis"] == "day_pillar_branch"
 
 
+@pytest.mark.usefixtures("native_ephemeris_files_module")
 @pytest.mark.parametrize(
     "case",
     CALENDAR["cases"] + CALENDAR["hko_solstices"],
@@ -183,12 +196,16 @@ def test_dangshi_heshen_uses_explicit_given_day_not_the_hour(monkeypatch):
     "source,provider", [("native", "swisseph"), ("de440", "jpl_de440")]
 )
 def test_astronomical_terms_against_two_official_observatories(
-    case, source, provider, monkeypatch
-):
+    case, source: str, provider: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", source)
     terms = {t.name: t for t in get_solar_terms_for_year(2026, "UTC")}
     term = terms[case["term"]]
     assert term.resolution_provider == provider
+    if source == "native":
+        assert term.ephemeris_model == "swieph"
+    else:
+        pass
     assert (
         abs((term.moment - datetime.fromisoformat(case["at"])).total_seconds())
         <= CALENDAR["tolerance_seconds"]
@@ -197,10 +214,10 @@ def test_astronomical_terms_against_two_official_observatories(
 
 @pytest.mark.parametrize(
     "case",
-    [c for c in CALENDAR["cases"] if c["term"] in periods.JIE_ORDER],
+    [c for c in CALENDAR["cases"] if c["term"] in frames.JIE_ORDER],
     ids=lambda c: c["term"],
 )
-def test_month_changes_at_each_jie_not_midnight_or_lunar_month(case):
+def test_month_changes_at_each_jie_not_midnight_or_lunar_month(case) -> None:
     # Two minutes away is safely outside the published-minute precision band.
     published = datetime.fromisoformat(case["at"]).astimezone(timezone.utc)
     before = periods.period_frame(
@@ -213,10 +230,10 @@ def test_month_changes_at_each_jie_not_midnight_or_lunar_month(case):
     )
     assert after["anchor"].name == case["term"]
     assert before["accumulation"] + 1 == after["accumulation"]
-    assert after["month_offset"] == periods.JIE_ORDER.index(case["term"])
+    assert after["month_offset"] == frames.JIE_ORDER.index(case["term"])
 
 
-def test_lunar_leap_six_does_not_add_a_solar_month():
+def test_lunar_leap_six_does_not_add_a_solar_month() -> None:
     # Independent HKO 2025 calendar: July25 starts leap six, no Jie that day.
     before = board_at(datetime(2025, 7, 24, 12), "month")
     after = board_at(datetime(2025, 7, 25, 12), "month")
@@ -236,7 +253,9 @@ def test_lunar_leap_six_does_not_add_a_solar_month():
         ("2026-12-22T09:00:00", "顺布", 4),
     ],
 )
-def test_solstice_partial_interval_and_double_hour_boundaries(moment, rotation, ju):
+def test_solstice_partial_interval_and_double_hour_boundaries(
+    moment: str, rotation: str, ju: int
+) -> None:
     board = board_at(datetime.fromisoformat(moment), "hour")
     assert board["rotation"] == rotation
     assert board["core_board"]["kook_number"] == ju
@@ -245,7 +264,9 @@ def test_solstice_partial_interval_and_double_hour_boundaries(moment, rotation, 
     assert "现代适配" in board["calendar_rules"]["modern_conventions"]
 
 
-def test_solstice_switch_compares_instants_at_second_resolution(monkeypatch):
+def test_solstice_switch_compares_instants_at_second_resolution(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # Synthetic anchor isolates the boundary operator; official tests above
     # only certify minute-scale agreement, not the solver's second accuracy.
     real = next(t for t in get_solar_terms_for_year(2026, "UTC") if t.name == "夏至")
@@ -254,12 +275,14 @@ def test_solstice_switch_compares_instants_at_second_resolution(monkeypatch):
         calendar=ZonedCalendar.from_datetime(
             datetime(2026, 6, 21, 8, 24, 31, tzinfo=timezone.utc)
         ),
+        civil_point=None,
+        tt_instant=None,
     )
     previous = next(
         t for t in get_solar_terms_for_year(2025, "UTC") if t.name == "冬至"
     )
     monkeypatch.setattr(
-        periods, "get_solar_terms_for_year", lambda *args: [previous, anchor]
+        frames, "get_solar_terms_for_year", lambda *args: [previous, anchor]
     )
     before = periods.period_frame(seed_at(datetime(2026, 6, 21, 16, 24, 30)), "hour")
     at = periods.period_frame(seed_at(datetime(2026, 6, 21, 16, 24, 31)), "hour")
@@ -267,9 +290,11 @@ def test_solstice_switch_compares_instants_at_second_resolution(monkeypatch):
     assert at["yin"] is True and at["accumulation"] == 1
 
 
-def test_23_hour_zi_boundary_is_continuous_through_midnight():
+def test_23_hour_zi_boundary_is_continuous_through_midnight() -> None:
     slots = [
-        periods._slot(datetime.fromisoformat(s))
+        double_hour_slot(
+            NominalClockLabel.from_local_datetime(datetime.fromisoformat(s))
+        )
         for s in [
             "2026-06-21T22:59:59.999999",
             "2026-06-21T23:00:00",
@@ -281,7 +306,9 @@ def test_23_hour_zi_boundary_is_continuous_through_midnight():
 
 
 @pytest.mark.parametrize("mode", ["month", "hour"])
-def test_apparent_solar_counter_is_invariant_under_timezone_representation(mode):
+def test_apparent_solar_counter_is_invariant_under_timezone_representation(
+    mode: str,
+) -> None:
     utc = datetime(2026, 8, 1, 12, 34, 56)
     a = board_at(utc, mode, zone="UTC", solar=True, longitude=121.47)
     b = board_at(
@@ -317,20 +344,24 @@ def test_apparent_solar_counter_is_invariant_under_timezone_representation(mode)
             == b["calendar_rules"]["target_clock"]
             == c["calendar_rules"]["target_clock"]
         )
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
     "moment", [datetime(2026, 3, 8, 2, 30), datetime(2026, 11, 1, 1, 30)]
 )
-def test_ambiguous_or_nonexistent_civil_clock_is_rejected(moment):
+def test_ambiguous_or_nonexistent_civil_clock_is_rejected(moment) -> None:
     with pytest.raises(ValueError, match="local time"):
         seed_at(moment, zone="America/New_York")
 
 
-def test_approximate_solar_term_fallback_cannot_silently_set_a_period(monkeypatch):
+def test_approximate_solar_term_fallback_cannot_silently_set_a_period(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     real = next(t for t in get_solar_terms_for_year(2026, "UTC") if t.name == "夏至")
     monkeypatch.setattr(
-        periods,
+        frames,
         "get_solar_terms_for_year",
         lambda *args: [replace(real, resolution_provider="linear_1900_fallback")],
     )
@@ -339,7 +370,7 @@ def test_approximate_solar_term_fallback_cannot_silently_set_a_period(monkeypatc
 
 
 @pytest.mark.parametrize("mode", ["month", "hour"])
-def test_public_clock_mode_is_preserved_in_sanshi_and_standalone(mode):
+def test_public_clock_mode_is_preserved_in_sanshi_and_standalone(mode: str) -> None:
     standalone = calculate_taiyi_analysis(
         analysis_year=2026,
         analysis_month=6,
@@ -372,7 +403,7 @@ def test_public_clock_mode_is_preserved_in_sanshi_and_standalone(mode):
     assert not any("太歲" in p["markers"] for p in standalone["taiyi"]["palace_marks"])
 
 
-def test_volume_three_yang_first_ju_captivity_and_opposition_are_individual():
+def test_volume_three_yang_first_ju_captivity_and_opposition_are_individual() -> None:
     # 卷三阳局1: 主参一乾(囚)，客参九巽(格); no all-four condition.
     # 卷三掩法及图书集成阳1另明确始击坤七掩主大将，不能漏记。
     pats = structural_patterns(cyclic_core(1))
@@ -394,15 +425,17 @@ def test_volume_three_yang_first_ju_captivity_and_opposition_are_individual():
     [("亥", "前击"), ("戌", "后击"), ("子", "外宫击"), ("酉", "内宫击")],
 )
 def test_source_spatial_predicate_each_direction_and_no_upper_eye_oppression(
-    palace, variant
-):
+    palace: str, variant: str
+) -> None:
     core = {**cyclic_core(1), "shiji": palace}
     patterns = structural_patterns(core)
     assert any(p["name"] == "击" and p["variant"] == variant for p in patterns)
     assert not any(p["name"] == "迫" and p["subject"] == "始击" for p in patterns)
 
 
-def test_equal_generals_in_center_are_recorded_without_directional_fabrication():
+def test_equal_generals_in_center_are_recorded_without_directional_fabrication() -> (
+    None
+):
     core = {
         **cyclic_core(1),
         "main_general": 5,

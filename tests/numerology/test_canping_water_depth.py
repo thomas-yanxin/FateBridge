@@ -7,9 +7,11 @@ from collections import Counter
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core.canping import BRANCHES, _verses, compute_number
-from fatebridge.core.canping_texts import (
+import fatebridge.core.numerology.canping_texts as module
+from fatebridge.core.numerology.canping import BRANCHES, _verses, compute_number
+from fatebridge.core.numerology.canping_texts import (
     _collation,
     collation_summary,
     lookup_record,
@@ -34,7 +36,7 @@ CELLS = [(r, k) for r in ROWS for k in ("male", "female", "luck")]
 
 
 @pytest.mark.parametrize("row,kind", CELLS)
-def test_actual_water_numbered_cell_and_its_specific_reading_status(row, kind):
+def test_actual_water_numbered_cell_and_its_specific_reading_status(row, kind) -> None:
     n = int(row["number"])
     selected = lookup_record("水", n, kind)
     revision = REREAD.get((n, kind))
@@ -42,6 +44,8 @@ def test_actual_water_numbered_cell_and_its_specific_reading_status(row, kind):
     evidence = selected["selection"]
     if revision:
         assert evidence["reading_revision"]["previous_text"] == row[kind]
+    else:
+        pass
     assert evidence["source_pdf_page"] == int(row["pdf_page"])
     assert evidence["cell_status"] == (
         revision["state"]
@@ -57,7 +61,9 @@ def test_actual_water_numbered_cell_and_its_specific_reading_status(row, kind):
         assert "editorial_unknown_marker" not in evidence
 
 
-def test_source_identity_and_coverage_separate_uncertainty_from_unexamined_cells():
+def test_source_identity_and_coverage_separate_uncertainty_from_unexamined_cells() -> (
+    None
+):
     assert len(ROWS) == len({r["number"] for r in ROWS}) == 78
     assert (
         hashlib.sha256((ROOT / "literal.tsv").read_bytes()).hexdigest()
@@ -88,7 +94,9 @@ def test_source_identity_and_coverage_separate_uncertainty_from_unexamined_cells
     )
 
 
-def test_known_source_circles_are_not_filled_from_inherited_or_familiar_wording():
+def test_known_source_circles_are_not_filled_from_inherited_or_familiar_wording() -> (
+    None
+):
     row = lookup_record("水", 2344, "female")
     assert row["text"] == "春歸當斷○，梅子釀酸時。"
     assert row["selection"]["cell_status"] == "source_printed_partial_blank"
@@ -106,7 +114,7 @@ def test_known_source_circles_are_not_filled_from_inherited_or_familiar_wording(
     assert "同馆藏原图复读，旧疑读另存" in selection_snapshot(v)
 
 
-def test_partial_and_complete_printed_blanks_keep_their_different_statuses():
+def test_partial_and_complete_printed_blanks_keep_their_different_statuses() -> None:
     partial = _verses("水", {"numShun": 2344, "numNi": 3336}, "female")
     assert partial["statusShun"] == "source_printed_partial_blank"
     assert partial["statusNi"] == "source_printed_blank"
@@ -116,7 +124,7 @@ def test_partial_and_complete_printed_blanks_keep_their_different_statuses():
 @pytest.mark.parametrize("element", list("水火木金土"))
 def test_all_day_hour_inputs_have_a_row_without_inventing_missing_direction_text(
     element,
-):
+) -> None:
     states = Counter()
     for day in BRANCHES:
         for hour in BRANCHES:
@@ -129,8 +137,9 @@ def test_all_day_hour_inputs_have_a_row_without_inventing_missing_direction_text
     assert states == {(True, True): 84, (True, False): 30, (False, True): 30}
 
 
-def test_untagged_editorial_unknown_cannot_be_promoted_to_collated(monkeypatch):
-    import fatebridge.core.canping_texts as module
+def test_untagged_editorial_unknown_cannot_be_promoted_to_collated(
+    monkeypatch: MonkeyPatch,
+) -> None:
 
     raw = json.loads(json.dumps(_collation()))
     entry = next(
@@ -142,7 +151,7 @@ def test_untagged_editorial_unknown_cannot_be_promoted_to_collated(monkeypatch):
         module._collation()
 
 
-def test_reading_uncertainties_are_isolated_between_calls():
+def test_reading_uncertainties_are_isolated_between_calls() -> None:
     a = lookup_record("水", 2740, "luck")
     a["selection"]["reading_uncertainties"].clear()
     assert lookup_record("水", 2740, "luck")["selection"]["reading_uncertainties"]

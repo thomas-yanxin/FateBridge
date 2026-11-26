@@ -1,14 +1,19 @@
 """Exact JSON fact comparison, including boolean and numeric types."""
 
-from collections.abc import Callable
+from typing import Protocol
+
+
+class FieldExclusion(Protocol):
+    def __call__(self, field_name: str, /) -> bool: ...
 
 
 def same_value(
     left: object,
     right: object,
     *,
-    exclude_field: Callable[[str], bool] | None = None,
+    exclude_field: FieldExclusion | None = None,
 ) -> bool:
+    """Compare raw evidence while distinguishing JSON booleans from numbers."""
     if type(left) is not type(right):
         return False
     if isinstance(left, dict) and isinstance(right, dict):
@@ -28,6 +33,7 @@ def same_value(
         )
     if isinstance(left, list) and isinstance(right, list):
         return len(left) == len(right) and all(
-            same_value(a, b, exclude_field=exclude_field) for a, b in zip(left, right)
+            same_value(left_value, right_value, exclude_field=exclude_field)
+            for left_value, right_value in zip(left, right)
         )
     return bool(left == right)

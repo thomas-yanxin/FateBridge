@@ -8,15 +8,17 @@ from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
+from pytest import MonkeyPatch
 
-from fatebridge.core import heluo
-from fatebridge.core import heluo_opposition as op
-from fatebridge.core.heluo_body import body_evidence
-from fatebridge.core.output_numerology import (
+from fatebridge.core.contracts.output_numerology import (
     HeluoYuanqiOpposition,
     HeluoYuanqiOppositionCondition,
 )
+from fatebridge.core.heluo import heluo
+from fatebridge.core.heluo import heluo_opposition as op
+from fatebridge.core.heluo.heluo_body import body_evidence
 from fatebridge.utils.errors import NumerologySourceError
+from scripts.numerology import audit_numerology as audit
 
 ROOT = Path(__file__).parents[1] / "fixtures/heluo_yuanqi_opposition_v1"
 REFERENCE = json.loads((ROOT / "verified-readings.json").read_text())
@@ -37,7 +39,7 @@ def evidence(year, up, low, other=None):
 
 
 @pytest.mark.parametrize("probe", REFERENCE["hand_derived_probes"])
-def test_hand_worked_absence_presence_and_direct_only_comparison(probe):
+def test_hand_worked_absence_presence_and_direct_only_comparison(probe) -> None:
     result, _, _, _ = evidence(probe["year"], probe["up"], probe["low"])
     HeluoYuanqiOpposition.model_validate(result)
     for phase in result["phases"]:
@@ -51,7 +53,7 @@ def test_hand_worked_absence_presence_and_direct_only_comparison(probe):
     assert result["full_rescue_assessment"] is False
 
 
-def test_other_phase_targets_cannot_supply_missing_current_phase_facts():
+def test_other_phase_targets_cannot_supply_missing_current_phase_facts() -> None:
     result, _, _, _ = evidence("甲戌", "坤", "坤", other=("乾", "乾"))
     a, b = result["phases"]
     assert all(r["condition_match"] for r in a["conditions"])
@@ -61,7 +63,7 @@ def test_other_phase_targets_cannot_supply_missing_current_phase_facts():
     assert "no_cross_phase_substitution" in result["body_scope_policy"]
 
 
-def test_mapping_groups_against_all_sixty_years_and_all_hexagrams():
+def test_mapping_groups_against_all_sixty_years_and_all_hexagrams() -> None:
     # Exhaustive rule-derived probes; not 3840 external horoscope references.
     mapping = {
         s: r for r in REFERENCE["runtime_source"]["mappings"] for s in r["symbols"]
@@ -86,7 +88,7 @@ def test_mapping_groups_against_all_sixty_years_and_all_hexagrams():
                     )
 
 
-def test_original_pages_and_distinct_full_hexagram_operations():
+def test_original_pages_and_distinct_full_hexagram_operations() -> None:
     for row in REFERENCE["images"]:
         assert (
             hashlib.sha256((ROOT / row["file"]).read_bytes()).hexdigest()
@@ -111,7 +113,7 @@ def test_original_pages_and_distinct_full_hexagram_operations():
     "fault",
     ["year", "target", "fan", "nuclear", "duplicate", "phase", "position", "gua"],
 )
-def test_runtime_context_conflicts_are_internal_source_failures(fault):
+def test_runtime_context_conflicts_are_internal_source_failures(fault: str) -> None:
     _, bodies, yuan, fan = evidence("甲戌", "坤", "坤")
     year = "甲戌"
     if fault == "year":
@@ -137,8 +139,8 @@ def test_runtime_context_conflicts_are_internal_source_failures(fault):
 
 @pytest.mark.parametrize("fault", ["mapping", "literal", "review", "missing"])
 def test_nonempty_resource_changes_cannot_keep_the_same_source_version(
-    fault, tmp_path, monkeypatch
-):
+    fault: str, tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     data = json.loads(op.SOURCE_PATH.read_text())
     path = tmp_path / "source.json"
     if fault == "mapping":
@@ -147,8 +149,12 @@ def test_nonempty_resource_changes_cannot_keep_the_same_source_version(
         data["absence_literal"] = "有坤就是相反"
     elif fault == "review":
         data["review_status"] = "independent_review_complete"
+    else:
+        pass
     if fault != "missing":
         path.write_text(json.dumps(data, ensure_ascii=False))
+    else:
+        pass
     monkeypatch.setattr(op, "SOURCE_PATH", path)
     op._source.cache_clear()
     try:
@@ -160,8 +166,8 @@ def test_nonempty_resource_changes_cannot_keep_the_same_source_version(
 
 
 def test_content_identity_is_format_independent_and_caches_actual_loaded_bytes(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     data = json.loads(op.SOURCE_PATH.read_text())
     path = tmp_path / "source.json"
     path.write_text(json.dumps(data, ensure_ascii=True, sort_keys=True, indent=4))
@@ -184,7 +190,7 @@ def test_content_identity_is_format_independent_and_caches_actual_loaded_bytes(
 @pytest.mark.parametrize(
     "change", [{"condition_match": True}, {"yuan_absent": True}, {"rescue_match": True}]
 )
-def test_types_do_not_erase_known_premises_or_invent_rescue(change):
+def test_types_do_not_erase_known_premises_or_invent_rescue(change) -> None:
     result, _, _, _ = evidence("甲子", "坤", "乾")
     row = copy.deepcopy(result["phases"][0]["conditions"][0])
     row.update(change)
@@ -195,7 +201,7 @@ def test_types_do_not_erase_known_premises_or_invent_rescue(change):
         HeluoYuanqiOpposition.model_validate({"full_rescue_assessment": True})
 
 
-def test_returned_conditions_do_not_mutate_source_or_other_phase():
+def test_returned_conditions_do_not_mutate_source_or_other_phase() -> None:
     result, _, _, _ = evidence("甲戌", "坤", "坤")
     result["phases"][0]["conditions"][0]["fan_body_ids"].clear()
     assert result["phases"][1]["conditions"][0]["fan_body_ids"]
@@ -203,7 +209,7 @@ def test_returned_conditions_do_not_mutate_source_or_other_phase():
     assert again["phases"][0]["conditions"][0]["fan_body_ids"]
 
 
-def test_draft_withdrawal_is_preserved_and_not_counted_as_a_product_bug():
+def test_draft_withdrawal_is_preserved_and_not_counted_as_a_product_bug() -> None:
     initial = (ROOT / "reference.json").read_bytes()
     amendments = (ROOT / "amendments.json").read_bytes()
     assert REFERENCE["initial_reference_sha256"] == hashlib.sha256(initial).hexdigest()
@@ -213,8 +219,9 @@ def test_draft_withdrawal_is_preserved_and_not_counted_as_a_product_bug():
 
 
 @pytest.mark.parametrize("fault", ["drop_absence", "select_rescue"])
-def test_audit_detects_an_overstated_source_condition(monkeypatch, fault):
-    from scripts.numerology import audit_numerology as audit
+def test_audit_detects_an_overstated_source_condition(
+    monkeypatch: MonkeyPatch, fault: str
+) -> None:
 
     original = op.opposition_evidence
 

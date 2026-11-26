@@ -4,9 +4,9 @@ import copy
 
 import pytest
 
-import fatebridge.core.astrology_election as election
+import fatebridge.core.astro.astrology_election as election
 from fatebridge.core.response_models import Election
-from tests.western.test_western_election_conditions import (
+from tests.unit_test.fixtures.western_event_cases import (
     event_result,
     synthetic_subject,
 )
@@ -59,7 +59,9 @@ def source_case(monkeypatch):
     return subject, history
 
 
-def test_original_natural_and_lunar_roles_follow_the_two_adjacent_contacts(source_case):
+def test_original_natural_and_lunar_roles_follow_the_two_adjacent_contacts(
+    source_case,
+) -> None:
     subject, _ = source_case
     result = election.build_election_payload(subject, topic_id="marriage")
     Election.model_validate(result)
@@ -80,15 +82,12 @@ def test_original_natural_and_lunar_roles_follow_the_two_adjacent_contacts(sourc
         is second["contact_order_established"]
         is True
     )
-    assert (
-        receipt["score_contribution"] == 0
-        and not receipt["full_original_text_acceptance"]
-    )
+    assert not receipt["full_original_text_acceptance"]
 
 
-def test_uncertain_history_does_not_change_any_existing_score_or_planet_facts(
+def test_uncertain_history_preserves_other_facts(
     source_case,
-):
+) -> None:
     subject, history = source_case
     known = election.build_election_payload(subject, topic_id="marriage")
     history.update(
@@ -104,7 +103,7 @@ def test_uncertain_history_does_not_change_any_existing_score_or_planet_facts(
     assert all(row["ruler"] is not None for row in receipt["houses"])
 
 
-def test_overlapping_past_brackets_do_not_assign_the_source_party(source_case):
+def test_overlapping_past_brackets_do_not_assign_the_source_party(source_case) -> None:
     subject, history = source_case
     history["events"].insert(1, contact("Saturn", -0.101, "past"))
     first, second = election.build_election_payload(subject, topic_id="marriage")[
@@ -118,7 +117,9 @@ def test_overlapping_past_brackets_do_not_assign_the_source_party(source_case):
     assert second["lunar_significator"] == "Venus"
 
 
-def test_earlier_unclassified_contact_prevents_a_certain_next_party(source_case):
+def test_earlier_unclassified_contact_prevents_a_certain_next_party(
+    source_case,
+) -> None:
     subject, history = source_case
     history["events"].insert(
         2, contact("Saturn", 0.05, "future", topology="tangent_unclassified")
@@ -133,7 +134,7 @@ def test_earlier_unclassified_contact_prevents_a_certain_next_party(source_case)
     )
 
 
-def test_unknown_asc_does_not_erase_the_known_lunar_roles_or_mc(source_case):
+def test_unknown_asc_does_not_erase_the_known_lunar_roles_or_mc(source_case) -> None:
     subject, _ = source_case
     subject.calculation_basis["angle_definition"] = {
         "geometric_ascendant_resolved": False
@@ -152,7 +153,7 @@ def test_unknown_asc_does_not_erase_the_known_lunar_roles_or_mc(source_case):
     ]
 
 
-def test_other_selected_zodiac_does_not_substitute_a_source_chart(source_case):
+def test_other_selected_zodiac_does_not_substitute_a_source_chart(source_case) -> None:
     subject, _ = source_case
     subject.zodiac_type = "Sidereal"
     receipt = election.build_election_payload(subject, topic_id="marriage")[

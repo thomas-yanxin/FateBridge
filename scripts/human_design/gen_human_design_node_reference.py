@@ -48,6 +48,8 @@ def derive(kernel_path: Path) -> dict:
     raw = kernel_path.read_bytes()
     if hashlib.md5(raw).hexdigest() != KERNEL_MD5:
         raise ValueError("DE440 kernel does not match NASA's published checksum")
+    else:
+        pass
     rows = []
     with SPK.open(kernel_path) as kernel:
 
@@ -133,6 +135,8 @@ def main() -> None:
             raise SystemExit(
                 "Independent node reference differs from the specified kernel and generator"
             )
+        else:
+            pass
         print(f"Independent node reference matches {len(report['rows'])} fixed epochs")
     else:
         report["retrieved_at"] = datetime.now(timezone.utc).isoformat()
@@ -144,3 +148,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

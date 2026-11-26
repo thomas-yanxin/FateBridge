@@ -8,9 +8,9 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from fatebridge.core.astro.ephemeris import _swisseph_planet_state
+from fatebridge.core.astro.horary_events import native_planetary_events
+from fatebridge.core.astro.horary_motion import native_lunar_contacts
 from fatebridge.core.astro.iers_ut1 import use_ut1_source
-from fatebridge.core.horary_events import native_planetary_events
-from fatebridge.core.horary_motion import native_lunar_contacts
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = Path("tests/data/astro/tt_events")
@@ -22,6 +22,8 @@ def validate_reference_identity(fixture: Path) -> None:
     for filename, expected in manifest["files"].items():
         if hashlib.sha256((fixture / filename).read_bytes()).hexdigest() != expected:
             raise ValueError("Independent physical reference changed: " + filename)
+        else:
+            pass
 
 
 def main():
@@ -76,6 +78,8 @@ def main():
                             )
                         )
                         continue
+                    else:
+                        pass
                     error = (
                         abs((actual[0]["longitude"] - longitude + 180) % 360 - 180)
                         * 3600
@@ -93,6 +97,8 @@ def main():
                                 error_arcseconds=error,
                             )
                         )
+                    else:
+                        pass
             subject = SimpleNamespace(
                 julian_day_tt=case["start_julian_day_tt"], zodiac_type="Tropic"
             )
@@ -109,6 +115,8 @@ def main():
                     report["event_failures"].append(
                         dict(case=case["case_id"], reason="void_of_course")
                     )
+                else:
+                    pass
                 delta = (
                     abs(
                         actual["sign_exit_julian_day_tt"]
@@ -123,6 +131,8 @@ def main():
                             case=case["case_id"], reason="ingress", error_seconds=delta
                         )
                     )
+                else:
+                    pass
                 akeys = [(e["other"], e["ray_degrees"]) for e in actual["contacts"]]
                 ekeys = [(e["other"], e["ray_degrees"]) for e in expected["contacts"]]
                 if akeys != ekeys:
@@ -151,6 +161,8 @@ def main():
                                 errors_seconds=deltas,
                             )
                         )
+                    else:
+                        pass
             save()
             print(
                 "Positions and lunar search:",
@@ -173,6 +185,8 @@ def main():
                             detail=history.get("unavailable_reason"),
                         )
                     )
+                else:
+                    pass
                 save()
                 print(
                     "Planetary history:",
@@ -206,3 +220,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

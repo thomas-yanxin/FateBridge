@@ -82,11 +82,15 @@ def select(run, fixture):
                     < 0
                 ):
                     brackets.append((previous, point))
+                else:
+                    pass
                 previous = point
             if len(brackets) != 2:
                 raise ValueError(
                     "Predeclared two solar-knot crossings were not available"
                 )
+            else:
+                pass
             for crossing_index, (left, right) in enumerate(brackets):
                 lo, hi = N(left["offset_seconds"]), N(right["offset_seconds"])
                 flo = N(left["impact_fraction"]) - target
@@ -99,6 +103,8 @@ def select(run, fixture):
                         raise ValueError(
                             "Selected solar knot is not on the background ray"
                         )
+                    else:
+                        pass
                     fm = impact - target
                     if flo * fm <= 0:
                         hi = mid
@@ -106,10 +112,14 @@ def select(run, fixture):
                         lo, flo = mid, fm
                     if hi - lo <= N(plan["bisection_width_seconds"]):
                         break
+                    else:
+                        pass
                 if hi - lo > N(plan["bisection_width_seconds"]):
                     raise ValueError(
                         "Frozen source-geometry bisection did not converge"
                     )
+                else:
+                    pass
                 rounded = int(
                     ((lo + hi) / 2).to_integral_value(rounding=ROUND_HALF_EVEN)
                 )
@@ -162,6 +172,8 @@ def select(run, fixture):
         for name in sys.modules
     ):
         raise ValueError("Geometry-only selector imported candidate")
+    else:
+        pass
     return {
         "method_id": "unbent_geometry_selected_solar_mass_knots_v1",
         "selection_plan_sha256": hashlib.sha256(plan_path.read_bytes()).hexdigest(),
@@ -183,3 +195,5 @@ if __name__ == "__main__":
     with args.output.open("x") as file:
         file.write(json.dumps(result, indent=2) + "\n")
     print({key: len(value) for key, value in result["cohorts"].items()})
+else:
+    pass

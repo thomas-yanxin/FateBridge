@@ -9,7 +9,6 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-import os
 from fractions import Fraction
 from pathlib import Path
 from typing import Any, cast
@@ -17,17 +16,17 @@ from typing import Any, cast
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.geometry import normalize_angle
 from fatebridge.core.astro.time_scales import tt_from_ut1
-from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
-from fatebridge.core.fixed_star_paths import fixed_star_search_path
+from fatebridge.core.fixed_star_paths import fixed_star_catalogue
 
 DATA = Path(__file__).parents[1] / "data/western_stars"
 MODEL_ID = "fatebridge_simbad_native_apparent_stars_v1"
 NATURE_SOURCE = "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Ptolemy/Tetrabiblos/1B%2A.html#9"
 
 
-def catalogue() -> dict[str, Any]:
+def catalogue() -> tuple[dict[str, Any], bytes]:
     source = cast(dict[str, Any], json.loads((DATA / "sources.json").read_text()))
-    digest = hashlib.sha256((DATA / "sefstars.txt").read_bytes()).hexdigest()
+    catalogue_bytes = (DATA / "sefstars.txt").read_bytes()
+    digest = hashlib.sha256(catalogue_bytes).hexdigest()
     if (
         digest != source["catalogue_sha256"]
         or len(source["stars"]) != 20
@@ -37,7 +36,7 @@ def catalogue() -> dict[str, Any]:
         raise ValueError(
             "Western fixed-star catalogue does not match its source receipt"
         )
-    return source
+    return source, catalogue_bytes
 
 
 def nature_rules() -> dict[str, Any]:
@@ -50,7 +49,7 @@ def apparent_positions(
     """Native geocentric apparent ecliptic coordinates at TT, in one frame."""
     if not math.isfinite(julian_day_tt):
         raise ValueError("Fixed-star TT Julian day must be finite")
-    source = catalogue()
+    source, catalogue_bytes = catalogue()
     profile: dict[str, Any] = {
         "model_id": MODEL_ID,
         "status": "unavailable",
@@ -82,78 +81,57 @@ def apparent_positions(
     swe = runtime.swe
     profile["swisseph_version"] = swe.version
     positions: dict[str, dict[str, Any]] = {}
-    with runtime.preserve_ephemeris_path():
-        selected = configured_ephemeris_path() or ""
-        with fixed_star_search_path(DATA, selected) as search_path:
-            # Swiss's environment override and fixstar2 cache otherwise bypass
-            # the selected catalogue. All changes hold the shared runtime lock.
-            operator_path = os.environ.get("SE_EPHE_PATH")
-            try:
-                # Managed calls must see the same temporary catalogue search
-                # path as the C library, including the operator's DE files.
-                os.environ["SE_EPHE_PATH"] = search_path
-                swe.close()
-                swe.set_ephe_path(search_path)
-                if sidereal:
-                    swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
-                flag = swe.FLG_SWIEPH | (swe.FLG_SIDEREAL if sidereal else 0)
-                # fixstar2 can echo SWIEPH even when its observer Earth used
-                # Moshier. Probe the same selected path explicitly, retaining
-                # both raw flags rather than promoting the star flag to proof.
-                _, earth_flags = runtime.ephemeris_call(
-                    "calc", julian_day_tt, swe.EARTH, swe.FLG_SWIEPH | swe.FLG_HELCTR
+    try:
+        with fixed_star_catalogue(swe, catalogue_bytes):
+            if sidereal:
+                swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
+            flag = swe.FLG_SWIEPH | (swe.FLG_SIDEREAL if sidereal else 0)
+            # fixstar2 can echo SWIEPH even when its observer Earth used
+            # Moshier. Probe the same selected path explicitly, retaining
+            # both raw flags rather than promoting the star flag to proof.
+            _, earth_flags = runtime.ephemeris_call(
+                "calc", julian_day_tt, swe.EARTH, swe.FLG_SWIEPH | swe.FLG_HELCTR
+            )
+            if earth_flags < 0:
+                raise ValueError("Invalid Earth state for apparent star positions")
+            for row in source["stars"]:
+                coordinates, returned_name, flags = runtime.ephemeris_call(
+                    "fixstar2", row["catalogue_key"], julian_day_tt, flag
                 )
-                if earth_flags < 0:
-                    raise ValueError("Invalid Earth state for apparent star positions")
-                for row in source["stars"]:
-                    coordinates, returned_name, flags = runtime.ephemeris_call(
-                        "fixstar2", row["catalogue_key"], julian_day_tt, flag
+                if flags < 0 or not all(math.isfinite(v) for v in coordinates):
+                    raise ValueError("Nonfinite or invalid native fixed-star position")
+                if sidereal and not flags & swe.FLG_SIDEREAL:
+                    raise ValueError(
+                        "Native fixed-star position did not retain Lahiri frame"
                     )
-                    if flags < 0 or not all(math.isfinite(v) for v in coordinates):
-                        raise ValueError(
-                            "Nonfinite or invalid native fixed-star position"
-                        )
-                    if sidereal and not flags & swe.FLG_SIDEREAL:
-                        raise ValueError(
-                            "Native fixed-star position did not retain Lahiri frame"
-                        )
-                    if returned_name.split(",")[0] != row["catalogue_key"]:
-                        raise ValueError(
-                            "Native fixed-star catalogue identity mismatch"
-                        )
-                    positions[row["name"]] = {
-                        "longitude": normalize_angle(float(coordinates[0])),
-                        "latitude": float(coordinates[1]),
-                        "native_flags": int(flags),
-                        "source_url": row["source_url"],
-                        "identifier": row["identifier"],
-                    }
-                profile.update(
-                    {
-                        "status": "computed",
-                        "native_flags": sorted(
-                            {p["native_flags"] for p in positions.values()}
-                        ),
-                        "earth_flags": int(earth_flags),
-                        "earth_ephemeris_model": runtime.ephemeris_model_from_retflag(
-                            earth_flags
-                        ),
-                        "note_zh": "恒星按本次TT传播自行、视差及径向速度，并计算岁差、章动与地心视位置；合相仅比较同一黄道下的黄经，默认容许度1°，不表示球面角距或掩星。",
-                    }
-                )
-            except swe.Error:
-                positions = {}
-                profile["unavailable_reason"] = "native_position_unavailable_at_epoch"
-                profile["note_zh"] = (
-                    "恒星层未计算：本时刻原生视位置不可用；空列表不表示没有恒星合相。"
-                )
-            finally:
-                swe.close()
-                if operator_path is not None:
-                    os.environ["SE_EPHE_PATH"] = operator_path
-                else:
-                    os.environ.pop("SE_EPHE_PATH", None)
-                swe.set_ephe_path(selected)
+                if returned_name.split(",")[0] != row["catalogue_key"]:
+                    raise ValueError("Native fixed-star catalogue identity mismatch")
+                positions[row["name"]] = {
+                    "longitude": normalize_angle(float(coordinates[0])),
+                    "latitude": float(coordinates[1]),
+                    "native_flags": int(flags),
+                    "source_url": row["source_url"],
+                    "identifier": row["identifier"],
+                }
+            profile.update(
+                {
+                    "status": "computed",
+                    "native_flags": sorted(
+                        {p["native_flags"] for p in positions.values()}
+                    ),
+                    "earth_flags": int(earth_flags),
+                    "earth_ephemeris_model": runtime.ephemeris_model_from_retflag(
+                        earth_flags
+                    ),
+                    "note_zh": "恒星按本次TT传播自行、视差及径向速度，并计算岁差、章动与地心视位置；合相仅比较同一黄道下的黄经，默认容许度1°，不表示球面角距或掩星。",
+                }
+            )
+    except swe.Error:
+        positions = {}
+        profile["unavailable_reason"] = "native_position_unavailable_at_epoch"
+        profile["note_zh"] = (
+            "恒星层未计算：本时刻原生视位置不可用；空列表不表示没有恒星合相。"
+        )
     return positions, profile
 
 

@@ -1,5 +1,6 @@
 """Select the actual desktop model runtime, preserving explicit operator choices."""
 
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -24,8 +25,8 @@ def desktop(tmp_path, monkeypatch):
 
 
 def test_unique_actual_running_app_beats_incompatible_PATH_without_reading_arguments(
-    desktop, monkeypatch
-):
+    desktop, monkeypatch: pytest.MonkeyPatch
+) -> None:
     seen = []
 
     def ps(args, **kwargs):
@@ -49,8 +50,8 @@ def test_unique_actual_running_app_beats_incompatible_PATH_without_reading_argum
     "fault", ["ambiguous", "non_executable", "ps_error", "timeout"]
 )
 def test_uncertain_desktop_discovery_keeps_explicit_PATH_fallback(
-    desktop, monkeypatch, tmp_path, fault
-):
+    desktop, monkeypatch: pytest.MonkeyPatch, tmp_path: Path, fault: str
+) -> None:
     text = str(desktop)
     if fault == "ambiguous":
         other = tmp_path / "Other.app/Contents/MacOS/codex"
@@ -58,12 +59,18 @@ def test_uncertain_desktop_discovery_keeps_explicit_PATH_fallback(
         other.write_text("x")
         other.chmod(0o755)
         text += "\n" + str(other)
+    else:
+        pass
     if fault == "non_executable":
         desktop.chmod(0o644)
+    else:
+        pass
 
     def ps(*args, **kwargs):
         if fault == "timeout":
             raise d.subprocess.TimeoutExpired("ps", 2)
+        else:
+            pass
         return SimpleNamespace(returncode=1 if fault == "ps_error" else 0, stdout=text)
 
     monkeypatch.setattr(d.subprocess, "run", ps)
@@ -72,8 +79,8 @@ def test_uncertain_desktop_discovery_keeps_explicit_PATH_fallback(
 
 @pytest.mark.parametrize("explicit", [True, False])
 def test_explicit_cli_or_non_desktop_caller_does_not_inventory_processes(
-    desktop, monkeypatch, explicit
-):
+    desktop, monkeypatch: pytest.MonkeyPatch, explicit: bool
+) -> None:
     def forbidden(*a, **k):
         raise AssertionError("Unnecessary process inventory")
 

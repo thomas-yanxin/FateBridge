@@ -25,9 +25,13 @@ def atan_bounds(value, terms):
     value = F(value)
     if not -1 <= value <= 1 or type(terms) is not int or terms < 1:
         raise ValueError("Invalid alternating arctangent domain")
+    else:
+        pass
     if value < 0:
         lo, hi = atan_bounds(-value, terms)
         return -hi, -lo
+    else:
+        pass
     partial = sum(
         ((-1) ** k * value ** (2 * k + 1) / (2 * k + 1) for k in range(terms)), F(0)
     )
@@ -52,9 +56,13 @@ def ra_shift_arcsec(original, shifted):
     denominator = x * xx + y * yy
     if denominator <= 0:
         raise ValueError("RA shift is not on the planned local branch")
+    else:
+        pass
     tangent = (x * yy - y * xx) / denominator
     if abs(tangent) > F(1, 2):
         raise ValueError("RA shift outside the small-angle diagnostic")
+    else:
+        pass
     lo, hi = atan_bounds(tangent, 2)
     pl, ph = pi_bounds()
     products = [
@@ -85,12 +93,16 @@ def diagnose(run, original_fixture):
     nominal = calendar_jd_tdb(source["date_tdb"])
     if source["date_tdb"] != "8103-07-26T18:51:11":
         raise ValueError("Clock diagnostic control changed")
+    else:
+        pass
     states = {}
 
     def xy(epoch):
         if epoch not in states:
             value = geometric_states(metadata, raw, epoch)
             states[epoch] = [a - e for a, e in zip(value["Venus"], value["Earth"])]
+        else:
+            pass
         return states[epoch]
 
     shifts = {}
@@ -108,6 +120,8 @@ def diagnose(run, original_fixture):
                 ra_shift_arcsec(xy(epoch), xy(quantized)),
                 (quantized - epoch) * 86400,
             )
+        else:
+            pass
         return shifts[key][0]
 
     records = json.loads(
@@ -115,6 +129,8 @@ def diagnose(run, original_fixture):
     )["records"]
     if len(records) != 5:
         raise ValueError("Original contradiction population changed")
+    else:
+        pass
     results = []
     for record in records:
         path = original_fixture / (
@@ -151,6 +167,8 @@ def diagnose(run, original_fixture):
                 baseline_coefficient += weight * sign * F(t, record["window_seconds"])
             if baseline_coefficient:
                 raise ValueError("Witness baseline did not cancel exactly")
+            else:
+                pass
             adjusted = original - contrast[1], original - contrast[0]
             hypotheses[name] = {
                 "geometric_clock_contrast_in_printing_scale_units": describe(contrast),
@@ -215,3 +233,5 @@ if __name__ == "__main__":
                 for k, v in row["hypotheses"].items()
             },
         )
+else:
+    pass

@@ -44,7 +44,7 @@ def matrix(tmp_path):
     return path, expected
 
 
-def test_tt_match_preserves_all_first_minute_failures_and_scope(matrix):
+def test_tt_match_preserves_all_first_minute_failures_and_scope(matrix) -> None:
     path, expected = matrix
     result = AUDIT.compare(
         path, lambda _: SimpleNamespace(jd_tt=2451545.0, method="test"), expected
@@ -57,7 +57,9 @@ def test_tt_match_preserves_all_first_minute_failures_and_scope(matrix):
 
 
 @pytest.mark.parametrize("offset_seconds", [1.0001, -1.0001])
-def test_one_second_tt_gate_keeps_both_sides_without_rounding(matrix, offset_seconds):
+def test_one_second_tt_gate_keeps_both_sides_without_rounding(
+    matrix, offset_seconds
+) -> None:
     path, expected = matrix
     result = AUDIT.compare(
         path,
@@ -69,7 +71,9 @@ def test_one_second_tt_gate_keeps_both_sides_without_rounding(matrix, offset_sec
     assert result["tt_failure_count"] == 3024
 
 
-def test_replacing_one_event_with_duplicate_does_not_preserve_the_cohort(matrix):
+def test_replacing_one_event_with_duplicate_does_not_preserve_the_cohort(
+    matrix,
+) -> None:
     path, expected = matrix
     record = json.loads(path.read_text())
     record["pmo_numeric_comparisons"][-1] = record["pmo_numeric_comparisons"][0]
@@ -79,7 +83,7 @@ def test_replacing_one_event_with_duplicate_does_not_preserve_the_cohort(matrix)
 
 
 @pytest.mark.parametrize("invalid", [None, True, float("nan")])
-def test_invalid_clock_rows_remain_errors_in_full_denominator(matrix, invalid):
+def test_invalid_clock_rows_remain_errors_in_full_denominator(matrix, invalid) -> None:
     path, expected = matrix
     result = AUDIT.compare(path, lambda _: SimpleNamespace(jd_tt=invalid), expected)
     assert result["expected_count"] == len(result["calculation_errors"]) == 3024
@@ -87,7 +91,7 @@ def test_invalid_clock_rows_remain_errors_in_full_denominator(matrix, invalid):
     assert result["all_declared_tt_comparisons_passed"] is False
 
 
-def test_frozen_independent_de440_references_are_complete():
+def test_frozen_independent_de440_references_are_complete() -> None:
     values = AUDIT.reference()
     assert len(values) == 4872
     assert (1899, "小寒") in values and (2101, "冬至") in values
@@ -95,13 +99,15 @@ def test_frozen_independent_de440_references_are_complete():
 
 @pytest.mark.parametrize("present", [False, True])
 def test_legacy_status_never_claims_missing_or_unverified_provenance(
-    present, tmp_path, monkeypatch
-):
+    present: bool, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setattr(AUDIT, "ROOT", tmp_path)
     target = tmp_path / "tests/data/bazi_all_terms_v1/provenance.json"
     if present:
         target.parent.mkdir(parents=True)
         target.write_text("{}")
+    else:
+        pass
     status = AUDIT.legacy_source_status()
     assert len(status) == 5
     missing = next(

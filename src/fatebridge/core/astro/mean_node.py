@@ -18,6 +18,7 @@ from fatebridge.core.astro.nutation import nutation
 from fatebridge.core.astro.reference_frames import (
     pair,
 )
+from fatebridge.core.astro.tt_epoch import TTInstant
 
 
 class SecularCorrection(TypedDict):
@@ -58,11 +59,12 @@ _END = float(_CORRECTION["model_end_jd_tt"])
 
 
 def mean_lunar_node(
-    julian_day_tt: float, *, include_nutation: bool = True
+    julian_day_tt: float | TTInstant, *, include_nutation: bool = True
 ) -> dict[str, float]:
-    if not _START <= julian_day_tt <= _END:
+    point = TTInstant.from_value(julian_day_tt)
+    if not _START <= point.days <= _END:
         raise ValueError("Mean lunar node TT is outside the sourced model range")
-    t = (julian_day_tt - 2451545.0) / 36525.0
+    t = float((point.days - 2451545) / 36525)
     longitude = _COEFFICIENTS[-1]
     derivative = 0.0
     for coefficient in reversed(_COEFFICIENTS[:-1]):
@@ -71,14 +73,14 @@ def mean_lunar_node(
     # Exact segment membership also distinguishes immediately adjacent floats
     # at the published rational knots. The source's float quotient can round
     # those distinct epochs onto a knot and misidentify its derivative.
-    index, remainder = divmod(Fraction(julian_day_tt) - _ORIGIN, _STEP)
+    index, remainder = divmod(point.days - _ORIGIN, _STEP)
     difference = _VALUES[index + 1] - _VALUES[index]
     correction = _VALUES[index] + remainder / _STEP * difference
     longitude = longitude / 3600.0 - float(correction)
     rate = derivative / (3600.0 * 36525.0) - float(difference / _STEP)
-    obliquity = pair(julian_day_tt, "pepol", "peper")[0][1]
+    obliquity = pair(point, "pepol", "peper")[0][1]
     if include_nutation:
-        psi, deps, psi_rate, _ = nutation(julian_day_tt)
+        psi, deps, psi_rate, _ = nutation(point)
         longitude += psi
         rate += psi_rate
         obliquity += math.radians(deps)

@@ -7,7 +7,6 @@ import xml.etree.ElementTree as ET
 from copy import deepcopy
 from datetime import datetime, timedelta
 from pathlib import Path
-from types import SimpleNamespace
 from zoneinfo import ZoneInfo
 
 import pytest
@@ -21,14 +20,16 @@ from fatebridge.core.fengshui.models import MonthlyRequest
 from fatebridge.core.fengshui.monthly import monthly_position_reading
 from fatebridge.core.fengshui.monthly_time import solar_month_context
 from fatebridge.services.fengshui import assess, calculate_monthly_stars
+from fatebridge.utils.civil_time import ZonedCalendar, utc_calendar
 from fatebridge.utils.errors import EphemerisSourceError
-from fatebridge.validation.fengshui_monthly import (
-    audit_monthly_reference,
-    verify_monthly_reading,
-)
+from tests.support.fengshui_clock import seconds_from_boundary
 from tests.support.fengshui_transports import mcp_call
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import rest_client
+from validation.fengshui_monthly import (
+    audit_monthly_reference,
+    verify_monthly_reading,
+)
 
 FOLDER = Path(__file__).parents[1] / "data/fengshui_monthly_v1"
 REFERENCE = json.loads((FOLDER / "reference.json").read_text())
@@ -81,7 +82,7 @@ def confirmed(year, month):
     return layer(effective_solar_year=year, solar_month_number=month)
 
 
-def test_printed_table_and_literal_reference_fingerprints_are_unchanged():
+def test_printed_table_and_literal_reference_fingerprints_are_unchanged() -> None:
     for filename, expected in json.loads((FOLDER / "hashes.json").read_text()).items():
         assert hashlib.sha256((FOLDER / filename).read_bytes()).hexdigest() == expected
     audit = audit_monthly_reference(REFERENCE)
@@ -110,7 +111,7 @@ def test_printed_table_and_literal_reference_fingerprints_are_unchanged():
 @pytest.mark.parametrize("month", range(1, 13))
 def test_all_twelve_year_branches_and_all_printed_month_center_numbers(
     year, branch, month
-):
+) -> None:
     column = next(
         g for g in REFERENCE["printed_center_columns"] if branch in g["branches"]
     )
@@ -128,7 +129,7 @@ def test_all_twelve_year_branches_and_all_printed_month_center_numbers(
 
 
 @pytest.mark.parametrize("month", range(1, 13))
-def test_all_108_authored_2026_palace_numbers_and_each_rendered_target(month):
+def test_all_108_authored_2026_palace_numbers_and_each_rendered_target(month) -> None:
     published = REFERENCE["published_2026"]
     actual = confirmed(2026, month)
     reading = actual["position_reading"]
@@ -151,7 +152,9 @@ def test_all_108_authored_2026_palace_numbers_and_each_rendered_target(month):
 
 
 @pytest.mark.parametrize("term,official", OFFICIAL)
-def test_48_official_published_jie_minutes_and_before_after_membership(term, official):
+def test_48_official_published_jie_minutes_and_before_after_membership(
+    term, official
+) -> None:
     result = layer(query_at=official + timedelta(seconds=61))
     time = result["time_context"]
     assert result["status"] == "complete"
@@ -163,10 +166,12 @@ def test_48_official_published_jie_minutes_and_before_after_membership(term, off
     expected_year = official.year - 1 if term == "小寒" else official.year
     assert time["effective_solar_year"] == expected_year
     assert time["solar_month_number"] == (12 if term == "小寒" else TERMS.index(term))
-    for edge, expected in [(-1, False), (0, True), (1, True)]:
-        # This asserts the model's half-open interval, separately from the
-        # independent official-minute comparison above; no second certification.
-        response = layer(query_at=start + timedelta(microseconds=edge))
+    point = time["timing"]["start_resolution"]["civil_point"]
+    for edge in (-1, 0, 1):
+        # The HKO minute check above covers absolute timing separately.
+        query = start + timedelta(microseconds=edge)
+        expected = seconds_from_boundary(query, point) >= 0
+        response = layer(query_at=query)
         exact = response["time_context"]
         if exact.get("month_status") == "requires_confirmation":
             assert response["palaces"] == {}
@@ -182,7 +187,7 @@ def test_48_official_published_jie_minutes_and_before_after_membership(term, off
 
 
 @pytest.mark.parametrize("month", range(1, 13))
-def test_zhongqi_does_not_switch_the_month(month):
+def test_zhongqi_does_not_switch_the_month(month) -> None:
     # Official 2026 XML alternates jie and zhongqi; January is the prior year.
     file = Path(__file__).parents[1] / "fixtures/calendar_hko_v1/24SolarTerms_2026.xml"
     row = list(ET.fromstring(file.read_text()))[(month - 1) * 2 + 1]
@@ -208,8 +213,8 @@ def test_zhongqi_does_not_switch_the_month(month):
     ],
 )
 def test_january_and_pre_lichun_use_the_prior_effective_year(
-    clock, year, month, center
-):
+    clock: str, year: int, month: int, center: int
+) -> None:
     actual = layer(query_at=clock)
     assert (
         actual["time_context"]["effective_solar_year"],
@@ -219,10 +224,37 @@ def test_january_and_pre_lichun_use_the_prior_effective_year(
 
 
 @pytest.mark.parametrize(
+    "clock,zone,year",
+    [
+        pytest.param("1801-01-01T00:00:00+00:00", "UTC-12:00", 1800, id="lower"),
+        pytest.param("2199-12-31T18:00:00+00:00", "UTC+14:00", 2199, id="upper"),
+    ],
+)
+def test_timezone_shifted_input_edges_need_only_applicable_jie(
+    monkeypatch: pytest.MonkeyPatch, clock: str, zone: str, year: int
+) -> None:
+    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "analytic")
+    result = layer(query_at=clock, timezone_name=zone)
+    time = result["time_context"]
+    assert result["status"] == "complete"
+    assert (time["effective_solar_year"], time["solar_month_number"]) == (year, 11)
+    timing = time["timing"]
+    assert timing["start_resolution"]["term_name"] == "大雪"
+    assert timing["end_resolution"]["term_name"] == "小寒"
+    assert (
+        datetime.fromisoformat(time["valid_from"])
+        <= datetime.fromisoformat(clock)
+        < datetime.fromisoformat(time["valid_until"])
+    )
+
+
+@pytest.mark.parametrize(
     "zone",
     ["UTC", "Asia/Hong_Kong", "America/New_York", "Pacific/Kiritimati", "UTC-12:00"],
 )
-def test_one_instant_has_one_month_in_different_display_timezones(monkeypatch, zone):
+def test_one_instant_has_one_month_in_different_display_timezones(
+    monkeypatch: pytest.MonkeyPatch, zone: str
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "de440")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     t = "2026-10-08T06:29:18+00:00"
@@ -260,29 +292,37 @@ def test_one_instant_has_one_month_in_different_display_timezones(monkeypatch, z
         )
 
 
-def test_actual_instants_control_a_repeated_wall_clock_boundary(monkeypatch):
+def test_actual_instants_control_a_repeated_wall_clock_boundary(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.core.fengshui.monthly_time as module
 
     zone = ZoneInfo("America/New_York")
     clocks = {
+        "小寒": datetime(2021, 1, 5, 1, 30, tzinfo=zone),
         "寒露": datetime(2021, 10, 8, 1, 30, tzinfo=zone),
         "立冬": datetime(2021, 11, 7, 1, 30, tzinfo=zone, fold=1),
         "大雪": datetime(2021, 12, 7, 1, 30, tzinfo=zone),
     }
+    terms = {
+        name: almanac.SolarTerm(
+            name=name,
+            calendar=ZonedCalendar(utc_calendar(moment), zone),
+            resolution_provider="synthetic_fold_fixture",
+        )
+        for name, moment in clocks.items()
+    }
     monkeypatch.setattr(
         module.almanac,
         "get_solar_terms_for_year",
-        lambda year, zone: (
-            [SimpleNamespace(name=n, moment=t) for n, t in clocks.items()]
-            if year == 2021
-            else []
-        ),
+        lambda year, zone: list(terms.values()) if year == 2021 else [],
     )
     monkeypatch.setattr(
         module,
-        "solar_term_resolution",
-        lambda year, name, zone: {
-            "moment": clocks[name].isoformat(),
+        "solar_term_receipt",
+        lambda term: {
+            "moment": term.moment.isoformat(),
+            "civil_point": term.point.to_record(),
             "provider": "synthetic_fold_fixture",
             "approximate": False,
         },
@@ -304,8 +344,8 @@ def test_actual_instants_control_a_repeated_wall_clock_boundary(monkeypatch):
 
 @pytest.mark.parametrize("source_available", [True, False])
 def test_month_boundaries_require_real_crossings_and_support_bundled_de441(
-    monkeypatch, request, source_available
-):
+    monkeypatch: pytest.MonkeyPatch, request, source_available: bool
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     for owner in (almanac, ephemeris_runtime, runtime):
@@ -320,10 +360,14 @@ def test_month_boundaries_require_real_crossings_and_support_bundled_de441(
             raise EphemerisSourceError("solar_native_unavailable")
 
         monkeypatch.setattr(de441_solar, "solar_longitude", unavailable)
+    else:
+        pass
     contexts = []
     for term, official in OFFICIAL:
         if official.year != 2026:
             continue
+        else:
+            pass
         if source_available:
             # Published minutes are rounded. The existing fixed reference
             # protocol checks membership one minute after each official jie.
@@ -382,7 +426,7 @@ def test_month_boundaries_require_real_crossings_and_support_bundled_de441(
         {"gregorian_month": 1},
     ],
 )
-def test_incomplete_conflicting_or_wrong_calendar_inputs_are_rejected(data):
+def test_incomplete_conflicting_or_wrong_calendar_inputs_are_rejected(data) -> None:
     with pytest.raises(ValidationError):
         MonthlyRequest.model_validate(data)
     errors = list(
@@ -395,16 +439,20 @@ def test_incomplete_conflicting_or_wrong_calendar_inputs_are_rejected(data):
         or data.get("effective_solar_year") is True
     ):
         assert errors
+    else:
+        pass
 
 
-def test_missing_time_stays_partial_and_does_not_use_today():
+def test_missing_time_stays_partial_and_does_not_use_today() -> None:
     actual = layer()
     assert actual["status"] == "partial" and not actual["palaces"]
     assert "center_star_number" not in actual
     assert len(actual["position_reading"]["statements"]) == 1
 
 
-def test_assess_reuses_query_only_when_monthly_is_explicitly_selected_and_never_guesses_from_year():
+def test_assess_reuses_query_only_when_monthly_is_explicitly_selected_and_never_guesses_from_year() -> (
+    None
+):
     automatic = assess(scene="workstation", query_at="2026-10-22T12:00:00+08:00")
     assert list(automatic["layers"]) == ["annual_stars"]
     monthly = assess(methods=["monthly_stars"], query_at="2026-10-22T12:00:00+08:00")
@@ -418,7 +466,9 @@ def test_assess_reuses_query_only_when_monthly_is_explicitly_selected_and_never_
     assert list(explicit["layers"]) == ["monthly_stars"]
 
 
-def test_monthly_does_not_overwrite_annual_or_natal_and_location_is_not_facing():
+def test_monthly_does_not_overwrite_annual_or_natal_and_location_is_not_facing() -> (
+    None
+):
     base = {
         "methods": ["annual_stars", "xuankong_natal"],
         "effective_year": 2026,
@@ -464,15 +514,15 @@ def test_monthly_does_not_overwrite_annual_or_natal_and_location_is_not_facing()
 
 
 def test_rest_mcp_cli_projection_and_trusted_monthly_receipts(
-    monkeypatch, tmp_path, capsys
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     data = {"query_at": "2027-01-10T12:00:00+08:00"}
     with rest_client(monkeypatch) as client:
-        response = client.post("/api/fengshui/monthly_stars", json=data)
+        response = client.post("/api/fengshui/monthly-stars", json=data)
         assert response.status_code == 200, response.text
         rest = response.json()
         projected = client.post(
-            "/api/fengshui/monthly_stars",
+            "/api/fengshui/monthly-stars",
             json=data,
             params={
                 "fields": [
@@ -520,7 +570,7 @@ def test_rest_mcp_cli_projection_and_trusted_monthly_receipts(
             == "rejected"
         )
     with rest_client(monkeypatch) as client:
-        partial = client.post("/api/fengshui/monthly_stars", json={}).json()
+        partial = client.post("/api/fengshui/monthly-stars", json={}).json()
     checked = verify_monthly_reading(partial, trusted_payload=deepcopy(partial))
     assert (
         checked["status"] == "verified_served_fixed_monthly_reading"
@@ -529,8 +579,8 @@ def test_rest_mcp_cli_projection_and_trusted_monthly_receipts(
 
 
 def test_renderer_only_consumes_returned_fields_instead_of_recomputing_month_or_chart(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     actual = confirmed(2026, 9)
     import fatebridge.core.fengshui.monthly as module
 

@@ -6,11 +6,14 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.requests.divination import SuZhanRequest
-from fatebridge.core.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_directions import source_bundle, travel_direction_evidence
-from fatebridge.core.sukuyo_padas import palace_reference
+from fatebridge.core.sukuyo.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_directions import (
+    source_bundle,
+    travel_direction_evidence,
+)
+from fatebridge.core.sukuyo.sukuyo_padas import palace_reference
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.sukuyo import required_quote_paths
+from validation.sukuyo import required_quote_paths
 
 PRIMARY = json.loads(
     (Path(__file__).parents[1] / "data/sukuyo-directions-primary.json").read_text()
@@ -38,7 +41,7 @@ def direction_layer(result):
     )
 
 
-def test_entire_chapter_and_original_apparatus_windows_are_retained():
+def test_entire_chapter_and_original_apparatus_windows_are_retained() -> None:
     bundle = source_bundle()
     assert bundle["source_sha256"] == PRIMARY["source_sha256"]
     assert len(bundle["rules"]) == len(PRIMARY["paragraphs"]) == 16
@@ -55,7 +58,7 @@ def test_entire_chapter_and_original_apparatus_windows_are_retained():
 
 
 @pytest.mark.parametrize("direction", ["north", "east", "south", "west"])
-def test_all_27_day_mansions_against_primary_direction_matrix(direction):
+def test_all_27_day_mansions_against_primary_direction_matrix(direction: str) -> None:
     # A manually transcribed primary-text matrix supplies expected values;
     # neither the rule bundle nor a prior production run supplies the oracle.
     for mansion in SU27_ORDER:
@@ -68,14 +71,18 @@ def test_all_27_day_mansions_against_primary_direction_matrix(direction):
         expected = set()
         if mansion in PRIMARY["main_text_positive"][direction]:
             expected.add("favorable")
+        else:
+            pass
         if mansion in PRIMARY["main_text_negative"][direction]:
             expected.add("caution")
+        else:
+            pass
         assert actual == expected, (mansion, direction)
         assert not result["directional_travel"]["direction_inferred"]
         assert not result["directional_travel"]["physical_palace_computed"]
 
 
-def test_missing_or_different_direction_cannot_apply_north_prohibition():
+def test_missing_or_different_direction_cannot_apply_north_prohibition() -> None:
     generic = evidence("轸")
     wrong = evidence("轸", ["eastbound_journey"])
     north = evidence("轸", ["northbound_journey"])
@@ -98,7 +105,7 @@ def test_missing_or_different_direction_cannot_apply_north_prohibition():
     assert "不能用吉时抵销" in north["reading_text"]
 
 
-def test_wall_south_preserves_opposite_chapter_and_individual_mansion_clauses():
+def test_wall_south_preserves_opposite_chapter_and_individual_mansion_clauses() -> None:
     result = evidence("壁", ["southbound_journey"])
     facts = result["activity_assessment"]["matched_rules"]
     assert {r["assessment"] for r in facts} == {"favorable", "caution"}
@@ -114,7 +121,7 @@ def test_wall_south_preserves_opposite_chapter_and_individual_mansion_clauses():
     assert "不宜南行" in result["reading_text"]
 
 
-def test_ming_opposite_assessment_and_membership_are_never_silently_merged():
+def test_ming_opposite_assessment_and_membership_are_never_silently_merged() -> None:
     for mansion, direction in [("女", "south"), ("娄", "west"), ("毕", "north")]:
         result = evidence(mansion, [direction + "bound_journey"])
         rules = [
@@ -138,7 +145,7 @@ def test_ming_opposite_assessment_and_membership_are_never_silently_merged():
     assert "互" in source_bundle()["textual_issues"][0]["literal"]
 
 
-def test_palace_numbers_are_local_labels_not_upper_pada_or_natal_palaces():
+def test_palace_numbers_are_local_labels_not_upper_pada_or_natal_palaces() -> None:
     record = travel_direction_evidence("星")["selected_records"][0]
     assert (record["literal_palace_ordinal"], record["literal_palace_name"]) == (
         5,
@@ -152,7 +159,7 @@ def test_palace_numbers_are_local_labels_not_upper_pada_or_natal_palaces():
     assert direction_layer(result)["status"] == "not_evaluated"
 
 
-def test_unresolved_hinoo_candidates_are_reference_only_not_directional_facts():
+def test_unresolved_hinoo_candidates_are_reference_only_not_directional_facts() -> None:
     context = calendar_mansion("2024-08-04", calendar_profile="hinoo_t1299_host27")
     result = day_evidence(
         context, activity="travel", activity_details=["westbound_journey"]
@@ -169,7 +176,7 @@ def test_unresolved_hinoo_candidates_are_reference_only_not_directional_facts():
     )
 
 
-def test_validation_schema_context_and_cache_do_not_lose_direction_conditions():
+def test_validation_schema_context_and_cache_do_not_lose_direction_conditions() -> None:
     for direction in ["north", "east", "south", "west"]:
         SuZhanRequest(
             date="2025-03-13",

@@ -10,7 +10,7 @@ import pytest
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro import solar_position as solar
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
-from fatebridge.core.output_charts import ApparentPositionPolicy
+from fatebridge.core.contracts.output_charts import ApparentPositionPolicy
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.support.ephemeris_case_runtime import (
     native_ephemeris_files_module as native_ephemeris_files_module,
@@ -29,8 +29,8 @@ def ray(distance, fraction):
     "distance,domain", [(0.5, "foreground_of_solar_disc"), (2, "behind_solar_disc")]
 )
 def test_finite_target_range_separates_transits_from_background_extensions(
-    fraction, distance, domain
-):
+    fraction: float, distance: float | int, domain: str
+) -> None:
     result = solar.finite_solar_ray(ray(distance, fraction), (-1, 0, 0))
     assert result["unbent_ray_domain"] == domain
     assert result["impact_solar_radius_fraction"] == pytest.approx(fraction)
@@ -42,14 +42,16 @@ def test_finite_target_range_separates_transits_from_background_extensions(
 
 
 @pytest.mark.parametrize("fraction", [1.0001, 2, 20])
-def test_a_ray_outside_the_sphere_has_no_virtual_extension(fraction):
+def test_a_ray_outside_the_sphere_has_no_virtual_extension(
+    fraction: float | int,
+) -> None:
     assert (
         solar.finite_solar_ray(ray(2, fraction), (-1, 0, 0))["unbent_ray_domain"]
         == "outside_solar_disc"
     )
 
 
-def test_tangent_and_target_on_sphere_remain_ambiguous():
+def test_tangent_and_target_on_sphere_remain_ambiguous() -> None:
     assert (
         solar.finite_solar_ray(ray(2, 1), (-1, 0, 0))["unbent_ray_domain"]
         == "solar_limb_ambiguous"
@@ -62,7 +64,7 @@ def test_tangent_and_target_on_sphere_remain_ambiguous():
     )
 
 
-def test_sun_behind_the_observer_does_not_occult_an_anti_solar_body():
+def test_sun_behind_the_observer_does_not_occult_an_anti_solar_body() -> None:
     assert (
         solar.finite_solar_ray((-2, 0, 0), (-1, 0, 0))["unbent_ray_domain"]
         == "sun_behind_observer"
@@ -79,7 +81,7 @@ def test_sun_behind_the_observer_does_not_occult_an_anti_solar_body():
         (1.7e308, 1.7e308, 0),
     ],
 )
-def test_invalid_and_overflowing_geometry_is_never_certified(bad):
+def test_invalid_and_overflowing_geometry_is_never_certified(bad) -> None:
     with pytest.raises(EphemerisSourceError) as caught:
         solar.finite_solar_ray(bad, (-1, 0, 0))
     assert caught.value.reason == "coordinate_values_unavailable"
@@ -87,12 +89,14 @@ def test_invalid_and_overflowing_geometry_is_never_certified(bad):
 
 @pytest.mark.parametrize("reason", ["version", "backend"])
 def test_unverified_source_is_explicitly_unknown_without_barycentric_fallback(
-    reason, monkeypatch
-):
+    reason: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     if reason == "version":
         monkeypatch.setattr(
             solar, "binding_distribution_version", lambda *_: "unverified"
         )
+    else:
+        pass
     monkeypatch.setattr(
         runtime,
         "ephemeris_call",
@@ -118,7 +122,9 @@ def test_unverified_source_is_explicitly_unknown_without_barycentric_fallback(
 
 
 @pytest.mark.parametrize("problem", ["frame", "model", "values", "configuration"])
-def test_solar_metadata_cannot_hide_a_changed_source_contract(problem, monkeypatch):
+def test_solar_metadata_cannot_hide_a_changed_source_contract(
+    problem: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     original = runtime.ephemeris_call
     calls = 0
 
@@ -134,6 +140,8 @@ def test_solar_metadata_cannot_hide_a_changed_source_contract(problem, monkeypat
             values = (float("nan"), *values[1:])
         elif problem == "configuration":
             monkeypatch.setenv("SE_EPHE_PATH", "/changed-after-solar-sample")
+        else:
+            pass
         return values, flags
 
     monkeypatch.setattr(runtime, "ephemeris_call", broken)
@@ -153,8 +161,8 @@ def test_solar_metadata_cannot_hide_a_changed_source_contract(problem, monkeypat
     ],
 )
 def test_real_source_geometry_is_typed_and_leaves_the_native_tuple_unchanged(
-    epoch, planet, domain
-):
+    epoch: float, planet: str, domain: str
+) -> None:
     flags = runtime.swe.FLG_SWIEPH | runtime.swe.FLG_SPEED
     body = getattr(runtime.swe, planet.upper())
     raw, returned = runtime.ephemeris_call("calc", epoch, body, flags)
@@ -174,7 +182,7 @@ def test_real_source_geometry_is_typed_and_leaves_the_native_tuple_unchanged(
     assert runtime.ephemeris_call("calc", epoch, body, flags)[0] == raw
 
 
-def test_independent_solar_position_reference_bytes_are_preserved():
+def test_independent_solar_position_reference_bytes_are_preserved() -> None:
     root = Path(__file__).parents[2]
     wanted = {
         "tests/fixtures/western-solar-position-protocol.json": "064ebd6f554cd94b2a3c3471a1f82d7afc4edf4abeabf1e76d2aac180e516973",
@@ -184,8 +192,10 @@ def test_independent_solar_position_reference_bytes_are_preserved():
         assert hashlib.sha256((root / name).read_bytes()).hexdigest() == digest
 
 
-def test_event_history_receipt_is_explicitly_only_at_the_question_epoch(monkeypatch):
-    from fatebridge.core import horary_events
+def test_event_history_receipt_is_explicitly_only_at_the_question_epoch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from fatebridge.core.astro import horary_events
 
     epoch = 2459892.375
 

@@ -32,6 +32,8 @@ def rounded(lo, hi=None, *, scale=S):
     lo, hi = Q(lo), Q(lo if hi is None else hi)
     if lo > hi:
         raise ValueError("Reversed independent box")
+    else:
+        pass
     return Q(lo.numerator * scale // lo.denominator, scale), Q(
         -((-hi.numerator * scale) // hi.denominator), scale
     )
@@ -61,6 +63,8 @@ def mul(a, b):
 def divide(a, b):
     if b[0] <= 0 <= b[1]:
         raise ValueError("Independent box denominator contains zero")
+    else:
+        pass
     return mul(a, rounded(1 / b[1], 1 / b[0]))
 
 
@@ -72,6 +76,8 @@ def square(a):
 def root(a):
     if a[0] < 0:
         raise ValueError("Negative independent square root")
+    else:
+        pass
     scaled_low, scaled_high = a[0] * S * S, a[1] * S * S
     lo = math.isqrt(scaled_low.numerator // scaled_low.denominator)
     hi = math.isqrt(scaled_high.numerator // scaled_high.denominator)
@@ -90,6 +96,8 @@ def cover(computed, declared):
     low, high = parse(declared)
     if not low <= computed[0] <= computed[1] <= high:
         raise ValueError("Independent exact source enclosure is not covered")
+    else:
+        pass
 
 
 class Source:
@@ -97,6 +105,8 @@ class Source:
         raw = (directory / "header.bin").read_bytes()
         if len(raw) != 8144 or struct.unpack_from("<i", raw, 2840)[0] != 441:
             raise ValueError("Independent source header identity differs")
+        else:
+            pass
         self.au, self.emrat = map(Q, struct.unpack_from("<2d", raw, 2680))
         self.pointers = [
             struct.unpack_from("<3i", raw, 2696 + i * 12) for i in range(12)
@@ -104,6 +114,8 @@ class Source:
         raw = (directory / f"record-responses/case-{window:02}.bin").read_bytes()
         if len(raw) != 3 * 8144:
             raise ValueError("Independent original source window incomplete")
+        else:
+            pass
         self.records = [
             v for v in (raw[k : k + 8144] for k in range(0, len(raw), 8144))
         ]
@@ -124,6 +136,8 @@ class Source:
         )
         if record is None:
             raise ValueError("Independent source record support crosses a boundary")
+        else:
+            pass
         start, end = map(Q, struct.unpack_from("<2d", record))
         offset, count, parts = self.pointers[group]
         width = (end - start) / parts
@@ -131,6 +145,8 @@ class Source:
         begin = start + part * width
         if not 0 <= part < parts or high >= begin + width:
             raise ValueError("Independent source polynomial support crosses a cell")
+        else:
+            pass
         key = (start, group, part)
         if key not in self.cache:
             basis = [[Q(1)], [Q(0), Q(1)]]
@@ -153,14 +169,20 @@ class Source:
             self.cache[key] = positions + [
                 [v * 2 / width for v in derivative(p)] for p in positions
             ]
+        else:
+            pass
         a, b = 2 * (low - begin) / width - 1, 2 * (high - begin) / width - 1
         return [rounded(*bernstein_bounds(p, a, b)) for p in self.cache[key]]
 
     def state(self, epoch, body):
         if body == "Venus":
             return self.group(epoch, 1)
+        else:
+            pass
         if body != "Earth":
             raise ValueError("Unplanned independent source body")
+        else:
+            pass
         emb, moon = self.group(epoch, 2), self.group(epoch, 9)
         return [sub(e, divide(m, rounded(self.emrat + 1))) for e, m in zip(emb, moon)]
 
@@ -176,6 +198,8 @@ def model_proof(source, reception, name, stored, plan):
             or stored["continuous_family_contraction_upper"] is not None
         ):
             raise ValueError("Legacy light-time hypothesis was silently replaced")
+        else:
+            pass
         now = source.state(reception, "Venus")
         rough = now[:3]
         for step in history:
@@ -195,6 +219,8 @@ def model_proof(source, reception, name, stored, plan):
             or len(history) != plan["fixed_point_iterations"]
         ):
             raise ValueError("Unplanned/incomplete fixed-point hypothesis")
+        else:
+            pass
         if name.endswith("ULP_hypothesis"):
             seconds = [
                 (v - 2451545) * 86400 for v in (reception[0] - initial, reception[1])
@@ -204,6 +230,8 @@ def model_proof(source, reception, name, stored, plan):
                 * plan["emission_error_full_binary64_ET_ULPs"]
                 / 86400
             )
+        else:
+            pass
         broad = source.state(
             add(sub(reception, rounded(0, initial)), rounded(-epsilon, epsilon)),
             "Venus",
@@ -212,10 +240,14 @@ def model_proof(source, reception, name, stored, plan):
         declared_q = Q(stored["continuous_family_contraction_upper"])
         if not actual_q <= declared_q < 1:
             raise ValueError("Independent fixed-point contraction proof failed")
+        else:
+            pass
         delay = rounded(0, initial)
         for step in history:
             if parse(step["input_days"]) != delay:
                 raise ValueError("Fixed-point chain skipped or altered an iteration")
+            else:
+                pass
             emitted = source.state(
                 add(sub(reception, delay), rounded(-epsilon, epsilon)), "Venus"
             )
@@ -226,15 +258,21 @@ def model_proof(source, reception, name, stored, plan):
             a, b = parse(step["image_days"])
             if not 0 <= a <= b <= initial:
                 raise ValueError("Image leaves the original fixed support")
+            else:
+                pass
             updated = (max(delay[0], a), min(delay[1], b))
             if updated != parse(step["next_days"]) or updated[0] > updated[1]:
                 raise ValueError("Invalid fixed-point interval intersection")
+            else:
+                pass
             delay = updated
     if (
         Q(stored["emission_argument_radius_days"]) != epsilon
         or stored["internal_iteration_algorithm_certified"]
     ):
         raise ValueError("Emission hypothesis or algorithm scope changed")
+    else:
+        pass
     emitted = source.state(
         add(sub(reception, delay), rounded(-epsilon, epsilon)), "Venus"
     )
@@ -278,6 +316,8 @@ def observed_direction(angles, ulps):
             if k:
                 st = divide(mul(st, minus_square), rounded((2 * k) * (2 * k + 1)))
                 ct = divide(mul(ct, minus_square), rounded((2 * k - 1) * (2 * k)))
+            else:
+                pass
             sn, cs = add(sn, st), add(cs, ct)
         lo, hi = observed(printed, ulps)
         radius = max(value - lo, hi - value) * pi[1] / 180
@@ -319,16 +359,22 @@ def verify(run, cohort):
         or data["cohort"] != cohort
     ):
         raise ValueError("Actual collection or calibration binding changed")
+    else:
+        pass
     if cohort == "B" and before["prior_A_analysis_sha256"] != sha(
         (run / "A-first-analysis.json").read_bytes()
     ):
         raise ValueError("B collection lost original A binding")
+    else:
+        pass
     if (
         cohort == "B"
         and (calibration_root / "A-first-analysis.json").read_bytes()
         != (run / "A-first-analysis.json").read_bytes()
     ):
         raise ValueError("B geometric calibration lost the same A phase binding")
+    else:
+        pass
     if (
         any(
             data[k]
@@ -345,9 +391,13 @@ def verify(run, cohort):
         or data["retained_overall_numeric_gate_exit_code"] != 1
     ):
         raise ValueError("Conditional diagnostics promoted to acceptance")
+    else:
+        pass
     queries = [q for q in plan["queries"] if q["cohort"] == cohort]
     if [q["id"] for q in data["queries"]] != [q["id"] for q in queries]:
         raise ValueError("OBSERVER query population changed")
+    else:
+        pass
     cases = {c["id"]: c for c in plan["cohorts"][cohort]}
     outputs = []
     steps = checks = 0
@@ -366,6 +416,8 @@ def verify(run, cohort):
             or receipt["verification_disabled"]
         ):
             raise ValueError("Raw response or actual query changed")
+        else:
+            pass
         if stored["status"] != "diagnosed":
             outputs.append(
                 {
@@ -375,9 +427,13 @@ def verify(run, cohort):
                 }
             )
             continue
+        else:
+            pass
         payload = json.loads(raw)
         if receipt["status"] != 200 or payload.get("error"):
             raise ValueError("Unavailable response promoted")
+        else:
+            pass
         text = payload["result"]
         prefix, body = text.split("$$SOE")
         body, _ = body.split("$$EOE")
@@ -395,9 +451,13 @@ def verify(run, cohort):
             ]
         ):
             raise ValueError("Independent OBSERVER header check failed")
+        else:
+            pass
         rows = [[v.strip() for v in c] for c in csv.reader(body.strip().splitlines())]
         if len(rows) != len(cases) or len(stored["rows"]) != len(cases):
             raise ValueError("OBSERVER rows were dropped")
+        else:
+            pass
         summary = {
             "id": query["id"],
             "primary": 0,
@@ -426,6 +486,8 @@ def verify(run, cohort):
             ]
             if len(cells) != 12 or cells[-1] or len(near) != 1:
                 raise ValueError("Invalid raw OBSERVER row")
+            else:
+                pass
             case = near[0]
             cid = case["id"]
             if (
@@ -439,6 +501,8 @@ def verify(run, cohort):
                 or record["light_time_minutes"] != cells[8]
             ):
                 raise ValueError("Raw case or quantity identity changed")
+            else:
+                pass
             seen.add(cid)
             error = (Q(cells[1]) - Q(case["nominal_JD"])) * 86400
             label_pass = (
@@ -453,6 +517,8 @@ def verify(run, cohort):
                 != cal["original_label_budget_pass"]
             ):
                 raise ValueError("Label line or geometric calibration identity changed")
+            else:
+                pass
             primary = case["role"] != "auxiliary_not_primary"
             summary["primary"] += primary
             summary["label_pass"] += primary and label_pass
@@ -466,16 +532,24 @@ def verify(run, cohort):
                     raise ValueError(
                         "Original geometric state contradiction was hidden"
                     )
+                else:
+                    pass
                 if calibration["status"] != "bracketed":
                     if result.get("status") != "calibration_unknown":
                         raise ValueError("Unknown calibration promoted")
+                    else:
+                        pass
                     continue
+                else:
+                    pass
                 if result["reception_JD_TDB"] != calibration["effective_JD"] or set(
                     result["models"]
                 ) != set(plan["source_models"]):
                     raise ValueError(
                         "Reception interval or source hypothesis set changed"
                     )
+                else:
+                    pass
                 reception = rounded(*parse(calibration["effective_JD"]), scale=1 << 256)
                 obs = {
                     k: observed(record[k], settings["extra_binary64_ULPs"])
@@ -483,6 +557,8 @@ def verify(run, cohort):
                 }
                 if {k: parse(v) for k, v in result["observed_bounds"].items()} != obs:
                     raise ValueError("Observation noise tube changed")
+                else:
+                    pass
                 direction = observed_direction(
                     record["astrometric_angles"], settings["extra_binary64_ULPs"]
                 )
@@ -496,6 +572,8 @@ def verify(run, cohort):
                     if row.get("status") == "source_model_unknown":
                         count["unknown"] += primary
                         continue
+                    else:
+                        pass
                     n, c = model_proof(source, reception, model, row, plan)
                     steps += n
                     checks += c
@@ -504,6 +582,8 @@ def verify(run, cohort):
                         or not row["apparent_angles_not_assessed"]
                     ):
                         raise ValueError("Unassessed returned quantities promoted")
+                    else:
+                        pass
                     expected = {k: intersects(parse(row[k]), obs[k]) for k in obs}
                     expected["astrometric_direction_components"] = [
                         intersects(parse(a), parse(b))
@@ -523,6 +603,8 @@ def verify(run, cohort):
                         raise ValueError(
                             "Failed source observable or conditional score changed"
                         )
+                    else:
+                        pass
                     count["all_not_refuted"] += primary and all_ok
                     count["range_not_refuted"] += primary and expected["range_AU"]
                     count["light_time_not_refuted"] += (
@@ -533,6 +615,8 @@ def verify(run, cohort):
                     )
         if seen != set(cases):
             raise ValueError("Original primary population changed")
+        else:
+            pass
         outputs.append(summary)
     return {
         "method_id": "independent_288bit_Bernstein_OBSERVER_transfer_proofs_v1",
@@ -563,3 +647,5 @@ if __name__ == "__main__":
     with args.output.open("x") as stream:
         json.dump(result, stream, indent=2)
         stream.write("\n")
+else:
+    pass

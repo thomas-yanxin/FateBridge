@@ -24,6 +24,8 @@ def audit_ming_properties(fixtures: Path = FIXTURES) -> dict[str, Any]:
             != item["sha256"]
         ):
             raise ValueError("Ming symbolism source checksum mismatch: " + item["path"])
+        else:
+            pass
     source = json.loads((folder / "collation.json").read_text())
     expected = {k: v for k, v in source.items() if k != "images"}
     expected["source_frames"] = [82, 83, 84]
@@ -35,6 +37,8 @@ def audit_ming_properties(fixtures: Path = FIXTURES) -> dict[str, Any]:
     mismatches: list[dict[str, Any]] = []
     if production != expected:
         mismatches.append(dict(case="production_source_data"))
+    else:
+        pass
     entities = {
         (e["kind"], e["name"]): clause["id"]
         for clause in source["clauses"]
@@ -50,6 +54,8 @@ def audit_ming_properties(fixtures: Path = FIXTURES) -> dict[str, Any]:
             elements = []
         if elements != row["elements"]:
             mismatches.append(dict(case="literal_elements/" + row["id"]))
+        else:
+            pass
     joins = 0
     cases = 0
     for year in range(1984, 2044):
@@ -66,6 +72,8 @@ def audit_ming_properties(fixtures: Path = FIXTURES) -> dict[str, Any]:
                         ):
                             if (kind, name) not in entities:
                                 continue
+                            else:
+                                pass
                             wanted.append(
                                 dict(
                                     kind=kind,
@@ -90,6 +98,8 @@ def audit_ming_properties(fixtures: Path = FIXTURES) -> dict[str, Any]:
                                 calculation_path=f"ziwei_birth.palaces.{i}.boshi12",
                             )
                         )
+                    else:
+                        pass
                 checks = {
                     "definitions": evidence["definitions"]
                     == {r["id"]: r for r in source["clauses"]},
@@ -152,11 +162,15 @@ def audit_ming_properties(fixtures: Path = FIXTURES) -> dict[str, Any]:
                 expected_terms = []
                 if lian["name"] == "官禄宫":
                     expected_terms.append("官祿主")
+                else:
+                    pass
                 if lian["ganzhi"][1] in {
                     chart["ming_gong"]["branch"],
                     chart["shen_gong"]["branch"],
                 }:
                     expected_terms.append("次桃花")
+                else:
+                    pass
                 checks["lianzhen_premises"] = (
                     c["lianzhen"]["applicable_terms_given_selected_reading"]
                     == expected_terms
@@ -177,6 +191,8 @@ def audit_ming_properties(fixtures: Path = FIXTURES) -> dict[str, Any]:
                     mismatches.append(
                         dict(year=year, profile=profile, gender=gender, checks=checks)
                     )
+                else:
+                    pass
                 joins += len(wanted)
                 cases += 1
     return dict(

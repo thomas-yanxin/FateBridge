@@ -19,20 +19,21 @@ import fatebridge.api as api
 from fatebridge.application.execution import execute_tool
 from fatebridge.cli import run
 from fatebridge.core import ephemeris_runtime as e
-from fatebridge.core import human_design as hd
-from fatebridge.core import jyotish
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.profiles import ANALYTICAL_MEAN_NODE_MODEL
-from fatebridge.core.human_design_mechanics import BODY_IDS
+from fatebridge.core.human_design import human_design as hd
+from fatebridge.core.human_design.human_design_mechanics import BODY_IDS
 from fatebridge.core.jpl_ephemeris import jpl_header
-from fatebridge.core.jyotish_kala import solar_packet
-from fatebridge.core.jyotish_mean import geometric_points
+from fatebridge.core.jyotish import jyotish
+from fatebridge.core.jyotish.jyotish_kala import solar_packet
+from fatebridge.core.jyotish.jyotish_mean import geometric_points
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.human_design import calculate_human_design
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
-from fatebridge.validation.human_design import verify_human_design_reading
-from fatebridge.validation.human_design_backend import verify_full_backend_report
+from tests.support.transports import call_calculation
+from validation.human_design import verify_human_design_reading
+from validation.human_design_backend import verify_full_backend_report
 
 pytestmark = pytest.mark.skipif(e.swe is None, reason="Swiss Ephemeris required")
 FIXTURES = Path(__file__).parents[1] / "fixtures"
@@ -67,7 +68,7 @@ def selected(tmp_path, monkeypatch):
         e.configure_ephemeris_path(previous if previous is not None else "")
 
 
-def test_wider_fixture_retains_original_coefficients_and_old_fixture():
+def test_wider_fixture_retains_original_coefficients_and_old_fixture() -> None:
     data = (FIXTURES / KERNEL).read_bytes()
     provenance = json.loads(
         (FIXTURES / "human-design-de441-j2000.provenance.json").read_text()
@@ -101,7 +102,7 @@ def test_wider_fixture_retains_original_coefficients_and_old_fixture():
     assert "legacy_tt_range_fields" not in header
 
 
-def test_original_96_day_subset_still_fails_unchanged_hd_root_bracket(selected):
+def test_original_96_day_subset_still_fails_unchanged_hd_root_bracket(selected) -> None:
     selected.write_bytes(
         (
             Path(__file__).parents[1] / "data/astrodice/tables/de441-j2000.eph"
@@ -111,7 +112,7 @@ def test_original_96_day_subset_still_fails_unchanged_hd_root_bracket(selected):
         hd.chart_at_tt(2451545.0, "true")
 
 
-def test_jpl_does_not_silently_satisfy_compressed_swiss_requirement(selected):
+def test_jpl_does_not_silently_satisfy_compressed_swiss_requirement(selected) -> None:
     result = calculate_human_design(**HD_BIRTH, require_swiss_files=True)
     assert result["error_code"] == "ephemeris_source_inconsistent"
     assert result["issues"] == [
@@ -123,7 +124,7 @@ def test_jpl_does_not_silently_satisfy_compressed_swiss_requirement(selected):
 
 
 @pytest.mark.parametrize("node_mode", ["mean", "true"])
-def test_india_all_physical_frames_honor_selected_jpl(selected, node_mode):
+def test_india_all_physical_frames_honor_selected_jpl(selected, node_mode: str) -> None:
     raw = jyotish.positions(build_astro_birth_info(**BIRTH), node_mode=node_mode)
     assert raw["ephemeris_models"] == ["jpl"]
     assert raw["ephemeris_model_scope"] == "physical_bodies"
@@ -142,10 +143,12 @@ def test_india_all_physical_frames_honor_selected_jpl(selected, node_mode):
             assert raw["longitudes"][name] == coords[0]
     if node_mode == "mean":
         assert raw["ephemeris_by_body"]["Rahu"] == ANALYTICAL_MEAN_NODE_MODEL
+    else:
+        pass
     assert raw["native_node_return_flags"]["Rahu"] & e.swe.FLG_JPLEPH
 
 
-def test_motion_and_solar_event_checks_honor_selected_jpl(selected):
+def test_motion_and_solar_event_checks_honor_selected_jpl(selected) -> None:
     geometric = geometric_points(2451545.0, "require_data_files")
     assert len(geometric) == 5
     assert all(row["ephemeris_model"] == "jpl" for row in geometric.values())
@@ -154,7 +157,9 @@ def test_motion_and_solar_event_checks_honor_selected_jpl(selected):
     assert packet["events"]
 
 
-def test_no_data_summaries_exclude_analytical_node(selected, monkeypatch, tmp_path):
+def test_no_data_summaries_exclude_analytical_node(
+    selected, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     empty = tmp_path / "empty"
     empty.mkdir()
     monkeypatch.setenv("SE_EPHE_PATH", str(empty))
@@ -176,7 +181,9 @@ def test_no_data_summaries_exclude_analytical_node(selected, monkeypatch, tmp_pa
 
 
 @pytest.mark.parametrize("mode", ["mean", "true"])
-def test_hd_primary_chart_survives_forbidden_optional_reference(selected, mode):
+def test_hd_primary_chart_survives_forbidden_optional_reference(
+    selected, mode: str
+) -> None:
     result = calculate_human_design(**HD_BIRTH, node_mode=mode)
     assert "error" not in result
     policy = result["calculation_policy"]
@@ -202,8 +209,8 @@ def test_hd_primary_chart_survives_forbidden_optional_reference(selected, mode):
 @pytest.mark.parametrize("layer", ["india", "motion", "solar", "hd"])
 @pytest.mark.parametrize("problem", ["missing", "truncated", "out_of_range"])
 def test_selected_source_failures_never_become_analytical_results(
-    selected, monkeypatch, layer, problem
-):
+    selected, monkeypatch: pytest.MonkeyPatch, layer: str, problem: str
+) -> None:
     epoch = 2451545.0
     birth = BIRTH
     if problem == "missing":
@@ -235,14 +242,24 @@ def test_selected_source_failures_never_become_analytical_results(
 )
 @pytest.mark.parametrize("node_mode", ["mean", "true"])
 def test_real_three_transport_policy_and_node_projection(
-    selected, tmp_path, monkeypatch, capsys, key, variant, node_mode
-):
+    selected,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    key: str,
+    variant: str | None,
+    node_mode: str,
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     payload = {**(HD_BIRTH if key == "human_design" else BIRTH), "node_mode": node_mode}
     if variant:
         payload["chart_variant"] = variant
+    else:
+        pass
     if key != "human_design":
         payload["ephemeris_policy"] = "require_data_files"
+    else:
+        pass
     if key == "astro_vimshottari":
         payload.update(
             analysis_year=2000,
@@ -251,6 +268,8 @@ def test_real_three_transport_policy_and_node_projection(
             analysis_hour=12,
             analysis_timezone="UTC",
         )
+    else:
+        pass
     fields = (
         [
             "calculation_policy",
@@ -284,8 +303,8 @@ def test_real_three_transport_policy_and_node_projection(
 
     async def mcp():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                spec.tool_name, {**payload, **options}, raise_on_error=False
+            return await call_calculation(
+                client, spec.tool_name, {**payload, **options}, raise_on_error=False
             )
 
     protocol = asyncio.run(mcp())
@@ -334,9 +353,11 @@ def test_real_three_transport_policy_and_node_projection(
                     "start_julian_day_tt" not in item
                     and "end_julian_day_tt" not in item
                 )
+        else:
+            pass
 
 
-def test_strict_jpl_original_reading_verifier_retains_fidelity_checks(selected):
+def test_strict_jpl_original_reading_verifier_retains_fidelity_checks(selected) -> None:
     spec = next(s for s in CATALOG if s.key == "human_design")
     result = execute_tool(spec, spec.request_model(**HD_BIRTH))
     checked = verify_human_design_reading(result)
@@ -345,8 +366,8 @@ def test_strict_jpl_original_reading_verifier_retains_fidelity_checks(selected):
 
 @pytest.mark.parametrize("mode", ["mean", "true"])
 def test_default_file_mode_still_performs_and_verifies_full_reference(
-    selected, monkeypatch, tmp_path, mode
-):
+    selected, monkeypatch: pytest.MonkeyPatch, tmp_path: Path, mode: str
+) -> None:
     from fatebridge.core.astro.ephemeris_integrity import (
         load_ephemeris_manifest,
         verify_ephemeris_bytes,
@@ -374,7 +395,9 @@ def test_default_file_mode_still_performs_and_verifies_full_reference(
 
 
 @pytest.mark.parametrize("key", ["astro_india", "human_design"])
-def test_main_source_failure_remains_public_503(selected, monkeypatch, key):
+def test_main_source_failure_remains_public_503(
+    selected, monkeypatch: pytest.MonkeyPatch, key: str
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "missing.eph")
     api._reset_runtime_state_for_tests()
@@ -395,8 +418,8 @@ def test_main_source_failure_remains_public_503(selected, monkeypatch, key):
 
 
 def test_native_and_optional_motion_frames_share_one_configuration(
-    selected, monkeypatch, tmp_path
-):
+    selected, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     from fatebridge.core.astro import native_execution
 
     # Probe the worker-local managed transaction. The public wrapper now
@@ -427,6 +450,8 @@ def test_native_and_optional_motion_frames_share_one_configuration(
     def worker():
         if not start.wait(5):
             return
+        else:
+            pass
         locked = e._EPHEMERIS_LOCK.acquire(blocking=False)
         acquired.append(locked)
         if locked:
@@ -434,6 +459,8 @@ def test_native_and_optional_motion_frames_share_one_configuration(
                 e.configure_ephemeris_path(str(empty))
             finally:
                 e._EPHEMERIS_LOCK.release()
+        else:
+            pass
         done.set()
 
     monkeypatch.setattr(jyotish, "geometric_points", between_frames)

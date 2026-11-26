@@ -10,9 +10,21 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.validation.predictions import Forecast, Outcome, digest
-from fatebridge.validation.sukuyo_study import (
-    REQUIRED_ARTIFACTS,
+from tests.unit_test.fixtures.sukuyo_study import (
+    ARTIFACTS,
+    EVALUATE_AT,
+    EVIDENCE,
+    MODEL,
+    OUTCOME_SOURCES,
+    REGISTER_AT,
+    SEAL_AT,
+    forecasts,
+    outcomes,
+    protocol,
+    registered,
+)
+from validation.predictions import Forecast, digest
+from validation.sukuyo_study import (
     SukuyoProtocol,
     blind_outcome_sheet,
     evaluate,
@@ -22,93 +34,8 @@ from fatebridge.validation.sukuyo_study import (
     seal_forecasts,
 )
 
-MODEL = b"synthetic test model; not an astrological probability mapping"
-MODEL_HASH = hashlib.sha256(MODEL).hexdigest()
-ARTIFACTS = {name: ("synthetic actual " + name).encode() for name in REQUIRED_ARTIFACTS}
-EVIDENCE = {str(i): f"synthetic calculation evidence {i}".encode() for i in range(2)}
-OUTCOME_SOURCES = {str(i): f"synthetic outcome record {i}".encode() for i in range(2)}
-REGISTER_AT = datetime(2027, 1, 2, tzinfo=timezone.utc)
-SEAL_AT = datetime(2027, 1, 3, tzinfo=timezone.utc)
-EVALUATE_AT = datetime(2028, 2, 2, tzinfo=timezone.utc)
 
-
-def protocol(**changes):
-    base = {
-        "blind_protocol": {
-            "plan": {
-                "study_id": "synthetic-workflow-test",
-                "data_kind": "synthetic",
-                "preregistered_at": "2027-01-01T00:00:00Z",
-                "window_start": "2027-02-01T00:00:00Z",
-                "window_end": "2028-02-01T00:00:00Z",
-                "target_definition": "Synthetic binary endpoint, not a real relationship observation",
-                "model_sha256": MODEL_HASH,
-                "baseline_probability": 0.5,
-                "minimum_evaluable": 2,
-                "training_subject_ids": [],
-                "cohort": [
-                    {"case_id": str(i), "subject_id": "synthetic-pair-" + str(i)}
-                    for i in range(2)
-                ],
-            },
-            "training_subject_ids": [],
-            "baseline_derivation": "Frozen synthetic test baseline",
-            "outcome_adjudication": "Independent source after complete follow-up; synthetic in this test",
-            "recruitment_and_exclusions": "Frozen complete two-pair synthetic cohort",
-            "probability_mapping": "Explicit synthetic values; no mapping from traditional labels",
-            "sample_size_justification": "Two cases verify arithmetic only, not statistical efficacy",
-            "analysis_plan": "Frozen Brier endpoint; no early stopping; keep missing cases in coverage",
-            "artifact_sha256": {
-                k: hashlib.sha256(v).hexdigest() for k, v in ARTIFACTS.items()
-            },
-        },
-        "pairs": [
-            {
-                "case_id": str(i),
-                "person1_subject_id": f"fictional-{i}-a",
-                "person2_subject_id": f"fictional-{i}-b",
-            }
-            for i in range(2)
-        ],
-        "relationship_context": "synthetic business pairing test",
-        "hypothesis": "Synthetic prediction pipeline validation only",
-    }
-    base.update(changes)
-    return SukuyoProtocol.model_validate(base)
-
-
-def forecasts():
-    return [
-        Forecast(
-            case_id=str(i),
-            issued_at="2027-01-02T12:00:00Z",
-            model_sha256=MODEL_HASH,
-            evidence_sha256=hashlib.sha256(EVIDENCE[str(i)]).hexdigest(),
-            probability=p,
-        )
-        for i, p in enumerate([0.9, 0.1])
-    ]
-
-
-def outcomes():
-    return [
-        Outcome(
-            case_id=str(i),
-            occurred=bool(v),
-            event_at="2027-07-01T00:00:00Z" if v else None,
-            recorded_at="2028-02-02T00:00:00Z",
-            source_sha256=hashlib.sha256(OUTCOME_SOURCES[str(i)]).hexdigest(),
-            source_reference="synthetic independent outcome",
-        )
-        for i, v in enumerate([1, 0])
-    ]
-
-
-def registered():
-    return register(protocol(), MODEL, at=REGISTER_AT, artifacts=ARTIFACTS)
-
-
-def test_registered_sealed_and_revealed_pipeline_preserves_synthetic_boundary():
+def test_registered_sealed_and_revealed_pipeline_preserves_synthetic_boundary() -> None:
     reg = registered()
     sealed = seal_forecasts(reg, forecasts(), at=SEAL_AT, evidence=EVIDENCE)
     report = evaluate(
@@ -123,21 +50,21 @@ def test_registered_sealed_and_revealed_pipeline_preserves_synthetic_boundary():
     assert not report["confidence_bound_gate_met"]
 
 
-def test_one_subject_cannot_inflate_sample_count_through_several_pairs():
+def test_one_subject_cannot_inflate_sample_count_through_several_pairs() -> None:
     pairs = protocol().model_dump(mode="json")["pairs"]
     pairs[1]["person1_subject_id"] = pairs[0]["person2_subject_id"]
     with pytest.raises(ValidationError, match="同一人"):
         protocol(pairs=pairs)
 
 
-def test_fixed_sample_study_refuses_unadjusted_repeated_looks():
+def test_fixed_sample_study_refuses_unadjusted_repeated_looks() -> None:
     values = protocol().model_dump(mode="json")
     values["blind_protocol"]["plan"]["planned_evaluations"] = 2
     with pytest.raises(ValidationError, match="一次到期评价"):
         SukuyoProtocol.model_validate(values)
 
 
-def test_pair_participants_are_checked_against_training_not_just_pair_ids():
+def test_pair_participants_are_checked_against_training_not_just_pair_ids() -> None:
     data = protocol().model_dump(mode="json")
     data["blind_protocol"]["training_subject_ids"] = ["fictional-0-a"]
     data["blind_protocol"]["plan"]["training_subject_ids"] = ["fictional-0-a"]
@@ -145,7 +72,7 @@ def test_pair_participants_are_checked_against_training_not_just_pair_ids():
         SukuyoProtocol.model_validate(data)
 
 
-def test_actual_source_files_are_required_at_registration():
+def test_actual_source_files_are_required_at_registration() -> None:
     with pytest.raises(ValueError, match="实际规则"):
         register(
             protocol(),
@@ -159,14 +86,16 @@ def test_actual_source_files_are_required_at_registration():
         SukuyoProtocol.model_validate(data)
 
 
-def test_pair_list_cannot_be_replaced_after_registration():
+def test_pair_list_cannot_be_replaced_after_registration() -> None:
     reg = registered()
     reg["protocol"]["pairs"][0]["person1_subject_id"] = "replacement"
     with pytest.raises(ValueError, match="注册文件已改变"):
         read_registration(reg)
 
 
-def test_declared_interpretation_cannot_differ_from_the_actual_frozen_artifact():
+def test_declared_interpretation_cannot_differ_from_the_actual_frozen_artifact() -> (
+    None
+):
     data = protocol().model_dump(mode="json")
     data["blind_protocol"]["plan"]["interpretation_policy_sha256"] = hashlib.sha256(
         b"a different interpretation policy, absent from the submitted files"
@@ -175,7 +104,9 @@ def test_declared_interpretation_cannot_differ_from_the_actual_frozen_artifact()
         SukuyoProtocol.model_validate(data)
 
 
-def test_actual_interpretation_is_bound_through_registration_forecast_and_reveal():
+def test_actual_interpretation_is_bound_through_registration_forecast_and_reveal() -> (
+    None
+):
     data = protocol().model_dump(mode="json")
     policy_sha = hashlib.sha256(ARTIFACTS["interpretation_policy"]).hexdigest()
     data["blind_protocol"]["plan"].update(
@@ -220,7 +151,7 @@ def test_actual_interpretation_is_bound_through_registration_forecast_and_reveal
     assert not report["authority_certified"]
 
 
-def test_even_rehashed_pair_scheme_cannot_reuse_old_forecast_commitment():
+def test_even_rehashed_pair_scheme_cannot_reuse_old_forecast_commitment() -> None:
     reg = registered()
     sealed = seal_forecasts(reg, forecasts(), at=SEAL_AT, evidence=EVIDENCE)
     changed = deepcopy(reg)
@@ -234,7 +165,7 @@ def test_even_rehashed_pair_scheme_cannot_reuse_old_forecast_commitment():
         )
 
 
-def test_early_issuance_reveal_duplicate_or_omitted_predictions_fail():
+def test_early_issuance_reveal_duplicate_or_omitted_predictions_fail() -> None:
     reg = registered()
     with pytest.raises(ValueError):
         seal_forecasts(reg, forecasts()[:1], at=SEAL_AT, evidence=EVIDENCE)
@@ -252,7 +183,7 @@ def test_early_issuance_reveal_duplicate_or_omitted_predictions_fail():
         evaluate(reg, sealed, [], at=SEAL_AT, outcome_sources={})
 
 
-def test_missing_observation_is_not_dropped_from_registered_coverage():
+def test_missing_observation_is_not_dropped_from_registered_coverage() -> None:
     reg = registered()
     sealed = seal_forecasts(reg, forecasts(), at=SEAL_AT, evidence=EVIDENCE)
     report = evaluate(
@@ -268,7 +199,7 @@ def test_missing_observation_is_not_dropped_from_registered_coverage():
     assert report["paired_brier_gain_interval"] is None
 
 
-def test_fingerprints_require_actual_forecast_and_outcome_evidence():
+def test_fingerprints_require_actual_forecast_and_outcome_evidence() -> None:
     reg = registered()
     with pytest.raises(ValueError, match="实际计算"):
         seal_forecasts(reg, forecasts(), at=SEAL_AT, evidence={})
@@ -289,7 +220,7 @@ def test_fingerprints_require_actual_forecast_and_outcome_evidence():
         )
 
 
-def test_adjudicator_sheet_excludes_births_pair_labels_and_predictions():
+def test_adjudicator_sheet_excludes_births_pair_labels_and_predictions() -> None:
     registration = registered()
     sheet = blind_outcome_sheet(registration)
     assert sheet["case_ids"] == ["0", "1"]
@@ -311,7 +242,9 @@ def test_adjudicator_sheet_excludes_births_pair_labels_and_predictions():
     )
 
 
-def test_draft_cli_has_no_real_subjects_and_cannot_overwrite_a_commitment(tmp_path):
+def test_draft_cli_has_no_real_subjects_and_cannot_overwrite_a_commitment(
+    tmp_path: Path,
+) -> None:
     root = Path(__file__).resolve().parents[2]
     import sys
 
@@ -332,8 +265,8 @@ def test_draft_cli_has_no_real_subjects_and_cannot_overwrite_a_commitment(tmp_pa
 
 
 def test_cli_register_seal_blind_sheet_and_evaluate_share_frozen_files(
-    monkeypatch, tmp_path, capsys
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     import importlib.util
     import sys
 

@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.jyotish_ashtakavarga import calculate
-from fatebridge.core.jyotish_pinda import PLANETS, analyze, coowned, reduce_row
+from fatebridge.core.jyotish.jyotish_ashtakavarga import calculate
+from fatebridge.core.jyotish.jyotish_pinda import PLANETS, analyze, coowned, reduce_row
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 PRIMARY_PATH = FIXTURES / "jyotish-pinda-primary.json"
@@ -18,7 +18,7 @@ PRIMARY = json.loads(PRIMARY_PATH.read_text())
 FULL = json.loads(FULL_PATH.read_text())
 
 
-def test_primary_and_full_expected_tables_remain_frozen_before_kernel():
+def test_primary_and_full_expected_tables_remain_frozen_before_kernel() -> None:
     assert hashlib.sha256(PRIMARY_PATH.read_bytes()).hexdigest() == (
         "eb665bdad180ab8b08afeb377f77ca9c6f7dc055b490b11ddd946dad39632d83"
     )
@@ -28,7 +28,7 @@ def test_primary_and_full_expected_tables_remain_frozen_before_kernel():
 
 
 @pytest.mark.parametrize("case", FULL, ids=lambda c: c["name"])
-def test_all_637_full_targets_and_source_missingness(case):
+def test_all_637_full_targets_and_source_missingness(case) -> None:
     signs = {p: case["signs"][p] for p in PLANETS}
     tables = calculate(case["signs"])["bhinna"]
     assert tables == case["bav"]
@@ -71,7 +71,7 @@ def test_all_637_full_targets_and_source_missingness(case):
 
 
 @pytest.mark.parametrize("example", PRIMARY["coowned_example42"], ids=lambda e: e["id"])
-def test_all_literal_example42_pairs(example):
+def test_all_literal_example42_pairs(example) -> None:
     signs = dict.fromkeys(PLANETS, 4)
     for index, sign in enumerate(["Taurus", "Libra"]):
         for planet in example["occupants"][sign]:
@@ -83,7 +83,7 @@ def test_all_literal_example42_pairs(example):
     assert [result[i] for i in example["pair"]] == example["after"]
 
 
-def test_mercury_literal_examples40_41_43_preserve_multiple_occupants():
+def test_mercury_literal_examples40_41_43_preserve_multiple_occupants() -> None:
     example = PRIMARY["mercury_examples40_41_43"]
     row = reduce_row(
         example["unreduced_BAV"],
@@ -99,7 +99,9 @@ def test_mercury_literal_examples40_41_43_preserve_multiple_occupants():
     assert [term["product"] for term in row["graha_terms"]] == [15, 0, 24, 15, 0, 21, 0]
 
 
-def test_all_729_trinal_triples_preserve_pairwise_differences_and_zero_footnote():
+def test_all_729_trinal_triples_preserve_pairwise_differences_and_zero_footnote() -> (
+    None
+):
     for values in itertools.product(range(9), repeat=3):
         original = [0] * 12
         original[0], original[4], original[8] = values
@@ -108,13 +110,17 @@ def test_all_729_trinal_triples_preserve_pairwise_differences_and_zero_footnote(
         assert 0 in triple and all(v >= 0 for v in triple)
         if 0 in values:
             assert triple == list(values)
+        else:
+            pass
         if len(set(values)) == 1:
             assert triple == [0, 0, 0]
+        else:
+            pass
         for i, j in itertools.combinations(range(3), 2):
             assert triple[i] - triple[j] == values[i] - values[j]
 
 
-def test_equal_single_occupied_source_gap_is_not_zero_or_a_hidden_default():
+def test_equal_single_occupied_source_gap_is_not_zero_or_a_hidden_default() -> None:
     # A transformation unit input, not a claim that this is a full natal BAV.
     row = [0] * 12
     row[0] = row[7] = 2
@@ -141,7 +147,7 @@ def test_equal_single_occupied_source_gap_is_not_zero_or_a_hidden_default():
         [0.5] + [0] * 11,
     ],
 )
-def test_invalid_count_domains_are_rejected(values):
+def test_invalid_count_domains_are_rejected(values) -> None:
     with pytest.raises(ValueError, match="twelve integer"):
         reduce_row(values, dict.fromkeys(PLANETS, 0))
 
@@ -149,7 +155,7 @@ def test_invalid_count_domains_are_rejected(values):
 @pytest.mark.parametrize(
     "change", ["missing", "extra", "bool", "float", "negative", "outside"]
 )
-def test_invalid_occupant_identity_and_signs_are_rejected(change):
+def test_invalid_occupant_identity_and_signs_are_rejected(change: str) -> None:
     signs = dict.fromkeys(PLANETS, 0)
     if change == "missing":
         del signs["Sun"]
@@ -163,7 +169,7 @@ def test_invalid_occupant_identity_and_signs_are_rejected(change):
         reduce_row([0] * 12, signs)
 
 
-def test_unreduced_total_and_target_contract_rejects_mutated_full_table():
+def test_unreduced_total_and_target_contract_rejects_mutated_full_table() -> None:
     signs = FULL[0]["signs"]
     tables = calculate(signs)["bhinna"]
     tables["Sun"][0] += 1
@@ -175,8 +181,8 @@ def test_unreduced_total_and_target_contract_rejects_mutated_full_table():
         analyze(tables, {p: signs[p] for p in PLANETS})
 
 
-def test_typed_partial_row_keeps_null_distinct_from_zero():
-    from fatebridge.core.output_jyotish import PindaRow
+def test_typed_partial_row_keeps_null_distinct_from_zero() -> None:
+    from fatebridge.core.contracts.output_jyotish import PindaRow
 
     values = [0] * 12
     values[0] = values[7] = 2
@@ -187,13 +193,13 @@ def test_typed_partial_row_keeps_null_distinct_from_zero():
     assert typed["graha_pinda"] == 10
 
 
-def test_every_returned_varga_and_own_birth_grid_has_declared_reductions():
+def test_every_returned_varga_and_own_birth_grid_has_declared_reductions() -> None:
     from fatebridge.core.astro.birth import build_astro_birth_info
-    from fatebridge.core.jyotish import build_india
-    from fatebridge.core.jyotish_ashtakavarga import RULE as BAV_RULE
-    from fatebridge.core.jyotish_ashtakavarga import chart_inputs
-    from fatebridge.core.jyotish_pinda import RULE, SOURCE
-    from fatebridge.core.output_jyotish import JyotishIndia
+    from fatebridge.core.contracts.output_jyotish import JyotishIndia
+    from fatebridge.core.jyotish.jyotish import build_india
+    from fatebridge.core.jyotish.jyotish_ashtakavarga import RULE as BAV_RULE
+    from fatebridge.core.jyotish.jyotish_ashtakavarga import chart_inputs
+    from fatebridge.core.jyotish.jyotish_pinda import RULE, SOURCE
     from tests.fixtures.surface_payloads import astro_payload
 
     india = build_india(
@@ -235,8 +241,8 @@ def test_every_returned_varga_and_own_birth_grid_has_declared_reductions():
             )
 
 
-def test_ascendant_grid_crossing_changes_its_own_count_basis_not_occupancy():
-    from fatebridge.core.jyotish_ashtakavarga import SampleGrid
+def test_ascendant_grid_crossing_changes_its_own_count_basis_not_occupancy() -> None:
+    from fatebridge.core.jyotish.jyotish_ashtakavarga import SampleGrid
 
     positions = PRIMARY["mercury_examples40_41_43"][
         "given_signs_from_prior_chart6_reference"

@@ -9,7 +9,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-PLAN_SHA256 = "b4ac55d88026d5aff7ede30f82301eb26c045c9975d7985fbd5188ae6d4ca59d"
+PLAN_SHA256 = "c397ced17ec8f83ee899e3de7a2c06cf2485ce1fdc5b11d474abe5a39793ad00"
 METHOD_ID = "registered_source_conditions_v1"
 DATA_NAME = "bazi-source-conditions.json"
 

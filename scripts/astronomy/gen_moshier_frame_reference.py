@@ -91,6 +91,8 @@ def add_lahiri_frames(result, protocol):
         for row in target["rows"]:
             if row["status"] != "available":
                 continue
+            else:
+                pass
             arguments = (
                 row["jd_tt"],
                 row["icrf_unit_direction"],
@@ -116,6 +118,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.output.exists():
         raise SystemExit("Refuse to replace an earlier reference")
+    else:
+        pass
     protocol = json.loads(args.protocol.read_text())
     result = add_lahiri_frames(collector.generate(args), protocol)
     result["projection_scope"] = (
@@ -126,3 +130,5 @@ if __name__ == "__main__":
     args.output.write_text(
         json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
     )
+else:
+    pass

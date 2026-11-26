@@ -7,13 +7,17 @@ from fatebridge.core.astro.midpoints import PHYSICAL_BODIES
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.services.astrology import calculate_core_chart_analysis
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.western import test_other_chart_physical_sources as shared_sources
+from tests.unit_test.fixtures.western_ephemeris import (
+    ephemeris_files as ephemeris_files,
+)
+from tests.unit_test.fixtures.western_ephemeris import (
+    restore_configuration as restore_configuration,
+)
 
-ephemeris_files = shared_sources.ephemeris_files
-restore_configuration = shared_sources.restore_configuration
 
-
-def test_equal13_compares_the_same_primary_factors_with_lunar_support(ephemeris_files):
+def test_equal13_compares_the_same_primary_factors_with_lunar_support(
+    ephemeris_files,
+) -> None:
     _, directory = ephemeris_files
     e.configure_ephemeris_path(str(directory))
     assert e.configured_ephemeris_path() == str(directory)
@@ -43,7 +47,9 @@ def test_equal13_compares_the_same_primary_factors_with_lunar_support(ephemeris_
         }
 
 
-def test_auxiliary_only_file_mutation_still_rejects_the_calculation(ephemeris_files):
+def test_auxiliary_only_file_mutation_still_rejects_the_calculation(
+    ephemeris_files,
+) -> None:
     _, directory = ephemeris_files
     e.configure_ephemeris_path(str(directory))
     assert e.configured_ephemeris_path() == str(directory)

@@ -10,12 +10,12 @@ import pytest
 from fatebridge.core.astro import layout
 from fatebridge.core.astro.context_geometry import build_context_geometry
 from fatebridge.core.astro.geometry import _house_for_longitude
+from fatebridge.core.astro.ptolemy import triplicity_rulers
 from fatebridge.core.astrodice import PLANETS, build_symbolic_evidence
 from fatebridge.core.classical_western import compute_lot
 from fatebridge.core.local_techniques.chart import _build_birth_info
 from fatebridge.core.local_techniques.otherbu import build_otherbu_result
-from fatebridge.core.ptolemy import triplicity_rulers
-from fatebridge.validation import astrodice_study
+from validation import astrodice_study
 
 REFERENCE = json.loads(
     (
@@ -27,13 +27,37 @@ REFERENCE = json.loads(
 @pytest.mark.parametrize(
     "longitude", [1e-14, math.nextafter(30.0, 0.0), math.nextafter(360.0, 0.0)]
 )
-def test_shared_lot_does_not_round_across_a_boundary_during_normalization(longitude):
+def test_shared_lot_does_not_round_across_a_boundary_during_normalization(
+    longitude,
+) -> None:
     assert (
         compute_lot(["a", "b", "c"], {"a": longitude, "b": 0.0, "c": 0.0}) == longitude
     )
 
 
-def test_sidereal_context_keeps_a_tiny_negative_offset_in_pisces():
+@pytest.mark.parametrize("method", ["sect_reversing", "ptolemy_iii10"])
+def test_fortune_house_uses_the_working_angle_at_a_cusp(method: str) -> None:
+    # The exact result is just below cusp 7 but displays as 190 degrees.
+    states = {"Sun": {"longitude": 2**-48}, "Moon": {"longitude": 190.0}}
+    context = build_context_geometry(
+        states,
+        list(states),
+        ascendant=0.0,
+        midheaven=270.0,
+        house_system="equal",
+        house_cusps=[10.0 + 30.0 * i for i in range(12)],
+        ayanamsha=0.0,
+        chart_sect="day",
+        fortune_method=method,
+    )
+    fortune = next(
+        point for point in context["objects"] if point["id"] == "Pars Fortuna"
+    )
+    assert fortune["lon"] == 190.0
+    assert fortune["house"] == "House6"
+
+
+def test_sidereal_context_keeps_a_tiny_negative_offset_in_pisces() -> None:
     context = build_context_geometry(
         {"Mercury": {"longitude": 0.0}},
         ["Mercury"],
@@ -52,7 +76,9 @@ def test_sidereal_context_keeps_a_tiny_negative_offset_in_pisces():
 
 
 @pytest.mark.parametrize("row,planet", list(product(REFERENCE["signs"], PLANETS)))
-def test_conditional_triplicities_against_separately_transcribed_edition(row, planet):
+def test_conditional_triplicities_against_separately_transcribed_edition(
+    row, planet
+) -> None:
     result = build_symbolic_evidence(planet, row["sign"], 0)
     relation = result["symbolic_details"]["triplicity_condition"]
     assert relation["sect"] is None
@@ -65,16 +91,9 @@ def test_conditional_triplicities_against_separately_transcribed_edition(row, pl
         t for t in result["rule_trace"] if t["rule_id"] == "conditional_triplicity"
     )
     assert trace["result"] == relation
-    assert "conditional_triplicity" in result["interpretation"]["basis"]
-    assert (
-        result["interpretation"]["triplicity_meaning"]
-        in build_otherbu_result(planet=planet, sign=row["sign"], house=0)[
-            "snapshot_text"
-        ]
-    )
 
 
-def test_water_joint_rulership_is_not_dorothean_rotating_third_lord():
+def test_water_joint_rulership_is_not_dorothean_rotating_third_lord() -> None:
     assert triplicity_rulers("Cancer", "day") == {
         "primary": "Mars",
         "co_ruler": "Venus",
@@ -88,7 +107,7 @@ def test_water_joint_rulership_is_not_dorothean_rotating_third_lord():
         triplicity_rulers("Aries", "unknown")
 
 
-def test_geometry_keeps_node_and_lot_on_original_side_of_sign_and_house():
+def test_geometry_keeps_node_and_lot_on_original_side_of_sign_and_house() -> None:
     # Hand-constructed geometry: rounding the north node to 180 changes its
     # opposite from Pisces to Aries. Rounding Sun/Moon before the lot formula
     # changes Fortune from Aries to Taurus. Both are <0.0001 degree cases.
@@ -117,14 +136,16 @@ def test_geometry_keeps_node_and_lot_on_original_side_of_sign_and_house():
     assert all(0 <= p["signlon"] < 30 for p in points.values())
 
 
-def test_equal_house_layout_does_not_round_before_membership(monkeypatch):
+def test_equal_house_layout_does_not_round_before_membership(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     birth, _, _ = _build_birth_info(
         date_text="2024-03-20", time_text="06:30", timezone_name="UTC", lat=0, lon=0
     )
     monkeypatch.setattr(
         layout,
         "_swisseph_angles",
-        lambda *args: {
+        lambda jd_ut1, lon, lat, *, julian_day_tt: {
             "ascendant": 29.99996,
             "midheaven": 270.123456789,
         },
@@ -153,7 +174,7 @@ def test_equal_house_layout_does_not_round_before_membership(monkeypatch):
 @pytest.mark.parametrize(
     "cusp_index,offset", list(product(range(12), [-0.000001, 0, 0.000001]))
 )
-def test_context_house_intervals_use_unrounded_cusps(cusp_index, offset):
+def test_context_house_intervals_use_unrounded_cusps(cusp_index, offset) -> None:
     cusps = [(29.99996 + 30.0 * i) % 360 for i in range(12)]
     longitude = (cusps[cusp_index] + offset) % 360
     geometry = build_context_geometry(
@@ -175,7 +196,7 @@ def test_context_house_intervals_use_unrounded_cusps(cusp_index, offset):
 @pytest.mark.parametrize("hsys,zodiacal", list(product(range(9), [0, 1])))
 def test_optional_sky_coordinates_are_consistent_and_sect_stays_unselected(
     hsys, zodiacal
-):
+) -> None:
     result = build_otherbu_result(
         planet="Mars",
         sign="Cancer",
@@ -204,7 +225,9 @@ def test_optional_sky_coordinates_are_consistent_and_sect_stays_unselected(
     }
 
 
-def test_study_fingerprint_includes_shared_triplicity_source(monkeypatch, tmp_path):
+def test_study_fingerprint_includes_shared_triplicity_source(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     before = astrodice_study.engine_fingerprint()
     fake_source = tmp_path / "ptolemy.py"
     fake_source.write_text("changed conditional triangle rules")

@@ -32,7 +32,7 @@ FIXTURE = json.loads(
 @pytest.mark.parametrize("case", FIXTURE["cases"], ids=lambda case: case["body"])
 def test_native_historical_longitude_matches_predeclared_nasa_tt_reference(
     case, native_ephemeris_files
-):
+) -> None:
     raw = case["raw_http_json"].encode("utf-8")
     assert hashlib.sha256(raw).hexdigest() == case["raw_http_json_sha256"]
     response = json.loads(raw)

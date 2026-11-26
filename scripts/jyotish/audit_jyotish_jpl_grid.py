@@ -54,6 +54,8 @@ def load_reference(protocol_path: Path, reference_path: Path) -> tuple[dict, dic
         or digest(reference_path) != REFERENCE_SHA256
     ):
         raise ValueError("Sealed protocol or independent reference changed")
+    else:
+        pass
     protocol, reference = json.loads(protocol_path.read_text()), json.loads(
         reference_path.read_text()
     )
@@ -69,6 +71,8 @@ def load_reference(protocol_path: Path, reference_path: Path) -> tuple[dict, dic
         or set(seen) != wanted
     ):
         raise ValueError("Reference separation or frozen cohort incomplete")
+    else:
+        pass
     return protocol, reference
 
 
@@ -76,12 +80,14 @@ def audit(kernel: Path, protocol_path: Path, reference_path: Path) -> dict[str, 
     protocol, reference = load_reference(protocol_path, reference_path)
     if digest(kernel) != KERNEL_SHA256:
         raise ValueError("The admitted complete DE441 kernel changed")
+    else:
+        pass
     os.environ["SE_EPHE_PATH"], os.environ["FATEBRIDGE_JPL_FILE"] = (
         str(kernel.parent),
         kernel.name,
     )
     from fatebridge.core import ephemeris_runtime as e
-    from fatebridge.core.jyotish_mean import admitted, geometric_points
+    from fatebridge.core.jyotish.jyotish_mean import admitted, geometric_points
 
     e.configure_ephemeris_path()
     rows: list[dict[str, Any]] = []
@@ -92,6 +98,8 @@ def audit(kernel: Path, protocol_path: Path, reference_path: Path) -> dict[str, 
         delta = same_epoch[0]["geocentric_tdb_minus_tt_seconds"]
         if any(r["geocentric_tdb_minus_tt_seconds"] != delta for r in same_epoch):
             raise ValueError("Inconsistent independent time offset")
+        else:
+            pass
         shifted = jd + delta / 86400
         by_epoch[jd] = {"original": {}, "supplementary": {}}
         try:
@@ -150,10 +158,16 @@ def audit(kernel: Path, protocol_path: Path, reference_path: Path) -> dict[str, 
                 diagnostic["change_from_original_arcsec"] = error_arcsec(
                     unit(alternate), unit(point)
                 )
+            else:
+                pass
+        else:
+            pass
         row["supplementary_time_argument"] = diagnostic
         rows.append(row)
     if digest(kernel) != KERNEL_SHA256:
         raise ValueError("DE441 kernel changed during audit")
+    else:
+        pass
     return {
         "status": (
             "passed_original_TT_grid"
@@ -188,6 +202,8 @@ def main() -> None:
         p.resolve() for p in (args.kernel, args.protocol, args.reference)
     }:
         parser.error("report must be new and must not overwrite an input")
+    else:
+        pass
     try:
         result = audit(args.kernel.resolve(), args.protocol, args.reference)
     except Exception as exc:
@@ -206,3 +222,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

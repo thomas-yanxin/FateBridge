@@ -1,9 +1,8 @@
-"""
-Basic data structures and constants for BaZi calculations.
-"""
+"""Provide shared stem, branch, element and Ten God rules."""
 
+from collections.abc import Iterator, Mapping
 from enum import Enum
-from typing import Dict, Iterator, Mapping, NamedTuple, Optional, Tuple
+from typing import Literal, NamedTuple
 
 # 天干 (Heavenly Stems)
 HEAVENLY_STEMS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"]
@@ -121,30 +120,31 @@ BRANCH_HIDDEN_STEMS = {
 }
 
 
-def count_element_distribution_units(
-    pillars: Mapping[str, Tuple[str, str]],
-) -> Dict[Element, int]:
-    """Count the project's structural weights in exact tenths.
+STRUCTURAL_WEIGHT_UNITS_PER_WEIGHT = 10
+VISIBLE_STEM_WEIGHT_UNITS = 10
+BRANCH_ELEMENT_WEIGHT_UNITS = 5
+HIDDEN_STEM_WEIGHT_UNITS = 3
 
-    A visible stem contributes 10 units, the branch element 5, and each hidden
-    stem 3. This is the shared career/health/wealth counting policy, not a
-    calibrated measure of classical force. Integer units keep thresholds exact.
-    """
-    counts: Dict[Element, int] = {e: 0 for e in Element}
+
+def count_element_distribution_units(
+    pillars: Mapping[str, tuple[str, str]],
+) -> dict[Element, int]:
+    """Tally the structural weights used by career, health and wealth analysis."""
+    counts: dict[Element, int] = {element: 0 for element in Element}
     for stem, branch in pillars.values():
-        counts[STEM_ELEMENTS[stem][0]] += 10
-        counts[BRANCH_ELEMENTS[branch][0]] += 5
-        for hidden in BRANCH_HIDDEN_STEMS[branch]:
-            counts[STEM_ELEMENTS[hidden][0]] += 3
+        counts[STEM_ELEMENTS[stem][0]] += VISIBLE_STEM_WEIGHT_UNITS
+        counts[BRANCH_ELEMENTS[branch][0]] += BRANCH_ELEMENT_WEIGHT_UNITS
+        for hidden_stem in BRANCH_HIDDEN_STEMS[branch]:
+            counts[STEM_ELEMENTS[hidden_stem][0]] += HIDDEN_STEM_WEIGHT_UNITS
     return counts
 
 
 def count_element_distribution(
-    pillars: Mapping[str, Tuple[str, str]],
-) -> Dict[Element, float]:
+    pillars: Mapping[str, tuple[str, str]],
+) -> dict[Element, float]:
     """Convert the exact structural tally to its declared decimal weights."""
     return {
-        element: units / 10
+        element: units / STRUCTURAL_WEIGHT_UNITS_PER_WEIGHT
         for element, units in count_element_distribution_units(pillars).items()
     }
 
@@ -450,7 +450,7 @@ GENDER_MALE_TOKENS = frozenset({"male", "m", "男", "man"})
 GENDER_FEMALE_TOKENS = frozenset({"female", "f", "女", "woman"})
 
 
-def normalize_gender(gender: Optional[str]) -> Optional[str]:
+def normalize_gender(gender: str | None) -> Literal["male", "female"] | None:
     """将自由格式的性别输入归一化为 ``"male"`` / ``"female"`` / ``None``。
 
     None、空串、无法识别的取值统一返回 None（中性，由各模块自行决定如何处理）。
@@ -475,8 +475,6 @@ def normalize_gender(gender: Optional[str]) -> Optional[str]:
 #   - personality / wealth / education / relatives / children 仅跳过**日干本身**，
 #     仍计入日支藏干。
 # 两类共同点：日干自身从不计入（它对自身是比肩，无分析意义）。
-# 与原循环一致，本原语**不吞** get_ten_god 抛出的异常（仅 life_dimensions 另行吞错，
-# 故不迁移它）。
 
 
 class PillarGod(NamedTuple):
@@ -491,7 +489,7 @@ class PillarGod(NamedTuple):
 
 
 def iter_pillar_gods(
-    pillars: Mapping[str, Tuple[str, str]],
+    pillars: Mapping[str, tuple[str, str]],
     day_stem: str,
     *,
     skip_day_pillar: bool = False,
@@ -527,37 +525,16 @@ def iter_pillar_gods(
 
 
 def count_ten_gods(
-    pillars: Mapping[str, Tuple[str, str]],
+    pillars: Mapping[str, tuple[str, str]],
     day_stem: str,
     *,
     skip_day_pillar: bool = False,
-) -> Dict[TenGod, float]:
+) -> dict[TenGod, float]:
     """汇总四柱十神直方图（含全部十神 key，未出现者为 0.0）。
 
     用于只需"各十神总权重"的调用方（如 career / personality）。
     """
-    counts: Dict[TenGod, float] = {tg: 0.0 for tg in TenGod}
+    counts: dict[TenGod, float] = {tg: 0.0 for tg in TenGod}
     for entry in iter_pillar_gods(pillars, day_stem, skip_day_pillar=skip_day_pillar):
         counts[entry.ten_god] += entry.weight
     return counts
-
-
-def sum_ten_god_weight(
-    pillars: Mapping[str, Tuple[str, str]],
-    day_stem: str,
-    gods: Tuple[TenGod, ...],
-) -> float:
-    """汇总某一组十神的总权重（四柱天干 + 地支藏干），保留 1 位小数。
-
-    各维度分析里反复出现的「某类星力量」原语：把 :func:`iter_pillar_gods`
-    的逐条权重按所选十神集合求和。用于只关心单一星组合力的调用方
-    （relatives 父母星、romance 异性缘星、education 各学业星等）。
-    """
-    return round(
-        sum(
-            entry.weight
-            for entry in iter_pillar_gods(pillars, day_stem)
-            if entry.ten_god in gods
-        ),
-        1,
-    )

@@ -10,10 +10,10 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.almanac import get_day_ganzhi
+from fatebridge.core.contracts.output_numerology import NumerologyEvidence
 from fatebridge.core.local_techniques.canping import build_canping_result
 from fatebridge.core.local_techniques.heluo import build_heluo_result
-from fatebridge.core.numerology_inputs import TIMEZONE_POLICY_ID
-from fatebridge.core.output_numerology import NumerologyEvidence
+from fatebridge.core.numerology.numerology_inputs import TIMEZONE_POLICY_ID
 from fatebridge.core.requests.divination import CanpingRequest, HeluoRequest
 from fatebridge.utils.timezones import parse_timezone_name
 
@@ -30,7 +30,7 @@ REFERENCE = json.loads((FIXTURES / "reference.json").read_text())
 
 
 @pytest.mark.parametrize("model,build", PAIRS)
-def test_omitted_and_null_zone_use_the_published_fixed_offset(model, build):
+def test_omitted_and_null_zone_use_the_published_fixed_offset(model, build) -> None:
     public = build(**model(**BASE).model_dump())
     direct = build(**BASE)
     null = build(**BASE, zone=None)
@@ -44,7 +44,7 @@ def test_omitted_and_null_zone_use_the_published_fixed_offset(model, build):
 
 
 @pytest.mark.parametrize("model,build", PAIRS)
-def test_explicit_historical_zone_remains_a_distinct_birth_clock(model, build):
+def test_explicit_historical_zone_remains_a_distinct_birth_clock(model, build) -> None:
     named = build(**model(**BASE, zone="Asia/Shanghai").model_dump())
     fixed = build(**BASE, zone="+08:00")
     assert named["input_normalized"]["zone"] == "Asia/Shanghai"
@@ -58,7 +58,9 @@ def test_explicit_historical_zone_remains_a_distinct_birth_clock(model, build):
 
 @pytest.mark.parametrize("model,build", PAIRS)
 @pytest.mark.parametrize("zone", ["", " ", "未知", "UTC+08:90", 8, True])
-def test_blank_or_invalid_zone_never_becomes_a_default(model, build, zone):
+def test_blank_or_invalid_zone_never_becomes_a_default(
+    model, build, zone: bool | int | str
+) -> None:
     with pytest.raises(ValidationError):
         model(**BASE, zone=zone)
     with pytest.raises(ValueError):
@@ -68,8 +70,8 @@ def test_blank_or_invalid_zone_never_becomes_a_default(model, build, zone):
 @pytest.mark.parametrize("model,build", PAIRS)
 @pytest.mark.parametrize("solar", [False, True])
 def test_explicit_historical_zone_and_fixed_dst_offset_are_same_solar_instant(
-    model, build, solar
-):
+    model, build, solar: bool
+) -> None:
     args = {**BASE, "use_true_solar_time": solar}
     named = build(**model(**args, zone=" Asia/Shanghai ").model_dump())
     fixed = build(**model(**args, zone="+09:00").model_dump())
@@ -167,7 +169,7 @@ def test_explicit_historical_zone_and_fixed_dst_offset_are_same_solar_instant(
 @pytest.mark.parametrize(
     "row", REFERENCE["transition_instants"], ids=lambda r: r["utc"]
 )
-def test_historical_transition_labels_from_named_notice(row):
+def test_historical_transition_labels_from_named_notice(row) -> None:
     # Expected constants were transcribed from the named notice/rules. They
     # are not produced with the timezone engine under test.
     instant = datetime.fromisoformat(row["utc"])
@@ -180,7 +182,9 @@ def test_historical_transition_labels_from_named_notice(row):
 @pytest.mark.parametrize("model,build", PAIRS)
 @pytest.mark.parametrize("solar", [False, True])
 @pytest.mark.parametrize("case", REFERENCE["invalid_regional_clocks"])
-def test_historical_gap_and_fold_are_not_guessed(model, build, solar, case):
+def test_historical_gap_and_fold_are_not_guessed(
+    model, build, solar: bool, case
+) -> None:
     args = dict(
         date=case["date"],
         time=case["time"],
@@ -195,7 +199,7 @@ def test_historical_gap_and_fold_are_not_guessed(model, build, solar, case):
 
 
 @pytest.mark.parametrize("model,build", PAIRS)
-def test_repeated_clock_requires_a_known_explicit_offset(model, build):
+def test_repeated_clock_requires_a_known_explicit_offset(model, build) -> None:
     args = {**BASE, "date": "1990-09-16", "time": "01:30"}
     clocks = []
     for zone, instant in (
@@ -209,7 +213,7 @@ def test_repeated_clock_requires_a_known_explicit_offset(model, build):
     assert clocks[0] != clocks[1]
 
 
-def test_reference_source_identity_and_bounded_scope():
+def test_reference_source_identity_and_bounded_scope() -> None:
     source = REFERENCE["iana_source"]
     assert (
         hashlib.sha256((FIXTURES / source["file"]).read_bytes()).hexdigest()

@@ -3,19 +3,20 @@
 import hashlib
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 
-from fatebridge.validation.taiyi_epoch import (
-    decode_day_counter,
-    lunar_day_counter_views,
-    sexagenary_hypothesis,
-)
 from scripts.taiyi.audit_taiyi_day_count_encodings import (
     CORPUS,
     FREEZE_SHA256,
     audit,
     verify_sources,
+)
+from validation.taiyi_epoch import (
+    decode_day_counter,
+    lunar_day_counter_views,
+    sexagenary_hypothesis,
 )
 
 LITERATURE = json.loads((CORPUS / "literature-controls.json").read_text())
@@ -30,7 +31,7 @@ def report():
     return audit()
 
 
-def test_new_source_controls_precede_implementation_and_are_not_taiyi_cases():
+def test_new_source_controls_precede_implementation_and_are_not_taiyi_cases() -> None:
     frozen = verify_sources()
     assert (
         hashlib.sha256((CORPUS / "freeze.json").read_bytes()).hexdigest()
@@ -60,7 +61,7 @@ def test_new_source_controls_precede_implementation_and_are_not_taiyi_cases():
 @pytest.mark.parametrize("row,epoch", WITNESSES)
 def test_all27_published_phase_labels_survive_a_coupled_change_of_representation(
     row, epoch
-):
+) -> None:
     phase = row["phase_remainder"]
     zero = decode_day_counter(phase, encoding="completed_days", epoch_ganzhi=epoch)
     one = decode_day_counter(
@@ -74,6 +75,8 @@ def test_all27_published_phase_labels_survive_a_coupled_change_of_representation
             phase, encoding="one_based_day_number", epoch_ganzhi=epoch
         )
         assert uncoupled["day_ganzhi"] != row["expected_ganzhi"]
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
@@ -87,7 +90,9 @@ def test_all27_published_phase_labels_survive_a_coupled_change_of_representation
         (61, "one_based_day_number", "甲子"),
     ],
 )
-def test_zero_origin_and_rollover_are_not_silently_changed(value, encoding, label):
+def test_zero_origin_and_rollover_are_not_silently_changed(
+    value: int, encoding: str, label: str
+) -> None:
     result = decode_day_counter(value, encoding=encoding, epoch_ganzhi="甲子")
     assert result["day_ganzhi"] == label
     assert not result["source_encoding_adjudicated"]
@@ -107,20 +112,24 @@ def test_zero_origin_and_rollover_are_not_silently_changed(value, encoding, labe
         (1, "completed_days", None),
     ],
 )
-def test_encoding_and_epoch_must_be_explicit_and_valid(value, encoding, epoch):
+def test_encoding_and_epoch_must_be_explicit_and_valid(
+    value, encoding: str, epoch: str | None
+) -> None:
     with pytest.raises(ValueError, match="Explicit"):
         decode_day_counter(value, encoding=encoding, epoch_ganzhi=epoch)
 
 
 @pytest.mark.parametrize("day", [0, 31, True, "8", 8.5])
-def test_lunar_day_is_an_ordinal_not_an_elapsed_offset(day):
+def test_lunar_day_is_an_ordinal_not_an_elapsed_offset(
+    day: bool | float | int | str,
+) -> None:
     with pytest.raises(ValueError, match="Explicit lunar day ordinal"):
         lunar_day_counter_views(
             100, day, month_start_encoding="completed_days", epoch_ganzhi="甲子"
         )
 
 
-def test_counter_epoch_name_does_not_make_different_actual_origins_equal():
+def test_counter_epoch_name_does_not_make_different_actual_origins_equal() -> None:
     first = decode_day_counter(0, encoding="completed_days", epoch_ganzhi="甲子")
     later = decode_day_counter(60, encoding="completed_days", epoch_ganzhi="甲子")
     assert first["day_ganzhi"] == later["day_ganzhi"]
@@ -130,8 +139,8 @@ def test_counter_epoch_name_does_not_make_different_actual_origins_equal():
 
 @pytest.mark.parametrize("rewrite_manifest", [False, True])
 def test_cannot_change_a_published_label_by_updating_a_local_manifest(
-    tmp_path, rewrite_manifest
-):
+    tmp_path: Path, rewrite_manifest: bool
+) -> None:
     corpus = tmp_path / "corpus"
     shutil.copytree(CORPUS, corpus)
     path = corpus / "literature-controls.json"
@@ -142,11 +151,13 @@ def test_cannot_change_a_published_label_by_updating_a_local_manifest(
         freeze = json.loads((corpus / "freeze.json").read_text())
         freeze["files"][path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
         (corpus / "freeze.json").write_text(json.dumps(freeze))
+    else:
+        pass
     with pytest.raises(ValueError, match="V34"):
         verify_sources(corpus)
 
 
-def test_both_initial_encodings_keep_all355_dates_and_all13_firsts(report):
+def test_both_initial_encodings_keep_all355_dates_and_all13_firsts(report) -> None:
     assert len(report["all_eight_legacy_cohorts"]) == 8
     series = report["whole_calendar_encoding_series"]
     assert len(series) == 16
@@ -185,7 +196,7 @@ def test_both_initial_encodings_keep_all355_dates_and_all13_firsts(report):
     assert not near["all12_month_lengths_match"]
 
 
-def test_matching_old_integer_on_day9_cannot_replace_day8_or_xing22(report):
+def test_matching_old_integer_on_day9_cannot_replace_day8_or_xing22(report) -> None:
     cases = report["date_encoding_candidates"]
     assert len(cases) == 48 and sum(len(r["counter_comparisons"]) for r in cases) == 96
     matched = [
@@ -229,7 +240,9 @@ def test_matching_old_integer_on_day9_cannot_replace_day8_or_xing22(report):
         assert len(candidate["board"]["observations"]) == 10
 
 
-def test_same_printed_integer_still_has_two_unadjudicated_interpretations(report):
+def test_same_printed_integer_still_has_two_unadjudicated_interpretations(
+    report,
+) -> None:
     zero, one = report["given_source_integer_encoding_hypotheses"]
     assert (
         zero["decoded"]["day_ganzhi"] == "乙酉"
@@ -243,7 +256,9 @@ def test_same_printed_integer_still_has_two_unadjudicated_interpretations(report
     assert report["new_complete_dated_classical_cases_passed"] == 0
 
 
-def test_all27_external_controls_and_unresolved_acceptance_remain_visible(report):
+def test_all27_external_controls_and_unresolved_acceptance_remain_visible(
+    report,
+) -> None:
     assert report["external_observation_count"] == 27
     assert all(
         r["both_match_published_label"] for r in report["external_phase_controls"]

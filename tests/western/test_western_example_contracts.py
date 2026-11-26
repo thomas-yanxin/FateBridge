@@ -4,6 +4,7 @@ import asyncio
 import copy
 import json
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
 from fastmcp import Client
@@ -15,14 +16,13 @@ from fatebridge.cli import run as cli_run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.mcp_result_delivery import read_full_result
-from tests.support.transports import rest
+from tests.support.transports import describe_capability, rest
 
 KEYS = [
     "astro_chart",
     "astro_chart13",
     "astro_hellen",
     "astro_germany",
-    "astro_relative",
     "astro_relative_chart",
     "western_timing_analysis",
     "solarreturn",
@@ -59,7 +59,9 @@ AS_OF = "2026-10-12T12:00:00+08:00"
 
 
 @pytest.mark.parametrize("key", KEYS)
-def test_example_has_explicit_fixture_context_but_does_not_supply_user_defaults(key):
+def test_example_has_explicit_fixture_context_but_does_not_supply_user_defaults(
+    key,
+) -> None:
     spec = SPECS[key]
     record = describe_input_spec(spec)
     assert record["example_input"]
@@ -77,14 +79,12 @@ def test_example_has_explicit_fixture_context_but_does_not_supply_user_defaults(
         )
 
 
-@pytest.mark.parametrize(
-    "key,nested", [("astro_relative", "inner"), ("fengshui_assess", "house")]
-)
 def test_client_nested_mutations_cannot_poison_later_discovery(
-    key, nested, monkeypatch
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.application.examples as examples
 
+    key, nested = "fengshui_assess", "house"
     isolated_registry = copy.deepcopy(examples._examples())
     monkeypatch.setattr(examples, "_examples", lambda: isolated_registry)
     first = example_input(SPECS[key])
@@ -99,7 +99,7 @@ def test_client_nested_mutations_cannot_poison_later_discovery(
         SPECS[key].request_model.model_validate(first)
 
 
-def test_missing_unrelated_examples_are_not_filled_with_a_generic_person():
+def test_missing_unrelated_examples_are_not_filled_with_a_generic_person() -> None:
     undeclared = replace(SPECS["astro_chart"], key="_unregistered_example_probe")
     assert example_input(undeclared) is None
     assert "example_context" not in describe_input_spec(undeclared)
@@ -110,6 +110,8 @@ def assert_original_facts(actual, original):
         for key, value in actual.items():
             if key in {"run_metadata", "result_delivery"}:
                 continue
+            else:
+                pass
             assert key in original, key
             assert_original_facts(value, original[key])
     elif isinstance(actual, list):
@@ -130,7 +132,7 @@ def assert_requested_path(value, field):
 @pytest.mark.parametrize(
     "changed", ["result_id", "run_id", "first_page_uri", "total_chars"]
 )
-def test_compact_readback_rejects_a_different_result_or_document(changed):
+def test_compact_readback_rejects_a_different_result_or_document(changed: str) -> None:
     from types import SimpleNamespace
 
     reference = {
@@ -174,13 +176,12 @@ def test_compact_readback_rejects_a_different_result_or_document(changed):
 
 @pytest.mark.parametrize("key", KEYS)
 def test_public_descriptor_drives_each_available_adapter_without_private_input_defaults(
-    key, rest, tmp_path, capsys
-):
+    key, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     spec = SPECS[key]
 
     async def public_call():
         async with Client(create_mcp_app()) as client:
-            tools = {tool.name: tool for tool in await client.list_tools()}
             if spec.mcp_name:
                 record = json.loads(
                     (
@@ -198,23 +199,34 @@ def test_public_descriptor_drives_each_available_adapter_without_private_input_d
             fields = record.get("suggested_fields")
             values = []
             if spec.mcp_name:
-                assert spec.tool_name in tools
+                description = await describe_capability(client, spec.tool_name)
+                assert description["input_schema"] == record["input_schema"]
+                validate(data, description["input_schema"])
                 params = {
-                    **data,
+                    "tool": spec.tool_name,
+                    "arguments": data,
+                    "detail": "standard",
                     "as_of": AS_OF,
                     "fields": fields,
                     "strict_fields": True,
                     "include_snapshot_text": False,
                     "response_char_limit": 0,
                 }
-                validate(params, tools[spec.tool_name].input_schema)
+                run_tool = next(
+                    tool
+                    for tool in await client.list_tools()
+                    if tool.name == "run_calculation"
+                )
+                validate(params, run_tool.input_schema)
                 result = await client.call_tool(
-                    spec.tool_name, params, raise_on_error=False
+                    run_tool.name, params, raise_on_error=False
                 )
                 assert not result.is_error
                 values.append(
                     ("mcp", await read_full_result(client, result.structured_content))
                 )
+            else:
+                pass
             return record, values
 
     record, values = asyncio.run(public_call())
@@ -229,9 +241,13 @@ def test_public_descriptor_drives_each_available_adapter_without_private_input_d
         }
         if fields is not None:
             params["fields"] = fields
+        else:
+            pass
         response = rest.post(spec.rest_path, json=data, params=params)
         assert response.status_code == 200
         values.append(("rest", response.json()))
+    else:
+        pass
     if spec_is_cli_safe(spec):
         assert cli_run(["describe", spec.tool_name]) == 0
         description = json.loads(capsys.readouterr().out)
@@ -240,6 +256,8 @@ def test_public_descriptor_drives_each_available_adapter_without_private_input_d
         flags = ["--include-snapshot-text", "false", "--response-char-limit", "0"]
         if fields is not None:
             flags += ["--fields", *fields, "--strict-fields", "true"]
+        else:
+            pass
         subject = tmp_path / "published-example.json"
         subject.write_text(json.dumps(data))
         code = cli_run(
@@ -248,12 +266,16 @@ def test_public_descriptor_drives_each_available_adapter_without_private_input_d
         value = json.loads(capsys.readouterr().out)
         assert code == 0
         values.append(("cli", value))
+    else:
+        pass
     assert values
     for surface, value in values:
         assert "error" not in value
         if fields:
             for field in fields:
                 assert_requested_path(value, field)
+        else:
+            pass
         (tmp_path / f"{key}-{surface}.json").write_text(json.dumps(value))
     for _, value in values[1:]:
         assert_original_facts(value, values[0][1])

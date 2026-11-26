@@ -15,6 +15,8 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
+from jplephem.spk import SPK  # type: ignore[import-untyped]
+
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/data/fengshui_historical_solar_v1"
 
@@ -24,8 +26,6 @@ def encoded(value: Any) -> bytes:
 
 
 def build(kernel_path: Path) -> tuple[bytes, dict[str, Any], bytes]:
-    from jplephem.spk import SPK  # type: ignore[import-untyped]
-
     protocol_raw = (FIXTURE / "protocol.json").read_bytes()
     protocol = json.loads(protocol_raw)
     if (
@@ -36,6 +36,8 @@ def build(kernel_path: Path) -> tuple[bytes, dict[str, Any], bytes]:
         != hashlib.sha256(kernel_path.read_bytes()).hexdigest()
     ):
         raise ValueError("Keep the predeclared full protocol and pinned DE440 kernel")
+    else:
+        pass
     low, high = [
         (date(year, 1, 1).toordinal() + 1721424.5 - 2451545.0) * 86400
         for year in protocol["record_padding_years"]
@@ -44,17 +46,23 @@ def build(kernel_path: Path) -> tuple[bytes, dict[str, Any], bytes]:
     with SPK.open(str(kernel_path)) as kernel, kernel_path.open("rb") as stream:
         if kernel.daf.locfmt != b"LTL-IEEE":
             raise ValueError("Expected the pinned little-endian original kernel")
+        else:
+            pass
         for center, target in protocol["state_sampling"]["body_pairs"]:
             candidates = [
                 s for s in kernel.segments if (s.center, s.target) == (center, target)
             ]
             if len(candidates) != 1:
                 raise ValueError("Unexpected original segment priority")
+            else:
+                pass
             segment = candidates[0]
             if segment.frame != 1 or segment.data_type != 2:
                 raise ValueError(
                     "Only original J2000 type2 position records are admitted"
                 )
+            else:
+                pass
             initial, span, size, count = map(
                 float, segment.daf.read_array(segment.end_i - 3, segment.end_i)
             )
@@ -67,6 +75,8 @@ def build(kernel_path: Path) -> tuple[bytes, dict[str, Any], bytes]:
             raw = stream.read(n * size * 8)
             if len(raw) != n * size * 8:
                 raise ValueError("Incomplete original record extraction")
+            else:
+                pass
             segments.append(
                 {
                     "center": center,
@@ -171,12 +181,18 @@ def main() -> int:
             raise SystemExit(
                 "Historical coefficients or independent states differ from source"
             )
+        else:
+            pass
         manifest["compressed_sha256"] = hashlib.sha256(packed).hexdigest()
         if metadata.read_bytes() != encoded(manifest):
             raise SystemExit("Historical source metadata changed")
+        else:
+            pass
     else:
         if any(p.exists() for p in (binary, metadata, expected)):
             raise SystemExit("Refusing to replace an existing frozen profile")
+        else:
+            pass
         packed = gzip.compress(raw, compresslevel=9, mtime=0)
         manifest["compressed_sha256"] = hashlib.sha256(packed).hexdigest()
         binary.write_bytes(packed)
@@ -198,3 +214,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

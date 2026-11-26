@@ -15,7 +15,7 @@ BIRTH = dict(
 )
 
 
-def test_solar_display_does_not_change_physical_sky_or_periods():
+def test_solar_display_does_not_change_physical_sky_or_periods() -> None:
     charts = [
         calculate_core_chart_analysis(
             **BIRTH,
@@ -40,7 +40,7 @@ def test_solar_display_does_not_change_physical_sky_or_periods():
     assert periods[0]["vimshottari"] == periods[1]["vimshottari"]
 
 
-def test_solar_display_cannot_reenter_a_model_window():
+def test_solar_display_cannot_reenter_a_model_window() -> None:
     options = dict(
         birth_year=2051,
         birth_month=1,
@@ -69,7 +69,7 @@ import pytest
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish import build_india, positions
+from fatebridge.core.jyotish.jyotish import build_india, positions
 from fatebridge.core.requests.astrology import (
     AstroChartPolyRequest,
     AstroIndiaRequest,
@@ -176,7 +176,7 @@ CIVIL_CASES = [
 @pytest.mark.parametrize("birth,expected_utc", CIVIL_CASES)
 def test_known_civil_instants_survive_display_all_vargas_strengths_and_full_grid(
     birth, expected_utc
-):
+) -> None:
     results = [
         calculate_core_chart_analysis(
             **birth,
@@ -229,7 +229,7 @@ def test_known_civil_instants_survive_display_all_vargas_strengths_and_full_grid
     assert periods[0]["vimshottari"] == periods[1]["vimshottari"]
 
 
-def test_solar_label_can_cross_year_without_changing_birth_or_target_clock():
+def test_solar_label_can_cross_year_without_changing_birth_or_target_clock() -> None:
     birth = CIVIL_CASES[-1][0]
     result = calculate_vimshottari(
         **birth,
@@ -250,7 +250,9 @@ def test_solar_label_can_cross_year_without_changing_birth_or_target_clock():
     )
 
 
-def test_solar_label_is_valid_even_if_its_digits_would_be_a_nonexistent_zone_clock():
+def test_solar_label_is_valid_even_if_its_digits_would_be_a_nonexistent_zone_clock() -> (
+    None
+):
     birth = CIVIL_CASES[3][0]
     result = calculate_core_chart_analysis(
         **birth, chart_variant="india_chart", divisions=[], use_true_solar_time=True
@@ -262,8 +264,8 @@ def test_solar_label_is_valid_even_if_its_digits_would_be_a_nonexistent_zone_clo
 
 @pytest.mark.parametrize("hour,month,day", [(2, 3, 10), (1, 11, 3)])
 def test_unresolved_civil_gap_or_fold_remains_invalid_with_display_enabled(
-    hour, month, day
-):
+    hour: int, month: int, day: int
+) -> None:
     birth = {
         **BIRTH,
         "birth_year": 2024,
@@ -287,7 +289,7 @@ def test_unresolved_civil_gap_or_fold_remains_invalid_with_display_enabled(
         )
 
 
-def test_domain_does_not_silently_accept_already_rebased_legacy_birth_objects():
+def test_domain_does_not_silently_accept_already_rebased_legacy_birth_objects() -> None:
     legacy = build_astro_birth_info(**BIRTH, use_true_solar_time=True)
     for calculate in [positions, build_india]:
         with pytest.raises(ValueError, match="物理时刻"):
@@ -312,7 +314,7 @@ def test_domain_does_not_silently_accept_already_rebased_legacy_birth_objects():
     assert result["person_info"]["utc_datetime"] == "1990-04-06T01:33:00+00:00"
 
 
-def test_public_solar_clock_schema_describes_the_indian_policy():
+def test_public_solar_clock_schema_describes_the_indian_policy() -> None:
     for model in [AstroIndiaRequest, AstroVimshottariRequest]:
         description = model.model_json_schema()["properties"]["use_true_solar_time"][
             "description"
@@ -334,8 +336,8 @@ HORIZONS = json.loads(
     "instant", [row["utc"] for row in HORIZONS["references"][0]["rows"]]
 )
 def test_both_clock_settings_match_frozen_seven_body_nasa_horizons(
-    monkeypatch, tmp_path, solar, instant
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, solar: bool, instant
+) -> None:
     from fatebridge.core import ephemeris_runtime
 
     # configure_ephemeris_path also updates this managed selection. Restore it
@@ -383,7 +385,7 @@ def test_both_clock_settings_match_frozen_seven_body_nasa_horizons(
         assert error < HORIZONS["tolerance_arcseconds"], (reference["body"], error)
 
 
-def test_domain_rejects_naive_or_inconsistent_manual_epoch_objects():
+def test_domain_rejects_naive_or_inconsistent_manual_epoch_objects() -> None:
     from dataclasses import replace
     from datetime import timedelta
 
@@ -402,7 +404,36 @@ def test_domain_rejects_naive_or_inconsistent_manual_epoch_objects():
             positions(invalid)
 
 
-def test_unrepresentable_solar_display_does_not_invalidate_valid_physical_chart():
+@pytest.mark.parametrize(
+    ("fold", "expected_utc"),
+    [(0, "1969-09-29T14:30:00+00:00"), (1, "1969-09-30T13:30:00+00:00")],
+)
+def test_india_sdk_preserves_the_selected_standard_offset_fold(
+    fold: int, expected_utc: str
+) -> None:
+    from dataclasses import replace
+
+    from fatebridge.utils.timezones import parse_timezone_name
+
+    birth = build_astro_birth_info(**BIRTH)
+    zone = "Pacific/Kwajalein"
+    recorded = datetime(1969, 9, 30, 1, 30, tzinfo=parse_timezone_name(zone), fold=fold)
+    resolved = replace(
+        birth,
+        timezone=zone,
+        local_datetime=recorded,
+        recorded_datetime=recorded,
+        utc_datetime=datetime.fromisoformat(expected_utc),
+    )
+    result = build_india(resolved, divisions=[])
+    assert (
+        result["profile"]["clock_context"]["calculation_utc_datetime"] == expected_utc
+    )
+
+
+def test_unrepresentable_solar_display_does_not_invalidate_valid_physical_chart() -> (
+    None
+):
     options = dict(
         birth_year=1,
         birth_month=1,

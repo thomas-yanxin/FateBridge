@@ -8,18 +8,22 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core.human_design_cross_coverage import expanded_cross_audit
-from fatebridge.core.human_design_primary_diagrams import (
+from fatebridge.core.human_design.human_design_cross_coverage import (
+    expanded_cross_audit,
+)
+from fatebridge.core.human_design.human_design_primary_diagrams import (
     diagram_reference,
     primary_diagram_evidence,
 )
-from fatebridge.core.human_design_source_variants import source_variant_audit
+from fatebridge.core.human_design.human_design_source_variants import (
+    source_variant_audit,
+)
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
 from scripts.human_design.check_human_design_primary_diagrams import (
     extract_diagram,
     frozen_observation_check,
 )
+from validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = next(s for s in CATALOG if s.key == "human_design")
@@ -30,7 +34,7 @@ COHORT = json.loads(
 )
 
 
-def test_preregistered_diagrams_pages_and_all_original_failures_remain():
+def test_preregistered_diagrams_pages_and_all_original_failures_remain() -> None:
     assert (
         hashlib.sha256(PLAN_PATH.read_bytes()).hexdigest()
         == "a160cb5c68081be11c6f799cc9f4d1aadbb410808019915beec300893d2b3adf"
@@ -74,7 +78,9 @@ def test_preregistered_diagrams_pages_and_all_original_failures_remain():
 
 @pytest.mark.parametrize("angle", ["right", "juxtaposition"])
 @pytest.mark.parametrize("gates", [[16, 9, 63, 64], [9, 16, 64, 63]])
-def test_no_matching_by_single_gate_or_name_when_angle_is_wrong(angle, gates):
+def test_no_matching_by_single_gate_or_name_when_angle_is_wrong(
+    angle: str, gates
+) -> None:
     result = primary_diagram_evidence(
         {
             "incarnation_cross": {
@@ -91,7 +97,9 @@ def test_no_matching_by_single_gate_or_name_when_angle_is_wrong(angle, gates):
 @pytest.mark.parametrize(
     "gates", [[16, 6, 63, 64], [16, 9, 64, 63], [9, 16, 63, 64], [1, 2, 7, 13]]
 )
-def test_ordered_four_gates_required_without_aliases_or_silent_correction(gates):
+def test_ordered_four_gates_required_without_aliases_or_silent_correction(
+    gates,
+) -> None:
     result = primary_diagram_evidence(
         {
             "incarnation_cross": {
@@ -113,7 +121,7 @@ def complete(request):
         return execute_tool(SPEC, SPEC.request_model(**case["birth_input"]))
 
 
-def test_same_quartet_witness_and_complete_additional_statement(complete):
+def test_same_quartet_witness_and_complete_additional_statement(complete) -> None:
     proof = complete["source_consistency"]["primary_transcript_diagrams"]
     assert proof["status"] == "observed_same_ordered_quartet_and_angle"
     assert len(proof["observations"]) == 1
@@ -134,7 +142,9 @@ def test_same_quartet_witness_and_complete_additional_statement(complete):
 
 
 @pytest.mark.parametrize("case", PLAN["rejection_probes"])
-def test_all_rehashed_diagram_and_qualification_mutations_are_rejected(complete, case):
+def test_all_rehashed_diagram_and_qualification_mutations_are_rejected(
+    complete, case
+) -> None:
     value = deepcopy(complete)
     proof = value["source_consistency"]["primary_transcript_diagrams"]
     row = proof["observations"][0]
@@ -163,7 +173,7 @@ def test_all_rehashed_diagram_and_qualification_mutations_are_rejected(complete,
     assert verify_human_design_reading((value))["status"] == "rejected"
 
 
-def test_evidence_cannot_mutate_the_cached_source_catalog(complete):
+def test_evidence_cannot_mutate_the_cached_source_catalog(complete) -> None:
     expected = deepcopy(diagram_reference())
     proof = primary_diagram_evidence(complete)
     proof["observations"][0]["gates"][0] = 60
@@ -198,7 +208,9 @@ def _minimal_pdf_xml():
     )
 
 
-def test_extraction_uses_page_coordinates_and_preserves_the_printed_pair_order():
+def test_extraction_uses_page_coordinates_and_preserves_the_printed_pair_order() -> (
+    None
+):
     actual = extract_diagram(_minimal_pdf_xml(), "Identification 1")
     assert actual == {
         "display_identifier": "Identification 1",
@@ -212,7 +224,9 @@ def test_extraction_uses_page_coordinates_and_preserves_the_printed_pair_order()
     "mutation",
     ["notice", "duplicate_heading", "extra_number", "wrong_row", "missing_footer"],
 )
-def test_source_parser_rejects_ambiguous_or_unqualified_observations(mutation):
+def test_source_parser_rejects_ambiguous_or_unqualified_observations(
+    mutation: str,
+) -> None:
     value = _minimal_pdf_xml()
     if mutation == "notice":
         value = value.replace("proofed.", "unverified.")
@@ -225,5 +239,7 @@ def test_source_parser_rejects_ambiguous_or_unqualified_observations(mutation):
         value = value.replace('xMin="494" yMin="112"', 'xMin="494" yMin="119"')
     elif mutation == "missing_footer":
         value = value.replace('yMin="760"', 'yMin="700"')
+    else:
+        pass
     with pytest.raises(ValueError):
         extract_diagram(value, "Identification 1")

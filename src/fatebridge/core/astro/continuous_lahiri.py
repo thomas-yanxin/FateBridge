@@ -18,8 +18,9 @@ https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301
 from __future__ import annotations
 
 import math
+from fractions import Fraction
 from functools import lru_cache
-from typing import Sequence, Tuple, TypedDict
+from typing import Sequence, TypedDict
 
 from fatebridge.core.astro.nutation import nutation
 from fatebridge.core.astro.reference_frames import (
@@ -39,6 +40,7 @@ from fatebridge.core.astro.reference_frames import (
     precession,
     transpose,
 )
+from fatebridge.core.astro.tt_epoch import TTInstant
 
 
 class FrameState(TypedDict):
@@ -88,7 +90,7 @@ DEG = 180.0 / math.pi
 
 
 @lru_cache(maxsize=1)
-def anchor() -> Tuple[Matrix, float]:
+def anchor() -> tuple[Matrix, float]:
     tt = float(DATA["anchor_tt"])
     matrix, _ = precession(tt)
     values, _ = pair(tt, "pepol", "peper")
@@ -98,7 +100,7 @@ def anchor() -> Tuple[Matrix, float]:
     return mm(rotation, matrix), initial - math.atan2(correction[1], correction[0])
 
 
-def _mean_origin(matrix: Matrix, matrix_d: Matrix) -> Tuple[float, float]:
+def _mean_origin(matrix: Matrix, matrix_d: Matrix) -> tuple[float, float]:
     anchor_matrix, constant = anchor()
     # P.T @ e1 is the first row of P. Anchor terms are fixed in TT.
     basis = mv(anchor_matrix, matrix[0])
@@ -110,7 +112,7 @@ def _mean_origin(matrix: Matrix, matrix_d: Matrix) -> Tuple[float, float]:
     return origin, origin_d
 
 
-def apparent_lahiri_origin(tt: float) -> Tuple[float, float]:
+def apparent_lahiri_origin(tt: float | TTInstant) -> tuple[float, float]:
     """Complete apparent offset and analytic rate, in degrees and degrees/TT day.
 
     Reuse the continuous mean origin, then add the complete 77-term nutation.
@@ -123,15 +125,12 @@ def apparent_lahiri_origin(tt: float) -> Tuple[float, float]:
     return (origin * DEG + dpsi) % 360.0, origin_d * DEG + dpsi_d
 
 
-def frame_state(tt: float) -> FrameState:
-    if (
-        isinstance(tt, bool)
-        or not math.isfinite(tt)
-        or not 1721425.5 <= tt <= 5373485.5
-    ):
+def frame_state(tt: float | TTInstant) -> FrameState:
+    point = TTInstant.from_value(tt)
+    if not Fraction(3442851, 2) <= point.days <= Fraction(10746971, 2):
         raise ValueError("TT epoch outside the declared continuous-frame domain")
-    matrix, matrix_d = precession(tt)
-    mean, mean_d = mean_ecliptic_frame(tt)
+    matrix, matrix_d = precession(point)
+    mean, mean_d = mean_ecliptic_frame(point)
     origin, origin_d = _mean_origin(matrix, matrix_d)
     c, s = math.cos(origin), math.sin(origin)
     sidereal = ((c, s, 0.0), (-s, c, 0.0), (0.0, 0.0, 1.0))
@@ -143,7 +142,7 @@ def frame_state(tt: float) -> FrameState:
     frame = mm(sidereal, mean)
     frame_d = madd(mm(sidereal_d, mean), mm(sidereal, mean_d))
     return {
-        "epoch_jd_tt": tt,
+        "epoch_jd_tt": point.as_float(),
         "mean_frame": mean,
         "mean_frame_derivative_per_TT_day": mean_d,
         "frame": frame,
@@ -205,7 +204,7 @@ def spherical_state(
 
 
 def project_state(
-    julian_day_tt: float,
+    julian_day_tt: float | TTInstant,
     position: Sequence[float],
     velocity: Sequence[float],
     *,
@@ -232,7 +231,7 @@ def project_state(
     return {
         "model_id": METHOD_ID,
         "coefficient_sha256": COEFFICIENT_SHA256,
-        "epoch_jd_tt": julian_day_tt,
+        "epoch_jd_tt": frame["epoch_jd_tt"],
         "vector_rate_scale": vector_rate_scale,
         "position": list(q),
         "velocity_per_TT_day": list(dq),
@@ -243,7 +242,9 @@ def project_state(
 
 
 def decode_native_fixed_reception_state(
-    julian_day_tt: float, position: Sequence[float], velocity: Sequence[float]
+    julian_day_tt: float | TTInstant,
+    position: Sequence[float],
+    velocity: Sequence[float],
 ) -> FixedReceptionState:
     """Decode a held native reception basis; do not differentiate its epoch.
 
@@ -251,15 +252,16 @@ def decode_native_fixed_reception_state(
     Reconstruct that input representation only. The output frame and its
     derivative in project_state remain continuous, including at J2000.
     """
+    native_tt = TTInstant.from_value(julian_day_tt).as_float()
     p, v = _vector(position), _vector(velocity)
-    basis = frame_state(julian_day_tt)["mean_frame"]
-    if julian_day_tt == 2451545.0:
-        epsilon = pair(julian_day_tt, "pepol", "peper")[0][1]
+    basis = frame_state(native_tt)["mean_frame"]
+    if native_tt == 2451545.0:
+        epsilon = pair(native_tt, "pepol", "peper")[0][1]
         basis = ecliptic_rotation(epsilon)[0]
     inverse = transpose(basis)
     return {
         "position": list(mv(inverse, p)),
         "velocity_per_native_argument_day": list(mv(inverse, v)),
         "input_frame_held_fixed": True,
-        "native_input_precession_identity_shortcut": julian_day_tt == 2451545.0,
+        "native_input_precession_identity_shortcut": native_tt == 2451545.0,
     }

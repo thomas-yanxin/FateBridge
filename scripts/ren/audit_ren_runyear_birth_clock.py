@@ -18,8 +18,11 @@ IMPLEMENTATION = (
     "src/fatebridge/data/lunar_calendar_pmo_1900_prefix.json",
     "src/fatebridge/core/metaphysics/ren_calendar.py",
     "src/fatebridge/core/metaphysics/liureng.py",
+    "src/fatebridge/core/metaphysics/liureng_course_layout.py",
+    "src/fatebridge/core/metaphysics/liureng_selection.py",
+    "src/fatebridge/core/metaphysics/liureng_year_fate.py",
     "src/fatebridge/core/requests/metaphysics.py",
-    "src/fatebridge/core/output_chinese.py",
+    "src/fatebridge/core/contracts/output_chinese.py",
     "src/fatebridge/services/metaphysics.py",
     "src/fatebridge/utils/civil_clock.py",
     "src/fatebridge/utils/timezones.py",
@@ -40,12 +43,18 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     }
     if names != set(manifest["files"]):
         raise ValueError("Frozen runyear clock inventory changed")
+    else:
+        pass
     for name, expected in manifest["files"].items():
         if sha(corpus / name) != expected:
             raise ValueError(f"Frozen runyear clock source changed: {name}")
+        else:
+            pass
     ref: dict[str, Any] = json.loads((corpus / "reference.json").read_text())
     if [case["id"] for case in ref["cases"]] != [f"B{i:02}" for i in range(1, 19)]:
         raise ValueError("All eighteen original runyear clock probes are required")
+    else:
+        pass
     # Reconstruct only the literal UTC -> local relationship with the copied
     # external database. No production resolver supplies these expectations.
     for case in ref["cases"]:
@@ -54,6 +63,8 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
             key = prefix + "_instant_utc"
             if key not in expected:
                 continue
+            else:
+                pass
             utc = datetime.fromisoformat(expected[key])
             zone = data[prefix + "_timezone"]
             if zone in ref["zones"]:
@@ -72,6 +83,8 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
             )
             if local.replace(tzinfo=None) != wall:
                 raise ValueError(f"Frozen UTC/local clock mismatch: {case['id']}")
+            else:
+                pass
             declared = data.get(prefix + "_utc_offset")
             if (
                 declared
@@ -79,14 +92,22 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
                 != datetime.fromisoformat("2000-01-01T00:00:00" + declared).utcoffset()
             ):
                 raise ValueError(f"Frozen explicit offset mismatch: {case['id']}")
+            else:
+                pass
             if prefix == "birth" and local.fold != expected["birth_fold"]:
                 raise ValueError(f"Frozen birth fold mismatch: {case['id']}")
+            else:
+                pass
         if "birth_instant_utc" in expected:
             earlier = datetime.fromisoformat(
                 expected["analysis_instant_utc"]
             ) < datetime.fromisoformat(expected["birth_instant_utc"])
             if earlier != (expected.get("error") == "早于出生"):
                 raise ValueError(f"Frozen chronology differs: {case['id']}")
+            else:
+                pass
+        else:
+            pass
     return ref
 
 
@@ -183,3 +204,5 @@ if __name__ == "__main__":
     else:
         print(text, end="")
     raise SystemExit(0 if report["selected_clock_checks_passed"] else 1)
+else:
+    pass

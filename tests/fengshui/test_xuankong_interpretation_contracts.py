@@ -3,6 +3,7 @@
 import asyncio
 import json
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 from fastmcp import Client
@@ -22,6 +23,7 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services import replay_metadata
 from fatebridge.services.fengshui import assess, calculate_xuankong_natal
 from fatebridge.services.tool_catalog import CATALOG
+from fatebridge.utils.formatting import format_json_response
 from tests.fixtures.fengshui import payload
 from tests.fixtures.mcp_result_delivery import assert_same_run_receipt, read_full_result
 from tests.support.fengshui_transports import mcp_call
@@ -29,46 +31,24 @@ from tests.support.mcp_result_assertions import without_transport
 from tests.support.result_delivery import (
     assert_same_run_receipt as assert_stored_result,
 )
-from tests.support.transports import rest_client
+from tests.support.transports import call_calculation, capability_contracts, rest_client
+from tests.unit_test.fixtures.fengshui_reading import (
+    assess_input,
+    interpretation_input,
+    natal_input,
+)
 
 
-def interpretation_input():
-    return {
-        "current_period_number": 9,
-        "period_evidence": "已确认按九运评价，非宅盘历史定运",
-        "external_forms": [
-            {
-                "direction": "N",
-                "mountain_present": True,
-                "water_present": False,
-                "observation_basis": "user_confirmed",
-                "evidence": "明确确认北宫外部有山形、无水形",
-            }
-        ],
-    }
-
-
-def natal_input():
-    return {**payload("xuankong_natal"), "interpretation": interpretation_input()}
-
-
-def assess_input():
-    return {
-        "methods": ["xuankong_natal"],
-        "analyze_layout": True,
-        "xuankong": natal_input(),
-        "placements": [
-            {"object_id": "bed", "purpose": "bed", "location_direction": "N"}
-        ],
-    }
-
-
-@pytest.mark.parametrize("name", ["xuankong_natal", "assess"])
+@pytest.mark.parametrize("name", ["xuankong_house_chart", "assess"])
 def test_opt_in_interpretation_matches_actual_rest_mcp_cli(
-    monkeypatch, tmp_path, capsys, name
-):
-    inputs = natal_input() if name == "xuankong_natal" else assess_input()
-    response = rest_client(monkeypatch).post("/api/fengshui/" + name, json=inputs)
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    name: str,
+) -> None:
+    inputs = assess_input() if name == "assess" else natal_input()
+    spec = next(s for s in CATALOG if s.tool_name == "fengshui_" + name)
+    response = rest_client(monkeypatch).post(spec.rest_path, json=inputs)
     protocol = asyncio.run(mcp_call(name, inputs))
     path = tmp_path / "玄空解释.json"
     path.write_text(json.dumps(inputs, ensure_ascii=False))
@@ -158,11 +138,17 @@ def test_opt_in_interpretation_matches_actual_rest_mcp_cli(
 )
 @pytest.mark.parametrize("name", ["xuankong_natal", "assess"])
 def test_invalid_nested_interpretation_is_rejected_on_all_transports(
-    monkeypatch, tmp_path, capsys, bad, name
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    bad,
+    name: str,
+) -> None:
     inputs = {**payload("xuankong_natal"), "interpretation": bad}
     if name == "assess":
         inputs = {"methods": ["xuankong_natal"], "xuankong": inputs}
+    else:
+        pass
     response = rest_client(monkeypatch).post("/api/fengshui/" + name, json=inputs)
     protocol = asyncio.run(mcp_call(name, inputs))
     path = tmp_path / "invalid.json"
@@ -177,30 +163,29 @@ def test_invalid_nested_interpretation_is_rejected_on_all_transports(
     )
 
 
-def test_published_mcp_schema_exposes_the_same_opt_in_contract():
+def test_published_mcp_schema_exposes_the_same_opt_in_contract() -> None:
     inputs = natal_input()
     Draft202012Validator(XuankongRequest.model_json_schema()).validate(inputs)
 
     async def check():
         async with Client(create_mcp_app(families="fengshui")) as client:
             schemas = {
-                t.name: t.model_dump(by_alias=True)["inputSchema"]
-                for t in await client.list_tools()
+                t["tool"]: t["input_schema"]
+                for t in (await capability_contracts(client)).values()
             }
-            Draft202012Validator(schemas["fengshui_xuankong_natal"]).validate(inputs)
+            natal_schema = Draft202012Validator(
+                schemas["fengshui_xuankong_house_chart"]
+            )
+            natal_schema.validate(inputs)
             Draft202012Validator(schemas["fengshui_assess"]).validate(assess_input())
             invalid = deepcopy(inputs)
             invalid["interpretation"]["unexpected"] = True
-            assert list(
-                Draft202012Validator(schemas["fengshui_xuankong_natal"]).iter_errors(
-                    invalid
-                )
-            )
+            assert list(natal_schema.iter_errors(invalid))
 
     asyncio.run(check())
 
 
-def test_interpretation_does_not_change_natal_numbers_or_add_an_annual_layer():
+def test_interpretation_does_not_change_natal_numbers_or_add_an_annual_layer() -> None:
     before = calculate_xuankong_natal(**payload("xuankong_natal"))
     after = calculate_xuankong_natal(**natal_input())
     old = before["layers"]["xuankong_natal"]
@@ -213,7 +198,7 @@ def test_interpretation_does_not_change_natal_numbers_or_add_an_annual_layer():
     assert new["interpretation"]
 
 
-def test_annual_year_never_replaces_history_or_interpretation_period():
+def test_annual_year_never_replaces_history_or_interpretation_period() -> None:
     inputs = assess_input()
     inputs["methods"].append("annual_stars")
     earlier = assess(**inputs, effective_year=2026)
@@ -222,7 +207,7 @@ def test_annual_year_never_replaces_history_or_interpretation_period():
     assert earlier["layers"]["annual_stars"] != later["layers"]["annual_stars"]
 
 
-def test_ordered_pairs_keep_five_element_direction_and_all_three_numbers():
+def test_ordered_pairs_keep_five_element_direction_and_all_three_numbers() -> None:
     result = calculate_xuankong_natal(**natal_input())
     layer = result["layers"]["xuankong_natal"]
     interpreted = layer["interpretation"]["candidates"][0]["palaces"]
@@ -248,7 +233,7 @@ def test_ordered_pairs_keep_five_element_direction_and_all_three_numbers():
     assert interpreted["SE"]["timeliness"]["facing"]["status"] == "current"
 
 
-def test_all_81_ordered_star_element_relationships_against_handwritten_matrix():
+def test_all_81_ordered_star_element_relationships_against_handwritten_matrix() -> None:
     # Rows are mountain stars 1..9; columns are facing stars 1..9. The oracle
     # is hand-transcribed from the five-element cycle, not production mappings.
     expected_rows = [
@@ -297,7 +282,9 @@ def test_all_81_ordered_star_element_relationships_against_handwritten_matrix():
         assert pair["relationship"] == vocabulary[token], (mountain, facing)
 
 
-def test_missing_explicit_period_is_not_filled_from_current_annual_or_natal_period():
+def test_missing_explicit_period_is_not_filled_from_current_annual_or_natal_period() -> (
+    None
+):
     inputs = assess_input()
     inputs["methods"].append("annual_stars")
     inputs["effective_year"] = 2026
@@ -311,7 +298,7 @@ def test_missing_explicit_period_is_not_filled_from_current_annual_or_natal_peri
     assert "interpretation.current_period_number" in interpretation["missing_inputs"]
 
 
-def test_moved_proposal_recalculates_its_purpose_at_its_new_house_palace():
+def test_moved_proposal_recalculates_its_purpose_at_its_new_house_palace() -> None:
     inputs = assess_input()
     inputs["xuankong"]["interpretation"]["external_forms"] = [
         {
@@ -350,7 +337,7 @@ def test_moved_proposal_recalculates_its_purpose_at_its_new_house_palace():
     assert moved["external_form_condition"]["evidence"] == "整宅西南外局有山形"
 
 
-def test_boundary_candidates_are_interpreted_individually():
+def test_boundary_candidates_are_interpreted_individually() -> None:
     inputs = natal_input()
     inputs["house"]["facing_degrees"] = 355.5
     layer = calculate_xuankong_natal(**inputs)["layers"]["xuankong_natal"]
@@ -368,8 +355,8 @@ def test_boundary_candidates_are_interpreted_individually():
 @pytest.mark.parametrize("observed", [True, False])
 @pytest.mark.parametrize("basis", ["user_confirmed", "image_observed"])
 def test_explicit_false_and_photographic_external_forms_keep_their_certainty(
-    observed, basis
-):
+    observed: bool, basis: str
+) -> None:
     inputs = natal_input()
     inputs["interpretation"]["external_forms"] = [
         {
@@ -394,9 +381,13 @@ def test_explicit_false_and_photographic_external_forms_keep_their_certainty(
     )
     if basis == "image_observed":
         assert result["missing_inputs"]
+    else:
+        pass
 
 
-def test_confirmed_absence_completes_presence_review_without_inventing_bad_layout():
+def test_confirmed_absence_completes_presence_review_without_inventing_bad_layout() -> (
+    None
+):
     inputs = natal_input()
     inputs["interpretation"]["external_forms"] = [
         {
@@ -428,7 +419,7 @@ def test_confirmed_absence_completes_presence_review_without_inventing_bad_layou
     assert {f["status"] for f in center.values()} == {"not_applicable_center"}
 
 
-def test_unknown_required_external_form_remains_partial_without_guessing():
+def test_unknown_required_external_form_remains_partial_without_guessing() -> None:
     inputs = natal_input()
     inputs["interpretation"]["external_forms"] = []
     interpretation = calculate_xuankong_natal(**inputs)["layers"]["xuankong_natal"][
@@ -445,7 +436,7 @@ def test_unknown_required_external_form_remains_partial_without_guessing():
     assert sw["observed"] is None and sw["status"] == "needs_confirmation"
 
 
-def test_bed_and_door_use_separate_star_roles_at_the_same_palace():
+def test_bed_and_door_use_separate_star_roles_at_the_same_palace() -> None:
     inputs = assess_input()
     inputs["placements"] = [
         {"object_id": "bed", "purpose": "bed", "location_direction": "SE"},
@@ -470,8 +461,8 @@ def test_bed_and_door_use_separate_star_roles_at_the_same_palace():
 
 @pytest.mark.parametrize("purpose", ["desk", "bed", "door"])
 def test_completed_external_review_does_not_hide_uncovered_purpose_or_invent_action(
-    purpose,
-):
+    purpose: str,
+) -> None:
     inputs = assess_input()
     inputs["placements"][0].update(object_id=purpose, purpose=purpose)
     inputs["xuankong"]["interpretation"]["external_forms"] = [
@@ -498,7 +489,7 @@ def test_completed_external_review_does_not_hide_uncovered_purpose_or_invent_act
     assert progress["action_readiness"] == "not_evaluated"
 
 
-def test_guidance_optional_path_can_extend_the_real_strict_mcp_first_view():
+def test_guidance_optional_path_can_extend_the_real_strict_mcp_first_view() -> None:
     spec = next(s for s in CATALOG if s.key == "fengshui_assess")
     guidance = call_guidance(spec)
     path = "layout_analysis.natal_interpretation"
@@ -508,7 +499,8 @@ def test_guidance_optional_path_can_extend_the_real_strict_mcp_first_view():
 
     async def call():
         async with Client(create_mcp_app(families="fengshui")) as client:
-            result = await client.call_tool(
+            result = await call_calculation(
+                client,
                 "fengshui_assess",
                 {
                     **assess_input(),
@@ -530,7 +522,7 @@ def test_guidance_optional_path_can_extend_the_real_strict_mcp_first_view():
     asyncio.run(call())
 
 
-def test_object_facing_never_supplies_its_missing_house_location():
+def test_object_facing_never_supplies_its_missing_house_location() -> None:
     inputs = assess_input()
     inputs["placements"] = [
         {
@@ -547,7 +539,9 @@ def test_object_facing_never_supplies_its_missing_house_location():
 
 
 @pytest.mark.parametrize("purpose", ["desk", "stove"])
-def test_uncovered_purposes_are_reported_without_borrowing_bed_or_door_rules(purpose):
+def test_uncovered_purposes_are_reported_without_borrowing_bed_or_door_rules(
+    purpose: str,
+) -> None:
     inputs = assess_input()
     inputs["placements"][0].update(object_id=purpose, purpose=purpose)
     result = assess(**inputs)["layers"]["xuankong_natal"]["interpretation"]
@@ -555,7 +549,7 @@ def test_uncovered_purposes_are_reported_without_borrowing_bed_or_door_rules(pur
     assert findings[0]["status"] == "unsupported"
 
 
-def test_jinsuo_and_indoor_facts_do_not_fill_missing_natal_external_forms():
+def test_jinsuo_and_indoor_facts_do_not_fill_missing_natal_external_forms() -> None:
     inputs = assess_input()
     inputs["xuankong"]["interpretation"]["external_forms"] = []
     plain = assess(**inputs)["layers"]["xuankong_natal"]["interpretation"]
@@ -573,15 +567,17 @@ def test_jinsuo_and_indoor_facts_do_not_fill_missing_natal_external_forms():
     assert augmented == plain
 
 
-def test_interpretation_rules_and_sources_are_resolvable_separately_from_chart():
+def test_interpretation_rules_and_sources_are_resolvable_separately_from_chart() -> (
+    None
+):
     result = calculate_xuankong_natal(**natal_input())
     rules = {r["ruleset_id"]: r for r in result["rulesets"]}
     assert {"xuankong_zhongzhou_v1", "xuankong_conditioned_v1"} <= set(rules)
     authored = rules["xuankong_conditioned_v1"]
-    sources = {s["source_id"] for s in authored["sources"]}
-    assert sources == set(authored["source_ids"])
+    sources = set(authored["source_ids"])
     assert authored["version"] and all(
-        s["url"].startswith("https://") for s in authored["sources"]
+        result["source_catalog"][source_id]["url"].startswith("https://")
+        for source_id in authored["source_ids"]
     )
     interpretation = result["layers"]["xuankong_natal"]["interpretation"]
     for entry in interpretation["rule_trace"]:
@@ -591,9 +587,16 @@ def test_interpretation_rules_and_sources_are_resolvable_separately_from_chart()
     )
 
 
-def test_strict_nested_projection_matches_all_transports(monkeypatch, tmp_path, capsys):
+def test_strict_nested_projection_matches_all_transports(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     inputs = assess_input()
-    fields = ["layers.xuankong_natal.interpretation", "rulesets", "rule_trace"]
+    fields = [
+        "layers.xuankong_natal.interpretation",
+        "source_catalog",
+        "rulesets",
+        "rule_trace",
+    ]
     response = rest_client(monkeypatch).post(
         "/api/fengshui/assess",
         json=inputs,
@@ -642,8 +645,11 @@ def test_strict_nested_projection_matches_all_transports(monkeypatch, tmp_path, 
     "inventory_count,policy_padding", [(0, 0), (100, 0), (0, 1500)]
 )
 def test_bounded_interpretation_is_read_back_from_the_original_mcp_run(
-    monkeypatch, tmp_path, inventory_count, policy_padding
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    inventory_count: int,
+    policy_padding: int,
+) -> None:
     # Delivery fixtures only: these names are not real ephemeris observations.
     files = [f"fixture/{i}.se1" for i in range(inventory_count)]
     monkeypatch.setattr(
@@ -667,7 +673,8 @@ def test_bounded_interpretation_is_read_back_from_the_original_mcp_run(
 
     async def call_and_read():
         async with Client(create_mcp_app(families="fengshui")) as client:
-            result = await client.call_tool(
+            result = await call_calculation(
+                client,
                 "fengshui_assess",
                 {
                     **assess_input(),
@@ -676,7 +683,7 @@ def test_bounded_interpretation_is_read_back_from_the_original_mcp_run(
                 },
             )
             assert not result.is_error
-            assert len(result.content[0].text) <= 4096
+            assert len(format_json_response(result.structured_content)) <= 4096
             shaped = result.structured_content
             ref = shaped["result_delivery"]
             if inventory_count or policy_padding:

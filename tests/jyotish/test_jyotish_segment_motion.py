@@ -12,22 +12,19 @@ from fatebridge.core.astro import motion_source_window as window
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.core.astro.position_motion import complete_position_rate
 from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
-from fatebridge.core.output_charts import CompletePositionMotion, SolarBranchGeometry
+from fatebridge.core.contracts.output_charts import (
+    CompletePositionMotion,
+    SolarBranchGeometry,
+)
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.jyotish.test_jyotish_sources import data18, restore_runtime  # noqa: F401
+from tests.unit_test.fixtures.jyotish_sources import (  # noqa: F401
+    data18,
+    full_files,
+    restore_runtime,
+)
 
 EPOCH = 2597651.3591456483  # Fixed original civil input's TT, not a neighbor.
 REFERENCE = Path(__file__).parents[1] / "fixtures/jyotish-segment-reference.json"
-
-
-def full_files(data18):
-    import shutil
-
-    root, directory = data18
-    for name in ("sepl_24.se1", "semo_24.se1"):
-        shutil.copy2(root / name, directory / name)
-    e.configure_ephemeris_path(str(directory))
-    return directory
 
 
 def raw(planet, *, sidereal=False, warm=False):
@@ -35,8 +32,12 @@ def raw(planet, *, sidereal=False, warm=False):
     if sidereal:
         e.ephemeris_call("set_sid_mode", e.swe.SIDM_LAHIRI, 0, 0)
         flags |= e.swe.FLG_SIDEREAL
+    else:
+        pass
     if warm:
         e.ephemeris_call("calc", EPOCH + 0.75, PLANET_SWISSEPH_IDS[planet], flags)
+    else:
+        pass
     result, returned = e.ephemeris_call(
         "calc", EPOCH, PLANET_SWISSEPH_IDS[planet], flags
     )
@@ -48,8 +49,8 @@ def raw(planet, *, sidereal=False, warm=False):
 @pytest.mark.parametrize("sidereal", [False, True])
 @pytest.mark.parametrize("warm", [False, True])
 def test_original_overlap_state_has_a_converged_complete_derivative(
-    data18, planet, sidereal, warm
-):
+    data18, planet: str, sidereal: bool, warm: bool
+) -> None:
     full_files(data18)
     state = raw(planet, sidereal=sidereal, warm=warm)
     original = tuple(state)
@@ -77,6 +78,8 @@ def test_original_overlap_state_has_a_converged_complete_derivative(
             13,
             25,
         }
+    else:
+        pass
     CompletePositionMotion.model_validate(policy)
 
 
@@ -92,8 +95,8 @@ def probe(planet):
 
 
 def test_replay_rejects_a_changed_center_instead_of_correcting_birth(
-    data18, monkeypatch
-):
+    data18, monkeypatch: pytest.MonkeyPatch
+) -> None:
     full_files(data18)
     subject = probe("Sun")
     original = subject._raw
@@ -108,7 +111,9 @@ def test_replay_rejects_a_changed_center_instead_of_correcting_birth(
         subject.value(0.0)
 
 
-def test_source_window_does_not_hide_an_ambiguous_solar_mass_knot(data18, monkeypatch):
+def test_source_window_does_not_hide_an_ambiguous_solar_mass_knot(
+    data18, monkeypatch: pytest.MonkeyPatch
+) -> None:
     full_files(data18)
     subject = probe("Mercury")
     monkeypatch.setattr(
@@ -119,7 +124,9 @@ def test_source_window_does_not_hide_an_ambiguous_solar_mass_knot(data18, monkey
         subject.value(0.0)
 
 
-def test_auxiliary_context_must_match_center_file_fingerprints(data18, monkeypatch):
+def test_auxiliary_context_must_match_center_file_fingerprints(
+    data18, monkeypatch: pytest.MonkeyPatch
+) -> None:
     full_files(data18)
     subject = probe("Sun")
     original = subject.trace.observe
@@ -135,18 +142,18 @@ def test_auxiliary_context_must_match_center_file_fingerprints(data18, monkeypat
 
 
 @pytest.mark.parametrize("label", ["arbitrary", "center_files_solar_cell_101"])
-def test_public_file_cell_contract_rejects_unrecognized_labels(label):
+def test_public_file_cell_contract_rejects_unrecognized_labels(label: str) -> None:
     with pytest.raises(ValidationError):
         SolarBranchGeometry.model_validate({"cell": label})
 
 
-def test_file_cell_contract_distinguishes_file_context_from_solar_radius_cell():
+def test_file_cell_contract_distinguishes_file_context_from_solar_radius_cell() -> None:
     value = SolarBranchGeometry.model_validate({"cell": "center_files_solar_direction"})
     assert value.cell == "center_files_solar_direction"
     assert SolarBranchGeometry.model_validate({"cell": 100}).cell == 100
 
 
-def test_external_reference_is_sealed_and_does_not_import_the_candidate():
+def test_external_reference_is_sealed_and_does_not_import_the_candidate() -> None:
     import ast
 
     assert (
@@ -172,6 +179,8 @@ def test_external_reference_is_sealed_and_does_not_import_the_candidate():
             names = [name.name for name in node.names]
         elif isinstance(node, ast.ImportFrom):
             names = [node.module or ""]
+        else:
+            pass
         assert not any(
             name == "swisseph" or name.startswith("fatebridge") for name in names
         )
@@ -180,8 +189,8 @@ def test_external_reference_is_sealed_and_does_not_import_the_candidate():
 @pytest.mark.parametrize("planet", ["Sun", "Mercury", "Venus", "Mars"])
 @pytest.mark.parametrize("warm", [False, True])
 def test_complete_rates_match_frozen_independent_JPL_ERFA_reference(
-    data18, planet, warm
-):
+    data18, planet: str, warm: bool
+) -> None:
     import math
 
     full_files(data18)

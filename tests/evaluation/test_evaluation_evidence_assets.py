@@ -2,11 +2,12 @@
 
 import hashlib
 import json
+from pathlib import Path
 
 import pytest
 
 import scripts.evaluate_agent as evaluator
-from fatebridge.validation.evaluation_assets import (
+from validation.evaluation_assets import (
     copy_case_evidence,
     evidence_source_files,
     evidence_specs,
@@ -49,7 +50,9 @@ def case(root, name="one"):
     }
 
 
-def test_explicit_evidence_is_frozen_and_each_workspace_gets_only_its_case(tmp_path):
+def test_explicit_evidence_is_frozen_and_each_workspace_gets_only_its_case(
+    tmp_path: Path,
+) -> None:
     source = tmp_path / "source"
     source_tree(source)
     first, second = case(source), case(source, "two")
@@ -89,8 +92,8 @@ def test_explicit_evidence_is_frozen_and_each_workspace_gets_only_its_case(tmp_p
     ],
 )
 def test_paths_cannot_escape_or_overwrite_instructions_or_change_type(
-    tmp_path, field, value
-):
+    tmp_path: Path, field: str, value
+) -> None:
     source_tree(tmp_path)
     item = case(tmp_path)
     item["evidence_files"][0][field] = value
@@ -99,8 +102,8 @@ def test_paths_cannot_escape_or_overwrite_instructions_or_change_type(
 
 
 def test_changed_evidence_and_symlink_escapes_fail_before_model_execution(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     source = tmp_path / "source"
     source_tree(source)
     item = case(source)
@@ -125,7 +128,9 @@ def test_changed_evidence_and_symlink_escapes_fail_before_model_execution(
         evidence_source_files([item], source)
 
 
-def test_existing_files_and_duplicate_destinations_are_never_overwritten(tmp_path):
+def test_existing_files_and_duplicate_destinations_are_never_overwritten(
+    tmp_path: Path,
+) -> None:
     source = tmp_path / "source"
     source_tree(source)
     item = case(source)
@@ -142,14 +147,14 @@ def test_existing_files_and_duplicate_destinations_are_never_overwritten(tmp_pat
     assert destination.read_text() == "original"
 
 
-def test_cases_without_declared_evidence_do_not_gain_files(tmp_path):
+def test_cases_without_declared_evidence_do_not_gain_files(tmp_path: Path) -> None:
     assert evidence_source_files([{}], tmp_path) == ()
     assert copy_case_evidence(tmp_path, {}, tmp_path) == []
 
 
 def test_evidence_only_workspace_excludes_backend_notes_but_keeps_full_tool_backend(
-    tmp_path,
-):
+    tmp_path: Path,
+) -> None:
     source = tmp_path / "source"
     source_tree(source)
     item = {**case(source), "evidence_only_workspace": True}

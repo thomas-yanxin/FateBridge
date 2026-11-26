@@ -5,11 +5,12 @@ import json
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core import heluo_poems as hp
-from fatebridge.core import heluo_texts as ht
-from fatebridge.core.heluo import yao_text
+from fatebridge.core.heluo import heluo_poems as hp
+from fatebridge.core.heluo import heluo_texts as ht
+from fatebridge.core.heluo.heluo import yao_text
 from fatebridge.services.knowledge import calculate_knowledge_read
 from tests.support.transports import SPECS
 
@@ -48,7 +49,7 @@ def canonical(value):
     ).hexdigest()
 
 
-def test_first_readings_all_amendments_and_primary_identities_are_preserved():
+def test_first_readings_all_amendments_and_primary_identities_are_preserved() -> None:
     freeze = json.loads((F / "source-reading-freeze.json").read_bytes())
     for name, digest in freeze["files"].items():
         assert hashlib.sha256((F / name).read_bytes()).hexdigest() == digest
@@ -78,7 +79,9 @@ def test_first_readings_all_amendments_and_primary_identities_are_preserved():
 @pytest.mark.parametrize(
     "expected", REFERENCE["cross_references"], ids=lambda r: str(r["source_line"])
 )
-def test_lin_references_keep_parent_conditions_and_no_printed_target_line(expected):
+def test_lin_references_keep_parent_conditions_and_no_printed_target_line(
+    expected,
+) -> None:
     text = yao_text("地澤臨", expected["source_line"])
     assert text["commentary_cross_references"] == [expected]
     assert (
@@ -98,7 +101,9 @@ def test_lin_references_keep_parent_conditions_and_no_printed_target_line(expect
     assert "原文未印目标爻位" in summary and "不替代正式卦盘" in summary
 
 
-def test_source_negation_crosspage_tail_and_count_conflict_stay_visible_in_summary():
+def test_source_negation_crosspage_tail_and_count_conflict_stay_visible_in_summary() -> (
+    None
+):
     second = yao_text("天水訟", 2)
     assert (
         "時間理未明" in second["shige"]
@@ -175,8 +180,8 @@ def corrupt_source(kind, monkeypatch, tmp_path):
 
 @pytest.mark.parametrize("kind", FAULTS)
 def test_changed_words_parents_count_or_uncertainty_are_source503(
-    kind, monkeypatch, tmp_path
-):
+    kind, monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
     key = corrupt_source(kind, monkeypatch, tmp_path)
     spec = SPECS["knowledge_read"]
     result = execute_tool(

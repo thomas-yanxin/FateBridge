@@ -7,8 +7,8 @@ from typing import Literal
 
 from shapely.geometry import LineString, Polygon, box
 
-from .layout_inputs import FormObservation
-from .spatial_angles import (
+from fatebridge.core.fengshui.layout_inputs import FormObservation
+from fatebridge.core.fengshui.spatial_angles import (
     DIRECTIONS,
     Angle,
     CompassDirection,
@@ -16,7 +16,7 @@ from .spatial_angles import (
     compose_degrees,
     direction_support,
 )
-from .spatial_geometry import (
+from fatebridge.core.fengshui.spatial_geometry import (
     AREA_EPSILON,
     GeometryRectangle,
     corner_points_at,
@@ -34,7 +34,7 @@ from .spatial_geometry import (
     transform_point,
     transform_rectangle,
 )
-from .spatial_inputs import (
+from fatebridge.core.fengshui.spatial_inputs import (
     PlanPoint,
     PlanPose,
     PlanRectangle,
@@ -42,13 +42,13 @@ from .spatial_inputs import (
     RelativePosition,
     SpatialScene,
 )
-from .spatial_outputs import (
+from fatebridge.core.fengshui.spatial_outputs import (
     DesktopPlacement,
     EvaluatedGeometry,
     GeometryCheck,
     SeatGeometry,
 )
-from .spatial_visibility import evaluate_screens
+from fatebridge.core.fengshui.spatial_visibility import evaluate_screens
 
 
 def posed_scene(scene: SpatialScene, poses: dict[str, PlanPose]) -> SpatialScene:

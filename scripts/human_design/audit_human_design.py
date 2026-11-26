@@ -19,24 +19,29 @@ from pathlib import Path
 
 if not __package__:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+else:
+    pass
 
 from tempfile import TemporaryDirectory
 
 from fatebridge.core import ephemeris_runtime
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.time_scales import ephemeris_time
-from fatebridge.core.human_design import (
+from fatebridge.core.human_design.human_design import (
     chart_at,
     chart_at_tt,
     longitude_activation,
     planetary_positions,
 )
-from fatebridge.core.human_design_cycles import derive_body_contacts
-from fatebridge.core.human_design_joint import JointSnapshotCache
-from fatebridge.core.human_design_sensitivity import assess_birth_interval
-from fatebridge.core.human_design_time import solve_design_epoch, solve_solar_root
-from fatebridge.validation.human_design_joint import verify_joint_snapshot
-from fatebridge.validation.human_design_transition import verify_transition_trace
+from fatebridge.core.human_design.human_design_cycles import derive_body_contacts
+from fatebridge.core.human_design.human_design_joint import JointSnapshotCache
+from fatebridge.core.human_design.human_design_sensitivity import assess_birth_interval
+from fatebridge.core.human_design.human_design_time import (
+    solve_design_epoch,
+    solve_solar_root,
+)
+from validation.human_design_joint import verify_joint_snapshot
+from validation.human_design_transition import verify_transition_trace
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -102,6 +107,8 @@ def cycle_phase_arithmetic_checks() -> dict:
                         and record["reported_residual_matches_direct"]
                         and record["exact_residual_matches_direct"]
                     )
+                else:
+                    pass
                 rows.append(record)
     return {
         "method_id": "human_design_multidecade_phase_arithmetic_oracle_v1",
@@ -175,6 +182,8 @@ def historical_utc_checks() -> dict:
         or reference["comparison_tolerance_seconds"] != 0.0002
     ):
         raise ValueError("The fixed SOFA clock cohort or declared tolerance changed")
+    else:
+        pass
     for case in reference["cases"]:
         actual = ephemeris_time(datetime.fromisoformat(case["utc"]))
         error = (
@@ -215,6 +224,8 @@ def node_astronomy_checks() -> dict:
         raise ValueError(
             "Node reference tolerance changed from the declared 1 arcsecond"
         )
+    else:
+        pass
     checks = {}
     for label, requested_flag in (
         ("selected", runtime.swe.FLG_SWIEPH),
@@ -357,15 +368,21 @@ def joint_variant_regression_checks() -> dict:
     ):
         if hashlib.sha256(path.read_bytes()).hexdigest() != expected:
             raise ValueError("Joint bridge oracle source changed")
+        else:
+            pass
     if (
         hashlib.sha256(reference["raw_output"].encode()).hexdigest()
         != reference["raw_output_sha256"]
     ):
         raise ValueError("Joint bridge oracle raw output changed")
+    else:
+        pass
     if [c["id"] for c in plan["cases"]] != ["left", "right"] or [
         c["id"] for c in reference["cases"]
     ] != ["left", "right"]:
         raise ValueError("Fixed joint regression endpoint cohort changed")
+    else:
+        pass
     with _moshier_reference_context():
         nominal = chart_at(datetime.fromisoformat(case["nominal_birth_utc"]))
         report = assess_birth_interval(
@@ -500,6 +517,8 @@ def astronomy_checks() -> dict:
                 cache[key] = planetary_positions(datetime.fromisoformat(key))[
                     "positions"
                 ]
+            else:
+                pass
             actual = cache[key][body["body"]]["longitude"]
             error = (
                 abs((actual - row["apparent_ecliptic_longitude"] + 180) % 360 - 180)
@@ -568,11 +587,11 @@ def astronomy_checks() -> dict:
 
 
 def build_report() -> dict:
-    from fatebridge.validation.human_design_arithmetic import (
+    from validation.human_design_arithmetic import (
         check_opposition_arithmetic,
     )
-    from fatebridge.validation.human_design_astronomy import physical_astronomy_checks
-    from fatebridge.validation.human_design_leap import confirmed_leap_checks
+    from validation.human_design_astronomy import physical_astronomy_checks
+    from validation.human_design_leap import confirmed_leap_checks
 
     report = {
         "method_id": "human_design_current_numeric_audit_v1",
@@ -631,3 +650,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

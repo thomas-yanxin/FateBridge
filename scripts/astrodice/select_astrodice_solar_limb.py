@@ -55,6 +55,8 @@ def select(run, fixture):
                         raise ValueError(
                             "Planned solar limb crossing count unavailable"
                         )
+                    else:
+                        pass
                     for crossing, (left, right) in enumerate(brackets):
                         lo, hi, flo = left[0], right[0], left[1] - target
                         for _ in range(100):
@@ -66,6 +68,8 @@ def select(run, fixture):
                                 raise ValueError(
                                     "Selected limb ray is not behind the Sun"
                                 )
+                            else:
+                                pass
                             value = impact - target
                             if flo * value <= 0:
                                 hi = mid
@@ -73,10 +77,14 @@ def select(run, fixture):
                                 lo, flo = mid, value
                             if hi - lo <= N(plan["root_width_seconds"]):
                                 break
+                            else:
+                                pass
                         if hi - lo > N(plan["root_width_seconds"]):
                             raise ValueError(
                                 "Source geometry root bracket did not converge"
                             )
+                        else:
+                            pass
                         micros = int(
                             (((lo + hi) / 2) * 1000000).to_integral_value(
                                 rounding=ROUND_HALF_EVEN
@@ -94,6 +102,8 @@ def select(run, fixture):
                             raise ValueError(
                                 "Rounded selection lost declared source geometry"
                             )
+                        else:
+                            pass
                         case = {
                             "id": f"solar-limb-{cohort}-{index}-{level}-{crossing}",
                             "body": body,
@@ -120,6 +130,8 @@ def select(run, fixture):
         for n in sys.modules
     ):
         raise ValueError("Independent selector imported candidate")
+    else:
+        pass
     identities = [
         (case["body"], case["exact_numeric_JD_fraction"])
         for cases in results.values()
@@ -127,6 +139,8 @@ def select(run, fixture):
     ]
     if len(set(identities)) != len(identities):
         raise ValueError("Source selection duplicated a condition")
+    else:
+        pass
     return {
         "plan_sha256": hashlib.sha256(
             (run / "selection-plan.json").read_bytes()
@@ -146,8 +160,12 @@ if __name__ == "__main__":
     args = p.parse_args()
     if args.output.exists():
         raise FileExistsError(args.output)
+    else:
+        pass
     result = select(args.run, args.fixture)
     with args.output.open("x") as f:
         json.dump(result, f, indent=2)
         f.write("\n")
     print("Frozen limb conditions", {k: len(v) for k, v in result["cohorts"].items()})
+else:
+    pass

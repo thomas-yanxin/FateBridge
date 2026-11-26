@@ -1,0 +1,1166 @@
+{
+  "at_utc": "2026-10-25T12:26:09.990606+00:00",
+  "reference_kind": "Input profile identities and before-R4 immediate native-call observations, not independent astronomical observations",
+  "original_asset_inventory_sha256": "86d36777fb5e1974c9b23517955cd04a88a8e63bde63652e09850ab9be8bd264",
+  "before_observation_report_sha256": "a440146a6eb643b2c745d4564ff86db7a94b5e087fdfc9083f7347045fececac",
+  "profiles": {
+    "recorded5": [
+      {
+        "name": "sepl_18.se1",
+        "size": 484061,
+        "sha256": "ca1393ceab3a44fbc895887cf789c68819ae6a1cbc9b22225872dbe4ccd99a66",
+        "manifest_verified": true
+      },
+      {
+        "name": "semo_18.se1",
+        "size": 1304771,
+        "sha256": "1ca07bd67c24374d77226180c20a4f9996cba013697894810518e7eb582ca4f7",
+        "manifest_verified": true
+      },
+      {
+        "name": "seas_18.se1",
+        "size": 223004,
+        "sha256": "a2cd8fc33807c78ca9a700c91c2e042258b12fc4796519e00781440b5ad8b2e2",
+        "manifest_verified": true
+      },
+      {
+        "name": "sepl_24.se1",
+        "size": 483414,
+        "sha256": "dea65ffc3ee39125eb1427ecfd578a208be2dd021f49fdfd4b8a130ccd5244f0",
+        "manifest_verified": true
+      },
+      {
+        "name": "semo_24.se1",
+        "size": 1308128,
+        "sha256": "62260992014e61d655c13733bb2d415ac23e8013d8ecf1d7714c237ea8f5b250",
+        "manifest_verified": true
+      }
+    ],
+    "full37": [
+      {
+        "name": "seas_12.se1",
+        "size": 223396,
+        "sha256": "3345555097e2080f4e2582026a6008ebbccfdca27600ba48019ca9c6e3e7a211"
+      },
+      {
+        "name": "seas_18.se1",
+        "size": 223004,
+        "sha256": "a2cd8fc33807c78ca9a700c91c2e042258b12fc4796519e00781440b5ad8b2e2"
+      },
+      {
+        "name": "seas_24.se1",
+        "size": 222674,
+        "sha256": "1b4160a4d289c3d2df55efcc016d407a1516c079b725b2bf2b073a70211aa391"
+      },
+      {
+        "name": "semo_00.se1",
+        "size": 1322594,
+        "sha256": "4b4cc4d2894130f006ab872f1e2c365883bc7354d63c9ca6491271ad3b8effe4"
+      },
+      {
+        "name": "semo_06.se1",
+        "size": 1316056,
+        "sha256": "3ab86918312d125cbadc10e087237a7f30254a206925f769123027c367fd15ac"
+      },
+      {
+        "name": "semo_12.se1",
+        "size": 1305932,
+        "sha256": "1c65fdbb854f350d3de36afc3e4ac126a53f360ae4f6dcb57beed7c690e7eb61"
+      },
+      {
+        "name": "semo_18.se1",
+        "size": 1304771,
+        "sha256": "1ca07bd67c24374d77226180c20a4f9996cba013697894810518e7eb582ca4f7"
+      },
+      {
+        "name": "semo_24.se1",
+        "size": 1308128,
+        "sha256": "62260992014e61d655c13733bb2d415ac23e8013d8ecf1d7714c237ea8f5b250"
+      },
+      {
+        "name": "semo_30.se1",
+        "size": 1312194,
+        "sha256": "937f2f9f6013642d3d4ae4bcca6e74918af8e1bc78c2b1fffeb08260477a925b"
+      },
+      {
+        "name": "semo_36.se1",
+        "size": 1326260,
+        "sha256": "f4e89fb3f69a337249ccff96d3f565baa8986a7c15e44cba5676d5dbdf00dfaa"
+      },
+      {
+        "name": "semo_42.se1",
+        "size": 1339610,
+        "sha256": "7f2927da9deb51669e3a6707a74d5e2c9e8ba30d0625906e0d1bbcb1c8b8983e"
+      },
+      {
+        "name": "semo_48.se1",
+        "size": 1349805,
+        "sha256": "a03cb0b50c8d995ab4bba28051a1bf8901abc4a5249d6c2ab42650b68a70ceec"
+      },
+      {
+        "name": "semo_54.se1",
+        "size": 1358182,
+        "sha256": "c52ee57cdf1ced6dc8cc108495e458018c13c0634382383aba532b333449f597"
+      },
+      {
+        "name": "semo_60.se1",
+        "size": 1366697,
+        "sha256": "7c59329a722f782d0565f9102ed367c8c7492b2c44157cc028c36bbec83ecb4b"
+      },
+      {
+        "name": "semo_66.se1",
+        "size": 1375360,
+        "sha256": "fd38b1ffdd3f4bc8c541bbd9de2d6d15e56be049def130e46db149bab2b9fb87"
+      },
+      {
+        "name": "semo_72.se1",
+        "size": 1383367,
+        "sha256": "4e21428bb61fb76d7f3aa319bac4850bcbb29f5cf312b0dfabfd623e69e3a694"
+      },
+      {
+        "name": "semo_78.se1",
+        "size": 1391023,
+        "sha256": "ebe9d458df1b1a12be065bbb69282a3f2bda7e6726ee69ae29a794154f2c7f6c"
+      },
+      {
+        "name": "semo_84.se1",
+        "size": 1397463,
+        "sha256": "f1ecc11716211aee80193e11a2e0911b1fcdce3cda2cd9bb6cf40085737ef7f2"
+      },
+      {
+        "name": "semo_90.se1",
+        "size": 1402608,
+        "sha256": "c0be2e104a2c4231f601cfeaf048bbeafa5b396cb5b00f19b0e23f310b39c645"
+      },
+      {
+        "name": "semo_96.se1",
+        "size": 1406419,
+        "sha256": "ba5d7a961c2f3763de8965899e8f4d4e60036f3997e83ea75dce2bcc5c37b6f2"
+      },
+      {
+        "name": "sepl_00.se1",
+        "size": 483932,
+        "sha256": "65f1bfa4c27a2311f6db8447ba9f678a03b1431eb30052bf323619c8209282f1"
+      },
+      {
+        "name": "sepl_06.se1",
+        "size": 482956,
+        "sha256": "5aff87ba1664410669b54366752343ca71a22cca1b3698c57edcc4631361675a"
+      },
+      {
+        "name": "sepl_12.se1",
+        "size": 483743,
+        "sha256": "8dccace2557601a223d5f8a7cf64de4e6bbb8a82b9b130b95a54d49adfbe546d"
+      },
+      {
+        "name": "sepl_18.se1",
+        "size": 484061,
+        "sha256": "ca1393ceab3a44fbc895887cf789c68819ae6a1cbc9b22225872dbe4ccd99a66"
+      },
+      {
+        "name": "sepl_24.se1",
+        "size": 483414,
+        "sha256": "dea65ffc3ee39125eb1427ecfd578a208be2dd021f49fdfd4b8a130ccd5244f0"
+      },
+      {
+        "name": "sepl_30.se1",
+        "size": 484363,
+        "sha256": "6294c0f144ec8d37f6ba2eba1a31101c83c3c31d3aef20fd183d4d3b2ab90355"
+      },
+      {
+        "name": "sepl_36.se1",
+        "size": 484799,
+        "sha256": "3faeadb0f2c04d455ce8c5a853d007e9b445e1dc7b65a43389fc3d746b7b9bd0"
+      },
+      {
+        "name": "sepl_42.se1",
+        "size": 483683,
+        "sha256": "4e1bf7d736d250948f58dee6acc80f997a3d5e1f3a62fa5d6bae495a25d4b40c"
+      },
+      {
+        "name": "sepl_48.se1",
+        "size": 485107,
+        "sha256": "5dd06850876b4508a056fd0538a7bb48235d5bbf7b72ed5b508c8dc12d89b26b"
+      },
+      {
+        "name": "sepl_54.se1",
+        "size": 487717,
+        "sha256": "74ddcea73ea3510f26ccd3a1ff118a2469eed4fcfb084cda590655dcc2e16c7c"
+      },
+      {
+        "name": "sepl_60.se1",
+        "size": 490577,
+        "sha256": "e91e27c800d27b15fa35d3c840f26fe3e10a88d3b3f2b0dff5c440eb6524f04c"
+      },
+      {
+        "name": "sepl_66.se1",
+        "size": 495368,
+        "sha256": "c5f38cb8c361a4526bb316c82add38697ba35b112deed44581221a17bcfc2266"
+      },
+      {
+        "name": "sepl_72.se1",
+        "size": 501546,
+        "sha256": "b0861d27507e4afc8c88a183dfd8db527adb49d7bca918a40ab2bc7dc75a8f51"
+      },
+      {
+        "name": "sepl_78.se1",
+        "size": 506541,
+        "sha256": "68918c88c471c3c232eade942335807c08ec1b5d504edd84909f06725f2b43ed"
+      },
+      {
+        "name": "sepl_84.se1",
+        "size": 517454,
+        "sha256": "ee6273286ab597252167f21eb15003f34b65e1cfb3286633cefc24b8c1bbc20a"
+      },
+      {
+        "name": "sepl_90.se1",
+        "size": 526675,
+        "sha256": "01fe231df42e38ca4d1bbfb063658b92d40f4e8424ae32613805e2693ba4450f"
+      },
+      {
+        "name": "sepl_96.se1",
+        "size": 536979,
+        "sha256": "3e3f6dd884552f6a9427b53a2b270ba56a0edceba1363f2e6956cae59ad23b20"
+      }
+    ],
+    "empty0": []
+  },
+  "case_outcomes": [
+    {
+      "profile": "recorded5",
+      "kind": "source",
+      "index": 0,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "moshier"
+        ],
+        "Moon": [
+          "moshier"
+        ]
+      },
+      "native_call_count": 75
+    },
+    {
+      "profile": "recorded5",
+      "kind": "source",
+      "index": 1,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "moshier"
+        ],
+        "Moon": [
+          "moshier"
+        ]
+      },
+      "native_call_count": 76
+    },
+    {
+      "profile": "recorded5",
+      "kind": "source",
+      "index": 2,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "moshier",
+          "swieph"
+        ],
+        "Moon": [
+          "moshier",
+          "swieph"
+        ]
+      },
+      "native_call_count": 97
+    },
+    {
+      "profile": "recorded5",
+      "kind": "source",
+      "index": 3,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "moshier",
+          "swieph"
+        ],
+        "Moon": [
+          "moshier",
+          "swieph"
+        ]
+      },
+      "native_call_count": 98
+    },
+    {
+      "profile": "recorded5",
+      "kind": "source",
+      "index": 4,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 83
+    },
+    {
+      "profile": "recorded5",
+      "kind": "source",
+      "index": 5,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 84
+    },
+    {
+      "profile": "recorded5",
+      "kind": "source",
+      "index": 6,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 71
+    },
+    {
+      "profile": "recorded5",
+      "kind": "source",
+      "index": 7,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 72
+    },
+    {
+      "profile": "recorded5",
+      "kind": "source",
+      "index": 8,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 69
+    },
+    {
+      "profile": "recorded5",
+      "kind": "source",
+      "index": 9,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 70
+    },
+    {
+      "profile": "recorded5",
+      "kind": "source",
+      "index": 10,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 95
+    },
+    {
+      "profile": "recorded5",
+      "kind": "source",
+      "index": 11,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 96
+    },
+    {
+      "profile": "recorded5",
+      "kind": "source",
+      "index": 12,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 75
+    },
+    {
+      "profile": "recorded5",
+      "kind": "source",
+      "index": 13,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 76
+    },
+    {
+      "profile": "recorded5",
+      "kind": "source",
+      "index": 14,
+      "status": "no_result",
+      "models_by_body": {},
+      "native_call_count": 0
+    },
+    {
+      "profile": "recorded5",
+      "kind": "source",
+      "index": 15,
+      "status": "no_result",
+      "models_by_body": {},
+      "native_call_count": 0
+    },
+    {
+      "profile": "full37",
+      "kind": "source",
+      "index": 0,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 75
+    },
+    {
+      "profile": "full37",
+      "kind": "source",
+      "index": 1,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 76
+    },
+    {
+      "profile": "full37",
+      "kind": "source",
+      "index": 2,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 97
+    },
+    {
+      "profile": "full37",
+      "kind": "source",
+      "index": 3,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 98
+    },
+    {
+      "profile": "full37",
+      "kind": "source",
+      "index": 4,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 83
+    },
+    {
+      "profile": "full37",
+      "kind": "source",
+      "index": 5,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 84
+    },
+    {
+      "profile": "full37",
+      "kind": "source",
+      "index": 6,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 71
+    },
+    {
+      "profile": "full37",
+      "kind": "source",
+      "index": 7,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 72
+    },
+    {
+      "profile": "full37",
+      "kind": "source",
+      "index": 8,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 69
+    },
+    {
+      "profile": "full37",
+      "kind": "source",
+      "index": 9,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 70
+    },
+    {
+      "profile": "full37",
+      "kind": "source",
+      "index": 10,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 95
+    },
+    {
+      "profile": "full37",
+      "kind": "source",
+      "index": 11,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 96
+    },
+    {
+      "profile": "full37",
+      "kind": "source",
+      "index": 12,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 75
+    },
+    {
+      "profile": "full37",
+      "kind": "source",
+      "index": 13,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 76
+    },
+    {
+      "profile": "full37",
+      "kind": "source",
+      "index": 14,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 75
+    },
+    {
+      "profile": "full37",
+      "kind": "source",
+      "index": 15,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 76
+    },
+    {
+      "profile": "full37",
+      "kind": "display",
+      "index": 0,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 79
+    },
+    {
+      "profile": "full37",
+      "kind": "display",
+      "index": 1,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 80
+    },
+    {
+      "profile": "full37",
+      "kind": "display",
+      "index": 2,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 87
+    },
+    {
+      "profile": "full37",
+      "kind": "display",
+      "index": 3,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 88
+    },
+    {
+      "profile": "full37",
+      "kind": "display",
+      "index": 4,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 97
+    },
+    {
+      "profile": "full37",
+      "kind": "display",
+      "index": 5,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 98
+    },
+    {
+      "profile": "full37",
+      "kind": "display",
+      "index": 6,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 79
+    },
+    {
+      "profile": "full37",
+      "kind": "display",
+      "index": 7,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 80
+    },
+    {
+      "profile": "full37",
+      "kind": "display",
+      "index": 8,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 83
+    },
+    {
+      "profile": "full37",
+      "kind": "display",
+      "index": 9,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 84
+    },
+    {
+      "profile": "full37",
+      "kind": "display",
+      "index": 10,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 75
+    },
+    {
+      "profile": "full37",
+      "kind": "display",
+      "index": 11,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 76
+    },
+    {
+      "profile": "full37",
+      "kind": "display",
+      "index": 12,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 77
+    },
+    {
+      "profile": "full37",
+      "kind": "display",
+      "index": 13,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 78
+    },
+    {
+      "profile": "full37",
+      "kind": "display",
+      "index": 14,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 71
+    },
+    {
+      "profile": "full37",
+      "kind": "display",
+      "index": 15,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "swieph"
+        ],
+        "Moon": [
+          "swieph"
+        ]
+      },
+      "native_call_count": 72
+    },
+    {
+      "profile": "empty0",
+      "kind": "source",
+      "index": 0,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "moshier"
+        ],
+        "Moon": [
+          "moshier"
+        ]
+      },
+      "native_call_count": 75
+    },
+    {
+      "profile": "empty0",
+      "kind": "source",
+      "index": 1,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "moshier"
+        ],
+        "Moon": [
+          "moshier"
+        ]
+      },
+      "native_call_count": 76
+    },
+    {
+      "profile": "empty0",
+      "kind": "source",
+      "index": 2,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "moshier"
+        ],
+        "Moon": [
+          "moshier"
+        ]
+      },
+      "native_call_count": 97
+    },
+    {
+      "profile": "empty0",
+      "kind": "source",
+      "index": 3,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "moshier"
+        ],
+        "Moon": [
+          "moshier"
+        ]
+      },
+      "native_call_count": 98
+    },
+    {
+      "profile": "empty0",
+      "kind": "source",
+      "index": 4,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "moshier"
+        ],
+        "Moon": [
+          "moshier"
+        ]
+      },
+      "native_call_count": 83
+    },
+    {
+      "profile": "empty0",
+      "kind": "source",
+      "index": 5,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "moshier"
+        ],
+        "Moon": [
+          "moshier"
+        ]
+      },
+      "native_call_count": 84
+    },
+    {
+      "profile": "empty0",
+      "kind": "source",
+      "index": 6,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "moshier"
+        ],
+        "Moon": [
+          "moshier"
+        ]
+      },
+      "native_call_count": 71
+    },
+    {
+      "profile": "empty0",
+      "kind": "source",
+      "index": 7,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "moshier"
+        ],
+        "Moon": [
+          "moshier"
+        ]
+      },
+      "native_call_count": 72
+    },
+    {
+      "profile": "empty0",
+      "kind": "source",
+      "index": 8,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "moshier"
+        ],
+        "Moon": [
+          "moshier"
+        ]
+      },
+      "native_call_count": 69
+    },
+    {
+      "profile": "empty0",
+      "kind": "source",
+      "index": 9,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "moshier"
+        ],
+        "Moon": [
+          "moshier"
+        ]
+      },
+      "native_call_count": 70
+    },
+    {
+      "profile": "empty0",
+      "kind": "source",
+      "index": 10,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "moshier"
+        ],
+        "Moon": [
+          "moshier"
+        ]
+      },
+      "native_call_count": 95
+    },
+    {
+      "profile": "empty0",
+      "kind": "source",
+      "index": 11,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "moshier"
+        ],
+        "Moon": [
+          "moshier"
+        ]
+      },
+      "native_call_count": 96
+    },
+    {
+      "profile": "empty0",
+      "kind": "source",
+      "index": 12,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "moshier"
+        ],
+        "Moon": [
+          "moshier"
+        ]
+      },
+      "native_call_count": 75
+    },
+    {
+      "profile": "empty0",
+      "kind": "source",
+      "index": 13,
+      "status": "returned",
+      "models_by_body": {
+        "Sun": [
+          "moshier"
+        ],
+        "Moon": [
+          "moshier"
+        ]
+      },
+      "native_call_count": 76
+    },
+    {
+      "profile": "empty0",
+      "kind": "source",
+      "index": 14,
+      "status": "no_result",
+      "models_by_body": {},
+      "native_call_count": 0
+    },
+    {
+      "profile": "empty0",
+      "kind": "source",
+      "index": 15,
+      "status": "no_result",
+      "models_by_body": {},
+      "native_call_count": 0
+    }
+  ]
+}

@@ -11,18 +11,66 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Literal
+
+from packaging.requirements import Requirement
+from typing_extensions import NotRequired, TypedDict
 
 from fatebridge import __version__
 from fatebridge.application.discovery import select_mcp_specs
 from fatebridge.application.examples import example_input
+from fatebridge.application.tool_spec import ServiceResult
+from fatebridge.core.ephemeris_installation import (
+    FENGSHUI_PROFILE,
+    HUMAN_DESIGN_PROFILE,
+    fengshui_file_status,
+    human_design_file_status,
+    user_ephemeris_dir,
+)
 from fatebridge.core.ephemeris_paths import ephemeris_search_directories
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import ParameterError
 from fatebridge.utils.runtime import load_runtime_env
 
+STDIO_CALL_TIMEOUT_SECONDS = 30
+STDIO_PROBE_TIMEOUT_SECONDS = 40
+STDIO_ERROR_MESSAGE_CHARS = 2048
+STDIO_LOG_TAIL_BYTES = 8192
 
-def resolve_codex_cli() -> Dict[str, str]:
+
+class CodexCliResolution(TypedDict):
+    path: str
+    source: Literal["desktop", "running_desktop", "PATH", "not_installed"]
+    path_cli: str
+
+
+class DependencyStatus(TypedDict):
+    ok: bool
+    version: NotRequired[str]
+
+
+class StdioProbeResult(TypedDict):
+    ok: bool
+    scope: str
+    tool_count: int
+    tools_wire_bytes: int
+    summary_bytes: int
+    smoke_tool: NotRequired[str]
+
+
+StdioStage = Literal[
+    "initialize", "tools/list", "resources/read", "tools/call", "shutdown"
+]
+
+
+class StdioFailureDetails(TypedDict):
+    stage: StdioStage
+    error_type: str
+    error: str
+    server_stderr: str
+
+
+def resolve_codex_cli() -> CodexCliResolution:
     """Prefer the running desktop's CLI to an unrelated PATH installation."""
     desktop = os.getenv("CODEX_CLI_PATH")
     terminal = shutil.which("codex")
@@ -46,7 +94,7 @@ def resolve_codex_cli() -> Dict[str, str]:
     }
 
 
-def _running_desktop_cli() -> Optional[str]:
+def _running_desktop_cli() -> str | None:
     """Discover a unique actual macOS app CLI; process arguments are never read."""
     if platform.system() != "Darwin":
         return None
@@ -66,27 +114,27 @@ def _running_desktop_cli() -> Optional[str]:
         and Path(line.strip()).is_file()
         and os.access(line.strip(), os.X_OK)
     }
-    # Multiple active app installations are ambiguous; retain the PATH fallback.
+    # note (desktop): Fall back to PATH if more than one app is active.
     return next(iter(candidates)) if len(candidates) == 1 else None
 
 
 class _StdioProbeError(RuntimeError):
-    def __init__(self, stage: str, cause: Exception, stderr: str) -> None:
+    def __init__(self, stage: StdioStage, cause: Exception, stderr: str) -> None:
         super().__init__(str(cause))
-        self.details = {
+        self.details: StdioFailureDetails = {
             "stage": stage,
             "error_type": type(cause).__name__,
-            "error": str(cause)[:2048],
+            "error": str(cause)[:STDIO_ERROR_MESSAGE_CHARS],
             "server_stderr": stderr,
         }
 
 
-async def _probe_stdio(env: Dict[str, str]) -> Dict[str, Any]:
+async def _probe_stdio(env: dict[str, str]) -> StdioProbeResult:
+    # note (startup): Load the protocol client only for a real stdio probe.
     from fastmcp import Client
     from fastmcp.client.transports import StdioTransport
 
-    # A GUI host need not launch in the checkout. Verify that installed imports
-    # and package data work from an unrelated working directory as well.
+    # note (installed entry): Launch outside the checkout to exercise installed imports and data.
     with tempfile.TemporaryDirectory(prefix="fatebridge-doctor-") as directory:
         with tempfile.TemporaryFile(
             mode="w+", encoding="utf-8", errors="replace"
@@ -99,17 +147,28 @@ async def _probe_stdio(env: Dict[str, str]) -> Dict[str, Any]:
                 log_file=log,
                 keep_alive=False,
             )
-            stage = "initialize"
+            stage: StdioStage = "initialize"
             try:
-                async with Client(transport, timeout=30) as client:
+                async with Client(
+                    transport, timeout=STDIO_CALL_TIMEOUT_SECONDS
+                ) as client:
                     stage = "tools/list"
                     tools = await client.list_tools()
                     stage = "resources/read"
                     summary = await client.read_resource("fatebridge://catalog/summary")
-                    catalog = json.loads(summary[0].text)
-                    if {t.name for t in tools} != {t["tool"] for t in catalog["tools"]}:
+                    summary_text = summary[0].text
+                    catalog = json.loads(summary_text)
+                    names = {tool.name for tool in tools}
+                    available = {tool["tool"] for tool in catalog["tools"]}
+                    expected = {
+                        "discover_capabilities",
+                        "describe_capability",
+                        "run_calculation",
+                        "read_result",
+                    }
+                    if names != expected:
                         raise RuntimeError("MCP catalog and tools/list disagree")
-                    output: Dict[str, Any] = {
+                    output: StdioProbeResult = {
                         "ok": True,
                         "scope": "initialize, tools/list, resources/read",
                         "tool_count": len(tools),
@@ -122,25 +181,22 @@ async def _probe_stdio(env: Dict[str, str]) -> Dict[str, Any]:
                                 ensure_ascii=False,
                             ).encode()
                         ),
-                        "summary_bytes": len(summary[0].text.encode()),
+                        "summary_bytes": len(summary_text.encode()),
                     }
-                    names = {tool.name for tool in tools}
-                    candidate = next(
-                        (
-                            (spec, example_input(spec))
-                            for spec in CATALOG
-                            if spec.mcp_name in names
-                            and example_input(spec) is not None
-                        ),
-                        None,
-                    )
-                    if candidate is not None:
+                    for spec in CATALOG:
+                        if (
+                            spec.mcp_name in available
+                            and (inputs := example_input(spec)) is not None
+                        ):
+                            pass
+                        else:
+                            continue
                         stage = "tools/call"
-                        spec, inputs = candidate
                         response = await client.call_tool(
-                            spec.tool_name,
+                            "run_calculation",
                             {
-                                **(inputs or {}),
+                                "tool": spec.tool_name,
+                                "arguments": inputs,
                                 "fields": ["run_metadata"],
                                 "strict_fields": True,
                             },
@@ -149,26 +205,25 @@ async def _probe_stdio(env: Dict[str, str]) -> Dict[str, Any]:
                         if response.is_error:
                             raise RuntimeError("MCP fictional smoke calculation failed")
                         receipt = response.structured_content["run_metadata"]
-                        if receipt["tool_name"] != spec.run_metadata_name:
+                        if receipt["tool_name"] != spec.tool_name:
                             raise RuntimeError("MCP smoke receipt has wrong tool name")
                         output["smoke_tool"] = spec.tool_name
                         output["scope"] += ", one fictional calculation"
+                        break
                     stage = "shutdown"
                 return output
             except Exception as exc:
-                # This diagnostic uses only bundled fictional inputs. Keep the
-                # child failure available without dumping the environment or an
-                # unbounded log, and close the child before the temporary files.
+                # note (diagnostics): Report the stage and a bounded tail of child stderr.
                 log.seek(0, os.SEEK_END)
-                log.seek(max(0, log.tell() - 8192))
+                log.seek(max(0, log.tell() - STDIO_LOG_TAIL_BYTES))
                 raise _StdioProbeError(stage, exc, log.read()) from exc
 
 
 def diagnose(
     *,
     mcp: bool = False,
-    family: Optional[str] = None,
-) -> Dict[str, Any]:
+    family: str | None = None,
+) -> ServiceResult:
     if mcp:
         load_runtime_env()
     family = family if family is not None else os.getenv("FATEBRIDGE_MCP_FAMILIES", "")
@@ -179,16 +234,13 @@ def diagnose(
         )
     except ParameterError as exc:
         return {"ok": False, **exc.as_result()}
-    env = {
-        "FATEBRIDGE_MCP_FAMILIES": family,
-    }
-    dependencies: Dict[str, Any] = {}
+    env = {"FATEBRIDGE_MCP_FAMILIES": family}
+    if archive_dir := os.getenv("FATEBRIDGE_DE441_DIR"):
+        env["FATEBRIDGE_DE441_DIR"] = archive_dir
+    dependencies: dict[str, DependencyStatus] = {}
     for dependency in importlib.metadata.requires("fatebridge") or []:
-        from packaging.requirements import Requirement
-
         requirement = Requirement(dependency)
-        # Platform requirements are active on that platform; unselected extras
-        # and other inactive markers must not enter the required dependency set.
+        # note (markers): Include active platform dependencies and exclude unselected extras.
         if requirement.marker and not requirement.marker.evaluate({"extra": ""}):
             continue
         try:
@@ -204,14 +256,15 @@ def diagnose(
     for key, value in env.items():
         args.extend(["--env", f"{key}={value}"])
     args.extend(["--", sys.executable, "-m", "fatebridge.mcp_server"])
-    output: Dict[str, Any] = {
-        "ok": all(item["ok"] for item in dependencies.values()),
+    output: ServiceResult = {
+        "ok": all(status["ok"] for status in dependencies.values()),
         "version": __version__,
         "python": platform.python_version(),
         "executable": sys.executable,
         "package_path": str(Path(__file__).parent),
         "dependencies": dependencies,
-        "mcp_tool_count": len(selected),
+        "mcp_tool_count": 4 if selected else 0,
+        "mcp_capability_count": len(selected),
         "codex": {
             "cli": codex_cli,
             "add_command": shlex.join(args),
@@ -229,7 +282,9 @@ def diagnose(
         output["error"] = "未找到所选分类的公开工具，请调整 --family"
     elif mcp and output["ok"]:
         try:
-            output["mcp"] = asyncio.run(asyncio.wait_for(_probe_stdio(env), timeout=40))
+            output["mcp"] = asyncio.run(
+                asyncio.wait_for(_probe_stdio(env), timeout=STDIO_PROBE_TIMEOUT_SECONDS)
+            )
         except Exception as exc:
             output["ok"] = False
             output["mcp"] = {
@@ -239,14 +294,16 @@ def diagnose(
             }
             if isinstance(exc, _StdioProbeError):
                 output["mcp"].update(exc.details)
-    if any(spec.family == "fengshui" for spec in selected):
-        from fatebridge.core.ephemeris_installation import (
-            fengshui_file_status,
-            user_ephemeris_dir,
-        )
+    has_fengshui = any(spec.family == "fengshui" for spec in selected)
+    has_human_design = any(spec.key == "human_design" for spec in selected)
+    if has_fengshui or has_human_design:
+        # note (runtime): The native engine reads its environment when first imported.
         from fatebridge.core.ephemeris_runtime import effective_ephemeris_search_path
 
         active = effective_ephemeris_search_path()
+    else:
+        active = None
+    if has_fengshui:
         output["fengshui_calendar"] = {
             "active_search_path": active,
             "active_directories": [
@@ -259,21 +316,13 @@ def diagnose(
                 "-m",
                 "fatebridge.fetch_ephe",
                 "--profile",
-                "fengshui_calendar",
+                FENGSHUI_PROFILE,
             ],
             "setup_command": f"{shlex.quote(sys.executable)} -m fatebridge.fetch_ephe --profile fengshui_calendar",
             "astronomical_acceptance": "not_run_by_doctor; file identity does not certify one-second TT accuracy",
             "scope": "read_only_data_readiness; doctor ok describes package/dependencies/protocol, not full Feng Shui precision",
         }
-    if any(spec.key == "human_design" for spec in selected):
-        from fatebridge.core.ephemeris_installation import (
-            HUMAN_DESIGN_PROFILE,
-            human_design_file_status,
-            user_ephemeris_dir,
-        )
-        from fatebridge.core.ephemeris_runtime import effective_ephemeris_search_path
-
-        active = effective_ephemeris_search_path()
+    if has_human_design:
         setup = [
             sys.executable,
             "-m",

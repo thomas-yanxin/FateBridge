@@ -14,7 +14,7 @@ WORKFLOW = yaml.safe_load(
 )
 
 
-def test_cloud_jobs_do_not_restore_external_test_data():
+def test_cloud_jobs_do_not_restore_external_test_data() -> None:
     for job in WORKFLOW["jobs"].values():
         for step in job["steps"]:
             command = step.get("run", "")
@@ -29,7 +29,7 @@ def test_cloud_jobs_do_not_restore_external_test_data():
                 assert dependency not in str(step.get("env", {})), step["name"]
 
 
-def test_every_environment_keeps_the_full_suite_across_three_shards():
+def test_every_environment_keeps_the_full_suite_across_three_shards() -> None:
     jobs = WORKFLOW["jobs"]
     assert set(jobs) == {"changes", "documentation", "locked", "quality", "test", "ci"}
     matrix = jobs["test"]["strategy"]["matrix"]
@@ -56,7 +56,7 @@ def test_every_environment_keeps_the_full_suite_across_three_shards():
     }
 
 
-def test_pr_updates_cancel_but_main_and_master_commits_have_unique_groups():
+def test_pr_updates_cancel_but_main_and_master_commits_have_unique_groups() -> None:
     concurrency = WORKFLOW["concurrency"]
     assert (
         concurrency["cancel-in-progress"]
@@ -66,7 +66,7 @@ def test_pr_updates_cancel_but_main_and_master_commits_have_unique_groups():
     assert "github.workflow" in concurrency["group"]
 
 
-def test_passive_docs_skip_heavy_jobs_but_keep_a_completed_summary():
+def test_passive_docs_skip_heavy_jobs_but_keep_a_completed_summary() -> None:
     documentation = WORKFLOW["jobs"]["documentation"]
     assert "if" not in documentation
     commands = "\n".join(step.get("run", "") for step in documentation["steps"])
@@ -102,7 +102,9 @@ def test_passive_docs_skip_heavy_jobs_but_keep_a_completed_summary():
         ("TEST_RESULT", "skipped"),
     ],
 )
-def test_summary_gate_requires_every_selected_job_to_succeed(failed_job, conclusion):
+def test_summary_gate_requires_every_selected_job_to_succeed(
+    failed_job: str, conclusion: str
+) -> None:
     script = WORKFLOW["jobs"]["ci"]["steps"][0]["run"]
     results = {
         name: "success"
@@ -131,8 +133,8 @@ def test_summary_gate_requires_every_selected_job_to_succeed(failed_job, conclus
     ],
 )
 def test_docs_summary_accepts_only_the_explicit_skip_path(
-    test_result, documentation_result
-):
+    test_result: str, documentation_result: str
+) -> None:
     results = dict(
         CHANGES_RESULT="success",
         DOCUMENTATION_RESULT=documentation_result,
@@ -159,7 +161,9 @@ def test_docs_summary_accepts_only_the_explicit_skip_path(
         "partial_rerun",
     ],
 )
-def test_live_gate_rejects_missing_or_overlapping_test_coverage(tmp_path, fault):
+def test_live_gate_rejects_missing_or_overlapping_test_coverage(
+    tmp_path: Path, fault: str | None
+) -> None:
     reports = {}
     for environment in range(6):
         for index in range(3):
@@ -191,6 +195,8 @@ def test_live_gate_rejects_missing_or_overlapping_test_coverage(tmp_path, fault)
         )
         reports[newer] = {**reports[first], "selected": ["test_a"]}
         reports[first]["selected"] = []
+    else:
+        pass
     for path, report in reports.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(report), encoding="utf-8")

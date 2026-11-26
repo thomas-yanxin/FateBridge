@@ -6,31 +6,19 @@ from pathlib import Path
 
 import pytest
 
+from fatebridge.core.liuyao.liuyao_hidden import PROFILE
 from scripts.liuyao.build_profile import build_profile
-from tests.liuyao.test_liuyao_conditions import conditional_case, mounted
+from tests.unit_test.fixtures.liuyao import hidden_case, liuyao_cases
+from tests.unit_test.fixtures.liuyao import mounted_lines as mounted
+from tests.unit_test.fixtures.liuyao import routing_case
+from tests.unit_test.fixtures.liuyao import void_case as classical
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_hidden_v14"
 CASES = json.loads((REFERENCE / "cases.json").read_text())["cases"]
 ERRATA = json.loads((REFERENCE / "errata.json").read_text())["corrections"]
 
 
-def hidden_case(case):
-    from fatebridge.core.liuyao_judgment import kinship
-    from fatebridge.core.liuyao_relations import ELEMENTS
-
-    info, _ = mounted(case["base_code"], case["changed_code"])
-    hidden = dict(
-        position=case["focus_line"],
-        branch=case["hidden_branch"],
-        element=ELEMENTS[case["hidden_branch"]],
-        liuqin=kinship(info["current_palace_element"], ELEMENTS[case["hidden_branch"]]),
-        flying_branch=case["flying_branch"],
-    )
-    return conditional_case(case, hidden=[hidden], focus_kind="hidden")
-
-
-def test_hidden_reception_cases_and_original_remain_frozen():
-    from fatebridge.core.liuyao_hidden import PROFILE
+def test_hidden_reception_cases_and_original_remain_frozen() -> None:
 
     assert PROFILE == build_profile("hidden")
     for name, digest in json.loads((REFERENCE / "freeze.json").read_text())[
@@ -44,7 +32,7 @@ def test_hidden_reception_cases_and_original_remain_frozen():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_hidden_reception_uses_its_own_branch_and_qualified_sources(case):
+def test_hidden_reception_uses_its_own_branch_and_qualified_sources(case) -> None:
     result = hidden_case(case)
     hidden = result["hidden_conditions"][0]
     reception = hidden["reception"]
@@ -71,9 +59,8 @@ def test_hidden_reception_uses_its_own_branch_and_qualified_sources(case):
     )
 
 
-def test_hidden_route_keeps_pending_reception_and_does_not_borrow_flying_row():
-    from tests.liuyao.test_liuyao_routing import CASES as ROUTE_CASES
-    from tests.liuyao.test_liuyao_routing import routing_case
+def test_hidden_route_keeps_pending_reception_and_does_not_borrow_flying_row() -> None:
+    ROUTE_CASES = liuyao_cases("liuyao_routing_v13")
 
     result = routing_case(ROUTE_CASES[10])
     for route in result["routing_conditions"]["routes"]:
@@ -83,7 +70,7 @@ def test_hidden_route_keeps_pending_reception_and_does_not_borrow_flying_row():
         assert stage["reason"] != "hidden_target_reception_not_adjudicated"
 
 
-def test_alternative_calendar_support_does_not_turn_void_flying_into_a_source():
+def test_alternative_calendar_support_does_not_turn_void_flying_into_a_source() -> None:
     hidden = hidden_case(CASES[2])["hidden_conditions"][0]
     assert hidden["reception"]["condition_match"] is True
     assert hidden["reception"]["flying_generation"]["condition_match"] is None
@@ -93,7 +80,9 @@ def test_alternative_calendar_support_does_not_turn_void_flying_into_a_source():
     )
 
 
-def test_frozen_annotation_error_is_explicit_and_possible_controller_is_retained():
+def test_frozen_annotation_error_is_explicit_and_possible_controller_is_retained() -> (
+    None
+):
     assert len(ERRATA) == 2 and CASES[3]["expected_reception"] is True
     result = hidden_case(CASES[3])
     assert (
@@ -105,7 +94,9 @@ def test_frozen_annotation_error_is_explicit_and_possible_controller_is_retained
     ] == [3]
 
 
-def test_static_flying_exception_keeps_ordinary_source_pending_and_its_own_pointer():
+def test_static_flying_exception_keeps_ordinary_source_pending_and_its_own_pointer() -> (
+    None
+):
     result = hidden_case(CASES[6])
     flying = result["hidden_conditions"][0]["reception"]["flying_generation"]
     assert flying["condition_match"] is True
@@ -120,7 +111,7 @@ def test_static_flying_exception_keeps_ordinary_source_pending_and_its_own_point
     )
 
 
-def test_day_combination_cannot_be_erased_to_call_hidden_unrooted():
+def test_day_combination_cannot_be_erased_to_call_hidden_unrooted() -> None:
     result = hidden_case(CASES[8])
     gate = result["hidden_conditions"][0]["reception"]
     assert CASES[8]["expected_reception"] is False
@@ -130,8 +121,9 @@ def test_day_combination_cannot_be_erased_to_call_hidden_unrooted():
     assert "flying_control_requires_global_resolution" in gate["pending_reasons"]
 
 
-def test_defeated_other_generator_does_not_cancel_month_supported_static_flying():
-    from tests.liuyao.test_liuyao_void import classical
+def test_defeated_other_generator_does_not_cancel_month_supported_static_flying() -> (
+    None
+):
 
     result = classical(
         dict(

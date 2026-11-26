@@ -7,11 +7,13 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.meihua_topics import TOPICS, topic_ruleset
+from fatebridge.application.examples import suggested_fields
+from fatebridge.core.meihua import meihua_topics
+from fatebridge.core.meihua.meihua_topics import TOPICS, topic_ruleset
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
-from fatebridge.validation.meihua_topics import audit_topic_clauses
 from tests.support.transports import SPECS, business, rest, surface_calls
+from validation.meihua_topics import audit_topic_clauses
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_topics_v1"
 CASES = json.loads((REFERENCES / "cases.json").read_text())["cases"]
@@ -24,7 +26,7 @@ def audited():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["topic"] + "-" + c["id"])
-def test_frozen_hand_diagrams_select_their_actual_topic_clause(case, audited):
+def test_frozen_hand_diagrams_select_their_actual_topic_clause(case, audited) -> None:
     row = next(
         r
         for r in audited["mathematical_cases"]
@@ -37,8 +39,8 @@ def test_frozen_hand_diagrams_select_their_actual_topic_clause(case, audited):
 @pytest.mark.parametrize("basis", ["raw_counts", "trigram_numbers"])
 @pytest.mark.parametrize("case", VARIANTS, ids=lambda c: c["id"])
 def test_each_count_candidate_keeps_own_clause_and_stage_context(
-    case, basis, topic, audited
-):
+    case, basis: str, topic, audited
+) -> None:
     row = next(
         r
         for r in audited["retained_cast_checks"]
@@ -47,7 +49,7 @@ def test_each_count_candidate_keeps_own_clause_and_stage_context(
     assert row["passed"], row
 
 
-def test_selected_nlc_transaction_delay_is_not_replaced_by_transcription_gain():
+def test_selected_nlc_transaction_delay_is_not_replaced_by_transcription_gain() -> None:
     out = calculate_meihua_cast(
         casting=CASES[0]["casting"], interpretation_topic="transaction"
     )
@@ -62,23 +64,15 @@ def test_selected_nlc_transaction_delay_is_not_replaced_by_transcription_gain():
         == "explicit_difference_in_selected_reading"
     )
     assert not clause["comparison_reading"]["used_to_override_selected_edition"]
-    assert (
-        clause["event_time"]
-        is clause["success_probability"]
-        is clause["real_outcome_verdict"]
-        is None
-    )
+    assert clause["event_time"] is clause["real_outcome_verdict"] is None
     assert clause["delay_scope"] == "relative_delay_without_numeric_window"
     assert "交易成遲" in out["summary"]
-    assert (
-        out["interpretation"]["action_hint"]
-        is out["interpretation"]["risk_hint"]
-        is None
-    )
 
 
 @pytest.mark.parametrize("topic", TOPICS)
-def test_explicit_topic_and_supplied_question_do_not_redraw_or_select_edition(topic):
+def test_explicit_topic_and_supplied_question_do_not_redraw_or_select_edition(
+    topic,
+) -> None:
     cast = {"method": "existing", "hexagram_code": "100111", "moving_line": 1}
     a = calculate_meihua_cast(
         casting=cast, interpretation_topic=topic, question="能否交易赚钱，明天会下雨吗"
@@ -94,7 +88,7 @@ def test_explicit_topic_and_supplied_question_do_not_redraw_or_select_edition(to
 
 
 @pytest.mark.parametrize("topic", TOPICS)
-def test_time_entry_retains_lunar_precision_and_selected_chapter(topic):
+def test_time_entry_retains_lunar_precision_and_selected_chapter(topic) -> None:
     result = calculate_meihua_analysis(
         analysis_year=2057,
         analysis_month=9,
@@ -115,7 +109,7 @@ def test_time_entry_retains_lunar_precision_and_selected_chapter(topic):
 
 def test_thematic_source_checks_do_not_promote_transcription_or_tests_to_authority(
     audited,
-):
+) -> None:
     assert audited["selected_checks_passed"], audited
     assert audited["runtime_clause_count"] == 20
     assert len(audited["source_checks"]) == 20
@@ -129,13 +123,15 @@ def test_thematic_source_checks_do_not_promote_transcription_or_tests_to_authori
     assert not audited["authority_certified"]
 
 
-def test_mutating_a_returned_topic_profile_cannot_change_later_clauses():
+def test_mutating_a_returned_topic_profile_cannot_change_later_clauses() -> None:
     profile = topic_ruleset()
     profile["rules"][0]["quote"] = "伪造文本"
     assert topic_ruleset()["rules"][0]["quote"] != "伪造文本"
 
 
-def test_changed_manual_relation_does_not_pass_even_after_rehashing_reference(tmp_path):
+def test_changed_manual_relation_does_not_pass_even_after_rehashing_reference(
+    tmp_path: Path,
+) -> None:
     target = tmp_path / "fixtures/meihua_topics_v1"
     shutil.copytree(REFERENCES, target)
     for name in ["meihua_scan_v1", "meihua_v1"]:
@@ -154,7 +150,7 @@ def test_changed_manual_relation_does_not_pass_even_after_rehashing_reference(tm
 
 
 @pytest.mark.parametrize("topic", TOPICS)
-def test_weather_context_cannot_silently_influence_a_topic_chapter(topic):
+def test_weather_context_cannot_silently_influence_a_topic_chapter(topic) -> None:
     out = calculate_meihua_cast(
         casting=CASES[0]["casting"],
         interpretation_topic=topic,
@@ -166,9 +162,8 @@ def test_weather_context_cannot_silently_influence_a_topic_chapter(topic):
 @pytest.mark.parametrize("tool", ["meihua_analysis", "meihua_cast"])
 @pytest.mark.parametrize("topic", TOPICS)
 def test_topic_guidance_projects_source_clause_identically_on_three_surfaces(
-    tool, topic, surface_calls
-):
-    from fatebridge.application.examples import suggested_fields
+    tool: str, topic, surface_calls
+) -> None:
 
     spec = SPECS[tool]
     payload = (
@@ -214,9 +209,8 @@ def test_topic_guidance_projects_source_clause_identically_on_three_surfaces(
 
 
 def test_quote_from_another_chapter_cannot_be_laundered_as_planning(
-    tmp_path, monkeypatch
-):
-    from fatebridge.core import meihua_topics
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
 
     target = tmp_path / "fixtures/meihua_topics_v1"
     shutil.copytree(REFERENCES, target)
@@ -251,7 +245,7 @@ def test_quote_from_another_chapter_cannot_be_laundered_as_planning(
     assert not report["selected_checks_passed"]
 
 
-def test_unflagged_textual_variants_are_not_certified_semantically_equivalent():
+def test_unflagged_textual_variants_are_not_certified_semantically_equivalent() -> None:
     result = calculate_meihua_cast(
         casting={"method": "existing", "hexagram_code": "101111", "moving_line": 1},
         interpretation_topic="planning",

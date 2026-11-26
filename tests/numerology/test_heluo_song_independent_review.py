@@ -8,14 +8,16 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 from fastmcp import Client
+from pytest import CaptureFixture, MonkeyPatch
 
 import fatebridge.api as api
 import fatebridge.mcp_server as mcp
 from fatebridge.cli import run as cli_run
-from fatebridge.core import heluo_poems as hp
-from fatebridge.core.heluo import yao_text
+from fatebridge.core.heluo import heluo_poems as hp
+from fatebridge.core.heluo.heluo import yao_text
 from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.services.tool_catalog import CATALOG
+from tests.support.transports import call_calculation
 
 F = Path(__file__).parents[1] / "fixtures/heluo_song_independent_v1"
 PROPOSAL = json.loads((F / "supplement-proposal.json").read_bytes())
@@ -29,13 +31,17 @@ def clear_source_caches():
     hp._collation.cache_clear()
     if hasattr(hp, "_review_supplement"):
         hp._review_supplement.cache_clear()
+    else:
+        pass
     yield
     hp._collation.cache_clear()
     if hasattr(hp, "_review_supplement"):
         hp._review_supplement.cache_clear()
+    else:
+        pass
 
 
-def test_frozen_unexposed_first_reading_and_later_comparison_stay_distinct():
+def test_frozen_unexposed_first_reading_and_later_comparison_stay_distinct() -> None:
     for name, digest in FREEZE["files"].items():
         assert hashlib.sha256((F / name).read_bytes()).hexdigest() == digest
     first = json.loads((F / "reader-first.json").read_bytes())
@@ -52,7 +58,9 @@ def test_frozen_unexposed_first_reading_and_later_comparison_stay_distinct():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: str(c["line"]))
-def test_full_first_transcription_and_unresolved_alternatives_reach_selected_line(case):
+def test_full_first_transcription_and_unresolved_alternatives_reach_selected_line(
+    case,
+) -> None:
     result = yao_text("天水訟", case["line"])
     review = result["poem_review_supplement"]
     assert review["entries"] == [case]
@@ -69,7 +77,7 @@ def test_full_first_transcription_and_unresolved_alternatives_reach_selected_lin
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: str(c["line"]))
-def test_summary_only_reads_cannot_hide_new_disagreements(case):
+def test_summary_only_reads_cannot_hide_new_disagreements(case) -> None:
     result = calculate_knowledge_read(domain="heluo", key=f"天水訟:{case['line']}")
     text = "\n".join(result["lines"])
     assert PROPOSAL["scope_note"] in text
@@ -80,8 +88,8 @@ def test_summary_only_reads_cannot_hide_new_disagreements(case):
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: str(c["line"]))
 def test_review_and_literal_qualifications_on_actual_local_rest_mcp_cli(
-    case, monkeypatch, tmp_path, capsys
-):
+    case, monkeypatch: MonkeyPatch, tmp_path: Path, capsys: CaptureFixture[str]
+) -> None:
     payload = {"domain": "heluo", "key": f"天水訟:{case['line']}"}
     fields = ["reference_details", "lines"]
     monkeypatch.setattr(
@@ -115,7 +123,8 @@ def test_review_and_literal_qualifications_on_actual_local_rest_mcp_cli(
 
     async def call_mcp():
         async with Client(mcp.app) as client:
-            return await client.call_tool(
+            return await call_calculation(
+                client,
                 "knowledge_read",
                 {
                     **payload,
@@ -155,13 +164,15 @@ def test_review_and_literal_qualifications_on_actual_local_rest_mcp_cli(
 
 @pytest.mark.parametrize("kind", ["missing", "altered"])
 def test_unbound_or_missing_review_cannot_silently_disappear(
-    kind, monkeypatch, tmp_path
-):
+    kind: str, monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
     bad = tmp_path / "review.json"
     if kind == "altered":
         value = json.loads((F / "supplement-proposal.json").read_bytes())
         value["unresolved_character_positions"] = 0
         bad.write_text(json.dumps(value, ensure_ascii=False))
+    else:
+        pass
     monkeypatch.setattr(hp, "REVIEW_PATH", bad)
     result = calculate_knowledge_read(domain="heluo", key="天水訟:4")
     assert result["status_code"] == 503

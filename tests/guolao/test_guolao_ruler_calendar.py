@@ -8,9 +8,9 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.guolao_grid import load_grid
-from fatebridge.core.guolao_limits import limit_scale
-from fatebridge.core.guolao_ruler_calendar import (
+from fatebridge.core.guolao.guolao_grid import load_grid
+from fatebridge.core.guolao.guolao_limits import limit_scale
+from fatebridge.core.guolao.guolao_ruler_calendar import (
     DATA,
     NominalSourceDate,
     load_ruler_calendar,
@@ -24,7 +24,7 @@ REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
 
 
 @pytest.mark.parametrize("asset", REFERENCE["assets"])
-def test_original_and_read_views_preserve_source_bytes_and_credits(asset):
+def test_original_and_read_views_preserve_source_bytes_and_credits(asset) -> None:
     raw = (FIXTURE / asset["path"]).read_bytes()
     assert len(raw) == asset["bytes"]
     assert hashlib.sha256(raw).hexdigest() == asset["sha256"]
@@ -45,8 +45,8 @@ def test_original_and_read_views_preserve_source_bytes_and_credits(asset):
     ],
 )
 def test_page35_printed_month_day_clauses_and_base100_annual_units(
-    palace, days, annual
-):
+    palace: str, days: int, annual: str
+) -> None:
     scale = ruler_calendar_scale(palace)
     assert scale.nominal_days_per_degree == days
     assert scale.printed_annual_rate == Fraction(annual)
@@ -56,7 +56,9 @@ def test_page35_printed_month_day_clauses_and_base100_annual_units(
 
 
 @pytest.mark.parametrize("reading", REFERENCE["page36"]["selected_first_cell_readings"])
-def test_six_independently_read_printed_first_cells_match_inclusive_labels(reading):
+def test_six_independently_read_printed_first_cells_match_inclusive_labels(
+    reading,
+) -> None:
     interval = ruler_calendar_scale(reading["palace"]).cell_interval(reading["cell"])
     for key, field in [
         ("start_nominal_source_date", "start"),
@@ -69,7 +71,7 @@ def test_six_independently_read_printed_first_cells_match_inclusive_labels(readi
     assert not REFERENCE["page36"]["disease_first_cell_numeric_reading_accepted"]
 
 
-def test_unreconciled_annual_rates_have_exact_visible_residuals():
+def test_unreconciled_annual_rates_have_exact_visible_residuals() -> None:
     audit = ruler_calendar_audit()
     assert audit["contradictory_rate_groups"] == 3
     scales = {row["palaces"][0]: row for row in audit["scales"]}
@@ -86,7 +88,7 @@ def test_unreconciled_annual_rates_have_exact_visible_residuals():
     assert "秒" in scales["疾厄"]["printed_annual_rate_text"]
 
 
-def test_one_based_source_origin_and_inclusive_end_do_not_add_a_year_or_day():
+def test_one_based_source_origin_and_inclusive_end_do_not_add_a_year_or_day() -> None:
     scale = ruler_calendar_scale("福德")
     assert (
         scale.position(NominalSourceDate(1, 1, 1))["limit_scale_degrees_exact"] == "0"
@@ -107,7 +109,7 @@ def test_one_based_source_origin_and_inclusive_end_do_not_add_a_year_or_day():
 
 
 @pytest.mark.parametrize("scale", load_ruler_calendar(), ids=lambda s: s.palaces[0])
-def test_exact_subday_inverse_local_completion_and_no_wrap(scale):
+def test_exact_subday_inverse_local_completion_and_no_wrap(scale) -> None:
     epsilon = Fraction(1, 10**80)
     for degree in (Fraction(0), epsilon, Fraction(1), Fraction(7, 3), Fraction(30)):
         days = scale.days_from_degrees(degree)
@@ -141,13 +143,15 @@ def test_exact_subday_inverse_local_completion_and_no_wrap(scale):
         (1, 1, 1, 0.5),
     ],
 )
-def test_nominal_date_rejects_wrong_types_and_invalid_labels(parts):
+def test_nominal_date_rejects_wrong_types_and_invalid_labels(parts) -> None:
     with pytest.raises((ValueError, TypeError)):
         NominalSourceDate(*parts)
 
 
 @pytest.mark.parametrize("value", [1, 1.0, True, "1", None])
-def test_fraction_units_cannot_be_implicit(value):
+def test_fraction_units_cannot_be_implicit(
+    value: bool | float | int | str | None,
+) -> None:
     scale = ruler_calendar_scale("官禄")
     with pytest.raises(TypeError):
         scale.at_degrees(value)
@@ -158,12 +162,12 @@ def test_fraction_units_cannot_be_implicit(value):
 
 
 @pytest.mark.parametrize("cell", [0, 31, -1, True, "1", 1.0])
-def test_invalid_cell_is_never_clamped(cell):
+def test_invalid_cell_is_never_clamped(cell) -> None:
     with pytest.raises((ValueError, TypeError)):
         ruler_calendar_scale("官禄").cell_interval(cell)
 
 
-def test_other_palaces_and_civil_dates_are_not_guessed():
+def test_other_palaces_and_civil_dates_are_not_guessed() -> None:
     for name in ("命", "", "ASC", "官祿"):
         with pytest.raises(ValueError):
             ruler_calendar_scale(name)
@@ -179,7 +183,7 @@ def test_other_palaces_and_civil_dates_are_not_guessed():
     )
 
 
-def test_footer_palace_limit_labels_do_not_become_celestial_fraction_tails():
+def test_footer_palace_limit_labels_do_not_become_celestial_fraction_tails() -> None:
     audit = load_grid().audit()
     assert (
         audit["lower_section_role"]

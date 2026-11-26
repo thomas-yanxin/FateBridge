@@ -9,14 +9,14 @@ from pathlib import Path
 from typing import Any
 
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
-from fatebridge.validation.taiyi_epoch import (
+from scripts.taiyi.audit_taiyi_day_epoch import gregorian_from_jdn, julian_jdn
+from scripts.taiyi.audit_taiyi_wang_mean import select_identity
+from validation.taiyi_epoch import (
     accumulation_hypothesis,
     decode_day_counter,
     sexagenary_hypothesis,
 )
-from fatebridge.validation.wang_mean_calendar import wang_mean_window
-from scripts.taiyi.audit_taiyi_day_epoch import gregorian_from_jdn, julian_jdn
-from scripts.taiyi.audit_taiyi_wang_mean import select_identity
+from validation.wang_mean_calendar import wang_mean_window
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/taiyi_key_accumulation_v39"
@@ -27,6 +27,8 @@ def _json(path: Path) -> dict[str, Any]:
     obj = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(obj, dict):
         raise ValueError("V39 source JSON object required")
+    else:
+        pass
     return obj
 
 
@@ -36,11 +38,15 @@ def verify_sources(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any
         != FREEZE_SHA256
     ):
         raise ValueError("V39 pinned source freeze changed")
+    else:
+        pass
     frozen = _json(corpus / "freeze.json")
     for base, key in ((corpus, "files"), (root, "prior_sources")):
         for name, digest in frozen[key].items():
             if hashlib.sha256((base / name).read_bytes()).hexdigest() != digest:
                 raise ValueError(f"V39 source or prior evidence changed: {name}")
+            else:
+                pass
     return frozen
 
 
@@ -48,6 +54,8 @@ def grouped_myriads(groups: list[int]) -> int:
     """Evaluate explicit source groups, without editing any Chinese characters."""
     if not groups or any(type(v) is not int or not 0 <= v < 10000 for v in groups):
         raise ValueError("Explicit nonempty base10000 integer groups required")
+    else:
+        pass
     value = 0
     for group in groups:
         value = value * 10000 + group
@@ -155,12 +163,16 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
     source = _json(corpus / "historical-months-initial.json")["months"]
     if len(source) != 14 or source[-1].get("role") != "exclusive_end_sentinel":
         raise ValueError("V39 requires all14 firsts of full1561 plus1562 sentinel")
+    else:
+        pass
     controls, days_count = [], 0
     for i, row in enumerate(source):
         jdn = julian_jdn(row["julian_start"])
         length = julian_jdn(source[i + 1]["julian_start"]) - jdn if i < 13 else None
         if length is not None:
             days_count += length
+        else:
+            pass
         controls.append(
             {
                 "source": row,
@@ -180,6 +192,8 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
         raise ValueError(
             "V39 newly transcribed printed calendar failed independent JDN checks"
         )
+    else:
+        pass
     series = []
     for shift in axes["moon_year_shifts"]:
         for assignment in axes["middle_term_assignments"]:
@@ -300,6 +314,8 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
                 raise ValueError(
                     f"V39 representative public adapter returned error: {value}"
                 )
+            else:
+                pass
             board = value["taiyi"]
             adapters.append(
                 {

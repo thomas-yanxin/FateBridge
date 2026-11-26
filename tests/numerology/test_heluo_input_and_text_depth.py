@@ -8,12 +8,17 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.heluo import _tiaowen, build_snapshot_text, calculate, yao_text
-from fatebridge.core.heluo_texts import COLLATION_PATH, collation_summary
-from fatebridge.core.heluo_timing import _selected_text
+from fatebridge.core.heluo.heluo import (
+    _tiaowen,
+    build_snapshot_text,
+    calculate,
+    yao_text,
+)
+from fatebridge.core.heluo.heluo_texts import COLLATION_PATH, collation_summary
+from fatebridge.core.heluo.heluo_timing import _selected_text
 from fatebridge.core.local_techniques.canping import build_canping_result
 from fatebridge.core.local_techniques.heluo import build_heluo_result
-from fatebridge.core.numerology_inputs import require_birth_clock
+from fatebridge.core.numerology.numerology_inputs import require_birth_clock
 from fatebridge.core.requests.divination import CanpingRequest, HeluoRequest
 from tests.support.heluo_source_facts import (
     ALL_HEADER_PAGES,
@@ -29,7 +34,9 @@ ARGS = dict(four_pillars=PILLARS, hour_zhi="辰", birth_year=1924, month_zhi="�
     "value",
     [None, "", " ", "未知", "24:00", "12:00:60", "09:33:00Z", "09:33+08:00", 0, False],
 )
-def test_missing_or_invalid_clock_cannot_become_midnight(value):
+def test_missing_or_invalid_clock_cannot_become_midnight(
+    value: bool | int | str | None,
+) -> None:
     with pytest.raises(ValueError):
         require_birth_clock(value)
     for model in (HeluoRequest, CanpingRequest):
@@ -44,7 +51,9 @@ def test_missing_or_invalid_clock_cannot_become_midnight(value):
     "value,expected",
     [("0:0", "00:00:00"), (" 9:3 ", "09:03:00"), ("09:03:04.125", "09:03:04.125")],
 )
-def test_explicit_clock_normalization_preserves_supplied_precision(value, expected):
+def test_explicit_clock_normalization_preserves_supplied_precision(
+    value: str, expected: str
+) -> None:
     assert require_birth_clock(value) == expected
     for model in (HeluoRequest, CanpingRequest):
         request = model(
@@ -57,18 +66,22 @@ def test_explicit_clock_normalization_preserves_supplied_precision(value, expect
 
 
 @pytest.mark.parametrize("value", [True, False, 0, 1])
-def test_direct_canping_gender_cannot_bypass_public_string_contract(value):
+def test_direct_canping_gender_cannot_bypass_public_string_contract(
+    value: bool | int,
+) -> None:
     with pytest.raises(ValueError):
         build_canping_result(date="2000-05-15", time="09:33", gender=value)
 
 
 @pytest.mark.parametrize("gender", [None, "", "未知", "typo", True, False, 0, 1])
-def test_fixed_pillars_cannot_silently_supply_a_calculation_gender(gender):
+def test_fixed_pillars_cannot_silently_supply_a_calculation_gender(
+    gender: bool | int | str | None,
+) -> None:
     with pytest.raises(ValueError):
         calculate(**ARGS, gender=gender)
 
 
-def test_gender_is_a_required_public_and_domain_input():
+def test_gender_is_a_required_public_and_domain_input() -> None:
     with pytest.raises(TypeError):
         calculate(**ARGS)
     with pytest.raises(ValidationError):
@@ -79,7 +92,7 @@ def test_gender_is_a_required_public_and_domain_input():
 
 
 @pytest.mark.parametrize("alias", ["女", "female", "FEMALE", "F", " f "])
-def test_female_aliases_do_not_follow_the_male_fixed_pillar_path(alias):
+def test_female_aliases_do_not_follow_the_male_fixed_pillar_path(alias: str) -> None:
     result = calculate(**ARGS, gender=alias)
     # Rule-derived from the original first four-pillar example: yang female
     # puts earth Xun outside sky Qian, then flips upper used line and swaps.
@@ -107,8 +120,8 @@ def test_female_aliases_do_not_follow_the_male_fixed_pillar_path(alias):
     ],
 )
 def test_scanned_header_corrections_have_specific_page_and_old_reading(
-    gua, pos, page, expected, old_error
-):
+    gua: str, pos: int, page: int, expected: str, old_error: str
+) -> None:
     selected = yao_text(gua, pos)
     assert selected["yaoci"] == expected
     provenance = selected["text_provenance"]
@@ -140,7 +153,7 @@ def test_scanned_header_corrections_have_specific_page_and_old_reading(
     assert provenance["automatic_branch_selection"] is False
 
 
-def test_collation_identity_has_90_headers_and_294_still_pending():
+def test_collation_identity_has_90_headers_and_294_still_pending() -> None:
     data = json.loads(COLLATION_PATH.read_text())
     summary = collation_summary()
     assert summary["sha256"] == hashlib.sha256(COLLATION_PATH.read_bytes()).hexdigest()
@@ -195,7 +208,7 @@ def test_collation_identity_has_90_headers_and_294_still_pending():
         assert selected["text_provenance"]["pdf_page"] == entry["pdf_page"]
 
 
-def test_source_variants_are_retained_and_uncollated_headers_remain_explicit():
+def test_source_variants_are_retained_and_uncollated_headers_remain_explicit() -> None:
     assert yao_text("水雷屯", 1)["yaoci"].startswith("盤桓")
     assert "龍戰于野" in yao_text("坤為地", 6)["yaoci"]
     assert "用脫桎梏" in yao_text("山水蒙", 1)["yaoci"]
@@ -205,7 +218,7 @@ def test_source_variants_are_retained_and_uncollated_headers_remain_explicit():
     assert yao_text("不存在", 1) is None
 
 
-def test_selection_cannot_mutate_cached_inherited_or_collated_texts():
+def test_selection_cannot_mutate_cached_inherited_or_collated_texts() -> None:
     before = copy.deepcopy(_tiaowen())
     for gua in ("坤為地", "天風姤"):
         selected = yao_text(gua, 4)
@@ -220,7 +233,7 @@ def test_selection_cannot_mutate_cached_inherited_or_collated_texts():
     assert _tiaowen() == before
 
 
-def test_natal_snapshot_and_timing_reference_the_actual_same_collation():
+def test_natal_snapshot_and_timing_reference_the_actual_same_collation() -> None:
     chart = calculate(**ARGS, gender="FEMALE")
     snapshot = build_snapshot_text(chart, None, None)
     assert "后天·天水訟·六三：食舊德" in snapshot

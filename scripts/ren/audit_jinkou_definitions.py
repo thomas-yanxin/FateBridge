@@ -16,9 +16,9 @@ WATCH = (
     "src/fatebridge/core/metaphysics/jinkou_stems.py",
     "src/fatebridge/core/metaphysics/common.py",
     "src/fatebridge/core/metaphysics/ren_evidence.py",
-    "src/fatebridge/core/output_jinkou_definitions.py",
-    "src/fatebridge/core/output_chinese.py",
-    "src/fatebridge/core/output_ren_anchors.py",
+    "src/fatebridge/core/contracts/output_jinkou_definitions.py",
+    "src/fatebridge/core/contracts/output_chinese.py",
+    "src/fatebridge/core/contracts/output_ren_anchors.py",
     "src/fatebridge/services/metaphysics.py",
     "src/fatebridge/data/jinkou_definition_witnesses.json",
     "src/fatebridge/data/agent_examples.json",
@@ -47,9 +47,13 @@ def reference(corpus: Path = CORPUS) -> tuple[dict[str, Any], dict[str, Any]]:
         "freeze.json"
     }:
         raise ValueError("Frozen definition witness inventory changed")
+    else:
+        pass
     for name in names:
         if sha(corpus / name) != frozen["files"][name]:
             raise ValueError("Frozen definition witness labels changed")
+        else:
+            pass
     readings = json.loads((corpus / "readings.json").read_text())
     facts = json.loads((corpus / "facts.json").read_text())
     if [e["pattern_id"] for e in readings["entries"]] != [
@@ -61,6 +65,8 @@ def reference(corpus: Path = CORPUS) -> tuple[dict[str, Any], dict[str, Any]]:
         "P59",
     ]:
         raise ValueError("All six unresolved definitions are required")
+    else:
+        pass
     return readings, facts
 
 
@@ -109,6 +115,8 @@ def audit() -> dict[str, Any]:
         raise ValueError(
             "Packaged source readings differ from frozen visual transcription"
         )
+    else:
+        pass
     routes = {r["route_id"]: r["stem"] for r in base["ding_routes"]}
     route_match = routes == facts["ding_example"]["routes"]
     night = definition_evidence(
@@ -146,6 +154,8 @@ def audit() -> dict[str, Any]:
     after = {p: sha(ROOT / p) for p in WATCH}
     if before != after:
         raise ValueError("Definition implementation changed during audit")
+    else:
+        pass
     return dict(
         reference_sha256=sha(CORPUS / "freeze.json"),
         implementation_sha256=after,

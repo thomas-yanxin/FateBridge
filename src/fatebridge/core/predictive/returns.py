@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import math
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any
 
 from fatebridge.core.astro.ephemeris import _swisseph_planet_state
 from fatebridge.core.astro.geometry import native_lahiri_ayanamsha
@@ -14,9 +14,9 @@ from fatebridge.core.ephemeris_runtime import (
     preserve_ephemeris_path,
     swe,
 )
-
-from ._common import build_subject, point_to_dict
-from .native_chart import NativeSubject
+from fatebridge.core.predictive._common import build_subject, point_to_dict
+from fatebridge.core.predictive.native_chart import NativeSubject
+from fatebridge.utils.civil_time import utc_calendar
 
 
 def _longitude_tt(
@@ -48,8 +48,9 @@ def governing_return_tt(
     """Latest positive-motion zero crossing at or before analysis_tt.
 
     Solar 10-day / lunar 1-day steps remain below half a revolution; reject the
-    antipodal discontinuity. Bisection keeps the final root inside its bracket.
-    The wider windows include at least one complete solar or lunar revolution.
+    antipodal discontinuity. An exact source match at the inclusive cutoff
+    takes precedence over refining an earlier bracket. The wider windows
+    include at least one complete solar or lunar revolution.
     """
     if body_id not in {swe.SUN, swe.MOON}:
         raise ValueError("This return solver supports Sun and Moon only")
@@ -67,6 +68,10 @@ def governing_return_tt(
         if previous <= 0 <= current and current - previous < 180:
             bracket = (left, right)
         left, previous = right, current
+    if previous == 0:
+        # A locally nonmonotone native longitude can make refinement discard
+        # the exact zero already observed at the analysis point.
+        return analysis_tt
     if bracket is None:
         raise ValueError(
             "No governing return was bracketed before the analysis instant"
@@ -74,7 +79,7 @@ def governing_return_tt(
     low, high = bracket
     for _ in range(64):
         middle = (low + high) / 2
-        if middle in {low, high} or high - low <= 1e-9:
+        if middle in {low, high}:
             break
         value = _signed_offset(
             _longitude_tt(body_id, middle, sidereal=sidereal), target_longitude
@@ -101,12 +106,13 @@ def build_return_payload(
     return_longitude: float,
     return_latitude: float,
     return_timezone: str,
-    include: Optional[List[str]] = None,
-) -> Dict[str, Any]:
-    times = ephemeris_time(analysis_datetime)
+    include: list[str] | None = None,
+) -> dict[str, Any]:
+    calendar = utc_calendar(analysis_datetime)
+    times = ephemeris_time(calendar)
     if times.jd_tt is None:
-        raise ImportError("Swiss Ephemeris is required for planetary returns")
-    payload: Dict[str, Any] = {}
+        raise ModuleNotFoundError("Swiss Ephemeris is required for planetary returns")
+    payload: dict[str, Any] = {}
     for key, planet, body_id in [
         ("solar_return", "sun", swe.SUN),
         ("lunar_return", "moon", swe.MOON),
@@ -117,10 +123,12 @@ def build_return_payload(
         sidereal = natal_subject.zodiac_type == "Sidereal"
         solved = governing_return_tt(body_id, target, times.jd_tt, sidereal=sidereal)
         if solved == times.jd_tt:
-            # This known civil input is a witness of the exact same TT point.
-            # Inverting a rounded JD could otherwise display a future label.
-            moment = analysis_datetime.astimezone(timezone.utc)
-            epoch = PhysicalEpoch(times, moment.isoformat(), moment, False)
+            # This civil input witnesses the same native scalar query, not
+            # equality of the exact TT points or a continuous physical root.
+            # Preserve its known label instead of inverting the rounded JD.
+            epoch = PhysicalEpoch(
+                times, calendar.isoformat(), calendar.as_datetime(), False
+            )
         else:
             epoch = PhysicalEpoch.from_tt(solved)
         chart = build_subject(

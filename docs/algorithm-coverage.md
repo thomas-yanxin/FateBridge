@@ -4,11 +4,15 @@
 
 当前采用的方法版本、已知分歧和未验收范围见[算法状态](algorithm-status.md)。工具清单与实现范围以本页及中央目录为准；代表性回归和来源对照不等于全部子算法的完整专家认证。
 
+`lunar_phase_progressions` 当前默认搜索出生后实际日月星历的八相交点，沿用公开源准入和共享次限钟；旧均速模型只按旧run解释。固定40日的11交点及真实三端对照已单独记录，不能据此授予全部时域、全部钟制或现实预测验收。详见[实际星历月相推运](western-astrology.md#实际星历月相推运)。
+
+涉及极年份时，另查各工具的[历法、日期载体和星历来源范围](calendar-boundary-audit.md#retained-domain-carriers-round34)。
+
 一项工具是否适合当前产品或咨询任务，取决于实际计算范围、数据依赖和精度。下表按 MCP 集合逐项列出工具与实现状态，说明可以使用的能力、近似路径与未覆盖内容，便于在接入和解读前核对。
 
 输入参数查 [API 参考](api-reference.md)，按用户问题选工具查[工具覆盖](algorithm-coverage.md)。
 
-查找体系、方法和适用场景先看[分类与方法矩阵](#分类与方法矩阵)；核对接口再看[总览](#1-总览13-个-family--92-个工具)和[工具清单](#2-逐-family-工具清单)。评估结果精度再看[依赖说明](#3-精度与依赖说明)与[快照覆盖](#4-快照协议覆盖)。八字和双人模型的版本分别见[八字判定](bazi-assessment.md)、[双人评分](compatibility-scoring.md)，风水规则见[家居风水](fengshui.md)。
+查找体系、方法和适用场景先看[分类与方法矩阵](#分类与方法矩阵)；核对接口再看[总览](#1-总览14-个-family--93-个工具)和[工具清单](#2-逐-family-工具清单)。评估结果精度再看[依赖说明](#3-精度与依赖说明)与[快照覆盖](#4-快照协议覆盖)。八字和双人模型的版本分别见[八字判定](bazi-assessment.md)、[双人八字取证](compatibility-scoring.md)，风水规则见[家居风水](fengshui.md)。
 
 状态分类：
 
@@ -18,7 +22,7 @@
 - `Placeholder`：合同或模式入口存在，但主输出层仍是占位兼容
 - `Excluded`：当前仓库不提供该能力
 
-> 工具的唯一信源是中央目录 `src/fatebridge/services/tool_catalog.py`。REST 公开 **91 个工具**，MCP 公开 **92 个工具**，分为 **13 个 family**。本页按 MCP 集合统计；目录有 93 条记录，CLI 可执行 92 条，差异见 [API 参考](api-reference.md#24-三端能力边界)。下表逐 family 列出全部工具；新增能力时请同步本页（总数、逐 family 数量与完整工具清单由 `tests/quality/test_doc_tool_counts.py` 锁定）。
+> 工具来自中央目录 `src/fatebridge/services/tool_catalog.py`。REST 公开 **93 个工具**，MCP 通过四个入口提供 **93 项业务能力**，分为 **14 个 family**。目录有 93 条记录，CLI 可执行 93 条。下表逐 family 列出全部工具，入口映射见 [API 参考](api-reference.md#24-三端能力边界)。
 
 所有目录记录现有统一的输入/输出 Schema，三端由同一 `ToolSpec` 发布并校验；这属于接口合同覆盖，不提高算法的 `Implemented` / `Approximate` 等级，也不表示全部嵌套专业字段已有完整类型定义。
 
@@ -110,12 +114,13 @@
 | 风水 | 十二节月紫白 | Limited | 查看月星位置及固定释义 | 未实现月星布局处方或年／月叠加断事 |
 | 风水 | 中州派玄空历史定运、下卦与兼向替星 | Implemented，限定规则版本 | 计算所选山向与运的宅盘 | 他派及全部历史规则未认证；保留外部盘例差异 |
 | 风水 | 多层布局、室内关系、家具候选与条件式方案 | Implemented，限定登记规则 | 根据已确认事实比较空间方案 | 缺失事实、未覆盖规则与动作可行性分别保留；不自动完成户型几何 |
+| 心理测量 | IPIP 50 题大五人格因子标记量表（外向性/宜人性/尽责性/情绪稳定性/智识） | Implemented | 按 1–5 题序列出量表或确定性正反向计分、8/10 缺题折算 | 不输出常模百分位、临床诊断或性格叙事建议 |
 | 基础能力 | 内置知识域目录及条目读取 | Implemented | 查询八字、占星、六壬、奇门知识 | 知识覆盖不等于整个领域完整；需核对具体来源 |
 | 基础能力 | 快照解析、导出协议与章节筛选 | Implemented，按工具合同 | 阅读、集成或导出计算结果 | 快照、导出及筛选并非每个工具都支持 |
 
 各方法的逐接口名称、技术依赖和具体验收情况见下文及对应领域文档。尤其须区分计算可复现、原典一致性、解释质量与前瞻性现实预测验证；它们不能互相替代。
 
-## 1. 总览：13 个 family / 92 个工具
+## 1. 总览：14 个 family / 93 个工具
 
 | family | 工具数 | 主题 | 总体状态 |
 | --- | --- | --- | --- |
@@ -132,6 +137,7 @@
 | `knowledge` | 2 | 内置知识库目录与读取 | Implemented |
 | `export` | 2 | 导出协议注册表与快照解析 | Implemented |
 | `fengshui` | 8 | 公共方位、命卦、八宅、砂水、年／月紫白、玄空宅盘、分层合参 | Implemented（明确版本） |
+| `psychometrics` | 1 | Goldberg (1992) IPIP 50 题大五人格因子标记量表 | Implemented |
 | 仓库内前端 | — | 内置 Web UI | Excluded |
 | 存储 / 账户 | — | 数据库、历史记录、用户体系 | Excluded |
 
@@ -143,16 +149,16 @@
 
 | 工具 | 说明 | 状态 |
 | --- | --- | --- |
-| `analyze_destiny` | 综合命理分析（八字 + 喜用 + 格局） | Implemented |
-| `bazi_birth` | 离线八字命盘，完整 `snapshot_text` + 可筛选 `snapshot_export` | Implemented |
-| `bazi_source_compare` | 已明确的字面四柱与登记编释逐项核对；保留计算、冲突与未知，不反推生日 | Implemented（已暴露材料核对） |
+| `bazi_overview` | 综合命理分析（八字 + 喜用 + 格局） | Implemented |
+| `bazi_birth_chart` | 离线八字命盘，完整 `snapshot_text` + 可筛选 `snapshot_export` | Implemented |
+| `compare_bazi_sources` | 已明确的字面四柱与登记编释逐项核对；保留计算、冲突与未知，不反推生日 | Implemented（已暴露材料核对） |
 | `bazi_marriage` | 配偶星／宫及传统关系信号，不保证婚期或婚姻结果 | Implemented，限定规则 |
 | `bazi_career` | 事业：事业类型、行业、创业倾向、贵人方位 | Implemented |
 | `bazi_wealth` | 财运：正偏财、财库、求财方式/方位、破财风险 | Implemented |
 | `bazi_health` | 传统健康文化：盘内权重／寒暖分类和传统名称对应；疾病风险禁用，不作体质诊断或调理处方 | Implemented |
 | `bazi_children` | 命主视角的子女星／宫传统对应；不推数量、生育能力或生育时间 | Implemented |
 | `bazi_education` | 印星／食伤／官星、文昌与传统学业信号，不保证学历或考试结果 | Implemented，限定规则 |
-| `bazi_personality` | 性格：日主心性、十神性格、刚柔内外向 | Implemented |
+| `bazi_personality` | 五行／十神自省类比、工程旺衰与日干阴阳；不测量人格 | Implemented |
 | `bazi_relatives` | 六亲：父母/兄弟姐妹星、六亲宫位、贵人 | Implemented |
 | `bazi_romance` | 桃花咸池、红鸾天喜等传统关系象意，不确认具体对象或相遇时间 | Implemented，限定规则 |
 
@@ -164,26 +170,24 @@
 
 | 工具 | 说明 | 状态 |
 | --- | --- | --- |
-| `two_person_compatibility` | 双人配合度分析（八字合婚 / 合作），复用两份个人分析做组合 | Implemented |
+| `bazi_compatibility` | 双人配合度分析（八字合婚 / 合作），复用两份个人分析做组合 | Implemented |
 | `sukuyo_compatibility` | 宿曜双人相性（三九の秘法，二十七宿） | Implemented |
 
 ### 2.3 `timing` —— 时运与历法（Implemented）
 
-八字时运默认按目标时刻与十二步大运交运边界选运；显式年龄查询保留参考口径。
-综合结果增加原局与岁运的关系证据，不将十神、合冲或五行占比直接定为吉凶。
-换算版本、独立节气对照及未覆盖的有效旺衰、制化与应期，见[八字时运审计](bazi-timing.md)。
+八字时运默认按目标时刻与十二步大运交运边界选运；显式年龄查询保留参考口径。 综合结果增加原局与岁运的关系证据，不将十神、合冲或五行占比直接定为吉凶。 换算版本、独立节气对照及未覆盖的有效旺衰、制化与应期，见[八字时运审计](bazi-timing.md)。
 
 | 工具 | 说明 | 状态 |
 | --- | --- | --- |
-| `timing_analysis` | 综合时运（大运/流年/流月等综合影响） | Implemented |
-| `dayun_analysis` | 大运分析 | Implemented |
-| `liunian_analysis` | 流年分析 | Implemented |
-| `liuyue_analysis` | 流月分析 | Implemented |
-| `liuri_analysis` | 流日分析 | Implemented |
-| `liushi_analysis` | 流时分析 | Implemented |
-| `jieqi_timeline_analysis` | 节气时间轴分析 | Implemented |
-| `jieqi_year` | 指定年份节气时刻表（calendar helper） | Implemented |
-| `nongli_time` | 公历时刻转农历与干支（calendar helper） | Implemented |
+| `bazi_timing` | 综合时运（大运/流年/流月等综合影响） | Implemented |
+| `bazi_luck_cycles` | 大运分析 | Implemented |
+| `bazi_yearly_timing` | 流年分析 | Implemented |
+| `bazi_monthly_timing` | 流月分析 | Implemented |
+| `bazi_daily_timing` | 流日分析 | Implemented |
+| `bazi_hourly_timing` | 流时分析 | Implemented |
+| `solar_term_timeline` | 节气时间轴分析 | Implemented |
+| `solar_terms_for_year` | 指定年份节气时刻表（calendar helper） | Implemented |
+| `lunar_calendar_time` | 公历时刻转农历与干支（calendar helper） | Implemented |
 
 > 历法基于本地算法（`fatebridge.core.almanac`），不依赖外部服务。真太阳时修正含经度 + 均时差，统一走 `fatebridge.utils.solar_time`；出生输入构造使用 `fatebridge.utils.birth_input`。
 
@@ -194,16 +198,16 @@
 | 工具 | 说明 | 状态 |
 | --- | --- | --- |
 | `gua_lookup` | 卦象查询（六十四卦义理） | Implemented |
-| `gua_meiyi` | 卦义 helper（批量说明） | Implemented |
-| `meihua_analysis` | 时间取数、体用互变、季令及经文参照；[有限原典规则与验收](meihua.md)，特定天气政策检验未胜基线，预测效力未证实 | Implemented |
+| `gua_meanings` | 卦义 helper（批量说明） | Implemented |
+| `meihua_time_cast` | 时间取数、体用互变、季令及经文参照；[有限原典规则与验收](meihua.md)，特定天气政策检验未胜基线，预测效力未证实 | Implemented |
 | `meihua_cast` | 物数、两段声音、丈尺/尺寸、字占、端法、年月日時加已报数及既有卦；保留输入缺项、取爻约定及原文语义分歧 | Implemented |
-| `tongshefa` | 按给定四卦作统摄组合；不实现大衍随机起卦 | Implemented，限定组合规则 |
-| `sixyao` | 六爻纳甲分析 | Implemented |
+| `combine_four_gua` | 按给定四卦作统摄组合；不实现大衍随机起卦 | Implemented，限定组合规则 |
+| `liuyao` | 六爻纳甲分析 | Implemented |
 | `canping` | 邵子参评数 / 金锁银匙（数算） | Implemented |
 | `heluo` | 河洛理数（数算） | Implemented |
 | `suzhan` | 宿占分析 | Implemented |
-| `otherbu` | [占星骰](astrodice.md)：十二骰面、七曜星座关系、条件三分性与喜乐宫；可追溯解释与独立天象，现实预测未验证 | Implemented（符号规则） |
-| `sanshiunited` | 三式分层证据、五将按实际方位对应奇门星门神，明确地支对应六壬十二神；四维寄支和完整联合断法未校定，见[审计](taiyi-sanshi-audit.md) | Partial |
+| `interpret_astrology_dice` | [占星骰](astrodice.md)：十二骰面、七曜星座关系、条件三分性与喜乐宫；可追溯解释与独立天象，现实预测未验证 | Implemented（符号规则） |
+| `sanshi_combined_chart` | 三式分层证据、五将按实际方位对应奇门星门神，明确地支对应六壬十二神；四维寄支和完整联合断法未校定，见[审计](taiyi-sanshi-audit.md) | Partial |
 
 河洛与参评数提供同次取数轨迹、版本来源和规则状态；固定四柱入口核对干支衔接，原文冲突算例保留形式取数，不计作已验出生盘。参评数默认 `gu` 日支法，显式 `ming` 为月支变法；配运 `reading_context` 保留方法、钟制、书影定位及引用角色。
 
@@ -215,11 +219,11 @@
 
 | 工具 | 说明 | 状态 |
 | --- | --- | --- |
-| `ziwei_birth` | 紫微斗数命盘 | Implemented |
-| `ziwei_horoscope` | 紫微斗数运限（大限/小限/流年/流月/流日/流时 + 动态四化） | Implemented |
+| `ziwei_birth_chart` | 紫微斗数命盘 | Implemented |
+| `ziwei_timing` | 紫微斗数运限（大限/小限/流年/流月/流日/流时 + 动态四化） | Implemented |
 | `ziwei_rules` | 紫微斗数规则 helper | Implemented |
-| `liureng_gods` | 四课三传、天将、按探原总说推导的细课名，及同盘支位合冲刑破害并存依据；表注仍有差异 | Implemented（部分原典核对） |
-| `liureng_runyear` | 农历虚岁行年与分析时刻六壬课（不含逐流月预测） | Implemented |
+| `liuren_chart` | 四课三传、天将、按探原总说推导的细课名，及同盘支位合冲刑破害并存依据；表注仍有差异 | Implemented（部分原典核对） |
+| `liuren_yearly_timing` | 农历虚岁行年与分析时刻六壬课（不含逐流月预测） | Implemented |
 | `qimen` | [时家转盘](qimen-depth-audit.md)：置闰／拆补、寄宫及有来源的格局证据；原典片段验收，现实预测未验证 | Implemented（限定规则） |
 | `taiyi` | 《太乙金镜式经》年计及卷五年度十神、六纪节月与冬夏至时计的现代天文适配；阴阳144局两算、七类空间条件、卷四五将合取；年/月定计及[分法八门](taiyi-sanshi-audit.md)，另有明选[金钥匙时计](taiyi-sanshi-audit.md)完整积时与四门，及[金钥匙日计](taiyi-sanshi-audit.md)积日与分源十精；原表与定计课例分歧、古历异单位解释及引文异数保留，见[审计](taiyi-sanshi-audit.md)；显式[历史年计](taiyi-sanshi-audit.md)支持381—385晋历及501—505齐梁史历主表，502年闰标异说随结果保留，未据此认证原典古日计 | Partial |
 | `jinkou` | 四位、阴阳用位及受克空破、五动三动、季节与有限课内旺衰、得气、六十四课钤逐条三态判定、四绝及岁日结构、三合齐缺与成员空破条件 | Implemented（58条课钤结构已评估，6条未决，全部64条以true/false/null区分命中、未命中、未判；四败仅临地分，大绝按显式本命支计算、缺命保留未知；支齐不等于合化，完整合化及综合取用未裁定） |
@@ -248,15 +252,15 @@
 
 | 工具 | 说明 | 状态 |
 | --- | --- | --- |
-| `astro_chart` | 离线核心星盘（`chart_variant` 切换盘式） | Implemented / Approximate（见 §3.1） |
-| `astro_chart13` | 上升起点的 13 等分扇区，精确分界；自定义分区，不是 IAU 星座 | Implemented / Approximate（天文底盘依赖星历） |
-| `astro_hellen_chart` | 离线希腊盘 | Implemented / Approximate |
-| `astro_guolao_chart` | 七政四余连续坐标、不等赤经研究宿界、宫主/度主与规则轨迹 | Implemented（需 Swiss；原典全盘与现实效力未验收，见[果老说明](guolao.md)） |
-| `astro_india_chart` | Lahiri 九曜、星宿／Pada、D1/D2/D3/D7/D9/D10/D12/D30、宫主／尊贵／相位、生时敏感性、未削减八分法及声明七曜占据口径的削减／Pinda；另列Aiyar1905自己的原始表与削减链，各具名参考口径分开读取 | Implemented（需 Swiss Ephemeris；原典未决分支保留空值，非预测有效性认证，见[印占范围](jyotish.md)） |
-| `astro_vimshottari` | Moon-nakshatra 出生余运、MD／AD完整目标周期、可选2—6层当前路径及逐层子期；三种年长与完整运主链生时网格 | Implemented（需 Swiss Ephemeris；计算范围见[印占说明](jyotish.md)，细分不代表事件精度） |
-| `astro_germany_chart` | 22 因素、253 中点轴、90°／45°对称式；可选指定时刻真太阳弧、本命／推运分层与生时重排；原文示例按实际直接占据触发并去重 | Implemented（需 Swiss Ephemeris；完整原典与现实效力未验收，保留七曜视图） |
+| `astrology_chart` | 离线核心星盘（`chart_variant` 切换盘式） | Implemented / Approximate（见 §3.1） |
+| `thirteen_sector_chart` | 上升起点的 13 等分扇区，精确分界；自定义分区，不是 IAU 星座 | Implemented / Approximate（天文底盘依赖星历） |
+| `hellenistic_chart` | 离线希腊盘 | Implemented / Approximate |
+| `guolao_chart` | 七政四余连续坐标、不等赤经研究宿界、宫主/度主与规则轨迹 | Implemented（需 Swiss；原典全盘与现实效力未验收，见[果老说明](guolao.md)） |
+| `vedic_chart` | Lahiri 九曜、星宿／Pada、D1/D2/D3/D7/D9/D10/D12/D30、宫主／尊贵／相位、生时敏感性、未削减八分法及声明七曜占据口径的削减／Pinda；另列Aiyar1905自己的原始表与削减链，各具名参考口径分开读取 | Implemented（需 Swiss Ephemeris；原典未决分支保留空值，非预测有效性认证，见[印占范围](jyotish.md)） |
+| `vimshottari_dasha` | Moon-nakshatra 出生余运、MD／AD完整目标周期、可选2—6层当前路径及逐层子期；三种年长与完整运主链生时网格 | Implemented（需 Swiss Ephemeris；计算范围见[印占说明](jyotish.md)，细分不代表事件精度） |
+| `hamburg_midpoint_chart` | 22 因素、253 中点轴、90°／45°对称式；可选指定时刻真太阳弧、本命／推运分层与生时重排；原文示例按实际直接占据触发并去重 | Implemented（需 Swiss Ephemeris；完整原典与现实效力未验收，保留七曜视图） |
 | `human_design` | [人类图](human-design.md)：88°设计时刻、26激活、36通道、类型权威与原典数值分歧；现实预测未验证 | Implemented（限定机制） |
-| `astro_relative_chart` | 离线关系/合盘（`compare`/`composite`/`influence`/`timespace`/`marks`） | Implemented / Approximate |
+| `relationship_chart` | 离线关系/合盘（`compare`/`composite`/`influence`/`timespace`/`marks`） | Implemented / Approximate |
 
 独立印占规则、兼容字段范围和数值对照见[印占说明](jyotish.md)。
 
@@ -268,16 +272,16 @@
 
 | 工具 | 说明 | 状态 |
 | --- | --- | --- |
-| `western_timing_analysis` | 西占推运综合总览 bundle | Implemented（依赖 backend） |
-| `solarreturn` | 太阳返照 | Implemented（依赖 backend） |
-| `lunarreturn` | 月亮返照 | Implemented（依赖 backend） |
-| `transit` | 行运盘 | Implemented（依赖 backend） |
-| `solararc` | 太阳弧 | Implemented（依赖 backend） |
-| `givenyear` | 指定年盘 | Implemented（依赖 backend） |
+| `western_timing` | 西占推运综合总览 bundle | Implemented（依赖 backend） |
+| `solar_return` | 太阳返照 | Implemented（依赖 backend） |
+| `lunar_return` | 月亮返照 | Implemented（依赖 backend） |
+| `transit_chart` | 行运盘 | Implemented（依赖 backend） |
+| `solar_arc` | 太阳弧 | Implemented（依赖 backend） |
+| `chart_for_year` | 指定年盘 | Implemented（依赖 backend） |
 | `profection` | 年小限 | Implemented（依赖 backend） |
-| `pd` | 主限（primary directions） | Implemented（公开近似/坐标策略，见 §3.3） |
-| `pdchart` | 主限法盘 | Implemented（含 coordinate / approximation 元数据） |
-| `zr` | 黄道释放（zodiacal releasing） | Implemented（依赖 backend） |
+| `primary_directions` | 主限（primary directions） | Implemented（公开近似/坐标策略，见 §3.3） |
+| `primary_directions_chart` | 主限法盘 | Implemented（含 coordinate / approximation 元数据） |
+| `zodiacal_releasing` | 黄道释放（zodiacal releasing） | Implemented（依赖 backend） |
 | `firdaria` | 法达星限 | Implemented（依赖 backend） |
 | `decennials` | 十年星限 | Implemented（依赖 backend） |
 
@@ -293,16 +297,16 @@
 
 ### 2.8 `western_event` —— 事件占星（Implemented，依赖 backend）
 
-求解天文时刻后起盘的一组事件类工具，走 `fatebridge.core.astrology_events` / `astrology_horary` / `astrology_election`。
+求解天文时刻后起盘的一组事件类工具，走 `fatebridge.core.astro.astrology_events` / `astrology_horary` / `astrology_election`。
 
 | 工具 | 说明 | 状态 |
 | --- | --- | --- |
-| `astro_mundane` | 世俗入宫盘 | Implemented（依赖 backend） |
-| `astro_extrareturns` | 多重回归 | Implemented（依赖 backend） |
-| `astro_horary` | 卜卦判断 | Implemented（依赖 backend） |
-| `astro_election` | 择日；婚姻来源回执含四宫主、自然星及有限历史的月亮相邻接触 | Implemented（限定事实；完整原典判断未验收） |
+| `mundane_ingress_chart` | 世俗入宫盘 | Implemented（依赖 backend） |
+| `planetary_returns` | 多重回归 | Implemented（依赖 backend） |
+| `horary_chart` | 卜卦证据 | Implemented（依赖 backend） |
+| `evaluate_election_time` | 择日；婚姻来源回执含四宫主、自然星及有限历史的月亮相邻接触 | Implemented（限定事实；完整原典判断未验收） |
 
-此处Implemented表示接口与计算路径存在。卜卦已逐项实现Lilly1647的两列相位容许度、实际落宫、分别保留的宫位序次／宫位分值及居宫的必要月亮条件；完整偶然尊贵、传光／阻碍与全盘判词仍未验收，`verdict=uncertain`。具体来源与未通过项见[西方占星](western-astrology.md)。判断前审查按第121–123页12项手工清单与报告的例外，四个时主对应例复现；未知月亮晚度、受损定义及整盘判断资格仍保留，不能据此认证现实预测。
+卜卦已逐项实现 Lilly 1647 的两列相位容许度、实际落宫、宫位序次和分值，以及居宫的必要月亮条件。`perfection` 交付扫描到的星体事件、原典条件与待核范围。判断前审查采用第121–123页12项清单与已报告的例外，已复现四个时主对应例。具体来源与未通过项见[西方占星](western-astrology.md)。
 
 卜卦与择日另支持显式儒略历日期，分别通过 `question_calendar`、`candidate_calendar` 选择；日期先按相应闰年规则校验、换成内部格里历，再处理时区。原日期与规范化日期并列返回，默认仍为前推格里历；其他出生／分析入口未据此扩展。地区改历、旧式年份与原典钟时不推断，见[西占历法与方法](western-astrology.md)。
 
@@ -316,31 +320,31 @@
 
 ### 2.9 `western_lifespan` —— 全生命周期 / 寿命技法（Implemented，依赖 backend）
 
-读取单张本命盘的一组全生命周期技法，走 `fatebridge.core.astrology_lifespan`。
+读取单张本命盘的一组全生命周期技法，走 `fatebridge.core.astro.astrology_lifespan`。
 
 | 工具 | 说明 | 状态 |
 | --- | --- | --- |
-| `astro_harmonic` | 调波盘 | Implemented（依赖 backend） |
-| `astro_planetary_ages` | 行星年龄 | Implemented（依赖 backend） |
-| `astro_triplicity_rulers` | 三分主星推运 | Implemented（依赖 backend） |
-| `astro_lunation_phase` | 月相推运 | Implemented（依赖 backend） |
-| `astro_distributions` | 界推运（distributions） | Implemented（依赖 backend） |
-| `astro_balbillus` | Balbillus 129 年系统 | Implemented（依赖 backend） |
-| `astro_keypoints` | 数字相位推运 | Implemented（依赖 backend） |
-| `astro_yearsystem129` | 129 年系统 | Implemented（依赖 backend） |
-| `astro_planetaryarc` | 行星弧方向 | Implemented（依赖 backend） |
-| `astro_persiandirected` | 波斯向运 | Implemented（依赖 backend） |
-| `astro_agepoint` | 年龄推进点（age point） | Implemented（依赖 backend） |
-| `astro_vedicprog` | 恒星推运 | Implemented（依赖 backend） |
-| `astro_jaynesprog` | 赤纬推运 | Implemented（依赖 backend） |
+| `harmonic_chart` | 调波盘 | Implemented（依赖 backend） |
+| `planetary_ages` | 行星年龄 | Implemented（依赖 backend） |
+| `triplicity_ruler_periods` | 三分主星推运 | Implemented（依赖 backend） |
+| `lunar_phase_progressions` | 月相推运 | Implemented（依赖 backend） |
+| `bounds_directions` | 界推运（distributions） | Implemented（依赖 backend） |
+| `balbillus_periods` | Balbillus 129 年系统 | Implemented（依赖 backend） |
+| `numeric_aspect_periods` | 数字相位推运 | Implemented（依赖 backend） |
+| `planetary_periods_129_years` | 129 年系统 | Implemented（依赖 backend） |
+| `planetary_arc_directions` | 行星弧方向 | Implemented（依赖 backend） |
+| `persian_directions` | 波斯向运 | Implemented（依赖 backend） |
+| `age_point` | 年龄推进点（age point） | Implemented（依赖 backend） |
+| `sidereal_progressions` | 恒星推运 | Implemented（依赖 backend） |
+| `declination_progressions` | 赤纬推运 | Implemented（依赖 backend） |
 
 ### 2.10 `knowledge` + `export` —— 知识库与导出（Implemented）
 
 | 工具 | 说明 | 状态 |
 | --- | --- | --- |
-| `knowledge_registry` | 列出内置知识域与分类 | Implemented |
+| `knowledge_catalog` | 列出内置知识域与分类 | Implemented |
 | `knowledge_read` | 读取单条内置知识并支持导出裁剪 | Implemented |
-| `export_registry` | 返回 FateBridge 导出协议注册表 | Implemented |
+| `export_formats` | 返回 FateBridge 导出协议注册表 | Implemented |
 | `export_parse` | 将快照文本解析为可筛选的结构化 section | Implemented |
 
 > 内置知识域：`astro`、`bazi`、`liureng`、`qimen`。`bazi` 域含十神（10）、神煞（12）、格局（10）、五行（5）、财运（8）、健康（8）、子女（4）、学业（6）、性格（3）、六亲（3）、正缘桃花（3）等条目。
@@ -355,7 +359,7 @@
 | `fengshui_jinsuo` | 八宫固定砂水偏好、已确认特征逐项判定 | Implemented（传本来源限制明确登记） |
 | `fengshui_annual_stars` | 年度紫白九宫、立春区间、当前元运 | Implemented（交节时刻依赖所选节气模型，求根不可用时明确失败） |
 | `fengshui_monthly_stars` | 十二节月紫白、跨年有效年、九宫中性位置与固定释义 | Implemented / Limited（原表36数、独立节气口径；保留原表六月节候倒序，未实现月星用途处方或现实效度认证） |
-| `fengshui_xuankong_natal` | 中州派历史定运、24山／三元龙、五黄、下卦与兼向替星 | Implemented（xuankong_zhongzhou_v1） |
+| `fengshui_xuankong_house_chart` | 中州派历史定运、24山／三元龙、五黄、下卦与兼向替星 | Implemented（xuankong_zhongzhou_v1） |
 | `fengshui_assess` | 多层布局关联、匹配方位、现代作者室内形态、条件式元素/年度方案、分歧与版本 | Implemented（限已登记规则版本） |
 
 布局入口设 `analyze_layout=true`。扩展覆盖包括场景选法与优先审查状态、家庭人物及楼层上下文、12 类明确室内关系、独立材质／器形事实、家具候选比较，以及显式启用的玄空有限解释；只按已确认事实与登记版本计算。照片候选、缺失资料、未覆盖规则和动作可行性分别保留，`complete` 不等于所有方法均已审查或可立即执行。输入与来源详见 [风水输入与来源](fengshui.md)。
@@ -366,11 +370,17 @@
 
 第二阶段的运／山／向宅盘与年星分层；版本选择、7套公开完整盘例及固定外部216盘比对的24项五黄差异见 [玄空宅盘](fengshui-xuankong.md)。
 
+### 2.12 `psychometrics` —— 心理测量量表（Implemented）
+
+| 工具 | 范围 | 状态 |
+| --- | --- | --- |
+| `ipip_big_five` | Goldberg (1992) IPIP 50 题大五人格因子标记量表：条目清单与 1–5 整数作答确定性正反向计分、8/10 缺题折算均值 | Implemented（不输出百分位、临床诊断或叙事建议） |
+
 ## 3. 精度与依赖说明
 
 ### 3.1 核心占星盘（`astro` family）
 
-西方本命盘的历法、UTC／TT／UT1、地平宗派、Robbins 1940《四书》限定子集与 NASA/JPL 外部对照见[西方占星验证说明](western-astrology.md)。`classical.ptolemy` 与混合古典规则分开，`interpretation_evidence` 提供本次解释依赖的字段路径；天文容差、原典范围、文本忠实度与现实预测分别验收。
+西方本命盘的历法、UTC／TT／UT1、地平宗派、Robbins 1940《四书》限定子集与 NASA/JPL 外部对照见[西方占星验证说明](western-astrology.md)。`classical.ptolemy` 提供具名来源及条件记录，Agent 可结合度数、相位和宫位取证。天文容差、原典范围、文本忠实度与现实预测分别验收。
 
 | 情形 | 状态 | 说明 |
 | --- | --- | --- |
@@ -384,7 +394,7 @@
 
 `pyswisseph` 是 `pyproject.toml` 的常规安装依赖。“缺依赖回退”描述的是异常/裁剪环境的能力边界，不是另一种官方安装模式。
 
-### 3.2 关系盘（`astro_relative_chart`）
+### 3.2 关系盘（`relationship_chart`）
 
 | 模式 | 状态 | 说明 |
 | --- | --- | --- |
@@ -402,9 +412,9 @@
 - 这四个 family 使用 FateBridge 原生底盘及 Swiss Ephemeris 运行时
 - `ensure_predictive_backend_available()` 会在缺依赖时抛错（`dependency_missing`）
 - 与核心 chart 不同，缺 backend 时不会使用 FateBridge 内置轨道近似；但这不保证所有 backend 都加载了相同星历数据，仍需检查返回的精度/模型字段
-- `pd` / `pdchart` 虽已实装，但内部会公开其近似/坐标策略（time key、direct/converse、相位列表等），不应被误读为单一路径高精度结果
+- `primary_directions` / `primary_directions_chart` 虽已实装，但内部会公开其近似/坐标策略（time key、direct/converse、相位列表等），不应被误读为单一路径高精度结果
 
-卜卦／择日的显式 `ut1_source=iers_c04` 接入固定IERS20 C04日值及TT上连续UT1−TAI线性插值；默认与其他西占入口仍为Swiss ΔT模型。固定覆盖期仅1962-01-01 00:00至2026-09-19 00:00 UTC，不外推。只应用UT1，极移／CIP／日内潮汐、插值物理误差、完整原典、实际模型解释与现实预测继续待验收。来源与限制见[西方占星](western-astrology.md)。
+卜卦／择日的显式 `ut1_source=iers_c04` 使用固定IERS20 C04日值、连续TT上的去Z62四点UT1−TAI插值及一次日内项，并把同一极移与有资格CPO供给物理姿态、接收者和地平几何；默认与其他西占入口仍为Swiss ΔT模型。固定覆盖期仍仅1962-01-01 00:00至2026-09-19 00:00 UTC，不外推；1984年前CPO列语义未准入，不补测量零。原线性／zero-EOP参考保留为历史，当前有限模型对比、实际三端、独立native house／azalt及完整物理／解释／预测资格分别记录，见[当前C04定义与限制](western-astrology.md#modern-c04-eop-round40)。
 
 ## 4. 快照协议覆盖
 
@@ -413,8 +423,8 @@
 | 形态 | 工具范围 | 读取方式 |
 | --- | --- | --- |
 | `snapshot_text` + `snapshot_export` | 八字独立盘/专项/综合分析、双人配合、全部时运与历法、卦义查询、三式合参、中国术数独立盘、knowledge、核心/关系星盘（中点盘除外）、独立西占推运、八个风水工具 | 业务数据为准，快照辅助阅读；支持选择的模型才裁剪导出 |
-| `snapshot_text`，无 `snapshot_export` | `tongshefa`、`sixyao`、`canping`、`heluo`、`suzhan`、`otherbu`、西占事件与生命周期工具 | 读取文本与结构化业务数据；需要 section 解析时另调用 `export_parse` |
-| 结构化数据，无双层快照 | `meihua_analysis`、`astro_germany_chart`、`western_timing_analysis`、`export_registry`、`export_parse` | 读取各自的业务字段；`export_parse` 直接返回解析结果，不再嵌套 `snapshot_export` |
+| `snapshot_text`，无 `snapshot_export` | `combine_four_gua`、`liuyao`、`canping`、`heluo`、`suzhan`、`interpret_astrology_dice`、西占事件与生命周期工具 | 读取文本与结构化业务数据；需要 section 解析时另调用 `export_parse` |
+| 结构化数据，无双层快照 | `meihua_time_cast`、`hamburg_midpoint_chart`、`western_timing`、`export_formats`、`export_parse` | 读取各自的业务字段；`export_parse` 直接返回解析结果，不再嵌套 `snapshot_export` |
 
 使用建议：
 

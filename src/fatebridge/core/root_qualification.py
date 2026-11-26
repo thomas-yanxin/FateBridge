@@ -18,6 +18,10 @@ def root_qualification_snapshot_lines(assessment: Mapping[str, Any]) -> list[str
         "in_command_multiple_vigorous_roots": "得令且有含月支在内的至少两处健全根",
         "multiple_vigorous_roots_and_rooted_visible_support": "至少两处健全根且另有实际通根的透干印比",
         "multiple_surviving_principal_body_roots": "至少两处保留合格的同类本气根",
+        "root_count_override_requires_controller_load_review": "多处本气根与有根官杀并见，缺少有根印比承接，暂缓按根数覆盖数值档",
+        "complete_same_element_bureau_with_surviving_vigorous_roots": (
+            "同类完整会合局透出目标五行，且至少两处实际根达到保留门槛"
+        ),
         "aligned_four_branch_generation_and_time_lu": "完整四支顺生、干支杀印身相承且时归禄旺",
         "winter_rootless_wood_cannot_receive_water": "冬水当令而木无实际藏根，不以印旺代替身强",
     }

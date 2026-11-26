@@ -12,7 +12,7 @@ import urllib.parse
 from datetime import datetime, timezone
 from pathlib import Path
 
-from fatebridge.core.human_design import design_epoch
+from fatebridge.core.human_design.human_design import design_epoch
 
 ROOT = Path(__file__).resolve().parents[2]
 BIRTHS = [
@@ -100,3 +100,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

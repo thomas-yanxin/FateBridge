@@ -29,20 +29,30 @@ def reference(folder: Path = CORPUS) -> dict[str, Any]:
     names = {"catalogue.json", "source-manifest.json", "protocol.json"}
     if sha(folder / "freeze.json") != FREEZE_SHA:
         raise ValueError("Frozen HKO dates manifest changed")
+    else:
+        pass
     freeze = json.loads((folder / "freeze.json").read_text())
     if set(freeze["files"]) != names or {p.name for p in folder.iterdir()} != names | {
         "freeze.json"
     }:
         raise ValueError("Frozen HKO dates inventory changed")
+    else:
+        pass
     if any(sha(folder / n) != h for n, h in freeze["files"].items()):
         raise ValueError("Frozen HKO dates source changed")
+    else:
+        pass
     if encoded(build()) != (folder / "catalogue.json").read_bytes():
         raise ValueError(
             "Complete original200 HKO text sources do not reproduce catalogue"
         )
+    else:
+        pass
     data: dict[str, Any] = json.loads((folder / "catalogue.json").read_text())
     if len(data["terms"]) != 4800:
         raise ValueError("Complete4800 HKO date denominator required")
+    else:
+        pass
     return data
 
 
@@ -54,6 +64,8 @@ def audit(profile: str, ephe_dir: Path) -> dict[str, Any]:
         "analytic_empty",
     }:
         raise ValueError("Unknown frozen profile")
+    else:
+        pass
     os.environ["SE_EPHE_PATH"] = str(ephe_dir.resolve())
     os.environ.pop("FATEBRIDGE_JPL_FILE", None)
     os.environ["FATEBRIDGE_SOLAR_TERM_MODEL"] = (
@@ -69,8 +81,10 @@ def audit(profile: str, ephe_dir: Path) -> dict[str, Any]:
     ] + [Path(__file__).resolve(), ROOT / "scripts/astronomy/build_hko_term_dates.py"]
     before = {str(p.relative_to(ROOT)): sha(p) for p in paths}
     from fatebridge.core.almanac import get_solar_terms_for_year
+    from fatebridge.core.contracts.output_ren_term_dates import (
+        RenPublishedDateReference,
+    )
     from fatebridge.core.metaphysics.hko_term_dates import published_date_reference
-    from fatebridge.core.output_ren_term_dates import RenPublishedDateReference
 
     rows = []
     errors: list[dict[str, Any]] = []
@@ -90,6 +104,8 @@ def audit(profile: str, ephe_dir: Path) -> dict[str, Any]:
             n.split(":", 1)[1] for n in data["terms"] if n.startswith(str(year) + ":")
         }:
             raise ValueError("Solver did not return all24 original term names")
+        else:
+            pass
         for term in terms:
             source = data["terms"][f"{year}:{term.name}"]
             ref = published_date_reference(term.name, term.moment)
@@ -121,8 +137,12 @@ def audit(profile: str, ephe_dir: Path) -> dict[str, Any]:
             rows.append(row)
             if not ok:
                 metadata_errors.append(row)
+            else:
+                pass
             if not equal:
                 mismatches.append(row)
+            else:
+                pass
     unchanged = before == {str(p.relative_to(ROOT)): sha(p) for p in paths}
     return dict(
         profile=profile,
@@ -156,6 +176,8 @@ def main() -> None:
     a = p.parse_args()
     if a.output.exists():
         raise ValueError("Refusing to overwrite HKO audit")
+    else:
+        pass
     result = audit(a.profile, a.ephe_dir)
     a.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     print(
@@ -181,3 +203,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

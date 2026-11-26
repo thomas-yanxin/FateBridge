@@ -1,17 +1,8 @@
-"""Tests for the canping (邵子参评数 / 金锁银匙) tool.
-
-The historical golden in ``tests/fixtures/canping_golden_snapshot.txt`` was produced
-by running horosa's own ``canpingLocal.js`` (buildSnapshotText) on fixed pillars
-庚午/寅/巳/午, 男, 明法, 起运 3, 流年支 戌. It is retained as port history;
-named primary-source corrections are applied explicitly in the comparison.
-Fixed-pillar arithmetic and source selection use no ephemeris.
-"""
+"""Canping arithmetic, source selection, rendering and service checks."""
 
 from __future__ import annotations
 
-from pathlib import Path
-
-from fatebridge.core.canping import (
+from fatebridge.core.numerology.canping import (
     build_snapshot_text,
     calculate,
     compute_number,
@@ -19,10 +10,6 @@ from fatebridge.core.canping import (
 )
 from fatebridge.services.divination import calculate_canping_analysis
 from fatebridge.utils.data import get_nayin
-
-_FIXTURE = (
-    Path(__file__).resolve().parents[1] / "fixtures" / "canping_golden_snapshot.txt"
-)
 
 # horosa NAYIN_PAIRS (canpingLocal.js:18-29): (ganzhi_a, ganzhi_b, element).
 _HOROSA_NAYIN_PAIRS = [
@@ -59,7 +46,7 @@ _HOROSA_NAYIN_PAIRS = [
 ]
 
 
-def test_canping_nayin_parity_with_fb_get_nayin():
+def test_canping_nayin_parity_with_fb_get_nayin() -> None:
     """FB get_nayin element must match horosa's NAYIN_ELEMENT for all 60 ganzhi."""
     for a, b, element in _HOROSA_NAYIN_PAIRS:
         for ganzhi in (a, b):
@@ -67,15 +54,14 @@ def test_canping_nayin_parity_with_fb_get_nayin():
             assert get_nayin(ganzhi[0], ganzhi[1])[-1] == element
 
 
-def test_canping_compute_number_documented_anchor():
+def test_canping_compute_number_documented_anchor() -> None:
     """本命 巳/午/火 → 2242/3242, the algorithm's own documented test case."""
     result = compute_number("巳", "午", "火")
     assert result["numShun"] == 2242
     assert result["numNi"] == 3242
 
 
-def test_canping_historical_snapshot_with_documented_primary_text_corrections():
-    """Retain the historical port fixture and apply named, source-checked deltas."""
+def test_canping_fixed_pillars_keep_numbers_columns_and_readings() -> None:
     result = calculate(
         year_gz="庚午",
         month_branch="寅",
@@ -87,28 +73,104 @@ def test_canping_historical_snapshot_with_documented_primary_text_corrections():
         liunian_branch="戌",
         active_dayun_branch="申",
     )
-    expected = _FIXTURE.read_text(encoding="utf-8").rstrip("\n")
-    # 卷六金部明文同支十三位，原先顺1/逆13属于移植缺陷。
-    expected = expected.replace(
-        "33-42岁 亥：顺2179  ／ 逆3379",
-        "33-42岁 亥：顺3379 塞翁須失馬，反禍又成福。 ／ 逆3379",
+    assert (result["element"], result["dayPalaceBranch"], result["mingGong"]) == (
+        "土",
+        "亥",
+        "申",
     )
-    # Earth PDF 99, 102 and 104: literal.tsv is checked against the overlay in
-    # test_canping_earth_depth; this migration does not rewrite the port fixture.
-    for inherited, primary in (
-        ("酩酊見街盃", "酩酊見衝盃"),
-        ("收威並失勢", "收威并失勢"),
-        ("喬校須出群", "喬枝須出群"),
-        ("良畫惟歸去", "良晝惟歸去"),
-    ):
-        assert inherited in expected
-        expected = expected.replace(inherited, primary)
-    # Historical content remains a port fixture; source/column states are now
-    # appended separately instead of silently certifying that inherited text.
-    assert build_snapshot_text(result).split("\n\n[参评选条与来源]")[0] == expected
+    # Earth adds 55 to 2000 and the two 子-origin counts, plus 100 per
+    # directional count. The inclusive 亥-to-午 counts are 8 and 6.
+    natal = result["benming"]
+    assert (natal["numShun"], natal["numNi"]) == (2874, 2674)
+    # Luck substitutes each successive branch for the hour. Volume 6's
+    # same-branch example counts a full turn plus the starting position.
+    expected_luck = [
+        (3, 12, "申", 3076, 2476),
+        (13, 22, "酉", 3177, 2377),
+        (23, 32, "戌", 3278, 2278),
+        (33, 42, "亥", 3379, 3379),
+        (43, 52, "子", 2268, 3268),
+        (53, 62, "丑", 2369, 3169),
+        (63, 72, "寅", 2470, 3070),
+        (73, 82, "卯", 2571, 2971),
+        (83, 92, "辰", 2672, 2872),
+    ]
+    annual = result["liunian"]
+    assert (annual["taisuiBranch"], annual["dayunBranch"]) == ("戌", "申")
+    assert (annual["numShun"], annual["numNi"]) == (3175, 2375)
+
+    assert natal["verses"]["textShun"] == ""
+    assert (
+        natal["verses"]["selectionShun"]["cell_status"] == "row_absent_in_local_corpus"
+    )
+    assert natal["verses"]["selectionNi"]["column"] == "upper_male"
+    assert natal["verses"]["selectionNi"]["source_pdf_page"] == 103
+    calculation_text, source_heading, _ = build_snapshot_text(result).partition(
+        "\n\n[参评选条与来源]\n"
+    )
+    assert source_heading
+    setup, natal_text, luck_text, annual_text = calculation_text.split("\n\n")
+    luck_heading, *luck_lines = luck_text.splitlines()
+    assert luck_heading == "[大运·歲運]"
+    luck = result["dayun"]
+    # National Archives of Japan, 305-0271, volume 6. The Earth luck cells
+    # are identified by their number and PDF page. Three forward rows are absent locally.
+    earth_luck: dict[int, tuple[int | None, str]] = {
+        3076: (None, ""),
+        3177: (None, ""),
+        3278: (None, ""),
+        3268: (98, "笙歌頻聒聒，自可樂歡顏。"),
+        3169: (99, "猛虎依平林，收威并失勢。"),
+        3070: (100, "春天喜勝遊，冬日真可愛。"),
+        2971: (101, "琴瑟不調和，其弦急可整。"),
+        2872: (102, "黃鶯聲百囀，其可樂春遲。"),
+        2268: (102, "荒田多野草，空自負耕犁。"),
+        2369: (102, "葉落為辭樹，正不為幹枝。"),
+        2470: (102, "柏樹長高崗，喬枝須出群。"),
+        2571: (102, "良晝惟歸去，志存楊柳間。"),
+        2672: (102, "二將競爭功，一得須一失。"),
+        2476: (104, "酩酊見衝盃，性真正自在。"),
+        2377: (104, "石上磨玉簪，不測中有折。"),
+        2278: (104, "遊舟入水中，進退不由己。"),
+        3379: (104, "塞翁須失馬，反禍又成福。"),
+    }
+    for step, rendered, expected in zip(luck, luck_lines, expected_luck, strict=True):
+        assert (
+            step["ageStart"],
+            step["ageEnd"],
+            step["branch"],
+            step["numShun"],
+            step["numNi"],
+        ) == expected
+        start, end, branch, forward, reverse = expected
+        verses = step["verses"]
+        for direction, number in (("Shun", forward), ("Ni", reverse)):
+            page, text = earth_luck[number]
+            selection = verses[f"selection{direction}"]
+            assert selection["kind"] == "luck"
+            assert selection.get("source_pdf_page") == page
+            assert verses[f"text{direction}"] == text
+        assert rendered == (
+            f"{start}-{end}岁 {branch}：顺{forward} {earth_luck[forward][1]} ／ "
+            f"逆{reverse} {earth_luck[reverse][1]}"
+        )
+    assert setup.splitlines() == [
+        "[起盘]",
+        "年纳音：土（土部）  取法：明法(月支反向)",
+        "日宫支：亥  命宫：申",
+    ]
+    assert natal_text.splitlines() == [
+        "[本命]",
+        "顺 2874：",
+        "逆 2674：義兵不用詐，背水戰何因。",
+    ]
+    assert annual_text.splitlines() == [
+        "[流年·歲運]",
+        "太岁戌/大运申：顺3175  ／ 逆2375 男兒衣祿好，女子命還危。",
+    ]
 
 
-def test_canping_service_full_shape():
+def test_canping_service_full_shape() -> None:
     result = calculate_canping_analysis(
         date="1990-06-15",
         time="09:33:00",
@@ -130,7 +192,7 @@ def test_canping_service_full_shape():
     assert result["snapshot_text"].startswith("[起盘]")
 
 
-def test_canping_gu_method_uses_day_branch():
+def test_canping_gu_method_uses_day_branch() -> None:
     ming = calculate(
         year_gz="庚午",
         month_branch="寅",

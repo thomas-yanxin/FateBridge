@@ -26,12 +26,18 @@ def derive(kernel_path: Path) -> dict:
     plan = json.loads(PLAN.read_text())
     if len(plan["birth_epochs"]) != 1200:
         raise ValueError("All1200 frozen calendar strata are required")
+    else:
+        pass
     raw = kernel_path.read_bytes()
     if hashlib.md5(raw).hexdigest() != plan["kernel_md5"]:
         raise ValueError("DE440 does not match NASA's published checksum")
+    else:
+        pass
     for name in ("skyfield", "jplephem", "numpy"):
         if version(name) != plan[name + "_version"]:
             raise ValueError("Reference runtime differs from the frozen plan")
+        else:
+            pass
     kernel = load_file(str(kernel_path))
     ts = load.timescale(builtin=True)
     earth = kernel[399]
@@ -50,6 +56,8 @@ def derive(kernel_path: Path) -> dict:
     lower, upper = births - 100, births - 70
     if not (np.all(residual(lower) > 0) and np.all(residual(upper) < 0)):
         raise ValueError("Independent solar roots are not bracketed")
+    else:
+        pass
     for _ in range(42):
         middle = lower + (upper - lower) / 2
         earlier = residual(middle) > 0
@@ -63,6 +71,8 @@ def derive(kernel_path: Path) -> dict:
         or np.max(np.abs(residuals)) > plan["root_maximum_residual_arcseconds"]
     ):
         raise ValueError("Independent root numerical convergence failed")
+    else:
+        pass
     epochs = np.concatenate((births, roots))
     positions = {name: apparent(body, epochs) for name, body in plan["bodies"].items()}
     pairs = []
@@ -127,6 +137,8 @@ def main() -> None:
     if args.check:
         if json.loads(args.output.read_text()) != result:
             raise SystemExit("Independent astronomy reference differs")
+        else:
+            pass
     else:
         args.output.write_bytes(
             (json.dumps(result, ensure_ascii=False, indent=2) + "\n").encode()
@@ -144,3 +156,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

@@ -33,7 +33,9 @@ _NATAL = dict(
 
 
 @_requires_swe
-def test_quadrant_house_swisseph_runtime_failure_fails_loud(monkeypatch):
+def test_quadrant_house_swisseph_runtime_failure_fails_loud(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """A runtime house-kernel failure for Placidus raises a clear ValueError.
 
     Not a raw swisseph error, and crucially NOT a silent degrade to
@@ -54,7 +56,9 @@ def test_quadrant_house_swisseph_runtime_failure_fails_loud(monkeypatch):
 
 
 @_requires_swe
-def test_planetary_hours_degrades_to_none_when_civil_conversion_fails(monkeypatch):
+def test_planetary_hours_degrades_to_none_when_civil_conversion_fails(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """A failed UT1-to-civil conversion yields the documented unavailable value."""
     monkeypatch.setattr(astrology_core, "_SWE_RUNTIME_FAILURE_LOGGED", False)
     info = build_astro_birth_info(**_NATAL)
@@ -63,7 +67,7 @@ def test_planetary_hours_degrades_to_none_when_civil_conversion_fails(monkeypatc
     def _boom(*args, **kwargs):
         raise RuntimeError("civil conversion exploded")
 
-    monkeypatch.setattr(classical, "datetime_from_ut1", _boom)
+    monkeypatch.setattr(classical, "utc_calendar_from_tt", _boom)
 
     result = _planetary_hours(
         julian_day, info.longitude, info.latitude, "Asia/Shanghai"

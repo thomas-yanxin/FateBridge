@@ -11,6 +11,7 @@ import hashlib
 import math
 import os
 import weakref
+from fractions import Fraction
 from functools import lru_cache
 from importlib import import_module
 from pathlib import Path
@@ -21,7 +22,7 @@ from fatebridge.core.analytic_solar import (
     C_AU_DAY,
     aberration,
     apparent_ecliptic,
-    profile,
+    loaded_sha256,
 )
 from fatebridge.utils.errors import EphemerisSourceError
 
@@ -48,14 +49,14 @@ def _signature(path: Path) -> tuple[int, ...]:
 
 
 class _KernelSun:
-    def __init__(self, path: Path, signature: tuple[int, ...]):
+    def __init__(self, path: Path, signature: tuple[int, ...]) -> None:
         try:
             erfa = import_module("erfa")
             jplephem = import_module("jplephem")
             np = import_module("numpy")
             SPK = import_module("jplephem.spk").SPK
-        except ImportError as error:
-            raise ImportError(
+        except ModuleNotFoundError as error:
+            raise ModuleNotFoundError(
                 "JPL SPK太阳模型需要安装FateBridge的jpl可选依赖"
             ) from error
         self.path, self.signature, self.erfa = path, signature, erfa
@@ -68,7 +69,11 @@ class _KernelSun:
         }
         self.kernel: Any = None
         try:
-            self.sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
+            kernel_digest = hashlib.sha256()
+            with path.open("rb") as kernel_file:
+                while kernel_chunk := kernel_file.read(1024 * 1024):
+                    kernel_digest.update(kernel_chunk)
+            self.sha256 = kernel_digest.hexdigest()
             self.kernel = SPK.open(str(path))
             self.segments = {
                 pair: [s for s in self.kernel.segments if (s.center, s.target) == pair]
@@ -100,9 +105,10 @@ class _KernelSun:
     def segment(self, pair: tuple[int, int], tdb2: float) -> Any:
         # SPK priority is the last applicable segment, not simply the last
         # segment for that body across disjoint time intervals.
-        epoch = 2451545.0 + tdb2
+        # DAF segment descriptors use TDB seconds from J2000.
+        seconds = Fraction(tdb2) * 86400 if math.isfinite(tdb2) else tdb2
         for segment in reversed(self.segments[pair]):
-            if segment.start_jd <= epoch <= segment.end_jd:
+            if segment.start_second <= seconds <= segment.end_second:
                 return segment
         raise EphemerisSourceError("solar_spk_range")
 
@@ -152,14 +158,13 @@ class _KernelSun:
             },
             "time_argument": "TDB from TT via geocentric ERFA dtdb",
             "position_frame": "BCRS then IAU2006/P03 and IAU2000B true ecliptic of date",
-            "frame_coefficient_sha256": profile()["loaded_sha256"],
+            "frame_coefficient_sha256": loaded_sha256(),
             "light_time_iterations": 3,
             "dependencies": dict(self.dependencies),
             "source_url": "https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/spk.html",
             "time_source_url": "https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/time.html",
             "native_moshier_relabelled": False,
             "accuracy_certified": False,
-            "source_identity_scope": "Actual selected file bytes; not authentication of a NASA download, atomic immutability or full physical/civil UTC accuracy",
         }
 
 
@@ -183,7 +188,7 @@ def cache_key() -> tuple[Any, ...]:
             str(source.path),
             source.signature,
             source.sha256,
-            profile()["loaded_sha256"],
+            loaded_sha256(),
         )
 
 
@@ -225,7 +230,7 @@ def longitude_crossing_tt(
             str(source.path),
             source.signature,
             source.sha256,
-            profile()["loaded_sha256"],
+            loaded_sha256(),
         )
         if expected_source_key is not None and actual_key != expected_source_key:
             raise EphemerisSourceError("solar_configuration_changed")

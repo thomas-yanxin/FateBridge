@@ -64,11 +64,15 @@ def check_actual_parts(value):
             assert low <= exact <= high
             assert details["numerical_resolution_is_physical_accuracy"] is False
             found += 1
+        else:
+            pass
         for child in value.values():
             found += check_actual_parts(child)
     elif isinstance(value, list):
         for child in value:
             found += check_actual_parts(child)
+    else:
+        pass
     return found
 
 
@@ -78,8 +82,8 @@ rest = _shared_rest
 @pytest.mark.parametrize("key", ["bazi_birth", "timing_analysis", "dayun_analysis"])
 @pytest.mark.parametrize("project", [False, True])
 def test_actual_parts_and_same_business_result_on_rest_mcp_cli(
-    key, project, surface_calls
-):
+    key: str, project: bool, surface_calls
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     payload = {
         **inputs(spec),
@@ -112,6 +116,8 @@ def test_actual_parts_and_same_business_result_on_rest_mcp_cli(
             "--strict-fields",
             "true",
         ]
+    else:
+        pass
     http, mcp, code, cli = surface_calls(
         spec,
         payload,
@@ -128,7 +134,7 @@ def test_actual_parts_and_same_business_result_on_rest_mcp_cli(
 @pytest.mark.parametrize(
     "year", [1800, 1899, 1959, 1960, 1961, 1968, 1971, 1972, 2000, 2101, 2200]
 )
-def test_default_calendar_keeps_all24terms_across_each_clock_regime(year):
+def test_default_calendar_keeps_all24terms_across_each_clock_regime(year: int) -> None:
     terms = get_solar_terms_for_year(year, "UTC")
     assert len(terms) == 24
     for term in terms:

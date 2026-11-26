@@ -1,11 +1,13 @@
 """Explicit axis host/guest definitions, separate from fortune interpretation."""
 
 import hashlib
-import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
+
+from pydantic import JsonValue, TypeAdapter
+from typing_extensions import TypedDict
 
 from fatebridge.core.hexagram_relations import ELEMENT_CONTROLS, ELEMENT_GENERATES
 from fatebridge.core.public_output import same_public_value as _same
@@ -29,20 +31,39 @@ def _check(value: bool) -> None:
         raise FengshuiCalculationError("natal_host_guest_inconsistent")
 
 
+class HostGuestClause(TypedDict):
+    period: int
+    sitting_mountain: str
+    facing_mountain: str
+    page: int
+    literal_full_clause: str
+    labels: dict[str, list[str]]
+
+
+class HostGuestSource(TypedDict):
+    ruleset: dict[str, JsonValue]
+    sources: list[dict[str, JsonValue]]
+    source_reference_sha256: str
+    source_policy_notes: list[str]
+    star_elements: dict[str, str]
+    fixed_earth_numbers: dict[str, int]
+    host_guest_matrix: dict[str, dict[str, str]]
+    sector_mountains: dict[str, str]
+    lower_clauses: list[HostGuestClause]
+
+
 @lru_cache(maxsize=1)
-def _facts() -> dict[str, Any]:
+def _facts() -> HostGuestSource:
     try:
         path = Path(__file__).parents[2] / "data/fengshui/host-guest-v1.json"
         raw = path.read_bytes()
         _check(hashlib.sha256(raw).hexdigest() == DATA_SHA256)
-        value = json.loads(raw)
-        _check(isinstance(value, dict))
-        return cast(dict[str, Any], value)
-    except (OSError, ValueError, TypeError) as error:
+        return TypeAdapter(HostGuestSource).validate_json(raw, strict=True)
+    except (OSError, ValueError) as error:
         raise FengshuiCalculationError("natal_host_guest_inconsistent") from error
 
 
-def provenance() -> dict[str, Any]:
+def provenance() -> dict[str, JsonValue]:
     data = _facts()
     return {
         **deepcopy(data["ruleset"]),
@@ -52,13 +73,15 @@ def provenance() -> dict[str, Any]:
         ],
         "loaded_data_sha256": DATA_SHA256,
         "source_reference_sha256": data["source_reference_sha256"],
-        "source_policy_notes": deepcopy(data["source_policy_notes"]),
+        "source_policy_notes": list[JsonValue](data["source_policy_notes"]),
     }
 
 
-def _number(value: Any) -> int:
-    _check(type(value) is int and value in range(1, 10))
-    return cast(int, value)
+def _number(value: object) -> int:
+    if type(value) is int and 1 <= value <= 9:
+        return value
+    else:
+        raise FengshuiCalculationError("natal_host_guest_inconsistent")
 
 
 def classify(host: int, guest: int) -> dict[str, str]:
@@ -91,18 +114,18 @@ def _direction(chart: dict[str, Any], axis: str) -> str:
     ]
     _check(len(directions) == 1)
     _check(chart[axis]["direction"] == directions[0])
-    return cast(str, directions[0])
+    return directions[0]
 
 
 def _raw_number(chart: dict[str, Any], direction: str, role: str) -> int:
     if role == "earth":
-        return cast(int, _facts()["fixed_earth_numbers"][direction])
+        return _facts()["fixed_earth_numbers"][direction]
     number = _number(chart[role + "_chart"][direction])
     _check(chart["palaces"][direction][role + "_star_number"] == number)
     return number
 
 
-def _literal(chart: dict[str, Any]) -> dict[str, Any]:
+def _literal(chart: dict[str, Any]) -> HostGuestClause:
     rows = [
         r
         for r in _facts()["lower_clauses"]
@@ -111,7 +134,7 @@ def _literal(chart: dict[str, Any]) -> dict[str, Any]:
         and r["facing_mountain"] == chart["facing"]["name"]
     ]
     _check(len(rows) == 1)
-    return cast(dict[str, Any], rows[0])
+    return rows[0]
 
 
 def _comparison(chart: dict[str, Any], axis: str, label: str) -> dict[str, Any]:
@@ -221,6 +244,7 @@ def validate(
     natal: dict[str, Any],
     *,
     expected_selected: bool | None = None,
+    served_receipt: dict[str, Any] | None = None,
 ) -> dict[str, int]:
     """Verify from literal element table and raw planes, not the relation builder."""
     counts = dict(
@@ -234,7 +258,33 @@ def validate(
         return counts
     try:
         data = _facts()
-        _check(_same(value["ruleset"], provenance()))
+        expected_provenance = provenance()
+        reported_provenance = value["ruleset"]
+        if served_receipt is not None and "sources" not in reported_provenance:
+            ruleset_id = expected_provenance["ruleset_id"]
+            registered = next(
+                ruleset
+                for ruleset in served_receipt["rulesets"]
+                if ruleset["ruleset_id"] == ruleset_id
+            )
+            registered_fields = {
+                field: fact
+                for field, fact in registered.items()
+                if field != "source_citations"
+            }
+            _check(_same(reported_provenance, registered_fields))
+            reported_provenance = {
+                **reported_provenance,
+                "sources": [
+                    {
+                        "source_id": source_id,
+                        **served_receipt["source_catalog"][source_id],
+                        **registered["source_citations"][source_id],
+                    }
+                    for source_id in registered["source_ids"]
+                ],
+            }
+        _check(_same(reported_provenance, expected_provenance))
         _check(value["scope"] == SCOPE)
         _check(value["evaluation_timeliness_applied"] is False)
         _check(value["site_eligibility_established"] is False)

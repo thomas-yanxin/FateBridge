@@ -8,14 +8,19 @@ also used by Morinus, rather than claiming to reproduce every textual variant.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone, tzinfo
+from datetime import datetime, timedelta, tzinfo
 from fractions import Fraction
 from typing import TypedDict
 
 from fatebridge.core.astro.birth import AstroBirthInfo
-
-from ._common import determine_sect, planet_label, point_absolute_position
-from .native_chart import NativeSubject
+from fatebridge.core.predictive._common import (
+    determine_sect,
+    planet_label,
+    point_absolute_position,
+)
+from fatebridge.core.predictive.native_chart import NativeSubject
+from fatebridge.utils.civil_time import UTCCalendar, ZonedCalendar, utc_calendar
+from fatebridge.utils.timezones import format_local_time_or_utc
 
 DECENNIAL_START_MODE_SECT_LIGHT = "sect_light"
 DECENNIAL_ORDER_ZODIACAL = "zodiacal"
@@ -189,21 +194,25 @@ class _DecennialInterval:
 
     def payload(
         self,
-        birth_utc: datetime,
-        display_zone: tzinfo | None,
-        analysis_utc: datetime,
+        birth_utc: UTCCalendar,
+        display_zone: tzinfo,
+        analysis_utc: UTCCalendar,
         calendar_scale: Fraction,
     ) -> DecennialPeriod:
-        # Round the absolute rational offset once to datetime's microsecond grid.
+        # Round the absolute rational offset once to the civil microsecond grid.
         # Local civil labels never participate in the elapsed-time arithmetic.
-        start_utc = birth_utc + timedelta(
-            microseconds=round(self.start_minutes * calendar_scale * 60_000_000)
+        start_utc = birth_utc.shifted(
+            timedelta(
+                microseconds=round(self.start_minutes * calendar_scale * 60_000_000)
+            )
         )
-        end_utc = birth_utc + timedelta(
-            microseconds=round(self.end_minutes * calendar_scale * 60_000_000)
+        end_utc = birth_utc.shifted(
+            timedelta(
+                microseconds=round(self.end_minutes * calendar_scale * 60_000_000)
+            )
         )
-        start = start_utc.astimezone(display_zone)
-        end = end_utc.astimezone(display_zone)
+        start = ZonedCalendar(start_utc, display_zone).require_datetime()
+        end = ZonedCalendar(end_utc, display_zone).require_datetime()
         display_start = round(self.start_minutes)
         display_end = round(self.end_minutes)
         return {
@@ -216,8 +225,8 @@ class _DecennialInterval:
                 f"{_format_nominal_offset(display_start, self.level)} - "
                 f"{_format_nominal_offset(display_end, self.level)}"
             ),
-            "start": start.isoformat(),
-            "end": end.isoformat(),
+            "start": format_local_time_or_utc(start),
+            "end": format_local_time_or_utc(end),
             "active": start_utc <= analysis_utc < end_utc,
             "start_offset_minutes": display_start,
             "end_offset_minutes": display_end,
@@ -261,9 +270,9 @@ def build_decennials_payload(
     if calendar_type not in (DECENNIAL_CALENDAR_TRADITIONAL, DECENNIAL_CALENDAR_ACTUAL):
         raise ValueError(f"Unsupported decennial calendar: {calendar_type}")
 
-    birth_utc = birth_info.require_utc_datetime
-    analysis_utc = analysis_datetime.astimezone(timezone.utc)
-    display_zone = birth_info.local_datetime.tzinfo
+    birth_utc = birth_info.utc_calendar
+    analysis_utc = utc_calendar(analysis_datetime)
+    display_zone = ZonedCalendar.from_datetime(birth_info.local_datetime).zone
     calendar_scale = (
         Fraction(487, 480)
         if calendar_type == DECENNIAL_CALENDAR_ACTUAL
@@ -272,7 +281,7 @@ def build_decennials_payload(
     start_planet = resolve_decennial_start_planet(natal_subject, start_mode)
     base_order = get_decennial_order(natal_subject, start_planet, order_type)
     l1_minutes = DECENNIAL_TOTAL_L1_DAYS * DECENNIAL_MINUTES_PER_DAY
-    elapsed = analysis_utc - birth_utc
+    elapsed = analysis_utc.elapsed_since(birth_utc)
     elapsed_minutes = Fraction(
         (elapsed.days * 86400 + elapsed.seconds) * 1_000_000 + elapsed.microseconds,
         60_000_000,

@@ -12,16 +12,16 @@ from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
 from fatebridge.core.classical_passage import build_passage_evidence
-from fatebridge.core.output_classical_passage import (
+from fatebridge.core.contracts.output_classical_passage import (
     ClassicalPassage,
     PassageNode,
     PassagePath,
 )
 from fatebridge.utils.data import BRANCH_HIDDEN_STEMS, GENERATION_CYCLE, STEM_ELEMENTS
-from tests.bazi.test_bazi_year_contract import TOPICS
 from tests.support.transports import AS_OF, SPECS, business, inputs
 from tests.support.transports import rest as _rest_fixture
 from tests.support.transports import surface_calls
+from tests.unit_test.fixtures.bazi_year_cases import TOPICS
 
 rest = _rest_fixture
 ROOT = Path(__file__).resolve().parents[2]
@@ -37,7 +37,7 @@ def first():
 
 
 @pytest.mark.parametrize("index", range(17))
-def test_all_seventeen_first_accepted_contradictions_are_now_rejected(index):
+def test_all_seventeen_first_accepted_contradictions_are_now_rejected(index) -> None:
     case = json.loads((ROOT / "tests/data/bazi/passage-invalid.json").read_text())[
         index
     ]
@@ -47,7 +47,7 @@ def test_all_seventeen_first_accepted_contradictions_are_now_rejected(index):
     assert case == before
 
 
-def test_every_parent_projection_subset_and_partial_items_remain_valid():
+def test_every_parent_projection_subset_and_partial_items_remain_valid() -> None:
     value = first()["passage"]
     names = list(value)
     for size in range(len(names) + 1):
@@ -63,7 +63,9 @@ def test_every_parent_projection_subset_and_partial_items_remain_valid():
                 PassagePath.model_validate({key: path[key]})
 
 
-def test_all_physical_stems_and_hidden_catalog_nodes_validate_without_mutation():
+def test_all_physical_stems_and_hidden_catalog_nodes_validate_without_mutation() -> (
+    None
+):
     for position in ("year", "month", "day", "hour"):
         for stem, (element, _) in STEM_ELEMENTS.items():
             node = dict(
@@ -96,7 +98,9 @@ def test_all_physical_stems_and_hidden_catalog_nodes_validate_without_mutation()
         )
 
 
-def test_all_five_generating_intermediary_chains_accept_all_eight_plane_patterns():
+def test_all_five_generating_intermediary_chains_accept_all_eight_plane_patterns() -> (
+    None
+):
     representative = {
         element: next(s for s, (e, _) in STEM_ELEMENTS.items() if e == element)
         for element in GENERATION_CYCLE
@@ -130,8 +134,8 @@ def test_all_five_generating_intermediary_chains_accept_all_eight_plane_patterns
     [({}, None), ({"hidden_stem_ledger": [], "relations": []}, False)],
 )
 def test_unknown_root_receipt_and_supplied_empty_receipt_stay_distinct(
-    assessment, expected
-):
+    assessment, expected: bool | None
+) -> None:
     pillars = first()["pillars"]
     value = build_passage_evidence(pillars, assessment)
     ClassicalPassage.model_validate(value)
@@ -144,7 +148,9 @@ def test_unknown_root_receipt_and_supplied_empty_receipt_stay_distinct(
         ClassicalPassage.model_validate(changed)
 
 
-def test_validation_never_calls_a_strength_or_passage_solver(monkeypatch):
+def test_validation_never_calls_a_strength_or_passage_solver(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.core.classical_passage as passage
     from fatebridge.core.elements import ElementAnalysis
 
@@ -157,7 +163,7 @@ def test_validation_never_calls_a_strength_or_passage_solver(monkeypatch):
 
 
 @pytest.mark.parametrize("topic", TOPICS)
-def test_all_ten_tools_keep_valid_summary_only_projection(topic, surface_calls):
+def test_all_ten_tools_keep_valid_summary_only_projection(topic, surface_calls) -> None:
     spec = SPECS["bazi_" + topic]
     prefix = "bazi_birth" if topic == "birth" else topic + "_analysis"
     path = (
@@ -197,8 +203,8 @@ def test_all_ten_tools_keep_valid_summary_only_projection(topic, surface_calls):
 
 @pytest.mark.parametrize("topic", TOPICS)
 def test_all_ten_tools_reject_contradictory_nested_receipts_before_projection(
-    topic, monkeypatch, surface_calls
-):
+    topic, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     spec = SPECS["bazi_" + topic]
     prefix = "bazi_birth" if topic == "birth" else topic + "_analysis"
     chain = "structure_profile" if topic == "birth" else None
@@ -208,6 +214,8 @@ def test_all_ten_tools_reject_contradictory_nested_receipts_before_projection(
     def corrupt(actual, parsed):
         if actual.key != spec.key:
             return original(actual, parsed)
+        else:
+            pass
         result = original(actual, parsed)
         value = deepcopy(result)
         business_result = value[prefix]

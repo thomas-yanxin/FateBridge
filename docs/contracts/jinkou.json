@@ -163,17 +163,20 @@
   },
   "input": {
     "additionalProperties": false,
+    "description": "Request model for Jin Kou analysis.",
     "properties": {
       "analysis_day": {
         "description": "Analysis day (1-31)",
         "maximum": 31,
         "minimum": 1,
+        "title": "Analysis Day",
         "type": "integer"
       },
       "analysis_hour": {
         "description": "Analysis hour (0-23)",
         "maximum": 23,
         "minimum": 0,
+        "title": "Analysis Hour",
         "type": "integer"
       },
       "analysis_longitude": {
@@ -188,19 +191,22 @@
           }
         ],
         "default": null,
-        "description": "Analysis longitude"
+        "description": "Analysis longitude",
+        "title": "Analysis Longitude"
       },
       "analysis_minute": {
         "default": 0,
         "description": "Analysis minute (0-59)",
         "maximum": 59,
         "minimum": 0,
+        "title": "Analysis Minute",
         "type": "integer"
       },
       "analysis_month": {
         "description": "Analysis month (1-12)",
         "maximum": 12,
         "minimum": 1,
+        "title": "Analysis Month",
         "type": "integer"
       },
       "analysis_second": {
@@ -208,6 +214,7 @@
         "description": "起课钟表秒数，保留交中气和太阳时辰边界；不代表秒级预测能力。",
         "maximum": 59,
         "minimum": 0,
+        "title": "Analysis Second",
         "type": "integer"
       },
       "analysis_timezone": {
@@ -220,7 +227,8 @@
           }
         ],
         "default": null,
-        "description": "Analysis timezone (IANA name or UTC offset)"
+        "description": "Analysis timezone (IANA name or UTC offset)",
+        "title": "Analysis Timezone"
       },
       "analysis_utc_offset": {
         "anyOf": [
@@ -232,23 +240,13 @@
           }
         ],
         "default": null,
-        "description": "起课民用钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与analysis_timezone共同核对并选择重复时刻，不替换命名时区规则。省略时拒绝歧义或不存在的钟时。"
+        "description": "起课民用钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与analysis_timezone共同核对并选择重复时刻，不替换命名时区规则。省略时拒绝歧义或不存在的钟时。",
+        "title": "Analysis Utc Offset"
       },
       "analysis_year": {
         "description": "Analysis year, e.g., 2026",
+        "title": "Analysis Year",
         "type": "integer"
-      },
-      "as_of": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
       },
       "birth_year_ganzhi": {
         "anyOf": [
@@ -260,12 +258,8 @@
           }
         ],
         "default": null,
-        "description": "已确认的完整出生年干支，须属六十甲子；供京本六甲旬起行年、本命年支和本命另课。本命另课不要求性别或岁序。不是公历年份，不从占时、年龄反推或代猜岁首。"
-      },
-      "compact": {
-        "default": true,
-        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
-        "type": "boolean"
+        "description": "已确认的完整出生年干支，须属六十甲子；供京本六甲旬起行年、本命年支和本命另课。本命另课不要求性别或岁序。不是公历年份，不从占时、年龄反推或代猜岁首。",
+        "title": "Birth Year Ganzhi"
       },
       "di_fen": {
         "anyOf": [
@@ -291,22 +285,8 @@
           }
         ],
         "default": null,
-        "description": "地分十二地支；不填按时支作软件回退，并非已观测的来人方位。"
-      },
-      "fields": {
-        "anyOf": [
-          {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+        "description": "地分十二地支；不填按时支作软件回退，并非已观测的来人方位。",
+        "title": "Di Fen"
       },
       "gender": {
         "anyOf": [
@@ -318,7 +298,8 @@
           }
         ],
         "default": "未知",
-        "description": "性别（可选）。接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法；省略默认 未知。"
+        "description": "性别（可选）。接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法；省略默认 未知。",
+        "title": "Gender"
       },
       "guiren_profile": {
         "default": "liuren_common_v1",
@@ -327,12 +308,8 @@
           "liuren_common_v1",
           "tanyuan_xieji_v1"
         ],
+        "title": "Guiren Profile",
         "type": "string"
-      },
-      "include_snapshot_text": {
-        "default": true,
-        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
-        "type": "boolean"
       },
       "is_diurnal": {
         "anyOf": [
@@ -344,7 +321,8 @@
           }
         ],
         "default": null,
-        "description": "显式昼贵/夜贵：true 昼、false 夜；省略按卯至申昼、酉至寅夜。未自动计算当地星没星出。"
+        "description": "显式昼贵/夜贵：true 昼、false 夜；省略按卯至申昼、酉至寅夜。未自动计算当地星没星出。",
+        "title": "Is Diurnal"
       },
       "natal_branch": {
         "anyOf": [
@@ -370,63 +348,21 @@
           }
         ],
         "default": null,
-        "description": "问课对象已确认的本命年支，用于京本将命大绝配对及本命另课。另课以本命支作派生地分，保留本次占时，与原地分主课分列。省略且已给birth_year_ganzhi时取其明确年支；两者并给须一致。不由占时、地分或行年推定，不要求补猜出生时刻。"
-      },
-      "parent_run_id": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Parent call's run_id; correlation only, no stored execution lookup"
-      },
-      "response_char_limit": {
-        "anyOf": [
-          {
-            "const": 0,
-            "type": "integer"
-          },
-          {
-            "maximum": 65536,
-            "minimum": 4096,
-            "type": "integer"
-          }
-        ],
-        "default": 8192,
-        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+        "description": "问课对象已确认的本命年支，用于京本将命大绝配对及本命另课。另课以本命支作派生地分，保留本次占时，与原地分主课分列。省略且已给birth_year_ganzhi时取其明确年支；两者并给须一致。不由占时、地分或行年推定，不要求补猜出生时刻。",
+        "title": "Natal Branch"
       },
       "selected_sections": {
-        "default": [],
         "description": "Optional snapshot section titles for filtered export payload",
         "items": {
           "type": "string"
         },
+        "title": "Selected Sections",
         "type": "array"
-      },
-      "strict_fields": {
-        "default": false,
-        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
-        "type": "boolean"
-      },
-      "trace_id": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Caller trace ID"
       },
       "use_true_solar_time": {
         "default": true,
         "description": "Enable true solar time correction (default on — 式占 keys off the apparent-solar 时辰)",
+        "title": "Use True Solar Time",
         "type": "boolean"
       },
       "year_fate_age": {
@@ -441,7 +377,8 @@
           }
         ],
         "default": null,
-        "description": "明确提供的一岁起算行年岁序，非周岁或寿限。与出生年干支及已知男/女齐备才另起行年课；不由生日、占时推算，也未认证原典换岁边界。"
+        "description": "明确提供的一岁起算行年岁序，非周岁或寿限。与出生年干支及已知男/女齐备才另起行年课；不由生日、占时推算，也未认证原典换岁边界。",
+        "title": "Year Fate Age"
       }
     },
     "required": [
@@ -450,6 +387,7 @@
       "analysis_day",
       "analysis_hour"
     ],
+    "title": "JinkouAnalysisRequest",
     "type": "object"
   },
   "method_contracts": [

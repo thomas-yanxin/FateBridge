@@ -34,6 +34,8 @@ def validate(directory):
         or reference["candidate_compared"]
     ):
         raise ValueError("Original or supplemental source identity changed")
+    else:
+        pass
     previous = json.loads(original_protocol.read_text())
     for key in (
         "reference_parameters",
@@ -43,6 +45,8 @@ def validate(directory):
     ):
         if protocol[key] != previous[key]:
             raise ValueError("Supplement changed the original reference semantics")
+        else:
+            pass
     original_missing = [
         row
         for row in json.loads(original.read_text())["rows"]
@@ -50,11 +54,15 @@ def validate(directory):
     ]
     if protocol["centers"] != original_missing:
         raise ValueError("Supplement detached from the two original missing centers")
+    else:
+        pass
     points = {}
     for request in reference["requests"]:
         raw = (directory / request["raw_path"]).read_bytes()
         if hashlib.sha256(raw).hexdigest() != request["sha256"]:
             raise ValueError("Independent raw response changed")
+        else:
+            pass
         epochs = list(map(Fraction, request["numeric_jd_tt"]))
         labels = list(map(calendar_label, epochs))
         if request["calendar_labels"] != labels or request["parameters"] != {
@@ -62,22 +70,32 @@ def validate(directory):
             "TLIST": " ".join(f"'{label}'" for label in labels),
         }:
             raise ValueError("Request epoch or target/frame changed")
+        else:
+            pass
         response = json.loads(raw)
         text = response.get("result", "")
         if "$$SOE\n" not in text:
             if request.get("error") != response.get("error", text) or request["rows"]:
                 raise ValueError("Unavailable NASA source became available")
+            else:
+                pass
             continue
+        else:
+            pass
         if not all(
             value in text
             for value in ("Moon (301)", "Earth (399)", "ICRF", "Date__(TT)")
         ):
             raise ValueError("Returned NASA target/frame/time changed")
+        else:
+            pass
         rows = list(
             csv.reader(io.StringIO(text.split("$$SOE\n", 1)[1].split("$$EOE", 1)[0]))
         )
         if len(rows) != len(request["rows"]) or len(rows) != len(epochs):
             raise ValueError("Incomplete independent raw table")
+        else:
+            pass
         for epoch, row, saved in zip(epochs, rows, request["rows"]):
             ra, dec = map(float, row[3:5])
             a, d = map(math.radians, (ra, dec))
@@ -96,6 +114,8 @@ def validate(directory):
                 "icrf_unit_direction": direction,
             }:
                 raise ValueError("Saved reference differs from original NASA row")
+            else:
+                pass
             points[str(epoch)] = direction
     weights = {
         k: float(
@@ -108,6 +128,8 @@ def validate(directory):
     }
     if len(reference["rows"]) != 2:
         raise ValueError("The complete original missing cohort was not retained")
+    else:
+        pass
     for center, row in zip(protocol["centers"], reference["rows"]):
         epoch = Fraction(center["jd_tt"])
         missing = [
@@ -125,8 +147,12 @@ def validate(directory):
             or row["status"] != ("incomplete" if missing else "available")
         ):
             raise ValueError("Missing probes were removed or relabeled")
+        else:
+            pass
         if missing:
             continue
+        else:
+            pass
         derivatives = {
             str(step): [
                 math.fsum(
@@ -152,6 +178,8 @@ def validate(directory):
             != math.degrees(math.dist(*derivatives.values())) * 3600
         ):
             raise ValueError("Original complete stencil or quality check changed")
+        else:
+            pass
     return (
         protocol,
         reference,
@@ -197,3 +225,5 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

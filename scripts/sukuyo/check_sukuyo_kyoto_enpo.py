@@ -12,9 +12,11 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 if not __package__:
     sys.path.insert(0, str(ROOT / "src"))
+else:
+    pass
 
-from fatebridge.core.sukuyo_printed_special import KYOTO_ENPO_SOURCE
-from fatebridge.core.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.sukuyo_printed_special import KYOTO_ENPO_SOURCE
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 
 def verify_kyoto_enpo(captures: Path | None = None) -> dict[str, Any]:
@@ -31,9 +33,13 @@ def verify_kyoto_enpo(captures: Path | None = None) -> dict[str, Any]:
     ]
     if groups != fixture["accepted_rows_by_group"]:
         errors.append("accepted_rows_changed")
+    else:
+        pass
     accepted = sum(r["mansion"] is not None for r in rows)
     if len(rows) != 21 or accepted != 20:
         errors.append("selected_positions_or_unresolved_slot_lost")
+    else:
+        pass
     earth = next(r for r in rows if r["label"] == "金刚峰" and r["weekday_index"] == 6)
     if (
         earth["literal_mansion"] is not None
@@ -41,6 +47,8 @@ def verify_kyoto_enpo(captures: Path | None = None) -> dict[str, Any]:
         or earth["literal_mansion_candidates"] != ["元", "亢"]
     ):
         errors.append("unresolved_earth_glyph_promoted")
+    else:
+        pass
     clock = source["clock_reference"]
     if (
         clock["accepted_complete_diplomatic_transcription"] is not None
@@ -50,6 +58,8 @@ def verify_kyoto_enpo(captures: Path | None = None) -> dict[str, Any]:
         or clock["source_efficacy_claim_is_empirical_evidence"]
     ):
         errors.append("selected_reference_promoted")
+    else:
+        pass
     images = {r["file"]: r["sha256"] for r in reference["images"]}
     if (
         images != fixture["source_images_sha256"]
@@ -57,6 +67,8 @@ def verify_kyoto_enpo(captures: Path | None = None) -> dict[str, Any]:
         or reference["raw_reading_files_sha256"] != fixture["raw_reading_files_sha256"]
     ):
         errors.append("source_binding_changed")
+    else:
+        pass
     checked = 0
     if captures:
         files = {
@@ -67,12 +79,16 @@ def verify_kyoto_enpo(captures: Path | None = None) -> dict[str, Any]:
         for name, expected in files.items():
             if hashlib.sha256((captures / name).read_bytes()).hexdigest() != expected:
                 raise ValueError(f"Selected Kyoto evidence bytes changed: {name}")
+            else:
+                pass
             checked += 1
         manifest = json.loads(
             (captures / "kyoto-RB00017017-manifest.json").read_bytes()
         )
         if len(manifest["items"]) != 80:
             errors.append("manifest_extent_changed")
+        else:
+            pass
         for row in reference["images"]:
             canvas = manifest["items"][row["frame"] - 1]
             body = canvas["items"][0]["items"][0]["body"]
@@ -81,6 +97,10 @@ def verify_kyoto_enpo(captures: Path | None = None) -> dict[str, Any]:
                 or body["service"][0]["id"] + "/full/max/0/default.jpg" != row["url"]
             ):
                 errors.append(["image_not_bound_to_manifest_service", row["frame"]])
+            else:
+                pass
+    else:
+        pass
     return {
         "format": "sukuyo_kyoto_enpo_selected_check_v1",
         "source_bundle_sha256": loaded.sha256,
@@ -115,3 +135,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

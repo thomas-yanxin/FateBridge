@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import human_design_interval_extrema as extrema
-from fatebridge.core.human_design_sensitivity import (
+from fatebridge.core.human_design import human_design_interval_extrema as extrema
+from fatebridge.core.human_design.human_design_sensitivity import (
     METHOD,
     assess_birth_interval,
 )
@@ -18,7 +18,9 @@ CASES = ("maximum", "minimum", "wrap_maximum", "grid_zero_maximum")
 
 
 @pytest.mark.parametrize("case_id", CASES)
-def test_synthetic_reader_matches_every_independently_frozen_binary64_scalar(case_id):
+def test_synthetic_reader_matches_every_independently_frozen_binary64_scalar(
+    case_id,
+) -> None:
     reference = json.loads((EVIDENCE / "interval-rational-reference.json").read_text())
     case = next(c for c in reference["cases"] if c["id"] == case_id)
     at, _, _, _ = model(case_id)
@@ -33,7 +35,9 @@ def test_synthetic_reader_matches_every_independently_frozen_binary64_scalar(cas
 
 
 @pytest.mark.parametrize("case_id", CASES)
-def test_frozen_coordinate_states_are_retained_without_supplying_the_peak(case_id):
+def test_frozen_coordinate_states_are_retained_without_supplying_the_peak(
+    case_id,
+) -> None:
     at, origin, peak, calls = model(case_id)
     result = assess_birth_interval(at(origin), 1, "true", _chart_reader=at)
     samples = result["evaluation_witnesses"]["samples"]
@@ -65,7 +69,9 @@ def test_frozen_coordinate_states_are_retained_without_supplying_the_peak(case_i
 
 
 @pytest.mark.parametrize("budget", [0, 1, 2])
-def test_budget_exhaustion_retains_every_partial_full_chart(monkeypatch, budget):
+def test_budget_exhaustion_retains_every_partial_full_chart(
+    monkeypatch: pytest.MonkeyPatch, budget: int
+) -> None:
     monkeypatch.setattr(extrema, "MAX_ADDITIONAL_EVALUATIONS", budget)
     at, origin, _, calls = model("grid_zero_maximum")
     result = assess_birth_interval(at(origin), 1, "true", _chart_reader=at)
@@ -91,8 +97,8 @@ def test_budget_exhaustion_retains_every_partial_full_chart(monkeypatch, budget)
     ],
 )
 def test_grid_zero_groups_and_search_boundary_do_not_invent_sign_changes(
-    speeds, kind, component
-):
+    speeds, kind: str, component
+) -> None:
     rows = extrema.zero_speed_components(
         [0.0, 1.0, 2.0, 3.0],
         "personality",

@@ -8,13 +8,13 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.liuyao_complex import SCAN
-from fatebridge.core.liuyao_judgment import build_conditional_analysis
+from fatebridge.core.liuyao.liuyao_complex import SCAN
+from fatebridge.core.liuyao.liuyao_judgment import build_conditional_analysis
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from fatebridge.core.requests.divination import SixYaoRequest
 from fatebridge.utils.timezones import parse_timezone_name
 from scripts.liuyao.build_liuyao_scan_profile import build
-from tests.liuyao.test_liuyao_conditions import mounted
+from tests.unit_test.fixtures.liuyao import mounted_lines as mounted
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_scan_v3"
 CASES = json.loads((REFERENCE / "cases.json").read_text())["cases"]
@@ -40,7 +40,7 @@ def classical(case, **overrides):
     return build_conditional_analysis(**{**inputs, **overrides})
 
 
-def test_original_scan_hash_and_reviewed_claims_are_frozen():
+def test_original_scan_hash_and_reviewed_claims_are_frozen() -> None:
     assert build() == SCAN
     freeze = json.loads((REFERENCE / "freeze.json").read_text())
     for name, expected in freeze["sha256"].items():
@@ -58,7 +58,7 @@ def test_original_scan_hash_and_reviewed_claims_are_frozen():
     )
 
 
-def test_original_changed_official_is_not_the_original_same_position_line():
+def test_original_changed_official_is_not_the_original_same_position_line() -> None:
     case = CASES[0]
     result = classical(case)
     assert {
@@ -78,7 +78,7 @@ def test_original_changed_official_is_not_the_original_same_position_line():
     }
 
 
-def test_actual_changed_parent_prevents_premature_hidden_search():
+def test_actual_changed_parent_prevents_premature_hidden_search() -> None:
     result = build_sixyao_result(
         **INPUT, gua_code="100000", changed_code="100100", focus_kinship="父母"
     )
@@ -108,7 +108,7 @@ def test_actual_changed_parent_prevents_premature_hidden_search():
     )
 
 
-def test_printed_inner_wood_and_outer_metal_keep_scoped_mixed_members():
+def test_printed_inner_wood_and_outer_metal_keep_scoped_mixed_members() -> None:
     case = CASES[1]
     harmony = classical(case)["three_harmony"]
     for pattern, expected in case["expected_formations"].items():
@@ -133,7 +133,7 @@ def test_printed_inner_wood_and_outer_metal_keep_scoped_mixed_members():
     assert "score" not in harmony and "auspicious" not in harmony
 
 
-def test_static_three_branches_are_not_activated_by_their_names():
+def test_static_three_branches_are_not_activated_by_their_names() -> None:
     water = next(
         r
         for r in classical(CASES[2])["three_harmony"]["candidates"]
@@ -143,7 +143,7 @@ def test_static_three_branches_are_not_activated_by_their_names():
     assert water["status"] == CASES[2]["expected_water_status"]
 
 
-def test_two_active_missing_branch_retains_calendar_completion_condition():
+def test_two_active_missing_branch_retains_calendar_completion_condition() -> None:
     case = CASES[3]
     result = classical(case)
     water = next(
@@ -165,7 +165,7 @@ def test_two_active_missing_branch_retains_calendar_completion_condition():
     assert candidate["status"] == "day_month_completion_candidate"
 
 
-def test_scoped_changed_completion_does_not_keep_claiming_missing_only():
+def test_scoped_changed_completion_does_not_keep_claiming_missing_only() -> None:
     result = build_sixyao_result(**INPUT, gua_code="100000", changed_code="001000")
     candidates = result["liuyao_evidence"]["conditional_analysis"]["three_harmony"][
         "candidates"
@@ -183,7 +183,7 @@ def test_scoped_changed_completion_does_not_keep_claiming_missing_only():
     assert set(water["completion_paths"]) <= {r["candidate_id"] for r in candidates}
 
 
-def test_flying_and_hidden_conditions_remain_separate_from_final_use():
+def test_flying_and_hidden_conditions_remain_separate_from_final_use() -> None:
     # Printed 姤 structure on PDF109: 寅财伏于亥水之下, 飞来生伏.
     result = build_sixyao_result(
         **INPUT,
@@ -217,7 +217,7 @@ def test_flying_and_hidden_conditions_remain_separate_from_final_use():
 
 
 @pytest.mark.parametrize("kind", ["month", "day"])
-def test_explicit_calendar_focus_has_no_fake_line_position(kind):
+def test_explicit_calendar_focus_has_no_fake_line_position(kind: str) -> None:
     result = build_sixyao_result(
         **INPUT, gua_code="111111", focus_kind=kind, timing_days=2
     )
@@ -245,7 +245,7 @@ def test_explicit_calendar_focus_has_no_fake_line_position(kind):
         {"focus_kind": "change"},
     ],
 )
-def test_bad_or_unavailable_focus_does_not_fall_back_to_another_location(bad):
+def test_bad_or_unavailable_focus_does_not_fall_back_to_another_location(bad) -> None:
     with pytest.raises(ValueError):
         build_sixyao_result(**INPUT, gua_code="111111", **bad)
 
@@ -259,12 +259,12 @@ def test_bad_or_unavailable_focus_does_not_fall_back_to_another_location(bad):
         {"focus_kind": "unknown"},
     ],
 )
-def test_focus_location_contract_is_strict(bad):
+def test_focus_location_contract_is_strict(bad) -> None:
     with pytest.raises(ValidationError):
         SixYaoRequest.model_validate({**INPUT, **bad})
 
 
-def test_scan_profile_return_is_not_a_mutable_global():
+def test_scan_profile_return_is_not_a_mutable_global() -> None:
     result = build_sixyao_result(**INPUT, gua_code="111111")
     result["liuyao_evidence"]["conditional_analysis"]["classical_scan"]["source"][
         "sha256"
@@ -277,7 +277,7 @@ def test_scan_profile_return_is_not_a_mutable_global():
     )
 
 
-def test_zero_coordinates_are_reported_as_supplied_not_as_missing():
+def test_zero_coordinates_are_reported_as_supplied_not_as_missing() -> None:
     result = build_sixyao_result(**INPUT, gua_code="111111", lon=0, lat=0)
     assert "经纬度：0 0" in result["snapshot_text"]
     assert result["input_normalized"]["lon"] == 0

@@ -8,8 +8,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from ...utils.birth_input import normalize_gender
-from .common import MetaphysicsSeed
+from fatebridge.core.metaphysics.common import MetaphysicsSeed
+from fatebridge.core.metaphysics.jinkou import build_jinkou_board
+from fatebridge.utils.birth_input import normalize_gender
 
 CYCLE = tuple(
     "甲乙丙丁戊己庚辛壬癸"[i % 10] + "子丑寅卯辰巳午未申酉戌亥"[i % 12]
@@ -110,7 +111,6 @@ def build_jinkou_year_fate(
     natal_branch: str | None,
     is_diurnal: bool | None,
 ) -> dict[str, Any]:
-    from .jinkou import build_jinkou_board
 
     natal = confirmed_natal_branch(birth_year_ganzhi, natal_branch, age)
     result = ordinal_year_fate(

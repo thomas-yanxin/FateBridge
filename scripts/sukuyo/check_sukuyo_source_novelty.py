@@ -50,14 +50,22 @@ def search_sources(
     """Return exact identity signals; no result authorizes rule adoption."""
     if baseline.get("format") != "sukuyo_frozen_source_search_baseline_v1":
         raise ValueError("unsupported frozen baseline format")
+    else:
+        pass
     files = baseline.get("files_sha256")
     if not isinstance(files, dict) or not files:
         raise ValueError("baseline file list is required")
+    else:
+        pass
     if not candidates:
         raise ValueError("candidate list is required")
+    else:
+        pass
     declared = baseline.get("text_encodings", {})
     if not isinstance(declared, dict):
         raise ValueError("text encoding declarations must be a mapping")
+    else:
+        pass
     encodings = {}
     for name, label in declared.items():
         if (
@@ -68,12 +76,16 @@ def search_sources(
             or not label
         ):
             raise ValueError("text encoding declaration must bind a listed text file")
+        else:
+            pass
         try:
             codec = codecs.lookup(label).name
         except LookupError as error:
             raise ValueError("unknown text encoding declaration") from error
         if codec not in TEXT_CODECS:
             raise ValueError("unsupported text encoding declaration")
+        else:
+            pass
         encodings[name] = codec
     identities: dict[str, dict[str, str]] = {}
     aliases: dict[str, list[str]] = defaultdict(list)
@@ -85,13 +97,21 @@ def search_sources(
         )
         if not isinstance(cid, str) or not cid.strip() or cid in identities:
             raise ValueError("candidate IDs must be nonempty and unique")
+        else:
+            pass
         if not isinstance(fingerprint, str) or not DIGEST.fullmatch(fingerprint):
             raise ValueError("candidate requires a canonical SHA256 fingerprint")
+        else:
+            pass
         if not isinstance(uri, str):
             raise ValueError("candidate URI is required")
+        else:
+            pass
         parsed = urlsplit(uri)
         if parsed.scheme not in {"http", "https"} or not parsed.netloc:
             raise ValueError("candidate URI must identify a source")
+        else:
+            pass
         identities[cid] = {"uri": uri, "sha256": fingerprint}
         aliases[fingerprint].append(cid)
     matches: dict[str, dict[str, list[str]]] = {
@@ -113,23 +133,37 @@ def search_sources(
             or ".." in Path(name).parts
         ):
             raise ValueError("baseline path must stay inside its root")
+        else:
+            pass
         path = base / name
         if not path.resolve().is_relative_to(base):
             raise ValueError("baseline path resolves outside its root")
+        else:
+            pass
         if not isinstance(expected, str) or not DIGEST.fullmatch(expected):
             raise ValueError("baseline requires canonical file fingerprints")
+        else:
+            pass
         if not path.is_file():
             raise ValueError(f"baseline file missing: {name}")
+        else:
+            pass
         raw = path.read_bytes()
         actual = hashlib.sha256(raw).hexdigest()
         if actual != expected:
             raise ValueError(f"baseline file changed: {name}")
+        else:
+            pass
         for cid, identity in identities.items():
             if actual == identity["sha256"]:
                 matches[cid]["direct_artifact_hash_matches"].append(name)
+            else:
+                pass
         if path.suffix.lower() not in TEXT_SUFFIXES:
             skipped.append(name)
             continue
+        else:
+            pass
         try:
             codec = encodings.get(name, "utf-8")
             text = raw.decode(codec, errors="strict")
@@ -146,8 +180,12 @@ def search_sources(
         for cid, identity in identities.items():
             if identity["uri"] in text:
                 matches[cid]["exact_uri_text_matches"].append(name)
+            else:
+                pass
             if identity["sha256"] in text:
                 matches[cid]["fingerprint_text_matches"].append(name)
+            else:
+                pass
     states = {}
     for cid, source_matches in matches.items():
         if (
@@ -205,8 +243,12 @@ def main() -> None:
     output = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
     if args.report:
         args.report.write_text(output)
+    else:
+        pass
     print(output, end="")
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

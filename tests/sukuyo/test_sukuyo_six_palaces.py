@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_six_palaces import SOURCE, six_palace_reference
+from fatebridge.core.sukuyo.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_six_palaces import SOURCE, six_palace_reference
 from fatebridge.services.tool_catalog import CATALOG
 
 PRIMARY = json.loads(
@@ -15,7 +15,7 @@ PRIMARY = json.loads(
 )
 
 
-def test_primary_counting_and_annotation_examples_are_not_generated_oracles():
+def test_primary_counting_and_annotation_examples_are_not_generated_oracles() -> None:
     reference = six_palace_reference("娄")
     assert reference["counting_excerpt"] in PRIMARY["paragraph"]
     assert (
@@ -40,7 +40,9 @@ def test_primary_counting_and_annotation_examples_are_not_generated_oracles():
 
 
 @pytest.mark.parametrize("natal", SU27_ORDER)
-def test_each_natal_reference_keeps_six_distinct_positions_without_event_claim(natal):
+def test_each_natal_reference_keeps_six_distinct_positions_without_event_claim(
+    natal,
+) -> None:
     result = six_palace_reference(natal)
     assert result["status"] == "natal_reference"
     assert result["members"][0]["mansion"] == natal
@@ -51,12 +53,14 @@ def test_each_natal_reference_keeps_six_distinct_positions_without_event_claim(n
 
 
 @pytest.mark.parametrize("natal", ["牛", "", "角亢", "命", 0, True])
-def test_unverified_or_non_single_mansion_inputs_are_rejected(natal):
+def test_unverified_or_non_single_mansion_inputs_are_rejected(
+    natal: bool | int | str,
+) -> None:
     with pytest.raises(ValueError):
         six_palace_reference(natal)
 
 
-def test_no_natal_input_is_not_replaced_by_target_mansion_and_aliases_work():
+def test_no_natal_input_is_not_replaced_by_target_mansion_and_aliases_work() -> None:
     plain = day_evidence(calendar_mansion("2025-03-04"))
     assert plain["day_mansion"] == "毕"
     assert plain["six_palace_reference"]["status"] == "natal_mansion_required"
@@ -71,7 +75,9 @@ def test_no_natal_input_is_not_replaced_by_target_mansion_and_aliases_work():
     )
 
 
-def test_reference_does_not_depend_on_target_date_or_raise_negative_day_trigger():
+def test_reference_does_not_depend_on_target_date_or_raise_negative_day_trigger() -> (
+    None
+):
     days = [
         day_evidence(calendar_mansion(value), "娄", "social")
         for value in ["2025-02-20", "2025-03-04", "2025-03-24"]
@@ -91,7 +97,7 @@ def test_reference_does_not_depend_on_target_date_or_raise_negative_day_trigger(
         )
 
 
-def test_natal_positions_survive_unresolved_or_incomplete_target_calendar():
+def test_natal_positions_survive_unresolved_or_incomplete_target_calendar() -> None:
     leap = day_evidence(
         calendar_mansion(
             "2017-06-24", zone="+09:00", calendar_basis="japanese_hutime_1002_1_utc09"
@@ -109,7 +115,9 @@ def test_natal_positions_survive_unresolved_or_incomplete_target_calendar():
     assert result["personal_day"] is None
 
 
-def test_returned_nested_data_is_detached_and_public_projection_schema_is_typed():
+def test_returned_nested_data_is_detached_and_public_projection_schema_is_typed() -> (
+    None
+):
     first = six_palace_reference("娄")
     first["members"][0]["mansion"] = "牛"
     first["joint_reading_requirement"]["evaluated"] = True

@@ -12,8 +12,8 @@ from decimal import Decimal, localcontext
 
 from fatebridge.core.classical_western import (
     LOTS,
-    _sign_of_longitude,
     almuten_of,
+    build_lots_layer,
     compute_lot,
     dignity_lords_at,
 )
@@ -36,7 +36,7 @@ _SIGNS = [
 _CHALDEAN = ["Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon"]
 
 
-def test_almuten_winner_is_always_one_of_the_degree_dignity_lords():
+def test_almuten_winner_is_always_one_of_the_degree_dignity_lords() -> None:
     for sign in _SIGNS:
         for tenth in range(300):
             degree = tenth / 10.0
@@ -46,7 +46,7 @@ def test_almuten_winner_is_always_one_of_the_degree_dignity_lords():
                 assert result["winner"] in lords, (sign, degree, is_day)
 
 
-def test_almuten_tiebreak_prefers_chaldean_earliest():
+def test_almuten_tiebreak_prefers_chaldean_earliest() -> None:
     # Aries 24° by day: Mars (domicile 5 + term 2 = 7) ties Sun (exalt 4 + trip 3
     # = 7). Mars precedes Sun in the Chaldean order, so Mars wins — matching
     # horosa's computeAlmuten (first-max over CLASSICAL_PLANETS).
@@ -57,7 +57,7 @@ def test_almuten_tiebreak_prefers_chaldean_earliest():
     assert _CHALDEAN.index("Mars") < _CHALDEAN.index("Sun")
 
 
-def test_arabic_lot_table_frozen_to_canonical_formulas():
+def test_arabic_lot_table_frozen_to_canonical_formulas() -> None:
     # The allowed lots' day/night marker formulas (horosa data/lots.js §1.5).
     expected = {
         "fortune": (["asc", "moon", "sun"], ["asc", "sun", "moon"]),
@@ -71,7 +71,7 @@ def test_arabic_lot_table_frozen_to_canonical_formulas():
         assert LOTS[lot_id]["night"] == night, lot_id
 
 
-def test_compute_lot_is_exact_modular_arithmetic():
+def test_compute_lot_is_exact_modular_arithmetic() -> None:
     # Independent exact decimal arithmetic; do not lock a lossy double-modulo implementation.
     for k in range(60):
         v = {
@@ -93,16 +93,22 @@ def test_compute_lot_is_exact_modular_arithmetic():
                     ) % 360
                     if exact < 0:
                         exact += 360
+                    else:
+                        pass
                     expected = float(exact)
                     if expected == 360.0:
                         expected = math.nextafter(360.0, 0.0)
+                    else:
+                        pass
                 assert compute_lot(formula, v) == expected
 
 
-def test_dignity_lords_at_has_all_five_rulers_off_node_signs():
+def test_dignity_lords_at_has_all_five_rulers_off_node_signs() -> None:
     # Every degree resolves a term & face lord; domicile/triplicity always set.
     for sign in _SIGNS:
         lords = dignity_lords_at(sign, 15.0, True)
         assert lords["domicile"] and lords["triplicity"]
         assert lords["term"] and lords["face"]
-        assert _sign_of_longitude((_SIGNS.index(sign)) * 30 + 15.0) == sign
+        longitude = _SIGNS.index(sign) * 30.0 + 15.0
+        lots = build_lots_layer({"asc": longitude, "moon": 0.0, "sun": 0.0}, True)
+        assert lots["fortune"]["sign"] == sign

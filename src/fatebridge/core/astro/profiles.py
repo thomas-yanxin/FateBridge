@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Mapping, Optional
+from typing import Any, Mapping
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.reference import (
@@ -40,8 +40,8 @@ def physical_ephemeris_summary(models: Mapping[str, str]) -> str:
 
 
 def _derive_engine_profile(
-    *profiles: Optional[Dict[str, Any]],
-) -> Dict[str, str]:
+    *profiles: dict[str, Any] | None,
+) -> dict[str, str]:
     precisions = {
         str(profile["engine_precision"])
         for profile in profiles
@@ -87,12 +87,12 @@ def _precision_label_zh(engine_precision: str) -> str:
 
 
 def _precision_label_from_profiles(
-    *profiles: Optional[Dict[str, Any]],
+    *profiles: dict[str, Any] | None,
 ) -> str:
     return _precision_label_zh(_derive_engine_profile(*profiles)["engine_precision"])
 
 
-def _coerce_house_system_code(hsys: object) -> Optional[int]:
+def _coerce_house_system_code(hsys: object) -> int | None:
     """Translate a user-facing house-system identifier into the internal 0-8 code.
 
     Accepts:
@@ -114,7 +114,7 @@ def _coerce_house_system_code(hsys: object) -> Optional[int]:
         return None
 
 
-def _resolve_offline_house_system(hsys: Any, *, context_label: str) -> Dict[str, Any]:
+def _resolve_offline_house_system(hsys: Any, *, context_label: str) -> dict[str, Any]:
     resolved = _coerce_house_system_code(hsys)
     if resolved is None or resolved not in RELATIVE_HOUSE_SYSTEM_SPECS:
         raise ValueError(
@@ -127,7 +127,7 @@ def _resolve_offline_house_system(hsys: Any, *, context_label: str) -> Dict[str,
     return {"value": resolved, **RELATIVE_HOUSE_SYSTEM_SPECS[resolved]}
 
 
-def _resolve_relative_house_system(hsys: Any) -> Dict[str, Any]:
+def _resolve_relative_house_system(hsys: Any) -> dict[str, Any]:
     return _resolve_offline_house_system(hsys, context_label="relative 关系盘")
 
 
@@ -135,7 +135,7 @@ def _resolve_core_chart_house_system(
     hsys: Any,
     *,
     chart_variant: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     if hsys in (None, ""):
         default_house_system = CORE_CHART_DEFAULT_HOUSE_SYSTEMS[chart_variant]
         # These defaults use the local house layout without a Swiss house code.
@@ -175,7 +175,7 @@ def _resolve_offline_zodiacal_mode(
     zodiacal: Any,
     *,
     context_label: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     try:
         resolved = int(zodiacal)
     except (TypeError, ValueError):
@@ -194,7 +194,7 @@ def _resolve_offline_zodiacal_mode(
     }
 
 
-def _resolve_relative_zodiacal_mode(zodiacal: Any) -> Dict[str, Any]:
+def _resolve_relative_zodiacal_mode(zodiacal: Any) -> dict[str, Any]:
     return _resolve_offline_zodiacal_mode(
         zodiacal,
         context_label="relative 关系盘",
@@ -205,7 +205,7 @@ def _resolve_core_chart_zodiacal_mode(
     zodiacal: Any,
     *,
     chart_variant: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     if zodiacal in (None, ""):
         return {
             **_resolve_offline_zodiacal_mode(
@@ -224,11 +224,11 @@ def _resolve_core_chart_zodiacal_mode(
 
 
 def _relative_zodiac_profile_overrides(
-    zodiacal_info: Dict[str, Any],
+    zodiacal_info: dict[str, Any],
     *,
-    ayanamsha: Optional[float] = None,
-) -> Dict[str, Any]:
-    overrides: Dict[str, Any] = {
+    ayanamsha: float | None = None,
+) -> dict[str, Any]:
+    overrides: dict[str, Any] = {
         "zodiac": zodiacal_info["zodiac"],
         "zodiacal": zodiacal_info["value"],
         "zodiac_label_zh": zodiacal_info["label_zh"],

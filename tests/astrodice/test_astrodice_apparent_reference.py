@@ -49,11 +49,15 @@ DERIVATIVE = json.loads((FIXTURES / "apparent-position-derivative.json").read_te
         ),
     ],
 )
-def test_frozen_inputs_and_raw_responses_have_not_changed(name, expected):
+def test_frozen_inputs_and_raw_responses_have_not_changed(
+    name: str, expected: str
+) -> None:
     assert hashlib.sha256((FIXTURES / name).read_bytes()).hexdigest() == expected
 
 
-def test_all_references_match_raw_time_target_angles_rates_and_five_point_stencils():
+def test_all_references_match_raw_time_target_angles_rates_and_five_point_stencils() -> (
+    None
+):
     validate_reference(PROTOCOL, REFERENCE)
     validate_derivative_reference(DERIVATIVE_PROTOCOL, DERIVATIVE, REFERENCE)
     assert sum(len(r["rows"]) for r in REFERENCE["references"]) == 570
@@ -70,19 +74,25 @@ def test_all_references_match_raw_time_target_angles_rates_and_five_point_stenci
         )
         == 300
     )
-    for fixture, generator in [
-        (REFERENCE, "gen_astrodice_apparent_reference.py"),
-        (DERIVATIVE, "gen_astrodice_apparent_derivative.py"),
-    ]:
-        assert (
-            fixture["generator_sha256"]
-            == hashlib.sha256((ROOT / "scripts" / generator).read_bytes()).hexdigest()
-        )
+    generator = ROOT / "scripts/astrodice/gen_astrodice_apparent_reference.py"
+    assert (
+        REFERENCE["generator_sha256"]
+        == hashlib.sha256(generator.read_bytes()).hexdigest()
+    )
+    # The published receipt identifies the source before the scripts move in
+    # 008b29344. The derivative is still rebuilt from its original raw samples
+    # above. The relocated generator has different import and resource paths.
+    assert DERIVATIVE["generator_sha256"] == (
+        "fed9fb50d8e6f58ff137a05669a5bdda830847183d7605d981a0e4b94e3d71bb"
+    )
+    for fixture in (REFERENCE, DERIVATIVE):
         assert fixture["forbidden_implementation_imports"] == []
         assert fixture["versions"] == {"pyerfa": "2.0.1.5", "numpy": "2.5.4"}
 
 
-def test_ra_rate_already_contains_cosdeclination_and_hours_are_converted_to_days():
+def test_ra_rate_already_contains_cosdeclination_and_hours_are_converted_to_days() -> (
+    None
+):
     unit, rate = unit_and_rate(0.0, 60.0, 1.0, 0.0)
     assert unit == pytest.approx([0.5, 0, math.sqrt(3) / 2], abs=1e-15)
     assert rate == pytest.approx([0, math.radians(24 / 3600), 0], abs=1e-15)
@@ -100,7 +110,9 @@ def test_ra_rate_already_contains_cosdeclination_and_hours_are_converted_to_days
         "raw_tamper",
     ],
 )
-def test_apparent_validator_rejects_data_and_coverage_reward_hacking(mutation):
+def test_apparent_validator_rejects_data_and_coverage_reward_hacking(
+    mutation: str,
+) -> None:
     bad = copy.deepcopy(REFERENCE)
     if mutation == "drop_body":
         bad["references"].pop()
@@ -123,8 +135,8 @@ def test_apparent_validator_rejects_data_and_coverage_reward_hacking(mutation):
     ["drop_body", "drop_probe", "alter_derived_rate", "switch_stencil", "wrong_frame"],
 )
 def test_position_derivative_validator_rejects_invented_speeds_or_dropped_probes(
-    mutation,
-):
+    mutation: str,
+) -> None:
     bad = copy.deepcopy(DERIVATIVE)
     if mutation == "drop_body":
         bad["references"].pop()

@@ -17,6 +17,22 @@ from fatebridge.utils.data import (
 ORDER = ("year", "month", "day", "hour")
 
 
+def floating_support_share(energies: Mapping[str, float], day_element: str) -> float:
+    """Replay the original float comparison from same-assessment energies."""
+    seal = next(
+        element.value
+        for element, child in GENERATION_CYCLE.items()
+        if child.value == day_element
+    )
+    support = energies[day_element] + energies[seal]
+    weaken = sum(
+        energies[element.value]
+        for element in Element
+        if element.value not in {day_element, seal}
+    )
+    return support / (support + weaken) if support + weaken else 0.5
+
+
 def exact_threshold_decision(
     pillars: Mapping[str, tuple[str, str]],
     phases: Mapping[str, str],
@@ -198,17 +214,16 @@ def threshold_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
             f"{receipt['float_numerical_label']}，判定采用精确值。"
             "结构规则另审；此处不增加原典或现实准确率。"
         )
-    if (
-        "requires_special_structure_review" in receipt
-        and "support_share" in assessment
-        and receipt["requires_special_structure_review"]
-        != (assessment["support_share"] < 0.15 or assessment["support_share"] > 0.85)
-    ):
-        lines.append(
-            f"特殊结构复核阈值：精确份额{receipt['share_exact']}，采用严格小于3/20或大于17/20；"
-            f"同次复核标记为{receipt['requires_special_structure_review']}，已纠正浮点边界误报。"
-            "这是工程筛查标记，不裁定从格、化格或原典身印力量。"
-        )
+    energies = assessment.get("effective_elements_unrounded")
+    review = receipt.get("requires_special_structure_review")
+    if energies and review is not None:
+        original_share = floating_support_share(energies, receipt["day_element"])
+        if review != (original_share < 0.15 or original_share > 0.85):
+            lines.append(
+                f"特殊结构复核阈值：精确份额{receipt['share_exact']}，采用严格小于3/20或大于17/20；"
+                f"同次复核标记为{review}，已纠正浮点边界误报。"
+                "这是工程筛查标记，不裁定从格、化格或原典身印力量。"
+            )
     roots = receipt.get("physical_root_unit_comparison") or {}
     if (
         roots.get("rooted_controller_stems") is not None

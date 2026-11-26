@@ -4,9 +4,9 @@ from copy import deepcopy
 
 import pytest
 
-from fatebridge.core.human_design_cycles import origin_source_evidence
-from fatebridge.validation.human_design import verify_human_design_reading
+from fatebridge.core.human_design.human_design_cycles import origin_source_evidence
 from tests.support.human_design_current import complete_run
+from validation.human_design import verify_human_design_reading
 
 
 @pytest.fixture(scope="module")
@@ -22,7 +22,9 @@ def complete():
     )
 
 
-def test_explicit_birth_wording_and_personality_epoch_binding_are_separate(complete):
+def test_explicit_birth_wording_and_personality_epoch_binding_are_separate(
+    complete,
+) -> None:
     context = complete["cycle_context"]
     summary = complete["cycle_summary"]
     assert context["ruleset"]["version"] == "1.6.0"
@@ -71,7 +73,7 @@ def test_explicit_birth_wording_and_personality_epoch_binding_are_separate(compl
         "false_legacy",
     ],
 )
-def test_source_and_priority_forgeries_are_rejected(complete, mutation):
+def test_source_and_priority_forgeries_are_rejected(complete, mutation: str) -> None:
     run = deepcopy(complete)
     context = run["cycle_context"]
     if mutation == "unknown_version":
@@ -103,7 +105,7 @@ def test_source_and_priority_forgeries_are_rejected(complete, mutation):
         }
 
 
-def test_returned_origin_evidence_cannot_change_the_source_catalogue():
+def test_returned_origin_evidence_cannot_change_the_source_catalogue() -> None:
     first = origin_source_evidence("Uranus")
     first["source"]["heading"] = "tampered"
     first["source_origin"] = "design"

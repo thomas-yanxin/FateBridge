@@ -8,12 +8,33 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_literal_candidates as subject
-from fatebridge.core.guolao_calendar_year import gujin_fixed_qice_year
-from fatebridge.core.guolao_cumulative_table import gujin_literal_lunar
-from fatebridge.validation.guolao_literal_candidates import audit_literal_candidate_grid
+from fatebridge.core.guolao import guolao_literal_candidates as subject
+from fatebridge.core.guolao.guolao_calendar_year import gujin_fixed_qice_year
+from fatebridge.core.guolao.guolao_cumulative_table import gujin_literal_lunar
+from validation.guolao_literal_candidates import audit_literal_candidate_grid
+from validation.guolao_witnesses import audit_gujin45_witness_variants
 
 ROOT = Path(__file__).parents[2]
+
+
+def test_targeted_witness_readings_preserve_the_frozen_cells():
+    audit = audit_gujin45_witness_variants()
+    assert audit["source_data_sha256"] == (
+        "3320958d164bb4a8aa08a2ccaa5925d8304f2ebec9e46186296dce7ffaf8dece"
+    )
+    assert audit["additional_readings"] == 18
+    assert [
+        (cell["field"], cell["limit_index"], cell["distinct_observed_values"])
+        for cell in audit["cells"]
+    ] == [
+        ("day_rate_days", 90, ["7.2807", "7.3607"]),
+        ("day_rate_days", 154, ["12.6292", "12.6392"]),
+        ("day_rate_days", 166, ["13.6333"]),
+        ("signed_increment_ancient_du", 12, ["0.10225075", "0.10255075"]),
+        ("signed_increment_ancient_du", 155, ["-0.10225075"]),
+        ("signed_increment_ancient_du", 163, ["-0.10817275"]),
+    ]
+    assert all(cell["computational_override"] is None for cell in audit["cells"])
 
 
 @pytest.mark.parametrize(
@@ -28,18 +49,22 @@ ROOT = Path(__file__).parents[2]
     ],
 )
 def test_declared_endpoint_policy_keeps_every_applicable_original_segment(
-    within, indices
-):
+    within: str, indices
+) -> None:
     result = subject.literal_lunar_candidates(F(within))
     assert result["candidate_limit_indices"] == indices
     assert [r["whole_limit_index"] for r in result["candidates"]] == indices
     assert not result["source_lookup_adjudicated"]
     if len(indices) > 1:
         assert result["strict_lookup"]["whole_limit_index"] is None
+    else:
+        pass
 
 
 @pytest.mark.parametrize("slow", [False, True])
-def test_independent_exact_arithmetic_preserves_negative_interpolation(slow):
+def test_independent_exact_arithmetic_preserves_negative_interpolation(
+    slow: bool,
+) -> None:
     anomaly = F("7.29") + (F("13.7773") if slow else F())
     result = subject.literal_lunar_candidates(anomaly)
     # Literal cells from the existing single-collator transcription; this is
@@ -76,8 +101,8 @@ def test_independent_exact_arithmetic_preserves_negative_interpolation(slow):
     "anomaly", ["0", ".041", "1.025", "12.7522", "13.7363", "13.7773", "13.8183"]
 )
 def test_unique_lookup_arithmetic_matches_strict_including_empty_origins_and_endpoint(
-    anomaly,
-):
+    anomaly: str,
+) -> None:
     strict = gujin_literal_lunar(F(anomaly))
     candidate = subject.literal_lunar_candidates(F(anomaly))["candidates"]
     assert len(candidate) == 1
@@ -102,7 +127,7 @@ def ordinary_year():
 
 def test_unique_branch_retains_strict_calendar_and_only_civil_shared_facts(
     ordinary_year,
-):
+) -> None:
     r = ordinary_year
     assert r["strict_calendar"] == gujin_fixed_qice_year(
         F("88753.8789"), conjunction_method="literal_table"
@@ -129,7 +154,7 @@ def test_unique_branch_retains_strict_calendar_and_only_civil_shared_facts(
 
 def test_disagreeing_branch_does_not_copy_first_but_preserves_unaffected_fields(
     ordinary_year,
-):
+) -> None:
     a = copy.deepcopy(ordinary_year["branches"][0])
     b = copy.deepcopy(a)
     b["branch_id"] = 1
@@ -149,7 +174,7 @@ def test_disagreeing_branch_does_not_copy_first_but_preserves_unaffected_fields(
 
 def test_incomplete_branch_is_not_dropped_or_counted_as_whole_year_consensus(
     ordinary_year,
-):
+) -> None:
     a = copy.deepcopy(ordinary_year["branches"][0])
     b = copy.deepcopy(a)
     b["branch_id"] = 1
@@ -164,7 +189,9 @@ def test_incomplete_branch_is_not_dropped_or_counted_as_whole_year_consensus(
     assert r["shared_civil_facts"]["months"][2]["length_days"] is None
 
 
-def test_missing_conjunction_branch_survives_into_unresolved_calendar(monkeypatch):
+def test_missing_conjunction_branch_survives_into_unresolved_calendar(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = subject.literal_conjunction_candidates
 
     def missing(middle, index):
@@ -173,6 +200,8 @@ def test_missing_conjunction_branch_survives_into_unresolved_calendar(monkeypatc
             extra = copy.deepcopy(result["candidates"][0])
             extra["research_conjunction_offset_from_winter_days_exact"] = None
             result["candidates"].append(extra)
+        else:
+            pass
         return result
 
     monkeypatch.setattr(subject, "literal_conjunction_candidates", missing)
@@ -182,7 +211,9 @@ def test_missing_conjunction_branch_survives_into_unresolved_calendar(monkeypatc
     assert len(r["branches"]) == 2
 
 
-def test_resource_limit_never_truncates_to_success(monkeypatch):
+def test_resource_limit_never_truncates_to_success(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(subject, "MAX_BRANCHES", 0)
     r = subject.literal_candidate_year(F("88753.8789"))
     assert r["status"] == "branch_limit_exceeded_unresolved"
@@ -192,18 +223,18 @@ def test_resource_limit_never_truncates_to_success(monkeypatch):
 
 
 @pytest.mark.parametrize("value", [0, 0.1, "1"])
-def test_nonfraction_input_rejected(value):
+def test_nonfraction_input_rejected(value: float | int | str) -> None:
     with pytest.raises(TypeError):
         subject.literal_candidate_year(value)
 
 
 @pytest.mark.parametrize("start,stop", [(0, 0), (-1, 1), (0, 401), (True, 2), (0, 2.0)])
-def test_bad_grid_not_silently_changed(start, stop):
+def test_bad_grid_not_silently_changed(start, stop: float | int) -> None:
     with pytest.raises(ValueError):
         audit_literal_candidate_grid(start, stop)
 
 
-def test_declared_policy_precedes_grid_and_does_not_claim_blinding():
+def test_declared_policy_precedes_grid_and_does_not_claim_blinding() -> None:
     p = (
         ROOT
         / "tests/fixtures/guolao-literal-candidates-v1/policy-before-evaluation.json"
@@ -219,12 +250,14 @@ def test_declared_policy_precedes_grid_and_does_not_claim_blinding():
     assert policy["empirical_subjects"] == 0
 
 
-def test_empty_branch_set_cannot_be_vacuously_unanimous():
+def test_empty_branch_set_cannot_be_vacuously_unanimous() -> None:
     with pytest.raises(ValueError):
         subject._civil_consensus([])
 
 
-def test_next_year_boundary_keeps_agreed_fields_when_one_fact_differs(ordinary_year):
+def test_next_year_boundary_keeps_agreed_fields_when_one_fact_differs(
+    ordinary_year,
+) -> None:
     a = copy.deepcopy(ordinary_year["branches"][0])
     b = copy.deepcopy(a)
     b["branch_id"] = 1

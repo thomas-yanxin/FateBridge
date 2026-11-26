@@ -8,6 +8,10 @@ import pytest
 from pydantic import BaseModel
 
 from fatebridge.application import execution
+from fatebridge.application.compute_limits import (
+    HeavyCalculationBudget,
+    heavy_calculation_budget,
+)
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.services.tool_catalog import CATALOG
 
@@ -16,20 +20,28 @@ class Value(BaseModel):
     value: int
 
 
-def test_heavy_shared_execution_is_bounded_across_callers(monkeypatch):
-    monkeypatch.setattr(execution, "HEAVY_CALCULATIONS", BoundedSemaphore(2))
+def test_heavy_shared_execution_is_bounded_across_callers(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Bound concurrent callers and release the permit when a service fails."""
+    assert heavy_calculation_budget() is execution.heavy_calculation_budget()
+    semaphore = BoundedSemaphore(2)
+    budget = HeavyCalculationBudget(max_concurrency=2, semaphore=semaphore)
+    monkeypatch.setattr(execution, "heavy_calculation_budget", lambda: budget)
     release, occupied = Event(), Event()
     mutex = Lock()
     active = 0
     maximum = 0
 
-    def service():
+    def service() -> dict[str, int]:
         nonlocal active, maximum
         with mutex:
             active += 1
             maximum = max(maximum, active)
             if active == 2:
                 occupied.set()
+            else:
+                pass
         release.wait(timeout=5)
         with mutex:
             active -= 1
@@ -55,16 +67,21 @@ def test_heavy_shared_execution_is_bounded_across_callers(monkeypatch):
         assert [future.result(timeout=5) for future in futures] == [{"value": 1}] * 4
     assert maximum == 2
 
-    def broken():
+    def broken() -> dict[str, int]:
         raise RuntimeError("synthetic failure")
 
     failed = replace(spec, bind=lambda _: (broken, (), {}))
     with pytest.raises(RuntimeError, match="synthetic failure"):
         execution.execute_spec(failed, Value(value=1))
-    assert execution.execute_spec(spec, Value(value=1)) == {"value": 1}
+    assert semaphore.acquire(blocking=False)
+    try:
+        assert semaphore.acquire(blocking=False), "A failing service leaked its permit"
+        semaphore.release()
+    finally:
+        semaphore.release()
 
 
-def test_expensive_astronomical_and_interval_tools_declare_the_budget():
+def test_expensive_astronomical_and_interval_tools_declare_the_budget() -> None:
     specs = {spec.key: spec for spec in CATALOG}
     for key in [
         "human_design",

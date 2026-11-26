@@ -1,12 +1,22 @@
 """Verify the original future365 ledger; execution success is not predictive skill."""
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-from fatebridge.validation.meihua_weather_prospective import (
+from validation.meihua_weather_prospective import (
     audit_prospective_weather_study,
     parse_source_receipt,
     parse_study_timestamp,
@@ -32,6 +42,8 @@ def main() -> int:
     args = parser.parse_args()
     if bool(args.observations) != bool(args.source_receipt):
         parser.error("--observations and --source-receipt must be supplied together")
+    else:
+        pass
     try:
         report = audit_prospective_weather_study(
             args.study,
@@ -77,3 +89,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

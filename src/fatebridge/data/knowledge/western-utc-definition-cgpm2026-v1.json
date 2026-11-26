@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "policy_id": "fatebridge.utc_definition_cgpm2026_v1",
+  "record_role": "normative_definition_and_sources_not_epoch_application",
+  "nominal_mapping_basis": "Published UTC offsets; continuous UTC under CGPM2026 from its effective date. Historical drift policy and existing numerical conversions are unchanged.",
+  "continuous_utc_effective_date": "2027-05-20",
+  "maximum_abs_ut1_minus_utc_seconds": 3600,
+  "future_actual_policy_guaranteed": false,
+  "clock_realization_accuracy_certified": false,
+  "source_refs": [
+    {
+      "source_id": "CGPM28-RES5-F",
+      "authority": "BIPM / 28th CGPM, official French text",
+      "title": "Resolution 5 (2026), DOI 10.59161/CGPM2026RES5F",
+      "version": "Resolution 5 (2026), DOI 10.59161/CGPM2026RES5F",
+      "url": "https://www.bipm.org/fr/cgpm-2026/resolution-5",
+      "locator": "French extracted 63-105; operative clauses 95-103",
+      "capture_kind": "saved_web_extraction",
+      "capture_sha256": "f1b534729d5314fe0653beb1bb4b2dac9d1494b203cd2b6a714462f5bea2d45a",
+      "hash_scope": "Previously saved web-extracted combined source result; SHA is local extraction identity, not official raw/signed file digest"
+    },
+    {
+      "source_id": "IERS-CURRENT-POLICY",
+      "authority": "IERS Earth Orientation Center",
+      "title": "Current leap-second page read 2026-11-19 local / 2026-11-18 UTC",
+      "version": "Current leap-second page read 2026-11-19 local / 2026-11-18 UTC",
+      "url": "https://hpiers.obspm.fr/eop-pc/index.php?change_lang=true&index=leapsecond&lang=en",
+      "locator": "web-extracted 49-53; actual HTML same policy paragraph",
+      "capture_kind": "http_response_body",
+      "capture_sha256": "77a39aa70da64d1e3b64ab5ad9f1729658a1ce836c046e85167b8fa48047dc22",
+      "hash_scope": "Actual HTTP200 HTML body; local body hash only"
+    },
+    {
+      "source_id": "IERS-C72",
+      "authority": "IERS Earth Orientation Center",
+      "title": "Bulletin C 72, 6 July 2026",
+      "version": "Bulletin C 72, 6 July 2026",
+      "url": "https://hpiers.obspm.fr/eoppc/bul/bulc/bulletinc.72",
+      "locator": "raw 31-40",
+      "capture_kind": "http_response_body",
+      "capture_sha256": "310e172eadacacca3adf92cb9bd646fcc0d6320e35e996a106d2644ede3b52f0",
+      "hash_scope": "Actual HTTP200 response body, receipt retained; digest is our body hash, not publisher signature"
+    },
+    {
+      "source_id": "IERS-C-GUIDE",
+      "authority": "IERS Earth Orientation Center",
+      "title": "BULLETINC.GUIDE, legacy operational guide",
+      "version": "BULLETINC.GUIDE, legacy operational guide",
+      "url": "https://hpiers.obspm.fr/eoppc/bul/bulc/BULLETINC.GUIDE",
+      "locator": "raw 15-33 for publication and expiry convention",
+      "capture_kind": "http_response_body",
+      "capture_sha256": "0edc0e22294c57736824e634f11ecd9a3bcef4f3979e5d3f034baa6c29209aed",
+      "hash_scope": "Actual HTTP200 response body; local body hash only"
+    }
+  ],
+  "scope": "Definition/source disclosure for nominal mapping under frozen published rules, not evidence that this regime applied to every attached epoch. Future actual legal policy and realized clocks are not authenticated; the3600s limit is not actualDUT1. No UTC=UT1, EOP extrapolation, historical policy change, or unqualified year9999 guarantee."
+}

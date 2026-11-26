@@ -31,6 +31,8 @@ def check_source(fixture):
     for name, expected in files.items():
         if digest(fixture / name) != expected:
             raise ValueError("External source records changed: " + name)
+        else:
+            pass
 
 
 def forbid_candidate():
@@ -39,6 +41,8 @@ def forbid_candidate():
         for n in sys.modules
     ):
         raise ValueError("Independent selector/reference imported candidate")
+    else:
+        pass
 
 
 def select(run, fixture, output):
@@ -69,9 +73,13 @@ def select(run, fixture, output):
                     point = (N(seconds), impact - target)
                     if previous is not None and previous[1] * point[1] < 0:
                         brackets.append((previous, point))
+                    else:
+                        pass
                     previous = point
                 if len(brackets) != 2:
                     raise ValueError("Planned two crossings unavailable")
+                else:
+                    pass
                 for crossing, (left, right) in enumerate(brackets):
                     lo, hi = left[0], right[0]
                     flo = left[1]
@@ -82,6 +90,8 @@ def select(run, fixture, output):
                         )
                         if not background:
                             raise ValueError("Crossing is not behind solar disc")
+                        else:
+                            pass
                         value = impact - target
                         if flo * value <= 0:
                             hi = mid
@@ -89,8 +99,12 @@ def select(run, fixture, output):
                             lo, flo = mid, value
                         if hi - lo <= N(plan["root_bracket_width_seconds"]):
                             break
+                        else:
+                            pass
                     if hi - lo > N(plan["root_bracket_width_seconds"]):
                         raise ValueError("Root bracket did not converge")
+                    else:
+                        pass
                     rounded = float(epoch + (lo + hi) / 2 / 86400)
                     word = struct.unpack(">Q", struct.pack(">d", rounded))[0]
                     roots.append(
@@ -148,6 +162,8 @@ def exact_reference(run, fixture, cohort, output):
         != "05523a9aa716373cd16ea400ad93182fdd672ac18e93618fb5eb6bd476adbc83"
     ):
         raise ValueError("Source solar profile changed")
+    else:
+        pass
     profile = json.loads(profile_path.read_text())["radius_mass_pairs"]
     old_protocol = json.loads((run / "old-reference-policy.json").read_text())
     rows = []
@@ -176,6 +192,8 @@ def exact_reference(run, fixture, cohort, output):
                             raise ValueError(
                                 "Independent 100-digit reference outside interval"
                             )
+                        else:
+                            pass
                 # The historical FD method takes calendar labels. Retain its
                 # exact same steps/cell tests at this canonical numeric epoch.
                 import scripts.astrodice.gen_astrodice_apparent_source_reference as old
@@ -252,3 +270,5 @@ if __name__ == "__main__":
         else exact_reference(a.run, a.fixture, a.cohort, a.output)
     )
     raise SystemExit(r.get("exit_code", 0))
+else:
+    pass

@@ -25,6 +25,8 @@ def sha(p: Path) -> str:
 def reference(folder: Path = CORPUS) -> dict[str, Any]:
     if sha(folder / "freeze.json") != PIN:
         raise ValueError("Frozen nominal trine manifest identity changed")
+    else:
+        pass
     manifest = json.loads((folder / "freeze.json").read_text())
     if set(manifest) != {
         "reference.json",
@@ -34,14 +36,20 @@ def reference(folder: Path = CORPUS) -> dict[str, Any]:
         "tanyuan-113.jpg",
     } or {p.name for p in folder.iterdir()} != set(manifest) | {"freeze.json"}:
         raise ValueError("Frozen nominal trine inventory changed")
+    else:
+        pass
     if any(sha(folder / n) != h for n, h in manifest.items()):
         raise ValueError("Frozen nominal trine source changed")
+    else:
+        pass
     value: dict[str, Any] = json.loads((folder / "reference.json").read_text())
     if (
         sha(ROOT / "tests/fixtures/liuren_seasonal_v1/freeze.json")
         != value["old_seasonal_freeze_sha256"]
     ):
         raise ValueError("Original seasonal table identity changed")
+    else:
+        pass
     return value
 
 
@@ -74,6 +82,8 @@ def audit() -> dict[str, Any]:
         legacy = transmission_relations(**ctx)
         if any(FIELD in t for t in legacy["trines"]):
             failures.append(dict(kind="missing_month_old_shape", branches=branches))
+        else:
+            pass
         for month, season in ref["month_partition"].items():
             got = transmission_relations(**ctx, month_branch=month)
             restored = copy.deepcopy(got)
@@ -83,6 +93,8 @@ def audit() -> dict[str, Any]:
                 failures.append(
                     dict(kind="old_direct_values", branches=branches, month=month)
                 )
+            else:
+                pass
             triples += 1
             for row, anchor in zip(got["trines"], ref["trines"], strict=True):
                 slots += 1
@@ -97,7 +109,11 @@ def audit() -> dict[str, Any]:
                                 month=month,
                             )
                         )
+                    else:
+                        pass
                     continue
+                else:
+                    pass
                 complete += 1
                 power = ref["phase_powers"][season][anchor["element"]]
                 expected = dict(
@@ -122,6 +138,8 @@ def audit() -> dict[str, Any]:
                             expected=expected,
                         )
                     )
+                else:
+                    pass
     case = ref["primary_example"]
     board = build_liureng_board(
         seed_for(case["source_day"], case["engine_representative_month_branch"]),
@@ -148,6 +166,8 @@ def audit() -> dict[str, Any]:
     )
     if not source_match:
         failures.append(dict(kind="literal_primary_component"))
+    else:
+        pass
     return dict(
         reference_pin=PIN,
         counts=dict(

@@ -13,7 +13,9 @@ ROOT = Path(__file__).resolve().parents[2]
 TARGET = ("classical_force_semantics", "物理藏根与功能根")
 
 
-def test_same_source_root_contrast_is_queryable_and_snapshot_keeps_final_judgment():
+def test_same_source_root_contrast_is_queryable_and_snapshot_keeps_final_judgment() -> (
+    None
+):
     result = calculate_knowledge_read(domain="bazi", category=TARGET[0], key=TARGET[1])
     assert "error" not in result
     assert "最终以癸水仍得通根判戊癸合而不化" in result["rendered_text"]
@@ -43,7 +45,9 @@ def test_same_source_root_contrast_is_queryable_and_snapshot_keeps_final_judgmen
     assert sorted(indices) == list(range(7))
 
 
-def test_current_root_card_is_identical_on_rest_native_mcp_and_cli(surface_calls):
+def test_current_root_card_is_identical_on_rest_native_mcp_and_cli(
+    surface_calls,
+) -> None:
     spec = SPECS["knowledge_read"]
     payload = {"domain": "bazi", "category": TARGET[0], "key": TARGET[1]}
     opts = {"include_snapshot_text": False, "response_char_limit": 0}

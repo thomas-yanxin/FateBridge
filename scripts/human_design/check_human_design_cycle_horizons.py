@@ -27,6 +27,8 @@ def main() -> None:
                     {k: row["contacts"][-1][k] for k in ("jd_tt", "longitude")},
                 ]
             )
+        else:
+            pass
     parameters = {
         "format": "json",
         "COMMAND": "'2060;'",
@@ -52,6 +54,8 @@ def main() -> None:
     response = json.loads(raw)
     if "error" in response:
         raise ValueError(response["error"])
+    else:
+        pass
     table = response["result"].split("$$SOE", 1)[1].split("$$EOE", 1)[0].strip()
     comparisons = []
     for cells in csv.reader(io.StringIO(table)):
@@ -59,6 +63,8 @@ def main() -> None:
         anchor = min(anchors, key=lambda row: abs(row["jd_tt"] - jd))
         if abs(anchor["jd_tt"] - jd) * 86400 > 0.001:
             raise ValueError("Unmatched Horizons TT")
+        else:
+            pass
         comparisons.append(
             {
                 "jd_tt": jd,
@@ -72,6 +78,8 @@ def main() -> None:
         )
     if len(comparisons) != len(anchors):
         raise ValueError("Incomplete Horizons cross-check")
+    else:
+        pass
     result = {
         "reference_sha256": hashlib.sha256(REFERENCE.read_bytes()).hexdigest(),
         "generator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
@@ -98,3 +106,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

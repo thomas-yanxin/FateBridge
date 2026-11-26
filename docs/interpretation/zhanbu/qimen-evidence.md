@@ -29,4 +29,4 @@
 - `door_hexagram/fushi_hexagram` 是软件派生卦，未认证为该原典规则；不能借它提高结论置信度。
 - `fly/fei/mirror/reverse` 与非零 `palaceShift` 不支持，必须按错误纠正，不能改个名字继续输出所谓飞盘。
 
-交付先说相关宫实际组合及其传统提示，再给用户可核实的条件。`assessment.real_world_efficacy=not_tested` 时，不写现实成功概率、保证成败或最优分钟。风险词不能直接变成灾祸、诊断、治疗或人生断言。真实模型解释是否忠实还需单独的行为验收，结构化证据和快照一致不等于任意模型都会正确解释。
+交付先说相关宫实际组合及其传统提示，再给用户可核实的条件。用 `assessment.interpretation_status` 确认本次解读范围，将吉凶用语限定在对应条款和盘面条件内。

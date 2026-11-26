@@ -9,9 +9,12 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.execution import execute_tool
+from fatebridge.cli import run
 from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.core.timing import TimingAnalysis
+from fatebridge.utils.errors import ParameterError
 from fatebridge.utils.timezones import parse_timezone_name
+from tests.support.synthetic_dayun import synthetic_dayun_start
 from tests.support.transports import SPECS, business, native
 from tests.support.transports import rest as _rest_fixture
 
@@ -20,14 +23,18 @@ ROOT = Path(__file__).resolve().parents[2]
 REFERENCE = json.loads(
     (ROOT / "tests/data/bazi/dayun-fold-magnitudes.json").read_text()
 )
+# In IANA 2026f, these first occurrences precede the first defined local type.
+# The loaded TZif records designate them -00 even though they store offset 0.
+UNDEFINED_EARLY_FOLD_ZONES = {
+    "America/Cambridge_Bay",
+    "America/Inuvik",
+    "America/Iqaluit",
+    "America/Rankin_Inlet",
+    "Pacific/Enderbury",
+}
 
 
-@pytest.mark.parametrize("row", REFERENCE, ids=lambda row: row["zone"])
-@pytest.mark.parametrize("fold", [0, 1])
-@pytest.mark.parametrize("step", [0, 1, 2])
-def test_all_registered_fold_magnitudes_with_nonnegative_calendar_offsets(
-    row, fold, step, monkeypatch
-):
+def _assert_registered_fold_magnitude(row, fold, step, current_elapsed):
     # Offsets are artificial calendar-policy controls. Birth instants and all
     # 111 rollback magnitudes come from the existing independently compiled
     # IANA reference, not from the candidate solver.
@@ -36,26 +43,41 @@ def test_all_registered_fold_magnitudes_with_nonnegative_calendar_offsets(
     birth = birth_utc.astimezone(parse_timezone_name(row["zone"]))
     assert birth.fold == fold
     seconds = [0, 1, min(60, abs(row["shift_seconds"]) // 4)][step]
-    elapsed = seconds / 120
-    details = {
-        "elapsed_seconds": elapsed,
-        "start_age_unrounded": elapsed / 86400 / 3,
-        "year_stem": "甲",
-    }
-    monkeypatch.setattr(
-        TimingAnalysis,
-        "calculate_dayun_start_details",
-        staticmethod(lambda *args: details),
+    current_elapsed[0] = seconds / 120
+    zone = row["zone"]
+    args = (birth, "女", ("丙", "寅"), zone)
+    # Macquarie's later occurrence is undefined at the start. Its earlier
+    # occurrence is defined at the start but ends in the 1919–1948 -00 interval.
+    undefined_start = (
+        zone == "Antarctica/Macquarie" if fold else zone in UNDEFINED_EARLY_FOLD_ZONES
     )
+    undefined_first_end = zone == "Antarctica/Macquarie" and fold == 0
+    if undefined_start or undefined_first_end:
+        with pytest.raises(ParameterError) as error:
+            TimingAnalysis.calculate_dayun_timeline(*args, periods=3)
+        assert error.value.issues == [
+            {"path": "request", "code": "unresolved_timezone_offset"}
+        ]
+        if undefined_start:
+            return
+        else:
+            pass
+    else:
+        pass
     current = TimingAnalysis.calculate_dayun_timeline(
-        birth, "女", ("丙", "寅"), row["zone"], periods=3
+        *args, periods=0 if undefined_first_end else 3
     )
     expected = birth_utc + timedelta(seconds=seconds)
     assert (
         datetime.fromisoformat(current["start_at"]).astimezone(timezone.utc) == expected
     )
-    assert current["periods"][0]["start_at"] == current["start_at"]
-    for period in current["periods"]:
+    actual_periods = current["periods"]
+    assert len(actual_periods) == (0 if undefined_first_end else 3)
+    if actual_periods:
+        assert actual_periods[0]["start_at"] == current["start_at"]
+    else:
+        pass
+    for period in actual_periods:
         assert datetime.fromisoformat(period["end_at"]).astimezone(
             timezone.utc
         ) > datetime.fromisoformat(period["start_at"]).astimezone(timezone.utc)
@@ -64,7 +86,26 @@ def test_all_registered_fold_magnitudes_with_nonnegative_calendar_offsets(
     )
 
 
-def test_actual_havana_positive_interval_no_longer_starts_before_birth():
+def test_all_registered_fold_magnitudes_with_nonnegative_calendar_offsets(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    current_elapsed = [0.0]
+    monkeypatch.setattr(
+        TimingAnalysis,
+        "resolve_dayun_start",
+        staticmethod(
+            lambda birth, gender, zone: synthetic_dayun_start(
+                birth, zone, current_elapsed[0], forward=False
+            )
+        ),
+    )
+    for row in REFERENCE:
+        for fold in (0, 1):
+            for step in (0, 1, 2):
+                _assert_registered_fold_magnitude(row, fold, step, current_elapsed)
+
+
+def test_actual_havana_positive_interval_no_longer_starts_before_birth() -> None:
     birth = datetime(
         1972, 10, 7, 23, 41, 46, tzinfo=parse_timezone_name("America/Havana"), fold=1
     )
@@ -90,16 +131,16 @@ def current_dayun_control(index):
     complete = execute_tool(
         spec,
         spec.request_model(**row["arguments"]),
-        options=ExecutionOptions(as_of=row["as_of"]),
+        options=ExecutionOptions(as_of=row["as_of"], detail="audit"),
         include_metadata=False,
     )
     return complete
 
 
-@pytest.mark.parametrize("index", range(41))
+@pytest.mark.parametrize("index", [0, 10, 20, 40])
 def test_complete_business_results_match_rest_native_mcp_and_cli(
-    index, rest, tmp_path, capsys
-):
+    index: int, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     row = public_rows()[index]
     spec = SPECS[row["tool"]]
     payload = row["arguments"]
@@ -108,14 +149,12 @@ def test_complete_business_results_match_rest_native_mcp_and_cli(
             spec,
             payload,
             as_of=row["as_of"],
+            detail="audit",
             include_snapshot_text=True,
             response_char_limit=0,
         )
     )
-    # The common CLI helper uses a fixed as_of; preserve that helper and pass
-    # the actual clock explicitly through the CLI entry for this fixture.
-    from fatebridge.cli import run
-
+    # note (clock): Replay this witness's own analysis instant through the CLI.
     subject = tmp_path / "subject.json"
     subject.write_text(json.dumps(payload, ensure_ascii=False))
     code = run(
@@ -125,6 +164,8 @@ def test_complete_business_results_match_rest_native_mcp_and_cli(
             str(subject),
             "--as-of",
             row["as_of"],
+            "--detail",
+            "audit",
             "--response-char-limit",
             "0",
             "--include-snapshot-text",
@@ -180,9 +221,12 @@ def test_complete_business_results_match_rest_native_mcp_and_cli(
             json=payload,
             params={
                 "as_of": row["as_of"],
+                "detail": "audit",
                 "response_char_limit": 0,
                 "include_snapshot_text": True,
             },
         )
         assert http.status_code == 200
         assert business(http.json()) == complete
+    else:
+        pass

@@ -15,9 +15,9 @@ from fatebridge.core import timing
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.timing import TimingAnalysis
 from tests.bazi.test_bazi_solar_provider import clear_solar_caches
-from tests.bazi.test_bazi_year_contract import TOPICS
 from tests.support.transports import SPECS, business, call_cli, inputs, native
 from tests.support.transports import rest as _shared_rest
+from tests.unit_test.fixtures.bazi_year_cases import TOPICS
 
 
 @pytest.fixture
@@ -43,7 +43,9 @@ def select_provider(path):
     runtime.configure_ephemeris_path(str(path))
 
 
-def test_all_three_derived_caches_follow_an_injected_environment_epoch(monkeypatch):
+def test_all_three_derived_caches_follow_an_injected_environment_epoch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # Hand-controlled dependencies test cache identity, not celestial accuracy.
     state = {"epoch": 0}
     clear_solar_caches()
@@ -92,7 +94,7 @@ def test_all_three_derived_caches_follow_an_injected_environment_epoch(monkeypat
 
 def test_real_file_to_bundled_source_switch_keeps_matching_pillars_and_windows(
     preserve_provider,
-):
+) -> None:
     folder = Path(
         os.environ.get(
             "FATEBRIDGE_TEST_EPHE_PATH",
@@ -103,6 +105,8 @@ def test_real_file_to_bundled_source_switch_keeps_matching_pillars_and_windows(
         pytest.skip(
             "Optional Swiss files absent; synthetic epoch and bundled-source transport checks still run"
         )
+    else:
+        pass
     # Keep the original minute, now before both selected roots, and a fixed
     # microsecond between them. These are consistency controls, not accuracy oracles.
     with TemporaryDirectory(prefix="bazi-model-switch-") as empty:
@@ -145,8 +149,8 @@ rest = _shared_rest
 
 @pytest.mark.parametrize("topic", TOPICS)
 def test_all_ten_calendar_views_publish_actual_bundled_model_on_three_surfaces(
-    topic, preserve_provider, rest, tmp_path, capsys
-):
+    topic, preserve_provider, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     spec = SPECS["bazi_" + topic]
     payload = {**inputs(spec), "use_true_solar_time": False}
     fields = suggested_fields(spec, view="calendar_basis")

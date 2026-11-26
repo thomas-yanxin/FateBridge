@@ -6,33 +6,16 @@ from pathlib import Path
 
 import pytest
 
+from fatebridge.core.liuyao.liuyao_routing import PROFILE
+from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from scripts.liuyao.build_profile import build_profile
-from tests.liuyao.test_liuyao_conditions import conditional_case
+from tests.unit_test.fixtures.liuyao import conditional_case, routing_case
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_routing_v13"
 CASES = json.loads((REFERENCE / "cases.json").read_text())["cases"]
 
 
-def routing_case(case):
-    if case.get("focus_kind") == "hidden":
-        from fatebridge.core.local_techniques.sixyao import build_sixyao_result
-
-        r = build_sixyao_result(
-            date=case["date"],
-            time="12:00:00",
-            gua_code=case["base_code"],
-            changed_code=case["changed_code"],
-            focus_kind="hidden",
-            focus_line=case["focus_line"],
-        )
-        assert r["nongli"]["dayGanZi"] == case["day_ganzhi"]
-        assert r["nongli"]["monthGanZi"][1] == case["month_branch"]
-        return r["liuyao_evidence"]["conditional_analysis"]
-    return conditional_case(case)
-
-
-def test_routing_original_and_case_bytes_remain_frozen():
-    from fatebridge.core.liuyao_routing import PROFILE
+def test_routing_original_and_case_bytes_remain_frozen() -> None:
 
     assert PROFILE == build_profile("routing")
     for name, digest in json.loads((REFERENCE / "freeze.json").read_text())[
@@ -42,13 +25,15 @@ def test_routing_original_and_case_bytes_remain_frozen():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_frozen_route_qualification_and_alternative_aggregation(case):
+def test_frozen_route_qualification_and_alternative_aggregation(case) -> None:
     result = routing_case(case)
     routes = result["routing_conditions"]
     assert routes["focus"]["condition_match"] is case["expected_focus_condition"]
     if case["positions"] is None:
         assert not routes["routes"]
         return
+    else:
+        pass
     route = next(r for r in routes["routes"] if r["positions"] == case["positions"])
     assert route["condition_match"] is case["expected_route"]
     assert route["status"] and route["conditions"]
@@ -59,10 +44,12 @@ def test_frozen_route_qualification_and_alternative_aggregation(case):
             ]
             is True
         )
+    else:
+        pass
     assert "success_probability" not in route and "predicted_success" not in route
 
 
-def test_rootless_original_keeps_raw_path_but_does_not_present_ready_relief():
+def test_rootless_original_keeps_raw_path_but_does_not_present_ready_relief() -> None:
     result = routing_case(CASES[0])
     raw = next(
         c for c in result["role_effects"]["chains"] if c["positions"] == [6, 5, 4]
@@ -79,8 +66,7 @@ def test_rootless_original_keeps_raw_path_but_does_not_present_ready_relief():
     assert edge["qualified_routing_condition"] is False
 
 
-def test_back_controlled_route_snapshot_is_not_the_generic_candidate_text():
-    from fatebridge.core.local_techniques.sixyao import build_sixyao_result
+def test_back_controlled_route_snapshot_is_not_the_generic_candidate_text() -> None:
 
     r = build_sixyao_result(
         date="2000-09-02",
@@ -93,7 +79,9 @@ def test_back_controlled_route_snapshot_is_not_the_generic_candidate_text():
     assert "回头克阻断当前接续条件" in r["snapshot_text"]
 
 
-def test_qualified_route_edges_keep_their_own_controller_and_original_direction():
+def test_qualified_route_edges_keep_their_own_controller_and_original_direction() -> (
+    None
+):
     for case in CASES:
         result = routing_case(case)
         routes = result["routing_conditions"]["routes"]
@@ -101,6 +89,8 @@ def test_qualified_route_edges_keep_their_own_controller_and_original_direction(
         for edge in result["interaction_edges"]:
             if "qualified_routing_status" not in edge:
                 continue
+            else:
+                pass
             assert result["focus"]["selected"]["location"] == "visible"
             assert edge["source_kind"] == edge["target_kind"] == "base"
             assert edge["relation"] == "克爻"
@@ -116,8 +106,7 @@ def test_qualified_route_edges_keep_their_own_controller_and_original_direction(
                     )
 
 
-def test_page59_variant_is_exposed_without_rewriting_old_transcription():
-    from fatebridge.core.liuyao_routing import PROFILE
+def test_page59_variant_is_exposed_without_rewriting_old_transcription() -> None:
 
     note = next(
         n for n in PROFILE["textual_issues"] if n["id"] == "page59-he-versus-ling"
@@ -134,14 +123,15 @@ def test_page59_variant_is_exposed_without_rewriting_old_transcription():
     )
 
 
-def test_changed_focus_does_not_borrow_original_receiving_gate():
+def test_changed_focus_does_not_borrow_original_receiving_gate() -> None:
     result = conditional_case(CASES[0], focus_line=5, focus_kind="changed")
     assert result["routing_conditions"]["focus"]["condition_match"] is None
     assert result["routing_conditions"]["routes"] == []
 
 
-def test_original_rootless_snapshot_does_not_upgrade_a_route_to_receiving_help():
-    from fatebridge.core.local_techniques.sixyao import build_sixyao_result
+def test_original_rootless_snapshot_does_not_upgrade_a_route_to_receiving_help() -> (
+    None
+):
 
     r = build_sixyao_result(
         date="2002-05-27",

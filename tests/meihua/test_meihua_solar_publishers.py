@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation.meihua_solar_publishers import (
+from validation.meihua_solar_publishers import (
     EXPECTED_REFERENCE_SHA256,
     compare_label,
     parse_annual_response,
@@ -23,7 +23,7 @@ BY_KEY = {(r["year"], r["term"]): r for r in ROWS}
 
 
 @pytest.mark.parametrize("year", range(1900, 2101))
-def test_each_required_year_retains_all24_source_identities(year):
+def test_each_required_year_retains_all24_source_identities(year) -> None:
     expected = json.loads((FOLDER / f"naoj-{year}-default-query.json").read_bytes())
     rows = [r for r in ROWS if r["year"] == year]
     assert len(rows) == 24
@@ -41,7 +41,7 @@ def test_each_required_year_retains_all24_source_identities(year):
 
 
 @pytest.mark.parametrize("literal", LITERALS, ids=lambda r: str(r["year"]))
-def test_seven_known_disagreements_keep_independent_literal_labels(literal):
+def test_seven_known_disagreements_keep_independent_literal_labels(literal) -> None:
     row = BY_KEY[literal["year"], literal["term"]]
     assert row["raw_date_label"] == literal["raw_date_label"]
     assert row["raw_clock_label"] == literal["raw_clock_label"]
@@ -53,7 +53,7 @@ def test_seven_known_disagreements_keep_independent_literal_labels(literal):
 
 
 @pytest.mark.parametrize("literal", LITERALS, ids=lambda r: str(r["year"]))
-def test_equal_labels_do_not_become_authenticated_UTC_instants(literal):
+def test_equal_labels_do_not_become_authenticated_UTC_instants(literal) -> None:
     row = BY_KEY[literal["year"], literal["term"]]
     actual = {
         "name": literal["term"],
@@ -76,7 +76,7 @@ def test_equal_labels_do_not_become_authenticated_UTC_instants(literal):
     assert output["NAOJ"]["raw_date_label"] == literal["raw_date_label"]
 
 
-def test_1979_end_of_day_label_is_not_a_new_measured_midnight_event():
+def test_1979_end_of_day_label_is_not_a_new_measured_midnight_event() -> None:
     row = BY_KEY[1979, "大寒"]
     original = deepcopy(row)
     actual = {"name": "大寒", "datetime_with_offset": "1979-01-20T23:59:54+08:00"}
@@ -101,7 +101,9 @@ def test_1979_end_of_day_label_is_not_a_new_measured_midnight_event():
 @pytest.mark.parametrize(
     "change", ["year", "offset", "delta_t", "method", "url", "rows"]
 )
-def test_wrong_query_identity_cannot_be_repaired_by_source_hash_alone(change):
+def test_wrong_query_identity_cannot_be_repaired_by_source_hash_alone(
+    change: str,
+) -> None:
     year = 1912
     receipt = json.loads((FOLDER / f"naoj-{year}-default-query.json").read_bytes())
     raw = (FOLDER / f"naoj-{year}-default.html").read_bytes()
@@ -121,7 +123,7 @@ def test_wrong_query_identity_cannot_be_repaired_by_source_hash_alone(change):
         parse_annual_response(raw, receipt, year)
 
 
-def test_server_fallback_to_another_year_is_rejected():
+def test_server_fallback_to_another_year_is_rejected() -> None:
     raw = (FOLDER / "naoj-1912-default.html").read_bytes().replace(b"1912", b"1913")
     receipt = json.loads((FOLDER / "naoj-1912-default-query.json").read_bytes())
     receipt["response_sha256"] = hashlib.sha256(raw).hexdigest()
@@ -129,20 +131,26 @@ def test_server_fallback_to_another_year_is_rejected():
         parse_annual_response(raw, receipt, 1912)
 
 
-def test_a_recommitted_subset_still_cannot_shrink_the_required_cohort(tmp_path):
+def test_a_recommitted_subset_still_cannot_shrink_the_required_cohort(
+    tmp_path: Path,
+) -> None:
     folder = tmp_path / "subset"
     shutil.copytree(FOLDER, folder)
     manifest = json.loads((folder / "manifest.json").read_bytes())
     for name in list(manifest["files"]):
         if name.startswith("naoj-1900-default"):
             del manifest["files"][name]
+        else:
+            pass
     raw = json.dumps(manifest).encode()
     (folder / "manifest.json").write_bytes(raw)
     with pytest.raises(ValueError, match="All201"):
         read_naoj_reference(folder, expected_sha256=hashlib.sha256(raw).hexdigest())
 
 
-def test_changed_primary_bytes_do_not_receive_an_old_reference_receipt(tmp_path):
+def test_changed_primary_bytes_do_not_receive_an_old_reference_receipt(
+    tmp_path: Path,
+) -> None:
     folder = tmp_path / "tamper"
     shutil.copytree(FOLDER, folder)
     p = folder / "naoj-1912-default.html"
@@ -151,7 +159,7 @@ def test_changed_primary_bytes_do_not_receive_an_old_reference_receipt(tmp_path)
         read_naoj_reference(folder)
 
 
-def test_an_actual_naive_clock_cannot_be_silently_read_as_UTC():
+def test_an_actual_naive_clock_cannot_be_silently_read_as_UTC() -> None:
     row = BY_KEY[1912, "小雪"]
     with pytest.raises(ValueError, match="requires its offset"):
         compare_label(
@@ -161,7 +169,7 @@ def test_an_actual_naive_clock_cannot_be_silently_read_as_UTC():
         )
 
 
-def test_a_wrong_manifest_commitment_is_not_a_reference():
+def test_a_wrong_manifest_commitment_is_not_a_reference() -> None:
     with pytest.raises(ValueError, match="prior commitment"):
         read_naoj_reference(FOLDER, expected_sha256="0" * 64)
     assert (

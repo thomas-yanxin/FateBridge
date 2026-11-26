@@ -78,30 +78,33 @@ jobs:
       - name: Verify metadata and long-description rendering
         run: uvx --from twine twine check dist/*
 
-      - name: Assert reference data is packaged
-        # Guards the exact bug this workflow was born with: a wheel that omits
-        # fatebridge/data/**/*.json installs but crashes at runtime.
+      - name: Compare wheel contents with the package source tree
         run: |
           python - <<'PY'
-          import glob, zipfile
           from pathlib import Path
-          wheel = glob.glob("dist/*.whl")[0]
-          names = zipfile.ZipFile(wheel).namelist()
+          from zipfile import ZipFile
+
           expected = {
               path.relative_to("src").as_posix()
               for path in Path("src/fatebridge").rglob("*")
-              if path.is_file() and (path.suffix in {".py", ".json"} or path.name == "py.typed")
+              if path.is_file() and "__pycache__" not in path.parts
+              and not path.is_relative_to("src/fatebridge/validation")
+              and not path.match("src/fatebridge/data/astronomy/de441-planetary-*-part-*.bin.gz")
           }
-          actual = {name for name in names if name.startswith("fatebridge/")}
+          wheel, = Path("dist").glob("*.whl")
+          with ZipFile(wheel) as archive:
+              actual = {
+                  item.filename for item in archive.infolist()
+                  if item.filename.startswith("fatebridge/") and not item.is_dir()
+              }
           assert actual == expected, {"missing": expected - actual, "extra": actual - expected}
-          jsons = [n for n in names if n.endswith(".json") and "/data/" in n]
-          assert jsons, f"no data JSON in wheel {wheel} — package-data missing"
-          assert any(n.endswith("py.typed") for n in names), "py.typed missing"
-          print(f"OK: {len(jsons)} data JSON files + py.typed present in wheel")
+          assert "fatebridge/py.typed" in actual, "py.typed missing"
+          print(f"OK: {len(actual)} files match the package source tree")
           PY
 
       - name: Verify installed wheel outside the checkout
         run: |
+          de441_dir="$PWD/src/fatebridge/data/astronomy"
           uv venv --python 3.12 /tmp/fatebridge-wheel-test
           uv pip install --python /tmp/fatebridge-wheel-test/bin/python dist/*.whl
           cd /tmp
@@ -110,11 +113,13 @@ jobs:
           from fastapi.testclient import TestClient
           from fatebridge import __version__
           from fatebridge.api import app
+          from fatebridge.core.astro.iers_ut1 import c04_table
           from fatebridge.services.tool_catalog import CATALOG
+          c04_table()
           with TestClient(app) as client:
               assert client.get("/health").json() == {"status": "healthy"}
               assert client.get("/openapi.json").json()["info"]["version"] == __version__
-              response = client.post("/api/cn/bazi/birth", params={
+              response = client.post("/api/bazi/birth-chart", params={
                   "fields": "bazi_birth.day_master", "strict_fields": "true",
               }, json={
                   "birth_year": 1990, "birth_month": 5, "birth_day": 15,
@@ -125,6 +130,10 @@ jobs:
               assert response.json()["run_metadata"]["package_version"] == __version__
               assert response.json()["bazi_birth"]["day_master"]
           print(f"Installed wheel OK: {__version__}, {len(CATALOG)} catalog records")
+          PY
+          FATEBRIDGE_DE441_DIR="$de441_dir" /tmp/fatebridge-wheel-test/bin/python - <<'PY'
+          from fatebridge.core.astro.de441_source import barycentric_state
+          assert len(barycentric_state("Pluto", 0.0).position) == 3
           PY
 
       - name: Upload distribution artifacts

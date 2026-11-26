@@ -9,12 +9,19 @@ import pytest
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro import native_execution, runtime
-from fatebridge.core.human_design import longitude_activation
-from fatebridge.core.human_design_depth import line_fixings
-from fatebridge.core.human_design_source_variants import line_variant_impact
+from fatebridge.core.human_design.human_design import longitude_activation
+from fatebridge.core.human_design.human_design_depth import line_fixings
+from fatebridge.core.human_design.human_design_source_variants import (
+    line_variant_impact,
+)
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
-from tests.human_design.test_human_design_publisher import current as current
+from tests.unit_test.fixtures.human_design_publisher import (
+    PublisherCapture,
+)
+from tests.unit_test.fixtures.human_design_publisher import (
+    publisher_capture as publisher_capture,
+)
+from validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[2]
 PLAN_PATH = ROOT / "tests/fixtures/human-design-object-order-plan.json"
@@ -30,12 +37,18 @@ def permute(value, order):
     if isinstance(value, dict):
         keys = sorted(value) if order == "sorted" else list(reversed(value))
         return {k: permute(value[k], order) for k in keys}
+    else:
+        pass
     if isinstance(value, list):
         return [permute(v, order) for v in value]
+    else:
+        pass
     return value
 
 
-def test_both_recipient_and_donor_sides_have_explicit_order_with_array_indices():
+def test_both_recipient_and_donor_sides_have_explicit_order_with_array_indices() -> (
+    None
+):
     sides = {
         "personality": [
             {"body": "Sun", "gate": 55, "line": 2},
@@ -69,7 +82,7 @@ def test_both_recipient_and_donor_sides_have_explicit_order_with_array_indices()
     ]
 
 
-def test_source_29_disagreement_lists_are_independent_of_side_object_order():
+def test_source_29_disagreement_lists_are_independent_of_side_object_order() -> None:
     a = {"body": "Moon", **longitude_activation(145.3)}
     p = {"activations": {"personality": [a], "design": [deepcopy(a)]}}
     d = {"activations": {"design": [deepcopy(a)], "personality": [a]}}
@@ -88,10 +101,10 @@ def test_source_29_disagreement_lists_are_independent_of_side_object_order():
 @pytest.mark.parametrize("order", ["sorted", "reversed"])
 @pytest.mark.parametrize("index", range(16))
 def test_all_frozen_publisher_runs_keep_facts_and_full_reading_when_maps_reorder(
-    index, order, current  # noqa: F811 - pytest fixture dependency
-):
-    RUNS, _ = current
-    original = RUNS[index]["run"]
+    index: int, order: str, publisher_capture: PublisherCapture
+) -> None:
+    runs = publisher_capture.runs
+    original = runs[index]["run"]
     reordered = permute(original, order)
     # Object-key order does not change facts; array order remains significant.
     assert reordered == original
@@ -111,14 +124,14 @@ def test_all_frozen_publisher_runs_keep_facts_and_full_reading_when_maps_reorder
 
 @pytest.mark.parametrize("kind", PLAN["negative_cases"])
 def test_rehashed_array_or_value_changes_still_reject_after_map_sorting(
-    kind, current
-):  # noqa: F811 - pytest fixture dependency
-    RUNS, _ = current
+    kind: str, publisher_capture: PublisherCapture
+) -> None:
+    runs = publisher_capture.runs
     # Select an actual frozen chart with multiple donors, so the donor-order
     # mutation is real rather than reversing an empty or one-item array.
     source = next(
         r["run"]
-        for r in RUNS
+        for r in runs
         if any(
             len(v) > 1
             for row in r["run"]["depth_evidence"]["line_fixings"]
@@ -155,7 +168,9 @@ def test_rehashed_array_or_value_changes_still_reject_after_map_sorting(
         assert verify_human_design_reading(run)["status"] == "rejected"
 
 
-def test_current_complete_cycle_context_replays_with_reordered_objects(monkeypatch):
+def test_current_complete_cycle_context_replays_with_reordered_objects(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(ROOT / "ephe"))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     run = execute_tool(

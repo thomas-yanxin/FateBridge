@@ -6,16 +6,22 @@ from pathlib import Path
 
 import pytest
 
+from fatebridge.core.contracts.output_liuyao_control import (
+    ControlConditions,
+    DirectedControl,
+)
+from fatebridge.core.liuyao.liuyao_control import PROFILE, build_control_conditions
+from fatebridge.core.liuyao.liuyao_judgment import STAGES
 from scripts.liuyao.build_profile import build_profile
-from tests.liuyao.test_liuyao_conditions import conditional_case
+from tests.unit_test.fixtures.liuyao import conditional_case
+from tests.unit_test.fixtures.liuyao import mounted_lines as mounted
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_control_v9"
 CASES = json.loads((REFERENCE / "cases.json").read_text(encoding="utf-8"))["cases"]
 ERRATA = json.loads((REFERENCE / "errata.json").read_text(encoding="utf-8"))
 
 
-def test_control_source_freeze_is_preserved():
-    from fatebridge.core.liuyao_control import PROFILE
+def test_control_source_freeze_is_preserved() -> None:
 
     assert build_profile("control") == PROFILE
     freeze = json.loads((REFERENCE / "freeze.json").read_text(encoding="utf-8"))
@@ -24,7 +30,7 @@ def test_control_source_freeze_is_preserved():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_frozen_control_conditions(case):
+def test_frozen_control_conditions(case) -> None:
     result = conditional_case(case)
     control = result["control_conditions"]
     by_pair = {
@@ -34,6 +40,8 @@ def test_frozen_control_conditions(case):
         if case["id"] == ERRATA["case_id"] and [source, target] == ERRATA["pair"]:
             assert expected is True  # Initial frozen annotation retained as wrong.
             expected = ERRATA["corrected_condition_match"]
+        else:
+            pass
         row = by_pair[(source, target)]
         assert row["condition_match"] is expected
         assert row["status"]
@@ -42,7 +50,7 @@ def test_frozen_control_conditions(case):
     assert "score" not in control and "predicted_success" not in control
 
 
-def test_weak_moving_controller_does_not_require_its_own_strength_root():
+def test_weak_moving_controller_does_not_require_its_own_strength_root() -> None:
     result = conditional_case(CASES[1])
     wood = result["classical_assessment"]["lines"][1]["strength"]
     metal = result["classical_assessment"]["lines"][4]["strength"]
@@ -52,7 +60,7 @@ def test_weak_moving_controller_does_not_require_its_own_strength_root():
     assert harm["control_condition_match"] is True
 
 
-def test_unrelated_move_does_not_erase_a_qualified_static_control_edge():
+def test_unrelated_move_does_not_erase_a_qualified_static_control_edge() -> None:
     result = conditional_case(CASES[2])
     edge = next(
         e
@@ -65,7 +73,7 @@ def test_unrelated_move_does_not_erase_a_qualified_static_control_edge():
     assert edge["control_condition_match"] is True
 
 
-def test_injured_static_control_is_preserved_as_a_blocked_relation():
+def test_injured_static_control_is_preserved_as_a_blocked_relation() -> None:
     result = conditional_case(CASES[1])
     edge = next(
         e
@@ -82,7 +90,7 @@ def test_injured_static_control_is_preserved_as_a_blocked_relation():
     assert all(o.get("position") != 2 for o in earth["oppositions"])
 
 
-def test_dark_activation_cannot_borrow_an_unresolved_empty_moving_helper():
+def test_dark_activation_cannot_borrow_an_unresolved_empty_moving_helper() -> None:
     result = conditional_case(CASES[3])
     # You is day-clashed, but its only raw helper is the empty, calendar-harmed Chou.
     assert result["lines"][4]["activity"] == "暗动条件匹配"
@@ -104,7 +112,9 @@ def test_dark_activation_cannot_borrow_an_unresolved_empty_moving_helper():
     assert row["condition_match"] is True
 
 
-def test_role_conditions_preserve_raw_relation_and_apply_scoped_control_unknown():
+def test_role_conditions_preserve_raw_relation_and_apply_scoped_control_unknown() -> (
+    None
+):
     result = conditional_case({**CASES[6], "focus_line": 3})
     role = next(r for r in result["role_effects"]["lines"] if r["position"] == 2)
     assert role["atom_values"]["calendar_moving_controls"] is True
@@ -129,10 +139,9 @@ def test_role_conditions_preserve_raw_relation_and_apply_scoped_control_unknown(
     assert co_motion["matched"] is True and co_motion["conditional_matched"] is None
 
 
-def test_simultaneous_control_conditions_are_independent_of_input_iteration_order():
-    from fatebridge.core.liuyao_control import build_control_conditions
-    from fatebridge.core.liuyao_judgment import STAGES
-    from tests.liuyao.test_liuyao_conditions import mounted
+def test_simultaneous_control_conditions_are_independent_of_input_iteration_order() -> (
+    None
+):
 
     case = CASES[7]
     result = conditional_case(case)
@@ -147,8 +156,7 @@ def test_simultaneous_control_conditions_are_independent_of_input_iteration_orde
     assert reversed_result == result["control_conditions"]
 
 
-def test_directed_control_models_allow_partial_fields_without_siblings():
-    from fatebridge.core.output_liuyao_control import ControlConditions, DirectedControl
+def test_directed_control_models_allow_partial_fields_without_siblings() -> None:
 
     assert DirectedControl.model_validate(
         {"status": "active_to_active_requires_arbitration"}

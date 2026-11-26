@@ -2,6 +2,7 @@
 
 import json
 import threading
+from pathlib import Path
 
 import pytest
 from jsonschema import Draft202012Validator
@@ -16,8 +17,13 @@ from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.support.transports import rest as rest
 from tests.support.transports import surface_calls as surface_calls
-from tests.western.test_other_chart_solar_sources import files as files
-from tests.western.test_other_chart_solar_sources import (
+from tests.unit_test.fixtures.western_ephemeris import (
+    configured_ephemeris_files as files,
+)
+from tests.unit_test.fixtures.western_ephemeris import (
+    ephemeris_files as ephemeris_files,
+)
+from tests.unit_test.fixtures.western_ephemeris import (
     restore_configuration as restore_configuration,
 )
 
@@ -37,8 +43,8 @@ BIRTH = dict(
 
 
 def test_same_tt_ecliptic_and_equatorial_calls_share_configuration(
-    files, tmp_path, monkeypatch
-):
+    files, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     empty = tmp_path / "empty"
     empty.mkdir()
     start, done = threading.Event(), threading.Event()
@@ -53,11 +59,17 @@ def test_same_tt_ecliptic_and_equatorial_calls_share_configuration(
             if len(models) == 1:
                 start.set()
                 assert done.wait(5)
+            else:
+                pass
+        else:
+            pass
         return result
 
     def worker():
         if not start.wait(5):
             return
+        else:
+            pass
         got = e._EPHEMERIS_LOCK.acquire(blocking=False)
         acquired.append(got)
         if got:
@@ -65,6 +77,8 @@ def test_same_tt_ecliptic_and_equatorial_calls_share_configuration(
                 e.configure_ephemeris_path(str(empty))
             finally:
                 e._EPHEMERIS_LOCK.release()
+        else:
+            pass
         done.set()
 
     monkeypatch.setattr(runtime, "ephemeris_call", tracked)
@@ -80,7 +94,9 @@ def test_same_tt_ecliptic_and_equatorial_calls_share_configuration(
     assert models == ["swieph", "swieph"] and result[1] == "swieph"
 
 
-def test_unexpected_actual_equatorial_model_is_a_source_error(files, monkeypatch):
+def test_unexpected_actual_equatorial_model_is_a_source_error(
+    files, monkeypatch: pytest.MonkeyPatch
+) -> None:
     actual = runtime.ephemeris_call
 
     def use_real_analytical_equatorial(op, *args, **kwargs):
@@ -90,6 +106,8 @@ def test_unexpected_actual_equatorial_model_is_a_source_error(files, monkeypatch
                 (args[2] & ~e.swe.FLG_SWIEPH) | e.swe.FLG_MOSEPH,
                 *args[3:],
             )
+        else:
+            pass
         return actual(op, *args, **kwargs)
 
     monkeypatch.setattr(runtime, "ephemeris_call", use_real_analytical_equatorial)
@@ -98,14 +116,16 @@ def test_unexpected_actual_equatorial_model_is_a_source_error(files, monkeypatch
 
 
 def test_unavailable_declination_preserves_successful_ecliptic_state(
-    files, monkeypatch
-):
+    files, monkeypatch: pytest.MonkeyPatch
+) -> None:
     actual = runtime.ephemeris_call
 
     def fail_equatorial(op, *args, **kwargs):
         value = actual(op, *args, **kwargs)
         if op == "calc" and args[2] & e.swe.FLG_EQUATORIAL:
             return value[0], -1
+        else:
+            pass
         return value
 
     monkeypatch.setattr(runtime, "ephemeris_call", fail_equatorial)
@@ -117,8 +137,8 @@ def test_unavailable_declination_preserves_successful_ecliptic_state(
 
 
 def test_file_changed_after_first_coordinate_is_not_an_orbital_fallback(
-    files, monkeypatch
-):
+    files, monkeypatch: pytest.MonkeyPatch
+) -> None:
     _, directory = files
     actual = runtime.ephemeris_call
 
@@ -127,6 +147,8 @@ def test_file_changed_after_first_coordinate_is_not_an_orbital_fallback(
         if op == "calc" and args[2] & e.swe.FLG_EQUATORIAL:
             p = directory / "sepl_18.se1"
             p.write_bytes(p.read_bytes() + b"changed after ecliptic identity")
+        else:
+            pass
         return value
 
     monkeypatch.setattr(runtime, "ephemeris_call", mutate_after_equatorial)
@@ -135,8 +157,8 @@ def test_file_changed_after_first_coordinate_is_not_an_orbital_fallback(
 
 
 def test_configuration_change_inside_call_is_not_swallowed_as_approximation(
-    files, tmp_path, monkeypatch
-):
+    files, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     empty = tmp_path / "empty"
     empty.mkdir()
     actual = runtime.ephemeris_call
@@ -145,6 +167,8 @@ def test_configuration_change_inside_call_is_not_swallowed_as_approximation(
         value = actual(op, *args, **kwargs)
         if op == "calc":
             e.configure_ephemeris_path(str(empty))
+        else:
+            pass
         return value
 
     monkeypatch.setattr(runtime, "ephemeris_call", switch)
@@ -153,8 +177,8 @@ def test_configuration_change_inside_call_is_not_swallowed_as_approximation(
 
 
 def test_whole_chart_lock_spans_physical_and_lahiri_passes(
-    files, tmp_path, monkeypatch
-):
+    files, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     empty = tmp_path / "empty"
     empty.mkdir()
     start, done = threading.Event(), threading.Event()
@@ -169,6 +193,8 @@ def test_whole_chart_lock_spans_physical_and_lahiri_passes(
     def worker():
         if not start.wait(5):
             return
+        else:
+            pass
         got = e._EPHEMERIS_LOCK.acquire(blocking=False)
         acquired.append(got)
         if got:
@@ -176,6 +202,8 @@ def test_whole_chart_lock_spans_physical_and_lahiri_passes(
                 e.configure_ephemeris_path(str(empty))
             finally:
                 e._EPHEMERIS_LOCK.release()
+        else:
+            pass
         done.set()
 
     monkeypatch.setattr(charts, "native_lahiri_positions", between_passes)
@@ -194,8 +222,8 @@ def test_whole_chart_lock_spans_physical_and_lahiri_passes(
 
 
 def test_explicit_base_fallback_does_not_discard_native_midpoint_layer(
-    files, monkeypatch
-):
+    files, monkeypatch: pytest.MonkeyPatch
+) -> None:
     actual = ephemeris._swisseph_planet_state
     monkeypatch.setattr(
         ephemeris,
@@ -225,8 +253,13 @@ def test_explicit_base_fallback_does_not_discard_native_midpoint_layer(
     ],
 )
 def test_nominal_source_and_metadata_across_three_surfaces(
-    files, tmp_path, monkeypatch, key, variant, surface_calls
-):
+    files,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    key: str,
+    variant: str | None,
+    surface_calls,
+) -> None:
     _, directory = files
     empty = tmp_path / "empty"
     empty.mkdir()
@@ -238,6 +271,8 @@ def test_nominal_source_and_metadata_across_three_surfaces(
     payload = {**BIRTH, "birth_time_uncertainty_minutes": 1.0}
     if variant:
         payload["chart_variant"] = variant
+    else:
+        pass
     options = dict(
         fields=[path],
         strict_fields=True,
@@ -261,7 +296,7 @@ def test_nominal_source_and_metadata_across_three_surfaces(
                 spec, payload, projection=options, cli_first=False
             )
             assert rest.status_code == 503 and protocol.is_error and code == 1
-            for error in (rest.json(), json.loads(protocol.content[0].text), cli):
+            for error in (rest.json(), protocol.structured_content, cli):
                 assert error["issues"] == [
                     {
                         "path": "runtime.ephemeris_data",
@@ -273,6 +308,8 @@ def test_nominal_source_and_metadata_across_three_surfaces(
                     and error["retryable"] is False
                 )
                 assert str(directory) not in json.dumps(error)
+    else:
+        pass
     e.configure_ephemeris_path(str(directory))
     rest, protocol, code, cli = surface_calls(
         spec, payload, projection=options, cli_first=False

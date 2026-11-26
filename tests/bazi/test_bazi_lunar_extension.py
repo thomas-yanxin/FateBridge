@@ -38,13 +38,13 @@ TOPICS = [
 @pytest.mark.parametrize(
     "case", RESULT["target_extension"]["cases"], ids=lambda c: c["date"]
 )
-def test_each_of_326_normative_hko_dates_is_converted_faithfully(case):
+def test_each_of_326_normative_hko_dates_is_converted_faithfully(case) -> None:
     value = _lunar_date_from_solar(date.fromisoformat(case["date"]))
     assert {k: getattr(value, k) for k in case["expected"]} == case["expected"]
 
 
 @pytest.mark.parametrize("day", [date(2057, 9, 28), date(2057, 10, 27)])
-def test_other_candidate_disagreements_do_not_replace_existing_calendar(day):
+def test_other_candidate_disagreements_do_not_replace_existing_calendar(day) -> None:
     source = next(
         r for r in RESULT["all_diagnostic_mismatches"] if r["date"] == day.isoformat()
     )
@@ -53,7 +53,7 @@ def test_other_candidate_disagreements_do_not_replace_existing_calendar(day):
     assert source_for(day) is None
 
 
-def test_supplement_never_extrapolates_or_mutates_source_metadata():
+def test_supplement_never_extrapolates_or_mutates_source_metadata() -> None:
     for day in [date(1900, 1, 1), date(2100, 2, 8), date(2101, 1, 1)]:
         assert convert(day) is None
         assert source_for(day) is None
@@ -70,7 +70,9 @@ def test_supplement_never_extrapolates_or_mutates_source_metadata():
 
 
 @pytest.mark.parametrize("topic", TOPICS)
-def test_extension_date_is_consistent_on_all_ten_bazi_transports(topic, surface_calls):
+def test_extension_date_is_consistent_on_all_ten_bazi_transports(
+    topic, surface_calls
+) -> None:
     spec = SPECS["bazi_" + topic]
     args = {
         "birth_year": 2100,
@@ -96,14 +98,16 @@ def test_extension_date_is_consistent_on_all_ten_bazi_transports(topic, surface_
         lunar = outputs[0]["bazi_birth"]["calendar_context"]["lunar_calendar"]
         assert (lunar["year"], lunar["month"], lunar["day"]) == (2100, 12, 1)
         assert lunar["conversion_source"]["method_id"] == "hko_2100_month_starts_v1"
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
     "solar,expected", [("2100-02-09", (2100, 1, 1)), ("2100-12-31", (2100, 12, 1))]
 )
 def test_lunar_conversion_exposes_its_finite_source_on_all_transports(
-    solar, expected, surface_calls
-):
+    solar: str, expected, surface_calls
+) -> None:
     spec = SPECS["nongli_time"]
     args = {"date": solar, "time": "12:00:00", "zone": "Asia/Shanghai", "time_alg": 1}
     response, protocol, code, local = surface_calls(

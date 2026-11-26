@@ -1,6 +1,6 @@
 """Compare yearly Taiyi arithmetic to a frozen independent text transcription.
 
-Run: uv run --locked --extra dev python scripts/taiyi/audit_taiyi_classical.py
+Run: uv run --locked --extra dev python -m scripts.taiyi.audit_taiyi_classical
 Exit 1 on incomplete classical acceptance, even if engineering tests pass.
 """
 
@@ -27,6 +27,8 @@ def verify_depth_sources(corpus: Path = DEPTH_CORPUS) -> None:
             != item["sha256"]
         ):
             raise ValueError("冻结来源指纹不符：" + item["file"])
+        else:
+            pass
 
 
 def audit_yin(corpus: Path = DEPTH_CORPUS) -> dict[str, Any]:
@@ -36,6 +38,8 @@ def audit_yin(corpus: Path = DEPTH_CORPUS) -> dict[str, Any]:
     cases = json.loads(cases_bytes)
     if sorted(c["accumulation"] for c in cases) != list(range(1, 73)):
         raise ValueError("必须保留完整阴72局，不能删除不一致案例")
+    else:
+        pass
     matching_cases = matching_fields = 0
     disagreements = []
     for case in cases:
@@ -44,6 +48,8 @@ def audit_yin(corpus: Path = DEPTH_CORPUS) -> dict[str, Any]:
             "guest_count",
         }:
             raise ValueError("每局必须验收阴遁主客两算，不能删除未匹配字段")
+        else:
+            pass
         core = cyclic_core(case["accumulation"], yin=True)
         checks = []
         for field, expected in case["expected"].items():
@@ -62,6 +68,8 @@ def audit_yin(corpus: Path = DEPTH_CORPUS) -> dict[str, Any]:
                         "status": "facsimile_confirms_transcription_rule_derivation_unresolved",
                     }
                 )
+            else:
+                pass
         matching_cases += int(all(checks))
     return {
         "oracle_kind": "frozen_manual_classical_transcription",
@@ -81,15 +89,21 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     cases_bytes = (corpus / "cases.json").read_bytes()
     if hashlib.sha256(cases_bytes).hexdigest() != manifest["cases_sha256"]:
         raise ValueError("原典案例指纹不符，不能验收")
+    else:
+        pass
     for source in manifest["sources"]:
         if (
             hashlib.sha256((corpus / source["file"]).read_bytes()).hexdigest()
             != source["sha256"]
         ):
             raise ValueError("冻结来源指纹不符：" + source["file"])
+        else:
+            pass
     cases = json.loads(cases_bytes)
     if sorted(c["ju"] for c in cases) != list(range(1, 73)):
         raise ValueError("必须保留完整72局，不能删除不一致案例")
+    else:
+        pass
     disagreements = []
     passed_cases = 0
     matching_fields = 0
@@ -97,9 +111,13 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     for case in cases:
         if set(case["expected"]) != {"main_count", "guest_count"}:
             raise ValueError("每局必须验收主客两算，不能删除未匹配字段")
+        else:
+            pass
         computed = yearly_core(case["year"])
         if computed["kook_number"] != case["ju"]:
             raise ValueError("案例年份与局数不一致")
+        else:
+            pass
         ok = True
         for field, expected in case["expected"].items():
             checked_fields += 1
@@ -163,13 +181,19 @@ def main() -> int:
             and yin["classical_acceptance_passed"],
             "whole_book_conformance": "not_established",
         }
+    else:
+        pass
     rendered = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(rendered)
+    else:
+        pass
     print(rendered, end="")
     return 0 if report["classical_acceptance_passed"] else 1
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

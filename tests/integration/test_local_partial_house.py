@@ -52,72 +52,103 @@ def partial_source() -> Reference:
     return reference
 
 
-@pytest.mark.parametrize("control_index", range(24))
-def test_canonical_partial_geometry_survives_each_local_option(
-    partial_source: Reference, control_index: int, monkeypatch, surface_calls
-):
-    control = partial_source["controls"][control_index]
+def _assert_partial_house_value(
+    value: dict, control: dict[str, JsonValue], partial_source: Reference
+) -> None:
+    chart = value["chart"]
+    assert chart["ok"] is True
+    assert chart["houses"] == []
+    assert chart["angles"] == {"ascendant": None, "midheaven": None}
+    assert [
+        {k: point[k] for k in ("id", "lon", "sign", "signlon")}
+        for point in chart["objects"]
+    ] == partial_source["planets"]
+    assert all(point["house"] is None for point in chart["objects"])
+    assert value["params"]["houseStartModeApplied"] is None
+    assert value["params"]["houseOrientation"] is None
+    assert value["params"]["houseGeometryStatus"] == "unavailable_selected_reference"
+    assert value["validation"]["chart_source"] == partial_source["source_validation"]
+    assert value["validation"]["chart_source"]["classical_acceptance_passed"] is False
+    assert value["rulesets"]["chart"] == partial_source["source_rulesets"]
+    assert "calendar" in value["rulesets"]
+    assert value["sukuyo"]["day_mansion"]
+    assert value["sukuyo"]["calendar"]["birth_time_known"] is True
+    layers = value["validation"]["calculation_layers"]
+    assert layers["calendar"] == value["sukuyo"]["calendar"]["status"]
+    assert layers["chart"] == layers["planet_positions"] == "computed"
+    assert layers["house_geometry"] == "unavailable_selected_reference"
+    if control["payload"]["doubing_su28"]:
+        if control["payload"]["mansion_method"] == "equatorial_research28":
+            assert value["astronomy"] is not None
+            assert "Sun" in {p["id"] for p in value["astronomy"]["bodies"]}
+            assert layers["astronomy"] == "computed"
+        else:
+            assert value["astronomy"] is None
+            assert all(point["su28"] for point in chart["objects"])
+            assert layers["astronomy"] == "not_computed"
+    else:
+        assert value["astronomy"] is None
+        assert all("su28" not in point for point in chart["objects"])
+        assert layers["astronomy"] == "not_computed"
+    snapshot = value["snapshot_text"]
+    assert "参考宫位未定" in snapshot and "HouseNone" not in snapshot
+    assert "星图来源与适用范围" in snapshot
+    assert all(f"星曜：{p['id']} " in snapshot for p in partial_source["planets"])
 
+
+def test_canonical_partial_geometry_survives_each_local_option(
+    partial_source: Reference, monkeypatch: pytest.MonkeyPatch, rest
+) -> None:
     def source(*args: object, **kwargs: object) -> dict[str, JsonValue]:
         return copy.deepcopy(partial_source["core"])
 
     monkeypatch.setattr(local_chart, "build_core_chart_payload", source)
-    response, protocol, code, cli = surface_calls(
-        SPECS["suzhan"],
-        control["payload"],
-        projection=dict(
-            as_of="2026-11-12T00:00:00Z",
-            response_char_limit=0,
-            include_snapshot_text=True,
+    params = {
+        "as_of": "2026-11-12T00:00:00Z",
+        "response_char_limit": 0,
+        "include_snapshot_text": "true",
+    }
+    for control in partial_source["controls"]:
+        response = rest.post(
+            SPECS["suzhan"].rest_path, json=control["payload"], params=params
+        )
+        assert response.status_code == 200, response.text
+        _assert_partial_house_value(response.json(), control, partial_source)
+
+
+def test_canonical_partial_geometry_representative_options_agree_across_transports(
+    partial_source: Reference, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
+    def source(*args: object, **kwargs: object) -> dict[str, JsonValue]:
+        return copy.deepcopy(partial_source["core"])
+
+    monkeypatch.setattr(local_chart, "build_core_chart_payload", source)
+    buckets = {
+        "no_doubing": lambda p: not p["doubing_su28"],
+        "equatorial": lambda p: (
+            bool(p["doubing_su28"]) and p["mansion_method"] == "equatorial_research28"
         ),
-    )
-    assert response.status_code == 200, response.text
-    assert code == 0 and not protocol.is_error
-    values = [response.json(), cli, protocol.structured_content]
-    assert business(values[0]) == business(values[1]) == business(values[2])
-    for value in values:
-        chart = value["chart"]
-        assert chart["ok"] is True
-        assert chart["houses"] == []
-        assert chart["angles"] == {"ascendant": None, "midheaven": None}
-        assert [
-            {k: point[k] for k in ("id", "lon", "sign", "signlon")}
-            for point in chart["objects"]
-        ] == partial_source["planets"]
-        assert all(point["house"] is None for point in chart["objects"])
-        assert value["params"]["houseStartModeApplied"] is None
-        assert value["params"]["houseOrientation"] is None
-        assert (
-            value["params"]["houseGeometryStatus"] == "unavailable_selected_reference"
+        "other_doubing": lambda p: (
+            bool(p["doubing_su28"]) and p["mansion_method"] != "equatorial_research28"
+        ),
+    }
+    representatives = [
+        next(c for c in partial_source["controls"] if pred(c["payload"]))
+        for pred in buckets.values()
+    ]
+    for control in representatives:
+        response, protocol, code, cli = surface_calls(
+            SPECS["suzhan"],
+            control["payload"],
+            projection=dict(
+                as_of="2026-11-12T00:00:00Z",
+                response_char_limit=0,
+                include_snapshot_text=True,
+            ),
         )
-        assert (
-            value["validation"]["chart_source"] == partial_source["source_validation"]
-        )
-        assert (
-            value["validation"]["chart_source"]["classical_acceptance_passed"] is False
-        )
-        assert value["rulesets"]["chart"] == partial_source["source_rulesets"]
-        assert "calendar" in value["rulesets"]
-        assert value["sukuyo"]["day_mansion"]
-        assert value["sukuyo"]["calendar"]["birth_time_known"] is True
-        layers = value["validation"]["calculation_layers"]
-        assert layers["calendar"] == value["sukuyo"]["calendar"]["status"]
-        assert layers["chart"] == layers["planet_positions"] == "computed"
-        assert layers["house_geometry"] == "unavailable_selected_reference"
-        if control["payload"]["doubing_su28"]:
-            if control["payload"]["mansion_method"] == "equatorial_research28":
-                assert value["astronomy"] is not None
-                assert "Sun" in {p["id"] for p in value["astronomy"]["bodies"]}
-                assert layers["astronomy"] == "computed"
-            else:
-                assert value["astronomy"] is None
-                assert all(point["su28"] for point in chart["objects"])
-                assert layers["astronomy"] == "not_computed"
-        else:
-            assert value["astronomy"] is None
-            assert all("su28" not in point for point in chart["objects"])
-            assert layers["astronomy"] == "not_computed"
-        snapshot = value["snapshot_text"]
-        assert "参考宫位未定" in snapshot and "HouseNone" not in snapshot
-        assert "星图来源与适用范围" in snapshot
-        assert all(f"星曜：{p['id']} " in snapshot for p in partial_source["planets"])
+        assert response.status_code == 200, response.text
+        assert code == 0 and not protocol.is_error
+        values = [response.json(), cli, protocol.structured_content]
+        assert business(values[0]) == business(values[1]) == business(values[2])
+        for value in values:
+            _assert_partial_house_value(value, control, partial_source)

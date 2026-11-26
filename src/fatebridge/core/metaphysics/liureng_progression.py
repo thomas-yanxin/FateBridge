@@ -4,9 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX, kongwang_for_ganzhi
 from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
-
-from .common import SEXAGENARY_INDEX, kongwang_for_ganzhi
 
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 SCOPE = (

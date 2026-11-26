@@ -6,14 +6,11 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.liuyao_judgment import build_conditional_analysis
-from fatebridge.core.liuyao_month_break import PROFILE, day_value_exception
-from fatebridge.core.local_techniques.sixyao import (
-    _BAGONG_BASES,
-    _build_sixyao_enrichment,
-)
+from fatebridge.core.liuyao.liuyao_judgment import build_conditional_analysis
+from fatebridge.core.liuyao.liuyao_month_break import PROFILE, day_value_exception
+from fatebridge.core.liuyao.liuyao_najia import BAGONG_BASES, build_sixyao_enrichment
 from scripts.liuyao.build_liuyao_month_break_profile import build
-from tests.liuyao.test_liuyao_conditions import mounted
+from tests.unit_test.fixtures.liuyao import mounted_lines as mounted
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_month_break_v24"
 CASES = json.loads((REFERENCE / "cases-r1.json").read_text())["cases"]
@@ -35,7 +32,7 @@ def analysis(case, hidden=None, focus_kind=None):
     )
 
 
-def test_frozen_source_and_all_original_erroneous_expectations_are_retained():
+def test_frozen_source_and_all_original_erroneous_expectations_are_retained() -> None:
     assert build() == PROFILE
     old = json.loads((REFERENCE / "cases.json").read_text())["cases"]
     assert len(old) == 9 and len(CASES) == 13
@@ -48,7 +45,7 @@ def test_frozen_source_and_all_original_erroneous_expectations_are_retained():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda case: case["id"])
-def test_source_backed_day_value_and_independent_control_counterexamples(case):
+def test_source_backed_day_value_and_independent_control_counterexamples(case) -> None:
     result = analysis(case)
     p = case["focus_line"]
     month = result["month_break_conditions"]["lines"][p - 1]
@@ -60,6 +57,8 @@ def test_source_backed_day_value_and_independent_control_counterexamples(case):
     assert month["day_value_exception"] is case["day_value_exception"]
     if case["raw_month_break"]:
         assert result["lines"][p - 1]["monthly_strength"]["category"] == "月破"
+    else:
+        pass
     checks = {
         "expected_calendar_month_opposition": any(
             h["location"] == "month" and h["reason"] == "月破"
@@ -84,9 +83,13 @@ def test_source_backed_day_value_and_independent_control_counterexamples(case):
                 for c in result["control_conditions"]["controls"]
                 if c["source_position"] == source and c["target_position"] == p
             )
+        else:
+            pass
     for key, value in checks.items():
         if key in case:
             assert value == case[key], key
+        else:
+            pass
     if case["id"] in {
         "static-day-value-excludes-month-opposition",
         "moving-day-value-retains-independent-day-root",
@@ -97,6 +100,8 @@ def test_source_backed_day_value_and_independent_control_counterexamples(case):
             if c["source_position"] == 3 and c["target_position"] == p
         )
         assert actor["source_active"] is True and actor["source_activity_match"] is True
+    else:
+        pass
     assert (
         result["month_break_conditions"]["source_sha256"] == PROFILE["source"]["sha256"]
     )
@@ -107,12 +112,12 @@ def test_source_backed_day_value_and_independent_control_counterexamples(case):
     [("001101", 3, "寅", "甲申"), ("000011", 1, "丑", "乙未")],
 )
 def test_actual_hidden_mounting_does_not_release_day_valued_flying_month_break(
-    code, position, month, day
-):
+    code: str, position: int, month: str, day: str
+) -> None:
     # Post-freeze integration checks, not additional independent ancient cases.
-    info, rows = _build_sixyao_enrichment(code, code, day[0])
-    palace = next(c for p, c, _ in _BAGONG_BASES if p == info["current_palace"])
-    _, pure = _build_sixyao_enrichment(palace, palace, day[0])
+    info, rows = build_sixyao_enrichment(code, code, day[0])
+    palace = next(c for p, c, _ in BAGONG_BASES if p == info["current_palace"])
+    _, pure = build_sixyao_enrichment(palace, palace, day[0])
     present = {r["liuqin"] for r in rows}
     hidden = [
         {**r, "flying_branch": rows[i]["branch"]}
@@ -147,7 +152,7 @@ def test_actual_hidden_mounting_does_not_release_day_valued_flying_month_break(
     assert result["month_break_conditions"]["focus"] is None
 
 
-def test_role_conditions_do_not_reintroduce_the_excluded_month_control():
+def test_role_conditions_do_not_reintroduce_the_excluded_month_control() -> None:
     case = next(c for c in CASES if c["id"] == "pure-static-day-value-no-active-metal")
     result = analysis({**case, "focus_line": 1})
     role = next(r for r in result["role_effects"]["lines"] if r["position"] == 3)

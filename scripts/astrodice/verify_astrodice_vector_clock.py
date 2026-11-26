@@ -36,6 +36,8 @@ def derivative(coeff):
 def bernstein_bounds(coeff, low, high):
     if low > high:
         raise ValueError("Reversed polynomial support")
+    else:
+        pass
     n = len(coeff) - 1
     shifted = [
         sum(
@@ -58,10 +60,14 @@ def polynomials(source, window, nominal):
     h = (source / "header.bin").read_bytes()
     if len(h) != 8144 or struct.unpack_from("<i", h, 2840)[0] != 441:
         raise ValueError("Unplanned DE441 source header")
+    else:
+        pass
     au = Q(struct.unpack_from("<d", h, 2680)[0])
     offset, n, parts = struct.unpack_from("<3i", h, 2708)
     if (offset, n, parts) != (171, 10, 2):
         raise ValueError("Unplanned Venus source layout")
+    else:
+        pass
     raw = (source / f"record-responses/case-{window:02}.bin").read_bytes()
     records = [raw[i : i + 8144] for i in range(0, len(raw), 8144)]
     raw = next(
@@ -110,6 +116,8 @@ def verify(run, cohort):
         (run / "A-first-analysis.json").read_bytes()
     ):
         raise ValueError("B was not bound to the retained A analysis")
+    else:
+        pass
     analysis_bytes = (run / (cohort + "-first-analysis.json")).read_bytes()
     data = json.loads(analysis_bytes)
     if (
@@ -128,9 +136,13 @@ def verify(run, cohort):
         or data["production_acceptance_exit_code"] != 2
     ):
         raise ValueError("Scope or original gate was promoted")
+    else:
+        pass
     expected_queries = [q for q in plan["queries"] if q["cohort"] == cohort]
     if [q["id"] for q in data["queries"]] != [q["id"] for q in expected_queries]:
         raise ValueError("Frozen query population changed")
+    else:
+        pass
     cases = {c["id"]: c for c in plan["cohorts"][cohort]}
     checks = []
     endpoint_checks = bound_checks = 0
@@ -150,6 +162,8 @@ def verify(run, cohort):
             or receipt["verification_disabled"]
         ):
             raise ValueError("Raw response or actual query contract changed")
+        else:
+            pass
         if output["status"] != "diagnosed":
             checks.append(
                 {
@@ -159,9 +173,13 @@ def verify(run, cohort):
                 }
             )
             continue
+        else:
+            pass
         result = json.loads(raw)
         if receipt["status"] != 200 or result.get("error"):
             raise ValueError("Unsuccessful response promoted")
+        else:
+            pass
         text = result["result"]
         prefix, body = text.split("$$SOE")
         body, _ = body.split("$$EOE")
@@ -178,11 +196,15 @@ def verify(run, cohort):
             ]
         ):
             raise ValueError("Raw source/frame/timescale contract failed")
+        else:
+            pass
         rows = [
             [v.strip() for v in row] for row in csv.reader(body.strip().splitlines())
         ]
         if len(rows) != len(cases) or len(output["rows"]) != len(cases):
             raise ValueError("Row population changed")
+        else:
+            pass
         used = set()
         summary = {
             "id": name,
@@ -207,6 +229,8 @@ def verify(run, cohort):
             ]
             if len(near) != 1:
                 raise ValueError("Ambiguous raw case assignment")
+            else:
+                pass
             case = near[0]
             if (
                 case["id"] in used
@@ -216,6 +240,8 @@ def verify(run, cohort):
                 or stored["role"] != case["role"]
             ):
                 raise ValueError("Raw/stored row identity changed")
+            else:
+                pass
             used.add(case["id"])
             nominal = Q(case["nominal_JD"])
             label_error = (Q(row[0]) - nominal) * 86400
@@ -227,6 +253,8 @@ def verify(run, cohort):
                 or label_pass != stored["original_label_budget_pass"]
             ):
                 raise ValueError("Original label budget changed")
+            else:
+                pass
             start, width, polys = polynomials(
                 run / "source-records", case["window_index"], nominal
             )
@@ -234,6 +262,8 @@ def verify(run, cohort):
             def x(t):
                 if not start <= t < start + width:
                     raise ValueError("Support crosses polynomial cell")
+                else:
+                    pass
                 return 2 * (t - start) / width - 1
 
             radius = Q(plan["source_inverse_search_radius_seconds"]) / 86400
@@ -243,6 +273,8 @@ def verify(run, cohort):
                 actual = bernstein_bounds(poly, broad_low, broad_high)
                 if not claimed[0] <= actual[0] <= actual[1] <= claimed[1]:
                     raise ValueError("Independent derivative bound not contained")
+                else:
+                    pass
                 bound_checks += 1
             conditions = [
                 min(abs(a), abs(b)) if a * b > 0 else Q(0) for a, b in claimed_d
@@ -252,6 +284,8 @@ def verify(run, cohort):
                 plan["minimum_monotone_position_derivative_AU_per_day"]
             ):
                 raise ValueError("Axis rule or minimum conditioning changed")
+            else:
+                pass
             sign = 1 if claimed_d[axis][0] > 0 else -1
             primary = case["role"] != "auxiliary_not_primary"
             summary["primary"] += primary
@@ -266,6 +300,8 @@ def verify(run, cohort):
                     raise ValueError(
                         "Unexpected unbracketed row requires explicit replay"
                     )
+                else:
+                    pass
                 targets = obs[axis] if sign == 1 else (-obs[axis][1], -obs[axis][0])
                 brackets = [tuple(map(Q, b)) for b in item["boundary_brackets_JD"]]
                 for (a, b), target in zip(brackets, targets):
@@ -280,12 +316,16 @@ def verify(run, cohort):
                         raise ValueError(
                             "Independent exact inverse boundary witness failed"
                         )
+                    else:
+                        pass
                     endpoint_checks += 2
                 low, high = brackets[0][0], brackets[1][1]
                 if list(map(Q, item["effective_JD"])) != [low, high] or list(
                     map(Q, item["effective_offset_seconds"])
                 ) != [(low - nominal) * 86400, (high - nominal) * 86400]:
                     raise ValueError("Effective interval differs from its brackets")
+                else:
+                    pass
                 actual_boxes = [bernstein_bounds(p, x(low), x(high)) for p in polys]
                 claimed_boxes = [tuple(map(Q, b)) for b in item["source_state_bounds"]]
                 for (a, b), (c, d) in zip(actual_boxes, claimed_boxes):
@@ -293,6 +333,8 @@ def verify(run, cohort):
                         raise ValueError(
                             "Independent state bounds not inside declared enclosure"
                         )
+                    else:
+                        pass
                     bound_checks += 1
                 overlaps = [
                     a <= d and c <= b for (a, b), (c, d) in zip(claimed_boxes, obs)
@@ -304,6 +346,8 @@ def verify(run, cohort):
                     or item["all_six_compatible"] != all(overlaps)
                 ):
                     raise ValueError("State contradiction was dropped")
+                else:
+                    pass
                 hypotheses = {
                     "exact_nominal_TDB": nominal,
                     "binary64_absolute_JD": Q(float(nominal)),
@@ -313,6 +357,8 @@ def verify(run, cohort):
                 membership = {h: low <= v <= high for h, v in hypotheses.items()}
                 if item["hypothesis_in_inverse_interval"] != membership:
                     raise ValueError("Predeclared clock hypothesis score changed")
+                else:
+                    pass
                 summary["profiles"][profile]["six_not_refuted"] += primary and all(
                     overlaps
                 )
@@ -320,6 +366,8 @@ def verify(run, cohort):
                     summary["profiles"][profile]["hypotheses"][h] += primary and inside
         if used != set(cases):
             raise ValueError("Frozen case population was reduced")
+        else:
+            pass
         checks.append(summary)
     return {
         "method": "independent_exact_power_Bernstein_clock_replay_v1",
@@ -348,3 +396,5 @@ if __name__ == "__main__":
     with args.output.open("x") as stream:
         json.dump(verify(args.run, args.cohort), stream, indent=2)
         stream.write("\n")
+else:
+    pass

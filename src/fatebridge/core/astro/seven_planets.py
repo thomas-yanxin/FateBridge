@@ -2,10 +2,10 @@
 
 import math
 from fractions import Fraction
-from typing import Any, Dict, List
+from typing import Any
 
+from fatebridge.core.astro.astrology_tables import SIGN_LABELS_ZH, SIGNS
 from fatebridge.core.astro.reference import _TRADITIONAL_PLANET_IDS, ASPECTS
-from fatebridge.core.astrology_tables import SIGN_LABELS_ZH, SIGNS
 
 
 def _display(value: Fraction, period: int = 360) -> float:
@@ -14,7 +14,7 @@ def _display(value: Fraction, period: int = 360) -> float:
     return math.nextafter(result, -math.inf) if Fraction(result) > value else result
 
 
-def seven_planet_view(factors: List[Dict[str, Any]]) -> Dict[str, Any]:
+def seven_planet_view(factors: list[dict[str, Any]]) -> dict[str, Any]:
     bodies = [factor for factor in factors if factor["id"] in _TRADITIONAL_PLANET_IDS]
     values = {factor["id"]: Fraction(factor["longitude"]) % 360 for factor in bodies}
     midpoints, contacts = [], []

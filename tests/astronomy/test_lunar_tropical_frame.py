@@ -43,8 +43,8 @@ def matrix(rows, kind):
 @pytest.mark.parametrize("index", range(3))
 @pytest.mark.parametrize("backend", ["swieph", "jpl_record_window"])
 def test_actual_source_state_with_analytic_frame_matches_independent_expanded_matrix(
-    index, backend
-):
+    index, backend: str
+) -> None:
     row = native(index, backend)
     metadata = row["metadata"]
     fixed = metadata["lunar_light_time"]["fixed_frame_source_derivative"]
@@ -98,7 +98,9 @@ def test_actual_source_state_with_analytic_frame_matches_independent_expanded_ma
         ("center_file_context_reproduced_exactly", False),
     ],
 )
-def test_unverified_source_state_is_never_upgraded(field, value):
+def test_unverified_source_state_is_never_upgraded(
+    field: str, value: bool | float | str
+) -> None:
     row = native()
     fixed = copy.deepcopy(
         row["metadata"]["lunar_light_time"]["fixed_frame_source_derivative"]
@@ -122,8 +124,8 @@ def test_unverified_source_state_is_never_upgraded(field, value):
     ],
 )
 def test_no_unique_derivative_claim_at_native_shortcut_or_outside_domain(
-    epoch, reason, monkeypatch
-):
+    epoch: float, reason: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     def forbidden(*args, **kwargs):
         raise AssertionError("An unavailable frame must not sample native states")
 
@@ -134,7 +136,9 @@ def test_no_unique_derivative_claim_at_native_shortcut_or_outside_domain(
     assert result is None and policy["reason"] == reason
 
 
-def test_unverified_binding_never_changes_the_delivered_rate(monkeypatch):
+def test_unverified_binding_never_changes_the_delivered_rate(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(
         frame, "binding_distribution_version", lambda *args: "unavailable"
     )
@@ -145,7 +149,9 @@ def test_unverified_binding_never_changes_the_delivered_rate(monkeypatch):
 
 
 @pytest.mark.parametrize("kind", ["nutation_model", "display_position"])
-def test_a_different_native_frame_is_not_silently_assumed(kind, monkeypatch):
+def test_a_different_native_frame_is_not_silently_assumed(
+    kind: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     row = native()
     fixed = row["metadata"]["lunar_light_time"]["fixed_frame_source_derivative"]
     coords = [row["state"]["longitude"], row["state"]["latitude"]]
@@ -164,7 +170,7 @@ def test_a_different_native_frame_is_not_silently_assumed(kind, monkeypatch):
     assert policy["native_model_component_errors_arcsec"]
 
 
-def test_same_domain_frame_formula_keeps_known_source_failure():
+def test_same_domain_frame_formula_keeps_known_source_failure() -> None:
     data = audit(RUN, RUN / "development-reference-first.json")
     failed = [r for r in data["rows"] if not r["qualified"]]
     assert len(failed) == 1 and failed[0]["label"] == "3000-12-07T04:07:32"

@@ -23,11 +23,15 @@ def audit_independent_readings(fixtures: Path = FIXTURES) -> dict[str, Any]:
         relative = Path(row["path"])
         if relative.is_absolute() or ".." in relative.parts:
             raise ValueError("Unsafe independent reading path")
+        else:
+            pass
         if (
             hashlib.sha256((folder / relative).read_bytes()).hexdigest()
             != row["sha256"]
         ):
             raise ValueError("Independent reading checksum mismatch: " + row["path"])
+        else:
+            pass
     raw = json.loads((folder / "reports/day-review.json").read_text())
     errata = json.loads((folder / "reports/day-review-errata-01.json").read_text())
     clock = json.loads((folder / "reports/source-review.json").read_text())
@@ -36,11 +40,15 @@ def audit_independent_readings(fixtures: Path = FIXTURES) -> dict[str, Any]:
         != hashlib.sha256((folder / "reports/day-review.json").read_bytes()).hexdigest()
     ):
         raise ValueError("Erratum does not identify the retained first reading")
+    else:
+        pass
 
     expected_keys = {(bureau, day) for bureau in range(2, 7) for day in range(1, 31)}
     first = {(r["bureau"], r["day"]): r for r in raw["day_to_branch_rows"]}
     if len(raw["day_to_branch_rows"]) != 150 or set(first) != expected_keys:
         raise ValueError("Independent day-reading denominator changed")
+    else:
+        pass
     corrected = deepcopy(first)
     correction = errata["corrected_day_to_branch_row"]
     key = (correction["bureau"], correction["day"])
@@ -51,6 +59,8 @@ def audit_independent_readings(fixtures: Path = FIXTURES) -> dict[str, Any]:
     selected = {(r["bureau"], r["day"]): r for r in selected_source["records"]}
     if set(selected) != expected_keys:
         raise ValueError("Selected transcription denominator changed")
+    else:
+        pass
 
     agreed = []
     differences = []
@@ -70,6 +80,8 @@ def audit_independent_readings(fixtures: Path = FIXTURES) -> dict[str, Any]:
                 )
             elif old["source_kind"] == "direct_grid_cell":
                 agreed.append(identity)
+            else:
+                pass
         elif branches:
             conflicts.append(dict(**identity, branches=branches))
         else:
@@ -83,15 +95,23 @@ def audit_independent_readings(fixtures: Path = FIXTURES) -> dict[str, Any]:
                         review_status=review["status"],
                     )
                 )
+            else:
+                pass
         if candidates := review.get("candidate_branches_from_unresolved_labels"):
             rival_candidates.append(dict(**identity, candidates=candidates))
+        else:
+            pass
 
     frames = {(r["item_id"], r["image_number_one_based"]) for r in clock["read_images"]}
     coverage = clock["coverage"]
     if len(frames) != coverage["unique_whole_frames_visually_read"]:
         raise ValueError("Reported image coverage does not match the frozen image list")
+    else:
+        pass
     if coverage["exhaustive_whole_book_reading"]:
         raise ValueError("The selected review must not become a whole-book claim")
+    else:
+        pass
     findings = {r["id"]: r for r in clock["findings"]}
     return dict(
         method_id="ziwei_independent_source_readings_r22_v1",

@@ -81,6 +81,8 @@ def independent_pi():
 def vector_metrics(q, w, e, f, scales):
     if len(scales) != 4 or any(Q(x) <= 0 for x in scales):
         raise ValueError("Independent positive norm scaling missing")
+    else:
+        pass
     iterator = iter(map(Q, scales))
 
     def length(v):
@@ -132,6 +134,8 @@ def blossom_matrix(n, leaf, depth):
             row.append(total)
         if sum(row) != step**n:
             raise ValueError("Independent blossom weights not a partition of unity")
+        else:
+            pass
         result.append(row)
     return result
 
@@ -174,8 +178,12 @@ def binary64(q):
     q = Q(q)
     if not q:
         return Q()
+    else:
+        pass
     if q < 0:
         return -binary64(-q)
+    else:
+        pass
     exponent = q.numerator.bit_length() - q.denominator.bit_length()
     while Q(2) ** exponent > q:
         exponent -= 1
@@ -199,6 +207,8 @@ def swe_chebyshev(coefficients, x):
     for k, c in enumerate(coefficients[1:], 1):
         if k > 1:
             t0, t1, d0, d1 = t1, 2 * x * t1 - t0, d1, 2 * t1 + 2 * x * d1 - d0
+        else:
+            pass
         value += c * t1
         velocity += c * d1
     return value, velocity
@@ -221,6 +231,8 @@ def descriptors(path):
     _, edition, _, _, count = read("ii2dh")
     if edition != 441:
         raise ValueError("Independent source edition differs")
+    else:
+        pass
     ids = read(("i" if count > 256 else "h") * (count % 256))
     read("I5d")
     result = {}
@@ -229,6 +241,8 @@ def descriptors(path):
         parameters = read("10d")
         if flags & 4:
             read(str(2 * ncoef) + "d")
+        else:
+            pass
         result[body] = {"flags": flags, "ncoef": ncoef, "parameters": parameters}
     return result
 
@@ -256,11 +270,15 @@ class IndependentSources:
             start, end, width, *_ = map(Q, desc["parameters"])
             if low < start or high > end:
                 raise ValueError("Independent source coverage missing")
+            else:
+                pass
             i = int((low - start) // width)
             while start + i * width < high:
                 t = start + i * width
                 if low < t < high:
                     points.add(t)
+                else:
+                    pass
                 i += 1
         for raw in self.records:
             a, b = map(Q, struct.unpack_from("<2d", raw))
@@ -270,6 +288,8 @@ class IndependentSources:
                     t = a + (b - a) * i / parts
                     if low < t < high:
                         points.add(t)
+                    else:
+                        pass
         points = sorted(points)
         return list(zip(points, points[1:]))
 
@@ -298,11 +318,15 @@ class IndependentSources:
                 )
             ):
                 raise ValueError("Independent SWE descriptor/normalizer differs")
+            else:
+                pass
             for a, b in zip(
                 s["decoded_coefficients"], decoded["decoded_exact_coefficients"]
             ):
                 if any(abs(Q(x) - y) > 8 * Q(math.ulp(x)) for x, y in zip(a, b)):
                     raise ValueError("Independent integer-packed input differs")
+                else:
+                    pass
             if (
                 max(
                     abs(x - float(y))
@@ -315,7 +339,11 @@ class IndependentSources:
                 > 1e-14
             ):
                 raise ValueError("Independent high precision rotation differs")
+            else:
+                pass
             self.validated.add(key)
+        else:
+            pass
         return key, s
 
     def swi(self, mid, t, body, profile):
@@ -340,6 +368,8 @@ class IndependentSources:
         moon, mk, md = self.swi(mid, t, 1, profile)
         if body == "Moon":
             return moon, [mk], md
+        else:
+            pass
         target, tk, td = self.swi(mid, t, {"Mercury": 2, "Venus": 3}[body], profile)
         sun, sk, sd = self.swi(mid, t, 10, profile)
         denominator = Q((1 / 0.0123000383) + 1)
@@ -365,6 +395,8 @@ class IndependentSources:
         x = 2 * (t - begin) / width - 1
         if not -1 <= x <= 1:
             raise ValueError("Independent JPL source cell mismatch")
+        else:
+            pass
         values = struct.unpack("<1018d", raw)
         p = []
         v = []
@@ -382,6 +414,8 @@ class IndependentSources:
         moon, md = self.group(mid, t, 9)
         if body == "Moon":
             return moon, md
+        else:
+            pass
         target, td = self.group(mid, t, {"Mercury": 0, "Venus": 1}[body])
         emb, ed = self.group(mid, t, 2)
         denominator = 1 + Q(struct.unpack_from("<d", self.header, 2688)[0])
@@ -395,6 +429,8 @@ def cover(pair, reported):
         lo, hi = map(Q, declared)
         if not lo <= actual.v[0] <= actual.v[1] <= hi:
             raise ValueError("Independent288bit result not contained")
+        else:
+            pass
 
 
 def verify(run, path):
@@ -406,16 +442,24 @@ def verify(run, path):
         or sha(run / "raw-source-before-evaluation.json") != RAW_SHA
     ):
         raise ValueError("Independent immutable plan/source receipt changed")
+    else:
+        pass
     plan = json.loads((run / "plan-before-analysis.json").read_text())
     report = json.loads(path.read_text())
     raw = json.loads((run / "raw-source-before-evaluation.json").read_text())
     for name, item in raw["records"].items():
         if sha(Path(name)) != item["sha256"]:
             raise ValueError("Original raw record changed")
+        else:
+            pass
     if sha(run / "raw-source/header.bin") != raw["full_header_sha256"]:
         raise ValueError("Original header changed")
+    else:
+        pass
     if report.get("status") == "evidence_unavailable":
         raise ValueError("Original unavailable condition remains unavailable")
+    else:
+        pass
     split, index = report["split"], report["case_index"]
     case = plan["cases"][split][index]
     if (
@@ -432,11 +476,15 @@ def verify(run, path):
         )
     ):
         raise ValueError("Original source curve binding/claim changed")
+    else:
+        pass
     source = IndependentSources(run, case, report["segments"])
     low, high = Q(case["domain_start_exact"]), Q(case["domain_end_exact"])
     partition = source.partition(low, high)
     if [(Q(c["start_exact"]), Q(c["end_exact"])) for c in report["cells"]] != partition:
         raise ValueError("Complete full-domain population changed")
+    else:
+        pass
     root_identities = leaf_proofs = point_proofs = 0
     for ci, cell in enumerate(report["cells"]):
         a, b = partition[ci]
@@ -444,9 +492,13 @@ def verify(run, path):
         width = b - a
         if cell["cell_index"] != ci or list(cell["bodies"]) != plan["bodies"]:
             raise ValueError("Body/cell population changed")
+        else:
+            pass
         for body, profiles in cell["bodies"].items():
             if list(profiles) != plan["profiles"]:
                 raise ValueError("Retention profile population changed")
+            else:
+                pass
             for profile, data in profiles.items():
                 q = [[Q(x) for x in axis] for axis in data["q_bernstein"]]
                 e = [[Q(x) for x in axis] for axis in data["error_bernstein"]]
@@ -456,10 +508,14 @@ def verify(run, path):
                     or any(not 1 <= len(c) <= 41 for c in q + e)
                 ):
                     raise ValueError("Invalid source polynomial degree/axis")
+                else:
+                    pass
                 _, ids, pdegree = source.candidate(mid, mid, body, profile)
                 _, qdegree = source.reference(mid, mid, body)
                 if ids != data["source_segment_ids"]:
                     raise ValueError("Selected physical source segment changed")
+                else:
+                    pass
                 degree = max(pdegree, qdegree, max(map(len, q + e)) - 1)
                 w = [bernstein_velocity(c, width) for c in q]
                 f = [bernstein_velocity(c, width) for c in e]
@@ -481,11 +537,15 @@ def verify(run, path):
                         raise ValueError(
                             "Exact full-polynomial identity with original source failed"
                         )
+                    else:
+                        pass
                     root_identities += 6
                 fields = {"q": q, "w": w, "e": e, "f": f}
                 depth = plan["bernstein_bisection_depth"]
                 if [x["leaf_index"] for x in data["leaves"]] != list(range(2**depth)):
                     raise ValueError("Complete fixed leaf population changed")
+                else:
+                    pass
                 hulls = {
                     k: [leaf_hulls(tuple(c), depth) for c in axes]
                     for k, axes in fields.items()
@@ -516,9 +576,13 @@ def verify(run, path):
                 expected_anchor = (Q(case["anchor_exact"]) - a) / width
                 if len(data["anchors"]) != int(0 <= expected_anchor <= 1):
                     raise ValueError("Frozen anchor removed/added")
+                else:
+                    pass
                 for anchor in data["anchors"]:
                     if Q(anchor["u_exact"]) != expected_anchor:
                         raise ValueError("Frozen source anchor shifted")
+                    else:
+                        pass
                     point = {
                         k: [B(bernstein_at(c, expected_anchor)) for c in axes]
                         for k, axes in fields.items()
@@ -540,6 +604,8 @@ def verify(run, path):
                         != expected_q
                     ):
                         raise ValueError("One-sided endpoint source state changed")
+                    else:
+                        pass
     for body in plan["bodies"]:
         for profile in plan["profiles"]:
             branches = [c["bodies"][body][profile] for c in report["cells"]]
@@ -574,6 +640,8 @@ def verify(run, path):
                 "leaf_count": len(leaves),
             }:
                 raise ValueError("Full-curve fixed-line classification changed")
+            else:
+                pass
     expected_seams = []
     for left, right in zip(report["cells"], report["cells"][1:]):
         for body in plan["bodies"]:
@@ -584,9 +652,13 @@ def verify(run, path):
                 ):
                     if origin == "DE441" and profile != plan["profiles"][0]:
                         continue
+                    else:
+                        pass
                     expected_seams.append((left, right, body, profile, origin, field))
     if len(report["seams"]) != len(expected_seams):
         raise ValueError("One-sided seam population changed")
+    else:
+        pass
     for row, (left, right, body, profile, origin, field) in zip(
         report["seams"], expected_seams
     ):
@@ -597,6 +669,8 @@ def verify(run, path):
             profile if origin == "SWE" else None,
         ):
             raise ValueError("One-sided seam rebound")
+        else:
+            pass
         a = list(map(Q, left["bodies"][body][profile][field]["right"]))
         b = list(map(Q, right["bodies"][body][profile][field]["left"]))
         if (row["position_equal_exact"], row["velocity_equal_exact"]) != (
@@ -604,6 +678,8 @@ def verify(run, path):
             a[3:] == b[3:],
         ):
             raise ValueError("One-sided state equality changed")
+        else:
+            pass
         d = [x - y for x, y in zip(a, b)]
         cover(
             vector_metrics(
@@ -630,7 +706,7 @@ def verify(run, path):
     }
 
 
-def main():
+def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--run", type=Path, required=True)
     p.add_argument("--input", type=Path, required=True)
@@ -645,3 +721,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

@@ -19,7 +19,7 @@ from fatebridge.core.physical_ephemeris_policy import (
     current_policy,
     data_file_policy,
 )
-from fatebridge.core.requests.western_policy import uses_western_policy
+from fatebridge.core.requests.western_policy import WesternEphemerisRequest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.fixtures.surface_payloads import MCP_CASES, REST_POST_CASES
@@ -31,7 +31,6 @@ WESTERN_KEYS = [
     "astro_chart13",
     "astro_hellen",
     "astro_germany",
-    "astro_relative",
     "astro_relative_chart",
     "western_timing_analysis",
     "solarreturn",
@@ -80,10 +79,13 @@ def request(key, **updates):
 
 
 @pytest.mark.parametrize("key", WESTERN_KEYS)
-def test_every_published_western_request_accepts_policy_and_removes_only_control(key):
+def test_every_published_western_request_accepts_policy_and_removes_only_control(
+    key,
+) -> None:
     strict = request(key, ephemeris_policy="require_data_files")
     auto = request(key)
-    assert uses_western_policy(strict) and auto.ephemeris_policy == "auto"
+    assert isinstance(strict, WesternEphemerisRequest)
+    assert strict.uses_western_ephemeris_policy() and auto.ephemeris_policy == "auto"
     assert strict.model_dump()["ephemeris_policy"] == "require_data_files"
     assert strict.model_json_schema()["properties"]["ephemeris_policy"]["enum"] == [
         "auto",
@@ -100,7 +102,9 @@ def test_every_published_western_request_accepts_policy_and_removes_only_control
 
 
 @pytest.mark.parametrize("key", WESTERN_KEYS)
-def test_every_published_western_strict_request_rejects_empty_data(key, selected):
+def test_every_published_western_strict_request_rejects_empty_data(
+    key, selected
+) -> None:
     selected("empty")
     result = execute_spec(
         SPECS[key], request(key, ephemeris_policy="require_data_files")
@@ -115,7 +119,7 @@ def test_every_published_western_strict_request_rejects_empty_data(key, selected
 @pytest.mark.parametrize("key", WESTERN_KEYS)
 def test_every_published_western_full_strict_request_preserves_whole_result(
     key, selected
-):
+) -> None:
     selected("full")
     before = execute_spec(SPECS[key], request(key))
     selected("full")
@@ -149,7 +153,9 @@ def test_every_published_western_full_strict_request_preserves_whole_result(
         "solararc",
     ],
 )
-def test_partial_data_keeps_original_mixed_dependency_failure(key, selected):
+def test_partial_data_keeps_original_mixed_dependency_failure(
+    key: str, selected
+) -> None:
     selected("planet_only")
     value = execute_spec(
         SPECS[key], request(key, ephemeris_policy="require_data_files")
@@ -158,7 +164,7 @@ def test_partial_data_keeps_original_mixed_dependency_failure(key, selected):
 
 
 @pytest.mark.parametrize("key", ["astro_chart", "astro_chart13", "astro_germany"])
-def test_solar_clock_calls_cannot_escape_strict_policy(key, selected):
+def test_solar_clock_calls_cannot_escape_strict_policy(key: str, selected) -> None:
     selected("empty")
     value = execute_spec(
         SPECS[key],
@@ -168,7 +174,7 @@ def test_solar_clock_calls_cannot_escape_strict_policy(key, selected):
     assert value["issues"][0]["code"] == "required_data_files_fallback"
 
 
-def test_original_native_values_and_flags_stay_exact(selected, directories):
+def test_original_native_values_and_flags_stay_exact(selected, directories) -> None:
     code = """import swisseph as s,json,sys,hashlib,platform
 from pathlib import Path
 s.set_ephe_path(sys.argv[1]);rows=[]
@@ -195,7 +201,7 @@ print(json.dumps(dict(rows=rows,python=sys.version,platform=platform.platform(),
     assert state.nonphysical_calls == 8 and state.reference_zero_calls == 2
 
 
-def test_analytical_nodes_and_reference_zeros_are_not_file_read_proof(selected):
+def test_analytical_nodes_and_reference_zeros_are_not_file_read_proof(selected) -> None:
     selected("empty")
     with data_file_policy("require_data_files") as state:
         runtime.ephemeris_call("calc", 2451545.0, runtime.swe.MEAN_NODE, 258)
@@ -208,7 +214,7 @@ def test_analytical_nodes_and_reference_zeros_are_not_file_read_proof(selected):
     assert state.reference_zero_calls == 2 and state.nonphysical_calls == 1
 
 
-def test_swallowed_source_error_and_nested_auto_cannot_weaken_request(selected):
+def test_swallowed_source_error_and_nested_auto_cannot_weaken_request(selected) -> None:
     selected("empty")
     with pytest.raises(EphemerisSourceError, match="require_data_files"):
         with data_file_policy("require_data_files"):
@@ -222,8 +228,8 @@ def test_swallowed_source_error_and_nested_auto_cannot_weaken_request(selected):
 
 
 def test_non_native_orbital_fallback_is_rejected_even_after_optional_api_failure(
-    selected, monkeypatch
-):
+    selected, monkeypatch: pytest.MonkeyPatch
+) -> None:
     from fatebridge.core.astro import ephemeris
 
     selected("full")
@@ -236,12 +242,19 @@ def test_non_native_orbital_fallback_is_rejected_even_after_optional_api_failure
 
 
 def test_optional_native_failure_cannot_return_a_successful_strict_chart(
-    selected, monkeypatch
-):
+    selected, monkeypatch: pytest.MonkeyPatch
+) -> None:
     selected("full")
 
-    def broken(*args, **kwargs):
-        raise RuntimeError("synthetic native failure")
+    native_calc = runtime.swe.calc
+
+    def broken(tjdet, planet, *args, **kwargs):
+        # The house frame also uses calc for the nonphysical ECL_NUT body.
+        if planet == runtime.swe.SUN:
+            raise RuntimeError("synthetic native failure")
+        else:
+            pass
+        return native_calc(tjdet, planet, *args, **kwargs)
 
     monkeypatch.setattr(runtime.swe, "calc", broken)
     value = execute_spec(
@@ -249,11 +262,14 @@ def test_optional_native_failure_cannot_return_a_successful_strict_chart(
         request("astro_chart", ephemeris_policy="require_data_files"),
     )
     assert value["issues"][0]["code"] == "required_data_files_unavailable"
+    assert value["error_code"] == "ephemeris_source_inconsistent"
+    assert value["status_code"] == 503 and value["retryable"] is False
+    assert current_policy() is None
 
 
 def test_unavailable_source_context_fails_instead_of_treating_flag_as_full_proof(
-    selected, monkeypatch
-):
+    selected, monkeypatch: pytest.MonkeyPatch
+) -> None:
     selected("full")
     monkeypatch.setattr(runtime.swe, "get_current_file_data", None)
     with pytest.raises(EphemerisSourceError) as error:
@@ -262,7 +278,7 @@ def test_unavailable_source_context_fails_instead_of_treating_flag_as_full_proof
     assert error.value.reason == "required_data_files_unverified"
 
 
-def test_endpoint_digest_catches_changed_file(selected, directories):
+def test_endpoint_digest_catches_changed_file(selected, directories) -> None:
     selected("full")
     path = directories["full"] / "sepl_18.se1"
     with path.open("rb") as source:
@@ -279,7 +295,7 @@ def test_endpoint_digest_catches_changed_file(selected, directories):
             target.write(initial)
 
 
-def test_context_isolation_in_reused_parallel_workers(selected):
+def test_context_isolation_in_reused_parallel_workers(selected) -> None:
     selected("empty")
 
     def calculate(strict):
@@ -297,7 +313,9 @@ def test_context_isolation_in_reused_parallel_workers(selected):
 
 
 @pytest.mark.parametrize("mode", ["empty", "full"])
-def test_owned_subprocess_inherits_policy_and_returns_explicit_receipt(mode, selected):
+def test_owned_subprocess_inherits_policy_and_returns_explicit_receipt(
+    mode: str, selected
+) -> None:
     selected(mode)
     birth = build_astro_birth_info(
         birth_year=2000,
@@ -313,21 +331,22 @@ def test_owned_subprocess_inherits_policy_and_returns_explicit_receipt(mode, sel
         with pytest.raises(EphemerisSourceError):
             with source_session(), data_file_policy("require_data_files"):
                 native_execution.calculate(
-                    "fatebridge.core.jyotish.positions", (birth,), {}
+                    "fatebridge.core.jyotish.jyotish.positions", (birth,), {}
                 )
     else:
         with source_session(), data_file_policy("require_data_files") as state:
             result = native_execution.calculate(
-                "fatebridge.core.jyotish.positions", (birth,), {}
+                "fatebridge.core.jyotish.jyotish.positions", (birth,), {}
             )
         assert result and state.worker_reports
         assert state.worker_reports[0]["requested"] == "require_data_files"
         assert state.worker_reports[0]["physical_calls_by_model"]["swieph"] > 0
 
 
-def test_india_policy_binding_is_retained_and_guolao_is_not_silently_claimed():
+def test_india_policy_binding_is_retained_and_guolao_is_not_silently_claimed() -> None:
     indian = request("astro_india", ephemeris_policy="require_data_files")
-    assert not uses_western_policy(indian)
+    assert isinstance(indian, WesternEphemerisRequest)
+    assert not indian.uses_western_ephemeris_policy()
     assert (
         SPECS["astro_india"].bind(indian)[2]["ephemeris_policy"] == "require_data_files"
     )
@@ -341,8 +360,8 @@ def test_india_policy_binding_is_retained_and_guolao_is_not_silently_claimed():
 
 @pytest.mark.parametrize("key", ["astro_chart13", "astro_germany"])
 def test_non_civil_clock_and_all_uncertainty_samples_share_strict_request(
-    key, selected
-):
+    key: str, selected
+) -> None:
     extra = dict(
         birth_clock_basis="local_apparent_solar",
         birth_timezone=None,
@@ -359,7 +378,7 @@ def test_non_civil_clock_and_all_uncertainty_samples_share_strict_request(
     assert receipt["physical_calls_by_model"]["swieph"] > 0
 
 
-def test_policy_public_schema_rejects_a_false_accuracy_claim(selected):
+def test_policy_public_schema_rejects_a_false_accuracy_claim(selected) -> None:
     from fatebridge.application.execution import OutputContractError, validate_output
 
     selected("full")
@@ -375,8 +394,8 @@ def test_policy_public_schema_rejects_a_false_accuracy_claim(selected):
 
 
 def test_native_version_outside_inspected_scope_cannot_certify_data_context(
-    selected, monkeypatch
-):
+    selected, monkeypatch: pytest.MonkeyPatch
+) -> None:
     selected("full")
     monkeypatch.setattr(runtime.swe, "version", "not-inspected")
     with pytest.raises(EphemerisSourceError) as error:
@@ -389,8 +408,8 @@ def test_native_version_outside_inspected_scope_cannot_certify_data_context(
 @pytest.mark.parametrize("body", [0, 1, 4, 14])
 @pytest.mark.parametrize("origin", [0, 8, 16384])
 def test_strict_policy_preserves_owned_file_endpoints_and_origins(
-    operation, body, origin, selected
-):
+    operation: str, body: int, origin: int, selected
+) -> None:
     for epoch in [2451545.0, 2597651.3591467496, 2597651.3591467794]:
         selected("full")
         with audit_compressed_endpoints():
@@ -405,8 +424,8 @@ def test_strict_policy_preserves_owned_file_endpoints_and_origins(
 @pytest.mark.parametrize("body", [0, 2, 4, 5, 9])
 @pytest.mark.parametrize("origin", [8, 16384])
 def test_strict_policy_does_not_reintroduce_unused_moon_dependency(
-    operation, body, origin, selected
-):
+    operation: str, body: int, origin: int, selected
+) -> None:
     selected("planet_only")
     with audit_compressed_endpoints():
         original = runtime.ephemeris_call(operation, 2451545.0, body, 258 | origin)

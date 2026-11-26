@@ -7,10 +7,13 @@ a country's reform date, or infer English March25 year numbering.
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Any, Literal
+from typing import Literal
 
 CivilCalendar = Literal["proleptic_gregorian", "julian"]
 GREGORIAN_ORDINAL_TO_JDN = 1721425
+
+
+CalendarConversionReceipt = dict[str, str | int | bool | dict[str, int] | None]
 
 
 def civil_date_jdn(
@@ -56,7 +59,7 @@ def civil_datetime(
     calendar: str = "proleptic_gregorian",
     *,
     second: int = 0,
-) -> tuple[datetime, dict[str, Any]]:
+) -> tuple[datetime, CalendarConversionReceipt]:
     """Preserve the supplied wall clock; timezone is applied by the chart builder."""
     converted = gregorian_date(year, month, day, calendar)
     if any(type(v) is not int for v in (hour, minute, second)):
@@ -88,7 +91,7 @@ def _calendar_conversion_receipt(
     normalized_label: datetime | None,
     *,
     second: int = 0,
-) -> dict[str, Any]:
+) -> CalendarConversionReceipt:
     """Date stage only; a raw hour label may still need origin normalization."""
     try:
         same_label = date(year, month, day)

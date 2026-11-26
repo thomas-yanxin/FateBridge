@@ -41,15 +41,21 @@ def _manifest(directory: Path, name: str, expected: str) -> dict[str, Any]:
     raw = (directory / name).read_bytes()
     if hashlib.sha256(raw).hexdigest() != expected:
         raise ValueError(f"武经来源清单指纹漂移：{name}")
+    else:
+        pass
     data: dict[str, Any] = json.loads(raw)
     for filename, fingerprint in data["files"].items():
         if Path(filename).name != filename:
             raise ValueError("来源文件必须位于同一封存目录")
+        else:
+            pass
         if (
             hashlib.sha256((directory / filename).read_bytes()).hexdigest()
             != fingerprint
         ):
             raise ValueError(f"武经来源文件指纹漂移：{filename}")
+        else:
+            pass
     return data
 
 
@@ -65,6 +71,8 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
         != reference_manifest["reference_sha256"]
     ):
         raise ValueError("十六神名位补证指纹漂移")
+    else:
+        pass
     data: dict[str, Any] = json.loads(
         (corpus / "wujing-literal-cycles.json").read_text()
     )
@@ -73,12 +81,16 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
         (polarity, ju) for polarity in ("yang", "yin") for ju in range(1, 73)
     }:
         raise ValueError("阴阳两套72局必须全部保留")
+    else:
+        pass
     if any(
         len(row["observations"]) != 10
         or {o["field"] for o in row["observations"]} != set(FIELDS)
         for row in data["rows"]
     ):
         raise ValueError("全部1440个待核字段必须保留，未知不得删去")
+    else:
+        pass
     data["name_reference"] = json.loads((corpus / "name-reference.json").read_text())
     data["source_metadata"] = json.loads((corpus / "source-metadata.json").read_text())
     data["facsimile_supplement"] = json.loads(
@@ -98,6 +110,8 @@ def source_value(
             "value": None,
             "reason": observation["status"],
         }
+    else:
+        pass
     if field in {"wenchang_name", "shiji_name"}:
         candidates = [
             (name, position)
@@ -110,6 +124,8 @@ def source_value(
                 "value": None,
                 "reason": "unmapped_or_ambiguous_literal_name_prefix",
             }
+        else:
+            pass
         name, position = candidates[0]
         return {
             "status": "declared_name_prefix_position_reference",
@@ -119,6 +135,8 @@ def source_value(
             "name_reference_file": reference["reference_file"],
             "whole_annotation_conformance_assessed": False,
         }
+    else:
+        pass
     return {"status": observation["status"], "value": raw}
 
 
@@ -138,6 +156,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     for previous, current in zip(data["rows"], data["rows"][1:]):
         if previous["polarity"] != current["polarity"]:
             continue
+        else:
+            pass
         left = {o["field"]: o["value"] for o in previous["observations"]}
         right = {o["field"]: o["value"] for o in current["observations"]}
         if (
@@ -160,6 +180,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
                     "source_or_runtime_values_replaced": False,
                 }
             )
+        else:
+            pass
     rows = []
     totals = {
         f: {"required": 144, "matching": 0, "different": 0, "unknown": 0}

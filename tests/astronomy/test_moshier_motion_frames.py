@@ -10,7 +10,6 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core import ephemeris_runtime as e
-from fatebridge.core import guolao
 from fatebridge.core.astro import ephemeris, moshier_motion, runtime, solar_decimal
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.longitude_motion import corrected_longitude_motion
@@ -18,6 +17,7 @@ from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
 from fatebridge.core.astro.solar_decimal import MOSHIER_PLANETS
 from fatebridge.core.astro.zodiac import native_lahiri_positions
+from fatebridge.core.guolao import guolao
 from fatebridge.utils.errors import EphemerisSourceError
 
 
@@ -40,6 +40,8 @@ def native(epoch, body, sidereal):
     swe = e.swe
     if sidereal:
         runtime.ephemeris_call("set_sid_mode", swe.SIDM_LAHIRI, 0.0, 0.0)
+    else:
+        pass
     values, flags = runtime.ephemeris_call(
         "calc",
         epoch,
@@ -61,8 +63,8 @@ def fourth_order(epoch, body, sidereal, center, h):
 @pytest.mark.parametrize("body", sorted(moshier_motion.TARGETS))
 @pytest.mark.parametrize("sidereal", [False, True])
 def test_nearly_coplanar_native_witnesses_do_not_block_motion(
-    analytical, body, sidereal
-):
+    analytical, body, sidereal: bool
+) -> None:
     # Frozen sample from the failed2025-03-15election request. The former
     # inverse failed its unchanged1e-10orthogonality gate at this exact TT.
     epoch = 2460726.3028840744
@@ -98,8 +100,8 @@ def test_nearly_coplanar_native_witnesses_do_not_block_motion(
 @pytest.mark.parametrize("body", sorted(moshier_motion.TARGETS))
 @pytest.mark.parametrize("sidereal", [False, True])
 def test_shared_state_matches_position_derivative_in_its_own_frame(
-    analytical, year, body, sidereal
-):
+    analytical, year: int, body, sidereal: bool
+) -> None:
     epoch = e.swe.julday(year, 1, 15, 12)
     trace = PhysicalEphemerisTrace()
     policy = {}
@@ -149,7 +151,9 @@ def test_shared_state_matches_position_derivative_in_its_own_frame(
 
 
 @pytest.mark.parametrize("problem", ["frame", "model", "nonfinite"])
-def test_lahiri_probes_reject_changed_contracts(analytical, monkeypatch, problem):
+def test_lahiri_probes_reject_changed_contracts(
+    analytical, monkeypatch: pytest.MonkeyPatch, problem: str
+) -> None:
     epoch = 2451545.0
     coordinates = native(epoch, "Moon", True)
     original = runtime.ephemeris_call
@@ -160,9 +164,15 @@ def test_lahiri_probes_reject_changed_contracts(analytical, monkeypatch, problem
             coords, flags = value
             if problem == "frame":
                 return coords, flags & ~e.swe.FLG_SIDEREAL
+            else:
+                pass
             if problem == "model":
                 return coords, (flags & ~e.swe.FLG_MOSEPH) | e.swe.FLG_SWIEPH
+            else:
+                pass
             return (math.nan, *coords[1:]), flags
+        else:
+            pass
         return value
 
     monkeypatch.setattr(runtime, "ephemeris_call", perturb)
@@ -172,7 +182,9 @@ def test_lahiri_probes_reject_changed_contracts(analytical, monkeypatch, problem
         )
 
 
-def test_guolao_reuses_shared_tropical_correction_once(analytical, monkeypatch):
+def test_guolao_reuses_shared_tropical_correction_once(
+    analytical, monkeypatch: pytest.MonkeyPatch
+) -> None:
     original = moshier_motion.complete_moshier_longitude_rate
     calls = []
 
@@ -216,14 +228,16 @@ def published_source_reference():
 @pytest.mark.parametrize("body", sorted(MOSHIER_PLANETS))
 @pytest.mark.parametrize("sidereal", [False, True])
 def test_all_published_source_rates_and_unseen_boundaries(
-    analytical, published_source_reference, body, sidereal
-):
+    analytical, published_source_reference, body, sidereal: bool
+) -> None:
     """The independent source series includes old failures and new domain probes."""
     frame = "lahiri" if sidereal else "tropical"
     reference = published_source_reference
     for row in reference["rows"]:
         if (row["body"], row["frame"]) != (body, frame):
             continue
+        else:
+            pass
         original = native(row["jd_tt"], body, sidereal)
         metadata = {}
         state = corrected_longitude_motion(
@@ -265,8 +279,8 @@ def published_sun_reference():
 
 @pytest.mark.parametrize("sidereal", [False, True])
 def test_all_solar_source_rates_preserve_their_own_optical_dependencies(
-    analytical, published_sun_reference, sidereal, monkeypatch
-):
+    analytical, published_sun_reference, sidereal: bool, monkeypatch: pytest.MonkeyPatch
+) -> None:
     def unrelated_mass_table():
         pytest.fail("The Moshier Sun has no solar self-deflection dependency")
 
@@ -275,6 +289,8 @@ def test_all_solar_source_rates_preserve_their_own_optical_dependencies(
     for row in published_sun_reference["rows"]:
         if row["frame"] != frame:
             continue
+        else:
+            pass
         original = native(row["epoch"]["jd_tt"], "Sun", sidereal)
         metadata = {}
         state = corrected_longitude_motion(
@@ -316,8 +332,11 @@ def published_lunar_reference():
 
 @pytest.mark.parametrize("sidereal", [False, True])
 def test_full_lunar_source_rates_and_unseen_range_boundaries(
-    analytical, published_lunar_reference, sidereal, monkeypatch
-):
+    analytical,
+    published_lunar_reference,
+    sidereal: bool,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     def unrelated_mass_table():
         pytest.fail("The geocentric Moshier Moon has no solar-deflection dependency")
 
@@ -326,6 +345,8 @@ def test_full_lunar_source_rates_and_unseen_range_boundaries(
     for row in published_lunar_reference["rows"]:
         if row["frame"] != frame:
             continue
+        else:
+            pass
         epoch = row["epoch"]["jd_tt"]
         original = native(epoch, "Moon", sidereal)
         metadata = {}
@@ -354,8 +375,8 @@ def test_full_lunar_source_rates_and_unseen_range_boundaries(
 @pytest.mark.parametrize("sidereal", [False, True])
 @pytest.mark.parametrize("fault", ["rotated", "reflected", "sheared"])
 def test_auxiliary_common_frame_must_reproduce_actual_native_basis(
-    analytical, monkeypatch, body, sidereal, fault
-):
+    analytical, monkeypatch: pytest.MonkeyPatch, body, sidereal: bool, fault: str
+) -> None:
     original = solar_decimal.reference_frames.native_equatorial_frame
 
     def different_frame(*args):
@@ -364,8 +385,12 @@ def test_auxiliary_common_frame_must_reproduce_actual_native_basis(
             return tuple(
                 solar_decimal.reference_frames.rotate(row, "z", 0.001) for row in matrix
             )
+        else:
+            pass
         if fault == "reflected":
             return tuple(-value for value in matrix[0]), *matrix[1:]
+        else:
+            pass
         return (
             (matrix[0][0] + 0.1, *matrix[0][1:]),
             *matrix[1:],

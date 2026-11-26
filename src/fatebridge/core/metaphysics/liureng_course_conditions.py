@@ -4,13 +4,19 @@ from __future__ import annotations
 
 from typing import Any
 
+from fatebridge.core.metaphysics.common import (
+    GUI_REN_SEQUENCE,
+    SEXAGENARY_INDEX,
+    xun_head_for_ganzhi,
+)
+from fatebridge.core.metaphysics.liureng_course_layout import (
+    layout_compatibility_basis,
+    pair_layout_necessity,
+)
+from fatebridge.core.metaphysics.liureng_life_stages import life_stage_cycle
+from fatebridge.core.metaphysics.liureng_transmissions import STEM_HOUSES
 from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
-
-from ...utils.data import EARTHLY_BRANCHES
-from .common import GUI_REN_SEQUENCE, SEXAGENARY_INDEX, xun_head_for_ganzhi
-from .liureng_course_layout import layout_compatibility_basis, pair_layout_necessity
-from .liureng_life_stages import life_stage_cycle
-from .liureng_transmissions import STEM_HOUSES
+from fatebridge.utils.data import EARTHLY_BRANCHES
 
 STAGE_PAIRS = (
     ("S01", "退龄", "长生", "青龙"),

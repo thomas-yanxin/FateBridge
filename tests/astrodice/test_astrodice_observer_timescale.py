@@ -37,21 +37,23 @@ $$EOE
     return json.dumps({"result": text, "signature": {"version": "observed"}}).encode()
 
 
-def test_actual_tdb_header_can_be_observed_without_claiming_documented_support():
+def test_actual_tdb_header_can_be_observed_without_claiming_documented_support() -> (
+    None
+):
     result = classify(raw("TDB"), 200, {"time_type": "TDB"}, [CASE], PLAN)
     assert result["status"] == "supported" and result["actual_time_type"] == "TDB"
     assert result["rows"][0]["TDB_minus_UT_seconds"] == "69.185000"
     assert result["EOP_file"] == "frozen-EOP"
 
 
-def test_requested_tdb_never_falls_back_to_a_returned_tt_header():
+def test_requested_tdb_never_falls_back_to_a_returned_tt_header() -> None:
     assert (
         classify(raw("TT"), 200, {"time_type": "TDB"}, [CASE], PLAN)["status"]
         == "contract_unverified"
     )
 
 
-def test_explicit_time_type_refusal_is_distinct_from_unrelated_service_error():
+def test_explicit_time_type_refusal_is_distinct_from_unrelated_service_error() -> None:
     refused = json.dumps(
         {"error": "Only UT or TT are allowed for observer time types"}
     ).encode()
@@ -70,21 +72,23 @@ def test_explicit_time_type_refusal_is_distinct_from_unrelated_service_error():
     "payload",
     [b"[]", b"null", b"<html>error</html>", b"bad", b"{}", b'{"result":null}'],
 )
-def test_invalid_success_payloads_are_not_treated_as_a_supported_contract(payload):
+def test_invalid_success_payloads_are_not_treated_as_a_supported_contract(
+    payload: bytes,
+) -> None:
     assert (
         classify(payload, 200, {"time_type": "TT"}, [CASE], PLAN)["status"]
         == "invalid_response"
     )
 
 
-def test_unavailable_time_field_does_not_erase_supported_position_quantities():
+def test_unavailable_time_field_does_not_erase_supported_position_quantities() -> None:
     value = classify(raw(delta="n.a."), 200, {"time_type": "TT"}, [CASE], PLAN)
     assert value["status"] == "supported"
     assert value["rows"][0]["TDB_minus_UT_seconds"] is None
     assert value["rows"][0]["range_AU"] == "1.23456789012345"
 
 
-def test_diagnostic_row_assignment_keeps_original_label_match_failure():
+def test_diagnostic_row_assignment_keeps_original_label_match_failure() -> None:
     value = classify(
         raw(stamp="4680826.000000002"), 200, {"time_type": "TT"}, [CASE], PLAN
     )
@@ -104,7 +108,7 @@ def calibration(epoch):
     }
 
 
-def test_nominal_and_paired_clock_comparisons_are_separate_uncertified_models():
+def test_nominal_and_paired_clock_comparisons_are_separate_uncertified_models() -> None:
     epoch = Q(CASE["nominal_JD"])
     row = {"nominal_JD": str(epoch), "TDB_minus_UT_seconds": "69.185000"}
     result = compare_field(
@@ -121,7 +125,7 @@ def test_nominal_and_paired_clock_comparisons_are_separate_uncertified_models():
     assert result["time_field_is_internal_clock_bound_certified"] is False
 
 
-def test_pre_1962_field_does_not_get_modern_leap_or_tt_tdb_interpretation():
+def test_pre_1962_field_does_not_get_modern_leap_or_tt_tdb_interpretation() -> None:
     epoch = Q(2243797)
     value = compare_field(
         {"nominal_JD": str(epoch), "TDB_minus_UT_seconds": "69.185000"},
@@ -134,7 +138,7 @@ def test_pre_1962_field_does_not_get_modern_leap_or_tt_tdb_interpretation():
     assert "reported_TDB_minus_TT_hypothesis_seconds" not in value
 
 
-def test_published_rss_is_not_inserted_as_a_strict_accuracy_allowance():
+def test_published_rss_is_not_inserted_as_a_strict_accuracy_allowance() -> None:
     epoch = Q(CASE["nominal_JD"])
     value = compare_field(
         {"nominal_JD": str(epoch), "TDB_minus_UT_seconds": "69.185000"},
@@ -156,8 +160,8 @@ def test_published_rss_is_not_inserted_as_a_strict_accuracy_allowance():
     ],
 )
 def test_conditional_branch_preserves_unavailable_requests_without_parameter_substitution(
-    status, tdb_dispatch
-):
+    status: str, tdb_dispatch: bool
+) -> None:
     queries = [
         {"id": "TT", "cohort": "B", "conditional_on_A_TDB_support": False},
         {"id": "TDB", "cohort": "B", "conditional_on_A_TDB_support": True},

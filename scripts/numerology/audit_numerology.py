@@ -14,74 +14,110 @@ import json
 import runpy
 import sys
 from datetime import date, datetime, timedelta, timezone
+from itertools import product
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+from fatebridge.core import almanac
 from fatebridge.core.almanac import get_day_ganzhi, get_solar_terms_for_year
-from fatebridge.core.canping import calculate as canping
-from fatebridge.core.canping import compute_number
-from fatebridge.core.canping_texts import collation_summary as canping_collation_summary
-from fatebridge.core.canping_texts import inherited_corpus as canping_inherited_corpus
-from fatebridge.core.canping_texts import lookup_record as canping_lookup_record
-from fatebridge.core.canping_timing import APPENDIX
-from fatebridge.core.canping_timing import SOURCE_SHA256 as CANPING_SOURCE_SHA256
-from fatebridge.core.canping_timing import SOURCE_URL as CANPING_SOURCE_URL
-from fatebridge.core.canping_timing import appendix_age, luck_timeline
-from fatebridge.core.heluo import (
+from fatebridge.core.heluo import heluo_clock
+from fatebridge.core.heluo import heluo_jiehou as jh
+from fatebridge.core.heluo import heluo_opposition
+from fatebridge.core.heluo import heluo_texts as ht
+from fatebridge.core.heluo import heluo_timing
+from fatebridge.core.heluo.heluo import (
     MONTH_GUA,
     _san_cai,
+    _tiaowen,
 )
-from fatebridge.core.heluo import calculate as heluo
-from fatebridge.core.heluo import (
+from fatebridge.core.heluo.heluo import calculate as heluo
+from fatebridge.core.heluo.heluo import (
     da_yun,
     four_pillar_number_totals,
     gua_lines,
     hexagram_najia,
 )
-from fatebridge.core.heluo import judge as heluo_judge
-from fatebridge.core.heluo import solar_term_huagong, transform_houtian, yao_text
-from fatebridge.core.heluo_body import ELEMENTS, body_evidence, element_relation
-from fatebridge.core.heluo_lines import line_conditions
-from fatebridge.core.heluo_months import COLLATION_PATH as MONTH_COLLATION_PATH
-from fatebridge.core.heluo_months import MONTH_BRANCHES, month_affinity
-from fatebridge.core.heluo_najia import annotate_positions
-from fatebridge.core.heluo_najia import collation_summary as najia_collation_summary
-from fatebridge.core.heluo_poems import collation_summary as poem_collation_summary
-from fatebridge.core.heluo_seasonal import seasonal_number_evidence
-from fatebridge.core.heluo_structure import body_structure
-from fatebridge.core.heluo_texts import (
+from fatebridge.core.heluo.heluo import judge as heluo_judge
+from fatebridge.core.heluo.heluo import (
+    lines_to_gua,
+    solar_term_huagong,
+    transform_houtian,
+    yao_text,
+)
+from fatebridge.core.heluo.heluo_body import ELEMENTS, body_evidence, element_relation
+from fatebridge.core.heluo.heluo_clock import (
+    compare_daily_extra,
+    source_branch_partition,
+    source_six_day_blocks,
+)
+from fatebridge.core.heluo.heluo_lines import line_conditions
+from fatebridge.core.heluo.heluo_months import COLLATION_PATH as MONTH_COLLATION_PATH
+from fatebridge.core.heluo.heluo_months import MONTH_BRANCHES, month_affinity
+from fatebridge.core.heluo.heluo_najia import (
+    annotate_positions,
+)
+from fatebridge.core.heluo.heluo_najia import (
+    collation_summary as najia_collation_summary,
+)
+from fatebridge.core.heluo.heluo_poems import (
+    collation_summary as poem_collation_summary,
+)
+from fatebridge.core.heluo.heluo_seasonal import seasonal_number_evidence
+from fatebridge.core.heluo.heluo_structure import body_structure
+from fatebridge.core.heluo.heluo_texts import (
     COLLATION_PATH,
     collation_summary,
     commentary_collation_summary,
 )
-from fatebridge.core.heluo_timing import (
+from fatebridge.core.heluo.heluo_timing import (
     SOURCE_SHA256,
+    HeluoYearContextError,
     annual_sequence,
     daily_template,
     monthly_sequence,
 )
-from fatebridge.core.heluo_yuantang import placement as yuantang_placement
+from fatebridge.core.heluo.heluo_yuantang import placement as yuantang_placement
 from fatebridge.core.local_techniques.canping import build_canping_result
 from fatebridge.core.local_techniques.heluo import build_heluo_result
-from fatebridge.core.numerology_inputs import require_birth_clock
-from fatebridge.core.numerology_pillars import (
+from fatebridge.core.numerology.canping import calculate as canping
+from fatebridge.core.numerology.canping import compute_number, liunian_series
+from fatebridge.core.numerology.canping_schedule_basis import source_readings
+from fatebridge.core.numerology.canping_texts import (
+    collation_summary as canping_collation_summary,
+)
+from fatebridge.core.numerology.canping_texts import (
+    inherited_corpus as canping_inherited_corpus,
+)
+from fatebridge.core.numerology.canping_texts import (
+    lookup_record as canping_lookup_record,
+)
+from fatebridge.core.numerology.canping_timing import (
+    APPENDIX,
+)
+from fatebridge.core.numerology.canping_timing import (
+    SOURCE_SHA256 as CANPING_SOURCE_SHA256,
+)
+from fatebridge.core.numerology.canping_timing import SOURCE_URL as CANPING_SOURCE_URL
+from fatebridge.core.numerology.canping_timing import appendix_age, luck_timeline
+from fatebridge.core.numerology.numerology_inputs import require_birth_clock
+from fatebridge.core.numerology.numerology_pillars import (
+    GAN,
+    ZHI,
     pillar_link_evidence,
     require_pillar_links,
 )
 from fatebridge.core.requests.divination import CanpingRequest, HeluoRequest
+from fatebridge.core.solar_model_policy import DE440_SOFTWARE_YEARS
 from fatebridge.core.song_clock import (
     compare_branch_window_to_term,
     source_clock_from_fraction,
     source_term_clock,
 )
 from fatebridge.core.song_qi import source_qi_sequence, source_term_remainder
+from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.utils.timezones import parse_timezone_name
 
 ROOT = Path(__file__).resolve().parents[2]
-
-# The repository audit reads sealed test references when run as a file or module.
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
 
 SOURCE_HEADER_COUNT = 156
 SOURCE_PENDING_COUNT = 228
@@ -97,6 +133,8 @@ def birth_timezone_checks() -> dict:
         != source["sha256"]
     ):
         failures.append({"kind": "civil_zone_reference_identity"})
+    else:
+        pass
     for row in reference["transition_instants"]:
         at = datetime.fromisoformat(row["utc"]).astimezone(
             parse_timezone_name("Asia/Shanghai")
@@ -106,6 +144,8 @@ def birth_timezone_checks() -> dict:
             or int(at.dst().total_seconds()) != row["daylight_saving_seconds"]
         ):
             failures.append({"kind": "historical_civil_transition", "case": row["utc"]})
+        else:
+            pass
     for name, model, build in (
         ("heluo", HeluoRequest, build_heluo_result),
         ("canping", CanpingRequest, build_canping_result),
@@ -141,6 +181,8 @@ def birth_timezone_checks() -> dict:
                         "input_kind": kind,
                     }
                 )
+            else:
+                pass
         named = build(**base, zone="Asia/Shanghai")
         dst = build(**base, zone="+09:00")
         ca, cb = [r["numerology_evidence"]["birth_clock"] for r in (named, dst)]
@@ -154,6 +196,8 @@ def birth_timezone_checks() -> dict:
             or cb["civil_daylight_saving_seconds"] != 0
         ):
             failures.append({"kind": "historical_zone_explicit_offset", "tool": name})
+        else:
+            pass
         for zone in (" ", "UTC+08:90"):
             try:
                 build(**base, zone=zone)
@@ -177,6 +221,8 @@ def birth_timezone_checks() -> dict:
                     failures.append(
                         {"kind": "wrong_civil_clock_rejection", "tool": name}
                     )
+                else:
+                    pass
             else:
                 failures.append(
                     {"kind": "civil_gap_or_fold_guessed", "tool": name, "case": case}
@@ -208,6 +254,8 @@ def birth_clock_checks() -> dict:
     errors = []
     if hashlib.sha256(path.read_bytes()).hexdigest() != reference["jpl_fixture_sha256"]:
         failures.append({"kind": "clock_jpl_reference_identity"})
+    else:
+        pass
     for name, build in (
         ("heluo", build_heluo_result),
         ("canping", build_canping_result),
@@ -227,6 +275,8 @@ def birth_clock_checks() -> dict:
             or civil["numerology_evidence"]["birth_clock"]["longitude"] is not None
         ):
             failures.append({"kind": "fabricated_unused_coordinate", "tool": name})
+        else:
+            pass
         for row in jpl["rows"]:
             instant = datetime.fromisoformat(row["instant"])
             at = instant.astimezone(ZoneInfo("Asia/Shanghai"))
@@ -260,12 +310,16 @@ def birth_clock_checks() -> dict:
                             "error_seconds": error,
                         }
                     )
+                else:
+                    pass
                 if (
                     clock["birth_instant_utc"] != row["instant"]
                     or clock["longitude_source"] != "gps_lon"
                     or clock["longitude"] != longitude
                 ):
                     failures.append({"kind": "clock_input_provenance", "tool": name})
+                else:
+                    pass
     return {
         "checks_passed": not failures,
         "failures": failures,
@@ -282,9 +336,6 @@ def birth_clock_checks() -> dict:
 
 
 def heluo_solar_context_checks() -> dict:
-    from fatebridge.core import almanac
-    from fatebridge.core.local_techniques.heluo import build_heluo_result
-    from fatebridge.core.solar_model_policy import DE440_SOFTWARE_YEARS
 
     fixture = ROOT / "tests/fixtures/heluo_solar_context_v1/reference.json"
     reference = json.loads(fixture.read_text())
@@ -297,6 +348,8 @@ def heluo_solar_context_checks() -> dict:
             failures.append(
                 {"kind": "heluo_reused_solar_reference_identity", "file": name}
             )
+        else:
+            pass
     for probe in reference["civil_endpoint_probes"]:
         result = build_heluo_result(
             date=probe["date"],
@@ -324,6 +377,8 @@ def heluo_solar_context_checks() -> dict:
                     "date": probe["date"],
                 }
             )
+        else:
+            pass
     rows = json.loads(
         (ROOT / "tests/fixtures/ren_calendar_guard_v1/reference.json").read_text()
     )["rows"]
@@ -353,10 +408,16 @@ def heluo_solar_context_checks() -> dict:
                             "error_seconds": error,
                         }
                     )
+                else:
+                    pass
+            else:
+                pass
     if errors and len(observed) != 96:
         failures.append(
             {"kind": "heluo_incomplete_selected_TT_cohort", "observed": len(observed)}
         )
+    else:
+        pass
     return {
         "checks_passed": not failures,
         "failures": failures,
@@ -385,26 +446,23 @@ def heluo_solar_context_checks() -> dict:
 
 
 def yuanqi_opposition_checks() -> dict:
-    from fatebridge.core.heluo import _san_cai, gua_lines, lines_to_gua
-    from fatebridge.core.heluo_body import body_evidence
-    from fatebridge.core.heluo_opposition import (
-        CONTENT_SHA256,
-        SOURCE_PATH,
-        opposition_evidence,
-    )
 
     root = ROOT / "tests/fixtures/heluo_yuanqi_opposition_v1"
     reference = json.loads((root / "verified-readings.json").read_text())
     failures = []
-    data = json.loads(SOURCE_PATH.read_text())
+    data = json.loads(heluo_opposition.SOURCE_PATH.read_text())
     if data != reference["runtime_source"]:
         failures.append({"kind": "yuanqi_source_content_changed"})
+    else:
+        pass
     for image in reference["images"]:
         if (
             hashlib.sha256((root / image["file"]).read_bytes()).hexdigest()
             != image["sha256"]
         ):
             failures.append({"kind": "yuanqi_native_witness_identity"})
+        else:
+            pass
     mappings = {
         symbol: row
         for row in reference["runtime_source"]["mappings"]
@@ -428,7 +486,7 @@ def yuanqi_opposition_checks() -> dict:
             },
             yuan,
         )["bodies"]
-        result = opposition_evidence(year, bodies, yuan, fan)
+        result = heluo_opposition.opposition_evidence(year, bodies, yuan, fan)
         for phase in result["phases"]:
             row = next(r for r in phase["conditions"] if r["kind"] == probe["kind"])
             prefix = phase["phase"] + "."
@@ -446,11 +504,15 @@ def yuanqi_opposition_checks() -> dict:
                         "phase": phase["phase"],
                     }
                 )
+            else:
+                pass
         if (
             result["full_rescue_assessment"] is not False
-            or result["content_sha256"] != CONTENT_SHA256
+            or result["content_sha256"] != heluo_opposition.CONTENT_SHA256
         ):
             failures.append({"kind": "yuanqi_incomplete_rescue_or_source_identity"})
+        else:
+            pass
     for row in reference["page35_full_hexagram_diagram_context"]:
         transformed = (
             [1 - b for b in row["before_bits"]]
@@ -462,6 +524,8 @@ def yuanqi_opposition_checks() -> dict:
             or lines_to_gua(row["after_bits"])["name"] != row["after"]
         ):
             failures.append({"kind": "yuanqi_vs_whole_hexagram_context"})
+        else:
+            pass
     return {
         "checks_passed": not failures,
         "failures": failures,
@@ -486,12 +550,16 @@ def phase_qi_checks() -> dict:
     failures = []
     if manifest["source_pdf_sha256"] != SOURCE_SHA256:
         failures.append({"kind": "qi_source_identity"})
+    else:
+        pass
     for image in manifest["images"]:
         if (
             hashlib.sha256((root / image["file"]).read_bytes()).hexdigest()
             != image["sha256"]
         ):
             failures.append({"kind": "qi_witness_identity", "file": image["file"]})
+        else:
+            pass
     for row in reference["quarter_probes"]:
         for term in row["terms"]:
             for earth in (False, True):
@@ -502,6 +570,8 @@ def phase_qi_checks() -> dict:
                     failures.append(
                         {"kind": "literal_qi_window", "term": term, "earth": earth}
                     )
+                else:
+                    pass
     for probe in reference["source_four_pillar_phase_probes"]:
         case = next(c for c in worked["cases"] if c["id"] == probe["case_id"])
         p = dict(zip(("year", "month", "day", "hour"), case["pillars"]))
@@ -530,20 +600,30 @@ def phase_qi_checks() -> dict:
                             "phase": phase["phase"],
                         }
                     )
+                else:
+                    pass
         if (
             next(t for t in qi["transitions"] if t["kind"] == "huagong")["change"]
             != probe["huagong"]["change"]
         ):
             failures.append({"kind": "qi_phase_transition", "case_id": case["id"]})
+        else:
+            pass
     disagreements = []
     for claim in reference["literal_definition_disagreements"]:
         expected = solar_term_huagong(claim["source_stated_term"], False)["hg"]
         if expected != claim["definition_huagong_trigrams"]:
             failures.append({"kind": "qi_definition_changed_to_fit_conflict"})
+        else:
+            pass
         if claim["literal_huagong_trigram"] not in expected:
             disagreements.append(claim)
+        else:
+            pass
     if disagreements != reference["literal_definition_disagreements"]:
         failures.append({"kind": "qi_literal_disagreement_lost"})
+    else:
+        pass
     return {
         "checks_passed": not failures,
         "failures": failures,
@@ -572,6 +652,8 @@ def song_qi_source_checks() -> dict:
             != item["sha256"]
         ):
             failures.append({"kind": "song_qi_witness_identity", "file": item["file"]})
+        else:
+            pass
     for name in ("prior_historical_reference", "prior_dila_excerpt"):
         if (
             hashlib.sha256(
@@ -582,6 +664,8 @@ def song_qi_source_checks() -> dict:
             failures.append(
                 {"kind": "song_qi_prior_reference_identity", "file": reference[name]}
             )
+        else:
+            pass
     for row in reference["derived_remainders"]:
         result = source_qi_sequence(profile_id=row["profile"], year_label=row["year"])
         actual = result["terms"][row["term_index"]]
@@ -599,6 +683,8 @@ def song_qi_source_checks() -> dict:
                     "term_index": row["term_index"],
                 }
             )
+        else:
+            pass
     dila = json.loads(
         (ROOT / "tests/fixtures" / reference["prior_dila_excerpt"]).read_text()
     )
@@ -622,6 +708,8 @@ def song_qi_source_checks() -> dict:
             failures.append(
                 {"kind": "song_qi_literal_profile", "profile": profile["id"]}
             )
+        else:
+            pass
         for link in reference["date_links"]:
             row = source_qi_sequence(profile_id=profile["id"], year_label=link["year"])[
                 "terms"
@@ -643,6 +731,8 @@ def song_qi_source_checks() -> dict:
                         "year": link["year"],
                     }
                 )
+            else:
+                pass
             agrees = offset + 1 == link["source_term_claim_lunar_day"]
             if agrees != link["literal_term_day_agrees"]:
                 failures.append(
@@ -651,6 +741,8 @@ def song_qi_source_checks() -> dict:
                         "profile": profile["id"],
                     }
                 )
+            else:
+                pass
             if not agrees:
                 literal_differences.append(
                     {
@@ -662,6 +754,8 @@ def song_qi_source_checks() -> dict:
                         "derived_gregorian_date_label": label,
                     }
                 )
+            else:
+                pass
     return {
         "checks_passed": not failures,
         "failures": failures,
@@ -697,9 +791,13 @@ def tongtian_source_checks() -> dict:
             != item["sha256"]
         ):
             failures.append({"kind": "tongtian_witness_identity", "file": item["file"]})
+        else:
+            pass
     for path, digest in reference["prior_fixture_hashes"].items():
         if hashlib.sha256((ROOT / path).read_bytes()).hexdigest() != digest:
             failures.append({"kind": "tongtian_prior_fixture_identity", "file": path})
+        else:
+            pass
     for row in reference["printed_worked_calculations"]:
         result = source_term_remainder(
             profile_id=profile, accumulated_years=row["accumulated"], term_index=0
@@ -731,11 +829,15 @@ def tongtian_source_checks() -> dict:
             failures.append(
                 {"kind": "tongtian_printed_working", "accumulated": row["accumulated"]}
             )
+        else:
+            pass
     for row in reference["derived_worksheets"]:
         sequence = source_qi_sequence(profile_id=profile, year_label=row["year"])
         trace = sequence["winter_correction"]
         if trace["corrected_accumulation_source_units"] != row["winter_integral_units"]:
             failures.append({"kind": "tongtian_derived_winter", "year": row["year"]})
+        else:
+            pass
         for expected in row["rows"]:
             actual = sequence["terms"][expected["index"]]
             if (actual["source_big_remainder"], actual["ganzhi_day"]) != (
@@ -749,6 +851,8 @@ def tongtian_source_checks() -> dict:
                         "term_index": expected["index"],
                     }
                 )
+            else:
+                pass
     link = reference["date_link"]
     sequence = source_qi_sequence(profile_id=profile, year_label=link["year_label"])
     term = sequence["terms"][link["term_index"]]
@@ -776,6 +880,8 @@ def tongtian_source_checks() -> dict:
         and not sequence["applied_to_public_four_pillars"]
     ):
         failures.append({"kind": "tongtian_retained_kai_xi_conflicts"})
+    else:
+        pass
     return {
         "checks_passed": not failures,
         "failures": failures,
@@ -818,9 +924,13 @@ def song_clock_source_checks() -> dict:
             failures.append(
                 {"kind": "song_clock_witness_identity", "file": item["file"]}
             )
+        else:
+            pass
     for path, digest in reference["prior_fixture_hashes"].items():
         if hashlib.sha256((ROOT / path).read_bytes()).hexdigest() != digest:
             failures.append({"kind": "song_clock_prior_identity", "file": path})
+        else:
+            pass
     for rule in reference["literal_clock_rules"]:
         result = source_clock_from_fraction(
             profile_id=rule["profile"], numerator=0, denominator=1
@@ -832,10 +942,14 @@ def song_clock_source_checks() -> dict:
             failures.append(
                 {"kind": "song_clock_literal_constants", "profile": rule["profile"]}
             )
+        else:
+            pass
         if result["ke_per_day"] != {"numerator": 100, "denominator": 1}:
             failures.append(
                 {"kind": "song_clock_ke_per_day", "profile": rule["profile"]}
             )
+        else:
+            pass
     for row in reference["printed_clock_captions"]:
         result = source_term_clock(
             profile_id=row["profile"],
@@ -867,6 +981,8 @@ def song_clock_source_checks() -> dict:
                     "accumulated": row["prior_worked_accumulated"],
                 }
             )
+        else:
+            pass
     for row in reference["derived_term_clock_probes"]:
         result = source_term_clock(
             profile_id=row["profile"],
@@ -890,6 +1006,8 @@ def song_clock_source_checks() -> dict:
             failures.append(
                 {"kind": "song_clock_derived_probe", "profile": row["profile"]}
             )
+        else:
+            pass
     link = reference["kai_xi_conditional_comparison"]
     result = compare_branch_window_to_term(
         profile_id=link["profile"],
@@ -911,6 +1029,8 @@ def song_clock_source_checks() -> dict:
         and not result["public_month_pillar_changed"]
     ):
         failures.append({"kind": "song_clock_kai_xi_uncertainty"})
+    else:
+        pass
     return {
         "checks_passed": not failures,
         "failures": failures,
@@ -954,6 +1074,8 @@ def historical_caption_checks() -> dict:
         != reference["source_worked_fixture_sha256"]
     ):
         failures.append({"kind": "historical_worked_fixture_identity"})
+    else:
+        pass
     for item in reference["images"] + reference["data_files"]:
         if (
             hashlib.sha256((root / item["file"]).read_bytes()).hexdigest()
@@ -962,6 +1084,8 @@ def historical_caption_checks() -> dict:
             failures.append(
                 {"kind": "historical_reference_identity", "file": item["file"]}
             )
+        else:
+            pass
     for row in reference["readings"]:
         month = next(r for r in source["t_month"] if r[0] == row["month_id"])
         original = next(r for r in worked["cases"] if r["id"] == row["id"])
@@ -996,6 +1120,8 @@ def historical_caption_checks() -> dict:
                     "reading": row["reading"],
                 }
             )
+        else:
+            pass
         if row["calendar_day_ganzhi"] != row["printed_day_ganzhi"]:
             differences.append(
                 {
@@ -1005,12 +1131,16 @@ def historical_caption_checks() -> dict:
                     "calendar": row["calendar_day_ganzhi"],
                 }
             )
+        else:
+            pass
     if [(r["case"], r["reading"]) for r in differences] != [
         ("yihai_bailu", "NLC"),
         ("bingyin_kai_xi", "both"),
         ("wuzi_dongzhi", "both"),
     ]:
         failures.append({"kind": "historical_literal_disagreements_changed"})
+    else:
+        pass
     return {
         "checks_passed": not failures,
         "checks_scope": "Frozen witnesses, DILA era-qualified month rows, explicitly named Julian/Gregorian date labels and printed cycle arithmetic versus the day-ganzhi implementation. Known source conflicts are retained, not successful full horoscopes.",
@@ -1047,12 +1177,16 @@ def worked_example_checks() -> dict:
         or manifest["source_pdf_sha256"] != SOURCE_SHA256
     ):
         failures.append({"kind": "worked_source_identity"})
+    else:
+        pass
     for row in manifest["images"]:
         if (
             hashlib.sha256((root / row["file"]).read_bytes()).hexdigest()
             != row["sha256"]
         ):
             failures.append({"kind": "worked_witness_identity", "file": row["file"]})
+        else:
+            pass
 
     direct_count = 0
     derived_count = 0
@@ -1072,6 +1206,8 @@ def worked_example_checks() -> dict:
                 failures.append(
                     {"kind": "worked_arithmetic", "case_id": case["id"], "field": field}
                 )
+            else:
+                pass
         for field, printed in case["source_totals"].items():
             if actual[field] != printed:
                 disagreements.append(
@@ -1083,6 +1219,8 @@ def worked_example_checks() -> dict:
                         repeated_in_source=case["source_repeated_totals"].get(field),
                     )
                 )
+            else:
+                pass
         for section in ("direct_expected", "rule_derived_expected"):
             for field, expected in case.get(section, {}).items():
                 value = actual
@@ -1097,6 +1235,8 @@ def worked_example_checks() -> dict:
                             "reference_kind": section,
                         }
                     )
+                else:
+                    pass
                 if section == "direct_expected":
                     direct_count += 1
                 else:
@@ -1112,6 +1252,10 @@ def worked_example_checks() -> dict:
                             "reference_kind": field,
                         }
                     )
+                else:
+                    pass
+            else:
+                pass
         for invalid in ("false", "true", "", 0, 1, [], {}):
             try:
                 heluo(**{**args, "month_yang_ling": invalid})
@@ -1123,13 +1267,19 @@ def worked_example_checks() -> dict:
                 )
         if actual["yangLingBasis"] != "explicit_half_year":
             failures.append({"kind": "manual_half_year_claims_astronomical_provenance"})
+        else:
+            pass
     if disagreements != reference["expected_source_total_disagreements"]:
         failures.append({"kind": "source_conflict_changed", "actual": disagreements})
+    else:
+        pass
     lines = gua_lines("坎", "震")
     for half, name, pos in ((False, "地雷復", 5), (True, "雷地豫", 2)):
         result = transform_houtian("水雷屯", lines, 5, half)
         if (result["name"], result["yuan"]) != (name, pos):
             failures.append({"kind": "half_year_counterexample", "half": half})
+        else:
+            pass
     return {
         "checks_passed": not failures,
         "checks_scope": "Witness identities, manually added totals, supported worked steps, separately derived steps and input guards. This is not all-literal agreement or historical calendar certification.",
@@ -1167,6 +1317,8 @@ def line_condition_checks() -> dict:
             failures.append(
                 {"kind": "line_condition_witness_identity", "file": item["file"]}
             )
+        else:
+            pass
     for case in reference["derived_pattern_cases"]:
         for pos in range(1, 7):
             other = (pos + 2) % 6 + 1
@@ -1181,6 +1333,8 @@ def line_condition_checks() -> dict:
                 failures.append(
                     {"kind": "line_condition_literal_clause", "case": case["gua"]}
                 )
+            else:
+                pass
             for row, selected in zip(actual["phases"], (pos, other)):
                 if (
                     row["pos"] != selected
@@ -1200,6 +1354,8 @@ def line_condition_checks() -> dict:
                             "pos": selected,
                         }
                     )
+                else:
+                    pass
             if (
                 actual["source_dangwei"]["match"] is not None
                 or actual["source_dangwei"]["month_polarity"] is not None
@@ -1211,6 +1367,8 @@ def line_condition_checks() -> dict:
                 failures.append(
                     {"kind": "unsupported_dangwei_or_synthesis", "case": case["gua"]}
                 )
+            else:
+                pass
     return {
         "checks_passed": not failures,
         "failures": failures,
@@ -1244,9 +1402,13 @@ def support_clause_checks() -> dict:
             failures.append(
                 {"kind": "support_witness_identity", "file": witness["file"]}
             )
+        else:
+            pass
     for path, digest in reference["prior_fixture_hashes"].items():
         if hashlib.sha256((ROOT / path).read_bytes()).hexdigest() != digest:
             failures.append({"kind": "support_prior_reference_identity", "file": path})
+        else:
+            pass
     for case in reference["derived_probes"]:
         chart = {
             "xian": {"name": case["gua"], "lines": case["lines"], "yuan": case["pos"]},
@@ -1266,6 +1428,8 @@ def support_clause_checks() -> dict:
             or source["required_corresponding_yang"] is not True
         ):
             failures.append({"kind": "support_literal_reading"})
+        else:
+            pass
         first, second = result["phases"]
         aid = first["source_youyuan"]
         actual = (
@@ -1292,6 +1456,8 @@ def support_clause_checks() -> dict:
                     "pos": case["pos"],
                 }
             )
+        else:
+            pass
         other = second["source_youyuan"]
         if (
             other["selected_pos"] != case["responding_pos"]
@@ -1304,6 +1470,8 @@ def support_clause_checks() -> dict:
             failures.append(
                 {"kind": "support_other_phase", "gua": case["gua"], "pos": case["pos"]}
             )
+        else:
+            pass
     return {
         "checks_passed": not failures,
         "failures": failures,
@@ -1338,11 +1506,15 @@ def body_structure_checks() -> dict:
             failures.append(
                 {"kind": "structure_witness_identity", "file": witness["file"]}
             )
+        else:
+            pass
     for path, digest in reference["prior_reference_hashes"].items():
         if hashlib.sha256((ROOT / path).read_bytes()).hexdigest() != digest:
             failures.append(
                 {"kind": "structure_prior_reference_identity", "file": path}
             )
+        else:
+            pass
     case = reference["source_case"]
     chart = {
         "xian": {"name": case["gua"], "lines": case["lines"]},
@@ -1352,6 +1524,8 @@ def body_structure_checks() -> dict:
     variants = json.loads((root / "variants.json").read_text())
     if result["wording_variants"] != variants["wording_variants"]:
         failures.append({"kind": "structure_wording_variants"})
+    else:
+        pass
     first, second = result["phases"]
     for actual, expected in zip(first["records"], case["bodies"]):
         if (
@@ -1370,17 +1544,23 @@ def body_structure_checks() -> dict:
             failures.append(
                 {"kind": "structure_literal_case", "body": expected["kind"]}
             )
+        else:
+            pass
     if (
         len(first["records"]) != 8
         or first["whole_reversal"]["name"] != case["whole_reversal"]["name"]
         or first["whole_reversal"]["lines"] != case["whole_reversal"]["bits"]
     ):
         failures.append({"kind": "structure_literal_cardinality_or_reversal"})
+    else:
+        pass
     if (
         second["whole_reversal"]["lines"] != [1, 1, 1, 1, 1, 1]
         or second["whole_reversal"]["name"] != "乾為天"
     ):
         failures.append({"kind": "structure_reversal_not_complement"})
+    else:
+        pass
     if (
         first["literal_case_match"] is not True
         or first["literal_names_reproduced"] is not True
@@ -1388,6 +1568,8 @@ def body_structure_checks() -> dict:
         or second["literal_names_reproduced"] is not None
     ):
         failures.append({"kind": "structure_example_scope"})
+    else:
+        pass
     if (
         result["five_ming_terminology"]["symbol_readings"]
         != reference["five_ming_symbol_readings"]
@@ -1396,6 +1578,8 @@ def body_structure_checks() -> dict:
         or result["complete_assessment"] is not False
     ):
         failures.append({"kind": "structure_terminology_or_completeness"})
+    else:
+        pass
     return {
         "checks_passed": not failures,
         "failures": failures,
@@ -1427,11 +1611,15 @@ def pillar_link_source_checks() -> dict:
             failures.append(
                 {"kind": "pillar_link_witness_identity", "file": image["file"]}
             )
+        else:
+            pass
     for path, digest in ref["prior_reference_hashes"].items():
         if hashlib.sha256((ROOT / path).read_bytes()).hexdigest() != digest:
             failures.append(
                 {"kind": "pillar_link_prior_reference_identity", "file": path}
             )
+        else:
+            pass
     for target, basis in (("month", "year"), ("hour", "day")):
         for group in ref[target + "_heads"]:
             for stem in group["basis_stems"]:
@@ -1439,7 +1627,6 @@ def pillar_link_source_checks() -> dict:
                     ref[target + "_branch_order"], group["expected_stems"]
                 ):
                     pillars = dict(year="甲子", month="丙寅", day="甲子", hour="甲子")
-                    from fatebridge.core.numerology_pillars import GAN, ZHI
 
                     i = GAN.index(stem)
                     pillars[basis] = stem + ZHI[i]
@@ -1462,6 +1649,8 @@ def pillar_link_source_checks() -> dict:
                                 "branch": branch,
                             }
                         )
+                    else:
+                        pass
     literal = ref["literal_source_conflict"]
     p = dict(zip(("year", "month", "day", "hour"), literal["pillars"]))
     result = pillar_link_evidence(p)
@@ -1471,6 +1660,8 @@ def pillar_link_source_checks() -> dict:
         or result["links"][1]["matches"] is not True
     ):
         failures.append({"kind": "retained_literal_pillar_link_conflict"})
+    else:
+        pass
     try:
         require_pillar_links(p)
     except ValueError:
@@ -1481,6 +1672,8 @@ def pillar_link_source_checks() -> dict:
     for key, value in literal["arithmetic_totals"].items():
         if totals[{"tian_num": "tianNum", "di_num": "diNum"}.get(key, key)] != value:
             failures.append({"kind": "retained_literal_arithmetic", "field": key})
+        else:
+            pass
     return {
         "checks_passed": not failures,
         "failures": failures,
@@ -1508,12 +1701,16 @@ def body_relation_checks() -> dict:
     failures = []
     if manifest["source_pdf_sha256"] != SOURCE_SHA256:
         failures.append({"kind": "body_source_identity"})
+    else:
+        pass
     for item in manifest["images"]:
         if (
             hashlib.sha256((root / item["file"]).read_bytes()).hexdigest()
             != item["sha256"]
         ):
             failures.append({"kind": "body_witness_identity", "file": item["file"]})
+        else:
+            pass
     for natal, expected in reference["rule_derived_relation_grid"].items():
         for trigram, relation in zip(reference["trigram_order"], expected):
             if element_relation(ELEMENTS[trigram], natal) != relation:
@@ -1524,18 +1721,26 @@ def body_relation_checks() -> dict:
                         "trigram": trigram,
                     }
                 )
+            else:
+                pass
     for case in reference["generating_clause_combinations"]:
         if element_relation(ELEMENTS[case["trigram"]], "水") != case["relation"]:
             failures.append({"kind": "body_generating_literal", "case": case})
+        else:
+            pass
     for case in reference["direct_reverse_readings"]:
         if (
             element_relation(case["source_body_element"], case["nayin"])
             != case["relation"]
         ):
             failures.append({"kind": "body_reverse_literal", "case": case})
+        else:
+            pass
     case = reference["direct_nuclear_reading"]
     if _san_cai(case["lines"])[1:3] != case["nuclear_trigrams"]:
         failures.append({"kind": "literal_nuclear_example"})
+    else:
+        pass
     bodies = {p: {"gua": "乾為天", "trigrams": ["乾"] * 4} for p in ("xian", "hou")}
     for year, targets, expected in (
         ("甲寅", {"tian": "乾", "di": "艮"}, False),
@@ -1547,6 +1752,8 @@ def body_relation_checks() -> dict:
             or result["present"] is not None
         ):
             failures.append({"kind": "yuanqi_qualifier", "year": year})
+        else:
+            pass
     return {
         "checks_passed": not failures,
         "failures": failures,
@@ -1576,18 +1783,24 @@ def month_and_clock_checks() -> dict:
         or manifest["pdf_sha256"] != SOURCE_SHA256
     ):
         failures.append({"kind": "month_source_identity"})
+    else:
+        pass
     if (
         collation["source_pdf_sha256"] != SOURCE_SHA256
         or collation["assigned_months"] != reference["assigned_months"]
         or len(collation["windows"]) != reference["additional_month_clauses"]
     ):
         failures.append({"kind": "month_collation_reference_disagreement"})
+    else:
+        pass
     for page in manifest["images"]:
         if (
             hashlib.sha256((root / page["file"]).read_bytes()).hexdigest()
             != page["sha256"]
         ):
             failures.append({"kind": "month_image_identity", "case": page["file"]})
+        else:
+            pass
 
     def chart(name):
         return {phase: {"name": name} for phase in ("xian", "hou")}
@@ -1604,6 +1817,8 @@ def month_and_clock_checks() -> dict:
             for r in result["phases"]
         ):
             failures.append({"kind": "original_assigned_month", "case": case})
+        else:
+            pass
     migrations = {
         ("離為火", 3, 0),
         ("雷水解", 5, 0),
@@ -1628,6 +1843,8 @@ def month_and_clock_checks() -> dict:
             )
             if not correct:
                 failures.append({"kind": "additional_month_window", "case": case})
+            else:
+                pass
     invalid_clocks = [None, "", " ", "未知", "24:00", "09:33:00Z", False]
     for value in invalid_clocks:
         try:
@@ -1640,6 +1857,8 @@ def month_and_clock_checks() -> dict:
             )
     if require_birth_clock("0:0") != "00:00:00":
         failures.append({"kind": "explicit_midnight_rejected"})
+    else:
+        pass
     return {
         "checks_passed": not failures,
         "failures": failures,
@@ -1678,12 +1897,16 @@ def yaoci_collation_checks() -> dict:
         or data["source_pdf_sha256"] != SOURCE_SHA256
     ):
         failures.append({"kind": "yaoci_source_identity"})
+    else:
+        pass
     for page in manifest["images"]:
         if (
             hashlib.sha256((root / page["file"]).read_bytes()).hexdigest()
             != page["sha256"]
         ):
             failures.append({"kind": "yaoci_image_identity", "case": page["file"]})
+        else:
+            pass
     for entry in data["entries"]:
         actual = yao_text(entry["hexagram"], entry["line"])
         if not actual or (
@@ -1691,6 +1914,8 @@ def yaoci_collation_checks() -> dict:
             actual["text_provenance"].get("pdf_page"),
         ) != (entry["yaoci"], entry["pdf_page"]):
             failures.append({"kind": "yaoci_overlay_selection", "case": entry})
+        else:
+            pass
     for gua, pos, word in (
         ("坤為地", 4, "括囊"),
         ("水雷屯", 2, "邅如"),
@@ -1701,6 +1926,8 @@ def yaoci_collation_checks() -> dict:
         actual = yao_text(gua, pos)
         if not actual or word not in actual["yaoci"]:
             failures.append({"kind": "yaoci_correction", "case": [gua, pos]})
+        else:
+            pass
     return {
         **summary,
         "checks_passed": not failures,
@@ -1717,7 +1944,6 @@ def yaoci_collation_checks() -> dict:
 
 def jiehou_source_checks() -> dict:
     """Selected labels and two explicit reconstructions; no selected hou date."""
-    from fatebridge.core import heluo_jiehou as jh
 
     root = ROOT / "tests/fixtures/heluo_jiehou_v1"
     reference = json.loads((root / "reference.json").read_text())
@@ -1729,15 +1955,21 @@ def jiehou_source_checks() -> dict:
             != image["sha256"]
         ):
             failures.append(dict(kind="heluo_jiehou_witness", file=image["file"]))
+        else:
+            pass
     for row in reference["term_rows"]:
         actual = jh.term_assignment(row["term"])
         if {k: actual[k] for k in row} != row:
             failures.append(dict(kind="heluo_jiehou_term_row", term=row["term"]))
+        else:
+            pass
     actual_rows = jh.literal_hou_table()
     if [
         {k: r[k] for k in reference["hou_rows"][i]} for i, r in enumerate(actual_rows)
     ] != reference["hou_rows"]:
         failures.append(dict(kind="heluo_jiehou_literal_table"))
+    else:
+        pass
     conflicts = [
         dict(
             term=r["term"],
@@ -1751,6 +1983,8 @@ def jiehou_source_checks() -> dict:
     ]
     if conflicts != reference["expected_yao_polarity_conflicts"]:
         failures.append(dict(kind="heluo_jiehou_literal_polarity_differences"))
+    else:
+        pass
     for probe in models["probes"]:
         for model, key in zip(models["models"], ("continuous", "caption_first")):
             row = jh.nominal_hou_day(probe["offset"], model=model)
@@ -1762,6 +1996,8 @@ def jiehou_source_checks() -> dict:
                         offset=probe["offset"],
                     )
                 )
+            else:
+                pass
     # Synthetic existing-term context: these are label/source checks, not24 new
     # astronomical instants or an independent check of the term solver.
     p = jh.jiehou_evidence(
@@ -1774,6 +2010,8 @@ def jiehou_source_checks() -> dict:
     )
     if [c["model"] for c in p["reconstruction_models"]] != models["models"]:
         failures.append(dict(kind="heluo_jiehou_model_coverage"))
+    else:
+        pass
     if (
         p["selected_hou"] is not None
         or p["huagong_assessment"] is not None
@@ -1782,12 +2020,16 @@ def jiehou_source_checks() -> dict:
         or p["hou_physical_date_mapping_complete"] is not False
     ):
         failures.append(dict(kind="heluo_jiehou_unestablished_model_or_date"))
+    else:
+        pass
     for comparison in p["reconstruction_models"]:
         model = comparison["model"]
         expected = models["expected_counts"][model]
         caption = comparison["caption_comparison"]
         if [r["printed"] for r in caption] != reference["caption"]["rows"]:
             failures.append(dict(kind="heluo_jiehou_printed_caption", model=model))
+        else:
+            pass
         for field, key in [
             ("caption_difference_count", "caption_differences"),
             ("term_start_position_difference_count", "term_position_differences"),
@@ -1797,6 +2039,8 @@ def jiehou_source_checks() -> dict:
                 failures.append(
                     dict(kind="heluo_jiehou_model_comparison", model=model, field=field)
                 )
+            else:
+                pass
         if any(
             r["derived"]["physical_date_applied"] is not False
             or r["derived"]["extra_ke_applied"] is not False
@@ -1805,6 +2049,8 @@ def jiehou_source_checks() -> dict:
             failures.append(
                 dict(kind="heluo_jiehou_nominal_promoted_to_date", model=model)
             )
+        else:
+            pass
     return dict(
         checks_passed=not failures,
         failures=failures,
@@ -1829,13 +2075,6 @@ def jiehou_source_checks() -> dict:
 
 def source_clock_checks() -> dict:
     """Literal counts and conditional arithmetic; no historical clock epoch."""
-    from fatebridge.core.heluo_clock import (
-        compare_daily_extra,
-        source_branch_partition,
-        source_clock_evidence,
-        source_six_day_blocks,
-    )
-    from fatebridge.core.heluo_timing import HeluoYearContextError, build_heluo_timing
 
     root = ROOT / "tests/fixtures/heluo_clock_v1"
     reference = json.loads((root / "reference.json").read_text())
@@ -1848,6 +2087,8 @@ def source_clock_checks() -> dict:
             failures.append(
                 dict(kind="heluo_clock_witness_identity", file=image["file"])
             )
+        else:
+            pass
     branch_reference = json.loads((root / "branch-shift-reference.json").read_text())
     blocks = source_six_day_blocks(origin_branch="未", blocks=12)
     if [
@@ -1855,13 +2096,17 @@ def source_clock_checks() -> dict:
         for row in blocks
     ] != branch_reference["origin_wei_first_twelve"]:
         failures.append(dict(kind="heluo_clock_six_day_branch_shifts"))
+    else:
+        pass
     for origin in "子丑寅卯辰巳午未申酉戌亥":
         if (
             source_six_day_blocks(origin_branch=origin, blocks=60)[-1]["end_ke"]
             != branch_reference["total_ke"]
         ):
             failures.append(dict(kind="heluo_clock_full_cycle_total", origin=origin))
-    profile = source_clock_evidence()
+        else:
+            pass
+    profile = heluo_clock.source_clock_evidence()
     shift = profile["branch_shift_projection"]
     if (
         shift["year_blocks"] != branch_reference["whole_year_blocks"]
@@ -1878,13 +2123,19 @@ def source_clock_checks() -> dict:
         or shift["daily_internal_distribution_resolved"] is not False
     ):
         failures.append(dict(kind="heluo_clock_branch_projection_scope"))
+    else:
+        pass
     if profile["source_pdf_sha256"] != reference["source_pdf_sha256"]:
         failures.append(dict(kind="heluo_clock_source_identity"))
+    else:
+        pass
     rows = source_branch_partition(origin_branch="子")
     if [{k: r[k] for k in ["branch", "start_ke", "end_ke"]} for r in rows] != reference[
         "cyclic_partition_from_zi"
     ]:
         failures.append(dict(kind="heluo_clock_branch_partition"))
+    else:
+        pass
     for case in reference["equal_shi_projection"]["assumed_scale_comparisons"]:
         result = compare_daily_extra(fen_per_ke=case["fen_per_ke"])
         for key, expected_key in [
@@ -1902,6 +2153,8 @@ def source_clock_checks() -> dict:
                         field=key,
                     )
                 )
+            else:
+                pass
         if (
             result["source_fen_scale_verified"] is not False
             or result["physical_clock_applied"] is not False
@@ -1912,6 +2165,8 @@ def source_clock_checks() -> dict:
                     scale=case["fen_per_ke"],
                 )
             )
+        else:
+            pass
     if (
         profile["physical_origin_branch"] is not None
         or profile["daily_extra_literal"]["fen_per_ke"] is not None
@@ -1919,6 +2174,8 @@ def source_clock_checks() -> dict:
         or profile["calendar_mapping_complete"] is not False
     ):
         failures.append(dict(kind="heluo_clock_unestablished_epoch_or_scale"))
+    else:
+        pass
     chart = heluo(
         four_pillars=dict(year="甲子", month="丁卯", day="庚申", hour="庚辰"),
         gender="男",
@@ -1928,17 +2185,21 @@ def source_clock_checks() -> dict:
     )
     rejected = False
     try:
-        build_heluo_timing(chart, "乙丑", analysis_year=1924)
+        heluo_timing.build_heluo_timing(chart, "乙丑", analysis_year=1924)
     except HeluoYearContextError:
         rejected = True
     if not rejected:
         failures.append(dict(kind="heluo_timing_mixed_year_context"))
-    good = build_heluo_timing(chart, "甲子", analysis_year=1924)
+    else:
+        pass
+    good = heluo_timing.build_heluo_timing(chart, "甲子", analysis_year=1924)
     if (
         good["selected_annual"]["gua"] != "天風姤"
         or good["selected_annual"]["ganzhi"] != "甲子"
     ):
         failures.append(dict(kind="heluo_timing_valid_year_context"))
+    else:
+        pass
     return dict(
         checks_passed=not failures,
         failures=failures,
@@ -1962,7 +2223,6 @@ def source_clock_checks() -> dict:
 
 def xusong_commentary_checks() -> dict:
     """Twelve new line readings and content identity, not a second reviewer."""
-    from fatebridge.core import heluo_texts as ht
 
     root = ROOT / "tests/fixtures/heluo_xusong_v1"
     reference = json.loads((root / "reference.json").read_text())
@@ -1974,9 +2234,13 @@ def xusong_commentary_checks() -> dict:
     ]:
         if hashlib.sha256((root / name).read_bytes()).hexdigest() != verified[key]:
             failures.append(dict(kind="xusong_draft_identity", file=name))
+        else:
+            pass
     for w in reference["images"]:
         if hashlib.sha256((root / w["file"]).read_bytes()).hexdigest() != w["sha256"]:
             failures.append(dict(kind="xusong_witness_identity", file=w["file"]))
+        else:
+            pass
     for e in verified["entries"]:
         t = yao_text(e["hexagram"], e["line"])
         if t is None or (
@@ -1990,6 +2254,8 @@ def xusong_commentary_checks() -> dict:
             failures.append(
                 dict(kind="xusong_complete_commentary", case=[e["hexagram"], e["line"]])
             )
+        else:
+            pass
     rejected = []
     for layer, path, expected in [
         ("header", ht.COLLATION_PATH, ht.HEADER_CONTENT_SHA256),
@@ -2006,6 +2272,8 @@ def xusong_commentary_checks() -> dict:
             or summary["sha256"] != hashlib.sha256(path.read_bytes()).hexdigest()
         ):
             failures.append(dict(kind="heluo_text_content_identity", layer=layer))
+        else:
+            pass
         # Nonempty, well-formed data used to retain a false collated status.
         if layer == "header":
             d["entries"][0]["yaoci"] = "非原典标题"
@@ -2041,7 +2309,6 @@ def xusong_commentary_checks() -> dict:
 
 def shibi_commentary_checks() -> dict:
     """Twelve primary readings and one conditional link; no new horoscope."""
-    from fatebridge.core import heluo_texts as ht
 
     root = ROOT / "tests/fixtures/heluo_shibi_v1"
     draft = json.loads((root / "reference.json").read_text())
@@ -2053,6 +2320,8 @@ def shibi_commentary_checks() -> dict:
     ):
         if hashlib.sha256((root / name).read_bytes()).hexdigest() != verified[key]:
             failures.append(dict(kind="shibi_draft_identity", file=name))
+        else:
+            pass
     for witness in draft["images"]:
         if (
             hashlib.sha256((root / witness["file"]).read_bytes()).hexdigest()
@@ -2061,6 +2330,8 @@ def shibi_commentary_checks() -> dict:
             failures.append(
                 dict(kind="shibi_native_image_identity", file=witness["file"])
             )
+        else:
+            pass
     for e in verified["entries"]:
         t = yao_text(e["hexagram"], e["line"])
         if t is None or (
@@ -2074,26 +2345,36 @@ def shibi_commentary_checks() -> dict:
             failures.append(
                 dict(kind="shibi_complete_commentary", case=[e["hexagram"], e["line"]])
             )
+        else:
+            pass
     ref = verified["conditional_reference"]
     expected = {k: v for k, v in ref.items() if k != "comparison_normal_houtian"}
     if yao_text("地水師", 3).get("commentary_cross_references") != [expected]:
         failures.append(dict(kind="shibi_conditional_reference"))
+    else:
+        pass
     hou = transform_houtian("地水師", ref["source_lines"], 3, True)
     normal = ref["comparison_normal_houtian"]
     if hou != dict(name=normal["hexagram"], lines=normal["lines"], yuan=normal["line"]):
         failures.append(dict(kind="shibi_reference_replaced_houtian"))
+    else:
+        pass
     bi2 = yao_text("水地比", 2)
     if (
         "戊戌" in bi2["detail"]
         or "戊戌" not in bi2["text_provenance"]["inherited_detail"]
     ):
         failures.append(dict(kind="bi2_whole_gua_condition_mixed_into_line"))
+    else:
+        pass
     summary = ht.commentary_collation_summary()
     if (
         summary["collated_line_commentaries"],
         summary["pending_line_commentaries"],
     ) != (SOURCE_HEADER_COUNT, SOURCE_PENDING_COUNT):
         failures.append(dict(kind="shibi_coverage_count"))
+    else:
+        pass
     return dict(
         checks_passed=not failures,
         failures=failures,
@@ -2125,9 +2406,13 @@ def xiaochuli_commentary_checks() -> dict:
     ):
         if hashlib.sha256((root / name).read_bytes()).hexdigest() != verified[key]:
             failures.append(dict(kind="xiaochuli_draft_identity", file=name))
+        else:
+            pass
     for w in draft["images"]:
         if hashlib.sha256((root / w["file"]).read_bytes()).hexdigest() != w["sha256"]:
             failures.append(dict(kind="xiaochuli_image_identity", file=w["file"]))
+        else:
+            pass
     for e in verified["entries"]:
         t = yao_text(e["hexagram"], e["line"])
         if t is None or (
@@ -2144,6 +2429,8 @@ def xiaochuli_commentary_checks() -> dict:
                     case=[e["hexagram"], e["line"]],
                 )
             )
+        else:
+            pass
     for e in verified["headers"]:
         t = yao_text(e["hexagram"], e["line"])
         if t is None or (t["yaoci"], t["text_provenance"].get("pdf_page")) != (
@@ -2151,6 +2438,8 @@ def xiaochuli_commentary_checks() -> dict:
             e["pdf_page"],
         ):
             failures.append(dict(kind="lu_new_header", case=e["line"]))
+        else:
+            pass
     three = yao_text("風天小畜", 3)
     if [s["section_id"] for s in three["commentary_sections"]] != verified[
         "source_section_exception"
@@ -2160,18 +2449,26 @@ def xiaochuli_commentary_checks() -> dict:
         "不葉者"
     ]:
         failures.append(dict(kind="xiaochu3_unprinted_condition_label"))
+    else:
+        pass
     ref = verified["conditional_reference"]
     if yao_text("風天小畜", 1).get("commentary_cross_references") != [
         {k: v for k, v in ref.items() if k != "comparison_normal_houtian"}
     ]:
         failures.append(dict(kind="xiaochu1_conditional_reference"))
+    else:
+        pass
     normal = ref["comparison_normal_houtian"]
     if transform_houtian("風天小畜", ref["source_lines"], 1, True) != dict(
         name=normal["hexagram"], lines=normal["lines"], yuan=normal["line"]
     ):
         failures.append(dict(kind="xiaochu1_reference_replaced_houtian"))
+    else:
+        pass
     if yao_text("天澤履", 6).get("commentary_cross_references"):
         failures.append(dict(kind="lu6_literal_phrase_improperly_became_transform"))
+    else:
+        pass
     return dict(
         checks_passed=not failures,
         failures=failures,
@@ -2206,9 +2503,13 @@ def taipi_commentary_checks() -> dict:
     ):
         if hashlib.sha256((root / name).read_bytes()).hexdigest() != verified[key]:
             failures.append(dict(kind="taipi_draft_identity", file=name))
+        else:
+            pass
     for w in draft["images"]:
         if hashlib.sha256((root / w["file"]).read_bytes()).hexdigest() != w["sha256"]:
             failures.append(dict(kind="taipi_image_identity", file=w["file"]))
+        else:
+            pass
     for e in verified["entries"]:
         t = yao_text(e["hexagram"], e["line"])
         if t is None or (
@@ -2222,6 +2523,8 @@ def taipi_commentary_checks() -> dict:
             failures.append(
                 dict(kind="taipi_complete_commentary", case=[e["hexagram"], e["line"]])
             )
+        else:
+            pass
     for e in verified["headers"]:
         t = yao_text(e["hexagram"], e["line"])
         if t is None or (t["yaoci"], t["text_provenance"].get("pdf_page")) != (
@@ -2229,6 +2532,8 @@ def taipi_commentary_checks() -> dict:
             e["pdf_page"],
         ):
             failures.append(dict(kind="taipi_header", case=[e["hexagram"], e["line"]]))
+        else:
+            pass
     for r in verified["conditional_references"]:
         if yao_text(r["source_hexagram"], r["source_line"]).get(
             "commentary_cross_references"
@@ -2239,8 +2544,12 @@ def taipi_commentary_checks() -> dict:
                     case=[r["source_hexagram"], r["source_line"]],
                 )
             )
+        else:
+            pass
     if yao_text("天地否", 6).get("commentary_cross_references"):
         failures.append(dict(kind="pi6_unnamed_target_invented"))
+    else:
+        pass
     return dict(
         checks_passed=not failures,
         failures=failures,
@@ -2269,6 +2578,8 @@ def commentary_collation_checks() -> dict:
     failures = []
     if reference["source_pdf_sha256"] != summary["source_pdf_sha256"]:
         failures.append({"kind": "commentary_source_identity"})
+    else:
+        pass
     for witness in reference["images"]:
         if (
             hashlib.sha256((root / witness["file"]).read_bytes()).hexdigest()
@@ -2277,6 +2588,8 @@ def commentary_collation_checks() -> dict:
             failures.append(
                 {"kind": "commentary_witness_identity", "case": witness["file"]}
             )
+        else:
+            pass
     for case in reference["cases"]:
         text = yao_text(case["hexagram"], case["line"])
         if text is None or (
@@ -2285,6 +2598,8 @@ def commentary_collation_checks() -> dict:
             or text["text_provenance"]["commentary_pdf_pages"] != case["pdf_pages"]
         ):
             failures.append({"kind": "commentary_literal_excerpt", "case": case})
+        else:
+            pass
     for gua in ("乾為天", "坤為地"):
         for pos in range(1, 7):
             text = yao_text(gua, pos)
@@ -2300,6 +2615,8 @@ def commentary_collation_checks() -> dict:
                 failures.append(
                     {"kind": "commentary_branch_preservation", "case": [gua, pos]}
                 )
+            else:
+                pass
     extension_root = ROOT / "tests/fixtures/heluo_tunmeng_v1"
     extension = json.loads((extension_root / "reference.json").read_text())
     verified = json.loads((extension_root / "verified-readings.json").read_text())
@@ -2309,11 +2626,15 @@ def commentary_collation_checks() -> dict:
     ):
         if hashlib.sha256((extension_root / name).read_bytes()).hexdigest() != digest:
             failures.append({"kind": "tunmeng_reference_identity", "file": name})
+        else:
+            pass
     if (
         hashlib.sha256((root / "commentary-reference.json").read_bytes()).hexdigest()
         != extension["previous_reference_sha256"]
     ):
         failures.append({"kind": "original_commentary_reference_changed"})
+    else:
+        pass
     for witness in extension["images"]:
         if (
             hashlib.sha256((extension_root / witness["file"]).read_bytes()).hexdigest()
@@ -2322,6 +2643,8 @@ def commentary_collation_checks() -> dict:
             failures.append(
                 {"kind": "tunmeng_native_witness_identity", "file": witness["file"]}
             )
+        else:
+            pass
     for case in verified["entries"]:
         text = yao_text(case["hexagram"], case["line"])
         if text is None or (
@@ -2340,11 +2663,15 @@ def commentary_collation_checks() -> dict:
                     "case": [case["hexagram"], case["line"]],
                 }
             )
+        else:
+            pass
     if (
         summary["collated_line_commentaries"] != SOURCE_HEADER_COUNT
         or summary["pending_line_commentaries"] != SOURCE_PENDING_COUNT
     ):
         failures.append({"kind": "commentary_coverage_count"})
+    else:
+        pass
     return {
         **summary,
         "checks_passed": not failures,
@@ -2369,12 +2696,16 @@ def yuantang_scan_checks() -> dict:
     comparisons = 0
     if reference["source_pdf_sha256"] != SOURCE_SHA256:
         failures.append({"kind": "yuantang_source_identity"})
+    else:
+        pass
     for row in reference["images"]:
         if (
             hashlib.sha256((root / row["file"]).read_bytes()).hexdigest()
             != row["sha256"]
         ):
             failures.append({"kind": "yuantang_witness_identity", "case": row["file"]})
+        else:
+            pass
     for row in reference["mixed_tables"]:
         for hour, position in zip(row["hours"], row["positions"]):
             result = yuantang_placement(row["lines"], hour, True, None)
@@ -2389,6 +2720,8 @@ def yuantang_scan_checks() -> dict:
                         "case": [row["id"], hour],
                     }
                 )
+            else:
+                pass
     for row in reference["pure_tables"]:
         halves = (False, True) if row["half_year"] == "any" else (row["half_year"],)
         bit = int(row["hexagram"] == "乾為天")
@@ -2407,6 +2740,8 @@ def yuantang_scan_checks() -> dict:
                             "case": [row["id"], half, hour],
                         }
                     )
+                else:
+                    pass
     for clause in reference["pure_reuse_clauses"]:
         row = next(
             r for r in reference["pure_tables"] if r["id"] == clause["reuse_table"]
@@ -2426,6 +2761,8 @@ def yuantang_scan_checks() -> dict:
                         "case": [clause["hexagram"], hour],
                     }
                 )
+            else:
+                pass
     for row in reference["modern_selection_probes"]:
         pillars = dict(zip(("year", "month", "day", "hour"), row["pillars"]))
         args = dict(
@@ -2442,6 +2779,8 @@ def yuantang_scan_checks() -> dict:
                 failures.append(
                     {"kind": "yuantang_wrong_guard_error", "case": row["date"]}
                 )
+            else:
+                pass
         else:
             failures.append(
                 {"kind": "yuantang_guessed_boundary_half", "case": row["date"]}
@@ -2453,6 +2792,8 @@ def yuantang_scan_checks() -> dict:
             row["hou_yuan"],
         ):
             failures.append({"kind": "yuantang_explicit_probe", "case": row["date"]})
+        else:
+            pass
     return {
         "checks_passed": not failures,
         "failures": failures,
@@ -2490,6 +2831,8 @@ def canping_text_checks() -> dict:
     ):
         if hashlib.sha256((header_root / file).read_bytes()).hexdigest() != expected:
             failures.append({"kind": "canping_header_fixture_identity", "case": file})
+        else:
+            pass
     header_witness = summary.get("number_reading_witness", {})
     # Runtime provenance omits local fixture names, canvas IDs and byte sizes.
     # Compare every published source coordinate, URL and digest explicitly.
@@ -2529,6 +2872,8 @@ def canping_text_checks() -> dict:
         )
     ):
         failures.append({"kind": "canping_header_scope"})
+    else:
+        pass
     for page in header_reference["pages"]:
         if {tuple(r["region"]) for r in page["regions"]} != {
             (0, 0, 2950, 2200),
@@ -2539,6 +2884,8 @@ def canping_text_checks() -> dict:
             failures.append(
                 {"kind": "canping_header_region_coverage", "case": page["pdf_page"]}
             )
+        else:
+            pass
         for region in page["regions"]:
             if (
                 hashlib.sha256((header_root / region["file"]).read_bytes()).hexdigest()
@@ -2547,6 +2894,8 @@ def canping_text_checks() -> dict:
                 failures.append(
                     {"kind": "canping_header_region_identity", "case": region["file"]}
                 )
+            else:
+                pass
     for cell in header_reference["cells"]:
         result = canping_lookup_record(cell["element"], cell["number"], cell["kind"])
         selected = result["selection"]
@@ -2569,6 +2918,8 @@ def canping_text_checks() -> dict:
                     "case": [cell["element"], cell["number"], cell["kind"]],
                 }
             )
+        else:
+            pass
     for image in reference["images"]:
         if (
             hashlib.sha256((root / image["file"]).read_bytes()).hexdigest()
@@ -2577,8 +2928,12 @@ def canping_text_checks() -> dict:
             failures.append(
                 {"kind": "canping_text_witness_identity", "case": image["file"]}
             )
+        else:
+            pass
     if summary["source_pdf_sha256"] != reference["source_pdf_sha256"]:
         failures.append({"kind": "canping_text_source_identity"})
+    else:
+        pass
     count = 0
     for row in reference["literal_reference"]:
         for kind, text in row["cells"].items():
@@ -2594,6 +2949,8 @@ def canping_text_checks() -> dict:
                         "case": [row["element"], row["number"], kind],
                     }
                 )
+            else:
+                pass
     unreachable = []
     active_invalid = []
     special_unreachable = []
@@ -2611,6 +2968,8 @@ def canping_text_checks() -> dict:
         raw["parts"]["火"]["3838"]["male"] = prior_comparison_text
     if not inherited_cache_isolated:
         failures.append({"kind": "canping_inherited_source_cache_exposed"})
+    else:
+        pass
     for element, part in raw["parts"].items():
         reachable = {
             compute_number(d, h, element)[k]
@@ -2626,11 +2985,15 @@ def canping_text_checks() -> dict:
             if correction["element"] == element:
                 active.discard(correction["inherited"])
                 active.add(correction["corrected"])
+            else:
+                pass
         active_invalid.extend(
             {"element": element, "number": n} for n in sorted(active - reachable)
         )
         if 2869 not in reachable:
             special_unreachable.append(element)
+        else:
+            pass
         for kind in ("male", "female", "luck"):
             if canping_lookup_record(element, 2869, kind)["text"]:
                 failures.append(
@@ -2639,6 +3002,8 @@ def canping_text_checks() -> dict:
                         "case": [element, kind],
                     }
                 )
+            else:
+                pass
     failures.extend(
         {"kind": "canping_active_header_unreachable", "case": case}
         for case in active_invalid
@@ -2654,6 +3019,8 @@ def canping_text_checks() -> dict:
         )
         if result["kindMain"] != "female":
             failures.append({"kind": "canping_gender_column", "case": alias})
+        else:
+            pass
     missing = canping(
         year_gz="甲子",
         month_branch="寅",
@@ -2663,6 +3030,8 @@ def canping_text_checks() -> dict:
     )
     if missing["kindMain"] is not None or missing["benming"]["verses"]["textShun"]:
         failures.append({"kind": "canping_missing_gender_selected_column"})
+    else:
+        pass
     rereading_root = ROOT / "tests/fixtures/canping_rereading_v1"
     rereading_reference = json.loads((rereading_root / "reference.json").read_text())
     rereading_cells = {
@@ -2677,6 +3046,8 @@ def canping_text_checks() -> dict:
     ):
         if hashlib.sha256((rereading_root / file).read_bytes()).hexdigest() != expected:
             failures.append({"kind": "canping_rereading_identity", "case": file})
+        else:
+            pass
     for page in rereading_reference["pages"]:
         regions = page["regions"]
         if {tuple(r["region"]) for r in regions} != {
@@ -2688,6 +3059,8 @@ def canping_text_checks() -> dict:
             failures.append(
                 {"kind": "canping_native_region_coverage", "case": page["pdf_page"]}
             )
+        else:
+            pass
         for region in regions:
             if (
                 hashlib.sha256(
@@ -2698,6 +3071,8 @@ def canping_text_checks() -> dict:
                 failures.append(
                     {"kind": "canping_native_region_identity", "case": region["file"]}
                 )
+            else:
+                pass
     if (
         len(rereading_cells) != 40
         or rereading_reference["resolved_cells"] != 30
@@ -2708,6 +3083,8 @@ def canping_text_checks() -> dict:
         != rereading_reference["source_manifest_sha256"]
     ):
         failures.append({"kind": "canping_rereading_scope"})
+    else:
+        pass
     water_root = ROOT / "tests/fixtures/canping_water_v1"
     water_reference = json.loads(
         (water_root / "reference.json").read_text(encoding="utf-8")
@@ -2718,6 +3095,8 @@ def canping_text_checks() -> dict:
         != water_reference["literal_sha256"]
     ):
         failures.append({"kind": "canping_water_literal_identity"})
+    else:
+        pass
     for image in water_reference["images"]:
         if (
             hashlib.sha256((water_root / image["file"]).read_bytes()).hexdigest()
@@ -2726,6 +3105,8 @@ def canping_text_checks() -> dict:
             failures.append(
                 {"kind": "canping_water_page_identity", "case": image["file"]}
             )
+        else:
+            pass
     special_states = {
         (r["number"], r["kind"]): r["state"]
         for r in water_reference["expected_special_states"]
@@ -2754,12 +3135,18 @@ def canping_text_checks() -> dict:
                     failures.append(
                         {"kind": "canping_rereading_history", "case": [number, kind]}
                     )
+                else:
+                    pass
+            else:
+                pass
             if (
                 selected["text"] != (revision["text"] if revision else row[kind])
                 or selected["selection"]["cell_status"] != expected
                 or selected["selection"].get("source_pdf_page") != int(row["pdf_page"])
             ):
                 failures.append({"kind": "canping_water_cell", "case": [number, kind]})
+            else:
+                pass
     witness_root = ROOT / "tests/fixtures/canping_witness_v1"
     witness_reference = json.loads(
         (witness_root / "reference.json").read_text(encoding="utf-8")
@@ -2770,6 +3157,8 @@ def canping_text_checks() -> dict:
         != witness_reference["literal_sha256"]
     ):
         failures.append({"kind": "canping_witness_literal_identity"})
+    else:
+        pass
     for image in witness_reference["images"]:
         if (
             hashlib.sha256((witness_root / image["file"]).read_bytes()).hexdigest()
@@ -2778,6 +3167,8 @@ def canping_text_checks() -> dict:
             failures.append(
                 {"kind": "canping_witness_page_identity", "case": image["file"]}
             )
+        else:
+            pass
     witness_rows = list(
         csv.DictReader(witness_literal.open(encoding="utf-8"), delimiter="\t")
     )
@@ -2792,6 +3183,8 @@ def canping_text_checks() -> dict:
             failures.append(
                 {"kind": "canping_witness_cell", "case": [row["number"], row["kind"]]}
             )
+        else:
+            pass
     witness_summary = summary["comparison_witness"]
     water_witness = witness_summary["part_coverage"]["水"]
     if (
@@ -2801,12 +3194,16 @@ def canping_text_checks() -> dict:
         or water_witness["uncertain_readings"] != 2
     ):
         failures.append({"kind": "canping_witness_coverage"})
+    else:
+        pass
     if (
         len(water_rows) != 78
         or uncertain_cells != 10
         or summary["part_coverage"]["水"]["collated_cells"] != 224
     ):
         failures.append({"kind": "canping_water_coverage"})
+    else:
+        pass
     gold_root = ROOT / "tests/fixtures/canping_gold_v1"
     gold_reference = json.loads((gold_root / "reference.json").read_text())
     gold_literal = gold_root / gold_reference["literal_file"]
@@ -2816,6 +3213,8 @@ def canping_text_checks() -> dict:
         != gold_reference["literal_sha256"]
     ):
         failures.append({"kind": "canping_gold_source_identity"})
+    else:
+        pass
     for image in gold_reference["images"]:
         if (
             hashlib.sha256((gold_root / image["file"]).read_bytes()).hexdigest()
@@ -2824,6 +3223,8 @@ def canping_text_checks() -> dict:
             failures.append(
                 {"kind": "canping_gold_page_identity", "case": image["file"]}
             )
+        else:
+            pass
     gold_states = {
         (int(r["number"]), r["kind"]): r["state"]
         for r in gold_reference["expected_special_states"]
@@ -2850,6 +3251,8 @@ def canping_text_checks() -> dict:
     ):
         if hashlib.sha256((gold_native_root / file).read_bytes()).hexdigest() != digest:
             failures.append({"kind": "canping_gold_native_identity", "case": file})
+        else:
+            pass
     gold_native_witnesses = [
         w
         for w in summary["additional_rereading_witnesses"]
@@ -2891,6 +3294,8 @@ def canping_text_checks() -> dict:
         )
     ):
         failures.append({"kind": "canping_gold_native_scope"})
+    else:
+        pass
     for page in gold_native_reference["pages"]:
         if {tuple(r["region"]) for r in page["regions"]} != {
             (0, 0, 2950, 2200),
@@ -2904,6 +3309,8 @@ def canping_text_checks() -> dict:
                     "case": page["pdf_page"],
                 }
             )
+        else:
+            pass
         for region in page["regions"]:
             if (
                 hashlib.sha256(
@@ -2918,6 +3325,8 @@ def canping_text_checks() -> dict:
                         "case": region["file"],
                     }
                 )
+            else:
+                pass
     gold_uncertain = 0
     for row in gold_rows:
         for kind in ("male", "female", "luck"):
@@ -2941,6 +3350,8 @@ def canping_text_checks() -> dict:
                 failures.append(
                     {"kind": "canping_gold_native_revision", "case": [number, kind]}
                 )
+            else:
+                pass
             if (
                 selected["text"] != (revision["text"] if revision else row[kind])
                 or selected["selection"]["number"] != number
@@ -2948,6 +3359,8 @@ def canping_text_checks() -> dict:
                 or selected["selection"].get("source_pdf_page") != int(row["pdf_page"])
             ):
                 failures.append({"kind": "canping_gold_cell", "case": [number, kind]})
+            else:
+                pass
     for row in gold_reference["numbered_content_correspondence"]:
         for kind in ("male", "female", "luck"):
             number = row["source_number"]
@@ -2960,12 +3373,16 @@ def canping_text_checks() -> dict:
                 failures.append(
                     {"kind": "canping_gold_number_body_pairing", "case": [number, kind]}
                 )
+            else:
+                pass
     if (
         len(gold_rows) != 78
         or gold_uncertain != 11
         or summary["part_coverage"]["金"]["collated_cells"] != 223
     ):
         failures.append({"kind": "canping_gold_coverage"})
+    else:
+        pass
     fire_root = ROOT / "tests/fixtures/canping_fire_v1"
     fire_reference = json.loads((fire_root / "reference.json").read_text())
     fire_literal = fire_root / fire_reference["literal_file"]
@@ -2975,6 +3392,8 @@ def canping_text_checks() -> dict:
         != fire_reference["literal_sha256"]
     ):
         failures.append({"kind": "canping_fire_source_identity"})
+    else:
+        pass
     for image in fire_reference["images"]:
         if (
             hashlib.sha256((fire_root / image["file"]).read_bytes()).hexdigest()
@@ -2983,6 +3402,8 @@ def canping_text_checks() -> dict:
             failures.append(
                 {"kind": "canping_fire_page_identity", "case": image["file"]}
             )
+        else:
+            pass
     fire_rows = list(
         csv.DictReader(fire_literal.open(encoding="utf-8"), delimiter="\t")
     )
@@ -3010,6 +3431,8 @@ def canping_text_checks() -> dict:
     ):
         if hashlib.sha256((fire_native_root / file).read_bytes()).hexdigest() != digest:
             failures.append({"kind": "canping_fire_native_identity", "case": file})
+        else:
+            pass
     fire_native_witnesses = [
         w
         for w in summary["additional_rereading_witnesses"]
@@ -3051,6 +3474,8 @@ def canping_text_checks() -> dict:
         )
     ):
         failures.append({"kind": "canping_fire_native_scope"})
+    else:
+        pass
     for page in fire_native_reference["pages"]:
         if {tuple(r["region"]) for r in page["regions"]} != {
             (0, 0, 2950, 2200),
@@ -3064,6 +3489,8 @@ def canping_text_checks() -> dict:
                     "case": page["pdf_page"],
                 }
             )
+        else:
+            pass
         for region in page["regions"]:
             if hashlib.sha256(
                 (fire_native_root / region["file"]).read_bytes()
@@ -3076,6 +3503,8 @@ def canping_text_checks() -> dict:
                         "case": region["file"],
                     }
                 )
+            else:
+                pass
     fire_uncertain = 0
     for row in fire_rows:
         for kind in ("male", "female", "luck"):
@@ -3098,6 +3527,8 @@ def canping_text_checks() -> dict:
                 failures.append(
                     {"kind": "canping_fire_native_revision", "case": [number, kind]}
                 )
+            else:
+                pass
             if (
                 selected["text"] != (revision["text"] if revision else row[kind])
                 or s["number"] != number
@@ -3114,6 +3545,8 @@ def canping_text_checks() -> dict:
                 )
             ):
                 failures.append({"kind": "canping_fire_cell", "case": [number, kind]})
+            else:
+                pass
     if (
         len(fire_rows) != 78
         or fire_uncertain != 11
@@ -3121,6 +3554,8 @@ def canping_text_checks() -> dict:
         or summary["part_coverage"]["火"]["collated_cells"] != 223
     ):
         failures.append({"kind": "canping_fire_coverage"})
+    else:
+        pass
     wood_root = ROOT / "tests/fixtures/canping_wood_v1"
     wood_reference = json.loads((wood_root / "reference.json").read_text())
     wood_literal = wood_root / wood_reference["literal_file"]
@@ -3130,6 +3565,8 @@ def canping_text_checks() -> dict:
         != wood_reference["literal_sha256"]
     ):
         failures.append({"kind": "canping_wood_source_identity"})
+    else:
+        pass
     for image in wood_reference["images"]:
         if (
             hashlib.sha256((wood_root / image["file"]).read_bytes()).hexdigest()
@@ -3138,6 +3575,8 @@ def canping_text_checks() -> dict:
             failures.append(
                 {"kind": "canping_wood_page_identity", "case": image["file"]}
             )
+        else:
+            pass
     wood_rows = list(
         csv.DictReader(wood_literal.open(encoding="utf-8"), delimiter="\t")
     )
@@ -3165,6 +3604,8 @@ def canping_text_checks() -> dict:
     ):
         if hashlib.sha256((wood_native_root / file).read_bytes()).hexdigest() != digest:
             failures.append({"kind": "canping_wood_native_identity", "case": file})
+        else:
+            pass
     wood_native_witnesses = [
         w
         for w in summary["additional_rereading_witnesses"]
@@ -3206,6 +3647,8 @@ def canping_text_checks() -> dict:
         )
     ):
         failures.append({"kind": "canping_wood_native_scope"})
+    else:
+        pass
     for page in wood_native_reference["pages"]:
         if {tuple(r["region"]) for r in page["regions"]} != {
             (0, 0, 2950, 2200),
@@ -3219,6 +3662,8 @@ def canping_text_checks() -> dict:
                     "case": page["pdf_page"],
                 }
             )
+        else:
+            pass
         for region in page["regions"]:
             if hashlib.sha256(
                 (wood_native_root / region["file"]).read_bytes()
@@ -3231,6 +3676,8 @@ def canping_text_checks() -> dict:
                         "case": region["file"],
                     }
                 )
+            else:
+                pass
     wood_uncertain = 0
     for row in wood_rows:
         for kind in ("male", "female", "luck"):
@@ -3253,6 +3700,8 @@ def canping_text_checks() -> dict:
                 failures.append(
                     {"kind": "canping_wood_native_revision", "case": [number, kind]}
                 )
+            else:
+                pass
             if (
                 selected["text"] != (revision["text"] if revision else row[kind])
                 or s["number"] != number
@@ -3269,6 +3718,8 @@ def canping_text_checks() -> dict:
                 )
             ):
                 failures.append({"kind": "canping_wood_cell", "case": [number, kind]})
+            else:
+                pass
     if (
         len(wood_rows) != 78
         or wood_uncertain != 13
@@ -3276,6 +3727,8 @@ def canping_text_checks() -> dict:
         or summary["part_coverage"]["木"]["collated_cells"] != 221
     ):
         failures.append({"kind": "canping_wood_coverage"})
+    else:
+        pass
     earth_root = ROOT / "tests/fixtures/canping_earth_v1"
     earth_reference = json.loads((earth_root / "reference.json").read_text())
     earth_literal = earth_root / earth_reference["literal_file"]
@@ -3285,6 +3738,8 @@ def canping_text_checks() -> dict:
         != earth_reference["literal_sha256"]
     ):
         failures.append({"kind": "canping_earth_source_identity"})
+    else:
+        pass
     for image in earth_reference["images"]:
         if (
             hashlib.sha256((earth_root / image["file"]).read_bytes()).hexdigest()
@@ -3293,6 +3748,8 @@ def canping_text_checks() -> dict:
             failures.append(
                 {"kind": "canping_earth_page_identity", "case": image["file"]}
             )
+        else:
+            pass
     earth_rows = list(
         csv.DictReader(earth_literal.open(encoding="utf-8"), delimiter="\t")
     )
@@ -3329,6 +3786,8 @@ def canping_text_checks() -> dict:
             != digest
         ):
             failures.append({"kind": "canping_earth_native_identity", "case": file})
+        else:
+            pass
     earth_native_witnesses = [
         w
         for w in summary["additional_rereading_witnesses"]
@@ -3370,6 +3829,8 @@ def canping_text_checks() -> dict:
         )
     ):
         failures.append({"kind": "canping_earth_native_scope"})
+    else:
+        pass
     for page in earth_native_reference["pages"]:
         if {tuple(r["region"]) for r in page["regions"]} != {
             (0, 0, 2950, 2200),
@@ -3383,6 +3844,8 @@ def canping_text_checks() -> dict:
                     "case": page["pdf_page"],
                 }
             )
+        else:
+            pass
         for region in page["regions"]:
             if (
                 hashlib.sha256(
@@ -3397,6 +3860,8 @@ def canping_text_checks() -> dict:
                         "case": region["file"],
                     }
                 )
+            else:
+                pass
     for comparison in earth_native_reference["comparison_cells"]:
         result = canping_lookup_record(
             comparison["element"], comparison["number"], comparison["kind"]
@@ -3409,12 +3874,16 @@ def canping_text_checks() -> dict:
             or comparison["prior_state_changed"]
         ):
             failures.append({"kind": "canping_earth_comparison_unchanged"})
+        else:
+            pass
     if (
         earth_native_reference["reviewed_previous_clear_cells"] != 1
         or earth_native_reference["corrected_previously_clear_cells"] != 0
         or len(earth_native_reference["withdrawn_draft_readings"]) != 1
     ):
         failures.append({"kind": "canping_earth_draft_withdrawal"})
+    else:
+        pass
     earth_uncertain = 0
     for row in earth_rows:
         for kind in ("male", "female", "luck"):
@@ -3440,6 +3909,8 @@ def canping_text_checks() -> dict:
                 failures.append(
                     {"kind": "canping_earth_native_revision", "case": [number, kind]}
                 )
+            else:
+                pass
             if (
                 selected["text"] != (revision["text"] if revision else row[kind])
                 or s["number"] != number
@@ -3456,6 +3927,8 @@ def canping_text_checks() -> dict:
                 )
             ):
                 failures.append({"kind": "canping_earth_cell", "case": [number, kind]})
+            else:
+                pass
     if (
         len(earth_rows) != 78
         or earth_uncertain != 2
@@ -3463,6 +3936,8 @@ def canping_text_checks() -> dict:
         or summary["part_coverage"]["土"]["collated_cells"] != 232
     ):
         failures.append({"kind": "canping_earth_coverage"})
+    else:
+        pass
     if (
         summary["collated_cells"] != 1123
         or summary["unresolved_reading_cells"] != 47
@@ -3472,6 +3947,8 @@ def canping_text_checks() -> dict:
         or summary["numbered_table_clear_readings_complete"] is not False
     ):
         failures.append({"kind": "canping_global_coverage_and_completion"})
+    else:
+        pass
     return {
         **summary,
         "checks_passed": not failures,
@@ -3617,6 +4094,8 @@ def seasonal_conditions_checks() -> dict:
         or reference["source_pdf_sha256"] != SOURCE_SHA256
     ):
         failures.append({"kind": "seasonal_source_identity"})
+    else:
+        pass
     for page in manifest["images"]:
         if (
             hashlib.sha256((root / page["file"]).read_bytes()).hexdigest()
@@ -3625,10 +4104,14 @@ def seasonal_conditions_checks() -> dict:
             failures.append(
                 {"kind": "seasonal_source_image_identity", "case": page["file"]}
             )
+        else:
+            pass
     for case in reference["pattern_cases"]:
         result = seasonal_number_evidence(case["tian"], case["di"], None)
         if result["matched_pattern_ids"] != case["ids"]:
             failures.append({"kind": "literal_numerical_pattern", "case": case})
+        else:
+            pass
     for case in reference["season_cases"]:
         result = seasonal_number_evidence(
             case["tian"], case["di"], datetime.fromisoformat(case["at"])
@@ -3646,6 +4129,8 @@ def seasonal_conditions_checks() -> dict:
             (w["id"], w["start"], w["end"]) for w in reference["windows"]
         ]:
             failures.append({"kind": "seasonal_source_window", "case": case})
+        else:
+            pass
     hko = json.loads(
         (ROOT / "tests/fixtures/calendar_hko_v1/reference.json").read_text()
     )
@@ -3658,6 +4143,8 @@ def seasonal_conditions_checks() -> dict:
             for case in hko["cases"]:
                 if case["term"] != term:
                     continue
+                else:
+                    pass
                 anchor = datetime.fromisoformat(case["at"])
                 observed = []
                 for minutes in (-2, 2):
@@ -3680,6 +4167,8 @@ def seasonal_conditions_checks() -> dict:
                             "case": case,
                         }
                     )
+                else:
+                    pass
     return {
         "checks_passed": not failures
         and len(manifest["images"]) == 11
@@ -3710,6 +4199,8 @@ def canping_luck_checks() -> dict:
         or reference["source_pdf_sha256"] != CANPING_SOURCE_SHA256
     ):
         failures.append({"kind": "canping_source_identity"})
+    else:
+        pass
     for witness in manifest["images"]:
         if (
             hashlib.sha256((root / witness["file"]).read_bytes()).hexdigest()
@@ -3718,6 +4209,8 @@ def canping_luck_checks() -> dict:
             failures.append(
                 {"kind": "canping_source_image_identity", "case": witness["file"]}
             )
+        else:
+            pass
     birth = datetime(2000, 1, 15, 12, tzinfo=timezone.utc)
     for case in reference["rounding"]:
         if (
@@ -3725,6 +4218,8 @@ def canping_luck_checks() -> dict:
             != case["years"]
         ):
             failures.append({"kind": "canping_appendix_rounding", "case": case})
+        else:
+            pass
     for case in reference["directions"]:
         at = datetime.fromisoformat(
             "1990-06-15T09:33:00+08:00"
@@ -3739,6 +4234,8 @@ def canping_luck_checks() -> dict:
             or timeline["periods"][0]["pillar"] != case["first"]
         ):
             failures.append({"kind": "canping_appendix_direction", "case": case})
+        else:
+            pass
     anchor = reference["modern_hko_anchor"]
     at = datetime.fromisoformat(anchor["birth"])
     args = dict(
@@ -3754,6 +4251,8 @@ def canping_luck_checks() -> dict:
         or result["dayun"][0]["pillar"] != anchor["first"]
     ):
         failures.append({"kind": "canping_hko_rule_derived_anchor"})
+    else:
+        pass
     for case in reference["query_cases"]:
         selected = build_canping_result(**args, analysis_datetime=case["at"])[
             "canping_timing"
@@ -3765,6 +4264,8 @@ def canping_luck_checks() -> dict:
             selected["numNi"],
         ) != (case["dayun_pillar"], case["ganzhi"], case["num_shun"], case["num_ni"]):
             failures.append({"kind": "canping_actual_boundary_query", "case": case})
+        else:
+            pass
     return {
         "checks_passed": not failures
         and len(reference["rounding"]) == 10
@@ -3794,12 +4295,16 @@ def najia_checks() -> dict:
         or reference["source_pdf_sha256"] != SOURCE_SHA256
     ):
         failures.append({"kind": "najia_source_identity"})
+    else:
+        pass
     for witness in source["images"]:
         if (
             hashlib.sha256((root / witness["file"]).read_bytes()).hexdigest()
             != witness["sha256"]
         ):
             failures.append({"kind": "najia_image_identity", "case": witness["file"]})
+        else:
+            pass
     qualifier_reference = json.loads(
         (ROOT / "tests/fixtures/heluo_najia_qualifiers_v1/reference.json").read_text()
     )
@@ -3817,6 +4322,8 @@ def najia_checks() -> dict:
             r["borrowed"] for r in rows
         ] != case["borrowed"]:
             failures.append({"kind": "najia_original_assignments", "case": case["gua"]})
+        else:
+            pass
     return {
         "checks_passed": len(reference["cases"]) == 5
         and len(qualifier_reference["najia_cases"]) == 3
@@ -3844,6 +4351,8 @@ def natal_najia_clause_checks() -> dict:
     failures = []
     if reference["source_pdf_sha256"] != SOURCE_SHA256:
         failures.append({"kind": "natal_najia_source_identity"})
+    else:
+        pass
     foundation = json.loads(
         (ROOT / "tests/fixtures/heluo_najia_foundations_v1/reference.json").read_text()
     )
@@ -3852,6 +4361,8 @@ def natal_najia_clause_checks() -> dict:
         != reference["literal_clauses"] + foundation["new_month_najia_clauses"]
     ):
         failures.append({"kind": "natal_najia_literal_binding"})
+    else:
+        pass
     for image in reference["images"]:
         if (
             hashlib.sha256((root / image["file"]).read_bytes()).hexdigest()
@@ -3860,6 +4371,8 @@ def natal_najia_clause_checks() -> dict:
             failures.append(
                 {"kind": "natal_najia_image_identity", "case": image["file"]}
             )
+        else:
+            pass
     for clause in reference["literal_clauses"]:
         chart = {phase: {"name": clause["gua"]} for phase in ("xian", "hou")}
         for month in range(1, 13):
@@ -3881,6 +4394,8 @@ def natal_najia_clause_checks() -> dict:
                             "month": month,
                         }
                     )
+                else:
+                    pass
     for case in reference["najia_cases"]:
         pillars = dict(year=case["direct"][0], month="丁卯", day="庚申", hour="庚辰")
         chart = heluo(
@@ -3903,6 +4418,8 @@ def natal_najia_clause_checks() -> dict:
                 failures.append(
                     {"kind": "natal_najia_actual_phase_probe", "case": case["gua"]}
                 )
+            else:
+                pass
     zero_keys = (
         "new_independent_calendar_instants",
         "new_classical_birth_examples",
@@ -3913,6 +4430,8 @@ def natal_najia_clause_checks() -> dict:
     )
     if any(reference[k] != 0 for k in zero_keys):
         failures.append({"kind": "natal_najia_inflated_evidence_counts"})
+    else:
+        pass
     return {
         "checks_passed": len(reference["literal_clauses"]) == 9
         and len(reference["najia_cases"]) == 3
@@ -3943,6 +4462,8 @@ def najia_foundation_checks() -> dict:
     failures = []
     if reference["source_pdf_sha256"] != SOURCE_SHA256:
         failures.append({"kind": "najia_foundation_source_identity"})
+    else:
+        pass
     for image in reference["images"]:
         if (
             hashlib.sha256((root / image["file"]).read_bytes()).hexdigest()
@@ -3951,12 +4472,16 @@ def najia_foundation_checks() -> dict:
             failures.append(
                 {"kind": "najia_foundation_image_identity", "case": image["file"]}
             )
+        else:
+            pass
     manifest = reference["najda_manifest"]
     if (
         hashlib.sha256((root / manifest["file"]).read_bytes()).hexdigest()
         != manifest["sha256"]
     ):
         failures.append({"kind": "najia_foundation_manifest_identity"})
+    else:
+        pass
     for case in reference["hexagram_entries"]:
         actual = annotate_positions(
             case["gua"], case["lines"], hexagram_najia(case["lines"])
@@ -3969,10 +4494,9 @@ def najia_foundation_checks() -> dict:
             failures.append(
                 {"kind": "najia_direct_source_binding", "case": case["gua"]}
             )
+        else:
+            pass
     bases = {tuple(p["bits"]): p for p in reference["pure_tables"]}
-    from itertools import product
-
-    from fatebridge.core.heluo import lines_to_gua
 
     for bits in product((0, 1), repeat=6):
         lines = list(bits)
@@ -3989,6 +4513,8 @@ def najia_foundation_checks() -> dict:
                 failures.append(
                     {"kind": "najia_component_application", "case": lines, "pos": pos}
                 )
+            else:
+                pass
     for output_key, expected in (
         ("pure_trigram_tables", 8),
         ("pure_table_assignment_slots", 48),
@@ -4000,11 +4526,15 @@ def najia_foundation_checks() -> dict:
     ):
         if summary[output_key] != expected:
             failures.append({"kind": "najia_evidence_counts", "case": output_key})
+        else:
+            pass
     if (
         summary["source_order_issues"] != reference["order_issues"]
         or summary["complete_assessment"] is not False
     ):
         failures.append({"kind": "najia_order_issue_or_complete_claim"})
+    else:
+        pass
     return {
         "checks_passed": not failures,
         "failures": failures,
@@ -4035,6 +4565,8 @@ def hko_calendar_checks() -> dict:
             != source["sha256"]
         ):
             failures.append({"kind": "hko_source_identity", "case": source["file"]})
+        else:
+            pass
     terms = {
         year: {
             t.name: t.moment
@@ -4054,6 +4586,8 @@ def hko_calendar_checks() -> dict:
             failures.append(
                 {"kind": "hko_calendar", "case": case, "error_seconds": error}
             )
+        else:
+            pass
     return {
         "checks_passed": len(errors) == 72 and not failures,
         "failures": failures,
@@ -4074,12 +4608,16 @@ def timing_checks() -> dict:
     derived_count = 0
     if source["pdf_sha256"] != SOURCE_SHA256:
         failures.append({"kind": "source_pdf_identity"})
+    else:
+        pass
     for witness in source["images"]:
         if (
             hashlib.sha256((root / witness["file"]).read_bytes()).hexdigest()
             != witness["sha256"]
         ):
             failures.append({"kind": "source_image_identity", "case": witness["file"]})
+        else:
+            pass
     for case in reference["annual"]:
         rows = annual_sequence(
             case["base_lines"], case["period_pos"], case["start_yang"]
@@ -4091,6 +4629,8 @@ def timing_checks() -> dict:
             or [r["changed_pos"] for r in rows] != case["changed_positions"]
         ):
             failures.append({"kind": "annual_sequence", "case": case["id"]})
+        else:
+            pass
     case = reference["monthly"]
     rows = monthly_sequence(case["annual_lines"], case["annual_pos"])
     direct_count += len(case["names"])
@@ -4098,6 +4638,8 @@ def timing_checks() -> dict:
         "positions"
     ]:
         failures.append({"kind": "monthly_sequence"})
+    else:
+        pass
     case = reference["daily"]
     rows = daily_template(case["month_lines"], case["month_pos"])
     for group in ("explicit_blocks", "rule_derived_blocks"):
@@ -4117,6 +4659,8 @@ def timing_checks() -> dict:
                 failures.append(
                     {"kind": "daily_template", "case": block["slots"], "basis": group}
                 )
+            else:
+                pass
     nonempty = direct_count == 54 and derived_count == 12 and len(source["images"]) == 4
     return {
         "checks_passed": nonempty and not failures,
@@ -4148,6 +4692,8 @@ def poem_collation_checks() -> dict:
     ):
         if hashlib.sha256((extension_root / name).read_bytes()).hexdigest() != digest:
             failures.append({"kind": "kuntun_poem_witness_identity", "file": name})
+        else:
+            pass
     for name, digest in (
         ("reference.json", verified["source_reference_sha256"]),
         ("draft-transcription.json", verified["draft_sha256"]),
@@ -4155,6 +4701,8 @@ def poem_collation_checks() -> dict:
     ):
         if hashlib.sha256((root / name).read_bytes()).hexdigest() != digest:
             failures.append({"kind": "poem_witness_identity", "file": name})
+        else:
+            pass
     if (
         summary["source_pdf_sha256"] != reference["source_pdf_sha256"]
         or summary["source_pdf_sha256"] == SOURCE_SHA256
@@ -4167,6 +4715,8 @@ def poem_collation_checks() -> dict:
         != (48, 336, 117, None)
     ):
         failures.append({"kind": "poem_source_or_count_units"})
+    else:
+        pass
     for entry in [*verified["entries"], *extension["entries"]]:
         text = yao_text(entry["hexagram"], entry["line"])
         if text is None or (
@@ -4181,6 +4731,8 @@ def poem_collation_checks() -> dict:
             or "unverified" not in text["inherited_xiang_reference"]["status"]
         ):
             failures.append({"kind": "poem_group_fidelity", "line": entry["line"]})
+        else:
+            pass
     for entry in amendments["source_specific_lexical_differences"]:
         text = yao_text("乾為天", entry["line"])
         if text is None or (
@@ -4188,6 +4740,8 @@ def poem_collation_checks() -> dict:
             or entry["inherited"] not in text["text_provenance"]["inherited_shige"]
         ):
             failures.append({"kind": "poem_source_difference", "entry": entry})
+        else:
+            pass
     for entry in extended_notes["source_specific_differences"]:
         text = yao_text(entry["hexagram"], entry["line"])
         if text is None or (
@@ -4195,6 +4749,8 @@ def poem_collation_checks() -> dict:
             or entry["inherited"] not in text["text_provenance"]["inherited_shige"]
         ):
             failures.append({"kind": "kuntun_poem_source_difference", "entry": entry})
+        else:
+            pass
     boundaries = json.loads((extension_root / "printed-boundaries.json").read_bytes())
     for entry in extension["entries"]:
         text = yao_text(entry["hexagram"], entry["line"])
@@ -4206,6 +4762,8 @@ def poem_collation_checks() -> dict:
                 }
             )
             continue
+        else:
+            pass
         for index, poem in enumerate(text["poem_sections"]):
             expected = boundaries["clause_lengths"][entry["hexagram"]][
                 entry["line"] - 1
@@ -4217,7 +4775,8 @@ def poem_collation_checks() -> dict:
                         "case": [entry["hexagram"], entry["line"], index + 1],
                     }
                 )
-    from fatebridge.core.heluo import _tiaowen
+            else:
+                pass
 
     # The retained literal poem readings come from the reviewed source pages.
     CURRENT_POEMS = json.loads(
@@ -4229,6 +4788,8 @@ def poem_collation_checks() -> dict:
         for pos in range(1, 7):
             if (gua, pos) in reviewed:
                 continue
+            else:
+                pass
             pending = yao_text(gua, pos)
             if (
                 pending["text_provenance"]["poem_status"]
@@ -4236,9 +4797,13 @@ def poem_collation_checks() -> dict:
                 or "poem_sections" in pending
             ):
                 failures.append(dict(kind="poem_unreviewed_control", gua=gua, line=pos))
+            else:
+                pass
             pending_count += 1
     if len(reviewed) != 48 or len(_tiaowen()) != 64 or pending_count != 336:
         failures.append(dict(kind="poem_reviewed_and_pending_control_scope"))
+    else:
+        pass
     return {
         **summary,
         "checks_passed": not failures,
@@ -4269,6 +4834,8 @@ def birth_fold_checks() -> dict:
             failures.append(
                 {"kind": "birth_fold_source_identity", "path": source["path"]}
             )
+        else:
+            pass
     anchor = reference["anchor"]
     at = next(
         t.moment for t in get_solar_terms_for_year(2021, "+08:00") if t.name == "立冬"
@@ -4283,6 +4850,8 @@ def birth_fold_checks() -> dict:
         failures.append(
             {"kind": "birth_fold_reused_hko_anchor", "error_seconds": error}
         )
+    else:
+        pass
     base = {
         k: reference[k]
         for k in ("date", "time", "zone", "gender", "use_true_solar_time")
@@ -4312,6 +4881,8 @@ def birth_fold_checks() -> dict:
                 base["zone"],
             ):
                 failures.append({"kind": "birth_fold_occurrence", "actual": actual})
+            else:
+                pass
             if name == "canping":
                 timing = result["canping_timing"]
                 actual.update(
@@ -4325,6 +4896,10 @@ def birth_fold_checks() -> dict:
                     failures.append(
                         {"kind": "birth_fold_luck_boundary", "actual": actual}
                     )
+                else:
+                    pass
+            else:
+                pass
             rows.append(actual)
         for change in (
             {},
@@ -4364,16 +4939,17 @@ def birth_fold_checks() -> dict:
 
 def canping_schedule_basis_checks() -> dict:
     """Bounded source excerpts and profile-specific application, not outcomes."""
-    from fatebridge.core.canping_schedule_basis import source_readings
 
     root = ROOT / "tests/fixtures/canping_schedule_basis_v1"
     reference = json.loads((root / "reference.json").read_bytes())
-    readings = json.loads((root / "verified-readings.json").read_bytes())
+    readings = json.loads((root / "verified-readings-v1.0.1.json").read_bytes())
     runtime = source_readings()
     runtime.pop("_file_sha256")
     failures = []
     if runtime != readings:
         failures.append({"kind": "canping_schedule_readings_mismatch"})
+    else:
+        pass
     for witness in reference["source_files"]:
         if (
             hashlib.sha256((root / witness["file"]).read_bytes()).hexdigest()
@@ -4382,6 +4958,8 @@ def canping_schedule_basis_checks() -> dict:
             failures.append(
                 {"kind": "canping_schedule_image_identity", "file": witness["file"]}
             )
+        else:
+            pass
     rows = []
     for profile, applied in (
         ("bazi_appendix_v1", ["appendix_month_order", "appendix_integer_rounding"]),
@@ -4406,6 +4984,8 @@ def canping_schedule_basis_checks() -> dict:
             failures.append(
                 {"kind": "canping_schedule_source_application", "profile": profile}
             )
+        else:
+            pass
         if profile == "legacy_minggong_v1":
             coherent = (
                 timing["first_period"] is None and not basis["has_actual_date_mapping"]
@@ -4420,6 +5000,8 @@ def canping_schedule_basis_checks() -> dict:
             failures.append(
                 {"kind": "canping_schedule_actual_context", "profile": profile}
             )
+        else:
+            pass
         rows.append(
             {
                 "profile": profile,
@@ -4457,6 +5039,8 @@ def canping_legacy_year_label_checks() -> dict:
         != source["sha256"]
     ):
         failures.append({"kind": "legacy_year_calendar_source_identity"})
+    else:
+        pass
     rows = []
     for case in reference["cases"]:
         arguments = {
@@ -4481,6 +5065,8 @@ def canping_legacy_year_label_checks() -> dict:
             or value["canping_timing"]["schedule_basis"]["has_actual_date_mapping"]
         ):
             failures.append({"kind": "legacy_year_label_coherence", "case": case["id"]})
+        else:
+            pass
         if case["id"] == "january":
             expected = reference["january_manual_number"]
             if (first["numShun"], first["numNi"]) != (
@@ -4488,6 +5074,10 @@ def canping_legacy_year_label_checks() -> dict:
                 expected["num_ni"],
             ):
                 failures.append({"kind": "legacy_year_hand_derived_numbers"})
+            else:
+                pass
+        else:
+            pass
         rows.append(
             {
                 "case": case["id"],
@@ -4513,7 +5103,6 @@ def canping_legacy_year_label_checks() -> dict:
 
 def canping_relative_year_checks() -> dict:
     """Relative Tai Sui and explicit age slots; no invented Gregorian epoch."""
-    from fatebridge.core.canping import liunian_series
 
     root = ROOT / "tests/fixtures/canping_relative_years_v1"
     reference = json.loads((root / "reference.json").read_bytes())
@@ -4526,6 +5115,8 @@ def canping_relative_year_checks() -> dict:
             failures.append(
                 {"kind": "canping_substitution_source_image", "file": image["file"]}
             )
+        else:
+            pass
     relative = liunian_series(**reference["fixed_pillars"])
     anchored = liunian_series(**reference["fixed_pillars"], birth_year=1984)
     for age, expected in reference["relative_years"].items():
@@ -4536,6 +5127,8 @@ def canping_relative_year_checks() -> dict:
             expected[1],
         ):
             failures.append({"kind": "canping_relative_year", "age": age})
+        else:
+            pass
     for row in relative["rows"][:2]:
         if row["status"] != "not_started" or any(
             k in row for k in ("numShun", "numNi", "verses", "dayunBranch")
@@ -4543,18 +5136,24 @@ def canping_relative_year_checks() -> dict:
             failures.append(
                 {"kind": "canping_relative_before_start", "age": row["age"]}
             )
+        else:
+            pass
     for expected in reference["manual_numbers"]:
         row = relative["rows"][expected["age"] - 1]
         if (row["numShun"], row["numNi"]) != (expected["num_shun"], expected["num_ni"]):
             failures.append(
                 {"kind": "canping_relative_manual_number", "age": expected["age"]}
             )
+        else:
+            pass
     if any(
         {k: v for k, v in a.items() if k != "year"}
         != {k: v for k, v in b.items() if k != "year"}
         for a, b in zip(relative["rows"], anchored["rows"])
     ):
         failures.append({"kind": "canping_relative_anchor_disagreement"})
+    else:
+        pass
     extension = json.loads((root / "extension-control.json").read_bytes())["control"]
     extended = liunian_series(
         **reference["fixed_pillars"],
@@ -4568,6 +5167,8 @@ def canping_relative_year_checks() -> dict:
         extended["numNi"],
     ) != (None, extension["ganzhi"], extension["num_shun"], extension["num_ni"]):
         failures.append({"kind": "canping_relative_extension"})
+    else:
+        pass
     actual = build_canping_result(
         date="2021-11-07",
         time="00:30",
@@ -4589,6 +5190,8 @@ def canping_relative_year_checks() -> dict:
         or trace["query_pair"] is not None
     ):
         failures.append({"kind": "canping_substitution_explanation_receipt"})
+    else:
+        pass
     return {
         "checks_passed": not failures,
         "failures": failures,
@@ -4614,7 +5217,6 @@ def month_source_profile_checks() -> dict:
 
 def sui17_meng4_source_checks() -> dict:
     """Reproduce the selected printings without certifying uncertain glyphs."""
-    from fatebridge.services.knowledge import calculate_knowledge_read
 
     root = ROOT / "tests/fixtures/heluo_sui17_meng4_v1"
     verified = json.loads((root / "verified-readings.json").read_bytes())
@@ -4626,12 +5228,18 @@ def sui17_meng4_source_checks() -> dict:
         != freeze["final_verified_sha256"]
     ):
         failures.append(dict(kind="sui_meng_final_reading_identity"))
+    else:
+        pass
     first = json.loads((root / "first-draft-freeze.json").read_bytes())
     if first["inherited_target_text_exposed"] is not False:
         failures.append(dict(kind="sui_meng_first_draft_exposure"))
+    else:
+        pass
     for name, expected in first["files"].items():
         if hashlib.sha256((root / name).read_bytes()).hexdigest() != expected:
             failures.append(dict(kind="sui_meng_first_draft_identity", file=name))
+        else:
+            pass
     for entry in verified["commentaries"]:
         text = yao_text("澤雷隨", entry["line"])
         sections = [
@@ -4645,8 +5253,12 @@ def sui17_meng4_source_checks() -> dict:
             or text["commentary_branch_selection"]["selected_section_ids"]
         ):
             failures.append(dict(kind="sui17_complete_conditions", line=entry["line"]))
+        else:
+            pass
         if [sections[i]["condition_label"] for i in [1, 2]] != ["叶者", "不叶者"]:
             failures.append(dict(kind="sui17_original_ye_form", line=entry["line"]))
+        else:
+            pass
     poem_notes = {
         (2, 1): [
             "所選詩訣底本原字納婿，繼承稿作納婦；這是具名底本讀文，不據性別自動代選詩或婚配條款。"
@@ -4664,6 +5276,8 @@ def sui17_meng4_source_checks() -> dict:
             expected = dict(poem, applicability=None)
             if (entry["line"], poem["index"]) in poem_notes:
                 expected["reading_notes"] = poem_notes[(entry["line"], poem["index"])]
+            else:
+                pass
             expected_poems.append(expected)
         if (
             text["poem_sections"] != expected_poems
@@ -4671,6 +5285,8 @@ def sui17_meng4_source_checks() -> dict:
             or text["poem_selection"]["selected_poem_indices"]
         ):
             failures.append(dict(kind="meng4_complete_poems", line=entry["line"]))
+        else:
+            pass
     for key, label in [
         ("雷地豫:2", "注文"),
         ("雷地豫:4", "爻辞"),
@@ -4682,6 +5298,8 @@ def sui17_meng4_source_checks() -> dict:
             label and f"{label}字形未决：" not in lines
         ):
             failures.append(dict(kind="knowledge_summary_uncertainty_scope", key=key))
+        else:
+            pass
     initial = json.loads((root / "case-selection-result.json").read_bytes())
     extension = json.loads((root / "case-selection-extension-result.json").read_bytes())
     if (
@@ -4690,6 +5308,8 @@ def sui17_meng4_source_checks() -> dict:
         or not extension["original_failed_plan_retained"]
     ):
         failures.append(dict(kind="sui_meng_initial_search_failure_lost"))
+    else:
+        pass
     return dict(
         checks_passed=not failures,
         failures=failures,
@@ -4772,14 +5392,20 @@ def main() -> int:
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(text)
+    else:
+        pass
     print(text, end="")
     if not report["calculation_checks_passed"]:
         return 1
+    else:
+        pass
     if (
         args.require_three_dimensions
         and not report["three_dimension_acceptance_passed"]
     ):
         return 2
+    else:
+        pass
     return (
         2
         if args.require_four_dimensions
@@ -4790,3 +5416,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

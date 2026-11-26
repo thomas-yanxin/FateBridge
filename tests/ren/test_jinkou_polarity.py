@@ -3,6 +3,7 @@
 import copy
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 
@@ -20,7 +21,9 @@ def data():
     return reference()
 
 
-def test_formal_truth_table_retains_unreachable_masks_and_explicit_source_scope(data):
+def test_formal_truth_table_retains_unreachable_masks_and_explicit_source_scope(
+    data,
+) -> None:
     answers = data["reference"]
     assert len(data["readings"]["formal_truth_table"]) == 16
     assert len(answers["cases"]) == 17280
@@ -34,7 +37,7 @@ def test_formal_truth_table_retains_unreachable_masks_and_explicit_source_scope(
     assert answers["scope"]["new_independent_real_events"] == 0
 
 
-def test_entire_symbolic_cohort_passes_only_the_named_finite_gate():
+def test_entire_symbolic_cohort_passes_only_the_named_finite_gate() -> None:
     result = audit()
     assert result["formal_mask_count"] == 16
     assert all(r["matched"] for r in result["formal_rules"])
@@ -57,8 +60,8 @@ def test_entire_symbolic_cohort_passes_only_the_named_finite_gate():
 
 @pytest.mark.parametrize("change", ["readings", "reference", "source_image", "joint"])
 def test_reference_labels_and_joint_manifest_rewrites_cannot_improve_score(
-    tmp_path, change
-):
+    tmp_path: Path, change: str
+) -> None:
     import hashlib
 
     target = tmp_path / "corpus"
@@ -75,6 +78,8 @@ def test_reference_labels_and_joint_manifest_rewrites_cannot_improve_score(
         manifest = json.loads((target / "freeze.json").read_text())
         manifest["files"][name] = hashlib.sha256(path.read_bytes()).hexdigest()
         (target / "freeze.json").write_text(json.dumps(manifest))
+    else:
+        pass
     with pytest.raises(ValueError, match="Frozen polarity"):
         reference(target)
 
@@ -91,7 +96,9 @@ def test_reference_labels_and_joint_manifest_rewrites_cannot_improve_score(
         "duplicate_trace",
     ],
 )
-def test_independent_reference_catches_identity_use_and_evidence_faults(data, fault):
+def test_independent_reference_catches_identity_use_and_evidence_faults(
+    data, fault: str
+) -> None:
     case = next(
         c
         for c in data["reference"]["cases"]

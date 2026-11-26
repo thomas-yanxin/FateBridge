@@ -17,6 +17,7 @@ from typing import Any, Optional, cast
 from fatebridge.core.astro.julian_day import _datetime_from_julian_day
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.astro.utc_policy import leap_table
+from fatebridge.utils.civil_time import CivilPoint
 
 
 class HistoricalUTCAdjustment(ValueError):
@@ -185,18 +186,20 @@ def historical_utc_to_tt_point(moment: datetime) -> Optional[TTInstant]:
 
 
 def historical_utc_from_tt(
-    jd_tt: float, *, nominal_boundaries: bool = False
+    jd_tt: float | TTInstant, *, nominal_boundaries: bool = False
 ) -> Optional[datetime]:
     """Use one point inverse; nominal encoded midnights are explicit policy."""
-    point = TTInstant.from_float(jd_tt)
-    if nominal_boundaries:
-        for interval in _utc_intervals():
-            if jd_tt == float(interval.start_tt):
-                return interval.start
-    return historical_utc_from_tt_point(point)
+    point = historical_utc_point_from_tt(jd_tt, nominal_boundaries=nominal_boundaries)
+    return (
+        None
+        if point is None
+        else _datetime_from_julian_day(point.day, before=point.excluded_before)
+    )
 
 
-def historical_utc_from_tt_point(point: TTInstant) -> Optional[datetime]:
+def historical_utc_point_from_tt(
+    julian_day_tt: float | TTInstant, *, nominal_boundaries: bool = False
+) -> CivilPoint | None:
     """Invert the same published affine coefficients without large-JD loss.
 
     Removed negative-step labels are outside the ordinary UTC source domain.
@@ -204,6 +207,16 @@ def historical_utc_from_tt_point(point: TTInstant) -> Optional[datetime]:
     the declared source equations are not filled with an invented label.
     """
     intervals = _utc_intervals()
+    if isinstance(julian_day_tt, TTInstant):
+        if nominal_boundaries:
+            raise ValueError("TTInstant cannot request nominal scalar boundary labels")
+        point = julian_day_tt
+    else:
+        point = TTInstant.from_float(julian_day_tt)
+        if nominal_boundaries:
+            for interval in intervals:
+                if julian_day_tt == float(interval.start_tt):
+                    return CivilPoint(interval.start_day, interval.stop_day)
     modern = Fraction(_date(historical_utc_table()["valid_until"]).toordinal())
     modern += (
         Fraction(3442849, 2)
@@ -229,4 +242,4 @@ def historical_utc_from_tt_point(point: TTInstant) -> Optional[datetime]:
             "TT lies in a historical UTC adjustment without a unique ordinary datetime label"
         )
     civil, stop = candidates[0]
-    return _datetime_from_julian_day(civil, before=stop)
+    return CivilPoint(civil, stop)

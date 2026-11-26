@@ -13,7 +13,7 @@ from fatebridge.core.astro.reference_frames import precession_angles
 PRIMARY = Path(__file__).parents[1] / "data/solar/erfa-2.0.1"
 
 
-def test_pinned_primary_sources_and_complete_harmonic_series():
+def test_pinned_primary_sources_and_complete_harmonic_series() -> None:
     source = json.loads((PRIMARY / "source-manifest.json").read_text())
     for name, record in source["files"].items():
         assert (
@@ -26,7 +26,7 @@ def test_pinned_primary_sources_and_complete_harmonic_series():
     assert len(data["epv00"]) == 18 and len(data["nut00b"]) == 77
 
 
-def test_published_epv00_two_part_date_expected_vectors():
+def test_published_epv00_two_part_date_expected_vectors() -> None:
     # ERFA2.0.1 t_erfa_c.c:t_epv00, unchanged author tolerances.
     helio, bary = solar.earth_state(2400000.5, 53411.52501161)
     expected = [
@@ -41,7 +41,22 @@ def test_published_epv00_two_part_date_expected_vectors():
         )
 
 
-def test_published_nutation_and_precession_angles_keep_radian_units():
+def test_two_part_epoch_interval_keeps_the_supplied_fraction_before_rounding() -> None:
+    reference = json.loads(
+        (Path(__file__).parents[1] / "data/solar_two_part_interval_v1.json").read_text()
+    )
+    for row in reference["rows"]:
+        assert (
+            solar._epoch(
+                float.fromhex(row["date1_hex"]),
+                float.fromhex(row["date2_hex"]),
+                float.fromhex(row["scale_hex"]),
+            ).hex()
+            == row["expected_hex"]
+        )
+
+
+def test_published_nutation_and_precession_angles_keep_radian_units() -> None:
     assert solar.nutation(2400000.5, 53736) == pytest.approx(
         [-0.9632552291148362783e-5, 0.4063197106621159367e-4], abs=1e-13, rel=0
     )
@@ -56,7 +71,7 @@ def test_published_nutation_and_precession_angles_keep_radian_units():
         assert abs(value - reference) <= line
 
 
-def test_published_aberration_reference():
+def test_published_aberration_reference() -> None:
     actual = solar.aberration(
         (-0.76321968546737951, -0.60869453983060384, -0.21676408580639883),
         (2.1044018893653786e-5, -8.9108923304429319e-5, -3.8633714797716569e-5),
@@ -70,12 +85,12 @@ def test_published_aberration_reference():
 
 
 @pytest.mark.parametrize("epoch", [math.nan, math.inf, -math.inf])
-def test_nonfinite_epochs_cannot_produce_a_plausible_solar_longitude(epoch):
+def test_nonfinite_epochs_cannot_produce_a_plausible_solar_longitude(epoch) -> None:
     with pytest.raises(ValueError, match="finite"):
         solar.solar_longitude(epoch)
 
 
-def test_author_warning_uses_actual_hundred_julian_years_boundary():
+def test_author_warning_uses_actual_hundred_julian_years_boundary() -> None:
     edge = 2451545 + 36525
     assert solar.model_details(edge)["outside_author_validation_range"] is False
     assert (

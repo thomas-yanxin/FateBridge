@@ -11,16 +11,24 @@ from math import lcm
 from shapely.geometry import Polygon, box
 from shapely.ops import unary_union
 
-from .spatial_angles import _sin_cos_degrees, angular_offset, compose_degrees
-from .spatial_geometry import (
+from fatebridge.core.fengshui.spatial_angles import (
+    _sin_cos_degrees,
+    angular_offset,
+    compose_degrees,
+)
+from fatebridge.core.fengshui.spatial_geometry import (
     AREA_EPSILON,
     heading,
     rectangle_xy,
     transform_point,
     transform_rectangle,
 )
-from .spatial_inputs import PlanPoint, SpatialScene
-from .spatial_outputs import GeometryCheck, ScreenVisibility, SeatGeometry
+from fatebridge.core.fengshui.spatial_inputs import PlanPoint, SpatialScene
+from fatebridge.core.fengshui.spatial_outputs import (
+    GeometryCheck,
+    ScreenVisibility,
+    SeatGeometry,
+)
 
 
 def _shadow(

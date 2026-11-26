@@ -1,7 +1,7 @@
 """Unrounded non-day stem budgets with current binding-only effects."""
 
 from itertools import pairwise
-from typing import Any, Mapping, Sequence, Tuple
+from typing import Any, Mapping, Sequence
 
 from fatebridge.core.stem_order_review import stem_order_review_snapshot_line
 from fatebridge.utils.data import STEM_ELEMENTS, Element
@@ -11,7 +11,7 @@ PAIRS = {frozenset(pair) for pair in ("甲己", "乙庚", "丙辛", "丁壬", "�
 
 
 def evaluate_stem_effects(
-    pillars: Mapping[str, Tuple[str, str]],
+    pillars: Mapping[str, tuple[str, str]],
     factors: Mapping[Element, float],
     ledger: Sequence[Mapping[str, Any]],
     non_root_mass: Mapping[Element, float],

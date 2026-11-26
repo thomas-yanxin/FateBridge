@@ -34,7 +34,7 @@ CASES = [
 ]
 
 
-def test_external_reference_is_complete_frozen_and_separated_by_entire_year():
+def test_external_reference_is_complete_frozen_and_separated_by_entire_year() -> None:
     assert (
         hashlib.sha256(FIXTURE.read_bytes()).hexdigest()
         == FIXTURE.with_suffix(".sha256").read_text().strip()
@@ -58,7 +58,7 @@ def test_external_reference_is_complete_frozen_and_separated_by_entire_year():
             )
 
 
-def test_daily_sweep_covers_every_supported_date_with_the_original_tolerance():
+def test_daily_sweep_covers_every_supported_date_with_the_original_tolerance() -> None:
     source = (
         Path(__file__).resolve().parents[2]
         / "scripts/bazi/audit_bazi_solar_accuracy.py"
@@ -81,7 +81,7 @@ rest = _shared_rest
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["instant"])
-def test_full_instant_solar_equation_against_independent_jpl(case):
+def test_full_instant_solar_equation_against_independent_jpl(case) -> None:
     actual = calculate_equation_of_time_minutes(datetime.fromisoformat(case["instant"]))
     assert (
         abs(actual - case["equation_of_time_minutes"]) * 60
@@ -89,7 +89,9 @@ def test_full_instant_solar_equation_against_independent_jpl(case):
     )
 
 
-def test_same_instant_same_equation_across_zones_and_fractional_day_is_retained():
+def test_same_instant_same_equation_across_zones_and_fractional_day_is_retained() -> (
+    None
+):
     instant = datetime(2026, 9, 15, tzinfo=timezone.utc)
     original = calculate_equation_of_time_minutes(instant)
     assert original == calculate_equation_of_time_minutes(
@@ -119,7 +121,7 @@ def test_same_instant_same_equation_across_zones_and_fractional_day_is_retained(
     )
 
 
-def test_aware_instant_is_converted_instead_of_having_its_zone_replaced():
+def test_aware_instant_is_converted_instead_of_having_its_zone_replaced() -> None:
     utc = datetime(2026, 6, 15, 12, tzinfo=timezone.utc)
     local = utc.astimezone(ZoneInfo("America/New_York"))
     assert calculate_solar_time_adjustment(
@@ -157,7 +159,9 @@ INPUT = dict(
 )
 
 
-def test_independent_boundary_example_exposes_old_wrong_hour_without_moving_month():
+def test_independent_boundary_example_exposes_old_wrong_hour_without_moving_month() -> (
+    None
+):
     civil = datetime(2026, 2, 15, 9, 14)
     expected = expected_solar_clock(civil, "Asia/Shanghai", 120.1)
     assert expected.hour == 9 and expected.minute == 0
@@ -192,7 +196,9 @@ def test_independent_boundary_example_exposes_old_wrong_hour_without_moving_mont
 
 
 @pytest.mark.parametrize("key", ["bazi_birth", "bazi_wealth", "bazi_personality"])
-def test_corrected_clock_and_new_facts_match_rest_native_mcp_cli(key, surface_calls):
+def test_corrected_clock_and_new_facts_match_rest_native_mcp_cli(
+    key: str, surface_calls
+) -> None:
     spec = SPECS[key]
     response, protocol, code, local = surface_calls(
         spec, INPUT, flags=["--response-char-limit", "0"]
@@ -207,6 +213,8 @@ def test_corrected_clock_and_new_facts_match_rest_native_mcp_cli(key, surface_ca
             assert output["bazi_birth"]["structure_profile"]["evidence_chain"][
                 "classical_root_profile"
             ]
+        else:
+            pass
         if key == "bazi_wealth":
             assert (
                 output["wealth_analysis"]["classical_context"]["formation_status"]
@@ -216,6 +224,8 @@ def test_corrected_clock_and_new_facts_match_rest_native_mcp_cli(key, surface_ca
                 output["wealth_analysis"]["wealth_structure"]["score_kind"]
                 == "uncalibrated_rule_index"
             )
+        else:
+            pass
 
 
 @pytest.mark.parametrize(
@@ -227,8 +237,8 @@ def test_corrected_clock_and_new_facts_match_rest_native_mcp_cli(key, surface_ca
     ],
 )
 def test_public_knowledge_does_not_reintroduce_retired_calculation_claims(
-    category, key, retired_claim, required_context, surface_calls
-):
+    category: str, key: str, retired_claim: str, required_context: str, surface_calls
+) -> None:
     spec = SPECS["knowledge_read"]
     arguments = {"domain": "bazi", "category": category, "key": key}
     response, protocol, code, local = surface_calls(

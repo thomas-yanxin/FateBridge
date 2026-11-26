@@ -2,16 +2,12 @@
 
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, Tuple
+from pydantic import BaseModel
 
 from fatebridge.application.bindings import lazy_service, resolve_service
-from fatebridge.core.requests.western_policy import service_inputs
+from fatebridge.application.tool_spec import BoundServiceCall, ServiceInput
+from fatebridge.core.requests.astrology import AstroChartPolyRequest
 
-# Service callables are bound LAZILY: each name below is a proxy that imports
-# its service module on first invocation. The catalog itself stays cheap to
-# import (it is pure metadata), and a session only loads the engines for the
-# tools it actually calls. The spec definitions below
-# reference these names exactly as if they were directly imported.
 calculate_core_chart_analysis = lazy_service(
     "fatebridge.services.astrology", "calculate_core_chart_analysis"
 )
@@ -28,9 +24,10 @@ calculate_relative_chart_analysis = lazy_service(
 
 
 def _astro_chart_bind(
-    req: Any,
-) -> Tuple[Callable[..., Any], Tuple[Any, ...], Dict[str, Any]]:
-    data = service_inputs(req)
+    req: BaseModel,
+) -> BoundServiceCall:
+    assert isinstance(req, AstroChartPolyRequest)
+    data = req.service_inputs()
     variant = data.pop("chart_variant", "chart")
     apparent_model = data.pop("apparent_model", "native")
     if variant == "chart":
@@ -41,69 +38,56 @@ def _astro_chart_bind(
             "guolao_seasonal_anchor_policy",
             "node_mode",
             "divisions",
-            "ephemeris_policy",
             "saptavargaja_profile",
             "drekkana_profile",
             "cheshta_model",
             "birth_microsecond",
         ):
             data.pop(key, None)
-        return resolve_service(calculate_germany_chart_analysis), (), data
-    return (
-        resolve_service(calculate_core_chart_analysis),
-        (),
-        {**data, "chart_variant": variant},
-    )
-
-
-def _astro_relative_rest_bind(
-    req: Any,
-) -> Tuple[Callable[..., Any], Tuple[Any, ...], Dict[str, Any]]:
-    return (
-        resolve_service(calculate_relative_chart_analysis),
-        (),
-        {
-            "inner_payload": req.inner.model_dump(),
-            "outer_payload": req.outer.model_dump(),
-            "relative_mode": req.relative_mode,
-            "hsys": req.hsys,
-            "zodiacal": req.zodiacal,
-            "relationship_focus": req.relationship_focus,
-            "davison_variant": req.davison_variant,
-        },
-    )
+        return BoundServiceCall(
+            resolve_service(calculate_germany_chart_analysis), (), data
+        )
+    else:
+        return BoundServiceCall(
+            resolve_service(calculate_core_chart_analysis),
+            (),
+            {**data, "chart_variant": variant},
+        )
 
 
 def _astro_relative_flat_bind(
-    req: Any,
-) -> Tuple[Callable[..., Any], Tuple[Any, ...], Dict[str, Any]]:
-    d = req.model_dump()
+    request: BaseModel,
+) -> BoundServiceCall:
+    arguments: dict[str, ServiceInput] = request.model_dump()
 
-    def party(prefix: str) -> Dict[str, Any]:
+    def party(prefix: str) -> dict[str, ServiceInput]:
         return {
-            "name": d[f"{prefix}_name"],
-            "birth_year": d[f"{prefix}_birth_year"],
-            "birth_month": d[f"{prefix}_birth_month"],
-            "birth_day": d[f"{prefix}_birth_day"],
-            "birth_hour": d[f"{prefix}_birth_hour"],
-            "birth_minute": d[f"{prefix}_birth_minute"],
-            "birth_timezone": d[f"{prefix}_birth_timezone"],
-            "birth_longitude": d[f"{prefix}_birth_longitude"],
-            "birth_latitude": d[f"{prefix}_birth_latitude"],
-            "birth_place": d[f"{prefix}_birth_place"],
-            "use_true_solar_time": d[f"{prefix}_use_true_solar_time"],
+            field: arguments[f"{prefix}_{field}"]
+            for field in (
+                "name",
+                "birth_year",
+                "birth_month",
+                "birth_day",
+                "birth_hour",
+                "birth_minute",
+                "birth_timezone",
+                "birth_longitude",
+                "birth_latitude",
+                "birth_place",
+                "use_true_solar_time",
+            )
         }
 
-    return (
+    return BoundServiceCall(
         resolve_service(calculate_relative_chart_analysis),
         (),
         {
             "inner_payload": party("inner"),
             "outer_payload": party("outer"),
-            "relative_mode": d["relative_mode"],
-            "hsys": d["hsys"],
-            "zodiacal": d["zodiacal"],
-            "relationship_focus": d.get("relationship_focus"),
-            "davison_variant": d["davison_variant"],
+            "relative_mode": arguments["relative_mode"],
+            "hsys": arguments["hsys"],
+            "zodiacal": arguments["zodiacal"],
+            "relationship_focus": arguments["relationship_focus"],
+            "davison_variant": arguments["davison_variant"],
         },
     )

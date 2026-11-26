@@ -35,6 +35,8 @@ def collect_apparatus_scope(raw, edition, windows, context_ids, legacy_keys):
     body = tree.find(".//" + N + "body")
     if body is None or not windows:
         raise ValueError("须有正文及完整的非空行窗口选择")
+    else:
+        pass
     ids = {}
     events = []
     ordinal = 0
@@ -48,7 +50,11 @@ def collect_apparatus_scope(raw, edition, windows, context_ids, legacy_keys):
             line = node.get("n")
             if not line or any(name == line for name, _ in events):
                 raise ValueError("主版本行号缺失或重复")
+            else:
+                pass
             events.append((line, start))
+        else:
+            pass
         loc = {
             "start": start,
             "start_line": line,
@@ -59,7 +65,11 @@ def collect_apparatus_scope(raw, edition, windows, context_ids, legacy_keys):
         if node.get(XI):
             if node.get(XI) in ids:
                 raise ValueError("重复正文xml:id：" + node.get(XI))
+            else:
+                pass
             ids[node.get(XI)] = loc
+        else:
+            pass
         for child in node:
             walk(child, inside_note or node.tag == N + "note")
         loc.update(end=ordinal, end_line=line)
@@ -74,11 +84,15 @@ def collect_apparatus_scope(raw, edition, windows, context_ids, legacy_keys):
     for name, (first, last) in windows.items():
         if first not in lines or last not in lines or lines[first][0] > lines[last][0]:
             raise ValueError("行窗口端点缺失或倒置：" + name)
+        else:
+            pass
         ranges[name] = (lines[first][0], lines[last][1])
     contexts = {}
     for ident in context_ids:
         if ident not in ids or ident in contexts:
             raise ValueError("上下文xml:id缺失或重复：" + ident)
+        else:
+            pass
         contexts[ident] = (ids[ident]["start"], ids[ident]["end"] + 1)
     back = tree.find(".//" + N + "back")
     records = (
@@ -94,21 +108,29 @@ def collect_apparatus_scope(raw, edition, windows, context_ids, legacy_keys):
         if not any(attrs.get(k) for k in ("target", "from", "to")):
             unlinked.append(node)
             continue
+        else:
+            pass
         resolved = {}
         for attr in ("target", "from", "to"):
             resolved[attr] = []
             for ref in attrs.get(attr, "").split():
                 if not ref.startswith("#") or ref[1:] not in ids:
                     raise ValueError("未解析或不支持的正文关联：" + ref)
+                else:
+                    pass
                 resolved[attr].append({"reference": ref, **ids[ref[1:]]})
         spans = []
         if "to" in attrs and not resolved["from"]:
             raise ValueError("to不能缺少from")
+        else:
+            pass
         if resolved["from"]:
             a = resolved["from"]
             b = resolved["to"] or a
             if len(a) != 1 or len(b) != 1 or a[0]["start"] > b[0]["end"]:
                 raise ValueError("from/to须为单一本地元素且顺序有效")
+            else:
+                pass
             spans.append(
                 (
                     a[0]["start"],
@@ -116,11 +138,15 @@ def collect_apparatus_scope(raw, edition, windows, context_ids, legacy_keys):
                     "from_to" if resolved["to"] else "from_element",
                 )
             )
+        else:
+            pass
         spans.extend(
             (v["start"], v["end"] + 1, "target_element") for v in resolved["target"]
         )
         if not spans:
             raise ValueError("空正文关联")
+        else:
+            pass
         hits = [
             {"window": k, "association": kind}
             for a, b, kind in spans
@@ -136,6 +162,8 @@ def collect_apparatus_scope(raw, edition, windows, context_ids, legacy_keys):
         legacy = key(node) in legacy_keys
         if legacy and not hits:
             raise ValueError("旧窗口记录未能关联，不能删除或改称通过子集")
+        else:
+            pass
         if hits or ctx or legacy:
             observed.append(
                 {
@@ -151,6 +179,8 @@ def collect_apparatus_scope(raw, edition, windows, context_ids, legacy_keys):
                     "xml_element": E.tostring(node, encoding="unicode"),
                 }
             )
+        else:
+            pass
     found_legacy = {
         (r["kind"], tuple(sorted(r["attributes"].items())))
         for r in observed
@@ -158,6 +188,8 @@ def collect_apparatus_scope(raw, edition, windows, context_ids, legacy_keys):
     }
     if found_legacy != legacy_keys:
         raise ValueError("旧记录缺失或身份不符")
+    else:
+        pass
     selected = {(r["kind"], tuple(sorted(r["attributes"].items()))) for r in observed}
     embedded = []
     for node in unlinked:
@@ -169,6 +201,8 @@ def collect_apparatus_scope(raw, edition, windows, context_ids, legacy_keys):
             ancestor = parents.get(id(ancestor))
         if ancestor is None:
             raise ValueError("无自身关联且无具关联父记录的校注，覆盖范围未定")
+        else:
+            pass
         if key(ancestor) in selected:
             embedded.append(
                 {
@@ -179,6 +213,8 @@ def collect_apparatus_scope(raw, edition, windows, context_ids, legacy_keys):
                     "xml_element": E.tostring(node, encoding="unicode"),
                 }
             )
+        else:
+            pass
     return {
         "legacy_count": len(legacy_keys),
         "window_new_count": sum(
@@ -217,11 +253,17 @@ def verify(captures):
     raw = FIXTURE.read_bytes()
     if sha(raw) != REFERENCE_SHA256:
         raise ValueError("改码前校注范围参考改变")
+    else:
+        pass
     expected = json.loads(raw)["source_data"]
     if json.loads(SOURCE.read_bytes()) != expected:
         raise ValueError("运行资料与完整改码前参考不等")
+    else:
+        pass
     if set(captures) != {s["capture_file"] for s in expected["sources"]}:
         raise ValueError("须提供全部八份捕获，不接受通过子集")
+    else:
+        pass
     old = json.loads(
         (ROOT / "src/fatebridge/data/sukuyo_upstream_dawn_sources.json").read_bytes()
     )["sources"]
@@ -233,6 +275,8 @@ def verify(captures):
         actual = captures[src["capture_file"]].read_bytes()
         if sha(actual) != src["sha256"] or len(actual) != src["bytes"]:
             raise ValueError("来源身份改变：" + src["source_id"])
+        else:
+            pass
         windows = {}
         for name, window in source_rows[src["source_id"]]["windows"].items():
             if "first_line" in window:
@@ -258,6 +302,8 @@ def verify(captures):
             raise ValueError(
                 "完整校注关联与改码前参考不符：" + src["source_id"] + str(mismatch)
             )
+        else:
+            pass
     return {
         "all_eight_captures_verified": True,
         "reference_sha256": REFERENCE_SHA256,
@@ -278,5 +324,9 @@ if __name__ == "__main__":
         name, path = pair.split("=", 1)
         if name in captures:
             raise ValueError("重复捕获")
+        else:
+            pass
         captures[name] = Path(path)
     print(json.dumps(verify(captures), ensure_ascii=False, indent=2))
+else:
+    pass

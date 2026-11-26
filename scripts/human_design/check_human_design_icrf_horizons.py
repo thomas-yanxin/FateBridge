@@ -36,6 +36,8 @@ def references() -> dict:
         raw = (E / name).read_bytes()
         if hashlib.sha256(raw).hexdigest() != digest:
             raise ValueError("Independent reference changed: " + name)
+        else:
+            pass
         result[name] = json.loads(raw)
     for record in result["nasa-attempt1/reference.json"]["records"]:
         folder = E / "nasa-attempt1"
@@ -49,15 +51,21 @@ def references() -> dict:
             != record
         ):
             raise ValueError("NASA reference detached from raw request/response")
+        else:
+            pass
     fixed = plan()
     for value in result.values():
         if [r["body"] for r in value["records"]] != list(fixed["bodies"]):
             raise ValueError("Wrong reference target order")
+        else:
+            pass
         for record in value["records"]:
             if record["target_id"] != fixed["bodies"][record["body"]] or [
                 (r["id"], r["jd_tt"]) for r in record["rows"]
             ] != [(r["id"], r["jd_tt"]) for r in fixed["epochs"]]:
                 raise ValueError("Missing/rebound original target or TT")
+            else:
+                pass
     return result
 
 
@@ -133,11 +141,15 @@ def validate_rotation(matrix: list | tuple) -> None:
         )
     ):
         raise ValueError("Malformed source rotation")
+    else:
+        pass
     product = mm(matrix, tuple(zip(*matrix)))
     if any(
         abs(product[i][j] - int(i == j)) > 1e-12 for i in range(3) for j in range(3)
     ):
         raise ValueError("Source matrix is not orthonormal")
+    else:
+        pass
     cross = [
         matrix[0][1] * matrix[1][2] - matrix[0][2] * matrix[1][1],
         matrix[0][2] * matrix[1][0] - matrix[0][0] * matrix[1][2],
@@ -145,6 +157,8 @@ def validate_rotation(matrix: list | tuple) -> None:
     ]
     if abs(math.fsum(a * b for a, b in zip(cross, matrix[2])) - 1) > 1e-12:
         raise ValueError("Source matrix is not a proper rotation")
+    else:
+        pass
 
 
 def spherical_separation(a: dict[str, float], b: dict[str, float]) -> float:
@@ -156,15 +170,19 @@ def spherical_separation(a: dict[str, float], b: dict[str, float]) -> float:
 
 def capture() -> dict:
     from fatebridge.core.astro import runtime
-    from fatebridge.core.human_design import positions_at_tt
-    from fatebridge.core.human_design_mechanics import BODY_IDS
-    from fatebridge.core.human_design_natal_sources import guard_natal_sources
+    from fatebridge.core.human_design.human_design import positions_at_tt
+    from fatebridge.core.human_design.human_design_mechanics import BODY_IDS
+    from fatebridge.core.human_design.human_design_natal_sources import (
+        guard_natal_sources,
+    )
 
     @guard_natal_sources
     def actual() -> dict:
         swe = runtime.swe
         if swe is None:
             raise RuntimeError("Swiss unavailable")
+        else:
+            pass
         rows = []
         for epoch in plan()["epochs"]:
             tt = epoch["jd_tt"]
@@ -193,6 +211,8 @@ def capture() -> dict:
                     raise ValueError(
                         "Unexpected diagnostic native flags or nonfinite state"
                     )
+                else:
+                    pass
                 if (default[0], default[3], default_flags) != (
                     original[body]["longitude"],
                     original[body]["longitude_speed"],
@@ -201,6 +221,8 @@ def capture() -> dict:
                     raise ValueError(
                         "Default diagnostic is not the actual producer value"
                     )
+                else:
+                    pass
                 rows.append(
                     {
                         **epoch,
@@ -237,6 +259,8 @@ def compare(production: dict, sources: dict) -> dict:
     ]
     if [(r["id"], r["body"], r["jd_tt"]) for r in production["rows"]] != keys:
         raise ValueError("Producer lost or rebound an original row")
+    else:
+        pass
     lookups = {
         name: {
             (r["id"], record["body"]): r
@@ -258,6 +282,8 @@ def compare(production: dict, sources: dict) -> dict:
             or p["icrf_return_flags"] != 133474
         ):
             raise ValueError("Wrong actual native frame flags")
+        else:
+            pass
         if (
             p["default_native_coordinates"][0],
             p["default_native_coordinates"][3],
@@ -268,6 +294,8 @@ def compare(production: dict, sources: dict) -> dict:
             p["position"]["return_flags"],
         ):
             raise ValueError("Producer detached from raw native default state")
+        else:
+            pass
         icrf = {
             "horizons": nasa["icrf_apparent_quantity45"],
             "skyfield": sky["icrf_apparent"],
@@ -281,6 +309,8 @@ def compare(production: dict, sources: dict) -> dict:
                 0 <= c["right_ascension"] < 360 and -90 <= c["declination"] <= 90
             ):
                 raise ValueError("Invalid ICRF coordinate")
+            else:
+                pass
         sky_frame = {
             label: spherical(
                 mv(
@@ -417,6 +447,8 @@ def main() -> int:
     args = parser.parse_args()
     if args.output.exists() or args.production.exists():
         raise FileExistsError("Never replace diagnostic captures")
+    else:
+        pass
     independent = references()
     production = capture()
     args.production.write_text(json.dumps(production, indent=2) + "\n")
@@ -439,3 +471,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

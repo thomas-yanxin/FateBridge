@@ -2,11 +2,26 @@
 
 from copy import deepcopy
 from math import isfinite
-from typing import Any, Mapping, TypeGuard
+from typing import Any, Literal, Mapping, TypedDict, TypeGuard
 
 ELEMENTS = "木火土金水"
 ROLES = ("body", "seal", "output", "wealth", "officer_killer")
 PARTS = ("physical_hidden", "synthetic_branch", "non_day_visible")
+
+
+class CompleteLedgerPart(TypedDict):
+    status: Literal["complete"]
+    energy_unrounded: float
+    refs: list[str]
+
+
+class IncompleteLedgerPart(TypedDict):
+    status: Literal["not_supplied", "partial"]
+    energy_unrounded: None
+    refs: list[str] | None
+
+
+LedgerPart = CompleteLedgerPart | IncompleteLedgerPart
 
 
 def role_elements(day_element: str) -> dict[str, str]:
@@ -31,9 +46,9 @@ def _native(value: object) -> TypeGuard[int | float]:
     )
 
 
-def ledger_parts(rows: Any, kind: str) -> dict[str, dict[str, Any]]:
+def ledger_parts(rows: object, kind: str) -> dict[str, LedgerPart]:
     """A known empty ledger is zero; an unclassifiable row makes totals unknown."""
-    result: dict[str, dict[str, Any]] = {
+    result: dict[str, LedgerPart] = {
         e: {"status": "not_supplied", "energy_unrounded": None, "refs": None}
         for e in ELEMENTS
     }
@@ -73,7 +88,8 @@ def ledger_parts(rows: Any, kind: str) -> dict[str, dict[str, Any]]:
             identity = f"stem_energy_accounting.ledger:{pillar}"
             valid_identity = pillar in ("year", "month", "hour")
         if (
-            element not in set(ELEMENTS)
+            not isinstance(element, str)
+            or element not in sums
             or not valid_identity
             or identity in seen
             or not _native(energy)
@@ -84,11 +100,18 @@ def ledger_parts(rows: Any, kind: str) -> dict[str, dict[str, Any]]:
         sums[element] += energy
         refs[element].append(identity)
     for element in ELEMENTS:
-        result[element] = {
-            "status": "complete" if complete else "partial",
-            "energy_unrounded": sums[element] if complete else None,
-            "refs": refs[element],
-        }
+        if complete:
+            result[element] = {
+                "status": "complete",
+                "energy_unrounded": sums[element],
+                "refs": refs[element],
+            }
+        else:
+            result[element] = {
+                "status": "partial",
+                "energy_unrounded": None,
+                "refs": refs[element],
+            }
     return result
 
 

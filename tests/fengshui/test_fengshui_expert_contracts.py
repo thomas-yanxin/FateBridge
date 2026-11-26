@@ -3,6 +3,7 @@
 import asyncio
 import json
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 from fastmcp import Client
@@ -15,10 +16,13 @@ from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.fengshui import assess
 from fatebridge.services.tool_catalog import CATALOG
-from tests.fengshui.test_fengshui_planning import proposal_request
 from tests.support.fengshui_transports import mcp_call
 from tests.support.mcp_result_assertions import without_transport
-from tests.support.transports import rest_client
+from tests.support.transports import describe_capability, rest_client
+from tests.unit_test.fixtures.fengshui_layout import (
+    form,
+    proposal_request,
+)
 
 
 def context_request():
@@ -80,7 +84,12 @@ def context_request():
 
 
 @pytest.mark.parametrize("case", ["context", "orientation_unknown", "floors"])
-def test_context_matches_actual_rest_mcp_cli(monkeypatch, tmp_path, capsys, case):
+def test_context_matches_actual_rest_mcp_cli(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    case: str,
+) -> None:
     inputs = context_request()
     context = inputs["environmental_context"]
     if case == "orientation_unknown":
@@ -140,6 +149,8 @@ def test_context_matches_actual_rest_mcp_cli(monkeypatch, tmp_path, capsys, case
         ]
         for floor in context["floors"]:
             floor.update(center_confirmed=True, floorplan_alignment_confirmed=True)
+    else:
+        pass
     response = rest_client(monkeypatch).post("/api/fengshui/assess", json=inputs)
     protocol = asyncio.run(mcp_call("assess", inputs))
     path = tmp_path / "专家口径.json"
@@ -182,14 +193,19 @@ def test_context_matches_actual_rest_mcp_cli(monkeypatch, tmp_path, capsys, case
             assert {s["status"] for s in influences[1]["subject_scope"]} == {
                 "shared_review_required"
             }
+        else:
+            pass
 
 
 @pytest.mark.parametrize(
     "physical", ["placement", "facing", "feature", "external_forms"]
 )
 def test_explicit_unknown_orientation_rejects_physical_claims_on_all_transports(
-    monkeypatch, tmp_path, capsys, physical
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    physical: str,
+) -> None:
     inputs = {
         "methods": [],
         "environmental_context": {"orientation": {"evidence": "方位尚未确认"}},
@@ -244,13 +260,15 @@ def test_explicit_unknown_orientation_rejects_physical_claims_on_all_transports(
 
 @pytest.mark.parametrize("explicit_unknown", [False, True])
 def test_no_compass_observations_close_as_limited_review_without_invented_taboo(
-    explicit_unknown,
-):
+    explicit_unknown: bool,
+) -> None:
     inputs = context_request()
     context = inputs["environmental_context"]
     context.pop("household_members")
     if explicit_unknown:
         context["orientation"] = {"evidence": "明确未知方位，但本次只审非方向事实"}
+    else:
+        pass
     result = assess(**inputs)
     review = result["layout_analysis"]["environmental_context"]
     assert result["status"] == "complete"
@@ -264,8 +282,9 @@ def test_no_compass_observations_close_as_limited_review_without_invented_taboo(
     assert all(not f["action_required"] for f in review["environment_findings"])
 
 
-def test_explicit_unknown_orientation_does_not_block_independent_indoor_form_review():
-    from tests.fengshui.test_fengshui_method_boundaries import form
+def test_explicit_unknown_orientation_does_not_block_independent_indoor_form_review() -> (
+    None
+):
 
     result = assess(
         scene="workstation",
@@ -284,7 +303,9 @@ def test_explicit_unknown_orientation_does_not_block_independent_indoor_form_rev
     assert result["layout_analysis"]["placement_findings"] == []
 
 
-def test_first_view_can_request_context_and_policy_with_resolvable_sources(monkeypatch):
+def test_first_view_can_request_context_and_policy_with_resolvable_sources(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     inputs = context_request()
     spec = next(s for s in CATALOG if s.key == "fengshui_assess")
     fields = suggested_fields(spec) + [
@@ -303,21 +324,17 @@ def test_first_view_can_request_context_and_policy_with_resolvable_sources(monke
     assert response.status_code == 200, response.text
     body = response.json()
     assert body["method_policy"] and body["layout_analysis"]["environmental_context"]
-    sources = {s["source_id"] for r in body["rulesets"] for s in r["sources"]}
+    sources = body["source_catalog"].keys()
     assert all(set(trace["source_ids"]) <= sources for trace in body["rule_trace"])
     assert "snapshot_text" not in body
 
 
-def test_published_mcp_schema_exposes_context_without_birth_requirements():
+def test_published_mcp_schema_exposes_context_without_birth_requirements() -> None:
     async def inspect():
         async with Client(create_mcp_app(families="fengshui")) as client:
-            tool = next(
-                t for t in await client.list_tools() if t.name == "fengshui_assess"
-            )
-            Draft202012Validator(
-                tool.model_dump(by_alias=True)["inputSchema"]
-            ).validate(context_request())
-            return tool.model_dump(by_alias=True)["inputSchema"]
+            tool = await describe_capability(client, "fengshui_assess")
+            Draft202012Validator(tool["input_schema"]).validate(context_request())
+            return tool["input_schema"]
 
     schema = asyncio.run(inspect())
     assert "environmental_context" in schema["properties"]
@@ -325,7 +342,7 @@ def test_published_mcp_schema_exposes_context_without_birth_requirements():
 
 
 @pytest.mark.parametrize("with_context", [False, True])
-def test_proposal_does_not_reuse_old_environment_context(with_context):
+def test_proposal_does_not_reuse_old_environment_context(with_context: bool) -> None:
     inputs = proposal_request()
     object_id = inputs["placements"][0]["object_id"]
     context = {
@@ -342,15 +359,19 @@ def test_proposal_does_not_reuse_old_environment_context(with_context):
     inputs["environmental_context"] = context
     if with_context:
         inputs["layout_alternatives"][0]["environmental_context"] = deepcopy(context)
+    else:
+        pass
     result = assess(**inputs)
     proposal = result["layout_analysis"]["alternatives_analysis"]["findings"][0]
     path = f"layout_alternatives.{proposal['candidate_id']}.environmental_context"
     assert (path not in proposal["missing_inputs"]) is with_context
     if not with_context:
         assert proposal["status"] != "ready"
+    else:
+        pass
 
 
-def test_household_subject_can_reference_placement_without_birth_chart():
+def test_household_subject_can_reference_placement_without_birth_chart() -> None:
     inputs = context_request()
     inputs["environmental_context"]["orientation"] = {
         "direction_confirmed": True,
@@ -382,7 +403,9 @@ def test_household_subject_can_reference_placement_without_birth_chart():
         None,
     ],
 )
-def test_each_floor_requires_its_own_confirmed_coordinate_frame(missing):
+def test_each_floor_requires_its_own_confirmed_coordinate_frame(
+    missing: str | None,
+) -> None:
     inputs = context_request()
     context = inputs["environmental_context"]
     context["orientation"] = {
@@ -423,7 +446,7 @@ def test_each_floor_requires_its_own_confirmed_coordinate_frame(missing):
         )
 
 
-def test_nonempty_candidate_context_cannot_erase_prior_environment_criteria():
+def test_nonempty_candidate_context_cannot_erase_prior_environment_criteria() -> None:
     inputs = proposal_request()
     object_id = inputs["placements"][0]["object_id"]
     inputs["environmental_context"] = {
@@ -453,7 +476,9 @@ def test_nonempty_candidate_context_cannot_erase_prior_environment_criteria():
 
 
 @pytest.mark.parametrize("present", [False, True])
-def test_other_shape_never_proves_previously_reviewed_shape_is_absent(present):
+def test_other_shape_never_proves_previously_reviewed_shape_is_absent(
+    present: bool,
+) -> None:
     inputs = proposal_request()
     object_id = inputs["placements"][0]["object_id"]
     old = {

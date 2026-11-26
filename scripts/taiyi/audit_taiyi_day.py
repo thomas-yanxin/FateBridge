@@ -31,12 +31,16 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     }
     if {s["file"] for s in manifest["source_files"]} != required_files:
         raise ValueError("日计全部冻结材料不得删减")
+    else:
+        pass
     for item in manifest["source_files"]:
         if (
             hashlib.sha256((corpus / item["file"]).read_bytes()).hexdigest()
             != item["sha256"]
         ):
             raise ValueError("日计来源指纹不符：" + item["file"])
+        else:
+            pass
     case = json.loads((corpus / "day-worked.json").read_text())
     rows = case["observations"]
     if (
@@ -45,8 +49,12 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         or manifest["observation_count"] != 34
     ):
         raise ValueError("日计34观察必须全部保留，包括课式异数和未决宫位")
+    else:
+        pass
     if case["input"] != {"accumulation": 44, "yin": False, "ruler_branch": "未"}:
         raise ValueError("不得更换丁未44日独立输入以匹配算法")
+    else:
+        pass
     board = key_day_numeric_board(44, "未", False)
     matches, differences, unknown = [], [], []
     for row in rows:

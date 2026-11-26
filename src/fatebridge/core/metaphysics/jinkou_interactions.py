@@ -9,8 +9,8 @@ from __future__ import annotations
 from itertools import combinations
 from typing import Any
 
-from .common import ELEMENT_CONTROLS, ELEMENT_GENERATES
-from .jinkou_sources import SCAN_SHA256, SCAN_URL
+from fatebridge.core.metaphysics.common import ELEMENT_CONTROLS, ELEMENT_GENERATES
+from fatebridge.core.metaphysics.jinkou_sources import SCAN_SHA256, SCAN_URL
 
 POSITIONS = ("人元", "贵神", "将神", "地分")
 # Each condition keeps its direction. The battle clauses permit either one;

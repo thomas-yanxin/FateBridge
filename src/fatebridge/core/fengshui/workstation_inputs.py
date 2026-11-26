@@ -1,14 +1,14 @@
 """Explicit authored uses, observed relationships and execution facts."""
 
-from typing import Any, List, Literal, Optional
+from typing import Any, Literal
 
 from pydantic import ConfigDict, Field, StrictBool, StrictInt, model_validator
 
-from .numeric_inputs import FengshuiInput as _DeferredModel
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput as _DeferredModel
 
 
 class ObservedCondition(_DeferredModel):
-    value: Optional[StrictBool]
+    value: StrictBool | None
     observation_basis: Literal["measured", "user_confirmed", "image_observed"]
     evidence: str = Field(min_length=1, max_length=1000, pattern=r"\S")
 
@@ -19,7 +19,7 @@ class WorkstationActivity(_DeferredModel):
     activity: Literal["work", "study", "meditation", "storage", "mixed", "unknown"]
     observation_basis: Literal["measured", "user_confirmed", "image_observed"]
     evidence: str = Field(min_length=1, max_length=1000, pattern=r"\S")
-    space_mixed_use: Optional[ObservedCondition] = Field(
+    space_mixed_use: ObservedCondition | None = Field(
         default=None,
         description="空间是否同时办公/睡眠等混用，独立于这张桌实际活动；未知不推定",
     )
@@ -38,10 +38,10 @@ class EntryBarrier(_DeferredModel):
     entry_line_through_user: ObservedCondition
     barrier_between_entry_and_user: ObservedCondition
     # These are engineering execution facts, not additional traditional rules.
-    entrance_view_maintained: Optional[ObservedCondition] = None
-    circulation_clear: Optional[ObservedCondition] = None
-    operating_space_clear: Optional[ObservedCondition] = None
-    physically_feasible: Optional[ObservedCondition] = None
+    entrance_view_maintained: ObservedCondition | None = None
+    circulation_clear: ObservedCondition | None = None
+    operating_space_clear: ObservedCondition | None = None
+    physically_feasible: ObservedCondition | None = None
 
     @model_validator(mode="after")
     def distinct_objects(self) -> "EntryBarrier":
@@ -64,9 +64,9 @@ class WorkstationReview(_DeferredModel):
             ]
         }
     )
-    activities: List[WorkstationActivity] = Field(default_factory=list, max_length=100)
-    entry_barriers: List[EntryBarrier] = Field(default_factory=list, max_length=100)
-    evaluation_period: Optional[EvaluationPeriod] = Field(
+    activities: list[WorkstationActivity] = Field(default_factory=list, max_length=100)
+    entry_barriers: list[EntryBarrier] = Field(default_factory=list, max_length=100)
+    evaluation_period: EvaluationPeriod | None = Field(
         default=None,
         description="本次活动参考的显式评价运；不从宅运、年星或系统日期补齐",
     )
@@ -92,27 +92,27 @@ class WorkstationReview(_DeferredModel):
 
 class MaterialApplication(_DeferredModel):
     ruleset_id: Literal["afsi_application_conditions_v1"]
-    target_request_id: Optional[str] = Field(
+    target_request_id: str | None = Field(
         default=None,
         min_length=1,
         max_length=100,
         pattern=r"\S",
         description="可选关联本轮明确 element_adjustments.request_id；绑定不证明物件已在目标宫位",
     )
-    water_clean: Optional[ObservedCondition] = None
-    water_moving: Optional[ObservedCondition] = None
-    metal_exposed: Optional[ObservedCondition] = None
-    proportionate_to_space: Optional[ObservedCondition] = Field(
+    water_clean: ObservedCondition | None = None
+    water_moving: ObservedCondition | None = None
+    metal_exposed: ObservedCondition | None = None
+    proportionate_to_space: ObservedCondition | None = Field(
         default=None,
         description="AFSI已登记实际代表物的定性尺度核对，须有独立观察；不是引擎算出的剂量/重量阈值",
     )
-    plant_healthy: Optional[ObservedCondition] = None
+    plant_healthy: ObservedCondition | None = None
 
 
 def validate_review(
     review: WorkstationReview,
-    placements: List[Any],
-    forms: List[Any],
+    placements: list[Any],
+    forms: list[Any],
     context: Any,
     known_context: Any = None,
 ) -> None:

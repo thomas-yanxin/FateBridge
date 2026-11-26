@@ -25,6 +25,8 @@ ROOT = Path(__file__).resolve().parents[2]
 if not __package__:
     sys.path.insert(0, str(ROOT))
     sys.path.insert(0, str(ROOT / "src"))
+else:
+    pass
 
 from scripts.sukuyo.build_sukuyo_historical_calendar import read_fixture  # noqa: E402
 
@@ -45,11 +47,15 @@ def hko_days() -> dict[int, tuple[int, int, int, bool]]:
         names = archive.namelist()
         if len(names) != len(set(names)):
             raise ValueError("Duplicate HKO capture member")
+        else:
+            pass
         sources = {name: archive.read(name) for name in names}
     if {name: sha(raw) for name, raw in sources.items()} != {
         row["file"]: row["sha256"] for row in manifest["sources"]
     }:
         raise ValueError("HKO captured source bytes changed")
+    else:
+        pass
 
     def decode(raw: bytes) -> str:
         try:
@@ -63,11 +69,15 @@ def hko_days() -> dict[int, tuple[int, int, int, bool]]:
             match = re.match(r"\s*(\d{4})/(\d{1,2})/(\d{1,2})\s+(.+?)\s{2,}", line)
             if not match:
                 continue
+            else:
+                pass
             civil = date(*map(int, match.group(1, 2, 3)))
             label = match[4].strip()
             month = re.fullmatch(r"(\d+)(?:st|nd|rd|th) Lunar [Mm]onth", label)
             if not month and not label.isdigit():
                 raise ValueError("Unrecognized HKO printed date label")
+            else:
+                pass
             printed.append(
                 (civil, int(month[1]) if month else None, 1 if month else int(label))
             )
@@ -76,12 +86,16 @@ def hko_days() -> dict[int, tuple[int, int, int, bool]]:
         r"2069年12月30日\s+十七\s+星期一", decode(sources["T2069c.txt"])
     ) or any(row[0] == gap for row in printed):
         raise ValueError("HKO English gap or Chinese supplement changed")
+    else:
+        pass
     printed.append((gap, None, 17))
     printed.sort()
     if len(printed) != 72684 or any(
         b[0] - a[0] != timedelta(days=1) for a, b in zip(printed, printed[1:])
     ):
         raise ValueError("HKO source must cover every declared day once")
+    else:
+        pass
     upcoming_month = next(row[1] for row in printed if row[1] is not None)
     assert upcoming_month is not None
     current_month, lunar_year, leap = upcoming_month - 1 or 12, 1900, False
@@ -91,7 +105,11 @@ def hko_days() -> dict[int, tuple[int, int, int, bool]]:
             leap = new_month == current_month
             if new_month == 1:
                 lunar_year = civil.year
+            else:
+                pass
             current_month = new_month
+        else:
+            pass
         result[civil.toordinal()] = (lunar_year, current_month, day, leap)
     return result
 
@@ -134,6 +152,8 @@ def source_expectations() -> tuple[list[dict[str, Any]], dict[str, Any]]:
         for d, r in zip(dates, rows):
             if r is None:
                 continue
+            else:
+                pass
             match = re.fullmatch(r"(\d{4})\|(閏)?(\d{1,2})\|(\d{1,2})", r["text"])
             assert match
             daily[date.fromisoformat(d).toordinal()] = (
@@ -180,6 +200,8 @@ def source_expectations() -> tuple[list[dict[str, Any]], dict[str, Any]]:
             y, m, d, leap = fields
             if d != 1:
                 continue
+            else:
+                pass
             prev = days.get(o - 1)
             prior = days.get(o - prev[2] - 1) if prev and leap else None
             base = mansion(m, 1)
@@ -202,6 +224,8 @@ def source_expectations() -> tuple[list[dict[str, Any]], dict[str, Any]]:
                 patterns[
                     f"{prior[2] if prior else 'unknown'}/{prev[2] if prev else 'unknown'}"
                 ] += 1
+            else:
+                pass
             for half in [None, "first_half", "second_half"]:
                 incomplete = (
                     prev is None or (leap and prior is None)
@@ -257,6 +281,8 @@ def source_expectations() -> tuple[list[dict[str, Any]], dict[str, Any]]:
         raise ValueError(
             "Fixed month-transition protocol changed; review a new version explicitly"
         )
+    else:
+        pass
     protocol = json.loads(protocol_raw)
     if (
         sha(raw) != protocol["oracle_sha256"]
@@ -265,6 +291,8 @@ def source_expectations() -> tuple[list[dict[str, Any]], dict[str, Any]]:
         or protocol["parent_source_manifest_sha256"] != PARENT_MANIFEST
     ):
         raise ValueError("Full source-only transition domain or oracle changed")
+    else:
+        pass
     return ledger, protocol
 
 
@@ -289,6 +317,8 @@ def compare_calendar(
             "expected": row["lunar_fields"],
             "actual": fields,
         }
+    else:
+        pass
     assignment = selection["short_month_assignment"]
     expected_assignment = row["previous_lunar_fields"] is not None and (
         row["previous_lunar_fields"][2] == 29 or row["lunar_fields"][3]
@@ -298,6 +328,8 @@ def compare_calendar(
             "expected": expected_assignment,
             "actual": assignment is not None,
         }
+    else:
+        pass
     if assignment is not None:
         prev = assignment["previous_lunar"]
         actual_previous = [
@@ -309,12 +341,16 @@ def compare_calendar(
                 "expected": row["previous_lunar_fields"],
                 "actual": actual_previous,
             }
+        else:
+            pass
         firsts = assignment["slots"][0]["candidate_mansions"]
         if firsts != row["branch_first_mansions"]:
             differences["first_half_branches"] = {
                 "expected": row["branch_first_mansions"],
                 "actual": firsts,
             }
+        else:
+            pass
         prior = prev.get("before_regular_month")
         actual_prior = (
             [
@@ -329,11 +365,15 @@ def compare_calendar(
                 "expected": row["before_regular_fields"],
                 "actual": actual_prior,
             }
+        else:
+            pass
+    else:
+        pass
     return {"actual": actual, "differences": differences}
 
 
 def verify_transitions(ledger_output: TextIO | None = None) -> dict[str, Any]:
-    from fatebridge.core.sukuyo import calendar_mansion
+    from fatebridge.core.sukuyo.sukuyo import calendar_mansion
 
     rows, protocol = source_expectations()
     counts: Counter[str] = Counter()
@@ -349,6 +389,8 @@ def verify_transitions(ledger_output: TextIO | None = None) -> dict[str, Any]:
             }
             if half != "None":
                 args["calendar_day_part"] = half
+            else:
+                pass
             try:
                 actual[half] = compare_calendar(
                     row, half, calendar_mansion(row["date"], **args)
@@ -364,11 +406,15 @@ def verify_transitions(ledger_output: TextIO | None = None) -> dict[str, Any]:
         actual_digest.update(encoded.encode())
         if ledger_output is not None:
             ledger_output.write(encoded)
+        else:
+            pass
         if any(
             value.get("differences") or "exception" in value
             for value in actual.values()
         ):
             failures.append(item)
+        else:
+            pass
     complete = counts == {
         key: value["conditions"] for key, value in protocol["counts"].items()
     }
@@ -401,9 +447,13 @@ def main() -> int:
     text = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
     if args.report:
         args.report.write_text(text, encoding="utf-8")
+    else:
+        pass
     print(text)
     return 0 if result["all_expected_fields_match"] else 1
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

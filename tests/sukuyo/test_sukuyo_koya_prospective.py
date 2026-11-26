@@ -4,14 +4,8 @@ import hashlib
 
 import pytest
 
-from fatebridge.core.sukuyo_koya import SOURCE
-from fatebridge.validation.sukuyo_study import (
-    SukuyoProtocol,
-    evaluate,
-    register,
-    seal_forecasts,
-)
-from tests.sukuyo.test_sukuyo_study import (
+from fatebridge.core.sukuyo.sukuyo_koya import SOURCE
+from tests.unit_test.fixtures.sukuyo_study import (
     ARTIFACTS,
     EVALUATE_AT,
     EVIDENCE,
@@ -24,20 +18,26 @@ from tests.sukuyo.test_sukuyo_study import (
     protocol,
     registered,
 )
+from validation.sukuyo_study import (
+    SukuyoProtocol,
+    evaluate,
+    register,
+    seal_forecasts,
+)
 
 
 def updated_source_artifacts():
     return {**ARTIFACTS, "classical_sources": SOURCE.read_bytes()}
 
 
-def test_new_actual_printed_source_requires_its_own_registered_digest():
+def test_new_actual_printed_source_requires_its_own_registered_digest() -> None:
     with pytest.raises(ValueError, match="实际规则"):
         register(
             protocol(), MODEL, at=REGISTER_AT, artifacts=updated_source_artifacts()
         )
 
 
-def test_new_source_cannot_inherit_old_sealed_forecasts_or_efficacy():
+def test_new_source_cannot_inherit_old_sealed_forecasts_or_efficacy() -> None:
     old = registered()
     sealed = seal_forecasts(old, forecasts(), at=SEAL_AT, evidence=EVIDENCE)
     artifacts = updated_source_artifacts()

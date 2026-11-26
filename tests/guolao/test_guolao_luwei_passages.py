@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.guolao_passages import (
+from fatebridge.core.guolao.guolao_passages import (
     CALENDARS,
     DATA,
     POLICIES,
@@ -21,7 +21,9 @@ FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-luwei-passages-v1"
 REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
 
 
-def test_source_pages_ambiguous_cell_images_and_runtime_data_are_fingerprinted():
+def test_source_pages_ambiguous_cell_images_and_runtime_data_are_fingerprinted() -> (
+    None
+):
     for key, digest in [
         ("source_image", "source_image_sha256"),
         ("later_note_image", "later_note_sha256"),
@@ -40,7 +42,9 @@ def test_source_pages_ambiguous_cell_images_and_runtime_data_are_fingerprinted()
 
 
 @pytest.mark.parametrize("case", REFERENCE["held_arithmetic_cases"])
-def test_held_source_component_arithmetic_does_not_fill_all_cells_with_zero(case):
+def test_held_source_component_arithmetic_does_not_fill_all_cells_with_zero(
+    case,
+) -> None:
     r = load_registry().entry(
         case["calendar"], case["branch"], whole_degree_policy=case["policy"]
     )
@@ -53,7 +57,7 @@ def test_held_source_component_arithmetic_does_not_fill_all_cells_with_zero(case
 
 
 @pytest.mark.parametrize("policy", POLICIES)
-def test_all48_cells_remain_separate_under_each_explicit_policy(policy):
+def test_all48_cells_remain_separate_under_each_explicit_policy(policy) -> None:
     r = load_registry().audit(whole_degree_policy=policy)
     assert r["cells"] == 48
     assert (
@@ -73,7 +77,7 @@ def test_all48_cells_remain_separate_under_each_explicit_policy(policy):
 @pytest.mark.parametrize("policy", POLICIES)
 def test_ambiguous_glyph_and_bare_printed_unit_block_a_sum_in_both_policies(
     case, policy
-):
+) -> None:
     r = load_registry().entry(
         case["calendar"], case["branch"], whole_degree_policy=policy
     )
@@ -91,7 +95,9 @@ def test_ambiguous_glyph_and_bare_printed_unit_block_a_sum_in_both_policies(
     assert all(not c["reference_used_to_fill_source"] for c in compared["comparisons"])
 
 
-def test_printed_whole_degree_overrides_the_heading_instead_of_being_added_to_it():
+def test_printed_whole_degree_overrides_the_heading_instead_of_being_added_to_it() -> (
+    None
+):
     g = load_registry()
     for calendar, branch, heading, printed in [
         ("tongtian", "午", 4, 5),
@@ -105,7 +111,9 @@ def test_printed_whole_degree_overrides_the_heading_instead_of_being_added_to_it
             assert not r["whole_degree_from_heading_interpretation"]
 
 
-def test_unit_not_printed_is_distinct_from_a_printed_unit_with_a_missing_number():
+def test_unit_not_printed_is_distinct_from_a_printed_unit_with_a_missing_number() -> (
+    None
+):
     g = load_registry()
     truncated = g.entry("tongtian", "午", whole_degree_policy="explicit_only")
     assert truncated["second"]["status"] == "not_printed"
@@ -123,7 +131,7 @@ def test_unit_not_printed_is_distinct_from_a_printed_unit_with_a_missing_number(
 
 
 @pytest.mark.parametrize("case", REFERENCE["comparison_hand_cases"])
-def test_named_comparisons_return_differences_without_emending_luwei(case):
+def test_named_comparisons_return_differences_without_emending_luwei(case) -> None:
     r = load_registry().compare_yuanshi(
         "shoushi", case["branch"], whole_degree_policy="inherit_column_heading"
     )
@@ -136,7 +144,7 @@ def test_named_comparisons_return_differences_without_emending_luwei(case):
     assert not r["source"]["luwei_table_emended"]
 
 
-def test_later_rejection_of_old_ruler_integer_is_returned_but_not_applied():
+def test_later_rejection_of_old_ruler_integer_is_returned_but_not_applied() -> None:
     g = load_registry()
     r = g.entry("shoushi", "卯", whole_degree_policy="inherit_column_heading")
     assert r["same_integral_degree_as_later_rejected_old_ruler_example"]
@@ -150,7 +158,9 @@ def test_later_rejection_of_old_ruler_integer_is_returned_but_not_applied():
     ]
 
 
-def test_six_earlier_explicit_cells_still_match_the_frozen_primary_observations():
+def test_six_earlier_explicit_cells_still_match_the_frozen_primary_observations() -> (
+    None
+):
     old = json.loads(
         (FIXTURE.parent / "guolao-historical-coordinates-v1/reference.json").read_text()
     )
@@ -162,12 +172,14 @@ def test_six_earlier_explicit_cells_still_match_the_frozen_primary_observations(
 
 
 @pytest.mark.parametrize("value", [0.0, True, F(0), "0"])
-def test_fractional_terms_reject_implicit_numerical_types(value):
+def test_fractional_terms_reject_implicit_numerical_types(value) -> None:
     with pytest.raises(TypeError):
         FractionalTerm(value, "literal", "零")
 
 
-def test_partial_units_cannot_be_backfilled_in_the_record_and_collections_are_frozen():
+def test_partial_units_cannot_be_backfilled_in_the_record_and_collections_are_frozen() -> (
+    None
+):
     with pytest.raises(ValueError):
         FractionalTerm(0, "unresolved", None)
     with pytest.raises(ValueError):

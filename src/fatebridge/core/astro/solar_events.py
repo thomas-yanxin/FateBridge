@@ -9,8 +9,9 @@ Neither mode substitutes a source-native observer for the physical receiver.
 from __future__ import annotations
 
 import math
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Callable, Literal, Sequence
+from typing import Literal
 
 import erfa
 
@@ -18,8 +19,10 @@ from fatebridge.core.astro import runtime
 from fatebridge.core.astro.aberration_math import LIGHT_SPEED_AU_PER_DAY
 from fatebridge.core.astro.cartesian import CartesianState, Vector3
 from fatebridge.core.astro.earth_attitude import earth_attitude, physical_equator
+from fatebridge.core.astro.iers_ut1 import active_ut1
 from fatebridge.core.astro.native_coordinates import require_spherical_coordinates
 from fatebridge.core.astro.reference_frames import dot, mv
+from fatebridge.core.astro.solar_altitude_search import solar_altitude_nodes
 from fatebridge.core.astro.solar_observer import (
     FileSolarSource,
     NativeSolarSource,
@@ -30,9 +33,11 @@ from fatebridge.core.astro.solar_observer import (
 from fatebridge.core.astro.source_session import coherent_ephemeris_sources
 from fatebridge.core.astro.terrestrial_observer import (
     native_observer_site,
+    terrestrial_frame,
     terrestrial_observer,
 )
-from fatebridge.core.astro.time_scales import tt_from_ut1
+from fatebridge.core.astro.time_scales import resolve_tt_from_ut1, tt_from_ut1
+from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.utils.errors import EphemerisSourceError
 
 SolarDefinition = Literal["hindu_geometric_center", "apparent_topocentric_center"]
@@ -100,15 +105,21 @@ def solar_observation(
     Coefficient sources use one native-TDB light cone and analytic Earth velocity.
     Explicit native sources retain their declared light path; topocentric
     native aberration is replaced by one SOFA boost with the physical station.
-    Polar motion, geoid, dynamical accuracy and atmosphere remain separate.
+    Selected EOP enters the shared receiver and ENU frame. Geoid, dynamical
+    accuracy and atmosphere remain outside this geometric altitude model.
     """
     module = runtime.swe
     if module is None:
-        raise ImportError("Swiss Ephemeris is required for solar events")
+        raise ModuleNotFoundError("Swiss Ephemeris is required for solar events")
     if source is not None and ephemeris_flags is not None:
         raise ValueError("Choose a solar source or native flags, not both")
     with runtime.preserve_ephemeris_path():
-        tt = tt_from_ut1(julian_day_ut1) if julian_day_tt is None else julian_day_tt
+        epoch = (
+            resolve_tt_from_ut1(julian_day_ut1)
+            if julian_day_tt is None
+            else TTInstant.from_float(julian_day_tt)
+        )
+        tt = epoch.as_float()
         selected = (
             select_solar_source(tt, tt, native_flags=ephemeris_flags)
             if source is None
@@ -128,7 +139,9 @@ def solar_observation(
                     actual_source = returned & SOURCE_MASK
                     if actual_source not in (1, 2, 4):
                         raise EphemerisSourceError("coordinate_contract_changed")
-                    attitude = earth_attitude(module, julian_day_ut1, julian_day_tt=tt)
+                    attitude = earth_attitude(
+                        module, julian_day_ut1, julian_day_tt=epoch
+                    )
                     equator = attitude.equator
                     angle = math.radians(solar_longitude)
                     x, y, z = mv(
@@ -149,7 +162,9 @@ def solar_observation(
                     geometric_sun, actual_source = _cartesian_state(
                         tt, module.SUN, requested | common | module.FLG_TRUEPOS
                     )
-                    equator = physical_equator(module, julian_day_ut1, julian_day_tt=tt)
+                    equator = physical_equator(
+                        module, julian_day_ut1, julian_day_tt=epoch
+                    )
                     receiver = terrestrial_observer(
                         equator, longitude=longitude, latitude=latitude, height=height
                     )
@@ -200,7 +215,7 @@ def solar_observation(
                     x, y, z = mv(equator.matrix, tuple(float(v) for v in apparent))
                 actual_model = runtime.ephemeris_model_from_retflag(actual_source)
             else:
-                equator = physical_equator(module, julian_day_ut1, julian_day_tt=tt)
+                equator = physical_equator(module, julian_day_ut1, julian_day_tt=epoch)
                 receiver = (
                     terrestrial_observer(
                         equator, longitude=longitude, latitude=latitude, height=height
@@ -208,10 +223,12 @@ def solar_observation(
                     if definition == "apparent_topocentric_center"
                     else CartesianState((0.0, 0.0, 0.0), (0.0, 0.0, 0.0))
                 )
-                direction = precise_solar_direction(tt, receiver, selected)
+                direction = precise_solar_direction(epoch, receiver, selected)
                 x, y, z = mv(equator.matrix, direction)
                 if definition == "hindu_geometric_center":
-                    attitude = earth_attitude(module, julian_day_ut1, julian_day_tt=tt)
+                    attitude = earth_attitude(
+                        module, julian_day_ut1, julian_day_tt=epoch
+                    )
                     ecliptic = mv(attitude.reduction.target_to_ecliptic, (x, y, z))
                     angle = math.atan2(ecliptic[1], ecliptic[0])
                     x, y, z = mv(
@@ -222,23 +239,10 @@ def solar_observation(
                 actual_model = selected.value
         except module.Error as error:
             raise EphemerisSourceError("unavailable_during") from error
-        local = math.radians(equator.greenwich_sidereal_degrees + longitude)
-        phi = math.radians(latitude)
-        east = math.fsum((-math.sin(local) * x, math.cos(local) * y))
-        north = math.fsum(
-            (
-                -math.sin(phi) * math.cos(local) * x,
-                -math.sin(phi) * math.sin(local) * y,
-                math.cos(phi) * z,
-            )
-        )
-        up = math.fsum(
-            (
-                math.cos(phi) * math.cos(local) * x,
-                math.cos(phi) * math.sin(local) * y,
-                math.sin(phi) * z,
-            )
-        )
+        frame = terrestrial_frame(equator, longitude=longitude, latitude=latitude)
+        east = dot(frame.east, (x, y, z))
+        north = dot(frame.north, (x, y, z))
+        up = dot(frame.up, (x, y, z))
         return SolarObservation(
             julian_day_ut1,
             tt,
@@ -248,169 +252,6 @@ def solar_observation(
             actual_source,
             definition,
         )
-
-
-def _solar_extremum(
-    value: Callable[[float], float], lower: float, upper: float, *, maximum: bool
-) -> float:
-    """Refine a bracketed solar-height extremum without clipping latitude."""
-    ratio = (math.sqrt(5) - 1) / 2
-    left = upper - ratio * (upper - lower)
-    right = lower + ratio * (upper - lower)
-    sign = -1 if maximum else 1
-    left_value, right_value = sign * value(left), sign * value(right)
-    for _ in range(96):
-        if left == right or left == lower or right == upper:
-            break
-        if left_value < right_value:
-            upper, right, right_value = right, left, left_value
-            left = upper - ratio * (upper - lower)
-            left_value = sign * value(left)
-        else:
-            lower, left, left_value = left, right, right_value
-            right = lower + ratio * (upper - lower)
-            right_value = sign * value(right)
-    else:
-        raise RuntimeError("Solar altitude extremum did not converge")
-    return min((lower, left, right, upper), key=lambda point: sign * value(point))
-
-
-def _chebyshev_value(coefficients: list[float], x: float) -> float:
-    """Clenshaw evaluation, including close roots without a power-basis change."""
-    first = second = 0.0
-    for coefficient in reversed(coefficients[1:]):
-        first, second = math.fsum((coefficient, 2 * x * first, -second)), first
-    return math.fsum((coefficients[0], x * first, -second))
-
-
-def _chebyshev_derivative(coefficients: list[float]) -> list[float]:
-    degree = len(coefficients) - 1
-    if degree == 0:
-        return [0.0]
-    derivative = [0.0] * degree
-    for index in range(degree - 1, -1, -1):
-        derivative[index] = 2 * (index + 1) * coefficients[index + 1]
-        if index + 2 < degree:
-            derivative[index] += derivative[index + 2]
-    derivative[0] /= 2
-    return derivative
-
-
-def _chebyshev_roots(coefficients: list[float]) -> list[float]:
-    """Isolate real roots on [-1,1] by the derivative's monotone intervals.
-
-    Rolle's theorem supplies the partitions recursively. The interpolant only
-    proposes height extrema; physical observations decide every event bracket.
-    """
-    if len(coefficients) == 1:
-        return []
-    stationary = _chebyshev_roots(_chebyshev_derivative(coefficients))
-    nodes = [-1.0, *stationary, 1.0]
-    values = [_chebyshev_value(coefficients, point) for point in nodes]
-    roots = [point for point, value in zip(nodes, values) if value == 0]
-    for lower, upper, low_value, high_value in zip(
-        nodes, nodes[1:], values, values[1:]
-    ):
-        if not (low_value < 0 < high_value or high_value < 0 < low_value):
-            continue
-        for _ in range(64):
-            middle = lower + (upper - lower) / 2
-            if middle == lower or middle == upper:
-                break
-            score = _chebyshev_value(coefficients, middle)
-            if score == 0:
-                lower = upper = middle
-                break
-            if (score < 0) == (low_value < 0):
-                lower, low_value = middle, score
-            else:
-                upper = middle
-        roots.append(lower + (upper - lower) / 2)
-    return sorted(set(roots))
-
-
-def _solar_height_nodes(
-    value: Callable[[float], float], lower: float, upper: float
-) -> list[float]:
-    """Resolve the smooth vertical component, allowing clustered extrema.
-
-    Chebyshev interpolation avoids assuming one extremum per sampling interval.
-    Its high-order tail controls subdivision; the tolerance includes rounding
-    the absolute UT1 date to binary64. This is a numerical resolution check,
-    not an interval-arithmetic proof for arbitrarily small tangent arcs.
-    See https://www.chebfun.org/docs/guide/guide03.html for spectral rootfinding.
-    """
-    degree = 12
-    pending = [(lower, upper, 0)]
-    nodes: set[float] = set()
-    while pending:
-        lower, upper, depth = pending.pop()
-        middle = lower + (upper - lower) / 2
-        radius = (upper - lower) / 2
-        points = [
-            (
-                upper
-                if index == 0
-                else (
-                    lower
-                    if index == degree
-                    else middle + radius * math.cos(index * math.pi / degree)
-                )
-            )
-            for index in range(degree + 1)
-        ]
-        scores = [value(point) for point in points]
-        coefficients = [
-            math.fsum(
-                (0.5 if index in (0, degree) else 1.0)
-                * score
-                * math.cos(index * order * math.pi / degree)
-                for index, score in enumerate(scores)
-            )
-            * 2
-            / degree
-            * (0.5 if order in (0, degree) else 1.0)
-            for order in range(degree + 1)
-        ]
-        uncertainty = 32 * math.ulp(1.0) + 32 * (max(scores) - min(scores)) * math.ulp(
-            middle
-        ) / (upper - lower)
-        tail = math.fsum(abs(c) for c in coefficients[-4:])
-        nodes.update(points)
-        # |T_k(x)| <= 1 gives the interpolant's complete range. A band
-        # separated from zero needs no extremum localization. In particular,
-        # do not subdivide coordinate roundoff at a polar solstice tens of
-        # degrees from the horizon. The tail is a numerical estimate, not a
-        # certified enclosure of an arbitrary underlying ephemeris function.
-        if abs(coefficients[0]) - math.fsum(abs(c) for c in coefficients[1:]) > (
-            8 * tail + uncertainty
-        ):
-            continue
-        if tail > uncertainty:
-            if depth == 20 or middle in (lower, upper):
-                raise RuntimeError("Solar altitude interpolation did not converge")
-            pending.extend(((lower, middle, depth + 1), (middle, upper, depth + 1)))
-            continue
-        while len(coefficients) > 1 and abs(coefficients[-1]) <= uncertainty:
-            coefficients.pop()
-        derivative = _chebyshev_derivative(coefficients)
-        extrema = [x for x in _chebyshev_roots(derivative) if -1 < x < 1]
-        partitions = [-1.0, *extrema, 1.0]
-        for index, estimate in enumerate(extrema, start=1):
-            left = (partitions[index - 1] + estimate) / 2
-            right = (estimate + partitions[index + 1]) / 2
-            before = _chebyshev_value(derivative, left)
-            after = _chebyshev_value(derivative, right)
-            if before * after < 0:
-                nodes.add(
-                    _solar_extremum(
-                        value,
-                        middle + radius * left,
-                        middle + radius * right,
-                        maximum=before > 0,
-                    )
-                )
-    return sorted(nodes)
 
 
 @coherent_ephemeris_sources
@@ -430,7 +271,8 @@ def solar_crossings_in_window(
     A spectral height interpolant locates every resolved extremum, including
     pairs within one two-hour segment. Physical signs, rather than polynomial
     zeros, bracket the events, then bisection reaches adjacent UT1 dates.
-    An exactly zero endpoint needs one-sided context to classify direction.
+    An exact zero needs opposite signs at both adjacent UT1 points. A zero
+    on an unresolved run of equal values does not give an isolated event.
     The root coordinate is the lower endpoint of its adjacent-float bracket;
     this gives half-open daily partitions one consistent event owner.
     Source, clock and convergence failures propagate; an empty list means
@@ -440,7 +282,7 @@ def solar_crossings_in_window(
     """
     module = runtime.swe
     if module is None:
-        raise ImportError("Swiss Ephemeris is required for solar events")
+        raise ModuleNotFoundError("Swiss Ephemeris is required for solar events")
     if (
         not math.isfinite(start_ut1)
         or not math.isfinite(end_ut1)
@@ -473,6 +315,10 @@ def solar_crossings_in_window(
         )
         observations: dict[float, SolarObservation] = {}
         observed_source: tuple[str, int | None] | None = None
+        rotation_source = active_ut1.get()
+        rotation_bounds = (
+            rotation_source.ut1_bounds if rotation_source is not None else None
+        )
 
         def value(ut1: float) -> float:
             nonlocal observed_source
@@ -503,92 +349,34 @@ def solar_crossings_in_window(
                 math.radians(observations[ut1].altitude_degrees)
             ) - math.sin(math.radians(horizon))
 
-        grid = [
-            point
-            for index in range(math.ceil((end_ut1 - start_ut1) * 12))
-            if (point := start_ut1 + index / 12) < end_ut1
-        ]
-        grid.append(end_ut1)
-        nodes = sorted(
-            {
-                point
-                for lower, upper in zip(grid, grid[1:])
-                for point in _solar_height_nodes(value, lower, upper)
-            }
-        )
-        scores = [value(point) for point in nodes]
-        crossings = []
-        for index, lower in enumerate(nodes):
-            low_value = scores[index]
-            if low_value == 0:
-                previous_score = next(
-                    (v for v in reversed(scores[:index]) if v != 0), None
-                )
-                following_score = next((v for v in scores[index + 1 :] if v != 0), None)
-                # Only exact endpoint zeros require a source-sided context.
-                # Start with the nearest representable date, rather than a
-                # fixed cursor that can skip a complete polar visibility arc.
-                for direction in (-1, 1):
-                    if (
-                        previous_score if direction < 0 else following_score
-                    ) is not None:
-                        continue
-                    offset = math.ulp(lower)
-                    while offset <= 1 / 12:
-                        score = value(lower + direction * offset)
-                        if score != 0:
-                            if direction < 0:
-                                previous_score = score
-                            else:
-                                following_score = score
-                            break
-                        offset *= 2
-                if (
-                    previous_score is not None
-                    and following_score is not None
-                    and previous_score * following_score < 0
-                ):
-                    sample = observations[lower]
-                    crossings.append(
-                        SolarEvent(
-                            lower,
-                            sample.julian_day_tt,
-                            sample.ephemeris_model,
-                            sample.ephemeris_flags,
-                            definition,
-                            (lower, lower),
-                            sample.altitude_degrees,
-                            horizon,
-                            len(observations),
-                            previous_score < 0,
-                        )
-                    )
-                continue
-            if index + 1 == len(nodes):
-                continue
-            upper, high_value = nodes[index + 1], scores[index + 1]
-            if low_value * high_value >= 0:
-                continue
-            rising = low_value < 0
-            for _ in range(64):
-                middle = lower + (upper - lower) / 2
-                if middle == lower or middle == upper:
-                    break
-                current = value(middle)
-                if current == 0:
-                    lower = upper = middle
-                    break
-                if (current < 0) == (low_value < 0):
-                    lower, low_value = middle, current
-                else:
-                    upper, high_value = middle, current
-            else:
-                raise RuntimeError("Solar event crossing did not converge")
-            event = lower
-            sample = observations[event]
+        def zero_neighbors(
+            point: float,
+        ) -> tuple[tuple[float, float], tuple[float, float]]:
+            left = math.nextafter(point, -math.inf)
+            right = math.nextafter(point, math.inf)
+            # An unavailable neighbor supplies no strict sign.
+            before = (
+                value(left)
+                if rotation_bounds is None or rotation_bounds[0] <= left
+                else 0.0
+            )
+            after = (
+                value(right)
+                if rotation_bounds is None or right <= rotation_bounds[1]
+                else 0.0
+            )
+            return (left, before), (right, after)
+
+        def sign_change(before: float, after: float) -> bool:
+            return before < 0 < after or after < 0 < before
+
+        crossings: list[SolarEvent] = []
+
+        def record_crossing(lower: float, upper: float, rising: bool) -> None:
+            sample = observations[lower]
             crossings.append(
                 SolarEvent(
-                    event,
+                    lower,
                     sample.julian_day_tt,
                     sample.ephemeris_model,
                     sample.ephemeris_flags,
@@ -600,6 +388,64 @@ def solar_crossings_in_window(
                     rising,
                 )
             )
+
+        def refine_crossing(
+            left: tuple[float, float], right: tuple[float, float], steps: int = 64
+        ) -> None:
+            lower, low_value = left
+            upper, high_value = right
+            if lower >= upper or not sign_change(low_value, high_value):
+                return
+            for remaining in range(steps - 1, -1, -1):
+                middle = lower + (upper - lower) / 2
+                if middle in (lower, upper):
+                    record_crossing(lower, upper, low_value < 0)
+                    return
+                current = value(middle)
+                if current == 0:
+                    # Partition the known bracket at the zero. Its own direction
+                    # does not decide whether either side contains a crossing.
+                    before, after = zero_neighbors(middle)
+                    refine_crossing((lower, low_value), before, remaining)
+                    if sign_change(before[1], after[1]):
+                        record_crossing(middle, middle, after[1] > 0)
+                    refine_crossing(after, (upper, high_value), remaining)
+                    return
+                if (current < 0) == (low_value < 0):
+                    lower, low_value = middle, current
+                else:
+                    upper, high_value = middle, current
+            raise RuntimeError("Solar event crossing did not converge")
+
+        grid = [
+            point
+            for index in range(math.ceil((end_ut1 - start_ut1) * 12))
+            if (point := start_ut1 + index / 12) < end_ut1
+        ]
+        grid.append(end_ut1)
+        nodes = sorted(
+            {
+                point
+                for lower, upper in zip(grid, grid[1:])
+                for point in solar_altitude_nodes(value, lower, upper)
+            }
+        )
+        previous: tuple[float, float] | None = None
+        for point in nodes:
+            sample = (point, value(point))
+            if sample[1] != 0:
+                if previous is not None:
+                    refine_crossing(previous, sample)
+                previous = sample
+                continue
+            before, after = zero_neighbors(point)
+            if previous is not None:
+                refine_crossing(previous, before)
+            if sign_change(before[1], after[1]):
+                record_crossing(point, point, after[1] > 0)
+            # A neighbor beyond the search window may classify the zero but
+            # cannot start another event bracket in this window.
+            previous = after if after[0] <= end_ut1 else None
         return crossings
 
 

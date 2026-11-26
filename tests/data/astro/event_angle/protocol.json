@@ -1,0 +1,41 @@
+{
+  "created_at": "2026-10-25T15:16:15.694677+00:00",
+  "scope": "Preserve numerically unresolved native ASC as backend convention, not a known horary ruler/Fortune or election score. Actual MC/orbital facts and ASC-independent house methods remain available. Ill-conditioned but resolved cases retain their numeric results with the existing diagnostic.",
+  "sources": [
+    "https://aa.usno.navy.mil/faq/alt_az",
+    "https://www.astro.com/swisseph/swisseph.htm#_Toc6.2",
+    "https://wellcomecollection.org/works/s7z7c46y"
+  ],
+  "epochs": [
+    "2000-01-01T12:00:00+00:00",
+    "2026-06-01T12:00:00+00:00"
+  ],
+  "latitude_offsets_degrees": [
+    -1e-05,
+    -1e-09,
+    -1e-13,
+    0,
+    1e-13,
+    1e-09,
+    1e-05
+  ],
+  "hemispheres": [
+    "north",
+    "south"
+  ],
+  "condition_threshold": "sqrt(binary64 epsilon), existing policy",
+  "resolution_guard": "64 binary64 epsilon, existing policy, not fitted to source totals",
+  "independent_house_methods": [
+    "D",
+    "N",
+    "X",
+    "M",
+    "H"
+  ],
+  "reference": "Standalone UTC->TT/UT1 and Swiss true obliquity/ARMC plus independent USNO plane coefficients. This checks geometry and declared floating resolution, not new independent astronomical observations.",
+  "numerical_points_unchanged": true,
+  "original_four_source_gates_retained": true,
+  "all_four_full_marks_established": false,
+  "real_world_outcomes_added": 0,
+  "model_invocations": 0
+}

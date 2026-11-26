@@ -1,20 +1,14 @@
-"""
-Shared primitives for the FateBridge metaphysics package.
-
-Sexagenary-cycle / five-element / xun-kongwang tables and the leaf helpers that
-every technique module (zi wei, liu ren, qi men, tai yi, jin kou) builds on,
-plus the ``MetaphysicsSeed`` input record. Kept free of any single technique's
-logic so domain modules can import from here without cycling back through the
-package facade (``metaphysics/__init__.py``).
-"""
+"""Shared sexagenary, element and clock definitions for metaphysics calculations."""
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any
 
-from ...utils.data import (
+from fatebridge.utils.civil_time import ClockTimespec, NominalClockLabel
+from fatebridge.utils.data import (
     BRANCH_COMBINATIONS,
     BRANCH_CONFLICTS,
     BRANCH_ELEMENTS,
@@ -54,7 +48,7 @@ SIX_CLASH_BRANCHES = BRANCH_CONFLICTS
 
 SIX_HARM_BRANCHES = BRANCH_HARMS
 
-# 大六壬 月将（神后…）与昼夜贵人/贵人顺序——金口诀与太乙也复用，故归 common。
+# note (monthly generals): Liu Ren, Jin Kou and Taiyi share these names and noble profiles.
 YUE_JIANG_NAMES = {
     "子": "神后",
     "丑": "大吉",
@@ -117,21 +111,44 @@ GUI_REN_SEQUENCE = [
 
 @dataclass(frozen=True)
 class MetaphysicsSeed:
+    """Resolved aware civil input and one separate, zone-free selected label.
+
+    Offset visibility preserves the original request's presentation, not a
+    second clock. Source and seasonal rules always consume input_datetime.
+    """
+
     input_datetime: datetime
-    corrected_datetime: datetime
+    clock: NominalClockLabel
     timezone: str
-    longitude: Optional[float]
+    longitude: float | None
     applied_true_solar: bool
     total_correction_minutes: float
-    pillars: Dict[str, Tuple[str, str]]
-    calendar_context: Dict[str, Any]
-    birth_time_normalization: Optional[Dict[str, Any]] = None
-    solar_time_adjustment: Optional[Dict[str, Any]] = None
+    pillars: dict[str, tuple[str, str]]
+    calendar_context: dict[str, Any]
+    birth_time_normalization: dict[str, Any] | None = None
+    solar_time_adjustment: dict[str, Any] | None = None
+    input_offset_visible: bool = False
+    current_term_source_grid_year: int | None = None
+
+    def input_isoformat(
+        self, *, sep: str = "T", timespec: ClockTimespec = "auto"
+    ) -> str:
+        display = self.input_datetime
+        if not self.input_offset_visible:
+            display = display.replace(tzinfo=None)
+        return display.isoformat(sep=sep, timespec=timespec)
+
+    def clock_isoformat(
+        self, *, sep: str = "T", timespec: ClockTimespec = "auto"
+    ) -> str:
+        if not self.applied_true_solar:
+            return self.input_isoformat(sep=sep, timespec=timespec)
+        return self.clock.isoformat(sep=sep, timespec=timespec)
 
 
 def require_lunar_month_day(
-    seed: "MetaphysicsSeed", technique: str
-) -> Tuple[Dict[str, Any], int, int]:
+    seed: MetaphysicsSeed, technique: str
+) -> tuple[dict[str, Any], int, int]:
     """Read the computed lunar context and month/day for Zi Wei consumers.
 
     The calendar provider owns conversion and coverage. Missing context
@@ -147,7 +164,7 @@ def require_lunar_month_day(
 
 def rotate_sequence(
     values: Iterable[str], start_value: str, reverse: bool = False
-) -> List[str]:
+) -> list[str]:
     ordered = list(values)
     if not ordered:
         return []
@@ -167,7 +184,7 @@ def branch_element_text(branch: str) -> str:
     return BRANCH_ELEMENTS[branch][0].value
 
 
-def ganzhi_text(pillar: Tuple[str, str]) -> str:
+def ganzhi_text(pillar: tuple[str, str]) -> str:
     return f"{pillar[0]}{pillar[1]}"
 
 
@@ -191,27 +208,29 @@ def kongwang_for_ganzhi(text: str) -> str:
 def liuqin_against_day(day_element: str, target_element: str) -> str:
     if day_element == target_element:
         return "兄弟"
-    if ELEMENT_GENERATES[day_element] == target_element:
+    elif ELEMENT_GENERATES[day_element] == target_element:
         return "子孙"
-    if ELEMENT_GENERATES[target_element] == day_element:
+    elif ELEMENT_GENERATES[target_element] == day_element:
         return "父母"
-    if ELEMENT_CONTROLS[day_element] == target_element:
+    elif ELEMENT_CONTROLS[day_element] == target_element:
         return "妻财"
-    if ELEMENT_CONTROLS[target_element] == day_element:
+    elif ELEMENT_CONTROLS[target_element] == day_element:
         return "官鬼"
-    return "比和"
+    else:
+        return "比和"
 
 
 def status_against_anchor(anchor: str, target: str) -> str:
     if anchor == target:
         return "旺"
-    if ELEMENT_GENERATES[anchor] == target:
+    elif ELEMENT_GENERATES[anchor] == target:
         return "相"
-    if ELEMENT_GENERATES[target] == anchor:
+    elif ELEMENT_GENERATES[target] == anchor:
         return "休"
-    if ELEMENT_CONTROLS[anchor] == target:
+    elif ELEMENT_CONTROLS[anchor] == target:
         return "死"
-    return "囚"
+    else:
+        return "囚"
 
 
 def chinese_numeral(value: int) -> str:

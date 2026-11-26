@@ -4,16 +4,19 @@ import asyncio
 import json
 import math
 from fractions import Fraction
+from pathlib import Path
 
 import pytest
 
 from fatebridge.cli import run
 from fatebridge.core.fengshui.xuankong import _selectors
 from fatebridge.services.fengshui import calculate_xuankong_natal
-from tests.fengshui.test_fengshui_depth_audit import natal as natal_request
-from tests.support.fengshui_transports import mcp_call
+from tests.support.fengshui_transports import SPECS, mcp_call
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import rest_client
+from tests.unit_test.fixtures.fengshui_reading import (
+    natal_request,
+)
 
 
 def natal(angle, radius=0):
@@ -22,7 +25,7 @@ def natal(angle, radius=0):
     return data
 
 
-def test_rounded_half_ulp_endpoints_do_not_manufacture_candidates():
+def test_rounded_half_ulp_endpoints_do_not_manufacture_candidates() -> None:
     # Numerical semantics only: this does not assert physical sub-ULP accuracy.
     # These cover a palace line, a mountain line and a lower/replacement line.
     for boundary in (22.5, 7.5, 355.5):
@@ -35,7 +38,7 @@ def test_rounded_half_ulp_endpoints_do_not_manufacture_candidates():
             }
 
 
-def test_actual_endpoint_contact_still_keeps_both_one_sided_limits():
+def test_actual_endpoint_contact_still_keeps_both_one_sided_limits() -> None:
     for boundary in (22.5, 7.5, 355.5):
         before = math.nextafter(boundary, -math.inf)
         after = math.nextafter(boundary, math.inf)
@@ -45,7 +48,7 @@ def test_actual_endpoint_contact_still_keeps_both_one_sided_limits():
         assert {s[:2] for s in _selectors(after, after - boundary)} == both
 
 
-def test_multiple_angle_reasons_are_retained_even_when_chart_is_unique():
+def test_multiple_angle_reasons_are_retained_even_when_chart_is_unique() -> None:
     data = natal(angle=4, radius=1)
     layer = calculate_xuankong_natal(**data)["layers"]["xuankong_natal"]
     # [3, 5] spans central 子 and its same-polarity wing; one chart.
@@ -80,7 +83,7 @@ def test_multiple_angle_reasons_are_retained_even_when_chart_is_unique():
     assert single["chart"]["bearing_support"] == support
 
 
-def test_north_wrap_has_all_four_candidates_and_exact_endpoint_only_support():
+def test_north_wrap_has_all_four_candidates_and_exact_endpoint_only_support() -> None:
     result = calculate_xuankong_natal(**natal(angle=0, radius=7.5))
     layer = result["layers"]["xuankong_natal"]
     candidates = {
@@ -105,7 +108,9 @@ def test_north_wrap_has_all_four_candidates_and_exact_endpoint_only_support():
 
 
 @pytest.mark.parametrize("angle,radius", [(0, 7.5), (6, 2), (22.5, 1), (355.5, 0)])
-def test_all_reported_support_is_within_the_original_exact_measurement(angle, radius):
+def test_all_reported_support_is_within_the_original_exact_measurement(
+    angle: float | int, radius: float | int
+) -> None:
     layer = calculate_xuankong_natal(**natal(angle=angle, radius=radius))["layers"][
         "xuankong_natal"
     ]
@@ -126,17 +131,22 @@ def test_all_reported_support_is_within_the_original_exact_measurement(angle, ra
 
 @pytest.mark.parametrize("tool", ["xuankong_natal", "assess"])
 def test_exact_boundaries_and_candidate_support_match_rest_mcp_cli(
-    monkeypatch, tmp_path, capsys, tool
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    tool: str,
+) -> None:
     angle = math.nextafter(22.5, -math.inf)
     data = natal(angle=angle, radius=math.ulp(22.5) / 2)
     if tool == "assess":
         data = {"methods": ["xuankong_natal"], "xuankong": data}
-    http = rest_client(monkeypatch).post("/api/fengshui/" + tool, json=data)
+    else:
+        pass
+    http = rest_client(monkeypatch).post(SPECS[tool].rest_path, json=data)
     protocol = asyncio.run(mcp_call(tool, data))
     path = tmp_path / "angle.json"
     path.write_text(json.dumps(data))
-    assert run(["fengshui_" + tool, "--request-file", str(path)]) == 0
+    assert run([SPECS[tool].tool_name, "--request-file", str(path)]) == 0
     cli = json.loads(capsys.readouterr().out)
     assert http.status_code == 200 and not protocol.is_error
     assert (
@@ -149,7 +159,7 @@ def test_exact_boundaries_and_candidate_support_match_rest_mcp_cli(
     assert layer["chart"]["facing"]["name"] == "癸"
 
 
-def test_strict_projection_keeps_new_support_on_real_mcp():
+def test_strict_projection_keeps_new_support_on_real_mcp() -> None:
     result = asyncio.run(
         mcp_call(
             "xuankong_natal",

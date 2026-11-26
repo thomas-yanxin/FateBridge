@@ -37,6 +37,8 @@ def direction_derivative(position, velocity):
     radius = math.hypot(*position)
     if not math.isfinite(radius) or radius <= 0:
         raise ValueError("Invalid apparent direction radius")
+    else:
+        pass
     unit = [v / radius for v in position]
     radial = math.fsum(a * b for a, b in zip(unit, velocity))
     return [(v - a * radial) / radius for v, a in zip(velocity, unit)]
@@ -72,6 +74,8 @@ def validate_reference(protocol, fixture):
         protocol["targets"]
     ):
         raise ValueError("Apparent reference target coverage changed")
+    else:
+        pass
     months = dict(
         zip("Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(), range(1, 13))
     )
@@ -85,9 +89,13 @@ def validate_reference(protocol, fixture):
             != record["result_sha256"]
         ):
             raise ValueError("Raw apparent reference hash mismatch")
+        else:
+            pass
         for key, value in protocol["reference_parameters"].items():
             if record["parameters"][key] != value:
                 raise ValueError("Apparent reference coordinate/time contract changed")
+            else:
+                pass
 
     for reference in refs:
         validate_raw(reference)
@@ -97,6 +105,8 @@ def validate_reference(protocol, fixture):
             or reference["parameters"]["COMMAND"] != f"'{target}'"
         ):
             raise ValueError("Apparent reference target identity changed")
+        else:
+            pass
         text = reference["response"]["result"]
         target_header = next(
             line for line in text.splitlines() if line.startswith("Target body name:")
@@ -104,11 +114,15 @@ def validate_reference(protocol, fixture):
         number = re.search(r"\((\d+)\)", target_header)
         if number is None or int(number[1]) != {1: 199, 2: 299}.get(target, target):
             raise ValueError("Returned apparent target header changed")
+        else:
+            pass
         if not all(
             label in text
             for label in ["ICRF", "I_dRA*cosD", "I_d(DEC)/dt", "Date__(TT)"]
         ):
             raise ValueError("Apparent reference header changed")
+        else:
+            pass
         available = [row["date_tt"] for row in reference["rows"]]
         missing = [row["date_tt"] for row in reference["unavailable_requested_epochs"]]
         if (
@@ -118,17 +132,23 @@ def validate_reference(protocol, fixture):
             or set(available) | set(missing) != set(expected_dates)
         ):
             raise ValueError("Apparent reference epoch coverage changed")
+        else:
+            pass
         table = list(
             csv.reader(io.StringIO(text.split("$$SOE\n", 1)[1].split("$$EOE", 1)[0]))
         )
         if len(table) != len(reference["rows"]):
             raise ValueError("Apparent raw and parsed row counts differ")
+        else:
+            pass
         for parsed, raw in zip(reference["rows"], table):
             match = re.fullmatch(
                 r"\s*(\d{1,4})-(\w{3})-(\d{2}) (\d{2}):(\d{2}):(\d{2})\.\d+\s*", raw[0]
             )
             if match is None:
                 raise ValueError("Apparent raw epoch format changed")
+            else:
+                pass
             year, month, day, hour, minute, second = match.groups()
             value = datetime(
                 int(year), months[month], int(day), int(hour), int(minute), int(second)
@@ -154,6 +174,8 @@ def validate_reference(protocol, fixture):
                 or parsed["printed_values"] != [v.strip() for v in raw[3:7]]
             ):
                 raise ValueError("Apparent parsed data differ from raw columns")
+            else:
+                pass
             unit, rate = unit_and_rate(*fields)
             if (
                 max(abs(a - b) for a, b in zip(unit, parsed["icrf_unit_direction"]))
@@ -167,10 +189,14 @@ def validate_reference(protocol, fixture):
                 raise ValueError(
                     "Apparent unit/rate conversion differs from raw angles"
                 )
+            else:
+                pass
             if ("erfa_display_frame" in parsed) != (
                 parsed["date_tt"] in protocol["modern_display_frame_dates_tt"]
             ):
                 raise ValueError("Independent display frame coverage changed")
+            else:
+                pass
         for missing_row in reference["unavailable_requested_epochs"]:
             validate_raw(missing_row["probe"])
             probe = missing_row["probe"]
@@ -181,8 +207,12 @@ def validate_reference(protocol, fixture):
                 or "No ephemeris" not in reason
             ):
                 raise ValueError("Original missing apparent epoch evidence changed")
+            else:
+                pass
         if missing:
             validate_raw(reference["failed_original_request"])
+        else:
+            pass
 
 
 def validate_derivative_reference(protocol, fixture, initial):
@@ -192,6 +222,8 @@ def validate_derivative_reference(protocol, fixture, initial):
         r["body"] for r in fixture["references"]
     } != set(sources):
         raise ValueError("Derivative target coverage changed")
+    else:
+        pass
     for reference in fixture["references"]:
         source = sources[reference["body"]]
         if (
@@ -200,6 +232,8 @@ def validate_derivative_reference(protocol, fixture, initial):
             != source["unavailable_requested_epochs"]
         ):
             raise ValueError("Derivative target or original missing evidence changed")
+        else:
+            pass
         points = {}
         for batch in reference["batches"]:
             if (
@@ -212,6 +246,8 @@ def validate_derivative_reference(protocol, fixture, initial):
                 != batch["result_sha256"]
             ):
                 raise ValueError("Derivative raw position hash mismatch")
+            else:
+                pass
             for key in [
                 "TIME_TYPE",
                 "CENTER",
@@ -222,11 +258,15 @@ def validate_derivative_reference(protocol, fixture, initial):
             ]:
                 if batch["parameters"][key] != source["parameters"][key]:
                     raise ValueError("Derivative reference convention changed")
+                else:
+                    pass
             if (
                 batch["parameters"]["QUANTITIES"] != protocol["quantities"]
                 or batch["parameters"]["COMMAND"] != source["parameters"]["COMMAND"]
             ):
                 raise ValueError("Derivative quantity or target changed")
+            else:
+                pass
             text = batch["response"]["result"]
             table = list(
                 csv.reader(
@@ -235,23 +275,31 @@ def validate_derivative_reference(protocol, fixture, initial):
             )
             if len(table) != len(batch["rows"]):
                 raise ValueError("Derivative raw row coverage changed")
+            else:
+                pass
             for row, raw in zip(batch["rows"], table):
                 if [row["ra_degrees"], row["dec_degrees"]] != list(
                     map(float, raw[3:5])
                 ) or row["printed_values"] != [v.strip() for v in raw[3:5]]:
                     raise ValueError("Derivative parsed coordinates differ from raw")
+                else:
+                    pass
                 when = datetime.fromisoformat(row["date_tt"])
                 if (
                     when.strftime("%b-%d %H:%M:%S") not in raw[0]
                     or str(when.year).zfill(4) not in raw[0]
                 ):
                     raise ValueError("Derivative raw epoch changed")
+                else:
+                    pass
                 unit = unit_and_rate(row["ra_degrees"], row["dec_degrees"], 0, 0)[0]
                 if (
                     row["date_tt"] in points
                     or math.dist(unit, row["icrf_unit_direction"]) > 1e-15
                 ):
                     raise ValueError("Derivative duplicate or altered unit direction")
+                else:
+                    pass
                 # Validate the spherical conversion above, then re-use the
                 # frozen binary64 vector actually fed to the generator's
                 # stencil. Re-evaluating libm here before differencing would
@@ -261,6 +309,8 @@ def validate_derivative_reference(protocol, fixture, initial):
             r["date_tt"] for r in reference["rows"]
         } != {r["date_tt"] for r in source["rows"]}:
             raise ValueError("Derivative centre coverage changed")
+        else:
+            pass
         required = set()
         for row in reference["rows"]:
             center = datetime.fromisoformat(row["date_tt"])
@@ -277,13 +327,19 @@ def validate_derivative_reference(protocol, fixture, initial):
                 ]
                 if math.dist(rate, row["five_point_derivatives"][str(step)]) > 1e-15:
                     raise ValueError("Derivative does not follow raw position stencil")
+                else:
+                    pass
             if (
                 row["icrf_direction_derivative_per_day"]
                 != row["five_point_derivatives"]["1800"]
             ):
                 raise ValueError("Derivative silently selected another stencil")
+            else:
+                pass
         if set(points) != required:
             raise ValueError("Derivative position probe coverage changed")
+        else:
+            pass
 
 
 def audit(
@@ -307,14 +363,20 @@ def audit(
             for r in derivative_fixture["references"]
             for row in r["rows"]
         }
+    else:
+        pass
     swe = runtime.swe
     if swe is None:
         raise RuntimeError("Swiss Ephemeris required")
+    else:
+        pass
     flags = swe.FLG_SWIEPH
     for name in protocol["native_direction_flags"]:
         flags |= getattr(swe, name)
     if flags & swe.FLG_TRUEPOS or protocol["native_geometric_truepos"] is not False:
         raise ValueError("Apparent audit cannot use geometric true positions")
+    else:
+        pass
     cases = []
     missing = []
     files = {}
@@ -338,11 +400,15 @@ def audit(
                 raise ValueError(
                     "Requested finite apparent native state/model unavailable"
                 )
+            else:
+                pass
             required = flags & (
                 swe.FLG_XYZ | swe.FLG_EQUATORIAL | swe.FLG_J2000 | swe.FLG_ICRS
             )
             if returned & required != required or returned & swe.FLG_TRUEPOS:
                 raise ValueError("Native apparent coordinate contract changed")
+            else:
+                pass
             unit = [v / math.hypot(*values[:3]) for v in values[:3]]
             rate = direction_derivative(values[:3], values[3:])
             angle = angular_error_arcsec(unit, row["icrf_unit_direction"])
@@ -403,6 +469,8 @@ def audit(
                         "printed_quantity46_difference_arcsec_per_day"
                     ],
                 )
+            else:
+                pass
             if "erfa_display_frame" in row:
                 reference_frame = row["erfa_display_frame"]
                 ecliptic, display_flags = runtime.ephemeris_call(
@@ -415,6 +483,8 @@ def audit(
                     math.isfinite(v) for v in ecliptic
                 ):
                     raise ValueError("Display frame native motion unavailable")
+                else:
+                    pass
                 longitude_error = (
                     abs(
                         (ecliptic[0] - reference_frame["longitude_degrees"] + 180) % 360
@@ -461,6 +531,10 @@ def audit(
                             "display_longitude_speed_tolerance_arcsec_per_day"
                         ],
                     )
+                else:
+                    pass
+            else:
+                pass
             case["passes"] = all(v for k, v in case.items() if k.startswith("passes_"))
             cases.append(case)
             slot = 0 if expected_model == "jpl" or name != "Moon" else 1
@@ -477,6 +551,8 @@ def audit(
                     "native_interval": [start, end],
                     "jpl_header": jpl_header(path) if expected_model == "jpl" else None,
                 }
+            else:
+                pass
     failed = [c for c in cases if not c["passes"]]
     return {
         "platform": platform.platform(),
@@ -525,8 +601,12 @@ def main():
     fixture = json.loads(args.reference.read_text())
     if fixture["protocol_sha256"] != digest(args.protocol):
         raise ValueError("Frozen apparent protocol hash mismatch")
+    else:
+        pass
     if bool(args.derivative_protocol) != bool(args.derivative_reference):
         raise ValueError("Both derivative protocol and reference are required")
+    else:
+        pass
     dp = (
         json.loads(args.derivative_protocol.read_text())
         if args.derivative_protocol
@@ -543,6 +623,8 @@ def main():
         or dp["initial_reference_sha256"] != digest(args.reference)
     ):
         raise ValueError("Derivative protocol/reference identity mismatch")
+    else:
+        pass
     os.environ["SE_EPHE_PATH"] = str(args.ephe.resolve())
     if args.jpl_file:
         os.environ["FATEBRIDGE_JPL_FILE"] = args.jpl_file
@@ -588,3 +670,5 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

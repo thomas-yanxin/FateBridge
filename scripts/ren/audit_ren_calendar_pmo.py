@@ -27,6 +27,9 @@ IMPLEMENTATION = (
     "src/fatebridge/services/metaphysics.py",
     "src/fatebridge/core/metaphysics/ren_calendar.py",
     "src/fatebridge/core/metaphysics/liureng.py",
+    "src/fatebridge/core/metaphysics/liureng_course_layout.py",
+    "src/fatebridge/core/metaphysics/liureng_selection.py",
+    "src/fatebridge/core/metaphysics/liureng_year_fate.py",
     "src/fatebridge/core/metaphysics/jinkou.py",
     "scripts/ren/audit_ren_calendar_pmo.py",
 )
@@ -47,12 +50,16 @@ def extracted_tables(text: str) -> list[dict[str, Any]]:
         heading = re.search(r"公元\s*(\d{4})\s*年", page)
         if heading is None:
             continue
+        else:
+            pass
         year = int(heading[1])
         pages_per_year[year] = pages_per_year.get(year, 0) + 1
         section = re.split(r"节\s*气", page)[-1]
         matches = list(pattern.finditer(section))
         if len(matches) != 8:
             raise ValueError(f"PMO page {index} must retain eight terms")
+        else:
+            pass
         for match in matches:
             month, day, hour, minute = map(int, match.group(2, 3, 4, 5))
             moment = datetime(year, month, day, hour, minute).isoformat() + "+08:00"
@@ -67,10 +74,14 @@ def extracted_tables(text: str) -> list[dict[str, Any]]:
             )
     if pages_per_year != {year: 3 for year in range(1900, 2026)}:
         raise ValueError("PMO must retain all three pages of all 126 years")
+    else:
+        pass
     rows.sort(key=lambda row: (row["year"], row["published_moment"]))
     for year in range(1900, 2026):
         if [row["term"] for row in rows if row["year"] == year] != TERMS:
             raise ValueError(f"PMO year {year} must retain all 24 ordered terms")
+        else:
+            pass
     return rows
 
 
@@ -81,12 +92,18 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
         path.name for path in corpus.iterdir()
     } != files | {"freeze.json"}:
         raise ValueError("Frozen PMO inventory changed")
+    else:
+        pass
     for name, checksum in manifest["files"].items():
         if sha(corpus / name) != checksum:
             raise ValueError(f"Frozen PMO source changed: {name}")
+        else:
+            pass
     ref: dict[str, Any] = json.loads((corpus / "reference.json").read_text())
     if extracted_tables((corpus / "source.txt").read_text()) != ref["cases"]:
         raise ValueError("PMO annotation differs from the complete extracted tables")
+    else:
+        pass
     return ref
 
 
@@ -106,7 +123,7 @@ def audit() -> dict[str, Any]:
     from fatebridge.core.metaphysics.jinkou import build_jinkou_board
     from fatebridge.core.metaphysics.liureng import build_liureng_board
     from fatebridge.core.metaphysics.ren_calendar import require_ren_calendar
-    from fatebridge.services.metaphysics import _build_analysis_seed
+    from fatebridge.core.metaphysics.seed import build_analysis_seed
 
     comparisons = []
     errors = []
@@ -144,6 +161,8 @@ def audit() -> dict[str, Any]:
             )
             if case["term"] not in generals:
                 continue
+            else:
+                pass
             before = generals[middle_terms[(middle_terms.index(case["term"]) - 1) % 12]]
             after = generals[case["term"]]
             for zone in ("+08:00", "UTC", "+09:00"):
@@ -152,7 +171,7 @@ def audit() -> dict[str, Any]:
                     civil = localize_datetime(
                         published + timedelta(seconds=seconds), zone
                     )
-                    seed = _build_analysis_seed(
+                    seed = build_analysis_seed(
                         analysis_year=civil.year,
                         analysis_month=civil.month,
                         analysis_day=civil.day,
@@ -184,6 +203,8 @@ def audit() -> dict[str, Any]:
                             actual=observed,
                         )
                     )
+                else:
+                    pass
         except Exception as exc:
             errors.append(
                 dict(
@@ -254,3 +275,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

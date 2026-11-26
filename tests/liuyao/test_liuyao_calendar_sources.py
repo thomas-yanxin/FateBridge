@@ -16,12 +16,11 @@ from fatebridge.core.ephemeris_runtime import (
     configured_ephemeris_path,
 )
 from fatebridge.core.solar_term_runtime import solar_term_cache_context
-from fatebridge.utils.civil_time import UTCCalendar, utc_calendar
+from fatebridge.utils.civil_time import CivilPoint, UTCCalendar, utc_calendar
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.liuyao.test_liuyao_clash_transports import all_surfaces
-from tests.support.transports import SPECS, native
+from tests.support.transports import SPECS
 from tests.support.transports import rest as rest
-from tests.support.transports import surface_calls
+from tests.unit_test.fixtures.liuyao import all_surfaces
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 
@@ -49,21 +48,27 @@ def symbolic(monkeypatch, observation):
     def solve(year, longitude, anchor, provenance=None):
         seconds = observation()
         calls.append(seconds)
+        civil = UTCCalendar(
+            anchor.ordinal, anchor.microseconds_of_day + seconds * 1_000_000
+        )
         if provenance is not None:
             provenance.update(
                 ephemeris_model="jpl" if os.getenv("FATEBRIDGE_JPL_FILE") else "swieph",
                 ephemeris_retflags=(1,) if os.getenv("FATEBRIDGE_JPL_FILE") else (2,),
                 ephemeris_library_version="synthetic-cache-test",
+                resolved_civil_point=CivilPoint(civil.julian_day_exact()),
             )
-        return UTCCalendar(
-            anchor.ordinal, anchor.microseconds_of_day + seconds * 1_000_000
-        )
+        else:
+            pass
+        return civil
 
     monkeypatch.setattr(almanac, "_solar_term_utc_via_swe", solve)
     return calls
 
 
-def test_real_warm_cache_cannot_bypass_missing_strict_kernel(monkeypatch):
+def test_real_warm_cache_cannot_bypass_missing_strict_kernel(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     moment = datetime(2026, 2, 4, 5)
     before = almanac.get_solar_terms_for_year(2026)
     assert all(t.resolution_provider == "swisseph" for t in before)
@@ -75,7 +80,9 @@ def test_real_warm_cache_cannot_bypass_missing_strict_kernel(monkeypatch):
         BaZiCalendar.get_four_pillars(moment)
 
 
-def test_invalid_selector_is_checked_before_a_cache_hit(monkeypatch):
+def test_invalid_selector_is_checked_before_a_cache_hit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     symbolic(monkeypatch, lambda: 1)
     almanac.get_solar_terms_for_year(2026)
     monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "../invalid.eph")
@@ -83,7 +90,9 @@ def test_invalid_selector_is_checked_before_a_cache_hit(monkeypatch):
         almanac.get_solar_terms_for_year(2026)
 
 
-def test_explicit_jpl_requires_native_library_even_for_cache_context(monkeypatch):
+def test_explicit_jpl_requires_native_library_even_for_cache_context(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "selected.eph")
     monkeypatch.setattr(almanac, "swe", None)
     with pytest.raises(ImportError, match="explicitly selected JPL"):
@@ -91,8 +100,8 @@ def test_explicit_jpl_requires_native_library_even_for_cache_context(monkeypatch
 
 
 def test_switching_selectors_recalculates_and_restoring_reuses_same_context(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     calls = symbolic(
         monkeypatch,
         lambda: {None: 0, "synthetic-a.eph": 1, "synthetic-b.eph": 9}[
@@ -115,8 +124,8 @@ def test_switching_selectors_recalculates_and_restoring_reuses_same_context(
 
 
 def test_selected_kernel_install_replace_remove_invalidates_cache(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     configure_ephemeris_path(str(tmp_path))
     monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "synthetic-marker.eph")
@@ -136,7 +145,9 @@ def test_selected_kernel_install_replace_remove_invalidates_cache(
     assert removed[0].moment == before[0].moment
 
 
-def test_observed_selector_change_discards_partial_year(monkeypatch):
+def test_observed_selector_change_discards_partial_year(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     first = True
 
     def observe():
@@ -145,6 +156,8 @@ def test_observed_selector_change_discards_partial_year(monkeypatch):
         if first:
             first = False
             monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "synthetic-a.eph")
+        else:
+            pass
         return 1 if selected else 0
 
     calls = symbolic(monkeypatch, observe)
@@ -159,7 +172,9 @@ def test_observed_selector_change_discards_partial_year(monkeypatch):
     )
 
 
-def test_selector_aba_between_terms_is_observed_and_bounded(monkeypatch):
+def test_selector_aba_between_terms_is_observed_and_bounded(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     def observe():
         selected = os.getenv("FATEBRIDGE_JPL_FILE")
         if selected:
@@ -189,7 +204,9 @@ def add_fictional_future_leap(table):
     table["bulletin"] = "FICTIONAL v19 cache regression profile"
 
 
-def test_loaded_clock_profile_content_is_part_of_the_key(monkeypatch):
+def test_loaded_clock_profile_content_is_part_of_the_key(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     table = hypothetical_table(monkeypatch)
     original = copy.deepcopy(table)
     before = solar_term_cache_context(almanac.swe)
@@ -201,8 +218,8 @@ def test_loaded_clock_profile_content_is_part_of_the_key(monkeypatch):
 
 
 def test_real_future_roots_keep_tt_and_relabel_utc_when_loaded_profile_changes(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     table = hypothetical_table(monkeypatch)
     before = almanac.get_solar_terms_for_year(2028, "UTC")
     old_tt = [time_scales.ephemeris_time(t.moment).jd_tt for t in before]
@@ -213,7 +230,9 @@ def test_real_future_roots_keep_tt_and_relabel_utc_when_loaded_profile_changes(
         assert abs((time_scales.ephemeris_time(new.moment).jd_tt - tt) * 86400) < 0.0002
 
 
-def test_derived_year_and_month_cache_follow_loaded_clock_profile(monkeypatch):
+def test_derived_year_and_month_cache_follow_loaded_clock_profile(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     table = hypothetical_table(monkeypatch)
     lichun = next(
         t for t in almanac.get_solar_terms_for_year(2028, "UTC") if t.name == "立春"
@@ -229,8 +248,8 @@ def test_derived_year_and_month_cache_follow_loaded_clock_profile(monkeypatch):
 
 @pytest.mark.parametrize("name,target,anchor", [("小寒", 285, 6), ("大寒", 300, 20)])
 def test_real_limited_de441_kernel_against_reused_de440_tt_reference(
-    monkeypatch, name, target, anchor
-):
+    monkeypatch: pytest.MonkeyPatch, name: str, target: int, anchor: int
+) -> None:
     kernel_dir = Path(__file__).parents[1] / "data/astrodice/tables"
     monkeypatch.setenv("SE_EPHE_PATH", str(kernel_dir))
     configure_ephemeris_path(str(kernel_dir))
@@ -253,17 +272,15 @@ def test_real_limited_de441_kernel_against_reused_de440_tt_reference(
 
 
 def test_synthetic_source_switch_changes_public_year_month(
-    rest, tmp_path, capsys, monkeypatch
-):
+    rest,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     def solve(year, longitude, anchor, provenance=None):
-        if provenance is not None:
-            provenance.update(
-                ephemeris_model="jpl" if os.getenv("FATEBRIDGE_JPL_FILE") else "swieph",
-                ephemeris_retflags=(1,) if os.getenv("FATEBRIDGE_JPL_FILE") else (2,),
-                ephemeris_library_version="synthetic-cache-test",
-            )
+        civil = anchor
         if longitude == 315:
-            return utc_calendar(
+            civil = utc_calendar(
                 datetime(
                     year,
                     2,
@@ -271,7 +288,18 @@ def test_synthetic_source_switch_changes_public_year_month(
                     tzinfo=timezone.utc,
                 )
             )
-        return anchor
+        else:
+            pass
+        if provenance is not None:
+            provenance.update(
+                ephemeris_model="jpl" if os.getenv("FATEBRIDGE_JPL_FILE") else "swieph",
+                ephemeris_retflags=(1,) if os.getenv("FATEBRIDGE_JPL_FILE") else (2,),
+                ephemeris_library_version="synthetic-cache-test",
+                resolved_civil_point=CivilPoint(civil.julian_day_exact()),
+            )
+        else:
+            pass
+        return civil
 
     monkeypatch.setattr(almanac, "_solar_term_utc_via_swe", solve)
     payload = dict(date="2026-02-04", time="12:00:00", zone="UTC", gua_code="000000")
@@ -288,14 +316,16 @@ def test_synthetic_source_switch_changes_public_year_month(
 
 @pytest.mark.parametrize("problem", ["missing", "invalid", "native_unavailable"])
 def test_strict_source_failure_after_warm_year_survives_public_surfaces(
-    problem, monkeypatch, surface_calls
-):
+    problem: str, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     almanac.get_solar_terms_for_year(2026)
     monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "missing-liuyao-v19.eph")
     if problem == "invalid":
         monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "../invalid.eph")
     elif problem == "native_unavailable":
         monkeypatch.setattr(almanac, "swe", None)
+    else:
+        pass
     spec = SPECS["sixyao"]
     payload = dict(date="2026-02-04", time="05:00:00", gua_code="000000")
     response, protocol, code, cli = surface_calls(spec, payload)
@@ -305,9 +335,11 @@ def test_strict_source_failure_after_warm_year_survives_public_surfaces(
         if problem == "native_unavailable"
         else "ephemeris_source_inconsistent"
     )
-    outputs = [response.json(), cli, json.loads(protocol.content[0].text)]
+    outputs = [response.json(), cli, protocol.structured_content]
     for output in outputs:
         assert output["error_code"] == error and output["retryable"] is False
         assert "liuyao_evidence" not in output
         if problem != "native_unavailable":
             assert output["issues"][0]["path"] == "runtime.ephemeris_data"
+        else:
+            pass

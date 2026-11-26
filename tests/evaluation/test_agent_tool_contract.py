@@ -3,12 +3,12 @@
 from pathlib import Path
 
 from scripts.evaluate_agent import command_for, grade_case, model_prompt
-from tests.evaluation.test_agent_evaluation import event
+from tests.unit_test.fixtures.evaluation_events import event
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_prompt_exposes_allowed_tools_without_answer_or_hidden_rubric():
+def test_prompt_exposes_allowed_tools_without_answer_or_hidden_rubric() -> None:
     case = {
         "prompt": "解释这次结果",
         "allowed_tools": ["bazi_birth", "knowledge_read"],
@@ -16,13 +16,14 @@ def test_prompt_exposes_allowed_tools_without_answer_or_hidden_rubric():
         "argument_paths": {"bazi_birth": {"HIDDEN_EXPECTED_VALUE": 1}},
     }
     prompt = model_prompt(case)
+    assert "run_calculation" in prompt
     assert "bazi_birth、knowledge_read" in prompt
     assert prompt.endswith(case["prompt"])
     assert "HIDDEN_" not in prompt
     assert model_prompt({"prompt": "unchanged"}) == "unchanged"
 
 
-def test_original_failed_comprehensive_call_still_fails_the_same_tool_gates():
+def test_original_failed_comprehensive_call_still_fails_the_same_tool_gates() -> None:
     case = {
         "prompt": "解释这次八字结果",
         "allowed_tools": ["bazi_birth"],
@@ -44,7 +45,7 @@ def test_original_failed_comprehensive_call_still_fails_the_same_tool_gates():
     } <= set(failed["failures"])
 
 
-def test_calculation_server_is_required_before_the_models_initial_catalog():
+def test_calculation_server_is_required_before_the_models_initial_catalog() -> None:
     command = command_for("codex", Path("/workspace"), Path("/output"), {})
     assert "--strict-config" in command
     assert "mcp_servers.fatebridge.required=true" in command

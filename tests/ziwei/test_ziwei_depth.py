@@ -2,9 +2,11 @@
 
 import shutil
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
 
+from fatebridge.core.metaphysics.seed import build_analysis_seed
 from fatebridge.core.metaphysics.ziwei import (
     ZIWEI_SIHUA_RULES,
     _resolve_wuxing_ju,
@@ -12,9 +14,8 @@ from fatebridge.core.metaphysics.ziwei import (
     build_ziwei_horoscope,
     build_ziwei_rules,
 )
-from fatebridge.core.ziwei_rulesets import effective_lunar_month
+from fatebridge.core.ziwei.ziwei_rulesets import effective_lunar_month
 from fatebridge.services.metaphysics import (
-    _build_analysis_seed,
     calculate_ziwei_birth,
     calculate_ziwei_horoscope,
 )
@@ -36,7 +37,7 @@ pytestmark = [
 ]
 
 
-def test_frozen_hko_cells_and_classical_vectors_have_separate_denominators():
+def test_frozen_hko_cells_and_classical_vectors_have_separate_denominators() -> None:
     result = report()
     calendar = result["calendar"]
     assert calendar["status"] == "pass_in_frozen_corpus"
@@ -64,7 +65,9 @@ def test_frozen_hko_cells_and_classical_vectors_have_separate_denominators():
     "kind,name",
     [("calendar", "hko/T2026c.txt"), ("classical", "classical_excerpt.json")],
 )
-def test_source_edits_fail_without_silent_fixture_regeneration(tmp_path, kind, name):
+def test_source_edits_fail_without_silent_fixture_regeneration(
+    tmp_path: Path, kind: str, name: str
+) -> None:
     shutil.copytree(FIXTURES, tmp_path, dirs_exist_ok=True)
     path = tmp_path / name
     path.write_bytes(path.read_bytes() + b"changed")
@@ -72,7 +75,7 @@ def test_source_edits_fail_without_silent_fixture_regeneration(tmp_path, kind, n
         (audit_calendar if kind == "calendar" else audit_classical)(tmp_path)
 
 
-def test_hko_parser_rejects_missing_or_reordered_days():
+def test_hko_parser_rejects_missing_or_reordered_days() -> None:
     text = (FIXTURES / "hko/T2026c.txt").read_text(encoding="utf-8-sig")
     lines = text.splitlines()
     incomplete = "\n".join(
@@ -82,7 +85,9 @@ def test_hko_parser_rejects_missing_or_reordered_days():
         hko_rows(incomplete, 2026)
 
 
-def test_audit_detects_a_wrong_engine_table_without_changing_expectations(monkeypatch):
+def test_audit_detects_a_wrong_engine_table_without_changing_expectations(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setitem(ZIWEI_SIHUA_RULES["甲"], "化科", "太阴")
     result = audit_classical()
     assert result["status"] == "failed"
@@ -92,7 +97,7 @@ def test_audit_detects_a_wrong_engine_table_without_changing_expectations(monkey
 
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
-def test_profile_changes_every_sihua_layer_and_actual_labels(profile):
+def test_profile_changes_every_sihua_layer_and_actual_labels(profile: str) -> None:
     chart = build_ziwei_chart(synthetic_seed(1992), "男", rule_profile=profile)
     expected = "左辅" if profile == "iztro_2_5_8" else "天府"
     assert chart["sihua"]["化科"] == expected
@@ -104,7 +109,7 @@ def test_profile_changes_every_sihua_layer_and_actual_labels(profile):
         )
         == 1
     )
-    target = _build_analysis_seed(
+    target = build_analysis_seed(
         analysis_year=2032, analysis_month=6, analysis_day=15, analysis_hour=12
     )
     horoscope = build_ziwei_horoscope(
@@ -117,6 +122,8 @@ def test_profile_changes_every_sihua_layer_and_actual_labels(profile):
     for scope in horoscope["scopes"]:
         if scope["stem"] == "壬":
             assert scope["mutagen"]["化科"] == expected
+        else:
+            pass
         assert (
             scope["mutagen"]
             == build_ziwei_rules(scope["stem"], rule_profile=profile)["focused_rules"][
@@ -131,10 +138,10 @@ def test_profile_changes_every_sihua_layer_and_actual_labels(profile):
     assert link["status"] == "matched"
 
 
-def test_real_leap_month_early_half_and_late_half_have_explicit_conventions():
+def test_real_leap_month_early_half_and_late_half_have_explicit_conventions() -> None:
     # HKO: 2025-07-25 is leap sixth month day 1; day 16 is 2025-08-09.
     for day, expected in [(25, [6, 7])]:
-        seed = _build_analysis_seed(
+        seed = build_analysis_seed(
             analysis_year=2025, analysis_month=7, analysis_day=day, analysis_hour=0
         )
         charts = [
@@ -150,7 +157,7 @@ def test_real_leap_month_early_half_and_late_half_have_explicit_conventions():
             == charts[1]["lunar_date"]
             == dict(year=2025, month=6, day=1, is_leap_month=True)
         )
-    seed = _build_analysis_seed(
+    seed = build_analysis_seed(
         analysis_year=2025, analysis_month=8, analysis_day=9, analysis_hour=0
     )
     assert [
@@ -162,7 +169,9 @@ def test_real_leap_month_early_half_and_late_half_have_explicit_conventions():
 
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
-def test_leap_twelfth_month_ordinal_is_preserved_for_ten_period_stems(profile):
+def test_leap_twelfth_month_ordinal_is_preserved_for_ten_period_stems(
+    profile: str,
+) -> None:
     assert effective_lunar_month(12, 16, True, profile) == 13
     chart = build_ziwei_chart(
         synthetic_seed(1984, month=12, day=16, leap=True), "男", rule_profile=profile
@@ -171,7 +180,7 @@ def test_leap_twelfth_month_ordinal_is_preserved_for_ten_period_stems(profile):
     assert chart["ming_gong"]["branch"] == "寅"
 
 
-def test_unknown_gender_keeps_natal_stars_but_does_not_guess_direction():
+def test_unknown_gender_keeps_natal_stars_but_does_not_guess_direction() -> None:
     seed = synthetic_seed(1984)
     unknown = build_ziwei_chart(seed, "未知")
     male = build_ziwei_chart(seed, "男")
@@ -182,19 +191,27 @@ def test_unknown_gender_keeps_natal_stars_but_does_not_guess_direction():
     assert [p["stars_detail"] for p in unknown["palaces"]] == [
         p["stars_detail"] for p in male["palaces"]
     ]
-    with pytest.raises(ValueError, match="需要明确性别"):
-        build_ziwei_horoscope(
-            birth_seed=synthetic_birth_clock(int((unknown)["lunar_date"]["year"])),
-            chart=unknown,
-            gender="未知",
-            target_seed=synthetic_seed(2026),
-        )
+    birth_clock = synthetic_birth_clock(unknown["lunar_date"]["year"])
+    target = synthetic_seed(2026)
+    partial = build_ziwei_horoscope(
+        birth_seed=birth_clock, chart=unknown, gender="未知", target_seed=target
+    )
+    known = build_ziwei_horoscope(
+        birth_seed=birth_clock, chart=male, gender="男", target_seed=target
+    )
+    assert partial["nominal_age"] == known["nominal_age"]
+    assert partial["scopes"][2:] == known["scopes"][2:]
+    for scope in partial["scopes"][:2]:
+        assert scope["status"] == "unavailable"
+        assert scope["unavailable_reason"] == "gender_required_for_direction"
+        assert scope["branch"] is scope["stem"] is scope["mutagen"] is None
+        assert scope["palace_map"] == scope["mutagen_natal_links"] == []
 
 
-def test_natal_leap_excerpt_is_not_silently_extended_to_target_months():
+def test_natal_leap_excerpt_is_not_silently_extended_to_target_months() -> None:
     # Natal is an ordinary month: profiles share geometry. Only the target is
     # leap-sixth-month day 1. The natal 安身命 excerpt is not a 流月 rule.
-    target = _build_analysis_seed(
+    target = build_analysis_seed(
         analysis_year=2025, analysis_month=7, analysis_day=25, analysis_hour=12
     )
     results = []
@@ -215,7 +232,9 @@ def test_natal_leap_excerpt_is_not_silently_extended_to_target_months():
     assert results[0]["stem"] == results[1]["stem"]
 
 
-def test_unknown_nayin_and_invalid_profiles_or_dates_cannot_produce_plausible_charts():
+def test_unknown_nayin_and_invalid_profiles_or_dates_cannot_produce_plausible_charts() -> (
+    None
+):
     with pytest.raises(ValueError, match="无法确定五行局"):
         _resolve_wuxing_ju("甲", "丑")
     with pytest.raises(ValueError, match="不支持的紫微规则"):
@@ -226,7 +245,7 @@ def test_unknown_nayin_and_invalid_profiles_or_dates_cannot_produce_plausible_ch
         build_ziwei_rules("not_a_stem")
     seed = synthetic_seed(2026)
     invalid = replace(seed, calendar_context={"lunar_calendar": {"month": 1, "day": 1}})
-    with pytest.raises(ValueError, match="目标农历年缺失"):
+    with pytest.raises(ValueError, match="紫微斗数运限.*农历年缺失"):
         build_ziwei_horoscope(
             birth_seed=synthetic_birth_clock(
                 int(
@@ -241,7 +260,9 @@ def test_unknown_nayin_and_invalid_profiles_or_dates_cannot_produce_plausible_ch
         )
 
 
-def test_ming_sanfang_contains_career_wealth_and_opposite_without_borrowing_stars():
+def test_ming_sanfang_contains_career_wealth_and_opposite_without_borrowing_stars() -> (
+    None
+):
     chart = build_ziwei_chart(synthetic_seed(1984), "男")
     ming = chart["palaces"][0]["structural_evidence"]
     assert [p["natal_palace_name"] for p in ming["sanfang_sizheng"]] == [
@@ -267,7 +288,7 @@ def test_ming_sanfang_contains_career_wealth_and_opposite_without_borrowing_star
             )
 
 
-def test_childhood_palace_is_not_silently_labelled_as_an_actual_decade():
+def test_childhood_palace_is_not_silently_labelled_as_an_actual_decade() -> None:
     chart = build_ziwei_chart(synthetic_seed(2025), "女")
     result = build_ziwei_horoscope(
         birth_seed=synthetic_birth_clock(int((chart)["lunar_date"]["year"])),
@@ -282,7 +303,7 @@ def test_childhood_palace_is_not_silently_labelled_as_an_actual_decade():
     assert result["childhood_limit"]["natal_palace_name"] == "命宫"
 
 
-def test_same_year_target_before_birth_is_rejected_using_actual_instants():
+def test_same_year_target_before_birth_is_rejected_using_actual_instants() -> None:
     person = create_person_info(
         birth_year=2025,
         birth_month=7,
@@ -311,7 +332,7 @@ def test_same_year_target_before_birth_is_rejected_using_actual_instants():
     assert accepted["analysis_context"]["analysis_minute"] == 1
 
 
-def test_rule_trace_exposes_inputs_and_snapshots_preserve_selected_convention():
+def test_rule_trace_exposes_inputs_and_snapshots_preserve_selected_convention() -> None:
     person = create_person_info(
         birth_year=1992,
         birth_month=8,

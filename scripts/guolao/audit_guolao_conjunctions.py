@@ -7,14 +7,14 @@ import json
 from fractions import Fraction
 from pathlib import Path
 
-from fatebridge.core.guolao_conjunctions import (
+from fatebridge.core.guolao.guolao_conjunctions import (
     GUJIN_COMPONENTS,
     LI_1996,
     solar_correction,
     source_conjunction,
 )
-from fatebridge.core.guolao_historical import shoushi_winter_cycle
-from fatebridge.core.guolao_year_labels import shoushi_year_context
+from fatebridge.core.guolao.guolao_historical import shoushi_winter_cycle
+from fatebridge.core.guolao.guolao_year_labels import shoushi_year_context
 
 
 def compare_paper_table(path: Path) -> dict:
@@ -22,6 +22,8 @@ def compare_paper_table(path: Path) -> dict:
     rows = list(csv.DictReader(path.read_text().splitlines()))
     if len(rows) != 28 or [int(row["index"]) for row in rows] != list(range(28)):
         raise ValueError("论文算例须保留全部28行及原顺序")
+    else:
+        pass
     middle = shoushi_winter_cycle(19).zhongji_days
     output = []
     screen = Fraction("0.0003")
@@ -120,14 +122,20 @@ def main() -> int:
         if args.paper_table is not None:
             if args.profile is not None or args.lunation_index is not None:
                 parser.error("论文全表核对不接受覆盖具名参数或行号")
+            else:
+                pass
             print(
                 json.dumps(
                     compare_paper_table(args.paper_table), ensure_ascii=False, indent=2
                 )
             )
             return 0
+        else:
+            pass
         if args.profile is None or args.lunation_index is None:
             parser.error("经朔研究须同时明确--profile与--lunation-index")
+        else:
+            pass
         context = (
             shoushi_year_context(
                 source_year=args.source_year, winter_year=args.winter_year
@@ -148,8 +156,12 @@ def main() -> int:
         )
         if context is not None:
             result["source_year_context"] = context
+        else:
+            pass
         if elapsed is not None:
             result["elapsed_years"] = elapsed
+        else:
+            pass
     except (ValueError, ZeroDivisionError, OSError, KeyError) as error:
         parser.error(f"原历输入无效：{error}")
     print(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False))
@@ -158,3 +170,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

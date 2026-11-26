@@ -11,10 +11,10 @@ from typing import Any
 
 from fatebridge.core.astro.ephemeris import _swisseph_planet_state
 from fatebridge.core.astro.geometry import angular_separation_fraction
+from fatebridge.core.astro.horary_events import native_planetary_events
 from fatebridge.core.astro.opaque_solar import opaque_solar_positions
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.core.astro.time_scales import ut1_from_tt
-from fatebridge.core.horary_events import native_planetary_events
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURES = ROOT / "tests/fixtures"
@@ -121,6 +121,8 @@ def audit_opaque_solar_positions() -> dict[str, Any]:
                             case_id=case["case_id"],
                             solar_disc_intercepted=state["solar_disc_intercepted"],
                         )
+                    else:
+                        pass
                     if (
                         residual > plan["position_diagnostic_arcseconds"]
                         or lat_residual > plan["position_diagnostic_arcseconds"]
@@ -134,6 +136,8 @@ def audit_opaque_solar_positions() -> dict[str, Any]:
                                 latitude_arcseconds=lat_residual,
                             )
                         )
+                    else:
+                        pass
                 count += 1
                 intercepted_count += state["solar_disc_intercepted"]
     expected_count = sum(
@@ -243,6 +247,8 @@ def audit(*, apparent_model: str = "native") -> dict[str, Any]:
                 )
                 if sampled is None:
                     raise RuntimeError("Physical coordinate comparison unavailable")
+                else:
+                    pass
                 state, model = sampled
                 for frame in maximum:
                     delta = (
@@ -269,6 +275,8 @@ def audit(*, apparent_model: str = "native") -> dict[str, Any]:
                                 math.acos(max(-1, min(1, cosine)))
                             ),
                         }
+                    else:
+                        pass
                 body_difference = max(
                     body_difference,
                     float(
@@ -406,3 +414,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -26,12 +26,16 @@ def digest(raw):
 def inspect(raw, status, query, cases, plan):
     if status != 200:
         return {"status": "transport_unavailable", "http_status": status}
+    else:
+        pass
     try:
         payload = json.loads(raw)
     except (ValueError, UnicodeDecodeError):
         return {"status": "invalid_response"}
     if not isinstance(payload, dict):
         return {"status": "invalid_response"}
+    else:
+        pass
     if payload.get("error"):
         text = str(payload["error"])
         refused = all(
@@ -41,11 +45,17 @@ def inspect(raw, status, query, cases, plan):
             "status": "service_refused" if refused else "service_error_unclassified",
             "service_error": text,
         }
+    else:
+        pass
     text = payload.get("result")
     if not isinstance(text, str):
         return {"status": "invalid_response"}
+    else:
+        pass
     if text.count("$$SOE") != 1 or text.count("$$EOE") != 1:
         return {"status": "contract_unverified"}
+    else:
+        pass
     prefix, body = text.split("$$SOE")
     body, _ = body.split("$$EOE")
     tt = query["time_type"]
@@ -62,12 +72,16 @@ def inspect(raw, status, query, cases, plan):
     ]
     if not all(re.search(p, prefix) for p in patterns):
         return {"status": "contract_unverified"}
+    else:
+        pass
     rows = []
     seen = set()
     for rawrow in csv.reader(body.strip().splitlines()):
         cells = [v.strip() for v in rawrow]
         if len(cells) != 13 or cells[-1]:
             raise ValueError("Independent quantity column identity differs")
+        else:
+            pass
         epoch = Q(cells[1])
         near = [
             c
@@ -77,6 +91,8 @@ def inspect(raw, status, query, cases, plan):
         ]
         if len(near) != 1 or near[0]["id"] in seen:
             raise ValueError("Independent raw row assignment failed")
+        else:
+            pass
         case = near[0]
         seen.add(case["id"])
         error = epoch - Q(case["nominal_JD"])
@@ -102,6 +118,8 @@ def inspect(raw, status, query, cases, plan):
         )
     if seen != {c["id"] for c in cases}:
         raise ValueError("Original cases missing")
+    else:
+        pass
 
     def header(pattern):
         match = re.search(pattern, prefix, re.M)
@@ -129,6 +147,8 @@ def expected_clock(row, TT, TDB, profile, plan):
     }
     if left["status"] != "bracketed" or right["status"] != "bracketed":
         return {**value, "status": "state_clock_unknown"}
+    else:
+        pass
     tlo, thi = map(Q, left["effective_JD"])
     dlo, dhi = map(Q, right["effective_JD"])
     label = Q(row["nominal_JD"])
@@ -140,8 +160,12 @@ def expected_clock(row, TT, TDB, profile, plan):
     )
     if label < Q(plan["quantity30_modern_cutoff_JD"]):
         return {**value, "status": "not_assessed_pre_1962"}
+    else:
+        pass
     if row["TDB_minus_UT_seconds"] is None:
         return {**value, "status": "time_field_unavailable"}
+    else:
+        pass
     low, high = observed_bounds(
         row["TDB_minus_UT_seconds"],
         plan["numerical_tube_profiles"][profile]["extra_binary64_ULPs"],
@@ -151,6 +175,8 @@ def expected_clock(row, TT, TDB, profile, plan):
     )
     if hold != Q(plan["future_current_leap_hold_hypothesis_seconds"]):
         raise ValueError("Declared leap-hold sum changed")
+    else:
+        pass
     field = (low - hold, high - hold)
     value.update(
         status="conditional_leap_hold_comparison",
@@ -182,6 +208,8 @@ def verify(run, cohort):
         != digest((run / "tai-utc-source-excerpt.txt").read_bytes())
     ):
         raise ValueError("Excerpt/source scope was promoted")
+    else:
+        pass
     verify_vector(run / "vector-calibration", cohort)
     cal_path = run / "vector-calibration" / (cohort + "-first-analysis.json")
     cal = {q["id"]: q for q in json.loads(cal_path.read_text())["queries"]}
@@ -206,6 +234,8 @@ def verify(run, cohort):
         or data["retained_overall_numeric_gate_exit_code"] != 1
     ):
         raise ValueError("Clock diagnostics were promoted to acceptance")
+    else:
+        pass
     A = None
     Astatus = None
     if cohort == "B":
@@ -222,14 +252,22 @@ def verify(run, cohort):
         ]
         if Astatus != A["TDB_OBSERVER_contract_status"]:
             raise ValueError("A support status differs from actual response")
+        else:
+            pass
+    else:
+        pass
     before = json.loads((run / ("before-" + cohort + "-queries.json")).read_text())
     if cohort == "B" and before["prior_A_analysis_sha256"] != digest(
         (run / "A-first-analysis.json").read_bytes()
     ):
         raise ValueError("B lost its original A binding")
+    else:
+        pass
     expected = [q for q in plan["queries"] if q["cohort"] == cohort]
     if [q["id"] for q in data["observer_queries"]] != [q["id"] for q in expected]:
         raise ValueError("Original query population changed")
+    else:
+        pass
     collection = json.loads((run / (cohort + "-collection.json")).read_text())
     receipts = {r["id"]: r for r in collection["receipts"]}
     expected_clock_rows = []
@@ -252,9 +290,13 @@ def verify(run, cohort):
                 or (run / "responses" / (query["id"] + ".raw")).exists()
             ):
                 raise ValueError("Unsupported branch was substituted or miscounted")
+            else:
+                pass
             skipped += 1
             summary.append(expected_skip)
             continue
+        else:
+            pass
         raw = (run / "responses" / (query["id"] + ".raw")).read_bytes()
         if (
             receipt["attempt"] != 1
@@ -266,12 +308,18 @@ def verify(run, cohort):
             or digest(raw) != stored["raw_sha256"]
         ):
             raise ValueError("Actual raw request or transport identity differs")
+        else:
+            pass
         parsed = inspect(raw, receipt["status"], query, plan["cohorts"][cohort], plan)
         if stored["status"] != parsed["status"]:
             raise ValueError("Refusal/unknown/support status changed")
+        else:
+            pass
         for key, value in parsed.items():
             if stored.get(key) != value:
                 raise ValueError("Independent raw OBSERVER replay differs: " + key)
+            else:
+                pass
         dispatched += 1
         summary.append(
             {
@@ -282,10 +330,16 @@ def verify(run, cohort):
         )
         if cohort == "A" and query["time_type"] == "TDB":
             Astatus = parsed["status"]
+        else:
+            pass
         if parsed["status"] == "supported" and parsed["EOP_file"] is not None:
             same_eop.add(parsed["EOP_file"])
+        else:
+            pass
         if query["time_type"] != "TT" or parsed["status"] != "supported":
             continue
+        else:
+            pass
         tt = cal.get(query["id"])
         tdb = cal.get(cohort + "-TDB-" + query["encoding"])
         if (
@@ -295,6 +349,8 @@ def verify(run, cohort):
             or tdb["status"] != "diagnosed"
         ):
             continue
+        else:
+            pass
         ttrows = {v["case_id"]: v for v in tt["rows"]}
         tdbrows = {v["case_id"]: v for v in tdb["rows"]}
         for row in parsed["rows"]:
@@ -320,6 +376,8 @@ def verify(run, cohort):
         raise ValueError(
             "Clock field values, case coverage, or mismatch results changed"
         )
+    else:
+        pass
     counts = {}
     primary = [r for r in expected_clock_rows if r["role"] != "auxiliary_not_primary"]
     for profile in plan["numerical_tube_profiles"]:
@@ -379,3 +437,5 @@ if __name__ == "__main__":
     with args.output.open("x") as out:
         json.dump(result, out, indent=2)
         out.write("\n")
+else:
+    pass

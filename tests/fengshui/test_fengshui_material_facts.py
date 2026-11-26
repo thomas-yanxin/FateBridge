@@ -14,44 +14,14 @@ from fatebridge.core.fengshui.materials import (
     material_reference,
 )
 from fatebridge.services.fengshui import assess
+from tests.unit_test.fixtures.fengshui_layout import material_fact as fact
+from tests.unit_test.fixtures.fengshui_layout import material_request
 
 AFSI_COLOURS = json.loads(
     (
         Path(__file__).parents[1] / "fixtures/fengshui-material-colours-afsi-2004.json"
     ).read_text(encoding="utf-8")
 )["colours"]
-
-
-def fact(**values):
-    return {
-        "fact_id": "f",
-        "object_id": "item",
-        "material": "processed_wood",
-        "observation_basis": "user_confirmed",
-        "evidence": "确认对象实际属性，不按物名猜测",
-        **values,
-    }
-
-
-def material_request(**values):
-    return dict(
-        methods=[],
-        scene="shared_rental",
-        environmental_context=dict(
-            orientation=dict(
-                direction_confirmed=False, evidence="只审查材料属性，方位未知"
-            ),
-            objects=[
-                dict(
-                    object_id="item",
-                    label="待审物件",
-                    kind="material_object",
-                    evidence="物件身份已确认",
-                )
-            ],
-            material_facts=[fact(**values)],
-        ),
-    )
 
 
 @pytest.mark.parametrize(
@@ -64,7 +34,9 @@ def material_request(**values):
         ("wavy", "水"),
     ],
 )
-def test_shapes_are_separate_source_references_not_pointing_geometry(shape, element):
+def test_shapes_are_separate_source_references_not_pointing_geometry(
+    shape: str, element: str
+) -> None:
     result = analyze_material_facts(
         [MaterialShapeFact.model_validate(fact(shape=shape))]
     )
@@ -87,7 +59,9 @@ def test_shapes_are_separate_source_references_not_pointing_geometry(shape, elem
         ("water", "water_remedy", {}),
     ],
 )
-def test_registered_material_use_stays_conditional_and_unplaced(material, goal, extra):
+def test_registered_material_use_stays_conditional_and_unplaced(
+    material: str, goal: str, extra
+) -> None:
     value = fact(element_use=goal)
     value.update(material=material, **extra)
     result = analyze_material_facts([MaterialShapeFact.model_validate(value)])
@@ -101,7 +75,9 @@ def test_registered_material_use_stays_conditional_and_unplaced(material, goal, 
     )
 
 
-def test_processed_wood_exclusion_is_not_global_bad_furniture_or_colour_exclusion():
+def test_processed_wood_exclusion_is_not_global_bad_furniture_or_colour_exclusion() -> (
+    None
+):
     request = material_request(
         element_use="wood_remedy", colour="green", shape="columnar"
     )
@@ -119,7 +95,9 @@ def test_processed_wood_exclusion_is_not_global_bad_furniture_or_colour_exclusio
     "attribute,value",
     [("material", "glass"), ("material", "plastic"), ("shape", "irregular")],
 )
-def test_unregistered_attributes_are_not_invented_cures(attribute, value):
+def test_unregistered_attributes_are_not_invented_cures(
+    attribute: str, value: str
+) -> None:
     record = fact(element_use="wood_remedy")
     record.update({attribute: value})
     finding = analyze_material_facts([MaterialShapeFact.model_validate(record)])[
@@ -130,7 +108,7 @@ def test_unregistered_attributes_are_not_invented_cures(attribute, value):
 
 
 @pytest.mark.parametrize("basis", ["measured", "user_confirmed", "image_observed"])
-def test_living_plant_question_requires_actual_alive_fact(basis):
+def test_living_plant_question_requires_actual_alive_fact(basis: str) -> None:
     record = fact(element_use="wood_remedy")
     record.update(material="living_plant", observation_basis=basis)
     result = analyze_material_facts([MaterialShapeFact.model_validate(record)])
@@ -141,7 +119,7 @@ def test_living_plant_question_requires_actual_alive_fact(basis):
     assert result["findings"][0]["candidate_only"]
 
 
-def test_shape_alone_does_not_supply_afsi_material_or_colour():
+def test_shape_alone_does_not_supply_afsi_material_or_colour() -> None:
     record = fact(shape="triangular", element_use="fire_remedy")
     record.pop("material")
     result = analyze_material_facts([MaterialShapeFact.model_validate(record)])
@@ -157,7 +135,9 @@ def test_shape_alone_does_not_supply_afsi_material_or_colour():
     )
 
 
-def test_separate_attributes_can_ask_same_use_without_promoting_photo_confirmation():
+def test_separate_attributes_can_ask_same_use_without_promoting_photo_confirmation() -> (
+    None
+):
     request = material_request(element_use="wood_remedy")
     request["environmental_context"]["material_facts"].append(
         dict(
@@ -177,7 +157,9 @@ def test_separate_attributes_can_ask_same_use_without_promoting_photo_confirmati
     assert findings[1]["candidate_only"]
 
 
-def test_different_attribute_bases_stay_independent_and_duplicate_attributes_reject():
+def test_different_attribute_bases_stay_independent_and_duplicate_attributes_reject() -> (
+    None
+):
     records = [
         fact(),
         {
@@ -207,12 +189,12 @@ def test_different_attribute_bases_stay_independent_and_duplicate_attributes_rej
         {"evidence": " "},
     ],
 )
-def test_material_schema_rejects_inferred_or_empty_facts(bad):
+def test_material_schema_rejects_inferred_or_empty_facts(bad) -> None:
     with pytest.raises(ValidationError):
         MaterialShapeFact.model_validate({**fact(), **bad})
 
 
-def test_material_reference_is_isolated_and_has_source_version_and_locations():
+def test_material_reference_is_isolated_and_has_source_version_and_locations() -> None:
     one = material_reference()
     two = deepcopy(one)
     one["shapes"]["round"]["element"] = "changed"
@@ -232,8 +214,8 @@ def test_material_reference_is_isolated_and_has_source_version_and_locations():
     ["wood_remedy", "fire_remedy", "earth_remedy", "metal_remedy", "water_remedy"],
 )
 def test_afsi_published_palette_against_each_requested_element(
-    source_colour, requested_use
-):
+    source_colour, requested_use: str
+) -> None:
     finding = analyze_material_facts(
         [
             MaterialShapeFact.model_validate(
@@ -257,13 +239,13 @@ def test_afsi_published_palette_against_each_requested_element(
     assert not finding["action_required"]
 
 
-def test_afsi_reference_keeps_the_complete_published_colour_vocabulary():
+def test_afsi_reference_keeps_the_complete_published_colour_vocabulary() -> None:
     assert material_reference()["colours"] == {
         row["colour"]: row["element"] for row in AFSI_COLOURS
     }
 
 
-def test_broad_brown_observation_does_not_establish_published_tan():
+def test_broad_brown_observation_does_not_establish_published_tan() -> None:
     finding = analyze_material_facts(
         [
             MaterialShapeFact.model_validate(
@@ -277,7 +259,7 @@ def test_broad_brown_observation_does_not_establish_published_tan():
     assert finding["finding"] == "not_determined_from_supplied_attributes"
 
 
-def test_published_tan_in_a_photo_keeps_candidate_status():
+def test_published_tan_in_a_photo_keeps_candidate_status() -> None:
     result = analyze_material_facts(
         [
             MaterialShapeFact.model_validate(

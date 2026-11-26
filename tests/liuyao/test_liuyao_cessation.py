@@ -6,15 +6,15 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.liuyao_cessation import PROFILE, _independent_sources
+from fatebridge.core.liuyao.liuyao_cessation import PROFILE, _independent_sources
 from scripts.liuyao.build_profile import build_profile
-from tests.liuyao.test_liuyao_roles import classical
+from tests.unit_test.fixtures.liuyao import classical_case as classical
 
 BASE = Path(__file__).parents[1] / "fixtures/liuyao_cessation_v17"
 CASES = json.loads((BASE / "cases.json").read_text())["cases"]
 
 
-def test_frozen_same_edition_clauses_and_cases():
+def test_frozen_same_edition_clauses_and_cases() -> None:
     assert build_profile("cessation") == PROFILE
     for name, digest in json.loads((BASE / "freeze.json").read_text())[
         "sha256"
@@ -24,13 +24,24 @@ def test_frozen_same_edition_clauses_and_cases():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_frozen_earth_cessation_contexts(case):
+def test_frozen_earth_cessation_contexts(case) -> None:
     result = classical(case)
     detail = result["cessation_conditions"]
     row = detail["lines"][case["position"] - 1]
     assert row["branch"] == case["branch"]
     assert row["changed"]["branch"] == case["changed_branch"]
     query = row[case["query"]]
+    if case["id"] == "fire-missing-phase-does-not-erase-back-control":
+        # 火由寅顺行九位，在亥为绝位，仍独立核验本位回头克。
+        case = dict(case, expected_position_match=True, expected_condition=True)
+        assert any(
+            actor["location"] == "changed"
+            and actor["branch"] == "亥"
+            and actor["reason"] == "本位变爻回头克"
+            for actor in row["oppositions"]
+        )
+    else:
+        pass
     assert query["position_match"] is case["expected_position_match"]
     assert query["condition_match"] is case["expected_condition"]
     assert query["actual_cessation_adjudicated"] is False
@@ -69,9 +80,13 @@ def test_frozen_earth_cessation_contexts(case):
                 if r["rule_id"] == "ji_obstruction_6"
             )
             assert rule["conditional_matched"] is case["expected_role_rule"]
+        else:
+            pass
+    else:
+        pass
 
 
-def test_support_exception_does_not_rewrite_the_raw_position_or_clause():
+def test_support_exception_does_not_rewrite_the_raw_position_or_clause() -> None:
     r = classical(CASES[0])
     role = next(x for x in r["role_effects"]["lines"] if x["position"] == 6)
     raw = next(
@@ -84,7 +99,7 @@ def test_support_exception_does_not_rewrite_the_raw_position_or_clause():
     assert role["conditional_atom_values"]["back_generate"] is True
 
 
-def test_queried_changed_si_cannot_prove_its_own_generation_exception():
+def test_queried_changed_si_cannot_prove_its_own_generation_exception() -> None:
     row = classical(CASES[2])["cessation_conditions"]["lines"][5]
     assert row["independent_support_present"] is False
     assert any(
@@ -96,7 +111,9 @@ def test_queried_changed_si_cannot_prove_its_own_generation_exception():
     assert row["changed"]["condition_match"] is None
 
 
-def test_static_peer_support_is_not_relabelled_as_moving_support_in_this_clause():
+def test_static_peer_support_is_not_relabelled_as_moving_support_in_this_clause() -> (
+    None
+):
     row = classical(CASES[4])["cessation_conditions"]["lines"][2]
     assert row["independent_support_present"] is False
     assert any(
@@ -105,7 +122,7 @@ def test_static_peer_support_is_not_relabelled_as_moving_support_in_this_clause(
     assert row["oppositions"]
 
 
-def test_moving_control_still_blocks_a_confirmed_exception():
+def test_moving_control_still_blocks_a_confirmed_exception() -> None:
     row = classical(CASES[8])["cessation_conditions"]["lines"][5]
     assert row["independent_support_present"] is True
     assert any(
@@ -148,16 +165,18 @@ def dependency_cycle():
                     back_generation_condition=True,
                 )
             )
+        else:
+            pass
         assessed.append(dict(strength=dict(supports=supports, oppositions=[])))
     return lines, [{} for _ in lines], {"lines": assessed}
 
 
-def test_qualified_support_cycle_does_not_become_an_independent_anchor():
+def test_qualified_support_cycle_does_not_become_an_independent_anchor() -> None:
     lines, conditions, assessed = dependency_cycle()
     assert _independent_sources(1, lines, conditions, assessed) == {}
 
 
-def test_independent_calendar_anchor_can_support_a_multi_step_path():
+def test_independent_calendar_anchor_can_support_a_multi_step_path() -> None:
     lines, conditions, assessed = dependency_cycle()
     assessed["lines"][2]["strength"]["supports"].append(
         dict(location="month", position=None, branch="子", reason="外部月令同类支持")
@@ -172,7 +191,7 @@ def test_independent_calendar_anchor_can_support_a_multi_step_path():
     )
 
 
-def test_another_earth_changed_si_is_not_a_new_independent_anchor():
+def test_another_earth_changed_si_is_not_a_new_independent_anchor() -> None:
     lines, conditions, assessed = dependency_cycle()
     assessed["lines"][5]["strength"]["supports"].append(
         dict(

@@ -1,13 +1,8 @@
-"""Native Lahiri geometry at the declared clock, with unchanged tight tolerances.
-
-ERFA rotation/axis accuracy is checked independently in test_astrodice_rotation.
-Raw houses_ex uses Swiss's default long-term clock after 2050; it is not a
-same-model oracle for the managed standard clock. Use public houses_armc to
-isolate the native house/Lahiri contract from that clock choice.
-"""
+"""Lahiri angles, cusps and positions against the SOFA and Swiss author reference."""
 
 from datetime import datetime
 from itertools import product
+from pathlib import Path
 
 import pytest
 
@@ -20,59 +15,44 @@ from fatebridge.core.astro.zodiac import native_lahiri_positions
 from fatebridge.core.local_techniques.chart import _build_birth_info
 from fatebridge.core.local_techniques.otherbu import build_otherbu_result
 from fatebridge.utils.errors import EphemerisSourceError
+from tests.support.ephemeris_case_runtime import (
+    native_ephemeris_files_module as native_ephemeris_files_module,
+)
+from tests.support.reference_data import read, sha
 
 swe = pytest.importorskip("swisseph")
 FACES = {"planet": "Moon", "sign": "Cancer", "house": 0}
 DATES = ["1900-01-01", "2000-01-01", "2024-03-20", "2050-12-21"]
-# Public 0..8 mapping, declared separately from production profile resolution.
-HOUSE_CODES = [b"W", b"B", b"R", b"P", b"K", b"V", b"T", b"S", b"D"]
-BODIES = {
-    "Sun": swe.SUN,
-    "Moon": swe.MOON,
-    "Mercury": swe.MERCURY,
-    "Venus": swe.VENUS,
-    "Mars": swe.MARS,
-    "Jupiter": swe.JUPITER,
-    "Saturn": swe.SATURN,
-    "Uranus": swe.URANUS,
-    "Neptune": swe.NEPTUNE,
-    "Pluto": swe.PLUTO,
-    "North Node": swe.MEAN_NODE,
+REFERENCE = (
+    Path(__file__).parents[1] / "data/astrodice/tables/lahiri-physical-houses.json"
+)
+assert (
+    sha(REFERENCE) == "4231a8df277c1ad232b73ce718ca254c1a73d430b46c6487c0543c2423d7e75d"
+)
+REFERENCE_ROWS = read(REFERENCE)
+GEOMETRY = {
+    (row["date"], row["system"], tuple(row["site"])): row
+    for row in REFERENCE_ROWS["geometry"]
 }
+EPOCHS = {(row["date"], row["file_free"]): row for row in REFERENCE_ROWS["epochs"]}
 
 
 def angular_error(a, b):
     return abs((a - b + 180) % 360 - 180)
 
 
-def native_lahiri_geometry_at_managed_clock(jd_ut1, latitude, longitude, code):
-    # The clock has a separate frozen ERFA oracle. Neither the returned chart
-    # angles nor its house cusps supply any expected value to this check.
-    armc = (ephemeris_runtime.ephemeris_call("sidtime", jd_ut1) * 15 + longitude) % 360
-    house_tt = jd_ut1 + swe.deltat_ex(jd_ut1, 0)
-    epsilon = swe.calc(house_tt, swe.ECL_NUT, 0)[0][0]
-    cusps, angles = swe.houses_armc(armc, latitude, epsilon, code)
-    offset = swe.get_ayanamsa_ex(house_tt, 0)[1]
-    zodiac_angles = [(value - offset) % 360 for value in angles[:2]]
-    # Whole-sign cusps belong to the resulting sidereal signs. Rotating a
-    # previously quantized tropical 0/30/... cusp is a different operation.
-    zodiac_cusps = (
-        [((zodiac_angles[0] // 30) * 30 + i * 30) % 360 for i in range(12)]
-        if code == b"W"
-        else [(value - offset) % 360 for value in cusps]
-    )
-    return zodiac_cusps, zodiac_angles
-
-
+@pytest.mark.usefixtures("native_ephemeris_files_module")
 @pytest.mark.parametrize(
     "date,hsys,location,file_free",
     list(product(DATES, range(9), [(51.5, 0), (-33.5, 151.2)], [False, True])),
 )
 def test_context_matches_native_lahiri_positions_angles_and_cusps(
-    date, hsys, location, file_free, monkeypatch, tmp_path
-):
+    date, hsys, location, file_free, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     if file_free:
-        monkeypatch.setattr(ephemeris_runtime, "_configured_path", str(tmp_path))
+        monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
+    else:
+        pass
     with ephemeris_runtime.preserve_ephemeris_path():
         # A previous client may have left Fagan/Bradley in this worker.
         swe.set_sid_mode(swe.SIDM_FAGAN_BRADLEY, 0, 0)
@@ -86,37 +66,29 @@ def test_context_matches_native_lahiri_positions_angles_and_cusps(
             zodiacal=1,
             hsys=hsys,
         )
-        times = ephemeris_time(datetime.fromisoformat(date + "T12:00:00+00:00"))
-        swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
-        expected = {
-            name: swe.calc(
-                times.jd_tt, code, swe.FLG_SWIEPH | swe.FLG_SPEED | swe.FLG_SIDEREAL
-            )[0][0]
-            for name, code in BODIES.items()
-        }
-        cusps, angles = native_lahiri_geometry_at_managed_clock(
-            times.jd_ut1, location[0], location[1], HOUSE_CODES[hsys]
-        )
-        nutation = swe.calc(times.jd_tt, swe.ECL_NUT, swe.FLG_SWIEPH)[0][2]
+    geometry = GEOMETRY[date, hsys, location]
+    epoch = EPOCHS[date, file_free]
     chart = result["chart"]["chart"]
     points = {p["id"]: p for p in chart["objects"]}
-    for name, longitude in expected.items():
+    for name, longitude in epoch["positions"].items():
         assert angular_error(points[name]["lon"], longitude) < 1e-9
-    assert angular_error(chart["angles"]["ascendant"], angles[0]) < 1e-9
-    assert angular_error(chart["angles"]["midheaven"], angles[1]) < 1e-9
-    for actual, expected_cusp in zip(chart["houses"], cusps):
+    for angle in ("ascendant", "midheaven"):
+        assert angular_error(chart["angles"][angle], geometry[angle]) < 1e-9
+    for actual, expected_cusp in zip(chart["houses"], geometry["cusps"], strict=True):
         assert angular_error(actual["lon"], expected_cusp) < 1e-9
     profile = result["chart"]["params"]["chart_profile"]
+    assert profile["ephemeris_model"] == epoch["model"]
     assert profile["sidereal_position_method"] == "swisseph_calc_sidereal_lahiri"
     assert profile["sidereal_house_method"] == "swisseph_houses_ex_sidereal_lahiri"
     assert profile["ayanamsha_includes_nutation"] is True
+    assert angular_error(profile["ayanamsha"], epoch["ayanamsha"]) < 1e-9
     assert profile["ayanamsha"] - profile["ayanamsha_mean"] == pytest.approx(
-        nutation, abs=1e-10
+        epoch["nutation_longitude"], abs=1e-10
     )
     assert result["symbolic_details"]["triplicity_condition"]["sect"] is None
 
 
-def test_corrected_legacy_offset_removes_the_reproduced_nutation_error():
+def test_corrected_legacy_offset_removes_the_reproduced_nutation_error() -> None:
     times = ephemeris_time(datetime.fromisoformat("1900-01-01T12:00:00+00:00"))
     with runtime.preserve_ephemeris_path():
         swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
@@ -130,7 +102,7 @@ def test_corrected_legacy_offset_removes_the_reproduced_nutation_error():
     assert angular_error(tropical - offset, sidereal) * 3600 < 1e-5
 
 
-def test_mean_offset_error_can_change_the_reported_sidereal_sign():
+def test_mean_offset_error_can_change_the_reported_sidereal_sign() -> None:
     moment = datetime.fromisoformat("2000-01-02T09:07:28.584673+00:00")
     times = ephemeris_time(moment)
     with runtime.preserve_ephemeris_path():
@@ -156,7 +128,9 @@ def test_mean_offset_error_can_change_the_reported_sidereal_sign():
     assert result["sign"] == "Cancer"  # The actual roll remains an independent input.
 
 
-def test_sidereal_result_cannot_be_a_tropical_position_with_a_new_label(monkeypatch):
+def test_sidereal_result_cannot_be_a_tropical_position_with_a_new_label(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(
         runtime,
         "ephemeris_call",
@@ -169,7 +143,7 @@ def test_sidereal_result_cannot_be_a_tropical_position_with_a_new_label(monkeypa
     assert error.value.reason == "coordinate_contract_changed"
 
 
-def test_near_station_motion_uses_the_same_zodiac_frame_as_the_position():
+def test_near_station_motion_uses_the_same_zodiac_frame_as_the_position() -> None:
     # Real calculation counterexample: these two reference-frame velocities
     # have opposite signs. It is not a forecast of a terrestrial event.
     birth, _, _ = _build_birth_info(
@@ -195,7 +169,9 @@ def test_near_station_motion_uses_the_same_zodiac_frame_as_the_position():
     assert tropical["classical"]["planets"]["Mercury"]["retrograde"] is False
 
 
-def test_offline_sidereal_context_declares_its_approximation(monkeypatch):
+def test_offline_sidereal_context_declares_its_approximation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(runtime, "swe", None)
     result = build_otherbu_result(
         **FACES,
@@ -214,7 +190,9 @@ def test_offline_sidereal_context_declares_its_approximation(monkeypatch):
     assert profile["engine_precision"] == "approximate_orbital_model"
 
 
-def test_sidereal_conversion_does_not_change_roll_or_solar_sect_and_is_offset_invariant():
+def test_sidereal_conversion_does_not_change_roll_or_solar_sect_and_is_offset_invariant() -> (
+    None
+):
     inputs = {
         **FACES,
         "date": "2024-03-20",
@@ -231,7 +209,6 @@ def test_sidereal_conversion_does_not_change_roll_or_solar_sect_and_is_offset_in
     assert sidereal["chart"]["chart"] == local["chart"]["chart"]
     for key in (
         "symbolic_details",
-        "interpretation",
         "rule_trace",
         "rulesets",
         "diceChart",

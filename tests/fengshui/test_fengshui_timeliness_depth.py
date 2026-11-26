@@ -17,10 +17,10 @@ from fatebridge.core.fengshui.timeliness import (
 )
 from fatebridge.services.fengshui import calculate_xuankong_natal
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.fengshui_timeliness import audit_timeliness_reference
 from tests.support.fengshui_transports import mcp_call
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import rest_client
+from validation.fengshui_timeliness import audit_timeliness_reference
 
 REFERENCE = Path(__file__).parents[1] / "data/fengshui_timeliness_v1/reference.json"
 PROFILE = "wang_zhongzhou_timeliness_v1"
@@ -32,6 +32,8 @@ def _inputs(natal=2, current=7, angle=0):
         config.update(
             current_period_number=current, period_evidence="独立核实的评价时运"
         )
+    else:
+        pass
     return {
         "house": {"facing_degrees": angle, "north_reference": "magnetic"},
         "period": {
@@ -43,7 +45,7 @@ def _inputs(natal=2, current=7, angle=0):
     }
 
 
-def test_complete_printed_tables_and_rejected_incomplete_oracles():
+def test_complete_printed_tables_and_rejected_incomplete_oracles() -> None:
     reference = json.loads(REFERENCE.read_text())
     result = audit_timeliness_reference(reference)
     assert result["checked"] == result["matched"] == 162
@@ -64,7 +66,7 @@ def test_complete_printed_tables_and_rejected_incomplete_oracles():
     assert audit_timeliness_reference(bad)["scoped_acceptance_passed"] is False
 
 
-def test_wraparound_remote_past_and_mutual_use_are_not_interchangeable():
+def test_wraparound_remote_past_and_mutual_use_are_not_interchangeable() -> None:
     assert classify_timeliness(1, 9)["phase"] == "growing"
     assert classify_timeliness(8, 1)["phase"] == "declining"
     # The author's own example: four is basically dormant in seven, yet the
@@ -97,12 +99,16 @@ def test_wraparound_remote_past_and_mutual_use_are_not_interchangeable():
 @pytest.mark.parametrize(
     "number,current", [(True, 1), (1, False), (0, 1), (1, 10), (1.0, 1)]
 )
-def test_strict_star_and_period_identity(number, current):
+def test_strict_star_and_period_identity(
+    number: bool | float | int, current: bool | int
+) -> None:
     with pytest.raises(ValueError):
         classify_timeliness(number, current)
 
 
-def test_all_evaluation_periods_preserve_original_charts_and_external_conditions():
+def test_all_evaluation_periods_preserve_original_charts_and_external_conditions() -> (
+    None
+):
     evaluations = 0
     for current in range(1, 10):
         for natal in range(1, 10):
@@ -146,7 +152,7 @@ def test_all_evaluation_periods_preserve_original_charts_and_external_conditions
     assert evaluations == 243
 
 
-def test_missing_period_stays_unknown_and_selection_is_strict():
+def test_missing_period_stays_unknown_and_selection_is_strict() -> None:
     result = calculate_xuankong_natal(**_inputs(current=None))
     interpretation = result["layers"]["xuankong_natal"]["interpretation"]
     assert interpretation["status"] == "partial"
@@ -165,19 +171,24 @@ def test_missing_period_stays_unknown_and_selection_is_strict():
 
 @pytest.mark.parametrize("tool", ["xuankong_natal", "assess"])
 def test_author_profile_rest_mcp_cli_schema_and_snapshot(
-    monkeypatch, tmp_path, capsys, tool
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    tool: str,
+) -> None:
     inputs = _inputs()
     if tool == "assess":
         inputs = {"methods": ["xuankong_natal"], "xuankong": inputs}
+    else:
+        pass
     spec = next(s for s in CATALOG if s.key == "fengshui_" + tool)
     response = rest_client(monkeypatch).post(spec.rest_path, json=inputs)
     assert response.status_code == 200, response.text
-    protocol = asyncio.run(mcp_call(tool, inputs))
+    protocol = asyncio.run(mcp_call(spec.tool_name.removeprefix("fengshui_"), inputs))
     assert not protocol.is_error
     request_file = tmp_path / "author.json"
     request_file.write_text(json.dumps(inputs))
-    assert run(["fengshui_" + tool, "--request-file", str(request_file)]) == 0
+    assert run([spec.tool_name, "--request-file", str(request_file)]) == 0
     cli = json.loads(capsys.readouterr().out)
     assert (
         without_transport(response.json())
@@ -186,7 +197,8 @@ def test_author_profile_rest_mcp_cli_schema_and_snapshot(
     )
     Draft202012Validator(spec.output_model.model_json_schema()).validate(cli)
     interpretation = cli["layers"]["xuankong_natal"]["interpretation"]
-    assert interpretation["timeliness_ruleset"]["sources"][0]["source_id"] == "WZT1"
+    assert "WZT1" in interpretation["timeliness_ruleset"]["source_ids"]
+    assert cli["source_catalog"]["WZT1"]["url"].startswith("https://")
     assert any(r["ruleset_id"] == PROFILE for r in cli["rulesets"])
     assert any(r.get("ruleset_id") == PROFILE for r in cli["rule_trace"])
     assert any(

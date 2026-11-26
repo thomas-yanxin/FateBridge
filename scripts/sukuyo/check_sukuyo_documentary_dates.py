@@ -13,9 +13,9 @@ import json
 from datetime import date
 from pathlib import Path
 
-from fatebridge.core.sukuyo import calendar_mansion
-from fatebridge.core.sukuyo_historical_calendar import SOURCE
-from fatebridge.core.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion
+from fatebridge.core.sukuyo.sukuyo_historical_calendar import SOURCE
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/data/sukuyo-documentary-dates.json"
@@ -33,7 +33,11 @@ def verify_documentary_controls(*, capture_dir: Path | None = None) -> dict:
                 raise ValueError(
                     "Documentary source capture fingerprint changed: " + record["file"]
                 )
+            else:
+                pass
             capture_checks.append(record["file"])
+    else:
+        pass
     bundle = load_source(SOURCE)
     rows, mismatches = [], []
     for control in fixture["controls"]:
@@ -47,6 +51,8 @@ def verify_documentary_controls(*, capture_dir: Path | None = None) -> dict:
             raise ValueError(
                 "Printed documentary date cannot map to one admitted reference month"
             )
+        else:
+            pass
         civil = date.fromordinal(months[0][0] + expected[2] - 1)
         actual = calendar_mansion(
             civil.isoformat(),
@@ -70,6 +76,8 @@ def verify_documentary_controls(*, capture_dir: Path | None = None) -> dict:
         rows.append(row)
         if not row["matches_printed_control"]:
             mismatches.append(row)
+        else:
+            pass
     conflicts = []
     for conflict in fixture["secondary_paper_conflicts"]:
         control = next(
@@ -117,3 +125,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

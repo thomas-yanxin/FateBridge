@@ -8,24 +8,24 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core.human_design_depth import line_fixings
-from fatebridge.core.human_design_historical_polarity import (
+from fatebridge.core.human_design.human_design_depth import line_fixings
+from fatebridge.core.human_design.human_design_historical_polarity import (
     METHOD,
     comparison_report,
     source_records,
 )
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
 from tests.support.ephemeris_case_runtime import (
     native_ephemeris_files_module as native_ephemeris_files_module,
 )
+from validation.human_design import verify_human_design_reading
 
 FIXTURE = Path(__file__).parents[1] / "data/human_design/historical_polarity"
 REFERENCE = json.loads((FIXTURE / "independent-plan-and-reference.json").read_text())
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 
 
-def test_independent_240_case_oracle_is_frozen_before_production_changes():
+def test_independent_240_case_oracle_is_frozen_before_production_changes() -> None:
     assert (
         hashlib.sha256(
             (FIXTURE / "independent-plan-and-reference.json").read_bytes()
@@ -37,7 +37,7 @@ def test_independent_240_case_oracle_is_frozen_before_production_changes():
 
 
 @pytest.mark.parametrize("start", range(0, 240, 30))
-def test_all_independent_same_gate_harmonic_other_side_and_node_cases(start):
+def test_all_independent_same_gate_harmonic_other_side_and_node_cases(start) -> None:
     for case in REFERENCE["cases"][start : start + 30]:
         chart = {"activations": case["activations"]}
         selected = line_fixings(chart["activations"])
@@ -71,7 +71,7 @@ def test_all_independent_same_gate_harmonic_other_side_and_node_cases(start):
         assert actual["source_conflict_resolved"] is False
 
 
-def test_no_recipient_is_distinct_from_resolved_source_conflict():
+def test_no_recipient_is_distinct_from_resolved_source_conflict() -> None:
     report = comparison_report(
         {
             "activations": {
@@ -86,7 +86,7 @@ def test_no_recipient_is_distinct_from_resolved_source_conflict():
     assert report["status"] == "unresolved_historical_source_conflict"
 
 
-def test_reviewed_official_markers_contradict_the_conditional_notice():
+def test_reviewed_official_markers_contradict_the_conditional_notice() -> None:
     observed = json.loads((FIXTURE / "visible-marker-observations.json").read_text())
     assert len(observed["observations"]) == 2
     assert observed["resolved"] is False
@@ -113,7 +113,7 @@ def complete(native_ephemeris_files_module):
 
 def test_current_complete_reading_preserves_actual_calculation_and_selected_fixings(
     complete,
-):
+) -> None:
     report = complete["historical_polarity_context"]
     assert (
         report["nominal_recipient_count"] == report["nominal_changed_state_count"] == 1
@@ -148,7 +148,9 @@ def test_current_complete_reading_preserves_actual_calculation_and_selected_fixi
         "reading_count",
     ],
 )
-def test_rehashed_forgeries_and_new_contract_omissions_are_rejected(complete, mutation):
+def test_rehashed_forgeries_and_new_contract_omissions_are_rejected(
+    complete, mutation: str
+) -> None:
     run = deepcopy(complete)
     context = run["historical_polarity_context"]
     if mutation in {"drop_context", "drop_all_regions", "unknown_contract_drop_all"}:
@@ -160,8 +162,12 @@ def test_rehashed_forgeries_and_new_contract_omissions_are_rejected(complete, mu
             run["rule_trace"] = [
                 r for r in run["rule_trace"] if r["ruleset_id"] != METHOD
             ]
+        else:
+            pass
         if mutation == "unknown_contract_drop_all":
             run["run_metadata"]["contract_sha256"] = "0" * 64
+        else:
+            pass
     elif mutation == "source_hash":
         context["ruleset"]["source_records"][0]["pdf_sha256"] = "0" * 64
     elif mutation == "resolved":

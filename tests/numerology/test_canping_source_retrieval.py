@@ -5,9 +5,11 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+from pathlib import Path
 from urllib.error import HTTPError, URLError
 
 import pytest
+from pytest import CaptureFixture, MonkeyPatch
 
 from scripts.numerology import retrieve_canping_source_images as retrieval
 
@@ -27,7 +29,7 @@ def small_region() -> dict:
     }
 
 
-def test_all_registered_regions_keep_frozen_source_and_duplicate_provenance():
+def test_all_registered_regions_keep_frozen_source_and_duplicate_provenance() -> None:
     rows = retrieval.registered_regions()
     assert len(rows) == 112
     assert len({r["pdf_page"] for r in rows}) == 28
@@ -46,7 +48,9 @@ def test_all_registered_regions_keep_frozen_source_and_duplicate_provenance():
     )
 
 
-def test_modified_collation_rejected_before_any_request(tmp_path, monkeypatch):
+def test_modified_collation_rejected_before_any_request(
+    tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     path = tmp_path / "collation.json"
     path.write_bytes(retrieval.COLLATION.read_bytes() + b"\n")
     monkeypatch.setattr(retrieval, "urlopen", lambda *a, **k: pytest.fail("network"))
@@ -54,7 +58,9 @@ def test_modified_collation_rejected_before_any_request(tmp_path, monkeypatch):
         retrieval.registered_regions(path)
 
 
-def test_plan_is_offline_and_selects_exact_page(monkeypatch, capsys):
+def test_plan_is_offline_and_selects_exact_page(
+    monkeypatch: MonkeyPatch, capsys: CaptureFixture[str]
+) -> None:
     monkeypatch.setattr(retrieval, "urlopen", lambda *a, **k: pytest.fail("network"))
     assert retrieval.main(["--page", "96", "--plan"]) == 0
     plan = json.loads(capsys.readouterr().out)
@@ -62,7 +68,9 @@ def test_plan_is_offline_and_selects_exact_page(monkeypatch, capsys):
     assert {r["pdf_page"] for r in plan["regions"]} == {96}
 
 
-def test_unregistered_page_is_not_guessed(tmp_path, monkeypatch):
+def test_unregistered_page_is_not_guessed(
+    tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     monkeypatch.setattr(retrieval, "urlopen", lambda *a, **k: pytest.fail("network"))
     output = tmp_path / "new-output"
     with pytest.raises(SystemExit) as exc:
@@ -74,7 +82,9 @@ def test_unregistered_page_is_not_guessed(tmp_path, monkeypatch):
 @pytest.mark.parametrize(
     "body,verified", [(b"fixed bytes", True), (b"changed bytes", False)]
 )
-def test_actual_response_hash_decides_identity(tmp_path, monkeypatch, body, verified):
+def test_actual_response_hash_decides_identity(
+    tmp_path: Path, monkeypatch: MonkeyPatch, body: bytes, verified: bool
+) -> None:
     monkeypatch.setattr(retrieval, "urlopen", lambda *a, **k: Response(body))
     row = retrieval.retrieve_region(small_region(), tmp_path, 1)
     assert row["http_status"] == 200
@@ -84,7 +94,9 @@ def test_actual_response_hash_decides_identity(tmp_path, monkeypatch, body, veri
     assert row["expected_sha256"] == small_region()["expected_sha256"]
 
 
-def test_http_failure_body_and_status_are_preserved(tmp_path, monkeypatch):
+def test_http_failure_body_and_status_are_preserved(
+    tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     def fail(*args, **kwargs):
         raise HTTPError(
             small_region()["url"], 400, "Bad Request", {}, io.BytesIO(b"bad image")
@@ -96,7 +108,9 @@ def test_http_failure_body_and_status_are_preserved(tmp_path, monkeypatch):
     assert (tmp_path / row["body_path"]).read_bytes() == b"bad image"
 
 
-def test_network_failure_is_not_retried_or_marked_verified(tmp_path, monkeypatch):
+def test_network_failure_is_not_retried_or_marked_verified(
+    tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     calls = []
 
     def fail(*args, **kwargs):
@@ -111,7 +125,9 @@ def test_network_failure_is_not_retried_or_marked_verified(tmp_path, monkeypatch
     assert list(tmp_path.iterdir()) == []
 
 
-def test_excess_response_is_retained_as_truncated_unverified(tmp_path, monkeypatch):
+def test_excess_response_is_retained_as_truncated_unverified(
+    tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     monkeypatch.setattr(retrieval, "MAX_RESPONSE_BYTES", 3)
     monkeypatch.setattr(retrieval, "urlopen", lambda *a, **k: Response(b"fixed bytes"))
     row = retrieval.retrieve_region(small_region(), tmp_path, 1)
@@ -120,7 +136,9 @@ def test_excess_response_is_retained_as_truncated_unverified(tmp_path, monkeypat
     assert (tmp_path / row["body_path"]).read_bytes() == b"fixe"
 
 
-def test_existing_output_directory_is_preserved(tmp_path, monkeypatch):
+def test_existing_output_directory_is_preserved(
+    tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     marker = tmp_path / "preserve.txt"
     marker.write_text("existing evidence")
     monkeypatch.setattr(retrieval, "urlopen", lambda *a, **k: pytest.fail("network"))
@@ -130,8 +148,8 @@ def test_existing_output_directory_is_preserved(tmp_path, monkeypatch):
 
 
 def test_failed_fetch_has_nonzero_exit_and_completed_failure_receipt(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     monkeypatch.setattr(retrieval, "registered_regions", lambda: [small_region()])
     monkeypatch.setattr(
         retrieval, "urlopen", lambda *a, **k: Response(b"changed bytes")
@@ -145,7 +163,9 @@ def test_failed_fetch_has_nonzero_exit_and_completed_failure_receipt(
     assert summary["results"][0]["expected_sha256"] == small_region()["expected_sha256"]
 
 
-def test_recorded_same_image_cannot_overwrite_a_previous_file(tmp_path, monkeypatch):
+def test_recorded_same_image_cannot_overwrite_a_previous_file(
+    tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     monkeypatch.setattr(retrieval, "urlopen", lambda *a, **k: Response(b"fixed bytes"))
     first = retrieval.retrieve_region(small_region(), tmp_path, 1)
     target = tmp_path / first["body_path"]

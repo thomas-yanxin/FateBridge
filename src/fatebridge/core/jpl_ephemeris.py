@@ -13,7 +13,7 @@ import os
 import re
 import struct
 from pathlib import Path
-from typing import Any, Dict, Tuple
+from typing import Any
 
 from fatebridge.utils.errors import EphemerisSourceError
 
@@ -31,7 +31,7 @@ def configured_jpl_file() -> str | None:
     return name
 
 
-def jpl_header(path: Path) -> Dict[str, Any]:
+def jpl_header(path: Path) -> dict[str, Any]:
     """Read both byte orders of the original direct-access DE441 format."""
     try:
         with path.open("rb") as source:
@@ -82,9 +82,9 @@ def prepare_jpl_call(
     module: Any,
     name: str,
     operation: str,
-    args: Tuple[Any, ...],
-    kwargs: Dict[str, Any],
-) -> Tuple[Tuple[Any, ...], Dict[str, Any], bool]:
+    args: tuple[Any, ...],
+    kwargs: dict[str, Any],
+) -> tuple[tuple[Any, ...], dict[str, Any], bool]:
     """Restore the selected kernel and replace supported ephemeris flags."""
     module.set_jpl_file(name)
     filename = module.get_current_file_data(0)[0]

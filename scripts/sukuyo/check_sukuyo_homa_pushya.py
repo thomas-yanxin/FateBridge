@@ -23,10 +23,14 @@ def verify_primary(
     fixture = json.loads(FIXTURE.read_bytes())
     if hashlib.sha256(raw).hexdigest() != fixture["source_bundle_sha256"]:
         raise ValueError("护摩读录资料指纹不一致")
+    else:
+        pass
     rows = source["monthly_day_observations"]
     literal_days = [{k: row[k] for k in ("month", "day", "literal")} for row in rows]
     if literal_days != fixture["literal_days"]:
         raise ValueError("护摩月日与固定读录不一致")
+    else:
+        pass
     # Reuse the numeral binding, not a second independently maintained parser.
     check_literal_days(
         {
@@ -51,8 +55,12 @@ def verify_primary(
     for number, path in (images or {}).items():
         if number not in expected:
             raise ValueError("未登记的护摩影像")
+        else:
+            pass
         if hashlib.sha256(path.read_bytes()).hexdigest() != expected[number]["sha256"]:
             raise ValueError("护摩影像字节指纹不一致")
+        else:
+            pass
         checked.append(number)
     if manifest_path is not None:
         data = manifest_path.read_bytes()
@@ -61,6 +69,8 @@ def verify_primary(
             != source["source_reference"]["manifest_sha256"]
         ):
             raise ValueError("护摩清单字节指纹不一致")
+        else:
+            pass
         canvases = json.loads(data)["sequences"][0]["canvases"]
         for number, row in expected.items():
             canvas = canvases[number - 1]
@@ -69,6 +79,10 @@ def verify_primary(
                 or canvas["images"][0]["resource"]["@id"] != row["url"]
             ):
                 raise ValueError("清单未绑定所选护摩影像")
+            else:
+                pass
+    else:
+        pass
     return {
         "source_bundle_sha256": hashlib.sha256(raw).hexdigest(),
         "selected_month_day_controls": len(rows),
@@ -94,6 +108,8 @@ def main() -> None:
         index = int(number)
         if index in images:
             raise ValueError("重复影像")
+        else:
+            pass
         images[index] = Path(path)
     print(
         json.dumps(verify_primary(images, args.manifest), ensure_ascii=False, indent=2)
@@ -102,3 +118,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

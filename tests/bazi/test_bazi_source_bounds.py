@@ -27,8 +27,8 @@ def row(forbidden, exact=None):
     ],
 )
 def test_unknown_exact_annotation_remains_unknown_with_any_bounded_outcome(
-    grade, status
-):
+    grade: str | None, status: str
+) -> None:
     records = [row(["弱"])]
     before = deepcopy(records)
     result = compare_records(records, grade)
@@ -43,11 +43,16 @@ def test_unknown_exact_annotation_remains_unknown_with_any_bounded_outcome(
     assert bounds["exact_strength_label_assigned"] is False
     assert result["calculation_overridden"] is False
     assert bounds["new_independent_validation_credit"] == 0
+    assert "按已登记的原文编释" in bounds["scope"]
     if grade == "弱":
-        assert "集合约束被当前计算违反" in annotation_comparison_summary(result)
+        assert "已登记的编释集合约束被当前计算违反" in (
+            annotation_comparison_summary(result)
+        )
+    else:
+        pass
 
 
-def test_contradictory_bounds_and_exact_labels_are_all_preserved():
+def test_contradictory_bounds_and_exact_labels_are_all_preserved() -> None:
     result = compare_records([row(["弱"], "弱"), row(["强", "中和"])], "弱")
     bounds = result["bounded_comparison"]
     assert result["status"] == "agrees_with_known_annotations"
@@ -60,6 +65,6 @@ def test_contradictory_bounds_and_exact_labels_are_all_preserved():
 
 
 @pytest.mark.parametrize("forbidden", [[], ["旺"], [None], "弱", [3]])
-def test_malformed_bounds_cannot_be_dropped_or_converted_to_unknown(forbidden):
+def test_malformed_bounds_cannot_be_dropped_or_converted_to_unknown(forbidden) -> None:
     with pytest.raises(ValueError, match="集合约束"):
         compare_records([row(forbidden)], "弱")

@@ -4,17 +4,20 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 from fractions import Fraction
-from typing import Any, Dict, TypedDict
+from typing import Any, TypedDict
 
 from fatebridge.core.astro.birth import AstroBirthInfo
-from fatebridge.utils.timezones import parse_timezone_name
-
-from ._common import (
+from fatebridge.core.predictive._common import (
     build_subject,
     collect_aspect_hits,
     extract_reference_longitudes,
     point_to_dict,
 )
+from fatebridge.core.predictive.native_chart import NativeSubject
+from fatebridge.utils.civil_time import UTCCalendar, ZonedCalendar, utc_calendar
+from fatebridge.utils.timezones import format_local_time_or_utc, parse_timezone_name
+
+SECONDARY_PROGRESSION_YEAR_KEY = Fraction(36524219, 100000)
 
 
 class ProgressionClockOptions(TypedDict):
@@ -30,45 +33,53 @@ class ProgressionCalculationOptions(ProgressionClockOptions):
     house_method: str
 
 
-def calculate_secondary_progression_clock(
-    birth_info: AstroBirthInfo,
-    *,
-    analysis_datetime: datetime,
-) -> tuple[datetime, ProgressionClockOptions]:
-    birth_utc = birth_info.require_utc_datetime
-    delta = analysis_datetime.astimezone(parse_timezone_name("UTC")) - birth_utc
-    elapsed_microseconds = (
-        delta.days * 86400 + delta.seconds
-    ) * 1_000_000 + delta.microseconds
-    # Astrolog's documented fixed mean-tropical key, not a measured solar year.
-    # The day/year unit cancels: divide elapsed microseconds by the exact key.
-    progressed_utc = birth_utc + timedelta(
-        microseconds=round(Fraction(elapsed_microseconds * 100000, 36524219))
-    )
-    return progressed_utc, {
+def secondary_progression_clock_options() -> ProgressionClockOptions:
+    return {
         "method": "direct_secondary_progression",
         "year_basis": "fixed_365_24219_nominal_days",
-        "year_key_numerator": 36524219,
-        "year_key_denominator": 100000,
+        "year_key_numerator": SECONDARY_PROGRESSION_YEAR_KEY.numerator,
+        "year_key_denominator": SECONDARY_PROGRESSION_YEAR_KEY.denominator,
         "time_basis": "UTC_nominal_elapsed_days",
         "timestamp_rounding": "nearest_microsecond_ties_to_even_from_birth",
     }
 
 
+def calculate_secondary_progression_clock(
+    birth_info: AstroBirthInfo,
+    *,
+    analysis_datetime: datetime,
+) -> tuple[UTCCalendar, ProgressionClockOptions]:
+    birth_utc = birth_info.utc_calendar
+    delta = utc_calendar(analysis_datetime).elapsed_since(birth_utc)
+    elapsed_microseconds = (
+        delta.days * 86400 + delta.seconds
+    ) * 1_000_000 + delta.microseconds
+    # Astrolog's documented fixed mean-tropical key, not a measured solar year.
+    # The day/year unit cancels: divide elapsed microseconds by the exact key.
+    progressed_utc = birth_utc.shifted(
+        timedelta(
+            microseconds=round(
+                Fraction(elapsed_microseconds) / SECONDARY_PROGRESSION_YEAR_KEY
+            )
+        )
+    )
+    return progressed_utc, secondary_progression_clock_options()
+
+
 def build_secondary_progression_payload(
     birth_info: AstroBirthInfo,
-    natal_subject: Any,
+    natal_subject: NativeSubject,
     *,
     analysis_datetime: datetime,
     house_system: str = "P",
     zodiac_type: str = "Tropic",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     progressed_utc, clock_options = calculate_secondary_progression_clock(
         birth_info, analysis_datetime=analysis_datetime
     )
-    progressed_local = progressed_utc.astimezone(
-        parse_timezone_name(birth_info.timezone)
-    )
+    progressed_local = ZonedCalendar(
+        progressed_utc, parse_timezone_name(birth_info.timezone)
+    ).require_datetime()
     progressed_subject = build_subject(
         name=f"{birth_info.name}-progressed",
         local_datetime=progressed_local,
@@ -90,7 +101,7 @@ def build_secondary_progression_payload(
     return {
         "calculation_options": calculation_options,
         "calculation_basis": progressed_subject.calculation_basis,
-        "progressed_datetime": progressed_local.isoformat(),
+        "progressed_datetime": format_local_time_or_utc(progressed_local),
         "sun": point_to_dict("Sun", progressed_subject.sun),
         "moon": point_to_dict("Moon", progressed_subject.moon),
         "ascendant": point_to_dict("Ascendant", progressed_subject.ascendant),

@@ -2,7 +2,7 @@
 
 Dignities combine Egyptian bounds, Dorothean triplicity, Chaldean faces and
 Lilly weights. This selected combination does not reproduce every rule of one
-author. Shared zodiac tables live in :mod:`fatebridge.core.astrology_tables`;
+author. Shared zodiac tables live in :mod:`fatebridge.core.astro.astrology_tables`;
 physical fixed-star positions have their own owner and source receipts.
 """
 
@@ -10,16 +10,9 @@ from __future__ import annotations
 
 import math
 from fractions import Fraction
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-from fatebridge.core.astro.geometry import (
-    Angle,
-    angle_fraction,
-    angular_separation_fraction,
-    combine_longitudes,
-    normalize_angle,
-)
-from fatebridge.core.astrology_tables import (
+from fatebridge.core.astro.astrology_tables import (
     DOMICILE_RULERS,
     EGYPTIAN_BOUNDS_BY_SIGN,
     ELEMENT_BY_SIGN,
@@ -28,10 +21,17 @@ from fatebridge.core.astrology_tables import (
     SIGNS,
     _opposite_sign,
 )
+from fatebridge.core.astro.geometry import (
+    Angle,
+    angle_fraction,
+    angular_separation_fraction,
+    combine_longitudes_exact,
+    longitude_float,
+)
 
 # Chaldean decan faces — each sign's three 10° faces, Chaldean order from Mars at
 # 0° Aries. Ported verbatim from horosa data/dignities.js FACES (lowercased there).
-CHALDEAN_FACES: Dict[str, List[str]] = {
+CHALDEAN_FACES: dict[str, list[str]] = {
     "Aries": ["Mars", "Sun", "Venus"],
     "Taurus": ["Mercury", "Moon", "Saturn"],
     "Gemini": ["Jupiter", "Mars", "Sun"],
@@ -47,7 +47,7 @@ CHALDEAN_FACES: Dict[str, List[str]] = {
 }
 
 # Dorothean triplicity rulers by element → day / night / participating ruler.
-DOROTHEAN_TRIPLICITY: Dict[str, Dict[str, str]] = {
+DOROTHEAN_TRIPLICITY: dict[str, dict[str, str]] = {
     "Fire": {"day": "Sun", "night": "Jupiter", "participating": "Saturn"},
     "Earth": {"day": "Venus", "night": "Moon", "participating": "Mars"},
     "Air": {"day": "Saturn", "night": "Mercury", "participating": "Jupiter"},
@@ -55,7 +55,7 @@ DOROTHEAN_TRIPLICITY: Dict[str, Dict[str, str]] = {
 }
 
 # Lilly's essential-dignity scores (domicile +5 … face +1; detriment −5 / fall −4).
-DIGNITY_SCORE: Dict[str, int] = {
+DIGNITY_SCORE: dict[str, int] = {
     "rulership": 5,
     "exaltation": 4,
     "triplicity": 3,
@@ -65,7 +65,7 @@ DIGNITY_SCORE: Dict[str, int] = {
     "fall": -4,
 }
 
-DIGNITY_LABELS_ZH: Dict[str, str] = {
+DIGNITY_LABELS_ZH: dict[str, str] = {
     "rulership": "庙",
     "exaltation": "旺",
     "triplicity": "三分",
@@ -78,7 +78,7 @@ DIGNITY_LABELS_ZH: Dict[str, str] = {
 
 # Planetary joys by house (Hellenistic): Mercury 1, Moon 3, Venus 5, Mars 6,
 # Sun 9, Jupiter 11, Saturn 12.
-PLANETARY_JOYS: Dict[str, int] = {
+PLANETARY_JOYS: dict[str, int] = {
     "Mercury": 1,
     "Moon": 3,
     "Venus": 5,
@@ -110,7 +110,7 @@ _UNDER_BEAMS_LIMIT = 17.0
 # Max separation for enclosure/besiegement by body — flanking bodies must be
 # within this orb on each side, else nearest-neighbour over-reports.
 _ENCLOSURE_ORB = 15.0
-# Solar obliquity bound — a body beyond this declination is "out of bounds".
+# Ideal ecliptic obliquity cone, not a measured annual solar-declination maximum.
 
 
 def _angular_distance(first: Angle, second: Angle) -> Fraction:
@@ -118,7 +118,7 @@ def _angular_distance(first: Angle, second: Angle) -> Fraction:
     return angular_separation_fraction(first, second)
 
 
-def bound_lord(sign: str, degree_in_sign: float) -> Optional[str]:
+def bound_lord(sign: str, degree_in_sign: Angle) -> str | None:
     """Egyptian-term (bound) lord at this sign + degree."""
     for lord, start, end in EGYPTIAN_BOUNDS_BY_SIGN.get(sign, []):
         if start <= degree_in_sign < end:
@@ -126,7 +126,7 @@ def bound_lord(sign: str, degree_in_sign: float) -> Optional[str]:
     return None
 
 
-def face_lord(sign: str, degree_in_sign: float) -> Optional[str]:
+def face_lord(sign: str, degree_in_sign: Angle) -> str | None:
     """Chaldean face (decan) lord at this sign + degree."""
     faces = CHALDEAN_FACES.get(sign)
     if not faces:
@@ -134,18 +134,7 @@ def face_lord(sign: str, degree_in_sign: float) -> Optional[str]:
     return faces[min(2, int(degree_in_sign // 10))]
 
 
-def triplicity_members(sign: str) -> List[str]:
-    """All three Dorothean triplicity rulers of the sign's element (unordered).
-
-    Used for reception / horary's membership-style dignity flag.
-    """
-    rulers = DOROTHEAN_TRIPLICITY.get(ELEMENT_BY_SIGN.get(sign, ""))
-    if not rulers:
-        return []
-    return [rulers["day"], rulers["night"], rulers["participating"]]
-
-
-def triplicity_ruler(sign: str, is_day: Optional[bool]) -> Optional[str]:
+def triplicity_ruler(sign: str, is_day: bool | None) -> str | None:
     """The first Dorothean triplicity ruler for a known chart sect."""
     rulers = DOROTHEAN_TRIPLICITY.get(ELEMENT_BY_SIGN.get(sign, ""))
     if not rulers or is_day is None:
@@ -158,8 +147,8 @@ def _detriment_signs(planet: str) -> set:
 
 
 def essential_dignities(
-    planet: str, sign: str, degree_in_sign: float, is_day: Optional[bool]
-) -> Optional[Dict[str, Any]]:
+    planet: str, sign: str, degree_in_sign: float, is_day: bool | None
+) -> dict[str, Any] | None:
     """Full classical essential-dignity picture for a traditional planet.
 
     Returns the dignities held (rulership/exaltation/triplicity/bound/face) and
@@ -169,7 +158,7 @@ def essential_dignities(
     if planet not in TRADITIONAL_PLANETS:
         return None
 
-    held: List[str] = []
+    held: list[str] = []
     if sign in DOMICILE_RULERS.get(planet, ()):
         held.append("rulership")
     if EXALTATION_SIGNS.get(planet) == sign:
@@ -181,7 +170,7 @@ def essential_dignities(
     if face_lord(sign, degree_in_sign) == planet:
         held.append("face")
 
-    debilities: List[str] = []
+    debilities: list[str] = []
     if sign in _detriment_signs(planet):
         debilities.append("detriment")
     if sign == _opposite_sign(EXALTATION_SIGNS.get(planet, "")):
@@ -219,7 +208,7 @@ def essential_dignities(
     }
 
 
-def angularity(house: Optional[int]) -> Optional[str]:
+def angularity(house: int | None) -> str | None:
     """Angular (1/4/7/10) · succedent (2/5/8/11) · cadent (3/6/9/12)."""
     if not house:
         return None
@@ -230,7 +219,7 @@ def angularity(house: Optional[int]) -> Optional[str]:
     return "cadent"
 
 
-def combustion_state(planet_lon: Angle, sun_lon: Optional[Angle]) -> Optional[str]:
+def combustion_state(planet_lon: Angle, sun_lon: Angle | None) -> str | None:
     """Lilly p.113 definitions with explicit interval/zero-sign policies."""
     if sun_lon is None:
         return None
@@ -247,7 +236,7 @@ def combustion_state(planet_lon: Angle, sun_lon: Optional[Angle]) -> Optional[st
     return None
 
 
-def solar_condition_policy() -> Dict[str, Any]:
+def solar_condition_policy() -> dict[str, Any]:
     return {
         "rule_id": "lilly1647_p113_solar_definitions_v1",
         "source_edition": "William Lilly, Christian Astrology, London 1647",
@@ -264,7 +253,7 @@ def solar_condition_policy() -> Dict[str, Any]:
     }
 
 
-def orientality(planet_lon: Angle, sun_lon: Optional[Angle]) -> Optional[str]:
+def orientality(planet_lon: Angle, sun_lon: Angle | None) -> str | None:
     """Longitude phase at the exact supplied values, without a dead band.
 
     This does not solve physical rising or visibility. Exact coincidence is
@@ -279,7 +268,7 @@ def orientality(planet_lon: Angle, sun_lon: Optional[Angle]) -> Optional[str]:
     return "oriental" if phase >= 180 else "occidental"
 
 
-def orientality_policy() -> Dict[str, Any]:
+def orientality_policy() -> dict[str, Any]:
     """Expose what the shared geometric classification actually establishes."""
     return {
         "model": "ecliptic_longitude_phase",
@@ -293,7 +282,7 @@ def orientality_policy() -> Dict[str, Any]:
     }
 
 
-def planet_sect(planet: str, orientality_value: Optional[str]) -> Optional[str]:
+def planet_sect(planet: str, orientality_value: str | None) -> str | None:
     """Natural sect of a planet; Mercury follows its orientality."""
     if planet in DIURNAL_PLANETS:
         return "day"
@@ -308,8 +297,8 @@ def planet_sect(planet: str, orientality_value: Optional[str]) -> Optional[str]:
 
 
 def sect_placement(
-    planet: str, chart_sect: Optional[str], orientality_value: Optional[str]
-) -> Optional[str]:
+    planet: str, chart_sect: str | None, orientality_value: str | None
+) -> str | None:
     """Whether the planet is of the chart's sect or contrary to it."""
     own = planet_sect(planet, orientality_value)
     if own is None or chart_sect is None:
@@ -319,10 +308,10 @@ def sect_placement(
 
 def in_halb(
     planet: str,
-    chart_sect: Optional[str],
-    above_horizon: Optional[bool],
-    orientality_value: Optional[str],
-) -> Optional[bool]:
+    chart_sect: str | None,
+    above_horizon: bool | None,
+    orientality_value: str | None,
+) -> bool | None:
     """The selected of-sect and hemisphere predicate, without sign gender.
 
     Matching sect is required; day planets are above by day and night planets
@@ -338,11 +327,11 @@ def in_halb(
     return not above_horizon if own == "day" else above_horizon
 
 
-def planetary_joy(planet: str, house: Optional[int]) -> bool:
+def planetary_joy(planet: str, house: int | None) -> bool:
     return bool(house) and PLANETARY_JOYS.get(planet) == house
 
 
-def is_retrograde(longitude_speed: Optional[float]) -> Optional[bool]:
+def is_retrograde(longitude_speed: float | None) -> bool | None:
     """Retrograde when ecliptic longitude speed is negative.
 
     ``None`` when the speed is unknown — the offline approximate orbital model
@@ -355,23 +344,47 @@ def is_retrograde(longitude_speed: Optional[float]) -> Optional[bool]:
 
 
 def out_of_bounds(
-    declination: Optional[float], obliquity: Optional[float] = None
-) -> Optional[bool]:
-    """A body is *out of bounds* when its declination exceeds the Sun's maximum.
+    declination: float | None, obliquity: float | None = None
+) -> bool | None:
+    """Compare supplied declination with an ideal epoch-obliquity bound.
 
     Compare with the epoch's obliquity in the same true-equator frame as the
     declination. Unknown obliquity stays unknown; chart assembly supplies the
-    actual epoch value.
+    actual epoch value. This geometric convention is not a search for the
+    real Sun's maximum declination over a physical year.
     """
     if declination is None or obliquity is None:
         return None
     return abs(declination) > abs(obliquity)
 
 
+def ecliptic_out_of_bounds(longitude: float, latitude: float, obliquity: float) -> bool:
+    """Strict same-source obliquity cone before a rounded declination display.
+
+    ERFA NUMAT's ecliptic/equatorial rotation gives the unit ray's z below.
+    Compare it directly with sin(epsilon), avoiding an asin/degree round trip
+    that can put even an in-plane ray outside its own bound. Supplied degree
+    inputs are retained at 96 digits; no body-name shortcut or deadband.
+    https://github.com/liberfa/erfa/blob/v2.0.1/src/numat.c
+    """
+    from mpmath import mp  # type: ignore[import-untyped]
+
+    ctx = mp.clone()
+    ctx.dps = 96
+    lam, beta, eps = (
+        ctx.mpf(value) / 180 for value in (longitude, latitude, obliquity)
+    )
+    sine_obliquity = ctx.sinpi(eps)
+    z = ctx.sinpi(beta) * ctx.cospi(eps) + ctx.cospi(beta) * sine_obliquity * ctx.sinpi(
+        lam
+    )
+    return bool(abs(z) > abs(sine_obliquity))
+
+
 # ── almuten (essential-dignity rulership of a degree) + dispositors ──
 
 # Reverse of EXALTATION_SIGNS: sign → the planet exalted there (7 of 12 signs).
-EXALT_RULER_BY_SIGN: Dict[str, str] = {
+EXALT_RULER_BY_SIGN: dict[str, str] = {
     sign: planet for planet, sign in EXALTATION_SIGNS.items()
 }
 
@@ -386,8 +399,8 @@ _ALMUTEN_WEIGHTS = {
 
 
 def dignity_lords_at(
-    sign: str, degree_in_sign: float, is_day: bool
-) -> Dict[str, Optional[str]]:
+    sign: str, degree_in_sign: Angle, is_day: bool
+) -> dict[str, str | None]:
     """The five essential-dignity lords of a point (domicile/exalt/trip/term/face)."""
     return {
         "domicile": RULER_BY_SIGN.get(sign),
@@ -402,7 +415,7 @@ def dignity_lords_at(
 _CHALDEAN_ORDER = ["Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon"]
 
 
-def _almuten_winner(totals: Dict[str, int]) -> Optional[str]:
+def _almuten_winner(totals: dict[str, int]) -> str | None:
     """The strongest planet in a weighted-dignity tally.
 
     Deterministic tie-break: higher score, then Chaldean (slowest-first) order —
@@ -420,7 +433,7 @@ def _almuten_winner(totals: Dict[str, int]) -> Optional[str]:
     )
 
 
-def almuten_of(sign: str, degree_in_sign: float, is_day: bool) -> Dict[str, Any]:
+def almuten_of(sign: str, degree_in_sign: Angle, is_day: bool) -> dict[str, Any]:
     """Almuten of a degree: the planet with the most weighted essential dignity.
 
     Sums the 5 dignity weights (5/4/3/2/1) each planet earns over the point;
@@ -428,7 +441,7 @@ def almuten_of(sign: str, degree_in_sign: float, is_day: bool) -> Dict[str, Any]
     order (slowest first), without an additional dignity-rank tie-break.
     """
     lords = dignity_lords_at(sign, degree_in_sign, is_day)
-    totals: Dict[str, int] = {}
+    totals: dict[str, int] = {}
     for dignity, weight in _ALMUTEN_WEIGHTS.items():
         lord = lords[dignity]
         if lord:
@@ -436,7 +449,7 @@ def almuten_of(sign: str, degree_in_sign: float, is_day: bool) -> Dict[str, Any]
     return {"winner": _almuten_winner(totals), "totals": totals, "lords": lords}
 
 
-def planetary_hour_sequence(day_ruler: str) -> List[str]:
+def planetary_hour_sequence(day_ruler: str) -> list[str]:
     """The 24 planetary-hour rulers of one sunrise-to-sunrise day.
 
     Hour 1 (the first after sunrise) is ruled by ``day_ruler`` — the planet of
@@ -453,25 +466,29 @@ def planetary_hour_sequence(day_ruler: str) -> List[str]:
     return [_CHALDEAN_ORDER[(start + offset) % 7] for offset in range(24)]
 
 
-# Almuten Figuris (命主 / Lord of the Nativity, Ibn Ezra) is elected over five
-# hylegic points. Order is fixed for deterministic JSON; ``syzygy`` is dropped on
-# the offline engine (it needs the prenatal lunation, an ephemeris search).
+# Selected essential-dignity tally over five hylegic points. This mixed-table
+# subset is not the full historical ruler-of-the-nativity procedure. Order is
+# fixed for deterministic JSON; unavailable points do not contribute.
 ALMUTEN_FIGURIS_POINTS = ("Sun", "Moon", "Ascendant", "fortune", "syzygy")
 
 
 def build_almuten_figuris(
-    points: Dict[str, Dict[str, Any]], is_day: bool
-) -> Dict[str, Any]:
-    """Almuten Figuris (命主): the planet ruling the chart's hylegic points.
+    points: dict[str, dict[str, Any]],
+    is_day: bool,
+    *,
+    unknown_points: tuple[str, ...] = (),
+) -> dict[str, Any]:
+    """Selected essential-dignity tally over the available hylegic points.
 
     ``points`` maps each point id (see :data:`ALMUTEN_FIGURIS_POINTS`) to a
     ``{"sign", "degree_in_sign"}`` placement; only the points the engine could
     supply are passed. Each point contributes the weighted essential-dignity
     tally of :func:`almuten_of`; summing those tallies across every point names
-    the chart's overall ruler. Same Chaldean tie-break as the per-degree almuten.
+    the selected tally's winner. The fixed Chaldean tie-break is shared with
+    the per-degree almuten, not an instantaneous angular-speed comparison.
     """
-    totals: Dict[str, int] = {}
-    per_point: Dict[str, Any] = {}
+    totals: dict[str, int] = {}
+    per_point: dict[str, Any] = {}
     for point_id in ALMUTEN_FIGURIS_POINTS:
         placement = points.get(point_id)
         if not placement:
@@ -490,18 +507,71 @@ def build_almuten_figuris(
         for planet, weight in result["totals"].items():
             totals[planet] = totals.get(planet, 0) + weight
     return {
-        "winner": _almuten_winner(totals),
-        "totals": totals,
+        "winner": None if unknown_points else _almuten_winner(totals),
+        "totals": None if unknown_points else totals,
         "points": per_point,
+        **(
+            {
+                "status": "partial",
+                "unknown_points": list(unknown_points),
+                "known_totals": totals,
+            }
+            if unknown_points
+            else {}
+        ),
+        "method": {
+            "method_id": "available_hylegic_points_essential_tally_v1",
+            "source_profile": "mixed_dorothean_egyptian_lilly",
+            "scope": "available_point_essential_dignities_only",
+            "dignity_weights": dict(_ALMUTEN_WEIGHTS),
+            "triplicity_policy": "one_sect_primary_dorothean_ruler",
+            "is_day": is_day,
+            "bounds_policy": "egyptian",
+            "face_policy": "chaldean",
+            "tie_break_policy": "highest_total_then_fixed_chaldean_order",
+            "tie_break_order": list(_CHALDEAN_ORDER),
+            "expected_points": list(ALMUTEN_FIGURIS_POINTS),
+            "included_points": list(per_point),
+            "missing_points": [
+                point_id
+                for point_id in ALMUTEN_FIGURIS_POINTS
+                if point_id not in per_point
+            ],
+            "historical_method_status": "selected_mixed_subset",
+            "source_refs": [
+                {
+                    "title": "Abraham Ibn Ezra on Nativities and Continuous Horoscopy",
+                    "author": "Abraham Ibn Ezra; edited and translated by Shlomo Sela",
+                    "edition": "Brill 2014, Astrological Writings 4 / EJM 59",
+                    "url": "https://www.degruyterbrill.com/document/isbn/9789004258525/html",
+                    "section": "Sefer ha-Moladot III.i.3(2–3), printed p.101",
+                    "scope": (
+                        "Five-place and 5/4/3/2/1 ingredients only; does not uniquely "
+                        "endorse these mixed tables, the fixed tie-break or a full method."
+                    ),
+                },
+                {
+                    "title": "Solar Fire 9 User Guide",
+                    "author": "Esoteric Technologies Pty Ltd",
+                    "edition": "2014",
+                    "url": "https://alabe.com/ProgramDocs/SolarFire_v9.pdf#page=449",
+                    "section": "10.12.2, printed p.449",
+                    "scope": (
+                        "Configurable selected-point dignity-summation software family; "
+                        "not runtime parity or unique endorsement of this tie-break."
+                    ),
+                },
+            ],
+        },
     }
 
 
-def domicile_ruler(sign: str) -> Optional[str]:
+def domicile_ruler(sign: str) -> str | None:
     """Traditional domicile ruler of a sign (for dispositor chains)."""
     return RULER_BY_SIGN.get(sign)
 
 
-def dispositor_chain(planet: str, placements: Dict[str, str]) -> Dict[str, Any]:
+def dispositor_chain(planet: str, placements: dict[str, str]) -> dict[str, Any]:
     """Follow the domicile-dispositor chain from ``planet``.
 
     ``placements`` maps planet → the sign it occupies. Each planet is disposited
@@ -509,7 +579,7 @@ def dispositor_chain(planet: str, placements: Dict[str, str]) -> Dict[str, Any]:
     its own domicile (final dispositor) or revisits a planet (mutual-reception /
     longer loop). Returns the visited chain + terminal info.
     """
-    chain: List[str] = [planet]
+    chain: list[str] = [planet]
     seen = {planet}
     current = planet
     while True:
@@ -528,7 +598,7 @@ def dispositor_chain(planet: str, placements: Dict[str, str]) -> Dict[str, Any]:
         current = ruler
 
 
-def build_dispositor_layer(placements: Dict[str, str]) -> Dict[str, Any]:
+def build_dispositor_layer(placements: dict[str, str]) -> dict[str, Any]:
     """Per-planet dispositor chains + the chart's final dispositor(s)."""
     chains = {planet: dispositor_chain(planet, placements) for planet in placements}
     finals = sorted(
@@ -542,15 +612,15 @@ def build_dispositor_layer(placements: Dict[str, str]) -> Dict[str, Any]:
 
 
 def build_topic_almutens(
-    houses: Dict[int, Dict[str, Any]], is_day: bool
-) -> Dict[str, Dict[str, Any]]:
+    houses: dict[int, dict[str, Any]], is_day: bool
+) -> dict[str, dict[str, Any]]:
     """Almuten of each house cusp — the topic ruler of that house's matters.
 
     Keyed by the house number as a **string** so the structure round-trips
     identically through JSON (REST) and in-process (MCP) transports — JSON object
     keys are always strings, and the two surfaces must stay byte-identical.
     """
-    topic: Dict[str, Dict[str, Any]] = {}
+    topic: dict[str, dict[str, Any]] = {}
     for house_number, cusp in houses.items():
         sign = cusp.get("sign")
         degree = cusp.get("degree_in_sign")
@@ -566,7 +636,7 @@ def build_topic_almutens(
 # Lot formulas: lon = (a + b − c) mod 360, with day/night reversal. Marker keys
 # index into the longitude table (asc / sun / moon / planets).
 # Ported verbatim from horosa data/lots.js (卜卦构建清单 §1.5).
-LOTS: Dict[str, Dict[str, Any]] = {
+LOTS: dict[str, dict[str, Any]] = {
     "fortune": {
         "cn": "福点",
         "use": "财富·失物·方位·身体",
@@ -594,43 +664,49 @@ LOTS: Dict[str, Dict[str, Any]] = {
 }
 
 
-def _sign_of_longitude(longitude: float) -> str:
-    return SIGNS[int(normalize_angle(longitude) // 30.0)]
-
-
-def compute_lot(formula: List[str], lons: Dict[str, float]) -> Optional[float]:
-    """``lon = (a + b − c) mod 360`` from the longitude table; None if a marker missing."""
+def lot_longitude(formula: list[str], lons: dict[str, float]) -> Fraction | None:
+    """Evaluate a lot on the exact supplied coordinates if all markers exist."""
     a = lons.get(formula[0])
     b = lons.get(formula[1])
     c = lons.get(formula[2])
     if a is None or b is None or c is None:
         return None
-    # Share the chart path's half-open angular normalization. Adding 360 after
-    # an already-positive modulo loses low bits and can wrap a tiny negative
-    # input to zero, changing which side of the zodiac boundary it occupies.
-    return combine_longitudes(a, b, -c)
+    return combine_longitudes_exact(a, b, -c)
 
 
-def lot_dispositor(lot_longitude: float) -> Optional[str]:
-    """Domicile ruler of the sign a lot falls in (its dispositor / 定位星)."""
-    return RULER_BY_SIGN.get(_sign_of_longitude(lot_longitude))
+def compute_lot(formula: list[str], lons: dict[str, float]) -> float | None:
+    """Deliver the lot as a sign-preserving longitude if all markers exist."""
+    longitude = lot_longitude(formula, lons)
+    return longitude_float(longitude) if longitude is not None else None
 
 
-def build_lots_layer(lons: Dict[str, float], is_day: bool) -> Dict[str, Any]:
-    """Each Arabic lot's position + its domicile dispositor and weighted almuten."""
-    out: Dict[str, Any] = {}
+def build_lots_layer(
+    lons: dict[str, float],
+    is_day: bool,
+    *,
+    lot_longitudes: dict[str, Fraction] | None = None,
+) -> dict[str, Any]:
+    """Build lot records and optionally retain working angles for geometry."""
+    out: dict[str, Any] = {}
     for lot_id, definition in LOTS.items():
         formula = definition["day"] if is_day else definition["night"]
-        lon = compute_lot(formula, lons)
+        lon = lot_longitude(formula, lons)
         if lon is None:
             continue
-        sign = _sign_of_longitude(lon)
-        degree = lon % 30.0
+        if lot_longitudes is not None:
+            lot_longitudes[lot_id] = lon
+        sign_index, degree = divmod(lon, 30)
+        sign = SIGNS[sign_index]
+        displayed_degree = float(degree)
+        # All mixed-table bounds and faces start at whole degrees. Preserve
+        # the working degree's interval when delivering it to table consumers.
+        if int(displayed_degree) != int(degree):
+            displayed_degree = math.nextafter(displayed_degree, -math.inf)
         out[lot_id] = {
             "cn": definition["cn"],
-            "longitude": lon,
+            "longitude": longitude_float(lon),
             "sign": sign,
-            "degree_in_sign": degree,
+            "degree_in_sign": displayed_degree,
             "dispositor": RULER_BY_SIGN.get(sign),
             "almuten": almuten_of(sign, degree, is_day)["winner"],
         }
@@ -661,7 +737,7 @@ _WHOLE_SIGN_ASPECT = {
 }
 
 
-def whole_sign_aspect(sign_a: str, sign_b: str) -> Optional[str]:
+def whole_sign_aspect(sign_a: str, sign_b: str) -> str | None:
     """Classical whole-sign aspect between two signs (None = aversion)."""
     if sign_a not in _SIGN_INDEX or sign_b not in _SIGN_INDEX:
         return None
@@ -690,9 +766,9 @@ NODE_BENDING_ORB = 3.0
 
 def _aspect_phase(
     lon_a: float,
-    speed_a: Optional[float],
+    speed_a: float | None,
     lon_b: float,
-    speed_b: Optional[float],
+    speed_b: float | None,
     exact_angle: float,
 ) -> str:
     """One-sided instantaneous motion of longitude distance to an aspect.
@@ -708,7 +784,7 @@ def _aspect_phase(
         raise ValueError("Aspect angle must be within 0..180 degrees")
     delta = (angle_fraction(lon_b) - angle_fraction(lon_a)) % 360
     angle = Fraction(exact_angle)
-    residuals: List[Fraction] = []
+    residuals: list[Fraction] = []
     for target in {angle % 360, (-angle) % 360}:
         forward = (delta - target) % 360
         residuals.extend((forward, forward - 360))
@@ -726,19 +802,19 @@ def _aspect_phase(
 
 def _aspect_is_applying(
     lon_a: float,
-    speed_a: Optional[float],
+    speed_a: float | None,
     lon_b: float,
-    speed_b: Optional[float],
+    speed_b: float | None,
     exact_angle: float,
-) -> Optional[bool]:
+) -> bool | None:
     """Compatibility predicate; exact/equal-speed/unknown are not separating."""
     phase = _aspect_phase(lon_a, speed_a, lon_b, speed_b, exact_angle)
     return {"applying": True, "separating": False}.get(phase)
 
 
 def ptolemy_latitude_condition(
-    angle: float, first: Optional[float], second: Optional[float]
-) -> Dict[str, Any]:
+    angle: float, first: float | None, second: float | None
+) -> dict[str, Any]:
     """Robbins I.24 latitude gate, separate from modern longitude aspects.
 
     Closed hemispheres admit a body on the ecliptic. That zero convention is
@@ -768,14 +844,14 @@ def ptolemy_latitude_condition(
 
 
 def build_classical_patterns(
-    planet_positions: List[Dict[str, Any]],
-    aspects: List[Dict[str, Any]],
-    chart_sect: Optional[str],
+    planet_positions: list[dict[str, Any]],
+    aspects: list[dict[str, Any]],
+    chart_sect: str | None,
     *,
-    speeds: Optional[Dict[str, float]] = None,
-    latitudes: Optional[Dict[str, float]] = None,
-    node_longitude: Optional[float] = None,
-) -> Dict[str, Any]:
+    speeds: dict[str, float] | None = None,
+    latitudes: dict[str, float] | None = None,
+    node_longitude: float | None = None,
+) -> dict[str, Any]:
     """``[古典格局]`` relational layer over the seven traditional planets.
 
     Aversion, overcoming (superior square), besiegement/enclosure by body,
@@ -792,8 +868,8 @@ def build_classical_patterns(
     latitudes = latitudes or {}
 
     # --- aversion: pairs sharing no whole-sign aspect ---
-    aversions: List[List[str]] = []
-    overcoming: List[Dict[str, str]] = []
+    aversions: list[list[str]] = []
+    overcoming: list[dict[str, str]] = []
     ids = [p["id"] for p in trad]
     for i, a in enumerate(ids):
         for b in ids[i + 1 :]:
@@ -808,7 +884,7 @@ def build_classical_patterns(
     # Enclosure by body requires the flanking bodies within ~15° on each side;
     # nearest-neighbour alone over-reports in sparse charts.
     ordered = sorted(trad, key=lambda p: p["longitude"])
-    besiegement: Dict[str, str] = {}
+    besiegement: dict[str, str] = {}
     n = len(ordered)
     for index, planet in enumerate(ordered):
         if planet["id"] in BENEFICS or planet["id"] in MALEFICS:
@@ -830,7 +906,7 @@ def build_classical_patterns(
             besiegement[planet["id"]] = "enclosed_by_benefics"
 
     # --- bonification / maltreatment by aspect to benefics / malefics ---
-    bonification: Dict[str, Dict[str, List[str]]] = {
+    bonification: dict[str, dict[str, list[str]]] = {
         pid: {"bonified_by": [], "maltreated_by": []} for pid in ids
     }
     for aspect in aspects:
@@ -845,8 +921,8 @@ def build_classical_patterns(
 
     # --- translation & collection of light (need applying/separating) ---
     # Aspect angle between two traditional planets, keyed by the unordered pair.
-    pair_angle: Dict[frozenset, float] = {}
-    aspect_motion: List[Dict[str, Any]] = []
+    pair_angle: dict[frozenset, float] = {}
+    aspect_motion: list[dict[str, Any]] = []
     for aspect in aspects:
         a, b = aspect.get("planet_a"), aspect.get("planet_b")
         angle = _ASPECT_ANGLES.get(str(aspect.get("aspect") or ""))
@@ -894,7 +970,7 @@ def build_classical_patterns(
     def lighter(p: str, q: str) -> bool:
         return LIGHT_WEIGHT_ORDER.index(p) > LIGHT_WEIGHT_ORDER.index(q)
 
-    def applying(source: str, target: str) -> Optional[bool]:
+    def applying(source: str, target: str) -> bool | None:
         angle = pair_angle.get(frozenset((source, target)))
         if angle is None:
             return None
@@ -906,8 +982,8 @@ def build_classical_patterns(
             angle,
         )
 
-    translation: List[Dict[str, str]] = []
-    collection: List[Dict[str, Any]] = []
+    translation: list[dict[str, str]] = []
+    collection: list[dict[str, Any]] = []
     if ids:
         # Lilly p.111 definition candidate: a lighter, faster Z separates from
         # X and applies to Y. His example has aspected endpoints. The separate
@@ -955,7 +1031,7 @@ def build_classical_patterns(
                     )
 
     # --- nodal bending (a planet square the nodal axis) ---
-    nodal_bending: List[Dict[str, Any]] = []
+    nodal_bending: list[dict[str, Any]] = []
     if node_longitude is not None:
         bending_points = {
             "north": (angle_fraction(node_longitude) + 90) % 360,
@@ -1019,7 +1095,7 @@ def build_classical_patterns(
 # Curated classical catalogue: the 15 Behenian stars + 5 notable bright stars.
 # Numerical positions come from the separate SIMBAD ICRS catalogue and native
 # apparent model. This table contains cited traditional natures and labels.
-FIXED_STARS: Dict[str, Dict[str, Any]] = {
+FIXED_STARS: dict[str, dict[str, Any]] = {
     "Algol": {
         "nature": ["Saturn", "Jupiter"],
         "cn": "大陵五",
@@ -1107,13 +1183,13 @@ FIXED_STAR_ORB = 1.0
 
 
 def build_fixed_star_layer(
-    points: Dict[str, float],
+    points: dict[str, float],
     julian_day: float,
     orb: float = FIXED_STAR_ORB,
     *,
-    julian_day_tt: Optional[float] = None,
+    julian_day_tt: float | None = None,
     sidereal: bool = False,
-) -> tuple[List[Dict[str, Any]], Dict[str, Any]]:
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     from fatebridge.core.fixed_stars import build_layer
 
     return build_layer(
@@ -1130,7 +1206,7 @@ def build_fixed_star_layer(
 
 # Sign → governed body parts (head-to-foot). Ported verbatim from horosa
 # data/signs.js body_parts (卜卦构建清单 §1.6).
-SIGN_BODY_PARTS: Dict[str, List[str]] = {
+SIGN_BODY_PARTS: dict[str, list[str]] = {
     "Aries": ["头", "脸", "眼", "鼻", "耳"],
     "Taurus": ["喉", "颈", "甲状腺"],
     "Gemini": ["手臂", "肩", "肺", "神经", "气管"],
@@ -1147,13 +1223,13 @@ SIGN_BODY_PARTS: Dict[str, List[str]] = {
 
 # Classical primary qualities. Sign qualities follow the element; planet
 # qualities ported from horosa data/planets.js (Mercury = common/neutral).
-ELEMENT_QUALITIES: Dict[str, List[str]] = {
+ELEMENT_QUALITIES: dict[str, list[str]] = {
     "Fire": ["hot", "dry"],
     "Earth": ["cold", "dry"],
     "Air": ["hot", "moist"],
     "Water": ["cold", "moist"],
 }
-PLANET_QUALITIES: Dict[str, List[str]] = {
+PLANET_QUALITIES: dict[str, list[str]] = {
     "Sun": ["hot", "dry"],
     "Moon": ["cold", "moist"],
     "Mercury": [],  # common / takes on what it is connected to
@@ -1171,7 +1247,7 @@ _HUMORS = {
 }
 
 
-def dodekatemorion(sign: str, degree_in_sign: float) -> Optional[str]:
+def dodekatemorion(sign: str, degree_in_sign: float) -> str | None:
     """12分度: the sign reached by advancing ``floor(degree / 2.5)`` signs from
     the planet's own sign (each 30° sign carries all 12 in 2.5° steps)."""
     if sign not in _SIGN_INDEX:
@@ -1192,7 +1268,7 @@ _NINTH_PART_START = {
 }
 
 
-def ninth_part(sign: str, degree_in_sign: float) -> Optional[str]:
+def ninth_part(sign: str, degree_in_sign: float) -> str | None:
     """九分部 (ninth-part / navamsa): the sign of the 3°20′ division.
 
     Each sign splits into nine 3°20′ parts; the first opens on the cardinal sign
@@ -1219,7 +1295,7 @@ def _degree_position(degree_in_sign: float) -> str:
     return "下方"
 
 
-def melothesia(sign: str, degree_in_sign: float) -> Dict[str, Any]:
+def melothesia(sign: str, degree_in_sign: float) -> dict[str, Any]:
     """Body parts governed by the sign + the early/middle/late degree band."""
     return {
         "body_parts": SIGN_BODY_PARTS.get(sign, []).copy(),
@@ -1228,11 +1304,13 @@ def melothesia(sign: str, degree_in_sign: float) -> Dict[str, Any]:
 
 
 def build_temperament(
-    asc_sign: Optional[str],
-    asc_ruler: Optional[str],
-    sun_sign: Optional[str],
-    moon_sign: Optional[str],
-) -> Dict[str, Any]:
+    asc_sign: str | None,
+    asc_ruler: str | None,
+    sun_sign: str | None,
+    moon_sign: str | None,
+    *,
+    ascendant_resolved: bool = True,
+) -> dict[str, Any]:
     """Simplified Lilly-style qualities tally → dominant humor.
 
     Tallies the primary qualities of the Ascendant / Sun / Moon signs (by
@@ -1241,11 +1319,11 @@ def build_temperament(
     """
     tally = {"hot": 0, "cold": 0, "dry": 0, "moist": 0}
 
-    def add_sign(sign: Optional[str]) -> None:
+    def add_sign(sign: str | None) -> None:
         for quality in ELEMENT_QUALITIES.get(ELEMENT_BY_SIGN.get(sign or "", ""), []):
             tally[quality] += 1
 
-    def add_planet(planet: Optional[str]) -> None:
+    def add_planet(planet: str | None) -> None:
         for quality in PLANET_QUALITIES.get(planet or "", []):
             tally[quality] += 1
 
@@ -1256,6 +1334,17 @@ def build_temperament(
     add_planet("Sun")
     add_planet("Moon")
 
+    if not ascendant_resolved:
+        return {
+            "status": "partial",
+            "unknown_components": ["ascendant_sign", "ascendant_ruler"],
+            "known_tally": tally,
+            "tally": None,
+            "thermal": None,
+            "hygral": None,
+            "humor": None,
+            "cn": None,
+        }
     thermal = "hot" if tally["hot"] >= tally["cold"] else "cold"
     hygral = "moist" if tally["moist"] >= tally["dry"] else "dry"
     humor = _HUMORS[(thermal, hygral)]
@@ -1268,19 +1357,21 @@ def build_planet_classical(
     sign: str,
     degree_in_sign: float,
     longitude: float,
-    house: Optional[int],
-    sun_longitude: Optional[float],
-    chart_sect: Optional[str],
-    longitude_speed: Optional[float] = None,
-    declination: Optional[float] = None,
-    altitude: Optional[float] = None,
-    obliquity: Optional[float] = None,
-) -> Dict[str, Any]:
+    house: int | None,
+    sun_longitude: float | None,
+    chart_sect: str | None,
+    longitude_speed: float | None = None,
+    declination: float | None = None,
+    altitude: float | None = None,
+    obliquity: float | None = None,
+    source_ecliptic_coordinates: tuple[float, float] | None = None,
+) -> dict[str, Any]:
     """The per-planet ``classical`` entry surfaced on the chart payload.
 
     Ecliptic longitude speed drives ``retrograde``; equatorial declination and
-    the same-frame obliquity drive ``out_of_bounds``. Missing inputs remain
-    unknown rather than becoming zero.
+    the same-frame obliquity drive ``out_of_bounds``. When an original tropical
+    ecliptic ray is supplied, its cone decision precedes rounded declination.
+    Missing inputs remain unknown rather than becoming zero.
     """
     # Whole-sign, Vehlow and MC-anchored house numbers do not encode which
     # side of the physical horizon the planet occupies. Unknown stays unknown.
@@ -1301,9 +1392,13 @@ def build_planet_classical(
         "orientality": orient,
         "sect_placement": sect_placement(planet, chart_sect, orient),
         "in_halb": in_halb(planet, chart_sect, above, orient),
-        "joy": planetary_joy(planet, house),
+        "joy": planetary_joy(planet, house) if house is not None else None,
         "retrograde": is_retrograde(longitude_speed),
-        "out_of_bounds": out_of_bounds(declination, obliquity),
+        "out_of_bounds": (
+            ecliptic_out_of_bounds(*source_ecliptic_coordinates, obliquity)
+            if source_ecliptic_coordinates is not None and obliquity is not None
+            else out_of_bounds(declination, obliquity)
+        ),
         "dodekatemorion": dodekatemorion(sign, degree_in_sign),
         "ninth_part": ninth_part(sign, degree_in_sign),
         "melothesia": melothesia(sign, degree_in_sign),

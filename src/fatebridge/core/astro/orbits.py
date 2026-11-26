@@ -47,6 +47,7 @@ from fatebridge.core.astro.solar_deflection import MODEL_ID as DEFLECTION_MODEL
 from fatebridge.core.astro.solar_deflection import SOURCE_URL as DEFLECTION_SOURCE_URL
 from fatebridge.core.astro.tdb import SOURCE_URL as TDB_SOURCE_URL
 from fatebridge.core.astro.time_scales import fallback_julian_day_tt
+from fatebridge.core.astro.tt_epoch import TTInstant
 
 ORBITAL_MODEL = "bounded_de441_earth_moon_planetary_fallback_v9"
 FALLBACK_MODELS = frozenset({ORBITAL_MODEL, MEAN_NODE_MODEL})
@@ -75,7 +76,7 @@ def fallback_factor_source(planet: str) -> FallbackFactorSource:
             if planet == "Moon"
             else "Sun" if planet == "Sun" else f"{planet}-system barycenter"
         )
-        version = f"{PLANETARY_SOURCE_VERSION} {point}; bounded binary coefficient quanta; same-source receiving Earth/Sun; geocentric ERFA 2.0.1 TDB-TT and derivative; fixed ERFA mean-J2000 frame bias; native-TDB polynomial p/v/a, right-hand source-cell derivatives except final endpoint; local TT chain, not a derivative of binary rounding"
+        version = f"{PLANETARY_SOURCE_VERSION} {point}; losslessly retained original binary64 coefficient words on the bounded source grid; same-source receiving Earth/Sun; geocentric ERFA 2.0.1 TDB-TT and derivative; fixed ERFA mean-J2000 frame bias; native-TDB polynomial p/v/a, right-hand source-cell derivatives except final endpoint; local TT chain, not a derivative of binary rounding"
         url = PLANETARY_SOURCE_URL
         method = MOTION_METHOD
     return {"source_version": version, "source_url": url, "method_id": method}
@@ -107,19 +108,25 @@ class FallbackProvenance(TypedDict):
 
 
 class ApproximateEphemeris:
-    def __init__(self, julian_day_ut1: float, julian_day_tt: float | None) -> None:
+    def __init__(
+        self, julian_day_ut1: float, julian_day_tt: float | TTInstant | None
+    ) -> None:
         self.uncomputed_motion_reasons: dict[str, str] = {}
         self.observer = AnalyticObserver()
-        self.julian_day_tt = fallback_julian_day_tt(julian_day_ut1, julian_day_tt)
+        self.tt = fallback_julian_day_tt(julian_day_ut1, julian_day_tt)
         self.tt_source = (
             "chart_tt"
             if julian_day_tt is not None
             else "astronomy_engine_espenak_meeus_delta_t_estimate"
         )
 
+    @property
+    def julian_day_tt(self) -> float:
+        """Scalar receipt adapter; computation retains the canonical point."""
+        return self.tt.as_float()
+
     def state(self, planet: str, offset_days: float = 0.0) -> dict[str, float]:
-        days = self.julian_day_tt - 2451545.0 + offset_days
-        tt = days + 2451545.0
+        tt = self.tt.shifted_by(offset_days)
         self.uncomputed_motion_reasons.pop(planet, None)
         if planet == "North Node":
             state = mean_lunar_node(tt)
@@ -129,7 +136,7 @@ class ApproximateEphemeris:
                 )
             return state
         motion = self.observer.apparent_state(
-            planet, self.julian_day_tt - 2451545.0, offset_days
+            planet, self.tt.days - 2451545, offset_days
         )
         matrix, matrix_d = precession(tt)
         values, derivatives = pair(tt, "pepol", "peper")
@@ -176,6 +183,8 @@ class ApproximateEphemeris:
             additional.extend(
                 [
                     FRAME_SOURCE_URL,
+                    "https://github.com/liberfa/erfa/blob/v2.0.1/src/gst06.c",
+                    "https://aa.usno.navy.mil/faq/alt_az",
                     PLANETARY_SOURCE_URL,
                     PLANETARY_PAPER_URL,
                     SOURCE_FRAME_URL,

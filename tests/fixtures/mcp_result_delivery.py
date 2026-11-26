@@ -16,6 +16,8 @@ def assert_same_run_receipt(inline, full, *, deferred_fields=None):
     for path in deferred_fields or ():
         if not path.startswith("run_metadata."):
             continue  # whole-result paging is separate from this receipt check
+        else:
+            pass
         assert path in {
             "run_metadata.runtime",
             "run_metadata.provenance",
@@ -24,16 +26,15 @@ def assert_same_run_receipt(inline, full, *, deferred_fields=None):
         }, path
         key = path.removeprefix("run_metadata.")
         if key == "calculation_evidence":
-            assert inline[key] == {
-                "delivery_path": path,
-                "coverage": full[key].get("coverage"),
-            }
+            assert inline[key] == {"delivery_path": path}
             restored[key] = full[key]
             restored_paths.add(path)
         elif key != "runtime":
             assert key not in inline and key in full, key
             restored[key] = full[key]
             restored_paths.add(path)
+        else:
+            pass
     summary = inline.get("runtime", {})
     if summary.get("delivery_path") == "run_metadata.runtime":
         runtime = full["runtime"]
@@ -42,8 +43,12 @@ def assert_same_run_receipt(inline, full, *, deferred_fields=None):
         assert summary["ephemeris_files_count"] == len(files)
         restored["runtime"] = runtime
         restored_paths.add("run_metadata.runtime")
+    else:
+        pass
     if declared is not None:
         assert declared == restored_paths
+    else:
+        pass
     assert restored == full
     assert json.dumps(restored, sort_keys=True) == json.dumps(full, sort_keys=True)
 
@@ -53,6 +58,8 @@ async def read_full_result(client, payload):
     reference = payload.get("result_delivery")
     if reference is None:
         return payload
+    else:
+        pass
     result_id = reference["result_id"]
     base_uri = f"fatebridge://results/{result_id}"
     expected_first = f"{base_uri}/pages/0"

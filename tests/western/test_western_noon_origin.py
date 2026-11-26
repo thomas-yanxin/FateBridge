@@ -10,7 +10,7 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.civil_calendar import civil_datetime, gregorian_date
-from fatebridge.core.output_western import (
+from fatebridge.core.contracts.output_western import (
     WesternCivilCalendarConversion,
     WesternHourOriginConversion,
 )
@@ -27,7 +27,7 @@ REFERENCE = json.loads(REFERENCE_FILE.read_text())
 REFERENCE_SHA = "67685c2edb97b67df94d3c5394d77e20b9876db4aa39066c84523789126c205f"
 
 
-def test_original_images_and_controls_were_sealed_before_candidate():
+def test_original_images_and_controls_were_sealed_before_candidate() -> None:
     assert hashlib.sha256(REFERENCE_FILE.read_bytes()).hexdigest() == REFERENCE_SHA
     source = Path(__file__).parents[1] / "data/astro/noon_origin"
     assert (source / "reference.json").read_bytes() == REFERENCE_FILE.read_bytes()
@@ -38,7 +38,7 @@ def test_original_images_and_controls_were_sealed_before_candidate():
 
 
 @pytest.mark.parametrize("row", REFERENCE["printed_hour_mappings"])
-def test_p31_printed_hour_mappings(row):
+def test_p31_printed_hour_mappings(row) -> None:
     wall, calendar, origin = event_wall_datetime(
         2000, 1, 1, row["hour"], 0, hour_origin="noon"
     )
@@ -51,7 +51,9 @@ def test_p31_printed_hour_mappings(row):
 
 
 @pytest.mark.parametrize("row", REFERENCE["printed_dated_applications"])
-def test_five_printed_dated_applications_without_reconstructing_their_aspects(row):
+def test_five_printed_dated_applications_without_reconstructing_their_aspects(
+    row,
+) -> None:
     wall, calendar, origin = event_wall_datetime(
         *row["date"], row["hour"], row["minute"], row["calendar"], row["hour_origin"]
     )
@@ -67,7 +69,7 @@ def test_five_printed_dated_applications_without_reconstructing_their_aspects(ro
 
 
 @pytest.mark.parametrize("row", REFERENCE["calendar_boundary_controls"])
-def test_frozen_calendar_boundaries_and_final_representability(row):
+def test_frozen_calendar_boundaries_and_final_representability(row) -> None:
     args = (
         *row["date"],
         row["hour"],
@@ -88,6 +90,8 @@ def test_frozen_calendar_boundaries_and_final_representability(row):
         if row["source_date_ordinal"] < 1:
             assert calendar["normalized_local_datetime"] is None
             assert origin["calendar_normalized_label"] is None
+        else:
+            pass
         WesternCivilCalendarConversion.model_validate(calendar)
         WesternHourOriginConversion.model_validate(origin)
 
@@ -98,8 +102,8 @@ def test_frozen_calendar_boundaries_and_final_representability(row):
 )
 @pytest.mark.parametrize("row", REFERENCE["calendar_boundary_controls"])
 def test_request_checks_the_final_label_instead_of_rejecting_a_valid_intermediate(
-    model, prefix, row
-):
+    model, prefix: str, row
+) -> None:
     p = {f"{prefix}_{k}": v for k, v in zip(["year", "month", "day"], row["date"])}
     p.update(
         {
@@ -121,7 +125,7 @@ def test_request_checks_the_final_label_instead_of_rejecting_a_valid_intermediat
         )
 
 
-def test_rescued_julian_lower_bound_keeps_the_raw_label_and_real_native_epoch():
+def test_rescued_julian_lower_bound_keeps_the_raw_label_and_real_native_epoch() -> None:
     with pytest.raises(ValueError):
         gregorian_date(1, 1, 2, "julian")
     wall, c, o = event_wall_datetime(1, 1, 2, 12, 0, "julian", "noon")
@@ -139,7 +143,9 @@ def test_rescued_julian_lower_bound_keeps_the_raw_label_and_real_native_epoch():
 
 
 @pytest.mark.parametrize("row", REFERENCE["published_jd_label_examples"])
-def test_usno_published_jd_definitions_are_clock_label_checks_not_utc_assumptions(row):
+def test_usno_published_jd_definitions_are_clock_label_checks_not_utc_assumptions(
+    row,
+) -> None:
     wall, _, _ = event_wall_datetime(
         *row["date"], row["hour"], row["minute"], hour_origin=row["hour_origin"]
     )
@@ -152,7 +158,7 @@ def test_usno_published_jd_definitions_are_clock_label_checks_not_utc_assumption
     assert label_jd == Fraction(row["jd_ut1"])
 
 
-def test_noon_origin_reaches_the_previously_unsupported_utc_leap_second():
+def test_noon_origin_reaches_the_previously_unsupported_utc_leap_second() -> None:
     wall, _, _ = event_wall_datetime(1977, 12, 31, 12, 0, hour_origin="noon")
     assert wall == datetime(1978, 1, 1)
     subject, receipt = build_event_subject(
@@ -168,7 +174,7 @@ def test_noon_origin_reaches_the_previously_unsupported_utc_leap_second():
     assert not receipt["utc_representation"]["datetime_representable"]
 
 
-def test_non_leap_usno_epoch_reaches_exact_native_ut1():
+def test_non_leap_usno_epoch_reaches_exact_native_ut1() -> None:
     wall, _, _ = event_wall_datetime(1978, 7, 21, 3, 0, hour_origin="noon")
     native, _ = build_event_subject(
         name="synthetic published UT1 label",
@@ -180,7 +186,7 @@ def test_non_leap_usno_epoch_reaches_exact_native_ut1():
     assert native.julian_day == 2443711.125
 
 
-def test_p31_supplementary_sexagesimal_minutes_keep_the_same_day():
+def test_p31_supplementary_sexagesimal_minutes_keep_the_same_day() -> None:
     # Supplementary original-image reading after candidate construction;
     # deliberately not inserted into the pre-candidate application denominator.
     wall, _, origin = event_wall_datetime(2000, 1, 1, 11, 48, hour_origin="noon")
@@ -190,8 +196,8 @@ def test_p31_supplementary_sexagesimal_minutes_keep_the_same_day():
 
 @pytest.mark.parametrize("basis", ["civil", "local_mean_solar", "local_apparent_solar"])
 def test_origin_normalization_precedes_each_clock_basis_without_changing_native_facts(
-    basis,
-):
+    basis: str,
+) -> None:
     wall, _, _ = event_wall_datetime(1646, 1, 3, 21, 0, "julian", "noon")
     kw = dict(
         name="synthetic epoch identity",
@@ -216,7 +222,9 @@ def test_origin_normalization_precedes_each_clock_basis_without_changing_native_
         ((2024, 11, 2, 13, 30), "America/New_York", "ambiguous"),
     ],
 )
-def test_dst_validation_reads_the_final_nominal_clock_label(parts, zone, error):
+def test_dst_validation_reads_the_final_nominal_clock_label(
+    parts, zone: str, error: str
+) -> None:
     wall, _, _ = event_wall_datetime(*parts, hour_origin="noon")
     with pytest.raises(ValueError, match=error):
         build_event_subject(
@@ -240,7 +248,7 @@ def test_dst_validation_reads_the_final_nominal_clock_label(parts, zone, error):
         {"calendar": "auto"},
     ],
 )
-def test_unknown_origin_or_invalid_labels_are_not_inferred_or_wrapped(changes):
+def test_unknown_origin_or_invalid_labels_are_not_inferred_or_wrapped(changes) -> None:
     kw = dict(year=2024, month=1, day=1, hour=0, minute=0, hour_origin="noon")
     with pytest.raises((ValueError, TypeError)):
         event_wall_datetime(**{**kw, **changes})
@@ -251,8 +259,8 @@ def test_unknown_origin_or_invalid_labels_are_not_inferred_or_wrapped(changes):
     [((2024, 6, 1, 14, 30), "proleptic_gregorian"), ((1700, 2, 29, 0, 0), "julian")],
 )
 def test_default_midnight_keeps_existing_calendar_receipt_and_wall_label(
-    parts, calendar
-):
+    parts, calendar: str
+) -> None:
     a, old = civil_datetime(*parts, calendar)
     b, new, origin = event_wall_datetime(*parts, calendar)
     assert a == b and old == new

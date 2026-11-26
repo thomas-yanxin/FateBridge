@@ -2529,9 +2529,9 @@
       ],
       "retained_strength_annotation": "强",
       "annotation_status": "annotated_body_strength",
-      "annotation_basis": "同页后例明确回指前造日主坚旺；前段土衰木盛是初始季势，不以它覆盖后文最终原局判断。",
-      "retained_anchor": "前則坐下印綬……而日主堅旺",
-      "retained_context": "同页后例明确回指前造日主坚旺；前段土衰木盛是初始季势，不以它覆盖后文最终原局判断。",
+      "annotation_basis": "同页后例以「日主堅固」回指前造；前段「土衰木盛」写初始季势。此条保留原登记的强档编释。",
+      "retained_anchor": "前則坐下印綬……而日主堅固",
+      "retained_context": "同页后例以「日主堅固」回指前造；前段「土衰木盛」写初始季势。此条保留原登记的强档编释。",
       "source_reference": {
         "title": "任注滴天髓闡微·官殺",
         "edition": "李雨田校訂，上海大東書局，1947年4月初版",
@@ -2547,7 +2547,7 @@
       "editorial_annotation_provenance": {
         "content_kind": "registered_editorial_annotation",
         "case_id": "DTCW1947-GS-03",
-        "annotation_sha256": "f822bea208d1959ec9000b6aa9fb533b23eca22eb7050c71484304f0ff45cd9d",
+        "annotation_sha256": "a54a9c806aaa382f32e58fa6ddcd1b802fa97307b40aa87a0dcace71b6a29cd6",
         "source_label_kind": "explicit_day_master_or_day_element_judgment",
         "is_verbatim_original_text": false,
         "strength_label_assigned_or_regraded": false,
@@ -2566,9 +2566,9 @@
       ],
       "retained_strength_annotation": null,
       "annotation_status": "explicitly_unknown_body_strength",
-      "annotation_basis": "同段的日主坚旺指前造；此造财生杀、运途比较、外貌象义均不是明确全局身强弱标签。",
+      "annotation_basis": "同段的「日主堅固」指前造；此造财生杀、运途比较、外貌象义均不是明确全局身强弱标签。",
       "retained_anchor": "此則財坐日下，反去生殺",
-      "retained_context": "同段的日主坚旺指前造；此造财生杀、运途比较、外貌象义均不是明确全局身强弱标签。",
+      "retained_context": "同段的「日主堅固」指前造；此造财生杀、运途比较、外貌象义均不是明确全局身强弱标签。",
       "source_reference": {
         "title": "任注滴天髓闡微·官殺",
         "edition": "李雨田校訂，上海大東書局，1947年4月初版",
@@ -12150,10 +12150,97 @@
         "whole_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
       },
       "independent_annotation_review": "not_certified"
+    },
+    {
+      "reference_id": "climate_research:HN01",
+      "group": "climate_research",
+      "case_id": "HN01",
+      "pillars": [
+        "甲申",
+        "丙子",
+        "庚辰",
+        "戊寅"
+      ],
+      "retained_strength_annotation": null,
+      "annotation_status": "explicitly_unknown_body_strength",
+      "annotation_basis": null,
+      "retained_anchor": null,
+      "retained_context": null,
+      "source_reference": {
+        "title": "任注滴天髓闡微",
+        "edition": "李雨田校訂，上海大東書局，1947年4月初版",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          258
+        ],
+        "locator": "卷二〈寒暖〉印116右例",
+        "whole_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
+      },
+      "independent_annotation_review": "not_certified"
+    },
+    {
+      "reference_id": "climate_research:HN02",
+      "group": "climate_research",
+      "case_id": "HN02",
+      "pillars": [
+        "己酉",
+        "丙子",
+        "庚辰",
+        "甲申"
+      ],
+      "retained_strength_annotation": null,
+      "annotation_status": "explicitly_unknown_body_strength",
+      "annotation_basis": null,
+      "retained_anchor": null,
+      "retained_context": null,
+      "source_reference": {
+        "title": "任注滴天髓闡微",
+        "edition": "李雨田校訂，上海大東書局，1947年4月初版",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          258,
+          259
+        ],
+        "locator": "卷二〈寒暖〉印116左例，续印117",
+        "whole_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
+      },
+      "independent_annotation_review": "not_certified"
+    },
+    {
+      "reference_id": "siku_vol8:WCBC-YCYY",
+      "group": "siku_vol8",
+      "case_id": "WCBC-YCYY",
+      "pillars": [
+        "乙丑",
+        "乙酉",
+        "戊辰",
+        "丙辰"
+      ],
+      "retained_strength_annotation": null,
+      "annotation_status": "explicitly_unknown_body_strength",
+      "annotation_basis": null,
+      "retained_anchor": null,
+      "retained_context": null,
+      "source_reference": {
+        "title": "三命通會·六戊日丙辰時斷",
+        "edition": "四庫全書本，CADAL 06066044.cn 影印",
+        "url": "https://archive.org/download/06066044.cn/06066044.cn.pdf",
+        "source_id": null,
+        "pdf_pages": [
+          266,
+          267,
+          268
+        ],
+        "locator": "卷八〈六戊日丙辰時斷〉，戊辰日丙辰時条下乙丑、乙酉小字条（PDF268／8.133b）",
+        "whole_pdf_sha256": "b25aab7fd62980aaea2fb5eddefe3dadedc9031eca654f85bab748814165f005"
+      },
+      "independent_annotation_review": "not_certified"
     }
   ],
-  "record_count": 367,
-  "literal_input_count": 321,
+  "record_count": 370,
+  "literal_input_count": 324,
   "strength_constraints": [
     {
       "constraint_id": "prior_ganzhi:GH-07#/body_constraints/0",

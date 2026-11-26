@@ -46,6 +46,8 @@ def sine(x):
     x = x - 2 * turns * pi_interval()
     if x.absolute_upper() > 4:
         raise ValueError("Sine enclosure support too wide")
+    else:
+        pass
     term, total = x, x
     minus_square = -x.square()
     for k in range(1, 96):
@@ -59,10 +61,14 @@ def sine(x):
 def coefficients(raw):
     if sha(raw) != FB_SHA256:
         raise ValueError("Pinned ERFA author source changed")
+    else:
+        pass
     table = re.search(rb"fairhd\[787\]\[3\] = \{(.*?)\n\s*\};", raw, re.S)
     rows = re.findall(rb"\{\s*([\d.e+-]+),\s*([\d.e+-]+),\s*([\d.e+-]+)\s*\}", table[1])
     if len(rows) != 787:
         raise ValueError("Incomplete Fairhead series")
+    else:
+        pass
     return [tuple(Q(float(x)) for x in row) for row in rows]
 
 
@@ -71,8 +77,12 @@ def delta(tdb, model, rows):
     if model == MODELS[1]:
         m = Q(float("6.239996")) + Q(float("1.99096871e-7")) * (tdb - 2451545) * 86400
         return Q(float("1.657e-3")) * sine(m + Q(float("1.671e-2")) * sine(m))
+    else:
+        pass
     if model != MODELS[0]:
         raise ValueError("Unknown analytic clock model")
+    else:
+        pass
     t = (tdb - 2451545) / 365250
     groups = [
         sum((a * sine(b * t + c) for a, b, c in rows[lo:hi]), I()) for lo, hi in SLICES
@@ -89,8 +99,12 @@ def prediction(tt, model, raw):
     rows = coefficients(raw)
     if not Q("1721425.5") <= tt < Q("5373484.5"):
         raise ValueError("Clock study outside AD1..9999")
+    else:
+        pass
     if clock_envelope(raw.decode(), tt)["maximum_offset_seconds"] >= 1:
         raise ValueError("Initial implicit support not qualified")
+    else:
+        pass
     if (
         model == MODELS[1]
         and not Q(float("1.657e-3"))
@@ -99,6 +113,8 @@ def prediction(tt, model, raw):
         < 1
     ):
         raise ValueError("NAIF fixed point not contractive")
+    else:
+        pass
     interval = I(tt - Q(1, 86400), tt + Q(1, 86400))
     for _ in range(6):
         updated = tt + delta(interval, model, rows) / 86400
@@ -106,6 +122,8 @@ def prediction(tt, model, raw):
         c, d = updated.bounds()
         if not a <= c <= d <= b:
             raise ValueError("Implicit clock enclosure not nested")
+        else:
+            pass
         interval = updated
     documented = Q("2433282.5") <= tt <= Q("2469807.5")
     return {
@@ -129,6 +147,8 @@ def prediction(tt, model, raw):
 def comparison(pred, inverse, label_pass):
     if inverse["status"] != "bracketed":
         return {"status": "source_clock_unknown", "qualified_not_refuted": False}
+    else:
+        pass
     a, b = map(Q, pred["predicted_JD_TDB"])
     c, d = map(Q, inverse["effective_JD"])
     overlap = a <= d and c <= b
@@ -161,18 +181,24 @@ def analyze(run, cohort):
     for query in plan["queries"]:
         if query["cohort"] != cohort:
             continue
+        else:
+            pass
         receipt = json.loads(
             (run / "responses" / (query["id"] + ".receipt.json")).read_text()
         )
         raw = (run / "responses" / (query["id"] + ".raw")).read_bytes()
         if receipt["status"] != 200 or sha(raw) != receipt["raw_sha256"]:
             raise ValueError("Unavailable or changed TT model response")
+        else:
+            pass
         cases = query["cases"]
         rows = parse(raw, query, cases, plan)
         checked = []
         for row in rows:
             if row["role"] == "auxiliary_not_primary":
                 continue
+            else:
+                pass
             case = next(c for c in cases if c["id"] == row["case_id"])
             record = diagnose(run / "source-records", case, row, query["body"], plan)
             record["models"] = {
@@ -198,7 +224,7 @@ def analyze(run, cohort):
     return output
 
 
-def main():
+def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--run", type=Path, required=True)
     p.add_argument("--cohort", choices=("A", "B"), required=True)
@@ -209,3 +235,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

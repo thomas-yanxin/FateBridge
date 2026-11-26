@@ -33,7 +33,9 @@ STIMULUS = {
 HAS_SWE = pytest.mark.skipif(runtime.swe is None, reason="Swiss Ephemeris required")
 
 
-def test_unknown_uncertainty_does_not_get_imputed_as_zero(monkeypatch):
+def test_unknown_uncertainty_does_not_get_imputed_as_zero(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     birth = build_astro_birth_info(**STIMULUS)
     monkeypatch.setattr(
         "fatebridge.core.astro.sensitivity._native_factors",
@@ -47,10 +49,10 @@ def test_unknown_uncertainty_does_not_get_imputed_as_zero(monkeypatch):
 
 
 @HAS_SWE
-@pytest.mark.parametrize("radius", [0.0, 0.001, 0.7, 120.0])
+@pytest.mark.parametrize("radius", [0.0, 0.001, 0.57, 0.58, 0.7, 120.0])
 def test_grid_covers_declared_endpoints_nominal_and_no_gaps_above_thirty_seconds(
-    radius,
-):
+    radius: float,
+) -> None:
     birth = build_astro_birth_info(**STIMULUS)
     result = time_sensitivity(birth, sidereal=False, uncertainty_minutes=radius)
     instants = [datetime.fromisoformat(s["recorded_utc"]) for s in result["samples"]]
@@ -58,18 +60,23 @@ def test_grid_covers_declared_endpoints_nominal_and_no_gaps_above_thirty_seconds
     assert instants[0] == birth.utc_datetime - expected
     assert instants[-1] == birth.utc_datetime + expected
     assert birth.utc_datetime in instants
-    assert max(
+    recorded_gap = max(
         (b - a for a, b in zip(instants, instants[1:])), default=timedelta(0)
-    ) <= timedelta(seconds=30)
+    )
+    assert recorded_gap <= timedelta(seconds=30)
+    assert result["maximum_recorded_sample_gap_seconds"] == recorded_gap.total_seconds()
     assert len(instants) <= 483
-    assert result["sample_frequency_is_probability"] is False
     assert result["continuous_interval_proven"] is False
     if radius == 0:
         assert result["sample_count"] == 1
+    else:
+        pass
 
 
 @HAS_SWE
-def test_original_reading_at_nominal_time_is_not_present_across_the_declared_samples():
+def test_original_reading_at_nominal_time_is_not_present_across_the_declared_samples() -> (
+    None
+):
     result = calculate_germany_chart_analysis(
         **STIMULUS, birth_time_uncertainty_minutes=10
     )
@@ -105,6 +112,8 @@ def test_original_reading_at_nominal_time_is_not_present_across_the_declared_sam
                     row["source_interpretation"]["birth_time_sampled_status"]
                     == "varies_across_samples"
                 )
+            else:
+                pass
     zero = calculate_germany_chart_analysis(
         **STIMULUS, birth_time_uncertainty_minutes=0
     )
@@ -117,7 +126,7 @@ def test_original_reading_at_nominal_time_is_not_present_across_the_declared_sam
 
 
 @HAS_SWE
-def test_thirteen_sector_assignment_changes_with_real_recalculated_angles():
+def test_thirteen_sector_assignment_changes_with_real_recalculated_angles() -> None:
     result = calculate_core_chart_analysis(
         **STIMULUS, chart_variant="chart13", birth_time_uncertainty_minutes=10
     )
@@ -149,7 +158,9 @@ def test_thirteen_sector_assignment_changes_with_real_recalculated_angles():
 
 
 @HAS_SWE
-def test_recorded_utc_grid_crosses_dst_fold_without_relocalizing_ambiguous_wall_times():
+def test_recorded_utc_grid_crosses_dst_fold_without_relocalizing_ambiguous_wall_times() -> (
+    None
+):
     birth = build_astro_birth_info(
         birth_year=2026,
         birth_month=11,
@@ -168,7 +179,9 @@ def test_recorded_utc_grid_crosses_dst_fold_without_relocalizing_ambiguous_wall_
 
 
 @HAS_SWE
-def test_solar_clock_is_recomputed_before_factor_samples_and_nominal_is_preserved():
+def test_solar_clock_is_recomputed_before_factor_samples_and_nominal_is_preserved() -> (
+    None
+):
     payload = {
         **STIMULUS,
         "birth_timezone": "Asia/Shanghai",
@@ -200,7 +213,7 @@ def test_solar_clock_is_recomputed_before_factor_samples_and_nominal_is_preserve
 @pytest.mark.parametrize("latitude", [-89.9, -70, 0, 70, 89.9])
 def test_uncertainty_positions_rotate_together_under_lahiri_at_extreme_latitudes(
     latitude,
-):
+) -> None:
     birth = build_astro_birth_info(**{**STIMULUS, "birth_latitude": latitude})
     tropical = time_sensitivity(birth, sidereal=False, uncertainty_minutes=0)
     sidereal = time_sensitivity(birth, sidereal=True, uncertainty_minutes=0)
@@ -214,14 +227,14 @@ def test_uncertainty_positions_rotate_together_under_lahiri_at_extreme_latitudes
 
 
 @pytest.mark.parametrize("value", [float("nan"), float("inf"), -1, 120.001])
-def test_invalid_intervals_rejected_by_public_request_contract(value):
+def test_invalid_intervals_rejected_by_public_request_contract(value) -> None:
     with pytest.raises(ValidationError):
         AstroSpecialtyRequest.model_validate(
             {**astro_payload(), "birth_time_uncertainty_minutes": value}
         )
 
 
-def test_polymorphic_options_are_scoped_without_silently_dropping_uncertainty():
+def test_polymorphic_options_are_scoped_without_silently_dropping_uncertainty() -> None:
     for variant in ("germany", "chart13", "india_chart"):
         model = AstroChartPolyRequest.model_validate(
             {
@@ -246,7 +259,9 @@ def test_polymorphic_options_are_scoped_without_silently_dropping_uncertainty():
         )
 
 
-def test_explicit_interval_is_unavailable_if_swiss_is_missing(monkeypatch):
+def test_explicit_interval_is_unavailable_if_swiss_is_missing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     birth = build_astro_birth_info(**STIMULUS)
     monkeypatch.setattr(runtime, "swe", None)
     result = time_sensitivity(birth, sidereal=False, uncertainty_minutes=5)
@@ -255,7 +270,9 @@ def test_explicit_interval_is_unavailable_if_swiss_is_missing(monkeypatch):
 
 
 @HAS_SWE
-def test_core_service_germany_dispatch_keeps_dedicated_geometry_and_uncertainty():
+def test_core_service_germany_dispatch_keeps_dedicated_geometry_and_uncertainty() -> (
+    None
+):
     direct = calculate_germany_chart_analysis(
         **STIMULUS, birth_time_uncertainty_minutes=0
     )

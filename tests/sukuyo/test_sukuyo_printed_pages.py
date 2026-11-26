@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import sukuyo_printed_pages as source
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo import sukuyo_printed_pages as source
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
 from scripts.sukuyo.check_sukuyo_printed_pages import verify_primary
 
 BEFORE = json.loads(
@@ -24,11 +24,11 @@ def reference():
 
 
 @pytest.mark.parametrize("row", BEFORE["expected_data"]["root_selected_observations"])
-def test_all_nine_before_code_selected_print_observations_retained(row):
+def test_all_nine_before_code_selected_print_observations_retained(row) -> None:
     assert row in reference()["root_selected_observations"]
 
 
-def test_new_page_evidence_is_not_all_printings_or_an_independent_manuscript():
+def test_new_page_evidence_is_not_all_printings_or_an_independent_manuscript() -> None:
     ref = reference()
     assert ref["raw_tiles_total"] == 330 and ref["initial_raw_tiles_total"] == 288
     assert len(ref["printed_frames"]) == 3
@@ -42,7 +42,9 @@ def test_new_page_evidence_is_not_all_printings_or_an_independent_manuscript():
     )
 
 
-def test_changed_parent_or_print_bundle_is_rejected(tmp_path, monkeypatch):
+def test_changed_parent_or_print_bundle_is_rejected(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     with pytest.raises(ValueError, match="版本不一致"):
         source.printed_page_reference("changed")
     changed = tmp_path / "changed.json"
@@ -52,14 +54,16 @@ def test_changed_parent_or_print_bundle_is_rejected(tmp_path, monkeypatch):
         reference()
 
 
-def test_print_observations_are_detached_and_do_not_correct_source_history():
+def test_print_observations_are_detached_and_do_not_correct_source_history() -> None:
     first = reference()
     expected = deepcopy(first)
     first["root_selected_observations"][0]["root_selected_image_literal"] = "牟"
     assert reference() == expected
 
 
-def test_native_delivery_preserves_same_calendar_and_explicitly_ages_the_old_flag():
+def test_native_delivery_preserves_same_calendar_and_explicitly_ages_the_old_flag() -> (
+    None
+):
     cal = calendar_mansion(
         "0806-07-23",
         "04:00:00",
@@ -80,11 +84,11 @@ def test_native_delivery_preserves_same_calendar_and_explicitly_ages_the_old_fla
         assert term in text
 
 
-def test_offline_receipt_does_not_claim_actual_private_tiles_read():
+def test_offline_receipt_does_not_claim_actual_private_tiles_read() -> None:
     assert verify_primary()["raw_tile_files_actually_read"] == 0
 
 
-def test_reinspection_retains_first_disagreements_and_metadata_erratum():
+def test_reinspection_retains_first_disagreements_and_metadata_erratum() -> None:
     supplement = reference()["followup_native_reference"]
     assert supplement["original_R1_and_A_unchanged"]
     assert (
@@ -105,7 +109,7 @@ def test_reinspection_retains_first_disagreements_and_metadata_erratum():
     )
 
 
-def test_printed_hinoo_passage_is_scoped_to_its_actual_profile():
+def test_printed_hinoo_passage_is_scoped_to_its_actual_profile() -> None:
     default = day_evidence(calendar_mansion("2025-03-04"))["reading_text"]
     assert "桧尾T78第30页所选印字" not in default
     assert "半字后己／已" not in default

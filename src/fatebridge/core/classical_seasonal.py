@@ -1,7 +1,8 @@
 """Separate an uncollated candidate table, selected source layers and actual stem positions.
 
-The Jia selected passages and Bing unit are declared developer collations,
-not a complete 120-cell edition or a chart-conditioned 用神 adjudicator.
+Developer collations cover the Jia selections, Bing unit, selected passages for all Ding months, and
+selected Wu/Yi passages and selected Ji passages for all twelve months.
+The chart-conditioned 用神 decisions remain open.
 Printed outlines, body conditions and commentator layers remain distinct.
 """
 
@@ -11,20 +12,40 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from importlib.resources import files
-from typing import Any, Dict, Mapping, Optional, Tuple
+from typing import Any, Mapping
 
 from fatebridge.utils.data import BRANCH_HIDDEN_STEMS
 
+_SOURCE_PROFILES = {
+    "甲": ("jia", "selected_jia_passages_not_full_acceptance"),
+    "丙": ("bing", "bing_unit_developer_collation_not_full_acceptance"),
+    "丁": ("ding", "selected_ding_spring_passages_not_full_acceptance"),
+    "戊": ("wu_you", "selected_wu_yi_passages_not_full_acceptance"),
+    "乙": ("yi_zi", "selected_wu_yi_passages_not_full_acceptance"),
+    "己": ("ji_spring", "selected_ji_spring_passages_not_full_acceptance"),
+}
 
-@lru_cache(maxsize=2)
-def _source_profile(day_stem: str = "甲") -> Dict[str, Any]:
-    names = {
-        "甲": "bazi_seasonal_qiongtong_jia_v1.json",
-        "丙": "bazi_seasonal_qiongtong_bing_v1.json",
-    }
-    profile: Dict[str, Any] = json.loads(
-        files("fatebridge.data").joinpath(names[day_stem]).read_text(encoding="utf-8")
+
+@lru_cache(maxsize=len(_SOURCE_PROFILES))
+def _source_profile(day_stem: str) -> dict[str, Any]:
+    name, _ = _SOURCE_PROFILES[day_stem]
+    profile: dict[str, Any] = json.loads(
+        files("fatebridge.data")
+        .joinpath(f"bazi_seasonal_qiongtong_{name}_v1.json")
+        .read_text(encoding="utf-8")
     )
+    for group in profile.get("month_groups", ()):
+        branches = group["branches"]
+        layers = group["layers"]
+        summaries = group.get("summaries_by_branch")
+        profile["months"].update(
+            {branch: {**layers, "summary": summaries[branch]} for branch in branches}
+            if summaries is not None
+            else dict.fromkeys(branches, layers)
+        )
+        profile["month_sources"].update(
+            dict.fromkeys(branches, group["source_context"])
+        )
     if day_stem == "丙":
         profile["input_witness_notes"] = json.loads(
             files("fatebridge.data")
@@ -37,9 +58,9 @@ def _source_profile(day_stem: str = "甲") -> Dict[str, Any]:
 def seasonal_reference_layers(
     day_stem: str,
     month_branch: str,
-    lookup: Dict[str, Any],
-    pillars: Optional[Mapping[str, Tuple[str, str]]] = None,
-) -> Dict[str, Any]:
+    lookup: dict[str, Any],
+    pillars: Mapping[str, tuple[str, str]] | None = None,
+) -> dict[str, Any]:
     """Keep unadjudicated candidates separate from source-supported choices."""
     result = {
         **lookup,
@@ -49,7 +70,7 @@ def seasonal_reference_layers(
         "source_review_status": "source_not_collated",
     }
     candidates = {lookup["primary"], *lookup["secondary"]} - {None}
-    profile = _source_profile(day_stem) if day_stem in {"甲", "丙"} else None
+    profile = _source_profile(day_stem) if day_stem in _SOURCE_PROFILES else None
     if profile is not None and month_branch in profile["months"]:
         layers = deepcopy(profile["months"][month_branch])
         if "general_fire_context" in profile:
@@ -64,15 +85,14 @@ def seasonal_reference_layers(
                     **{k: deepcopy(v) for k, v in witness.items() if k != "notes"},
                     "notes": deepcopy(matching),
                 }
+        source_context = profile.get("month_sources", {}).get(month_branch, profile)
         result.update(
-            source_review_status=(
-                "selected_jia_passages_not_full_acceptance"
-                if day_stem == "甲"
-                else "bing_unit_developer_collation_not_full_acceptance"
+            source_review_status=source_context.get(
+                "source_review_status", _SOURCE_PROFILES[day_stem][1]
             ),
-            source_ref=deepcopy(profile["source"]),
+            source_ref=deepcopy(source_context["source"]),
             source_layers=layers,
-            source_scope=profile["scope"],
+            source_scope=source_context["scope"],
         )
         candidates.update(layers["body"]["stem_sequence"])
         candidates.update(layers["body"].get("condition_stems", []))

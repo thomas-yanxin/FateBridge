@@ -8,10 +8,12 @@ import pytest
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro import native_execution, runtime
-from fatebridge.core.human_design_depth import fixing_reading
-from fatebridge.core.human_design_root_interpretations import root_interpretations
+from fatebridge.core.human_design.human_design_depth import fixing_reading
+from fatebridge.core.human_design.human_design_root_interpretations import (
+    root_interpretations,
+)
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
+from validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[2]
 PLAN_PATH = ROOT / "tests/fixtures/human-design-root-interpretation-plan.json"
@@ -33,8 +35,8 @@ def proof(run):
 @pytest.mark.parametrize("empty_files", [False, True])
 @pytest.mark.parametrize("case", PLAN["cases"], ids=lambda c: c["id"])
 def test_all_original_public_seconds_both_modes_and_backends(
-    case, empty_files, mode, monkeypatch, tmp_path
-):
+    case, empty_files: bool, mode, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path if empty_files else ROOT / "ephe"))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     run = execute_tool(SPEC, SPEC.request_model(**case["input"], node_mode=mode))
@@ -63,6 +65,8 @@ def test_all_original_public_seconds_both_modes_and_backends(
             == case["expected_bridge_change"]
         )
         assert p["summary"]["circuitry_changed"] == case["expected_circuitry_change"]
+    else:
+        pass
     monkeypatch.setattr(runtime, "ephemeris_call", forbidden)
     monkeypatch.setattr(native_execution, "calculate", forbidden)
     check = verify_human_design_reading(run)
@@ -82,7 +86,7 @@ def complete():
         )
 
 
-def test_unchanged_personality_neptune_changes_when_design_moon_moves(complete):
+def test_unchanged_personality_neptune_changes_when_design_moon_moves(complete) -> None:
     p = proof(complete)
     row = next(r for r in p["line_fixing_changes"] if r["side"] == "personality")
     assert row["body"] == "Neptune"
@@ -113,7 +117,9 @@ def test_unchanged_personality_neptune_changes_when_design_moon_moves(complete):
 
 
 @pytest.mark.parametrize("bad", PLAN["required_negative_receipts"])
-def test_every_preregistered_rehashed_corruption_rejected(complete, bad, monkeypatch):
+def test_every_preregistered_rehashed_corruption_rejected(
+    complete, bad, monkeypatch: pytest.MonkeyPatch
+) -> None:
     run = deepcopy(complete)
     p = proof(run)
     if bad == "missing_interpretation":
@@ -172,13 +178,15 @@ def test_every_preregistered_rehashed_corruption_rejected(complete, bad, monkeyp
     assert verify_human_design_reading(run)["status"] == "rejected"
 
 
-def test_unsupported_alternative_profile_is_not_repaired(complete):
+def test_unsupported_alternative_profile_is_not_repaired(complete) -> None:
     p = deepcopy(complete["activations"]["personality"])
     d = deepcopy(complete["activations"]["design"])
     for rows, line in ((p, 1), (d, 5)):
         for row in rows:
             if row["body"] in {"Sun", "Earth"}:
                 row["line"] = line
+            else:
+                pass
     result = root_interpretations(p, [d])
     assert (
         result["candidates"][0]["profile_evidence"]["status"]

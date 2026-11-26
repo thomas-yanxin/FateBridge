@@ -5,7 +5,7 @@ They describe the environment and the people using it, independently of Ba Zhai
 birth inputs and independently of an actual flying-star calculation.
 """
 
-from typing import Any, Iterable, List, Literal, Mapping, Optional, Set
+from typing import Any, Iterable, Literal, Mapping
 
 from pydantic import (
     ConfigDict,
@@ -16,14 +16,14 @@ from pydantic import (
     model_validator,
 )
 
-from .interior_inputs import (
+from fatebridge.core.fengshui.interior_inputs import (
     InteriorRelation,
     InteriorRole,
     validate_relation_references,
 )
-from .material_inputs import MaterialShapeFact
-from .numeric_inputs import FengshuiInput as _DeferredModel
-from .workstation_inputs import WorkstationReview
+from fatebridge.core.fengshui.material_inputs import MaterialShapeFact
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput as _DeferredModel
+from fatebridge.core.fengshui.workstation_inputs import WorkstationReview
 
 ContextBasis = Literal["measured", "user_confirmed"]
 FamilyRole = Literal["parent", "eldest_child", "middle_child", "youngest_child"]
@@ -86,7 +86,7 @@ class ContextFact(_DeferredModel):
 class OrientationConfirmation(ContextFact):
     """A north reference alone does not confirm the plan centre or alignment."""
 
-    north_reference: Optional[Literal["magnetic", "true"]] = None
+    north_reference: Literal["magnetic", "true"] | None = None
     direction_confirmed: StrictBool = False
     floorplan_alignment_confirmed: StrictBool = False
     center_confirmed: StrictBool = False
@@ -113,19 +113,19 @@ class HouseholdMember(ContextFact):
     generation: StrictInt = Field(
         ge=0, le=20, description="同一家庭相对辈分；数值越小越长，不是决策权"
     )
-    family_roles: List[FamilyRole] = Field(
+    family_roles: list[FamilyRole] = Field(
         default_factory=list,
         max_length=2,
         json_schema_extra={"uniqueItems": True},
         description="本家庭已确认父母身份及子女排行；可同时有两种身份",
     )
     co_resident: StrictBool = True
-    spouse_subject_id: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    spouse_subject_id: str | None = Field(default=None, min_length=1, max_length=100)
     follow_spouse_rank: StrictBool = Field(
         default=False,
         description="显式采用本次专家的妻随夫排行口径；不会自动按婚姻推定",
     )
-    zodiac: Optional[Zodiac] = Field(
+    zodiac: Zodiac | None = Field(
         default=None, description="用户明确确认的生肖，不从生日或命卦反推"
     )
 
@@ -149,16 +149,16 @@ class FloorSpace(ContextFact):
     floor_id: str = Field(min_length=1, max_length=100)
     level: StrictInt = Field(ge=-20, le=200)
     space_kind: Literal["interior", "courtyard"] = "interior"
-    uses_shared_orientation: Optional[StrictBool] = Field(
+    uses_shared_orientation: StrictBool | None = Field(
         default=None, description="本层与全宅使用统一已确认方位；未知不默认相同"
     )
-    center_confirmed: Optional[StrictBool] = Field(
+    center_confirmed: StrictBool | None = Field(
         default=None, description="本层自身立极已确认；不继承全宅或其他层中心"
     )
-    floorplan_alignment_confirmed: Optional[StrictBool] = Field(
+    floorplan_alignment_confirmed: StrictBool | None = Field(
         default=None, description="本层户型与统一方向对齐已确认；不继承其他层"
     )
-    subject_ids: List[str] = Field(
+    subject_ids: list[str] = Field(
         default_factory=list,
         max_length=50,
         json_schema_extra={"uniqueItems": True},
@@ -168,19 +168,19 @@ class FloorSpace(ContextFact):
         default=False,
         description="本空间全部实际住用/日常活动范围已完整核对，subject_ids未列的人确不使用；不由居住楼层自动推定",
     )
-    usage_evidence: Optional[str] = Field(
+    usage_evidence: str | None = Field(
         default=None,
         min_length=1,
         max_length=1000,
         description="实际住用名单及不使用范围的完整核对依据；与usage_confirmed=true成对",
     )
-    object_ids: List[str] = Field(
+    object_ids: list[str] = Field(
         default_factory=list, max_length=500, json_schema_extra={"uniqueItems": True}
     )
     suitability: Literal["confirmed_suitable", "requires_review", "not_assessed"] = (
         "not_assessed"
     )
-    suitability_evidence: Optional[str] = Field(
+    suitability_evidence: str | None = Field(
         default=None, min_length=1, max_length=1000
     )
 
@@ -218,7 +218,7 @@ class FloorInfluence(ContextFact):
     influence_id: str = Field(min_length=1, max_length=100)
     source_floor_id: str = Field(min_length=1, max_length=100)
     extent: Literal["floor_local_confirmed", "shared_confirmed", "unknown"]
-    shared_floor_ids: List[str] = Field(
+    shared_floor_ids: list[str] = Field(
         default_factory=list, max_length=100, json_schema_extra={"uniqueItems": True}
     )
 
@@ -236,7 +236,7 @@ class FloorInfluence(ContextFact):
 class EnvironmentalObservation(ContextFact):
     observation_id: str = Field(min_length=1, max_length=100)
     object_id: str = Field(min_length=1, max_length=100)
-    floor_id: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    floor_id: str | None = Field(default=None, min_length=1, max_length=100)
     category: Literal["room_relationship", "material", "shape", "modern_design"]
     feature: Literal[
         "kitchen_bathroom_adjacent",
@@ -288,8 +288,8 @@ class EnvironmentalObject(ContextFact):
     object_id: str = Field(min_length=1, max_length=100)
     label: str = Field(min_length=1, max_length=100)
     kind: Literal["room", "furniture", "garden_feature", "material_object", "opening"]
-    purpose: Optional[Literal["door", "bed", "desk", "stove"]] = None
-    role: Optional[InteriorRole] = Field(
+    purpose: Literal["door", "bed", "desk", "stove"] | None = None
+    role: InteriorRole | None = Field(
         default=None,
         description="明确功能/部件身份；pillar_corner仅实体柱角，toilet_wall仅便器所在侧的墙，不从名称或普通相邻推定",
     )
@@ -327,7 +327,7 @@ class EnvironmentalContext(_DeferredModel):
     ruleset_id: Literal["expert_environment_2026_10_v1"] = (
         "expert_environment_2026_10_v1"
     )
-    orientation: Optional[OrientationConfirmation] = None
+    orientation: OrientationConfirmation | None = None
     household_scope: Literal["environmental_binding", "symbolic_reference"] = Field(
         default="environmental_binding",
         description="家庭索引查询范围：environmental_binding核对实际环境方区；symbolic_reference仅解释家庭/生肖卦象，不绑定实际方向或追问罗盘，是工程查询范围而非新传统断法",
@@ -336,22 +336,22 @@ class EnvironmentalContext(_DeferredModel):
         default=False,
         description="同住家庭名单及辈分已完整确认；否则不能由名单最年长者推乾坤",
     )
-    household_members: List[HouseholdMember] = Field(
+    household_members: list[HouseholdMember] = Field(
         default_factory=list, max_length=50
     )
-    objects: List[EnvironmentalObject] = Field(default_factory=list, max_length=500)
-    floors: List[FloorSpace] = Field(default_factory=list, max_length=100)
-    floor_influences: List[FloorInfluence] = Field(default_factory=list, max_length=100)
-    observations: List[EnvironmentalObservation] = Field(
+    objects: list[EnvironmentalObject] = Field(default_factory=list, max_length=500)
+    floors: list[FloorSpace] = Field(default_factory=list, max_length=100)
+    floor_influences: list[FloorInfluence] = Field(default_factory=list, max_length=100)
+    observations: list[EnvironmentalObservation] = Field(
         default_factory=list, max_length=500
     )
-    interior_relations: List[InteriorRelation] = Field(
+    interior_relations: list[InteriorRelation] = Field(
         default_factory=list, max_length=500
     )
-    material_facts: List[MaterialShapeFact] = Field(
+    material_facts: list[MaterialShapeFact] = Field(
         default_factory=list, max_length=500
     )
-    workstation_review: Optional[WorkstationReview] = Field(
+    workstation_review: WorkstationReview | None = Field(
         default=None,
         description="显式作者工位活动/入口隔挡；不启用BTB或WOFS桌面摆位，事实与执行条件分开",
     )
@@ -444,16 +444,16 @@ class EnvironmentalContext(_DeferredModel):
         self,
         known_object_ids: Iterable[str],
         known_subject_ids: Iterable[str],
-        known_object_purposes: Optional[Mapping[str, str]] = None,
-        known_object_roles: Optional[Mapping[str, Set[str]]] = None,
-        known_object_floors: Optional[Mapping[str, Any]] = None,
+        known_object_purposes: Mapping[str, str] | None = None,
+        known_object_roles: Mapping[str, set[str]] | None = None,
+        known_object_floors: Mapping[str, Any] | None = None,
     ) -> None:
         """Validate enclosing-request references without requiring birth charts.
 
         Context members supply their own identities. Other occupants can be
         passed in by the aggregate request, so floor use does not force roles.
         """
-        objects: Set[str] = set(known_object_ids) | {o.object_id for o in self.objects}
+        objects: set[str] = set(known_object_ids) | {o.object_id for o in self.objects}
         subjects = set(known_subject_ids) | {
             m.subject_id for m in self.household_members
         }

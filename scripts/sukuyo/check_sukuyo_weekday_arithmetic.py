@@ -13,8 +13,10 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 if not __package__:
     sys.path.insert(0, str(ROOT / "src"))
+else:
+    pass
 
-from fatebridge.core.sukuyo_weekday import SOURCE, classical_weekday_arithmetic
+from fatebridge.core.sukuyo.sukuyo_weekday import SOURCE, classical_weekday_arithmetic
 
 FIXTURE = ROOT / "tests/data/sukuyo-weekday-arithmetic-primary.json"
 
@@ -24,12 +26,16 @@ def verify_arithmetic(capture_dir: Path | None = None) -> dict[str, Any]:
     source = json.loads(SOURCE.read_bytes())
     if source["general_formula"] != fixture["general_formula"]:
         raise ValueError("Selected manuscript clauses or constants changed")
+    else:
+        pass
     checked_captures = []
     if capture_dir is not None:
         for row in fixture["captured_pages"]:
             raw = (capture_dir / row["file"]).read_bytes()
             if hashlib.sha256(raw).hexdigest() != row["sha256"]:
                 raise ValueError("Manuscript image fingerprint changed")
+            else:
+                pass
             checked_captures.append(row["file"])
         manifest = capture_dir / "utokyo-T30107-manifest.json"
         if (
@@ -37,6 +43,10 @@ def verify_arithmetic(capture_dir: Path | None = None) -> dict[str, Any]:
             != fixture["manifest_sha256"]
         ):
             raise ValueError("Manuscript manifest changed")
+        else:
+            pass
+    else:
+        pass
     example = fixture["printed_recalculation"]
     result = classical_weekday_arithmetic(example["elapsed_years"], 0, 0)
     trace = result["trace"]
@@ -48,6 +58,8 @@ def verify_arithmetic(capture_dir: Path | None = None) -> dict[str, Any]:
     separate_numerator = trace["nominal_days"] * 11
     if separate_numerator != example["printed_unbiased_numerator"]:
         errors.append("separate_printed_unbiased_numerator")
+    else:
+        pass
     counterexamples = []
     rational_errors = []
     case_count = 0
@@ -64,6 +76,8 @@ def verify_arithmetic(capture_dir: Path | None = None) -> dict[str, Any]:
                 actual = classical_weekday_arithmetic(years, months, days)["trace"]
                 if expected != actual["accumulated_days"]:
                     rational_errors.append([years, months, days])
+                else:
+                    pass
                 wrong_leaps = Fraction(years * 12 * 7, 228).__floor__()
                 if wrong_leaps != leaps and days == 1:
                     wrong_nominal = (count + wrong_leaps) * 30 + days
@@ -79,6 +93,8 @@ def verify_arithmetic(capture_dir: Path | None = None) -> dict[str, Any]:
                             "difference_days": expected - wrong_days,
                         }
                     )
+                else:
+                    pass
     return {
         "format": "sukuyo_t30107_weekday_arithmetic_check_v1",
         "fixture_sha256": hashlib.sha256(FIXTURE.read_bytes()).hexdigest(),
@@ -121,3 +137,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -16,18 +16,19 @@ from jsonschema import Draft202012Validator
 import fatebridge.api as api
 from fatebridge.cli import run
 from fatebridge.core import ephemeris_runtime as e
-from fatebridge.core import guolao
 from fatebridge.core.astro import moshier_motion as motion
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.time_scales import datetime_from_tt
+from fatebridge.core.guolao import guolao
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
+from tests.support.transports import call_calculation
 
 
 @pytest.fixture
-def analytical(tmp_path, monkeypatch):
+def analytical(tmp_path, monkeypatch: pytest.MonkeyPatch):
     previous = e.configured_ephemeris_path()
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
@@ -60,7 +61,7 @@ def birth_at_tt(jd):
 def native_longitude(jd, body):
     swe = e.swe
     coordinates, returned = runtime.ephemeris_call(
-        "calc", jd, motion.PLANET_SWISSEPH_IDS[body], swe.FLG_MOSEPH | swe.FLG_SPEED
+        "calc", jd, getattr(swe, body.upper()), swe.FLG_MOSEPH | swe.FLG_SPEED
     )
     assert runtime.ephemeris_model_from_retflag(returned) == "moshier"
     return coordinates
@@ -78,8 +79,8 @@ def fourth_order_rate(jd, body, center, h):
 
 @pytest.mark.parametrize("year", [2000, 2027, 2047, 2077])
 def test_real_native_moon_uses_forward_biased_nonbinary_geometric_stencil(
-    analytical, year
-):
+    analytical, year: int
+) -> None:
     swe = e.swe
     jd = swe.julday(year, 1, 1 if year == 2000 else 15, 12)
     h = 0.00005  # MOON_SPEED_INTV in the inspected source, not a fitted step.
@@ -110,8 +111,8 @@ def test_real_native_moon_uses_forward_biased_nonbinary_geometric_stencil(
 @pytest.mark.parametrize("year", [1900, 2000, 2020, 2077])
 @pytest.mark.parametrize("body", sorted(guolao.CN))
 def test_delivered_rate_matches_independent_local_position_derivative(
-    analytical, year, body
-):
+    analytical, year: int, body
+) -> None:
     jd = e.swe.julday(year, 1, 15, 12)
     raw = guolao.positions(birth_at_tt(jd), observer_geometry=False)
     assert abs(raw["julian_day_tt"] - jd) < 1e-9
@@ -142,8 +143,8 @@ def test_delivered_rate_matches_independent_local_position_derivative(
 
 @pytest.mark.parametrize("problem", ["frame", "model", "nonfinite"])
 def test_moshier_probe_contract_failures_remain_errors(
-    analytical, monkeypatch, problem
-):
+    analytical, monkeypatch: pytest.MonkeyPatch, problem: str
+) -> None:
     jd = 2451545.0
     coordinates = native_longitude(jd, "Moon")
     original = runtime.ephemeris_call
@@ -154,9 +155,15 @@ def test_moshier_probe_contract_failures_remain_errors(
             state, flags = value
             if problem == "frame":
                 return state, flags ^ e.swe.FLG_TRUEPOS
+            else:
+                pass
             if problem == "model":
                 return state, (flags & ~e.swe.FLG_MOSEPH) | e.swe.FLG_SWIEPH
+            else:
+                pass
             return (math.nan, *state[1:]), flags
+        else:
+            pass
         return value
 
     monkeypatch.setattr(runtime, "ephemeris_call", perturb)
@@ -164,7 +171,9 @@ def test_moshier_probe_contract_failures_remain_errors(
         motion.complete_moshier_longitude_rate("Moon", jd, coordinates)
 
 
-def test_unknown_version_never_receives_a_moshier_correction(monkeypatch):
+def test_unknown_version_never_receives_a_moshier_correction(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(motion, "binding_distribution_version", lambda *a: "future")
     rate, policy = motion.complete_moshier_longitude_rate(
         "Moon", 2451545.0, (0.0, 0.0, 1.0, 13.0)
@@ -173,8 +182,8 @@ def test_unknown_version_never_receives_a_moshier_correction(monkeypatch):
 
 
 def test_nonconvergence_stays_explicit_and_does_not_copy_native_rate(
-    analytical, monkeypatch
-):
+    analytical, monkeypatch: pytest.MonkeyPatch
+) -> None:
     jd = 2451545.0
     coordinates = native_longitude(jd, "Moon")
     original = motion.reduced_longitude
@@ -195,8 +204,12 @@ def test_nonconvergence_stays_explicit_and_does_not_copy_native_rate(
 @pytest.mark.parametrize("tool", ["astro_guolao", "astro_chart"])
 @pytest.mark.parametrize("target", [None, "2000-01-02T12:00:00+00:00"])
 def test_moshier_native_and_corrected_rates_roundtrip_actual_interfaces(
-    analytical, monkeypatch, capsys, tool, target
-):
+    analytical,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    tool: str,
+    target: str | None,
+) -> None:
     spec = next(s for s in CATALOG if s.key == tool)
     payload = dict(
         birth_year=2000,
@@ -210,8 +223,12 @@ def test_moshier_native_and_corrected_rates_roundtrip_actual_interfaces(
     )
     if tool == "astro_chart":
         payload["chart_variant"] = "guolao_chart"
+    else:
+        pass
     if target:
         payload["analysis_datetime"] = target
+    else:
+        pass
     fields = [
         "guolao.bodies",
         "guolao.profile.ephemeris_models",
@@ -222,6 +239,8 @@ def test_moshier_native_and_corrected_rates_roundtrip_actual_interfaces(
             "guolao.timing.transit_bodies",
             "guolao.timing.profile.ephemeris_models",
         ]
+    else:
+        pass
     options = dict(
         as_of="2000-01-02T12:00:00+00:00",
         fields=fields,
@@ -250,8 +269,8 @@ def test_moshier_native_and_corrected_rates_roundtrip_actual_interfaces(
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                spec.tool_name, {**payload, **options}, raise_on_error=False
+            return await call_calculation(
+                client, spec.tool_name, {**payload, **options}, raise_on_error=False
             )
 
     native = asyncio.run(call())
@@ -285,9 +304,13 @@ def test_moshier_native_and_corrected_rates_roundtrip_actual_interfaces(
         layers = [(chart, "bodies")]
         if target:
             layers.append((chart["timing"], "transit_bodies"))
+        else:
+            pass
         for layer, members in layers:
             assert layer["profile"]["ephemeris_models"] == ["moshier"]
             for state in layer[members]:
                 if state["id"] in guolao.CN:
                     assert "longitude_speed_native" in state
                     assert "longitude_speed_position_derivative_correction" in state
+                else:
+                    pass

@@ -30,7 +30,7 @@ BIRTH = {
 }
 
 
-def test_sensitive_strength_does_not_automatically_add_water():
+def test_sensitive_strength_does_not_automatically_add_water() -> None:
     analysis = ElementAnalysis.comprehensive_analysis(PILLARS)
     assert analysis["day_master"]["strength_level"] == "强"
     assert analysis["favorable_elements"] == []
@@ -44,7 +44,7 @@ def test_sensitive_strength_does_not_automatically_add_water():
     assert evidence["limitations"]
 
 
-def test_source_strength_without_fuyi_applicability_never_selects_preferences():
+def test_source_strength_without_fuyi_applicability_never_selects_preferences() -> None:
     analysis = ElementAnalysis.comprehensive_analysis(PILLARS)
     day_master = analysis["day_master"]
     adjudication = day_master["classical_adjudication"]
@@ -61,7 +61,7 @@ def test_source_strength_without_fuyi_applicability_never_selects_preferences():
     ]
 
 
-def test_unadjudicated_reference_cannot_change_an_established_fuyi_direction():
+def test_unadjudicated_reference_cannot_change_an_established_fuyi_direction() -> None:
     analysis = ElementAnalysis.comprehensive_analysis(PILLARS)
     # Interface counterfactual, not a source judgment about this chart.
     analysis["day_master"]["classical_adjudication"].update(
@@ -86,7 +86,7 @@ def test_unadjudicated_reference_cannot_change_an_established_fuyi_direction():
     assert set(result["avoid_elements"]) == {"木", "火", "土"}
 
 
-def test_original_case_preserves_wood_conflict_and_fire_reference():
+def test_original_case_preserves_wood_conflict_and_fire_reference() -> None:
     profile = BaZiRules.chart_useful_profile(PILLARS)
     assert profile["useful_elements"] == []
     assert profile["avoid_elements"] == []
@@ -111,7 +111,7 @@ def test_original_case_preserves_wood_conflict_and_fire_reference():
 
 
 @pytest.mark.parametrize("strength", ["强", "中和", "弱"])
-def test_strong_label_cannot_make_wood_both_useful_and_avoided(strength):
+def test_strong_label_cannot_make_wood_both_useful_and_avoided(strength: str) -> None:
     # Sensitivity input, not a recalculation or a claim that this chart is strong.
     analysis = ElementAnalysis.comprehensive_analysis(PILLARS)
     analysis["day_master"]["engineering_index"]["strength_level"] = strength
@@ -131,7 +131,9 @@ def test_strong_label_cannot_make_wood_both_useful_and_avoided(strength):
 @pytest.mark.parametrize(
     "stem,branch", tuple(product("甲乙丙丁戊己庚辛壬癸", "子丑寅卯辰巳午未申酉戌亥"))
 )
-def test_all_day_stem_month_pairs_partition_without_losing_climate(stem, branch):
+def test_all_day_stem_month_pairs_partition_without_losing_climate(
+    stem, branch
+) -> None:
     pillars = {**PILLARS, "day": (stem, "寅"), "month": ("戊", branch)}
     profile = BaZiRules.chart_useful_profile(pillars)
     groups = [
@@ -150,28 +152,12 @@ def test_all_day_stem_month_pairs_partition_without_losing_climate(stem, branch)
         assert STEM_ELEMENTS[climate_stem][0].value not in profile["avoid_elements"]
 
 
-def test_specialties_share_resolver_without_complement_avoidance():
-    from fatebridge.analysis.career import CareerAnalysis
-    from fatebridge.analysis.education import EducationAnalysis
-
-    career = CareerAnalysis._analyze_industries(PILLARS, "壬", Element.WATER)
-    assert career["favorable_elements"] == []
-    assert career["preference_status"] == "not_adjudicated"
-    assert career["avoid_industries"] == []
-    education = EducationAnalysis._analyze_subjects(
-        PILLARS, "壬", {"seal_weight": 1, "food_hurt_weight": 1, "officer_weight": 1}
-    )
-    assert set(education["conditional_elements"]) == {"木", "火", "土", "金", "水"}
-    assert education["preference_status"] == "not_adjudicated"
-    directions = CareerAnalysis._analyze_noble_direction(PILLARS, Element.WATER)
-    assert directions["favorable_directions"] == []
-    assert directions["preference_status"] == "not_adjudicated"
-
-
-def test_birth_evidence_and_layers_match_rest_mcp_cli(capsys, monkeypatch):
+def test_birth_evidence_and_layers_match_rest_mcp_cli(
+    capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
     import fatebridge.api as api
     from fatebridge.cli import run
-    from tests.fixtures.transports import mcp_text
+    from tests.fixtures.transports import mcp_payload
 
     monkeypatch.setattr(
         api,
@@ -179,16 +165,20 @@ def test_birth_evidence_and_layers_match_rest_mcp_cli(capsys, monkeypatch):
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
     controls = {
-        "fields": ["bazi_birth.day_master", "bazi_birth.structure_profile"],
+        "fields": [
+            "bazi_birth.day_master",
+            "bazi_birth.day_master.assessment",
+            "bazi_birth.structure_profile",
+        ],
         "include_snapshot_text": False,
         "strict_fields": True,
     }
     response = TestClient(api.app).post(
-        "/api/cn/bazi/birth", json=BIRTH, params=controls
+        "/api/bazi/birth-chart", json=BIRTH, params=controls
     )
     assert response.status_code == 200, response.text
-    mcp = json.loads(mcp_text("bazi_birth", **BIRTH, **controls))
-    args = ["bazi_birth"]
+    mcp = mcp_payload("bazi_birth_chart", **BIRTH, **controls)
+    args = ["bazi_birth_chart"]
     for key, value in BIRTH.items():
         args.extend(["--" + key.replace("_", "-"), str(value)])
     args += [

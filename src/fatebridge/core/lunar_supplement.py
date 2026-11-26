@@ -12,7 +12,6 @@ from dataclasses import dataclass
 from datetime import date
 from functools import lru_cache
 from importlib.resources import files
-from typing import Optional
 
 START = date(2100, 2, 9)
 END = date(2100, 12, 31)
@@ -70,7 +69,7 @@ def _load() -> _Supplement:
     )
 
 
-def convert(solar_date: date) -> Optional[tuple[int, int, int, bool]]:
+def convert(solar_date: date) -> tuple[int, int, int, bool] | None:
     if not START <= solar_date <= END:
         return None
     data = _load()
@@ -83,5 +82,5 @@ def convert(solar_date: date) -> Optional[tuple[int, int, int, bool]]:
     )
 
 
-def source_for(solar_date: date) -> Optional[dict[str, str]]:
+def source_for(solar_date: date) -> dict[str, str] | None:
     return dict(_load().source) if START <= solar_date <= END else None

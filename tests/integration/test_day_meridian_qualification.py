@@ -3,6 +3,7 @@
 import copy
 import json
 import math
+from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -13,9 +14,11 @@ from fatebridge.core.astro.day_meridian import (
     build_day_meridian,
     day_meridian_coordinates,
 )
-from fatebridge.core.output_midpoints import MidpointAnalysis
+from fatebridge.core.astro.solar_arc_state import SolarArcState
+from fatebridge.core.contracts.output_midpoints import MidpointAnalysis
 from fatebridge.services.astrology import calculate_germany_chart_analysis
 from fatebridge.utils.errors import EphemerisSourceError
+from tests.fixtures.surface_payloads import J2000_UNRESOLVED_ASC_SITE
 
 MANUAL = json.loads(
     (Path(__file__).parents[1] / "fixtures/day-meridian-qualification.json").read_text()
@@ -49,24 +52,24 @@ def context(definition=None):
             observations.append(
                 dict(index=len(observations), julian_day_tt=epoch, longitude=longitude)
             )
+        else:
+            pass
         return indices[epoch]
 
     ni = observe(tt, 20.0)
     pi = observe(tt + 1, 25.0)
     target_index = observe(tt + 365.25, 40.0)
-    profile = dict(
+    solar_state = SolarArcState(
         birth_julian_day_tt=tt,
-        birth_effective_utc=BIRTH.isoformat(),
-        analysis_utc=analysis.isoformat(),
-        year_days=365.25,
+        birth_effective_utc=BIRTH,
+        analysis_utc=analysis,
+        elapsed_calendar_days=365.25,
         key_years=1.0,
         progressed_julian_day_tt=tt + 1,
         natal_tropical_sun=20.0,
         progressed_tropical_sun=25.0,
-        solar_arc_degrees=5.0,
-        sun_observation_indices=[ni, pi],
-        sun_ephemeris_source={"observations": observations},
-        key_policy="Toy role fixture",
+        sun_observation_indices=(ni, pi),
+        sun_ephemeris_models=("controlled_geometry", "controlled_geometry"),
     )
     native_profile = {"julian_day_tt": tt}
     factor = {"id": "Midheaven", "longitude": 10.0}
@@ -77,13 +80,32 @@ def context(definition=None):
                 coordinate_basis="geographic_pole_meridian_convention",
                 angle_definition=copy.deepcopy(definition),
             )
+        else:
+            pass
+    else:
+        pass
     native = []
-    derived = []
+    derived, sample_states = [], []
     for offset, mc in [(-30, 9.0), (0, 10.0), (30, 11.0)]:
         instant = BIRTH + timedelta(seconds=offset)
         epoch = tt + offset / 86400
         key = ((analysis - instant).total_seconds() / 86400) / 365.25
         progressed = epoch + key
+        sample_indices = (observe(epoch, 20.0), observe(progressed, 25.0))
+        sample_states.append(
+            SolarArcState(
+                analysis_utc=analysis,
+                birth_effective_utc=instant,
+                elapsed_calendar_days=(analysis - instant).total_seconds() / 86400,
+                key_years=key,
+                birth_julian_day_tt=epoch,
+                progressed_julian_day_tt=progressed,
+                natal_tropical_sun=20.0,
+                progressed_tropical_sun=25.0,
+                sun_observation_indices=sample_indices,
+                sun_ephemeris_models=("controlled_geometry", "controlled_geometry"),
+            )
+        )
         raw = dict(
             offset_seconds=float(offset),
             recorded_utc=instant.isoformat(),
@@ -100,7 +122,7 @@ def context(definition=None):
             julian_day_tt=epoch,
             progressed_julian_day_tt=progressed,
             key_years=key,
-            sun_observation_indices=[observe(epoch, 20.0), observe(progressed, 25.0)],
+            sun_observation_indices=list(sample_indices),
             natal_upper_meridian_longitude=mc,
             natal_lower_meridian_longitude=mc + 180,
             natal_tropical_sun=20.0,
@@ -114,6 +136,8 @@ def context(definition=None):
         if definition:
             raw["angle_definition"] = copy.deepcopy(definition)
             row["angle_definition"] = copy.deepcopy(definition)
+        else:
+            pass
         native.append(raw)
         derived.append(row)
     uncertainty = dict(
@@ -132,7 +156,9 @@ def context(definition=None):
         native_factors=[factor],
         nominal_effective_utc=BIRTH.isoformat(),
         supported_key_years=(0.0, 150.0),
-        solar_profile=profile,
+        solar_state=solar_state,
+        sun_observations=observations,
+        sample_states=sample_states,
         target=dict(
             analysis_utc=analysis.isoformat(),
             target_julian_day_tt=tt + 365.25,
@@ -145,7 +171,7 @@ def context(definition=None):
 
 
 @pytest.mark.parametrize("row", MANUAL["rows"], ids=lambda r: r["id"])
-def test_frozen_hand_arithmetic_and_independent_circle(row):
+def test_frozen_hand_arithmetic_and_independent_circle(row) -> None:
     result = day_meridian_coordinates(
         row["mc"], row["natal_sun"], row["arc"], row["target_sun"]
     )
@@ -159,15 +185,15 @@ def test_frozen_hand_arithmetic_and_independent_circle(row):
 
 
 @pytest.mark.parametrize("value", [True, False, None, "0", float("nan"), float("inf")])
-def test_invalid_source_numbers_cannot_become_angles(value):
+def test_invalid_source_numbers_cannot_become_angles(value) -> None:
     with pytest.raises(ValueError, match="finite"):
         day_meridian_coordinates(value, 20.0, 5.0, 40.0)
 
 
 @pytest.mark.parametrize("mode", ["resolved", "asc_only_unresolved", "mc_unresolved"])
 def test_exact_roles_and_reference_qualification_without_ephemeris_queries(
-    mode, monkeypatch
-):
+    mode: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     args = context(MANUAL["reference_cases"][mode])
     monkeypatch.setattr(
         runtime,
@@ -222,7 +248,7 @@ def test_exact_roles_and_reference_qualification_without_ephemeris_queries(
     )
 
 
-def test_known_absolute_samples_survive_an_unknown_nominal_reference():
+def test_known_absolute_samples_survive_an_unknown_nominal_reference() -> None:
     args = context(MANUAL["reference_cases"]["mc_unresolved"])
     for rows in [args["samples"], args["uncertainty"]["samples"]]:
         rows[0].pop("angle_definition")
@@ -237,7 +263,7 @@ def test_known_absolute_samples_survive_an_unknown_nominal_reference():
     )
 
 
-def test_unknown_non_nominal_samples_have_separate_formal_bounds():
+def test_unknown_non_nominal_samples_have_separate_formal_bounds() -> None:
     args = context()
     for rows in [args["samples"], args["uncertainty"]["samples"]]:
         rows[0]["angle_definition"] = copy.deepcopy(
@@ -263,6 +289,7 @@ def corrupt(a, case):
     elif case == "reordered":
         a["uncertainty"]["samples"].reverse()
         a["samples"].reverse()
+        a["sample_states"].reverse()
     elif case == "duplicate_offset":
         a["samples"][0]["offset_seconds"] = 0
         a["uncertainty"]["samples"][0]["offset_seconds"] = 0
@@ -289,7 +316,9 @@ def corrupt(a, case):
     elif case == "sample_progressed_tt":
         a["samples"][0]["progressed_julian_day_tt"] += 1
     elif case == "nominal_key":
-        a["solar_profile"]["key_years"] += 1
+        a["solar_state"] = replace(
+            a["solar_state"], key_years=a["solar_state"].key_years + 1
+        )
     elif case == "zero_native_mc":
         a["uncertainty"]["samples"][1]["factor_longitudes"]["Midheaven"] += 1
     elif case == "effective_clock":
@@ -299,11 +328,12 @@ def corrupt(a, case):
     elif case == "truncate_native_too":
         a["samples"].pop()
         a["uncertainty"]["samples"].pop()
+        a["sample_states"].pop()
         a["uncertainty"]["sample_count"] = 2
     elif case == "nominal_unavailable":
         a["samples"][1].update(status="unavailable", reason_code="fictional gap")
     elif case == "observation_sun":
-        a["solar_profile"]["sun_ephemeris_source"]["observations"][0]["longitude"] += 1
+        a["sun_observations"][0]["longitude"] += 1
     elif case == "wrong_basis":
         a["native_factors"][0][
             "coordinate_basis"
@@ -315,21 +345,23 @@ def corrupt(a, case):
     elif case == "gap_metadata":
         a["uncertainty"]["maximum_recorded_sample_gap_seconds"] = 29
     elif case == "duplicate_observation_epoch":
-        rows = a["solar_profile"]["sun_ephemeris_source"]["observations"]
+        rows = a["sun_observations"]
         rows.append({**rows[0], "index": len(rows)})
 
     elif case == "same_instant_target_epoch":
-        a["solar_profile"].update(
-            analysis_utc=BIRTH.isoformat(),
+        a["solar_state"] = replace(
+            a["solar_state"],
+            analysis_utc=BIRTH,
+            elapsed_calendar_days=0.0,
             key_years=0.0,
             progressed_julian_day_tt=a["native_profile"]["julian_day_tt"],
             progressed_tropical_sun=20.0,
-            solar_arc_degrees=0.0,
-            sun_observation_indices=[0, 0],
+            sun_observation_indices=(0, 0),
         )
         a["target"]["analysis_utc"] = BIRTH.isoformat()
         a["uncertainty"] = {"status": "not_assessed", "uncertainty_minutes": None}
         a["samples"] = []
+        a["sample_states"] = []
     else:
         raise AssertionError(case)
 
@@ -367,7 +399,7 @@ def corrupt(a, case):
         "same_instant_target_epoch",
     ],
 )
-def test_incoherent_backend_sources_raise_runtime503(case):
+def test_incoherent_backend_sources_raise_runtime503(case: str) -> None:
     args = context()
     corrupt(args, case)
     with pytest.raises(EphemerisSourceError) as exc:
@@ -380,12 +412,41 @@ def test_incoherent_backend_sources_raise_runtime503(case):
 
 
 @HAS_SWE
+def test_daily_meridian_uses_exact_adjacent_recorded_labels_for_gap() -> None:
+    result = calculate_germany_chart_analysis(
+        **{
+            **PAYLOAD,
+            "birth_hour": 4,
+            "birth_minute": 30,
+            "birth_longitude": 0,
+            "birth_latitude": 0,
+        },
+        analysis_datetime=datetime(2000, 1, 2, 4, 30, tzinfo=timezone.utc),
+        birth_time_uncertainty_minutes=0.58,
+    )
+    layer = result["midpoint_analysis"]
+    sensitivity = layer["time_sensitivity"]
+    day = layer["solar_arc_analysis"]["daily_meridian"]
+    instants = [
+        datetime.fromisoformat(sample["recorded_utc"])
+        for sample in sensitivity["samples"]
+    ]
+    recorded_gap = max(b - a for a, b in zip(instants, instants[1:]))
+    assert len(instants) == 5 and recorded_gap == timedelta(seconds=30)
+    assert day["input_coherence"]["status"] == "verified"
+    assert (
+        day["birth_time_sensitivity"]["maximum_recorded_sample_gap_seconds"]
+        == recorded_gap.total_seconds()
+    )
+
+
+@HAS_SWE
 @pytest.mark.parametrize("latitude", [-90, 90])
 @pytest.mark.parametrize("zodiacal", [0, 1])
 @pytest.mark.parametrize("radius", [None, 0, 0.5])
 def test_actual_poles_keep_only_mc_dependent_coordinates_unknown(
-    latitude, zodiacal, radius
-):
+    latitude, zodiacal: int, radius: float | int | None
+) -> None:
     result = calculate_germany_chart_analysis(
         **{**PAYLOAD, "birth_latitude": latitude},
         zodiacal=zodiacal,
@@ -435,8 +496,8 @@ def test_actual_poles_keep_only_mc_dependent_coordinates_unknown(
 @pytest.mark.parametrize("key_years", [0, 150])
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_model_unavailability_and_unresolved_reference_remain_separate(
-    key_years, zodiacal
-):
+    key_years: int, zodiacal: int
+) -> None:
     result = calculate_germany_chart_analysis(
         **{**PAYLOAD, "birth_latitude": 90},
         zodiacal=zodiacal,
@@ -468,7 +529,7 @@ def test_model_unavailability_and_unresolved_reference_remain_separate(
 
 @HAS_SWE
 @pytest.mark.parametrize("latitude", [-89.9, 89.9])
-def test_nearby_resolved_poles_remain_computed(latitude):
+def test_nearby_resolved_poles_remain_computed(latitude) -> None:
     r = calculate_germany_chart_analysis(
         **{**PAYLOAD, "birth_latitude": latitude},
         birth_time_uncertainty_minutes=0,
@@ -485,13 +546,9 @@ def test_nearby_resolved_poles_remain_computed(latitude):
 
 @HAS_SWE
 @pytest.mark.parametrize("zodiacal", [0, 1])
-def test_only_unresolved_asc_does_not_restrict_day_mc(zodiacal):
+def test_only_unresolved_asc_does_not_restrict_day_mc(zodiacal: int) -> None:
     r = calculate_germany_chart_analysis(
-        **{
-            **PAYLOAD,
-            "birth_longitude": 169.5414439374805,
-            "birth_latitude": -66.56232328397007,
-        },
+        **{**PAYLOAD, **J2000_UNRESOLVED_ASC_SITE},
         zodiacal=zodiacal,
         birth_time_uncertainty_minutes=1,
         analysis_datetime=datetime(2050, 1, 1, tzinfo=timezone.utc),
@@ -505,7 +562,9 @@ def test_only_unresolved_asc_does_not_restrict_day_mc(zodiacal):
 
 
 @HAS_SWE
-def test_real_service_rejects_corrupt_derived_sample_as503(monkeypatch):
+def test_real_service_rejects_corrupt_derived_sample_as503(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.core.astro.solar_arc as module
 
     original = module.day_meridian_coordinates
@@ -529,7 +588,9 @@ def test_real_service_rejects_corrupt_derived_sample_as503(monkeypatch):
 
 
 @HAS_SWE
-def test_target_aligned_with_non_nominal_sample_reuses_its_true_tt_observation():
+def test_target_aligned_with_non_nominal_sample_reuses_its_true_tt_observation() -> (
+    None
+):
     r = calculate_germany_chart_analysis(
         **PAYLOAD,
         birth_time_uncertainty_minutes=0.5,

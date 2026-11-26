@@ -17,12 +17,18 @@ def verify_sources(corpus: Path = CORPUS) -> dict[str, Any]:
     raw = (corpus / "freeze.json").read_bytes()
     if hashlib.sha256(raw).hexdigest() != FREEZE_SHA256:
         raise ValueError("V27 original source freeze changed")
+    else:
+        pass
     freeze = json.loads(raw)
     if not isinstance(freeze, dict):
         raise ValueError("V27 source freeze must be an object")
+    else:
+        pass
     for name, digest in freeze["files"].items():
         if hashlib.sha256((corpus / name).read_bytes()).hexdigest() != digest:
             raise ValueError(f"V27 frozen file changed: {name}")
+        else:
+            pass
     return freeze
 
 
@@ -45,6 +51,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         result = calculate_taiyi_analysis(**public_input(case))
         if "taiyi" not in result:
             raise ValueError(f"V27 public calculation failed: {case['id']}: {result}")
+        else:
+            pass
         board = result["taiyi"]
         evidence = board["calendar_rules"]["civil_lunar_calendar"]
         actual = [evidence[k] for k in ("year", "month", "day", "is_leap_month")]

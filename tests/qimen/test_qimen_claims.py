@@ -7,8 +7,8 @@ import pytest
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.claims import CalculationClaim
-from fatebridge.validation.qimen import verify_qimen_pattern_quotes
+from validation.claims import CalculationClaim
+from validation.qimen import verify_qimen_pattern_quotes
 
 
 @pytest.fixture
@@ -44,7 +44,9 @@ def receipt():
     return payload, claim
 
 
-def test_verified_quote_carries_conditions_and_keeps_semantic_scope_limited(receipt):
+def test_verified_quote_carries_conditions_and_keeps_semantic_scope_limited(
+    receipt,
+) -> None:
     payload, claim = receipt
     report = verify_qimen_pattern_quotes(payload, [claim])
     assert report["status"] == "verified_structured_pattern_quotes"
@@ -66,7 +68,9 @@ def test_verified_quote_carries_conditions_and_keeps_semantic_scope_limited(rece
         "name_only",
     ],
 )
-def test_quote_cannot_hide_conditions_or_use_a_different_receipt(receipt, mutation):
+def test_quote_cannot_hide_conditions_or_use_a_different_receipt(
+    receipt, mutation: str
+) -> None:
     payload, claim = receipt
     changed = claim.model_dump()
     if mutation == "drop_qualification":
@@ -87,7 +91,9 @@ def test_quote_cannot_hide_conditions_or_use_a_different_receipt(receipt, mutati
     assert report["errors"]
 
 
-def test_projected_or_modified_payload_is_rejected_against_trusted_original(receipt):
+def test_projected_or_modified_payload_is_rejected_against_trusted_original(
+    receipt,
+) -> None:
     payload, claim = receipt
     projected = {"qimen": payload["qimen"], "run_metadata": payload["run_metadata"]}
     assert (
@@ -97,14 +103,14 @@ def test_projected_or_modified_payload_is_rejected_against_trusted_original(rece
         == "rejected"
     )
     changed = deepcopy(payload)
-    changed["qimen"]["assessment"]["authority_certified"] = True
+    changed["qimen"]["assessment"]["classical_conformance"] = "complete"
     assert (
         verify_qimen_pattern_quotes(changed, [claim], trusted_payload=payload)["status"]
         == "rejected"
     )
 
 
-def test_new_head_dependent_quote_cannot_hide_or_replace_hour_xun_binding():
+def test_new_head_dependent_quote_cannot_hide_or_replace_hour_xun_binding() -> None:
     spec = next(s for s in CATALOG if s.tool_name == "qimen")
     payload = execute_tool(
         spec,
@@ -154,7 +160,7 @@ def test_new_head_dependent_quote_cannot_hide_or_replace_hour_xun_binding():
         )
 
 
-def test_literal_day_identity_cannot_be_replaced_by_hour_head_in_a_quote():
+def test_literal_day_identity_cannot_be_replaced_by_hour_head_in_a_quote() -> None:
     spec = next(s for s in CATALOG if s.tool_name == "qimen")
     payload = execute_tool(
         spec,

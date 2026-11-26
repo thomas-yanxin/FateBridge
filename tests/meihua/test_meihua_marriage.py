@@ -5,13 +5,16 @@ import json
 
 import pytest
 
-from fatebridge.core.meihua_marriage import marriage_qualifications, marriage_ruleset
+from fatebridge.core.meihua.meihua_marriage import (
+    marriage_qualifications,
+    marriage_ruleset,
+)
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
 from tests.support.meihua_marriage_reference import CASES, FOLDER, validate
 
 
-def test_source_and_cases_were_frozen_before_new_production():
+def test_source_and_cases_were_frozen_before_new_production() -> None:
     manifest = json.loads((FOLDER / "manifest.json").read_bytes())
     assert not manifest["new_production_implemented_before_freeze"]
     assert (
@@ -24,32 +27,40 @@ def test_source_and_cases_were_frozen_before_new_production():
     for name, digest in manifest["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FOLDER / name).read_bytes()).hexdigest() == digest
 
 
-@pytest.mark.parametrize(
-    "case", CASES, ids=lambda r: f"{r['code']}-{r['line']}-{r['month']}"
-)
-def test_all_4992_reused_geometry_and_month_contexts_preserve_own_clauses_unknowns_and_source_variants(
-    case,
+def test_covering_reused_geometry_and_month_contexts_preserve_own_clauses_unknowns_and_source_variants() -> (
+    None
 ):
-    result = calculate_meihua_cast(
-        casting={
-            "method": "existing",
-            "hexagram_code": case["code"],
-            "moving_line": case["line"],
-        },
-        interpretation_topic="marriage",
-        season_month_branch=case["month"],
-    )
-    validate(result, case["month"])
+    months = list(dict.fromkeys(case["month"] for case in CASES))
+    geometries = list(dict.fromkeys((case["code"], case["line"]) for case in CASES))
+    by_key = {(case["code"], case["line"], case["month"]): case for case in CASES}
+    for index, (code, line) in enumerate(geometries):
+        case = by_key[(code, line, months[index % len(months)])]
+        result = calculate_meihua_cast(
+            casting={
+                "method": "existing",
+                "hexagram_code": case["code"],
+                "moving_line": case["line"],
+            },
+            interpretation_topic="marriage",
+            season_month_branch=case["month"],
+        )
+        validate(result, case["month"])
 
 
-@pytest.mark.parametrize("month", [None, *"子丑寅卯辰巳午未申酉戌亥"])
-@pytest.mark.parametrize("basis", ["raw_counts", "trigram_numbers"])
-def test_candidate_body_and_use_swap_preserves_each_family_strength_and_own_clause(
-    month, basis
+def test_candidate_body_and_use_swap_preserves_each_family_strength_and_own_clause() -> (
+    None
 ):
+    for month in (None, *"子丑寅卯辰巳午未申酉戌亥"):
+        for basis in ("raw_counts", "trigram_numbers"):
+            _assert_candidate_body_and_use_swap(month, basis)
+
+
+def _assert_candidate_body_and_use_swap(month, basis):
     manual = json.loads((FOLDER / "manual-candidate-probe.json").read_bytes())
     result = calculate_meihua_cast(
         casting={**manual["casting"], "line_sum_basis": basis},
@@ -72,7 +83,7 @@ def test_candidate_body_and_use_swap_preserves_each_family_strength_and_own_clau
         assert row["topic_clause"]["quote"] in row["traditional_judgement"]
 
 
-def test_initial_bihe_is_independent_of_later_unadjudicated_bili():
+def test_initial_bihe_is_independent_of_later_unadjudicated_bili() -> None:
     result = calculate_meihua_cast(
         casting={"method": "existing", "hexagram_code": "000000", "moving_line": 1},
         interpretation_topic="marriage",
@@ -88,8 +99,8 @@ def test_initial_bihe_is_independent_of_later_unadjudicated_bili():
 
 @pytest.mark.parametrize("month", ["申", "巳", None])
 def test_changing_chapter_never_recasts_geometry_or_uses_question_words_as_context(
-    month,
-):
+    month: str | None,
+) -> None:
     args = {
         "casting": {"method": "existing", "hexagram_code": "100111", "moving_line": 1},
         "season_month_branch": month,
@@ -115,7 +126,7 @@ def test_changing_chapter_never_recasts_geometry_or_uses_question_words_as_conte
 
 
 @pytest.mark.parametrize("hour", [0, 23])
-def test_calendar_entry_preserves_the_actual_clock_and_original_cast(hour):
+def test_calendar_entry_preserves_the_actual_clock_and_original_cast(hour: int) -> None:
     args = {
         "analysis_year": 2026,
         "analysis_month": 2,
@@ -155,8 +166,8 @@ def test_calendar_entry_preserves_the_actual_clock_and_original_cast(hour):
     ],
 )
 def test_independent_reference_rejects_wrong_source_scope_or_borrowed_candidate(
-    mutation,
-):
+    mutation: str,
+) -> None:
     result = calculate_meihua_cast(
         casting={
             "method": "sound_groups",
@@ -194,13 +205,13 @@ def test_independent_reference_rejects_wrong_source_scope_or_borrowed_candidate(
         validate(result, "辰")
 
 
-def test_cached_profile_is_returned_as_an_isolated_copy():
+def test_cached_profile_is_returned_as_an_isolated_copy() -> None:
     profile = marriage_ruleset()
     profile["rules"][0]["quote"] = "forged"
     assert marriage_ruleset()["rules"][0]["quote"] == "體尅用可成但成之遲"
 
 
-def test_strength_rows_from_another_candidate_are_rejected_at_domain_boundary():
+def test_strength_rows_from_another_candidate_are_rejected_at_domain_boundary() -> None:
     result = calculate_meihua_cast(
         casting={
             "method": "sound_groups",

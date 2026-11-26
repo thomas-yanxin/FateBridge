@@ -2,21 +2,23 @@
 
 import json
 import math
+from datetime import datetime
 from decimal import Decimal, localcontext
 from pathlib import Path
+from typing import TypedDict
 
 import pytest
 
 from fatebridge.core.astro.aspects import (
     _build_directional_relative_midpoints,
-    _match_cross_aspect,
+    _match_cross_aspect_fraction,
 )
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.chart import build_core_chart_payload
 from fatebridge.core.astro.relationship_geometry import (
     davison_birth,
     geographic_midpoint,
-    midpoint_candidates,
+    midpoint_candidates_fraction,
     unique_midpoint,
 )
 from fatebridge.core.astro.time_scales import ephemeris_time
@@ -24,32 +26,35 @@ from fatebridge.core.ephemeris_runtime import swe
 from fatebridge.services.astrology import calculate_relative_chart_analysis
 from tests.support.relationship_inputs import A, B
 
-REFERENCE = json.loads(
+
+class GeographicReferenceCase(TypedDict):
+    input_longitudes_latitudes: tuple[float, float, float, float]
+    expected_latitude: float
+    expected_longitude: float
+
+
+class GeographicReference(TypedDict):
+    cases: list[GeographicReferenceCase]
+    tolerance_degrees: float
+
+
+REFERENCE: GeographicReference = json.loads(
     (
         Path(__file__).parents[1] / "fixtures/western-geographiclib-midpoints.json"
-    ).read_text()
-)
-B = dict(
-    name="乙",
-    birth_year=1992,
-    birth_month=3,
-    birth_day=2,
-    birth_hour=8,
-    birth_minute=18,
-    birth_timezone="UTC",
-    birth_longitude=-179,
-    birth_latitude=20,
+    ).read_text(encoding="utf-8")
 )
 
 
-def separation(a, b):
-    return abs((a - b + 180) % 360 - 180)
+def separation(first_degrees: float, second_degrees: float) -> float:
+    return abs((first_degrees - second_degrees + 180) % 360 - 180)
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"])
-def test_spherical_midpoints_against_independent_geographiclib(case):
-    args = case["input_longitudes_latitudes"]
-    for inputs in (args, args[2:] + args[:2]):
+def test_spherical_midpoints_against_independent_geographiclib(
+    case: GeographicReferenceCase,
+) -> None:
+    coordinates = case["input_longitudes_latitudes"]
+    for inputs in (coordinates, coordinates[2:] + coordinates[:2]):
         longitude, latitude = geographic_midpoint(*inputs, spherical=True)
         assert (
             abs(latitude - case["expected_latitude"]) <= REFERENCE["tolerance_degrees"]
@@ -59,28 +64,41 @@ def test_spherical_midpoints_against_independent_geographiclib(case):
                 separation(longitude, case["expected_longitude"])
                 <= REFERENCE["tolerance_degrees"]
             )
+        else:
+            pass
 
 
 @pytest.mark.parametrize(
-    "lon1,lon2,expected", [(179, -179, -180), (-180, 180, -180), (10, 20, 15)]
+    "lon1,lon2,expected",
+    [
+        (179, -179, -180),
+        (-180, 180, -180),
+        (10, 20, 15),
+        (-2e-20, 0.0, -1e-20),
+        (math.nextafter(30.0, 0.0), 30.0, 30.0),
+    ],
 )
-def test_coordinate_mean_is_dateline_and_alias_aware(lon1, lon2, expected):
+def test_coordinate_mean_is_dateline_and_alias_aware(
+    lon1: float, lon2: float, expected: float
+) -> None:
     assert geographic_midpoint(lon1, 10, lon2, 20) == (expected, 15)
     assert geographic_midpoint(lon2, 20, lon1, 10) == (expected, 15)
 
 
-def test_sphere_and_coordinate_mean_remain_distinct_methods():
+def test_sphere_and_coordinate_mean_remain_distinct_methods() -> None:
     assert geographic_midpoint(179, 10, -179, 10) == (-180, 10)
     assert geographic_midpoint(179, 10, -179, 10, spherical=True)[1] > 10.001
 
 
 @pytest.mark.parametrize("args", [(0, 10, 180, -10), (50, 90, -20, -90)])
-def test_exact_antipodes_have_no_unique_spherical_midpoint(args):
+def test_exact_antipodes_have_no_unique_spherical_midpoint(
+    args: tuple[float, float, float, float],
+) -> None:
     with pytest.raises(ValueError, match="对跖"):
         geographic_midpoint(*args, spherical=True)
 
 
-def test_near_antipodes_preserve_the_unique_side_without_epsilon_rejection():
+def test_near_antipodes_preserve_the_unique_side_without_epsilon_rejection() -> None:
     for longitude in (math.nextafter(180.0, 0), math.nextafter(-180.0, 0)):
         actual_lon, actual_lat = geographic_midpoint(
             0, 10, longitude, -10, spherical=True
@@ -90,22 +108,64 @@ def test_near_antipodes_preserve_the_unique_side_without_epsilon_rejection():
 
 
 @pytest.mark.parametrize(
+    "a,b,expected",
+    [
+        (
+            (0.0, 10.0),
+            (math.nextafter(-180.0, 0.0), math.nextafter(-10.0, -math.inf)),
+            (-89.36860107225387, -3.5761177853875723),
+        ),
+        (
+            (0.0, 60.0),
+            (math.nextafter(-180.0, 0.0), math.nextafter(-60.0, math.inf)),
+            (-113.41322444637052, 12.920966381583565),
+        ),
+        (
+            (50.0, 90.0),
+            (-137.0, math.nextafter(-90.0, 0.0)),
+            (-137.0, 7.105427357601002e-15),
+        ),
+        (
+            (50.0, math.nextafter(90.0, 0.0)),
+            (-137.0, math.nextafter(math.nextafter(-90.0, 0.0), 0.0)),
+            (-143.8974234247824, 2.100543931132534e-14),
+        ),
+    ],
+)
+def test_near_antipodes_keep_both_small_angular_components(
+    a: tuple[float, float], b: tuple[float, float], expected: tuple[float, float]
+) -> None:
+    """Check the midpoint against a high-precision sum of both unit position vectors."""
+    for first, second in ((a, b), (b, a)):
+        actual = geographic_midpoint(*first, *second, spherical=True)
+        assert actual == pytest.approx(expected, rel=0, abs=1e-9)
+
+
+@pytest.mark.parametrize(
     "second",
     [math.nextafter(180.0, 0), math.nextafter(180.0, math.inf), 359.9999999, 0.0000001],
 )
-def test_circular_midpoint_uses_independent_exact_decimal_arithmetic(second):
+def test_circular_midpoint_uses_independent_exact_decimal_arithmetic(
+    second: float,
+) -> None:
     with localcontext() as context:
         context.prec = 1100
         a, b = Decimal(0), Decimal.from_float(second)
         delta = b % 360
         if delta > 180:
             delta -= 360
+        else:
+            pass
         expected = ((a + delta / 2) % 360 + 360) % 360
     assert unique_midpoint(0, second) == unique_midpoint(second, 0) == float(expected)
 
 
-def test_exact_diametric_points_keep_both_candidates_for_comparison_only():
-    assert midpoint_candidates(0, 180) == midpoint_candidates(180, 0) == (90, 270)
+def test_exact_diametric_points_keep_both_candidates_for_comparison_only() -> None:
+    assert (
+        midpoint_candidates_fraction(0, 180)
+        == midpoint_candidates_fraction(180, 0)
+        == (90, 270)
+    )
     with pytest.raises(ValueError, match="没有唯一"):
         unique_midpoint(0, 180)
     hits = _build_directional_relative_midpoints(
@@ -119,8 +179,8 @@ def test_exact_diametric_points_keep_both_candidates_for_comparison_only():
 
 @pytest.mark.parametrize("degree,expected", [(33.0, False), (32.9999999, True)])
 def test_relative_midpoint_orb_is_not_changed_by_four_decimal_rounding(
-    degree, expected
-):
+    degree: float, expected: bool
+) -> None:
     targets = [
         {"id": "Sun", "longitude": 29.99999996},
         {"id": "Moon", "longitude": 29.99999998},
@@ -131,10 +191,12 @@ def test_relative_midpoint_orb_is_not_changed_by_four_decimal_rounding(
     assert bool(hits) is expected
     if expected:
         assert hits["Jupiter"][0]["midpoint"]["longitude"] < 30
+    else:
+        pass
 
 
-def test_cross_aspect_offset_retains_computed_precision():
-    assert _match_cross_aspect(0, 0.123456789)["delta"] == 0.123456789
+def test_cross_aspect_offset_retains_computed_precision() -> None:
+    assert float(_match_cross_aspect_fraction(0, 0.123456789)[1]) == 0.123456789
 
 
 @pytest.mark.skipif(swe is None, reason="Native ephemeris required")
@@ -142,8 +204,8 @@ def test_cross_aspect_offset_retains_computed_precision():
 @pytest.mark.parametrize("zodiacal", [0, 1])
 @pytest.mark.parametrize("hsys", [0, 3])
 def test_davison_uses_native_positions_houses_and_declared_variant(
-    variant, zodiacal, hsys
-):
+    variant: str, zodiacal: int, hsys: int
+) -> None:
     first, second = build_astro_birth_info(**A), build_astro_birth_info(**B)
     birth, policy = davison_birth(first, second, variant=variant)
     reversed_birth, _ = davison_birth(second, first, variant=variant)
@@ -181,10 +243,12 @@ def test_davison_uses_native_positions_houses_and_declared_variant(
             abs((policy["mc_actual_tropical"] - expected_axis + 90) % 180 - 90) < 1e-5
         )
         assert policy["mc_residual_degrees"] < 1e-5
+    else:
+        pass
 
 
 @pytest.mark.skipif(swe is None, reason="Native ephemeris required")
-def test_time_mean_is_explicit_ut1_not_naive_utc_calendar_arithmetic():
+def test_time_mean_is_explicit_ut1_not_naive_utc_calendar_arithmetic() -> None:
     first = build_astro_birth_info(**{**A, "birth_year": 1900})
     second = build_astro_birth_info(**{**B, "birth_year": 2099})
     birth, policy = davison_birth(first, second)
@@ -200,7 +264,7 @@ def test_time_mean_is_explicit_ut1_not_naive_utc_calendar_arithmetic():
 
 
 @pytest.mark.skipif(swe is None, reason="Native ephemeris required")
-def test_marks_is_two_natal_to_davison_charts_with_quarter_time_identities():
+def test_marks_is_two_natal_to_davison_charts_with_quarter_time_identities() -> None:
     result = calculate_relative_chart_analysis(
         inner_payload=A, outer_payload=B, relative_mode="Marks", hsys=0
     )
@@ -228,7 +292,49 @@ def test_marks_is_two_natal_to_davison_charts_with_quarter_time_identities():
     )
 
 
-def test_non_davison_mode_does_not_silently_accept_a_davison_variant():
+@pytest.mark.skipif(swe is None, reason="Native ephemeris required")
+def test_marks_preserves_utc_when_the_derived_local_offset_is_unspecified() -> None:
+    location = {
+        "birth_year": 1994,
+        "birth_minute": 0,
+        "birth_timezone": "Antarctica/Vostok",
+        "birth_longitude": 106.84,
+        "birth_latitude": -78.4636,
+    }
+    result = calculate_relative_chart_analysis(
+        inner_payload={
+            **location,
+            "birth_month": 1,
+            "birth_day": 31,
+            "birth_hour": 9,
+        },
+        outer_payload={
+            **location,
+            "birth_month": 11,
+            "birth_day": 1,
+            "birth_hour": 11,
+        },
+        relative_mode="Marks",
+        hsys=0,
+    )
+    assert result["inner_chart"]["person_info"]["birth_datetime"] == (
+        "1994-01-31T09:00:00+07:00"
+    )
+    assert result["outer_chart"]["person_info"]["birth_datetime"] == (
+        "1994-11-01T11:00:00+07:00"
+    )
+    assert result["chart"] == result["marks_charts"]["inner"]
+    start = datetime.fromisoformat("1994-01-31T17:00:00+00:00")
+    stop = datetime.fromisoformat("1994-11-01T00:00:00+00:00")
+    for chart in result["marks_charts"].values():
+        person = chart["person_info"]
+        assert person["birth_timezone"] == "Antarctica/Vostok"
+        utc = person["utc_datetime"]
+        assert start < datetime.fromisoformat(utc) < stop
+        assert person["birth_datetime"] == utc.removesuffix("+00:00") + "Z"
+
+
+def test_non_davison_mode_does_not_silently_accept_a_davison_variant() -> None:
     result = calculate_relative_chart_analysis(
         inner_payload=A,
         outer_payload=B,

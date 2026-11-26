@@ -18,12 +18,16 @@ def separation(a, b):
 def audit(reference, roots):
     if len(reference["cases"]) != len(roots["cases"]):
         raise ValueError("Root/reference case collections differ")
+    else:
+        pass
     rows = []
     root_rows = []
     for index, c in enumerate(reference["cases"]):
         p = c["input"]
         if roots["cases"][index]["input"] != p:
             raise ValueError("Root/reference geometry inputs differ")
+        else:
+            pass
         for code in reference["protocol"]["systems"]:
             row = {"case_index": index, "system": code}
             try:
@@ -47,6 +51,8 @@ def audit(reference, roots):
                     raise ValueError(
                         "Native geometry must contain twelve finite cusps and finite axes"
                     )
+                else:
+                    pass
                 physical, note = canonical_house_axes(
                     julian_day_ut1=p["jd_ut1"],
                     latitude=p["latitude"],
@@ -71,12 +77,16 @@ def audit(reference, roots):
                     root = roots["cases"][index]
                     if root["status"] != "solved":
                         raise ValueError("Unexpected root/method domain disagreement")
+                    else:
+                        pass
                     if len(root["cusps"]) != 12 or not all(
                         math.isfinite(v) for v in root["cusps"]
                     ):
                         raise ValueError(
                             "Independent roots must contain twelve finite cusps"
                         )
+                    else:
+                        pass
                     error = max(separation(a, b) for a, b in zip(cusps, root["cusps"]))
                     astrolog_error = max(
                         separation(a, b)
@@ -93,6 +103,8 @@ def audit(reference, roots):
                             <= roots["protocol"]["cusp_tolerance_arcseconds"],
                         }
                     )
+                else:
+                    pass
             rows.append(row)
     defined = [r for r in rows if r["status"] == "defined"]
     return {
@@ -135,6 +147,8 @@ if __name__ == "__main__":
         != hashlib.sha256(args.reference.read_bytes()).hexdigest()
     ):
         raise ValueError("Reference differs from the frozen root protocol")
+    else:
+        pass
     result = audit(json.loads(args.reference.read_text()), roots)
     result["reference_sha256"] = hashlib.sha256(args.reference.read_bytes()).hexdigest()
     result["roots_sha256"] = hashlib.sha256(args.roots.read_bytes()).hexdigest()
@@ -161,3 +175,5 @@ if __name__ == "__main__":
         }
     )
     raise SystemExit(0 if result["scoped_numerical_gate_passed"] else 1)
+else:
+    pass

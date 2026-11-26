@@ -7,19 +7,21 @@ from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
+from pytest import MonkeyPatch
 
 from fatebridge.application.examples import evidence_views
 from fatebridge.application.projection import project_fields
-from fatebridge.core import canping_schedule_basis as basis
+from fatebridge.core.contracts.output_canping_schedule import CanpingScheduleBasis
+from fatebridge.core.contracts.output_chinese import CanpingRow, CanpingTiming
 from fatebridge.core.local_techniques.canping import build_canping_result
-from fatebridge.core.output_canping_schedule import CanpingScheduleBasis
-from fatebridge.core.output_chinese import CanpingTiming
+from fatebridge.core.numerology import canping_schedule_basis as basis
 from fatebridge.services.tool_catalog import CATALOG
+from fatebridge.utils.civil_time import CivilPoint, ZonedCalendar
 from fatebridge.utils.errors import NumerologySourceError
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/canping_schedule_basis_v1"
 REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
-READINGS = json.loads((FIXTURE / "verified-readings.json").read_text())
+READINGS = json.loads((FIXTURE / "verified-readings-v1.0.1.json").read_text())
 BASE = dict(
     date="2021-11-07",
     time="00:30",
@@ -37,7 +39,7 @@ def native_model(monkeypatch, tmp_path):
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path / "empty-ephe"))
 
 
-def test_primary_excerpts_keep_distinct_books_and_frozen_image_identities():
+def test_primary_excerpts_keep_distinct_books_and_frozen_image_identities() -> None:
     assert REFERENCE["frozen_before_implementation"]
     assert (
         hashlib.sha256((FIXTURE / "verified-readings.json").read_bytes()).hexdigest()
@@ -74,8 +76,8 @@ def test_primary_excerpts_keep_distinct_books_and_frozen_image_identities():
     ],
 )
 def test_actual_profile_does_not_borrow_another_profiles_source_certification(
-    profile, applied
-):
+    profile: str, applied
+) -> None:
     value = build_canping_result(**BASE, dayun_method=profile)
     timing = value["canping_timing"]
     b = timing["schedule_basis"]
@@ -84,23 +86,19 @@ def test_actual_profile_does_not_borrow_another_profiles_source_certification(
     assert b["bridge_step_years"] == 10
     assert b["target_excerpt_ten_year_step_explicitly_collated"] is False
     assert b["datetime_mapping_is_original_source_formula"] is False
-    assert (
-        b["whole_book_alignment_established"]
-        is b["real_world_efficacy_validated"]
-        is False
-    )
     for c in b["clauses"]:
         assert (c["role"] == "applied_rule") is (c["id"] in applied)
         if c["source_id"] == "sanming_nlc":
             assert c["role"] != "applied_rule"
-    assert (
-        next(
-            r["facts"]
-            for r in value["numerology_evidence"]["rule_trace"]
-            if r["rule_id"] == basis.POLICY_ID
-        )
-        == b
+        else:
+            pass
+    trace = next(
+        r
+        for r in value["numerology_evidence"]["rule_trace"]
+        if r["rule_id"] == basis.POLICY_ID
     )
+    assert trace["fact_path"] == "canping_timing.schedule_basis"
+    assert "facts" not in trace
     CanpingTiming.model_validate(timing)
     if profile == "legacy_minggong_v1":
         assert b["has_actual_date_mapping"] is False
@@ -121,7 +119,7 @@ def test_actual_profile_does_not_borrow_another_profiles_source_certification(
 @pytest.mark.parametrize("profile", PROFILES)
 def test_compact_policy_view_is_complete_for_each_profile_without_reading_all_121_boundaries(
     profile,
-):
+) -> None:
     value = build_canping_result(**BASE, dayun_method=profile)
     spec = next(s for s in CATALOG if s.key == "canping")
     views = evidence_views(spec)
@@ -140,7 +138,7 @@ def test_compact_policy_view_is_complete_for_each_profile_without_reading_all_12
     assert full_periods["dayun"] == value["dayun"]
 
 
-def test_queried_segment_is_not_replaced_with_the_new_first_period_summary():
+def test_queried_segment_is_not_replaced_with_the_new_first_period_summary() -> None:
     value = build_canping_result(**BASE, analysis_datetime="2036-01-01T12:00:00Z")
     timing = value["canping_timing"]
     assert timing["first_period"] == value["dayun"][0]
@@ -151,7 +149,7 @@ def test_queried_segment_is_not_replaced_with_the_new_first_period_summary():
     assert value["dayun"][0]["verses"]["textShun"] != "detached summary edit"
 
 
-def test_loaded_source_returns_detached_copies():
+def test_loaded_source_returns_detached_copies() -> None:
     value = basis.source_readings()
     value["clauses"][0]["text"] = "poison"
     assert basis.source_readings()["clauses"][0]["text"] == "雖非希夷著述"
@@ -159,8 +157,8 @@ def test_loaded_source_returns_detached_copies():
 
 @pytest.mark.parametrize("mutation", ["quote", "source", "role_source", "efficacy"])
 def test_nonempty_source_rewriting_fails_before_any_field_projection(
-    tmp_path, monkeypatch, mutation
-):
+    tmp_path: Path, monkeypatch: MonkeyPatch, mutation: str
+) -> None:
     data = deepcopy(READINGS)
     if mutation == "quote":
         data["clauses"][3]["text"] = data["clauses"][3]["text"].replace("不用", "用")
@@ -181,7 +179,9 @@ def test_nonempty_source_rewriting_fails_before_any_field_projection(
         basis._collation.cache_clear()
 
 
-def test_layout_only_change_gets_its_own_loaded_file_digest(tmp_path, monkeypatch):
+def test_layout_only_change_gets_its_own_loaded_file_digest(
+    tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     raw = json.dumps(READINGS, ensure_ascii=False, separators=(",", ":")).encode()
     path = tmp_path / "layout-only.json"
     path.write_bytes(raw)
@@ -195,15 +195,13 @@ def test_layout_only_change_gets_its_own_loaded_file_digest(tmp_path, monkeypatc
         basis._collation.cache_clear()
 
 
-def test_partial_receipts_stay_valid_and_present_source_conflicts_fail():
+def test_partial_receipts_stay_valid_and_present_source_conflicts_fail() -> None:
     value = build_canping_result(**BASE)["canping_timing"]
     b = value["schedule_basis"]
     for k, v in b.items():
         CanpingScheduleBasis.model_validate({k: v})
     changes = [
         dict(profile_id="legacy_minggong_v1"),
-        dict(whole_book_alignment_established=True),
-        dict(real_world_efficacy_validated=0),
         dict(target_excerpt_ten_year_step_explicitly_collated=True),
     ]
     for change in changes:
@@ -223,19 +221,31 @@ def test_partial_receipts_stay_valid_and_present_source_conflicts_fail():
             CanpingTiming.model_validate({**deepcopy(value), **change})
 
 
-def test_projected_source_start_still_bounds_the_first_period_without_parent_start():
+def test_projected_source_start_still_bounds_the_first_period_without_parent_start() -> (
+    None
+):
     timing = build_canping_result(**BASE)["canping_timing"]
     projected = {
         "schedule_basis": timing["schedule_basis"],
         "first_period": deepcopy(timing["first_period"]),
     }
     CanpingTiming.model_validate(projected)
-    projected["first_period"]["start_at"] = "2021-11-07T00:30:00-04:00"
+    start = "2021-11-07T00:30:00-04:00"
+    period = projected["first_period"]
+    period["start_at"] = start
+    with pytest.raises(ValidationError, match="配运数值端点与显示标签不一致"):
+        CanpingTiming.model_validate(projected)
+    period["start_point"] = CivilPoint(
+        ZonedCalendar.from_isoformat(start).utc.julian_day_exact()
+    ).to_record()
+    CanpingRow.model_validate(period)
     with pytest.raises(ValidationError, match="首运摘要"):
         CanpingTiming.model_validate(projected)
 
 
-def test_projected_legacy_basis_cannot_gain_a_date_summary_without_parent_profile():
+def test_projected_legacy_basis_cannot_gain_a_date_summary_without_parent_profile() -> (
+    None
+):
     timing = build_canping_result(**BASE, dayun_method="legacy_minggong_v1")[
         "canping_timing"
     ]
@@ -249,7 +259,9 @@ def test_projected_legacy_basis_cannot_gain_a_date_summary_without_parent_profil
         CanpingTiming.model_validate(projected)
 
 
-def test_projected_false_date_mapping_blocks_a_fabricated_summary_without_any_profile():
+def test_projected_false_date_mapping_blocks_a_fabricated_summary_without_any_profile() -> (
+    None
+):
     with pytest.raises(ValidationError, match="旧命宫"):
         CanpingTiming.model_validate(
             {

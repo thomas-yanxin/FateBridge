@@ -15,7 +15,7 @@ from fatebridge.core.classical import (
     classical_snapshot_lines,
     seasonal_climate_god,
 )
-from fatebridge.core.output_classical_seasonal import SeasonalClimateReference
+from fatebridge.core.contracts.output_classical_seasonal import SeasonalClimateReference
 from tests.support.bazi_transport_reader import (
     cli_payload,
     file_payload,
@@ -42,7 +42,7 @@ def pillars(values):
     return dict(zip(("year", "month", "day", "hour"), map(tuple, values)))
 
 
-def test_full_unit_first_transcription_retains_bounded_labels_and_all_charts():
+def test_full_unit_first_transcription_retains_bounded_labels_and_all_charts() -> None:
     raw = (FIXTURE / "source-collation-first.json").read_bytes()
     assert (
         hashlib.sha256(raw).hexdigest()
@@ -82,25 +82,67 @@ def test_full_unit_first_transcription_retains_bounded_labels_and_all_charts():
 @pytest.mark.parametrize("branch", list("子丑寅卯辰巳午未申酉戌亥"))
 def test_current_candidate_cells_keep_source_scope_and_never_claim_adjudication(
     stem, branch
-):
+) -> None:
     value = seasonal_climate_god(stem, branch)
     assert value["chart_adjudication_status"] == "not_performed"
-    expected = (
-        "selected_jia_passages_not_full_acceptance"
-        if stem == "甲"
-        else (
-            "bing_unit_developer_collation_not_full_acceptance"
-            if stem == "丙"
-            else "source_not_collated"
-        )
-    )
+    if stem == "甲":
+        expected = "selected_jia_passages_not_full_acceptance"
+    elif stem == "丙":
+        expected = "bing_unit_developer_collation_not_full_acceptance"
+    elif stem == "丁" and branch in {"寅", "卯", "辰"}:
+        expected = "selected_ding_spring_passages_not_full_acceptance"
+    elif stem == "丁" and branch in {"巳", "午", "未"}:
+        expected = "selected_ding_summer_passages_not_full_acceptance"
+    elif stem == "丁" and branch in {"申", "酉", "戌"}:
+        expected = "selected_ding_autumn_passages_not_full_acceptance"
+    elif stem == "丁" and branch in {"亥", "子", "丑"}:
+        expected = "selected_ding_winter_passages_not_full_acceptance"
+    elif stem == "己" and branch in {"寅", "卯", "辰"}:
+        expected = "selected_ji_spring_passages_not_full_acceptance"
+    elif stem == "己" and branch in {"巳", "午", "未"}:
+        expected = "selected_ji_summer_passages_not_full_acceptance"
+    elif stem == "己" and branch in {"申", "酉", "戌"}:
+        expected = "selected_ji_autumn_passages_not_full_acceptance"
+    elif stem == "己" and branch in {"亥", "子", "丑"}:
+        expected = "selected_ji_winter_passages_not_full_acceptance"
+    elif (stem, branch) in {
+        ("戊", "酉"),
+        ("戊", "戌"),
+        ("戊", "亥"),
+        ("戊", "子"),
+        ("戊", "丑"),
+        ("戊", "寅"),
+        ("戊", "卯"),
+        ("戊", "辰"),
+        ("戊", "巳"),
+        ("戊", "午"),
+        ("戊", "未"),
+        ("戊", "申"),
+        ("乙", "寅"),
+        ("乙", "卯"),
+        ("乙", "辰"),
+        ("乙", "巳"),
+        ("乙", "午"),
+        ("乙", "未"),
+        ("乙", "申"),
+        ("乙", "酉"),
+        ("乙", "戌"),
+        ("乙", "亥"),
+        ("乙", "子"),
+        ("乙", "丑"),
+    }:
+        expected = "selected_wu_yi_passages_not_full_acceptance"
+    else:
+        expected = "source_not_collated"
     assert value["source_review_status"] == expected
-    if stem not in {"甲", "丙"}:
+    if expected == "source_not_collated":
         assert "source_layers" not in value and "source_ref" not in value
+    else:
+        pass
 
 
 @pytest.mark.parametrize("branch", list("寅卯辰巳午未申酉戌亥子丑"))
-def test_every_month_keeps_author_conditions_and_first_source_examples(branch):
+def test_every_month_keeps_author_conditions_and_first_source_examples(branch) -> None:
     value = seasonal_climate_god("丙", branch)
     expected = {
         **SOURCE["months"][branch],
@@ -109,6 +151,8 @@ def test_every_month_keeps_author_conditions_and_first_source_examples(branch):
     notes = [n for n in SOURCE_NOTES["notes"] if n["month_branch"] == branch]
     if notes:
         expected["input_witness_notes"] = {**SOURCE_NOTES, "notes": notes}
+    else:
+        pass
     assert value["source_layers"] == expected
     assert value["source_ref"] == SOURCE["source"]
     assert value["source_layers"]["chart_conditions_status"] == "not_adjudicated"
@@ -122,7 +166,7 @@ def test_every_month_keeps_author_conditions_and_first_source_examples(branch):
 @pytest.mark.parametrize("case", CASES, ids=lambda r: r["id"])
 def test_all_literal_chart_observations_match_independent_hidden_stems_and_stay_unadjudicated(
     case,
-):
+) -> None:
     ps = pillars(case["pillars"])
     value = seasonal_climate_god("丙", ps["month"][1], ps)
     for row in value["stem_observations"]:
@@ -140,7 +184,9 @@ def test_all_literal_chart_observations_match_independent_hidden_stems_and_stay_
     )
 
 
-def test_source_indirect_root_does_not_manufacture_physical_fire_hidden_in_hai():
+def test_source_indirect_root_does_not_manufacture_physical_fire_hidden_in_hai() -> (
+    None
+):
     ps = pillars(["辛酉", "己亥", "丙子", "壬辰"])
     value = seasonal_climate_god("丙", "亥", ps)
     assert "亥中甲" in value["source_layers"]["body"]["paraphrase"]
@@ -174,7 +220,7 @@ def test_source_indirect_root_does_not_manufacture_physical_fire_hidden_in_hai()
 )
 def test_contradictory_source_and_fabricated_decisions_are_rejected_but_projection_is_partial(
     patch,
-):
+) -> None:
     value = seasonal_climate_god("丙", "亥")
     with pytest.raises(ValidationError):
         SeasonalClimateReference.model_validate({**value, **patch})
@@ -186,8 +232,8 @@ def test_contradictory_source_and_fabricated_decisions_are_rejected_but_projecti
 
 @pytest.mark.parametrize("case", PUBLIC, ids=lambda r: r["id"])
 def test_all_twelve_months_eleven_entries_actual_transports_and_scope_controls(
-    case, rest, tmp_path, capsys
-):
+    case, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     spec = SPECS[case["tool"]]
     fields = suggested_fields(spec, view="seasonal_conditions")
     assert len(fields) == 4
@@ -231,6 +277,10 @@ def test_all_twelve_months_eleven_entries_actual_transports_and_scope_controls(
             verify_identity(
                 rest_value["result_delivery"], rest_value["run_metadata"], rest_manifest
             )
+        else:
+            pass
+    else:
+        pass
     assert not result.is_error and code == 0
     payloads = [
         file_payload(result.structured_content, manifest, tmp_path, "mcp"),
@@ -238,6 +288,8 @@ def test_all_twelve_months_eleven_entries_actual_transports_and_scope_controls(
     ]
     if rest_value is not None:
         payloads.append(file_payload(rest_value, rest_manifest, tmp_path, "rest"))
+    else:
+        pass
     for payload in payloads:
         spec.output_model.model_validate(payload)
     assert all(business(v) == business(payloads[0]) for v in payloads)
@@ -275,12 +327,22 @@ def test_all_twelve_months_eleven_entries_actual_transports_and_scope_controls(
             climate["source_review_status"]
             == "selected_jia_passages_not_full_acceptance"
         )
+    elif case["kind"] == "ding":
+        assert (
+            climate["source_review_status"]
+            == "selected_ding_autumn_passages_not_full_acceptance"
+        )
+        assert climate["primary"] == "甲"
+        assert climate["source_ref"]["id"] == "qiongtong_xu_qianqian_ding_autumn_v1"
+        layers = climate["source_layers"]
+        assert layers["body"]["pdf_pages"] == [115, 116, 117, 118]
+        assert layers["body"]["stem_sequence"] == ["甲", "丙", "庚"]
+        assert layers["chart_conditions_status"] == "not_adjudicated"
     else:
-        assert climate["source_review_status"] == "source_not_collated"
-        assert "source_ref" not in climate
+        pass
 
 
-def test_printed_calendar_conflict_is_visible_without_rewriting_the_case():
+def test_printed_calendar_conflict_is_visible_without_rewriting_the_case() -> None:
     note = seasonal_climate_god("丙", "卯")["source_layers"]["input_witness_notes"][
         "notes"
     ][0]

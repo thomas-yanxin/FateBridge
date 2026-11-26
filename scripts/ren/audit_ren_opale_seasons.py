@@ -41,6 +41,8 @@ def label(value: str) -> datetime:
         raise ValueError(
             "Service clock labels must keep their explicit scale separately"
         )
+    else:
+        pass
     return result
 
 
@@ -51,17 +53,25 @@ def julian_day(value: str) -> float:
 def frozen(corpus: Path, expected_digest: str) -> dict[str, Any]:
     if sha(corpus / "freeze.json") != expected_digest:
         raise ValueError("Original OPALE freeze changed")
+    else:
+        pass
     manifest = json.loads((corpus / "freeze.json").read_text())["files"]
     if {p.name for p in corpus.iterdir()} != set(manifest) | {"freeze.json"}:
         raise ValueError("Frozen OPALE inventory changed")
+    else:
+        pass
     for name, digest in manifest.items():
         if sha(corpus / name) != digest:
             raise ValueError("Frozen OPALE source changed: " + name)
+        else:
+            pass
     pre = json.loads((corpus / "protocol-freeze.json").read_text())["files"]
     if "protocol.json" not in pre or any(
         sha(corpus / name) != digest for name, digest in pre.items()
     ):
         raise ValueError("OPALE prequery protocol changed")
+    else:
+        pass
     return {name: json.loads((corpus / name).read_text()) for name in manifest}
 
 
@@ -82,6 +92,8 @@ def season_cases(
         response[k] != v for k, v in dict(calendar="gregorian", timescale=scale).items()
     ):
         raise ValueError("OPALE request/response clock or cohort changed")
+    else:
+        pass
     rows = []
     for index, row in enumerate(response["data"]):
         year, event = label(row["date"]).year, row["phenomena"]
@@ -102,6 +114,8 @@ def season_cases(
         (year, event) for year in range(start, stop) for event in EVENTS
     ]:
         raise ValueError("All ordered OPALE years and four seasons are required")
+    else:
+        pass
     return rows
 
 
@@ -110,6 +124,8 @@ def annotated(
 ) -> None:
     if data["cases"] != cases or data[count_key] != len(cases):
         raise ValueError("OPALE annotation differs from the complete raw response")
+    else:
+        pass
 
 
 def reference(fixtures: Path = FIXTURES) -> dict[str, Any]:
@@ -125,6 +141,8 @@ def reference(fixtures: Path = FIXTURES) -> dict[str, Any]:
         != TOLERANCE_SECONDS
     ):
         raise ValueError("Original one-second engineering criterion changed")
+    else:
+        pass
     cases = season_cases(
         primary["historical-ut1.json"], 1900, 1972, "UT1", "historical-ut1.json"
     )
@@ -154,12 +172,16 @@ def reference(fixtures: Path = FIXTURES) -> dict[str, Any]:
     historical = cases[:288]
     if request["date-set"] != [r["published_label"] for r in historical]:
         raise ValueError("Clock diagnostic must retain all 288 external UT1 labels")
+    else:
+        pass
     if raw["request"]["id"] != 10 or any(
         raw["request"][k] != v
         for k, v in request.items()
         if k not in {"body", "date-set"}
     ):
         raise ValueError("OPALE clock request changed")
+    else:
+        pass
     response = raw["response"]
     if (
         response["timescale"] != "UT1"
@@ -168,6 +190,8 @@ def reference(fixtures: Path = FIXTURES) -> dict[str, Any]:
         or len(response["data"]) != 288
     ):
         raise ValueError("OPALE clock scale, units or full denominator changed")
+    else:
+        pass
     clock_cases = []
     for case, row in zip(historical, response["data"]):
         offset = row["TT-UT1"]
@@ -177,6 +201,8 @@ def reference(fixtures: Path = FIXTURES) -> dict[str, Any]:
             or not math.isfinite(offset)
         ):
             raise ValueError("Invalid OPALE clock row")
+        else:
+            pass
         clock_cases.append(
             dict(
                 id=case["id"],
@@ -209,12 +235,16 @@ def comparison(
                 raise ValueError(
                     "Expected an aware Swiss calculation, without fallback"
                 )
+            else:
+                pass
             time = convert(moment)
             if any(
                 isinstance(value, bool) or value is None or not math.isfinite(value)
                 for value in (time.jd_tt, time.jd_ut1)
             ):
                 raise ValueError("Nonfinite or unavailable production clock")
+            else:
+                pass
             if route == "seasons" and case["timescale"] == "UTC":
                 # The production civil label can have +08:00; source labels use UTC.
                 expected = label(case["published_label"]).replace(tzinfo=timezone.utc)
@@ -229,6 +259,8 @@ def comparison(
                 delta = (getattr(time, scale) - julian_day(expected_label)) * 86400
             if not math.isfinite(delta):
                 raise ValueError("Nonfinite clock difference")
+            else:
+                pass
             row = dict(
                 **case,
                 actual=original["actual"],
@@ -242,6 +274,8 @@ def comparison(
                 row["clock_model_difference_seconds"] = (
                     actual_delta_t - case["tt_minus_ut1_seconds"]
                 )
+            else:
+                pass
             rows.append(row)
         except Exception as exc:
             errors.append(
@@ -282,9 +316,13 @@ def assemble(
         raise ValueError(
             "The original complete PMO cohort and 30-second gate are required"
         )
+    else:
+        pass
     actuals = {(r["year"], r["term"]): r for r in pmo["comparisons"]}
     if len(actuals) != len(pmo["comparisons"]):
         raise ValueError("Duplicate production event labels")
+    else:
+        pass
     routes = {key: comparison(ref[key], actuals, key, convert) for key in ref}
     return dict(
         audit_id="ren_opale_seasons_v1",
@@ -353,3 +391,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

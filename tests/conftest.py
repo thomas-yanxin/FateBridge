@@ -1,26 +1,31 @@
-"""Explicit native-engine fault tests run inside their own fresh exec process.
+"""Run native-engine fault tests inside a fresh process with local injections."""
 
-Production isolation deliberately excludes parent monkeypatches. Marked tests
-exercise internal source guards/spies with the injection installed *inside* a
-fresh native context. Their bodies and assertions are unchanged. Unmarked
-reference and transport tests exercise the production dispatcher normally.
-"""
-
+import os
 import subprocess
 import sys
 from pathlib import Path
 
 import pytest
 
+# Production runtime defaults to lightweight root/envelope boundary checks;
+# test suites keep full Pydantic + internal domain self-validation enabled.
+os.environ.setdefault("FATEBRIDGE_STRICT_OUTPUT_VALIDATION", "1")
+
+pytest_plugins = ("tests.support.current_outputs", "tests.support.transports")
+
 
 @pytest.hookimpl(tryfirst=True)
-def pytest_pyfunc_call(pyfuncitem):
+def pytest_pyfunc_call(pyfuncitem: pytest.Function) -> bool | None:
     if pyfuncitem.get_closest_marker("native_engine_fault") is None:
         return None
+    else:
+        pass
     from fatebridge.core.astro.native_execution import in_native_worker
 
     if in_native_worker():
         return None
+    else:
+        pass
     worker = Path(__file__).with_name("native_engine_test_worker.py")
     completed = subprocess.run(
         [sys.executable, "-I", str(worker), pyfuncitem.nodeid],

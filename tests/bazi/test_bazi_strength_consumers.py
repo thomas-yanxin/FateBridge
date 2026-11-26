@@ -16,17 +16,19 @@ from fatebridge.application.execution import (
     execute_spec,
     validate_output,
 )
-from fatebridge.core.bazi_evidence import build_natal_evidence
+from fatebridge.core.bazi.bazi_evidence import build_natal_evidence
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.classical_force import build_force_components
-from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.output_bazi_evidence import (
+from fatebridge.core.contracts.output_bazi_evidence import (
     BaziEvidenceChain,
     EvidenceStructureProfile,
     StrengthContext,
 )
-from fatebridge.core.output_classical_force import EngineeringForceComposition
-from fatebridge.core.output_strength_thresholds import StrengthThresholdArithmetic
+from fatebridge.core.contracts.output_classical_force import EngineeringForceComposition
+from fatebridge.core.contracts.output_strength_thresholds import (
+    StrengthThresholdArithmetic,
+)
+from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.response_models import DayMaster
 from tests.bazi.test_bazi_strength_thresholds import delivered_payload, evaluate
 from tests.support import bazi_strength_reference_v3 as current_reference
@@ -50,7 +52,9 @@ def assess(values):
 
 
 @pytest.mark.parametrize("row", BODY, ids=lambda r: str(r["index"]))
-def test_current_v11_all_187_budgets_match_independent_literal_season_arithmetic(row):
+def test_current_v11_all_187_budgets_match_independent_literal_season_arithmetic(
+    row,
+) -> None:
     pillars, strength = assess(row["pillars"])
     assessment = strength["assessment"]
     assert assessment["method_id"] == "season_root_revelation_relations_v12"
@@ -96,7 +100,7 @@ def test_current_v11_all_187_budgets_match_independent_literal_season_arithmetic
 
 
 @pytest.mark.parametrize("row", SPECIAL, ids=lambda r: str(r["index"]))
-def test_current_v11_special_flags_match_independent_exact_inequalities(row):
+def test_current_v11_special_flags_match_independent_exact_inequalities(row) -> None:
     _, strength = assess(row["pillars"])
     assessment = strength["assessment"]
     expected = current_reference.reconstruct(row["pillars"], assessment["relations"])
@@ -114,7 +118,7 @@ def test_current_v11_special_flags_match_independent_exact_inequalities(row):
 
 
 @pytest.mark.parametrize("row", CLIMATE, ids=lambda r: r["id"])
-def test_complete_climate_units_preserve_unknowns_and_distinct_root_actors(row):
+def test_complete_climate_units_preserve_unknowns_and_distinct_root_actors(row) -> None:
     pillars, strength = assess(row["pillars"])
     evidence = build_natal_evidence(pillars, strength)
     assert row["expected_strength"] is None
@@ -128,14 +132,20 @@ def test_complete_climate_units_preserve_unknowns_and_distinct_root_actors(row):
     if row["id"] == "ZS03":
         assert any(r["hidden_element_present"] for r in by_stem["甲"]["roots"])
         assert not any(r["hidden_element_present"] for r in by_stem["癸"]["roots"])
+    else:
+        pass
     if row["id"] == "HN04":
         assert not any(r["hidden_element_present"] for r in by_stem["癸"]["roots"])
+    else:
+        pass
     if row["id"] == "ZS04":
         assert any(r["hidden_element_present"] for r in by_stem["癸"]["roots"])
         assert any(r["hidden_element_present"] for r in by_stem["甲"]["roots"])
+    else:
+        pass
 
 
-def test_missing_or_partial_exact_evidence_is_never_recalculated_or_promoted():
+def test_missing_or_partial_exact_evidence_is_never_recalculated_or_promoted() -> None:
     pillars, strength = assess(BODY[0]["pillars"])
     original = copy.deepcopy(strength["assessment"])
     for patch in (
@@ -159,7 +169,9 @@ def test_missing_or_partial_exact_evidence_is_never_recalculated_or_promoted():
     )
 
 
-def test_engineering_and_source_objects_cannot_be_substituted_at_output_boundary():
+def test_engineering_and_source_objects_cannot_be_substituted_at_output_boundary() -> (
+    None
+):
     pillars, strength = assess(BODY[0]["pillars"])
     evidence = build_natal_evidence(pillars, strength)
     BaziEvidenceChain.model_validate(evidence)
@@ -181,7 +193,9 @@ def test_engineering_and_source_objects_cannot_be_substituted_at_output_boundary
         )
 
 
-def test_full_natal_contract_rejects_missing_or_mixed_new_objects_but_allows_projection():
+def test_full_natal_contract_rejects_missing_or_mixed_new_objects_but_allows_projection() -> (
+    None
+):
     spec = SPECS["analyze_destiny"]
     request = spec.request_model(**example_input(spec))
     original = execute_spec(spec, request)
@@ -248,7 +262,9 @@ def test_full_natal_contract_rejects_missing_or_mixed_new_objects_but_allows_pro
         {"special_lower_threshold_exact": "1/5"},
     ],
 )
-def test_contradictory_exact_receipts_rejected_while_partial_projection_allowed(patch):
+def test_contradictory_exact_receipts_rejected_while_partial_projection_allowed(
+    patch,
+) -> None:
     receipt = evaluate(
         SPECIAL[0]["pillars"],
     )["threshold_arithmetic"]
@@ -257,6 +273,8 @@ def test_contradictory_exact_receipts_rejected_while_partial_projection_allowed(
         patch["requires_special_structure_review"] = not receipt[
             "requires_special_structure_review"
         ]
+    else:
+        pass
     with pytest.raises(ValidationError):
         StrengthThresholdArithmetic.model_validate({**receipt, **patch})
     assert StrengthThresholdArithmetic.model_validate(
@@ -282,7 +300,7 @@ def test_contradictory_exact_receipts_rejected_while_partial_projection_allowed(
         {"seal_energy_exact": "-1"},
     ],
 )
-def test_comparison_receipt_rejects_contradictory_explanation_fields(patch):
+def test_comparison_receipt_rejects_contradictory_explanation_fields(patch) -> None:
     pillars = dict(zip(current_reference.ORDER, map(tuple, BODY[0]["pillars"])))
     composition = build_force_components(
         pillars,
@@ -298,11 +316,15 @@ def test_comparison_receipt_rejects_contradictory_explanation_fields(patch):
             if composition["body_seal_energy_relation"] != "body_greater"
             else "seal_greater"
         )
+    else:
+        pass
     if (
         patch.get("body_within_support_exact")
         == composition["body_within_support_exact"]
     ):
         patch["body_within_support_exact"] = "1/3"
+    else:
+        pass
     with pytest.raises(ValidationError):
         EngineeringForceComposition.model_validate({**composition, **patch})
     EngineeringForceComposition.model_validate({"body_energy_exact": "1/3"})
@@ -310,8 +332,8 @@ def test_comparison_receipt_rejects_contradictory_explanation_fields(patch):
 
 @pytest.mark.parametrize("case", PUBLIC, ids=lambda r: r["id"])
 def test_five_fictional_identities_use_v11_reference_on_eleven_tools_and_transports(
-    case, rest, tmp_path, capsys
-):
+    case, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     original = next(row for row in [*BODY, *SPECIAL] if row["index"] == case["index"])
     arguments = case["arguments"]
     birth_pillars = BaZiCalendar.get_four_pillars(
@@ -358,6 +380,8 @@ def test_five_fictional_identities_use_v11_reference_on_eleven_tools_and_transpo
         response = rest.post(selected.rest_path, json=case["arguments"], params=flags)
         assert response.status_code == 200, response.text
         responses.append(("rest", response.json()))
+    else:
+        pass
     payloads = []
     for name, value in responses:
         (tmp_path / (name + "-original-response.json")).write_text(
@@ -366,8 +390,14 @@ def test_five_fictional_identities_use_v11_reference_on_eleven_tools_and_transpo
         delivery = value.get("result_delivery")
         if delivery:
             (tmp_path / (name + "-same-run-file.json.gz")).write_bytes(
-                gzip.compress(Path(delivery["file_path"]).read_bytes(), mtime=0)
+                gzip.compress(
+                    Path(delivery["file_path"]).read_bytes(),
+                    compresslevel=1,
+                    mtime=0,
+                )
             )
+        else:
+            pass
         payload = delivered_payload(value)
         payloads.append(payload)
         selected.output_model.model_validate(payload)

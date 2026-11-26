@@ -50,10 +50,14 @@ def build(pdf: Path, dictionary: Path, cohorts: list[Path]) -> dict:
         )
         if pos is None:
             raise ValueError(f"Missing gate {gate} position")
+        else:
+            pass
         start = SIGNS[pos[4]] * 108000 + arcseconds(pos.group(1, 2, 3))
         ranges = list(RANGE.finditer(pages[index + 1]))
         if len(ranges) != 6:
             raise ValueError(f"Expected six line ranges for gate {gate}")
+        else:
+            pass
         for line, match in enumerate(reversed(ranges), 1):
             endpoints = [
                 (start + (arcseconds(match.group(*group)) - start % 108000) % 108000)
@@ -77,8 +81,12 @@ def build(pdf: Path, dictionary: Path, cohorts: list[Path]) -> dict:
     )[0]
     if not all(v in foundation for v in ("56’15”", "48’45”", "07’30”")):
         raise ValueError("Explicit dictionary line arcs absent")
+    else:
+        pass
     if "they are always activating the same line" not in text:
         raise ValueError("Paired Sun/Earth line rule absent")
+    else:
+        pass
     observations, sources = [], []
     angle_ids = {
         "Right Angle": "right",
@@ -99,6 +107,8 @@ def build(pdf: Path, dictionary: Path, cohorts: list[Path]) -> dict:
             )
             if match is None:
                 raise ValueError("Unknown frozen cross label format")
+            else:
+                pass
             observations.append(
                 {
                     "case_id": case["id"],
@@ -111,6 +121,8 @@ def build(pdf: Path, dictionary: Path, cohorts: list[Path]) -> dict:
             )
     if len({r["case_id"] for r in observations}) != len(observations):
         raise ValueError("Duplicate observation")
+    else:
+        pass
     return {
         "method_id": "human_design_source_variant_facts_v1",
         "printed_source": {
@@ -156,3 +168,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

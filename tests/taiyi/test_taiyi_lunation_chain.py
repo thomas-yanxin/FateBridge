@@ -4,6 +4,7 @@ import asyncio
 import hashlib
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -23,6 +24,7 @@ from scripts.taiyi.audit_taiyi_lunation_chain import (
     serial_lunations,
     verify_sources,
 )
+from tests.support.transports import SPECS, call_calculation
 
 
 @pytest.fixture(scope="module")
@@ -32,8 +34,8 @@ def report():
 
 @pytest.mark.parametrize("rewrite_manifest", [False, True])
 def test_cannot_erase_the_652_transcription_by_editing_frozen_readings(
-    tmp_path, rewrite_manifest
-):
+    tmp_path: Path, rewrite_manifest: bool
+) -> None:
     corpus = tmp_path / "corpus"
     shutil.copytree(CORPUS, corpus)
     path = corpus / "readings.json"
@@ -44,11 +46,15 @@ def test_cannot_erase_the_652_transcription_by_editing_frozen_readings(
         frozen = json.loads((corpus / "freeze.json").read_text())
         frozen["files"][path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
         (corpus / "freeze.json").write_text(json.dumps(frozen))
+    else:
+        pass
     with pytest.raises(ValueError, match="V32"):
         verify_sources(corpus)
 
 
-def test_native_constant_corroboration_does_not_replace_primary_siku_values(report):
+def test_native_constant_corroboration_does_not_replace_primary_siku_values(
+    report,
+) -> None:
     assert report["online_transcription_variant"] == {
         "initial_online": 652,
         "native": 657,
@@ -66,7 +72,9 @@ def test_native_constant_corroboration_does_not_replace_primary_siku_values(repo
     assert report["fuying_month_formula"]["source_epoch_reused_as_jinjing"] is False
 
 
-def test_all_rival_year_readings_and_profiles_survive_when_one_happens_to_match(report):
+def test_all_rival_year_readings_and_profiles_survive_when_one_happens_to_match(
+    report,
+) -> None:
     rows = report["month_case_rival_readings"]
     assert len(rows) == 4
     assert [r["cycle360"] for r in rows] == [241, 241, 253, 253]
@@ -76,7 +84,7 @@ def test_all_rival_year_readings_and_profiles_survive_when_one_happens_to_match(
     assert not report["mean_lunation_counter_is_public_jie_counter"]
 
 
-def test_complete_month_cohorts_keep_the_remaining_failures(report):
+def test_complete_month_cohorts_keep_the_remaining_failures(report) -> None:
     rows = report["full_lunation_cohort_hypotheses"]
     assert len(rows) == 8
     assert {
@@ -116,8 +124,8 @@ def test_complete_month_cohorts_keep_the_remaining_failures(report):
 
 @pytest.mark.parametrize("edition,per49", [("ncl_ming", 1447), ("siku", 1457)])
 def test_every_small_remainder_survives_49_serial_steps_without_rounding(
-    edition, per49
-):
+    edition: str, per49: int
+) -> None:
     reading = json.loads((CORPUS / "readings.json").read_text())
     profile = reading["jinjing_serial_month_rules"][edition]
     rows = serial_lunations(profile, 1937060, months=50)
@@ -134,7 +142,9 @@ def test_every_small_remainder_survives_49_serial_steps_without_rounding(
 @pytest.mark.parametrize(
     "year,offset", [(0, 0), (True, 0), (10000, 0), (2026, -1), (2026, 12), (2026, True)]
 )
-def test_origin_requires_explicit_year_and_month_units(year, offset):
+def test_origin_requires_explicit_year_and_month_units(
+    year: bool | int, offset
+) -> None:
     with pytest.raises(ValueError, match="金镜节月"):
         jinjing_month_origin(year, offset)
 
@@ -145,8 +155,13 @@ def test_origin_requires_explicit_year_and_month_units(year, offset):
     [(2026, 1, 2025), (2026, 12, 2026), (1043, 12, 1043), (1561, 5, 1560)],
 )
 def test_default_month_receipt_is_identical_on_rest_mcp_cli(
-    monkeypatch, capsys, key, year, month, cycle_year
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    key: str,
+    year: int,
+    month: int,
+    cycle_year: int,
+) -> None:
     payload = (
         {
             "analysis_year": year,
@@ -182,7 +197,7 @@ def test_default_month_receipt_is_identical_on_rest_mcp_cli(
         "API_KEY_AUTHENTICATOR",
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
-    route = "/api/cn/taiyi" if key == "taiyi" else "/api/divination/sanshiunited"
+    route = "/api/taiyi" if key == "taiyi" else "/api/divination/sanshi"
     rest = TestClient(api.app).post(
         route,
         json=payload,
@@ -198,8 +213,8 @@ def test_default_month_receipt_is_identical_on_rest_mcp_cli(
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                key, {**payload, **opts}, raise_on_error=False
+            result = await call_calculation(
+                client, SPECS[key].tool_name, {**payload, **opts}, raise_on_error=False
             )
             assert not result.is_error, result
             return result.structured_content
@@ -239,4 +254,6 @@ def test_default_month_receipt_is_identical_on_rest_mcp_cli(
         assert receipt["accumulation"] == 23257410
     elif (year, month) == (1043, 12):
         assert (receipt["accumulation"] - 1) % 360 + 1 == 241
+    else:
+        pass
     assert receipt["source_year_label_adjudicated"] is False

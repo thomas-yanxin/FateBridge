@@ -29,6 +29,8 @@ def sha(path: Path) -> str:
 def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     if sha(corpus / "freeze.json") != PIN:
         raise ValueError("Frozen polarity reference identity changed")
+    else:
+        pass
     manifest = json.loads((corpus / "freeze.json").read_text())
     expected = {
         "readings.json",
@@ -39,9 +41,13 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
         p.name for p in corpus.iterdir() if p.name != "__pycache__"
     } != expected | {"freeze.json"}:
         raise ValueError("Frozen polarity file inventory changed")
+    else:
+        pass
     for name, digest in manifest["files"].items():
         if sha(corpus / name) != digest:
             raise ValueError("Frozen polarity reference bytes changed: " + name)
+        else:
+            pass
     readings = json.loads((corpus / "readings.json").read_text())
     if (
         sha(ROOT / "tests/fixtures/jinkou_month_building_v1/source.pdf")
@@ -50,6 +56,8 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
         != readings["annotation"]["reused_old_table_pin"]
     ):
         raise ValueError("Polarity original source identity changed")
+    else:
+        pass
     from scripts.ren.audit_ren_classical import load_frozen_corpus
 
     load_frozen_corpus()
@@ -58,6 +66,8 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     answer = json.loads((corpus / "reference.json").read_text())
     if polarity(readings) != answer or len(answer["cases"]) != 17280:
         raise ValueError("Independent polarity reference cannot be reproduced")
+    else:
+        pass
     return dict(readings=readings, reference=answer)
 
 
@@ -197,6 +207,8 @@ def audit() -> dict[str, Any]:
         result = compare_case(case, board, readings=data["readings"])
         if not result["matched"]:
             failures.append(dict(input=case, **result))
+        else:
+            pass
         actual = result["actual"]
         masks[actual["mask"]] += 1
         uses[actual["use"]] += 1
@@ -211,10 +223,14 @@ def audit() -> dict[str, Any]:
             mismatched_phase_same_polarity += (
                 readings["stem_polarity"][stem] == god["polarity"]
             )
+        else:
+            pass
         checked += 1
     unchanged = before == {str(p.relative_to(ROOT)): sha(p) for p in paths}
     if not unchanged:
         raise ValueError("Source changed during polarity audit; repeat on fixed bytes")
+    else:
+        pass
     from scripts.ren.audit_jinkou_strength import audit as strength_audit
 
     old = strength_audit()
@@ -283,3 +299,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

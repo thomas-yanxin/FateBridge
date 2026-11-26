@@ -3,8 +3,11 @@
 import json
 from pathlib import Path
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence, rulesets
-from fatebridge.core.sukuyo_calendar_text import calendar_day_evidence, source_bundle
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence, rulesets
+from fatebridge.core.sukuyo.sukuyo_calendar_text import (
+    calendar_day_evidence,
+    source_bundle,
+)
 from fatebridge.services.tool_catalog import CATALOG
 
 PRIMARY = json.loads(
@@ -12,7 +15,7 @@ PRIMARY = json.loads(
 )
 
 
-def test_all_four_time_witnesses_and_release_references_have_primary_windows():
+def test_all_four_time_witnesses_and_release_references_have_primary_windows() -> None:
     bundle = source_bundle()
     assert bundle["source_sha256"] == PRIMARY["source_sha256"]
     refs = {r["witness"]: r for r in PRIMARY["passages"]}
@@ -30,7 +33,7 @@ def test_all_four_time_witnesses_and_release_references_have_primary_windows():
     assert PRIMARY["inline_note"]["xml_fragment"].startswith('<note place="inline">')
 
 
-def test_all_30_effective_day_sets_agree_with_explicit_prose_and_source_note():
+def test_all_30_effective_day_sets_agree_with_explicit_prose_and_source_note() -> None:
     expected_nights = set(PRIMARY["expected_effective_night_days"])
     expected_days = set(PRIMARY["expected_effective_daylight_days"])
     actual_nights = set()
@@ -47,6 +50,8 @@ def test_all_30_effective_day_sets_agree_with_explicit_prose_and_source_note():
                 "lower_prose",
                 "lower_verse",
             }
+        else:
+            pass
         assert not r["prose_verse_time_semantic_conflict"]
         assert r["clock_evaluation_status"] == "not_computed"
     assert actual_nights == expected_nights == {4, 11, 18, 25}
@@ -56,7 +61,7 @@ def test_all_30_effective_day_sets_agree_with_explicit_prose_and_source_note():
     ] == PRIMARY["literal_variant_days"]
 
 
-def test_direct_lower_gloss_and_upper_parallel_reading_are_distinguished():
+def test_direct_lower_gloss_and_upper_parallel_reading_are_distinguished() -> None:
     rows = {r["witness"]: r for r in calendar_day_evidence(11)["time_restrictions"]}
     assert rows["lower_verse"]["interpretation_status"] == "direct_lower_inline_gloss"
     assert (
@@ -67,7 +72,7 @@ def test_direct_lower_gloss_and_upper_parallel_reading_are_distinguished():
     assert rows["lower_verse"]["release_locator"] == "T21n1299_p0393c27-28"
 
 
-def test_first_night_native_reading_has_no_fabricated_verse_restriction():
+def test_first_night_native_reading_has_no_fabricated_verse_restriction() -> None:
     first = day_evidence(calendar_mansion("2025-01-29"))
     eleventh = day_evidence(calendar_mansion("2025-02-08"))
     assert first["calendar_day"]["lunar_day"] == 1
@@ -80,7 +85,9 @@ def test_first_night_native_reading_has_no_fabricated_verse_restriction():
     assert "下卷偈文另列此日夜的限制" in eleventh["reading_text"]
 
 
-def test_resolved_gloss_remains_published_but_not_listed_as_unresolved_conflict():
+def test_resolved_gloss_remains_published_but_not_listed_as_unresolved_conflict() -> (
+    None
+):
     result = rulesets()
     assert (
         result["calendar_day"]["id"]
@@ -92,7 +99,7 @@ def test_resolved_gloss_remains_published_but_not_listed_as_unresolved_conflict(
     assert result["textual_resolutions"][0]["literal_expression"] == "一夜"
 
 
-def test_mutating_returned_gloss_or_witness_does_not_change_later_results():
+def test_mutating_returned_gloss_or_witness_does_not_change_later_results() -> None:
     first = calendar_day_evidence(11)
     first["verse_abbreviation_resolution"]["interpreted_lunar_day"] = 1
     first["time_restrictions"][0]["literal_lunar_day"] = 99
@@ -111,7 +118,7 @@ def test_mutating_returned_gloss_or_witness_does_not_change_later_results():
     )
 
 
-def test_live_schema_exposes_abbreviation_literal_interpretation_and_status():
+def test_live_schema_exposes_abbreviation_literal_interpretation_and_status() -> None:
     spec = next(s for s in CATALOG if s.key == "suzhan")
     defs = spec.output_model.model_json_schema()["$defs"]
     assert "verse_abbreviation_resolution" in defs["SukuyoCalendarDay"]["properties"]

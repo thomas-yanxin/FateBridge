@@ -42,12 +42,14 @@ def refuse_profile(monkeypatch, wanted):
     def load(profile_id=de440_solar.MODEL_ID):
         if profile_id == wanted:
             raise EphemerisSourceError("solar_de440_invalid")
+        else:
+            pass
         return original(profile_id)
 
     monkeypatch.setattr(de440_solar, "_profile", load)
 
 
-def test_new_receipt_preserves_source_identity_and_qualification_scope():
+def test_new_receipt_preserves_source_identity_and_qualification_scope() -> None:
     receipt = de440_solar.source_receipt(NEW)
     assert receipt["model_id"] == NEW
     assert receipt["software_solar_term_years"] == [1684, 2304]
@@ -66,8 +68,8 @@ def test_new_receipt_preserves_source_identity_and_qualification_scope():
 @pytest.mark.parametrize("mode", ["auto", "de440"])
 @pytest.mark.parametrize("year", [1700, 1799, 1800, 2200, 2201, 2300])
 def test_public_years_match_independent_reference_and_named_profile(
-    mode, year, monkeypatch
-):
+    mode: str, year: int, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
     expected_model = OLD if 1800 <= year <= 2200 else NEW
     terms = almanac.get_solar_terms_for_year(year, "UTC")
@@ -92,8 +94,8 @@ def test_public_years_match_independent_reference_and_named_profile(
 
 @pytest.mark.parametrize("year", [1699, 2301])
 def test_unselected_extension_does_not_become_a_native_year_dependency(
-    year, monkeypatch
-):
+    year: int, monkeypatch: pytest.MonkeyPatch
+) -> None:
     refuse_profile(monkeypatch, NEW)
     assert {
         t.ephemeris_model for t in almanac.get_solar_terms_for_year(year, "UTC")
@@ -105,8 +107,8 @@ def test_unselected_extension_does_not_become_a_native_year_dependency(
 
 @pytest.mark.parametrize("year", [1800, 2000, 2200])
 def test_established_profile_and_its_guard_years_do_not_load_extension(
-    year, monkeypatch
-):
+    year: int, monkeypatch: pytest.MonkeyPatch
+) -> None:
     refuse_profile(monkeypatch, NEW)
     almanac.get_solar_term_environment_key(year=year)
     previous, following = almanac.get_adjacent_solar_terms(
@@ -116,7 +118,9 @@ def test_established_profile_and_its_guard_years_do_not_load_extension(
 
 
 @pytest.mark.parametrize("year", [1700, 2300])
-def test_extended_input_context_does_not_load_unused_old_data(year, monkeypatch):
+def test_extended_input_context_does_not_load_unused_old_data(
+    year: int, monkeypatch: pytest.MonkeyPatch
+) -> None:
     refuse_profile(monkeypatch, OLD)
     almanac.get_solar_term_environment_key(year=year)
     previous, following = almanac.get_adjacent_solar_terms(
@@ -132,14 +136,14 @@ def test_extended_input_context_does_not_load_unused_old_data(year, monkeypatch)
 @pytest.mark.parametrize("year", [1799, 2201])
 @pytest.mark.parametrize("missing", [OLD, NEW])
 def test_derived_mixed_year_cache_requires_both_consumed_profiles(
-    year, missing, monkeypatch
-):
+    year: int, missing, monkeypatch: pytest.MonkeyPatch
+) -> None:
     refuse_profile(monkeypatch, missing)
     with pytest.raises(EphemerisSourceError):
         almanac.get_solar_term_environment_key(year=year)
 
 
-def test_mixed_profile_receipt_does_not_invent_one_global_model():
+def test_mixed_profile_receipt_does_not_invent_one_global_model() -> None:
     receipt = solar_model_policy.solar_model_environment_receipt(
         observed_de440_models=[OLD, NEW]
     )
@@ -149,20 +153,19 @@ def test_mixed_profile_receipt_does_not_invent_one_global_model():
 
 
 @pytest.mark.parametrize("models", [[], ["moshier"], ["forged_de440_model"]])
-def test_receipt_rejects_unobserved_or_unrecognized_profile_claims(models):
+def test_receipt_rejects_unobserved_or_unrecognized_profile_claims(models) -> None:
     with pytest.raises(ValueError):
         solar_model_policy.solar_model_environment_receipt(observed_de440_models=models)
 
 
-def test_explicit_models_and_strict_jpl_do_not_silently_use_new_profile(monkeypatch):
+def test_explicit_models_and_strict_jpl_do_not_silently_use_new_profile(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     refuse_profile(monkeypatch, NEW)
     for mode in ["analytic", "aa1996"]:
         monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
         with pytest.raises(ValueError, match="1800..2200"):
-            if mode == "aa1996":
-                solar_model_policy.solar_model_cache_key(year=1700)
-            else:
-                solar_model_policy.analytic_selected(1700, "moshier")
+            solar_model_policy.solar_model_cache_key(year=1700)
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
     monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "required-native.eph")
     assert solar_model_policy.solar_model_cache_key(year=1700) == (
@@ -172,7 +175,9 @@ def test_explicit_models_and_strict_jpl_do_not_silently_use_new_profile(monkeypa
 
 
 @pytest.mark.parametrize("fault", ["missing", "crc", "frame", "scope", "rehash"])
-def test_invalid_selected_extension_fails_closed(fault, tmp_path, monkeypatch):
+def test_invalid_selected_extension_fails_closed(
+    fault: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     folder = tmp_path / "package/data/astronomy"
     folder.mkdir(parents=True)
     for name in [
@@ -198,7 +203,7 @@ def test_invalid_selected_extension_fails_closed(fault, tmp_path, monkeypatch):
     else:
         data = bytearray(gzip.decompress(binary.read_bytes()))
         data[40] ^= 1
-        packed = gzip.compress(data, mtime=0)
+        packed = gzip.compress(data, compresslevel=1, mtime=0)
         binary.write_bytes(packed)
         manifest["compressed_sha256"] = hashlib.sha256(packed).hexdigest()
         manifest["uncompressed_sha256"] = hashlib.sha256(data).hexdigest()
@@ -214,7 +219,9 @@ def test_invalid_selected_extension_fails_closed(fault, tmp_path, monkeypatch):
     assert error.value.reason == "solar_de440_invalid"
 
 
-def test_adjacent_context_keeps_its_selected_profile_separate_from_standalone_year():
+def test_adjacent_context_keeps_its_selected_profile_separate_from_standalone_year() -> (
+    None
+):
     ordinary = almanac.get_solar_terms_for_year(1799, "UTC")
     guarded = almanac._solar_terms_for_context_year(1799, "UTC", 1800)
     assert ordinary[0].ephemeris_model == NEW

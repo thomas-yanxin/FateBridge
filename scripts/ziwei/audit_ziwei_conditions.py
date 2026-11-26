@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
-from fatebridge.core.ziwei_conditions import structural_condition_evidence
+from fatebridge.core.ziwei.ziwei_conditions import structural_condition_evidence
 from scripts.ziwei.audit_ziwei_limits import _seed
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -37,9 +37,13 @@ def revised_condition_source(
         != hashlib.sha256(prior_manifest_path.read_bytes()).hexdigest()
     ):
         raise ValueError("Ming condition evidence predecessor changed")
+    else:
+        pass
     for name, digest in prior_manifest["files"].items():
         if hashlib.sha256((prior_folder / name).read_bytes()).hexdigest() != digest:
             raise ValueError("Ming condition frozen predecessor checksum mismatch")
+        else:
+            pass
     image_names = {
         f"naj_{region}_native_region.jpg"
         for region in (
@@ -61,6 +65,8 @@ def revised_condition_source(
     }
     if set(manifest["files"]) != required:
         raise ValueError("Ming condition evidence membership changed")
+    else:
+        pass
     if _strict(
         {
             k: manifest.get(k)
@@ -82,9 +88,13 @@ def revised_condition_source(
         raise ValueError(
             "Ming condition independence metadata contradicts frozen scope"
         )
+    else:
+        pass
     for name, expected in manifest["files"].items():
         if hashlib.sha256((folder / name).read_bytes()).hexdigest() != expected:
             raise ValueError("Ming condition rereading checksum mismatch: " + name)
+        else:
+            pass
     original = fixtures / "naj_ming_conditions_v1/collation.json"
     original_hash = hashlib.sha256(original.read_bytes()).hexdigest()
     changes = json.loads((folder / "corrections.json").read_text())
@@ -94,12 +104,16 @@ def revised_condition_source(
         raise ValueError(
             "Ming condition correction differs from preserved first revision"
         )
+    else:
+        pass
     prior_compiled = json.loads((folder / "prior-compiled.json").read_text())
     if (
         changes["prior_compiled_sha256"]
         != hashlib.sha256((folder / "prior-compiled.json").read_bytes()).hexdigest()
     ):
         raise ValueError("Ming condition prior compiled bytes changed")
+    else:
+        pass
     if _strict(
         {
             k: changes.get(k)
@@ -121,17 +135,23 @@ def revised_condition_source(
         )
     ):
         raise ValueError("Ming condition correction scope contradicts frozen review")
+    else:
+        pass
     if not (
         original_hash
         == changes["prior_collation_sha256"]
         == manifest["prior_collation_sha256"]
     ):
         raise ValueError("Ming condition prior collation changed")
+    else:
+        pass
     source = json.loads(original.read_text())
     if _strict(prior_compiled["clauses"]) != _strict(source["clauses"]):
         raise ValueError(
             "Ming condition prior compiled clauses differ from original collation"
         )
+    else:
+        pass
     first = json.loads((folder / "first_blind_read_frozen.json").read_text())
     peer = json.loads(
         (folder / "ziwei-r25-conditions-glyph-peer-review.json").read_text()
@@ -150,18 +170,26 @@ def revised_condition_source(
         raise ValueError(
             "Ming condition primary report freeze disagrees with actual bytes"
         )
+    else:
+        pass
     if _strict(primary["primary_witness"]["native_evidence"]) != _strict(regions):
         raise ValueError(
             "Ming condition primary report native evidence disagrees with region inventory"
         )
+    else:
+        pass
     if len(regions) != 6 or {Path(r["path"]).name for r in regions} != image_names:
         raise ValueError("Ming condition native region membership changed")
+    else:
+        pass
     region_by_name = {Path(r["path"]).name: r for r in regions}
     if (
         len(peer["source_images"]) != 6
         or {r["file"] for r in peer["source_images"]} != image_names
     ):
         raise ValueError("Ming condition peer image membership changed")
+    else:
+        pass
     for row in peer["source_images"]:
         region = region_by_name[row["file"]]
         if not (
@@ -172,6 +200,8 @@ def revised_condition_source(
             and Path(row["path"]).name == row["file"]
         ):
             raise ValueError("Ming condition peer/native image evidence changed")
+        else:
+            pass
     first_rows = {r["id"]: r for r in first["readings"]}
     primary_rows = {r["id"]: r for r in primary["primary_witness"]["readings"]}
     if (
@@ -180,14 +210,20 @@ def revised_condition_source(
         or set(first_rows) != set(primary_rows)
     ):
         raise ValueError("Ming condition first/primary reading targets changed")
+    else:
+        pass
     for key, reading in first_rows.items():
         if _strict(reading) != _strict({k: primary_rows[key].get(k) for k in reading}):
             raise ValueError(
                 "Ming condition primary text contradicts frozen first reading"
             )
+        else:
+            pass
         columns = reading["small_print_columns_right_to_left"]
         if reading["joined_small_print"] != ("".join(columns) if columns else None):
             raise ValueError("Ming condition first reading columns disagree")
+        else:
+            pass
     peer_rows = {r["target_id"]: r for r in peer["targets"]}
     for target in peer["targets"]:
         for entry in target.get("entries_in_reading_order", [target]):
@@ -196,6 +232,8 @@ def revised_condition_source(
                 range(1, len(columns) + 1)
             ) or entry["small_note_joined_raw"] != "".join(r["raw"] for r in columns):
                 raise ValueError("Ming condition peer reading columns disagree")
+            else:
+                pass
             if any(
                 row.get("belongs_to_large_text") != entry["large_text_raw"]
                 for row in columns
@@ -205,6 +243,8 @@ def revised_condition_source(
                 raise ValueError(
                     "Ming condition peer annotation ownership contradicts its entry"
                 )
+            else:
+                pass
     if not (
         peer_rows["ziwei_fubi_same_palace"]["large_text_raw"]
         == first_rows["ziwei_fubi_same_palace"]["main"]
@@ -226,6 +266,8 @@ def revised_condition_source(
         raise ValueError(
             "Ming condition reading ownership or source identity disagrees"
         )
+    else:
+        pass
     independent_readings = {
         "ziwei_fubi_conjunction": [
             first_rows["ziwei_fubi_same_palace"]["joined_small_print"],
@@ -246,6 +288,8 @@ def revised_condition_source(
         independent_readings
     ):
         raise ValueError("Ming condition correction targets changed")
+    else:
+        pass
     for delta in changes["changes"]:
         clause = next(c for c in source["clauses"] if c["id"] == delta["id"])
         readings = independent_readings[delta["id"]]
@@ -264,6 +308,8 @@ def revised_condition_source(
             )
         ):
             raise ValueError("Ming condition correction disagrees with frozen readings")
+        else:
+            pass
         clause["annotation"] = delta["annotation"]
         clause["unresolved_conditions"] = deepcopy(delta["unresolved_conditions"])
         clause["annotation_revision"] = {
@@ -295,6 +341,8 @@ def audit_conditions(fixtures: Path = FIXTURES) -> dict[str, Any]:
     for name, expected in json.loads((folder / "checksums.json").read_text()).items():
         if hashlib.sha256((folder / name).read_bytes()).hexdigest() != expected:
             raise ValueError("Ming condition source checksum mismatch: " + name)
+        else:
+            pass
     source, revision = revised_condition_source(fixtures)
     extension = json.loads((folder / "coverage_extension.json").read_text())
     if (
@@ -304,6 +352,8 @@ def audit_conditions(fixtures: Path = FIXTURES) -> dict[str, Any]:
         or not extension["declared_after_implementation"]
     ):
         raise ValueError("Ming condition postimplementation coverage policy mismatch")
+    else:
+        pass
     compiled = json.loads(
         (
             ROOT / "src/fatebridge/data/classical/ziwei-naj-ming-conditions.json"
@@ -317,16 +367,22 @@ def audit_conditions(fixtures: Path = FIXTURES) -> dict[str, Any]:
     )
     if strict(compiled) != strict(expected_compiled):
         differences.append(dict(case="production_source_clauses"))
+    else:
+        pass
     if (
         strict(compiled.get("source_revision")) != strict(revision)
         or compiled["version"] != "1.1.0"
     ):
         differences.append(dict(case="production_source_revision"))
+    else:
+        pass
     examples = 0
     for clause in source["clauses"]:
         example = clause["literal_example"]
         if example is None:
             continue
+        else:
+            pass
         positions = example["positions"]
         palaces = [
             dict(
@@ -349,6 +405,8 @@ def audit_conditions(fixtures: Path = FIXTURES) -> dict[str, Any]:
             r["geometry_match"] is True and r["source_literal_example_matches"] is True
         ):
             differences.append(dict(case="literal_example", id=clause["id"]))
+        else:
+            pass
         examples += 1
     charts = checks = joins = 0
     hits: Counter[str] = Counter()
@@ -413,6 +471,8 @@ def audit_conditions(fixtures: Path = FIXTURES) -> dict[str, Any]:
                                     profile=profile,
                                 )
                             )
+                        else:
+                            pass
                         expected_ids = [r["id"] for r in source["clauses"]]
                         if [r["id"] for r in e["records"]] != expected_ids or [
                             r["id"] for r in e["index"]
@@ -426,6 +486,8 @@ def audit_conditions(fixtures: Path = FIXTURES) -> dict[str, Any]:
                                     profile=profile,
                                 )
                             )
+                        else:
+                            pass
                         for clause in source["clauses"]:
                             r = records[clause["id"]]
                             branches = [
@@ -522,6 +584,8 @@ def audit_conditions(fixtures: Path = FIXTURES) -> dict[str, Any]:
                                         id=clause["id"],
                                     )
                                 )
+                            else:
+                                pass
                             hits[clause["id"]] += int(expected)
                             outcomes[clause["id"]].add(
                                 bool(expected and branch_ok and stem_ok)

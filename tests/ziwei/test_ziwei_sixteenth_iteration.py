@@ -3,6 +3,7 @@
 import asyncio
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -22,12 +23,12 @@ from fatebridge.core.metaphysics.ziwei import (
     build_ziwei_horoscope,
     build_ziwei_rules,
 )
-from fatebridge.core.ziwei_rulesets import (
+from fatebridge.core.ziwei.ziwei_rulesets import (
     ZIWEI_SIHUA_RULES,
     sihua_rules_for,
     ziwei_ruleset_metadata,
 )
-from fatebridge.core.ziwei_sources import sihua_source_comparison
+from fatebridge.core.ziwei.ziwei_sources import sihua_source_comparison
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import (
     calculate_ziwei_birth,
@@ -35,10 +36,11 @@ from fatebridge.services.metaphysics import (
 )
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.birth_input import create_person_info
-from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from scripts.ziwei.audit_ziwei_limits import _seed
 from scripts.ziwei.ziwei_conditional_inputs import synthetic_birth_clock
 from tests.fixtures.mcp_receipt import verified_inline_business
+from tests.support.transports import call_calculation
+from validation.claims import CalculationClaim, verify_calculation_claims
 
 BIRTH = dict(
     birth_year=1990,
@@ -52,7 +54,9 @@ BIRTH = dict(
 GENG = {"化禄": "太阳", "化权": "武曲", "化科": "天同", "化忌": "天相"}
 
 
-def test_frozen_cells_and_preimplementation_coverage_are_not_new_independent_cases():
+def test_frozen_cells_and_preimplementation_coverage_are_not_new_independent_cases() -> (
+    None
+):
     r = audit.audit_sihua_selection()
     assert not r["differences"]
     assert (
@@ -78,13 +82,17 @@ def test_frozen_cells_and_preimplementation_coverage_are_not_new_independent_cas
     assert r["live_model_blind_evaluation"] == "not_run"
 
 
-def test_wrong_applied_values_cannot_redefine_the_frozen_expected_table(monkeypatch):
+def test_wrong_applied_values_cannot_redefine_the_frozen_expected_table(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = audit.build_ziwei_chart
 
     def wrong(*a, **kw):
         c = original(*a, **kw)
         if kw.get("sihua_source") == "naj_ming_v1":
             c["sihua"]["化科"] = "太阳"
+        else:
+            pass
         return c
 
     monkeypatch.setattr(audit, "build_ziwei_chart", wrong)
@@ -92,7 +100,7 @@ def test_wrong_applied_values_cannot_redefine_the_frozen_expected_table(monkeypa
     assert len(rows) == 60 and all("sihua" in row["failed"] for row in rows)
 
 
-def test_original_scan_not_only_compiled_table_is_required(tmp_path):
+def test_original_scan_not_only_compiled_table_is_required(tmp_path: Path) -> None:
     shutil.copy(audit.FIXTURES / "sihua_selection_vectors.json", tmp_path)
     shutil.copytree(
         audit.FIXTURES / "naj_ming_anxing_v1", tmp_path / "naj_ming_anxing_v1"
@@ -102,7 +110,9 @@ def test_original_scan_not_only_compiled_table_is_required(tmp_path):
         audit.audit_sihua_selection(tmp_path)
 
 
-def test_selected_table_does_not_merge_an_unrelated_baseline_or_mutate_cached_source():
+def test_selected_table_does_not_merge_an_unrelated_baseline_or_mutate_cached_source() -> (
+    None
+):
     a = sihua_rules_for({}, "iztro_2_5_8", sihua_source="naj_ming_v1")
     assert a["庚"] == GENG
     a["庚"]["化忌"] = "天同"
@@ -112,7 +122,9 @@ def test_selected_table_does_not_merge_an_unrelated_baseline_or_mutate_cached_so
 
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
-def test_an_applied_source_badge_requires_the_actual_whole_table_to_match(profile):
+def test_an_applied_source_badge_requires_the_actual_whole_table_to_match(
+    profile: str,
+) -> None:
     old = sihua_rules_for(ZIWEI_SIHUA_RULES, profile)
     with pytest.raises(ValueError, match="实际四化表与来源不符"):
         sihua_source_comparison(old, compared_assignments_applied=True)
@@ -127,13 +139,13 @@ def test_an_applied_source_badge_requires_the_actual_whole_table_to_match(profil
         lambda: sihua_rules_for({}, "iztro_2_5_8", sihua_source="invented"),
     ],
 )
-def test_unknown_source_never_silently_falls_back(call):
+def test_unknown_source_never_silently_falls_back(call) -> None:
     with pytest.raises(ValueError, match="不支持的紫微四化来源"):
         call()
 
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
-def test_actual_geng_markers_and_symbolic_hua_yin_remain_separate(profile):
+def test_actual_geng_markers_and_symbolic_hua_yin_remain_separate(profile: str) -> None:
     r = calculate_ziwei_birth(
         create_person_info(**BIRTH), rule_profile=profile, sihua_source="naj_ming_v1"
     )
@@ -161,7 +173,9 @@ def test_actual_geng_markers_and_symbolic_hua_yin_remain_separate(profile):
 @pytest.mark.parametrize(
     "fault", ["lost_selection", "projected_ruleset", "retagged_old_chart"]
 )
-def test_horoscope_rejects_missing_or_contradictory_natal_source_identity(fault):
+def test_horoscope_rejects_missing_or_contradictory_natal_source_identity(
+    fault: str,
+) -> None:
     if fault in ("lost_selection", "projected_ruleset"):
         chart = build_ziwei_chart(_seed(1990), "女", sihua_source="naj_ming_v1")
         if fault == "lost_selection":
@@ -183,7 +197,9 @@ def test_horoscope_rejects_missing_or_contradictory_natal_source_identity(fault)
 
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
-def test_selected_source_does_not_create_pre_decade_transformations(profile):
+def test_selected_source_does_not_create_pre_decade_transformations(
+    profile: str,
+) -> None:
     h = calculate_ziwei_horoscope(
         create_person_info(**BIRTH),
         rule_profile=profile,
@@ -200,7 +216,9 @@ def test_selected_source_does_not_create_pre_decade_transformations(profile):
     assert not h["sihua_source_comparison"]["dynamic_reuse_classically_verified"]
 
 
-def test_source_selection_does_not_masquerade_as_solving_the_clock_age_boundary():
+def test_source_selection_does_not_masquerade_as_solving_the_clock_age_boundary() -> (
+    None
+):
     m = json.loads((audit.FIXTURES / "clock_manifest.json").read_text())
     r = calculate_ziwei_horoscope(
         create_person_info(**m["cases"][0]["input"]),
@@ -219,7 +237,7 @@ def test_source_selection_does_not_masquerade_as_solving_the_clock_age_boundary(
     assert age["age_boundary_classically_verified"] is False
 
 
-def test_same_run_claims_reject_the_former_marker_on_the_new_source():
+def test_same_run_claims_reject_the_former_marker_on_the_new_source() -> None:
     spec = next(s for s in CATALOG if s.key == "ziwei_birth")
     p = execute_tool(
         spec,
@@ -245,8 +263,12 @@ def test_same_run_claims_reject_the_former_marker_on_the_new_source():
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 @pytest.mark.parametrize("source", ["rule_profile", "naj_ming_v1"])
 def test_source_identity_and_applied_values_match_rest_native_mcp_cli(
-    tool, profile, source, monkeypatch, capsys
-):
+    tool: str,
+    profile: str,
+    source: str,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -266,18 +288,24 @@ def test_source_identity_and_applied_values_match_rest_native_mcp_cli(
             target_day=15,
             target_hour=12,
         )
+    else:
+        pass
     fields = evidence_views(spec)["sihua_source"]["fields"]
     opts = dict(
         fields=fields,
         strict_fields=True,
         include_snapshot_text=False,
         as_of="2026-10-22T12:00:00+08:00",
+        detail="audit",
+        response_char_limit=0,
     )
     rest = TestClient(api.app).post(
         spec.rest_path,
         json=inputs,
         params=[
             ("as_of", opts["as_of"]),
+            ("detail", opts["detail"]),
+            ("response_char_limit", "0"),
             ("strict_fields", "true"),
             ("include_snapshot_text", "false"),
             *[("fields", f) for f in fields],
@@ -287,17 +315,23 @@ def test_source_identity_and_applied_values_match_rest_native_mcp_cli(
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            r = await client.call_tool(tool, {**inputs, **opts}, raise_on_error=False)
+            r = await call_calculation(
+                client, spec.tool_name, {**inputs, **opts}, raise_on_error=False
+            )
             assert not r.is_error, r.content
-            return await verified_inline_business(client, r.structured_content)
+            return r.structured_content
 
     native = asyncio.run(call())
-    args = [tool]
+    args = [spec.tool_name]
     for k, v in inputs.items():
         args += ["--" + k.replace("_", "-"), str(v)]
     args += [
         "--as-of",
         opts["as_of"],
+        "--detail",
+        opts["detail"],
+        "--response-char-limit",
+        "0",
         "--strict-fields",
         "--no-include-snapshot-text",
         "--fields",
@@ -306,6 +340,21 @@ def test_source_identity_and_applied_values_match_rest_native_mcp_cli(
     capsys.readouterr()
     assert run(args) == 0
     cli = json.loads(capsys.readouterr().out)
+    catalogue = tool == "ziwei_rules"
+    method = "ziwei_rule_catalogue" if catalogue else "ziwei_natal_and_temporal_rules"
+    for payload in (rest.json(), native, cli):
+        evidence = payload["run_metadata"]["calculation_evidence"]
+        (registered,) = evidence["registered_methods"]
+        assert registered["method_id"] == f"fatebridge.{method}.contract_v1"
+        assert "sihua_source" in registered["selector_fields"]
+        if catalogue:
+            assert registered["role"] == "reference"
+            budget = evidence["error_budget"]
+            assert [item["source"] for item in budget["components"]] == [
+                "rule_adjudication"
+            ]
+        else:
+            pass
     bodies = [
         {k: v for k, v in p.items() if k not in ("run_metadata", "result_delivery")}
         for p in [rest.json(), native, cli]
@@ -319,18 +368,25 @@ def test_source_identity_and_applied_values_match_rest_native_mcp_cli(
         assert c["sihua_by_year_stem"]["庚"] == (
             GENG if selected else ZIWEI_SIHUA_RULES["庚"]
         )
+    else:
+        pass
     if tool == "ziwei_birth":
         assert dict(c["sihua"]) == (GENG if selected else ZIWEI_SIHUA_RULES["庚"])
+    else:
+        pass
 
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
-def test_selected_source_default_natal_view_keeps_every_star_and_new_marker(profile):
+def test_selected_source_default_natal_view_keeps_every_star_and_new_marker(
+    profile: str,
+) -> None:
     spec = next(s for s in CATALOG if s.key == "ziwei_birth")
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            r = await client.call_tool(
-                "ziwei_birth",
+            r = await call_calculation(
+                client,
+                "ziwei_birth_chart",
                 {
                     **example_input(spec),
                     "rule_profile": profile,

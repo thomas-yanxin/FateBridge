@@ -22,7 +22,9 @@ CASES = [
 
 
 @pytest.mark.parametrize("key", LEDGER["curated_keys"]["ten_gods"])
-def test_ten_god_cards_replace_unqualified_outcomes_with_conditions_and_sources(key):
+def test_ten_god_cards_replace_unqualified_outcomes_with_conditions_and_sources(
+    key,
+) -> None:
     result = calculate_knowledge_read(domain="bazi", category="ten_gods", key=key)
     assert "error" not in result
     text = result["rendered_text"]
@@ -45,7 +47,9 @@ def test_ten_god_cards_replace_unqualified_outcomes_with_conditions_and_sources(
     assert "非逐字引文" in result["citation"]
 
 
-def test_force_term_cards_keep_known_counterexamples_and_inferred_variant_separate():
+def test_force_term_cards_keep_known_counterexamples_and_inferred_variant_separate() -> (
+    None
+):
     heavy = calculate_knowledge_read(
         domain="bazi", category="classical_force_semantics", key="身重印轻"
     )
@@ -78,14 +82,18 @@ def test_force_term_cards_keep_known_counterexamples_and_inferred_variant_separa
         )
 
 
-def test_unreviewed_card_keeps_an_explicit_unreviewed_status():
+def test_unreviewed_card_keeps_an_explicit_unreviewed_status() -> None:
     result = calculate_knowledge_read(domain="bazi", category="shensha", key="桃花")
+    assert result["lines"] == [
+        "**查法：**以年支或日支查四柱地支。",
+        "申子辰见酉，寅午戌见卯，亥卯未见子，巳酉丑见午。",
+    ]
     assert result["provenance"]["review_status"] == "legacy_unreviewed"
     assert "旧资料待逐条核对" in result["citation"]
     assert "entry_curation" not in result["provenance"]
 
 
-def test_nested_entry_sources_cannot_mutate_the_cached_knowledge_bundle():
+def test_nested_entry_sources_cannot_mutate_the_cached_knowledge_bundle() -> None:
     first = calculate_knowledge_read(domain="bazi", category="ten_gods", key="正印")
     first["provenance"]["entry_curation"]["source_refs"][0]["source_pdf_pages"].append(
         999
@@ -102,7 +110,7 @@ def test_nested_entry_sources_cannot_mutate_the_cached_knowledge_bundle():
 @pytest.mark.parametrize("category,key", CASES)
 def test_curated_cards_keep_identical_content_on_rest_native_mcp_and_cli(
     category, key, surface_calls
-):
+) -> None:
     spec = SPECS["knowledge_read"]
     payload = {"domain": "bazi", "category": category, "key": key}
     opts = {"include_snapshot_text": False, "response_char_limit": 0}
@@ -123,7 +131,7 @@ def test_curated_cards_keep_identical_content_on_rest_native_mcp_and_cli(
 
 
 @pytest.mark.parametrize("key", LEDGER["curated_keys"]["health"])
-def test_health_cards_separate_software_evidence_from_uncollated_correspondences(key):
+def test_health_sources_separate_correspondence_software_and_medical_scope(key) -> None:
     result = calculate_knowledge_read(domain="bazi", category="health", key=key)
     curation = result["provenance"]["entry_curation"]
     implementation = curation["implementation_refs"][0]
@@ -139,17 +147,45 @@ def test_health_cards_separate_software_evidence_from_uncollated_correspondences
             [28, 39, 77] if key == "七杀攻身" else [37, 38]
         )
     else:
-        assert curation["source_refs"] == []
-        assert curation["legacy_correspondence_status"] == "not_collated"
-        assert (
-            curation["review_status"]
-            == "computational_scope_only_correspondence_source_pending"
+        expected_revisions = {
+            "五行藏象": [1100773, 1100774, 1100775, 1100776],
+            "木主肝胆": [1100773, 640546],
+            "火主心": [1100774],
+            "土主脾胃": [1100775, 640546],
+            "金主肺": [1100775],
+            "水主肾": [1100776],
+        }
+        references = curation["source_refs"]
+        assert [item["source_revision_id"] for item in references] == (
+            expected_revisions[key]
         )
-        assert "医籍" in result["citation"] and "待完成" in result["citation"]
-        assert "原典：" not in result["snapshot_text"]
+        assert all(item["supporting_tip_indexes"] == [0] for item in references)
+        assert all(item["source_url"] in result["snapshot_text"] for item in references)
+        assert all(
+            item["source_locator"] in result["snapshot_text"] for item in references
+        )
+        assert (
+            curation["legacy_correspondence_status"]
+            == "selected_sources_identified_legacy_origin_unverified"
+        )
+        assert "external_expert_review_pending" in curation["review_status"]
+        assert (
+            curation["validation_status"]
+            == "selected_cultural_correspondences_not_medical_or_prediction_validation"
+        )
+        assert "implementation_scope_only" in curation["tip_attribution"]["1"]
+        assert "editorial_delivery_boundary" in curation["tip_attribution"]["2"]
+        assert "旧Xingque包历史出处" in result["citation"]
+        if key in {"木主肝胆", "土主脾胃"}:
+            assert "跨段整理" in result["tips"][0]
+            assert "未完成同版原叶影印校勘" in references[1]["source_locator"]
+        else:
+            pass
 
 
-def test_climate_card_discloses_the_actual_grouping_and_unimplemented_classical_layer():
+def test_climate_card_discloses_the_actual_grouping_and_unimplemented_classical_layer() -> (
+    None
+):
     result = calculate_knowledge_read(domain="bazi", category="health", key="调候寒暖")
     text = result["rendered_text"]
     assert "火土权重之和与水金权重之和" in text and "差值达到3" in text
@@ -165,11 +201,11 @@ def test_climate_card_discloses_the_actual_grouping_and_unimplemented_classical_
 @pytest.mark.parametrize("key", LEDGER["curated_keys"]["structures"])
 def test_structure_cards_replace_automatic_formation_and_occupation_with_conditions(
     key,
-):
+) -> None:
     result = calculate_knowledge_read(domain="bazi", category="structures", key=key)
     text = result["rendered_text"]
     assert "候选" in text and "不认证成格" in text
-    assert "monthly_structure.structure_god" in text
+    assert "monthly_structure.use_resolution" in text
     curation = result["provenance"]["entry_curation"]
     assert (
         result["provenance"]["review_status"]
@@ -180,7 +216,9 @@ def test_structure_cards_replace_automatic_formation_and_occupation_with_conditi
     assert (ROOT / curation["implementation_refs"][0]["source_path"]).is_file()
 
 
-def test_structure_cards_preserve_seal_output_exceptions_and_actual_blade_seat_meaning():
+def test_structure_cards_preserve_seal_output_exceptions_and_actual_blade_seat_meaning() -> (
+    None
+):
     wealth = calculate_knowledge_read(
         domain="bazi", category="structures", key="正财格"
     )

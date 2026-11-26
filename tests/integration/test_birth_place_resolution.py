@@ -27,7 +27,7 @@ def _person(**overrides) -> PersonInfo:
     return PersonInfo(**base)
 
 
-def test_province_fallback_emits_resolution_advisory():
+def test_province_fallback_emits_resolution_advisory() -> None:
     # 全量库已覆盖宿豫区；用明确的未收录地点保持省级降级分支的验证。
     nb = normalize_birth_time(_person(birth_place="江苏省未收录地点"))
     summary = nb.as_dict()
@@ -42,7 +42,7 @@ def test_province_fallback_emits_resolution_advisory():
     assert "birth_longitude" in advisory
 
 
-def test_explicit_longitude_has_no_advisory():
+def test_explicit_longitude_has_no_advisory() -> None:
     nb = normalize_birth_time(
         _person(birth_place="江苏省南通市海安市", birth_longitude=120.47)
     )
@@ -53,7 +53,7 @@ def test_explicit_longitude_has_no_advisory():
     assert "resolution_advisory" not in summary
 
 
-def test_city_level_place_has_no_advisory():
+def test_city_level_place_has_no_advisory() -> None:
     nb = normalize_birth_time(_person(birth_place="杭州"))
     summary = nb.as_dict()
     assert summary["resolved_place"] == "杭州"
@@ -61,7 +61,7 @@ def test_city_level_place_has_no_advisory():
     assert "resolution_advisory" not in summary
 
 
-def test_no_true_solar_no_advisory_even_for_uncatalogued_tail():
+def test_no_true_solar_no_advisory_even_for_uncatalogued_tail() -> None:
     # 未启用真太阳时：不做校正，无精度顾虑，不提示。
     nb = normalize_birth_time(
         _person(birth_place="江苏省南通市海安市", use_true_solar_time=False)
@@ -71,7 +71,7 @@ def test_no_true_solar_no_advisory_even_for_uncatalogued_tail():
     assert "resolution_advisory" not in summary
 
 
-def test_haian_resolves_to_county_not_parent_prefecture():
+def test_haian_resolves_to_county_not_parent_prefecture() -> None:
     # 海安是南通下辖县级市。含「南通海安」的串里府(南通)与县(海安)同时出现，
     # 县级更具体，必须胜出——否则会用南通市区坐标(纬度差约 0.56°)排出偏盘。
     for place in ("海安", "海安市", "南通海安", "江苏南通海安", "中国江苏南通海安市"):
@@ -82,13 +82,13 @@ def test_haian_resolves_to_county_not_parent_prefecture():
         assert abs(r.latitude - 32.54) < 0.1, place
 
 
-def test_nantong_prefecture_alone_still_resolves_to_itself():
+def test_nantong_prefecture_alone_still_resolves_to_itself() -> None:
     r = resolve_birth_place_context("南通")
     assert r.canonical_name == "南通"
     assert r.level == "city"
 
 
-def test_nantong_county_siblings_each_resolve_distinctly():
+def test_nantong_county_siblings_each_resolve_distinctly() -> None:
     # 同府的其它县级单位也补齐，避免「南通X」全部塌回南通市区。
     for name in ("如皋", "启东", "海门", "如东"):
         r = resolve_birth_place_context(f"南通{name}")
@@ -96,7 +96,7 @@ def test_nantong_county_siblings_each_resolve_distinctly():
         assert r.level == "county", name
 
 
-def test_kaizhou_resolves_to_county_not_chongqing_centroid():
+def test_kaizhou_resolves_to_county_not_chongqing_centroid() -> None:
     # 开州区是重庆下辖远郊区(原开县)，距渝中半岛约 180km。含「重庆开州」的串里
     # 直辖市(重庆)与区(开州区)同时出现：区级更具体且别名更长，必须胜出——否则会
     # 用重庆市中心坐标(106.55°E/29.56°N)排盘，上升/天顶偏约 1.7°。
@@ -115,7 +115,7 @@ def test_kaizhou_resolves_to_county_not_chongqing_centroid():
         assert abs(r.latitude - 31.178) < 0.1, place
 
 
-def test_chongqing_and_its_district_resolve_at_the_requested_level():
+def test_chongqing_and_its_district_resolve_at_the_requested_level() -> None:
     for place in ("重庆", "重庆市"):
         r = resolve_birth_place_context(place)
         assert r.canonical_name == "重庆", place
@@ -123,7 +123,7 @@ def test_chongqing_and_its_district_resolve_at_the_requested_level():
     assert resolve_birth_place_context("重庆市渝中区").canonical_name == "渝中区"
 
 
-def test_beijing_tongzhou_not_misresolved_to_jiangsu():
+def test_beijing_tongzhou_not_misresolved_to_jiangsu() -> None:
     # 同名区均收录后必须用行政上级区分，不能再退回北京市中心。
     r = resolve_birth_place_context("北京通州区")
     assert r.canonical_name == "通州区"
@@ -132,7 +132,7 @@ def test_beijing_tongzhou_not_misresolved_to_jiangsu():
     assert abs(nantong.longitude - 121.07) < 0.1
 
 
-def test_haian_no_longer_emits_province_advisory():
+def test_haian_no_longer_emits_province_advisory() -> None:
     # 已精确到县级 → 不再触发省级近似 advisory。
     nb = normalize_birth_time(_person(birth_place="江苏省南通市海安市"))
     summary = nb.as_dict()

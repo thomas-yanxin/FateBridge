@@ -8,14 +8,17 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, cast
 
-from .city_gate_inputs import CityGateObservation, CityGateRequest
-from .directions import rule_data, wrap9
+from fatebridge.core.fengshui.city_gate_inputs import (
+    CityGateObservation,
+    CityGateRequest,
+)
+from fatebridge.core.fengshui.directions import rule_data, wrap9
 
 
 @lru_cache(maxsize=1)
-def _bundle() -> Dict[str, Any]:
+def _bundle() -> dict[str, Any]:
     return cast(
         Dict[str, Any],
         json.loads(
@@ -24,7 +27,7 @@ def _bundle() -> Dict[str, Any]:
     )
 
 
-def city_gate_provenance() -> Dict[str, Any]:
+def city_gate_provenance() -> dict[str, Any]:
     data = _bundle()
     return {
         **deepcopy(data["ruleset"]),
@@ -35,11 +38,11 @@ def city_gate_provenance() -> Dict[str, Any]:
     }
 
 
-def _conjunction(values: List[Optional[bool]]) -> Optional[bool]:
+def _conjunction(values: list[bool | None]) -> bool | None:
     return False if False in values else None if None in values else True
 
 
-def _form(observation: Optional[CityGateObservation]) -> Dict[str, Any]:
+def _form(observation: CityGateObservation | None) -> dict[str, Any]:
     if observation is None:
         return {
             "status": "not_requested",
@@ -61,8 +64,8 @@ def _form(observation: Optional[CityGateObservation]) -> Dict[str, Any]:
         observation.multiple_openings_present is True
         or observation.water_present is False
     ):
-        match: Optional[bool] = False
-        patterns: Dict[str, Optional[bool]] = {}
+        match: bool | None = False
+        patterns: dict[str, bool | None] = {}
     else:
         patterns = {
             "encircled_sole_water_opening": _conjunction(
@@ -123,9 +126,9 @@ def _form(observation: Optional[CityGateObservation]) -> Dict[str, Any]:
 
 def analyze_city_gate(
     config: CityGateRequest,
-    orientations: List[Dict[str, Any]],
-    registry: Dict[str, Any],
-) -> Dict[str, Any]:
+    orientations: list[dict[str, Any]],
+    registry: dict[str, Any],
+) -> dict[str, Any]:
     period = config.reference_period_number
     path = rule_data("flight_path")
     directions = rule_data("directions")

@@ -12,22 +12,22 @@ from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.geometry import _julian_day
 from fatebridge.core.astro.time_scales import datetime_from_tt, leap_table
-from fatebridge.core.human_design import chart_at
-from fatebridge.core.human_design_depth import (
+from fatebridge.core.human_design.human_design import chart_at
+from fatebridge.core.human_design.human_design_depth import (
     cross_identifier,
     depth_reference,
     line_fixings,
 )
-from fatebridge.core.human_design_evidence import source_activation_impacts
-from fatebridge.core.human_design_time import sun_at_tt, utc_from_tt
+from fatebridge.core.human_design.human_design_evidence import source_activation_impacts
+from fatebridge.core.human_design.human_design_time import sun_at_tt, utc_from_tt
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
+from validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = next(spec for spec in CATALOG if spec.key == "human_design")
 
 
-def test_source_depth_catalogue_is_complete_without_invented_dualities():
+def test_source_depth_catalogue_is_complete_without_invented_dualities() -> None:
     data = depth_reference()
     numeric = json.loads(
         (ROOT / "src/fatebridge/data/human_design/rave-2001-reference.json").read_text()
@@ -76,8 +76,8 @@ def test_source_depth_catalogue_is_complete_without_invented_dualities():
     ],
 )
 def test_cross_identifiers_match_primary_printed_names_including_original_spelling(
-    gate, angle, name
-):
+    gate: int, angle: str, name: str
+) -> None:
     assert cross_identifier(gate, angle)["name"] == name
 
 
@@ -93,7 +93,7 @@ def selected(items, side="design", body="Sun"):
     )
 
 
-def test_official_55_2_venus_in_harmonic_39_example():
+def test_official_55_2_venus_in_harmonic_39_example() -> None:
     result = selected(
         {
             "design": [activation("Sun", 55, 2)],
@@ -114,7 +114,7 @@ def test_official_55_2_venus_in_harmonic_39_example():
 
 
 @pytest.mark.parametrize("line", [3, 4])
-def test_official_16_mars_can_fix_other_lines_within_same_gate(line):
+def test_official_16_mars_can_fix_other_lines_within_same_gate(line: int) -> None:
     result = selected(
         {
             "design": [activation("Sun", 16, line)],
@@ -127,7 +127,7 @@ def test_official_16_mars_can_fix_other_lines_within_same_gate(line):
     )
 
 
-def test_both_planet_polarities_are_retained_as_juxtaposition():
+def test_both_planet_polarities_are_retained_as_juxtaposition() -> None:
     result = selected(
         {
             "design": [activation("Sun", 27, 5), activation("Jupiter", 27, 1)],
@@ -139,7 +139,7 @@ def test_both_planet_polarities_are_retained_as_juxtaposition():
     assert result["fixing_planets"]["detriment"][0]["body"] == "Saturn"
 
 
-def test_other_planets_and_nodes_cannot_substitute_for_named_fixing_planet():
+def test_other_planets_and_nodes_cannot_substitute_for_named_fixing_planet() -> None:
     result = selected(
         {
             "design": [activation("Sun", 55, 2)],
@@ -150,7 +150,7 @@ def test_other_planets_and_nodes_cannot_substitute_for_named_fixing_planet():
     assert result["fixing_planets"] == {"exaltation": [], "detriment": []}
 
 
-def test_all_five_official_jobs_fixing_arrows_without_adding_unshown_arrows():
+def test_all_five_official_jobs_fixing_arrows_without_adding_unshown_arrows() -> None:
     fixture = json.loads(
         (ROOT / "tests/fixtures/human-design-official-example.json").read_text()
     )
@@ -173,7 +173,7 @@ def test_all_five_official_jobs_fixing_arrows_without_adding_unshown_arrows():
     }
 
 
-def test_utc_leap_second_is_not_rebased_onto_next_midnight():
+def test_utc_leap_second_is_not_rebased_onto_next_midnight() -> None:
     midnight = _julian_day(datetime(2017, 1, 1, tzinfo=timezone.utc))
     leap_tt = midnight + (36 + 32.184 + 0.5) / 86400
     label, moment, is_leap = utc_from_tt(leap_tt)
@@ -184,7 +184,7 @@ def test_utc_leap_second_is_not_rebased_onto_next_midnight():
     assert moment is not None
 
 
-def test_design_root_can_lie_inside_an_actual_utc_leap_second():
+def test_design_root_can_lie_inside_an_actual_utc_leap_second() -> None:
     # Construct the birth through Swiss' independent crossing routine so that
     # its 88-degree earlier Sun occurs during the known inserted UTC second.
     leap_tt = (
@@ -202,28 +202,36 @@ def test_design_root_can_lie_inside_an_actual_utc_leap_second():
     assert chart["design_solver"]["bracket_width_seconds"] <= 0.0002
 
 
-def test_every_frozen_positive_leap_second_and_its_adjacent_boundaries():
+def test_every_frozen_positive_leap_second_and_its_adjacent_boundaries() -> None:
     count = 0
     for previous, current in zip(leap_table()["entries"], leap_table()["entries"][1:]):
         if current["tai_minus_utc_seconds"] - previous["tai_minus_utc_seconds"] != 1:
             continue
+        else:
+            pass
         effective = datetime.fromisoformat(current["effective_date"]).replace(
             tzinfo=timezone.utc
         )
         jd = _julian_day(effective)
         start = jd + (previous["tai_minus_utc_seconds"] + 32.184) / 86400
         stop = jd + (current["tai_minus_utc_seconds"] + 32.184) / 86400
-        for moment in (start, start + 0.25 / 86400, start + 0.75 / 86400):
+        for moment in (start + 0.25 / 86400, start + 0.75 / 86400):
             label, date, leap = utc_from_tt(moment)
             assert leap and date is None and "T23:59:60." in label
-        for moment in (start - 0.01 / 86400, stop, stop + 0.01 / 86400):
+        for moment in (start - 0.01 / 86400, stop + 0.01 / 86400):
             _, date, leap = utc_from_tt(moment)
             assert not leap and date is not None
+        # These rounded scalars encode nominal boundary aliases. Their raw
+        # IEEE points need not lie on the same side of the exact boundary;
+        # the independent SOFA neighbor corpus checks that point semantics.
+        with pytest.raises(ValueError, match="UTC leap second"):
+            datetime_from_tt(start)
+        assert datetime_from_tt(stop) == effective
         count += 1
     assert count == 27
 
 
-def test_tt_elapsed_days_do_not_lose_inserted_civil_second():
+def test_tt_elapsed_days_do_not_lose_inserted_civil_second() -> None:
     chart = chart_at(datetime(2017, 3, 1, tzinfo=timezone.utc))
     solver = chart["design_solver"]
     assert (
@@ -231,7 +239,7 @@ def test_tt_elapsed_days_do_not_lose_inserted_civil_second():
     ) * 86400 == pytest.approx(1, abs=0.001)
 
 
-def test_chart_utc_label_is_normalized_even_for_direct_library_call():
+def test_chart_utc_label_is_normalized_even_for_direct_library_call() -> None:
     from datetime import timedelta
 
     chart = chart_at(datetime(2000, 1, 1, 8, tzinfo=timezone(timedelta(hours=8))))
@@ -249,9 +257,9 @@ def test_chart_utc_label_is_normalized_even_for_direct_library_call():
     ],
 )
 def test_source_conflict_is_located_only_where_it_changes_this_activation(
-    longitude, line, candidates
-):
-    from fatebridge.core.human_design import longitude_activation
+    longitude: float, line: int, candidates
+) -> None:
+    from fatebridge.core.human_design.human_design import longitude_activation
 
     # Source interval wrap-around is also checked near the end of the zodiac.
     coordinates = longitude_activation(longitude)
@@ -276,7 +284,9 @@ def complete_run():
     return execute_tool(SPEC, SPEC.request_model(**example_input(SPEC)))
 
 
-def test_fixed_reading_verifier_checks_all_eight_source_bound_statements(complete_run):
+def test_fixed_reading_verifier_checks_all_eight_source_bound_statements(
+    complete_run,
+) -> None:
     result = verify_human_design_reading(complete_run)
     assert result["status"] == "verified_fixed_template_reading", result
     assert result["checked_statement_count"] == 10
@@ -310,8 +320,8 @@ def test_fixed_reading_verifier_checks_all_eight_source_bound_statements(complet
     ],
 )
 def test_false_reading_or_internally_inconsistent_calculation_cannot_pass_even_after_rehash(
-    complete_run, tamper
-):
+    complete_run, tamper: str
+) -> None:
     changed = deepcopy(complete_run)
     if tamper == "text":
         changed["interpretation"]["authority_meaning"] = "头脑是可靠的内在权威。"
@@ -336,14 +346,9 @@ def test_false_reading_or_internally_inconsistent_calculation_cannot_pass_even_a
     elif tamper == "source_consistency":
         changed["source_consistency"]["discrepancies"] = []
     elif tamper == "certification":
-        changed["validation"].update(
-            all_three_axes_full_marks=True,
-            all_four_axes_full_marks=True,
-            authority_certified=True,
-            prediction="proven",
-        )
+        changed["validation"]["prediction"] = "proven"
     elif tamper == "certification_type":
-        changed["validation"]["authority_certified"] = 0
+        changed["validation"]["classical_acceptance_passed"] = 0
     elif tamper == "graph_boolean_type":
         changed["bodygraph"]["motor_to_throat"] = int(
             changed["bodygraph"]["motor_to_throat"]
@@ -374,7 +379,7 @@ def test_false_reading_or_internally_inconsistent_calculation_cannot_pass_even_a
     assert verify_human_design_reading(changed)["status"] == "rejected"
 
 
-def test_projection_is_not_complete_run_verification(complete_run):
+def test_projection_is_not_complete_run_verification(complete_run) -> None:
     assert (
         verify_human_design_reading(
             {
@@ -396,15 +401,17 @@ def test_projection_is_not_complete_run_verification(complete_run):
         ("run_metadata", None),
     ],
 )
-def test_malformed_result_is_rejected_without_verifier_crash(complete_run, root, bad):
+def test_malformed_result_is_rejected_without_verifier_crash(
+    complete_run, root: str, bad
+) -> None:
     value = deepcopy(complete_run)
     value[root] = bad
     assert verify_human_design_reading(value)["status"] == "rejected"
 
 
 def test_astronomy_audit_replays_current_solver_not_only_the_frozen_reference(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from scripts.human_design import audit_human_design as audit
 
     original = audit.solve_design_epoch

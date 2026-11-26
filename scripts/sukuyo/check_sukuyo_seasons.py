@@ -21,10 +21,16 @@ def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:
     before = json.loads(FIXTURE.read_bytes())
     if hashlib.sha256(raw).hexdigest() != before["source_bundle_sha256"]:
         raise ValueError("季节来源包与修改前冻结指纹不一致")
+    else:
+        pass
     if data["all12_season_rows"] != before["all12_season_rows"]:
         raise ValueError("十二月季节原录与修改前参考不一致")
+    else:
+        pass
     if [r["textual_month"] for r in data["all12_season_rows"]] != list(range(1, 13)):
         raise ValueError("十二月季节原录缺失或重复")
+    else:
+        pass
     checked = []
     ns = {
         "t": "http://www.tei-c.org/ns/1.0",
@@ -34,6 +40,8 @@ def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:
         captured = path.read_bytes()
         if hashlib.sha256(captured).hexdigest() != before["source_files_sha256"][name]:
             raise ValueError("季节实际源文件字节指纹不一致")
+        else:
+            pass
         if name == "T13n0397.xml":
             tree = ET.fromstring(captured)
             for row in [*data["all12_season_rows"], data["rizang_unit_context"]]:
@@ -46,12 +54,18 @@ def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:
                     != row["literal"]
                 ):
                     raise ValueError("日藏季节实际原段与修改前参考不一致")
+                else:
+                    pass
         elif name == "T25n1509.xml":
             from scripts.sukuyo.check_sukuyo_time_units import selected_tei_lines
 
             text, _ = selected_tei_lines(path, "0409b25", "0409b29")
             if re.sub(r"\s+", "", text) != data["T1509_season_context"]["main_literal"]:
                 raise ValueError("大智度论实际原段与修改前参考不一致")
+            else:
+                pass
+        else:
+            pass
         checked.append(name)
     return {
         "source_bundle_sha256": hashlib.sha256(raw).hexdigest(),
@@ -78,3 +92,5 @@ if __name__ == "__main__":
             indent=2,
         )
     )
+else:
+    pass

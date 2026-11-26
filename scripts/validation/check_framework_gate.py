@@ -1,12 +1,22 @@
 """Re-evaluate complete HD physical rows against the unchanged frozen cohort."""
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import hashlib
 import json
 import math
 from pathlib import Path
 
-from fatebridge.validation.acceptance import (
+from validation.acceptance import (
     GateObservation,
     GateProtocol,
     evaluate_gate,
@@ -21,9 +31,13 @@ def evaluate(report: dict) -> dict:
     raw = REFERENCE.read_bytes()
     if hashlib.sha256(raw).hexdigest() != REFERENCE_SHA256:
         raise ValueError("原JPL参考改变；不能更新固定身份绕过验收")
+    else:
+        pass
     reference = json.loads(raw)
     if set(report["backends"]) != {"selected", "moshier_diagnostic"}:
         raise ValueError("原两个后端均须保留；不能只验成功分支")
+    else:
+        pass
     facts = {
         f"{pair['label']}|{side}|{body}": (pair[side]["jd_tt"], fact["longitude"])
         for pair in reference["pairs"]
@@ -150,3 +164,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

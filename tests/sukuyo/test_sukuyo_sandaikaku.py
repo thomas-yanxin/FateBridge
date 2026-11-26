@@ -8,18 +8,20 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_historical_calendar import date_reference
-from fatebridge.core.sukuyo_sandaikaku import (
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_historical_calendar import date_reference
+from fatebridge.core.sukuyo.sukuyo_sandaikaku import (
     SOURCE,
     month_reference,
     reference_lines,
     validate_bundle,
 )
-from fatebridge.core.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 
-def test_822_document_and_766_quote_bind_to_before_code_primary_facts_separately():
+def test_822_document_and_766_quote_bind_to_before_code_primary_facts_separately() -> (
+    None
+):
     raw = (
         Path(__file__).parents[1] / "data/sukuyo-sandaikaku-source-v1.json"
     ).read_bytes()
@@ -75,7 +77,7 @@ def test_822_document_and_766_quote_bind_to_before_code_primary_facts_separately
 @pytest.mark.parametrize(
     "args", [(True, 2, False), (766, 0, False), (766, 13, False), (766, 2, 0)]
 )
-def test_bad_month_keys_do_not_silently_coerce(args):
+def test_bad_month_keys_do_not_silently_coerce(args) -> None:
     with pytest.raises(ValueError):
         month_reference(*args)
 
@@ -90,7 +92,7 @@ def test_bad_month_keys_do_not_silently_coerce(args):
         (841, 11, False),
     ],
 )
-def test_not_inherited_by_adjacent_month_leap_or_another_year(args):
+def test_not_inherited_by_adjacent_month_leap_or_another_year(args) -> None:
     assert month_reference(*args) is None
 
 
@@ -107,7 +109,9 @@ def test_not_inherited_by_adjacent_month_leap_or_another_year(args):
         "real",
     ],
 )
-def test_quote_knowledge_or_source_status_cannot_be_silently_rewritten(mutation):
+def test_quote_knowledge_or_source_status_cannot_be_silently_rewritten(
+    mutation: str,
+) -> None:
     d = deepcopy(load_source(SOURCE).data)
     if mutation == "swap_dates":
         d["transmitted_record"]["quoted_earlier_date"]["year"] = 822
@@ -129,7 +133,7 @@ def test_quote_knowledge_or_source_status_cannot_be_silently_rewritten(mutation)
         validate_bundle(d)
 
 
-def test_every_day_of_both_host_months_keeps_its_binding_role_and_real_input():
+def test_every_day_of_both_host_months_keeps_its_binding_role_and_real_input() -> None:
     raw = json.loads(
         (
             Path(__file__).parents[1] / "data/sukuyo-sandaikaku-source-v1.json"
@@ -159,8 +163,8 @@ def test_every_day_of_both_host_months_keeps_its_binding_role_and_real_input():
 
 @pytest.mark.parametrize("civil", ["0766-03-19", "0822-03-31", "0822-04-27"])
 def test_product_reading_keeps_actual_source_dates_unknowns_and_remaining_conflicts(
-    civil,
-):
+    civil: str,
+) -> None:
     c = calendar_mansion(
         civil, "12:00:00", "+09:00", calendar_basis="japanese_naoj_historical_utc09"
     )
@@ -179,7 +183,9 @@ def test_product_reading_keeps_actual_source_dates_unknowns_and_remaining_confli
     assert "五万斛" in "".join(reference_lines(ref))
 
 
-def test_no_selected_quotation_is_explicit_without_suppressing_actual_calendar():
+def test_no_selected_quotation_is_explicit_without_suppressing_actual_calendar() -> (
+    None
+):
     c = calendar_mansion(
         "0766-04-18",
         "12:00:00",

@@ -3,12 +3,13 @@
 import hashlib
 import json
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.validation import jyotish_study_binding as api
 from tests.jyotish import test_jyotish_study_binding as f
+from validation import jyotish_study_binding as api
 
 FIELDS = [
     "baseline_derivation",
@@ -71,7 +72,9 @@ def expected_context():
     )
 
 
-def test_context_commits_declared_outer_details_and_plan_explicitly_includes_binding():
+def test_context_commits_declared_outer_details_and_plan_explicitly_includes_binding() -> (
+    None
+):
     protocol = f.protocol()
     assert api.protocol_context_digest(protocol) == expected_context()
     assert protocol.plan.model_dump(mode="json")["protocol_context_sha256"] is None
@@ -91,13 +94,13 @@ def test_context_commits_declared_outer_details_and_plan_explicitly_includes_bin
 
 
 @pytest.mark.parametrize("field", FIELDS)
-def test_supplied_context_rejects_a_changed_wrapper_before_registration(field):
+def test_supplied_context_rejects_a_changed_wrapper_before_registration(field) -> None:
     data, _ = changed_data(field)
     with pytest.raises(ValidationError, match="完整协议上下文指纹"):
         api.JyotishProtocol.model_validate(data)
 
 
-def test_mutated_protocol_and_fully_rehashed_packet_cannot_keep_stale_context():
+def test_mutated_protocol_and_fully_rehashed_packet_cannot_keep_stale_context() -> None:
     protocol = bound_protocol()
     protocol.outcome_adjudication += "; changed"
     with pytest.raises(ValidationError, match="完整协议上下文指纹"):
@@ -119,7 +122,9 @@ def test_mutated_protocol_and_fully_rehashed_packet_cannot_keep_stale_context():
 
 
 @pytest.mark.parametrize("field", FIELDS)
-def test_original_forecasts_and_outcomes_cannot_move_to_a_new_bound_protocol(field):
+def test_original_forecasts_and_outcomes_cannot_move_to_a_new_bound_protocol(
+    field,
+) -> None:
     original = bound_protocol()
     old_forecasts = records(original, f.forecasts)
     old_outcomes = records(original, f.outcomes)
@@ -147,7 +152,7 @@ def test_original_forecasts_and_outcomes_cannot_move_to_a_new_bound_protocol(fie
         )
 
 
-def test_complete_original_binding_allows_only_the_existing_limited_gates():
+def test_complete_original_binding_allows_only_the_existing_limited_gates() -> None:
     protocol = bound_protocol()
     registration = api.register(
         protocol, f.MODEL, at=f.REGISTERED, artifacts=f.ARTIFACTS
@@ -176,7 +181,7 @@ def test_complete_original_binding_allows_only_the_existing_limited_gates():
     )
 
 
-def test_missing_context_blocks_protocol_gate_without_silent_rebinding():
+def test_missing_context_blocks_protocol_gate_without_silent_rebinding() -> None:
     protocol = f.protocol()
     registration = api.register(
         protocol, f.MODEL, at=f.REGISTERED, artifacts=f.ARTIFACTS
@@ -203,7 +208,9 @@ def test_missing_context_blocks_protocol_gate_without_silent_rebinding():
     assert canonical(registration) == before
 
 
-def test_context_cannot_retroactively_supply_missing_original_record_commitments():
+def test_context_cannot_retroactively_supply_missing_original_record_commitments() -> (
+    None
+):
     protocol = bound_protocol()
     registration = api.register(
         protocol, f.MODEL, at=f.REGISTERED, artifacts=f.ARTIFACTS
@@ -225,8 +232,8 @@ def test_context_cannot_retroactively_supply_missing_original_record_commitments
 
 
 def test_actual_cli_preserves_original_context_and_record_bindings(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     protocol = bound_protocol()
     data = protocol.model_dump(mode="json")
     original_forecasts, original_outcomes = f.forecasts, f.outcomes

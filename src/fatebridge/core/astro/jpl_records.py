@@ -13,15 +13,19 @@ import struct
 from contextlib import contextmanager
 from fractions import Fraction
 from pathlib import Path
-from typing import Any, BinaryIO, Dict, Iterator, Tuple
+from typing import Any, BinaryIO, Iterator
 
-from fatebridge.core.astro.jpl_kinematics import RECORD_BYTES, _signature
+from fatebridge.core.astro.jpl_kinematics import (
+    RECORD_BYTES,
+    _path_signature,
+    _signature,
+)
 from fatebridge.core.jpl_ephemeris import jpl_header
 from fatebridge.utils.errors import EphemerisSourceError
 
 
 class SourceRecords:
-    def __init__(self, stream: BinaryIO, path: Path, info: Dict[str, Any]) -> None:
+    def __init__(self, stream: BinaryIO, path: Path, info: dict[str, Any]) -> None:
         self.stream, self.path = stream, path
         self.signature = _signature(os.fstat(stream.fileno()))
         self.check()
@@ -48,17 +52,17 @@ class SourceRecords:
             or self.end != info["end_julian_day_tdb"]
         ):
             raise EphemerisSourceError("jpl_kinematics_invalid")
-        self.cache: Dict[int, Tuple[float, ...]] = {}
-        self.receipts: Dict[int, Dict[str, Any]] = {}
+        self.cache: dict[int, tuple[float, ...]] = {}
+        self.receipts: dict[int, dict[str, Any]] = {}
         self.cells: set[tuple] = set()
 
     def check(self) -> None:
         if self.signature != _signature(
             os.fstat(self.stream.fileno())
-        ) or self.signature != _signature(self.path.stat()):
+        ) or self.signature != _path_signature(self.path):
             raise EphemerisSourceError("changed_during")
 
-    def record(self, epoch: Fraction) -> Tuple[float, ...]:
+    def record(self, epoch: Fraction) -> tuple[float, ...]:
         if not Fraction(self.start) <= epoch <= Fraction(self.end):
             raise EphemerisSourceError("jpl_kinematics_outside_source")
         index = min(
@@ -86,7 +90,7 @@ class SourceRecords:
             }
         return self.cache[index]
 
-    def pointer(self, group: int) -> Tuple[int, int, int]:
+    def pointer(self, group: int) -> tuple[int, int, int]:
         if not 0 <= group <= 10:
             raise EphemerisSourceError("jpl_kinematics_invalid")
         offset, count, parts = struct.unpack_from(
@@ -101,7 +105,7 @@ class SourceRecords:
             raise EphemerisSourceError("jpl_kinematics_invalid")
         return offset, count, parts
 
-    def evidence(self) -> Dict[str, Any]:
+    def evidence(self) -> dict[str, Any]:
         return {
             "filename": self.path.name,
             "header_sha256": hashlib.sha256(self.header).hexdigest(),

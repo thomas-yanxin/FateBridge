@@ -15,14 +15,19 @@ from fatebridge.core.fengshui import source_comparison
 from fatebridge.core.fengshui.xuankong import _chart
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.fengshui import calculate_xuankong_natal
-from tests.fengshui.test_fengshui_source_comparison import request
+from tests.support.fengshui_transports import SPECS
 from tests.support.mcp_result_assertions import without_transport
-from tests.support.transports import rest_client
+from tests.support.transports import call_calculation, rest_client
+from tests.unit_test.fixtures.fengshui_reading import (
+    source_comparison_request as request,
+)
 
 ROOT = Path(__file__).parents[2]
 
 
-def test_all_216_replacement_source_rows_are_original_numbers_not_engine_outputs():
+def test_all_216_replacement_source_rows_are_original_numbers_not_engine_outputs() -> (
+    None
+):
     original = json.loads(
         (
             ROOT / "tests/data/fengshui_replacement_diagrams_v1/reference.json"
@@ -42,7 +47,7 @@ def test_all_216_replacement_source_rows_are_original_numbers_not_engine_outputs
     assert data["corpus"]["total_diagram_numerals"] == 11664
 
 
-def test_all_declared_replacement_candidates_keep_complete_numeric_comparison():
+def test_all_declared_replacement_candidates_keep_complete_numeric_comparison() -> None:
     charts = [
         _chart(
             period,
@@ -106,8 +111,8 @@ def test_all_declared_replacement_candidates_keep_complete_numeric_comparison():
 
 @pytest.mark.parametrize("period,angle,page", [(5, 174, 515), (9, 39, 582)])
 def test_actual_selected_replacement_includes_edition_conflict_and_fixed_text(
-    period, angle, page
-):
+    period: int, angle: int, page: int
+) -> None:
     inputs = request(
         period,
         angle,
@@ -142,7 +147,7 @@ def test_actual_selected_replacement_includes_edition_conflict_and_fixed_text(
     )
 
 
-def test_ambiguous_mode_candidates_all_receive_their_own_source_section():
+def test_ambiguous_mode_candidates_all_receive_their_own_source_section() -> None:
     result = calculate_xuankong_natal(**request(5, 175.5))
     natal = result["layers"]["xuankong_natal"]
     assert {c["chart_mode"] for c in natal["candidates"]} == {"lower", "replacement"}
@@ -164,7 +169,7 @@ def test_ambiguous_mode_candidates_all_receive_their_own_source_section():
         assert row["source_angle_applicability_verified"] is False
 
 
-def test_literal_matching_invalid_replacement_is_not_repaired_or_accepted():
+def test_literal_matching_invalid_replacement_is_not_repaired_or_accepted() -> None:
     chart = _chart(5, (12, "replacement", "Synthetic numeric branch"))
     chart["palaces"]["S"]["mountain_star_number"] = 9
     chart["mountain_chart"]["S"] = 9
@@ -185,8 +190,13 @@ def test_literal_matching_invalid_replacement_is_not_repaired_or_accepted():
 @pytest.mark.parametrize("period,angle", [(5, 174), (9, 39), (5, 175.5)])
 @pytest.mark.parametrize("name", ["xuankong_natal", "assess"])
 def test_replacement_source_facts_are_identical_on_rest_mcp_cli(
-    monkeypatch, tmp_path, capsys, period, angle, name
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    period: int,
+    angle: float | int,
+    name: str,
+) -> None:
     inputs = request(
         period,
         angle,
@@ -201,18 +211,20 @@ def test_replacement_source_facts_are_identical_on_rest_mcp_cli(
                 "interpretation": inputs["interpretation"],
             },
         }
+    else:
+        pass
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                "fengshui_" + name, {**inputs, "response_char_limit": 0}
+            return await call_calculation(
+                client, SPECS[name].tool_name, {**inputs, "response_char_limit": 0}
             )
 
-    rest = rest_client(monkeypatch).post("/api/fengshui/" + name, json=inputs)
+    rest = rest_client(monkeypatch).post(SPECS[name].rest_path, json=inputs)
     mcp = asyncio.run(call())
     path = tmp_path / "input.json"
     path.write_text(json.dumps(inputs, ensure_ascii=False))
-    code = run(["fengshui_" + name, "--request-file", str(path)])
+    code = run([SPECS[name].tool_name, "--request-file", str(path)])
     cli = json.loads(capsys.readouterr().out)
     assert rest.status_code == 200 and not mcp.is_error and code == 0
     assert (
@@ -232,7 +244,7 @@ def test_replacement_source_facts_are_identical_on_rest_mcp_cli(
     )
 
 
-def test_generator_builds_current_source_profile_without_engine_import():
+def test_generator_builds_current_source_profile_without_engine_import() -> None:
     process = subprocess.run(
         [
             sys.executable,

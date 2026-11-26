@@ -98,24 +98,34 @@ def extract(page: dict, number: int) -> dict:
     raw = page["wikitext"]
     if sha(raw) != page["wikitext_sha256"]:
         raise ValueError(f"Source hash changed: {page['title']}")
+    else:
+        pass
     # Span tags may wrap across lines. Preserve wikitext list markers.
     text = re.sub(r"<[^>]+>", "", raw)
     sections = re.split(r"^\*'+彖曰[：:]'+", text, maxsplit=1, flags=re.M)
     if len(sections) != 2:
         raise ValueError(f"Missing 彖曰 delimiter: {page['title']}")
+    else:
+        pass
     scripture = sections[0]
     verses = [plain(x) for x in re.findall(r"^\*#(.*)$", scripture, re.M)]
     if len(verses) != (7 if number in (1, 2) else 6):
         raise ValueError(f"Wrong line count: {page['title']}: {verses}")
+    else:
+        pass
     lines = []
     for position, verse in enumerate(verses[:6], 1):
         match = re.fullmatch(r"(初[九六]|[九六][二三四五]|上[九六])[：:，](.+)", verse)
         if not match:
             raise ValueError(f"Unparsed line: {page['title']}: {verse}")
+        else:
+            pass
         label, content = match.groups()
         expected = {1: "初", 2: "二", 3: "三", 4: "四", 5: "五", 6: "上"}[position]
         if expected not in label:
             raise ValueError(f"Wrong line position: {verse}")
+        else:
+            pass
         lines.append({"position": position, "label": label, "text": content})
     guaci = "".join(
         plain(x) for x in re.findall(r"^\*{2,3}([^*#].*)$", scripture, re.M)
@@ -127,10 +137,14 @@ def extract(page: dict, number: int) -> dict:
     code = "".join("1" if "九" in line["label"] else "0" for line in lines)
     if not guaci or not image or any("{{" in s or "-{" in s for s in [guaci, image]):
         raise ValueError(f"Unparsed text: {page['title']}")
+    else:
+        pass
     special = None
     if len(verses) == 7:
         label, content = verses[6].split("：", 1)
         special = {"label": label, "text": content}
+    else:
+        pass
     return {
         "number": number,
         "name": page["title"].split("/", 1)[1],
@@ -151,6 +165,8 @@ def build(source: dict) -> dict:
         chapters.append(extract(page, number))
     if len(chapters) != 64 or len({c["code"] for c in chapters}) != 64:
         raise ValueError("Expected exactly 64 distinct six-line hexagrams")
+    else:
+        pass
     return {
         "corpus_id": "zhouyi_wikisource_v1",
         "title": "《周易》经文与《象传》大象，维基文库转录本",
@@ -170,6 +186,8 @@ def main() -> None:
     if args.fetch:
         if args.check:
             parser.error("--fetch and --check cannot be combined")
+        else:
+            pass
         index = fetch("周易")
         # Unicode hexagram symbols identify King Wen order independently of
         # FateBridge's hexagram table or any production calculation.
@@ -177,11 +195,15 @@ def main() -> None:
         names = {ord(symbol) - 0x4DC0 + 1: name for symbol, name in pairs}
         if set(names) != set(range(1, 65)):
             raise ValueError("Index must identify all 64 chapters")
+        else:
+            pass
         chapters = fetch_chapters(["周易/" + names[n] for n in range(1, 65)])
         source = {"index": index, "chapters": chapters}
         # Preserve fetched revision bytes even if a new transcription format
         # needs a parser repair; never replace the runtime corpus on failure.
         SOURCE.write_text(serialize(source), encoding="utf-8")
+    else:
+        pass
     corpus = build(json.loads(SOURCE.read_text(encoding="utf-8")))
     rendered = serialize(corpus)
     if args.check:
@@ -189,6 +211,8 @@ def main() -> None:
             raise SystemExit(
                 "Zhouyi corpus drift; run scripts/catalogs/build_zhouyi_corpus.py"
             )
+        else:
+            pass
     else:
         OUTPUT.parent.mkdir(parents=True, exist_ok=True)
         OUTPUT.write_text(rendered, encoding="utf-8")
@@ -197,3 +221,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

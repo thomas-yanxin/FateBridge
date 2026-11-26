@@ -1,11 +1,11 @@
 """A seated desktop is a separate authored reference frame, never a house palace."""
 
-from typing import List, Literal, Optional
+from typing import Literal
 
 from pydantic import ConfigDict, Field, StrictBool, model_validator
 
-from .numeric_inputs import FengshuiInput as _DeferredModel
-from .workstation_inputs import ObservedCondition
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput as _DeferredModel
+from fatebridge.core.fengshui.workstation_inputs import ObservedCondition
 
 SurfaceZone = Literal[
     "near_left",
@@ -57,19 +57,19 @@ class SurfaceItem(_DeferredModel):
     representation: Representation = Field(
         description="已确认的作者规则代表物；手机、饮料瓶、普通玩偶不自动当火、水或土",
     )
-    zone: Optional[SurfaceZone] = Field(
+    zone: SurfaceZone | None = Field(
         default=None,
         description="near靠身体的桌沿，far是远离身体的桌沿；near_right为右前近沿，far_left为左后远沿。未知位置省略/null；只确认左右不补近远",
     )
-    zone_observation_basis: Optional[
-        Literal["measured", "user_confirmed", "image_observed"]
-    ] = Field(
+    zone_observation_basis: (
+        Literal["measured", "user_confirmed", "image_observed"] | None
+    ) = Field(
         default=None,
         description="位置的独立证据；确认是真植物不等于确认其九格位置，照片估计用image_observed",
     )
     observation_basis: Literal["measured", "user_confirmed", "image_observed"]
     evidence: str = Field(min_length=1, max_length=1000)
-    healthy: Optional[ObservedCondition] = Field(
+    healthy: ObservedCondition | None = Field(
         default=None,
         description="植物健康或鲜花/新鲜剪枝状态的独立事实；已知身份、位置或移动许可不能代替状态核对",
     )
@@ -100,7 +100,7 @@ class SurfaceLayout(_DeferredModel):
     )
     observation_basis: Literal["measured", "user_confirmed", "image_observed"]
     evidence: str = Field(min_length=1, max_length=1000)
-    items: List[SurfaceItem] = Field(default_factory=list, max_length=100)
+    items: list[SurfaceItem] = Field(default_factory=list, max_length=100)
 
     @model_validator(mode="after")
     def surface_evidence(self) -> "SurfaceLayout":
@@ -116,11 +116,11 @@ class SurfaceConstraints(_DeferredModel):
     """Action permissions and confirmed feasibility, not observations of qi."""
 
     object_id: str = Field(min_length=1, max_length=100)
-    can_move_items: Optional[StrictBool] = None
-    can_add_items: Optional[StrictBool] = None
-    locked_item_ids: List[str] = Field(default_factory=list, max_length=100)
-    unavailable_zones: List[SurfaceZone] = Field(default_factory=list, max_length=9)
-    feasible_zones: List[SurfaceZone] = Field(
+    can_move_items: StrictBool | None = None
+    can_add_items: StrictBool | None = None
+    locked_item_ids: list[str] = Field(default_factory=list, max_length=100)
+    unavailable_zones: list[SurfaceZone] = Field(default_factory=list, max_length=9)
+    feasible_zones: list[SurfaceZone] = Field(
         default_factory=list,
         max_length=9,
         description="只列用户逐区明确确认能容纳对象且保留入口视野的区域；照片空白、材质确认或移动许可不能证明其他区域可行",

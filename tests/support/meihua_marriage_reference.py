@@ -53,6 +53,8 @@ def check_layer(result, cast, layer, clause, prefix, line, month):
         )
         if row["strength_fact_path"] is not None:
             assert resolve(result, row["strength_fact_path"]) == row["actual_strength"]
+        else:
+            pass
         assert row["actual_household_wealth_or_status"] is None
     for atom in q["generation_relation_atoms"]:
         relation = atom["relation_atom"]
@@ -102,12 +104,7 @@ def check_layer(result, cast, layer, clause, prefix, line, month):
         "real_outcome",
     ]:
         assert q[name] is None
-    assert (
-        clause["event_time"]
-        is clause["success_probability"]
-        is clause["real_outcome_verdict"]
-        is None
-    )
+    assert clause["event_time"] is clause["real_outcome_verdict"] is None
 
 
 def validate(result, month=None):

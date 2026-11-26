@@ -9,9 +9,9 @@ import hashlib
 import json
 import math
 from fractions import Fraction
-from typing import Any, Dict, Mapping, Optional
+from typing import Any, Mapping
 
-SOURCE: Dict[str, Any] = {
+SOURCE: dict[str, Any] = {
     "id": "udo_rudolph_1996_abc_excerpt",
     "author": "Udo Rudolph",
     "title": "ABC fuer Planetenbilder, first German edition 1996, ISBN 3-00-000881-0",
@@ -40,7 +40,7 @@ def sensitive_equivalence(
     *,
     midpoint_period: int,
     midpoint_orb: Fraction,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Equivalent occupied sensitive point for one actual four-factor contact.
 
     The returned folded relation need not be a direct conjunction. Direct
@@ -76,7 +76,7 @@ def original_example_reading(
     values: Mapping[str, Fraction],
     *,
     axis_orb: Fraction,
-) -> Optional[Dict[str, Any]]:
+) -> dict[str, Any] | None:
     """Interpret only the actual source-authored symbolic pattern when occupied.
 
     The source excerpt does not license an invented keyword dictionary for

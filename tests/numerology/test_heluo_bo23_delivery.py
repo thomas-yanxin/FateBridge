@@ -5,10 +5,13 @@ import json
 from pathlib import Path
 
 import pytest
+from fastapi.testclient import TestClient
+from pytest import CaptureFixture, MonkeyPatch
 
-from fatebridge.core import heluo_texts
-from fatebridge.core.heluo import yao_text
-from fatebridge.core.numerology_knowledge import _catalogue, _source
+from fatebridge.core.heluo import heluo_texts
+from fatebridge.core.heluo.heluo import yao_text
+from fatebridge.core.local_techniques.heluo import build_heluo_result
+from fatebridge.core.numerology.numerology_knowledge import _catalogue, _source
 from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.heluo_source_facts import (
@@ -29,8 +32,9 @@ CALCULATION_CASES = json.loads(
 
 
 @pytest.mark.parametrize("case", CALCULATION_CASES, ids=lambda c: f"line{c['line']}")
-def test_six_original_routes_keep_source_scope_and_formal_houtian(case, monkeypatch):
-    from fatebridge.core.local_techniques.heluo import build_heluo_result
+def test_six_original_routes_keep_source_scope_and_formal_houtian(
+    case, monkeypatch: MonkeyPatch
+) -> None:
 
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
@@ -51,10 +55,12 @@ def test_six_original_routes_keep_source_scope_and_formal_houtian(case, monkeypa
         )
         assert reference["target_line"] != actual["chart"]["hou"]["yuan"]
         assert reference["condition_text"] in heluo_texts.text_status_snapshot(selected)
+    else:
+        pass
 
 
 @pytest.mark.parametrize("entry", LITERAL["entries"], ids=lambda e: str(e["line"]))
-def test_actual_knowledge_read_keeps_all_editorial_conditions(entry):
+def test_actual_knowledge_read_keeps_all_editorial_conditions(entry) -> None:
     out = calculate_knowledge_read(domain="heluo", key=f"山地剝:{entry['line']}")
     assert out["reference_details"]["record"] == yao_text("山地剝", entry["line"])
     assert out["reference_details"]["personal_applicability_assessed"] is False
@@ -74,9 +80,11 @@ def test_actual_knowledge_read_keeps_all_editorial_conditions(entry):
         assert len(lines) == 1 and ref["condition_text"] in lines[0]
         assert ref["source_context_text"] in lines[0]
         assert "适用性未裁定" in lines[0] and "不替代正式卦盘" in lines[0]
+    else:
+        pass
 
 
-def test_current_catalogue_binds_all_sources_to_actual_current_content():
+def test_current_catalogue_binds_all_sources_to_actual_current_content() -> None:
     new = _catalogue()
     assert new["version"] == CATALOGUE_VERSION
     assert len(new["sources"]) == 17
@@ -105,8 +113,8 @@ def test_current_catalogue_binds_all_sources_to_actual_current_content():
 
 @pytest.mark.parametrize("line", [4, 5, 6])
 def test_actual_rest_cli_inprocess_mcp_deliver_the_same_new_source(
-    line, rest, tmp_path, capsys
-):
+    line: int, rest: TestClient, tmp_path: Path, capsys: CaptureFixture[str]
+) -> None:
     spec = next(s for s in CATALOG if s.key == "knowledge_read")
     response, code, cli, mcp = run_three(
         spec,
@@ -127,9 +135,13 @@ def test_actual_rest_cli_inprocess_mcp_deliver_the_same_new_source(
             ref = record["commentary_cross_references"][0]
             assert ref["applicability"] is None
             assert ref["automatic_application"] is ref["replaces_chart"] is False
+        else:
+            pass
 
 
-def test_printed_target_status_keeps_the_leaf_condition_not_just_annual_parent():
+def test_printed_target_status_keeps_the_leaf_condition_not_just_annual_parent() -> (
+    None
+):
     record = yao_text("山地剝", 6)
     reference = record["commentary_cross_references"][0]
     assert reference["condition_text"] == "數凶"

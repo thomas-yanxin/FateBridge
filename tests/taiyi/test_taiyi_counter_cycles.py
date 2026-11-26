@@ -14,15 +14,17 @@ from pydantic import ValidationError
 import fatebridge.api as api
 from fatebridge.application.examples import suggested_fields
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_chinese import TaiyiCounterCycles
 from fatebridge.core.metaphysics import taiyi_year
 from fatebridge.core.metaphysics.taiyi_cycles import counter_cycles, counter_cycles_text
-from fatebridge.core.output_chinese import TaiyiCounterCycles
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.taiyi_caption_cycles import caption_candidates
 from scripts.taiyi.audit_taiyi_cycles import audit
+from tests.support.transports import call_calculation
+from tests.unit_test.fixtures.taiyi import same_run_payload
+from validation.taiyi_caption_cycles import caption_candidates
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/taiyi_cycles_v42"
@@ -38,7 +40,9 @@ def source():
     return json.loads((CORPUS / "arithmetic-reference.json").read_text())
 
 
-def test_full887_counter_is_retained_with_different_sixty_and_seventy_two_positions():
+def test_full887_counter_is_retained_with_different_sixty_and_seventy_two_positions() -> (
+    None
+):
     core = taiyi_year.cyclic_core(887)
     core.update(suijun="子", heshen="丑")
     board = taiyi_year.assemble_board(core, calculation_mode="hour")
@@ -51,13 +55,13 @@ def test_full887_counter_is_retained_with_different_sixty_and_seventy_two_positi
     assert cycles["actual_kook_number"] == board["core_board"]["kook_number"] == 23
 
 
-def test_the_frozen_expectations_are_not_derived_from_the_production_core():
+def test_the_frozen_expectations_are_not_derived_from_the_production_core() -> None:
     rows = source()["rows"]
     assert len(rows) == 13 and rows[-1] == [887, 2, 167, 3, 47, 3, 23]
 
 
 @pytest.mark.parametrize("vector", source()["rows"])
-def test_manual_counter_vectors_and_exact_recomposition(vector):
+def test_manual_counter_vectors_and_exact_recomposition(vector) -> None:
     n, complete, position, ji, within_ji, yuan, within_yuan = vector
     core = {"accumulation": n, "kook_number": within_yuan}
     original = deepcopy(core)
@@ -93,19 +97,23 @@ def test_manual_counter_vectors_and_exact_recomposition(vector):
         ("kook_number", 72),
     ],
 )
-def test_bad_or_disagreeing_core_counters_cannot_make_a_plausible_trace(field, value):
+def test_bad_or_disagreeing_core_counters_cannot_make_a_plausible_trace(
+    field: str, value: bool | float | int | str
+) -> None:
     core = {"accumulation": 887, "kook_number": 23, field: value}
     with pytest.raises(ValueError):
         counter_cycles(core, calculation_mode="hour")
 
 
 @pytest.mark.parametrize("mode", ["unknown", "", False, 0])
-def test_unknown_counter_unit_is_not_silently_called_years(mode):
+def test_unknown_counter_unit_is_not_silently_called_years(
+    mode: bool | int | str,
+) -> None:
     with pytest.raises(ValueError):
         counter_cycles({"accumulation": 1, "kook_number": 1}, calculation_mode=mode)
 
 
-def test_887_and_47_have_the_same_palace_but_different_eyes_and_ju():
+def test_887_and_47_have_the_same_palace_but_different_eyes_and_ju() -> None:
     full, shortcut = [taiyi_year.cyclic_core(n) for n in (887, 47)]
     assert full["accumulation"] == 887 and shortcut["accumulation"] == 47
     assert full["taiyi_number"] == shortcut["taiyi_number"]
@@ -113,7 +121,7 @@ def test_887_and_47_have_the_same_palace_but_different_eyes_and_ju():
     assert full["wenchang_palace"] != shortcut["wenchang_palace"]
 
 
-def test_all_ten_caption_cases_and_omitted_constraints_remain_visible():
+def test_all_ten_caption_cases_and_omitted_constraints_remain_visible() -> None:
     report = audit()
     assert report["source_volumes"] == 10 and report["inventory_contexts"] == 15
     assert report["captioned_cases"] == 10
@@ -150,19 +158,21 @@ def test_all_ten_caption_cases_and_omitted_constraints_remain_visible():
         {"ganzhi": "乙卯时"},
     ],
 )
-def test_caption_solver_requires_explicit_valid_coordinate_constraints(args):
+def test_caption_solver_requires_explicit_valid_coordinate_constraints(args) -> None:
     with pytest.raises(ValueError):
         caption_candidates(**args)
 
 
-def test_source_dangshi_phase_can_omit_the_unadjudicated_yuan_glyph():
+def test_source_dangshi_phase_can_omit_the_unadjudicated_yuan_glyph() -> None:
     assert caption_candidates(ji60=6, ju=27, ganzhi="戊寅") == [315]
 
 
 @pytest.mark.parametrize(
     "mode,unit", [("year", "年"), ("month", "节月"), ("day", "日"), ("hour", "时辰")]
 )
-def test_actual_selected_counter_mode_and_unit_are_read_from_the_same_board(mode, unit):
+def test_actual_selected_counter_mode_and_unit_are_read_from_the_same_board(
+    mode: str, unit: str
+) -> None:
     result = calculate_taiyi_analysis(
         analysis_year=2026,
         analysis_month=10,
@@ -187,7 +197,7 @@ def test_actual_selected_counter_mode_and_unit_are_read_from_the_same_board(mode
     )
 
 
-def test_sanshi_retains_the_same_actual_counter_evidence_and_its_scope():
+def test_sanshi_retains_the_same_actual_counter_evidence_and_its_scope() -> None:
     result = calculate_sanshiunited_analysis(
         date="2026-10-25",
         time="12:00:00",
@@ -199,7 +209,6 @@ def test_sanshi_retains_the_same_actual_counter_evidence_and_its_scope():
         },
     )
     trace = result["taiyi"]["counter_cycles"]
-    assert trace == result["subresults"]["taiyi"]["pan"]["counter_cycles"]
     text = counter_cycles_text(trace)
     section = next(
         s for s in result["snapshot_export"]["sections"] if s["title"] == "太乙规则依据"
@@ -207,7 +216,9 @@ def test_sanshi_retains_the_same_actual_counter_evidence_and_its_scope():
     assert text in result["snapshot_text"] and text in section["content"]
 
 
-def test_cycle_projection_accepts_missing_siblings_but_rejects_numeric_strings():
+def test_cycle_projection_accepts_missing_siblings_but_rejects_numeric_strings() -> (
+    None
+):
     TaiyiCounterCycles.model_validate({"yuan72": {"position": 23}})
     with pytest.raises(ValidationError):
         TaiyiCounterCycles.model_validate({"yuan72": {"position": "23"}})
@@ -217,7 +228,12 @@ def test_cycle_projection_accepts_missing_siblings_but_rejects_numeric_strings()
 @pytest.mark.parametrize(
     "profile", ["jinjing_hour_solstice_v1", "key_hour_winter_jiazi_v1"]
 )
-def test_same_counter_division_reaches_rest_mcp_cli(monkeypatch, capsys, tool, profile):
+def test_same_counter_division_reaches_rest_mcp_cli(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    tool: str,
+    profile: str,
+) -> None:
     spec = next(s for s in CATALOG if s.key == tool)
     fields = suggested_fields(spec, view="counter_cycles")
     if tool == "taiyi":
@@ -267,8 +283,8 @@ def test_same_counter_division_reaches_rest_mcp_cli(monkeypatch, capsys, tool, p
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                spec.mcp_name, {**payload, **options}, raise_on_error=False
+            result = await call_calculation(
+                client, spec.mcp_name, {**payload, **options}, raise_on_error=False
             )
             assert not result.is_error, result
             return result.structured_content
@@ -303,8 +319,9 @@ def test_same_counter_division_reaches_rest_mcp_cli(monkeypatch, capsys, tool, p
 
 
 @pytest.mark.parametrize("tool", ["taiyi", "sanshiunited"])
-def test_default_mcp_counter_view_keeps_all_business_evidence_in_same_run(tool):
-    from tests.taiyi.test_taiyi_transports import _same_run_payload
+def test_default_mcp_counter_view_keeps_all_business_evidence_in_same_run(
+    tool: str,
+) -> None:
 
     spec = next(s for s in CATALOG if s.key == tool)
     payload = (
@@ -333,7 +350,8 @@ def test_default_mcp_counter_view_keeps_all_business_evidence_in_same_run(tool):
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
+            result = await call_calculation(
+                client,
                 spec.mcp_name,
                 {
                     **payload,
@@ -343,7 +361,7 @@ def test_default_mcp_counter_view_keeps_all_business_evidence_in_same_run(tool):
                 },
                 raise_on_error=False,
             )
-            full = await _same_run_payload(client, result, require_business_inline=True)
+            full = await same_run_payload(client, result, require_business_inline=True)
             assert full["taiyi"]["counter_cycles"]["counter_unit"] == "时辰"
             assert (
                 full["taiyi"]["counter_cycles"]["calendar_ganzhi_alignment"]

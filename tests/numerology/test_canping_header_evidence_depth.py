@@ -7,14 +7,18 @@ from collections import Counter
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
+from pytest import MonkeyPatch
 
-from fatebridge.core.canping_texts import (
+from fatebridge.core.contracts.output_numerology import CanpingTextSelection
+from fatebridge.core.numerology import canping_texts as texts
+from fatebridge.core.numerology.canping_texts import (
     collation_summary,
     lookup_record,
     selection_snapshot,
 )
 from fatebridge.utils.errors import NumerologySourceError
-from tests.numerology.test_canping_rereading_depth import jpeg_dimensions
+from tests.unit_test.fixtures.canping_source import jpeg_dimensions
 
 
 @pytest.mark.parametrize(
@@ -25,8 +29,8 @@ from tests.numerology.test_canping_rereading_depth import jpeg_dimensions
     ],
 )
 def test_number_uncertainty_and_observed_body_status_are_separate(
-    element, number, kind, body_status
-):
+    element: str, number: int, kind: str, body_status: str
+) -> None:
     selected = lookup_record(element, number, kind)["selection"]
     assert selected["body_reading_status"] == body_status
     assert selected["cell_status"] == "source_reading_uncertain"
@@ -39,7 +43,9 @@ REFERENCE = json.loads((ROOT / "reference.json").read_text())
 
 
 @pytest.mark.parametrize("cell", REFERENCE["cells"])
-def test_all_eighteen_bodies_and_unresolved_number_attributions_stay_separate(cell):
+def test_all_eighteen_bodies_and_unresolved_number_attributions_stay_separate(
+    cell,
+) -> None:
     result = lookup_record(cell["element"], cell["number"], cell["kind"])
     selected = result["selection"]
     assert result["text"] == cell["text"]
@@ -60,7 +66,7 @@ def test_all_eighteen_bodies_and_unresolved_number_attributions_stay_separate(ce
 
 
 @pytest.mark.parametrize("page", REFERENCE["pages"])
-def test_native_regions_cover_the_same_copy_and_keep_actual_source_pixels(page):
+def test_native_regions_cover_the_same_copy_and_keep_actual_source_pixels(page) -> None:
     manifest = json.loads((ROOT / REFERENCE["source_manifest_file"]).read_text())
     canvas = manifest["sequences"][0]["canvases"][page["pdf_page"] - 1]
     assert (
@@ -79,7 +85,7 @@ def test_native_regions_cover_the_same_copy_and_keep_actual_source_pixels(page):
         assert region["canvas"] == canvas["@id"]
 
 
-def test_native_reinspection_does_not_promote_any_header_or_whole_cell():
+def test_native_reinspection_does_not_promote_any_header_or_whole_cell() -> None:
     assert len(REFERENCE["headers"]) == 6 and len(REFERENCE["cells"]) == 18
     assert len(REFERENCE["pages"]) == 5
     assert Counter(h["obstruction_kind"] for h in REFERENCE["headers"]) == {
@@ -127,9 +133,8 @@ def test_native_reinspection_does_not_promote_any_header_or_whole_cell():
     ],
 )
 def test_unresolved_native_header_evidence_cannot_be_silently_promoted(
-    monkeypatch, change
-):
-    from fatebridge.core import canping_texts as texts
+    monkeypatch: MonkeyPatch, change: str
+) -> None:
 
     original = texts._loaded
     loaded = copy.deepcopy(original(texts.COLLATION_PATH))
@@ -167,7 +172,7 @@ def test_unresolved_native_header_evidence_cannot_be_silently_promoted(
     assert error.value.as_result()["retryable"] is False
 
 
-def test_body_state_and_snapshot_cannot_relabel_a_provisional_number():
+def test_body_state_and_snapshot_cannot_relabel_a_provisional_number() -> None:
     female = lookup_record("火", 2248, "female")
     v = {"selectionShun": female["selection"], "selectionNi": female["selection"]}
     text = selection_snapshot(v)
@@ -179,7 +184,7 @@ def test_body_state_and_snapshot_cannot_relabel_a_provisional_number():
     assert "body_reading_status" not in ordinary
 
 
-def test_native_number_evidence_and_global_registry_are_isolated():
+def test_native_number_evidence_and_global_registry_are_isolated() -> None:
     selected = lookup_record("木", 2816, "male")["selection"]
     selected["number_reading_evidence"]["observed_header"] = "二八一六"
     summary = collation_summary()
@@ -203,10 +208,7 @@ def test_native_number_evidence_and_global_registry_are_isolated():
         {"reading_revision": {"previous_cell_status": "source_cell_visually_collated"}},
     ],
 )
-def test_public_selection_contract_rejects_wrong_present_evidence_types(value):
-    from pydantic import ValidationError
-
-    from fatebridge.core.output_numerology import CanpingTextSelection
+def test_public_selection_contract_rejects_wrong_present_evidence_types(value) -> None:
 
     with pytest.raises(ValidationError):
         CanpingTextSelection.model_validate(value)
@@ -220,7 +222,6 @@ def test_public_selection_contract_rejects_wrong_present_evidence_types(value):
         {"reading_revision": {"previous_text": "□女乘龍去，□□結子□。"}},
     ],
 )
-def test_public_evidence_leaves_project_without_requiring_siblings(value):
-    from fatebridge.core.output_numerology import CanpingTextSelection
+def test_public_evidence_leaves_project_without_requiring_siblings(value) -> None:
 
     CanpingTextSelection.model_validate(value)

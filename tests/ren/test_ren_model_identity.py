@@ -10,19 +10,21 @@ import pytest
 from fatebridge.core import almanac
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.metaphysics import ren_calendar
-from fatebridge.services.metaphysics import _build_analysis_seed
+from fatebridge.core.metaphysics.seed import build_analysis_seed
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.ren.test_ren_transports import PAYLOAD
 from tests.support.ephemeris_case_runtime import (
     native_ephemeris_files as native_ephemeris_files,
 )
 from tests.support.transports import SPECS, native, rest, surface_calls
+from tests.unit_test.fixtures.ren_protocol import REN_PROTOCOL_PAYLOAD
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/ren_model_identity_v1"
 FREEZE_SHA = "62d60748aef9269330494d850fc90bb993e2558d0b3552482205c21c81e86534"
 SEED_PAYLOAD = {
-    k: v for k, v in PAYLOAD.items() if k not in {"is_diurnal", "guiren_profile"}
+    k: v
+    for k, v in REN_PROTOCOL_PAYLOAD.items()
+    if k not in {"is_diurnal", "guiren_profile"}
 }
 
 
@@ -65,8 +67,10 @@ def corrupt_dependencies(monkeypatch, field, value):
 
 
 @pytest.mark.parametrize("fault", protocol()["faults"], ids=lambda f: f["field"])
-def test_de440_frame_source_and_claim_faults_are_rejected(fault, packaged, monkeypatch):
-    seed = _build_analysis_seed(**SEED_PAYLOAD)
+def test_de440_frame_source_and_claim_faults_are_rejected(
+    fault, packaged, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    seed = build_analysis_seed(**SEED_PAYLOAD)
     corrupt_dependencies(monkeypatch, fault["field"], fault["value"])
     with pytest.raises(EphemerisSourceError) as rejected:
         ren_calendar.require_ren_calendar(seed)
@@ -76,20 +80,24 @@ def test_de440_frame_source_and_claim_faults_are_rejected(fault, packaged, monke
 @pytest.mark.parametrize("key", ["liureng_gods", "liureng_runyear", "jinkou"])
 @pytest.mark.parametrize("project", [False, True])
 def test_corrupt_frame_never_publishes_a_board(
-    key, project, packaged, monkeypatch, surface_calls
-):
+    key: str, project: bool, packaged, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     corrupt_dependencies(monkeypatch, "position_frame", "heliocentric J2000")
     spec = SPECS[key]
-    payload = dict(PAYLOAD)
+    payload = dict(REN_PROTOCOL_PAYLOAD)
     if key == "liureng_runyear":
         payload.update(
             birth_year=1994, birth_month=8, birth_day=23, birth_hour=14, gender="女"
         )
+    else:
+        pass
     params, options, flags = {}, {}, []
     if project:
         params = {"fields": "analysis_type", "strict_fields": "true"}
         options = {"fields": ["analysis_type"], "strict_fields": True}
         flags = ["--fields", "analysis_type", "--strict-fields", "true"]
+    else:
+        pass
     http, mcp, code, cli = surface_calls(
         spec, payload, params=params, options=options, flags=flags, cli_first=False
     )
@@ -100,9 +108,11 @@ def test_corrupt_frame_never_publishes_a_board(
         assert "jinkou" not in body and "liureng" not in body
 
 
-def test_unused_swiss_solver_failure_does_not_break_actual_de440(packaged, monkeypatch):
+def test_unused_swiss_solver_failure_does_not_break_actual_de440(
+    packaged, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setattr(almanac, "_solar_term_utc_via_swe", lambda *a, **kw: None)
-    policy = ren_calendar.require_ren_calendar(_build_analysis_seed(**SEED_PAYLOAD))
+    policy = ren_calendar.require_ren_calendar(build_analysis_seed(**SEED_PAYLOAD))
     assert {t["provider"] for t in policy["solar_term_dependencies"]} == {"jpl_de440"}
     assert (
         policy["solar_longitude_definition"]["horizons_frame_equivalence_certified"]
@@ -111,37 +121,44 @@ def test_unused_swiss_solver_failure_does_not_break_actual_de440(packaged, monke
 
 
 @pytest.mark.parametrize("key", ["liureng_gods", "liureng_runyear", "jinkou"])
-def test_missing_model_receipt_remains_a_nonretryable_dependency_failure(
-    key, packaged, monkeypatch, surface_calls
-):
+def test_missing_model_receipt_remains_a_nonretryable_source_failure(
+    key: str, packaged, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     corrupt_dependencies(monkeypatch, "coefficient_sha256", None)
     spec = SPECS[key]
-    payload = dict(PAYLOAD)
+    payload = dict(REN_PROTOCOL_PAYLOAD)
     if key == "liureng_runyear":
         payload.update(
             birth_year=1994, birth_month=8, birth_day=23, birth_hour=14, gender="女"
         )
+    else:
+        pass
     http, mcp, code, cli = surface_calls(spec, payload, cli_first=False)
     assert http.status_code == 503 and mcp.is_error and code != 0
     for body in (http.json(), mcp.structured_content, cli):
-        assert body["error_code"] == "dependency_missing"
+        assert body["error_code"] == "ephemeris_source_inconsistent"
         assert body["retryable"] is False
+        assert body["issues"] == [
+            {"path": "runtime.ephemeris_data", "code": "solar_term_source_unverified"}
+        ]
         assert "jinkou" not in body and "liureng" not in body
 
 
 @pytest.mark.parametrize("key", ["liureng_gods", "liureng_runyear", "jinkou"])
 def test_selected_packaged_solver_failure_cannot_publish_linear_boundary(
-    key, packaged, monkeypatch, surface_calls
-):
+    key: str, packaged, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     monkeypatch.setattr(
         almanac, "_solar_term_utc_via_analytic", lambda *a, **kw: (None, {})
     )
     spec = SPECS[key]
-    payload = dict(PAYLOAD)
+    payload = dict(REN_PROTOCOL_PAYLOAD)
     if key == "liureng_runyear":
         payload.update(
             birth_year=1994, birth_month=8, birth_day=23, birth_hour=14, gender="女"
         )
+    else:
+        pass
     http, mcp, code, cli = surface_calls(spec, payload, cli_first=False)
     assert http.status_code == 503 and mcp.is_error and code != 0
     for body in (http.json(), mcp.structured_content, cli):
@@ -157,8 +174,8 @@ def test_selected_packaged_solver_failure_cannot_publish_linear_boundary(
     "model,flags", [("swieph", (4,)), ("moshier", (2,)), ("jpl", (2,))]
 )
 def test_native_model_must_agree_with_its_own_return_flags(
-    model, flags, monkeypatch, native_ephemeris_files
-):
+    model: str, flags, monkeypatch: pytest.MonkeyPatch, native_ephemeris_files
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     term = almanac.get_solar_terms_for_year(2026, "UTC")[0]
     with pytest.raises(RuntimeError, match="模型回执"):

@@ -20,13 +20,15 @@ from fatebridge.services.divination import (
     calculate_suzhan_analysis,
     calculate_tongshefa_analysis,
 )
-from tests.fixtures.transports import mcp_text
+from tests.fixtures.transports import mcp_payload
 from tests.support.transports import SPECS, business, rest, surface_calls
 
 
 def _expected_offline_engine() -> tuple[str, str]:
     if swe is not None:
         return ("ephemeris_runtime_model", "swisseph_api")
+    else:
+        pass
     return ("approximate_orbital_model", "fatebridge_analytic_ephemerides")
 
 
@@ -38,6 +40,8 @@ def _house_id_for_longitude(houses, longitude):
         distance = (float(longitude) - current_cusp) % 360.0
         if distance < span:
             return house["id"]
+        else:
+            pass
     return houses[0]["id"]
 
 
@@ -151,24 +155,18 @@ def _local_golden_projection():
     }
 
 
-def test_calculate_gua_lookup_supports_hexagram_and_trigram_queries():
+def test_calculate_gua_lookup_supports_hexagram_and_trigram_queries() -> None:
     hexagram_result = calculate_gua_lookup(query="111111", lookup_mode="auto")
     trigram_result = calculate_gua_lookup(query="111", lookup_mode="auto")
 
     assert hexagram_result["result"]["lookup_type"] == "hexagram"
     assert hexagram_result["result"]["name"] == "乾为天"
-    assert hexagram_result["result"]["theme"] == "开创与自强"
-    assert (
-        hexagram_result["result"]["judgement"] == "局势昂扬，宜先定大方向再强力推进。"
-    )
-    assert "六阳纯健" in hexagram_result["result"]["image"]
-    assert "立战略" in hexagram_result["result"]["favorable"]
-    assert "刚愎" in hexagram_result["result"]["caution"]
-    assert "主动定方向" in hexagram_result["summary"]
-    assert "忌刚愎" in hexagram_result["summary"]
+    assert hexagram_result["result"]["lines"] == [1] * 6
+    assert hexagram_result["result"]["classical"]["guaci"] == "乾：元亨。利貞。"
+    assert hexagram_result["result"]["classical"]["source_url"]
     assert "[查询信息]" in hexagram_result["snapshot_text"]
     assert "[卦象结构]" in hexagram_result["snapshot_text"]
-    assert "[义理摘要]" in hexagram_result["snapshot_text"]
+    assert "[经文]" in hexagram_result["snapshot_text"]
     assert "[来源]" in hexagram_result["snapshot_text"]
     assert (
         hexagram_result["snapshot_export"]["export_text"]
@@ -177,40 +175,39 @@ def test_calculate_gua_lookup_supports_hexagram_and_trigram_queries():
 
     assert trigram_result["result"]["lookup_type"] == "trigram"
     assert trigram_result["result"]["name"] == "乾"
-    assert trigram_result["result"]["theme"] == "主动开创"
-    assert "纯阳在上" in trigram_result["result"]["image"]
-    assert "立规" in trigram_result["result"]["favorable"]
-    assert "刚亢" in trigram_result["result"]["caution"]
-    assert "立方向" in trigram_result["summary"]
-    assert "忌刚亢" in trigram_result["summary"]
+    assert trigram_result["result"]["lines"] == [1, 1, 1]
+    assert trigram_result["result"]["nature"] == "天"
 
 
-def test_calculate_gua_lookup_supports_selected_export_sections():
+def test_calculate_gua_lookup_supports_selected_export_sections() -> None:
     result = calculate_gua_lookup(
         query="111111",
         lookup_mode="auto",
-        selected_sections=["查询信息", "义理摘要"],
+        selected_sections=["查询信息", "经文"],
     )
 
-    assert result["snapshot_export"]["selected_sections"] == ["查询信息", "义理摘要"]
+    assert result["snapshot_export"]["selected_sections"] == ["查询信息", "经文"]
     assert "[查询信息]" in result["snapshot_export"]["export_text"]
-    assert "[义理摘要]" in result["snapshot_export"]["export_text"]
+    assert "[经文]" in result["snapshot_export"]["export_text"]
     assert "[卦象结构]" not in result["snapshot_export"]["export_text"]
     assert "[来源]" not in result["snapshot_export"]["export_text"]
 
 
-def test_calculate_gua_meiyi_returns_snapshot_export():
+def test_calculate_gua_meiyi_returns_snapshot_export() -> None:
     result = calculate_gua_meiyi(name=["111111", "111"])
 
     assert result["results"]["111111"]["name"] == "乾为天"
     assert result["results"]["111"]["name"] == "乾"
     assert "[查询概览]" in result["snapshot_text"]
     assert "[批量结果]" in result["snapshot_text"]
-    assert "[来源]" in result["snapshot_text"]
+    assert (
+        result["results"]["111111"]["classical"]["source_url"]
+        in result["snapshot_text"]
+    )
     assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 
-def test_calculate_gua_meiyi_supports_selected_export_sections():
+def test_calculate_gua_meiyi_supports_selected_export_sections() -> None:
     result = calculate_gua_meiyi(
         name=["111111", "111"],
         selected_sections=["批量结果"],
@@ -222,7 +219,7 @@ def test_calculate_gua_meiyi_supports_selected_export_sections():
     assert "[来源]" not in result["snapshot_export"]["export_text"]
 
 
-def test_calculate_meihua_analysis_returns_expected_hexagram_chain():
+def test_calculate_meihua_analysis_returns_expected_hexagram_chain() -> None:
     result = calculate_meihua_analysis(
         analysis_year=2028,
         analysis_month=4,
@@ -244,63 +241,28 @@ def test_calculate_meihua_analysis_returns_expected_hexagram_chain():
     assert "opposite_hexagram" not in meihua
     assert meihua["cuo_hexagram"]["name"] == "水地比"
     assert meihua["zong_hexagram"]["name"] == "天火同人"
-    assert interpretation["cuo_oracle"]["name"] == "水地比"
-    assert interpretation["cuo_reading"].startswith("错卦水地比")
     assert "opposite_oracle" not in interpretation
     assert "opposite_reading" not in interpretation
-    assert meihua["base_hexagram"]["judgement"] == "资源在手，宜放大优势并守住尺度。"
-    assert "火在天上" in meihua["base_hexagram"]["image"]
     assert meihua["moving_palace"] == "下卦"
     assert meihua["body_trigram"]["name"] == "离"
     assert meihua["use_trigram"]["name"] == "乾"
     assert meihua["body_use_relation"] == "体克用"
     assert "体卦离、用卦乾" in meihua["body_use_summary"]
-    assert interpretation["question_domain"]["label"] == "事业/项目"
-    assert interpretation["moving_line_phase"]["stage"] == "起念与启动"
     assert len(interpretation["line_oracles"]) == 6
     assert sum(1 for item in interpretation["line_oracles"] if item["is_active"]) == 1
-    assert interpretation["moving_line_oracle"]["position"] == "初爻"
-    assert interpretation["moving_line_oracle"]["title"] == "发端位"
-    assert interpretation["moving_line_oracle"]["focus"] == "起势、试探与基础"
-    assert interpretation["moving_line_oracle"]["timing"] == "先小后大"
     assert interpretation["moving_line_oracle"]["changed_hexagram"]["name"] == "火风鼎"
     assert interpretation["moving_line_oracle"]["body_trigram"] == "离"
     assert interpretation["moving_line_oracle"]["use_trigram"] == "乾"
-    assert "第一步踩稳" in interpretation["moving_line_oracle"]["position_hint"]
     assert (
         "无交害，匪咎，艱則无咎。" in interpretation["moving_line_oracle"]["judgement"]
     )
-    assert "试探、起步" in interpretation["moving_line_oracle"]["favorable"]
-    assert "起手过满" in interpretation["moving_line_oracle"]["caution"]
-    assert "里程碑先钉牢" in interpretation["moving_line_oracle"]["domain_hint"]
-    assert "主动拿节奏" in interpretation["moving_line_oracle"]["body_use_adjustment"]
     assert interpretation["line_oracles"][0]["is_active"] is True
     assert interpretation["line_oracles"][-1]["changed_hexagram"]["name"] == "雷天大壮"
-    assert "主动掌控" in interpretation["body_use_reading"]
-    assert "火天大有" in interpretation["base_reading"]
-    assert "火风鼎" in interpretation["changed_reading"]
-    assert (
-        interpretation["base_oracle"]["judgement"] == "资源在手，宜放大优势并守住尺度。"
-    )
-    assert "扩成果" in interpretation["base_oracle"]["favorable"]
-    assert (
-        interpretation["changed_oracle"]["judgement"]
-        == "重整器局可成新局，关键在结构升级。"
-    )
-    assert "重组团队" in interpretation["changed_oracle"]["favorable"]
-    assert "扩成果" in interpretation["action_hint"]
-    assert "试探、起步" in interpretation["action_hint"]
-    assert "重组团队" in interpretation["action_hint"]
-    assert "骄满" in interpretation["risk_hint"]
-    assert "起手过满" in interpretation["risk_hint"]
-    assert "站错队" in interpretation["risk_hint"]
-    assert len(interpretation["judgement_outline"]) == 7
-    assert "事业/项目" in result["summary"]
     assert "无交害，匪咎，艱則无咎。" in result["summary"]
     assert "传统体用解读" in result["summary"]
 
 
-def test_calculate_tongshefa_analysis_returns_expected_local_structure():
+def test_calculate_tongshefa_analysis_returns_expected_local_structure() -> None:
     result = calculate_tongshefa_analysis(
         taiyin="巽",
         taiyang="坤",
@@ -322,7 +284,7 @@ def test_calculate_tongshefa_analysis_returns_expected_local_structure():
     assert "[亲和]" in result["snapshot_text"]
 
 
-def test_calculate_sixyao_analysis_supports_explicit_lines():
+def test_calculate_sixyao_analysis_supports_explicit_lines() -> None:
     result = calculate_sixyao_analysis(
         date="2028-04-06",
         time="09:33:00",
@@ -347,7 +309,7 @@ def test_calculate_sixyao_analysis_supports_explicit_lines():
     assert "问题：合作" in result["snapshot_text"]
 
 
-def test_calculate_sixyao_analysis_time_casts_when_no_hexagram_supplied():
+def test_calculate_sixyao_analysis_time_casts_when_no_hexagram_supplied() -> None:
     """当调用方未提供卦码 / 爻线时，六爻按起卦时刻做时间起卦（梅花口径）真实
     装卦，而不是返回一个与时刻无关的固定演示卦。"""
     result = calculate_sixyao_analysis(
@@ -369,7 +331,7 @@ def test_calculate_sixyao_analysis_time_casts_when_no_hexagram_supplied():
     assert "第6爻：阴爻（动）" in result["snapshot_text"]
 
 
-def test_calculate_sixyao_time_cast_varies_with_moment():
+def test_calculate_sixyao_time_cast_varies_with_moment() -> None:
     """时间起卦必须随起卦时刻变化，而非恒返回同一卦。"""
     morning = calculate_sixyao_analysis(
         date="2028-04-06", time="09:33:00", zone="+08:00"
@@ -384,7 +346,7 @@ def test_calculate_sixyao_time_cast_varies_with_moment():
     assert other["cast"]["method"] == "time_meihua"
 
 
-def test_calculate_sixyao_explicit_code_is_marked_manual():
+def test_calculate_sixyao_explicit_code_is_marked_manual() -> None:
     """显式提供卦码时不做时间起卦，且标记为手动起卦。"""
     result = calculate_sixyao_analysis(
         date="2028-04-06",
@@ -400,7 +362,7 @@ def test_calculate_sixyao_explicit_code_is_marked_manual():
     assert result["moving_lines"] == [3]
 
 
-def test_calculate_sixyao_coin_casting_from_explicit_tosses():
+def test_calculate_sixyao_coin_casting_from_explicit_tosses() -> None:
     """真·摇钱起卦：调用方提供六掷之和（初爻→上爻），按字面=2/背面=3 装卦。
     coins=[7,8,7,9,8,6] → 少阳/少阴/少阳/老阳/少阴/老阴。"""
     result = calculate_sixyao_analysis(
@@ -426,7 +388,7 @@ def test_calculate_sixyao_coin_casting_from_explicit_tosses():
     assert tosses[1]["moving"] is False
 
 
-def test_calculate_sixyao_coin_casting_random_is_seedable():
+def test_calculate_sixyao_coin_casting_random_is_seedable() -> None:
     """系统随机摇卦：同一 seed 必出同一卦（可复现），标记 coin/random。"""
     first = calculate_sixyao_analysis(
         date="2028-04-06", time="09:33:00", zone="+08:00", method="coin", seed=42
@@ -450,7 +412,7 @@ def test_calculate_sixyao_coin_casting_random_is_seedable():
         assert (toss["sum"] in (6, 9)) == toss["moving"]
 
 
-def test_calculate_sixyao_coin_rejects_invalid_toss():
+def test_calculate_sixyao_coin_rejects_invalid_toss() -> None:
     """每掷之和必须 ∈ {6,7,8,9}（三枚铜钱），非法值经守卫返回校验错误。"""
     result = calculate_sixyao_analysis(
         date="2028-04-06",
@@ -462,7 +424,7 @@ def test_calculate_sixyao_coin_rejects_invalid_toss():
     assert "6/7/8/9" in result["error"]
 
 
-def test_calculate_sixyao_coin_requires_six_tosses():
+def test_calculate_sixyao_coin_requires_six_tosses() -> None:
     result = calculate_sixyao_analysis(
         date="2028-04-06",
         time="09:33:00",
@@ -472,7 +434,7 @@ def test_calculate_sixyao_coin_requires_six_tosses():
     assert result["error_code"] == "validation_error"
 
 
-def test_build_sixyao_result_raises_on_invalid_coins():
+def test_build_sixyao_result_raises_on_invalid_coins() -> None:
     """核心层（无守卫）对非法摇钱输入直接 fail-loud。"""
     from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 
@@ -482,7 +444,7 @@ def test_build_sixyao_result_raises_on_invalid_coins():
         )
 
 
-def test_sixyao_does_not_treat_the_string_zero_as_a_yang_line():
+def test_sixyao_does_not_treat_the_string_zero_as_a_yang_line() -> None:
     result = calculate_sixyao_analysis(
         date="2028-04-06",
         time="09:33:00",
@@ -500,7 +462,7 @@ def test_sixyao_does_not_treat_the_string_zero_as_a_yang_line():
     assert all(line["value"] == 0 for line in result["lines"])
 
 
-def test_calculate_suzhan_analysis_returns_chart_and_snapshot():
+def test_calculate_suzhan_analysis_returns_chart_and_snapshot() -> None:
     result = calculate_suzhan_analysis(
         date="2028-04-06",
         time="09:33:00",
@@ -523,7 +485,9 @@ def test_calculate_suzhan_analysis_returns_chart_and_snapshot():
 
 
 @pytest.mark.parametrize("mansion_method", ["equatorial_research28", "legacy_equal28"])
-def test_suzhan_uses_shared_local_chart_runtime(mansion_method, surface_calls):
+def test_suzhan_uses_shared_local_chart_runtime(
+    mansion_method: str, surface_calls
+) -> None:
     local_chart = _build_local_chart_response(
         date_text="2028-04-06",
         time_text="09:33:00",
@@ -627,7 +591,7 @@ def test_suzhan_uses_shared_local_chart_runtime(mansion_method, surface_calls):
     )
 
 
-def test_calculate_suzhan_analysis_exposes_runtime_engine_metadata():
+def test_calculate_suzhan_analysis_exposes_runtime_engine_metadata() -> None:
     result = calculate_suzhan_analysis(
         date="2028-04-06",
         time="09:33:00",
@@ -641,7 +605,7 @@ def test_calculate_suzhan_analysis_exposes_runtime_engine_metadata():
     assert result["params"]["engineBackend"] == expected_backend
 
 
-def test_calculate_suzhan_analysis_applies_chart_modes_to_offline_output():
+def test_calculate_suzhan_analysis_applies_chart_modes_to_offline_output() -> None:
     default_result = calculate_suzhan_analysis(
         date="2028-04-06",
         time="09:33:00",
@@ -682,7 +646,9 @@ def test_calculate_suzhan_analysis_applies_chart_modes_to_offline_output():
     assert default_result["snapshot_text"] != adjusted_result["snapshot_text"]
 
 
-def test_calculate_suzhan_analysis_supports_offline_house_system_and_zodiacal_modes():
+def test_calculate_suzhan_analysis_supports_offline_house_system_and_zodiacal_modes() -> (
+    None
+):
     tropical_equal_result = calculate_suzhan_analysis(
         date="2028-04-06",
         time="09:33:00",
@@ -729,7 +695,7 @@ def test_calculate_suzhan_analysis_supports_offline_house_system_and_zodiacal_mo
     assert tropical_sun["sign"] != sidereal_sun["sign"]
 
 
-def test_calculate_suzhan_analysis_supports_extended_offline_house_systems():
+def test_calculate_suzhan_analysis_supports_extended_offline_house_systems() -> None:
     placidus_result = calculate_suzhan_analysis(
         date="2028-04-06",
         time="09:33:00",
@@ -783,7 +749,7 @@ def test_calculate_suzhan_analysis_supports_extended_offline_house_systems():
     assert placidus_houses[0]["lon"] != sripati_houses[0]["lon"]
 
 
-def test_calculate_suzhan_analysis_rejects_unsupported_offline_modes():
+def test_calculate_suzhan_analysis_rejects_unsupported_offline_modes() -> None:
     invalid_hsys_result = calculate_suzhan_analysis(
         date="2028-04-06",
         time="09:33:00",
@@ -815,7 +781,7 @@ def test_calculate_suzhan_analysis_rejects_unsupported_offline_modes():
     }
 
 
-def test_calculate_otherbu_analysis_supports_traditional_mode():
+def test_calculate_otherbu_analysis_supports_traditional_mode() -> None:
     result = calculate_otherbu_analysis(
         date="2028-04-06",
         time="09:33:00",
@@ -840,7 +806,7 @@ def test_calculate_otherbu_analysis_supports_traditional_mode():
     assert dice_sun["house"] == "House1"
     assert dice_sun["sign"] == "Aries"
     assert not any(item["id"] == "Uranus" for item in natal_objects)
-    assert "Sun主核心意志" in result["interpretation"]["summary"]
+    assert result["symbolic_details"]["sign_condition"]["conditions"] == ["exaltation"]
     assert "星座：Aries" in result["snapshot_text"]
     assert '问题原文（JSON引用）："合作"' in result["snapshot_text"]
     assert result["question"] == result["input_normalized"]["question"] == "合作"
@@ -848,7 +814,9 @@ def test_calculate_otherbu_analysis_supports_traditional_mode():
     assert "[天象盘宫位与星体]" in result["snapshot_text"]
 
 
-def test_calculate_otherbu_analysis_supports_offline_house_system_and_zodiacal_modes():
+def test_calculate_otherbu_analysis_supports_offline_house_system_and_zodiacal_modes() -> (
+    None
+):
     tropical_equal_result = calculate_otherbu_analysis(
         date="2028-04-06",
         time="09:33:00",
@@ -904,7 +872,7 @@ def test_calculate_otherbu_analysis_supports_offline_house_system_and_zodiacal_m
     assert tropical_sun["sign"] != sidereal_sun["sign"]
 
 
-def test_calculate_otherbu_analysis_exposes_runtime_engine_metadata():
+def test_calculate_otherbu_analysis_exposes_runtime_engine_metadata() -> None:
     result = calculate_otherbu_analysis(
         date="2028-04-06",
         time="09:33:00",
@@ -923,7 +891,7 @@ def test_calculate_otherbu_analysis_exposes_runtime_engine_metadata():
     assert result["diceChart"]["params"]["engineBackend"] == "symbolic_rules"
 
 
-def test_calculate_otherbu_analysis_supports_extended_offline_house_systems():
+def test_calculate_otherbu_analysis_supports_extended_offline_house_systems() -> None:
     placidus_result = calculate_otherbu_analysis(
         date="2028-04-06",
         time="09:33:00",
@@ -985,7 +953,7 @@ def test_calculate_otherbu_analysis_supports_extended_offline_house_systems():
     assert placidus_houses[0]["lon"] != sripati_houses[0]["lon"]
 
 
-def test_calculate_otherbu_analysis_rejects_unsupported_offline_modes():
+def test_calculate_otherbu_analysis_rejects_unsupported_offline_modes() -> None:
     invalid_hsys_result = calculate_otherbu_analysis(
         date="2028-04-06",
         time="09:33:00",
@@ -1023,7 +991,9 @@ def test_calculate_otherbu_analysis_rejects_unsupported_offline_modes():
     }
 
 
-def test_calculate_otherbu_analysis_keeps_dice_chart_house_geometry_consistent():
+def test_calculate_otherbu_analysis_keeps_dice_chart_house_geometry_consistent() -> (
+    None
+):
     result = calculate_otherbu_analysis(
         date="2028-04-06",
         time="09:33:00",
@@ -1047,7 +1017,7 @@ def test_calculate_otherbu_analysis_keeps_dice_chart_house_geometry_consistent()
     assert "su28" not in dice_sun
 
 
-def test_calculate_sanshiunited_analysis_returns_local_aggregation():
+def test_calculate_sanshiunited_analysis_returns_local_aggregation() -> None:
     result = calculate_sanshiunited_analysis(
         date="2028-04-06",
         time="09:33:00",
@@ -1064,9 +1034,6 @@ def test_calculate_sanshiunited_analysis_returns_local_aggregation():
     assert result["liureng"]["patterns"][0]["name"] == "贵人顺行格"
     assert "subresults" in result
     assert "qimen" in result["subresults"]
-    assert result["subresults"]["qimen"]["pan"] == result["qimen"]
-    assert result["subresults"]["taiyi"]["pan"] == result["taiyi"]
-    assert result["subresults"]["liureng_gods"]["liureng"] == result["liureng"]
     assert "[太乙十六宫]" in result["snapshot_text"]
     assert "[六壬小局]" in result["snapshot_text"]
     assert "[八宫详解]" in result["snapshot_text"]
@@ -1092,7 +1059,7 @@ def test_calculate_sanshiunited_analysis_returns_local_aggregation():
     assert zhishi_palace["door"] == result["qimen"]["zhishi"]["door"]
 
 
-def test_calculate_sanshiunited_analysis_respects_liureng_overrides():
+def test_calculate_sanshiunited_analysis_respects_liureng_overrides() -> None:
     result = calculate_sanshiunited_analysis(
         date="2028-04-06",
         time="09:33:00",
@@ -1107,7 +1074,7 @@ def test_calculate_sanshiunited_analysis_respects_liureng_overrides():
     assert result["liureng"]["meta"]["is_diurnal"] is False
 
 
-def test_calculate_sanshiunited_qimen_options_preserve_default_taiyi():
+def test_calculate_sanshiunited_qimen_options_preserve_default_taiyi() -> None:
     payload = dict(
         date="2028-04-06", time="09:33:00", zone="+08:00", lat="31n13", lon="121e28"
     )
@@ -1120,14 +1087,12 @@ def test_calculate_sanshiunited_qimen_options_preserve_default_taiyi():
     assert optioned_result["qimen"]["ju_number"] == 7
     assert default_result["qimen"]["ju_number"] == 6
     assert optioned_result["taiyi"] == default_result["taiyi"]
-    assert optioned_result["subresults"]["qimen"]["pan"] == optioned_result["qimen"]
-    assert optioned_result["subresults"]["taiyi"]["pan"] == optioned_result["taiyi"]
     assert all(
         p["content_palace"] == p["name"] for p in optioned_result["qimen"]["palaces"]
     )
 
 
-def test_calculate_sanshiunited_analysis_supports_selected_export_sections():
+def test_calculate_sanshiunited_analysis_supports_selected_export_sections() -> None:
     result = calculate_sanshiunited_analysis(
         date="2028-04-06",
         time="09:33:00",
@@ -1149,7 +1114,7 @@ def test_calculate_sanshiunited_analysis_supports_selected_export_sections():
     assert "[八宫详解]" not in result["snapshot_export"]["export_text"]
 
 
-def test_calculate_sanshiunited_analysis_supports_true_solar_time():
+def test_calculate_sanshiunited_analysis_supports_true_solar_time() -> None:
     # 三式默认已开真太阳时；显式关掉得到钟表时间基线，与开启态对比。
     default_result = calculate_sanshiunited_analysis(
         date="2026-04-04",
@@ -1178,12 +1143,12 @@ def test_calculate_sanshiunited_analysis_supports_true_solar_time():
     assert "真太阳时" in true_solar_result["snapshot_text"]
     assert true_solar_result["snapshot_text"] != default_result["snapshot_text"]
     assert (
-        true_solar_result["sources"]["four_pillars"]["hour"]
-        != default_result["sources"]["four_pillars"]["hour"]
+        true_solar_result["subresults"]["liureng_gods"]["four_pillars"]["hour"]
+        != default_result["subresults"]["liureng_gods"]["four_pillars"]["hour"]
     )
 
 
-def test_local_offline_golden_samples_match_current_contract():
+def test_local_offline_golden_samples_match_current_contract() -> None:
     assert _local_golden_projection() == {
         "tongshefa": {
             "baseLeft": "风雷益",
@@ -1258,31 +1223,25 @@ def test_local_offline_golden_samples_match_current_contract():
     }
 
 
-def test_tongshefa_hex_always_enriches_every_hexagram():
-    """_hex 必须对全部 64 卦都填上 theme/judgement/image，不再静默吞错。
-
-    回归历史 bug：_hex 用 ``except ValueError: pass`` 兜底 lookup，
-    一旦卦码构造出错就静默产出缺 theme 的残卦。binary_code 由合法八卦拼成
-    恒合法，lookup 永不抛错，故此处验证 64 卦全部被成功补全。
-    """
+def test_tongshefa_composes_all_hexagrams_in_lower_to_upper_order() -> None:
     from fatebridge.core.local_techniques import tongshefa as _t
 
     names = ["乾", "兑", "离", "震", "巽", "坎", "艮", "坤"]
-    built = 0
+    codes = set()
     for upper_name in names:
         for lower_name in names:
             hexagram = _t._hex(_t._bagua(upper_name), _t._bagua(lower_name))
-            # 三个增益键必须存在且非空——证明 lookup 一定被成功消费。
-            assert hexagram["theme"], hexagram["name"]
-            assert hexagram["judgement"], hexagram["name"]
-            assert hexagram["image"], hexagram["name"]
-            built += 1
-    assert built == 64
+            assert hexagram["lines"] == [
+                *hexagram["lower"]["lines"],
+                *hexagram["upper"]["lines"],
+            ]
+            codes.add(hexagram["binary_code"])
+    assert len(codes) == 64
 
 
 @pytest.mark.parametrize("lunar_day", range(1, 9))
 @pytest.mark.parametrize("hour_branch", "子丑寅卯辰巳午未")
-def test_meihua_uses_distinct_cuo_and_zong_fields(lunar_day, hour_branch):
+def test_meihua_uses_distinct_cuo_and_zong_fields(lunar_day, hour_branch) -> None:
     from fatebridge.core.divination import (
         build_meihua_interpretation,
         derive_meihua_hexagram,
@@ -1297,8 +1256,6 @@ def test_meihua_uses_distinct_cuo_and_zong_fields(lunar_day, hour_branch):
     assert "opposite_hexagram" not in meihua
     interpretation = build_meihua_interpretation(meihua)
     cuo_name = meihua["cuo_hexagram"]["name"]
-    assert interpretation["cuo_reading"].startswith(f"错卦{cuo_name}")
-    assert interpretation["cuo_oracle"]["name"] == cuo_name
 
 
 def test_normalize_date_text_zero_pads_single_digits() -> None:

@@ -45,20 +45,28 @@ def inputs() -> tuple[dict, dict, dict]:
         or declared["expected_total_positions"] != 48000
     ):
         raise ValueError("All original pairs are required")
+    else:
+        pass
     if (
         declared["angular_tolerance_arcseconds"] != 2
         or old_plan["comparison_tolerance_arcseconds"] != 2
         or old_plan["design_root_time_tolerance_seconds"] != 5
     ):
         raise ValueError("Original numeric thresholds changed")
+    else:
+        pass
     for expected, pair in zip(
         old_plan["birth_epochs"], reference["pairs"], strict=True
     ):
         if expected != {"label": pair["label"], "jd_tt": pair["personality"]["jd_tt"]}:
             raise ValueError("Original birth label or TT rebound")
+        else:
+            pass
         for side in ("personality", "design"):
             if set(pair[side]["positions"]) != set(old_plan["bodies"]):
                 raise ValueError("Original physical body omitted")
+            else:
+                pass
             for body, fact in pair[side]["positions"].items():
                 if (
                     fact["target_id"] != old_plan["bodies"][body]
@@ -73,6 +81,8 @@ def inputs() -> tuple[dict, dict, dict]:
                     )
                 ):
                     raise ValueError("Invalid original physical target or LBR")
+                else:
+                    pass
     return declared, old_plan, reference
 
 
@@ -88,6 +98,8 @@ def recover_icrf(matrix: list | tuple, value: list | tuple) -> list[float]:
         )
     ):
         raise ValueError("Invalid stored frame or direction")
+    else:
+        pass
     exact = [[Fraction(x) for x in row] for row in matrix]
     cofactors = []
     for i in range(3):
@@ -103,6 +115,8 @@ def recover_icrf(matrix: list | tuple, value: list | tuple) -> list[float]:
     determinant = sum(exact[0][j] * cofactors[0][j] for j in range(3))
     if determinant <= 0 or abs(float(determinant) - 1) > 1e-12:
         raise ValueError("Invalid stored rotation determinant")
+    else:
+        pass
     vector = [Fraction(x) for x in value]
     return [
         float(sum(cofactors[i][j] * vector[i] for i in range(3)) / determinant)
@@ -117,15 +131,21 @@ def derive(output: Path) -> None:
 
     if output.exists():
         raise FileExistsError(output)
+    else:
+        pass
     declared, old_plan, reference = inputs()
     for name, expected in declared["reference_runtime"].items():
         if version(name) != expected:
             raise ValueError("Changed reference runtime: " + name)
+        else:
+            pass
     package_files = {}
     for name in declared["reference_runtime"]:
         module = importlib.import_module(name)
         if module.__file__ is None:
             raise ValueError("Reference package has no readable origin: " + name)
+        else:
+            pass
         folder = Path(module.__file__).parent
         package_files.update(
             {
@@ -178,6 +198,8 @@ def derive(output: Path) -> None:
     }
     if before != after:
         raise ValueError("Independent reference package changed during derivation")
+    else:
+        pass
     write(
         output,
         {
@@ -209,3 +231,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", type=Path)
     derive(parser.parse_args().output)
+else:
+    pass

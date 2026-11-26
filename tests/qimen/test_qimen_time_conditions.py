@@ -10,22 +10,22 @@ import pytest
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.core.metaphysics.common import SEXAGENARY_CYCLE
-from fatebridge.core.qimen_time_conditions import build_hour_branch_tomb
+from fatebridge.core.qimen.qimen_time_conditions import build_hour_branch_tomb
 from fatebridge.services.metaphysics import calculate_qimen_analysis
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.claims import CalculationClaim
-from fatebridge.validation.qimen_study import FrozenQimenPolicy, apply_policy
-from fatebridge.validation.qimen_time_conditions import (
+from tests.unit_test.fixtures.qimen import fixed_board
+from validation.claims import CalculationClaim
+from validation.qimen_study import FrozenQimenPolicy, apply_policy
+from validation.qimen_time_conditions import (
     audit_hour_branch_tombs,
     verify_qimen_time_condition_quotes,
 )
-from tests.qimen.test_qimen_depth import fixed_board
 
 BUNDLE = Path(__file__).parents[1] / "fixtures/qimen_classical_v8"
 REFERENCE = json.loads((BUNDLE / "sources-and-hours.json").read_text())
 
 
-def test_six_prose_definitions_and_sixty_hour_scope_are_audited_separately():
+def test_six_prose_definitions_and_sixty_hour_scope_are_audited_separately() -> None:
     report = audit_hour_branch_tombs(BUNDLE)
     assert report["printed_literal_pair_definitions"] == 6
     assert report["finite_hour_values_checked"] == 60
@@ -36,7 +36,7 @@ def test_six_prose_definitions_and_sixty_hour_scope_are_audited_separately():
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"], ids=lambda c: c["hour_ganzhi"])
-def test_literals_have_the_printed_element_polarity_and_verse_membership(case):
+def test_literals_have_the_printed_element_polarity_and_verse_membership(case) -> None:
     condition = build_hour_branch_tomb(case["hour_ganzhi"], source=REFERENCE["source"])
     assert condition["matched"]
     assert condition["matched_definition"] == {
@@ -50,8 +50,8 @@ def test_literals_have_the_printed_element_polarity_and_verse_membership(case):
     "dun,ju", [(d, j) for d in ("阳遁", "阴遁") for j in range(1, 10)]
 )
 def test_all_1080_boards_use_literal_hour_independently_of_ju_and_palace(
-    monkeypatch, dun, ju
-):
+    monkeypatch: pytest.MonkeyPatch, dun, ju
+) -> None:
     expected = {c["hour_ganzhi"] for c in REFERENCE["cases"]}
     for hour in SEXAGENARY_CYCLE:
         q = fixed_board(monkeypatch, {"dun": dun, "ju": ju, "hour": hour})
@@ -64,14 +64,16 @@ def test_all_1080_boards_use_literal_hour_independently_of_ju_and_palace(
         assert step["outputs"] == clock
 
 
-def test_jia_chen_hides_ren_but_is_not_the_literal_ren_chen_tomb(monkeypatch):
+def test_jia_chen_hides_ren_but_is_not_the_literal_ren_chen_tomb(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     q = fixed_board(monkeypatch, {"dun": "阳遁", "ju": 1, "hour": "甲辰"})
     assert q["stem_context"]["hour"]["effective_stem"] == "壬"
     assert not q["structure"]["hour_branch_tomb"]
     assert q["stem_context"]["hour_branch_tomb"]["literal_stem"] == "甲"
 
 
-def test_ji_chou_prose_supplement_is_kept_in_snapshot_and_export():
+def test_ji_chou_prose_supplement_is_kept_in_snapshot_and_export() -> None:
     result = calculate_qimen_analysis(
         analysis_year=2026,
         analysis_month=1,
@@ -86,7 +88,7 @@ def test_ji_chou_prose_supplement_is_kept_in_snapshot_and_export():
     assert "己丑为正文补列" in result["snapshot_export"]["export_text"]
 
 
-def test_true_solar_crossing_uses_actual_selected_hour_not_input_clock_label():
+def test_true_solar_crossing_uses_actual_selected_hour_not_input_clock_label() -> None:
     args = dict(
         analysis_year=2026,
         analysis_month=1,
@@ -105,8 +107,8 @@ def test_true_solar_crossing_uses_actual_selected_hour_not_input_clock_label():
 
 
 def test_research_policy_reads_this_known_clock_fact_even_with_day_jia_unknown(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     q = fixed_board(monkeypatch, {"dun": "阳遁", "ju": 1, "hour": "壬辰"}, day="甲子")
     policy = FrozenQimenPolicy(
         policy_id="synthetic",
@@ -154,7 +156,7 @@ def receipt():
     return payload, claim
 
 
-def test_whole_time_quote_preserves_semantic_limits(receipt):
+def test_whole_time_quote_preserves_semantic_limits(receipt) -> None:
     payload, claim = receipt
     report = verify_qimen_time_condition_quotes(payload, [claim])
     assert report["status"] == "verified_structured_time_condition"
@@ -167,7 +169,9 @@ def test_whole_time_quote_preserves_semantic_limits(receipt):
 @pytest.mark.parametrize(
     "change", ["scope", "palace", "jia", "verse", "flag_only", "different_run"]
 )
-def test_quotes_cannot_drop_limits_or_turn_clock_into_palace_evidence(receipt, change):
+def test_quotes_cannot_drop_limits_or_turn_clock_into_palace_evidence(
+    receipt, change: str
+) -> None:
     payload, claim = receipt
     altered = claim.model_dump()
     if change == "scope":
@@ -190,7 +194,7 @@ def test_quotes_cannot_drop_limits_or_turn_clock_into_palace_evidence(receipt, c
     )
 
 
-def test_cannot_delete_sixth_definition_or_change_source(tmp_path):
+def test_cannot_delete_sixth_definition_or_change_source(tmp_path: Path) -> None:
     b = tmp_path / "fixture"
     shutil.copytree(BUNDLE, b)
     p = b / "sources-and-hours.json"
@@ -206,6 +210,6 @@ def test_cannot_delete_sixth_definition_or_change_source(tmp_path):
 
 
 @pytest.mark.parametrize("hour", ["甲丑", "壬戍", "example", ""])
-def test_invalid_hour_is_not_silently_reported_as_a_negative(hour):
+def test_invalid_hour_is_not_silently_reported_as_a_negative(hour: str) -> None:
     with pytest.raises(ValueError):
         build_hour_branch_tomb(hour, source=REFERENCE["source"])

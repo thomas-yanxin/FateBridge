@@ -1,0 +1,57 @@
+{
+  "source_urls": [
+    "https://github.com/liberfa/erfa/blob/v2.0.1/src/epv00.c",
+    "https://github.com/liberfa/erfa/blob/v2.0.1/src/pfw06.c"
+  ],
+  "scope": "Exact interval of supplied IEEEdateparts, nearestbinary64 at output. IndependentDecimal100/200 reference; strongerprimitivearithmetic criterion than originalC evaluation, no new physical or sourcecoefficientaccuracy claim.",
+  "formula": "((date1 -2451545)+date2)/scale",
+  "reference_precisions_decimal": [
+    100,
+    200
+  ],
+  "complete_reference_sha256": "bf6d65afa9727f18d3fc97d3c6d80475d43611fa2f3070e292e83df001ad2190",
+  "rows": [
+    {
+      "date1_hex": "0x1.2d49940000000p+21",
+      "date2_hex": "0x1.9d4ca602cb092p-2",
+      "scale_hex": "0x1.1d5a000000000p+15",
+      "expected_hex": "0x1.d171b6e6d85b3p-2"
+    },
+    {
+      "date1_hex": "0x1.27ccb40000000p+21",
+      "date2_hex": "0x1.745d1867467c0p-2",
+      "scale_hex": "0x1.6d40000000000p+8",
+      "expected_hex": "-0x1.36848002092dep+6"
+    },
+    {
+      "date1_hex": "0x1.2eb9640000000p+21",
+      "date2_hex": "0x1.cadf6c0d83d49p-1",
+      "scale_hex": "0x1.6d40000000000p+8",
+      "expected_hex": "0x1.36b7b1526ba92p+6"
+    },
+    {
+      "date1_hex": "0x1.2c78840000000p+21",
+      "date2_hex": "0x1.a46cfb1749e26p-1",
+      "scale_hex": "0x1.1d5a000000000p+15",
+      "expected_hex": "0x1.15e5d5b1ab7a1p-2"
+    },
+    {
+      "date1_hex": "0x1.2cce1c0000000p+21",
+      "date2_hex": "0x1.0e3d51128c2ecp-3",
+      "scale_hex": "0x1.1d5a000000000p+15",
+      "expected_hex": "0x1.62aaff366d87bp-2"
+    },
+    {
+      "date1_hex": "0x1.2375dc0000000p+21",
+      "date2_hex": "0x1.863a0bf691bdap-2",
+      "scale_hex": "0x1.6d40000000000p+8",
+      "expected_hex": "-0x1.5de748fd013d5p+7"
+    },
+    {
+      "date1_hex": "0x1.27cbbc0000000p+21",
+      "date2_hex": "0x1.d333ddc70d94bp-1",
+      "scale_hex": "0x1.1d5a000000000p+15",
+      "expected_hex": "-0x1.8de3acf5a2a98p-1"
+    }
+  ]
+}

@@ -10,13 +10,13 @@ from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
 from fatebridge.application.examples import evidence_views
-from fatebridge.core.metaphysics.liureng import build_liureng_board
-from fatebridge.core.metaphysics.liureng_progression import transmission_progression
-from fatebridge.core.output_chinese import Liuren
-from fatebridge.core.output_liuren_progression import (
+from fatebridge.core.contracts.output_chinese import Liuren
+from fatebridge.core.contracts.output_liuren_progression import (
     LiurenProgression,
     require_complete_progression,
 )
+from fatebridge.core.metaphysics.liureng import build_liureng_board
+from fatebridge.core.metaphysics.liureng_progression import transmission_progression
 from scripts.ren.audit_liuren_progression import CORPUS, audit, reference
 from scripts.ren.audit_ren_classical import make_seed
 from tests.fixtures.ren_anchors import ANCHOR_PAYLOADS as PAYLOADS
@@ -33,7 +33,7 @@ def native_solar(monkeypatch):
 
 
 @pytest.mark.parametrize("case", REF["synthetic_cases"])
-def test_frozen_synthetic_condition_keeps_effective_judgement_unknown(case):
+def test_frozen_synthetic_condition_keeps_effective_judgement_unknown(case) -> None:
     got = transmission_progression(case["day"], case["branches"])
     assert (
         got["kind"],
@@ -46,7 +46,9 @@ def test_frozen_synthetic_condition_keeps_effective_judgement_unknown(case):
 
 
 @pytest.mark.parametrize("fault", ["bytes", "manifest", "extra", "missing"])
-def test_frozen_reference_cannot_be_pruned_or_refrozen(fault, tmp_path):
+def test_frozen_reference_cannot_be_pruned_or_refrozen(
+    fault: str, tmp_path: Path
+) -> None:
     folder = tmp_path / "corpus"
     shutil.copytree(CORPUS, folder)
     if fault == "bytes":
@@ -72,14 +74,14 @@ def test_frozen_reference_cannot_be_pruned_or_refrozen(fault, tmp_path):
         ("甲子", None),
     ],
 )
-def test_invalid_symbolic_inputs_rejected(day, branches):
+def test_invalid_symbolic_inputs_rejected(day: str, branches) -> None:
     with pytest.raises(ValueError):
         transmission_progression(day, branches)
 
 
 def test_all_mathematical_combinations_and_symbolic_boards_with_canonical_paths(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     import scripts.ren.audit_liuren_progression as mod
 
     alias = tmp_path / "source"
@@ -118,7 +120,7 @@ def test_all_mathematical_combinations_and_symbolic_boards_with_canonical_paths(
         ("branch_xun_kong", [0, False, False]),
     ],
 )
-def test_same_context_tampering_rejected(field, value):
+def test_same_context_tampering_rejected(field: str, value) -> None:
     evidence = transmission_progression("甲子", ["亥", "子", "丑"])
     evidence[field] = value
     with pytest.raises(ValidationError):
@@ -144,7 +146,7 @@ def board():
         "empty",
     ],
 )
-def test_full_before_projection_guard_rejects_corruption(fault):
+def test_full_before_projection_guard_rejects_corruption(fault: str) -> None:
     b = board()
     if fault == "missing":
         b.pop("transmission_progression")
@@ -172,7 +174,7 @@ def test_full_before_projection_guard_rejects_corruption(fault):
         require_complete_progression(b)
 
 
-def test_sparse_projection_can_omit_context_but_copresent_facts_must_agree():
+def test_sparse_projection_can_omit_context_but_copresent_facts_must_agree() -> None:
     Liuren.model_validate(dict(transmission_progression=dict(kind="连茹")))
     b = board()
     ev = b["transmission_progression"]
@@ -185,12 +187,12 @@ def test_sparse_projection_can_omit_context_but_copresent_facts_must_agree():
 
 
 @pytest.mark.parametrize("value", [True, 0, 1])
-def test_partial_conformance_flag_requires_boolean_false(value):
+def test_partial_conformance_flag_requires_boolean_false(value: bool | int) -> None:
     with pytest.raises(ValidationError):
         LiurenProgression.model_validate(dict(complete_classical_conformance=value))
 
 
-def test_seated_empty_and_god_sky_never_replace_raw_branch_empty():
+def test_seated_empty_and_god_sky_never_replace_raw_branch_empty() -> None:
     found = False
     for g in "子丑寅卯辰巳午未申酉戌亥":
         b = build_liureng_board(
@@ -208,7 +210,9 @@ def test_seated_empty_and_god_sky_never_replace_raw_branch_empty():
 
 
 @pytest.mark.parametrize("key", ["liureng_gods", "liureng_runyear", "jinkou"])
-def test_actual_rest_native_mcp_cli_share_published_evidence_view(key, surface_calls):
+def test_actual_rest_native_mcp_cli_share_published_evidence_view(
+    key: str, surface_calls
+) -> None:
     spec = SPECS[key]
     payload = copy.deepcopy(PAYLOADS[key])
     payload["selected_sections"] = ["起盘信息"]
@@ -232,7 +236,7 @@ def test_actual_rest_native_mcp_cli_share_published_evidence_view(key, surface_c
     ]
 
 
-def test_snapshot_section_is_derived_from_same_conditional_evidence():
+def test_snapshot_section_is_derived_from_same_conditional_evidence() -> None:
     spec = SPECS["liureng_gods"]
     payload = {**PAYLOADS["liureng_gods"], "selected_sections": ["三传连茹与间断"]}
     fn, args, kw = spec.bind(spec.request_model.model_validate(payload))
@@ -244,7 +248,9 @@ def test_snapshot_section_is_derived_from_same_conditional_evidence():
     assert (ev["raw_branch_empty_conditional_reading"] or "无所列释读") in text
 
 
-def test_shared_execution_rejects_deleted_layer_before_requested_sparse_fields():
+def test_shared_execution_rejects_deleted_layer_before_requested_sparse_fields() -> (
+    None
+):
     spec = SPECS["liureng_gods"]
     fn, args, kw = spec.bind(
         spec.request_model.model_validate(PAYLOADS["liureng_gods"])
@@ -260,8 +266,8 @@ def test_shared_execution_rejects_deleted_layer_before_requested_sparse_fields()
 
 @pytest.mark.parametrize("project", [False, True])
 def test_deleted_progression_fails_actual_transports_before_projection(
-    project, monkeypatch, surface_calls
-):
+    project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     spec = SPECS["liureng_gods"]
     payload = PAYLOADS["liureng_gods"]
     fn, args, kw = spec.bind(spec.request_model.model_validate(payload))
@@ -274,6 +280,8 @@ def test_deleted_progression_fails_actual_transports_before_projection(
             current = replace(
                 current, bind=lambda _: (lambda: copy.deepcopy(bad), (), {})
             )
+        else:
+            pass
         return original(current, request)
 
     monkeypatch.setattr(execution, "execute_spec", broken)
@@ -284,6 +292,8 @@ def test_deleted_progression_fails_actual_transports_before_projection(
         params += [("fields", "four_pillars"), ("strict_fields", "true")]
         flags += ["--fields", "four_pillars", "--strict-fields", "true"]
         options = dict(fields=["four_pillars"], strict_fields=True)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec, payload, params=params, options=options, flags=flags, cli_first=False
     )

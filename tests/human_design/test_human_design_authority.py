@@ -9,10 +9,10 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core.human_design import bodygraph
+from fatebridge.core.human_design.human_design import bodygraph
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
-from fatebridge.validation.human_design_official import (
+from validation.human_design import verify_human_design_reading
+from validation.human_design_official import (
     combine_official_chart_cohorts,
     official_chart_checks,
 )
@@ -25,7 +25,9 @@ COMBINED = combine_official_chart_cohorts(OLD, NEW)
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 
 
-def test_frozen_plan_covers_all_observations_without_using_engine_diagnostics_as_expected():
+def test_frozen_plan_covers_all_observations_without_using_engine_diagnostics_as_expected() -> (
+    None
+):
     plan_path = ROOT / NEW["plan_reference"]["path"]
     plan = json.loads(plan_path.read_text())
     assert (
@@ -44,7 +46,7 @@ def test_frozen_plan_covers_all_observations_without_using_engine_diagnostics_as
     assert "not a blind" in plan["selection_method"]
 
 
-def test_combined_cohort_keeps_all_name_discrepancies_and_finite_coverage():
+def test_combined_cohort_keeps_all_name_discrepancies_and_finite_coverage() -> None:
     result = official_chart_checks(COMBINED)
     assert result["gate_lines_checked"] == result["gate_lines_matched"] == 494
     assert len(result["cohorts"]) == 2
@@ -72,10 +74,12 @@ def test_combined_cohort_keeps_all_name_discrepancies_and_finite_coverage():
         assert failures <= {"cross_name", "variables"}
         if "variables" in failures:
             assert "moshier" in case["observed_ephemeris_models"]
+        else:
+            pass
 
 
 @pytest.mark.parametrize("case", NEW["cases"], ids=lambda c: c["id"])
-def test_each_authority_and_path_quote_comes_from_its_original_full_run(case):
+def test_each_authority_and_path_quote_comes_from_its_original_full_run(case) -> None:
     run = execute_tool(SPEC, SPEC.request_model(**case["birth_input"]))
     assert (
         verify_human_design_reading(run)["status"] == "verified_fixed_template_reading"
@@ -119,8 +123,8 @@ def test_each_authority_and_path_quote_comes_from_its_original_full_run(case):
     ],
 )
 def test_priority_and_complete_channel_counterexamples(
-    p, d, authority, path, has_motor
-):
+    p, d, authority: str, path, has_motor: bool
+) -> None:
     graph = bodygraph(p, d)
     evidence = graph["classification_evidence"]
     assert graph["authority"] == authority
@@ -132,12 +136,16 @@ def test_priority_and_complete_channel_counterexamples(
     assert checks[-1]["defined"] is (not evidence["no_inner_authority"])
     if authority == "environment_no_inner_authority":
         assert graph["centers"]["throat"]["status"] == "completely_open"
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
     "tamper", ["path", "priority", "boolean_type", "missing", "text"]
 )
-def test_forged_path_or_priority_cannot_pass_even_with_a_new_business_hash(tamper):
+def test_forged_path_or_priority_cannot_pass_even_with_a_new_business_hash(
+    tamper: str,
+) -> None:
     case = NEW["cases"][-1]  # frozen official indirect Ego -> G -> Throat
     run = deepcopy(execute_tool(SPEC, SPEC.request_model(**case["birth_input"])))
     evidence = run["bodygraph"]["classification_evidence"]
@@ -157,6 +165,8 @@ def test_forged_path_or_priority_cannot_pass_even_with_a_new_business_hash(tampe
         assert any(
             e["code"] == "bodygraph_derivation_mismatch" for e in check["errors"]
         )
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
@@ -164,8 +174,8 @@ def test_forged_path_or_priority_cannot_pass_even_with_a_new_business_hash(tampe
     [("Authority", "Mind"), ("Definition", "Quadruple Split"), ("Type", "Unknown")],
 )
 def test_unobserved_official_labels_require_source_expansion_before_comparison(
-    key, value
-):
+    key: str, value: str
+) -> None:
     ref = deepcopy(NEW)
     ref["cases"] = [ref["cases"][0]]
     ref["cases"][0]["properties"][key] = value
@@ -173,7 +183,9 @@ def test_unobserved_official_labels_require_source_expansion_before_comparison(
         official_chart_checks(ref)
 
 
-def test_unknown_or_malformed_cross_and_duplicate_or_different_cohorts_are_rejected():
+def test_unknown_or_malformed_cross_and_duplicate_or_different_cohorts_are_rejected() -> (
+    None
+):
     with pytest.raises(ValueError, match="Duplicate"):
         official_chart_checks(combine_official_chart_cohorts(NEW, NEW))
     changed = deepcopy(NEW)

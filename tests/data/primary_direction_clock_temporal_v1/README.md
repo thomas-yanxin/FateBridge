@@ -25,5 +25,13 @@ reference.json.sha256 hashes the decompressed UTF-8 bytes. Production never
 loads this fixture. Original broader failures and the unchanged criteria are
 retained under fatebridge-predictive-role-census-20261112.
 
+The stored ages record the former calculation, which rounded intermediate
+angles. The current regression independently forms and divides the directed
+arc over the same binary64 operands before rounding the delivered age. It
+still uses every original event identity, Temporal instant, offset, and
+clock tolerance. An independent BigInt and Temporal replay in
+`fatebridge-audit-20261122-round84/primary-clock-continuity` records the old
+age differences and checks the clocks produced from both sets of ages.
+
 Primary definitions: [Temporal.Instant](https://tc39.es/proposal-temporal/docs/instant.html)
 and [Python datetime arithmetic](https://docs.python.org/3.12/library/datetime.html).

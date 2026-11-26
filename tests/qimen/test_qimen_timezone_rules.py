@@ -14,7 +14,7 @@ ROOT = Path(__file__).parents[1] / "fixtures/qimen_timezone_iana_v1"
 REFERENCE = json.loads((ROOT / "reference.json").read_text())
 
 
-def test_iana_source_excerpts_are_frozen():
+def test_iana_source_excerpts_are_frozen() -> None:
     for source in REFERENCE["sources"]:
         assert (
             hashlib.sha256((ROOT / source["excerpt_file"]).read_bytes()).hexdigest()
@@ -23,7 +23,7 @@ def test_iana_source_excerpts_are_frozen():
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"])
-def test_64bit_transitions_and_future_rules_match_iana_text(case):
+def test_64bit_transitions_and_future_rules_match_iana_text(case) -> None:
     zone = timezones.parse_timezone_name(case["zone"])
     at = datetime.fromisoformat(case["at"]).replace(tzinfo=zone)
     assert at.utcoffset().total_seconds() == case["offset_seconds"]
@@ -32,7 +32,7 @@ def test_64bit_transitions_and_future_rules_match_iana_text(case):
 
 
 @pytest.mark.parametrize("case", REFERENCE["invalid_clocks"])
-def test_future_dst_gap_and_fold_checks_do_not_stop_at_2037(case):
+def test_future_dst_gap_and_fold_checks_do_not_stop_at_2037(case) -> None:
     zone = timezones.parse_timezone_name(case["zone"])
     at = datetime.fromisoformat(case["at"]).replace(tzinfo=zone)
     with pytest.raises(ValueError, match=case["kind"]):
@@ -44,8 +44,8 @@ def test_future_dst_gap_and_fold_checks_do_not_stop_at_2037(case):
     [(2040, 1, 30, "子"), (1900, 1, 1, "丑")],
 )
 def test_wrong_utc_offset_previously_changed_qimen_solar_hour(
-    year, hour, minute, expected_hour_branch
-):
+    year: int, hour: int, minute: int, expected_hour_branch: str
+) -> None:
     result = calculate_qimen_analysis(
         analysis_year=year,
         analysis_month=7,
@@ -64,7 +64,9 @@ def test_wrong_utc_offset_previously_changed_qimen_solar_hour(
     assert len(metadata["tzif_sha256"]) == 64
 
 
-def test_named_zones_use_declared_data_even_if_host_reader_is_unavailable(monkeypatch):
+def test_named_zones_use_declared_data_even_if_host_reader_is_unavailable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     def fail_if_used(*args, **kwargs):
         raise AssertionError(
             "host dateutil database must not determine named-zone rules"
@@ -79,7 +81,7 @@ def test_named_zones_use_declared_data_even_if_host_reader_is_unavailable(monkey
         timezones._parse_timezone_name_cached.cache_clear()
 
 
-def test_explicit_offset_metadata_does_not_claim_named_zone_dst_rules():
+def test_explicit_offset_metadata_does_not_claim_named_zone_dst_rules() -> None:
     assert timezones.timezone_rules_metadata("-04:00") == {
         "provider": "datetime.timezone",
         "database": "explicit_fixed_offset",

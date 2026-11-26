@@ -7,8 +7,7 @@ import math
 from fractions import Fraction
 from typing import Any
 
-from ...utils.errors import EphemerisSourceError
-from .. import (
+from fatebridge.core import (
     aa1996_solar,
     analytic_solar,
     de440_solar,
@@ -16,18 +15,23 @@ from .. import (
     spk_solar,
     vsop2013_solar,
 )
-from ..almanac import (
+from fatebridge.core.almanac import (
     NATIVE_SOLAR_ROOT_MODEL_ID,
     SOLAR_TERM_LONGITUDES,
     SOLAR_TERM_NAMES,
 )
-from ..ephemeris_runtime import (
+from fatebridge.core.ephemeris_runtime import (
     ephemeris_call,
     lock_ephemeris_configuration,
     swe,
 )
-from ..native_solar_source import native_solar_file_context, prime_swiss_solar_context
-from ..solar_term_runtime import solar_term_cache_context
+from fatebridge.core.native_solar_source import (
+    native_solar_file_context,
+    prime_swiss_solar_context,
+    swiss_solar_context_required,
+)
+from fatebridge.core.solar_term_runtime import solar_term_cache_context
+from fatebridge.utils.errors import EphemerisSourceError
 
 TARGETS = dict(zip(SOLAR_TERM_NAMES, SOLAR_TERM_LONGITUDES))
 _REASON = "ren_solar_term_longitude_inconsistent"
@@ -100,7 +104,7 @@ def _native(
     complete: bool,
 ) -> list[float]:
     if swe is None:
-        raise ImportError("swisseph is unavailable")
+        raise ModuleNotFoundError("swisseph is unavailable")
     expected_flag = {"jpl": 1, "swieph": 2, "moshier": 4}.get(model)
     if expected_flag is None or tuple(flags) != (expected_flag,):
         raise _fail()
@@ -123,19 +127,26 @@ def _native(
     _source(details, expected, complete)
     if any(len(point) != 1 for point in points):
         raise _fail()
+    midpoint_tt = (points[0][0] + points[1][0]) / 2.0
+    pin_source = model == "swieph" and swiss_solar_context_required(midpoint_tt)
+    if model == "swieph":
+        if pin_source and complete and "native_source_context" not in details:
+            raise _fail()
+        if not pin_source and "native_source_context" in details:
+            raise _fail()
     with lock_ephemeris_configuration():
         before = solar_term_cache_context(swe, native_only=True)
         context = None
-        if model == "swieph":
+        if pin_source:
             primed, context = prime_swiss_solar_context(
-                (points[0][0] + points[1][0]) / 2.0,
+                midpoint_tt,
                 native=swe,
                 invoke=ephemeris_call,
             )
             if primed[1] != expected_flag or context is None:
                 raise _fail()
             if "native_source_context" in details:
-                _source(details, {"native_source_context": context}, complete=False)
+                _source(details, {"native_source_context": context}, complete)
         values = []
         for point in points:
             vector, actual_flags = ephemeris_call(

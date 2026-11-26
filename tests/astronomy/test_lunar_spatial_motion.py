@@ -10,7 +10,7 @@ import pytest
 from fatebridge.core import ephemeris_runtime as e
 from fatebridge.core.astro import ephemeris, lunar_motion
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.jyotish.test_jyotish_sources import restore_runtime  # noqa: F401
+from tests.unit_test.fixtures.jyotish_sources import restore_runtime  # noqa: F401
 
 REFERENCE_PATH = (
     Path(__file__).parents[2] / "tests/fixtures"
@@ -23,7 +23,7 @@ NATIVE_REFERENCE = json.loads(NATIVE_REFERENCE_PATH.read_text())
 AS = 180 / math.pi * 3600
 
 
-def test_reference_identity_and_all_unfavorable_rows_remain_visible():
+def test_reference_identity_and_all_unfavorable_rows_remain_visible() -> None:
     assert hashlib.sha256(REFERENCE_PATH.read_bytes()).hexdigest() == (
         "651c707ed6f940460049e9c4ece9d44caf7ffa39365c93949fa1a8bbabf72ea5"
     )
@@ -51,7 +51,7 @@ def test_reference_identity_and_all_unfavorable_rows_remain_visible():
     REFERENCE["cases"] + NATIVE_REFERENCE["cases"],
     ids=lambda r: f'{r["job_id"]}:{r["clock"]}:{r["frame"]}',
 )
-def test_spatial_jacobian_and_replacement_against_independent_forward_ad(row):
+def test_spatial_jacobian_and_replacement_against_independent_forward_ad(row) -> None:
     apparent, spatial = lunar_motion.aberration_position_jvp(
         row["position"], row["relative_velocity"], row["observer_beta"]
     )
@@ -70,7 +70,7 @@ def test_spatial_jacobian_and_replacement_against_independent_forward_ad(row):
 
 
 @pytest.mark.parametrize("case", ["short", "nan", "superluminal", "zero_position"])
-def test_invalid_spatial_inputs_are_rejected(case):
+def test_invalid_spatial_inputs_are_rejected(case: str) -> None:
     position, velocity, beta = (
         [1.0, 2.0, 3.0],
         [0.01, 0.02, 0.03],
@@ -96,7 +96,9 @@ EPOCHS = [
 
 
 @pytest.mark.parametrize("row", EPOCHS, ids=lambda r: r["job_id"])
-def test_native_all_original_epochs_keep_positions_and_separate_partial_terms(row):
+def test_native_all_original_epochs_keep_positions_and_separate_partial_terms(
+    row,
+) -> None:
     e.configure_ephemeris_path(str(Path(__file__).resolve().parents[2] / "ephe"))
     tt = row["epoch"]["jd_tt_binary64"]
     context = {}
@@ -110,6 +112,8 @@ def test_native_all_original_epochs_keep_positions_and_separate_partial_terms(ro
     for name in ("longitude", "latitude", "distance"):
         if name in raw:
             assert corrected[name] == raw[name]
+        else:
+            pass
     assert corrected["longitude_speed_native"] == raw["longitude_speed"]
     assert corrected["longitude_speed"] == (
         corrected["longitude_speed_native"]

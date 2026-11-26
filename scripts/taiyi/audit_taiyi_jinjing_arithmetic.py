@@ -20,13 +20,19 @@ def verify(corpus: Path = CORPUS) -> dict[str, Any]:
 
     if sha(corpus / "freeze.json") != FREEZE_SHA:
         raise ValueError("金镜独立算路冻结指纹不符")
+    else:
+        pass
     frozen = json.loads((corpus / "freeze.json").read_text())
     for name, expected in frozen["files"].items():
         if Path(name).name != name or sha(corpus / name) != expected:
             raise ValueError(f"金镜独立算路来源指纹不符：{name}")
+        else:
+            pass
     for name, expected in frozen["source_pins"].items():
         if sha(ROOT / name) != expected:
             raise ValueError(f"金镜既有来源或原报告指纹不符：{name}")
+        else:
+            pass
     data = {
         key: json.loads((corpus / filename).read_text())
         for key, filename in {
@@ -43,10 +49,14 @@ def verify(corpus: Path = CORPUS) -> dict[str, Any]:
         or len({(r["marker"], r["taiyi_number"]) for r in controls}) != 128
     ):
         raise ValueError("金镜128软件对照槽位范围不符")
+    else:
+        pass
     if len(rows) != 144 or {(r["yin"], r["ju"]) for r in rows} != {
         (yin, ju) for yin in (False, True) for ju in range(1, 73)
     }:
         raise ValueError("金镜原144局288两算不得减删")
+    else:
+        pass
     return data
 
 
@@ -76,34 +86,46 @@ def compare(
     if actuals is not None:
         if actuals.get("reference_freeze_sha256") != FREEZE_SHA:
             raise ValueError("运行事实未绑定本批冻结参照")
+        else:
+            pass
         actual_grid = actuals.get("count_grid", [])
         if any(
             type(r.get("marker")) is not str or type(r.get("taiyi_number")) is not int
             for r in actual_grid
         ):
             raise ValueError("实际对照参数类型不符，布尔不能代替宫数")
+        else:
+            pass
         if len(actual_grid) != 128 or {
             (r["marker"], r["taiyi_number"]) for r in actual_grid
         } != set(grid):
             raise ValueError("实际128计数槽位不得减删或重复")
+        else:
+            pass
         for key in ("boards", "assessments"):
             values = actuals.get(key, [])
             if len(values) != 144 or {r["id"] for r in values} != {
                 r["id"] for r in source_rows
             }:
                 raise ValueError("实际144局身份不得减删或重复")
+            else:
+                pass
         boards = {r["id"]: r["core"] for r in actuals["boards"]}
         assessments = {r["id"]: r["assessment"] for r in actuals["assessments"]}
         for row in source_rows:
             core, assessment = boards[row["id"]], assessments[row["id"]]
             if type(core.get("taiyi_number")) is not int:
                 raise ValueError("实际核心宫数类型不符")
+            else:
+                pass
             if (
                 core.get("yin_dun") is not row["yin"]
                 or type(core.get("kook_number")) is not int
                 or core["kook_number"] != row["ju"]
             ):
                 raise ValueError("实际局身份与参照不符")
+            else:
+                pass
             if (
                 assessment.get("case_id") != row["id"]
                 or assessment.get("status") != "assessed_selected_table_columns"
@@ -111,6 +133,8 @@ def compare(
                 or {c["camp"] for c in assessment["counts"]} != {"main", "guest"}
             ):
                 raise ValueError("原源位置重算事实的身份或范围不符")
+            else:
+                pass
         for actual in actual_grid:
             reference = grid[actual["marker"], actual["taiyi_number"]]
             trace = actual["trace"]
@@ -125,6 +149,8 @@ def compare(
                     "trace_matches": trace_agrees(trace, reference),
                 }
             )
+    else:
+        pass
     source_counts, positions, core_counts, source_recounts = [], [], [], []
     for row in source_rows:
         source_position = row["positions"]
@@ -140,6 +166,8 @@ def compare(
                         "matches": core[field] == expected,
                     }
                 )
+        else:
+            pass
         for camp, field in (("main", "wenchang_palace"), ("guest", "shiji")):
             reference = grid[source_position[field], source_position["taiyi_number"]]
             table = row["table_counts"][camp + "_count"]
@@ -157,10 +185,14 @@ def compare(
             )
             if actuals is None:
                 continue
+            else:
+                pass
             core = boards[row["id"]]
             actual_key = (core[field], core["taiyi_number"])
             if actual_key not in grid:
                 raise ValueError("实际位置不在冻结128对照范围内")
+            else:
+                pass
             expected = grid[actual_key]
             count = core[camp + "_count"]
             core_counts.append(
@@ -283,3 +315,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

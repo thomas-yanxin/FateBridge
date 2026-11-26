@@ -2,10 +2,10 @@
 
 import pytest
 
-from fatebridge.core import sukuyo_zentsuji_later as later
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_hinoo_critical import ZENTSUJI_SOURCE
-from fatebridge.core.sukuyo_sources import LoadedSource, load_source
+from fatebridge.core.sukuyo import sukuyo_zentsuji_later as later
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_hinoo_critical import ZENTSUJI_SOURCE
+from fatebridge.core.sukuyo.sukuyo_sources import LoadedSource, load_source
 
 
 def reference():
@@ -13,7 +13,7 @@ def reference():
     return later.later_reading_reference(legacy.data, legacy.sha256)
 
 
-def test_old_capture_and_new_native_evidence_coexist_with_unaccepted_glyphs():
+def test_old_capture_and_new_native_evidence_coexist_with_unaccepted_glyphs() -> None:
     legacy = load_source(ZENTSUJI_SOURCE).data
     result = reference()
     assert (
@@ -46,7 +46,7 @@ def test_old_capture_and_new_native_evidence_coexist_with_unaccepted_glyphs():
 @pytest.mark.parametrize(
     "key", ["source_bundle_sha256", "id", "image_sha256", "call_number"]
 )
-def test_later_record_cannot_bind_another_legacy_source(key):
+def test_later_record_cannot_bind_another_legacy_source(key: str) -> None:
     legacy = load_source(ZENTSUJI_SOURCE)
     value = legacy.data
     identity = legacy.sha256
@@ -61,7 +61,9 @@ def test_later_record_cannot_bind_another_legacy_source(key):
 @pytest.mark.parametrize(
     "change", ["true_flag", "missing_flag", "null_flag", "accepted_glyph"]
 )
-def test_working_evidence_does_not_silently_become_acceptance(monkeypatch, change):
+def test_working_evidence_does_not_silently_become_acceptance(
+    monkeypatch: pytest.MonkeyPatch, change: str
+) -> None:
     loaded = load_source(later.SOURCE)
     data = loaded.data
     if change == "true_flag":
@@ -79,7 +81,7 @@ def test_working_evidence_does_not_silently_become_acceptance(monkeypatch, chang
         reference()
 
 
-def test_returned_later_readings_are_copy_isolated():
+def test_returned_later_readings_are_copy_isolated() -> None:
     first = reference()
     first["calendar_columns"][0]["literal"] = "changed"
     first["unresolved_calendar_readings"][-1]["candidates"].clear()
@@ -89,7 +91,9 @@ def test_returned_later_readings_are_copy_isolated():
 
 
 @pytest.mark.parametrize("half,expected", [("first_half", None), ("second_half", "参")])
-def test_returned_source_and_reading_qualify_current_uncertainty(half, expected):
+def test_returned_source_and_reading_qualify_current_uncertainty(
+    half: str, expected: str | None
+) -> None:
     result = calendar_mansion(
         "1903-06-25", calendar_profile="hinoo_t1299_host27", calendar_day_part=half
     )

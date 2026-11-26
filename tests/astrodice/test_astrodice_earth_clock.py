@@ -16,7 +16,9 @@ from scripts.astrodice.verify_astrodice_emission_epoch import exact_position
 
 @pytest.mark.parametrize("body", ["Earth", "Venus"])
 @pytest.mark.parametrize("axis", [0, 1, 2])
-def test_source_axes_equal_independent_original_coefficients(body, axis):
+def test_source_axes_equal_independent_original_coefficients(
+    body: str, axis: int
+) -> None:
     source = (
         Path(__file__).parents[1]
         / "data/astrodice/reference_sets/fixture-de441-records-v1"
@@ -50,7 +52,7 @@ class ConstantReader:
 PLAN = {"numerical_tube_profiles": {"printing_only": {"extra_binary64_ULPs": 0}}}
 
 
-def test_touching_closed_clock_intervals_keep_the_exact_common_point():
+def test_touching_closed_clock_intervals_keep_the_exact_common_point() -> None:
     result = pair(
         ConstantReader(), synthetic([1, 2]), synthetic([2, 3]), "printing_only", PLAN
     )
@@ -59,14 +61,14 @@ def test_touching_closed_clock_intervals_keep_the_exact_common_point():
     assert result["Earth_minus_Venus_seconds"] == ["-172800", "0"]
 
 
-def test_disjoint_clocks_have_no_common_receiver_even_if_each_body_fits():
+def test_disjoint_clocks_have_no_common_receiver_even_if_each_body_fits() -> None:
     result = pair(
         ConstantReader(), synthetic([1, 2]), synthetic([3, 4]), "printing_only", PLAN
     )
     assert result["status"] == "disjoint" and "common_JD" not in result
 
 
-def test_component_failure_survives_an_intersecting_clock_interval():
+def test_component_failure_survives_an_intersecting_clock_interval() -> None:
     result = pair(
         ConstantReader(),
         synthetic([1, 2], False),
@@ -78,7 +80,7 @@ def test_component_failure_survives_an_intersecting_clock_interval():
     assert result["joint_necessary_not_refuted"] is False
 
 
-def test_unknown_single_clock_is_not_a_false_disjoint_or_usable_common_clock():
+def test_unknown_single_clock_is_not_a_false_disjoint_or_usable_common_clock() -> None:
     result = pair(
         ConstantReader(),
         {"profiles": {"printing_only": {"status": "unbracketed"}}},
@@ -102,7 +104,7 @@ def time_query():
     }
 
 
-def test_equal_primary_epoch_cannot_bind_a_different_companion_time_batch():
+def test_equal_primary_epoch_cannot_bind_a_different_companion_time_batch() -> None:
     original, other = time_query(), time_query()
     assert matching_time_batches(original, other)
     require_matching_time_batches(original, other)
@@ -115,7 +117,9 @@ def test_equal_primary_epoch_cannot_bind_a_different_companion_time_batch():
 @pytest.mark.parametrize(
     "key", ["TIME_TYPE", "CAL_TYPE", "TIME_DIGITS", "CAL_FORMAT", "TLIST_TYPE", "TLIST"]
 )
-def test_time_batch_contract_does_not_ignore_missing_or_changed_fields(key):
+def test_time_batch_contract_does_not_ignore_missing_or_changed_fields(
+    key: str,
+) -> None:
     original, other = time_query(), time_query()
     other["parameters"][key] += " changed"
     with pytest.raises(ValueError, match="Cross-batch"):

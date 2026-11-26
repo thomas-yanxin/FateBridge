@@ -22,9 +22,9 @@ from fatebridge.core.divination import (
     lookup_trigram_by_code,
     lookup_trigram_by_name,
 )
-from fatebridge.core.meihua import build_meihua_evidence, meihua_ruleset
+from fatebridge.core.meihua.meihua import build_meihua_evidence, meihua_ruleset
 from fatebridge.services.divination import calculate_meihua_analysis
-from fatebridge.validation.meihua import audit_meihua, reference_bundle
+from validation.meihua import audit_meihua, reference_bundle
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_v1"
 CASES = json.loads((REFERENCES / "cases.json").read_text())["cases"]
@@ -69,7 +69,7 @@ def enriched(case, month_branch="寅"):
     return cast
 
 
-def test_frozen_audit_does_not_promote_regression_pass_to_authority():
+def test_frozen_audit_does_not_promote_regression_pass_to_authority() -> None:
     report = audit_meihua(REFERENCES)
     assert report["selected_checks_passed"]
     assert sum(r["date_count"] for r in report["calendar"]["reports"]) == 72723
@@ -79,7 +79,7 @@ def test_frozen_audit_does_not_promote_regression_pass_to_authority():
     assert report["real_world_prediction"]["authority_certified"] is False
 
 
-def test_changed_reference_cannot_be_silently_accepted(tmp_path):
+def test_changed_reference_cannot_be_silently_accepted(tmp_path: Path) -> None:
     shutil.copytree(REFERENCES, tmp_path / "refs")
     path = tmp_path / "refs/cases.json"
     path.write_text(path.read_text() + " ")
@@ -88,7 +88,7 @@ def test_changed_reference_cannot_be_silently_accepted(tmp_path):
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_original_examples_and_explicit_pure_hexagram_rule(case):
+def test_original_examples_and_explicit_pure_hexagram_rule(case) -> None:
     cast = enriched(case)
     expected = case["expected"]
     for key, field in [
@@ -111,7 +111,7 @@ def test_original_examples_and_explicit_pure_hexagram_rule(case):
 
 
 @pytest.mark.parametrize("upper,lower", tuple(product(DIAGRAMS, repeat=2)))
-def test_all_64_diagrams_and_all_384_single_line_changes(upper, lower):
+def test_all_64_diagrams_and_all_384_single_line_changes(upper, lower) -> None:
     base = build_hexagram(upper, lower)
     expected = DIAGRAMS[lower] + DIAGRAMS[upper]
     assert base["binary_code"] == expected
@@ -127,8 +127,8 @@ def test_all_64_diagrams_and_all_384_single_line_changes(upper, lower):
 @pytest.mark.parametrize("name", DIAGRAMS)
 @pytest.mark.parametrize("route", ["name", "code", "hexagram"])
 def test_returned_trigram_lines_cannot_change_basis_or_later_results(
-    name, route, monkeypatch
-):
+    name, route: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     expected = [int(bit) for bit in DIAGRAMS[name]]
     # Restore a fresh basis list on teardown even if the regression returns it.
     monkeypatch.setitem(BAGUA_BY_NAME[name], "lines", list(expected))
@@ -170,13 +170,15 @@ def test_returned_trigram_lines_cannot_change_basis_or_later_results(
     ],
 )
 def test_published_short_names_and_script_forms_respect_explicit_mode(
-    query, mode, kind, code, number
-):
+    query: str, mode: str, kind: str, code: str, number: int | None
+) -> None:
     result = lookup_gua(query, mode)
     assert result["lookup_type"] == kind
     assert result["code"] == code
     if kind == "hexagram":
         assert result["classical"]["number"] == number
+    else:
+        pass
     assert result["matched_query"] == query.strip()
 
 
@@ -185,13 +187,13 @@ def test_published_short_names_and_script_forms_respect_explicit_mode(
     [("人", "hexagram"), ("畜", "auto"), ("臨近", "auto"), ("天澤履", "trigram")],
 )
 def test_name_lookup_does_not_guess_partial_names_or_override_requested_mode(
-    query, mode
-):
+    query: str, mode: str
+) -> None:
     with pytest.raises(ValueError):
         lookup_gua(query, mode)
 
 
-def test_unrecognized_trigram_lines_never_substitute_qian():
+def test_unrecognized_trigram_lines_never_substitute_qian() -> None:
     with pytest.raises(ValueError, match="八卦爻序列"):
         _bagua_from_lines([0, 2, 0])
 
@@ -207,15 +209,15 @@ def test_unrecognized_trigram_lines_never_substitute_qian():
     ],
 )
 def test_lunar_year_never_silently_uses_lichun_year(
-    day, month, year, branch, bazi_branch
-):
+    day: int, month: int, year: int, branch: str, bazi_branch: str
+) -> None:
     result = calculate(analysis_year=year, analysis_month=month, analysis_day=day)
     assert result["meihua"]["seed"]["year_branch"] == branch
     assert result["four_pillars"]["year"]["branch"] == bazi_branch
     assert result["meihua"]["calendar_policy"]["year_boundary"] == "lunar_new_year"
 
 
-def test_calendar_context_does_not_take_hour_branch_from_unrelated_pillars():
+def test_calendar_context_does_not_take_hour_branch_from_unrelated_pillars() -> None:
     moment = datetime(2026, 2, 5, 12)
     pillars = BaZiCalendar.get_four_pillars(moment)
     pillars["hour"] = ("甲", "子")
@@ -223,7 +225,7 @@ def test_calendar_context_does_not_take_hour_branch_from_unrelated_pillars():
     assert context["meihua"]["seed"]["hour_branch"] == "午"
 
 
-def test_leap_month_is_recorded_and_uses_nominal_month():
+def test_leap_month_is_recorded_and_uses_nominal_month() -> None:
     result = calculate(analysis_year=2025, analysis_month=7, analysis_day=25)
     assert result["meihua"]["calendar_policy"]["is_leap_month"]
     assert result["meihua"]["seed"]["lunar_month"] == 6
@@ -231,7 +233,7 @@ def test_leap_month_is_recorded_and_uses_nominal_month():
     assert result["meihua"]["calendar_policy"]["rule_kind"] == "software_convention"
 
 
-def test_minute_role_and_midnight_are_explicit_and_not_bazi_rollover():
+def test_minute_role_and_midnight_are_explicit_and_not_bazi_rollover() -> None:
     a = calculate(analysis_hour=23, analysis_minute=0)
     b = calculate(analysis_hour=23, analysis_minute=59)
     next_day = calculate(analysis_day=6, analysis_hour=0)
@@ -249,7 +251,9 @@ def test_minute_role_and_midnight_are_explicit_and_not_bazi_rollover():
 
 
 @pytest.mark.parametrize("month,day,hour", [(3, 8, 2), (11, 1, 1)])
-def test_dst_gap_and_fold_are_rejected_instead_of_guessing(month, day, hour):
+def test_dst_gap_and_fold_are_rejected_instead_of_guessing(
+    month: int, day: int, hour: int
+) -> None:
     result = calculate(
         analysis_month=month,
         analysis_day=day,
@@ -270,7 +274,9 @@ def test_dst_gap_and_fold_are_rejected_instead_of_guessing(month, day, hour):
 
 
 @pytest.mark.parametrize("year,month,day", [(1899, 12, 31), (2101, 1, 1)])
-def test_out_of_supported_range_is_input_error_not_missing_dependency(year, month, day):
+def test_out_of_supported_range_is_input_error_not_missing_dependency(
+    year: int, month: int, day: int
+) -> None:
     result = calculate(analysis_year=year, analysis_month=month, analysis_day=day)
     assert result["error_code"] == "validation_error"
     assert result["status_code"] == 422
@@ -290,7 +296,9 @@ def test_out_of_supported_range_is_input_error_not_missing_dependency(year, mont
         ("hour_branch", "甲"),
     ],
 )
-def test_invalid_integer_seeds_do_not_wrap_to_valid_trigrams(field, value):
+def test_invalid_integer_seeds_do_not_wrap_to_valid_trigrams(
+    field: str, value: bool | float | int | str
+) -> None:
     with pytest.raises(ValueError):
         derive_meihua_hexagram(**{**CASES[0]["input"], field: value})
 
@@ -305,7 +313,9 @@ def test_invalid_integer_seeds_do_not_wrap_to_valid_trigrams(field, value):
         ("辰", "土", "水"),
     ],
 )
-def test_seasonal_tags_do_not_invent_unstated_five_phase_weights(branch, strong, weak):
+def test_seasonal_tags_do_not_invent_unstated_five_phase_weights(
+    branch: str, strong: str, weak: str
+) -> None:
     cast = enriched(CASES[0], month_branch=branch)
     for row in cast["seasonal_strength"]["trigrams"]:
         assert row["strength"] == (
@@ -316,9 +326,9 @@ def test_seasonal_tags_do_not_invent_unstated_five_phase_weights(branch, strong,
     assert cast["seasonal_strength"]["convention_rule_id"] == "season_policy"
 
 
-def test_actual_classical_verse_and_counterfactual_templates_stay_separate():
+def test_actual_classical_verse_and_other_line_changes_stay_separate() -> None:
     cast = enriched(CASES[0])
-    interpretation = build_meihua_interpretation(cast, "项目推进")
+    interpretation = build_meihua_interpretation(cast)
     actual = interpretation["classical_text_reference"]["moving_yaoci"]
     assert actual["position"] == 1
     assert "鞏用黃牛之革" in actual["text"]
@@ -330,21 +340,16 @@ def test_actual_classical_verse_and_counterfactual_templates_stay_separate():
         == 1
     )
     assert "终应之变用艮对原体兑为用生体" in interpretation["traditional_judgement"]
-    assert "当前更应把握" not in interpretation["comprehensive_judgement"]
-    assert (
-        interpretation["moving_line_phase"]["source_kind"]
-        == "modern_editorial_position_template"
-    )
     assert interpretation["evidence_scope"]["event_timing"] == "not_computed"
 
 
-def test_ruleset_mutation_does_not_poison_future_calculations():
+def test_ruleset_mutation_does_not_poison_future_calculations() -> None:
     rules = meihua_ruleset()
     rules["sources"][0]["url"] = "changed"
     assert meihua_ruleset()["sources"][0]["url"] != "changed"
 
 
-def test_zero_remainder_is_sixth_line_and_question_does_not_recast():
+def test_zero_remainder_is_sixth_line_and_question_does_not_recast() -> None:
     cast = derive_meihua_hexagram(
         year_branch="子", lunar_month=1, lunar_day=2, hour_branch="丑"
     )

@@ -16,23 +16,31 @@ def build() -> dict[str, Any]:
     for name, digest in freeze["files_sha256"].items():
         if hashlib.sha256((REFERENCE / name).read_bytes()).hexdigest() != digest:
             raise ValueError(f"Frozen moving-Si material changed: {name}")
+        else:
+            pass
     adjudication = json.loads((REFERENCE / "profile-adjudication.json").read_text())
     for name, digest in json.loads(
         (REFERENCE / "profile-adjudication-freeze.json").read_text()
     ).items():
         if hashlib.sha256((REFERENCE / name).read_bytes()).hexdigest() != digest:
             raise ValueError(f"Frozen moving-Si adjudication changed: {name}")
+        else:
+            pass
     if (
         adjudication["original_profile_sha256"]
         != freeze["files_sha256"]["profile.json"]
     ):
         raise ValueError("Moving-Si adjudication detached from initial profile")
+    else:
+        pass
     permission = json.loads((REFERENCE / "permission-adjudication.json").read_text())
     for name, digest in json.loads(
         (REFERENCE / "permission-adjudication-freeze.json").read_text()
     ).items():
         if hashlib.sha256((REFERENCE / name).read_bytes()).hexdigest() != digest:
             raise ValueError(f"Frozen ordinary-permission adjudication changed: {name}")
+        else:
+            pass
     if (
         permission["previous_adjudication_sha256"]
         != hashlib.sha256(
@@ -40,14 +48,20 @@ def build() -> dict[str, Any]:
         ).hexdigest()
     ):
         raise ValueError("Ordinary-permission adjudication detached from prior record")
+    else:
+        pass
     profile: dict[str, Any] = json.loads(
         (REFERENCE / permission["adjudicated_profile"]).read_text()
     )
     source = (REFERENCE / profile["source"]["file"]).resolve()
     if not source.is_relative_to((ROOT / "tests/fixtures").resolve()):
         raise ValueError("Moving-Si source escaped fixtures")
+    else:
+        pass
     if hashlib.sha256(source.read_bytes()).hexdigest() != profile["source"]["sha256"]:
         raise ValueError("Original moving-Si scan changed")
+    else:
+        pass
     return profile
 
 
@@ -59,6 +73,8 @@ def main() -> None:
     if args.check:
         if OUTPUT.read_text() != text:
             raise SystemExit("Moving-Si profile is stale")
+        else:
+            pass
     else:
         OUTPUT.write_text(text)
     print("Frozen moving-Si clauses, contexts and scan hash verified")
@@ -66,3 +82,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

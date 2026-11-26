@@ -11,13 +11,20 @@ from fatebridge.cli import run
 from fatebridge.core.fengshui.opposite import opposite_star_comparison
 from fatebridge.core.fengshui.xuankong import _chart
 from fatebridge.services.fengshui import calculate_xuankong_natal
-from fatebridge.validation.fengshui_opposite import audit_opposite_reference
-from fatebridge.validation.fengshui_reading import verify_fengshui_reading
-from tests.fengshui.test_fengshui_fixed_reading import executed, trusted
-from tests.fengshui.test_fengshui_structure_reading import MOUNTAINS, REFERENCE, request
-from tests.support.fengshui_transports import mcp_call
+from tests.support.fengshui_transports import SPECS, mcp_call
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import rest_client
+from tests.unit_test.fixtures.fengshui_reading import (
+    MOUNTAINS,
+)
+from tests.unit_test.fixtures.fengshui_reading import (
+    PRINTED_CHART_REFERENCE as REFERENCE,
+)
+from tests.unit_test.fixtures.fengshui_reading import executed
+from tests.unit_test.fixtures.fengshui_reading import printed_chart_request as request
+from tests.unit_test.fixtures.fengshui_reading import trusted
+from validation.fengshui_opposite import audit_opposite_reference
+from validation.fengshui_reading import verify_fengshui_reading
 
 FIXTURES = Path(__file__).parents[1] / "data"
 OPPOSITE_REFERENCE = json.loads(
@@ -31,7 +38,9 @@ def comparison(result):
     ]["opposite_star_comparison"]
 
 
-def test_printed_operands_match_sixteen_directed_pairs_and_two_independent_centers():
+def test_printed_operands_match_sixteen_directed_pairs_and_two_independent_centers() -> (
+    None
+):
     report = audit_opposite_reference(OPPOSITE_REFERENCE, REFERENCE)
     assert report["scoped_acceptance_passed"] and not report["differences"]
     assert report["directed_pair_checks"] == 16 and report["center_numeric_checks"] == 2
@@ -42,7 +51,7 @@ def test_printed_operands_match_sixteen_directed_pairs_and_two_independent_cente
     )
 
 
-def test_printed_five_example_is_opposite_not_same_palace_sum_ten():
+def test_printed_five_example_is_opposite_not_same_palace_sum_ten() -> None:
     result = calculate_xuankong_natal(**request(REFERENCE["charts"][4]))
     c = comparison(result)
     assert c["all_eight_sum_to_ten"] is True
@@ -65,7 +74,9 @@ def test_printed_five_example_is_opposite_not_same_palace_sum_ten():
     assert "八个有向对宫条件：符合" in result["calculation_reading"]["text"]
 
 
-def test_author_reverse_heading_can_coexist_with_false_opposite_star_condition():
+def test_author_reverse_heading_can_coexist_with_false_opposite_star_condition() -> (
+    None
+):
     result = calculate_xuankong_natal(**request(REFERENCE["charts"][3]))
     assert not comparison(result)["all_eight_sum_to_ten"]
     assert result["layers"]["xuankong_natal"]["chart"]["structure"][
@@ -74,7 +85,9 @@ def test_author_reverse_heading_can_coexist_with_false_opposite_star_condition()
     assert "本条数式不等于所有反吟定义" in result["calculation_reading"]["text"]
 
 
-def test_all432_charts_match_independent_coordinate_reflection_and_raw_operands():
+def test_all432_charts_match_independent_coordinate_reflection_and_raw_operands() -> (
+    None
+):
     coordinates = {
         "N": (0, 1),
         "NE": (1, 1),
@@ -122,7 +135,9 @@ def test_all432_charts_match_independent_coordinate_reflection_and_raw_operands(
                 )
 
 
-def test_valid_synthetic_permutation_cannot_hide_last_pairs_behind_four_axes_or_center():
+def test_valid_synthetic_permutation_cannot_hide_last_pairs_behind_four_axes_or_center() -> (
+    None
+):
     # This deliberately modified pair of valid permutations is not a real natal example.
     chart = _chart(
         5,
@@ -146,8 +161,8 @@ def test_valid_synthetic_permutation_cannot_hide_last_pairs_behind_four_axes_or_
     "corruption", ["missing", "boolean", "duplicate_star", "duplicate_flight"]
 )
 def test_incomplete_plates_are_rejected_instead_of_looking_like_complete_negative(
-    corruption,
-):
+    corruption: str,
+) -> None:
     chart = _chart(5, (0, "lower", "invalid_input_test"))
     if corruption == "missing":
         del chart["facing_chart"]["NW"]
@@ -161,7 +176,9 @@ def test_incomplete_plates_are_rejected_instead_of_looking_like_complete_negativ
         opposite_star_comparison(chart)
 
 
-def test_current_period_does_not_rewrite_historical_spatial_numbers_and_replacement_is_numeric_only():
+def test_current_period_does_not_rewrite_historical_spatial_numbers_and_replacement_is_numeric_only() -> (
+    None
+):
     req = request(REFERENCE["charts"][4])
     a = calculate_xuankong_natal(**req)
     req["interpretation"]["current_period_number"] = 2
@@ -175,7 +192,9 @@ def test_current_period_does_not_rewrite_historical_spatial_numbers_and_replacem
     assert "不继承原书下卦例盘或应期裁决" in replacement["calculation_reading"]["text"]
 
 
-def test_new_version_covers_every_bearing_candidate_and_does_not_credit_missing_natal():
+def test_new_version_covers_every_bearing_candidate_and_does_not_credit_missing_natal() -> (
+    None
+):
     req = request(REFERENCE["charts"][4])
     req["house"]["facing_degrees"] = 7.5
     result = executed(req)
@@ -220,8 +239,8 @@ def test_new_version_covers_every_bearing_candidate_and_does_not_credit_missing_
     ],
 )
 def test_new_semantic_or_context_corruption_is_rejected_even_with_synthetic_trusted_receipt(
-    mutation,
-):
+    mutation: str,
+) -> None:
     result = executed(request(REFERENCE["charts"][3]))
     reading = result["calculation_reading"]
     c = result["layers"]["xuankong_natal"]["candidates"][0]["structure"][
@@ -254,7 +273,9 @@ def test_new_semantic_or_context_corruption_is_rejected_even_with_synthetic_trus
     assert verify_fengshui_reading(result, **trusted(result))["status"] == "rejected"
 
 
-def test_new_run_downgrade_to_previous_valid_renderer_cannot_replace_original_receipt():
+def test_new_run_downgrade_to_previous_valid_renderer_cannot_replace_original_receipt() -> (
+    None
+):
     result = executed(request(REFERENCE["charts"][4]))
     anchor = trusted(result)
     result["calculation_reading"]["version"] = "1.1.0"
@@ -264,16 +285,21 @@ def test_new_run_downgrade_to_previous_valid_renderer_cannot_replace_original_re
 
 @pytest.mark.parametrize("tool", ["xuankong_natal", "assess"])
 def test_opposite_comparison_and_fixed_text_match_rest_mcp_cli(
-    monkeypatch, tmp_path, capsys, tool
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    tool: str,
+) -> None:
     data = request(REFERENCE["charts"][4])
     if tool == "assess":
         data = {"methods": ["xuankong_natal"], "xuankong": data}
-    http = rest_client(monkeypatch).post("/api/fengshui/" + tool, json=data)
+    else:
+        pass
+    http = rest_client(monkeypatch).post(SPECS[tool].rest_path, json=data)
     mcp = asyncio.run(mcp_call(tool, data))
     path = tmp_path / "opposite.json"
     path.write_text(json.dumps(data))
-    assert run(["fengshui_" + tool, "--request-file", str(path)]) == 0
+    assert run([SPECS[tool].tool_name, "--request-file", str(path)]) == 0
     cli = json.loads(capsys.readouterr().out)
     assert http.status_code == 200 and not mcp.is_error
     assert (
@@ -290,7 +316,9 @@ def test_opposite_comparison_and_fixed_text_match_rest_mcp_cli(
     ]
 
 
-def test_strict_projection_keeps_full_directed_relation_and_source_but_is_not_a_complete_receipt():
+def test_strict_projection_keeps_full_directed_relation_and_source_but_is_not_a_complete_receipt() -> (
+    None
+):
     data = request(REFERENCE["charts"][4])
     result = asyncio.run(
         mcp_call(
@@ -324,7 +352,9 @@ def test_strict_projection_keeps_full_directed_relation_and_source_but_is_not_a_
         "float_total",
     ],
 )
-def test_independent_reference_cannot_be_narrowed_or_repaired_from_production(mutation):
+def test_independent_reference_cannot_be_narrowed_or_repaired_from_production(
+    mutation: str,
+) -> None:
     ref = deepcopy(OPPOSITE_REFERENCE)
     if mutation == "drop_case":
         ref["cases"].pop()
@@ -346,10 +376,10 @@ def test_independent_reference_cannot_be_narrowed_or_repaired_from_production(mu
 
 @pytest.mark.parametrize("mutation", ["number", "boolean_type"])
 def test_independent_reference_reports_a_corrupted_engine_value_as_disagreement(
-    monkeypatch,
-    mutation,
-):
-    from fatebridge.validation import fengshui_opposite as module
+    monkeypatch: pytest.MonkeyPatch,
+    mutation: str,
+) -> None:
+    from validation import fengshui_opposite as module
 
     original = module._chart
 

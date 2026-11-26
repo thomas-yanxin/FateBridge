@@ -7,6 +7,7 @@ import math
 import random
 from fractions import Fraction as F
 from itertools import combinations
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -18,33 +19,38 @@ import fatebridge.cli as cli
 from fatebridge.application.description import spec_is_cli_safe
 from fatebridge.application.examples import evidence_views
 from fatebridge.core.astro import runtime
+from fatebridge.core.astro.astrology_tables import _opposite_sign
 from fatebridge.core.astro.geometry import _house_for_longitude
 from fatebridge.core.astro.midpoints import midpoint_geometry
 from fatebridge.core.astro.parts import _essential_dignity
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.core.astro.solar_position import apparent_position_policy
-from fatebridge.core.astrology_tables import _opposite_sign
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.astrology import calculate_germany_chart_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
+from fatebridge.utils.house_systems import (
+    INVALID_HOUSE_CODE_MESSAGE,
+    INVALID_HOUSE_SYSTEM_MESSAGE,
+)
 from tests.fixtures.surface_payloads import astro_payload
 from tests.support.transports import (
     SPECS,
     business,
+    call_calculation,
     call_cli,
+    discover_capabilities,
     native,
-    rest,
-    surface_calls,
 )
 from tests.support.western_angular_reference import reference_phase
-from tests.western.test_house_selection_contract import CODE_SPECS, HOUSE_SPECS, inputs
-from tests.western.test_other_chart_schools_transports import (
-    test_specialized_facts_across_three_real_surfaces as check_surfaces,
+from tests.unit_test.fixtures.house_system import HOUSE_CODE_SPECS as CODE_SPECS
+from tests.unit_test.fixtures.house_system import HOUSE_SYSTEM_SPECS as HOUSE_SPECS
+from tests.unit_test.fixtures.house_system import house_system_payload as inputs
+from tests.unit_test.fixtures.western_event_cases import CANDIDATE, QUESTION
+from tests.unit_test.fixtures.western_natal import GREENWICH_EQUINOX_BIRTH as BIRTH
+from tests.unit_test.fixtures.western_specialty import (
+    assert_specialized_facts_across_surfaces,
 )
-from tests.western.test_western_accuracy import BIRTH
-from tests.western.test_western_election import CANDIDATE
-from tests.western.test_western_horary import QUESTION
 
 
 @pytest.mark.parametrize(
@@ -67,32 +73,32 @@ from tests.western.test_western_horary import QUESTION
         ("Venus", "Aquarius", "no_major_dignity"),
     ],
 )
-def test_classical_dignities(planet, sign, expected):
+def test_classical_dignities(planet: str, sign: str, expected: str) -> None:
     result = _essential_dignity(planet, sign)
     assert result is not None
     assert result["dignity"] == expected
 
 
 @pytest.mark.parametrize("planet", ["Uranus", "Neptune", "Pluto", "North Node"])
-def test_non_classical_bodies_have_no_dignity(planet):
+def test_non_classical_bodies_have_no_dignity(planet: str) -> None:
     assert _essential_dignity(planet, "Aquarius") is None
 
 
-def test_status_zh_labels():
+def test_status_zh_labels() -> None:
     assert _essential_dignity("Mars", "Libra")["status_zh"] == "陷"
     assert _essential_dignity("Sun", "Leo")["status_zh"] == "庙"
     assert _essential_dignity("Sun", "Aries")["status_zh"] == "旺"
     assert _essential_dignity("Mars", "Cancer")["status_zh"] == "弱"
 
 
-def test_opposite_sign():
+def test_opposite_sign() -> None:
     assert _opposite_sign("Aries") == "Libra"
     assert _opposite_sign("Libra") == "Aries"
     assert _opposite_sign("Pisces") == "Virgo"
 
 
 @pytest.mark.skipif(runtime.swe is None, reason="Swiss Ephemeris required")
-def test_e_and_a_have_identical_native_cusps_on_the_predeclared_grid():
+def test_e_and_a_have_identical_native_cusps_on_the_predeclared_grid() -> None:
     count = 0
     for armc, lat, eps in itertools.product(
         range(0, 360, 30), [-55, -25, 0, 25, 55], [0, 23.4, 30]
@@ -104,7 +110,7 @@ def test_e_and_a_have_identical_native_cusps_on_the_predeclared_grid():
     assert count == 180
 
 
-def test_last_house_does_not_round_up_at_the_wrapped_first_cusp():
+def test_last_house_does_not_round_up_at_the_wrapped_first_cusp() -> None:
     cusps = [(60.0 + i * 30) % 360 for i in range(12)]
     assert (
         _house_for_longitude(math.nextafter(60.0, -math.inf), 60.0, "whole_sign", cusps)
@@ -114,7 +120,9 @@ def test_last_house_does_not_round_up_at_the_wrapped_first_cusp():
 
 
 @pytest.mark.parametrize("origin", [0.0, 30.0, 60.0, 215.12345])
-def test_every_cusp_matches_independent_circular_interval_membership(origin):
+def test_every_cusp_matches_independent_circular_interval_membership(
+    origin: float,
+) -> None:
     cusps = [(origin + i * 30) % 360 for i in range(12)]
     for edge in cusps:
         for probe in [
@@ -128,11 +136,13 @@ def test_every_cusp_matches_independent_circular_interval_membership(origin):
                 offset = (F(probe) - F(start)) % 360
                 if offset < width:
                     matches.append(i + 1)
+                else:
+                    pass
             assert len(matches) == 1
             assert _house_for_longitude(probe, origin, "equal", cusps) == matches[0]
 
 
-def test_equal_house_fallback_also_retains_both_sides_of_every_edge():
+def test_equal_house_fallback_also_retains_both_sides_of_every_edge() -> None:
     ascendant = 60.0
     for i in range(12):
         edge = (ascendant + 30 * i) % 360
@@ -147,12 +157,12 @@ def test_equal_house_fallback_also_retains_both_sides_of_every_edge():
         )
 
 
-def test_whole_sign_fallback_handles_negative_wrap_without_rounding_to_zero():
+def test_whole_sign_fallback_handles_negative_wrap_without_rounding_to_zero() -> None:
     assert _house_for_longitude(math.nextafter(0.0, -math.inf), 0.0, "whole_sign") == 12
     assert _house_for_longitude(0.0, 0.0, "whole_sign") == 1
 
 
-def test_nonfinite_geometry_is_rejected_explicitly():
+def test_nonfinite_geometry_is_rejected_explicitly() -> None:
     for invalid in [math.nan, math.inf, -math.inf]:
         invalid_cusps = [invalid, *[float(i * 30) for i in range(1, 12)]]
         for args in [
@@ -165,8 +175,8 @@ def test_nonfinite_geometry_is_rejected_explicitly():
 
 
 def test_all_selector_endpoints_reject_invalid_input_before_any_calculation(
-    monkeypatch, tmp_path, capsys
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -177,15 +187,15 @@ def test_all_selector_endpoints_reject_invalid_input_before_any_calculation(
     def forbidden(*args, **kwargs):
         raise AssertionError("invalid house selection reached calculation")
 
-    monkeypatch.setattr("fatebridge.transports.rest.execute_tool", forbidden)
-    monkeypatch.setattr("fatebridge.transports.mcp.execute_tool", forbidden)
+    monkeypatch.setattr(api, "execute_tool", forbidden)
+    monkeypatch.setattr("fatebridge.mcp_server.execute_tool", forbidden)
     monkeypatch.setattr(cli, "execute_tool", forbidden)
     rest = TestClient(api.app)
     seen = []
 
     async def run():
         async with Client(create_mcp_app()) as client:
-            available_tools = {tool.name for tool in await client.list_tools()}
+            available_tools = set(await discover_capabilities(client))
             for field, specs, issue_code in (
                 ("house_system", HOUSE_SPECS, "invalid_house_system"),
                 ("hsys", CODE_SPECS, "invalid_house_code"),
@@ -198,6 +208,8 @@ def test_all_selector_endpoints_reject_invalid_input_before_any_calculation(
                         response = rest.post(spec.rest_path, json=body)
                         assert response.status_code == 422, spec.key
                         results.append(response.json())
+                    else:
+                        pass
                     path = tmp_path / f"{field}-{spec.key}.json"
                     path.write_text(json.dumps(body))
                     capsys.readouterr()
@@ -225,21 +237,28 @@ def test_all_selector_endpoints_reject_invalid_input_before_any_calculation(
                         ), spec.key
                     if spec.mcp_name is not None:
                         assert spec.tool_name in available_tools
-                        native = await client.call_tool(
-                            spec.tool_name, body, raise_on_error=False
+                        native = await call_calculation(
+                            client, spec.tool_name, body, raise_on_error=False
                         )
                         assert native.is_error, spec.key
-                        results.append(json.loads(native.content[0].text))
+                        results.append(native.structured_content)
                     else:
                         # Retain the REST/CLI case; a REST-only compatibility
                         # alias must not be tested as an invented MCP tool.
                         assert spec.tool_name not in available_tools
                     assert results, spec.key
                     for result in results:
-                        assert result["issues"][0] == {
-                            "path": field,
-                            "code": issue_code,
-                        }, (spec.key, result)
+                        issue = result["issues"][0]
+                        expected = {"path": field, "code": issue_code}
+                        if "message" in issue:
+                            expected["message"] = (
+                                INVALID_HOUSE_SYSTEM_MESSAGE
+                                if field == "house_system"
+                                else INVALID_HOUSE_CODE_MESSAGE
+                            )
+                        else:
+                            pass
+                        assert issue == expected, (spec.key, result)
                         assert (
                             result["retryable"] is False
                             and "run_metadata" not in result
@@ -259,11 +278,16 @@ def test_all_selector_endpoints_reject_invalid_input_before_any_calculation(
 )
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_native_meridian_cusps_across_three_surfaces(
-    monkeypatch, capsys, tmp_path, key, variant, zodiacal
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+    key: str,
+    variant: str | None,
+    zodiacal: int,
+) -> None:
     spec = next(row for row in CATALOG if row.key == "astro_germany")
     card = evidence_views(spec)["meridian_houses"]
-    check_surfaces(
+    assert_specialized_facts_across_surfaces(
         monkeypatch,
         capsys,
         tmp_path,
@@ -274,7 +298,9 @@ def test_native_meridian_cusps_across_three_surfaces(
     )
 
 
-def test_offline_geometry_policy_does_not_invent_a_tt_epoch(monkeypatch):
+def test_offline_geometry_policy_does_not_invent_a_tt_epoch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(runtime, "swe", None)
     policy = apparent_position_policy(
         None,
@@ -287,7 +313,7 @@ def test_offline_geometry_policy_does_not_invent_a_tt_epoch(monkeypatch):
     assert not policy["observational_accuracy_certified"]
 
 
-def test_available_native_backend_rejects_an_unknown_tt():
+def test_available_native_backend_rejects_an_unknown_tt() -> None:
     assert runtime.swe is not None
     with pytest.raises(EphemerisSourceError) as error:
         apparent_position_policy(None, {"Mercury": "swieph"}, PhysicalEphemerisTrace())
@@ -295,7 +321,7 @@ def test_available_native_backend_rejects_an_unknown_tt():
 
 
 @pytest.mark.parametrize("separation", range(0, 360, 45))
-def test_hard_angles_keep_full_circle_identity(separation):
+def test_hard_angles_keep_full_circle_identity(separation) -> None:
     # Rudolph 1979 laws 13/16 specify the angle classes, not these numerical
     # examples or our one-degree inclusive tolerance.
     result = midpoint_geometry({"A": 0.0, "B": float(separation)}, orb_degrees=0)
@@ -310,12 +336,14 @@ def test_hard_angles_keep_full_circle_identity(separation):
             assert row["aspect_degrees"] == min(separation, 360 - separation)
             assert row["separation_degrees"] == min(separation, 360 - separation)
             assert row["rule_id"] == "hamburg.two_factor_hard_contacts.v1"
+        else:
+            pass
     # The same pair in two dials is still one pair, not two independent facts.
     assert result["unique_two_factor_pair_count"] == 1
 
 
 @pytest.mark.parametrize("period", [90, 45])
-def test_two_factor_orb_boundaries_use_unrounded_inputs(period):
+def test_two_factor_orb_boundaries_use_unrounded_inputs(period: int) -> None:
     for center in range(0, 361, 45):
         for sign in (-1, 1):
             boundary = float(center + sign)
@@ -338,10 +366,12 @@ def test_two_factor_orb_boundaries_use_unrounded_inputs(period):
                         center % 360, (-center) % 360
                     )
                     assert contacts[0]["orb"] <= 1
+                else:
+                    pass
 
 
 @pytest.mark.parametrize("seed,size", [(13981, 9), (68219, 22)])
-def test_two_factor_set_against_independent_trigonometry(seed, size):
+def test_two_factor_set_against_independent_trigonometry(seed: int, size: int) -> None:
     rng = random.Random(seed)
     points = {f"P{i:02}": rng.uniform(-400, 700) for i in range(size)}
     result = midpoint_geometry(points)
@@ -353,6 +383,8 @@ def test_two_factor_set_against_independent_trigonometry(seed, size):
             signed = math.atan2(math.sin(phi), math.cos(phi)) * period / (2 * math.pi)
             if abs(signed) <= 1:
                 expected[a, b] = signed
+            else:
+                pass
         rows = result["dials"][str(period)]["two_factor_contacts"]
         actual = {(row["id_a"], row["id_b"]): row for row in rows}
         assert len(actual) == len(rows)  # No reversed pairs or self-pair hits.
@@ -368,7 +400,7 @@ def test_two_factor_set_against_independent_trigonometry(seed, size):
     assert result["unique_two_factor_pair_count"] == len(union)
 
 
-def test_two_factor_pairs_are_order_and_common_rotation_invariant():
+def test_two_factor_pairs_are_order_and_common_rotation_invariant() -> None:
     points = {"Sun": 350.0, "Cupido": 35.125, "Midheaven": 80.5, "Aries Point": 0.0}
     first = midpoint_geometry(points)
     reordered = midpoint_geometry(dict(reversed(list(points.items()))))
@@ -380,7 +412,7 @@ def test_two_factor_pairs_are_order_and_common_rotation_invariant():
         assert contacts == rotated["dials"][period]["two_factor_contacts"]
 
 
-def test_empty_and_single_factor_catalogues_cannot_inflate_contact_counts():
+def test_empty_and_single_factor_catalogues_cannot_inflate_contact_counts() -> None:
     for points in ({}, {"A": 0.0}):
         result = midpoint_geometry(points)
         assert result["unique_two_factor_pair_count"] == 0
@@ -391,7 +423,7 @@ def test_empty_and_single_factor_catalogues_cannot_inflate_contact_counts():
 
 
 @pytest.mark.skipif(runtime.swe is None, reason="Swiss Ephemeris required")
-def test_native_two_factor_layer_covers_all_factors_without_invented_readings():
+def test_native_two_factor_layer_covers_all_factors_without_invented_readings() -> None:
     layer = calculate_germany_chart_analysis(**astro_payload())["midpoint_analysis"]
     assert layer["ruleset_id"] == "hamburg_midpoint_geometry_v3"
     assert layer["version"] == "3"
@@ -431,7 +463,9 @@ def test_native_two_factor_layer_covers_all_factors_without_invented_readings():
     "key",
     ["astro_chart", "astro_chart13", "astro_hellen", "astro_india", "astro_germany"],
 )
-def test_published_motion_card_reads_conditions_with_instantaneous_evidence(key, rest):
+def test_published_motion_card_reads_conditions_with_instantaneous_evidence(
+    key: str, rest
+) -> None:
     spec = SPECS[key]
     card = evidence_views(spec)["aspect_motion"]
     response = rest.post(
@@ -459,8 +493,8 @@ def test_published_motion_card_reads_conditions_with_instantaneous_evidence(key,
 @pytest.mark.parametrize("key", ["astro_chart", "astro_hellen", "astro_india"])
 @pytest.mark.parametrize("project", [False, True])
 def test_motion_facts_and_limits_agree_across_rest_native_mcp_and_cli(
-    key, project, surface_calls
-):
+    key: str, project: bool, surface_calls
+) -> None:
     spec = SPECS[key]
     fields = [
         "classical_patterns.aspect_motion",
@@ -487,6 +521,8 @@ def test_motion_facts_and_limits_agree_across_rest_native_mcp_and_cli(
             "strict_fields": True,
             "include_snapshot_text": False,
         }
+    else:
+        pass
     response, protocol, code, local = surface_calls(
         spec, BIRTH, params=query, options=protocol_flags, flags=flags
     )
@@ -506,6 +542,8 @@ def test_motion_facts_and_limits_agree_across_rest_native_mcp_and_cli(
         if project:
             assert "snapshot_text" not in result
             continue
+        else:
+            pass
         planets = {p["id"]: p for p in result["planets"]}
         for row in patterns["aspect_motion"]:
             # Only relative speed is needed by the independent gap derivative.
@@ -528,8 +566,14 @@ def test_motion_facts_and_limits_agree_across_rest_native_mcp_and_cli(
     ],
 )
 def test_julian_and_gregorian_same_instant_on_rest_native_mcp_cli(
-    tool, prefix, body, inputs, rest, tmp_path, capsys
-):
+    tool: str,
+    prefix: str,
+    body: str,
+    inputs,
+    rest,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     spec = SPECS[tool]
     original = {
         **inputs,
@@ -550,14 +594,14 @@ def test_julian_and_gregorian_same_instant_on_rest_native_mcp_cli(
             "horary.ascendant.longitude",
             "horary.planets.Sun.longitude",
             "horary.moon.sign",
-            "horary.verdict",
+            "horary.perfection.status",
         ]
         if tool == "astro_horary"
         else [
             "election.axes",
             "election.moon.longitude",
-            "election.score",
-            "election.verdict",
+            "election.factors",
+            "election.unresolved_factors",
         ]
     )
     params = [("fields", f) for f in fields] + [
@@ -639,8 +683,15 @@ def test_julian_and_gregorian_same_instant_on_rest_native_mcp_cli(
     ],
 )
 def test_calendar_faults_are_rejected_consistently_before_calculation(
-    tool, prefix, inputs, calendar, year, month, day, surface_calls
-):
+    tool: str,
+    prefix: str,
+    inputs,
+    calendar: str,
+    year: int,
+    month: int,
+    day: int,
+    surface_calls,
+) -> None:
     spec = SPECS[tool]
     payload = {
         **inputs,
@@ -658,8 +709,8 @@ def test_calendar_faults_are_rejected_consistently_before_calculation(
 @pytest.mark.parametrize("house", ["R", "E", "N"])
 @pytest.mark.parametrize("zodiac", ["Tropic", "Sidereal"])
 def test_unresolved_physical_reference_is_not_a_confirmed_fact_on_any_adapter(
-    key, house, zodiac, tmp_path, surface_calls
-):
+    key: str, house: str, zodiac: str, tmp_path: Path, surface_calls
+) -> None:
     prefix = "question" if key == "astro_horary" else "candidate"
     root = "horary" if key == "astro_horary" else "election"
     payload = {
@@ -675,19 +726,41 @@ def test_unresolved_physical_reference_is_not_a_confirmed_fact_on_any_adapter(
         "zodiac_type": zodiac,
     }
     spec = SPECS[key]
-    # Full JSON validates all nested facts, not a stubbed domain calculation.
-    http, protocol, code, cli = surface_calls(
-        spec,
-        payload,
-        params={"response_char_limit": 0},
-        flags=["--response-char-limit", "0"],
-    )
-    assert http.status_code == 200 and code == 0 and not protocol.is_error
-    values = [http.json(), cli, json.loads(protocol.content[0].text)]
-    assert business(values[0]) == business(values[1]) == business(values[2])
-    for index, value in enumerate(values):
-        spec.output_model.model_validate(value)
-        Draft202012Validator(spec.output_model.model_json_schema()).validate(value)
+    schema = Draft202012Validator(spec.output_model.model_json_schema())
+
+    def validated_surfaces(site_payload):
+        http, protocol, code, cli = surface_calls(
+            spec,
+            site_payload,
+            params={"response_char_limit": 0},
+            flags=["--response-char-limit", "0"],
+        )
+        assert http.status_code == 200 and code == 0 and not protocol.is_error
+        values = [http.json(), cli, protocol.structured_content]
+        assert business(values[0]) == business(values[1]) == business(values[2])
+        for value in values:
+            spec.output_model.model_validate(value)
+            schema.validate(value)
+        return values
+
+    # R59 Swiss/SOFA intersection reference for the original north site.
+    expected_asc = 15.277715051457369 if zodiac == "Tropic" else 351.42449256526294
+    for value in validated_surfaces(payload):
+        facts = value[root]
+        definition = facts["calculation_basis"]["angle_definition"]
+        assert definition["status"] == "ecliptic_horizon_ill_conditioned"
+        assert definition["geometric_ascendant_resolved"] is True
+        asc = facts["ascendant"]["longitude"]
+        assert asc is not None
+        assert abs(math.remainder(asc - expected_asc, 360)) * 3600 <= 1
+
+    # R59 independent-null-north, using the same UTC epoch and angle model.
+    unresolved_site = {
+        **payload,
+        "longitude": -10.458555984878615,
+        "latitude": 66.5623231709126,
+    }
+    for index, value in enumerate(validated_surfaces(unresolved_site)):
         facts = value[root]
         assert facts["ascendant"]["longitude"] is None
         assert facts["reference_geometry"]["ascendant_resolved"] is False
@@ -704,7 +777,5 @@ def test_unresolved_physical_reference_is_not_a_confirmed_fact_on_any_adapter(
             assert facts["perfection"]["event_history"]["status"] == "computed"
             assert facts["rule_profile"]["full_original_text_acceptance"] is False
         else:
-            assert facts["score"] is None and facts["score_bounds"] is not None
             assert facts["axes"]["midheaven_longitude"] is not None
-            assert "非概率区间" in value["summary"]
         (tmp_path / f"{root}-{index}.json").write_text(json.dumps(value))

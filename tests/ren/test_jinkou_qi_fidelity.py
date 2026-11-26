@@ -5,16 +5,22 @@ import hashlib
 import json
 import shutil
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
-from fatebridge.core.output_chinese import JinkouCourse, JinkouQiEvidence
+from fatebridge.core.contracts.output_chinese import JinkouCourse, JinkouQiEvidence
 from fatebridge.core.public_output import same_public_value
 from scripts.ren.audit_jinkou_qi_fidelity import CORPUS, audit, reference
-from tests.ren.test_jinkou_branch_breaks import PAYLOAD, SPEC, course, raw
 from tests.support.transports import AS_OF, business, rest, surface_calls
+from tests.unit_test.fixtures.jinkou_courses import (
+    BRANCH_BREAKS_PAYLOAD,
+    JINKOU_SPEC,
+    branch_breaks_output,
+    jinkou_course,
+)
 
 FAULTS = {
     "basis": "月建子、将神丑相距0支，所选月建条文：建旺；日支午属水，生将神金。",
@@ -24,7 +30,7 @@ FAULTS = {
 }
 
 
-def test_independent_month_day_and_combined_cohorts():
+def test_independent_month_day_and_combined_cohorts() -> None:
     result = audit()
     assert result["month_matrix_count"] == result["day_matrix_count"] == 144
     assert result["combined_count"] == 1728 and result["finite_facts_passed"]
@@ -36,7 +42,9 @@ def test_independent_month_day_and_combined_cohorts():
 
 
 @pytest.mark.parametrize("change", ["page", "reference", "joint"])
-def test_original_reading_cannot_be_rewritten_with_its_manifest(tmp_path, change):
+def test_original_reading_cannot_be_rewritten_with_its_manifest(
+    tmp_path: Path, change: str
+) -> None:
     target = tmp_path / "qi"
     shutil.copytree(CORPUS, target)
     name = "page-112.jpg" if change == "page" else "reference.json"
@@ -46,6 +54,8 @@ def test_original_reading_cannot_be_rewritten_with_its_manifest(tmp_path, change
         manifest = json.loads((target / "freeze.json").read_text())
         manifest[name] = hashlib.sha256(path.read_bytes()).hexdigest()
         (target / "freeze.json").write_text(json.dumps(manifest))
+    else:
+        pass
     with pytest.raises(ValueError, match="Frozen qi reference"):
         reference(target)
 
@@ -61,7 +71,7 @@ def test_original_reading_cannot_be_rewritten_with_its_manifest(tmp_path, change
         {"month_offset": 3, "month_qi_label": None},
     ],
 )
-def test_sparse_views_keep_omitted_or_unknown_facts(value):
+def test_sparse_views_keep_omitted_or_unknown_facts(value) -> None:
     assert (
         JinkouQiEvidence.model_validate(value).model_dump(exclude_unset=True) == value
     )
@@ -95,17 +105,17 @@ def test_sparse_views_keep_omitted_or_unknown_facts(value):
         {"jiangshen_branch": None, "jiangshen_element": "水"},
     ],
 )
-def test_sparse_views_reject_only_present_contradictions(value):
+def test_sparse_views_reject_only_present_contradictions(value) -> None:
     with pytest.raises(ValidationError):
         JinkouQiEvidence.model_validate(value)
 
 
 @pytest.mark.parametrize("key", list(FAULTS))
-def test_trace_only_views_check_own_text_metadata_and_computed_anchors(key):
+def test_trace_only_views_check_own_text_metadata_and_computed_anchors(key) -> None:
     trace = copy.deepcopy(
         next(
             t
-            for t in raw()["jinkou"]["rule_trace"]
+            for t in branch_breaks_output()["jinkou"]["rule_trace"]
             if t["rule_id"] == "jinkou.month_day_qi"
         )
     )
@@ -113,31 +123,37 @@ def test_trace_only_views_check_own_text_metadata_and_computed_anchors(key):
     with pytest.raises(ValidationError):
         JinkouCourse.model_validate(dict(rule_trace=[trace]))
     if key in ("source_url", "source_section"):
-        trace["result"][key] = raw()["jinkou"]["qi_evidence"][key]
+        trace["result"][key] = branch_breaks_output()["jinkou"]["qi_evidence"][key]
         trace[key] = FAULTS[key]
         with pytest.raises(ValidationError):
             JinkouCourse.model_validate(dict(rule_trace=[trace]))
+    else:
+        pass
 
 
 @pytest.mark.parametrize("role", ["primary", "natal_course", "year_fate"])
 @pytest.mark.parametrize("project", [False, True])
 @pytest.mark.parametrize("key", list(FAULTS))
 def test_wrong_deterministic_text_is_rejected_before_projection_on_three_ports(
-    role, project, key, monkeypatch, surface_calls
-):
-    bad = copy.deepcopy(raw())
-    board = course(bad, role)
+    role: str, project: bool, key, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
+    bad = copy.deepcopy(branch_breaks_output())
+    board = jinkou_course(bad, role)
     board["qi_evidence"][key] = FAULTS[key]
     for trace in board["rule_trace"]:
         if trace["rule_id"] == "jinkou.month_day_qi":
             trace["result"][key] = FAULTS[key]
+        else:
+            pass
     with pytest.raises(execution.OutputContractError):
-        execution.validate_output(SPEC, bad)
+        execution.validate_output(JINKOU_SPEC, bad)
     original = execution.execute_spec
 
     def broken(spec, request):
         if spec.key == "jinkou":
             spec = replace(spec, bind=lambda _: (lambda: copy.deepcopy(bad), (), {}))
+        else:
+            pass
         return original(spec, request)
 
     monkeypatch.setattr(execution, "execute_spec", broken)
@@ -147,15 +163,24 @@ def test_wrong_deterministic_text_is_rejected_before_projection_on_three_ports(
         params.update(fields="analysis_type", strict_fields="true")
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
         options = dict(fields=["analysis_type"], strict_fields=True)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
-        SPEC, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
+        JINKOU_SPEC,
+        BRANCH_BREAKS_PAYLOAD,
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
     )
     assert http.status_code == 500 and protocol.is_error and code == 1
     assert cli["error_code"] == "internal_error"
 
 
 @pytest.mark.parametrize("project", [False, True])
-def test_valid_unchanged_qi_is_preserved_across_three_ports(project, surface_calls):
+def test_valid_unchanged_qi_is_preserved_across_three_ports(
+    project: bool, surface_calls
+) -> None:
     fields = [
         "jinkou.qi_evidence",
         "jinkou.natal_course.course.qi_evidence",
@@ -177,8 +202,15 @@ def test_valid_unchanged_qi_is_preserved_across_three_ports(project, surface_cal
             "false",
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
-        SPEC, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
+        JINKOU_SPEC,
+        BRANCH_BREAKS_PAYLOAD,
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     assert (
@@ -187,11 +219,14 @@ def test_valid_unchanged_qi_is_preserved_across_three_ports(project, surface_cal
     for body in (http.json(), cli, protocol.structured_content):
         for role in ("primary", "natal_course", "year_fate"):
             assert same_public_value(
-                course(body, role)["qi_evidence"], course(raw(), role)["qi_evidence"]
+                jinkou_course(body, role)["qi_evidence"],
+                jinkou_course(branch_breaks_output(), role)["qi_evidence"],
             )
 
 
-def test_shared_helper_cannot_be_its_own_independent_month_oracle(monkeypatch):
+def test_shared_helper_cannot_be_its_own_independent_month_oracle(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.core.metaphysics.jinkou_qi as production
 
     original = production.month_qi_facts

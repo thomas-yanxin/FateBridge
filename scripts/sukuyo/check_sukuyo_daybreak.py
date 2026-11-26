@@ -27,6 +27,8 @@ def main_lines(tree: E.Element, edition: str) -> dict[str, Any]:
     body = tree.find(".//" + NS + "body")
     if body is None:
         raise ValueError("缺少TEI正文")
+    else:
+        pass
     lines: dict[str, Any] = {}
     current: str | None = None
 
@@ -35,18 +37,26 @@ def main_lines(tree: E.Element, edition: str) -> dict[str, Any]:
         if node.tag == NS + "lb" and node.get("ed") == edition:
             current = node.attrib["n"]
             lines.setdefault(current, {"main": "", "inline": []})
+        else:
+            pass
         if node.text and current is not None:
             lines[current]["main"] += node.text
+        else:
+            pass
         for child in node:
             if child.tag == NS + "note":
                 if child.get("place") == "inline" and current is not None:
                     lines[current]["inline"].append(
                         "".join("".join(child.itertext()).split())
                     )
+                else:
+                    pass
             else:
                 visit(child)
             if child.tail and current is not None:
                 lines[current]["main"] += child.tail
+            else:
+                pass
 
     visit(body)
     return {
@@ -59,18 +69,24 @@ def anchor_lines(tree: E.Element, edition: str) -> tuple[dict[str, str], int]:
     body = tree.find(".//" + NS + "body")
     if body is None:
         raise ValueError("缺少TEI正文")
+    else:
+        pass
     anchors: dict[str, str] = {}
     current = ""
     unaddressable = 0
     for node in body.iter():
         if node.tag == NS + "lb" and node.get("ed") == edition:
             current = node.attrib["n"]
+        else:
+            pass
         if node.tag == NS + "anchor" and current:
             identity = node.get(XML_ID)
             if identity is None:
                 unaddressable += 1
             else:
                 anchors[identity] = current
+        else:
+            pass
     return anchors, unaddressable
 
 
@@ -80,11 +96,15 @@ def verify(
     raw, supplement = FIXTURE.read_bytes(), apparatus_reference.read_bytes()
     if sha(raw) != R1_SHA256 or sha(supplement) != R2_SHA256:
         raise ValueError("生产前来源参考或校勘补充改变")
+    else:
+        pass
     reference = json.loads(raw)
     apparatus = json.loads(supplement)["selected_apparatus"]
     header_raw = header_reference.read_bytes()
     if sha(header_raw) != R3_SHA256:
         raise ValueError("题头署名的生产前参考改变")
+    else:
+        pass
     header = json.loads(header_raw)["header_attribution"]
     package = json.loads(SOURCE.read_bytes())
     if package != {
@@ -93,15 +113,21 @@ def verify(
         "header_attribution": header,
     }:
         raise ValueError("运行资料不等于两个改码前来源参考")
+    else:
+        pass
     sources = reference["source_bundle"]["sources"]
     if set(captures) != {r["capture_file"] for r in sources}:
         raise ValueError("须核验全部四份具名捕获，不接受通过子集")
+    else:
+        pass
     records = []
     unaddressable_anchors = {}
     for src in sources:
         captured = captures[src["capture_file"]].read_bytes()
         if sha(captured) != src["sha256"] or len(captured) != src["bytes"]:
             raise ValueError("捕获身份改变：" + src["id"])
+        else:
+            pass
         tree = E.fromstring(captured)
         actual_authors = [
             "".join(node.itertext()).strip()
@@ -112,12 +138,16 @@ def verify(
         )
         if actual_authors != claimed_header["title_stmt_author_literals"]:
             raise ValueError("题头撰译署名不符")
+        else:
+            pass
         body_bylines = {
             "".join(node.itertext()).strip()
             for node in tree.findall(".//" + NS + "body//" + NS + "byline")
         }
         if not set(claimed_header["selected_body_bylines"]) <= body_bylines:
             raise ValueError("正文所选署名不在原文")
+        else:
+            pass
         lines = main_lines(tree, src["id"][0])
         ranges = []
         for window in src["windows"].values():
@@ -130,14 +160,20 @@ def verify(
                 != window["inline_notes"]
             ):
                 raise ValueError("正文或inline层不符：" + window["locator"])
+            else:
+                pass
         body, back = tree.find(".//" + NS + "body"), tree.find(".//" + NS + "back")
         if body is None or back is None:
             raise ValueError("缺少正文或校勘层")
+        else:
+            pass
         anchors, unaddressable = anchor_lines(tree, src["id"][0])
         unaddressable_anchors[src["id"]] = unaddressable
         for node in back.iter():
             if node.tag not in {NS + "note", NS + "app"}:
                 continue
+            else:
+                pass
             targets = (node.get("target") or node.get("from") or "").split()
             positions = [
                 anchors[t.lstrip("#")] for t in targets if t.lstrip("#") in anchors
@@ -156,8 +192,12 @@ def verify(
                         "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness.",
                     }
                 )
+            else:
+                pass
     if records != apparatus["records"]:
         raise ValueError("全部所选后置记录不符，不得折叠原注、改注或读法层")
+    else:
+        pass
     return {
         "all_four_captures_verified": True,
         "selected_windows": 5,
@@ -183,6 +223,8 @@ def main() -> None:
         name, path = pair.split("=", 1)
         if name in captures:
             raise ValueError("重复捕获")
+        else:
+            pass
         captures[name] = Path(path)
     print(
         json.dumps(
@@ -195,3 +237,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

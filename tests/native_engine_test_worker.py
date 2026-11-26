@@ -16,4 +16,16 @@ native_execution._WORKER_ACTIVE = True
 
 import pytest  # noqa: E402
 
-raise SystemExit(pytest.main([sys.argv[1], "-q", "--override-ini=addopts="]))
+raise SystemExit(
+    pytest.main(
+        [
+            sys.argv[1],
+            "-q",
+            "--override-ini=addopts=",
+            "-p",
+            "no:cacheprovider",
+            "-p",
+            "no:xdist",
+        ]
+    )
+)

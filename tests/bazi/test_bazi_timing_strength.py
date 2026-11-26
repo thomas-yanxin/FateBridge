@@ -6,8 +6,8 @@ from fractions import Fraction
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.core.contracts.output_timing import TimingInteractions
 from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.output_timing import TimingInteractions
 from fatebridge.core.timing_interactions import analyze_timing_interactions
 from fatebridge.core.timing_strength import StrengthProjectionBaseline
 
@@ -46,7 +46,9 @@ def mass(layer, element):
     )
 
 
-def test_clash_uses_original_month_budget_and_does_not_add_time_fire_to_natal_energy():
+def test_clash_uses_original_month_budget_and_does_not_add_time_fire_to_natal_energy() -> (
+    None
+):
     result, a = calculate("子子子子", {"liunian": {"stem": "庚", "branch": "午"}})
     layer = result["layers"][0]
     assert layer["status"] == "projected"
@@ -67,7 +69,7 @@ def test_clash_uses_original_month_budget_and_does_not_add_time_fire_to_natal_en
     assert result["baseline"]["parameters"] == a["parameters"]
 
 
-def test_existing_self_punishment_and_new_clash_do_not_multiply_retention():
+def test_existing_self_punishment_and_new_clash_do_not_multiply_retention() -> None:
     result, a = calculate("午午午午", {"dayun": {"stem": "壬", "branch": "子"}})
     layer = result["layers"][0]
     assert layer["status"] == "projected"
@@ -76,7 +78,9 @@ def test_existing_self_punishment_and_new_clash_do_not_multiply_retention():
     assert layer["energies_exact"] == a["threshold_arithmetic"]["energies_exact"]
 
 
-def test_complete_zi_mao_punishment_retains_nine_tenths_once_per_physical_root():
+def test_complete_zi_mao_punishment_retains_nine_tenths_once_per_physical_root() -> (
+    None
+):
     result, _ = calculate("卯卯卯卯", {"liunian": {"stem": "壬", "branch": "子"}})
     row = result["layers"][0]
     assert row["status"] == "projected"
@@ -84,15 +88,19 @@ def test_complete_zi_mao_punishment_retains_nine_tenths_once_per_physical_root()
     assert mass(row, "木") == 9
 
 
-def test_two_branch_punishment_fragment_and_harm_do_not_mechanically_remove_roots():
+def test_two_branch_punishment_fragment_and_harm_do_not_mechanically_remove_roots() -> (
+    None
+):
     result, a = calculate("寅寅寅寅", {"liunian": {"stem": "丁", "branch": "巳"}})
     row = result["layers"][0]
     assert row["status"] == "projected" and row["effect_relation_ids"] == []
     assert row["energies_exact"] == a["threshold_arithmetic"]["energies_exact"]
 
 
-def test_original_fragment_fixture_now_retains_its_unresolved_repeated_stem_match():
-    # Preserve the original 己巳 control: its four甲 partners include the day
+def test_original_fragment_fixture_now_retains_its_unresolved_repeated_stem_match() -> (
+    None
+):
+    # Preserve the original 己巳 control -> None: its four甲 partners include the day
     # stem, so the new combined-budget scope cannot choose a binding winner.
     result, _ = calculate("寅寅寅寅", {"liunian": {"stem": "己", "branch": "巳"}})
     row = result["layers"][0]
@@ -109,7 +117,9 @@ def test_original_fragment_fixture_now_retains_its_unresolved_repeated_stem_matc
     )
 
 
-def test_completed_earth_punishment_cannot_override_existing_stronger_water_loss():
+def test_completed_earth_punishment_cannot_override_existing_stronger_water_loss() -> (
+    None
+):
     result, a = calculate("丑未丑未", {"liunian": {"stem": "戊", "branch": "戌"}})
     row = result["layers"][0]
     assert row["status"] == "projected" and row["effect_relation_ids"]
@@ -117,7 +127,9 @@ def test_completed_earth_punishment_cannot_override_existing_stronger_water_loss
     assert row["energies_exact"] == a["threshold_arithmetic"]["energies_exact"]
 
 
-def test_storage_movement_keeps_earth_and_reduces_only_water_beyond_old_self_punishment():
+def test_storage_movement_keeps_earth_and_reduces_only_water_beyond_old_self_punishment() -> (
+    None
+):
     result, _ = calculate("辰辰辰辰", {"liunian": {"stem": "甲", "branch": "戌"}})
     layer = result["layers"][0]
     assert layer["status"] == "projected"
@@ -126,7 +138,9 @@ def test_storage_movement_keeps_earth_and_reduces_only_water_beyond_old_self_pun
     assert mass(layer, "水") == Fraction(15, 14)
 
 
-def test_new_time_combination_blocks_numeric_projection_instead_of_claiming_resolution():
+def test_new_time_combination_blocks_numeric_projection_instead_of_claiming_resolution() -> (
+    None
+):
     result, _ = calculate("子子子子", {"liunian": {"stem": "乙", "branch": "丑"}})
     row = result["layers"][0]
     assert row["status"] == "blocked" and row["blocker_relation_ids"]
@@ -134,14 +148,16 @@ def test_new_time_combination_blocks_numeric_projection_instead_of_claiming_reso
     assert row["residual_natal_numerical_label"] is None
 
 
-def test_clash_on_old_combination_blocks_reusing_its_prior_transfer():
+def test_clash_on_old_combination_blocks_reusing_its_prior_transfer() -> None:
     result, _ = calculate("寅午戌子", {"liunian": {"stem": "庚", "branch": "申"}})
     row = result["layers"][0]
     assert row["status"] == "blocked"
     assert any(r.startswith("natal.relations:") for r in row["blocker_relation_ids"])
 
 
-def test_layers_are_separate_and_a_new_wood_branch_does_not_create_a_natal_root():
+def test_layers_are_separate_and_a_new_wood_branch_does_not_create_a_natal_root() -> (
+    None
+):
     first, a = calculate("子子子子", {"dayun": {"stem": "庚", "branch": "午"}})
     both, _ = calculate(
         "子子子子",
@@ -158,7 +174,9 @@ def test_layers_are_separate_and_a_new_wood_branch_does_not_create_a_natal_root(
     )
 
 
-def test_blocked_receipt_cannot_publish_a_force_label_and_projections_stay_optional():
+def test_blocked_receipt_cannot_publish_a_force_label_and_projections_stay_optional() -> (
+    None
+):
     result, _ = calculate("子子子子", {"liunian": {"stem": "乙", "branch": "丑"}})
     result["layers"][0]["residual_natal_numerical_label"] = "强"
     with pytest.raises(ValidationError, match="未解会合"):
@@ -172,7 +190,9 @@ def test_blocked_receipt_cannot_publish_a_force_label_and_projections_stay_optio
     "fault",
     ["negative", "nonfinite", "retention_over_one", "wrong_grade", "wrong_method"],
 )
-def test_present_budget_and_threshold_receipts_cannot_contradict_the_baseline(fault):
+def test_present_budget_and_threshold_receipts_cannot_contradict_the_baseline(
+    fault: str,
+) -> None:
     result, _ = calculate("子子子子", {"liunian": {"stem": "庚", "branch": "午"}})
     row = result["layers"][0]
     if fault == "negative":

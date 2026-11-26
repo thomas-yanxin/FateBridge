@@ -7,9 +7,9 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_winter_error_budget as core
-from fatebridge.validation import guolao_winter_error_budget as audit
-from fatebridge.validation.guolao_modern_solstices import parse_horizons_observer
+from fatebridge.core.guolao import guolao_winter_error_budget as core
+from validation import guolao_winter_error_budget as audit
+from validation.guolao_modern_solstices import parse_horizons_observer
 
 FIXTURES = Path(__file__).parents[1] / "fixtures/guolao-winter-error-budget-v1"
 
@@ -30,7 +30,9 @@ FIXTURES = Path(__file__).parents[1] / "fixtures/guolao-winter-error-budget-v1"
         (399, "365.2422", "0"),
     ],
 )
-def test_original_year_parameter_is_not_successive_winter_interval(n, interval, step):
+def test_original_year_parameter_is_not_successive_winter_interval(
+    n: int, interval: str | None, step: str | None
+) -> None:
     row = core.century_year_diagnostic(n)
     assert row["successive_winter_interval_days_exact"] == (
         str(F(interval)) if interval else None
@@ -44,10 +46,12 @@ def test_original_year_parameter_is_not_successive_winter_interval(n, interval, 
         assert F(row["century_adjustment_from_fixed_base_year_days_exact"]) * 1440 == F(
             "-137.376"
         )
+    else:
+        pass
 
 
 @pytest.mark.parametrize("n", [-1, 400, True, False, 100.0, "100", None])
-def test_diagnostic_does_not_silently_extend_or_coerce_cohort(n):
+def test_diagnostic_does_not_silently_extend_or_coerce_cohort(n) -> None:
     with pytest.raises(ValueError):
         core.century_year_diagnostic(n)
 
@@ -63,7 +67,9 @@ def _synthetic():
     )
 
 
-def test_four_term_attribution_has_independently_specified_signed_clock_and_year_terms():
+def test_four_term_attribution_has_independently_specified_signed_clock_and_year_terms() -> (
+    None
+):
     result = core.shoushi_winter_error_budget(100, **_synthetic())
     terms = result["signed_terms_nominal_days_exact"]
     assert {k: F(v) for k, v in terms.items()} == {
@@ -89,14 +95,16 @@ def test_four_term_attribution_has_independently_specified_signed_clock_and_year
         ("reference_epoch_local_label_serial", F(1), ValueError),
     ],
 )
-def test_mixed_scales_wrong_years_and_implicit_inputs_rejected(key, value, error):
+def test_mixed_scales_wrong_years_and_implicit_inputs_rejected(
+    key: str, value, error
+) -> None:
     arguments = _synthetic()
     arguments[key] = value
     with pytest.raises(error):
         core.shoushi_winter_error_budget(100, **arguments)
 
 
-def test_zero_elapsed_years_cannot_hide_a_different_reference_epoch():
+def test_zero_elapsed_years_cannot_hide_a_different_reference_epoch() -> None:
     args = _synthetic()
     args["reference_tt_jd"] = args["reference_epoch_tt_jd"] + F(".001")
     args["reference_local_label_serial"] = args["reference_epoch_local_label_serial"]
@@ -104,12 +112,14 @@ def test_zero_elapsed_years_cannot_hide_a_different_reference_epoch():
         core.shoushi_winter_error_budget(0, **args)
 
 
-def test_all_raw_requests_replay_the_complete_independent_reference_search():
+def test_all_raw_requests_replay_the_complete_independent_reference_search() -> None:
     source, _ = audit.load_reference()
     manifest = source["raw_reference_file_hashes"]
     for name, wanted in manifest.items():
         if name.endswith(".py"):
             continue  # Raw requests and replies remain the independent evidence.
+        else:
+            pass
         assert (
             hashlib.sha256((FIXTURES / name).read_bytes()).hexdigest() == wanted
         ), name
@@ -159,7 +169,9 @@ def test_all_raw_requests_replay_the_complete_independent_reference_search():
     "mutation",
     ["omit_year", "reorder", "rate", "width", "sign", "clock_time", "fitted"],
 )
-def test_reference_changes_fail_before_comparison(tmp_path, monkeypatch, mutation):
+def test_reference_changes_fail_before_comparison(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mutation: str
+) -> None:
     source = json.loads(audit.DATA.read_bytes())
     if mutation == "omit_year":
         source["cases"].pop(100)
@@ -191,8 +203,8 @@ def test_reference_changes_fail_before_comparison(tmp_path, monkeypatch, mutatio
 
 
 def test_unversioned_reference_edit_is_rejected_by_frozen_release_hash(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     path = tmp_path / "changed.json"
     path.write_bytes(audit.DATA.read_bytes() + b"\n")
     monkeypatch.setattr(audit, "DATA", path)
@@ -200,7 +212,9 @@ def test_unversioned_reference_edit_is_rejected_by_frozen_release_hash(
         audit.load_reference()
 
 
-def test_complete400_year_audit_keeps_all800_clock_hypotheses_and_unrounded_native_roots():
+def test_complete400_year_audit_keeps_all800_clock_hypotheses_and_unrounded_native_roots() -> (
+    None
+):
     result = audit.audit_winter_error_budget()
     assert result["case_count"] == 400
     assert result["historical_through1644_count"] == 365

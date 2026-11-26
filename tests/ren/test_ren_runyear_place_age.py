@@ -7,10 +7,10 @@ from pathlib import Path
 
 import pytest
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    test_nested_fact_faults_are_internal_failures_on_all_surfaces as reject_fault,
-)
 from tests.support.transports import SPECS, business, rest, surface_calls
+from tests.unit_test.fixtures.schema_assertions import (
+    reject_nested_fact_fault as reject_fault,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -23,7 +23,7 @@ REFERENCE = AUDIT.reference()
 CASES = REFERENCE["cases"]
 
 
-def test_entire_precommitted_cohort_keeps_all_failed_input_probes():
+def test_entire_precommitted_cohort_keeps_all_failed_input_probes() -> None:
     report = AUDIT.audit()
     assert (
         report["expected_count"]
@@ -40,7 +40,9 @@ def test_entire_precommitted_cohort_keeps_all_failed_input_probes():
 
 
 @pytest.mark.parametrize("change", ["edit", "missing", "extra"])
-def test_source_inventory_changes_do_not_create_a_pass(tmp_path, change):
+def test_source_inventory_changes_do_not_create_a_pass(
+    tmp_path: Path, change: str
+) -> None:
     corpus = tmp_path / "source"
     shutil.copytree(AUDIT.CORPUS, corpus)
     p = corpus / "reference.json"
@@ -59,8 +61,8 @@ def test_source_inventory_changes_do_not_create_a_pass(tmp_path, change):
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
 @pytest.mark.parametrize("project", [False, True])
 def test_place_inference_errors_and_age_clock_survive_all_three_transports(
-    case, project, surface_calls
-):
+    case, project: bool, surface_calls
+) -> None:
     spec = SPECS["liureng_runyear"]
     fields = ["runyear", "liureng.calendar_policy.civil_instant_utc"]
     params, flags, options = (
@@ -82,6 +84,8 @@ def test_place_inference_errors_and_age_clock_survive_all_three_transports(
             "false",
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec, case["input"], params=params, options=options, flags=flags
     )
@@ -93,6 +97,8 @@ def test_place_inference_errors_and_age_clock_survive_all_three_transports(
             assert expected["error"] in body["error"]
             assert "runyear" not in body
         return
+    else:
+        pass
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     assert business(bodies[0]) == business(bodies[1]) == business(bodies[2])
     for body in bodies:
@@ -108,6 +114,8 @@ def test_place_inference_errors_and_age_clock_survive_all_three_transports(
         assert age["analysis_lunar_year"] - age["birth_lunar_year"] + 1 == run["age"]
         if "analysis_in_age_zone" in expected:
             assert age["analysis_civil_datetime"] == expected["analysis_in_age_zone"]
+        else:
+            pass
         if not project:
             assert f"虚岁参考时区：{clock['timezone']}" in body["snapshot_text"]
             assert (
@@ -115,9 +123,13 @@ def test_place_inference_errors_and_age_clock_survive_all_three_transports(
             )
             if expected.get("assumed"):
                 assert "未核实实际出生时区" in body["snapshot_text"]
+            else:
+                pass
+        else:
+            pass
 
 
-def test_same_physical_analysis_instant_has_same_age_in_two_display_zones():
+def test_same_physical_analysis_instant_has_same_age_in_two_display_zones() -> None:
     utc, tokyo = [AUDIT.calculate(CASES[i]["input"]) for i in (19, 20)]
     assert (
         utc["liureng"]["calendar_policy"]["civil_instant_utc"]
@@ -136,7 +148,7 @@ def test_same_physical_analysis_instant_has_same_age_in_two_display_zones():
     assert utc["runyear"]["age"] == 1
 
 
-def test_age_changes_once_at_birth_zone_lunar_new_year_midnight():
+def test_age_changes_once_at_birth_zone_lunar_new_year_midnight() -> None:
     after, before = [AUDIT.calculate(CASES[i]["input"]) for i in (21, 22)]
     assert before["runyear"]["age"] == 1 and after["runyear"]["age"] == 2
     assert (
@@ -150,7 +162,7 @@ def test_age_changes_once_at_birth_zone_lunar_new_year_midnight():
     )
 
 
-def test_birth_zone_correction_does_not_rebase_analysis_board_or_solar_clock():
+def test_birth_zone_correction_does_not_rebase_analysis_board_or_solar_clock() -> None:
     data = CASES[1]["input"]
     ny = AUDIT.calculate(data)
     tokyo = AUDIT.calculate({**data, "birth_timezone": "Asia/Tokyo"})
@@ -171,6 +183,10 @@ def test_birth_zone_correction_does_not_rebase_analysis_board_or_solar_clock():
     ],
 )
 def test_false_clock_claims_cannot_hide_behind_projection(
-    bad, rest, monkeypatch, tmp_path, capsys
-):
+    bad,
+    rest,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     reject_fault("liureng_runyear", bad, rest, monkeypatch, tmp_path, capsys)

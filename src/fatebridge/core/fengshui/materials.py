@@ -4,20 +4,20 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, cast
+from typing import Any, Dict, Iterable, cast
 
-from .material_application import analyze_application
-from .material_inputs import MaterialShapeFact
-from .workstation_sources import disagreement, provenance
+from fatebridge.core.fengshui.material_application import analyze_application
+from fatebridge.core.fengshui.material_inputs import MaterialShapeFact
+from fatebridge.core.fengshui.workstation_sources import disagreement, provenance
 
 
 @lru_cache(maxsize=1)
-def _bundle() -> Dict[str, Any]:
+def _bundle() -> dict[str, Any]:
     path = Path(__file__).parents[2] / "data/fengshui/material-representations-v1.json"
     return cast(Dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
-def material_reference() -> Dict[str, Any]:
+def material_reference() -> dict[str, Any]:
     data = deepcopy(_bundle())
     return {
         "status": "reference_only",
@@ -36,14 +36,14 @@ def material_reference() -> Dict[str, Any]:
 
 
 def analyze_material_facts(
-    facts: Iterable[MaterialShapeFact], targets: Optional[List[Dict[str, Any]]] = None
-) -> Dict[str, Any]:
+    facts: Iterable[MaterialShapeFact], targets: list[dict[str, Any]] | None = None
+) -> dict[str, Any]:
     data = _bundle()
     reference = material_reference()
     findings = []
     missing = []
     counts = dict(supported=0, confirmed_unsupported=0, unknown=0)
-    trace: List[Dict[str, Any]] = []
+    trace: list[dict[str, Any]] = []
     extra_rules = {}
     for fact in facts:
         path = f"environmental_context.material_facts.{fact.fact_id}"

@@ -9,7 +9,7 @@ import pytest
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
+from validation.human_design import verify_human_design_reading
 
 FIXTURE = Path(__file__).parents[1] / "data/human_design/fractional_leap"
 PLAN = json.loads((FIXTURE / "plan.json").read_text())
@@ -22,7 +22,9 @@ SPEC = next(s for s in CATALOG if s.key == "human_design")
     list(zip(PLAN["cases"], REFERENCE["cases"], strict=True)),
     ids=[r["id"] for r in PLAN["cases"]],
 )
-def test_every_original_input_keeps_label_sofa_axis_and_complete_reading(case, fact):
+def test_every_original_input_keeps_label_sofa_axis_and_complete_reading(
+    case, fact
+) -> None:
     assert case["id"] == fact["id"]
     value = execute_tool(SPEC, SPEC.request_model(**case["input"]))
     assert "error" not in value, value
@@ -36,23 +38,18 @@ def test_every_original_input_keeps_label_sofa_axis_and_complete_reading(case, f
         and time["utc_label_status"] == "inserted_UTC_leap_second"
     )
     assert value["design_solver"]["civil_elapsed_days"] is None
-    error = (
-        abs(
-            Fraction(time["jd_tt"])
-            - Fraction(fact["tt_jd1"])
-            - Fraction(fact["tt_jd2"])
-        )
-        * 86400
-    )
+    sofa_tt = Fraction(fact["tt_jd1"]) + Fraction(fact["tt_jd2"])
+    error = abs(Fraction(time["jd_tt"]) - sofa_tt) * 86400
     assert error <= Fraction(1, 5000)
+    assert time["jd_tt"] == float(sofa_tt)
     check = verify_human_design_reading(value)
     assert check["status"] == "verified_fixed_template_reading", check
 
 
 @pytest.mark.parametrize("offset", ["-0.0000000025", "-0.0002777775"])
 def test_accepted_birth_interval_keeps_exact_nominal_leap_input_and_all_witnesses(
-    offset,
-):
+    offset: str,
+) -> None:
     case = next(
         c
         for c in PLAN["cases"]
@@ -76,8 +73,8 @@ def last_microsecond_run():
     "fault", ["midnight_label", "float_inverse_label", "leap_flag", "midnight_source"]
 )
 def test_fresh_hash_does_not_hide_input_display_alias_or_calendar_changes(
-    last_microsecond_run, fault
-):
+    last_microsecond_run, fault: str
+) -> None:
     value = copy.deepcopy(last_microsecond_run)
     if fault == "midnight_label":
         value["birth_utc"] = "2017-01-01T00:00:00+00:00"

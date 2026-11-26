@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_date_support import local_date_support
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_date_support import local_date_support
 from fatebridge.services.divination import calculate_sukuyo_compatibility
 
 REFERENCE = (
@@ -28,46 +28,50 @@ def epoch_microseconds(text):
     return (delta.days * 86400 + delta.seconds) * 1000000 + delta.microseconds
 
 
-def test_independent_reference_was_frozen_before_the_production_repair():
+def test_independent_reference_was_frozen_before_the_production_repair() -> None:
     assert hashlib.sha256(RAW).hexdigest() == EXPECTED_REFERENCE_SHA256
     assert len(ROWS) == 366
     assert json.loads(RAW)["no_domain_or_production_timezone_parser_imported"]
 
 
-@pytest.mark.parametrize("row", ROWS, ids=lambda row: row["id"])
-def test_all_fixed_offset_preimages_equal_independent_interval_intersections(row):
-    result = local_date_support(
-        row["date"], row["zone"], calendar_offset_hours=row["reference_hours"]
-    )
-    assert result["possible_calendar_dates"] == row["expected_calendar_dates"]
-    assert len(result["utc_support_intervals"]) == len(row["expected_intervals"])
-    for actual, expected in zip(
-        result["utc_support_intervals"], row["expected_intervals"], strict=True
-    ):
-        assert actual["calendar_date"] == expected["calendar_date"]
-        for edge in ("start", "end"):
-            exact = actual.get(edge + "_utc_epoch_microseconds")
-            if exact is None:
-                if edge + "_utc_epoch_seconds" in actual:
-                    exact = actual[edge + "_utc_epoch_seconds"] * 1000000
+def test_all_fixed_offset_preimages_equal_independent_interval_intersections() -> None:
+    for row in ROWS:
+        result = local_date_support(
+            row["date"], row["zone"], calendar_offset_hours=row["reference_hours"]
+        )
+        assert result["possible_calendar_dates"] == row["expected_calendar_dates"]
+        assert len(result["utc_support_intervals"]) == len(row["expected_intervals"])
+        for actual, expected in zip(
+            result["utc_support_intervals"], row["expected_intervals"], strict=True
+        ):
+            assert actual["calendar_date"] == expected["calendar_date"]
+            for edge in ("start", "end"):
+                exact = actual.get(edge + "_utc_epoch_microseconds")
+                if exact is None:
+                    if edge + "_utc_epoch_seconds" in actual:
+                        exact = actual[edge + "_utc_epoch_seconds"] * 1000000
+                    else:
+                        exact = epoch_microseconds(
+                            actual[
+                                edge
+                                + (
+                                    "_utc_inclusive"
+                                    if edge == "start"
+                                    else "_utc_exclusive"
+                                )
+                            ]
+                        )
                 else:
-                    exact = epoch_microseconds(
-                        actual[
-                            edge
-                            + (
-                                "_utc_inclusive"
-                                if edge == "start"
-                                else "_utc_exclusive"
-                            )
-                        ]
-                    )
-            assert int(exact) == expected[edge + "_utc_epoch_microseconds"]
-    assert result["civil_support_seconds"] == 86400
-    assert result["complete_under_loaded_timezone_rules"]
-    assert not result["birth_time_imputed"]
+                    pass
+                assert int(exact) == expected[edge + "_utc_epoch_microseconds"]
+        assert result["civil_support_seconds"] == 86400
+        assert result["complete_under_loaded_timezone_rules"]
+        assert not result["birth_time_imputed"]
 
 
-def test_one_microsecond_before_new_year_cannot_be_dropped_as_a_determined_mansion():
+def test_one_microsecond_before_new_year_cannot_be_dropped_as_a_determined_mansion() -> (
+    None
+):
     result = calendar_mansion("2025-01-29", zone="8.0000000002777778")
     assert result["status"] == "partial" and result["natal_su27"] is None
     assert [row["calendar_date"] for row in result["calendar_candidates"]] == [
@@ -78,7 +82,7 @@ def test_one_microsecond_before_new_year_cannot_be_dropped_as_a_determined_mansi
     assert result["input_datetime"] is None and not result["birth_time_known"]
 
 
-def test_ancient_lower_boundary_keeps_the_one_microsecond_year_zero_branch():
+def test_ancient_lower_boundary_keeps_the_one_microsecond_year_zero_branch() -> None:
     result = calendar_mansion(
         "0001-01-01",
         zone="9.0000000002777778",
@@ -94,7 +98,9 @@ def test_ancient_lower_boundary_keeps_the_one_microsecond_year_zero_branch():
     ]
 
 
-def test_leap_month_overlap_keeps_both_reference_dates_and_every_existing_rule_branch():
+def test_leap_month_overlap_keeps_both_reference_dates_and_every_existing_rule_branch() -> (
+    None
+):
     result = calendar_mansion(
         "0806-07-23",
         zone="9.0000000002777778",
@@ -119,7 +125,9 @@ def test_leap_month_overlap_keeps_both_reference_dates_and_every_existing_rule_b
     )
 
 
-def test_decimal_rounding_policy_is_delivered_even_when_rounding_matches_the_host_zone():
+def test_decimal_rounding_policy_is_delivered_even_when_rounding_matches_the_host_zone() -> (
+    None
+):
     result = calendar_mansion("2025-01-29", zone="8.0000000000000000001")
     assert (
         result["input_timezone_rules"]["decimal_hour_rounding"]
@@ -130,7 +138,7 @@ def test_decimal_rounding_policy_is_delivered_even_when_rounding_matches_the_hos
     assert result["input_datetime"] is None
 
 
-def test_pair_cannot_lose_a_date_branch_or_impute_both_unknown_clocks():
+def test_pair_cannot_lose_a_date_branch_or_impute_both_unknown_clocks() -> None:
     result = calculate_sukuyo_compatibility(
         person1_date="2025-01-29",
         person1_zone="8.0000000002777778",
@@ -148,7 +156,7 @@ def test_pair_cannot_lose_a_date_branch_or_impute_both_unknown_clocks():
         )
 
 
-def test_ancient_microsecond_wire_keeps_exact_decimal_integers():
+def test_ancient_microsecond_wire_keeps_exact_decimal_integers() -> None:
     result = local_date_support(
         "0001-01-01", "9.0000000002777778", calendar_offset_hours=9
     )
@@ -162,7 +170,7 @@ def test_ancient_microsecond_wire_keeps_exact_decimal_integers():
     )
 
 
-def test_precision_and_interval_length_are_delivered_from_actual_fields():
+def test_precision_and_interval_length_are_delivered_from_actual_fields() -> None:
     calendar = calendar_mansion("2025-01-29", zone="8.0000000002777778")
     assert (
         calendar["input_timezone_rules"]["effective_offset_microseconds"]

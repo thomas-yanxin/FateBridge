@@ -3,13 +3,16 @@
 import hashlib
 import json
 import shutil
-from dataclasses import replace
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import pytest
 
 from fatebridge.application.projection import project_fields
 from fatebridge.core.almanac import get_solar_terms_for_year
+from fatebridge.core.contracts.output_chinese import Taiyi
+from fatebridge.core.contracts.output_taiyi_day import TaiyiDayOrigin, TaiyiTenJing
+from fatebridge.core.metaphysics.seed import build_metaphysics_seed
 from fatebridge.core.metaphysics.taiyi import build_taiyi_board
 from fatebridge.core.metaphysics.taiyi_day import (
     KEY_DAY_PROFILE,
@@ -17,14 +20,15 @@ from fatebridge.core.metaphysics.taiyi_day import (
     key_day_origin,
 )
 from fatebridge.core.metaphysics.taiyi_ten_jing import key_ten_jing
-from fatebridge.core.output_chinese import Taiyi
-from fatebridge.core.output_taiyi_day import TaiyiDayOrigin, TaiyiTenJing
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
+from fatebridge.utils.civil_time import NominalClockLabel
 from scripts.taiyi.audit_taiyi_day import CORPUS, audit
-from tests.taiyi.test_taiyi_periods import seed_at
+from tests.unit_test.fixtures.taiyi import seed_at
 
 
-def test_complete_frozen_observations_keep_all_prose_chart_conflicts_and_unknowns():
+def test_complete_frozen_observations_keep_all_prose_chart_conflicts_and_unknowns() -> (
+    None
+):
     report = audit()
     assert report["required_observations"] == 34
     assert report["evaluated_observations"] == 33
@@ -44,7 +48,9 @@ def test_complete_frozen_observations_keep_all_prose_chart_conflicts_and_unknown
     assert report["full_judgment_validated"] is False
 
 
-def test_source_numeric_chain_is_the_actual_day_chain_and_keeps_positions_separate():
+def test_source_numeric_chain_is_the_actual_day_chain_and_keeps_positions_separate() -> (
+    None
+):
     d = key_day_numeric_board(44, "未", False)
     core = d["core_board"]
     assert core["accumulation"] == 44 and core["kook_number"] == 44
@@ -71,7 +77,7 @@ def test_source_numeric_chain_is_the_actual_day_chain_and_keeps_positions_separa
     )
 
 
-def test_every_new_day_evidence_leaf_can_be_read_without_required_siblings():
+def test_every_new_day_evidence_leaf_can_be_read_without_required_siblings() -> None:
     board = key_day_numeric_board(44, "未", False)
 
     def leaves(value, path):
@@ -97,7 +103,9 @@ def test_every_new_day_evidence_leaf_can_be_read_without_required_siblings():
         (29, (2, 3, 7, 3)),
     ],
 )
-def test_source_nine_palace_rules_include_terminal_and_middle_palaces(count, expected):
+def test_source_nine_palace_rules_include_terminal_and_middle_palaces(
+    count: int, expected
+) -> None:
     d = key_ten_jing(count, False)["records"]
     assert (
         tuple(
@@ -112,7 +120,7 @@ def test_source_nine_palace_rules_include_terminal_and_middle_palaces(count, exp
     )
 
 
-def test_held_positions_and_yin_opposition_never_invent_a_center_opposite():
+def test_held_positions_and_yin_opposition_never_invent_a_center_opposite() -> None:
     for a, b, key, position in [
         (4, 5, "emperor", "乾"),
         (19, 20, "emperor", "坤"),
@@ -132,10 +140,14 @@ def test_held_positions_and_yin_opposition_never_invent_a_center_opposite():
     TaiyiTenJing.model_validate(key_ten_jing(5, True))
 
 
-def test_daily_midnight_boundary_does_not_use_hourly_zi_boundary_or_multiply_by_twelve():
-    winter = datetime(2025, 12, 21, 23, 3)
+def test_daily_midnight_boundary_does_not_use_hourly_zi_boundary_or_multiply_by_twelve() -> (
+    None
+):
+    winter = NominalClockLabel.from_local_datetime(datetime(2025, 12, 21, 23, 3))
     a, b, c = [
-        key_day_origin(winter, datetime.fromisoformat(s))
+        key_day_origin(
+            winter, NominalClockLabel.from_local_datetime(datetime.fromisoformat(s))
+        )
         for s in ("2026-01-08T22:59:59", "2026-01-08T23:00:00", "2026-01-09T00:00:00")
     ]
     assert a["accumulation"] == b["accumulation"] == 19
@@ -152,20 +164,28 @@ def test_daily_midnight_boundary_does_not_use_hourly_zi_boundary_or_multiply_by_
 
 
 @pytest.mark.parametrize("term_name", ["冬至", "夏至"])
-def test_daily_dun_changes_at_exact_solstice_but_does_not_use_hour_count(term_name):
+def test_daily_dun_changes_at_exact_solstice_but_does_not_use_hour_count(
+    term_name: str,
+) -> None:
     t = next(t for t in get_solar_terms_for_year(2026, "UTC") if t.name == term_name)
-    moments = [
-        (t.moment + timedelta(microseconds=n)).replace(tzinfo=None) for n in (-1, 1)
-    ]
+    _, upper = t.point.nominal_calendar_bracket()
+    first = datetime.fromisoformat(upper.isoformat())
     boards = [
         build_taiyi_board(
-            replace(seed_at(moment, zone="UTC"), input_datetime=moment),
+            build_metaphysics_seed(
+                civil=moment,
+                timezone_name="UTC",
+                input_offset_visible=False,
+                longitude=None,
+                use_true_solar_time=False,
+            ),
             "未知",
             calculation_mode="day",
         )
-        for moment in moments
+        for moment in (first - datetime.resolution, first)
     ]
     assert boards[0]["rotation"] != boards[1]["rotation"]
+    assert boards[1]["calendar_rules"]["anchor_name"] == term_name
     for d in boards:
         assert d["ruleset"]["id"] == KEY_DAY_PROFILE
         assert (
@@ -176,7 +196,7 @@ def test_daily_dun_changes_at_exact_solstice_but_does_not_use_hour_count(term_na
         Taiyi.model_validate(d)
 
 
-def test_apparent_day_origin_is_invariant_under_timezone_representation():
+def test_apparent_day_origin_is_invariant_under_timezone_representation() -> None:
     instant = datetime(2026, 8, 1, 12, 34, 56)
     boards = [
         build_taiyi_board(
@@ -200,7 +220,7 @@ def test_apparent_day_origin_is_invariant_under_timezone_representation():
 
 
 @pytest.mark.parametrize("month,day,hour", [(3, 8, 2), (11, 1, 1)])
-def test_daily_dst_input_ambiguity_is_rejected(month, day, hour):
+def test_daily_dst_input_ambiguity_is_rejected(month: int, day: int, hour: int) -> None:
     with pytest.raises(ValueError, match="local time"):
         build_taiyi_board(
             seed_at(datetime(2026, month, day, hour, 30), zone="America/New_York"),
@@ -209,7 +229,7 @@ def test_daily_dst_input_ambiguity_is_rejected(month, day, hour):
         )
 
 
-def test_modern_same_phase_snapshot_shows_both_sources_and_actual_calculation():
+def test_modern_same_phase_snapshot_shows_both_sources_and_actual_calculation() -> None:
     result = calculate_taiyi_analysis(
         analysis_year=2026,
         analysis_month=2,
@@ -233,8 +253,8 @@ def test_modern_same_phase_snapshot_shows_both_sources_and_actual_calculation():
 
 @pytest.mark.parametrize("mutation", ["drop_conflict", "drop_unknown", "alter_scan"])
 def test_day_oracle_cannot_drop_disagreements_or_unknowns_even_after_rehash(
-    tmp_path, mutation
-):
+    tmp_path: Path, mutation: str
+) -> None:
     c = tmp_path / "corpus"
     shutil.copytree(CORPUS, c)
     if mutation == "alter_scan":
@@ -243,6 +263,8 @@ def test_day_oracle_cannot_drop_disagreements_or_unknowns_even_after_rehash(
         with pytest.raises(ValueError, match="指纹"):
             audit(c)
         return
+    else:
+        pass
     p = c / "day-worked.json"
     d = json.loads(p.read_text())
     drop = "main_chart" if mutation == "drop_conflict" else "heaven_time"

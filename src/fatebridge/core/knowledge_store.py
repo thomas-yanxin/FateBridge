@@ -1,12 +1,26 @@
+"""Look up bundled knowledge with explicit reference and curation provenance."""
+
 from __future__ import annotations
 
 import hashlib
-import json
 import re
+from collections.abc import Mapping
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, cast
+from typing import Annotated, Any, Literal
+
+from pydantic import Field, JsonValue, TypeAdapter, ValidationError
+from typing_extensions import TypedDict
+
+from fatebridge.core.knowledge_rule_tables import (
+    KnowledgeCard,
+    astro_rule_cards,
+    qimen_rule_cards,
+)
+
+RULE_REFERENCE_DOMAINS = {"astro", "qimen"}
+RULE_REFERENCE_SOURCE = "fatebridge_rule_references"
 
 
 class ToolValidationError(ValueError):
@@ -15,11 +29,11 @@ class ToolValidationError(ValueError):
         message: str,
         *,
         code: str,
-        details: dict[str, Any] | None = None,
+        details: dict[str, JsonValue] | None = None,
     ) -> None:
         super().__init__(message)
-        self.code = code
-        self.details = details or {}
+        self.code: str = code
+        self.details: dict[str, JsonValue] = details or {}
 
 
 ASTRO_LABELS = {
@@ -91,58 +105,102 @@ QIMEN_STAR_ALIASES = {
 }
 
 
-def _data_path(name: str) -> Path:
-    return Path(__file__).resolve().parents[1] / "data" / "knowledge" / name
+def _data_path(filename: str) -> Path:
+    return Path(__file__).resolve().parents[1] / "data" / "knowledge" / filename
 
 
-def _load_json(name: str) -> dict[str, Any]:
-    return cast(
-        "dict[str, Any]", json.loads(_data_path(name).read_text(encoding="utf-8"))
-    )
+class GeneralSpiritText(TypedDict, total=False):
+    intros: list[str]
+    verses: list[str]
+    extra: list[str]
+
+
+class SupplementCategory(TypedDict):
+    name: str
+    count: int
+    keys_sample: list[str]
+
+
+class KnowledgeSupplementReceipt(TypedDict):
+    id: str
+    version: int
+    source_file: str
+    sha256: str
+    categories: list[SupplementCategory]
+
+
+class KnowledgeBundle(TypedDict, total=False):
+    domain: str
+    description: str
+    schema_version: int
+    source: str
+    generated_at: str
+    categories: dict[str, dict[str, KnowledgeCard]]
+    jiang_aliases: dict[str, str]
+    jiang_info: dict[str, GeneralSpiritText]
+    jiang_branch_note: dict[str, dict[str, str]]
+    shen_entries: dict[str, KnowledgeCard]
+    shen_info: dict[str, JsonValue]
+    supplements: list[KnowledgeSupplementReceipt]
+
+
+class KnowledgeSupplement(TypedDict):
+    domain: Literal["bazi"]
+    schema_version: int
+    id: Annotated[str, Field(min_length=1)]
+    version: int
+    categories: Annotated[dict[str, dict[str, KnowledgeCard]], Field(min_length=1)]
+
+
+KNOWLEDGE_JSON_OBJECT: TypeAdapter[dict[str, JsonValue]] = TypeAdapter(
+    dict[str, JsonValue],
+)
+KNOWLEDGE_BUNDLE: TypeAdapter[KnowledgeBundle] = TypeAdapter(KnowledgeBundle)
+KNOWLEDGE_SUPPLEMENT: TypeAdapter[KnowledgeSupplement] = TypeAdapter(
+    KnowledgeSupplement
+)
 
 
 @lru_cache(maxsize=1)
-def load_knowledge_bundles() -> dict[str, dict[str, Any]]:
-    bundles = {
-        "astro": _load_json("astro.json"),
-        "liureng": _load_json("liureng.json"),
-        "qimen": _load_json("qimen.json"),
-        "bazi": _load_json("bazi.json"),
+def load_knowledge_bundles() -> dict[str, KnowledgeBundle]:
+    bundles: dict[str, KnowledgeBundle] = {
+        "astro": {"categories": astro_rule_cards(ASTRO_LABELS)},
+        "liureng": KNOWLEDGE_BUNDLE.validate_json(
+            _data_path("liureng.json").read_bytes(), strict=True
+        ),
+        "qimen": {"categories": qimen_rule_cards()},
+        "bazi": KNOWLEDGE_BUNDLE.validate_json(
+            _data_path("bazi.json").read_bytes(), strict=True
+        ),
     }
-    # Add new concepts without rewriting the historically sealed base bundle.
+    # note (knowledge bundles): Supplements extend the sealed base without changing its source bytes.
     base = bundles["bazi"]["categories"]
     old_keys = {key for entries in base.values() for key in entries}
-    supplements = []
-    supplement_ids = set()
+    supplements: list[KnowledgeSupplementReceipt] = []
+    supplement_ids: set[str] = set()
     for filename in (
         "bazi-foundations.json",
         "bazi-source-contrasts.json",
         "bazi-frontmatter.json",
     ):
         raw = _data_path(filename).read_bytes()
-        supplement = json.loads(raw)
-        if not isinstance(supplement, dict):
+        try:
+            supplement = KNOWLEDGE_SUPPLEMENT.validate_json(raw, strict=True)
+        except ValidationError as error:
+            raise ValueError("Invalid BaZi knowledge supplement") from error
+        if supplement["schema_version"] != 1:
             raise ValueError("Invalid BaZi knowledge supplement")
-        categories = supplement.get("categories")
-        if (
-            supplement.get("schema_version") != 1
-            or supplement.get("domain") != "bazi"
-            or not isinstance(supplement.get("id"), str)
-            or not supplement["id"]
-            or type(supplement.get("version")) is not int
-            or not isinstance(categories, dict)
-            or not categories
-        ):
-            raise ValueError("Invalid BaZi knowledge supplement")
-        if supplement["id"] in supplement_ids:
+        supplement_id = supplement["id"]
+        if supplement_id in supplement_ids:
             raise ValueError("Knowledge supplements cannot repeat component IDs")
-        supplement_ids.add(supplement["id"])
+        supplement_ids.add(supplement_id)
+        categories = supplement["categories"]
         for category, entries in categories.items():
-            if not isinstance(category, str) or not category:
+            if not category:
                 raise ValueError("Knowledge supplement needs named categories")
             if category in base:
                 raise ValueError("Knowledge supplement cannot replace a base category")
-            if not isinstance(entries, dict) or not entries:
+            if not entries:
                 raise ValueError("Knowledge supplement needs nonempty entry mappings")
             if old_keys.intersection(entries):
                 raise ValueError("Knowledge supplement cannot shadow existing keys")
@@ -150,7 +208,7 @@ def load_knowledge_bundles() -> dict[str, dict[str, Any]]:
             old_keys.update(entries)
         supplements.append(
             {
-                "id": supplement["id"],
+                "id": supplement_id,
                 "version": supplement["version"],
                 "source_file": "data/knowledge/" + filename,
                 "sha256": hashlib.sha256(raw).hexdigest(),
@@ -169,81 +227,63 @@ def load_knowledge_bundles() -> dict[str, dict[str, Any]]:
 
 
 @lru_cache(maxsize=1)
-def load_knowledge_index() -> dict[str, Any]:
-    try:
-        return _load_json("index.json")
-    except FileNotFoundError:
-        bundles = load_knowledge_bundles()
-        return {
-            "schema_version": 1,
-            "bundle_version": 1,
-            "source": "xingque_hover_docs",
-            "build_timestamp": None,
-            "upstream_source_marker": "xingque_hover_docs",
-            "domains": [
-                {
-                    "domain": "astro",
-                    "categories": [
-                        {
-                            "name": key,
-                            "count": len(value),
-                            "keys_sample": sorted(value)[:20],
-                        }
-                        for key, value in bundles["astro"].get("categories", {}).items()
-                    ],
-                    "missing_categories": [],
-                    "fallback_categories": [],
-                },
-                {
-                    "domain": "liureng",
-                    "categories": [
-                        {
-                            "name": "shen",
-                            "count": len(bundles["liureng"].get("shen_entries", {})),
-                            "keys_sample": sorted(
-                                bundles["liureng"].get("shen_entries", {})
-                            )[:20],
-                        },
-                        {
-                            "name": "house",
-                            "count": len(bundles["liureng"].get("jiang_info", {})),
-                            "keys_sample": sorted(
-                                bundles["liureng"].get("jiang_info", {})
-                            )[:20],
-                        },
-                    ],
-                    "missing_categories": [],
-                    "fallback_categories": [],
-                },
-                {
-                    "domain": "qimen",
-                    "categories": [
-                        {
-                            "name": key,
-                            "count": len(value),
-                            "keys_sample": sorted(value)[:20],
-                        }
-                        for key, value in bundles["qimen"].get("categories", {}).items()
-                    ],
-                    "missing_categories": [],
-                    "fallback_categories": [],
-                },
-            ],
-        }
+def load_knowledge_index() -> dict[str, JsonValue]:
+    return KNOWLEDGE_JSON_OBJECT.validate_json(_data_path("index.json").read_bytes())
 
 
 def _domain_index(domain: str) -> dict[str, Any]:
-    for item in load_knowledge_index().get("domains", []):
-        if item.get("domain") == domain:
-            return deepcopy(cast("dict[str, Any]", item))
+    if domain in RULE_REFERENCE_DOMAINS:
+        return {
+            "domain": domain,
+            "categories": [
+                {"name": name, "count": len(entries), "keys_sample": sorted(entries)}
+                for name, entries in load_knowledge_bundles()[domain][
+                    "categories"
+                ].items()
+            ],
+        }
+    domain_index = load_knowledge_index().get("domains")
+    assert isinstance(domain_index, list)
+    for domain_record in domain_index:
+        assert isinstance(domain_record, dict)
+        if domain_record.get("domain") == domain:
+            return deepcopy(domain_record)
     return {}
+
+
+class KnowledgeProvenance(TypedDict, total=False):
+    source_domain: str
+    domain: str
+    category: str | None
+    key: str | None
+    bundle_version: JsonValue
+    build_timestamp: JsonValue
+    upstream_source_marker: JsonValue
+    coverage: dict[str, Any]
+    reference_only: bool
+    personal_applicability_assessed: bool
+    supplements: list[KnowledgeSupplementReceipt]
+    coverage_scope: str
+    review_status: JsonValue
+    build_timestamp_scope: str
+    entry_curation: dict[str, JsonValue]
 
 
 def _knowledge_provenance(
     *, domain: str, category: str | None = None, key: str | None = None
-) -> dict[str, Any]:
+) -> KnowledgeProvenance:
+    if domain in RULE_REFERENCE_DOMAINS:
+        return {
+            "source_domain": RULE_REFERENCE_SOURCE,
+            "domain": domain,
+            "category": category,
+            "key": key,
+            "coverage": _domain_index(domain),
+            "reference_only": True,
+            "personal_applicability_assessed": False,
+        }
     index = load_knowledge_index()
-    provenance = {
+    provenance: KnowledgeProvenance = {
         "source_domain": "xingque_hover_docs",
         "domain": domain,
         "category": category,
@@ -256,10 +296,15 @@ def _knowledge_provenance(
         "coverage": _domain_index(domain),
     }
     supplements = [
-        item
-        for item in load_knowledge_bundles().get(domain, {}).get("supplements", [])
+        supplement
+        for supplement in load_knowledge_bundles()
+        .get(domain, {})
+        .get("supplements", [])
         if category is None
-        or any(entry["name"] == category for entry in item["categories"])
+        or any(
+            category_record["name"] == category
+            for category_record in supplement["categories"]
+        )
     ]
     if supplements:
         provenance["supplements"] = deepcopy(supplements)
@@ -292,12 +337,8 @@ def _normalize_astro_key(category: str, key: str) -> str:
         return _normalize_house_key(text)
     if category == "aspect":
         return text
-    bundle = load_knowledge_bundles()["astro"]
-    labels = bundle.get("labels", {})
-    reverse_labels = {
-        value: one for one, value in labels.items() if isinstance(value, str)
-    }
-    return cast(str, reverse_labels.get(text, text))
+    reverse_labels = {label: name for name, label in ASTRO_LABELS.items()}
+    return reverse_labels.get(text, text)
 
 
 def _normalize_qimen_key(category: str, key: str) -> str:
@@ -321,7 +362,7 @@ def _normalize_liureng_branch(key: str) -> str:
 def _tips_to_rendered_text(title: str, tips: list[str]) -> str:
     lines = [f"[{title}]"]
     for tip in tips:
-        tip_text = f"{tip}".strip()
+        tip_text = tip.strip()
         if not tip_text:
             continue
         if tip_text == "==":
@@ -331,49 +372,15 @@ def _tips_to_rendered_text(title: str, tips: list[str]) -> str:
     return "\n".join(lines).strip()
 
 
-def _strip_qimen_html(text: str) -> str:
-    return re.sub(r"<[^>]+>", "", text or "").strip()
-
-
-def _render_qimen_blocks(
-    title: str, blocks: list[dict[str, Any]]
-) -> tuple[list[str], str]:
-    lines = [f"[{title}]"]
-    flat_lines: list[str] = []
-    for block in blocks:
-        block_type = block.get("type")
-        if block_type == "blank":
-            lines.append("")
-            flat_lines.append("")
-            continue
-        if block_type == "divider":
-            lines.append("==")
-            flat_lines.append("==")
-            continue
-        if block_type == "subTitle":
-            text = _strip_qimen_html(block.get("text", ""))
-            if text:
-                lines.append(f"## {text}")
-                flat_lines.append(f"## {text}")
-            continue
-        text = _strip_qimen_html(block.get("text", ""))
-        if text:
-            lines.append(text)
-            flat_lines.append(text)
-    rendered = "\n".join(line for line in lines if line is not None).strip()
-    normalized_lines = [line for line in flat_lines if line.strip()]
-    return normalized_lines, rendered
-
-
 def _build_liureng_house_entry(
-    bundle: dict[str, Any], jiang_name: str, tian_branch: str, di_branch: str
+    bundle: KnowledgeBundle, jiang_name: str, tian_branch: str, di_branch: str
 ) -> dict[str, Any]:
     aliases = bundle.get("jiang_aliases", {})
     jiang_info = bundle.get("jiang_info", {})
     jiang_branch_note = bundle.get("jiang_branch_note", {})
     normalized_name = aliases.get(jiang_name, jiang_name)
-    info = jiang_info.get(normalized_name)
-    if not info:
+    general_spirit = jiang_info.get(normalized_name)
+    if not general_spirit:
         raise ToolValidationError(
             f"Unknown 六壬将神: {jiang_name}",
             code="knowledge.liureng.unknown_jiang",
@@ -392,12 +399,10 @@ def _build_liureng_house_entry(
     di_entry = shen_entries.get(di, {"title": f"{di}神", "tips": []})
     notes = jiang_branch_note.get(normalized_name, {})
     tips: list[str] = []
-    for line in info.get("intros", []):
-        tips.append(line)
-    for line in info.get("verses", []):
+    tips.extend(general_spirit.get("intros", []))
+    for line in general_spirit.get("verses", []):
         tips.append(f"**{line}**")
-    for line in info.get("extra", []):
-        tips.append(line)
+    tips.extend(general_spirit.get("extra", []))
     tips.extend(
         [
             "==",
@@ -443,27 +448,7 @@ def build_knowledge_registry(domain: str | None = None) -> dict[str, Any]:
                 code="knowledge.unknown_domain",
                 details={"domain": name},
             )
-        if name == "astro":
-            categories = [
-                {
-                    "name": category,
-                    "count": len(entries),
-                    "keys": sorted(entries)[:20],
-                    "supports": ["read"],
-                }
-                for category, entries in bundle.get("categories", {}).items()
-            ]
-        elif name == "qimen":
-            categories = [
-                {
-                    "name": category,
-                    "count": len(entries),
-                    "keys": sorted(entries)[:20],
-                    "supports": ["read"],
-                }
-                for category, entries in bundle.get("categories", {}).items()
-            ]
-        elif name == "bazi":
+        if name != "liureng":
             categories = [
                 {
                     "name": category,
@@ -491,12 +476,26 @@ def build_knowledge_registry(domain: str | None = None) -> dict[str, Any]:
         result_domains.append(
             {
                 "domain": name,
-                "source": "xingque_hover_docs",
-                "bundle_version": index.get("bundle_version"),
+                "source": (
+                    RULE_REFERENCE_SOURCE
+                    if name in RULE_REFERENCE_DOMAINS
+                    else "xingque_hover_docs"
+                ),
+                **(
+                    {}
+                    if name in RULE_REFERENCE_DOMAINS
+                    else {"bundle_version": index.get("bundle_version")}
+                ),
                 "provenance": _knowledge_provenance(domain=name),
                 "categories": categories,
             }
         )
+    if domain in RULE_REFERENCE_DOMAINS:
+        return {
+            "source": RULE_REFERENCE_SOURCE,
+            "provenance": _knowledge_provenance(domain=domain),
+            "domains": result_domains,
+        }
     return {
         "source": "xingque_hover_docs",
         "bundle_version": index.get("bundle_version"),
@@ -512,65 +511,51 @@ def build_knowledge_registry(domain: str | None = None) -> dict[str, Any]:
     }
 
 
-def _resolve_category_for_key(
-    categories: dict[str, Any],
-    key: str,
-    normalizer: Callable[[str, str], str] | None = None,
-) -> list[tuple[str, str]]:
-    """Find which category/categories under a domain hold ``key``.
-
-    Returns ``(category, normalized_key)`` matches so the caller can tell apart
-    "not found" (0), "resolved" (1), and "ambiguous" (>1).
-    """
-    matches: list[tuple[str, str]] = []
-    for cat_name, entries in categories.items():
-        if not isinstance(entries, dict):
-            continue
-        candidate = normalizer(cat_name, key) if normalizer else key
-        if candidate in entries:
-            matches.append((cat_name, candidate))
-    return matches
-
-
-def _autoresolve_bare_category(domain: str, bundles: dict[str, Any], key: str) -> str:
-    """Resolve the category for a bare ``key`` lookup (category omitted).
-
-    Only the flat ``categories``-dict domains (astro, bazi, qimen) can be
-    auto-resolved; liureng keeps its own shen/house layout, so callers there
-    must still pass a category.
-    """
-    categories = bundles.get(domain, {}).get("categories", {})
+def _autoresolve_bare_category(
+    domain: str, categories: Mapping[str, dict[str, KnowledgeCard]], lookup_key: str
+) -> str:
+    """Resolve a key against the complete category inventory for its domain."""
     if not categories:
         raise ToolValidationError(
             f"Category is required for domain '{domain}'",
             code=f"knowledge.{domain}.category_required",
             details={"domain": domain},
         )
-    normalizer: Callable[[str, str], str] | None = None
-    if domain == "astro":
-
-        def normalizer(cat: str, k: str) -> str:
-            return k if cat == "aspect" else _normalize_astro_key(cat, k)
-
-    elif domain == "qimen":
-        normalizer = _normalize_qimen_key
-    matches = _resolve_category_for_key(categories, key, normalizer)
-    if len(matches) == 1:
-        return matches[0][0]
-    if not matches:
+    candidate_categories: list[str] = []
+    for category, entries in categories.items():
+        if domain == "astro":
+            normalized_key = _normalize_astro_key(category, lookup_key)
+        elif domain == "qimen":
+            normalized_key = _normalize_qimen_key(category, lookup_key)
+        else:
+            normalized_key = lookup_key
+        if normalized_key in entries:
+            candidate_categories.append(category)
+    if len(candidate_categories) == 1:
+        return candidate_categories[0]
+    elif not candidate_categories:
         raise ToolValidationError(
-            f"Unknown {domain} knowledge key: {key}",
+            f"Unknown {domain} knowledge key: {lookup_key}",
             code=f"knowledge.{domain}.unknown_key",
-            details={"key": key, "available_categories": sorted(categories)},
+            details={
+                "key": lookup_key,
+                "available_categories": [name for name in sorted(categories)],
+            },
         )
-    raise ToolValidationError(
-        f"Ambiguous knowledge key '{key}' in domain '{domain}'; specify a category",
-        code=f"knowledge.{domain}.ambiguous_key",
-        details={"key": key, "candidate_categories": [c for c, _ in matches]},
-    )
+    else:
+        raise ToolValidationError(
+            f"Ambiguous knowledge key '{lookup_key}' in domain '{domain}'; specify a category",
+            code=f"knowledge.{domain}.ambiguous_key",
+            details={
+                "key": lookup_key,
+                "candidate_categories": [name for name in candidate_categories],
+            },
+        )
 
 
-def read_knowledge_entry(payload: dict[str, Any]) -> dict[str, Any]:
+def read_knowledge_entry(
+    payload: Mapping[str, str | int | None],
+) -> dict[str, Any]:
     bundles = load_knowledge_bundles()
     domain = f"{payload.get('domain') or ''}".strip()
     category = f"{payload.get('category') or ''}".strip()
@@ -582,84 +567,54 @@ def read_knowledge_entry(payload: dict[str, Any]) -> dict[str, Any]:
             details={"domain": domain},
         )
     if not category and key:
-        category = _autoresolve_bare_category(domain, bundles, key)
-    if domain == "astro":
-        bundle = bundles["astro"]
+        category = _autoresolve_bare_category(
+            domain, bundles[domain].get("categories", {}), key
+        )
+    if domain in RULE_REFERENCE_DOMAINS:
+        bundle = bundles[domain]
         categories = bundle.get("categories", {})
-        if category == "aspect":
-            aspect_key = str(
-                payload.get("aspect_degree")
-                if payload.get("aspect_degree") is not None
-                else key
-            ).strip()
-            entry = categories.get("aspect", {}).get(aspect_key)
-            if not entry:
-                raise ToolValidationError(
-                    f"Unknown astro aspect: {aspect_key}",
-                    code="knowledge.astro.unknown_key",
-                    details={"category": category, "key": aspect_key},
-                )
-            object_a = f"{payload.get('object_a') or ''}".strip()
-            object_b = f"{payload.get('object_b') or ''}".strip()
-            title = entry.get("title", "")
-            tips = list(entry.get("tips", []))
-            if object_a and object_b:
-                title = f"{ASTRO_LABELS.get(object_a, object_a)} - {ASTRO_LABELS.get(object_b, object_b)}：{entry.get('title', '')}"
-                if tips and not tips[0].startswith("对象："):
-                    tips.insert(
-                        0,
-                        f"对象：{ASTRO_LABELS.get(object_a, object_a)} 与 {ASTRO_LABELS.get(object_b, object_b)}",
-                    )
-            return {
-                "domain": domain,
-                "category": category,
-                "key": aspect_key,
-                "query_normalized": {
-                    "key": aspect_key,
-                    "object_a": object_a or None,
-                    "object_b": object_b or None,
-                },
-                "title": title,
-                "tips": tips,
-                "lines": [tip for tip in tips if tip and tip != "=="],
-                "rendered_text": _tips_to_rendered_text(title, tips),
-                "source": "xingque_hover_docs",
-                "bundle_version": load_knowledge_index().get("bundle_version"),
-                "provenance": _knowledge_provenance(
-                    domain=domain, category=category, key=aspect_key
-                ),
-                "citation": f"Xingque hover knowledge · {domain}/{category}/{aspect_key}",
-            }
-        normalized_key = _normalize_astro_key(category, key)
+        is_aspect = domain == "astro" and category == "aspect"
+        if is_aspect and payload.get("aspect_degree") is not None:
+            key = str(payload["aspect_degree"])
+        normalizer = _normalize_astro_key if domain == "astro" else _normalize_qimen_key
+        normalized_key = normalizer(category, key)
         entry = categories.get(category, {}).get(normalized_key)
         if not entry:
             raise ToolValidationError(
-                f"Unknown astro knowledge key: {key}",
-                code="knowledge.astro.unknown_key",
+                f"Unknown {domain} knowledge key: {key}",
+                code=f"knowledge.{domain}.unknown_key",
                 details={
                     "category": category,
                     "key": key,
                     "normalized_key": normalized_key,
                 },
             )
-        tips = list(entry.get("tips", []))
+        query: dict[str, str | None] = {"key": normalized_key}
+        title = entry["title"]
+        tips = list(entry["tips"])
+        if is_aspect:
+            object_a = f"{payload.get('object_a') or ''}".strip()
+            object_b = f"{payload.get('object_b') or ''}".strip()
+            query.update(object_a=object_a or None, object_b=object_b or None)
+            if object_a and object_b:
+                first = ASTRO_LABELS.get(object_a, object_a)
+                second = ASTRO_LABELS.get(object_b, object_b)
+                title = f"{first} - {second}：{title}"
+                tips.insert(0, f"对象：{first} 与 {second}")
         return {
             "domain": domain,
             "category": category,
             "key": normalized_key,
-            "query_normalized": {"key": normalized_key},
-            "title": entry.get("title", normalized_key),
+            "query_normalized": query,
+            "title": title,
             "tips": tips,
-            "lines": [tip for tip in tips if tip and tip != "=="],
-            "rendered_text": _tips_to_rendered_text(
-                entry.get("title", normalized_key), tips
-            ),
-            "source": "xingque_hover_docs",
-            "bundle_version": load_knowledge_index().get("bundle_version"),
+            "lines": tips,
+            "rendered_text": _tips_to_rendered_text(title, tips),
+            "source": RULE_REFERENCE_SOURCE,
             "provenance": _knowledge_provenance(
                 domain=domain, category=category, key=normalized_key
             ),
-            "citation": f"Xingque hover knowledge · {domain}/{category}/{normalized_key}",
+            "citation": entry["citation"],
         }
 
     if domain == "liureng":
@@ -708,8 +663,8 @@ def read_knowledge_entry(payload: dict[str, Any]) -> dict[str, Any]:
     if domain == "bazi":
         bundle = bundles["bazi"]
         categories = bundle.get("categories", {})
-        category_data = categories.get(category, {})
-        entry = category_data.get(key)
+        category_entries = categories.get(category, {})
+        entry = category_entries.get(key)
         if not entry:
             raise ToolValidationError(
                 f"Unknown 八字 knowledge key: {key}",
@@ -719,8 +674,8 @@ def read_knowledge_entry(payload: dict[str, Any]) -> dict[str, Any]:
         tips = list(entry.get("tips", []))
         provenance = _knowledge_provenance(domain=domain, category=category, key=key)
         curation = entry.get("curation")
-        if isinstance(curation, dict):
-            # Copy nested sources so callers cannot mutate the cached bundle.
+        if curation is not None:
+            # note (knowledge cache): Readers must not be able to mutate the cached references.
             provenance = {
                 **provenance,
                 "source_domain": "fatebridge_curated_bazi",
@@ -748,40 +703,13 @@ def read_knowledge_entry(payload: dict[str, Any]) -> dict[str, Any]:
                 curation.get(
                     "citation", f"FateBridge knowledge · {domain}/{category}/{key}"
                 )
-                if isinstance(curation, dict)
+                if curation is not None
                 else f"FateBridge旧资料待逐条核对 · {domain}/{category}/{key}；未据此认证指定原典或现实效力。"
             ),
         }
 
-    bundle = bundles["qimen"]
-    normalized_key = _normalize_qimen_key(category, key)
-    entry = bundle.get("categories", {}).get(category, {}).get(normalized_key)
-    if not entry:
-        raise ToolValidationError(
-            f"Unknown 奇门 knowledge key: {key}",
-            code="knowledge.qimen.unknown_key",
-            details={
-                "category": category,
-                "key": key,
-                "normalized_key": normalized_key,
-            },
-        )
-    lines, rendered_text = _render_qimen_blocks(
-        entry.get("title", normalized_key), entry.get("blocks", [])
+    raise ToolValidationError(
+        f"Unknown knowledge domain: {domain}",
+        code="knowledge.unknown_domain",
+        details={"domain": domain},
     )
-    return {
-        "domain": domain,
-        "category": category,
-        "key": normalized_key,
-        "query_normalized": {"key": normalized_key},
-        "title": entry.get("title", normalized_key),
-        "blocks": entry.get("blocks", []),
-        "lines": lines,
-        "rendered_text": rendered_text,
-        "source": "xingque_hover_docs",
-        "bundle_version": load_knowledge_index().get("bundle_version"),
-        "provenance": _knowledge_provenance(
-            domain=domain, category=category, key=normalized_key
-        ),
-        "citation": f"Xingque hover knowledge · {domain}/{category}/{normalized_key}",
-    }

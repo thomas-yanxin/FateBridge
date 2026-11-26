@@ -9,25 +9,16 @@ import pytest
 
 from fatebridge.core.astro.aspects import _build_aspects
 from fatebridge.core.astro.parts import _build_houses, _build_planet_record
+from fatebridge.core.astro.ptolemy import build_ptolemy_layer, sign_relationship
 from fatebridge.core.classical_western import build_planet_classical, ninth_part
 from fatebridge.core.predictive._common import longitude_to_point_dict
-from fatebridge.core.ptolemy import build_ptolemy_layer, sign_relationship
 from fatebridge.services.astrology import (
-    SIGN_INTERPRETATION,
-    _augment_core_chart_reading,
     _build_angle_lines,
-    _build_aspect_pattern,
-    _build_development_advice,
-    _build_dominant_energy,
     _build_house_lines,
-    _build_life_focus,
     _build_planet_lines,
-    _build_social_style,
-    _house_focus,
-    _sign_focus,
     calculate_core_chart_analysis,
 )
-from tests.western.test_western_accuracy import BIRTH
+from tests.unit_test.fixtures.western_natal import GREENWICH_EQUINOX_BIRTH as BIRTH
 
 SIGNS = [
     "Aries",
@@ -56,7 +47,7 @@ NINTH_PART_SOURCE = json.loads(
 
 @pytest.mark.parametrize("index", range(12))
 @pytest.mark.parametrize("side", [-1, 0, 1])
-def test_public_coordinate_and_sign_stay_on_the_same_boundary_side(index, side):
+def test_public_coordinate_and_sign_stay_on_the_same_boundary_side(index, side) -> None:
     cusp = index * 30.0
     longitude = (
         cusp if side == 0 else math.nextafter(cusp, math.inf if side > 0 else -math.inf)
@@ -74,7 +65,7 @@ def test_public_coordinate_and_sign_stay_on_the_same_boundary_side(index, side):
     assert point["degree_in_sign"] == point["longitude"] % 30
 
 
-def test_term_lord_is_not_changed_by_rounding_before_classification():
+def test_term_lord_is_not_changed_by_rounding_before_classification() -> None:
     point = _build_planet_record("Jupiter", 5.99999999, 0, 0, "whole_sign")
     conditions = build_planet_classical(
         planet="Jupiter",
@@ -89,7 +80,9 @@ def test_term_lord_is_not_changed_by_rounding_before_classification():
 
 
 @pytest.mark.parametrize("group", NINTH_PART_SOURCE["sign_groups"])
-def test_ninth_parts_follow_source_intervals_at_every_boundary_and_neighbor(group):
+def test_ninth_parts_follow_source_intervals_at_every_boundary_and_neighbor(
+    group,
+) -> None:
     # Literal arcsecond edges and sign rows from Rao2000 §6.2.9 are an
     # independent interval oracle, including the nonrepresentable thirds.
     edges = NINTH_PART_SOURCE["interval_edges_arcseconds"]
@@ -102,6 +95,8 @@ def test_ninth_parts_follow_source_intervals_at_every_boundary_and_neighbor(grou
         ):
             if not 0 <= degree < 30:
                 continue
+            else:
+                pass
             numerator, denominator = degree.as_integer_ratio()
             expected = next(
                 destination
@@ -115,7 +110,7 @@ def test_ninth_parts_follow_source_intervals_at_every_boundary_and_neighbor(grou
 
 
 @pytest.mark.parametrize("example", NINTH_PART_SOURCE["published_examples"])
-def test_ninth_part_published_examples(example):
+def test_ninth_part_published_examples(example) -> None:
     assert (
         ninth_part(example["sign"], example["degree_in_sign"]) == example["destination"]
     )
@@ -129,7 +124,9 @@ def test_ninth_part_published_examples(example):
         (math.nextafter(8.0, math.inf), False),
     ],
 )
-def test_modern_aspect_acceptance_uses_unrounded_longitudes(offset, included):
+def test_modern_aspect_acceptance_uses_unrounded_longitudes(
+    offset, included: bool
+) -> None:
     # The existing named policy gives Mercury/Saturn conjunction an 8° limit.
     planets = [
         _build_planet_record("Mercury", 0, 0, 0, "whole_sign"),
@@ -141,9 +138,11 @@ def test_modern_aspect_acceptance_uses_unrounded_longitudes(offset, included):
         assert aspects[0]["orb"] == offset
         assert aspects[0]["orb_limit"] == 8.0
         assert aspects[0]["rule_id"] == "fatebridge_modern_dynamic_orbs_v1"
+    else:
+        pass
 
 
-def test_exported_sign_degrees_are_not_absolute_longitudes_or_30_degrees():
+def test_exported_sign_degrees_are_not_absolute_longitudes_or_30_degrees() -> None:
     houses = _build_houses(75.1234567, "equal")
     assert houses[0]["cusp_longitude"] == 75.1234567
     assert "第1宫：双子 15.12°" in _build_house_lines(houses)
@@ -161,57 +160,8 @@ def test_exported_sign_degrees_are_not_absolute_longitudes_or_30_degrees():
     )
 
 
-def test_parallel_count_leaders_remain_tied_in_reading_and_advice():
-    elements = {"Fire": 2, "Air": 2, "Earth": 1}
-    modalities = {"Fixed": 2, "Cardinal": 2, "Mutable": 1}
-    text = _build_dominant_energy(elements, modalities)
-    assert "风、火元素数量并列最多（各2颗）" in text
-    assert "基本、固定模式数量并列最多（各2颗）" in text
-    assert "偏强" not in text
-    assert text == _build_dominant_energy(
-        dict(reversed(elements.items())), dict(reversed(modalities.items()))
-    )
-    assert text in _build_development_advice([], elements, modalities)
-
-
-def test_both_nodes_are_excluded_from_counted_house_and_sign_emphasis():
-    planets = [
-        {"id": "Sun", "house": 1, "sign": "Aries"},
-        {"id": "Moon", "house": 2, "sign": "Taurus"},
-        {"id": "North Node", "house": 3, "sign": "Gemini"},
-        {"id": "South Node", "house": 3, "sign": "Gemini"},
-    ]
-    assert _house_focus(planets) == [(1, 1), (2, 1)]
-    assert _sign_focus(planets) == [("Aries", 1), ("Taurus", 1)]
-    assert "第3宫(2)" not in _build_life_focus(planets)
-
-
-@pytest.mark.parametrize("mc_sign", SIGNS)
-def test_mc_symbolism_tracks_mc_and_does_not_borrow_ascendant(mc_sign):
-    ascendant = {"sign": "Aries", "sign_zh": "白羊"}
-    text = _build_social_style(
-        [], {"ascendant": ascendant, "midheaven": {"sign": mc_sign, "sign_zh": mc_sign}}
-    )
-    first, second = text.split("MC落在", 1)
-    assert SIGN_INTERPRETATION["Aries"]["persona"] in first
-    assert SIGN_INTERPRETATION[mc_sign]["core"] in second
-    assert "这类气质" not in second
-
-
-def test_orb_is_reported_as_geometric_proximity_not_strength():
-    text = _build_aspect_pattern(
-        [
-            {"planet_a": "Sun", "planet_b": "Moon", "aspect": "square", "orb": 4.0},
-            {"planet_a": "Venus", "planet_b": "Mars", "aspect": "trine", "orb": 0.1},
-        ]
-    )
-    assert "最强" not in text
-    assert "偏离精确角度最小的主相位是金星与火星的拱相" in text
-    assert "各1条" in text
-
-
 @pytest.mark.parametrize("row", PRIMARY["signs"])
-def test_robbins_sign_familiarities_against_manual_primary_text_annotation(row):
+def test_robbins_sign_familiarities_against_manual_primary_text_annotation(row) -> None:
     for other in SIGNS:
         relation = sign_relationship(row["sign"], other)
         reverse = sign_relationship(other, row["sign"])
@@ -221,6 +171,8 @@ def test_robbins_sign_familiarities_against_manual_primary_text_annotation(row):
             assert relation["commanding_sign"] == (
                 row["sign"] if row["hemisphere"] == "summer" else other
             )
+        else:
+            pass
         assert relation["beholding_equal_power"] is (other == row["beholding_partner"])
         assert relation["disjunct"] == reverse["disjunct"]
         assert relation["sign_aspect"] == reverse["sign_aspect"]
@@ -235,18 +187,18 @@ def test_robbins_sign_familiarities_against_manual_primary_text_annotation(row):
 
 
 @pytest.mark.parametrize("case", PRIMARY["aspect_cases"])
-def test_robbins_four_sign_aspects_and_their_qualities(case):
+def test_robbins_four_sign_aspects_and_their_qualities(case) -> None:
     relation = sign_relationship(case["a"], case["b"])
     assert relation["sign_aspect"] == case["aspect"]
     assert relation["aspect_quality"] == case["quality"]
 
 
 @pytest.mark.parametrize("case", PRIMARY["disjunct_cases"])
-def test_robbins_i16_does_not_discard_other_familiarities(case):
+def test_robbins_i16_does_not_discard_other_familiarities(case) -> None:
     assert sign_relationship(case["a"], case["b"])["disjunct"] is case["expected"]
 
 
-def test_original_sign_relation_and_modern_degree_aspect_are_distinct():
+def test_original_sign_relation_and_modern_degree_aspect_are_distinct() -> None:
     positions = {"Sun": 29.9, "Moon": 60.1}
     layer = build_ptolemy_layer(positions, "day", tropical=True)
     assert layer["sign_relationships"][0]["sign_aspect"] == "sextile"
@@ -261,50 +213,9 @@ def test_original_sign_relation_and_modern_degree_aspect_are_distinct():
     )
 
 
-def test_every_generated_reading_has_resolvable_dependencies_and_correct_policy():
-    result = calculate_core_chart_analysis(
-        **BIRTH, chart_variant="hellen_chart", node_mode="both"
-    )
-    assert "error" not in result
-    for key in result["interpretation"]:
-        if key == "evidence_scope":
-            continue
-        assert key in result["interpretation_evidence"]
-        for path in result["interpretation_evidence"][key]["source_paths"]:
-            value = result
-            for token in path.split("."):
-                value = value[int(token)] if isinstance(value, list) else value[token]
-            assert value is not None
-    assert (
-        result["interpretation_evidence"]["original_text_relations"]["policy_id"]
-        == "ptolemy_robbins_sign_relations_v1"
-    )
-    assert (
-        result["interpretation_evidence"]["core_identity"]["policy_id"]
-        == "modern_symbolic_templates_v2"
-    )
-    assert "日盘" in result["interpretation"]["variant_note"]
-    assert "day盘" not in result["interpretation"]["variant_note"]
-
-
-def test_changing_mc_changes_its_reading_without_changing_sun_or_moon_readings():
-    result = calculate_core_chart_analysis(**BIRTH, chart_variant="chart")
-    altered = copy.deepcopy(result)
-    altered["angles"]["midheaven"] = {
-        "longitude": 130.0,
-        "sign": "Leo",
-        "sign_zh": "狮子",
-    }
-    before = _augment_core_chart_reading(result, "chart")["interpretation"]
-    after = _augment_core_chart_reading(altered, "chart")["interpretation"]
-    assert before["social_style"] != after["social_style"]
-    assert before["core_identity"] == after["core_identity"]
-    assert before["emotional_style"] == after["emotional_style"]
-
-
-def test_lot_reduction_preserves_tiny_positive_and_negative_boundary_sides():
-    from fatebridge.core.classical_western import compute_lot, lot_dispositor
-    from fatebridge.core.ptolemy import fortune_longitude
+def test_lot_reduction_preserves_tiny_positive_and_negative_boundary_sides() -> None:
+    from fatebridge.core.astro.ptolemy import fortune_longitude
+    from fatebridge.core.classical_western import build_lots_layer, compute_lot
 
     assert (
         compute_lot(["asc", "moon", "sun"], {"asc": 1e-14, "moon": 0, "sun": 0})
@@ -312,7 +223,9 @@ def test_lot_reduction_preserves_tiny_positive_and_negative_boundary_sides():
     )
     negative = fortune_longitude(0, 1e-14, 0)
     assert 330 < negative < 360
-    assert lot_dispositor(negative) == "Jupiter"
+    lot = build_lots_layer({"asc": 0, "moon": 0, "sun": 1e-14}, True)["fortune"]
+    assert lot["longitude"] == negative
+    assert lot["dispositor"] == "Jupiter"
 
 
 @pytest.mark.parametrize(
@@ -325,10 +238,12 @@ def test_lot_reduction_preserves_tiny_positive_and_negative_boundary_sides():
         ("ChartAspect", {"orb": -0.001}),
     ],
 )
-def test_output_contract_rejects_impossible_coordinate_facts(model, payload):
+def test_output_contract_rejects_impossible_coordinate_facts(
+    model: str, payload
+) -> None:
     from pydantic import ValidationError
 
-    from fatebridge.core import output_charts
+    from fatebridge.core.contracts import output_charts
 
     with pytest.raises(ValidationError):
         getattr(output_charts, model).model_validate(payload)

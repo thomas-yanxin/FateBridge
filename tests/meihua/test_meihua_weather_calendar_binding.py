@@ -9,8 +9,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation import meihua_weather_calendar_binding as binding
-from fatebridge.validation.meihua_weather_trace_binding import bound_weather_label
+from validation import meihua_weather_calendar_binding as binding
+from validation.meihua_weather_trace_binding import bound_weather_label
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/fixtures/meihua_weather_calendar_binding_v1"
@@ -23,7 +23,9 @@ def first():
     return copy.deepcopy(json.loads(OLD.read_bytes())["samples"]["first"])
 
 
-def test_preimplementation_freeze_and_all_raw_official_references_are_retained():
+def test_preimplementation_freeze_and_all_raw_official_references_are_retained() -> (
+    None
+):
     freeze = json.loads((FIXTURE / "reference-freeze.json").read_bytes())
     assert not freeze["new_module_present"]
     assert not freeze["new_packaged_profile_present"]
@@ -45,8 +47,12 @@ def test_preimplementation_freeze_and_all_raw_official_references_are_retained()
     assert not freeze["independent_astronomical_accuracy_established"]
 
 
-@pytest.mark.parametrize("day", list(PROFILE["dates"]))
-def test_each_frozen_reference_date_retains_labels_and_exact_row_provenance(day):
+def test_each_frozen_reference_date_retains_labels_and_exact_row_provenance() -> None:
+    for day in list(PROFILE["dates"]):
+        _assert_frozen_reference_date(day)
+
+
+def _assert_frozen_reference_date(day):
     actual = binding.published_lunar_date_reference(date.fromisoformat(day))
     expected = PROFILE["dates"][day]
     for key, value in expected.items():
@@ -84,21 +90,21 @@ def test_each_frozen_reference_date_retains_labels_and_exact_row_provenance(day)
     )
 
 
-@pytest.mark.parametrize("day,expected", list(ANCHORS.items()))
-def test_literal_new_year_leap_month_and_year_end_anchors(day, expected):
-    row = binding.published_lunar_date_reference(date.fromisoformat(day))
-    assert [row[k] for k in ["year", "month", "day", "is_leap_month"]] == expected
+def test_literal_new_year_leap_month_and_year_end_anchors() -> None:
+    for day, expected in list(ANCHORS.items()):
+        row = binding.published_lunar_date_reference(date.fromisoformat(day))
+        assert [row[k] for k in ["year", "month", "day", "is_leap_month"]] == expected
 
 
-@pytest.mark.parametrize(
-    "day", ["2022-01-01", "2022-01-02", "2021-12-31", "2027-01-01"]
-)
-def test_unanchored_bootstrap_and_outside_dates_stay_unavailable(day):
-    with pytest.raises(ValueError, match="outside"):
-        binding.published_lunar_date_reference(date.fromisoformat(day))
+def test_unanchored_bootstrap_and_outside_dates_stay_unavailable() -> None:
+    for day in ("2022-01-01", "2022-01-02", "2021-12-31", "2027-01-01"):
+        with pytest.raises(ValueError, match="outside"):
+            binding.published_lunar_date_reference(date.fromisoformat(day))
 
 
-def test_self_consistent_twelve_year_substitution_preserves_old_result_but_fails_new_binding():
+def test_self_consistent_twelve_year_substitution_preserves_old_result_but_fails_new_binding() -> (
+    None
+):
     original = first()
     changed = copy.deepcopy(original)
     for key in ["calendar_actual", "calendar_expected"]:
@@ -128,15 +134,17 @@ def test_self_consistent_twelve_year_substitution_preserves_old_result_but_fails
     ],
 )
 def test_published_fields_and_declared_date_policy_cannot_be_substituted(
-    field, key, value
-):
+    field: str, key: str, value: bool | float | int | str
+) -> None:
     record = first()
     record[field][key] = value
     with pytest.raises(ValueError):
         binding.calendar_bound_weather_label(record)
 
 
-def test_common_mode_false_leap_flag_is_not_authenticated_by_internal_agreement():
+def test_common_mode_false_leap_flag_is_not_authenticated_by_internal_agreement() -> (
+    None
+):
     record = first()
     record["calendar_actual"]["is_leap_month"] = record["calendar_expected"][
         "is_leap_month"
@@ -147,7 +155,9 @@ def test_common_mode_false_leap_flag_is_not_authenticated_by_internal_agreement(
         binding.calendar_bound_weather_label(record)
 
 
-def test_original_decision_and_record_are_unchanged_and_full_calendar_gates_stay_false():
+def test_original_decision_and_record_are_unchanged_and_full_calendar_gates_stay_false() -> (
+    None
+):
     record = first()
     saved = copy.deepcopy(record)
     old = bound_weather_label(record)
@@ -167,15 +177,15 @@ def test_original_decision_and_record_are_unchanged_and_full_calendar_gates_stay
         assert scope[key] is False
 
 
-def test_reference_integrity_rejects_content_drift(monkeypatch):
-    class Fake:
-        def joinpath(self, *args):
-            return self
-
-        def read_bytes(self):
-            return b"{}"
-
-    monkeypatch.setattr(binding, "files", lambda *args: Fake())
+def test_reference_integrity_rejects_content_drift(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    target = tmp_path / "validation/data/meihua"
+    target.mkdir(parents=True)
+    (target / "weather-calendar-hko-v1.json").write_bytes(
+        (FIXTURE / "calendar-profile.json").read_bytes() + b" "
+    )
+    monkeypatch.setattr(binding, "REPO_ROOT", tmp_path)
     binding._profile.cache_clear()
     try:
         with pytest.raises(ValueError, match="content changed"):
@@ -184,7 +194,9 @@ def test_reference_integrity_rejects_content_drift(monkeypatch):
         binding._profile.cache_clear()
 
 
-def test_new_reader_imports_no_production_calendar_engine_or_weather_outcome_reader():
+def test_new_reader_imports_no_production_calendar_engine_or_weather_outcome_reader() -> (
+    None
+):
     source = Path(binding.__file__).read_text()
     tree = ast.parse(source)
     imports = [

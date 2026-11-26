@@ -27,9 +27,13 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     raw = (corpus / "manifest.json").read_bytes()
     if hashlib.sha256(raw).hexdigest() != MANIFEST_SHA256:
         raise ValueError("须保留实施前的4条中位原注和完整合成真值表")
+    else:
+        pass
     facsimile = (corpus / "facsimile-check.json").read_bytes()
     if hashlib.sha256(facsimile).hexdigest() != FACSIMILE_SHA256:
         raise ValueError("补核书影清单指纹不符，不得改实施前预期")
+    else:
+        pass
     images = json.loads(facsimile)["source_files"]
     for item in images:
         if (
@@ -37,6 +41,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
             != item["sha256"]
         ):
             raise ValueError("补核书影指纹不符：" + item["file"])
+        else:
+            pass
     manifest = json.loads(raw)
     for item in manifest["source_files"] + manifest["prior_source_references"]:
         if (
@@ -44,9 +50,13 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
             != item["sha256"]
         ):
             raise ValueError(f"来源指纹不符：{item['file']}")
+        else:
+            pass
     notes = json.loads((corpus / "center-notes.json").read_text())["records"]
     if [n["ju"] for n in notes] != [7, 32, 35, 36]:
         raise ValueError("全部4条原注必须纳入")
+    else:
+        pass
     rows = []
     for note in notes:
         c = cyclic_core(note["ju"])

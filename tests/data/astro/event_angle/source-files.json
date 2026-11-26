@@ -1,0 +1,7 @@
+{
+  "files": {
+    "reference.json": "95dd580d08d02fc44fb73f5722af79c42a776f7a61090a245f5c1fbd4db49f03",
+    "protocol.json": "d03f6bc8a5ac08be19285466575b791893e04f6db2ac9459af4055b016a9fada"
+  },
+  "scope": "Current fixed inputs, independent numeric references and raw source data only; no FateBridge source snapshots or old native output packets."
+}

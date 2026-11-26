@@ -6,8 +6,11 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.classical_passage import build_passage_evidence
+from fatebridge.core.contracts.output_classical_passage import (
+    ClassicalPassage,
+    PassagePath,
+)
 from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.output_classical_passage import ClassicalPassage, PassagePath
 
 
 def chart(text):
@@ -20,7 +23,7 @@ def evidence(text):
     return pillars, assessment, build_passage_evidence(pillars, assessment)
 
 
-def test_source_four_clashes_have_two_positioned_branch_intermediaries():
+def test_source_four_clashes_have_two_positioned_branch_intermediaries() -> None:
     pillars = chart("癸酉 甲子 丁卯 丙午")
     assessment = ElementAnalysis.analyze_day_master_strength(pillars)["assessment"]
     before = deepcopy(assessment)
@@ -61,7 +64,7 @@ def test_source_four_clashes_have_two_positioned_branch_intermediaries():
     ClassicalPassage.model_validate(result)
 
 
-def test_separated_or_outside_intermediary_is_not_relabelled_as_contiguous():
+def test_separated_or_outside_intermediary_is_not_relabelled_as_contiguous() -> None:
     _, _, result = evidence("庚寅 甲辰 壬子 丙午")
     path = next(
         p for p in result["visible_paths"] if p["elements"] == ["金", "水", "木"]
@@ -83,7 +86,9 @@ def test_separated_or_outside_intermediary_is_not_relabelled_as_contiguous():
     PassagePath.model_validate({"position_status": "outside_interval"})
 
 
-def test_absent_assessment_is_unknown_and_no_solver_is_called(monkeypatch):
+def test_absent_assessment_is_unknown_and_no_solver_is_called(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     def forbidden(*args, **kwargs):
         raise AssertionError("Passage evidence must use the supplied calculation")
 
@@ -96,7 +101,7 @@ def test_absent_assessment_is_unknown_and_no_solver_is_called(monkeypatch):
     assert all(n["binding_state"] == "not_supplied" for n in result["nodes"])
 
 
-def test_synthetic_energy_does_not_manufacture_an_intermediary_root():
+def test_synthetic_energy_does_not_manufacture_an_intermediary_root() -> None:
     pillars, assessment, _ = evidence("癸酉 甲子 丁卯 丙午")
     changed = deepcopy(assessment)
     for row in changed["hidden_stem_ledger"]:
@@ -104,12 +109,14 @@ def test_synthetic_energy_does_not_manufacture_an_intermediary_root():
             row.update(
                 remaining_mass=0.0, retention_fraction=0.0, engineering_energy=0.0
             )
+        else:
+            pass
     changed["combination_contributions"].append({"element": "水", "mass": 100.0})
     result = build_passage_evidence(pillars, changed)
     assert all(not p["all_nodes_have_remaining_roots"] for p in result["visible_paths"])
 
 
-def test_binding_is_read_from_the_same_assessment_and_subsets_are_independent():
+def test_binding_is_read_from_the_same_assessment_and_subsets_are_independent() -> None:
     _, _, result = evidence("戊寅 癸亥 丁未 辛亥")
     stems = {n["pillar"]: n for n in result["nodes"] if n["plane"] == "stem"}
     assert (
@@ -130,7 +137,9 @@ def test_binding_is_read_from_the_same_assessment_and_subsets_are_independent():
         ("戊午 己未 壬申 辛亥", "庚", "壬"),
     ],
 )
-def test_day_branch_seal_can_be_an_observed_cross_plane_intermediary(text, seal, body):
+def test_day_branch_seal_can_be_an_observed_cross_plane_intermediary(
+    text: str, seal: str, body: str
+) -> None:
     # 官殺 PDF215–216 explicitly describe these hidden seals feeding the body.
     _, _, result = evidence(text)
     paths = [

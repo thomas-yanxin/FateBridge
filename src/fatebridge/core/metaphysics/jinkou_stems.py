@@ -4,8 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from ...utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
-from .common import (
+from fatebridge.core.metaphysics.common import (
     ELEMENT_CONTROLS,
     ELEMENT_GENERATES,
     SIX_HARMONY_BRANCHES,
@@ -13,7 +12,8 @@ from .common import (
     stem_element_text,
     xun_head_for_ganzhi,
 )
-from .jinkou_sources import SCAN_SHA256, SCAN_URL
+from fatebridge.core.metaphysics.jinkou_sources import SCAN_SHA256, SCAN_URL
+from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
 
 WUZI_DUN_START = dict(zip("甲乙丙丁戊己庚辛壬癸", "甲丙戊庚壬甲丙戊庚壬"))
 STEM_PAIRS = (

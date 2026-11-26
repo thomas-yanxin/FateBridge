@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 
+from fatebridge.core.liuyao.liuyao_stages import PROFILE, stage_knowledge
 from scripts.liuyao.liuyao_quote_collation import apply_quote_errata
 
 BASE = Path(__file__).parents[1] / "fixtures/liuyao_quote_collation_v43"
@@ -19,7 +20,7 @@ ERRATA = json.loads((BASE / "errata.json").read_text())
 @pytest.mark.parametrize(
     "case", BEFORE["all_selected_clauses"], ids=lambda c: c["file"] + c["path"]
 )
-def test_every_selected_quotation_is_an_exact_same_edition_excerpt(case):
+def test_every_selected_quotation_is_an_exact_same_edition_excerpt(case) -> None:
     profile = json.loads(
         files("fatebridge.data").joinpath("classical", case["file"]).read_text()
     )
@@ -31,7 +32,7 @@ def test_every_selected_quotation_is_an_exact_same_edition_excerpt(case):
     ), clause
 
 
-def test_the_three_original_failures_and_all_material_hashes_are_retained():
+def test_the_three_original_failures_and_all_material_hashes_are_retained() -> None:
     failed = [
         c
         for c in BEFORE["all_selected_clauses"]
@@ -46,8 +47,7 @@ def test_the_three_original_failures_and_all_material_hashes_are_retained():
         assert hashlib.sha256((BASE / relative).read_bytes()).hexdigest() == expected
 
 
-def test_quotation_repairs_do_not_invent_the_missing_fire_positions():
-    from fatebridge.core.liuyao_stages import PROFILE, stage_knowledge
+def test_quotation_repairs_do_not_invent_the_missing_fire_positions() -> None:
 
     knowledge = stage_knowledge()
     assert knowledge["literal_source_stages"] == PROFILE["known_stages"]
@@ -62,8 +62,8 @@ def test_quotation_repairs_do_not_invent_the_missing_fire_positions():
 
 @pytest.mark.parametrize("rewrite_manifest", [False, True])
 def test_unapproved_transcription_cannot_become_a_generated_quote(
-    rewrite_manifest, tmp_path
-):
+    rewrite_manifest: bool, tmp_path: Path
+) -> None:
     copied = tmp_path / "tests/fixtures/liuyao_quote_collation_v43"
     shutil.copytree(BASE, copied)
     transcription = copied / "transcription.json"
@@ -75,6 +75,8 @@ def test_unapproved_transcription_cannot_become_a_generated_quote(
             transcription.read_bytes()
         ).hexdigest()
         manifest.write_text(json.dumps(data))
+    else:
+        pass
     original = BASE.parent / "liuyao_stages_v15/profile.json"
     with pytest.raises(ValueError, match="Frozen same-edition quotation"):
         apply_quote_errata(

@@ -7,11 +7,15 @@ from pathlib import Path
 
 import pytest
 
+from fatebridge.core.astro.astrology_tables import SIGNS
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.astrology_tables import SIGNS
-from fatebridge.core.jyotish import GRAHAS, build_india, divisional_chart
-from fatebridge.core.jyotish_sthana import COMPONENTS, calculate_sthana, saptavargaja
-from fatebridge.core.jyotish_vargas import (
+from fatebridge.core.jyotish.jyotish import GRAHAS, build_india, divisional_chart
+from fatebridge.core.jyotish.jyotish_sthana import (
+    COMPONENTS,
+    calculate_sthana,
+    saptavargaja,
+)
+from fatebridge.core.jyotish.jyotish_vargas import (
     varga_coordinates,
     varga_longitude,
     varga_sign,
@@ -25,8 +29,8 @@ ORACLE = json.loads((FIXTURES / "jyotish-sthana-reference.json").read_text())
 
 @pytest.mark.parametrize("division", [2, 3, 7, 12])
 def test_equal_divisions_against_transcribed_source_tables_and_exact_cusp_sides(
-    division,
-):
+    division: int,
+) -> None:
     table = CLASSICAL[f"D{division}"]
     for sign, row in enumerate(table):
         for part, target in enumerate(row):
@@ -37,6 +41,8 @@ def test_equal_divisions_against_transcribed_source_tables_and_exact_cusp_sides(
             if part == 0:
                 assert varga_sign(sign * 30.0, division) == target - 1
                 continue
+            else:
+                pass
             exact = Fraction(sign * 30) + Fraction(part * 30, division)
             rounded = float(exact)
             for value in (
@@ -51,7 +57,7 @@ def test_equal_divisions_against_transcribed_source_tables_and_exact_cusp_sides(
                 assert int(varga_longitude(value, division) // 30) == expected - 1
 
 
-def test_unequal_d30_intervals_exact_boundaries_and_no_fabricated_degree():
+def test_unequal_d30_intervals_exact_boundaries_and_no_fabricated_degree() -> None:
     for sign in range(12):
         row = CLASSICAL["D30"]["odd" if sign % 2 == 0 else "even"]
         start = 0
@@ -67,6 +73,8 @@ def test_unequal_d30_intervals_exact_boundaries_and_no_fabricated_degree():
                     row["signs"][part + 1] - 1,
                     None,
                 )
+            else:
+                pass
             start = end
     with pytest.raises(ValueError, match="D30"):
         varga_longitude(5, 30)
@@ -82,7 +90,7 @@ def test_unequal_d30_intervals_exact_boundaries_and_no_fabricated_degree():
 
 
 @pytest.mark.parametrize("profile", ["santhanam_27", "raman_30"])
-def test_five_components_against_independent_hand_arithmetic(profile):
+def test_five_components_against_independent_hand_arithmetic(profile: str) -> None:
     raw = {"ascendant": 0.0, "longitudes": dict.fromkeys(GRAHAS, 0.0)}
     result = calculate_sthana(raw, profile)
     hand = CLASSICAL["all_grahas_at_zero"]
@@ -110,7 +118,9 @@ def test_five_components_against_independent_hand_arithmetic(profile):
     assert len(result["remaining_shadbala"]) == 5
 
 
-def test_raman_primary_book_sun_example_without_using_its_corrupted_ocr_totals():
+def test_raman_primary_book_sun_example_without_using_its_corrupted_ocr_totals() -> (
+    None
+):
     row = CLASSICAL["raman_example9"]
     longitudes = {
         key: degrees + minutes / 60 + seconds / 3600
@@ -121,7 +131,7 @@ def test_raman_primary_book_sun_example_without_using_its_corrupted_ocr_totals()
     assert actual["value"] == row["Sun_saptavargaja_total"]
 
 
-def test_d1_relationship_is_used_in_d30_even_when_varga_distance_differs():
+def test_d1_relationship_is_used_in_d30_even_when_varga_distance_differs() -> None:
     longitudes = {**dict.fromkeys(GRAHAS, 0.0), "Sun": 30.0, "Venus": 132.0}
     row = saptavargaja(longitudes, "Sun", "santhanam_27")["rows"][-1]
     assert row["division"] == 30
@@ -129,7 +139,7 @@ def test_d1_relationship_is_used_in_d30_even_when_varga_distance_differs():
     assert row["value"] == 10
 
 
-def test_author_profile_changes_only_saptavargaja_and_preserves_disagreement():
+def test_author_profile_changes_only_saptavargaja_and_preserves_disagreement() -> None:
     raw = {"ascendant": 0.0, "longitudes": dict.fromkeys(GRAHAS, 0.0)}
     santhanam, raman = [
         calculate_sthana(raw, profile) for profile in ("santhanam_27", "raman_30")
@@ -139,6 +149,8 @@ def test_author_profile_changes_only_saptavargaja_and_preserves_disagreement():
         for component in COMPONENTS:
             if component != "saptavargaja_bala":
                 assert a[component] == b[component]
+            else:
+                pass
         assert (
             santhanam["profile_comparison"]["raman_30"][planet]["saptavargaja_bala"]
             == b["saptavargaja_bala"]
@@ -152,8 +164,8 @@ def test_author_profile_changes_only_saptavargaja_and_preserves_disagreement():
 
 @pytest.mark.parametrize("case", ORACLE["examples"])
 def test_all_vargas_and_aligned_strength_components_against_isolated_pyjhora(
-    case, monkeypatch, tmp_path
-):
+    case, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     year, month, day = case["date"]
     hour, minute, _ = case["time"]
@@ -189,6 +201,8 @@ def test_all_vargas_and_aligned_strength_components_against_isolated_pyjhora(
                 assert point["longitude"] == pytest.approx(
                     sign * 30 + degree, abs=base * chart["division"], rel=0
                 )
+            else:
+                pass
     for planet, expected in case["strength"].items():
         actual = india["strengths"]["sthana_bala"]["summary"][planet]
         for component in COMPONENTS:
@@ -196,6 +210,8 @@ def test_all_vargas_and_aligned_strength_components_against_isolated_pyjhora(
             # reverse Santhanam 27.6. Keep this documented disagreement.
             if component == "drekkana_bala":
                 continue
+            else:
+                pass
             assert actual[component] == pytest.approx(
                 expected[component], abs=0.0051, rel=0
             ), (planet, component)
@@ -232,8 +248,8 @@ def test_all_vargas_and_aligned_strength_components_against_isolated_pyjhora(
     ],
 )
 def test_santhanam_drekkana_boundaries_do_not_inherit_raman_categories(
-    planet, degree, expected
-):
+    planet: str, degree: int, expected: int
+) -> None:
     raw = {
         "ascendant": 0.0,
         "longitudes": {**dict.fromkeys(GRAHAS, 0.0), planet: float(degree)},
@@ -243,7 +259,9 @@ def test_santhanam_drekkana_boundaries_do_not_inherit_raman_categories(
     assert result["summary"][planet]["drekkana_bala"] == expected
 
 
-def test_strengths_exist_without_exporting_extra_charts_and_sensitivity_contains_actual_values():
+def test_strengths_exist_without_exporting_extra_charts_and_sensitivity_contains_actual_values() -> (
+    None
+):
     birth = build_astro_birth_info(**astro_payload())
     india = build_india(birth, divisions=[], birth_time_uncertainty_minutes=1)
     assert set(india["charts"]) == {"D1"}
@@ -258,7 +276,7 @@ def test_strengths_exist_without_exporting_extra_charts_and_sensitivity_contains
     assert india["birth_time_sensitivity"]["sample_count"] == 5
 
 
-def test_all_rasi_groups_and_parities_against_source_component_tables():
+def test_all_rasi_groups_and_parities_against_source_component_tables() -> None:
     # D1 degree0 falls in the first Navamsa, whose parity follows D1.
     kendra_by_house = [60, 30, 15, 60, 30, 15, 60, 30, 15, 60, 30, 15]
     for sign in range(12):
@@ -277,9 +295,9 @@ def test_all_rasi_groups_and_parities_against_source_component_tables():
 
 @pytest.mark.native_engine_fault
 def test_unexported_varga_strength_change_is_not_reported_as_no_categorical_change(
-    monkeypatch,
-):
-    from fatebridge.core import jyotish
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from fatebridge.core.jyotish import jyotish
 
     birth = build_astro_birth_info(**astro_payload())
     base = jyotish.positions(birth)
@@ -287,7 +305,10 @@ def test_unexported_varga_strength_change_is_not_reported_as_no_categorical_chan
     def synthetic_positions(birth, when=None, *args, **kwargs):
         # Freeze every physical-state label to isolate the internal D2 change.
         # This is a sampling-control test, not an astronomical reference.
-        longitude = 15.01 if when is not None and when > birth.utc_datetime else 14.99
+        when_dt = when.utc_datetime if hasattr(when, "utc_datetime") else when
+        longitude = (
+            15.01 if when_dt is not None and when_dt > birth.utc_datetime else 14.99
+        )
         return {**base, "longitudes": {**base["longitudes"], "Sun": longitude}}
 
     monkeypatch.setattr(jyotish, "positions", synthetic_positions)

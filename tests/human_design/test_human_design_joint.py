@@ -8,16 +8,16 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core.human_design import chart_at_tt
-from fatebridge.core.human_design_joint import JointSnapshotCache
-from fatebridge.core.human_design_sensitivity import (
+from fatebridge.core.human_design.human_design import chart_at_tt
+from fatebridge.core.human_design.human_design_joint import JointSnapshotCache
+from fatebridge.core.human_design.human_design_sensitivity import (
     assess_birth_interval,
     compare_charts,
 )
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
-from fatebridge.validation.human_design_joint import verify_joint_snapshot
 from tests.support.ephemeris_context import empty_ephemeris_path
+from validation.human_design import verify_human_design_reading
+from validation.human_design_joint import verify_joint_snapshot
 
 ROOT = Path(__file__).resolve().parents[2]
 CASE = json.loads(
@@ -31,7 +31,7 @@ def endpoint(side):
         return chart_at_tt(CASE["endpoint_jd_tt"][side], backend="moshier")
 
 
-def test_current_endpoint_charts_keep_distinct_minimum_bridge_families():
+def test_current_endpoint_charts_keep_distinct_minimum_bridge_families() -> None:
     changes = compare_charts(
         endpoint("left"), endpoint("right"), include_snapshots=True
     )
@@ -48,9 +48,11 @@ def test_current_endpoint_charts_keep_distinct_minimum_bridge_families():
     assert changes["line_fixing_changes"]
 
 
-def test_actual_interval_keeps_coherent_joint_evidence_and_replayable_witnesses():
+def test_actual_interval_keeps_coherent_joint_evidence_and_replayable_witnesses() -> (
+    None
+):
     with empty_ephemeris_path():
-        from fatebridge.core.human_design import chart_at
+        from fatebridge.core.human_design.human_design import chart_at
 
         nominal = chart_at(datetime.fromisoformat(CASE["nominal_birth_utc"]))
         report = assess_birth_interval(nominal, 10, "true")
@@ -91,7 +93,7 @@ def test_actual_interval_keeps_coherent_joint_evidence_and_replayable_witnesses(
         assert report["sampling"]["continuous_interval_certified"] is False
 
 
-def test_gate_line_and_variable_paths_resolve_within_each_snapshot():
+def test_gate_line_and_variable_paths_resolve_within_each_snapshot() -> None:
     value = JointSnapshotCache().snapshot(endpoint("left"))
     for fix in value["depth_evidence"]["line_fixings"]:
         _, side, index = fix["calculation_path"].split(".")
@@ -116,7 +118,7 @@ def test_gate_line_and_variable_paths_resolve_within_each_snapshot():
             assert value["activations"][side][int(index)][field] == basis["value"]
 
 
-def test_cache_is_local_and_does_not_collapse_typed_invalid_tones():
+def test_cache_is_local_and_does_not_collapse_typed_invalid_tones() -> None:
     cache = JointSnapshotCache()
     a = deepcopy(endpoint("left"))
     first = cache.snapshot(a)
@@ -155,7 +157,7 @@ def test_cache_is_local_and_does_not_collapse_typed_invalid_tones():
         "unknown",
     ],
 )
-def test_snapshot_corruption_is_rejected_without_a_position_oracle(bad):
+def test_snapshot_corruption_is_rejected_without_a_position_oracle(bad: str) -> None:
     value = deepcopy(JointSnapshotCache().snapshot(endpoint("left")))
     if bad == "gate":
         value["activations"]["personality"][0]["gate"] = True
@@ -188,7 +190,7 @@ def complete_joint_run():
         return execute_tool(SPEC, SPEC.request_model(**CASE["birth_input"]))
 
 
-def test_complete_run_checks_all_joint_snapshots(complete_joint_run):
+def test_complete_run_checks_all_joint_snapshots(complete_joint_run) -> None:
     check = verify_human_design_reading(complete_joint_run)
     assert check["status"] == "verified_fixed_template_reading", check
     assert check["checked_joint_snapshot_count"] >= 7
@@ -206,7 +208,9 @@ def test_complete_run_checks_all_joint_snapshots(complete_joint_run):
         "backend_summary",
     ],
 )
-def test_fresh_hash_does_not_certify_corrupted_joint_context(complete_joint_run, bad):
+def test_fresh_hash_does_not_certify_corrupted_joint_context(
+    complete_joint_run, bad: str
+) -> None:
     value = deepcopy(complete_joint_run)
     if bad == "interval_family":
         value["time_sensitivity"]["classification_variants"][0]["value"][
@@ -239,7 +243,7 @@ def test_fresh_hash_does_not_certify_corrupted_joint_context(complete_joint_run,
     assert verify_human_design_reading(value)["status"] == "rejected"
 
 
-def test_regression_endpoint_families_match_separate_exhaustive_c_oracle():
+def test_regression_endpoint_families_match_separate_exhaustive_c_oracle() -> None:
     import hashlib
     import math
 
@@ -281,7 +285,9 @@ def test_regression_endpoint_families_match_separate_exhaustive_c_oracle():
         )
 
 
-def test_audit_does_not_accept_omitted_joint_family_variation(monkeypatch):
+def test_audit_does_not_accept_omitted_joint_family_variation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from scripts.human_design import audit_human_design as audit
 
     original = audit.assess_birth_interval

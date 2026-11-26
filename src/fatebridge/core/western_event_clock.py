@@ -118,7 +118,7 @@ def build_event_subject(
             # Native chart must use the very same physical axis as inversion.
             assert expected_time is not None and expected_time.jd_tt is not None
             if (
-                abs(subject.julian_day - solar["julian_day_ut1"]) * 86400 > 0.0002
+                float(abs(subject.ut1.days - expected_time.ut1.days) * 86400) > 0.0002
                 or abs(subject.julian_day_tt - expected_time.jd_tt) * 86400 > 0.0002
             ):
                 raise EphemerisSourceError("event_clock_source_mismatch")
@@ -143,7 +143,7 @@ def build_event_subject(
             "julian_day_tt": subject.julian_day_tt,
             "julian_day_ut1": subject.julian_day,
             "time_scale_method": subject.calculation_basis["time_scale"],
-            "ut1_reference": ut1_reference(subject.julian_day_tt, subject.julian_day),
+            "ut1_reference": ut1_reference(subject.tt, subject.ut1),
             "utc_representation": (
                 epoch.representation() if solar is not None else None
             ),

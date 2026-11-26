@@ -3,26 +3,24 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, Optional
+from typing import Any
 
+from fatebridge.core.astro.astrology_tables import SIGNS
 from fatebridge.core.astro.context_geometry import FORTUNE_METHODS
 from fatebridge.core.astrodice import (
-    EDITORIAL_RULESET,
     build_symbolic_evidence,
     normalize_house,
     normalize_planet,
     normalize_sign,
     validate_context,
 )
-from fatebridge.core.astrology_tables import SIGNS
-
-from .chart import (
+from fatebridge.core.local_techniques.chart import (
     _build_house_ring,
     _build_local_chart_response,
     _normalize_date_text,
     _normalize_time_text,
 )
-from .snapshot import render_snapshot_text
+from fatebridge.core.local_techniques.snapshot import render_snapshot_text
 
 
 def _quote_question(question: str) -> str:
@@ -36,7 +34,7 @@ def _quote_question(question: str) -> str:
     )
 
 
-def _motion_snapshot_line(obj: Dict[str, Any]) -> str:
+def _motion_snapshot_line(obj: dict[str, Any]) -> str:
     motion = obj["motion"]
     labels = {
         "direct": "瞬时顺行",
@@ -70,7 +68,7 @@ def _motion_snapshot_line(obj: Dict[str, Any]) -> str:
     return line
 
 
-def _solar_position_snapshot(policy: Dict[str, Any]) -> str:
+def _solar_position_snapshot(policy: dict[str, Any]) -> str:
     """Render the computed convention receipt without inventing visibility."""
     domains = {
         "behind_solar_disc": "太阳盘后方；视位置来自透明太阳质量模型的虚拟延拓",
@@ -107,22 +105,22 @@ def _solar_position_snapshot(policy: Dict[str, Any]) -> str:
 
 def build_otherbu_result(
     *,
-    date: Optional[str] = None,
-    time: Optional[str] = None,
-    zone: Optional[str] = None,
-    lat: Any = None,
-    lon: Any = None,
-    gps_lat: Optional[float] = None,
-    gps_lon: Optional[float] = None,
+    date: str | None = None,
+    time: str | None = None,
+    zone: str | None = None,
+    lat: str | float | None = None,
+    lon: str | float | None = None,
+    gps_lat: float | None = None,
+    gps_lon: float | None = None,
     tradition: bool = False,
-    sign: Optional[str] = None,
-    house: Optional[int] = None,
-    planet: Optional[str] = None,
-    question: Optional[str] = None,
+    sign: str | None = None,
+    house: int | None = None,
+    planet: str | None = None,
+    question: str | None = None,
     hsys: int = 8,
     zodiacal: int = 0,
     fortune_method: str = "sect_reversing",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     normalized_sign = normalize_sign(sign)
     normalized_planet = normalize_planet(planet)
     normalized_house = normalize_house(house)
@@ -141,9 +139,11 @@ def build_otherbu_result(
         gps_lat=gps_lat,
         gps_lon=gps_lon,
     )
+    date_text = _normalize_date_text(date) if date is not None else None
+    time_text = _normalize_time_text(time) if time is not None else None
     inputs = {
-        "date": _normalize_date_text(date) if date is not None else None,
-        "time": _normalize_time_text(time) if time is not None else None,
+        "date": date_text,
+        "time": time_text,
         "zone": zone,
         "lat": lat,
         "lon": lon,
@@ -187,10 +187,10 @@ def build_otherbu_result(
         },
     }
     base_chart = None
-    if date is not None and time is not None:
+    if date_text is not None and time_text is not None:
         base_chart = _build_local_chart_response(
-            date_text=inputs["date"],
-            time_text=inputs["time"],
+            date_text=date_text,
+            time_text=time_text,
             timezone_name=zone,
             lat=lat,
             lon=lon,
@@ -207,18 +207,6 @@ def build_otherbu_result(
         )
         base_chart["params"]["chartKind"] = "astronomical_context_only"
         evidence["validation"]["calendar"] = "separate_astronomical_context_computed"
-    interpretation = evidence["interpretation"]
-    if question:
-        interpretation["question_adjustment"] = (
-            f"围绕用户问题（JSON引用）{_quote_question(question)}核对上述议题；问题文本不改变骰面或规则。"
-        )
-        interpretation["evidence"]["question_adjustment"] = {
-            "text_path": "interpretation.question_adjustment",
-            "kind": "user_context",
-            "fact_paths": ["question"],
-            "rule_ids": [],
-            "ruleset_ids": [EDITORIAL_RULESET],
-        }
     snapshot = [
         (
             "骰子结果",
@@ -229,28 +217,11 @@ def build_otherbu_result(
             f"符号示意：{normalized_planet} / {normalized_sign} / House{normalized_house + 1}；无精确度数、上升点或天顶。",
         ),
         (
-            "符号解释",
-            "\n".join(
-                [
-                    interpretation["summary"],
-                    *interpretation["condition_meanings"],
-                    interpretation["dispositor_meaning"],
-                    interpretation["house_condition_meaning"],
-                    interpretation["triplicity_meaning"],
-                    interpretation["planet_sect_meaning"],
-                    interpretation["symbolic_links"],
-                ]
-            ),
-        ),
-        ("现实核对", interpretation["reality_check"]),
-        (
             "依据与边界",
             "\n".join(
                 f"{r['author']} | {r['version']} | {r.get('source_url') or r['source_path']}"
                 for r in evidence["rulesets"]
-            )
-            + "\n"
-            + interpretation["limits"],
+            ),
         ),
     ]
     if base_chart is not None:
@@ -331,5 +302,5 @@ def build_otherbu_result(
         "question": question,
         **evidence,
         "snapshot_text": render_snapshot_text(snapshot),
-        "summary": f"星骰符号：{normalized_planet} / {normalized_sign} / 第{normalized_house + 1}宫。{interpretation['summary']}",
+        "summary": f"星骰符号：{normalized_planet} / {normalized_sign} / 第{normalized_house + 1}宫。",
     }

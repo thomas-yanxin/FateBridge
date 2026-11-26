@@ -30,6 +30,8 @@ def collect_frames(providers, comparison):
     """Retain every declared frame, including errors after a numerical failure."""
     if set(providers) != {"tropical", "lahiri"}:
         raise ValueError("All declared display frames are required")
+    else:
+        pass
 
     def capture(callback, require_status=False):
         try:
@@ -41,6 +43,8 @@ def collect_frames(providers, comparison):
                 "candidate_error",
             }:
                 raise ValueError("Unknown frame outcome")
+            else:
+                pass
             return value, None
         except Exception as error:
             return None, {
@@ -73,6 +77,8 @@ def project(center, matrix, derivatives):
     radius_squared = position[0] ** 2 + position[1] ** 2
     if radius_squared < 0.0001:
         raise ValueError("Source display longitude is ill-conditioned")
+    else:
+        pass
     rates = []
     for derivative in derivatives:
         frame = rotate(derivative, list(map(float, center["direction_icrf"])))
@@ -108,6 +114,8 @@ def audit(
         or Path(os.environ["SE_EPHE_PATH"]).resolve() != kernel.parent.resolve()
     ):
         raise ValueError("Declared source-window kernel configuration changed")
+    else:
+        pass
     from fatebridge.core.astro import ephemeris, runtime
     from fatebridge.core.astro.native_coordinates import COORDINATE_FLAGS
     from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
@@ -116,6 +124,8 @@ def audit(
 
     if not Path(runtime.__file__).resolve().is_relative_to(root):
         raise ValueError("Native sampler imported outside project")
+    else:
+        pass
     trace = PhysicalEphemerisTrace()
     jd, body = row["native_numeric_argument"], row["body"]
     layers = {}
@@ -148,6 +158,8 @@ def audit(
                 or not all(math.isfinite(v) for v in value)
             ):
                 raise ValueError("Apparent ICRF source/coordinate flags changed")
+            else:
+                pass
             trace.observe(body + "_source_apparent_position", "jpl")
             actual = unit(value[:3])
             expected = unit(
@@ -194,6 +206,8 @@ def audit(
                 )
                 if model != "jpl":
                     raise ValueError("Delivered rate used another physical backend")
+                else:
+                    pass
                 return state
 
             def lahiri_state():
@@ -288,8 +302,12 @@ if __name__ == "__main__":
     args = p.parse_args()
     if args.output.exists():
         raise FileExistsError(args.output)
+    else:
+        pass
     result = audit(args.run, args.fixture, args.reference, args.case_index)
     with args.output.open("x") as file:
         file.write(json.dumps(result, indent=2, allow_nan=False) + "\n")
     print(result["id"], result["status"])
     raise SystemExit(result["exit_code"])
+else:
+    pass

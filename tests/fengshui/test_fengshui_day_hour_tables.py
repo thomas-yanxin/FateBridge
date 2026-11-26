@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.fengshui.xuankong import _fly
-from fatebridge.validation import fengshui_day_hour as audit
+from validation import fengshui_day_hour as audit
 
 FOLDER = Path(__file__).parents[1] / "data/fengshui_day_hour_tables_v1"
 
@@ -18,7 +18,7 @@ def reference():
     return audit.load_day_hour_reference(FOLDER)
 
 
-def test_complete_printed_tables_and_source_scope():
+def test_complete_printed_tables_and_source_scope() -> None:
     result = audit.audit_day_hour_reference(reference())
     assert result["daily_confirmed_table_cycle_cases"] == 1080
     assert result["hour_confirmed_day_group_cases"] == 72
@@ -44,7 +44,7 @@ def test_complete_printed_tables_and_source_scope():
         assert result[key] is False
 
 
-def test_transcription_was_fixed_before_arithmetic_probe():
+def test_transcription_was_fixed_before_arithmetic_probe() -> None:
     assert hashlib.sha256((FOLDER / "reference.json").read_bytes()).hexdigest() == (
         "968fa587634e1f53a657142622b4b4dada3c10d65e0d1043caa4028fe3f01a32"
     )
@@ -53,7 +53,7 @@ def test_transcription_was_fixed_before_arithmetic_probe():
     )
 
 
-def test_literal_inverted_branch_controls_the_third_cycle_only():
+def test_literal_inverted_branch_controls_the_third_cycle_only() -> None:
     table = next(t for t in reference()["daily_tables"] if t["id"] == "middle_yang")
     cell = next(t for t in table["inverted_cells"] if t["ganzhi"] == "戊午")
     assert (cell["row"], cell["column"]) == (5, 8)
@@ -73,7 +73,7 @@ def test_literal_inverted_branch_controls_the_third_cycle_only():
     assert case["ignoring_inverted_tail_center"] == 1
 
 
-def test_hour_table_keeps_inverse_spatial_flight_and_literal_group_names():
+def test_hour_table_keeps_inverse_spatial_flight_and_literal_group_names() -> None:
     hour = reference()["hour_table"]
     assert hour["title"] == "三元时紫白顺逆合局表"
     assert hour["intro_page"] == 856
@@ -90,7 +90,7 @@ def test_hour_table_keeps_inverse_spatial_flight_and_literal_group_names():
     assert _fly(9, True)["NW"] == 1
 
 
-def test_pure_collation_never_mutates_literal_capture():
+def test_pure_collation_never_mutates_literal_capture() -> None:
     data = reference()
     original = deepcopy(data)
     audit.audit_day_hour_reference(data)
@@ -98,7 +98,7 @@ def test_pure_collation_never_mutates_literal_capture():
 
 
 @pytest.mark.parametrize("file", ["reference.json", "page-849.png", "page-857.png"])
-def test_changed_source_bytes_are_rejected(tmp_path, file):
+def test_changed_source_bytes_are_rejected(tmp_path: Path, file: str) -> None:
     folder = tmp_path / "capture"
     shutil.copytree(FOLDER, folder)
     with (folder / file).open("ab") as stream:
@@ -107,7 +107,7 @@ def test_changed_source_bytes_are_rejected(tmp_path, file):
         audit.load_day_hour_reference(folder)
 
 
-def test_incomplete_capture_manifest_cannot_reduce_scope(tmp_path):
+def test_incomplete_capture_manifest_cannot_reduce_scope(tmp_path: Path) -> None:
     folder = tmp_path / "capture"
     shutil.copytree(FOLDER, folder)
     hashes = json.loads((folder / "hashes.json").read_text())
@@ -117,7 +117,7 @@ def test_incomplete_capture_manifest_cannot_reduce_scope(tmp_path):
         audit.load_day_hour_reference(folder)
 
 
-def test_hashes_do_not_make_a_nonobject_reference_valid(tmp_path):
+def test_hashes_do_not_make_a_nonobject_reference_valid(tmp_path: Path) -> None:
     folder = tmp_path / "capture"
     shutil.copytree(FOLDER, folder)
     (folder / "reference.json").write_text("[]\n")
@@ -131,7 +131,7 @@ def test_hashes_do_not_make_a_nonobject_reference_valid(tmp_path):
 
 
 @pytest.mark.parametrize("change", ["table", "cycle", "day", "tail", "star", "row"])
-def test_no_missing_or_invalid_cells_are_treated_as_passing(change):
+def test_no_missing_or_invalid_cells_are_treated_as_passing(change: str) -> None:
     data = reference()
     if change == "table":
         data["daily_tables"].pop()
@@ -149,7 +149,7 @@ def test_no_missing_or_invalid_cells_are_treated_as_passing(change):
         audit.audit_day_hour_reference(data)
 
 
-def test_wrong_but_well_formed_palace_row_is_a_disagreement():
+def test_wrong_but_well_formed_palace_row_is_a_disagreement() -> None:
     data = reference()
     row = list(data["daily_tables"][0]["palace_rows"][0])
     row[1], row[2] = row[2], row[1]
@@ -159,7 +159,7 @@ def test_wrong_but_well_formed_palace_row_is_a_disagreement():
     assert result["table_arithmetic_and_shared_flight_conform"] is False
 
 
-def test_prose_endpoint_cannot_be_ignored():
+def test_prose_endpoint_cannot_be_ignored() -> None:
     data = reference()
     data["daily_tables"][2]["last_ordinary_star"] = 8
     result = audit.audit_day_hour_reference(data)
@@ -167,7 +167,7 @@ def test_prose_endpoint_cannot_be_ignored():
     assert result["table_arithmetic_and_shared_flight_conform"] is False
 
 
-def test_prose_join_does_not_disappear_when_the_matrix_matches():
+def test_prose_join_does_not_disappear_when_the_matrix_matches() -> None:
     data = reference()
     data["daily_tables"][2]["following_anchor_star"] = 9
     result = audit.audit_day_hour_reference(data)
@@ -177,7 +177,7 @@ def test_prose_join_does_not_disappear_when_the_matrix_matches():
     assert result["table_arithmetic_and_shared_flight_conform"] is False
 
 
-def test_bad_flight_implementation_is_detected(monkeypatch):
+def test_bad_flight_implementation_is_detected(monkeypatch: pytest.MonkeyPatch) -> None:
     original = audit._fly
     monkeypatch.setattr(audit, "_fly", lambda center, yang=True: original(center, True))
     result = audit.audit_day_hour_reference(reference())
@@ -186,7 +186,7 @@ def test_bad_flight_implementation_is_detected(monkeypatch):
     assert result["calendar_table_selection_verified"] is False
 
 
-def test_reference_cannot_award_itself_full_algorithm_coverage():
+def test_reference_cannot_award_itself_full_algorithm_coverage() -> None:
     data = reference()
     data["not_implemented_or_certified"] = {}
     data["whole_book_conformity_established"] = True

@@ -6,9 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import SU27_ORDER, calendar_mansion
-from fatebridge.core.sukuyo_hinoo_critical import critical_calendar_reference
-from fatebridge.core.sukuyo_profiles import fullmoon_calculation, source_bundle
+from fatebridge.core.sukuyo.sukuyo import SU27_ORDER, calendar_mansion
+from fatebridge.core.sukuyo.sukuyo_hinoo_critical import critical_calendar_reference
+from fatebridge.core.sukuyo.sukuyo_profiles import fullmoon_calculation, source_bundle
 from scripts.sukuyo.check_sukuyo_hinoo_critical import verify_primary
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -23,7 +23,9 @@ def reference():
 
 
 @pytest.mark.parametrize("key,mansion", PRIMARY["expected_month_day_mansions"].items())
-def test_direct_manuscript_month_day_controls_and_retained_taisho_reading(key, mansion):
+def test_direct_manuscript_month_day_controls_and_retained_taisho_reading(
+    key, mansion
+) -> None:
     month, day = map(int, key.split("/"))
     row = next(
         r
@@ -37,9 +39,13 @@ def test_direct_manuscript_month_day_controls_and_retained_taisho_reading(key, m
     if day == 30:
         assert row["taisho_literal_mansion"] == "星"
         assert not row["taisho_literal_matches_host"]
+    else:
+        pass
 
 
-def test_offline_quotation_check_does_not_claim_reopened_images_or_complete_collation():
+def test_offline_quotation_check_does_not_claim_reopened_images_or_complete_collation() -> (
+    None
+):
     report = verify_primary()
     assert report["selected_manuscript_fragments_checked"] == 8
     assert report["apparatus_span_characters"] == 16
@@ -52,7 +58,7 @@ def test_offline_quotation_check_does_not_claim_reopened_images_or_complete_coll
 
 
 @pytest.mark.parametrize("kind", ["image", "manifest"])
-def test_changed_private_primary_bytes_are_rejected(tmp_path, kind):
+def test_changed_private_primary_bytes_are_rejected(tmp_path: Path, kind: str) -> None:
     p = tmp_path / kind
     p.write_bytes(b"not the captured primary source")
     with pytest.raises(ValueError, match="fingerprint changed"):
@@ -64,7 +70,7 @@ def test_changed_private_primary_bytes_are_rejected(tmp_path, kind):
 @pytest.mark.parametrize(
     "field", ["publisher_html_response_sha256", "downloaded_calendar_windows"]
 )
-def test_companion_reference_rejects_a_different_taisho_source(field):
+def test_companion_reference_rejects_a_different_taisho_source(field: str) -> None:
     source = source_bundle()["hinoo_addendum"]
     source["downloaded_primary_edition"][field] = "changed"
     with pytest.raises(ValueError, match="原文不一致"):
@@ -74,7 +80,7 @@ def test_companion_reference_rejects_a_different_taisho_source(field):
 
 
 @pytest.mark.parametrize("days", [(1, 15), (1, 15, 15, 30), (1, 15, 29)])
-def test_example_context_cannot_be_omitted_duplicated_or_substituted(days):
+def test_example_context_cannot_be_omitted_duplicated_or_substituted(days) -> None:
     with pytest.raises(ValueError, match="不完整或重复"):
         critical_calendar_reference(
             source_bundle()["hinoo_addendum"],
@@ -86,8 +92,8 @@ def test_example_context_cannot_be_omitted_duplicated_or_substituted(days):
     "date,expected", [("1903-06-25", ["鬼", "参"]), ("1957-09-24", ["角", "轸"])]
 )
 def test_both_reconstruction_derivations_remain_available_without_picking_a_priority(
-    date, expected
-):
+    date: str, expected
+) -> None:
     result = calendar_mansion(
         date, calendar_profile="hinoo_t1299_host27", calendar_day_part="first_half"
     )
@@ -117,7 +123,9 @@ def test_both_reconstruction_derivations_remain_available_without_picking_a_prio
     }
 
 
-def test_manuscript_and_apparatus_do_not_supply_a_modern_clock_or_resolve_priority():
+def test_manuscript_and_apparatus_do_not_supply_a_modern_clock_or_resolve_priority() -> (
+    None
+):
     report = reference()
     span = report["apparatus_span_reference"]
     assert span["normalized_candidate_span"].endswith("故傍月")
@@ -135,7 +143,9 @@ def test_manuscript_and_apparatus_do_not_supply_a_modern_clock_or_resolve_priori
     ]
 
 
-def test_returned_critical_text_is_detached_from_next_profile_and_source_cache():
+def test_returned_critical_text_is_detached_from_next_profile_and_source_cache() -> (
+    None
+):
     first = reference()
     expected = copy.deepcopy(first)
     first["selected_primary"]["observations"][0]["normalized_transcription"] = "changed"
@@ -143,7 +153,7 @@ def test_returned_critical_text_is_detached_from_next_profile_and_source_cache()
     assert reference() == expected
 
 
-def test_literal_verb_correction_does_not_hide_adverse_model_mansion_reading():
+def test_literal_verb_correction_does_not_hide_adverse_model_mansion_reading() -> None:
     selected = reference()["selected_primary"]
     first = next(r for r in selected["observations"] if r["id"] == "twelfth_day_1")
     assert first["normalized_transcription"] == "十二月一日重宿是虚宿"
@@ -153,7 +163,7 @@ def test_literal_verb_correction_does_not_hide_adverse_model_mansion_reading():
     assert readings["conflicts"][1]["reviewer"] == "室"
     assert not readings["selected_root_control_independently_certified"]
     assert not readings["complete_collation_accepted"]
-    from fatebridge.core.sukuyo import day_evidence
+    from fatebridge.core.sukuyo.sukuyo import day_evidence
 
     day = day_evidence(
         calendar_mansion("2006-08-24", calendar_profile="hinoo_t1299_host27"),
@@ -164,7 +174,7 @@ def test_literal_verb_correction_does_not_hide_adverse_model_mansion_reading():
     assert day["day_mansion"] is None
 
 
-def test_default_profile_does_not_inherit_or_switch_to_a_manuscript_policy():
+def test_default_profile_does_not_inherit_or_switch_to_a_manuscript_policy() -> None:
     result = calendar_mansion("1903-06-25")
     assert result["status"] == "partial"
     assert result["profile_calculation"]["hinoo_source"] is None

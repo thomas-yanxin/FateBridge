@@ -22,7 +22,7 @@ FIXTURE = (
 )
 
 
-def test_machin_pi_bounds_and_nonunit_vector_angular_units():
+def test_machin_pi_bounds_and_nonunit_vector_angular_units() -> None:
     lower, upper = pi_bounds()
     known = Q(Decimal("3.14159265358979323846264338327950288419716939937510"))
     assert lower < known < upper
@@ -35,12 +35,12 @@ def test_machin_pi_bounds_and_nonunit_vector_angular_units():
     assert bounds[1] <= Q(324000) / lower + Q(1, 10**60)
 
 
-def test_pole_cannot_receive_a_finite_RA_slope_certificate():
+def test_pole_cannot_receive_a_finite_RA_slope_certificate() -> None:
     with pytest.raises(ValueError):
         angular_rate_bounds([A(0), A(0), A(1)])
 
 
-def test_independent_source_boxes_and_unscaled_LP_certificates_replay():
+def test_independent_source_boxes_and_unscaled_LP_certificates_replay() -> None:
     slope = verify_slopes(FIXTURE)
     assert slope["derived_scalar_caps"] == [1932, 1930, 1934]
     assert slope["angular_rate_boxes_checked"] == 3456
@@ -63,8 +63,8 @@ def test_independent_source_boxes_and_unscaled_LP_certificates_replay():
     ],
 )
 def test_independent_source_replay_refuses_underbounds_and_premise_changes(
-    tmp_path, mutation
-):
+    tmp_path: Path, mutation: str
+) -> None:
     names = [
         "shape-first.json",
         "source-slope-first.json",
@@ -103,7 +103,9 @@ def test_independent_source_replay_refuses_underbounds_and_premise_changes(
 @pytest.mark.parametrize(
     "mutation", ["primal_and_own_optimum", "missing_window", "tuned_cap"]
 )
-def test_unscaled_LP_replay_rejects_forged_proofs_or_narrowed_scope(tmp_path, mutation):
+def test_unscaled_LP_replay_rejects_forged_proofs_or_narrowed_scope(
+    tmp_path: Path, mutation: str
+) -> None:
     names = [
         "source-slope-plan-before-evaluation.json",
         "source-cap-first-certificates.json",

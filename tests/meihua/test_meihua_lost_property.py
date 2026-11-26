@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.meihua import meihua_stage_relations
-from fatebridge.core.meihua_lost_property import (
+from fatebridge.core.meihua.meihua import meihua_stage_relations
+from fatebridge.core.meihua.meihua_lost_property import (
     lost_property_qualifications,
     lost_property_ruleset,
 )
@@ -28,7 +28,7 @@ def calculate(code="111111", line=1, **kwargs):
     )
 
 
-def test_source_freeze_precedes_implementation_and_retains_all_raw_witnesses():
+def test_source_freeze_precedes_implementation_and_retains_all_raw_witnesses() -> None:
     freeze = json.loads((FIXTURE / "reference-freeze.json").read_text())
     assert not freeze["new_production_module_present"]
     assert not freeze["new_profile_present"]
@@ -37,6 +37,8 @@ def test_source_freeze_precedes_implementation_and_retains_all_raw_witnesses():
     for name, sha in freeze["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == sha
     assert lost_property_ruleset() == PROFILE
     copy = lost_property_ruleset()
@@ -45,7 +47,9 @@ def test_source_freeze_precedes_implementation_and_retains_all_raw_witnesses():
 
 
 @pytest.mark.parametrize("case", GEOMETRY, ids=lambda c: f"{c['code']}:{c['line']}")
-def test_all_384_reused_geometries_bind_initial_and_changed_roles_separately(case):
+def test_all_384_reused_geometries_bind_initial_and_changed_roles_separately(
+    case,
+) -> None:
     result = calculate(case["code"], case["line"])
     clause = result["interpretation"]["topic_reading"]
     initial, changed = case["rows"][0], case["rows"][3]
@@ -77,12 +81,7 @@ def test_all_384_reused_geometries_bind_initial_and_changed_roles_separately(cas
         is location["event_time"]
         is None
     )
-    assert (
-        clause["event_time"]
-        is clause["success_probability"]
-        is clause["real_outcome_verdict"]
-        is None
-    )
+    assert clause["event_time"] is clause["real_outcome_verdict"] is None
     assert not location["selection_policy"]["unique_classical_scope_adjudicated"]
     assert location["selected_trigram"] in result["summary"]
     assert location["direction_symbol"] in result["summary"]
@@ -98,8 +97,8 @@ def test_all_384_reused_geometries_bind_initial_and_changed_roles_separately(cas
     ],
 )
 def test_literal_anchors_do_not_choose_the_unchanged_half(
-    code, line, trigram, direction, position
-):
+    code: str, line: int, trigram: str, direction: str, position: str
+) -> None:
     result = calculate(code, line)
     loc = result["interpretation"]["topic_reading"]["chapter_qualifications"]
     assert (
@@ -111,8 +110,8 @@ def test_literal_anchors_do_not_choose_the_unchanged_half(
 
 @pytest.mark.parametrize("basis", ["raw_counts", "trigram_numbers"])
 def test_count_candidates_keep_opposed_initial_clauses_and_distinct_location_paths(
-    basis,
-):
+    basis: str,
+) -> None:
     result = calculate_meihua_cast(
         casting={
             "method": "sound_groups",
@@ -155,7 +154,7 @@ def test_count_candidates_keep_opposed_initial_clauses_and_distinct_location_pat
     )
 
 
-def test_source_variants_and_reported_loss_are_not_silently_rewritten():
+def test_source_variants_and_reported_loss_are_not_silently_rewritten() -> None:
     result = calculate(question="已经确认丢失了钥匙")
     clause = result["interpretation"]["topic_reading"]
     assert clause["quote"] == "體用比和物不失矣"
@@ -167,7 +166,9 @@ def test_source_variants_and_reported_loss_are_not_silently_rewritten():
     assert "倉廩" in kun["quote"] and "倉稟" in kun["comparison_reading"]["quote"]
 
 
-def test_questions_do_not_select_the_chapter_and_weather_context_stays_exclusive():
+def test_questions_do_not_select_the_chapter_and_weather_context_stays_exclusive() -> (
+    None
+):
     result = calculate_meihua_cast(
         casting={"method": "existing", "hexagram_code": "111111", "moving_line": 1},
         question="失物在西北吗",
@@ -179,7 +180,9 @@ def test_questions_do_not_select_the_chapter_and_weather_context_stays_exclusive
         )
 
 
-def test_mismatched_stage_path_fails_instead_of_silently_copying_another_candidate():
+def test_mismatched_stage_path_fails_instead_of_silently_copying_another_candidate() -> (
+    None
+):
     cast = calculate()["meihua"]
     stages = meihua_stage_relations(cast)
     stages[-1]["fact_path"] = "meihua.changed_hexagram.upper"

@@ -4,28 +4,32 @@ from __future__ import annotations
 
 import math
 from calendar import monthrange
+from collections.abc import Mapping
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
 from datetime import tzinfo as DateTimeZone
 from fractions import Fraction
-from typing import Any, Dict, List, Literal, Mapping, Optional
+from typing import Any, Literal
 
+from fatebridge.core.astro.angle_definitions import is_ascendant_resolved
+from fatebridge.core.astro.astrology_tables import (
+    EGYPTIAN_BOUNDS_BY_SIGN as EGYPTIAN_BOUNDS_BY_SIGN,
+)
+from fatebridge.core.astro.astrology_tables import SIGN_LABELS_ZH, SIGNS
 from fatebridge.core.astro.birth import (
     AstroBirthInfo,
     build_astro_birth_info,
     require_resolved_birth_timezone,
 )
+from fatebridge.core.astro.event_reference import ASC_INDEPENDENT_HOUSES
 from fatebridge.core.astro.geometry import (
     Angle,
     angular_separation_fraction,
-    combine_longitudes,
+    combine_longitudes_exact,
+    longitude_float,
     normalize_angle,
 )
 from fatebridge.core.astro.physical_epoch import PhysicalEpoch
-from fatebridge.core.astrology_tables import (
-    EGYPTIAN_BOUNDS_BY_SIGN as EGYPTIAN_BOUNDS_BY_SIGN,
-)
-from fatebridge.core.astrology_tables import SIGN_LABELS_ZH, SIGNS
 from fatebridge.core.ephemeris_runtime import swe
 from fatebridge.core.execution_context import current_datetime
 from fatebridge.core.predictive.native_chart import (
@@ -33,7 +37,12 @@ from fatebridge.core.predictive.native_chart import (
     NativeSubject,
     build_native_subject,
 )
-from fatebridge.utils.timezones import parse_timezone_name, validate_local_clock
+from fatebridge.utils.civil_time import ZonedCalendar, utc_calendar
+from fatebridge.utils.timezones import (
+    parse_timezone_name,
+    require_defined_gap_offsets,
+    validate_local_clock,
+)
 
 TROPICAL_YEAR_DAYS = 365.2425
 TIMING_POINT_NAMES = [
@@ -158,7 +167,7 @@ ZR_PHASE_LABELS = {
 
 def ensure_predictive_backend_available() -> None:
     if swe is None:
-        raise ImportError("Swiss Ephemeris 未安装，无法启用西占推运能力。")
+        raise ModuleNotFoundError("Swiss Ephemeris 未安装，无法启用西占推运能力。")
 
 
 def build_predictive_birth_info(
@@ -170,9 +179,9 @@ def build_predictive_birth_info(
     birth_longitude: float,
     birth_latitude: float,
     birth_minute: int = 0,
-    birth_timezone: Optional[str] = None,
-    name: Optional[str] = None,
-    birth_place: Optional[str] = None,
+    birth_timezone: str | None = None,
+    name: str | None = None,
+    birth_place: str | None = None,
 ) -> AstroBirthInfo:
     return build_astro_birth_info(
         birth_year=birth_year,
@@ -191,11 +200,11 @@ def build_predictive_birth_info(
 
 def build_analysis_datetime(
     birth_info: AstroBirthInfo,
-    analysis_year: Optional[int] = None,
-    analysis_month: Optional[int] = None,
-    analysis_day: Optional[int] = None,
-    analysis_hour: Optional[int] = None,
-    analysis_minute: Optional[int] = None,
+    analysis_year: int | None = None,
+    analysis_month: int | None = None,
+    analysis_day: int | None = None,
+    analysis_hour: int | None = None,
+    analysis_minute: int | None = None,
 ) -> datetime:
     """Resolve the target clock independently of the natal clock.
 
@@ -205,16 +214,13 @@ def build_analysis_datetime(
     """
     timezone_name = birth_info.timezone
     tzinfo = parse_timezone_name(timezone_name)
-    now = current_datetime(tzinfo, timezone_name, now_provider=datetime.now)
-    year = now.year if analysis_year is None else analysis_year
-    month = now.month if analysis_month is None else analysis_month
-    # A default day must fit the requested month (including leap-year changes).
-    # Explicit days retain datetime's validation instead of being rewritten.
-    day = (
-        min(now.day, monthrange(year, month)[1])
-        if analysis_day is None
-        else analysis_day
-    )
+    year, month, day = analysis_year, analysis_month, analysis_day
+    if year is None or month is None or day is None:
+        now = current_datetime(tzinfo, timezone_name, now_provider=datetime.now)
+        year = now.year if year is None else year
+        month = now.month if month is None else month
+        if day is None:
+            day = min(now.day, monthrange(year, month)[1])
     target = datetime(
         year,
         month,
@@ -227,10 +233,7 @@ def build_analysis_datetime(
         ),
         tzinfo=tzinfo,
     )
-    try:
-        validate_local_clock(target)
-    except ValueError as error:
-        raise ValueError(str(error).replace("出生钟时", "分析钟时")) from error
+    validate_local_clock(target, clock_label="分析钟时")
     return target
 
 
@@ -238,7 +241,7 @@ def resolve_local_birthday_anniversary(
     birth_local_datetime: datetime,
     target_year: int,
     *,
-    tzinfo: Optional[DateTimeZone] = None,
+    tzinfo: DateTimeZone | None = None,
     clock_policy: Literal["preserve_wall", "compatible"] = "preserve_wall",
 ) -> datetime:
     """Reconstruct the original birthday; callers select generated-clock policy.
@@ -262,7 +265,11 @@ def resolve_local_birthday_anniversary(
         tzinfo=tzinfo or birth_local_datetime.tzinfo,
     )
     if clock_policy == "compatible":
-        return moment.astimezone(timezone.utc).astimezone(moment.tzinfo)
+        require_defined_gap_offsets(moment, clock_label="计算所得的周年钟时")
+        moment = ZonedCalendar.from_datetime(moment).require_datetime()
+        validate_local_clock(
+            moment, allow_ambiguous=True, clock_label="计算所得的周年钟时"
+        )
     return moment
 
 
@@ -281,9 +288,12 @@ def resolve_last_birthday(
     A date-line gap can move a December anniversary into January, so the
     displayed year cannot be used to choose the next birthday or the age.
     """
-    analysis_local = analysis_datetime.astimezone(
-        parse_timezone_name(birth_info.timezone)
-    )
+    analysis_utc = utc_calendar(analysis_datetime)
+    if analysis_utc < birth_info.utc_calendar:
+        raise ValueError("分析时刻不能早于出生时刻。")
+    zone = parse_timezone_name(birth_info.timezone)
+    analysis_local = ZonedCalendar(analysis_utc, zone).require_datetime()
+    birth_local = birth_info.local_datetime
     nominal_year = analysis_local.year
     anniversary = resolve_local_birthday_anniversary(
         birth_info.local_datetime,
@@ -291,9 +301,7 @@ def resolve_last_birthday(
         tzinfo=analysis_local.tzinfo,
         clock_policy="compatible",
     )
-    while analysis_local.astimezone(timezone.utc) < anniversary.astimezone(
-        timezone.utc
-    ):
+    while analysis_utc < utc_calendar(anniversary):
         nominal_year -= 1
         anniversary = resolve_local_birthday_anniversary(
             birth_info.local_datetime,
@@ -301,7 +309,11 @@ def resolve_last_birthday(
             tzinfo=analysis_local.tzinfo,
             clock_policy="compatible",
         )
-    return BirthdayAnniversary(analysis_local, nominal_year, anniversary)
+    return BirthdayAnniversary(
+        analysis_local,
+        nominal_year,
+        birth_local if nominal_year == birth_local.year else anniversary,
+    )
 
 
 def normalize_sign_name(sign_name: str) -> str:
@@ -313,7 +325,7 @@ def sign_label(sign_name: str) -> str:
     return f"{SIGN_LABELS_ZH.get(normalized, normalized)}座"
 
 
-def resolve_egyptian_bound(sign_name: str, degree_in_sign: float) -> Dict[str, Any]:
+def resolve_egyptian_bound(sign_name: str, degree_in_sign: float) -> dict[str, Any]:
     normalized_sign = normalize_sign_name(sign_name)
     for lord, start_degree, end_degree in EGYPTIAN_BOUNDS_BY_SIGN.get(
         normalized_sign, []
@@ -332,13 +344,13 @@ def planet_label(planet_name: str) -> str:
     return PLANET_LABELS.get(planet_name, planet_name)
 
 
-def house_number(house_name: Optional[str]) -> Optional[int]:
+def house_number(house_name: str | None) -> int | None:
     if house_name is None:
         return None
     return HOUSE_NAME_TO_NUMBER.get(house_name)
 
 
-def house_label(house_name: Optional[str]) -> Optional[str]:
+def house_label(house_name: str | None) -> str | None:
     number = house_number(house_name)
     if number is None:
         return None
@@ -354,7 +366,7 @@ def point_absolute_position(subject: NativeSubject, point_name: str) -> float:
     return float(point.abs_pos)
 
 
-def point_to_dict(point_name: str, point: NativePoint) -> Dict[str, Any]:
+def point_to_dict(point_name: str, point: NativePoint) -> dict[str, Any]:
     sign_name = normalize_sign_name(point.sign)
     house_name = point.house
     return {
@@ -371,16 +383,25 @@ def point_to_dict(point_name: str, point: NativePoint) -> Dict[str, Any]:
     }
 
 
-def longitude_to_point_dict(point_name: str, absolute_degree: float) -> Dict[str, Any]:
-    normalized_degree = normalize_angle(absolute_degree)
-    sign_index = int(normalized_degree // 30)
+def longitude_to_point_dict(point_name: str, absolute_degree: Angle) -> dict[str, Any]:
+    if isinstance(absolute_degree, Fraction):
+        sign_index, degree = divmod(absolute_degree % 360, 30)
+        normalized_degree = longitude_float(absolute_degree)
+        displayed_degree = float(degree)
+        # Preserve ownership of whole-degree table intervals in the public record.
+        if int(displayed_degree) != int(degree):
+            displayed_degree = math.nextafter(displayed_degree, -math.inf)
+    else:
+        normalized_degree = normalize_angle(absolute_degree)
+        sign_index = int(normalized_degree // 30)
+        displayed_degree = normalized_degree % 30
     sign_name = SIGNS[sign_index]
     return {
         "point": point_name,
         "point_label": planet_label(point_name),
         "sign": sign_name,
         "sign_label": sign_label(sign_name),
-        "degree": normalized_degree % 30,
+        "degree": displayed_degree,
         "absolute_degree": normalized_degree,
         "longitude": normalized_degree,
     }
@@ -394,7 +415,7 @@ def opposite_sign(sign_name: str) -> str:
     return SIGNS[(SIGNS.index(sign_name) + 6) % 12]
 
 
-def classify_releasing_phase(sign_name: str, fortune_sign: str) -> Dict[str, Any]:
+def classify_releasing_phase(sign_name: str, fortune_sign: str) -> dict[str, Any]:
     relative_index = ((SIGNS.index(sign_name) - SIGNS.index(fortune_sign)) % 12) + 1
     if relative_index in {1, 4, 7, 10}:
         phase = "angular"
@@ -416,10 +437,10 @@ def whole_sign_house_from_asc(asc_sign: str, target_sign: str) -> int:
 
 def build_lot_point_dict(
     lot_key: str,
-    absolute_degree: float,
+    absolute_degree: Angle,
     *,
     asc_sign: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     point_name = LOT_POINT_NAMES[lot_key]
     payload = longitude_to_point_dict(point_name, absolute_degree)
     sign_name = payload["sign"]
@@ -435,37 +456,28 @@ def build_lot_point_dict(
     return payload
 
 
-def build_lot_payloads(natal_subject: NativeSubject) -> Dict[str, Dict[str, Any]]:
-    asc_sign = normalize_sign_name(natal_subject.ascendant.sign)
-    sect = determine_sect(natal_subject)
-    sun_longitude = point_absolute_position(natal_subject, "Sun")
-    moon_longitude = point_absolute_position(natal_subject, "Moon")
-    asc_longitude = point_absolute_position(natal_subject, "Ascendant")
-    if sect == "day":
-        fortune_longitude = combine_longitudes(
-            asc_longitude, moon_longitude, -sun_longitude
-        )
-        spirit_longitude = combine_longitudes(
-            asc_longitude, sun_longitude, -moon_longitude
-        )
-    else:
-        fortune_longitude = combine_longitudes(
-            asc_longitude, sun_longitude, -moon_longitude
-        )
-        spirit_longitude = combine_longitudes(
-            asc_longitude, moon_longitude, -sun_longitude
-        )
+def build_lot_longitudes(natal_subject: NativeSubject) -> dict[str, Fraction]:
+    if not is_ascendant_resolved(natal_subject):
+        return {}
+    sun = point_absolute_position(natal_subject, "Sun")
+    moon = point_absolute_position(natal_subject, "Moon")
+    asc = point_absolute_position(natal_subject, "Ascendant")
+    added, subtracted = (
+        (moon, sun) if determine_sect(natal_subject) == "day" else (sun, moon)
+    )
     return {
-        "lot_of_fortune": build_lot_point_dict(
-            "lot_of_fortune",
-            fortune_longitude,
-            asc_sign=asc_sign,
-        ),
-        "lot_of_spirit": build_lot_point_dict(
-            "lot_of_spirit",
-            spirit_longitude,
-            asc_sign=asc_sign,
-        ),
+        "lot_of_fortune": combine_longitudes_exact(asc, added, -subtracted),
+        "lot_of_spirit": combine_longitudes_exact(asc, subtracted, -added),
+    }
+
+
+def build_lot_payloads(natal_subject: NativeSubject) -> dict[str, dict[str, Any]]:
+    asc_sign = normalize_sign_name(natal_subject.ascendant.sign)
+    return {
+        lot_key: build_lot_point_dict(
+            lot_key, longitude_float(longitude), asc_sign=asc_sign
+        )
+        for lot_key, longitude in build_lot_longitudes(natal_subject).items()
     }
 
 
@@ -503,12 +515,15 @@ def build_natal_subject(
     require_resolved_birth_timezone(birth_info.timezone_source)
     return build_subject(
         name=birth_info.name,
-        local_datetime=birth_info.local_datetime,
+        local_datetime=(
+            birth_info.local_datetime if birth_info.native_epoch is None else None
+        ),
         longitude=birth_info.longitude,
         latitude=birth_info.latitude,
         timezone_name=birth_info.timezone,
         house_system=house_system,
         zodiac_type=zodiac_type,
+        physical_epoch=birth_info.native_epoch,
     )
 
 
@@ -524,49 +539,67 @@ def calculate_age_years(
     birth_info: AstroBirthInfo,
     analysis_datetime: datetime,
 ) -> float:
-    birth_utc = birth_info.require_utc_datetime
-    analysis_utc = analysis_datetime.astimezone(parse_timezone_name("UTC"))
-    delta = analysis_utc - birth_utc
+    delta = utc_calendar(analysis_datetime).elapsed_since(birth_info.utc_calendar)
     return delta.total_seconds() / (TROPICAL_YEAR_DAYS * 86400.0)
 
 
-def calculate_age_years_int(
-    birth_info: AstroBirthInfo,
-    analysis_datetime: datetime,
-) -> int:
-    anniversary = resolve_last_birthday(birth_info, analysis_datetime=analysis_datetime)
-    return anniversary.nominal_year - birth_info.local_datetime.year
-
-
-def extract_reference_points(subject: NativeSubject) -> Dict[str, Dict[str, Any]]:
+def extract_reference_points(subject: NativeSubject) -> dict[str, dict[str, Any]]:
     return extract_named_points(subject, TIMING_POINT_NAMES)
 
 
 def extract_named_points(
     subject: NativeSubject,
-    point_names: List[str],
-) -> Dict[str, Dict[str, Any]]:
+    point_names: list[str],
+) -> dict[str, dict[str, Any]]:
+    ascendant_resolved = is_ascendant_resolved(subject)
+    houses_resolved = ascendant_resolved or (
+        subject.houses_system_identifier in ASC_INDEPENDENT_HOUSES
+    )
     result = {}
     for point_name in point_names:
-        result[point_name.lower()] = point_to_dict(
-            point_name,
-            getattr(subject, point_attribute_name(point_name)),
+        point = point_to_dict(
+            point_name, getattr(subject, point_attribute_name(point_name))
         )
+        if point_name == "Ascendant" and not ascendant_resolved:
+            point = {
+                key: value if key in {"point", "point_label"} else None
+                for key, value in point.items()
+            }
+            point["status"] = "underdetermined_ascendant"
+        elif not houses_resolved:
+            point.update(house=None, house_label=None)
+        result[point_name.lower()] = point
     return result
 
 
-def extract_reference_longitudes(subject: NativeSubject) -> Dict[str, float]:
+def extract_reference_longitudes(subject: NativeSubject) -> dict[str, float]:
     return extract_named_longitudes(subject, TIMING_POINT_NAMES)
 
 
 def extract_named_longitudes(
     subject: NativeSubject,
-    point_names: List[str],
-) -> Dict[str, float]:
+    point_names: list[str],
+) -> dict[str, float]:
+    ascendant_resolved = is_ascendant_resolved(subject)
     return {
         point_name: point_absolute_position(subject, point_name)
         for point_name in point_names
+        if ascendant_resolved or point_name != "Ascendant"
     }
+
+
+def source_arc_positions(
+    natal_longitudes: Mapping[str, float],
+    natal_source: float,
+    progressed_source: float,
+) -> tuple[Fraction, dict[str, Fraction]]:
+    """Retain one source displacement through rotations and aspect decisions."""
+    arc = (Fraction(progressed_source) - Fraction(natal_source)) % 360
+    directed = {
+        name: (Fraction(longitude) + arc) % 360
+        for name, longitude in natal_longitudes.items()
+    }
+    return arc, directed
 
 
 def collect_aspect_hits(
@@ -574,7 +607,7 @@ def collect_aspect_hits(
     source_longitudes: Mapping[str, Angle],
     target_longitudes: Mapping[str, Angle],
     orb_limit: float = 1.5,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     if not math.isfinite(orb_limit) or not 0 <= orb_limit <= 180:
         raise ValueError("Aspect orb must be finite and within 0..180 degrees")
     limit = Fraction(orb_limit)

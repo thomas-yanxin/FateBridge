@@ -11,10 +11,10 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core.human_design import bodygraph
-from fatebridge.core.human_design_bridging import definition_bridging
+from fatebridge.core.human_design.human_design import bodygraph
+from fatebridge.core.human_design.human_design_bridging import definition_bridging
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
+from validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[2]
 REFERENCE = json.loads(
@@ -24,7 +24,9 @@ PLAN = json.loads((ROOT / REFERENCE["plan_path"]).read_text())
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 
 
-def test_oracle_is_bound_to_separate_code_frozen_source_and_complete_subset_counts():
+def test_oracle_is_bound_to_separate_code_frozen_source_and_complete_subset_counts() -> (
+    None
+):
     for path, expected in PLAN["source_fingerprints"].items():
         assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == expected
     assert (
@@ -80,7 +82,9 @@ def test_oracle_is_bound_to_separate_code_frozen_source_and_complete_subset_coun
 
 
 @pytest.mark.parametrize("index", range(22), ids=[c["id"] for c in PLAN["cases"]])
-def test_all_minimum_sets_match_exhaustive_independent_union_find_and_replay(index):
+def test_all_minimum_sets_match_exhaustive_independent_union_find_and_replay(
+    index,
+) -> None:
     case, expected = PLAN["cases"][index], REFERENCE["cases"][index]
     graph = bodygraph(case["activated_gates"], [])
     original = deepcopy(graph)
@@ -122,7 +126,9 @@ def test_all_minimum_sets_match_exhaustive_independent_union_find_and_replay(ind
         assert replay["definition"]["kind"] == "single"
 
 
-def test_a_partial_one_gate_merge_is_not_a_complete_bridge_for_three_components():
+def test_a_partial_one_gate_merge_is_not_a_complete_bridge_for_three_components() -> (
+    None
+):
     case = next(c for c in PLAN["cases"] if c["id"] == "branch-1980-01-02")
     graph = bodygraph(case["activated_gates"], [])
     assert graph["definition"]["single_gate_bridges"]
@@ -135,7 +141,7 @@ def test_a_partial_one_gate_merge_is_not_a_complete_bridge_for_three_components(
         assert len(row["merged_original_component_indices"][0]) == 2
 
 
-def test_shared_gate_costs_are_not_double_counted_across_channels():
+def test_shared_gate_costs_are_not_double_counted_across_channels() -> None:
     graph = bodygraph([25, 51, 43, 23, 28, 38], [])
     report = definition_bridging(graph)
     assert report["minimum_added_gate_count"] == 3
@@ -146,7 +152,9 @@ def test_shared_gate_costs_are_not_double_counted_across_channels():
     )
 
 
-def test_paths_can_use_formerly_undefined_centers_and_all_six_long_route_options():
+def test_paths_can_use_formerly_undefined_centers_and_all_six_long_route_options() -> (
+    None
+):
     graph = bodygraph([64, 47, 19, 49], [])
     assert graph["centers"]["throat"]["status"] == "completely_open"
     report = definition_bridging(graph)
@@ -157,7 +165,7 @@ def test_paths_can_use_formerly_undefined_centers_and_all_six_long_route_options
     )
 
 
-def test_bad_component_claim_cannot_be_used_as_a_bridge_input():
+def test_bad_component_claim_cannot_be_used_as_a_bridge_input() -> None:
     graph = bodygraph([64, 47, 19, 49], [])
     graph["definition"]["components"] = [["head", "ajna", "root", "solar_plexus"]]
     with pytest.raises(ValueError, match="分组"):
@@ -176,7 +184,7 @@ def test_bad_component_claim_cannot_be_used_as_a_bridge_input():
         "text",
     ],
 )
-def test_rehashed_false_bridge_and_its_description_are_rejected(tamper):
+def test_rehashed_false_bridge_and_its_description_are_rejected(tamper: str) -> None:
     run = execute_tool(
         SPEC,
         SPEC.request_model(
@@ -186,6 +194,7 @@ def test_rehashed_false_bridge_and_its_description_are_rejected(tamper):
             birth_hour=12,
             birth_minute=0,
             birth_timezone="Europe/London",
+            compare_apparent_models=True,
         ),
     )
     assert (

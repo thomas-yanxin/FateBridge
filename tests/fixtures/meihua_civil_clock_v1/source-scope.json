@@ -1,0 +1,51 @@
+{
+  "iana_version": "2026e",
+  "release_url": "https://data.iana.org/time-zones/releases/tzdata2026e.tar.gz",
+  "release_sha256": "b26882805f26aac59d5b222978e6580484b834ccdc98be89df2f05a6dc53a652",
+  "selected_lines": {
+    "northamerica": {
+      "US_rule_lines": [
+        193,
+        194
+      ],
+      "New_York_zone_lines": [
+        346,
+        352
+      ]
+    },
+    "australasia": {
+      "Lord_Howe_rule_zone_lines": [
+        208,
+        214
+      ],
+      "Apia_zone_lines": [
+        796,
+        801
+      ]
+    },
+    "asia": {
+      "Shanghai_comment_uncertainty_lines": [
+        532,
+        535
+      ],
+      "Shanghai_zone_lines": [
+        654,
+        656
+      ],
+      "Kathmandu_zone_lines": [
+        3008,
+        3010
+      ]
+    }
+  },
+  "nist_crosscheck": {
+    "url": "https://www.nist.gov/pml/time-and-frequency-division/popular-links/daylight-saving-time-dst",
+    "retrieval": "web tool read; not archived HTML",
+    "2026_dst_start": "March8at02local",
+    "2026_dst_end": "November1at02local;01hourrepeated"
+  },
+  "historic_shanghai_precision_scope": "Tests selected published tzdb whole-second +08:05:43. Source comments cite8:05:43.2and uncertainty about actual standardization; not verified local historical clock practice.",
+  "future_rules_are_known_future_law": false,
+  "meihua_original_prescribes_modern_IANA_or_fold": false,
+  "all_dates_all_instants_calendar_certificate": false
+}

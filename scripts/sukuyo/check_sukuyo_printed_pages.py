@@ -20,22 +20,34 @@ def verify_primary(captures: Path | None = None) -> dict[str, Any]:
     sha = lambda value: hashlib.sha256(value).hexdigest()
     if sha(raw) != before["source_bundle_sha256"] or data != before["expected_data"]:
         raise ValueError("所选印页记录与修改前参考不一致")
+    else:
+        pass
     checked = 0
     if captures is not None:
         for name, digest in before["raw_tile_files_sha256"].items():
             if sha((captures / name).read_bytes()) != digest:
                 raise ValueError("实际图砖字节指纹不一致")
+            else:
+                pass
             checked += 1
         for frame in data["printed_frames"]:
             image = captures / (frame["id"] + "-level12.png")
             if sha(image.read_bytes()) != frame["assembled_png_sha256"]:
                 raise ValueError("所选层整页图像指纹不一致")
+            else:
+                pass
         roi = captures / "T1644-0196-a12-native-roi.png"
         if sha(roi.read_bytes()) != data["native_a12_ROI"]["png_sha256"]:
             raise ValueError("所选原分辨率局部指纹不一致")
+        else:
+            pass
         for item in data["followup_native_reference"]["additional_native_ROIs"]:
             if sha((captures / item["png_file"]).read_bytes()) != item["png_sha256"]:
                 raise ValueError("补充原分辨率局部指纹不一致")
+            else:
+                pass
+    else:
+        pass
     return {
         "source_bundle_sha256": sha(raw),
         "selected_print_pages": len(data["printed_frames"]),
@@ -50,3 +62,5 @@ if __name__ == "__main__":
     parser.add_argument("--captures", type=Path)
     args = parser.parse_args()
     print(json.dumps(verify_primary(args.captures), ensure_ascii=False, indent=2))
+else:
+    pass

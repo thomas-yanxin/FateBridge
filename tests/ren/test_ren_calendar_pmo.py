@@ -17,7 +17,7 @@ AUDIT = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(AUDIT)
 
 
-def test_all_126_years_keep_both_modern_minutes_and_legacy_notes():
+def test_all_126_years_keep_both_modern_minutes_and_legacy_notes() -> None:
     ref = AUDIT.reference()
     assert len(ref["cases"]) == 3024
     assert ref["years"] == list(range(1900, 2026))
@@ -30,7 +30,9 @@ def test_all_126_years_keep_both_modern_minutes_and_legacy_notes():
     assert values[(1979, "大寒")]["published_moment"] == "1979-01-21T00:00:00+08:00"
 
 
-def test_complete_minute_comparisons_keep_declared_threshold_and_full_denominator():
+def test_complete_minute_comparisons_keep_declared_threshold_and_full_denominator() -> (
+    None
+):
     report = AUDIT.audit()
     assert report["expected_count"] == report["compared_count"] == 3024
     assert report["boundary_pair_count"] == 4536
@@ -45,6 +47,8 @@ def test_complete_minute_comparisons_keep_declared_threshold_and_full_denominato
         assert row["within_printed_minute_criterion"] == expected
         if not expected:
             failures.append(row)
+        else:
+            pass
     assert report["minute_failures"] == failures
     assert report["minute_failure_count"] == len(failures)
     assert report["all_performed_comparisons_passed"] == (not failures)
@@ -53,8 +57,8 @@ def test_complete_minute_comparisons_keep_declared_threshold_and_full_denominato
 
 
 def test_an_entire_solver_failure_remains_reportable_without_dropping_the_cohort(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(almanac, "get_solar_terms_for_year", lambda *a, **kw: [])
     report = AUDIT.audit()
     assert report["expected_count"] == 3024
@@ -64,7 +68,7 @@ def test_an_entire_solver_failure_remains_reportable_without_dropping_the_cohort
     assert not report["all_performed_comparisons_passed"]
 
 
-def test_frozen_source_edit_and_omitted_term_table_are_rejected(tmp_path):
+def test_frozen_source_edit_and_omitted_term_table_are_rejected(tmp_path: Path) -> None:
     ref = AUDIT.reference()
     text = (AUDIT.CORPUS / "source.txt").read_text()
     with pytest.raises(ValueError, match="eight terms"):

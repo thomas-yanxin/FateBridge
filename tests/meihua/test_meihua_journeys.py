@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.meihua_journeys import journey_ruleset
-from fatebridge.core.meihua_topics import topic_ruleset
+from fatebridge.core.meihua.meihua_journeys import journey_ruleset
+from fatebridge.core.meihua.meihua_topics import topic_ruleset
 from fatebridge.services.meihua import calculate_meihua_cast
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_journeys_v1"
@@ -35,7 +35,7 @@ def calculate(case, topic="travel", month=None, **extra):
     )
 
 
-def test_source_and_manual_geometry_commitment_precede_new_implementation():
+def test_source_and_manual_geometry_commitment_precede_new_implementation() -> None:
     manifest = json.loads((FIXTURE / "manifest.json").read_text())
     assert not manifest["implementation_present"]
     assert not manifest["expected_values_from_production"]
@@ -43,11 +43,15 @@ def test_source_and_manual_geometry_commitment_precede_new_implementation():
     for name, digest in manifest["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
 
 
 @pytest.mark.parametrize("topic,relation,quote,case", CLAUSES)
-def test_selected_literal_clause_and_original_body_paths(topic, relation, quote, case):
+def test_selected_literal_clause_and_original_body_paths(
+    topic, relation, quote, case
+) -> None:
     result = calculate(case, topic)
     assert "error" not in result
     row = result["interpretation"]["topic_reading"]
@@ -63,18 +67,13 @@ def test_selected_literal_clause_and_original_body_paths(topic, relation, quote,
         row["source_witness"]["original_pdf_indices"]
         == READING["chapters"][topic]["quote_indices"][relation]
     )
-    assert (
-        row["event_time"]
-        is row["success_probability"]
-        is row["real_outcome_verdict"]
-        is None
-    )
+    assert row["event_time"] is row["real_outcome_verdict"] is None
     assert not row["comparison_reading"]["used_to_override_selected_edition"]
 
 
 @pytest.mark.parametrize("case", ANCHORS)
 @pytest.mark.parametrize("month", [None, *STRENGTH])
-def test_every_body_element_uses_its_own_known_or_unknown_strength(case, month):
+def test_every_body_element_uses_its_own_known_or_unknown_strength(case, month) -> None:
     result = calculate(case, month=month)
     layer = result["interpretation"]["topic_reading"]["chapter_qualifications"]
     expected = (
@@ -102,7 +101,9 @@ def test_every_body_element_uses_its_own_known_or_unknown_strength(case, month):
     ] == [r["relation"] == "用生体" for r in case["roles"]]
 
 
-def test_complete_unclear_source_sentences_remain_pending_without_restored_dui():
+def test_complete_unclear_source_sentences_remain_pending_without_restored_dui() -> (
+    None
+):
     layer = calculate(ANCHORS[0])["interpretation"]["topic_reading"][
         "chapter_qualifications"
     ]
@@ -145,7 +146,7 @@ def test_complete_unclear_source_sentences_remain_pending_without_restored_dui()
 
 
 @pytest.mark.parametrize("topic", ["travel", "meeting"])
-def test_count_candidates_use_their_own_geometry_and_evidence_paths(topic):
+def test_count_candidates_use_their_own_geometry_and_evidence_paths(topic: str) -> None:
     result = calculate_meihua_cast(
         casting={
             "method": "sound_groups",
@@ -183,14 +184,18 @@ def test_count_candidates_use_their_own_geometry_and_evidence_paths(topic):
                 layer["body_strength_preference"]["strength_fact_path"]
                 == f"interpretation.casting_readings.{i}.seasonal_strength.trigrams.0.strength"
             )
+        else:
+            pass
 
 
 @pytest.mark.parametrize("topic", ["travel", "meeting"])
-def test_weather_context_cannot_supply_human_chapter_conditions(topic):
+def test_weather_context_cannot_supply_human_chapter_conditions(topic: str) -> None:
     assert "error" in calculate(ANCHORS[0], topic, weather_context={"season": "autumn"})
 
 
-def test_new_profiles_cannot_mutate_old_twenty_clause_profile_or_cached_quotes():
+def test_new_profiles_cannot_mutate_old_twenty_clause_profile_or_cached_quotes() -> (
+    None
+):
     original = topic_ruleset()
     assert len(original["rules"]) == 20
     new = journey_ruleset()
@@ -199,7 +204,7 @@ def test_new_profiles_cannot_mutate_old_twenty_clause_profile_or_cached_quotes()
     assert topic_ruleset() == original
 
 
-def test_question_keywords_do_not_select_new_classical_chapters():
+def test_question_keywords_do_not_select_new_classical_chapters() -> None:
     result = calculate_meihua_cast(
         casting={"method": "existing", "hexagram_code": "100111", "moving_line": 1},
         question="虚构工程示例：出行和谒见",
@@ -209,7 +214,9 @@ def test_question_keywords_do_not_select_new_classical_chapters():
 
 
 @pytest.mark.parametrize("topic", ["travel", "meeting"])
-def test_new_human_branches_keep_reported_motion_and_external_roles_separate(topic):
+def test_new_human_branches_keep_reported_motion_and_external_roles_separate(
+    topic: str,
+) -> None:
     result = calculate_meihua_cast(
         casting={
             "method": "sound_groups",

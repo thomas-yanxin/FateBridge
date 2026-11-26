@@ -5,23 +5,27 @@ import itertools
 import json
 import math
 from copy import deepcopy
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.bazi_evidence import build_natal_evidence
+from fatebridge.core.bazi.bazi_evidence import build_natal_evidence
 from fatebridge.core.complete_bureaus import complete_bureau_snapshot_lines
+from fatebridge.core.contracts.output_root_ledger import HiddenStemLedgerEntry
 from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.output_root_ledger import HiddenStemLedgerEntry
 from fatebridge.core.strength import DEFAULT_POLICY, _evaluate
 from fatebridge.utils.data import STEM_ELEMENTS
-from tests.bazi.test_strength_v2 import pillars, score
+from tests.unit_test.fixtures.bazi_strength import (
+    bazi_pillars,
+    evaluate_pillar_strength,
+)
 
 FOLDER = Path(__file__).parents[1] / "data/bazi_complete_bureau_v1"
 
 
-def test_scanned_source_retains_one_complete_gold_bureau_with_two_roosters():
+def test_scanned_source_retains_one_complete_gold_bureau_with_two_roosters() -> None:
     raw = (FOLDER / "reference.json").read_bytes()
     assert (
         hashlib.sha256(raw).hexdigest()
@@ -33,7 +37,7 @@ def test_scanned_source_retains_one_complete_gold_bureau_with_two_roosters():
         == reference["source"]["retained_pages_sha256"]
     )
     case = reference["case"]
-    result = score(" ".join(case["pillars"]))
+    result = evaluate_pillar_strength(" ".join(case["pillars"]))
     events = [r for r in result["relations"] if r["kind"] == "三合"]
     assert len(events) == 1
     event = events[0]
@@ -75,8 +79,8 @@ def test_scanned_source_retains_one_complete_gold_bureau_with_two_roosters():
     ],
 )
 def test_every_duplicate_member_is_one_physical_position_under_all_permutations(
-    kind, group
-):
+    kind: str, group: str
+) -> None:
     # Synthetic topology probes, never extra source examples or accuracy labels.
     for duplicate in group:
         for branches in set(itertools.permutations(group + duplicate)):
@@ -113,21 +117,54 @@ def test_every_duplicate_member_is_one_physical_position_under_all_permutations(
                 assert budget["remaining"] <= budget["initial"] + 1e-12
 
 
-def test_incompatible_different_relations_and_incomplete_shared_peak_stay_unresolved():
-    # Full 寅午戌 and outside 戌卯六合 remain distinct relation claims.
-    result = score("甲寅 丙午 戊戌 乙卯")
-    full = next(e for e in result["relations"] if e["kind"] == "三合")
-    assert full["status"] == "contested_or_clashed"
-    half = score("甲辰 丁卯 甲子 戊辰")
+def test_incompatible_different_relations_and_incomplete_shared_peak_stay_unresolved() -> (
+    None
+):
+    # Both 寅午戌 and adjacent 戌卯 target fire. The outside seat has no budget.
+    result = evaluate_pillar_strength("甲寅 丙午 戊戌 乙卯")
+    (full,) = [e for e in result["relations"] if e["kind"] == "三合"]
+    assert full["positions"] == ["year", "month", "day"]
+    assert full["target"] == "火"
+    assert full["status"] == "conditioned_transformation"
+    (affiliate,) = [e for e in result["relations"] if e["kind"] == "六合"]
+    assert affiliate["positions"] == ["day", "hour"]
+    assert affiliate["status"] == "same_target_affiliation_only"
+    assert affiliate["primary_formation"] == {
+        "kind": "三合",
+        "positions": ["year", "month", "day"],
+        "target": "火",
+    }
+    assert affiliate["outside_positions"] == ["hour"]
+    assert affiliate["additional_budget"] == 0.0
+    assert affiliate["calculation_effect"] == "none"
+
+    # The complete fire bureau and adjacent 寅亥 wood pair really compete.
+    rival = evaluate_pillar_strength("丙戌 甲午 戊寅 癸亥")
+    full, pair = [e for e in rival["relations"] if e["kind"] in {"三合", "六合"}]
+    assert (full["kind"], full["target"], full["positions"]) == (
+        "三合",
+        "火",
+        ["year", "month", "day"],
+    )
+    assert (pair["kind"], pair["target"], pair["positions"]) == (
+        "六合",
+        "木",
+        ["day", "hour"],
+    )
+    assert full["status"] == pair["status"] == "contested_or_clashed"
+    half = evaluate_pillar_strength("甲辰 丁卯 甲子 戊辰")
     assert {e["status"] for e in half["relations"] if e["kind"] == "半合"} == {
         "contested"
     }
 
 
-def test_synthetic_contributions_never_become_physical_stem_roots():
+def test_synthetic_contributions_never_become_physical_stem_roots() -> None:
     # A smaller branch budget is a controlled engineering ablation. It exposes
     # activation differences hidden by saturation under the default policy.
-    result = score("甲寅 丙午 丙辰 丁酉", branch_budget=0.5)
+    result = evaluate_pillar_strength(
+        "甲寅 丙午 丙辰 丁酉",
+        policy=replace(DEFAULT_POLICY, branch_budget=0.5),
+    )
     ledger = result["hidden_stem_ledger"]
     assert all(row["stem"] is not None for row in ledger)
     assert result["combination_contributions"]
@@ -146,8 +183,10 @@ def test_synthetic_contributions_never_become_physical_stem_roots():
     assert fire["energy"] == pytest.approx(12 / 7, abs=1e-6)
 
 
-def test_body_and_seal_get_copied_surviving_roots_without_becoming_classical_labels():
-    chart = pillars("辛巳 丁酉 丁酉 辛丑")
+def test_body_and_seal_get_copied_surviving_roots_without_becoming_classical_labels() -> (
+    None
+):
+    chart = bazi_pillars("辛巳 丁酉 丁酉 辛丑")
     strength = ElementAnalysis.analyze_day_master_strength(chart)
     force = build_natal_evidence(chart, strength)["force_components"]
     actual = strength["assessment"]["hidden_stem_ledger"]
@@ -156,7 +195,20 @@ def test_body_and_seal_get_copied_surviving_roots_without_becoming_classical_lab
         assert roots == [r for r in actual if r["element"] == component["element"]]
         for row in roots:
             HiddenStemLedgerEntry.model_validate(row)
-    assert set(force["classical_adjudication"].values()) == {"not_adjudicated"}
+    adjudication = force["classical_adjudication"]
+    assert adjudication == strength["classical_adjudication"]
+    assert adjudication["status"] == "not_adjudicated"
+    assert all(
+        adjudication[field] is None
+        for field in (
+            "body_strength",
+            "seal_weight",
+            "body_seal_relation",
+            "ordinary_fuyi_applicable",
+        )
+    )
+    assert adjudication["observed_body_root_positions"] == ["year"]
+    assert adjudication["observed_seal_root_positions"] == []
     force["components"]["body"]["remaining_hidden_roots"][0]["remaining_mass"] = 999
     assert actual[0]["remaining_mass"] != 999
     absent = build_natal_evidence(chart)["force_components"]

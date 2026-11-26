@@ -7,9 +7,9 @@ import zipfile
 from fractions import Fraction
 from pathlib import Path
 
-from fatebridge.core.lilly_fortune import ROW_SPECS, evaluate_fortune
-from fatebridge.core.lilly_house_assignment import assign_cusp_virtue
-from fatebridge.core.output_western import LillyFortune
+from fatebridge.core.astro.lilly_fortune import ROW_SPECS, evaluate_fortune
+from fatebridge.core.astro.lilly_house_assignment import assign_cusp_virtue
+from fatebridge.core.contracts.output_western import LillyFortune
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE_SHA256 = "08fdcb25a97ff486eeab20516925bff58b1ad5d96d90c2b71f565ab79a52e4d7"
@@ -152,3 +152,5 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

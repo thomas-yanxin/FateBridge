@@ -40,11 +40,15 @@ def published_rows(sources: dict[str, bytes]) -> list[list]:
             m = re.match(r"\s*(\d{4})/(\d{1,2})/(\d{1,2})\s+(.+?)\s{2,}", line)
             if not m:
                 continue
+            else:
+                pass
             civil = date(*map(int, m.group(1, 2, 3)))
             label = m[4].strip()
             month = re.fullmatch(r"(\d+)(?:st|nd|rd|th) Lunar [Mm]onth", label)
             if not month and not label.isdigit():
                 raise ValueError(f"Unrecognized source label: {line}")
+            else:
+                pass
             rows.append(
                 [civil, int(month[1]) if month else None, 1 if month else int(label)]
             )
@@ -52,8 +56,12 @@ def published_rows(sources: dict[str, bytes]) -> list[list]:
     chinese = decode(sources["T2069c.txt"])
     if not re.search(r"2069年12月30日\s+十七\s+星期一", chinese):
         raise ValueError("Chinese supplement for 2069-12-30 changed")
+    else:
+        pass
     if any(row[0] == date(2069, 12, 30) for row in rows):
         raise ValueError("English table gap changed: review source reconciliation")
+    else:
+        pass
     rows.append([date(2069, 12, 30), None, 17])
     rows.sort()
     expected_count = (date(2100, 1, 1) - date(1901, 1, 1)).days
@@ -63,6 +71,8 @@ def published_rows(sources: dict[str, bytes]) -> list[list]:
         raise ValueError(
             "Official source dates must cover the declared range exactly once"
         )
+    else:
+        pass
     # First upcoming new month provides the preceding month's number. No call
     # to the production calendar is used to seed the reference chronology.
     first = next(row for row in rows if row[1] is not None)
@@ -73,7 +83,11 @@ def published_rows(sources: dict[str, bytes]) -> list[list]:
             leap = new_month == month
             if new_month == 1:
                 lunar_year = civil.year
+            else:
+                pass
             month = new_month
+        else:
+            pass
         result.append([civil.isoformat(), lunar_year, month, day, leap])
     return result
 
@@ -92,6 +106,8 @@ def render(sources: dict[str, bytes]) -> tuple[str, str]:
         expected = [year, month, day, leap]
         if [lunar.year, lunar.month, lunar.day, bool(lunar.isLeapMonth)] != expected:
             corrections[civil] = expected
+        else:
+            pass
     bundle = {
         "id": "sukuyo_hko_corrections_v1",
         "source": "https://www.hko.gov.hk/en/gts/time/conversion.htm",
@@ -135,6 +151,8 @@ def main():
         def fetch(name):
             if args.source_dir:
                 return name, (args.source_dir / name).read_bytes()
+            else:
+                pass
             url = SUPPLEMENT if name.endswith("c.txt") else PREFIX + name
             return name, urlopen(url, timeout=30).read()
 
@@ -153,6 +171,8 @@ def main():
         if args.check:
             if path.read_text() != content:
                 raise SystemExit(f"Reference drift: {path}")
+            else:
+                pass
         else:
             path.write_text(content)
     print(
@@ -167,3 +187,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

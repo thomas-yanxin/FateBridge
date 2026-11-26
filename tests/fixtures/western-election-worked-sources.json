@@ -709,7 +709,8 @@
       "as_of": "2026-11-15T00:00:00+00:00",
       "geometric_reference_claim": "Originaldisplayedglyphs",
       "source_framework_confirmed": true,
-      "source_clock_or_calendar_resolved": true
+      "source_clock_or_calendar_resolved": false,
+      "clock_evidence_status": "explicit_EST_body_hypothesis_conflicts_with_EDT_image"
     },
     {
       "id": "w2003-image-EDT",
@@ -731,7 +732,8 @@
       "as_of": "2026-11-15T00:00:00+00:00",
       "geometric_reference_claim": "Originaldisplayedglyphs",
       "source_framework_confirmed": true,
-      "source_clock_or_calendar_resolved": true
+      "source_clock_or_calendar_resolved": false,
+      "clock_evidence_status": "explicit_EDT_image_hypothesis_conflicts_with_EST_body"
     },
     {
       "id": "g1991-local-caption",

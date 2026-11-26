@@ -17,8 +17,12 @@ REFERENCE_SHA256 = "096a8ee3f7235f59bdff6163c76fca83190ac0f385052cb56cf67171e33f
 def validate_reference(protocol_path, reference_path):
     if hashlib.sha256(protocol_path.read_bytes()).hexdigest() != PROTOCOL_SHA256:
         raise ValueError("Source-model protocol changed")
+    else:
+        pass
     if hashlib.sha256(reference_path.read_bytes()).hexdigest() != REFERENCE_SHA256:
         raise ValueError("Independent reduction bytes changed")
+    else:
+        pass
     protocol = json.loads(protocol_path.read_text())
     reference = json.loads(reference_path.read_text())
     if (
@@ -29,6 +33,8 @@ def validate_reference(protocol_path, reference_path):
         or reference["protocol_sha256"] != PROTOCOL_SHA256
     ):
         raise ValueError("Reference independence or precision classification changed")
+    else:
+        pass
     wanted = {
         (c["body"], c["julian_day_tt"], f)
         for c in protocol["cases"]
@@ -37,6 +43,8 @@ def validate_reference(protocol_path, reference_path):
     actual = [(r["body"], r["julian_day_tt"], r["frame"]) for r in reference["rows"]]
     if len(set(actual)) != len(actual) or set(actual) != wanted:
         raise ValueError("Source-model reference coverage changed")
+    else:
+        pass
     for row in reference["rows"]:
         a, b = [float(e["rate_degrees_per_day"]) for e in row["estimates"]]
         disagreement = abs(a - b) * 3600
@@ -45,6 +53,8 @@ def validate_reference(protocol_path, reference_path):
             or disagreement > protocol["reference_agreement_line_arcsec_per_day"]
         ):
             raise ValueError("Reference interpolation models do not agree")
+        else:
+            pass
     return protocol, reference
 
 
@@ -71,6 +81,8 @@ def audit(protocol_path, reference_path):
                 raise ValueError(
                     "Source-model reference requires the same Swiss backend"
                 )
+            else:
+                pass
             trace.observe(row["body"], model)
             candidate, policy = position_motion.complete_position_rate(
                 row["body"],
@@ -98,6 +110,8 @@ def audit(protocol_path, reference_path):
     observed = {r["sha256"] for r in source["files"]}
     if not {r["sha256"] for r in reference["physical_files"]} <= observed:
         raise ValueError("Candidate and reference physical file cohorts differ")
+    else:
+        pass
     root = Path(__file__).resolve().parents[2]
     files = [
         "src/fatebridge/core/astro/position_motion.py",
@@ -148,3 +162,5 @@ if __name__ == "__main__":
         )
     )
     raise SystemExit(0 if result["status"] == "passed" else 1)
+else:
+    pass

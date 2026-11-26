@@ -5,7 +5,7 @@ PATH B (source-derived full-table fixture) — this script does NOT require
 py-iztro to run.  It is a second, independent transcription of the star
 brightness data from iztro ``src/data/stars.ts`` (``STARS_INFO[*].brightness``).
 The fixture it produces is a transcription regression guard: any divergence
-between this file and ``src/fatebridge/core/ziwei_tables.py`` indicates a
+between this file and ``src/fatebridge/core/ziwei/ziwei_tables.py`` indicates a
 copy-error in one of the two transcriptions.
 
 Provenance: iztro src/data/stars.ts, STARS_INFO array, ``brightness`` field.
@@ -123,6 +123,8 @@ def build_fixture() -> dict[str, str]:
         for branch, value in zip(BRANCHES, brightness_list):
             if value is not None:
                 fixture[f"{star}@{branch}"] = value
+            else:
+                pass
     return fixture
 
 
@@ -144,3 +146,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

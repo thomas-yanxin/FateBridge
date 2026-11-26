@@ -7,7 +7,7 @@ No root loss, numerical energy or strength label is modified here.
 
 from copy import deepcopy
 from itertools import permutations
-from typing import Any, Mapping, Tuple
+from typing import Any, Mapping
 
 from fatebridge.core.passage_relations import relation_plane
 from fatebridge.utils.data import (
@@ -31,7 +31,7 @@ SOURCE = {
 
 
 def build_passage_evidence(
-    pillars: Mapping[str, Tuple[str, str]], assessment: Mapping[str, Any]
+    pillars: Mapping[str, tuple[str, str]], assessment: Mapping[str, Any]
 ) -> dict[str, Any]:
     """Read original nodes and supplied remaining roots; do not recalculate.
 

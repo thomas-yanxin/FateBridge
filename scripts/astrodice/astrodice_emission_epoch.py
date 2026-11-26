@@ -58,19 +58,29 @@ def lattice_points(low, high, maximum):
         or struct.calcsize("d") != 8
     ):
         raise ValueError("Unplanned binary64 lattice or support")
+    else:
+        pass
     value = float(low)
     if not math.isfinite(value):
         raise ValueError("Nonfinite lattice support")
+    else:
+        pass
     if Q(value) < low:
         value = math.nextafter(value, math.inf)
+    else:
+        pass
     points = []
     while Q(value) <= high:
         if len(points) == maximum:
             return {"status": "enumeration_limit", "points": points}
+        else:
+            pass
         points.append(value)
         value = math.nextafter(value, math.inf)
         if not math.isfinite(value):
             break
+        else:
+            pass
     return {"status": "complete", "points": points}
 
 
@@ -81,6 +91,8 @@ def rounding_cell(value):
     )
     if not all(math.isfinite(v) for v in (previous, value, following)):
         raise ValueError("Unbounded rounding cell")
+    else:
+        pass
     even = struct.unpack(">Q", struct.pack(">d", value))[0] % 2 == 0
     return {
         "bounds": [
@@ -107,16 +119,24 @@ def cell_relations(image, cell):
 def coordinate(epoch, model):
     if model == "absolute_JD_binary64":
         return epoch
+    else:
+        pass
     if model == "seconds_from_J2000_binary64":
         return (epoch - 2451545) * 86400
+    else:
+        pass
     raise ValueError("Unplanned time coordinate")
 
 
 def epoch_from_coordinate(value, model):
     if model == "absolute_JD_binary64":
         return Q(value)
+    else:
+        pass
     if model == "seconds_from_J2000_binary64":
         return Q(2451545) + Q(value) / 86400
+    else:
+        pass
     raise ValueError("Unplanned time coordinate")
 
 
@@ -171,6 +191,8 @@ def infer(source, case, row, calibration, profile, plan):
     }
     if calibration["status"] != "bracketed":
         return {**result, "status": "calibration_unknown"}
+    else:
+        pass
     low, high = map(Q, calibration["effective_JD"])
     reception = I(low, high)
     midpoint = (low + high) / 2
@@ -187,6 +209,8 @@ def infer(source, case, row, calibration, profile, plan):
     range_low, range_high = raw_range_low - radius, raw_range_high + radius
     if range_low <= 0:
         raise ValueError("Expanded range is nonpositive")
+    else:
+        pass
     nominal = midpoint - Q(row["range_AU"]) * K
     search = Q(plan["emission_search_radius_seconds"]) / 86400
     broad = reader.state(A(I(nominal - search, nominal + search), 1), "Venus")
@@ -209,6 +233,8 @@ def infer(source, case, row, calibration, profile, plan):
     )
     if minimum < Q(plan["minimum_absolute_emission_radial_derivative_AU_per_day"]):
         return {**result, "status": "conditioning_unknown"}
+    else:
+        pass
     axes = [scalar_source(source, case["window_index"], nominal, a) for a in range(3)]
 
     def evaluate(epoch):
@@ -225,6 +251,8 @@ def infer(source, case, row, calibration, profile, plan):
     result["inverse"] = inv
     if inv["status"] != "bracketed":
         return {**result, "status": "source_range_unbracketed"}
+    else:
+        pass
     a, b = map(Q, inv["effective_JD"])
     continuous = (low - raw_range_high * K, high - raw_range_low * K)
     result.update(
@@ -304,6 +332,8 @@ def analyze(run, cohort):
         for query in source_plan["queries"]:
             if query["cohort"] != spec["cohort"]:
                 continue
+            else:
+                pass
             raw_path = observation_root / "responses" / (query["id"] + ".raw")
             raw = raw_path.read_bytes()
             receipt = json.loads(raw_path.with_suffix(".receipt.json").read_text())
@@ -318,13 +348,19 @@ def analyze(run, cohort):
             }
             if sha(raw) != receipt["raw_sha256"]:
                 raise ValueError("Raw OBSERVER identity changed")
+            else:
+                pass
             try:
                 if receipt["status"] != 200:
                     raise ValueError("Unavailable OBSERVER response")
+                else:
+                    pass
                 rows = parse_observer(raw, query, cases, source_plan)
                 lookup = {v["case_id"]: v for v in cal[query["id"]]["rows"]}
                 if cal[query["id"]]["status"] != "diagnosed":
                     raise ValueError("Geometric calibration unavailable")
+                else:
+                    pass
                 for row in rows:
                     case = next(c for c in cases if c["id"] == row["case_id"])
                     c = lookup[row["case_id"]]
@@ -369,3 +405,5 @@ if __name__ == "__main__":
         args.run / (args.cohort + "-first-analysis.json"),
         analyze(args.run, args.cohort),
     )
+else:
+    pass

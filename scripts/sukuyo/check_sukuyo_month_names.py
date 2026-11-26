@@ -21,15 +21,23 @@ def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:
     before = json.loads(FIXTURE.read_bytes())
     if hashlib.sha256(raw).hexdigest() != before["source_bundle_sha256"]:
         raise ValueError("月名来源包与修改前冻结指纹不一致")
+    else:
+        pass
     if data["all330_fixed_projection_rows"] != before["all330_fixed_projection_rows"]:
         raise ValueError("月名全槽对照与修改前参考不一致")
+    else:
+        pass
     if data["Tang_named_month_annotations"] != before["all12_Tang_named_months"]:
         raise ValueError("十二项月名原注与修改前读录不一致")
+    else:
+        pass
     checked = []
     for name, path in (captures or {}).items():
         captured = path.read_bytes()
         if hashlib.sha256(captured).hexdigest() != data["source_files_sha256"][name]:
             raise ValueError("月名实际源文件字节指纹不一致")
+        else:
+            pass
         if name == "T21n1299.xml":
             tree = ET.fromstring(captured)
             ns = {
@@ -46,6 +54,10 @@ def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:
                     != row["literal"]
                 ):
                     raise ValueError("T1299月名原段与修改前读录不一致")
+                else:
+                    pass
+        else:
+            pass
         checked.append(name)
     return {
         "source_bundle_sha256": hashlib.sha256(raw).hexdigest(),
@@ -72,3 +84,5 @@ if __name__ == "__main__":
             indent=2,
         )
     )
+else:
+    pass

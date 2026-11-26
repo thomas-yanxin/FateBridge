@@ -8,8 +8,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from fatebridge.core.almanac import localize_datetime
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
+from fatebridge.utils.civil_time import NominalClockLabel
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURES = ROOT / "tests/data/ziwei_independent"
@@ -23,9 +25,10 @@ DAY_LABELS = (
 
 def _seed(year: int, month: int, day: int) -> MetaphysicsSeed:
     """Synthetic lunar rule inputs, not historical civil-date conversions."""
+
     return MetaphysicsSeed(
-        input_datetime=datetime(year, 1, 1),
-        corrected_datetime=datetime(year, 1, 1),
+        input_datetime=localize_datetime(datetime(year, 1, 1), "Asia/Shanghai"),
+        clock=NominalClockLabel.from_local_datetime(datetime(year, 1, 1)),
         timezone="Asia/Shanghai",
         longitude=None,
         applied_true_solar=False,
@@ -39,6 +42,7 @@ def _seed(year: int, month: int, day: int) -> MetaphysicsSeed:
                 "is_leap_month": False,
             }
         },
+        input_offset_visible=False,
     )
 
 
@@ -51,6 +55,8 @@ def audit_day_tables(fixtures: Path = FIXTURES) -> dict[str, Any]:
             != item["sha256"]
         ):
             raise ValueError(f"Ming day-table source checksum mismatch: {item['path']}")
+        else:
+            pass
     source = json.loads((directory / "collation.json").read_text(encoding="utf-8"))
     labels = {label: index + 1 for index, label in enumerate(DAY_LABELS)}
     labels["廿"] = 20
@@ -83,6 +89,8 @@ def audit_day_tables(fixtures: Path = FIXTURES) -> dict[str, Any]:
                     same_branch_duplicates.append(
                         dict(bureau=bureau, day=day, candidates=candidates)
                     )
+                else:
+                    pass
             elif len(branches) > 1:
                 row["source_kind"] = "unresolved_conflicting_grid_day"
                 conflicts.append(dict(bureau=bureau, day=day, candidates=candidates))
@@ -109,6 +117,8 @@ def audit_day_tables(fixtures: Path = FIXTURES) -> dict[str, Any]:
     mismatches: list[dict[str, Any]] = []
     if set(actual_source) != set(expected) or len(rows) != len(actual_source):
         mismatches.append({"case": "production_source_input_coverage"})
+    else:
+        pass
     for key, wanted in expected.items():
         actual = actual_source.get(key, {})
         facts = {name: actual.get(name) for name in wanted}
@@ -120,6 +130,8 @@ def audit_day_tables(fixtures: Path = FIXTURES) -> dict[str, Any]:
                     "actual": facts,
                 }
             )
+        else:
+            pass
     # Only star placement conditioned on the resolved bureau is checked here.
     # Calendar conversion and the bureau derivation need their own sources.
     seeds: dict[int, tuple[int, int]] = {}
@@ -176,9 +188,13 @@ def audit_day_tables(fixtures: Path = FIXTURES) -> dict[str, Any]:
                         "actual": actual_trace,
                     }
                 )
+            else:
+                pass
             comparisons += 1
             if ziwei is None:
                 continue  # Counted as unresolved, never as a matching chart.
+            else:
+                pass
             expected_stars = {}
             for anchor, slots, direction in (
                 (
@@ -198,10 +214,14 @@ def audit_day_tables(fixtures: Path = FIXTURES) -> dict[str, Any]:
                         expected_stars[name] = BRANCHES_FROM_YIN[
                             (start + direction * offset) % 12
                         ]
+                    else:
+                        pass
             if len(expected_stars) != 14:
                 raise ValueError(
                     "Printed major-star groups do not resolve 14 distinct stars"
                 )
+            else:
+                pass
             actual_stars = {
                 s["name"]: p["ganzhi"][1]
                 for p in chart["palaces"]
@@ -216,6 +236,8 @@ def audit_day_tables(fixtures: Path = FIXTURES) -> dict[str, Any]:
                         "actual": actual_stars,
                     }
                 )
+            else:
+                pass
             comparable += 1
             placements += len(expected_stars)
     direct = sum(row["source_kind"] == "direct_grid_cell" for row in expected.values())

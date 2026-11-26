@@ -7,16 +7,36 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.meihua_weather import weather_ruleset
-from fatebridge.core.meihua_weather_time_scope import compare_weather_time_scopes
+from fatebridge.application.examples import suggested_fields
+from fatebridge.core.meihua import meihua_weather_time_scope
+from fatebridge.core.meihua.meihua_weather import weather_ruleset
+from fatebridge.core.meihua.meihua_weather_time_scope import compare_weather_time_scopes
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
-from fatebridge.validation.meihua_weather_dayparts import (
+from tests.support.transports import (
+    SPECS,
+    business,
+    call_cli,
+    native,
+    rest,
+    surface_calls,
+)
+from validation.meihua_weather import (
+    audit_weather_controls,
+    audit_weather_gen_rain,
+    audit_weather_rules,
+)
+from validation.meihua_weather_cast_variants import (
+    audit_weather_cast_variants,
+)
+from validation.meihua_weather_chapter import audit_weather_chapter
+from validation.meihua_weather_dayparts import (
     NEW_RULES,
     audit_weather_dayparts,
     synthetic_scope_traces,
 )
-from tests.support.transports import rest, surface_calls
+from validation.meihua_weather_frequency import audit_weather_frequency
+from validation.meihua_weather_seasonal import audit_weather_seasonal
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_weather_dayparts_v7"
 CASES = json.loads((REFERENCES / "cases.json").read_text())["cases"]
@@ -30,18 +50,20 @@ def audited():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_original_clause_uses_the_actual_ordered_hexagram_pair(case, audited):
+def test_original_clause_uses_the_actual_ordered_hexagram_pair(case, audited) -> None:
     row = next(r for r in audited["cases"] if r["id"] == case["id"])
     assert not row["disagreements"], row
 
 
 @pytest.mark.parametrize("case", SCOPE_CASES, ids=lambda c: c["id"])
-def test_declared_time_scope_comparisons_remain_separate(case, audited):
+def test_declared_time_scope_comparisons_remain_separate(case, audited) -> None:
     row = next(r for r in audited["scope_cases"] if r["id"] == case["id"])
     assert not row["disagreements"], row
 
 
-def test_diagram_constraint_does_not_adjudicate_the_ambiguous_following_clause(audited):
+def test_diagram_constraint_does_not_adjudicate_the_ambiguous_following_clause(
+    audited,
+) -> None:
     assert audited["selected_checks_passed"]
     assert audited["mutual_diagram_check_passed"]
     assert (
@@ -54,7 +76,7 @@ def test_diagram_constraint_does_not_adjudicate_the_ambiguous_following_clause(a
     assert not audited["authority_certified"]
 
 
-def test_previous_38_rule_bodies_and_first_16_oracles_remain_frozen():
+def test_previous_38_rule_bodies_and_first_16_oracles_remain_frozen() -> None:
     baseline = json.loads((REFERENCES / "baseline-profile.json").read_text())
     current = weather_ruleset()
     assert current["rules"][:38] == baseline["rules"]
@@ -67,14 +89,14 @@ def test_previous_38_rule_bodies_and_first_16_oracles_remain_frozen():
     assert manifest["implementation_changed_before_freeze"] is False
 
 
-def test_unknown_daypart_cannot_silently_become_an_all_day_scope():
+def test_unknown_daypart_cannot_silently_become_an_all_day_scope() -> None:
     traces = synthetic_scope_traces(SCOPE_CASES[0]["rows"])
     traces[0]["time_scope"] = "every_hour"
     with pytest.raises(ValueError, match="Unknown weather source time scope"):
         compare_weather_time_scopes(traces)
 
 
-def test_known_analysis_date_is_not_an_invented_daypart_target_date():
+def test_known_analysis_date_is_not_an_invented_daypart_target_date() -> None:
     manifest = json.loads((REFERENCES / "time-case-manifest.json").read_text())
     assert (
         hashlib.sha256((REFERENCES / "time-case.json").read_bytes()).hexdigest()
@@ -107,7 +129,7 @@ def test_known_analysis_date_is_not_an_invented_daypart_target_date():
     assert comparison["has_explicit_daypart_readings"]
 
 
-def test_morning_and_evening_are_not_added_to_legacy_unscoped_conflicts():
+def test_morning_and_evening_are_not_added_to_legacy_unscoped_conflicts() -> None:
     result = calculate_meihua_cast(
         casting=CASES[0]["casting"], interpretation_topic="weather"
     )
@@ -124,7 +146,7 @@ def test_morning_and_evening_are_not_added_to_legacy_unscoped_conflicts():
     assert weather["single_forecast"] is None
 
 
-def test_scope_information_is_computed_for_each_retained_cast():
+def test_scope_information_is_computed_for_each_retained_cast() -> None:
     result = calculate_meihua_cast(
         casting=CASES[14]["casting"],
         interpretation_topic="weather",
@@ -142,7 +164,9 @@ def test_scope_information_is_computed_for_each_retained_cast():
     assert weather["casting_comparison"]["changed_control_ids"] == []
 
 
-def test_changed_expected_scope_is_not_accepted_merely_by_rehashing(tmp_path):
+def test_changed_expected_scope_is_not_accepted_merely_by_rehashing(
+    tmp_path: Path,
+) -> None:
     target = tmp_path / "fixtures/meihua_weather_dayparts_v7"
     shutil.copytree(REFERENCES, target)
     for name in ["meihua_v1", "meihua_weather_gen_v4"]:
@@ -176,20 +200,8 @@ def test_changed_expected_scope_is_not_accepted_merely_by_rehashing(tmp_path):
     ],
 )
 def test_each_weather_auditor_rejects_time_scope_source_drift(
-    audit_name, reference_name, monkeypatch
-):
-    from fatebridge.core import meihua_weather_time_scope
-    from fatebridge.validation.meihua_weather import (
-        audit_weather_controls,
-        audit_weather_gen_rain,
-        audit_weather_rules,
-    )
-    from fatebridge.validation.meihua_weather_cast_variants import (
-        audit_weather_cast_variants,
-    )
-    from fatebridge.validation.meihua_weather_chapter import audit_weather_chapter
-    from fatebridge.validation.meihua_weather_frequency import audit_weather_frequency
-    from fatebridge.validation.meihua_weather_seasonal import audit_weather_seasonal
+    audit_name: str, reference_name: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
 
     auditors = {
         "rules": audit_weather_rules,
@@ -212,6 +224,10 @@ def test_each_weather_auditor_rejects_time_scope_source_drift(
             reads += 1
             if reads > 1:
                 return data + b"\n# simulated source drift, without changing the file\n"
+            else:
+                pass
+        else:
+            pass
         return data
 
     monkeypatch.setattr(Path, "read_bytes", changed_after_initial_fingerprint)
@@ -222,10 +238,8 @@ def test_each_weather_auditor_rejects_time_scope_source_drift(
 
 @pytest.mark.parametrize("tool", ["meihua_analysis", "meihua_cast"])
 def test_dayparts_and_unresolved_time_relations_agree_across_surfaces(
-    tool, surface_calls
-):
-    from fatebridge.application.examples import suggested_fields
-    from tests.support.transports import SPECS, business, call_cli, native
+    tool: str, surface_calls
+) -> None:
 
     spec = SPECS[tool]
     payload = (

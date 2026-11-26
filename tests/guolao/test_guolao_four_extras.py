@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_four_extras as g
-from fatebridge.core.guolao_historical import (
+from fatebridge.core.guolao import guolao_four_extras as g
+from fatebridge.core.guolao.guolao_historical import (
     GUJIN_58_PURPLE,
     purple_historical_position,
 )
@@ -19,7 +19,7 @@ SOURCE = json.loads((FIXTURE / "reference.json").read_text())
 EXAMPLE = SOURCE["worked_example"]
 
 
-def test_downloaded_full_pages_keep_original_fingerprints_and_review_scope():
+def test_downloaded_full_pages_keep_original_fingerprints_and_review_scope() -> None:
     for image in SOURCE["images"]:
         assert hashlib.sha256((FIXTURE / image["path"]).read_bytes()).hexdigest() == (
             image["sha256"]
@@ -30,7 +30,7 @@ def test_downloaded_full_pages_keep_original_fingerprints_and_review_scope():
 
 
 @pytest.mark.parametrize("key", ["purple", "apogee", "rahu", "ketu"])
-def test_all_four_separate_original_worked_chains(key):
+def test_all_four_separate_original_worked_chains(key: str) -> None:
     value = g.four_extras_source_days(
         F(EXAMPLE["zhongji_days"]), winter_cycle_days=F(EXAMPLE["winter_cycle_days"])
     )["factors"][key]
@@ -46,11 +46,15 @@ def test_all_four_separate_original_worked_chains(key):
         assert F(value[actual]) == F(expected[reference])
     if expected["sum_days"] is not None:
         assert F(value["sum_days_exact"]) == F(expected["sum_days"])
+    else:
+        pass
     assert value["next_entry_sexagenary_day"] == expected["entry_sexagenary_day"]
 
 
 @pytest.mark.parametrize("key", ["purple", "apogee", "rahu", "ketu"])
-def test_every_printed_endpoint_and_either_side_follow_the_correct_direction(key):
+def test_every_printed_endpoint_and_either_side_follow_the_correct_direction(
+    key: str,
+) -> None:
     factor = SOURCE["offsets"][key]
     table = SOURCE["tables_transcribed"][factor["table"]]
     origin = -F(factor["offset_days"])
@@ -82,8 +86,8 @@ def test_every_printed_endpoint_and_either_side_follow_the_correct_direction(key
     ],
 )
 def test_regenerating_the_table_from_rounded_rate_misplaces_a_printed_boundary(
-    key, offset, endpoint, width, next_name
-):
+    key: str, offset: str, endpoint: str, width: str, next_name: str
+) -> None:
     record = g.four_extras_source_days(F(endpoint) - F(offset))["factors"][key]
     generated_end = F(width) * F(record["printed_days_per_historical_du_exact"])
     assert F(endpoint) < generated_end
@@ -92,7 +96,9 @@ def test_regenerating_the_table_from_rounded_rate_misplaces_a_printed_boundary(
     assert record["degree_in_mansion_historical_du_exact"] is None
 
 
-def test_node_half_period_is_a_source_day_shift_not_a_modern_longitude_rotation():
+def test_node_half_period_is_a_source_day_shift_not_a_modern_longitude_rotation() -> (
+    None
+):
     middle = F(EXAMPLE["zhongji_days"])
     value = g.four_extras_source_days(middle)
     shifted = g.four_extras_source_days(middle + F("3396.7216"))["factors"]["rahu"]
@@ -111,7 +117,9 @@ def test_node_half_period_is_a_source_day_shift_not_a_modern_longitude_rotation(
 
 
 @pytest.mark.parametrize("middle", [F(), F("116147.0196"), F(-1, 10**9), F(-900000)])
-def test_purple_reuses_existing_exact_table_and_new_tables_preserve_periodicity(middle):
+def test_purple_reuses_existing_exact_table_and_new_tables_preserve_periodicity(
+    middle,
+) -> None:
     records = g.four_extras_source_days(middle)["factors"]
     purple = purple_historical_position(middle)
     assert records["purple"]["mansion"] == purple.mansion
@@ -126,7 +134,9 @@ def test_purple_reuses_existing_exact_table_and_new_tables_preserve_periodicity(
             assert repeated[field] == record[field]
 
 
-def test_entire_printed_tables_match_transcription_without_forcing_rate_closure():
+def test_entire_printed_tables_match_transcription_without_forcing_rate_closure() -> (
+    None
+):
     source = json.loads(g.DATA.read_bytes())
     assert source["tables"] == SOURCE["tables_transcribed"]
     assert source["factors"] == SOURCE["offsets"]
@@ -138,19 +148,23 @@ def test_entire_printed_tables_match_transcription_without_forcing_rate_closure(
 
 
 @pytest.mark.parametrize("bad", [0, True, "116147.0196", 2451545.0, None])
-def test_raw_middle_requires_declared_exact_source_days(bad):
+def test_raw_middle_requires_declared_exact_source_days(
+    bad: bool | float | int | str | None,
+) -> None:
     with pytest.raises(TypeError, match="中积"):
         g.four_extras_source_days(bad)
 
 
 @pytest.mark.parametrize("bad", [0, True, "42.0796", 42.0796])
-def test_optional_winter_requires_declared_exact_cycle(bad):
+def test_optional_winter_requires_declared_exact_cycle(
+    bad: bool | float | int | str,
+) -> None:
     with pytest.raises(TypeError, match="冬至分"):
         g.four_extras_source_days(F(), winter_cycle_days=bad)
 
 
 @pytest.mark.parametrize("bad", [F(-1, 10**10), F(60), F(2451545)])
-def test_winter_is_a_day_cycle_not_a_julian_day(bad):
+def test_winter_is_a_day_cycle_not_a_julian_day(bad) -> None:
     with pytest.raises(ValueError, match="60"):
         g.four_extras_source_days(F(), winter_cycle_days=bad)
 
@@ -159,7 +173,9 @@ def test_winter_is_a_day_cycle_not_a_julian_day(bad):
     "fault",
     ["missing", "reorder", "nonmonotonic", "closure", "entry_kind", "half_period"],
 )
-def test_damaged_source_table_fails_closed(tmp_path, monkeypatch, fault):
+def test_damaged_source_table_fails_closed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fault: str
+) -> None:
     source = json.loads(g.DATA.read_bytes())
     table = source["tables"]["nodes"]
     if fault == "missing":

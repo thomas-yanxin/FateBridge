@@ -12,7 +12,7 @@ from scripts.human_design import check_human_design_calendar_span as audit
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_every_supported_year_has_both_predeclared_additional_seasons():
+def test_every_supported_year_has_both_predeclared_additional_seasons() -> None:
     plan, data = audit.reference(ROOT)
     assert len(plan["birth_epochs"]) == len(data["pairs"]) == 1200
     assert [r["label"] for r in plan["birth_epochs"]] == [
@@ -32,7 +32,9 @@ def test_every_supported_year_has_both_predeclared_additional_seasons():
 @pytest.mark.parametrize(
     "change", ["remove_row", "replace_longitude", "raise_tolerance"]
 )
-def test_the_frozen_cohort_cannot_be_narrowed_or_made_easier(tmp_path, change):
+def test_the_frozen_cohort_cannot_be_narrowed_or_made_easier(
+    tmp_path: Path, change: str
+) -> None:
     for name in audit.BINDINGS:
         destination = tmp_path / name
         destination.parent.mkdir(parents=True, exist_ok=True)
@@ -53,7 +55,9 @@ def test_the_frozen_cohort_cannot_be_narrowed_or_made_easier(tmp_path, change):
         audit.reference(tmp_path)
 
 
-def test_a_failed_position_is_kept_alongside_all_passing_rows(monkeypatch):
+def test_a_failed_position_is_kept_alongside_all_passing_rows(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # Four small synthetic positions test failure retention only; these never
     # enter the independent reference or the claimed external sample count.
     pairs = [
@@ -100,7 +104,9 @@ def test_a_failed_position_is_kept_alongside_all_passing_rows(monkeypatch):
         assert backend["position_failures"][0]["jd_tt"] == 1.0
 
 
-def test_finite_success_cannot_satisfy_full_calendar_acceptance(monkeypatch, tmp_path):
+def test_finite_success_cannot_satisfy_full_calendar_acceptance(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setattr(
         audit,
         "checks",
@@ -121,7 +127,7 @@ def test_finite_success_cannot_satisfy_full_calendar_acceptance(monkeypatch, tmp
     assert audit.main() == 1
 
 
-def test_reference_generator_has_no_fatebridge_or_swiss_imports():
+def test_reference_generator_has_no_fatebridge_or_swiss_imports() -> None:
     source = (
         ROOT / "scripts/human_design/gen_human_design_calendar_span_reference.py"
     ).read_text()
@@ -131,6 +137,8 @@ def test_reference_generator_has_no_fatebridge_or_swiss_imports():
             imports.extend(alias.name for alias in node.names)
         elif isinstance(node, ast.ImportFrom):
             imports.append(node.module or "")
+        else:
+            pass
     assert not any(
         name.startswith(("fatebridge", "swisseph", "pyswisseph")) for name in imports
     )

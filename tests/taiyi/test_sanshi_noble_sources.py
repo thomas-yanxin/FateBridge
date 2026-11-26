@@ -15,13 +15,15 @@ from pydantic import ValidationError
 import fatebridge.api as api
 from fatebridge.application.examples import suggested_fields
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_sanshi import NobleSourceAssessment
 from fatebridge.core.metaphysics.ren_gods import noble_start
 from fatebridge.core.metaphysics.taiyi_dangshi import noble_source_assessment
-from fatebridge.core.output_sanshi import NobleSourceAssessment
 from fatebridge.core.requests.divination import SanShiUnitedRequest
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.tool_catalog import CATALOG
+from tests.support.transports import call_calculation
+from tests.unit_test.fixtures.taiyi import same_run_payload
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/taiyi_dangshi_noble_v40"
@@ -62,8 +64,8 @@ def source_readings(corpus: Path = CORPUS):
     ],
 )
 def test_source_only_manifest_cannot_replace_or_reduce_original_evidence(
-    tmp_path, fault
-):
+    tmp_path: Path, fault: str
+) -> None:
     corpus = tmp_path / "corpus"
     shutil.copytree(CORPUS, corpus)
     manifest = json.loads((corpus / "freeze.json").read_text())
@@ -88,14 +90,16 @@ def test_source_only_manifest_cannot_replace_or_reduce_original_evidence(
         source_readings(corpus)
 
 
-def test_sanshi_exposes_an_explicit_noble_profile_without_changing_default():
+def test_sanshi_exposes_an_explicit_noble_profile_without_changing_default() -> None:
     field = SanShiUnitedRequest.model_fields.get("liureng_guiren_profile")
     assert field is not None
     assert field.default == "liuren_common_v1"
 
 
 @pytest.mark.parametrize("mode", [None, "year", "month", "day", "hour"])
-def test_comparison_uses_the_actual_mode_summary_including_default_year(mode):
+def test_comparison_uses_the_actual_mode_summary_including_default_year(
+    mode: str | None,
+) -> None:
     options = {"calculation_mode": mode} if mode else None
     result = calculate_sanshiunited_analysis(
         date="2026-10-25",
@@ -115,7 +119,7 @@ def test_comparison_uses_the_actual_mode_summary_including_default_year(mode):
 
 
 @pytest.mark.parametrize("profile", ["liuren_common_v1", "tanyuan_xieji_v1"])
-def test_selected_noble_profile_reaches_the_actual_same_run_board(profile):
+def test_selected_noble_profile_reaches_the_actual_same_run_board(profile: str) -> None:
     result = calculate_sanshiunited_analysis(
         date="2026-10-25",
         time="12:00:00",
@@ -160,8 +164,8 @@ def test_selected_noble_profile_reaches_the_actual_same_run_board(profile):
 @pytest.mark.parametrize("is_day", [True, False])
 @pytest.mark.parametrize("stem", list("甲乙丙丁戊己庚辛壬癸"))
 def test_all_twenty_starts_for_each_profile_keep_both_source_editions(
-    profile, is_day, stem
-):
+    profile: str, is_day: bool, stem
+) -> None:
     board = {
         "meta": {"guiren_profile": profile, "is_diurnal": is_day},
         "rule_trace": [
@@ -229,8 +233,8 @@ def actual_ren():
     ],
 )
 def test_missing_or_conflicting_actual_trace_never_selects_a_source_by_fit(
-    actual_ren, fault
-):
+    actual_ren, fault: str
+) -> None:
     board = deepcopy(actual_ren)
     stem = "甲"
     if fault == "missing":
@@ -254,7 +258,7 @@ def test_missing_or_conflicting_actual_trace_never_selects_a_source_by_fit(
 
 def test_comparison_reads_the_supplied_result_instead_of_recalculating_a_profile(
     actual_ren,
-):
+) -> None:
     actual_ren["rule_trace"][0]["result"]["start_branch"] = "卯"
     compared = noble_source_assessment("甲", actual_ren, taiyi_mode="year")
     assert compared["actual_start_branch"] == "卯"
@@ -265,8 +269,11 @@ def test_comparison_reads_the_supplied_result_instead_of_recalculating_a_profile
 @pytest.mark.parametrize("profile", ["liuren_common_v1", "tanyuan_xieji_v1"])
 @pytest.mark.parametrize("is_day", [True, False])
 def test_noble_selection_and_evidence_are_identical_on_rest_mcp_cli(
-    monkeypatch, capsys, profile, is_day
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    profile: str,
+    is_day: bool,
+) -> None:
     spec = next(s for s in CATALOG if s.key == "sanshiunited")
     fields = suggested_fields(spec, view="noble_sources")
     payload = dict(
@@ -306,14 +313,17 @@ def test_noble_selection_and_evidence_are_identical_on_rest_mcp_cli(
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                "sanshiunited", {**payload, **opts}, raise_on_error=False
+            result = await call_calculation(
+                client,
+                "sanshi_combined_chart",
+                {**payload, **opts},
+                raise_on_error=False,
             )
             assert not result.is_error, result
             return result.structured_content
 
     protocol = asyncio.run(invoke())
-    argv = ["sanshiunited"]
+    argv = ["sanshi_combined_chart"]
     for key, value in payload.items():
         argv += [
             "--" + key.replace("_", "-"),
@@ -346,7 +356,9 @@ def test_noble_selection_and_evidence_are_identical_on_rest_mcp_cli(
 @pytest.mark.parametrize(
     "profile", ["best", None, True, "jinjing_ming_dangshi_noble_v1"]
 )
-def test_source_ids_and_arbitrary_values_are_not_request_profile_choices(profile):
+def test_source_ids_and_arbitrary_values_are_not_request_profile_choices(
+    profile: bool | str | None,
+) -> None:
     with pytest.raises(ValidationError):
         SanShiUnitedRequest.model_validate(
             dict(date="2026-10-25", time="12:00:00", liureng_guiren_profile=profile)
@@ -354,15 +366,17 @@ def test_source_ids_and_arbitrary_values_are_not_request_profile_choices(profile
 
 
 @pytest.mark.parametrize("view", ["noble_sources", "scoped_evidence"])
-def test_default_mcp_budget_preserves_the_selected_same_run_source_evidence(view):
-    from tests.taiyi.test_taiyi_transports import _same_run_payload
+def test_default_mcp_budget_preserves_the_selected_same_run_source_evidence(
+    view: str,
+) -> None:
 
     spec = next(s for s in CATALOG if s.key == "sanshiunited")
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            response = await client.call_tool(
-                "sanshiunited",
+            response = await call_calculation(
+                client,
+                "sanshi_combined_chart",
                 dict(
                     date="2026-10-25",
                     time="12:00:00",
@@ -376,7 +390,7 @@ def test_default_mcp_budget_preserves_the_selected_same_run_source_evidence(view
                 ),
                 raise_on_error=False,
             )
-            full = await _same_run_payload(
+            full = await same_run_payload(
                 client, response, require_business_inline=view == "noble_sources"
             )
             assert (

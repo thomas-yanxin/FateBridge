@@ -29,11 +29,15 @@ def verify_sources(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any
     path = corpus / "freeze.json"
     if hashlib.sha256(path.read_bytes()).hexdigest() != FREEZE_SHA256:
         raise ValueError("V36 pinned source freeze changed")
+    else:
+        pass
     frozen: dict[str, Any] = json.loads(path.read_text())
     for base, key in ((corpus, "files"), (root, "prior_sources")):
         for name, digest in frozen[key].items():
             if hashlib.sha256((base / name).read_bytes()).hexdigest() != digest:
                 raise ValueError(f"V36 source or prior evidence changed: {name}")
+            else:
+                pass
     return frozen
 
 
@@ -48,6 +52,8 @@ def public_case(day: date, *, key: str = "taiyi") -> dict[str, Any]:
             use_true_solar_time=False,
             year_profile=QILIANG_YEAR_PROFILE,
         )
+    else:
+        pass
     if key == "sanshiunited":
         return calculate_sanshiunited_analysis(
             date=day.isoformat(),
@@ -59,6 +65,8 @@ def public_case(day: date, *, key: str = "taiyi") -> dict[str, Any]:
                 "year_profile": QILIANG_YEAR_PROFILE,
             },
         )
+    else:
+        pass
     raise ValueError("V36 known tool required")
 
 
@@ -73,6 +81,8 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
     data, dates, digest = historical_month_table(QILIANG_YEAR_PROFILE)
     if len(rows) != 63 or len(data["months"]) != 63:
         raise ValueError("V36 requires complete63 source month-first rows")
+    else:
+        pass
     source_fields = {
         "lunar_year": "year",
         "month": "month",
@@ -108,6 +118,8 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
         )
         if i + 1 == len(rows):
             continue
+        else:
+            pass
         stop = julian_jdn(rows[i + 1]["julian_start"])
         for offset in range(stop - jdn):
             day = gregorian_from_jdn(jdn + offset)
@@ -163,6 +175,8 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
                     }
                 )
                 continue
+            else:
+                pass
             context = board["calendar_rules"]["historical_calendar"]
             examples.append(
                 {

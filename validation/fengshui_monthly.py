@@ -1,0 +1,168 @@
+"""Independent literal month tables and trusted same-run fixed position text."""
+
+from typing import Any
+
+from fatebridge.core.fengshui.models import MonthlyRequest
+from fatebridge.core.fengshui.monthly import (
+    monthly_position_reading,
+    monthly_provenance,
+    monthly_stars,
+)
+from fatebridge.core.fengshui.monthly_integrity import validate_monthly_layer
+from fatebridge.core.fengshui.monthly_time import JIE
+from fatebridge.core.public_output import same_public_value as _same_value
+from fatebridge.utils.errors import FengshuiCalculationError
+from fatebridge.utils.json_values import same_value
+
+
+def audit_monthly_reference(reference: dict[str, Any]) -> dict[str, Any]:
+    groups = reference["printed_center_columns"]
+    if (
+        len(groups) != 3
+        or sorted(b for g in groups for b in g["branches"])
+        != sorted("子丑寅卯辰巳午未申酉戌亥")
+        or any(len(g["centers"]) != 12 for g in groups)
+        or any(
+            type(n) is not int or n not in range(1, 10)
+            for g in groups
+            for n in g["centers"]
+        )
+        or len(reference["printed_term_rows"]) != 12
+    ):
+        raise ValueError("月紫白夹具须保留十二支、三组与36个原始星数")
+    else:
+        pass
+    differences = []
+    checked = 0
+    for year in range(2020, 2032):
+        branch = "子丑寅卯辰巳午未申酉戌亥"[(year - 4) % 12]
+        column = next(g for g in groups if branch in g["branches"])
+        for month, expected in enumerate(column["centers"], 1):
+            actual = monthly_stars(
+                MonthlyRequest(effective_solar_year=year, solar_month_number=month)
+            )["center_star_number"]
+            checked += 1
+            if not _same_value(actual, expected):
+                differences.append(
+                    {
+                        "year_branch": branch,
+                        "month": month,
+                        "expected": expected,
+                        "actual": actual,
+                    }
+                )
+            else:
+                pass
+    label_differences = [
+        {
+            "solar_month_number": index,
+            "printed_terms": terms,
+            "selected_start_term": JIE[index - 1],
+            "resolution": "independent_author_and_official_astronomical_order_not_rewriting_print",
+        }
+        for index, terms in enumerate(reference["printed_term_rows"], 1)
+        if terms[0] != JIE[index - 1]
+    ]
+    return {
+        "source_cell_count": 36,
+        "branch_month_checks": checked,
+        "numeric_differences": differences,
+        "numeric_scoped_acceptance_passed": not differences,
+        "printed_calendar_label_differences": label_differences,
+        "printed_calendar_labels_all_conform": not label_differences,
+        "whole_book_conformity_established": False,
+        "independent_human_expert_review": False,
+        "real_world_prediction": "not_tested",
+    }
+
+
+def verify_monthly_reading(
+    payload: dict[str, Any], *, trusted_payload: dict[str, Any]
+) -> dict[str, Any]:
+    """Verify complete delivered text against independently retained receipt."""
+    errors = []
+    metadata = payload.get("run_metadata") or {}
+    trusted_metadata = trusted_payload.get("run_metadata") or {}
+    if (
+        not isinstance(metadata, dict)
+        or not isinstance(trusted_metadata.get("run_id"), str)
+        or not trusted_metadata.get("run_id")
+        or metadata.get("run_id") != trusted_metadata["run_id"]
+        or not same_value(metadata, trusted_metadata)
+    ):
+        errors.append("trusted_original_receipt_mismatch")
+    else:
+        pass
+    if not same_value(payload, trusted_payload):
+        errors.append("incomplete_changed_or_projected_business_payload")
+    else:
+        pass
+    if not isinstance(metadata, dict) or metadata.get("tool_name") not in {
+        "fengshui_monthly_stars",
+        "fengshui_assess",
+    }:
+        errors.append("unsupported_original_tool")
+    else:
+        pass
+    statement_count = 0
+    complete = False
+    numeric_palaces = 0
+    try:
+        layer = payload["layers"]["monthly_stars"]
+        try:
+            numeric_palaces = validate_monthly_layer(layer)["numeric_palaces"]
+        except FengshuiCalculationError:
+            errors.append("monthly_numeric_context_inconsistent")
+        expected_profile = {
+            k: v for k, v in monthly_provenance().items() if k != "sources"
+        }
+        actual_profile = {k: v for k, v in layer["ruleset"].items() if k != "sources"}
+        if not _same_value(actual_profile, expected_profile):
+            errors.append("unsupported_monthly_profile")
+        else:
+            pass
+        complete = layer["status"] == "complete"
+        if layer["status"] not in {"complete", "partial"}:
+            errors.append("unsupported_monthly_status")
+        else:
+            pass
+        if complete:
+            palaces = layer["palaces"]
+            if (
+                set(palaces) != {"C", "N", "NE", "E", "SE", "S", "SW", "W", "NW"}
+                or any(
+                    type(p["monthly_star_number"]) is not int for p in palaces.values()
+                )
+                or sorted(p["monthly_star_number"] for p in palaces.values())
+                != list(range(1, 10))
+            ):
+                errors.append("incomplete_monthly_position_coverage")
+            else:
+                pass
+        elif layer["palaces"] or not layer["missing_inputs"]:
+            errors.append("inconsistent_partial_monthly_context")
+        else:
+            pass
+        expected = monthly_position_reading(layer)
+        if not _same_value(layer["position_reading"], expected):
+            errors.append("fixed_text_context_or_coverage_mismatch")
+        else:
+            pass
+        statement_count = len(expected["statements"])
+    except (KeyError, TypeError, ValueError, AttributeError):
+        errors.append("unsupported_or_incomplete_monthly_context")
+    return {
+        "method_id": "trusted_run_monthly_position_reading_v1",
+        "status": "rejected" if errors else "verified_served_fixed_monthly_reading",
+        "errors": errors,
+        "checked_statement_count": statement_count,
+        "monthly_position_coverage_verified": complete and not errors,
+        "derived_monthly_numeric_consistency_verified": numeric_palaces == 9
+        and not errors,
+        "calendar_accuracy_verified": False,
+        "free_model_prose_verified": False,
+        "whole_book_conformity_established": False,
+        "real_world_prediction_established": False,
+        "authority_certified": False,
+        "scope": "只核验本版本固定位置释义与完整可信原run的一致性；历法实现精度须另读独立对照，不以本项未认证否定其他层的有效证据。",
+    }

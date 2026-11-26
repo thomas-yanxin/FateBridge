@@ -25,18 +25,26 @@ def sha(path: Path) -> str:
 def reference(folder: Path = CORPUS) -> dict[str, Any]:
     if sha(folder / "freeze.json") != PIN:
         raise ValueError("Frozen cross-harmony identity changed")
+    else:
+        pass
     files = json.loads((folder / "freeze.json").read_text())["files"]
     if {p.name for p in folder.iterdir()} != set(files) | {"freeze.json"} or any(
         sha(folder / n) != h for n, h in files.items()
     ):
         raise ValueError("Frozen cross-harmony inventory or content changed")
+    else:
+        pass
     reading = json.loads((folder / "readings.json").read_text())
     if sha(ROOT / reading["tanyuan_source_path"]) != reading["tanyuan_sha256"]:
         raise ValueError("Original Tanyuan primary witness changed")
+    else:
+        pass
     from tests.support.ren_source_arithmetic import cross_harmony
 
     if cross_harmony(folder) != json.loads((folder / "reference.json").read_text()):
         raise ValueError("Independent source arithmetic differs")
+    else:
+        pass
     return dict(
         reading=reading,
         reference=json.loads((folder / "reference.json").read_text()),
@@ -83,12 +91,12 @@ def expected_facts(row: dict[str, Any]) -> dict[str, Any]:
 
 def audit() -> dict[str, Any]:
     data = reference()
+    from fatebridge.core.contracts.output_liuren_cross_harmony import LiurenCrossHarmony
     from fatebridge.core.metaphysics.liureng import build_liureng_board
     from fatebridge.core.metaphysics.liureng_cross_harmony import (
         cross_harmony,
         cross_harmony_trace,
     )
-    from fatebridge.core.output_liuren_cross_harmony import LiurenCrossHarmony
     from scripts.ren.audit_ren_classical import make_seed
 
     watched = sorted((ROOT / "src").rglob("*.py")) + [
@@ -118,6 +126,8 @@ def audit() -> dict[str, Any]:
         literals.append(literal)
         if not literal["passed"]:
             failures.append(dict(kind="literal", **literal))
+        else:
+            pass
         for profile in ("liuren_common_v1", "tanyuan_xieji_v1"):
             for daytime in (True, False):
                 board = build_liureng_board(
@@ -146,6 +156,8 @@ def audit() -> dict[str, Any]:
                 boards.append(row)
                 if not ok or old_ok is False:
                     failures.append(dict(kind="board", **row))
+                else:
+                    pass
     reference()
     stable = source_before == {str(p.relative_to(ROOT)): sha(p) for p in watched}
     return dict(

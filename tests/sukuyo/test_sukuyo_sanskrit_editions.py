@@ -12,8 +12,10 @@ REFERENCE = ROOT / "tests/data/sukuyo-sanskrit-before-production-v80.json"
 
 
 @pytest.mark.parametrize("edition", ["cowell_neil_1886", "mukhopadhyaya_1954_titus"])
-def test_source_specific_products(edition):
-    from fatebridge.core.sukuyo_sanskrit_editions import sanskrit_edition_reference
+def test_source_specific_products(edition: str) -> None:
+    from fatebridge.core.sukuyo.sukuyo_sanskrit_editions import (
+        sanskrit_edition_reference,
+    )
 
     first = json.loads(
         (
@@ -38,14 +40,16 @@ def test_source_specific_products(edition):
         "physical_witness_independence_verified",
     ],
 )
-def test_source_comparison_does_not_certify_unknown_rules(flag):
-    from fatebridge.core.sukuyo_sanskrit_editions import sanskrit_edition_reference
+def test_source_comparison_does_not_certify_unknown_rules(flag: str) -> None:
+    from fatebridge.core.sukuyo.sukuyo_sanskrit_editions import (
+        sanskrit_edition_reference,
+    )
 
     assert sanskrit_edition_reference()["source_data"][flag] is False
 
 
-def test_edition_data_tampering_rejected():
-    from fatebridge.core.sukuyo_sanskrit_editions import (
+def test_edition_data_tampering_rejected() -> None:
+    from fatebridge.core.sukuyo.sukuyo_sanskrit_editions import (
         sanskrit_edition_reference,
         validate_edition_data,
     )
@@ -58,8 +62,11 @@ def test_edition_data_tampering_rejected():
         validate_edition_data(data)
 
 
-def test_new_source_is_additive_and_old_hash_scope_is_retained():
-    from fatebridge.core.sukuyo_upstream_dawn import upstream_lines, upstream_reference
+def test_new_source_is_additive_and_old_hash_scope_is_retained() -> None:
+    from fatebridge.core.sukuyo.sukuyo_upstream_dawn import (
+        upstream_lines,
+        upstream_reference,
+    )
 
     result = upstream_reference()
     assert (
@@ -79,7 +86,7 @@ def test_new_source_is_additive_and_old_hash_scope_is_retained():
     assert any("未刊全文" in s and "第三年" in s for s in lines)
 
 
-def test_duplicate_paragraph_labels_and_invalid_bytes_are_not_silently_lost():
+def test_duplicate_paragraph_labels_and_invalid_bytes_are_not_silently_lost() -> None:
     from scripts.sukuyo.check_sukuyo_sanskrit_editions import parse_titus
 
     raw = b"<html><script>Paragraph: 999</script><br>Subchapter: I<br>Paragraph: 53<br>Verse: 2 first<br>Paragraph: 53<br>Verse: 2 second\xd7</html>"
@@ -91,22 +98,24 @@ def test_duplicate_paragraph_labels_and_invalid_bytes_are_not_silently_lost():
     assert parsed["invalid_utf8_bytes"] == [{"byte_offset": len(raw) - 8, "hex": "d7"}]
 
 
-def test_required_capture_set_rejects_a_passing_subset():
+def test_required_capture_set_rejects_a_passing_subset() -> None:
     from scripts.sukuyo.check_sukuyo_sanskrit_editions import verify
 
     with pytest.raises(ValueError, match="全部四份"):
         verify({})
 
 
-def test_before_code_reference_identity():
+def test_before_code_reference_identity() -> None:
     assert (
         hashlib.sha256(REFERENCE.read_bytes()).hexdigest()
         == "7f98037a8906e806c4ce7c8a07c021e5968e07bcc8fccf2ce8fb68b121b4560f"
     )
 
 
-def test_independent_adjudication_is_bound_separately():
-    from fatebridge.core.sukuyo_sanskrit_editions import sanskrit_edition_reference
+def test_independent_adjudication_is_bound_separately() -> None:
+    from fatebridge.core.sukuyo.sukuyo_sanskrit_editions import (
+        sanskrit_edition_reference,
+    )
 
     assert (
         sanskrit_edition_reference()["adjudication_before_c_sha256"]

@@ -11,6 +11,7 @@ import math
 import os
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
@@ -19,13 +20,18 @@ from fastmcp import Client
 
 import fatebridge.api as api
 from fatebridge.cli import run
-from fatebridge.core import guolao_epoch as module
 from fatebridge.core.astro.physical_epoch import PhysicalEpoch
-from fatebridge.core.astro.time_scales import ephemeris_time, ut1_from_tt
+from fatebridge.core.astro.tt_epoch import TTInstant
+from fatebridge.core.guolao import guolao_epoch as module
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.guolao.test_guolao_native_frames import fixed_moshier  # noqa:F401
+from tests.support.transports import cached_mcp_app, call_calculation
+from tests.unit_test.fixtures.guolao import (
+    SOURCE_DOMAINS,
+    epoch_for,
+)
+from tests.unit_test.fixtures.guolao import fixed_moshier as fixed_moshier
 
 REFERENCE = json.loads(
     (
@@ -43,26 +49,13 @@ LUNAR_CASES = {
         ).read_text()
     )["cases"]
 }
-SOURCE_DOMAINS = {
-    row["id"]: row
-    for row in json.loads(
-        (
-            Path(__file__).parents[1]
-            / "fixtures/historical-utc-domain-reference-v1.json"
-        ).read_text()
-    )["guolao_original_adjustment_source_domain"]["rows"]
-}
-
-
-def epoch_for(case):
-    return PhysicalEpoch.from_ut1(ut1_from_tt(case["jd_tt"]))
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
 def test_published_UTC_adjustments_keep_Jie_and_source_qualified_lunar_dates(
     fixed_moshier, case
-):
-    epoch = epoch_for(case)
+) -> None:
+    epoch = epoch_for(case["jd_tt"])
     expected_utc = SOURCE_DOMAINS[case["id"]]["UTC"]
     if expected_utc is None:
         assert epoch.utc_label is None and epoch.utc_datetime is None
@@ -122,41 +115,74 @@ def test_published_UTC_adjustments_keep_Jie_and_source_qualified_lunar_dates(
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
 @pytest.mark.parametrize("side", [-1, 0, 1])
 def test_TT_search_is_half_open_at_actual_shared_Jie_boundaries(
-    fixed_moshier, case, side
-):
-    epoch = epoch_for(case)
+    fixed_moshier, monkeypatch: pytest.MonkeyPatch, case, side
+) -> None:
+    # Native roots select an exact binary64 point. A two-part root cannot
+    # generally be used as an exact endpoint through this scalar probe.
+    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
+    epoch = epoch_for(case["jd_tt"])
     jie = module.native_month_context(epoch, "jie_month")
-    boundary = datetime.fromisoformat(jie["next_boundary"]["datetime_with_offset"])
-    tt = ephemeris_time(boundary).jd_tt
+    tt = jie["next_boundary"]["solar_model_details"]["selected_crossing_jd_tt"]
     if side:
         tt = math.nextafter(tt, -math.inf if side < 0 else math.inf)
+    else:
+        pass
     # Synthetic numerical probe: vary TT, without asserting a new physical
-    # observation or constructing a valid birth-input replay receipt.
-    probe = replace(epoch, time=replace(epoch.time, jd_tt=tt))
+    # observation or constructing a valid birth-input replay receipt. The
+    # public calendar label is a display and must not redefine this root.
+    probe = replace(epoch, time=replace(epoch.time, tt=TTInstant.from_float(tt)))
     found = module.native_month_context(probe, "jie_month")
     expected = case["expected_month"] if side < 0 else case["expected_month"] % 12 + 1
     assert found["month_number"] == expected
     assert found["instant_utc"] == epoch.utc_label
 
 
+@pytest.mark.parametrize("side", [-1, 0, 1])
+def test_year_and_Jie_membership_keep_original_two_part_LiChun(
+    side, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "de440")
+    # Original2024 LiChun source from the retained-civil-point audit. These
+    # are synthetic PhysicalEpoch SDK points, not observations of the Sun.
+    root = Fraction(1385051020380955820183, 562949953421312)
+    term = next(
+        term
+        for term in module.almanac.get_solar_terms_for_year(2024, "UTC")
+        if term.name == "立春"
+    )
+    assert term.tt_instant.days == root
+    point = TTInstant(root + Fraction(side, 86_400_000_000))
+    epoch = PhysicalEpoch.from_tt(point)
+    year, _ = module.year_context_for_epoch(epoch, 2024)
+    month = module.native_month_context(epoch, "jie_month")
+    assert epoch.time.tt == point
+    assert year == (2023 if side < 0 else 2024)
+    assert month["month_number"] == (12 if side < 0 else 1)
+
+
 def test_unverified_shared_boundary_is_not_converted_to_optional_unavailability(
-    fixed_moshier, monkeypatch
-):
+    fixed_moshier, monkeypatch: pytest.MonkeyPatch
+) -> None:
     def reject(_):
         raise EphemerisSourceError("birth_clock_source_mismatch")
 
     monkeypatch.setattr(module.almanac, "require_calculated_solar_term", reject)
     with pytest.raises(EphemerisSourceError) as raised:
-        module.native_month_context(epoch_for(CASES[3]), "jie_month")
+        module.native_month_context(epoch_for(CASES[3]["jd_tt"]), "jie_month")
     assert raised.value.reason == "birth_clock_source_mismatch"
 
 
 @pytest.mark.parametrize("tool", ["astro_guolao", "astro_chart"])
 @pytest.mark.parametrize("case", [CASES[1], CASES[3], CASES[-1]], ids=lambda c: c["id"])
 def test_gap_and_overlap_full_results_match_REST_MCP_CLI(
-    fixed_moshier, monkeypatch, capsys, record_testsuite_property, tool, case
-):
-    epoch = epoch_for(case)
+    fixed_moshier,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    record_testsuite_property,
+    tool: str,
+    case,
+) -> None:
+    epoch = epoch_for(case["jd_tt"])
     date = datetime.fromisoformat(case["id"])
     wall_jd = date.toordinal() + 1721424.5
     payload = dict(
@@ -172,6 +198,8 @@ def test_gap_and_overlap_full_results_match_REST_MCP_CLI(
     )
     if tool == "astro_chart":
         payload["chart_variant"] = "guolao_chart"
+    else:
+        pass
     options = dict(
         as_of="2026-10-25T00:00:00+08:00",
         include_snapshot_text=False,
@@ -195,9 +223,9 @@ def test_gap_and_overlap_full_results_match_REST_MCP_CLI(
     assert response.status_code == 200, response.text
 
     async def call():
-        async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                spec.tool_name, {**payload, **options}, raise_on_error=False
+        async with Client(cached_mcp_app()) as client:
+            result = await call_calculation(
+                client, spec.tool_name, {**payload, **options}, raise_on_error=False
             )
             assert not result.is_error
             return result.structured_content
@@ -224,6 +252,8 @@ def test_gap_and_overlap_full_results_match_REST_MCP_CLI(
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open("x") as stream:
             json.dump(wire, stream, ensure_ascii=False)
+    else:
+        pass
     values = [
         {k: v for k, v in result.items() if k != "run_metadata"}
         for result in [response.json(), mcp, cli]
@@ -234,7 +264,6 @@ def test_gap_and_overlap_full_results_match_REST_MCP_CLI(
     expected_utc = SOURCE_DOMAINS[case["id"]]["UTC"]
     if expected_utc is None:
         assert birth["instant_utc"] is None and birth["calendar_datetime"] is None
-        assert "没有唯一UTC标签" in values[0]["interpretation"]["input_clock"]
     else:
         assert (
             abs(

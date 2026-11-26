@@ -6,17 +6,20 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo_quotation_comparison import (
+from fatebridge.core.sukuyo.sukuyo_quotation_comparison import (
     quotation_lines,
     quotation_reference,
     validate_quotation,
 )
-from fatebridge.core.sukuyo_t2217_collation import collation_lines, collation_reference
+from fatebridge.core.sukuyo.sukuyo_t2217_collation import (
+    collation_lines,
+    collation_reference,
+)
 
 FIXTURE = Path(__file__).parents[1] / "data/sukuyo-quotation-before-code-v88.json"
 
 
-def test_entire_before_code_reference_and_legacy_snapshot_are_retained():
+def test_entire_before_code_reference_and_legacy_snapshot_are_retained() -> None:
     expected = json.loads(FIXTURE.read_bytes())
     reference = collation_reference()
     assert reference["subsequent_quotation_comparison"]["source_data"] == expected
@@ -47,14 +50,14 @@ def test_entire_before_code_reference_and_legacy_snapshot_are_retained():
         ("leap_short_month_priority_established", True),
     ],
 )
-def test_unreviewed_scope_upgrades_fail_closed(key, value):
+def test_unreviewed_scope_upgrades_fail_closed(key: str, value: bool | int) -> None:
     data = copy.deepcopy(json.loads(FIXTURE.read_bytes()))
     data["scope"][key] = value
     with pytest.raises(ValueError):
         validate_quotation(data)
 
 
-def test_wrong_volume_or_silent_punctuation_revision_requires_review():
+def test_wrong_volume_or_silent_punctuation_revision_requires_review() -> None:
     for fault in ["volume", "punctuation"]:
         data = copy.deepcopy(json.loads(FIXTURE.read_bytes()))
         if fault == "volume":
@@ -71,7 +74,9 @@ def test_wrong_volume_or_silent_punctuation_revision_requires_review():
             validate_quotation(data)
 
 
-def test_native_text_distinguishes_work_inference_copy_punctuation_and_author_roles():
+def test_native_text_distinguishes_work_inference_copy_punctuation_and_author_roles() -> (
+    None
+):
     text = "\n".join(collation_lines(collation_reference()))
     for literal in (
         "第87轮",
@@ -92,7 +97,7 @@ def test_native_text_distinguishes_work_inference_copy_punctuation_and_author_ro
     assert "夕" in text and "且" in text and "旦" in text
 
 
-def test_references_are_isolated_and_rendering_validates_actual_data():
+def test_references_are_isolated_and_rendering_validates_actual_data() -> None:
     reference = quotation_reference()
     reference["source_data"]["scope"]["every_sho_is_same_work"] = True
     with pytest.raises(ValueError):
@@ -100,7 +105,7 @@ def test_references_are_isolated_and_rendering_validates_actual_data():
     assert not quotation_reference()["source_data"]["scope"]["every_sho_is_same_work"]
 
 
-def test_current_research_marker_cannot_silently_lose_its_evidence():
+def test_current_research_marker_cannot_silently_lose_its_evidence() -> None:
     reference = collation_reference()
     reference.pop("subsequent_quotation_comparison")
     with pytest.raises(KeyError):

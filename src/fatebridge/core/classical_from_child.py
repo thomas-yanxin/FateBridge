@@ -5,7 +5,7 @@ hidden stems stay present even where the source calls a hidden force ineffective
 """
 
 from copy import deepcopy
-from typing import Any, Mapping, Tuple
+from typing import Any, Mapping
 
 from fatebridge.utils.data import (
     BRANCH_HIDDEN_STEMS,
@@ -28,7 +28,7 @@ ORDER = ("year", "month", "day", "hour")
 
 
 def build_from_child_reference(
-    pillars: Mapping[str, Tuple[str, str]],
+    pillars: Mapping[str, tuple[str, str]],
 ) -> dict[str, Any]:
     """Keep month carrier, distributed output, wealth and obstructions separate.
 

@@ -6,10 +6,12 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import sukuyo_fortnights as source
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_commentarial_clock import commentarial_boundary_reference
-from fatebridge.core.sukuyo_sources import LoadedSource
+from fatebridge.core.sukuyo import sukuyo_fortnights as source
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_commentarial_clock import (
+    commentarial_boundary_reference,
+)
+from fatebridge.core.sukuyo.sukuyo_sources import LoadedSource
 from scripts.sukuyo.check_sukuyo_fortnights import verify_primary
 
 FIXTURE = Path(__file__).parents[1] / "data/sukuyo-fortnight-before-production-v69.json"
@@ -23,7 +25,7 @@ def reference():
 
 
 @pytest.mark.parametrize("row", BEFORE["all68_declared_ordinal_cases"])
-def test_every_before_production_ordinal_case_including_invalid_days(row):
+def test_every_before_production_ordinal_case_including_invalid_days(row) -> None:
     args = {k: row[k] for k in ("half", "day", "black_length", "white_length")}
     if row["valid"]:
         assert source.declared_fortnight_ordinal(**args) == row["ordinal"]
@@ -45,7 +47,7 @@ def test_every_before_production_ordinal_case_including_invalid_days(row):
         {"half": "first_half"},
     ],
 )
-def test_unsupported_numbering_or_halfday_is_not_silently_accepted(changed):
+def test_unsupported_numbering_or_halfday_is_not_silently_accepted(changed) -> None:
     args = {
         "half": "white",
         "day": 9,
@@ -57,12 +59,12 @@ def test_unsupported_numbering_or_halfday_is_not_silently_accepted(changed):
         source.declared_fortnight_ordinal(**args)
 
 
-def test_black_length_and_white_length_have_no_implicit_defaults():
+def test_black_length_and_white_length_have_no_implicit_defaults() -> None:
     with pytest.raises(TypeError):
         source.declared_fortnight_ordinal("white", 9)
 
 
-def test_yuga_derived_ledger_is_exact_but_has_no_month_placement_or_epoch():
+def test_yuga_derived_ledger_is_exact_but_has_no_month_placement_or_epoch() -> None:
     value = reference()
     ledger = value["derived_five_year_ledger"]
     assert ledger == BEFORE["before_production_five_year_ledger"]
@@ -81,7 +83,7 @@ def test_yuga_derived_ledger_is_exact_but_has_no_month_placement_or_epoch():
     ]
 
 
-def test_all_quoted_season_schemes_keep_own_author_stance_and_mapping():
+def test_all_quoted_season_schemes_keep_own_author_stance_and_mapping() -> None:
     rows = reference()["T1821_all_four_attributed_three_season_schemes"]
     assert [r["rain_second_white9_chinese_label"] for r in rows] == [
         [8, 9],
@@ -100,7 +102,9 @@ def test_all_quoted_season_schemes_keep_own_author_stance_and_mapping():
     ]
 
 
-def test_four_quarter_groups_do_not_masquerade_as_twelve_daily_conversion_tables():
+def test_four_quarter_groups_do_not_masquerade_as_twelve_daily_conversion_tables() -> (
+    None
+):
     value = reference()
     rows = value["T2087_four_quarters_original_groups_not12_literal_daily_intervals"]
     assert len(rows) == 4 and sum(len(r["names"]) for r in rows) == 12
@@ -110,7 +114,7 @@ def test_four_quarter_groups_do_not_masquerade_as_twelve_daily_conversion_tables
     ]
 
 
-def test_eleven_and_explicit_twelve_correction_remain_different_layers():
+def test_eleven_and_explicit_twelve_correction_remain_different_layers() -> None:
     value = reference()["T1644_T2251_explicit_correction_context"]["source_conflict"]
     assert value["T1644_selected_main_literal"] == "十一月九日"
     assert value["T2251_selected_quotation_literal"] == "十二月九日"
@@ -119,8 +123,8 @@ def test_eleven_and_explicit_twelve_correction_remain_different_layers():
 
 
 def test_tampered_source_bundle_cannot_reuse_the_canonical_reference(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     path = tmp_path / "changed.json"
     path.write_text("{}")
     monkeypatch.setattr(source, "SOURCE", path)
@@ -135,13 +139,17 @@ def test_tampered_source_bundle_cannot_reuse_the_canonical_reference(
         ("sukuyo_comparative_time_units.json", "西域记"),
     ],
 )
-def test_changed_bound_parent_edition_is_rejected(monkeypatch, file, expected):
+def test_changed_bound_parent_edition_is_rejected(
+    monkeypatch: pytest.MonkeyPatch, file: str, expected: str
+) -> None:
     load = source.load_source
 
     def changed(path):
         value = load(path)
         if path.name != file:
             return value
+        else:
+            pass
         payload = value.data
         if file == "sukuyo_t1299_days.json":
             payload["source_sha256"] = "changed"
@@ -149,6 +157,8 @@ def test_changed_bound_parent_edition_is_rejected(monkeypatch, file, expected):
             for r in payload["witnesses"]:
                 if r["id"] == "T51n2087":
                     r["source_sha256"] = "changed"
+                else:
+                    pass
         return LoadedSource(payload, "changed")
 
     monkeypatch.setattr(source, "load_source", changed)
@@ -158,12 +168,12 @@ def test_changed_bound_parent_edition_is_rejected(monkeypatch, file, expected):
         )
 
 
-def test_wrong_rizang_edition_is_not_bound():
+def test_wrong_rizang_edition_is_not_bound() -> None:
     with pytest.raises(ValueError, match="日藏具名版本不一致"):
         source.fortnight_calendar_reference({"source_sha256": "changed"})
 
 
-def test_source_reference_copy_cannot_emend_later_runs():
+def test_source_reference_copy_cannot_emend_later_runs() -> None:
     first = reference()
     first["T1644_T2251_explicit_correction_context"]["source_conflict"][
         "T1644_selected_main_literal"
@@ -176,7 +186,9 @@ def test_source_reference_copy_cannot_emend_later_runs():
     )
 
 
-def test_declared_arithmetic_does_not_reassign_current_historical_date_or_half():
+def test_declared_arithmetic_does_not_reassign_current_historical_date_or_half() -> (
+    None
+):
     calendar = calendar_mansion(
         "0806-07-23",
         "23:59:00",
@@ -195,21 +207,23 @@ def test_declared_arithmetic_does_not_reassign_current_historical_date_or_half()
 
 
 @pytest.mark.parametrize("name", list(BEFORE["actual_sources"]))
-def test_actual_source_capture_substitution_rejected(tmp_path, name):
+def test_actual_source_capture_substitution_rejected(tmp_path: Path, name) -> None:
     path = tmp_path / "wrong"
     path.write_bytes(b"wrong")
     with pytest.raises(ValueError, match="实际源文件字节指纹不一致"):
         verify_primary({name: path})
 
 
-def test_offline_checker_does_not_claim_actual_source_reading():
+def test_offline_checker_does_not_claim_actual_source_reading() -> None:
     result = verify_primary()
     assert result["declared_ordinal_cases"] == 68
     assert result["actual_source_files_rechecked"] == []
     assert not result["actual_date_or_leap_precedence_admitted"]
 
 
-def test_complete_runtime_numbering_summary_retains_denominator_and_rejection_meaning():
+def test_complete_runtime_numbering_summary_retains_denominator_and_rejection_meaning() -> (
+    None
+):
     value = reference()
     assert (
         value["all68_declared_ordinal_cases"] == BEFORE["all68_declared_ordinal_cases"]

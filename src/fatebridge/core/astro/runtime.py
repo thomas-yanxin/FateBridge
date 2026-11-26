@@ -9,11 +9,18 @@ from fatebridge.core.ephemeris_runtime import (
     ephemeris_model_from_retflag as ephemeris_model_from_retflag,
 )
 from fatebridge.core.ephemeris_runtime import (
+    native_ephemeris_errors as _native_ephemeris_errors,
+)
+from fatebridge.core.ephemeris_runtime import (
     preserve_ephemeris_path as preserve_ephemeris_path,
 )
 from fatebridge.core.ephemeris_runtime import swe as swe
 
 logger = logging.getLogger(__name__)
+
+
+def native_ephemeris_errors() -> tuple[type[BaseException], ...]:
+    return _native_ephemeris_errors(swe)
 
 
 # Log the first swisseph runtime failure so operators notice a broken ephemeris
@@ -28,9 +35,8 @@ def _log_swe_runtime_failure(call: str, error: BaseException) -> None:
         return
     _SWE_RUNTIME_FAILURE_LOGGED = True
     logger.warning(
-        "Swiss Ephemeris %s raised %s (%s); inspect calculation provenance "
+        "Swiss Ephemeris %s raised %s; inspect calculation provenance "
         "or error for the outcome. Subsequent failures will be suppressed.",
         call,
         type(error).__name__,
-        error,
     )

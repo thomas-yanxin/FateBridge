@@ -2,7 +2,7 @@
 
 [文档中心](README.md) · [API 参考](api-reference.md) · [算法状态](algorithm-status.md)
 
-公开入口为 `ziwei_birth`、`ziwei_horoscope` 与 `ziwei_rules`。本命与运限保持来源和规则选择，规则查询提供具名条文、前提与未覆盖项。参数和输出字段见[按需合同](contracts/README.md)。
+公开入口为 `ziwei_birth_chart`、`ziwei_timing` 与 `ziwei_rules`。本命与运限保持来源和规则选择，规则查询提供具名条文、前提与未覆盖项。参数和输出字段见[按需合同](contracts/README.md)。
 
 ## 盘式与四化
 
@@ -15,6 +15,10 @@
 ## 时钟与岁序
 
 出生民用时钟、真太阳排盘时钟、目标时钟各自记录；已知重复钟时需明确UTC偏移。真太阳日期可改变安星日期，但岁序统一采用 `birth_civil_timezone`：将出生和目标的实际瞬间转换到出生民用时区，再按当地日期查所采用的东亚农历日期表，以正月初一00:00换岁。
+
+目标瞬间如果落入出生时区的 `-00` 区间，当地日期未定义，运限返回 `unresolved_timezone_offset`。目标 UTC 即使已知，也只能用来确定投影位置。 [TZif 规范](https://www.rfc-editor.org/rfc/rfc9636.html#section-3.2)
+
+分钟诊断沿秒 0 选定的实际时线核对 `59.999999` 秒。历史区内跳时或回拨使该端点缺失时，`endpoint_seconds` 只含 `0`，跨时支和跨排盘日期均为 `null`。 [固定钟面与端点对照](precision-acceptance.md#ziwei-civil-clock-membership-round112)
 
 这一软件约定不重建历史地方朔时，也未认证古典岁首。目标实际时刻早于出生时刻明确拒绝，不能把小于1的错误钳为1。内部规则审计使用的合成农历输入只是条件盘；无实际出生时钟不能自行推定岁序。
 
@@ -41,8 +45,16 @@
 
 2026-11-09 在原1,080例之外，新增固定 [iztro 2.5.8](https://github.com/SylarLong/iztro/tree/2.5.8) 默认配置的普通月日时、六十年时序和四个闰月网格。13,936条比较记录对应13,910组不同输入；66颗本命星的919,776条记录及334,464个长生／博士格无差异，同时核对命身宫、五行局、命身主、宫名宫干及大限序列。104条不存在的闰月三十日保留为来源无效日期控制，未计通过。参考及采集计划位于本地 `tests/data/ziwei_independent/natal_factor_grid_v1`；网格有重叠，未覆盖所有年份的完整组合，也不裁定其他规则配置、原典异文或全部流曜。
 
+<a id="horoscope-boundaries-round46"></a>
+
+2026-11-19 的运限对照固定 20 例，覆盖十个流年干、闰二月及闰十一月交接、除夕晚子与午夜、同一瞬间转换到不同民用时区的岁序。香港天文台历表给出三组日期。用出生民用时区的目标农历年减出生农历年再加一，独立核对岁序。命身宫、五行局及大限、小限、流年、流月、流日、流时的实际落宫、宫干、四化、十二宫映射、四化星位连接和流年禄羊陀与原版软件对照。 [香港天文台历表](https://www.hko.gov.hk/sc/gts/time/conversion.htm) · [iztro 2.5.8 运限实现](https://raw.githubusercontent.com/SylarLong/iztro/2.5.8/src/astro/FunctionalAstrolabe.ts)
+
+服务、REST、独立 MCP 会话及 CLI 各有 2,440 项对照相符。60 次公开调用均成功。每个案例的完整业务内容与服务一致，比较仅排除顶层 `run_metadata`。MCP 的公开输入 Schema 与当前按需合同相同，输出 Schema 与当前输出模型相同。原 105 条运限比较和三项正式起限前的童限替代差异继续保留。新结果限于这 20 例的所选盘式和字段，其他流曜、其他盘式及原典岁首仍待验。
+
+同一批保存的服务结果与 iztro 2.6.5 发布包另比较，2,422／2,440 项相符。三个晚子时样本各有六项差异，涉及流日、流时的干、四化及本命星位连接。两版对这三例的运限落宫、农历日期和岁序一致。FateBridge 的具名 `iztro_2_5_8` 配置从共享日柱、时柱取干，晚子时按次日取日干；2.6.5 的 `dayDivide=current` 使用当日取干。两个口径按版本保留，原典对流日和流时换日的要求仍待裁定。 [iztro 2.6.5 发布记录](https://github.com/SylarLong/iztro/releases/tag/v2.6.5)
+
 ```bash
-uv run --locked --extra dev python -m pytest -n0 tests/ziwei/test_contract_regressions.py tests/ziwei/test_ziwei_horoscope_crosscheck.py tests/ziwei/test_ziwei_twenty_first_iteration.py
+uv run --locked --extra dev python -m pytest -n0 tests/ziwei/test_ziwei_depth_transports.py tests/ziwei/test_ziwei_horoscope_crosscheck.py tests/ziwei/test_ziwei_twenty_first_iteration.py
 uv run --locked --extra dev python -m scripts.ziwei.audit_ziwei_natal --fixtures tests/data/ziwei_independent/natal_factor_grid_v1 --output /tmp/ziwei-natal-factor-grid-audit.json
 ```
 

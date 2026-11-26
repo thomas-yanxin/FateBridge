@@ -8,12 +8,14 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.astro import runtime
-from fatebridge.core.human_design import chart_at, chart_at_tt
-from fatebridge.core.human_design_precision import compare_node_backends
-from fatebridge.core.human_design_sensitivity import assess_birth_interval
-from fatebridge.core.human_design_variables import variables_from_activations
+from fatebridge.core.human_design.human_design import chart_at, chart_at_tt
+from fatebridge.core.human_design.human_design_precision import compare_node_backends
+from fatebridge.core.human_design.human_design_sensitivity import assess_birth_interval
+from fatebridge.core.human_design.human_design_variables import (
+    variables_from_activations,
+)
 from fatebridge.services.human_design import calculate_human_design
-from fatebridge.validation.human_design_official import official_chart_checks
+from validation.human_design_official import official_chart_checks
 
 REFERENCE = json.loads(
     (
@@ -23,7 +25,7 @@ REFERENCE = json.loads(
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"], ids=lambda c: c["id"])
-def test_official_variable_code_and_each_paired_field_quote(case):
+def test_official_variable_code_and_each_paired_field_quote(case) -> None:
     result = calculate_human_design(**case["birth_input"])
     variables = result["variables"]
     assert variables["status"] == "computed"
@@ -32,6 +34,8 @@ def test_official_variable_code_and_each_paired_field_quote(case):
         check = official_chart_checks({**REFERENCE, "cases": [case]})
         assert check["status"] == "failed"
         assert check["cases"][0]["structure_checks"]["variables"] is False
+    else:
+        pass
     assert len(variables["arrows"]) == 4
     assert variables["subdivision_accuracy_certified"] is False
     for arrow in variables["arrows"]:
@@ -47,7 +51,7 @@ def test_official_variable_code_and_each_paired_field_quote(case):
         assert quoted_bodies == arrow["body_pair"]
 
 
-def test_complete_official_cohort_includes_utc_graph_and_all_208_gate_lines():
+def test_complete_official_cohort_includes_utc_graph_and_all_208_gate_lines() -> None:
     result = official_chart_checks(REFERENCE)
     assert result["charts_checked"] == 8
     assert result["gate_lines_checked"] == result["gate_lines_matched"] == 208
@@ -81,7 +85,9 @@ def test_complete_official_cohort_includes_utc_graph_and_all_208_gate_lines():
         "wrong_variable",
     ],
 )
-def test_incomplete_or_wrong_official_reference_does_not_gain_acceptance(part):
+def test_incomplete_or_wrong_official_reference_does_not_gain_acceptance(
+    part: str,
+) -> None:
     ref = copy.deepcopy(REFERENCE)
     if part == "body_order":
         ref["planet_order"][1] = "Sun"
@@ -104,14 +110,22 @@ def test_incomplete_or_wrong_official_reference_does_not_gain_acceptance(part):
         assert check["cases"][0]["status"] == "failed"
         if part == "wrong_variable":
             assert check["cases"][0]["structure_checks"]["variables"] is False
+        else:
+            pass
         if part == "wrong_utc":
             assert check["cases"][0]["structure_checks"]["birth_utc"] is False
+        else:
+            pass
         if part == "wrong_gate":
             assert check["cases"][0]["gate_line_mismatches"]
+        else:
+            pass
 
 
 @pytest.mark.parametrize("bad_tone", [None, True, 0, 7, "3"])
-def test_invalid_paired_tone_never_acquires_an_arrow_code(bad_tone):
+def test_invalid_paired_tone_never_acquires_an_arrow_code(
+    bad_tone: bool | int | str | None,
+) -> None:
     chart = chart_at(datetime.fromisoformat("2000-01-01T12:00:00+00:00"))
     earth = next(a for a in chart["activations"]["personality"] if a["body"] == "Earth")
     earth["tone"] = bad_tone
@@ -120,21 +134,25 @@ def test_invalid_paired_tone_never_acquires_an_arrow_code(bad_tone):
     assert result["code"] is None
 
 
-def test_opposite_pair_cannot_be_spliced_even_if_both_tones_point_left():
+def test_opposite_pair_cannot_be_spliced_even_if_both_tones_point_left() -> None:
     chart = chart_at(datetime.fromisoformat("2000-01-01T12:00:00+00:00"))
     for a in chart["activations"]["design"]:
         if a["body"] == "Sun":
             a["tone"] = 1
+        else:
+            pass
         if a["body"] == "Earth":
             a["tone"] = 2
+        else:
+            pass
     result = variables_from_activations(chart["activations"])
     assert result["code"] is None
     assert result["arrows"][0]["status"] == "inconsistent_pair"
 
 
 def test_node_backend_diagnostic_rebuilds_variable_and_returns_both_actual_structures(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from tests.support.ephemeris_context import empty_ephemeris_path
 
     with empty_ephemeris_path():
@@ -164,7 +182,7 @@ def test_node_backend_diagnostic_rebuilds_variable_and_returns_both_actual_struc
     assert result["reference_structure"]["authority"] == chart["bodygraph"]["authority"]
 
 
-def test_birth_interval_returns_joint_variable_witnesses():
+def test_birth_interval_returns_joint_variable_witnesses() -> None:
     chart = chart_at(datetime.fromisoformat("2000-01-01T12:00:00+00:00"))
     result = assess_birth_interval(chart, 60, "true")
     assert result["sampling"]["continuous_interval_certified"] is False

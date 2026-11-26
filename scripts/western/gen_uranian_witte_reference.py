@@ -56,12 +56,16 @@ def extract(path: Path) -> dict:
         ]
         if len(first_days) != 2:
             raise ValueError(f"Unexpected first-day tables on page {page}")
+        else:
+            pass
         tables = [
             re.findall(r"(\d+)ý([Ï-Ú])ý(\d+)(?:\s+(\d+))?[ïñ]", line)
             for line in first_days
         ]
         if [len(table) for table in tables] != [12, 8]:
             raise ValueError(f"Unrecognised PDF glyph layout on page {page}")
+        else:
+            pass
         columns = [*tables[0][:10], tables[0][11], *tables[1]]
         positions = {}
         for name, (degree, glyph, minute, second) in zip(
@@ -110,6 +114,8 @@ def main() -> None:
             raise SystemExit(
                 "Publisher source or extracted fixture changed; manual review required"
             )
+        else:
+            pass
         print("Publisher source hash and extracted factual rows match")
     else:
         args.output.write_text(rendered)
@@ -117,3 +123,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

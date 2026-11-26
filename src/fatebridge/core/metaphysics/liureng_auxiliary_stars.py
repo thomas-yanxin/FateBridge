@@ -9,12 +9,11 @@ from __future__ import annotations
 
 from typing import Any
 
+from fatebridge.core.metaphysics.common import GUI_REN_SEQUENCE, sexagenary_index_for
+from fatebridge.core.metaphysics.liureng_life_stages import build_life_stages
+from fatebridge.core.metaphysics.ren_evidence import xun_dun_stems
 from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
-
-from ...utils.data import EARTHLY_BRANCHES
-from .common import GUI_REN_SEQUENCE, sexagenary_index_for
-from .liureng_life_stages import build_life_stages
-from .ren_evidence import xun_dun_stems
+from fatebridge.utils.data import EARTHLY_BRANCHES
 
 MONTH_ORDER = "寅卯辰巳午未申酉戌亥子丑"
 HEAVEN_DE = dict(

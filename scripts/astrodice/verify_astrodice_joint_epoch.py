@@ -49,8 +49,12 @@ def exact_state(source, window, epoch, body):
     )
     if body == "Venus":
         return [v / au for v in direct_state(record, pointers[1], epoch)]
+    else:
+        pass
     if body != "Earth":
         raise ValueError("Unplanned source body")
+    else:
+        pass
     emb, moon = [direct_state(record, pointers[g], epoch) for g in (2, 9)]
     return [(e - m / (1 + emrat)) / au for e, m in zip(emb, moon)]
 
@@ -76,13 +80,19 @@ def predicate_layers(name, reported, declared, independent, measured, refinement
     original = overlap(parse(declared), measured)
     if reported != original:
         raise ValueError("Reported enclosure predicate changed: " + name)
+    else:
+        pass
     refined = overlap(independent, measured)
     if refined and not original:
         raise ValueError("Nested source refinement cannot reverse a refutation")
+    else:
+        pass
     if original and not refined:
         refinements.append(
             {"field": name, "reported_not_refuted": True, "independently_refuted": True}
         )
+    else:
+        pass
     return refined
 
 
@@ -102,6 +112,8 @@ def reported_rate_conversion(bounds):
 def source_support(source, centers, offsets, declared):
     if len(declared) != 2:
         raise ValueError("Source support dimension differs")
+    else:
+        pass
     allowance = Q(4, 1 << 256)
     states = []
     for c, x, claimed, body in zip(centers, offsets, declared, ["Earth", "Venus"]):
@@ -113,6 +125,8 @@ def source_support(source, centers, offsets, declared):
             and b - true[1] <= allowance
         ):
             raise ValueError("Absolute epoch enclosure changed or excessive padding")
+        else:
+            pass
         states.append(source.state((a, b), body))
     J = [
         [
@@ -145,12 +159,16 @@ def verify_joint(directory, case, vector, observer, profile, stored, plan):
         or stored["full_three_component_root_certified"]
     ):
         raise ValueError("Frozen support or physical scope changed")
+    else:
+        pass
     source = Source(directory, case["window_index"])
     _, J = source_support(source, centers, initial, stored["initial_support_JD"])
     if len(stored["initial_jacobian"]) != 3 or any(
         len(r) != 2 for r in stored["initial_jacobian"]
     ):
         raise ValueError("Initial Jacobian dimensions changed")
+    else:
+        pass
     for actual, row in zip(J, stored["initial_jacobian"]):
         for a, b in zip(actual, row):
             cover(a, b)
@@ -158,20 +176,28 @@ def verify_joint(directory, case, vector, observer, profile, stored, plan):
     choices = list(combinations(range(3), 2))
     if len(stored["axis_candidates"]) != 3:
         raise ValueError("Axis candidate omitted")
+    else:
+        pass
     conditioning = []
     for axes, c in zip(choices, stored["axis_candidates"]):
         if c["axes"] != list(axes):
             raise ValueError("Residual-based axis selection")
+        else:
+            pass
         cover(det([J[a] for a in axes]), c["determinant"])
         a, b = parse(c["determinant"])
         lower = min(abs(a), abs(b)) if a * b > 0 else Q(0)
         if Q(c["minimum_absolute_determinant"]) != lower:
             raise ValueError("Conditioning lower bound changed")
+        else:
+            pass
         conditioning.append(lower)
     chosen = max(range(3), key=conditioning.__getitem__)
     axes = list(choices[chosen])
     if stored["selected_axes"] != axes:
         raise ValueError("Source-only axis rule changed")
+    else:
+        pass
     if conditioning[chosen] <= 0:
         if (
             stored["status"] != "conditioning_unknown"
@@ -179,7 +205,11 @@ def verify_joint(directory, case, vector, observer, profile, stored, plan):
             or stored["selected_equations_parametric_unique_root_proved"]
         ):
             raise ValueError("Singular source promoted")
+        else:
+            pass
         return {"steps": 0, "source_boxes": 6, "enclosed": False}
+    else:
+        pass
     e, v = [
         exact_state(directory, case["window_index"], t, b)
         for t, b in zip(centers, ["Earth", "Venus"])
@@ -188,23 +218,35 @@ def verify_joint(directory, case, vector, observer, profile, stored, plan):
     d = point[0][0] * point[1][1] - point[0][1] * point[1][0]
     if d == 0:
         raise ValueError("Singular exact preconditioner")
+    else:
+        pass
     C = [[point[1][1] / d, -point[0][1] / d], [-point[1][0] / d, point[0][0] / d]]
     if [list(map(Q, row)) for row in stored["preconditioner"]] != C:
         raise ValueError("Independent exact preconditioner differs")
+    else:
+        pass
     offsets = initial
     proved = False
     source_boxes = 6
     empty = False
     if len(stored["history"]) > plan["joint_contractor_iterations"]:
         raise ValueError("Unplanned contractor work")
+    else:
+        pass
     for step in stored["history"]:
         if empty:
             raise ValueError("Iteration after empty source support")
+        else:
+            pass
         if list(map(parse, step["input_seconds"])) != offsets:
             raise ValueError("Contractor input changed")
+        else:
+            pass
         mid = [sum(x) / 2 for x in offsets]
         if list(map(Q, step["midpoint_seconds"])) != mid:
             raise ValueError("Residual-dependent midpoint")
+        else:
+            pass
         _, J = source_support(source, centers, offsets, step["support_JD"])
         for a, row in zip(axes, step["jacobian"]):
             for actual, declared in zip(J[a], row):
@@ -218,6 +260,8 @@ def verify_joint(directory, case, vector, observer, profile, stored, plan):
         differences = [exact[1][a] - exact[0][a] for a in axes]
         if list(map(Q, step["point_difference_AU"])) != differences:
             raise ValueError("Exact direct-basis point differs")
+        else:
+            pass
         for difference, a, declared in zip(differences, axes, step["residual_AU"]):
             cover(sub(rounded(difference), measured[a]), declared)
         residual = list(map(parse, step["residual_AU"]))
@@ -235,6 +279,8 @@ def verify_joint(directory, case, vector, observer, profile, stored, plan):
             len(r) != 2 for r in step["error_matrix"]
         ):
             raise ValueError("Preconditioned error matrix dimensions differ")
+        else:
+            pass
         for row, claimed in zip(error, step["error_matrix"]):
             for actual, declared in zip(row, claimed):
                 cover(actual, declared)
@@ -242,6 +288,8 @@ def verify_joint(directory, case, vector, observer, profile, stored, plan):
         contraction = max(sum(max(abs(a), abs(b)) for a, b in row) for row in error)
         if Q(step["contraction_upper"]) != contraction:
             raise ValueError("Contraction norm understated")
+        else:
+            pass
         images = [
             add(
                 sub(
@@ -267,6 +315,8 @@ def verify_joint(directory, case, vector, observer, profile, stored, plan):
             or step["empty_intersection"] != empty
         ):
             raise ValueError("Krawczyk inclusion predicate changed")
+        else:
+            pass
         if empty:
             if (
                 step["next_seconds"] is not None
@@ -274,30 +324,42 @@ def verify_joint(directory, case, vector, observer, profile, stored, plan):
                 or stored["status"] != "no_source_root_in_frozen_support"
             ):
                 raise ValueError("Empty support hidden or proved family contradicted")
+            else:
+                pass
         else:
             if list(map(parse, step["next_seconds"])) != intersections:
                 raise ValueError("Interval intersection shrunk or moved")
+            else:
+                pass
             proved |= inside and contraction < 1
             offsets = intersections
     if stored["selected_equations_parametric_unique_root_proved"] != proved:
         raise ValueError("Selected-equation theorem scope changed")
+    else:
+        pass
     if empty:
         return {
             "steps": len(stored["history"]),
             "source_boxes": source_boxes,
             "enclosed": False,
         }
+    else:
+        pass
     if (
         len(stored["history"]) != plan["joint_contractor_iterations"]
         or stored["status"] != "enclosed"
         or list(map(parse, stored["final_offsets_seconds"])) != offsets
     ):
         raise ValueError("Unfinished contractor promoted or final support changed")
+    else:
+        pass
     finalJD = [stored["reception_JD"], stored["emission_JD"]]
     states, _ = source_support(source, centers, offsets, finalJD)
     for actual, row in zip(states, stored["source_states_AU_and_AU_per_day"]):
         if len(row) != 6:
             raise ValueError("Final source state omitted")
+        else:
+            pass
         for a, b in zip(actual, row):
             cover(a, b)
             source_boxes += 1
@@ -305,6 +367,8 @@ def verify_joint(directory, case, vector, observer, profile, stored, plan):
     distance = length(ray)
     if len(stored["source_ray_AU"]) != 3:
         raise ValueError("Unused position component omitted")
+    else:
+        pass
     for actual, declared in zip(ray, stored["source_ray_AU"]):
         cover(actual, declared)
     cover(distance, stored["source_range_AU"])
@@ -329,6 +393,8 @@ def verify_joint(directory, case, vector, observer, profile, stored, plan):
         "all_three_position_components_not_refuted"
     ] != all(original_flags):
         raise ValueError("Unused position contradiction hidden")
+    else:
+        pass
     rg, obs, lt = [
         observed(v, ulps)
         for v in [vector["range_AU"], observer["range_AU"], vector["light_time_days"]]
@@ -355,6 +421,8 @@ def verify_joint(directory, case, vector, observer, profile, stored, plan):
     cover(seconds, stored["emission_minus_reception_plus_LT_seconds"])
     if stored["continuous_LT_relation_not_refuted"] != overlap(relation, rounded(0)):
         raise ValueError("Continuous epoch relation changed")
+    else:
+        pass
     unit = [divide(p, distance) for p in ray]
     ev, vv = states[0][3:], states[1][3:]
     ratio = divide(
@@ -378,6 +446,8 @@ def verify_joint(directory, case, vector, observer, profile, stored, plan):
         stored["velocity_models"]
     ) != set(models):
         raise ValueError("Partial position fit promoted or velocity model omitted")
+    else:
+        pass
     refined_velocities = {}
     refined_radial_RR = {}
     refined_radial_observer = {}
@@ -385,6 +455,8 @@ def verify_joint(directory, case, vector, observer, profile, stored, plan):
         declared = stored["velocity_models"][name]
         if len(declared["AU_per_day"]) != 3:
             raise ValueError("Velocity component omitted")
+        else:
+            pass
         for actual, claimed in zip(values, declared["AU_per_day"]):
             cover(actual, claimed)
         original_compatible = [
@@ -409,6 +481,8 @@ def verify_joint(directory, case, vector, observer, profile, stored, plan):
             raise ValueError(
                 "Velocity predicate changed or position qualification lost"
             )
+        else:
+            pass
         radial = sum_boxes(mul(u, v) for u, v in zip(unit, values))
         cover(radial, declared["radial_rate_AU_per_day"])
         refined_radial_RR[name] = predicate_layers(
@@ -443,6 +517,8 @@ def verify_joint(directory, case, vector, observer, profile, stored, plan):
     )
     if stored["continuous_Newtonian_LT_vector_model_not_refuted"] != original_full:
         raise ValueError("Epoch failure hidden in full-model predicate")
+    else:
+        pass
     full = (
         refined_velocities["continuous_Newtonian_reception_derivative"]
         and stored["continuous_LT_relation_not_refuted"]
@@ -451,9 +527,13 @@ def verify_joint(directory, case, vector, observer, profile, stored, plan):
     )
     if set(stored["lattices"]) != {"reception", "emission"}:
         raise ValueError("Epoch lattice role omitted")
+    else:
+        pass
     for role, epoch in zip(["reception", "emission"], [rec, emit]):
         if set(stored["lattices"][role]) != set(plan["lattice_coordinate_models"]):
             raise ValueError("Grid model omitted")
+        else:
+            pass
         for model, value in stored["lattices"][role].items():
             a, b = (
                 epoch
@@ -470,6 +550,8 @@ def verify_joint(directory, case, vector, observer, profile, stored, plan):
                 "internal_representation_certified": False,
             }:
                 raise ValueError("Grid membership or physical scope changed")
+            else:
+                pass
     return {
         "steps": len(stored["history"]),
         "source_boxes": source_boxes,
@@ -496,6 +578,8 @@ def verify(run, cohort):
         (run / "A-first-analysis.json").read_bytes()
     ):
         raise ValueError("B was not bound to the original A analysis")
+    else:
+        pass
     rawanalysis = (run / (cohort + "-first-analysis.json")).read_bytes()
     data = json.loads(rawanalysis)
     if (
@@ -516,6 +600,8 @@ def verify(run, cohort):
         or data["retained_overall_numeric_gate_exit_code"] != 1
     ):
         raise ValueError("Joint source proof promoted to acceptance")
+    else:
+        pass
     expected = []
     for spec in plan["groups"][cohort]:
         sp = json.loads((run / spec["root"] / "plan-before-queries.json").read_text())
@@ -526,6 +612,8 @@ def verify(run, cohort):
         )
     if len(expected) != len(data["groups"]):
         raise ValueError("Original query group omitted")
+    else:
+        pass
     summaries = []
     refinement_rows = []
     steps = boxes = 0
@@ -545,6 +633,8 @@ def verify(run, cohort):
             }.items()
         ):
             raise ValueError("Original joint source/table identity changed")
+        else:
+            pass
         keys = (
             "TIME_TYPE",
             "CAL_TYPE",
@@ -555,6 +645,8 @@ def verify(run, cohort):
         )
         if any(query["parameters"][k] != oq["parameters"][k] for k in keys):
             raise ValueError("Cross-batch joint clock input")
+        else:
+            pass
         cases = sp["cohorts"][spec["source_cohort"]]
         vectors = parse_vectors(raw, query, cases, sp)
         obs = inspect(oraw, oreceipt["status"], oq, cases, sp)
@@ -564,6 +656,8 @@ def verify(run, cohort):
             or len(group["rows"]) != len(vectors)
         ):
             raise ValueError("Unavailable table promoted or row omitted")
+        else:
+            pass
         lookup = {r["case_id"]: r for r in obs["rows"]}
         stats = {
             p: {
@@ -597,6 +691,8 @@ def verify(run, cohort):
                 or set(row["profiles"]) != set(plan["numerical_tube_profiles"])
             ):
                 raise ValueError("Original values, case roles or profiles changed")
+            else:
+                pass
             case = next(c for c in cases if c["id"] == vector["case_id"])
             for p, stored in row["profiles"].items():
                 result = verify_joint(
@@ -615,8 +711,12 @@ def verify(run, cohort):
                             "refinements": result["original_enclosure_refinements"],
                         }
                     )
+                else:
+                    pass
                 if vector["role"] == "auxiliary_not_primary":
                     continue
+                else:
+                    pass
                 stat = stats[p]
                 stat["primary"] += 1
                 status = stored["status"]
@@ -662,3 +762,5 @@ if __name__ == "__main__":
     with a.output.open("x") as f:
         json.dump(verify(a.run, a.cohort), f, indent=2)
         f.write("\n")
+else:
+    pass

@@ -13,13 +13,17 @@ from fatebridge.utils.errors import EphemerisSourceError
 @pytest.mark.parametrize(
     "observation", [0.0, -12345.0, 2451545.0, 2460398.8333333335, 1e8]
 )
-def test_stationary_source_selects_exact_rational_first_post_light_cone(observation):
+def test_stationary_source_selects_exact_rational_first_post_light_cone(
+    observation,
+) -> None:
     # The constant one-AU source gives an independent exact root. These are
     # mathematical TT carriers, not claimed observed dates or source accuracy.
     exact = Fraction(observation) - Fraction(149597870700, 299792458 * 86400)
     expected = float(exact)
     if Fraction(expected) < exact:
         expected = math.nextafter(expected, math.inf)
+    else:
+        pass
     solution = solve_light_cone(
         observation, [0.0, 0.0, 0.0], lambda at: ((1.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0)
     )
@@ -30,7 +34,9 @@ def test_stationary_source_selects_exact_rational_first_post_light_cone(observat
     assert 1 <= solution.iterations <= 20
 
 
-def test_subluminal_linear_source_has_certified_adjacent_root_not_cycle_acceptance():
+def test_subluminal_linear_source_has_certified_adjacent_root_not_cycle_acceptance() -> (
+    None
+):
     observation = 2460398.8333333335
     lower = observation - 0.01
     upper = math.nextafter(lower, math.inf)
@@ -61,7 +67,7 @@ def test_subluminal_linear_source_has_certified_adjacent_root_not_cycle_acceptan
     assert 1 <= solution.iterations <= 20
 
 
-def test_exact_light_cone_root_is_distinguished_from_an_adjacent_bracket():
+def test_exact_light_cone_root_is_distinguished_from_an_adjacent_bracket() -> None:
     solution = solve_light_cone(
         2451545.0, [0.0, 0.0, 0.0], lambda at: ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0)
     )
@@ -70,7 +76,7 @@ def test_exact_light_cone_root_is_distinguished_from_an_adjacent_bracket():
     assert solution.lower.residual_squared == solution.upper.residual_squared == 0
 
 
-def test_unbracketed_source_still_fails_after_the_original_twenty_steps():
+def test_unbracketed_source_still_fails_after_the_original_twenty_steps() -> None:
     observation = 2451545.0
     calls = []
 
@@ -94,7 +100,7 @@ def test_unbracketed_source_still_fails_after_the_original_twenty_steps():
 
 
 @pytest.mark.parametrize("offset", [-0.02, -0.01, 0.0, 0.01, 0.02])
-def test_real_j2000_source_refines_its_fine_clock_bracket(offset):
+def test_real_j2000_source_refines_its_fine_clock_bracket(offset) -> None:
     from fatebridge.core.astro.analytic_observer import AnalyticObserver
 
     # This real source previously exhausted the combined twenty-step loop.

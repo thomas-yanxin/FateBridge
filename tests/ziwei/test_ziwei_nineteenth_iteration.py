@@ -4,6 +4,7 @@ import asyncio
 import json
 import shutil
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -15,24 +16,25 @@ import scripts.ziwei.audit_ziwei_subperiods as audit
 from fatebridge.application.examples import evidence_views
 from fatebridge.application.execution import execute_tool
 from fatebridge.cli import run
-from fatebridge.core.metaphysics.ziwei import build_ziwei_chart, build_ziwei_horoscope
-from fatebridge.core.output_chinese import (
+from fatebridge.core.contracts.output_chinese import (
     ZiweiDecadeHalf,
     ZiweiLimitStarGroup,
     ZiweiLimitSubperiods,
     ZiweiSmallLimitHalf,
 )
-from fatebridge.core.ziwei_subperiods import decade_half, limit_subperiod_evidence
+from fatebridge.core.metaphysics.ziwei import build_ziwei_chart, build_ziwei_horoscope
+from fatebridge.core.ziwei.ziwei_subperiods import decade_half, limit_subperiod_evidence
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from scripts.ziwei.audit_ziwei_limits import _seed
 from scripts.ziwei.ziwei_conditional_inputs import synthetic_birth_clock
 from tests.fixtures.mcp_receipt import verified_inline_business
 from tests.fixtures.mcp_result_delivery import read_full_result
+from tests.support.transports import call_calculation
+from validation.claims import CalculationClaim, verify_calculation_claims
 
 
-def test_original_text_and_conditional_coverage_are_separate():
+def test_original_text_and_conditional_coverage_are_separate() -> None:
     r = audit.audit_subperiods()
     assert not r["differences"]
     assert (r["textual_group_definitions"], r["textual_star_entities"]) == (22, 23)
@@ -51,7 +53,9 @@ def test_original_text_and_conditional_coverage_are_separate():
     assert r["live_model_blind_evaluation"] == "not_run"
 
 
-def test_wrong_phase_in_real_result_is_detected(monkeypatch):
+def test_wrong_phase_in_real_result_is_detected(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = audit.build_ziwei_horoscope
 
     def wrong(*a, **kw):
@@ -59,6 +63,8 @@ def test_wrong_phase_in_real_result_is_detected(monkeypatch):
         r = h["ming_limit_subperiods"]["daxian"]
         if r["half"] == "upper_five_years":
             r["half"] = "lower_five_years"
+        else:
+            pass
         return h
 
     monkeypatch.setattr(audit, "build_ziwei_horoscope", wrong)
@@ -66,7 +72,7 @@ def test_wrong_phase_in_real_result_is_detected(monkeypatch):
     assert len(result["differences"]) == 1440
 
 
-def test_original_image_and_definition_sources_are_required(tmp_path):
+def test_original_image_and_definition_sources_are_required(tmp_path: Path) -> None:
     for name in ["naj_ming_subperiods_v1", "naj_ming_symbolism_v1"]:
         shutil.copytree(audit.FIXTURES / name, tmp_path / name)
     target = tmp_path / "naj_ming_subperiods_v1/frame_0035.jpg"
@@ -81,7 +87,7 @@ def test_original_image_and_definition_sources_are_required(tmp_path):
 
 
 @pytest.mark.parametrize("first", [2, 3, 4, 5, 6])
-def test_split_uses_selected_start_not_age_last_digit(first):
+def test_split_uses_selected_start_not_age_last_digit(first: int) -> None:
     for period in range(12):
         lo = first + 10 * period
         palace = dict(ganzhi="甲子", daxian=f"{lo}~{lo + 9}")
@@ -97,14 +103,14 @@ def test_split_uses_selected_start_not_age_last_digit(first):
 @pytest.mark.parametrize(
     "text,age", [(None, 7), ("2~12", 7), ("2~11", 12), ("bad", 7), ("0~9", 7)]
 )
-def test_inconsistent_range_stays_unknown(text, age):
+def test_inconsistent_range_stays_unknown(text: str | None, age: int) -> None:
     r = decade_half(
         [dict(ganzhi="甲子", daxian=text)], dict(status="computed", branch="子"), age
     )
     assert r["status"] == "unresolved" and r["half"] is None
 
 
-def test_missing_or_duplicate_branch_cannot_select_half():
+def test_missing_or_duplicate_branch_cannot_select_half() -> None:
     palace = dict(ganzhi="甲子", daxian="2~11")
     for palaces in [[], [palace, palace]]:
         assert (
@@ -126,7 +132,7 @@ def _chart_and_horoscope():
     return c, h
 
 
-def test_dual_labels_unclassified_stars_and_malefics_are_not_filtered():
+def test_dual_labels_unclassified_stars_and_malefics_are_not_filtered() -> None:
     _, h = _chart_and_horoscope()
     e = h["ming_limit_subperiods"]
     rows = {r["star"]: r for r in e["natal_star_groups"]}
@@ -151,7 +157,7 @@ def test_dual_labels_unclassified_stars_and_malefics_are_not_filtered():
     assert e["xiaoxian"]["half"] is None and e["full_traditional_judgment"] is None
 
 
-def test_missing_duplicate_occurrences_and_mutation_are_retained():
+def test_missing_duplicate_occurrences_and_mutation_are_retained() -> None:
     c, h = _chart_and_horoscope()
     before = deepcopy((c, h))
     e = limit_subperiod_evidence(
@@ -186,7 +192,7 @@ def test_missing_duplicate_occurrences_and_mutation_are_retained():
         (ZiweiLimitSubperiods, dict(source_outcome_claim_adopted=True)),
     ],
 )
-def test_public_models_reject_uncomputed_claims(model, payload):
+def test_public_models_reject_uncomputed_claims(model, payload) -> None:
     with pytest.raises(ValidationError):
         model.model_validate(payload)
 
@@ -194,8 +200,11 @@ def test_public_models_reject_uncomputed_claims(model, payload):
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 @pytest.mark.parametrize("detail", [False, True])
 def test_limit_views_match_rest_native_mcp_cli_and_same_run_pages(
-    profile, detail, monkeypatch, capsys
-):
+    profile: str,
+    detail: bool,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -241,16 +250,18 @@ def test_limit_views_match_rest_native_mcp_cli_and_same_run_pages(
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            r = await client.call_tool("ziwei_horoscope", {**inputs, **opts})
+            r = await call_calculation(client, "ziwei_timing", {**inputs, **opts})
             assert not r.is_error
             p = r.structured_content
             assert len(json.dumps(p, ensure_ascii=False, separators=(",", ":"))) <= 8192
             if not detail:
                 return await verified_inline_business(client, p)
+            else:
+                pass
             return await read_full_result(client, p)
 
     native = asyncio.run(call())
-    args = ["ziwei_horoscope"]
+    args = ["ziwei_timing"]
     for k, v in inputs.items():
         args += ["--" + k.replace("_", "-"), str(v)]
     args += [
@@ -275,9 +286,11 @@ def test_limit_views_match_rest_native_mcp_cli_and_same_run_pages(
     assert ("natal_star_groups" in e) is detail
     if detail:
         assert len(e["natal_star_groups"]) == 23
+    else:
+        pass
 
 
-def test_same_run_claim_verifier_preserves_unresolved_half_year():
+def test_same_run_claim_verifier_preserves_unresolved_half_year() -> None:
     spec = next(s for s in CATALOG if s.key == "ziwei_horoscope")
     request = spec.request_model.model_validate(
         dict(

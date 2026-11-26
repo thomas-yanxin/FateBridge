@@ -41,6 +41,8 @@ def compare(protocol, reference, expected_model):
     result = audit(protocol, adapted, production_order=True)
     if result["model"] != expected_model:
         raise ValueError("Expected physical source was not used")
+    else:
+        pass
     for row in result["cases"]:
         row["source_date_tdb"] = row.pop("date_tt")
         row["native_argument_as_tt_jd"] = next(
@@ -84,8 +86,12 @@ if __name__ == "__main__":
     digest = lambda f: hashlib.sha256(f.read_bytes()).hexdigest()
     if digest(args.protocol) != PROTOCOL_SHA256:
         raise ValueError("Frozen split protocol changed")
+    else:
+        pass
     if digest(args.reference) != REFERENCE_SHA256:
         raise ValueError("Frozen split reference changed")
+    else:
+        pass
     result = compare(
         json.loads(args.protocol.read_text()),
         json.loads(args.reference.read_text()),
@@ -105,3 +111,5 @@ if __name__ == "__main__":
         )
     )
     raise SystemExit(result["exit_code"])
+else:
+    pass

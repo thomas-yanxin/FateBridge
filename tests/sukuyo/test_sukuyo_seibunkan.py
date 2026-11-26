@@ -7,10 +7,10 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import sukuyo_seibunkan as later
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_profiles import source_bundle
-from tests.sukuyo.test_sukuyo_witness_research import critical
+from fatebridge.core.sukuyo import sukuyo_seibunkan as later
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_profiles import source_bundle
+from tests.unit_test.fixtures.sukuyo_readings import critical
 
 REFERENCE = json.loads(
     (
@@ -19,7 +19,7 @@ REFERENCE = json.loads(
 )
 
 
-def test_selected_print_matches_actual_reference_frozen_before_production():
+def test_selected_print_matches_actual_reference_frozen_before_production() -> None:
     actual = critical()["later_seibunkan_comparison"]
     assert (
         actual.pop("source_bundle_sha256")
@@ -39,8 +39,8 @@ def test_selected_print_matches_actual_reference_frozen_before_production():
 
 @pytest.mark.parametrize("change", ["literal_glyph", "calendar_priority"])
 def test_unreviewed_glyph_normalization_or_rule_promotion_stops(
-    tmp_path, monkeypatch, change
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, change: str
+) -> None:
     data = copy.deepcopy(REFERENCE["expected_bundle"])
     if change == "literal_glyph":
         data["natal_example"]["literal_result_mansion"] = "氐"
@@ -56,7 +56,7 @@ def test_unreviewed_glyph_normalization_or_rule_promotion_stops(
 
 
 @pytest.mark.parametrize("change", ["meanings", "taisho"])
-def test_new_source_cannot_inherit_another_comparison_context(change):
+def test_new_source_cannot_inherit_another_comparison_context(change: str) -> None:
     meanings = copy.deepcopy(critical()["calendar_clause_meanings"])
     taisho = copy.deepcopy(
         source_bundle()["hinoo_addendum"]["downloaded_primary_edition"]
@@ -77,7 +77,9 @@ def test_new_source_cannot_inherit_another_comparison_context(change):
         ("1957-09-24", "second_half", ("computed", "角", [])),
     ],
 )
-def test_positive_source_clause_does_not_resolve_unproven_overlap(date, part, expected):
+def test_positive_source_clause_does_not_resolve_unproven_overlap(
+    date: str, part: str | None, expected
+) -> None:
     calendar = calendar_mansion(
         date, calendar_profile="hinoo_t1299_host27", calendar_day_part=part
     )
@@ -95,7 +97,7 @@ def test_positive_source_clause_does_not_resolve_unproven_overlap(date, part, ex
     assert reference["scope"]["leap_short_month_execution_priority"] is None
 
 
-def test_default_profile_does_not_adopt_later_book_policy():
+def test_default_profile_does_not_adopt_later_book_policy() -> None:
     calendar = calendar_mansion("1957-09-24")
     assert calendar["profile_calculation"]["hinoo_source"] is None
     assert (

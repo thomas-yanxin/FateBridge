@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_lunar_velocity as v
+from fatebridge.core.guolao import guolao_lunar_velocity as v
 
 ROOT = Path(__file__).parents[2]
 FIXTURE = ROOT / "tests/fixtures/guolao-lunar-velocity-v1"
@@ -17,10 +17,12 @@ HALF = F("13.7773")
 RATE = F("12.2")
 
 
-def test_all_source_images_transcription_and_previous_reference_are_pinned():
+def test_all_source_images_transcription_and_previous_reference_are_pinned() -> None:
     for artifact in SOURCE["artifacts"]:
         if artifact["path"].endswith("-cli-stdout.json"):
             continue  # Retired program output is not an independent source.
+        else:
+            pass
         assert (
             hashlib.sha256((FIXTURE / artifact["path"]).read_bytes()).hexdigest()
             == artifact["sha256"]
@@ -59,7 +61,9 @@ def test_all_source_images_transcription_and_previous_reference_are_pinned():
     )
 
 
-def test_every_printed_numeric_cell_is_reachable_without_reflection_or_interpolation():
+def test_every_printed_numeric_cell_is_reachable_without_reflection_or_interpolation() -> (
+    None
+):
     for row in SOURCE["rows_transcribed"][:168]:
         index = row["limit_index"]
         within = F(2 * index + 1, 2) / RATE
@@ -75,7 +79,7 @@ def test_every_printed_numeric_cell_is_reachable_without_reflection_or_interpola
             assert not result["reflected_or_periodically_filled"]
 
 
-def test_all_integer_cell_boundaries_and_both_sides_use_exact_rational_input():
+def test_all_integer_cell_boundaries_and_both_sides_use_exact_rational_input() -> None:
     epsilon = F(1, 10**14)
     for index in range(1, 169):
         within = F(index) / RATE
@@ -93,7 +97,9 @@ def test_all_integer_cell_boundaries_and_both_sides_use_exact_rational_input():
             )
 
 
-def test_half_anomaly_endpoint_stays_empty_and_is_not_replaced_by_opposite_initial_row():
+def test_half_anomaly_endpoint_stays_empty_and_is_not_replaced_by_opposite_initial_row() -> (
+    None
+):
     at = v.gujin45_lunar_velocity(HALF)
     assert at["phase"] == "疾"
     assert at["whole_limit_index"] == 168
@@ -110,7 +116,7 @@ def test_half_anomaly_endpoint_stays_empty_and_is_not_replaced_by_opposite_initi
     )
 
 
-def test_all_ten_reflection_disagreements_are_retained_not_normalized():
+def test_all_ten_reflection_disagreements_are_retained_not_normalized() -> None:
     data = json.loads(v.DATA.read_bytes())
     rows = data["rows"]
     mismatches = []
@@ -130,12 +136,16 @@ def test_all_ten_reflection_disagreements_are_retained_not_normalized():
                         opposite_printed=other[b],
                     )
                 )
+            else:
+                pass
     assert mismatches == SOURCE["reflection_comparison_without_emendation"]
     assert len(mismatches) == 10
     for mismatch in mismatches:
         phase = (F(mismatch["index"]) + F(1, 2)) / RATE
         if mismatch["column"] == "slow_ancient_du_per_limit":
             phase += HALF
+        else:
+            pass
         result = v.gujin45_lunar_velocity(phase)
         diagnostic = result["reflection_comparison_diagnostic"]
         assert not diagnostic["agrees"]
@@ -151,7 +161,7 @@ def test_all_ten_reflection_disagreements_are_retained_not_normalized():
 
 
 @pytest.mark.parametrize("example", SOURCE["gujin49_independent_step_checks"])
-def test_original_juan49_116_and_118_limit_rates(example):
+def test_original_juan49_116_and_118_limit_rates(example) -> None:
     result = v.gujin45_lunar_velocity(HALF + F(example["half_anomaly_days"]))
     assert result["phase"] == example["phase"]
     assert result["whole_limit_index"] == example["index"]
@@ -160,9 +170,13 @@ def test_original_juan49_116_and_118_limit_rates(example):
         assert F(result["velocity_ancient_du_per_limit_exact"]) - F(".082") == F(
             example["eclipse_relative_velocity"]
         )
+    else:
+        pass
 
 
-def test_original_juan49_time_correction_reports_rounding_residual_not_a_patched_answer():
+def test_original_juan49_time_correction_reports_rounding_residual_not_a_patched_answer() -> (
+    None
+):
     example = SOURCE["gujin49_correction_check"]
     result = v.gujin45_time_correction(
         F(example["solar_signed_ancient_du"]),
@@ -182,12 +196,14 @@ def test_original_juan49_time_correction_reports_rounding_residual_not_a_patched
     assert not result["printed_shortcut_column_used"]
 
 
-def test_empty_velocity_does_not_invent_a_time_correction():
+def test_empty_velocity_does_not_invent_a_time_correction() -> None:
     result = v.gujin45_time_correction(F(1), F(2), HALF)
     assert result["time_correction_days_exact"] is None
 
 
-def test_four_original_entry_days_are_reproduced_from_two_independent_conjunctions():
+def test_four_original_entry_days_are_reproduced_from_two_independent_conjunctions() -> (
+    None
+):
     example = SOURCE["worked_example"]
     result = v.gujin_four_extras_table_days(F(example["zhongji_days"]))
     indices = set()
@@ -215,7 +231,9 @@ def test_four_original_entry_days_are_reproduced_from_two_independent_conjunctio
     assert not result["modern_epoch_calibrated"]
 
 
-def test_purple_conjunction_crosses_midnight_while_other_three_share_the_same_month_start():
+def test_purple_conjunction_crosses_midnight_while_other_three_share_the_same_month_start() -> (
+    None
+):
     result = v.gujin_four_extras_table_days(F("116147.0196"))["factors"]
     purple = result["purple"]["conjunction"]
     assert F(purple["angular_components"]["mean_conjunction_day_cycle_exact"]) == F(
@@ -242,8 +260,8 @@ def test_purple_conjunction_crosses_midnight_while_other_three_share_the_same_mo
     ],
 )
 def test_corrupt_or_emended_data_is_rejected_without_guessing(
-    tmp_path, monkeypatch, fault
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fault: str
+) -> None:
     data = json.loads(v.DATA.read_bytes())
     if fault == "removed_row":
         data["rows"].pop(58)
@@ -265,7 +283,7 @@ def test_corrupt_or_emended_data_is_rejected_without_guessing(
 
 
 @pytest.mark.parametrize("bad", [0, True, "1", 2451545.0, None])
-def test_explicit_fraction_units_required(bad):
+def test_explicit_fraction_units_required(bad: bool | float | int | str | None) -> None:
     with pytest.raises(TypeError, match="Fraction"):
         v.gujin45_lunar_velocity(bad)
     with pytest.raises(TypeError, match="Fraction"):

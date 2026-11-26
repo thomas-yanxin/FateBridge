@@ -126,7 +126,7 @@ def assert_current_components(result):
         for key in ["favorable_clause_applies", "attacker_wang_exception_applies"]:
             assert r[key] is truth[key]
         assert r["effect_after_all_controls"] is None
-    for key in ["net_verdict", "event_time", "real_outcome", "success_probability"]:
+    for key in ["net_verdict", "event_time", "real_outcome"]:
         assert volume3[key] is None
     symbols = interpretation["trigram_relation_symbols"]
     assert symbols["ruleset"] == SYMBOL_PROFILE
@@ -161,7 +161,7 @@ def assert_current_components(result):
     assert selected["matched_clause_ids"] == [
         r["expected_clause_id"] for r in geometry["rows"] if r["expected_clause_id"]
     ]
-    for key in ["net_verdict", "event_time", "success_probability"]:
+    for key in ["net_verdict", "event_time"]:
         assert selected[key] is None
 
     def check_verse(value):
@@ -175,6 +175,8 @@ def assert_current_components(result):
             ]:
                 if key not in value:
                     continue
+                else:
+                    pass
                 rendering, raw = value[key], value[original]["text"]
                 assert raw in VERSES
                 assert rendering["raw_text"] == raw
@@ -188,5 +190,7 @@ def assert_current_components(result):
                 assert rendering["critical_edition_adjudicated"] is False
             for item in value.values():
                 check_verse(item)
+        else:
+            pass
 
     check_verse(interpretation)

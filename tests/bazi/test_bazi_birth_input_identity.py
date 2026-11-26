@@ -1,17 +1,21 @@
 """Input identity includes the component presence that changes the receipt."""
 
 import asyncio
+from pathlib import Path
 
 import pytest
 
-from tests.bazi.test_bazi_birth_component_presence import omitted_payload
-from tests.bazi.test_bazi_birth_seconds import SPECS
-from tests.bazi.test_bazi_birth_seconds_transports import leaf, receipt_path
 from tests.support.transports import AS_OF, call_cli, native
 from tests.support.transports import rest as _shared_rest
+from tests.unit_test.fixtures.bazi_birth_clock import (
+    SPECS,
+    leaf,
+    omitted_payload,
+    receipt_path,
+)
 
 
-def test_mcp_omitted_and_explicit_zero_minute_have_distinct_input_identity():
+def test_mcp_omitted_and_explicit_zero_minute_have_distinct_input_identity() -> None:
     spec = next(s for s in SPECS if s.key == "bazi_birth")
     payload = omitted_payload(spec)
     opts = dict(
@@ -36,8 +40,8 @@ rest = _shared_rest
     "key", ["analyze_destiny", "bazi_birth", "bazi_career", "dayun_analysis"]
 )
 def test_original_input_replay_and_identity_agree_across_actual_surfaces(
-    key, rest, tmp_path, capsys
-):
+    key: str, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     spec = next(s for s in SPECS if s.key == key)
     payload = omitted_payload(spec)
     opts = dict(
@@ -70,6 +74,8 @@ def test_original_input_replay_and_identity_agree_across_actual_surfaces(
         )
         assert response.status_code == 200
         all_values.append(response.json())
+    else:
+        pass
     assert all(
         leaf(d, receipt_path(spec)) == leaf(first, receipt_path(spec))
         for d in all_values
@@ -77,7 +83,7 @@ def test_original_input_replay_and_identity_agree_across_actual_surfaces(
     assert all(d["run_metadata"]["replay"] == replay for d in all_values)
 
 
-def test_null_second_and_omitted_second_keep_the_same_unknown_input_identity():
+def test_null_second_and_omitted_second_keep_the_same_unknown_input_identity() -> None:
     spec = next(s for s in SPECS if s.key == "bazi_birth")
     payload = {**omitted_payload(spec), "birth_minute": 0}
     opts = dict(

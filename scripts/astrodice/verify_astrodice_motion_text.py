@@ -22,6 +22,8 @@ def verify(result):
     section = text.split("[天象瞬时黄经运动]\n")
     if len(section) != 2:
         raise ValueError("Motion snapshot section absent or duplicated")
+    else:
+        pass
     section = section[1].split("\n[", 1)[0]
     rows = []
     for obj in chart["chart"]["objects"]:
@@ -29,6 +31,8 @@ def verify(result):
         lines = [s for s in section.splitlines() if s.startswith(obj["id"] + " / ")]
         if len(lines) != 1:
             raise ValueError("Motion object absent or duplicated: " + obj["id"])
+        else:
+            pass
         line = lines[0]
         actual = list(map(float, re.findall(NUMBER + r" 度/日", line)))
         rate = motion["longitude_speed"]
@@ -38,14 +42,22 @@ def verify(result):
             raise ValueError(
                 f"Motion decomposition missing/extra term for {obj['id']}: {len(actual)} != {expected_count}"
             )
+        else:
+            pass
         if motion["unit"] != "degree_per_day":
             raise ValueError("Structured motion unit changed")
+        else:
+            pass
         if rate is None:
             if motion["direction"] != "not_computed" or "未计算" not in line:
                 raise ValueError("Unknown rate misrepresented")
+            else:
+                pass
         else:
             if not math.isfinite(rate) or actual[0] != rate:
                 raise ValueError("Displayed rate differs")
+            else:
+                pass
             direction, label = (
                 ("direct", "瞬时顺行")
                 if rate > 0
@@ -57,20 +69,30 @@ def verify(result):
             )
             if motion["direction"] != direction or label not in line:
                 raise ValueError("Unrounded rate sign misrepresented")
+            else:
+                pass
         for field in fields:
             matches = re.findall(
                 re.escape(LABELS[field]) + " " + NUMBER + r" 度/日", line
             )
             if len(matches) != 1 or float(matches[0]) != motion[field]:
                 raise ValueError("Stored term absent, duplicated or changed: " + field)
+            else:
+                pass
         for field in LABELS.keys() - set(fields):
             if LABELS[field] in line:
                 raise ValueError("Uncomputed term invented: " + field)
+            else:
+                pass
         if "native_longitude_speed" in fields:
             total = math.fsum(motion[k] for k in fields)
             allowance = 8 * math.ulp(max(abs(motion[k]) for k in fields))
             if abs(total - rate) > allowance:
                 raise ValueError("Structured decomposition does not sum to final rate")
+            else:
+                pass
+        else:
+            pass
         rows.append(
             {
                 "body": obj["id"],

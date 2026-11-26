@@ -43,7 +43,7 @@ def synthetic_actual(case):
     }
 
 
-def test_all_original_events_and_direct_tt_probes_reconstruct_from_raw():
+def test_all_original_events_and_direct_tt_probes_reconstruct_from_raw() -> None:
     data = reference()
     assert len(data["reference"]["events"]) == 113
     assert data["reference"]["production_imported"] is False
@@ -62,8 +62,8 @@ def test_all_original_events_and_direct_tt_probes_reconstruct_from_raw():
 @pytest.mark.parametrize("corpus", ["source", "comparison"])
 @pytest.mark.parametrize("change", ["content", "rehash", "extra", "missing"])
 def test_frozen_identity_inventory_and_content_cannot_be_rewritten(
-    tmp_path, corpus, change
-):
+    tmp_path: Path, corpus: str, change: str
+) -> None:
     source = AUDIT.CORPUS if corpus == "source" else AUDIT.COMPARISON
     target = tmp_path / "copy"
     shutil.copytree(source, target)
@@ -74,6 +74,8 @@ def test_frozen_identity_inventory_and_content_cannot_be_rewritten(
             manifest = json.loads((target / "freeze.json").read_text())
             manifest["files"][path.name] = AUDIT.sha(path)
             (target / "freeze.json").write_text(json.dumps(manifest))
+        else:
+            pass
     elif change == "extra":
         (target / "unexpected.json").write_text("{}")
     else:
@@ -83,7 +85,9 @@ def test_frozen_identity_inventory_and_content_cannot_be_rewritten(
 
 
 @pytest.mark.parametrize("change", ["scale", "label", "body", "frame", "nonfinite"])
-def test_remote_parser_rejects_wrong_time_geometry_or_angles(tmp_path, change):
+def test_remote_parser_rejects_wrong_time_geometry_or_angles(
+    tmp_path: Path, change: str
+) -> None:
     from tests.support.ren_horizons_reference import parse
 
     path = AUDIT.CORPUS / "collection/refinement-get20/batch-00.response.json"
@@ -111,7 +115,7 @@ def test_remote_parser_rejects_wrong_time_geometry_or_angles(tmp_path, change):
         parse(target, labels)
 
 
-def test_tt_label_is_not_an_utc_label_and_microseconds_are_retained():
+def test_tt_label_is_not_an_utc_label_and_microseconds_are_retained() -> None:
     first = "2000-01-01 12:00:00.000000"
     second = "2000-01-01 12:00:00.000001"
     assert (AUDIT.tt_days(second) - AUDIT.tt_days(first)) * 86400000000 == 1
@@ -122,7 +126,9 @@ def test_tt_label_is_not_an_utc_label_and_microseconds_are_retained():
 @pytest.mark.parametrize(
     "change", ["late", "wrong_model", "nonfinite", "missing", "naive"]
 )
-def test_failed_model_or_root_is_retained_in_the_complete_113_row_matrix(change):
+def test_failed_model_or_root_is_retained_in_the_complete_113_row_matrix(
+    change: str,
+) -> None:
     data = reference()
     first = data["reference"]["events"][0]
 
@@ -130,6 +136,8 @@ def test_failed_model_or_root_is_retained_in_the_complete_113_row_matrix(change)
         actual = synthetic_actual(case)
         if case is not first:
             return actual
+        else:
+            pass
         if change == "late":
             actual["selected_tt_parts"][1] += 1.5 / 86400
         elif change == "wrong_model":
@@ -158,7 +166,7 @@ def test_failed_model_or_root_is_retained_in_the_complete_113_row_matrix(change)
         assert report["comparisons"][0]["within_original_tt_criterion"] is None
 
 
-def test_complete_unavailable_source_retains_all_failed_event_identities():
+def test_complete_unavailable_source_retains_all_failed_event_identities() -> None:
     def unavailable(case):
         raise RuntimeError("No source")
 
@@ -170,7 +178,9 @@ def test_complete_unavailable_source_retains_all_failed_event_identities():
 
 
 @pytest.mark.parametrize("change", ["missing", "duplicate"])
-def test_narrowed_or_duplicated_cohort_cannot_be_a_complete_comparison(change):
+def test_narrowed_or_duplicated_cohort_cannot_be_a_complete_comparison(
+    change: str,
+) -> None:
     data = copy.deepcopy(reference())
     if change == "missing":
         data["reference"]["events"].pop()

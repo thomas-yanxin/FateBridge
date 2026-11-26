@@ -11,12 +11,13 @@ import pytest
 from fastmcp import Client
 from fastmcp.client.transports import StdioTransport
 
-from fatebridge.core.meihua_observation import _seed_calendar_values
+from fatebridge.application.examples import suggested_fields
+from fatebridge.core.meihua.meihua_observation import _seed_calendar_values
 from fatebridge.core.public_output import same_public_value
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.meihua import calculate_meihua_cast
 from tests.support.reference_data import resolve as at_path
-from tests.support.transports import SPECS, call_cli, rest
+from tests.support.transports import SPECS, call_calculation, call_cli, rest
 
 FOLDER = Path(__file__).parents[1] / "fixtures/meihua_quiet_calendar_v74"
 CASES = json.loads((FOLDER / "confirmed-label-cases24.json").read_bytes())
@@ -59,7 +60,7 @@ def check_labels(out, case):
     assert out["input_normalized"]["casting"] == case["casting"]
 
 
-def test_labels_and_source_visual_recheck_were_frozen_before_production_edit():
+def test_labels_and_source_visual_recheck_were_frozen_before_production_edit() -> None:
     assert (
         hashlib.sha256(
             (FOLDER / "confirmed-label-cases24.json").read_bytes()
@@ -83,7 +84,7 @@ def test_labels_and_source_visual_recheck_were_frozen_before_production_edit():
 @pytest.mark.parametrize("context", [None, QUIET])
 def test_confirmed_labels_and_actual_paths_are_present_with_or_without_quiet_declaration(
     case, context
-):
+) -> None:
     out = calculate_meihua_cast(casting=case["casting"], observation_context=context)
     check_labels(out, case)
     assert out["interpretation"]["observation_context"]["status"] == (
@@ -94,7 +95,7 @@ def test_confirmed_labels_and_actual_paths_are_present_with_or_without_quiet_dec
 @pytest.mark.parametrize("topic", TOPICS)
 def test_all_human_topics_preserve_reported_labels_without_full_quiet_certification(
     topic,
-):
+) -> None:
     out = calculate_meihua_cast(
         casting=CASES[0]["casting"],
         interpretation_topic=topic,
@@ -111,8 +112,8 @@ def test_all_human_topics_preserve_reported_labels_without_full_quiet_certificat
     ],
 )
 def test_incomplete_or_false_context_does_not_erase_known_calendar_labels(
-    context, status
-):
+    context, status: str
+) -> None:
     out = calculate_meihua_cast(
         casting=CASES[0]["casting"], observation_context=context
     )
@@ -136,7 +137,7 @@ def test_incomplete_or_false_context_does_not_erase_known_calendar_labels(
 )
 def test_other_counts_question_and_day_branch_do_not_become_lunar_calendar_labels(
     casting,
-):
+) -> None:
     out = calculate_meihua_cast(
         casting=casting,
         question="虚构问题中写寅年十二月初一午时",
@@ -154,7 +155,9 @@ def test_other_counts_question_and_day_branch_do_not_become_lunar_calendar_label
 @pytest.mark.parametrize(
     "field", ["year_branch", "lunar_month", "lunar_day", "hour_branch", "method"]
 )
-def test_contradictory_internal_seed_is_rejected_instead_of_silently_rebound(field):
+def test_contradictory_internal_seed_is_rejected_instead_of_silently_rebound(
+    field: str,
+) -> None:
     seed = {
         "casting_method": "lunar_time_added_count",
         "parameters": copy.deepcopy(CASES[0]["casting"]),
@@ -169,7 +172,7 @@ def test_contradictory_internal_seed_is_rejected_instead_of_silently_rebound(fie
 
 
 @pytest.mark.parametrize("field", ["year_branch", "lunar_month", "lunar_day"])
-def test_reported_labels_remain_required_no_defaults(field):
+def test_reported_labels_remain_required_no_defaults(field: str) -> None:
     casting = copy.deepcopy(CASES[0]["casting"])
     del casting[field]
     assert "error" in calculate_meihua_cast(casting=casting, observation_context=QUIET)
@@ -177,8 +180,8 @@ def test_reported_labels_remain_required_no_defaults(field):
 
 @pytest.mark.asyncio
 async def test_rest_native_mcp_and_cli_preserve_the_actual_nested_fact_paths(
-    rest, capsys, tmp_path
-):
+    rest, capsys: pytest.CaptureFixture[str], tmp_path: Path
+) -> None:
     arguments = {"casting": CASES[-1]["casting"], "observation_context": QUIET}
     expected = calculate_meihua_cast(**arguments)
     fields = [
@@ -196,7 +199,8 @@ async def test_rest_native_mcp_and_cli_preserve_the_actual_nested_fact_paths(
     response = rest.post(SPECS["meihua_cast"].rest_path, json=arguments, params=params)
     assert response.status_code == 200, response.text
     async with Client(create_mcp_app()) as client:
-        reply = await client.call_tool(
+        reply = await call_calculation(
+            client,
             "meihua_cast",
             {
                 **arguments,
@@ -238,7 +242,9 @@ async def test_rest_native_mcp_and_cli_preserve_the_actual_nested_fact_paths(
 
 
 @pytest.mark.asyncio
-async def test_fresh_stdio_reads_published_quiet_fields_with_corrected_labels(tmp_path):
+async def test_fresh_stdio_reads_published_quiet_fields_with_corrected_labels(
+    tmp_path: Path,
+) -> None:
     root = Path(__file__).resolve().parents[2]
     transport = StdioTransport(
         command=sys.executable,
@@ -249,11 +255,11 @@ async def test_fresh_stdio_reads_published_quiet_fields_with_corrected_labels(tm
         },
         log_file=tmp_path / "stdio.log",
     )
-    from fatebridge.application.examples import suggested_fields
 
     fields = suggested_fields(SPECS["meihua_cast"], view="quiet")
     async with Client(transport) as client:
-        reply = await client.call_tool(
+        reply = await call_calculation(
+            client,
             "meihua_cast",
             {
                 "casting": CASES[0]["casting"],

@@ -8,9 +8,9 @@ from pathlib import Path
 import pytest
 import swisseph as swe
 
-from fatebridge.core import guolao_calendar_date_bridge as bridge
 from fatebridge.core.ephemeris_runtime import ephemeris_call
-from fatebridge.validation.guolao_calendar_date_bridge import audit_calendar_date_bridge
+from fatebridge.core.guolao import guolao_calendar_date_bridge as bridge
+from validation.guolao_calendar_date_bridge import audit_calendar_date_bridge
 
 ROOT = Path(__file__).parents[2]
 FIXTURES = Path(__file__).parents[1] / "fixtures/guolao-calendar-date-bridge-v1"
@@ -19,7 +19,7 @@ MODEL = bridge.load_calendar_date_bridge(bridge.PROFILE)
 
 
 @pytest.mark.parametrize("row", SOURCE["hko31_literal_day_labels"])
-def test_all_literal_hko_labels_match_the_preselected_modern_anchor(row):
+def test_all_literal_hko_labels_match_the_preselected_modern_anchor(row) -> None:
     label = MODEL.label(
         *map(int, row["gregorian_date"].split("-")), calendar=bridge.CALENDARS[0]
     )
@@ -29,7 +29,7 @@ def test_all_literal_hko_labels_match_the_preselected_modern_anchor(row):
 
 
 @pytest.mark.parametrize("row", SOURCE["usno5_published_examples"])
-def test_published_usno_numeric_examples_without_live_api_claim(row):
+def test_published_usno_numeric_examples_without_live_api_claim(row) -> None:
     serial = bridge.calendar_label_noon_jdn(*row["date"], calendar=row["calendar"])
     assert F(serial) - F(1, 2) + F(row["ut1_fraction"]) == F(row["jd"])
 
@@ -57,13 +57,13 @@ def test_published_usno_numeric_examples_without_live_api_claim(row):
 )
 def test_integer_calendar_roundtrip_against_separate_swiss_implementation(
     calendar, flag, label
-):
+) -> None:
     serial = bridge.calendar_label_noon_jdn(*label, calendar=calendar)
     assert serial == ephemeris_call("julday", *label, 12.0, flag)
     assert bridge.calendar_label_from_noon_jdn(serial, calendar=calendar) == list(label)
 
 
-def test_reform_labels_are_explicit_and_no_automatic_switch_or_ten_day_skip():
+def test_reform_labels_are_explicit_and_no_automatic_switch_or_ten_day_skip() -> None:
     julian = bridge.calendar_label_noon_jdn(1582, 10, 4, calendar=bridge.CALENDARS[1])
     gregorian = bridge.calendar_label_noon_jdn(
         1582, 10, 15, calendar=bridge.CALENDARS[0]
@@ -100,13 +100,13 @@ def test_reform_labels_are_explicit_and_no_automatic_switch_or_ten_day_skip():
         (1900, 2, 29),
     ],
 )
-def test_gregorian_invalid_labels_rejected(label):
+def test_gregorian_invalid_labels_rejected(label) -> None:
     with pytest.raises(ValueError):
         bridge.calendar_label_noon_jdn(*label, calendar=bridge.CALENDARS[0])
 
 
 @pytest.mark.parametrize("value", [True, 1.0, "1", F(1)])
-def test_no_implicit_casts_in_date_serial_or_year(value):
+def test_no_implicit_casts_in_date_serial_or_year(value) -> None:
     with pytest.raises(TypeError):
         bridge.calendar_label_noon_jdn(2016, 10, value, calendar=bridge.CALENDARS[0])
     with pytest.raises(TypeError):
@@ -115,7 +115,7 @@ def test_no_implicit_casts_in_date_serial_or_year(value):
         MODEL.winter_candidates(source_year=value, search_policy=bridge.SEARCH_POLICY)
 
 
-def test_julian_leap_rules_and_declared_ranges():
+def test_julian_leap_rules_and_declared_ranges() -> None:
     assert bridge.calendar_label_noon_jdn(
         1900, 2, 29, calendar=bridge.CALENDARS[1]
     ) + 1 == bridge.calendar_label_noon_jdn(1900, 3, 1, calendar=bridge.CALENDARS[1])
@@ -139,8 +139,8 @@ def test_julian_leap_rules_and_declared_ranges():
     ],
 )
 def test_calculated_candidates_are_conditional_and_not_external_observations(
-    source_year, gregorian, julian
-):
+    source_year: int, gregorian, julian
+) -> None:
     # These are regression values from first-domain-audit, not frozen source labels.
     result = MODEL.winter_candidates(
         source_year=source_year, search_policy=bridge.SEARCH_POLICY
@@ -154,7 +154,9 @@ def test_calculated_candidates_are_conditional_and_not_external_observations(
     assert result["physical_julian_day"] is None
 
 
-def test_no_match_does_not_move_anchor_or_expand_window(monkeypatch):
+def test_no_match_does_not_move_anchor_or_expand_window(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     context = bridge.guolao_year_labels.shoushi_year_context(source_year=1599)
     seen = {
         MODEL.label(1598, 12, d, calendar=bridge.CALENDARS[0])["ganzhi"]
@@ -187,7 +189,7 @@ def test_no_match_does_not_move_anchor_or_expand_window(monkeypatch):
     )
 
 
-def test_unwrapped_counter_preserves_fraction_and_before_winter_midnight():
+def test_unwrapped_counter_preserves_fraction_and_before_winter_midnight() -> None:
     for counter, offset, expected in [
         (F(42), 0, [1598, 12, 22]),
         (F("130.98875"), 88, [1599, 3, 20]),
@@ -231,7 +233,7 @@ def test_unwrapped_counter_preserves_fraction_and_before_winter_midnight():
 
 
 @pytest.mark.parametrize("year", [1280, 10000])
-def test_source_year_bounds_and_search_policy_not_inferred(year):
+def test_source_year_bounds_and_search_policy_not_inferred(year: int) -> None:
     with pytest.raises(ValueError):
         MODEL.winter_candidates(source_year=year, search_policy=bridge.SEARCH_POLICY)
     with pytest.raises(ValueError, match="移锚"):
@@ -243,8 +245,8 @@ def test_source_year_bounds_and_search_policy_not_inferred(year):
     ["date", "calendar", "sexagenary_index", "printed_ganzhi", "source_pdf_sha256"],
 )
 def test_changed_anchor_fails_instead_of_fitting_historical_example(
-    tmp_path, monkeypatch, key
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, key: str
+) -> None:
     source = json.loads(bridge.DATA.read_bytes())
     source["anchor"][key] = {
         "date": [2016, 10, 10],
@@ -260,7 +262,7 @@ def test_changed_anchor_fails_instead_of_fitting_historical_example(
         bridge.load_calendar_date_bridge(bridge.PROFILE)
 
 
-def test_frozen_artifacts_and_audit_do_not_inflate_reference_counts():
+def test_frozen_artifacts_and_audit_do_not_inflate_reference_counts() -> None:
     reference = json.loads((FIXTURES / "reference.json").read_bytes())
     assert (
         reference["data_sha256"] == hashlib.sha256(bridge.DATA.read_bytes()).hexdigest()

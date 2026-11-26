@@ -15,7 +15,7 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core import western_event_clock as clock
-from fatebridge.core.output_western import WesternEventClockConversion
+from fatebridge.core.contracts.output_western import WesternEventClockConversion
 from fatebridge.core.predictive.native_chart import build_native_subject
 from fatebridge.core.requests.western_events import (
     AstroElectionRequest,
@@ -39,7 +39,7 @@ def event(wall="2000-01-01T01:00:00", longitude=15.0, **kw):
     )
 
 
-def test_pre_edit_reference_and_reused_jpl_operands_have_not_changed():
+def test_pre_edit_reference_and_reused_jpl_operands_have_not_changed() -> None:
     assert hashlib.sha256(REFERENCE_FILE.read_bytes()).hexdigest() == SEALED_SHA
     old = FIXTURES / "guolao-apparent-clock-v1"
     manifest = json.loads((old / "reference.json").read_text())
@@ -61,7 +61,7 @@ def test_pre_edit_reference_and_reused_jpl_operands_have_not_changed():
 
 
 @pytest.mark.parametrize("row", REFERENCE["historical_lmt_controls"])
-def test_lmt_hand_arithmetic_and_same_native_epoch(row):
+def test_lmt_hand_arithmetic_and_same_native_epoch(row) -> None:
     subject, receipt = event(
         row["wall"], row["longitude"], clock_basis="local_mean_solar"
     )
@@ -96,7 +96,7 @@ def test_lmt_hand_arithmetic_and_same_native_epoch(row):
 
 
 @pytest.mark.parametrize("row", REFERENCE["apparent_inverse_controls"])
-def test_lat_inverse_against_reused_external_jpl_ra_and_gast(row):
+def test_lat_inverse_against_reused_external_jpl_ra_and_gast(row) -> None:
     subject, receipt = event(
         row["wall"], row["longitude"], clock_basis="local_apparent_solar"
     )
@@ -122,7 +122,7 @@ def test_lat_inverse_against_reused_external_jpl_ra_and_gast(row):
     WesternEventClockConversion.model_validate(receipt)
 
 
-def test_modern_lmt_is_ut1_not_a_utc_label():
+def test_modern_lmt_is_ut1_not_a_utc_label() -> None:
     # Analytic 01:00 LMT at 15E is midnight UT1, JD2451544.5.
     subject, receipt = event(clock_basis="local_mean_solar")
     assert abs(subject.julian_day - 2451544.5) * 86400 <= 0.0002
@@ -137,7 +137,7 @@ def test_modern_lmt_is_ut1_not_a_utc_label():
     )
 
 
-def test_civil_default_is_explicit_legacy_policy_and_sky_stays_identical():
+def test_civil_default_is_explicit_legacy_policy_and_sky_stays_identical() -> None:
     a, ra = event()
     b, rb = event(timezone_name="+08:00")
     assert a.points == b.points and a.julian_day_tt == b.julian_day_tt
@@ -152,7 +152,9 @@ def test_civil_default_is_explicit_legacy_policy_and_sky_stays_identical():
     [(AstroHoraryRequest, "question"), (AstroElectionRequest, "candidate")],
 )
 @pytest.mark.parametrize("basis", ["local_mean_solar", "local_apparent_solar"])
-def test_solar_requests_reject_every_explicit_civil_zone(model, prefix, basis):
+def test_solar_requests_reject_every_explicit_civil_zone(
+    model, prefix: str, basis: str
+) -> None:
     base = {
         f"{prefix}_year": 2000,
         f"{prefix}_month": 1,
@@ -176,12 +178,12 @@ def test_solar_requests_reject_every_explicit_civil_zone(model, prefix, basis):
         {"clock_basis": "local_apparent_solar", "timezone_name": "+08:00"},
     ],
 )
-def test_direct_call_cannot_bypass_clock_contract(kw):
+def test_direct_call_cannot_bypass_clock_contract(kw) -> None:
     with pytest.raises(ValueError):
         event(**kw)
 
 
-def test_civil_dst_gap_does_not_make_a_solar_label_nonexistent():
+def test_civil_dst_gap_does_not_make_a_solar_label_nonexistent() -> None:
     with pytest.raises(ValueError, match="nonexistent"):
         event("2024-03-31T02:30:00", timezone_name="Europe/Paris")
     _, receipt = event("2024-03-31T02:30:00", clock_basis="local_mean_solar")
@@ -190,7 +192,7 @@ def test_civil_dst_gap_does_not_make_a_solar_label_nonexistent():
 
 
 @pytest.mark.parametrize("fault", ["model", "edition", "hash"])
-def test_clock_and_chart_cannot_silently_mix_observed_sun_sources(fault):
+def test_clock_and_chart_cannot_silently_mix_observed_sun_sources(fault: str) -> None:
     row = {"model": "swieph", "status": "se1_contexts_identified", "file_ids": ["test"]}
     source = {
         "by_factor": {"equatorial_Sun": row},
@@ -227,12 +229,17 @@ def test_clock_and_chart_cannot_silently_mix_observed_sun_sources(fault):
 
 
 @pytest.mark.parametrize("axis", ["julian_day", "julian_day_tt"])
-def test_chart_axis_mismatch_fails_before_returning_a_receipt(monkeypatch, axis):
+def test_chart_axis_mismatch_fails_before_returning_a_receipt(
+    monkeypatch: pytest.MonkeyPatch, axis: str
+) -> None:
     real = clock.build_subject
+    field = {"julian_day": "ut1", "julian_day_tt": "tt"}[axis]
 
     def shifted(**kw):
-        s = real(**kw)
-        return replace(s, **{axis: getattr(s, axis) + 1 / 86400})
+        subject = real(**kw)
+        instant = getattr(subject, field)
+        shifted_instant = replace(instant, days=instant.days + Fraction(1, 86400))
+        return replace(subject, **{field: shifted_instant})
 
     monkeypatch.setattr(clock, "build_subject", shifted)
     with pytest.raises(EphemerisSourceError, match="physical time axes"):
@@ -240,8 +247,8 @@ def test_chart_axis_mismatch_fails_before_returning_a_receipt(monkeypatch, axis)
 
 
 def test_changed_tt_mapping_after_lat_inversion_is_not_hidden_by_matching_sources(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     real = clock.resolve_solar_epoch
 
     def shifted(*args, **kw):
@@ -257,7 +264,9 @@ def test_changed_tt_mapping_after_lat_inversion_is_not_hidden_by_matching_source
 
 
 @pytest.mark.parametrize("basis", ["local_mean_solar", "local_apparent_solar"])
-def test_solar_planetary_weekday_uses_local_opening_sunrise_date(monkeypatch, basis):
+def test_solar_planetary_weekday_uses_local_opening_sunrise_date(
+    monkeypatch: pytest.MonkeyPatch, basis: str
+) -> None:
     from fatebridge.core.astro import classical
     from fatebridge.core.astro.geometry import _julian_day
 
@@ -289,3 +298,103 @@ def test_solar_planetary_weekday_uses_local_opening_sunrise_date(monkeypatch, ba
         "planetary_day_start_utc",
     ):
         assert civil[key] == solar[key]
+
+
+def test_civil_planetary_weekday_requires_a_defined_opening_sunrise(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from fatebridge.core.astro import classical
+    from fatebridge.core.astro.iers_ut1 import use_ut1_source
+    from fatebridge.core.astro.lilly_radicality_inputs import collect_radicality_hour
+    from tests.support.solar_events import fixed_crossings
+
+    # Fixed UT1 points from the Davis observer after the station reopened.
+    # Its opening sunrise still falls in the earlier -00 TZif interval.
+    query = 2440253.520833784
+    rise, setting = 2440253.3893537987, 2440254.1933527226
+    longitude, latitude = 77.96666666666667, -68.58333333333333
+    monkeypatch.setattr(
+        classical,
+        "solar_crossings_in_window",
+        fixed_crossings((rise,), (setting,)),
+    )
+    with use_ut1_source("iers_c04"):
+        assert (
+            classical._planetary_hours(query, longitude, latitude, "Antarctica/Davis")
+            is None
+        )
+        utc = classical._planetary_hours(query, longitude, latitude, "UTC")
+        subject = SimpleNamespace(
+            julian_day=query, lng=longitude, lat=latitude, tz_str="Antarctica/Davis"
+        )
+        davis_inputs = collect_radicality_hour(subject)
+        subject.tz_str = "UTC"
+        utc_inputs = collect_radicality_hour(subject)
+
+        with monkeypatch.context() as missing:
+            missing.setattr(
+                classical, "solar_crossings_in_window", fixed_crossings([], [])
+            )
+            no_arc = collect_radicality_hour(subject)
+
+        def unavailable_conversion(*args):
+            raise ValueError("ordinary unavailable quantity")
+
+        with monkeypatch.context() as ordinary:
+            ordinary.setattr(classical, "utc_calendar_from_tt", unavailable_conversion)
+            assert classical._planetary_hours(query, longitude, latitude, "UTC") is None
+            no_label = collect_radicality_hour(subject)
+
+    for unavailable in (no_arc, no_label):
+        assert unavailable["status"] == "unavailable" and unavailable["hour"] is None
+        assert (
+            unavailable["unavailable_reason"] == "sunrise_sunset_interval_unavailable"
+        )
+    assert davis_inputs["status"] == "unavailable" and davis_inputs["hour"] is None
+    assert davis_inputs["actual_solar_backend_verified"] is False
+    assert davis_inputs["source_method_acceptance"] is False
+    assert (
+        davis_inputs["unavailable_reason"] == "opening_sunrise_civil_weekday_undefined"
+    )
+    assert utc_inputs["hour"] == utc and utc_inputs["unavailable_reason"] is None
+
+    assert utc is not None
+    assert utc["day_ruler"] == "Venus"
+    assert utc["hour_ruler"] == "Mercury"
+
+
+@pytest.mark.parametrize(
+    ("offset", "hour_ruler", "is_day"),
+    [(0.02, "Saturn", True), (0.52, "Mercury", False)],
+)
+def test_solar_planetary_weekday_keeps_c04_opening_ut1(
+    monkeypatch: pytest.MonkeyPatch, offset: float, hour_ruler: str, is_day: bool
+) -> None:
+    from fatebridge.core.astro import classical
+    from fatebridge.core.astro.iers_ut1 import use_ut1_source
+    from tests.support.solar_events import fixed_crossings
+
+    rise = float.fromhex("0x1.2b42c60440000p+21")
+    longitude = -90.7470703135
+    # The supplied UT1 plus longitude/360 is about 0.24 μs before local
+    # midnight. Nearest-even rounds to Saturday, while the UTC datetime
+    # round trip moves the sample to Friday on the solar display grid.
+    monkeypatch.setattr(
+        classical,
+        "solar_crossings_in_window",
+        fixed_crossings((rise, rise + 1), (rise - 0.5, rise + 0.5)),
+    )
+    with use_ut1_source("iers_c04"):
+        result = classical._planetary_hours(
+            rise + offset,
+            longitude,
+            40.0,
+            "UTC",
+            weekday_clock_basis="local_mean_solar",
+        )
+
+    assert result["weekday_opening_sunrise_label"] == "2000-01-01T00:00:00"
+    assert result["day_ruler"] == "Saturn"
+    assert result["hour_ruler"] == hour_ruler
+    assert result["is_day"] is is_day
+    assert result["hour_number"] == 1

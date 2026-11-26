@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from fatebridge.utils.formatting import format_json_response
 
 """Large runtime inventories remain lossless without crowding out the analysis."""
@@ -28,7 +30,9 @@ def inventory():
 
 
 @pytest.mark.parametrize("compact", [True, False])
-def test_large_inventory_keeps_business_and_exact_receipt_in_same_run(store, compact):
+def test_large_inventory_keeps_business_and_exact_receipt_in_same_run(
+    store, compact: bool
+) -> None:
     source = inventory()
     original = {
         "analysis": {"conclusion": "测试字段" * 80},
@@ -59,8 +63,8 @@ def test_large_inventory_keeps_business_and_exact_receipt_in_same_run(store, com
 
 
 def test_semicolon_directory_inventory_is_equal_across_transports(
-    monkeypatch, tmp_path, surface_calls
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, surface_calls
+) -> None:
     monkeypatch.chdir(tmp_path)
     for name in ("first", "second"):
         directory = tmp_path / name
@@ -102,8 +106,8 @@ def test_semicolon_directory_inventory_is_equal_across_transports(
 
 @pytest.mark.parametrize("limit", [4096, 8192])
 def test_real_career_stays_readable_with_large_inventory_across_transports(
-    monkeypatch, limit, store, surface_calls
-):
+    monkeypatch: pytest.MonkeyPatch, limit: int, store, surface_calls
+) -> None:
     source = inventory()
     monkeypatch.setattr(
         replay_metadata, "ephemeris_inventory", lambda: copy.deepcopy(source)
@@ -124,6 +128,8 @@ def test_real_career_stays_readable_with_large_inventory_across_transports(
         opts.update(fields=fields, strict_fields=True)
         params += [("fields", f) for f in fields] + [("strict_fields", "true")]
         flags += ["--fields", *fields, "--strict-fields", "true"]
+    else:
+        pass
     response, protocol, code, cli = surface_calls(
         spec, payload, params=params, options=opts, flags=flags, cli_first=False
     )

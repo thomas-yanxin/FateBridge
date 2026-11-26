@@ -1,7 +1,7 @@
 """Canonical house-system selection and aliases, without numerical geometry."""
 
 import re
-from typing import Dict, Optional, Tuple, TypedDict
+from typing import TypedDict
 from unicodedata import normalize
 
 TWELVE_HOUSE_SYSTEM_NOTE = " Explicit values must be supported letters/names or integer codes0..8; unknown, blank, boolean and floating-point selections are rejected without substitution. Gauquelin (G) has36 clockwise sectors and is unavailable here."
@@ -52,7 +52,7 @@ def reject_gauquelin_house_system(value: object) -> None:
 # Swiss Ephemeris 宫位系统代码 ↔ 常见英文/中文别名
 # Keys normalized via casefold + strip for lookup. Values are the
 # single-letter codes accepted by Swiss Ephemeris.
-_HOUSE_SYSTEM_ALIASES: Dict[str, str] = {
+_HOUSE_SYSTEM_ALIASES: dict[str, str] = {
     # Placidus (default)
     "placidus": "P",
     "placidian": "P",
@@ -119,7 +119,7 @@ _HOUSE_SYSTEM_ALIASES: Dict[str, str] = {
 # chart family) mapped to the Swiss Ephemeris letters the western family uses.
 # Mirrors RELATIVE_HOUSE_SYSTEM_SPECS in core/astrology.py so a single integer
 # code means the same system on every surface.
-_HOUSE_SYSTEM_CODE_TO_LETTER: Dict[int, str] = {
+_HOUSE_SYSTEM_CODE_TO_LETTER: dict[int, str] = {
     0: "W",  # whole_sign
     1: "B",  # Alcabitus
     2: "R",  # Regiomontanus
@@ -136,7 +136,7 @@ _HOUSE_SYSTEM_CODE_TO_LETTER: Dict[int, str] = {
 # tools report a house system the same way the core/relative charts do. Letters
 # without a 0..8 code (Campanus, Porphyry, ...) still get a readable key+label
 # with code=None.
-_HOUSE_SYSTEM_LETTER_INFO: Dict[str, Tuple[Optional[int], str, str]] = {
+_HOUSE_SYSTEM_LETTER_INFO: dict[str, tuple[int | None, str, str]] = {
     "W": (0, "whole_sign", "整宫制"),
     "B": (1, "alcabitus", "Alcabitus"),
     "R": (2, "regiomontanus", "Regiomontanus"),
@@ -165,7 +165,7 @@ _HOUSE_SYSTEM_LETTER_INFO: Dict[str, Tuple[Optional[int], str, str]] = {
 
 class HouseSystemFields(TypedDict):
     house_system: str
-    house_system_code: Optional[int]
+    house_system_code: int | None
     house_system_label_zh: str
 
 
@@ -226,11 +226,11 @@ def _alias_key(value: str) -> str:
     )
 
 
-def _build_alias_index() -> Dict[str, str]:
+def _build_alias_index() -> dict[str, str]:
     entries = list(_HOUSE_SYSTEM_ALIASES.items())
     for code, (_, key, label) in _HOUSE_SYSTEM_LETTER_INFO.items():
         entries.extend([(key, code), (label, code)])
-    result: Dict[str, str] = {}
+    result: dict[str, str] = {}
     for name, code in entries:
         token = _alias_key(name)
         if token in result and result[token] != code:

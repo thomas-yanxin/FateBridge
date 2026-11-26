@@ -8,7 +8,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Literal, cast
 
-from .taiyi_hour import KEY_SOURCE
+from fatebridge.core.metaphysics.taiyi_hour import KEY_SOURCE
 
 TaiyiMonthProfile = Literal["jinjing_month_jie_360_v1", "key_month_tianzheng_jie_v1"]
 DEFAULT_MONTH_PROFILE = "jinjing_month_jie_360_v1"

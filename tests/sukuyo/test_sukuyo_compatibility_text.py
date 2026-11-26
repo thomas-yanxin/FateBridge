@@ -5,7 +5,7 @@ from fatebridge.services.divination import calculate_sukuyo_compatibility
 HISTORICAL = "japanese_naoj_historical_utc09"
 
 
-def test_unknown_dates_explain_all_four_directed_relationship_rows():
+def test_unknown_dates_explain_all_four_directed_relationship_rows() -> None:
     result = calculate_sukuyo_compatibility(
         person1_name="甲",
         person1_date="1346-07-17",
@@ -36,7 +36,7 @@ def test_unknown_dates_explain_all_four_directed_relationship_rows():
     )
 
 
-def test_unresolved_leap_candidate_is_not_called_complete_in_native_text():
+def test_unresolved_leap_candidate_is_not_called_complete_in_native_text() -> None:
     result = calculate_sukuyo_compatibility(
         person1_date="2025-07-25",
         person1_zone="+08:00",
@@ -51,7 +51,7 @@ def test_unresolved_leap_candidate_is_not_called_complete_in_native_text():
     assert result["pair"] is None
 
 
-def test_declared_half_is_retained_when_leap_priority_remains_unresolved():
+def test_declared_half_is_retained_when_leap_priority_remains_unresolved() -> None:
     result = calculate_sukuyo_compatibility(
         person1_date="1341-05-24",
         person1_zone="+09:00",

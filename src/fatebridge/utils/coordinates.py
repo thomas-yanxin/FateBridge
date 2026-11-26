@@ -1,8 +1,9 @@
 """Shared decimal and degree/direction/minute coordinate parsing."""
 
-import math
 import re
-from typing import Literal, Optional
+from decimal import Decimal
+from fractions import Fraction
+from typing import Literal
 
 _COORDINATE = re.compile(
     r"\s*(?P<degrees>[+-]?\d+(?:\.\d+)?)(?:(?P<direction>[NSEW])(?P<minutes>\d+(?:\.\d+)?))?\s*",
@@ -12,35 +13,34 @@ _COORDINATE = re.compile(
 
 def parse_geo_coordinate(
     value: object, *, axis: Literal["latitude", "longitude"]
-) -> Optional[float]:
-    """Return None only for absent values; reject malformed or out-of-range input."""
+) -> float | None:
+    """Validate exact text components before converting once to binary64."""
     if value is None or value == "":
         return None
     if isinstance(value, bool):
         raise ValueError(f"无效的{axis}坐标")
+    coordinate: int | float | Decimal | Fraction
     direction = ""
     if isinstance(value, (int, float)):
-        decimal = float(value)
+        coordinate = value
     else:
         match = _COORDINATE.fullmatch(str(value))
         if match is None:
             raise ValueError(f"无效的{axis}坐标")
-        degrees = float(match["degrees"])
+        degrees = Decimal(match["degrees"])
         direction = (match["direction"] or "").upper()
-        minutes = float(match["minutes"] or "0")
-        if minutes >= 60:
-            raise ValueError("坐标分数须小于 60")
+        coordinate = degrees
         if direction:
-            decimal = abs(degrees) + minutes / 60
-            if direction in {"S", "W"}:
-                decimal = -decimal
+            minutes = Decimal(match["minutes"])
+            if minutes >= 60:
+                raise ValueError("坐标分数须小于 60")
             if degrees < 0 and direction in {"N", "E"}:
                 raise ValueError("坐标正负号与方向不一致")
-        else:
-            decimal = degrees
+            if direction not in ("NS" if axis == "latitude" else "EW"):
+                raise ValueError(f"坐标方向与{axis}不一致")
+            coordinate = abs(Fraction(degrees)) + Fraction(minutes) / 60
     limit = 90 if axis == "latitude" else 180
-    if direction and direction not in ("NS" if axis == "latitude" else "EW"):
-        raise ValueError(f"坐标方向与{axis}不一致")
-    if not math.isfinite(decimal) or not -limit <= decimal <= limit:
+    if not -limit <= coordinate <= limit:
         raise ValueError(f"{axis}坐标须在 {-limit} 到 {limit} 之间")
-    return decimal
+    decimal = float(coordinate)
+    return -decimal if direction in {"S", "W"} else decimal

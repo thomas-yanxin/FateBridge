@@ -7,11 +7,11 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.meihua_solar_reference import (
+from fatebridge.core.meihua.meihua_solar_reference import (
     compare_solar_term_date,
     parse_solar_reference_datetime,
 )
-from fatebridge.validation.meihua_solar_publishers import compare_label
+from validation.meihua_solar_publishers import compare_label
 
 FOLDER = Path(__file__).parents[1] / "fixtures/meihua_solar_iso_v1"
 MANIFEST_SHA256 = "c1289b17148893d2607a5aa70f9f8742f03cd840a6ae62190e58928ddb3e02e9"
@@ -20,13 +20,17 @@ assert hashlib.sha256(raw).hexdigest() == MANIFEST_SHA256
 for name, digest in json.loads(raw)["files"].items():
     if str(name).endswith((".py", ".py.txt")):
         continue
+    else:
+        pass
     assert hashlib.sha256((FOLDER / name).read_bytes()).hexdigest() == digest
 CASES = json.loads((FOLDER / "exact-cases201.json").read_bytes())
 UNKNOWN = json.loads((FOLDER / "unknown5.json").read_bytes())
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda r: r["id"])
-def test_hko_reference_uses_the_integer_offset_instant_and_keeps_raw_label(case):
+def test_hko_reference_uses_the_integer_offset_instant_and_keeps_raw_label(
+    case,
+) -> None:
     # Expected labels were constructed from integers before the core fix.
     expected = datetime.fromisoformat(case["expected_fixed_UTC8_datetime"])
     output = compare_solar_term_date(
@@ -42,6 +46,8 @@ def test_hko_reference_uses_the_integer_offset_instant_and_keeps_raw_label(case)
         assert decoded.utcoffset() == timedelta(
             microseconds=case["offset_microseconds"]
         )
+    else:
+        pass
     if expected.year == 1900 or expected.year == 2101:
         assert output["comparison_status"] == "outside_published_year_range"
     else:
@@ -49,7 +55,9 @@ def test_hko_reference_uses_the_integer_offset_instant_and_keeps_raw_label(case)
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda r: r["id"])
-def test_secondary_auditor_consumes_the_same_exact_offset_without_certification(case):
+def test_secondary_auditor_consumes_the_same_exact_offset_without_certification(
+    case,
+) -> None:
     expected = datetime.fromisoformat(case["expected_fixed_UTC8_datetime"])
     # A synthetic label is an arithmetic control, never a new NAOJ observation.
     reference = {
@@ -74,9 +82,38 @@ def test_secondary_auditor_consumes_the_same_exact_offset_without_certification(
 
 
 @pytest.mark.parametrize("label", UNKNOWN)
-def test_absent_offset_or_invalid_time_is_not_guessed(label):
+def test_absent_offset_or_invalid_time_is_not_guessed(label) -> None:
     output = compare_solar_term_date(
         {"name": "小雪", "datetime_with_offset": label}, fact_path="unknown_control"
     )
     assert output["comparison_status"] == "actual_instant_unavailable"
     assert output["computed_date"] is None
+
+
+@pytest.mark.parametrize(
+    "label",
+    [
+        "2026-11-06T16:00:00.0000001Z",
+        "2026-11-07T00:00:01+08:00:01.0000001",
+        "2026-11-06T15:59:59-00:00:01,0000001",
+        "2026-11-06T17:00:00+00:60",
+        "2026-11-06T16:01:00+00:00:60",
+        "2026-11-06T16:00:00.Z",
+    ],
+)
+def test_solar_publisher_comparison_uses_the_strict_clock_profile(label: str) -> None:
+    actual = {"name": "立冬", "datetime_with_offset": label}
+    hko = compare_solar_term_date(actual, fact_path="supplied_term")
+    assert hko["actual_datetime_with_offset"] == label
+    assert hko["comparison_status"] == "actual_instant_unavailable"
+    assert hko["computed_date"] is None
+
+    reference = {
+        "year": 2026,
+        "index": 0,
+        "term": actual["name"],
+        "label_normalization": {"nominal_display_datetime": "2026-11-07T00:00:00"},
+        "source_midnight_label": True,
+    }
+    with pytest.raises(ValueError, match="Invalid or unsupported Meihua clock label"):
+        compare_label(reference, actual, hko)

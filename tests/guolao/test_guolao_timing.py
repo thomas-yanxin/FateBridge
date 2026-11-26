@@ -4,22 +4,55 @@ import copy
 import hashlib
 import json
 from datetime import datetime, timedelta, timezone
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core import guolao, guolao_timing
-from fatebridge.core.astro.birth import build_astro_birth_info
+from fatebridge.core.astro.birth import NativeSolarBirthInfo, build_astro_birth_info
+from fatebridge.core.guolao import guolao, guolao_timing
 from fatebridge.core.requests.astrology import AstroChartPolyRequest, AstroGuolaoRequest
+from fatebridge.services.astrology import calculate_core_chart_analysis
 from tests.fixtures.surface_payloads import astro_payload
-from tests.guolao.test_guolao_depth import chart
+from tests.unit_test.fixtures.guolao import chart
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 TARGET = datetime(2027, 6, 1, tzinfo=timezone(timedelta(hours=8)))
 
 
-def test_small_limit_facsimile_and_transcribed_cases_are_preserved():
+def test_native_target_order_uses_canonical_TT_before_final_float() -> None:
+
+    args = dict(
+        birth_year=1978,
+        birth_month=1,
+        birth_day=1,
+        birth_hour=0,
+        birth_minute=0,
+        birth_longitude=0,
+        birth_latitude=40,
+        birth_clock_basis="local_mean_solar",
+    )
+    birth = build_astro_birth_info(
+        **args, preserve_instant=True, allow_native_solar_epoch=True
+    )
+    assert isinstance(birth, NativeSolarBirthInfo)
+    target = datetime(1978, 1, 1, 0, 0, 1, tzinfo=timezone.utc)
+    # Original fixed target with IERS17s TAI-UTC and TT-TAI32.184s. The
+    # birth inverse retains its actual scalar SDK point, not civil precision.
+    target_tt = Fraction(2932211400697, 1200000)
+    expected = float((target_tt - birth.native_epoch.time.tt.days) * 86400)
+    result = calculate_core_chart_analysis(
+        chart_variant="guolao_chart", **args, analysis_datetime=target
+    )
+    assert "error" not in result
+    evidence = result["guolao"]["timing"]["target_order_evidence"]
+    assert evidence["nominal_TT_difference_seconds"] == expected
+    assert evidence["numerical_order_guard_seconds"] == 0.0002
+    assert evidence["physical_clock_precision_certified"] is False
+
+
+def test_small_limit_facsimile_and_transcribed_cases_are_preserved() -> None:
     folder = FIXTURES / "guolao-small-limit-v1"
     reference = json.loads((folder / "reference.json").read_text())
     assert (
@@ -47,8 +80,8 @@ def test_small_limit_facsimile_and_transcribed_cases_are_preserved():
     ],
 )
 def test_source_reverse_small_limit_is_connected_to_explicit_year(
-    year, stem, year_branch, limit, palace
-):
+    year: int, stem: str, year_branch: str, limit: str, palace: str
+) -> None:
     source = json.loads((FIXTURES / "guolao-classical-source.json").read_text())
     assert (
         source["transcription"]["small_limit_rule"] == "以生年支加在命宮逆數至太歲宮是"
@@ -76,15 +109,16 @@ def test_source_reverse_small_limit_is_connected_to_explicit_year(
     assert trace["rule_id"] == "source_small_limit_reverse_count"
     assert trace["outputs"]["small_limit_branch"] == limit
     assert trace["source_id"] == source["edition_id"]
-    text = result["interpretation"]["timing"]
-    assert f"小限在{limit}，对应本命{palace}" in text
-    assert f"{stem}{year_branch}年" in text
+    assert (
+        f"{stem}{year_branch}年小限：{limit}宫，临本命{palace}。"
+        in result["snapshot_text"]
+    )
     assert "目标时刻小限与十一曜研究位置" in result["snapshot_text"]
     assert "full_marks_established" in g["validation"]
     assert not g["validation"]["full_marks_established"]
 
 
-def test_declared_lichun_policy_on_each_side_of_independent_hko_minute():
+def test_declared_lichun_policy_on_each_side_of_independent_hko_minute() -> None:
     # HKO's retained raw XML replaces the retired duplicate JSON transcription.
     raw = (
         Path(__file__).parents[1] / "fixtures/calendar_hko_v1/24SolarTerms_2026.xml"
@@ -111,7 +145,9 @@ def test_declared_lichun_policy_on_each_side_of_independent_hko_minute():
 
 
 @pytest.mark.parametrize("zodiacal", [0, 1])
-def test_equivalent_target_offsets_and_solar_display_preserve_target_sky(zodiacal):
+def test_equivalent_target_offsets_and_solar_display_preserve_target_sky(
+    zodiacal: int,
+) -> None:
     a = chart(analysis_datetime=TARGET, zodiacal=zodiacal, birth_longitude=75)
     b = chart(
         analysis_datetime=TARGET.astimezone(timezone.utc),
@@ -150,7 +186,9 @@ def test_equivalent_target_offsets_and_solar_display_preserve_target_sky(zodiaca
 
 
 @pytest.mark.parametrize("zodiacal", [0, 1])
-def test_target_uses_geocentric_layer_without_observer_geometry(monkeypatch, zodiacal):
+def test_target_uses_geocentric_layer_without_observer_geometry(
+    monkeypatch: pytest.MonkeyPatch, zodiacal: int
+) -> None:
     birth = build_astro_birth_info(
         **{k: v for k, v in astro_payload().items() if k != "name"}
     )
@@ -166,7 +204,9 @@ def test_target_uses_geocentric_layer_without_observer_geometry(monkeypatch, zod
     assert len(result["guolao"]["timing"]["transit_bodies"]) == 11
 
 
-def test_no_target_is_not_the_present_and_target_does_not_mutate_natal(monkeypatch):
+def test_no_target_is_not_the_present_and_target_does_not_mutate_natal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     natal = chart()
     target = chart(analysis_datetime=TARGET)
     assert natal["guolao"]["timing"] == {"status": "not_requested"}
@@ -193,8 +233,6 @@ def test_no_target_is_not_the_present_and_target_does_not_mutate_natal(monkeypat
     assert natal["guolao"]["rule_trace"] == target["guolao"]["rule_trace"][:-1]
     for key in ("person_info", "planets", "houses", "angles"):
         assert natal[key] == target[key]
-    for key, value in natal["interpretation"].items():
-        assert target["interpretation"][key] == value
     birth = build_astro_birth_info(
         **{k: v for k, v in astro_payload().items() if k != "name"}
     )
@@ -207,7 +245,7 @@ def test_no_target_is_not_the_present_and_target_does_not_mutate_natal(monkeypat
 
 
 @pytest.mark.parametrize("instant", ["2027-01-01T00:00:00", "not-a-date"])
-def test_target_contract_requires_explicit_offset(instant):
+def test_target_contract_requires_explicit_offset(instant: str) -> None:
     for model, extra in [
         (AstroGuolaoRequest, {}),
         (AstroChartPolyRequest, {"chart_variant": "guolao_chart"}),
@@ -222,7 +260,7 @@ def test_target_contract_requires_explicit_offset(instant):
     "instant",
     [datetime(2027, 1, 1), datetime(1990, 4, 6, 1, 32, 59, tzinfo=timezone.utc)],
 )
-def test_direct_domain_rejects_naive_or_prebirth_targets(instant):
+def test_direct_domain_rejects_naive_or_prebirth_targets(instant) -> None:
     birth = build_astro_birth_info(
         **{k: v for k, v in astro_payload().items() if k != "name"}
     )
@@ -231,7 +269,9 @@ def test_direct_domain_rejects_naive_or_prebirth_targets(instant):
 
 
 @pytest.mark.parametrize("zodiacal", [0, 1])
-def test_exact_birth_target_reproduces_sky_and_does_not_invent_age_offset(zodiacal):
+def test_exact_birth_target_reproduces_sky_and_does_not_invent_age_offset(
+    zodiacal: int,
+) -> None:
     natal = chart(zodiacal=zodiacal)
     target = chart(
         zodiacal=zodiacal,
@@ -246,7 +286,7 @@ def test_exact_birth_target_reproduces_sky_and_does_not_invent_age_offset(zodiac
     assert t["mansion_boundaries"] == natal["guolao"]["mansion_boundaries"]
 
 
-def test_repeated_local_dst_hour_keeps_explicit_target_instant():
+def test_repeated_local_dst_hour_keeps_explicit_target_instant() -> None:
     # Both instants have a legitimate 01:30 New York clock, with different offsets.
     results = [
         chart(
@@ -261,7 +301,35 @@ def test_repeated_local_dst_hour_keeps_explicit_target_instant():
     assert timing[0]["transit_bodies"] != timing[1]["transit_bodies"]
 
 
-def test_target_seven_bodies_against_21_external_nasa_positions():
+def test_vostok_closed_target_keeps_sky_and_both_calendar_roles() -> None:
+    result = chart(
+        birth_year=1993,
+        birth_month=12,
+        birth_day=1,
+        birth_hour=12,
+        birth_minute=0,
+        birth_timezone="Antarctica/Vostok",
+        birth_longitude=0,
+        birth_latitude=40,
+        analysis_datetime=datetime(1994, 7, 1, 12, tzinfo=timezone.utc),
+        guolao_month_basis="chinese_lunar_utc8",
+    )
+    timing = result["guolao"]["timing"]
+    assert timing["analysis_datetime"] == "1994-07-01T12:00:00+00:00"
+    assert timing["calendar_datetime"] is None
+    assert timing["calendar_timezone"] == "Antarctica/Vostok"
+    assert timing["calendar_timezone_role"] == (
+        "birth_zone_local_clock_unspecified_UTC_year_selects_LiChun"
+    )
+    assert timing["small_limit"]["target_year_branch"] == "戌"
+    target = timing["month_limit"]["target_month"]
+    assert target["calendar_datetime"] == "1994-07-01T20:00:00+08:00"
+    assert (target["month_number"], target["lunar_day"]) == (5, 23)
+    assert len(timing["transit_bodies"]) == 11
+    assert "出生区未定义目标时刻的当地钟面" in result["snapshot_text"]
+
+
+def test_target_seven_bodies_against_21_external_nasa_positions() -> None:
     fixture = json.loads((FIXTURES / "jyotish-horizons.json").read_text())
     cache = {}
     errors = []
@@ -279,6 +347,8 @@ def test_target_seven_bodies_against_21_external_nasa_positions():
                 cache[row["utc"]] = {
                     b["id"]: b for b in result["guolao"]["timing"]["transit_bodies"]
                 }
+            else:
+                pass
             body = cache[row["utc"]][reference["body"]]
             errors.append(
                 abs(

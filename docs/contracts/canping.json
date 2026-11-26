@@ -104,6 +104,7 @@
   },
   "input": {
     "additionalProperties": false,
+    "description": "Request model for canping (邵子参评数 / 金锁银匙).",
     "properties": {
       "analysis_datetime": {
         "anyOf": [
@@ -115,19 +116,8 @@
           }
         ],
         "default": null,
-        "description": "可选带时区ISO时刻，查询实际交运和立春年界后的当段参评数；无默认当前时刻，legacy方法不支持精确时刻查询。"
-      },
-      "as_of": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+        "description": "可选带时区ISO时刻，查询实际交运和立春年界后的当段参评数；无默认当前时刻，legacy方法不支持精确时刻查询。",
+        "title": "Analysis Datetime"
       },
       "birth_utc_offset": {
         "anyOf": [
@@ -139,15 +129,12 @@
           }
         ],
         "default": null,
-        "description": "Optional confirmed birth UTC offset ±HH:MM[:SS]. With an IANA zone, verifies or selects the occurrence of a repeated birth clock while retaining regional rules for later boundaries. Never infer an unknown offset; cannot make a nonexistent local time valid or replace birth-record precision."
-      },
-      "compact": {
-        "default": true,
-        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
-        "type": "boolean"
+        "description": "Optional confirmed birth UTC offset ±HH:MM[:SS]. With an IANA zone, verifies or selects the occurrence of a repeated birth clock while retaining regional rules for later boundaries. Never infer an unknown offset; cannot make a nonexistent local time valid or replace birth-record precision.",
+        "title": "Birth Utc Offset"
       },
       "date": {
         "description": "Birth date YYYY-MM-DD in the proleptic Gregorian calendar, including before 1582; no automatic Julian/Gregorian cutover or historical lunar/era conversion. Historical source dates require a separately evidenced conversion.",
+        "title": "Date",
         "type": "string"
       },
       "dayun_method": {
@@ -158,25 +145,12 @@
           "bazi_continuous_v1",
           "legacy_minggong_v1"
         ],
+        "title": "Dayun Method",
         "type": "string"
-      },
-      "fields": {
-        "anyOf": [
-          {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
       },
       "gender": {
         "description": "需明确男/女：选择男女条文及附子平法配运方向；接受male/female，不默认性别。",
+        "title": "Gender",
         "type": "string"
       },
       "gps_lat": {
@@ -189,7 +163,8 @@
           }
         ],
         "default": null,
-        "description": "GPS latitude"
+        "description": "GPS latitude",
+        "title": "Gps Lat"
       },
       "gps_lon": {
         "anyOf": [
@@ -203,12 +178,8 @@
           }
         ],
         "default": null,
-        "description": "Explicit numeric GPS longitude; preferred over lon; zero is valid"
-      },
-      "include_snapshot_text": {
-        "default": true,
-        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
-        "type": "boolean"
+        "description": "Explicit numeric GPS longitude; preferred over lon; zero is valid",
+        "title": "Gps Lon"
       },
       "lat": {
         "anyOf": [
@@ -220,7 +191,8 @@
           }
         ],
         "default": null,
-        "description": "Latitude text or decimal (optional)"
+        "description": "Latitude text or decimal (optional)",
+        "title": "Lat"
       },
       "lon": {
         "anyOf": [
@@ -232,7 +204,8 @@
           }
         ],
         "default": null,
-        "description": "Longitude text or decimal; required when true solar time is on"
+        "description": "Longitude text or decimal; required when true solar time is on",
+        "title": "Lon"
       },
       "method": {
         "default": "gu",
@@ -241,59 +214,18 @@
           "gu",
           "ming"
         ],
+        "title": "Method",
         "type": "string"
-      },
-      "parent_run_id": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Parent call's run_id; correlation only, no stored execution lookup"
-      },
-      "response_char_limit": {
-        "anyOf": [
-          {
-            "const": 0,
-            "type": "integer"
-          },
-          {
-            "maximum": 65536,
-            "minimum": 4096,
-            "type": "integer"
-          }
-        ],
-        "default": 8192,
-        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
-      },
-      "strict_fields": {
-        "default": false,
-        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
-        "type": "boolean"
       },
       "time": {
         "description": "Known birth local time HH:MM[:SS[.ffffff]], up to six fractional digits; required, blank is not midnight; timezone goes in zone. Supplied components are retained separately from zero calculation defaults. Textual digits do not certify birth-record precision or imply an uncertainty interval.",
+        "title": "Time",
         "type": "string"
-      },
-      "trace_id": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Caller trace ID"
       },
       "use_true_solar_time": {
         "default": true,
         "description": "Apply true solar time correction (needs lon); default on — 数算 derives from the BaZi pillars",
+        "title": "Use True Solar Time",
         "type": "boolean"
       },
       "zone": {
@@ -306,7 +238,8 @@
           }
         ],
         "default": "+08:00",
-        "description": "IANA zone or UTC offset; omitted/null means fixed +08:00, not historical Asia/Shanghai. Blank/invalid zones and nonexistent clocks are rejected. Repeated clocks require a confirmed birth_utc_offset; the IANA zone remains in use for later boundaries."
+        "description": "IANA zone or UTC offset; omitted/null means fixed +08:00, not historical Asia/Shanghai. Blank/invalid zones and nonexistent clocks are rejected. Repeated clocks require a confirmed birth_utc_offset; the IANA zone remains in use for later boundaries.",
+        "title": "Zone"
       }
     },
     "required": [
@@ -314,6 +247,7 @@
       "time",
       "gender"
     ],
+    "title": "CanpingRequest",
     "type": "object"
   },
   "method_contracts": [

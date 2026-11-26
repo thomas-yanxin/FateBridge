@@ -5,8 +5,11 @@ of 辰未戌丑 to soil remains the existing convention, not an adjudication of
 the last-eighteen-days alternative.
 """
 
-from ...utils.data import EARTHLY_BRANCHES
-from .common import branch_element_text, status_against_anchor
+from fatebridge.core.metaphysics.common import (
+    branch_element_text,
+    status_against_anchor,
+)
+from fatebridge.utils.data import EARTHLY_BRANCHES
 
 
 def seasonal_power(month_branch: str, element: str) -> str:

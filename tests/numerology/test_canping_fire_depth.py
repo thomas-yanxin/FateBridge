@@ -7,9 +7,11 @@ import json
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core import canping_texts as texts
-from fatebridge.core.canping_texts import lookup_record
+from fatebridge.core.numerology import canping_texts as texts
+from fatebridge.core.numerology.canping import _verses
+from fatebridge.core.numerology.canping_texts import lookup_record
 from fatebridge.utils.errors import NumerologySourceError
 
 ROOT = Path(__file__).parents[1] / "fixtures/canping_fire_v1"
@@ -29,7 +31,9 @@ REREADINGS = {
 
 
 @pytest.mark.parametrize("row,kind", CELLS)
-def test_all_fire_cells_keep_literal_text_column_page_and_provisional_status(row, kind):
+def test_all_fire_cells_keep_literal_text_column_page_and_provisional_status(
+    row, kind
+) -> None:
     n = int(row["number"])
     r = lookup_record("火", n, kind)
     s = r["selection"]
@@ -37,6 +41,8 @@ def test_all_fire_cells_keep_literal_text_column_page_and_provisional_status(row
     assert r["text"] == (revision["text"] if revision else row[kind])
     if revision:
         assert s["reading_revision"]["previous_text"] == row[kind]
+    else:
+        pass
     assert s["number"] == n and s["kind"] == kind
     assert s["source_pdf_page"] == int(row["pdf_page"])
     assert s["cell_status"] == (
@@ -47,15 +53,23 @@ def test_all_fire_cells_keep_literal_text_column_page_and_provisional_status(row
     if s["cell_status"] == "source_reading_uncertain":
         assert s["reading_uncertainties"]
         assert ("editorial_unknown_marker" in s) == ("□" in row[kind])
+    else:
+        pass
     if n in HEADERS:
         assert s["number_attribution_status"] == "provisional_inherited_key"
         assert s["number_reading_uncertainties"]
         assert s["cell_status"] == "source_reading_uncertain"
+    else:
+        pass
     if n == 2838:
         assert s["inherited_number"] == 3838
+    else:
+        pass
 
 
-def test_fire_and_global_counts_exclude_uncertain_headers_without_double_counting():
+def test_fire_and_global_counts_exclude_uncertain_headers_without_double_counting() -> (
+    None
+):
     assert len(ROWS) == len({r["number"] for r in ROWS}) == 78
     assert len(CELLS) == 234
     assert (
@@ -95,7 +109,9 @@ def test_fire_and_global_counts_exclude_uncertain_headers_without_double_countin
 
 @pytest.mark.parametrize("number", [2743, 2248])
 @pytest.mark.parametrize("kind", ["male", "female", "luck"])
-def test_clear_body_or_printed_circles_do_not_certify_an_obscured_header(number, kind):
+def test_clear_body_or_printed_circles_do_not_certify_an_obscured_header(
+    number: int, kind: str
+) -> None:
     selected = lookup_record("火", number, kind)["selection"]
     assert selected["number"] == number
     assert selected["number_attribution_status"] == "provisional_inherited_key"
@@ -105,7 +121,9 @@ def test_clear_body_or_printed_circles_do_not_certify_an_obscured_header(number,
     assert selected["reading_notes"]
 
 
-def test_literal_readings_and_printed_circles_are_not_normalized_to_familiar_phrases():
+def test_literal_readings_and_printed_circles_are_not_normalized_to_familiar_phrases() -> (
+    None
+):
     assert lookup_record("火", 2638, "male")["text"] == "鐵船再江水，船內有魚遊。"
     assert lookup_record("火", 2244, "luck")["text"] == "百煉忘真金，自然添火力。"
     assert lookup_record("火", 2444, "female")["text"] == "山水珊瑚樹，春風費力栽。"
@@ -115,7 +133,9 @@ def test_literal_readings_and_printed_circles_are_not_normalized_to_familiar_phr
 
 
 @pytest.mark.parametrize("change", ["empty_header_reason", "clear_one_column"])
-def test_obscured_number_cannot_be_counted_as_a_confirmed_column(monkeypatch, change):
+def test_obscured_number_cannot_be_counted_as_a_confirmed_column(
+    monkeypatch: MonkeyPatch, change: str
+) -> None:
     original = texts._loaded
     data = copy.deepcopy(original(texts.COLLATION_PATH))
     row = next(
@@ -143,7 +163,7 @@ def test_obscured_number_cannot_be_counted_as_a_confirmed_column(monkeypatch, ch
     assert error.value.as_result()["retryable"] is False
 
 
-def test_number_notes_are_independent_copies():
+def test_number_notes_are_independent_copies() -> None:
     selected = lookup_record("火", 2743, "male")["selection"]
     selected["number_reading_uncertainties"].append("tampered")
     selected["reading_uncertainties"].clear()
@@ -152,8 +172,7 @@ def test_number_notes_are_independent_copies():
     assert again["reading_uncertainties"]
 
 
-def test_snapshot_differentiates_obscured_header_from_unknown_body_glyph():
-    from fatebridge.core.canping import _verses
+def test_snapshot_differentiates_obscured_header_from_unknown_body_glyph() -> None:
 
     v = _verses("火", {"numShun": 2248, "numNi": 2743}, "male")
     snapshot = texts.selection_snapshot(v)

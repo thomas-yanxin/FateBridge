@@ -5,7 +5,10 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
+
+from scripts.astrodice.astrodice_de441_records import calendar_jd_tdb
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -23,7 +26,6 @@ def sample(case, backend):
 
 
 def current(case, backend):
-    from scripts.astrodice.astrodice_de441_records import calendar_jd_tdb
 
     if backend == "jpl_record_window":
         kernel = (
@@ -51,6 +53,8 @@ def current(case, backend):
             calls.append(
                 {"args": args, "returned_flags": result[1], "coordinates": result[0]}
             )
+        else:
+            pass
         return result
 
     domain_runtime.ephemeris_call = recording
@@ -86,7 +90,7 @@ def current(case, backend):
     return {"case": case, "backend_requested": backend, "rows": rows}
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("backend", choices=("swieph", "jpl_record_window"))
     args = parser.parse_args()
@@ -95,10 +99,11 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass
 
 
 def sample_lunar(run, split, index, backend, *, jpl_file=None):
-    import tempfile
 
     with tempfile.TemporaryDirectory(prefix="astrodice-current-") as temporary:
         output = Path(temporary) / "sample.json"

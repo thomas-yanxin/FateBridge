@@ -6,11 +6,14 @@ import json
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core import heluo
-from fatebridge.core import heluo_texts as ht
-from fatebridge.core.heluo import transform_houtian, yao_text
+from fatebridge.core.heluo import heluo, heluo_hexagrams
+from fatebridge.core.heluo import heluo_texts as ht
+from fatebridge.core.heluo.heluo import transform_houtian, yao_text
+from fatebridge.core.heluo.heluo_months import month_affinity
 from fatebridge.utils.errors import NumerologySourceError
+from scripts.numerology import audit_numerology as audit
 from tests.support.heluo_source_facts import HEADER_COUNT
 
 ROOT = Path(__file__).parents[1] / "fixtures/heluo_shibi_v1"
@@ -18,7 +21,7 @@ DRAFT = json.loads((ROOT / "reference.json").read_bytes())
 VERIFIED = json.loads((ROOT / "verified-readings.json").read_bytes())
 
 
-def test_missing_column_draft_and_character_withdrawals_are_reproducible():
+def test_missing_column_draft_and_character_withdrawals_are_reproducible() -> None:
     assert (
         hashlib.sha256((ROOT / "reference.json").read_bytes()).hexdigest()
         == VERIFIED["draft_sha256"]
@@ -61,8 +64,7 @@ def test_missing_column_draft_and_character_withdrawals_are_reproducible():
     assert ht.commentary_collation_summary()["collated_poems"] == 0
 
 
-def test_whole_gua_najia_is_removed_only_from_misplaced_bi2_commentary():
-    from fatebridge.core.heluo_months import month_affinity
+def test_whole_gua_najia_is_removed_only_from_misplaced_bi2_commentary() -> None:
 
     t = yao_text("水地比", 2)
     assert "戊戌" in t["text_provenance"]["inherited_detail"]
@@ -84,7 +86,7 @@ def test_whole_gua_najia_is_removed_only_from_misplaced_bi2_commentary():
     assert bi["natal_najia_clause"]["match"] is None
 
 
-def test_source_specific_readings_and_nested_conditions_survive():
+def test_source_specific_readings_and_nested_conditions_survive() -> None:
     assert "才德大弱，大衆不服" in yao_text("地水師", 3)["detail"]
     assert "或服丁憂" in yao_text("地水師", 3)["detail"]
     assert "不倖成" in yao_text("地水師", 4)["detail"]
@@ -114,7 +116,7 @@ def test_source_specific_readings_and_nested_conditions_survive():
     assert "文清身正" in yao_text("水地比", 6)["detail"]
 
 
-def test_shi3_conditional_sheng_quote_never_replaces_the_normal_houtian():
+def test_shi3_conditional_sheng_quote_never_replaces_the_normal_houtian() -> None:
     r = VERIFIED["conditional_reference"]
     before = r["source_lines"][:]
     actual = yao_text("地水師", 3)["commentary_cross_references"][0]
@@ -136,8 +138,9 @@ def test_shi3_conditional_sheng_quote_never_replaces_the_normal_houtian():
 @pytest.mark.parametrize(
     "fault", ["swapped_target", "wrong_source_bits", "source_quote"]
 )
-def test_inconsistent_conditional_reference_fails_closed(fault, monkeypatch):
-    from fatebridge.core import heluo_hexagrams
+def test_inconsistent_conditional_reference_fails_closed(
+    fault: str, monkeypatch: MonkeyPatch
+) -> None:
 
     entry = copy.deepcopy(
         next(
@@ -163,8 +166,9 @@ def test_inconsistent_conditional_reference_fails_closed(fault, monkeypatch):
     assert exc.value.reason == "invalid_heluo_commentary_collation"
 
 
-def test_finite_audit_detects_dropped_conditional_link(monkeypatch):
-    from scripts.numerology import audit_numerology as audit
+def test_finite_audit_detects_dropped_conditional_link(
+    monkeypatch: MonkeyPatch,
+) -> None:
 
     monkeypatch.setattr(ht, "_commentary_cross_references", lambda entry: [])
     result = audit.shibi_commentary_checks()

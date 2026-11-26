@@ -1,68 +1,76 @@
 """Shared result field projection and invalid-path reporting."""
 
-from typing import Dict, Iterable, List, Literal, Optional, Union
+from collections.abc import Iterable
+from typing import Literal
+
+from pydantic import JsonValue
 
 from fatebridge.application.tool_spec import ServiceResult
 from fatebridge.utils.errors import ParameterError
 
-# True keeps a subtree whole; a mapping selects its children.
-SelectionTree = Dict[str, Union[Literal[True], "SelectionTree"]]
+SelectionTree = dict[str, "Literal[True] | SelectionTree"]
 
 
 def project_fields(
-    result: ServiceResult,
-    fields: Optional[Iterable[str]],
+    result: dict[str, JsonValue],
+    fields: Iterable[str] | None,
     *,
     strict_fields: bool = False,
+    validate_against: ServiceResult | None = None,
 ) -> ServiceResult:
-    """Project a result to a subset of keys for token budgeting.
+    """Select dotted object paths and keep the run receipt whole.
 
-    Supports two forms, freely mixed:
-
-    - **Top-level**: ``"snapshot_text"`` keeps that whole top-level value.
-    - **Dotted sub-path**: ``"bazi_birth.day_master"`` keeps ``bazi_birth`` but
-      prunes it to just ``day_master`` (recurses to any depth). This lets an
-      agent pull a scalar buried in an otherwise huge block (e.g. the ~50KB
-      ``bazi_birth`` payload) without dumping the whole thing.
-
-    Rules: ``run_metadata`` is always preserved whole. Asking for a whole parent
-    AND a sub-path of it keeps the whole parent (whole wins, any order). A
-    ``None``/empty selection returns the result unchanged. Lenient projection
-    retains historical data shaping, with visible ``projection_warnings`` for
-    every invalid path. Strict projection rejects them before shaping any data.
-    Paths traverse objects only; arrays and scalars must be selected whole.
+    A whole parent takes precedence. For shaped child results, callers may
+    validate a path against the original facts before detail and text omission.
     """
     if fields is None:
         return result
     fields = list(fields)
     if not fields:
         return result
-    issues = _projection_issues(result, fields)
+    issues = projection_issues(
+        result if validate_against is None else validate_against, fields
+    )
     if issues and strict_fields:
-        raise ParameterError("输出字段投影无效", issues)
-    tree = _build_selection_tree(fields)
-    tree["run_metadata"] = True  # provenance always survives, whole
-    projected = {
-        key: _apply_selection(result[key], child)
-        for key, child in tree.items()
-        if key in result
+        raise ParameterError("输出字段投影无效", [{**issue} for issue in issues])
+    tree = build_selection_tree(fields)
+    tree["run_metadata"] = True
+    projected: dict[str, JsonValue] = {
+        name: apply_selection(result[name], child)
+        for name, child in tree.items()
+        if name in result
     }
     if issues:
-        projected["projection_warnings"] = issues
+        projected["projection_warnings"] = [{**issue} for issue in issues]
     return projected
 
 
-def _projection_issues(
-    result: ServiceResult, fields: List[str]
-) -> List[Dict[str, str]]:
-    issues = []
+def merge_projected_fields(
+    base: dict[str, JsonValue], selected: dict[str, JsonValue]
+) -> dict[str, JsonValue]:
+    """Add explicit facts to an existing view without mutating either projection."""
+    merged = dict(base)
+    for name, value in selected.items():
+        current = merged.get(name)
+        merged[name] = (
+            merge_projected_fields(current, value)
+            if isinstance(current, dict) and isinstance(value, dict)
+            else value
+        )
+    return merged
+
+
+def projection_issues(
+    result: dict[str, JsonValue], fields: list[str]
+) -> list[dict[str, str]]:
+    issues: list[dict[str, str]] = []
     for path in dict.fromkeys(fields):
         parts = path.split(".")
         code = ""
         if any(not part or part.strip() != part for part in parts):
             code = "invalid_projection_path"
         else:
-            value: object = result
+            value: JsonValue = result
             for part in parts:
                 if not isinstance(value, dict):
                     code = "non_object_projection_path"
@@ -76,18 +84,18 @@ def _projection_issues(
     return issues
 
 
-def _build_selection_tree(fields: Iterable[str]) -> SelectionTree:
+def build_selection_tree(fields: Iterable[str]) -> SelectionTree:
     root: SelectionTree = {}
     for field in fields:
         node = root
         parts = field.split(".")
         for i, part in enumerate(parts):
             if i == len(parts) - 1:
-                node[part] = True  # whole-keep wins over any partial selection
+                node[part] = True
                 break
             child = node.get(part)
             if child is True:
-                break  # parent already requested whole; sub-path is subsumed
+                break
             if child is None:
                 child = {}
                 node[part] = child
@@ -95,9 +103,11 @@ def _build_selection_tree(fields: Iterable[str]) -> SelectionTree:
     return root
 
 
-def _apply_selection(value: object, node: Literal[True] | SelectionTree) -> object:
+def apply_selection(value: JsonValue, node: Literal[True] | SelectionTree) -> JsonValue:
     if node is True or not isinstance(value, dict):
         return value
     return {
-        k: _apply_selection(value[k], child) for k, child in node.items() if k in value
+        name: apply_selection(value[name], child)
+        for name, child in node.items()
+        if name in value
     }

@@ -9,15 +9,15 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.application.examples import suggested_fields
-from fatebridge.core.output_stem_order_review import StemOrderSourceReview
+from fatebridge.core.contracts.output_stem_order_review import StemOrderSourceReview
 from fatebridge.core.stem_effects import PAIRS
 from fatebridge.core.stem_order_review import (
     build_stem_order_review,
     stem_order_review_snapshot_line,
 )
-from fatebridge.validation.stem_order_candidate import extend_non_day_links
 from tests.support.transports import SPECS, business, call_cli, native
 from tests.support.transports import rest as _rest_fixture
+from validation.stem_order_candidate import extend_non_day_links
 
 rest = _rest_fixture
 FIXTURE = Path(__file__).parents[1] / "data/bazi_ordered_conditions_v1"
@@ -41,7 +41,7 @@ KEYS = ["analyze_destiny", "bazi_birth"] + [
 @pytest.mark.parametrize(
     "case", SOURCE["partial_stem_layout_expectations"], ids=lambda c: c["id"]
 )
-def test_complete_source_local_layouts_use_only_supplied_stems(case):
+def test_complete_source_local_layouts_use_only_supplied_stems(case) -> None:
     from itertools import pairwise
 
     stems = case["stems"]
@@ -63,8 +63,8 @@ def test_complete_source_local_layouts_use_only_supplied_stems(case):
 @pytest.mark.parametrize("pair", ["甲己", "乙庚", "丙辛", "丁壬", "戊癸"])
 @pytest.mark.parametrize("reverse", [False, True])
 def test_all_five_glyph_pairs_keep_unknown_empty_and_actual_events_separate(
-    pair, reverse
-):
+    pair: str, reverse: bool
+) -> None:
     left, right = pair[::-1] if reverse else pair
     stems = {"year": "甲", "month": left, "day": "丙", "hour": right}
     unknown = build_stem_order_review(stems, None, PAIRS)
@@ -94,7 +94,7 @@ def test_all_five_glyph_pairs_keep_unknown_empty_and_actual_events_separate(
         assert value["calculation_effect"] == "none"
 
 
-def test_day_and_year_partner_observations_do_not_choose_a_binding_winner():
+def test_day_and_year_partner_observations_do_not_choose_a_binding_winner() -> None:
     review = build_stem_order_review(
         {"year": "甲", "month": "己", "day": "甲", "hour": "甲"}, [], PAIRS
     )
@@ -103,7 +103,9 @@ def test_day_and_year_partner_observations_do_not_choose_a_binding_winner():
     assert "月时己甲" in stem_order_review_snapshot_line(review)
 
 
-def test_contradictory_full_review_rejected_and_partial_does_not_invent_missing_events():
+def test_contradictory_full_review_rejected_and_partial_does_not_invent_missing_events() -> (
+    None
+):
     value = build_stem_order_review(
         {"year": "甲", "month": "癸", "day": "丙", "hour": "戊"}, [], PAIRS
     )
@@ -119,8 +121,8 @@ def test_contradictory_full_review_rejected_and_partial_does_not_invent_missing_
 
 @pytest.mark.parametrize("key", KEYS)
 def test_published_source_order_view_matches_actual_public_transports(
-    key, rest, tmp_path, capsys
-):
+    key, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     spec = SPECS[key]
     payload = {
         "name": "虚构月时原典关系核对",
@@ -136,6 +138,8 @@ def test_published_source_order_view_matches_actual_public_transports(
     }
     if key != "analyze_destiny":
         payload.update(analysis_year=2026, analysis_month=10, analysis_day=12)
+    else:
+        pass
     fields = suggested_fields(spec, view="stem_order")
     flags = {
         "fields": fields,
@@ -165,6 +169,8 @@ def test_published_source_order_view_matches_actual_public_transports(
         response = rest.post(spec.rest_path, json=payload, params=flags)
         assert response.status_code == 200, response.text
         assert business(response.json()) == business(local)
+    else:
+        pass
     spec.output_model.model_validate(local)
     accounting = local
     for part in fields[0].split("."):

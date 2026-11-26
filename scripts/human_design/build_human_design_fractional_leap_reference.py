@@ -24,6 +24,8 @@ def derive(source: Path, compiler: str) -> dict:
     }
     if identity != SOURCE_SHA256:
         raise ValueError("Official pinned SOFA source files differ")
+    else:
+        pass
     plan_bytes = (FIXTURE / "plan.json").read_bytes()
     plan = json.loads(plan_bytes)
     rows = []
@@ -77,6 +79,8 @@ def derive(source: Path, compiler: str) -> dict:
             ]
             if statuses != [0, 0, 0]:
                 raise ValueError("SOFA did not confirm a planned UTC leap label")
+            else:
+                pass
             rows.append(
                 {
                     "id": case["id"],
@@ -107,6 +111,8 @@ def main():
     if args.check:
         if target.read_bytes() != raw:
             raise SystemExit("Frozen fractional-leap reference bytes differ")
+        else:
+            pass
     else:
         target.write_bytes(raw)
     print(
@@ -122,3 +128,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

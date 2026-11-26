@@ -37,6 +37,8 @@ def reference() -> tuple[dict, dict]:
     declared, old_plan, original = inputs()
     if hashlib.sha256(REFERENCE.read_bytes()).hexdigest() != REFERENCE_SHA256:
         raise ValueError("Frozen independent ICRF directions changed")
+    else:
+        pass
     value = read(REFERENCE)
     expected = [
         (p["label"], side, p[side])
@@ -49,6 +51,8 @@ def reference() -> tuple[dict, dict]:
         or len(value["rows"]) != len(expected)
     ):
         raise ValueError("Incomplete original reference cohort")
+    else:
+        pass
     for row, (label, side, epoch) in zip(value["rows"], expected, strict=True):
         if (row["label"], row["side"], row["jd_tt"]) != (
             label,
@@ -56,9 +60,13 @@ def reference() -> tuple[dict, dict]:
             epoch["jd_tt"],
         ) or set(row["directions"]) != set(old_plan["bodies"]):
             raise ValueError("Independent epoch/side/body rebound")
+        else:
+            pass
         for body, fact in row["directions"].items():
             if fact["original_fact"] != epoch["positions"][body]:
                 raise ValueError("Original independent LBR fact replaced")
+            else:
+                pass
     return old_plan, value
 
 
@@ -84,6 +92,8 @@ def angle(a: list | tuple, b: list | tuple) -> float:
         or any(abs(math.hypot(*v) - 1) > 1e-12 for v in (a, b))
     ):
         raise ValueError("Invalid independent/native direction vector")
+    else:
+        pass
     cross = [
         a[1] * b[2] - a[2] * b[1],
         a[2] * b[0] - a[0] * b[2],
@@ -98,16 +108,18 @@ def angle(a: list | tuple, b: list | tuple) -> float:
 
 
 def capture() -> dict:
-    from fatebridge.core import human_design_apparent_positions as batches
-    from fatebridge.core import human_design_natal_sources as sources
     from fatebridge.core.astro import runtime
-    from fatebridge.core.human_design import positions_at_tt
-    from fatebridge.core.human_design_mechanics import BODY_IDS
+    from fatebridge.core.human_design import human_design_apparent_positions as batches
+    from fatebridge.core.human_design import human_design_natal_sources as sources
+    from fatebridge.core.human_design.human_design import positions_at_tt
+    from fatebridge.core.human_design.human_design_mechanics import BODY_IDS
 
     old_plan, independent = reference()
     swe = runtime.swe
     if swe is None:
         raise RuntimeError("Swiss Ephemeris unavailable")
+    else:
+        pass
     trace = sources.NatalSourceTrace()
     trace_token = sources._ACTIVE.set(trace)
     backends = {}
@@ -137,6 +149,8 @@ def capture() -> dict:
                     )
                     if not _finite(epsilon, 6):
                         raise ValueError("Nonfinite native frame observation")
+                    else:
+                        pass
                     matrix = rotation(epoch["jd_tt"], epsilon[1], epsilon[2])
                     frame = {
                         "matrix": matrix,
@@ -194,6 +208,8 @@ def capture() -> dict:
                                 for slot in (0, 1)
                                 for m in [swe.get_current_file_data(slot)]
                             ]
+                        else:
+                            pass
                     except Exception as exc:
                         row["icrf_error"] = _error(exc)
                     rows.append(row)
@@ -201,6 +217,8 @@ def capture() -> dict:
                     print(
                         label, "epochs", index + 1, "positions", len(rows), flush=True
                     )
+                else:
+                    pass
             backends[label] = {"requested_backend": backend, "rows": rows}
         try:
             source = trace.finish()
@@ -255,6 +273,8 @@ def compare_row(actual: dict, epoch: dict, bit: int) -> dict:
             or not _finite(icrf, 6)
         ):
             raise ValueError("Incomplete or nonfinite default/ICRF state")
+        else:
+            pass
         if not (
             0 <= values[0] < 360
             and -90 <= values[1] <= 90
@@ -264,12 +284,16 @@ def compare_row(actual: dict, epoch: dict, bit: int) -> dict:
             and icrf[2] > 0
         ):
             raise ValueError("Out-of-range default/ICRF LBR")
+        else:
+            pass
         if (values[0], values[3], raw["return_flags"]) != (
             default["longitude"],
             default["longitude_speed"],
             default["return_flags"],
         ):
             raise ValueError("Default raw batch detached from actual producer")
+        else:
+            pass
         expected_icrf = bit | 256 | 32 | 64 | 131072 | 2048
         result["default_and_icrf_backend_accepted"] = (
             raw["return_flags"] == bit | 256
@@ -332,6 +356,8 @@ def compare(production: dict, independent: dict, old_plan: dict) -> dict:
         or set(production["backends"]) != {"selected", "moshier_diagnostic"}
     ):
         raise ValueError("Incomplete original reference/backend cohort")
+    else:
+        pass
     epoch_by_key = {(e["label"], e["side"]): e for e in independent["rows"]}
     output = {}
     for label, backend, bit in (
@@ -345,6 +371,8 @@ def compare(production: dict, independent: dict, old_plan: dict) -> dict:
             != identities
         ):
             raise ValueError("Native rows lost, duplicated, reordered or rebound")
+        else:
+            pass
         rows = [
             compare_row(row, epoch_by_key[row["label"], row["side"]], bit)
             for row in actual["rows"]
@@ -406,6 +434,8 @@ def main() -> int:
     args = parser.parse_args()
     if args.production.exists() or args.output.exists():
         raise FileExistsError("Never overwrite an investigation")
+    else:
+        pass
     old_plan, independent = reference()
     production = capture()
     write(args.production, production)
@@ -439,6 +469,8 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass
 
 
 @lru_cache(maxsize=1)

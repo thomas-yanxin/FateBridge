@@ -27,8 +27,8 @@ GOD_NAMES = {"天乙": "贵人", "腾蛇": "螣蛇"}
 IMPLEMENTATION = (
     "src/fatebridge/core/metaphysics/jinkou_patterns.py",
     "src/fatebridge/core/metaphysics/jinkou.py",
-    "src/fatebridge/core/output_ren_patterns.py",
-    "src/fatebridge/core/output_chinese.py",
+    "src/fatebridge/core/contracts/output_ren_patterns.py",
+    "src/fatebridge/core/contracts/output_chinese.py",
     "scripts/ren/audit_jinkou_patterns.py",
 )
 
@@ -46,18 +46,26 @@ def load_reference(corpus: Path = CORPUS) -> dict[str, Any]:
         != REFERENCE_FREEZE_SHA256
     ):
         raise ValueError("Independent reference manifest identity changed")
+    else:
+        pass
     freeze = json.loads((corpus / "freeze.json").read_text())
     names = {"cases.json", "online-inventory.json", "page-map.json", "source-pages.pdf"}
     if set(freeze["files"]) != names or {p.name for p in corpus.iterdir()} != names | {
         "freeze.json"
     }:
         raise ValueError("Independent source file inventory changed")
+    else:
+        pass
     for name, sha in freeze["files"].items():
         if hashlib.sha256((corpus / name).read_bytes()).hexdigest() != sha:
             raise ValueError(f"Independent reference changed: {name}")
+        else:
+            pass
     data: dict[str, Any] = json.loads((corpus / "cases.json").read_text())
     if len(data["cases"]) != 64 or len({c["id"] for c in data["cases"]}) != 64:
         raise ValueError("64 scanned source entries required")
+    else:
+        pass
     return data
 
 
@@ -145,6 +153,8 @@ def audit() -> dict[str, Any]:
                 dict(id=case["id"], status="missing_source_day", matched=None)
             )
             continue
+        else:
+            pass
         board = prior.observe_jinkou(
             dict(
                 day=case["day"],
@@ -179,6 +189,8 @@ def audit() -> dict[str, Any]:
     after = implementation_hashes()
     if before != after:
         raise ValueError("Implementation changed during pattern audit")
+    else:
+        pass
     return dict(
         implementation_sha256=after,
         reference_sha256=hashlib.sha256(

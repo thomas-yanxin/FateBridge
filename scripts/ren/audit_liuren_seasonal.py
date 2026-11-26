@@ -12,6 +12,8 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 
 if TYPE_CHECKING:
     from fatebridge.core.metaphysics.common import MetaphysicsSeed
+else:
+    pass
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/liuren_seasonal_v1"
@@ -56,14 +58,20 @@ def canonical(value: Any) -> bytes:
 def reference(folder: Path = CORPUS) -> dict[str, Any]:
     if sha(folder / "freeze.json") != FREEZE_SHA:
         raise ValueError("Frozen seasonal manifest changed")
+    else:
+        pass
     manifest = json.loads((folder / "freeze.json").read_text())
     names = {"source-pages.pdf", "reference.json", "protocol.json"}
     if set(manifest["files"]) != names or {
         p.name for p in folder.iterdir()
     } != names | {"freeze.json"}:
         raise ValueError("Frozen seasonal source inventory changed")
+    else:
+        pass
     if any(sha(folder / n) != h for n, h in manifest["files"].items()):
         raise ValueError("Frozen seasonal source changed")
+    else:
+        pass
     ref: dict[str, Any] = json.loads((folder / "reference.json").read_text())
     if (
         len(ref["literal_phase_table"]) != 5
@@ -73,6 +81,8 @@ def reference(folder: Path = CORPUS) -> dict[str, Any]:
         or set(ref["declared_month_partition"]) != set(BRANCHES)
     ):
         raise ValueError("Complete original seasonal denominators required")
+    else:
+        pass
     return ref
 
 
@@ -97,6 +107,8 @@ def expected_row(
     condition = None
     if empty:
         condition = "真空条件" if power in ref["true_empty_powers"] else "半空条件"
+    else:
+        pass
     return dict(
         earth_branch=earth,
         sky_branch=sky,
@@ -121,10 +133,12 @@ def audit() -> dict[str, Any]:
         if p.is_file() and "__pycache__" not in p.parts and p.suffix != ".pyc"
     ] + [Path(__file__).resolve()]
     source_before = {str(p.relative_to(ROOT)): sha(p) for p in paths}
+    from fatebridge.core.contracts.output_chinese import Liuren
+    from fatebridge.core.contracts.output_liuren_seasonal import (
+        require_complete_seasonal,
+    )
     from fatebridge.core.metaphysics.liureng import build_liureng_board
     from fatebridge.core.metaphysics.liureng_seasonal import POWERS, seasonal_evidence
-    from fatebridge.core.output_chinese import Liuren
-    from fatebridge.core.output_liuren_seasonal import require_complete_seasonal
 
     literal_matches = POWERS == ref["literal_phase_table"]
     synthetic = []
@@ -154,6 +168,8 @@ def audit() -> dict[str, Any]:
                         kind="component", day=day, month=month, actual=row, expected=exp
                     )
                 )
+            else:
+                pass
     for c in ref["synthetic_cases"]:
         rotation = (gods.index(c["god"]) - BRANCHES.index(c["sky"])) % 12
         got = seasonal_evidence(
@@ -195,8 +211,12 @@ def audit() -> dict[str, Any]:
             row_comparisons += 1
             if row != exp:
                 errors.append(dict(actual=row, expected=exp))
+            else:
+                pass
         if errors:
             failures.append(dict(kind="board", key=key, errors=errors))
+        else:
+            pass
         record = dict(
             key=key,
             season_partition=ev["season_partition"],

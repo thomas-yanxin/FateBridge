@@ -2,6 +2,7 @@
 
 import json
 import math
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
@@ -20,7 +21,9 @@ REFERENCE = json.loads(
 
 
 @pytest.mark.parametrize("case", REFERENCE["rows"])
-def test_complete_origin_matches_explicit_native_lahiri(case, monkeypatch):
+def test_complete_origin_matches_explicit_native_lahiri(
+    case, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setattr(runtime, "swe", None)
     origin, rate = apparent_lahiri_origin(case["jd_tt"])
     assert (
@@ -35,7 +38,9 @@ def test_complete_origin_matches_explicit_native_lahiri(case, monkeypatch):
 
 
 @pytest.mark.parametrize("date", [(1, 1, 1), (2000, 1, 1), (9999, 12, 31)])
-def test_offline_origin_and_motion_use_the_same_orbital_TT(date, monkeypatch):
+def test_offline_origin_and_motion_use_the_same_orbital_TT(
+    date, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setattr(runtime, "swe", None)
     birth = build_astro_birth_info(
         birth_year=date[0],
@@ -55,4 +60,4 @@ def test_offline_origin_and_motion_use_the_same_orbital_TT(date, monkeypatch):
     assert provenance["longitude_motion_origin_rate_degrees_per_day"] == pytest.approx(
         rate, abs=1e-12
     )
-    assert fallback_julian_day_tt(0, epoch) == epoch
+    assert fallback_julian_day_tt(0, epoch).days == Fraction(epoch)

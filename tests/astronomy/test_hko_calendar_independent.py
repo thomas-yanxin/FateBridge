@@ -33,7 +33,7 @@ ZHONGQI_BRANCH = dict(
 MONTH_ORDER = "寅卯辰巳午未申酉戌亥子丑"
 
 
-def test_official_xml_sources_remain_frozen_and_complete():
+def test_official_xml_sources_remain_frozen_and_complete() -> None:
     assert len(CASES) == 72
     for source in REFERENCE["sources"]:
         assert (
@@ -53,7 +53,7 @@ def test_official_xml_sources_remain_frozen_and_complete():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: f"{c['year']}-{c['term']}")
-def test_actual_solar_crossing_agrees_with_published_hko_minute(case):
+def test_actual_solar_crossing_agrees_with_published_hko_minute(case) -> None:
     expected = datetime.fromisoformat(case["at"])
     terms = {
         t.name: t for t in get_solar_terms_for_year(case["year"], "Asia/Hong_Kong")
@@ -64,7 +64,7 @@ def test_actual_solar_crossing_agrees_with_published_hko_minute(case):
 
 @pytest.mark.parametrize("zone", ["Asia/Shanghai", "America/New_York"])
 @pytest.mark.parametrize("case", CASES, ids=lambda c: f"{c['year']}-{c['term']}")
-def test_month_changes_at_jie_and_not_zhongqi_in_every_zone(case, zone):
+def test_month_changes_at_jie_and_not_zhongqi_in_every_zone(case, zone: str) -> None:
     reference = datetime.fromisoformat(case["at"])
     before = localize_datetime(reference - timedelta(minutes=2), zone)
     after = localize_datetime(reference + timedelta(minutes=2), zone)
@@ -79,3 +79,5 @@ def test_month_changes_at_jie_and_not_zhongqi_in_every_zone(case, zone):
     if case["term"] == "立春":
         assert get_bazi_year(before, zone) == case["year"] - 1
         assert get_bazi_year(after, zone) == case["year"]
+    else:
+        pass

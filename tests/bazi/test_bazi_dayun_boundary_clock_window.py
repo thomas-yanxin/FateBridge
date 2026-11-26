@@ -24,7 +24,7 @@ def short_clock(delta, hour=1):
     return ZoneInfo.from_file(io.BytesIO(data + b"STD\0DST\0"), key="same-clock-key")
 
 
-def test_scan_preserves_multiple_changes_and_loaded_object_identity():
+def test_scan_preserves_multiple_changes_and_loaded_object_identity() -> None:
     hour, half = short_clock(3600), short_clock(1800)
     low, high = datetime(2020, 1, 1, 1, 15), datetime(2020, 1, 1, 2, 15)
     gaps, start, end = forward_gaps_for_wall_image(hour, low, high)
@@ -36,7 +36,7 @@ def test_scan_preserves_multiple_changes_and_loaded_object_identity():
     assert forward_gaps_for_wall_image(hour, low, high)[0] is gaps
 
 
-def test_scan_filters_gap_ends_outside_the_image_and_handles_fixed_offsets():
+def test_scan_filters_gap_ends_outside_the_image_and_handles_fixed_offsets() -> None:
     low, high = datetime(2020, 1, 1, 2, 1), datetime(2020, 1, 1, 2, 15)
     assert forward_gaps_for_wall_image(short_clock(3600), low, high)[0] == ()
     assert (
@@ -48,14 +48,14 @@ def test_scan_filters_gap_ends_outside_the_image_and_handles_fixed_offsets():
         forward_gaps_for_wall_image(short_clock(3600), high, low)
 
 
-def test_day_cache_preserves_a_transition_exactly_at_utc_midnight():
+def test_day_cache_preserves_a_transition_exactly_at_utc_midnight() -> None:
     low, high = datetime(2020, 1, 1, 0, 45), datetime(2020, 1, 1, 1, 15)
     gaps, _, _ = forward_gaps_for_wall_image(short_clock(3600, hour=0), low, high)
     assert len(gaps) == 1
     assert gaps[0].instant_utc == datetime(2020, 1, 1, tzinfo=timezone.utc)
 
 
-def test_projected_image_keeps_both_sides_of_backward_leap_clipping():
+def test_projected_image_keeps_both_sides_of_backward_leap_clipping() -> None:
     low = datetime(2000, 2, 28, 23, 59, 59, 900000)
     high = datetime(2000, 2, 29, 0, 0, 0, 100000)
     a, b = projected_wall_image(low, high, 10)
@@ -65,7 +65,7 @@ def test_projected_image_keeps_both_sides_of_backward_leap_clipping():
     assert b > max(low + relativedelta(years=10), high + relativedelta(years=10))
 
 
-def test_projected_image_contains_dense_calendar_probes_over_full_cycle():
+def test_projected_image_contains_dense_calendar_probes_over_full_cycle() -> None:
     for year in range(1900, 2300):
         low = datetime(year, 2, 28, 23, 59)
         high = datetime(year, 3, 1, 0, 1)

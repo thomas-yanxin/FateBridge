@@ -8,7 +8,7 @@ from typing import Any, Dict, cast
 
 
 @lru_cache(maxsize=1)
-def bundle() -> Dict[str, Any]:
+def bundle() -> dict[str, Any]:
     return cast(
         Dict[str, Any],
         json.loads(
@@ -19,7 +19,7 @@ def bundle() -> Dict[str, Any]:
     )
 
 
-def provenance(key: str) -> Dict[str, Any]:
+def provenance(key: str) -> dict[str, Any]:
     data = bundle()
     record = deepcopy(data["rulesets"][key])
     record["sources"] = [
@@ -29,11 +29,11 @@ def provenance(key: str) -> Dict[str, Any]:
     return cast(Dict[str, Any], record)
 
 
-def disagreement(key: str) -> Dict[str, Any]:
+def disagreement(key: str) -> dict[str, Any]:
     return cast(Dict[str, Any], deepcopy(bundle()["disagreements"][key]))
 
 
-def desktop_reference() -> Dict[str, Any]:
+def desktop_reference() -> dict[str, Any]:
     result = deepcopy(bundle()["non_btb_desktop_reference"])
     result["sources"] = [
         dict(source_id=s, **deepcopy(bundle()["sources"][s]))

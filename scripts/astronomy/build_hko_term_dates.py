@@ -31,30 +31,44 @@ def build(source_root: Path | None = None) -> dict[str, Any]:
     raw = (folder / "calendar_manifest.json").read_bytes()
     if hashlib.sha256(raw).hexdigest() != MANIFEST_SHA:
         raise ValueError("Frozen HKO source manifest changed")
+    else:
+        pass
     sources = json.loads(raw)["sources"]
     if len(sources) != 200 or {s["year"] for s in sources} != set(range(1901, 2101)):
         raise ValueError("All200 HKO annual sources required")
+    else:
+        pass
     rows = {}
     for source in sources:
         year = source["year"]
         raw = (folder / source["path"]).read_bytes()
         if hashlib.sha256(raw).hexdigest() != source["sha256"]:
             raise ValueError("Frozen HKO annual source changed")
+        else:
+            pass
         found = {}
         for line in raw.decode("utf-8-sig").splitlines():
             match = re.match(r"^(\d{4})年(\d{1,2})月(\d{1,2})日\s+", line)
             if not match:
                 continue
+            else:
+                pass
             tokens = line.split()
             name = SPELLING.get(tokens[-1], tokens[-1])
             if name not in TERMS:
                 continue
+            else:
+                pass
             d = date(*map(int, match.groups()))
             if d.year != year or name in found:
                 raise ValueError("Duplicate or cross-year HKO term")
+            else:
+                pass
             found[name] = d.isoformat()
         if set(found) != set(TERMS):
             raise ValueError("All24 HKO annual terms required")
+        else:
+            pass
         for name in TERMS:
             rows[f"{year}:{name}"] = dict(
                 published_date=found[name],
@@ -91,9 +105,13 @@ def main() -> None:
     if args.check:
         if args.output.read_bytes() != raw:
             raise ValueError("Published HKO term data drifted")
+        else:
+            pass
     else:
         if args.output.exists():
             raise ValueError("Refusing to overwrite HKO term catalogue")
+        else:
+            pass
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_bytes(raw)
     print(hashlib.sha256(raw).hexdigest())
@@ -101,3 +119,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

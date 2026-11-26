@@ -1,15 +1,37 @@
 """Shared descriptions of transport output controls."""
 
-from typing import Annotated, Literal, Union
+from typing import Annotated, Literal
 
-from pydantic import Field
+from pydantic import Field, ValidationError, ValidatorFunctionWrapHandler, WrapValidator
+from pydantic_core import PydanticCustomError
 
 from fatebridge.application.result_delivery import DEFAULT_MCP_RESPONSE_CHARS
 
-# The public schema must express the same disjoint budget as the renderer.
-ResponseCharLimit = Union[Literal[0], Annotated[int, Field(ge=4096, le=65536)]]
 
-COMPACT_FLAG_DESC = "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。"
+def invalid_response_budget() -> PydanticCustomError:
+    return PydanticCustomError(
+        "invalid_response_limit",
+        "response_char_limit 须为 0 或 4096–65536",
+    )
+
+
+def validate_response_budget(
+    raw_budget: object, validate: ValidatorFunctionWrapHandler
+) -> int:
+    try:
+        budget: int = validate(raw_budget)
+    except ValidationError:
+        raise invalid_response_budget() from None
+    else:
+        return budget
+
+
+# note (schema): Publish the same disjoint budget accepted by the renderer.
+ResponseCharLimit = Annotated[
+    Literal[0] | Annotated[int, Field(ge=4096, le=65536)],
+    WrapValidator(validate_response_budget),
+]
+
 SNAPSHOT_FLAG_DESC = (
     "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；"
     "设为 false 可显著减少返回的 token 数。"

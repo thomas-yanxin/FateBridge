@@ -6,15 +6,15 @@
 
 ## 来源与固定输入
 
-第三方实现固定为[6tail/lunar-python的1645ad3版本](https://github.com/6tail/lunar-python/tree/1645ad3b3653635e5cb31b0c6df22b5e4298f8ce)，对应v1.4.9。直接读取该版本的LunarUtil表和EightChar阶段偏移，调用其时支转换；完整参考、文件SHA256和下载包SHA256保存于[离散参考](../tests/data/bazi_discrete_relations_v1.json)。测试不安装该库，也不从FateBridge生成期望表。长生参考属于第三方所选阴阳顺逆、火土同宫方案，不能由此证明所有土长生异说已统一。
+第三方实现固定为[6tail/lunar-python 1.4.9](https://github.com/6tail/lunar-python)，对应v1.4.9。直接读取该版本的LunarUtil表和EightChar阶段偏移，调用其时支转换；完整参考、文件SHA256和下载包SHA256保存于[离散参考](../tests/data/bazi_discrete_relations_v1.json)。测试不安装该库，也不从FateBridge生成期望表。长生参考属于第三方所选阴阳顺逆、火土同宫方案，不能由此证明所有土长生异说已统一。
 
-原典另读国家图书馆藏、上海世界图书馆发行[《秘本子平真诠》影印](https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf)，PDF17–21页，文件SHA256为`71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620`。17–18页列五合之化神，19–21页分别讨论间隔、远合、本身之合和争合；该书没有把任意字面配对直接裁为已成化。原页中的六阳／六阴等异字保留，不以电子校注改写原本。
+原典另读国家图书馆藏、上海世界图书馆发行[《秘本子平真诠》影印](https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf)，PDF17–21页。17–18页列五合之化神，19–21页分别讨论间隔、远合、本身之合和争合；该书没有把任意字面配对直接裁为已成化。原页中的六阳／六阴等异字保留，不以电子校注改写原本。
 
 纳音名称另与[《古今图书集成》艺术典原文页的电子转录](https://zh.wikisource.org/wiki/Page:Gujin_Tushu_Jicheng,_Volume_470_(1700-1725).djvu/26)“戊寅己卯城頭土”交叉核对。该页转录标为尚未校对，本次扫描图读取超时，未将它作为完成原页目验的证据；这里只核具名名称及独立表，不能据此认证全书逐字无误。
 
 ## 公历日序、晚子时与退役的偏移路径
 
-另固定[yuangu/sxtwl_cpp的2.0.4标签](https://github.com/yuangu/sxtwl_cpp/tree/f78cd5e0cfca4661cfe5af2f06d630fff5b0c051)，完整官方源码自行编译，作为第二套公历日干支实现。原计划使用2.0.7，但其PyPI源码分发缺少所需C++文件；失败日志和更换参考版本的记录保留，未把安装失败算成比较通过，也没有把2.0.4称为最新版本。两套实现的一致性不能代替历法原点的全部史料校勘。
+另固定[yuangu/sxtwl_cpp的2.0.4标签](https://github.com/yuangu/sxtwl_cpp)，完整官方源码自行编译，作为第二套公历日干支实现。原计划使用2.0.7，但其PyPI源码分发缺少所需C++文件；失败日志和更换参考版本的记录保留，未把安装失败算成比较通过，也没有把2.0.4称为最新版本。两套实现的一致性不能代替历法原点的全部史料校勘。
 
 1900-01-01至2100-12-31逐日核对共73,414日，两套外部实现的日干支完全相同，FateBridge标准路径也逐日相同。另在16个日历／闰年边界日期的全部24小时核对384组日柱和时柱，与lunar-python显式选择的23点换日方案一致。第二套sxtwl只参与民用日柱比较，未用它认证这384组时柱；也未比较1582历法切换以前或当前完整日期支持范围。
 
@@ -53,7 +53,7 @@
 | _element_for_ten_god / _derive_ten_gods_from_elements | 喜忌五行与相对日干的十神转换 | 与独立十神表同源规则，整局喜忌输入仍须已裁定 |
 | build_structure_profile / chart_useful_profile | 汇集月令、候选、喜忌职责及来源账本 | 组装与委托，不另计为每个下游算法已通过 |
 | analyze_harmony_effects | 对三合、半合、六合和冲刑害生成五行影响与分类文字 | 工程趋势解释，未执行strength.py的合成预算；旧清单称为“合化预算”不准确 |
-| analyze_combined_chart_events / calculate_compatibility_score | 双人关系事件与固定权重评分 | 仍有复合项，见[双人评分范围](compatibility-scoring.md)；本次离散核对未验收此评分 |
+| `cross_chart_relations` | 跨人逐柱接触、成员组合和定向刑 | [双人八字取证](compatibility-scoring.md) |
 
 四个去重／五行查找辅助和两个影响描述辅助只记支持职责，未作为新的算法数量。表驱动条目仍须逐条审查，不能按函数覆盖代替来源覆盖。三会另在strength.py与bureau_season.py中处理；六破尚须查清八字公开消费者与其他领域的差别。
 
@@ -65,7 +65,7 @@
 
 ## 后续藏干与特殊日事实层
 
-两项复合函数现移至[bazi_pattern_facts.py](../src/fatebridge/core/bazi_pattern_facts.py)，与格局优先级、取用和力量账本分开。旧类方法及仅为它们存在的硬编码表已移除；相邻明干与藏干配对复用同一五合表，没有兼容转发层。
+两项复合函数现移至[bazi_pattern_facts.py](../src/fatebridge/core/bazi/bazi_pattern_facts.py)，与格局优先级、取用和力量账本分开。旧类方法及仅为它们存在的硬编码表已移除；相邻明干与藏干配对复用同一五合表，没有兼容转发层。
 
 藏干按实际柱位、藏干序号和五合对象逐一列事实，字段为`hidden_stem_combinations`。不同支、同支跨柱均保留；例如子辰中的癸／戊关系仍可读取，但不再以无来源的特殊条目宣布“子辰暗合”。《三命通会》卷二《论支元六合》引《广录》的寅午、子巳、巳酉、卯申、午亥五组另列`lu_stem_pair_references`，不与全部藏干交集或第三方所选三对暗合混成一个通用表。所选电子转录首组写“甲巳”，本层按已核藏干／五合表形式化为甲己；原异字保留，未把它改写成新增原页校勘通过。
 
@@ -83,7 +83,7 @@
 
 原函数只将明干与支本气比较，却把天生地、地生天分别命名为“覆”“载”。1947年任注本PDF101页要求天覆地载、气序及干支不反悖，391页又明确以丁火盖头论丑中辛财：丁火生丑本气土与丁火克藏辛必须分别保留。503–504页的盖头截脚还涉及喜忌、无根、制泄与其他柱的救应，没有提供通用固定力量系数。
 
-两项旧类方法现移入同一[柱位事实模块](../src/fatebridge/core/bazi_pattern_facts.py)。`patterns.pillar_relationships` 改为逐柱的 `pillars`，分列 `principal_relation` 和 `hidden_relations`；五类方向均从明干出发，值为 `same_element`、`generates`、`generated_by`、`controls`、`controlled_by`。旧 `gai_tou`、`jie_jiao`、`fu`、`zai`、`tong` 分类字段移除，不用本气分类代替完整术语与力量判断。
+两项旧类方法现移入同一[柱位事实模块](../src/fatebridge/core/bazi/bazi_pattern_facts.py)。`patterns.pillar_relationships` 改为逐柱的 `pillars`，分列 `principal_relation` 和 `hidden_relations`；五类方向均从明干出发，值为 `same_element`、`generates`、`generated_by`、`controls`、`controlled_by`。旧 `gai_tou`、`jie_jiao`、`fu`、`zai`、`tong` 分类字段移除，不用本气分类代替完整术语与力量判断。
 
 旧 `patterns.fu_yin_fan_yin` 改为 `patterns.pillar_pair_relationships`，六个位置对分别提供 `identical`、`stem_four_clash`、`branch_six_clash` 和 `stem_relation`。天干冲选择固定四冲表，不混用第三方的其他冲表；四冲表由相邻明干与柱间事实共用。同干同支、支六冲和干四冲各自可读，旧合取条件不再冒充通用反吟定义。原典岁运语境、版本用语和完整作用仍须分别核验。
 
@@ -91,7 +91,7 @@
 
 ## 地支事实与共享半合资格
 
-`check_harmony_patterns`、`check_clash_patterns` 已从规则类移至 [bazi_branch_facts.py](../src/fatebridge/core/bazi_branch_facts.py)。原三合、半合、六合、六冲、六害和刑组的字面结果在20,736组四支符号赋值上保持；新增 `branch_positions` 保留同支重见的全部柱位，刑项的 `directed_edges` 保留寅→巳→申→寅、丑→戌→未→丑、子↔卯和重见自刑。原页118–122的主说与所引《三车一览》名称并列，`group_name_variants` 不改变方向。`formation_status`／`effect_status` 均保留未裁定，配对不冒作作用已成。
+`check_harmony_patterns`、`check_clash_patterns` 已从规则类移至 [bazi_branch_facts.py](../src/fatebridge/core/bazi/bazi_branch_facts.py)。原三合、半合、六合、六冲、六害和刑组的字面结果在20,736组四支符号赋值上保持；新增 `branch_positions` 保留同支重见的全部柱位，刑项的 `directed_edges` 保留寅→巳→申→寅、丑→戌→未→丑、子↔卯和重见自刑。原页118–122的主说与所引《三车一览》名称并列，`group_name_variants` 不改变方向。`formation_status`／`effect_status` 均保留未裁定，配对不冒作作用已成。
 
 五个消费者共用同一成员分类：三字齐、含中神两字、缺中神两端、成员不足。本命、力量及候选清单原本已采用含中神口径，双人事件和基础兼容分却还把任意两字当半合；现纠正这一不一致。全部144个有序支对核对原冻结函数后，只有四类端支的两个方向不再误得半合奖励，冲害项与其余净分不变。3,796个可放入八柱的非空支集合也核对双人事件。权重不是古籍常数，本次没有调整。
 
@@ -105,7 +105,7 @@
 
 `bazi_evidence._roots` 与既有 `bazi_root_context.hidden_roots` 的完整返回表达式相同，前者只在本命取证的两处调用。现删除重复函数，两处取证和透财根语境统一使用后者。`HiddenRootFact` 明确柱位、支字、藏干、原序号及同字／同五行类别；它没有有效根力字段。原取证函数内另写的五组干合也改为读取已有 `STEM_COMBINATIONS`，与其他事实消费者共用同一张表，没有兼容转发层或第二套根力分类器。
 
-独立进程实际载入未改动的[6tail固定提交原文件](https://github.com/6tail/lunar-python/blob/1645ad3b3653635e5cb31b0c6df22b5e4298f8ce/lunar_python/util/LunarUtil.py)，由其有序藏干、干五行及五合对象表生成参考，未导入FateBridge。先冻结参考，再比较10个请求干与全部12⁴个有序四支字串，共207360个符号描述；每个消费者各得到387072条实际藏根记录。改前两个函数、改后两个调用路径的完整有序事实均相符，前后压缩输出逐字节相同；两个调用路径和前后重放不是额外独立样本。另100个有序干对的取证五合资格相符。这些字串可含非有效出生盘，验证的是所选查表模型，不证明原典通根力量或预测有效性。
+独立进程实际载入未改动的[6tail固定提交原文件](https://github.com/6tail/lunar-python)，由其有序藏干、干五行及五合对象表生成参考，未导入FateBridge。先冻结参考，再比较10个请求干与全部12⁴个有序四支字串，共207360个符号描述；每个消费者各得到387072条实际藏根记录。改前两个函数、改后两个调用路径的完整有序事实均相符，前后压缩输出逐字节相同；两个调用路径和前后重放不是额外独立样本。另100个有序干对的取证五合资格相符。这些字串可含非有效出生盘，验证的是所选查表模型，不证明原典通根力量或预测有效性。
 
 取证链的职责现明确分开：
 
@@ -126,3 +126,13 @@
 随后重新核对1947年本[PDF199页](https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf#page=199)：癸酉、甲子、丁卯、丙午这一具体命式明载“日主弱中变旺”。既有两个重叠来源记录也一直保留“强”，不是两个新命例。旧通关测试把最终工程档要求为“弱”，与已实施的结构覆盖及该原页不符。现保留整个输入裁定对象不被通关取证修改的断言，另核对数值阈值仍为“弱”、具名结构规则及工程档为“强”；生产算法、系数、来源标签及冻结资料均未改。相关7个模块210项回归通过，原失败记录保留，不能称原来的“最终档必须弱”判据已通过。
 
 根位样例15172的12个失败节点继续保留。原6个根位样例中有的已包含结构覆盖，不能把整份旧夹具改称纯数值档以消除差异。另复读的PDF172–173、203、205页包含司令、生长阶段、印比承接及财杀位置等条件，没有因此建立“两处本气根即足以判强”的通用充分规则。这些局部来源与回归核对不构成完整原典力量或SOTA验收。
+
+<a id="bazi-three-origins-round45"></a>
+
+## 胎元、命宫与身宫的离散公式对照（R45）
+
+以已经解析、月干符合五虎遁的四柱为输入，三个结果柱只取决于年干、太阳月支和时支。固定十年干、十二月支、十二时支的1440类输入，逐一调用当前`_build_three_origins`，与 lunar-python 1.4.9 的三个原作者方法比较。参考执行完整原始`EightChar.py`与`LunarUtil.py`，五个getter只提供固定givens，没有复制本仓公式或读取候选结果。全部4320个干支字符串逐类型、逐字符相等，无缺行、重复、额外行或重试。
+
+这次只认证所选离散公式的一致性。固定甲子日足以覆盖三个柱字符串的参数类，不能覆盖完整结果的十神、纳音或真实日期组合，也没有验证上游历法、真太阳时、子时政策或三端。两臂的实际来源及被动调用记录见[精度验收范围](precision-acceptance.md#bazi-three-origins-round45)。旧八个日期回归未运行；旧“300随机盘一致”没有seed、完整输入输出和运行来源，测试说明已明确这一限度，原案例、断言及可执行AST保持。
+
+原典资格另列：所读四库本电子转录的命宫月序亥起与子起示例尚有矛盾，未完成影印校勘；胎元章质疑现行简式并讨论另一取法；所选身宫公式的直接原典尚未取得。与固定软件相等不能裁定唯一古法、实际受胎日期或预测效度。本次没有生产修复，新增根因信用为0，累计37；既有力量等级差异、约束失败及未决项均保持。

@@ -6,20 +6,22 @@ Pure relocation from the package facade.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
+from fatebridge.core.local_techniques.chart import (
+    _build_qimen_palace_overview_lines,
+    _render_qimen_palace_sections,
+)
+from fatebridge.core.local_techniques.snapshot import join_lines, render_snapshot_text
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.qimen import (
     build_qimen_board,
 )
-from fatebridge.core.qimen_profiles import DEFAULT_GOD_PROFILE, DEFAULT_SEASON_PROFILE
-from fatebridge.utils.solar_time_provenance import solar_time_evidence_lines
-
-from .chart import (
-    _build_qimen_palace_overview_lines,
-    _render_qimen_palace_sections,
+from fatebridge.core.qimen.qimen_profiles import (
+    DEFAULT_GOD_PROFILE,
+    DEFAULT_SEASON_PROFILE,
 )
-from .snapshot import join_lines, render_snapshot_text
+from fatebridge.utils.solar_time_provenance import solar_time_evidence_lines
 
 QIMEN_NINE_GRID_LAYOUT = (
     ("巽四宫", "离九宫", "坤二宫"),
@@ -28,15 +30,15 @@ QIMEN_NINE_GRID_LAYOUT = (
 )
 
 
-def _build_qimen_nine_grid_lines(qimen: Dict[str, Any]) -> List[str]:
+def _build_qimen_nine_grid_lines(qimen: dict[str, Any]) -> list[str]:
     palace_map = {
         palace.get("name"): palace
         for palace in qimen.get("palaces", []) or []
         if isinstance(palace, dict) and palace.get("name")
     }
-    rows: List[str] = []
+    rows: list[str] = []
     for row in QIMEN_NINE_GRID_LAYOUT:
-        cells: List[str] = []
+        cells: list[str] = []
         for palace_name in row:
             palace = palace_map.get(palace_name, {})
             cell = (
@@ -58,7 +60,7 @@ def _build_qimen_nine_grid_lines(qimen: Dict[str, Any]) -> List[str]:
     return rows
 
 
-def _render_qimen_pattern_line(pattern: Dict[str, Any]) -> str:
+def _render_qimen_pattern_line(pattern: dict[str, Any]) -> str:
     line = f"{pattern['palace']}：{pattern['name']}；{pattern['facts']}；{pattern['traditional_meaning']}"
     qualification = pattern.get("qualification")
     if qualification:
@@ -125,12 +127,12 @@ def _render_qimen_pattern_line(pattern: Dict[str, Any]) -> str:
     return line
 
 
-def _qimen_stem_context_lines(qimen: Dict[str, Any]) -> List[str]:
+def _qimen_stem_context_lines(qimen: dict[str, Any]) -> list[str]:
     context = qimen.get("stem_context")
     if not context:
         return []
 
-    def candidate_lines(stem: Dict[str, Any]) -> List[str]:
+    def candidate_lines(stem: dict[str, Any]) -> list[str]:
         labels = {
             "hidden_day_stem": "伏干",
             "flying_day_stem": "飞干",
@@ -259,14 +261,14 @@ def _qimen_stem_context_lines(qimen: Dict[str, Any]) -> List[str]:
     return lines
 
 
-def _render_qimen_source_disagreements(qimen: Dict[str, Any]) -> List[str]:
+def _render_qimen_source_disagreements(qimen: dict[str, Any]) -> list[str]:
     return [
         f"原典差异待核：{d['source_section']}，影印第{d['source_scan_page']}页，{d['field']}原文{d['source_value']}，本盘{d['computed_value']}；保留计算，不判已符合原典"
         for d in qimen.get("source_disagreements", [])
     ]
 
 
-def build_qimen_snapshot_text(*, seed: MetaphysicsSeed, qimen: Dict[str, Any]) -> str:
+def build_qimen_snapshot_text(*, seed: MetaphysicsSeed, qimen: dict[str, Any]) -> str:
     zhifu = qimen.get("zhifu") or {}
     zhishi = qimen.get("zhishi") or {}
     palace_map = {
@@ -277,7 +279,7 @@ def build_qimen_snapshot_text(*, seed: MetaphysicsSeed, qimen: Dict[str, Any]) -
     zhifu_palace = palace_map.get(zhifu.get("palace"), {})
     zhishi_palace = palace_map.get(zhishi.get("palace"), {})
 
-    def _content_note(item: Dict[str, Any]) -> str:
+    def _content_note(item: dict[str, Any]) -> str:
         if not item.get("content_palace"):
             return ""
         if item.get("content_palace") == item.get("palace") and item.get(
@@ -295,7 +297,7 @@ def build_qimen_snapshot_text(*, seed: MetaphysicsSeed, qimen: Dict[str, Any]) -
             join_lines(
                 [
                     f"农历：{(seed.calendar_context.get('lunar_calendar') or {}).get('display') or '无'}",
-                    f"起局时间：{seed.corrected_datetime:%Y-%m-%d %H:%M:%S}（{'真太阳时' if seed.applied_true_solar else '钟表时间'}）",
+                    f"起局时间：{seed.clock.isoformat(sep=' ', timespec='seconds')}（{'真太阳时' if seed.applied_true_solar else '钟表时间'}）",
                     f"四柱：{seed.pillars['year'][0]}{seed.pillars['year'][1]}年/{seed.pillars['month'][0]}{seed.pillars['month'][1]}月/{seed.pillars['day'][0]}{seed.pillars['day'][1]}日/{seed.pillars['hour'][0]}{seed.pillars['hour'][1]}时",
                     f"定局法：{qimen.get('ju_method')}；天文节气按民用时刻判断",
                     "换日：子初换日",
@@ -378,8 +380,8 @@ def build_qimen_snapshot_text(*, seed: MetaphysicsSeed, qimen: Dict[str, Any]) -
 
 
 def build_qimen_with_options(
-    seed: MetaphysicsSeed, options: Optional[Dict[str, Any]]
-) -> Dict[str, Any]:
+    seed: MetaphysicsSeed, options: dict[str, Any] | None
+) -> dict[str, Any]:
     normalized = dict(options or {})
     unknown = set(normalized) - {
         "layout",

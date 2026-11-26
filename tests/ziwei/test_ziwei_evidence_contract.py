@@ -15,6 +15,7 @@ from fatebridge.services.metaphysics import (
     calculate_ziwei_horoscope,
 )
 from fatebridge.utils.birth_input import create_person_info
+from tests.support.transports import call_calculation
 
 TARGET = dict(target_year=2027, target_month=6, target_day=15, target_hour=12)
 BIRTH = dict(
@@ -35,7 +36,7 @@ def _calculate(birth=BIRTH, target=TARGET):
     return calculate_ziwei_horoscope(create_person_info(**birth), **target)
 
 
-def test_target_receipt_is_not_the_birth_receipt():
+def test_target_receipt_is_not_the_birth_receipt() -> None:
     result = _calculate()
     target, birth = result["analysis_context"], result["birth_context"]
     assert target["context_role"] == "target" and birth["context_role"] == "birth"
@@ -49,7 +50,7 @@ def test_target_receipt_is_not_the_birth_receipt():
     assert birth["input_datetime"] == "1992-08-15 14:30:00"
 
 
-def test_target_timezone_does_not_inherit_birth_timezone():
+def test_target_timezone_does_not_inherit_birth_timezone() -> None:
     result = _calculate(
         {**BIRTH, "birth_timezone": "America/New_York", "use_true_solar_time": False}
     )
@@ -82,7 +83,7 @@ def test_target_timezone_does_not_inherit_birth_timezone():
         ),
     ],
 )
-def test_scope_transformations_join_to_actual_natal_star_data(birth):
+def test_scope_transformations_join_to_actual_natal_star_data(birth) -> None:
     result = _calculate(birth)
     natal = calculate_ziwei_birth(create_person_info(**birth))["ziwei_birth"]
     horoscope = result["ziwei_horoscope"]
@@ -108,7 +109,7 @@ def test_scope_transformations_join_to_actual_natal_star_data(birth):
             assert link["natal_mutagen"] == star["mutagen"]
 
 
-def test_annual_transformation_in_natal_career_is_not_annual_career_palace():
+def test_annual_transformation_in_natal_career_is_not_annual_career_palace() -> None:
     annual = next(
         s for s in _calculate()["ziwei_horoscope"]["scopes"] if s["scope"] == "流年"
     )
@@ -121,7 +122,7 @@ def test_annual_transformation_in_natal_career_is_not_annual_career_palace():
     assert career["natal_palace_ganzhi"] == "乙巳"
 
 
-def test_late_zi_natal_day_keeps_current_day_with_explicit_solar_convention():
+def test_late_zi_natal_day_keeps_current_day_with_explicit_solar_convention() -> None:
     person = create_person_info(
         birth_year=1986,
         birth_month=1,
@@ -140,7 +141,9 @@ def test_late_zi_natal_day_keeps_current_day_with_explicit_solar_convention():
     assert result["ziwei_horoscope"]["nominal_age"] == 43
 
 
-def test_context_scope_and_natal_linkage_match_rest_mcp_cli(monkeypatch, capsys):
+def test_context_scope_and_natal_linkage_match_rest_mcp_cli(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -156,7 +159,7 @@ def test_context_scope_and_natal_linkage_match_rest_mcp_cli(monkeypatch, capsys)
         response_char_limit=0,
     )
     response = TestClient(api.app).post(
-        "/api/cn/ziwei/horoscope",
+        "/api/ziwei/timing",
         json=inputs,
         params=[
             ("as_of", options["as_of"]),
@@ -169,14 +172,14 @@ def test_context_scope_and_natal_linkage_match_rest_mcp_cli(monkeypatch, capsys)
 
     async def mcp_call():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            return await client.call_tool(
-                "ziwei_horoscope", {**inputs, **options}, raise_on_error=False
+            return await call_calculation(
+                client, "ziwei_timing", {**inputs, **options}, raise_on_error=False
             )
 
     protocol = asyncio.run(mcp_call())
     assert response.status_code == 200, response.json()
     assert not protocol.is_error, protocol.content
-    args = ["ziwei_horoscope"]
+    args = ["ziwei_timing"]
     for key, value in inputs.items():
         args.extend(["--" + key.replace("_", "-"), str(value)])
     args.extend(

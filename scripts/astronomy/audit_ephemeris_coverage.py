@@ -30,21 +30,33 @@ def interval_coverage(
     for start, end in intervals:
         if end < cursor or start > upper:
             continue
+        else:
+            pass
         if start > cursor:
             gaps.append([cursor, min(start, upper)])
+        else:
+            pass
         cursor = max(cursor, end)
         if cursor >= upper:
             break
+        else:
+            pass
     if cursor < upper:
         gaps.append([cursor, upper])
+    else:
+        pass
     return {"domain_tt_jd": [lower, upper], "gaps": gaps, "covered": not gaps}
 
 
 def audit(path: Path, start_year: int, end_year: int) -> Dict[str, Any]:
     if runtime.swe is None:
         raise RuntimeError("Swiss Ephemeris runtime is required")
+    else:
+        pass
     if not 1 <= start_year <= end_year <= 9999:
         raise ValueError("Require 1 <= start year <= end year <= 9999")
+    else:
+        pass
     selected = runtime.configure_ephemeris_path(str(path))
     # A nonempty SE_EPHE_PATH intentionally overrides explicit configuration.
     # Do not verify one directory while the native library reads another.
@@ -52,6 +64,8 @@ def audit(path: Path, start_year: int, end_year: int) -> Dict[str, Any]:
         raise ValueError(
             "Effective native path differs from the directory being audited"
         )
+    else:
+        pass
     manifest = load_ephemeris_manifest()
     names = ephemeris_files_for_years(range(start_year, end_year + 1))
     fingerprints = []
@@ -70,6 +84,10 @@ def audit(path: Path, start_year: int, end_year: int) -> Dict[str, Any]:
                 moment = boundary + timedelta(days=day)
                 if start_year <= moment.year <= end_year:
                     moments.add(moment)
+                else:
+                    pass
+        else:
+            pass
     headers: Dict[str, Dict[str, Any]] = {}
     errors = []
     checked = 0
@@ -79,6 +97,8 @@ def audit(path: Path, start_year: int, end_year: int) -> Dict[str, Any]:
         times = ephemeris_time(moment)
         if times.jd_tt is None:
             raise RuntimeError("TT unavailable with the native ephemeris runtime")
+        else:
+            pass
         lower, upper = min(lower, times.jd_tt), max(upper, times.jd_tt)
         for name, body in PLANET_SWISSEPH_IDS.items():
             try:
@@ -90,8 +110,12 @@ def audit(path: Path, start_year: int, end_year: int) -> Dict[str, Any]:
                 )
                 if flags < 0 or not flags & runtime.swe.FLG_SWIEPH:
                     raise ValueError(f"returned model flags {flags}")
+                else:
+                    pass
                 if not all(math.isfinite(value) for value in coordinates):
                     raise ValueError("nonfinite coordinate")
+                else:
+                    pass
                 checked += 1
             except Exception as error:
                 errors.append(
@@ -109,11 +133,15 @@ def audit(path: Path, start_year: int, end_year: int) -> Dict[str, Any]:
                     "end_tt_jd": last,
                     "jpl_de_number": denum,
                 }
+            else:
+                pass
         if index % 2000 == 0:
             print(
                 f"Checked {index} instants / {checked} native states; {len(errors)} failures",
                 flush=True,
             )
+        else:
+            pass
     rows = list(headers.values())
     return {
         "scope": "Pinned file identity, nominal TT interval union and native model availability at every CE year endpoint plus segment-switch neighbourhoods. Not independent positional accuracy, observed historical UT1, future UTC or house accuracy certification. Mean node is analytic; its SWIEPH flag does not prove file access.",
@@ -162,7 +190,11 @@ def main() -> None:
         not value["covered"] for value in report["interval_coverage"].values()
     ):
         raise SystemExit(1)
+    else:
+        pass
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

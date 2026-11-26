@@ -8,15 +8,15 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.meihua_weather_frequency import qualify_weather_frequency
+from fatebridge.core.meihua.meihua_weather_frequency import qualify_weather_frequency
 from fatebridge.services.meihua import calculate_meihua_cast
-from fatebridge.validation.meihua_weather_frequency import audit_weather_frequency
+from validation.meihua_weather_frequency import audit_weather_frequency
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_weather_frequency_v2"
 CASES = json.loads((REFERENCES / "cases.json").read_text())["cases"]
 
 
-def test_frozen_frequency_oracles_and_source_quotes():
+def test_frozen_frequency_oracles_and_source_quotes() -> None:
     report = audit_weather_frequency(REFERENCES)
     assert report["selected_frequency_checks_passed"], report["cases"]
     assert report["independent_mathematical_probe_count"] == 8
@@ -34,7 +34,9 @@ def test_frozen_frequency_oracles_and_source_quotes():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_actual_many_conditions_are_qualified_without_overwriting_raw_result(case):
+def test_actual_many_conditions_are_qualified_without_overwriting_raw_result(
+    case,
+) -> None:
     output = calculate_meihua_cast(
         casting=case["casting"],
         interpretation_topic="weather",
@@ -70,7 +72,9 @@ def test_actual_many_conditions_are_qualified_without_overwriting_raw_result(cas
     assert weather["single_forecast"] is None
 
 
-def test_frequency_qualification_retains_independent_control_and_pure_pair_readings():
+def test_frequency_qualification_retains_independent_control_and_pure_pair_readings() -> (
+    None
+):
     result = calculate_meihua_cast(
         casting=CASES[0]["casting"],
         interpretation_topic="weather",
@@ -99,7 +103,7 @@ def test_frequency_qualification_retains_independent_control_and_pure_pair_readi
     assert row["effective_reading"].endswith("原有制约说明")
 
 
-def test_rehashed_false_frequency_oracle_is_still_reported(tmp_path):
+def test_rehashed_false_frequency_oracle_is_still_reported(tmp_path: Path) -> None:
     directory = tmp_path / REFERENCES.name
     shutil.copytree(REFERENCES, directory)
     shutil.copytree(

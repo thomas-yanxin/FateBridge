@@ -1,6 +1,8 @@
 """Actual source receipts and unresolved-ID counterexamples remain explicit."""
 
 import copy
+import hashlib
+import os
 from pathlib import Path
 
 import pytest
@@ -11,8 +13,9 @@ from scripts.astrodice.verify_astrodice_source_receipt import verify
 
 
 @pytest.mark.parametrize("frame", [0, 1])
-def test_actual_swiss_context_exposes_resolvable_source_receipt(monkeypatch, frame):
-    import hashlib
+def test_actual_swiss_context_exposes_resolvable_source_receipt(
+    monkeypatch: pytest.MonkeyPatch, frame: int
+) -> None:
 
     previous = e.configured_ephemeris_path()
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
@@ -44,8 +47,6 @@ def test_actual_swiss_context_exposes_resolvable_source_receipt(monkeypatch, fra
 
 @pytest.fixture(scope="module")
 def current_source_result():
-    import hashlib
-    import os
 
     previous_path = e.configured_ephemeris_path()
     previous_jpl = os.environ.pop("FATEBRIDGE_JPL_FILE", None)
@@ -71,6 +72,8 @@ def current_source_result():
     finally:
         if previous_jpl is not None:
             os.environ["FATEBRIDGE_JPL_FILE"] = previous_jpl
+        else:
+            pass
         if previous_environment is None:
             os.environ.pop("SE_EPHE_PATH", None)
         else:
@@ -78,7 +81,7 @@ def current_source_result():
         e.configure_ephemeris_path(previous_path or "")
 
 
-def test_current_missing_source_receipt_is_rejected(current_source_result):
+def test_current_missing_source_receipt_is_rejected(current_source_result) -> None:
     result, allowed = copy.deepcopy(current_source_result)
     assert verify(result, "swieph", allowed)["physical_factors"] == 10
     del result["chart"]["params"]["chart_profile"]["physical_ephemeris_source"]
@@ -90,8 +93,8 @@ def test_current_missing_source_receipt_is_rejected(current_source_result):
     "mutation", ["missing", "duplicate", "hash", "unresolved", "factor", "accuracy"]
 )
 def test_independent_source_reader_rejects_false_provenance(
-    mutation, current_source_result
-):
+    mutation: str, current_source_result
+) -> None:
     result, allowed = copy.deepcopy(current_source_result)
     profile = result["chart"]["params"]["chart_profile"]
     source = profile["physical_ephemeris_source"]

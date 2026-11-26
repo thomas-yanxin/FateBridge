@@ -1,23 +1,21 @@
 """Sitting-trigram house chart and separately scoped personal charts."""
 
-from datetime import date
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
-from fatebridge.core.aa1996_solar import MODEL_ID as AA1996_SOLAR_MODEL
-from fatebridge.core.de441_solar import MODEL_ID as DE441_SOLAR_MODEL
 from fatebridge.core.divination import BAGUA_BY_NAME
-from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_SOLAR_MODEL
-
-from .bazhai_interpretation import palace_star_relationship, you_nian_trace
-from .bearing_support import sitting_support
-from .calendar import (
-    boundary_candidate_dates,
+from fatebridge.core.fengshui.bazhai_interpretation import (
+    palace_star_relationship,
+    you_nian_trace,
+)
+from fatebridge.core.fengshui.bearing_support import sitting_support
+from fatebridge.core.fengshui.calendar import (
+    boundary_dates,
     boundary_model_policy,
     lichun_resolution,
     year_context,
 )
-from .directions import rule_data, sitting_from_facing, wrap9
-from .models import BazhaiRequest, House, MingguaRequest
+from fatebridge.core.fengshui.directions import rule_data, sitting_from_facing, wrap9
+from fatebridge.core.fengshui.models import BazhaiRequest, House, MingguaRequest
 
 
 def placement_polarity(purpose: str, aspect: str) -> str:
@@ -28,8 +26,8 @@ def placement_polarity(purpose: str, aspect: str) -> str:
 
 
 def placement_application(
-    palace: Dict[str, Any], purpose: str, aspect: str
-) -> Dict[str, Any]:
+    palace: dict[str, Any], purpose: str, aspect: str
+) -> dict[str, Any]:
     """The same scoped evidence for a current or proposed direction."""
     expected = placement_polarity(purpose, aspect)
     return {
@@ -49,7 +47,7 @@ def placement_application(
     }
 
 
-def sectors(base: str, subject_id: str, basis: str) -> Dict[str, Any]:
+def sectors(base: str, subject_id: str, basis: str) -> dict[str, Any]:
     bits = {
         name: sum(bit << i for i, bit in enumerate(info["lines"]))
         for name, info in BAGUA_BY_NAME.items()
@@ -77,7 +75,7 @@ def sectors(base: str, subject_id: str, basis: str) -> Dict[str, Any]:
     }
 
 
-def minggua(req: MingguaRequest, subject_id: str = "occupant") -> Dict[str, Any]:
+def minggua(req: MingguaRequest, subject_id: str = "occupant") -> dict[str, Any]:
     time = year_context(
         req.effective_birth_year,
         req.birth_at,
@@ -87,10 +85,13 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> Dict[str, Any]
     )
     year = time["effective_year"]
     missing = []
+    required_year_input = "birth_at_or_effective_birth_year"
     if time.get("effective_year_status") == "requires_confirmation":
         year = None
-        missing.append(
-            f"occupants.{subject_id}.confirmed_effective_birth_year_due_to_boundary_precision"
+        required_year_input = (
+            "confirmed_effective_birth_year_due_to_undefined_local_clock"
+            if req.year_boundary == "january_1"
+            else "confirmed_effective_birth_year_due_to_boundary_precision"
         )
     if req.birth_date is not None:
         day = req.birth_date
@@ -99,20 +100,24 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> Dict[str, Any]
             if req.year_boundary == "lichun"
             else None
         )
-        boundary_day = (
-            date.fromisoformat(resolution["moment"][:10]) if resolution else None
+        projected_boundary = (
+            boundary_dates(resolution, req.timezone_name)
+            if resolution is not None
+            else None
         )
+        unresolved_boundary_date = resolution is not None and projected_boundary is None
+        boundary_day, possible_dates = projected_boundary or (None, set())
         # Preserve any date crossed by the selected model guard; it is not
         # an independently certified physical error bound.
         uncertain_boundary = bool(
             resolution
             and boundary_day is not None
-            and day in boundary_candidate_dates(resolution, req.timezone_name)
+            and day in possible_dates
             and day != boundary_day
         )
         year = (
             None
-            if day == boundary_day or uncertain_boundary
+            if unresolved_boundary_date or day == boundary_day or uncertain_boundary
             else day.year - int(boundary_day is not None and day < boundary_day)
         )
         time = {
@@ -124,46 +129,30 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> Dict[str, Any]
         }
         if resolution is not None:
             time["boundary_resolution"] = resolution
-            policy = boundary_model_policy(resolution)
+            policy = boundary_model_policy(resolution, date_only=True)
             if uncertain_boundary and policy is not None:
-                model_name = (
-                    "moshier"
-                    if policy["ephemeris_model"] == "moshier"
-                    else (
-                        "de441_solar"
-                        if policy["ephemeris_model"] == DE441_SOLAR_MODEL
-                        else (
-                            "vsop2013_solar"
-                            if policy["ephemeris_model"] == VSOP2013_SOLAR_MODEL
-                            else (
-                                "aa1996_solar"
-                                if policy["ephemeris_model"] == AA1996_SOLAR_MODEL
-                                else "analytic_solar"
-                            )
-                        )
-                    )
-                )
                 time["boundary_precision_policy"] = {
                     **policy,
-                    "reason": model_name
-                    + "_guard_crosses_civil_date_not_fabricated_birth_hour",
                     "boundary_possible_civil_dates": sorted(
-                        d.isoformat()
-                        for d in boundary_candidate_dates(resolution, req.timezone_name)
+                        d.isoformat() for d in possible_dates
                     ),
                 }
-        if year is None:
-            missing.append(
-                f"occupants.{subject_id}.confirmed_effective_birth_year_due_to_boundary_precision"
-                if uncertain_boundary
-                else f"occupants.{subject_id}.birth_at_on_year_boundary"
+        if unresolved_boundary_date:
+            time["effective_year_status"] = "requires_confirmation"
+            required_year_input = (
+                "confirmed_effective_birth_year_due_to_undefined_local_clock"
             )
+        elif uncertain_boundary:
+            required_year_input = (
+                "confirmed_effective_birth_year_due_to_boundary_precision"
+            )
+        else:
+            required_year_input = "birth_at_on_year_boundary"
     if year is None:
-        if not missing:
-            missing.append(f"occupants.{subject_id}.birth_at_or_effective_birth_year")
+        missing.append(f"occupants.{subject_id}.{required_year_input}")
     if req.gender_convention is None:
         missing.append(f"occupants.{subject_id}.gender_convention")
-    candidates: List[Dict[str, Any]] = []
+    candidates: list[dict[str, Any]] = []
     if year is not None:
         for convention in (
             [req.gender_convention] if req.gender_convention else ["male", "female"]
@@ -204,7 +193,7 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> Dict[str, Any]
     }
 
 
-def _house_inputs(req: BazhaiRequest) -> Tuple[Optional[House], float, str, str]:
+def _house_inputs(req: BazhaiRequest) -> tuple[House | None, float, str, str]:
     # Assess is a BazhaiRequest subclass. Its optional natal branch describes
     # the same physical house, as enforced by the assessment input contract.
     natal = getattr(req, "xuankong", None)
@@ -220,11 +209,11 @@ def _house_inputs(req: BazhaiRequest) -> Tuple[Optional[House], float, str, str]
     return house, 0, origin, "not_provided_point_input_convention"
 
 
-def bazhai(req: BazhaiRequest) -> Dict[str, Any]:
+def bazhai(req: BazhaiRequest) -> dict[str, Any]:
     house = None
-    house_candidates: List[Dict[str, Any]] = []
+    house_candidates: list[dict[str, Any]] = []
     orientation = None
-    missing: List[str] = []
+    missing: list[str] = []
     declared_house, radius, origin, radius_source = _house_inputs(req)
     if declared_house is not None:
         data = declared_house.model_dump(exclude={"bearing_uncertainty_degrees"})

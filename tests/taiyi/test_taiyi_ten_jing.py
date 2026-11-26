@@ -4,6 +4,7 @@ import asyncio
 import hashlib
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -11,14 +12,17 @@ from fastmcp import Client
 
 import fatebridge.api as api
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_taiyi_day import TaiyiTenJing
 from fatebridge.core.metaphysics.taiyi_ten_jing import key_ten_jing
-from fatebridge.core.output_taiyi_day import TaiyiTenJing
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from scripts.taiyi.audit_taiyi_ten_jing import CORPUS, audit
+from tests.support.transports import SPECS, call_calculation
 
 
-def test_all_annual_remainders_and_locations_preserve_direction_difference_and_absence():
+def test_all_annual_remainders_and_locations_preserve_direction_difference_and_absence() -> (
+    None
+):
     report = audit()
     annual = report["annual_cross_period_reference"]
     assert (
@@ -62,7 +66,9 @@ def test_all_annual_remainders_and_locations_preserve_direction_difference_and_a
         (10155478, "亥", "巳"),
     ],
 )
-def test_twelve_branches_and_opposition_do_not_insert_corner_palaces(count, yang, yin):
+def test_twelve_branches_and_opposition_do_not_insert_corner_palaces(
+    count: int, yang: str, yin: str
+) -> None:
     for reverse, expected in [(False, yang), (True, yin)]:
         data = key_ten_jing(count, reverse)
         h = data["records"]["heaven_time"]
@@ -76,7 +82,9 @@ def test_twelve_branches_and_opposition_do_not_insert_corner_palaces(count, yang
         TaiyiTenJing.model_validate(data)
 
 
-def test_same_phase_comparison_is_explicit_and_does_not_change_arithmetic_to_kun():
+def test_same_phase_comparison_is_explicit_and_does_not_change_arithmetic_to_kun() -> (
+    None
+):
     a, b, other, yin = [
         key_ten_jing(n, y)["records"]["heaven_time"]
         for n, y in [(44, False), (56, False), (45, False), (44, True)]
@@ -95,8 +103,8 @@ def test_same_phase_comparison_is_explicit_and_does_not_change_arithmetic_to_kun
     "mutation", ["drop_direction_disagreement", "drop_unstated_location", "alter_scan"]
 )
 def test_source_freeze_rejects_removing_inconvenient_observations_even_after_rehash(
-    tmp_path, mutation
-):
+    tmp_path: Path, mutation: str
+) -> None:
     fixtures = tmp_path / "fixtures"
     for original in CORPUS.parent.glob("taiyi_jinjing_v*"):
         shutil.copytree(original, fixtures / original.name)
@@ -118,13 +126,17 @@ def test_source_freeze_rejects_removing_inconvenient_observations_even_after_reh
         for row in manifest["source_files"]:
             if row["file"] == p.name:
                 row["sha256"] = hashlib.sha256(p.read_bytes()).hexdigest()
+            else:
+                pass
         manifest["annual_observation_count"] = len(data["observations"])
         (c / "manifest.json").write_text(json.dumps(manifest))
     with pytest.raises(ValueError):
         audit(c)
 
 
-def test_actual_public_board_and_snapshot_distinguish_rule_from_source_observation():
+def test_actual_public_board_and_snapshot_distinguish_rule_from_source_observation() -> (
+    None
+):
     r = calculate_taiyi_analysis(
         analysis_year=1562,
         analysis_month=1,
@@ -151,8 +163,8 @@ def test_actual_public_board_and_snapshot_distinguish_rule_from_source_observati
 
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 def test_source_rule_and_disagreement_are_identical_on_actual_transports(
-    monkeypatch, capsys, key
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], key: str
+) -> None:
     payload = (
         {
             "analysis_year": 1562,
@@ -189,7 +201,7 @@ def test_source_rule_and_disagreement_are_identical_on_actual_transports(
         "API_KEY_AUTHENTICATOR",
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
-    route = "/api/cn/taiyi" if key == "taiyi" else "/api/divination/sanshiunited"
+    route = "/api/taiyi" if key == "taiyi" else "/api/divination/sanshi"
     rest = TestClient(api.app).post(
         route,
         json=payload,
@@ -204,14 +216,14 @@ def test_source_rule_and_disagreement_are_identical_on_actual_transports(
 
     async def native():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                key, {**payload, **opts}, raise_on_error=False
+            result = await call_calculation(
+                client, SPECS[key].tool_name, {**payload, **opts}, raise_on_error=False
             )
             assert not result.is_error, result
             return result.structured_content
 
     mcp = asyncio.run(native())
-    args = [key]
+    args = [SPECS[key].tool_name]
     for name, value in payload.items():
         args += [
             "--" + name.replace("_", "-"),

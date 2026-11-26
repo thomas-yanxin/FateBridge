@@ -5,14 +5,19 @@ from pathlib import Path
 
 import pytest
 
-from scripts.astrodice.audit_astrodice_lunar_precision import digest, validate_reference
+from scripts.astrodice.audit_astrodice_lunar_precision import (
+    audit,
+    digest,
+    validate_reference,
+)
+from scripts.astrodice.audit_astrodice_position_motion import parse_date
 
 ROOT = Path(__file__).resolve().parents[2]
 P = ROOT / "tests/data/astrodice/tables/lunar-wide-protocol.json"
 R = ROOT / "tests/data/astrodice/tables/lunar-wide-reference.json"
 
 
-def test_raw_reference_and_all_centers_remain_frozen_with_missing_endpoints():
+def test_raw_reference_and_all_centers_remain_frozen_with_missing_endpoints() -> None:
     assert (
         digest(P) == "0d5b8f8addd380a21de536cdb731dbfbcb68af6798e25f4c802ca1f7ffe63bbc"
     )
@@ -33,7 +38,7 @@ def test_raw_reference_and_all_centers_remain_frozen_with_missing_endpoints():
 
 
 @pytest.mark.parametrize("problem", ["raw", "time", "rate", "missing", "cohort"])
-def test_reference_tampering_cannot_turn_into_an_acceptance(problem):
+def test_reference_tampering_cannot_turn_into_an_acceptance(problem: str) -> None:
     protocol = json.loads(P.read_text())
     reference = json.loads(R.read_text())
     if problem == "raw":
@@ -52,7 +57,7 @@ def test_reference_tampering_cannot_turn_into_an_acceptance(problem):
         validate_reference(protocol, reference)
 
 
-def test_fractional_boundary_holdout_is_frozen_and_complete():
+def test_fractional_boundary_holdout_is_frozen_and_complete() -> None:
     p = ROOT / "tests/data/astrodice/tables/lunar-fractional-window-protocol.json"
     r = ROOT / "tests/data/astrodice/tables/lunar-fractional-window-reference.json"
     assert (
@@ -67,8 +72,7 @@ def test_fractional_boundary_holdout_is_frozen_and_complete():
     assert not result["incomplete"] and not result["template_failures"]
 
 
-def test_fractional_tt_calendar_labels_preserve_microseconds():
-    from scripts.astrodice.audit_astrodice_position_motion import parse_date
+def test_fractional_tt_calendar_labels_preserve_microseconds() -> None:
 
     assert (
         parse_date("600ad-Jan-01 00:00:00.250000", True) == "0600-01-01T00:00:00.250000"
@@ -78,7 +82,7 @@ def test_fractional_tt_calendar_labels_preserve_microseconds():
         parse_date(" 9600-Jan-01 00:00:00.0000001 ")
 
 
-def test_new_precise_source_holdouts_keep_the_original_horizons_parameters():
+def test_new_precise_source_holdouts_keep_the_original_horizons_parameters() -> None:
     directory = ROOT / "tests/data/astrodice/precise-source-holdout"
     protocol = json.loads((directory / "protocol.json").read_text())
     reference = json.loads((directory / "reference.json").read_text())
@@ -108,8 +112,9 @@ def test_new_precise_source_holdouts_keep_the_original_horizons_parameters():
     assert not result["incomplete"] and not result["template_failures"]
 
 
-def test_precision_audit_grades_the_current_complete_source_derivative(monkeypatch):
-    from scripts.astrodice.audit_astrodice_lunar_precision import audit
+def test_precision_audit_grades_the_current_complete_source_derivative(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     monkeypatch.setenv("SE_EPHE_PATH", str(ROOT / "ephe"))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)

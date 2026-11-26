@@ -9,14 +9,15 @@ import json
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core import heluo_texts
-from fatebridge.core.heluo import _tiaowen, build_snapshot_text, yao_text
-from fatebridge.core.heluo_texts import (
+from fatebridge.core.heluo import heluo_texts
+from fatebridge.core.heluo.heluo import _tiaowen, build_snapshot_text, yao_text
+from fatebridge.core.heluo.heluo_texts import (
     COMMENTARY_PATH,
     commentary_collation_summary,
 )
-from fatebridge.core.heluo_timing import _selected_text
+from fatebridge.core.heluo.heluo_timing import _selected_text
 from fatebridge.core.local_techniques.heluo import build_heluo_result
 from tests.support.heluo_source_facts import (
     CURRENT_HEADERS,
@@ -30,7 +31,7 @@ KEYS = [(g, p) for g in ("乾為天", "坤為地") for p in range(1, 7)]
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"])
-def test_source_excerpts_repair_recorded_inherited_errors(case):
+def test_source_excerpts_repair_recorded_inherited_errors(case) -> None:
     selected = yao_text(case["hexagram"], case["line"])
     for excerpt in case["source_excerpts"]:
         assert excerpt in selected["detail"]
@@ -40,7 +41,7 @@ def test_source_excerpts_repair_recorded_inherited_errors(case):
     assert selected["text_provenance"]["commentary_pdf_pages"] == case["pdf_pages"]
 
 
-def test_identity_keeps_old_twelve_cases_and_six_reused_witnesses():
+def test_identity_keeps_old_twelve_cases_and_six_reused_witnesses() -> None:
     summary = commentary_collation_summary()
     assert summary["sha256"] == hashlib.sha256(COMMENTARY_PATH.read_bytes()).hexdigest()
     assert summary["source_pdf_sha256"] == REFERENCE["source_pdf_sha256"]
@@ -58,7 +59,9 @@ def test_identity_keeps_old_twelve_cases_and_six_reused_witnesses():
 
 
 @pytest.mark.parametrize("gua,pos", KEYS)
-def test_full_text_preserves_conditional_sections_and_does_not_select_them(gua, pos):
+def test_full_text_preserves_conditional_sections_and_does_not_select_them(
+    gua, pos
+) -> None:
     selected = yao_text(gua, pos)
     sections = selected["commentary_sections"]
     ids = [s["section_id"] for s in sections]
@@ -79,7 +82,7 @@ def test_full_text_preserves_conditional_sections_and_does_not_select_them(gua, 
     assert selected["text_provenance"]["automatic_branch_selection"] is False
 
 
-def test_secondary_conditions_stay_with_their_literal_context():
+def test_secondary_conditions_stay_with_their_literal_context() -> None:
     kun = yao_text("坤為地", 1)["commentary_sections"]
     assert "蓋必生於陽月可也" in kun[1]["text"]
     assert "惟陰命則大興家業" in kun[-1]["text"]
@@ -89,7 +92,7 @@ def test_secondary_conditions_stay_with_their_literal_context():
     assert qian[-2]["applicability"] is None
 
 
-def test_kun_four_has_one_annual_branch_without_interleaved_duplicate():
+def test_kun_four_has_one_annual_branch_without_interleaved_duplicate() -> None:
     text = yao_text("坤為地", 4)["detail"]
     assert text.count("歲運逢之") == 1
     assert text.count("在庶俗則經營阻滯") == 1
@@ -98,7 +101,7 @@ def test_kun_four_has_one_annual_branch_without_interleaved_duplicate():
 
 
 @pytest.mark.parametrize("gua,pos", KEYS)
-def test_poem_and_verdict_never_inherit_commentary_source_approval(gua, pos):
+def test_poem_and_verdict_never_inherit_commentary_source_approval(gua, pos) -> None:
     selected = yao_text(gua, pos)
     inherited = _tiaowen()[gua]["yao"][str(pos)]
     if gua in {"乾為天", "坤為地", "水雷屯"}:
@@ -123,7 +126,7 @@ def test_poem_and_verdict_never_inherit_commentary_source_approval(gua, pos):
     )
 
 
-def test_natal_and_timing_use_actual_line_while_preserving_branch_uncertainty():
+def test_natal_and_timing_use_actual_line_while_preserving_branch_uncertainty() -> None:
     chart = {
         "tian": 1,
         "tianGua": "乾",
@@ -150,7 +153,7 @@ def test_natal_and_timing_use_actual_line_while_preserving_branch_uncertainty():
     assert selected["heluo_commentary"] != yao_text("坤為地", 1)
 
 
-def test_same_run_trace_matches_selected_text_source_and_snapshot():
+def test_same_run_trace_matches_selected_text_source_and_snapshot() -> None:
     result = build_heluo_result(
         date="2000-03-08", time="09:33:00", gender="女", use_true_solar_time=False
     )
@@ -174,8 +177,8 @@ def test_same_run_trace_matches_selected_text_source_and_snapshot():
 
 @pytest.mark.parametrize("layer", ["header", "commentary"])
 def test_provenance_hash_identifies_loaded_bytes_even_if_file_changes(
-    layer, monkeypatch, tmp_path
-):
+    layer: str, monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
     """A cached old reading must not borrow a newly edited file's hash."""
     path_name, loader, summary = (
         ("COLLATION_PATH", heluo_texts._collation, heluo_texts.collation_summary)

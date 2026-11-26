@@ -11,34 +11,33 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core import ephemeris_runtime, guolao
-from fatebridge.core import sukuyo_xuanying as xuanying
-from fatebridge.core import sukuyo_zhidu_pointer_scope as scopes
-from fatebridge.core.fixed_star_paths import fixed_star_search_path
+from fatebridge.core import ephemeris_runtime
+from fatebridge.core.guolao import guolao
 from fatebridge.core.local_techniques import suzhan
 from fatebridge.core.requests.divination import SuZhanRequest
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_commentarial_clock import commentarial_boundary_reference
-from fatebridge.core.sukuyo_sources import LoadedSource, load_source
-from fatebridge.core.sukuyo_zhidu_calendar import SOURCE as LEGACY_SOURCE
-from fatebridge.core.sukuyo_zhidu_calendar import zhidu_lines, zhidu_reference
+from fatebridge.core.sukuyo import sukuyo_xuanying as xuanying
+from fatebridge.core.sukuyo import sukuyo_zhidu_pointer_scope as scopes
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_commentarial_clock import (
+    commentarial_boundary_reference,
+)
+from fatebridge.core.sukuyo.sukuyo_sources import LoadedSource, load_source
+from fatebridge.core.sukuyo.sukuyo_zhidu_calendar import SOURCE as LEGACY_SOURCE
+from fatebridge.core.sukuyo.sukuyo_zhidu_calendar import zhidu_lines, zhidu_reference
 from fatebridge.services.divination import calculate_suzhan_analysis
 from scripts.sukuyo.check_sukuyo_xuanying import verify_primary
-from tests.sukuyo.test_sukuyo_transports import (
-    test_calendar_and_relations_across_all_real_transports as _check_surfaces,
-)
-from tests.sukuyo.test_sukuyo_transports import (
-    test_calendar_and_relations_across_all_real_transports as check_surfaces,
-)
-from tests.sukuyo.test_sukuyo_transports import (
-    test_calendar_and_relations_across_all_real_transports as run_transport_check,
+from tests.support.transports import call_calculation, capability_contracts
+from tests.unit_test.fixtures.sukuyo_transports import (
+    AS_OF,
+    SPECS,
+    assert_sukuyo_transport_parity,
 )
 
 
 @pytest.mark.parametrize("relative_to_data", [False, True])
 def test_long_catalogue_plus_operator_path_keeps_coordinates_and_configuration(
-    monkeypatch, tmp_path, relative_to_data
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, relative_to_data: bool
+) -> None:
     # Each directory is a valid native input, but concatenating both exceeds
     # the actual AS_MAXCH-1-13 limit in Swiss 2.10's swe_set_ephe_path().
     # macOS's pytest root happens to be longer than Linux's. Construct each
@@ -76,21 +75,23 @@ def test_long_catalogue_plus_operator_path_keeps_coordinates_and_configuration(
         monkeypatch.setattr(guolao, "DATA", catalogue)
         if relative_to_data:
             monkeypatch.chdir(tmp_path)
+        else:
+            pass
         cwd = Path.cwd()
-        with fixed_star_search_path(catalogue, str(operator)) as search:
-            assert len(os.fsencode(search)) <= 242
-            assert [Path(p).resolve() for p in search.split(os.pathsep)] == [
-                catalogue.resolve(),
-                operator.resolve(),
-            ]
-        actual = calculate_suzhan_analysis(
-            lat="31n13",
-            lon="121e28",
-            date="2025-03-04",
-            time="12:00:00",
-            zone="+08:00",
-            szchart=1,
-        )
+        with monkeypatch.context() as scoped:
+
+            def denied(*args, **kwargs):
+                raise OSError("synthetic platform denies directory links")
+
+            scoped.setattr(Path, "symlink_to", denied)
+            actual = calculate_suzhan_analysis(
+                lat="31n13",
+                lon="121e28",
+                date="2025-03-04",
+                time="12:00:00",
+                zone="+08:00",
+                szchart=1,
+            )
         assert "error" not in actual, actual
         assert actual["astronomy"] == baseline["astronomy"]
         assert actual["chart"] == baseline["chart"]
@@ -102,24 +103,11 @@ def test_long_catalogue_plus_operator_path_keeps_coordinates_and_configuration(
         ephemeris_runtime.configure_ephemeris_path(previous)
 
 
-def test_unsupported_compact_directory_links_fail_explicitly(monkeypatch, tmp_path):
-    long_catalogue = tmp_path / ("a" * 100)
-    long_operator = tmp_path / ("b" * 100)
-
-    def denied(*args, **kwargs):
-        raise OSError("synthetic platform denies directory links")
-
-    monkeypatch.setattr(Path, "symlink_to", denied)
-    with pytest.raises(ValueError, match="Cannot create compact fixed-star paths"):
-        with fixed_star_search_path(long_catalogue, str(long_operator)):
-            pytest.fail("A silent native default would use a different catalogue")
-
-
 @pytest.mark.parametrize("separator", [";", ":"])
 @pytest.mark.skipif(os.name == "nt", reason="Colon is not a Windows directory name")
 def test_literal_catalogue_separator_is_not_a_native_search_list(
-    monkeypatch, tmp_path, separator
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, separator: str
+) -> None:
     catalogue = tmp_path / ("catalogue" + separator + "copy")
     catalogue.mkdir()
     for name in ["sefstars.txt", "sources.json"]:
@@ -155,8 +143,8 @@ def test_literal_catalogue_separator_is_not_a_native_search_list(
 
 @pytest.mark.skipif(os.name == "nt", reason="POSIX separator-bearing directory")
 def test_separator_in_temporary_root_never_escapes_to_native_code(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     from fatebridge.core import fixed_star_paths
 
     temporary = tmp_path / "temporary;root"
@@ -167,15 +155,17 @@ def test_separator_in_temporary_root_never_escapes_to_native_code(
         yield str(temporary)
 
     monkeypatch.setattr(fixed_star_paths, "TemporaryDirectory", use_temporary)
-    with pytest.raises(ValueError, match="native search separator"):
-        with fixed_star_search_path(tmp_path / "catalogue;copy", ""):
+    with pytest.raises(ValueError, match="not a valid Swiss path"):
+        with fixed_star_paths.fixed_star_catalogue(
+            ephemeris_runtime.swe, (guolao.DATA / "sefstars.txt").read_bytes()
+        ):
             pytest.fail("An ambiguous native search path must never be used")
 
 
 @pytest.mark.parametrize("provided", [{}, {"time": None}])
 def test_omitted_and_null_clock_do_not_call_any_astronomy_or_house_builder(
-    monkeypatch, provided
-):
+    monkeypatch: pytest.MonkeyPatch, provided
+) -> None:
     def forbidden(*args, **kwargs):
         raise AssertionError("Unknown clock reached physical sky or chart")
 
@@ -217,20 +207,24 @@ def test_omitted_and_null_clock_do_not_call_any_astronomy_or_house_builder(
 
 
 @pytest.mark.parametrize("clock", ["", " ", "\t"])
-def test_blank_clock_is_invalid_rather_than_imputed_or_accepted_as_unknown(clock):
+def test_blank_clock_is_invalid_rather_than_imputed_or_accepted_as_unknown(
+    clock: str,
+) -> None:
     with pytest.raises(ValueError, match="空字符串"):
         suzhan.build_suzhan_result(date="2024-08-04", time=clock)
 
 
 @pytest.mark.parametrize("clock", ["not-time", "25:00:00", "12:00:60"])
-def test_invalid_known_clock_is_not_downgraded_to_date_only(clock):
+def test_invalid_known_clock_is_not_downgraded_to_date_only(clock: str) -> None:
     result = calculate_suzhan_analysis(
         lat="31n13", lon="121e28", date="2024-08-04", time=clock, zone="+08:00"
     )
     assert "error" in result
 
 
-def test_request_schema_exposes_optional_clock_without_using_example_as_default():
+def test_request_schema_exposes_optional_clock_without_using_example_as_default() -> (
+    None
+):
     schema = SuZhanRequest.model_json_schema()
     assert "time" not in schema["required"]
     assert SuZhanRequest(date="2024-08-04").time is None
@@ -250,8 +244,8 @@ def test_request_schema_exposes_optional_clock_without_using_example_as_default(
     ],
 )
 def test_public_date_only_retains_every_existing_calendar_and_day_branch(
-    basis, date, zone
-):
+    basis: str, date: str, zone: str
+) -> None:
     expected_calendar = calendar_mansion(
         date, zone=zone, calendar_basis=basis, calendar_profile="hinoo_t1299_host27"
     )
@@ -274,9 +268,11 @@ def test_public_date_only_retains_every_existing_calendar_and_day_branch(
         assert not expected_calendar["profile_calculation"][
             "candidate_set_complete_under_declared_reconstructions"
         ]
+    else:
+        pass
 
 
-def test_explicit_textual_half_does_not_establish_a_clock_or_physical_sky():
+def test_explicit_textual_half_does_not_establish_a_clock_or_physical_sky() -> None:
     result = calculate_suzhan_analysis(
         date="2024-08-04",
         zone="+08:00",
@@ -288,7 +284,7 @@ def test_explicit_textual_half_does_not_establish_a_clock_or_physical_sky():
     assert result["chart"] is None and result["astronomy"] is None
 
 
-def test_date_only_does_not_infer_a_natal_mansion_or_a_place():
+def test_date_only_does_not_infer_a_natal_mansion_or_a_place() -> None:
     result = calculate_suzhan_analysis(
         date="2024-08-04",
         zone="+08:00",
@@ -324,7 +320,9 @@ def test_date_only_does_not_infer_a_natal_mansion_or_a_place():
         },
     ],
 )
-def test_omitted_clock_across_all_surfaces(monkeypatch, capsys, extra):
+def test_omitted_clock_across_all_surfaces(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], extra
+) -> None:
     payload = {
         "date": "2024-08-04",
         "zone": "+08:00",
@@ -333,7 +331,7 @@ def test_omitted_clock_across_all_surfaces(monkeypatch, capsys, extra):
         "natal_mansion": "室",
         **extra,
     }
-    check_surfaces(
+    assert_sukuyo_transport_parity(
         monkeypatch,
         capsys,
         "suzhan",
@@ -354,7 +352,9 @@ def test_omitted_clock_across_all_surfaces(monkeypatch, capsys, extra):
     )
 
 
-def test_null_clock_rest_and_native_mcp_equal_cli_omission(monkeypatch, capsys):
+def test_null_clock_rest_and_native_mcp_equal_cli_omission(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     import asyncio
     import json
 
@@ -365,7 +365,6 @@ def test_null_clock_rest_and_native_mcp_equal_cli_omission(monkeypatch, capsys):
     import fatebridge.api as api
     from fatebridge.cli import run
     from fatebridge.mcp_server import create_mcp_app
-    from tests.sukuyo.test_sukuyo_transports import AS_OF, SPECS
 
     spec = SPECS["suzhan"]
     api._reset_runtime_state_for_tests()
@@ -410,11 +409,13 @@ def test_null_clock_rest_and_native_mcp_equal_cli_omission(monkeypatch, capsys):
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            schemas = await client.list_tools()
-            schema = next(t.inputSchema for t in schemas if t.name == spec.tool_name)
+            schemas = (await capability_contracts(client)).values()
+            schema = next(
+                t["input_schema"] for t in schemas if t["tool"] == spec.tool_name
+            )
             assert "time" not in schema.get("required", [])
-            return await client.call_tool(
-                spec.tool_name, {**payload, **options}, raise_on_error=False
+            return await call_calculation(
+                client, spec.tool_name, {**payload, **options}, raise_on_error=False
             )
 
     native = asyncio.run(call())
@@ -494,12 +495,16 @@ def test_null_clock_rest_and_native_mcp_equal_cli_omission(monkeypatch, capsys):
     ],
 )
 def test_actual_transports_deliver_the_added_source_reference(
-    monkeypatch, capsys, key, payload, fields
-):
-    _check_surfaces(monkeypatch, capsys, key, payload, fields)
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    key: str,
+    payload,
+    fields,
+) -> None:
+    assert_sukuyo_transport_parity(monkeypatch, capsys, key, payload, fields)
 
 
-def test_standalone_entry_does_not_inherit_branches_from_later_nested_gloss():
+def test_standalone_entry_does_not_inherit_branches_from_later_nested_gloss() -> None:
     result = commentarial_boundary_reference()
     direct = result["standalone_xuanying_reference"]
     assert direct["selected_juan"] == 8
@@ -517,7 +522,7 @@ def test_standalone_entry_does_not_inherit_branches_from_later_nested_gloss():
     assert not direct["interpretation_scope"]["all_T2216_nested_originals_acquired"]
 
 
-def test_facsimile_selected_fragments_do_not_complete_the_unaccepted_glyph():
+def test_facsimile_selected_fragments_do_not_complete_the_unaccepted_glyph() -> None:
     result = commentarial_boundary_reference()["standalone_xuanying_reference"]
     physical = result["facsimile_reference"]
     assert physical["pdf_pages"] == 302
@@ -529,14 +534,14 @@ def test_facsimile_selected_fragments_do_not_complete_the_unaccepted_glyph():
     assert not physical["full_text_collation_completed"]
 
 
-def test_changed_commentary_cannot_inherit_the_old_entry_binding():
+def test_changed_commentary_cannot_inherit_the_old_entry_binding() -> None:
     reference = commentarial_boundary_reference()
     reference["sources"][0]["capture_sha256"] = "0" * 64
     with pytest.raises(ValueError, match="注疏来源不一致"):
         xuanying.standalone_reference(reference)
 
 
-def test_detached_output_cannot_change_later_reference():
+def test_detached_output_cannot_change_later_reference() -> None:
     first = commentarial_boundary_reference()
     first["standalone_xuanying_reference"]["selected_literal"] = "寅時換日"
     first["standalone_xuanying_reference"]["facsimile_reference"]["glyph_before_night"][
@@ -550,7 +555,7 @@ def test_detached_output_cannot_change_later_reference():
     )
 
 
-def test_complete_reading_keeps_explicit_half_and_both_leap_reconstructions():
+def test_complete_reading_keeps_explicit_half_and_both_leap_reconstructions() -> None:
     calendar = calendar_mansion(
         "0806-07-23",
         "23:59:00",
@@ -574,21 +579,23 @@ def test_complete_reading_keeps_explicit_half_and_both_leap_reconstructions():
 
 
 @pytest.mark.parametrize("name", ["C1163", "T2216", "SINICA_PDF"])
-def test_checker_rejects_substituted_actual_source_bytes(tmp_path, name):
+def test_checker_rejects_substituted_actual_source_bytes(
+    tmp_path: Path, name: str
+) -> None:
     path = tmp_path / name
     path.write_bytes(b"different bytes")
     with pytest.raises(ValueError, match="字节指纹不一致"):
         verify_primary({name: path})
 
 
-def test_offline_checker_does_not_claim_to_have_read_source_bytes():
+def test_offline_checker_does_not_claim_to_have_read_source_bytes() -> None:
     result = verify_primary()
     assert result["actual_captures_rechecked"] == []
     assert not result["facsimile_glyph_uniquely_accepted"]
     assert not result["historical_clock_or_hinoo_priority_established"]
 
 
-def test_modern_default_reports_actual_null_half_and_three_source_identities():
+def test_modern_default_reports_actual_null_half_and_three_source_identities() -> None:
     evidence = day_evidence(calendar_mansion("2024-03-17", "12:00:00", "+08:00"))
     assert evidence["calendar"]["calendar_day_part"] is None
     text = evidence["reading_text"]
@@ -598,7 +605,7 @@ def test_modern_default_reports_actual_null_half_and_three_source_identities():
     assert "尚未认证为同一实物，也未证明谱系独立" in text
 
 
-def test_pair_retains_source_chain_and_unconstrained_matrix():
+def test_pair_retains_source_chain_and_unconstrained_matrix() -> None:
     from fatebridge.services.divination import calculate_sukuyo_compatibility
 
     result = calculate_sukuyo_compatibility(
@@ -625,9 +632,9 @@ def test_pair_retains_source_chain_and_unconstrained_matrix():
 
 @pytest.mark.parametrize("date", ["2024-03-17", "2024-09-25"])
 def test_standalone_source_reference_across_all_real_transports(
-    monkeypatch, capsys, date
-):
-    run_transport_check(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], date: str
+) -> None:
+    assert_sukuyo_transport_parity(
         monkeypatch,
         capsys,
         "suzhan",
@@ -647,7 +654,7 @@ def test_standalone_source_reference_across_all_real_transports(
     )
 
 
-def test_original_source_and_numerical_controls_remain_unchanged():
+def test_original_source_and_numerical_controls_remain_unchanged() -> None:
     reference = zhidu_reference()
     assert hashlib.sha256(LEGACY_SOURCE.read_bytes()).hexdigest() == (
         "b140a869f1b4a13eb8e1ab72061160393118d17f9ee9b3867f08a1a80fc5d3c2"
@@ -680,7 +687,7 @@ def test_original_source_and_numerical_controls_remain_unchanged():
 
 
 @pytest.mark.parametrize("change", ["missing", "zero_for_false", "changed_count"])
-def test_native_cannot_omit_or_coerce_the_current_scope(change):
+def test_native_cannot_omit_or_coerce_the_current_scope(change: str) -> None:
     reference = zhidu_reference()
     if change == "missing":
         reference.pop("apparatus_pointer_scope")
@@ -697,7 +704,9 @@ def test_native_cannot_omit_or_coerce_the_current_scope(change):
 
 
 @pytest.mark.parametrize("change", ["flag", "missing_flag", "corresp", "scope"])
-def test_even_a_new_review_digest_cannot_promote_association_scope(monkeypatch, change):
+def test_even_a_new_review_digest_cannot_promote_association_scope(
+    monkeypatch: pytest.MonkeyPatch, change: str
+) -> None:
     loaded = load_source(scopes.SOURCE)
     data = loaded.data
     if change == "flag":
@@ -720,7 +729,7 @@ def test_even_a_new_review_digest_cannot_promote_association_scope(monkeypatch, 
         zhidu_reference()
 
 
-def test_returned_scope_is_detached_from_next_source_load():
+def test_returned_scope_is_detached_from_next_source_load() -> None:
     first = zhidu_reference()
     original = copy.deepcopy(first["apparatus_pointer_scope"])
     first["apparatus_pointer_scope"]["sources"]["T1509"][
@@ -729,7 +738,7 @@ def test_returned_scope_is_detached_from_next_source_load():
     assert zhidu_reference()["apparatus_pointer_scope"] == original
 
 
-def test_bad_legacy_identity_cannot_be_bound_to_a_valid_scope():
+def test_bad_legacy_identity_cannot_be_bound_to_a_valid_scope() -> None:
     reference = zhidu_reference()
     with pytest.raises(ValueError, match="来源身份"):
         scopes.pointer_count_scope(reference["source_data"], "0" * 64)
@@ -737,15 +746,15 @@ def test_bad_legacy_identity_cannot_be_bound_to_a_valid_scope():
 
 @pytest.mark.parametrize("half", ["first_half", "second_half"])
 def test_scope_and_native_qualification_reach_all_actual_local_adapters(
-    monkeypatch, capsys, half
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], half: str
+) -> None:
     path = (
         "sukuyo.calendar_day.clock_doctrine.source_specific_time_calibration."
         "daybreak_source_comparison.T2217_printed_collation."
         "subsequent_quotation_comparison.upstream_calendar_context."
         "apparatus_pointer_scope"
     )
-    run_transport_check(
+    assert_sukuyo_transport_parity(
         monkeypatch,
         capsys,
         "suzhan",

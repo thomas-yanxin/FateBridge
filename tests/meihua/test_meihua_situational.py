@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.meihua_situational import _reading
+from fatebridge.core.meihua.meihua_situational import _reading
 from fatebridge.core.requests.divination import MeihuaAnalysisRequest
 from fatebridge.core.requests.meihua import MeihuaCastRequest
 from fatebridge.core.requests.meihua_situational import MeihuaResponseContext
@@ -37,6 +37,8 @@ def context(family, category):
                 "reference_label": "虚构占者所在点",
             },
         }
+    else:
+        pass
     return {**BASE, family: [category]}
 
 
@@ -44,7 +46,9 @@ def normalized(value):
     return MeihuaResponseContext.model_validate(value).model_dump(mode="json")
 
 
-def test_frozen_literals_and_precode_correction_are_not_production_expectations():
+def test_frozen_literals_and_precode_correction_are_not_production_expectations() -> (
+    None
+):
     manifest = json.loads((FIXTURE / "source-files.json").read_bytes())
     assert not manifest["implementation_present_at_reference_freeze"]
     assert not manifest["new_lookup_values_from_production"]
@@ -58,7 +62,9 @@ def test_frozen_literals_and_precode_correction_are_not_production_expectations(
 
 
 @pytest.mark.parametrize("body,family,category", CASES)
-def test_all_eight_bodies_and_twenty_three_source_categories(body, family, category):
+def test_all_eight_bodies_and_twenty_three_source_categories(
+    body, family, category
+) -> None:
     result = _reading(
         {"name": body, "element": REF["elements"][body]},
         normalized(context(family, category)),
@@ -83,28 +89,33 @@ def test_all_eight_bodies_and_twenty_three_source_categories(body, family, categ
         assert row["exact_weather_pair"]["matches_actual_body"] == (
             body == REF["weather_exact_preferred"][category]
         )
+    else:
+        pass
     if family == "human":
         assert row["source_symbolic_valence"] == REF["human_symbolic_valence"].get(
             category
         )
+    else:
+        pass
     if family == "weather" and category == "thunder":
         clause = row["unresolved_source_relation_clause"]
         assert clause["selected_quote"] == "體見雷爲比和"
         assert clause["comparison_quote"] == "火見雷為比和"
         assert clause["selected_subject"] == "unresolved"
         assert not clause["used_to_override_five_element_relation"]
+    else:
+        pass
     assert (
         result["ten_response_synthesis"]
         is result["event_time"]
         is result["real_outcome"]
-        is result["success_probability"]
         is None
     )
     assert result["independent_verified_observations"] == 0
     assert not result["changes_casting_or_registered_study_eligibility"]
 
 
-def test_fire_and_thunder_keep_generation_with_unresolved_source_subject():
+def test_fire_and_thunder_keep_generation_with_unresolved_source_subject() -> None:
     out = calculate_meihua_cast(
         casting=CAST, response_context=context("weather", "thunder")
     )
@@ -116,7 +127,7 @@ def test_fire_and_thunder_keep_generation_with_unresolved_source_subject():
     assert "主语接续未裁定" in out["summary"]
 
 
-def test_unknown_context_is_distinct_from_no_context_and_absent_omens():
+def test_unknown_context_is_distinct_from_no_context_and_absent_omens() -> None:
     omitted = calculate_meihua_cast(casting=CAST, question="晴明，老人北来，竹林")
     assert "situational_responses" not in omitted["interpretation"]
     provided = calculate_meihua_cast(casting=CAST, response_context=BASE)
@@ -127,7 +138,7 @@ def test_unknown_context_is_distinct_from_no_context_and_absent_omens():
     assert "缺项" in layer["summary"]
 
 
-def test_multiple_observations_neither_vote_nor_silently_choose_one_trigram():
+def test_multiple_observations_neither_vote_nor_silently_choose_one_trigram() -> None:
     value = {
         **BASE,
         "weather": ["clear", "rain_or_snow"],
@@ -152,7 +163,7 @@ def test_multiple_observations_neither_vote_nor_silently_choose_one_trigram():
     )
 
 
-def test_each_ambiguous_count_candidate_uses_own_actual_body_and_real_paths():
+def test_each_ambiguous_count_candidate_uses_own_actual_body_and_real_paths() -> None:
     out = calculate_meihua_cast(
         casting={"method": "object_count", "count": 11, "hour_branch": "丑"},
         response_context={
@@ -178,7 +189,7 @@ def test_each_ambiguous_count_candidate_uses_own_actual_body_and_real_paths():
     "topic",
     ["general", "planning", "reputation", "wealth", "transaction", "travel", "meeting"],
 )
-def test_all_human_topics_accept_reported_context_without_recasting(topic):
+def test_all_human_topics_accept_reported_context_without_recasting(topic: str) -> None:
     baseline = calculate_meihua_cast(casting=CAST, interpretation_topic=topic)
     changed = calculate_meihua_cast(
         casting=CAST,
@@ -192,7 +203,7 @@ def test_all_human_topics_accept_reported_context_without_recasting(topic):
     )
 
 
-def test_time_input_retains_context_and_uses_its_actual_body():
+def test_time_input_retains_context_and_uses_its_actual_body() -> None:
     inputs = dict(
         analysis_year=2026,
         analysis_month=10,
@@ -227,7 +238,7 @@ def test_time_input_retains_context_and_uses_its_actual_body():
         {"future_date": "2027-01-01"},
     ],
 )
-def test_unknown_categories_fake_confirmations_and_duplicate_votes_fail(change):
+def test_unknown_categories_fake_confirmations_and_duplicate_votes_fail(change) -> None:
     with pytest.raises(ValidationError):
         MeihuaResponseContext.model_validate({**BASE, **change})
 
@@ -247,7 +258,7 @@ def test_unknown_categories_fake_confirmations_and_duplicate_votes_fail(change):
         ),
     ],
 )
-def test_weather_topic_and_contradictory_quiet_facts_rejected(model, extra):
+def test_weather_topic_and_contradictory_quiet_facts_rejected(model, extra) -> None:
     value = context("human", "heard_laughter")
     with pytest.raises(ValidationError):
         model.model_validate(
@@ -276,7 +287,9 @@ def test_weather_topic_and_contradictory_quiet_facts_rejected(model, extra):
         )
 
 
-def test_uncollected_categories_and_single_unknown_modality_do_not_invent_contradictions():
+def test_uncollected_categories_and_single_unknown_modality_do_not_invent_contradictions() -> (
+    None
+):
     quiet = {
         "label": "fixture",
         "quiet_room": True,
@@ -295,7 +308,7 @@ def test_uncollected_categories_and_single_unknown_modality_do_not_invent_contra
     assert "error" not in out
 
 
-def test_source_and_input_mutations_do_not_poison_cached_profile():
+def test_source_and_input_mutations_do_not_poison_cached_profile() -> None:
     value = context("setting", "bamboo_woodland")
     original = copy.deepcopy(value)
     out = calculate_meihua_cast(casting=CAST, response_context=value)
@@ -308,7 +321,7 @@ def test_source_and_input_mutations_do_not_poison_cached_profile():
     ]["situational_responses"]["observations"][0]["trigram_candidates"]
 
 
-def test_weather_negative_result_and_registered_denominator_unchanged():
+def test_weather_negative_result_and_registered_denominator_unchanged() -> None:
     out = calculate_meihua_cast(casting=CAST, interpretation_topic="weather")
     assert "situational_responses" not in out["interpretation"]
     primary = out["interpretation"]["weather"]["research_validation"][
@@ -325,8 +338,8 @@ def test_weather_negative_result_and_registered_denominator_unchanged():
 @pytest.mark.parametrize("body", list(REF["elements"]))
 @pytest.mark.parametrize("kind", ["rain", "snow"])
 def test_precipitation_supplement_separates_mapping_and_exact_rain_preference(
-    body, kind
-):
+    body, kind: str
+) -> None:
     supplement = json.loads(
         (FIXTURE / "precipitation-distinction-supplement.json").read_bytes()
     )
@@ -364,7 +377,9 @@ def test_precipitation_supplement_separates_mapping_and_exact_rain_preference(
 
 
 @pytest.mark.parametrize("body", list(REF["elements"]))
-def test_umbrella_precipitation_never_claims_the_exact_rain_predicate_true(body):
+def test_umbrella_precipitation_never_claims_the_exact_rain_predicate_true(
+    body,
+) -> None:
     layer = _reading(
         {"name": body, "element": REF["elements"][body]},
         normalized(context("weather", "rain_or_snow")),

@@ -10,17 +10,21 @@ import pytest
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro import native_execution, runtime
-from fatebridge.core.human_design import bodygraph
-from fatebridge.core.human_design_joint import JointSnapshotCache
-from fatebridge.core.human_design_personality_color import personality_colors
-from fatebridge.core.human_design_transition import (
+from fatebridge.core.human_design.human_design import bodygraph
+from fatebridge.core.human_design.human_design_joint import JointSnapshotCache
+from fatebridge.core.human_design.human_design_personality_color import (
+    personality_colors,
+)
+from fatebridge.core.human_design.human_design_transition import (
     changed_dependencies,
     dependency_projection,
 )
-from fatebridge.core.human_design_variables import variables_from_activations
+from fatebridge.core.human_design.human_design_variables import (
+    variables_from_activations,
+)
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
-from fatebridge.validation.human_design_joint import verify_joint_snapshot
+from validation.human_design import verify_human_design_reading
+from validation.human_design_joint import verify_joint_snapshot
 
 ROOT = Path(__file__).resolve().parents[2]
 PLAN_PATH = ROOT / "tests/fixtures/human-design-personality-color-plan.json"
@@ -48,7 +52,7 @@ def forbidden(*args, **kwargs):
     raise AssertionError("Pure Color verification called native producer")
 
 
-def test_original_lost_projection_and_independent_taxonomy_are_frozen():
+def test_original_lost_projection_and_independent_taxonomy_are_frozen() -> None:
     assert (
         hashlib.sha256(PLAN_PATH.read_bytes()).hexdigest()
         == "92a8abe35757f99e04ed0896f4595c2345f09607b22a5df0794fd37020965aa6"
@@ -92,13 +96,15 @@ def test_original_lost_projection_and_independent_taxonomy_are_frozen():
 @pytest.mark.parametrize("kind", ["motivation", "view"])
 @pytest.mark.parametrize("color", range(1, 7))
 def test_all_twelve_source_category_mappings_have_actual_local_basis(
-    kind, color, source_runs
-):
+    kind: str, color, source_runs
+) -> None:
     chart = deepcopy(source_runs[PLAN["cases"][0]["id"]]["true"])
     pair = ("Sun", "Earth") if kind == "motivation" else ("NorthNode", "SouthNode")
     for row in chart["activations"]["personality"]:
         if row["body"] in pair:
             row["color"] = color
+        else:
+            pass
     value = personality_colors(chart["activations"])
     r = value[kind]
     assert r["status"] == "computed" and r["color"] == color
@@ -118,8 +124,8 @@ def test_all_twelve_source_category_mappings_have_actual_local_basis(
 
 @pytest.mark.parametrize("bad", [None, True, 0, 7, "3", "mismatch"])
 def test_invalid_or_inconsistent_color_pair_cannot_acquire_a_source_label(
-    bad, source_runs
-):
+    bad: bool | int | str | None, source_runs
+) -> None:
     chart = deepcopy(source_runs[PLAN["cases"][0]["id"]]["true"])
     p = chart["activations"]["personality"]
     earth = next(r for r in p if r["body"] == "Earth")
@@ -138,7 +144,7 @@ def test_invalid_or_inconsistent_color_pair_cannot_acquire_a_source_label(
 
 def test_design_color_and_valid_tone_cannot_substitute_for_personality_color(
     source_runs,
-):
+) -> None:
     chart = deepcopy(source_runs[PLAN["cases"][0]["id"]]["true"])
     for r in chart["activations"]["personality"]:
         r.pop("color", None)
@@ -154,7 +160,7 @@ def test_design_color_and_valid_tone_cannot_substitute_for_personality_color(
 @pytest.mark.parametrize("case", PLAN["cases"], ids=lambda c: c["id"])
 def test_same_arrow_and_legacy_key_do_not_collapse_distinct_real_color_categories(
     case, source_runs
-):
+) -> None:
     a, b = (source_runs[case["id"]][mode] for mode in ("true", "mean"))
     cache = JointSnapshotCache()
     assert a["variables"]["code"] == b["variables"]["code"]
@@ -184,15 +190,21 @@ def test_same_arrow_and_legacy_key_do_not_collapse_distinct_real_color_categorie
         for r in s["activations"]["personality"]:
             if r["body"] in {"Sun", "Earth", "NorthNode", "SouthNode"}:
                 assert type(r["color"]) is int
+            else:
+                pass
 
 
-def test_same_source_color_tone_and_derived_mirror_count_as_one_dependency(source_runs):
+def test_same_source_color_tone_and_derived_mirror_count_as_one_dependency(
+    source_runs,
+) -> None:
     a = deepcopy(source_runs[PLAN["cases"][0]["id"]]["true"])
     b = deepcopy(a)
     for r in b["activations"]["personality"]:
         if r["body"] in {"Sun", "Earth"}:
             r["color"] = r["color"] % 6 + 1
             r["tone"] = r["tone"] % 6 + 1
+        else:
+            pass
     assert (
         changed_dependencies(
             dependency_projection(a["activations"]),
@@ -210,8 +222,8 @@ def test_same_source_color_tone_and_derived_mirror_count_as_one_dependency(sourc
 @pytest.mark.parametrize("mode", PLAN["modes"])
 @pytest.mark.parametrize("empty_files", [False, True])
 def test_real_public_cases_both_conventions_and_backends_are_fully_replayed(
-    case, mode, empty_files, monkeypatch, tmp_path
-):
+    case, mode, empty_files: bool, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path if empty_files else ROOT / "ephe"))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     run = execute_tool(SPEC, SPEC.request_model(**case["input"], node_mode=mode))
@@ -225,6 +237,8 @@ def test_real_public_cases_both_conventions_and_backends_are_fully_replayed(
         assert run["node_convention_comparison"]["personality_colors_changed"] is True
         assert run["node_convention_comparison"]["variable_changed"] is False
         assert "四箭头编码虽相同" in run["interpretation"]["personality_color_meaning"]
+    else:
+        pass
     monkeypatch.setattr(runtime, "ephemeris_call", forbidden)
     monkeypatch.setattr(native_execution, "calculate", forbidden)
     check = verify_human_design_reading(run)
@@ -246,8 +260,8 @@ def complete():
 
 @pytest.mark.parametrize("bad", PLAN["negative_receipts"])
 def test_rehashed_false_color_labels_states_and_projection_witnesses_rejected(
-    complete, bad, monkeypatch
-):
+    complete, bad, monkeypatch: pytest.MonkeyPatch
+) -> None:
     run = deepcopy(complete)
     value = run["variables"]["personality_colors"]
     if bad == "wrong_label":
@@ -271,6 +285,8 @@ def test_rehashed_false_color_labels_states_and_projection_witnesses_rejected(
         for r in s["activations"]["personality"]:
             if r["body"] in {"NorthNode", "SouthNode"}:
                 r["color"] = r["color"] % 6 + 1
+            else:
+                pass
         chart = {
             "activations": s["activations"],
             "bodygraph": bodygraph(

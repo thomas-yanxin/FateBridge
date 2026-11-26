@@ -2,8 +2,21 @@
 
 from typing import Any, Dict
 
+from fatebridge.core.metaphysics.common import SEXAGENARY_CYCLE, SEXAGENARY_INDEX
+from fatebridge.core.metaphysics.liureng_course_conditions_convention import (
+    CONVENTION,
+)
+from fatebridge.core.metaphysics.liureng_cross_harmony_convention import (
+    CONVENTION as CROSS_HARMONY_CONVENTION,
+)
+from fatebridge.core.metaphysics.liureng_day_placements_convention import (
+    CONVENTION as DAY_PLACEMENT_CONVENTION,
+)
+from fatebridge.core.metaphysics.ren_gods import TANYUAN_TRANSCRIPTION
 from fatebridge.core.metaphysics.ren_sources import (
     JINGWEI_SOURCE,
+    JINKOU_RELATIONS_SOURCE,
+    JINKOU_SCAN_URL,
     JINKOU_SOURCE,
     LIUREN_SOURCE,
     TANYUAN_SCAN_SHA256,
@@ -45,9 +58,6 @@ def ruleset_metadata(
         result["conventions"][
             "natal_course"
         ] = "次客法本命另课以已确认本命支为派生地分，保留本次日时月将及昼夜选择，与原地分和行年另课分列；未知不补造，不自动换将换日，不认证综合取用或现实应验"
-        from fatebridge.core.metaphysics.jinkou_pattern_tables import JINKOU_SCAN_URL
-
-        from .jinkou_relations import SOURCE_URL as JINKOU_RELATIONS_SOURCE
 
         result["conventions"][
             "month_building"
@@ -97,7 +107,6 @@ def ruleset_metadata(
         )
     else:
         result["version"] = "1.16.1"
-        from .ren_gods import TANYUAN_TRANSCRIPTION
 
         result["conventions"][
             "selection_evidence"
@@ -138,12 +147,6 @@ def ruleset_metadata(
         result["source_title"] += "、季节五态与本空条件"
         result["source_title"] += "、类神阴神"
         result["source_title"] += "、三种传序课体"
-        from fatebridge.core.metaphysics.liureng_course_conditions_convention import (
-            CONVENTION,
-        )
-        from fatebridge.core.metaphysics.liureng_day_placements_convention import (
-            CONVENTION as DAY_PLACEMENT_CONVENTION,
-        )
 
         result["source_title"] += "、课体纲要条件"
         result["source_title"] += "、课体可实现条件校核"
@@ -154,9 +157,6 @@ def ruleset_metadata(
         result["conventions"]["course_conditions"] = CONVENTION
         result["source_title"] += "、干支加临课体"
         result["conventions"]["day_placement_patterns"] = DAY_PLACEMENT_CONVENTION
-        from fatebridge.core.metaphysics.liureng_cross_harmony_convention import (
-            CONVENTION as CROSS_HARMONY_CONVENTION,
-        )
 
         result["source_title"] += "、交车六合条件"
         result["conventions"]["cross_harmony"] = CROSS_HARMONY_CONVENTION
@@ -191,7 +191,6 @@ def ruleset_metadata(
 
 def xun_dun_stems(day_ganzhi: str) -> Dict[str, str]:
     """The ten actual xun stems; the two empty branches have no stem."""
-    from .common import SEXAGENARY_CYCLE, SEXAGENARY_INDEX
 
     head = SEXAGENARY_INDEX[day_ganzhi] // 10 * 10
     return {pair[1]: pair[0] for pair in SEXAGENARY_CYCLE[head : head + 10]}

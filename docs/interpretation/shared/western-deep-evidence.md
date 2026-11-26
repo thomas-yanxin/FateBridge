@@ -8,7 +8,7 @@
 
 宫头反序、折返或非常接近时，连同 `house_axis_convention` 读取同run的 `house_position_projection`；预测合同在对应 `calculation_basis` 下读取。R／C的 `precision.checks` 并列实际输入热带黄经、原生值、交付值、工作精度和修正方式。预测模块的派生角点与宫头在显示转换前保留原始热带投影输入；不要从恒星黄道显示角度反加偏移去替换记录输入。它按黄纬0°的几何平面复核，不能解释成计入真实黄纬的空间落宫；0.001″是声明的相位边界余量，不是占星容许度。交付值可能不同于原生的黄经邻近宫头吸附结果，不能用原生值覆盖；字段中的物理误差未知仍须保留，检查行数与重复输入不是预测样本数。R的地理极点状态 `native_geographic_pole_convention_not_requalified` 只保留原生约定，不表示已校定唯一几何分宫。
 
-T投影的 `fatebridge_topocentric_zero_ecliptic_latitude_v1` 按实际纬度求解位线，已替换原生逆算中±89.999°的纬度钳制及旋转纬度残差停止条件。以实际地平半球和东西分支选支，读取每条 `precision.checks.topocentric_branch` 的实际纬度、所选根和全部该物理象限内的候选；候选不止一个时必须说明选支约定，不能说几何唯一。交付相位采用明确的前移0.001″政策，区别于原生的黄经宫头吸附；不要拿原生整数宫头覆盖交付宫号。精确地理极点仍是另列的原生极限约定，未计作独立数值通过。这里只修复实际选用的T投影，顺行宫头采用黄经区间的既有选择仍保留；黄纬仍为0°，不能解读为含星体实际黄纬的空间落宫，也不能称Polich／Page原典全套技法已通过。分支定义见[极区天球四轴与制宫分支](../../western-astrology.md#极区天球四轴与制宫分支)。
+T投影的 `fatebridge_topocentric_zero_ecliptic_latitude_v2` 按实际纬度求解位线，已替换原生逆算中±89.999°的纬度钳制及旋转纬度残差停止条件。以实际地平半球和东西分支选支，读取每条 `precision.checks.topocentric_branch` 的实际纬度、所选根和全部该物理象限内的候选；候选不止一个时必须说明选支约定，不能说几何唯一。未加偏移的连续几何相位决定半开宫归属，binary64 交付保持该归属；不采用先前局部 +0.001″呈现偏移，也不采用原生黄经邻近宫头吸附。不要拿原生整数宫头覆盖交付宫号。精确地理极点仍是另列的原生极限约定，未计作独立数值通过。这里只修复实际选用的T投影，顺行宫头采用黄经区间的既有选择仍保留；黄纬仍为0°，不能解读为含星体实际黄纬的空间落宫，也不能称Polich／Page原典全套技法已通过。分支定义见[极区天球四轴与制宫分支](../../western-astrology.md#极区天球四轴与制宫分支)。 固定总体包含 63,264 条主样本、16 条端点和原有 2 条精确反足点；2,208 条极点仅保留原生约定。独立区间参考不等于物理误差、预测能力或全域 SOTA 认证。 工作精度记录随实际输入在基点附近的尺度增加，表示私有数值上下文的求解过程；工作位数本身不是准确性分数，仍须满足独立参考的相位、半开归属与分支门槛。
 
 黄道与地平面近重合时，按实际 `angle_definition` 区分高度敏感的交线与数值未解析的后端约定；已作高精度复核仍不能消除出生时地与角度模型误差。Placidus的 `house_cusp_scope` 若为 `placidus_horizon_endpoints1_7_checked_intermediate_native_time_fraction_cusps_retained`，仅表示ASC／DESC端点已复核，中间半弧宫头保留原生结果。不能称为全套Placidus原典认证，也不能因另一软件固定迭代输出不同而直接改盘；原始失败门槛和Lilly原例未通过状态继续保留。
 
@@ -16,11 +16,11 @@ T投影的 `fatebridge_topocentric_zero_ecliptic_latitude_v1` 按实际纬度求
 
 ## 本命中的古典细问
 
-`classical.source_profile=mixed_dorothean_egyptian_lilly` 表示多来源组合，不能整体归给某一原典。点名 Ptolemy 时读 `classical.ptolemy` 的作者、Robbins 1940 版本、`chapters/status` 及实际星体关系；目前覆盖 I.7、I.13–19 与 III.10 的福点算式，恒星黄道不适用。I.18 水象为火星主掌，并列昼金星／夜月亮共治，不改写成 Dorotheus 三分表。`classical.ptolemy.lot_of_fortune` 按 Robbins 主文昼夜同用 `ASC + Moon − Sun`，与原有混合传统夜盘反转的 `classical.lots.fortune` 分别解释；核对实际 `formula/longitude/source_url`。不补原典未返回的界表、擢升度数或寿命判断。`astro_chart` 公开的 `evidence_views.ptolemy` 可按需取此层。
+`classical.source_profile=mixed_dorothean_egyptian_lilly` 表示多来源组合，不能整体归给某一原典。点名 Ptolemy 时读 `classical.ptolemy` 的作者、Robbins 1940 版本、`chapters/status` 及实际星体关系；目前覆盖 I.7、I.13–19 与 III.10 的福点算式，恒星黄道不适用。I.18 水象为火星主掌，并列昼金星／夜月亮共治，不改写成 Dorotheus 三分表。`classical.ptolemy.lot_of_fortune` 按 Robbins 主文昼夜同用 `ASC + Moon − Sun`，与原有混合传统夜盘反转的 `classical.lots.fortune` 分别解释；核对实际 `formula/longitude/source_url`。不补原典未返回的界表、擢升度数或寿命判断。`astrology_chart` 公开的 `evidence_views.ptolemy` 可按需取此层。
 
-昼夜由太阳中心真实地平高度确定，整宫第1／7宫不能直接决定昼夜。核对 `chart_profile.time_scale/horizon_method/sect_convention`；未来闰秒沿用假设见 `future_leap_seconds_assumed_unchanged`。普通西占保持民用钟时默认值，不能用真太阳时重置追求“更准”。`interpretation_evidence` 是确定性现代象征模板的依赖路径；需要时绑定同 run 原始回执核对，不能当成 Ptolemy 原文或现实预测证明。范围和来源见[西方占星验证说明](../../western-astrology.md)。
+昼夜由太阳中心真实地平高度确定，整宫第1／7宫不能直接决定昼夜。核对 `chart_profile.time_scale/horizon_method/sect_convention`；未来闰秒沿用假设见 `future_leap_seconds_assumed_unchanged`。普通西占保持民用钟时默认值，不能用真太阳时重置追求“更准”。解读依据应指向同 run 的实际星体、宫位及原典规则字段。范围和来源见[西方占星验证说明](../../western-astrology.md)。
 
-原典的 `classical.ptolemy.sign_relationships` 依据 I.13–16，按星座关系返回相位、命令／服从、相互注视及离隔；I.16先排除其他亲缘关系。现代度数相位另看 `chart_profile.aspect_policy/aspect_evidence`，不把两层相位名称直接互换。`interpretation.original_text_relations` 为原典关系说明，其余现代模板有各自 `policy_id`。元素／模式并列、南北交点不计入本体统计的口径都应保留；最小偏离度不称为最强相位。
+原典的 `classical.ptolemy.sign_relationships` 依据 I.13–16，按星座关系返回相位、命令／服从、相互注视及离隔；I.16先排除其他亲缘关系。现代度数相位另看 `chart_profile.aspect_policy/aspect_evidence`，不把两层相位名称直接互换。Agent 按实际规则说明其传统含义。元素／模式并列、南北交点不计入本体统计的口径都应保留；最小偏离度不称为最强相位。
 
 日月返照取分析时刻之前最近一次，读取实际 `return_datetime/return_datetime_utc/solver`；`residual_arcseconds` 表示数值零点残差，不能当成现实事件时刻误差或预测置信度。推运的 `calculation_basis` 交代实际星历与时间尺度。半弧主限在恒显／恒隐点无定义时应保留错误，不由模型替换纬度或制造落点；已有近似方法标签继续保留。
 
@@ -43,9 +43,7 @@ T投影的 `fatebridge_topocentric_zero_ecliptic_latitude_v1` 按实际纬度求
 
 朔望的`ephemeris_source`描述整次搜索及显示调用，出生历元的`chart_profile.planetary_models`不能替代它。`models_stable=false`时须说明搜索或显示发生星历模型切换；有效结果仍保留，但不声称来源一致、根附近连续性已证或残差等于天文精度。调用次数、文件名称和模型名称均不是独立观测或原典验收。来源完整性错误不能解释为“没有出生前朔望”。
 
-朔望的日期表示另读`utc_representation`。`datetime_representable=false`只限制Python日期载体；实际返回的TT／UT1、经度和总主星参与点仍应解释。扩展标签中的天文年0对应纪元前1年，不是公元1年，也不扩大出生输入范围。`event_datetime_utc`是标签字符串，可能含扩展年份或闰秒；历史调整时也可能没有唯一民用标签。1960年前UTC命名的历史载体按模型UT1读取，不冒充原子UTC；日期显示限制不等于没有朔望。
-| 明确问恒星合某星／角度 | `fixed_stars`、该点实际落点及 `chart_profile.fixed_stars` | 先核对实际 `status/model_id/julian_day_tt/longitude_frame/orb_limit/earth_ephemeris_model`，再逐条读 `star/cn/point/orb/star_longitude/star_latitude/nature_components`。当前生产层以20颗SIMBAD ICRS星表观测量传播自行、视差与径向速度，再计算本次地心视位置；不能说成仅用固定黄经线性岁差推进。合相只比较同黄道黄经，黄纬不参与命中，因此不是球面近合、掩星或赤纬平行。`status=unavailable`的空表表示未计算，`computed`的空表表示本次目录／容许度内无命中；均不代表完整天空。最紧一条未必最贴主题，不把传统星性当灾祸事件 |
-| 明确问出生行星日／行星时 | `planetary_hours`、`person_info` | 读 `is_day/day_ruler/hour_ruler/hour_number`，这是按出生地日出日落划分的不等时辰。缺星历或极昼夜可能为 `null`；不改用民用整点凑一颗主星，也不把出生行星时说成未来活动的吉时 |
+朔望的日期表示另读`utc_representation`。`datetime_representable=false`只限制Python日期载体；实际返回的TT／UT1、经度和总主星参与点仍应解释。扩展标签中的天文年0对应纪元前1年，不是公元1年，也不扩大出生输入范围。`event_datetime_utc`是标签字符串，可能含扩展年份或闰秒；历史调整时也可能没有唯一民用标签。1960年前UTC命名的历史载体按模型UT1读取，不冒充原子UTC；日期显示限制不等于没有朔望。 | 明确问恒星合某星／角度 | `fixed_stars`、该点实际落点及 `chart_profile.fixed_stars` | 先核对实际 `status/model_id/julian_day_tt/longitude_frame/orb_limit/earth_ephemeris_model`，再逐条读 `star/cn/point/orb/star_longitude/star_latitude/nature_components`。当前生产层以20颗SIMBAD ICRS星表观测量传播自行、视差与径向速度，再计算本次地心视位置；不能说成仅用固定黄经线性岁差推进。合相只比较同黄道黄经，黄纬不参与命中，因此不是球面近合、掩星或赤纬平行。`status=unavailable`的空表表示未计算，`computed`的空表表示本次目录／容许度内无命中；均不代表完整天空。最紧一条未必最贴主题，不把传统星性当灾祸事件 | | 明确问出生行星日／行星时 | `planetary_hours`、`person_info` | 读 `is_day/day_ruler/hour_ruler/hour_number`，这是按出生地日出日落划分的不等时辰。缺星历或极昼夜可能为 `null`；不改用民用整点凑一颗主星，也不把出生行星时说成未来活动的吉时 |
 
 对资源、关系等普通问题，只有这层能补独立信息时才取。气质／身体部位的传统对应不作为诊断或器官状态；不因某星、恒星或点位带有传统凶名就预告灾祸。
 
@@ -115,7 +113,7 @@ Lahiri 的交付日速跟随实际恒星黄道零点的运动，不能复制热�
 
 ## 汉堡本命子午宫表
 
-用户点名 Witte 1923 本命子午宫表时，按公开 `evidence_views.meridian_houses` 读取 `midpoint_analysis.meridian_houses` 与同 run 生时样点。宫头沿赤经每30°等分，黄道上一般不等宽；第一宫宫头为赤道上升点，不能替换 `factors` 的实际 ASC，也不能把 `base_chart` 所选宫制说成 X。核对实际 `profile.native_angle_julian_day_tt/true_obliquity/ayanamsha_apparent`；角度后端的 TT 与共享 TT 分列，差值不是测得的出生钟时误差。`physical_ascendant` 仍须连同基础盘的极点／地平退化约定读取，子午宫头本身不要求解析唯一ASC。用户确认的生时误差逐样点重算宫头；未知误差不是零，样点范围不是连续误差界或概率。宫头定义与原表范围见[子午宫表几何复核](../../../scripts/western/audit_meridian_house_geometry.py)；新增天体落宫另读下段，不补完整推运钥匙、原书关键词或现实预测。
+用户点名 Witte 1923 本命子午宫表时，按公开 `evidence_views.meridian_houses` 读取宫头和同 run 生时样点。宫头沿赤经每 30° 等分，黄道上一般不等宽。第一宫宫头为赤道上升点，实际 ASC 和基础宫制各从 `factors` 和 `base_chart` 读取。`physical_ascendant` 须连同基础盘的极点或地平退化约定读取。宫头几何使用明确传入的共享 TT 和 UT1。重放时，用该历元的交角求赤经面与黄道的交点，加源黄道原点，再减 Lahiri 视偏移。名义值见 `profile`，各样点的原点见 `time_sensitivity.samples` 的 `meridian_source_ecliptic_longitude_origin`。生时误差未知时保持 `not_assessed`，已确认的误差只给出有限样点范围。宫头定义与原表范围见[子午宫表几何复核](../../../scripts/western/audit_meridian_house_geometry.py)。
 
 要看天体在子午宫的位置，选公开 `evidence_views.meridian_placement`，读取同run `factor_placement` 的输入黄经／黄纬、赤经、`house/house_position`、种类与模型。它用完整方向投影，`longitude_only_control_house`只是零黄纬反事实诊断；不能按黄经宫头区间另算后覆盖结果。物理天体、解析交点与数学假设点分别解释，不把19因素当19颗实测行星；3个角点参考未纳入。`factor_ayanamsha_apparent`取天体同历元，制宫交角历元另列，两者不能混用。数值极点未定不补RA0或宫1。
 
@@ -161,7 +159,7 @@ Lahiri 的交付日速跟随实际恒星黄道零点的运动，不能复制热�
 
 公开十二宫请求尚未提供 Gauquelin 的36分区技法。已识别的 `G`／Gauquelin 名称现在会在请求校验时报 `unsupported_house_system`，不再回落普通宫制；说明及三端取证。不要通过改传 Placidus 绕过拒绝，也不能与 Witte 十二个赤经子午宫混称。历史 CFEPP 离线复算的1053条原分区一致是计算比较，不是职业预测命中；13条主算法差异、897条未完成独立钟时核对及无前瞻验证状态须保留。需要这部分依据时读历史分区审计，不自行补出生秒数、折射或完整原典验收。
 
-卜卦／择日可按明确需求选 `ut1_source=iers_c04`；默认仍为 `swiss_delta_t`。先读 `ut1_input` 字段卡中的 `clock_conversion.ut1_reference` 与盘面 `calculation_basis.earth_rotation`：固定日值覆盖1962-01-01 00:00至2026-09-19 00:00 UTC，需要UT1的起盘、宫位及地平时刻超出范围会拒绝；地心TT黄经事件不需要试算时刻的UT1，可在不外推UT1的情况下跨边界搜索。按实际事件 `status` 解释可用性，不能仅因事件超出C04边界就说它未知；真实失败仍不能当无相位／空亡。已发布日值与日间线性插值分开；只应用UT1，极移、CIP偏移、日内潮汐未应用，形式标准差不能说成精确置信界。来源标识和数值通过不证明原始出生钟时准确、原典完整或现实预测有效。模型路径引用为null，不能据此说工具失败。
+卜卦／择日可按明确需求选 `ut1_source=iers_c04`；默认仍为 `swiss_delta_t`。先读 `ut1_input` 字段卡中的 `clock_conversion.ut1_reference` 与盘面 `calculation_basis.earth_rotation`：固定日值覆盖1962-01-01 00:00至2026-09-19 00:00 UTC，需要UT1的起盘、宫位及地平时刻超出范围会拒绝；地心TT黄经事件不需要试算时刻的UT1，可在不外推UT1的情况下跨边界搜索。按实际事件 `status` 解释可用性，不能仅因事件超出C04边界就说它未知；真实失败仍不能当无相位／空亡。已发布日值、去还Z62的四点插值及日内修正分别读取；base已含恢复的Z62，不能再加一次说明字段。时间receipt的极移／CPO applied=False只限定时间评估本身，实际几何应用看 `earth_rotation.terrestrial_orientation`；1984年前CPO未准入不补测量零。形式sigma与solver残差均不是完整物理置信界，当前有限依据见[现代C04定义](../../western-astrology.md#modern-c04-eop-round40)。来源标识和数值通过不证明原始出生钟时准确、原典完整或现实预测有效。模型路径引用为null，不能据此说工具失败。
 
 
 宫制选择按实际返回的 canonical 字母和名称解释。`Alcabitus`／`Alcabitius` 均取B，`Whole Signs`取W，`Axial Rotation`取X，Swiss等宫字母E等价规范为A；I与i保留为不同Sunshine模型。未知／空白名字、布尔值和浮点编号现在报参数错误，不再默认成另一宫制。`hsys`为0..8共用编号，仍须遵守各技法额外限制；省略参数的既有默认值保留。收到`invalid_house_system`或`invalid_house_code`时修正该选择，不把错误解释为命盘结论，也不改传P后沿用用户原来的流派名称。源码与数值反例。

@@ -23,7 +23,7 @@ REFERENCE = AUDIT.reference()
 CASES = REFERENCE["cases"]
 
 
-def test_all_frozen_chronology_cases_keep_the_complete_denominator_and_scope():
+def test_all_frozen_chronology_cases_keep_the_complete_denominator_and_scope() -> None:
     report = AUDIT.audit()
     assert (
         report["expected_count"]
@@ -39,7 +39,7 @@ def test_all_frozen_chronology_cases_keep_the_complete_denominator_and_scope():
     assert not report["classical_acceptance_passed"]
 
 
-def test_frozen_reference_edit_cannot_turn_into_a_pass(tmp_path):
+def test_frozen_reference_edit_cannot_turn_into_a_pass(tmp_path: Path) -> None:
     corpus = tmp_path / "reference"
     shutil.copytree(AUDIT.CORPUS, corpus)
     p = corpus / "reference.json"
@@ -53,8 +53,8 @@ def test_frozen_reference_edit_cannot_turn_into_a_pass(tmp_path):
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
 @pytest.mark.parametrize("project", [False, True])
 def test_birth_instants_chronology_and_failures_agree_across_transports(
-    case, project, surface_calls
-):
+    case, project: bool, surface_calls
+) -> None:
     spec = SPECS["liureng_runyear"]
     fields = ["runyear", "liureng.calendar_policy.civil_instant_utc"]
     params = [("response_char_limit", "0")]
@@ -73,6 +73,8 @@ def test_birth_instants_chronology_and_failures_agree_across_transports(
             *fields,
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec, case["input"], params=params, options=options, flags=flags
     )
@@ -83,7 +85,19 @@ def test_birth_instants_chronology_and_failures_agree_across_transports(
         for body in bodies:
             assert expected["error"] in body["error"]
             assert "runyear" not in body and "liureng" not in body
+            if expected["error"] == "birth_utc_offset":
+                (issue,) = body["issues"]
+                assert issue["path"] == "birth_utc_offset"
+                if case["id"] == "B09":
+                    assert issue["code"] == "utc_offset_mismatch"
+                    assert issue["constraints"]["expected"] == ["-04:00", "-05:00"]
+                else:
+                    assert issue["code"] == "invalid_utc_offset"
+            else:
+                pass
         return
+    else:
+        pass
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     assert business(bodies[0]) == business(bodies[1]) == business(bodies[2])
     internal = AUDIT.calculate(case["input"])["runyear"]["birth_civil_clock"]
@@ -97,6 +111,8 @@ def test_birth_instants_chronology_and_failures_agree_across_transports(
             )
         assert internal["timezone_rules"]["package_version"] == pytz.__version__
         assert internal["timezone_rules"]["iana_version"] == pytz.OLSON_VERSION
+    else:
+        pass
     for body in bodies:
         runyear = body["runyear"]
         clock = runyear["birth_civil_clock"]
@@ -116,9 +132,11 @@ def test_birth_instants_chronology_and_failures_agree_across_transports(
         if not project:
             assert expected["birth_instant_utc"] in body["snapshot_text"]
             assert "出生时间未做太阳钟偏移" in body["snapshot_text"]
+        else:
+            pass
 
 
-def test_birth_fold_does_not_move_analysis_board_or_solar_instant():
+def test_birth_fold_does_not_move_analysis_board_or_solar_instant() -> None:
     base = dict(CASES[0]["input"])
     outputs = [
         AUDIT.calculate({**base, "birth_utc_offset": offset})
@@ -133,7 +151,9 @@ def test_birth_fold_does_not_move_analysis_board_or_solar_instant():
     assert outputs[0]["runyear"]["age"] == outputs[1]["runyear"]["age"]
 
 
-def test_birth_utc_order_is_preserved_with_analysis_solar_clock_and_unknown_gender():
+def test_birth_utc_order_is_preserved_with_analysis_solar_clock_and_unknown_gender() -> (
+    None
+):
     case = CASES[3]
     plain = AUDIT.calculate(case["input"])
     solar = AUDIT.calculate(

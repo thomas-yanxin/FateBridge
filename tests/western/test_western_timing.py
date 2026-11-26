@@ -5,6 +5,8 @@ from pathlib import Path
 
 import pytest
 
+from fatebridge.core.astro.tt_epoch import TTInstant
+from fatebridge.core.astro.ut1_epoch import UT1Instant
 from fatebridge.core.ephemeris_runtime import swe
 from fatebridge.core.predictive import profections, progressions, transit
 from fatebridge.core.predictive._common import (
@@ -13,7 +15,6 @@ from fatebridge.core.predictive._common import (
     build_lot_payloads,
     build_natal_subject,
     build_predictive_birth_info,
-    calculate_age_years_int,
     normalize_angle,
     point_attribute_name,
 )
@@ -31,6 +32,8 @@ from fatebridge.core.predictive.zodiacal_releasing import (
 )
 from fatebridge.services.astrology import calculate_core_chart_analysis
 from fatebridge.services.western_timing import calculate_western_timing_analysis
+from fatebridge.services.western_timing_tools import calculate_timing_tool
+from fatebridge.utils.civil_time import utc_calendar
 from fatebridge.utils.timezones import parse_timezone_name
 
 PREDICTIVE_TIME_REFERENCE = json.loads(
@@ -53,8 +56,8 @@ def predictive_clock_operands() -> NativeSubject:
         tz_str="UTC",
         iso_formatted_utc_datetime=None,
         iso_formatted_local_datetime=None,
-        julian_day=2451545,
-        julian_day_tt=2451545,
+        ut1=UT1Instant.from_float(2451545),
+        tt=TTInstant.from_float(2451545.0),
         houses_system_identifier="P",
         zodiac_type="Tropic",
         sidereal_mode=None,
@@ -78,8 +81,8 @@ def predictive_clock_operands() -> NativeSubject:
     "case", TRANSIT_EXACT_ORB_REFERENCE["cases"], ids=lambda c: c["id"]
 )
 def test_transit_exact_hits_match_flint_supplied_angles(
-    case, predictive_clock_operands, monkeypatch
-):
+    case, predictive_clock_operands, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """FLINT membership over supplied angles, with only chart casting adapted."""
     subjects = []
     for sun, other in [
@@ -131,10 +134,14 @@ def test_transit_exact_hits_match_flint_supplied_angles(
     assert result["orb_limit"] == case["orb_limit"]
     if sun_hits:
         assert sun_hits[0]["orb"] == case["delivered_orb"]
+    else:
+        pass
 
 
 def _assert_predictive_reference_clock(moment: datetime, reference):
-    assert moment.astimezone(timezone.utc) == datetime.fromisoformat(reference["UTC"])
+    assert moment.astimezone(timezone.utc) == datetime.fromisoformat(
+        reference["UTC"].replace("Z", "+00:00")
+    )
     assert (
         moment.replace(tzinfo=None).isoformat(timespec="microseconds")
         == reference["local_plain"]
@@ -142,12 +149,90 @@ def _assert_predictive_reference_clock(moment: datetime, reference):
     assert moment.utcoffset().total_seconds() == reference["offset_seconds"]
 
 
+@pytest.mark.parametrize("tool", ["profection", "givenyear"])
+def test_generated_anniversary_requires_a_defined_local_clock(tool: str) -> None:
+    for month, hour, minute in ((7, 12, 0), (11, 3, 30)):
+        result = calculate_timing_tool(
+            tool,
+            birth_year=1993,
+            birth_month=month,
+            birth_day=1,
+            birth_hour=hour,
+            birth_minute=minute,
+            birth_longitude=105,
+            birth_latitude=0,
+            birth_timezone="Antarctica/Vostok",
+            house_system="W",
+            analysis_year=1994,
+            analysis_month=11,
+            analysis_day=10,
+            analysis_hour=12,
+            analysis_minute=0,
+        )
+        assert result["status_code"] == 422
+        assert result["issues"] == [
+            {"path": "request", "code": "unresolved_timezone_offset"}
+        ]
+        assert "周年钟时" in result["error"]
+
+
+@pytest.mark.parametrize(
+    "tool, options, path, expected",
+    [
+        (
+            "firdaria",
+            {"firdaria_year_basis": "fixed_365_2425"},
+            ("current_sub", "start"),
+            "1994-03-15T19:20:24Z",
+        ),
+        (
+            "firdaria",
+            {"firdaria_year_basis": "calendar_anniversary"},
+            ("current_sub", "start_display"),
+            "1994-03-15 18:42Z",
+        ),
+        (
+            "decennials",
+            {},
+            ("current_level_3", "start"),
+            "1994-06-29T18:57:12.558140Z",
+        ),
+        ("zr", {}, ("fortune", "current_level_2", "start"), "1994-06-24T05:00:00Z"),
+    ],
+)
+def test_period_boundaries_preserve_utc_when_local_offset_is_unspecified(
+    tool: str, options, path, expected: str
+) -> None:
+    result = calculate_timing_tool(
+        tool,
+        birth_year=1992,
+        birth_month=12,
+        birth_day=1,
+        birth_hour=12,
+        birth_minute=0,
+        birth_timezone="Antarctica/Vostok",
+        birth_longitude=0,
+        birth_latitude=51.5,
+        house_system="W",
+        analysis_year=1994,
+        analysis_month=11,
+        analysis_day=2,
+        analysis_hour=12,
+        analysis_minute=0,
+        **options,
+    )
+    boundary = result[tool]
+    for field in path:
+        boundary = boundary[field]
+    assert boundary == expected
+
+
 @pytest.mark.parametrize(
     "case", PREDICTIVE_TIME_REFERENCE["profection_clocks"], ids=lambda c: c["id"]
 )
 def test_profection_anniversary_and_months_match_temporal(
     case, predictive_clock_operands
-):
+) -> None:
     row = case["birth"]
     local = datetime.fromisoformat(row["local"])
     info = build_predictive_birth_info(
@@ -160,7 +245,7 @@ def test_profection_anniversary_and_months_match_temporal(
         birth_longitude=0,
         birth_latitude=40,
     )
-    target = datetime.fromisoformat(case["analysis_UTC"])
+    target = datetime.fromisoformat(case["analysis_UTC"].replace("Z", "+00:00"))
     zone = parse_timezone_name(row["zone"])
     output = profections.build_annual_profection_payload(
         info, predictive_clock_operands, analysis_datetime=target
@@ -168,8 +253,6 @@ def test_profection_anniversary_and_months_match_temporal(
     assert output == profections.build_annual_profection_payload(
         info, predictive_clock_operands, analysis_datetime=target.astimezone(zone)
     )
-    assert calculate_age_years_int(info, target) == case["age"]
-    assert calculate_age_years_int(info, target.astimezone(zone)) == case["age"]
     assert output["age_years"] == case["age"]
     assert output["calculation_options"]["anniversary_clock_policy"] == "compatible"
     start = datetime.fromisoformat(output["year_start"]).astimezone(zone)
@@ -198,11 +281,105 @@ def test_profection_anniversary_and_months_match_temporal(
 
 
 @pytest.mark.parametrize(
+    "zone, month, birthday, hour, minute, target, expected",
+    [
+        pytest.param(
+            "Asia/Tokyo",
+            1,
+            1,
+            9,
+            18,
+            "0001-01-01T09:18:00+09:18:59",
+            "分析时刻不能早于出生时刻",
+            id="utc-year-zero-local-year-one",
+        ),
+        pytest.param(
+            "Etc/GMT+5",
+            12,
+            31,
+            19,
+            1,
+            "9999-12-31T19:00:00-05:00",
+            ("9998-12-31T19:01:00-05:00", "9999-12-31T19:01:00-05:00", 8098, 11, 10),
+            id="utc-year-10000-local-year-9999",
+        ),
+        pytest.param(
+            "Asia/Tokyo",
+            1,
+            15,
+            9,
+            18,
+            "0001-01-01T09:18:00+09:18:59",
+            "分析时刻不能早于出生时刻",
+            id="previous-anniversary-in-local-year-zero",
+        ),
+        pytest.param(
+            "Etc/GMT+5",
+            12,
+            30,
+            19,
+            1,
+            "9999-12-31T19:00:00-05:00",
+            10000,
+            id="next-anniversary-in-local-year-10000",
+        ),
+    ],
+)
+def test_profection_anniversary_intervals_at_local_calendar_edges(
+    zone: str,
+    month: int,
+    birthday: int,
+    hour: int,
+    minute: int,
+    target: str,
+    expected,
+    predictive_clock_operands,
+) -> None:
+    info = build_predictive_birth_info(
+        birth_year=1900,
+        birth_month=month,
+        birth_day=birthday,
+        birth_hour=hour,
+        birth_minute=minute,
+        birth_timezone=zone,
+        birth_longitude=139.6917,
+        birth_latitude=35.6895,
+    )
+    analysis = datetime.fromisoformat(target)
+    if isinstance(expected, int):
+        with pytest.raises(ValueError, match=f"year {expected} is out of range"):
+            profections.build_annual_profection_payload(
+                info, predictive_clock_operands, analysis_datetime=analysis
+            )
+        return
+    else:
+        pass
+    if isinstance(expected, str):
+        with pytest.raises(ValueError, match=expected):
+            profections.build_annual_profection_payload(
+                info, predictive_clock_operands, analysis_datetime=analysis
+            )
+        return
+    else:
+        pass
+    result = profections.build_annual_profection_payload(
+        info, predictive_clock_operands, analysis_datetime=analysis
+    )
+    assert (
+        result["year_start"],
+        result["year_end"],
+        result["age_years"],
+        result["activated_house"],
+        result["monthly_house"],
+    ) == expected
+
+
+@pytest.mark.parametrize(
     "case", PREDICTIVE_TIME_REFERENCE["progression_clocks"], ids=lambda c: c["id"]
 )
 def test_secondary_progression_fixed_key_matches_flint(
-    case, predictive_clock_operands, monkeypatch
-):
+    case, predictive_clock_operands, monkeypatch: pytest.MonkeyPatch
+) -> None:
     observed = []
 
     def capture_subject(**parameters):
@@ -236,12 +413,32 @@ def test_secondary_progression_fixed_key_matches_flint(
     assert options["house_method"] == "quotidian_at_progressed_UTC"
 
 
+def test_secondary_progression_labels_undefined_local_time_in_utc() -> None:
+    result = calculate_western_timing_analysis(
+        birth_year=1994,
+        birth_month=1,
+        birth_day=31,
+        birth_hour=12,
+        birth_timezone="Antarctica/Vostok",
+        birth_longitude=0,
+        birth_latitude=51.5,
+        house_system="W",
+        analysis_year=2000,
+        analysis_month=1,
+        analysis_day=31,
+        analysis_hour=12,
+        analysis_minute=0,
+    )
+    progressed = result["directions"]["secondary_progression"]
+    assert progressed["progressed_datetime"] == "1994-02-06T04:58:12.807301Z"
+
+
 @pytest.mark.parametrize(
     "case", PREDICTIVE_TIME_REFERENCE["profection_clocks"], ids=lambda c: c["id"]
 )
 def test_given_year_preserves_anniversary_interval_in_return_zone(
-    case, predictive_clock_operands, monkeypatch
-):
+    case, predictive_clock_operands, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setattr(
         profections, "build_subject", lambda **parameters: predictive_clock_operands
     )
@@ -257,7 +454,7 @@ def test_given_year_preserves_anniversary_interval_in_return_zone(
         birth_longitude=0,
         birth_latitude=40,
     )
-    target = datetime.fromisoformat(case["analysis_UTC"])
+    target = datetime.fromisoformat(case["analysis_UTC"].replace("Z", "+00:00"))
     annual = profections.build_annual_profection_payload(
         info, predictive_clock_operands, analysis_datetime=target
     )
@@ -273,10 +470,10 @@ def test_given_year_preserves_anniversary_interval_in_return_zone(
     expected = case["expected_window"]
     assert datetime.fromisoformat(result["year_start"]).astimezone(
         timezone.utc
-    ) == datetime.fromisoformat(expected["start"]["UTC"])
+    ) == datetime.fromisoformat(expected["start"]["UTC"].replace("Z", "+00:00"))
     assert datetime.fromisoformat(result["year_end"]).astimezone(
         timezone.utc
-    ) == datetime.fromisoformat(expected["end"]["UTC"])
+    ) == datetime.fromisoformat(expected["end"]["UTC"].replace("Z", "+00:00"))
     assert [m["month_index"] for m in result["monthly_profections"] if m["active"]] == [
         case["month_index"] + 1
     ]
@@ -317,7 +514,7 @@ def _governing_returns_for(analysis_month, analysis_day):
     return analysis_utc, solar_utc, lunar_utc
 
 
-def test_solar_return_governs_analysis_date_before_birthday():
+def test_solar_return_governs_analysis_date_before_birthday() -> None:
     # Analysis 2025-03-01 precedes the May 17 birthday: the governing solar
     # return is the prior birthday's (2024-05-17), NOT the upcoming 2025 one.
     analysis_utc, solar_utc, _ = _governing_returns_for(3, 1)
@@ -328,7 +525,7 @@ def test_solar_return_governs_analysis_date_before_birthday():
     assert (analysis_utc - solar_utc).days < 366
 
 
-def test_lunar_return_governs_analysis_instant():
+def test_lunar_return_governs_analysis_instant() -> None:
     # The active lunar return can fall in the previous calendar month; seeding
     # the search at the analysis-month start wrongly skips it for the next one.
     analysis_utc, _, lunar_utc = _governing_returns_for(3, 1)
@@ -339,7 +536,7 @@ def test_lunar_return_governs_analysis_instant():
     assert (analysis_utc - lunar_utc).days < 31
 
 
-def test_monthly_profection_segments_are_equal_twelfths():
+def test_monthly_profection_segments_are_equal_twelfths() -> None:
     # The declared monthly policy divides the profected year into 12 equal
     # elapsed-time parts. Every segment must have
     # the same duration, and exactly one must be active and agree with the
@@ -377,7 +574,7 @@ def test_monthly_profection_segments_are_equal_twelfths():
     )
 
 
-def test_calculate_western_timing_analysis_returns_predictive_sections():
+def test_calculate_western_timing_analysis_returns_predictive_sections() -> None:
     result = calculate_western_timing_analysis(
         name="Alice",
         birth_year=1990,
@@ -519,7 +716,7 @@ def test_calculate_western_timing_analysis_returns_predictive_sections():
     assert "行运太阳" in result["summary"]
 
 
-def test_western_timing_transit_respects_transit_timezone():
+def test_western_timing_transit_respects_transit_timezone() -> None:
     result = calculate_western_timing_analysis(
         name="Alice",
         birth_year=1990,
@@ -542,7 +739,7 @@ def test_western_timing_transit_respects_transit_timezone():
     assert result["directions"]["given_year"]["analysis_datetime"].endswith("+00:00")
 
 
-def test_core_chart_supports_fixed_offset_timezones():
+def test_core_chart_supports_fixed_offset_timezones() -> None:
     result = calculate_core_chart_analysis(
         birth_year=2028,
         birth_month=4,
@@ -561,7 +758,7 @@ def test_core_chart_supports_fixed_offset_timezones():
     assert result["chart_profile"]["engine_precision"] == expected_precision
 
 
-def test_primary_directions_expose_exact_window_for_exact_hit_moment():
+def test_primary_directions_expose_exact_window_for_exact_hit_moment() -> None:
     baseline_result = calculate_western_timing_analysis(
         name="Alice",
         birth_year=1990,
@@ -627,7 +824,27 @@ def test_primary_directions_expose_exact_window_for_exact_hit_moment():
     )
 
 
-def test_western_timing_supports_fixed_offset_timezones():
+def test_primary_direction_windows_label_undefined_local_time_in_utc() -> None:
+    result = calculate_timing_tool(
+        "pd",
+        birth_year=1994,
+        birth_month=1,
+        birth_day=31,
+        birth_hour=12,
+        birth_timezone="Antarctica/Vostok",
+        birth_longitude=107.6,
+        birth_latitude=51.5,
+        house_system="W",
+        analysis_year=1994,
+        analysis_month=11,
+        analysis_day=1,
+        analysis_hour=7,
+        analysis_minute=0,
+    )
+    assert result["pd"]["exact_window"][0]["event_datetime"] == "1994-10-29T22:12:05Z"
+
+
+def test_western_timing_supports_fixed_offset_timezones() -> None:
     result = calculate_western_timing_analysis(
         birth_year=2028,
         birth_month=4,
@@ -650,7 +867,9 @@ def test_western_timing_supports_fixed_offset_timezones():
     assert result["returns"]["lunar_return"]["return_datetime"].endswith("+08:00")
 
 
-def test_calculate_age_years_int_handles_leap_day_birth_in_common_year():
+def test_profection_age_handles_leap_day_birth_in_common_year(
+    predictive_clock_operands,
+) -> None:
     birth_info = build_predictive_birth_info(
         name="Leap Native",
         birth_year=2000,
@@ -667,11 +886,14 @@ def test_calculate_age_years_int_handles_leap_day_birth_in_common_year():
     before_adjusted_birthday = datetime(2025, 2, 27, 10, 30, tzinfo=tzinfo)
     adjusted_birthday = datetime(2025, 2, 28, 10, 30, tzinfo=tzinfo)
 
-    assert calculate_age_years_int(birth_info, before_adjusted_birthday) == 24
-    assert calculate_age_years_int(birth_info, adjusted_birthday) == 25
+    for moment, age in ((before_adjusted_birthday, 24), (adjusted_birthday, 25)):
+        result = profections.build_annual_profection_payload(
+            birth_info, predictive_clock_operands, analysis_datetime=moment
+        )
+        assert result["age_years"] == age
 
 
-def test_western_timing_handles_leap_day_births_for_profection_and_given_year():
+def test_western_timing_handles_leap_day_births_for_profection_and_given_year() -> None:
     result = calculate_western_timing_analysis(
         name="Leap Native",
         birth_year=2000,
@@ -700,7 +922,9 @@ def test_western_timing_handles_leap_day_births_for_profection_and_given_year():
     assert given_year["monthly_profections"][0]["active"] is True
 
 
-def test_western_timing_uses_previous_real_leap_birthday_before_adjusted_birthday():
+def test_western_timing_uses_previous_real_leap_birthday_before_adjusted_birthday() -> (
+    None
+):
     result = calculate_western_timing_analysis(
         name="Leap Native",
         birth_year=2000,
@@ -724,7 +948,7 @@ def test_western_timing_uses_previous_real_leap_birthday_before_adjusted_birthda
     assert given_year["year_end"].startswith("2025-02-28T10:30:00+08:00")
 
 
-def test_primary_directions_support_converse_mode():
+def test_primary_directions_support_converse_mode() -> None:
     result = calculate_western_timing_analysis(
         name="Alice",
         birth_year=1990,
@@ -799,7 +1023,7 @@ def test_primary_directions_support_converse_mode():
     assert sun_sign_change["to_sign"] == "Aries"
 
 
-def test_primary_direction_chart_omits_bounds_overlay_when_disabled():
+def test_primary_direction_chart_omits_bounds_overlay_when_disabled() -> None:
     result = calculate_western_timing_analysis(
         name="Alice",
         birth_year=1990,
@@ -827,7 +1051,7 @@ def test_primary_direction_chart_omits_bounds_overlay_when_disabled():
     assert bounds_overlay["points"] == {}
 
 
-def test_equatorial_primary_directions_use_right_ascension_arc():
+def test_equatorial_primary_directions_use_right_ascension_arc() -> None:
     result = calculate_western_timing_analysis(
         name="Alice",
         birth_year=1990,
@@ -891,11 +1115,17 @@ def test_equatorial_primary_directions_use_right_ascension_arc():
             abs=0.01,
         )
         assert "declination" in sun_diagnostic
+    else:
+        pass
 
 
-def test_equatorial_primary_direction_chart_reconstructs_ecliptic_positions_from_ra():
+def test_equatorial_primary_direction_chart_reconstructs_ecliptic_positions_from_ra() -> (
+    None
+):
     if predictive_swe is None:
         pytest.skip("Swiss Ephemeris is required for equatorial reconstruction")
+    else:
+        pass
 
     result = calculate_western_timing_analysis(
         name="Alice",
@@ -936,23 +1166,21 @@ def test_equatorial_primary_direction_chart_reconstructs_ecliptic_positions_from
     sun_ra, sun_declination = point_equatorial_position(
         "Sun",
         natal_subject,
-        julian_day=equatorial_context["julian_day"],
-        obliquity=equatorial_context["obliquity"],
-        armc=equatorial_context["armc"],
+        context=equatorial_context,
     )
     expected_sun_longitude, _expected_sun_latitude, _ = predictive_swe.cotrans(
         (normalize_angle(sun_ra + arc_degrees), sun_declination, 1.0),
-        equatorial_context["obliquity"],
+        equatorial_context.obliquity,
     )
 
     fortune_payload = build_lot_payloads(natal_subject)["lot_of_fortune"]
     fortune_ra, fortune_declination, _ = predictive_swe.cotrans(
         (float(fortune_payload["absolute_degree"]), 0.0, 1.0),
-        -equatorial_context["obliquity"],
+        -equatorial_context.obliquity,
     )
     expected_fortune_longitude, _expected_fortune_latitude, _ = predictive_swe.cotrans(
         (normalize_angle(fortune_ra + arc_degrees), fortune_declination, 1.0),
-        equatorial_context["obliquity"],
+        equatorial_context.obliquity,
     )
 
     primary_direction_chart = result["directions"]["primary_direction_chart"]
@@ -974,9 +1202,13 @@ def test_equatorial_primary_direction_chart_reconstructs_ecliptic_positions_from
     assert sun_sign_change["to_sign"] == "Gemini"
 
 
-def test_mundane_semiarc_primary_direction_chart_reconstructs_projection_from_mundane_arc():
+def test_mundane_semiarc_primary_direction_chart_reconstructs_projection_from_mundane_arc() -> (
+    None
+):
     if predictive_swe is None:
         pytest.skip("Swiss Ephemeris is required for mundane semiarc reconstruction")
+    else:
+        pass
 
     result = calculate_western_timing_analysis(
         name="Alice",
@@ -1023,20 +1255,24 @@ def test_mundane_semiarc_primary_direction_chart_reconstructs_projection_from_mu
         nocturnal_semiarc = max(180.0 - clamped_semiarc, 1e-6)
         if normalized_coordinate <= 90.0:
             return ((normalized_coordinate / 90.0) * clamped_semiarc) - clamped_semiarc
+        else:
+            pass
         if normalized_coordinate <= 180.0:
             return ((normalized_coordinate - 90.0) / 90.0) * clamped_semiarc
+        else:
+            pass
         if normalized_coordinate <= 270.0:
             return clamped_semiarc + (
                 ((normalized_coordinate - 180.0) / 90.0) * nocturnal_semiarc
             )
+        else:
+            pass
         return -180.0 + (((normalized_coordinate - 270.0) / 90.0) * nocturnal_semiarc)
 
     sun_ra, sun_declination = point_equatorial_position(
         "Sun",
         natal_subject,
-        julian_day=equatorial_context["julian_day"],
-        obliquity=equatorial_context["obliquity"],
-        armc=equatorial_context["armc"],
+        context=equatorial_context,
     )
     sun_semiarc = semiarc_degrees_for_declination(
         birth_info.latitude,
@@ -1047,16 +1283,16 @@ def test_mundane_semiarc_primary_direction_chart_reconstructs_projection_from_mu
         + arc_degrees
     )
     sun_hour_angle = inverse_mundane_hour_angle(sun_target_coordinate, sun_semiarc)
-    directed_sun_ra = normalize_angle(equatorial_context["armc"] - sun_hour_angle)
+    directed_sun_ra = normalize_angle(equatorial_context.armc - sun_hour_angle)
     expected_sun_longitude, _expected_sun_latitude, _ = predictive_swe.cotrans(
         (directed_sun_ra, sun_declination, 1.0),
-        equatorial_context["obliquity"],
+        equatorial_context.obliquity,
     )
 
     fortune_payload = build_lot_payloads(natal_subject)["lot_of_fortune"]
     fortune_ra, fortune_declination = project_absolute_degree_to_equatorial(
         float(fortune_payload["absolute_degree"]),
-        obliquity=equatorial_context["obliquity"],
+        obliquity=equatorial_context.obliquity,
     )
     fortune_semiarc = semiarc_degrees_for_declination(
         birth_info.latitude,
@@ -1070,12 +1306,10 @@ def test_mundane_semiarc_primary_direction_chart_reconstructs_projection_from_mu
         fortune_target_coordinate,
         fortune_semiarc,
     )
-    directed_fortune_ra = normalize_angle(
-        equatorial_context["armc"] - fortune_hour_angle
-    )
+    directed_fortune_ra = normalize_angle(equatorial_context.armc - fortune_hour_angle)
     expected_fortune_longitude, _expected_fortune_latitude, _ = predictive_swe.cotrans(
         (directed_fortune_ra, fortune_declination, 1.0),
-        equatorial_context["obliquity"],
+        equatorial_context.obliquity,
     )
 
     primary_direction_chart = result["directions"]["primary_direction_chart"]
@@ -1094,7 +1328,7 @@ def test_mundane_semiarc_primary_direction_chart_reconstructs_projection_from_mu
     )
 
 
-def test_fatebridge_mundane_semiarc_method_exposes_mundane_projection():
+def test_fatebridge_mundane_semiarc_method_exposes_mundane_projection() -> None:
     baseline_result = calculate_western_timing_analysis(
         name="Alice",
         birth_year=1990,
@@ -1204,6 +1438,8 @@ def test_fatebridge_mundane_semiarc_method_exposes_mundane_projection():
         significator_entry = primary_direction_chart["natal_coordinate_lots"][
             lot_key_by_point[first_hit["significator"]]
         ]
+    else:
+        pass
     assert (
         first_hit["coordinate_context"]["promissor_current"]["coordinate_degrees"]
         == primary_direction_chart["directed_coordinate_points"][
@@ -1245,16 +1481,16 @@ def test_fatebridge_mundane_semiarc_method_exposes_mundane_projection():
     }
 
 
-def test_zodiacal_releasing_loosing_of_bond_jumps_after_full_cycle():
-    start = datetime(2000, 1, 1)
+def test_zodiacal_releasing_loosing_of_bond_jumps_after_full_cycle() -> None:
+    start = utc_calendar(datetime(2000, 1, 1, tzinfo=timezone.utc))
     periods = build_releasing_level_within_interval(
         start_sign="Aquarius",
         period_start=start,
-        period_end=start + timedelta(days=30 * 360),
+        period_end=start.shifted(timedelta(days=30 * 360)),
         fortune_sign="Aquarius",
         parent_sign="Aquarius",
         level=2,
-        analysis_datetime=start,
+        analysis_utc=start,
         max_periods=20,
     )
 
@@ -1280,7 +1516,7 @@ def test_zodiacal_releasing_loosing_of_bond_jumps_after_full_cycle():
     assert loosing_flags[12] is True
 
 
-def test_zodiacal_releasing_shifts_spirit_when_lots_coincide():
+def test_zodiacal_releasing_shifts_spirit_when_lots_coincide() -> None:
     # Brennan/Schaim episode192: same-sign lots shift Spirit forward one sign;
     # Fortune remains the angular reference and natal lots are not relocated.
     from fatebridge.core.predictive._common import (
@@ -1330,7 +1566,7 @@ def test_zodiacal_releasing_shifts_spirit_when_lots_coincide():
     assert periods["Cancer"]["duration_value"] == 62.5
 
 
-def test_zodiacal_releasing_active_boundary_uses_elapsed_days_across_dst():
+def test_zodiacal_releasing_active_boundary_uses_elapsed_days_across_dst() -> None:
     from datetime import timezone
 
     from fatebridge.core.predictive._common import build_natal_subject
@@ -1365,3 +1601,27 @@ def test_zodiacal_releasing_active_boundary_uses_elapsed_days_across_dst():
             current = track[f"current_level_{level}"]
             assert datetime.fromisoformat(current["start"]) <= moment
             assert moment < datetime.fromisoformat(current["end"])
+
+
+def test_zodiacal_releasing_rejects_a_period_end_outside_the_birth_zone_calendar(
+    predictive_clock_operands,
+) -> None:
+    from fatebridge.core.predictive.zodiacal_releasing import (
+        build_zodiacal_releasing_payload,
+    )
+
+    zone_name = "Etc/GMT+5"
+    birth = build_predictive_birth_info(
+        birth_year=9995,
+        birth_month=1,
+        birth_day=1,
+        birth_hour=0,
+        birth_timezone=zone_name,
+        birth_longitude=-75,
+        birth_latitude=40,
+    )
+    target = datetime(9995, 1, 1, tzinfo=parse_timezone_name(zone_name))
+    with pytest.raises(ValueError, match="Civil calendar label is outside"):
+        build_zodiacal_releasing_payload(
+            birth, predictive_clock_operands, analysis_datetime=target
+        )

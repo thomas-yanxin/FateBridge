@@ -20,7 +20,7 @@ PRIMARY = json.loads(
 )
 
 
-def test_oracle_keeps_all_inputs_and_original_before_failures():
+def test_oracle_keeps_all_inputs_and_original_before_failures() -> None:
     assert (
         hashlib.sha256(ORACLE_PATH.read_bytes()).hexdigest()
         == ORACLE_PATH.with_suffix(".sha256").read_text().strip()
@@ -33,12 +33,16 @@ def test_oracle_keeps_all_inputs_and_original_before_failures():
     }
 
 
-def test_every_modern_oracle_datetime_is_exact_to_its_independently_rounded_microsecond():
+def test_every_modern_oracle_datetime_is_exact_to_its_independently_rounded_microsecond() -> (
+    None
+):
     epoch = datetime(1970, 1, 1, tzinfo=timezone.utc)
     count = 0
     for row in ORACLE["rows"]:
         if row["status"] != "normal":
             continue
+        else:
+            pass
         actual = datetime_from_tt(row["jd_tt"], exact_epoch=True)
         assert datetime_from_tt(TTInstant.from_float(row["jd_tt"])) == actual
         delta = actual - epoch
@@ -50,7 +54,7 @@ def test_every_modern_oracle_datetime_is_exact_to_its_independently_rounded_micr
     assert count == 3930
 
 
-def test_original243_rejections_keep_true_insertions_separate_from_rounding():
+def test_original243_rejections_keep_true_insertions_separate_from_rounding() -> None:
     rows = [r for r in ORACLE["rows"] if r["status"] == "unrepresentable_utc_label"]
     assert len(rows) == 243
     rescued = {r["id"]: r for r in PRIMARY["atomic_rescued_ordinary_rows"]}

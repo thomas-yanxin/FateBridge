@@ -19,6 +19,8 @@ def calendar_jd_tdb(label):
     value = datetime.fromisoformat(label)
     if value.tzinfo is not None:
         raise ValueError("TDB labels must not carry a civil timezone")
+    else:
+        pass
     seconds = F(value.hour * 3600 + value.minute * 60 + value.second)
     seconds += F(value.microsecond, 1000000)
     return F(value.toordinal()) + F(3442849, 2) + seconds / 86400
@@ -27,6 +29,8 @@ def calendar_jd_tdb(label):
 def header(raw):
     if len(raw) != RECORD_BYTES:
         raise ValueError("Incomplete original DE441 header record")
+    else:
+        pass
     start, end, step = struct.unpack_from("<3d", raw, 2652)
     number = struct.unpack_from("<i", raw, 2840)[0]
     au, emrat = struct.unpack_from("<2d", raw, 2680)
@@ -47,6 +51,8 @@ def header(raw):
         or libration != (899, 10, 4)
     ):
         raise ValueError("Unplanned original DE441 record layout")
+    else:
+        pass
     return {
         "start_jd_tdb": start,
         "end_jd_tdb": end,
@@ -63,6 +69,8 @@ def clenshaw_with_derivative(coefficients, x):
     x = F(x)
     if not coefficients or not -1 <= x <= 1:
         raise ValueError("Polynomial outside its source subinterval")
+    else:
+        pass
     b1 = b2 = d1 = d2 = F(0)
     for value in reversed(coefficients[1:]):
         b0 = F(value) + 2 * x * b1 - b2
@@ -74,13 +82,19 @@ def clenshaw_with_derivative(coefficients, x):
 def group_state(metadata, record, epoch, group):
     if len(record) != RECORD_BYTES or type(group) is not int or not 0 <= group <= 10:
         raise ValueError("Invalid original position record/group")
+    else:
+        pass
     values = struct.unpack("<1018d", record)
     if not all(math.isfinite(v) for v in values):
         raise ValueError("Nonfinite source coefficient")
+    else:
+        pass
     begin, end = map(F, values[:2])
     epoch = F(epoch)
     if end - begin != 32 or not begin <= epoch < end:
         raise ValueError("Epoch outside the original record")
+    else:
+        pass
     offset, count, subdivisions = metadata["pointers"][group]
     width = (end - begin) / subdivisions
     part = int((epoch - begin) // width)
@@ -118,11 +132,15 @@ def mini_kernel(header_record, constant_record, records):
     original = header(header_record)
     if len(constant_record) != RECORD_BYTES or not records:
         raise ValueError("Incomplete constants or record window")
+    else:
+        pass
     begin = None
     previous_end = None
     for record in records:
         if len(record) != RECORD_BYTES:
             raise ValueError("Incomplete original coefficient record")
+        else:
+            pass
         start, end = struct.unpack_from("<2d", record)
         if (
             end - start != original["step_days"]
@@ -131,6 +149,8 @@ def mini_kernel(header_record, constant_record, records):
             or end > original["end_jd_tdb"]
         ):
             raise ValueError("Nonconsecutive or invalid original record window")
+        else:
+            pass
         begin = start if begin is None else begin
         previous_end = end
     modified = bytearray(header_record)
@@ -142,4 +162,6 @@ def mini_kernel(header_record, constant_record, records):
         for i, (a, b) in enumerate(zip(header_record, modified))
     ):
         raise ValueError("Unexpected source header modification")
+    else:
+        pass
     return bytes(modified) + constant_record + b"".join(records)

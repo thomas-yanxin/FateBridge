@@ -4,7 +4,7 @@ import pytest
 
 from fatebridge.core.requests.divination import SixYaoRequest
 from fatebridge.services.divination import calculate_sixyao_analysis
-from tests.support.transports import SPECS, business, rest, surface_calls
+from tests.support.transports import SPECS, business
 
 CASES = [
     pytest.param(
@@ -74,18 +74,20 @@ def check(output, source, target, bucket, matched):
         assert strength["status"] == "contested_or_pending"
         assert strength["is_supported"] is strength["is_weak"] is None
         assert actor["reason"] == "本位金化巳的长生或回头克资格待审"
+    else:
+        pass
 
 
 @pytest.mark.parametrize("date,base,changed,source,target,bucket,matched", CASES)
 def test_unresolved_source_keeps_strength_unknown(
     date, base, changed, source, target, bucket, matched
-):
+) -> None:
     request = SixYaoRequest.model_validate(payload_for(date, base, changed))
     result = calculate_sixyao_analysis(**request.model_dump())
     check(result, source, target, bucket, matched)
 
 
-def test_pending_source_does_not_override_month_broken_day_controlled_target():
+def test_pending_source_does_not_override_month_broken_day_controlled_target() -> None:
     request = SixYaoRequest.model_validate(
         payload_for("2026-05-24", "001000", "001101")
     )
@@ -109,7 +111,7 @@ def test_pending_source_does_not_override_month_broken_day_controlled_target():
 @pytest.mark.parametrize("date,base,changed,source,target,bucket,matched", CASES)
 def test_pending_support_qualification_matches_real_transports(
     date, base, changed, source, target, bucket, matched, surface_calls
-):
+) -> None:
     spec = SPECS["sixyao"]
     payload = payload_for(date, base, changed)
     fields = [
@@ -132,7 +134,9 @@ def test_pending_support_qualification_matches_real_transports(
     check(expected, source, target, bucket, matched)
 
 
-def test_pending_dark_movement_reaches_void_conditions_on_all_surfaces(surface_calls):
+def test_pending_dark_movement_reaches_void_conditions_on_all_surfaces(
+    surface_calls,
+) -> None:
     payload = {**payload_for("2025-02-26", "011010", "111010"), "focus_line": 2}
     prefix = "liuyao_evidence.conditional_analysis"
     fields = [f"{prefix}.classical_assessment.lines", f"{prefix}.void_conditions.focus"]

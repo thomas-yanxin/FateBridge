@@ -24,17 +24,25 @@ def parts_from_clauses(
     """Ordinary clauses as knot interpolation; no special endpoint adjudication."""
     if body not in PLANETS or not 0 <= angle < 360:
         raise ValueError("Seven-graha normalized directed angle required")
+    else:
+        pass
     base = Fraction(0)
     for (left, low), (right, high) in zip(KNOTS, KNOTS[1:]):
         if left <= angle <= right:
             base = low + (angle - left) * Fraction(high - low, right - left)
             break
+        else:
+            pass
     rules = primary["source_rule_witness"]
     for lo, hi in rules["special_strict_interiors"].get(body, []):
         if angle in {lo, hi}:
             raise ValueError("This witness audit does not adjudicate special endpoints")
+        else:
+            pass
         if lo < angle < hi:
             return base, Fraction(rules["special_addition_virupa"][body])
+        else:
+            pass
     return base, Fraction(0)
 
 
@@ -45,9 +53,13 @@ def value_from_clauses(body: str, angle: Fraction, primary: dict) -> Fraction:
 def given_inputs(primary: dict) -> list[Fraction]:
     if tuple(primary["planet_order"]) != PLANETS:
         raise ValueError("Literal planet orientation/order must be preserved")
+    else:
+        pass
     headings = primary["example53_headers_degrees_minutes"]
     if len(headings) != 7:
         raise ValueError("All seven printed headings are required")
+    else:
+        pass
     for d, m in headings:
         if (
             type(d) is not int
@@ -56,6 +68,8 @@ def given_inputs(primary: dict) -> list[Fraction]:
             or not 0 <= m < 60
         ):
             raise ValueError("Literal degree/minute heading required")
+        else:
+            pass
     for name in (
         "example53_angles_target_rows",
         "example54_signed_contributions_target_rows",
@@ -65,6 +79,8 @@ def given_inputs(primary: dict) -> list[Fraction]:
             raise ValueError(
                 "All49printed matrix slots, including blanks, are required"
             )
+        else:
+            pass
     for name in (
         "example54_signed_net",
         "example55_signed_net",
@@ -73,6 +89,8 @@ def given_inputs(primary: dict) -> list[Fraction]:
     ):
         if len(primary[name]) != 7:
             raise ValueError("All seven printed totals are required")
+        else:
+            pass
     return [Fraction(d) + Fraction(m, 60) for d, m in headings]
 
 
@@ -85,6 +103,8 @@ def build_report(primary: dict, later: dict) -> dict:
         "malefic",
     }:
         raise ValueError("All seven explicitly given worked-column signs are required")
+    else:
+        pass
 
     def relation(kind: str, target: str, expected: Decimal, printed: str) -> None:
         decimal.append(
@@ -111,6 +131,8 @@ def build_report(primary: dict, later: dict) -> dict:
                     or not 0 <= literal[1] < 60
                 ):
                     raise ValueError("Literal angle must be degrees/minutes or null")
+                else:
+                    pass
                 printed_angle = Fraction(literal[0]) + Fraction(literal[1], 60)
                 gap = (printed_angle - x + 180) % 360 - 180
                 angles.append(
@@ -123,6 +145,8 @@ def build_report(primary: dict, later: dict) -> dict:
                         equal=not gap,
                     )
                 )
+            else:
+                pass
             ordinary, special = parts_from_clauses(aspector, x, primary)
             expected = ordinary + special
             sign = 1 if natures[aspector] == "benefic" else -1
@@ -130,6 +154,8 @@ def build_report(primary: dict, later: dict) -> dict:
                 not raw or any(not isinstance(v, str) for v in raw)
             ):
                 raise ValueError("Signed printed terms must remain literal strings")
+            else:
+                pass
             combined = (
                 sum((Fraction(v) for v in raw), Fraction(0))
                 if raw is not None
@@ -145,6 +171,8 @@ def build_report(primary: dict, later: dict) -> dict:
                     raise ValueError(
                         "Only the literal single or two-term printed cell is supported"
                     )
+                else:
+                    pass
                 for index, (printed_term, exact_term) in enumerate(
                     zip(raw, expected_parts)
                 ):
@@ -152,6 +180,8 @@ def build_report(primary: dict, later: dict) -> dict:
                     quantum = Decimal(printed_term).as_tuple().exponent
                     if not isinstance(quantum, int):
                         raise ValueError("Finite printed decimal quantum required")
+                    else:
+                        pass
                     unit = Decimal(1).scaleb(quantum)
                     terms.append(
                         dict(
@@ -174,6 +204,8 @@ def build_report(primary: dict, later: dict) -> dict:
                             ),
                         )
                     )
+            else:
+                pass
             cells.append(
                 dict(
                     target=target,
@@ -287,7 +319,7 @@ def build_report(primary: dict, later: dict) -> dict:
 
 def compare_native(primary: dict) -> dict:
     # The source/numeric report is built before this optional native import.
-    from fatebridge.core import jyotish_balas
+    from fatebridge.core.jyotish import jyotish_balas
 
     inputs = [float(x) for x in given_inputs(primary)]
     binary = [Fraction(x) for x in inputs]
@@ -374,12 +406,16 @@ def main() -> int:
         parser.error(
             "Report must be new; frozen references and earlier reports cannot be overwritten"
         )
+    else:
+        pass
     raw = [p.read_bytes() for p in sources]
     primary, later = [json.loads(x) for x in raw]
     report = build_report(primary, later)
     report["fixture_sha256s"] = [hashlib.sha256(x).hexdigest() for x in raw]
     if args.native:
         report["native_comparison"] = compare_native(primary)
+    else:
+        pass
     args.report.parent.mkdir(parents=True, exist_ok=True)
     with args.report.open("x") as stream:
         stream.write(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
@@ -401,3 +437,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -4,18 +4,22 @@ import asyncio
 import copy
 import hashlib
 import json
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
 from fastmcp import Client
 
 import fatebridge.api as api
+import fatebridge.core.ziwei.ziwei_sources as sources
+import scripts.ziwei.audit_ziwei_review_disclosure as audit
 from fatebridge.cli import run
-from fatebridge.core.ziwei_sources import ziwei_day_source_evidence
+from fatebridge.core.ziwei.ziwei_sources import ziwei_day_source_evidence
 from fatebridge.mcp_server import create_mcp_app
 from scripts.ziwei.audit_ziwei_review_disclosure import audit_review_disclosure
 from scripts.ziwei.build_ziwei_review_disclosure import TARGET, build
 from tests.support.result_delivery import store
+from tests.support.transports import call_calculation
 
 
 def canonical(value):
@@ -25,8 +29,9 @@ def canonical(value):
 @pytest.mark.parametrize(
     "field", ["whole_day_table_certified", "external_human_experts"]
 )
-def test_review_audit_does_not_equate_json_booleans_and_integers(monkeypatch, field):
-    import scripts.ziwei.audit_ziwei_review_disclosure as audit
+def test_review_audit_does_not_equate_json_booleans_and_integers(
+    monkeypatch: pytest.MonkeyPatch, field: str
+) -> None:
 
     original = audit.ziwei_day_source_evidence
 
@@ -41,7 +46,7 @@ def test_review_audit_does_not_equate_json_booleans_and_integers(monkeypatch, fi
     assert len(audit.audit_review_disclosure()["mismatches"]) == 1800
 
 
-def test_corrected_independent_rows_reach_all_150_public_receipts():
+def test_corrected_independent_rows_reach_all_150_public_receipts() -> None:
     expected = build()
     assert json.loads(TARGET.read_text()) == expected
     assert len(expected["records"]) == 150
@@ -72,8 +77,8 @@ def test_corrected_independent_rows_reach_all_150_public_receipts():
     [(2, 21, "亥"), (3, 11, "辰"), (3, 12, "辰"), (6, 6, "寅"), (6, 8, "未")],
 )
 def test_disputed_readings_cannot_become_unambiguous_by_matching_a_calculation(
-    bureau, day, actual
-):
+    bureau: int, day: int, actual: str
+) -> None:
     result = ziwei_day_source_evidence(
         bureau=bureau, lunar_day=day, actual_branch=actual
     )
@@ -88,10 +93,13 @@ def test_disputed_readings_cannot_become_unambiguous_by_matching_a_calculation(
         assert result["source_kind"] == "direct_grid_cell"
         assert result["matches_source_record"] is True
         assert review["status"] == "unknown_no_directly_read_label"
+    else:
+        pass
 
 
-def test_review_audit_detects_a_runtime_claim_that_hides_the_unknown(monkeypatch):
-    import fatebridge.core.ziwei_sources as sources
+def test_review_audit_detects_a_runtime_claim_that_hides_the_unknown(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     fake = copy.deepcopy(build())
     row = next(r for r in fake["records"] if (r["bureau"], r["day"]) == (6, 6))
@@ -104,8 +112,9 @@ def test_review_audit_detects_a_runtime_claim_that_hides_the_unknown(monkeypatch
 
 
 @pytest.mark.parametrize("field", ["agrees_with_selected_branch", "method_id"])
-def test_review_audit_rejects_every_corrupted_public_review_field(monkeypatch, field):
-    import scripts.ziwei.audit_ziwei_review_disclosure as audit
+def test_review_audit_rejects_every_corrupted_public_review_field(
+    monkeypatch: pytest.MonkeyPatch, field: str
+) -> None:
 
     original = audit.ziwei_day_source_evidence
 
@@ -119,9 +128,8 @@ def test_review_audit_rejects_every_corrupted_public_review_field(monkeypatch, f
 
 
 def test_review_audit_rejects_a_different_package_manifest_identity(
-    tmp_path, monkeypatch
-):
-    import scripts.ziwei.audit_ziwei_review_disclosure as audit
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
 
     value = json.loads(TARGET.read_text())
     value["frozen_manifest_sha256"] = "0" * 64
@@ -141,9 +149,8 @@ def test_review_audit_rejects_a_different_package_manifest_identity(
     "mutation", ["edition_false_as_zero", "experts_zero_as_false", "day_one_as_true"]
 )
 def test_review_audit_rejects_package_boolean_integer_substitutions(
-    tmp_path, monkeypatch, mutation
-):
-    import scripts.ziwei.audit_ziwei_review_disclosure as audit
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mutation: str
+) -> None:
 
     value = json.loads(TARGET.read_text())
     if mutation == "edition_false_as_zero":
@@ -154,6 +161,8 @@ def test_review_audit_rejects_package_boolean_integer_substitutions(
         for row in value["records"]:
             if row["day"] == 1:
                 row["day"] = True
+            else:
+                pass
     changed = tmp_path / TARGET.name
     changed.write_text(json.dumps(value))
     (tmp_path / "ziwei-naj-ming-days.json").write_bytes(
@@ -170,8 +179,13 @@ def test_review_audit_rejects_package_boolean_integer_substitutions(
 @pytest.mark.parametrize("day,lunar_day", [(7, 6), (9, 8)])
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 def test_disputed_source_reaches_real_birth_rest_mcp_cli(
-    store, monkeypatch, capsys, day, lunar_day, profile
-):
+    store,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    day: int,
+    lunar_day: int,
+    profile: str,
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -197,7 +211,7 @@ def test_disputed_source_reaches_real_birth_rest_mcp_cli(
         as_of="2026-10-22T12:00:00+08:00",
     )
     rest = TestClient(api.app).post(
-        "/api/cn/ziwei/birth",
+        "/api/ziwei/birth-chart",
         json=inputs,
         params=[
             ("fields", "ziwei_birth.rule_trace"),
@@ -211,12 +225,14 @@ def test_disputed_source_reaches_real_birth_rest_mcp_cli(
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as c:
-            result = await c.call_tool("ziwei_birth", {**inputs, **options})
+            result = await call_calculation(
+                c, "ziwei_birth_chart", {**inputs, **options}
+            )
             assert not result.is_error
             return result.structured_content
 
     native = asyncio.run(call())
-    args = ["ziwei_birth"]
+    args = ["ziwei_birth_chart"]
     for key, value in inputs.items():
         args += ["--" + key.replace("_", "-"), str(value)]
     args += [

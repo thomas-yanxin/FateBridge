@@ -8,9 +8,11 @@ from zipfile import ZipFile
 
 import pytest
 
-from fatebridge.core import sukuyo_japanese_calendar as japanese
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_calendar_basis import JAPANESE_CALENDAR_BASIS as BASIS
+from fatebridge.core.sukuyo import sukuyo_japanese_calendar as japanese
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_calendar_basis import (
+    JAPANESE_CALENDAR_BASIS as BASIS,
+)
 from fatebridge.services.divination import (
     calculate_sukuyo_compatibility,
     calculate_suzhan_analysis,
@@ -36,7 +38,9 @@ def raw_day(value):
         return json.loads(archive.read(f"{index // 100:03}.response.json"))[index % 100]
 
 
-def test_complete_daily_capture_rebuilds_exact_shipped_data_without_trimmed_nulls():
+def test_complete_daily_capture_rebuilds_exact_shipped_data_without_trimmed_nulls() -> (
+    None
+):
     files, manifest = read_fixture(FIXTURE)
     data, report = normalize(files, manifest)
     assert data == json.loads(japanese.SOURCE.read_bytes())
@@ -51,7 +55,7 @@ def test_complete_daily_capture_rebuilds_exact_shipped_data_without_trimmed_null
     assert report["reconciled_monthly_discrepancies"][0]["month_start"] == "1989-01-08"
 
 
-def test_runtime_lunar_fields_match_every_frozen_daily_printed_date():
+def test_runtime_lunar_fields_match_every_frozen_daily_printed_date() -> None:
     first = date(1872, 2, 9)
     count = 0
     with ZipFile(FIXTURE / "captures.zip") as archive:
@@ -60,6 +64,8 @@ def test_runtime_lunar_fields_match_every_frozen_daily_printed_date():
             for offset, row in enumerate(rows):
                 if row is None:
                     continue
+                else:
+                    pass
                 civil = first + timedelta(days=index * 100 + offset)
                 year, month, day, leap = japanese.lunar_fields(civil)
                 assert f"{year}|{'閏' if leap else ''}{month}|{day}" == row["text"]
@@ -67,7 +73,7 @@ def test_runtime_lunar_fields_match_every_frozen_daily_printed_date():
     assert count == 58057
 
 
-def test_day_period_false_is_not_an_enclosing_month_false():
+def test_day_period_false_is_not_an_enclosing_month_false() -> None:
     row = raw_day("2017-06-24")
     assert row["isLeap"] == "False" and row["ofMonth.isLeap"] == "True"
     assert parse_day(row, date(2017, 6, 24)) == (2017, 5, 1, True)
@@ -91,8 +97,8 @@ def test_day_period_false_is_not_an_enclosing_month_false():
     ],
 )
 def test_calendar_pipeline_preserves_published_exceptions_and_lunar_year(
-    civil, expected
-):
+    civil: str, expected
+) -> None:
     actual = reference(civil)
     assert (
         tuple(
@@ -109,7 +115,7 @@ def test_calendar_pipeline_preserves_published_exceptions_and_lunar_year(
     assert not actual["calendar_reference"]["historical_local_time_reconstruction"]
 
 
-def test_birth_zone_host_calendar_and_mansion_profile_are_independent_choices():
+def test_birth_zone_host_calendar_and_mansion_profile_are_independent_choices() -> None:
     chinese = calendar_mansion("2017-06-24", "12:00:00", "Asia/Tokyo")
     selected = calendar_mansion(
         "2017-06-24", "12:00:00", "Asia/Tokyo", calendar_basis=BASIS
@@ -132,7 +138,9 @@ def test_birth_zone_host_calendar_and_mansion_profile_are_independent_choices():
     assert default_zone["input_timezone"] == "+08:00"
 
 
-def test_hinoo_uses_japanese_adjacent_months_without_invented_halves_or_precedence():
+def test_hinoo_uses_japanese_adjacent_months_without_invented_halves_or_precedence() -> (
+    None
+):
     unknown = reference("2024-08-04", calendar_profile="hinoo_t1299_host27")
     assert unknown["natal_su27"] is None and unknown["candidate_su27s"] == ["星", "张"]
     assert (
@@ -171,7 +179,7 @@ def test_hinoo_uses_japanese_adjacent_months_without_invented_halves_or_preceden
     ]
 
 
-def test_unknown_time_retains_complete_utc09_dates_and_repeated_civil_date():
+def test_unknown_time_retains_complete_utc09_dates_and_repeated_civil_date() -> None:
     china = calendar_mansion("2017-06-23", zone="UTC")
     assert (
         china["date_support"]["utc_support_intervals"][1]["start_utc_inclusive"]
@@ -204,7 +212,7 @@ def test_unknown_time_retains_complete_utc09_dates_and_repeated_civil_date():
     ]
 
 
-def test_utc09_boundary_preserves_microseconds_without_rounding():
+def test_utc09_boundary_preserves_microseconds_without_rounding() -> None:
     before = calendar_mansion(
         "2017-06-23", "14:59:59.999999", "UTC", calendar_basis=BASIS
     )
@@ -214,7 +222,7 @@ def test_utc09_boundary_preserves_microseconds_without_rounding():
     assert before["is_leap_month"] is False and after["is_leap_month"] is True
 
 
-def test_out_of_range_candidate_cannot_be_dropped_to_make_a_definite_result():
+def test_out_of_range_candidate_cannot_be_dropped_to_make_a_definite_result() -> None:
     result = calendar_mansion("2031-01-22", zone="UTC", calendar_basis=BASIS)
     assert result["out_of_range_calendar_dates"] == ["2031-01-23"]
     assert result["natal_su27"] is None
@@ -227,7 +235,7 @@ def test_out_of_range_candidate_cannot_be_dropped_to_make_a_definite_result():
         calendar_mansion("2025-03-04", calendar_basis="guess_from_country")
 
 
-def test_compatibility_uses_one_declared_basis_for_both_people():
+def test_compatibility_uses_one_declared_basis_for_both_people() -> None:
     result = calculate_sukuyo_compatibility(
         person1_date="2017-06-24",
         person1_zone="+09:00",
@@ -244,7 +252,9 @@ def test_compatibility_uses_one_declared_basis_for_both_people():
     assert "calendar_reference" in result["rulesets"]
 
 
-def test_host_basis_never_moves_the_physical_sky_and_native_text_keeps_provenance():
+def test_host_basis_never_moves_the_physical_sky_and_native_text_keeps_provenance() -> (
+    None
+):
     payload = dict(
         lat="31n13",
         lon="121e28",
@@ -269,8 +279,8 @@ def test_host_basis_never_moves_the_physical_sky_and_native_text_keeps_provenanc
 
 
 def test_source_index_metadata_cannot_be_poisoned_or_given_a_replaced_file_hash(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     raw = japanese.SOURCE.read_bytes()
     path = tmp_path / "japanese.json"
     path.write_bytes(raw)
@@ -287,7 +297,9 @@ def test_source_index_metadata_cannot_be_poisoned_or_given_a_replaced_file_hash(
     assert later["calendar_reference"]["source_provenance"][0]["basis"] != "fabricated"
 
 
-def test_default_chinese_path_never_loads_the_optional_japanese_table(monkeypatch):
+def test_default_chinese_path_never_loads_the_optional_japanese_table(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(japanese, "SOURCE", ROOT / "missing-japanese-reference.json")
     assert calendar_mansion("2025-03-04") == calendar_mansion(
         "2025-03-04", calendar_basis="chinese_hko_utc08"

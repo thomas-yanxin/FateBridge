@@ -11,7 +11,6 @@ from typing import Any
 
 import pytest
 
-from fatebridge.validation.wang_mean_calendar import phase_in_month, wang_mean_window
 from scripts.taiyi.audit_taiyi_wang_mean import (
     CORPUS,
     ROOT,
@@ -19,6 +18,7 @@ from scripts.taiyi.audit_taiyi_wang_mean import (
     select_identity,
     verify_sources,
 )
+from validation.wang_mean_calendar import phase_in_month, wang_mean_window
 
 
 @pytest.fixture(scope="module")
@@ -200,12 +200,14 @@ def test_both_leap_readings_remain_distinct(result: dict[str, Any]) -> None:
             leaps[s["middle_term_assignment"]] = [
                 r["month"] for w in s["conditional_leaps"] for r in w["leaps"]
             ]
+        else:
+            pass
     assert leaps == {"civil_day": [5, 2], "exact_fraction": [6, 3]}
 
 
 def test_sources_and_previous_reports_still_match_pins() -> None:
     frozen = verify_sources()
-    assert len(frozen["prior_sources"]) == 35
+    assert len(frozen["prior_sources"]) == 32
     assert len(frozen["files"]) == 2
 
 

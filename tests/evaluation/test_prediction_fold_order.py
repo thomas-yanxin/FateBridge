@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.validation.predictions import (
+from validation.predictions import (
     Forecast,
     Outcome,
     StudyPlan,
@@ -64,7 +64,7 @@ def outcome(recorded_at=None, event_at=None):
     )
 
 
-def test_future_window_and_outcome_cannot_leak_through_repeated_hour():
+def test_future_window_and_outcome_cannot_leak_through_repeated_hour() -> None:
     p, o = plan(), outcome()
     # Wall 01:45 fold=0 is physically earlier than 01:15/01:20 fold=1.
     assert at(45, 0).astimezone(timezone.utc) < p.window_end.astimezone(timezone.utc)
@@ -77,7 +77,7 @@ def test_future_window_and_outcome_cannot_leak_through_repeated_hour():
     assert p.window_end.fold == 1 and o.recorded_at.fold == 1
 
 
-def test_folded_future_record_remains_pending_after_window_end():
+def test_folded_future_record_remains_pending_after_window_end() -> None:
     p = plan(window_end=at(20, 0))
     report = evaluate_study(
         p, [forecast()], [outcome(recorded_at=at(10, 1))], as_of=at(50, 0)
@@ -86,7 +86,7 @@ def test_folded_future_record_remains_pending_after_window_end():
     assert report["rows"][0]["status"] == "outcome_pending"
 
 
-def test_physically_ordered_window_can_reverse_wall_labels():
+def test_physically_ordered_window_can_reverse_wall_labels() -> None:
     p = plan(window_start=at(50, 0), window_end=at(10, 1))
     report = evaluate_study(
         p, [forecast()], [outcome(event_at=at(1, 1))], as_of=at(25, 1)
@@ -96,12 +96,12 @@ def test_physically_ordered_window_can_reverse_wall_labels():
     assert not report["authority_certified"]
 
 
-def test_wall_order_cannot_make_a_physically_reversed_window_valid():
+def test_wall_order_cannot_make_a_physically_reversed_window_valid() -> None:
     with pytest.raises(ValidationError, match="窗口"):
         plan(window_start=at(10, 1), window_end=at(50, 0))
 
 
-def test_baseline_cannot_be_frozen_after_registration_in_the_other_fold():
+def test_baseline_cannot_be_frozen_after_registration_in_the_other_fold() -> None:
     with pytest.raises(ValidationError, match="基线"):
         plan(
             preregistered_at=at(50, 0),
@@ -111,20 +111,20 @@ def test_baseline_cannot_be_frozen_after_registration_in_the_other_fold():
         )
 
 
-def test_forecast_in_later_fold_cannot_precede_earlier_fold_window():
+def test_forecast_in_later_fold_cannot_precede_earlier_fold_window() -> None:
     p = plan(window_start=at(50, 0), window_end=at(30, 1))
     with pytest.raises(ValueError, match="窗口开始前"):
         evaluate_study(p, [forecast(at(10, 1))], [], as_of=at(40, 1))
 
 
-def test_early_negative_record_in_first_fold_is_rejected():
+def test_early_negative_record_in_first_fold_is_rejected() -> None:
     with pytest.raises(ValueError, match="完整目标窗口"):
         evaluate_study(
             plan(), [forecast()], [outcome(recorded_at=at(50, 0))], as_of=at(40, 1)
         )
 
 
-def test_record_in_second_fold_is_accepted_even_with_smaller_wall_label():
+def test_record_in_second_fold_is_accepted_even_with_smaller_wall_label() -> None:
     p = plan(window_end=at(50, 0))
     report = evaluate_study(
         p, [forecast()], [outcome(recorded_at=at(10, 1))], as_of=at(40, 1)

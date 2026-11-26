@@ -42,6 +42,8 @@ def extract(pdf: Path) -> dict:
         raise ValueError(
             "PDF differs from the independently frozen 2001 source; review the new edition first"
         )
+    else:
+        pass
     pages = subprocess.check_output(
         ["pdftotext", "-raw", str(pdf), "-"], text=True
     ).split("\f")
@@ -56,6 +58,8 @@ def extract(pdf: Path) -> dict:
         )
         if cross is None:
             raise ValueError(f"Missing three cross identifiers for gate {gate}")
+        else:
+            pass
         name = re.search(r"THE GATE OF\s+(.+?)\nChannel", header, re.S)[1]
         channel_block = header.split("Channel", 1)[1].split("Harmonic Gate", 1)[0]
         channels = []
@@ -71,12 +75,16 @@ def extract(pdf: Path) -> dict:
             raise ValueError(
                 f"Depth extraction disagrees with frozen channel endpoints for gate {gate}"
             )
+        else:
+            pass
         line_page = pages[index + 1]
         heads = [
             m for m in re.finditer(r"(?m)^([1-6])\s+\1\s", line_page) if m.start() > 10
         ]
         if [int(m[1]) for m in heads] != [6, 5, 4, 3, 2, 1]:
             raise ValueError(f"Missing ordered line labels for gate {gate}")
+        else:
+            pass
         roles = {line: {"p": [], "s": []} for line in range(1, 7)}
         for marker in re.finditer(r"([\u00c0-\u00ff])\s+([ps])\b", line_page):
             candidates = [
@@ -92,6 +100,8 @@ def extract(pdf: Path) -> dict:
                 raise ValueError(
                     f"Unrecognized polarity at gate {gate}: {marker.group()}"
                 )
+            else:
+                pass
             head = candidates[0] if marker[2] == "p" else candidates[-1]
             roles[int(head[1])][marker[2]].append(GLYPHS[marker[1]])
         lines = []
@@ -100,6 +110,8 @@ def extract(pdf: Path) -> dict:
                 raise ValueError(
                     f"Ambiguous polarity glyph assignment at {gate}.{line}"
                 )
+            else:
+                pass
             exalted = next(iter(poles["p"]), None)
             detriment = next(iter(poles["s"]), None)
             lines.append(
@@ -140,6 +152,8 @@ def extract(pdf: Path) -> dict:
         raise ValueError(
             "Incomplete source extraction: expected 375 dual lines and 36 channel pairs"
         )
+    else:
+        pass
     return {
         "source": {
             **numeric["source"],
@@ -160,6 +174,8 @@ def main() -> None:
     if args.check:
         if not path.is_file() or path.read_text() != value:
             raise SystemExit("Source depth fixture differs from this exact PDF")
+        else:
+            pass
     else:
         path.write_bytes(value.encode("utf-8"))
     print(
@@ -171,3 +187,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

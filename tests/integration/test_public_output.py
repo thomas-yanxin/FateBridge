@@ -6,12 +6,14 @@ import pytest
 from pydantic import Field
 
 from fatebridge.application.projection import project_fields
-from fatebridge.core.output_base import PartialOutput
+from fatebridge.core.contracts.output_base import PartialOutput
 from fatebridge.core.public_output import public_payload
 from fatebridge.utils.errors import ParameterError
 
 
-def test_public_boundary_preserves_facts_and_does_not_mutate_internal_evidence():
+def test_public_boundary_preserves_facts_and_does_not_mutate_internal_evidence() -> (
+    None
+):
     internal = {
         "source": {
             "title": "原典",
@@ -49,7 +51,9 @@ def test_public_boundary_preserves_facts_and_does_not_mutate_internal_evidence()
         project_fields(actual, ["source.source_sha256"], strict_fields=True)
 
 
-def test_output_schema_hides_internal_fields_without_weakening_internal_validation():
+def test_output_schema_hides_internal_fields_without_weakening_internal_validation() -> (
+    None
+):
     class Source(PartialOutput):
         filename: str
         sha256: str = Field(pattern=r"^[0-9a-f]{64}$")

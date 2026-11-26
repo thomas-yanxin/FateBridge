@@ -26,26 +26,26 @@ def reference():
 
 @pytest.mark.parametrize("second", [None, 0])
 def test_derived_grid_preserves_actual_instants_across_historical_second_offset(
-    second, monkeypatch
-):
+    second: int | None, monkeypatch: pytest.MonkeyPatch
+) -> None:
     ref = reference()
     person = PersonInfo(**ref["birth_input"], birth_second=second)
     before = person.model_dump()
     seen = []
-    original = module.normalize_birth_time
+    rebase = module.rebase_birth_clock
 
-    def observe(sample, **kwargs):
-        result = original(sample, **kwargs)
+    def observe(template, instant):
+        result = rebase(template, instant)
         seen.append(result)
         return result
 
-    monkeypatch.setattr(module, "normalize_birth_time", observe)
+    monkeypatch.setattr(module, "rebase_birth_clock", observe)
     actual = module.analyze_birth_time_range(
         person, 1, analysis_moment=datetime(2026, 1, 1)
     )
-    assert [
-        r.input_datetime.astimezone(timezone.utc).isoformat() for r in seen[1:]
-    ] == ref["expected_grid_utc"]
+    assert [r.input_datetime.astimezone(timezone.utc).isoformat() for r in seen] == ref[
+        "expected_grid_utc"
+    ]
     assert seen[-1].input_datetime.isoformat() == ref["expected_last_civil_clock"]
     assert (
         abs(
@@ -63,7 +63,7 @@ def test_derived_grid_preserves_actual_instants_across_historical_second_offset(
     assert person.birth_second == second
 
 
-def test_omitted_and_explicit_zero_share_the_same_nominal_grid_calculation():
+def test_omitted_and_explicit_zero_share_the_same_nominal_grid_calculation() -> None:
     ref = reference()
     a = module.analyze_birth_time_range(
         PersonInfo(**ref["birth_input"]), 1, analysis_moment=datetime(2026, 1, 1)
@@ -77,7 +77,9 @@ def test_omitted_and_explicit_zero_share_the_same_nominal_grid_calculation():
 
 
 @pytest.mark.parametrize("second", [None, 0])
-def test_discarded_seconds_cannot_invent_an_extra_hour_candidate(second, monkeypatch):
+def test_discarded_seconds_cannot_invent_an_extra_hour_candidate(
+    second: int | None, monkeypatch: pytest.MonkeyPatch
+) -> None:
     path = FIXTURE.with_name("unknown-second-hour-transition.json")
     assert (
         hashlib.sha256(path.read_bytes()).hexdigest()
@@ -86,25 +88,25 @@ def test_discarded_seconds_cannot_invent_an_extra_hour_candidate(second, monkeyp
     ref = json.loads(path.read_text())
     person = PersonInfo(**ref["birth_input"], birth_second=second)
     seen = []
-    original = module.normalize_birth_time
+    rebase = module.rebase_birth_clock
 
-    def observe(sample, **kwargs):
-        actual = original(sample, **kwargs)
+    def observe(template, instant):
+        actual = rebase(template, instant)
         seen.append(actual)
         return actual
 
-    monkeypatch.setattr(module, "normalize_birth_time", observe)
+    monkeypatch.setattr(module, "rebase_birth_clock", observe)
     result = module.analyze_birth_time_range(
         person, 1, analysis_moment=datetime(2026, 1, 1)
     )
-    assert [
-        n.input_datetime.astimezone(timezone.utc).isoformat() for n in seen[1:]
-    ] == ref["expected_grid_utc"]
-    assert seen[1].input_datetime.isoformat() == ref["expected_first_civil_clock"]
+    assert [n.input_datetime.astimezone(timezone.utc).isoformat() for n in seen] == ref[
+        "expected_grid_utc"
+    ]
+    assert seen[0].input_datetime.isoformat() == ref["expected_first_civil_clock"]
     assert (
         abs(
             (
-                seen[1].corrected_datetime
+                seen[0].corrected_datetime
                 - datetime.fromisoformat(ref["expected_first_corrected_clock"])
             ).total_seconds()
         )

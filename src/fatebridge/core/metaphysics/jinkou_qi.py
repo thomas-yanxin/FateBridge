@@ -9,11 +9,10 @@ from __future__ import annotations
 
 from typing import Any
 
+from fatebridge.core.metaphysics.common import ELEMENT_GENERATES, branch_element_text
+from fatebridge.core.metaphysics.jinkou_sources import SCAN_SHA256, SCAN_URL
 from fatebridge.core.metaphysics.ren_sources import JINKOU_SOURCE
-
-from ...utils.data import EARTHLY_BRANCHES
-from .common import ELEMENT_GENERATES, branch_element_text
-from .jinkou_sources import SCAN_SHA256, SCAN_URL
+from fatebridge.utils.data import EARTHLY_BRANCHES
 
 
 def qi_metadata() -> dict[str, Any]:

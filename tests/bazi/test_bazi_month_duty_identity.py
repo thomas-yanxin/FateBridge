@@ -6,10 +6,10 @@ import pytest
 
 from fatebridge.core.month_duty_scan_reference import build_month_duty_scan_reference
 from fatebridge.utils.data import BRANCH_HIDDEN_STEMS
-from tests.bazi.test_bazi_year_contract import TOPICS
 from tests.support.transports import AS_OF, SPECS, business, inputs
 from tests.support.transports import rest as _rest_fixture
 from tests.support.transports import surface_calls
+from tests.unit_test.fixtures.bazi_year_cases import TOPICS
 
 # Re-export the actual fixture object; test arguments refer to this registration.
 rest = _rest_fixture
@@ -28,7 +28,7 @@ def layer(pillars):
 @pytest.mark.parametrize("branch", list("寅卯辰巳午未申酉戌亥子丑"))
 def test_all_months_join_source_identity_and_actual_positions_without_rewriting_claims(
     branch,
-):
+) -> None:
     pillars = chart(branch)
     before, catalog = deepcopy(pillars), deepcopy(BRANCH_HIDDEN_STEMS)
     witness = build_month_duty_scan_reference(pillars)
@@ -66,7 +66,7 @@ def test_all_months_join_source_identity_and_actual_positions_without_rewriting_
         assert original["visible_positions"] is original["hidden_positions"] is None
 
 
-def test_source_definition_has_actual_anchor_and_retains_conflicting_context():
+def test_source_definition_has_actual_anchor_and_retains_conflicting_context() -> None:
     value = layer(chart())
     anchors = {a["id"]: a for a in value["anchors"]}
     gen, kun = value["identity_claims"]
@@ -80,7 +80,7 @@ def test_source_definition_has_actual_anchor_and_retains_conflicting_context():
     assert value["independent_expert_review"] == "not_completed"
 
 
-def test_gen_identity_is_not_a_duty_choice_and_does_not_relabel_ji_table():
+def test_gen_identity_is_not_a_duty_choice_and_does_not_relabel_ji_table() -> None:
     witness = build_month_duty_scan_reference(chart())
     prose, table = witness["duration_source_layers"]
     observation = witness["cross_chapter_identities"]["month_term_observations"][0]
@@ -98,7 +98,9 @@ def test_gen_identity_is_not_a_duty_choice_and_does_not_relabel_ji_table():
     assert witness["selected_duty_stem"] is None
 
 
-def test_returned_source_identity_and_occurrences_cannot_mutate_cache_or_inputs():
+def test_returned_source_identity_and_occurrences_cannot_mutate_cache_or_inputs() -> (
+    None
+):
     pillars = chart()
     first = layer(pillars)
     expected = deepcopy(first)
@@ -112,7 +114,7 @@ def test_returned_source_identity_and_occurrences_cannot_mutate_cache_or_inputs(
 @pytest.mark.parametrize("topic", TOPICS)
 def test_identity_layer_matches_actual_rest_native_mcp_cli_for_all_ten_tools(
     topic, surface_calls
-):
+) -> None:
     spec = SPECS["bazi_" + topic]
     prefix = "bazi_birth" if topic == "birth" else topic + "_analysis"
     chain = prefix + (

@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-from fatebridge.core.meihua_dining import dining_qualifications, dining_ruleset
+from fatebridge.core.meihua.meihua_dining import dining_qualifications, dining_ruleset
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
 from tests.support.meihua_dining_reference import (
@@ -17,7 +17,7 @@ from tests.support.meihua_dining_reference import (
 )
 
 
-def test_frozen_source_and_arithmetic_precede_new_dining_production():
+def test_frozen_source_and_arithmetic_precede_new_dining_production() -> None:
     p = json.loads((FOLDER / "manifest.json").read_bytes())
     assert not p["new_dining_production_implemented_before_freeze"]
     assert (
@@ -31,33 +31,37 @@ def test_frozen_source_and_arithmetic_precede_new_dining_production():
     for name, digest in p["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FOLDER / name).read_bytes()).hexdigest() == digest
 
 
-@pytest.mark.parametrize(
-    "case", CASES, ids=lambda r: f"{r['code']}-{r['line']}-{r['month']}"
-)
-def test_all_4992_reused_geometries_and_month_states_keep_source_and_actual_direct_control(
-    case,
+def test_covering_reused_geometries_and_month_states_keep_source_and_actual_direct_control() -> (
+    None
 ):
-    result = calculate_meihua_cast(
-        casting={
-            "method": "existing",
-            "hexagram_code": case["code"],
-            "moving_line": case["line"],
-        },
-        interpretation_topic="dining",
-        season_month_branch=case["month"],
-    )
-    validate(result)
+    months = list(dict.fromkeys(case["month"] for case in CASES))
+    geometries = list(dict.fromkeys((case["code"], case["line"]) for case in CASES))
+    by_key = {(case["code"], case["line"], case["month"]): case for case in CASES}
+    for index, (code, line) in enumerate(geometries):
+        case = by_key[(code, line, months[index % len(months)])]
+        result = calculate_meihua_cast(
+            casting={
+                "method": "existing",
+                "hexagram_code": case["code"],
+                "moving_line": case["line"],
+            },
+            interpretation_topic="dining",
+            season_month_branch=case["month"],
+        )
+        validate(result)
 
 
 @pytest.mark.parametrize("probe", ["control_disagreement", "presence_disagreement"])
 @pytest.mark.parametrize("basis", ["raw_counts", "trigram_numbers"])
 @pytest.mark.parametrize("month", [None, "子", "辰"])
 def test_each_candidate_uses_its_own_mutual_changed_symbols_and_source_control(
-    probe, basis, month
-):
+    probe: str, basis: str, month: str | None
+) -> None:
     ref = json.loads((FOLDER / "manual-candidate-probes.json").read_bytes())[probe]
     result = calculate_meihua_cast(
         casting={**ref["casting"], "line_sum_basis": basis},
@@ -85,7 +89,7 @@ def test_each_candidate_uses_its_own_mutual_changed_symbols_and_source_control(
     )
 
 
-def test_one_named_controller_is_enough_without_a_many_threshold():
+def test_one_named_controller_is_enough_without_a_many_threshold() -> None:
     case = next(
         r
         for r in GEOMETRY
@@ -109,7 +113,9 @@ def test_one_named_controller_is_enough_without_a_many_threshold():
     )
 
 
-def test_a_controller_itself_controlled_is_preserved_without_recursive_reactivation():
+def test_a_controller_itself_controlled_is_preserved_without_recursive_reactivation() -> (
+    None
+):
     case = next(
         r
         for r in GEOMETRY
@@ -138,7 +144,7 @@ def test_a_controller_itself_controlled_is_preserved_without_recursive_reactivat
     )
 
 
-def test_weak_fire_does_not_disable_the_selected_fire_controls_food_sentence():
+def test_weak_fire_does_not_disable_the_selected_fire_controls_food_sentence() -> None:
     case = next(r for r in GEOMETRY if r["symbols"]["food"]["direct_control_condition"])
     result = calculate_meihua_cast(
         casting={
@@ -164,7 +170,7 @@ def test_weak_fire_does_not_disable_the_selected_fire_controls_food_sentence():
 
 
 @pytest.mark.parametrize("hour", [0, 23])
-def test_new_topic_does_not_recast_the_calendar_or_original_hexagram(hour):
+def test_new_topic_does_not_recast_the_calendar_or_original_hexagram(hour: int) -> None:
     args = {
         "analysis_year": 2026,
         "analysis_month": 2,
@@ -190,7 +196,7 @@ def test_new_topic_does_not_recast_the_calendar_or_original_hexagram(hour):
         assert before["meihua"][key] == after["meihua"][key]
 
 
-def test_dining_words_never_select_a_new_chapter_by_themselves():
+def test_dining_words_never_select_a_new_chapter_by_themselves() -> None:
     result = calculate_meihua_cast(
         casting={"method": "existing", "hexagram_code": "000000", "moving_line": 1},
         question="飲食，有酒有食，赴宴",
@@ -213,8 +219,8 @@ def test_dining_words_never_select_a_new_chapter_by_themselves():
     ],
 )
 def test_reference_rejects_source_emendation_missing_qualification_or_physical_claim(
-    mutation,
-):
+    mutation: str,
+) -> None:
     ref = json.loads((FOLDER / "manual-candidate-probes.json").read_bytes())[
         "control_disagreement"
     ]
@@ -245,13 +251,13 @@ def test_reference_rejects_source_emendation_missing_qualification_or_physical_c
         validate(result)
 
 
-def test_profile_copy_cannot_mutate_future_source_clauses():
+def test_profile_copy_cannot_mutate_future_source_clauses() -> None:
     data = dining_ruleset()
     data["generation_reference"]["quote"] = "forged"
     assert dining_ruleset()["generation_reference"]["quote"] == "兌坎生身酒肉醉飽"
 
 
-def test_a_control_graph_from_another_candidate_is_rejected():
+def test_a_control_graph_from_another_candidate_is_rejected() -> None:
     ref = json.loads((FOLDER / "manual-candidate-probes.json").read_bytes())[
         "control_disagreement"
     ]

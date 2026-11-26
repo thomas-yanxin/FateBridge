@@ -57,7 +57,7 @@ uv run --no-project --with fatebridge python -m fatebridge.fetch_ephe \
 
 在各服务启动前设置 `SE_EPHE_PATH` 指向该目录；上面的 `export` 为 macOS / Linux 写法，Windows PowerShell 使用 `$env:SE_EPHE_PATH="C:\path\to\ephe"`。
 
-非空 `SE_EPHE_PATH` 在 Swiss 底层优先于代码传入的显式路径，回执记录实际选择。当前接口的路径总长须在 242 个编码字节内，避免底层静默回退；可以使用更短的挂载路径。德国盘的 `seorbel.txt` 可能覆盖假设点轨道，即使物理星体仍使用 Moshier；查看 `midpoint_analysis.profile.hypothetical_element_source` 的来源说明。库的默认搜索路径还可能含当前工作目录。外部数据应在服务运行期间保持不变，更新后重启并复核实际模型及回执。
+非空 `SE_EPHE_PATH` 在 Swiss 底层优先于代码传入的显式路径，回执记录实际选择。当前接口的路径总长须在 242 个编码字节内，避免底层静默回退；可以使用更短的挂载路径。按单目录安装时，路径不得含底层解释为搜索分隔符的字符或换行。macOS 和 Linux 的分隔符为 `;` 与 `:`，Windows 允许盘符冒号。显式 `SE_EPHE_PATH` 仍可指定有序搜索列表。242 字节上限适用于整条列表。离线核验成功后，若现有列表超限，安装命令会提示改设可用目录。 原生打开文件时另核目录和文件名的拼接字节数。达到 256 字节即停止搜索该文件名，备用名独立搜索。来源候选回执和节气缓存沿用这条边界。德国盘的 `seorbel.txt` 可能覆盖假设点轨道，即使物理星体仍使用 Moshier；查看 `midpoint_analysis.profile.hypothetical_element_source` 的来源说明。库的默认搜索路径还可能含当前工作目录。外部数据应在服务运行期间保持不变，更新后重启并复核实际模型及回执。
 
 需要固定版本时，将 `--with fatebridge` 改为当前服务使用的 `fatebridge==<version>`。
 
@@ -74,7 +74,7 @@ export SE_EPHE_PATH=/absolute/path/to/jpl-de441
 export FATEBRIDGE_JPL_FILE=linux_m13000p17000.441
 ```
 
-省略 `--dest` 时使用当前用户星历缓存下的 `jpl-de441/`，命令会打印实际目录。下载器从 JPL 官方地址流式下载，检查固定字节数、完整 SHA-256 和 DE441 文件头，校验后原子安装；已有不匹配文件会报错并保留。指纹来自本项目历史独立读取器核对记录，并非 NASA 发布的校验和。`--verify-only` 不联网；自定义 CA 可用 `--ca-file /absolute/path/to/ca.pem`，仍须通过 TLS 证书验证。下载不会自动切换后端，也不修改服务配置；在启动环境设置上述两个变量并重启客户端／服务后，检查实际模型及 `physical_ephemeris_source.files` 中的文件名、覆盖范围与 DE 版本。
+省略 `--dest` 时使用当前用户星历缓存下的 `jpl-de441/`，命令会打印实际目录。Swiss 2.10.03 要求完整文件路径最多 255 个编码字节。使用默认的 22 字节文件名时，下载目录最多 232 个编码字节。下载器会在联网前检查完整路径的长度和单目录资格，再从 JPL 官方地址流式下载，检查固定字节数、完整 SHA-256 和 DE441 文件头，校验后原子安装；已有不匹配文件会报错并保留。指纹来自本项目历史独立读取器核对记录，并非 NASA 发布的校验和。`--verify-only` 不联网。若已验证文件的目录超出原生限制，命令仍报告内容校验成功，并指引将文件复制到可用目录。自定义 CA 可用 `--ca-file /absolute/path/to/ca.pem`，仍须通过 TLS 证书验证。下载不会自动切换后端，也不修改服务配置；在启动环境设置上述两个变量并重启客户端／服务后，检查实际模型及 `physical_ephemeris_source.files` 中的文件名、覆盖范围与 DE 版本。
 
 DE441 的长时间覆盖不代表各年代精度一致；[JPL 原论文](https://ssd.jpl.nasa.gov/doc/de440_de441.html)明确说明 DE440 在当前世纪更准确。原始文件头采用 TDB，现有原生调用入口采用 TT；文件校验不认证时标换算、视位置模型或预测效力。固定样本的误差线和仍未通过的项目见[当前算法状态](algorithm-status.md)。
 
@@ -82,7 +82,9 @@ DE441 的长时间覆盖不代表各年代精度一致；[JPL 原论文](https:/
 
 ## 连续冥王星源与共享太阳系数
 
-离线冥王星使用随包的原始DE441冥王星系统质心／太阳多项式，先在同一TDB历元相减为日心位置，再按声明框架接入现有观测者。运行不依赖原生星历库、网络或参考点缓存。模型的源、时标、框架与实际五点TT日速方法由共享提供者交付，精度范围见[分项验收](precision-acceptance.md)。
+离线冥王星使用原始 DE441 冥王星系统质心与太阳多项式，在同一 TDB 历元相减为日心位置，再按声明框架接入观测者。运行时按需读取分片并核对压缩文件与解压后系数的固定 SHA-256。模型、时标和速度方法的精度范围见[分项验收](precision-acceptance.md)。
+
+Python 分发包保留 DE441 的固定清单，约 600 MiB 的系数分片独立供应。源码检出可直接读取 `src/fatebridge/data/astronomy`。使用 wheel 或 sdist 安装时，从匹配版本的 GitHub 源码归档中提取该目录下的 `de441-planetary-*-part-*.bin.gz`，将 `FATEBRIDGE_DE441_DIR` 设为分片目录的绝对路径，再启动 REST、MCP 或 CLI。缺少所需分片时，引擎返回 `de441_archive_missing`。这套分片使用项目固定布局，严格原生 JPL 模式所用的完整内核另行配置。
 
 太阳的五个DE440逻辑模型共用`de440-solar-record-atlas-v1`，每个模型保留原记录选择、系数字节、适用年份和源身份；相同记录只存一次。两个数据所有者共用可逆的记录字节通道压缩，没有降低系数位数、拟合修正或改变太阳计算。源码中的元数据身份及解压后原始系数身份在加载边界核对。
 

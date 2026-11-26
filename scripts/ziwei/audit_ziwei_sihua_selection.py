@@ -55,12 +55,16 @@ def frozen_table(
         != vectors["source_manifest_sha256"]
     ):
         raise ValueError("Ming selection source manifest checksum mismatch")
+    else:
+        pass
     for row in json.loads(manifest.read_text())["files"]:
         if (
             hashlib.sha256((folder / row["path"]).read_bytes()).hexdigest()
             != row["sha256"]
         ):
             raise ValueError("Ming selection source checksum mismatch")
+        else:
+            pass
     source = json.loads((folder / "collation.json").read_text())["sihua"]
     table = {
         row["stem"]: dict(
@@ -82,6 +86,8 @@ def audit_sihua_selection(fixtures: Path = FIXTURES) -> dict[str, Any]:
         ]
         if catalogue["sihua_by_year_stem"] != expected:
             failures.append(dict(case="selected_table", profile=profile))
+        else:
+            pass
         table_cells += 40
         for year in range(1984, 1994):
             for gender in ("男", "女", "未知"):
@@ -147,6 +153,8 @@ def audit_sihua_selection(fixtures: Path = FIXTURES) -> dict[str, Any]:
                             failed=bad,
                         )
                     )
+                else:
+                    pass
                 natal_cases += 1
                 natal_joins += len(actual)
     person = create_person_info(**vectors["birth"])
@@ -169,13 +177,19 @@ def audit_sihua_selection(fixtures: Path = FIXTURES) -> dict[str, Any]:
         if h is None:
             failures.append(dict(case="service_error", input=row, error=result))
             continue
+        else:
+            pass
         actual_stems = {s["scope"]: s["stem"] for s in h["scopes"]}
         if actual_stems != row["computed_stems"]:
             failures.append(dict(case="coverage_stems_changed", input=row))
+        else:
+            pass
         for scope in h["scopes"]:
             stem = scope["stem"]
             if stem in ("庚", "壬"):
                 coverage.add((profile, scope["scope"], stem))
+            else:
+                pass
             wanted = expected[stem]
             if scope["mutagen"] != wanted:
                 failures.append(
@@ -186,6 +200,8 @@ def audit_sihua_selection(fixtures: Path = FIXTURES) -> dict[str, Any]:
                         stem=stem,
                     )
                 )
+            else:
+                pass
             objects = {
                 s["name"]: (p, s)
                 for p in charts[profile]["palaces"]
@@ -209,14 +225,20 @@ def audit_sihua_selection(fixtures: Path = FIXTURES) -> dict[str, Any]:
                             transformation=link["transformation"],
                         )
                     )
+                else:
+                    pass
                 dynamic_joins += 1
         if (
             h["sihua_source_comparison"]["dynamic_reuse_classically_verified"]
             is not False
         ):
             failures.append(dict(case="unearned_dynamic_certification"))
+        else:
+            pass
     if len(coverage) != 24:
         failures.append(dict(case="coverage_incomplete", count=len(coverage)))
+    else:
+        pass
     return {
         "method_id": "explicit_ming_sihua_selection_v1",
         "independent_literal_source_cells": 40,

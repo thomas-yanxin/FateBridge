@@ -13,6 +13,7 @@ import hashlib
 import json
 import math
 from copy import deepcopy
+from fractions import Fraction
 from functools import lru_cache
 from importlib.resources import files
 from typing import Any, Dict, Sequence, Tuple
@@ -66,6 +67,11 @@ def _profile_data() -> Dict[str, Any]:
     return data
 
 
+def loaded_sha256() -> str:
+    """Return the immutable SHA-256 digest of the loaded analytic solar table without copying."""
+    return str(_profile_data()["loaded_sha256"])
+
+
 def profile() -> Dict[str, Any]:
     """Return a detached source view; callers cannot rewrite loaded mathematics."""
     return deepcopy(_profile_data())
@@ -80,7 +86,8 @@ profile.cache_parameters = _profile_data.cache_parameters  # type: ignore[attr-d
 def _epoch(date1: float, date2: float, scale: float) -> float:
     if not math.isfinite(date1) or not math.isfinite(date2):
         raise ValueError("Analytic solar epoch must be finite")
-    return ((date1 - 2451545.0) + date2) / scale
+    # Keep both supplied date parts until the final interval rounding.
+    return float((Fraction(date1) - 2451545 + Fraction(date2)) / Fraction(scale))
 
 
 def _orientation(vector: Sequence[float]) -> Vector:

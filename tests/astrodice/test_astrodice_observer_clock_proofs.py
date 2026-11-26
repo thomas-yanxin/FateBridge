@@ -17,13 +17,15 @@ from scripts.astrodice.verify_astrodice_observer_clock import (
     root,
     rounded,
 )
-from tests.astrodice.test_astrodice_observer_clock import PLAN, LinearReader
+from tests.unit_test.fixtures.astrodice_analytic import PLAN, LinearReader
 
 
 class LinearSource:
     def state(self, epoch, body):
         if body == "Earth":
             return [rounded(0) for _ in range(6)]
+        else:
+            pass
         return [
             add(rounded(1), mul(rounded(Q(1, 100)), epoch)),
             rounded(0),
@@ -42,7 +44,7 @@ class LinearSource:
         "converged_Newtonian_24_emission_ET_ULP_hypothesis",
     ],
 )
-def test_independent_exact_proof_replays_analytic_motion_enclosures(model):
+def test_independent_exact_proof_replays_analytic_motion_enclosures(model: str) -> None:
     stored = forward(LinearReader(), I(), model, PLAN)
     steps, checks = model_proof(LinearSource(), rounded(0), model, stored, PLAN)
     assert steps == (2 if model.startswith("legacy") else 24)
@@ -53,7 +55,7 @@ def test_independent_exact_proof_replays_analytic_motion_enclosures(model):
     "mutation",
     ["skip", "understate_image", "understate_range", "emission", "promotion"],
 )
-def test_independent_proof_rejects_fabricated_source_claims(mutation):
+def test_independent_proof_rejects_fabricated_source_claims(mutation: str) -> None:
     model = "converged_Newtonian_24_emission_ET_ULP_hypothesis"
     stored = copy.deepcopy(forward(LinearReader(), I(), model, PLAN))
     if mutation == "skip":
@@ -70,7 +72,9 @@ def test_independent_proof_rejects_fabricated_source_claims(mutation):
         model_proof(LinearSource(), rounded(0), model, stored, PLAN)
 
 
-def test_separate_box_arithmetic_keeps_reversed_support_and_zero_denominators_invalid():
+def test_separate_box_arithmetic_keeps_reversed_support_and_zero_denominators_invalid() -> (
+    None
+):
     a, b = root(rounded(2))
     assert a * a <= 2 <= b * b
     assert length([rounded(3), rounded(4)]) == rounded(5)

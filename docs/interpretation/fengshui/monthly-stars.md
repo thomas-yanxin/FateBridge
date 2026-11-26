@@ -31,7 +31,7 @@ MP1的六月节候栏原印“大暑、小暑”，与标准时间顺序相反�
 
 读取 `layers.monthly_stars`，保留 `rulesets/rule_trace`。`center_star_number` 和 `palaces.*.monthly_star_number` 是本节月飞星，`palace_number` 是固定宫数。月星名称和五行共享固定数的身份，不继承基础年星表中的通用吉凶标签。
 
-`position_reading@1.0.0` 包含一条年／月／有效期说明和九条逐宫固定文本。每条有精确 `target_path`、完整时间与来源的 `basis_paths/basis`；只消费同次返回值，不重算月份或星盘。资料缺失或交节待确认时，仅说明缺项／候选，不给唯一月盘。完整原始响应与从执行端另外保管的完整回执，可交给 `fatebridge.validation.fengshui_monthly.verify_monthly_reading` 核验。通过须先满足月表数字、逐宫数式和区间上下文的内部一致性，再核对固定文本与原run；不表示历法独立精度、自由模型改写或现实预测通过。
+`position_reading@1.0.0` 包含一条年／月／有效期说明和九条逐宫固定文本。每条有精确 `target_path`、完整时间与来源的 `basis_paths/basis`；只消费同次返回值，不重算月份或星盘。资料缺失或交节待确认时，仅说明缺项／候选，不给唯一月盘。完整原始响应与从执行端另外保管的完整回执，可交给 `validation.fengshui_monthly.verify_monthly_reading` 核验。通过须先满足月表数字、逐宫数式和区间上下文的内部一致性，再核对固定文本与原run；不表示历法独立精度、自由模型改写或现实预测通过。
 
 布局只按物件已确认的**位置**读取月星；朝向不能替代位置。`usage_interpretation=not_covered_not_inauspicious` 表示本版没有月星用途与行动规则，不判该宫不利，不生成搬动、摆水、施工或物件处方。候选方案在各自新位置重新读取同一时间月盘，不能沿用旧位置星数。
 
@@ -44,7 +44,7 @@ uv run --locked --extra dev fatebridge fengshui_monthly_stars \
   --query-at '2027-01-10T12:00:00+08:00' --timezone-name Asia/Shanghai
 ```
 
-REST为 `POST /api/fengshui/monthly_stars`，请求体可用 `{"effective_solar_year":2026,"solar_month_number":12}`。MCP名称为 `fengshui_monthly_stars`，参数以当前工具Schema为准。完整原始响应按初次请求范围读取同run交付，不能重算旧输入来替代原始回执。
+REST为 `POST /api/fengshui/monthly-stars`，请求体可用 `{"effective_solar_year":2026,"solar_month_number":12}`。MCP名称为 `fengshui_monthly_stars`，参数以当前工具Schema为准。完整原始响应按初次请求范围读取同run交付，不能重算旧输入来替代原始回执。
 
 三端比较须使用同一星历配置。由客户端启动stdio MCP子进程时，自定义 `SE_EPHE_PATH` 应显式写入该服务器的 `env`；标准MCP客户端只继承有限环境变量，不能假定它会转发宿主的自定义星历路径。核对实际返回的 `ephemeris_model` 和文件回执：Moshier与完整Swiss配置可能给出不同交节时刻，工具同名本身不证明后端一致。
 

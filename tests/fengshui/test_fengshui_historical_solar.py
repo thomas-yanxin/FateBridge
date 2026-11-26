@@ -14,7 +14,8 @@ from fastmcp import Client
 from fatebridge.cli import run
 from fatebridge.core import de440_solar
 from fatebridge.core import ephemeris_runtime as runtime
-from fatebridge.core.astro.time_scales import ephemeris_time
+from fatebridge.core.astro.time_scales import datetime_from_tt, ephemeris_time
+from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.de441_solar import MODEL_ID as MOSHIER_MODEL
 from fatebridge.core.fengshui import historical_solar
 from fatebridge.core.fengshui.calendar import (
@@ -24,8 +25,10 @@ from fatebridge.core.fengshui.calendar import (
 )
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.utils.errors import EphemerisSourceError
+from tests.support.fengshui_clock import seconds_from_boundary
+from tests.support.fengshui_transports import SPECS
 from tests.support.mcp_result_assertions import without_transport
-from tests.support.transports import rest_client
+from tests.support.transports import call_calculation, rest_client
 
 ROOT = Path(__file__).parents[2]
 FOLDER = ROOT / "tests/data/fengshui_historical_solar_v1"
@@ -37,7 +40,7 @@ REFERENCE = json.loads(
 )
 
 
-def test_all_original_state_rows_and_predeclared_tolerances():
+def test_all_original_state_rows_and_predeclared_tolerances() -> None:
     hashes = json.loads((FOLDER / "hashes.json").read_text())
     for name, expected in hashes.items():
         assert hashlib.sha256((FOLDER / name).read_bytes()).hexdigest() == expected
@@ -64,7 +67,7 @@ def test_all_original_state_rows_and_predeclared_tolerances():
         ) <= (PROTOCOL["state_sampling"]["velocity_tolerance_km_per_day"])
 
 
-def test_overlapping_original_profile_states_are_unchanged():
+def test_overlapping_original_profile_states_are_unchanged() -> None:
     rows = json.loads(gzip.decompress((FOLDER / "states.json.gz").read_bytes()))["rows"]
     checked = 0
     for row in rows:
@@ -79,6 +82,8 @@ def test_overlapping_original_profile_states_are_unchanged():
                 pair, epoch - 2451545.0, profile_id=MODEL
             )
             checked += 1
+        else:
+            pass
     assert checked == 4812
     assert de440_solar.source_receipt()["model_id"] == de440_solar.MODEL_ID
 
@@ -86,8 +91,8 @@ def test_overlapping_original_profile_states_are_unchanged():
 @pytest.mark.parametrize("mode", ["auto", "de440"])
 @pytest.mark.parametrize("year", [1784, 1785, 1799, 2201, 2204])
 def test_both_selected_packaged_modes_identify_the_actual_historical_source(
-    monkeypatch, mode, year
-):
+    monkeypatch: pytest.MonkeyPatch, mode: str, year: int
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     result = lichun_resolution(year, "Asia/Shanghai")
@@ -102,16 +107,26 @@ def test_both_selected_packaged_modes_identify_the_actual_historical_source(
         "c98f944353434ac9f8c65989837d3196f09a8cb41ecbaecae0f853e0861e5d31"
     )
     root = datetime.fromisoformat(result["moment"])
+    assert root == datetime_from_tt(
+        TTInstant.from_float(details["selected_crossing_jd_tt"])
+    )
     assert lichun(year, "Asia/Shanghai") == root
     assert root == datetime.fromisoformat(lichun_resolution(year, "UTC")["moment"])
-    assert boundary_uncertainty_reason(root + timedelta(seconds=5), result) == (
+    upper = root + timedelta(seconds=5)
+    distance = seconds_from_boundary(upper, result["civil_point"])
+    reason = (
         "de440_historical_solar_model_guard_not_accuracy_certification"
+        if abs(distance) <= 5
+        else None
     )
+    assert boundary_uncertainty_reason(upper, result) == reason
     assert boundary_uncertainty_reason(root + timedelta(seconds=6), result) is None
 
 
 @pytest.mark.parametrize("year", [1783, 1800, 2000, 2200, 2205])
-def test_other_years_do_not_open_the_historical_profile(monkeypatch, year):
+def test_other_years_do_not_open_the_historical_profile(
+    monkeypatch: pytest.MonkeyPatch, year: int
+) -> None:
     def unavailable(*args, **kwargs):
         pytest.fail("An unused historical source must not be loaded")
 
@@ -120,20 +135,24 @@ def test_other_years_do_not_open_the_historical_profile(monkeypatch, year):
 
 
 @pytest.mark.parametrize("mode", ["native", "analytic", "spk"])
-def test_explicit_other_models_are_not_replaced(monkeypatch, mode):
+def test_explicit_other_models_are_not_replaced(
+    monkeypatch: pytest.MonkeyPatch, mode: str
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
     assert historical_solar.historical_solar_resolution(1785, "立春", "UTC") is None
 
 
-def test_strict_jpl_auto_selection_is_not_replaced(monkeypatch):
+def test_strict_jpl_auto_selection_is_not_replaced(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
     monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "de441.eph")
     assert historical_solar.historical_solar_resolution(1785, "立春", "UTC") is None
 
 
 def test_1785_corrected_models_preserve_the_raw_swiss_moshier_failure(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     reference = next(r for r in REFERENCE["rows"] if r["year"] == 1785)
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
@@ -170,8 +189,8 @@ def test_1785_corrected_models_preserve_the_raw_swiss_moshier_failure(
 
 @pytest.mark.parametrize("changed_mode", ["native", "invalid_during_solar_batch"])
 def test_configuration_changes_during_a_root_are_not_delivered(
-    monkeypatch, changed_mode
-):
+    monkeypatch: pytest.MonkeyPatch, changed_mode: str
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     original = de440_solar.longitude_crossing_tt
@@ -190,8 +209,8 @@ def test_configuration_changes_during_a_root_are_not_delivered(
     "fault", ["missing", "bytes", "tdb_identity", "model_identity"]
 )
 def test_corrupt_historical_data_fail_without_a_native_fallback(
-    monkeypatch, tmp_path, fault
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, fault: str
+) -> None:
     folder = tmp_path / "data/astronomy"
     folder.mkdir(parents=True)
     for name in (
@@ -227,8 +246,12 @@ def test_corrupt_historical_data_fail_without_a_native_fallback(
 
 @pytest.mark.parametrize("year,expected_period", [(1800, 6), (2199, 8)])
 def test_actual_period_endpoints_keep_the_source_on_rest_mcp_cli(
-    monkeypatch, tmp_path, capsys, year, expected_period
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    year: int,
+    expected_period: int,
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     data = {
@@ -242,15 +265,19 @@ def test_actual_period_endpoints_keep_the_source_on_rest_mcp_cli(
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                "fengshui_xuankong_natal", {**data, "response_char_limit": 0}
+            return await call_calculation(
+                client,
+                "fengshui_xuankong_house_chart",
+                {**data, "response_char_limit": 0},
             )
 
-    http = rest_client(monkeypatch).post("/api/fengshui/xuankong_natal", json=data)
+    http = rest_client(monkeypatch).post(
+        "/api/fengshui/xuankong-house-chart", json=data
+    )
     mcp = asyncio.run(call())
     path = tmp_path / "input.json"
     path.write_text(json.dumps(data))
-    code = run(["fengshui_xuankong_natal", "--request-file", str(path)])
+    code = run(["fengshui_xuankong_house_chart", "--request-file", str(path)])
     cli = json.loads(capsys.readouterr().out)
     assert http.status_code == 200 and not mcp.is_error and code == 0
     assert (
@@ -267,8 +294,11 @@ def test_actual_period_endpoints_keep_the_source_on_rest_mcp_cli(
 
 @pytest.mark.parametrize("name", ["xuankong_natal", "assess"])
 def test_de440_candidate_guard_is_not_called_a_linear_fallback_on_any_protocol(
-    monkeypatch, tmp_path, capsys, name
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    name: str,
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     # An internally computed instant checks candidate semantics only. Absolute
@@ -284,18 +314,22 @@ def test_de440_candidate_guard_is_not_called_a_linear_fallback_on_any_protocol(
     }
     if name == "assess":
         inputs = {"methods": ["xuankong_natal"], "xuankong": inputs}
+    else:
+        pass
+
+    spec = SPECS[name]
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                "fengshui_" + name, {**inputs, "response_char_limit": 0}
+            return await call_calculation(
+                client, spec.tool_name, {**inputs, "response_char_limit": 0}
             )
 
-    http = rest_client(monkeypatch).post("/api/fengshui/" + name, json=inputs)
+    http = rest_client(monkeypatch).post(spec.rest_path, json=inputs)
     mcp = asyncio.run(call())
     path = tmp_path / "boundary.json"
     path.write_text(json.dumps(inputs))
-    code = run(["fengshui_" + name, "--request-file", str(path)])
+    code = run([spec.tool_name, "--request-file", str(path)])
     cli = json.loads(capsys.readouterr().out)
     assert http.status_code == 200 and not mcp.is_error and code == 0
     assert (
@@ -315,8 +349,8 @@ def test_de440_candidate_guard_is_not_called_a_linear_fallback_on_any_protocol(
 
 
 def test_missing_historical_source_cannot_be_hidden_by_projection_on_any_protocol(
-    monkeypatch, tmp_path, capsys
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     original = de440_solar._selected_profile
@@ -324,6 +358,8 @@ def test_missing_historical_source_cannot_be_hidden_by_projection_on_any_protoco
     def unavailable(profile_id):
         if profile_id == MODEL:
             raise EphemerisSourceError("solar_de440_invalid")
+        else:
+            pass
         return original(profile_id)
 
     monkeypatch.setattr(de440_solar, "_selected_profile", unavailable)
@@ -338,14 +374,15 @@ def test_missing_historical_source_cannot_be_hidden_by_projection_on_any_protoco
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                "fengshui_xuankong_natal",
+            return await call_calculation(
+                client,
+                "fengshui_xuankong_house_chart",
                 {**inputs, "fields": ["status"], "strict_fields": True},
                 raise_on_error=False,
             )
 
     http = rest_client(monkeypatch).post(
-        "/api/fengshui/xuankong_natal",
+        "/api/fengshui/xuankong-house-chart",
         json=inputs,
         params={"fields": "status", "strict_fields": "true"},
     )
@@ -354,7 +391,7 @@ def test_missing_historical_source_cannot_be_hidden_by_projection_on_any_protoco
     path.write_text(json.dumps(inputs))
     code = run(
         [
-            "fengshui_xuankong_natal",
+            "fengshui_xuankong_house_chart",
             "--request-file",
             str(path),
             "--fields",

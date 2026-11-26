@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.meihua_day_qi import civil_day_qi_context, day_qi_ruleset
+from fatebridge.core.meihua.meihua_day_qi import civil_day_qi_context, day_qi_ruleset
 from fatebridge.core.requests.meihua import MeihuaCastRequest
 from fatebridge.services.meihua import calculate_meihua_cast
 
@@ -47,7 +47,7 @@ def at_path(output, path):
     return result
 
 
-def test_primary_source_and_expected_tables_frozen_before_implementation():
+def test_primary_source_and_expected_tables_frozen_before_implementation() -> None:
     m = json.loads((FIXTURE / "manifest.json").read_text())
     assert not m["implementation_present_at_reference_freeze"]
     assert not m["expected_values_from_production"]
@@ -55,12 +55,14 @@ def test_primary_source_and_expected_tables_frozen_before_implementation():
     for name, digest in m["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
     assert len({row["ganzhi"] for row in PRINTED}) == 60
 
 
 @pytest.mark.parametrize("row", PRINTED, ids=lambda row: row["date"])
-def test_all_sixty_printed_cells_not_a_production_generated_reference(row):
+def test_all_sixty_printed_cells_not_a_production_generated_reference(row) -> None:
     c = civil_day_qi_context(
         datetime.fromisoformat(row["date"] + "T12:00"), bazi_day_ganzhi=row["ganzhi"]
     )
@@ -71,7 +73,7 @@ def test_all_sixty_printed_cells_not_a_production_generated_reference(row):
 
 @pytest.mark.parametrize("topic", TOPICS)
 @pytest.mark.parametrize("branch", BRANCHES)
-def test_all_twelve_day_branches_on_all_human_branches(branch, topic):
+def test_all_twelve_day_branches_on_all_human_branches(branch, topic) -> None:
     out = calculate_meihua_cast(
         casting=cast_for(GEOMETRY[0]),
         interpretation_topic=topic,
@@ -108,7 +110,9 @@ def test_all_twelve_day_branches_on_all_human_branches(branch, topic):
 
 @pytest.mark.parametrize("body", ["木", "火", "土", "金", "水"])
 @pytest.mark.parametrize("branch", BRANCHES)
-def test_day_element_relation_preserves_undeclared_body_controls_day_case(body, branch):
+def test_day_element_relation_preserves_undeclared_body_controls_day_case(
+    body: str, branch
+) -> None:
     case = next(row for row in GEOMETRY if row["body_element"] == body)
     out = calculate_meihua_cast(casting=cast_for(case), day_qi_context=context(branch))
     row = out["interpretation"]["day_qi"]["calendar_candidates"][0]
@@ -120,10 +124,12 @@ def test_day_element_relation_preserves_undeclared_body_controls_day_case(body, 
         assert pref == "not_preferred_in_selected_day_clause"
     elif expected in {"用生体", "体用比和"}:
         assert pref == "preferred_in_selected_day_clause"
+    else:
+        pass
 
 
 @pytest.mark.parametrize("branch", BRANCHES)
-def test_ambiguous_count_candidates_each_keep_own_body_and_month_paths(branch):
+def test_ambiguous_count_candidates_each_keep_own_body_and_month_paths(branch) -> None:
     out = calculate_meihua_cast(
         casting={"method": "object_count", "count": 11, "hour_branch": "丑"},
         day_qi_context=context(branch),
@@ -145,7 +151,7 @@ def test_ambiguous_count_candidates_each_keep_own_body_and_month_paths(branch):
             )
 
 
-def test_month_and_day_disagreement_is_not_voted_or_cancelled():
+def test_month_and_day_disagreement_is_not_voted_or_cancelled() -> None:
     case = next(row for row in GEOMETRY if row["body_element"] == "木")
     out = calculate_meihua_cast(
         casting=cast_for(case), season_month_branch="申", day_qi_context=context("寅")
@@ -159,7 +165,7 @@ def test_month_and_day_disagreement_is_not_voted_or_cancelled():
     assert body["net_strength"] is None
 
 
-def test_hour_year_lunar_day_question_do_not_fill_missing_day_branch():
+def test_hour_year_lunar_day_question_do_not_fill_missing_day_branch() -> None:
     out = calculate_meihua_cast(
         casting={
             "method": "lunar_time_added_count",
@@ -177,7 +183,7 @@ def test_hour_year_lunar_day_question_do_not_fill_missing_day_branch():
 
 
 @pytest.mark.parametrize("value", [None, "甲子", "", True, 1, {}])
-def test_invalid_or_unknown_day_branch_not_coerced(value):
+def test_invalid_or_unknown_day_branch_not_coerced(value) -> None:
     result = calculate_meihua_cast(
         casting=cast_for(GEOMETRY[0]),
         day_qi_context={"label": "虚构", "day_branch": value},
@@ -194,13 +200,13 @@ def test_invalid_or_unknown_day_branch_not_coerced(value):
         {"label": "虚构", "day_branch": "子", "declared_day_boundary": "guess"},
     ],
 )
-def test_context_not_completed_from_missing_label_or_unrecognized_fields(value):
+def test_context_not_completed_from_missing_label_or_unrecognized_fields(value) -> None:
     assert "error" in calculate_meihua_cast(
         casting=cast_for(GEOMETRY[0]), day_qi_context=value
     )
 
 
-def test_day_boundary_on_reported_branch_is_not_a_verified_date():
+def test_day_boundary_on_reported_branch_is_not_a_verified_date() -> None:
     out = calculate_meihua_cast(
         casting=cast_for(GEOMETRY[0]),
         day_qi_context={**context("子"), "declared_day_boundary": "zi_start"},
@@ -210,7 +216,7 @@ def test_day_boundary_on_reported_branch_is_not_a_verified_date():
     assert row["calendar"]["day_boundary"] == "zi_start"
 
 
-def test_weather_rejects_supplied_context_and_preserves_failed_primary_gate():
+def test_weather_rejects_supplied_context_and_preserves_failed_primary_gate() -> None:
     payload = {"casting": cast_for(GEOMETRY[0]), "interpretation_topic": "weather"}
     with pytest.raises(ValidationError):
         MeihuaCastRequest.model_validate({**payload, "day_qi_context": context("子")})
@@ -228,7 +234,7 @@ def test_weather_rejects_supplied_context_and_preserves_failed_primary_gate():
     ) == (273, 29, 158, False)
 
 
-def test_selected_day_words_and_cache_not_normalized_to_other_witness():
+def test_selected_day_words_and_cache_not_normalized_to_other_witness() -> None:
     p = day_qi_ruleset()
     assert "看所占卦日屬何卦" in p["day_clause"]["quote"]
     assert "水旺則火衰" in p["month_day_strength"]["weak_quote"]

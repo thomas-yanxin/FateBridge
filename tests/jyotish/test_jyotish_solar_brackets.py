@@ -9,9 +9,9 @@ import pytest
 
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.time_scales import datetime_from_ut1
-from fatebridge.core.jyotish import build_india, positions
-from fatebridge.core.jyotish_evidence import strength_context
-from fatebridge.core.jyotish_kala import solar_parts, temporal_balas
+from fatebridge.core.jyotish.jyotish import build_india, positions
+from fatebridge.core.jyotish.jyotish_evidence import strength_context
+from fatebridge.core.jyotish.jyotish_kala import solar_parts, temporal_balas
 from tests.fixtures.surface_payloads import astro_payload
 
 REFERENCE = json.loads(
@@ -30,7 +30,7 @@ def packet(*pairs):
     }
 
 
-def test_first_day_after_polar_night_keeps_its_supported_solar_components():
+def test_first_day_after_polar_night_keeps_its_supported_solar_components() -> None:
     birth = build_astro_birth_info(
         birth_year=2026,
         birth_month=2,
@@ -52,7 +52,7 @@ def test_first_day_after_polar_night_keeps_its_supported_solar_components():
 )
 def test_both_hemispheres_against_frozen_event_inputs_and_manual_component_expectations(
     case, expected
-):
+) -> None:
     actual = solar_parts(case["jd_ut1"], 0, {"events": case["events"]})
     assert actual["status"] == "bracketed"
     assert actual["sunrise_day_status"] == actual["active_arc_status"] == "bracketed"
@@ -76,7 +76,7 @@ def test_both_hemispheres_against_frozen_event_inputs_and_manual_component_expec
 
 
 @pytest.mark.parametrize("hours,ruler", [(2, "Mercury"), (6, "Sun"), (10, "Saturn")])
-def test_day_arc_does_not_require_any_previous_sunset(hours, ruler):
+def test_day_arc_does_not_require_any_previous_sunset(hours: int, ruler: str) -> None:
     context = packet(("rise", 0), ("set", 0.5), ("rise", 1))
     actual = solar_parts(RISE + hours / 24, 0, context)
     assert actual["status"] == "bracketed"
@@ -88,7 +88,7 @@ def test_day_arc_does_not_require_any_previous_sunset(hours, ruler):
 
 
 @pytest.mark.parametrize("hours,ruler", [(14, "Moon"), (18, "Venus"), (22, "Mars")])
-def test_night_arc_does_not_require_a_future_sunset(hours, ruler):
+def test_night_arc_does_not_require_a_future_sunset(hours: int, ruler: str) -> None:
     actual = solar_parts(
         RISE + hours / 24, 0, packet(("rise", 0), ("set", 0.5), ("rise", 1))
     )
@@ -104,7 +104,9 @@ def test_night_arc_does_not_require_a_future_sunset(hours, ruler):
         ([("set", 0), ("rise", 0.5)], "Moon", False),
     ],
 )
-def test_day_or_night_third_is_independent_of_missing_sunrise_day(pairs, ruler, is_day):
+def test_day_or_night_third_is_independent_of_missing_sunrise_day(
+    pairs, ruler: str, is_day: bool
+) -> None:
     actual = solar_parts(RISE + 0.125, 0, packet(*pairs))
     assert actual["status"] == "partial_solar_brackets"
     assert (
@@ -115,7 +117,7 @@ def test_day_or_night_third_is_independent_of_missing_sunrise_day(pairs, ruler, 
     assert actual["day_lord"] is actual["hora_lord"] is None
 
 
-def test_sunrise_day_keeps_dina_hora_without_inventing_a_day_night_arc():
+def test_sunrise_day_keeps_dina_hora_without_inventing_a_day_night_arc() -> None:
     actual = solar_parts(RISE + 0.125, 0, packet(("rise", 0), ("rise", 1)))
     assert actual["status"] == "partial_solar_brackets"
     assert actual["sunrise_day_status"] == "bracketed"
@@ -127,7 +129,7 @@ def test_sunrise_day_keeps_dina_hora_without_inventing_a_day_night_arc():
 @pytest.mark.parametrize(
     "pairs", [[], [("rise", 0)], [("set", 0.5)], [("set", 0), ("set", 0.5)]]
 )
-def test_empty_one_sided_or_same_kind_support_does_not_create_an_arc(pairs):
+def test_empty_one_sided_or_same_kind_support_does_not_create_an_arc(pairs) -> None:
     actual = solar_parts(RISE + 0.125, 0, packet(*pairs))
     assert actual["status"] == "solar_day_not_bracketed"
     assert actual["day_lord"] is actual["hora_lord"] is actual["tribhaga_lord"] is None
@@ -137,7 +139,7 @@ def test_empty_one_sided_or_same_kind_support_does_not_create_an_arc(pairs):
     "pairs",
     [[("rise", 0), ("set", 0), ("rise", 1)], [("rise", 0), ("rise", 1), ("set", 1)]],
 )
-def test_exact_coincident_opposite_events_are_not_arbitrarily_ordered(pairs):
+def test_exact_coincident_opposite_events_are_not_arbitrarily_ordered(pairs) -> None:
     actual = solar_parts(RISE + 0.125, 0, packet(*pairs))
     assert actual["active_arc_status"] == "ambiguous_coincident_events"
     assert actual["tribhaga_lord"] is None
@@ -148,8 +150,8 @@ def test_exact_coincident_opposite_events_are_not_arbitrarily_ordered(pairs):
     [(0.25, "Mercury", "Sun"), (0.5, "Sun", "Saturn"), (0.75, "Saturn", "Moon")],
 )
 def test_exact_thirds_and_sunset_keep_half_open_binary_boundaries(
-    offset, previous, next_ruler
-):
+    offset: float, previous: str, next_ruler: str
+) -> None:
     context = packet(("rise", 0), ("set", 0.75), ("rise", 1))
     edge = RISE + offset
     assert (
@@ -163,7 +165,7 @@ def test_exact_thirds_and_sunset_keep_half_open_binary_boundaries(
     )
 
 
-def test_known_constant_and_per_planet_explanation_survive_a_partial_arc():
+def test_known_constant_and_per_planet_explanation_survive_a_partial_arc() -> None:
     birth = build_astro_birth_info(**astro_payload())
     raw = positions(birth)
     jd = raw["julian_day_ut"]
@@ -193,7 +195,9 @@ def test_known_constant_and_per_planet_explanation_survive_a_partial_arc():
     assert constraints["active_arc_status"] == "inconsistent_event_sequence"
 
 
-def test_first_sunrise_uncertainty_retains_available_and_unavailable_grid_states():
+def test_first_sunrise_uncertainty_retains_available_and_unavailable_grid_states() -> (
+    None
+):
     case = REFERENCE["cases"][0]
     moment = datetime_from_ut1(case["events"][0]["julian_day_ut1"])
     birth = build_astro_birth_info(

@@ -22,6 +22,7 @@ cp -n .env.example .env
 | `API_KEY_HEADER_NAME` | `X-API-Key` | 密钥请求头名称 |
 | `FATEBRIDGE_MCP_FAMILIES` | 空 | MCP 公开的工具分类，逗号分隔；空时保留全部工具，分类拼错阻止启动；不影响 REST / CLI |
 | `SE_EPHE_PATH` | 未设置 | 自定义本地星历目录，不在模板内 |
+| `FATEBRIDGE_DE441_DIR` | 未设置 | DE441 系数分片目录。源码检出默认读取项目数据目录。wheel 与 sdist 安装按[星历说明](ephemeris.md)提供同版本分片 |
 | `FATEBRIDGE_SOLAR_TERM_MODEL` | `auto` | 当前源码在 1700–2300 年默认使用随包 DE440；严格原生 JPL 配置优先。各模式、年份和相邻边界见[太阳后端](solar-backends.md) |
 | `FATEBRIDGE_SOLAR_SPK_FILE` | 未设置 | 仅显式`spk`模式使用的外部文件，需可选`jpl`依赖；默认随包系数不读取该文件 |
 | `FATEBRIDGE_HEAVY_CALC_MAX_CONCURRENCY` | `min(4, max(1, CPU 数))` | 单进程的重计算并发上限，至少为 1；不是请求速率限制 |

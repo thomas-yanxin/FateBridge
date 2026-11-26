@@ -31,7 +31,7 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def test_all15_source_comparisons_and14_unknown_alternatives_are_bound():
+def test_all15_source_comparisons_and14_unknown_alternatives_are_bound() -> None:
     binding = read(FIXTURE / "source-bindings.json")
     actual = calculate_knowledge_read(domain="bazi", key=KEY)
     curation = actual["provenance"]["entry_curation"]
@@ -57,7 +57,7 @@ def test_all15_source_comparisons_and14_unknown_alternatives_are_bound():
     assert not linked["force_comparison_allowed"] and not linked["causal_acceptance"]
 
 
-def test_all_three_rendered_examples_match_source_pillars_and_keep_cautions():
+def test_all_three_rendered_examples_match_source_pillars_and_keep_cautions() -> None:
     actual = calculate_knowledge_read(domain="bazi", key=KEY)
     rows = {
         r["after_case_id"]: r
@@ -108,8 +108,8 @@ def test_all_three_rendered_examples_match_source_pillars_and_keep_cautions():
     ],
 )
 def test_second_supplement_cannot_shadow_any_existing_entry(
-    mode, tmp_path, monkeypatch
-):
+    mode: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     value = copy.deepcopy(read(BUNDLE))
     entry = value["categories"]["source_contrasts"][KEY]
     if mode == "base_category":
@@ -143,7 +143,7 @@ def test_second_supplement_cannot_shadow_any_existing_entry(
         knowledge_store.load_knowledge_bundles.cache_clear()
 
 
-def test_new_entry_nested_evidence_cannot_mutate_cached_values():
+def test_new_entry_nested_evidence_cannot_mutate_cached_values() -> None:
     first = calculate_knowledge_read(domain="bazi", key=KEY)
     first["provenance"]["entry_curation"]["source_contrast_binding"][
         "all15_printed_pairs"
@@ -160,12 +160,14 @@ def test_new_entry_nested_evidence_cannot_mutate_cached_values():
 @pytest.mark.parametrize("category", [None, "source_contrasts"])
 @pytest.mark.parametrize("include_snapshot", [False, True])
 def test_complete_card_is_identical_on_rest_mcp_and_cli(
-    category, include_snapshot, surface_calls
-):
+    category: str | None, include_snapshot: bool, surface_calls
+) -> None:
     spec = SPECS["knowledge_read"]
     payload = {"domain": "bazi", "key": KEY}
     if category:
         payload["category"] = category
+    else:
+        pass
     options = {"include_snapshot_text": include_snapshot, "response_char_limit": 0}
     http, protocol, code, cli = surface_calls(
         spec,
@@ -194,7 +196,7 @@ def test_complete_card_is_identical_on_rest_mcp_and_cli(
     )
 
 
-def test_strict_source_projection_matches_on_three_transports(surface_calls):
+def test_strict_source_projection_matches_on_three_transports(surface_calls) -> None:
     spec = SPECS["knowledge_read"]
     payload = {"domain": "bazi", "key": KEY}
     fields = [

@@ -4,9 +4,10 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.analysis.children import ChildrenAnalysis
-from fatebridge.analysis.education import EducationAnalysis
-from fatebridge.analysis.relatives import RelativesAnalysis
+from fatebridge.core.bazi.bazi_evidence import (
+    build_natal_evidence,
+    build_topic_evidence,
+)
 from fatebridge.services.knowledge import calculate_knowledge_read
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -33,7 +34,9 @@ CASES = [(c, k) for c, keys in TARGETS.items() for k in keys]
 
 
 @pytest.mark.parametrize("category,key", CASES)
-def test_each_public_entry_attributes_only_its_declared_statements(category, key):
+def test_each_public_entry_attributes_only_its_declared_statements(
+    category, key
+) -> None:
     result = calculate_knowledge_read(domain="bazi", category=category, key=key)
     entry = result["provenance"]["entry_curation"]
     assert (
@@ -74,7 +77,7 @@ def test_each_public_entry_attributes_only_its_declared_statements(category, key
     assert entry["reality_prediction_efficacy"] == "not_tested"
 
 
-def test_wenchang_cards_match_each_other_and_the_day_only_counterexample():
+def test_wenchang_cards_match_each_other_and_the_day_only_counterexample() -> None:
     first = calculate_knowledge_read(
         domain="bazi", category="education", key="文昌贵人"
     )
@@ -88,10 +91,11 @@ def test_wenchang_cards_match_each_other_and_the_day_only_counterexample():
         "day": ("辛", "酉"),
         "hour": ("戊", "戌"),
     }
-    result = EducationAnalysis.analyze_education(pillars)
-    assert result["wenchang"]["wenchang_branch"] == "子"
-    assert result["wenchang"]["hit_pillars"] == []
-    assert result["wenchang"]["has_wenchang"] is False
+    result = build_topic_evidence(
+        build_natal_evidence(pillars), pillars, "education", None, None, None
+    )["markers"][0]
+    assert result["target_branch"] == "子"
+    assert result["natal_positions"] == []
     assert (
         "只按日干" in first["rendered_text"]
         and "不同时按年干另算" in first["rendered_text"]
@@ -99,72 +103,63 @@ def test_wenchang_cards_match_each_other_and_the_day_only_counterexample():
     assert "待校勘" in first["rendered_text"]
 
 
-def test_repeated_wenchang_positions_are_retained_without_exam_prediction():
+def test_repeated_wenchang_positions_are_retained_without_exam_prediction() -> None:
     pillars = {
         "year": ("甲", "子"),
         "month": ("丙", "子"),
         "day": ("辛", "酉"),
         "hour": ("戊", "子"),
     }
-    result = EducationAnalysis.analyze_education(pillars)
-    assert result["wenchang"]["hit_pillars"] == ["year", "month", "hour"]
-    assert (
-        result["education_level"]["assessment_status"]
-        == "counts_only_not_education_prediction"
-    )
-    assert result["education_level"]["score_kind"] == "uncalibrated_rule_index"
+    result = build_topic_evidence(
+        build_natal_evidence(pillars), pillars, "education", None, None, None
+    )["markers"][0]
+    assert result["natal_positions"] == ["year", "month", "hour"]
 
 
 @pytest.mark.parametrize(
-    "gender,label,weight",
-    [("男", "官杀", 2.5), ("女", "食伤", 1.5), (None, "性别未提供", 4.0)],
+    "gender,expected",
+    [("男", {"辛", "庚"}), ("女", {"丁"}), (None, {"辛", "庚", "丁"})],
 )
 def test_actual_child_counts_gender_basis_and_missing_timing_match_card(
-    gender, label, weight
-):
-    # Synthetic symbolic input; no birth record, source-body label or reality
-    # result is assigned. Independent occurrences: 辛+酉辛+酉辛+申庚=2.5;
-    # 丁+午丁=1.5. Day stem is never another count.
+    gender: str | None, expected
+) -> None:
     pillars = {
         "year": ("辛", "酉"),
         "month": ("丁", "酉"),
         "day": ("甲", "午"),
         "hour": ("壬", "申"),
     }
-    result = ChildrenAnalysis.analyze_children(pillars, gender=gender)
-    assert label in result["gender_basis"]
-    assert result["child_star"]["weight"] == weight
-    assert result["relationship"]["hour_ten_god"] == "偏印"
-    assert result["children_timing"]["timing_signals"] == [
-        "本轮未取得子女星／宫的时间关系，不据此判断生育时机"
-    ]
-    assert "不是孩子本人测算" in result["interpretation_scope"]
-    relatives = RelativesAnalysis.analyze_relatives(pillars, gender=gender)
-    assert relatives["parents"]["father_star_weight"] == 0.5
-    assert relatives["parents"]["mother_star_weight"] == 0
-    assert "未见对应星也不表示亲人缺席" in "".join(relatives["parents"]["notes"])
+    natal = build_natal_evidence(pillars)
+    result = build_topic_evidence(natal, pillars, "children", gender, None, None)
+    assert {
+        row["stem"] for rows in result["stars"].values() for row in rows
+    } == expected
+    assert result["palaces"]["hour"]["pillar"] == "壬申"
+    assert result["first_view"]["timing"] == []
+    relatives = build_topic_evidence(natal, pillars, "relatives", gender, None, None)
+    assert {row["pillar"] for row in relatives["stars"]["偏财"]} == {"hour"}
+    assert relatives["stars"]["正印"] == []
 
 
-def test_current_child_timing_is_a_supplied_relation_not_a_fertility_window():
+def test_current_child_timing_is_a_supplied_relation_not_a_fertility_window() -> None:
     pillars = {
         "year": ("辛", "酉"),
         "month": ("丁", "酉"),
         "day": ("甲", "午"),
         "hour": ("壬", "申"),
     }
-    result = ChildrenAnalysis.analyze_children(
-        pillars, gender="男", liunian_pillar=("辛", "巳")
+    result = build_topic_evidence(
+        build_natal_evidence(pillars), pillars, "children", "男", None, ("辛", "巳")
     )
-    signals = result["children_timing"]["timing_signals"]
-    assert len(signals) == 2
-    assert any("引动子女星" in line for line in signals)
-    assert any("合子女宫申" in line for line in signals)
+    layer = result["first_view"]["timing"][0]
+    assert layer["pillar"] == "辛巳"
+    assert "正官" in layer["topic_stars"]
+    assert layer["palace_relation_count"] >= 1
     card = calculate_knowledge_read(domain="bazi", category="children", key="生育时机")
-    assert "已提供的大运、流年柱" in card["rendered_text"]
-    assert "没有计算日级受孕概率" in card["rendered_text"]
+    assert "明干与藏干子女星" in card["rendered_text"]
 
 
-def test_source_palace_order_is_disclosed_separately_from_current_module():
+def test_source_palace_order_is_disclosed_separately_from_current_module() -> None:
     card = calculate_knowledge_read(domain="bazi", category="relatives", key="六亲宫位")
     assert "年、月、日、时分别配祖、父、妻、子" in card["rendered_text"]
     assert "范围不等于上述原典宫分" in card["rendered_text"]

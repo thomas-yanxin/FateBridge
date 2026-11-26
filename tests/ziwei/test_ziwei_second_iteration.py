@@ -8,11 +8,10 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.execution import execute_tool
+from fatebridge.core.metaphysics.seed import build_analysis_seed
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart, build_ziwei_horoscope
-from fatebridge.core.ziwei_tables import lookup_star_brightness
-from fatebridge.services.metaphysics import _build_analysis_seed
+from fatebridge.core.ziwei.ziwei_tables import lookup_star_brightness
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from scripts.ziwei.audit_ziwei import (
     FIXTURES,
     ROOT,
@@ -22,6 +21,7 @@ from scripts.ziwei.audit_ziwei import (
 )
 from scripts.ziwei.audit_ziwei_natal import audit_natal
 from scripts.ziwei.ziwei_conditional_inputs import synthetic_birth_clock
+from validation.claims import CalculationClaim, verify_calculation_claims
 
 pytestmark = [
     pytest.mark.filterwarnings("ignore:fromSolarDate is deprecated:DeprecationWarning"),
@@ -40,7 +40,7 @@ pytestmark = [
 )
 def test_complete_natal_corpus_preserves_all_cases_and_fields(
     fixtures: Path, case_count: int
-):
+) -> None:
     result = audit_natal(fixtures)
     assert result["case_count"] == case_count
     assert result["star_records_checked"] == case_count * 66
@@ -51,7 +51,9 @@ def test_complete_natal_corpus_preserves_all_cases_and_fields(
     assert not result["whole_input_space_certified"]
 
 
-def test_selected_classical_table_has_240_actual_source_cells_without_full_book_claim():
+def test_selected_classical_table_has_240_actual_source_cells_without_full_book_claim() -> (
+    None
+):
     result = audit_additional_classical()
     assert result["brightness_cells_checked"] == 240
     assert not result["differences"]
@@ -65,15 +67,15 @@ def test_selected_classical_table_has_240_actual_source_cells_without_full_book_
     [("太阳", "陷", "平"), ("太阴", "不", "旺"), ("七杀", "庙", "旺")],
 )
 def test_software_and_classical_brightness_are_explicit_source_choices(
-    star, software, table
-):
+    star: str, software: str, table: str
+) -> None:
     assert lookup_star_brightness(star, "酉") == software
     assert (
         lookup_star_brightness(star, "酉", rule_profile="quanshu_v2_excerpt") == table
     )
 
 
-def test_table_vs_prose_conflict_is_not_silently_adjudicated():
+def test_table_vs_prose_conflict_is_not_silently_adjudicated() -> None:
     # The selected table calls 太阴寅 旺; prose in the same volume says 庙.
     assert (
         lookup_star_brightness("太阴", "寅", rule_profile="quanshu_v2_excerpt") == "旺"
@@ -89,7 +91,7 @@ def test_table_vs_prose_conflict_is_not_silently_adjudicated():
     )
 
 
-def test_changsheng_and_boshi_directions_are_independent_rules():
+def test_changsheng_and_boshi_directions_are_independent_rules() -> None:
     seed = synthetic_seed(1985)  # 乙丑, male: software reverse; text 长生 forward.
     software = build_ziwei_chart(seed, "男")
     classic = build_ziwei_chart(seed, "男", rule_profile="quanshu_v2_excerpt")
@@ -105,7 +107,7 @@ def test_changsheng_and_boshi_directions_are_independent_rules():
     assert by_branch["寅"]["boshi12"] == "力士"
 
 
-def test_missing_gender_keeps_only_direction_invariants_and_defined_masters():
+def test_missing_gender_keeps_only_direction_invariants_and_defined_masters() -> None:
     chart = build_ziwei_chart(synthetic_seed(1984), "未知")
     assert chart["calendar_cycles"]["status"] == "partial_missing_gender"
     assert chart["chart_masters"]["life"]["star"] == "禄存"
@@ -125,7 +127,7 @@ def test_missing_gender_keeps_only_direction_invariants_and_defined_masters():
     )
 
 
-def test_three_distinct_void_systems_are_not_merged_by_name():
+def test_three_distinct_void_systems_are_not_merged_by_name() -> None:
     chart = build_ziwei_chart(synthetic_seed(1992), "男")
     stars = {
         s["name"]: p["ganzhi"][1] for p in chart["palaces"] for s in p["stars_detail"]
@@ -137,10 +139,10 @@ def test_three_distinct_void_systems_are_not_merged_by_name():
     assert len(stars) == 66
 
 
-def test_annual_lucun_yang_tuo_follow_target_stem_without_moving_natal_stars():
+def test_annual_lucun_yang_tuo_follow_target_stem_without_moving_natal_stars() -> None:
     chart = build_ziwei_chart(synthetic_seed(1984), "男")
     before = deepcopy(chart)
-    target = _build_analysis_seed(
+    target = build_analysis_seed(
         analysis_year=2029, analysis_month=6, analysis_day=15, analysis_hour=12
     )
     result = build_ziwei_horoscope(
@@ -155,18 +157,26 @@ def test_annual_lucun_yang_tuo_follow_target_stem_without_moving_natal_stars():
         "禄存": "午",
         "擎羊": "未",
         "陀罗": "巳",
+        "天魁": "子",
+        "天钺": "申",
+        "文昌": "酉",
+        "文曲": "巳",
+        "天马": "亥",
+        "红鸾": "午",
+        "天喜": "子",
+        "年解": "丑",
     }
     assert all(
         not s["natal_stars_relocated"] and s["scope"] == "流年"
         for s in annual["flowing_stars"]
     )
     assert chart == before
-    assert all(
-        "flowing_stars" not in s for s in result["scopes"] if s["scope"] != "流年"
-    )
+    assert {s["scope"] for s in result["scopes"] if "flowing_stars" not in s} == {
+        "小限"
+    }
 
 
-def test_natal_reference_is_frozen_independently_of_current_engine():
+def test_natal_reference_is_frozen_independently_of_current_engine() -> None:
     manifest = json.loads((FIXTURES / "natal_manifest.json").read_text())
     for source in manifest["files"]:
         assert (
@@ -178,9 +188,9 @@ def test_natal_reference_is_frozen_independently_of_current_engine():
 
 
 def test_audit_rejects_source_drift_during_audit_without_editing_real_files(
-    monkeypatch,
-):
-    source = ROOT / "src/fatebridge/core/ziwei_rulesets.py"
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source = ROOT / "src/fatebridge/core/ziwei/ziwei_rulesets.py"
     original = type(source).read_bytes
     reads = 0
 
@@ -191,6 +201,10 @@ def test_audit_rejects_source_drift_during_audit_without_editing_real_files(
             reads += 1
             if reads > 1:
                 return data + b"\n"
+            else:
+                pass
+        else:
+            pass
         return data
 
     monkeypatch.setattr(type(source), "read_bytes", changed_after_first_read)
@@ -198,7 +212,9 @@ def test_audit_rejects_source_drift_during_audit_without_editing_real_files(
         report()
 
 
-def test_real_calculation_receipt_rejects_natal_scope_confusion_and_changed_source():
+def test_real_calculation_receipt_rejects_natal_scope_confusion_and_changed_source() -> (
+    None
+):
     spec = next(s for s in CATALOG if s.key == "ziwei_horoscope")
     request = spec.request_model.model_validate(
         dict(

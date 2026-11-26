@@ -1,0 +1,10 @@
+{
+  "files": {
+    "leap-seconds.json": "3f5fd6054e143fdd65b3f41fb4575a99d52c0ef00f3dce682b59c194b40fdfb0",
+    "reference.json": "64cbe8ead255e531a0aed897db2b4b6b794fe2a28729a6bbd390bd8c3865d7dd",
+    "same-definition-reference.json": "50e9b7569bdde35fa2a4c431a3a176754c3b3d8b2935f787096ed3fb27df0e4e",
+    "protocol.json": "06f54f7e016b4968b506a5d1b26acd767f21cdbb75b1612128499409e7f39229",
+    "c04.json.gz": "756a854e7c01770ad87f0956aedab4aa4d071fc7a3008067363a389b075e7b7c"
+  },
+  "scope": "Current fixed inputs, independent numeric references and raw source data only; no FateBridge source snapshots or old native output packets."
+}

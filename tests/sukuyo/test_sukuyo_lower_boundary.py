@@ -7,16 +7,16 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_date_support import (
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_date_support import (
     _support,
     _wall_second_support,
     local_date_support,
 )
 from fatebridge.services.divination import calculate_sukuyo_compatibility
 from fatebridge.utils.timezones import parse_timezone_name
-from tests.sukuyo.test_sukuyo_transports import (
-    test_calendar_and_relations_across_all_real_transports as run_transport_check,
+from tests.unit_test.fixtures.sukuyo_transports import (
+    assert_sukuyo_transport_parity as run_transport_check,
 )
 
 BASIS = "japanese_naoj_historical_utc09"
@@ -31,8 +31,8 @@ BASIS = "japanese_naoj_historical_utc09"
     ],
 )
 def test_second_precision_offsets_preserve_complete_year_zero_support(
-    zone, offset, dates
-):
+    zone: str, offset, dates
+) -> None:
     result = local_date_support("0001-01-01", zone, calendar_offset_hours=9)
     assert result["possible_calendar_dates"] == dates
     assert result["method_id"] == "complete_local_wall_second_fold_preimage_v1"
@@ -61,7 +61,7 @@ def test_second_precision_offsets_preserve_complete_year_zero_support(
 
 
 @pytest.mark.parametrize("day", ["0001-01-01", "0001-01-02"])
-def test_unknown_early_tokyo_never_drops_the_previous_host_day(day):
+def test_unknown_early_tokyo_never_drops_the_previous_host_day(day: str) -> None:
     r = calendar_mansion(day, zone="Asia/Tokyo", calendar_basis=BASIS)
     assert r["status"] == "partial" and r["natal_su27"] is None
     assert not r["birth_time_known"]
@@ -98,7 +98,9 @@ def test_unknown_early_tokyo_never_drops_the_previous_host_day(day):
 @pytest.mark.parametrize(
     "zone,clock", [("Asia/Tokyo", "00:19:00"), ("Pacific/Apia", "12:00:00")]
 )
-def test_known_clock_can_have_unrepresentable_utc_but_valid_reference_date(zone, clock):
+def test_known_clock_can_have_unrepresentable_utc_but_valid_reference_date(
+    zone: str, clock: str
+) -> None:
     r = calendar_mansion("0001-01-01", clock, zone, calendar_basis=BASIS)
     assert r["calendar_date"] == "0001-01-01"
     assert (r["lunar_year"], r["lunar_month"], r["lunar_day"]) == (0, 11, 20)
@@ -107,7 +109,7 @@ def test_known_clock_can_have_unrepresentable_utc_but_valid_reference_date(zone,
     assert not r["calendar_reference"]["historical_local_time_reconstruction"]
 
 
-def test_known_clock_really_before_the_supported_host_date_remains_rejected():
+def test_known_clock_really_before_the_supported_host_date_remains_rejected() -> None:
     with pytest.raises(ValueError, match="超出可表示"):
         calendar_mansion("0001-01-01", "00:18:58", "Asia/Tokyo", calendar_basis=BASIS)
 
@@ -122,7 +124,9 @@ def test_known_clock_really_before_the_supported_host_date_remains_rejected():
         ("2025-10-05", "Australia/Lord_Howe"),
     ],
 )
-def test_local_enumeration_agrees_with_independent_utc_enumeration(day, zone):
+def test_local_enumeration_agrees_with_independent_utc_enumeration(
+    day: str, zone: str
+) -> None:
     # These two directions use distinct algorithms. Include 23/25-hour days,
     # a 47-hour repeated date, a 30-minute jump and a second-resolution offset.
     expected, count, _ = _support(day, zone, 9)
@@ -137,7 +141,7 @@ def test_local_enumeration_agrees_with_independent_utc_enumeration(day, zone):
     )
 
 
-def test_local_enumeration_rejects_a_wholly_skipped_date():
+def test_local_enumeration_rejects_a_wholly_skipped_date() -> None:
     with pytest.raises(ValueError, match="不存在"):
         _wall_second_support(date(2011, 12, 30), parse_timezone_name("Pacific/Apia"), 9)
 
@@ -161,8 +165,8 @@ def _synthetic_zone(before, after):
     "before,after,begin,end", [(0, 3600, 0, 82800), (3600, 0, -3600, 86400)]
 )
 def test_lower_boundary_does_not_assume_the_midnight_offset_is_constant(
-    before, after, begin, end
-):
+    before: int, after: int, begin, end: int
+) -> None:
     intervals, count = _wall_second_support(
         date(1, 1, 1), _synthetic_zone(before, after), 9
     )
@@ -171,7 +175,11 @@ def test_lower_boundary_does_not_assume_the_midnight_offset_is_constant(
 
 
 @pytest.mark.parametrize("clock", [None, "00:19:00"])
-def test_early_boundary_across_actual_rest_native_mcp_cli(monkeypatch, capsys, clock):
+def test_early_boundary_across_actual_rest_native_mcp_cli(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    clock: str | None,
+) -> None:
     payload = {
         "person1_date": "0001-01-01",
         "person1_zone": "Asia/Tokyo",
@@ -181,6 +189,8 @@ def test_early_boundary_across_actual_rest_native_mcp_cli(monkeypatch, capsys, c
     }
     if clock:
         payload["person1_time"] = clock
+    else:
+        pass
     run_transport_check(
         monkeypatch,
         capsys,

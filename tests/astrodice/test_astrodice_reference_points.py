@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.astro import ephemeris
+from fatebridge.core.astro.orbits import ORBITAL_MODEL
 from fatebridge.core.astro.profiles import ANALYTICAL_MEAN_NODE_MODEL
 from fatebridge.core.astro.reference_points import ephemeris_reference_points
 from fatebridge.core.local_techniques.otherbu import build_otherbu_result
@@ -22,7 +23,7 @@ REFERENCE = json.loads(
 )
 
 
-def test_frozen_reference_hashes_frame_time_and_target_identity():
+def test_frozen_reference_hashes_frame_time_and_target_identity() -> None:
     validate_reference(PROTOCOL, REFERENCE)
     assert (
         REFERENCE["protocol_sha256"]
@@ -54,7 +55,9 @@ def test_frozen_reference_hashes_frame_time_and_target_identity():
 @pytest.mark.parametrize(
     "mutation", ["drop_body", "drop_row", "change_vector", "invent_missing"]
 )
-def test_reference_validation_detects_coverage_and_data_reward_hacking(mutation):
+def test_reference_validation_detects_coverage_and_data_reward_hacking(
+    mutation: str,
+) -> None:
     bad = copy.deepcopy(REFERENCE)
     if mutation == "drop_body":
         bad["references"].pop()
@@ -70,7 +73,7 @@ def test_reference_validation_detects_coverage_and_data_reward_hacking(mutation)
         validate_reference(PROTOCOL, bad)
 
 
-def test_missing_original_endpoint_is_retained_not_replaced_by_supplement():
+def test_missing_original_endpoint_is_retained_not_replaced_by_supplement() -> None:
     requested = set(PROTOCOL["dates_tt"])
     for item in REFERENCE["references"]:
         available = {r["date_tt"] for r in item["rows"]}
@@ -92,8 +95,8 @@ def test_missing_original_endpoint_is_retained_not_replaced_by_supplement():
 @pytest.mark.parametrize("zodiacal", [0, 1])
 @pytest.mark.parametrize("failed_body", [None, "Pluto", "Moon", "North Node"])
 def test_actual_model_reference_points_and_snapshot_agree(
-    zodiacal, failed_body, monkeypatch
-):
+    zodiacal: int, failed_body: str | None, monkeypatch: pytest.MonkeyPatch
+) -> None:
     original = ephemeris._swisseph_planet_state
     if failed_body:
         monkeypatch.setattr(
@@ -103,6 +106,8 @@ def test_actual_model_reference_points_and_snapshot_agree(
                 None if name == failed_body else original(name, *a, **kw)
             ),
         )
+    else:
+        pass
     faces = {"planet": "Jupiter", "sign": "Aries", "house": 0}
     plain = build_otherbu_result(**faces)
     result = build_otherbu_result(
@@ -114,26 +119,33 @@ def test_actual_model_reference_points_and_snapshot_agree(
         lon=0,
         zodiacal=zodiacal,
     )
-    basis = result["chart"]["params"]["ephemerisReferencePoints"]
+    params = result["chart"]["params"]
+    basis = params["ephemerisReferencePoints"]
     assert basis["center_body_correction_applied"] is False
-    assert basis["body_centers"] == [
-        p for p in ["Sun", "Moon", "Mercury", "Venus"] if p != failed_body
-    ]
+    assert basis["body_centers"] == ["Sun", "Moon", "Mercury", "Venus"]
     assert basis["system_barycenters"] == [
-        p
-        for p in ["Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"]
-        if p != failed_body or p == "Pluto"
+        "Mars",
+        "Jupiter",
+        "Saturn",
+        "Uranus",
+        "Neptune",
+        "Pluto",
     ]
     assert basis["theoretical_points"] == ["North Node"]
-    assert basis["approximate_points"] == (
-        [failed_body] if failed_body not in {None, "North Node", "Pluto"} else []
-    )
+    assert basis["approximate_points"] == []
+    if failed_body in {"Moon", "Pluto"}:
+        profile = params["chart_profile"]
+        assert profile["planetary_models"][failed_body] == ORBITAL_MODEL
+        fallback = profile["orbital_fallback"]
+        assert fallback["approximate_planets"] == [failed_body]
+        assert fallback["accuracy_certified"] is False
+    else:
+        pass
     assert basis["derived_points"] == ["South Node", "Pars Fortuna"]
     assert basis["unresolved_points"] == []
     assert basis["note_zh"] in result["snapshot_text"]
     for key in [
         "symbolic_details",
-        "interpretation",
         "rule_trace",
         "rulesets",
         "diceChart",
@@ -141,7 +153,7 @@ def test_actual_model_reference_points_and_snapshot_agree(
         assert plain[key] == result[key]
 
 
-def test_unknown_model_cannot_inherit_a_native_center_claim():
+def test_unknown_model_cannot_inherit_a_native_center_claim() -> None:
     result = ephemeris_reference_points(
         {"Jupiter": "unknown", "Moon": "unavailable"}, []
     )
@@ -149,7 +161,7 @@ def test_unknown_model_cannot_inherit_a_native_center_claim():
     assert result["unresolved_points"] == ["Jupiter", "Moon"]
 
 
-def test_declared_mean_node_theory_is_theoretical_and_cannot_label_a_body():
+def test_declared_mean_node_theory_is_theoretical_and_cannot_label_a_body() -> None:
     result = ephemeris_reference_points(
         {"North Node": ANALYTICAL_MEAN_NODE_MODEL, "Sun": ANALYTICAL_MEAN_NODE_MODEL},
         ["South Node"],
@@ -159,7 +171,7 @@ def test_declared_mean_node_theory_is_theoretical_and_cannot_label_a_body():
     assert result["body_centers"] == result["system_barycenters"] == []
 
 
-def test_all_approximate_points_are_not_described_as_native_centers():
+def test_all_approximate_points_are_not_described_as_native_centers() -> None:
     result = ephemeris_reference_points(
         {
             "Sun": "bounded_de441_earth_moon_planetary_fallback_v9",
@@ -167,6 +179,9 @@ def test_all_approximate_points_are_not_described_as_native_centers():
         },
         ["Pars Fortuna"],
     )
-    assert result["body_centers"] == result["system_barycenters"] == []
+    assert result["body_centers"] == ["Sun"]
+    assert result["system_barycenters"] == ["Jupiter"]
+    assert result["approximate_points"] == result["unresolved_points"] == []
+    assert result["derived_points"] == ["Pars Fortuna"]
+    assert result["center_body_correction_applied"] is False
     assert "原生" not in result["note_zh"]
-    assert result["approximate_points"] == ["Sun", "Jupiter"]

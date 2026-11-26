@@ -9,11 +9,12 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation.meihua_weather_references import (
+from fatebridge.core import ephemeris_paths
+from validation.meihua_weather_references import (
     climatology_reference,
     monthly_climatology_profile,
 )
-from fatebridge.validation.meihua_weather_study import (
+from validation.meihua_weather_study import (
     RainObservation,
     _aware,
     parse_hko_rainfall,
@@ -38,6 +39,8 @@ for name, expected in [
             assert (
                 hashlib.sha256((FOLDER / relative).read_bytes()).hexdigest() == digest
             )
+        else:
+            pass
 assert (
     hashlib.sha256((FOLDER / "climate-input-profile.json").read_bytes()).hexdigest()
     == "0777119f724c70bdf53b575dcf476befd08b26014a572691ed94b6c0fba0bd3d"
@@ -56,7 +59,7 @@ assert len(ALL_CLOCKS) == 405
 
 
 @pytest.mark.parametrize("case", ALL_CLOCKS, ids=lambda r: r["id"])
-def test_legacy_study_clock_uses_the_independent_integer_instant(case):
+def test_legacy_study_clock_uses_the_independent_integer_instant(case) -> None:
     expected = datetime(*case["expected_utc_components"], tzinfo=timezone.utc)
     assert _aware(case["label"]).astimezone(timezone.utc) == expected
 
@@ -80,7 +83,7 @@ def synthetic_training():
 @pytest.mark.parametrize("case", CLIMATE, ids=lambda r: r["id"])
 def test_publication_maximum_and_availability_preserve_true_instants(
     case, synthetic_training
-):
+) -> None:
     issue = datetime(2021, 2, 28, 12, tzinfo=timezone.utc)
     expected = datetime(*case["expected_utc_components"], tzinfo=timezone.utc)
     first = datetime(
@@ -114,7 +117,9 @@ def test_publication_maximum_and_availability_preserve_true_instants(
     assert not result["classical_rule_or_engine_forecast"]
 
 
-def test_all13057_source_tokens_flags_and_rainfall_events_match_independent_reference():
+def test_all13057_source_tokens_flags_and_rainfall_events_match_independent_reference() -> (
+    None
+):
     expected = json.loads(
         gzip.decompress((FOLDER / "independent-source-rows13057.json.gz").read_bytes())
     )
@@ -145,9 +150,8 @@ def test_all13057_source_tokens_flags_and_rainfall_events_match_independent_refe
     ],
 )
 def test_reviewed_search_path_changes_have_explicit_retained_examples(
-    path, expected, monkeypatch
-):
-    from fatebridge.core import ephemeris_paths
+    path, expected, monkeypatch: pytest.MonkeyPatch
+) -> None:
 
     monkeypatch.setattr(ephemeris_paths.os, "pathsep", ":")
     monkeypatch.setattr(ephemeris_paths.os, "sep", "/")
@@ -164,7 +168,7 @@ def csv_control(first, tail):
     ).encode()
 
 
-def test_trace_legend_in_metadata_does_not_adjudicate_trace_values():
+def test_trace_legend_in_metadata_does_not_adjudicate_trace_values() -> None:
     raw = csv_control(
         "metadata: Trace means rainfall less than 0.05 mm", "2025,1,1,Trace,C\n"
     )
@@ -174,7 +178,7 @@ def test_trace_legend_in_metadata_does_not_adjudicate_trace_values():
     assert row.occurred(Decimal("0.1")) is None
 
 
-def test_conflicting_trace_footer_is_unknown_instead_of_guessed_dry():
+def test_conflicting_trace_footer_is_unknown_instead_of_guessed_dry() -> None:
     raw = csv_control(
         "metadata",
         "2025,1,1,Trace,C\nTrace means rainfall less than 0.05 mm\nTrace means rainfall less than 0.10 mm\n",
@@ -185,7 +189,7 @@ def test_conflicting_trace_footer_is_unknown_instead_of_guessed_dry():
     assert row.occurred(Decimal("0.1")) is None
 
 
-def test_data_after_a_footer_is_not_silently_merged_into_source_rows():
+def test_data_after_a_footer_is_not_silently_merged_into_source_rows() -> None:
     raw = csv_control(
         "metadata",
         "2025,1,1,Trace,C\nTrace means rainfall less than 0.05 mm\n2025,1,2,0,C\n",

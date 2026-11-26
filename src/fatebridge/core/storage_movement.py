@@ -5,12 +5,15 @@ does not give numeric weights, certify formation, or release stored elements.
 """
 
 from copy import deepcopy
-from typing import Any, Dict, Mapping, Optional, Sequence
+from typing import Any, Literal, Mapping, Sequence
+
+from typing_extensions import NotRequired, TypedDict
 
 from fatebridge.core.classical_roots import SOURCE as ROOT_SOURCE
+from fatebridge.core.classical_roots import RootSource
 from fatebridge.utils.data import BRANCH_HIDDEN_STEMS, STEM_ELEMENTS, get_shishen
 
-SOURCE = {
+SOURCE: RootSource = {
     **ROOT_SOURCE,
     "id": "ziping_storage_movement_v1",
     "title": "秘本子平真诠·论墓库刑冲之说",
@@ -20,18 +23,38 @@ SOURCE = {
 _CLASHES = {frozenset("辰戌"), frozenset("丑未")}
 
 
+class StorageRootRetention(TypedDict):
+    pillar: str
+    branch: str
+    stem: str
+    element: str
+    ten_god: str
+    event_retention_multiplier: float
+    basis: str
+    combined_loss_multiplier: NotRequired[float]
+    remaining_hidden_mass: NotRequired[float]
+
+
+class StorageMovementReceipt(TypedDict):
+    method_id: Literal["ziping_storage_movement_v1"]
+    movement_kind: Literal["same_element_earth_movement"]
+    root_effects: list[StorageRootRetention]
+    earth_energy_bonus: float
+    water_retention_policy: float
+    numeric_magnitude_origin: Literal["engineering_policy_not_classical_coefficient"]
+    formation_status: Literal["not_adjudicated"]
+    source: RootSource
+    scope: str
+
+
 def storage_movement_effect(
     branches: Mapping[str, str],
     positions: Sequence[str],
     kind: str,
     day_stem: str,
     water_retention: float,
-) -> Optional[Dict[str, Any]]:
-    """Separate a text-supported direction from an explicit numeric policy.
-
-    Only actual participating positions qualify. A lone storage branch,
-    incomplete earth punishment, or different clash cannot trigger this rule.
-    """
+) -> StorageMovementReceipt | None:
+    """Separate the text's retention direction from the numeric policy for participating roots."""
     present = frozenset(branches[p] for p in positions)
     applicable = (kind == "六冲" and len(positions) == 2 and present in _CLASHES) or (
         kind == "刑" and present == frozenset("丑未戌")

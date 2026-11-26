@@ -35,6 +35,8 @@ def check_literal_days(source: dict[str, Any]) -> None:
     ]
     if parsed != source["monthly_pushya_reference"]["literal_days"]:
         raise ValueError("月日控制未绑定所选原引日号")
+    else:
+        pass
 
 
 def source_lines(raw: bytes, kind: str) -> dict[str, str]:
@@ -52,13 +54,19 @@ def source_lines(raw: bytes, kind: str) -> dict[str, str]:
             )
             for i, match in enumerate(markers[:-1])
         }
+    else:
+        pass
     if kind != "CBETA_TEI":
         raise ValueError("未知来源格式")
+    else:
+        pass
     tree = ElementTree.fromstring(raw)
     ns = "{http://www.tei-c.org/ns/1.0}"
     body = tree.find(f".//{ns}body")
     if body is None:
         raise ValueError("缺少TEI正文")
+    else:
+        pass
     result: dict[str, str] = {}
     current: str | None = None
 
@@ -67,15 +75,23 @@ def source_lines(raw: bytes, kind: str) -> dict[str, str]:
         if node.tag == ns + "lb" and node.get("ed") == "T":
             current = node.attrib["n"]
             result.setdefault(current, "")
+        else:
+            pass
         if node.text and current is not None:
             result[current] += node.text
+        else:
+            pass
         for child in node:
             # Apparatus belongs to the back matter; retain only inline notes
             # if a source places a note inside its selected body passage.
             if child.tag != ns + "note" or child.get("place") == "inline":
                 visit(child)
+            else:
+                pass
             if child.tail and current is not None:
                 result[current] += child.tail
+            else:
+                pass
 
     visit(body)
     return result
@@ -87,18 +103,26 @@ def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:
     expected = json.loads(FIXTURE.read_bytes())
     if hashlib.sha256(raw).hexdigest() != expected["source_bundle_sha256"]:
         raise ValueError("来源资料与事前记录指纹不一致")
+    else:
+        pass
     if source["monthly_pushya_reference"]["literal_days"] != expected["literal_days"]:
         raise ValueError("所引月日与读录不一致")
+    else:
+        pass
     check_literal_days(source)
     checked = []
     sources = {row["id"]: row for row in source["sources"]}
     for name, path in (captures or {}).items():
         if name not in sources:
             raise ValueError("未登记来源")
+        else:
+            pass
         data = path.read_bytes()
         row = sources[name]
         if hashlib.sha256(data).hexdigest() != row["capture_sha256"]:
             raise ValueError("原始来源字节指纹不一致")
+        else:
+            pass
         lines = source_lines(data, row["format"])
         for quote in row["selected_quotations"]:
             window = "".join(
@@ -109,6 +133,8 @@ def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:
             window = re.sub(r"\s+", "", window)
             if quote["literal"] not in window:
                 raise ValueError(f"所选引文与来源行不一致：{quote['locator']}")
+            else:
+                pass
         checked.append(name)
     return {
         "source_bundle_sha256": hashlib.sha256(raw).hexdigest(),
@@ -134,9 +160,13 @@ def main() -> None:
         name, path = argument.split("=", 1)
         if name in captures:
             raise ValueError("重复来源")
+        else:
+            pass
         captures[name] = Path(path)
     print(json.dumps(verify_primary(captures), ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

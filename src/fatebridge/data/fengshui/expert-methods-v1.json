@@ -32,28 +32,19 @@
       "locator": "卷九之十一：乾为天至兑为泽八卦取象注疏",
       "retrieved_at": "2026-10-15"
     },
-    "FOUNDATION_S4": {
-      "title": "沈氏玄空学卷四转录（既有基础规则来源 S4）",
-      "url": "https://www.diancangwang.cn/xuanxuewushu/f6f37803664b/90b563d9cb41.html",
-      "kind": "existing_registered_primary_transcription",
+    "S4": {
       "scope": "沿用已登记的洛书固定宫数、宫五行和飞布基础；固定宫不等于临宫飞星",
       "source_version": "既有基础规则S4；2026-10-15复核转录，印本未认证",
       "locator": "卷四：九宫挨星掌诀及洛书飞布参考",
       "retrieved_at": "2026-10-15"
     },
-    "FOUNDATION_S5": {
-      "title": "署名陈益峰《九砂九水》注解所引传本（既有来源 S5）",
-      "url": "https://k.sina.cn/article_6492742263_182ff627700100c8vw.html",
-      "kind": "existing_registered_attributed_commentary_repost",
+    "S5": {
       "scope": "沿用基础规则 1234 砂、6789 水及砂阳水阴口径；未获得完整底本影印，不确认历史归属或新增细断",
       "source_version": "既有基础规则S5转载；2026-10-15复核，未获得历史底本",
       "locator": "九砂九水注解：基础八宫砂水取用；不扩展转载的细断",
       "retrieved_at": "2026-10-15"
     },
-    "FOUNDATION_S3": {
-      "title": "八宅明镜卷下转录（既有来源 S3）",
-      "url": "https://xm.yi958.com/gsqm/4089",
-      "kind": "existing_registered_primary_transcription",
+    "S3": {
       "scope": "沿用坐山起伏位、大游年和灶座/火门作用域；个人命卦与环境卦位分别计算",
       "source_version": "易德轩2016-03-17转录；2026-10-15核对，未做全本校勘",
       "locator": "卷下：修造论；生气贪狼、文曲六煞及灶座灶口分论",
@@ -77,9 +68,9 @@
       "EXPERT_20261015",
       "SHUOGUA_PRIMARY",
       "ZHOUYI_ZHENGYI_PRIMARY",
-      "FOUNDATION_S4",
-      "FOUNDATION_S5",
-      "FOUNDATION_S3",
+      "S4",
+      "S5",
+      "S3",
       "FATEBRIDGE_OBSERVATION_REFERENCE"
     ],
     "scope": "三法选法与作用域、固定宫与临星的独立参考、来源分层的古典人物器物与有限现代教学例；不增加职业预测、自动分类或处方",
@@ -163,7 +154,7 @@
         ],
         "source_ids": [
           "EXPERT_20261015",
-          "FOUNDATION_S3"
+          "S3"
         ]
       }
     },
@@ -215,7 +206,7 @@
       ],
       "source_ids": [
         "EXPERT_20261015",
-        "FOUNDATION_S4"
+        "S4"
       ]
     },
     "jinsuo": {
@@ -255,7 +246,7 @@
       ],
       "source_ids": [
         "EXPERT_20261015",
-        "FOUNDATION_S5"
+        "S5"
       ]
     },
     "bazhai": {
@@ -275,7 +266,7 @@
       ],
       "source_ids": [
         "EXPERT_20261015",
-        "FOUNDATION_S3"
+        "S3"
       ]
     }
   },
@@ -298,7 +289,7 @@
       "source_ids": [
         "SHUOGUA_PRIMARY",
         "ZHOUYI_ZHENGYI_PRIMARY",
-        "FOUNDATION_S4",
+        "S4",
         "FATEBRIDGE_OBSERVATION_REFERENCE"
       ]
     },
@@ -323,7 +314,7 @@
       "source_ids": [
         "SHUOGUA_PRIMARY",
         "ZHOUYI_ZHENGYI_PRIMARY",
-        "FOUNDATION_S4",
+        "S4",
         "FATEBRIDGE_OBSERVATION_REFERENCE"
       ]
     },
@@ -345,7 +336,7 @@
       "source_ids": [
         "SHUOGUA_PRIMARY",
         "ZHOUYI_ZHENGYI_PRIMARY",
-        "FOUNDATION_S4",
+        "S4",
         "FATEBRIDGE_OBSERVATION_REFERENCE"
       ]
     },
@@ -370,7 +361,7 @@
       "source_ids": [
         "SHUOGUA_PRIMARY",
         "ZHOUYI_ZHENGYI_PRIMARY",
-        "FOUNDATION_S4",
+        "S4",
         "FATEBRIDGE_OBSERVATION_REFERENCE"
       ]
     },
@@ -393,7 +384,7 @@
       "source_ids": [
         "SHUOGUA_PRIMARY",
         "ZHOUYI_ZHENGYI_PRIMARY",
-        "FOUNDATION_S4",
+        "S4",
         "FATEBRIDGE_OBSERVATION_REFERENCE"
       ]
     },
@@ -416,7 +407,7 @@
       "source_ids": [
         "SHUOGUA_PRIMARY",
         "ZHOUYI_ZHENGYI_PRIMARY",
-        "FOUNDATION_S4",
+        "S4",
         "FATEBRIDGE_OBSERVATION_REFERENCE"
       ]
     },
@@ -440,7 +431,7 @@
       "source_ids": [
         "SHUOGUA_PRIMARY",
         "ZHOUYI_ZHENGYI_PRIMARY",
-        "FOUNDATION_S4",
+        "S4",
         "FATEBRIDGE_OBSERVATION_REFERENCE"
       ]
     },
@@ -465,7 +456,7 @@
       "source_ids": [
         "SHUOGUA_PRIMARY",
         "ZHOUYI_ZHENGYI_PRIMARY",
-        "FOUNDATION_S4",
+        "S4",
         "FATEBRIDGE_OBSERVATION_REFERENCE"
       ]
     },
@@ -482,7 +473,7 @@
       ],
       "reference_kind": "fixed_palace_and_authored_observation_prompts",
       "source_ids": [
-        "FOUNDATION_S4",
+        "S4",
         "FATEBRIDGE_OBSERVATION_REFERENCE"
       ]
     }
@@ -553,7 +544,7 @@
     ],
     "source_ids": [
       "EXPERT_20261015",
-      "FOUNDATION_S5",
+      "S5",
       "FATEBRIDGE_OBSERVATION_REFERENCE"
     ]
   },

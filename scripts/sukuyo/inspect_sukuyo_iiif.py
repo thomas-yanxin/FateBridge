@@ -2,14 +2,24 @@
 
 from __future__ import annotations
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import json
 import os
 import tempfile
 from pathlib import Path
 
-from fatebridge.validation.sukuyo_artifacts import Artifact
-from fatebridge.validation.sukuyo_iiif import inspect_iiif_manifest
+from validation.sukuyo_artifacts import Artifact
+from validation.sukuyo_iiif import inspect_iiif_manifest
 
 
 def main() -> None:
@@ -21,6 +31,8 @@ def main() -> None:
     args = parser.parse_args()
     if args.output.exists():
         raise FileExistsError("Output must not exist")
+    else:
+        pass
     result = inspect_iiif_manifest(
         Artifact(args.manifest, args.sha256, args.source_version)
     )
@@ -40,7 +52,11 @@ def main() -> None:
     finally:
         if temporary is not None:
             temporary.unlink(missing_ok=True)
+        else:
+            pass
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

@@ -1,8 +1,12 @@
 """Explicit Mei Hua casting inputs; no inferred sounds, tones or observations."""
 
-from typing import Annotated, Literal, Optional, Union
+from typing import Annotated, Literal, Union
 
 from pydantic import Field, StrictBool, StrictInt, model_validator
+
+from fatebridge.core.meihua.meihua_observation import (
+    ensure_observation_method_context,
+)
 
 from .base import _DeferredModel
 from .meihua_day_qi import MeihuaDayQiContext
@@ -104,7 +108,7 @@ class ZhangChi(_DeferredModel):
     method: Literal["length_zhang_chi"]
     zhang: Whole
     chi: Unit
-    cun: Optional[Unit] = Field(
+    cun: Unit | None = Field(
         default=None, description="Recorded but excluded from casting by 丈尺占"
     )
 
@@ -119,7 +123,7 @@ class ChiCun(_DeferredModel):
     method: Literal["length_chi_cun"]
     chi: Whole
     cun: Unit
-    fen: Optional[Unit] = Field(
+    fen: Unit | None = Field(
         default=None, description="Recorded but excluded from casting by 尺寸占"
     )
     hour_branch: Branch
@@ -162,13 +166,13 @@ class TextTones(_DeferredModel):
         max_length=10,
         description="One caller-supplied 平/上/去/入 category per character, encoded 1/2/3/4. Historical sound systems and the selected Meihua worked example can differ. Do not replace categories with modern Mandarin tone numbers or silently change the source system",
     )
-    text: Optional[str] = Field(
+    text: str | None = Field(
         default=None,
         min_length=4,
         max_length=10,
         description="Optional original characters, only for matching the supplied categories",
     )
-    tone_reference: Optional[MeihuaToneReference] = Field(
+    tone_reference: MeihuaToneReference | None = Field(
         default=None,
         description="Optional declared sound system, source and reading scope; absent means unknown, supplied means caller-declared rather than independently verified. No online dictionary lookup or automatic tone assignment",
     )
@@ -187,7 +191,7 @@ class TextStrokes(_DeferredModel):
         max_length=3,
         description="Confirmed strokes of each actual glyph; never replace an unusual glyph with a modern dictionary count",
     )
-    text: Optional[str] = Field(default=None, min_length=2, max_length=3)
+    text: str | None = Field(default=None, min_length=2, max_length=3)
 
     @model_validator(mode="after")
     def matching_characters(self) -> "TextStrokes":
@@ -204,7 +208,7 @@ class SingleCharacter(_DeferredModel):
     left_strokes: Whole
     right_strokes: Whole
     total_strokes: Count
-    text: Optional[str] = Field(default=None, min_length=1, max_length=1)
+    text: str | None = Field(default=None, min_length=1, max_length=1)
 
     @model_validator(mode="after")
     def complete_partition(self) -> "SingleCharacter":
@@ -292,13 +296,13 @@ MeihuaCasting = Annotated[
 
 
 class MeihuaWeatherContext(_DeferredModel):
-    season: Optional[Literal["spring", "summer", "autumn", "winter"]] = Field(
+    season: Literal["spring", "summer", "autumn", "winter"] | None = Field(
         default=None,
         description="Confirmed season in the source's weather context; not inferred from a timezone or Gregorian month",
     )
-    prior_condition: Optional[
-        Literal["prolonged_rain", "prolonged_clear", "neither_prolonged"]
-    ] = Field(
+    prior_condition: (
+        Literal["prolonged_rain", "prolonged_clear", "neither_prolonged"] | None
+    ) = Field(
         default=None,
         description=(
             "Caller-confirmed prior weather: prolonged_rain, prolonged_clear, or "
@@ -308,7 +312,7 @@ class MeihuaWeatherContext(_DeferredModel):
             "a completed dry day, a missing observation or a cast cannot supply this fact"
         ),
     )
-    many_min_count: Optional[StrictInt] = Field(
+    many_min_count: StrictInt | None = Field(
         default=None,
         ge=2,
         le=6,
@@ -339,15 +343,22 @@ class MeihuaExternalObservation(_DeferredModel):
         max_length=240,
         description="Caller description/reference for this reported observation; presence and classification are not independently verified",
     )
-    motion: Optional[Literal["moving", "stationary"]] = Field(
+    motion: Literal["moving", "stationary"] | None = Field(
         default=None,
         description="Optional caller-reported actual motion of this external observation. Omit if unknown; never inferred from material, description, observer activity or inner symbolic roles. Moving water/carried soil and still wells/ground remain distinct. Does not determine omen valence or an event date",
     )
 
+    orientation: Literal["approaching", "departing"] | None = Field(
+        default=None,
+        description="Caller-reported movement toward or away from the observer at the same instant, for 卷二·向背. Separate from motion and compass direction. Omit if unknown.",
+    )
+
     @model_validator(mode="after")
-    def nonblank_label(self) -> "MeihuaExternalObservation":
+    def validate_observation(self) -> "MeihuaExternalObservation":
         if not self.label.strip():
             raise ValueError("外应资料须有已报描述，不能用空白代替未知事实")
+        if self.orientation is not None and self.motion == "stationary":
+            raise ValueError("同一时刻静止的外物不能同时声明趋近或离开")
         return self
 
 
@@ -357,15 +368,15 @@ class MeihuaObservationContext(_DeferredModel):
         max_length=240,
         description="Caller reference for the same casting episode and observer. Not parsed to infer any condition; presence or perception is not independently verified",
     )
-    quiet_room: Optional[StrictBool] = Field(
+    quiet_room: StrictBool | None = Field(
         default=None,
         description="Caller declaration of 在静室 for this cast; omit/null if unknown. Physical setting is not mental stillness or a decibel measurement",
     )
-    nothing_heard: Optional[StrictBool] = Field(
+    nothing_heard: StrictBool | None = Field(
         default=None,
         description="Caller declaration of no external 所闻 in the selected 静占 sense at this cast; omit/null if unknown. No inference from absent records or unimplemented categories",
     )
-    nothing_seen: Optional[StrictBool] = Field(
+    nothing_seen: StrictBool | None = Field(
         default=None,
         description="Caller declaration of no external 所见 in the selected 静占 sense at this cast; omit/null if unknown. No inference from an unseen scene, empty records or unimplemented categories",
     )
@@ -383,11 +394,11 @@ class MeihuaReputationContext(_DeferredModel):
         max_length=240,
         description="Caller reference for the declared source context; never parsed to infer office status, desired result or an appointment",
     )
-    currently_in_office: Optional[StrictBool] = Field(
+    currently_in_office: StrictBool | None = Field(
         default=None,
         description="Caller-confirmed 在任 in the selected historical official-office clause, not generic modern employment, seniority or a desired promotion. Omit/null if unknown; no real personnel or hazard verdict follows",
     )
-    seeking_official_appointment: Optional[StrictBool] = Field(
+    seeking_official_appointment: StrictBool | None = Field(
         default=None,
         description="Caller confirms the question concerns the source's 職任之處. Not inferred from reputation, an exam, already being employed, question keywords or wishes. Omit/null if unknown; selected 方道 witnesses are not an actual location",
     )
@@ -419,33 +430,31 @@ class MeihuaInterpretationOptions(_DeferredModel):
         default="general",
         description="Explicit branch: general; weather (no body/use); planning/reputation/wealth/transaction (文明书局本原四章初始体用条款，wealth另列求财成分)；travel/meeting为同本出行/谒见章，travel另核旺气及辅助生体偏好，多字及舟陆角色范围未裁定；lost_property为失物章五种初始关系及明示变用经卦读法的方位类象，物不失不否认已报遗失，位置与寻获未核实。traveler为行人章，返归句保留原体参照，在外补充明示以初用为受生受克对象，四个其他内卦角色逐一列出；初用月令衰与受克须同时成立，未知不猜，多字门槛及完整角色范围未裁定，不生成行踪、灾祸、返归核实或日期。reputation另列求名补充句及原文時序/方道，reputation_context声明原文在任与求职任条件，未知不猜，巽方道東/同本地理及转录東南等差异未裁定。household/dwelling分别为家宅/屋舍章，沿用实际原体与初用。家宅比利/转录比和未裁定，五行相同不自动套家宅安稳句；屋舍保留冷退/衰退异文。家宅生体转引人事章只核所列四内卦实际角色，未作完整跨章合参、住宅安全鉴定、选房或迁居许可。marriage为婚姻章五种初始关系，并分别核原体所占之家、初用所婚之家的已报节月旺气条件；原文未定与缺月令保持未知。补充生体/体生只列实际关系成分，或字不合并成必然同现；后段比利/转录比和未裁定，不自动套彼此相就句。八卦相貌品行仅作历史文本记录，不指派现实人物特征、两家财富、意愿或婚姻成败。dining为飲食章五种初始关系，并另列内卦坎酒、兑食及體用類的坤艮制坎、离制兑；这些句不要求多字门槛，不因制约者受制或季令衰自动抵消，完整内外合参未裁定。影印生身/转录生体及兑坎组合未裁定，不把酒食象当实际供应、菜单、席上人物、饮酒或饮食医疗建议。版本异文另列。Question keywords never switch branches; historical clauses are not hazard verdicts, travel instructions, validated outcomes or event dates",
     )
-    weather_context: Optional[MeihuaWeatherContext] = Field(
+    weather_context: MeihuaWeatherContext | None = Field(
         default=None,
         description="Optional caller-confirmed season and weather declarations, only with interpretation_topic=weather. Omit unknown facts; these conditions qualify the selected classical weather clauses.",
     )
-    reputation_context: Optional[MeihuaReputationContext] = Field(
+    reputation_context: MeihuaReputationContext | None = Field(
         default=None,
         description="Optional caller-confirmed 在任 and 職任之處 declarations, only with interpretation_topic=reputation. Unknown omit/null; no keyword inference, permission, event date, validated outcome or probability",
     )
-    observation_context: Optional[MeihuaObservationContext] = Field(
+    observation_context: MeihuaObservationContext | None = Field(
         default=None,
         description="Optional same-cast/observer quiet-room and hearing/vision declarations for human branches. Missing is uncollected, not confirmed absent. Selected NLC1925静占 conditions only; no full year-month-day strength synthesis, mental-state inference, casting eligibility or validated forecast. Never changes old study denominators",
     )
-    response_context: Optional[MeihuaResponseContext] = Field(
+    response_context: MeihuaResponseContext | None = Field(
         default=None,
         description="Optional caller-reported same-cast 方應/天時應/地理應/人事應 for human matters. No scene, direction or weather inferred; retain multiple trigram candidates and source variants. Not a casting method, future weather forecast, combined ten-response verdict, probability or event date",
     )
-    observer_activity: Optional[Literal["seated", "walking", "standing"]] = Field(
+    observer_activity: Literal["seated", "walking", "standing"] | None = Field(
         default=None,
         description="Optional caller-confirmed observer activity corresponding to selected NLC1925 我坐/我行/我立. Omit if unknown; no inference from question, vehicle motion, external movement or mental stillness. Selected relative wording only, no measured delay, omen valence, or date. Human-matter branches only",
     )
-    matter_scenario: Optional[Literal["favorable_matter", "unfavorable_matter"]] = (
-        Field(
-            default=None,
-            description="Caller-confirmed subject category for the selected 占卦訣: 原文问吉事 or 原文问不吉之事. Not a desired answer, question sentiment, topic classification or prediction of an actual outcome. Omit when unknown. Human-matter branches only; declaration is not independently verified",
-        )
+    matter_scenario: Literal["favorable_matter", "unfavorable_matter"] | None = Field(
+        default=None,
+        description="Caller-confirmed subject category for the selected 占卦訣: 原文问吉事 or 原文问不吉之事. Not a desired answer, question sentiment, topic classification or prediction of an actual outcome. Omit when unknown. Human-matter branches only; declaration is not independently verified",
     )
-    external_observations: Optional[list[MeihuaExternalObservation]] = Field(
+    external_observations: list[MeihuaExternalObservation] | None = Field(
         default=None,
         min_length=1,
         max_length=12,
@@ -497,18 +506,18 @@ class MeihuaInterpretationOptions(_DeferredModel):
 
 
 class MeihuaCastRequest(MeihuaInterpretationOptions):
-    day_qi_context: Optional[MeihuaDayQiContext] = Field(
+    day_qi_context: MeihuaDayQiContext | None = Field(
         default=None,
         description="Optional caller-confirmed day branch for selected NLC1925日應/month-day strength clauses. No datetime is inferred from hour/year/lunar day/question; missing stays uncollected. A declared day boundary without a civil date is not independently verified. Human branches only; no full year-month-day synthesis or validated forecast",
     )
     casting: MeihuaCasting = Field(
         description="Confirmed casting input. Select method explicitly and supply its observed counts, trigrams or existing hexagram; the method determines the required fields.",
     )
-    season_month_branch: Optional[Branch] = Field(
+    season_month_branch: Branch | None = Field(
         default=None,
         description="Optional independently resolved solar-term month branch. If unknown, seasonal strength stays unavailable; no date/time is invented",
     )
-    question: Optional[str] = Field(
+    question: str | None = Field(
         default=None, description="One question; does not alter the supplied cast"
     )
 
@@ -517,9 +526,6 @@ class MeihuaCastRequest(MeihuaInterpretationOptions):
         if self.day_qi_context is not None and self.interpretation_topic == "weather":
             raise ValueError("所选日气体用条款仅用于人事分支，不能套用天时占")
         if self.observation_context is not None:
-            from fatebridge.core.meihua_observation import (
-                ensure_observation_method_context,
-            )
 
             ensure_observation_method_context(
                 self.casting.method,

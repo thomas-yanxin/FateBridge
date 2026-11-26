@@ -140,22 +140,21 @@ def declared_error_budget(
     sources: tuple[str, ...], inputs: Mapping[str, object], origin: str
 ) -> dict[str, JsonValue]:
     components = []
-    paths = tuple(
-        k
-        for k, v in inputs.items()
-        if k.endswith("birth_time_uncertainty_minutes") and v is not None
-    )
-    bounds = [
-        Fraction(v) * 60
-        for k, v in inputs.items()
-        if k in paths
-        and isinstance(v, (int, float))
-        and not isinstance(v, bool)
-        and v > 0
-    ]
-    radius = float(max(bounds)) if bounds else None
-    if radius is not None and Fraction(radius) < max(bounds):
-        radius = nextafter(radius, inf)
+    field = "birth_time_uncertainty_minutes"
+    minutes = inputs.get(field)
+    radius = None
+    # LMT/LAT minutes belong to the recorded solar clock. Their converted
+    # endpoints do not establish a declared elapsed bound on the civil clock.
+    if (
+        inputs.get("birth_clock_basis", "civil") == "civil"
+        and isinstance(minutes, (int, float))
+        and not isinstance(minutes, bool)
+        and minutes > 0
+    ):
+        exact_radius = Fraction(minutes) * 60
+        radius = float(exact_radius)
+        if Fraction(radius) < exact_radius:
+            radius = nextafter(radius, inf)
     for source in sorted(set(sources)):
         unit = SOURCE_UNITS[source]
         interval = (
@@ -171,7 +170,7 @@ def declared_error_budget(
                 status="declared" if interval is not None else "unquantified",
                 interval=interval,
                 correlation_group=f"{origin}:{source}",
-                evidence_paths=paths if interval is not None else (),
+                evidence_paths=(field,) if interval is not None else (),
                 scope=(
                     "调用方声明的UTC经过时间范围，不认证出生记录、历史钟制或连续稳定"
                     if interval is not None

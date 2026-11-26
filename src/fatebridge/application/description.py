@@ -1,26 +1,29 @@
 """Schema and compact capability descriptions derived from ToolSpec."""
 
-import json
-from typing import Any, Dict, List, Union, get_args, get_origin
+from types import UnionType
+from typing import Any, Union, get_args, get_origin
 
 from pydantic import BaseModel
 
-from fatebridge.application.tool_spec import ToolSpec
-from fatebridge.core.response_models import (
-    CHART_VARIANT_TOOL_KEYS,
-    required_output_fields_for,
+from fatebridge.application.examples import (
+    call_guidance,
+    compact_fields,
+    evidence_views,
+    example_context,
+    example_input,
+    suggested_fields,
 )
+from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.schema_cache import model_schema
 
 
-def resolve_spec(specs: List[ToolSpec], name: str) -> ToolSpec | None:
-    """Accept a catalog key or published name without inventing transport aliases."""
-    return next((s for s in specs if name in {s.key, s.tool_name}), None)
+def resolve_spec(specs: list[ToolSpec], name: str) -> ToolSpec | None:
+    return next((spec for spec in specs if spec.tool_name == name), None)
 
 
 def unwrap_optional(annotation: object) -> object:
     """Strip a single ``Optional[...]`` / ``Union[..., None]`` wrapper."""
-    if get_origin(annotation) is Union:
+    if get_origin(annotation) in (Union, UnionType):
         non_none = [a for a in get_args(annotation) if a is not type(None)]
         if non_none:
             return non_none[0]
@@ -41,13 +44,13 @@ def field_type_name(annotation: object) -> str:
     # ``"placidus"``/``"equal_mc"``. (MCP input validation is unaffected; it
     # binds the live annotation, but the human/agent-readable ``type`` string
     # comes from here.)
-    if get_origin(annotation) is Union:
+    if get_origin(annotation) in (Union, UnionType):
         non_none = [a for a in get_args(annotation) if a is not type(None)]
         if len(non_none) > 1:
             return " | ".join(field_type_name(a) for a in non_none)
     base = unwrap_optional(annotation)
     origin = get_origin(base)
-    if origin in (list, List):
+    if origin is list:
         args = get_args(base)
         inner = getattr(args[0], "__name__", str(args[0])) if args else "str"
         return f"list[{inner}]"
@@ -56,14 +59,14 @@ def field_type_name(annotation: object) -> str:
     return str(base)
 
 
-def spec_is_cli_safe(spec: "ToolSpec") -> bool:
+def spec_is_cli_safe(spec: ToolSpec) -> bool:
     """Nested models need an explicit JSON request-file/argument contract."""
     return spec.cli_request_file or not any(
         is_model_field(f.annotation) for f in spec.request_model.model_fields.values()
     )
 
 
-def describe_spec(spec: "ToolSpec") -> Dict[str, Any]:
+def describe_spec(spec: ToolSpec) -> dict[str, Any]:
     """Self-describing, transport-agnostic record for one tool.
 
     The CLI ``describe`` command and the REST ``GET /api/tools`` endpoint both
@@ -76,7 +79,7 @@ def describe_spec(spec: "ToolSpec") -> Dict[str, Any]:
 
 def _describe_contract(
     spec: ToolSpec, *, include_output_schema: bool
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Build requested contracts without generating schemas that are discarded."""
     parameters = [
         {
@@ -94,13 +97,6 @@ def _describe_contract(
         }
         for name, field in spec.request_model.model_fields.items()
     ]
-    from fatebridge.application.examples import (
-        call_guidance,
-        evidence_views,
-        example_context,
-        example_input,
-    )
-
     example = example_input(spec)
     views = evidence_views(spec)
     guidance = call_guidance(spec)
@@ -126,15 +122,7 @@ def _describe_contract(
         "method_contracts": [method.as_manifest() for method in spec.methods],
         "method_registration": {
             "scope": "domain_methods_and_runtime_policy_witnesses",
-            "status": (
-                "registered"
-                if spec.methods
-                else (
-                    "excluded_by_request"
-                    if spec.key == "bazi_personality"
-                    else "not_registered"
-                )
-            ),
+            "status": "registered" if spec.methods else "not_registered",
             "applicability_contract": "input_schema_and_runtime_domain_preconditions",
             "version_semantics": "contract_v1 is a registration contract; actual algorithm versions are recorded separately",
         },
@@ -142,11 +130,11 @@ def _describe_contract(
         **(
             {
                 "full_result_required_fields_by_variant": {
-                    variant: list(required_output_fields_for(owner))
-                    for variant, owner in CHART_VARIANT_TOOL_KEYS.items()
+                    variant: list(fields)
+                    for variant, fields in spec.required_output_fields_by_variant.items()
                 }
             }
-            if spec.key == "astro_chart"
+            if spec.required_output_fields_by_variant
             else {}
         ),
         "full_result_empty_object_policy": "reject_required_roots",
@@ -175,7 +163,7 @@ def _describe_contract(
     }
 
 
-def summarize_spec(spec: ToolSpec) -> Dict[str, Any]:
+def summarize_spec(spec: ToolSpec) -> dict[str, Any]:
     cli_safe = spec_is_cli_safe(spec)
     return {
         "tool": spec.tool_name,
@@ -200,67 +188,22 @@ def summarize_spec(spec: ToolSpec) -> Dict[str, Any]:
     }
 
 
-def mcp_description(spec: ToolSpec) -> str:
-    """Make a published tool callable without another discovery round trip."""
-    from fatebridge.application.examples import (
-        call_guidance,
-        evidence_views,
-        suggested_fields,
-    )
-
-    fields = suggested_fields(spec)
-    guidance = call_guidance(spec)
-    views = evidence_views(spec)
-    if spec.key == "fengshui_assess" and guidance:
-        # Detailed branches remain in the input resource / on-demand contract.
-        # Parameters describe their own semantics, avoiding a second manual in
-        # every loaded tool description.
-        guidance = {k: guidance[k] for k in ("scene_selection", "interpretation")}
-        guidance["conditional_fields"] = (
-            "只有提供environmental_context时才追加layout_analysis.environmental_context；"
-            "只有提交对应关系或材质事实时才追加interior_analysis/material_analysis，"
-            "避免严格投影读取未生成的分支。"
-            "提交workstation_layout时可追加layout_analysis.workstation_layout_analysis；"
-            "算法完工读research_completion_status/research_coverage，不以请求complete代替全部算法覆盖。"
-            "实测候选保留完整回执及动作许可，不把ready解释为综合吉凶。"
-        )
-    summary = spec.summary + (
-        " 调用参考系：" + json.dumps(guidance, ensure_ascii=False) if guidance else ""
-    )
-    if not fields:
-        return summary
-    return (
-        summary
-        + " 首轮可直接调用；建议 fields="
-        + json.dumps(fields, ensure_ascii=False)
-        + "; strict_fields=true, include_snapshot_text=false。"
-        + "这些是可扩展的首轮视图；仅需更细字段时读取完整输出契约。"
-        + (
-            " 按本轮任务优先复制 evidence_views 中对应 fields（它们不是请求参数）："
-            + json.dumps(views, ensure_ascii=False)
-            if views
-            else ""
-        )
-    )
-
-
-def describe_input_spec(spec: ToolSpec) -> Dict[str, Any]:
+def describe_input_spec(spec: ToolSpec) -> dict[str, Any]:
     """Compact call contract; full output validation stays available on demand."""
     record = _describe_contract(spec, include_output_schema=False)
     record["output_fields"] = (
         list(spec.output_model.model_fields) if spec.output_model else []
     )
     record["output_contract_uri"] = f"fatebridge://tools/{spec.tool_name}"
-    from fatebridge.application.examples import call_guidance, suggested_fields
-
     fields = suggested_fields(spec)
     if fields is not None:
         record["suggested_fields"] = fields
-    guidance = call_guidance(spec)
-    if guidance is not None:
-        record["call_guidance"] = guidance
+    default_fields = compact_fields(spec)
+    if default_fields != fields:
+        record["compact_fields"] = default_fields
     record["projection_note"] = (
-        "suggested_fields 是首轮参考，可按问题增减；否则按 output_fields 选业务分支。"
+        "首次摘要使用 detail=compact 并省略 fields。"
+        "suggested_fields 是可显式请求的业务字段参考，按问题取用。"
         "run_metadata 自动保留。"
         "需要更细路径时再读完整 output_schema；不要猜测字段名。"
     )

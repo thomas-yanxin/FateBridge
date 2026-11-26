@@ -5,7 +5,8 @@
     "conventions": "丈尺不加时且不用寸，尺寸加时而不用分；字占按具体例不暗加时。物数以实际数量取上卦、时支数取下卦，取爻保留原时支数且只加一次。物数与两段声音超八取爻有约定边界，保留line_sum_basis和counting_variants中各自的本变互、体用及stage_relations，不把默认口径当唯一原典答案。",
     "current_weather_study": "1.7.0实际范围检验另读weather.research_validation.current_profile_study。固定2026年1—9月主队列273日，明示起卦节月季节时49个无雨标签、29正确、224弃权；全队列正确贡献29，对比恒无雨158，未通过。2024/2025和季节未知敏感性情形分别保留，不能挑较好比例拼接或代替主队列；2008份情形记录对应1004个目标日期，不是2008独立观测。源时段配次日及未定晴象转无雨是研究假设，朝晴不等于全天无雨；午时队列未命中明确朝暮，不能验证朝暮预测。是公开资料下的追加回顾，前瞻观测与实际模型仍0，不能据工程执行成功或来源符合宣称现实预测通过。",
     "day_qi": "Read interpretation.day_qi for selected NLC1925 day-branch element and month/day strength. Keep each counting candidate own original body; no unique day trigram, inferred missing branch, five-state weights, month/day cancellation or year-month-day net verdict. At23h time entry follows declared Meihua midnight convention and retains zi-start alternative rather than borrowing Bazi day; not event timing, validated outcome or a retrospective study exclusion. Provide day_qi_context only with a nonblank label and caller-confirmed day_branch; optional declared_day_boundary without civil date remains unverified. Unknown omit; weather rejects it.",
-    "external_manifestations": "external_observations只接收已报manifestation类别及label描述，未知不猜，不按问题文字或未查看场景自动分类。仅用于general/planning/reputation/wealth/transaction/travel/meeting/lost_property。读interpretation.external_omens：raw_relation_to_body是符号关系，qualification才是文明书局卷三所选实物／形色条款资格；炉火、烛火、红紫色，锐器、饰物器皿，土、瓦器，柴薪、未伐树不可互套。未覆盖配对保持not_addressed_in_selected_pairs，不由五行归属补作用。不把真生真克术语当实测物理、临床或灾祸判断，不转成概率、数值强度或日期。每个取数候选使用自身原体，来源及两处用字差异随配置保留；不将外应与内卦投票或抵消成结局。没有资料时null仍表示未采集，非确认没有外应；12条上限仅软件保护。",
+    "external_manifestations": "external_observations接收已报manifestation类别及label描述，可选填motion=moving或stationary。未知不猜，不按问题文字或未查看场景自动分类。适用于全部人事题篇（general/planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler/household/dwelling/marriage/dining）。weather不适用。同次已确认静室且无所闻见时，不可同时提交外应。读interpretation.external_omens：raw_relation_to_body是符号关系，qualification才是文明书局卷三所选实物／形色条款资格；炉火、烛火、红紫色，锐器、饰物器皿，土、瓦器，柴薪、未伐树不可互套。未覆盖配对保持not_addressed_in_selected_pairs，不由五行归属补作用。不把真生真克术语当实测物理、临床或灾祸判断，不转成概率、数值强度或日期。每个取数候选使用自身原体，来源及两处用字差异随配置保留；不将外应与内卦投票或抵消成结局。没有资料时null仍表示未采集，非确认没有外应；12条上限仅软件保护。",
+    "first_response": "普通卦务首轮复制evidence_views.general.fields（同suggested_fields），启用strict_fields并关闭快照文本。明确选择interpretation_topic=weather时用weather卡，明确选择人事题篇时用topic卡。按实际选定的分支取证，问题文字不切换分支。需要完整JSON时首次fields=null。",
     "household_chapters": "显式household为家宅章、dwelling为屋舍章，均读topic/topic_audit已发布父字段。以本候选原体为主、初用为家宅或屋舍；不是风水空间评估、房屋检查或选房迁居许可。家宅影印比利与固定转录比和未裁定，source_relation_condition=null，五行相同不能自动套家宅安稳；屋舍體生用保留冷退/转录衰退，不改原字。家宅生体转引人事章按所列四内卦实际生体角色留路径；未见仅限该范围，不当完整内外无生。full_source_generation_condition和完整跨章净结论保持null；原体、互变、受制及旺衰分别保留，不输出住宅安全、实际失盗、资产结果、日期或概率。",
     "internal_control": "人事分支读取interpretation.internal_countercontrol：原体加初用、体互、用互、变用共五个分析角色，不是五次独立观测。用生体之卦受其他卦克则生助受限，用克体之卦受制仅取稍解其凶；原关系保留。control_edges给直接制约及制约者自身所受克，qualifications保留其对原体的关系；离火制兑金也可能同时泄木体，不能递归抵消、计票、加权、合成成败。季令弱或未知不自动关掉制约。每个计数候选自带本卦事实路径；weather分支为null。新internal_control字段卡可核对完整证据；所选影印字句目读不是独立专家、全书或现实预测认证。",
     "method": "casting.method为必填判别字段；所需字段只属于该方法，不混入别法参数。时间法另用meihua_analysis。",
@@ -28,7 +29,7 @@
     "traveler_frame": "traveler按行人章初始五条及补充六句，返归仍以原体为参照，在外另以初用为受作用者。chapter_qualifications.initial_use_frame逐列原体、体互、用互、变用对初用的实际有向关系；体生用可为初用受生，用生体不能改写成用受生。初用月令衰且实际受克须同成立，原文未定与缺月令保持未知，内卦未见不证明完整内外没有。震多艮多门槛与范围未裁定；坎兑句只标明初用经卦读法。保留影印盈旺/转录在外之情況、紛爭之應/紛爭差异。各取数候选使用自己的原体、初用、旺衰及事实路径，不合并为吉凶、归期、行踪、安全或现实结局。",
     "trigram_relation_symbols": "按trigram_symbols字段卡核对所选16条史料象义：仅实际用生体或用克体的角色匹配对应卦名，不能以同五行替代卦名。所有或字为备选，不自动识别姓名、性别、身份、实际方位或事件；受制与未知旺衰保留，各取爻候选用自己的原体。所选巽克体作南方，固定转录作东南，不据八卦常识换字；不是现实灾祸、临床、应期或预测效力判断。",
     "unknowns": "没有season_month_branch时不算季令；不补当前日期或时辰。existing模式保留原卦码与动爻，不重起。",
-    "wealth_supplement": "interpretation_topic=wealth时另读interpretation.wealth_components：文明书局卷二求財占补充句逐项核对初用、体互、用互、变用对同一原体的体克用／用生体与用克体／体生用。每个取数候选沿用自身路径、体气及直接制约，不能借主候选。source_groups给原句和关系成分；all_named_components_present仅为所列成分全有的事实，不是及的组合含义已裁定或有财／破财整句适用。两侧成分可并存，不计票、不抵消、不覆盖初始条款。timing_reference只是源文，event_time／real_financial_change／success_probability均未计算；不据此作投资、收入保证或具体日期。",
+    "wealth_supplement": "interpretation_topic=wealth 时读取 interpretation.wealth_components。文明书局卷二求財占补充句逐项核对初用、体互、用互、变用和原体的关系，各候选使用自己的卦、体气和直接制约。source_groups 给出原句与关系成分。all_named_components_present 表示该句所列成分是否齐备，两组可同时齐备。及字的组合含义待裁定，timing_reference 保留原文卦气措辞。",
     "weather": "天时占显式选interpretation_topic=weather并复制weather字段卡到fields。按selected_readings的effective_status/controlled_tags/conditional_tags解释，不能只读raw status=matched。controls保留阈值和五/六位置及合计/单卦范围分歧，不投票。旧1.0.0研究组合128/209未胜过同日始终无雨134/209；不冒称当前组件已做现实预测验收。",
     "weather_dayparts": "1.7.0离在艮上暮雨朝晴仅匹配同一本/互/变重卦上离下艮；两项原文时段保留time_scope=morning/evening，不能当成同窗自相矛盾。读取time_scope_comparison：未定时段不等于全天，与朝暮的关系仍待核定；不自动交集、排序或合为唯一预报。朝暮不补日期、钟时或日出日落，已知analysis_datetime也不自动定位应验日。离互艮宫仍未裁定。每个取爻候选都有自己的时段比较；旧1.5.0现实检验及1.6.0语义准备不能认证本轮。",
     "weather_prior_context": "prior_condition可用neither_prolonged表达久雨与久晴两个前期条件均已确认不成立；null或省略仍未知，不为消除pending_context而填neither。它只使四项前期条件条款not_met，不补季节、多字阈值或唯一预报。一天无雨不证明久晴，缺测或间歇天气也不自动证明两者均不成立；公开月度回顾资料不证明起卦当时已可得。旧1.7.0负面现实检验保持不变，新增事实状态不是预测提升或原文久字阈值已裁定的证明。",
@@ -111,6 +112,34 @@
       "purpose": "所报金银世宝、兵刃的原体限定与实物资格分列；不把不凶改成吉或安全",
       "strict_fields": true,
       "when": "只有已报明确类别才选新manifestation，未知省略；旧金属或锐器不自动升级为新类别"
+    },
+    "general": {
+      "fields": [
+        "meihua.seed.casting_method",
+        "meihua.calendar_policy.context_status",
+        "meihua.base_hexagram.name",
+        "meihua.base_hexagram.binary_code",
+        "meihua.base_hexagram.symbol",
+        "meihua.mutual_hexagram.name",
+        "meihua.mutual_hexagram.binary_code",
+        "meihua.changed_hexagram.name",
+        "meihua.changed_hexagram.binary_code",
+        "meihua.changed_hexagram.symbol",
+        "meihua.seed.moving_line",
+        "meihua.body_trigram.name",
+        "meihua.use_trigram.name",
+        "meihua.body_use_relation",
+        "meihua.stage_relations",
+        "meihua.ruleset.id",
+        "meihua.ruleset.version",
+        "interpretation.interpretation_topic",
+        "interpretation.classical_text_reference",
+        "summary"
+      ],
+      "include_snapshot_text": false,
+      "purpose": "首轮读取本互变、实际动爻经文及原体用生克。",
+      "strict_fields": true,
+      "when": "interpretation_topic=general（默认）。明确选天时占用weather，明确选人事题篇用topic。"
     },
     "internal_control": {
       "fields": [
@@ -427,755 +456,1247 @@
   },
   "first_view": {
     "fields": [
-      "input_normalized",
-      "meihua.method",
-      "meihua.seed",
-      "meihua.counting_variants",
-      "meihua.ruleset.id",
-      "meihua.ruleset.sources",
-      "meihua.ruleset.version",
-      "meihua.calendar_policy",
-      "meihua.base_hexagram",
-      "meihua.changed_hexagram",
+      "meihua.seed.casting_method",
+      "meihua.calendar_policy.context_status",
+      "meihua.base_hexagram.name",
+      "meihua.base_hexagram.binary_code",
+      "meihua.base_hexagram.symbol",
+      "meihua.mutual_hexagram.name",
+      "meihua.mutual_hexagram.binary_code",
+      "meihua.changed_hexagram.name",
+      "meihua.changed_hexagram.binary_code",
+      "meihua.changed_hexagram.symbol",
+      "meihua.seed.moving_line",
+      "meihua.body_trigram.name",
+      "meihua.use_trigram.name",
+      "meihua.body_use_relation",
       "meihua.stage_relations",
-      "meihua.seasonal_strength",
-      "meihua.evidence_scope",
-      "interpretation.topic_reading",
+      "meihua.ruleset.id",
+      "meihua.ruleset.version",
+      "interpretation.interpretation_topic",
       "interpretation.classical_text_reference",
-      "interpretation.evidence_scope",
-      "interpretation.weather",
-      "summary",
-      "interpretation.casting_readings",
-      "interpretation.casting_comparison",
-      "interpretation.internal_countercontrol",
-      "interpretation.seasonal_qualification"
+      "summary"
     ],
     "include_snapshot_text": false,
     "strict_fields": true
   },
   "input": {
-    "additionalProperties": false,
-    "properties": {
-      "as_of": {
-        "anyOf": [
-          {
+    "$defs": {
+      "ChiCun": {
+        "additionalProperties": false,
+        "properties": {
+          "chi": {
+            "maximum": 1000000,
+            "minimum": 0,
+            "title": "Chi",
+            "type": "integer"
+          },
+          "cun": {
+            "maximum": 9,
+            "minimum": 0,
+            "title": "Cun",
+            "type": "integer"
+          },
+          "fen": {
+            "anyOf": [
+              {
+                "maximum": 9,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Recorded but excluded from casting by 尺寸占",
+            "title": "Fen"
+          },
+          "hour_branch": {
+            "enum": [
+              "子",
+              "丑",
+              "寅",
+              "卯",
+              "辰",
+              "巳",
+              "午",
+              "未",
+              "申",
+              "酉",
+              "戌",
+              "亥"
+            ],
+            "title": "Hour Branch",
             "type": "string"
           },
-          {
-            "type": "null"
+          "method": {
+            "const": "length_chi_cun",
+            "title": "Method",
+            "type": "string"
           }
+        },
+        "required": [
+          "method",
+          "chi",
+          "cun",
+          "hour_branch"
         ],
-        "default": null,
-        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+        "title": "ChiCun",
+        "type": "object"
       },
-      "casting": {
-        "description": "Confirmed casting input. Select method explicitly and supply its observed counts, trigrams or existing hexagram; the method determines the required fields.",
-        "oneOf": [
-          {
-            "additionalProperties": false,
-            "properties": {
-              "first_count": {
-                "description": "First actually heard group of sounds",
-                "maximum": 1000000,
-                "minimum": 1,
-                "type": "integer"
-              },
-              "hour_branch": {
-                "enum": [
-                  "子",
-                  "丑",
-                  "寅",
-                  "卯",
-                  "辰",
-                  "巳",
-                  "午",
-                  "未",
-                  "申",
-                  "酉",
-                  "戌",
-                  "亥"
-                ],
-                "type": "string"
-              },
-              "line_sum_basis": {
-                "default": "raw_counts",
-                "description": "Explicit convention for counts above eight; the worked example does not uniquely adjudicate this boundary",
-                "enum": [
-                  "raw_counts",
-                  "trigram_numbers"
-                ],
-                "type": "string"
-              },
-              "method": {
-                "const": "sound_groups",
-                "type": "string"
-              },
-              "second_count": {
-                "description": "Second actually heard group; keep the order",
-                "maximum": 1000000,
-                "minimum": 1,
-                "type": "integer"
-              }
-            },
-            "required": [
-              "method",
-              "first_count",
-              "second_count",
-              "hour_branch"
-            ],
-            "type": "object"
+      "ExistingCast": {
+        "additionalProperties": false,
+        "properties": {
+          "hexagram_code": {
+            "description": "Actual existing cast, bottom line first",
+            "pattern": "^[01]{6}$",
+            "title": "Hexagram Code",
+            "type": "string"
           },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "count": {
-                "description": "Confirmed quantity of countable objects; no inferred scene count or arbitrary replacement number",
-                "maximum": 1000000,
-                "minimum": 1,
-                "type": "integer"
-              },
-              "hour_branch": {
-                "description": "Confirmed hour branch; no current-clock fallback",
-                "enum": [
-                  "子",
-                  "丑",
-                  "寅",
-                  "卯",
-                  "辰",
-                  "巳",
-                  "午",
-                  "未",
-                  "申",
-                  "酉",
-                  "戌",
-                  "亥"
-                ],
-                "type": "string"
-              },
-              "line_sum_basis": {
-                "default": "raw_counts",
-                "description": "Declared reading of 卦數 above eight: raw_counts uses count + hour number; trigram_numbers uses reduced UPPER trigram number + original hour number. Never reduce the hour to the lower-trigram number for the moving line. Both candidates are retained when they differ",
-                "enum": [
-                  "raw_counts",
-                  "trigram_numbers"
-                ],
-                "type": "string"
-              },
-              "method": {
-                "const": "object_count",
-                "type": "string"
-              }
-            },
-            "required": [
-              "method",
-              "count",
-              "hour_branch"
-            ],
-            "type": "object"
+          "method": {
+            "const": "existing",
+            "title": "Method",
+            "type": "string"
           },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "hour_branch": {
-                "enum": [
-                  "子",
-                  "丑",
-                  "寅",
-                  "卯",
-                  "辰",
-                  "巳",
-                  "午",
-                  "未",
-                  "申",
-                  "酉",
-                  "戌",
-                  "亥"
-                ],
-                "type": "string"
-              },
-              "lower_trigram": {
-                "description": "Confirmed trigram of the observed direction; use pre-heaven trigram numbers, not Luo Shu numbers",
-                "enum": [
-                  "乾",
-                  "兑",
-                  "离",
-                  "震",
-                  "巽",
-                  "坎",
-                  "艮",
-                  "坤"
-                ],
-                "type": "string"
-              },
-              "method": {
-                "const": "observed_trigrams",
-                "type": "string"
-              },
-              "upper_trigram": {
-                "description": "Confirmed trigram of the observed object/person; do not infer from an unseen scene",
-                "enum": [
-                  "乾",
-                  "兑",
-                  "离",
-                  "震",
-                  "巽",
-                  "坎",
-                  "艮",
-                  "坤"
-                ],
-                "type": "string"
-              }
-            },
-            "required": [
-              "method",
-              "upper_trigram",
-              "lower_trigram",
-              "hour_branch"
-            ],
-            "type": "object"
+          "moving_line": {
+            "description": "The one actual moving line, bottom=1; never draw again",
+            "maximum": 6,
+            "minimum": 1,
+            "title": "Moving Line",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "method",
+          "hexagram_code",
+          "moving_line"
+        ],
+        "title": "ExistingCast",
+        "type": "object"
+      },
+      "LunarTimeAddedCount": {
+        "additionalProperties": false,
+        "properties": {
+          "added_count": {
+            "description": "Confirmed added count, e.g. supplied surname count(s); never inferred from modern glyph strokes. Upper raw sum includes it, lower and moving-line sum add the original hour number once",
+            "maximum": 1000000,
+            "minimum": 1,
+            "title": "Added Count",
+            "type": "integer"
           },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "direction": {
-                "description": "Confirmed named compass side used for the lower trigram; source chart uses east震/south離/west兌/north坎 and pre-heaven trigram numbers. No GPS bearing sector or north-reference conversion inferred",
+          "hour_branch": {
+            "enum": [
+              "子",
+              "丑",
+              "寅",
+              "卯",
+              "辰",
+              "巳",
+              "午",
+              "未",
+              "申",
+              "酉",
+              "戌",
+              "亥"
+            ],
+            "title": "Hour Branch",
+            "type": "string"
+          },
+          "lunar_day": {
+            "description": "Caller-confirmed lunar day; this branch alone cannot validate the actual month's length",
+            "maximum": 30,
+            "minimum": 1,
+            "title": "Lunar Day",
+            "type": "integer"
+          },
+          "lunar_month": {
+            "description": "Caller-confirmed lunar month number; no date conversion or leap-month adjudication",
+            "maximum": 12,
+            "minimum": 1,
+            "title": "Lunar Month",
+            "type": "integer"
+          },
+          "method": {
+            "const": "lunar_time_added_count",
+            "title": "Method",
+            "type": "string"
+          },
+          "year_branch": {
+            "description": "Confirmed lunar year branch; not a Gregorian year or Li Chun year pillar",
+            "enum": [
+              "子",
+              "丑",
+              "寅",
+              "卯",
+              "辰",
+              "巳",
+              "午",
+              "未",
+              "申",
+              "酉",
+              "戌",
+              "亥"
+            ],
+            "title": "Year Branch",
+            "type": "string"
+          }
+        },
+        "required": [
+          "method",
+          "year_branch",
+          "lunar_month",
+          "lunar_day",
+          "hour_branch",
+          "added_count"
+        ],
+        "title": "LunarTimeAddedCount",
+        "type": "object"
+      },
+      "MeihuaDayQiContext": {
+        "additionalProperties": false,
+        "properties": {
+          "day_branch": {
+            "description": "Caller-confirmed day branch, never the hour/year branch or lunar day number",
+            "enum": [
+              "子",
+              "丑",
+              "寅",
+              "卯",
+              "辰",
+              "巳",
+              "午",
+              "未",
+              "申",
+              "酉",
+              "戌",
+              "亥"
+            ],
+            "title": "Day Branch",
+            "type": "string"
+          },
+          "declared_day_boundary": {
+            "anyOf": [
+              {
                 "enum": [
-                  "north",
-                  "northeast",
-                  "east",
-                  "southeast",
-                  "south",
-                  "southwest",
-                  "west",
-                  "northwest"
+                  "local_midnight",
+                  "zi_start"
                 ],
                 "type": "string"
               },
-              "direction_role": {
-                "description": "Meaning of the reported compass side: comes from, goes/falls toward, or is located at. Preserve this side; do not replace a source side with the opposite travel heading. Unknown relation must not be guessed",
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional caller-declared convention; without a civil date it is not verified or used to infer another date/branch",
+            "title": "Declared Day Boundary"
+          },
+          "label": {
+            "maxLength": 240,
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "day_branch"
+        ],
+        "title": "MeihuaDayQiContext",
+        "type": "object"
+      },
+      "MeihuaExternalObservation": {
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "description": "Caller description/reference for this reported observation; presence and classification are not independently verified",
+            "maxLength": 240,
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          },
+          "manifestation": {
+            "description": "Caller-reported selected source category; gold_silver_treasure and weapon are explicit NLC1925內外論 classifications, never inferred from every metallic ornament or sharp tool, free text, favorable/unfavorable wishes or an unseen scene. Symbolic body qualification is separate from material effect, real-world safety and outcomes. Unknown manifestations cannot be guessed",
+            "enum": [
+              "furnace_flame",
+              "candle_flame",
+              "red_purple_color",
+              "sharp_metal_tool",
+              "metal_ornament_or_utensil",
+              "actual_water",
+              "black_or_damp_appearance",
+              "soil",
+              "fired_pottery",
+              "cut_firewood",
+              "living_tree",
+              "gold_silver_treasure",
+              "weapon"
+            ],
+            "title": "Manifestation",
+            "type": "string"
+          },
+          "motion": {
+            "anyOf": [
+              {
                 "enum": [
-                  "from",
-                  "toward",
-                  "at"
+                  "moving",
+                  "stationary"
                 ],
                 "type": "string"
               },
-              "hour_branch": {
-                "description": "Confirmed hour branch used once in the moving-line sum; no current-clock fallback",
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional caller-reported actual motion of this external observation. Omit if unknown; never inferred from material, description, observer activity or inner symbolic roles. Moving water/carried soil and still wells/ground remain distinct. Does not determine omen valence or an event date",
+            "title": "Motion"
+          },
+          "orientation": {
+            "anyOf": [
+              {
                 "enum": [
-                  "子",
-                  "丑",
-                  "寅",
-                  "卯",
-                  "辰",
-                  "巳",
-                  "午",
-                  "未",
-                  "申",
-                  "酉",
-                  "戌",
-                  "亥"
+                  "approaching",
+                  "departing"
                 ],
                 "type": "string"
               },
-              "method": {
-                "const": "observed_categories",
-                "type": "string"
-              },
-              "single_subject_confirmed": {
-                "const": true,
-                "description": "Caller explicitly confirms one selected subject. False, unknown and group sightings cannot enter this finite single-subject route; not an independent scene verification",
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Caller-reported movement toward or away from the observer at the same instant, for 卷二·向背. Separate from motion and compass direction. Omit if unknown.",
+            "title": "Orientation"
+          }
+        },
+        "required": [
+          "manifestation",
+          "label"
+        ],
+        "title": "MeihuaExternalObservation",
+        "type": "object"
+      },
+      "MeihuaObservationContext": {
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "description": "Caller reference for the same casting episode and observer. Not parsed to infer any condition; presence or perception is not independently verified",
+            "maxLength": 240,
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          },
+          "nothing_heard": {
+            "anyOf": [
+              {
                 "type": "boolean"
               },
-              "subject_category": {
-                "description": "Caller-confirmed category matching the selected NLC1925 duanfa examples: 老人/少年/牛/雞/槁木. Finite source lookup, no inferred scene classification, age cutoff, generic wood substitution or sound-method switching",
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Caller declaration of no external 所闻 in the selected 静占 sense at this cast; omit/null if unknown. No inference from absent records or unimplemented categories",
+            "title": "Nothing Heard"
+          },
+          "nothing_seen": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Caller declaration of no external 所见 in the selected 静占 sense at this cast; omit/null if unknown. No inference from an unseen scene, empty records or unimplemented categories",
+            "title": "Nothing Seen"
+          },
+          "quiet_room": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Caller declaration of 在静室 for this cast; omit/null if unknown. Physical setting is not mental stillness or a decibel measurement",
+            "title": "Quiet Room"
+          }
+        },
+        "required": [
+          "label"
+        ],
+        "title": "MeihuaObservationContext",
+        "type": "object"
+      },
+      "MeihuaQuerentPosition": {
+        "additionalProperties": false,
+        "properties": {
+          "direction": {
+            "description": "Reported compass side occupied by the person asking at this cast; not movement heading, facing, address or the casting object's direction. No compass bearing or north-reference conversion inferred",
+            "enum": [
+              "north",
+              "northeast",
+              "east",
+              "southeast",
+              "south",
+              "southwest",
+              "west",
+              "northwest"
+            ],
+            "title": "Direction",
+            "type": "string"
+          },
+          "reference_label": {
+            "description": "Caller-reported reference/origin for this occupied side; not parsed or independently located",
+            "maxLength": 240,
+            "minLength": 1,
+            "title": "Reference Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "direction",
+          "reference_label"
+        ],
+        "title": "MeihuaQuerentPosition",
+        "type": "object"
+      },
+      "MeihuaReputationContext": {
+        "additionalProperties": false,
+        "properties": {
+          "currently_in_office": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Caller-confirmed 在任 in the selected historical official-office clause, not generic modern employment, seniority or a desired promotion. Omit/null if unknown; no real personnel or hazard verdict follows",
+            "title": "Currently In Office"
+          },
+          "label": {
+            "description": "Caller reference for the declared source context; never parsed to infer office status, desired result or an appointment",
+            "maxLength": 240,
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          },
+          "seeking_official_appointment": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Caller confirms the question concerns the source's 職任之處. Not inferred from reputation, an exam, already being employed, question keywords or wishes. Omit/null if unknown; selected 方道 witnesses are not an actual location",
+            "title": "Seeking Official Appointment"
+          }
+        },
+        "required": [
+          "label"
+        ],
+        "title": "MeihuaReputationContext",
+        "type": "object"
+      },
+      "MeihuaResponseContext": {
+        "additionalProperties": false,
+        "properties": {
+          "human": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "elderly_man",
+                    "elderly_woman",
+                    "young_boy",
+                    "young_girl",
+                    "heard_laughter",
+                    "weeping_encountered"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 6,
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Caller-reported source classes 老人/老婦/少男/少女 or actually heard笑語/encountered哭泣. No numerical age cutoffs, automatic person classification or outcomes. Laughter/weeping do not manufacture a trigram",
+            "title": "Human"
+          },
+          "label": {
+            "maxLength": 240,
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          },
+          "querent_position": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/MeihuaQuerentPosition"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "same_casting_episode_confirmed": {
+            "const": true,
+            "description": "Caller explicitly confirms these are reported actual conditions at this casting episode, not desired/future outcomes. Presence/classification is not independently verified",
+            "title": "Same Casting Episode Confirmed",
+            "type": "boolean"
+          },
+          "setting": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "bamboo_woodland",
+                    "rivers_streams_or_pools",
+                    "metal_place",
+                    "kiln_stove_or_fire",
+                    "earth_or_tiles"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 5,
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Reported place at the cast: 竹林/江河溪澗池沼/五金/窰竈爐火/土瓦. Keep all source trigram candidates; never infer setting from address, objects, question or unseen scene",
+            "title": "Setting"
+          },
+          "weather": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "clear",
+                    "rain",
+                    "snow",
+                    "rain_or_snow",
+                    "wind",
+                    "thunder"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 6,
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Reported present conditions corresponding to 晴明/雨/雪/雨雪未分/風/雷. 雨雪皆配坎, but坎體宜雨does not uniquely establish a preference for snow; rain_or_snow keeps that condition pending. Human-matter 天時應 only; not a future weather prediction or daily rain label. Unknown omit/null; multiple observations retained without voting",
+            "title": "Weather"
+          }
+        },
+        "required": [
+          "label",
+          "same_casting_episode_confirmed"
+        ],
+        "title": "MeihuaResponseContext",
+        "type": "object"
+      },
+      "MeihuaToneReference": {
+        "additionalProperties": false,
+        "properties": {
+          "encoding": {
+            "const": "ping_shang_qu_ru",
+            "default": "ping_shang_qu_ru",
+            "description": "1/2/3/4 mean 平/上/去/入, never Mandarin pinyin tone numbers",
+            "title": "Encoding",
+            "type": "string"
+          },
+          "reading_scope": {
+            "enum": [
+              "lexical_category",
+              "reported_pronunciation",
+              "worked_example"
+            ],
+            "title": "Reading Scope",
+            "type": "string"
+          },
+          "source": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Source",
+            "type": "string"
+          },
+          "system_name": {
+            "description": "Caller-declared phonological system or specific worked-example reading; not automatically authenticated",
+            "maxLength": 240,
+            "minLength": 1,
+            "title": "System Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system_name",
+          "source",
+          "reading_scope"
+        ],
+        "title": "MeihuaToneReference",
+        "type": "object"
+      },
+      "MeihuaWeatherContext": {
+        "additionalProperties": false,
+        "properties": {
+          "many_min_count": {
+            "anyOf": [
+              {
+                "maximum": 6,
+                "minimum": 2,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Declared software threshold for 多, with both six-position and five-role static-once scope probes retained. The raw six-position status is qualified when scopes disagree; neither scope is claimed as uniquely classical. If absent, potentially applicable 多 conditions remain pending",
+            "title": "Many Min Count"
+          },
+          "prior_condition": {
+            "anyOf": [
+              {
                 "enum": [
-                  "elder_person",
-                  "young_person",
-                  "cow",
-                  "chicken",
-                  "dry_wood"
+                  "prolonged_rain",
+                  "prolonged_clear",
+                  "neither_prolonged"
                 ],
                 "type": "string"
               },
-              "subject_description": {
-                "description": "Actual caller-provided description or reference for the declared subject; never parsed to override explicit source-category or direction fields",
-                "maxLength": 240,
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Caller-confirmed prior weather: prolonged_rain, prolonged_clear, or neither_prolonged only when both prolonged conditions are confirmed false. None means unknown, never confirmed neither. The original gives no number of days for 久. No rainfall alone does not establish clear sky; a completed dry day, a missing observation or a cast cannot supply this fact",
+            "title": "Prior Condition"
+          },
+          "season": {
+            "anyOf": [
+              {
+                "enum": [
+                  "spring",
+                  "summer",
+                  "autumn",
+                  "winter"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Confirmed season in the source's weather context; not inferred from a timezone or Gregorian month",
+            "title": "Season"
+          }
+        },
+        "title": "MeihuaWeatherContext",
+        "type": "object"
+      },
+      "ObjectCount": {
+        "additionalProperties": false,
+        "properties": {
+          "count": {
+            "description": "Confirmed quantity of countable objects; no inferred scene count or arbitrary replacement number",
+            "maximum": 1000000,
+            "minimum": 1,
+            "title": "Count",
+            "type": "integer"
+          },
+          "hour_branch": {
+            "description": "Confirmed hour branch; no current-clock fallback",
+            "enum": [
+              "子",
+              "丑",
+              "寅",
+              "卯",
+              "辰",
+              "巳",
+              "午",
+              "未",
+              "申",
+              "酉",
+              "戌",
+              "亥"
+            ],
+            "title": "Hour Branch",
+            "type": "string"
+          },
+          "line_sum_basis": {
+            "default": "raw_counts",
+            "description": "Declared reading of 卦數 above eight: raw_counts uses count + hour number; trigram_numbers uses reduced UPPER trigram number + original hour number. Never reduce the hour to the lower-trigram number for the moving line. Both candidates are retained when they differ",
+            "enum": [
+              "raw_counts",
+              "trigram_numbers"
+            ],
+            "title": "Line Sum Basis",
+            "type": "string"
+          },
+          "method": {
+            "const": "object_count",
+            "title": "Method",
+            "type": "string"
+          }
+        },
+        "required": [
+          "method",
+          "count",
+          "hour_branch"
+        ],
+        "title": "ObjectCount",
+        "type": "object"
+      },
+      "ObservedCategories": {
+        "additionalProperties": false,
+        "properties": {
+          "direction": {
+            "description": "Confirmed named compass side used for the lower trigram; source chart uses east震/south離/west兌/north坎 and pre-heaven trigram numbers. No GPS bearing sector or north-reference conversion inferred",
+            "enum": [
+              "north",
+              "northeast",
+              "east",
+              "southeast",
+              "south",
+              "southwest",
+              "west",
+              "northwest"
+            ],
+            "title": "Direction",
+            "type": "string"
+          },
+          "direction_role": {
+            "description": "Meaning of the reported compass side: comes from, goes/falls toward, or is located at. Preserve this side; do not replace a source side with the opposite travel heading. Unknown relation must not be guessed",
+            "enum": [
+              "from",
+              "toward",
+              "at"
+            ],
+            "title": "Direction Role",
+            "type": "string"
+          },
+          "hour_branch": {
+            "description": "Confirmed hour branch used once in the moving-line sum; no current-clock fallback",
+            "enum": [
+              "子",
+              "丑",
+              "寅",
+              "卯",
+              "辰",
+              "巳",
+              "午",
+              "未",
+              "申",
+              "酉",
+              "戌",
+              "亥"
+            ],
+            "title": "Hour Branch",
+            "type": "string"
+          },
+          "method": {
+            "const": "observed_categories",
+            "title": "Method",
+            "type": "string"
+          },
+          "single_subject_confirmed": {
+            "const": true,
+            "description": "Caller explicitly confirms one selected subject. False, unknown and group sightings cannot enter this finite single-subject route; not an independent scene verification",
+            "title": "Single Subject Confirmed",
+            "type": "boolean"
+          },
+          "subject_category": {
+            "description": "Caller-confirmed category matching the selected NLC1925 duanfa examples: 老人/少年/牛/雞/槁木. Finite source lookup, no inferred scene classification, age cutoff, generic wood substitution or sound-method switching",
+            "enum": [
+              "elder_person",
+              "young_person",
+              "cow",
+              "chicken",
+              "dry_wood"
+            ],
+            "title": "Subject Category",
+            "type": "string"
+          },
+          "subject_description": {
+            "description": "Actual caller-provided description or reference for the declared subject; never parsed to override explicit source-category or direction fields",
+            "maxLength": 240,
+            "minLength": 1,
+            "title": "Subject Description",
+            "type": "string"
+          }
+        },
+        "required": [
+          "method",
+          "subject_category",
+          "subject_description",
+          "single_subject_confirmed",
+          "direction",
+          "direction_role",
+          "hour_branch"
+        ],
+        "title": "ObservedCategories",
+        "type": "object"
+      },
+      "ObservedTrigrams": {
+        "additionalProperties": false,
+        "properties": {
+          "hour_branch": {
+            "enum": [
+              "子",
+              "丑",
+              "寅",
+              "卯",
+              "辰",
+              "巳",
+              "午",
+              "未",
+              "申",
+              "酉",
+              "戌",
+              "亥"
+            ],
+            "title": "Hour Branch",
+            "type": "string"
+          },
+          "lower_trigram": {
+            "description": "Confirmed trigram of the observed direction; use pre-heaven trigram numbers, not Luo Shu numbers",
+            "enum": [
+              "乾",
+              "兑",
+              "离",
+              "震",
+              "巽",
+              "坎",
+              "艮",
+              "坤"
+            ],
+            "title": "Lower Trigram",
+            "type": "string"
+          },
+          "method": {
+            "const": "observed_trigrams",
+            "title": "Method",
+            "type": "string"
+          },
+          "upper_trigram": {
+            "description": "Confirmed trigram of the observed object/person; do not infer from an unseen scene",
+            "enum": [
+              "乾",
+              "兑",
+              "离",
+              "震",
+              "巽",
+              "坎",
+              "艮",
+              "坤"
+            ],
+            "title": "Upper Trigram",
+            "type": "string"
+          }
+        },
+        "required": [
+          "method",
+          "upper_trigram",
+          "lower_trigram",
+          "hour_branch"
+        ],
+        "title": "ObservedTrigrams",
+        "type": "object"
+      },
+      "SingleCharacter": {
+        "additionalProperties": false,
+        "properties": {
+          "left_strokes": {
+            "maximum": 1000000,
+            "minimum": 0,
+            "title": "Left Strokes",
+            "type": "integer"
+          },
+          "method": {
+            "const": "single_character_strokes",
+            "title": "Method",
+            "type": "string"
+          },
+          "right_strokes": {
+            "maximum": 1000000,
+            "minimum": 0,
+            "title": "Right Strokes",
+            "type": "integer"
+          },
+          "script_style": {
+            "const": "regular",
+            "description": "The original method requires a legible regular-script glyph, not cursive",
+            "title": "Script Style",
+            "type": "string"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "maxLength": 1,
                 "minLength": 1,
                 "type": "string"
+              },
+              {
+                "type": "null"
               }
-            },
-            "required": [
-              "method",
-              "subject_category",
-              "subject_description",
-              "single_subject_confirmed",
-              "direction",
-              "direction_role",
-              "hour_branch"
             ],
-            "type": "object"
+            "default": null,
+            "title": "Text"
           },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "chi": {
-                "maximum": 9,
-                "minimum": 0,
-                "type": "integer"
-              },
-              "cun": {
-                "anyOf": [
-                  {
-                    "maximum": 9,
-                    "minimum": 0,
-                    "type": "integer"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "Recorded but excluded from casting by 丈尺占"
-              },
-              "method": {
-                "const": "length_zhang_chi",
-                "type": "string"
-              },
-              "zhang": {
-                "maximum": 1000000,
-                "minimum": 0,
-                "type": "integer"
-              }
-            },
-            "required": [
-              "method",
-              "zhang",
-              "chi"
-            ],
-            "type": "object"
-          },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "chi": {
-                "maximum": 1000000,
-                "minimum": 0,
-                "type": "integer"
-              },
-              "cun": {
-                "maximum": 9,
-                "minimum": 0,
-                "type": "integer"
-              },
-              "fen": {
-                "anyOf": [
-                  {
-                    "maximum": 9,
-                    "minimum": 0,
-                    "type": "integer"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "Recorded but excluded from casting by 尺寸占"
-              },
-              "hour_branch": {
-                "enum": [
-                  "子",
-                  "丑",
-                  "寅",
-                  "卯",
-                  "辰",
-                  "巳",
-                  "午",
-                  "未",
-                  "申",
-                  "酉",
-                  "戌",
-                  "亥"
-                ],
-                "type": "string"
-              },
-              "method": {
-                "const": "length_chi_cun",
-                "type": "string"
-              }
-            },
-            "required": [
-              "method",
-              "chi",
-              "cun",
-              "hour_branch"
-            ],
-            "type": "object"
-          },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "method": {
-                "const": "text_tones",
-                "type": "string"
-              },
-              "text": {
-                "anyOf": [
-                  {
-                    "maxLength": 10,
-                    "minLength": 4,
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "Optional original characters, only for matching the supplied categories"
-              },
-              "tone_reference": {
-                "anyOf": [
-                  {
-                    "additionalProperties": false,
-                    "properties": {
-                      "encoding": {
-                        "const": "ping_shang_qu_ru",
-                        "default": "ping_shang_qu_ru",
-                        "description": "1/2/3/4 mean 平/上/去/入, never Mandarin pinyin tone numbers",
-                        "type": "string"
-                      },
-                      "reading_scope": {
-                        "enum": [
-                          "lexical_category",
-                          "reported_pronunciation",
-                          "worked_example"
-                        ],
-                        "type": "string"
-                      },
-                      "source": {
-                        "maxLength": 1000,
-                        "minLength": 1,
-                        "type": "string"
-                      },
-                      "system_name": {
-                        "description": "Caller-declared phonological system or specific worked-example reading; not automatically authenticated",
-                        "maxLength": 240,
-                        "minLength": 1,
-                        "type": "string"
-                      }
-                    },
-                    "required": [
-                      "system_name",
-                      "source",
-                      "reading_scope"
-                    ],
-                    "type": "object"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "Optional declared sound system, source and reading scope; absent means unknown, supplied means caller-declared rather than independently verified. No online dictionary lookup or automatic tone assignment"
-              },
-              "tones": {
-                "description": "One caller-supplied 平/上/去/入 category per character, encoded 1/2/3/4. Historical sound systems and the selected Meihua worked example can differ. Do not replace categories with modern Mandarin tone numbers or silently change the source system",
-                "items": {
-                  "maximum": 4,
-                  "minimum": 1,
-                  "type": "integer"
-                },
-                "maxItems": 10,
-                "minItems": 4,
-                "type": "array"
-              }
-            },
-            "required": [
-              "method",
-              "tones"
-            ],
-            "type": "object"
-          },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "method": {
-                "const": "text_strokes",
-                "type": "string"
-              },
-              "strokes": {
-                "description": "Confirmed strokes of each actual glyph; never replace an unusual glyph with a modern dictionary count",
-                "items": {
-                  "maximum": 1000000,
-                  "minimum": 1,
-                  "type": "integer"
-                },
-                "maxItems": 3,
-                "minItems": 2,
-                "type": "array"
-              },
-              "text": {
-                "anyOf": [
-                  {
-                    "maxLength": 3,
-                    "minLength": 2,
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null
-              }
-            },
-            "required": [
-              "method",
-              "strokes"
-            ],
-            "type": "object"
-          },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "left_strokes": {
-                "maximum": 1000000,
-                "minimum": 0,
-                "type": "integer"
-              },
-              "method": {
-                "const": "single_character_strokes",
-                "type": "string"
-              },
-              "right_strokes": {
-                "maximum": 1000000,
-                "minimum": 0,
-                "type": "integer"
-              },
-              "script_style": {
-                "const": "regular",
-                "description": "The original method requires a legible regular-script glyph, not cursive",
-                "type": "string"
-              },
-              "text": {
-                "anyOf": [
-                  {
-                    "maxLength": 1,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null
-              },
-              "total_strokes": {
-                "maximum": 1000000,
-                "minimum": 1,
-                "type": "integer"
-              }
-            },
-            "required": [
-              "method",
-              "script_style",
-              "left_strokes",
-              "right_strokes",
-              "total_strokes"
-            ],
-            "type": "object"
-          },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "character_count": {
-                "description": "Confirmed character count, no silent exclusions. The default fixed transcription is limited to100. Explicitnlc1925_selected_span preserves百餘字; counts above100 are labelled software extensions because its exact upper extent is unadjudicated.1million is a software guard, not a classical limit",
-                "maximum": 1000000,
-                "minimum": 11,
-                "type": "integer"
-              },
-              "line_sum_basis": {
-                "default": "raw_counts",
-                "description": "Declared reading of合二卦總數: sum raw character halves or their reduced trigram numbers; no hour added. Both distinct casts retained; not uniquely adjudicated by the selected span",
-                "enum": [
-                  "raw_counts",
-                  "trigram_numbers"
-                ],
-                "type": "string"
-              },
-              "method": {
-                "const": "text_count",
-                "type": "string"
-              },
-              "text_basis": {
-                "default": "fixed_transcription_2690596",
-                "description": "Explicit source choice: fixed transcription百字 or selected facsimile百餘字. Never switch source after seeing a result",
-                "enum": [
-                  "fixed_transcription_2690596",
-                  "nlc1925_selected_span"
-                ],
-                "type": "string"
-              }
-            },
-            "required": [
-              "method",
-              "character_count"
-            ],
-            "type": "object"
-          },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "hexagram_code": {
-                "description": "Actual existing cast, bottom line first",
-                "pattern": "^[01]{6}$",
-                "type": "string"
-              },
-              "method": {
-                "const": "existing",
-                "type": "string"
-              },
-              "moving_line": {
-                "description": "The one actual moving line, bottom=1; never draw again",
-                "maximum": 6,
-                "minimum": 1,
-                "type": "integer"
-              }
-            },
-            "required": [
-              "method",
-              "hexagram_code",
-              "moving_line"
-            ],
-            "type": "object"
-          },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "added_count": {
-                "description": "Confirmed added count, e.g. supplied surname count(s); never inferred from modern glyph strokes. Upper raw sum includes it, lower and moving-line sum add the original hour number once",
-                "maximum": 1000000,
-                "minimum": 1,
-                "type": "integer"
-              },
-              "hour_branch": {
-                "enum": [
-                  "子",
-                  "丑",
-                  "寅",
-                  "卯",
-                  "辰",
-                  "巳",
-                  "午",
-                  "未",
-                  "申",
-                  "酉",
-                  "戌",
-                  "亥"
-                ],
-                "type": "string"
-              },
-              "lunar_day": {
-                "description": "Caller-confirmed lunar day; this branch alone cannot validate the actual month's length",
-                "maximum": 30,
-                "minimum": 1,
-                "type": "integer"
-              },
-              "lunar_month": {
-                "description": "Caller-confirmed lunar month number; no date conversion or leap-month adjudication",
-                "maximum": 12,
-                "minimum": 1,
-                "type": "integer"
-              },
-              "method": {
-                "const": "lunar_time_added_count",
-                "type": "string"
-              },
-              "year_branch": {
-                "description": "Confirmed lunar year branch; not a Gregorian year or Li Chun year pillar",
-                "enum": [
-                  "子",
-                  "丑",
-                  "寅",
-                  "卯",
-                  "辰",
-                  "巳",
-                  "午",
-                  "未",
-                  "申",
-                  "酉",
-                  "戌",
-                  "亥"
-                ],
-                "type": "string"
-              }
-            },
-            "required": [
-              "method",
-              "year_branch",
-              "lunar_month",
-              "lunar_day",
-              "hour_branch",
-              "added_count"
-            ],
-            "type": "object"
+          "total_strokes": {
+            "maximum": 1000000,
+            "minimum": 1,
+            "title": "Total Strokes",
+            "type": "integer"
           }
-        ]
+        },
+        "required": [
+          "method",
+          "script_style",
+          "left_strokes",
+          "right_strokes",
+          "total_strokes"
+        ],
+        "title": "SingleCharacter",
+        "type": "object"
       },
-      "compact": {
-        "default": true,
-        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
-        "type": "boolean"
+      "SoundGroups": {
+        "additionalProperties": false,
+        "properties": {
+          "first_count": {
+            "description": "First actually heard group of sounds",
+            "maximum": 1000000,
+            "minimum": 1,
+            "title": "First Count",
+            "type": "integer"
+          },
+          "hour_branch": {
+            "enum": [
+              "子",
+              "丑",
+              "寅",
+              "卯",
+              "辰",
+              "巳",
+              "午",
+              "未",
+              "申",
+              "酉",
+              "戌",
+              "亥"
+            ],
+            "title": "Hour Branch",
+            "type": "string"
+          },
+          "line_sum_basis": {
+            "default": "raw_counts",
+            "description": "Explicit convention for counts above eight; the worked example does not uniquely adjudicate this boundary",
+            "enum": [
+              "raw_counts",
+              "trigram_numbers"
+            ],
+            "title": "Line Sum Basis",
+            "type": "string"
+          },
+          "method": {
+            "const": "sound_groups",
+            "title": "Method",
+            "type": "string"
+          },
+          "second_count": {
+            "description": "Second actually heard group; keep the order",
+            "maximum": 1000000,
+            "minimum": 1,
+            "title": "Second Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "method",
+          "first_count",
+          "second_count",
+          "hour_branch"
+        ],
+        "title": "SoundGroups",
+        "type": "object"
+      },
+      "TextCount": {
+        "additionalProperties": false,
+        "properties": {
+          "character_count": {
+            "description": "Confirmed character count, no silent exclusions. The default fixed transcription is limited to100. Explicitnlc1925_selected_span preserves百餘字; counts above100 are labelled software extensions because its exact upper extent is unadjudicated.1million is a software guard, not a classical limit",
+            "maximum": 1000000,
+            "minimum": 11,
+            "title": "Character Count",
+            "type": "integer"
+          },
+          "line_sum_basis": {
+            "default": "raw_counts",
+            "description": "Declared reading of合二卦總數: sum raw character halves or their reduced trigram numbers; no hour added. Both distinct casts retained; not uniquely adjudicated by the selected span",
+            "enum": [
+              "raw_counts",
+              "trigram_numbers"
+            ],
+            "title": "Line Sum Basis",
+            "type": "string"
+          },
+          "method": {
+            "const": "text_count",
+            "title": "Method",
+            "type": "string"
+          },
+          "text_basis": {
+            "default": "fixed_transcription_2690596",
+            "description": "Explicit source choice: fixed transcription百字 or selected facsimile百餘字. Never switch source after seeing a result",
+            "enum": [
+              "fixed_transcription_2690596",
+              "nlc1925_selected_span"
+            ],
+            "title": "Text Basis",
+            "type": "string"
+          }
+        },
+        "required": [
+          "method",
+          "character_count"
+        ],
+        "title": "TextCount",
+        "type": "object"
+      },
+      "TextStrokes": {
+        "additionalProperties": false,
+        "properties": {
+          "method": {
+            "const": "text_strokes",
+            "title": "Method",
+            "type": "string"
+          },
+          "strokes": {
+            "description": "Confirmed strokes of each actual glyph; never replace an unusual glyph with a modern dictionary count",
+            "items": {
+              "maximum": 1000000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "maxItems": 3,
+            "minItems": 2,
+            "title": "Strokes",
+            "type": "array"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "maxLength": 3,
+                "minLength": 2,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Text"
+          }
+        },
+        "required": [
+          "method",
+          "strokes"
+        ],
+        "title": "TextStrokes",
+        "type": "object"
+      },
+      "TextTones": {
+        "additionalProperties": false,
+        "properties": {
+          "method": {
+            "const": "text_tones",
+            "title": "Method",
+            "type": "string"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "maxLength": 10,
+                "minLength": 4,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional original characters, only for matching the supplied categories",
+            "title": "Text"
+          },
+          "tone_reference": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/MeihuaToneReference"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional declared sound system, source and reading scope; absent means unknown, supplied means caller-declared rather than independently verified. No online dictionary lookup or automatic tone assignment"
+          },
+          "tones": {
+            "description": "One caller-supplied 平/上/去/入 category per character, encoded 1/2/3/4. Historical sound systems and the selected Meihua worked example can differ. Do not replace categories with modern Mandarin tone numbers or silently change the source system",
+            "items": {
+              "maximum": 4,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "maxItems": 10,
+            "minItems": 4,
+            "title": "Tones",
+            "type": "array"
+          }
+        },
+        "required": [
+          "method",
+          "tones"
+        ],
+        "title": "TextTones",
+        "type": "object"
+      },
+      "ZhangChi": {
+        "additionalProperties": false,
+        "properties": {
+          "chi": {
+            "maximum": 9,
+            "minimum": 0,
+            "title": "Chi",
+            "type": "integer"
+          },
+          "cun": {
+            "anyOf": [
+              {
+                "maximum": 9,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Recorded but excluded from casting by 丈尺占",
+            "title": "Cun"
+          },
+          "method": {
+            "const": "length_zhang_chi",
+            "title": "Method",
+            "type": "string"
+          },
+          "zhang": {
+            "maximum": 1000000,
+            "minimum": 0,
+            "title": "Zhang",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "method",
+          "zhang",
+          "chi"
+        ],
+        "title": "ZhangChi",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "casting": {
+        "description": "Confirmed casting input. Select method explicitly and supply its observed counts, trigrams or existing hexagram; the method determines the required fields.",
+        "discriminator": {
+          "mapping": {
+            "existing": "#/$defs/ExistingCast",
+            "length_chi_cun": "#/$defs/ChiCun",
+            "length_zhang_chi": "#/$defs/ZhangChi",
+            "lunar_time_added_count": "#/$defs/LunarTimeAddedCount",
+            "object_count": "#/$defs/ObjectCount",
+            "observed_categories": "#/$defs/ObservedCategories",
+            "observed_trigrams": "#/$defs/ObservedTrigrams",
+            "single_character_strokes": "#/$defs/SingleCharacter",
+            "sound_groups": "#/$defs/SoundGroups",
+            "text_count": "#/$defs/TextCount",
+            "text_strokes": "#/$defs/TextStrokes",
+            "text_tones": "#/$defs/TextTones"
+          },
+          "propertyName": "method"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/SoundGroups"
+          },
+          {
+            "$ref": "#/$defs/ObjectCount"
+          },
+          {
+            "$ref": "#/$defs/ObservedTrigrams"
+          },
+          {
+            "$ref": "#/$defs/ObservedCategories"
+          },
+          {
+            "$ref": "#/$defs/ZhangChi"
+          },
+          {
+            "$ref": "#/$defs/ChiCun"
+          },
+          {
+            "$ref": "#/$defs/TextTones"
+          },
+          {
+            "$ref": "#/$defs/TextStrokes"
+          },
+          {
+            "$ref": "#/$defs/SingleCharacter"
+          },
+          {
+            "$ref": "#/$defs/TextCount"
+          },
+          {
+            "$ref": "#/$defs/ExistingCast"
+          },
+          {
+            "$ref": "#/$defs/LunarTimeAddedCount"
+          }
+        ],
+        "title": "Casting"
       },
       "day_qi_context": {
         "anyOf": [
           {
-            "additionalProperties": false,
-            "properties": {
-              "day_branch": {
-                "description": "Caller-confirmed day branch, never the hour/year branch or lunar day number",
-                "enum": [
-                  "子",
-                  "丑",
-                  "寅",
-                  "卯",
-                  "辰",
-                  "巳",
-                  "午",
-                  "未",
-                  "申",
-                  "酉",
-                  "戌",
-                  "亥"
-                ],
-                "type": "string"
-              },
-              "declared_day_boundary": {
-                "anyOf": [
-                  {
-                    "enum": [
-                      "local_midnight",
-                      "zi_start"
-                    ],
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "Optional caller-declared convention; without a civil date it is not verified or used to infer another date/branch"
-              },
-              "label": {
-                "maxLength": 240,
-                "minLength": 1,
-                "type": "string"
-              }
-            },
-            "required": [
-              "label",
-              "day_branch"
-            ],
-            "type": "object"
+            "$ref": "#/$defs/MeihuaDayQiContext"
           },
           {
             "type": "null"
@@ -1188,55 +1709,7 @@
         "anyOf": [
           {
             "items": {
-              "additionalProperties": false,
-              "properties": {
-                "label": {
-                  "description": "Caller description/reference for this reported observation; presence and classification are not independently verified",
-                  "maxLength": 240,
-                  "minLength": 1,
-                  "type": "string"
-                },
-                "manifestation": {
-                  "description": "Caller-reported selected source category; gold_silver_treasure and weapon are explicit NLC1925內外論 classifications, never inferred from every metallic ornament or sharp tool, free text, favorable/unfavorable wishes or an unseen scene. Symbolic body qualification is separate from material effect, real-world safety and outcomes. Unknown manifestations cannot be guessed",
-                  "enum": [
-                    "furnace_flame",
-                    "candle_flame",
-                    "red_purple_color",
-                    "sharp_metal_tool",
-                    "metal_ornament_or_utensil",
-                    "actual_water",
-                    "black_or_damp_appearance",
-                    "soil",
-                    "fired_pottery",
-                    "cut_firewood",
-                    "living_tree",
-                    "gold_silver_treasure",
-                    "weapon"
-                  ],
-                  "type": "string"
-                },
-                "motion": {
-                  "anyOf": [
-                    {
-                      "enum": [
-                        "moving",
-                        "stationary"
-                      ],
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "default": null,
-                  "description": "Optional caller-reported actual motion of this external observation. Omit if unknown; never inferred from material, description, observer activity or inner symbolic roles. Moving water/carried soil and still wells/ground remain distinct. Does not determine omen valence or an event date"
-                }
-              },
-              "required": [
-                "manifestation",
-                "label"
-              ],
-              "type": "object"
+              "$ref": "#/$defs/MeihuaExternalObservation"
             },
             "maxItems": 12,
             "minItems": 1,
@@ -1247,27 +1720,8 @@
           }
         ],
         "default": null,
-        "description": "Optional caller-reported manifestations for general/planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler/household/dwelling/marriage/dining; NLC1925 selected material-versus-appearance qualifications plus explicit gold_silver_treasure/weapon original-body symbolic cases. Traveler observations keep the original-body reference and are not automatically rebased to initial use. Not every metal object is treasure or every sharp tool a weapon. Omit if unknown; no default observations, unique trigram assignment, physical/hazard/clinical verdict or event date.12 is a software guard, not a classical limit"
-      },
-      "fields": {
-        "anyOf": [
-          {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
-      },
-      "include_snapshot_text": {
-        "default": true,
-        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
-        "type": "boolean"
+        "description": "Optional caller-reported manifestations for general/planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler/household/dwelling/marriage/dining; NLC1925 selected material-versus-appearance qualifications plus explicit gold_silver_treasure/weapon original-body symbolic cases. Traveler observations keep the original-body reference and are not automatically rebased to initial use. Not every metal object is treasure or every sharp tool a weapon. Omit if unknown; no default observations, unique trigram assignment, physical/hazard/clinical verdict or event date.12 is a software guard, not a classical limit",
+        "title": "External Observations"
       },
       "interpretation_topic": {
         "default": "general",
@@ -1288,6 +1742,7 @@
           "marriage",
           "dining"
         ],
+        "title": "Interpretation Topic",
         "type": "string"
       },
       "matter_scenario": {
@@ -1304,60 +1759,13 @@
           }
         ],
         "default": null,
-        "description": "Caller-confirmed subject category for the selected 占卦訣: 原文问吉事 or 原文问不吉之事. Not a desired answer, question sentiment, topic classification or prediction of an actual outcome. Omit when unknown. Human-matter branches only; declaration is not independently verified"
+        "description": "Caller-confirmed subject category for the selected 占卦訣: 原文问吉事 or 原文问不吉之事. Not a desired answer, question sentiment, topic classification or prediction of an actual outcome. Omit when unknown. Human-matter branches only; declaration is not independently verified",
+        "title": "Matter Scenario"
       },
       "observation_context": {
         "anyOf": [
           {
-            "additionalProperties": false,
-            "properties": {
-              "label": {
-                "description": "Caller reference for the same casting episode and observer. Not parsed to infer any condition; presence or perception is not independently verified",
-                "maxLength": 240,
-                "minLength": 1,
-                "type": "string"
-              },
-              "nothing_heard": {
-                "anyOf": [
-                  {
-                    "type": "boolean"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "Caller declaration of no external 所闻 in the selected 静占 sense at this cast; omit/null if unknown. No inference from absent records or unimplemented categories"
-              },
-              "nothing_seen": {
-                "anyOf": [
-                  {
-                    "type": "boolean"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "Caller declaration of no external 所见 in the selected 静占 sense at this cast; omit/null if unknown. No inference from an unseen scene, empty records or unimplemented categories"
-              },
-              "quiet_room": {
-                "anyOf": [
-                  {
-                    "type": "boolean"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "Caller declaration of 在静室 for this cast; omit/null if unknown. Physical setting is not mental stillness or a decibel measurement"
-              }
-            },
-            "required": [
-              "label"
-            ],
-            "type": "object"
+            "$ref": "#/$defs/MeihuaObservationContext"
           },
           {
             "type": "null"
@@ -1381,19 +1789,8 @@
           }
         ],
         "default": null,
-        "description": "Optional caller-confirmed observer activity corresponding to selected NLC1925 我坐/我行/我立. Omit if unknown; no inference from question, vehicle motion, external movement or mental stillness. Selected relative wording only, no measured delay, omen valence, or date. Human-matter branches only"
-      },
-      "parent_run_id": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Parent call's run_id; correlation only, no stored execution lookup"
+        "description": "Optional caller-confirmed observer activity corresponding to selected NLC1925 我坐/我行/我立. Omit if unknown; no inference from question, vehicle motion, external movement or mental stillness. Selected relative wording only, no measured delay, omen valence, or date. Human-matter branches only",
+        "title": "Observer Activity"
       },
       "question": {
         "anyOf": [
@@ -1405,48 +1802,13 @@
           }
         ],
         "default": null,
-        "description": "One question; does not alter the supplied cast"
+        "description": "One question; does not alter the supplied cast",
+        "title": "Question"
       },
       "reputation_context": {
         "anyOf": [
           {
-            "additionalProperties": false,
-            "properties": {
-              "currently_in_office": {
-                "anyOf": [
-                  {
-                    "type": "boolean"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "Caller-confirmed 在任 in the selected historical official-office clause, not generic modern employment, seniority or a desired promotion. Omit/null if unknown; no real personnel or hazard verdict follows"
-              },
-              "label": {
-                "description": "Caller reference for the declared source context; never parsed to infer office status, desired result or an appointment",
-                "maxLength": 240,
-                "minLength": 1,
-                "type": "string"
-              },
-              "seeking_official_appointment": {
-                "anyOf": [
-                  {
-                    "type": "boolean"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "Caller confirms the question concerns the source's 職任之處. Not inferred from reputation, an exam, already being employed, question keywords or wishes. Omit/null if unknown; selected 方道 witnesses are not an actual location"
-              }
-            },
-            "required": [
-              "label"
-            ],
-            "type": "object"
+            "$ref": "#/$defs/MeihuaReputationContext"
           },
           {
             "type": "null"
@@ -1455,154 +1817,10 @@
         "default": null,
         "description": "Optional caller-confirmed 在任 and 職任之處 declarations, only with interpretation_topic=reputation. Unknown omit/null; no keyword inference, permission, event date, validated outcome or probability"
       },
-      "response_char_limit": {
-        "anyOf": [
-          {
-            "const": 0,
-            "type": "integer"
-          },
-          {
-            "maximum": 65536,
-            "minimum": 4096,
-            "type": "integer"
-          }
-        ],
-        "default": 8192,
-        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
-      },
       "response_context": {
         "anyOf": [
           {
-            "additionalProperties": false,
-            "properties": {
-              "human": {
-                "anyOf": [
-                  {
-                    "items": {
-                      "enum": [
-                        "elderly_man",
-                        "elderly_woman",
-                        "young_boy",
-                        "young_girl",
-                        "heard_laughter",
-                        "weeping_encountered"
-                      ],
-                      "type": "string"
-                    },
-                    "maxItems": 6,
-                    "minItems": 1,
-                    "type": "array"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "Caller-reported source classes 老人/老婦/少男/少女 or actually heard笑語/encountered哭泣. No numerical age cutoffs, automatic person classification or outcomes. Laughter/weeping do not manufacture a trigram"
-              },
-              "label": {
-                "maxLength": 240,
-                "minLength": 1,
-                "type": "string"
-              },
-              "querent_position": {
-                "anyOf": [
-                  {
-                    "additionalProperties": false,
-                    "properties": {
-                      "direction": {
-                        "description": "Reported compass side occupied by the person asking at this cast; not movement heading, facing, address or the casting object's direction. No compass bearing or north-reference conversion inferred",
-                        "enum": [
-                          "north",
-                          "northeast",
-                          "east",
-                          "southeast",
-                          "south",
-                          "southwest",
-                          "west",
-                          "northwest"
-                        ],
-                        "type": "string"
-                      },
-                      "reference_label": {
-                        "description": "Caller-reported reference/origin for this occupied side; not parsed or independently located",
-                        "maxLength": 240,
-                        "minLength": 1,
-                        "type": "string"
-                      }
-                    },
-                    "required": [
-                      "direction",
-                      "reference_label"
-                    ],
-                    "type": "object"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null
-              },
-              "same_casting_episode_confirmed": {
-                "const": true,
-                "description": "Caller explicitly confirms these are reported actual conditions at this casting episode, not desired/future outcomes. Presence/classification is not independently verified",
-                "type": "boolean"
-              },
-              "setting": {
-                "anyOf": [
-                  {
-                    "items": {
-                      "enum": [
-                        "bamboo_woodland",
-                        "rivers_streams_or_pools",
-                        "metal_place",
-                        "kiln_stove_or_fire",
-                        "earth_or_tiles"
-                      ],
-                      "type": "string"
-                    },
-                    "maxItems": 5,
-                    "minItems": 1,
-                    "type": "array"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "Reported place at the cast: 竹林/江河溪澗池沼/五金/窰竈爐火/土瓦. Keep all source trigram candidates; never infer setting from address, objects, question or unseen scene"
-              },
-              "weather": {
-                "anyOf": [
-                  {
-                    "items": {
-                      "enum": [
-                        "clear",
-                        "rain",
-                        "snow",
-                        "rain_or_snow",
-                        "wind",
-                        "thunder"
-                      ],
-                      "type": "string"
-                    },
-                    "maxItems": 6,
-                    "minItems": 1,
-                    "type": "array"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "Reported present conditions corresponding to 晴明/雨/雪/雨雪未分/風/雷. 雨雪皆配坎, but坎體宜雨does not uniquely establish a preference for snow; rain_or_snow keeps that condition pending. Human-matter 天時應 only; not a future weather prediction or daily rain label. Unknown omit/null; multiple observations retained without voting"
-              }
-            },
-            "required": [
-              "label",
-              "same_casting_episode_confirmed"
-            ],
-            "type": "object"
+            "$ref": "#/$defs/MeihuaResponseContext"
           },
           {
             "type": "null"
@@ -1635,81 +1853,13 @@
           }
         ],
         "default": null,
-        "description": "Optional independently resolved solar-term month branch. If unknown, seasonal strength stays unavailable; no date/time is invented"
-      },
-      "strict_fields": {
-        "default": false,
-        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
-        "type": "boolean"
-      },
-      "trace_id": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Caller trace ID"
+        "description": "Optional independently resolved solar-term month branch. If unknown, seasonal strength stays unavailable; no date/time is invented",
+        "title": "Season Month Branch"
       },
       "weather_context": {
         "anyOf": [
           {
-            "additionalProperties": false,
-            "properties": {
-              "many_min_count": {
-                "anyOf": [
-                  {
-                    "maximum": 6,
-                    "minimum": 2,
-                    "type": "integer"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "Declared software threshold for 多, with both six-position and five-role static-once scope probes retained. The raw six-position status is qualified when scopes disagree; neither scope is claimed as uniquely classical. If absent, potentially applicable 多 conditions remain pending"
-              },
-              "prior_condition": {
-                "anyOf": [
-                  {
-                    "enum": [
-                      "prolonged_rain",
-                      "prolonged_clear",
-                      "neither_prolonged"
-                    ],
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "Caller-confirmed prior weather: prolonged_rain, prolonged_clear, or neither_prolonged only when both prolonged conditions are confirmed false. None means unknown, never confirmed neither. The original gives no number of days for 久. No rainfall alone does not establish clear sky; a completed dry day, a missing observation or a cast cannot supply this fact"
-              },
-              "season": {
-                "anyOf": [
-                  {
-                    "enum": [
-                      "spring",
-                      "summer",
-                      "autumn",
-                      "winter"
-                    ],
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "Confirmed season in the source's weather context; not inferred from a timezone or Gregorian month"
-              }
-            },
-            "type": "object"
+            "$ref": "#/$defs/MeihuaWeatherContext"
           },
           {
             "type": "null"
@@ -1722,6 +1872,7 @@
     "required": [
       "casting"
     ],
+    "title": "MeihuaCastRequest",
     "type": "object"
   },
   "method_contracts": [

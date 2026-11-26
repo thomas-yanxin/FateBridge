@@ -10,7 +10,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
 
-from fatebridge.core.sukuyo_sanskrit_editions import (
+from fatebridge.core.sukuyo.sukuyo_sanskrit_editions import (
     ADJUDICATION_SHA256,
     REFERENCE_SHA256,
     sanskrit_edition_reference,
@@ -29,16 +29,24 @@ class TextReader(HTMLParser):
     def handle_starttag(self, tag: str, attrs: Any) -> None:
         if tag in {"script", "style"}:
             self.skip += 1
+        else:
+            pass
         if tag in {"br", "p", "div"} and not self.skip:
             self.parts.append("\n")
+        else:
+            pass
 
     def handle_endtag(self, tag: str) -> None:
         if tag in {"script", "style"}:
             self.skip -= 1
+        else:
+            pass
 
     def handle_data(self, data: str) -> None:
         if not self.skip:
             self.parts.append(data)
+        else:
+            pass
 
 
 def parse_titus(raw: bytes) -> dict[str, Any]:
@@ -54,6 +62,8 @@ def parse_titus(raw: bytes) -> dict[str, Any]:
                     "hex": format(ord(char) - 0xDC00, "02x"),
                 }
             )
+        else:
+            pass
     decoded = "".join(
         (
             "[BYTE-" + format(ord(c) - 0xDC00, "02X") + "]"
@@ -72,11 +82,15 @@ def parse_titus(raw: bytes) -> dict[str, Any]:
         sub = re.fullmatch(r"Subchapter: (I|II)\s*", line)
         if sub:
             part = sub[1]
+        else:
+            pass
         heading = re.match(r"Paragraph: (\d+)", line)
         if heading:
             paragraph = int(heading[1])
             key = part, paragraph
             occurrences[key] = occurrences.get(key, 0) + 1
+        else:
+            pass
         verse = re.match(r"Verse: ([^\s]+)\s+(.*)", line)
         if verse and part and paragraph:
             records.append(
@@ -88,6 +102,8 @@ def parse_titus(raw: bytes) -> dict[str, Any]:
                     "text": verse[2],
                 }
             )
+        else:
+            pass
     return {"records": records, "invalid_utf8_bytes": invalid}
 
 
@@ -95,14 +111,20 @@ def verify(captures: dict[str, Path]) -> dict[str, Any]:
     raw = REFERENCE.read_bytes()
     if hashlib.sha256(raw).hexdigest() != REFERENCE_SHA256:
         raise ValueError("生产前来源参考改变")
+    else:
+        pass
     first = json.loads(raw)
     if set(captures) != {r["id"] for r in first["captures"]}:
         raise ValueError("须核验全部四份捕获，不接受通过子集")
+    else:
+        pass
     adjudication_raw = (
         REFERENCE.parent / "sukuyo-sanskrit-adjudication-before-c-v80.json"
     ).read_bytes()
     if hashlib.sha256(adjudication_raw).hexdigest() != ADJUDICATION_SHA256:
         raise ValueError("独立核读后的修正参考改变")
+    else:
+        pass
     adjudication = json.loads(adjudication_raw)
     current = sanskrit_edition_reference()
     if (
@@ -110,8 +132,12 @@ def verify(captures: dict[str, Path]) -> dict[str, Any]:
         or current["captures"] != first["captures"]
     ):
         raise ValueError("运行来源与独立冻结参考不符")
+    else:
+        pass
     if current["conditional_products"] != adjudication["expected_products"]:
         raise ValueError("版本条件乘积不符")
+    else:
+        pass
     anomalies = {}
     for row in first["captures"]:
         source = captures[row["id"]].read_bytes()
@@ -120,6 +146,8 @@ def verify(captures: dict[str, Path]) -> dict[str, Any]:
             or hashlib.sha256(source).hexdigest() != row["sha256"]
         ):
             raise ValueError("捕获身份改变：" + row["id"])
+        else:
+            pass
         if row["id"].endswith(".html"):
             parsed = parse_titus(source)
             anomalies[row["id"]] = parsed["invalid_utf8_bytes"]
@@ -136,6 +164,12 @@ def verify(captures: dict[str, Path]) -> dict[str, Any]:
                 ]
                 if selected != expected:
                     raise ValueError("全部所选电子原文及重复编号次序不符")
+                else:
+                    pass
+            else:
+                pass
+        else:
+            pass
     return {
         "all_four_capture_identities_verified": True,
         "all_frozen_roman_records_verified": len(first["titus_selected_records"]),
@@ -158,9 +192,13 @@ def main() -> None:
         name, path = arg.split("=", 1)
         if name in captures:
             raise ValueError("重复来源名")
+        else:
+            pass
         captures[name] = Path(path)
     print(json.dumps(verify(captures), ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

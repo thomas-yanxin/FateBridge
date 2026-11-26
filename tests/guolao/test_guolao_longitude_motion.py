@@ -6,14 +6,17 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core import ephemeris_runtime as e
-from fatebridge.core import guolao
 from fatebridge.core.astro import longitude_motion, lunar_motion, position_motion
 from fatebridge.core.astro.time_scales import datetime_from_tt
+from fatebridge.core.guolao import guolao
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.western import test_other_chart_physical_sources as shared_sources
-
-ephemeris_files = shared_sources.ephemeris_files
-restore_configuration = shared_sources.restore_configuration
+from tests.unit_test.fixtures.western_ephemeris import birth as western_birth
+from tests.unit_test.fixtures.western_ephemeris import (
+    ephemeris_files as ephemeris_files,
+)
+from tests.unit_test.fixtures.western_ephemeris import (
+    restore_configuration as restore_configuration,
+)
 
 REFERENCE = json.loads(
     (
@@ -34,7 +37,7 @@ DATES = sorted(set.intersection(*(set(rows) for rows in BY_BODY.values())))
 def birth(jd_tt=2451545.0):
     # Swiss's native inverse can return UT1 in the distant future. Use the
     # domain's declared frozen-leap UTC inverse and check the actual TT below.
-    return shared_sources.birth(datetime_from_tt(jd_tt))
+    return western_birth(datetime_from_tt(jd_tt))
 
 
 @pytest.fixture
@@ -48,7 +51,7 @@ def physical(ephemeris_files):
 @pytest.mark.parametrize("date_tt", DATES)
 def test_all_seven_actual_rates_against_preexisting_fixed_tt_reference(
     physical, date_tt
-):
+) -> None:
     """Prior development evidence, never presented as a new holdout."""
     jd = BY_BODY["Moon"][date_tt]["jd_tt"]
     raw = guolao.positions(birth(jd), observer_geometry=False)
@@ -80,8 +83,8 @@ def test_all_seven_actual_rates_against_preexisting_fixed_tt_reference(
 
 @pytest.mark.parametrize("problem", ["frame", "model", "missing_speed"])
 def test_initial_state_and_derivative_probes_enforce_their_contract(
-    physical, monkeypatch, problem
-):
+    physical, monkeypatch: pytest.MonkeyPatch, problem: str
+) -> None:
     original = guolao.runtime.ephemeris_call
 
     def inject(operation, *args, **kwargs):
@@ -90,10 +93,18 @@ def test_initial_state_and_derivative_probes_enforce_their_contract(
             coordinates, flags = value
             if problem == "missing_speed":
                 return coordinates, flags & ~e.swe.FLG_SPEED
+            else:
+                pass
             if args[0] != 2451545.0:
                 if problem == "frame":
                     return coordinates, flags | e.swe.FLG_TRUEPOS
+                else:
+                    pass
                 return coordinates, (flags & ~e.swe.FLG_SWIEPH) | e.swe.FLG_MOSEPH
+            else:
+                pass
+        else:
+            pass
         return value
 
     monkeypatch.setattr(guolao.runtime, "ephemeris_call", inject)
@@ -101,7 +112,9 @@ def test_initial_state_and_derivative_probes_enforce_their_contract(
         guolao.positions(birth(), observer_geometry=False)
 
 
-def test_auxiliary_file_change_remains_a_source_failure(physical, monkeypatch):
+def test_auxiliary_file_change_remains_a_source_failure(
+    physical, monkeypatch: pytest.MonkeyPatch
+) -> None:
     original = guolao.runtime.ephemeris_call
     changed = False
 
@@ -119,6 +132,8 @@ def test_auxiliary_file_change_remains_a_source_failure(physical, monkeypatch):
             raw = bytearray(path.read_bytes())
             raw[-1] ^= 1
             path.write_bytes(raw)
+        else:
+            pass
         return value
 
     monkeypatch.setattr(guolao.runtime, "ephemeris_call", inject)
@@ -128,8 +143,8 @@ def test_auxiliary_file_change_remains_a_source_failure(physical, monkeypatch):
 
 
 def test_unverified_native_version_keeps_raw_values_with_explicit_status(
-    physical, monkeypatch
-):
+    physical, monkeypatch: pytest.MonkeyPatch
+) -> None:
     def unverified(_):
         return "0.0.0-unverified"
 
@@ -150,8 +165,8 @@ def test_unverified_native_version_keeps_raw_values_with_explicit_status(
 
 
 def test_sidereal_display_does_not_relabel_tropical_motion_or_correct_extras(
-    physical, monkeypatch
-):
+    physical, monkeypatch: pytest.MonkeyPatch
+) -> None:
     original = guolao.corrected_longitude_motion
     called = []
 

@@ -5,11 +5,12 @@ import hashlib
 import json
 import shutil
 from fractions import Fraction
+from pathlib import Path
 
 import pytest
 
-from fatebridge.validation.taiyi_calendar import audit_edition
 from scripts.taiyi.audit_taiyi_calendar_constants import CORPUS, audit, verify_sources
+from validation.taiyi_calendar import audit_edition
 
 READINGS, EXPECTED = verify_sources()
 CASES = [
@@ -22,14 +23,14 @@ CASES = [
 @pytest.mark.parametrize("edition,relation,status", CASES)
 def test_all_frozen_relations_including_differences_and_unknowns(
     edition, relation, status
-):
+) -> None:
     result = audit_edition(READINGS["editions"][edition]["readings"])
     rows = {r["id"]: r for r in result["relations"]}
     assert len(rows) == 8
     assert rows[relation]["status"] == status
 
 
-def test_native_ming_chain_and_half_hour_units_are_exact_not_float_closeness():
+def test_native_ming_chain_and_half_hour_units_are_exact_not_float_closeness() -> None:
     # Hand products recorded before the diagnostic implementation; no API chart
     # generated these expectations or selected a source value after comparison.
     assert 8126 * 1447 == 11_758_322
@@ -48,7 +49,7 @@ def test_native_ming_chain_and_half_hour_units_are_exact_not_float_closeness():
     assert result["whole_calendar_acceptance"] is False
 
 
-def test_unique_fraction_candidate_is_not_written_back_as_a_source_reading():
+def test_unique_fraction_candidate_is_not_written_back_as_a_source_reading() -> None:
     original = READINGS["editions"]["ncl_ming"]["readings"]
     before = copy.deepcopy(original)
     result = audit_edition(original)
@@ -67,8 +68,8 @@ def test_unique_fraction_candidate_is_not_written_back_as_a_source_reading():
 
 @pytest.mark.parametrize("edition", ["siku", "ncl_ming"])
 def test_literal_leap_step_fails_whole_chapter_for_every_allowed_start_remainder(
-    edition,
-):
+    edition: str,
+) -> None:
     result = audit_edition(READINGS["editions"][edition]["readings"])
     row = next(r for r in result["relations"] if r["id"] == "literal_leap_step_cycle")
     expected = EXPECTED["expected_leap_cycle"][edition]
@@ -81,8 +82,8 @@ def test_literal_leap_step_fails_whole_chapter_for_every_allowed_start_remainder
 
 @pytest.mark.parametrize("change", ["image", "drop_edition", "move_expectation"])
 def test_source_or_requirement_changes_fail_even_with_rewritten_local_hashes(
-    tmp_path, change
-):
+    tmp_path: Path, change: str
+) -> None:
     target = tmp_path / "corpus"
     shutil.copytree(CORPUS, target)
     if change == "image":
@@ -103,11 +104,15 @@ def test_source_or_requirement_changes_fail_even_with_rewritten_local_hashes(
         data = json.loads(freeze.read_text())
         data["files"][path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
         freeze.write_text(json.dumps(data))
+    else:
+        pass
     with pytest.raises(ValueError, match="freeze|fingerprint"):
         audit(target)
 
 
-def test_regular_month_hypothesis_does_not_turn_matching_carry_count_into_closure():
+def test_regular_month_hypothesis_does_not_turn_matching_carry_count_into_closure() -> (
+    None
+):
     result = audit()
     for name, expected in (("ncl_ming", [242, 243]), ("siku", [241, 242])):
         row = next(
@@ -135,7 +140,7 @@ def test_regular_month_hypothesis_does_not_turn_matching_carry_count_into_closur
 @pytest.mark.parametrize(
     "value", [True, 657.0, "657", {"numerator": 1, "denominator": 0}]
 )
-def test_source_values_are_exact_and_never_coerced(value):
+def test_source_values_are_exact_and_never_coerced(value) -> None:
     readings = copy.deepcopy(READINGS["editions"]["ncl_ming"]["readings"])
     readings["chapter_years"]["value"] = value
     with pytest.raises(ValueError):

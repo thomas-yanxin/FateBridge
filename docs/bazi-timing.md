@@ -12,6 +12,10 @@
 
 八字综合、独立大运、流月、流日、流时的分析日期全部省略时，使用 `as_of` 或执行开始时刻的完整当地瞬间。`analysis_reference` 保留 UTC、偏移、fold、秒微秒与分量来源。显式部分日期按各工具规则补齐，例如流月缺日取 15；不以只传当前年月代替“当前”。显式重复或不存在的分析钟时不能暗选瞬间；已确认 UTC 时刻可通过带时区的 `as_of` 表达。日期级专题的零点锚点不能代表交节当日全天。
 
+如果补齐日期所需的当地钟面在 TZif 中标为未指定（`-00`），请求返回 `as_of/unresolved_timezone_offset`。可明确填写分析日期和时刻，或提供能投影到已定义当地钟面的 `as_of`。 [RFC 9636 §3.2](https://www.rfc-editor.org/rfc/rfc9636.html#section-3.2)
+
+综合时运、大运、流月、流日和流时的默认导出包含快照内的「分析时刻依据」。用 `export_parse` 处理只含这个标题和自定义区段的片段时，默认选择只保留匹配的时刻段。需要自定义区段时，请在 `selected_titles` 明确列出标题。
+
 ## 交运口径
 
 `three_days_one_year_calendar_v1` 以[《三命通会·论大运》](https://zh.wikisource.org/zh-hant/三命通會/卷二#論大運)的三日折一年、十年一运为依据。年干阴阳与已确认性别决定顺逆；顺行取严格晚于出生的下一节，逆行取不晚于出生的上一节。十二节与中气不能混用。
@@ -20,7 +24,7 @@
 
 每步十年边界从首运锚点分别计算，避免闰日逐次截断。派生重复钟时取有效的 `fold=0`，缺失钟时向前过缺口；首运不得早于已确认出生瞬间，必要时取符合这一条件的较晚一次，否则明确失败。原始出生的重复或缺失钟时仍须调用者消歧，不猜选。
 
-`start_age_unrounded` 是未舍入折算，`start_age_precise` 是两位展示，整数起运岁数按原始量向上取整且至少1。它们不反算交运日；实际选运使用 `start_at/end_at`。365.2425日折年的显示年数不参与选运。
+`start_age_unrounded` 是未取两位小数的浮点展示，`start_age_precise` 是两位展示。整数起运岁数对原始有理名义跨度除以3后直接向上取整且至少1，不从浮点展示反算；极近整数时展示可能为3.0而整数岁数为4。它们不反算交运日；日期查询使用 `start_at/end_at`；显式整岁查询按有理名义跨度除以三后确定半开的十年段。365.2425日折年的显示年数不参与选运。
 
 ## 关系与作用范围
 
@@ -30,6 +34,10 @@
 
 唯一时间干与原局非日干的合绊投影使用既有原局预算，保留根与原字身份。投影不重写本命评价，也不宣称已裁定古典有效根力、从格或化格。
 
+## 五行结构占比
+
+`structural_element_share_v1` 对原局与实际参与的时间柱采用同一结构计数。每柱明干和地支本气各计 1，每个藏干计 0.5。`original` 与 `new` 分别用原局和叠加后的总量归一为百分数。`change` 在舍入前相减，单位是百分点。方向由该差值的符号确定，公开变化项省略精确为零的元素。大运、流年、流日和综合快照将两个占比显示到小数点后三位。结构权重属于项目约定，传统旺衰和喜忌另由相关规则交付。 [固定有理数及公开对照](precision-acceptance.md#timing-structural-share-round61)
+
 ## 范围与检验
 
 未知时刻与出生时间范围按候选传播，不猜生时。范围中的连续完备性、未解析事件与未来当地时钟均需读取对应状态，有限采样不能证明全部极值。
@@ -38,7 +46,7 @@
 
 ```bash
 uv run --locked --extra dev python -m scripts.astronomy.audit_solar_model_reference --output /tmp/solar-model-audit.json
-uv run --locked --extra dev pytest -n0 tests/bazi/test_bazi_dayun_initial_fold.py tests/bazi/test_bazi_timing_roots.py tests/bazi/test_bazi_timing_cache_isolation.py
+uv run --locked --extra dev pytest -n0 tests/bazi/test_bazi_dayun_initial_fold.py tests/bazi/test_bazi_timing_roots.py tests/integration/test_timing_cache_intervals.py
 ```
 
 首个审计会对未过的1秒门槛返回非零退出状态。当前来源分歧与独立专家、实际预测缺口见[八字旺衰](bazi-assessment.md)；准确的时间换算不证明现实事件预测有效。

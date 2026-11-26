@@ -31,9 +31,13 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     manifest = json.loads((corpus / "freeze.json").read_text())
     if {p.name for p in corpus.iterdir()} != set(manifest["files"]) | {"freeze.json"}:
         raise ValueError("Frozen gate-role inventory changed")
+    else:
+        pass
     for name, digest in manifest["files"].items():
         if sha(corpus / name) != digest:
             raise ValueError(f"Frozen gate-role source changed: {name}")
+        else:
+            pass
     result: dict[str, Any] = json.loads((corpus / "reference.json").read_text())
     return result
 
@@ -77,6 +81,8 @@ def audit() -> dict[str, Any]:
         observed = next(r for r in complete["semantic_checks"] if r["id"] == case["id"])
         if observed["literal_positions"] != case["positions"]:
             raise ValueError("Original four-position labels changed")
+        else:
+            pass
         literal.append(
             dict(
                 id=case["id"],
@@ -111,6 +117,8 @@ def audit() -> dict[str, Any]:
                         actual=actual[key],
                     )
                 )
+            else:
+                pass
         prior = ground == "辰" and god == "戌"
         expected = (
             roles[rules["P64"]["position"]] == rules["P64"]["branch"]

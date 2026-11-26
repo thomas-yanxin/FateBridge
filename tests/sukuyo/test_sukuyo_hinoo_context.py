@@ -7,10 +7,10 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import sukuyo_hinoo_context as context
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_profiles import source_bundle
-from tests.sukuyo.test_sukuyo_witness_research import critical
+from fatebridge.core.sukuyo import sukuyo_hinoo_context as context
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_profiles import source_bundle
+from tests.unit_test.fixtures.sukuyo_readings import critical
 
 REFERENCE = json.loads(
     (
@@ -19,7 +19,7 @@ REFERENCE = json.loads(
 )["expected_bundle"]
 
 
-def test_complete_context_matches_reference_frozen_before_production():
+def test_complete_context_matches_reference_frozen_before_production() -> None:
     actual = critical()["image_witness_context_followup"]
     assert (
         actual.pop("source_bundle_sha256")
@@ -54,7 +54,7 @@ def test_complete_context_matches_reference_frozen_before_production():
 
 
 @pytest.mark.parametrize("key", ["id", "source_bundle_sha256"])
-def test_later_context_cannot_inherit_another_acquisition_record(key):
+def test_later_context_cannot_inherit_another_acquisition_record(key: str) -> None:
     previous = copy.deepcopy(critical()["image_witness_native_completion"])
     previous[key] = "different preceding record"
     taisho = source_bundle()["hinoo_addendum"]["downloaded_primary_edition"]
@@ -70,7 +70,7 @@ def test_later_context_cannot_inherit_another_acquisition_record(key):
         "calendar_apparatus",
     ],
 )
-def test_manuscript_context_does_not_silently_follow_changed_SAT(key):
+def test_manuscript_context_does_not_silently_follow_changed_SAT(key: str) -> None:
     previous = critical()["image_witness_native_completion"]
     taisho = copy.deepcopy(
         source_bundle()["hinoo_addendum"]["downloaded_primary_edition"]
@@ -84,8 +84,8 @@ def test_manuscript_context_does_not_silently_follow_changed_SAT(key):
     "change", ["normalize_month", "merge_half_glyphs", "promote_feedback", "clock"]
 )
 def test_unreviewed_normalization_or_acceptance_changes_are_rejected(
-    tmp_path, monkeypatch, change
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, change: str
+) -> None:
     data = copy.deepcopy(REFERENCE)
     rows = {row["id"]: row for row in data["qualified_comparisons"]}
     if change == "normalize_month":
@@ -110,7 +110,7 @@ def test_unreviewed_normalization_or_acceptance_changes_are_rejected(
         context.context_reference(previous, taisho)
 
 
-def test_native_text_delivers_differences_without_changing_known_results():
+def test_native_text_delivers_differences_without_changing_known_results() -> None:
     calendar = calendar_mansion(
         "1957-09-24",
         calendar_profile="hinoo_t1299_host27",
@@ -144,7 +144,7 @@ def test_native_text_delivers_differences_without_changing_known_results():
     )
 
 
-def test_default_profile_does_not_claim_manuscript_context():
+def test_default_profile_does_not_claim_manuscript_context() -> None:
     calendar = calendar_mansion("1957-09-24")
     assert calendar["profile_calculation"]["hinoo_source"] is None
     assert (

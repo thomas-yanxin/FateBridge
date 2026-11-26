@@ -17,10 +17,12 @@ import jsonschema
 from fastapi.testclient import TestClient
 from fastmcp import Client
 from fastmcp.client.transports import StdioTransport
+from pydantic import JsonValue
 
 from fatebridge import __version__
 from fatebridge.api import app as rest_app
 from fatebridge.application.examples import example_input, suggested_fields
+from fatebridge.application.projection import project_fields
 from fatebridge.services.tool_catalog import CATALOG
 
 AS_OF = "2026-10-12T04:00:00Z"
@@ -40,13 +42,13 @@ CASES = [
 ]
 
 
-def save(path, data):
+def save(path: Path, payload: JsonValue) -> None:
     path.write_text(
-        json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
 
 
-async def exercise(output):
+async def exercise(output: Path) -> None:
     records = {spec.key: spec for spec in CATALOG}
     report = {
         "version": __version__,
@@ -63,14 +65,18 @@ async def exercise(output):
                     command=sys.executable,
                     args=["-m", "fatebridge.mcp_server"],
                     cwd=cwd,
-                    env={
-                        "FATEBRIDGE_MCP_FAMILIES": family,
-                    },
+                    env={"FATEBRIDGE_MCP_FAMILIES": family},
                     log_file=log,
                 )
                 started = time.monotonic()
                 async with Client(transport, timeout=60) as client:
                     tools = {tool.name: tool for tool in await client.list_tools()}
+                    assert set(tools) == {
+                        "discover_capabilities",
+                        "describe_capability",
+                        "run_calculation",
+                        "read_result",
+                    }
                     report["mcp_profiles"][label] = {
                         "tool_count": len(tools),
                         "startup_and_list_ms": round(
@@ -91,32 +97,43 @@ async def exercise(output):
                             f"fatebridge://families/{family}"
                         )
                         manifest = json.loads(family_data[0].text)
-                        assert {tool["tool"] for tool in manifest["tools"]} == set(
-                            tools
+                        assert manifest["tools"]
+                        assert all(
+                            tool["family"] == family for tool in manifest["tools"]
                         )
                         continue
-                    alias = await client.read_resource(
-                        "fatebridge://tools/astro_hellen"
+                    else:
+                        pass
+                    chart = await client.read_resource(
+                        "fatebridge://tools/hellenistic_chart"
                     )
                     assert (
-                        json.loads(alias[0].text)["tools"][0]["tool"]
-                        == "astro_hellen_chart"
+                        json.loads(chart[0].text)["tools"][0]["tool"]
+                        == "hellenistic_chart"
                     )
                     for key in CASES:
                         spec = records[key]
                         inputs = example_input(spec)
                         assert inputs is not None, key
                         result = await client.call_tool(
-                            spec.tool_name,
-                            {**inputs, "as_of": AS_OF},
+                            "run_calculation",
+                            {
+                                "tool": spec.tool_name,
+                                "arguments": inputs,
+                                "as_of": AS_OF,
+                                "detail": "standard",
+                                "response_char_limit": 0,
+                            },
                             raise_on_error=False,
                         )
                         assert not result.is_error, (key, result.structured_content)
                         data = result.structured_content
+                        contract = await client.call_tool(
+                            "describe_capability",
+                            {"tool": spec.tool_name, "detail": "full"},
+                        )
                         jsonschema.Draft202012Validator(
-                            tools[spec.tool_name].model_dump(by_alias=True)[
-                                "outputSchema"
-                            ]
+                            contract.structured_content["output_schema"]
                         ).validate(data)
                         save(output / f"{key}.json", {"input": inputs, "result": data})
                         business = [
@@ -127,10 +144,13 @@ async def exercise(output):
                         ]
                         fields = suggested_fields(spec) or business[:1]
                         projected = await client.call_tool(
-                            spec.tool_name,
+                            "run_calculation",
                             {
-                                **inputs,
+                                "tool": spec.tool_name,
+                                "arguments": inputs,
                                 "as_of": AS_OF,
+                                "detail": "standard",
+                                "response_char_limit": 0,
                                 "fields": fields,
                                 "strict_fields": True,
                             },
@@ -144,9 +164,7 @@ async def exercise(output):
                             output / f"{key}-projected.json",
                             projected.structured_content,
                         )
-                        from fatebridge.application.projection import project_fields
-
-                        # Compare the actual requested facts, rather than accepting a matching digest.
+                        # note (projection): Compare full requested facts to detect dropped values.
                         full_business = {
                             k: v for k, v in data.items() if k != "run_metadata"
                         }
@@ -185,8 +203,13 @@ async def exercise(output):
                         ),
                     ]
                     for overrides, error_code in bad_cases:
+                        request = {"tool": "bazi_birth_chart", "arguments": base}
+                        if "fields" in overrides:
+                            request.update(overrides)
+                        else:
+                            request["arguments"] = {**base, **overrides}
                         result = await client.call_tool(
-                            "bazi_birth", {**base, **overrides}, raise_on_error=False
+                            "run_calculation", request, raise_on_error=False
                         )
                         assert (
                             result.is_error
@@ -199,9 +222,10 @@ async def exercise(output):
                             }
                         )
                     corrected = await client.call_tool(
-                        "bazi_birth",
+                        "run_calculation",
                         {
-                            **base,
+                            "tool": "bazi_birth_chart",
+                            "arguments": base,
                             "fields": ["bazi_birth.day_master"],
                             "strict_fields": True,
                         },
@@ -270,3 +294,5 @@ if __name__ == "__main__":
     directory = parser.parse_args().output
     directory.mkdir(parents=True, exist_ok=True)
     asyncio.run(exercise(directory))
+else:
+    pass

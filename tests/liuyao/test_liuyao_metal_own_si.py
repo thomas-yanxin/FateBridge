@@ -7,13 +7,14 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.liuyao_metal_change import PROFILE, own_si_context
-from fatebridge.core.output_liuyao_conditions import StrengthActor
-from fatebridge.core.output_liuyao_growth import GrowthConditions
+from fatebridge.core.contracts.output_liuyao_conditions import StrengthActor
+from fatebridge.core.contracts.output_liuyao_growth import GrowthConditions
+from fatebridge.core.liuyao.liuyao_metal_change import PROFILE, own_si_context
 from scripts.liuyao.build_profile import build_profile
-from tests.liuyao.test_liuyao_conditions import conditional_case
-from tests.liuyao.test_liuyao_metal_moving import cycle, read_path
-from tests.liuyao.test_liuyao_roles import classical
+from tests.unit_test.fixtures.liuyao import classical_case as classical
+from tests.unit_test.fixtures.liuyao import conditional_case
+from tests.unit_test.fixtures.liuyao import cyclic_support_case as cycle
+from tests.unit_test.fixtures.liuyao import read_condition_path as read_path
 
 BASE = Path(__file__).parents[1] / "fixtures/liuyao_metal_own_si_v35"
 CASES = json.loads((BASE / "cases.json").read_text())["cases"]
@@ -41,6 +42,8 @@ def check(result, case):
     if case.get("expected_applicable", True) is False:
         assert own is None
         return
+    else:
+        pass
     assert own["condition_match"] is case["expected_own_growth"]
     assert own["is_actual_moving"] is True and own["changed_branch"] == "巳"
     assert own["raw_back_relation"] == "克爻" and own["raw_back_control"] is True
@@ -48,7 +51,10 @@ def check(result, case):
     assert source["back_generation_condition"] is False
     assert read_path(result, own["source_path"]) == own
     assert result["growth_conditions"]["ruleset_id"] == PROFILE["ruleset_id"]
-    assert result["growth_conditions"]["source_sha256"] == own["source_sha256"]
+    assert result["growth_conditions"]["ruleset_version"] == own["ruleset_version"]
+    assert own["ruleset_version"] == PROFILE["ruleset_version"]
+    assert own["source_url"] == PROFILE["source"]["url"] + "#page=97"
+    assert own["admission_source_url"] == PROFILE["source"]["url"] + "#page=53"
     for root in own["calendar_supports"]:
         actor = read_path(result, root["source_path"])
         assert (actor["location"], actor["branch"]) == (
@@ -65,6 +71,8 @@ def check(result, case):
                 assert (
                     read_path(result, step["source_path"])["branch"] == step["branch"]
                 )
+    else:
+        pass
     qualified = False if case["expected_own_growth"] is True else None
     clash = result["clash_conditions"]["lines"][p]
     assert clash["back_control"] is True
@@ -88,29 +96,45 @@ def check(result, case):
             a["location"] == "changed" and a["harm_condition_match"] is False
             for a in strength["blocked_oppositions"]
         )
+    else:
+        pass
     if case.get("retain_month_control"):
         assert any(a["location"] == "month" for a in strength["oppositions"])
+    else:
+        pass
     if case.get("retain_day_control"):
         assert any(a["location"] == "day" for a in strength["oppositions"])
+    else:
+        pass
     if case.get("retain_visible_control"):
         assert any(
             a["location"] == "visible"
             and a["position"] == case["retain_visible_control"]
             for a in strength["oppositions"]
         )
+    else:
+        pass
     if case.get("changed_void"):
         assert (
             own["changed_void"] is True and own["changed_admission_condition"] is None
         )
+    else:
+        pass
     if case.get("changed_month_break"):
         assert (
             own["changed_month_break"] is True
             and own["changed_admission_condition"] is None
         )
+    else:
+        pass
     if case.get("retain_binding"):
         assert result["lines"][p]["binding_cues"]
+    else:
+        pass
     if case.get("retain_original_void"):
         assert source["status"] == "source_current_void_waits_for_filling"
+    else:
+        pass
     if case["id"] == "month-root-replaces-own-si-control":
         role = next(
             x
@@ -121,17 +145,21 @@ def check(result, case):
         assert role["conditional_atom_values"]["injured_relation"] is False
         assert role["atom_values"]["back_generate"] is False
         assert role["conditional_atom_values"]["back_generate"] is False
+    else:
+        pass
     if case.get("expected_basis") == "moving":
         assert own["calendar_supports"] == [] and moving["condition_match"] is True
     elif case.get("expected_basis"):
         assert any(
             x["location"] == case["expected_basis"] for x in own["calendar_supports"]
         )
+    else:
+        pass
     assert all("_metal_own_si_growth" not in x for x in result["lines"])
     return own
 
 
-def test_own_si_original_scan_and_frozen_cases():
+def test_own_si_original_scan_and_frozen_cases() -> None:
     assert build_profile("metal_own_si") == PROFILE
     for name, digest in json.loads((BASE / "freeze.json").read_text())[
         "files_sha256"
@@ -141,11 +169,19 @@ def test_own_si_original_scan_and_frozen_cases():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_actual_own_si_qualification_and_retained_conditions(case):
-    check(result_for(case), case)
+def test_actual_own_si_qualification_and_retained_conditions(case) -> None:
+    result = result_for(case)
+    if own := check(result, case):
+        assert (
+            result["growth_conditions"]["source_sha256"]
+            == own["source_sha256"]
+            == PROFILE["source"]["sha256"]
+        )
+    else:
+        pass
 
 
-def test_pending_own_si_does_not_become_a_definite_route_blocker():
+def test_pending_own_si_does_not_become_a_definite_route_blocker() -> None:
     case = next(c for c in CASES if c["id"] == "changed-si-void-remains-pending")
     result = result_for(case)
     route = next(
@@ -161,7 +197,9 @@ def test_pending_own_si_does_not_become_a_definite_route_blocker():
     json.loads((BASE / "post-implementation-geometry.json").read_text())["cases"],
     ids=lambda c: c["id"],
 )
-def test_second_legal_geometry_is_separately_labelled_engineering_coverage(case):
+def test_second_legal_geometry_is_separately_labelled_engineering_coverage(
+    case,
+) -> None:
     for name, h in json.loads(
         (BASE / "post-implementation-freeze.json").read_text()
     ).items():
@@ -172,6 +210,8 @@ def test_second_legal_geometry_is_separately_labelled_engineering_coverage(case)
     if case.get("retain_month_break"):
         assert result["lines"][4]["monthly_strength"]["category"] == "月破"
         assert result["generation_conditions"]["sources"][4]["condition_match"] is None
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
@@ -185,7 +225,7 @@ def test_second_legal_geometry_is_separately_labelled_engineering_coverage(case)
         "inactive-source",
     ],
 )
-def test_own_si_cannot_use_circular_or_unqualified_moving_roots(anchor):
+def test_own_si_cannot_use_circular_or_unqualified_moving_roots(anchor: str) -> None:
     anchors = (
         {6: [dict(location="month", branch="丑")]}
         if anchor == "queried-metal"
@@ -197,8 +237,12 @@ def test_own_si_cannot_use_circular_or_unqualified_moving_roots(anchor):
         args["generation"]["sources"][0]["condition_match"] = (
             False if anchor == "source-false" else None
         )
+    else:
+        pass
     if anchor == "inactive-source":
         args["generation"]["sources"][0]["activity_condition_match"] = False
+    else:
+        pass
     own = own_si_context(
         args["lines"][5],
         dict(monthly_supported=False),
@@ -211,14 +255,14 @@ def test_own_si_cannot_use_circular_or_unqualified_moving_roots(anchor):
     assert own["condition_match"] is (True if anchor == "calendar-fire" else None)
 
 
-def test_own_si_leaf_projection_needs_no_sibling_fields():
+def test_own_si_leaf_projection_needs_no_sibling_fields() -> None:
     output = GrowthConditions.model_validate(
         {"lines": [{"own_changed_si": {"qualified_back_control_condition": None}}]}
     )
     assert output.lines[0].own_changed_si.qualified_back_control_condition is None
 
 
-def test_own_si_calendar_proof_rejects_a_boolean_in_place_of_roots():
+def test_own_si_calendar_proof_rejects_a_boolean_in_place_of_roots() -> None:
     with pytest.raises(ValidationError):
         GrowthConditions.model_validate(
             {"lines": [{"own_changed_si": {"calendar_supports": True}}]}
@@ -228,6 +272,6 @@ def test_own_si_calendar_proof_rejects_a_boolean_in_place_of_roots():
 @pytest.mark.parametrize(
     "payload", [{"harm_condition_match": "true"}, {"qualification_source_path": False}]
 )
-def test_strength_qualification_fields_have_strict_published_types(payload):
+def test_strength_qualification_fields_have_strict_published_types(payload) -> None:
     with pytest.raises(ValidationError):
         StrengthActor.model_validate(payload)

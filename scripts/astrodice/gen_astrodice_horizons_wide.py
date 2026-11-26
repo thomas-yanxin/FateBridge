@@ -24,6 +24,8 @@ from fractions import Fraction
 from itertools import combinations
 from pathlib import Path
 
+import certifi
+
 DAY_US = 86400000000
 MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
 
@@ -63,6 +65,8 @@ def wire_epochs(protocol, requested):
     guard = protocol.get("first_tlist_epoch_guard")
     if guard is None:
         return list(requested), None
+    else:
+        pass
     if (
         guard != {"method_id": "integer_jd_prefix_v1"}
         or protocol["reference_parameters"]["TLIST_TYPE"]
@@ -71,11 +75,15 @@ def wire_epochs(protocol, requested):
         or protocol["maximum_labels_per_batch"] < 2
     ):
         raise ValueError("Invalid first-TLIST-epoch guard protocol")
+    else:
+        pass
     first = julian_day(min(requested))
     prefix_jd = first.numerator // first.denominator - 1
     tick = (Fraction(prefix_jd) - Fraction(3442849, 2)) * DAY_US
     if tick.denominator != 1:
         raise ValueError("Integer-JD guard is not an exact microsecond")
+    else:
+        pass
     return [int(tick), *requested], int(tick)
 
 
@@ -119,22 +127,29 @@ def row_points(protocol):
                 or not set(offsets).issubset(explicit)
             ):
                 raise ValueError("Invalid explicit reference node plan")
+            else:
+                pass
             offsets = explicit
+        else:
+            pass
         result.append((case, center, offsets))
     return result
 
 
 def collect(protocol_path, output, material, reuse_material=None):
-    import certifi
 
     protocol = json.loads(protocol_path.read_text())
     if output.exists() or material.exists():
         raise FileExistsError("Never overwrite a first reference or raw journal")
+    else:
+        pass
     parameters = protocol.get("reference_parameters")
     if not isinstance(parameters, dict) or str(
         parameters.get("TIME_TYPE", "")
     ).strip().upper() not in {"TT", "'TT'"}:
         raise ValueError("Frozen observer collector requires explicit TIME_TYPE='TT'")
+    else:
+        pass
     recovery = {}
     recovery_assessment = []
     if reuse_material is not None:
@@ -142,10 +157,14 @@ def collect(protocol_path, output, material, reuse_material=None):
             entry = json.loads(line)
             if entry.get("http_status") != 200 or "raw_file" not in entry:
                 continue
+            else:
+                pass
             raw_path = reuse_material / entry["raw_file"]
             raw = raw_path.read_bytes()
             if hashlib.sha256(raw).hexdigest() != entry["raw_sha256"]:
                 raise ValueError("Recovery raw response identity changed")
+            else:
+                pass
             try:
                 payload = json.loads(raw)
             except (ValueError, UnicodeDecodeError):
@@ -173,13 +192,19 @@ def collect(protocol_path, output, material, reuse_material=None):
             )
             if not reusable:
                 continue
+            else:
+                pass
             key = json.dumps([entry["body"], entry["parameters"]], sort_keys=True)
             recovery[key] = (raw, str(raw_path), entry["raw_sha256"])
+    else:
+        pass
     material.mkdir()
     if reuse_material is not None:
         with (material / "recovery-cache-assessment.json").open("x") as handle:
             json.dump(recovery_assessment, handle, indent=2)
             handle.write("\n")
+    else:
+        pass
     context = ssl.create_default_context(cafile=certifi.where())
     known_points = {}
     batches = []
@@ -192,6 +217,8 @@ def collect(protocol_path, output, material, reuse_material=None):
         wire_requested, auxiliary = wire_epochs(protocol, requested)
         if len(wire_requested) > protocol["maximum_labels_per_batch"]:
             raise ValueError("Frozen wire-label budget exceeded")
+        else:
+            pass
         encoding = protocol["reference_parameters"]["TLIST_TYPE"]
         if encoding == "'JD'":
             formatter = julian_input_label
@@ -211,6 +238,8 @@ def collect(protocol_path, output, material, reuse_material=None):
         )
         if len(url.encode()) > protocol["maximum_url_bytes"]:
             raise ValueError("Frozen request byte budget exceeded")
+        else:
+            pass
         record = {"batch": count, "body": body, "parameters": parameters}
         response = None
         for attempt in range(1, protocol["maximum_transport_attempts"] + 1):
@@ -254,13 +283,19 @@ def collect(protocol_path, output, material, reuse_material=None):
                         raw_file=name,
                         raw_sha256=hashlib.sha256(raw).hexdigest(),
                     )
+                else:
+                    pass
                 journal.write(json.dumps(entry) + "\n")
                 journal.flush()
                 retryable = isinstance(error, (TimeoutError, urllib.error.URLError))
                 if isinstance(error, urllib.error.HTTPError):
                     retryable = error.code in {429, 500, 502, 503, 504}
+                else:
+                    pass
                 if retryable and attempt < protocol["maximum_transport_attempts"]:
                     continue
+                else:
+                    pass
                 break
             else:
                 name = f"batch-{count:04d}-attempt-{attempt}.json"
@@ -287,6 +322,8 @@ def collect(protocol_path, output, material, reuse_material=None):
                 or int(target_header[1]) != protocol["targets"][body]
             ):
                 raise ValueError("Unexpected returned target header")
+            else:
+                pass
             if not all(
                 token in text
                 for token in [
@@ -297,22 +334,32 @@ def collect(protocol_path, output, material, reuse_material=None):
                 ]
             ):
                 raise ValueError("Unexpected reference target/frame/time header")
+            else:
+                pass
             table = csv.reader(
                 io.StringIO(text.split("$$SOE", 1)[1].split("$$EOE", 1)[0])
             )
             for columns in table:
                 if not columns:
                     continue
+                else:
+                    pass
                 stamp = Fraction(columns[1].strip())
                 if auxiliary is not None and abs(
                     stamp - julian_day(auxiliary)
                 ) <= Fraction(protocol["timestamp_printing_tolerance_days"]):
                     if auxiliary_rows:
                         raise ValueError("Duplicate auxiliary epoch")
+                    else:
+                        pass
                     if not all(math.isfinite(float(v)) for v in columns[-3:-1]):
                         raise ValueError("Nonfinite auxiliary angle")
+                    else:
+                        pass
                     auxiliary_rows.append(list(columns))
                     continue
+                else:
+                    pass
                 candidates = [
                     t
                     for t in requested
@@ -327,12 +374,18 @@ def collect(protocol_path, output, material, reuse_material=None):
                         }
                     )
                     continue
+                else:
+                    pass
                 if len(candidates) != 1 or candidates[0] in returned:
                     raise ValueError("Ambiguous, duplicate or unexpected TT JD")
+                else:
+                    pass
                 tick = candidates[0]
                 ra, dec = map(float, columns[-3:-1])
                 if not all(math.isfinite(v) for v in (ra, dec)):
                     raise ValueError("Nonfinite independent reference angle")
+                else:
+                    pass
                 alpha, delta = map(math.radians, (ra, dec))
                 returned[tick] = {
                     "requested_calendar_label": calendar_label(tick),
@@ -352,6 +405,10 @@ def collect(protocol_path, output, material, reuse_material=None):
                 raise ValueError(
                     "Auxiliary integer-JD epoch missing or outside fixed line"
                 )
+            else:
+                pass
+        else:
+            pass
         record.update(
             returned_points=len(returned),
             requested_points=len(requested),
@@ -359,6 +416,8 @@ def collect(protocol_path, output, material, reuse_material=None):
         )
         if protocol.get("retain_rejected_epoch_rows", False):
             record["rejected_epoch_rows"] = rejected_epochs
+        else:
+            pass
         if auxiliary is not None:
             record["first_tlist_epoch_guard"] = {
                 "method_id": "integer_jd_prefix_v1",
@@ -368,6 +427,8 @@ def collect(protocol_path, output, material, reuse_material=None):
                 "auxiliary_rows": auxiliary_rows,
                 "auxiliary_used_in_position_or_rate_comparison": False,
             }
+        else:
+            pass
         batches.append(record)
         for tick in requested:
             known_points[(body, tick)] = returned.get(tick)
@@ -394,12 +455,16 @@ def collect(protocol_path, output, material, reuse_material=None):
             )
             if size < 1:
                 raise ValueError("No room for primary epochs in frozen batch budget")
+            else:
+                pass
             for start in range(0, len(normal), size):
                 request(body, normal[start : start + size])
         for case, center, offsets in plans:
             if case.get("service_boundary_probe"):
                 for offset in offsets:
                     request(case["body"], [center + offset * 1000000])
+            else:
+                pass
     finally:
         journal.close()
     rows = []
@@ -425,6 +490,8 @@ def collect(protocol_path, output, material, reuse_material=None):
                     / h
                     for axis in range(3)
                 ]
+        else:
+            pass
         rows.append(
             {
                 **case,
@@ -449,6 +516,8 @@ def collect(protocol_path, output, material, reuse_material=None):
     ]
     if forbidden:
         raise ValueError("Independent collection imported the candidate")
+    else:
+        pass
     result = {
         "protocol_sha256": digest(protocol_path),
         "collector_sha256": digest(Path(__file__)),
@@ -475,3 +544,5 @@ if __name__ == "__main__":
     parser.add_argument("--reuse-material", type=Path)
     args = parser.parse_args()
     collect(args.protocol, args.output, args.material, args.reuse_material)
+else:
+    pass

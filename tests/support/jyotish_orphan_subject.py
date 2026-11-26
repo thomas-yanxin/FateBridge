@@ -8,7 +8,7 @@ from pathlib import Path
 
 from fatebridge.core.astro import native_execution as execution
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish import build_india
+from fatebridge.core.jyotish.jyotish import build_india
 
 children = []
 original_start = execution.subprocess.Popen
@@ -33,6 +33,8 @@ def receive(*args):
         # Child is computing with no sample callbacks or ACK wait. The test
         # kills this owner while it is blocked here, outside Python cleanup.
         time.sleep(60)
+    else:
+        pass
     return result
 
 

@@ -10,7 +10,7 @@ from __future__ import annotations
 from copy import deepcopy
 from fractions import Fraction
 from math import isfinite
-from typing import Any, Literal, Mapping, Tuple, TypedDict
+from typing import Any, Literal, Mapping, TypedDict
 
 from fatebridge.core.classical_roots import SOURCE as ROOT_SOURCE
 from fatebridge.core.classical_roots import classify_classical_root
@@ -85,7 +85,7 @@ def _unresolved_force(
 
 
 def adjudicate_classical_force(
-    pillars: Mapping[str, Tuple[str, str]],
+    pillars: Mapping[str, tuple[str, str]],
 ) -> SourceForceAdjudication:
     """Observe literal roots; keep unestablished force premises unresolved."""
     body = STEM_ELEMENTS[pillars["day"][0]][0]
@@ -105,7 +105,7 @@ def adjudicate_classical_force(
 
 
 def _source_roots_by_stem(
-    pillars: Mapping[str, Tuple[str, str]], elements: Mapping[str, Any]
+    pillars: Mapping[str, tuple[str, str]], elements: Mapping[str, Any]
 ) -> list[dict[str, Any]]:
     """Classify actual visible/hidden stems without inferring effective force."""
     observed = {stem for stem, _ in pillars.values()} | {
@@ -157,7 +157,7 @@ def _source_roots_by_stem(
 
 
 def build_force_components(
-    pillars: Mapping[str, Tuple[str, str]],
+    pillars: Mapping[str, tuple[str, str]],
     assessment: Mapping[str, Any],
     stars: Mapping[str, list[dict[str, Any]]],
     *,

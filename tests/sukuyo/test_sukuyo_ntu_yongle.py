@@ -6,11 +6,11 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_documentary import clock_position_reference
-from fatebridge.core.sukuyo_printed_special import NTU_YONGLE_SOURCE
-from fatebridge.core.sukuyo_sources import load_source
-from fatebridge.core.sukuyo_special_days import special_day_evidence
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_documentary import clock_position_reference
+from fatebridge.core.sukuyo.sukuyo_printed_special import NTU_YONGLE_SOURCE
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.sukuyo_special_days import special_day_evidence
 
 FIXTURE = Path(__file__).parents[1] / "data/sukuyo-ntu-yongle130-selected-v1.json"
 MANSIONS = "角亢氐房心尾箕斗女虚危室壁奎娄胃昴毕觜参井鬼柳星张翼轸"
@@ -22,7 +22,9 @@ def evidence(name, weekday):
     )
 
 
-def test_frozen_visual_oracle_preserves_all_42_slots_before_runtime_comparison():
+def test_frozen_visual_oracle_preserves_all_42_slots_before_runtime_comparison() -> (
+    None
+):
     raw = FIXTURE.read_bytes()
     assert hashlib.sha256(raw).hexdigest() == (
         "5205a64930010b8232cdf1935936d8555010acf612b8ac6fa06f2cde66c219f3"
@@ -72,8 +74,8 @@ def test_frozen_visual_oracle_preserves_all_42_slots_before_runtime_comparison()
     ],
 )
 def test_distinct_volume_cells_never_rewrite_primary_or_resolve_other_glyphs(
-    name, weekday, upper, lower, primary
-):
+    name: str, weekday: int, upper, lower, primary
+) -> None:
     result = evidence(name, weekday)
     direct = result["direct_printed_comparisons"]
     assert [r["witness"] for r in direct] == [
@@ -88,9 +90,13 @@ def test_distinct_volume_cells_never_rewrite_primary_or_resolve_other_glyphs(
     if weekday in (0, 4):
         other = next(r for r in result["comparisons"] if r["witness"] == "lower_taisho")
         assert other["unresolved_rows"][0]["literal_mansion"] in ("冒", "底")
+    else:
+        pass
 
 
-def test_matching_downloads_and_apparatus_cells_cannot_authenticate_physical_witness():
+def test_matching_downloads_and_apparatus_cells_cannot_authenticate_physical_witness() -> (
+    None
+):
     bundle = load_source(NTU_YONGLE_SOURCE).data
     ref = bundle["source_reference"]
     matches = ref["selected_page_image_matches"]
@@ -117,7 +123,7 @@ def test_matching_downloads_and_apparatus_cells_cannot_authenticate_physical_wit
     )
 
 
-def test_source_clock_is_not_civil_time_hinoo_priority_or_empirical_efficacy():
+def test_source_clock_is_not_civil_time_hinoo_priority_or_empirical_efficacy() -> None:
     clock = clock_position_reference()["direct_chinese_print_reference"]
     assert clock["day_parts"] == clock["night_parts"] == 8
     assert clock["accepted_selected_clauses"][1] == "平明即是所直之曜"
@@ -139,7 +145,7 @@ def test_source_clock_is_not_civil_time_hinoo_priority_or_empirical_efficacy():
 
 
 @pytest.mark.parametrize("weekday", range(7))
-def test_unknown_day_mansion_never_becomes_a_definitive_printed_label(weekday):
+def test_unknown_day_mansion_never_becomes_a_definitive_printed_label(weekday) -> None:
     result = evidence(None, weekday)
     for row in result["direct_printed_comparisons"][2:]:
         assert row["matched_labels"] == []
@@ -147,7 +153,9 @@ def test_unknown_day_mansion_never_becomes_a_definitive_printed_label(weekday):
         assert row["disagrees_with_primary"] is None
 
 
-def test_product_explanation_names_both_volumes_and_retains_unaccepted_caption():
+def test_product_explanation_names_both_volumes_and_retains_unaccepted_caption() -> (
+    None
+):
     result = day_evidence(calendar_mansion("2000-01-18"))
     text = result["reading_text"]
     assert "台大馆藏《永樂北藏》第一三〇册上卷所选影印段" in text

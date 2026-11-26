@@ -1,16 +1,11 @@
-"""Explicit circular, geographical and time policies for relationship charts.
-
-Astrodienst documents arithmetic, spherical and MC-corrected Davison variants.
-The subsecond UT1 midpoint and longitude-unwrapping policies are declared here;
-the published prose does not specify atomic-time or floating-point details.
-"""
+"""Calculate circular, geographic, and physical-epoch relationship midpoints."""
 
 from __future__ import annotations
 
 import math
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from fractions import Fraction
-from typing import Any, Dict, Tuple
+from typing import Literal, TypedDict
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import AstroBirthInfo
@@ -20,46 +15,89 @@ from fatebridge.core.astro.geometry import (
     longitude_float,
     normalize_angle,
 )
-from fatebridge.core.astro.time_scales import datetime_from_ut1, ephemeris_time
+from fatebridge.core.astro.physical_epoch import PhysicalEpoch
+from fatebridge.core.astro.ut1_epoch import UT1Instant
 from fatebridge.utils.timezones import parse_timezone_name
 
 DAVISON_SOURCE = "https://www.astro.com/cgi/h.cgi?f=gch&h=gch64&lang=e"
 COMPOSITE_SOURCE = "https://www.astro.com/faq/fq_fh_compo_e.htm"
 MARKS_SOURCE = "https://astroer.com/htmls/bob/bobmar/markschart28.0.htm"
 
+DavisonVariant = Literal["uncorrected", "corrected", "spherical"]
+DAVISON_VARIANTS: frozenset[DavisonVariant] = frozenset(
+    {"uncorrected", "corrected", "spherical"}
+)
+MC_CORRECTION_LIMIT_DEGREES = 1e-5
+MC_SEARCH_HALF_WINDOW_DAYS = 0.4
+MC_SEARCH_STEP_DAYS = 0.02
+MC_SEARCH_STEP_COUNT = 40
+MC_BISECTION_LIMIT = 60
+SECONDS_PER_DAY = 86400
+
+
+@dataclass(frozen=True, kw_only=True)
+class CorrectedMidpoint:
+    julian_day_ut1: float
+    target_mc_degrees: float
+
+
+class DavisonCorrectionFacts(TypedDict, total=False):
+    mc_target_tropical: float
+    mc_actual_tropical: float
+    mc_residual_degrees: float
+    time_correction_seconds_ut1: float
+    mc_target_policy: str
+
+
+class DavisonPolicy(DavisonCorrectionFacts):
+    method_id: str
+    variant: str
+    source_url: str
+    source_kind: str
+    positions_from_single_instant: bool
+    time_policy: str
+    time_source_scope: str
+    geographic_policy: str
+    longitude_unwrapping: str
+    midpoint_jd_ut1: float
+    input_julian_days_ut1: list[float]
+    midpoint_longitude: float
+    midpoint_latitude: float
+
+
+class MarksPolicy(DavisonPolicy):
+    recipe: str
+    base_davison_variant: str
+
 
 def unique_midpoint(first: float, second: float) -> float:
     """Unordered shorter-arc midpoint; a diametric pair has two equal answers."""
-    if not math.isfinite(first) or not math.isfinite(second):
-        raise ValueError("中点坐标必须为有限数值")
+    return longitude_float(_unique_midpoint_fraction(first, second))
+
+
+def _unique_midpoint_fraction(first: Angle, second: Angle) -> Fraction:
     values = midpoint_candidates_fraction(first, second)
     if len(values) != 1:
         raise ValueError("精确相隔180°的输入没有唯一短弧中点；不能任取一个方向")
-    return longitude_float(values[0])
+    return values[0]
 
 
-def midpoint_candidates_fraction(first: Angle, second: Angle) -> Tuple[Fraction, ...]:
+def midpoint_candidates_fraction(first: Angle, second: Angle) -> tuple[Fraction, ...]:
     """Retain the original midpoint formula for subsequent classifications."""
-    a, b = angle_fraction(first) % 360, angle_fraction(second) % 360
-    delta = (b - a) % 360
+    first_degrees = angle_fraction(first) % 360
+    second_degrees = angle_fraction(second) % 360
+    delta = (second_degrees - first_degrees) % 360
     if delta == 180:
-        axis = ((a + b) / 2) % 180
+        axis = ((first_degrees + second_degrees) / 2) % 180
         return axis, axis + 180
     if delta > 180:
         delta -= 360
-    return ((a + delta / 2) % 360,)
+    return ((first_degrees + delta / 2) % 360,)
 
 
-def _signed_longitude(value: float) -> float:
+def _signed_longitude(value: Angle) -> float:
     result = float((Fraction(value) + 180) % 360 - 180)
     return min(result, math.nextafter(180.0, 0.0))
-
-
-def midpoint_candidates(first: float, second: float) -> Tuple[float, ...]:
-    """Short-arc point, or both equal candidates for an exact diametric pair."""
-    return tuple(
-        longitude_float(value) for value in midpoint_candidates_fraction(first, second)
-    )
 
 
 def geographic_midpoint(
@@ -69,12 +107,10 @@ def geographic_midpoint(
     second_latitude: float,
     *,
     spherical: bool = False,
-) -> Tuple[float, float]:
-    """Coordinate mean on the short longitude arc, or spherical geodesic mean.
+) -> tuple[float, float]:
+    """Calculate a short-arc coordinate mean or midpoint on a sphere.
 
-    Half-angle identities avoid subtracting nearly opposite unit vectors.
-    Exact antipodes are undefined; a pole itself has canonical longitude zero.
-    The sphere is an explicit convention, not a WGS84 ellipsoidal midpoint.
+    Exact spherical antipodes are undefined and poles use longitude zero.
     """
     values = (first_longitude, first_latitude, second_longitude, second_latitude)
     if not all(math.isfinite(value) for value in values):
@@ -85,7 +121,9 @@ def geographic_midpoint(
         raise ValueError("经度必须在[-180,180]内")
     if not spherical:
         return (
-            _signed_longitude(unique_midpoint(first_longitude, second_longitude)),
+            _signed_longitude(
+                _unique_midpoint_fraction(first_longitude, second_longitude)
+            ),
             float((Fraction(first_latitude) + Fraction(second_latitude)) / 2),
         )
     delta = (Fraction(second_longitude) - Fraction(first_longitude) + 180) % 360 - 180
@@ -98,14 +136,15 @@ def geographic_midpoint(
     mean_lat = math.radians(
         float((Fraction(first_latitude) + Fraction(second_latitude)) / 2)
     )
-    half_lat_diff = math.radians(
-        float((Fraction(second_latitude) - Fraction(first_latitude)) / 2)
-    )
+    half_lat_diff_degrees = (Fraction(second_latitude) - Fraction(first_latitude)) / 2
+    half_lat_diff = math.radians(float(half_lat_diff_degrees))
     half_lon_diff = math.radians(float(delta / 2))
-    cos_half_lon = 0.0 if abs(delta) == 180 else math.cos(half_lon_diff)
-    x = math.cos(mean_lat) * math.cos(half_lat_diff) * cos_half_lon
+    # note (precision): Take the exact complements before converting to radians near a zero cosine.
+    cos_half_lon = math.sin(math.radians(float((180 - abs(delta)) / 2)))
+    cos_half_lat = math.sin(math.radians(float(90 - abs(half_lat_diff_degrees))))
+    x = math.cos(mean_lat) * cos_half_lat * cos_half_lon
     y = -math.sin(mean_lat) * math.sin(half_lat_diff) * math.sin(half_lon_diff)
-    z = math.sin(mean_lat) * math.cos(half_lat_diff)
+    z = math.sin(mean_lat) * cos_half_lat
     latitude = math.degrees(math.atan2(z, math.hypot(x, y)))
     if abs(latitude) == 90:
         return 0.0, latitude
@@ -115,81 +154,101 @@ def geographic_midpoint(
     return _signed_longitude(longitude), latitude
 
 
-def _tropical_mc(ut1: float, longitude: float) -> float:
-    # MC depends on the meridian, not geographic latitude. Latitude zero avoids
-    # undefined polar ASC geometry in this MC-only correction calculation.
+def _tropical_mc(ut1: float | UT1Instant, longitude: float) -> float:
+    # note (midheaven): The equator avoids polar ASC errors without changing the meridian.
     _, angles = runtime.ephemeris_call("houses_ex", ut1, 0.0, longitude, b"E")
     return normalize_angle(float(angles[1]))
 
 
 def _corrected_ut1(
-    centre: float, longitude: float, first: AstroBirthInfo, second: AstroBirthInfo
-) -> Tuple[float, Dict[str, Any]]:
-    if runtime.swe is None:
-        raise ValueError("Davison MC校正需要Swiss Ephemeris")
+    midpoint_julian_day_ut1: float,
+    midpoint_longitude_degrees: float,
+    first_birth: AstroBirthInfo,
+    second_birth: AstroBirthInfo,
+) -> CorrectedMidpoint:
     natal_mcs = [
-        _tropical_mc(ephemeris_time(p.require_utc_datetime).jd_ut1, p.longitude)
-        for p in (first, second)
+        _tropical_mc(birth.time_scales.ut1, birth.longitude)
+        for birth in (first_birth, second_birth)
     ]
-    axis = float(((Fraction(natal_mcs[0]) + Fraction(natal_mcs[1])) / 2) % 180)
-    candidates = [axis, axis + 180]
-    mc_here = _tropical_mc(centre, longitude)
-    distances = [
-        abs((mc_here - candidate + 180) % 360 - 180) for candidate in candidates
+    midpoint_axis_degrees = float(
+        ((Fraction(natal_mcs[0]) + Fraction(natal_mcs[1])) / 2) % 180
+    )
+    candidate_mc_degrees = [midpoint_axis_degrees, midpoint_axis_degrees + 180]
+    midpoint_mc_degrees = _tropical_mc(
+        midpoint_julian_day_ut1, midpoint_longitude_degrees
+    )
+    distances_degrees = [
+        abs((midpoint_mc_degrees - candidate + 180) % 360 - 180)
+        for candidate in candidate_mc_degrees
     ]
-    if distances[0] == distances[1]:
+    if distances_degrees[0] == distances_degrees[1]:
         raise ValueError("Davison MC轴校正有两个等距方向，无法唯一选择")
-    target = candidates[distances.index(min(distances))]
+    else:
+        target_mc_degrees = candidate_mc_degrees[
+            distances_degrees.index(min(distances_degrees))
+        ]
 
-    def residual(at: float) -> float:
-        difference = normalize_angle(_tropical_mc(at, longitude) - target)
-        return difference - 360 if difference >= 180 else difference
+    def residual(julian_day_ut1: float) -> float:
+        difference_degrees = normalize_angle(
+            _tropical_mc(julian_day_ut1, midpoint_longitude_degrees) - target_mc_degrees
+        )
+        return (
+            difference_degrees - 360
+            if difference_degrees >= 180
+            else difference_degrees
+        )
 
-    brackets = []
-    left, f_left = centre - 0.4, residual(centre - 0.4)
-    for step in range(1, 41):
-        right = centre - 0.4 + step * 0.02
-        f_right = residual(right)
-        if f_left <= 0 <= f_right and f_right - f_left < 90:
-            brackets.append((left, right))
-        left, f_left = right, f_right
+    brackets: list[tuple[float, float]] = []
+    window_start_julian_day_ut1 = midpoint_julian_day_ut1 - MC_SEARCH_HALF_WINDOW_DAYS
+    left_julian_day_ut1 = window_start_julian_day_ut1
+    left_residual_degrees = residual(left_julian_day_ut1)
+    for step in range(1, MC_SEARCH_STEP_COUNT + 1):
+        right_julian_day_ut1 = window_start_julian_day_ut1 + step * MC_SEARCH_STEP_DAYS
+        right_residual_degrees = residual(right_julian_day_ut1)
+        if (
+            left_residual_degrees <= 0 <= right_residual_degrees
+            and right_residual_degrees - left_residual_degrees < 90
+        ):
+            brackets.append((left_julian_day_ut1, right_julian_day_ut1))
+        left_julian_day_ut1, left_residual_degrees = (
+            right_julian_day_ut1,
+            right_residual_degrees,
+        )
     if not brackets:
         raise ValueError("Davison MC校正未找到有效括界")
-    solutions = []
-    for left, right in brackets:
-        for _ in range(60):
-            mid = (left + right) / 2
-            if mid in (left, right):
+    solutions_julian_day_ut1: list[float] = []
+    for left_julian_day_ut1, right_julian_day_ut1 in brackets:
+        for _ in range(MC_BISECTION_LIMIT):
+            trial_julian_day_ut1 = (left_julian_day_ut1 + right_julian_day_ut1) / 2
+            if trial_julian_day_ut1 in (left_julian_day_ut1, right_julian_day_ut1):
                 break
-            if residual(mid) >= 0:
-                right = mid
+            elif residual(trial_julian_day_ut1) >= 0:
+                right_julian_day_ut1 = trial_julian_day_ut1
             else:
-                left = mid
-        solutions.append(right)
-    solved = min(solutions, key=lambda at: abs(at - centre))
-    error = abs(residual(solved))
-    if error > 1e-5:
+                left_julian_day_ut1 = trial_julian_day_ut1
+        solutions_julian_day_ut1.append(right_julian_day_ut1)
+    corrected_julian_day_ut1 = min(
+        solutions_julian_day_ut1,
+        key=lambda julian_day_ut1: abs(julian_day_ut1 - midpoint_julian_day_ut1),
+    )
+    if abs(residual(corrected_julian_day_ut1)) > MC_CORRECTION_LIMIT_DEGREES:
         raise ValueError("Davison MC校正残差超限")
-    return solved, {
-        "mc_target_tropical": target,
-        "mc_actual_tropical": _tropical_mc(solved, longitude),
-        "mc_residual_degrees": error,
-        "time_correction_seconds_ut1": (solved - centre) * 86400,
-        "mc_target_policy": "nearest direction of the natal MC midpoint meridian axis",
-    }
+    else:
+        return CorrectedMidpoint(
+            julian_day_ut1=corrected_julian_day_ut1, target_mc_degrees=target_mc_degrees
+        )
 
 
 def davison_birth(
     first: AstroBirthInfo, second: AstroBirthInfo, *, variant: str = "uncorrected"
-) -> Tuple[AstroBirthInfo, Dict[str, Any]]:
-    if variant not in {"uncorrected", "corrected", "spherical"}:
+) -> tuple[AstroBirthInfo, DavisonPolicy]:
+    """Use the selected UT1 midpoint and preserve its physical epoch."""
+    if variant not in DAVISON_VARIANTS:
         raise ValueError("davison_variant必须为uncorrected、corrected或spherical")
-    first_time, second_time = (
-        ephemeris_time(p.require_utc_datetime) for p in (first, second)
-    )
+    first_time, second_time = first.time_scales, second.time_scales
     if runtime.swe is None:
         raise ValueError("Davison时间尺度换算需要Swiss Ephemeris，不能冒用UTC为UT1")
-    midpoint = float((Fraction(first_time.jd_ut1) + Fraction(second_time.jd_ut1)) / 2)
+    midpoint = UT1Instant((first_time.ut1.days + second_time.ut1.days) / 2)
     longitude, latitude = geographic_midpoint(
         first.longitude,
         first.latitude,
@@ -197,19 +256,37 @@ def davison_birth(
         second.latitude,
         spherical=variant == "spherical",
     )
-    correction: Dict[str, Any] = {}
-    if variant == "corrected":
-        midpoint, correction = _corrected_ut1(midpoint, longitude, first, second)
-    utc = datetime_from_ut1(midpoint)
-    if variant == "corrected":
-        actual_mc = _tropical_mc(ephemeris_time(utc).jd_ut1, longitude)
-        target = correction["mc_target_tropical"]
-        actual_error = abs((actual_mc - target + 180) % 360 - 180)
-        if actual_error > 1e-5:
-            raise ValueError("民用时间转换后Davison MC校正残差超限")
-        correction.update(
-            mc_actual_tropical=actual_mc, mc_residual_degrees=actual_error
+    mean_julian_day_ut1 = midpoint.as_float() if variant == "corrected" else None
+    if mean_julian_day_ut1 is not None:
+        corrected_midpoint = _corrected_ut1(
+            mean_julian_day_ut1, longitude, first, second
         )
+        midpoint = UT1Instant.from_float(corrected_midpoint.julian_day_ut1)
+    else:
+        corrected_midpoint = None
+    epoch = PhysicalEpoch.from_ut1(midpoint)
+    utc = epoch.require_datetime()
+    correction: DavisonCorrectionFacts = {}
+    if corrected_midpoint is not None:
+        assert mean_julian_day_ut1 is not None
+        actual_mc_degrees = _tropical_mc(epoch.time.ut1, longitude)
+        target_mc_degrees = corrected_midpoint.target_mc_degrees
+        residual_degrees = abs(
+            (actual_mc_degrees - target_mc_degrees + 180) % 360 - 180
+        )
+        if residual_degrees > MC_CORRECTION_LIMIT_DEGREES:
+            raise ValueError("民用时间转换后Davison MC校正残差超限")
+        else:
+            correction = {
+                "mc_target_tropical": target_mc_degrees,
+                "mc_actual_tropical": actual_mc_degrees,
+                "mc_residual_degrees": residual_degrees,
+                "time_correction_seconds_ut1": (
+                    corrected_midpoint.julian_day_ut1 - mean_julian_day_ut1
+                )
+                * SECONDS_PER_DAY,
+                "mc_target_policy": "nearest direction of the natal MC midpoint meridian axis",
+            }
     zone = first.timezone if first.timezone == second.timezone else "UTC"
     birth = AstroBirthInfo(
         name=f"{first.name}/{second.name} 时空中点",
@@ -219,6 +296,7 @@ def davison_birth(
         latitude=latitude,
         local_datetime=utc.astimezone(parse_timezone_name(zone)),
         utc_datetime=utc,
+        native_epoch=epoch,
     )
     return birth, {
         "method_id": "davison_geometry_v2",
@@ -226,7 +304,7 @@ def davison_birth(
         "source_url": DAVISON_SOURCE,
         "source_kind": "first_party_implementation_documentation",
         "positions_from_single_instant": True,
-        "time_policy": "arithmetic mean of modeled UT1 Julian days, then frozen-policy civil conversion",
+        "time_policy": "arithmetic mean of selected UT1 Julian days; retain solved UT1/TT and format frozen-policy civil display",
         "time_source_scope": "Source specifies mean birth times; UT1 and subsecond policy are explicit FateBridge conventions, not a quote from Davison's original book",
         "geographic_policy": (
             "spherical_shortest_geodesic"
@@ -238,7 +316,7 @@ def davison_birth(
             if variant == "spherical"
             else "short arc; exact opposite meridians require an explicit alternative"
         ),
-        "midpoint_jd_ut1": midpoint,
+        "midpoint_jd_ut1": midpoint.as_float(),
         "input_julian_days_ut1": [first_time.jd_ut1, second_time.jd_ut1],
         "midpoint_longitude": longitude,
         "midpoint_latitude": latitude,
@@ -248,7 +326,8 @@ def davison_birth(
 
 def marks_birth(
     person: AstroBirthInfo, relationship: AstroBirthInfo, *, variant: str
-) -> Tuple[AstroBirthInfo, Dict[str, Any]]:
+) -> tuple[AstroBirthInfo, MarksPolicy]:
+    """Derive a personal Marks chart from the shared Davison birth data."""
     birth, policy = davison_birth(person, relationship, variant=variant)
     return replace(birth, name=f"{person.name} 马克斯盘"), {
         **policy,

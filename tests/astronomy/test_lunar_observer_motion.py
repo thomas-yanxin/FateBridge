@@ -17,7 +17,10 @@ from fatebridge.core.compressed_ephemeris import (
     preserve_native_observer_sample_context,
 )
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.jyotish.test_jyotish_sources import data18, restore_runtime  # noqa: F401
+from tests.unit_test.fixtures.jyotish_sources import (  # noqa: F401
+    data18,
+    restore_runtime,
+)
 
 FIXTURES = Path(__file__).parents[2] / "tests/fixtures"
 SOURCE_PATH = FIXTURES / "lunar-observer-source-reference-v1.json"
@@ -28,7 +31,7 @@ OWNED = json.loads((FIXTURES / "jyotish-lunar-owned-window-reference.json").read
 AS = 180 / math.pi * 3600
 
 
-def test_reference_identity_and_all_original_failed_gates_remain():
+def test_reference_identity_and_all_original_failed_gates_remain() -> None:
     assert hashlib.sha256(SOURCE_PATH.read_bytes()).hexdigest() == (
         "044ad401a4b4a4f7e74e34fce8a3d08d2b1804e8dfaf0f189540a7eb53e7eb86"
     )
@@ -48,7 +51,7 @@ def test_reference_identity_and_all_original_failed_gates_remain():
 @pytest.mark.parametrize(
     "row", SOURCE["rows"], ids=lambda r: f'{r["job_id"]}:{r["clock"]}:{r["frame"]}'
 )
-def test_beta_jacobian_matches_independent_forward_ad(row):
+def test_beta_jacobian_matches_independent_forward_ad(row) -> None:
     position, derivative = lunar_motion.aberration_beta_jvp(
         row["preaberration_position"],
         row["observer_beta"],
@@ -62,7 +65,7 @@ def test_beta_jacobian_matches_independent_forward_ad(row):
 @pytest.mark.parametrize(
     "row", SOURCE["rows"], ids=lambda r: f'{r["job_id"]}:{r["clock"]}:{r["frame"]}'
 )
-def test_source_remainder_matches_independent_complete_fixed_derivative(row):
+def test_source_remainder_matches_independent_complete_fixed_derivative(row) -> None:
     pre = [*row["preaberration_position"], *row["preaberration_velocity"]]
     native = [*row["native_apparent_position"], *row["native_apparent_velocity"]]
     correction, policy = lunar_observer.fixed_frame_source_remainder(
@@ -109,7 +112,7 @@ def test_source_remainder_matches_independent_complete_fixed_derivative(row):
     DIRECTION["rows"],
     ids=lambda r: f'{r["job_id"]}:{r["clock"]}:{r["direction"]}:{r["step_days"]}',
 )
-def test_every_direction_and_step_matches_raw_de441_acceleration(row):
+def test_every_direction_and_step_matches_raw_de441_acceleration(row) -> None:
     acceleration = lunar_observer.acceleration_from_velocities(
         row["sample_velocities"], row["step_days"], row["direction"]
     )
@@ -127,7 +130,9 @@ def test_every_direction_and_step_matches_raw_de441_acceleration(row):
         ((math.nan, 1.0), None),
     ],
 )
-def test_direction_is_chosen_only_by_source_coverage(bounds, expected):
+def test_direction_is_chosen_only_by_source_coverage(
+    bounds, expected: str | None
+) -> None:
     epoch = 2451545.0
     assert (
         lunar_observer.select_source_stencil(
@@ -138,7 +143,7 @@ def test_direction_is_chosen_only_by_source_coverage(bounds, expected):
 
 
 @pytest.mark.parametrize("bad", ["shape", "nan", "superluminal", "zero_position"])
-def test_beta_derivative_rejects_invalid_inputs(bad):
+def test_beta_derivative_rejects_invalid_inputs(bad: str) -> None:
     p, b, db = [1.0, 2.0, 3.0], [0.0001, 0.0002, 0.0003], [0.000001, 0.000002, 0.000003]
     if bad == "shape":
         db.pop()
@@ -153,7 +158,7 @@ def test_beta_derivative_rejects_invalid_inputs(bad):
 
 
 @pytest.mark.parametrize("row", OWNED["rows"], ids=lambda r: r["date_tt"])
-def test_actual_owned_boundary_cohort_restores_exact_center_and_source(row):
+def test_actual_owned_boundary_cohort_restores_exact_center_and_source(row) -> None:
     e.configure_ephemeris_path(str(Path(__file__).resolve().parents[2] / "ephe"))
     context = {}
     tt = row["jd_tt"]
@@ -200,8 +205,8 @@ def test_actual_owned_boundary_cohort_restores_exact_center_and_source(row):
     "problem", ["flags", "model", "nan", "epoch", "body", "restore"]
 )
 def test_auxiliary_faults_propagate_and_restore_managed_sidereal_mode(
-    problem, monkeypatch
-):
+    problem: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     e.configure_ephemeris_path(str(Path(__file__).resolve().parents[2] / "ephe"))
     original = runtime.ephemeris_call
     tt = 2451545.0
@@ -217,16 +222,28 @@ def test_auxiliary_faults_propagate_and_restore_managed_sidereal_mode(
             sampled = True
             if problem == "epoch":
                 return original(operation, args[0] + 1 / 8, *args[1:], **kwargs)
+            else:
+                pass
             if problem == "body":
                 return original(operation, args[0], e.swe.MOON, *args[2:], **kwargs)
+            else:
+                pass
+        else:
+            pass
         values = original(operation, *args, **kwargs)
         if auxiliary and problem in {"flags", "model", "nan"}:
             data, returned = values
             if problem == "flags":
                 return data, returned & ~e.swe.FLG_SPEED
+            else:
+                pass
             if problem == "model":
                 return data, (returned & ~7) | e.swe.FLG_MOSEPH
+            else:
+                pass
             return (math.nan, *data[1:]), returned
+        else:
+            pass
         if (
             problem == "restore"
             and sampled
@@ -236,6 +253,8 @@ def test_auxiliary_faults_propagate_and_restore_managed_sidereal_mode(
         ):
             data, returned = values
             return (data[0] + 1e-12, *data[1:]), returned
+        else:
+            pass
         return values
 
     monkeypatch.setattr(runtime, "ephemeris_call", inject)
@@ -249,7 +268,9 @@ def test_auxiliary_faults_propagate_and_restore_managed_sidereal_mode(
 
 
 @pytest.mark.parametrize("violation", ["body", "time", "truepos", "frame"])
-def test_positive_context_rejects_every_other_coordinate_contract(violation):
+def test_positive_context_rejects_every_other_coordinate_contract(
+    violation: str,
+) -> None:
     e.configure_ephemeris_path(str(Path(__file__).resolve().parents[2] / "ephe"))
     epoch = 2451545.0
     e.ephemeris_call("calc", epoch, e.swe.MOON, e.swe.FLG_SWIEPH | e.swe.FLG_SPEED)
@@ -280,8 +301,8 @@ def test_positive_context_rejects_every_other_coordinate_contract(violation):
 
 @pytest.mark.parametrize("direction", ["central", "forward", "backward"])
 def test_actual_native_window_edges_use_the_predeclared_direction_and_restore(
-    direction,
-):
+    direction: str,
+) -> None:
     e.configure_ephemeris_path(str(Path(__file__).resolve().parents[2] / "ephe"))
     runtime.ephemeris_call(
         "calc",
@@ -304,10 +325,16 @@ def test_actual_native_window_edges_use_the_predeclared_direction_and_restore(
         flags = e.swe.FLG_SWIEPH | e.swe.FLG_SPEED | e.swe.FLG_XYZ | e.swe.FLG_SIDEREAL
         if barycentric:
             flags |= e.swe.FLG_BARYCTR
+        else:
+            pass
         if kind == "geometric":
             flags |= e.swe.FLG_TRUEPOS
+        else:
+            pass
         if kind == "preaberration":
             flags |= e.swe.FLG_NOABERR
+        else:
+            pass
         data, returned = runtime.ephemeris_call("calc", at, body, flags)
         assert e.ephemeris_model_from_retflag(returned) == "swieph"
         return tuple(data), int(returned)
@@ -332,7 +359,9 @@ def test_actual_native_window_edges_use_the_predeclared_direction_and_restore(
         runtime.ephemeris_call("set_sid_mode", e.swe.SIDM_LAHIRI, 0.0, 0.0)
 
 
-def test_nonconvergent_acceleration_retains_only_the_verified_prior_terms(monkeypatch):
+def test_nonconvergent_acceleration_retains_only_the_verified_prior_terms(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     e.configure_ephemeris_path(str(Path(__file__).resolve().parents[2] / "ephe"))
     original = runtime.ephemeris_call
     tt = 2451545.0
@@ -350,6 +379,8 @@ def test_nonconvergent_acceleration_retains_only_the_verified_prior_terms(monkey
             altered = True
             data, returned = values
             return (*data[:3], data[3] + 1e-5, *data[4:]), returned
+        else:
+            pass
         return values
 
     monkeypatch.setattr(runtime, "ephemeris_call", inject)
@@ -378,8 +409,8 @@ def test_nonconvergent_acceleration_retains_only_the_verified_prior_terms(monkey
 
 
 def test_physical_file_change_during_sampling_is_never_a_partial_success(
-    data18, monkeypatch
-):
+    data18, monkeypatch: pytest.MonkeyPatch
+) -> None:
     _, directory = data18
     original = runtime.ephemeris_call
     changed = False
@@ -401,6 +432,8 @@ def test_physical_file_change_during_sampling_is_never_a_partial_success(
                 last = f.read(1)
                 f.seek(-1, 2)
                 f.write(bytes([last[0] ^ 1]))
+        else:
+            pass
         return value
 
     monkeypatch.setattr(runtime, "ephemeris_call", inject)
@@ -414,7 +447,9 @@ def test_physical_file_change_during_sampling_is_never_a_partial_success(
     assert error.value.as_result()["retryable"] is False
 
 
-def test_four_component_reuse_keeps_source_remainder_without_recalculating(monkeypatch):
+def test_four_component_reuse_keeps_source_remainder_without_recalculating(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from fatebridge.core.astro import longitude_motion
     from fatebridge.core.astro.zodiac import native_lahiri_positions
 

@@ -15,6 +15,7 @@ from jsonschema import Draft202012Validator
 import fatebridge.api as api
 from fatebridge.cli import run
 from fatebridge.core import ephemeris_runtime as e
+from fatebridge.core.astro import jpl_kinematics, physical_sources, runtime
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
 from fatebridge.core.jpl_ephemeris import jpl_header
@@ -23,9 +24,10 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
 from scripts.astrodice.audit_astrodice_kernel import angular_error_arcsec
+from tests.support.transports import call_calculation
+from tests.unit_test.fixtures.astrodice_jpl import FIXTURES, KERNEL
+from tests.unit_test.fixtures.astrodice_jpl import jpl as jpl
 
-FIXTURES = Path(__file__).parents[1] / "data/astrodice/tables"
-KERNEL = "de441-j2000.eph"
 SPEC = next(x for x in CATALOG if x.key == "otherbu")
 INPUTS = {
     "planet": "Jupiter",
@@ -39,24 +41,7 @@ INPUTS = {
 }
 
 
-@pytest.fixture
-def jpl(tmp_path, monkeypatch):
-    previous = e.configured_ephemeris_path()
-    kernel = tmp_path / KERNEL
-    kernel.write_bytes((FIXTURES / KERNEL).read_bytes())
-    monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
-    monkeypatch.setenv("FATEBRIDGE_JPL_FILE", KERNEL)
-    e.configure_ephemeris_path()
-    try:
-        yield kernel
-    finally:
-        # The tests also change these variables. Restore the whole shared
-        # monkeypatch stack before restoring the runtime, in the same order.
-        monkeypatch.undo()
-        e.configure_ephemeris_path(previous if previous is not None else "")
-
-
-def test_fixture_is_a_declared_unmodified_coefficient_subset():
+def test_fixture_is_a_declared_unmodified_coefficient_subset() -> None:
     data = (FIXTURES / KERNEL).read_bytes()
     provenance = json.loads((FIXTURES / "de441-j2000.provenance.json").read_text())
     assert len(data) == provenance["fixture_bytes"] == 40720
@@ -77,8 +62,9 @@ def test_fixture_is_a_declared_unmodified_coefficient_subset():
     assert "legacy_tt_range_fields" not in header
 
 
-def test_uninspected_binding_does_not_inherit_the_native_clock_estimate(monkeypatch):
-    from fatebridge.core.astro import physical_sources
+def test_uninspected_binding_does_not_inherit_the_native_clock_estimate(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     monkeypatch.setattr(
         physical_sources, "binding_distribution_version", lambda *args: "future-binding"
@@ -89,7 +75,7 @@ def test_uninspected_binding_does_not_inherit_the_native_clock_estimate(monkeypa
     assert policy["source_documented_maximum_difference_seconds"] is None
 
 
-def test_jpl_satisfies_the_original_vector_threshold_at_j2000(jpl):
+def test_jpl_satisfies_the_original_vector_threshold_at_j2000(jpl) -> None:
     fixture = json.loads((FIXTURES / "kernel-horizons.json").read_text())
     protocol = json.loads((FIXTURES / "kernel-protocol.json").read_text())
     flags = (
@@ -117,7 +103,9 @@ def test_jpl_satisfies_the_original_vector_threshold_at_j2000(jpl):
 
 
 @pytest.mark.parametrize("zodiacal", [0, 1])
-def test_actual_context_exposes_jpl_identity_without_changing_symbols(jpl, zodiacal):
+def test_actual_context_exposes_jpl_identity_without_changing_symbols(
+    jpl, zodiacal: int
+) -> None:
     plain = build_otherbu_result(planet="Jupiter", sign="Aries", house=0)
     result = build_otherbu_result(**INPUTS, zodiacal=zodiacal)
     profile = result["chart"]["params"]["chart_profile"]
@@ -179,12 +167,14 @@ def test_actual_context_exposes_jpl_identity_without_changing_symbols(jpl, zodia
         assert context["file_ids"] == [file["id"]]
     assert all(x["model"] == "jpl" for x in source["by_factor"].values())
     assert source["accuracy_certified"] is False
-    for key in ("symbolic_details", "interpretation", "rule_trace", "rulesets"):
+    for key in ("symbolic_details", "rule_trace", "rulesets"):
         assert result[key] == plain[key]
 
 
 @pytest.mark.parametrize("name", ["../private.eph", "a" * 256, "has space", ".."])
-def test_ambiguous_or_truncated_names_are_rejected(jpl, monkeypatch, name):
+def test_ambiguous_or_truncated_names_are_rejected(
+    jpl, monkeypatch: pytest.MonkeyPatch, name
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_JPL_FILE", name)
     with pytest.raises(EphemerisSourceError) as error:
         build_otherbu_result(**INPUTS)
@@ -192,7 +182,9 @@ def test_ambiguous_or_truncated_names_are_rejected(jpl, monkeypatch, name):
 
 
 @pytest.mark.parametrize("problem", ["missing", "truncated", "out_of_range"])
-def test_explicit_jpl_never_downgrades_to_an_approximation(jpl, monkeypatch, problem):
+def test_explicit_jpl_never_downgrades_to_an_approximation(
+    jpl, monkeypatch: pytest.MonkeyPatch, problem: str
+) -> None:
     inputs = dict(INPUTS)
     if problem == "missing":
         monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "missing.eph")
@@ -210,7 +202,9 @@ def test_explicit_jpl_never_downgrades_to_an_approximation(jpl, monkeypatch, pro
     }
 
 
-def test_file_change_and_configuration_change_are_detected(jpl, monkeypatch):
+def test_file_change_and_configuration_change_are_detected(
+    jpl, monkeypatch: pytest.MonkeyPatch
+) -> None:
     e.ephemeris_call("calc", 2451545.0, e.swe.SUN, e.swe.FLG_SWIEPH)
     trace = PhysicalEphemerisTrace()
     trace.observe("Sun", "jpl")
@@ -226,7 +220,9 @@ def test_file_change_and_configuration_change_are_detected(jpl, monkeypatch):
     assert error.value.reason == "physical_configuration_changed"
 
 
-def test_strict_mode_preserves_keyword_flags_and_rejects_analytical_request(jpl):
+def test_strict_mode_preserves_keyword_flags_and_rejects_analytical_request(
+    jpl,
+) -> None:
     _, flags = e.ephemeris_call(
         "calc", 2451545.0, e.swe.NEPTUNE, flags=e.swe.FLG_SWIEPH | e.swe.FLG_SPEED
     )
@@ -237,21 +233,25 @@ def test_strict_mode_preserves_keyword_flags_and_rejects_analytical_request(jpl)
     assert error.value.reason == "jpl_mixed_request"
 
 
-def test_disabling_explicit_mode_restores_default_model_selection(jpl, monkeypatch):
+def test_disabling_explicit_mode_restores_default_model_selection(
+    jpl, monkeypatch: pytest.MonkeyPatch
+) -> None:
     e.ephemeris_call("calc", 2451545.0, e.swe.NEPTUNE, e.swe.FLG_SWIEPH)
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE")
     _, flag = e.ephemeris_call("calc", 2451545.0, e.swe.NEPTUNE, e.swe.FLG_SWIEPH)
     assert e.ephemeris_model_from_retflag(flag) == "moshier"
 
 
-def test_dice_faces_without_sky_context_do_not_require_a_jpl_file(jpl, monkeypatch):
+def test_dice_faces_without_sky_context_do_not_require_a_jpl_file(
+    jpl, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "missing.eph")
     result = build_otherbu_result(planet="Jupiter", sign="Aries", house=0)
     assert result["chart"] is None
     assert result["diceChart"]["params"]["chartKind"] == "symbolic_whole_sign_diagram"
 
 
-def test_worker_calls_restore_selected_kernel_after_foreign_changes(jpl):
+def test_worker_calls_restore_selected_kernel_after_foreign_changes(jpl) -> None:
     def calculate(_):
         # Third-party integrations participate in the shared managed lock.
         # The next managed call must restore the explicitly selected kernel.
@@ -266,20 +266,24 @@ def test_worker_calls_restore_selected_kernel_after_foreign_changes(jpl):
 
 
 @pytest.mark.parametrize("order", ["<", ">"])
-def test_header_reader_supports_both_direct_access_byte_orders(tmp_path, order):
+def test_header_reader_supports_both_direct_access_byte_orders(
+    tmp_path: Path, order: str
+) -> None:
     data = bytearray((FIXTURES / KERNEL).read_bytes())
     if order == ">":
         for offset, fmt in ((2652, "3d"), (2680, "2d"), (2696, "36i"), (2840, "4i")):
             values = struct.unpack_from("<" + fmt, data, offset)
             struct.pack_into(">" + fmt, data, offset, *values)
+    else:
+        pass
     path = tmp_path / "header-only-synthetic.eph"
     path.write_bytes(data)
     assert jpl_header(path)["start_julian_day_tdb"] == 2451504.5
 
 
 def test_jpl_source_projects_identically_across_three_transports(
-    jpl, capsys, monkeypatch
-):
+    jpl, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -309,8 +313,9 @@ def test_jpl_source_projects_identically_across_three_transports(
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                "otherbu",
+            result = await call_calculation(
+                client,
+                "interpret_astrology_dice",
                 {
                     **INPUTS,
                     "fields": fields,
@@ -322,7 +327,7 @@ def test_jpl_source_projects_identically_across_three_transports(
             return result.structured_content
 
     native = asyncio.run(invoke())
-    flags = ["otherbu"]
+    flags = ["interpret_astrology_dice"]
     for key, value in INPUTS.items():
         flags.extend(["--" + key.replace("_", "-"), str(value)])
     assert run([*flags, "--fields", *fields, "--strict-fields"]) == 0
@@ -345,8 +350,11 @@ def test_jpl_source_projects_identically_across_three_transports(
     ],
 )
 def test_jpl_failure_is_preserved_across_three_transports(
-    jpl, capsys, monkeypatch, problem
-):
+    jpl,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+    problem: str,
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -359,7 +367,6 @@ def test_jpl_failure_is_preserved_across_three_transports(
     elif problem == "out_of_range":
         inputs["date"] = "2005-01-01"
     elif problem == "native_unavailable":
-        from fatebridge.core.astro import runtime
 
         monkeypatch.setattr(runtime, "swe", None)
         # Whole-sign geometry is supported offline, so only the explicit JPL
@@ -368,7 +375,6 @@ def test_jpl_failure_is_preserved_across_three_transports(
         with pytest.raises(ImportError, match="explicitly selected JPL mode"):
             build_otherbu_result(**inputs)
     elif problem.startswith("jpl_kinematics"):
-        from fatebridge.core.astro import jpl_kinematics
 
         def fail_source(*args, **kwargs):
             raise EphemerisSourceError(problem)
@@ -392,18 +398,22 @@ def test_jpl_failure_is_preserved_across_three_transports(
     assert expected["retryable"] is False
     if problem != "native_unavailable":
         assert expected["issues"][0]["path"] == "runtime.ephemeris_data"
+    else:
+        pass
     assert "chart" not in expected
     assert str(jpl.parent) not in json.dumps(expected)
     assert "private native initialization detail" not in json.dumps(expected)
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool("otherbu", inputs, raise_on_error=False)
+            result = await call_calculation(
+                client, "interpret_astrology_dice", inputs, raise_on_error=False
+            )
             assert result.is_error
-            return json.loads(result.content[0].text)
+            return result.structured_content
 
     native = asyncio.run(invoke())
-    flags = ["otherbu"]
+    flags = ["interpret_astrology_dice"]
     for key, value in inputs.items():
         flags.extend(["--" + key.replace("_", "-"), str(value)])
     assert run(flags) == 1

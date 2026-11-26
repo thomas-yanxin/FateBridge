@@ -22,14 +22,14 @@ RECORD_SHA256 = "301a22dbc2390ca9b644e4ed87d65cbf67437bf608165f49825e19229960875
 RULESET = "witte1925_table_numeric_interpolation_v1"
 
 
-def load_table() -> Dict[str, Any]:
+def load_table() -> dict[str, Any]:
     raw = RECORD.read_bytes()
     if hashlib.sha256(raw).hexdigest() != RECORD_SHA256:
         raise RuntimeError("Witte1925 solar-arc table source checksum mismatch")
     return cast(Dict[str, Any], json.loads(raw))
 
 
-def normalized_rows(record: Dict[str, Any]) -> list[dict[str, Any]]:
+def normalized_rows(record: dict[str, Any]) -> list[dict[str, Any]]:
     """Carry legible explicit degrees; an unclear marker invalidates that carry."""
     ages = record["age_columns_years"]
     unclear = {(r["row"], r["age_years"]) for r in record["unresolved_degree_marker"]}
@@ -71,10 +71,10 @@ def _coordinate(value: int | float | Fraction) -> Fraction:
 
 
 def interpolate(
-    record: Dict[str, Any],
+    record: dict[str, Any],
     day_offset: int | float | Fraction,
     age_years: int | float | Fraction,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Interpolate numeric axes only; preserve positive-weight unknown corners.
 
     day_offset0 is printed January1; offset370 is the following January6.
@@ -130,13 +130,13 @@ def interpolate(
     }
 
 
-def _fraction(probe: Dict[str, Any]) -> Fraction:
+def _fraction(probe: dict[str, Any]) -> Fraction:
     if probe["status"] != "computed":
         raise RuntimeError("Printed worked example has unresolved source corners")
     return Fraction(*probe["arcminutes_fraction"])
 
 
-def source_table_analysis() -> Dict[str, Any]:
+def source_table_analysis() -> dict[str, Any]:
     """Retain every raw cell and replay the author's staged worked example."""
     record = load_table()
     rows = normalized_rows(record)

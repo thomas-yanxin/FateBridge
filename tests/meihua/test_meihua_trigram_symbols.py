@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.meihua_trigram_symbols import (
+from fatebridge.core.meihua.meihua_trigram_symbols import (
     _layer,
     apply_trigram_relation_symbols,
     trigram_symbols_ruleset,
@@ -27,7 +27,7 @@ def calculate(code="010111", line=4, **kwargs):
     )
 
 
-def test_source_profile_is_exactly_the_preimplementation_visual_reference():
+def test_source_profile_is_exactly_the_preimplementation_visual_reference() -> None:
     expected = json.loads((FIXTURE / "profile.json").read_text())
     freeze = json.loads((FIXTURE / "reference-freeze.json").read_text())
     assert not freeze["new_module_present"]
@@ -52,13 +52,15 @@ def test_source_profile_is_exactly_the_preimplementation_visual_reference():
     assert trigram_symbols_ruleset() == expected
 
 
-def test_packaged_reference_bundle_retains_every_original_frozen_file():
+def test_packaged_reference_bundle_retains_every_original_frozen_file() -> None:
     manifest = json.loads((FIXTURE / "manifest.json").read_text())
     assert manifest["source_and_geometry_frozen_before_production"]
     assert manifest["fixture_packaged_after_implementation"]
     for name, expected in manifest["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert (
             hashlib.sha256((FIXTURE / "references" / name).read_bytes()).hexdigest()
             == expected
@@ -68,7 +70,7 @@ def test_packaged_reference_bundle_retains_every_original_frozen_file():
 @pytest.mark.parametrize(
     "case", GEOMETRY, ids=lambda c: c["code"] + ":" + str(c["line"])
 )
-def test_all_384_frozen_geometries_select_actual_role_and_literal_source(case):
+def test_all_384_frozen_geometries_select_actual_role_and_literal_source(case) -> None:
     result = calculate(case["code"], case["line"])
     layer = result["interpretation"]["trigram_relation_symbols"]["selected"]
     assert layer["body"] == case["body"]
@@ -96,7 +98,7 @@ def test_all_384_frozen_geometries_select_actual_role_and_literal_source(case):
         assert not actual["real_person_or_event_inferred"]
 
 
-def test_all_sixteen_rules_reached_and_same_element_never_substitutes_trigram():
+def test_all_sixteen_rules_reached_and_same_element_never_substitutes_trigram() -> None:
     ids = {r["expected_clause_id"] for c in GEOMETRY for r in c["rows"]} - {None}
     assert ids == {r["id"] for r in trigram_symbols_ruleset()["rules"]}
     qian = calculate("010111", 4)["interpretation"]["trigram_relation_symbols"][
@@ -112,7 +114,9 @@ def test_all_sixteen_rules_reached_and_same_element_never_substitutes_trigram():
     assert qian["quote"] != dui["quote"]
 
 
-def test_printed_south_and_other_variants_are_not_corrected_from_common_tables():
+def test_printed_south_and_other_variants_are_not_corrected_from_common_tables() -> (
+    None
+):
     profile = trigram_symbols_ruleset()
     rules = {r["id"]: r for r in profile["rules"]}
     assert "謀事乃南方之人" in rules["xun_controls_body"]["quote"]
@@ -128,7 +132,7 @@ def test_printed_south_and_other_variants_are_not_corrected_from_common_tables()
 @pytest.mark.parametrize("branch", [None, *"子丑寅卯辰巳午未申酉戌亥"])
 def test_strength_unknown_and_direct_control_remain_qualifications_not_raw_rule_erasure(
     branch,
-):
+) -> None:
     for code, line in [("010111", 4), ("100010", 2), ("110011", 3)]:
         p = calculate(code, line, season_month_branch=branch)
         layer = p["interpretation"]["trigram_relation_symbols"]["selected"]
@@ -144,19 +148,14 @@ def test_strength_unknown_and_direct_control_remain_qualifications_not_raw_rule_
                 else row["strength"] in ["旺", "衰", "原文未定"]
             )
             assert row["effective_net_imagery"] is None
-        assert (
-            layer["net_verdict"]
-            is layer["event_time"]
-            is layer["success_probability"]
-            is None
-        )
+        assert layer["net_verdict"] is layer["event_time"] is None
 
 
 @pytest.mark.parametrize(
     "topic",
     ["general", "planning", "reputation", "wealth", "transaction", "travel", "meeting"],
 )
-def test_every_count_candidate_owns_its_body_and_fact_paths(topic):
+def test_every_count_candidate_owns_its_body_and_fact_paths(topic: str) -> None:
     p = calculate_meihua_cast(
         casting={
             "method": "sound_groups",
@@ -184,7 +183,7 @@ def test_every_count_candidate_owns_its_body_and_fact_paths(topic):
             assert resolve(p, v["strength_fact_path"]) == v["strength"]
 
 
-def test_no_match_does_not_activate_ambiguous_closing_clause_or_infer_absence():
+def test_no_match_does_not_activate_ambiguous_closing_clause_or_infer_absence() -> None:
     p = next(
         c for c in GEOMETRY if all(r["expected_clause_id"] is None for r in c["rows"])
     )
@@ -196,13 +195,13 @@ def test_no_match_does_not_activate_ambiguous_closing_clause_or_infer_absence():
     assert "不反推" in layer["summary"]
 
 
-def test_weather_uses_no_human_body_use_symbols():
+def test_weather_uses_no_human_body_use_symbols() -> None:
     p = calculate(interpretation_topic="weather", weather_context={"season": "winter"})
     assert p["interpretation"]["trigram_relation_symbols"] is None
 
 
 @pytest.mark.parametrize("part", ["control", "strength", "stage_order"])
-def test_cross_cast_qualifications_are_rejected(part):
+def test_cross_cast_qualifications_are_rejected(part: str) -> None:
     p = calculate()
     cast = p["meihua"]
     interpretation = p["interpretation"]
@@ -225,7 +224,7 @@ def test_cross_cast_qualifications_are_rejected(part):
         )
 
 
-def test_annotator_does_not_mutate_existing_facts_or_summary():
+def test_annotator_does_not_mutate_existing_facts_or_summary() -> None:
     result = calculate()
     cast = copy.deepcopy(result["meihua"])
     before = copy.deepcopy(result["interpretation"])

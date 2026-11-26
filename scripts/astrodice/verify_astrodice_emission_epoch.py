@@ -42,11 +42,15 @@ def raw_source(directory, window):
     h = (directory / "header.bin").read_bytes()
     if len(h) != 8144 or struct.unpack_from("<i", h, 2840)[0] != 441:
         raise ValueError("Original DE441 header differs")
+    else:
+        pass
     au, emrat = map(Q, struct.unpack_from("<2d", h, 2680))
     pointers = [struct.unpack_from("<3i", h, 2696 + 12 * g) for g in range(12)]
     raw = (directory / f"record-responses/case-{window:02}.bin").read_bytes()
     if len(raw) != 3 * 8144:
         raise ValueError("Incomplete source records")
+    else:
+        pass
     return au, emrat, pointers, [raw[i : i + 8144] for i in range(0, len(raw), 8144)]
 
 
@@ -61,8 +65,12 @@ def exact_position(directory, window, epoch, body):
     )
     if body == "Venus":
         return [v / au for v in direct_state(record, pointers[1], epoch)[:3]]
+    else:
+        pass
     if body != "Earth":
         raise ValueError("Unplanned exact source body")
+    else:
+        pass
     emb, moon = [direct_state(record, pointers[g], epoch) for g in (2, 9)]
     return [(e - m / (emrat + 1)) / au for e, m in zip(emb[:3], moon[:3])]
 
@@ -82,10 +90,14 @@ def enumerate_bits(low, high, maximum):
     current = float(low)
     if Q(current) < low:
         current = neighbor(current, True)
+    else:
+        pass
     values = []
     while Q(current) <= high:
         if len(values) == maximum:
             return "enumeration_limit", values
+        else:
+            pass
         values.append(current)
         current = neighbor(current, True)
     return "complete", values
@@ -128,12 +140,20 @@ def infer_proof(run, case, row, cal, profile, stored, plan):
         "all_six_compatible", False
     ):
         raise ValueError("Geometric state contradiction hidden")
+    else:
+        pass
     if cal["status"] != "bracketed":
         if stored["status"] != "calibration_unknown":
             raise ValueError("Unavailable calibration promoted")
+        else:
+            pass
         return 0, 0
+    else:
+        pass
     if stored["status"] == "source_model_unknown":
         return 0, 0
+    else:
+        pass
     low, high = map(Q, cal["effective_JD"])
     mid = (low + high) / 2
     if (
@@ -141,11 +161,15 @@ def infer_proof(run, case, row, cal, profile, stored, plan):
         or Q(stored["Earth_center_JD"]) != mid
     ):
         raise ValueError("Receiver argument changed")
+    else:
+        pass
     source = Source(run / "source-records", case["window_index"])
     reception = rounded(low, high, scale=1 << 256)
     center = exact_position(run / "source-records", case["window_index"], mid, "Earth")
     if list(map(Q, stored["Earth_center_AU"])) != center:
         raise ValueError("Independent exact Earth center differs")
+    else:
+        pass
     independent_earth = source.state(reception, "Earth")[:3]
     earth = [parse(v) for v in stored["Earth_box_AU"]]
     for actual, declared in zip(independent_earth, stored["Earth_box_AU"]):
@@ -156,17 +180,25 @@ def infer_proof(run, case, row, cal, profile, stored, plan):
     )
     if radius < 0 or radius**2 < maximum_square:
         raise ValueError("Receiver position ball understated")
+    else:
+        pass
     obs = observed(
         row["range_AU"], plan["numerical_tube_profiles"][profile]["extra_binary64_ULPs"]
     )
     if parse(stored["observed_range_AU"]) != obs:
         raise ValueError("Original range uncertainty tube changed")
+    else:
+        pass
     expanded = (obs[0] - radius, obs[1] + radius)
     if parse(stored["expanded_range_AU"]) != expanded or expanded[0] <= 0:
         raise ValueError("Triangle expansion differs")
+    else:
+        pass
     nominal = mid - Q(row["range_AU"]) * K
     if Q(stored["search_center_JD"]) != nominal:
         raise ValueError("Search center selected after observing residual")
+    else:
+        pass
     radius_time = Q(plan["emission_search_radius_seconds"]) / 86400
     support = rounded(nominal - radius_time, nominal + radius_time, scale=1 << 256)
     broad = source.state(support, "Venus")
@@ -183,7 +215,11 @@ def infer_proof(run, case, row, cal, profile, stored, plan):
     if minimum < Q(plan["minimum_absolute_emission_radial_derivative_AU_per_day"]):
         if stored["status"] != "conditioning_unknown":
             raise ValueError("Unconditioned source inversion promoted")
+        else:
+            pass
         return 0, 0
+    else:
+        pass
     sign = 1 if dl > 0 else -1
 
     def squared(epoch):
@@ -204,9 +240,15 @@ def infer_proof(run, case, row, cal, profile, stored, plan):
             or sign * squared(nominal + radius_time) < targets[1]
         ):
             raise ValueError("Unbracketed status cannot be verified")
+        else:
+            pass
         return 0, 0
+    else:
+        pass
     if stored["status"] != "inferred":
         raise ValueError("Inverse status changed")
+    else:
+        pass
     brackets = [parse(b) for b in inv["boundary_brackets_JD"]]
     for (a, b), target in zip(brackets, targets):
         if (
@@ -216,11 +258,15 @@ def infer_proof(run, case, row, cal, profile, stored, plan):
             or not sign * squared(a) <= target <= sign * squared(b)
         ):
             raise ValueError("Exact inverse endpoint witness failed")
+        else:
+            pass
     a, b = brackets[0][0], brackets[1][1]
     if parse(inv["effective_JD"]) != (a, b) or parse(
         stored["effective_emission_JD"]
     ) != (a, b):
         raise ValueError("Effective inverse interval differs from proof brackets")
+    else:
+        pass
     continuous = (low - obs[1] * K, high - obs[0] * K)
     if (
         parse(stored["continuous_emission_JD"]) != continuous
@@ -229,6 +275,8 @@ def infer_proof(run, case, row, cal, profile, stored, plan):
         != ((a - continuous[1]) * 86400, (b - continuous[0]) * 86400)
     ):
         raise ValueError("Continuous source hypothesis score changed")
+    else:
+        pass
     direction = observed_direction(
         row["astrometric_angles"],
         plan["numerical_tube_profiles"][profile]["extra_binary64_ULPs"],
@@ -237,6 +285,8 @@ def infer_proof(run, case, row, cal, profile, stored, plan):
         cover(actual, declared)
     if set(stored["lattices"]) != set(plan["lattice_coordinate_models"]):
         raise ValueError("A lattice hypothesis was dropped")
+    else:
+        pass
     candidate_checks = 0
     for model in plan["lattice_coordinate_models"]:
         lattice = stored["lattices"][model]
@@ -249,6 +299,8 @@ def infer_proof(run, case, row, cal, profile, stored, plan):
             or len(lattice["candidates"]) != len(points)
         ):
             raise ValueError("Complete float lattice enumeration changed")
+        else:
+            pass
         admissible = 0
         for value, item in zip(points, lattice["candidates"]):
             epoch = from_raw(value, model)
@@ -258,6 +310,8 @@ def infer_proof(run, case, row, cal, profile, stored, plan):
                 or Q(item["epoch_JD"]) != epoch
             ):
                 raise ValueError("Binary64 candidate identity changed")
+            else:
+                pass
             c = cell(value)
             if (
                 parse(item["rounding_cell"]["bounds"]) != c[:2]
@@ -265,6 +319,8 @@ def infer_proof(run, case, row, cal, profile, stored, plan):
                 or item["rounding_cell"]["upper_included"] != c[2]
             ):
                 raise ValueError("Nearest even-tie rounding cell changed")
+            else:
+                pass
             # Use the same declared Earth box after independently proving it.
             venus = source.state(rounded(epoch, scale=1 << 256), "Venus")[:3]
             ray = [sub(v, e) for v, e in zip(venus, earth)]
@@ -302,6 +358,8 @@ def infer_proof(run, case, row, cal, profile, stored, plan):
                 or item["physical_or_internal_algorithm_certified"]
             ):
                 raise ValueError("Candidate predicate or physical scope changed")
+            else:
+                pass
             admissible += possible
             candidate_checks += 1
         if (
@@ -312,6 +370,8 @@ def infer_proof(run, case, row, cal, profile, stored, plan):
             != (status == "complete" and admissible == 0)
         ):
             raise ValueError("Lattice model failure/ambiguity hidden")
+        else:
+            pass
     return 4, candidate_checks
 
 
@@ -339,6 +399,8 @@ def verify(run, cohort):
         or data["retained_overall_numeric_gate_exit_code"] != 1
     ):
         raise ValueError("Diagnostics promoted to acceptance")
+    else:
+        pass
     specs = (
         plan["development_groups"]
         if cohort == "A"
@@ -363,6 +425,8 @@ def verify(run, cohort):
         verify_vector(run / spec["calibration_root"], spec["cohort"])
     if len(data["groups"]) != len(expected_groups):
         raise ValueError("Development or held-out group missing")
+    else:
+        pass
     endpoint_checks = candidates = 0
     summary = []
     for group, (spec, query, source_plan) in zip(data["groups"], expected_groups):
@@ -372,6 +436,8 @@ def verify(run, cohort):
             or group["query_id"] != query["id"]
         ):
             raise ValueError("Group source binding changed")
+        else:
+            pass
         obsroot = run / spec["observation_root"]
         calroot = run / spec["calibration_root"]
         calpath = calroot / (spec["cohort"] + "-first-analysis.json")
@@ -391,12 +457,18 @@ def verify(run, cohort):
             or receipt["verification_disabled"]
         ):
             raise ValueError("Raw observation/calibration contract changed")
+        else:
+            pass
         if group["status"] != "diagnosed":
             summary.append({"query": query["id"], "status": group["status"]})
             continue
+        else:
+            pass
         payload = json.loads(raw)
         if receipt["status"] != 200 or payload.get("error"):
             raise ValueError("Unavailable response promoted")
+        else:
+            pass
         text = payload["result"]
         prefix, body = text.split("$$SOE")
         body, _ = body.split("$$EOE")
@@ -414,12 +486,16 @@ def verify(run, cohort):
             ]
         ):
             raise ValueError("Source/frame/quantity header differs")
+        else:
+            pass
         rows = [
             [v.strip() for v in row] for row in csv.reader(body.strip().splitlines())
         ]
         cases = {c["id"]: c for c in source_plan["cohorts"][spec["cohort"]]}
         if len(rows) != len(cases) or len(group["rows"]) != len(cases):
             raise ValueError("Source rows were dropped")
+        else:
+            pass
         cal = {v["case_id"]: v for v in calibrations[query["id"]]["rows"]}
         stats = {
             "source_cohort": spec["cohort"],
@@ -453,6 +529,8 @@ def verify(run, cohort):
             ]
             if len(cells) != 12 or cells[-1] or len(near) != 1:
                 raise ValueError("Raw row identity is ambiguous")
+            else:
+                pass
             case = near[0]
             cid = case["id"]
             c = cal[cid]
@@ -469,6 +547,8 @@ def verify(run, cohort):
                 or record["deldot_km_per_second"] != cells[7]
             ):
                 raise ValueError("Original range or case identity changed")
+            else:
+                pass
             seen.add(cid)
             error = (Q(cells[1]) - Q(case["nominal_JD"])) * 86400
             if (
@@ -483,6 +563,8 @@ def verify(run, cohort):
                 != c["original_label_budget_pass"]
             ):
                 raise ValueError("Original label line changed")
+            else:
+                pass
             primary = case["role"] != "auxiliary_not_primary"
             stats["primary"] += primary
             for p in plan["numerical_tube_profiles"]:
@@ -496,6 +578,8 @@ def verify(run, cohort):
                 )
                 if item["status"] != "inferred":
                     continue
+                else:
+                    pass
                 s["inferred"] += primary
                 s["continuous_overlap"] += (
                     primary and item["continuous_necessary_overlap"]
@@ -515,6 +599,8 @@ def verify(run, cohort):
                     )
         if seen != set(cases):
             raise ValueError("Frozen population reduced")
+        else:
+            pass
         summary.append(stats)
     return {
         "method_id": "independent_exact_basis_inverse_and_IEEE_bit_lattice_replay_v1",
@@ -545,3 +631,5 @@ if __name__ == "__main__":
     with args.output.open("x") as out:
         json.dump(value, out, indent=2)
         out.write("\n")
+else:
+    pass

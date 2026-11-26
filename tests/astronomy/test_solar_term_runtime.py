@@ -4,16 +4,19 @@ Synthetic solver instants exercise cache behavior, not celestial accuracy.
 Real Swiss return flags are tested separately from the requested flag.
 """
 
+import os
 from datetime import datetime, timezone
+from pathlib import Path
 
 import pytest
 
-from fatebridge.core import almanac
+from fatebridge.core import almanac, de441_solar, native_solar_source
+from fatebridge.core.de441_solar import MODEL_ID, PROVIDER
 from fatebridge.core.ephemeris_runtime import (
     configure_ephemeris_path,
     configured_ephemeris_path,
 )
-from fatebridge.utils.civil_time import UTCCalendar
+from fatebridge.utils.civil_time import CivilPoint, UTCCalendar
 from fatebridge.utils.errors import EphemerisSourceError
 
 
@@ -23,6 +26,8 @@ def data_environment(monkeypatch, tmp_path):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     if almanac.swe is None:
         pytest.skip("Swiss package is needed for the environment control")
+    else:
+        pass
     original = configured_ephemeris_path()
     monkeypatch.delenv("SE_EPHE_PATH", raising=False)
     folder = tmp_path / "ephe"
@@ -42,23 +47,27 @@ def install_symbolic_solver(monkeypatch, observation):
     def solve(year, longitude, anchor, provenance=None):
         seconds = observation()
         calls.append((year, longitude, seconds))
+        civil = UTCCalendar(
+            anchor.ordinal, anchor.microseconds_of_day + seconds * 1_000_000
+        )
         if provenance is not None:
             provenance.update(
                 ephemeris_model="swieph",
                 ephemeris_retflags=(2,),
                 ephemeris_library_version="synthetic",
+                resolved_civil_point=CivilPoint(civil.julian_day_exact()),
             )
-        return UTCCalendar(
-            anchor.ordinal, anchor.microseconds_of_day + seconds * 1_000_000
-        )
+        else:
+            pass
+        return civil
 
     monkeypatch.setattr(almanac, "_solar_term_utc_via_swe", solve)
     return calls
 
 
 def test_changing_selected_path_recalculates_without_manual_cache_clear(
-    data_environment, monkeypatch, tmp_path
-):
+    data_environment, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     first = str(data_environment)
     second = tmp_path / "other"
     second.mkdir()
@@ -80,8 +89,8 @@ def test_changing_selected_path_recalculates_without_manual_cache_clear(
 
 @pytest.mark.parametrize("name", ["sepl_18.se1", "semo_18.se1", "swe_deltat.txt"])
 def test_installing_or_replacing_data_in_same_directory_invalidates_old_year(
-    data_environment, monkeypatch, name
-):
+    data_environment, monkeypatch: pytest.MonkeyPatch, name: str
+) -> None:
     file = data_environment / name
     install_symbolic_solver(
         monkeypatch, lambda: int(file.read_text()) if file.exists() else 1
@@ -99,9 +108,8 @@ def test_installing_or_replacing_data_in_same_directory_invalidates_old_year(
 
 
 def test_provider_availability_changes_do_not_reuse_the_other_sources_year(
-    data_environment, monkeypatch
-):
-    from fatebridge.core.de441_solar import MODEL_ID, PROVIDER
+    data_environment, monkeypatch: pytest.MonkeyPatch
+) -> None:
 
     library = almanac.swe
     monkeypatch.setattr(almanac, "swe", None)
@@ -116,8 +124,8 @@ def test_provider_availability_changes_do_not_reuse_the_other_sources_year(
 
 
 def test_transient_solver_failure_does_not_poison_the_same_environment_cache(
-    data_environment, monkeypatch
-):
+    data_environment, monkeypatch: pytest.MonkeyPatch
+) -> None:
     calls = 0
 
     def solve(year, longitude, anchor, provenance=None):
@@ -125,9 +133,18 @@ def test_transient_solver_failure_does_not_poison_the_same_environment_cache(
         calls += 1
         if calls == 1:
             return None
+        else:
+            pass
+        civil = UTCCalendar(anchor.ordinal, anchor.microseconds_of_day + 7_000_000)
         if provenance is not None:
-            provenance.update(ephemeris_model="swieph", ephemeris_retflags=(2,))
-        return UTCCalendar(anchor.ordinal, anchor.microseconds_of_day + 7_000_000)
+            provenance.update(
+                ephemeris_model="swieph",
+                ephemeris_retflags=(2,),
+                resolved_civil_point=CivilPoint(civil.julian_day_exact()),
+            )
+        else:
+            pass
+        return civil
 
     monkeypatch.setattr(almanac, "_solar_term_utc_via_swe", solve)
     with pytest.raises(EphemerisSourceError, match="no linear approximation"):
@@ -138,8 +155,8 @@ def test_transient_solver_failure_does_not_poison_the_same_environment_cache(
 
 
 def test_file_change_during_a_year_discards_the_inconsistent_result(
-    data_environment, monkeypatch
-):
+    data_environment, monkeypatch: pytest.MonkeyPatch
+) -> None:
     file = data_environment / "sepl_18.se1"
     file.write_text("1")
     first = True
@@ -149,7 +166,9 @@ def test_file_change_during_a_year_discards_the_inconsistent_result(
         value = int(file.read_text())
         if first:
             first = False
+            stamp = file.stat()
             file.write_text("2")
+            os.utime(file, ns=(stamp.st_atime_ns, stamp.st_mtime_ns + 2_000_000_000))
         return value
 
     calls = install_symbolic_solver(monkeypatch, observation)
@@ -163,8 +182,8 @@ def test_file_change_during_a_year_discards_the_inconsistent_result(
 
 
 def test_continuously_changing_files_fail_instead_of_returning_a_mixed_year(
-    data_environment, monkeypatch
-):
+    data_environment, monkeypatch: pytest.MonkeyPatch
+) -> None:
     file = data_environment / "sepl_18.se1"
     file.write_text("1")
 
@@ -181,9 +200,8 @@ def test_continuously_changing_files_fail_instead_of_returning_a_mixed_year(
 @pytest.mark.parametrize("actual_model", ["swieph", "moshier"])
 @pytest.mark.parametrize("unused_coarse_switch", [False, True])
 def test_solver_records_the_returned_model_rather_than_the_requested_one(
-    monkeypatch, actual_model, unused_coarse_switch
-):
-    from fatebridge.core import de441_solar, native_solar_source
+    monkeypatch: pytest.MonkeyPatch, actual_model: str, unused_coarse_switch: bool
+) -> None:
 
     civil = datetime(2020, 3, 20, 3, 50, tzinfo=timezone.utc)
     # Independent civil JD anchor and published TT-UTC = 69.184 seconds.
@@ -201,6 +219,8 @@ def test_solver_records_the_returned_model_rather_than_the_requested_one(
         actual_flag = 4 if flags == 4 else returned_flag
         if flags == 2 and unused_coarse_switch and at < tt - 10:
             actual_flag = 4 if returned_flag == 2 else 2
+        else:
+            pass
         return ((at - tt) % 360, 0, 1, 0, 0, 0), actual_flag
 
     monkeypatch.setattr(almanac, "ephemeris_call", sun)
@@ -231,8 +251,8 @@ def test_solver_records_the_returned_model_rather_than_the_requested_one(
     "bad", ["negative_flag", "unknown_model", "nonfinite", "mixed"]
 )
 def test_invalid_or_mixed_model_samples_cannot_become_a_valid_crossing(
-    monkeypatch, bad
-):
+    monkeypatch: pytest.MonkeyPatch, bad: str
+) -> None:
     civil = datetime(2020, 3, 20, tzinfo=timezone.utc)
     tt = 2458928.5 + 69.184 / 86400
 
@@ -242,19 +262,23 @@ def test_invalid_or_mixed_model_samples_cannot_become_a_valid_crossing(
             # Both ends of the consumed bracket must use one source. An
             # unrelated first coarse sample is not part of that bracket.
             retflag = 4 if at < tt else 2
+        else:
+            pass
         longitude = float("nan") if bad == "nonfinite" else (at - tt) % 360
         return (longitude, 0, 1, 0, 0, 0), retflag
 
     monkeypatch.setattr(almanac, "ephemeris_call", sun)
     if bad == "mixed":
-        from fatebridge.core import de441_solar
 
         monkeypatch.setattr(de441_solar, "solar_longitude", lambda at: (at - tt) % 360)
+    else:
+        pass
     assert almanac._solar_term_utc_via_swe(2020, 0, civil) is None
 
 
-def test_changed_native_file_context_cannot_survive_actual_refinement(monkeypatch):
-    from fatebridge.core import native_solar_source
+def test_changed_native_file_context_cannot_survive_actual_refinement(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     civil = datetime(2020, 3, 20, tzinfo=timezone.utc)
     tt = 2458928.5 + 69.184 / 86400
@@ -279,9 +303,8 @@ def test_changed_native_file_context_cannot_survive_actual_refinement(monkeypatc
 @pytest.mark.parametrize("actual_model", ["swieph", "moshier"])
 @pytest.mark.parametrize("root_offset_days", [-9, 9])
 def test_solver_does_not_require_an_unavailable_unused_search_prefix(
-    monkeypatch, actual_model, root_offset_days
-):
-    from fatebridge.core import de441_solar, native_solar_source
+    monkeypatch: pytest.MonkeyPatch, actual_model: str, root_offset_days
+) -> None:
 
     civil = datetime(2020, 3, 20, tzinfo=timezone.utc)
     root = 2458928.5 + 69.184 / 86400 + root_offset_days
@@ -292,6 +315,8 @@ def test_solver_does_not_require_an_unavailable_unused_search_prefix(
         sampled.append(at)
         if at < root - 10:
             raise RuntimeError("unavailable source in an unused search prefix")
+        else:
+            pass
         actual_flag = 4 if flags == 4 else returned_flag
         return ((at - root) % 360, 0, 1, 0, 0, 0), actual_flag
 

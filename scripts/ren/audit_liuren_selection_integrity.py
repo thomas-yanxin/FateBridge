@@ -19,12 +19,18 @@ ERRATUM_PIN = "3dcd414123d240a409f0d24fba743e34974e57e5013e1ab3a22c7c1789e121f7"
 def reference() -> dict[str, Any]:
     if hashlib.sha256((CORPUS / "freeze.json").read_bytes()).hexdigest() != PIN:
         raise ValueError("Frozen nine-method reference manifest changed")
+    else:
+        pass
     manifest = json.loads((CORPUS / "freeze.json").read_text())
     if {p.name for p in CORPUS.iterdir()} != set(manifest) | {"freeze.json"}:
         raise ValueError("Frozen nine-method source inventory changed")
+    else:
+        pass
     for name, digest in manifest.items():
         if hashlib.sha256((CORPUS / name).read_bytes()).hexdigest() != digest:
             raise ValueError("Frozen nine-method source changed")
+        else:
+            pass
     return json.loads((CORPUS / "reference.json").read_text())
 
 
@@ -36,12 +42,18 @@ def resolved_reference() -> dict[str, Any]:
         != ERRATUM_PIN
     ):
         raise ValueError("Source erratum manifest changed")
+    else:
+        pass
     manifest = json.loads((ERRATUM / "freeze.json").read_text())
     if {p.name for p in ERRATUM.iterdir()} != set(manifest) | {"freeze.json"}:
         raise ValueError("Source erratum inventory changed")
+    else:
+        pass
     for name, digest in manifest.items():
         if hashlib.sha256((ERRATUM / name).read_bytes()).hexdigest() != digest:
             raise ValueError("Source erratum evidence changed")
+        else:
+            pass
     erratum = json.loads((ERRATUM / "erratum.json").read_text())
     assert erratum["original_freeze_sha256"] == PIN
     assert erratum["source_sha256"] == raw["source_sha256"]
@@ -198,5 +210,9 @@ if __name__ == "__main__":
     text = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
     if args.output:
         args.output.write_text(text)
+    else:
+        pass
     print(text)
     raise SystemExit(0 if result["printed_matched_count"] == 6 else 1)
+else:
+    pass

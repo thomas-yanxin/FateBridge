@@ -2,19 +2,40 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List
+from typing import TypedDict
+
+from typing_extensions import NotRequired
 
 from fatebridge.utils.birth_input import PersonInfo
 from fatebridge.utils.civil_clock import format_utc_offset, utc_instant
+from fatebridge.utils.solar_time import NormalizedBirthTime
 from fatebridge.utils.timezones import parse_timezone_name, timezone_rules_metadata
 
-if TYPE_CHECKING:
-    from fatebridge.utils.solar_time import NormalizedBirthTime
+
+class BirthClockReceipt(TypedDict):
+    method_id: str
+    supplied_components: list[str]
+    omitted_components: list[str]
+    calculation_defaults: dict[str, int]
+    nominal_civil_datetime: str
+    corrected_clock_datetime: str
+    timezone: str
+    uncertainty_interval: None
+    observed_precision_certified: bool
+    scope: str
+    requested_utc_offset: NotRequired[str]
+    civil_utc_offset: NotRequired[str]
+    civil_instant_utc: NotRequired[str]
+    civil_fold: NotRequired[int]
+    civil_time_ambiguous: NotRequired[bool]
+    timezone_source: NotRequired[str | None]
+    timezone_rules: NotRequired[dict[str, str]]
+    offset_selection_scope: NotRequired[str]
 
 
 def birth_clock_input_receipt(
     person: PersonInfo, normalized: NormalizedBirthTime
-) -> Dict[str, Any]:
+) -> BirthClockReceipt:
     """Declare old nominal defaults without inventing a recording interval."""
     supplied = ["year", "month", "day", "hour"]
     if "birth_minute" in person.model_fields_set:
@@ -27,7 +48,7 @@ def birth_clock_input_receipt(
     civil = (
         civil.replace(tzinfo=zone) if civil.tzinfo is None else civil.astimezone(zone)
     )
-    receipt: Dict[str, Any] = {
+    receipt: BirthClockReceipt = {
         "method_id": "birth_clock_components_v1",
         "supplied_components": supplied,
         "omitted_components": omitted,
@@ -46,22 +67,22 @@ def birth_clock_input_receipt(
     if person.birth_utc_offset is not None:
         offset = civil.utcoffset()
         assert offset is not None
-        receipt.update(
-            requested_utc_offset=person.birth_utc_offset,
-            civil_utc_offset=format_utc_offset(offset),
-            civil_instant_utc=utc_instant(civil).isoformat(),
-            civil_fold=civil.fold,
-            civil_time_ambiguous=(
-                civil.replace(fold=0).utcoffset() != civil.replace(fold=1).utcoffset()
-            ),
-            timezone_source=normalized.timezone_source,
-            timezone_rules=timezone_rules_metadata(normalized.timezone),
-            offset_selection_scope="偏移只按已解析时区的规则校验并选择实际时刻；不认证出生记录、推断时区或未来规则。",
+        receipt["requested_utc_offset"] = person.birth_utc_offset
+        receipt["civil_utc_offset"] = format_utc_offset(offset)
+        receipt["civil_instant_utc"] = utc_instant(civil).isoformat()
+        receipt["civil_fold"] = civil.fold
+        receipt["civil_time_ambiguous"] = (
+            civil.replace(fold=0).utcoffset() != civil.replace(fold=1).utcoffset()
+        )
+        receipt["timezone_source"] = normalized.timezone_source
+        receipt["timezone_rules"] = timezone_rules_metadata(normalized.timezone)
+        receipt["offset_selection_scope"] = (
+            "偏移只按已解析时区的规则校验并选择实际时刻；不认证出生记录、推断时区或未来规则。"
         )
     return receipt
 
 
-def birth_clock_snapshot_lines(receipt: Dict[str, Any]) -> List[str]:
+def birth_clock_snapshot_lines(receipt: BirthClockReceipt) -> list[str]:
     """Keep source precision visible alongside the nominal chart."""
     omitted = receipt.get("omitted_components", [])
     assumptions = [

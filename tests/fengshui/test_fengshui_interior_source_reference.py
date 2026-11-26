@@ -17,7 +17,9 @@ REFERENCE = json.loads(
 
 
 @pytest.mark.parametrize("reference", REFERENCE["rules"], ids=lambda r: r["id"])
-def test_independent_author_predicates_keep_sources_and_candidate_endpoints(reference):
+def test_independent_author_predicates_keep_sources_and_candidate_endpoints(
+    reference,
+) -> None:
     objects = []
     for endpoint in ("source", "target"):
         role = reference[f"{endpoint}_role"]
@@ -64,6 +66,8 @@ def test_independent_author_predicates_keep_sources_and_candidate_endpoints(refe
         assert reference["separate_dissent"] in {
             d["source_id"] for d in finding["method_disagreements"]
         }
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
@@ -76,12 +80,14 @@ def test_independent_author_predicates_keep_sources_and_candidate_endpoints(refe
 )
 def test_all_element_pairs_match_independently_read_afsi_cycle_diagrams(
     introduced, target, expected
-):
+) -> None:
     assert _effect(introduced, target) == expected
 
 
 @pytest.mark.parametrize("direction,goal", [("N", "drain"), ("W", "support")])
-def test_afsi_water_candidate_keeps_clean_and_moving_source_qualifiers(direction, goal):
+def test_afsi_water_candidate_keeps_clean_and_moving_source_qualifiers(
+    direction: str, goal: str
+) -> None:
     result = assess(
         methods=["annual_stars"],
         effective_year=2026,
@@ -105,7 +111,9 @@ def test_afsi_water_candidate_keeps_clean_and_moving_source_qualifiers(direction
     )
 
 
-def test_bed_headboard_adjustment_cites_the_author_who_explicitly_describes_it():
+def test_bed_headboard_adjustment_cites_the_author_who_explicitly_describes_it() -> (
+    None
+):
     result = assess(
         methods=[],
         form_observations=[

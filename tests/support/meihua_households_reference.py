@@ -22,8 +22,12 @@ def assert_candidate_chapter_summary(row):
     qualification = clause.get("chapter_qualifications")
     if qualification:
         assert qualification["summary"] in text
+    else:
+        pass
     if clause["topic"] == "wealth":
         assert row["wealth_components"]["summary"] in text
+    else:
+        pass
 
 
 def validate(result, topic):
@@ -80,6 +84,8 @@ def validate(result, topic):
             assert (
                 "same_element_not_automatic_favorable_clause" in clause["semantic_tags"]
             )
+        else:
+            pass
         reference = qualification["household_support_reference"]
         if topic == "household":
             assert reference["quote"] == "如有生體之卦即以前章人事占斷之"
@@ -106,9 +112,4 @@ def validate(result, topic):
             "real_outcome",
         ):
             assert qualification[key] is None
-        assert (
-            clause["event_time"]
-            is clause["success_probability"]
-            is clause["real_outcome_verdict"]
-            is None
-        )
+        assert clause["event_time"] is clause["real_outcome_verdict"] is None

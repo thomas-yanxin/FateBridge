@@ -2,12 +2,13 @@
 
 import math
 from datetime import timedelta
+from pathlib import Path
 
 import pytest
 
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish import build_india, positions
-from fatebridge.core.jyotish_strength import degree_condition
+from fatebridge.core.jyotish.jyotish import build_india, positions
+from fatebridge.core.jyotish.jyotish_strength import degree_condition
 from tests.fixtures.surface_payloads import astro_payload
 
 
@@ -24,8 +25,8 @@ from tests.fixtures.surface_payloads import astro_payload
     ],
 )
 def test_bphs_3_49_50_and_27_1_independent_peak_and_quadrature_table(
-    planet, peak, fall
-):
+    planet: str, peak: int, fall: int
+) -> None:
     # Hand-transcribed source table; not imported from production PEAKS.
     assert degree_condition(planet, peak)["uchcha_bala"]["value"] == 60
     assert degree_condition(planet, fall)["uchcha_bala"]["value"] == 0
@@ -52,8 +53,8 @@ def test_bphs_3_49_50_and_27_1_independent_peak_and_quadrature_table(
     ],
 )
 def test_bphs_3_51_54_moolatrikona_has_explicit_half_open_boundaries(
-    planet, start, end
-):
+    planet: str, start: int, end: int
+) -> None:
     assert degree_condition(planet, start)["degree_zone"] == "moolatrikona"
     assert (
         degree_condition(planet, math.nextafter(end, -math.inf))["degree_zone"]
@@ -66,7 +67,7 @@ def test_bphs_3_51_54_moolatrikona_has_explicit_half_open_boundaries(
     )
 
 
-def test_mercury_peak_and_zone_are_distinct_and_not_collapsed_to_one_rank():
+def test_mercury_peak_and_zone_are_distinct_and_not_collapsed_to_one_rank() -> None:
     before = degree_condition("Mercury", math.nextafter(165, -math.inf))
     at = degree_condition("Mercury", 165)
     assert before["degree_zone"] == "exaltation_portion"
@@ -82,7 +83,9 @@ def test_mercury_peak_and_zone_are_distinct_and_not_collapsed_to_one_rank():
         (1, ["mrita", "vriddha", "yuva", "kumara", "bala"]),
     ],
 )
-def test_bphs_45_3_baladi_odd_even_order_and_each_six_degree_boundary(sign, states):
+def test_bphs_45_3_baladi_odd_even_order_and_each_six_degree_boundary(
+    sign: int, states
+) -> None:
     for part, state in enumerate(states):
         boundary = sign * 30 + part * 6
         assert degree_condition("Sun", boundary)["baladi_avastha"]["state"] == state
@@ -93,22 +96,24 @@ def test_bphs_45_3_baladi_odd_even_order_and_each_six_degree_boundary(sign, stat
                 ]["state"]
                 == states[part - 1]
             )
+        else:
+            pass
 
 
 @pytest.mark.parametrize(
     "planet,longitude", [("Rahu", 20), ("Ketu", 20), ("Sun", float("nan"))]
 )
 def test_unregistered_node_doctrines_and_nonfinite_angles_are_rejected(
-    planet, longitude
-):
+    planet: str, longitude
+) -> None:
     with pytest.raises(ValueError):
         degree_condition(planet, longitude)
 
 
 @pytest.mark.native_engine_fault
 def test_actual_backend_is_per_body_and_strict_policy_rejects_empty_data_path(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     from fatebridge.core import ephemeris_runtime
 
     # Set the actual shared native configuration, not one module's imported
@@ -132,7 +137,7 @@ def test_actual_backend_is_per_body_and_strict_policy_rejects_empty_data_path(
         positions(birth, ephemeris_policy="require_data_files")
 
 
-def test_physical_states_remain_d1_only_and_topic_facts_match_actual_paths():
+def test_physical_states_remain_d1_only_and_topic_facts_match_actual_paths() -> None:
     birth = build_astro_birth_info(**astro_payload())
     india = build_india(birth)
     for name, chart in india["charts"].items():
@@ -143,12 +148,16 @@ def test_physical_states_remain_d1_only_and_topic_facts_match_actual_paths():
                     point["physical_state"]["combustion"]["source_layer"]
                     == "translator_commentary"
                 )
+            else:
+                pass
     checked = 0
     ashtakavarga_checked = 0
     for topic in india["topic_evidence"].values():
         for factor in topic["factors"]:
             if "fact_path" not in factor:
                 continue
+            else:
+                pass
             value = {"india": india}
             for key in factor["fact_path"].split("."):
                 value = value[int(key)] if isinstance(value, list) else value[key]
@@ -161,7 +170,7 @@ def test_physical_states_remain_d1_only_and_topic_facts_match_actual_paths():
     assert ashtakavarga_checked == 5  # D1 plus the requested D9/D10 themes.
 
 
-def test_native_longitude_speed_matches_independent_centered_time_difference():
+def test_native_longitude_speed_matches_independent_centered_time_difference() -> None:
     birth = build_astro_birth_info(**astro_payload())
     raw = positions(birth)
     before = positions(birth, birth.utc_datetime - timedelta(seconds=60))
@@ -175,7 +184,7 @@ def test_native_longitude_speed_matches_independent_centered_time_difference():
         )
 
 
-def test_strict_policy_is_shared_by_all_indian_request_models():
+def test_strict_policy_is_shared_by_all_indian_request_models() -> None:
     from fatebridge.services.tool_catalog import CATALOG
 
     specs = {s.key: s for s in CATALOG}
@@ -193,14 +202,18 @@ def test_strict_policy_is_shared_by_all_indian_request_models():
                     {**payload, "chart_variant": "guolao_chart"}
                 )
             payload["chart_variant"] = "india_chart"
+        else:
+            pass
         assert (
             specs[key].request_model.model_validate(payload).ephemeris_policy
             == "require_data_files"
         )
 
 
-def test_brihat_jataka_relationship_table_matches_independent_sign_lord_derivation():
-    from fatebridge.core.jyotish_relationships import relationship
+def test_brihat_jataka_relationship_table_matches_independent_sign_lord_derivation() -> (
+    None
+):
+    from fatebridge.core.jyotish.jyotish_relationships import relationship
 
     # Independent derivation from the rule in II.15 and its explanatory note;
     # production uses the separately enumerated II.16-17 table instead.
@@ -246,6 +259,8 @@ def test_brihat_jataka_relationship_table_matches_independent_sign_lord_derivati
         for other in roots:
             if p == other:
                 continue
+            else:
+                pass
             expected = (
                 "neutral"
                 if other in friend_lords & enemy_lords
@@ -254,8 +269,8 @@ def test_brihat_jataka_relationship_table_matches_independent_sign_lord_derivati
             assert relationship(p, other, signs)["natural"] == expected
 
 
-def test_relationship_direction_compound_rule_and_cooccupancy_are_preserved():
-    from fatebridge.core.jyotish_relationships import relationship
+def test_relationship_direction_compound_rule_and_cooccupancy_are_preserved() -> None:
+    from fatebridge.core.jyotish.jyotish_relationships import relationship
 
     signs = {"Sun": 0, "Moon": 0, "Mercury": 1, "Venus": 6, "Saturn": 3}
     assert relationship("Moon", "Mercury", signs)["compound"] == "great_friend"
@@ -270,11 +285,11 @@ def test_relationship_direction_compound_rule_and_cooccupancy_are_preserved():
         relationship("Sun", "Rahu", signs)
 
 
-def test_new_topic_facts_verify_against_the_original_calculation_receipt():
+def test_new_topic_facts_verify_against_the_original_calculation_receipt() -> None:
     from fatebridge.application.execution import execute_tool
     from fatebridge.core.execution_context import ExecutionOptions
     from fatebridge.services.tool_catalog import CATALOG
-    from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
+    from validation.claims import CalculationClaim, verify_calculation_claims
 
     spec = next(s for s in CATALOG if s.key == "astro_india")
     body = execute_tool(
@@ -305,7 +320,7 @@ def test_new_topic_facts_verify_against_the_original_calculation_receipt():
     assert verify_calculation_claims(body, claims)["status"] == "rejected"
 
 
-def test_shared_delta_t_initializes_new_workers_before_the_first_calculation():
+def test_shared_delta_t_initializes_new_workers_before_the_first_calculation() -> None:
     from concurrent.futures import ThreadPoolExecutor
     from threading import Barrier
 
@@ -324,7 +339,7 @@ def test_shared_delta_t_initializes_new_workers_before_the_first_calculation():
             assert 0.0005 < value < 0.001
 
 
-def test_india_rest_works_as_the_first_request_in_a_fresh_process():
+def test_india_rest_works_as_the_first_request_in_a_fresh_process() -> None:
     import subprocess
     import sys
 
@@ -333,7 +348,7 @@ from fastapi.testclient import TestClient
 import fatebridge.api as api
 api._reset_runtime_state_for_tests()
 api.API_KEY_AUTHENTICATOR = api.ApiKeyAuthenticator(header_name='X-API-Key', api_keys={})
-response = TestClient(api.app).post('/api/astro/india', json=PAYLOAD, params={'fields':'india.profile', 'strict_fields':'true', 'include_snapshot_text':'false'})
+response = TestClient(api.app).post('/api/astrology/vedic-chart', json=PAYLOAD, params={'fields':'india.profile', 'strict_fields':'true', 'include_snapshot_text':'false'})
 assert response.status_code == 200, response.text
 assert response.json()['india']['profile']['ruleset_id'] == 'parashari_lahiri_core_v29'
 """.replace("PAYLOAD", repr(astro_payload()))

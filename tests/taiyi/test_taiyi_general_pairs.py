@@ -3,6 +3,7 @@
 import asyncio
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -12,6 +13,7 @@ import fatebridge.api as api
 from fatebridge.application.examples import suggested_fields
 from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_chinese import Taiyi
 from fatebridge.core.metaphysics.taiyi_enclosures import (
     PAIR_PROFILE,
     enclosure_assessment,
@@ -19,16 +21,15 @@ from fatebridge.core.metaphysics.taiyi_enclosures import (
     general_pair_enclosures,
 )
 from fatebridge.core.metaphysics.taiyi_year import assemble_board, cyclic_core
-from fatebridge.core.output_chinese import Taiyi
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_general_pairs import CORPUS, audit
 from tests.support.reference_data import resolve
-from tests.taiyi.test_taiyi_enclosures import transport_payload
-from tests.taiyi.test_taiyi_transports import _same_run_payload
+from tests.support.transports import SPECS, call_calculation
+from tests.unit_test.fixtures.taiyi import same_run_payload, transport_payload
 
 
-def test_all_frozen_source_requirements_and_unresolved_literal_survive():
+def test_all_frozen_source_requirements_and_unresolved_literal_survive() -> None:
     r = audit()
     assert r["independent_worked_cases"] == 2
     assert r["worked_case_numeric_observations"] == 17
@@ -51,8 +52,8 @@ def test_all_frozen_source_requirements_and_unresolved_literal_survive():
 @pytest.mark.parametrize("step", [-1, 1])
 @pytest.mark.parametrize("offset", [1, 2, 3])
 def test_every_bearing_direction_and_unequal_intercalary_distance(
-    camp, start, step, offset
-):
+    camp: str, start, step, offset: int
+) -> None:
     # Independently declared physical order, not imported from the algorithm.
     physical = "子丑艮寅卯辰巽巳午未坤申酉戌乾亥"
     principals = [
@@ -91,7 +92,7 @@ def test_every_bearing_direction_and_unequal_intercalary_distance(
 
 
 @pytest.mark.parametrize("endpoint", [1, 5, 6, 7, 8, 9])
-def test_no_center_same_opposite_long_arc_or_cross_side_pair(endpoint):
+def test_no_center_same_opposite_long_arc_or_cross_side_pair(endpoint: int) -> None:
     core = {
         "taiyi_palace": "子",
         "wenchang_palace": "中",
@@ -104,7 +105,7 @@ def test_no_center_same_opposite_long_arc_or_cross_side_pair(endpoint):
     assert general_pair_enclosures(core) == []
 
 
-def test_same_side_eye_is_outside_adjudicated_target_policy():
+def test_same_side_eye_is_outside_adjudicated_target_policy() -> None:
     core = {
         "taiyi_palace": "中",
         "wenchang_palace": "子",
@@ -117,7 +118,7 @@ def test_same_side_eye_is_outside_adjudicated_target_policy():
     assert general_pair_enclosures(core) == []
 
 
-def test_yang19_does_not_collapse_shen_to_kun_or_demand_midpoint():
+def test_yang19_does_not_collapse_shen_to_kun_or_demand_midpoint() -> None:
     board = board_for_ju(19)
     found = [
         p
@@ -134,7 +135,7 @@ def test_yang19_does_not_collapse_shen_to_kun_or_demand_midpoint():
     }
 
 
-def test_each_new_assessment_leaf_projects_and_all_facts_resolve():
+def test_each_new_assessment_leaf_projects_and_all_facts_resolve() -> None:
     board = board_for_ju(2)
     assessment = board["enclosure_assessment"]
     assert assessment["two_general_enclosure"]["present"]
@@ -142,6 +143,8 @@ def test_each_new_assessment_leaf_projects_and_all_facts_resolve():
         if p.get("relation_profile") == PAIR_PROFILE:
             for fact in p["basis"]:
                 assert resolve(board, fact["field"]) == fact["value"]
+        else:
+            pass
 
     def leaves(value, path):
         if isinstance(value, dict) and value:
@@ -155,7 +158,9 @@ def test_each_new_assessment_leaf_projects_and_all_facts_resolve():
         Taiyi.model_validate(projected["taiyi"])
 
 
-def test_missing_core_is_unknown_and_all_144_components_keep_same_board_facts_and_text():
+def test_missing_core_is_unknown_and_all_144_components_keep_same_board_facts_and_text() -> (
+    None
+):
     unknown = enclosure_assessment([])
     assert unknown["two_general_enclosure"]["present"] is None
     assert unknown["two_general_enclosure"]["status"] == "not_assessed"
@@ -193,7 +198,7 @@ def board_for_ju(ju):
         "alter_name_proof",
     ],
 )
-def test_source_cases_cannot_be_removed_or_replaced(tmp_path, kind):
+def test_source_cases_cannot_be_removed_or_replaced(tmp_path: Path, kind: str) -> None:
     d = tmp_path / "corpus"
     shutil.copytree(CORPUS, d)
     if kind == "alter_image":
@@ -218,8 +223,12 @@ def test_source_cases_cannot_be_removed_or_replaced(tmp_path, kind):
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 @pytest.mark.parametrize("year", [1913, 1926, 1930])
 def test_actual_rest_mcp_cli_and_same_run_enclosure_view(
-    key, year, tmp_path, capsys, monkeypatch
-):
+    key: str,
+    year: int,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     payload = transport_payload(key, year)
     fields = ["taiyi.enclosure_assessment", "taiyi.patterns", "taiyi.core_board"]
@@ -241,16 +250,25 @@ def test_actual_rest_mcp_cli_and_same_run_enclosure_view(
         )
     assert response.status_code == 200, response.text
     expected = response.json()
-    args = [key, "--strict-fields", "--no-use-true-solar-time", "--fields", *fields]
+    args = [
+        SPECS[key].tool_name,
+        "--strict-fields",
+        "--no-use-true-solar-time",
+        "--fields",
+        *fields,
+    ]
     for name, value in payload.items():
         if name != "use_true_solar_time":
             args += ["--" + name.replace("_", "-"), str(value)]
+        else:
+            pass
     assert run(args) == 0
     cli = json.loads(capsys.readouterr().out)
 
     async def native():
         async with Client(create_mcp_app()) as client:
-            selected = await client.call_tool(
+            selected = await call_calculation(
+                client,
                 spec.tool_name,
                 {
                     **payload,
@@ -263,7 +281,8 @@ def test_actual_rest_mcp_cli_and_same_run_enclosure_view(
             view = suggested_fields(
                 spec, view="enclosures" if key == "taiyi" else "taiyi_enclosures"
             )
-            first = await client.call_tool(
+            first = await call_calculation(
+                client,
                 spec.tool_name,
                 {
                     **payload,
@@ -273,7 +292,7 @@ def test_actual_rest_mcp_cli_and_same_run_enclosure_view(
                 },
             )
             assert not selected.is_error and not first.is_error
-            full = await _same_run_payload(client, first, require_business_inline=True)
+            full = await same_run_payload(client, first, require_business_inline=True)
             business = {
                 k: v
                 for k, v in first.structured_content.items()

@@ -10,7 +10,7 @@ from __future__ import annotations
 import math
 import sys
 from fractions import Fraction
-from typing import Any, Dict, Mapping, Sequence
+from typing import Any, Mapping, Sequence
 
 RULESET = "witte1924_meridian_ra_placement_v1"
 POLE_NORM_THRESHOLD = 64 * sys.float_info.epsilon
@@ -42,7 +42,7 @@ def _turn(value: Fraction) -> float:
     return min(float(value % 360), math.nextafter(360.0, 0.0))
 
 
-def house_from_ra(right_ascension: float, armc: float) -> Dict[str, Any]:
+def house_from_ra(right_ascension: float, armc: float) -> dict[str, Any]:
     """Half-open30deg sectors, using the actual input floats without cusp bias."""
     _finite(right_ascension)
     _finite(armc)
@@ -61,7 +61,7 @@ def house_from_ra(right_ascension: float, armc: float) -> Dict[str, Any]:
 
 def project_direction(
     longitude: float, latitude: float, obliquity: float
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     for value in (longitude, latitude, obliquity):
         _finite(value)
     if not -90 <= latitude <= 90 or not 0 <= obliquity < 90:
@@ -100,7 +100,7 @@ def project_direction(
 
 def factor_position(
     *, longitude: float, latitude: float, obliquity: float, armc: float
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     _finite(armc)
     direction = project_direction(longitude, latitude, obliquity)
     control = project_direction(longitude, 0.0, obliquity)
@@ -126,7 +126,7 @@ def factor_position(
 
 
 def attach_factor_placement(
-    meridian: Dict[str, Any],
+    meridian: dict[str, Any],
     factors: Sequence[Mapping[str, Any]],
     *,
     factor_ayanamsha: float,

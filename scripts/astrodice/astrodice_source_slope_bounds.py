@@ -12,6 +12,8 @@ from scripts.astrodice.astrodice_clock_interval import I
 def arctangent_bounds(inverse, terms):
     if type(inverse) is not int or inverse <= 1 or type(terms) is not int or terms < 1:
         raise ValueError("Invalid alternating arctangent declaration")
+    else:
+        pass
     total = sum(
         (Q((-1) ** k, (2 * k + 1) * inverse ** (2 * k + 1)) for k in range(terms)), Q()
     )
@@ -28,6 +30,8 @@ def pi_bounds():
 def angular_rate_bounds(direction):
     if len(direction) != 3:
         raise ValueError("Three source direction/derivative components required")
+    else:
+        pass
     x, y, z = direction
     rho2 = x.v.square() + y.v.square()
     rho = rho2.sqrt()

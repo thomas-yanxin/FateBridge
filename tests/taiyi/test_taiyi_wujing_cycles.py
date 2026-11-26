@@ -1,6 +1,7 @@
 """Complete independent source scope, contradictory facts, and unknown names."""
 
 import shutil
+from pathlib import Path
 
 import pytest
 
@@ -13,7 +14,9 @@ from scripts.taiyi.audit_taiyi_wujing_cycles import (
 )
 
 
-def test_complete_cycles_retain_every_target_including_differences_and_unknowns():
+def test_complete_cycles_retain_every_target_including_differences_and_unknowns() -> (
+    None
+):
     report = audit()
     assert report["required_rows"] == report["audited_rows"] == 144
     assert report["required_observations"] == 1440
@@ -31,7 +34,9 @@ def test_complete_cycles_retain_every_target_including_differences_and_unknowns(
     assert report["new_dated_cases"] == 0
 
 
-def test_scan_confirmed_yin_thirteen_count_and_general_are_not_made_consistent():
+def test_scan_confirmed_yin_thirteen_count_and_general_are_not_made_consistent() -> (
+    None
+):
     report = audit()
     row = next(r for r in report["source_rows"] if r["id"] == "yin-13")
     fields = {r["source_observation"]["field"]: r for r in row["comparisons"]}
@@ -44,7 +49,9 @@ def test_scan_confirmed_yin_thirteen_count_and_general_are_not_made_consistent()
     assert report["source_outcomes_applied"] is False
 
 
-def test_eight_gates_delimiter_and_explicit_center_do_not_generate_a_general_from_count():
+def test_eight_gates_delimiter_and_explicit_center_do_not_generate_a_general_from_count() -> (
+    None
+):
     data = source_data()
     row = next(r for r in data["rows"] if r["id"] == "yang-4")
     facts = {o["field"]: o for o in row["observations"]}
@@ -59,7 +66,9 @@ def test_eight_gates_delimiter_and_explicit_center_do_not_generate_a_general_fro
 
 
 @pytest.mark.parametrize("name", ["五德", "大族", "大陽", "太陰", "大昊", "太昊"])
-def test_unadjudicated_names_are_not_corrected_to_fit_runtime_positions(name):
+def test_unadjudicated_names_are_not_corrected_to_fit_runtime_positions(
+    name: str,
+) -> None:
     reference = source_data()["name_reference"]
     value = source_value(
         {"field": "shiji_name", "value": name, "status": "literal_text"}, reference
@@ -67,7 +76,7 @@ def test_unadjudicated_names_are_not_corrected_to_fit_runtime_positions(name):
     assert value["status"] == "not_resolved" and value["value"] is None
 
 
-def test_name_position_comparison_does_not_accept_the_attached_condition():
+def test_name_position_comparison_does_not_accept_the_attached_condition() -> None:
     reference = source_data()["name_reference"]
     value = source_value(
         {"field": "wenchang_name", "value": "陰德主辰迫", "status": "literal_text"},
@@ -78,7 +87,9 @@ def test_name_position_comparison_does_not_accept_the_attached_condition():
     assert value["whole_annotation_conformance_assessed"] is False
 
 
-def test_scan_confirmed_adjacent_repetition_stays_a_diagnostic_without_correction():
+def test_scan_confirmed_adjacent_repetition_stays_a_diagnostic_without_correction() -> (
+    None
+):
     report = audit()
     assert report["adjacent_source_pairs_considered"] == 142
     row = next(
@@ -115,7 +126,9 @@ def test_scan_confirmed_adjacent_repetition_stays_a_diagnostic_without_correctio
         "facsimile-manifest.json",
     ],
 )
-def test_source_text_images_extraction_and_name_reference_remain_frozen(tmp_path, name):
+def test_source_text_images_extraction_and_name_reference_remain_frozen(
+    tmp_path: Path, name: str
+) -> None:
     copied = tmp_path / "corpus"
     shutil.copytree(CORPUS, copied)
     (copied / name).write_bytes(b"changed")

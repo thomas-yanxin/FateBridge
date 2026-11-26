@@ -7,9 +7,11 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.application.examples import suggested_fields
+from fatebridge.core.meihua.meihua_motion import motion_ruleset
 from fatebridge.core.requests.meihua import MeihuaCastRequest
 from fatebridge.services.meihua import calculate_meihua_cast
-from tests.meihua.test_meihua_external import at_path
+from tests.support.reference_data import resolve
 from tests.support.transports import SPECS, business, rest, surface_calls
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_motion_v1"
@@ -24,7 +26,7 @@ TIME = dict(
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_frozen_inner_observer_and_outer_contexts(case):
+def test_frozen_inner_observer_and_outer_contexts(case) -> None:
     out = calculate_meihua_cast(**case["input"])
     assert "error" not in out, out
     layer = out["interpretation"]["motion_context"]
@@ -45,23 +47,23 @@ def test_frozen_inner_observer_and_outer_contexts(case):
     ]
     assert [r["trigram"] for r in roles] == [case["body"], *case["stage_trigrams"]]
     for row in roles:
-        assert at_path(out, row["fact_path"])["name"] == row["trigram"]
+        assert resolve(out, row["fact_path"])["name"] == row["trigram"]
     observer = layer["observer"]
     assert observer["activity"] == case["activity"]
     assert observer["relative_wording"] == case["relative_wording"]
     if case["activity"] is None:
         assert observer["declaration"] is None
     else:
-        assert at_path(out, observer["declaration"]["fact_path"]) == case["activity"]
+        assert resolve(out, observer["declaration"]["fact_path"]) == case["activity"]
     assert len(layer["external_motion"]) == int(case["external_record_present"])
     for row in layer["external_motion"]:
         assert row["motion"] == case["motion"]
         assert row["declaration_status"] == (
             "not_collected" if case["motion"] is None else "caller_reported_unverified"
         )
-        observation = at_path(out, row["reported_fact_path"])
+        observation = resolve(out, row["reported_fact_path"])
         assert observation == case["input"]["external_observations"][0]
-        assert at_path(out, row["qualification_fact_path"])["body"] == case["body"]
+        assert resolve(out, row["qualification_fact_path"])["body"] == case["body"]
         assert row["omen_valence"] is None
         assert [r["full_clause_applies"] for r in row["moving_clauses"]] == (
             [False, False] if case["motion"] == "stationary" else [None, None]
@@ -74,15 +76,16 @@ def test_frozen_inner_observer_and_outer_contexts(case):
     assert layer["independent_verified_observations"] == 0
 
 
-def test_frozen_bytes_and_variant_are_preserved():
+def test_frozen_bytes_and_variant_are_preserved() -> None:
     m = json.loads((FIXTURE / "manifest.json").read_text())
     assert m["implementation_not_present"] and m["request_fields_not_present"]
     assert m["production_generated_expected_values"] is False
     for name, digest in m["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
-    from fatebridge.core.meihua_motion import motion_ruleset
 
     p = motion_ruleset()
     assert p["source"]["transcription_variants"][0]["selected"] == "吉凶之未見也"
@@ -91,7 +94,7 @@ def test_frozen_bytes_and_variant_are_preserved():
 
 
 @pytest.mark.parametrize("value", [True, 0, "", "坐", "driving", {}, []])
-def test_unknown_observer_activity_rejected(value):
+def test_unknown_observer_activity_rejected(value) -> None:
     with pytest.raises(ValidationError):
         MeihuaCastRequest.model_validate(
             {"casting": CASES[0]["input"]["casting"], "observer_activity": value}
@@ -99,7 +102,7 @@ def test_unknown_observer_activity_rejected(value):
 
 
 @pytest.mark.parametrize("value", [True, 0, "", "water", "static", {}, []])
-def test_unknown_external_motion_rejected(value):
+def test_unknown_external_motion_rejected(value) -> None:
     with pytest.raises(ValidationError):
         MeihuaCastRequest.model_validate(
             {
@@ -111,7 +114,7 @@ def test_unknown_external_motion_rejected(value):
         )
 
 
-def test_scenario_raw_relation_and_question_never_supply_omen_valence():
+def test_scenario_raw_relation_and_question_never_supply_omen_valence() -> None:
     for scenario in [None, "favorable_matter", "unfavorable_matter"]:
         out = calculate_meihua_cast(
             casting=CASES[0]["input"]["casting"],
@@ -137,7 +140,7 @@ def test_scenario_raw_relation_and_question_never_supply_omen_valence():
         assert layer["combined_outcome"] is None
 
 
-def test_omitted_activity_and_movement_are_not_read_from_words_or_material():
+def test_omitted_activity_and_movement_are_not_read_from_words_or_material() -> None:
     out = calculate_meihua_cast(
         casting=CASES[0]["input"]["casting"],
         question="我行路时看见流动的水和搬土的人",
@@ -155,7 +158,7 @@ def test_omitted_activity_and_movement_are_not_read_from_words_or_material():
     )
 
 
-def test_count_candidates_keep_own_roles_and_qualified_pair_paths():
+def test_count_candidates_keep_own_roles_and_qualified_pair_paths() -> None:
     out = calculate_meihua_cast(
         casting={
             "method": "sound_groups",
@@ -178,17 +181,17 @@ def test_count_candidates_keep_own_roles_and_qualified_pair_paths():
         layer = candidate["motion_context"]
         assert layer["inner_roles"][0]["trigram"] == candidate["body"]
         for role in layer["inner_roles"]:
-            assert at_path(out, role["fact_path"])["name"] == role["trigram"]
+            assert resolve(out, role["fact_path"])["name"] == role["trigram"]
         row = layer["external_motion"][0]
         assert (
             row["qualification_fact_path"]
             == f"interpretation.casting_readings.{i}.external_omens.observations.0"
         )
-        q = at_path(out, row["qualification_fact_path"])
+        q = resolve(out, row["qualification_fact_path"])
         assert q["body"] == candidate["body"]
         assert row["omen_valence"] is None
     assert (
-        at_path(
+        resolve(
             out,
             rows[1]["motion_context"]["external_motion"][0]["qualification_fact_path"],
         )["qualification"]
@@ -196,7 +199,7 @@ def test_count_candidates_keep_own_roles_and_qualified_pair_paths():
     )
 
 
-def test_weather_excludes_motion_context_and_rejects_observer_activity():
+def test_weather_excludes_motion_context_and_rejects_observer_activity() -> None:
     casting = CASES[0]["input"]["casting"]
     out = calculate_meihua_cast(casting=casting, interpretation_topic="weather")
     assert out["interpretation"]["motion_context"] is None
@@ -207,8 +210,7 @@ def test_weather_excludes_motion_context_and_rejects_observer_activity():
 
 
 @pytest.mark.parametrize("tool", ["meihua_cast", "meihua_analysis"])
-def test_motion_agrees_on_rest_mcp_cli(tool, surface_calls):
-    from fatebridge.application.examples import suggested_fields
+def test_motion_agrees_on_rest_mcp_cli(tool: str, surface_calls) -> None:
 
     spec = SPECS[tool]
     payload = (

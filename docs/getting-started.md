@@ -46,7 +46,7 @@ uv sync --locked --extra dev
 想先验证安装，直接运行 CLI 即可，无需启动 REST：
 
 ```bash
-fatebridge bazi_birth --birth-year 1990 --birth-month 5 --birth-day 15 \
+fatebridge bazi_birth_chart --birth-year 1990 --birth-month 5 --birth-day 15 \
   --birth-hour 10 --birth-minute 30 --gender 男 --birth-place 北京 \
   --birth-timezone Asia/Shanghai \
   --fields bazi_birth.day_master.stem bazi_birth.day_master.element \
@@ -60,7 +60,7 @@ fatebridge bazi_birth --birth-year 1990 --birth-month 5 --birth-day 15 \
 
 ```bash
 fatebridge list
-fatebridge describe bazi_birth --detail input
+fatebridge describe bazi_birth_chart --detail input
 ```
 
 CLI 不自动读取 `.env`，不需要配置 REST 密钥；如果已有进程环境配置，仍会按实际设置运行。
@@ -94,7 +94,7 @@ curl http://localhost:8010/metrics
 保持 REST 进程运行，在另一个终端执行。推荐使用独立八字命盘入口：
 
 ```bash
-curl -X POST http://localhost:8010/api/cn/bazi/birth \
+curl -X POST http://localhost:8010/api/bazi/birth-chart \
   -H "Content-Type: application/json" \
   -d '{
     "name": "张三", "gender": "男",
@@ -107,7 +107,7 @@ curl -X POST http://localhost:8010/api/cn/bazi/birth \
 
 开启鉴权时加 `-H "X-API-Key: replace-me"`。响应业务字段在 `bazi_birth`，包含 `four_pillars`、`day_master` 等；此外还有 `person_info`、`snapshot_text`、`snapshot_export` 和 `run_metadata`。
 
-旧版 `/api/calculate` 已移除。独立命盘使用 `/api/cn/bazi/birth`，综合命理 `analyze_destiny` 使用 MCP / CLI。详情见 [三端能力边界](api-reference.md#24-三端能力边界)。
+独立命盘使用 `/api/bazi/birth-chart`，综合命理 `bazi_overview` 的 REST 路由为 `/api/bazi/overview`。详情见 [三端能力边界](api-reference.md#24-三端能力边界)。
 
 中式出生信息默认开启真太阳时，显式 true 时必须提供可解析地点或经度；没有经度且只使用模型默认值时，按钟表时间计算并附提示。小时必填。固定时区、经度和分析日期有助于复现。
 
@@ -116,7 +116,7 @@ curl -X POST http://localhost:8010/api/cn/bazi/birth \
 ## 第一条星盘请求
 
 ```bash
-curl -X POST http://localhost:8010/api/astro/chart \
+curl -X POST http://localhost:8010/api/astrology/chart \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Chart Demo",

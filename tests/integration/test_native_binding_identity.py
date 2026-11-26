@@ -1,6 +1,7 @@
 """Read-only identity caching cannot turn an unsupported motion model into an applied one."""
 
 from importlib.metadata import PackageNotFoundError
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -9,7 +10,9 @@ from fatebridge.core.astro import longitude_motion, runtime
 from fatebridge.core.astro.native_identity import binding_distribution_version
 
 
-def test_identity_lookup_reuses_only_the_same_binary_version_and_resolver(tmp_path):
+def test_identity_lookup_reuses_only_the_same_binary_version_and_resolver(
+    tmp_path: Path,
+) -> None:
     binary = tmp_path / "native.so"
     binary.write_bytes(b"original")
     native = SimpleNamespace(__file__=str(binary), version="2.10.03")
@@ -39,10 +42,14 @@ def test_identity_lookup_reuses_only_the_same_binary_version_and_resolver(tmp_pa
 
 
 @pytest.mark.parametrize("file_present", [False, True])
-def test_unknown_binary_identity_keeps_uncached_resolution(file_present, tmp_path):
+def test_unknown_binary_identity_keeps_uncached_resolution(
+    file_present: bool, tmp_path: Path
+) -> None:
     native = SimpleNamespace(version="2.10.03")
     if file_present:
         native.__file__ = str(tmp_path / "missing.so")
+    else:
+        pass
     calls = []
 
     def resolve(name):
@@ -53,7 +60,7 @@ def test_unknown_binary_identity_keeps_uncached_resolution(file_present, tmp_pat
     assert binding_distribution_version(native, resolve) == "2"
 
 
-def test_missing_package_never_acquires_a_verified_version(tmp_path):
+def test_missing_package_never_acquires_a_verified_version(tmp_path: Path) -> None:
     binary = tmp_path / "native.so"
     binary.write_bytes(b"one")
     native = SimpleNamespace(__file__=str(binary), version="2.10.03")
@@ -66,8 +73,8 @@ def test_missing_package_never_acquires_a_verified_version(tmp_path):
 
 @pytest.mark.parametrize("problem", ["binding", "native"])
 def test_warmed_identity_cache_does_not_bypass_unknown_version_guard(
-    problem, monkeypatch
-):
+    problem: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     swe = runtime.swe
     assert swe is not None
     monkeypatch.setattr(longitude_motion, "version", lambda name: "2.10.3.2")

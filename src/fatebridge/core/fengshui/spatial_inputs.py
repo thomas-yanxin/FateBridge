@@ -12,10 +12,13 @@ from pydantic import (
 )
 from shapely.geometry import Polygon
 
-from .numeric_inputs import FengshuiInput
-from .spatial_angles import _sin_cos_degrees, compose_degrees
-from .surface_inputs import PLANT_REPRESENTATIONS, Representation
-from .workstation_inputs import ObservedCondition
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput
+from fatebridge.core.fengshui.spatial_angles import _sin_cos_degrees, compose_degrees
+from fatebridge.core.fengshui.surface_inputs import (
+    PLANT_REPRESENTATIONS,
+    Representation,
+)
+from fatebridge.core.fengshui.workstation_inputs import ObservedCondition
 
 Identifier = Annotated[str, Field(min_length=1, max_length=100, pattern=r"\S")]
 Evidence = Annotated[str, Field(min_length=1, max_length=1000, pattern=r"\S")]

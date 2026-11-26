@@ -6,8 +6,9 @@ from pathlib import Path
 
 import pytest
 
+from fatebridge.core.liuyao.liuyao_generation import PROFILE
 from scripts.liuyao.build_profile import build_profile
-from tests.liuyao.test_liuyao_conditions import conditional_case
+from tests.unit_test.fixtures.liuyao import conditional_case
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_generation_v11"
 CASES = json.loads((REFERENCE / "cases.json").read_text())["cases"]
@@ -18,17 +19,20 @@ def annotated_case(case):
     for erratum in ERRATA:
         if case["id"] != erratum["case_id"]:
             continue
+        else:
+            pass
         if "original_inputs" in erratum:
             for field, value in erratum["original_inputs"].items():
                 assert case[field] == value
             return {**case, **erratum["corrected_inputs"]}
+        else:
+            pass
         assert case["expected_benefit"] is erratum["original_expected_benefit"]
         return {**case, "expected_benefit": erratum["corrected_expected_benefit"]}
     return case
 
 
-def test_generation_reference_is_frozen_and_packaged():
-    from fatebridge.core.liuyao_generation import PROFILE
+def test_generation_reference_is_frozen_and_packaged() -> None:
 
     assert build_profile("generation") == PROFILE
     for name, digest in json.loads((REFERENCE / "freeze.json").read_text())[
@@ -38,7 +42,7 @@ def test_generation_reference_is_frozen_and_packaged():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_frozen_source_can_generate_and_target_can_receive_are_separate(case):
+def test_frozen_source_can_generate_and_target_can_receive_are_separate(case) -> None:
     case = annotated_case(case)
     result = conditional_case(case)
     generation = result["generation_conditions"]
@@ -54,7 +58,7 @@ def test_frozen_source_can_generate_and_target_can_receive_are_separate(case):
     assert pair["source_path"] and pair["source_url"]
 
 
-def test_original_huan_source_keeps_calendar_injury_without_losing_generation():
+def test_original_huan_source_keeps_calendar_injury_without_losing_generation() -> None:
     detail = conditional_case(CASES[1])
     source = detail["classical_assessment"]["lines"][5]["strength"]
     target = detail["classical_assessment"]["lines"][2]["strength"]
@@ -75,7 +79,9 @@ def test_original_huan_source_keeps_calendar_injury_without_losing_generation():
     assert edge["generation_status"] and edge["target_reception_status"]
 
 
-def test_rootless_target_keeps_the_incoming_direction_but_not_confirmed_benefit():
+def test_rootless_target_keeps_the_incoming_direction_but_not_confirmed_benefit() -> (
+    None
+):
     detail = conditional_case(annotated_case(CASES[2]))
     focus = detail["classical_assessment"]["focus"]["strength"]
     assert focus["is_failing"] is True
@@ -85,7 +91,9 @@ def test_rootless_target_keeps_the_incoming_direction_but_not_confirmed_benefit(
     )
 
 
-def test_nonvoid_counterfactual_retains_generation_without_overriding_frozen_day():
+def test_nonvoid_counterfactual_retains_generation_without_overriding_frozen_day() -> (
+    None
+):
     detail = conditional_case({**CASES[10], "day_ganzhi": "丁巳"})
     pair = next(
         g

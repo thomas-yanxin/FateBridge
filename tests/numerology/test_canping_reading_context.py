@@ -9,10 +9,12 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.application.projection import project_fields
-from fatebridge.core import canping_schedule_basis as basis
-from fatebridge.core.canping_schedule_validation import require_schedule_binding
+from fatebridge.core.contracts.output_canping_schedule import CanpingScheduleBasis
 from fatebridge.core.local_techniques.canping import build_canping_result
-from fatebridge.core.output_canping_schedule import CanpingScheduleBasis
+from fatebridge.core.numerology import canping_schedule_basis as basis
+from fatebridge.core.numerology.canping_schedule_validation import (
+    require_schedule_binding,
+)
 from fatebridge.utils.errors import NumerologySourceError
 
 ROOT = Path(__file__).parents[1] / "fixtures/canping_reading_context_v1"
@@ -36,7 +38,7 @@ def actual(profile, clock):
 @pytest.mark.parametrize("clock", REFERENCE["clock_cases"], ids=lambda r: r["zone"])
 def test_snapshot_conditions_follow_actual_mapping_not_a_generic_warning(
     profile, clock
-):
+) -> None:
     out = actual(profile, clock)
     snapshot = out["snapshot_text"]
     assert "未来地区规则有条件" not in snapshot
@@ -52,7 +54,7 @@ def test_snapshot_conditions_follow_actual_mapping_not_a_generic_warning(
 @pytest.mark.parametrize("clock", REFERENCE["clock_cases"], ids=lambda r: r["zone"])
 def test_reading_context_binds_actual_profile_clock_books_pages_and_roles(
     profile, clock
-):
+) -> None:
     out = actual(profile, clock)
     b = out["canping_timing"]["schedule_basis"]
     context = b["reading_context"]
@@ -63,29 +65,32 @@ def test_reading_context_binds_actual_profile_clock_books_pages_and_roles(
     assert [c["source_id"] for c in citations] == list(REFERENCE["books"])
     for c in citations:
         expected = REFERENCE["books"][c["source_id"]]
-        assert {k: c[k] for k in expected} == expected
+        source = b["sources"][c["source_id"]]
+        assert {k: source[k] for k in expected} == expected
+        assert set(c) == {"source_id", "pdf_pages", "roles"}
         assert c["pdf_pages"] == REFERENCE["pdf_pages"][c["source_id"]]
         assert c["roles"] == REFERENCE["roles_by_profile"][profile][c["source_id"]]
-        assert c["edition"] in out["snapshot_text"]
+        assert source["edition"] in out["snapshot_text"]
     assert out["canping_timing"]["first_row"] == out["dayun"][0]
     assert out["canping_timing"]["selected"] is None
     if profile == basis.LEGACY:
         assert out["canping_timing"]["first_period"] is None
     else:
         assert out["canping_timing"]["first_period"] == out["dayun"][0]
-    assert b["whole_book_alignment_established"] is False
-    assert b["real_world_efficacy_validated"] is False
     require_schedule_binding(out)
 
 
 @pytest.mark.parametrize(
     "fault", ["book", "pages", "role", "profile", "clock", "statement"]
 )
-def test_forged_context_cannot_agree_with_itself_and_bypass_the_actual_run(fault):
+def test_forged_context_cannot_agree_with_itself_and_bypass_the_actual_run(
+    fault: str,
+) -> None:
     out = actual(basis.APPENDIX, REFERENCE["clock_cases"][0])
-    context = out["canping_timing"]["schedule_basis"]["reading_context"]
+    schedule = out["canping_timing"]["schedule_basis"]
+    context = schedule["reading_context"]
     if fault == "book":
-        context["source_citations"][1]["edition"] = "unregistered printing"
+        schedule["sources"]["sanming_nlc"]["edition"] = "unregistered printing"
     elif fault == "pages":
         context["source_citations"][1]["pdf_pages"] = [105, 106]
     elif fault == "role":
@@ -98,18 +103,14 @@ def test_forged_context_cannot_agree_with_itself_and_bypass_the_actual_run(fault
         context["date_mapping_statement"] = (
             "All future legal times have been certified."
         )
-    # Synchronize the trace too; matching two forged copies is insufficient.
-    for row in out["numerology_evidence"]["rule_trace"]:
-        if row["rule_id"] == basis.POLICY_ID:
-            row["facts"] = deepcopy(out["canping_timing"]["schedule_basis"])
     with pytest.raises(NumerologySourceError):
         require_schedule_binding(out)
 
 
 @pytest.mark.parametrize("field", ["date_mapping_statement", "source_citations"])
 def test_real_partial_projection_retains_requested_context_without_guessing_omitted_fields(
-    field,
-):
+    field: str,
+) -> None:
     out = actual(basis.CONTINUOUS, REFERENCE["clock_cases"][1])
     selected = project_fields(
         out, [f"canping_timing.schedule_basis.reading_context.{field}"]
@@ -124,11 +125,15 @@ def test_real_partial_projection_retains_requested_context_without_guessing_omit
     CanpingScheduleBasis.model_validate(b)
 
 
-def test_frozen_original_source_file_is_not_rewritten_to_make_the_join_pass():
+def test_frozen_original_source_file_is_not_rewritten_to_make_the_join_pass() -> None:
+    source_fixtures = ROOT.parent / "canping_schedule_basis_v1"
+    historical = source_fixtures / "verified-readings.json"
     assert (
-        hashlib.sha256(basis.COLLATION_PATH.read_bytes()).hexdigest()
+        hashlib.sha256(historical.read_bytes()).hexdigest()
         == REFERENCE["source_file_sha256"]
     )
+    current = source_fixtures / "verified-readings-v1.0.1.json"
+    assert basis.COLLATION_PATH.read_bytes() == current.read_bytes()
     original = ROOT / "reference.json"
     assert json.loads(original.read_bytes())["frozen_before_production_edits"]
     assert (
@@ -137,7 +142,7 @@ def test_frozen_original_source_file_is_not_rewritten_to_make_the_join_pass():
     )
 
 
-def test_registered_citations_remain_checked_in_a_source_only_projection():
+def test_registered_citations_remain_checked_in_a_source_only_projection() -> None:
     out = actual(basis.LEGACY, REFERENCE["clock_cases"][0])
     b = {
         "reading_context": {
@@ -149,12 +154,21 @@ def test_registered_citations_remain_checked_in_a_source_only_projection():
         }
     }
     CanpingScheduleBasis.model_validate(b)
-    b["reading_context"]["source_citations"][0]["pdf_sha256"] = "0" * 64
+    b["reading_context"]["source_citations"][0]["pdf_pages"] = [1]
     with pytest.raises(ValidationError):
         CanpingScheduleBasis.model_validate(b)
 
 
-def test_internally_synchronized_fake_clock_still_compares_actual_birth_rules():
+def test_source_identity_still_checked_in_the_book_registry() -> None:
+    out = actual(basis.LEGACY, REFERENCE["clock_cases"][0])
+    sources = out["canping_timing"]["schedule_basis"]["sources"]
+    CanpingScheduleBasis.model_validate({"sources": sources})
+    sources["heluo_najda"]["pdf_sha256"] = "0" * 64
+    with pytest.raises(ValidationError):
+        CanpingScheduleBasis.model_validate({"sources": sources})
+
+
+def test_internally_synchronized_fake_clock_still_compares_actual_birth_rules() -> None:
     out = actual(basis.APPENDIX, REFERENCE["clock_cases"][0])
     b = out["canping_timing"]["schedule_basis"]
     b["timezone_rules"] = {"database": "explicit_fixed_offset"}
@@ -164,9 +178,6 @@ def test_internally_synchronized_fake_clock_still_compares_actual_birth_rules():
         b["profile_id"], b["future_clock_policy"], b["timezone_spec"]
     )
     CanpingScheduleBasis.model_validate(b)
-    for row in out["numerology_evidence"]["rule_trace"]:
-        if row["rule_id"] == basis.POLICY_ID:
-            row["facts"] = deepcopy(b)
     marker = "[配运原典与日期映射]"
     start = out["snapshot_text"].index(marker)
     end = out["snapshot_text"].find("\n\n[", start)

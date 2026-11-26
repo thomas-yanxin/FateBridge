@@ -57,7 +57,7 @@ def compare(rows, convert=None):
     )
 
 
-def test_named_model_numeric_result_does_not_repair_original_swiss_only_gate():
+def test_named_model_numeric_result_does_not_repair_original_swiss_only_gate() -> None:
     rows = actual()
     before = deepcopy(rows)
     named = compare(rows)
@@ -76,14 +76,16 @@ def test_named_model_numeric_result_does_not_repair_original_swiss_only_gate():
 @pytest.mark.parametrize(
     ("seconds", "fails"), [(1.0, 0), (-1.0, 0), (1.000001, 1), (-1.000001, 1)]
 )
-def test_original_one_second_gate_is_not_rounded_or_relaxed(seconds, fails):
+def test_original_one_second_gate_is_not_rounded_or_relaxed(
+    seconds, fails: int
+) -> None:
     result = compare(actual(seconds))
     assert result["numeric_failure_count"] == fails
     assert result["expected_count"] == result["compared_count"] == 1
 
 
 @pytest.mark.parametrize("value", [None, True, float("nan"), float("inf")])
-def test_bad_clock_is_retained_as_error_not_a_numeric_pass(value):
+def test_bad_clock_is_retained_as_error_not_a_numeric_pass(value) -> None:
     result = compare(actual(), lambda _: SimpleNamespace(jd_tt=value, jd_ut1=0))
     assert result["expected_count"] == 1
     assert result["compared_count"] == 0
@@ -91,7 +93,7 @@ def test_bad_clock_is_retained_as_error_not_a_numeric_pass(value):
     assert result["all_declared_numeric_and_identity_checks_passed"] is False
 
 
-def test_unknown_model_cannot_pass_by_having_good_numeric_residual():
+def test_unknown_model_cannot_pass_by_having_good_numeric_residual() -> None:
     rows = actual()
     rows[(2026, "春分")]["ephemeris_model"] = "unknown"
     result = compare(rows)
@@ -100,14 +102,14 @@ def test_unknown_model_cannot_pass_by_having_good_numeric_residual():
     assert result["all_declared_numeric_and_identity_checks_passed"] is False
 
 
-def test_missing_event_is_not_removed_from_denominator():
+def test_missing_event_is_not_removed_from_denominator() -> None:
     result = compare({})
     assert result["expected_count"] == 1
     assert result["compared_count"] == 0
     assert len(result["calculation_errors"]) == 1
 
 
-def test_original_source_protocol_and_all_profiles_are_frozen():
+def test_original_source_protocol_and_all_profiles_are_frozen() -> None:
     value = AUDIT.protocol()
     assert len(value["profiles"]) == 3
     assert value["cohorts"]["pmo_minutes"]["count"] == 3024
@@ -115,7 +117,9 @@ def test_original_source_protocol_and_all_profiles_are_frozen():
     assert value["cohorts"]["hko_lunar_table_replay"]["civil_dates"] == 73049
 
 
-def test_changed_protocol_cannot_be_accepted_by_rewrapping_its_freeze(tmp_path):
+def test_changed_protocol_cannot_be_accepted_by_rewrapping_its_freeze(
+    tmp_path: Path,
+) -> None:
     value = json.loads((AUDIT.CORPUS / "protocol.json").read_text())
     value["cohorts"]["pmo_minutes"]["max_absolute_difference_seconds"] = 31
     (tmp_path / "protocol.json").write_text(json.dumps(value))

@@ -10,27 +10,17 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.heluo import calculate, hexagram_najia, judge, solar_term
-from fatebridge.core.heluo_timing import selected_timing_snapshot
-from fatebridge.core.output_numerology import HeluoJudge
+from fatebridge.core.contracts.output_numerology import HeluoJudge
+from fatebridge.core.heluo.heluo import calculate, hexagram_najia, judge, solar_term
+from fatebridge.core.heluo.heluo_timing import selected_timing_snapshot
 from fatebridge.services.divination import calculate_heluo_analysis
+from tests.unit_test.fixtures.heluo_charts import PILLARS, example_chart
 
 ROOT = Path(__file__).parents[1] / "fixtures/numerology_nlc_v1"
 REFERENCE = json.loads((ROOT / "najia-reference.json").read_text())
-PILLARS = dict(year="甲子", month="丁卯", day="庚申", hour="庚辰")
 
 
-def example_chart():
-    return calculate(
-        four_pillars=PILLARS,
-        gender="男",
-        hour_zhi="辰",
-        birth_year=1924,
-        month_zhi="卯",
-    )
-
-
-def test_source_witnesses_have_the_declared_identity():
+def test_source_witnesses_have_the_declared_identity() -> None:
     manifest = json.loads((ROOT / "najia-manifest.json").read_text())
     assert REFERENCE["source_pdf_sha256"] == manifest["pdf_sha256"]
     assert {i["pdf_page"] for i in manifest["images"]} == {119, 122, 124, 136, 139}
@@ -42,14 +32,14 @@ def test_source_witnesses_have_the_declared_identity():
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"], ids=lambda c: c["gua"])
-def test_original_direct_and_borrowed_najia(case):
+def test_original_direct_and_borrowed_najia(case) -> None:
     rows = hexagram_najia(case["lines"])
     assert [r["pos"] for r in rows] == [1, 2, 3, 4, 5, 6]
     assert [r["direct"] for r in rows] == case["direct"]
     assert [r["borrowed"] for r in rows] == case["borrowed"]
 
 
-def test_jiazi_is_not_in_gou_or_zhongfu_just_because_qian_is_present():
+def test_jiazi_is_not_in_gou_or_zhongfu_just_because_qian_is_present() -> None:
     # 姤只有外乾的壬午申戌/借甲午申戌，不能混入内乾甲子寅辰。
     chart = example_chart()
     actual = judge(chart, PILLARS, "卯")
@@ -58,7 +48,7 @@ def test_jiazi_is_not_in_gou_or_zhongfu_just_because_qian_is_present():
     assert all(not phase["matches"] for phase in actual["najia"])
 
 
-def test_borrowed_renzi_is_seen_only_in_inner_qian():
+def test_borrowed_renzi_is_seen_only_in_inner_qian() -> None:
     # 借用壬子在内乾初爻；旧乾表只有外乾的壬午申戌，原会漏判。
     chart = example_chart()
     chart["xian"].update(name="風天小畜", lines=[1, 1, 1, 0, 1, 1], up="巽", low="乾")
@@ -68,21 +58,21 @@ def test_borrowed_renzi_is_seen_only_in_inner_qian():
     assert not actual["najia"][1]["matches"]
 
 
-def test_outer_xun_does_not_receive_inner_xun_xinyou():
+def test_outer_xun_does_not_receive_inner_xun_xinyou() -> None:
     chart = example_chart()
     chart["xian"].update(name="風天小畜", lines=[1, 1, 1, 0, 1, 1], up="巽", low="乾")
     actual = judge(chart, {**PILLARS, "year": "辛酉"}, "卯")
     assert actual["deSheng"] is False
 
 
-def test_houtian_receives_a_real_lower_dui_assignment():
+def test_houtian_receives_a_real_lower_dui_assignment() -> None:
     actual = judge(example_chart(), {**PILLARS, "year": "丁巳"}, "卯")
     assert not actual["najia"][0]["matches"]
     assert actual["najia"][1]["matches"] == [{"pos": 1, "kind": "direct"}]
     assert actual["deSheng"] is True
 
 
-def test_six_actual_positions_and_no_input_mutation_for_all_hexagrams():
+def test_six_actual_positions_and_no_input_mutation_for_all_hexagrams() -> None:
     # Structural invariants only, not 64 independent original examples.
     for bits in itertools.product((0, 1), repeat=6):
         lines = list(bits)
@@ -96,7 +86,7 @@ def test_six_actual_positions_and_no_input_mutation_for_all_hexagrams():
 
 
 @pytest.mark.parametrize("lines", [[True] * 6, [1] * 5, [0, 1, 0, 2, 1, 0]])
-def test_invalid_lines_are_rejected(lines):
+def test_invalid_lines_are_rejected(lines) -> None:
     with pytest.raises(ValueError):
         hexagram_najia(lines)
 
@@ -109,12 +99,14 @@ def test_invalid_lines_are_rejected(lines):
         {"najia": [{"lines": [{"pos": True}]}]},
     ],
 )
-def test_corrupt_najia_facts_are_rejected_by_output_contract(payload):
+def test_corrupt_najia_facts_are_rejected_by_output_contract(payload) -> None:
     with pytest.raises(ValidationError):
         HeluoJudge.model_validate(payload)
 
 
-def test_selected_sequence_snapshot_uses_day_position_instead_of_changed_position():
+def test_selected_sequence_snapshot_uses_day_position_instead_of_changed_position() -> (
+    None
+):
     result = calculate_heluo_analysis(
         date="1990-06-15",
         time="09:33:00",
@@ -136,11 +128,13 @@ def test_selected_sequence_snapshot_uses_day_position_instead_of_changed_positio
     assert "尚未桥接实际日期" in selected
 
 
-def test_hko_three_year_solstices_agree_in_different_timezones():
+def test_hko_three_year_solstices_agree_in_different_timezones() -> None:
     reference = json.loads((ROOT.parent / "calendar_hko_v1/reference.json").read_text())
     for case in reference["cases"]:
         if case["term"] not in {"冬至", "夏至", "春分", "秋分"}:
             continue
+        else:
+            pass
         instant = datetime.fromisoformat(case["at"])
         before = instant - timedelta(minutes=2)
         after = instant + timedelta(minutes=2)

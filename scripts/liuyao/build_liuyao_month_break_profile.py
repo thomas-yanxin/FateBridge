@@ -17,12 +17,18 @@ def build() -> dict[str, Any]:
         for name, digest in frozen["sha256"].items():
             if hashlib.sha256((REFERENCE / name).read_bytes()).hexdigest() != digest:
                 raise ValueError(f"Frozen month-break reference changed: {name}")
+            else:
+                pass
     profile: dict[str, Any] = json.loads((REFERENCE / "profile-r2.json").read_text())
     source = (REFERENCE / profile["source"]["file"]).resolve()
     if not source.is_relative_to((ROOT / "tests/fixtures").resolve()):
         raise ValueError("Month-break source escaped fixture directory")
+    else:
+        pass
     if hashlib.sha256(source.read_bytes()).hexdigest() != profile["source"]["sha256"]:
         raise ValueError("Month-break source scan changed")
+    else:
+        pass
     return profile
 
 
@@ -34,6 +40,8 @@ def main() -> None:
     if args.check:
         if OUTPUT.read_text() != rendered:
             raise SystemExit("Month-break source profile is stale")
+        else:
+            pass
     else:
         OUTPUT.write_text(rendered)
     print("Pre-implementation month-break sources and cases verified")
@@ -41,3 +49,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

@@ -3,10 +3,10 @@
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.bazi_evidence import build_natal_evidence
+from fatebridge.core.bazi.bazi_evidence import build_natal_evidence
+from fatebridge.core.contracts.output_bazi_evidence import BaziEvidenceChain
+from fatebridge.core.contracts.output_source_annotations import SourceCurrentCalculation
 from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.output_bazi_evidence import BaziEvidenceChain
-from fatebridge.core.output_source_annotations import SourceCurrentCalculation
 from fatebridge.services.source_comparison import calculate_bazi_source_compare
 
 ORDER = ("year", "month", "day", "hour")
@@ -16,7 +16,7 @@ def chart(values):
     return dict(zip(ORDER, map(tuple, values)))
 
 
-def test_new_v10_true_single_end_receipt_valid():
+def test_new_v10_true_single_end_receipt_valid() -> None:
     value = calculate_bazi_source_compare("乙丑", "戊子", "丙辰", "辛卯")[
         "current_calculation"
     ]
@@ -24,7 +24,7 @@ def test_new_v10_true_single_end_receipt_valid():
     SourceCurrentCalculation.model_validate(value)
 
 
-def test_new_v10_natal_evidence_valid():
+def test_new_v10_natal_evidence_valid() -> None:
     p = chart(["乙丑", "戊子", "丙辰", "辛卯"])
     BaziEvidenceChain.model_validate(
         build_natal_evidence(p, ElementAnalysis.analyze_day_master_strength(p))
@@ -34,7 +34,9 @@ def test_new_v10_natal_evidence_valid():
 @pytest.mark.parametrize(
     "fault", ["missed_resolution", "repeated_pair", "invented_cover"]
 )
-def test_known_v10_conditions_reject_wrong_state_even_without_inventory(fault):
+def test_known_v10_conditions_reject_wrong_state_even_without_inventory(
+    fault: str,
+) -> None:
     current = calculate_bazi_source_compare("乙丑", "戊子", "丙辰", "辛卯")[
         "current_calculation"
     ]
@@ -47,15 +49,21 @@ def test_known_v10_conditions_reject_wrong_state_even_without_inventory(fault):
         for root in assessment["hidden_stem_ledger"]:
             if root["pillar"] == "day":
                 root["branch"] = "卯"
+            else:
+                pass
     else:
         for relation in assessment["relations"]:
             if relation["kind"] in {"三会", "三合", "六合"}:
                 relation["status"] = "contested_or_clashed"
+            else:
+                pass
     with pytest.raises(ValidationError):
         SourceCurrentCalculation.model_validate(current)
 
 
-def test_partial_branches_and_potential_unknown_cover_not_filled_or_reclassified():
+def test_partial_branches_and_potential_unknown_cover_not_filled_or_reclassified() -> (
+    None
+):
     current = calculate_bazi_source_compare("乙丑", "戊子", "丙辰", "辛卯")[
         "current_calculation"
     ]

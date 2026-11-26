@@ -1,14 +1,14 @@
 """Trace the adopted clash proxy without adjudicating classical root force."""
 
 from copy import deepcopy
-from typing import Any, Mapping, Sequence, Tuple
+from typing import Any, Mapping, Sequence
 
 ORDER = ("year", "month", "day", "hour")
 SCOPE = "本表复用同次六冲决策。普通六冲仅比较两五行的初始藏干预算总量，包含月支预算倍数；未将季相、透干盖头、任意间接生扶、距离权重或寒暖纳入输赢。具名完整四支通关另列来源分支，不作预算输赢比较；不是见印即免冲。保留系数为工程政策，不等于原典完整有效根力、拔根、发福或吉凶。"
 
 
 def build_clash_comparison(
-    pillars: Mapping[str, Tuple[str, str]],
+    pillars: Mapping[str, tuple[str, str]],
     events: Sequence[Mapping[str, Any]],
     sources: Sequence[Mapping[str, Any]],
 ) -> dict[str, Any]:

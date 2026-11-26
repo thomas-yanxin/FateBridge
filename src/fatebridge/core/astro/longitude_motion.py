@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 from importlib.metadata import version
-from typing import Any, Dict, Optional, Sequence, Tuple
+from typing import Any, Sequence
 
 from fatebridge.core.astro import moshier_motion, runtime
 from fatebridge.core.astro.lunar_motion import (
@@ -18,13 +18,13 @@ from fatebridge.core.astro.sidereal_origin_motion import traditional_lahiri_orig
 from fatebridge.utils.errors import EphemerisSourceError
 
 METHOD_ID = "fatebridge_apparent_longitude_motion_v4"
-LunarAdjustment = Tuple[float, str, float, Optional[float]]
+LunarAdjustment = tuple[float, str, float, float | None]
 NUTATION_STEP_DAYS = 0.0001  # NUT_SPEED_INTV in the inspected native source.
 
 
 def nutation_obliquity_rate(
-    julian_day_tt: float, context: Dict[str, Any]
-) -> Optional[float]:
+    julian_day_tt: float, context: dict[str, Any]
+) -> float | None:
     swe = runtime.swe
     native_version = str(getattr(swe, "version", "unavailable"))
     binding_version = binding_distribution_version(swe, version)
@@ -37,7 +37,7 @@ def nutation_obliquity_rate(
     ):
         cached = previous.get("nutation_obliquity_rate_degrees_per_day")
         return float(cached) if cached is not None else None
-    policy: Dict[str, Any] = {
+    policy: dict[str, Any] = {
         "method_id": "native_nutation_ecliptic_rotation_derivative_v1",
         "epoch_jd_tt": julian_day_tt,
         "native_version": native_version,
@@ -97,10 +97,10 @@ def corrected_longitude_motion(
     model: str,
     *,
     sidereal: bool = False,
-    source_trace: Optional[PhysicalEphemerisTrace] = None,
-    context: Optional[Dict[str, Any]] = None,
-    lunar_adjustment: Optional[LunarAdjustment] = None,
-) -> Dict[str, float]:
+    source_trace: PhysicalEphemerisTrace | None = None,
+    context: dict[str, Any] | None = None,
+    lunar_adjustment: LunarAdjustment | None = None,
+) -> dict[str, float]:
     """Keep native motion and each correction visible.
 
     Managed sidereal callers establish traditional SIDM_LAHIRI under the
@@ -121,7 +121,7 @@ def corrected_longitude_motion(
             result["longitude_speed_sidereal_origin_wrap_correction"] = origin_wrap
     light = 0.0
     spatial = 0.0
-    source_remainder: Optional[float] = None
+    source_remainder: float | None = None
     if planet == "Moon":
         if lunar_adjustment is not None:
             light, source_model, spatial, source_remainder = lunar_adjustment

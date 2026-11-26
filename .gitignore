@@ -53,9 +53,6 @@ ephe/
 .coverage
 .coverage.*
 htmlcov/
-/pytest-results.xml
-/nonuniform-reference-results.xml
-/resolved-dependencies.txt
 
 # Node modules (for frontend)
 node_modules/
@@ -86,6 +83,7 @@ docs/plans/
 
 # One-off review transcripts, snapshots, and collection scripts
 docs/reviews/
+/.workbuddy/memory/
 
 # Local scratch output
 /tmp/
@@ -115,17 +113,42 @@ docs/reviews/
 !/tests/data/guolao/solar_day_flint_v1/README.md
 !/tests/data/guolao/solar_day_flint_v1/reference.json.gz
 !/tests/data/guolao/solar_day_flint_v1/provenance.json
+!/tests/data/guolao/moira_rule_semantics_v1.json
 !/tests/data/astro/iers_c04/flint-interpolation-v1.json.gz
 !/tests/data/astro/iers_c04/flint-interpolation-v1.provenance.json
+!/tests/data/astro/iers_c04/modern-clock-regressions-v1.json.gz
+!/tests/data/astro/iers_c04/modern-eop-math-v1.json.gz
+!/tests/data/astro/iers_c04/modern-sofa-geometry-v1.json.gz
+!/tests/data/astro/iers_c04/modern-eop-v1.provenance.json
 !/tests/data/guolao/selected_day_models_v1/README.md
 !/tests/data/guolao/selected_day_models_v1/reference.json.gz
 !/tests/data/guolao/selected_day_models_v1/provenance.json
+!/tests/data/guolao/selected_day_models_v1/retained-epochs-v1.json
 # Fixed JPL inputs required by the outer-system position regression.
 !/tests/data/astro/outer-opaque-solar/uranus-response.json
 !/tests/data/astro/outer-opaque-solar/neptune-response.json
 !/tests/data/astro/outer-opaque-solar/pluto-response.json
 !/tests/data/astro/outer-opaque-solar/protocol.json
 !/tests/data/astro/outer-opaque-solar/provenance.json
+# Fixed independent T inputs/targets consumed by regression tests; audit corpora stay local.
+!/tests/data/astro/topocentric_precision/inputs.json
+!/tests/data/astro/topocentric_precision/reference.jsonl.gz
+!/tests/data/astro/topocentric_precision/candidate-boundary-inputs.json
+!/tests/data/astro/topocentric_precision/candidate-boundary-reference.json
+!/tests/data/astro/topocentric_precision/original-antipode-reference.json
+!/tests/data/astro/topocentric_precision/additional-antipode-reference.json
+!/tests/data/astro/topocentric_precision/README.md
+!/tests/data/astro/topocentric_precision/source-files.json
+!/tests/data/astro/event_angle/protocol.json
+!/tests/data/astro/event_angle/reference.json
+!/tests/data/astro/event_angle/source-files.json
+!/tests/data/astro/syzygy_display/calendar-reference.json
+!/tests/data/astro/syzygy_display/inputs.json
+!/tests/data/astro/syzygy_display/protocol.json
+!/tests/data/astro/syzygy_display/source-files.json
+!/tests/data/astro/syzygy_source/inputs.json
+!/tests/data/astro/syzygy_source/protocol.json
+!/tests/data/astro/syzygy_source/source-files.json
 /tests/fixtures/**
 !/tests/fixtures/**/
 !/tests/fixtures/*.py
@@ -138,6 +161,11 @@ docs/reviews/
 !/tests/fixtures/fengshui-desktop-authors-reference-v1.json
 !/tests/fixtures/fengshui-method-authors-reference-v1.json
 !/tests/fixtures/western-lahiri-origin-reference-v1.json
+!/tests/fixtures/jyotish-ascendant-frame-reference-v1.json
+!/tests/fixtures/western-placidus-current-frame-reference-v1.json
+!/tests/fixtures/western-syzygy-source-profiles-v1.json
+!/tests/fixtures/human-design-de441-j2000.eph
+!/tests/fixtures/human-design-de441-j2000.provenance.json
 !/tests/fixtures/native-longterm-frame-reference-v1.json
 !/tests/fixtures/native-source-frame-reference-v1.json
 !/tests/fixtures/historical-utc-affine-reference-v1.json
@@ -154,7 +182,10 @@ docs/reviews/
 !/tests/fixtures/taiyi_dangshi_case_v41/freeze-original.json
 !/tests/fixtures/taiyi_dangshi_case_v41/collation.json
 
-# Generated CI evidence, kept as workflow artifacts rather than source.
+# Generated reports in the checkout root.
+/pytest-results.xml
+/nonuniform-reference-results.xml
+/resolved-dependencies.txt
 /ci-selection.json
 /cache-status.txt
 /ci-evidence/
@@ -169,6 +200,9 @@ docs/reviews/
 !/tests/fixtures/solar-deflection-high-precision-reference-v1.json
 
 # Small pinned references required by the self-contained calendar checks.
+!/tests/data/de440-selected-record-boundaries-v1.json
+!/tests/data/chebyshev-source-controls-v1.json.gz
+!/tests/data/source-kinematics-j2000-v1.json
 !/tests/data/solar_tt_de440_v1/README.md
 !/tests/data/solar_tt_de440_v1/reference.json.gz
 !/tests/data/solar_de441_v1/README.md
@@ -183,6 +217,7 @@ docs/reviews/
 !/tests/data/earth_attitude_v1/reference.json.gz
 !/tests/data/solar_horizon_v1/README.md
 !/tests/data/solar_horizon_v1/reference.json.gz
+!/tests/data/solar_horizon_v1/c04-reference.json.gz
 !/tests/data/solar_horizon_v1/de440-reference.json.gz
 !/tests/data/solar_horizon_v1/de440-provenance.json
 !/tests/data/solar_horizon_v1/jpl-reference.json.gz
@@ -256,6 +291,8 @@ docs/reviews/
 !/tests/data/human_design_finite_contacts_v1/README.md
 !/tests/data/human_design_finite_contacts_v1/manifest.json
 !/tests/data/human_design_finite_contacts_v1/reference.jsonl.gz
+!/tests/data/human_design/semantic-inputs.json
+!/tests/data/human_design/gate4/gate4-independent-source-locators.json
 !/tests/data/jyotish_varga_flint_v1/README.md
 !/tests/data/jyotish_varga_flint_v1/criteria.json
 !/tests/data/jyotish_varga_flint_v1/source-tables.json
@@ -293,3 +330,94 @@ docs/reviews/
 !/tests/data/astro/moshier_lunar_motion_v1/README.md
 !/tests/data/astro/moshier_lunar_motion_v1/reference.json.gz
 !/tests/data/astro/moshier_lunar_motion_v1/reference.json.sha256
+!/tests/data/solar_clock_labels_v1/README.md
+!/tests/data/solar_clock_labels_v1/reference.json
+!/tests/data/solar_clock_labels_v1/nominal-seed-boundaries-v1.json
+!/tests/data/astro/solar_clock_coherence/same-definition-reference.json
+!/tests/data/astro/solar_clock_coherence/source-files.json
+!/tests/data/astro/solar_offset/physical-clock-reference.json
+!/tests/data/astro/solar_offset/source-files.json
+!/tests/data/astrodice/tables/lahiri-physical-houses.json
+!/tests/data/clock_scalar_rounding_v1/README.md
+!/tests/data/clock_scalar_rounding_v1/reference.json.gz
+!/tests/data/clock_scalar_rounding_v1/reference.json.sha256
+!/tests/data/jyotish_sthana_total_flint_v1.json
+!/tests/data/jyotish_positional_chain_flint_v1/README.md
+!/tests/data/jyotish_positional_chain_flint_v1/source.json.gz
+!/tests/data/jyotish_positional_chain_flint_v1/source.json.sha256
+!/tests/data/jyotish_positional_chain_flint_v1/proposed-cohort.json
+!/tests/data/jyotish_positional_chain_flint_v1/source-primitives.json
+!/tests/data/jyotish_positional_chain_flint_v1/criteria.json
+!/tests/data/physical_epoch_points_v1/README.md
+!/tests/data/physical_epoch_points_v1/reference.json.gz
+!/tests/data/physical_epoch_points_v1/sha256.json
+!/tests/data/ut1_primary_epoch_v1.json
+!/tests/data/solar_two_part_interval_v1.json
+!/tests/data/offline_frame_v1.json
+!/tests/data/offline_classical_frame_v1.json
+!/tests/data/retained_civil_points_v1.json
+!/tests/data/native_return_crossings_swisseph_v1.json
+!/tests/data/jyotish_temporal_chain_flint_v1/README.md
+!/tests/data/jyotish_temporal_chain_flint_v1/reference.json.gz
+!/tests/data/jyotish_temporal_chain_flint_v1/reference.json.sha256
+!/tests/data/guolao_calibration_scale_v1/README.md
+!/tests/data/guolao_calibration_scale_v1/reference.json
+!/tests/data/guolao_calibration_scale_v1/reference.json.sha256
+
+!/tests/data/hamburg_source_arc_v1/README.md
+!/tests/data/hamburg_source_arc_v1/inputs.json
+!/tests/data/hamburg_source_arc_v1/criteria.json
+!/tests/data/hamburg_source_arc_v1/independent-reference.py
+!/tests/data/hamburg_source_arc_v1/reference.json.gz
+!/tests/data/hamburg_source_arc_v1/reference.json.sha256
+
+!/tests/data/planetary_source_arc_v1/README.md
+!/tests/data/planetary_source_arc_v1/inputs.json
+!/tests/data/planetary_source_arc_v1/criteria.json
+!/tests/data/planetary_source_arc_v1/delivery-contract.json
+!/tests/data/planetary_source_arc_v1/reference.json.gz
+!/tests/data/planetary_source_arc_v1/reference.json.sha256
+
+!/tests/data/progressed_lunation_v1/README.md
+!/tests/data/progressed_lunation_v1/inputs.json
+!/tests/data/progressed_lunation_v1/criteria.json
+!/tests/data/progressed_lunation_v1/expected-roots.json
+!/tests/data/progressed_lunation_v1/expected-roots.json.sha256
+
+!/tests/data/geometry-source-constraints-v1.json
+
+!/tests/data/house_coordinate_rounding_arb_v1/README.md
+!/tests/data/house_coordinate_rounding_arb_v1/inputs.json
+!/tests/data/house_coordinate_rounding_arb_v1/native-diagnostic-inputs.json
+!/tests/data/house_coordinate_rounding_arb_v1/provenance.json
+!/tests/data/house_coordinate_rounding_arb_v1/reference.jsonl.gz
+
+# Small, fixed inputs required by self-contained CI regressions.
+!/tests/data/bazi_dayun_calendar_carries_v1/reference.json.gz
+!/tests/data/bazi_dayun_calendar_carries_v1/reference.json.sha256
+!/tests/data/bazi_dayun_calendar_carries_v1/protocol.json
+!/tests/data/bazi_dayun_calendar_carries_v1/protocol.sha256
+!/tests/data/bazi_uncertainty_events_v1/reference.json.gz
+!/tests/data/bazi_uncertainty_events_v1/reference.json.sha256
+!/tests/data/bazi_uncertainty_events_v1/protocol.json
+!/tests/data/bazi_uncertainty_events_v1/protocol.sha256
+!/tests/data/astrodice/tables/de441-j2000.eph
+!/tests/data/astrodice/tables/de441-j2000.provenance.json
+!/tests/fixtures/guolao-native-jie-month-v1/reference-before-implementation.json
+!/tests/fixtures/guolao-native-lunar-date-v1/reference-before-implementation.json
+!/tests/fixtures/heluo_solar_context_v1/reference.json
+!/tests/fixtures/ren_calendar_guard_v1/reference.json
+!/tests/fixtures/ren_calendar_guard_v1/protocol.json
+!/tests/fixtures/ren_calendar_guard_v1/freeze.json
+!/tests/fixtures/meihua_civil_clock_v1/cases.json
+!/tests/fixtures/meihua_civil_clock_v1/manifest.json
+!/tests/fixtures/meihua_civil_clock_v1/source-scope.json
+!/tests/fixtures/meihua_civil_clock_v1/source-line-locator-amendment.json
+!/tests/fixtures/meihua_civil_clock_v1/historical-fold-supplement.json
+!/tests/fixtures/meihua_civil_clock_v1/historical-fold-supplement-lock.json
+!/tests/fixtures/meihua_civil_clock_v1/sources/asia
+!/tests/fixtures/meihua_civil_clock_v1/sources/australasia
+!/tests/fixtures/meihua_civil_clock_v1/sources/northamerica
+!/tests/fixtures/meihua_civil_clock_v1/sources/version
+!/tests/fixtures/western-returns-horizons.json
+!/tests/fixtures/western-ptolemy-fortune-robbins-1940.json

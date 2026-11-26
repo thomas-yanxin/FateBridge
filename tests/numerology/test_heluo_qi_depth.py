@@ -9,17 +9,17 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.heluo import (
+from fatebridge.core.contracts.output_numerology import HeluoJudge
+from fatebridge.core.heluo.heluo import (
     build_snapshot_text,
     gua_lines,
     judge,
     solar_term,
     solar_term_huagong,
 )
-from fatebridge.core.heluo_qi import RULESET_ID
-from fatebridge.core.output_numerology import HeluoJudge
-from tests.numerology.test_heluo_worked_depth import REFERENCE as WORKED
-from tests.numerology.test_heluo_worked_depth import calculate_case
+from fatebridge.core.heluo.heluo_qi import RULESET_ID
+from tests.unit_test.fixtures.heluo_worked import REFERENCE as WORKED
+from tests.unit_test.fixtures.heluo_worked import calculate_case
 
 ROOT = Path(__file__).parents[1] / "fixtures/numerology_nlc_v1"
 REFERENCE = json.loads((ROOT / "qi-reference.json").read_text())
@@ -35,15 +35,19 @@ def source_result(case_id, term):
 
 @pytest.mark.parametrize("term,expected", TERMS, ids=[t for t, _ in TERMS])
 @pytest.mark.parametrize("earth", [False, True])
-def test_literal_overlapping_windows_across_all_term_labels(term, expected, earth):
+def test_literal_overlapping_windows_across_all_term_labels(
+    term, expected, earth: bool
+) -> None:
     result = solar_term_huagong(term, earth)
     assert result["hg"] == expected["hg"] + (["坤", "艮"] if earth else [])
     assert result["fh"] == expected["fh"] + (["乾", "兌"] if earth else [])
     if term in REFERENCE["quarter_probes"][1]["terms"]:
         assert result["fanhua_rule_ids"][:2] == ["winter_to_summer_li", "spring_xun"]
+    else:
+        pass
 
 
-def test_literal_clauses_and_frozen_witnesses_do_not_claim_independent_review():
+def test_literal_clauses_and_frozen_witnesses_do_not_claim_independent_review() -> None:
     manifest = json.loads((ROOT / "qi-manifest.json").read_text())
     assert len(manifest["images"]) == 13
     for image in manifest["images"]:
@@ -59,7 +63,9 @@ def test_literal_clauses_and_frozen_witnesses_do_not_claim_independent_review():
 @pytest.mark.parametrize(
     "probe", REFERENCE["source_four_pillar_phase_probes"], ids=lambda c: c["case_id"]
 )
-def test_original_hexagrams_have_separate_direct_and_nuclear_phase_matches(probe):
+def test_original_hexagrams_have_separate_direct_and_nuclear_phase_matches(
+    probe,
+) -> None:
     _, result = source_result(probe["case_id"], probe["term"])
     qi = result["qi_phases"]
     assert qi["ruleset_id"] == RULESET_ID
@@ -75,7 +81,7 @@ def test_original_hexagrams_have_separate_direct_and_nuclear_phase_matches(probe
     HeluoJudge.model_validate(result)
 
 
-def test_union_hides_the_loss_and_does_not_verify_the_printed_trigram():
+def test_union_hides_the_loss_and_does_not_verify_the_printed_trigram() -> None:
     chart, result = source_result("yihai_bailu", "白露")
     assert result["huagong"]["present"] == ["離"]  # Union alone misses the loss.
     a, b = result["qi_phases"]["phases"]
@@ -90,7 +96,7 @@ def test_union_hides_the_loss_and_does_not_verify_the_printed_trigram():
     assert "下互離" in text and "化工離：无" in text
 
 
-def test_gained_nuclear_huagong_does_not_become_a_direct_match():
+def test_gained_nuclear_huagong_does_not_become_a_direct_match() -> None:
     # Rule-derived from the original Kun initial-six -> Yu example at PDF62.
     p = {"year": "乙未", "month": "丁卯", "day": "甲子", "hour": "乙丑"}
     chart = {
@@ -111,7 +117,7 @@ def test_gained_nuclear_huagong_does_not_become_a_direct_match():
     )
 
 
-def test_empty_explicit_targets_never_turn_into_month_branch_candidates():
+def test_empty_explicit_targets_never_turn_into_month_branch_candidates() -> None:
     chart, original = source_result("yihai_bailu", "白露")
     case = WORKED["cases"][1]
     p = dict(zip(("year", "month", "day", "hour"), case["pillars"]))
@@ -137,14 +143,14 @@ def test_empty_explicit_targets_never_turn_into_month_branch_candidates():
         {"hg": [], "fh": None},
     ],
 )
-def test_malformed_explicit_targets_are_not_silently_replaced(override):
+def test_malformed_explicit_targets_are_not_silently_replaced(override) -> None:
     chart, _ = source_result("yihai_bailu", "白露")
     p = dict(zip(("year", "month", "day", "hour"), WORKED["cases"][1]["pillars"]))
     with pytest.raises(ValueError, match="显式化工"):
         judge(chart, p, "卯", override)
 
 
-def test_phase_evidence_does_not_share_mutable_positions_with_body_evidence():
+def test_phase_evidence_does_not_share_mutable_positions_with_body_evidence() -> None:
     _, result = source_result("gengwu_zhao", "處暑")
     original = copy.deepcopy(result["deTi"])
     result["qi_phases"]["phases"][0]["bodies"][0]["line_positions"][0] = 6
@@ -166,7 +172,7 @@ BEFORE_AFTER = {
 
 
 @pytest.mark.parametrize("case", BOUNDARIES, ids=lambda c: f"{c['year']}-{c['term']}")
-def test_overlapping_fanhua_has_real_external_before_after_brackets(case):
+def test_overlapping_fanhua_has_real_external_before_after_brackets(case) -> None:
     at = datetime.fromisoformat(case["at"])
     for delta, expected in zip((-2, 2), BEFORE_AFTER[case["term"]]):
         moment = at + timedelta(minutes=delta)

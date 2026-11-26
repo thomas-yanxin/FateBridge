@@ -7,9 +7,12 @@ import math
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
+from importlib.metadata import version
 from pathlib import Path
 from typing import Any, Callable, Iterator, NoReturn, TypeGuard
 
+from fatebridge.core.astro.native_identity import binding_distribution_version
+from fatebridge.core.compressed_ephemeris import _physical_slots
 from fatebridge.utils.errors import EphemerisSourceError
 
 RULESET = "fatebridge.observed_physical_data_policy.v1"
@@ -125,8 +128,6 @@ def _coordinate_result(
     ):
         state.fail("required_data_files_unavailable")
     coordinates, flags = value
-    from fatebridge.core.compressed_ephemeris import _physical_slots
-
     slots = _physical_slots(native, body, flags)
     if not slots:
         if len(coordinates) != 6 or any(value != 0 for value in coordinates):
@@ -141,10 +142,6 @@ def _coordinate_result(
     if not callable(getter):
         state.fail("required_data_files_unverified")
     if model == "swieph":
-        from importlib.metadata import version
-
-        from fatebridge.core.astro.native_identity import binding_distribution_version
-
         if (
             str(getattr(native, "version", "unavailable")),
             binding_distribution_version(native, version),

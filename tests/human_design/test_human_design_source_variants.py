@@ -9,16 +9,19 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core.human_design import longitude_activation, opposite_activation
-from fatebridge.core.human_design_evidence import source_activation_impacts
-from fatebridge.core.human_design_source_variants import (
+from fatebridge.core.human_design.human_design import (
+    longitude_activation,
+    opposite_activation,
+)
+from fatebridge.core.human_design.human_design_evidence import source_activation_impacts
+from fatebridge.core.human_design.human_design_source_variants import (
     cross_name_evidence,
     line_variant_impact,
     source_variant_audit,
     variant_reference,
 )
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
+from validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = next(s for s in CATALOG if s.key == "human_design")
@@ -34,7 +37,7 @@ INPUT = dict(
 )
 
 
-def test_all_384_exact_arcs_and_all_19_names_retain_the_original_failures():
+def test_all_384_exact_arcs_and_all_19_names_retain_the_original_failures() -> None:
     report = source_variant_audit()
     assert report["printed_line_count"] == 384
     assert [
@@ -60,7 +63,7 @@ def test_all_384_exact_arcs_and_all_19_names_retain_the_original_failures():
     assert report["all_disagreements_resolved"] is False
 
 
-def test_each_observed_name_is_bound_to_an_unchanged_official_case_and_pdf():
+def test_each_observed_name_is_bound_to_an_unchanged_official_case_and_pdf() -> None:
     import hashlib
 
     reference = variant_reference()
@@ -76,7 +79,7 @@ def test_each_observed_name_is_bound_to_an_unchanged_official_case_and_pdf():
     assert len(cases) == len(reference["observed_cross_labels"]) == 19
 
 
-def test_an_observed_name_is_not_a_fuzzy_alias_or_an_unobserved_general_rule():
+def test_an_observed_name_is_not_a_fuzzy_alias_or_an_unobserved_general_rule() -> None:
     cross = {"angle": "right", "gates": [38, 39, 48, 21], "name": "TENSION (4)"}
     report = cross_name_evidence({"incarnation_cross": cross})
     assert len(report["observations"]) == 9
@@ -89,7 +92,7 @@ def test_an_observed_name_is_not_a_fuzzy_alias_or_an_unobserved_general_rule():
     assert absent["disagreement_resolved"] is False
 
 
-def test_printed_source_candidates_at_every_boundary_and_adjacent_float():
+def test_printed_source_candidates_at_every_boundary_and_adjacent_float() -> None:
     # Independent integer interval oracle; does not call the production classifier.
     rows = variant_reference()["printed_line_arcs"]
     for row in rows:
@@ -120,7 +123,9 @@ def test_printed_source_candidates_at_every_boundary_and_adjacent_float():
                     )
 
 
-def test_literal_29_table_breaks_the_paired_solar_rule_without_inventing_a_profile():
+def test_literal_29_table_breaks_the_paired_solar_rule_without_inventing_a_profile() -> (
+    None
+):
     p = [
         {"body": "Sun", **longitude_activation(145.3)},
         {"body": "Earth", "derived_from": "Sun", **opposite_activation(145.3)},
@@ -155,7 +160,7 @@ def complete():
 
 def test_complete_served_reading_explains_actual_conflict_and_retains_all_prior_statements(
     complete,
-):
+) -> None:
     source = complete["source_consistency"]
     assert source["activation_impacts"]["status"] == "affected"
     assert source["version_comparison"]["literal_name_matches"] == 4
@@ -182,7 +187,9 @@ def test_complete_served_reading_explains_actual_conflict_and_retains_all_prior_
     assert complete["validation"]["classical_acceptance_passed"] is False
 
 
-def test_initial_august_17_clock_is_retained_as_an_outside_gap_negative_control():
+def test_initial_august_17_clock_is_retained_as_an_outside_gap_negative_control() -> (
+    None
+):
     # The initial harness used this clock with an incorrect affected expectation.
     # Keep the original input: its Sun is before the disputed source interval.
     value = execute_tool(
@@ -212,7 +219,9 @@ def test_initial_august_17_clock_is_retained_as_an_outside_gap_negative_control(
         "drop_statement",
     ],
 )
-def test_rehashed_forged_dispute_or_incomplete_reading_is_rejected(complete, mutation):
+def test_rehashed_forged_dispute_or_incomplete_reading_is_rejected(
+    complete, mutation: str
+) -> None:
     value = deepcopy(complete)
     source = value["source_consistency"]
     effects = source["activation_impacts"]["conditional_printed_line_effects"]

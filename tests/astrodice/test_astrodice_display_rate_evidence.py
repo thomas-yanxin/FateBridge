@@ -14,7 +14,9 @@ RUN = (
 
 
 @pytest.mark.parametrize("split,expected", [("development", 22), ("heldout", 18)])
-def test_current_complete_population_is_graded_at_original_lines(split, expected):
+def test_current_complete_population_is_graded_at_original_lines(
+    split: str, expected: int
+) -> None:
     reference = RUN / f"{split}-reference-first.json"
     result = audit(RUN, reference)
     assert len(result["rows"]) == expected
@@ -41,14 +43,16 @@ def test_current_complete_population_is_graded_at_original_lines(split, expected
                 and row["rate_pass"]
                 and row["derivative_policy_applied"]
             )
+        else:
+            pass
 
 
 @pytest.mark.parametrize("split", ["development", "heldout"])
-def test_original_intervals_remain_independently_reproducible(split):
+def test_original_intervals_remain_independently_reproducible(split: str) -> None:
     result = verify(RUN, RUN / f"{split}-reference-first.json")
     assert all(r["status"] == "strict_containment_passed" for r in result["rows"])
 
 
-def test_historical_negative_rows_remain_separate_from_current_execution():
+def test_historical_negative_rows_remain_separate_from_current_execution() -> None:
     evidence = json.loads((RUN.parents[1] / "historical-failures.json").read_text())
     assert any(row["study"] == "lunar-pipeline" for row in evidence)

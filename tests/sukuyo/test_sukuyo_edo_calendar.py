@@ -6,12 +6,15 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import sukuyo_historical_calendar as historical
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_edo_calendar import SOURCE, calendar_method_reference
+from fatebridge.core.sukuyo import sukuyo_historical_calendar as historical
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_edo_calendar import SOURCE, calendar_method_reference
+from tests.unit_test.fixtures.sukuyo_transports import (
+    assert_sukuyo_transport_parity as check,
+)
 
 
-def test_data_bytes_match_frozen_source_readings_before_production():
+def test_data_bytes_match_frozen_source_readings_before_production() -> None:
     assert hashlib.sha256(SOURCE.read_bytes()).hexdigest() == (
         "9a77377093e450e6b91edcf8e3c2ea2cb0ceb5b1fb1ea30eaabd9c783671a5e7"
     )
@@ -32,7 +35,9 @@ def test_data_bytes_match_frozen_source_readings_before_production():
         (1872, "tenpo"),
     ],
 )
-def test_named_period_is_lunar_year_context_not_era_name(year, method):
+def test_named_period_is_lunar_year_context_not_era_name(
+    year: int, method: str
+) -> None:
     ref = calendar_method_reference(year, 1, False)
     assert ref["calendar_period"]["id"] == method
     assert (
@@ -45,14 +50,14 @@ def test_named_period_is_lunar_year_context_not_era_name(year, method):
     assert ref["independent_historical_observations_added"] == 0
 
 
-def test_horeki_era_year_four_during_civil_1755_still_uses_jokyo_context():
+def test_horeki_era_year_four_during_civil_1755_still_uses_jokyo_context() -> None:
     source = historical.date_reference(date(1755, 1, 13))
     assert source["printed_lunar_year"] == 1754
     assert source["edo_calendar_method_reference"]["calendar_period"]["id"] == "jokyo"
     assert source["edo_calendar_method_reference"]["intercalation_research"] is None
 
 
-def test_complete_ten_rows_and_later_counterexamples_are_retained():
+def test_complete_ten_rows_and_later_counterexamples_are_retained() -> None:
     ref = calendar_method_reference(1792, 2, True)
     research = ref["intercalation_research"]
     rows = research["all_ten_selected_rows"]
@@ -90,7 +95,7 @@ def test_complete_ten_rows_and_later_counterexamples_are_retained():
     )
 
 
-def test_rule_next_month_is_not_used_as_a_replacement_leap_month():
+def test_rule_next_month_is_not_used_as_a_replacement_leap_month() -> None:
     current = calendar_method_reference(1773, 3, True)["intercalation_research"]
     row = current["current_year_record"]
     assert row["published_leap_month_literal"] == "3月"
@@ -102,7 +107,7 @@ def test_rule_next_month_is_not_used_as_a_replacement_leap_month():
     ]
 
 
-def test_printed_size_and_covered_reform_days_remain_different():
+def test_printed_size_and_covered_reform_days_remain_different() -> None:
     source = historical.date_reference(date(1872, 12, 31))
     assert source["source_month_length_days"] == 2
     note = source["edo_calendar_method_reference"]["reform_month_length_reference"]
@@ -114,15 +119,17 @@ def test_printed_size_and_covered_reform_days_remain_different():
         historical.lunar_fields(date(1873, 1, 1))
 
 
-def test_outside_named_source_period_does_not_load_or_invent_context(monkeypatch):
-    import fatebridge.core.sukuyo_edo_calendar as edo
+def test_outside_named_source_period_does_not_load_or_invent_context(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import fatebridge.core.sukuyo.sukuyo_edo_calendar as edo
 
     monkeypatch.setattr(edo, "SOURCE", Path("/not-an-available-reference.json"))
     assert edo.calendar_method_reference(1684, 12, False) is None
     assert edo.calendar_method_reference(1873, 1, False) is None
 
 
-def test_native_reading_explains_nominal_reform_length_and_clock_limit():
+def test_native_reading_explains_nominal_reform_length_and_clock_limit() -> None:
     calendar = calendar_mansion(
         "1872-12-31", zone="+09:00", calendar_basis="japanese_naoj_historical_utc09"
     )
@@ -134,10 +141,9 @@ def test_native_reading_explains_nominal_reform_length_and_clock_limit():
 
 
 @pytest.mark.parametrize("value", ["1755-01-13", "1773-04-22"])
-def test_context_matches_rest_native_mcp_and_cli(monkeypatch, capsys, value):
-    from tests.sukuyo.test_sukuyo_transports import (
-        test_calendar_and_relations_across_all_real_transports as check,
-    )
+def test_context_matches_rest_native_mcp_and_cli(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], value: str
+) -> None:
 
     check(
         monkeypatch,

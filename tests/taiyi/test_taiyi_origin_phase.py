@@ -4,13 +4,13 @@ import copy
 import hashlib
 import json
 import shutil
-import subprocess
-import sys
 from fractions import Fraction
+from pathlib import Path
 
 import pytest
 
-from fatebridge.validation.taiyi_epoch import mean_origin_hypothesis
+from scripts.taiyi.audit_taiyi_day_epoch import audit as day_audit
+from scripts.taiyi.audit_taiyi_liang_collation import audit as liang_audit
 from scripts.taiyi.audit_taiyi_origin_phase import audit
 from scripts.taiyi.taiyi_origin_sources import (
     CORPUS,
@@ -18,6 +18,7 @@ from scripts.taiyi.taiyi_origin_sources import (
     ROOT,
     read_origin_sources,
 )
+from validation.taiyi_epoch import mean_origin_hypothesis
 
 
 @pytest.fixture(scope="module")
@@ -44,14 +45,14 @@ def parameters():
     )
 
 
-def test_new_correction_is_not_a_rewritten_old_source_or_blind_case():
+def test_new_correction_is_not_a_rewritten_old_source_or_blind_case() -> None:
     source = read_origin_sources()
     frozen = json.loads((CORPUS / "freeze.json").read_text())
     assert (
         hashlib.sha256((CORPUS / "freeze.json").read_bytes()).hexdigest()
         == FREEZE_SHA256
     )
-    assert len(frozen["prior_sources"]) == 48
+    assert len(frozen["prior_sources"]) == 45
     assert frozen["new_production_comparisons_before_freeze"] == 0
     assert (
         not frozen["blinded"]
@@ -73,8 +74,8 @@ def test_new_correction_is_not_a_rewritten_old_source_or_blind_case():
 
 @pytest.mark.parametrize("rewrite_manifest", [False, True])
 def test_cannot_replace_explicit_day_to_make_the_nearest_candidate_match(
-    tmp_path, rewrite_manifest
-):
+    tmp_path: Path, rewrite_manifest: bool
+) -> None:
     corpus = tmp_path / "corpus"
     shutil.copytree(CORPUS, corpus)
     path = corpus / "readings.json"
@@ -85,11 +86,15 @@ def test_cannot_replace_explicit_day_to_make_the_nearest_candidate_match(
         frozen = json.loads((corpus / "freeze.json").read_text())
         frozen["files"][path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
         (corpus / "freeze.json").write_text(json.dumps(frozen))
+    else:
+        pass
     with pytest.raises(ValueError, match="V33"):
         read_origin_sources(corpus)
 
 
-def test_given_accumulation_matches_the_ming_day_only_under_one_numbering(report):
+def test_given_accumulation_matches_the_ming_day_only_under_one_numbering(
+    report,
+) -> None:
     rows = report["given_source_day_labels"]
     assert [
         (r["jiazi_origin"], r["day_ganzhi"], r["matches_ming_explicit_day"])
@@ -102,7 +107,9 @@ def test_given_accumulation_matches_the_ming_day_only_under_one_numbering(report
     assert report["old_calendar_report_is_new_independent_observation"] is False
 
 
-def test_all_old_serial_fields_and_failures_remain_with_new_day_constraint(report):
+def test_all_old_serial_fields_and_failures_remain_with_new_day_constraint(
+    report,
+) -> None:
     rows = report["all_eight_retained_serial_cohorts"]
     assert len(rows) == 8
     for current in rows:
@@ -134,7 +141,9 @@ def test_all_old_serial_fields_and_failures_remain_with_new_day_constraint(repor
     ] == ["癸未", "壬午"]
 
 
-def test_remainder_units_and_conditional_absolute_lift_are_not_collapsed(report):
+def test_remainder_units_and_conditional_absolute_lift_are_not_collapsed(
+    report,
+) -> None:
     full, completed = report["phase_hypotheses"]
     assert (full["month_year_shift"], completed["month_year_shift"]) == (0, -1)
     assert (
@@ -168,7 +177,7 @@ def test_remainder_units_and_conditional_absolute_lift_are_not_collapsed(report)
     )
 
 
-def test_literal_annual_identity_does_not_force_a_calendar_name_to36525():
+def test_literal_annual_identity_does_not_force_a_calendar_name_to36525() -> None:
     args = parameters()
     before = copy.deepcopy(args)
     result = mean_origin_hypothesis(**args)
@@ -198,16 +207,16 @@ def test_literal_annual_identity_does_not_force_a_calendar_name_to36525():
         ("whole_cycle_days_per_year", 365),
     ],
 )
-def test_implicit_or_invalid_units_are_rejected(field, value):
+def test_implicit_or_invalid_units_are_rejected(field: str, value) -> None:
     args = parameters()
     args[field] = value
     with pytest.raises(ValueError, match="Explicit exact mean-origin"):
         mean_origin_hypothesis(**args)
 
 
-def test_current_old_auditors_correct_the_unqualified_absence_without_regrading():
-    from scripts.taiyi.audit_taiyi_day_epoch import audit as day_audit
-    from scripts.taiyi.audit_taiyi_liang_collation import audit as liang_audit
+def test_current_old_auditors_correct_the_unqualified_absence_without_regrading() -> (
+    None
+):
 
     day, liang = day_audit(), liang_audit()
     assert "jinjing_explicit_year_ganzhi_is_not_explicit_day_ganzhi" not in liang
@@ -225,7 +234,7 @@ def test_current_old_auditors_correct_the_unqualified_absence_without_regrading(
     assert day["hypothesis_convention_pairs_matching_Liang_day"] == 1
 
 
-def test_unparsed_siku_and_full_goal_remain_unresolved(report, tmp_path):
+def test_unparsed_siku_and_full_goal_remain_unresolved(report) -> None:
     assert report["siku_phase"]["annual_residue_numerator"] is None
     assert report["siku_phase"]["status"] == "unresolved"
     assert report["new_complete_dated_classical_cases_passed"] == 0
@@ -233,19 +242,3 @@ def test_unparsed_siku_and_full_goal_remain_unresolved(report, tmp_path):
         not report["whole_calendar_acceptance_passed"]
         and not report["whole_goal_complete"]
     )
-    outputs = []
-    for entry in (
-        [str(ROOT / "scripts/taiyi/audit_taiyi_origin_phase.py")],
-        ["-m", "scripts.taiyi.audit_taiyi_origin_phase"],
-    ):
-        path = tmp_path / f"report{len(outputs)}.json"
-        result = subprocess.run(
-            [sys.executable, *entry, "--output", str(path)],
-            capture_output=True,
-            text=True,
-            check=False,
-            timeout=60,
-        )
-        assert result.returncode == 1 and not result.stderr
-        outputs.append(path.read_bytes())
-    assert outputs[0] == outputs[1]

@@ -6,8 +6,8 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.bureau_season import build_bureau_season_reference
+from fatebridge.core.contracts.output_bureau_season import BureauSeasonReference
 from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.output_bureau_season import BureauSeasonReference
 
 PILLARS = dict(
     zip(("year", "month", "day", "hour"), map(tuple, ("癸卯", "丙辰", "甲辰", "丙寅")))
@@ -18,7 +18,9 @@ def calculated():
     return ElementAnalysis.analyze_day_master_strength(PILLARS)["assessment"]
 
 
-def test_source_month_chen_branch_group_keeps_actual_phase_and_unadopted_numeric_result():
+def test_source_month_chen_branch_group_keeps_actual_phase_and_unadopted_numeric_result() -> (
+    None
+):
     assessment = calculated()
     before = deepcopy(assessment)
     result = build_bureau_season_reference(PILLARS, assessment)
@@ -38,7 +40,9 @@ def test_source_month_chen_branch_group_keeps_actual_phase_and_unadopted_numeric
     BureauSeasonReference.model_validate(result)
 
 
-def test_no_supplied_calculation_remains_unknown_and_contested_gate_is_not_false():
+def test_no_supplied_calculation_remains_unknown_and_contested_gate_is_not_false() -> (
+    None
+):
     empty = build_bureau_season_reference(PILLARS, {})
     assert empty["combination_observations"] is None
     assert empty["calculated_phases"] is None
@@ -71,8 +75,8 @@ def test_no_supplied_calculation_remains_unknown_and_contested_gate_is_not_false
     ],
 )
 def test_four_earth_principal_months_keep_their_different_branch_groups(
-    branch, group, element
-):
+    branch: str, group: str, element: str
+) -> None:
     pillars = {**PILLARS, "month": ("甲", branch)}
     result = build_bureau_season_reference(pillars, {})
     assert result["principal_branch_element"] == "土"
@@ -93,7 +97,7 @@ def test_four_earth_principal_months_keep_their_different_branch_groups(
         "unknown_method",
     ],
 )
-def test_contract_rejects_conflated_or_invented_seasonal_claims(change):
+def test_contract_rejects_conflated_or_invented_seasonal_claims(change: str) -> None:
     result = build_bureau_season_reference(PILLARS, calculated())
     row = result["combination_observations"][0]
     if change == "quarter_as_earth":
@@ -114,7 +118,7 @@ def test_contract_rejects_conflated_or_invented_seasonal_claims(change):
         BureauSeasonReference.model_validate(result)
 
 
-def test_present_object_fields_remain_valid_when_projected_alone():
+def test_present_object_fields_remain_valid_when_projected_alone() -> None:
     result = build_bureau_season_reference(PILLARS, calculated())
     for name, value in result.items():
         projected = {name: value}

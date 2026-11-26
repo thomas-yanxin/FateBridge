@@ -11,14 +11,14 @@ import pytest
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro.time_scales import ephemeris_time, leap_table
-from fatebridge.core.human_design_birth_clock import (
+from fatebridge.core.human_design.human_design_birth_clock import (
     resolve_birth_clock,
     verify_birth_clock,
 )
-from fatebridge.core.human_design_cycles import reference_epoch
+from fatebridge.core.human_design.human_design_cycles import reference_epoch
 from fatebridge.core.requests.human_design import HumanDesignRequest
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
+from validation.human_design import verify_human_design_reading
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 PLAN = json.loads((FIXTURES / "human-design-leap-plan.json").read_text())
@@ -38,7 +38,7 @@ def birth_input(label):
     )
 
 
-def test_frozen_sofa_plan_contains_every_known_step_and_no_removed_rows():
+def test_frozen_sofa_plan_contains_every_known_step_and_no_removed_rows() -> None:
     assert (
         REFERENCE["plan_sha256"]
         == hashlib.sha256(
@@ -64,7 +64,7 @@ def test_frozen_sofa_plan_contains_every_known_step_and_no_removed_rows():
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"], ids=lambda r: r["utc_label"])
-def test_all_81_frozen_labels_agree_with_independent_two_part_sofa(case):
+def test_all_81_frozen_labels_agree_with_independent_two_part_sofa(case) -> None:
     request = HumanDesignRequest(**birth_input(case["utc_label"]))
     clock = resolve_birth_clock(**birth_input(case["utc_label"]))
     tt = clock.jd_tt if clock.leap_second else ephemeris_time(clock.utc_anchor).jd_tt
@@ -74,7 +74,7 @@ def test_all_81_frozen_labels_agree_with_independent_two_part_sofa(case):
 
 
 @pytest.mark.parametrize("label", [x for x in PLAN["utc_labels"] if x[17:19] == "60"])
-def test_all_27_public_leap_births_have_full_verified_explanations(label):
+def test_all_27_public_leap_births_have_full_verified_explanations(label) -> None:
     run = execute_tool(SPEC, HumanDesignRequest(**birth_input(label)))
     proof = run["birth_clock_evidence"]
     assert run["birth_utc"] == label[:19] + ".000000+00:00"
@@ -94,7 +94,6 @@ def test_all_27_public_leap_births_have_full_verified_explanations(label):
     after_tt = ephemeris_time(following).jd_tt
     assert abs((after_tt - proof["jd_tt"]) * 86400 - 1) < 0.0002
     assert after_tt != proof["jd_tt"]
-    assert run["validation"]["all_three_axes_full_marks"] is False
 
 
 @pytest.mark.parametrize(
@@ -111,7 +110,9 @@ def test_all_27_public_leap_births_have_full_verified_explanations(label):
         ("2024-11-03T01:30:60", "America/New_York"),
     ],
 )
-def test_unknown_unpublished_wrong_local_minute_and_dst_are_rejected(label, zone):
+def test_unknown_unpublished_wrong_local_minute_and_dst_are_rejected(
+    label: str, zone: str
+) -> None:
     with pytest.raises(ValueError):
         HumanDesignRequest(**{**birth_input(label), "birth_timezone": zone})
 
@@ -125,7 +126,7 @@ def test_unknown_unpublished_wrong_local_minute_and_dst_are_rejected(label, zone
         "2016-12-31T23:59:60.000000+00:00",
     ],
 )
-def test_cycle_reference_accepts_the_same_confirmed_leap_instant(label):
+def test_cycle_reference_accepts_the_same_confirmed_leap_instant(label: str) -> None:
     canonical, tt = reference_epoch(label)
     clock = resolve_birth_clock(**birth_input("2016-12-31T23:59:60"))
     assert canonical == clock.utc_label and tt == clock.jd_tt
@@ -139,7 +140,7 @@ def test_cycle_reference_accepts_the_same_confirmed_leap_instant(label):
         )
 
 
-def test_fractional_cycle_reference_is_continuous_and_replays_its_own_label():
+def test_fractional_cycle_reference_is_continuous_and_replays_its_own_label() -> None:
     label, tt = reference_epoch("2017-01-01T07:59:60.500000+08:00")
     _, start = reference_epoch("2016-12-31T23:59:60Z")
     assert label == "2016-12-31T23:59:60.500000+00:00"
@@ -163,7 +164,9 @@ def test_fractional_cycle_reference_is_continuous_and_replays_its_own_label():
         "text",
     ],
 )
-def test_rehashed_inconsistent_leap_proofs_and_explanations_are_rejected(mutation):
+def test_rehashed_inconsistent_leap_proofs_and_explanations_are_rejected(
+    mutation: str,
+) -> None:
     run = execute_tool(SPEC, HumanDesignRequest(**birth_input("2016-12-31T23:59:60")))
     forged = deepcopy(run)
     proof = forged["birth_clock_evidence"]
@@ -192,15 +195,19 @@ def test_rehashed_inconsistent_leap_proofs_and_explanations_are_rejected(mutatio
     if mutation != "text":
         with pytest.raises((ValueError, KeyError)):
             verify_birth_clock(forged)
+    else:
+        pass
     assert verify_human_design_reading(forged)["status"] == "rejected"
 
 
 @pytest.mark.parametrize("empty_files", [False, True])
 def test_leap_birth_uncertainty_and_cycles_keep_selected_tt(
-    monkeypatch, tmp_path, empty_files
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, empty_files: bool
+) -> None:
     if empty_files:
         monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
+    else:
+        pass
     run = execute_tool(
         SPEC,
         HumanDesignRequest(

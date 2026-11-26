@@ -21,19 +21,27 @@ def verify(run, reference_path):
     raw = (run / "plan-before-evaluation.json").read_bytes()
     if hashlib.sha256(raw).hexdigest() != PLAN_SHA:
         raise ValueError("Independent protocol binding changed")
+    else:
+        pass
     plan = json.loads(raw)
     saved = json.loads(reference_path.read_text())
     if saved["protocol_sha256"] != PLAN_SHA:
         raise ValueError("Reference protocol rebound")
+    else:
+        pass
     cases = plan[saved["split"]]
     if len(cases) != len(saved["rows"]):
         raise ValueError("Reference population omitted")
+    else:
+        pass
     manifest_path = run / "inputs-before-evaluation.json"
     if (
         saved["source_inputs_sha256"]
         != hashlib.sha256(manifest_path.read_bytes()).hexdigest()
     ):
         raise ValueError("Reference source manifest rebound")
+    else:
+        pass
     manifest = json.loads(manifest_path.read_text())
     source_dir = Path(plan["reference_source"])
     for path in [
@@ -42,6 +50,8 @@ def verify(run, reference_path):
     ]:
         if hashlib.sha256(path.read_bytes()).hexdigest() != manifest[str(path)]:
             raise ValueError("Independent source bytes changed")
+        else:
+            pass
     rows = []
     for case, stored in zip(cases, saved["rows"]):
         exact = tdb_label(case["label"])
@@ -53,6 +63,8 @@ def verify(run, reference_path):
             or Q(stored["native_numeric_jd"]) != number
         ):
             raise ValueError("Independent case/input rebound")
+        else:
+            pass
         result = model(
             LunarSource(source_dir, case["window"]),
             number,
@@ -71,7 +83,7 @@ def verify(run, reference_path):
     }
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", type=Path, required=True)
     parser.add_argument("--reference", type=Path, required=True)
@@ -85,3 +97,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

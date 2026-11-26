@@ -6,17 +6,18 @@ import json
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core import canping_texts as texts
-from fatebridge.core.canping_texts import lookup_record
-from fatebridge.core.output_numerology import CanpingReadingRevision
+from fatebridge.core.contracts.output_numerology import CanpingReadingRevision
+from fatebridge.core.numerology import canping_texts as texts
+from fatebridge.core.numerology.canping_texts import lookup_record
 from fatebridge.utils.errors import NumerologySourceError
-from tests.numerology.test_canping_rereading_depth import jpeg_dimensions
+from tests.unit_test.fixtures.canping_source import jpeg_dimensions
 
 
 def test_inherited_corpus_callers_cannot_poison_source_cache_or_its_provenance(
-    monkeypatch,
-):
+    monkeypatch: MonkeyPatch,
+) -> None:
     original = texts._loaded
     loaded = copy.deepcopy(original(texts.INHERITED_PATH))
     monkeypatch.setattr(
@@ -39,7 +40,7 @@ CELLS = REFERENCE["cells"]
 
 
 @pytest.mark.parametrize("cell", CELLS)
-def test_earth_revisions_keep_the_actual_previous_status(cell):
+def test_earth_revisions_keep_the_actual_previous_status(cell) -> None:
     out = lookup_record("土", cell["number"], cell["kind"])
     s = out["selection"]
     r = s["reading_revision"]
@@ -61,7 +62,9 @@ def test_earth_revisions_keep_the_actual_previous_status(cell):
 
 
 @pytest.mark.parametrize("page", REFERENCE["pages"])
-def test_three_native_pages_keep_source_identity_and_full_coordinate_coverage(page):
+def test_three_native_pages_keep_source_identity_and_full_coordinate_coverage(
+    page,
+) -> None:
     m = json.loads((ROOT / REFERENCE["source_manifest_file"]).read_text())
     c = m["sequences"][0]["canvases"][page["pdf_page"] - 1]
     assert [c["width"], c["height"]] == page["canvas_dimensions"] == [5900, 4400]
@@ -82,7 +85,9 @@ def test_three_native_pages_keep_source_identity_and_full_coordinate_coverage(pa
         )
 
 
-def test_earth_clear_correction_does_not_count_as_another_resolved_uncertainty():
+def test_earth_clear_correction_does_not_count_as_another_resolved_uncertainty() -> (
+    None
+):
     old = json.loads((ROOT.parent / "canping_earth_v1/reference.json").read_text())
     assert (
         old["unambiguous_earth_cells"] == 231 and old["unresolved_reading_cells"] == 3
@@ -178,7 +183,7 @@ def test_earth_clear_correction_does_not_count_as_another_resolved_uncertainty()
 
 
 @pytest.mark.parametrize("number,kind", [(2460, "luck"), (3363, "luck")])
-def test_two_earth_unreadable_ends_remain_uncertain(number, kind):
+def test_two_earth_unreadable_ends_remain_uncertain(number: int, kind: str) -> None:
     out = lookup_record("土", number, kind)
     assert (
         "□" in out["text"]
@@ -187,7 +192,9 @@ def test_two_earth_unreadable_ends_remain_uncertain(number, kind):
 
 
 @pytest.mark.parametrize("change", ["remove_earth", "duplicate_earth", "wrong_batch"])
-def test_earth_rereading_requires_its_own_witness(monkeypatch, change):
+def test_earth_rereading_requires_its_own_witness(
+    monkeypatch: MonkeyPatch, change: str
+) -> None:
     original = texts._loaded
     loaded = copy.deepcopy(original(texts.COLLATION_PATH))
     d = loaded["data"]

@@ -6,16 +6,18 @@ import json
 import shutil
 from copy import deepcopy
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
 from fastmcp import Client
 
 import fatebridge.api as api
+import fatebridge.core.ziwei.ziwei_time_input as module
 import scripts.ziwei.audit_ziwei_solar_clock as audit
 from fatebridge.application.examples import evidence_views
 from fatebridge.cli import run
-from fatebridge.core.ziwei_time_input import birth_clock_receipt
+from fatebridge.core.ziwei.ziwei_time_input import birth_clock_receipt
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_ziwei_birth
 from fatebridge.services.tool_catalog import CATALOG
@@ -23,6 +25,7 @@ from fatebridge.utils.birth_input import create_person_info
 from fatebridge.utils.solar_time import normalize_birth_time
 from scripts.ziwei.audit_ziwei import FIXTURES, hko_rows
 from tests.fixtures.mcp_receipt import verified_inline_business
+from tests.support.transports import call_calculation
 
 BIRTH = dict(
     birth_year=2024,
@@ -37,7 +40,7 @@ BIRTH = dict(
 )
 
 
-def test_all_external_solar_clocks_join_hko_dates_and_real_placements():
+def test_all_external_solar_clocks_join_hko_dates_and_real_placements() -> None:
     r = audit.audit_solar_clock(hko_rows, FIXTURES)
     assert r["independent_jpl_points"] == 449
     assert r["observer_sites"] == 7 and r["chart_checks"] == 898
@@ -56,7 +59,7 @@ def test_all_external_solar_clocks_join_hko_dates_and_real_placements():
     assert not r["full_calendar_acceptance_passed"]
 
 
-def test_source_keeps_every_declared_instant_and_independent_solar_hour_angle():
+def test_source_keeps_every_declared_instant_and_independent_solar_hour_angle() -> None:
     p, rows = audit.load_reference()
     assert len(rows) == p["expected_source_points"] == 449
     assert len({(r["site"]["id"], r["instant"]) for r in rows}) == 449
@@ -72,7 +75,7 @@ def test_source_keeps_every_declared_instant_and_independent_solar_hour_angle():
     )
 
 
-def test_corrupted_original_reply_is_rejected(tmp_path):
+def test_corrupted_original_reply_is_rejected(tmp_path: Path) -> None:
     shutil.copytree(audit.DIRECTORY, tmp_path / "data")
     (tmp_path / "data/zero-00.json").write_text("changed")
     with pytest.raises(ValueError, match="reply checksum mismatch"):
@@ -80,7 +83,9 @@ def test_corrupted_original_reply_is_rejected(tmp_path):
 
 
 @pytest.mark.parametrize("kind", ["site", "point", "duplicate", "solar_hour"])
-def test_rehashed_wrong_metadata_or_tables_are_not_valid_sources(tmp_path, kind):
+def test_rehashed_wrong_metadata_or_tables_are_not_valid_sources(
+    tmp_path: Path, kind: str
+) -> None:
     directory = tmp_path / "data"
     shutil.copytree(audit.DIRECTORY, directory)
     m = json.loads((directory / "manifest.json").read_text())
@@ -106,7 +111,9 @@ def test_rehashed_wrong_metadata_or_tables_are_not_valid_sources(tmp_path, kind)
         audit.load_reference(directory)
 
 
-def test_wrong_actual_hour_does_not_change_external_expectation(monkeypatch):
+def test_wrong_actual_hour_does_not_change_external_expectation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = audit.calculate_ziwei_birth
 
     def wrong(person, **kw):
@@ -117,6 +124,8 @@ def test_wrong_actual_hour_does_not_change_external_expectation(monkeypatch):
             and person.birth_hour == 0
         ):
             r["ziwei_birth"]["hour_branch"] = "wrong"
+        else:
+            pass
         return r
 
     monkeypatch.setattr(audit, "calculate_ziwei_birth", wrong)
@@ -125,7 +134,7 @@ def test_wrong_actual_hour_does_not_change_external_expectation(monkeypatch):
     assert all(x["checks"]["actual_hour"] is False for x in r["differences"])
 
 
-def test_seconds_endpoint_does_not_replace_base_birth_facts_or_chart():
+def test_seconds_endpoint_does_not_replace_base_birth_facts_or_chart() -> None:
     r = calculate_ziwei_birth(create_person_info(**BIRTH))
     c = r["ziwei_birth"]
     s = c["calendar_basis"]["time_input"]["minute_sensitivity"]
@@ -143,7 +152,9 @@ def test_seconds_endpoint_does_not_replace_base_birth_facts_or_chart():
 
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
-def test_given_minute_can_cross_lunar_new_year_without_changing_hour_branch(profile):
+def test_given_minute_can_cross_lunar_new_year_without_changing_hour_branch(
+    profile: str,
+) -> None:
     r = calculate_ziwei_birth(
         create_person_info(
             **{
@@ -170,9 +181,8 @@ def test_given_minute_can_cross_lunar_new_year_without_changing_hour_branch(prof
 
 
 def test_sensitivity_does_not_apply_a_solar_model_when_solar_time_was_not_applied(
-    monkeypatch,
-):
-    import fatebridge.core.ziwei_time_input as module
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     p = create_person_info(**{**BIRTH, "use_true_solar_time": False})
     n = normalize_birth_time(p)
@@ -191,8 +201,8 @@ def test_sensitivity_does_not_apply_a_solar_model_when_solar_time_was_not_applie
 
 @pytest.mark.parametrize("tool", ["ziwei_birth", "ziwei_horoscope"])
 def test_minute_diagnostics_have_three_surface_parity_and_fit_default_budget(
-    tool, monkeypatch, capsys
-):
+    tool: str, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -204,6 +214,8 @@ def test_minute_diagnostics_have_three_surface_parity_and_fit_default_budget(
     inputs = {**BIRTH}
     if tool == "ziwei_horoscope":
         inputs.update(target_year=2026, target_month=10, target_day=22, target_hour=12)
+    else:
+        pass
     opts = dict(
         as_of="2026-10-22T12:00:00+08:00",
         fields=fields,
@@ -211,7 +223,7 @@ def test_minute_diagnostics_have_three_surface_parity_and_fit_default_budget(
         include_snapshot_text=False,
     )
     rest = TestClient(api.app).post(
-        "/api/cn/ziwei/" + ("birth" if tool == "ziwei_birth" else "horoscope"),
+        spec.rest_path,
         json=inputs,
         params=[
             ("as_of", opts["as_of"]),
@@ -223,12 +235,14 @@ def test_minute_diagnostics_have_three_surface_parity_and_fit_default_budget(
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            r = await client.call_tool(tool, {**inputs, **opts}, raise_on_error=False)
+            r = await call_calculation(
+                client, spec.tool_name, {**inputs, **opts}, raise_on_error=False
+            )
             assert not r.is_error, r.content
             return await verified_inline_business(client, r.structured_content)
 
     native = asyncio.run(call())
-    args = [tool]
+    args = [spec.tool_name]
     for k, v in inputs.items():
         args += ["--" + k.replace("_", "-"), str(v)]
     args += [
@@ -252,3 +266,27 @@ def test_minute_diagnostics_have_three_surface_parity_and_fit_default_budget(
     b = bodies[0][tool]["calendar_basis"]
     s = (b if tool == "ziwei_birth" else b["birth"])["time_input"]["minute_sensitivity"]
     assert s["endpoint_hour_branches"] == ["子", "丑"] and s["crosses_hour_branch"]
+
+
+def test_minute_endpoint_cannot_borrow_from_a_different_civil_minute() -> None:
+    # TZif Africa/Bissau advances from 23:57:40 LMT to Jan 1 00:00:00.
+    r = calculate_ziwei_birth(
+        create_person_info(
+            birth_year=1911,
+            birth_month=12,
+            birth_day=31,
+            birth_hour=23,
+            birth_minute=57,
+            birth_timezone="Africa/Bissau",
+            use_true_solar_time=False,
+        )
+    )
+    s = r["ziwei_birth"]["calendar_basis"]["time_input"]["minute_sensitivity"]
+    assert (
+        s["assumption"] == "second_0_only_upper_endpoint_not_in_selected_civil_minute"
+    )
+    assert s["endpoint_seconds"] == [0]
+    assert s["endpoint_placement_datetimes"] == ["1911-12-31 23:57:00"]
+    assert s["endpoint_hour_branches"] == [r["ziwei_birth"]["hour_branch"]]
+    assert s["crosses_placement_date"] is None
+    assert s["crosses_hour_branch"] is None

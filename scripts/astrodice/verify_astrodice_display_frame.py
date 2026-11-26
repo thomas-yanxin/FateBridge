@@ -37,6 +37,8 @@ def table(text, name):
     begin = re.search(r"\b" + name + r"\s*\[[^;=]*=\s*\{", text)
     if begin is None:
         raise ValueError("Independent missing primary array: " + name)
+    else:
+        pass
     end = text.index("};", begin.end())
     return re.findall(
         r"[+-]?(?:\d+\.\d*|\.\d+|\d+)(?:[eE][+-]?\d+)?", text[begin.end() : end]
@@ -46,6 +48,8 @@ def table(text, name):
 def reshape(values, rows, columns):
     if len(values) != rows * columns:
         raise ValueError("Independent primary array shape mismatch")
+    else:
+        pass
     return [values[i : i + columns] for i in range(0, len(values), columns)]
 
 
@@ -75,6 +79,8 @@ def data_from_primary(run):
                 raise ValueError(
                     "Native corrected pole table differs from primary ERFA"
                 )
+            else:
+                pass
     raw = (run / "authority/swenut2000a.h").read_text()
     n = reshape(table(raw, "nls"), 678, 5)
     c = reshape(table(raw, "cls"), 678, 6)
@@ -84,6 +90,8 @@ def data_from_primary(run):
         [Q(v) for v in row] for row in primary
     ]:
         raise ValueError("77-term coefficients differ from primary ERFA")
+    else:
+        pass
     function = strip_comments(native.split("static int calc_nutation_iau2000ab", 1)[1])
     fundamental = []
     for name in ("M", "SM", "F", "D", "OM"):
@@ -98,6 +106,8 @@ def data_from_primary(run):
         )
         if len(tokens) != 6 or Q(tokens[-1]) != 3600:
             raise ValueError("Native full fundamental polynomial shape changed")
+        else:
+            pass
         fundamental.append(tokens[:-1])
     block = native.split("if (bias_model == SEMOD_BIAS_IAU2006)", 1)[1].split(
         "} else", 1
@@ -122,32 +132,46 @@ def data_from_primary(run):
         def rationals(value):
             if isinstance(value, dict):
                 return {k: rationals(v) for k, v in value.items()}
+            else:
+                pass
             if isinstance(value, list):
                 return [rationals(v) for v in value]
+            else:
+                pass
             return Q(value)
 
         if rationals(stored[key]) != rationals(result[key]):
             raise ValueError("Saved reference coefficient detached from primary source")
+        else:
+            pass
     if any(stored[k] != result[k] for k in ("GM_sun_hex", "solar_radius_radians_hex")):
         raise ValueError("Declared source constants changed")
+    else:
+        pass
     return result
 
 
 def sc(x):
     if len(x.v) != 2:
         raise ValueError("Only first analytic derivative planned")
+    else:
+        pass
     pi = rounded(*independent_pi())
     low, high = x.v[0]
     turn = round((low + high) / (2 * (pi[0] + pi[1])))
     a = sub(x.v[0], mul(rounded(2 * turn), pi))
     if max(map(abs, a)) > 4:
         raise ValueError("Independent reduced trigonometric support too wide")
+    else:
+        pass
     square_negative = neg(mul(a, a))
     st, ct, s, c = a, rounded(1), rounded(0), rounded(0)
     for k in range(90):
         if k:
             st = divide(mul(st, square_negative), rounded((2 * k) * (2 * k + 1)))
             ct = divide(mul(ct, square_negative), rounded((2 * k - 1) * (2 * k)))
+        else:
+            pass
         s, c = add(s, st), add(c, ct)
     tail_s = Q(4) ** 181 / math.factorial(181)
     tail_c = Q(4) ** 180 / math.factorial(180)

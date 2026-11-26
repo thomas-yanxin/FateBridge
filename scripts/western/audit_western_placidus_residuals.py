@@ -27,6 +27,8 @@ def semiarc_residual(longitude, latitude, obliquity, armc, fraction):
     cosine = -math.tan(phi) * math.tan(dec)
     if abs(cosine) > 1:
         return {"defined": False, "reason": "ecliptic_point_has_no_rise_set"}
+    else:
+        pass
     hour_angle = (armc - ra + 180) % 360 - 180
     semiarc = math.degrees(math.acos(cosine))
     return {
@@ -59,6 +61,8 @@ def audit(path):
                     != reference["protocol"]["systems"]["P"]
                 ):
                     continue
+                else:
+                    pass
                 row[name] = [
                     {
                         "cusp": i + 1,
@@ -108,3 +112,5 @@ if __name__ == "__main__":
         json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
     )
     print(result["maximum_absolute_equation_residual_arcseconds"])
+else:
+    pass

@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation.fengshui_monthly_calendar import (
+from validation.fengshui_monthly_calendar import (
     audit_monthly_calendar_reference,
 )
 
@@ -17,7 +17,7 @@ RAW = gzip.decompress((FOLDER / "jie-de440-tt.json.gz").read_bytes())
 REFERENCE = json.loads(RAW)
 
 
-def test_complete_independent_tt_reference_and_collector_identity():
+def test_complete_independent_tt_reference_and_collector_identity() -> None:
     manifest = json.loads((FOLDER / "calendar-reference.json").read_text())
     assert hashlib.sha256(RAW).hexdigest() == manifest["raw_sha256"]
     assert len(REFERENCE["rows"]) == 4812
@@ -46,7 +46,9 @@ def test_complete_independent_tt_reference_and_collector_identity():
         "wide_bracket",
     ],
 )
-def test_corrupted_or_easier_protocols_are_rejected_before_calculation(change):
+def test_corrupted_or_easier_protocols_are_rejected_before_calculation(
+    change: str,
+) -> None:
     bad = deepcopy(REFERENCE)
     if change == "drop":
         bad["rows"].pop()
@@ -64,5 +66,7 @@ def test_corrupted_or_easier_protocols_are_rejected_before_calculation(change):
         bad["rows"][0]["term"] = "立春"
     elif change == "wide_bracket":
         bad["rows"][0]["bracket_width_seconds"] = 1.1
+    else:
+        pass
     with pytest.raises(ValueError):
         audit_monthly_calendar_reference(bad)

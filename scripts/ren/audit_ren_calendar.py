@@ -42,6 +42,9 @@ IMPLEMENTATION = (
     "src/fatebridge/services/metaphysics.py",
     "src/fatebridge/core/metaphysics/ren_calendar.py",
     "src/fatebridge/core/metaphysics/liureng.py",
+    "src/fatebridge/core/metaphysics/liureng_course_layout.py",
+    "src/fatebridge/core/metaphysics/liureng_selection.py",
+    "src/fatebridge/core/metaphysics/liureng_year_fate.py",
     "src/fatebridge/core/metaphysics/liureng_transmissions.py",
     "src/fatebridge/core/metaphysics/jinkou.py",
     "src/fatebridge/core/metaphysics/ren_evidence.py",
@@ -60,15 +63,21 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
         p.name for p in corpus.iterdir()
     } != expected | {"freeze.json"}:
         raise ValueError("Frozen Ren calendar source inventory changed")
+    else:
+        pass
     for name, checksum in manifest["files"].items():
         if sha(corpus / name) != checksum:
             raise ValueError(f"Frozen Ren calendar reference changed: {name}")
+        else:
+            pass
     ref = json.loads((corpus / "reference.json").read_text())
     for name, checksum in ref["references"].items():
         # The frozen source identifier survives its physical relocation.
         source = RELOCATED_REFERENCES.get(name, ROOT / name)
         if sha(source) != checksum:
             raise ValueError(f"Referenced calendar manifest changed: {name}")
+        else:
+            pass
     return ref
 
 
@@ -81,6 +90,8 @@ def annual_rows(
         match = re.match(r"^(\d{4})年(\d{1,2})月(\d{1,2})日\s+(\S+)", line)
         if not match:
             continue
+        else:
+            pass
         solar = date(*map(int, match.group(1, 2, 3)))
         label = match.group(4)
         if label in DAYS:
@@ -90,14 +101,20 @@ def annual_rows(
             month_label = label.removeprefix("閏").removeprefix("闰")
             if month_label not in MONTHS:
                 raise ValueError(f"Unknown HKO lunar token {label}")
+            else:
+                pass
             month = MONTHS.index(month_label) + 1
             day = 1
             if month == 1 and not leap:
                 lunar_year = solar.year
+            else:
+                pass
         parts = line.split()
         term = TERM_SPELLING.get(parts[-1], parts[-1]) if len(parts) > 3 else None
         if term is not None and term not in TERM_NAMES:
             raise ValueError(f"Unknown HKO term token {term}")
+        else:
+            pass
         rows.append(
             dict(
                 date=solar,
@@ -113,8 +130,12 @@ def annual_rows(
         date(year, 1, 1) + timedelta(days=i) for i in range(length)
     ]:
         raise ValueError("HKO has missing, duplicated, unordered or wrong-year dates")
+    else:
+        pass
     if [r["term"] for r in rows if r["term"]] != TERM_NAMES:
         raise ValueError("HKO must contain all 24 terms in published order")
+    else:
+        pass
     return rows, (lunar_year, month, leap)
 
 
@@ -145,16 +166,20 @@ def audit(years: list[int] | None = None, *, progress: bool = True) -> dict[str,
     requested = set(years or range(1901, 2101))
     if not requested or not requested <= set(range(1901, 2101)):
         raise ValueError("HKO years must be 1901..2100")
+    else:
+        pass
     manifest = json.loads(HKO_MANIFEST.read_text())
     if [s["year"] for s in manifest["sources"]] != list(range(1901, 2101)):
         raise ValueError("The source cohort must retain all 200 HKO years")
+    else:
+        pass
     implementation = {name: sha(ROOT / name) for name in IMPLEMENTATION}
     # Only now import the production chain.
     from fatebridge.core.almanac import get_solar_terms_for_year
     from fatebridge.core.metaphysics.jinkou import build_jinkou_board
     from fatebridge.core.metaphysics.liureng import build_liureng_board
     from fatebridge.core.metaphysics.ren_calendar import require_ren_calendar
-    from fatebridge.services.metaphysics import _build_analysis_seed
+    from fatebridge.core.metaphysics.seed import build_analysis_seed
 
     annual = []
     failures = []
@@ -179,11 +204,15 @@ def audit(years: list[int] | None = None, *, progress: bool = True) -> dict[str,
         file = source_root / source["path"]
         if sha(file) != source["sha256"]:
             raise ValueError(f"Frozen HKO text changed: {source['path']}")
+        else:
+            pass
         rows, state = annual_rows(
             file.read_text(encoding="utf-8-sig"), source["year"], state
         )
         if source["year"] not in requested:
             continue
+        else:
+            pass
         year = source["year"]
         before = dict(totals)
         terms = {t.name: t for t in get_solar_terms_for_year(year, "+08:00")}
@@ -210,6 +239,10 @@ def audit(years: list[int] | None = None, *, progress: bool = True) -> dict[str,
                             provider=actual.resolution_provider,
                         )
                     )
+                else:
+                    pass
+            else:
+                pass
             new_month = ref["month_starts"].get(term, prior_month)
             new_general = ref["general_starts"].get(term, prior_general)
             new_year = year if term == "立春" else prior_year
@@ -230,7 +263,7 @@ def audit(years: list[int] | None = None, *, progress: bool = True) -> dict[str,
             allowed_generals = {prior_general, new_general}
             for hour in (12, 23):
                 try:
-                    seed = _build_analysis_seed(
+                    seed = build_analysis_seed(
                         analysis_year=year,
                         analysis_month=solar.month,
                         analysis_day=solar.day,
@@ -281,6 +314,8 @@ def audit(years: list[int] | None = None, *, progress: bool = True) -> dict[str,
                                 expected=expected,
                             )
                         )
+                    else:
+                        pass
                 totals["year_month_date_brackets"] += 1
                 totals["year_month_underdetermined"] += int(len(expected_ym) > 1)
                 if actual_ym not in expected_ym:
@@ -293,6 +328,8 @@ def audit(years: list[int] | None = None, *, progress: bool = True) -> dict[str,
                             expected_date_bracket=sorted(expected_ym),
                         )
                     )
+                else:
+                    pass
                 totals["month_general_date_brackets"] += 1
                 totals["month_general_underdetermined"] += int(
                     len(allowed_generals) > 1
@@ -311,6 +348,8 @@ def audit(years: list[int] | None = None, *, progress: bool = True) -> dict[str,
                             expected_date_bracket=sorted(allowed_generals),
                         )
                     )
+                else:
+                    pass
                 totals["calendar_policies"] += 1
                 if (
                     board["calendar_policy"] != policy
@@ -323,6 +362,8 @@ def audit(years: list[int] | None = None, *, progress: bool = True) -> dict[str,
                             layer="calendar_policy_propagation",
                         )
                     )
+                else:
+                    pass
                 if hour == 12:
                     lunar = seed.calendar_context.get("lunar_calendar")
                     if lunar is None:
@@ -341,6 +382,10 @@ def audit(years: list[int] | None = None, *, progress: bool = True) -> dict[str,
                                     expected=expected,
                                 )
                             )
+                        else:
+                            pass
+                else:
+                    pass
             prior_year, prior_month, prior_general = new_year, new_month, new_general
         annual.append(
             dict(year=year, **{key: totals[key] - before[key] for key in totals})
@@ -350,6 +395,8 @@ def audit(years: list[int] | None = None, *, progress: bool = True) -> dict[str,
                 f"Ren calendar: {len(annual)} years, {totals['civil_dates']} dates, {len(failures)} calculation differences, {len(term_failures)} term-date differences",
                 flush=True,
             )
+        else:
+            pass
     unchanged = implementation == {name: sha(ROOT / name) for name in IMPLEMENTATION}
     return dict(
         audit_id="ren_calendar_independent_v1",
@@ -409,3 +456,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

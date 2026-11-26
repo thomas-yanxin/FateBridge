@@ -6,7 +6,7 @@ not a hidden-root loss policy, a complete 截腳 rule or an effective-force test
 """
 
 from copy import deepcopy
-from typing import Any, Mapping, Tuple
+from typing import Any, Mapping
 
 from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
 from fatebridge.utils.data import (
@@ -104,7 +104,7 @@ def _describe_literal_hidden_targets(stem: str, branch: str) -> dict[str, Any]:
 
 
 def build_natal_hidden_carriers(
-    pillars: Mapping[str, Tuple[str, str]],
+    pillars: Mapping[str, tuple[str, str]],
 ) -> dict[str, Any]:
     day_stem = pillars["day"][0]
     rows = []

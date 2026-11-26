@@ -6,11 +6,11 @@ from dataclasses import replace
 import pytest
 
 from fatebridge.core import almanac, de440_solar
-from fatebridge.core.astro.time_scales import datetime_from_tt
+from fatebridge.core.astro.time_scales import utc_point_from_tt
 from fatebridge.core.astro.tt_epoch import TTInstant
+from fatebridge.core.contracts.output_chinese import RenTermDependency
 from fatebridge.core.metaphysics import ren_calendar
-from fatebridge.core.output_chinese import RenTermDependency
-from fatebridge.services.metaphysics import _build_analysis_seed
+from fatebridge.core.metaphysics.seed import build_analysis_seed
 from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.support.ren_de440_profile_reference import reference
@@ -25,7 +25,9 @@ def model_selection(monkeypatch):
 
 @pytest.mark.parametrize("mode", ["auto", "de440"])
 @pytest.mark.parametrize("year", [1700, 1799, 1800, 2200, 2201, 2300])
-def test_all24_actual_terms_are_accepted_in_both_public_modes(mode, year, monkeypatch):
+def test_all24_actual_terms_are_accepted_in_both_public_modes(
+    mode: str, year: int, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
     expected = (
         de440_solar.MODEL_ID if 1800 <= year <= 2200 else de440_solar.EXTENDED_MODEL_ID
@@ -47,7 +49,9 @@ def test_all24_actual_terms_are_accepted_in_both_public_modes(mode, year, monkey
 
 
 @pytest.mark.parametrize("year", [1700, 1799, 1800, 2200, 2201, 2300])
-def test_all_declared_independent_sample_points_keep_original_one_second_gate(year):
+def test_all_declared_independent_sample_points_keep_original_one_second_gate(
+    year: int,
+) -> None:
     refs = [r for r in reference()["rows"] if r["year"] == year]
     terms = almanac.get_solar_terms_for_year(year, "UTC")
     assert len(refs) == 24
@@ -66,8 +70,8 @@ def test_all_declared_independent_sample_points_keep_original_one_second_gate(ye
 
 @pytest.mark.parametrize("year", [1700, 2000, 2300])
 def test_longitude_reobservation_uses_actual_profile_for_both_endpoints(
-    year, monkeypatch
-):
+    year: int, monkeypatch: pytest.MonkeyPatch
+) -> None:
     term = almanac.get_solar_terms_for_year(year, "UTC")[0]
     observed = []
     original = de440_solar.solar_longitude_parts
@@ -92,25 +96,26 @@ def test_longitude_reobservation_uses_actual_profile_for_both_endpoints(
         ("native_moshier_relabelled", True),
     ],
 )
-def test_extended_receipt_still_rejects_corrupt_or_relabelled_source(field, wrong):
+def test_extended_receipt_still_rejects_corrupt_or_relabelled_source(
+    field: str, wrong
+) -> None:
     term = almanac.get_solar_terms_for_year(1700, "UTC")[0]
     details = copy.deepcopy(term.solar_model_details)
     details[field] = wrong
-    expected_error = RuntimeError if field == "model_id" else EphemerisSourceError
-    with pytest.raises(expected_error):
+    with pytest.raises(EphemerisSourceError):
         ren_calendar.require_ren_solar_term(replace(term, solar_model_details=details))
 
 
 @pytest.mark.parametrize(
     "model", [de440_solar.HISTORICAL_MODEL_ID, de440_solar.CANPING_MODEL_ID, "invented"]
 )
-def test_private_profiles_are_not_admitted_as_public_year_grid_models(model):
+def test_private_profiles_are_not_admitted_as_public_year_grid_models(model) -> None:
     term = almanac.get_solar_terms_for_year(1700, "UTC")[0]
     with pytest.raises((RuntimeError, EphemerisSourceError)):
         ren_calendar.require_ren_solar_term(replace(term, ephemeris_model=model))
 
 
-def test_coherent_tt_receipt_is_not_enough_for_wrong_extended_crossing():
+def test_coherent_tt_receipt_is_not_enough_for_wrong_extended_crossing() -> None:
     term = almanac.get_solar_terms_for_year(1700, "UTC")[0]
     details = copy.deepcopy(term.solar_model_details)
     details["selected_crossing_jd_tt"] += 1
@@ -118,14 +123,14 @@ def test_coherent_tt_receipt_is_not_enough_for_wrong_extended_crossing():
     details["root_bracket_tt"] = [v + 1 for v in details["root_bracket_tt"]]
     for p in details["root_bracket_tt_parts"]:
         p[0] += 1
+    tt_instant = TTInstant.from_parts(*details["selected_crossing_tt_parts"])
+    civil_point = utc_point_from_tt(tt_instant)
     bad = replace(
         term,
         solar_model_details=details,
-        calendar=ZonedCalendar.from_datetime(
-            datetime_from_tt(
-                TTInstant.from_parts(*details["selected_crossing_tt_parts"])
-            )
-        ),
+        calendar=ZonedCalendar(civil_point.as_calendar(), term.calendar.zone),
+        civil_point=civil_point,
+        tt_instant=tt_instant,
     )
     from fatebridge.core.metaphysics.ren_term_point import validate_term_point
 
@@ -146,9 +151,9 @@ def test_coherent_tt_receipt_is_not_enough_for_wrong_extended_crossing():
     ],
 )
 def test_actual_dependencies_keep_selected_and_mixed_profile_identities(
-    year, month, day, expected
-):
-    seed = _build_analysis_seed(
+    year: int, month: int, day: int, expected
+) -> None:
+    seed = build_analysis_seed(
         analysis_year=year,
         analysis_month=month,
         analysis_day=day,
@@ -168,8 +173,8 @@ def test_actual_dependencies_keep_selected_and_mixed_profile_identities(
 @pytest.mark.parametrize("year", [1700, 2300])
 @pytest.mark.parametrize("key", ["liureng_gods", "jinkou"])
 def test_extended_full_request_reaches_rest_mcp_cli_with_actual_source(
-    year, key, surface_calls
-):
+    year: int, key: str, surface_calls
+) -> None:
     payload = dict(
         analysis_year=year,
         analysis_month=6,
@@ -181,9 +186,13 @@ def test_extended_full_request_reaches_rest_mcp_cli_with_actual_source(
     )
     if key == "jinkou":
         payload["di_fen"] = "酉"
+    else:
+        pass
     s = SPECS[key]
     fields = ["four_pillars", "liureng.calendar_policy", "liureng.meta"]
-    options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
+    options = dict(
+        detail="audit", fields=fields, strict_fields=True, include_snapshot_text=False
+    )
     h, m, ccode, c = surface_calls(
         s, payload, projection={**options, "response_char_limit": 0}
     )

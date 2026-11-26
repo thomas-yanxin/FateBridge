@@ -19,6 +19,7 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.civil_time import utc_calendar
 from fatebridge.utils.timezones import parse_timezone_name, validate_local_clock
+from tests.support.transports import call_calculation
 
 FIXTURES = Path(__file__).parents[1] / "data/astrodice/tables"
 PROTOCOL = json.loads((FIXTURES / "timezone-boundary-protocol.json").read_text())
@@ -29,7 +30,7 @@ SPEC = next(spec for spec in CATALOG if spec.key == "otherbu")
 @pytest.mark.parametrize(
     "case,reference", tuple(zip(PROTOCOL["cases"], REFERENCE["rows"]))
 )
-def test_frozen_independent_calendar_reference(case, reference):
+def test_frozen_independent_calendar_reference(case, reference) -> None:
     local = datetime.fromisoformat(case["date"] + "T" + case["time"]).replace(
         tzinfo=parse_timezone_name(case["zone"])
     )
@@ -52,7 +53,9 @@ def test_frozen_independent_calendar_reference(case, reference):
     ],
 )
 @pytest.mark.parametrize("fold", [0, 1])
-def test_dst_and_political_gaps_folds_remain_rejected(zone, clock, kind, fold):
+def test_dst_and_political_gaps_folds_remain_rejected(
+    zone: str, clock: str, kind: str, fold: int
+) -> None:
     local = datetime.fromisoformat(clock).replace(
         tzinfo=parse_timezone_name(zone), fold=fold
     )
@@ -61,7 +64,7 @@ def test_dst_and_political_gaps_folds_remain_rejected(zone, clock, kind, fold):
 
 
 @pytest.mark.parametrize("case", PROTOCOL["cases"][:2])
-def test_extended_birth_round_trips_native_envelope_without_fake_utc(case):
+def test_extended_birth_round_trips_native_envelope_without_fake_utc(case) -> None:
     local = datetime.fromisoformat(case["date"] + "T" + case["time"])
     birth = build_astro_birth_info(
         birth_year=local.year,
@@ -82,7 +85,9 @@ def test_extended_birth_round_trips_native_envelope_without_fake_utc(case):
 
 
 @pytest.mark.parametrize("case", PROTOCOL["cases"][:2])
-def test_extended_utc_is_preserved_across_rest_mcp_cli(case, monkeypatch, capsys):
+def test_extended_utc_is_preserved_across_rest_mcp_cli(
+    case, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -120,8 +125,9 @@ def test_extended_utc_is_preserved_across_rest_mcp_cli(case, monkeypatch, capsys
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                "otherbu",
+            result = await call_calculation(
+                client,
+                "interpret_astrology_dice",
                 {
                     **inputs,
                     "fields": fields,
@@ -133,7 +139,7 @@ def test_extended_utc_is_preserved_across_rest_mcp_cli(case, monkeypatch, capsys
             return result.structured_content
 
     native = asyncio.run(invoke())
-    flags = ["otherbu"]
+    flags = ["interpret_astrology_dice"]
     for key, value in inputs.items():
         flags.extend(["--" + key.replace("_", "-"), str(value)])
     assert run([*flags, "--fields", *fields, "--strict-fields"]) == 0

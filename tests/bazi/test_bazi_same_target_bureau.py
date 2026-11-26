@@ -6,11 +6,10 @@ from fractions import Fraction
 
 import pytest
 
-from fatebridge.core.bazi_evidence import build_natal_evidence
+from fatebridge.core.bazi.bazi_evidence import build_natal_evidence
 from fatebridge.core.complete_bureaus import complete_bureau_snapshot_lines
+from fatebridge.core.contracts.output_bazi_evidence import BaziEvidenceChain
 from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.output_bazi_evidence import BaziEvidenceChain
-from tests.bazi.test_strength_v2 import pillars
 from tests.support.bazi_formation_reference import (
     BRANCHES,
     FULL,
@@ -21,6 +20,7 @@ from tests.support.bazi_formation_reference import (
 from tests.support.bazi_strength_reference_v3 import (
     assert_current_assessment_arithmetic,
 )
+from tests.unit_test.fixtures.bazi_strength import bazi_pillars as pillars
 
 POSITIVES = [
     ("ZP31-XUAN", "己卯 辛未 壬寅 辛亥", "三合", ["year", "month", "hour"]),
@@ -33,7 +33,7 @@ POSITIVES = [
 @pytest.mark.parametrize("case,text,kind,seats", POSITIVES)
 def test_primary_complete_formation_survives_same_target_affiliate(
     case, text, kind, seats
-):
+) -> None:
     chart = pillars(text)
     strength = ElementAnalysis.analyze_day_master_strength(chart)
     result = strength["assessment"]
@@ -90,11 +90,13 @@ def test_primary_complete_formation_survives_same_target_affiliate(
         "甲寅 丙午 戊戌 乙亥",
     ],
 )
-def test_pair_only_clashing_and_different_target_controls_retain_current_receipts(text):
+def test_pair_only_clashing_and_different_target_controls_retain_current_receipts(
+    text: str,
+) -> None:
     chart = pillars(text)
     current = ElementAnalysis.analyze_day_master_strength(chart)["assessment"]
     assert current["punishment_resolution_policy"] == (
-        "completed_combination_unique_pair_resolution_v2"
+        "completed_combination_zi_mao_month_officer_resolution_v4"
     )
     assert affiliations(tuple(chart[position][1] for position in ORDER)) == []
     assert not any(
@@ -103,7 +105,7 @@ def test_pair_only_clashing_and_different_target_controls_retain_current_receipt
     assert_current_assessment_arithmetic(text.split(), current)
 
 
-def test_all_20736_branch_seatings_against_independent_literal_oracle():
+def test_all_20736_branch_seatings_against_independent_literal_oracle() -> None:
     from fatebridge.core.formation_affiliations import partition_affiliations
 
     count = matches = 0
@@ -115,10 +117,14 @@ def test_all_20736_branch_seatings_against_independent_literal_oracle():
             seats = tuple(ORDER[i] for i, b in enumerate(branches) if b in letters)
             if set(branches[ORDER.index(p)] for p in seats) == set(letters):
                 candidates.append((kind, seats, target))
+            else:
+                pass
         for i in range(3):
             target = PAIRS.get(frozenset(branches[i : i + 2]))
             if target is not None:
                 candidates.append(("六合", ORDER[i : i + 2], target))
+            else:
+                pass
         full_sets = [set(c[1]) for c in candidates if len(c[1]) >= 3]
         candidates = [
             c

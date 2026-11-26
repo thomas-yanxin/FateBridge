@@ -1,37 +1,15 @@
-#!/usr/bin/env python3
-"""
-八字时间柱、节令边界与盘内关系。
+"""Compute BaZi time pillars, term boundaries, and pillar relationships."""
 
-大运使用所声明的起运换算和民用历时间轴；流年、月、日、时共用
-历法所有者。十神、六合与六冲是盘内结构，不能据此量化现实吉凶。
-"""
-
-import math
-from calendar import isleap
 from copy import deepcopy
 from datetime import date, datetime, timedelta, timezone
+from fractions import Fraction
 from functools import lru_cache
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, Dict
 
-from dateutil.relativedelta import relativedelta
-from dateutil.tz import resolve_imaginary
-
-from fatebridge.utils.birth_input import normalize_gender
-from fatebridge.utils.civil_time import ZonedCalendar
-from fatebridge.utils.timezones import validate_local_clock
-
-from ..utils.data import (
-    EARTHLY_BRANCHES,
-    HEAVENLY_STEMS,
-    STEM_ELEMENTS,
-    check_branch_combination,
-    check_branch_conflict,
-    get_nayin,
-    get_shishen,
-)
-from .almanac import (
+from fatebridge.core.almanac import (
     BAZI_MONTH_START_TERMS,
     DEFAULT_TIMEZONE,
+    SolarTerm,
     _solar_term_source_year,
     _solar_terms_for_context_year,
     elapsed_days_between,
@@ -43,16 +21,34 @@ from .almanac import (
     localize_datetime,
     require_calculated_solar_term,
 )
-from .calendar import BaZiCalendar, resolve_bazi_effective_date
+from fatebridge.core.calendar import BaZiCalendar, resolve_bazi_effective_date
+from fatebridge.core.timing_dayun import (
+    DayunCalendarOffset,
+    DayunStartDetails,
+    DayunStartResolution,
+    DayunTimeline,
+    calculate_dayun_sequence,
+    dayun_is_forward,
+    dayun_wall_year_preimages,
+    resolve_dayun_calendar_boundary,
+)
+from fatebridge.utils.civil_time import ZonedCalendar, utc_calendar
+from fatebridge.utils.data import (
+    STEM_ELEMENTS,
+    check_branch_combination,
+    check_branch_conflict,
+    get_nayin,
+    get_shishen,
+)
+from fatebridge.utils.timezones import (
+    is_unspecified_local_time,
+    timezone_transition_candidates,
+    validate_local_clock,
+)
 
 
 def _copy_timing_info(info: Dict) -> Dict:
-    """Detach the cached scalar payload and all nested solar-term metadata.
-
-    The window contains model dictionaries and lists below its term records.
-    Copy the entire window so caller edits cannot corrupt subsequent hits.
-    The remaining cache-owned fields are immutable scalars.
-    """
+    """Copy cached fields and detach nested solar-term metadata before delivery."""
     result = info.copy()
     if "solar_term_window" in info:
         result["solar_term_window"] = deepcopy(info["solar_term_window"])
@@ -63,7 +59,7 @@ def _copy_timing_info(info: Dict) -> Dict:
 def _calculate_liuyue_cached(
     target_clock: ZonedCalendar,
     timezone_name: str,
-    _solar_environment: Tuple[Any, ...] = (),
+    _solar_environment: tuple[Any, ...] = (),
 ) -> Dict:
     """Cache deterministic liuyue calculations for repeated timing analysis."""
     local_target_date = target_clock.require_datetime()
@@ -129,15 +125,9 @@ def _calculate_liushi_cached(
 def _calculate_liuri_cached(
     target_clock: ZonedCalendar,
     timezone_name: str,
-    _solar_environment: Tuple[Any, ...] = (),
+    _solar_environment: tuple[Any, ...] = (),
 ) -> Dict:
-    """Cache deterministic liuri calculations for repeated timeline analysis.
-
-    BaZi day pillars roll over at 23:00 (晚子时/夜子时) - times at or after
-    23:00 belong to the NEXT day's pillar. We pass ``hour=`` to
-    ``calculate_day_pillar`` so the rollover is handled atomically with the
-    pillar calculation and cannot be forgotten again.
-    """
+    """Cache daily timing with the day pillar rolled over at 23:00."""
     local_target_date = target_clock.require_datetime()
     liuri_stem, liuri_branch = BaZiCalendar.calculate_day_pillar(
         local_target_date.year,
@@ -161,9 +151,7 @@ def _calculate_liuri_cached(
     weekday_names = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
 
     return {
-        # Civil year/month/day so callers can locate the sample on their own
-        # calendar timeline. The pillar above is computed on the BaZi-effective
-        # date per the 晚子时 rollover rule, handled by calculate_day_pillar.
+        # note (calendar): Keep the civil date label even after the pillar changes at 23:00.
         "year": local_target_date.year,
         "month": local_target_date.month,
         "day": local_target_date.day,
@@ -178,9 +166,6 @@ def _calculate_liuri_cached(
         "element": stem_element.value,
         "polarity": stem_polarity.value,
         "nayin": get_nayin(liuri_stem, liuri_branch),
-        # Weekday stays on the civil calendar - 23:30 is still "today"
-        # for the wall-clock user, even though the BaZi day pillar has
-        # advanced.
         "weekday": weekday_names[local_target_date.weekday()],
         "solar_term_window": {
             "start_term": month_context["start_term"],
@@ -195,141 +180,89 @@ DEFAULT_DAYUN_PERIODS = 12
 
 
 class TimingAnalysis:
-    """
-    八字时间层计算与关系说明。
+    """Compute the Dayun timeline and the annual through hourly BaZi layers."""
 
-    已确认性别和年干阴阳决定大运顺逆，出生至相邻节令按三日一年
-    换算，再按360日年、30日月的声明口径建立民用历时间轴。流年以
-    立春、流月以十二节分界；流日和流时使用共同的23:00换日规则。
-    单个时间柱的十神与冲合保留上下文缺项，不输出独立吉凶分。
-    """
+    _dayun_wall_year_preimages = staticmethod(dayun_wall_year_preimages)
+    _resolve_dayun_calendar_boundary = staticmethod(resolve_dayun_calendar_boundary)
+    calculate_dayun_sequence = staticmethod(calculate_dayun_sequence)
 
     @staticmethod
-    def calculate_dayun_start_details(
+    def resolve_dayun_start(
         birth_date: datetime,
-        gender: Optional[str],
+        gender: str | None,
         timezone_name: str = DEFAULT_TIMEZONE,
-    ) -> Dict:
-        """
-        计算起运细节，按节令边界而不是固定月中日。
-
-        Returns:
-            包含顺逆行方向、参考节令及所声明换算口径的起运岁数。
-        """
+    ) -> DayunStartResolution:
+        """Select the existing direction and actual Jie without serializing it."""
         local_birth_date = localize_datetime(birth_date, timezone_name)
         bazi_year = get_bazi_year(local_birth_date, timezone_name)
         year_stem, _ = BaZiCalendar.calculate_year_pillar(bazi_year)
-        is_yang_year = HEAVENLY_STEMS.index(year_stem) % 2 == 0
-
-        canonical_gender = normalize_gender(gender)
-        if canonical_gender not in ("男", "女"):
-            raise ValueError(
-                "大运方向需要明确性别（男/女）；请提供 gender，或显式传入 dayun_pillar。"
-            )
-        if (canonical_gender == "男" and is_yang_year) or (
-            canonical_gender == "女" and not is_yang_year
-        ):
-            forward_direction = True
-        else:
-            forward_direction = False
+        forward_direction = dayun_is_forward(gender, year_stem)
 
         start_term, next_term, _, _ = get_bazi_month_boundaries(
             local_birth_date, timezone_name
         )
         target_term = next_term if forward_direction else start_term
-        delta_days = abs(elapsed_days_between(local_birth_date, target_term.calendar))
-        start_age_unrounded = delta_days / 3
-        start_age_precise = round(start_age_unrounded, 2)
+        nominal_days = abs(
+            target_term.point.day - utc_calendar(local_birth_date).julian_day_exact()
+        )
+        return DayunStartResolution(
+            local_birth_date, target_term, forward_direction, year_stem, nominal_days
+        )
 
-        return {
-            "forward_direction": forward_direction,
-            "year_stem": year_stem,
-            "reference_term": target_term.as_dict(),
-            "reference_term_resolution": target_term.resolution_provider,
-            "days_to_boundary": round(delta_days, 4),
-            "start_age_precise": start_age_precise,
-            "start_age_unrounded": start_age_unrounded,
-            # Integer display policy; the actual timeline uses the raw age.
-            # Two-decimal rounding first can erase a crossed integer age.
-            "start_age_rounded": max(1, math.ceil(start_age_unrounded)),
-            "elapsed_seconds": delta_days * 86400,
-            "elapsed_scale": "nominal_utc_label_seconds",
-            "leap_second_policy": "not_counted",
-        }
+    @staticmethod
+    def calculate_dayun_start_details(
+        birth_date: datetime,
+        gender: str | None,
+        timezone_name: str = DEFAULT_TIMEZONE,
+    ) -> DayunStartDetails:
+        """JSON/SDK details for the same selected source used by event owners."""
+        return TimingAnalysis.resolve_dayun_start(
+            birth_date, gender, timezone_name
+        ).to_details()
 
     @staticmethod
     def _dayun_calendar_wall_context(
         birth_date: datetime,
-        gender: Optional[str],
+        gender: str | None,
         timezone_name: str,
-    ) -> Tuple[datetime, Dict, datetime, Dict[str, int]]:
-        """Keep the existing wall-start arithmetic shared with event inverses."""
-        birth = localize_datetime(birth_date, timezone_name)
-        details = TimingAnalysis.calculate_dayun_start_details(
-            birth, gender, timezone_name
+    ) -> tuple[datetime, DayunStartDetails, datetime, DayunCalendarOffset]:
+        """Quantize the retained span once, then apply the civil calendar policy."""
+        resolution = TimingAnalysis.resolve_dayun_start(
+            birth_date, gender, timezone_name
         )
-        nominal_us = round(details["elapsed_seconds"] * 120 * 1_000_000)
-        day_us = 86400 * 1_000_000
-        years, remainder = divmod(nominal_us, 360 * day_us)
-        months, remainder = divmod(remainder, 30 * day_us)
-        days, remainder = divmod(remainder, day_us)
-        wall_birth = birth.replace(tzinfo=None)
-        start_wall = wall_birth + relativedelta(
-            years=years, months=months, days=days, microseconds=remainder
-        )
-        offset = {
-            "years": years,
-            "months": months,
-            "days": days,
-            "microseconds": remainder,
-        }
-        return birth, details, start_wall, offset
-
-    @staticmethod
-    def _dayun_wall_year_preimages(
-        boundary_wall: datetime, year_offset: int
-    ) -> Tuple[datetime, ...]:
-        """Invert decade year addition, retaining both leap-day preimages."""
-        if boundary_wall.tzinfo is not None:
-            raise ValueError("大运年份逆像需要未附民用时区的钟面标签")
-        year = boundary_wall.year - year_offset
-        if not 1 <= year <= 9999:
-            return ()
-        try:
-            targets = [boundary_wall.replace(year=year)]
-        except ValueError:
-            return ()
-        if (
-            boundary_wall.month == 2
-            and boundary_wall.day == 28
-            and not isleap(boundary_wall.year)
-            and isleap(year)
-        ):
-            targets.append(boundary_wall.replace(year=year, day=29))
-        return tuple(targets)
+        start_wall, offset = resolution.calendar_wall_offset()
+        return resolution.birth, resolution.to_details(), start_wall, offset
 
     @staticmethod
     def calculate_dayun_timeline(
         birth_date: datetime,
-        gender: Optional[str],
+        gender: str | None,
         month_pillar: tuple[str, str],
         timezone_name: str = DEFAULT_TIMEZONE,
         periods: int = DEFAULT_DAYUN_PERIODS,
-    ) -> Dict:
-        """Calendar boundaries under an explicit three-days/one-year policy.
-
-        The traditional 360-day conversion gives years/months/days, which are
-        added to the civil birth clock in one calendar operation. It is neither
-        a fixed tropical-year duration nor an integer-birthday selector.
-        """
-        # One nominal UTC-label birth-to-jie second becomes 120 offset seconds.
-        # Leap seconds are excluded by the disclosed elapsed-time policy.
-        # Keep all precision until the final microsecond representation.
-        birth, details, start_wall, calendar_offset = (
-            TimingAnalysis._dayun_calendar_wall_context(
-                birth_date, gender, timezone_name
+    ) -> dict[str, Any]:
+        """Add the nominal three-days-per-year Dayun conversion to the civil birth clock."""
+        resolution = TimingAnalysis.resolve_dayun_start(
+            birth_date, gender, timezone_name
+        )
+        return dict(
+            TimingAnalysis.build_dayun_timeline(
+                resolution, gender, month_pillar, timezone_name, periods
             )
         )
+
+    @staticmethod
+    def build_dayun_timeline(
+        resolution: DayunStartResolution,
+        gender: str | None,
+        month_pillar: tuple[str, str],
+        timezone_name: str,
+        periods: int = DEFAULT_DAYUN_PERIODS,
+    ) -> DayunTimeline:
+        """Build boundaries and displays from a caller's selected source point."""
+        birth = resolution.birth
+        details = resolution.to_details()
+        start_wall, calendar_offset = resolution.calendar_wall_offset()
         initial_fold_adjusted = False
 
         def civil_boundary(year_offset: int) -> datetime:
@@ -349,11 +282,11 @@ class TimingAnalysis:
             periods=periods,
             start_age=details["start_age_unrounded"],
         )
-        for index, item in enumerate(sequence):
-            item["start_at"] = (
+        for index, period in enumerate(sequence):
+            period["start_at"] = (
                 initial_boundary if index == 0 else civil_boundary(index * 10)
             ).isoformat()
-            item["end_at"] = civil_boundary((index + 1) * 10).isoformat()
+            period["end_at"] = civil_boundary((index + 1) * 10).isoformat()
         return {
             "method_id": "three_days_one_year_calendar_v1",
             "timezone": timezone_name,
@@ -378,135 +311,20 @@ class TimingAnalysis:
         }
 
     @staticmethod
-    def _resolve_dayun_calendar_boundary(
-        birth: datetime, start_wall: datetime, year_offset: int, timezone_name: str
-    ) -> Tuple[datetime, bool]:
-        """Shared existing year-clipping/fold policy for timelines and inverses."""
-        wall = start_wall + relativedelta(years=year_offset)
-        local = localize_datetime(wall, timezone_name).replace(fold=0)
-        resolved = cast(
-            datetime,
-            resolve_imaginary(local).astimezone(timezone.utc).astimezone(birth.tzinfo),
-        )
-        if year_offset == 0 and resolved.astimezone(timezone.utc) < birth.astimezone(
-            timezone.utc
-        ):
-            later = wall.replace(tzinfo=birth.tzinfo, fold=1)
-            instant = later.astimezone(timezone.utc)
-            roundtrip = instant.astimezone(birth.tzinfo)
-            if roundtrip.replace(tzinfo=None) == wall and instant >= birth.astimezone(
-                timezone.utc
-            ):
-                return cast(datetime, roundtrip), True
-            raise ValueError("首运边界不能早于已确认的出生时刻")
-        return resolved, False
-
-    @staticmethod
-    def calculate_dayun_sequence(
-        month_pillar_stem: str,
-        month_pillar_branch: str,
-        gender: Optional[str],
-        year_stem: str,
-        periods: int = 8,
-        start_age: float = 1.0,
-    ) -> List[Dict]:
-        """
-        计算大运序列
-
-        Args:
-            month_pillar_stem: 月柱天干
-            month_pillar_branch: 月柱地支
-            gender: 性别
-            periods: 计算的大运期数，默认8期（80年）
-            year_stem: 八字年干，用于判定顺逆
-
-        Returns:
-            大运序列列表
-        """
-        # 判断大运方向
-        is_yang_year = HEAVENLY_STEMS.index(year_stem) % 2 == 0
-
-        canonical_gender = normalize_gender(gender)
-        if canonical_gender not in ("男", "女"):
-            raise ValueError(
-                "大运方向需要明确性别（男/女）；请提供 gender，或显式传入 dayun_pillar。"
-            )
-        if (canonical_gender == "男" and is_yang_year) or (
-            canonical_gender == "女" and not is_yang_year
-        ):
-            direction = 1  # 顺行
-        else:
-            direction = -1  # 逆行
-
-        month_stem_index = HEAVENLY_STEMS.index(month_pillar_stem)
-        month_branch_index = EARTHLY_BRANCHES.index(month_pillar_branch)
-
-        dayun_sequence = []
-
-        for period_index in range(periods):
-            current_stem_index = (
-                month_stem_index + direction * (period_index + 1)
-            ) % 10
-            current_branch_index = (
-                month_branch_index + direction * (period_index + 1)
-            ) % 12
-
-            dayun_stem = HEAVENLY_STEMS[current_stem_index]
-            dayun_branch = EARTHLY_BRANCHES[current_branch_index]
-
-            dayun_info = {
-                "period": period_index + 1,
-                "stem": dayun_stem,
-                "branch": dayun_branch,
-                "pillar": f"{dayun_stem}{dayun_branch}",
-                "age_range": {
-                    "start": round(start_age + period_index * 10, 2),
-                    "end": round(start_age + (period_index + 1) * 10, 2),
-                },
-            }
-
-            dayun_sequence.append(dayun_info)
-
-        return dayun_sequence
-
-    @staticmethod
     def calculate_liunian(
         target_year: int,
         *,
-        moment: Optional[datetime] = None,
+        moment: datetime | None = None,
         timezone_name: str = DEFAULT_TIMEZONE,
     ) -> Dict:
-        """
-        计算指定年份的流年干支。
-
-        Args:
-            target_year: 目标年份（公历 / civil year）。当同时提供 ``moment`` 时，
-                直接使用 ``moment`` 所在的立春 BaZi 年，不读取该参数。
-            moment: 可选的具体日期-时间。若给出，该方法会用 ``get_bazi_year``
-                以立春为分界解析真正的 BaZi 年，从而避免 1 月 / 早 2 月的流年
-                误差。生产调用强烈建议传入 ``moment``。
-            timezone_name: ``moment`` 的时区，默认为模块 ``DEFAULT_TIMEZONE``。
-
-        Returns:
-            流年信息 dict，包含 `year`（解析后的 BaZi 年，可能与 `target_year`
-            不同）、`stem`、`branch`、`pillar`、`element`。
-        """
+        """Return the Li Chun year pillar when a moment is supplied, or the requested year pillar."""
         if moment is not None:
             resolved_year = get_bazi_year(moment, timezone_name)
         else:
             resolved_year = target_year
 
-        # 计算年干支（以甲子年为基准：1984年）
-        base_year = 1984  # 甲子年
-        year_offset = resolved_year - base_year
-
-        stem_index = year_offset % 10
-        branch_index = year_offset % 12
-
-        liunian_stem = HEAVENLY_STEMS[stem_index]
-        liunian_branch = EARTHLY_BRANCHES[branch_index]
-
-        stem_element, stem_polarity = STEM_ELEMENTS[liunian_stem]
+        liunian_stem, liunian_branch = BaZiCalendar.calculate_year_pillar(resolved_year)
+        stem_element, _ = STEM_ELEMENTS[liunian_stem]
 
         return {
             "year": resolved_year,
@@ -522,21 +340,9 @@ class TimingAnalysis:
         target_month: int,
         target_day: int = 1,
         timezone_name: str = DEFAULT_TIMEZONE,
-        target_date: Optional[datetime] = None,
+        target_date: datetime | None = None,
     ) -> Dict:
-        """
-        按节气月令计算指定时点的流月干支
-
-        Args:
-            target_year: 目标年份
-            target_month: 目标月份 (1-12)
-            target_day: 目标日期，默认 1
-            timezone_name: 时区
-            target_date: 完整的分析时刻；提供时优先使用
-
-        Returns:
-            流月信息
-        """
+        """Calculate the solar-term month pillar at the supplied or constructed analysis instant."""
         local_target_date = localize_datetime(
             target_date or datetime(target_year, target_month, target_day),
             timezone_name,
@@ -551,27 +357,49 @@ class TimingAnalysis:
 
     @staticmethod
     def _next_supported_analysis_anchor(
-        moment: datetime,
+        start_term: SolarTerm,
         timezone_name: str = DEFAULT_TIMEZONE,
-    ) -> datetime:
-        """
-        将节气切换点规范到外部接口可复现的最早分钟锚点。
-
-        FastMCP / REST 当前只暴露到小时、分钟精度，因此时间轴里的
-        analysis_anchor 需要落在节气后最早可接受的无歧义整分钟。
-        重复区间不能用现有分钟字段和IANA名称区分fold，跳过重复或不存在
-        的钟时，避免给出无法回放的锚点。锚点不是节气本身的天文时刻。
-        """
-        local_moment = localize_datetime(moment, timezone_name)
-        anchor = local_moment.replace(second=0, microsecond=0) + timedelta(minutes=1)
+        *,
+        end_term: SolarTerm | None = None,
+    ) -> datetime | None:
+        """Find the earliest replayable local minute strictly within the term interval."""
+        local_moment = localize_datetime(start_term.moment, timezone_name)
+        anchor = local_moment.replace(second=0, microsecond=0)
+        start_day = start_term.point.day
+        end_day = end_term.point.day if end_term is not None else None
         instant = local_moment.astimezone(timezone.utc)
+        if end_term is not None and is_unspecified_local_time(local_moment):
+            end = end_term.calendar.utc.as_datetime()
+            zone = local_moment.tzinfo
+            assert zone is not None
+            if end is not None:
+                cuts = timezone_transition_candidates(zone, instant, end)
+                if cuts is not None:
+                    reopened = next(
+                        (
+                            local
+                            for cut in cuts
+                            if not is_unspecified_local_time(
+                                local := cut.astimezone(zone)
+                            )
+                        ),
+                        None,
+                    )
+                    if reopened is None:
+                        return None
+                    anchor = reopened.replace(second=0, microsecond=0)
+                    if anchor != reopened:
+                        anchor += timedelta(minutes=1)
         while True:
             try:
                 validate_local_clock(anchor)
             except ValueError:
                 anchor += timedelta(minutes=1)
                 continue
-            if anchor.astimezone(timezone.utc) > instant:
+            anchor_day = utc_calendar(anchor).julian_day_exact()
+            if end_day is not None and anchor_day >= end_day:
+                return None
+            if anchor_day > start_day:
                 return anchor
             anchor += timedelta(minutes=1)
 
@@ -579,7 +407,7 @@ class TimingAnalysis:
     def calculate_liuyue_timeline(
         target_year: int,
         timezone_name: str = DEFAULT_TIMEZONE,
-    ) -> List[Dict]:
+    ) -> list[Dict]:
         """
         生成目标年份的 12 个节令月时间轴。
         """
@@ -595,7 +423,7 @@ class TimingAnalysis:
             term_index=0,
         )
 
-        timeline: List[Dict] = []
+        timeline: list[Dict] = []
 
         for index, start_term in enumerate(current_year_terms):
             next_term = (
@@ -605,40 +433,39 @@ class TimingAnalysis:
             )
             require_calculated_solar_term(start_term)
             require_calculated_solar_term(next_term)
+            start = start_term.as_dict()
+            end = next_term.as_dict()
+            window: dict[str, str | float] = {
+                "days": round(
+                    elapsed_days_between(start_term.point, next_term.point), 4
+                )
+            }
+            for key, record in (("start", start), ("end", end)):
+                if "datetime" in record:
+                    window[key] = record["datetime"]
+                else:
+                    window[f"{key}_utc"] = record["datetime_utc"]
+            item = {
+                "order": index + 1,
+                "gregorian_window": window,
+                "start_term": start,
+                "next_term": end,
+            }
             anchor = TimingAnalysis._next_supported_analysis_anchor(
-                start_term.moment,
-                timezone_name=timezone_name,
+                start_term, timezone_name, end_term=next_term
             )
-            liuyue_info = TimingAnalysis.calculate_liuyue(
-                anchor.year,
-                anchor.month,
-                anchor.day,
-                timezone_name=timezone_name,
-                target_date=anchor,
-            )
-            timeline.append(
-                {
-                    "order": index + 1,
-                    "analysis_anchor": anchor.strftime("%Y-%m-%d %H:%M:%S"),
-                    "gregorian_window": {
-                        "start": start_term.calendar.isoformat(
-                            sep=" ", include_offset=False
-                        ),
-                        "end": next_term.calendar.isoformat(
-                            sep=" ", include_offset=False
-                        ),
-                        "days": round(
-                            elapsed_days_between(
-                                start_term.calendar, next_term.calendar
-                            ),
-                            4,
-                        ),
-                    },
-                    "start_term": start_term.as_dict(),
-                    "next_term": next_term.as_dict(),
-                    "liuyue": liuyue_info,
-                }
-            )
+            if anchor is None:
+                item["analysis_anchor_status"] = "no_replayable_local_minute_in_window"
+            else:
+                item["analysis_anchor"] = anchor.strftime("%Y-%m-%d %H:%M:%S")
+                item["liuyue"] = TimingAnalysis.calculate_liuyue(
+                    anchor.year,
+                    anchor.month,
+                    anchor.day,
+                    timezone_name=timezone_name,
+                    target_date=anchor,
+                )
+            timeline.append(item)
 
         return timeline
 
@@ -682,12 +509,12 @@ class TimingAnalysis:
     def analyze_liushi_detailed(
         birth_pillars: Dict,
         target_datetime: datetime,
-        day_stem: Optional[str] = None,
+        day_stem: str | None = None,
         timezone_name: str = DEFAULT_TIMEZONE,
-        liushi_info: Optional[Dict] = None,
+        liushi_info: Dict | None = None,
     ) -> Dict:
         """
-        流时详细分析，包括十神关系、冲合与时级建议。
+        流时详细分析，包括十神关系与冲合。
         """
         if liushi_info is None:
             liushi_info = TimingAnalysis.calculate_liushi(
@@ -701,12 +528,6 @@ class TimingAnalysis:
         branch_relations = TimingAnalysis._collect_branch_relations(
             liushi_info["branch"], birth_pillars, "流时"
         )
-        fortune_analysis = TimingAnalysis._analyze_liuyue_fortune(
-            stem_shishen, branch_relations, liushi_info, scope_label="本时"
-        )
-        suggestions = TimingAnalysis._generate_liuyue_suggestions(
-            stem_shishen, branch_relations, fortune_analysis, scope_label="本时"
-        )
 
         return {
             "basic_info": liushi_info,
@@ -715,10 +536,8 @@ class TimingAnalysis:
                 "description": f"流时天干{liushi_info['stem']}对日主{day_stem}为{stem_shishen}",
             },
             "branch_relations": branch_relations,
-            "fortune_analysis": fortune_analysis,
-            "suggestions": suggestions,
             "overall_summary": TimingAnalysis._generate_liushi_summary(
-                liushi_info, stem_shishen, branch_relations, fortune_analysis
+                liushi_info, stem_shishen, branch_relations
             ),
         }
 
@@ -726,8 +545,7 @@ class TimingAnalysis:
     def _generate_liushi_summary(
         liushi_info: Dict,
         stem_shishen: str,
-        branch_relations: List[Dict],
-        fortune_analysis: Dict,
+        branch_relations: list[Dict],
     ) -> str:
         """生成流时分析总结。"""
         dt_label = (
@@ -736,12 +554,10 @@ class TimingAnalysis:
         )
         pillar = liushi_info["pillar"]
         nayin = liushi_info["nayin"]
-        overall_fortune = fortune_analysis["overall_fortune"]
 
         summary_parts = [
             f"{dt_label}流时{pillar}({nayin})",
             f"十神{stem_shishen}",
-            f"总体运势{overall_fortune}",
         ]
 
         if branch_relations:
@@ -754,36 +570,40 @@ class TimingAnalysis:
     def calculate_jieqi_transition_timeline(
         target_year: int,
         timezone_name: str = DEFAULT_TIMEZONE,
-    ) -> List[Dict]:
+    ) -> list[Dict]:
         """
         生成目标年份 24 节气切换节点的时运时间轴。
         """
-        timeline: List[Dict] = []
-        for index, term in enumerate(
-            get_solar_terms_for_year(target_year, timezone_name)
-        ):
+        terms = tuple(get_solar_terms_for_year(target_year, timezone_name))
+        following = _solar_terms_for_context_year(
+            target_year + 1,
+            timezone_name,
+            _solar_term_source_year(target_year + 1, target_year),
+            term_index=0,
+        )
+        timeline: list[Dict] = []
+        for index, (term, next_term) in enumerate(zip(terms, terms[1:] + following)):
             require_calculated_solar_term(term)
+            require_calculated_solar_term(next_term)
+            item = {"order": index + 1, "jieqi": term.as_dict()}
             anchor = TimingAnalysis._next_supported_analysis_anchor(
-                term.moment,
-                timezone_name=timezone_name,
+                term, timezone_name, end_term=next_term
             )
-            timeline.append(
-                {
-                    "order": index + 1,
-                    "jieqi": term.as_dict(),
-                    "analysis_anchor": anchor.strftime("%Y-%m-%d %H:%M:%S"),
-                    "liuyue": TimingAnalysis.calculate_liuyue(
-                        anchor.year,
-                        anchor.month,
-                        anchor.day,
-                        timezone_name=timezone_name,
-                        target_date=anchor,
-                    ),
-                    "liuri": TimingAnalysis.calculate_liuri(
-                        anchor, timezone_name=timezone_name
-                    ),
-                }
-            )
+            if anchor is None:
+                item["analysis_anchor_status"] = "no_replayable_local_minute_in_window"
+            else:
+                item["analysis_anchor"] = anchor.strftime("%Y-%m-%d %H:%M:%S")
+                item["liuyue"] = TimingAnalysis.calculate_liuyue(
+                    anchor.year,
+                    anchor.month,
+                    anchor.day,
+                    timezone_name=timezone_name,
+                    target_date=anchor,
+                )
+                item["liuri"] = TimingAnalysis.calculate_liuri(
+                    anchor, timezone_name=timezone_name
+                )
+            timeline.append(item)
         return timeline
 
     @staticmethod
@@ -791,7 +611,7 @@ class TimingAnalysis:
         target_branch: str,
         birth_pillars: Dict,
         label: str,
-    ) -> List[Dict]:
+    ) -> list[Dict]:
         """收集目标支与命局四支的冲合关系。"""
         branch_relations = []
         for pillar_name, pillar_data in birth_pillars.items():
@@ -824,24 +644,13 @@ class TimingAnalysis:
         birth_pillars: Dict,
         target_year: int,
         target_month: int,
-        day_stem: Optional[str] = None,
+        day_stem: str | None = None,
         target_day: int = 1,
         timezone_name: str = DEFAULT_TIMEZONE,
-        target_date: Optional[datetime] = None,
-        liuyue_info: Optional[Dict] = None,
+        target_date: datetime | None = None,
+        liuyue_info: Dict | None = None,
     ) -> Dict:
-        """
-        流月的详细分析，包括十神关系、吉凶判断等
-
-        Args:
-            birth_pillars: 出生四柱
-            target_year: 目标年份
-            target_month: 目标月份
-            day_stem: 日主天干，如果未提供则从birth_pillars中获取
-
-        Returns:
-            流月详细分析结果
-        """
+        """Describe ten-god and branch relationships for the monthly pillar."""
         if liuyue_info is None:
             liuyue_info = TimingAnalysis.calculate_liuyue(
                 target_year,
@@ -860,14 +669,6 @@ class TimingAnalysis:
             liuyue_info["branch"], birth_pillars, "流月"
         )
 
-        fortune_analysis = TimingAnalysis._analyze_liuyue_fortune(
-            stem_shishen, branch_relations, liuyue_info, scope_label="本月"
-        )
-
-        suggestions = TimingAnalysis._generate_liuyue_suggestions(
-            stem_shishen, branch_relations, fortune_analysis, scope_label="本月"
-        )
-
         return {
             "basic_info": liuyue_info,
             "shishen_analysis": {
@@ -875,10 +676,8 @@ class TimingAnalysis:
                 "description": f"流月天干{liuyue_info['stem']}对日主{day_stem}为{stem_shishen}",
             },
             "branch_relations": branch_relations,
-            "fortune_analysis": fortune_analysis,
-            "suggestions": suggestions,
             "overall_summary": TimingAnalysis._generate_liuyue_summary(
-                liuyue_info, stem_shishen, branch_relations, fortune_analysis
+                liuyue_info, stem_shishen, branch_relations
             ),
         }
 
@@ -886,12 +685,12 @@ class TimingAnalysis:
     def analyze_liuri_detailed(
         birth_pillars: Dict,
         target_date: datetime,
-        day_stem: Optional[str] = None,
+        day_stem: str | None = None,
         timezone_name: str = DEFAULT_TIMEZONE,
-        liuri_info: Optional[Dict] = None,
+        liuri_info: Dict | None = None,
     ) -> Dict:
         """
-        流日详细分析，包括十神关系、冲合与日级建议。
+        流日详细分析，包括十神关系与冲合。
         """
         if liuri_info is None:
             liuri_info = TimingAnalysis.calculate_liuri(
@@ -905,12 +704,6 @@ class TimingAnalysis:
         branch_relations = TimingAnalysis._collect_branch_relations(
             liuri_info["branch"], birth_pillars, "流日"
         )
-        fortune_analysis = TimingAnalysis._analyze_liuyue_fortune(
-            stem_shishen, branch_relations, liuri_info, scope_label="本日"
-        )
-        suggestions = TimingAnalysis._generate_liuyue_suggestions(
-            stem_shishen, branch_relations, fortune_analysis, scope_label="本日"
-        )
 
         return {
             "basic_info": liuri_info,
@@ -919,94 +712,25 @@ class TimingAnalysis:
                 "description": f"流日天干{liuri_info['stem']}对日主{day_stem}为{stem_shishen}",
             },
             "branch_relations": branch_relations,
-            "fortune_analysis": fortune_analysis,
-            "suggestions": suggestions,
             "overall_summary": TimingAnalysis._generate_liuri_summary(
-                liuri_info, stem_shishen, branch_relations, fortune_analysis
+                liuri_info, stem_shishen, branch_relations
             ),
         }
-
-    @staticmethod
-    def _analyze_liuyue_fortune(
-        stem_shishen: str,
-        branch_relations: List[Dict],
-        liuyue_info: Dict,
-        scope_label: str = "本阶段",
-    ) -> Dict:
-        """
-        分析流月的吉凶趋势
-
-        Args:
-            stem_shishen: 天干十神关系
-            branch_relations: 地支关系列表
-            liuyue_info: 流月基础信息
-
-        Returns:
-            吉凶分析结果
-        """
-        # A ten-god name or a combine/clash table hit alone cannot establish
-        # favourability. Preserve the old keys with an explicit null score.
-        return {
-            "method_id": "context_required_no_fortune_score_v1",
-            "assessment_status": "context_required",
-            "fortune_score": None,
-            "fortune_factors": [f"天干十神：{stem_shishen}"]
-            + [relation["description"] for relation in branch_relations],
-            "overall_fortune": "未判定",
-            "nayin_description": f"纳音{liuyue_info['nayin']}仅作传统分类，不参与吉凶判断",
-            "detailed_analysis": f"{scope_label}关系已列出；未完成原局喜忌与制化核验，不作吉凶定级",
-            "required_context": [
-                "原局用神与相神",
-                "旺衰及根气",
-                "会合能否成立及制化救应",
-            ],
-        }
-
-    @staticmethod
-    def _generate_liuyue_suggestions(
-        stem_shishen: str,
-        branch_relations: List[Dict],
-        fortune_analysis: Dict,
-        scope_label: str = "本阶段",
-    ) -> List[str]:
-        """Return a reading aid rather than advice inferred from a bare label."""
-        suggestions = [
-            f"{scope_label}十神{stem_shishen}是关系分类，需结合原局判断其作用。"
-        ]
-        if any(r["type"] == "六冲" for r in branch_relations):
-            suggestions.append("六冲须辨所冲位置及喜忌，不能直接据此否定行动。")
-        if any(r["type"] == "六合" for r in branch_relations):
-            suggestions.append("六合只确认配对，尚未证明合化、助益或现实合作顺利。")
-        return suggestions
 
     @staticmethod
     def _generate_liuyue_summary(
         liuyue_info: Dict,
         stem_shishen: str,
-        branch_relations: List[Dict],
-        fortune_analysis: Dict,
+        branch_relations: list[Dict],
     ) -> str:
-        """
-        生成流月分析总结
-
-        Args:
-            liuyue_info: 流月基础信息
-            stem_shishen: 十神关系
-            branch_relations: 地支关系
-            fortune_analysis: 吉凶分析
-
-        Returns:
-            分析总结
-        """
+        """Summarize monthly stem and branch relationships."""
         year_month = f"{liuyue_info['year']}年{liuyue_info['month']}月"
         pillar = liuyue_info["pillar"]
         nayin = liuyue_info["nayin"]
-        overall_fortune = fortune_analysis["overall_fortune"]
 
         summary_parts = [
             f"{year_month}流月{pillar}({nayin})",
             f"十神{stem_shishen}",
-            f"总体运势{overall_fortune}",
         ]
 
         if branch_relations:
@@ -1019,8 +743,7 @@ class TimingAnalysis:
     def _generate_liuri_summary(
         liuri_info: Dict,
         stem_shishen: str,
-        branch_relations: List[Dict],
-        fortune_analysis: Dict,
+        branch_relations: list[Dict],
     ) -> str:
         """生成流日分析总结。"""
         year_month_day = (
@@ -1028,12 +751,10 @@ class TimingAnalysis:
         )
         pillar = liuri_info["pillar"]
         nayin = liuri_info["nayin"]
-        overall_fortune = fortune_analysis["overall_fortune"]
 
         summary_parts = [
             f"{year_month_day}流日{pillar}({nayin})",
             f"十神{stem_shishen}",
-            f"总体运势{overall_fortune}",
         ]
 
         if branch_relations:

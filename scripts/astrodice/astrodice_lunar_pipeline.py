@@ -15,9 +15,16 @@ import traceback
 from fractions import Fraction as Q
 from pathlib import Path
 
-if not __package__:
+if __name__ == "__main__" and not __package__:
+    # note (script entry): Direct execution needs the checkout for archive readers.
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+else:
+    pass
 
+# isort: split
+
+from scripts.astrodice.astrodice_de441_records import calendar_jd_tdb
+from scripts.astrodice.astrodice_reference_data import verify_material
 
 PLAN_SHA = "be9f316e77e39200635358c6e17ea913c83c5f1917a42aaf93bd5686cc26f729"
 BIAS = (
@@ -38,7 +45,6 @@ def write_new(path, value):
 
 
 def plan(run):
-    from scripts.astrodice.astrodice_reference_data import verify_material
 
     path = run / "plan-before-evaluation.json"
     verify_material(path)
@@ -53,7 +59,6 @@ def unit_state(p, v):
 
 
 def reference(run, split):
-    from scripts.astrodice.astrodice_de441_records import calendar_jd_tdb
     from scripts.astrodice.astrodice_lunar_split import LunarSource, apparent
 
     protocol = plan(run)
@@ -85,7 +90,6 @@ def reference(run, split):
 def native(run, split, index, backend, *, jpl_file=None):
     protocol = plan(run)
     case = protocol[split][index]
-    from scripts.astrodice.astrodice_de441_records import calendar_jd_tdb
 
     epoch = float(calendar_jd_tdb(case["label"]))
     source_dir = Path(protocol["reference_source"]).resolve()
@@ -125,6 +129,8 @@ def native(run, split, index, backend, *, jpl_file=None):
                     "returned_flags": result[1],
                 }
             )
+        else:
+            pass
         return result
 
     domain_runtime.ephemeris_call = recording
@@ -163,6 +169,8 @@ def native(run, split, index, backend, *, jpl_file=None):
         if policy["status"] != "applied":
             result["status"] = "unavailable"
             return result
+        else:
+            pass
         position = policy["full_fixed_frame_apparent_position_au"]
         velocity = policy["full_fixed_frame_velocity_au_per_native_argument_day"]
         decoded = frame.decode_native_fixed_reception_state(epoch, position, velocity)
@@ -213,7 +221,7 @@ def native(run, split, index, backend, *, jpl_file=None):
     return result
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mode", choices=("reference", "native"))
     parser.add_argument("--run", type=Path, required=True)
@@ -237,3 +245,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

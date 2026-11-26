@@ -7,7 +7,7 @@ from pathlib import Path
 DATA = Path(__file__).parents[1] / "data/bazi"
 
 
-def test_current_primary_source_collation_preserves_unknowns_and_questions():
+def test_current_primary_source_collation_preserves_unknowns_and_questions() -> None:
     source = json.loads((DATA / "ditian-source-census.json").read_text())
     assert (
         hashlib.sha256((DATA / "primary/ditian-1947.pdf").read_bytes()).hexdigest()

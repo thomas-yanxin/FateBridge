@@ -29,19 +29,27 @@ def sha(path: Path) -> str:
 def reference(folder: Path = CORPUS) -> dict[str, Any]:
     if sha(folder / "freeze.json") != FREEZE_SHA:
         raise ValueError("Frozen branch-relation manifest changed")
+    else:
+        pass
     manifest = json.loads((folder / "freeze.json").read_text())
     if set(manifest["files"]) != {"reference.json", "source-pages.pdf"} or {
         p.name for p in folder.iterdir()
     } != {"reference.json", "source-pages.pdf", "freeze.json"}:
         raise ValueError("Frozen branch-relation inventory changed")
+    else:
+        pass
     for name, checksum in manifest["files"].items():
         if sha(folder / name) != checksum:
             raise ValueError("Frozen branch-relation source changed")
+        else:
+            pass
     ref: dict[str, Any] = json.loads((folder / "reference.json").read_text())
     if {k: len(v) for k, v in ref["tables"].items()} != dict(
         liuhe=6, liupo=6, liuhai=6, liuchong=6, xing=12
     ) or len(ref["synthetic_cases"]) != 10:
         raise ValueError("Complete original branch-table denominators required")
+    else:
+        pass
     return ref
 
 
@@ -107,9 +115,9 @@ def audit() -> dict[str, Any]:
         if p.is_file() and "__pycache__" not in p.parts and p.suffix != ".pyc"
     ] + [Path(__file__).resolve()]
     before = {str(p.relative_to(ROOT)): sha(p) for p in paths}
+    from fatebridge.core.contracts.output_chinese import Liuren
     from fatebridge.core.metaphysics.liureng import build_liureng_board
     from fatebridge.core.metaphysics.liureng_branch_relations import branch_pair_facts
-    from fatebridge.core.output_chinese import Liuren
     from scripts.ren.audit_ren_classical import make_seed
 
     synthetic = []
@@ -165,8 +173,12 @@ def audit() -> dict[str, Any]:
                             right=right,
                         )
                     )
+                else:
+                    pass
             if errors:
                 failures.append(dict(day=day, general=general, errors=errors))
+            else:
+                pass
             boards.append(
                 dict(day=day, general=general, compared_pairs=47, matched=not errors)
             )

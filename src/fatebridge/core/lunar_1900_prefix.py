@@ -6,15 +6,26 @@ import json
 from datetime import date
 from functools import lru_cache
 from importlib.resources import files
-from typing import Any
+from typing import TypedDict
 
 START = date(1900, 1, 1)
 END = date(1900, 1, 30)
 
 
+class LunarPrefix(TypedDict):
+    method_id: str
+    solar_start: str
+    solar_end: str
+    lunar_year: int
+    lunar_month: int
+    lunar_first_day: int
+    is_leap_month: bool
+    source: dict[str, str]
+
+
 @lru_cache(maxsize=1)
-def _load() -> dict[str, Any]:
-    raw: dict[str, Any] = json.loads(
+def _load() -> LunarPrefix:
+    raw: LunarPrefix = json.loads(
         files("fatebridge.data")
         .joinpath("lunar_calendar_pmo_1900_prefix.json")
         .read_text(encoding="utf-8")

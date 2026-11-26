@@ -1,0 +1,381 @@
+{
+  "created_at_utc": "2026-10-25T00:56:45.833236+00:00",
+  "production_before": {},
+  "source_pdf_hashes": {
+    "hko-1961.pdf": "c547be161d6b2a3903d25dd090428810cd01fd7f4a1f5502bbfe9888e0b599a7",
+    "hko-1963.pdf": "a1f626e9c66a2cd8c8555ed32b0ea8f27a2353c66bb64dd1b03d3132aa8d4d28",
+    "hko-1964.pdf": "c4c960b1abf4195df4bf8f259396c0af636cf7bd77cf137fd06a160d40cf3ef8",
+    "hko-1965.pdf": "fa55100983912a29288ee09d0fd6a6281a502428ec98f0ba1f83247f1cb243db",
+    "hko-1968.pdf": "20e012f1f0d1cae34b0e9e8025e63c34149d0da71bba4b372f711153cf93c2df",
+    "hko-1972.pdf": "ffec730a760c85a1dac7341d96a55417008042300c6871edb884ef90f54803d8"
+  },
+  "independent_source": "HKO printed calendar cells and exact published SOFA/IERS affine UTC coefficients; runtime lunar converter not a reference producer",
+  "scope": "FixedUTC+08 Gregorian date proved on TT; unknown UTC clock label is retained. Modern convention, not original Guolao clock adjudication.",
+  "new_observed_celestial_epochs": 0,
+  "real_world_samples": 0,
+  "cases": [
+    {
+      "id": "1961-01-01",
+      "jd_tt": 2437300.500388939,
+      "exact_jd_tt": "105291381616802159/43200000000",
+      "old_tai_minus_utc": "708909/500000",
+      "new_tai_minus_utc": "711409/500000",
+      "step_seconds": 0.005,
+      "expected_month": 11,
+      "expected_branch": "子",
+      "next_term": "小寒",
+      "next_term_hko_date": "1961-01-05",
+      "hko_url": "https://www.hko.gov.hk/en/gts/time/calendar/pdf/files/1961e.pdf",
+      "date_proof": {
+        "id": "1961-01-01",
+        "UTC8_date": "1961-01-01",
+        "previous_local_midnight_UTC": "1960-12-31T16:00:00+00:00",
+        "next_local_midnight_UTC": "1961-01-01T16:00:00+00:00",
+        "day_start_TT_exact": "35097122405600231/14400000000",
+        "adjustment_TT_interval_exact": [
+          "35097127205600303/14400000000",
+          "105291381616803409/43200000000"
+        ],
+        "day_end_TT_exact": "105291410416803841/43200000000",
+        "whole_fractional_adjustment_strictly_inside_one_UTC8_day": true,
+        "minimum_separation_from_day_boundaries_seconds": "1800000027/62500"
+      },
+      "expected_lunar": {
+        "year": 1960,
+        "month": 11,
+        "day": 15,
+        "is_leap_month": false
+      }
+    },
+    {
+      "id": "1961-08-01",
+      "jd_tt": 2437512.5003918586,
+      "exact_jd_tt": "21060108003385657/8640000000",
+      "old_tai_minus_utc": "169757/100000",
+      "new_tai_minus_utc": "164757/100000",
+      "step_seconds": -0.05,
+      "expected_month": 6,
+      "expected_branch": "未",
+      "next_term": "立秋",
+      "next_term_hko_date": "1961-08-08",
+      "hko_url": "https://www.hko.gov.hk/en/gts/time/calendar/pdf/files/1961e.pdf",
+      "date_proof": {
+        "id": "1961-08-01",
+        "UTC8_date": "1961-08-01",
+        "previous_local_midnight_UTC": "1961-07-31T16:00:00+00:00",
+        "next_local_midnight_UTC": "1961-08-01T16:00:00+00:00",
+        "day_start_TT_exact": "105300525616940569/43200000000",
+        "adjustment_TT_interval_exact": [
+          "7020036001127719/2880000000",
+          "21060108003388157/8640000000"
+        ],
+        "day_end_TT_exact": "35100189605638739/14400000000",
+        "whole_fractional_adjustment_strictly_inside_one_UTC8_day": true,
+        "minimum_separation_from_day_boundaries_seconds": "899998451/31250"
+      },
+      "expected_lunar": {
+        "year": 1961,
+        "month": 6,
+        "day": 20,
+        "is_leap_month": false
+      }
+    },
+    {
+      "id": "1963-11-01",
+      "jd_tt": 2438334.5004031397,
+      "exact_jd_tt": "526680252087078197/216000000000",
+      "old_tai_minus_utc": "6493197/2500000",
+      "new_tai_minus_utc": "6743197/2500000",
+      "step_seconds": 0.1,
+      "expected_month": 9,
+      "expected_branch": "戌",
+      "next_term": "立冬",
+      "next_term_hko_date": "1963-11-08",
+      "hko_url": "https://www.hko.gov.hk/en/gts/time/calendar/pdf/files/1963e.pdf",
+      "date_proof": {
+        "id": "1963-11-01",
+        "UTC8_date": "1963-11-01",
+        "previous_local_midnight_UTC": "1963-10-31T16:00:00+00:00",
+        "next_local_midnight_UTC": "1963-11-01T16:00:00+00:00",
+        "day_start_TT_exact": "175560060028984087/72000000000",
+        "adjustment_TT_interval_exact": [
+          "175560084028984399/72000000000",
+          "526680252087203197/216000000000"
+        ],
+        "day_end_TT_exact": "526680396087205069/216000000000",
+        "whole_fractional_adjustment_strictly_inside_one_UTC8_day": true,
+        "minimum_separation_from_day_boundaries_seconds": "9000000117/312500"
+      },
+      "expected_lunar": {
+        "year": 1963,
+        "month": 9,
+        "day": 16,
+        "is_leap_month": false
+      }
+    },
+    {
+      "id": "1964-04-01",
+      "jd_tt": 2438486.5004064552,
+      "exact_jd_tt": "2340947040390197/960000000",
+      "old_tai_minus_utc": "288373/100000",
+      "new_tai_minus_utc": "298373/100000",
+      "step_seconds": 0.1,
+      "expected_month": 2,
+      "expected_branch": "卯",
+      "next_term": "清明",
+      "next_term_hko_date": "1964-04-05",
+      "hko_url": "https://www.hko.gov.hk/en/gts/time/calendar/pdf/files/1964e.pdf",
+      "date_proof": {
+        "id": "1964-04-01",
+        "UTC8_date": "1964-04-01",
+        "previous_local_midnight_UTC": "1964-03-31T16:00:00+00:00",
+        "next_local_midnight_UTC": "1964-04-01T16:00:00+00:00",
+        "day_start_TT_exact": "105342602417533649/43200000000",
+        "adjustment_TT_interval_exact": [
+          "21068523363506773/8640000000",
+          "21068523363516773/8640000000"
+        ],
+        "day_end_TT_exact": "105342645617584297/43200000000",
+        "whole_fractional_adjustment_strictly_inside_one_UTC8_day": true,
+        "minimum_separation_from_day_boundaries_seconds": "1800000027/62500"
+      },
+      "expected_lunar": {
+        "year": 1964,
+        "month": 2,
+        "day": 19,
+        "is_leap_month": false
+      }
+    },
+    {
+      "id": "1964-09-01",
+      "jd_tt": 2438639.5004099077,
+      "exact_jd_tt": "105349226417708009/43200000000",
+      "old_tai_minus_utc": "1591009/500000",
+      "new_tai_minus_utc": "1641009/500000",
+      "step_seconds": 0.1,
+      "expected_month": 7,
+      "expected_branch": "申",
+      "next_term": "白露",
+      "next_term_hko_date": "1964-09-07",
+      "hko_url": "https://www.hko.gov.hk/en/gts/time/calendar/pdf/files/1964e.pdf",
+      "date_proof": {
+        "id": "1964-09-01",
+        "UTC8_date": "1964-09-01",
+        "previous_local_midnight_UTC": "1964-08-31T16:00:00+00:00",
+        "next_local_midnight_UTC": "1964-09-01T16:00:00+00:00",
+        "day_start_TT_exact": "105349212017682793/43200000000",
+        "adjustment_TT_interval_exact": [
+          "105349226417683009/43200000000",
+          "35116408805911003/14400000000"
+        ],
+        "day_end_TT_exact": "35116418405911147/14400000000",
+        "whole_fractional_adjustment_strictly_inside_one_UTC8_day": true,
+        "minimum_separation_from_day_boundaries_seconds": "1800000027/62500"
+      },
+      "expected_lunar": {
+        "year": 1964,
+        "month": 7,
+        "day": 25,
+        "is_leap_month": false
+      }
+    },
+    {
+      "id": "1965-01-01",
+      "jd_tt": 2438761.500412895,
+      "exact_jd_tt": "21070899363567413/8640000000",
+      "old_tai_minus_utc": "344013/100000",
+      "new_tai_minus_utc": "354013/100000",
+      "step_seconds": 0.1,
+      "expected_month": 11,
+      "expected_branch": "子",
+      "next_term": "小寒",
+      "next_term_hko_date": "1965-01-05",
+      "hko_url": "https://www.hko.gov.hk/en/gts/time/calendar/pdf/files/1965e.pdf",
+      "date_proof": {
+        "id": "1965-01-01",
+        "UTC8_date": "1965-01-01",
+        "previous_local_midnight_UTC": "1964-12-31T16:00:00+00:00",
+        "next_local_midnight_UTC": "1965-01-01T16:00:00+00:00",
+        "day_start_TT_exact": "35118160805937283/14400000000",
+        "adjustment_TT_interval_exact": [
+          "7023633121187471/2880000000",
+          "21070899363572413/8640000000"
+        ],
+        "day_end_TT_exact": "105354525617862497/43200000000",
+        "whole_fractional_adjustment_strictly_inside_one_UTC8_day": true,
+        "minimum_separation_from_day_boundaries_seconds": "1800000027/62500"
+      },
+      "expected_lunar": {
+        "year": 1964,
+        "month": 11,
+        "day": 29,
+        "is_leap_month": false
+      }
+    },
+    {
+      "id": "1965-03-01",
+      "jd_tt": 2438820.5004149373,
+      "exact_jd_tt": "35119015205975099/14400000000",
+      "old_tai_minus_utc": "1808297/500000",
+      "new_tai_minus_utc": "1858297/500000",
+      "step_seconds": 0.1,
+      "expected_month": 1,
+      "expected_branch": "寅",
+      "next_term": "惊蛰",
+      "next_term_hko_date": "1965-03-06",
+      "hko_url": "https://www.hko.gov.hk/en/gts/time/calendar/pdf/files/1965e.pdf",
+      "date_proof": {
+        "id": "1965-03-01",
+        "UTC8_date": "1965-03-01",
+        "previous_local_midnight_UTC": "1965-02-28T16:00:00+00:00",
+        "next_local_midnight_UTC": "1965-03-01T16:00:00+00:00",
+        "day_start_TT_exact": "105357031217900081/43200000000",
+        "adjustment_TT_interval_exact": [
+          "105357045617900297/43200000000",
+          "105357045617950297/43200000000"
+        ],
+        "day_end_TT_exact": "105357074417950729/43200000000",
+        "whole_fractional_adjustment_strictly_inside_one_UTC8_day": true,
+        "minimum_separation_from_day_boundaries_seconds": "1800000027/62500"
+      },
+      "expected_lunar": {
+        "year": 1965,
+        "month": 1,
+        "day": 28,
+        "is_leap_month": false
+      }
+    },
+    {
+      "id": "1965-07-01",
+      "jd_tt": 2438942.500417925,
+      "exact_jd_tt": "105362316018054353/43200000000",
+      "old_tai_minus_utc": "1937353/500000",
+      "new_tai_minus_utc": "1987353/500000",
+      "step_seconds": 0.1,
+      "expected_month": 5,
+      "expected_branch": "午",
+      "next_term": "小暑",
+      "next_term_hko_date": "1965-07-07",
+      "hko_url": "https://www.hko.gov.hk/en/gts/time/calendar/pdf/files/1965e.pdf",
+      "date_proof": {
+        "id": "1965-07-01",
+        "UTC8_date": "1965-07-01",
+        "previous_local_midnight_UTC": "1965-06-30T16:00:00+00:00",
+        "next_local_midnight_UTC": "1965-07-01T16:00:00+00:00",
+        "day_start_TT_exact": "105362301618029137/43200000000",
+        "adjustment_TT_interval_exact": [
+          "105362316018029353/43200000000",
+          "11706924002008817/4800000000"
+        ],
+        "day_end_TT_exact": "2341385440401773/960000000",
+        "whole_fractional_adjustment_strictly_inside_one_UTC8_day": true,
+        "minimum_separation_from_day_boundaries_seconds": "1800000027/62500"
+      },
+      "expected_lunar": {
+        "year": 1965,
+        "month": 6,
+        "day": 3,
+        "is_leap_month": false
+      }
+    },
+    {
+      "id": "1965-09-01",
+      "jd_tt": 2439004.500420012,
+      "exact_jd_tt": "105364994418144529/43200000000",
+      "old_tai_minus_utc": "2027529/500000",
+      "new_tai_minus_utc": "2077529/500000",
+      "step_seconds": 0.1,
+      "expected_month": 7,
+      "expected_branch": "申",
+      "next_term": "白露",
+      "next_term_hko_date": "1965-09-08",
+      "hko_url": "https://www.hko.gov.hk/en/gts/time/calendar/pdf/files/1965e.pdf",
+      "date_proof": {
+        "id": "1965-09-01",
+        "UTC8_date": "1965-09-01",
+        "previous_local_midnight_UTC": "1965-08-31T16:00:00+00:00",
+        "next_local_midnight_UTC": "1965-09-01T16:00:00+00:00",
+        "day_start_TT_exact": "11707220002013257/4800000000",
+        "adjustment_TT_interval_exact": [
+          "11707221602013281/4800000000",
+          "105364994418169529/43200000000"
+        ],
+        "day_end_TT_exact": "105365023218169961/43200000000",
+        "whole_fractional_adjustment_strictly_inside_one_UTC8_day": true,
+        "minimum_separation_from_day_boundaries_seconds": "1800000027/62500"
+      },
+      "expected_lunar": {
+        "year": 1965,
+        "month": 8,
+        "day": 6,
+        "is_leap_month": false
+      }
+    },
+    {
+      "id": "1968-02-01",
+      "jd_tt": 2439887.500444672,
+      "exact_jd_tt": "105403140019209841/43200000000",
+      "old_tai_minus_utc": "3142841/500000",
+      "new_tai_minus_utc": "3092841/500000",
+      "step_seconds": -0.1,
+      "expected_month": 12,
+      "expected_branch": "丑",
+      "next_term": "立春",
+      "next_term_hko_date": "1968-02-05",
+      "hko_url": "https://www.hko.gov.hk/en/gts/time/calendar/pdf/files/1968e.pdf",
+      "date_proof": {
+        "id": "1968-02-01",
+        "UTC8_date": "1968-02-01",
+        "previous_local_midnight_UTC": "1968-01-31T16:00:00+00:00",
+        "next_local_midnight_UTC": "1968-02-01T16:00:00+00:00",
+        "day_start_TT_exact": "105403125619234409/43200000000",
+        "adjustment_TT_interval_exact": [
+          "11711460002131649/4800000000",
+          "105403140019234841/43200000000"
+        ],
+        "day_end_TT_exact": "2342292640426349/960000000",
+        "whole_fractional_adjustment_strictly_inside_one_UTC8_day": true,
+        "minimum_separation_from_day_boundaries_seconds": "449998451/15625"
+      },
+      "expected_lunar": {
+        "year": 1968,
+        "month": 1,
+        "day": 3,
+        "is_leap_month": false
+      }
+    },
+    {
+      "id": "1972-01-01",
+      "jd_tt": 2441317.500487617,
+      "exact_jd_tt": "210929832042130121/86400000000",
+      "old_tai_minus_utc": "4946121/500000",
+      "new_tai_minus_utc": "10",
+      "step_seconds": 0.107758,
+      "expected_month": 11,
+      "expected_branch": "子",
+      "next_term": "小寒",
+      "next_term_hko_date": "1972-01-06",
+      "hko_url": "https://www.hko.gov.hk/en/gts/time/calendar/pdf/files/1972e.pdf",
+      "date_proof": {
+        "id": "1972-01-01",
+        "UTC8_date": "1972-01-01",
+        "previous_local_midnight_UTC": "1971-12-31T16:00:00+00:00",
+        "next_local_midnight_UTC": "1972-01-01T16:00:00+00:00",
+        "day_start_TT_exact": "11718322402337521/4800000000",
+        "adjustment_TT_interval_exact": [
+          "11718324002337569/4800000000",
+          "26366229005273/10800000"
+        ],
+        "day_end_TT_exact": "26366236205273/10800000",
+        "whole_fractional_adjustment_strictly_inside_one_UTC8_day": true,
+        "minimum_separation_from_day_boundaries_seconds": "900000027/31250"
+      },
+      "expected_lunar": {
+        "year": 1971,
+        "month": 11,
+        "day": 15,
+        "is_leap_month": false
+      }
+    }
+  ]
+}

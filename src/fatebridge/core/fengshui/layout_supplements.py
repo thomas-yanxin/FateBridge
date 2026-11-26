@@ -4,25 +4,24 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List, cast
+from typing import Any, Dict, cast
 
+from fatebridge.core.fengshui.bazhai import placement_polarity
+from fatebridge.core.fengshui.models import AssessRequest
+from fatebridge.core.fengshui.surface import evaluate_surfaces, surface_provenance
+from fatebridge.core.fengshui.workstation_sources import disagreement, provenance
 from fatebridge.core.hexagram_relations import ELEMENT_CONTROLS, ELEMENT_GENERATES
-
-from .bazhai import placement_polarity
-from .models import AssessRequest
-from .surface import evaluate_surfaces, surface_provenance
-from .workstation_sources import disagreement, provenance
 
 
 @lru_cache(maxsize=1)
-def _bundle() -> Dict[str, Any]:
+def _bundle() -> dict[str, Any]:
     path = (
         Path(__file__).parents[2] / "data" / "fengshui" / "layout-supplements-v1.json"
     )
     return cast(Dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
-def supplement_provenance(key: str) -> Dict[str, Any]:
+def supplement_provenance(key: str) -> dict[str, Any]:
     data = _bundle()
     rule = {"ruleset_id": key, **deepcopy(data["rulesets"][key])}
     rule["sources"] = [
@@ -32,9 +31,9 @@ def supplement_provenance(key: str) -> Dict[str, Any]:
     return rule
 
 
-def evaluate_forms(req: AssessRequest) -> Dict[str, Any]:
-    findings: List[Dict[str, Any]] = []
-    missing: List[str] = []
+def evaluate_forms(req: AssessRequest) -> dict[str, Any]:
+    findings: list[dict[str, Any]] = []
+    missing: list[str] = []
     for obs in req.form_observations:
         rear = obs.entrance_position in {"back", "back_left", "back_right"}
         checks = []
@@ -202,8 +201,8 @@ def _effect(introduced: str, target: str) -> str:
 
 
 def _cross_scope_effects(
-    introduced: str, object_id: str, profiles: List[Dict[str, Any]]
-) -> List[Dict[str, Any]]:
+    introduced: str, object_id: str, profiles: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
     return [
         {
             "method": p["method"],
@@ -225,10 +224,10 @@ def _cross_scope_effects(
 
 
 def evaluate_element_targets(
-    req: AssessRequest, profiles: List[Dict[str, Any]]
-) -> Dict[str, Any]:
-    plans: List[Dict[str, Any]] = []
-    missing: List[str] = []
+    req: AssessRequest, profiles: list[dict[str, Any]]
+) -> dict[str, Any]:
+    plans: list[dict[str, Any]] = []
+    missing: list[str] = []
     complete = True
     for request in req.element_adjustments:
         targets = [
@@ -345,8 +344,8 @@ def evaluate_element_targets(
 
 
 def evaluate_annual_remedies(
-    req: AssessRequest, layers: Dict[str, Any], profiles: List[Dict[str, Any]]
-) -> Dict[str, Any]:
+    req: AssessRequest, layers: dict[str, Any], profiles: list[dict[str, Any]]
+) -> dict[str, Any]:
     if req.annual_remedy_ruleset_id is None:
         return {"status": "not_requested", "findings": [], "missing_inputs": []}
     annual = layers.get("annual_stars", {})
@@ -367,8 +366,8 @@ def evaluate_annual_remedies(
             "missing_inputs": [],
             "reason": "已登记作者规则只覆盖2026年；不把该年度物件规则外推到其他年份",
         }
-    findings: List[Dict[str, Any]] = []
-    missing: List[str] = []
+    findings: list[dict[str, Any]] = []
+    missing: list[str] = []
     if not req.placements:
         missing.append("annual_remedies.placements")
     for placement in req.placements:
@@ -427,12 +426,12 @@ def evaluate_annual_remedies(
 
 
 def analyze_supplements(
-    req: AssessRequest, layers: Dict[str, Any], profiles: List[Dict[str, Any]]
-) -> Dict[str, Any]:
+    req: AssessRequest, layers: dict[str, Any], profiles: list[dict[str, Any]]
+) -> dict[str, Any]:
     forms = evaluate_forms(req)
     targets = evaluate_element_targets(req, profiles)
     annual = evaluate_annual_remedies(req, layers, profiles)
-    keys: List[str] = []
+    keys: list[str] = []
     if req.form_observations:
         keys.append(req.form_ruleset_id)
     if req.element_adjustments:

@@ -5,12 +5,12 @@ import hashlib
 
 import pytest
 
-from fatebridge.core import sukuyo_kyoto_layers as layers
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_hinoo_critical import SOURCE as LEGACY_SOURCE
-from fatebridge.core.sukuyo_sources import LoadedSource, load_source
-from tests.sukuyo.test_sukuyo_transports import (
-    test_calendar_and_relations_across_all_real_transports as run_transport_check,
+from fatebridge.core.sukuyo import sukuyo_kyoto_layers as layers
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_hinoo_critical import SOURCE as LEGACY_SOURCE
+from fatebridge.core.sukuyo.sukuyo_sources import LoadedSource, load_source
+from tests.unit_test.fixtures.sukuyo_transports import (
+    assert_sukuyo_transport_parity as run_transport_check,
 )
 
 
@@ -38,7 +38,7 @@ def reviewed_fact_mutation(monkeypatch, change):
     )
 
 
-def test_current_scope_is_qualified_without_rewriting_the_historical_record():
+def test_current_scope_is_qualified_without_rewriting_the_historical_record() -> None:
     primary, original_span, identity = legacy()
     selected, active_span = reference()
     followup = selected.pop("later_layered_reading")
@@ -60,7 +60,7 @@ def test_current_scope_is_qualified_without_rewriting_the_historical_record():
     assert hashlib.sha256(LEGACY_SOURCE.read_bytes()).hexdigest() == identity
 
 
-def test_distinct_date_positions_do_not_inherit_other_positions_corrections():
+def test_distinct_date_positions_do_not_inherit_other_positions_corrections() -> None:
     primary, _ = reference()
     data = primary["later_layered_reading"]
     assert [r["lunar_day"] for r in data["clear_date_example_positions"]] == [1, 15, 30]
@@ -82,7 +82,7 @@ def test_distinct_date_positions_do_not_inherit_other_positions_corrections():
 
 
 @pytest.mark.parametrize("part", ["primary", "span", "source_identity"])
-def test_mismatched_legacy_objects_are_rejected(part):
+def test_mismatched_legacy_objects_are_rejected(part: str) -> None:
     primary, span, identity = legacy()
     if part == "primary":
         primary["observations"][1]["normalized_transcription"] = "changed"
@@ -94,7 +94,9 @@ def test_mismatched_legacy_objects_are_rejected(part):
         layers.qualify_kyoto_reference(primary, span, identity)
 
 
-def test_undeclared_fact_edit_rejected_before_source_acceptance(monkeypatch):
+def test_undeclared_fact_edit_rejected_before_source_acceptance(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     loaded = load_source(layers.SOURCE)
     changed = loaded.data
     changed["scope"] = "changed"
@@ -106,7 +108,9 @@ def test_undeclared_fact_edit_rejected_before_source_acceptance(monkeypatch):
 
 
 @pytest.mark.parametrize("value", [True, None, 0])
-def test_even_a_reviewed_new_digest_cannot_promote_acceptance(monkeypatch, value):
+def test_even_a_reviewed_new_digest_cannot_promote_acceptance(
+    monkeypatch: pytest.MonkeyPatch, value: bool | int | None
+) -> None:
     reviewed_fact_mutation(
         monkeypatch,
         lambda d: d["acceptance_flags"].__setitem__(
@@ -117,7 +121,9 @@ def test_even_a_reviewed_new_digest_cannot_promote_acceptance(monkeypatch, value
         reference()
 
 
-def test_missing_acceptance_flag_is_unknown_not_false(monkeypatch):
+def test_missing_acceptance_flag_is_unknown_not_false(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     reviewed_fact_mutation(
         monkeypatch, lambda d: d["acceptance_flags"].pop("algorithm_override_applied")
     )
@@ -128,7 +134,9 @@ def test_missing_acceptance_flag_is_unknown_not_false(monkeypatch):
 @pytest.mark.parametrize(
     "section", ["number", "glyph", "span", "quote", "overwrite", "side", "insertion"]
 )
-def test_unresolved_readings_cannot_be_promoted_silently(monkeypatch, section):
+def test_unresolved_readings_cannot_be_promoted_silently(
+    monkeypatch: pytest.MonkeyPatch, section: str
+) -> None:
     def change(data):
         if section == "number":
             data["corrected_number_positions"][0]["black_accepted_literal"] = "三十"
@@ -161,8 +169,8 @@ def test_unresolved_readings_cannot_be_promoted_silently(monkeypatch, section):
     ["missing_mapping", "changed_control", "overlapping_position", "outside_image"],
 )
 def test_reviewed_mapping_cannot_drop_old_context_or_mix_distinct_positions(
-    monkeypatch, change
-):
+    monkeypatch: pytest.MonkeyPatch, change: str
+) -> None:
     def mutate(data):
         if change == "missing_mapping":
             data["mapped_legacy_observations"].pop()
@@ -180,7 +188,7 @@ def test_reviewed_mapping_cannot_drop_old_context_or_mix_distinct_positions(
         reference()
 
 
-def test_new_working_conflicts_and_small_notes_remain_attributed():
+def test_new_working_conflicts_and_small_notes_remain_attributed() -> None:
     primary, _ = reference()
     data = primary["later_layered_reading"]
     disputes = {r["id"]: r for r in data["unresolved_readings"]}
@@ -197,7 +205,7 @@ def test_new_working_conflicts_and_small_notes_remain_attributed():
     assert all(value is False for value in data["acceptance_flags"].values())
 
 
-def test_returned_followup_is_detached_from_source_cache_and_next_call():
+def test_returned_followup_is_detached_from_source_cache_and_next_call() -> None:
     selected, span = reference()
     original = copy.deepcopy((selected, span))
     selected["later_layered_reading"]["corrected_number_positions"][0][
@@ -208,7 +216,9 @@ def test_returned_followup_is_detached_from_source_cache_and_next_call():
 
 
 @pytest.mark.parametrize("half,expected", [("first_half", None), ("second_half", "参")])
-def test_actual_reading_delivers_qualifications_without_changing_slots(half, expected):
+def test_actual_reading_delivers_qualifications_without_changing_slots(
+    half: str, expected: str | None
+) -> None:
     result = calendar_mansion(
         "1903-06-25", calendar_profile="hinoo_t1299_host27", calendar_day_part=half
     )
@@ -234,8 +244,11 @@ def test_actual_reading_delivers_qualifications_without_changing_slots(half, exp
 @pytest.mark.parametrize("half", ["first_half", "second_half"])
 @pytest.mark.parametrize("key", ["suzhan", "sukuyo_compatibility"])
 def test_source_layer_fields_survive_all_real_local_adapters(
-    monkeypatch, capsys, half, key
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    half: str,
+    key: str,
+) -> None:
     if key == "suzhan":
         payload = {
             "date": "1903-06-25",

@@ -1,12 +1,8 @@
 # 果老研究盘取证
 
-`astro_guolao_chart` 与 `astro_chart(chart_variant="guolao_chart")` 等价。先读本次
-`guolao.profile/validation`，再按已发布 `astronomy/classical/reading/timing` 视图取字段。
-视图名不是请求参数；使用对应 `fields`、`strict_fields=true`、`include_snapshot_text=false`。
+`guolao_chart` 与 `astrology_chart(chart_variant="guolao_chart")` 等价。先读本次 `guolao.profile/validation`，再按已发布 `astronomy/classical/patterns/timing` 视图取字段。 视图名不是请求参数；使用对应 `fields`、`strict_fields=true`、`include_snapshot_text=false`。
 
-七政及四余在 `guolao.bodies`，保留黄经、赤经、速度、宫主、研究宿位和度主。
-宫主和度主归属表校对自东北大学藏陆位辑校本卷一；本次星位由现代星历与距星表计算。
-宫主/度主归属正确，不代表宿界或整张盘已经复原原典。
+七政及四余在 `guolao.bodies`，保留黄经、赤经、速度、宫主、研究宿位和度主。 宫主和度主归属表校对自东北大学藏陆位辑校本卷一；本次星位由现代星历与距星表计算。 宫主/度主归属正确，不代表宿界或整张盘已经复原原典。
 
 - `life_palace.method=source_hour_count_with_declared_research_inputs_v1`：按底本顺数安命与二至例外；核对太阳宫、生时、计数锚点和钟面。所选现代30度太阳宫与交节瞬间端点仍为研究映射，不能称完整原典安命已验收。命度/命宿为null，不拿`angles.ascendant`补出命宿或“命坐两歧”。
 - `mansion.placement_basis=modern_equatorial_research_anchors_v1`：不等赤经研究宿界；不能写成底本历史宿界，不能把现代角度与古度混算。
@@ -23,6 +19,4 @@
 - 对无UTC标签的原生瞬间，月序资料若返回 `calendar_date/calendar_date_evidence`，只说明已证明固定UTC+08的日期可用于查历；`calendar_datetime=null`仍不提供UTC钟时。日期证明不等于古代月制、现代出生记录或整套历法已验收。没有这项日期证据时也不自行按TT的日期标签填月序。
 - 小限落宫和当时星位还不是完整流年判断；洞微大限、童限未完成，不能由静态盘补写事件日期，或由落官禄宫推出晋升。尚无独立前瞻验证，不把规则标签、软件一致性或可复现性解释为现实命中率。
 
-交付先回答可答的盘面含义，说明传统的主从、生克对应，再给现实中可观察的安排。
-只在对应结论旁说明其未验收依赖，不用限制列表代替全部解释。完整JSON首次 `fields=null`，
-其后读取同run `result_delivery`，不以摘要重新排盘。
+交付先回答可答的盘面含义，说明传统的主从、生克对应，再给现实中可观察的安排。 只在对应结论旁说明其未验收依赖，不用限制列表代替全部解释。完整JSON首次 `fields=null`， 其后读取同run `result_delivery`，不以摘要重新排盘。

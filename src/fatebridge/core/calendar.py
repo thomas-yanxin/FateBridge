@@ -5,9 +5,14 @@ Converts Gregorian dates to Chinese sexagenary cycle (干支).
 
 from datetime import datetime
 from functools import lru_cache
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
-from ..utils.civil_time import ZonedCalendar, gregorian_date_parts, gregorian_ordinal
+from ..utils.civil_time import (
+    NominalClockLabel,
+    ZonedCalendar,
+    gregorian_date_parts,
+    gregorian_ordinal,
+)
 from ..utils.data import (
     EARTHLY_BRANCHES,
     HEAVENLY_STEMS,
@@ -27,7 +32,7 @@ LATE_ZI_HOUR = 23  # 23:00-23:59 属 late 子时 / 晚子时, 日柱翻至次日
 
 def resolve_bazi_effective_date(
     year: int, month: int, day: int, hour: int
-) -> Tuple[int, int, int]:
+) -> tuple[int, int, int]:
     """根据晚子时 (夜子时) 规则把 23:00-23:59 的 BaZi 日柱向次日翻转。
 
     传入参数是一个公历 civil 日期 + 时辰小时（0-23）。返回用于 BaZi 日/时柱
@@ -68,7 +73,7 @@ class BaZiCalendar:
         return (base_index + offset) % cycle_length
 
     @classmethod
-    def calculate_year_pillar(cls, year: int) -> Tuple[str, str]:
+    def calculate_year_pillar(cls, year: int) -> tuple[str, str]:
         """Calculate the year pillar (年柱) for a given year."""
         year_offset = year - cls.BASE_YEAR
 
@@ -80,7 +85,7 @@ class BaZiCalendar:
     @classmethod
     def calculate_month_pillar_by_branch(
         cls, year: int, month_branch: str
-    ) -> Tuple[str, str]:
+    ) -> tuple[str, str]:
         """Calculate the month pillar using a resolved BaZi month branch."""
         month_index = [
             "寅",
@@ -128,9 +133,9 @@ class BaZiCalendar:
         month: int,
         day: int,
         *,
-        hour: Optional[int] = None,
+        hour: int | None = None,
         apply_late_zi_rollover: bool = True,
-    ) -> Tuple[str, str]:
+    ) -> tuple[str, str]:
         """Calculate the day pillar (日柱) for a given date.
 
         When ``hour`` is provided and ``apply_late_zi_rollover`` is True
@@ -160,7 +165,7 @@ class BaZiCalendar:
         hour: int,
         *,
         apply_late_zi_rollover: bool = True,
-    ) -> Tuple[str, str]:
+    ) -> tuple[str, str]:
         """Calculate the hour pillar (时柱) for a given datetime.
 
         当 ``apply_late_zi_rollover`` 为 True (默认) 且 ``hour`` 为 23 时，
@@ -210,20 +215,18 @@ class BaZiCalendar:
     @lru_cache(maxsize=2048)
     def _get_four_pillars_cached(
         cls,
-        local_birth_datetime: datetime,
+        label: NominalClockLabel,
         civil_calendar: ZonedCalendar,
         timezone_name: str,
-        _solar_environment: Tuple[Any, ...] = (),
-    ) -> Tuple[Tuple[str, str], Tuple[str, str], Tuple[str, str], Tuple[str, str]]:
+        _solar_environment: tuple[Any, ...] = (),
+    ) -> tuple[tuple[str, str], tuple[str, str], tuple[str, str], tuple[str, str]]:
         """Cache a day/hour wall label plus a distinct physical civil instant.
 
-        Same-zone aware datetimes ignore fold in equality and hashing. The
-        public entry therefore sends a naive day/hour clock and UTC civil key.
+        The label has no zone or physical epoch. The civil key retains fold
+        through its exact UTC coordinate.
         """
-        year = local_birth_datetime.year
-        month = local_birth_datetime.month
-        day = local_birth_datetime.day
-        hour = local_birth_datetime.hour
+        year, month, day = label.date_parts
+        hour = label.time_parts[0]
 
         civil_datetime = civil_calendar.require_datetime()
         bazi_year = get_bazi_year(civil_datetime, timezone_name)
@@ -255,11 +258,11 @@ class BaZiCalendar:
     @classmethod
     def get_four_pillars(
         cls,
-        birth_datetime: datetime,
+        birth_datetime: datetime | NominalClockLabel,
         timezone_name: str = DEFAULT_TIMEZONE,
         *,
-        civil_datetime: Optional[datetime] = None,
-    ) -> Dict[str, Tuple[str, str]]:
+        civil_datetime: datetime | None = None,
+    ) -> dict[str, tuple[str, str]]:
         """
         Calculate all four pillars (四柱) for a given birth datetime.
 
@@ -271,19 +274,25 @@ class BaZiCalendar:
             Dict with keys: 'year', 'month', 'day', 'hour'
             Each value is a tuple of (heavenly_stem, earthly_branch)
         """
-        local_birth_datetime = localize_datetime(birth_datetime, timezone_name)
+        if isinstance(birth_datetime, datetime):
+            label = NominalClockLabel.from_local_datetime(
+                localize_datetime(birth_datetime, timezone_name)
+            )
+            civil_input = (
+                civil_datetime if civil_datetime is not None else birth_datetime
+            )
+        else:
+            label = birth_datetime
+            if civil_datetime is None:
+                raise ValueError("名义日时钟须另附真实民用时刻，不能反推年月交节")
+            civil_input = civil_datetime
+        civil = localize_datetime(civil_input, timezone_name)
         year_pillar, month_pillar, day_pillar, hour_pillar = (
             cls._get_four_pillars_cached(
-                local_birth_datetime.replace(tzinfo=None, fold=0),
-                ZonedCalendar.from_datetime(
-                    localize_datetime(civil_datetime or birth_datetime, timezone_name)
-                ),
+                label,
+                ZonedCalendar.from_datetime(civil),
                 timezone_name,
-                get_solar_term_environment_key(
-                    year=localize_datetime(
-                        civil_datetime or birth_datetime, timezone_name
-                    ).year
-                ),
+                get_solar_term_environment_key(year=civil.year),
             )
         )
         return {

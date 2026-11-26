@@ -4,6 +4,7 @@ import asyncio
 import json
 import shutil
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -19,7 +20,7 @@ from fatebridge.application.examples import (
 from fatebridge.application.execution import execute_tool
 from fatebridge.cli import run
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
-from fatebridge.core.ziwei_ming_properties import (
+from fatebridge.core.ziwei.ziwei_ming_properties import (
     contextual_readings,
     ming_property_evidence,
 )
@@ -27,13 +28,14 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_ziwei_birth
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.birth_input import create_person_info
-from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from scripts.ziwei.audit_ziwei_limits import _seed
 from tests.fixtures.mcp_receipt import verified_inline_business
 from tests.fixtures.mcp_result_delivery import assert_same_run_receipt, read_full_result
+from tests.support.transports import call_calculation
+from validation.claims import CalculationClaim, verify_calculation_claims
 
 
-def test_printed_definitions_keep_unknowns_and_derived_check_denominators():
+def test_printed_definitions_keep_unknowns_and_derived_check_denominators() -> None:
     r = audit.audit_ming_properties()
     assert (r["source_clauses"], r["source_entities"]) == (47, 53)
     assert (
@@ -57,7 +59,9 @@ def test_printed_definitions_keep_unknowns_and_derived_check_denominators():
     )
 
 
-def test_wrong_join_cannot_redefine_the_frozen_expected_source(monkeypatch):
+def test_wrong_join_cannot_redefine_the_frozen_expected_source(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = audit.build_ziwei_chart
 
     def wrong(*a, **kw):
@@ -70,8 +74,8 @@ def test_wrong_join_cannot_redefine_the_frozen_expected_source(monkeypatch):
 
 
 def test_rewriting_packaged_source_does_not_change_the_printed_reading(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     name = "src/fatebridge/data/classical/ziwei-naj-ming-symbolism.json"
     r = json.loads((audit.ROOT / name).read_text())
     r["clauses"][13]["quote"] = r["clauses"][13]["quote"].replace("將", "降")
@@ -85,7 +89,7 @@ def test_rewriting_packaged_source_does_not_change_the_printed_reading(
     )
 
 
-def test_high_resolution_source_is_required(tmp_path):
+def test_high_resolution_source_is_required(tmp_path: Path) -> None:
     folder = "naj_ming_symbolism_v1"
     shutil.copytree(audit.FIXTURES / folder, tmp_path / folder)
     (tmp_path / folder / "tianliang-detail.jpg").write_bytes(b"changed")
@@ -94,7 +98,7 @@ def test_high_resolution_source_is_required(tmp_path):
 
 
 @pytest.mark.parametrize("gender", ["男", "未知"])
-def test_primary_glyphs_and_same_name_layers_are_preserved(gender):
+def test_primary_glyphs_and_same_name_layers_are_preserved(gender: str) -> None:
     c = build_ziwei_chart(_seed(1984), gender)
     e = c["ming_textual_properties"]
     d = e["definitions"]
@@ -131,8 +135,8 @@ def test_primary_glyphs_and_same_name_layers_are_preserved(gender):
     ],
 )
 def test_lianzhen_conditions_overlap_without_renaming_actual_palaces(
-    palace, branch, ming, shen, terms
-):
+    palace: str, branch: str, ming: str, shen: str, terms
+) -> None:
     p = [
         dict(
             name=palace,
@@ -158,7 +162,9 @@ def test_lianzhen_conditions_overlap_without_renaming_actual_palaces(
     assert p == original
 
 
-def test_star_and_transformation_elements_are_distinct_and_returned_data_is_isolated():
+def test_star_and_transformation_elements_are_distinct_and_returned_data_is_isolated() -> (
+    None
+):
     c = build_ziwei_chart(_seed(1984), "男")
     before = deepcopy(c)
     e = c["ming_textual_properties"]
@@ -198,8 +204,8 @@ def test_star_and_transformation_elements_are_distinct_and_returned_data_is_isol
     ],
 )
 def test_observed_geometry_does_not_define_the_source_encounter_word(
-    branch, steps, opposite, trine
-):
+    branch: str, steps: int, opposite: bool, trine: bool
+) -> None:
     p = [
         dict(
             name="命宫",
@@ -225,7 +231,7 @@ def test_observed_geometry_does_not_define_the_source_encounter_word(
 
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
-def test_real_chart_can_satisfy_career_and_shen_premises_together(profile):
+def test_real_chart_can_satisfy_career_and_shen_premises_together(profile: str) -> None:
     # Conditional regression: this date is lunar 甲子年三月初六 in HKO.
     # Neither source phrase becomes a claim about a real person's career.
     r = calculate_ziwei_birth(
@@ -249,7 +255,7 @@ def test_real_chart_can_satisfy_career_and_shen_premises_together(profile):
     assert e["applicable_terms_given_selected_reading"] == ["官祿主", "次桃花"]
 
 
-def test_actual_run_rejects_an_invented_applied_condition():
+def test_actual_run_rejects_an_invented_applied_condition() -> None:
     spec = next(s for s in CATALOG if s.key == "ziwei_birth")
     request = spec.request_model.model_validate(
         dict(
@@ -282,8 +288,11 @@ def test_actual_run_rejects_an_invented_applied_condition():
 @pytest.mark.parametrize("view", ["ming_symbolism", "contextual_symbolism"])
 @pytest.mark.parametrize("gender", ["男", "未知"])
 def test_sources_and_conditions_survive_three_surfaces_with_verified_same_run_pages(
-    view, gender, monkeypatch, capsys
-):
+    view: str,
+    gender: str,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -308,7 +317,7 @@ def test_sources_and_conditions_survive_three_surfaces_with_verified_same_run_pa
         include_snapshot_text=False,
     )
     rest = TestClient(api.app).post(
-        "/api/cn/ziwei/birth",
+        "/api/ziwei/birth-chart",
         json=inputs,
         params=[
             ("as_of", opts["as_of"]),
@@ -320,18 +329,20 @@ def test_sources_and_conditions_survive_three_surfaces_with_verified_same_run_pa
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            r = await client.call_tool(
-                "ziwei_birth", {**inputs, **opts}, raise_on_error=False
+            r = await call_calculation(
+                client, "ziwei_birth_chart", {**inputs, **opts}, raise_on_error=False
             )
             assert not r.is_error, r.content
             if view == "contextual_symbolism":
                 return await verified_inline_business(client, r.structured_content)
+            else:
+                pass
             payload = r.structured_content
             assert len(json.dumps(payload, ensure_ascii=False)) <= 8192
             return await read_full_result(client, payload)
 
     native = asyncio.run(call())
-    args = ["ziwei_birth"]
+    args = ["ziwei_birth_chart"]
     for k, v in inputs.items():
         args += ["--" + k.replace("_", "-"), str(v)]
     args += [
@@ -358,12 +369,16 @@ def test_sources_and_conditions_survive_three_surfaces_with_verified_same_run_pa
         assert len(e["definitions"]) == 47 and len(e["occurrences"]) == (
             48 if gender == "男" else 38
         )
+    else:
+        pass
 
 
 @pytest.mark.parametrize("birth_year", [None, 1933])
 def test_complete_default_reading_survives_the_same_budget_on_three_surfaces(
-    monkeypatch, capsys, birth_year
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    birth_year: int | None,
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -375,6 +390,8 @@ def test_complete_default_reading_survives_the_same_budget_on_three_surfaces(
     inputs = {**example_input(spec), "rule_profile": "quanshu_v2_excerpt"}
     if birth_year is not None:
         inputs["birth_year"] = birth_year
+    else:
+        pass
     opts = dict(
         as_of="2026-10-15T12:00:00+08:00",
         fields=fields,
@@ -384,7 +401,7 @@ def test_complete_default_reading_survives_the_same_budget_on_three_surfaces(
     )
     client = TestClient(api.app)
     response = client.post(
-        "/api/cn/ziwei/birth",
+        "/api/ziwei/birth-chart",
         json=inputs,
         params=[
             ("as_of", opts["as_of"]),
@@ -399,15 +416,15 @@ def test_complete_default_reading_survives_the_same_budget_on_three_surfaces(
 
     async def native_call():
         async with Client(create_mcp_app(families="metaphysics")) as c:
-            r = await c.call_tool(
-                "ziwei_birth", {**inputs, **opts}, raise_on_error=False
+            r = await call_calculation(
+                c, "ziwei_birth_chart", {**inputs, **opts}, raise_on_error=False
             )
             assert not r.is_error, r.content
             await verified_inline_business(c, r.structured_content)
             return r.structured_content
 
     native = asyncio.run(native_call())
-    args = ["ziwei_birth"]
+    args = ["ziwei_birth_chart"]
     for k, v in inputs.items():
         args += ["--" + k.replace("_", "-"), str(v)]
     args += [
@@ -462,6 +479,8 @@ def test_complete_default_reading_survives_the_same_budget_on_three_surfaces(
                 offset = page["next_offset"]
                 if offset is None:
                     break
+                else:
+                    pass
             text = "".join(chunks)
             assert len(text) == ref["total_chars"]
             manifest_response = client.get(f"/api/results/{ref['result_id']}")
@@ -481,6 +500,8 @@ def test_complete_default_reading_survives_the_same_budget_on_three_surfaces(
                 for k, v in p.items()
                 if k not in ("run_metadata", "result_delivery")
             } == {k: v for k, v in full.items() if k != "run_metadata"}
+        else:
+            pass
         bodies.append(
             {k: v for k, v in p.items() if k not in ("run_metadata", "result_delivery")}
         )

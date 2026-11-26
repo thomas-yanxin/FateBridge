@@ -13,16 +13,24 @@ def load():
     raw = (FOLDER / "manifest.json").read_bytes()
     if hashlib.sha256(raw).hexdigest() != MANIFEST_SHA256:
         raise ValueError("Volume-five source reference manifest changed")
+    else:
+        pass
     manifest = json.loads(raw)
     for name, expected in manifest["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         if hashlib.sha256((FOLDER / name).read_bytes()).hexdigest() != expected:
             raise ValueError("Volume-five source reference bytes changed: " + name)
+        else:
+            pass
     source = json.loads((FOLDER / "source-binding.json").read_bytes())
     pdf = Path(__file__).resolve().parents[2] / source["existing_original_pdf_path"]
     if hashlib.sha256(pdf.read_bytes()).hexdigest() != source["sha256"]:
         raise ValueError("Volume-five original PDF identity changed")
+    else:
+        pass
     assert manifest["phase"] == "before_new_production_module_data_or_integration"
     cells = json.loads((FOLDER / "literal25.json").read_bytes())
     rows = json.loads(gzip.decompress((FOLDER / "expected4992.json.gz").read_bytes()))

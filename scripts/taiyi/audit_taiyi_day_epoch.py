@@ -14,11 +14,11 @@ from fatebridge.core.metaphysics.taiyi_day import key_day_numeric_board
 from fatebridge.core.metaphysics.taiyi_historical import julian_to_proleptic_gregorian
 from fatebridge.core.metaphysics.taiyi_year import cyclic_core
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
-from fatebridge.validation.taiyi_epoch import (
+from scripts.taiyi.taiyi_origin_sources import day_token_evidence
+from validation.taiyi_epoch import (
     accumulation_hypothesis,
     sexagenary_hypothesis,
 )
-from scripts.taiyi.taiyi_origin_sources import day_token_evidence
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/taiyi_jinjing_v28"
@@ -35,6 +35,8 @@ def _json(path: Path) -> dict[str, Any]:
     value = json.loads(path.read_text())
     if not isinstance(value, dict):
         raise ValueError(f"Source must be an object: {path.name}")
+    else:
+        pass
     return value
 
 
@@ -46,17 +48,25 @@ def verify_sources(corpus: Path = CORPUS) -> dict[str, Any]:
     ]:
         if hashlib.sha256((corpus / name).read_bytes()).hexdigest() != digest:
             raise ValueError(f"V28 original source/errata freeze changed: {name}")
+        else:
+            pass
     freeze = _json(corpus / "freeze.json")
     for name, digest in freeze["files"].items():
         if hashlib.sha256((corpus / name).read_bytes()).hexdigest() != digest:
             raise ValueError(f"V28 frozen source changed: {name}")
+        else:
+            pass
     for name, digest in freeze["prior_sources"].items():
         if hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != digest:
             raise ValueError(f"V28 prior source changed: {name}")
+        else:
+            pass
     additional = _json(corpus / "additional-source-freeze.json")
     for name, digest in additional["files"].items():
         if hashlib.sha256((corpus / name).read_bytes()).hexdigest() != digest:
             raise ValueError(f"V28 additional source changed: {name}")
+        else:
+            pass
     return freeze
 
 
@@ -77,6 +87,8 @@ def calendar_cohort(data: dict[str, Any]) -> dict[str, Any]:
     months = data["months"]
     if len(months) != 13 or [r["month"] for r in months] != [*range(1, 13), 1]:
         raise ValueError("V28 requires the complete12 months and next-year sentinel")
+    else:
+        pass
     mismatch = []
     records = []
     for row, following in zip(months, months[1:]):
@@ -84,6 +96,8 @@ def calendar_cohort(data: dict[str, Any]) -> dict[str, Any]:
         length = julian_jdn(following["julian_month_start"]) - start
         if length != row["printed_month_length"] or length not in (29, 30):
             raise ValueError("V28 printed month length disagrees with month-first rows")
+        else:
+            pass
         for day in range(1, length + 1):
             western = gregorian_from_jdn(start + day - 1)
             idx = (row["printed_cycle_base"] + day - 1) % 60
@@ -99,6 +113,8 @@ def calendar_cohort(data: dict[str, Any]) -> dict[str, Any]:
                         "printed_weekday": weekday,
                     }
                 )
+            else:
+                pass
             records.append(
                 {
                     "month": row["month"],
@@ -130,6 +146,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         or location_errata["corrected"] != 43
     ):
         raise ValueError("V28 summary location correction lost its original")
+    else:
+        pass
     original_case = readings["independent_calendar_case"]
     case = copy.deepcopy(original_case)
     errata = _json(corpus / "derived-label-errata.json")
@@ -137,8 +155,12 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     for change in errata["changes"]:
         if change["path"] != "independent_calendar_case.weekday_sunday_zero":
             raise ValueError("V28 unregistered derived-label correction")
+        else:
+            pass
         if case["weekday_sunday_zero"] != change["original"]:
             raise ValueError("V28 correction lost original derived label")
+        else:
+            pass
         case["weekday_sunday_zero"] = change["corrected"]
     cohort = calendar_cohort(data)
     selected = next(r for r in cohort["records"] if r["month"] == 6 and r["day"] == 8)
@@ -227,6 +249,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     )
     if "taiyi" not in public:
         raise ValueError(f"V28 public current-profile replay failed: {public}")
+    else:
+        pass
     board = public["taiyi"]
     return {
         "freeze_sha256": FREEZE_SHA256,

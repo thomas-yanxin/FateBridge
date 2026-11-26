@@ -1,0 +1,781 @@
+{
+  "method_id": "solar_clock_label_preservation_v1",
+  "created_on": "2026-11-17",
+  "production_imported_for_reference": false,
+  "scope": "Eight specified solar-clock labels. HKO civil-date mapping is applied to the supplied derived calendar date, preserving the existing product convention. Does not certify universal timezone lunar astronomy, full EOT accuracy, classical solar/civil priority, or prediction.",
+  "gate": {
+    "calendar_label": "exact date/hour and lunar/branch/trigram/line equality",
+    "eot_seconds": "not an EOT precision gate; derived input label diagnostic only",
+    "solar_datetime": "Diagnostic only; production must preserve its own derived corrected label exactly through delivery."
+  },
+  "sources": {
+    "clock_definition": "https://aa.usno.navy.mil/faq/eqtime",
+    "zone_scope": "https://www.iana.org/time-zones/theory",
+    "sxtwl": {
+      "version": "2.0.6",
+      "url": "https://pypi.org/project/sxtwl/2.0.6/",
+      "sdist_sha256": "d00e3091f05767d5914bc31fef2b012790edb1d6728c967ddb18c164e67e86ff",
+      "binding_sha256": "20c2aa06a063e0c18eebbc8c9a0c8c82bec8d089ca98dc2ccff76a55bbc46fc7",
+      "binary_sha256": "336ccf9d09c9f1f994b9caffb91dd19e1dc10b6a2734c5788a83d5df27835133",
+      "local_library": "~/.codex/artifacts/fatebridge-qimen-role-census-20261113/authorities/sxtwl/published-source/sxtwl-2.0.6/build/lib.macosx-11.0-arm64-cpython-312"
+    },
+    "timezone": {
+      "provider": "pytz direct localize; independently called without FateBridge",
+      "version": "2026.6",
+      "iana_version": "2026f"
+    },
+    "eot": {
+      "provider": "unmanaged direct pyswisseph time_equ",
+      "version": "2.10.03",
+      "scope": "Diagnostic derivation only. Raw direct Swiss state differs slightly from managed production EOT (~milliseconds in this set); no seconds-level correctness gate is inferred."
+    },
+    "meihua": {
+      "url": "https://zh.wikisource.org/w/index.php?oldid=2690596&title=梅花易數/卷一",
+      "sections": [
+        "周易卦數",
+        "年月日時起例"
+      ],
+      "basis": "Independent literal integer arithmetic, not a second complete meihua implementation; transcription not a full facsimile collation."
+    },
+    "hko": [
+      {
+        "year": 2011,
+        "url": "https://www.hko.gov.hk/en/gts/time/calendar/text/files/T2011e.txt",
+        "sha256": "190a245434f85d15a81c7f4c35644a4b97aca62b35dbc153f8d0f93b0b3a3ec9"
+      },
+      {
+        "year": 2026,
+        "url": "https://www.hko.gov.hk/en/gts/time/calendar/text/files/T2026e.txt",
+        "sha256": "29ef9c43977a69681ef770d0c264e4226692f21f3febc3d16a4ee5c8aa06c60c"
+      }
+    ]
+  },
+  "rows": [
+    {
+      "id": "ny_spring_gap",
+      "expected": {
+        "solar_date": "2026-03-08",
+        "solar_hour": 2,
+        "solar_datetime": "2026-03-08 02:23:12.050047",
+        "is_leap_month": false,
+        "day_ganzhi": "辛巳",
+        "hour_ganzhi": "己丑",
+        "hour_branch": "丑",
+        "year_branch": "午",
+        "upper_number": 4,
+        "lower_number": 6,
+        "moving_line": 6,
+        "upper_trigram": "震",
+        "lower_trigram": "坎",
+        "lunar_year": 2026,
+        "lunar_month": 1,
+        "lunar_day": 20,
+        "solar_minute": 23
+      },
+      "independent_operands": {
+        "civil_utc": "2026-03-08T07:30:00+00:00",
+        "civil_offset_seconds": -14400.0,
+        "julian_day_ut1_approximation": 2461107.8125,
+        "equation_of_time_minutes": -10.77516587709033,
+        "total_correction_minutes": -66.79916587709033,
+        "year_month_day_sum": 28,
+        "year_month_day_hour_sum": 30,
+        "hko_row": "2026/3/8          20                      Sunday",
+        "hko_url": "https://www.hko.gov.hk/en/gts/time/calendar/text/files/T2026e.txt",
+        "hko_sha256": "29ef9c43977a69681ef770d0c264e4226692f21f3febc3d16a4ee5c8aa06c60c",
+        "hko_month_start_row": "2026/2/17         1st Lunar Month         Tuesday"
+      },
+      "input": {
+        "date": "2026-03-08",
+        "time": "03:30",
+        "zone": "America/New_York",
+        "gps_lon": -74.006,
+        "time_alg": 0
+      },
+      "pre_fix": {
+        "actual": {
+          "solar_date": "2026-03-08",
+          "solar_hour": 3,
+          "solar_datetime": "2026-03-08 03:23:12.048562",
+          "lunar": [
+            2026,
+            1,
+            20
+          ],
+          "hour_branch": "寅",
+          "upper_number": 4,
+          "lower_number": 7,
+          "moving_line": 1
+        },
+        "mismatches": [
+          "solar_hour",
+          "hour_branch",
+          "lower_number",
+          "moving_line"
+        ],
+        "corrected_datetime": "2026-03-08 02:23:12.048562",
+        "public_pillars": {
+          "day": "辛巳",
+          "hour": "己丑"
+        },
+        "label_changed": true
+      },
+      "post_fix": {
+        "actual": {
+          "solar_date": "2026-03-08",
+          "solar_hour": 2,
+          "solar_datetime": "2026-03-08 02:23:12.048562",
+          "lunar": [
+            2026,
+            1,
+            20
+          ],
+          "hour_branch": "丑",
+          "upper_number": 4,
+          "lower_number": 6,
+          "moving_line": 6
+        },
+        "mismatches": [],
+        "corrected_datetime": "2026-03-08 02:23:12.048562",
+        "public_pillars": {
+          "day": "辛巳",
+          "hour": "己丑"
+        }
+      }
+    },
+    {
+      "id": "paris_spring_gap",
+      "expected": {
+        "solar_date": "2026-03-29",
+        "solar_hour": 2,
+        "solar_datetime": "2026-03-29 02:34:33.284337",
+        "is_leap_month": false,
+        "day_ganzhi": "壬寅",
+        "hour_ganzhi": "辛丑",
+        "hour_branch": "丑",
+        "year_branch": "午",
+        "upper_number": 4,
+        "lower_number": 6,
+        "moving_line": 4,
+        "upper_trigram": "震",
+        "lower_trigram": "坎",
+        "lunar_year": 2026,
+        "lunar_month": 2,
+        "lunar_day": 11,
+        "solar_minute": 34
+      },
+      "independent_operands": {
+        "civil_utc": "2026-03-29T02:30:00+00:00",
+        "civil_offset_seconds": 7200.0,
+        "julian_day_ut1_approximation": 2461128.6041666665,
+        "equation_of_time_minutes": -4.85406104761978,
+        "total_correction_minutes": -115.44526104761978,
+        "year_month_day_sum": 20,
+        "year_month_day_hour_sum": 22,
+        "hko_row": "2026/3/29         11                      Sunday",
+        "hko_url": "https://www.hko.gov.hk/en/gts/time/calendar/text/files/T2026e.txt",
+        "hko_sha256": "29ef9c43977a69681ef770d0c264e4226692f21f3febc3d16a4ee5c8aa06c60c",
+        "hko_month_start_row": "2026/3/19         2nd Lunar Month         Thursday"
+      },
+      "input": {
+        "date": "2026-03-29",
+        "time": "04:30",
+        "zone": "Europe/Paris",
+        "gps_lon": 2.3522,
+        "time_alg": 0
+      },
+      "pre_fix": {
+        "actual": {
+          "solar_date": "2026-03-29",
+          "solar_hour": 3,
+          "solar_datetime": "2026-03-29 03:34:33.282528",
+          "lunar": [
+            2026,
+            2,
+            11
+          ],
+          "hour_branch": "寅",
+          "upper_number": 4,
+          "lower_number": 7,
+          "moving_line": 5
+        },
+        "mismatches": [
+          "solar_hour",
+          "hour_branch",
+          "lower_number",
+          "moving_line"
+        ],
+        "corrected_datetime": "2026-03-29 02:34:33.282528",
+        "public_pillars": {
+          "day": "壬寅",
+          "hour": "辛丑"
+        },
+        "label_changed": true
+      },
+      "post_fix": {
+        "actual": {
+          "solar_date": "2026-03-29",
+          "solar_hour": 2,
+          "solar_datetime": "2026-03-29 02:34:33.282528",
+          "lunar": [
+            2026,
+            2,
+            11
+          ],
+          "hour_branch": "丑",
+          "upper_number": 4,
+          "lower_number": 6,
+          "moving_line": 4
+        },
+        "mismatches": [],
+        "corrected_datetime": "2026-03-29 02:34:33.282528",
+        "public_pillars": {
+          "day": "壬寅",
+          "hour": "辛丑"
+        }
+      }
+    },
+    {
+      "id": "sydney_spring_gap",
+      "expected": {
+        "solar_date": "2026-10-04",
+        "solar_hour": 2,
+        "solar_datetime": "2026-10-04 02:45:52.526842",
+        "is_leap_month": false,
+        "day_ganzhi": "辛亥",
+        "hour_ganzhi": "己丑",
+        "hour_branch": "丑",
+        "year_branch": "午",
+        "upper_number": 7,
+        "lower_number": 1,
+        "moving_line": 5,
+        "upper_trigram": "艮",
+        "lower_trigram": "乾",
+        "lunar_year": 2026,
+        "lunar_month": 8,
+        "lunar_day": 24,
+        "solar_minute": 45
+      },
+      "independent_operands": {
+        "civil_utc": "2026-10-03T16:30:00+00:00",
+        "civil_offset_seconds": 39600.0,
+        "julian_day_ut1_approximation": 2461317.1875,
+        "equation_of_time_minutes": 11.038247366169571,
+        "total_correction_minutes": -44.124552633830376,
+        "year_month_day_sum": 39,
+        "year_month_day_hour_sum": 41,
+        "hko_row": "2026/10/4         24                      Sunday",
+        "hko_url": "https://www.hko.gov.hk/en/gts/time/calendar/text/files/T2026e.txt",
+        "hko_sha256": "29ef9c43977a69681ef770d0c264e4226692f21f3febc3d16a4ee5c8aa06c60c",
+        "hko_month_start_row": "2026/9/11         8th Lunar Month         Friday"
+      },
+      "input": {
+        "date": "2026-10-04",
+        "time": "03:30",
+        "zone": "Australia/Sydney",
+        "gps_lon": 151.2093,
+        "time_alg": 0
+      },
+      "pre_fix": {
+        "actual": {
+          "solar_date": "2026-10-04",
+          "solar_hour": 3,
+          "solar_datetime": "2026-10-04 03:45:52.526543",
+          "lunar": [
+            2026,
+            8,
+            24
+          ],
+          "hour_branch": "寅",
+          "upper_number": 7,
+          "lower_number": 2,
+          "moving_line": 6
+        },
+        "mismatches": [
+          "solar_hour",
+          "hour_branch",
+          "lower_number",
+          "moving_line"
+        ],
+        "corrected_datetime": "2026-10-04 02:45:52.526543",
+        "public_pillars": {
+          "day": "辛亥",
+          "hour": "己丑"
+        },
+        "label_changed": true
+      },
+      "post_fix": {
+        "actual": {
+          "solar_date": "2026-10-04",
+          "solar_hour": 2,
+          "solar_datetime": "2026-10-04 02:45:52.526543",
+          "lunar": [
+            2026,
+            8,
+            24
+          ],
+          "hour_branch": "丑",
+          "upper_number": 7,
+          "lower_number": 1,
+          "moving_line": 5
+        },
+        "mismatches": [],
+        "corrected_datetime": "2026-10-04 02:45:52.526543",
+        "public_pillars": {
+          "day": "辛亥",
+          "hour": "己丑"
+        }
+      }
+    },
+    {
+      "id": "lordhowe_half_hour_gap",
+      "expected": {
+        "solar_date": "2026-10-04",
+        "solar_hour": 2,
+        "solar_datetime": "2026-10-04 02:22:20.781918",
+        "is_leap_month": false,
+        "day_ganzhi": "辛亥",
+        "hour_ganzhi": "己丑",
+        "hour_branch": "丑",
+        "year_branch": "午",
+        "upper_number": 7,
+        "lower_number": 1,
+        "moving_line": 5,
+        "upper_trigram": "艮",
+        "lower_trigram": "乾",
+        "lunar_year": 2026,
+        "lunar_month": 8,
+        "lunar_day": 24,
+        "solar_minute": 22
+      },
+      "independent_operands": {
+        "civil_utc": "2026-10-03T15:35:00+00:00",
+        "civil_offset_seconds": 39600.0,
+        "julian_day_ut1_approximation": 2461317.1493055555,
+        "equation_of_time_minutes": 11.026365302337354,
+        "total_correction_minutes": -12.653634697662596,
+        "year_month_day_sum": 39,
+        "year_month_day_hour_sum": 41,
+        "hko_row": "2026/10/4         24                      Sunday",
+        "hko_url": "https://www.hko.gov.hk/en/gts/time/calendar/text/files/T2026e.txt",
+        "hko_sha256": "29ef9c43977a69681ef770d0c264e4226692f21f3febc3d16a4ee5c8aa06c60c",
+        "hko_month_start_row": "2026/9/11         8th Lunar Month         Friday"
+      },
+      "input": {
+        "date": "2026-10-04",
+        "time": "02:35",
+        "zone": "Australia/Lord_Howe",
+        "gps_lon": 159.08,
+        "time_alg": 0
+      },
+      "pre_fix": {
+        "actual": {
+          "solar_date": "2026-10-04",
+          "solar_hour": 2,
+          "solar_datetime": "2026-10-04 02:52:20.781626",
+          "lunar": [
+            2026,
+            8,
+            24
+          ],
+          "hour_branch": "丑",
+          "upper_number": 7,
+          "lower_number": 1,
+          "moving_line": 5
+        },
+        "mismatches": [],
+        "corrected_datetime": "2026-10-04 02:22:20.781626",
+        "public_pillars": {
+          "day": "辛亥",
+          "hour": "己丑"
+        },
+        "label_changed": true
+      },
+      "post_fix": {
+        "actual": {
+          "solar_date": "2026-10-04",
+          "solar_hour": 2,
+          "solar_datetime": "2026-10-04 02:22:20.781626",
+          "lunar": [
+            2026,
+            8,
+            24
+          ],
+          "hour_branch": "丑",
+          "upper_number": 7,
+          "lower_number": 1,
+          "moving_line": 5
+        },
+        "mismatches": [],
+        "corrected_datetime": "2026-10-04 02:22:20.781626",
+        "public_pillars": {
+          "day": "辛亥",
+          "hour": "己丑"
+        }
+      }
+    },
+    {
+      "id": "apia_skipped_day",
+      "expected": {
+        "solar_date": "2011-12-30",
+        "solar_hour": 0,
+        "solar_datetime": "2011-12-30 00:30:38.657334",
+        "is_leap_month": false,
+        "day_ganzhi": "己未",
+        "hour_ganzhi": "甲子",
+        "hour_branch": "子",
+        "year_branch": "卯",
+        "upper_number": 6,
+        "lower_number": 7,
+        "moving_line": 5,
+        "upper_trigram": "坎",
+        "lower_trigram": "艮",
+        "lunar_year": 2011,
+        "lunar_month": 12,
+        "lunar_day": 6,
+        "solar_minute": 30
+      },
+      "independent_operands": {
+        "civil_utc": "2011-12-30T12:00:00+00:00",
+        "civil_offset_seconds": 50400.0,
+        "julian_day_ut1_approximation": 2455926.0,
+        "equation_of_time_minutes": -2.3557111019517833,
+        "total_correction_minutes": -1529.3557111019518,
+        "year_month_day_sum": 22,
+        "year_month_day_hour_sum": 23,
+        "hko_row": "2011/12/30        6                       Friday",
+        "hko_url": "https://www.hko.gov.hk/en/gts/time/calendar/text/files/T2011e.txt",
+        "hko_sha256": "190a245434f85d15a81c7f4c35644a4b97aca62b35dbc153f8d0f93b0b3a3ec9",
+        "hko_month_start_row": "2011/12/25        12th Lunar Month        Sunday"
+      },
+      "input": {
+        "date": "2011-12-31",
+        "time": "02:00",
+        "zone": "Pacific/Apia",
+        "gps_lon": -171.75,
+        "time_alg": 0
+      },
+      "pre_fix": {
+        "actual": {
+          "solar_date": "2011-12-31",
+          "solar_hour": 0,
+          "solar_datetime": "2011-12-31 00:30:38.657739",
+          "lunar": [
+            2011,
+            12,
+            7
+          ],
+          "hour_branch": "子",
+          "upper_number": 7,
+          "lower_number": 8,
+          "moving_line": 6
+        },
+        "mismatches": [
+          "solar_date",
+          "lunar",
+          "upper_number",
+          "lower_number",
+          "moving_line"
+        ],
+        "corrected_datetime": "2011-12-30 00:30:38.657739",
+        "public_pillars": {
+          "day": "己未",
+          "hour": "甲子"
+        },
+        "label_changed": true
+      },
+      "post_fix": {
+        "actual": {
+          "solar_date": "2011-12-30",
+          "solar_hour": 0,
+          "solar_datetime": "2011-12-30 00:30:38.657739",
+          "lunar": [
+            2011,
+            12,
+            6
+          ],
+          "hour_branch": "子",
+          "upper_number": 6,
+          "lower_number": 7,
+          "moving_line": 5
+        },
+        "mismatches": [],
+        "corrected_datetime": "2011-12-30 00:30:38.657739",
+        "public_pillars": {
+          "day": "己未",
+          "hour": "甲子"
+        }
+      }
+    },
+    {
+      "id": "ny_autumn_control",
+      "expected": {
+        "solar_date": "2026-11-01",
+        "solar_hour": 3,
+        "solar_datetime": "2026-11-01 03:50:23.759438",
+        "is_leap_month": false,
+        "day_ganzhi": "己卯",
+        "hour_ganzhi": "丙寅",
+        "hour_branch": "寅",
+        "year_branch": "午",
+        "upper_number": 7,
+        "lower_number": 2,
+        "moving_line": 6,
+        "upper_trigram": "艮",
+        "lower_trigram": "兑",
+        "lunar_year": 2026,
+        "lunar_month": 9,
+        "lunar_day": 23,
+        "solar_minute": 50
+      },
+      "independent_operands": {
+        "civil_utc": "2026-11-01T08:30:00+00:00",
+        "civil_offset_seconds": -18000.0,
+        "julian_day_ut1_approximation": 2461345.8541666665,
+        "equation_of_time_minutes": 16.419990629822223,
+        "total_correction_minutes": 20.395990629822222,
+        "year_month_day_sum": 39,
+        "year_month_day_hour_sum": 42,
+        "hko_row": "2026/11/1         23                      Sunday",
+        "hko_url": "https://www.hko.gov.hk/en/gts/time/calendar/text/files/T2026e.txt",
+        "hko_sha256": "29ef9c43977a69681ef770d0c264e4226692f21f3febc3d16a4ee5c8aa06c60c",
+        "hko_month_start_row": "2026/10/10        9th Lunar Month         Saturday"
+      },
+      "input": {
+        "date": "2026-11-01",
+        "time": "03:30",
+        "zone": "America/New_York",
+        "gps_lon": -74.006,
+        "time_alg": 0
+      },
+      "pre_fix": {
+        "actual": {
+          "solar_date": "2026-11-01",
+          "solar_hour": 3,
+          "solar_datetime": "2026-11-01 03:50:23.760421",
+          "lunar": [
+            2026,
+            9,
+            23
+          ],
+          "hour_branch": "寅",
+          "upper_number": 7,
+          "lower_number": 2,
+          "moving_line": 6
+        },
+        "mismatches": [],
+        "corrected_datetime": "2026-11-01 03:50:23.760421",
+        "public_pillars": {
+          "day": "己卯",
+          "hour": "丙寅"
+        },
+        "label_changed": false
+      },
+      "post_fix": {
+        "actual": {
+          "solar_date": "2026-11-01",
+          "solar_hour": 3,
+          "solar_datetime": "2026-11-01 03:50:23.760421",
+          "lunar": [
+            2026,
+            9,
+            23
+          ],
+          "hour_branch": "寅",
+          "upper_number": 7,
+          "lower_number": 2,
+          "moving_line": 6
+        },
+        "mismatches": [],
+        "corrected_datetime": "2026-11-01 03:50:23.760421",
+        "public_pillars": {
+          "day": "己卯",
+          "hour": "丙寅"
+        }
+      }
+    },
+    {
+      "id": "lordhowe_autumn_control",
+      "expected": {
+        "solar_date": "2026-04-05",
+        "solar_hour": 3,
+        "solar_datetime": "2026-04-05 03:03:25.396717",
+        "is_leap_month": false,
+        "day_ganzhi": "己酉",
+        "hour_ganzhi": "丙寅",
+        "hour_branch": "寅",
+        "year_branch": "午",
+        "upper_number": 3,
+        "lower_number": 6,
+        "moving_line": 6,
+        "upper_trigram": "离",
+        "lower_trigram": "坎",
+        "lunar_year": 2026,
+        "lunar_month": 2,
+        "lunar_day": 18,
+        "solar_minute": 3
+      },
+      "independent_operands": {
+        "civil_utc": "2026-04-04T16:30:00+00:00",
+        "civil_offset_seconds": 37800.0,
+        "julian_day_ut1_approximation": 2461135.1875,
+        "equation_of_time_minutes": -2.8967213858422833,
+        "total_correction_minutes": 3.4232786141577667,
+        "year_month_day_sum": 27,
+        "year_month_day_hour_sum": 30,
+        "hko_row": "2026/4/5          18                      Sunday         Bright & Clear",
+        "hko_url": "https://www.hko.gov.hk/en/gts/time/calendar/text/files/T2026e.txt",
+        "hko_sha256": "29ef9c43977a69681ef770d0c264e4226692f21f3febc3d16a4ee5c8aa06c60c",
+        "hko_month_start_row": "2026/3/19         2nd Lunar Month         Thursday"
+      },
+      "input": {
+        "date": "2026-04-05",
+        "time": "03:00",
+        "zone": "Australia/Lord_Howe",
+        "gps_lon": 159.08,
+        "time_alg": 0
+      },
+      "pre_fix": {
+        "actual": {
+          "solar_date": "2026-04-05",
+          "solar_hour": 3,
+          "solar_datetime": "2026-04-05 03:03:25.395125",
+          "lunar": [
+            2026,
+            2,
+            18
+          ],
+          "hour_branch": "寅",
+          "upper_number": 3,
+          "lower_number": 6,
+          "moving_line": 6
+        },
+        "mismatches": [],
+        "corrected_datetime": "2026-04-05 03:03:25.395125",
+        "public_pillars": {
+          "day": "己酉",
+          "hour": "丙寅"
+        },
+        "label_changed": false
+      },
+      "post_fix": {
+        "actual": {
+          "solar_date": "2026-04-05",
+          "solar_hour": 3,
+          "solar_datetime": "2026-04-05 03:03:25.395125",
+          "lunar": [
+            2026,
+            2,
+            18
+          ],
+          "hour_branch": "寅",
+          "upper_number": 3,
+          "lower_number": 6,
+          "moving_line": 6
+        },
+        "mismatches": [],
+        "corrected_datetime": "2026-04-05 03:03:25.395125",
+        "public_pillars": {
+          "day": "己酉",
+          "hour": "丙寅"
+        }
+      }
+    },
+    {
+      "id": "utc_control",
+      "expected": {
+        "solar_date": "2026-03-08",
+        "solar_hour": 2,
+        "solar_datetime": "2026-03-08 02:23:12.050047",
+        "is_leap_month": false,
+        "day_ganzhi": "辛巳",
+        "hour_ganzhi": "己丑",
+        "hour_branch": "丑",
+        "year_branch": "午",
+        "upper_number": 4,
+        "lower_number": 6,
+        "moving_line": 6,
+        "upper_trigram": "震",
+        "lower_trigram": "坎",
+        "lunar_year": 2026,
+        "lunar_month": 1,
+        "lunar_day": 20,
+        "solar_minute": 23
+      },
+      "independent_operands": {
+        "civil_utc": "2026-03-08T07:30:00+00:00",
+        "civil_offset_seconds": 0.0,
+        "julian_day_ut1_approximation": 2461107.8125,
+        "equation_of_time_minutes": -10.77516587709033,
+        "total_correction_minutes": -306.79916587709033,
+        "year_month_day_sum": 28,
+        "year_month_day_hour_sum": 30,
+        "hko_row": "2026/3/8          20                      Sunday",
+        "hko_url": "https://www.hko.gov.hk/en/gts/time/calendar/text/files/T2026e.txt",
+        "hko_sha256": "29ef9c43977a69681ef770d0c264e4226692f21f3febc3d16a4ee5c8aa06c60c",
+        "hko_month_start_row": "2026/2/17         1st Lunar Month         Tuesday"
+      },
+      "input": {
+        "date": "2026-03-08",
+        "time": "07:30",
+        "zone": "UTC",
+        "gps_lon": -74.006,
+        "time_alg": 0
+      },
+      "pre_fix": {
+        "actual": {
+          "solar_date": "2026-03-08",
+          "solar_hour": 2,
+          "solar_datetime": "2026-03-08 02:23:12.048562",
+          "lunar": [
+            2026,
+            1,
+            20
+          ],
+          "hour_branch": "丑",
+          "upper_number": 4,
+          "lower_number": 6,
+          "moving_line": 6
+        },
+        "mismatches": [],
+        "corrected_datetime": "2026-03-08 02:23:12.048562",
+        "public_pillars": {
+          "day": "辛巳",
+          "hour": "己丑"
+        },
+        "label_changed": false
+      },
+      "post_fix": {
+        "actual": {
+          "solar_date": "2026-03-08",
+          "solar_hour": 2,
+          "solar_datetime": "2026-03-08 02:23:12.048562",
+          "lunar": [
+            2026,
+            1,
+            20
+          ],
+          "hour_branch": "丑",
+          "upper_number": 4,
+          "lower_number": 6,
+          "moving_line": 6
+        },
+        "mismatches": [],
+        "corrected_datetime": "2026-03-08 02:23:12.048562",
+        "public_pillars": {
+          "day": "辛巳",
+          "hour": "己丑"
+        }
+      }
+    }
+  ],
+  "baseline": {
+    "baseline_commit": "c63968b5fe11b59e24a37d8aec4bd2c3d87751ed",
+    "baseline_almanac_sha256": "10e432998320593b21d18ff1a4dae227dcaeaf6d696414188160f09d1350f787",
+    "current_almanac_sha256": "269495c4aecf8dd36a88d8b96195a33c7d6bab6cf3aaeaf7d241d8ac512b8874",
+    "oracle_sha256": "90cd6ac37c59a6fefd5ebf3671e10d28cc574939f03e74821139c7729f4eb240"
+  },
+  "evidence_directory": "~/.codex/artifacts/fatebridge-solar-clock-labels-20261117",
+  "generation_script_sha256": "965f18875c4eacd440ed104f262bc9307cc385a330621fa126b55ea6fe662d0f",
+  "comparison_script_sha256": "5e25e6462058351487b8de3bac68668eb553cf16269642221fffc8e0c893bfe8"
+}

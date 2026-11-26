@@ -7,15 +7,15 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.meihua_weather_controls import qualify_weather_rules
+from fatebridge.core.meihua.meihua_weather_controls import qualify_weather_rules
 from fatebridge.services.meihua import calculate_meihua_cast
-from fatebridge.validation.meihua_weather import audit_weather_controls
+from validation.meihua_weather import audit_weather_controls
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_weather_controls_v1"
 CASES = json.loads((REFERENCES / "cases.json").read_text())["cases"]
 
 
-def test_fixed_source_counts_and_all_control_probes():
+def test_fixed_source_counts_and_all_control_probes() -> None:
     report = audit_weather_controls(REFERENCES)
     assert report["selected_control_checks_passed"], report["cases"]
     assert report["existing_classical_frequency_example_count"] == 1
@@ -26,7 +26,7 @@ def test_fixed_source_counts_and_all_control_probes():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_frequency_paths_scope_variants_and_actual_reading(case):
+def test_frequency_paths_scope_variants_and_actual_reading(case) -> None:
     output = calculate_meihua_cast(
         casting=case["casting"],
         interpretation_topic="weather",
@@ -52,7 +52,7 @@ def test_frequency_paths_scope_variants_and_actual_reading(case):
     assert weather["single_forecast"] is None
 
 
-def test_controlled_weather_is_not_still_presented_as_unqualified():
+def test_controlled_weather_is_not_still_presented_as_unqualified() -> None:
     case = CASES[0]
     output = calculate_meihua_cast(
         casting=case["casting"],
@@ -69,7 +69,7 @@ def test_controlled_weather_is_not_still_presented_as_unqualified():
     assert "风象" in row["effective_reading"] and "受制" in output["summary"]
 
 
-def test_selected_readings_keep_actual_conditions_and_source_paths():
+def test_selected_readings_keep_actual_conditions_and_source_paths() -> None:
     case = CASES[0]
     output = calculate_meihua_cast(
         casting=case["casting"],
@@ -89,7 +89,7 @@ def test_selected_readings_keep_actual_conditions_and_source_paths():
     ]
 
 
-def test_grouping_and_static_deduplication_disagreement_are_not_voted():
+def test_grouping_and_static_deduplication_disagreement_are_not_voted() -> None:
     case = CASES[2]
     output = calculate_meihua_cast(
         casting=case["casting"],
@@ -107,7 +107,7 @@ def test_grouping_and_static_deduplication_disagreement_are_not_voted():
     assert "尚未确定" in output["summary"]
 
 
-def test_water_controls_li_does_not_cancel_qian_clear_symbol():
+def test_water_controls_li_does_not_cancel_qian_clear_symbol() -> None:
     case = CASES[6]
     output = calculate_meihua_cast(
         casting=case["casting"],
@@ -120,7 +120,7 @@ def test_water_controls_li_does_not_cancel_qian_clear_symbol():
     assert rows["symbol_qian"]["effective_tags"] == ["clear"]
 
 
-def test_earth_control_is_not_a_blanket_veto_of_every_rain_clause():
+def test_earth_control_is_not_a_blanket_veto_of_every_rain_clause() -> None:
     # The source control is 坎雨. A different rain clause with 巽/兑 dependencies
     # must retain its own conditions, even if a separate 坎 symbol is controlled.
     traces = [
@@ -144,7 +144,9 @@ def test_earth_control_is_not_a_blanket_veto_of_every_rain_clause():
     assert traces[0]["control_checks"] == []
 
 
-def test_old_negative_research_evidence_is_not_current_prediction_certification():
+def test_old_negative_research_evidence_is_not_current_prediction_certification() -> (
+    None
+):
     result = calculate_meihua_cast(
         casting=CASES[0]["casting"], interpretation_topic="weather"
     )
@@ -159,7 +161,9 @@ def test_old_negative_research_evidence_is_not_current_prediction_certification(
     assert not evidence["current_ruleset_efficacy_established"]
 
 
-def test_control_oracle_corruption_and_false_expected_status_cannot_pass(tmp_path):
+def test_control_oracle_corruption_and_false_expected_status_cannot_pass(
+    tmp_path: Path,
+) -> None:
     directory = tmp_path / "meihua_weather_controls_v1"
     shutil.copytree(REFERENCES, directory)
     shutil.copytree(

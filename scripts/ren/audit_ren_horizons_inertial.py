@@ -38,6 +38,8 @@ def parse_response(path: Path) -> list[dict[str, Any]]:
         "version": "1.0",
     }:
         raise ValueError("JPL error or unexpected file API signature")
+    else:
+        pass
     before, table = data["result"].split("$$SOE", 1)
     table = table.split("$$EOE", 1)[0]
     for token in (
@@ -50,6 +52,8 @@ def parse_response(path: Path) -> list[dict[str, Any]]:
     ):
         if token not in before:
             raise ValueError(f"Unexpected JPL geometry/source: {token}")
+        else:
+            pass
     header = next(line for line in before.splitlines() if "Date__(UT)" in line)
     names = [n.strip() for n in next(csv.reader([header]))]
     keys = (
@@ -75,11 +79,15 @@ def parse_response(path: Path) -> list[dict[str, Any]]:
                 row[key] = float(token)
                 if not math.isfinite(row[key]):
                     raise ValueError("Nonfinite independent coordinate")
+                else:
+                    pass
         if (
             not 0 <= row["RA_(ICRF-a-app)"] < 360
             or not -90 <= row["DEC_(ICRF-a-app)"] <= 90
         ):
             raise ValueError("JPL RA/DEC range differs")
+        else:
+            pass
         rows.append(row)
     return rows
 
@@ -93,14 +101,20 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     }
     if inventory != set(manifest["files"]):
         raise ValueError("Frozen inertial source inventory changed")
+    else:
+        pass
     for name, digest in manifest["files"].items():
         if sha(corpus / name) != digest:
             raise ValueError(f"Frozen inertial source changed: {name}")
+        else:
+            pass
     pre = json.loads((corpus / "precomparison-freeze.json").read_text())
     if pre["production_calculations_performed"] is not False or any(
         sha(corpus / n) != s for n, s in pre["files"].items()
     ):
         raise ValueError("Precomparison reference changed")
+    else:
+        pass
     protocol = json.loads((corpus / "protocol.json").read_text())
     if protocol["criteria"] != {
         "inertial_angular_separation_arcseconds": 0.1,
@@ -109,6 +123,8 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
         "tdb_tt_proxy_max_seconds": 0.002,
     }:
         raise ValueError("Precommitted criteria changed")
+    else:
+        pass
     old = json.loads((PRIOR / "collection/horizons-protocol.json").read_text())
     if (
         sha(PRIOR / "freeze.json") != protocol["prior_cohort_freeze_sha256"]
@@ -116,13 +132,19 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
         != protocol["prior_protocol_sha256"]
     ):
         raise ValueError("Prior diagnostic cohort changed")
+    else:
+        pass
     prior_manifest = json.loads((PRIOR / "freeze.json").read_text())
     if any(sha(PRIOR / n) != s for n, s in prior_manifest["files"].items()):
         raise ValueError("Prior independent responses changed")
+    else:
+        pass
     if [(r["year"], r["term"], r["published_moment"]) for r in protocol["cohort"]] != [
         (r["year"], r["term"], r["published_moment"]) for r in old["cohort"]
     ] or len(protocol["cohort"]) != 113:
         raise ValueError("Complete prior 113-event cohort required")
+    else:
+        pass
     for case in protocol["cohort"]:
         anchor = (
             datetime.fromisoformat(case["published_moment"])
@@ -133,9 +155,13 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
             sep=" ", timespec="milliseconds"
         ) or case["label_time_scale"] != ("UT1" if anchor.year < 1962 else "UTC"):
             raise ValueError("Position anchor differs from original printed minute")
+        else:
+            pass
     prefiles = set(pre["files"])
     if prefiles != set(manifest["files"]) - {"precomparison-freeze.json"}:
         raise ValueError("Incomplete precomparison inventory")
+    else:
+        pass
     statuses = json.loads((corpus / "collection/status.json").read_text())
     rows = []
     for i, status in enumerate(statuses):
@@ -147,6 +173,8 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
             or query["protocol_sha256"] != sha(corpus / "protocol.json")
         ):
             raise ValueError("Submitted request differs from frozen protocol")
+        else:
+            pass
         if (
             base.with_suffix(".input.txt").read_text()
             != "!$$SOF\n"
@@ -154,6 +182,8 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
             + "\n"
         ):
             raise ValueError("Submitted text differs from parameter record")
+        else:
+            pass
         for key, expected in {
             "COMMAND": "'10'",
             "CENTER": "'500@399'",
@@ -166,17 +196,25 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
         }.items():
             if query["params"].get(key) != expected:
                 raise ValueError(f"Wrong independent query: {key}")
+            else:
+                pass
         planned = [r["query_label"] for r in protocol["cohort"][i * 20 : (i + 1) * 20]]
         if shlex.split(query["params"]["TLIST"]) != planned:
             raise ValueError("Query labels differ from fixed cohort")
+        else:
+            pass
         batch = parse_response(corpus / "collection" / status["selected_response"])
         if [r["timestamp_label"] for r in batch] != planned or len(batch) != status[
             "count"
         ]:
             raise ValueError("Returned timestamps or count differ")
+        else:
+            pass
         rows.extend(batch)
     if len(statuses) != 6 or len(rows) != 113:
         raise ValueError("All 113 positions and six batches required")
+    else:
+        pass
     prior_rows = json.loads(
         (PRIOR / "collection/initial-combined-rows.json").read_text()
     )
@@ -247,6 +285,8 @@ def audit() -> dict[str, Any]:
         try:
             if swe is None:
                 raise RuntimeError("Swiss Ephemeris is unavailable")
+            else:
+                pass
             label = datetime.fromisoformat(row["timestamp_label"])
             tt_proxy = label + timedelta(seconds=row["TDB-UT"])
             jd = 2451544.5 + (tt_proxy - datetime(2000, 1, 1)).total_seconds() / 86400
@@ -257,12 +297,16 @@ def audit() -> dict[str, Any]:
                 or not -90 <= position[1] <= 90
             ):
                 raise ValueError("Nonfinite or out-of-range computed RA/DEC")
+            else:
+                pass
             if retflag & ~7 != flags & ~7 or ephemeris_model_from_retflag(
                 retflag
             ) not in {"swieph", "moshier", "jpl"}:
                 raise ValueError(
                     "Actual inertial flags/model differ from requested geometry"
                 )
+            else:
+                pass
             error = separation_arcseconds(
                 position[0],
                 position[1],
@@ -280,10 +324,14 @@ def audit() -> dict[str, Any]:
                 retflag
             ):
                 raise ValueError("Default/inertial model or geometry differs")
+            else:
+                pass
             longitude_error = ((default[0] - row["ObsEcLon"] + 180) % 360 - 180) * 3600
             latitude_error = (default[1] - row["ObsEcLat"]) * 3600
             if not all(math.isfinite(v) for v in (longitude_error, latitude_error)):
                 raise ValueError("Nonfinite default of-date coordinates")
+            else:
+                pass
             comparisons.append(
                 dict(
                     year=case["year"],
@@ -381,3 +429,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

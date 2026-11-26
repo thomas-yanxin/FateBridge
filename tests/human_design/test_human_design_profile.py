@@ -8,18 +8,18 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core.human_design_joint import JointSnapshotCache
-from fatebridge.core.human_design_profile import (
+from fatebridge.core.human_design.human_design_joint import JointSnapshotCache
+from fatebridge.core.human_design.human_design_profile import (
     profile_evidence,
     profile_reading,
     profile_reference,
 )
 from fatebridge.core.public_output import public_payload
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
-from fatebridge.validation.human_design_profile import public_profile_checks
 from tests.support.ephemeris_context import empty_ephemeris_path
 from tests.support.reference_data import resolve
+from validation.human_design import verify_human_design_reading
+from validation.human_design_profile import public_profile_checks
 
 ROOT = Path(__file__).resolve().parents[2]
 REFERENCE = json.loads(
@@ -55,13 +55,15 @@ def paired(profile, angle=None):
     }
     if angle:
         chart["incarnation_cross"] = {"angle": angle}
+    else:
+        pass
     return chart
 
 
 @pytest.mark.parametrize("fact", REFERENCE["profiles"], ids=lambda r: r["profile"])
 def test_all_source_profile_headers_keep_polarity_trigram_geometry_and_actual_paths(
     fact,
-):
+) -> None:
     chart = paired(fact["profile"], fact["angle"])
     result = profile_evidence(chart)
     assert result["status"] == "computed"
@@ -83,7 +85,7 @@ def test_all_source_profile_headers_keep_polarity_trigram_geometry_and_actual_pa
     assert phases["current_phase"] is None and phases["computed_return_dates"] is None
 
 
-def test_four_six_is_right_despite_two_upper_lines_and_four_one_is_distinct():
+def test_four_six_is_right_despite_two_upper_lines_and_four_one_is_distinct() -> None:
     result = profile_evidence(paired("4/6"))
     assert [r["trigram"] for r in result["lines"]] == ["upper", "upper"]
     assert result["geometry"]["angle"] == "right"
@@ -109,7 +111,9 @@ def test_four_six_is_right_despite_two_upper_lines_and_four_one_is_distinct():
         "claimed_profile",
     ],
 )
-def test_incomplete_or_false_basis_does_not_receive_invented_role_themes(bad):
+def test_incomplete_or_false_basis_does_not_receive_invented_role_themes(
+    bad: str,
+) -> None:
     chart = paired("1/3")
     if bad == "missing_earth":
         chart["activations"]["personality"].pop(1)
@@ -121,6 +125,8 @@ def test_incomplete_or_false_basis_does_not_receive_invented_role_themes(bad):
         for row in chart["activations"]["personality"]:
             if row["body"] in ["Sun", "Earth"]:
                 row["line"] = True
+            else:
+                pass
     elif bad == "invalid_pair":
         chart = paired("1/1")
     else:
@@ -130,7 +136,9 @@ def test_incomplete_or_false_basis_does_not_receive_invented_role_themes(bad):
     assert "lines" not in result and "geometry" not in result
 
 
-def test_ordinary_activation_six_and_return_teaching_never_assign_current_age_phase():
+def test_ordinary_activation_six_and_return_teaching_never_assign_current_age_phase() -> (
+    None
+):
     plain = profile_evidence(paired("1/3"))
     assert plain["sixth_line_process"]["applicable"] is False
     assert plain["sixth_line_process"]["source_cycle_markers"] is None
@@ -157,7 +165,7 @@ def test_ordinary_activation_six_and_return_teaching_never_assign_current_age_ph
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_every_official_profile_replays_in_real_run_and_joint_snapshots(case):
+def test_every_official_profile_replays_in_real_run_and_joint_snapshots(case) -> None:
     with empty_ephemeris_path():
         run = execute_tool(SPEC, SPEC.request_model(**case["birth_input"]))
     assert run["profile_evidence"]["status"] == "computed"
@@ -207,8 +215,8 @@ def real_sixth_profile_run():
     ],
 )
 def test_rehashed_role_or_cycle_assertions_cannot_override_actual_chart(
-    real_sixth_profile_run, bad
-):
+    real_sixth_profile_run, bad: str
+) -> None:
     run = copy.deepcopy(real_sixth_profile_run)
     role = run["profile_evidence"]
     if bad == "geometry":
@@ -230,7 +238,7 @@ def test_rehashed_role_or_cycle_assertions_cannot_override_actual_chart(
     elif bad == "joint":
         run["node_convention_comparison"]["reference_structure"]["profile_evidence"][
             "lines"
-        ][0]["theme"] = "guaranteed"
+        ][0]["line"] = 0
     elif bad == "catalog":
         role["source_catalog_sha256"] = "0" * 64
     elif bad == "rule_version":
@@ -240,7 +248,7 @@ def test_rehashed_role_or_cycle_assertions_cannot_override_actual_chart(
     assert verify_human_design_reading(run)["status"] == "rejected"
 
 
-def test_public_fact_audit_keeps_bounded_scope_and_extractor_independent():
+def test_public_fact_audit_keeps_bounded_scope_and_extractor_independent() -> None:
     result = public_profile_checks(ROOT)
     assert result["status"] == "bounded_public_profile_facts_matched"
     assert result["angle_profile_counts"] == {"right": 7, "juxtaposition": 1, "left": 4}

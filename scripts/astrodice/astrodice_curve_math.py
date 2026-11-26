@@ -107,6 +107,8 @@ def length(a, audit_scales=None):
     magnitude = max(x.absolute_upper() for x in a) or Q(1)
     if audit_scales is not None:
         audit_scales.append(str(magnitude))
+    else:
+        pass
     scaled = [x / magnitude for x in a]
     return sum((x.square() for x in scaled), I()).sqrt() * magnitude
 

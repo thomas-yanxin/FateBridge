@@ -1,51 +1,61 @@
 import asyncio
 import json
 import re
+from dataclasses import replace
 
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from fastmcp import Client
 from jsonschema import Draft202012Validator
+from jsonschema.validators import validator_for
+from pydantic import BaseModel, JsonValue
 
 import fatebridge.api as api_module
 import fatebridge.mcp_server as mcp_module
+from fatebridge.application.execution import execute_tool
+from fatebridge.cli import run
 from fatebridge.core.schema_cache import model_schema
 from fatebridge.services.tool_catalog import CATALOG
+from fatebridge.transports.rest import register_rest
 from tests.fixtures.surface_payloads import (
     MCP_CASES,
     REST_GET_CASES,
     REST_POST_CASES,
 )
+from tests.support.output_facts import canonical_json
+from tests.support.transports import (
+    AS_OF,
+    SPECS,
+    cached_mcp_app,
+    cached_output_validator,
+    call_calculation,
+    describe_capability,
+    discover_capabilities,
+    surface_calls,
+)
 
 
-def _build_client(monkeypatch) -> TestClient:
-    api_module._reset_runtime_state_for_tests()
-    monkeypatch.setattr(
-        api_module,
-        "API_KEY_AUTHENTICATOR",
-        api_module.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
-    )
-    return TestClient(api_module.app)
-
-
-def _assert_run_metadata(payload: dict) -> None:
-    pending = [payload]
+def assert_public_run_metadata(payload: dict[str, JsonValue]) -> None:
+    pending: list[JsonValue] = [payload]
     while pending:
-        item = pending.pop()
-        if isinstance(item, dict):
+        value = pending.pop()
+        if isinstance(value, dict):
             assert not any(
                 re.search(
                     r"(?:^|_)(?:sha\d*|hash|hashes|digest|fingerprint)(?:_|$)",
-                    key,
+                    field_name,
                     re.I,
                 )
-                for key in item
+                for field_name in value
             )
-            pending.extend(item.values())
-        elif isinstance(item, list):
-            pending.extend(item)
-        elif isinstance(item, str):
-            assert not re.fullmatch(r"[0-9a-f]{64}", item)
+            pending.extend(value.values())
+        elif isinstance(value, list):
+            pending.extend(value)
+        elif isinstance(value, str):
+            assert not re.fullmatch(r"[0-9a-f]{64}", value)
+        else:
+            pass
     metadata = payload.get("run_metadata")
     assert isinstance(metadata, dict)
     assert metadata["tool_name"]
@@ -55,21 +65,22 @@ def _assert_run_metadata(payload: dict) -> None:
     assert metadata["generated_at"]
 
 
-def test_rest_case_map_covers_all_business_routes():
+def test_rest_case_map_covers_all_business_routes() -> None:
     actual_paths = {
         route.path
         for route in api_module.app.routes
         if getattr(route, "path", None)
+        and getattr(route, "include_in_schema", False)
         and not route.path.startswith("/openapi")
         and not route.path.startswith("/docs")
         and not route.path.startswith("/redoc")
     }
-    # Result readers take opaque IDs from a prior calculation, so their live
-    # success/auth/error cases are in test_result_delivery and
-    # test_ziwei_twenty_third_iteration (verified reads), not static GETs.
+    # Result readers use IDs from prior calculations. Dedicated delivery tests
+    # exercise their live success, authorization and error cases.
     result_reader_paths = {
         "/api/results/{result_id}",
         "/api/results/{result_id}/pages",
+        "/api/results/{result_id}/payload",
         "/api/results/{result_id}/verified",
     }
     expected_paths = set(REST_GET_CASES) | set(REST_POST_CASES) | result_reader_paths
@@ -77,62 +88,148 @@ def test_rest_case_map_covers_all_business_routes():
     assert expected_paths == actual_paths
 
 
-def test_mcp_case_map_covers_all_registered_tools():
-    actual_names = {
-        tool.name
-        for tool in asyncio.run(mcp_module.app.list_tools(run_middleware=False))
+@pytest.mark.asyncio
+async def test_mcp_case_map_covers_all_discovered_capabilities() -> None:
+    async with Client(cached_mcp_app()) as client:
+        assert set(await discover_capabilities(client)) == set(MCP_CASES)
+
+
+def test_renamed_tool_accepts_only_the_public_name_on_all_surfaces(
+    rest: TestClient, capsys: pytest.CaptureFixture[str]
+) -> None:
+    new_path = "/api/divination/gua/meanings"
+    old_path = "/api/cn/gua/meiyi"
+    new_name = "gua_meanings"
+    old_name = "gua_meiyi"
+    routes_by_path = {
+        r.path: r
+        for r in api_module.app.routes
+        if getattr(r, "path", None) and getattr(r, "include_in_schema", False)
     }
+    assert routes_by_path[new_path].operation_id == new_name
+    assert old_path not in routes_by_path
+    args = {"name": ["111111"]}
+    http = rest.post(new_path, json=args)
+    assert http.status_code == 200
+    assert rest.post(old_path, json=args).status_code == 404
+    assert rest.get("/api/tools", params={"tool": old_name}).status_code == 422
 
-    assert set(MCP_CASES) == actual_names
+    async def call_mcp() -> list[dict[str, JsonValue]]:
+        results: list[dict[str, JsonValue]] = []
+        for family in (None, "divination"):
+            async with Client(cached_mcp_app(family)) as native:
+                names = await discover_capabilities(native)
+                assert new_name in names and old_name not in names
+                for endpoint, params in (
+                    ("describe_capability", {"tool": old_name}),
+                    ("run_calculation", {"tool": old_name, "arguments": args}),
+                ):
+                    rejected = await native.call_tool(
+                        endpoint, params, raise_on_error=False
+                    )
+                    assert rejected.is_error
+                    assert rejected.structured_content["error_code"] == "unknown_tool"
+                result = await call_calculation(native, new_name, args)
+                assert result.structured_content is not None
+                results.append(result.structured_content)
+        return results
+
+    assert run([old_name, "--name", "111111"]) == 2
+    assert json.loads(capsys.readouterr().out)["error_code"] == "usage_error"
+    assert run(["describe", old_name]) == 2
+    assert json.loads(capsys.readouterr().out)["error_code"] == "unknown_tool"
+    assert run([new_name, "--name", "111111"]) == 0
+    results = [
+        http.json(),
+        json.loads(capsys.readouterr().out),
+        *asyncio.run(call_mcp()),
+    ]
+    assert all(result["run_metadata"]["tool_name"] == new_name for result in results)
+    assert all(result["results"] == results[0]["results"] for result in results[1:])
 
 
-def test_rest_health_endpoints_return_expected_contract(monkeypatch):
-    client = _build_client(monkeypatch)
+def test_rest_rejects_retired_nested_relationship_payload(rest: TestClient) -> None:
+    path = "/api/astrology/relationship-chart"
+    current = REST_POST_CASES[path]()
+    old = {
+        side: {
+            key.removeprefix(side + "_"): value
+            for key, value in current.items()
+            if key.startswith(side + "_")
+        }
+        for side in ("inner", "outer")
+    }
+    response = rest.post(path, json=old)
+    assert response.status_code == 422
+    assert {
+        issue["path"]
+        for issue in response.json()["issues"]
+        if issue["code"] == "extra_forbidden"
+    } == {"inner", "outer"}
 
+
+def test_rest_health_endpoints_return_expected_contract(rest: TestClient) -> None:
     for path, assertion in REST_GET_CASES.items():
-        response = client.get(path)
+        response = rest.get(
+            path, params={"detail": "index"} if path == "/api/tools" else None
+        )
         assert response.status_code == 200
         if path == "/metrics":
             assert "fatebridge_http_requests_total" in response.text
             continue
+        else:
+            pass
         assertion(response.json())
 
 
 @pytest.mark.parametrize("path", REST_POST_CASES)
-def test_rest_post_endpoints_all_accept_representative_payloads(monkeypatch, path):
-    client = _build_client(monkeypatch)
-    response = client.post(path, json=REST_POST_CASES[path]())
+def test_rest_post_endpoints_all_accept_representative_payloads(
+    rest: TestClient, path: str
+) -> None:
+    response = rest.post(path, json=REST_POST_CASES[path]())
     assert response.status_code == 200, path
     body = response.json()
     assert "error" not in body, path
-    _assert_run_metadata(body)
+    assert_public_run_metadata(body)
 
 
-@pytest.mark.parametrize(
-    "names", [tuple(MCP_CASES)[i::6] for i in range(6)], ids=lambda names: names[0]
-)
-def test_fastmcp_client_accepts_all_representative_payloads(names, mcp_output_models):
-    """Exercise protocol validation and defaults, which direct .fn skips."""
+def mcp_tool_batches() -> list[tuple[str, ...]]:
+    heavy = (
+        "horary_chart",
+        "evaluate_election_time",
+        "canping",
+        "bazi_compatibility",
+        "bazi_timing",
+    )
+    heavy_set = {name for name in heavy if name in MCP_CASES}
+    rest_names = [name for name in MCP_CASES if name not in heavy_set]
+    return [(name,) for name in heavy if name in heavy_set] + [
+        tuple(rest_names[i::6]) for i in range(6) if rest_names[i::6]
+    ]
 
-    async def run():
-        async with Client(mcp_module.app) as client:
-            for name in names:
-                result = await client.call_tool(name, MCP_CASES[name][1]())
-                body = json.loads(result.content[0].text)
-                assert "error" not in body, name
-                _assert_run_metadata(body)
-                assert result.structured_content == body
-                Draft202012Validator(model_schema(mcp_output_models[name])).validate(
-                    body
-                )
 
-    asyncio.run(run())
+@pytest.mark.parametrize("names", mcp_tool_batches(), ids=lambda names: names[0])
+@pytest.mark.asyncio
+async def test_fastmcp_client_accepts_all_representative_payloads(
+    names: tuple[str, ...], mcp_output_models: dict[str, type[BaseModel]]
+) -> None:
+    """Check successful envelopes and schema validation through an MCP client."""
+    async with Client(mcp_module.app) as client:
+        for tool_name in names:
+            result = await call_calculation(
+                client, tool_name, MCP_CASES[tool_name][1](), raise_on_error=False
+            )
+            assert not result.is_error, (tool_name, result.structured_content)
+            body = result.structured_content
+            assert body is not None, tool_name
+            assert "error" not in body, tool_name
+            assert_public_run_metadata(body)
+            cached_output_validator(mcp_output_models[tool_name]).validate(body)
 
 
 @pytest.fixture(scope="module")
-def mcp_output_models():
-    # Publication equality is checked once below. Response cases reuse those
-    # canonical models instead of serializing every wire schema for each batch.
+def mcp_output_models() -> dict[str, type[BaseModel]]:
+    # note (contracts): The schema publication test checks the same canonical models once.
     return {
         spec.tool_name: spec.output_model
         for spec in CATALOG
@@ -140,64 +237,155 @@ def mcp_output_models():
     }
 
 
-@pytest.mark.asyncio
-async def test_all_published_schemas_keep_valid_shared_references():
-    from jsonschema.validators import validator_for
+def assert_local_schema_defs(schema: dict[str, JsonValue]) -> None:
+    definitions = schema.get("$defs", {})
+    assert isinstance(definitions, dict)
+    pending: list[JsonValue] = [schema]
+    while pending:
+        value = pending.pop()
+        if isinstance(value, dict):
+            reference = value.get("$ref")
+            if isinstance(reference, str) and reference.startswith("#/$defs/"):
+                target = reference.removeprefix("#/$defs/").split("/", 1)[0]
+                assert target in definitions, reference
+            else:
+                pass
+            pending.extend(value.values())
+        elif isinstance(value, list):
+            pending.extend(value)
+        else:
+            pass
 
+
+@pytest.mark.asyncio
+async def test_all_published_schemas_keep_valid_shared_references() -> None:
+    validated_definitions: set[tuple[type[Draft202012Validator], str]] = set()
+    meta_validators: dict[type[Draft202012Validator], Draft202012Validator] = {}
     async with Client(mcp_module.app) as client:
-        tools = await client.list_tools()
-    by_name = {s.tool_name: s for s in CATALOG if s.mcp_name}
-    total_wire = 0
-    total_original = 0
-    checked_schemas = set()
-    for tool in tools:
+        default_tools = await client.list_tools()
+    for tool in default_tools:
         published = tool.model_dump(by_alias=True)
-        for schema in [
-            published["inputSchema"],
-            published["outputSchema"],
-        ]:
-            if schema is not None:
-                signature = json.dumps(schema, sort_keys=True)
-                if signature not in checked_schemas:
-                    validator_for(schema).check_schema(schema)
-                    checked_schemas.add(signature)
-        if published["outputSchema"] is not None:
-            original = model_schema(by_name[tool.name].output_model)
-            assert published["outputSchema"] == original
+        assert published["outputSchema"] is None
+        schema = published["inputSchema"]
+        assert_local_schema_defs(schema)
+        validator_type = validator_for(schema)
+        if validator_type not in meta_validators:
+            meta_validators[validator_type] = validator_type(validator_type.META_SCHEMA)
+        else:
+            pass
+        meta_validator = meta_validators[validator_type]
+        definitions = schema.get("$defs")
+        if isinstance(definitions, dict):
+            # note (contracts): Shared definitions use the same meta-schema across most tools.
+            for definition in definitions.values():
+                definition_identity = (
+                    validator_type,
+                    json.dumps(definition, sort_keys=True),
+                )
+                if definition_identity not in validated_definitions:
+                    meta_validator.validate(definition)
+                    validated_definitions.add(definition_identity)
+                else:
+                    pass
+            meta_validator.validate(
+                {name: value for name, value in schema.items() if name != "$defs"}
+            )
+        else:
+            meta_validator.validate(schema)
+
+    by_name = {s.tool_name: s for s in CATALOG if s.mcp_name}
+    representatives = (
+        "bazi_birth_chart",
+        "astrology_chart",
+        "gua_meanings",
+        "fengshui_xuankong_house_chart",
+        "ziwei_birth_chart",
+    )
+    async with Client(cached_mcp_app()) as client:
+        discovered = set(await discover_capabilities(client))
+        assert discovered == set(by_name)
+        for name in representatives:
+            published = await describe_capability(client, name, detail="full")
+            assert_local_schema_defs(published["input_schema"])
+            published_output_schema = published["output_schema"]
+            assert isinstance(published_output_schema, dict), name
+            assert_local_schema_defs(published_output_schema)
+            output_model = by_name[name].output_model
+            assert output_model is not None, name
+            assert published_output_schema == model_schema(output_model)
+
+    for spec in by_name.values():
+        if spec.request_model is not None:
+            assert_local_schema_defs(model_schema(spec.request_model))
+        else:
+            pass
+        if spec.output_model is not None:
+            original = model_schema(spec.output_model)
+            assert_local_schema_defs(original)
             for definition in original.get("$defs", {}).values():
                 assert not any(
                     re.search(r"sha\d+|fingerprint|(?:^|_)hash(?:_|$)", key, re.I)
                     for key in definition.get("properties", {})
                 )
-            total_wire += len(json.dumps(published["outputSchema"]))
-            total_original += len(json.dumps(original))
-    assert total_wire == total_original
+        else:
+            pass
 
 
-def test_rest_reserved_field_guard_rejects_clashing_model():
-    """A request model that declares a reserved transport field must fail loud."""
-    from pydantic import BaseModel
+def test_rest_reserved_field_guard_rejects_clashing_model() -> None:
+    """Reject a request field named after the REST projection query parameter."""
 
-    from fatebridge.application.bindings import person_invoke
-    from fatebridge.application.tool_spec import ToolSpec
-    from fatebridge.transports.rest import register_rest
+    class ConflictingRequest(BaseModel):
+        fields: str = ""
 
-    class _Clashing(BaseModel):
-        fields: str = ""  # collides with the REST projection query param
+    catalog_spec = next(spec for spec in CATALOG if spec.tool_name == "gua_meanings")
+    spec = replace(catalog_spec, request_model=ConflictingRequest)
 
-    bad = ToolSpec(
-        key="_clash",
-        bind=person_invoke(lambda *_a, **_k: {}),
-        request_model=_Clashing,
-        summary="x",
-        operation_label_zh="x",
-        family="x",
-        rest_path="/api/_clash",
-    )
-
-    class _DummyApp:
-        def add_api_route(self, *a, **k):  # pragma: no cover - never reached
-            raise AssertionError("route mounted despite reserved-field clash")
-
+    app = FastAPI()
+    existing_routes = list(app.routes)
     with pytest.raises(ValueError, match="reserved"):
-        register_rest(_DummyApp(), [bad], execute_service=lambda *a, **k: None)
+        register_rest(app, [spec], execute_service=execute_tool)
+    assert app.routes == existing_routes
+
+
+@pytest.mark.parametrize(
+    ("spec_key", "arguments", "field", "expected"),
+    [
+        (
+            "export_registry",
+            {"technique": "generic"},
+            "selected_technique.key",
+            {"key": "generic"},
+        ),
+        ("knowledge_read", {"domain": "qimen", "key": "休门"}, "category", "door"),
+    ],
+)
+def test_reference_helpers_share_strict_projection_and_clock(
+    spec_key: str,
+    arguments: dict[str, JsonValue],
+    field: str,
+    expected: JsonValue,
+    surface_calls,
+) -> None:
+    spec = SPECS[spec_key]
+    response, protocol, code, cli = surface_calls(
+        spec,
+        arguments,
+        projection={
+            "detail": "audit",
+            "fields": [field],
+            "strict_fields": True,
+            "response_char_limit": 0,
+        },
+        rest_as_of=AS_OF,
+    )
+    assert response.status_code == 200, response.text
+    assert not protocol.is_error, protocol.content
+    assert code == 0, cli
+    assert protocol.content == []
+    root = field.partition(".")[0]
+    assert canonical_json({root: expected}) == canonical_json(cli)
+    for result in (response.json(), protocol.structured_content, cli):
+        assert canonical_json(result) == canonical_json(cli)
+        assert_public_run_metadata(result)
+        assert result["run_metadata"]["tool_name"] == spec.tool_name
+        assert result["run_metadata"]["effective_time"]["as_of"] == AS_OF

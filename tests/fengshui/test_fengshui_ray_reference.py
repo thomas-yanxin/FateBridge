@@ -86,7 +86,9 @@ def reference() -> Reference:
     return result
 
 
-def test_closed_convex_finite_ray_parameters_match_actual_cgal(reference: Reference):
+def test_closed_convex_finite_ray_parameters_match_actual_cgal(
+    reference: Reference,
+) -> None:
     assert len(reference["rays"]) == 17056
     for i, row in enumerate(reference["rays"]):
         actual = geometry._ray_parameter(
@@ -99,7 +101,9 @@ def test_closed_convex_finite_ray_parameters_match_actual_cgal(reference: Refere
         assert actual == (None if expected is None else Fraction(expected)), (i, row)
 
 
-def test_corner_presence_and_four_ray_masks_match_actual_cgal(reference: Reference):
+def test_corner_presence_and_four_ray_masks_match_actual_cgal(
+    reference: Reference,
+) -> None:
     assert len(reference["corners"]) == 6296
     for i, row in enumerate(reference["corners"]):
         rectangle = PlanRectangle(
@@ -128,16 +132,20 @@ def test_corner_presence_and_four_ray_masks_match_actual_cgal(reference: Referen
                 is not None
             ):
                 mask |= 1 << index
+            else:
+                pass
         assert mask == row["expected_mask"], (i, row, mask)
 
 
 def test_valid_backing_segments_match_actual_cgal_presence_and_distance(
     reference: Reference,
-):
+) -> None:
     qualified = 0
     for i, row in enumerate(reference["backing"]):
         if row["group"] == "raw_collapsed_segment_model_control":
             continue
+        else:
+            pass
         qualified += 1
         segments = [
             PlanSegment(start=PlanPoint(x=a[0], y=a[1]), end=PlanPoint(x=b[0], y=b[1]))
@@ -165,7 +173,7 @@ def test_valid_backing_segments_match_actual_cgal_presence_and_distance(
 
 def test_collapsed_internal_controls_do_not_expand_public_segment_schema(
     reference: Reference,
-):
+) -> None:
     controls = [
         row
         for row in reference["backing"]
@@ -189,7 +197,7 @@ def test_collapsed_internal_controls_do_not_expand_public_segment_schema(
 @pytest.mark.parametrize("control_index", range(18))
 def test_exact_contacts_preserve_shape_facts_and_public_search_qualification(
     reference: Reference, control_index: int, surface_calls
-):
+) -> None:
     control = reference["public_controls"][control_index]
     fields = ["layout_analysis.workstation_layout_analysis"]
     options = dict(

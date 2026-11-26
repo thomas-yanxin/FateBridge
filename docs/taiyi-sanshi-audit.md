@@ -35,6 +35,14 @@
 
 年计新增卷五三基五福等年度十神的独立数值核心，详见**年运审计**。年、月定目定算及太乙八门另有**后本补证与门法审计**，各自声明方法，不由旧软件移植值混入。默认至点时计不附定计；明确选择**金钥匙时计**另算完整积时、定计和阴阳四门，保留三项数值分歧及未决课语。古历时实与完整断法仍未完成。
 
+<a id="retained-civil-term-round58"></a>
+
+现代月、日、时计用已求解节气的保留民用点选锚。月、时计从同一点算 `seconds_from_anchor`，`anchor_utc` 保留供阅读的量化标签。这样，在精确交节位于两个可输入钟时之间时，首个到点的输入会归入新节月或新遁。所选民用或真太阳钟仍负责日界、子初及起算位置。 [保留点实现](../src/fatebridge/core/metaphysics/taiyi_periods.py#L71)
+
+固定参考使用 DE440 求得的保留 TT，以 `TAI−UTC = 37 s` 和 `TT−TAI = 32.184 s` 独立推导名义 UTC 坐标。150 个领域输入覆盖 2026 年十二节、两至及多种盘式。修前有 24 个选锚不符，140 个距锚秒数不符。修后的预定字段全部符合。14 个 2026 年锚点均进入日本国立天文台年历的一分钟门。亚秒部分验的是同一保留 TT 的归属及算术，绝对交节时刻只有分钟级外部对照，所选钟面、古历复原和全盘规则各依原范围。 [国立天文台 2026 年历](https://eco.mtk.nao.ac.jp/koyomi/yoko/2026/rekiyou262.html) · [IERS 第 72 号通报](https://datacenter.iers.org/data/16/bulletinc-072.txt)
+
+`taiyi` 和 `sanshiunited` 的固定 14 个请求跨 REST、MCP、CLI 验证。所选字段从 12/42 到 42/42，两个版本的合法请求均为 42/42 符合响应 Schema，同版逐例三端业务一致。两个 2025 年备用锚也分别与日本国立天文台年历相差不到一分钟。首版观察器改写 UTC `Z` 后产生的 14 个 REST 422 保留在记录里，正式对照逐字发送冻结请求。 [国立天文台 2025 年历](https://eco.mtk.nao.ac.jp/koyomi/yoko/2025/rekiyou252.html)
+
 ## 原典与历法来源
 
 - [《太乙金镜式经》卷一](https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷01)：开元十二年724年积数1,937,281，逐年增一；太乙三年一宫、天目十八步及计神规则。
@@ -57,10 +65,9 @@ uv run --locked --extra dev fatebridge taiyi \
   --no-use-true-solar-time --strict-fields \
   --fields taiyi.calendar_rules taiyi.core_board taiyi.rule_trace taiyi.ruleset
 uv run --locked --extra dev python -m scripts.taiyi.audit_taiyi_classical \
-  --output /tmp/fatebridge-taiyi-jinjing-source-current.json
+  --include-yin --output /tmp/fatebridge-taiyi-jinjing-source-current.json
 uv run --locked --extra dev pytest -q \
-  tests/taiyi/test_taiyi_accuracy.py tests/taiyi/test_taiyi_transports.py \
-  tests/integration/test_contract_regressions.py
+  tests/taiyi/test_taiyi_accuracy.py tests/taiyi/test_taiyi_transports.py
 ```
 
 审计脚本有未决分歧就返回非零；测试验证审计是否诚实保留这些分歧，所以测试绿色和原典审计失败可以同时成立。测试不得删去失败局或只改分母。
@@ -127,7 +134,7 @@ uv run --locked --extra dev fatebridge taiyi \
   --analysis-hour 17 --analysis-second 2 --analysis-timezone Asia/Shanghai \
   --calculation-mode hour --no-use-true-solar-time --strict-fields \
   --fields taiyi.calendar_rules taiyi.core_board taiyi.rule_trace taiyi.ruleset
-uv run --locked --extra dev fatebridge sanshiunited \
+uv run --locked --extra dev fatebridge sanshi_combined_chart \
   --date 2026-06-21 --time 17:00:02 --zone Asia/Shanghai \
   --taiyi-options '{"calculation_mode":"hour"}' --no-use-true-solar-time \
   --strict-fields --fields synthesis.palace_correspondences
@@ -143,9 +150,15 @@ uv run --locked --extra dev pytest -q tests/taiyi/test_taiyi_periods.py \
 
 目标仍在进行：古历常数、日计、年度十神异文及完整断法、复杂格局、真实模型自由解释及联合课例各自保留未决状态，不能把该范围测试通过写成三项目标满分。
 
+## 独立实现对照
+
+以第三方 Rust 实现核对《太乙金镜式经》离散计算。双方分别执行 Rust 和 Python，共享部分原典规则。对照涵盖阴阳各 360 个循环相位、1–40 的算数、公元 1–9999 年的名义年及年度长周期、八门和四门。共有 233,154 个可比字段一致。第三方将中宫将位留空，FateBridge 保留中五及其星标，这形成其余 424 个表示差异。[lhttjdr/calendar](https://github.com/lhttjdr/calendar)
+
+上述比较采用直接给定的名义年，仍待裁定立春与农历岁首的区别，古历复原、连续时刻和现实预测也超出对照范围。《金镜》144 局的 288 个两算仍有 11 处表文分歧，阴遁第 37、43、44 局另有始击异文。计算时可显式选择卷二推演、卷三表列始击并重算客算，或卷三照录。
+
 ## 现实预测的独立验收
 
-目前没有已注册的太乙或三式真实研究，`real_world_efficacy=not_tested`。可复用 [前瞻评估器](../src/fatebridge/validation/predictions.py) 与 [运行脚本](../scripts/evaluation/audit_prediction_study.py)，但应先完成以下材料再开始收集结果：
+目前没有已注册的太乙或三式真实研究，`real_world_efficacy=not_tested`。可复用 [前瞻评估器](../validation/predictions.py) 与 [运行脚本](../scripts/evaluation/audit_prediction_study.py)，但应先完成以下材料再开始收集结果：
 
 - 预先固定可观测的事件定义、时间窗、来源、基线、入组队列、模型及解释策略指纹；预测在窗口开始前存证。只有年计的配置不能为同一年不同分钟制造不同太乙预测。
 - 在独立训练集上确定解释到预测的规则；锁定后使用未用于调参的前瞻样本。修改规则后重新注册验证，不能把旧验证结果沿用为新模型成绩。
@@ -273,3 +286,27 @@ uv run --locked --extra dev pytest -q tests/taiyi/test_taiyi_periods.py \
 既有《金镜》所读源表在三局的始击仍为午、坤、酉，客算为25、38、31。其完整对照继续保留四位置573/576、两算277/288，以及按该源位置重算278/288的分母及失败。此旁证支持所选通则在这三个局上的版本归属，不能裁定《金镜》必为误刻，也未解决其余算数分歧。
 
 输出在`count_source_assessment.edition_comparisons`并列实际值、原选《金镜》值及此版值，附馆藏、版别、目录与原JPEG URL、实际所读字段的分母和限制声明；字节完整性资料在内部保留。三局各6项，其余所选局仅有1项，合计27项。默认计算、旧源字及`differences_unadjudicated`状态保持原样。
+
+## 年度长周期与原表
+
+卷五年度层包含十个主标记及大游天目辅助标记：君基、臣基、民基、五福、
+大游、小游、四神、天乙、地乙、直符分别具名；共享巡行算术与资料、文字、
+盘面装配分开登记，不能将标记或函数个数直接当作独立算法数。
+724年的285011、13331、3361三组积年分别使用，不并入主局的1937281起元。
+原典为[《金镜》四库卷五固定转录](https://zh.wikisource.org/w/index.php?title=太乙金鏡式經_(四庫全書本)/卷05&oldid=773936)。
+
+现有独立原表60行、四巡行各三元共720格，完整重跑仍为687相符：
+四神、天乙、地乙各180相符，直符147相符、33分歧。全部分歧在直符中元
+年序28至60，即完整180年序88至120；正文三年一位的连续36年环与原表
+都保留。9个既有独立算例共24字段相符，不充作新增9个出生咨询或全书验收。
+
+```bash
+uv run --locked --extra dev python -c 'import json; from scripts.taiyi.audit_taiyi_long_cycles import audit; print(json.dumps(audit(), ensure_ascii=False, indent=2))'
+```
+
+该入口返回完整审计资料，`classical_acceptance_passed=false`才是当前判定，
+不能把Python进程正常退出视为原典通过。原始转录和全部分歧保存在
+`tests/fixtures/taiyi_jinjing_v3/`，运行所选表在
+[src/fatebridge/data/classical/taiyi-jinjing-vol5-v1.json](../src/fatebridge/data/classical/taiyi-jinjing-vol5-v1.json)。
+地乙起九的明钞书影补证只支持该起宫及行序，不替换四库积年；
+额外三宫定位、大游天目常数关系、分野与完整断法仍待核。

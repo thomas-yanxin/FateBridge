@@ -2,9 +2,15 @@
 
 from __future__ import annotations
 
-from typing import Any, List
+from pydantic import BaseModel
 
-from fatebridge.application.bindings import lazy_service, person_invoke, raw_invoke
+from fatebridge.application.bindings import (
+    LazyService,
+    lazy_service,
+    person_invoke,
+    raw_invoke,
+)
+from fatebridge.application.domain_validators import validate_bazi_anchors
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.requests.bazi import (
     BaziBirthRequest,
@@ -77,49 +83,43 @@ calculate_destiny_analysis = lazy_service(
 )
 
 
-def _bazi_dimension_spec(name: str, service: Any, model: Any, label: str) -> ToolSpec:
+def _bazi_dimension_spec(
+    name: str, service: LazyService, model: type[BaseModel], label: str
+) -> ToolSpec:
     return ToolSpec(
         key=f"bazi_{name}",
         bind=person_invoke(service),
         request_model=model,
         summary=(
-            f"{label}：已按出生资料与分析日期自动推算大运、流年和时机依据；"
-            "首轮无需先调用 timing_analysis 或手动传大运柱。"
-            "仅有明确外部口径时用 dayun_pillar / liunian_pillar 覆盖。"
-            + (
-                "仅解释盘内五行权重、寒暖分类与传统对应；不作中医体质辨识、疾病风险、诊断或调理处方。"
-                if name == "health"
-                else (
-                    "命主子女星／宫的传统对应，不是孩子本人测算；不预测子女数量、生育能力或生育时间。"
-                    if name == "children"
-                    else ""
-                )
-            )
+            f"{label}取证：四柱星位、传统前提与当前大运／流年触点。"
+            "先读 evidence_chain.topic.first_view，按需读取深层事实。"
+            "大运、流年默认随分析日期推算，支持显式柱覆盖。"
         ),
         operation_label_zh=label,
         family="bazi",
-        rest_path=f"/api/cn/bazi/{name}",
+        rest_path=f"/api/bazi/{name}",
         mcp_name=f"bazi_{name}",
         cpu_bound=True,
-        # The dimension factory now renders a structured snapshot_text, so this
-        # tool participates in the standard snapshot contract (default True).
+        output_validators=(validate_bazi_anchors,),
+        optional_snapshot=True,
     )
 
 
-SPECS: List[ToolSpec] = [
+SPECS: list[ToolSpec] = [
     ToolSpec(
         key="analyze_destiny",
         bind=person_invoke(calculate_destiny_analysis),
         request_model=BaziClockRequest,
         summary=(
             "八字综合命理分析：在命盘之上叠加喜用神判定与格局识别，"
-            "输出最完整的命理画像；只需四柱/十神原始命盘用 bazi_birth。"
+            "输出最完整的命理画像；只需四柱/十神原始命盘用 bazi_birth_chart。"
         ),
         operation_label_zh="命理分析",
         family="bazi",
-        rest_path=None,
-        mcp_name="analyze_destiny",
+        rest_path="/api/bazi/overview",
+        mcp_name="bazi_overview",
         cpu_bound=True,
+        output_validators=(validate_bazi_anchors,),
     ),
     ToolSpec(
         key="bazi_birth",
@@ -127,13 +127,15 @@ SPECS: List[ToolSpec] = [
         request_model=BaziBirthRequest,
         summary=(
             "八字标准命盘：返回完整 snapshot_text 与可按 section 裁剪的 "
-            "snapshot_export，是获取四柱/十神/五行的首选；要喜用+格局解读用 analyze_destiny。"
+            "snapshot_export，是获取四柱/十神/五行的首选；喜用与格局分析用 bazi_overview。"
         ),
         operation_label_zh="八字命盘",
         family="bazi",
-        rest_path="/api/cn/bazi/birth",
-        mcp_name="bazi_birth",
+        rest_path="/api/bazi/birth-chart",
+        mcp_name="bazi_birth_chart",
         cpu_bound=True,
+        optional_snapshot=True,
+        output_validators=(validate_bazi_anchors,),
     ),
     _bazi_dimension_spec(
         "marriage", calculate_bazi_marriage, BaziMarriageRequest, "八字婚姻分析"
@@ -172,8 +174,8 @@ SPECS: List[ToolSpec] = [
         summary="按明确给出的字面四柱计算当前旺衰，并与全部已登记同柱原典编释核对。显示差异、未裁定及未收录；不改计算、不反推生日、不认证完整原典或现实预测。",
         operation_label_zh="原典四柱核对",
         family="bazi",
-        rest_path="/api/cn/bazi/source-compare",
-        mcp_name="bazi_source_compare",
+        rest_path="/api/bazi/compare-sources",
+        mcp_name="compare_bazi_sources",
         cpu_bound=True,
         include_snapshot_text=False,
     ),

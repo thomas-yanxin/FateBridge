@@ -2,11 +2,14 @@
 
 import math
 from dataclasses import dataclass, replace
-from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, Optional
+from datetime import datetime, timedelta
+from typing import Any, TypedDict
 
+from fatebridge.core import ephemeris_runtime as runtime
 from fatebridge.utils.birth_input import PersonInfo, create_birth_datetime
 from fatebridge.utils.civil_clock import resolve_civil_clock, utc_instant
+from fatebridge.utils.civil_time import UTCCalendar, ZonedCalendar, utc_calendar
+from fatebridge.utils.errors import ParameterError
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE, resolve_birth_place_context
 from fatebridge.utils.timezones import (
     invalid_timezone_message as _invalid_timezone_message,
@@ -23,7 +26,12 @@ SOLAR_TIME_STRATEGY_LONGITUDE_ONLY = "longitude_only"
 EQUATION_OF_TIME_METHOD = "swiss_time_equ_utc_instant_v1"
 
 
-# the astrology engine would reject an address the BaZi engine happily accepts.
+class SolarTimeAdjustment(TypedDict):
+    standard_meridian: float
+    longitude_correction_minutes: float
+    equation_of_time_minutes: float
+    daylight_saving_minutes: float
+    total_correction_minutes: float
 
 
 @dataclass(frozen=True)
@@ -33,10 +41,10 @@ class NormalizedBirthTime:
     input_datetime: datetime
     corrected_datetime: datetime
     timezone: str
-    longitude: Optional[float]
-    longitude_source: Optional[str]
-    resolved_place: Optional[str]
-    resolution_level: Optional[str]
+    longitude: float | None
+    longitude_source: str | None
+    resolved_place: str | None
+    resolution_level: str | None
     longitude_correction_minutes: float
     equation_of_time_minutes: float
     daylight_saving_minutes: float
@@ -44,15 +52,15 @@ class NormalizedBirthTime:
     applied: bool
     # 仅当经度是从 birth_place 推断、且只匹配到省级中心点（而非具体市县）时填充：
     # 告知调用方此次校正用的是省级代表经度，未量化实际出生点的误差界。
-    resolution_advisory: Optional[str] = None
-    equation_of_time_method: Optional[str] = None
-    solar_time_strategy: Optional[str] = None
-    timezone_source: Optional[str] = None
-    timezone_resolved_place: Optional[str] = None
+    resolution_advisory: str | None = None
+    equation_of_time_method: str | None = None
+    solar_time_strategy: str | None = None
+    timezone_source: str | None = None
+    timezone_resolved_place: str | None = None
 
-    def as_dict(self, *, include_timezone_resolution: bool = False) -> Dict[str, Any]:
+    def as_dict(self, *, include_timezone_resolution: bool = False) -> dict[str, Any]:
         """Return a JSON-safe summary for API responses."""
-        summary: Dict[str, Any] = {
+        summary: dict[str, Any] = {
             "applied": self.applied,
             "timezone": self.timezone,
             "longitude": self.longitude,
@@ -80,33 +88,40 @@ class NormalizedBirthTime:
 
 
 def calculate_equation_of_time_minutes(
-    target_datetime: datetime, *, julian_day_ut1: Optional[float] = None
+    target_datetime: datetime | UTCCalendar, *, julian_day_ut1: float | None = None
 ) -> float:
     """Apparent minus mean solar time at an explicit civil instant.
 
     Swiss Ephemeris expects UT and returns days. UTC is used as an
     approximation to UT1 by default. A domain with a resolved physical clock
     may supply that instant's explicit UT1 instead. Neither mode certifies
-    measured DUT1. Never substitute a seasonal sinusoid silently.
+    measured DUT1. UTCCalendar is the same normalized physical UTC coordinate,
+    including auxiliary endpoint years; a nominal solar label is not accepted.
+    Never substitute a seasonal sinusoid silently.
     """
-    from fatebridge.core import ephemeris_runtime as runtime
-
-    if target_datetime.utcoffset() is None:
-        raise ValueError("均时差计算需要带时区的真实时刻")
+    if isinstance(target_datetime, datetime):
+        if target_datetime.utcoffset() is None:
+            raise ValueError("均时差计算需要带时区的真实时刻")
+        instant = utc_calendar(target_datetime)
+    else:
+        instant = target_datetime
     if runtime.swe is None:
-        raise ImportError("真太阳时均时差计算需要 Swiss Ephemeris")
+        raise ModuleNotFoundError("真太阳时均时差计算需要 Swiss Ephemeris")
     if julian_day_ut1 is None:
-        instant = target_datetime.astimezone(timezone.utc)
+        year, month, day = instant.date_parts
+        instant_hour, instant_minute, instant_second, instant_microsecond = (
+            instant.time_parts
+        )
         hour = (
-            instant.hour
-            + instant.minute / 60
-            + (instant.second + instant.microsecond / 1e6) / 3600
+            instant_hour
+            + instant_minute / 60
+            + (instant_second + instant_microsecond / 1e6) / 3600
         )
         julian_day = runtime.ephemeris_call(
             "julday",
-            instant.year,
-            instant.month,
-            instant.day,
+            year,
+            month,
+            day,
             hour,
             runtime.swe.GREG_CAL,
         )
@@ -123,15 +138,17 @@ def calculate_solar_time_adjustment(
     longitude: float,
     *,
     strategy: str = SOLAR_TIME_STRATEGY_APPARENT,
-    equation_of_time_jd_ut1: Optional[float] = None,
-) -> Dict[str, float]:
+    equation_of_time_jd_ut1: float | None = None,
+) -> SolarTimeAdjustment:
     """Calculate solar-time correction details for a local civil datetime."""
     timezone_info = parse_timezone_name(timezone_name)
     if input_datetime.utcoffset() is None:
         aware_datetime = input_datetime.replace(tzinfo=timezone_info)
         validate_local_clock(aware_datetime)
     else:
-        aware_datetime = input_datetime.astimezone(timezone_info)
+        aware_datetime = ZonedCalendar(
+            utc_calendar(input_datetime), timezone_info
+        ).require_datetime()
     utc_offset = aware_datetime.utcoffset()
     if utc_offset is None:
         raise ValueError(_invalid_timezone_message(timezone_name))
@@ -221,7 +238,8 @@ def normalize_birth_time(
     person: PersonInfo,
     *,
     solar_time_strategy: str = SOLAR_TIME_STRATEGY_APPARENT,
-    birth_utc_offset: Optional[str] = None,
+    birth_utc_offset: str | None = None,
+    field_prefix: str = "",
 ) -> NormalizedBirthTime:
     """Normalize birth time and optionally apply true solar time correction."""
     input_datetime = create_birth_datetime(
@@ -267,7 +285,8 @@ def normalize_birth_time(
         input_datetime,
         timezone_name,
         birth_utc_offset,
-        offset_field="birth_utc_offset",
+        offset_field=field_prefix + "birth_utc_offset",
+        timezone_field=field_prefix + "birth_timezone",
         recorded_offset=person.birth_utc_offset,
     )
     if birth_utc_offset is not None or person.birth_utc_offset is not None:
@@ -293,21 +312,25 @@ def normalize_birth_time(
 
     if longitude is None:
         place = person.birth_place
-        if place and place != "未提供":
-            uncatalogued_msg = (
-                f"True solar time correction needs a longitude, but birth_place "
-                f"{place!r} is not in the offline place catalog. Pass "
-                "birth_longitude explicitly (east positive, e.g. 108.71 for 咸阳), "
-                "or use a catalogued city name."
-            )
-        else:
-            uncatalogued_msg = (
-                "True solar time correction needs a longitude. Pass birth_longitude "
-                "explicitly (east positive), or a catalogued birth_place city name."
-            )
         # 显式请求真太阳时却无经度可用 → fail-loud（与用户显式无效请求的处理一致）。
         if person.true_solar_explicit:
-            raise ValueError(uncatalogued_msg)
+            longitude_field = field_prefix + "birth_longitude"
+            message = (
+                f"出生地 {place!r} 未能解析出唯一经度。"
+                if place and place != "未提供"
+                else "真太阳时校正需要出生地经度。"
+            )
+            raise ParameterError(
+                message
+                + f"请提供 {longitude_field}（东经为正），或能唯一识别的 {field_prefix}birth_place。",
+                [
+                    {
+                        "path": longitude_field,
+                        "code": "longitude_required_for_solar_time",
+                    }
+                ],
+                status_code=400,
+            )
         # 真太阳时是「默认开」而非显式要求，且无经度可解 → 降级为钟表时间，并透明
         # 提示精度损失（与省级 fallback 的 advisory 同一模式），而不是让默认路径报错。
         return NormalizedBirthTime(
@@ -339,7 +362,7 @@ def normalize_birth_time(
     )
     longitude_correction_minutes = adjustment["longitude_correction_minutes"]
     equation_of_time_minutes = adjustment["equation_of_time_minutes"]
-    daylight_saving_minutes = adjustment.get("daylight_saving_minutes", 0.0)
+    daylight_saving_minutes = adjustment["daylight_saving_minutes"]
     total_correction_minutes = adjustment["total_correction_minutes"]
     # Apparent-solar output is a clock label, not another civil instant.
     corrected_datetime = input_datetime.replace(tzinfo=None) + timedelta(

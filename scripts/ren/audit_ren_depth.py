@@ -31,9 +31,13 @@ def load_reference(corpus: Path = CORPUS) -> dict[str, Any]:
         p.name for p in corpus.glob("*.json")
     } != expected | {"freeze.json"}:
         raise ValueError("Reference file set changed")
+    else:
+        pass
     for name, checksum in frozen["files"].items():
         if sha(corpus / name) != checksum:
             raise ValueError(f"Reference changed after freeze: {name}")
+        else:
+            pass
     return {
         Path(name).stem: json.loads((corpus / name).read_text(encoding="utf-8"))
         for name in expected
@@ -47,12 +51,18 @@ def load_scan_reference(corpus: Path = SCAN_CORPUS) -> dict[str, Any]:
         p.name for p in corpus.iterdir() if p.is_file()
     } != expected | {"freeze.json"}:
         raise ValueError("Reference scan file set changed")
+    else:
+        pass
     for name, checksum in frozen["files"].items():
         if sha(corpus / name) != checksum:
             raise ValueError(f"Reference scan changed after freeze: {name}")
+        else:
+            pass
     data = json.loads((corpus / "collation.json").read_text(encoding="utf-8"))
     if len(data["missing_table_rows"]) != 8 or len(data["fuyin_table_rows"]) != 3:
         raise ValueError("Reference scan coverage changed")
+    else:
+        pass
     return data
 
 
@@ -150,12 +160,16 @@ def audit() -> dict[str, Any]:
             duplicate_conflicts.append(
                 dict(key=list(key), first=unique[key], other=row)
             )
+        else:
+            pass
         unique.setdefault(key, row)
     failures = []
     for row in unique.values():
         _, actual = observe(row)
         if actual != row["transmissions"]:
             failures.append({**row, "actual": actual})
+        else:
+            pass
     # Full sixty-day space from arithmetic, independent of source coverage.
     days = ["甲乙丙丁戊己庚辛壬癸"[i % 10] + branches[i % 12] for i in range(60)]
     missing = [
@@ -166,6 +180,8 @@ def audit() -> dict[str, Any]:
     ]
     if missing != table["known_missing"]:
         raise ValueError("Reference missing-board inventory changed")
+    else:
+        pass
     combined = dict(unique)
     scan_checks = []
     for row in scan["missing_table_rows"]:
@@ -174,6 +190,8 @@ def audit() -> dict[str, Any]:
             raise ValueError(
                 "Reference scan supplements must not replace existing rows"
             )
+        else:
+            pass
         combined[key] = row
         _, actual = observe(row)
         scan_checks.append(
@@ -189,11 +207,15 @@ def audit() -> dict[str, Any]:
             != combined[(row["day"], row["gan_upper"])]["transmissions"]
         ):
             raise ValueError("Reference scan and retained text-table labels conflict")
+        else:
+            pass
     combined_failures = []
     for row in combined.values():
         _, actual = observe(row)
         if actual != row["transmissions"]:
             combined_failures.append({**row, "actual": actual})
+        else:
+            pass
     preamble = []
     for row in rules["conflicting_preamble"]:
         _, actual = observe(row)
@@ -285,8 +307,11 @@ def audit() -> dict[str, Any]:
                     "src/fatebridge/core/metaphysics/ren_gods.py",
                     "src/fatebridge/core/metaphysics/ren_evidence.py",
                     "src/fatebridge/core/metaphysics/liureng.py",
+                    "src/fatebridge/core/metaphysics/liureng_course_layout.py",
+                    "src/fatebridge/core/metaphysics/liureng_selection.py",
+                    "src/fatebridge/core/metaphysics/liureng_year_fate.py",
                     "src/fatebridge/core/metaphysics/liureng_transmissions.py",
-                    "src/fatebridge/core/output_chinese.py",
+                    "src/fatebridge/core/contracts/output_chinese.py",
                     "src/fatebridge/core/requests/metaphysics.py",
                     "src/fatebridge/services/metaphysics.py",
                 )
@@ -307,6 +332,8 @@ def main() -> int:
             json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
             encoding="utf-8",
         )
+    else:
+        pass
     print(
         json.dumps(
             {
@@ -342,3 +369,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

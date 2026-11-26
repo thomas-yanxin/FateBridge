@@ -6,9 +6,11 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_activities import source_bundle as legacy_activity_source
-from fatebridge.core.sukuyo_sanjiu_days import (
+from fatebridge.core.sukuyo.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_activities import (
+    source_bundle as legacy_activity_source,
+)
+from fatebridge.core.sukuyo.sukuyo_sanjiu_days import (
     SOURCE,
     personal_day_witnesses,
     source_bundle,
@@ -30,7 +32,9 @@ def ids(rows):
     return {row["rule_id"] for row in rows if row["layer"] == "sanjiu"}
 
 
-def test_selected_witness_excerpts_match_primary_paragraphs_not_runtime_answers():
+def test_selected_witness_excerpts_match_primary_paragraphs_not_runtime_answers() -> (
+    None
+):
     paragraphs = {p["id"]: p["text"] for p in PRIMARY["paragraphs"]}
     bundle = source_bundle()
     assert {r["relation"] for r in bundle["relation_witnesses"]} == set(
@@ -69,7 +73,9 @@ def test_selected_witness_excerpts_match_primary_paragraphs_not_runtime_answers(
 
 
 @pytest.mark.parametrize("offset", [4, 6, 13, 15, 22, 24])
-def test_generic_danger_or_destruction_travel_cannot_satisfy_far_or_departure(offset):
+def test_generic_danger_or_destruction_travel_cannot_satisfy_far_or_departure(
+    offset: int,
+) -> None:
     assessment = result(offset, "travel")["activity_assessment"]
     assert not ids(assessment["matched_rules"])
     assert {"t1299_activity_03", "t1299_activity_12", "t1299_sanjiu_lower_18"} <= ids(
@@ -87,7 +93,7 @@ def test_generic_danger_or_destruction_travel_cannot_satisfy_far_or_departure(of
 )
 def test_far_journey_another_saying_departure_and_residence_entry_use_different_clauses(
     details, matched
-):
+) -> None:
     assessment = result(4, "travel", details)["activity_assessment"]
     assert ids(assessment["matched_rules"]) == matched
     assert {
@@ -97,7 +103,9 @@ def test_far_journey_another_saying_departure_and_residence_entry_use_different_
     } - matched <= ids(assessment["conditional_rules"])
 
 
-def test_lower_peaceful_residence_entry_does_not_turn_all_departures_favorable():
+def test_lower_peaceful_residence_entry_does_not_turn_all_departures_favorable() -> (
+    None
+):
     for details in [[], ["personal_departure"], ["long_distance_journey"]]:
         assessment = result(3, "travel", details)["activity_assessment"]
         assert "t1299_sanjiu_lower_16" not in ids(assessment["matched_rules"])
@@ -112,7 +120,7 @@ def test_lower_peaceful_residence_entry_does_not_turn_all_departures_favorable()
     assert {"t1299_activity_04", "t1299_sanjiu_lower_15"} <= ids(move["matched_rules"])
 
 
-def test_lower_glory_monastic_clause_cannot_impute_participant_identity():
+def test_lower_glory_monastic_clause_cannot_impute_participant_identity() -> None:
     for details in [
         [],
         ["learning_with_teacher"],
@@ -135,7 +143,9 @@ def test_lower_glory_monastic_clause_cannot_impute_participant_identity():
     ]
 
 
-def test_priority_reference_never_deletes_same_volume_opposing_marriage_clause():
+def test_priority_reference_never_deletes_same_volume_opposing_marriage_clause() -> (
+    None
+):
     assessment = result(4, "marriage")["activity_assessment"]
     assert {"t1299_activity_05", "t1299_activity_11", "t1299_activity_12"} <= ids(
         assessment["matched_rules"]
@@ -150,7 +160,7 @@ def test_priority_reference_never_deletes_same_volume_opposing_marriage_clause()
     )
 
 
-def test_no_natal_or_unresolved_target_does_not_apply_personal_day_clauses():
+def test_no_natal_or_unresolved_target_does_not_apply_personal_day_clauses() -> None:
     context = calendar_mansion("2025-03-04")
     day = day_evidence(
         context,
@@ -169,7 +179,7 @@ def test_no_natal_or_unresolved_target_does_not_apply_personal_day_clauses():
         )
 
 
-def test_delivered_witnesses_are_detached_and_exposed_in_public_schema():
+def test_delivered_witnesses_are_detached_and_exposed_in_public_schema() -> None:
     first = personal_day_witnesses("安")
     first["witnesses"].clear()
     assert personal_day_witnesses("安")["witnesses"]
@@ -181,3 +191,5 @@ def test_delivered_witnesses_are_detached_and_exposed_in_public_schema():
                 "source_day_evidence"
                 in schema["$defs"]["SukuyoPersonalDay"]["properties"]
             )
+        else:
+            pass

@@ -2,10 +2,11 @@
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Literal, TypedDict
 
 from fatebridge.core.execution_context import current_datetime
 from fatebridge.utils.civil_time import utc_calendar
+from fatebridge.utils.errors import ParameterError
 from fatebridge.utils.timezones import parse_timezone_name, validate_local_clock
 
 DATE_FIELDS = (
@@ -15,30 +16,52 @@ DATE_FIELDS = (
     "analysis_hour",
     "analysis_minute",
 )
-METHOD_ID = "bazi_analysis_instant_v1"
+METHOD_ID: Literal["bazi_analysis_instant_v1"] = "bazi_analysis_instant_v1"
 
 
-@dataclass(frozen=True)
+class AnalysisClockFields(TypedDict):
+    method_id: Literal["bazi_analysis_instant_v1"]
+    provided_fields: list[str]
+    defaulted_from_clock: list[str]
+    fixed_defaults: dict[str, int]
+    scope: str
+
+
+class AnalysisInstantReference(AnalysisClockFields):
+    basis: Literal[
+        "implicit_execution_clock", "declared_partial_components", "explicit_components"
+    ]
+    analysis_datetime: str
+    utc_datetime: str
+    timezone: str
+    fold: int
+    precision: Literal["execution_clock", "minute"]
+
+
+class AnalysisAgeReference(AnalysisClockFields):
+    basis: Literal["explicit_age_reference"]
+
+
+AnalysisClockReference = AnalysisInstantReference | AnalysisAgeReference
+
+
+@dataclass(frozen=True, kw_only=True)
 class AnalysisMoment:
     moment: datetime
-    reference: Dict[str, Any]
+    reference: AnalysisInstantReference
 
 
 def resolve_analysis_moment(
     tool: str,
     timezone_name: str,
     *,
-    analysis_year: Optional[int] = None,
-    analysis_month: Optional[int] = None,
-    analysis_day: Optional[int] = None,
-    analysis_hour: Optional[int] = None,
-    analysis_minute: Optional[int] = None,
+    analysis_year: int | None = None,
+    analysis_month: int | None = None,
+    analysis_day: int | None = None,
+    analysis_hour: int | None = None,
+    analysis_minute: int | None = None,
 ) -> AnalysisMoment:
-    """Implicit now retains its instant; explicit components follow declared defaults.
-
-    An aware execution clock already identifies the correct DST occurrence.
-    Explicit wall components do not, and must pass the local-clock validator.
-    """
+    """Preserve the implicit instant or validate the explicitly supplied local wall label."""
     inherited = {
         "timing_analysis": DATE_FIELDS[:2],
         "liuyue_analysis": DATE_FIELDS[:2],
@@ -62,10 +85,13 @@ def resolve_analysis_moment(
         )
     )
     provided = [name for name in DATE_FIELDS if supplied[name] is not None]
-    fixed = {}
+    fixed: dict[str, int] = {}
+    basis: Literal[
+        "implicit_execution_clock", "declared_partial_components", "explicit_components"
+    ]
+    precision: Literal["execution_clock", "minute"]
     if not provided:
-        # Do not reconstruct a wall datetime or floor seconds: either would
-        # lose information already present in the frozen as_of instant.
+        # note (clock): Keep seconds and the selected fold from the frozen instant.
         moment = current_datetime(zone, timezone_name)
         aware = moment
         defaulted = list(DATE_FIELDS)
@@ -74,15 +100,18 @@ def resolve_analysis_moment(
     else:
         defaulted = [name for name in inherited[tool] if supplied[name] is None]
         now = current_datetime(zone, timezone_name) if defaulted else None
-        values = []
-        for field, attribute in zip(
-            DATE_FIELDS, ("year", "month", "day", "hour", "minute")
-        ):
+        clock_components = (
+            (now.year, now.month, now.day, now.hour, now.minute)
+            if now is not None
+            else (None, None, None, None, None)
+        )
+        values: list[int] = []
+        for field, clock_component in zip(DATE_FIELDS, clock_components):
             value = supplied[field]
             if value is None:
                 if field in defaulted:
-                    assert now is not None
-                    value = getattr(now, attribute)
+                    assert clock_component is not None
+                    value = clock_component
                 else:
                     value = (
                         15
@@ -91,14 +120,15 @@ def resolve_analysis_moment(
                     )
                     fixed[field] = value
             values.append(value)
-        # Preserve the existing naive explicit-component contract after
-        # validating which physical instant that wall label can represent.
+        # note (clock): Explicit components return a naive wall label after validation.
         moment = datetime(values[0], values[1], values[2], values[3], values[4])
         aware = moment.replace(tzinfo=zone)
         try:
-            validate_local_clock(aware)
+            validate_local_clock(aware, clock_label="分析钟时")
+        except ParameterError:
+            raise
         except ValueError as exc:
-            reason = str(exc).split("；", 1)[0].replace("出生钟时", "分析钟时")
+            reason = str(exc).split("；", 1)[0]
             raise ValueError(
                 reason
                 + "；请更正分析钟时，或省略analysis_*日期分量并用含时区as_of提供已确认的目标瞬间；勿改出生时区来消歧。"
@@ -109,7 +139,7 @@ def resolve_analysis_moment(
             else "explicit_components"
         )
         precision = "minute"
-    reference = {
+    reference: AnalysisInstantReference = {
         "method_id": METHOD_ID,
         "basis": basis,
         "analysis_datetime": aware.isoformat(),
@@ -122,10 +152,10 @@ def resolve_analysis_moment(
         "fixed_defaults": fixed,
         "scope": "实际分析民用瞬间，不是出生太阳钟。完全省略日期用本次as_of或执行开始时刻，保留UTC偏移、fold及秒微秒；显式部分日期沿用各工具补齐约定。旧流时内的整点仅是时柱缓存粒度，不用于交气、交运比较。秒微秒是输入表示精度，不认证天文或出生记录精度。",
     }
-    return AnalysisMoment(moment, reference)
+    return AnalysisMoment(moment=moment, reference=reference)
 
 
-def age_only_reference() -> Dict[str, Any]:
+def age_only_reference() -> AnalysisAgeReference:
     return {
         "method_id": METHOD_ID,
         "basis": "explicit_age_reference",
@@ -136,8 +166,8 @@ def age_only_reference() -> Dict[str, Any]:
     }
 
 
-def analysis_clock_snapshot_lines(reference: Dict[str, Any]) -> list[str]:
-    if reference.get("basis") != "implicit_execution_clock":
+def analysis_clock_snapshot_lines(reference: AnalysisClockReference) -> list[str]:
+    if reference["basis"] != "implicit_execution_clock":
         return []
     return [
         f"本次分析民用瞬间：{reference['analysis_datetime']}；UTC：{reference['utc_datetime']}。",

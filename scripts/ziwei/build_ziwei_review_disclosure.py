@@ -22,14 +22,20 @@ def build() -> dict:
             != wanted[relative]
         ):
             raise ValueError("Independent reading checksum mismatch: " + relative)
+        else:
+            pass
     first = json.loads((FROZEN / paths[0]).read_text())
     erratum = json.loads((FROZEN / paths[1]).read_text())
     if erratum["frozen_original"]["sha256"] != wanted[paths[0]]:
         raise ValueError("Erratum does not identify the retained first report")
+    else:
+        pass
     rows = {(r["bureau"], r["day"]): r for r in first["day_to_branch_rows"]}
     expected = {(b, d) for b in range(2, 7) for d in range(1, 31)}
     if len(first["day_to_branch_rows"]) != 150 or set(rows) != expected:
         raise ValueError("Independent reading denominator changed")
+    else:
+        pass
     correction = erratum["corrected_day_to_branch_row"]
     rows[(correction["bureau"], correction["day"])] = correction
     return {
@@ -55,9 +61,13 @@ def main() -> None:
     if args.check:
         if not TARGET.exists() or TARGET.read_text() != text:
             raise SystemExit("Ziwei independent-reading disclosure is stale")
+        else:
+            pass
     else:
         TARGET.write_text(text)
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

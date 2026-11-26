@@ -7,19 +7,23 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.liuyao_progression import PROFILE
+from fatebridge.core.contracts.output_liuyao_conditions import (
+    ProgressClause,
+    ProgressConditions,
+)
+from fatebridge.core.liuyao.liuyao_evidence import ADVANCES
+from fatebridge.core.liuyao.liuyao_progression import PROFILE
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from fatebridge.core.requests.divination import SixYaoRequest
 from scripts.liuyao.build_profile import build_profile
-from tests.liuyao.test_liuyao_conditions import conditional_case
+from tests.unit_test.fixtures.liuyao import conditional_case
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_progression_v8"
 CASES = json.loads((REFERENCE / "cases.json").read_text(encoding="utf-8"))["cases"]
 ERRATA = json.loads((REFERENCE / "errata.json").read_text(encoding="utf-8"))["cases"]
 
 
-def test_progression_reference_was_frozen_before_implementation():
-    from fatebridge.core.liuyao_evidence import ADVANCES
+def test_progression_reference_was_frozen_before_implementation() -> None:
 
     assert build_profile("progression") == PROFILE
     assert ADVANCES == dict(PROFILE["advance_pairs"])
@@ -29,7 +33,7 @@ def test_progression_reference_was_frozen_before_implementation():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_progression_conditions_follow_the_frozen_original_structures(case):
+def test_progression_conditions_follow_the_frozen_original_structures(case) -> None:
     result = conditional_case(
         {**case, "focus_line": case["position"]},
         event_horizon=case.get("event_horizon"),
@@ -47,6 +51,8 @@ def test_progression_conditions_follow_the_frozen_original_structures(case):
             ],
         )
         assert progress["state"] != case["expected_state"]
+    else:
+        pass
     assert progress["state"] == expected["expected_state"]
     assert progress["condition_now"] is expected["expected_now"]
     assert len(progress["clauses"]) == 4
@@ -54,7 +60,7 @@ def test_progression_conditions_follow_the_frozen_original_structures(case):
     assert "score" not in progress and "predicted_success" not in progress
 
 
-def test_same_element_transformation_cannot_supply_its_own_independent_root():
+def test_same_element_transformation_cannot_supply_its_own_independent_root() -> None:
     # Synthetic winter-metal counterexample; no original event or civil year.
     case = {
         "base_code": "011100",
@@ -86,8 +92,8 @@ def test_same_element_transformation_cannot_supply_its_own_independent_root():
     ],
 )
 def test_unassisted_winter_metal_does_not_bootstrap_progression(
-    base, changed, state, now
-):
+    base: str, changed: str, state: str, now: bool | None
+) -> None:
     result = conditional_case(
         {
             "base_code": base,
@@ -102,7 +108,7 @@ def test_unassisted_winter_metal_does_not_bootstrap_progression(
     assert progress["original_strength_basis"] == "unassisted_seasonal_branch_only"
 
 
-def test_raw_role_predicates_are_preserved_but_progress_atoms_are_conditional():
+def test_raw_role_predicates_are_preserved_but_progress_atoms_are_conditional() -> None:
     # Same source structure; line 5 metal is Yuan for line 4 Hai water.
     case = {**CASES[1], "focus_line": 4}
     result = conditional_case(case, event_horizon="near")
@@ -130,7 +136,7 @@ def test_raw_role_predicates_are_preserved_but_progress_atoms_are_conditional():
     assert advancing["progress_adjusted_matched"] is None
 
 
-def test_timing_days_does_not_supply_a_missing_horizon():
+def test_timing_days_does_not_supply_a_missing_horizon() -> None:
     case = {**CASES[3], "focus_line": 5}
     for days in (0, 60):
         result = conditional_case(case, timing_days=days)
@@ -141,7 +147,9 @@ def test_timing_days_does_not_supply_a_missing_horizon():
 
 
 @pytest.mark.parametrize("value", ["short", "", 1, True])
-def test_horizon_is_an_explicit_enum_on_schema_and_direct_builder(value):
+def test_horizon_is_an_explicit_enum_on_schema_and_direct_builder(
+    value: bool | int | str,
+) -> None:
     payload = {"date": "2026-08-10", "time": "12:00:00", "event_horizon": value}
     with pytest.raises(ValidationError):
         SixYaoRequest(**payload)
@@ -149,18 +157,14 @@ def test_horizon_is_an_explicit_enum_on_schema_and_direct_builder(value):
         build_sixyao_result(**payload)
 
 
-def test_static_projection_branches_do_not_gain_progression_conditions():
+def test_static_projection_branches_do_not_gain_progression_conditions() -> None:
     result = conditional_case({**CASES[0], "focus_line": 5})
     assert all(
         "progress_conditions" not in r for r in result["lines"] if r["position"] != 5
     )
 
 
-def test_progress_models_allow_partial_fields_without_sibling_requirements():
-    from fatebridge.core.output_liuyao_conditions import (
-        ProgressClause,
-        ProgressConditions,
-    )
+def test_progress_models_allow_partial_fields_without_sibling_requirements() -> None:
 
     assert (
         ProgressConditions.model_validate({"state": "requires_event_horizon"}).state

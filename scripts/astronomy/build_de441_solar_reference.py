@@ -18,7 +18,6 @@ from pathlib import Path
 
 import erfa
 import numpy as np
-import skyfield
 import swisseph as swe
 from skyfield.api import load
 from skyfield.vectorlib import VectorFunction

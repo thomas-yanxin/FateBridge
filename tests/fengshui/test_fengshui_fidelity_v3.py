@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+from pathlib import Path
 
 import pytest
 
@@ -28,6 +29,8 @@ def request(*, unknown_convention=False):
     occupant = {"subject_id": "resident", "effective_birth_year": 1990}
     if not unknown_convention:
         occupant["gender_convention"] = "male"
+    else:
+        pass
     return {
         "methods": ["bazhai"],
         "analyze_layout": True,
@@ -44,7 +47,7 @@ def request(*, unknown_convention=False):
     }
 
 
-def test_inverse_matching_direction_keeps_the_countervailing_element_fact():
+def test_inverse_matching_direction_keeps_the_countervailing_element_fact() -> None:
     result = assess(**request())
     option = result["layout_analysis"]["adjustment_options"][0]
     house = next(s for s in option["scopes"] if s["subject_kind"] == "house")
@@ -74,8 +77,8 @@ def test_inverse_matching_direction_keeps_the_countervailing_element_fact():
 @pytest.mark.parametrize("purpose", ["door", "bed", "desk", "stove"])
 @pytest.mark.parametrize("aspect", ["location", "facing"])
 def test_current_and_inverse_lookup_share_application_evidence_and_facing_role(
-    purpose, aspect
-):
+    purpose: str, aspect: str
+) -> None:
     data = request()
     role = {
         "door": "door_facing",
@@ -90,6 +93,8 @@ def test_current_and_inverse_lookup_share_application_evidence_and_facing_role(
     }
     if aspect == "facing":
         placement["facing_role"] = role
+    else:
+        pass
     data["placements"] = [placement]
     result = assess(**data)
     options = result["layout_analysis"]["adjustment_options"]
@@ -109,7 +114,7 @@ def test_current_and_inverse_lookup_share_application_evidence_and_facing_role(
         )
 
 
-def test_each_proposed_direction_reproduces_a_fresh_forward_calculation():
+def test_each_proposed_direction_reproduces_a_fresh_forward_calculation() -> None:
     data = request()
     result = assess(**data)
     option = result["layout_analysis"]["adjustment_options"][0]
@@ -129,7 +134,9 @@ def test_each_proposed_direction_reproduces_a_fresh_forward_calculation():
                 assert {**metadata, **proposed[key]} == finding[key]
 
 
-def test_unconfirmed_personal_candidates_remain_distinct_in_every_snapshot_use():
+def test_unconfirmed_personal_candidates_remain_distinct_in_every_snapshot_use() -> (
+    None
+):
     data = request(unknown_convention=True)
     data.pop("house")
     result = assess(**data)
@@ -165,7 +172,9 @@ def test_unconfirmed_personal_candidates_remain_distinct_in_every_snapshot_use()
     )
 
 
-def test_house_and_person_conflict_keeps_per_scope_proof_without_common_direction():
+def test_house_and_person_conflict_keeps_per_scope_proof_without_common_direction() -> (
+    None
+):
     data = request()
     data["occupants"][0]["gender_convention"] = "female"
     result = assess(**data)
@@ -181,8 +190,11 @@ def test_house_and_person_conflict_keeps_per_scope_proof_without_common_directio
 
 @pytest.mark.parametrize("variant", ["confirmed", "candidate", "stove_facing"])
 def test_layout_proof_and_readable_candidate_scopes_match_all_transports(
-    monkeypatch, tmp_path, capsys, variant
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    variant: str,
+) -> None:
     data = request(unknown_convention=variant == "candidate")
     if variant == "stove_facing":
         data["placements"] = [
@@ -193,6 +205,8 @@ def test_layout_proof_and_readable_candidate_scopes_match_all_transports(
                 "facing_role": "fire_mouth",
             }
         ]
+    else:
+        pass
     http = rest_client(monkeypatch).post("/api/fengshui/assess", json=data)
     protocol = asyncio.run(mcp_call("assess", data))
     path = tmp_path / "fidelity.json"
@@ -209,7 +223,7 @@ def test_layout_proof_and_readable_candidate_scopes_match_all_transports(
     assert "current_result_scope" in http.text
 
 
-def test_strict_projection_delivers_complete_inverse_evidence_on_real_mcp():
+def test_strict_projection_delivers_complete_inverse_evidence_on_real_mcp() -> None:
     data = {
         **request(unknown_convention=True),
         "fields": ["layout_analysis.adjustment_options", "rulesets", "rule_trace"],

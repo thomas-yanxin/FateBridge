@@ -33,6 +33,8 @@ def load_protocol(path: Path) -> dict[str, Any]:
     raw = path.read_bytes()
     if hashlib.sha256(raw).hexdigest() != PROTOCOL_SHA256:
         raise ValueError("Frozen geometry protocol changed")
+    else:
+        pass
     return cast(dict[str, Any], json.loads(raw))
 
 
@@ -61,10 +63,14 @@ def reduce_response(
         or "$$EOE" not in result
     ):
         raise ValueError(f"{body}: Horizons returned a different physical contract")
+    else:
+        pass
     table = list(csv.reader(io.StringIO(result.split("$$SOE\n")[1].split("$$EOE")[0])))
     wanted = [row["jd_tt"] for row in protocol["epochs"]]
     if len(table) != len(wanted):
         raise ValueError(f"{body}: incomplete reference coverage")
+    else:
+        pass
     rotation = erfa.rx(erfa.obl80(2451545.0, 0.0), erfa.bp00(2451545.0, 0.0)[0])
     rows = []
     for columns, epoch in zip(table, protocol["epochs"]):
@@ -73,13 +79,19 @@ def reduce_response(
         # request/response rounding differs by at most one double ULP here.
         if abs(jd - epoch["jd_tt"]) > math.ulp(epoch["jd_tt"]):
             raise ValueError(f"{body}: returned epoch changed")
+        else:
+            pass
         vector = np.array([float(v) for v in columns[2:5]])
         velocity = [float(v) for v in columns[5:8]]
         if not all(math.isfinite(v) for v in [*vector, *velocity]):
             raise ValueError(f"{body}: nonfinite reference vector")
+        else:
+            pass
         norm = float(np.linalg.norm(vector))
         if norm <= 0:
             raise ValueError(f"{body}: undefined reference direction")
+        else:
+            pass
         direction = rotation @ vector / norm
         delta = float(erfa.dtdb(2451545.0, epoch["jd_tt"] - 2451545.0, 0, 0, 0, 0))
         rows.append(
@@ -107,6 +119,8 @@ def main() -> None:
     protocol = load_protocol(args.protocol)
     if args.output.exists() or args.output.resolve() == args.protocol.resolve():
         parser.error("output must be new and must not overwrite the protocol")
+    else:
+        pass
     args.raw_dir.mkdir(parents=True, exist_ok=True)
     references, rows = [], []
     for body, target in protocol["targets"].items():
@@ -148,8 +162,12 @@ def main() -> None:
         print(f"{body}: validated {len(body_rows)} raw reference rows", flush=True)
     if any(n == "swisseph" or n.startswith("fatebridge") for n in sys.modules):
         raise ValueError("Reference isolation violated")
+    else:
+        pass
     if len(rows) != protocol["expected_rows"]:
         raise ValueError("Incomplete frozen cohort")
+    else:
+        pass
     output = {
         "protocol_sha256": PROTOCOL_SHA256,
         "generator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
@@ -167,3 +185,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

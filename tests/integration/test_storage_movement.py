@@ -10,13 +10,14 @@ from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.storage_movement import storage_movement_effect
 from fatebridge.core.strength import DEFAULT_POLICY, _evaluate
 from fatebridge.utils.data import STEM_ELEMENTS, get_shishen
+from scripts.bazi.audit_bazi_classical import audit
 from tests.bazi.test_strength_v2 import pillars, score
 
 PATH = Path(__file__).parents[1] / "data/bazi_storage_movement_v1/reference.json"
 REFERENCE = json.loads(PATH.read_text())
 
 
-def test_source_probes_remain_frozen_and_do_not_invent_complete_births():
+def test_source_probes_remain_frozen_and_do_not_invent_complete_births() -> None:
     assert (
         hashlib.sha256(PATH.read_bytes()).hexdigest()
         == PATH.with_suffix(".sha256").read_text().strip()
@@ -26,10 +27,8 @@ def test_source_probes_remain_frozen_and_do_not_invent_complete_births():
     assert all("hour" not in case for case in REFERENCE["partial_source_examples"])
 
 
-def test_classical_audit_fingerprints_the_actual_root_effect_implementation():
-    from tests.bazi.test_bazi_classical_audit import audit
-
-    result = audit.audit()
+def test_classical_audit_fingerprints_the_actual_root_effect_implementation() -> None:
+    result = audit()
     name = "src/fatebridge/core/storage_movement.py"
     assert (
         result["source_fingerprints"][name]
@@ -39,7 +38,9 @@ def test_classical_audit_fingerprints_the_actual_root_effect_implementation():
 
 
 @pytest.mark.parametrize("case", REFERENCE["partial_source_examples"])
-def test_source_examples_preserve_earth_and_do_not_automatically_open_storage(case):
+def test_source_examples_preserve_earth_and_do_not_automatically_open_storage(
+    case,
+) -> None:
     branches = {"month": case["month_branch"], "other": case["other_branch"]}
     result = storage_movement_effect(
         branches, ["month", "other"], "六冲", case["day_stem"], 0.75
@@ -74,14 +75,16 @@ def test_source_examples_preserve_earth_and_do_not_automatically_open_storage(ca
         (["寅", "申"], "六冲"),
     ],
 )
-def test_lone_storage_or_other_relations_do_not_trigger_the_rule(branches, kind):
+def test_lone_storage_or_other_relations_do_not_trigger_the_rule(
+    branches, kind: str
+) -> None:
     mapping = dict(enumerate(branches))
     # Use stable names, without filling any unspecified pillars.
     named = {str(k): v for k, v in mapping.items()}
     assert storage_movement_effect(named, list(named), kind, "甲", 0.75) is None
 
 
-def test_earth_clash_changes_water_not_every_hidden_root_or_earth_energy():
+def test_earth_clash_changes_water_not_every_hidden_root_or_earth_energy() -> None:
     text = "甲辰 丙戌 戊巳 庚寅"
     actual, control = score(text), score(text, clash_equal=1)
     assert actual["effective_elements"]["水"] < control["effective_elements"]["水"]
@@ -98,7 +101,7 @@ def test_earth_clash_changes_water_not_every_hidden_root_or_earth_energy():
     )
 
 
-def test_complete_earth_punishment_does_not_erase_soil_root():
+def test_complete_earth_punishment_does_not_erase_soil_root() -> None:
     text = "甲丑 丙未 戊戌 庚亥"
     actual = score(text, clash_equal=1)
     control = score(text, clash_equal=1, punishment=1)
@@ -108,7 +111,7 @@ def test_complete_earth_punishment_does_not_erase_soil_root():
     assert event["source_id"] == "ziping_storage_movement_v1"
 
 
-def test_event_soil_protection_does_not_erase_actual_combination_binding():
+def test_event_soil_protection_does_not_erase_actual_combination_binding() -> None:
     result = score("庚戌 癸丑 乙子 丁未")
     event = next(e for e in result["relations"] if e["kind"] == "刑")
     soil = next(
@@ -123,8 +126,16 @@ def test_event_soil_protection_does_not_erase_actual_combination_binding():
     )
 
 
-def test_repeat_clashes_do_not_multiply_water_loss_and_input_order_is_stable():
-    text = "甲辰 丙戌 戊辰 庚寅"
+@pytest.mark.parametrize(
+    "text,expected_water_positions",
+    [
+        ("甲辰 丙戌 戊辰 庚寅", ["year", "day"]),
+        ("甲戌 丙辰 戊戌 庚寅", ["month", "month"]),
+    ],
+)
+def test_repeat_clashes_do_not_multiply_water_loss_and_input_order_is_stable(
+    text: str, expected_water_positions: list[str]
+) -> None:
     result = score(text)
     p = pillars(text)
     assert result == _evaluate(
@@ -132,12 +143,15 @@ def test_repeat_clashes_do_not_multiply_water_loss_and_input_order_is_stable():
         ElementAnalysis.seasonal_phases(p["month"][1]),
         DEFAULT_POLICY,
     )
-    for event in result["relations"]:
-        if "storage_effect" not in event:
-            continue
-        for root in event["storage_effect"]["root_effects"]:
-            if root["element"] == "水":
-                assert root["combined_loss_multiplier"] == 0.75
+    water_roots = [
+        root
+        for event in result["relations"]
+        if event["kind"] == "六冲" and "storage_effect" in event
+        for root in event["storage_effect"]["root_effects"]
+        if root["element"] == "水"
+    ]
+    assert [root["pillar"] for root in water_roots] == expected_water_positions
+    assert all(root["combined_loss_multiplier"] == 0.75 for root in water_roots)
     assert sum(b["remaining"] for b in result["branch_budgets"].values()) <= sum(
         b["initial"] for b in result["branch_budgets"].values()
     )

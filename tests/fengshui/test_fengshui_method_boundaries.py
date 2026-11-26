@@ -6,6 +6,9 @@ from pydantic import ValidationError
 from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.services.fengshui import assess
 from tests.fixtures.fengshui import payload
+from tests.unit_test.fixtures.fengshui_layout import (
+    form,
+)
 
 
 def unknown_orientation(**updates):
@@ -18,20 +21,10 @@ def unknown_orientation(**updates):
     }
 
 
-def form():
-    return {
-        "object_id": "desk",
-        "purpose": "desk",
-        "observation_basis": "user_confirmed",
-        "evidence": "已独立确认实际使用位置形态",
-        "entrance_visible": True,
-        "entrance_direct_line": False,
-        "solid_backing": True,
-    }
-
-
 @pytest.mark.parametrize("methods", [[], ["bazhai"]])
-def test_unselected_environment_methods_are_references_without_findings(methods):
+def test_unselected_environment_methods_are_references_without_findings(
+    methods,
+) -> None:
     result = assess(
         scene="shared_rental",
         methods=methods,
@@ -57,15 +50,15 @@ def test_unselected_environment_methods_are_references_without_findings(methods)
         assert entry["judgment_scope"] == "no_calculation_or_physical_judgment"
 
 
-def test_empty_environment_context_is_rejected():
+def test_empty_environment_context_is_rejected() -> None:
     with pytest.raises(ValidationError):
         assess(environmental_context={})
 
 
 @pytest.mark.parametrize("conflict", ["location", "facing", "jinsuo", "external_form"])
 def test_explicit_unknown_orientation_cannot_be_bypassed_by_any_physical_layer(
-    conflict,
-):
+    conflict: str,
+) -> None:
     inputs = {
         "scene": "workstation",
         "environmental_context": {"orientation": unknown_orientation()},
@@ -112,7 +105,9 @@ def test_explicit_unknown_orientation_cannot_be_bypassed_by_any_physical_layer(
         AssessRequest.model_validate(inputs)
 
 
-def test_confirmed_facing_remains_distinct_from_unconfirmed_house_sector_geometry():
+def test_confirmed_facing_remains_distinct_from_unconfirmed_house_sector_geometry() -> (
+    None
+):
     result = assess(
         scene="workstation",
         methods=["annual_stars"],
@@ -141,7 +136,9 @@ def test_confirmed_facing_remains_distinct_from_unconfirmed_house_sector_geometr
     assert context["orientation_review"]["physical_sector_binding_allowed"] is False
 
 
-def test_candidate_cannot_erase_known_unknown_orientation_by_supplying_other_context():
+def test_candidate_cannot_erase_known_unknown_orientation_by_supplying_other_context() -> (
+    None
+):
     inputs = {
         "scene": "workstation",
         "methods": ["annual_stars"],
@@ -182,7 +179,7 @@ def test_candidate_cannot_erase_known_unknown_orientation_by_supplying_other_con
         AssessRequest.model_validate(inputs)
 
 
-def test_all_composed_source_ids_are_resolved_by_published_rulesets():
+def test_all_composed_source_ids_are_resolved_by_published_rulesets() -> None:
     result = assess(
         scene="home",
         methods=["annual_stars", "jinsuo", "bazhai"],
@@ -207,22 +204,28 @@ def test_all_composed_source_ids_are_resolved_by_published_rulesets():
             }
         },
     )
-    sources = {
-        source["source_id"]
-        for ruleset in result["rulesets"]
-        for source in ruleset["sources"]
-    }
+    sources = result["source_catalog"].keys()
     rulesets = {r["ruleset_id"]: r for r in result["rulesets"]}
+    annual_ruleset = result["layers"]["annual_stars"]["ruleset"]["ruleset_id"]
+    annual_citation = rulesets[annual_ruleset]["source_citations"]["S4"]
+    method_citation = rulesets["expert_fengshui_methods_v1"]["source_citations"]["S4"]
+    assert annual_citation["scope"] != method_citation["scope"]
+    assert "九宫挨星掌诀" in method_citation["locator"]
+    assert result["source_catalog"]["S4"]["title"] == "沈氏玄空学卷四转录"
 
     def inspect(value):
         if isinstance(value, dict):
             if "source_ids" in value:
                 assert set(value["source_ids"]) <= sources
+            else:
+                pass
             for item in value.values():
                 inspect(item)
         elif isinstance(value, list):
             for item in value:
                 inspect(item)
+        else:
+            pass
 
     inspect(result)
     for trace in result["rule_trace"]:

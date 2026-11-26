@@ -7,11 +7,11 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_classical as c
-from fatebridge.core import guolao_moira
+from fatebridge.core.guolao import guolao_classical as c
+from fatebridge.core.guolao import guolao_moira
 
 
-def test_luwei_hour_count_example_and_reverse_palace_example():
+def test_luwei_hour_count_example_and_reverse_palace_example() -> None:
     # Volume 1 image 9: Sun 子, birth 酉, count to 卯 -> 午.
     assert c.life_branch("子", "酉", "卯") == "午"
     # The same image independently enumerates the twelve palaces for 命在寅.
@@ -30,13 +30,15 @@ def test_luwei_hour_count_example_and_reverse_palace_example():
         (300.0, "辰", "卯"),
     ],
 )
-def test_declared_term_instant_policy_keeps_adjacent_floats(edge, before, after):
+def test_declared_term_instant_policy_keeps_adjacent_floats(
+    edge: float, before: str, after: str
+) -> None:
     assert c.counting_anchor(math.nextafter(edge, -math.inf)) == before
     assert c.counting_anchor(edge) == after
     assert c.counting_anchor(math.nextafter(edge, math.inf)) == after
 
 
-def test_small_limit_is_reverse_counting_not_an_event_forecast():
+def test_small_limit_is_reverse_counting_not_an_event_forecast() -> None:
     # Put birth-year 子 on life 寅; successive year branches run backwards.
     assert [c.small_limit_branch("寅", "子", y) for y in c.BRANCHES] == list(
         "寅丑子亥戌酉申未午巳辰卯"
@@ -45,7 +47,7 @@ def test_small_limit_is_reverse_counting_not_an_event_forecast():
     assert c.small_limit_branch("午", "酉", "戌") == "巳"
 
 
-def test_missing_life_degree_cannot_be_fabricated_from_discrete_palace():
+def test_missing_life_degree_cannot_be_fabricated_from_discrete_palace() -> None:
     patterns = guolao_moira.calculate(
         {
             "life_sign_idx": 4,
@@ -61,7 +63,7 @@ def test_missing_life_degree_cannot_be_fabricated_from_discrete_palace():
             guolao_moira.calculate({"life_sign_idx": invalid})
 
 
-def test_shoushi_table_preserves_primary_circle_and_quadrant_subtotals():
+def test_shoushi_table_preserves_primary_circle_and_quadrant_subtotals() -> None:
     source = json.loads(
         (
             Path(__file__).parents[1] / "fixtures" / "guolao-shoushi-source.json"
@@ -79,7 +81,7 @@ def test_shoushi_table_preserves_primary_circle_and_quadrant_subtotals():
     assert not source["luwei_edition_table_emended"]
 
 
-def test_every_historical_boundary_in_source_units_and_negative_wrap():
+def test_every_historical_boundary_in_source_units_and_negative_wrap() -> None:
     table = c.SHOUSHI_1281
     epsilon = F(1, 10**8)
     start = F()
@@ -100,12 +102,12 @@ def test_every_historical_boundary_in_source_units_and_negative_wrap():
 
 
 @pytest.mark.parametrize("invalid", ["", "子丑", "X"])
-def test_invalid_branches_never_become_a_default(invalid):
+def test_invalid_branches_never_become_a_default(invalid: str) -> None:
     with pytest.raises(ValueError, match="地支"):
         c.life_branch("子", invalid, "卯")
 
 
-def test_noble_tables_are_from_the_selected_edition_including_wu_exception():
+def test_noble_tables_are_from_the_selected_edition_including_wu_exception() -> None:
     source = json.loads(
         (
             Path(__file__).parents[1] / "fixtures" / "guolao-classical-source.json"
@@ -126,7 +128,9 @@ def test_noble_tables_are_from_the_selected_edition_including_wu_exception():
             c.year_god_branches(invalid, "子")
 
 
-def test_purple_cycle_replays_source_arithmetic_without_fitting_a_modern_epoch():
+def test_purple_cycle_replays_source_arithmetic_without_fitting_a_modern_epoch() -> (
+    None
+):
     source = json.loads(
         (
             Path(__file__).parents[1] / "fixtures" / "guolao-purple-source.json"

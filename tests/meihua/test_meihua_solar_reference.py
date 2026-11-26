@@ -5,13 +5,31 @@ import copy
 import gzip
 import hashlib
 import json
+import shutil
 from datetime import date, timedelta
+from importlib.resources import files
 from pathlib import Path
 
 import pytest
+from fastmcp import Client
 
+import fatebridge.core.meihua.meihua_solar_reference as module
+import fatebridge.mcp_server as mcp
+from fatebridge.core.meihua.meihua_solar_reference import (
+    compare_solar_term_date,
+    solar_reference_notice,
+    solar_term_date_reference,
+)
 from fatebridge.services.divination import calculate_meihua_analysis
-from tests.support.transports import SPECS, business, rest, surface_calls
+from tests.fixtures.mcp_result_delivery import read_full_result
+from tests.support.transports import (
+    SPECS,
+    business,
+    call_calculation,
+    rest,
+    surface_calls,
+)
+from validation.meihua_solar_reference import audit_solar_date_reference
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_solar_reference_v1"
 READING = json.loads((FIXTURE / "source-reading.json").read_text())
@@ -20,7 +38,6 @@ PATH = "meihua.calendar_policy.solar_term_date_reference"
 
 
 def compare(term):
-    from fatebridge.core.meihua_solar_reference import compare_solar_term_date
 
     return compare_solar_term_date(
         term, fact_path="calendar_context.current_solar_term"
@@ -28,12 +45,11 @@ def compare(term):
 
 
 def layer(context):
-    from fatebridge.core.meihua_solar_reference import solar_term_date_reference
 
     return solar_term_date_reference(context)
 
 
-def test_reference_precedes_implementation_and_keeps_all_source_bytes():
+def test_reference_precedes_implementation_and_keeps_all_source_bytes() -> None:
     manifest = json.loads((FIXTURE / "manifest.json").read_text())
     assert manifest["implementation_not_present"]
     assert not manifest["expected_published_dates_from_production_calculator"]
@@ -41,13 +57,16 @@ def test_reference_precedes_implementation_and_keeps_all_source_bytes():
     for name, expected in manifest["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == expected
     assert manifest["source_date_labels"] == 4800
     assert manifest["publisher_named_solar_events"] == 4
 
 
-def test_production_transcription_and_all4800_day_comparisons_follow_raw_sources():
-    from importlib.resources import files
+def test_production_transcription_and_all4800_day_comparisons_follow_raw_sources() -> (
+    None
+):
 
     raw = files("fatebridge.data").joinpath("meihua/solar-dates-hko-v1.json")
     assert json.loads(raw.read_text()) == READING
@@ -85,7 +104,9 @@ def test_production_transcription_and_all4800_day_comparisons_follow_raw_sources
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_supplied_instant_is_compared_in_fixed8_with_all_disagreements_retained(case):
+def test_supplied_instant_is_compared_in_fixed8_with_all_disagreements_retained(
+    case,
+) -> None:
     original = copy.deepcopy(case["term"])
     event = compare(case["term"])
     assert case["term"] == original
@@ -122,7 +143,9 @@ def test_supplied_instant_is_compared_in_fixed8_with_all_disagreements_retained(
         {"name": "立春", "date_key": "20260204"},
     ],
 )
-def test_unknown_or_naive_instants_do_not_get_a_guessed_offset_or_day_agreement(term):
+def test_unknown_or_naive_instants_do_not_get_a_guessed_offset_or_day_agreement(
+    term,
+) -> None:
     event = compare(term)
     assert event["comparison_status"] == "actual_instant_unavailable"
     assert event["published_date"] is None
@@ -131,7 +154,9 @@ def test_unknown_or_naive_instants_do_not_get_a_guessed_offset_or_day_agreement(
 
 
 @pytest.mark.parametrize("year", [1899, 1900, 2101])
-def test_outside_table_year_is_not_negative_calendar_or_exactness_evidence(year):
+def test_outside_table_year_is_not_negative_calendar_or_exactness_evidence(
+    year: int,
+) -> None:
     event = compare(
         {"name": "小寒", "datetime_with_offset": f"{year}-01-06T12:00:00+08:00"}
     )
@@ -139,7 +164,7 @@ def test_outside_table_year_is_not_negative_calendar_or_exactness_evidence(year)
     assert event["published_date"] is event["source"] is None
 
 
-def test_unknown_term_name_is_not_inferred_from_its_day():
+def test_unknown_term_name_is_not_inferred_from_its_day() -> None:
     event = compare(
         {"name": "unknown", "datetime_with_offset": "2026-02-04T04:02:00+08:00"}
     )
@@ -147,7 +172,7 @@ def test_unknown_term_name_is_not_inferred_from_its_day():
     assert event["published_date"] is None
 
 
-def test_partial_comparison_and_day_agreement_do_not_certify_exactness():
+def test_partial_comparison_and_day_agreement_do_not_certify_exactness() -> None:
     known = CASES[7]["term"]
     result = layer({"current_solar_term": known})
     assert result["status"] == "partially_compared"
@@ -164,7 +189,7 @@ def test_partial_comparison_and_day_agreement_do_not_certify_exactness():
     assert layer({})["status"] == "not_compared"
 
 
-def test_metadata_is_independent_of_input_mutation_and_later_calls():
+def test_metadata_is_independent_of_input_mutation_and_later_calls() -> None:
     context = {
         "current_solar_term": CASES[0]["term"],
         "next_solar_term": CASES[7]["term"],
@@ -181,7 +206,9 @@ def test_metadata_is_independent_of_input_mutation_and_later_calls():
 
 
 @pytest.mark.parametrize("topic", ["general", "weather"])
-def test_actual_service_explains_disagreement_without_replacing_instant_or_cast(topic):
+def test_actual_service_explains_disagreement_without_replacing_instant_or_cast(
+    topic: str,
+) -> None:
     out = calculate_meihua_analysis(
         analysis_year=1912,
         analysis_month=11,
@@ -208,10 +235,14 @@ def test_actual_service_explains_disagreement_without_replacing_instant_or_cast(
     )
     if topic == "weather":
         assert out["interpretation"]["weather"]["single_forecast"] is None
+    else:
+        pass
 
 
 @pytest.mark.parametrize("topic", ["general", "weather"])
-def test_new_layer_projects_identically_on_rest_native_mcp_cli(topic, surface_calls):
+def test_new_layer_projects_identically_on_rest_native_mcp_cli(
+    topic: str, surface_calls
+) -> None:
     payload = {
         "analysis_year": 1912,
         "analysis_month": 11,
@@ -245,9 +276,8 @@ def test_new_layer_projects_identically_on_rest_native_mcp_cli(topic, surface_ca
 
 
 def test_edited_date_cannot_masquerade_as_better_agreement_in_same_version(
-    monkeypatch, tmp_path
-):
-    import fatebridge.core.meihua_solar_reference as module
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
 
     edited = copy.deepcopy(READING)
     edited["years"]["1912"]["terms"]["小雪"] = "1912-11-22"
@@ -263,7 +293,7 @@ def test_edited_date_cannot_masquerade_as_better_agreement_in_same_version(
         module._profile.cache_clear()
 
 
-def test_named_note_stays_visible_even_when_actual_and_published_dates_match():
+def test_named_note_stays_visible_even_when_actual_and_published_dates_match() -> None:
     published = date.fromisoformat(READING["years"]["2021"]["terms"]["冬至"])
     day = published + timedelta(days=1)
     result = calculate_meihua_analysis(
@@ -281,7 +311,7 @@ def test_named_note_stays_visible_even_when_actual_and_published_dates_match():
     assert not ref["published_date_match_certifies_exactness"]
 
 
-def test_ordinary_ny_local_previous_day_is_not_a_reference_mismatch_notice():
+def test_ordinary_ny_local_previous_day_is_not_a_reference_mismatch_notice() -> None:
     result = calculate_meihua_analysis(
         analysis_year=2026,
         analysis_month=2,
@@ -295,8 +325,7 @@ def test_ordinary_ny_local_previous_day_is_not_a_reference_mismatch_notice():
     assert "solar_term_date_reference_notice" not in result["interpretation"]
 
 
-def test_frozen_data_and_supplied_clock_audit_cannot_certify_real_events():
-    from fatebridge.validation.meihua_solar_reference import audit_solar_date_reference
+def test_frozen_data_and_supplied_clock_audit_cannot_certify_real_events() -> None:
 
     report = audit_solar_date_reference(FIXTURE)
     assert report["selected_checks_passed"]
@@ -316,10 +345,9 @@ def test_frozen_data_and_supplied_clock_audit_cannot_certify_real_events():
     assert not report["authority_certified"]
 
 
-def test_changed_raw_reference_is_rejected_before_comparing_dates(tmp_path):
-    import shutil
-
-    from fatebridge.validation.meihua_solar_reference import audit_solar_date_reference
+def test_changed_raw_reference_is_rejected_before_comparing_dates(
+    tmp_path: Path,
+) -> None:
 
     target = tmp_path / "references"
     shutil.copytree(FIXTURE, target)
@@ -330,17 +358,13 @@ def test_changed_raw_reference_is_rejected_before_comparing_dates(tmp_path):
 
 
 @pytest.mark.parametrize("limit", [4096, 8192])
-def test_default_bounded_mcp_preserves_new_evidence_in_same_result(limit):
-    import hashlib
-
-    from fastmcp import Client
-
-    import fatebridge.mcp_server as mcp
+def test_default_bounded_mcp_preserves_new_evidence_in_same_result(limit: int) -> None:
 
     async def run():
         async with Client(mcp.app) as client:
-            reply = await client.call_tool(
-                "meihua_analysis",
+            reply = await call_calculation(
+                client,
+                "meihua_time_cast",
                 {
                     "analysis_year": 1912,
                     "analysis_month": 11,
@@ -357,22 +381,26 @@ def test_default_bounded_mcp_preserves_new_evidence_in_same_result(limit):
             assert not reply.is_error
             receipt = reply.structured_content
             ref = receipt["result_delivery"]
-            manifest = json.loads(
-                (await client.read_resource(ref["manifest_uri"]))[0].text
-            )
-            assert (
-                manifest["run_metadata"]["run_id"] == receipt["run_metadata"]["run_id"]
-            )
-            uri = f"fatebridge://results/{ref['result_id']}/fields/{PATH}/0"
-            pages = []
+            full = await read_full_result(client, receipt)
+            expected = full["meihua"]["calendar_policy"]["solar_term_date_reference"]
+            base_uri = f"fatebridge://results/{ref['result_id']}/fields/{PATH}"
+            uri, offset, pieces = f"{base_uri}/0", 0, []
             while uri:
                 page = json.loads((await client.read_resource(uri))[0].text)
                 assert page["result_id"] == ref["result_id"] and page["path"] == PATH
-                pages.append(page)
+                assert page["offset"] == offset and page["text"]
+                assert "sha256" not in page
+                pieces.append(page["text"])
+                offset += len(page["text"])
+                next_offset = offset if offset < page["total_chars"] else None
+                assert page["next_offset"] == next_offset
+                assert page["next_uri"] == (
+                    f"{base_uri}/{next_offset}" if next_offset is not None else None
+                )
                 uri = page["next_uri"]
-            raw = "".join(p["text"] for p in pages)
-            assert hashlib.sha256(raw.encode()).hexdigest() == pages[-1]["sha256"]
-            value = json.loads(raw)
+            assert offset == page["total_chars"]
+            value = json.loads("".join(pieces))
+            assert value == expected
             assert value["status"] == "published_date_disagreement"
             assert (
                 next(e for e in value["events"] if e["event_name"] == "小雪")[
@@ -385,7 +413,9 @@ def test_default_bounded_mcp_preserves_new_evidence_in_same_result(limit):
     asyncio.run(run())
 
 
-def test_actual_month_anchor_is_compared_after_it_leaves_the_adjacent_term_pair():
+def test_actual_month_anchor_is_compared_after_it_leaves_the_adjacent_term_pair() -> (
+    None
+):
     out = calculate_meihua_analysis(
         analysis_year=1917,
         analysis_month=12,
@@ -410,7 +440,7 @@ def test_actual_month_anchor_is_compared_after_it_leaves_the_adjacent_term_pair(
     assert "大雪" in out["summary"]
 
 
-def test_repeated_records_of_one_event_do_not_inflate_disagreement_counts():
+def test_repeated_records_of_one_event_do_not_inflate_disagreement_counts() -> None:
     term = copy.deepcopy(CASES[0]["term"])
     context = {
         "current_solar_term": term,
@@ -424,8 +454,7 @@ def test_repeated_records_of_one_event_do_not_inflate_disagreement_counts():
     assert not ref["same_reference_event_has_multiple_instants"]
 
 
-def test_different_returned_instants_for_same_event_are_not_silently_resolved():
-    from fatebridge.core.meihua_solar_reference import solar_reference_notice
+def test_different_returned_instants_for_same_event_are_not_silently_resolved() -> None:
 
     term = copy.deepcopy(CASES[7]["term"])
     different = {**term, "datetime_with_offset": "2026-02-04T04:03:00+08:00"}

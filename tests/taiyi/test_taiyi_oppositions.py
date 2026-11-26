@@ -3,6 +3,7 @@
 import asyncio
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -12,23 +13,25 @@ import fatebridge.api as api
 from fatebridge.application.examples import suggested_fields
 from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_chinese import Taiyi
+from fatebridge.core.contracts.output_taiyi_oppositions import TaiyiOppositionEntry
 from fatebridge.core.metaphysics.taiyi_oppositions import (
     opposition_assessment,
     oppositions_text,
 )
 from fatebridge.core.metaphysics.taiyi_year import cyclic_core
-from fatebridge.core.output_chinese import Taiyi
-from fatebridge.core.output_taiyi_oppositions import TaiyiOppositionEntry
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_oppositions import CORPUS, audit
 from tests.support.reference_data import resolve
-from tests.taiyi.test_taiyi_enclosures import transport_payload
-from tests.taiyi.test_taiyi_transports import _same_run_payload
+from tests.support.transports import SPECS, call_calculation
+from tests.unit_test.fixtures.taiyi import same_run_payload, transport_payload
 
 
-def test_all_twelve_notes_keep_twenty_four_positions_names_and_source53_conflict():
+def test_all_twelve_notes_keep_twenty_four_positions_names_and_source53_conflict() -> (
+    None
+):
     report = audit()
     assert report["selected_annotation_records"] == 12
     assert (
@@ -49,7 +52,7 @@ def test_all_twelve_notes_keep_twenty_four_positions_names_and_source53_conflict
     assert report["whole_classic_acceptance_passed"] is False
 
 
-def test_all_six_actors_each_physical_axis_and_all_intercalary_spirits():
+def test_all_six_actors_each_physical_axis_and_all_intercalary_spirits() -> None:
     bearings = [
         (1, "乾"),
         (8, "子"),
@@ -93,13 +96,15 @@ def test_all_six_actors_each_physical_axis_and_all_intercalary_spirits():
                 assert row["is_opposite"] is False
 
 
-def test_center_is_null_bearing_and_no_rotation_is_not_assumed_yang():
+def test_center_is_null_bearing_and_no_rotation_is_not_assumed_yang() -> None:
     core = {**cyclic_core(53), "main_general": 5, "main_vice_general": 5}
     rows = opposition_assessment(core)["entries"]
     for row in rows:
         if row["field"] in {"main_general", "main_vice_general"}:
             assert row["is_opposite"] is None and row["relative_steps"] is None
             assert row["status"] == "no_ring_bearing"
+        else:
+            pass
     for core in [
         cyclic_core(53, yin=True),
         {k: v for k, v in cyclic_core(53).items() if k != "yin_dun"},
@@ -111,7 +116,9 @@ def test_center_is_null_bearing_and_no_rotation_is_not_assumed_yang():
 
 
 @pytest.mark.parametrize("year,ju", [(1912, 13), (1920, 21), (1952, 53)])
-def test_source_names_actual_facts_and_extra_disagreement_survive_text(year, ju):
+def test_source_names_actual_facts_and_extra_disagreement_survive_text(
+    year: int, ju: int
+) -> None:
     result = calculate_taiyi_analysis(**transport_payload("taiyi", year))
     board = result["taiyi"]
     a = board["opposition_assessment"]
@@ -136,7 +143,7 @@ def test_source_names_actual_facts_and_extra_disagreement_survive_text(year, ju)
     Taiyi.model_validate(board)
 
 
-def test_every_assessment_projection_and_entry_leaf_is_strictly_typed():
+def test_every_assessment_projection_and_entry_leaf_is_strictly_typed() -> None:
     result = calculate_taiyi_analysis(**transport_payload("taiyi", 1952))
     a = result["taiyi"]["opposition_assessment"]
     for field in [
@@ -163,7 +170,9 @@ def test_every_assessment_projection_and_entry_leaf_is_strictly_typed():
 
 
 @pytest.mark.parametrize("mutation", ["drop_note", "alter_number", "erase_conflict"])
-def test_oracle_cannot_be_reduced_to_make_the_scope_pass(tmp_path, mutation):
+def test_oracle_cannot_be_reduced_to_make_the_scope_pass(
+    tmp_path: Path, mutation: str
+) -> None:
     target = tmp_path / "corpus"
     shutil.copytree(CORPUS, target)
     p = target / "opposition-notes.json"
@@ -182,8 +191,11 @@ def test_oracle_cannot_be_reduced_to_make_the_scope_pass(tmp_path, mutation):
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 @pytest.mark.parametrize("year", [1912, 1920, 1952])
 def test_actual_rest_mcp_cli_match_geometry_source_words_and_unknowns(
-    key, year, capsys, monkeypatch
-):
+    key: str,
+    year: int,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     fields = [
         "taiyi.opposition_assessment",
         "taiyi.pattern_summary.main_oppositions",
@@ -211,7 +223,8 @@ def test_actual_rest_mcp_cli_match_geometry_source_words_and_unknowns(
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
+            result = await call_calculation(
+                client,
                 spec.tool_name,
                 {
                     **inputs,
@@ -221,10 +234,10 @@ def test_actual_rest_mcp_cli_match_geometry_source_words_and_unknowns(
                 },
                 raise_on_error=False,
             )
-            return await _same_run_payload(client, result)
+            return await same_run_payload(client, result)
 
     mcp = asyncio.run(call())
-    args = [key]
+    args = [SPECS[key].tool_name]
     for k, v in inputs.items():
         args += ["--" + k.replace("_", "-"), str(v)]
     capsys.readouterr()
@@ -243,13 +256,16 @@ def test_actual_rest_mcp_cli_match_geometry_source_words_and_unknowns(
 
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 @pytest.mark.parametrize("year", [1912, 1920, 1952])
-def test_published_opposition_view_keeps_all_requested_business_inline(key, year):
+def test_published_opposition_view_keeps_all_requested_business_inline(
+    key: str, year: int
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     view = "oppositions" if key == "taiyi" else "taiyi_oppositions"
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            r = await client.call_tool(
+            r = await call_calculation(
+                client,
                 spec.tool_name,
                 {
                     **transport_payload(key, year),
@@ -259,7 +275,7 @@ def test_published_opposition_view_keeps_all_requested_business_inline(key, year
                 },
                 raise_on_error=False,
             )
-            await _same_run_payload(client, r, require_business_inline=True)
+            await same_run_payload(client, r, require_business_inline=True)
             return r.structured_content
 
     result = asyncio.run(call())

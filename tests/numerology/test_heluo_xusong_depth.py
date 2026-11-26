@@ -6,11 +6,13 @@ import json
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core import heluo_texts as ht
-from fatebridge.core.heluo import yao_text
+from fatebridge.core.heluo import heluo_texts as ht
+from fatebridge.core.heluo.heluo import yao_text
 from fatebridge.core.local_techniques.heluo import build_heluo_result
 from fatebridge.utils.errors import NumerologySourceError
+from scripts.numerology import audit_numerology as audit
 from tests.support.heluo_source_facts import (
     COMMENTARY_RULESET_ID,
     HEADER_COUNT,
@@ -22,8 +24,9 @@ REF = json.loads((ROOT / "reference.json").read_text())
 VERIFIED = json.loads((ROOT / "verified-readings.json").read_text())
 
 
-def test_audit_rejects_bypassing_canonical_content_identity(monkeypatch):
-    from scripts.numerology import audit_numerology as audit
+def test_audit_rejects_bypassing_canonical_content_identity(
+    monkeypatch: MonkeyPatch,
+) -> None:
 
     monkeypatch.setattr(ht, "_pin_content", lambda data, expected: expected)
     result = audit.xusong_commentary_checks()
@@ -37,7 +40,7 @@ def test_audit_rejects_bypassing_canonical_content_identity(monkeypatch):
     } in result["failures"]
 
 
-def test_source_words_that_change_interpretation_and_unusual_readings():
+def test_source_words_that_change_interpretation_and_unusual_readings() -> None:
     one = yao_text("水天需", 1)
     assert (
         "恬淡之官" in one["detail"]
@@ -71,7 +74,7 @@ def test_source_words_that_change_interpretation_and_unusual_readings():
     assert "自訟則吉" in yao_text("天水訟", 6)["commentary_sections"][-1]["text"]
 
 
-def test_nested_conditions_and_character_omens_are_not_automatically_applied():
+def test_nested_conditions_and_character_omens_are_not_automatically_applied() -> None:
     for g in ("水天需", "天水訟"):
         for pos in range(1, 7):
             t = yao_text(g, pos)
@@ -84,7 +87,7 @@ def test_nested_conditions_and_character_omens_are_not_automatically_applied():
     assert "如數空者" in yao_text("水天需", 1)["commentary_sections"][-1]["text"]
 
 
-def test_draft_withdrawals_and_native_source_identity_are_preserved():
+def test_draft_withdrawals_and_native_source_identity_are_preserved() -> None:
     assert (
         VERIFIED["draft_sha256"]
         == hashlib.sha256((ROOT / "reference.json").read_bytes()).hexdigest()
@@ -124,8 +127,8 @@ def test_draft_withdrawals_and_native_source_identity_are_preserved():
     "fault", ["nonempty_text", "metadata", "fraction_total", "swapped_content"]
 )
 def test_valid_json_and_nonempty_fields_do_not_preserve_false_collation_identity(
-    layer, fault, tmp_path, monkeypatch
-):
+    layer: str, fault: str, tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     attr, loader, summary, reason = (
         (
             "COLLATION_PATH",
@@ -179,8 +182,8 @@ def test_valid_json_and_nonempty_fields_do_not_preserve_false_collation_identity
 
 @pytest.mark.parametrize("layer", ["header", "commentary"])
 def test_formatting_only_changes_loaded_bytes_not_pinned_content(
-    layer, tmp_path, monkeypatch
-):
+    layer: str, tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     attr, loader, summary = (
         ("COLLATION_PATH", ht._collation, ht.collation_summary)
         if layer == "header"
@@ -209,7 +212,7 @@ def test_formatting_only_changes_loaded_bytes_not_pinned_content(
         loader.cache_clear()
 
 
-def test_metadata_title_counts_and_trace_describe_the_current_corpus():
+def test_metadata_title_counts_and_trace_describe_the_current_corpus() -> None:
     r = build_heluo_result(
         date="2000-01-11",
         time="00:30",

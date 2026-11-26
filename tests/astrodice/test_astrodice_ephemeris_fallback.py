@@ -6,7 +6,11 @@ import pytest
 
 from fatebridge.core.astro import ephemeris, runtime
 from fatebridge.core.astro.geometry import combine_longitudes
-from fatebridge.core.astro.orbits import MEAN_NODE_MODEL, ORBITAL_MODEL
+from fatebridge.core.astro.orbits import (
+    MEAN_NODE_MODEL,
+    ORBITAL_MODEL,
+    ApproximateEphemeris,
+)
 from fatebridge.core.astro.reference import PLANET_SEQUENCE
 from fatebridge.core.local_techniques.otherbu import build_otherbu_result
 
@@ -21,9 +25,8 @@ APPROXIMATE = ORBITAL_MODEL
 @pytest.mark.parametrize(
     "year,month", list(product((1900, 1950, 2000, 2026, 2050, 2099), (1, 7)))
 )
-def test_pluto_fallback_is_geocentric_against_independent_moshier(year, month):
+def test_pluto_fallback_is_geocentric_against_independent_moshier(year, month) -> None:
     """Same twelve dates, stricter 60-arcsecond apparent-position control."""
-    from fatebridge.core.astro.orbits import ApproximateEphemeris
 
     with runtime.preserve_ephemeris_path():
         jd = runtime.swe.julday(year, month, 1, 12)
@@ -45,8 +48,8 @@ def test_pluto_fallback_is_geocentric_against_independent_moshier(year, month):
     "failed_planet,zodiacal", list(product(PLANET_SEQUENCE, [0, 1]))
 )
 def test_single_failure_preserves_every_other_native_longitude(
-    monkeypatch, failed_planet, zodiacal
-):
+    monkeypatch: pytest.MonkeyPatch, failed_planet, zodiacal
+) -> None:
     complete = build_otherbu_result(**FACES, **SKY, zodiacal=zodiacal, hsys=0)
     original = ephemeris._swisseph_planet_state
     called = []
@@ -63,10 +66,16 @@ def test_single_failure_preserves_every_other_native_longitude(
     for name in PLANET_SEQUENCE:
         if name != failed_planet:
             assert actual[name] == expected[name]
+        else:
+            pass
     if failed_planet not in {"Sun", "Moon"}:
         assert actual["Pars Fortuna"] == expected["Pars Fortuna"]
+    else:
+        pass
     if failed_planet != "North Node":
         assert actual["South Node"] == expected["South Node"]
+    else:
+        pass
     profile = partial["chart"]["params"]["chart_profile"]
     assert profile["engine_precision"] == "mixed_precision_runtime_model"
     assert profile["engine_backend"] == "swisseph_api_with_analytic_fallback"
@@ -96,9 +105,10 @@ def test_single_failure_preserves_every_other_native_longitude(
         assert profile["sidereal_position_method"] == (
             "mixed_native_lahiri_and_ayanamsha_offset_approximation"
         )
+    else:
+        pass
     for key in [
         "symbolic_details",
-        "interpretation",
         "diceChart",
         "rulesets",
         "rule_trace",
@@ -108,8 +118,8 @@ def test_single_failure_preserves_every_other_native_longitude(
 
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_fallback_sidereal_coordinates_have_the_declared_offset_method(
-    monkeypatch, zodiacal
-):
+    monkeypatch: pytest.MonkeyPatch, zodiacal: int
+) -> None:
     original = ephemeris._swisseph_planet_state
     monkeypatch.setattr(
         ephemeris,
@@ -125,8 +135,8 @@ def test_fallback_sidereal_coordinates_have_the_declared_offset_method(
 
 
 def test_all_failures_return_explicit_per_body_approximation_without_claiming_native(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(ephemeris, "_swisseph_planet_state", lambda *a, **kw: None)
     result = build_otherbu_result(**FACES, **SKY, hsys=0)
     profile = result["chart"]["params"]["chart_profile"]
@@ -138,7 +148,9 @@ def test_all_failures_return_explicit_per_body_approximation_without_claiming_na
     assert len(result["chart"]["chart"]["objects"]) == 13
 
 
-def test_no_runtime_uses_the_same_declared_approximation(monkeypatch):
+def test_no_runtime_uses_the_same_declared_approximation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(runtime, "swe", None)
     result = build_otherbu_result(**FACES, **SKY, hsys=0)
     profile = result["chart"]["params"]["chart_profile"]
@@ -147,6 +159,6 @@ def test_no_runtime_uses_the_same_declared_approximation(monkeypatch):
     assert profile["orbital_fallback"]["tt_source"] == "chart_tt"
 
 
-def test_fully_native_sky_has_no_orbital_fallback_claim():
+def test_fully_native_sky_has_no_orbital_fallback_claim() -> None:
     result = build_otherbu_result(**FACES, **SKY, hsys=0)
     assert "orbital_fallback" not in result["chart"]["params"]["chart_profile"]

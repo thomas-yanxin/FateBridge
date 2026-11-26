@@ -10,8 +10,11 @@ from fatebridge.core.compressed_ephemeris import (
     audit_compressed_endpoints,
     coordinate_context_evidence,
 )
-from tests.jyotish.test_jyotish_segment_motion import full_files
-from tests.jyotish.test_jyotish_sources import data18, restore_runtime  # noqa: F401
+from tests.unit_test.fixtures.jyotish_sources import (  # noqa: F401
+    data18,
+    full_files,
+    restore_runtime,
+)
 
 MATERIAL = json.loads(
     (
@@ -27,8 +30,8 @@ MATERIAL = json.loads(
 @pytest.mark.parametrize("operation", ["calc", "calc_ut"])
 @pytest.mark.parametrize("form", MATERIAL["forms"])
 def test_all_native_components_agree_after_private_context_preselection(
-    data18, epoch, body, operation, form
-):
+    data18, epoch, body, operation: str, form
+) -> None:
     directory = full_files(data18)
     native = e.swe
     flags = (
@@ -57,6 +60,8 @@ def test_all_native_components_agree_after_private_context_preselection(
                 getattr(native, operation)(
                     instant, getattr(native, body.upper()), flags
                 )
+            else:
+                pass
             with audit_compressed_endpoints():
                 values, returned = e.ephemeris_call(
                     operation, instant, getattr(native, body.upper()), flags

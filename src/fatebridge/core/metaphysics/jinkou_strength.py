@@ -9,8 +9,12 @@ from __future__ import annotations
 
 from typing import Any
 
-from .common import ELEMENT_CONTROLS, ELEMENT_GENERATES, status_against_anchor
-from .jinkou_sources import strength_sources
+from fatebridge.core.metaphysics.common import (
+    ELEMENT_CONTROLS,
+    ELEMENT_GENERATES,
+    status_against_anchor,
+)
+from fatebridge.core.metaphysics.jinkou_sources import strength_sources
 
 
 def internal_strength(rows: list[dict[str, Any]]) -> dict[str, Any]:

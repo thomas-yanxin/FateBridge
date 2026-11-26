@@ -92,6 +92,8 @@ def acquire(job):
     response = json.loads(raw)
     if "error" in response:
         raise ValueError(response["error"])
+    else:
+        pass
     text = response["result"]
     assert all(s in text for s in ("Date__(TT)", "ObsEcLon", "ICRF-a-app"))
     models = [plan["primary_projection"], *plan["other_projections"]]
@@ -186,3 +188,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

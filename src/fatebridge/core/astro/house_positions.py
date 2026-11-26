@@ -14,7 +14,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 from fractions import Fraction
-from typing import Any, Dict, Optional
+from typing import Any
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.earth_attitude import earth_attitude
@@ -24,12 +24,15 @@ from fatebridge.core.astro.house_projection_precision import (
     RC_PLANE_PROJECTION_METHOD,
     checked_house_plane_position,
 )
+from fatebridge.core.astro.terrestrial_observer import house_site
 from fatebridge.core.astro.topocentric_precision import (
     NATIVE_INVERSE_LATITUDE_LIMIT,
     TOPOCENTRIC_BRANCH_POLICY,
     TOPOCENTRIC_PROJECTION_METHOD,
     checked_topocentric_position,
 )
+from fatebridge.core.astro.tt_epoch import TTInstant
+from fatebridge.core.astro.ut1_epoch import UT1Instant
 from fatebridge.utils.errors import EphemerisSourceError
 
 NATIVE_PROJECTION_METHOD = "swisseph_house_pos_zero_ecliptic_latitude"
@@ -49,19 +52,29 @@ class EclipticHouseProjection:
     obliquity: float
     house_code: bytes
     longitude_origin: float = 0.0
-    _precision_records: list[Dict[str, Any]] = field(
+    rotation_latitude: float | None = field(default=None, kw_only=True)
+    sun_declination: float | None = field(default=None, kw_only=True)
+    _precision_records: list[dict[str, Any]] = field(
         default_factory=list, compare=False, repr=False
     )
 
     @property
+    def _latitude(self) -> float:
+        return (
+            self.geographic_latitude
+            if self.rotation_latitude is None
+            else self.rotation_latitude
+        )
+
+    @property
     def _native_pole_convention(self) -> bool:
-        return self.house_code in (b"R", b"T") and abs(self.geographic_latitude) == 90
+        return self.house_code in (b"R", b"T") and abs(self._latitude) == 90
 
     def position(
         self,
         tropical_longitude: float,
         *,
-        exact_longitude: Optional[Fraction] = None,
+        exact_longitude: Fraction | None = None,
     ) -> float:
         return self.coordinate(
             tropical_longitude, exact_longitude=exact_longitude
@@ -71,7 +84,7 @@ class EclipticHouseProjection:
         self,
         tropical_longitude: float,
         *,
-        exact_longitude: Optional[Fraction] = None,
+        exact_longitude: Fraction | None = None,
     ) -> HouseCoordinate:
         if runtime.swe is None:
             raise ValueError("非单圈宫头的原生落宫投影需要Swiss Ephemeris")
@@ -82,14 +95,22 @@ class EclipticHouseProjection:
         )
         backend_longitude = source_longitude - Fraction(self.longitude_origin)
         longitude = normalize_angle(float(backend_longitude % 360))
+        options = {}
+        if self.house_code in (b"I", b"i"):
+            if self.sun_declination is None:
+                raise ValueError(
+                    "Sunshine house projection requires the frame's Sun declination"
+                )
+            options["_sun_declination"] = self.sun_declination
         position = float(
             runtime.ephemeris_call(
                 "house_pos",
                 self.armc,
-                self.geographic_latitude,
+                self._latitude,
                 self.obliquity,
                 (longitude, 0.0),
                 self.house_code,
+                **options,
             )
         )
         if self._native_pole_convention:
@@ -104,7 +125,11 @@ class EclipticHouseProjection:
                     "house": int(position),
                     "phase_degrees": (position - 1) * 30,
                     "working_decimal_digits": [],
-                    "action": "native_geographic_pole_convention_retained_not_requalified",
+                    "action": (
+                        "native_geographic_pole_convention_retained_not_requalified"
+                        if self.rotation_latitude is None
+                        else "native_rotation_pole_convention_retained_not_requalified"
+                    ),
                 }
             )
             return HouseCoordinate(position, (Fraction(position) - 1) * 30)
@@ -113,7 +138,7 @@ class EclipticHouseProjection:
                 raise ValueError("原生黄经落宫投影无有效结果，不能钳制或补默认宫位")
             try:
                 checked_t = checked_topocentric_position(
-                    latitude=self.geographic_latitude,
+                    latitude=self._latitude,
                     armc=self.armc,
                     obliquity=self.obliquity,
                     # A rounded [0,360) float can move an almost-zero input
@@ -126,6 +151,13 @@ class EclipticHouseProjection:
                 raise EphemerisSourceError(
                     "house_projection_precision_unavailable"
                 ) from error
+            branch = checked_t.branch
+            if self.rotation_latitude is not None:
+                branch = dict(branch)
+                branch["rotation_axis_latitude_used"] = branch.pop(
+                    "geographic_latitude_used"
+                )
+                branch["geographic_latitude_input"] = self.geographic_latitude
             self._precision_records.append(
                 {
                     "tropical_longitude": float(tropical_longitude),
@@ -146,14 +178,14 @@ class EclipticHouseProjection:
                         if exact_longitude is not None
                         else {}
                     ),
-                    "topocentric_branch": checked_t.branch,
+                    "topocentric_branch": branch,
                 }
             )
             return HouseCoordinate(checked_t.position, checked_t.phase_degrees_working)
         if self.house_code in (b"R", b"C"):
             try:
                 checked = checked_house_plane_position(
-                    latitude=self.geographic_latitude,
+                    latitude=self._latitude,
                     armc=self.armc,
                     obliquity=self.obliquity,
                     longitude=backend_longitude,
@@ -191,8 +223,8 @@ class EclipticHouseProjection:
             raise ValueError("原生黄经落宫投影无有效结果，不能钳制或补默认宫位")
         return HouseCoordinate(position, (Fraction(position) - 1) * 30)
 
-    def metadata(self) -> Dict[str, Any]:
-        result: Dict[str, Any] = {
+    def metadata(self) -> dict[str, Any]:
+        result: dict[str, Any] = {
             "method": (
                 RC_PLANE_PROJECTION_METHOD
                 if self.house_code in (b"R", b"C") and not self._native_pole_convention
@@ -212,6 +244,11 @@ class EclipticHouseProjection:
             "source_section": "16",
             "scope": "Longitude-only native projection; not actual-body spatial placement",
         }
+        if self.house_code == b"i":
+            result["scope"] = (
+                "Lowercase i labels are retained from the forward calculation. "
+                "Swiss Ephemeris uses uppercase I for inverse placement at zero ecliptic latitude."
+            )
         if self.house_code in (b"R", b"C"):
             result["note_zh"] = (
                 "落宫方法：非单圈顺行宫头，按R／C几何平面复核黄纬0°投影；不是计入星体实际黄纬的空间落宫。原生值与交付值另列。"
@@ -258,14 +295,12 @@ class EclipticHouseProjection:
             result["precision"] = {
                 "method_id": result["method"],
                 "phase_forward_offset_arcseconds": (
-                    None
-                    if self._native_pole_convention
-                    else PHASE_FORWARD_OFFSET_ARCSECONDS
+                    None if self._native_pole_convention else 0.0
                 ),
                 "boundary_policy": (
                     "native_geographic_pole_limit_convention"
                     if self._native_pole_convention
-                    else "geometric_phase_plus_forward_offset_not_longitude_cusp_snap"
+                    else "continuous_geometric_phase_half_open_without_cusp_snap"
                 ),
                 "input_precision_scope": (
                     "native_pole_convention_preserved_without_independent_geometry_qualification"
@@ -305,13 +340,31 @@ class EclipticHouseProjection:
                 if self._native_pole_convention
                 else "落宫方法：按实际纬度求解T的黄纬0°位线，未使用原生逆算的89.999°纬度钳制；以地平半球与东西分支选支，边界候选另列。原生值与交付值并列，原生形式宫头不能强展开成顺行区间；不是计入星体实际黄纬的空间落宫。"
             )
+        if self.rotation_latitude is not None:
+            result["rotation_axis_latitude"] = self.rotation_latitude
+            if self._native_pole_convention:
+                result["precision"][
+                    "status"
+                ] = "native_rotation_pole_convention_not_requalified"
+                result["precision"][
+                    "input_precision_scope"
+                ] = "native_rotation_pole_convention_preserved_without_independent_geometry_qualification"
+                result["precision"][
+                    "boundary_policy"
+                ] = "native_rotation_pole_limit_convention"
+                result["scope"] = (
+                    "Native rotation-pole convention retained; no independent unique geometric division certified"
+                )
+                result["note_zh"] = result["note_zh"].replace(
+                    "地理极点", "所选旋转模型的极点"
+                )
         return result
 
 
 def build_ecliptic_house_projection(
     *,
-    julian_day_ut1: float,
-    julian_day_tt: Optional[float],
+    julian_day_ut1: float | UT1Instant,
+    julian_day_tt: float | TTInstant | None,
     geographic_latitude: float,
     geographic_longitude: float,
     house_code: bytes,
@@ -320,16 +373,29 @@ def build_ecliptic_house_projection(
         raise ValueError("非单圈宫头的原生落宫投影需要Swiss Ephemeris")
     with runtime.preserve_ephemeris_path():
         # ARMC is an equatorial Earth-rotation angle, not a sidereal longitude.
-        _, angles = runtime.ephemeris_call(
+        sunshine = house_code in (b"I", b"i")
+        options = {"_return_sun_declination": True} if sunshine else {}
+        house_result = runtime.ephemeris_call(
             "houses_ex",
             julian_day_ut1,
             geographic_latitude,
             geographic_longitude,
             house_code,
             _julian_day_tt=julian_day_tt,
+            **options,
         )
+        if sunshine:
+            _, angles, sun_declination = house_result
+        else:
+            _, angles = house_result
+            sun_declination = None
         attitude = earth_attitude(
             runtime.swe, julian_day_ut1, julian_day_tt=julian_day_tt
+        )
+        _, rotation_latitude = house_site(
+            attitude,
+            longitude=geographic_longitude,
+            latitude=geographic_latitude,
         )
     if not math.isfinite(angles[2]):
         raise ValueError("原生落宫投影的ARMC或真黄赤交角无效")
@@ -339,4 +405,8 @@ def build_ecliptic_house_projection(
         attitude.reduction.house_obliquity,
         house_code,
         longitude_origin=attitude.reduction.house_longitude_origin,
+        sun_declination=sun_declination,
+        rotation_latitude=(
+            rotation_latitude if attitude.equator.polar_motion is not None else None
+        ),
     )

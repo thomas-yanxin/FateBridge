@@ -9,10 +9,12 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_ruler_printed_table as core
-from fatebridge.core.guolao_ruler_calendar import NominalSourceDate as Date
-from fatebridge.core.guolao_ruler_calendar import ruler_calendar_scale
-from fatebridge.validation.guolao_ruler_printed_table import audit_printed_limit_table
+from fatebridge.core.guolao import guolao_ruler_printed_table as core
+from fatebridge.core.guolao.guolao_clock import METHOD_ID as SOLAR_CLOCK_METHOD
+from fatebridge.core.guolao.guolao_ruler_calendar import NominalSourceDate as Date
+from fatebridge.core.guolao.guolao_ruler_calendar import ruler_calendar_scale
+from tests.support.transports import AS_OF, SPECS, inputs, rest, surface_calls
+from validation.guolao_ruler_printed_table import audit_printed_limit_table
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-ruler-printed-table-v1"
 REFERENCE_DATA = Path(__file__).parents[1] / "data/guolao/ruler_flint_v1"
@@ -23,7 +25,9 @@ RULER_REFERENCE = json.loads(gzip.decompress(BLOB))
 RULER_INPUTS = json.loads((REFERENCE_DATA / "arithmetic-inputs.json").read_text())
 
 
-def test_complete_literal_reading_and_original_scan_freeze_precede_numeric_comparison():
+def test_complete_literal_reading_and_original_scan_freeze_precede_numeric_comparison() -> (
+    None
+):
     ref = json.loads((FIXTURE / "reference.json").read_text())
     frozen = json.loads(
         (FIXTURE / "literal-freeze-before-numeric-comparison.json").read_text()
@@ -57,7 +61,7 @@ def test_complete_literal_reading_and_original_scan_freeze_precede_numeric_compa
 @pytest.mark.parametrize("group", core.GROUPS)
 def test_all_literal_interval_starts_and_last_day_fractions_resolve_without_rate_fallback(
     group,
-):
+) -> None:
     table = core.load_printed_limit_table(core.PROFILE)
     for cell in table.rows[group]:
         for date in [
@@ -90,12 +94,16 @@ def test_all_literal_interval_starts_and_last_day_fractions_resolve_without_rate
         (Date(1, 3, 25), 2),
     ],
 )
-def test_disease_row30_nominal_day_gap_is_retained_at_every_boundary(date, expected):
+def test_disease_row30_nominal_day_gap_is_retained_at_every_boundary(
+    date, expected: int | None
+) -> None:
     result = core.load_printed_limit_table(core.PROFILE).lookup("jie", date)
     assert result["selected_cell"] == expected
     if expected is None:
         assert result["status"] == "unassigned_printed_gap"
         assert result["matching_cells"] == []
+    else:
+        pass
     assert result["formula_fallback_used"] is False
 
 
@@ -108,14 +116,16 @@ def test_disease_row30_nominal_day_gap_is_retained_at_every_boundary(date, expec
     ],
 )
 def test_printed_internal_boundaries_remain_distinct_from_constant_month_day_rate(
-    group, palace, date, literal_cell, formula_cell
-):
+    group: str, palace: str, date, literal_cell: int, formula_cell: int
+) -> None:
     table = core.load_printed_limit_table(core.PROFILE)
     assert table.lookup(group, date)["selected_cell"] == literal_cell
     assert ruler_calendar_scale(palace).position(date)["cell"] == formula_cell
 
 
-def test_all210_endpoint_comparisons_keep_seven_source_discrepancies_and_all_rows():
+def test_all210_endpoint_comparisons_keep_seven_source_discrepancies_and_all_rows() -> (
+    None
+):
     result = audit_printed_limit_table()
     assert result["complete_comparisons"] == 210
     assert result["equal_endpoint_cells"] == 203
@@ -145,7 +155,7 @@ def test_all210_endpoint_comparisons_keep_seven_source_discrepancies_and_all_row
     assert result["real_world_predictive_efficacy_established"] is False
 
 
-def test_explicit_year_context_and_14_16_leaf_split_are_preserved():
+def test_explicit_year_context_and_14_16_leaf_split_are_preserved() -> None:
     table = core.load_printed_limit_table(core.PROFILE)
     a = table.cell("fude", 14)["cell"]
     b = table.cell("fude", 15)["cell"]
@@ -158,7 +168,7 @@ def test_explicit_year_context_and_14_16_leaf_split_are_preserved():
 
 
 @pytest.mark.parametrize("profile", [None, "", "nlc3150", True, core.PROFILE + " "])
-def test_no_implicit_or_approximate_profile_selection(profile):
+def test_no_implicit_or_approximate_profile_selection(profile) -> None:
     with pytest.raises(ValueError):
         core.load_printed_limit_table(profile)
 
@@ -167,12 +177,16 @@ def test_no_implicit_or_approximate_profile_selection(profile):
     "group,column",
     [("jie", 0), ("jie", 31), ("jie", True), ("jie", 1.0), ("疾厄", 1), ("unknown", 1)],
 )
-def test_cell_query_has_explicit_group_and_integer_column(group, column):
+def test_cell_query_has_explicit_group_and_integer_column(
+    group: str, column: bool | float | int
+) -> None:
     with pytest.raises(ValueError):
         core.load_printed_limit_table(core.PROFILE).cell(group, column)
 
 
-def test_changed_immutable_reference_is_not_silently_accepted(tmp_path, monkeypatch):
+def test_changed_immutable_reference_is_not_silently_accepted(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     path = tmp_path / "changed.json"
     path.write_bytes(core.DATA.read_bytes() + b"\n")
     monkeypatch.setattr(core, "DATA", path)
@@ -190,7 +204,9 @@ def test_changed_immutable_reference_is_not_silently_accepted(tmp_path, monkeypa
         "formula_corrected",
     ],
 )
-def test_source_constructor_does_not_fill_cells_or_infer_year_rollover(mutation):
+def test_source_constructor_does_not_fill_cells_or_infer_year_rollover(
+    mutation: str,
+) -> None:
     source = json.loads(core.DATA.read_bytes())
     if mutation == "omit":
         source["rows"][0]["cells"].pop()
@@ -206,7 +222,7 @@ def test_source_constructor_does_not_fill_cells_or_infer_year_rollover(mutation)
         core.PrintedLimitTable(source, "synthetic_rejected_source")
 
 
-def test_overlap_keeps_both_cells_without_selecting_one_or_using_formula():
+def test_overlap_keeps_both_cells_without_selecting_one_or_using_formula() -> None:
     source = copy.deepcopy(json.loads(core.DATA.read_bytes()))
     source["rows"][0]["cells"][1] = "五月十二|九月二十四"
     table = core.PrintedLimitTable(source, "synthetic_overlap_not_a_new_source_version")
@@ -218,7 +234,7 @@ def test_overlap_keeps_both_cells_without_selecting_one_or_using_formula():
 
 
 @pytest.mark.parametrize("date", [Date(2027, 1, 1), "1-1-1", None])
-def test_civil_year_or_untyped_date_not_coerced_into_the_table(date):
+def test_civil_year_or_untyped_date_not_coerced_into_the_table(date) -> None:
     with pytest.raises((TypeError, ValueError)):
         core.load_printed_limit_table(core.PROFILE).lookup("jie", date)
 
@@ -228,12 +244,14 @@ def test_civil_year_or_untyped_date_not_coerced_into_the_table(date):
 )
 def test_every_frozen_nominal_day_and_subday_matches_independent_rational_targets(
     group,
-):
+) -> None:
     scale = ruler_calendar_scale(group["palaces"][0])
     table = core.load_printed_limit_table(core.PROFILE)
     for row in RULER_REFERENCE["rows"]:
         if row["group"] != group["group"]:
             continue
+        else:
+            pass
         label = row["nominal_source_date"]
         days = F(row["elapsed_nominal_days_exact"])
         degrees = F(row["formula_degrees_exact"])
@@ -273,7 +291,9 @@ def test_every_frozen_nominal_day_and_subday_matches_independent_rational_target
 @pytest.mark.parametrize(
     "group", RULER_INPUTS["groups"], ids=lambda group: group["group"]
 )
-def test_all_literal_and_formula_endpoints_match_independently_parsed_source(group):
+def test_all_literal_and_formula_endpoints_match_independently_parsed_source(
+    group,
+) -> None:
     scale = ruler_calendar_scale(group["palaces"][0])
     table = core.load_printed_limit_table(core.PROFILE)
     comparison = {
@@ -283,6 +303,8 @@ def test_all_literal_and_formula_endpoints_match_independently_parsed_source(gro
     for row in RULER_REFERENCE["cell_rows"]:
         if row["group"] != group["group"]:
             continue
+        else:
+            pass
         literal = table.cell(row["group"], row["column"])["cell"]
         assert literal["normalized_literal_text"] == row["literal_text"]
         assert literal["start_nominal_days_exact"] == row["literal_start_exact"]
@@ -339,8 +361,105 @@ def test_all_literal_and_formula_endpoints_match_independently_parsed_source(gro
 
 
 @pytest.mark.parametrize("row", RULER_REFERENCE["date_only_stress"])
-def test_independent_extreme_date_labels_preserve_exact_subdays_and_large_integers(row):
+def test_independent_extreme_date_labels_preserve_exact_subdays_and_large_integers(
+    row,
+) -> None:
     elapsed = F(row["elapsed_nominal_days_exact"])
     date = Date.from_elapsed_days(elapsed)
     assert date.as_dict() == row["nominal_source_date"]
     assert date.elapsed_days == elapsed
+
+
+def test_portable_reference_inputs_and_complete_literal_edition_are_frozen() -> None:
+    for filename, fingerprint in MANIFEST["files"].items():
+        assert (
+            hashlib.sha256((REFERENCE_DATA / filename).read_bytes()).hexdigest()
+            == fingerprint
+        )
+    source = json.loads(core.DATA.read_bytes())
+    assert hashlib.sha256(core.DATA.read_bytes()).hexdigest() == core.REFERENCE_SHA256
+    assert source["source"]["pdf_sha256"] == MANIFEST["source_pdf"]["sha256"]
+    assert len(source["read_views"]) == 14
+    assert sum(len(row["cells"]) for row in source["rows"]) == 210
+    assert RULER_REFERENCE["production_imported"] is False
+    assert RULER_REFERENCE["total_rows"] == MANIFEST["rational_rows"] == 22635
+    assert len(RULER_REFERENCE["cell_rows"]) == MANIFEST["cell_rows"] == 210
+
+
+@pytest.mark.parametrize(
+    "solar,target_requested", [(False, True), (True, True), (True, False)]
+)
+def test_public_chart_method_clocks_do_not_claim_a_printed_ruler_date_mapping(
+    surface_calls, solar: bool, target_requested: bool
+) -> None:
+    spec = SPECS["astro_guolao"]
+    payload = {**inputs(spec), "use_true_solar_time": solar}
+    if target_requested:
+        payload["analysis_datetime"] = "2026-10-12T10:00:00+08:00"
+    else:
+        pass
+    fields = [
+        "guolao.profile",
+        "guolao.life_palace",
+        "guolao.timing",
+        "guolao.validation",
+        "guolao.rule_trace",
+    ]
+    for selected_fields in (None, fields):
+        projection = {
+            "strict_fields": True,
+            "include_snapshot_text": False,
+            "response_char_limit": 0,
+        }
+        if selected_fields is not None:
+            projection["fields"] = selected_fields
+        else:
+            pass
+        http, protocol, code, local = surface_calls(
+            spec, payload, projection=projection, rest_as_of=AS_OF
+        )
+        assert http.status_code == 200, http.text
+        assert not protocol.is_error, protocol.content
+        assert code == 0, local
+        bodies = [
+            {name: value for name, value in body.items() if name != "run_metadata"}
+            for body in (http.json(), protocol.structured_content, local)
+        ]
+        assert bodies[0] == bodies[1] == bodies[2]
+        chart = bodies[0]["guolao"]
+        life = chart["life_palace"]
+        assert life["longitude"] is life["mansion"] is None
+        assert life["degree_status"] == "unresolved_no_ascendant_substitution"
+        assert "横看表和刊载算例" in life["degree_reason"]
+        assert life["clock_basis"] == (
+            "apparent_solar_display" if solar else "recorded_civil_clock"
+        )
+        assert chart["validation"]["classical_acceptance_passed"] is False
+        assert chart["validation"]["real_world_prediction_status"] == "not_tested"
+        if solar:
+            clock = chart["profile"]["apparent_solar_clock"]
+            assert clock["method_id"] == SOLAR_CLOCK_METHOD
+            assert life["birth_clock"] == clock["display"]
+            assert life["birth_hour_branch"] == clock["birth_hour_branch"]
+            assert clock["classical_clock_mapping_accepted"] is False
+        else:
+            assert chart["profile"].get("apparent_solar_clock") is None
+        timing = chart["timing"]
+        if target_requested:
+            assert timing["status"] == "research_partial"
+            assert timing["analysis_datetime"] == "2026-10-12T02:00:00+00:00"
+            assert timing["calendar_datetime"] == "2026-10-12T10:00:00+08:00"
+            assert timing["calendar_timezone"] == "Asia/Shanghai"
+            assert len(timing["transit_bodies"]) == 11
+            assert (
+                timing["profile"]["position_basis"]
+                == "geocentric_apparent_target_sky_not_symbolic_direction"
+            )
+            assert timing["small_limit"]["placement_classical_acceptance"] is False
+            assert timing["small_limit"]["source_id"] == "tohoku_luwei_10020000001141"
+        else:
+            assert timing == {"status": "not_requested"}
+        assert all(
+            trace["source_id"] != "nlc892_411999021002_92845_3150"
+            for trace in chart["rule_trace"]
+        )

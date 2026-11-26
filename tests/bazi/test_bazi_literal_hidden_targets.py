@@ -3,12 +3,12 @@
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.core.contracts.output_bazi import DimensionTimingContext
+from fatebridge.core.contracts.output_hidden_carriers import HiddenCarrierRelations
 from fatebridge.core.hidden_carriers import (
     build_natal_hidden_carriers,
     describe_hidden_targets,
 )
-from fatebridge.core.output_bazi import DimensionTimingContext
-from fatebridge.core.output_hidden_carriers import HiddenCarrierRelations
 from tests.bazi.test_hidden_carriers import ELEMENT, HIDDEN, MATRIX, NATAL
 
 STEMS, BRANCHES = "甲乙丙丁戊己庚辛壬癸", "子丑寅卯辰巳午未申酉戌亥"
@@ -19,7 +19,7 @@ CYCLE = {STEMS[i % 10] + BRANCHES[i % 12] for i in range(60)}
 @pytest.mark.parametrize("branch", BRANCHES)
 def test_all120_literal_pairs_preserve_independent_relations_and_strict60_gate(
     stem, branch
-):
+) -> None:
     pillars = {**NATAL, "year": (stem, branch)}
     current = build_natal_hidden_carriers(pillars)
     HiddenCarrierRelations.model_validate(current)
@@ -49,7 +49,7 @@ def test_all120_literal_pairs_preserve_independent_relations_and_strict60_gate(
     assert current["effective_force_status"] == "not_adjudicated"
 
 
-def test_boundary_date_context_uses_the_full_existing_clock_contract():
+def test_boundary_date_context_uses_the_full_existing_clock_contract() -> None:
     # Synthetic contract facts only; no invented physical solar root.
     term = {
         "name": "立春",

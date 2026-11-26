@@ -5,6 +5,7 @@ import hashlib
 import json
 import shutil
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -12,18 +13,19 @@ from fastmcp import Client
 from pydantic import ValidationError
 
 import fatebridge.api as api
-import fatebridge.core.ziwei_conditions as conditions
+import fatebridge.core.ziwei.ziwei_conditions as conditions
 import scripts.ziwei.audit_ziwei_conditions as audit
 from fatebridge.application.result_delivery import RESULT_STORE
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_chinese import ZiweiConditionSourceRevision
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
-from fatebridge.core.output_chinese import ZiweiConditionSourceRevision
 from fatebridge.mcp_server import create_mcp_app
 from scripts.ziwei.audit_ziwei_conditions import FIXTURES, revised_condition_source
 from scripts.ziwei.audit_ziwei_limits import _seed
+from tests.support.transports import call_calculation
 
 
-def test_two_corrections_and_one_dispute_keep_original_readings():
+def test_two_corrections_and_one_dispute_keep_original_readings() -> None:
     source, revision = revised_condition_source()
     package = conditions._source()
     assert package["clauses"] == source["clauses"]
@@ -58,7 +60,9 @@ def test_two_corrections_and_one_dispute_keep_original_readings():
         "naj_0059_left_lower_native_region.jpg",
     ],
 )
-def test_source_revision_requires_actual_frozen_evidence(tmp_path, name):
+def test_source_revision_requires_actual_frozen_evidence(
+    tmp_path: Path, name: str
+) -> None:
     shutil.copytree(
         FIXTURES / "naj_ming_conditions_r25_v1", tmp_path / "naj_ming_conditions_r25_v1"
     )
@@ -80,7 +84,9 @@ def test_source_revision_requires_actual_frozen_evidence(tmp_path, name):
         ("whole_book_acceptance_passed", True),
     ],
 )
-def test_public_source_receipt_rejects_unearned_certification(field, value):
+def test_public_source_receipt_rejects_unearned_certification(
+    field: str, value: bool | int
+) -> None:
     with pytest.raises(ValidationError):
         ZiweiConditionSourceRevision.model_validate({field: value})
 
@@ -97,7 +103,9 @@ def test_public_source_receipt_rejects_unearned_certification(field, value):
         "peer_ownership",
     ],
 )
-def test_revision_rejects_self_rehashed_contradictory_evidence(tmp_path, kind):
+def test_revision_rejects_self_rehashed_contradictory_evidence(
+    tmp_path: Path, kind: str
+) -> None:
     for folder in [
         "naj_ming_conditions_v1",
         "naj_ming_conditions_r25_v1",
@@ -137,12 +145,16 @@ def test_revision_rejects_self_rehashed_contradictory_evidence(tmp_path, kind):
         manifest["files"][changed.name] = hashlib.sha256(
             changed.read_bytes()
         ).hexdigest()
+    else:
+        pass
     manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
     with pytest.raises(ValueError, match="Ming condition"):
         revised_condition_source(tmp_path)
 
 
-def test_audit_checks_all_public_source_and_record_fields(monkeypatch):
+def test_audit_checks_all_public_source_and_record_fields(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original_source = audit.revised_condition_source
     original_build = audit.build_ziwei_chart
 
@@ -180,8 +192,8 @@ def test_audit_checks_all_public_source_and_record_fields(monkeypatch):
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 def test_text_corrections_preserve_numeric_chart_and_geometric_premises(
-    profile, monkeypatch
-):
+    profile: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     revised = deepcopy(conditions._source())
     original = json.loads(
         (FIXTURES / "naj_ming_conditions_v1/collation.json").read_text()
@@ -219,6 +231,8 @@ def _verified_conditions(reply):
     delivery = reply.get("result_delivery")
     if delivery is None:
         return reply["ziwei_birth"]["ming_structural_conditions"]
+    else:
+        pass
     offset, parts = 0, []
     while True:
         page = RESULT_STORE.verified_page(
@@ -231,13 +245,15 @@ def _verified_conditions(reply):
         offset = page["next_offset"]
         if offset is None:
             break
+        else:
+            pass
     return json.loads("".join(parts))
 
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 def test_corrected_and_disputed_annotations_survive_rest_mcp_cli(
-    profile, monkeypatch, capsys
-):
+    profile: str, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -268,17 +284,19 @@ def test_corrected_and_disputed_annotations_survive_rest_mcp_cli(
     ]
     params.append(("fields", flags["fields"][0]))
     response = TestClient(api.app).post(
-        "/api/cn/ziwei/birth", json=inputs, params=params
+        "/api/ziwei/birth-chart", json=inputs, params=params
     )
     assert response.status_code == 200, response.text
 
     async def native():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            result = await client.call_tool("ziwei_birth", {**inputs, **flags})
+            result = await call_calculation(
+                client, "ziwei_birth_chart", {**inputs, **flags}
+            )
             assert not result.is_error
             return result.structured_content
 
-    args = ["ziwei_birth"]
+    args = ["ziwei_birth_chart"]
     for key, value in inputs.items():
         args += ["--" + key.replace("_", "-"), str(value)]
     args += [

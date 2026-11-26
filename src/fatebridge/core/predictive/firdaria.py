@@ -2,23 +2,21 @@
 
 from __future__ import annotations
 
-from dataclasses import replace
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from fractions import Fraction
-from typing import Any, Dict
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
-
-from dateutil import tz
+from itertools import cycle
+from typing import Any
 
 from fatebridge.core.astro.birth import AstroBirthInfo
-
-from ._common import (
+from fatebridge.core.predictive._common import (
     TROPICAL_YEAR_DAYS,
     determine_sect,
     planet_label,
     resolve_local_birthday_anniversary,
     sect_label,
 )
+from fatebridge.utils.civil_time import UTCCalendar, ZonedCalendar, utc_calendar
+from fatebridge.utils.timezones import format_local_time_or_utc, validate_local_clock
 
 # 日盘与夜盘的行星时主顺序（planet, years）
 FIRDARIA_DAY_SEQUENCE = [
@@ -50,35 +48,10 @@ FIRDARIA_NIGHT_NODES_AFTER_MARS_SEQUENCE = [
 ]
 
 
-def normalize_calendar_firdaria_birth(birth_info: AstroBirthInfo) -> AstroBirthInfo:
-    """Use IANA recurrence rules beyond TZif's last explicit DST transition.
-
-    Fixed-duration periods use UTC and need the original zone only for display.
-    Fixed-offset spellings are already normalized by the shared birth builder.
-    """
-    try:
-        zone = ZoneInfo(birth_info.timezone)
-    except (ZoneInfoNotFoundError, ValueError):
-        return birth_info
-    local = birth_info.local_datetime.replace(tzinfo=zone)
-    return replace(
-        birth_info,
-        local_datetime=local,
-        utc_datetime=local.astimezone(timezone.utc),
-    )
-
-
 def _validate_calendar_clock(moment: datetime, role: str) -> None:
     if moment.tzinfo is None or moment.utcoffset() is None:
         raise ValueError(f"法达公历周年模式的{role}必须带时区")
-    if not tz.datetime_exists(moment):
-        raise ValueError(
-            f"法达公历周年模式的{role}为 nonexistent local time，请确认有效钟时"
-        )
-    if tz.datetime_ambiguous(moment):
-        raise ValueError(
-            f"法达公历周年模式的{role}为 ambiguous local time，请确认明确偏移"
-        )
+    validate_local_clock(moment, clock_label=f"法达公历周年模式的{role}")
 
 
 def validate_calendar_firdaria_inputs(
@@ -87,7 +60,7 @@ def validate_calendar_firdaria_inputs(
     """Reject ambiguous clocks before the natal backend can silently resolve them."""
     _validate_calendar_clock(birth_info.local_datetime, "出生钟时")
     _validate_calendar_clock(analysis_datetime, "分析钟时")
-    if analysis_datetime.astimezone(timezone.utc) < birth_info.require_utc_datetime:
+    if utc_calendar(analysis_datetime) < birth_info.utc_calendar:
         raise ValueError("法达公历周年模式的分析时刻不能早于出生时刻")
 
 
@@ -98,14 +71,14 @@ def _calendar_anniversary(birth: datetime, nominal_age: int) -> datetime:
     return moment
 
 
-def _calendar_period(start: datetime, end: datetime, planet: str) -> Dict[str, Any]:
+def _calendar_period(start: datetime, end: datetime, planet: str) -> dict[str, Any]:
     return {
         "planet": planet,
         "planet_label": planet_label(planet),
-        "start": start.isoformat(),
-        "end": end.isoformat(),
-        "start_display": start.isoformat(sep=" ", timespec="minutes"),
-        "end_display": end.isoformat(sep=" ", timespec="minutes"),
+        "start": format_local_time_or_utc(start),
+        "end": format_local_time_or_utc(end),
+        "start_display": format_local_time_or_utc(start, sep=" ", timespec="minutes"),
+        "end_display": format_local_time_or_utc(end, sep=" ", timespec="minutes"),
     }
 
 
@@ -114,59 +87,61 @@ def _build_calendar_payload(
     sequence: list[tuple[str, int]],
     sect: str,
     analysis_datetime: datetime,
-) -> Dict[str, Any]:
-    birth_info = normalize_calendar_firdaria_birth(birth_info)
+) -> dict[str, Any]:
     validate_calendar_firdaria_inputs(birth_info, analysis_datetime)
     birth = birth_info.local_datetime
-    target = analysis_datetime.astimezone(timezone.utc)
-    horizon = target + timedelta(days=90 * TROPICAL_YEAR_DAYS)
+    clock = ZonedCalendar.from_datetime(birth)
+    target = utc_calendar(analysis_datetime)
+    horizon = target.shifted(timedelta(days=90 * TROPICAL_YEAR_DAYS))
     microsecond = timedelta(microseconds=1)
     planet_order = [planet for planet, _ in sequence if "Node" not in planet]
-    timeline = []
+    timeline: list[dict[str, Any]] = []
     current_major = None
     current_sub = None
     age = 0
-    start = birth
+    start, start_utc = birth, clock.utc
 
-    while start.astimezone(timezone.utc) <= horizon:
-        for planet, years in sequence:
-            end = _calendar_anniversary(birth, age + years)
-            start_utc, end_utc = start.astimezone(timezone.utc), end.astimezone(
-                timezone.utc
-            )
-            major = {
-                **_calendar_period(start, end, planet),
-                "years": years,
-                "nominal_start_age": age,
-                "nominal_end_age": age + years,
-                "subperiods": [],
-            }
-            if "Node" not in planet:
-                index = planet_order.index(planet)
-                order = planet_order[index:] + planet_order[:index]
-                ticks = (end_utc - start_utc) // microsecond
-                boundaries = [
-                    start_utc + round(Fraction(ticks * k, 7)) * microsecond
-                    for k in range(8)
-                ]
-                for k, sub_planet in enumerate(order):
-                    sub = _calendar_period(
-                        boundaries[k].astimezone(birth.tzinfo),
-                        boundaries[k + 1].astimezone(birth.tzinfo),
-                        sub_planet,
-                    )
-                    major["subperiods"].append(sub)
-                    if boundaries[k] <= target < boundaries[k + 1]:
-                        current_sub = sub
-            if start_utc <= target < end_utc:
-                current_major = major
-            timeline.append(major)
-            start, age = end, age + years
-            if end_utc > horizon:
+    for planet, years in cycle(sequence):
+        if start_utc > horizon:
+            break
+        end_age = age + years
+        if birth.year + end_age > datetime.max.year:
+            # Earlier preview periods and the current period are already complete.
+            if start_utc > target and len(timeline) >= 12:
                 break
-        else:
-            continue
-        break
+            raise ValueError(
+                "Civil calendar label is outside Python datetime's year range"
+            )
+        end = _calendar_anniversary(birth, end_age)
+        end_utc = utc_calendar(end)
+        major = {
+            **_calendar_period(start, end, planet),
+            "years": years,
+            "nominal_start_age": age,
+            "nominal_end_age": end_age,
+            "subperiods": [],
+        }
+        if "Node" not in planet:
+            index = planet_order.index(planet)
+            order = planet_order[index:] + planet_order[:index]
+            ticks = end_utc.elapsed_since(start_utc) // microsecond
+            boundaries = [
+                start_utc.shifted(round(Fraction(ticks * k, 7)) * microsecond)
+                for k in range(8)
+            ]
+            for k, sub_planet in enumerate(order):
+                sub = _calendar_period(
+                    ZonedCalendar(boundaries[k], clock.zone).require_datetime(),
+                    ZonedCalendar(boundaries[k + 1], clock.zone).require_datetime(),
+                    sub_planet,
+                )
+                major["subperiods"].append(sub)
+                if boundaries[k] <= target < boundaries[k + 1]:
+                    current_sub = sub
+        if start_utc <= target < end_utc:
+            current_major = major
+        timeline.append(major)
+        start, start_utc, age = end, end_utc, end_age
 
     return {
         "sect": sect,
@@ -184,7 +159,7 @@ def build_firdaria_payload(
     analysis_datetime: datetime,
     firdaria_night_order: str = "nodes_at_end",
     firdaria_year_basis: str = "fixed_365_2425",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     return build_firdaria_for_sect(
         birth_info,
         determine_sect(natal_subject),
@@ -201,7 +176,7 @@ def build_firdaria_for_sect(
     analysis_datetime: datetime,
     firdaria_night_order: str = "nodes_at_end",
     firdaria_year_basis: str = "fixed_365_2425",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Calendar arithmetic with an explicit sect; no surrogate natal houses."""
     if sect not in {"day", "night"}:
         raise ValueError("法达计算需要明确的 day／night 宗派")
@@ -238,66 +213,69 @@ def _build_fixed_year_payload(
     sequence: list[tuple[str, int]],
     sect: str,
     analysis_datetime: datetime,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Fixed nominal days on UTC elapsed time, displayed in the birth timezone."""
-    sub_planet_order = [planet for planet, _ in sequence if "Node" not in planet]
+    display_zone = ZonedCalendar.from_datetime(birth_info.local_datetime).zone
 
-    timeline = []
-    cursor = birth_info.require_utc_datetime
-    target = analysis_datetime.astimezone(timezone.utc)
-    display_timezone = birth_info.local_datetime.tzinfo
-    horizon = target + timedelta(days=90 * TROPICAL_YEAR_DAYS)
+    def label(point: UTCCalendar) -> str:
+        return format_local_time_or_utc(
+            ZonedCalendar(point, display_zone).require_datetime()
+        )
+
+    sub_planet_order = [planet for planet, _ in sequence if "Node" not in planet]
+    timeline: list[dict[str, Any]] = []
+    cursor = birth_info.utc_calendar
+    target = utc_calendar(analysis_datetime)
+    horizon = target.shifted(timedelta(days=90 * TROPICAL_YEAR_DAYS))
     current_major = None
     current_sub = None
 
-    while cursor <= horizon:
-        for planet, years in sequence:
-            start = cursor
-            end = start + timedelta(days=years * TROPICAL_YEAR_DAYS)
-            main_period: Dict[str, Any] = {
-                "planet": planet,
-                "planet_label": planet_label(planet),
-                "start": start.astimezone(display_timezone).isoformat(),
-                "end": end.astimezone(display_timezone).isoformat(),
-                "years": years,
-                "subperiods": [],
-            }
-
-            if "Node" not in planet:
-                order = (
-                    sub_planet_order[sub_planet_order.index(planet) :]
-                    + sub_planet_order[: sub_planet_order.index(planet)]
-                )
-                sub_duration = (end - start) / 7
-                sub_cursor = start
-                for sub_planet in order:
-                    sub_end = sub_cursor + sub_duration
-                    sub_period = {
-                        "planet": sub_planet,
-                        "planet_label": planet_label(sub_planet),
-                        "start": sub_cursor.astimezone(display_timezone).isoformat(),
-                        "end": sub_end.astimezone(display_timezone).isoformat(),
-                    }
-                    main_period["subperiods"].append(sub_period)
-                    if sub_cursor <= target < sub_end:
-                        current_sub = sub_period
-                    sub_cursor = sub_end
-
-            if start <= target < end:
-                current_major = main_period
-
-            timeline.append(main_period)
-            cursor = end
-            if cursor > horizon:
-                break
-        else:
+    for planet, years in cycle(sequence):
+        if cursor > horizon or (len(timeline) == 12 and cursor > target):
+            break
+        start = cursor
+        duration = timedelta(days=years * TROPICAL_YEAR_DAYS)
+        cursor = start.shifted(duration)
+        current = start <= target < cursor
+        in_preview = len(timeline) < 12
+        if not (current or in_preview):
             continue
-        break
+
+        main_period: dict[str, Any] = {
+            "planet": planet,
+            "planet_label": planet_label(planet),
+            "start": label(start),
+            "end": label(cursor),
+            "years": years,
+            "subperiods": [],
+        }
+        if "Node" not in planet:
+            index = sub_planet_order.index(planet)
+            order = sub_planet_order[index:] + sub_planet_order[:index]
+            sub_duration = duration / 7
+            sub_cursor = start
+            for sub_planet in order:
+                sub_end = sub_cursor.shifted(sub_duration)
+                sub_period = {
+                    "planet": sub_planet,
+                    "planet_label": planet_label(sub_planet),
+                    "start": label(sub_cursor),
+                    "end": label(sub_end),
+                }
+                main_period["subperiods"].append(sub_period)
+                if sub_cursor <= target < sub_end:
+                    current_sub = sub_period
+                sub_cursor = sub_end
+
+        if current:
+            current_major = main_period
+        if in_preview:
+            timeline.append(main_period)
 
     return {
         "sect": sect,
         "sect_label": sect_label(sect),
         "current_major": current_major,
         "current_sub": current_sub,
-        "timeline": timeline[:12],
+        "timeline": timeline,
     }

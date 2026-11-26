@@ -36,7 +36,7 @@ def payload(spec):
 
 
 @pytest.mark.parametrize("value", GAUQUELIN_NAMES)
-def test_known_sector_names_are_rejected_by_both_shared_house_helpers(value):
+def test_known_sector_names_are_rejected_by_both_shared_house_helpers(value) -> None:
     with pytest.raises(UnsupportedGauquelinError, match="36 clockwise sectors"):
         normalize_house_system(value)
     with pytest.raises(UnsupportedGauquelinError):
@@ -44,7 +44,9 @@ def test_known_sector_names_are_rejected_by_both_shared_house_helpers(value):
 
 
 @pytest.mark.parametrize("value", GAUQUELIN_NAMES)
-def test_all_live_house_system_request_models_reject_the_known_sector_name(value):
+def test_all_live_house_system_request_models_reject_the_known_sector_name(
+    value,
+) -> None:
     assert HOUSE_SPECS
     for spec in HOUSE_SPECS:
         with pytest.raises(ValidationError) as caught:
@@ -55,13 +57,13 @@ def test_all_live_house_system_request_models_reject_the_known_sector_name(value
         assert issue["ctx"] == {"system": "Gauquelin", "sector_count": 36}
 
 
-def test_gauquelin_cannot_be_supplied_as_a_default_house_system():
+def test_gauquelin_cannot_be_supplied_as_a_default_house_system() -> None:
     for value in (None, "", "P"):
         with pytest.raises(UnsupportedGauquelinError):
             normalize_house_system(value, default="G")
 
 
-def test_every_live_house_field_describes_the_36_sector_exclusion():
+def test_every_live_house_field_describes_the_36_sector_exclusion() -> None:
     for spec in HOUSE_SPECS:
         schema = spec.request_model.model_json_schema()
         description = schema["properties"]["house_system"]["description"]
@@ -84,7 +86,7 @@ def test_every_live_house_field_describes_the_36_sector_exclusion():
         *range(9),
     ],
 )
-def test_supported_inputs_are_kept_in_every_request_model(value):
+def test_supported_inputs_are_kept_in_every_request_model(value) -> None:
     for spec in HOUSE_SPECS:
         model = spec.request_model.model_validate(
             {**payload(spec), "house_system": value}
@@ -92,7 +94,7 @@ def test_supported_inputs_are_kept_in_every_request_model(value):
         assert model.house_system == value, spec.key
 
 
-def test_unknown_extra_house_field_is_still_an_extra_field_on_other_models():
+def test_unknown_extra_house_field_is_still_an_extra_field_on_other_models() -> None:
     from fatebridge.core.requests.base import _DeferredModel
 
     class Unrelated(_DeferredModel):
@@ -103,7 +105,7 @@ def test_unknown_extra_house_field_is_still_an_extra_field_on_other_models():
     assert caught.value.errors()[0]["type"] == "extra_forbidden"
 
 
-def test_integer_hsys_family_already_rejects_g_without_fallback():
+def test_integer_hsys_family_already_rejects_g_without_fallback() -> None:
     from fatebridge.core.requests.astrology import AstroChartRequest
 
     with pytest.raises(ValidationError) as caught:

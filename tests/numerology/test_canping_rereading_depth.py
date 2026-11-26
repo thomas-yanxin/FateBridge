@@ -7,8 +7,11 @@ import json
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core.canping_texts import collation_summary, lookup_record
+from fatebridge.core.numerology import canping_texts
+from fatebridge.core.numerology.canping_texts import collation_summary, lookup_record
+from tests.unit_test.fixtures.canping_source import jpeg_dimensions
 
 ROOT = Path(__file__).parents[1] / "fixtures/canping_rereading_v1"
 REFERENCE = json.loads((ROOT / "reference.json").read_text())
@@ -17,7 +20,9 @@ CELLS = REFERENCE["cells"]
 
 
 @pytest.mark.parametrize("cell", CELLS)
-def test_reread_cells_keep_exact_readings_prior_uncertainty_and_source_identity(cell):
+def test_reread_cells_keep_exact_readings_prior_uncertainty_and_source_identity(
+    cell,
+) -> None:
     actual = lookup_record(cell["element"], cell["number"], cell["kind"])
     selected = actual["selection"]
     assert actual["text"] == cell["text"]
@@ -34,24 +39,10 @@ def test_reread_cells_keep_exact_readings_prior_uncertainty_and_source_identity(
     assert bool(selected.get("reading_uncertainties")) == ("□" in cell["text"])
 
 
-def jpeg_dimensions(raw):
-    assert raw[:2] == b"\xff\xd8"
-    offset = 2
-    while offset < len(raw):
-        assert raw[offset] == 255
-        marker = raw[offset + 1]
-        length = int.from_bytes(raw[offset + 2 : offset + 4], "big")
-        if marker in {0xC0, 0xC1, 0xC2}:
-            return (
-                int.from_bytes(raw[offset + 7 : offset + 9], "big"),
-                int.from_bytes(raw[offset + 5 : offset + 7], "big"),
-            )
-        offset += 2 + length
-    raise AssertionError("JPEG lacks a supported frame header")
-
-
 @pytest.mark.parametrize("page", REFERENCE["pages"])
-def test_native_regions_have_actual_pixels_and_cover_exactly_one_same_copy_page(page):
+def test_native_regions_have_actual_pixels_and_cover_exactly_one_same_copy_page(
+    page,
+) -> None:
     manifest = json.loads((ROOT / REFERENCE["source_manifest_file"]).read_text())
     canvas = manifest["sequences"][0]["canvases"][page["pdf_page"] - 1]
     assert (canvas["width"], canvas["height"]) == (5900, 4400)
@@ -72,7 +63,9 @@ def test_native_regions_have_actual_pixels_and_cover_exactly_one_same_copy_page(
         )
 
 
-def test_rereading_does_not_inflate_numbered_cells_independent_reviews_or_full_acceptance():
+def test_rereading_does_not_inflate_numbered_cells_independent_reviews_or_full_acceptance() -> (
+    None
+):
     assert len(CELLS) == len(ROWS) == 40
     assert len({(r["number"], r["kind"]) for r in CELLS}) == 40
     assert sum("□" not in r["text"] for r in CELLS) == 30
@@ -121,9 +114,8 @@ def test_rereading_does_not_inflate_numbered_cells_independent_reviews_or_full_a
     ["previous_text", "previous_cell_status", "source_pdf_page", "rereading_id"],
 )
 def test_revision_cannot_discard_prior_uncertainty_or_claim_another_page(
-    monkeypatch, change
-):
-    from fatebridge.core import canping_texts
+    monkeypatch: MonkeyPatch, change: str
+) -> None:
 
     original = canping_texts._loaded
     record = copy.deepcopy(original(canping_texts.COLLATION_PATH))
@@ -142,7 +134,7 @@ def test_revision_cannot_discard_prior_uncertainty_or_claim_another_page(
         canping_texts._collation()
 
 
-def test_revisions_and_rereading_summary_are_isolated_between_calls():
+def test_revisions_and_rereading_summary_are_isolated_between_calls() -> None:
     row = lookup_record("水", 3241, "female")
     row["selection"]["reading_revision"]["previous_text"] = "tampered"
     summary = collation_summary()

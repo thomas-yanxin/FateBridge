@@ -109,6 +109,8 @@ def sector_check() -> dict:
                 failed.append(
                     {"anchor": anchor, "longitude": value, "expected": expected}
                 )
+            else:
+                pass
     return {
         "probe_count": tested,
         "failed": failed,
@@ -139,18 +141,24 @@ def geometry_check() -> dict:
             )
             if direct_error <= 1:
                 expected_two.add(tuple(sorted((a, b))))
+            else:
+                pass
             for p in values:
                 if (
                     p not in (a, b)
                     and error(2 * values[p] - values[a] - values[b]) <= 1
                 ):
                     expected_three.add((p, a, b))
+                else:
+                    pass
         for (a, b), (c, d) in combinations(pairs, 2):
             if (
                 len({a, b, c, d}) == 4
                 and error(values[a] + values[b] - values[c] - values[d]) <= 1
             ):
                 expected_four.add((a, b, c, d))
+            else:
+                pass
         actual = result["dials"][str(dial)]
         checks.append(
             {
@@ -202,6 +210,8 @@ def source_example_check() -> dict:
                     rows[0]["axis_offset_degrees"] == case["axis_offset_degrees"]
                     and rows[0]["orb"] == 0
                 )
+            else:
+                pass
         checks.append(
             {
                 "case_id": case["id"],
@@ -514,9 +524,11 @@ def physical_chart_source_check() -> dict:
 
 def cross_school_model_check() -> dict:
     """Model bookkeeping at one fixed epoch; not an astronomical oracle."""
-    from fatebridge.core import guolao, human_design, jyotish
     from fatebridge.core.astro import runtime
-    from fatebridge.core.human_design_mechanics import BODY_IDS
+    from fatebridge.core.guolao import guolao
+    from fatebridge.core.human_design import human_design
+    from fatebridge.core.human_design.human_design_mechanics import BODY_IDS
+    from fatebridge.core.jyotish import jyotish
 
     birth = build_astro_birth_info(
         birth_year=2000,
@@ -626,6 +638,8 @@ def day_meridian_check() -> dict:
     older_data = WITTE_1923_FIXTURE.read_bytes()
     if hashlib.sha256(older_data).hexdigest() != WITTE_1923_FIXTURE_SHA256:
         raise ValueError("Frozen Witte 1923 transcription checksum mismatch")
+    else:
+        pass
     reconciliation = replay_witte_sources(json.loads(older_data))
     return {
         "original_author_printed_arithmetic_cases": 3,
@@ -985,6 +999,8 @@ def historical_ephemeris_check() -> dict:
             raw = case["raw_http_json"].encode("utf-8")
             if hashlib.sha256(raw).hexdigest() != case["raw_http_json_sha256"]:
                 raise ValueError("Historical NASA HTTP JSON bytes changed")
+            else:
+                pass
             response = json.loads(raw)
             text = response["result"]
             params = case["request_parameters"]
@@ -1002,11 +1018,15 @@ def historical_ephemeris_check() -> dict:
                 and params["QUANTITIES"] == "'31'"
             ):
                 raise ValueError("Historical NASA target/frame/time definition changed")
+            else:
+                pass
             rows = list(
                 csv.reader(io.StringIO(text.split("$$SOE\n")[1].split("$$EOE")[0]))
             )
             if len(rows) != 1:
                 raise ValueError("Historical NASA epoch count changed")
+            else:
+                pass
             moment = datetime.strptime(rows[0][0].strip(), "%Y-%b-%d %H:%M:%S.%f")
             expected = float(rows[0][3])
             if (
@@ -1014,6 +1034,8 @@ def historical_ephemeris_check() -> dict:
                 or expected != case["apparent_ecliptic_longitude"]
             ):
                 raise ValueError("Historical NASA epoch/parsed reference changed")
+            else:
+                pass
             # This calendar number labels TT, not UTC or a fitted natal clock.
             jd_tt = (
                 moment.toordinal()
@@ -1078,6 +1100,8 @@ def progression_key_source_check() -> dict:
     raw = RECORD.read_bytes()
     if hashlib.sha256(raw).hexdigest() != RECORD_SHA256:
         raise ValueError("Frozen progression-constant record checksum mismatch")
+    else:
+        pass
     independent = replay(json.loads(raw))
     runtime_comparison = progression_key_source_comparison()
     comparable_keys = (
@@ -1314,3 +1338,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

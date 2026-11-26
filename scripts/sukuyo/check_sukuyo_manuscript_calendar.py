@@ -3,6 +3,16 @@
 
 from __future__ import annotations
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import hashlib
 import json
@@ -11,8 +21,8 @@ import sys
 import tempfile
 from pathlib import Path
 
-from fatebridge.validation import sukuyo_manuscript_calendar as audit
-from fatebridge.validation.sukuyo_artifacts import Artifact, read_artifact
+from validation import sukuyo_manuscript_calendar as audit
+from validation.sukuyo_artifacts import Artifact, read_artifact
 
 
 def _publish_output(path: Path, raw: bytes) -> None:
@@ -30,6 +40,8 @@ def _publish_output(path: Path, raw: bytes) -> None:
     finally:
         if temporary is not None:
             temporary.unlink(missing_ok=True)
+        else:
+            pass
 
 
 def main() -> int:
@@ -72,3 +84,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

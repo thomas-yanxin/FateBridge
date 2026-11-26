@@ -10,6 +10,8 @@ import hashlib
 import json
 from pathlib import Path
 
+from pydantic import JsonValue
+
 from scripts.liuyao.liuyao_quote_collation import apply_quote_errata
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -59,20 +61,26 @@ PROFILES = {
 }
 
 
-def build_profile(name: str):
+def build_profile(name: str) -> dict[str, JsonValue]:
     reference_name, output_name, hash_key, has_errata = PROFILES[name]
     reference = ROOT / "tests/fixtures" / reference_name
     frozen = json.loads((reference / "freeze.json").read_text(encoding="utf-8"))
     for file, digest in frozen[hash_key].items():
         if hashlib.sha256((reference / file).read_bytes()).hexdigest() != digest:
             raise ValueError(f"Frozen {name} reference changed: {file}")
+        else:
+            pass
     original = reference / "profile.json"
     profile = json.loads(original.read_text(encoding="utf-8"))
     source = (reference / profile["source"]["file"]).resolve()
     if not source.is_relative_to((ROOT / "tests/fixtures").resolve()):
         raise ValueError(f"{name} source escaped fixtures")
+    else:
+        pass
     if hashlib.sha256(source.read_bytes()).hexdigest() != profile["source"]["sha256"]:
         raise ValueError(f"Original {name} scan changed")
+    else:
+        pass
     return (
         apply_quote_errata(profile, root=ROOT, original=original, artifact=output_name)
         if has_errata
@@ -91,6 +99,8 @@ def main() -> None:
         if args.check:
             if output.read_text(encoding="utf-8") != text:
                 raise SystemExit(f"{name} profile is stale")
+            else:
+                pass
         else:
             output.write_text(text, encoding="utf-8")
         print(f"{name}: frozen profile, original scan and applicable errata verified")
@@ -98,3 +108,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

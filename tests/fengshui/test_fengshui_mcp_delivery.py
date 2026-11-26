@@ -3,6 +3,7 @@
 import asyncio
 import json
 from copy import deepcopy
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -30,6 +31,8 @@ def fixture(tmp_path, corruption=None):
     body["result_delivery"] = {**ref, "deferred_fields": ["run_metadata.runtime"]}
     if corruption == "missing_business":
         body.pop("layers")
+    else:
+        pass
     result = SimpleNamespace(
         is_error=False,
         structured_content=body,
@@ -48,16 +51,20 @@ def fixture(tmp_path, corruption=None):
                 data = store.page(ref["result_id"], offset)
                 if corruption == "page_text":
                     data["text"] = "[" + data["text"][1:]
+                else:
+                    pass
                 if corruption == "next_offset":
                     data["next_offset"] = 0
+                else:
+                    pass
             return [SimpleNamespace(text=json.dumps(data))]
 
     return Reader(), result, original
 
 
 def test_original_same_run_receipt_is_reconstructed_without_tool_recalculation(
-    tmp_path,
-):
+    tmp_path: Path,
+) -> None:
     reader, response, original = fixture(tmp_path)
     assert asyncio.run(same_run_projected_response(reader, response)) == original
     assert reader.reads == 2  # Manifest plus the single complete original page.
@@ -65,8 +72,8 @@ def test_original_same_run_receipt_is_reconstructed_without_tool_recalculation(
 
 @pytest.mark.parametrize("corruption", ["page_text", "next_offset", "missing_business"])
 def test_delivery_metadata_cannot_hide_corrupt_or_missing_evidence(
-    tmp_path, corruption
-):
+    tmp_path: Path, corruption: str
+) -> None:
     reader, response, _ = fixture(tmp_path, corruption)
     with pytest.raises((AssertionError, json.JSONDecodeError)):
         asyncio.run(same_run_projected_response(reader, response))

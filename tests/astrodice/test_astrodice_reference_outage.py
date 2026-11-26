@@ -12,7 +12,9 @@ FIXTURE = (
 )
 
 
-def test_frozen_source_outage_retains_every_planned_probe_without_comparing_candidate():
+def test_frozen_source_outage_retains_every_planned_probe_without_comparing_candidate() -> (
+    None
+):
     result = replay(
         FIXTURE / "protocol.json",
         FIXTURE / "reference.json",

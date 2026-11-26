@@ -1,13 +1,14 @@
 """Installed Human Design data readiness, distinct from accuracy acceptance."""
 
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import pytest
 
 from fatebridge import fetch_ephe
 from fatebridge.core import ephemeris_installation as install
 from fatebridge.core import ephemeris_runtime
-from fatebridge.core.human_design_cycles import HORIZON_DAYS
+from fatebridge.core.human_design.human_design_cycles import HORIZON_DAYS
 from fatebridge.core.requests.human_design import HumanDesignRequest
 from tests.fixtures.ephemeris_manifest import manifest_for_payloads
 
@@ -50,7 +51,9 @@ def profile(tmp_path, monkeypatch):
     return payloads, calls
 
 
-def test_profile_covers_public_birth_extrema_design_and_optional_cycle_horizon():
+def test_profile_covers_public_birth_extrema_design_and_optional_cycle_horizon() -> (
+    None
+):
     schema = HumanDesignRequest.model_json_schema()["properties"]
     # Account conservatively for any legal civil UTC offset, the uncertainty
     # interval, and the actual existing Design search bracket/horizon.
@@ -81,7 +84,9 @@ def test_profile_covers_public_birth_extrema_design_and_optional_cycle_horizon()
     assert len(install.HUMAN_DESIGN_FILES) == 9
 
 
-def test_profile_acquires_all_nine_files_and_cache_is_discovered(profile, capsys):
+def test_profile_acquires_all_nine_files_and_cache_is_discovered(
+    profile, capsys: pytest.CaptureFixture[str]
+) -> None:
     _, calls = profile
     directory = install.user_ephemeris_dir()
     assert not directory.exists()
@@ -101,13 +106,17 @@ def test_profile_acquires_all_nine_files_and_cache_is_discovered(profile, capsys
 
 
 @pytest.mark.parametrize("missing", install.HUMAN_DESIGN_FILES)
-def test_each_missing_file_keeps_full_human_design_profile_incomplete(profile, missing):
+def test_each_missing_file_keeps_full_human_design_profile_incomplete(
+    profile, missing
+) -> None:
     payloads, _ = profile
     directory = install.user_ephemeris_dir()
     directory.mkdir(parents=True)
     for name, data in payloads.items():
         if name != missing:
             (directory / name).write_bytes(data)
+        else:
+            pass
     status = install.human_design_file_status(directory)
     assert not status["all_files_verified"]
     assert not status["files"][missing]["verified"]
@@ -119,7 +128,7 @@ def test_each_missing_file_keeps_full_human_design_profile_incomplete(profile, m
     )
 
 
-def test_existing_partial_checkout_is_completed_in_place(profile):
+def test_existing_partial_checkout_is_completed_in_place(profile) -> None:
     payloads, calls = profile
     directory = fetch_ephe.default_dest()
     directory.mkdir(parents=True)
@@ -132,7 +141,7 @@ def test_existing_partial_checkout_is_completed_in_place(profile):
     assert not install.user_ephemeris_dir().exists()
 
 
-def test_other_profile_does_not_claim_human_design_ready(profile):
+def test_other_profile_does_not_claim_human_design_ready(profile) -> None:
     assert fetch_ephe.main(["--profile", "fengshui_calendar"]) == 0
     directory = install.user_ephemeris_dir()
     assert install.fengshui_file_status(directory)["all_files_verified"]
@@ -143,8 +152,11 @@ def test_other_profile_does_not_claim_human_design_ready(profile):
 
 
 def test_explicit_environment_and_project_precedence_are_preserved(
-    profile, monkeypatch, tmp_path, capsys
-):
+    profile,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     assert fetch_ephe.main(["--profile", "human_design"]) == 0
     capsys.readouterr()
     explicit = tmp_path / "empty-operator-path"
@@ -156,8 +168,8 @@ def test_explicit_environment_and_project_precedence_are_preserved(
 
 
 def test_doctor_is_read_only_reports_profile_and_does_not_certify_accuracy(
-    profile, monkeypatch
-):
+    profile, monkeypatch: pytest.MonkeyPatch
+) -> None:
     from fatebridge.core.astro import runtime
     from fatebridge.diagnostics import diagnose
 
@@ -177,8 +189,8 @@ def test_doctor_is_read_only_reports_profile_and_does_not_certify_accuracy(
 
 
 def test_bad_download_and_offline_verification_leave_failure_visible(
-    profile, monkeypatch, capsys
-):
+    profile, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     monkeypatch.setattr(
         fetch_ephe, "_download", lambda *args, **kwargs: b"<html>error</html>"
     )
@@ -191,7 +203,7 @@ def test_bad_download_and_offline_verification_leave_failure_visible(
     assert not install.user_ephemeris_dir().exists()
 
 
-def test_profile_modes_remain_mutually_exclusive(profile):
+def test_profile_modes_remain_mutually_exclusive(profile) -> None:
     for option, values in [
         ("--years", ["2000"]),
         ("--year-range", ["1800", "2399"]),

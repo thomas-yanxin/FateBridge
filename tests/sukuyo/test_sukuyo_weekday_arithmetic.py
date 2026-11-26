@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_weekday import (
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_weekday import (
     civil_weekday,
     classical_weekday_arithmetic,
 )
@@ -19,7 +19,7 @@ FIXTURE = json.loads(
 )
 
 
-def test_entered_months_are_added_before_intercalation_not_after_it():
+def test_entered_months_are_added_before_intercalation_not_after_it() -> None:
     # Literal order: multiply years by 12, ADD entered months, multiply by 7.
     # A zero-month worked example cannot catch this 30-day error.
     result = classical_weekday_arithmetic(2, 9, 1)
@@ -31,7 +31,7 @@ def test_entered_months_are_added_before_intercalation_not_after_it():
     assert result["luminary"] == "木"
 
 
-def test_printed_2603_year_example_only_controls_its_shared_integer_prefix():
+def test_printed_2603_year_example_only_controls_its_shared_integer_prefix() -> None:
     example = FIXTURE["printed_recalculation"]
     trace = classical_weekday_arithmetic(example["elapsed_years"], 0, 0)["trace"]
     assert {key: trace[key] for key in example["printed_integer_steps"]} == example[
@@ -52,8 +52,8 @@ def test_printed_2603_year_example_only_controls_its_shared_integer_prefix():
     [(0, 0, 0), (1, 0, 1), (2, 9, 1), (1501, 4, 5), (2**60 + 13, 12, 30)],
 )
 def test_exact_division_order_and_remainders_without_floating_point(
-    years, months, days
-):
+    years, months: int, days: int
+) -> None:
     # Independent rational formulation of the transcribed formula, not a
     # production-output fixture or an independent historical observation.
     count = years * 12 + months
@@ -75,7 +75,7 @@ def test_exact_division_order_and_remainders_without_floating_point(
     assert not result["later_fractional_recalculation_applied"]
 
 
-def test_count_one_and_zero_remainder_are_not_zero_based_moon_counts():
+def test_count_one_and_zero_remainder_are_not_zero_based_moon_counts() -> None:
     outputs = [classical_weekday_arithmetic(0, 0, day) for day in range(1, 8)]
     assert [row["luminary"] for row in outputs] == list("月火水木金土日")
     assert outputs[0]["sexagenary_label"] == "甲辰"
@@ -97,15 +97,15 @@ def test_count_one_and_zero_remainder_are_not_zero_based_moon_counts():
     ],
 )
 def test_elapsed_count_inputs_cannot_imply_a_civil_date_or_invent_missing_counts(
-    position, value
-):
+    position: int, value
+) -> None:
     counts = [1501, 4, 5]
     counts[position] = value
     with pytest.raises(ValueError):
         classical_weekday_arithmetic(*counts)
 
 
-def test_returned_trace_does_not_mutate_the_next_source_calculation():
+def test_returned_trace_does_not_mutate_the_next_source_calculation() -> None:
     result = classical_weekday_arithmetic(1501, 4, 5)
     expected = result["trace"].copy()
     result["trace"]["accumulated_days"] = -999
@@ -113,7 +113,7 @@ def test_returned_trace_does_not_mutate_the_next_source_calculation():
 
 
 @pytest.mark.parametrize("zone", ["UTC+08:00", "UTC+09:00"])
-def test_primary_civil_weekday_stays_separate_from_manuscript_counts(zone):
+def test_primary_civil_weekday_stays_separate_from_manuscript_counts(zone: str) -> None:
     result = civil_weekday("0840-02-11", zone)
     assert result["luminary"] == "土"
     assert not result["classical_daybreak_boundary_acceptance"]
@@ -121,7 +121,7 @@ def test_primary_civil_weekday_stays_separate_from_manuscript_counts(zone):
     assert day_evidence(context)["weekday"] == civil_weekday("2025-02-07", "UTC+08:00")
 
 
-def test_unknown_host_boundary_cannot_silently_claim_utc08():
+def test_unknown_host_boundary_cannot_silently_claim_utc08() -> None:
     with pytest.raises(ValueError):
         civil_weekday("2025-02-07", "UTC+10:00")
     context = calendar_mansion("2025-02-07", "12:00:00", "+08:00")
@@ -130,7 +130,9 @@ def test_unknown_host_boundary_cannot_silently_claim_utc08():
         day_evidence(context)
 
 
-def test_primary_source_control_does_not_count_a_later_formula_as_the_general_rule():
+def test_primary_source_control_does_not_count_a_later_formula_as_the_general_rule() -> (
+    None
+):
     from scripts.sukuyo.check_sukuyo_weekday_arithmetic import verify_arithmetic
 
     report = verify_arithmetic()
@@ -141,7 +143,7 @@ def test_primary_source_control_does_not_count_a_later_formula_as_the_general_ru
     assert not report["separate_recalculation"]["same_full_algorithm_claimed"]
 
 
-def test_manuscript_capture_must_match_its_fingerprint(tmp_path):
+def test_manuscript_capture_must_match_its_fingerprint(tmp_path: Path) -> None:
     from scripts.sukuyo.check_sukuyo_weekday_arithmetic import verify_arithmetic
 
     (tmp_path / FIXTURE["captured_pages"][0]["file"]).write_bytes(b"altered image")

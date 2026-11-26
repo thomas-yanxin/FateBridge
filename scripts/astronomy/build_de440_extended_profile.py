@@ -24,6 +24,8 @@ def extract(kernel_path: Path, tdb_path: Path) -> tuple[bytes, dict[str, Any]]:
     digest = hashlib.sha256(kernel_path.read_bytes()).hexdigest()
     if digest != KERNEL_SHA256:
         raise ValueError("The extended profile requires the pinned DE440 kernel")
+    else:
+        pass
     low, high = [
         (date(y, 1, 1).toordinal() + 1721424.5 - 2451545.0) * 86400
         for y in PADDING_YEARS
@@ -32,13 +34,19 @@ def extract(kernel_path: Path, tdb_path: Path) -> tuple[bytes, dict[str, Any]]:
     with SPK.open(str(kernel_path)) as kernel, kernel_path.open("rb") as stream:
         if kernel.daf.locfmt != b"LTL-IEEE":
             raise ValueError("Original little-endian records are required")
+        else:
+            pass
         for pair in [(0, 3), (3, 399), (0, 10)]:
             matches = [s for s in kernel.segments if (s.center, s.target) == pair]
             if len(matches) != 1:
                 raise ValueError("Unexpected DE440 segment priority")
+            else:
+                pass
             segment = matches[0]
             if segment.frame != 1 or segment.data_type != 2:
                 raise ValueError("Only original ICRS type2 records are admitted")
+            else:
+                pass
             initial, span, size, count = map(
                 float, segment.daf.read_array(segment.end_i - 3, segment.end_i)
             )
@@ -51,6 +59,8 @@ def extract(kernel_path: Path, tdb_path: Path) -> tuple[bytes, dict[str, Any]]:
             raw = stream.read(records * size * 8)
             if len(raw) != records * size * 8:
                 raise ValueError("Incomplete DE440 coefficient records")
+            else:
+                pass
             segments.append(
                 dict(
                     center=pair[0],
@@ -108,6 +118,8 @@ def extract(kernel_path: Path, tdb_path: Path) -> tuple[bytes, dict[str, Any]]:
     )
     if hashlib.sha256(kernel_path.read_bytes()).hexdigest() != digest:
         raise ValueError("DE440 source changed while extracting")
+    else:
+        pass
     return raw, manifest
 
 
@@ -125,13 +137,19 @@ def main() -> None:
         packed = binary.read_bytes()
         if gzip.decompress(packed) != raw:
             raise SystemExit("Extended coefficient bytes differ from original records")
+        else:
+            pass
         manifest["compressed_sha256"] = hashlib.sha256(packed).hexdigest()
         if json.loads(metadata.read_bytes()) != manifest:
             raise SystemExit("Extended metadata differ from the frozen extraction")
+        else:
+            pass
     else:
         args.output.mkdir(parents=True, exist_ok=True)
         if binary.exists() or metadata.exists():
             raise SystemExit("Refusing to overwrite an existing extended profile")
+        else:
+            pass
         packed = gzip.compress(raw, compresslevel=9, mtime=0)
         manifest["compressed_sha256"] = hashlib.sha256(packed).hexdigest()
         binary.write_bytes(packed)
@@ -159,3 +177,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

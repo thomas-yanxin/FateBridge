@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation.sukuyo_semantic import (
+from validation.sukuyo_semantic import (
     complete_suzhan_calculation_view,
     semantic_calculation_view,
 )
@@ -20,12 +20,12 @@ def prepared():
     return json.loads(FIXTURE.read_bytes())
 
 
-def test_complete_view_matches_entire_frozen_literal_without_hiding_the_sky():
+def test_complete_view_matches_entire_frozen_literal_without_hiding_the_sky() -> None:
     ref = prepared()
     assert complete_suzhan_calculation_view(ref["input"]) == ref["expected_complete"]
 
 
-def test_existing_calendar_only_view_remains_explicitly_separate():
+def test_existing_calendar_only_view_remains_explicitly_separate() -> None:
     ref = prepared()
     assert (
         semantic_calculation_view("suzhan", ref["input"])
@@ -35,7 +35,7 @@ def test_existing_calendar_only_view_remains_explicitly_separate():
     assert full["chart"]["objects"][0]["su28"] != full["sukuyo"]["day_mansion"]
 
 
-def test_future_adverse_science_and_nested_summary_are_retained():
+def test_future_adverse_science_and_nested_summary_are_retained() -> None:
     source = prepared()["input"]
     source["future_sky_evidence"] = {"rejected": [False, None], "summary": "unresolved"}
     result = complete_suzhan_calculation_view(source)
@@ -45,7 +45,7 @@ def test_future_adverse_science_and_nested_summary_are_retained():
     assert result["sukuyo"]["calendar"]["complete"] is False
 
 
-def test_mutating_review_copy_cannot_modify_its_raw_evidence():
+def test_mutating_review_copy_cannot_modify_its_raw_evidence() -> None:
     source = prepared()["input"]
     before = deepcopy(source)
     result = complete_suzhan_calculation_view(source)
@@ -56,14 +56,14 @@ def test_mutating_review_copy_cannot_modify_its_raw_evidence():
 
 
 @pytest.mark.parametrize("key", prepared()["required_actual_top_keys"])
-def test_missing_complete_domain_branch_is_not_silently_accepted(key):
+def test_missing_complete_domain_branch_is_not_silently_accepted(key) -> None:
     source = prepared()["input"]
     del source[key]
     with pytest.raises(KeyError):
         complete_suzhan_calculation_view(source)
 
 
-def test_declared_disabled_sky_keeps_null_and_available_planet_data():
+def test_declared_disabled_sky_keeps_null_and_available_planet_data() -> None:
     source = prepared()["input"]
     source["astronomy"] = None
     source["params"]["su28AstronomicalAccuracy"] = "not_computed"
@@ -74,7 +74,7 @@ def test_declared_disabled_sky_keeps_null_and_available_planet_data():
     assert result["chart"]["objects"] == [{"id": "Moon", "longitude": 123.0}]
 
 
-def test_native_text_is_removed_recursively_without_removing_other_assertions():
+def test_native_text_is_removed_recursively_without_removing_other_assertions() -> None:
     source = prepared()["input"]
     source["chart"]["objects"].append(
         {"id": "future", "reading_text": "NATIVE-DEEP", "claim": {"unresolved": True}}

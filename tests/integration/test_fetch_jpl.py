@@ -2,7 +2,9 @@
 
 import hashlib
 import io
+import os
 import ssl
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -10,13 +12,10 @@ import pytest
 from fatebridge import fetch_jpl as fetch
 from fatebridge.core.jpl_ephemeris import jpl_header
 
-FIXTURE = (
-    Path(__file__).parents[1]
-    / "data/astrodice/reference_sets/study-lunar-split/diagnostic-kernels/case-02.eph"
-)
+FIXTURE = Path(__file__).parents[1] / "fixtures/human-design-de441-j2000.eph"
 
 
-def spec():
+def kernel_fixture() -> tuple[fetch._KernelSpec, bytes]:
     raw = FIXTURE.read_bytes()
     header = jpl_header(FIXTURE)
     return (
@@ -33,7 +32,9 @@ def spec():
 
 
 class Response(io.BytesIO):
-    def __init__(self, raw, status=200, headers=None):
+    def __init__(
+        self, raw: bytes, status: int = 200, headers: dict[str, str] | None = None
+    ) -> None:
         super().__init__(raw)
         self.status = status
         self.headers = (
@@ -42,9 +43,9 @@ class Response(io.BytesIO):
 
 
 def test_streamed_file_is_verified_and_a_valid_existing_file_needs_no_download(
-    tmp_path, monkeypatch
-):
-    selected, raw = spec()
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    selected, raw = kernel_fixture()
     calls = []
 
     def open_request(request, **kwargs):
@@ -75,8 +76,10 @@ def test_streamed_file_is_verified_and_a_valid_existing_file_needs_no_download(
     "problem",
     ["checksum", "truncated", "oversized", "partial_response", "content_length"],
 )
-def test_bad_download_never_becomes_an_installed_kernel(tmp_path, monkeypatch, problem):
-    selected, raw = spec()
+def test_bad_download_never_becomes_an_installed_kernel(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, problem: str
+) -> None:
+    selected, raw = kernel_fixture()
     body, status, headers = raw, 200, None
     if problem == "checksum":
         body = raw[:-1] + bytes([raw[-1] ^ 1])
@@ -101,9 +104,9 @@ def test_bad_download_never_becomes_an_installed_kernel(tmp_path, monkeypatch, p
 
 
 def test_existing_invalid_file_is_preserved_and_not_downloaded_over(
-    tmp_path, monkeypatch
-):
-    selected, _ = spec()
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    selected, _ = kernel_fixture()
     target = tmp_path / selected.filename
     target.write_bytes(b"original invalid file")
     monkeypatch.setattr(
@@ -114,12 +117,15 @@ def test_existing_invalid_file_is_preserved_and_not_downloaded_over(
     assert target.read_bytes() == b"original invalid file"
 
 
-def test_concurrent_target_creation_is_not_overwritten(tmp_path, monkeypatch):
-    selected, raw = spec()
+def test_concurrent_target_creation_is_not_overwritten(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    selected, raw = kernel_fixture()
     monkeypatch.setattr(fetch.urllib.request, "urlopen", lambda *a, **k: Response(raw))
     target = tmp_path / selected.filename
 
-    def concurrent_change(done, total):
+    def concurrent_change(received_bytes: int, total_bytes: int) -> None:
+        assert received_bytes == total_bytes == len(raw)
         target.write_bytes(b"concurrent owner's file")
 
     with pytest.raises(ValueError):
@@ -127,18 +133,96 @@ def test_concurrent_target_creation_is_not_overwritten(tmp_path, monkeypatch):
     assert target.read_bytes() == b"concurrent owner's file"
 
 
-def test_tls_setup_failure_closes_and_removes_staging_file(tmp_path, monkeypatch):
-    selected, _ = spec()
+def test_tls_setup_failure_closes_and_removes_staging_file(tmp_path: Path) -> None:
+    selected, _ = kernel_fixture()
     with pytest.raises(OSError):
         fetch._acquire(tmp_path, selected, ca_file=tmp_path / "missing-ca-file")
     assert not list(tmp_path.glob(".de441-download-*"))
 
 
-def test_verify_only_cli_never_calls_the_acquirer(tmp_path, monkeypatch):
-    seen = []
-    monkeypatch.setattr(fetch, "verify_de441", lambda path: seen.append(path) or {})
+@pytest.mark.parametrize("file_bytes, loadable", [(255, True), (256, False)])
+def test_verify_only_cli_never_calls_the_acquirer(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    file_bytes: int,
+    loadable: bool,
+) -> None:
+    selected, raw = kernel_fixture()
+    selected = replace(selected, filename=fetch.DE441.filename)
+    monkeypatch.setattr(fetch, "DE441", selected)
+    fixed_bytes = len(os.fsencode(tmp_path / "d" / selected.filename)) - 1
+    destination = tmp_path / ("d" * (file_bytes - fixed_bytes))
+    destination.mkdir()
+    target = destination / selected.filename
+    target.write_bytes(raw)
     monkeypatch.setattr(
         fetch, "fetch_de441", lambda *a, **k: pytest.fail("acquisition called")
     )
-    assert fetch.main(["--verify-only", "--dest", str(tmp_path)]) == 0
-    assert seen == [tmp_path / fetch.DE441.filename]
+
+    assert fetch.main(["--verify-only", "--dest", str(destination)]) == 0
+    output = capsys.readouterr().out
+    assert f"Full content pin verified: {target}" in output
+    assert ("Select explicitly with SE_EPHE_PATH=" in output) is loadable
+    assert ("Copy the verified file" in output) is not loadable
+    assert target.read_bytes() == raw
+
+
+@pytest.mark.parametrize("prefix", ["", "生"])
+@pytest.mark.parametrize("file_bytes, accepted", [(255, True), (256, False)])
+def test_full_cli_acquisition_respects_native_file_path_boundary(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    prefix: str,
+    file_bytes: int,
+    accepted: bool,
+) -> None:
+    selected, raw = kernel_fixture()
+    selected = replace(selected, filename=fetch.DE441.filename)
+    monkeypatch.setattr(fetch, "DE441", selected)
+    fixed_bytes = len(os.fsencode(tmp_path / "d" / selected.filename)) - 1
+    padding = file_bytes - fixed_bytes - len(os.fsencode(prefix))
+    destination = tmp_path / (prefix + "d" * padding)
+    target = destination / selected.filename
+    assert len(os.fsencode(target)) == file_bytes
+    calls = []
+
+    def reply(request, **kwargs):
+        calls.append(request.full_url)
+        return Response(raw)
+
+    monkeypatch.setattr(fetch.urllib.request, "urlopen", reply)
+    assert fetch.main(["--dest", str(destination)]) == (0 if accepted else 1)
+    assert calls == ([selected.url] if accepted else [])
+    if accepted:
+        assert target.read_bytes() == raw
+    else:
+        assert not destination.exists()
+
+
+@pytest.mark.parametrize(
+    "delimiter",
+    [
+        pytest.param(";", id="semicolon"),
+        pytest.param("\r", id="carriage-return"),
+        pytest.param("\n", id="line-feed"),
+        pytest.param(
+            ":",
+            id="colon",
+            marks=pytest.mark.skipif(os.pathsep != ":", reason="Unix delimiter"),
+        ),
+    ],
+)
+def test_full_cli_rejects_nonliteral_swiss_install_directory(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    delimiter: str,
+) -> None:
+    destination = tmp_path / f"left{delimiter}right"
+    monkeypatch.setattr(
+        fetch.urllib.request, "urlopen", lambda *a, **k: pytest.fail("network called")
+    )
+    assert fetch.main(["--dest", str(destination)]) == 1
+    assert "search-path delimiters" in capsys.readouterr().err
+    assert not destination.exists()

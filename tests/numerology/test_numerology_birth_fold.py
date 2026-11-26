@@ -10,11 +10,18 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.almanac import get_solar_terms_for_year
-from fatebridge.core.canping_timing import APPENDIX, CONTINUOUS, luck_timeline
+from fatebridge.core.contracts.output_numerology import (
+    NumerologyBirthClock,
+    NumerologyEvidence,
+)
 from fatebridge.core.local_techniques.canping import build_canping_result
 from fatebridge.core.local_techniques.heluo import build_heluo_result
-from fatebridge.core.numerology_inputs import BIRTH_OFFSET_POLICY_ID
-from fatebridge.core.output_numerology import NumerologyBirthClock, NumerologyEvidence
+from fatebridge.core.numerology.canping_timing import (
+    APPENDIX,
+    CONTINUOUS,
+    luck_timeline,
+)
+from fatebridge.core.numerology.numerology_inputs import BIRTH_OFFSET_POLICY_ID
 from fatebridge.core.requests.divination import CanpingRequest, HeluoRequest
 from fatebridge.utils.timezones import parse_timezone_name
 
@@ -36,7 +43,7 @@ def utc(text):
     return datetime.fromisoformat(text).astimezone(timezone.utc)
 
 
-def test_preimplementation_reference_and_reused_primary_sources():
+def test_preimplementation_reference_and_reused_primary_sources() -> None:
     assert REFERENCE["frozen_before_implementation"]
     assert not REFERENCE["whole_history_accuracy_established"]
     for source in REFERENCE["source_files"]:
@@ -58,7 +65,9 @@ def test_preimplementation_reference_and_reused_primary_sources():
 @pytest.mark.parametrize(
     "case", REFERENCE["cases"], ids=lambda c: c["birth_utc_offset"]
 )
-def test_selected_occurrence_straddles_the_independent_term_anchor(model, build, case):
+def test_selected_occurrence_straddles_the_independent_term_anchor(
+    model, build, case
+) -> None:
     result = build(
         **model(**BASE, birth_utc_offset=case["birth_utc_offset"]).model_dump()
     )
@@ -95,9 +104,11 @@ def test_selected_occurrence_straddles_the_independent_term_anchor(model, build,
         assert timing["timezone"] == BASE["zone"]
         for a, b in zip(result["dayun"], result["dayun"][1:]):
             assert utc(a["end_at"]) == utc(b["start_at"])
+    else:
+        pass
 
 
-def test_same_gu_natal_numbers_do_not_erase_different_month_pillar_luck():
+def test_same_gu_natal_numbers_do_not_erase_different_month_pillar_luck() -> None:
     a, b = [
         build_canping_result(**BASE, birth_utc_offset=c["birth_utc_offset"])
         for c in REFERENCE["cases"]
@@ -113,7 +124,7 @@ def test_same_gu_natal_numbers_do_not_erase_different_month_pillar_luck():
     assert ha["chart"]["di"] != hb["chart"]["di"]
 
 
-def test_birth_offset_is_not_a_fixed_zone_for_future_boundaries():
+def test_birth_offset_is_not_a_fixed_zone_for_future_boundaries() -> None:
     named = build_canping_result(**BASE, birth_utc_offset="-04:00")
     fixed = build_canping_result(**{**BASE, "zone": "-04:00"})
     assert (
@@ -130,7 +141,7 @@ def test_birth_offset_is_not_a_fixed_zone_for_future_boundaries():
 
 
 @pytest.mark.parametrize("method", [APPENDIX, CONTINUOUS])
-def test_initial_luck_boundary_cannot_precede_confirmed_second_birth(method):
+def test_initial_luck_boundary_cannot_precede_confirmed_second_birth(method) -> None:
     birth = utc("2021-11-07T05:30:00+00:00").astimezone(
         parse_timezone_name(BASE["zone"])
     )
@@ -139,6 +150,8 @@ def test_initial_luck_boundary_cannot_precede_confirmed_second_birth(method):
     if method == APPENDIX:
         assert timeline["start_at"] == birth.isoformat()
         assert timeline["dst_policy"] == "fold_0_gap_forward_initial_birth_preserved"
+    else:
+        pass
     # The birth occurrence is not blindly carried into every later anniversary.
     for row in timeline["periods"]:
         assert utc(row["start_at"]) < utc(row["end_at"])
@@ -147,8 +160,8 @@ def test_initial_luck_boundary_cannot_precede_confirmed_second_birth(method):
 @pytest.mark.parametrize("model,build", PAIRS)
 @pytest.mark.parametrize("offset", [None, "-03:00"])
 def test_unknown_or_region_inconsistent_offset_never_selects_a_fold(
-    model, build, offset
-):
+    model, build, offset: str | None
+) -> None:
     request = model(**BASE, birth_utc_offset=offset)
     with pytest.raises(ValueError):
         build(**request.model_dump())
@@ -157,8 +170,8 @@ def test_unknown_or_region_inconsistent_offset_never_selects_a_fold(
 @pytest.mark.parametrize("model,build", PAIRS)
 @pytest.mark.parametrize("offset", ["+08:00", "+09:00"])
 def test_confirmed_offset_cannot_make_a_nonexistent_birth_clock_valid(
-    model, build, offset
-):
+    model, build, offset: str
+) -> None:
     args = {
         **BASE,
         "date": "1990-04-15",
@@ -174,7 +187,9 @@ def test_confirmed_offset_cannot_make_a_nonexistent_birth_clock_valid(
 @pytest.mark.parametrize(
     "offset", ["", "未知", "-5:00", "+15:00:01", "+08:60", True, 8]
 )
-def test_invalid_offset_never_turns_into_a_default(model, build, offset):
+def test_invalid_offset_never_turns_into_a_default(
+    model, build, offset: bool | int | str
+) -> None:
     if offset == "+15:00:01":
         # Valid offset syntax, still invalid for this New York birth clock.
         request = model(**BASE, birth_utc_offset=offset)
@@ -190,7 +205,7 @@ def test_invalid_offset_never_turns_into_a_default(model, build, offset):
 @pytest.mark.parametrize("model,build", PAIRS)
 def test_explicit_fixed_offset_preserves_seconds_and_supplied_clock_precision(
     model, build
-):
+) -> None:
     args = {
         **BASE,
         "zone": "+00:00:30",
@@ -205,7 +220,9 @@ def test_explicit_fixed_offset_preserves_seconds_and_supplied_clock_precision(
     assert result["input_normalized"]["birth_utc_offset"] == "+00:00:30"
 
 
-def test_selected_birth_receipt_allows_projection_but_rejects_internal_conflicts():
+def test_selected_birth_receipt_allows_projection_but_rejects_internal_conflicts() -> (
+    None
+):
     clock = build_heluo_result(**BASE, birth_utc_offset="-05:00")[
         "numerology_evidence"
     ]["birth_clock"]
@@ -226,8 +243,8 @@ def test_selected_birth_receipt_allows_projection_but_rejects_internal_conflicts
 @pytest.mark.parametrize("model,build", PAIRS)
 @pytest.mark.parametrize("offset", ["-04:00", "-05:00"])
 def test_solar_label_uses_the_confirmed_instant_without_second_dst_conversion(
-    model, build, offset
-):
+    model, build, offset: str
+) -> None:
     args = {**BASE, "lon": "-82.3667", "use_true_solar_time": True}
     named = build(**model(**args, birth_utc_offset=offset).model_dump())
     fixed = build(**model(**{**args, "zone": offset}).model_dump())

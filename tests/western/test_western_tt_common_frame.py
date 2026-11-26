@@ -20,7 +20,7 @@ from scripts.western.audit_western_tt_common_frame import (
 from tests.western.test_western_tt_events import refuse_ut1
 
 
-def test_complete_corpus_identity_and_mixed_point_controls_are_preserved():
+def test_complete_corpus_identity_and_mixed_point_controls_are_preserved() -> None:
     plan, reference = validate_corpus()
     assert plan["position_line_arcseconds"] == 0.02
     assert plan["native_reference_targets"]["Mars"] == 4
@@ -69,6 +69,8 @@ def pinned_ephemeris(monkeypatch):
             pytest.fail(
                 "Pinned Swiss1800 segments required; set FATEBRIDGE_TEST_EPHE_DIR"
             )
+        else:
+            pass
         verify_ephemeris_bytes(name, (directory / name).read_bytes(), manifest)
     with runtime.preserve_ephemeris_path():
         monkeypatch.setenv("SE_EPHE_PATH", str(directory))
@@ -77,8 +79,8 @@ def pinned_ephemeris(monkeypatch):
 
 @pytest.mark.parametrize("case_id", ["0", "1"])
 def test_actual_published_frame_at_sealed_daily_controls(
-    case_id, pinned_ephemeris, monkeypatch
-):
+    case_id: str, pinned_ephemeris, monkeypatch: pytest.MonkeyPatch
+) -> None:
     plan, reference = validate_corpus()
     case = next(c for c in reference["cases"] if c["case_id"] == case_id)
     refuse_ut1(monkeypatch)

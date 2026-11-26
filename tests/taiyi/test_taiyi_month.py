@@ -4,8 +4,8 @@ import asyncio
 import hashlib
 import json
 import shutil
-from dataclasses import replace
-from datetime import datetime, timedelta
+from datetime import datetime
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -16,20 +16,28 @@ from fatebridge.application.examples import suggested_fields
 from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
 from fatebridge.core.almanac import get_solar_terms_for_year
+from fatebridge.core.contracts.output_chinese import Taiyi
+from fatebridge.core.metaphysics.seed import build_metaphysics_seed
 from fatebridge.core.metaphysics.taiyi import build_taiyi_board
+from fatebridge.core.metaphysics.taiyi_gates import (
+    SECTORS,
+    check_three_gates,
+    gate_frame,
+)
 from fatebridge.core.metaphysics.taiyi_month import KEY_MONTH_PROFILE, key_month_origin
 from fatebridge.core.metaphysics.taiyi_year import cyclic_core
-from fatebridge.core.output_chinese import Taiyi
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_gate_sectors import audit as sector_audit
 from scripts.taiyi.audit_taiyi_month import CORPUS, audit, public_case
-from tests.taiyi.test_taiyi_periods import seed_at
-from tests.taiyi.test_taiyi_transports import _same_run_payload
+from tests.support.transports import SPECS, call_calculation
+from tests.unit_test.fixtures.taiyi import same_run_payload, seed_at
 
 
-def test_all_month_requirements_keep_arithmetic_disagreements_and_incomplete_chart_label():
+def test_all_month_requirements_keep_arithmetic_disagreements_and_incomplete_chart_label() -> (
+    None
+):
     report = audit()
     assert (
         report["required_observations"],
@@ -52,12 +60,7 @@ def test_all_month_requirements_keep_arithmetic_disagreements_and_incomplete_cha
     assert report["full_ancient_calendar_reconstructed"] is False
 
 
-def test_all_sixteen_gate_sectors_include_both_branches_of_each_corner():
-    from fatebridge.core.metaphysics.taiyi_gates import (
-        SECTORS,
-        check_three_gates,
-        gate_frame,
-    )
+def test_all_sixteen_gate_sectors_include_both_branches_of_each_corner() -> None:
 
     report = sector_audit()
     assert report["required_observations"] == report["matching_observations"] == 16
@@ -77,8 +80,8 @@ def test_all_sixteen_gate_sectors_include_both_branches_of_each_corner():
     "year,door,satisfied", [(1911, "开", False), (2019, "伤", True)]
 )
 def test_public_year_gate_judgment_uses_source_chen_xunsi_sector_in_both_directions(
-    year, door, satisfied
-):
+    year: int, door: str, satisfied: bool
+) -> None:
     result = calculate_taiyi_analysis(
         analysis_year=year,
         analysis_month=4,
@@ -95,7 +98,9 @@ def test_public_year_gate_judgment_uses_source_chen_xunsi_sector_in_both_directi
 
 
 @pytest.mark.parametrize("year", [1, 724, 1504, 1561, 2026, 9998])
-def test_full_positive_months_align_with_shortcut_on_all_shared_cycles(year):
+def test_full_positive_months_align_with_shortcut_on_all_shared_cycles(
+    year: int,
+) -> None:
     for offset in range(12):
         origin = key_month_origin(year, offset)
         assert origin["accumulation"] > 0
@@ -109,9 +114,13 @@ def test_full_positive_months_align_with_shortcut_on_all_shared_cycles(year):
             assert {k: v for k, v in full.items() if k != "accumulation"} == {
                 k: v for k, v in short.items() if k != "accumulation"
             }
+        else:
+            pass
 
 
-def test_source_example_is_real_public_chain_and_gate_input_cannot_be_chosen_to_fit():
+def test_source_example_is_real_public_chain_and_gate_input_cannot_be_chosen_to_fit() -> (
+    None
+):
     r = public_case()
     b = r["taiyi"]
     assert b["core_board"]["accumulation"] == 121865735
@@ -142,7 +151,7 @@ def test_source_example_is_real_public_chain_and_gate_input_cannot_be_chosen_to_
     Taiyi.model_validate(b)
 
 
-def test_lunar_month_and_selected_jie_month_are_not_conflated():
+def test_lunar_month_and_selected_jie_month_are_not_conflated() -> None:
     yes = public_case()["taiyi"]["calendar_rules"]["month_origin"]["calendar_reference"]
     no = public_case(day=10, month=11)["taiyi"]["calendar_rules"]["month_origin"][
         "calendar_reference"
@@ -154,12 +163,21 @@ def test_lunar_month_and_selected_jie_month_are_not_conflated():
 
 
 @pytest.mark.parametrize("name", ["大雪", "小寒", "立春", "立冬"])
-def test_jie_boundary_adds_one_without_resetting_at_civil_or_nominal_year(name):
+def test_jie_boundary_adds_one_without_resetting_at_civil_or_nominal_year(
+    name: str,
+) -> None:
     t = next(t for t in get_solar_terms_for_year(2026, "UTC") if t.name == name)
+    _, upper = t.point.nominal_calendar_bracket()
+    first = datetime.fromisoformat(upper.isoformat())
     boards = []
-    for delta in (-1, 1):
-        moment = (t.moment + timedelta(microseconds=delta)).replace(tzinfo=None)
-        seed = replace(seed_at(moment, zone="UTC"), input_datetime=moment)
+    for moment in (first - datetime.resolution, first):
+        seed = build_metaphysics_seed(
+            civil=moment,
+            timezone_name="UTC",
+            input_offset_visible=False,
+            longitude=None,
+            use_true_solar_time=False,
+        )
         boards.append(
             build_taiyi_board(
                 seed, "未知", calculation_mode="month", month_profile=KEY_MONTH_PROFILE
@@ -170,13 +188,15 @@ def test_jie_boundary_adds_one_without_resetting_at_civil_or_nominal_year(name):
         - boards[0]["core_board"]["accumulation"]
         == 1
     )
+    assert boards[1]["calendar_rules"]["anchor_name"] == name
+    assert 0 <= boards[1]["calendar_rules"]["seconds_from_anchor"] < 1e-6
     assert (
         boards[0]["calendar_rules"]["counter"]
         == boards[0]["calendar_rules"]["month_origin"]["accumulation"]
     )
 
 
-def test_default_jinjing_corrects_nominal_year_without_switching_profile():
+def test_default_jinjing_corrects_nominal_year_without_switching_profile() -> None:
     kwargs = dict(
         analysis_year=1561,
         analysis_month=10,
@@ -207,8 +227,8 @@ def test_default_jinjing_corrects_nominal_year_without_switching_profile():
     ],
 )
 def test_month_profile_validation_prevents_cross_mode_or_unpublished_methods(
-    mode, profile
-):
+    mode: str, profile
+) -> None:
     with pytest.raises(ValueError, match="month_profile"):
         build_taiyi_board(
             seed_at(datetime(2026, 4, 4, 12)),
@@ -218,7 +238,7 @@ def test_month_profile_validation_prevents_cross_mode_or_unpublished_methods(
         )
 
 
-def test_each_new_month_fact_can_be_strictly_projected_and_typed():
+def test_each_new_month_fact_can_be_strictly_projected_and_typed() -> None:
     b = public_case()["taiyi"]
 
     def leaves(obj, path):
@@ -241,8 +261,8 @@ def test_each_new_month_fact_can_be_strictly_projected_and_typed():
 
 @pytest.mark.parametrize("mode", ["year", "day", "hour"])
 def test_month_profile_wrong_mode_is_rejected_on_all_actual_transports(
-    monkeypatch, capsys, mode
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], mode: str
+) -> None:
     payload = {
         "analysis_year": 2026,
         "analysis_month": 4,
@@ -258,12 +278,14 @@ def test_month_profile_wrong_mode_is_rejected_on_all_actual_transports(
         "API_KEY_AUTHENTICATOR",
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
-    rest = TestClient(api.app).post("/api/cn/taiyi", json=payload)
+    rest = TestClient(api.app).post("/api/taiyi", json=payload)
     assert rest.status_code == 400
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool("taiyi", payload, raise_on_error=False)
+            return await call_calculation(
+                client, "taiyi", payload, raise_on_error=False
+            )
 
     mcp = asyncio.run(invoke())
     assert mcp.is_error
@@ -294,8 +316,8 @@ def test_month_profile_wrong_mode_is_rejected_on_all_actual_transports(
 
 @pytest.mark.parametrize("target", ["gate_remainder", "chart_ju"])
 def test_oracle_cannot_drop_failed_or_unknown_requirement_even_after_rehash(
-    tmp_path, target
-):
+    tmp_path: Path, target: str
+) -> None:
     base = tmp_path / "fixtures"
     for p in CORPUS.parent.glob("taiyi_jinjing_v*"):
         shutil.copytree(p, base / p.name)
@@ -308,6 +330,8 @@ def test_oracle_cannot_drop_failed_or_unknown_requirement_even_after_rehash(
     for row in m["source_files"]:
         if row["file"] == p.name:
             row["sha256"] = hashlib.sha256(p.read_bytes()).hexdigest()
+        else:
+            pass
     m["source_reference"]["file"] = str(
         (CORPUS / m["source_reference"]["file"]).resolve()
     )
@@ -318,7 +342,9 @@ def test_oracle_cannot_drop_failed_or_unknown_requirement_even_after_rehash(
 
 
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
-def test_month_first_view_keeps_source_conflicts_and_restores_same_run(key):
+def test_month_first_view_keeps_source_conflicts_and_restores_same_run(
+    key: str,
+) -> None:
     s = next(s for s in CATALOG if s.key == key)
     payload = (
         {
@@ -344,8 +370,9 @@ def test_month_first_view_keeps_source_conflicts_and_restores_same_run(key):
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                key,
+            result = await call_calculation(
+                client,
+                SPECS[key].tool_name,
                 {
                     **payload,
                     "use_true_solar_time": False,
@@ -355,7 +382,7 @@ def test_month_first_view_keeps_source_conflicts_and_restores_same_run(key):
                 },
                 raise_on_error=False,
             )
-            await _same_run_payload(client, result, require_business_inline=True)
+            await same_run_payload(client, result, require_business_inline=True)
             return result.structured_content
 
     body = asyncio.run(invoke())
@@ -365,8 +392,13 @@ def test_month_first_view_keeps_source_conflicts_and_restores_same_run(key):
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 @pytest.mark.parametrize("month,day,matched", [(10, 20, True), (11, 10, False)])
 def test_month_source_facts_across_actual_rest_native_mcp_and_cli(
-    monkeypatch, capsys, key, month, day, matched
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    key: str,
+    month: int,
+    day: int,
+    matched: bool,
+) -> None:
     payload = (
         {
             "analysis_year": 1561,
@@ -403,7 +435,7 @@ def test_month_source_facts_across_actual_rest_native_mcp_and_cli(
         "API_KEY_AUTHENTICATOR",
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
-    route = "/api/cn/taiyi" if key == "taiyi" else "/api/divination/sanshiunited"
+    route = "/api/taiyi" if key == "taiyi" else "/api/divination/sanshi"
     rest = TestClient(api.app).post(
         route,
         json=payload,
@@ -418,7 +450,9 @@ def test_month_source_facts_across_actual_rest_native_mcp_and_cli(
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            v = await client.call_tool(key, {**payload, **opts}, raise_on_error=False)
+            v = await call_calculation(
+                client, SPECS[key].tool_name, {**payload, **opts}, raise_on_error=False
+            )
             assert not v.is_error, v
             return v.structured_content
 

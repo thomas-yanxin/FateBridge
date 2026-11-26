@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import math
 from importlib.metadata import version
-from typing import Any, Dict, Optional, Sequence, Tuple
+from typing import Any, Sequence
 
 from fatebridge.core import ephemeris_runtime
 from fatebridge.core.astro import runtime
@@ -41,7 +41,7 @@ SOURCE_VERSION = ("2.10.03", "2.10.3.2")
 
 def aberration_spatial_correction(
     position: Sequence[float], velocity: Sequence[float], beta: Sequence[float]
-) -> Tuple[float, ...]:
+) -> tuple[float, ...]:
     """Replace swi_aberr_light's backward spatial difference by its Jacobian.
 
     Observer beta is held fixed. Subtract the inspected source approximation,
@@ -52,7 +52,7 @@ def aberration_spatial_correction(
     """
     _, analytic = aberration_position_jvp(position, velocity, beta)
 
-    def native_position(values: Sequence[float]) -> Tuple[float, ...]:
+    def native_position(values: Sequence[float]) -> tuple[float, ...]:
         # Explicit source order, independent of Python sum() version changes.
         # Compiled contraction/rounding can still differ from this replay.
         radius = math.sqrt(
@@ -85,8 +85,8 @@ def lunar_light_time_correction(
     displayed_coordinates: Sequence[float],
     model: str,
     *,
-    source_trace: Optional[PhysicalEphemerisTrace] = None,
-) -> Tuple[Optional[float], Dict[str, Any]]:
+    source_trace: PhysicalEphemerisTrace | None = None,
+) -> tuple[float | None, dict[str, Any]]:
     """Return a longitude-rate correction and explicit applicability metadata.
 
     Only the locked/source-inspected native version and physical JPL/Swiss
@@ -97,7 +97,7 @@ def lunar_light_time_correction(
     swe = runtime.swe
     native_version = str(getattr(swe, "version", "unavailable"))
     binding_version = binding_distribution_version(swe, version)
-    metadata: Dict[str, Any] = {
+    metadata: dict[str, Any] = {
         "method_id": METHOD_ID,
         "native_version": native_version,
         "binding_version": binding_version,
@@ -124,7 +124,7 @@ def lunar_light_time_correction(
     trace = source_trace if source_trace is not None else PhysicalEphemerisTrace()
     factors = []
     contexts = {}
-    returned_flags: Dict[str, int] = {}
+    returned_flags: dict[str, int] = {}
     # Keep reception-frame auxiliary states in the already checked apparent
     # light-path window. Resetting each geometric sample can select the newer
     # reception-only file and sever the retarded dependency at a file start.
@@ -150,7 +150,7 @@ def lunar_light_time_correction(
             barycentric: bool,
             factor: str,
             kind: str = "geometric",
-        ) -> Tuple[float, ...]:
+        ) -> tuple[float, ...]:
             flags = base | (swe.FLG_BARYCTR if barycentric else 0)
             if kind != "geometric":
                 flags &= ~swe.FLG_TRUEPOS
@@ -200,7 +200,7 @@ def lunar_light_time_correction(
             barycentric: bool,
             factor: str,
             kind: str = "geometric",
-        ) -> Tuple[Tuple[float, ...], int]:
+        ) -> tuple[tuple[float, ...], int]:
             values = state(
                 epoch, body, barycentric=barycentric, factor=factor, kind=kind
             )

@@ -8,7 +8,7 @@ from decimal import Decimal, localcontext
 from math import inf, nextafter
 from pathlib import Path
 
-from fatebridge.core.lilly import dignity_at, pair_reception
+from fatebridge.core.astro.lilly import dignity_at, pair_reception
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -82,6 +82,8 @@ def audit():
                                         "actual": actual,
                                     }
                                 )
+                            else:
+                                pass
     printed_examples = []
     for row in reference["p112_examples"]:
         (first, first_lon), (second, second_lon) = row["bodies"].items()
@@ -127,8 +129,8 @@ def audit():
         "source_sha256": {
             rel: hashlib.sha256((ROOT / rel).read_bytes()).hexdigest()
             for rel in [
-                "src/fatebridge/core/lilly.py",
-                "src/fatebridge/core/horary_conditions.py",
+                "src/fatebridge/core/astro/lilly.py",
+                "src/fatebridge/core/astro/horary_conditions.py",
                 "src/fatebridge/core/classical_western.py",
                 "scripts/western/audit_western_lilly_reception.py",
             ]
@@ -147,3 +149,5 @@ if __name__ == "__main__":
         f"{report['comparisons']} boundary/planet/sect comparisons; selected examples passed={report['passed']}"
     )
     raise SystemExit(0 if report["passed"] else 1)
+else:
+    pass

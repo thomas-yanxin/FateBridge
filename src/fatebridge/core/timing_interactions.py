@@ -1,11 +1,10 @@
-"""Position-preserving natal/timing relations, without a fortune-score shortcut.
-
-These are table matches and contextual facts. A combination match does not
-certify transformation, useful-god suitability, pattern success or an event.
-"""
+"""Match structural relations while preserving natal and timing node positions."""
 
 from itertools import combinations
-from typing import Any, Dict, Mapping, Tuple
+from typing import Literal, Mapping, TypedDict
+
+from pydantic import JsonValue
+from typing_extensions import NotRequired, Unpack
 
 from fatebridge.core.hidden_carriers import (
     describe_temporal_hidden_carrier,
@@ -15,17 +14,22 @@ from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
 from fatebridge.core.timing_carriers import SCOPE as CARRIER_SCOPE
 from fatebridge.core.timing_carriers import SOURCE as CARRIER_SOURCE
 from fatebridge.core.timing_carriers import (
+    CarrierNatalRoot,
+    TimingCarrierReceipt,
+    TimingCarrierSummary,
     describe_timing_carrier,
     summarize_timing_carriers,
 )
 from fatebridge.core.timing_roots import (
     BRANCH_RELATION_KINDS,
     RootRelationReference,
+    TimingRootContext,
     build_timing_root_context,
 )
 from fatebridge.core.timing_strength import (
     BudgetEffectRelation,
     StrengthProjectionBaseline,
+    TimingStrengthProjection,
     project_timing_root_effects,
 )
 from fatebridge.utils.data import (
@@ -50,19 +54,75 @@ STEM_COMBINATIONS = {
 SOURCE_URL = "https://zh.wikisource.org/zh-hant/三命通會/卷二"
 
 
+class TimingInteractionNode(TypedDict):
+    id: str
+    scope: Literal["natal", "timing"]
+    layer: str
+    stem: str
+    branch: str
+    pillar: str
+
+
+class InteractionFacts(TypedDict, total=False):
+    source: str
+    target: str
+    definition: str
+    group: str
+    bureau: str
+    transformation: Literal["not_assessed"]
+    complete: bool
+    traditional_label: str
+
+
+class TimingInteraction(InteractionFacts):
+    id: str
+    rule_id: str
+    participants: list[str]
+    scope: Literal["natal_timing", "timing_timing"]
+    status: Literal["structural_match"]
+
+
+class HiddenStemTenGod(TypedDict):
+    stem: str
+    ten_god: str
+    rank: int
+
+
+class TimingTenGodContext(TypedDict):
+    node_id: str
+    stem_ten_god: str
+    hidden_stems: list[HiddenStemTenGod]
+    natal_same_element_roots: list[CarrierNatalRoot]
+
+
+class TimingInteractionAnalysis(TypedDict):
+    strength_projection: NotRequired[TimingStrengthProjection]
+    method_id: str
+    assessment_status: Literal["structural_evidence_only"]
+    nodes: list[TimingInteractionNode]
+    ten_god_context: list[TimingTenGodContext]
+    pillar_carriers: list[TimingCarrierReceipt]
+    pillar_carrier_summary: list[TimingCarrierSummary]
+    pillar_carrier_scope: str
+    pillar_carrier_source: dict[str, str]
+    hidden_target_reference: dict[str, JsonValue]
+    hidden_target_carriers: list[dict[str, JsonValue]]
+    relations: list[TimingInteraction]
+    root_context: TimingRootContext
+    rulesets: list[dict[str, str]]
+    rule_trace: list[str]
+    coverage: dict[str, list[str]]
+    interpretation_scope: str
+
+
 def analyze_timing_interactions(
-    natal: Mapping[str, Tuple[str, str]],
+    natal: Mapping[str, tuple[str, str]],
     timing: Mapping[str, Mapping[str, str]],
     *,
     strength_baseline: StrengthProjectionBaseline | None = None,
-) -> Dict[str, Any]:
-    """Match actual node occurrences, including natal/timing and timing/timing.
-
-    Full three-member groups require three different branch characters. Pairs
-    of a three-punishment group remain partial; half-combinations require the
-    group's peak. Existing natal-only relations are outside this delta view.
-    """
-    nodes: list[Dict[str, Any]] = []
+) -> TimingInteractionAnalysis:
+    """Match pair and triple relations involving at least one timing node."""
+    nodes: list[TimingInteractionNode] = []
     for name in ("year", "month", "day", "hour"):
         stem, branch = natal[name]
         nodes.append(
@@ -90,9 +150,13 @@ def analyze_timing_interactions(
     if any(node["pillar"] not in SEXAGENARY_INDEX for node in nodes):
         raise ValueError("时运关系需要六十甲子中的完整干支柱")
 
-    events: list[Dict[str, Any]] = []
+    events: list[TimingInteraction] = []
 
-    def emit(kind: str, members: tuple, **facts: Any) -> None:
+    def emit(
+        kind: str,
+        members: tuple[TimingInteractionNode, ...],
+        **facts: Unpack[InteractionFacts],
+    ) -> None:
         if not any(node["scope"] == "timing" for node in members):
             return
         participants = [node["id"] for node in members]
@@ -201,7 +265,7 @@ def analyze_timing_interactions(
                 )
 
     day_stem = natal["day"][0]
-    ten_gods = []
+    ten_gods: list[TimingTenGodContext] = []
     for node in nodes:
         if node["scope"] != "timing":
             continue
@@ -234,29 +298,27 @@ def analyze_timing_interactions(
         for node in nodes
         if node["scope"] == "timing"
     ]
-    return {
-        **(
-            {
-                "strength_projection": project_timing_root_effects(
-                    natal,
-                    timing,
-                    [
-                        BudgetEffectRelation(
-                            id=e["id"],
-                            rule_id=e["rule_id"],
-                            participants=e["participants"],
-                            complete=e.get("complete", False),
-                        )
-                        for e in events
-                        if e["rule_id"] in BRANCH_RELATION_KINDS
-                        or e["rule_id"] == "stem_combination"
-                    ],
-                    strength_baseline,
+    strength_projection = (
+        project_timing_root_effects(
+            natal,
+            timing,
+            [
+                BudgetEffectRelation(
+                    id=e["id"],
+                    rule_id=e["rule_id"],
+                    participants=e["participants"],
+                    complete=e.get("complete", False),
                 )
-            }
-            if strength_baseline is not None
-            else {}
-        ),
+                for e in events
+                if e["rule_id"] in BRANCH_RELATION_KINDS
+                or e["rule_id"] == "stem_combination"
+            ],
+            strength_baseline,
+        )
+        if strength_baseline is not None
+        else None
+    )
+    interactions: TimingInteractionAnalysis = {
         "method_id": METHOD_ID,
         "assessment_status": "structural_evidence_only",
         "nodes": nodes,
@@ -311,3 +373,7 @@ def analyze_timing_interactions(
         },
         "interpretation_scope": "关系可同时命中，不能相加计分或重复消耗根气；同柱、刑冲会合及根的存在不证明吉凶、合化或事件必然发生。",
     }
+    if strength_projection is not None:
+        return {"strength_projection": strength_projection, **interactions}
+    else:
+        return interactions

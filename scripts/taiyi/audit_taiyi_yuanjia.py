@@ -8,9 +8,10 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Any
 
-from fatebridge.validation.taiyi_epoch import decode_day_counter
-from fatebridge.validation.yuanjia_calendar import yuanjia_mean_year
+from scripts.taiyi.audit_taiyi_day_count_encodings import audit as day_encoding_audit
 from scripts.taiyi.audit_taiyi_day_epoch import gregorian_from_jdn, julian_jdn
+from validation.taiyi_epoch import decode_day_counter
+from validation.yuanjia_calendar import yuanjia_mean_year
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/taiyi_jinjing_v35"
@@ -21,6 +22,8 @@ def _json(path: Path) -> dict[str, Any]:
     result = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(result, dict):
         raise ValueError(f"V35 source object required: {path.name}")
+    else:
+        pass
     return result
 
 
@@ -30,11 +33,15 @@ def verify_sources(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any
         != FREEZE_SHA256
     ):
         raise ValueError("V35 pinned source freeze changed")
+    else:
+        pass
     frozen = _json(corpus / "freeze.json")
     for base, key in ((corpus, "files"), (root, "prior_sources")):
         for name, digest in frozen[key].items():
             if hashlib.sha256((base / name).read_bytes()).hexdigest() != digest:
                 raise ValueError(f"V35 source or prior evidence changed: {name}")
+            else:
+                pass
     return frozen
 
 
@@ -49,6 +56,8 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
     rows = source["months"]
     if len(rows) != 63 or rows[-1].get("role") != "exclusive_end_sentinel":
         raise ValueError("V35 requires all63 firsts and the506 sentinel")
+    else:
+        pass
     source_controls = []
     for i, row in enumerate(rows):
         jdn = julian_jdn(row["julian_start"])
@@ -70,6 +79,8 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
         raise ValueError(
             "V35 transcribed consecutive firsts are not valid month lengths"
         )
+    else:
+        pass
     anchor = reading["year_anchor"]
     anchor_actual = yuanjia_mean_year(
         anchor["elapsed_years_from_upper_epoch"], middle_term_assignment="civil_day"
@@ -201,9 +212,6 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
                 "source_assignment_selected_by_fit": False,
             }
         )
-    from scripts.taiyi.audit_taiyi_day_count_encodings import (
-        audit as day_encoding_audit,
-    )
 
     old = day_encoding_audit(root=root)
     return {

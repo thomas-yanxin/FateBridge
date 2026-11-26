@@ -13,7 +13,7 @@ import random
 from datetime import datetime, timezone
 from pathlib import Path
 
-from fatebridge.core.astro.aspects import _match_cross_aspect
+from fatebridge.core.astro.aspects import _match_cross_aspect_fraction
 from fatebridge.core.classical_western import _aspect_is_applying, _aspect_phase
 from tests.support.western_angular_reference import (
     ANGLES,
@@ -52,7 +52,12 @@ def audit():
     for a, b, radius in cases:
         for pair in (None, ("Mercury", "Saturn"), ("Sun", "Mars")):
             expected = reference_match(a, b, radius, pair)
-            actual = _match_cross_aspect(a, b, radius, *(pair or ()))
+            match = _match_cross_aspect_fraction(a, b, radius, *(pair or ()))
+            actual = (
+                None
+                if match is None
+                else {"aspect": match[0], "delta": float(match[1])}
+            )
             count += 1
             if actual != expected:
                 failures.append(
@@ -62,6 +67,8 @@ def audit():
                         "actual": actual,
                     }
                 )
+            else:
+                pass
     phases = [
         (0.0, 13.0, 0.1, 0.0, 0.0),
         (0.0, -13.0, 359.9, 0.0, 0.0),
@@ -101,6 +108,9 @@ def audit():
                 phase_failures.append(
                     {"input": values, "expected": expected, "actual": actual}
                 )
+            else:
+                pass
+    counterexample = _match_cross_aspect_fraction(0.5000000000000001, 352.5, 8)
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "protocol_id": "western_angular_predicates_decimal_v1",
@@ -114,7 +124,14 @@ def audit():
             {
                 "input_longitudes": [0.5000000000000001, 352.5],
                 "orb_limit": 8.0,
-                "now": _match_cross_aspect(0.5000000000000001, 352.5, 8),
+                "now": (
+                    None
+                    if counterexample is None
+                    else {
+                        "aspect": counterexample[0],
+                        "delta": float(counterexample[1]),
+                    }
+                ),
             },
             {
                 "input_longitudes_and_speeds": [0, 13, 0.1, 0, 0],
@@ -142,7 +159,11 @@ def main():
     )
     if not report["passed"]:
         raise SystemExit(1)
+    else:
+        pass
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

@@ -6,6 +6,16 @@ Supply the decompressed final3 file from the version recorded in the protocol.
 
 from __future__ import annotations
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import hashlib
 import itertools
@@ -15,7 +25,7 @@ from collections import Counter
 from pathlib import Path
 
 from fatebridge.core.astro import runtime
-from fatebridge.validation.gauquelin import (
+from validation.gauquelin import (
     clock_coherence,
     decode_final3,
     method_profile,
@@ -91,6 +101,8 @@ def geometry_grid() -> dict:
                     ),
                 )
                 row.update(geometry_comparison(native, independent["sector36"]))
+            else:
+                pass
         except (ValueError, runtime.swe.Error) as exc:
             row["native_error"] = str(exc)
         rows.append(row)
@@ -156,13 +168,21 @@ def native_sector(
 def audit(data: bytes) -> dict:
     if runtime.swe is None:
         raise RuntimeError("Swiss Ephemeris is required; no approximate substitute")
+    else:
+        pass
     if sha(PROTOCOL.read_bytes()) != PROTOCOL_SHA256:
         raise ValueError("frozen_protocol_hash_mismatch")
+    else:
+        pass
     if sha(POLICY.read_bytes()) != POLICY_SHA256:
         raise ValueError("native_policy_hash_mismatch")
+    else:
+        pass
     policy = json.loads(POLICY.read_text())
     if policy["primary_protocol_sha256"] != PROTOCOL_SHA256:
         raise ValueError("native_policy_protocol_mismatch")
+    else:
+        pass
     source = decode_final3(data)
     grid = geometry_grid()
     rows, seen = [], {}
@@ -174,6 +194,8 @@ def audit(data: bytes) -> dict:
         if row["issues"]:
             rows.append(record)
             continue
+        else:
+            pass
         identity = tuple(row["raw"][k] for k in ("name", "local_date", "local_time"))
         record["duplicate_source_identity_of"] = seen.get(identity)
         seen.setdefault(identity, row["case_id"])
@@ -205,6 +227,8 @@ def audit(data: bytes) -> dict:
         )
         if flags & runtime.swe.FLG_MOSEPH != runtime.swe.FLG_MOSEPH:
             raise RuntimeError("requested Moshier backend not returned")
+        else:
+            pass
         eps, _ = runtime.ephemeris_call(
             "calc", tt, runtime.swe.ECL_NUT, runtime.swe.FLG_MOSEPH
         )
@@ -221,6 +245,8 @@ def audit(data: bytes) -> dict:
             record["native_geometry_comparison"] = geometry_comparison(
                 primary["sector36"], independent["sector36"]
             )
+        else:
+            pass
         samples = []
         for seconds, dlon, dlat in itertools.product(
             (-60, 0, 60), (-0.01, 0.0, 0.01), (-0.01, 0.0, 0.01)
@@ -357,3 +383,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

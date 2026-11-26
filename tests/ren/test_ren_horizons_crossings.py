@@ -7,14 +7,14 @@ from pathlib import Path
 
 import pytest
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    test_nested_fact_faults_are_internal_failures_on_all_surfaces as reject_fault,
-)
-from tests.ren.test_ren_transports import PAYLOAD
 from tests.support.ephemeris_case_runtime import (
     native_ephemeris_files as native_ephemeris_files,
 )
 from tests.support.transports import SPECS, business, native, rest, surface_calls
+from tests.unit_test.fixtures.ren_protocol import REN_PROTOCOL_PAYLOAD
+from tests.unit_test.fixtures.schema_assertions import (
+    reject_nested_fact_fault as reject_fault,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -25,7 +25,7 @@ AUDIT = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(AUDIT)
 
 
-def test_raw_jpl_probes_reconstruct_the_complete_frozen_diagnostic_cohort():
+def test_raw_jpl_probes_reconstruct_the_complete_frozen_diagnostic_cohort() -> None:
     frozen = AUDIT.reference()
     cases = frozen["reference"]["cases"]
     assert len(cases) == 113
@@ -40,7 +40,7 @@ def test_raw_jpl_probes_reconstruct_the_complete_frozen_diagnostic_cohort():
     assert not frozen["reference"]["goal_complete"]
 
 
-def test_actual_audit_retains_both_frames_and_original_thresholds():
+def test_actual_audit_retains_both_frames_and_original_thresholds() -> None:
     report = AUDIT.audit()
     assert report["expected_count"] == report["compared_count"] == 113
     assert not report["calculation_errors"]
@@ -63,7 +63,9 @@ def test_actual_audit_retains_both_frames_and_original_thresholds():
     assert not report["classical_acceptance_passed"] and not report["goal_complete"]
 
 
-def test_complete_solver_failure_keeps_all_113_errors(monkeypatch):
+def test_complete_solver_failure_keeps_all_113_errors(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from fatebridge.core import almanac
 
     monkeypatch.setattr(almanac, "get_solar_terms_for_year", lambda *a, **kw: [])
@@ -74,8 +76,8 @@ def test_complete_solver_failure_keeps_all_113_errors(monkeypatch):
 
 
 def test_stale_native_file_receipt_preserves_all_errors_without_crashing(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     from fatebridge.core import almanac
     from fatebridge.core.ephemeris_runtime import swe
 
@@ -91,7 +93,7 @@ def test_stale_native_file_receipt_preserves_all_errors_without_crashing(
     assert not report["all_performed_comparisons_passed"]
 
 
-def test_frozen_source_tampering_is_rejected(tmp_path):
+def test_frozen_source_tampering_is_rejected(tmp_path: Path) -> None:
     corpus = tmp_path / "corpus"
     shutil.copytree(AUDIT.CORPUS, corpus)
     path = corpus / "collection/initial-post-short/batch-00.response.json"
@@ -100,7 +102,7 @@ def test_frozen_source_tampering_is_rejected(tmp_path):
         AUDIT.reference(corpus)
 
 
-def test_opposite_side_wrap_and_unbracketed_probes_cannot_become_crossings():
+def test_opposite_side_wrap_and_unbracketed_probes_cannot_become_crossings() -> None:
     samples = [
         {"timestamp_label": "2000-01-01 12:00:00", "ObsEcLon": 179.999},
         {"timestamp_label": "2000-01-01 12:01:00", "ObsEcLon": 180.001},
@@ -116,10 +118,10 @@ def test_opposite_side_wrap_and_unbracketed_probes_cannot_become_crossings():
 
 @pytest.mark.parametrize("flags", [(), (32770,), (34,), (18,)])
 def test_unverified_geometry_cannot_receive_the_default_definition(
-    flags, monkeypatch, native_ephemeris_files
-):
+    flags, monkeypatch: pytest.MonkeyPatch, native_ephemeris_files
+) -> None:
     from fatebridge.core.metaphysics import ren_calendar
-    from fatebridge.services.metaphysics import _build_analysis_seed
+    from fatebridge.core.metaphysics.seed import build_analysis_seed
 
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     original = ren_calendar.get_adjacent_solar_terms
@@ -131,7 +133,7 @@ def test_unverified_geometry_cannot_receive_the_default_definition(
         )
 
     monkeypatch.setattr(ren_calendar, "get_adjacent_solar_terms", different_geometry)
-    seed = _build_analysis_seed(
+    seed = build_analysis_seed(
         analysis_year=2026,
         analysis_month=4,
         analysis_day=4,
@@ -147,17 +149,26 @@ def test_unverified_geometry_cannot_receive_the_default_definition(
 @pytest.mark.parametrize("project", [False, True])
 @pytest.mark.parametrize("mode", ["native", "de440"])
 def test_actual_coordinate_definition_survives_all_surfaces(
-    key, project, mode, monkeypatch, surface_calls, native_ephemeris_files
-):
+    key: str,
+    project: bool,
+    mode: str,
+    monkeypatch: pytest.MonkeyPatch,
+    surface_calls,
+    native_ephemeris_files,
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
     spec = SPECS[key]
-    payload = {**PAYLOAD}
+    payload = {**REN_PROTOCOL_PAYLOAD}
     if key == "jinkou":
         payload["di_fen"] = "酉"
+    else:
+        pass
     if key == "liureng_runyear":
         payload.update(
             birth_year=1994, birth_month=8, birth_day=23, birth_hour=14, gender="女"
         )
+    else:
+        pass
     root = "jinkou" if key == "jinkou" else "liureng"
     field = f"{root}.calendar_policy.solar_longitude_definition"
     params = [("response_char_limit", "0")]
@@ -177,6 +188,8 @@ def test_actual_coordinate_definition_survives_all_surfaces(
             field,
         ]
         options = dict(fields=[field], strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec, payload, params=params, options=options, flags=flags
     )
@@ -204,8 +217,13 @@ def test_actual_coordinate_definition_survives_all_surfaces(
     "fault", [{"horizons_frame_equivalence_certified": True}, {"origin": "topocentric"}]
 )
 def test_wrong_reference_frame_claim_is_rejected_before_projection(
-    key, fault, rest, monkeypatch, tmp_path, capsys
-):
+    key: str,
+    fault,
+    rest,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     root = "jinkou" if key == "jinkou" else "liureng"
     payload = {root: {"calendar_policy": {"solar_longitude_definition": fault}}}
     reject_fault(key, payload, rest, monkeypatch, tmp_path, capsys)

@@ -1,0 +1,144 @@
+{
+  "edition": "Ptolemy, Tetrabiblos, F. E. Robbins, Loeb 1940",
+  "chapters": [
+    "I.13",
+    "I.14",
+    "I.15",
+    "I.16"
+  ],
+  "source_url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Ptolemy/Tetrabiblos/1B%2A.html#13",
+  "source_html_sha256": "39222a252fa86724ebf6be2a7acdeaf10fa237a04acf089aef86f8a76b4fbd9e",
+  "annotation": "Manual sign-pair annotation from I.14 equinoctial symmetry and I.15 solstitial symmetry; northern summer hemisphere convention. I.16 disjunction requires absence of the other stated familiarities. This annotation is not independent expert certification.",
+  "signs": [
+    {
+      "sign": "Aries",
+      "command_obey_partner": "Pisces",
+      "beholding_partner": "Virgo",
+      "hemisphere": "summer"
+    },
+    {
+      "sign": "Taurus",
+      "command_obey_partner": "Aquarius",
+      "beholding_partner": "Leo",
+      "hemisphere": "summer"
+    },
+    {
+      "sign": "Gemini",
+      "command_obey_partner": "Capricorn",
+      "beholding_partner": "Cancer",
+      "hemisphere": "summer"
+    },
+    {
+      "sign": "Cancer",
+      "command_obey_partner": "Sagittarius",
+      "beholding_partner": "Gemini",
+      "hemisphere": "summer"
+    },
+    {
+      "sign": "Leo",
+      "command_obey_partner": "Scorpio",
+      "beholding_partner": "Taurus",
+      "hemisphere": "summer"
+    },
+    {
+      "sign": "Virgo",
+      "command_obey_partner": "Libra",
+      "beholding_partner": "Aries",
+      "hemisphere": "summer"
+    },
+    {
+      "sign": "Libra",
+      "command_obey_partner": "Virgo",
+      "beholding_partner": "Pisces",
+      "hemisphere": "winter"
+    },
+    {
+      "sign": "Scorpio",
+      "command_obey_partner": "Leo",
+      "beholding_partner": "Aquarius",
+      "hemisphere": "winter"
+    },
+    {
+      "sign": "Sagittarius",
+      "command_obey_partner": "Cancer",
+      "beholding_partner": "Capricorn",
+      "hemisphere": "winter"
+    },
+    {
+      "sign": "Capricorn",
+      "command_obey_partner": "Gemini",
+      "beholding_partner": "Sagittarius",
+      "hemisphere": "winter"
+    },
+    {
+      "sign": "Aquarius",
+      "command_obey_partner": "Taurus",
+      "beholding_partner": "Scorpio",
+      "hemisphere": "winter"
+    },
+    {
+      "sign": "Pisces",
+      "command_obey_partner": "Aries",
+      "beholding_partner": "Libra",
+      "hemisphere": "winter"
+    }
+  ],
+  "aspect_cases": [
+    {
+      "a": "Aries",
+      "b": "Gemini",
+      "aspect": "sextile",
+      "quality": "harmonious"
+    },
+    {
+      "a": "Aries",
+      "b": "Cancer",
+      "aspect": "square",
+      "quality": "disharmonious"
+    },
+    {
+      "a": "Aries",
+      "b": "Leo",
+      "aspect": "trine",
+      "quality": "harmonious"
+    },
+    {
+      "a": "Aries",
+      "b": "Libra",
+      "aspect": "opposition",
+      "quality": "disharmonious"
+    }
+  ],
+  "disjunct_cases": [
+    {
+      "a": "Aries",
+      "b": "Taurus",
+      "expected": true
+    },
+    {
+      "a": "Aries",
+      "b": "Scorpio",
+      "expected": true
+    },
+    {
+      "a": "Aries",
+      "b": "Pisces",
+      "expected": false
+    },
+    {
+      "a": "Aries",
+      "b": "Virgo",
+      "expected": false
+    },
+    {
+      "a": "Gemini",
+      "b": "Cancer",
+      "expected": false
+    },
+    {
+      "a": "Cancer",
+      "b": "Sagittarius",
+      "expected": false
+    }
+  ]
+}

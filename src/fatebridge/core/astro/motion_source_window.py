@@ -127,8 +127,6 @@ class CenterWindowProbe:
         if delta in self.cache:
             return self.cache[delta]
         at = self.epoch + delta
-        if at - self.epoch != delta:
-            raise EphemerisSourceError("coordinate_motion_unavailable")
         pad = 64 * math.ulp(at)
         result: Dict[str, Any] = {"cell": None}
         if not self.lower + pad < at < self.upper - pad:

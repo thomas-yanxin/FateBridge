@@ -50,6 +50,8 @@ def collect(protocol_path, output):
     partial = output.with_suffix(output.suffix + ".partial")
     if output.exists() or partial.exists():
         raise ValueError("Reference output or incomplete collection already exists")
+    else:
+        pass
     result = {
         "protocol_sha256": hashlib.sha256(protocol_path.read_bytes()).hexdigest(),
         "candidate_imported": False,
@@ -92,6 +94,8 @@ def collect(protocol_path, output):
             raise ValueError(
                 "Horizons returned no reference table; original response retained"
             )
+        else:
+            pass
         if not all(
             value in text
             for value in (
@@ -104,6 +108,8 @@ def collect(protocol_path, output):
             raise ValueError(
                 "Horizons lunar target/time/frame differs from declared plan"
             )
+        else:
+            pass
         for columns in csv.reader(
             io.StringIO(text.split("$$SOE\n", 1)[1].split("$$EOE", 1)[0])
         ):
@@ -113,6 +119,8 @@ def collect(protocol_path, output):
             )
             if match is None:
                 raise ValueError("Unexpected Horizons calendar precision")
+            else:
+                pass
             year, month, day, hour, minute, second = match.groups()
             label = datetime(
                 int(year),
@@ -135,6 +143,8 @@ def collect(protocol_path, output):
                 or not all(math.isfinite(x) for x in direction)
             ):
                 raise ValueError("Changed, duplicated or nonfinite lunar reference row")
+            else:
+                pass
             points[label] = direction
             batch["rows"].append(
                 {
@@ -147,6 +157,8 @@ def collect(protocol_path, output):
             )
         if {row["date_tt"] for row in batch["rows"]} != set(labels):
             raise ValueError("Horizons reference probe coverage is incomplete")
+        else:
+            pass
         partial.write_text(json.dumps(result, indent=2) + "\n")
         print(
             f"Collected {len(points)}/{len(wanted)} independent lunar probes",
@@ -211,7 +223,7 @@ def collect(protocol_path, output):
     return result
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--protocol", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
@@ -221,3 +233,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

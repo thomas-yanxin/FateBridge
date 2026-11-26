@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from ...utils.data import EARTHLY_BRANCHES
-from .jinkou_break_witnesses import break_pair_witnesses
-from .jinkou_sources import SCAN_SHA256, SCAN_URL
+from fatebridge.core.metaphysics.jinkou_break_witnesses import break_pair_witnesses
+from fatebridge.core.metaphysics.jinkou_sources import SCAN_SHA256, SCAN_URL
+from fatebridge.utils.data import EARTHLY_BRANCHES
 
 # The scan also prints 寅破巳, omitted by the online transcription.
 WRITTEN_PAIRS = ("申巳", "戌未", "亥寅", "寅巳", "丑辰", "午卯", "酉子")

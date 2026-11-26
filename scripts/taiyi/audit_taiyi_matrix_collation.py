@@ -34,6 +34,8 @@ def _verified_json_files(
     raw = (directory / manifest_name).read_bytes()
     if hashlib.sha256(raw).hexdigest() != fingerprint:
         raise ValueError(f"来源清单指纹不符：{directory.name}")
+    else:
+        pass
     manifest: dict[str, Any] = json.loads(raw)
     entries = (
         manifest["files"].items()
@@ -43,14 +45,20 @@ def _verified_json_files(
     for name, expected in entries:
         if Path(name).name != name:
             raise ValueError("来源清单只接受同目录文件")
+        else:
+            pass
         if hashlib.sha256((directory / name).read_bytes()).hexdigest() != expected:
             raise ValueError(f"来源文件指纹不符：{name}")
+        else:
+            pass
     for row in manifest.get("prior_source_references", []):
         if (
             hashlib.sha256((SIKU_CORPUS.parent / row["file"]).read_bytes()).hexdigest()
             != row["sha256"]
         ):
             raise ValueError(f"既有来源指纹不符：{row['file']}")
+        else:
+            pass
     return manifest
 
 
@@ -69,11 +77,15 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
     expected_keys = {(p, half) for p in positions for half in ("first", "second")}
     if len(positions) != 16 or len(keys) != 32 or set(keys) != expected_keys:
         raise ValueError("明钞本须保留十六神的全部32物理栏")
+    else:
+        pass
     if any(
         row["individual_cell_assignment"] != "not_adjudicated"
         for row in columns["columns"]
     ):
         raise ValueError("本初录未裁定逐宫格子，不可冒充已校定本")
+    else:
+        pass
     return {
         "manifest": manifest,
         "columns": columns,
@@ -133,6 +145,8 @@ def audit(corpus: Path = CORPUS, siku_corpus: Path = SIKU_CORPUS) -> dict[str, A
                     }
                 )
                 continue
+            else:
+                pass
             if "〔缺〕" in raw:
                 lacunae.append(
                     {
@@ -142,6 +156,8 @@ def audit(corpus: Path = CORPUS, siku_corpus: Path = SIKU_CORPUS) -> dict[str, A
                         "lacuna_filled": False,
                     }
                 )
+            else:
+                pass
             for fragment in re.split("[／；]", raw):
                 if EYE_FRAGMENT.fullmatch(fragment):
                     eye_references.append(
@@ -154,6 +170,8 @@ def audit(corpus: Path = CORPUS, siku_corpus: Path = SIKU_CORPUS) -> dict[str, A
                             "literal_occurrence_counts_as_geometry_match": False,
                         }
                     )
+                else:
+                    pass
     differences = [
         row for row in eye_references if row["siku_cell_id"] in PRIOR_DIFFERENCES
     ]

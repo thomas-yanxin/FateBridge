@@ -11,17 +11,23 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import human_design_backend as backend_module
 from fatebridge.core.astro import runtime
-from fatebridge.core.human_design import bodygraph, chart_at_tt, positions_at_tt
-from fatebridge.core.human_design_backend import (
+from fatebridge.core.human_design import human_design_backend as backend_module
+from fatebridge.core.human_design.human_design import (
+    bodygraph,
+    chart_at_tt,
+    positions_at_tt,
+)
+from fatebridge.core.human_design.human_design_backend import (
     compare_full_backends,
     full_backend_report,
 )
-from fatebridge.core.human_design_personality_color import personality_colors
-from fatebridge.core.human_design_time import sun_at_tt
-from fatebridge.validation.human_design_astronomy import physical_astronomy_checks
-from fatebridge.validation.human_design_backend import verify_full_backend_report
+from fatebridge.core.human_design.human_design_personality_color import (
+    personality_colors,
+)
+from fatebridge.core.human_design.human_design_time import sun_at_tt
+from validation.human_design_astronomy import physical_astronomy_checks
+from validation.human_design_backend import verify_full_backend_report
 
 ROOT = Path(__file__).resolve().parents[2]
 PLAN = json.loads(
@@ -49,6 +55,8 @@ def current_chart(side):
                 row["native_return_flag_model"] = runtime.ephemeris_model_from_retflag(
                     row["return_flags"]
                 )
+            else:
+                pass
     chart["bodygraph"] = bodygraph(
         (a["gate"] for a in chart["activations"]["personality"]),
         (a["gate"] for a in chart["activations"]["design"]),
@@ -71,7 +79,9 @@ def current_reference_chart():
 
 
 @pytest.mark.parametrize("side", ["selected", "reference"])
-def test_current_backend_adapter_preserves_every_frozen_activation_field(side):
+def test_current_backend_adapter_preserves_every_frozen_activation_field(
+    side: str,
+) -> None:
     chart = current_chart(side)
     assert {
         k: v for k, v in chart["variables"].items() if k != "personality_colors"
@@ -87,7 +97,9 @@ def test_current_backend_adapter_preserves_every_frozen_activation_field(side):
             assert comparable == frozen
 
 
-def test_independent_reference_keeps_predeclared_epochs_targets_roots_and_sources():
+def test_independent_reference_keeps_predeclared_epochs_targets_roots_and_sources() -> (
+    None
+):
     assert len(REFERENCE["pairs"]) == 122
     labels = ["1800-01-01T00:00:00", "2399-12-31T23:59:00"] + [
         f"{y}-{md}T12:00:00" for y in range(1800, 2400, 10) for md in ("01-01", "07-02")
@@ -148,7 +160,7 @@ def test_independent_reference_keeps_predeclared_epochs_targets_roots_and_source
             } == PLAN["bodies"]
 
 
-def test_horizons_raw_tt_anchors_crosscheck_the_independent_pipeline():
+def test_horizons_raw_tt_anchors_crosscheck_the_independent_pipeline() -> None:
     path = ROOT / "tests/fixtures/human-design-astronomy-horizons.json"
     reference = json.loads(path.read_text())
     assert (
@@ -191,7 +203,7 @@ def test_horizons_raw_tt_anchors_crosscheck_the_independent_pipeline():
     assert count == 18
 
 
-def test_fixed_independent_reference_keeps_moshier_position_and_line_failures():
+def test_fixed_independent_reference_keeps_moshier_position_and_line_failures() -> None:
     report = physical_astronomy_checks(ROOT)
     selected, moshier = report["selected"], report["moshier_diagnostic"]
     assert moshier["same_epoch_observations_checked"] == 2440
@@ -217,8 +229,8 @@ def test_fixed_independent_reference_keeps_moshier_position_and_line_failures():
 
 
 def test_full_backend_reference_recomputes_own_root_and_every_activation(
-    monkeypatch, current_reference_chart
-):
+    monkeypatch: pytest.MonkeyPatch, current_reference_chart
+) -> None:
     selected, alternate = current_chart("selected"), current_chart("reference")
     original = copy.deepcopy(selected)
     calls = []
@@ -277,8 +289,8 @@ def test_full_backend_reference_recomputes_own_root_and_every_activation(
     ],
 )
 def test_full_backend_local_verifier_rejects_forged_context(
-    bad, current_reference_chart
-):
+    bad: str, current_reference_chart
+) -> None:
     selected = current_chart("selected")
     alternate = copy.deepcopy(current_reference_chart)
     report = full_backend_report(selected, alternate, "true")
@@ -326,7 +338,9 @@ def test_full_backend_local_verifier_rejects_forged_context(
     assert verify_full_backend_report(payload)["errors"]
 
 
-def test_no_data_or_same_backend_does_not_become_full_comparison(monkeypatch):
+def test_no_data_or_same_backend_does_not_become_full_comparison(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     def failed(*args, **kwargs):
         raise RuntimeError("unavailable")
 
@@ -341,7 +355,7 @@ def test_no_data_or_same_backend_does_not_become_full_comparison(monkeypatch):
     assert same["joint_evidence_summary"] is None
 
 
-def test_forced_moshier_backend_is_explicit_and_does_not_mutate_operator_path():
+def test_forced_moshier_backend_is_explicit_and_does_not_mutate_operator_path() -> None:
     from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
 
     before = configured_ephemeris_path()
@@ -358,7 +372,9 @@ def test_forced_moshier_backend_is_explicit_and_does_not_mutate_operator_path():
         positions_at_tt(2451545, "true", backend="unknown")
 
 
-def test_reference_backend_requires_actual_return_flags(monkeypatch):
+def test_reference_backend_requires_actual_return_flags(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(
         runtime,
         "ephemeris_call",
@@ -373,7 +389,7 @@ def test_reference_backend_requires_actual_return_flags(monkeypatch):
         sun_at_tt(2451545, backend="moshier")
 
 
-def test_analytic_mean_node_flag_cannot_turn_moshier_into_file_comparison():
+def test_analytic_mean_node_flag_cannot_turn_moshier_into_file_comparison() -> None:
     from tests.support.ephemeris_context import empty_ephemeris_path
 
     with empty_ephemeris_path():

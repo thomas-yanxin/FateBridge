@@ -20,7 +20,7 @@ OFFSETS = [
 
 
 @pytest.mark.parametrize("label,seconds", OFFSETS)
-def test_canonical_seconds_label_round_trips_exact_fixed_clock(label, seconds):
+def test_canonical_seconds_label_round_trips_exact_fixed_clock(label, seconds) -> None:
     zone = parse_timezone_name(label)
     offset = timedelta(seconds=seconds)
     assert zone.utcoffset(None) == offset
@@ -35,8 +35,8 @@ def test_canonical_seconds_label_round_trips_exact_fixed_clock(label, seconds):
 @pytest.mark.parametrize("second", [None, 0, 32])
 @pytest.mark.parametrize("label,seconds", [OFFSETS[0], OFFSETS[2]])
 def test_canonical_birth_clock_equals_existing_decimal_fixed_clock_without_inventing_seconds(
-    label, seconds, second
-):
+    label, seconds, second: int | None
+) -> None:
     common = dict(
         birth_year=1965,
         birth_month=8,
@@ -90,6 +90,6 @@ def test_canonical_birth_clock_equals_existing_decimal_fixed_clock_without_inven
         "0500:30",
     ],
 )
-def test_invalid_seconds_offsets_do_not_bypass_existing_bounds(label):
+def test_invalid_seconds_offsets_do_not_bypass_existing_bounds(label: str) -> None:
     with pytest.raises(ValueError):
         parse_timezone_name(label)

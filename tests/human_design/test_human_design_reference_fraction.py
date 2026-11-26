@@ -8,11 +8,11 @@ import pytest
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro import native_execution, runtime
-from fatebridge.core.human_design_cycles import reference_epoch
-from fatebridge.core.human_design_reference_clock import reference_datetime
+from fatebridge.core.human_design.human_design_cycles import reference_epoch
+from fatebridge.core.human_design.human_design_reference_clock import reference_datetime
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.claims import _same_value
-from fatebridge.validation.human_design import verify_human_design_reading
+from fatebridge.utils.json_values import same_value
+from validation.human_design import verify_human_design_reading
 
 FIXTURE = Path(__file__).parents[1] / "data/human_design/reference_fraction"
 PLAN = json.loads((FIXTURE / "plan.json").read_text())
@@ -35,7 +35,7 @@ BASIC = dict(
 )
 def test_all_original_local_clock_labels_expand_to_independent_utc_and_same_tt(
     case, fact
-):
+) -> None:
     label, tt = reference_epoch(case["input"])
     canonical, expected_tt = reference_epoch(fact["utc_label"])
     assert label == canonical == case["expected_utc_label"]
@@ -46,7 +46,9 @@ def forbidden(*args, **kwargs):
     raise AssertionError("Pure clock parser/replay called a native producer")
 
 
-def test_independent126labels_parse_without_native_calls(monkeypatch):
+def test_independent126labels_parse_without_native_calls(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(runtime, "ephemeris_call", forbidden)
     monkeypatch.setattr(native_execution, "calculate", forbidden)
     for c in PLAN["cases"]:
@@ -66,7 +68,7 @@ def test_independent126labels_parse_without_native_calls(monkeypatch):
         "1980-09-09T12.5+00:00:00.0000001",
     ],
 )
-def test_original_six_digit_limit_remains_a_rejection(value):
+def test_original_six_digit_limit_remains_a_rejection(value: str) -> None:
     with pytest.raises(ValueError, match="最多6位"):
         reference_epoch(value)
     with pytest.raises(ValueError, match="最多6位"):
@@ -83,8 +85,13 @@ def test_original_six_digit_limit_remains_a_rejection(value):
     ],
 )
 def test_complete_actual_reference_matches_expanded_input_on_both_backends(
-    empty, text, canonical, birth_minute, monkeypatch, tmp_path
-):
+    empty: bool,
+    text: str,
+    canonical: str,
+    birth_minute: int,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
     monkeypatch.setenv(
         "SE_EPHE_PATH",
         str(tmp_path if empty else Path(__file__).resolve().parents[2] / "ephe"),
@@ -116,16 +123,20 @@ def test_complete_actual_reference_matches_expanded_input_on_both_backends(
         value.pop("run_metadata")
         value["clock_evidence"].pop("cycle_reference_datetime")
         values.append(value)
-    assert _same_value(*values)
+    assert same_value(*values)
 
 
-def test_every_original_fact_also_passes_the_python310_complete_form_path(monkeypatch):
-    import fatebridge.core.human_design_reference_clock as module
+def test_every_original_fact_also_passes_the_python310_complete_form_path(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import fatebridge.core.human_design.human_design_reference_clock as module
     from fatebridge.utils.civil_time import datetime_fromisoformat_preserving_offset
 
     def python310_subset(value):
         if module._REDUCED_FRACTION.fullmatch(value):
             raise ValueError("Python3.10does not accept this reduced representation")
+        else:
+            pass
         return datetime_fromisoformat_preserving_offset(value)
 
     monkeypatch.setattr(

@@ -1,12 +1,15 @@
 """Keep the named table, unresolved citation and actual calculation distinct."""
 
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 
-from fatebridge.core import sukuyo_rizang as rizang
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_commentarial_clock import commentarial_boundary_reference
+from fatebridge.core.sukuyo import sukuyo_rizang as rizang
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_commentarial_clock import (
+    commentarial_boundary_reference,
+)
 from scripts.sukuyo.check_sukuyo_rizang import verify_primary
 
 
@@ -26,11 +29,13 @@ def reference():
         (2, "black", 9, "女"),
     ],
 )
-def test_named_edition_cells_keep_month_and_fortnight(month, half, day, expected):
+def test_named_edition_cells_keep_month_and_fortnight(
+    month: int, half: str, day: int, expected: str
+) -> None:
     assert rizang.literal_cell(reference(), month, half, day) == expected
 
 
-def test_compound_slots_are_not_silently_split_or_selected():
+def test_compound_slots_are_not_silently_split_or_selected() -> None:
     value = reference()
     assert len(value["literal_slots"]) == 330
     assert rizang.literal_cell(value, 10, "white", 3) == "女虛"
@@ -41,7 +46,7 @@ def test_compound_slots_are_not_silently_split_or_selected():
         rizang.literal_cell(value, 8, "white", 9)
 
 
-def test_named_edition_is_not_certified_as_the_actual_cited_exemplar():
+def test_named_edition_is_not_certified_as_the_actual_cited_exemplar() -> None:
     value = reference()
     compared = value["xuanying_citation_comparison"]
     assert not compared["cited_fortnight_explicitly_stated"]
@@ -51,20 +56,20 @@ def test_named_edition_is_not_certified_as_the_actual_cited_exemplar():
     assert not value["interpretation_scope"]["hinoo_half_mapping_established"]
 
 
-def test_changed_xuanying_capture_cannot_inherit_old_comparison():
+def test_changed_xuanying_capture_cannot_inherit_old_comparison() -> None:
     direct = commentarial_boundary_reference()["standalone_xuanying_reference"]
     direct["capture_sha256"] = "0" * 64
     with pytest.raises(ValueError, match="捕获版本不一致"):
         rizang.named_rizang_reference(direct)
 
 
-def test_detached_source_view_cannot_change_later_output():
+def test_detached_source_view_cannot_change_later_output() -> None:
     first = reference()
     first["literal_slots"][0]["mansion_literal"] = "鬼"
     assert reference()["literal_slots"][0]["mansion_literal"] == "畢"
 
 
-def test_table_conflict_does_not_move_the_modern_default_day_or_mansion():
+def test_table_conflict_does_not_move_the_modern_default_day_or_mansion() -> None:
     calendar = calendar_mansion("2024-03-17", "12:00:00", "+08:00")
     old = deepcopy(calendar)
     evidence = day_evidence(calendar)
@@ -80,14 +85,14 @@ def test_table_conflict_does_not_move_the_modern_default_day_or_mansion():
         assert cell in text
 
 
-def test_checker_rejects_substituted_capture(tmp_path):
+def test_checker_rejects_substituted_capture(tmp_path: Path) -> None:
     path = tmp_path / "source.xml"
     path.write_bytes(b"substituted")
     with pytest.raises(ValueError, match="字节指纹不一致"):
         verify_primary(path)
 
 
-def test_offline_check_does_not_claim_to_read_actual_source():
+def test_offline_check_does_not_claim_to_read_actual_source() -> None:
     checked = verify_primary()
     assert checked["literal_slots_checked"] == 330
     assert not checked["actual_source_bytes_rechecked"]

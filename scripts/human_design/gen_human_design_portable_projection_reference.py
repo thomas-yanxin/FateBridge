@@ -27,8 +27,12 @@ def derive():
         != plan["preserved_geometry_reference_sha256"]
     ):
         raise ValueError("Original21600row reference changed")
+    else:
+        pass
     if version("mpmath") != "1.3.0":
         raise ValueError("Independent arithmetic runtime changed")
+    else:
+        pass
     mp.dps = 1000
     source = json.loads(gzip.decompress(old_raw))
     keys = (
@@ -84,6 +88,8 @@ def derive():
         # Exact coordinate coincidences and poles have exactly zero distance.
         if (sun[:2] == target[:2]) or (sun[1] == target[1] and abs(sun[1]) == 90):
             separation = mp.mpf(0)
+        else:
+            pass
         radius = mp.asin(mp.mpf(695700000) / (exact(sun[2]) * 149597870700))
         margin = separation - radius
         relation = (
@@ -138,3 +144,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

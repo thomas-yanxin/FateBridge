@@ -10,7 +10,7 @@ from fractions import Fraction
 
 import pytest
 
-from fatebridge.core.astrology_lifespan import (
+from fatebridge.core.astro.astrology_lifespan import (
     _bound_segments_from,
     build_distributions_payload,
 )
@@ -34,7 +34,7 @@ SIGNS = (
 )
 
 
-def test_ordinary_origin_does_not_skip_mars_and_saturn_bound_periods():
+def test_ordinary_origin_does_not_skip_mars_and_saturn_bound_periods() -> None:
     segments = _bound_segments_from(ASCENDANT, 90)
     aries = [row for row in segments if row["sign"] == "Aries"]
     assert [row["bound"]["bound_lord"] for row in aries] == [
@@ -50,7 +50,7 @@ def test_ordinary_origin_does_not_skip_mars_and_saturn_bound_periods():
     assert aries[4]["exit_arc"] - aries[4]["enter_arc"] == 5
 
 
-def test_body_on_a_bound_boundary_belongs_to_the_entered_half_open_period():
+def test_body_on_a_bound_boundary_belongs_to_the_entered_half_open_period() -> None:
     value = build_distributions_payload(
         {"ascendant": {"absolute_degree": ASCENDANT}, "sun": {"absolute_degree": 20.0}},
         time_key="Ptolemy",
@@ -66,7 +66,9 @@ def test_body_on_a_bound_boundary_belongs_to_the_entered_half_open_period():
     assert containing[0]["start_age_years"] == round(20 - ASCENDANT, 3)
 
 
-def test_a_positive_initial_remainder_is_never_replaced_with_the_rest_of_the_sign():
+def test_a_positive_initial_remainder_is_never_replaced_with_the_rest_of_the_sign() -> (
+    None
+):
     asc = math.nextafter(6.0, 0.0)
     rows = _bound_segments_from(asc, 2)
     assert rows[0]["bound"]["bound_lord"] == "Jupiter"
@@ -77,7 +79,7 @@ def test_a_positive_initial_remainder_is_never_replaced_with_the_rest_of_the_sig
 @pytest.mark.parametrize("sign_index", range(12))
 def test_all_sign_origins_have_contiguous_nonempty_cells_and_correct_midpoint_labels(
     sign_index,
-):
+) -> None:
     origin = Fraction(sign_index * 30 + ASCENDANT)
     rows = _bound_segments_from(float(origin), 90)
     assert rows[0]["enter_arc"] == 0 and rows[-1]["exit_arc"] == 90
@@ -86,6 +88,8 @@ def test_all_sign_origins_have_contiguous_nonempty_cells_and_correct_midpoint_la
         assert left < right
         if index:
             assert rows[index - 1]["exit_arc"] == left
+        else:
+            pass
         midpoint = (origin + (left + right) / 2) % 360
         assert row["sign"] == SIGNS[int(midpoint // 30)]
         assert (
@@ -100,7 +104,9 @@ def test_all_sign_origins_have_contiguous_nonempty_cells_and_correct_midpoint_la
 
 
 @pytest.mark.parametrize("time_key", ["Ptolemy", "Naibod"])
-def test_correct_bound_sequence_reaches_rest_mcp_cli(time_key, surface_calls):
+def test_correct_bound_sequence_reaches_rest_mcp_cli(
+    time_key: str, surface_calls
+) -> None:
     spec = SPECS["astro_distributions"]
     inputs = dict(
         birth_year=2001,
@@ -153,7 +159,7 @@ def test_correct_bound_sequence_reaches_rest_mcp_cli(time_key, surface_calls):
 
 
 @pytest.mark.parametrize("degree", [-1.0, 30.0, math.inf, -math.inf, math.nan])
-def test_invalid_bound_coordinate_cannot_become_a_plausible_lord(degree):
+def test_invalid_bound_coordinate_cannot_become_a_plausible_lord(degree) -> None:
     with pytest.raises(ValueError):
         resolve_egyptian_bound("Aries", degree)
 
@@ -167,5 +173,5 @@ def test_invalid_bound_coordinate_cannot_become_a_plausible_lord(degree):
         (math.nextafter(30.0, 0.0), "Saturn"),
     ],
 )
-def test_bound_membership_retains_half_open_coordinates(degree, lord):
+def test_bound_membership_retains_half_open_coordinates(degree, lord: str) -> None:
     assert resolve_egyptian_bound("Aries", degree)["bound_lord"] == lord

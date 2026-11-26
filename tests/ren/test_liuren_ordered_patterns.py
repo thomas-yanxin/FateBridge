@@ -10,11 +10,13 @@ import pytest
 from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
+from fatebridge.core.contracts.output_liuren_ordered_patterns import (
+    LiurenOrderedPatterns,
+)
+from fatebridge.core.contracts.output_ren_anchors import require_complete_ren_anchors
 from fatebridge.core.metaphysics.liureng_ordered_patterns import (
     ordered_transmission_patterns,
 )
-from fatebridge.core.output_liuren_ordered_patterns import LiurenOrderedPatterns
-from fatebridge.core.output_ren_anchors import require_complete_ren_anchors
 from scripts.ren.audit_liuren_ordered_patterns import CORPUS, audit, reference
 from tests.fixtures.ren_anchors import ANCHOR_PAYLOADS as PAYLOADS
 from tests.support.ren_anchors import anchor_output as raw
@@ -31,7 +33,7 @@ def native_solar(monkeypatch):
 
 
 @pytest.mark.parametrize("clause", REF["clauses"], ids=lambda c: c["id"])
-def test_all_permutations_distinguish_the_literal_order(clause):
+def test_all_permutations_distinguish_the_literal_order(clause) -> None:
     for triple in itertools.permutations(clause["branches"]):
         value = ordered_transmission_patterns(list(triple))
         expected = [c["id"] for c in REF["clauses"] if list(triple) == c["branches"]]
@@ -39,7 +41,7 @@ def test_all_permutations_distinguish_the_literal_order(clause):
         LiurenOrderedPatterns.model_validate(value)
 
 
-def test_frozen_anchors_and_entire_symbolic_space():
+def test_frozen_anchors_and_entire_symbolic_space() -> None:
     result = audit()
     assert result["engineering_checks_passed"] and result["implementation_unchanged"]
     assert (
@@ -53,7 +55,7 @@ def test_frozen_anchors_and_entire_symbolic_space():
 
 
 @pytest.mark.parametrize("fault", ["bytes", "manifest", "extra", "missing"])
-def test_reference_is_pinned_without_pruning(fault, tmp_path):
+def test_reference_is_pinned_without_pruning(fault: str, tmp_path: Path) -> None:
     path = tmp_path / "reference"
     shutil.copytree(CORPUS, path)
     if fault == "bytes":
@@ -80,7 +82,7 @@ def test_reference_is_pinned_without_pruning(fault, tmp_path):
         None,
     ],
 )
-def test_invalid_order_is_not_guessed(branches):
+def test_invalid_order_is_not_guessed(branches) -> None:
     with pytest.raises(ValueError):
         ordered_transmission_patterns(branches)
 
@@ -88,7 +90,7 @@ def test_invalid_order_is_not_guessed(branches):
 @pytest.mark.parametrize(
     "fault", ["source", "reverse", "prune", "matched", "numeric_bool", "conformance"]
 )
-def test_present_facts_cannot_be_rewritten(fault):
+def test_present_facts_cannot_be_rewritten(fault: str) -> None:
     value = ordered_transmission_patterns(["卯", "戌", "巳"])
     if fault == "source":
         value["source_sha256"] = "invented"
@@ -106,7 +108,7 @@ def test_present_facts_cannot_be_rewritten(fault):
         LiurenOrderedPatterns.model_validate(value)
 
 
-def test_sparse_projection_keeps_only_returned_facts():
+def test_sparse_projection_keeps_only_returned_facts() -> None:
     LiurenOrderedPatterns.model_validate({"matched_ids": ["zhuolun"]})
     LiurenOrderedPatterns.model_validate(
         {"evaluations": [{"name": c["name"]} for c in REF["clauses"]]}
@@ -117,7 +119,9 @@ def test_sparse_projection_keeps_only_returned_facts():
     "key", ["liureng_gods", "liureng_runyear", "jinkou", "sanshiunited"]
 )
 @pytest.mark.parametrize("project", [False, True])
-def test_actual_three_ports_deliver_the_same_new_facts(key, project, surface_calls):
+def test_actual_three_ports_deliver_the_same_new_facts(
+    key: str, project: bool, surface_calls
+) -> None:
     spec = SPECS[key]
     fields = ["liureng.transmission_relations.named_structures"]
     params = [("as_of", AS_OF), ("response_char_limit", "0")]
@@ -138,6 +142,8 @@ def test_actual_three_ports_deliver_the_same_new_facts(key, project, surface_cal
             "false",
         ]
         options.update(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec,
         PAYLOADS[key],
@@ -165,7 +171,9 @@ def test_actual_three_ports_deliver_the_same_new_facts(key, project, surface_cal
 @pytest.mark.parametrize(
     "fault", ["missing", "other_order", "trace", "trace_duplicate"]
 )
-def test_full_result_requires_same_board_order_and_one_trace(key, fault):
+def test_full_result_requires_same_board_order_and_one_trace(
+    key: str, fault: str
+) -> None:
     value = raw(key)
     board = value["liureng"]
     if fault == "missing":
@@ -190,8 +198,8 @@ def test_full_result_requires_same_board_order_and_one_trace(key, fault):
 
 @pytest.mark.parametrize("project", [False, True])
 def test_false_order_fails_before_projection_on_three_ports(
-    project, monkeypatch, surface_calls
-):
+    project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     key = "liureng_gods"
     spec = SPECS[key]
     value = raw(key)
@@ -213,6 +221,8 @@ def test_false_order_fails_before_projection_on_three_ports(
         params += [("fields", "four_pillars"), ("strict_fields", "true")]
         flags += ["--fields", "four_pillars", "--strict-fields", "true"]
         options.update(fields=["four_pillars"], strict_fields=True)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec,
         PAYLOADS[key],

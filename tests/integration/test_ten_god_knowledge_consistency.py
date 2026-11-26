@@ -13,6 +13,7 @@ from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.utils.data import get_shishen, get_ten_god
+from tests.support.transports import call_calculation
 
 # Independent oracle: the generating ring is wood -> fire -> earth -> metal ->
 # water. Adjacent stem pairs share an element; their first stem is yang, second
@@ -41,7 +42,9 @@ def independent_relation(day, other):
 
 
 @pytest.mark.parametrize("day,other", list(product(STEMS, repeat=2)))
-def test_all_stem_pairs_match_knowledge_definition_and_both_calculators(day, other):
+def test_all_stem_pairs_match_knowledge_definition_and_both_calculators(
+    day, other
+) -> None:
     expected, direction, polarity = independent_relation(day, other)
     assert get_ten_god(day, other).value == expected
     assert get_shishen(day, other) == expected
@@ -55,7 +58,7 @@ def test_all_stem_pairs_match_knowledge_definition_and_both_calculators(day, oth
 # 三命通会卷五's named 甲见庚/乙见辛七杀 example supplies a second,
 # concrete anchor rather than relying solely on the cyclic oracle.
 @pytest.mark.parametrize("day,other", [("甲", "庚"), ("乙", "辛")])
-def test_classical_seven_killings_examples(day, other):
+def test_classical_seven_killings_examples(day: str, other: str) -> None:
     assert independent_relation(day, other)[0] == "七杀"
     assert get_ten_god(day, other).value == "七杀"
     assert get_shishen(day, other) == "七杀"
@@ -69,8 +72,14 @@ def test_classical_seven_killings_examples(day, other):
     ],
 )
 def test_corrected_definitions_reach_rest_mcp_and_cli(
-    monkeypatch, capsys, day, other, expected, direction, polarity
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    day: str,
+    other: str,
+    expected: str,
+    direction: str,
+    polarity: str,
+) -> None:
     assert get_ten_god(day, other).value == expected
     inputs = {"domain": "bazi", "category": "ten_gods", "key": expected}
     controls = {"include_snapshot_text": False, "response_char_limit": 0}
@@ -87,7 +96,9 @@ def test_corrected_definitions_reach_rest_mcp_and_cli(
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool("knowledge_read", {**inputs, **controls})
+            return await call_calculation(
+                client, "knowledge_read", {**inputs, **controls}
+            )
 
     protocol = asyncio.run(call())
     assert not protocol.is_error

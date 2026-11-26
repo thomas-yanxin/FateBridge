@@ -30,30 +30,42 @@ class NativeSourceWitness:
     def _context(self, model):
         if model == "moshier":
             return {"model": model, "status": "library_builtin", "file_ids": []}, {}
+        else:
+            pass
         ids = []
         files = {}
         for slot in ((0,) if model == "jpl" else (0, 1)):
             name, start, end, de = self.runtime.swe.get_current_file_data(slot)
             if not name:
                 continue
+            else:
+                pass
             path = Path(name)
             assert path.is_file(), ("native file unavailable at calc return", str(path))
             raw = path.read_bytes() if path not in self.paths else None
             if raw is not None:
                 self.paths[path] = hashlib.sha256(raw).hexdigest()
+            else:
+                pass
             digest = self.paths[path]
             if model == "jpl":
                 if raw is None:
                     raw = path.read_bytes()
+                else:
+                    pass
                 for byte_order in ("<", ">"):
                     if struct.unpack_from(byte_order + "i", raw, 2840)[0] == 441:
                         start, end, _ = struct.unpack_from(byte_order + "3d", raw, 2652)
                         de = 441
                         break
+                    else:
+                        pass
                 else:
                     raise AssertionError("Unsupported direct-access JPL header")
+            else:
+                pass
             assert math.isfinite(start) and math.isfinite(end) and start < end
-            identity = f"{'jpl' if model=='jpl' else 'se1'}:{slot}:{digest}"
+            identity = f"{'jpl' if model == 'jpl' else 'se1'}:{slot}:{path.name}"
             ids.append(identity)
             files[identity] = {
                 "id": identity,
@@ -121,11 +133,17 @@ class NativeSourceWitness:
                             "files": files,
                         }
                     )
+                else:
+                    pass
+            else:
+                pass
             return result
 
         def watched(operation, *args, **kwargs):
             if operation != "calc" or args[1] not in (swe.SUN, swe.MOON):
                 return original(operation, *args, **kwargs)
+            else:
+                pass
             requested = int(args[2] if len(args) > 2 else kwargs["flags"])
             frame = bool(requested & swe.FLG_SIDEREAL)
             allowed = swe.FLG_SWIEPH | (swe.FLG_SIDEREAL if frame else swe.FLG_SPEED)
@@ -200,6 +218,8 @@ class NativeSourceWitness:
                     "minimum_jd_tt": entry["epoch_tt"],
                     "maximum_jd_tt": entry["epoch_tt"],
                 }
+            else:
+                pass
             c = contexts[key]
             c["sample_count"] += 1
             c["minimum_jd_tt"] = min(c["minimum_jd_tt"], entry["epoch_tt"])
@@ -219,9 +239,13 @@ class NativeSourceWitness:
         for name in ("models_by_body", "models_stable", "sample_contexts"):
             if actual[name] != expected[name]:
                 differences.append(name)
+            else:
+                pass
         physical = actual["physical_ephemeris_source"]
         if physical["by_factor"] != expected["by_factor"]:
             differences.append("physical_ephemeris_source.by_factor")
+        else:
+            pass
         af = [
             {
                 k: f[k]
@@ -241,12 +265,16 @@ class NativeSourceWitness:
         ]
         if af != expected["files"]:
             differences.append("physical_ephemeris_source.files")
+        else:
+            pass
         if (
             actual["absolute_accuracy_certified"] is not False
             or physical["accuracy_certified"] is not False
             or physical["atomic_file_read_proven"] is not False
         ):
             differences.append("unjustified_certification")
+        else:
+            pass
         return differences
 
     def assert_matches(self, result):

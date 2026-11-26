@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.fengshui import xuankong
-from fatebridge.validation.fengshui_angle_sources import (
+from validation.fengshui_angle_sources import (
     audit_angle_source_reference,
     load_angle_source_reference,
     normalize_source_quantities,
@@ -17,7 +17,7 @@ from fatebridge.validation.fengshui_angle_sources import (
 FOLDER = Path(__file__).parents[1] / "data/fengshui_angle_sources_v1"
 
 
-def test_frozen_source_preserves_author_context_and_different_local_units():
+def test_frozen_source_preserves_author_context_and_different_local_units() -> None:
     raw = (FOLDER / "reference.json").read_bytes()
     assert hashlib.sha256(raw).hexdigest() == (
         "9257220a2e0a9b96a1e4a086273cca7f815802bc135a97655409093f4855de0e"
@@ -34,7 +34,7 @@ def test_frozen_source_preserves_author_context_and_different_local_units():
     assert not reference["quarantined_lead"]["admitted_for_expected_values"]
 
 
-def test_unknown_unit_or_origin_cannot_be_filled_from_the_engine_threshold():
+def test_unknown_unit_or_origin_cannot_be_filled_from_the_engine_threshold() -> None:
     reference = load_angle_source_reference(FOLDER)
     old, edited = [
         normalize_source_quantities(c) for c in reference["unresolved_thresholds"]
@@ -50,7 +50,9 @@ def test_unknown_unit_or_origin_cannot_be_filled_from_the_engine_threshold():
     assert edited["offsets_from_center_degrees_exact"] is None
 
 
-def test_same_numeral_can_mean_different_offsets_under_explicit_synthetic_facts():
+def test_same_numeral_can_mean_different_offsets_under_explicit_synthetic_facts() -> (
+    None
+):
     claim = {
         "id": "synthetic_not_a_book_claim",
         "quantities": ["3"],
@@ -81,14 +83,14 @@ def test_same_numeral_can_mean_different_offsets_under_explicit_synthetic_facts(
         {"origin_offset_degrees": "-1"},
     ],
 )
-def test_invalid_quantities_never_gain_angular_evidence(change):
+def test_invalid_quantities_never_gain_angular_evidence(change) -> None:
     claim = deepcopy(load_angle_source_reference(FOLDER)["unresolved_thresholds"][1])
     claim.update(change)
     with pytest.raises(ValueError):
         normalize_source_quantities(claim)
 
 
-def test_all_relative_regions_keep_the_declared_composition_scope():
+def test_all_relative_regions_keep_the_declared_composition_scope() -> None:
     result = audit_angle_source_reference(load_angle_source_reference(FOLDER))
     assert result["relative_probes"] == 144
     assert result["declared_composition_agreement"]
@@ -114,7 +116,9 @@ def test_all_relative_regions_keep_the_declared_composition_scope():
         assert result[key] is False
 
 
-def test_wrong_threshold_is_retained_as_a_failure(monkeypatch):
+def test_wrong_threshold_is_retained_as_a_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = xuankong.natal_rules
     rules = deepcopy(original())
     rules["central_half_width_degrees"] = 3
@@ -128,7 +132,9 @@ def test_wrong_threshold_is_retained_as_a_failure(monkeypatch):
     }
 
 
-def test_dropping_a_branch_cannot_improve_composition_agreement(monkeypatch):
+def test_dropping_a_branch_cannot_improve_composition_agreement(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = xuankong._selectors
 
     def discard_replacement(angle, uncertainty):
@@ -141,7 +147,7 @@ def test_dropping_a_branch_cannot_improve_composition_agreement(monkeypatch):
     assert all(d["actual"] == [] for d in result["disagreements"])
 
 
-def test_changed_source_bytes_are_rejected(tmp_path):
+def test_changed_source_bytes_are_rejected(tmp_path: Path) -> None:
     for name in ("reference.json", "hashes.json"):
         (tmp_path / name).write_bytes((FOLDER / name).read_bytes())
     data = json.loads((tmp_path / "reference.json").read_text())
@@ -151,7 +157,9 @@ def test_changed_source_bytes_are_rejected(tmp_path):
         load_angle_source_reference(tmp_path)
 
 
-def test_non_object_source_is_rejected_even_with_a_matching_manifest(tmp_path):
+def test_non_object_source_is_rejected_even_with_a_matching_manifest(
+    tmp_path: Path,
+) -> None:
     raw = b"[]\n"
     (tmp_path / "reference.json").write_bytes(raw)
     (tmp_path / "hashes.json").write_text(

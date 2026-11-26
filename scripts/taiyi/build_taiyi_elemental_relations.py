@@ -19,6 +19,8 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
     raw = (corpus / "manifest.json").read_bytes()
     if hashlib.sha256(raw).hexdigest() != MANIFEST_SHA:
         raise ValueError("二目五行初始清单指纹不符")
+    else:
+        pass
     manifest = json.loads(raw)
     for row in manifest["source_files"]:
         if (
@@ -26,12 +28,16 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
             != row["sha256"]
         ):
             raise ValueError("二目五行源材料指纹不符：" + row["file"])
+        else:
+            pass
     for row in manifest["prior_source_references"]:
         if (
             hashlib.sha256((CORPUS.parent / row["file"]).read_bytes()).hexdigest()
             != row["sha256"]
         ):
             raise ValueError("既有二目源材料指纹不符：" + row["file"])
+        else:
+            pass
     spirits = json.loads((corpus / "spirit-elements.json").read_text())
     cases = json.loads((corpus / "worked-cases.json").read_text())["cases"]
     truth = json.loads((corpus / "synthetic-truth.json").read_text())["rows"]
@@ -41,14 +47,20 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
         "子丑艮寅卯辰巽巳午未坤申酉戌乾亥"
     ):
         raise ValueError("十六神须完整保留，不能删未决项")
+    else:
+        pass
     if len(cases) != 4 or not all(
         normalize(c["quote"]) in normalize(extracts) for c in cases
     ):
         raise ValueError("四条原文例须完整保留且逐字可追溯")
+    else:
+        pass
     if len(truth) != 25 or {(r["main"], r["guest"]) for r in truth} != {
         (a, b) for a in "木火土金水" for b in "木火土金水"
     }:
         raise ValueError("25个合成五行关系须完整保留")
+    else:
+        pass
     return {
         "id": "taojin_eyes_wuxing_fragment_v1",
         "version": "1.0.0",
@@ -77,6 +89,8 @@ def main() -> int:
     if args.check:
         if not DEST.exists() or DEST.read_bytes() != raw:
             raise SystemExit("二目五行运行资料漂移")
+        else:
+            pass
     else:
         DEST.write_bytes(raw)
     print(hashlib.sha256(raw).hexdigest())
@@ -85,3 +99,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

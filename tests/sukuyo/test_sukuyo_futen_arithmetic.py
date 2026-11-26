@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import sukuyo_futen_arithmetic as arithmetic
-from fatebridge.core.sukuyo_futen_clock import futen_clock_reference
+from fatebridge.core.sukuyo import sukuyo_futen_arithmetic as arithmetic
+from fatebridge.core.sukuyo.sukuyo_futen_clock import futen_clock_reference
 
 REFERENCE = Path(__file__).parents[1] / "data/sukuyo-futen-arithmetic-source-v1.json"
 
@@ -17,7 +17,9 @@ def ratio(value):
     return Fraction(value["numerator"], value["denominator"])
 
 
-def test_all_fifteen_source_rows_match_preimplementation_independent_arithmetic():
+def test_all_fifteen_source_rows_match_preimplementation_independent_arithmetic() -> (
+    None
+):
     reference = json.loads(REFERENCE.read_bytes())
     result = arithmetic.futen_arithmetic_reference()
     rows = result["all_fifteen_row_checks"]
@@ -39,7 +41,7 @@ def test_all_fifteen_source_rows_match_preimplementation_independent_arithmetic(
     assert reference["no_repository_calculation_imported"]
 
 
-def test_cycle_origin_units_labels_and_rounding_conflicts_are_not_erased():
+def test_cycle_origin_units_labels_and_rounding_conflicts_are_not_erased() -> None:
     expected = json.loads(REFERENCE.read_bytes())
     result = arithmetic.futen_arithmetic_reference()
     chain = result["calculated_chain"]
@@ -68,7 +70,7 @@ def test_cycle_origin_units_labels_and_rounding_conflicts_are_not_erased():
     )
 
 
-def test_ordinary_and_leap_eleventh_month_are_distinct_and_not_relabelled():
+def test_ordinary_and_leap_eleventh_month_are_distinct_and_not_relabelled() -> None:
     result = arithmetic.futen_arithmetic_reference()
     rows = result["all_fifteen_row_checks"]
     regular, leap = rows[12:14]
@@ -82,7 +84,9 @@ def test_ordinary_and_leap_eleventh_month_are_distinct_and_not_relabelled():
     assert not comparison["source_months_relabelled"]
 
 
-def test_threshold_disagreement_is_exposed_instead_of_choosing_a_new_day_boundary():
+def test_threshold_disagreement_is_exposed_instead_of_choosing_a_new_day_boundary() -> (
+    None
+):
     result = arithmetic.futen_arithmetic_reference()
     senmyo, futen = result["threshold_unit_checks"]
     assert ratio(senmyo["nominal_hours_from_printed_units"]) == Fraction(128, 7)
@@ -114,8 +118,8 @@ def test_threshold_disagreement_is_exposed_instead_of_choosing_a_new_day_boundar
     ["drop_row", "merge_leap", "change_qi_ying", "erase_name", "change_threshold"],
 )
 def test_source_changes_require_recollation_not_silent_score_improvement(
-    monkeypatch, tmp_path, mutation
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, mutation: str
+) -> None:
     bundle = json.loads(arithmetic.SOURCE.read_bytes())
     if mutation == "drop_row":
         bundle["rows"].pop()
@@ -127,6 +131,8 @@ def test_source_changes_require_recollation_not_silent_score_improvement(
         bundle["printed_example"]["mean_cycle_name_literal"] = "丁亥"
     elif mutation == "change_threshold":
         bundle["threshold_labels"][0]["printed_threshold_units"] = 6300
+    else:
+        pass
     path = tmp_path / "changed.json"
     path.write_text(json.dumps(bundle, ensure_ascii=False))
     monkeypatch.setattr(arithmetic, "SOURCE", path)
@@ -134,7 +140,7 @@ def test_source_changes_require_recollation_not_silent_score_improvement(
         arithmetic.futen_arithmetic_reference()
 
 
-def test_reference_is_integrated_and_returns_isolated_data():
+def test_reference_is_integrated_and_returns_isolated_data() -> None:
     expected = arithmetic.futen_arithmetic_reference()
     actual = futen_clock_reference()["selected_reconstruction_arithmetic"]
     assert actual == expected
@@ -170,8 +176,8 @@ def test_reference_is_integrated_and_returns_isolated_data():
 
 @pytest.mark.parametrize("change", ["drop_model", "change_units"])
 def test_conditional_units_are_bound_to_the_actual_two_source_models(
-    monkeypatch, tmp_path, change
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, change: str
+) -> None:
     bundle = json.loads(arithmetic.UNIT_SOURCE.read_bytes())
     if change == "drop_model":
         bundle["models"].pop()
@@ -184,8 +190,8 @@ def test_conditional_units_are_bound_to_the_actual_two_source_models(
         arithmetic.futen_arithmetic_reference()
 
 
-def test_modern_host_source_and_missing_validation_receipt_are_explained():
-    from fatebridge.core.sukuyo import calendar_mansion, day_evidence
+def test_modern_host_source_and_missing_validation_receipt_are_explained() -> None:
+    from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
 
     calendar = calendar_mansion("2026-02-17", "10:00:00", "+08:00")
     text = day_evidence(calendar)["reading_text"]

@@ -4,21 +4,21 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, Optional, cast
+from typing import Any, Dict, Iterable, cast
 
-from .bazhai_interpretation import fuwei_element_context
-from .directions import rule_data
-from .materials import material_reference
+from fatebridge.core.fengshui.bazhai_interpretation import fuwei_element_context
+from fatebridge.core.fengshui.directions import rule_data
+from fatebridge.core.fengshui.materials import material_reference
 
 
 @lru_cache(maxsize=1)
-def _bundle() -> Dict[str, Any]:
+def _bundle() -> dict[str, Any]:
     path = Path(__file__).parents[2] / "data" / "fengshui" / "expert-methods-v1.json"
     return cast(Dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
 @lru_cache(maxsize=1)
-def _supplement() -> Dict[str, Any]:
+def _supplement() -> dict[str, Any]:
     path = (
         Path(__file__).parents[2]
         / "data"
@@ -33,13 +33,13 @@ def reference_data(key: str) -> Any:
     return deepcopy(_bundle()[key])
 
 
-def method_reference_provenance() -> Dict[str, Any]:
+def method_reference_provenance() -> dict[str, Any]:
     record = reference_data("ruleset")
     sources = reference_data("sources")
     sources.update(deepcopy(_supplement()["sources"]))
     foundation = rule_data("sources")
-    for key in ("S10", "S12"):
-        sources["FOUNDATION_" + key] = foundation[key]
+    for key in ("S3", "S4", "S5", "S10", "S12"):
+        sources[key] = {**foundation[key], **sources.get(key, {})}
     for source in material_reference()["ruleset"]["sources"]:
         source = deepcopy(source)
         source_id = source.pop("source_id")
@@ -55,7 +55,7 @@ def method_reference_provenance() -> Dict[str, Any]:
     }
 
 
-def _flying_star_references() -> Dict[str, Any]:
+def _flying_star_references() -> dict[str, Any]:
     """Join registered Luo Shu numbers to labelled, non-operational references.
 
     The classical text supplies trigram symbols, not the flying-star number
@@ -91,14 +91,12 @@ def _flying_star_references() -> Dict[str, Any]:
             "symbol_scope": (
                 "cross_text_reference_not_actual_occupant_or_furniture_assignment"
             ),
-            "source_ids": list(
-                dict.fromkeys(["FOUNDATION_S4", *teaching[number]["source_ids"]])
-            ),
+            "source_ids": list(dict.fromkeys(["S4", *teaching[number]["source_ids"]])),
         }
     return result
 
 
-def method_details(methods: Optional[Iterable[str]] = None) -> Dict[str, Any]:
+def method_details(methods: Iterable[str] | None = None) -> dict[str, Any]:
     """Explain selected engines, keeping fixed palaces and visiting stars apart.
 
     An omitted filter gives the three method families. An explicit empty list
@@ -175,13 +173,11 @@ def method_details(methods: Optional[Iterable[str]] = None) -> Dict[str, Any]:
                 "reference_frame": "bazhai_you_nian",
                 "lookup_key": "actual_bazhai_star_name",
                 "scope": "bazhai_relation_star_not_flying_star_number",
-                "source_ids": ["FOUNDATION_S3", "FOUNDATION_S10"],
+                "source_ids": ["S3", "S10"],
                 **(
                     {
                         "element_policy": "selected_star_table_fixed_fuwei_wood",
-                        "source_context_variation": fuwei_element_context(
-                            "FOUNDATION_"
-                        ),
+                        "source_context_variation": fuwei_element_context(),
                     }
                     if star["name"] == "伏位"
                     else {}

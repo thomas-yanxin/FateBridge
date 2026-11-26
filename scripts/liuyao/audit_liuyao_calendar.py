@@ -3,16 +3,27 @@
 import argparse
 import hashlib
 import json
+import logging
+import sys
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
+# note (imports): Direct script execution must locate the repository's validation modules.
+if __name__ == "__main__" and __package__ is None:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+else:
+    pass
+
+
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
-from fatebridge.validation.meihua import (
+from validation.meihua import (
     hko_calendar_rows,
     read_source,
     reference_bundle,
 )
+
+logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).resolve().parents[2]
 REFERENCES = ROOT / "tests/fixtures/liuyao_scan_v3"
@@ -23,6 +34,11 @@ IMPLEMENTATION_FILES = (
     "src/fatebridge/data/lunar_calendar_hko_2100.json",
     "src/fatebridge/core/calendar.py",
     "src/fatebridge/core/local_techniques/sixyao.py",
+    "src/fatebridge/core/liuyao/liuyao_casting.py",
+    "src/fatebridge/core/liuyao/liuyao_najia.py",
+    "src/fatebridge/core/liuyao/liuyao_patterns.py",
+    "src/fatebridge/core/liuyao/liuyao_snapshot.py",
+    "src/fatebridge/core/liuyao/liuyao_snapshot_interactions.py",
     "scripts/liuyao/audit_liuyao_calendar.py",
 )
 
@@ -38,6 +54,8 @@ def reference() -> tuple[dict[str, Any], dict[str, Any]]:
         or sha(HKO / "sources.json") != freeze["hko_manifest_sha256"]
     ):
         raise ValueError("Frozen independent calendar reference changed")
+    else:
+        pass
     return reference_bundle(HKO), json.loads(
         (REFERENCES / "naoj-day-reference.json").read_text()
     )
@@ -59,6 +77,8 @@ def audit(years: list[int] | None = None) -> dict[str, Any]:
     requested = set(years or range(1901, 2101))
     if not requested or not requested <= set(range(1901, 2101)):
         raise ValueError("HKO reference years must be within 1901..2100")
+    else:
+        pass
     reports: list[dict[str, Any]] = []
     mismatches: list[dict[str, Any]] = []
     errors: list[dict[str, Any]] = []
@@ -72,6 +92,8 @@ def audit(years: list[int] | None = None) -> dict[str, Any]:
             or int(source["id"].split("-")[1]) not in requested
         ):
             continue
+        else:
+            pass
         rows = hko_calendar_rows(read_source(HKO / source["file"]), source)
         annual_day = annual_lunar = annual_unavailable = 0
         for row in rows:
@@ -104,15 +126,23 @@ def audit(years: list[int] | None = None) -> dict[str, Any]:
                             "actual": actual_day,
                         }
                     )
+                else:
+                    pass
                 if late:
                     continue
+                else:
+                    pass
                 lunar = result["calendar_context"]["lunar_calendar"]
                 if lunar is None:
                     unavailable_count += 1
                     annual_unavailable += 1
                     if len(unavailable) < 20:
                         unavailable.append(solar.isoformat())
+                    else:
+                        pass
                     continue
+                else:
+                    pass
                 expected = {
                     key: row[key] for key in ("year", "month", "day", "is_leap_month")
                 }
@@ -120,6 +150,8 @@ def audit(years: list[int] | None = None) -> dict[str, Any]:
                 lunar_checks += 1
                 if date(2100, 2, 9) <= solar <= date(2100, 12, 31):
                     overlapping_source_checks += 1
+                else:
+                    pass
                 annual_lunar += 1
                 if actual != expected:
                     mismatches.append(
@@ -130,6 +162,8 @@ def audit(years: list[int] | None = None) -> dict[str, Any]:
                             "actual": actual,
                         }
                     )
+                else:
+                    pass
         reports.append(
             {
                 "source_id": source["id"],
@@ -140,9 +174,9 @@ def audit(years: list[int] | None = None) -> dict[str, Any]:
             }
         )
         if len(reports) % 20 == 0:
-            print(
-                f"Calendar audit: {len(reports)} years, {date_count} dates", flush=True
-            )
+            logger.info(f"Calendar audit: {len(reports)} years, {date_count} dates")
+        else:
+            pass
     unchanged = implementation == {
         name: sha(ROOT / name) for name in IMPLEMENTATION_FILES
     }
@@ -186,6 +220,7 @@ def audit(years: list[int] | None = None) -> dict[str, Any]:
 
 
 def main() -> int:
+    logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--year", action="append", type=int)
@@ -213,3 +248,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

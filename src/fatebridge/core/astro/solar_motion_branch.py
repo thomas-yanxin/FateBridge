@@ -10,7 +10,7 @@ of continuous interval completeness or astronomical/observational accuracy.
 from __future__ import annotations
 
 import math
-from typing import Any, Dict
+from typing import Any
 
 from fatebridge.core import ephemeris_runtime
 from fatebridge.core.astro import runtime
@@ -34,9 +34,9 @@ def solar_interpolation_branch(
     epoch: float,
     model: str,
     trace: PhysicalEphemerisTrace,
-    contexts: Dict[str, Any],
+    contexts: dict[str, Any],
     prefix: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Same pre-deflection ray and Earth/Sun geometry as the pinned source.
 
     Both the source's sqrt(1-dot²) and a cross-product evaluation must fall

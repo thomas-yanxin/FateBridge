@@ -4,7 +4,8 @@ from datetime import date
 from typing import Any
 
 from fatebridge.core import almanac, de440_solar
-from fatebridge.core.astro.time_scales import datetime_from_tt, ephemeris_time
+from fatebridge.core.astro.time_scales import ephemeris_time, utc_point_from_tt
+from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.astro.utc_policy import leap_table
 from fatebridge.core.jpl_ephemeris import configured_jpl_file
 from fatebridge.core.solar_model_policy import solar_model_policy
@@ -47,9 +48,9 @@ def historical_solar_resolution(
     root = de440_solar.longitude_crossing_tt(
         float(almanac.SOLAR_TERM_LONGITUDES[index]), low, high, profile_id=MODEL_ID
     )
-    moment = datetime_from_tt(root["jd_tt"]).astimezone(
-        parse_timezone_name(timezone_name)
-    )
+    point = utc_point_from_tt(TTInstant.from_float(root["jd_tt"]))
+    calendar = ZonedCalendar(point.as_calendar(), parse_timezone_name(timezone_name))
+    moment = calendar.require_datetime()
     clock = ephemeris_time(moment)
     try:
         current_configuration = (
@@ -65,6 +66,8 @@ def historical_solar_resolution(
         raise EphemerisSourceError("solar_configuration_changed")
     return {
         "moment": moment.isoformat(),
+        "civil_point": point.to_record(),
+        "comparison_policy": "retained_nominal_civil_point_v1",
         "provider": "jpl_de440",
         "approximate": False,
         "precision_scope": "engine_computed_not_independently_certified_to_seconds",
@@ -107,7 +110,6 @@ def _aa1996_resolution(year: int, term_name: str, timezone_name: str) -> dict[st
     moment, provenance = almanac._solar_term_utc_via_analytic(
         year,
         index,
-        {},
         aa1996=True,
         expected_aa1996_key=context[-1][2],
     )
@@ -124,6 +126,8 @@ def _aa1996_resolution(year: int, term_name: str, timezone_name: str) -> dict[st
         raise EphemerisSourceError("solar_configuration_changed")
     return {
         "moment": ZonedCalendar(moment, parse_timezone_name(timezone_name)).isoformat(),
+        "civil_point": provenance["resolved_civil_point"].to_record(),
+        "comparison_policy": "retained_nominal_civil_point_v1",
         "provider": "moshier_aa1996",
         "approximate": False,
         "precision_scope": "engine_computed_not_independently_certified_to_seconds",

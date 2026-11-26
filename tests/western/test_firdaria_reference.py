@@ -4,11 +4,9 @@ The independent oracle checks production against the original reference vectors.
 Sect is supplied explicitly, so these tests do not validate natal astronomy.
 """
 
-import json
 from calendar import monthrange
 from datetime import datetime, timedelta, timezone
 from fractions import Fraction
-from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import pytest
@@ -19,12 +17,9 @@ from fatebridge.core.predictive.firdaria import (
     _calendar_anniversary,
     build_firdaria_for_sect,
 )
+from fatebridge.utils.timezones import parse_timezone_name
+from tests.unit_test.fixtures.western_firdaria_cases import VECTORS
 
-VECTORS = json.loads(
-    (Path(__file__).parents[1] / "fixtures" / "firdaria-reference.json").read_text(
-        encoding="utf-8"
-    )
-)
 UTC = timezone.utc
 MICROSECOND = timedelta(microseconds=1)
 # Independent specification values, deliberately not imported from the engine.
@@ -53,8 +48,12 @@ def _reference_local(raw, timezone_name):
     local = naive.replace(tzinfo=zone)
     if not tz.datetime_exists(local):
         raise ValueError("nonexistent local time; confirm a valid instant")
+    else:
+        pass
     if tz.datetime_ambiguous(local):
         raise ValueError("ambiguous local time; confirm an explicit offset")
+    else:
+        pass
     return local
 
 
@@ -65,6 +64,8 @@ def _reference_anniversary(birth, age):
     # Always start from the original birthday, never a clamped prior endpoint.
     if isinstance(birth.tzinfo, ZoneInfo):
         return _reference_local(local.isoformat(), birth.tzinfo.key)
+    else:
+        pass
     return local.replace(tzinfo=birth.tzinfo)
 
 
@@ -108,7 +109,7 @@ def _example_birth(case):
 
 
 @pytest.mark.parametrize("schedule", VECTORS["periods"])
-def test_reference_age_tables_are_complete_cycles(schedule):
+def test_reference_age_tables_are_complete_cycles(schedule) -> None:
     rows = VECTORS["periods"][schedule]
     assert len(rows) == 9
     assert {planet for planet, _, _ in rows} == PERIOD_YEARS.keys()
@@ -119,7 +120,7 @@ def test_reference_age_tables_are_complete_cycles(schedule):
 
 
 @pytest.mark.parametrize("case", VECTORS["examples"], ids=lambda case: case["id"])
-def test_reference_original_examples_preserve_precision_and_display(case):
+def test_reference_original_examples_preserve_precision_and_display(case) -> None:
     birth = _example_birth(case)
     end = _reference_anniversary(birth, case["years"])
     first = _reference_sub_boundaries(birth, end)[1]
@@ -148,7 +149,7 @@ def test_reference_original_examples_preserve_precision_and_display(case):
 
 
 @pytest.mark.parametrize("case", VECTORS["examples"], ids=lambda case: case["id"])
-def test_production_original_examples_have_distinct_fixed_year_boundaries(case):
+def test_production_original_examples_have_distinct_fixed_year_boundaries(case) -> None:
     result = _production(_example_birth(case), case["sect"])
     major = result["timeline"][0]
     assert result["sect"] == case["sect"]
@@ -159,7 +160,9 @@ def test_production_original_examples_have_distinct_fixed_year_boundaries(case):
 
 
 @pytest.mark.parametrize("sect,schedule", [("day", "day"), ("night", "legacy_night")])
-def test_production_full_cycle_and_all_subperiod_lords(sect, schedule):
+def test_production_full_cycle_and_all_subperiod_lords(
+    sect: str, schedule: str
+) -> None:
     birth = datetime(2000, 1, 1, tzinfo=UTC)
     result = _production(birth, sect)
     for major, (planet, start_age, end_age) in zip(
@@ -181,16 +184,18 @@ def test_production_full_cycle_and_all_subperiod_lords(sect, schedule):
             assert [sub["end"] for sub in subs[:-1]] == [
                 sub["start"] for sub in subs[1:]
             ]
+        else:
+            pass
 
 
 @pytest.mark.parametrize("case", VECTORS["anniversaries"], ids=lambda case: case["id"])
-def test_reference_leap_anniversaries_use_original_anchor(case):
+def test_reference_leap_anniversaries_use_original_anchor(case) -> None:
     birth = _reference_local(case["birth_local"], "UTC")
     assert _reference_anniversary(birth, case["age"]).isoformat() == case["expected"]
     assert _calendar_anniversary(birth, case["age"]).isoformat() == case["expected"]
 
 
-def test_production_leap_birth_keeps_fixed_year_arithmetic():
+def test_production_leap_birth_keeps_fixed_year_arithmetic() -> None:
     birth = datetime(2000, 2, 29, 12, tzinfo=UTC)
     timeline = _production(birth, "night")["timeline"]
     assert timeline[0]["end"] == "2009-02-28T16:22:48+00:00"
@@ -199,7 +204,7 @@ def test_production_leap_birth_keeps_fixed_year_arithmetic():
 
 
 @pytest.mark.parametrize("case", VECTORS["timezone_cases"], ids=lambda case: case["id"])
-def test_reference_partitions_real_elapsed_time_and_converts_display(case):
+def test_reference_partitions_real_elapsed_time_and_converts_display(case) -> None:
     birth = _example_birth(case)
     end = _reference_anniversary(birth, case["age"])
     first = _reference_sub_boundaries(birth, end)[1]
@@ -217,7 +222,7 @@ def test_reference_partitions_real_elapsed_time_and_converts_display(case):
 @pytest.mark.parametrize(
     "case", VECTORS["invalid_local_times"], ids=lambda case: case["id"]
 )
-def test_reference_rejects_ambiguous_or_nonexistent_wall_clocks(case):
+def test_reference_rejects_ambiguous_or_nonexistent_wall_clocks(case) -> None:
     with pytest.raises(ValueError, match=case["reason"]):
         birth = _example_birth(case)
         _reference_anniversary(birth, case["age"])
@@ -231,7 +236,9 @@ def test_reference_rejects_ambiguous_or_nonexistent_wall_clocks(case):
 
 
 @pytest.mark.parametrize("offset", ["+01:00", "+02:00"])
-def test_reference_explicit_offsets_distinguish_repeated_birth_clock(offset):
+def test_reference_explicit_offsets_distinguish_repeated_birth_clock(
+    offset: str,
+) -> None:
     birth = _reference_local("2023-10-29T02:30:00", offset)
     expected_hour = 1 if offset == "+01:00" else 0
     assert birth.astimezone(UTC) == datetime(
@@ -245,7 +252,7 @@ def test_reference_explicit_offsets_distinguish_repeated_birth_clock(offset):
     )
 
 
-def test_production_fixed_years_keep_utc_duration_across_dst():
+def test_production_fixed_years_keep_utc_duration_across_dst() -> None:
     birth = _reference_local("2000-01-01T00:00:00", "Europe/Berlin")
     first = _production(birth, "day")["timeline"][0]["subperiods"][0]
     end = datetime.fromisoformat(first["end"])
@@ -254,8 +261,91 @@ def test_production_fixed_years_keep_utc_duration_across_dst():
     assert end.astimezone(UTC) - birth.astimezone(UTC) == nominal_duration
 
 
+def test_fixed_year_analysis_on_extended_utc_calendar() -> None:
+    tokyo = parse_timezone_name("Asia/Tokyo")
+    birth = datetime(1900, 1, 1, 9, 18, tzinfo=tokyo)
+    target = datetime(1, 1, 1, 9, 18, tzinfo=tokyo)
+    result = _production(birth, "day", target)
+    assert result["timeline"] == []
+    assert result["current_major"] is None
+    assert result["current_sub"] is None
+
+
+def test_fixed_year_search_horizon_and_delivered_endpoints_have_distinct_bounds() -> (
+    None
+):
+    west = timezone(timedelta(hours=-5))
+    birth = datetime(1900, 12, 31, 19, 1, tzinfo=west)
+    target = datetime(9950, 7, 1, 12, tzinfo=west)
+    result = _production(birth, "day", target)
+    assert len(result["timeline"]) == 12
+    assert result["current_major"]["planet"] == "Mercury"
+    assert result["current_major"]["end"] == "9956-12-31T08:56:12-05:00"
+    assert result["current_sub"]["end"] == "9951-06-06T10:47:48-05:00"
+
+    target = datetime(9999, 12, 31, 18, 59, tzinfo=west)
+    with pytest.raises(ValueError, match="Civil calendar label is outside"):
+        _production(birth, "day", target)
+
+
+@pytest.mark.parametrize("elapsed_minutes", [0, 1])
+def test_calendar_anniversary_preserves_birth_at_utc_year_zero(
+    elapsed_minutes: int,
+) -> None:
+    from fatebridge.core.astro.birth import build_astro_birth_info
+
+    birth = build_astro_birth_info(
+        birth_year=1,
+        birth_month=1,
+        birth_day=1,
+        birth_hour=13,
+        birth_minute=59,
+        birth_timezone="Etc/GMT-14",
+        birth_longitude=180,
+        birth_latitude=0,
+    )
+    assert birth.utc_datetime is None
+    analysis = birth.local_datetime + timedelta(minutes=elapsed_minutes)
+    result = build_firdaria_for_sect(
+        birth,
+        "day",
+        analysis_datetime=analysis,
+        firdaria_year_basis="calendar_anniversary",
+    )
+    assert result["current_major"]["start"] == "0001-01-01T13:59:00+14:00"
+    assert result["current_sub"]["end"] == "0002-06-07T07:07:34.285714+14:00"
+    assert result["current_sub"]["end_display"] == "0002-06-07 07:07+14:00"
+
+
+def test_calendar_anniversary_orders_extended_utc_analysis_before_birth() -> None:
+    east = parse_timezone_name("Etc/GMT-14")
+    birth = datetime(1, 1, 1, 14, tzinfo=east)
+    target = datetime(1, 1, 1, 13, 59, tzinfo=east)
+    with pytest.raises(ValueError, match="不能早于出生时刻"):
+        _production(birth, "day", target, firdaria_year_basis="calendar_anniversary")
+
+
+def test_calendar_anniversary_distinguishes_horizon_from_required_local_endpoint() -> (
+    None
+):
+    west = parse_timezone_name("Etc/GMT+5")
+    birth = datetime(1974, 12, 31, 23, tzinfo=west)
+    boundary = datetime(9999, 12, 31, 23, tzinfo=west)
+    for hour in (18, 22):
+        target = boundary.replace(hour=hour, minute=59)
+        result = _production(
+            birth, "day", target, firdaria_year_basis="calendar_anniversary"
+        )
+        assert len(result["timeline"]) == 12
+        assert result["current_major"]["planet"] == "South Node"
+        assert result["current_major"]["end"] == "9999-12-31T23:00:00-05:00"
+        assert result["current_sub"] is None
+    with pytest.raises(ValueError, match="Civil calendar label is outside"):
+        _production(birth, "day", boundary, firdaria_year_basis="calendar_anniversary")
+
+
 @pytest.mark.parametrize("sect", ["day", "night"])
-def test_production_exact_boundaries_nodes_and_75_year_restart(sect):
+def test_production_exact_boundaries_nodes_and_75_year_restart(sect: str) -> None:
     birth = datetime(2000, 1, 1, tzinfo=UTC)
     timeline = _production(birth, sect)["timeline"]
     for major in timeline[:10]:
@@ -265,6 +355,8 @@ def test_production_exact_boundaries_nodes_and_75_year_restart(sect):
         subs = major["subperiods"]
         if not subs:
             assert selected["current_sub"] is None
+        else:
+            pass
         for sub in subs:
             target = datetime.fromisoformat(sub["start"])
             active = _production(birth, sect, target)["current_sub"]
@@ -281,7 +373,7 @@ def test_production_exact_boundaries_nodes_and_75_year_restart(sect):
 
 
 @pytest.mark.parametrize("schedule", ["day", "reference_night"])
-def test_reference_cycle_boundaries_subdivision_and_restart(schedule):
+def test_reference_cycle_boundaries_subdivision_and_restart(schedule: str) -> None:
     birth = _reference_local("2000-02-29T12:00:00", "UTC")
     periods = []
     for cycle in range(2):
@@ -302,6 +394,8 @@ def test_reference_cycle_boundaries_subdivision_and_restart(schedule):
                     # Full precision, not displayed minutes, assigns the sub-lord.
                     assert bounds[k - 1] <= boundary - MICROSECOND < bounds[k]
                     assert bounds[k] <= boundary < bounds[k + 1]
+            else:
+                pass
     for index, (_, start, end) in enumerate(periods[:-1]):
         assert end == periods[index + 1][1]
         assert [row[0] for row in periods if row[1] <= end < row[2]] == [
@@ -337,13 +431,19 @@ def test_reference_cycle_boundaries_subdivision_and_restart(schedule):
                 instant = datetime.fromisoformat(sub["start"])
                 active = _production(birth, sect, instant, **options)
                 assert active["current_sub"]["planet"] == sub["planet"]
+        else:
+            pass
         active = _production(birth, sect, start, **options)
         assert active["current_major"]["planet"] == planet
         if not major["subperiods"]:
             assert active["current_sub"] is None
+        else:
+            pass
         if start > birth:
             previous = _production(birth, sect, start - MICROSECOND, **options)
             assert previous["current_major"]["end"] == start.isoformat()
+        else:
+            pass
     assert production["timeline"][8]["nominal_end_age"] == 75
     assert (
         _production(birth, sect, periods[9][1], **options)["current_major"]["planet"]
@@ -354,7 +454,9 @@ def test_reference_cycle_boundaries_subdivision_and_restart(schedule):
 @pytest.mark.parametrize("sect", ["day", "night"])
 @pytest.mark.parametrize("basis", ["fixed_365_2425", "calendar_anniversary"])
 @pytest.mark.parametrize("night_order", ["nodes_at_end", "nodes_after_mars"])
-def test_production_options_are_independent(sect, basis, night_order):
+def test_production_options_are_independent(
+    sect: str, basis: str, night_order: str
+) -> None:
     birth = datetime(2000, 1, 1, tzinfo=UTC)
     result = _production(
         birth, sect, firdaria_night_order=night_order, firdaria_year_basis=basis
@@ -376,6 +478,8 @@ def test_production_options_are_independent(sect, basis, night_order):
         assert major["end"] == expected.isoformat()
     if (night_order, basis) == ("nodes_at_end", "fixed_365_2425"):
         assert result == _production(birth, sect)
+    else:
+        pass
     assert result["calculation_options"] == {
         "night_order": night_order,
         "year_basis": basis,
@@ -386,8 +490,8 @@ def test_production_options_are_independent(sect, basis, night_order):
 
 @pytest.mark.parametrize("second,microsecond", [(0, 1), (34, 285714), (59, 999999)])
 def test_reference_minute_display_always_truncates_without_mutating_instant(
-    second, microsecond
-):
+    second: int, microsecond: int
+) -> None:
     exact = datetime(2003, 3, 18, 4, 48, second, microsecond, tzinfo=UTC)
     original = exact.isoformat()
     assert _display_minute(exact, UTC) == "2003-03-18 04:48+00:00"
@@ -398,7 +502,9 @@ def test_reference_minute_display_always_truncates_without_mutating_instant(
 
 
 @pytest.mark.parametrize("hour,sect", [(6, "day"), (0, "night")])
-def test_native_horizon_sect_feeds_the_explicit_calendar_arithmetic(hour, sect):
+def test_native_horizon_sect_feeds_the_explicit_calendar_arithmetic(
+    hour: int, sect: str
+) -> None:
     from fatebridge.core.astro.birth import build_astro_birth_info
     from fatebridge.core.predictive._common import build_natal_subject
     from fatebridge.core.predictive.firdaria import build_firdaria_payload
@@ -424,7 +530,7 @@ def test_native_horizon_sect_feeds_the_explicit_calendar_arithmetic(hour, sect):
     VECTORS["third_party"]["morinus_cases"],
     ids=lambda case: case["date"] + "-" + case["schedule"],
 )
-def test_pinned_morinus_calendar_dates_and_all_displayed_sub_lords(case):
+def test_pinned_morinus_calendar_dates_and_all_displayed_sub_lords(case) -> None:
     birth = datetime.fromisoformat(case["date"]).replace(tzinfo=UTC)
     result = _production(
         birth,
@@ -456,7 +562,7 @@ def test_pinned_morinus_calendar_dates_and_all_displayed_sub_lords(case):
     VECTORS["third_party"]["temporal_cases"],
     ids=lambda case: case["schedule"] + "-" + case["basis"],
 )
-def test_frozen_temporal_leap_clock_boundaries_and_active_intervals(case):
+def test_frozen_temporal_leap_clock_boundaries_and_active_intervals(case) -> None:
     birth = datetime.fromisoformat(case["birth"]["local"]).replace(tzinfo=UTC)
     target = datetime.fromisoformat(case["target"]["local"]).replace(tzinfo=UTC)
     options = dict(
@@ -497,7 +603,9 @@ def test_frozen_temporal_leap_clock_boundaries_and_active_intervals(case):
     VECTORS["third_party"]["birchfield_tables"],
     ids=lambda case: case["schedule"],
 )
-def test_literal_paper_table_disagreements_with_governing_order_are_retained(case):
+def test_literal_paper_table_disagreements_with_governing_order_are_retained(
+    case,
+) -> None:
     birth = datetime(2000, 1, 1, tzinfo=UTC)
     result = _production(
         birth,
@@ -526,4 +634,6 @@ def test_literal_paper_table_disagreements_with_governing_order_are_retained(cas
                         governing_rule=sub["planet"],
                     )
                 )
+            else:
+                pass
     assert differences == case["literal_discrepancies"]

@@ -31,6 +31,8 @@ def source_bundle(source, window):
     raw = (source / f"record-responses/case-{window:02}.bin").read_bytes()
     if len(raw) != 3 * 8144:
         raise ValueError("Incomplete source records")
+    else:
+        pass
     return meta, [raw[k : k + 8144] for k in range(0, len(raw), 8144)]
 
 
@@ -151,6 +153,8 @@ def infer_joint(source, case, vector, observer, profile, plan):
     }
     if Q(chosen["minimum_absolute_determinant"]) <= 0:
         return {**result, "status": "conditioning_unknown"}
+    else:
+        pass
     axes = chosen["axes"]
     e, v = [
         exact_state(source, case["window_index"], t, body)
@@ -160,6 +164,8 @@ def infer_joint(source, case, vector, observer, profile, plan):
     det = point[0][0] * point[1][1] - point[0][1] * point[1][0]
     if det == 0:
         raise ValueError("Source interval monotonicity contradicts exact Jacobian")
+    else:
+        pass
     C = [
         [point[1][1] / det, -point[0][1] / det],
         [-point[1][0] / det, point[0][0] / det],
@@ -186,7 +192,11 @@ def infer_joint(source, case, vector, observer, profile, plan):
         if step["empty_intersection"]:
             if result["selected_equations_parametric_unique_root_proved"]:
                 raise ValueError("Proved source-root family became empty")
+            else:
+                pass
             return {**result, "status": "no_source_root_in_frozen_support"}
+        else:
+            pass
         result["selected_equations_parametric_unique_root_proved"] |= (
             step["strict_image_interior"] and Q(step["contraction_upper"]) < 1
         )
@@ -305,6 +315,8 @@ def analyze(run, cohort):
         for query in source_plan["queries"]:
             if query["cohort"] != spec["source_cohort"] or query["kind"] != "LT_vector":
                 continue
+            else:
+                pass
             root = run / spec["root"]
             raw = (root / "responses" / (query["id"] + ".raw")).read_bytes()
             receipt = json.loads(
@@ -322,12 +334,16 @@ def analyze(run, cohort):
             require_matching_time_batches(query, oq)
             if sha(raw) != receipt["raw_sha256"] or sha(oraw) != oreceipt["raw_sha256"]:
                 raise ValueError("Original table bytes changed")
+            else:
+                pass
             rows = parse(raw, query, cases, source_plan)
             observed = classify(oraw, oreceipt["status"], oq, cases, source_plan)
             if receipt["status"] != 200 or observed["status"] != "supported":
                 raise ValueError(
                     "Unavailable table cannot be a joint source constraint"
                 )
+            else:
+                pass
             lookup = {r["case_id"]: r for r in observed["rows"]}
             group = {
                 **spec,
@@ -362,3 +378,5 @@ if __name__ == "__main__":
     p.add_argument("--cohort", choices=["A", "B"], required=True)
     a = p.parse_args()
     save(a.run / (a.cohort + "-first-analysis.json"), analyze(a.run, a.cohort))
+else:
+    pass

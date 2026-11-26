@@ -25,7 +25,9 @@ SOURCE = {
 }
 
 
-def _finite(value: float) -> Fraction:
+def _finite(value: float | Fraction) -> Fraction:
+    if isinstance(value, Fraction):
+        return value
     if type(value) not in (int, float) or not math.isfinite(value):
         raise ValueError("Mixed-pair coordinates require finite numbers")
     return Fraction(value)
@@ -48,7 +50,6 @@ def unavailable_mixed_pairs(
             "unavailable_arc_sample_count": None,
             "summary": None,
             "continuous_interval_proven": False,
-            "sample_frequency_is_probability": False,
         },
         "sources": [SOURCE],
         "limitations": [
@@ -60,7 +61,7 @@ def unavailable_mixed_pairs(
 
 def mixed_pair_geometry(
     longitudes: Mapping[str, float],
-    arc_degrees: float,
+    arc_degrees: float | Fraction,
     *,
     orb_degrees: float = 1.0,
     hypothetical_ids: Collection[str] = (),
@@ -179,7 +180,6 @@ def mixed_pair_geometry(
             "unavailable_arc_sample_count": None,
             "summary": None,
             "continuous_interval_proven": False,
-            "sample_frequency_is_probability": False,
         },
         "sources": [SOURCE],
         "limitations": [

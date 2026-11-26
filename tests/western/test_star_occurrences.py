@@ -6,8 +6,11 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.bazi_evidence import build_natal_evidence
-from fatebridge.core.output_star_occurrences import StarOccurrenceCount, StarOccurrences
+from fatebridge.core.bazi.bazi_evidence import build_natal_evidence
+from fatebridge.core.contracts.output_star_occurrences import (
+    StarOccurrenceCount,
+    StarOccurrences,
+)
 from fatebridge.core.star_occurrences import build_star_occurrences
 
 FIXTURE = Path(__file__).parents[1] / "data/bazi/star-count-source-cases.json"
@@ -19,7 +22,9 @@ CASES = [
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_source_integer_counts_and_visible_absence_match_the_published_receipt(case):
+def test_source_integer_counts_and_visible_absence_match_the_published_receipt(
+    case,
+) -> None:
     pillars = dict(zip(("year", "month", "day", "hour"), map(tuple, case["pillars"])))
     evidence = build_natal_evidence(pillars)
     result = evidence["star_occurrences"]
@@ -35,7 +40,7 @@ def test_source_integer_counts_and_visible_absence_match_the_published_receipt(c
     StarOccurrences.model_validate(result)
 
 
-def test_missing_categories_stay_missing_and_count_units_cannot_be_forged():
+def test_missing_categories_stay_missing_and_count_units_cannot_be_forged() -> None:
     result = build_star_occurrences({"正印": []})
     assert (
         result["status"] == "partial_star_categories" and "偏印" not in result["gods"]

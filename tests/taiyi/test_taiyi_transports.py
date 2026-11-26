@@ -10,74 +10,11 @@ from fastmcp import Client
 import fatebridge.api as api
 from fatebridge.application.examples import example_input, suggested_fields
 from fatebridge.cli import run
+from fatebridge.core.metaphysics.taiyi_conditions import conjunction
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
-
-
-async def _same_run_payload(client, result, *, require_business_inline=False):
-    """Check actual evidence visibility, including an explicitly deferred runtime.
-
-    A delivery reference may now point only to metadata. Presence of that
-    reference is not a proxy for missing calculation facts. Compare every
-    business value to the exact stored run instead of weakening the evidence.
-    """
-    assert not result.is_error, result
-    first = result.structured_content
-    assert len(json.dumps(first, ensure_ascii=False, separators=(",", ":"))) <= 8192
-    ref = first.get("result_delivery")
-    if ref is None:
-        return first
-    parts = []
-    uri = ref.get("first_page_uri")
-    if uri is None:
-        manifest = json.loads((await client.read_resource(ref["manifest_uri"]))[0].text)
-        assert manifest["result_id"] == ref["result_id"]
-        assert manifest["run_metadata"]["run_id"] == first["run_metadata"]["run_id"]
-        uri = manifest["first_page_uri"]
-    while uri:
-        page = json.loads((await client.read_resource(uri))[0].text)
-        parts.append(page["text"])
-        uri = page["next_uri"]
-    raw = "".join(parts)
-    assert len(raw) == ref["total_chars"]
-    original = json.loads(raw)
-    receipt = first["run_metadata"]
-    full_receipt = original["run_metadata"]
-    assert_same_run_receipt(
-        receipt, full_receipt, deferred_fields=ref["deferred_fields"]
-    )
-    if require_business_inline:
-        assert "run_metadata" not in ref["deferred_fields"]
-        business_deferred = {
-            p for p in ref["deferred_fields"] if not p.startswith("run_metadata.")
-        }
-        assert business_deferred == set(original) - set(first)
-        for key in set(original) & set(first) - {"run_metadata"}:
-            assert first[key] == original[key]
-        if business_deferred:
-            # Paging is permitted only if even a lower bound with
-            # every optional locator/supplement removed exceeds8192.
-            essential = {
-                k: v
-                for k, v in receipt.items()
-                if k not in {"provenance", "determinism"}
-            }
-            minimal_ref = {k: ref[k] for k in ("result_id", "manifest_uri")}
-            floor = {
-                **original,
-                "run_metadata": essential,
-                "result_delivery": minimal_ref,
-            }
-            assert (
-                len(json.dumps(floor, ensure_ascii=False, separators=(",", ":"))) > 8192
-            )
-        for key in (
-            "run_id",
-            "trace_id",
-        ):
-            assert receipt[key] == full_receipt[key]
-    return original
+from tests.support.transports import SPECS, call_calculation
+from tests.unit_test.fixtures.taiyi import same_run_payload
 
 
 @pytest.mark.parametrize(
@@ -125,8 +62,12 @@ async def _same_run_payload(client, result, *, require_business_inline=False):
     ],
 )
 def test_published_first_views_preserve_evidence_under_default_limits(
-    key, view, mode, hour_profile, month_profile
-):
+    key: str,
+    view: str | None,
+    mode: str,
+    hour_profile: str | None,
+    month_profile: str | None,
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     inputs = example_input(spec)
     assert inputs is not None
@@ -134,18 +75,27 @@ def test_published_first_views_preserve_evidence_under_default_limits(
         inputs["calculation_mode"] = mode
         if month_profile:
             inputs["month_profile"] = month_profile
+        else:
+            pass
         if hour_profile:
             inputs["hour_profile"] = hour_profile
+        else:
+            pass
     else:
         inputs["taiyi_options"] = {"calculation_mode": mode}
         if month_profile:
             inputs["taiyi_options"]["month_profile"] = month_profile
+        else:
+            pass
         if hour_profile:
             inputs["taiyi_options"]["hour_profile"] = hour_profile
+        else:
+            pass
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
+            result = await call_calculation(
+                client,
                 spec.tool_name,
                 {
                     **inputs,
@@ -155,7 +105,7 @@ def test_published_first_views_preserve_evidence_under_default_limits(
                 },
                 raise_on_error=False,
             )
-            body = await _same_run_payload(client, result, require_business_inline=True)
+            body = await same_run_payload(client, result, require_business_inline=True)
             return result, body
 
     result, body = asyncio.run(protocol())
@@ -167,7 +117,6 @@ def test_published_first_views_preserve_evidence_under_default_limits(
         assert assessment["three_gates"]["status"] == (
             "not_assessed" if mode in {"hour", "day"} or month_profile else "computed"
         )
-        from fatebridge.core.metaphysics.taiyi_conditions import conjunction
 
         assert assessment["menju_jiangfa"] is conjunction(
             assessment["five_generals"]["conditions_satisfied"],
@@ -245,6 +194,8 @@ def test_published_first_views_preserve_evidence_under_default_limits(
                 "hour": "double_hour",
             }[mode]
         )
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
@@ -286,21 +237,36 @@ def test_published_first_views_preserve_evidence_under_default_limits(
     ],
 )
 def test_taiyi_evidence_across_real_transports(
-    monkeypatch, capsys, key, payload, fields, mode, hour_profile, month_profile
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    key: str,
+    payload,
+    fields,
+    mode: str,
+    hour_profile: str | None,
+    month_profile: str | None,
+) -> None:
     payload = dict(payload)
     if key == "taiyi":
         payload.update(calculation_mode=mode, analysis_second=2)
         if month_profile:
             payload["month_profile"] = month_profile
+        else:
+            pass
         if hour_profile:
             payload["hour_profile"] = hour_profile
+        else:
+            pass
     else:
         payload.update(taiyi_options={"calculation_mode": mode}, time="12:00:02")
         if month_profile:
             payload["taiyi_options"]["month_profile"] = month_profile
+        else:
+            pass
         if hour_profile:
             payload["taiyi_options"]["hour_profile"] = hour_profile
+        else:
+            pass
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -313,7 +279,7 @@ def test_taiyi_evidence_across_real_transports(
         "strict_fields": True,
         "response_char_limit": 0,
     }
-    route = "/api/cn/taiyi" if key == "taiyi" else "/api/divination/sanshiunited"
+    route = "/api/taiyi" if key == "taiyi" else "/api/divination/sanshi"
     response = TestClient(api.app).post(
         route,
         json=payload,
@@ -328,15 +294,17 @@ def test_taiyi_evidence_across_real_transports(
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                key, {**payload, **options}, raise_on_error=False
+            return await call_calculation(
+                client,
+                SPECS[key].tool_name,
+                {**payload, **options},
+                raise_on_error=False,
             )
 
     native = asyncio.run(protocol())
     assert not native.is_error, native
     mcp = native.structured_content
-    assert mcp == json.loads(native.content[0].text)
-    args = [key]
+    args = [SPECS[key].tool_name]
     for name, value in payload.items():
         args += [
             "--" + name.replace("_", "-"),
@@ -374,7 +342,9 @@ def test_taiyi_evidence_across_real_transports(
 @pytest.mark.parametrize(
     "obsolete", [{"accNum": 0}, {"acc_num": 0}, {"rotation": "顺布"}]
 )
-def test_obsolete_options_rejected_by_rest_mcp_and_cli(monkeypatch, capsys, obsolete):
+def test_obsolete_options_rejected_by_rest_mcp_and_cli(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], obsolete
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -387,20 +357,22 @@ def test_obsolete_options_rejected_by_rest_mcp_and_cli(monkeypatch, capsys, obso
         "use_true_solar_time": False,
         "taiyi_options": obsolete,
     }
-    response = TestClient(api.app).post("/api/divination/sanshiunited", json=payload)
+    response = TestClient(api.app).post("/api/divination/sanshi", json=payload)
     assert response.status_code == 400
     assert "未实现的太乙选项" in response.text
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool("sanshiunited", payload, raise_on_error=False)
+            return await call_calculation(
+                client, "sanshi_combined_chart", payload, raise_on_error=False
+            )
 
     native = asyncio.run(protocol())
     assert native.is_error
     capsys.readouterr()
     code = run(
         [
-            "sanshiunited",
+            "sanshi_combined_chart",
             "--date",
             payload["date"],
             "--time",
@@ -421,8 +393,8 @@ def test_obsolete_options_rejected_by_rest_mcp_and_cli(monkeypatch, capsys, obso
 
 @pytest.mark.parametrize("mode", ["year", "day"])
 def test_hour_profile_is_rejected_in_non_hour_mode_on_all_transports(
-    monkeypatch, capsys, mode
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], mode: str
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -438,12 +410,14 @@ def test_hour_profile_is_rejected_in_non_hour_mode_on_all_transports(
         "calculation_mode": mode,
         "hour_profile": "key_hour_winter_jiazi_v1",
     }
-    response = TestClient(api.app).post("/api/cn/taiyi", json=payload)
+    response = TestClient(api.app).post("/api/taiyi", json=payload)
     assert response.status_code == 400
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool("taiyi", payload, raise_on_error=False)
+            return await call_calculation(
+                client, "taiyi", payload, raise_on_error=False
+            )
 
     native = asyncio.run(protocol())
     assert native.is_error
@@ -474,7 +448,9 @@ def test_hour_profile_is_rejected_in_non_hour_mode_on_all_transports(
 
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 @pytest.mark.parametrize("view", ["daily_calendar", "daily_essences"])
-def test_daily_first_views_preserve_unknowns_and_source_variants(key, view):
+def test_daily_first_views_preserve_unknowns_and_source_variants(
+    key: str, view: str
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     inputs = example_input(spec)
     if key == "taiyi":
@@ -484,7 +460,8 @@ def test_daily_first_views_preserve_unknowns_and_source_variants(key, view):
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
+            result = await call_calculation(
+                client,
                 spec.tool_name,
                 {
                     **inputs,
@@ -494,7 +471,7 @@ def test_daily_first_views_preserve_unknowns_and_source_variants(key, view):
                 },
                 raise_on_error=False,
             )
-            await _same_run_payload(client, result, require_business_inline=True)
+            await same_run_payload(client, result, require_business_inline=True)
             return result
 
     result = asyncio.run(protocol())
@@ -517,7 +494,9 @@ def test_daily_first_views_preserve_unknowns_and_source_variants(key, view):
 
 
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
-def test_daily_complete_board_paging_recovers_same_run_evidence_and_receipt(key):
+def test_daily_complete_board_paging_recovers_same_run_evidence_and_receipt(
+    key: str,
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     inputs = example_input(spec)
     if key == "taiyi":
@@ -527,7 +506,8 @@ def test_daily_complete_board_paging_recovers_same_run_evidence_and_receipt(key)
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
+            result = await call_calculation(
+                client,
                 spec.tool_name,
                 {
                     **inputs,
@@ -537,7 +517,7 @@ def test_daily_complete_board_paging_recovers_same_run_evidence_and_receipt(key)
                 },
             )
             assert "result_delivery" in result.structured_content
-            return await _same_run_payload(client, result)
+            return await same_run_payload(client, result)
 
     body = asyncio.run(protocol())
     records = body["taiyi"]["ten_jing"]["records"]

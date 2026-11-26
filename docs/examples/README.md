@@ -45,7 +45,7 @@
 
 ## 六爻教学输入
 
-[旬空、动静与日级条件](liuyao-conditional-demo.json)和[需之讼装卦](liuyao-need-to-song.json)用于 `sixyao`。它们是构造的教学资料，不代表历史占例的真实日期或现实问事。JSON 可作为 MCP 参数或发送至 REST `/api/divination/sixyao`；CLI 按 `describe sixyao --detail input` 转成对应字段参数，不套用风水的 `--request-file`。
+[旬空、动静与日级条件](liuyao-conditional-demo.json)和[需之讼装卦](liuyao-need-to-song.json)用于 `sixyao`。它们是构造的教学资料，不代表历史占例的真实日期或现实问事。JSON 可作为 MCP 参数或发送至 REST `/api/divination/liuyao`；CLI 按 `describe sixyao --detail input` 转成对应字段参数，不套用风水的 `--request-file`。
 
 ## 历法核对示例
 
@@ -58,7 +58,7 @@
 ```bash
 uv run --locked --extra dev fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json \
   --fields status layers coverage rulesets rule_trace --strict-fields --compact
-uv run --locked --extra dev fatebridge fengshui_xuankong_natal --request-file docs/examples/fengshui-xuankong.json --compact
+uv run --locked --extra dev fatebridge fengshui_xuankong_house_chart --request-file docs/examples/fengshui-xuankong.json --compact
 ```
 
 两个命令分别演示原始分层结果和独立数字宅盘。查看布局规则时，投影另加实际请求对应的 `layout_analysis` 分支；例如 `fengshui-forms.json` 应读取 `layout_analysis.form_analysis`，`fengshui-home-alternatives.json` 应读取 `layout_analysis.alternatives_analysis`。不要把只投影 `layers` 的输出当成布局审查结果。

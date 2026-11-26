@@ -13,13 +13,21 @@ https://github.com/aloistr/swisseph/blob/175e1fcb3108bcd5c0d146c803f51dcf2350801
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
+from fractions import Fraction
 from typing import Protocol
 
 import erfa
 
 from fatebridge.core.astro.cartesian import CartesianState
-from fatebridge.core.astro.earth_attitude import PhysicalEquator, RotationSource
+from fatebridge.core.astro.earth_attitude import (
+    EarthAttitude,
+    PhysicalEquator,
+    RotationSource,
+)
 from fatebridge.core.astro.reference_frames import (
+    dot,
+    mm,
     mv,
     native_precession_frame,
     transpose,
@@ -35,6 +43,102 @@ class ObserverSource(RotationSource, Protocol):
     def sidtime0(self, jd_ut1: float, obliquity: float, nutation: float) -> float: ...
 
 
+@dataclass(frozen=True)
+class TerrestrialFrame:
+    """Geodetic east, north and up, expressed in the selected equator."""
+
+    east: tuple[float, float, float]
+    north: tuple[float, float, float]
+    up: tuple[float, float, float]
+
+    def equatorial_site(self) -> tuple[float, float]:
+        """Right ascension and declination of the model vertical, in degrees."""
+        x, y, z = self.up
+        return (
+            math.degrees(math.atan2(y, x)) % 360,
+            math.degrees(math.atan2(z, math.hypot(x, y))),
+        )
+
+
+def terrestrial_frame(
+    equator: PhysicalEquator, *, longitude: float, latitude: float
+) -> TerrestrialFrame:
+    """Use the same polar motion and rotation as the physical receiver.
+
+    SOFA C2TEQX is W R3(GAST) N; local ENU rows in N axes are therefore
+    L W R3(GAST). The zero-EOP branch retains the original scalar geometry.
+    The vertical is the declared ellipsoid normal, not a surveyed plumb line.
+    """
+    phi = math.radians(latitude)
+    if equator.polar_motion is None:
+        local = math.radians(equator.greenwich_sidereal_degrees + longitude)
+        return TerrestrialFrame(
+            (-math.sin(local), math.cos(local), 0.0),
+            (
+                -math.sin(phi) * math.cos(local),
+                -math.sin(phi) * math.sin(local),
+                math.cos(phi),
+            ),
+            (
+                math.cos(phi) * math.cos(local),
+                math.cos(phi) * math.sin(local),
+                math.sin(phi),
+            ),
+        )
+    lam = math.radians(longitude)
+    local_itrs = (
+        (-math.sin(lam), math.cos(lam), 0.0),
+        (
+            -math.sin(phi) * math.cos(lam),
+            -math.sin(phi) * math.sin(lam),
+            math.cos(phi),
+        ),
+        (
+            math.cos(phi) * math.cos(lam),
+            math.cos(phi) * math.sin(lam),
+            math.sin(phi),
+        ),
+    )
+    pole = erfa.pom00(*equator.polar_motion)
+    polar_motion = (
+        (float(pole[0][0]), float(pole[0][1]), float(pole[0][2])),
+        (float(pole[1][0]), float(pole[1][1]), float(pole[1][2])),
+        (float(pole[2][0]), float(pole[2][1]), float(pole[2][2])),
+    )
+    theta = math.radians(equator.greenwich_sidereal_degrees)
+    rotation = (
+        (math.cos(theta), math.sin(theta), 0.0),
+        (-math.sin(theta), math.cos(theta), 0.0),
+        (0.0, 0.0, 1.0),
+    )
+    east, north, up = mm(mm(local_itrs, polar_motion), rotation)
+    return TerrestrialFrame(
+        (east[0], east[1], east[2]),
+        (north[0], north[1], north[2]),
+        (up[0], up[1], up[2]),
+    )
+
+
+def house_site(
+    attitude: EarthAttitude, *, longitude: float, latitude: float
+) -> tuple[float, float]:
+    """ARMC and vertical latitude for the house model's actual equator."""
+    if attitude.equator.polar_motion is None:
+        return (attitude.house_sidereal_degrees + longitude) % 360, latitude
+    frame = terrestrial_frame(attitude.equator, longitude=longitude, latitude=latitude)
+    right_ascension, declination = frame.equatorial_site()
+    origin = math.degrees(
+        math.atan2(
+            dot(attitude.reduction.house_frame[0], attitude.equator.matrix[1]),
+            dot(attitude.reduction.house_frame[0], attitude.equator.matrix[0]),
+        )
+    )
+    return (
+        float((Fraction(right_ascension) - Fraction(origin)) % 360) % 360,
+        declination,
+    )
+
+
 def terrestrial_observer(
     equator: PhysicalEquator,
     *,
@@ -44,18 +148,19 @@ def terrestrial_observer(
 ) -> CartesianState:
     """Geocentric receiver in ICRS axes, AU and AU/day, at one epoch pair.
 
-    Pairing GAST with the matching true-equinox triad is equivalent to the
-    standard ERA/CIRS construction. Polar motion and TIO locator are zero;
-    this is a declared WGS84 ellipsoid/nominal spin, not a surveyed geoid,
-    measured EOP or a derivative of an extrapolated orientation model.
+    Pairing GAST with its matching triad is equivalent to the ERA/CIRS
+    construction. Selected polar motion and TIO locator are supplied with
+    that attitude; the default retains zero EOP. This is a WGS84 ellipsoid
+    and nominal spin, not a surveyed geoid or full station-motion derivative.
     """
+    xp, yp, sp = equator.polar_motion or (0.0, 0.0, 0.0)
     pv = erfa.pvtob(
         math.radians(longitude),
         math.radians(latitude),
         height,
-        0.0,
-        0.0,
-        0.0,
+        xp,
+        yp,
+        sp,
         math.radians(equator.greenwich_sidereal_degrees),
     )
     inverse = transpose(equator.matrix)

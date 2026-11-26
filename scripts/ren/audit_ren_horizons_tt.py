@@ -34,6 +34,8 @@ def sha(path: Path) -> str:
 def frozen(folder: Path, pin: str) -> dict[str, str]:
     if sha(folder / "freeze.json") != pin:
         raise ValueError("Frozen TT reference identity changed")
+    else:
+        pass
     manifest: dict[str, str] = json.loads((folder / "freeze.json").read_text())["files"]
     inventory = {
         str(p.relative_to(folder))
@@ -42,9 +44,13 @@ def frozen(folder: Path, pin: str) -> dict[str, str]:
     }
     if inventory != set(manifest):
         raise ValueError("Frozen TT reference inventory changed")
+    else:
+        pass
     for name, digest in manifest.items():
         if sha(folder / name) != digest:
             raise ValueError("Frozen TT reference content changed: " + name)
+        else:
+            pass
     return manifest
 
 
@@ -59,6 +65,8 @@ def reference(corpus: Path = CORPUS, comparison: Path = COMPARISON) -> dict[str,
         or any(sha(corpus / n) != h for n, h in pre["files"].items())
     ):
         raise ValueError("TT precomparison reference changed")
+    else:
+        pass
     protocol = json.loads((corpus / "protocol.json").read_text())
     specification = json.loads((comparison / "protocol.json").read_text())
     if (
@@ -71,6 +79,8 @@ def reference(corpus: Path = CORPUS, comparison: Path = COMPARISON) -> dict[str,
         != ["native_swiss", "native_moshier", "analytic", "de440", "spk"]
     ):
         raise ValueError("TT cohort or comparison criteria changed")
+    else:
+        pass
     prior = ROOT / "tests/fixtures/ren_horizons_crossings_v1"
     if (
         sha(prior / "freeze.json") != protocol["prior_freeze_sha256"]
@@ -78,14 +88,20 @@ def reference(corpus: Path = CORPUS, comparison: Path = COMPARISON) -> dict[str,
         != protocol["prior_protocol_sha256"]
     ):
         raise ValueError("Original 113-event cohort identity changed")
+    else:
+        pass
     prior_manifest = json.loads((prior / "freeze.json").read_text())["files"]
     if any(sha(prior / n) != h for n, h in prior_manifest.items()):
         raise ValueError("Original 113-event source changed")
+    else:
+        pass
     old = json.loads((prior / "collection/horizons-protocol.json").read_text())
     cases = protocol["cohort"]
     key = lambda c: (c["year"], c["term"], c["published_moment"])
     if len(cases) != 113 or list(map(key, cases)) != list(map(key, old["cohort"])):
         raise ValueError("All original 113 events are required")
+    else:
+        pass
     for case in cases:
         center = (
             datetime.fromisoformat(case["published_moment"])
@@ -97,6 +113,8 @@ def reference(corpus: Path = CORPUS, comparison: Path = COMPARISON) -> dict[str,
             for s in (-300, -150, 0, 150, 300)
         ]:
             raise ValueError("Independent TT query window changed")
+        else:
+            pass
     import erfa
     import numpy
 
@@ -109,6 +127,8 @@ def reference(corpus: Path = CORPUS, comparison: Path = COMPARISON) -> dict[str,
         numpy.__version__,
     ) != ("2.0.1.5", "2.0.1", "20231011", "2.5.4"):
         raise ValueError("TT reference transform runtime differs")
+    else:
+        pass
     transport = json.loads((corpus / "transport-protocol.json").read_text())
     initial = json.loads((corpus / "initial-reference.json").read_text())
     data = json.loads((corpus / "reference.json").read_text())
@@ -119,6 +139,8 @@ def reference(corpus: Path = CORPUS, comparison: Path = COMPARISON) -> dict[str,
         or data["production_calculations_performed"] is not False
     ):
         raise ValueError("Complete independent TT reference required")
+    else:
+        pass
     observed: dict[str, list[dict[str, Any]]] = {}
     for stage, labels in (
         ("initial", [s for c in cases for s in c["initial_tt_labels"]]),
@@ -132,6 +154,8 @@ def reference(corpus: Path = CORPUS, comparison: Path = COMPARISON) -> dict[str,
         size = transport["effective_batch_size"]
         if len(queries) != math.ceil(len(labels) / size):
             raise ValueError("Complete TT request batches required")
+        else:
+            pass
         rows = []
         for index, path in enumerate(queries):
             base = Path(str(path).removesuffix(".query.json"))
@@ -150,6 +174,8 @@ def reference(corpus: Path = CORPUS, comparison: Path = COMPARISON) -> dict[str,
                 or shlex.split(params["TLIST"]) != batch
             ):
                 raise ValueError("Remote TT request differs from fixed cohort")
+            else:
+                pass
             status = json.loads(base.with_suffix(".status.json").read_text())
             response = base.with_suffix(".response.json")
             if (
@@ -159,12 +185,18 @@ def reference(corpus: Path = CORPUS, comparison: Path = COMPARISON) -> dict[str,
                 or status["response_sha256"] != sha(response)
             ):
                 raise ValueError("Unsuccessful or replaced remote TT response")
+            else:
+                pass
             rows.extend(parse(response, batch))
         observed[stage] = [transform(row) for row in rows]
     if len(observed["initial"]) != 565 or len(observed["refinement"]) != 226:
         raise ValueError("All 791 direct TT probes are required")
+    else:
+        pass
     if observed["initial"] != initial["transformed_probes"]:
         raise ValueError("Stored TT transform differs from raw JPL reconstruction")
+    else:
+        pass
     for i, (case, seed, result) in enumerate(
         zip(cases, initial["events"], data["events"], strict=True)
     ):
@@ -189,6 +221,8 @@ def reference(corpus: Path = CORPUS, comparison: Path = COMPARISON) -> dict[str,
         }
         if seed != expected_seed or result != expected_result:
             raise ValueError("Independent TT interpolation or event binding differs")
+        else:
+            pass
     return {"protocol": protocol, "specification": specification, "reference": data}
 
 
@@ -196,6 +230,8 @@ def tt_days(label: str) -> Fraction:
     moment = datetime.fromisoformat(label)
     if moment.tzinfo is not None:
         raise ValueError("Reference TT label must not masquerade as UTC")
+    else:
+        pass
     delta = moment - J2000
     micros = (delta.days * 86400 + delta.seconds) * 1000000 + delta.microseconds
     return Fraction(2451545) + Fraction(micros, 86400000000)
@@ -209,6 +245,8 @@ def compare_cases(
     cases = data["reference"]["events"]
     if len(cases) != 113 or len({(c["year"], c["term"]) for c in cases}) != 113:
         raise ValueError("Complete unique 113-event comparison required")
+    else:
+        pass
     rows = []
     for case in cases:
         row: dict[str, Any] = {
@@ -223,12 +261,16 @@ def compare_cases(
                 type(v) not in (int, float) or not math.isfinite(v) for v in parts
             ):
                 raise ValueError("Actual root must have two finite TT parts")
+            else:
+                pass
             delta = float(
                 (sum(map(Fraction, parts)) - tt_days(case["refined_root_tt"])) * 86400
             )
             civil = datetime.fromisoformat(actual["civil_datetime"])
             if civil.utcoffset() is None:
                 raise ValueError("Actual civil label must retain an offset")
+            else:
+                pass
             minute_delta = (
                 civil - datetime.fromisoformat(case["published_moment"])
             ).total_seconds()
@@ -302,15 +344,23 @@ def audit(data: dict[str, Any], profile: dict[str, Any]) -> dict[str, Any]:
                 }
             except Exception as error:
                 errors[year] = error
+        else:
+            pass
         if year in errors:
             raise errors[year]
+        else:
+            pass
         term = years[year][case["term"]]
         detail = term.solar_model_details
         if not isinstance(detail, dict):
             raise ValueError("Actual selected root receipt is missing")
+        else:
+            pass
         parts = detail.get("selected_crossing_tt_parts")
         if parts is None:
             parts = [detail["selected_crossing_jd_tt"], 0.0]
+        else:
+            pass
         return {
             "selected_tt_parts": parts,
             "provider": term.resolution_provider,
@@ -349,6 +399,8 @@ def main() -> int:
     else:
         if args.ephe_dir is None:
             parser.error("--profile requires an explicit --ephe-dir")
+        else:
+            pass
         profile = next(
             p for p in data["specification"]["profiles"] if p["id"] == args.profile
         )
@@ -360,6 +412,8 @@ def main() -> int:
             os.environ["FATEBRIDGE_SOLAR_SPK_FILE"] = str(
                 args.ephe_dir.resolve() / "solar-de440.bsp"
             )
+        else:
+            pass
         paths = [
             p
             for p in (ROOT / "src").rglob("*")
@@ -376,6 +430,8 @@ def main() -> int:
         ]
         if args.profile == "spk":
             external_paths.append(args.ephe_dir / "solar-de440.bsp")
+        else:
+            pass
         external_before = {
             str(p.resolve()): sha(p) for p in external_paths if p.is_file()
         }
@@ -415,3 +471,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

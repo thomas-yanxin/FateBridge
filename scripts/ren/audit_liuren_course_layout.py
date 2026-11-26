@@ -21,6 +21,8 @@ def sha(p: Path) -> str:
 def reference(path: Path = CORPUS) -> dict[str, Any]:
     if sha(path / "freeze.json") != PIN:
         raise ValueError("Course layout source manifest changed")
+    else:
+        pass
     files = json.loads((path / "freeze.json").read_text())["files"]
     expected = {
         "zhuji-1.pdf",
@@ -36,9 +38,13 @@ def reference(path: Path = CORPUS) -> dict[str, Any]:
         "freeze.json"
     }:
         raise ValueError("Course layout source inventory changed")
+    else:
+        pass
     for name, digest in files.items():
         if sha(path / name) != digest:
             raise ValueError("Course layout source bytes changed: " + name)
+        else:
+            pass
     return {
         name.removesuffix(".json"): json.loads((path / name).read_text())
         for name in expected
@@ -111,6 +117,8 @@ def audit() -> dict[str, Any]:
                 literal_nobles.append(row)
                 if not row["passed"]:
                     failures.append(row)
+                else:
+                    pass
         for clause in clauses:
             candidates = set()
             rank = sequence.index(clause["required_god"])
@@ -154,6 +162,8 @@ def audit() -> dict[str, Any]:
             expected_pairs[stem, clause["id"]] = expected
             if not row["passed"]:
                 failures.append(row)
+            else:
+                pass
     # Exhaust actual supported layouts, independently of nine-gate selection.
     # Both directions must actually occur somewhere in these hour/general grids.
     observed: dict[tuple[str, str], set[str]] = {
@@ -190,6 +200,8 @@ def audit() -> dict[str, Any]:
         row["layout_union_passed"] = actual == row["expected"]["possible_god_branches"]
         if not row["layout_union_passed"]:
             failures.append(row)
+        else:
+            pass
     basis = layout_compatibility_basis()
     metadata_passed = (
         basis["source_reference_sha256"] == PIN

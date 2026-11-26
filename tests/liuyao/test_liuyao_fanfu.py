@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.liuyao_fanfu import PROFILE
+from fatebridge.core.liuyao.liuyao_fanfu import PROFILE
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from scripts.liuyao.build_profile import build_profile
 
@@ -13,12 +13,14 @@ REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_fanfu_v6"
 CASES = json.loads((REFERENCE / "cases.json").read_text(encoding="utf-8"))["cases"]
 
 
-def test_runtime_rules_match_frozen_scan_clauses_and_pre_implementation_cases():
+def test_runtime_rules_match_frozen_scan_clauses_and_pre_implementation_cases() -> None:
     assert build_profile("fanfu") == PROFILE
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_original_body_and_region_cases_without_static_line_transformations(case):
+def test_original_body_and_region_cases_without_static_line_transformations(
+    case,
+) -> None:
     result = build_sixyao_result(
         date="2000-01-07",
         time="12:00:00",
@@ -39,13 +41,15 @@ def test_original_body_and_region_cases_without_static_line_transformations(case
     for row in result["lines"]:
         if not row["change"]:
             assert "changed_branch" not in row
+        else:
+            pass
     assert [r["position"] for r in fanfu["moving_line_relations"]] == case[
         "expected_moving_positions"
     ]
     assert fanfu["efficacy"] == "requires_focus_strength_and_back_control"
 
 
-def test_qian_kun_is_not_lost_by_branch_clash_only_detection():
+def test_qian_kun_is_not_lost_by_branch_clash_only_detection() -> None:
     result = build_sixyao_result(
         date="2000-01-07",
         time="12:00:00",
@@ -55,7 +59,7 @@ def test_qian_kun_is_not_lost_by_branch_clash_only_detection():
     assert any(p["name"] == "卦体反吟" for p in result["patterns"])
 
 
-def test_unchanged_trigram_does_not_become_fuyin_due_to_equal_branches():
+def test_unchanged_trigram_does_not_become_fuyin_due_to_equal_branches() -> None:
     result = build_sixyao_result(
         date="2000-01-07",
         time="12:00:00",
@@ -67,7 +71,7 @@ def test_unchanged_trigram_does_not_become_fuyin_due_to_equal_branches():
     assert outer["nazhi_relation"] == "伏吟"
 
 
-def test_region_chart_comparison_does_not_make_static_branch_an_active_actor():
+def test_region_chart_comparison_does_not_make_static_branch_an_active_actor() -> None:
     result = build_sixyao_result(
         date="2000-01-07",
         time="12:00:00",
@@ -90,7 +94,7 @@ def test_region_chart_comparison_does_not_make_static_branch_an_active_actor():
     )
 
 
-def test_generic_complement_does_not_get_an_invented_source_body_verdict():
+def test_generic_complement_does_not_get_an_invented_source_body_verdict() -> None:
     result = build_sixyao_result(
         date="2000-01-07",
         time="12:00:00",
@@ -102,7 +106,7 @@ def test_generic_complement_does_not_get_an_invented_source_body_verdict():
     assert fanfu["body_classification"] == "outside_explicit_example_table"
 
 
-def test_snapshot_separates_inner_structure_and_keeps_its_scope():
+def test_snapshot_separates_inner_structure_and_keeps_its_scope() -> None:
     result = build_sixyao_result(
         date="2000-01-07",
         time="12:00:00",

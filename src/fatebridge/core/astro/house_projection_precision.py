@@ -18,7 +18,6 @@ from mpmath.libmp import to_rational  # type: ignore[import-untyped]
 
 from fatebridge.core.astro.horizon_precision import (
     CONVERGENCE_DEGREES,
-    NATIVE_COORDINATE_GUARD_DEGREES,
     WORKING_DIGITS,
 )
 
@@ -111,20 +110,6 @@ def checked_house_plane_position(
         reported_phase = math.nextafter(360.0, 0.0)
     decimal_phase = ctx.nstr(shifted, 100)
     working_phase = Fraction(*to_rational(shifted._mpf_))
-    if math.isfinite(native_position) and 1 <= native_position < 13:
-        error = abs(((ctx.mpf(native_position) - 1) * 30 - shifted + 180) % 360 - 180)
-        if int(native_position) == house and error <= ctx.mpf(
-            NATIVE_COORDINATE_GUARD_DEGREES
-        ):
-            return HousePlanePosition(
-                native_position,
-                house,
-                reported_phase,
-                decimal_phase,
-                (low_digits, digits),
-                "native_coordinate_retained",
-                working_phase,
-            )
     value = float(shifted / 30 + 1)
     # Retain the exact half-open house when binary64 rounds up to its boundary.
     if math.floor(value) > house:
@@ -133,12 +118,17 @@ def checked_house_plane_position(
         raise ArithmeticError(
             "House-plane position cannot represent its half-open house"
         )
+    action = (
+        "native_coordinate_retained"
+        if native_position == value
+        else "scalar_plane_recomputed"
+    )
     return HousePlanePosition(
         value,
         house,
         reported_phase,
         decimal_phase,
         (low_digits, digits),
-        "scalar_plane_recomputed",
+        action,
         working_phase,
     )

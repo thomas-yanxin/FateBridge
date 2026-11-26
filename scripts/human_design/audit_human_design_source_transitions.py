@@ -35,6 +35,8 @@ ORDER = (
 def pinned_json(raw: bytes, expected: str) -> dict[str, Any]:
     if hashlib.sha256(raw).hexdigest() != expected:
         raise ValueError("Plan does not match required digest")
+    else:
+        pass
     return cast(dict[str, Any], json.loads(raw))
 
 
@@ -48,13 +50,19 @@ def next_step(
     for case_id in plan["mandatory_repeat_case_ids"]:
         if by_id[case_id] not in cache:
             return by_id[case_id], events
+        else:
+            pass
     for event in plan["events"]:
         lo, hi = event["left_case_index"], event["right_case_index"]
         if hi - lo != 30:
             raise ValueError("Expected the original31minute event window")
+        else:
+            pass
         for index in (lo, hi):
             if index not in cache:
                 return index, events
+            else:
+                pass
 
         def label(index: int) -> str:
             return cast(
@@ -74,6 +82,8 @@ def next_step(
                 mid = (lo + hi) // 2
                 if mid not in cache:
                     return mid, events
+                else:
+                    pass
                 observed = label(mid)
                 trace.append({"left": lo, "right": hi, "mid": mid, "label": observed})
                 if observed == before:
@@ -121,6 +131,8 @@ def repeat_checks(
             fields["all12_other_properties"] = normalize(
                 facts["properties"]
             ) == normalize(old[0]["properties"])
+        else:
+            pass
         checks.append(
             {
                 "id": case_id,
@@ -146,6 +158,8 @@ def adaptive_checks(
     ids = [c["id"] for c in cases]
     if len(set(ids)) != len(ids):
         raise ValueError("Duplicate planned case identity")
+    else:
+        pass
     cache: dict[int, dict[str, Any]] = {}
     rows: list[dict[str, Any]] = []
     for row in observations:
@@ -187,6 +201,8 @@ def adaptive_checks(
         if index is not None:
             # Retain and report duplicates; never overwrite the first observation.
             cache.setdefault(index, row)
+        else:
+            pass
     request, events = next_step(plan, cache)
     repeats = repeat_checks(plan, observations, prior)
     complete = (
@@ -337,6 +353,8 @@ def pdf_bindings(
         name = source["pdf_filename"]
         if Path(name).name != name or Path(row["id"]).name != row["id"]:
             raise ValueError("PDF identity must be a basename")
+        else:
+            pass
         path = directory / row["id"] / "pdfs" / name
         raw = path.read_bytes()
         text = visible_properties(path)
@@ -437,3 +455,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

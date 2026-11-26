@@ -2,6 +2,7 @@
 
 import shutil
 from datetime import datetime
+from pathlib import Path
 
 import pytest
 import swisseph as swe
@@ -29,7 +30,9 @@ def frozen():
     return audit.reference()
 
 
-def test_whole_reference_is_frozen_before_candidate_and_not_a_physical_holdout(frozen):
+def test_whole_reference_is_frozen_before_candidate_and_not_a_physical_holdout(
+    frozen,
+) -> None:
     rows = frozen["data"]["rows"]
     p = frozen["protocol"]
     assert len(rows) == 19248 and p["root_count"] == 9624 and p["guard_roots"] == 48
@@ -47,7 +50,9 @@ def test_whole_reference_is_frozen_before_candidate_and_not_a_physical_holdout(f
 
 
 @pytest.mark.parametrize("fault", ["reference_bytes", "replacement", "truncated"])
-def test_corrupt_reference_is_rejected_without_rescoring(tmp_path, fault):
+def test_corrupt_reference_is_rejected_without_rescoring(
+    tmp_path: Path, fault: str
+) -> None:
     folder = tmp_path / "corpus"
     shutil.copytree(audit.CORPUS, folder)
     path = folder / "reference.json.gz"
@@ -62,7 +67,9 @@ def test_corrupt_reference_is_rejected_without_rescoring(tmp_path, fault):
         audit.reference(folder)
 
 
-def test_reference_clock_matches_all233_original_sofa_cases_without_production(frozen):
+def test_reference_clock_matches_all233_original_sofa_cases_without_production(
+    frozen,
+) -> None:
     cases = frozen["data"]["reference_clock_sofa_checks"]
     assert len(cases) == 233
     assert max(abs(r["delta_seconds"]) for r in cases) <= 0.0002
@@ -85,8 +92,8 @@ def default_empty(monkeypatch, tmp_path):
 @pytest.mark.parametrize("identifier", IDS)
 @pytest.mark.parametrize("key", ["liureng_gods", "jinkou"])
 def test_whole_seconds_reach_three_protocols_and_the_snapshot(
-    identifier, key, frozen, default_empty, surface_calls
-):
+    identifier, key: str, frozen, default_empty, surface_calls
+) -> None:
     row = next(r for r in frozen["data"]["rows"] if r["id"] == identifier)
     moment = datetime.fromisoformat(row["civil_utc"])
     expected = row["expected"]
@@ -103,6 +110,8 @@ def test_whole_seconds_reach_three_protocols_and_the_snapshot(
     )
     if key == "jinkou":
         payload["di_fen"] = "酉"
+    else:
+        pass
     fields = [
         "four_pillars",
         "liureng.month_general",
@@ -111,6 +120,8 @@ def test_whole_seconds_reach_three_protocols_and_the_snapshot(
     ]
     if key == "jinkou":
         fields += ["jinkou.rows", "jinkou.overview"]
+    else:
+        pass
     spec = SPECS[key]
     opts = dict(
         fields=fields,
@@ -164,21 +175,23 @@ def test_whole_seconds_reach_three_protocols_and_the_snapshot(
                 assert len(lines) == 1
                 assert f"四季旺衰：{power}" in lines[0]
             assert f"用爻：{expected['polarity_use']}" in snap
+        else:
+            pass
 
 
 def test_audit_carries_the_actual_second_instead_of_silently_using_zero(
-    frozen, default_empty, monkeypatch
-):
+    frozen, default_empty, monkeypatch: pytest.MonkeyPatch
+) -> None:
     import fatebridge.services.metaphysics as service
 
-    original = service._build_analysis_seed
+    original = service.build_analysis_seed
     seen = []
 
     def observe(**kwargs):
         seen.append(kwargs["analysis_second"])
         return original(**kwargs)
 
-    monkeypatch.setattr(service, "_build_analysis_seed", observe)
+    monkeypatch.setattr(service, "build_analysis_seed", observe)
     p = next(r for r in frozen["data"]["rows"] if r["id"] == "1800-小寒-floor")
     got = audit.evaluate_probe(p, frozen["protocol"])
     assert seen == [datetime.fromisoformat(p["civil_utc"]).second] and seen[0] != 0

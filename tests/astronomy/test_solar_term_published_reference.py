@@ -49,7 +49,9 @@ def moshier_terms(tmp_path_factory):
         ("冬至", "2026-12-22T04:50:00+08:00"),
     ],
 )
-def test_native_terms_match_published_hko_minutes(moshier_terms, name, published):
+def test_native_terms_match_published_hko_minutes(
+    moshier_terms, name: str, published: str
+) -> None:
     term = moshier_terms[name]
     expected = datetime.fromisoformat(published)
     assert term.moment.utcoffset() == expected.utcoffset()

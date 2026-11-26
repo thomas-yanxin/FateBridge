@@ -4,16 +4,20 @@ import re
 import shlex
 import subprocess
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
 
+from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.cli import build_parser as build_cli_parser
+from fatebridge.cli import run as cli_run
 from tests.fixtures.catalog import cli_specs_by_name
 
-_REFERENCES_ROOT = Path(__file__).resolve().parents[2] / "docs/interpretation"
+REFERENCES_ROOT = Path(__file__).resolve().parents[2] / "docs/interpretation"
 
-# Global argparse flags the CLI adds on top of each tool's request model.
-_GLOBAL_CLI_FLAGS = {
+# note (cli): These global flags are accepted independently of the tool request model.
+GLOBAL_CLI_FLAGS = {
     "--no-metadata",
     "--fields",
     "--selected-sections",
@@ -21,73 +25,89 @@ _GLOBAL_CLI_FLAGS = {
     "--no-include-snapshot-text",
 }
 
-# Tokens that mark an example as a non-runnable template, not a real command.
-_PLACEHOLDER_RE = re.compile(r"[<>\[\]]|\.\.\.")
+PLACEHOLDER_RE = re.compile(r"[<>\[\]]|\.\.\.")
 
 
-def _cli_flags_for_spec(spec: object) -> set[str]:
-    """Valid ``--flag`` set for a tool: one per request-model field, derived the
-    same way the CLI does (``field_name`` -> ``--field-name``), plus globals."""
+@dataclass(frozen=True, kw_only=True)
+class CliExample:
+    path: Path
+    tool_name: str
+    command: str
+    flags: set[str]
+
+
+def cli_flags_for_spec(spec: ToolSpec) -> set[str]:
     flags = {
-        "--" + name.replace("_", "-")
-        for name in spec.request_model.model_fields  # type: ignore[attr-defined]
+        "--" + field_name.replace("_", "-")
+        for field_name in spec.request_model.model_fields
     }
-    return flags | _GLOBAL_CLI_FLAGS
+    return flags | GLOBAL_CLI_FLAGS
 
 
-def _documented_cli_examples() -> list[tuple[Path, str, str, set[str]]]:
-    """Parse fenced ```bash blocks across method references and return one entry per
-    *concrete* fatebridge.cli invocation: (doc_path, tool, command, flags_used).
-
-    Placeholder/template examples and the meta commands (``list``/``describe``)
-    are excluded — only runnable commands are returned.
-    """
-    examples: list[tuple[Path, str, str, set[str]]] = []
-    for md in sorted(_REFERENCES_ROOT.rglob("*.md")):
-        text = md.read_text()
+def documented_cli_examples() -> list[CliExample]:
+    """Read concrete CLI tool commands from the method-reference Bash fences."""
+    examples: list[CliExample] = []
+    for path in sorted(REFERENCES_ROOT.rglob("*.md")):
+        text = path.read_text(encoding="utf-8")
         for block in re.findall(r"```bash\n(.*?)```", text, re.S):
-            joined = re.sub(r"\\\n\s*", " ", block)  # fold line continuations
+            joined = re.sub(r"\\\n\s*", " ", block)
             for raw in joined.splitlines():
                 line = raw.strip()
                 if "fatebridge.cli" not in line:
                     continue
+                else:
+                    pass
                 if " describe " in f" {line} " or re.search(r"\blist\b", line):
                     continue
-                if _PLACEHOLDER_RE.search(line):
+                else:
+                    pass
+                if PLACEHOLDER_RE.search(line):
                     continue
+                else:
+                    pass
                 tokens = line.split()
-                idx = tokens.index("fatebridge.cli")
-                rest = [t for t in tokens[idx + 1 :] if t != "--no-metadata"]
+                module_position = tokens.index("fatebridge.cli")
+                rest = [
+                    t for t in tokens[module_position + 1 :] if t != "--no-metadata"
+                ]
                 if not rest:
                     continue
+                else:
+                    pass
                 tool = rest[0]
                 flags = set(re.findall(r"--[a-z0-9-]+", line))
-                examples.append((md, tool, line, flags))
+                examples.append(
+                    CliExample(path=path, tool_name=tool, command=line, flags=flags)
+                )
     return examples
 
 
-def test_documented_examples_exist():
-    # If the parser stops finding examples (docs restructured, fence style
-    # changed), the runnability tests below would vacuously pass — guard that.
-    assert len(_documented_cli_examples()) >= 10
+def test_documented_examples_exist() -> None:
+    """Catch reference changes that would leave the execution gate with no input."""
+    assert len(documented_cli_examples()) >= 10
 
 
-def test_documented_cli_examples_use_real_flags():
-    """Static gate (no engine execution, never flaky): every concrete example
-    targets an existing CLI tool and uses only that tool's real flags."""
+def test_documented_cli_examples_use_real_flags() -> None:
+    """Check that concrete commands use published tool names and flags."""
     specs = cli_specs_by_name()
     problems: list[str] = []
-    for md, tool, line, flags in _documented_cli_examples():
-        spec = specs.get(tool)
+    for example in documented_cli_examples():
+        spec = specs.get(example.tool_name)
         if spec is None:
-            problems.append(f"{md.name}: unknown / non-CLI tool `{tool}`")
+            problems.append(
+                f"{example.path.name}: unknown / non-CLI tool {example.tool_name}"
+            )
             continue
-        unknown = sorted(flags - _cli_flags_for_spec(spec))
+        else:
+            pass
+        unknown = sorted(example.flags - cli_flags_for_spec(spec))
         if unknown:
             problems.append(
-                f"{md.name}: `{tool}` documented with flags the "
+                f"{example.path.name}: {example.tool_name} documented with flags the "
                 f"engine doesn't accept: {unknown}"
             )
+        else:
+            pass
     assert (
         not problems
     ), "Method references drifted from engine CLI schema:\n" + "\n".join(problems)
@@ -96,19 +116,52 @@ def test_documented_cli_examples_use_real_flags():
 @pytest.mark.parametrize(
     "example",
     {
-        tuple(shlex.split(row[2]))[1:]: row for row in _documented_cli_examples()
+        tuple(shlex.split(example.command))[1:]: example
+        for example in documented_cli_examples()
     }.values(),
-    ids=lambda row: f"{row[0].name}-{row[1]}",
+    ids=lambda example: f"{example.path.name}-{example.tool_name}",
 )
-def test_documented_cli_examples_run_clean(example):
-    """Runnability gate: every concrete example actually executes (exit 0).
+def test_documented_cli_examples_run_clean(
+    example: CliExample, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Run the documented command or parse charts that have separate slow tests."""
+    command = shlex.split(example.command)
+    assert command[:3] in (
+        ["python", "-m", "fatebridge.cli"],
+        ["python3", "-m", "fatebridge.cli"],
+    ), example.command
+    if example.tool_name in {
+        "horary_chart",
+        "astro_horary",
+        "evaluate_election_time",
+        "astro_election",
+    }:
+        parsed = build_cli_parser().parse_args(command[3:])
+        assert parsed._spec.tool_name == example.tool_name
+        return
+    else:
+        pass
+    capsys.readouterr()
+    code = cli_run(command[3:])
+    captured = capsys.readouterr()
+    tail = (captured.out or captured.err).strip().replace("\n", " ")[:200]
+    assert code == 0, f"{example.path.name}: {example.tool_name} exit={code} :: {tail}"
 
-    The engine is fully offline and returns structured error payloads on stdout
-    with a non-zero exit code, so exit 0 is the clean-run signal."""
-    md, tool, line, _flags = example
-    command = shlex.split(line)
-    assert command[0] in {"python", "python3"}, line
+
+def test_documented_cli_entrypoint_smoke() -> None:
+    """Verify the CLI subprocess can start and run a documented chart."""
+    examples = documented_cli_examples()
+    birth_tool = next(
+        spec.tool_name
+        for spec in cli_specs_by_name().values()
+        if spec.key == "bazi_birth"
+    )
+    example = next(example for example in examples if example.tool_name == birth_tool)
+    command = shlex.split(example.command)
+    assert command[0] in {"python", "python3"}, example.command
     command[0] = sys.executable
-    proc = subprocess.run(command, capture_output=True, text=True, timeout=180)
-    tail = (proc.stdout or proc.stderr).strip().replace("\n", " ")[:200]
-    assert proc.returncode == 0, f"{md.name}: `{tool}` exit={proc.returncode} :: {tail}"
+    completed = subprocess.run(command, capture_output=True, text=True, timeout=60)
+    tail = (completed.stdout or completed.stderr).strip().replace("\n", " ")[:200]
+    assert (
+        completed.returncode == 0
+    ), f"{example.path.name}: {example.tool_name} exit={completed.returncode} :: {tail}"

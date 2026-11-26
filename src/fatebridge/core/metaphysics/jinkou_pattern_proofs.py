@@ -9,8 +9,18 @@ from __future__ import annotations
 
 from typing import Any
 
-from ...utils.data import EARTHLY_BRANCHES
-from .common import ELEMENT_CONTROLS, ELEMENT_GENERATES, SIX_CLASH_BRANCHES
+from fatebridge.core.metaphysics.common import (
+    ELEMENT_CONTROLS,
+    ELEMENT_GENERATES,
+    SIX_CLASH_BRANCHES,
+)
+from fatebridge.core.metaphysics.jinkou_pattern_tables import (
+    BRANCH_COMBINES,
+    HOUSE_BRANCH,
+    STEM_COMBINES,
+    TRINES,
+)
+from fatebridge.utils.data import EARTHLY_BRANCHES
 
 ROLES = dict(zip("HGJD", ("人元", "贵神", "将神", "地分")))
 
@@ -96,12 +106,6 @@ def evaluate_fact(
     operation: str, operands: dict[str, Any]
 ) -> tuple[bool | None, list[str]]:
     """Recompute a complete atomic statement, independently of its verdict."""
-    from fatebridge.core.metaphysics.jinkou_pattern_tables import (
-        BRANCH_COMBINES,
-        HOUSE_BRANCH,
-        STEM_COMBINES,
-        TRINES,
-    )
 
     if operation in {"control", "generate", "same"}:
         a, b = text(operands, "source_element"), text(operands, "target_element")

@@ -7,12 +7,15 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.liuyao_moving_si import PROFILE
-from fatebridge.core.output_liuyao_control import DirectedControl
-from fatebridge.core.output_liuyao_growth import GrowthConditions, MovingSiGrowth
+from fatebridge.core.contracts.output_liuyao_control import DirectedControl
+from fatebridge.core.contracts.output_liuyao_growth import (
+    GrowthConditions,
+    MovingSiGrowth,
+)
+from fatebridge.core.liuyao.liuyao_moving_si import PROFILE
 from scripts.liuyao.build_liuyao_moving_si_profile import build
-from tests.liuyao.test_liuyao_conditions import conditional_case
-from tests.liuyao.test_liuyao_metal_moving import read_path
+from tests.unit_test.fixtures.liuyao import conditional_case
+from tests.unit_test.fixtures.liuyao import read_condition_path as read_path
 
 BASE = Path(__file__).parents[1] / "fixtures/liuyao_moving_si_v40"
 CASES = json.loads((BASE / "cases.json").read_text())["cases"]
@@ -26,12 +29,19 @@ def check(result, case):
     if not case["expected_visible_si_encounter"]:
         assert context is None
         return
+    else:
+        pass
     assert (
         context["ruleset_id"]
         == result["growth_conditions"]["ruleset_id"]
         == PROFILE["ruleset_id"]
     )
-    assert context["source_sha256"] == PROFILE["source"]["sha256"]
+    assert (
+        context["ruleset_version"]
+        == result["growth_conditions"]["ruleset_version"]
+        == PROFILE["ruleset_version"]
+    )
+    assert context["source_url"] == PROFILE["source"]["url"] + "#page=97"
     assert result["growth_conditions"]["clauses"] == PROFILE["clauses"]
     assert context["combined_effect_adjudicated"] is False
     assert context["cross_passage_source_urls"] == [
@@ -61,6 +71,8 @@ def check(result, case):
                 assert (
                     read_path(result, step["source_path"])["branch"] == step["branch"]
                 )
+    else:
+        pass
     if case["pattern"] == "si_back_controlled":
         expected = False
     elif case["id"].endswith(("si-void", "si-binding")):
@@ -78,6 +90,8 @@ def check(result, case):
             if c["condition_match"]
             for s in c["root_proof"]
         )
+    else:
+        pass
     for source in context["sources"]:
         assert source["growth_condition_match"] is expected
         control = read_path(result, source["control_source_path"])
@@ -118,11 +132,15 @@ def check(result, case):
             a["location"] == "day" and a["branch"] == "午"
             for a in strength["oppositions"]
         )
+    else:
+        pass
     if case["id"].endswith("day-root"):
         assert any(
             a["location"] == "month" and a["branch"] == "午"
             for a in strength["oppositions"]
         )
+    else:
+        pass
     if case["pattern"] == "si_and_wu" and case["id"].endswith(
         ("month-root", "day-root")
     ):
@@ -132,11 +150,14 @@ def check(result, case):
             if c["source_branch"] == "午" and c["target_position"] == p
         )
         assert wu["condition_match"] is True and "metal_si_growth_condition" not in wu
+    else:
+        pass
     assert all("_metal_moving_si_growth" not in line for line in result["lines"])
     assert context["actual_total_effect_adjudicated"] is False
+    return context
 
 
-def test_original_scan_and_frozen_material_match_the_generated_profile():
+def test_original_scan_and_frozen_material_match_the_generated_profile() -> None:
     assert build() == PROFILE
     freeze = json.loads((BASE / "freeze.json").read_text())
     for name, digest in freeze["files_sha256"].items():
@@ -145,12 +166,15 @@ def test_original_scan_and_frozen_material_match_the_generated_profile():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_specific_directed_qualification_preserves_other_conditions(case):
-    check(conditional_case(case), case)
+def test_specific_directed_qualification_preserves_other_conditions(case) -> None:
+    if context := check(conditional_case(case), case):
+        assert context["source_sha256"] == PROFILE["source"]["sha256"]
+    else:
+        pass
 
 
 @pytest.mark.parametrize("value", [0, 1, "true", "false"])
-def test_projected_qualification_never_coerces_truth_values(value):
+def test_projected_qualification_never_coerces_truth_values(value: int | str) -> None:
     with pytest.raises(ValidationError):
         MovingSiGrowth.model_validate({"condition_match": value})
     with pytest.raises(ValidationError):
@@ -162,7 +186,7 @@ def test_projected_qualification_never_coerces_truth_values(value):
     json.loads((BASE / "precedence-cases.json").read_text())["cases"],
     ids=lambda c: c["id"],
 )
-def test_specific_yin_precedence_cannot_be_bypassed_by_moving_si_growth(case):
+def test_specific_yin_precedence_cannot_be_bypassed_by_moving_si_growth(case) -> None:
     for name, digest in json.loads(
         (BASE / "precedence-freeze.json").read_text()
     ).items():
@@ -182,7 +206,7 @@ def test_specific_yin_precedence_cannot_be_bypassed_by_moving_si_growth(case):
         assert growth["sources"][0]["combined_effect_condition"] is None
 
 
-def test_same_edition_explicit_control_example_prevents_automatic_exemption():
+def test_same_edition_explicit_control_example_prevents_automatic_exemption() -> None:
     original = json.loads((BASE.parent / "liuyao_control_v9/cases.json").read_text())
     case = next(c for c in original["cases"] if c["id"] == "scan22-kun-shi")
     assert [2, 6, True] in case["expected_controls"]

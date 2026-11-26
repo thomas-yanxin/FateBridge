@@ -111,14 +111,22 @@ def reconstruct(values, relations, policy=None):
                             transferred = masses[name, stem] * fraction
                             masses[name, stem] -= transferred
                             synthetic[name][target] += transferred
+                        else:
+                            pass
             elif status == "binding":
                 for name in positions:
                     for element in ELEMENTS:
                         loss[name][element] = min(loss[name][element], p["binding"])
+            else:
+                pass
+        else:
+            pass
         if status == "active" and kind == "六冲" and "root_multipliers" in event:
             for name, multiplier in event["root_multipliers"].items():
                 for element in ELEMENTS:
                     loss[name][element] = min(loss[name][element], Q(str(multiplier)))
+        else:
+            pass
         if "storage_effect" in event:
             for row in event["storage_effect"]["root_effects"]:
                 name, element = row["pillar"], row["element"]
@@ -129,6 +137,8 @@ def reconstruct(values, relations, policy=None):
             for name in positions:
                 for element in ELEMENTS:
                     loss[name][element] = min(loss[name][element], p["punishment"])
+        else:
+            pass
     phases = seasonal_phases(values[1][1])
     factors = {
         element: 1 + (PHASE_FACTORS[phases[element]] - 1) * p["seasonal_spread"]
@@ -155,12 +165,18 @@ def reconstruct(values, relations, policy=None):
             for name in event["positions"]:
                 if name == "day":
                     raise ValueError("Default binding cannot consume the day stem")
+                else:
+                    pass
                 binding[name] = p["binding"]
+        else:
+            pass
         if (
             event["kind"] == "天干合"
             and event["status"] == "conditioned_transformation"
         ):
             raise ValueError("Non-adopted stem conversion is outside this reference")
+        else:
+            pass
     for name in ("year", "month", "hour"):
         element = STEM_ELEMENT[pillars[name][0]]
         activation = p["floating_stem"] + (p["rooted_stem"] - p["floating_stem"]) * min(

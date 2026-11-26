@@ -9,9 +9,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from .liureng_transmissions import PUNISHMENT
-from .ren_evidence import liuren_annotation_note
-from .ren_gods import TANYUAN_TRANSCRIPTION
+from fatebridge.core.metaphysics.liureng_transmissions import PUNISHMENT
+from fatebridge.core.metaphysics.ren_evidence import liuren_annotation_note
+from fatebridge.core.metaphysics.ren_gods import TANYUAN_TRANSCRIPTION
 
 
 def classify_transmission_pattern(

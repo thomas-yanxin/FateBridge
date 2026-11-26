@@ -24,18 +24,26 @@ def reduce_reference(material):
     actual = [(r["index"], r["body"]) for r in material["requests"]]
     if len(actual) != 6 or set(actual) != wanted:
         raise ValueError("Extended endpoint reference coverage changed")
+    else:
+        pass
     rows = []
     for request in material["requests"]:
         if request["parameters"]["COMMAND"] != f"'{targets[request['body']]}'":
             raise ValueError("Physical target identity changed")
+        else:
+            pass
         raw = request["raw_response_utf8"]
         if hashlib.sha256(raw.encode()).hexdigest() != request["raw_sha256"]:
             raise ValueError("Raw JPL reference changed")
+        else:
+            pass
         response = json.loads(raw)
         table = response["result"].split("$$SOE\n", 1)[1].split("$$EOE", 1)[0]
         values = list(csv.reader(io.StringIO(table)))
         if len(values) != 11:
             raise ValueError("Declared reference probes changed")
+        else:
+            pass
         ra, dec = map(math.radians, map(float, values[5][5:7]))
         unit = np.array(
             [math.cos(dec) * math.cos(ra), math.cos(dec) * math.sin(ra), math.sin(dec)]
@@ -70,6 +78,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.material.resolve() == args.output.resolve():
         parser.error("output must not overwrite frozen source material")
+    else:
+        pass
     result = reduce_reference(json.loads(args.material.read_text()))
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     print(json.dumps({"expected_directions": len(result["expected_directions"])}))
+else:
+    pass

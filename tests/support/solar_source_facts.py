@@ -55,6 +55,8 @@ def canonical_c_first_post(case):
         mid = (lo + hi) / 2
         if mid in (lo, hi):
             break
+        else:
+            pass
         if residual(mid) < 0:
             lo = mid
         else:

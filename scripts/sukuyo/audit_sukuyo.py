@@ -24,7 +24,7 @@ SOURCE_PATHS = [
     "scripts/sukuyo/check_sukuyo_time_units.py",
     "tests/sukuyo/test_sukuyo_time_origin.py",
     "tests/data/sukuyo-comparative-time-primary.json",
-    "src/fatebridge/core/sukuyo_printed_special.py",
+    "src/fatebridge/core/sukuyo/sukuyo_printed_special.py",
     "src/fatebridge/data/sukuyo_wakita_special_days.json",
     "scripts/sukuyo/check_sukuyo_printed_special.py",
     "tests/sukuyo/test_sukuyo_printed_special.py",
@@ -40,12 +40,12 @@ SOURCE_PATHS = [
     "scripts/sukuyo/check_sukuyo_weekday_recalculation.py",
     "tests/sukuyo/test_sukuyo_weekday_recalculation.py",
     "tests/data/sukuyo-weekday-recalculation-primary.json",
-    "src/fatebridge/core/sukuyo_weekday.py",
+    "src/fatebridge/core/sukuyo/sukuyo_weekday.py",
     "src/fatebridge/data/sukuyo_t30107_weekday_arithmetic.json",
     "scripts/sukuyo/check_sukuyo_weekday_arithmetic.py",
     "tests/sukuyo/test_sukuyo_weekday_arithmetic.py",
     "tests/data/sukuyo-weekday-arithmetic-primary.json",
-    "src/fatebridge/core/sukuyo_clothing.py",
+    "src/fatebridge/core/sukuyo/sukuyo_clothing.py",
     "src/fatebridge/data/sukuyo_t1299_clothing.json",
     "scripts/sukuyo/audit_sukuyo_clothing_primary.py",
     "tests/sukuyo/test_sukuyo_clothing.py",
@@ -55,13 +55,13 @@ SOURCE_PATHS = [
     "scripts/sukuyo/check_sukuyo_documentary_dates.py",
     "tests/data/sukuyo-documentary-dates.json",
     "tests/sukuyo/test_sukuyo_day_cycle.py",
-    "src/fatebridge/core/sukuyo_taibai.py",
+    "src/fatebridge/core/sukuyo/sukuyo_taibai.py",
     "src/fatebridge/data/sukuyo_t1299_taibai.json",
     "tests/sukuyo/test_sukuyo_taibai.py",
     "tests/data/sukuyo-taibai-primary.json",
     "scripts/sukuyo/audit_sukuyo_taibai_primary.py",
-    "src/fatebridge/core/sukuyo_historical_calendar.py",
-    "src/fatebridge/validation/sukuyo_historical_sources.py",
+    "src/fatebridge/core/sukuyo/sukuyo_historical_calendar.py",
+    "validation/sukuyo_historical_sources.py",
     "src/fatebridge/data/sukuyo_japanese_historical_v1.json",
     "scripts/sukuyo/build_sukuyo_historical_calendar.py",
     "scripts/sukuyo/fetch_sukuyo_historical_calendars.py",
@@ -75,43 +75,47 @@ SOURCE_PATHS = [
     "tests/data/sukuyo_historical_daily_controls_v1/manifest.json",
     "uv.lock",
     "pyproject.toml",
-    "src/fatebridge/core/sukuyo.py",
-    "src/fatebridge/core/sukuyo_calendar_basis.py",
-    "src/fatebridge/core/sukuyo_japanese_calendar.py",
-    "src/fatebridge/core/sukuyo_date_support.py",
-    "src/fatebridge/core/sukuyo_profiles.py",
-    "src/fatebridge/core/sukuyo_hinoo_critical.py",
+    "src/fatebridge/core/sukuyo/sukuyo.py",
+    "src/fatebridge/core/sukuyo/sukuyo_calendar_basis.py",
+    "src/fatebridge/core/sukuyo/sukuyo_japanese_calendar.py",
+    "src/fatebridge/core/sukuyo/sukuyo_date_support.py",
+    "src/fatebridge/core/sukuyo/sukuyo_profiles.py",
+    "src/fatebridge/core/sukuyo/sukuyo_hinoo_critical.py",
     "src/fatebridge/data/sukuyo_t2465_critical.json",
     "scripts/sukuyo/check_sukuyo_hinoo_critical.py",
     "tests/sukuyo/test_sukuyo_hinoo_critical.py",
     "tests/sukuyo/test_sukuyo_boundary_receipts.py",
     "tests/data/sukuyo-t2465-kyoto-primary.json",
-    "src/fatebridge/core/sukuyo_lower.py",
-    "src/fatebridge/core/sukuyo_lower_methods.py",
-    "src/fatebridge/core/sukuyo_padas.py",
-    "src/fatebridge/core/sukuyo_sources.py",
-    "src/fatebridge/core/sukuyo_activities.py",
-    "src/fatebridge/core/sukuyo_calendar_text.py",
-    "src/fatebridge/core/sukuyo_directions.py",
-    "src/fatebridge/core/sukuyo_special_days.py",
-    "src/fatebridge/core/sukuyo_sanjiu_days.py",
-    "src/fatebridge/core/sukuyo_six_palaces.py",
-    "src/fatebridge/core/suzhan_astronomy.py",
-    "src/fatebridge/core/guolao.py",
+    "src/fatebridge/core/sukuyo/sukuyo_lower.py",
+    "src/fatebridge/core/sukuyo/sukuyo_lower_methods.py",
+    "src/fatebridge/core/sukuyo/sukuyo_padas.py",
+    "src/fatebridge/core/sukuyo/sukuyo_sources.py",
+    "src/fatebridge/core/sukuyo/sukuyo_activities.py",
+    "src/fatebridge/core/sukuyo/sukuyo_calendar_text.py",
+    "src/fatebridge/core/sukuyo/sukuyo_calendar_reading.py",
+    "src/fatebridge/core/sukuyo/sukuyo_hinoo_text.py",
+    "src/fatebridge/core/sukuyo/sukuyo_daily_source_reading.py",
+    "src/fatebridge/core/sukuyo/sukuyo_activity_day_reading.py",
+    "src/fatebridge/core/sukuyo/sukuyo_directions.py",
+    "src/fatebridge/core/sukuyo/sukuyo_special_days.py",
+    "src/fatebridge/core/sukuyo/sukuyo_sanjiu_days.py",
+    "src/fatebridge/core/sukuyo/sukuyo_six_palaces.py",
+    "src/fatebridge/core/sukuyo/suzhan_astronomy.py",
+    "src/fatebridge/core/guolao/guolao.py",
     "src/fatebridge/core/fixed_star_paths.py",
     "src/fatebridge/core/astro/time_scales.py",
     "src/fatebridge/core/astro/birth.py",
     "src/fatebridge/core/ephemeris_runtime.py",
-    "src/fatebridge/core/output_reference.py",
+    "src/fatebridge/core/contracts/output_reference.py",
     "src/fatebridge/core/requests/divination.py",
     "src/fatebridge/core/requests/compatibility.py",
     "src/fatebridge/services/divination.py",
     "src/fatebridge/core/response_models.py",
     "src/fatebridge/core/local_techniques/suzhan.py",
-    "src/fatebridge/validation/sukuyo_study.py",
-    "src/fatebridge/validation/sukuyo.py",
-    "src/fatebridge/validation/sukuyo_calendar_sources.py",
-    "src/fatebridge/validation/claims.py",
+    "validation/sukuyo_study.py",
+    "validation/sukuyo.py",
+    "validation/sukuyo_calendar_sources.py",
+    "validation/claims.py",
     "src/fatebridge/data/agent_examples.json",
     "src/fatebridge/data/sukuyo_calendar_corrections.json",
     "src/fatebridge/data/sukuyo_japanese_daily_v1.json",
@@ -155,6 +159,8 @@ SOURCE_PATHS = [
     "tests/sukuyo/test_sukuyo_rule_scope.py",
     "tests/sukuyo/test_sukuyo_lower_methods.py",
     "tests/sukuyo/test_sukuyo_transports.py",
+    "tests/unit_test/fixtures/sukuyo_transports.py",
+    "tests/unit_test/fixtures/sukuyo_readings.py",
     "tests/sukuyo/test_sukuyo_date_support.py",
     "tests/data/sukuyo_date_support_v1/reference.json",
     "tests/data/sukuyo_date_support_v1/northamerica-excerpts.txt",
@@ -198,36 +204,43 @@ def audit() -> dict:
     )
     from fatebridge.core import ephemeris_runtime
     from fatebridge.core.astro.birth import build_astro_birth_info
-    from fatebridge.core.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
-    from fatebridge.core.sukuyo_activities import source_bundle
-    from fatebridge.core.sukuyo_calendar_text import (
+    from fatebridge.core.sukuyo.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
+    from fatebridge.core.sukuyo.sukuyo_activities import source_bundle
+    from fatebridge.core.sukuyo.sukuyo_calendar_text import (
         calendar_day_evidence,
         month_table_variant,
     )
-    from fatebridge.core.sukuyo_calendar_text import source_bundle as day_source_bundle
-    from fatebridge.core.sukuyo_date_support import local_date_support
-    from fatebridge.core.sukuyo_directions import (
+    from fatebridge.core.sukuyo.sukuyo_calendar_text import (
+        source_bundle as day_source_bundle,
+    )
+    from fatebridge.core.sukuyo.sukuyo_date_support import local_date_support
+    from fatebridge.core.sukuyo.sukuyo_directions import (
         source_bundle as direction_source_bundle,
     )
-    from fatebridge.core.sukuyo_lower import source_bundle as lower_source_bundle
-    from fatebridge.core.sukuyo_lower_methods import (
+    from fatebridge.core.sukuyo.sukuyo_lower import source_bundle as lower_source_bundle
+    from fatebridge.core.sukuyo.sukuyo_lower_methods import (
         source_bundle as method_source_bundle,
     )
-    from fatebridge.core.sukuyo_padas import palace_reference, reference_cell
-    from fatebridge.core.sukuyo_padas import source_bundle as pada_source_bundle
-    from fatebridge.core.sukuyo_profiles import SOURCE as profile_source_path
-    from fatebridge.core.sukuyo_profiles import fullmoon_calculation
-    from fatebridge.core.sukuyo_profiles import source_bundle as profile_source_bundle
-    from fatebridge.core.sukuyo_sanjiu_days import personal_day_witnesses
-    from fatebridge.core.sukuyo_sanjiu_days import source_bundle as sanjiu_source_bundle
-    from fatebridge.core.sukuyo_sources import load_source
-    from fatebridge.core.sukuyo_special_days import (
+    from fatebridge.core.sukuyo.sukuyo_padas import palace_reference, reference_cell
+    from fatebridge.core.sukuyo.sukuyo_padas import source_bundle as pada_source_bundle
+    from fatebridge.core.sukuyo.sukuyo_profiles import SOURCE as profile_source_path
+    from fatebridge.core.sukuyo.sukuyo_profiles import fullmoon_calculation
+    from fatebridge.core.sukuyo.sukuyo_profiles import (
+        source_bundle as profile_source_bundle,
+    )
+    from fatebridge.core.sukuyo.sukuyo_sanjiu_days import (
+        personal_day_witnesses,
+    )
+    from fatebridge.core.sukuyo.sukuyo_sanjiu_days import (
+        source_bundle as sanjiu_source_bundle,
+    )
+    from fatebridge.core.sukuyo.sukuyo_sources import load_source
+    from fatebridge.core.sukuyo.sukuyo_special_days import (
         source_bundle as special_source_bundle,
     )
-    from fatebridge.core.sukuyo_special_days import special_day_evidence
-    from fatebridge.core.suzhan_astronomy import build_equatorial_mansions
+    from fatebridge.core.sukuyo.sukuyo_special_days import special_day_evidence
+    from fatebridge.core.sukuyo.suzhan_astronomy import build_equatorial_mansions
     from fatebridge.services.divination import calculate_sukuyo_compatibility
-    from fatebridge.validation.sukuyo_calendar_sources import audit_candidate
     from scripts.sukuyo.build_sukuyo_japanese_calendar import (
         normalize as normalize_japanese,
     )
@@ -242,12 +255,15 @@ def audit() -> dict:
     from scripts.sukuyo.check_sukuyo_printed_special import verify_printed_special
     from scripts.sukuyo.check_sukuyo_time_units import verify_time_primary
     from scripts.sukuyo.fetch_sukuyo_reference import published_rows, read_sources
+    from validation.sukuyo_calendar_sources import audit_candidate
 
     official = read_sources()
     manifest = json.loads((ROOT / "tests/data/sukuyo_hko_v1/manifest.json").read_text())
     for source in manifest["sources"]:
         if hashlib.sha256(official[source["file"]]).hexdigest() != source["sha256"]:
             raise ValueError("Frozen HKO source hash mismatch")
+        else:
+            pass
     calendar_errors = []
     calendar_rows = published_rows(official)
     for civil, year, month, day, leap in calendar_rows:
@@ -257,6 +273,8 @@ def audit() -> dict:
             for k in ("lunar_year", "lunar_month", "lunar_day", "is_leap_month")
         ] != [year, month, day, leap]:
             calendar_errors.append(civil)
+        else:
+            pass
 
     fixture = json.loads(
         (ROOT / "tests/data/sukuyo-equatorial-horizons.json").read_text()
@@ -276,6 +294,8 @@ def audit() -> dict:
                 != ref["response_sha256"]
             ):
                 raise ValueError("Frozen JPL source hash mismatch")
+            else:
+                pass
             for row in ref["rows"]:
                 utc = row["utc"]
                 when = datetime.fromisoformat(utc)
@@ -293,6 +313,8 @@ def audit() -> dict:
                             birth_longitude=0,
                         )
                     )
+                else:
+                    pass
                 actual = next(
                     p for p in outputs[utc]["bodies"] if p["id"] == ref["body"]
                 )
@@ -333,6 +355,8 @@ def audit() -> dict:
                 or actual["locator"] != row["locator"]
             ):
                 source_cell_errors.append([month, day])
+            else:
+                pass
             checked_cells += 1
     fullmoon_primary = json.loads(
         (ROOT / "tests/data/sukuyo-fullmoon-primary.json").read_text()
@@ -350,6 +374,8 @@ def audit() -> dict:
                 or result["shortcut_mansion"] != expected
             ):
                 fullmoon_errors.append([month, day])
+            else:
+                pass
     primary_example_errors = []
     for case in fullmoon_primary["examples"]:
         result = fullmoon_calculation(case["month"], case["day"], SU27_ORDER)
@@ -359,6 +385,8 @@ def audit() -> dict:
             or result["shortcut_mansion"] != expected
         ):
             primary_example_errors.append(case)
+        else:
+            pass
     hinoo_results = []
     hinoo_errors = []
     for civil, part, expected_status, expected_candidates, expected_mansion in [
@@ -376,6 +404,8 @@ def audit() -> dict:
         values = [result["status"], result["candidate_su27s"], result["natal_su27"]]
         if values != [expected_status, expected_candidates, expected_mansion]:
             hinoo_errors.append([civil, part, values])
+        else:
+            pass
         hinoo_results.append(
             {
                 "civil_date": civil,
@@ -433,6 +463,8 @@ def audit() -> dict:
         )["status"]
         if state != expected:
             lower_example_errors.append([name, activity, details, state, expected])
+        else:
+            pass
         lower_examples.append(
             {
                 "mansion": name,
@@ -452,15 +484,21 @@ def audit() -> dict:
             actual = reference_cell(name, foot)
             if actual["palace_ordinal"] != ordinal:
                 pada_errors.append([name, foot, ordinal, actual["palace_ordinal"]])
+            else:
+                pass
             pada_count += 1
     if [p["literal_name"] for p in pada_bundle["palaces"]] != pada_primary[
         "source_names"
     ]:
         pada_errors.append("literal_palace_names")
+    else:
+        pass
     if [p["ruler_luminary"] for p in pada_bundle["palaces"]] != pada_primary[
         "source_lords"
     ]:
         pada_errors.append("source_luminary_lords")
+    else:
+        pass
     pada_partial = palace_reference(
         calendar_mansion("2024-08-04", calendar_profile="hinoo_t1299_host27")
     )
@@ -470,6 +508,8 @@ def audit() -> dict:
         or pada_incomplete["selected_palace"] is not None
     ):
         pada_errors.append("candidate_completeness_handling")
+    else:
+        pass
     scope_primary = json.loads(
         (ROOT / "tests/data/sukuyo-rule-scope-primary.json").read_text()
     )
@@ -494,6 +534,8 @@ def audit() -> dict:
             or not rule.get("source_excerpts")
         ):
             quote_errors.append(rule["rule_id"])
+        else:
+            pass
     scope_errors = []
     scope_examples = []
     for civil, activity, details, rule_id, expected in [
@@ -587,6 +629,8 @@ def audit() -> dict:
         matched = rule_id in {r["rule_id"] for r in value["matched_rules"]}
         if matched != expected:
             scope_errors.append([civil, rule_id, matched, expected])
+        else:
+            pass
         scope_examples.append(
             {
                 "civil_date": civil,
@@ -614,12 +658,16 @@ def audit() -> dict:
         )
         if members != group["members"]:
             method_errors.append(["members", group["name"], members, group["members"]])
+        else:
+            pass
     weekday_passages = {
         p["locator"]: p["text"] for p in method_primary["weekday_passages"]
     }
     for weekday in method_source_bundle()["weekday_records"]:
         if weekday["literal_title"] not in weekday_passages[weekday["locator"]]:
             method_errors.append(["weekday_title", weekday["luminary"]])
+        else:
+            pass
     examples = json.loads(
         (ROOT / "src/fatebridge/data/agent_examples.json").read_text()
     )
@@ -638,6 +686,8 @@ def audit() -> dict:
         path = ROOT / "tests/data/sukuyo_date_support_v1" / ref["excerpt_file"]
         if hashlib.sha256(path.read_bytes()).hexdigest() != ref["excerpt_sha256"]:
             raise ValueError("Frozen IANA excerpt hash mismatch")
+        else:
+            pass
 
     def zone_hashes():
         out = {}
@@ -674,6 +724,8 @@ def audit() -> dict:
             )
         ):
             support_errors.append([ref["local_date"], ref["zone"]])
+        else:
+            pass
         support_examples.append(actual)
     for ref in support_reference["nonexistent_dates"]:
         try:
@@ -681,6 +733,8 @@ def audit() -> dict:
         except ValueError as error:
             if "日期" not in str(error) or "不存在" not in str(error):
                 support_errors.append(["unexpected_error", ref["zone"], str(error)])
+            else:
+                pass
         else:
             support_errors.append(["skipped_date_accepted", ref["zone"]])
     uncertain_pair = calculate_sukuyo_compatibility(
@@ -691,10 +745,14 @@ def audit() -> dict:
         (r["person1_su27"], r["pair"]) for r in rows
     ] != [("室", "安壊"), ("壁", "危成")]:
         support_errors.append("timezone_candidate_relations")
+    else:
+        pass
     zone_after = zone_hashes()
     zone_changed = [z for z in zone_before if zone_before[z] != zone_after[z]]
     if zone_changed:
         support_errors.append(["timezone_files_changed", zone_changed])
+    else:
+        pass
     gloss_primary = json.loads(
         (ROOT / "tests/data/sukuyo-time-gloss-primary.json").read_text()
     )
@@ -708,6 +766,8 @@ def audit() -> dict:
         or gloss_note["interpreted_lunar_day"] != 11
     ):
         gloss_errors.append("source_inline_gloss")
+    else:
+        pass
     gloss_refs = {r["witness"]: r for r in gloss_primary["passages"]}
     for witness in gloss_bundle["timing_witnesses"]:
         ref = gloss_refs[witness["witness"]]
@@ -718,6 +778,8 @@ def audit() -> dict:
             or witness["release_excerpt"] != ref["release_text"]
         ):
             gloss_errors.append(witness["witness"])
+        else:
+            pass
     for day in range(1, 31):
         evidence = calendar_day_evidence(day)
         generic = [
@@ -740,6 +802,8 @@ def audit() -> dict:
             or evidence["prose_verse_time_semantic_conflict"]
         ):
             gloss_errors.append(["effective_day_witnesses", day])
+        else:
+            pass
     direction_primary = json.loads(
         (ROOT / "tests/data/sukuyo-directions-primary.json").read_text()
     )
@@ -750,12 +814,16 @@ def audit() -> dict:
     for rule in direction_bundle["rules"]:
         if any(e not in direction_text for e in rule["source_excerpts"]):
             direction_errors.append(["source_quote", rule["rule_id"]])
+        else:
+            pass
         for variant in rule["textual_variants"]:
             if (
                 variant["literal"] != direction_apparatus[variant["apparatus_id"]]
                 or variant["applied_to_selected_text"]
             ):
                 direction_errors.append(["apparatus", rule["rule_id"]])
+            else:
+                pass
     for mansion in SU27_ORDER:
         for direction in ("north", "east", "south", "west"):
             evidence = day_evidence(
@@ -776,10 +844,16 @@ def audit() -> dict:
             expected = set()
             if mansion in direction_primary["main_text_positive"][direction]:
                 expected.add("favorable")
+            else:
+                pass
             if mansion in direction_primary["main_text_negative"][direction]:
                 expected.add("caution")
+            else:
+                pass
             if actual != expected:
                 direction_errors.append(["direction_cell", mansion, direction])
+            else:
+                pass
     wall_south = day_evidence(
         {
             "natal_su27": "壁",
@@ -792,6 +866,8 @@ def audit() -> dict:
     )["activity_assessment"]
     if wall_south["evidence_status"] != "conflicted":
         direction_errors.append("wall_south_opposite_clauses")
+    else:
+        pass
     special_primary = json.loads(
         (ROOT / "tests/data/sukuyo-special-days-primary.json").read_text()
     )
@@ -807,6 +883,8 @@ def audit() -> dict:
         )
         if any(excerpt not in passage["text"] for excerpt in rule["source_excerpts"]):
             special_errors.append(["activity_source_quote", rule["rule_id"]])
+        else:
+            pass
     for witness in special_bundle["witnesses"]:
         for row in witness["rows"]:
             original_literal = special_primary["expected_main_tables"][
@@ -821,6 +899,8 @@ def audit() -> dict:
                         row["weekday_index"],
                     ]
                 )
+            else:
+                pass
             passage = next(
                 p
                 for p in special_primary["paragraphs"]
@@ -833,11 +913,15 @@ def audit() -> dict:
                 special_errors.append(
                     ["source_slot", witness["id"], row["label"], row["weekday_index"]]
                 )
+            else:
+                pass
             for app in row["apparatus"]:
                 if app["literal"] != special_apparatus[app["id"]]:
                     special_errors.append(
                         ["source_apparatus", witness["id"], app["id"]]
                     )
+                else:
+                    pass
     for mansion in SU27_ORDER:
         for weekday in range(7):
             evidence = special_day_evidence(
@@ -866,6 +950,8 @@ def audit() -> dict:
                     special_errors.append(
                         ["witness_cell", mansion, weekday, witness["witness"]]
                     )
+                else:
+                    pass
     special_boundary_receipts = []
     for basis, civil in [
         ("chinese_hko_utc08", "2000-01-01"),
@@ -914,6 +1000,8 @@ def audit() -> dict:
                     or row["classical_daybreak_accepted"]
                 ):
                     special_errors.append(["weekday_boundary_receipt", basis, row])
+                else:
+                    pass
                 rows.append(row)
             special_boundary_receipts.append(
                 {
@@ -943,6 +1031,8 @@ def audit() -> dict:
             not expected_match and learning_rule_ids.intersection(matched_ids)
         ):
             special_errors.append(["religious_scope", details])
+        else:
+            pass
     capture_errors = []
     exposed_profile = profile_source_bundle()
     original_anchor = exposed_profile["fullmoon_anchors"][0]["fullmoon_mansion"]
@@ -956,6 +1046,8 @@ def audit() -> dict:
                 capture_errors.append(
                     ["returned_anchor_contaminated_later_call", month]
                 )
+            else:
+                pass
     finally:
         exposed_profile["fullmoon_anchors"][0]["fullmoon_mansion"] = original_anchor
     profile_record = load_source(profile_source_path)
@@ -966,6 +1058,8 @@ def audit() -> dict:
         != fullmoon_primary["anchors"][0]
     ):
         capture_errors.append("loaded_source_data_alias")
+    else:
+        pass
     hinoo_cached_primary = json.loads(
         (ROOT / "tests/data/sukuyo-hinoo-primary-cache.json").read_text()
     )
@@ -979,12 +1073,16 @@ def audit() -> dict:
         or production_cached_primary["facsimile_collation_complete"]
     ):
         capture_errors.append("hinoo_primary_excerpt_scope")
+    else:
+        pass
     for window in hinoo_cached_primary["windows"]:
         if (
             hashlib.sha256(window["text"].encode()).hexdigest()
             != window["normalized_excerpt_utf8_sha256"]
         ):
             capture_errors.append(["hinoo_normalized_excerpt_hash", window["locator"]])
+        else:
+            pass
     split_capture = calendar_mansion(
         "2024-08-04", calendar_profile="hinoo_t1299_host27"
     )["profile_calculation"]
@@ -998,6 +1096,8 @@ def audit() -> dict:
     )
     if not capture_coupled:
         capture_errors.append("profile_branch_fingerprints_not_coupled")
+    else:
+        pass
     sanjiu_primary = json.loads(
         (ROOT / "tests/data/sukuyo-sanjiu-days-primary.json").read_text()
     )
@@ -1011,6 +1111,8 @@ def audit() -> dict:
                 for q in row["source_excerpts"]
             ):
                 sanjiu_errors.append([label, row["locator"]])
+            else:
+                pass
     sanjiu_bundle = sanjiu_source_bundle()
     for rule in sanjiu_bundle["activity_rules"]:
         if not any(
@@ -1018,6 +1120,8 @@ def audit() -> dict:
             for text in sanjiu_paragraphs.values()
         ):
             sanjiu_errors.append(rule["rule_id"])
+        else:
+            pass
     sanjiu_examples = []
     for natal, topic, details, expected_ids in [
         ("奎", "travel", [], []),
@@ -1046,6 +1150,8 @@ def audit() -> dict:
         )
         if actual_ids != sorted(expected_ids):
             sanjiu_errors.append([natal, topic, details, actual_ids])
+        else:
+            pass
         sanjiu_examples.append(
             {
                 "natal": natal,
@@ -1110,6 +1216,8 @@ def audit() -> dict:
         )
         if actual != sorted(expected_weekday_ids):
             action_errors.append([civil, topic, details, actual])
+        else:
+            pass
         for row in assessed["matched_rules"]:
             if (
                 row.get("applicability_status") == "matched_declared_activity_detail"
@@ -1118,6 +1226,8 @@ def audit() -> dict:
                 action_errors.append(
                     ["condition_missing_from_native_reading", row["rule_id"]]
                 )
+            else:
+                pass
         action_examples.append(
             {
                 "date": civil,
@@ -1139,6 +1249,8 @@ def audit() -> dict:
         or "王公百官等東西南北遠行" not in lower_sun["source_excerpts"]
     ):
         action_errors.append("lower_sun_actor_qualifier_not_preserved")
+    else:
+        pass
     japanese_files, japanese_manifest = read_japanese_fixture(
         ROOT / "tests/data/sukuyo_hutime_daily_v1"
     )
@@ -1152,6 +1264,8 @@ def audit() -> dict:
         japanese_errors.append(
             "production_reference_differs_from_frozen_daily_derivation"
         )
+    else:
+        pass
     japanese_count, index = 0, 0
     for batch in japanese_manifest["daily_batches"]:
         for row in json.loads(japanese_files[batch["response"]]):
@@ -1159,6 +1273,8 @@ def audit() -> dict:
             index += 1
             if row is None:
                 continue
+            else:
+                pass
             actual = calendar_mansion(
                 civil.isoformat(),
                 zone="+09:00",
@@ -1171,12 +1287,11 @@ def audit() -> dict:
                 or actual["calendar_timezone"] != "UTC+09:00"
             ):
                 japanese_errors.append(civil.isoformat())
+            else:
+                pass
             japanese_count += 1
-    from fatebridge.core.sukuyo_historical_calendar import (
+    from fatebridge.core.sukuyo.sukuyo_historical_calendar import (
         lunar_fields as historical_fields,
-    )
-    from fatebridge.validation.sukuyo_historical_sources import (
-        normalize as normalize_historical,
     )
     from scripts.sukuyo.build_sukuyo_historical_calendar import (
         read_fixture as read_historical_fixture,
@@ -1185,6 +1300,7 @@ def audit() -> dict:
         verify_documentary_controls,
     )
     from scripts.sukuyo.check_sukuyo_historical_daily import verify_daily_controls
+    from validation.sukuyo_historical_sources import normalize as normalize_historical
 
     historical_files, historical_manifest = read_historical_fixture(
         ROOT / "tests/data/sukuyo_historical_calendar_v1"
@@ -1199,6 +1315,8 @@ def audit() -> dict:
         historical_errors.append(
             "production_reference_differs_from_frozen_raw_derivation"
         )
+    else:
+        pass
     historical_count, historical_pipeline_count = 0, 0
     for ordinal, year, month, leap, length in historical_bundle["months"]:
         start, end = max(1, ordinal), ordinal + length
@@ -1206,6 +1324,8 @@ def audit() -> dict:
             expected = (year, month, current - ordinal + 1, leap)
             if historical_fields(date.fromordinal(current)) != expected:
                 historical_errors.append(["kernel", current])
+            else:
+                pass
             historical_count += 1
         for current in sorted({start, end - 1}):
             expected = (year, month, current - ordinal + 1, leap)
@@ -1222,15 +1342,19 @@ def audit() -> dict:
                 != expected
             ):
                 historical_errors.append(["public_calendar_month_boundary", current])
+            else:
+                pass
             if actual["calendar_backend"] != "frozen_naoj_historical_month_starts":
                 historical_errors.append(["wrong_backend", current])
+            else:
+                pass
             historical_pipeline_count += 1
     historical_daily = verify_daily_controls()
     historical_documentary = verify_documentary_controls()
     from scripts.sukuyo.check_sukuyo_historical_weekday import verify_weekday
 
     historical_weekday = verify_weekday()
-    from fatebridge.core.sukuyo_six_palaces import six_palace_reference
+    from fatebridge.core.sukuyo.sukuyo_six_palaces import six_palace_reference
     from scripts.sukuyo.audit_sukuyo_t2465_primary import verify_primary
 
     hinoo_downloaded_primary = verify_primary()
@@ -1250,6 +1374,8 @@ def audit() -> dict:
     ):
         if primary_edition[key] != hinoo_downloaded_primary[key]:
             capture_errors.append(["hinoo_downloaded_primary_differs", key])
+        else:
+            pass
     six_primary = json.loads(
         (ROOT / "tests/data/sukuyo-six-palaces-primary.json").read_bytes()
     )
@@ -1265,6 +1391,8 @@ def audit() -> dict:
             example["inclusive_ordinal"],
         ):
             six_errors.append(example)
+        else:
+            pass
         six_examples.append({**example, "actual_mansion": actual["mansion"]})
     for natal in SU27_ORDER:
         reference = six_palace_reference(natal)
@@ -1276,13 +1404,17 @@ def audit() -> dict:
             or reference["joint_reading_requirement"]["evaluated"]
         ):
             six_errors.append(["counting_or_scope", natal])
+        else:
+            pass
         if (
             reference["counting_excerpt"] not in six_primary["paragraph"]
             or reference["joint_reading_requirement"]["source_excerpt"]
             not in six_primary["paragraph"]
         ):
             six_errors.append(["primary_quote", natal])
-    from fatebridge.core.sukuyo_taibai import taibai_direction_reference
+        else:
+            pass
+    from fatebridge.core.sukuyo.sukuyo_taibai import taibai_direction_reference
     from scripts.sukuyo.audit_sukuyo_taibai_primary import (
         verify_primary as verify_taibai_primary,
     )
@@ -1292,7 +1424,7 @@ def audit() -> dict:
     )
     taibai_errors = []
     taibai_source_check = verify_taibai_primary()
-    from fatebridge.core.sukuyo_clothing import clothing_reference
+    from fatebridge.core.sukuyo.sukuyo_clothing import clothing_reference
     from scripts.sukuyo.audit_sukuyo_clothing_primary import (
         verify_primary as verify_clothing_primary,
     )
@@ -1306,6 +1438,8 @@ def audit() -> dict:
         actual = clothing_reference({"natal_su27": item["mansion"]})
         if actual["candidate_references"][0]["verse"] != item:
             clothing_errors.append(item["mansion"])
+        else:
+            pass
         clothing_rows.append(
             {
                 "mansion": item["mansion"],
@@ -1319,17 +1453,23 @@ def audit() -> dict:
             direction,
         ):
             taibai_errors.append(["printed_day_triple", lunar_day])
+        else:
+            pass
         ming = reference["witnesses"][1]
         if (ming["status"] == "row_deleted_in_apparatus") != (
             lunar_day in taibai_primary["ming_missing_days"]
         ):
             taibai_errors.append(["ming_deleted_row", lunar_day])
+        else:
+            pass
         if (
             reference["physical_venus_position_evaluated"]
             or reference["movement_alignment_evaluated"]
             or reference["applied_to_activity_assessment"]
         ):
             taibai_errors.append(["unestablished_claim", lunar_day])
+        else:
+            pass
     from scripts.sukuyo.check_sukuyo_wakita_primary import verify_printed_chapter
     from scripts.sukuyo.check_sukuyo_weekday_arithmetic import verify_arithmetic
     from scripts.sukuyo.check_sukuyo_weekday_recalculation import verify_recalculation
@@ -1779,7 +1919,11 @@ def main():
         ]
     ):
         raise SystemExit(1)
+    else:
+        pass
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

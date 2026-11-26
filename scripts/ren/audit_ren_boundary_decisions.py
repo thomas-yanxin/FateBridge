@@ -107,6 +107,8 @@ def expectations(
             v for k, v in calendar["month_stems"].items() if year_pair[0] in k
         )
         month_pair = sequence["寅卯辰巳午未申酉戌亥子丑".index(month)] + month
+    else:
+        pass
     general = maps["general_by_last_term"].get(state["last_term"])
     # HKO/NAOJ JDN anchor and the already declared 23h software day rule.
     cycle = (
@@ -144,10 +146,14 @@ def expectations(
         if month is not None:
             power = rules["power"][maps["branch_elements"][month]]
             powers = [power[v] for v in elements]
+        else:
+            pass
         mask = ("阳" if STEMS.index(human) % 2 == 0 else "阴") + "".join(
             "阳" if BRANCHES.index(v) % 2 == 0 else "阴" for v in positions[1:]
         )
         use = next(v["use"] for v in rules["polarity_use"] if v["mask"] == mask)
+    else:
+        pass
     return dict(
         current_term=state["last_term"],
         year=year_pair,
@@ -169,6 +175,8 @@ def audit(profile: str, ephe_dir: Path, kernel: Path | None) -> dict[str, Any]:
         != cal["references"]["tests/fixtures/ziwei_independent/calendar_manifest.json"]
     ):
         raise ValueError("Original HKO annual manifest changed")
+    else:
+        pass
     manifest = json.loads(manifest_path.read_text())
     selected = protocol["arms"][profile]
     if not ephe_dir.is_dir() or (
@@ -177,10 +185,14 @@ def audit(profile: str, ephe_dir: Path, kernel: Path | None) -> dict[str, Any]:
         raise ValueError(
             "Profile needs its declared existing or empty ephemeris directory"
         )
+    else:
+        pass
     if profile == "explicit_de440_spk" and (
         kernel is None or sha(kernel) != protocol["kernel_sha256"]
     ):
         raise ValueError("SPK profile requires the frozen official kernel bytes")
+    else:
+        pass
     os.environ["SE_EPHE_PATH"] = str(ephe_dir.resolve())
     os.environ["FATEBRIDGE_SOLAR_TERM_MODEL"] = selected["mode"]
     os.environ.pop("FATEBRIDGE_JPL_FILE", None)
@@ -194,7 +206,7 @@ def audit(profile: str, ephe_dir: Path, kernel: Path | None) -> dict[str, Any]:
     from fatebridge.core.metaphysics.jinkou import build_jinkou_board
     from fatebridge.core.metaphysics.liureng import build_liureng_board
     from fatebridge.core.metaphysics.ren_calendar import require_ren_calendar
-    from fatebridge.services.metaphysics import _build_analysis_seed
+    from fatebridge.core.metaphysics.seed import build_analysis_seed
 
     spec = importlib.util.spec_from_file_location(
         "hko_original_parser", ROOT / "scripts/ren/audit_ren_calendar.py"
@@ -208,6 +220,8 @@ def audit(profile: str, ephe_dir: Path, kernel: Path | None) -> dict[str, Any]:
         path = ROOT / "tests/data/ziwei_independent" / src["path"]
         if sha(path) != src["sha256"]:
             raise ValueError("Original HKO annual source changed")
+        else:
+            pass
         rows, lunar_state = old.annual_rows(
             path.read_text(encoding="utf-8-sig"), src["year"], lunar_state
         )
@@ -216,6 +230,8 @@ def audit(profile: str, ephe_dir: Path, kernel: Path | None) -> dict[str, Any]:
         )
     if len(hko) != 4800:
         raise ValueError("All 4800 HKO term labels required")
+    else:
+        pass
     by_year = defaultdict(list)
     for probe in probes:
         by_year[probe["year"]].append(probe)
@@ -257,6 +273,8 @@ def audit(profile: str, ephe_dir: Path, kernel: Path | None) -> dict[str, Any]:
                         future_leap_seconds_assumed_unchanged=epoch.future_leap_seconds_assumed_unchanged,
                     )
                 )
+            else:
+                pass
         for probe in by_year[year]:
             try:
                 moment = datetime.fromisoformat(probe["civil_utc"])
@@ -271,7 +289,7 @@ def audit(profile: str, ephe_dir: Path, kernel: Path | None) -> dict[str, Any]:
                     cal,
                     rules,
                 )
-                seed = _build_analysis_seed(
+                seed = build_analysis_seed(
                     analysis_year=moment.year,
                     analysis_month=moment.month,
                     analysis_day=moment.day,
@@ -327,6 +345,8 @@ def audit(profile: str, ephe_dir: Path, kernel: Path | None) -> dict[str, Any]:
                 f"{profile} {year}: roots={len(root_rows)} probes={len(comparisons)} errors={len(errors)}",
                 flush=True,
             )
+        else:
+            pass
     reference()
     after = source_map()
     fields = list(comparisons[0]["matches"]) if comparisons else []
@@ -381,6 +401,8 @@ def main() -> int:
     args = parser.parse_args()
     if args.output.exists():
         raise FileExistsError("Refuse to overwrite original boundary evidence")
+    else:
+        pass
     result = audit(args.profile, args.ephe_dir, args.kernel)
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     failed = (
@@ -396,3 +418,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -22,6 +22,17 @@ PRODUCTION = json.loads((BASE / "production-clock-model-predictions.json").read_
 SUPPLEMENT = json.loads((BASE / "production-clock-supplement-plan.json").read_bytes())
 COHORT = json.loads((BASE / "source-cohort.json").read_bytes())
 
+# Exact UTC + (TAI−UTC) + 32.184 s, rounded once, using the frozen future
+# offset assumption. The longitudes come from an isolated Swiss 2.10.03
+# DE441 data call at those independently derived TT coordinates.
+CURRENT_CLOCK_NATIVE_ANCHORS = {
+    "od-2100-saturn": (2488086.1306618517, 206.3749984720358),
+    "od-2100-neptune": (2488091.8806618517, 167.00042385616834),
+    "od-2200-saturn": (2524704.7008007406, 340.4373982504785),
+    "od-2200-uranus": (2524609.4917729627, 86.37501879496013),
+    "od-2300-pluto": (2561576.7862174073, 346.9975097843402),
+}
+
 
 @lru_cache(maxsize=1)
 def current_packets():
@@ -55,7 +66,9 @@ def assert_no_full_source_acceptance(result):
         assert result[key] is False
 
 
-def test_all520_predictions_and24_packets_retain14_missing_sources_and5_clock_conflicts():
+def test_all520_predictions_and24_packets_retain14_missing_sources_and5_clock_conflicts() -> (
+    None
+):
     result = audit()
     assert result["status"] == "not_achieved"
     assert result["required_cases"] == 24 and result["observed_cases"] == 10
@@ -66,8 +79,29 @@ def test_all520_predictions_and24_packets_retain14_missing_sources_and5_clock_co
     assert result["source_rows_bound"] and result["source_metadata_consistent"]
     assert result["all_obtained_pdf_text_bound"] is False
     assert result["primary_source_status"] == "not_available"
-    assert result["all24_native_packets_bound"]
-    assert result["all24_fixed_readings_verified"] is True
+    archive_links = {row["id"]: row["matched"] for row in result["native_packet_links"]}
+    assert len(archive_links) == 24
+    assert {case for case, matches in archive_links.items() if not matches} == set(
+        CURRENT_CLOCK_NATIVE_ANCHORS
+    )
+    assert result["all24_native_packets_bound"] is False
+    assert result["all24_fixed_readings_verified"] is False
+    for case, packet in zip(json.loads(PLAN)["cases"], current_packets(), strict=True):
+        if case["id"] in CURRENT_CLOCK_NATIVE_ANCHORS:
+            expected_tt, expected_longitude = CURRENT_CLOCK_NATIVE_ANCHORS[case["id"]]
+            run = packet["run"]
+            clock = run["time_scales"]["personality"]
+            target = next(
+                row
+                for row in run["activations"]["personality"]
+                if row["body"] == case["body"]
+            )
+            assert clock["jd_tt"] == expected_tt
+            assert clock["future_leap_seconds_assumed_unchanged"] is True
+            assert target["longitude"] == expected_longitude
+            assert target["ephemeris_model"] == "swieph"
+        else:
+            pass
     assert len(result["fixed_reading_checks"]) == 24
     assert all(
         row["proof"]["status"] == "verified_fixed_template_reading"
@@ -101,7 +135,9 @@ def test_all520_predictions_and24_packets_retain14_missing_sources_and5_clock_co
 
 
 @pytest.mark.parametrize("body", ["Saturn", "Uranus", "Neptune", "Pluto"])
-def test_dropping_any_body_invalidates_the_required_prediction_inventory(body):
+def test_dropping_any_body_invalidates_the_required_prediction_inventory(
+    body: str,
+) -> None:
     changed = deepcopy(INITIAL)
     changed["rows"] = [r for r in changed["rows"] if r["body"] != body]
     result = audit(initial=changed)
@@ -110,7 +146,9 @@ def test_dropping_any_body_invalidates_the_required_prediction_inventory(body):
     assert_no_full_source_acceptance(result)
 
 
-def test_keeping_only_matching_de406_profiles_is_not_a_complete_model_inventory():
+def test_keeping_only_matching_de406_profiles_is_not_a_complete_model_inventory() -> (
+    None
+):
     changed = deepcopy(INITIAL)
     changed["rows"] = [r for r in changed["rows"] if r["model"].startswith("JPL406")]
     result = audit(initial=changed)
@@ -119,7 +157,7 @@ def test_keeping_only_matching_de406_profiles_is_not_a_complete_model_inventory(
     assert_no_full_source_acceptance(result)
 
 
-def test_duplicate_prediction_is_retained_and_invalidates_inventory():
+def test_duplicate_prediction_is_retained_and_invalidates_inventory() -> None:
     changed = deepcopy(INITIAL)
     changed["rows"].append(deepcopy(changed["rows"][0]))
     result = audit(initial=changed)
@@ -131,7 +169,7 @@ def test_duplicate_prediction_is_retained_and_invalidates_inventory():
     assert not result["all_required_predictions_bound"]
 
 
-def test_forged_gate_label_is_checked_against_numeric_longitude():
+def test_forged_gate_label_is_checked_against_numeric_longitude() -> None:
     changed = deepcopy(INITIAL)
     changed["rows"][0]["uniform_gate_line"] = "57.1"
     changed["rows"][0]["printed2001_gate_line"] = "57.1"
@@ -140,14 +178,14 @@ def test_forged_gate_label_is_checked_against_numeric_longitude():
     assert not result["all_required_predictions_bound"]
 
 
-def test_changing_epoch_without_changing_line_still_breaks_clock_binding():
+def test_changing_epoch_without_changing_line_still_breaks_clock_binding() -> None:
     changed = deepcopy(INITIAL)
     changed["rows"][0]["jd_tt"] += 1 / 86400
     result = audit(initial=changed)
     assert result["initial_prediction_inventory"]["invalid_row_indices"] == [0]
 
 
-def test_production_clock_cannot_overwrite_original_common_clock_predictions():
+def test_production_clock_cannot_overwrite_original_common_clock_predictions() -> None:
     changed = deepcopy(INITIAL)
     target = next(
         r
@@ -165,7 +203,9 @@ def test_production_clock_cannot_overwrite_original_common_clock_predictions():
     assert len(result["original_clock_label_disagreement_ids"]) == 5
 
 
-def test_deleting_failed_observation_and_claiming_complete_does_not_shrink24_plan():
+def test_deleting_failed_observation_and_claiming_complete_does_not_shrink24_plan() -> (
+    None
+):
     changed = deepcopy(COHORT)
     changed["cases"].pop()
     changed.update(
@@ -182,7 +222,7 @@ def test_deleting_failed_observation_and_claiming_complete_does_not_shrink24_pla
 
 
 @pytest.mark.parametrize("kind", ["duplicate", "unknown", "altered_input"])
-def test_source_identity_corruption_is_not_accepted(kind):
+def test_source_identity_corruption_is_not_accepted(kind: str) -> None:
     changed = deepcopy(COHORT)
     if kind == "duplicate":
         changed["cases"].append(deepcopy(changed["cases"][0]))
@@ -195,22 +235,25 @@ def test_source_identity_corruption_is_not_accepted(kind):
     assert_no_full_source_acceptance(result)
 
 
-def test_missing_full_packet_cannot_pass_interpretation_coverage():
+def test_missing_full_packet_cannot_pass_interpretation_coverage() -> None:
     result = audit(packets=current_packets()[:-1])
     assert not result["all24_native_packets_bound"]
     assert not result["all24_fixed_readings_verified"]
     assert result["fixed_reading_checks"][-1]["proof"]["status"] == "not_verified"
 
 
-def test_production_prediction_must_equal_actual_packet_longitude():
+def test_production_prediction_must_equal_actual_packet_longitude() -> None:
     changed = deepcopy(PRODUCTION)
     changed["rows"][0]["longitude"] += 0.000000001
     result = audit(production=changed)
+    assert {
+        row["id"] for row in result["native_packet_links"] if not row["matched"]
+    } == {*CURRENT_CLOCK_NATIVE_ANCHORS, changed["rows"][0]["case_id"]}
     assert not result["all24_native_packets_bound"]
     assert not result["all24_fixed_readings_verified"]
 
 
-def test_missing_primary_files_cannot_be_replaced_by_transcription_agreement():
+def test_missing_primary_files_cannot_be_replaced_by_transcription_agreement() -> None:
     result = audit()
     assert result["primary_source_status"] == "not_available"
     assert not result["all_obtained_pdf_text_bound"]
@@ -224,7 +267,7 @@ def test_missing_primary_files_cannot_be_replaced_by_transcription_agreement():
     assert not any(h["all_observed_targets_compatible"] for h in result["hypotheses"])
 
 
-def test_changed_plan_bytes_rejected_even_if_json_semantics_unchanged():
+def test_changed_plan_bytes_rejected_even_if_json_semantics_unchanged() -> None:
     with pytest.raises(ValueError, match="Original off-disc plan changed"):
         MODULE.compare_all(
             PLAN + b" ", INITIAL, PRODUCTION, SUPPLEMENT, COHORT, current_packets()

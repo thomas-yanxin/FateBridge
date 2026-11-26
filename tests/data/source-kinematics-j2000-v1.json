@@ -1,0 +1,102 @@
+{
+  "provenance": {
+    "reference_sha256": "f9db7d96e4c053123b5bd2d22081acb5df2cc1338054436f339726b426b03a74",
+    "reference_before_product_observations": true,
+    "math": "exact original/given coefficient polynomial and source AU/EMRAT algebra followed by independent RNE",
+    "direct_file_sha256": "5e298b899542373c2f5814c8397cdea5a4627d1e4f5f6d1a89a11810955441cf",
+    "packaged_manifest_sha256": "b9761f8beed103b9c65cb27e16bded8313c45291b6c53d50526c910b4d1abd08",
+    "scope": "J2000 TDB, same supplied source point; original and quantized represented layers remain distinct"
+  },
+  "source_kinematics": {
+    "Sun": [
+      "-0x1.d3bdff15b55d5p-8",
+      "-0x1.5afdef88c7f0cp-9",
+      "-0x1.e3deb749ac91fp-11",
+      "0x1.68f13ebb5562ap-18",
+      "-0x1.c588bd3ea7106p-18",
+      "-0x1.971046cd027a3p-19",
+      "0x1.20600c2e3dc62p-27",
+      "0x1.022533242fac5p-27",
+      "0x1.a0598b6655e84p-29"
+    ],
+    "Mercury": [
+      "-0x1.190c741cba905p-3",
+      "-0x1.9ceb3974d0c22p-2",
+      "-0x1.9c7e01522a597p-3",
+      "0x1.5e27b7bc1515ep-6",
+      "-0x1.434afa41897c8p-8",
+      "-0x1.3de15092ba34fp-8",
+      "0x1.8db249c21dc42p-12",
+      "0x1.32266e416aa5cp-10",
+      "0x1.3271a85418978p-11"
+    ],
+    "Earth": [
+      "-0x1.7963be8b7a78bp-3",
+      "0x1.c5020a12512eep-1",
+      "0x1.89081b882a16fp-2",
+      "-0x1.19d773a672d63p-6",
+      "-0x1.7cc123800ddd8p-9",
+      "-0x1.4a26c6c738a2bp-10",
+      "0x1.c55f45166d5ddp-15",
+      "-0x1.22a556ca6654fp-12",
+      "-0x1.f76a36cf22ebfp-14"
+    ],
+    "Moon": [
+      "-0x1.7d61bab2f7994p-3",
+      "0x1.c4185a2566a3cp-1",
+      "0x1.8882c0553b876p-2",
+      "-0x1.13c08d8392240p-6",
+      "-0x1.af2d74ac5c19ap-9",
+      "-0x1.77c5be1ace213p-10",
+      "0x1.300ad19c7ac7bp-13",
+      "-0x1.99eb2474c8818p-13",
+      "-0x1.966201b6489e3p-14"
+    ]
+  },
+  "barycentric_state_given_words": {
+    "Sun": [
+      "-0x1.d3bdff15b57edp-8",
+      "-0x1.5afdef88c88b0p-9",
+      "-0x1.e3deb749aa88ep-11",
+      "0x1.68f13ebae9471p-18",
+      "-0x1.c588bd3f4f111p-18",
+      "-0x1.971046cd541e5p-19",
+      "0x1.20600c735e0a9p-27",
+      "0x1.0225347f92f47p-27",
+      "0x1.a0598c6324b7fp-29"
+    ],
+    "Mercury": [
+      "-0x1.190c741cba911p-3",
+      "-0x1.9ceb3974d0c19p-2",
+      "-0x1.9c7e01522a58bp-3",
+      "0x1.5e27b7bc1519dp-6",
+      "-0x1.434afa4189d4ep-8",
+      "-0x1.3de15092ba9cfp-8",
+      "0x1.8db249c2354fcp-12",
+      "0x1.32266e4168b5cp-10",
+      "0x1.3271a85416b0fp-11"
+    ],
+    "Earth": [
+      "-0x1.7963be8b7a79dp-3",
+      "0x1.c5020a12512ebp-1",
+      "0x1.89081b882a178p-2",
+      "-0x1.19d773a672ce7p-6",
+      "-0x1.7cc123800df18p-9",
+      "-0x1.4a26c6c739643p-10",
+      "0x1.c55f45168fcaap-15",
+      "-0x1.22a556ca64d25p-12",
+      "-0x1.f76a36cf2179cp-14"
+    ],
+    "Moon": [
+      "-0x1.7d61bab2f79aap-3",
+      "0x1.c4185a2566a3bp-1",
+      "0x1.8882c0553b87ap-2",
+      "-0x1.13c08d839220bp-6",
+      "-0x1.af2d74ac5c574p-9",
+      "-0x1.77c5be1ace704p-10",
+      "0x1.300ad19c9bfcfp-13",
+      "-0x1.99eb2474f7edcp-13",
+      "-0x1.966201b5e22a4p-14"
+    ]
+  }
+}

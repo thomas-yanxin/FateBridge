@@ -4,13 +4,12 @@ from __future__ import annotations
 
 from fractions import Fraction
 from functools import lru_cache
-from typing import Tuple
 
 
 @lru_cache(maxsize=128)
 def polynomial_weights(
-    nodes: Tuple[Fraction, ...], moments: Tuple[Fraction, ...]
-) -> Tuple[Fraction, ...]:
+    nodes: tuple[Fraction, ...], moments: tuple[Fraction, ...]
+) -> tuple[Fraction, ...]:
     """Apply a linear functional to the least-squares polynomial on these nodes.
 
     moments[i] is the desired value of that functional on x**i. The normal

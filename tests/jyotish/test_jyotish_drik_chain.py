@@ -5,8 +5,12 @@ import math
 
 import pytest
 
-from fatebridge.core import jyotish
-from fatebridge.core.jyotish_balas import PLANETS, aspect_strength, verify_drik_evidence
+from fatebridge.core.jyotish import jyotish
+from fatebridge.core.jyotish.jyotish_balas import (
+    PLANETS,
+    aspect_strength,
+    verify_drik_evidence,
+)
 from fatebridge.utils.errors import JyotishCalculationError
 from tests.jyotish.test_jyotish_ruler_provenance import computed  # noqa: F401
 
@@ -46,6 +50,8 @@ def mutate(packet, d1, target, fault):
             row["summary"][target] += 1
         if packet["summary"][target] is not None:
             packet["summary"][target] += 1
+        else:
+            pass
     elif fault == "nature":
         nature = packet["scenarios"][first]["natures"]["Mercury"]
         packet["scenarios"][first]["natures"]["Mercury"] = (
@@ -95,7 +101,9 @@ def mutate(packet, d1, target, fault):
 
 
 @pytest.mark.parametrize("fault", FAULTS)
-def test_formal_topic_rejects_full_graph_inconsistency_before_prose(computed, fault):
+def test_formal_topic_rejects_full_graph_inconsistency_before_prose(
+    computed, fault
+) -> None:
     strengths = copy.deepcopy(computed["strengths"])
     target = computed["charts"]["D1"]["houses"][0]["lord"]
     mutate(strengths["drik_bala"], computed["charts"]["D1"], target, fault)
@@ -108,7 +116,7 @@ def test_formal_topic_rejects_full_graph_inconsistency_before_prose(computed, fa
         )
 
 
-def test_valid_whole_topic_and_receipt_are_not_mutated(computed):
+def test_valid_whole_topic_and_receipt_are_not_mutated(computed) -> None:
     before = copy.deepcopy(computed)
     verify_drik_evidence(computed["strengths"]["drik_bala"], computed["charts"]["D1"])
     assert (
@@ -136,7 +144,9 @@ def test_valid_whole_topic_and_receipt_are_not_mutated(computed):
         "outside",
     ],
 )
-def test_natal_D1_operand_identity_is_not_a_varga_or_invalid_scalar(computed, fault):
+def test_natal_D1_operand_identity_is_not_a_varga_or_invalid_scalar(
+    computed, fault: str
+) -> None:
     chart = copy.deepcopy(computed["charts"]["D1"])
     if fault == "division":
         chart["division"] = 9
@@ -168,7 +178,7 @@ def test_natal_D1_operand_identity_is_not_a_varga_or_invalid_scalar(computed, fa
         359.99999999999994,
     ],
 )
-def test_real_ambiguous_phases_and_zero_consensus_remain_computed(elongation):
+def test_real_ambiguous_phases_and_zero_consensus_remain_computed(elongation) -> None:
     values = dict.fromkeys(PLANETS, 0.0)
     values["Moon"] = elongation
     packet = aspect_strength(values)
@@ -185,16 +195,18 @@ def test_real_ambiguous_phases_and_zero_consensus_remain_computed(elongation):
     if elongation == 0:
         assert packet["summary"] == dict.fromkeys(PLANETS, 0.0)
         assert len(packet["scenarios"]) == 4
+    else:
+        pass
 
 
 @pytest.mark.native_engine_fault
 def test_a_corrupted_component_returned_by_calculator_cannot_reach_full_build(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = jyotish.other_balas
 
-    def altered(raw):
-        result = original(raw)
+    def altered(raw, *, directional=None):
+        result = original(raw, directional=directional)
         result["drik_bala"]["matrix"]["Sun"]["Sun"] = False
         return result
 
@@ -217,7 +229,7 @@ def test_a_corrupted_component_returned_by_calculator_cannot_reach_full_build(
         )
 
 
-def test_exact_D1_recomputation_preserves_rounded_elongation_near360():
+def test_exact_D1_recomputation_preserves_rounded_elongation_near360() -> None:
     values = dict.fromkeys(PLANETS, 0.0)
     values["Sun"] = math.nextafter(0.0, 1.0)
     packet = aspect_strength(values)

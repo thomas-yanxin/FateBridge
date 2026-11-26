@@ -8,16 +8,15 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.astrology_tables import SIGNS
+from fatebridge.core.astro.astrology_tables import SIGNS
+from fatebridge.core.astro.ptolemy import build_ptolemy_layer
+from fatebridge.core.astro.ptolemy_terms import terms_at
 from fatebridge.core.classical_western import bound_lord
-from fatebridge.core.output_charts import PtolemyLayer
-from fatebridge.core.ptolemy import build_ptolemy_layer
-from fatebridge.core.ptolemy_terms import terms_at
+from fatebridge.core.contracts.output_charts import PtolemyLayer
 from fatebridge.services.astrology import (
-    _build_ptolemy_term_reading,
     calculate_core_chart_analysis,
 )
-from tests.western.test_western_accuracy import BIRTH
+from tests.unit_test.fixtures.western_natal import GREENWICH_EQUINOX_BIRTH as BIRTH
 
 REFERENCE = json.loads(
     (
@@ -30,6 +29,8 @@ def segments(system, index, sect):
     if system == "chaldaean":
         order = REFERENCE["chaldaean_order_by_triangle"][sect][index % 4]
         return list(zip(order, REFERENCE["chaldaean_lengths"]))
+    else:
+        pass
     row = REFERENCE[system][index]
     assert row[0] == SIGNS[index]
     return row[1:]
@@ -38,7 +39,9 @@ def segments(system, index, sect):
 @pytest.mark.parametrize("sect", ["day", "night"])
 @pytest.mark.parametrize("system", ["egyptian", "chaldaean", "ptolemaic"])
 @pytest.mark.parametrize("index", range(12))
-def test_all_printed_segments_integer_degrees_and_float_boundaries(sect, system, index):
+def test_all_printed_segments_integer_degrees_and_float_boundaries(
+    sect: str, system: str, index
+) -> None:
     row = segments(system, index, sect)
     assert len(row) == 5 and sum(n for _, n in row) == 30
     assert len({lord for lord, _ in row}) == 5
@@ -68,21 +71,21 @@ def test_all_printed_segments_integer_degrees_and_float_boundaries(sect, system,
 
 
 @pytest.mark.parametrize("sect", ["day", "night"])
-def test_chaldaean_totals_match_the_main_text_not_fitted_cells(sect):
+def test_chaldaean_totals_match_the_main_text_not_fitted_cells(sect: str) -> None:
     counts = Counter(
         terms_at(degree + 0.5, sect)["chaldaean"]["lord"] for degree in range(360)
     )
     assert counts == REFERENCE["chaldaean_totals"][sect]
 
 
-def test_printed_libra_mars_cell_is_not_the_html_transcription():
+def test_printed_libra_mars_cell_is_not_the_html_transcription() -> None:
     term = terms_at(205, "day")["ptolemaic"]
     assert term["lord"] == REFERENCE["online_discrepancy"]["printed_lord"] == "Mars"
     assert term["lord"] != REFERENCE["online_discrepancy"]["html_lord"]
     assert (term["start_degree"], term["end_degree"]) == (24, 30)
 
 
-def test_systems_and_day_night_cannot_be_substituted_for_each_other():
+def test_systems_and_day_night_cannot_be_substituted_for_each_other() -> None:
     day, night = terms_at(16, "day"), terms_at(16, "night")
     assert day["chaldaean"]["lord"] == "Saturn"
     assert night["chaldaean"]["lord"] == "Mercury"
@@ -95,17 +98,17 @@ def test_systems_and_day_night_cannot_be_substituted_for_each_other():
 
 
 @pytest.mark.parametrize("value", [math.nan, math.inf, -math.inf])
-def test_nonfinite_terms_are_rejected(value):
+def test_nonfinite_terms_are_rejected(value) -> None:
     with pytest.raises(ValueError, match="finite"):
         terms_at(value, "day")
 
 
-def test_unknown_sect_is_not_silently_a_day_chart():
+def test_unknown_sect_is_not_silently_a_day_chart() -> None:
     with pytest.raises(ValueError, match="explicit"):
         terms_at(16, "unknown")
 
 
-def test_new_layer_is_typed_bounded_and_sidereal_is_unsupported():
+def test_new_layer_is_typed_bounded_and_sidereal_is_unsupported() -> None:
     layer = build_ptolemy_layer({"Sun": 205}, "day", tropical=True)
     typed = PtolemyLayer.model_validate(layer)
     assert (
@@ -120,37 +123,9 @@ def test_new_layer_is_typed_bounded_and_sidereal_is_unsupported():
     assert unsupported["planets"] == {}
 
 
-def test_term_reading_tracks_returned_facts_and_sect_without_a_strength_claim():
-    payload = {
-        "classical": {
-            "sect": "day",
-            "ptolemy": build_ptolemy_layer({"Sun": 205}, "day", tropical=True),
-        }
-    }
-    text = _build_ptolemy_term_reading(payload)
-    assert "昼盘" in text and "托勒密界主火星[24,30)°" in text
-    changed = copy.deepcopy(payload)
-    changed["classical"]["ptolemy"]["planets"]["Sun"]["terms"]["ptolemaic"] = {
-        "lord": "Venus",
-        "start_degree": 6,
-        "end_degree": 11,
-    }
-    altered = _build_ptolemy_term_reading(changed)
-    assert "托勒密界主金星[6,11)°" in altered
-    assert "托勒密界主火星[24,30)°" not in altered
-    assert "不据此推断整体强弱或现实事件" in text
-
-
-def test_complete_reading_export_and_dependencies_include_same_term_text():
-    result = calculate_core_chart_analysis(**BIRTH, chart_variant="hellen_chart")
-    assert "error" not in result
-    text = result["interpretation"]["original_text_terms"]
-    assert text in result["summary"] and text in result["snapshot_text"]
-    evidence = result["interpretation_evidence"]["original_text_terms"]
-    assert evidence["kind"] == "primary_text_rule_interpretation"
-    assert evidence["policy_id"] == "ptolemy_robbins_printed_terms_v1"
-    for path in evidence["source_paths"]:
-        value = result
-        for token in path.split("."):
-            value = value[token]
-        assert value is not None
+def test_chart_retains_ptolemy_term_evidence() -> None:
+    result = calculate_core_chart_analysis(**BIRTH)
+    ptolemy = result["classical"]["ptolemy"]
+    assert ptolemy["planets"]
+    assert ptolemy["term_policy"]
+    assert ptolemy["term_source_url"]

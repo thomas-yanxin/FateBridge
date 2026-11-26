@@ -9,7 +9,7 @@
 | 维度 | 固定版本的可复核结果 | 尚未成立的部分 |
 | --- | --- | --- |
 | 历法 | 2026–2028 年 72 个香港天文台节气时刻均在 60 秒容差内，最大差异约31秒（以当次审计快照为准）；另有上海、纽约的 144 个交节／中气月界探针 | 未覆盖全部支持年份、历史地方时及所有独立历书；发表到分钟的资料不验证秒级精度 |
-| 原典 | 冻结的《秘本子平真诠》命例取格名称目前10/10相符；原文明示旺衰仍为1/3；7例原文未裁定 | 十例已用于开发，不再是盲测；两例旺衰分歧及成格、相神、救应的完整规则仍未通过；`classical_acceptance_passed=false` |
+| 原典 | 冻结的《秘本子平真诠》十例中，取用见证身份为 10/10，原单一格名比较为 7/10。原文明示旺衰为 1/3，其余七例未裁定 | 十例已用于开发。两例旺衰分歧尚未解决，成格、相神和救应尚未完整验收。`classical_acceptance_passed=false` |
 | 解读忠实 | 新增同 run、完整业务摘要、路径、值与类型的结构化引用核验；时运快照显示已声明出生时间范围及大运候选 | 不验证任意自由文本的全部语义；也未完成真实模型多轮行为验收 |
 | 现实预测 | 新增固定队列、事前预测、外部结果和基线的评估模块；空示例实际运行返回 `not_tested` | 没有独立现实预测／结果数据，不能计算现实准确率或认证权威 |
 
@@ -19,21 +19,24 @@
 
 [月令领域实现](../src/fatebridge/core/classical.py)将建禄、阳刃的资格与“本气是比肩／劫财”分开；戊日未月不能因己土劫财直接命名月刃，戊巳建禄与戊午阳刃也不能只看主气判定。规则依据所选[《秘本子平真诠》书影](https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf)的《论阳刃》（PDF86–87，书页77–78），并以不同命式反例核对。
 
-杂气月增加“透干且有实际会支支持”的有限取格条件；仍保留所有候选，不把会支存在解释为已经合化或成格。PDF65的戊日丁未月命例因此从误报月刃改为正官。后续又按PDF65–66正官章补上本气正官、财印辅助的限定分支，同页乙日壬申月命例不再因印透自动改为印格；详细条件和藏干根语义见[八字判定](bazi-assessment.md)。`original_structure`、`seat_qualification`、`selection_rule`显示选择依据，不能把标签当完整原典裁定。
+杂气月保留透干与完整会支的并存见证，旧单选结果只供追溯。孤官例、宣参国例和秦龙图例的当前格名都显示为“杂气月令取用候选”，原单格名比较记三项差异。审计分别核对乙官、己官和己伤官的透干见证。宣参国例的完整木局仍保留食伤类别，是否具有原书所论的作用与救应另待裁定。 [杂气月令规则和固定原例](bazi-assessment.md#month-use-witnesses-round35)
+
+先按[原典资料与未决范围](bazi-assessment.md#原典资料与未决范围)取得冻结命例。在源码检出目录运行：
 
 ```bash
+AUDIT_DIR=$(mktemp -d)
 uv run --locked --extra dev python -m scripts.bazi.audit_bazi_classical \
-  --output /tmp/fatebridge-classical-audit.json
+  --output "$AUDIT_DIR/classical-audit.json"
 ```
 
 当前此命令应退出 1，表示算法验收仍未通过。不得通过修改冻结命例或将未裁定强弱补成中和来取得满分。书目、冻结范围及分组状态见[原典对照](bazi-assessment.md#原典资料与未决范围)。
 
 ## 同次结果引用核验
 
-[核验模块](../src/fatebridge/validation/claims.py)接受完整原始结果及结构化引用。先从可信调用获得完整 JSON，保留其 `run_metadata`；不要用投影结果重建摘要。示例中的 `payload` 是待核对结果，`original_payload` 是调用方另行可信保存的完整原结果：
+[核验模块](../validation/claims.py)接受完整原始结果及结构化引用。先从可信调用获得完整 JSON，保留其 `run_metadata`；不要用投影结果重建摘要。示例中的 `payload` 是待核对结果，`original_payload` 是调用方另行可信保存的完整原结果：
 
 ```python
-from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
+from validation.claims import CalculationClaim, verify_calculation_claims
 
 receipt = payload["run_metadata"]
 claim = CalculationClaim(
@@ -49,7 +52,7 @@ assert verification["status"] == "verified_structured_facts"
 
 ## 可证伪的现实预测评估
 
-[评估模块](../src/fatebridge/validation/predictions.py)只计算外部提交的记录，不生成预测概率，也不将八字分数除以 100 当概率。当前范围为一个完整时间窗口内、每个独立主体一次的二元事件评估；多次观察、连续结果、生存时间或多目标检验需要另设统计方案。
+[评估模块](../validation/predictions.py)只计算外部提交的记录，不生成预测概率，也不将八字分数除以 100 当概率。当前范围为一个完整时间窗口内、每个独立主体一次的二元事件评估；多次观察、连续结果、生存时间或多目标检验需要另设统计方案。
 
 在观察目标窗口前固定 `StudyPlan`，包括可操作的目标定义、窗口、模型与解释政策指纹、完整队列、基线概率、决策阈值、置信水平、`planned_evaluations`检验次数和最低样本／Brier条件。基线不能从测试结果反推。计划需要存入可外部核验的事前登记系统；[COS 的预注册说明](https://www.cos.io/initiatives/prereg)解释了计划与结果揭晓的时间关系。开发数据与已经看过的古代命例不能重新命名为独立盲测。
 
@@ -61,14 +64,11 @@ assert verification["status"] == "verified_structured_facts"
 
 评估会拒绝重复 case、未注册记录、迟发预测、模型替换、未结束即确认的阴性结果及非有限概率。缺预测、弃权和未随访记录保留在队列及覆盖率中；`as_of` 之后才记录的结果不参与指标。全队列可评估、样本数足够且超过预设 Brier 条件时，`registered_numeric_gate_met` 才可能为 true。完整的 `preregistered_performance_gate_met` 还要求登记引用、解释政策、基线冻结及训练主体声明完整；这仍不等于外部认证。
 
-`StudyPlan.registration_reference`保存外部事前登记引用，`interpretation_policy_sha256`冻结解释政策，
-`baseline_frozen_at`不得晚于计划登记时刻。每条`Forecast.interpretation_policy_sha256`必须与计划一致；
-即使计算模型不变，也不能更换解释政策后混入同一评估。
-描述性诊断允许资料尚未齐全，`protocol_blockers`会逐项列出缺失，
-`protocol_status`不会报为完整，且完整预注册门槛保持false；描述性指标仍可计算。
-填写引用、时间及散列只构成内部声明，外部登记真实性和执行时间仍须独立核验。
+`StudyPlan.registration_reference`保存外部事前登记引用，`interpretation_policy_sha256`冻结解释政策， `baseline_frozen_at`不得晚于计划登记时刻。每条`Forecast.interpretation_policy_sha256`必须与计划一致； 即使计算模型不变，也不能更换解释政策后混入同一评估。 描述性诊断允许资料尚未齐全，`protocol_blockers`会逐项列出缺失， `protocol_status`不会报为完整，且完整预注册门槛保持false；描述性指标仍可计算。 填写引用、时间及散列只构成内部声明，外部登记真实性和执行时间仍须独立核验。
 
-通用评估器v4另核对每条预测与结果的 `study_plan_sha256`，其值为 `digest(StudyPlan.model_validate_json(plan_text).model_dump(mode="json"))`。它绑定整个校验后方案，包含事件、窗口、队列、基线及统计政策；不是原始文件字节散列。错配直接拒绝，缺少绑定的记录仅可作数值诊断，但列出 `missing_forecast_plan_commitment`／`missing_outcome_plan_commitment`，不能通过完整预注册或统计证据门槛。不能在看过结果后补字段并冒充当初承诺。虚构完整流程见下方示例。审计脚本的输出路径必须尚不存在，避免覆盖以前的报告。
+预测和结果文件各须为 JSON 数组，所有输入 JSON 都拒绝任意深度的重复成员名。
+
+通用评估器 v4 核对每条预测与结果的 `study_plan_sha256`，其值为 `digest(StudyPlan.model_validate_json(plan_text).model_dump(mode="json"))`。它绑定整个校验后方案，包含事件、窗口、队列、基线及统计政策；不是原始文件字节散列。错配直接拒绝，缺少绑定的记录仅可作数值诊断，但列出 `missing_forecast_plan_commitment`／`missing_outcome_plan_commitment`，不能通过完整预注册或统计证据门槛。不能在看过结果后补字段并冒充当初承诺。虚构完整流程见下方示例。审计脚本的输出路径必须尚不存在，避免覆盖以前的报告。
 
 输出包括准确率、[NIST Wilson 准确率区间](https://www.itl.nist.gov/div898/handbook/prc/section2/prc241.htm)、Brier分数、固定基线比较与覆盖率。10/10的样本全对，在独立样本假设下95% Wilson下界仍约为72.25%；不能据此宣称总体准确率为100%。现新增`statistical_evidence_gate_met`，以配对损失的Hoeffding保守单侧界检验注册的技能阈值，并对登记检验次数作Bonferroni分配；`preregistered_performance_gate_met`表示点估计、覆盖及协议完整门槛，`registered_numeric_gate_met`只表示数值门槛；统计门槛也不能绕过协议缺失。该方法不是Brier技能比值的专用区间，也不证明现实记录真实性。
 
@@ -77,12 +77,13 @@ assert verification["status"] == "verified_structured_facts"
 可以直接运行不包含任何预测和结果的[虚构流程示例](examples/prediction-study/plan.json)：
 
 ```bash
+AUDIT_DIR=$(mktemp -d)
 uv run --locked --extra dev python -m scripts.evaluation.audit_prediction_study \
   --plan docs/examples/prediction-study/plan.json \
   --forecasts docs/examples/prediction-study/forecasts.json \
   --outcomes docs/examples/prediction-study/outcomes.json \
   --as-of 2028-01-02T00:00:00Z \
-  --output /tmp/fatebridge-prediction-audit.json
+  --output "$AUDIT_DIR/prediction-audit.json"
 ```
 
 预期 `evaluable_count=0`、`real_world_efficacy=not_tested`、`authority_certified=false`。退出 0 只表示评估流程成功执行。示例中的全零模型／解释政策散列、登记占位引用和三个虚构主体是流程占位，不能作为真实预注册使用。实际研究应另外创建带有真实固定模型、外部登记与独立结果的数据集；报告保留计划、预测及结果的散列，软件本身不能鉴定时间戳、来源真实性或盲法执行情况。
@@ -94,7 +95,7 @@ uv run --locked --extra dev pytest -q \
   tests/astronomy/test_hko_calendar_independent.py \
   tests/bazi/test_bazi_second_iteration.py \
   tests/evaluation/test_prediction_validation.py \
-  tests/bazi/test_bazi_timing_transports.py
+  tests/bazi/test_bazi_timing_roots_transports.py
 ```
 
 这组测试覆盖有限历法对照、资格反例、出生范围、三端共享合同、结构化引用与统计计算；它不将软件回归数量换算为四项能力总分。
@@ -127,6 +128,8 @@ uv run --locked --extra dev pytest -q \
 - 评估先重算每个实际奇门盘及策略决策，再检查预测、证据哈希与已封存结果。重放检查预测是否由该策略算得；全包指纹另核对是否仍是事前封存的那份计划及预测。真实研究必须提供从独立登记或可信存档取得的事前全包指纹，拒绝缺失或不匹配。仅靠重放不能发现整个计划、基线、队列和收据被一致重做；合成演示可以省略外部指纹，但报告明确标为未锚定的合成包。
 
 当前采用 `qimen_forecast_commitment_v3`，对应常数／逐例基线二选一的研究输入。封存不得通过补字段或重算而冒充原来的事前承诺。`study_input_sha256` 在封存时绑定完整输入，不证明计划在问事发生前已经外部登记。
+
+引擎指纹同时绑定生效的 Swiss 搜索目录、相关文件、配置的原生 JPL 文件名及太阳时序来源。封存和重放在重算首例前核对登记身份。已有封存包使用登记时的原版、文件和配置重放。 [来源与四臂重放对照](precision-acceptance.md#qimen-study-source-binding-round50)
 
 盘级 `qimen.source_disagreements` 可预先固定为 `source_disagreement_action=abstain` 或 `use_declared_rules`。前者保留该例并弃权，后者保留该例分歧并按已声明规则计算；不能看过结果再切换。这个开关不等于所有原典范围、释读和优先未决项都已完成自动裁决或自动弃权。整条引用或冻结条件的检查不认证任意自由文本解释。
 

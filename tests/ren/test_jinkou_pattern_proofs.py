@@ -10,10 +10,17 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.application.execution import OutputContractError, validate_output
+from fatebridge.core.contracts.output_ren_patterns import JinkouPatterns
 from fatebridge.core.metaphysics.jinkou_patterns import patterns_from_symbols
-from fatebridge.core.output_ren_patterns import JinkouPatterns
-from tests.ren.test_ren_anchors import assert_broken_on_three_ports
-from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
+from tests.support.transports import (
+    AS_OF,
+    SPECS,
+    business,
+    call_calculation,
+    rest,
+    surface_calls,
+)
+from tests.unit_test.fixtures.ren_protocol import assert_output_fault_on_all_transports
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/jinkou_pattern_proofs_v1"
@@ -46,6 +53,8 @@ def assert_logic(value):
         if row["matched"] is None:
             assert groups is None
             continue
+        else:
+            pass
         assert groups and all(groups)
         result = any(
             all(facts[t["fact_id"]]["matched"] is t["expected"] for t in g)
@@ -57,7 +66,9 @@ def assert_logic(value):
     JinkouPatterns.model_validate(value)
 
 
-def test_whole_catalog_premises_are_available_for_positive_negative_and_unknown():
+def test_whole_catalog_premises_are_available_for_positive_negative_and_unknown() -> (
+    None
+):
     ref = reference()
     value = recognized(["甲", "子", "辰", "申"], "甲子")
     assert_logic(value)
@@ -69,7 +80,9 @@ def test_whole_catalog_premises_are_available_for_positive_negative_and_unknown(
 
 
 @pytest.mark.parametrize("case", reference()["cases"], ids=lambda c: c["id"])
-def test_four_book_conflicts_explain_the_actual_failed_operands_without_repair(case):
+def test_four_book_conflicts_explain_the_actual_failed_operands_without_repair(
+    case,
+) -> None:
     value = recognized(case["symbols"], case["day"])
     assert_logic(value)
     row = next(r for r in value["evaluations"] if r["id"] == case["id"])
@@ -82,7 +95,7 @@ def test_four_book_conflicts_explain_the_actual_failed_operands_without_repair(c
         ) == v
 
 
-def test_disjunction_negation_and_all_premises_survive_earlier_failure():
+def test_disjunction_negation_and_all_premises_survive_earlier_failure() -> None:
     value = recognized(["甲", "子", "丑", "寅"], "甲子")
     assert_logic(value)
     rows = {r["id"]: r for r in value["evaluations"]}
@@ -99,7 +112,7 @@ def test_disjunction_negation_and_all_premises_survive_earlier_failure():
     assert len(rows["P33"]["condition_groups"]) == 2
 
 
-def test_mathematical_equal_phase_and_equal_branch_remain_different():
+def test_mathematical_equal_phase_and_equal_branch_remain_different() -> None:
     value = recognized(["庚", "巳", "辰", "戌"], "甲子")
     facts = {f["id"]: f for f in value["condition_facts"]}
     assert facts["same:J:D"]["matched"] is True
@@ -212,18 +225,24 @@ def damaged(which, fault):
 
 @pytest.mark.parametrize("which", ["primary", "natal", "year_fate"])
 @pytest.mark.parametrize("fault", FAULTS)
-def test_each_complete_course_rejects_forged_or_missing_proofs(which, fault):
+def test_each_complete_course_rejects_forged_or_missing_proofs(
+    which: str, fault
+) -> None:
     with pytest.raises(OutputContractError):
         validate_output(SPEC, damaged(which, fault))
 
 
 @pytest.mark.parametrize("project", [False, True])
 def test_proof_failure_is_rejected_on_all_three_ports_before_projection(
-    project, rest, monkeypatch, tmp_path, capsys
-):
+    project: bool,
+    rest,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     value, payload = complete()
     assert value
-    assert_broken_on_three_ports(
+    assert_output_fault_on_all_transports(
         SPEC,
         damaged("natal", "missing_facts"),
         project,
@@ -234,8 +253,8 @@ def test_proof_failure_is_rejected_on_all_three_ports_before_projection(
     )
 
 
-def test_positive_complete_and_sparse_proofs_preserve_omission():
-    from fatebridge.core.output_ren_patterns import JinkouPatternFact
+def test_positive_complete_and_sparse_proofs_preserve_omission() -> None:
+    from fatebridge.core.contracts.output_ren_patterns import JinkouPatternFact
 
     value, _ = complete()
     for which in ("primary", "natal", "year_fate"):
@@ -270,7 +289,7 @@ def missing_reference():
     return json.loads((folder / "reference.json").read_text())
 
 
-def test_missing_raw_stems_are_unknown_while_defined_gate_rules_stay_known():
+def test_missing_raw_stems_are_unknown_while_defined_gate_rules_stay_known() -> None:
     from fatebridge.core.metaphysics.jinkou_patterns import structural_patterns
     from scripts.ren.audit_jinkou_gate_roles import synthetic_rows
 
@@ -295,7 +314,7 @@ def test_missing_raw_stems_are_unknown_while_defined_gate_rules_stay_known():
 
 
 @pytest.mark.parametrize("case", missing_reference()["truth_cases"])
-def test_unknown_propagation_obeys_frozen_three_valued_logic(case):
+def test_unknown_propagation_obeys_frozen_three_valued_logic(case) -> None:
     from fatebridge.core.metaphysics.jinkou_pattern_proofs import evaluate_groups
 
     facts = {}
@@ -313,8 +332,8 @@ def test_unknown_propagation_obeys_frozen_three_valued_logic(case):
 
 @pytest.mark.parametrize("project", [False, True])
 def test_positive_proofs_on_three_ports_full_and_strict_projection(
-    project, surface_calls
-):
+    project: bool, surface_calls
+) -> None:
     _, payload = complete()
     params = {"as_of": AS_OF, "response_char_limit": 0}
     options = {}
@@ -329,6 +348,8 @@ def test_positive_proofs_on_three_ports_full_and_strict_projection(
         options = dict(fields=fields, strict_fields=True)
         flags.extend(["--fields", *fields])
         flags.extend(["--strict-fields", "true"])
+    else:
+        pass
     response, protocol, code, cli = surface_calls(
         SPEC, payload, params=params, options=options, flags=flags, cli_first=False
     )
@@ -344,8 +365,8 @@ def test_positive_proofs_on_three_ports_full_and_strict_projection(
 
 @pytest.mark.asyncio
 async def test_complete_proof_payload_is_retrieved_from_the_same_run_without_recalculation(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from fastmcp import Client
 
     import fatebridge.application.execution as execution
@@ -357,13 +378,16 @@ async def test_complete_proof_payload_is_retrieved_from_the_same_run_without_rec
     def count(spec, request):
         if spec.key == "jinkou":
             calls.append(spec.key)
+        else:
+            pass
         return original(spec, request)
 
     monkeypatch.setattr(execution, "execute_spec", count)
     _, payload = complete()
     calls.clear()
     async with Client(create_mcp_app()) as client:
-        response = await client.call_tool(
+        response = await call_calculation(
+            client,
             "jinkou",
             {
                 **payload,

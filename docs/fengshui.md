@@ -26,16 +26,16 @@
 | `/api/fengshui/minggua` | `fengshui_minggua` | 公历 `birth_date`、`effective_birth_year` 或含时区的 `birth_at` 三选一；`gender_convention` | 命卦、原始数、寄宫、东西组、个人八方关系 |
 | `/api/fengshui/bazhai` | `fengshui_bazhai` | `house`、`occupants`；可选 `placements` | 坐山宅盘、逐人命盘、位置与朝向的用途判断 |
 | `/api/fengshui/jinsuo` | `fengshui_jinsuo` | `features` | 八宫砂水偏好、逐个观察判定 |
-| `/api/fengshui/annual_stars` | `fengshui_annual_stars` | `effective_year` 或含时区的 `query_at` | 当年入中星、九宫年星、立春有效期、当前元运 |
-| `/api/fengshui/monthly_stars` | `fengshui_monthly_stars` | 含时区的 `query_at`，或已确认 `effective_solar_year/solar_month_number` | 十二节换月的中性月星落宫、独立有效期与固定释义；不产生用途处方 |
-| `/api/fengshui/xuankong_natal` | `fengshui_xuankong_natal` | `house`、历史 `period`，按需提供测量误差及 `interpretation` | 运／山／向盘、下卦／替星与分界候选；有限解释须显式启用 |
+| `/api/fengshui/annual-stars` | `fengshui_annual_stars` | `effective_year` 或含时区的 `query_at` | 当年入中星、九宫年星、立春有效期、当前元运 |
+| `/api/fengshui/monthly-stars` | `fengshui_monthly_stars` | 含时区的 `query_at`，或已确认 `effective_solar_year/solar_month_number` | 十二节换月的中性月星落宫、独立有效期与固定释义；不产生用途处方 |
+| `/api/fengshui/xuankong-house-chart` | `fengshui_xuankong_natal` | `house`、历史 `period`，按需提供测量误差及 `interpretation` | 运／山／向盘、下卦／替星与分界候选；有限解释须显式启用 |
 | `/api/fengshui/assess` | `fengshui_assess` | 已确认的住宅、住户、环境、年度或历史宅运输入；可选 `methods`、`scene`，布局时 `analyze_layout=true` | `bazhai` / `jinsuo` / `annual_stars` / `xuankong_natal` 独立分层；布局及所请求补充审查 |
 
 同一宅向的已知测量误差使用 `house.bearing_uncertainty_degrees`，在已选八宅及玄空层共同传播。八宅跨宫时保留各自宅卦及布局条件，详见[共享宅向误差](interpretation/fengshui/house-bearing-uncertainty.md)。省略误差只沿用点输入约定，不认证现场误差为零。
 
 数值用JSON数值，日期和时刻按明确的ISO形式提交；布尔值、数字字符串或Unix时间戳不能冒充角度、运数及历法事实。范围内的整数值 `8.0` 仍可使用，非整数不舍入。详见风水输入类型。
 
-可运行输入按用途列于[示例索引](examples/README.md)。完整约束见 `/openapi.json`、MCP `tools/list` 和 `fatebridge describe fengshui_assess`。工具分类为 `fengshui`；不加入个人 `analyze_destiny` 或 `profile` 默认系统。[月紫白参考](interpretation/fengshui/monthly-stars.md)说明立春有效年、十二节换月、原表标签差异与原始回执核验；合参可显式选择 `monthly_stars` 或提供独立 `monthly`。
+可运行输入按用途列于[示例索引](examples/README.md)。完整约束见 `/openapi.json`、MCP `tools/list` 和 `fatebridge describe fengshui_assess`。工具分类为 `fengshui`；不加入个人 `bazi_overview` 或 `profile` 默认系统。[月紫白参考](interpretation/fengshui/monthly-stars.md)说明立春有效年、十二节换月、原表标签差异与原始回执核验；合参可显式选择 `monthly_stars` 或提供独立 `monthly`。
 
 `fengshui_xuankong_natal` 提供中州派完整运／山／向数字盘与兼向替星；聚合时显式选择 `xuankong_natal`，与年度飞星独立。定运资料、分界候选、规则版本及独立盘例见 [玄空宅盘](fengshui-xuankong.md)。
 
@@ -110,7 +110,7 @@ asyncio.run(main())
 
 ## 规则与版本
 
-规则数据位于 `src/fatebridge/data/fengshui/rules-v1.json`，随 wheel 打包。八宅 `bazhai_sitting_v1` 当前为 `1.1.0`，其他三个基础规则集为 `1.0.0`；每个输出层含 `ruleset_id`、`version`、`bundle_version`、来源标题／URL／类别／适用范围与约定。逐项关系带 `rule_id` 和 `source_ids`，不能只在最终文本附一条笼统来源。
+规则数据位于 `src/fatebridge/data/fengshui/rules-v1.json`，随 wheel 打包。八宅 `bazhai_sitting_v1` 当前为 `1.1.0`，其他三个基础规则集为 `1.0.0`。逐项关系带 `rule_id` 和 `source_ids`。规则版本和引用页码、适用范围在 `rulesets` 中查找，书名、作者和 URL 通过对应的 `source_ids` 在 `source_catalog` 中查找。
 
 | 规则集 | 精确范围 | 来源与约定 |
 | --- | --- | --- |
@@ -157,11 +157,11 @@ asyncio.run(main())
 
 时间输入必须含 UTC 偏移或Z，`timezone_name` 默认为 `Asia/Shanghai`，可用 IANA 名称或偏移。每个出生／查询时刻与对应有效年字段二选一。显式有效生年表示调用方已确认换年，无需出生小时或真太阳时。未知 `gender_convention` 应省略或传 null，返回男女候选并标记 `partial`，不会默认男性。支持有效年1800–2199、带时区输入1801–2199；区间结束可延伸下一年。
 
-命卦另接受公历 `birth_date`，与有效生年、出生时刻三选一。按所选时区计算立春所在日期；之前取上一有效生年，之后取本年，立春当日保留 `partial` 并要求出生时刻。选择 `january_1` 时日期即可确定生年。该路径不构造虚假的出生小时，也不使用真太阳时。
+命卦另接受公历 `birth_date`，与有效生年、出生时刻三选一。立春日期由保留的交节点按所选时区确定。早于该日取上一有效生年，晚于该日取本年，立春当日保留 `partial` 并请求出生时刻。选择 `january_1` 时日期即可确定生年。只有日期时按民用日期处理。
 
 年盘有效期是 `[立春, 下次立春)`，不硬编码2月4日午夜，也不按春节。节气沿用现有 `almanac`，逐端点报告实际求解器、星历返回模型及时间政策；选定模型无法求根时返回不可重试的503错误，不使用线性节气回退。外部分钟表与独立421年TT实现比对各自保留，均不认证绝对UTC秒级精度；详见[太阳模型与边界](solar-backends.md)。
 
-月层另有1800–2200年全部十二节4,812个独立TT参考交点，完整Swiss配置通过一秒实现门槛，Moshier保留569项失败。Moshier计算交节前后5秒使用候选保护，年星、命卦和宅运跨运边界共用；保护不改变原始数值验收门槛，也不证明现实准确率。只有日期的命卦会考虑该窗口跨过的相邻民用日。[月紫白参考](interpretation/fengshui/monthly-stars.md)给出模型、时标、候选与离线复核范围。
+月层另有1800–2200年全部十二节4,812个独立TT参考交点，完整Swiss配置通过一秒实现门槛，Moshier保留569项失败。共享边界政策按实际星历模型保留交节点前后五秒内的候选。仅给日期时，若护栏延伸至所给日期，`boundary_precision_policy` 返回实际模型、原因与可能的立春日期。五秒是操作护栏，一秒仍是原数值验收门槛。 [月紫白参考](interpretation/fengshui/monthly-stars.md) · [保留点和模型回执对照](precision-acceptance.md#fengshui-retained-boundary-round59)
 
 源码与本地wheel可通过[完整星历安装配置](solar-backends.md)补齐宅运端点数据，并在新进程中发现已验证缓存。未取得数据的Moshier配置仍保留降级标记和原精度失败，不能借用完整配置的验收结果。
 
@@ -249,6 +249,8 @@ run_metadata: 三端通用运行元数据
 
 `complete` 仅表示请求的基础层已有所需输入，不代表全流派、完整环境勘测或进阶宅盘完成。八宅缺住户时宅盘仍可计算，但个人层缺失使状态为 `partial`；金锁玉关只覆盖提供的特征，不保证全宅环境已勘测。空请求返回各层缺失项，HTTP200／MCP成功／CLI退出0。非法输入返回校验错误，HTTP422／MCP `isError=true`／CLI退出1。`methods` 可以只选择需要的层，未请求的层不计算。
 
+年星查询、节月查询及以立春划分的命卦出生时刻和玄空历史事件均可使用含偏移的时点。若所选 IANA 时区在该时点没有定义当地钟面，时间上下文返回 `local_moment=null`、`local_clock_status="undefined"`，并用 `utc_moment` 保留该时点的 UTC 表示。节气区间按实际时点比较。已定义的当地钟面仍由 `local_moment` 返回。
+
 八宅游年星与年度紫白星有不同名称空间，例如八宅生气贪狼属木、一白贪狼属水。`palace_number` 始终是固定宫数，`annual_star_number` 才是当年临宫星数；`current_period` 是当前日历元运，不是住宅建造元运。
 
 `method_details.status=reference_only` 表示方法与象意参考。按 `mapping_boundaries` 区分固定宫 `palaces`、实际临宫星数 `flying_star_references`、八宅游年星名 `bazhai_you_nian_references`，不能因同名混用五行。跨文本本卦人物／器物、Joey Yap 一至九星主题与有限职业例分别保留来源及条件；未覆盖职业不补造。`object_observation_references`、各法 `application_references`、砂水 `form_condition_references` 和 `material_shape_reference` 补观察与用途说明，不构成自动分类、摆放处方或职业预测。精确字段以实际返回的 `method_details` 为准，来源及剩余边界见[方法补充说明](interpretation/fengshui/sourced-interior-rules.md#与方法细节的区别)。
@@ -274,7 +276,7 @@ uv run --locked --extra dev pytest -q tests/fengshui/test_fengshui.py tests/feng
 
 离线测试用固定参考事实（本地数据：`../tests/data/fengshui-reference.json`）登记的提交／SHA-256核对1900–2099男女命卦400项、独立八宅字典64项，并测试纪元／世纪／五数寄宫、立春前后与时区等价、方位边界、坐向反转、门床灶用途、不同住户、未知／混合砂水、来源版本、三端真实调用／校验／投影／请求文件。2026九宫另用作者出版年盘核对。代表性输入加入当前全端合同检查，数值精度使用独立参考及边界反例验证。
 
-外部参考 [JackieL233/fengshui-master 固定提交](https://github.com/JackieL233/fengshui-master/blob/2666304c5cb4ac13091c8c1fcdd4e40c218b275a/fengshui-master/scripts/minggua.py) 仅核对有效生年和八宅关系，不覆盖精确出生时间、年飞星、金锁玉关或完整玄空。金锁玉关未登记独立引擎比较；其验收依据为明确登记的八宫传本规则与输入语义检查。
+外部参考 [JackieL233/fengshui-master 固定提交](https://github.com/JackieL233/fengshui-master) 仅核对有效生年和八宅关系，不覆盖精确出生时间、年飞星、金锁玉关或完整玄空。金锁玉关未登记独立引擎比较；其验收依据为明确登记的八宫传本规则与输入语义检查。
 
 ## 场景兼容与归一化
 

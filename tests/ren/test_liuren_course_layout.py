@@ -9,10 +9,12 @@ import pytest
 from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
+from fatebridge.core.contracts.output_liuren_course_conditions import (
+    LiurenCourseConditions,
+)
+from fatebridge.core.contracts.output_ren_anchors import require_complete_ren_anchors
 from fatebridge.core.metaphysics.liureng_course_conditions import course_conditions
 from fatebridge.core.metaphysics.liureng_course_layout import pair_layout_necessity
-from fatebridge.core.output_liuren_course_conditions import LiurenCourseConditions
-from fatebridge.core.output_ren_anchors import require_complete_ren_anchors
 from scripts.ren.audit_liuren_course_conditions import transmissions
 from scripts.ren.audit_liuren_course_layout import CORPUS, audit, reference
 from tests.fixtures.ren_anchors import ANCHOR_PAYLOADS as PAYLOADS
@@ -28,7 +30,7 @@ def native_solar(monkeypatch):
     monkeypatch.setenv("SE_EPHE_PATH", str(ROOT / "ephe"))
 
 
-def test_primary_anchors_and_entire_supported_layout_space():
+def test_primary_anchors_and_entire_supported_layout_space() -> None:
     result = audit()
     assert result["engineering_checks_passed"] and not result["failures"]
     assert len(result["literal_peak_anchors"]) == 10
@@ -55,14 +57,14 @@ def test_primary_anchors_and_entire_supported_layout_space():
 @pytest.mark.parametrize(
     "stem,peak", tuple(zip("甲乙丙丁戊己庚辛壬癸", "卯寅午巳午巳酉申子亥"))
 )
-def test_chongwei_zero_is_explained_by_a_necessary_condition(stem, peak):
+def test_chongwei_zero_is_explained_by_a_necessary_condition(stem, peak) -> None:
     result = pair_layout_necessity(stem, "帝旺", "贵人")
     assert result["required_stage_branch"] == peak
     assert peak not in result["possible_god_branches"]
     assert result["compatible_in_any_supported_noble_layout"] is False
 
 
-def test_symbolic_literal_match_does_not_fabricate_a_reachable_board():
+def test_symbolic_literal_match_does_not_fabricate_a_reachable_board() -> None:
     value = course_conditions("甲子", transmissions(["卯", "寅", "卯"], "贵人", "子"))
     row = value["stage_god_patterns"][4]
     assert row["id"] == "S05" and row["matched"] is True
@@ -76,7 +78,7 @@ def test_symbolic_literal_match_does_not_fabricate_a_reachable_board():
 
 
 @pytest.mark.parametrize("fault", ["manifest", "bytes", "extra", "missing"])
-def test_primary_reference_cannot_be_relabelled(fault, tmp_path):
+def test_primary_reference_cannot_be_relabelled(fault: str, tmp_path: Path) -> None:
     target = tmp_path / "reference"
     # Copy small annotations and symlink the untouched, read-only large scans.
     # No operation in this test mutates a PDF or its target.
@@ -114,7 +116,7 @@ def test_primary_reference_cannot_be_relabelled(fault, tmp_path):
         "rewrite",
     ],
 )
-def test_present_layout_claims_cannot_be_substituted(fault):
+def test_present_layout_claims_cannot_be_substituted(fault: str) -> None:
     value = course_conditions("甲子", transmissions(["辰", "寅", "卯"], "天后", "子"))
     row = value["stage_god_patterns"][4]
     basis = value["layout_compatibility_basis"]
@@ -142,7 +144,7 @@ def test_present_layout_claims_cannot_be_substituted(fault):
         LiurenCourseConditions.model_validate(value)
 
 
-def test_sparse_projection_does_not_invent_a_missing_day():
+def test_sparse_projection_does_not_invent_a_missing_day() -> None:
     LiurenCourseConditions.model_validate(
         {
             "stage_god_patterns": [
@@ -160,8 +162,8 @@ def test_sparse_projection_does_not_invent_a_missing_day():
 )
 @pytest.mark.parametrize("project", [False, True])
 def test_real_ports_keep_matches_and_necessary_conditions_distinct(
-    key, project, surface_calls
-):
+    key: str, project: bool, surface_calls
+) -> None:
     spec = SPECS[key]
     path = "liureng.transmission_relations.course_conditions"
     params = [("as_of", AS_OF), ("response_char_limit", "0")]
@@ -182,6 +184,8 @@ def test_real_ports_keep_matches_and_necessary_conditions_distinct(
             "false",
         ]
         options.update(fields=[path], strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec,
         PAYLOADS[key],
@@ -219,7 +223,7 @@ def test_real_ports_keep_matches_and_necessary_conditions_distinct(
         "compatible_in_any_supported_noble_layout",
     ],
 )
-def test_complete_gate_requires_same_day_layout_evidence(key, field):
+def test_complete_gate_requires_same_day_layout_evidence(key: str, field: str) -> None:
     value = raw(key)
     course = value["liureng"]["transmission_relations"]["course_conditions"]
     if field == "layout_compatibility_basis":
@@ -232,8 +236,8 @@ def test_complete_gate_requires_same_day_layout_evidence(key, field):
 
 @pytest.mark.parametrize("project", [False, True])
 def test_false_compatibility_fails_before_an_unrelated_projection(
-    project, monkeypatch, surface_calls
-):
+    project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     spec = SPECS["liureng_gods"]
     value = raw(spec.key)
     value["liureng"]["transmission_relations"]["course_conditions"][
@@ -255,6 +259,8 @@ def test_false_compatibility_fails_before_an_unrelated_projection(
         params += [("fields", "four_pillars"), ("strict_fields", "true")]
         flags += ["--fields", "four_pillars", "--strict-fields", "true"]
         options.update(fields=["four_pillars"], strict_fields=True)
+    else:
+        pass
     http, protocol, code, _ = surface_calls(
         spec,
         PAYLOADS[spec.key],

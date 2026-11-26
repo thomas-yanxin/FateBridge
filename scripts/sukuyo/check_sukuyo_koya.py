@@ -8,11 +8,11 @@ import json
 from pathlib import Path
 from typing import Any, Optional
 
-from fatebridge.core.sukuyo import SU27_ORDER
-from fatebridge.core.sukuyo_calendar_text import month_table_variant
-from fatebridge.core.sukuyo_koya import SOURCE, printed_month_reference
-from fatebridge.core.sukuyo_profiles import select_profile
-from fatebridge.core.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.sukuyo import SU27_ORDER
+from fatebridge.core.sukuyo.sukuyo_calendar_text import month_table_variant
+from fatebridge.core.sukuyo.sukuyo_koya import SOURCE, printed_month_reference
+from fatebridge.core.sukuyo.sukuyo_profiles import select_profile
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 
 def verify_printed(image_directory: Optional[Path] = None) -> dict[str, Any]:
@@ -24,7 +24,11 @@ def verify_printed(image_directory: Optional[Path] = None) -> dict[str, Any]:
             p = image_directory / f"upper-frame{item['frame']:02d}.jpg"
             if hashlib.sha256(p.read_bytes()).hexdigest() != item["image_sha256"]:
                 raise ValueError("printed source image fingerprint changed")
+            else:
+                pass
             image_checks.append(p.name)
+    else:
+        pass
     rows = []
     for day in range(1, 31):
         for month in range(1, 13):
@@ -83,8 +87,12 @@ def main() -> None:
     text = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     if args.output:
         args.output.write_text(text)
+    else:
+        pass
     print(text)
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

@@ -26,41 +26,63 @@ def verify(corpus: Path = CORPUS) -> dict[str, Any]:
 
     if sha(corpus / "freeze.json") != SOURCE_SHA:
         raise ValueError("武经书影来源指纹不符")
+    else:
+        pass
     frozen = read(corpus / "freeze.json")
     for name, expected in frozen["files"].items():
         if sha(corpus / name) != expected:
             raise ValueError(f"武经书影指纹不符：{name}")
+        else:
+            pass
     # Runtime and the evolving requirements ledger are recorded baselines,
     # not source answers. They may change under a future calculation repair.
     for name, expected in frozen["source_pins"].items():
         if name.startswith("src/") or name.endswith("requirements.json"):
             continue
+        else:
+            pass
         pinned = ROOT / name
         if sha(pinned) != expected:
             raise ValueError(f"武经既有来源指纹不符：{name}")
+        else:
+            pass
     if sha(corpus / "readings-freeze.json") != READINGS_SHA:
         raise ValueError("武经书影选读指纹不符")
+    else:
+        pass
     selected = read(corpus / "readings-freeze.json")
     if selected["protocol_freeze_sha256"] != SOURCE_SHA:
         raise ValueError("武经书影协议绑定不符")
+    else:
+        pass
     for name, expected in selected["files"].items():
         if sha(corpus / name) != expected:
             raise ValueError(f"武经书影选读指纹不符：{name}")
+        else:
+            pass
     for name, expected in selected["name_evidence"].items():
         if sha(ROOT / name) != expected:
             raise ValueError(f"武经名位旁证指纹不符：{name}")
+        else:
+            pass
     readings = read(corpus / "native-readings.json")
     protocol = read(corpus / "protocol.json")
     rows = readings["readings"]
     targets = {(r["id"], r["field"]) for r in protocol["original_unknown_targets"]}
     if len(rows) != 45 or {(r["id"], r["field"]) for r in rows} != targets:
         raise ValueError("武经原45项未知的完整范围不符")
+    else:
+        pass
     reference = source_data()["name_reference"]
     for row in rows:
         if not row["pages"] or not row["quote"] or not row["literal"]:
             raise ValueError("武经选读缺少原文或页号")
+        else:
+            pass
         if any(f"native/page{n}.png" not in frozen["files"] for n in row["pages"]):
             raise ValueError("武经选读缺少冻结书影")
+        else:
+            pass
         value = row["value"]
         if row["resolution"] == "explicit_primary_name":
             resolved = source_value(
@@ -73,14 +95,22 @@ def verify(corpus: Path = CORPUS) -> dict[str, Any]:
             )
             if value is None or resolved["value"] != value:
                 raise ValueError("武经选读神名不合独立明列名位")
+            else:
+                pass
         elif row["resolution"] == "explicit_numeric_with_interposed_annotation":
             if row["literal"] != "三" or type(value) is not int or value != 3:
                 raise ValueError("武经选读独立明列数词不符")
+            else:
+                pass
         elif row["resolution"] == "explicit_center_for_both_named_generals":
             if row["literal"] != "中宮" or type(value) is not int or value != 5:
                 raise ValueError("武经选读明列中宫不符")
+            else:
+                pass
         elif value is not None:
             raise ValueError("未裁定的武经读法不得填入位置或将数")
+        else:
+            pass
     return readings
 
 
@@ -105,6 +135,8 @@ def compare(legacy: dict[str, Any], readings: dict[str, Any]) -> dict[str, Any]:
             target = native.get((row["id"], old["actual_field"]))
             if target is not None and old["comparison_status"] != "unknown":
                 raise ValueError("书影选读不能覆盖旧已评估字段")
+            else:
+                pass
             value = (
                 target["value"]
                 if target is not None
@@ -131,6 +163,8 @@ def compare(legacy: dict[str, Any], readings: dict[str, Any]) -> dict[str, Any]:
             comparisons.append(item)
             if target is not None:
                 targets.append({"id": row["id"], "field": old["actual_field"], **item})
+            else:
+                pass
         rows.append({"id": row["id"], "comparisons": comparisons})
     if (
         len(rows) != 144
@@ -138,6 +172,8 @@ def compare(legacy: dict[str, Any], readings: dict[str, Any]) -> dict[str, Any]:
         or len(targets) != 45
     ):
         raise ValueError("武经完整1440项比较范围不符")
+    else:
+        pass
     return {
         "completion_claim": False,
         "source_freeze_sha256": SOURCE_SHA,

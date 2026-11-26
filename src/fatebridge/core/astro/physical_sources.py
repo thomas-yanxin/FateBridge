@@ -10,15 +10,17 @@ from __future__ import annotations
 
 import hashlib
 import math
+from importlib.metadata import version
 from pathlib import Path
 from typing import Any, Dict, List
 
 from fatebridge.core.astro import runtime
-from fatebridge.core.astro.ephemeris_integrity import load_ephemeris_manifest
+from fatebridge.core.astro.ephemeris_integrity import _packaged_manifest
 from fatebridge.core.astro.native_identity import binding_distribution_version
 from fatebridge.core.astro.orbits import ORBITAL_MODEL
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
 from fatebridge.core.jpl_ephemeris import configured_jpl_file, jpl_header
+from fatebridge.core.physical_source_observation import require_physical_model
 from fatebridge.utils.errors import EphemerisSourceError
 
 RULESET = "fatebridge.physical_ephemeris_sources.v1"
@@ -45,7 +47,7 @@ class PhysicalEphemerisTrace:
         self._paths: Dict[Path, str] = {}
         self._files: Dict[str, Dict[str, Any]] = {}
         self._factors: Dict[str, Dict[str, Any]] = {}
-        self._manifest = load_ephemeris_manifest()["files"]
+        self._manifest = _packaged_manifest()["files"]
         self._jpl_name = configured_jpl_file()
 
     def observe(
@@ -57,8 +59,6 @@ class PhysicalEphemerisTrace:
         their context in the method's own provenance. They are not additional
         physical chart factors and must not change a body's source cohort.
         """
-        from fatebridge.core.physical_source_observation import require_physical_model
-
         require_physical_model(model)
         if configured_jpl_file() != self._jpl_name:
             raise EphemerisSourceError("physical_configuration_changed")
@@ -78,7 +78,7 @@ class PhysicalEphemerisTrace:
                 filename, start, end, de_number = getter(slot)
                 if not filename:
                     continue
-                path = Path(filename).absolute()
+                path = _absolute_path(filename)
                 if model == "jpl":
                     header = jpl_header(path)
                     start = header["start_julian_day_tdb"]
@@ -187,8 +187,6 @@ class PhysicalEphemerisTrace:
 
 def jpl_time_scale_policy() -> Dict[str, Any]:
     """Describe the inspected native approximation; do not change an epoch."""
-    from importlib.metadata import version
-
     native = str(getattr(runtime.swe, "version", "unavailable"))
     binding = binding_distribution_version(runtime.swe, version)
     inspected = (native, binding) == ("2.10.03", "2.10.3.2")
@@ -236,3 +234,18 @@ class PhysicalSourceCohort:
         if source not in self.sources:
             self.sources.append(source)
         return self.sources.index(source)
+
+
+_ABS_PATHS: Dict[str, Path] = {}
+
+
+def _absolute_path(filename: str) -> Path:
+    if filename.startswith("/") or (
+        len(filename) > 2 and filename[1] == ":" and filename[2] in "\\/"
+    ):
+        cached = _ABS_PATHS.get(filename)
+        if cached is None:
+            cached = Path(filename).absolute()
+            _ABS_PATHS[filename] = cached
+        return cached
+    return Path(filename).absolute()

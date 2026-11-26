@@ -19,7 +19,7 @@ assert _row[ERRATA["field"]] == ERRATA["old_value"]
 _row[ERRATA["field"]] = ERRATA["new_value"]
 
 
-def test_published_source_frozen_before_repair():
+def test_published_source_frozen_before_repair() -> None:
     freeze = json.loads((BASE / "freeze.json").read_text())
     for name, digest in freeze["files_sha256"].items():
         assert hashlib.sha256((BASE / name).read_bytes()).hexdigest() == digest
@@ -28,7 +28,7 @@ def test_published_source_frozen_before_repair():
 
 
 @pytest.mark.parametrize("record", REFERENCE["records"], ids=lambda r: r["name"])
-def test_calculated_term_against_independent_naoj_printed_minute(record):
+def test_calculated_term_against_independent_naoj_printed_minute(record) -> None:
     actual = next(t for t in get_solar_terms_for_year(2026) if t.name == record["name"])
     published = datetime.fromisoformat(record["published_at"])
     assert abs((actual.moment - published).total_seconds()) <= 60
@@ -36,7 +36,9 @@ def test_calculated_term_against_independent_naoj_printed_minute(record):
 
 @pytest.mark.parametrize("zone", ["Asia/Shanghai", "Asia/Tokyo", "America/New_York"])
 @pytest.mark.parametrize("record", REFERENCE["records"], ids=lambda r: r["name"])
-def test_public_months_on_both_sides_of_published_minute_band(record, zone):
+def test_public_months_on_both_sides_of_published_minute_band(
+    record, zone: str
+) -> None:
     published = datetime.fromisoformat(record["published_at"])
     for sign, expected in [(-1, "before_month_branch"), (1, "after_month_branch")]:
         moment = (published + sign * timedelta(seconds=61)).astimezone(ZoneInfo(zone))
@@ -53,7 +55,7 @@ def test_public_months_on_both_sides_of_published_minute_band(record, zone):
         )
 
 
-def test_fractional_cast_clocks_round_trip_across_the_consumed_boundary():
+def test_fractional_cast_clocks_round_trip_across_the_consumed_boundary() -> None:
     # The root is deliberately runtime-derived: this is output fidelity, not
     # independent evidence that the computed root is physically accurate.
     term = next(t for t in get_solar_terms_for_year(2026) if t.name == "立春")

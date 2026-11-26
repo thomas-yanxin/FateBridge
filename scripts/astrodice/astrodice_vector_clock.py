@@ -44,6 +44,8 @@ def check_inputs(run):
     for name, digest in plan["inputs_sha256"].items():
         if sha((run / name).read_bytes()) != digest:
             raise ValueError("Frozen input drift: " + name)
+        else:
+            pass
     return plan, sha(plan_raw)
 
 
@@ -52,6 +54,8 @@ def collect(run, cohort):
     before = run / ("before-" + cohort + "-queries.json")
     if cohort == "B" and not (run / "A-first-analysis.json").is_file():
         raise ValueError("Analyze and freeze A before opening B")
+    else:
+        pass
     inputs = {
         "plan_sha256": plan_hash,
         "collector_sha256": sha(Path(__file__).read_bytes()),
@@ -69,12 +73,16 @@ def collect(run, cohort):
     for query in plan["queries"]:
         if query["cohort"] != cohort:
             continue
+        else:
+            pass
         name = query["id"]
         url = "https://ssd.jpl.nasa.gov/api/horizons.api?" + urllib.parse.urlencode(
             query["parameters"]
         )
         if len(url.encode()) > plan["maximum_url_bytes"]:
             raise ValueError("Frozen request exceeds URL budget")
+        else:
+            pass
         receipt = {"id": name, "url": url, "attempt": 1}
         try:
             request = urllib.request.Request(url)
@@ -104,9 +112,13 @@ def parse(raw, query, cases, plan):
     data = json.loads(raw)
     if data.get("error"):
         raise ValueError("Horizons service error: " + str(data["error"]))
+    else:
+        pass
     result = data["result"]
     if result.count("$$SOE") != 1 or result.count("$$EOE") != 1:
         raise ValueError("Missing/duplicate ephemeris delimiters")
+    else:
+        pass
     prefix, rest = result.split("$$SOE")
     body, _ = rest.split("$$EOE")
     target = re.search(r"Target body name:.*?\((\d+)\).*?DE441", prefix)
@@ -123,13 +135,19 @@ def parse(raw, query, cases, plan):
         or expected not in prefix
     ):
         raise ValueError("Returned vector header differs from frozen contract")
+    else:
+        pass
     rows, assigned = [], set()
     for line in body.splitlines():
         if not line.strip():
             continue
+        else:
+            pass
         cells = [v.strip() for v in next(csv.reader([line]))]
         if len(cells) != 9 or cells[-1] != "":
             raise ValueError("Unplanned vector column set")
+        else:
+            pass
         epoch = Q(cells[0])
         near = [
             c
@@ -139,10 +157,14 @@ def parse(raw, query, cases, plan):
         ]
         if len(near) != 1 or near[0]["id"] in assigned:
             raise ValueError("Row identity is missing, duplicate or ambiguous")
+        else:
+            pass
         case = near[0]
         assigned.add(case["id"])
         if not all(math.isfinite(float(v)) for v in cells[2:8]):
             raise ValueError("Nonfinite vector component")
+        else:
+            pass
         error = epoch - Q(case["nominal_JD"])
         rows.append(
             {
@@ -157,6 +179,8 @@ def parse(raw, query, cases, plan):
         )
     if assigned != {c["id"] for c in cases}:
         raise ValueError("Missing or unexpected requested population")
+    else:
+        pass
     return rows
 
 
@@ -164,6 +188,8 @@ def tube(printed, ulps):
     value = Decimal(printed)
     if not value.is_finite():
         raise ValueError("Nonfinite printed state")
+    else:
+        pass
     lsb = Q(10) ** value.as_tuple().exponent
     center = Q(printed)
     radius = lsb + ulps * Q(math.ulp(float(printed)))
@@ -193,6 +219,8 @@ def scalar_source(source, window, epoch, axis):
     def evaluate(t):
         if not begin <= t < begin + width:
             raise ValueError("Inverse left the frozen polynomial cell")
+        else:
+            pass
         x = 2 * (t - begin) / width - 1
         return clenshaw_with_derivative(coeff, x)[0] / au
 
@@ -205,6 +233,8 @@ def inverse(evaluate, nominal, bounds, increasing, radius, iterations):
     low, high = bounds if increasing else (-bounds[1], -bounds[0])
     if sign * evaluate(left) > low or sign * evaluate(right) < high:
         return {"status": "unbracketed"}
+    else:
+        pass
     witnesses = []
     for value in (low, high):
         a, b = left, right
@@ -241,6 +271,8 @@ def diagnose(source, case, row, plan):
     axis = max(range(3), key=lambda i: conditioning[i])
     if conditioning[axis] < Q(plan["minimum_monotone_position_derivative_AU_per_day"]):
         raise ValueError("No planned well-conditioned monotone position axis")
+    else:
+        pass
     evaluate = scalar_source(source, case["window_index"], epoch, axis)
     result = {
         **row,
@@ -280,6 +312,8 @@ def diagnose(source, case, row, plan):
                     k: low <= v <= high for k, v in clock_hypotheses(epoch).items()
                 },
             )
+        else:
+            pass
         result["profiles"][name] = item
     return result
 
@@ -303,6 +337,8 @@ def analyze(run, cohort):
     for query in plan["queries"]:
         if query["cohort"] != cohort:
             continue
+        else:
+            pass
         raw = (run / "responses" / (query["id"] + ".raw")).read_bytes()
         receipt = json.loads(
             (run / "responses" / (query["id"] + ".receipt.json")).read_text()
@@ -310,9 +346,13 @@ def analyze(run, cohort):
         result = {"id": query["id"], "raw_sha256": sha(raw), "rows": []}
         if sha(raw) != receipt["raw_sha256"]:
             raise ValueError("Raw network response drift")
+        else:
+            pass
         try:
             if receipt["status"] != 200:
                 raise ValueError("Unavailable HTTP result: " + str(receipt["status"]))
+            else:
+                pass
             rows = parse(raw, query, cases, plan)
             for row in rows:
                 result["rows"].append(
@@ -338,3 +378,5 @@ if __name__ == "__main__":
             args.run / (args.cohort + "-first-analysis.json"),
             analyze(args.run, args.cohort),
         )
+else:
+    pass

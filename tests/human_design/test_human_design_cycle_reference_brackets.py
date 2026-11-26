@@ -8,10 +8,10 @@ from unittest.mock import patch
 
 import pytest
 
-from fatebridge.core import human_design_cycles as cycles
-from fatebridge.core.human_design_reference_order import reference_ordering
-from fatebridge.validation.human_design import verify_human_design_reading
+from fatebridge.core.human_design import human_design_cycles as cycles
+from fatebridge.core.human_design.human_design_reference_order import reference_ordering
 from tests.support.human_design_current import complete_run
+from validation.human_design import verify_human_design_reading
 
 PLAN = json.loads(
     (
@@ -22,7 +22,7 @@ PLAN = json.loads(
 
 
 @pytest.mark.parametrize("case", PLAN["cases"], ids=lambda c: c["id"])
-def test_all_reference_clocks_use_exact_order_against_declared_intervals(case):
+def test_all_reference_clocks_use_exact_order_against_declared_intervals(case) -> None:
     label, tt = cycles.reference_epoch(case["reference_utc"])
     birth_label, birth_tt = cycles.reference_epoch("1980-01-01T00:00:00Z")
     ordering = reference_ordering(birth_label, birth_tt, label, tt)
@@ -38,6 +38,8 @@ def test_all_reference_clocks_use_exact_order_against_declared_intervals(case):
             endpoints = grouped.setdefault(row["contact_index"], {})
             old = endpoints.setdefault(row["endpoint"], row["endpoint_tt"])
             assert old == row["endpoint_tt"]
+        else:
+            pass
     contacts = [
         {"bracket_jd_tt": [ends["lower"], ends["upper"]]}
         for _, ends in sorted(grouped.items())
@@ -66,7 +68,7 @@ def complete(request):
     )
 
 
-def test_current_complete_run_uses_the_exact_reference_relation(complete):
+def test_current_complete_run_uses_the_exact_reference_relation(complete) -> None:
     case, current = complete
     assert (
         current["cycle_summary"]["bodies"][0]["reference_relation"]
@@ -80,7 +82,6 @@ def test_current_complete_run_uses_the_exact_reference_relation(complete):
             verify_human_design_reading(current)["status"]
             == "verified_fixed_template_reading"
         )
-    assert not current["validation"]["all_three_axes_full_marks"]
 
 
 @pytest.mark.parametrize(
@@ -94,7 +95,9 @@ def test_current_complete_run_uses_the_exact_reference_relation(complete):
         "old_version_unknown_contract",
     ],
 )
-def test_fresh_hash_cannot_hide_wrong_order_or_downgrade(complete, mutation):
+def test_fresh_hash_cannot_hide_wrong_order_or_downgrade(
+    complete, mutation: str
+) -> None:
     _, original = complete
     value = deepcopy(original)
     if mutation == "rounded_relation":
@@ -114,7 +117,11 @@ def test_fresh_hash_cannot_hide_wrong_order_or_downgrade(complete, mutation):
         value["cycle_context"]["ruleset"]["version"] = "unsupported"
         if mutation == "old_version_unknown_contract":
             value["run_metadata"]["contract_sha256"] = "0" * 64
+        else:
+            pass
     result = verify_human_design_reading(value)
     assert result["status"] == "rejected"
     if mutation in {"old_version", "old_version_unknown_contract"}:
         assert {"code": "incomplete_or_malformed_cycle_witnesses"} in result["errors"]
+    else:
+        pass

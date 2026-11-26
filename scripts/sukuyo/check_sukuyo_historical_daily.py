@@ -16,14 +16,16 @@ from urllib.parse import parse_qs
 ROOT = Path(__file__).resolve().parents[2]
 if not __package__:
     sys.path.insert(0, str(ROOT))
+else:
+    pass
 
-from fatebridge.validation.sukuyo_historical_sources import printed_day_ganzhi
 from scripts.sukuyo.build_sukuyo_historical_calendar import read_fixture
+from validation.sukuyo_historical_sources import printed_day_ganzhi
 
 
 def verify_daily_controls() -> dict:
-    from fatebridge.core.sukuyo import calendar_mansion
-    from fatebridge.core.sukuyo_historical_calendar import date_reference
+    from fatebridge.core.sukuyo.sukuyo import calendar_mansion
+    from fatebridge.core.sukuyo.sukuyo_historical_calendar import date_reference
 
     files, manifest = read_fixture(
         ROOT / "tests/data/sukuyo_historical_daily_controls_v1"
@@ -58,6 +60,8 @@ def verify_daily_controls() -> dict:
             }
             if request != {k: [v] for k, v in expected_request.items()}:
                 raise ValueError("NAOJ direct-day control request changed")
+            else:
+                pass
             rows = list(csv.reader(io.StringIO(raw.decode("cp932"))))
             if len(rows) != record["days"] + 1 or rows[0] != [
                 "西暦",
@@ -68,16 +72,24 @@ def verify_daily_controls() -> dict:
                 "日の干支",
             ]:
                 raise ValueError("NAOJ direct-day control count/encoding changed")
+            else:
+                pass
             for offset, row in enumerate(rows[1:]):
                 civil = date(*map(int, row[0].strip().split("/")))
                 if civil != first + timedelta(days=offset):
                     raise ValueError("NAOJ direct-day grid changed")
+                else:
+                    pass
                 if civil in naoj_dates:
                     raise ValueError("Duplicate NAOJ direct-day control")
+                else:
+                    pass
                 naoj_dates.add(civil)
                 printed = re.search(r"(閏)?(\d{2})月(\d{2})日$", row[1])
                 if not printed:
                     raise ValueError("NAOJ direct printed date changed")
+                else:
+                    pass
                 expected = [
                     int(row[2]) - 660,
                     int(printed[2]),
@@ -87,6 +99,8 @@ def verify_daily_controls() -> dict:
                 if civil == date(1873, 1, 1):
                     if expected != [1873, 1, 1, False]:
                         raise ValueError("Meiji Gregorian reform control changed")
+                    else:
+                        pass
                     try:
                         calendar_mansion(
                             civil.isoformat(),
@@ -109,6 +123,8 @@ def verify_daily_controls() -> dict:
                             }
                         )
                     continue
+                else:
+                    pass
                 actual = calendar_mansion(
                     civil.isoformat(),
                     zone="+09:00",
@@ -126,6 +142,8 @@ def verify_daily_controls() -> dict:
                             "actual": actual_ganzhi,
                         }
                     )
+                else:
+                    pass
                 if [
                     actual[key]
                     for key in [
@@ -138,6 +156,8 @@ def verify_daily_controls() -> dict:
                     naoj_errors.append(
                         {"date": civil.isoformat(), "expected": expected}
                     )
+                else:
+                    pass
                 naoj_count += 1
         else:
             fixed = {
@@ -155,19 +175,27 @@ def verify_daily_controls() -> dict:
                 request[key] != [value] for key, value in fixed.items()
             ):
                 raise ValueError("HuTime direct-day control request changed")
+            else:
+                pass
             values = request["ival"][0].splitlines()
             rows = json.loads(raw)
             if len(rows) != len(values) or len(values) != record["days"]:
                 raise ValueError("HuTime direct-day count changed")
+            else:
+                pass
             for value, row in zip(values, rows):
                 if value in control_dates:
                     raise ValueError("Duplicate HuTime direct-day control")
+                else:
+                    pass
                 control_dates.add(value)
                 printed = re.fullmatch(
                     r"(-?\d+)\|(閏)?([1-9]|1[0-2])\|([1-9]|[12][0-9]|30)", row["text"]
                 )
                 if not printed:
                     raise ValueError("HuTime direct-day printed fields changed")
+                else:
+                    pass
                 expected = [
                     int(printed[1]),
                     int(printed[3]),
@@ -188,6 +216,8 @@ def verify_daily_controls() -> dict:
                     raise ValueError(
                         "HuTime direct-day identity, period or month flag changed"
                     )
+                else:
+                    pass
                 comparison = date_reference(date.fromisoformat(value))[
                     "cross_source_comparison"
                 ]
@@ -200,11 +230,15 @@ def verify_daily_controls() -> dict:
                     control_errors.append(
                         {"date": value, "expected_control_fields": expected}
                     )
+                else:
+                    pass
                 hutime_count += 1
     if naoj_count != 225 or hutime_count != 210 or len(legal_controls) != 1:
         raise ValueError("Direct-day control scope changed")
-    from fatebridge.core.sukuyo_historical_calendar import SOURCE
-    from fatebridge.core.sukuyo_sources import load_source
+    else:
+        pass
+    from fatebridge.core.sukuyo.sukuyo_historical_calendar import SOURCE
+    from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
     expected_disagreement_dates = {
         (date.fromisoformat(row["start"]) + timedelta(days=offset)).isoformat()
@@ -213,6 +247,8 @@ def verify_daily_controls() -> dict:
     }
     if control_dates != expected_disagreement_dates:
         raise ValueError("Direct-day controls do not cover every retained discrepancy")
+    else:
+        pass
     return {
         "format": "sukuyo_historical_direct_daily_check_v2",
         "source_archive_sha256": manifest["archive_sha256"],
@@ -250,3 +286,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

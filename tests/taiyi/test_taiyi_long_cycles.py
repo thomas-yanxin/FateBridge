@@ -3,16 +3,17 @@
 import hashlib
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.core.contracts.output_taiyi_long_cycles import TaiyiLongCycles
 from fatebridge.core.metaphysics.taiyi_long_cycles import (
     annual_long_cycles,
     four_spirit_records,
 )
 from fatebridge.core.metaphysics.taiyi_year import yearly_core
-from fatebridge.core.output_taiyi_long_cycles import TaiyiLongCycles
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from scripts.taiyi.audit_taiyi_long_cycles import CORPUS, audit
@@ -23,7 +24,7 @@ WORKED = json.loads((CORPUS / "worked-cases.json").read_text())
 
 
 @pytest.mark.parametrize("row", TABLE["rows"], ids=lambda c: c["id"])
-def test_every_original_row_is_compared_without_skipping_failed_cells(row):
+def test_every_original_row_is_compared_without_skipping_failed_cells(row) -> None:
     mismatched = []
     for field, expected in row["expected"].items():
         star, yuan = field.split(".")
@@ -34,11 +35,13 @@ def test_every_original_row_is_compared_without_skipping_failed_cells(row):
         assert actual["table_disagreement"] is (actual["position"] != expected)
         if actual["position"] != expected:
             mismatched.append(field)
+        else:
+            pass
     assert mismatched == (["zhifu.middle"] if row["year_index"] >= 28 else [])
 
 
 @pytest.mark.parametrize("case", WORKED, ids=lambda c: c["id"])
-def test_independent_worked_examples_and_epoch_facts(case):
+def test_independent_worked_examples_and_epoch_facts(case) -> None:
     result = annual_long_cycles(case["year"])
     for name, fields in case.get("expected", {}).items():
         for field, expected in fields.items():
@@ -47,7 +50,7 @@ def test_independent_worked_examples_and_epoch_facts(case):
         assert result["records"][name]["accumulation"] == expected
 
 
-def test_all_raw_failures_remain_in_audit_and_source_collation():
+def test_all_raw_failures_remain_in_audit_and_source_collation() -> None:
     result = audit()
     assert (result["source_rows"], result["source_columns"]) == (60, 12)
     assert (result["checked_fields"], result["matching_fields"]) == (720, 687)
@@ -70,8 +73,8 @@ def test_all_raw_failures_remain_in_audit_and_source_collation():
 
 @pytest.mark.parametrize("attempt", ["drop_row", "drop_column", "alter_scan"])
 def test_frozen_audit_rejects_removed_cases_or_changed_primary_sources(
-    tmp_path, attempt
-):
+    tmp_path: Path, attempt: str
+) -> None:
     copy = tmp_path / "corpus"
     shutil.copytree(CORPUS, copy)
     if attempt == "alter_scan":
@@ -79,6 +82,8 @@ def test_frozen_audit_rejects_removed_cases_or_changed_primary_sources(
         with pytest.raises(ValueError, match="指纹"):
             audit(copy)
         return
+    else:
+        pass
     path = copy / "four-spirit-cases.json"
     data = json.loads(path.read_text())
     if attempt == "drop_row":
@@ -91,12 +96,16 @@ def test_frozen_audit_rejects_removed_cases_or_changed_primary_sources(
     for item in manifest["source_files"]:
         if item["file"] == path.name:
             item["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+        else:
+            pass
     manifest_path.write_text(json.dumps(manifest))
     with pytest.raises(ValueError, match="60|12"):
         audit(copy)
 
 
-def test_packaged_original_reference_is_generated_without_domain_recalculation():
+def test_packaged_original_reference_is_generated_without_domain_recalculation() -> (
+    None
+):
     assert TARGET.read_text() == render()
     assert (
         json.loads(TARGET.read_text())["source_transcription_sha256"]
@@ -105,12 +114,12 @@ def test_packaged_original_reference_is_generated_without_domain_recalculation()
 
 
 @pytest.mark.parametrize("invalid", [True, 0, -1, 10000, "2026", 2026.0])
-def test_invalid_year_is_never_silently_coerced(invalid):
+def test_invalid_year_is_never_silently_coerced(invalid) -> None:
     with pytest.raises(ValueError):
         annual_long_cycles(invalid)
 
 
-def test_independent_epochs_do_not_alias_eight_generals_counter():
+def test_independent_epochs_do_not_alias_eight_generals_counter() -> None:
     cycles = annual_long_cycles(724)
     assert yearly_core(724)["accumulation"] == 1937281
     assert {r["accumulation"] for r in cycles["records"].values()} == {
@@ -124,7 +133,7 @@ def test_independent_epochs_do_not_alias_eight_generals_counter():
     assert cycles["records"]["wufu"]["palace"] == "艮"
 
 
-def test_ming_diyi_corroboration_does_not_replace_the_siku_epoch():
+def test_ming_diyi_corroboration_does_not_replace_the_siku_epoch() -> None:
     cycles = annual_long_cycles(724)
     record = cycles["records"]["diyi"]
     assert record["accumulation"] == 3361
@@ -134,7 +143,7 @@ def test_ming_diyi_corroboration_does_not_replace_the_siku_epoch():
     assert "未替换积年" in record["source_edition"]
 
 
-def test_small_you_and_annual_taiyi_are_not_independent_positions():
+def test_small_you_and_annual_taiyi_are_not_independent_positions() -> None:
     # The two printed epochs differ by a multiple of both 24 and 72.
     # Their common phase must not become an extra vote in SanShi.
     for year in (1, 622, 724, 904, 930, 1900, 2026, 2100, 9999):
@@ -144,7 +153,7 @@ def test_small_you_and_annual_taiyi_are_not_independent_positions():
         )
 
 
-def test_first_three_year_dwell_boundary_uses_all_printed_rows():
+def test_first_three_year_dwell_boundary_uses_all_printed_rows() -> None:
     assert [four_spirit_records(n)["sishen"]["position"] for n in range(1, 8)] == [
         "1",
         "1",
@@ -162,7 +171,7 @@ def test_first_three_year_dwell_boundary_uses_all_printed_rows():
     ]
 
 
-def test_long_cycle_contract_rejects_non_integer_facts_and_text_booleans():
+def test_long_cycle_contract_rejects_non_integer_facts_and_text_booleans() -> None:
     with pytest.raises(ValidationError):
         TaiyiLongCycles.model_validate(
             {"records": {"junji": {"accumulation": "285011"}}}
@@ -185,7 +194,7 @@ def standalone(year=2026, month=4, day=4, mode="year"):
     )
 
 
-def test_every_annual_marker_is_preserved_in_ring_center_or_extra_palace():
+def test_every_annual_marker_is_preserved_in_ring_center_or_extra_palace() -> None:
     # Several complete four-spirit revolutions, including table conflicts.
     for year in range(1900, 2100):
         board = standalone(year)["taiyi"]
@@ -207,7 +216,7 @@ def test_every_annual_marker_is_preserved_in_ring_center_or_extra_palace():
             assert extra["palace"] in {"绛宫", "明堂", "玉堂"}
 
 
-def test_lunar_new_year_controls_long_cycles_and_birth_time_cannot_rewrite_it():
+def test_lunar_new_year_controls_long_cycles_and_birth_time_cannot_rewrite_it() -> None:
     a = standalone(month=2, day=16)["taiyi"]["long_cycles"]
     b = standalone(month=2, day=17)["taiyi"]["long_cycles"]
     assert (a["year"], b["year"]) == (2025, 2026)
@@ -218,21 +227,27 @@ def test_lunar_new_year_controls_long_cycles_and_birth_time_cannot_rewrite_it():
 
 
 @pytest.mark.parametrize("mode", ["month", "hour"])
-def test_non_annual_board_does_not_relabel_month_or_hour_counter_as_year(mode):
+def test_non_annual_board_does_not_relabel_month_or_hour_counter_as_year(
+    mode: str,
+) -> None:
     result = standalone(mode=mode)
     assert result["taiyi"]["long_cycles"]["status"] == "not_computed_for_selected_mode"
     assert "records" not in result["taiyi"]["long_cycles"]
     assert "本盘采用月/时计" in result["snapshot_text"]
 
 
-def test_current_source_conflict_is_visible_in_same_run_interpretation():
+def test_current_source_conflict_is_visible_in_same_run_interpretation() -> None:
     year = next(
         y
         for y in range(1900, 2100)
         if annual_long_cycles(y)["records"]["zhifu"]["table_disagreement"]
     )
     result = standalone(year)
-    assert result["taiyi"]["long_cycles"]["records"]["zhifu"]["table_disagreement"]
+    zhifu = result["taiyi"]["long_cycles"]["records"]["zhifu"]
+    assert zhifu["table_disagreement"]
+    assert zhifu["table_position"] != zhifu["position"]
+    assert "CADAL06056495" in zhifu["source_reference"]
+    assert "中元33格分歧未裁定" in zhifu["source_edition"]
     assert "直符有异文：正文通则" in result["snapshot_text"]
     assert any(
         s["title"] == "年运十神" and s["included"]
@@ -240,7 +255,7 @@ def test_current_source_conflict_is_visible_in_same_run_interpretation():
     )
 
 
-def test_sanshi_keeps_the_same_annual_positions_without_using_them_as_votes():
+def test_sanshi_keeps_the_same_annual_positions_without_using_them_as_votes() -> None:
     joined = calculate_sanshiunited_analysis(
         date="2026-04-04",
         time="12:00:00",

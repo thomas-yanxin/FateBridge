@@ -10,12 +10,12 @@ import pytest
 
 from fatebridge.core import ephemeris_runtime as e
 from fatebridge.core.astro import sidereal_origin_motion as origin
-from fatebridge.core.jyotish import positions
-from fatebridge.core.jyotish_longitude_motion import node_motion
+from fatebridge.core.jyotish.jyotish import positions
+from fatebridge.core.jyotish.jyotish_longitude_motion import node_motion
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.astrodice.test_astrodice_jpl import jpl  # noqa: F401
-from tests.jyotish.test_jyotish_longitude_motion import from_tt
-from tests.jyotish.test_jyotish_sources import restore_runtime  # noqa: F401
+from tests.unit_test.fixtures.astrodice_jpl import jpl  # noqa: F401
+from tests.unit_test.fixtures.jyotish_sources import restore_runtime  # noqa: F401
+from tests.unit_test.fixtures.jyotish_sources import from_tt
 
 ROOT = Path(__file__).resolve().parents[2]
 REFERENCE_PATH = ROOT / "tests/fixtures/lahiri-origin-circle-reference-v1.json"
@@ -26,7 +26,7 @@ BEFORE = json.loads(
 ORACLE = {(r["epoch_jd_tt"], r["body"]): r for r in REF["rows"]}
 
 
-def test_reference_precedes_production_and_retains_all_rows():
+def test_reference_precedes_production_and_retains_all_rows() -> None:
     assert hashlib.sha256(REFERENCE_PATH.read_bytes()).hexdigest() == (
         "ce64bf292eba5ec70cdbe60c3a97cd669bbef891aee128e188cfb2d0c293a8e6"
     )
@@ -38,7 +38,7 @@ def test_reference_precedes_production_and_retains_all_rows():
 
 
 @pytest.mark.parametrize("row", REF["rows"])
-def test_integer_correction_matches_prior_exact_fraction_oracle(row):
+def test_integer_correction_matches_prior_exact_fraction_oracle(row) -> None:
     correction, turns, raw, principal = origin.circular_origin_correction(
         row["origin_current"], row["origin_previous"]
     )
@@ -54,8 +54,8 @@ def test_integer_correction_matches_prior_exact_fraction_oracle(row):
     [(0.01, 359.99), (359.99, 0.01), (30.0, 30.1), (0.0, 0.0)],
 )
 def test_both_directions_and_nonboundary_angles_have_rational_winding(
-    current, previous
-):
+    current: float, previous: float
+) -> None:
     difference = Fraction.from_float(current) - Fraction.from_float(previous)
     expected = (difference + 180) % 360 - 180
     turns = int((difference - expected) / 360)
@@ -68,13 +68,13 @@ def test_both_directions_and_nonboundary_angles_have_rational_winding(
     "current,previous",
     [(float("nan"), 0), (0, float("inf")), (-1, 0), (0, 360), (180, 0)],
 )
-def test_invalid_and_antipodal_inputs_are_not_inferred(current, previous):
+def test_invalid_and_antipodal_inputs_are_not_inferred(current, previous) -> None:
     with pytest.raises(EphemerisSourceError):
         origin.circular_origin_correction(current, previous)
 
 
 @pytest.mark.parametrize("row", BEFORE["rows"])
-def test_full_d1_preserves_positions_and_native_rates_but_repairs_winding(row):
+def test_full_d1_preserves_positions_and_native_rates_but_repairs_winding(row) -> None:
     e.configure_ephemeris_path(str(ROOT / "ephe"))
     result = positions(
         from_tt(row["epoch_jd_tt"]),
@@ -155,6 +155,8 @@ def test_full_d1_preserves_positions_and_native_rates_but_repairs_winding(row):
                 if expected < 0
                 else "direct" if expected > 0 else "stationary"
             )
+        else:
+            pass
     assert (
         states["Ketu"]["longitude_speed_degrees_per_day"]
         == states["Rahu"]["longitude_speed_degrees_per_day"]
@@ -166,7 +168,9 @@ def test_full_d1_preserves_positions_and_native_rates_but_repairs_winding(row):
 
 
 @pytest.mark.parametrize("mode", ["mean", "true"])
-def test_antipode_keeps_original_native_rate_without_applying_repair_twice(mode):
+def test_antipode_keeps_original_native_rate_without_applying_repair_twice(
+    mode: str,
+) -> None:
     policy = {"status": "applied", "longitude_speed_correction": -360000.0}
     rahu = node_motion(1825399.072, 359999.95, mode, origin_wrap_policy=policy)
     ketu = node_motion(
@@ -180,7 +184,9 @@ def test_antipode_keeps_original_native_rate_without_applying_repair_twice(mode)
 
 
 @pytest.mark.parametrize("fault", ["flags", "nan", "malformed", "restore", "path"])
-def test_origin_integrity_faults_propagate_without_filling_zero(fault, monkeypatch):
+def test_origin_integrity_faults_propagate_without_filling_zero(
+    fault: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     e.configure_ephemeris_path(str(ROOT / "ephe"))
     e.ephemeris_call("set_sid_mode", e.swe.SIDM_LAHIRI, 0, 0)
     original = origin.runtime.ephemeris_call
@@ -191,17 +197,29 @@ def test_origin_integrity_faults_propagate_without_filling_zero(fault, monkeypat
         value = original(operation, *args, **kwargs)
         if operation != "get_ayanamsa_ex":
             return value
+        else:
+            pass
         calls += 1
         if fault == "flags":
             return value[0] & ~e.swe.FLG_NONUT, value[1]
+        else:
+            pass
         if fault == "nan":
             return value[0], float("nan")
+        else:
+            pass
         if fault == "malformed":
             return ()
+        else:
+            pass
         if fault == "restore" and calls == 3:
             return value[0], (value[1] + 0.01) % 360
+        else:
+            pass
         if fault == "path" and calls == 2:
             e.configure_ephemeris_path(str(ROOT / "ephe-does-not-exist"))
+        else:
+            pass
         return value
 
     monkeypatch.setattr(origin.runtime, "ephemeris_call", changed)
@@ -211,19 +229,23 @@ def test_origin_integrity_faults_propagate_without_filling_zero(fault, monkeypat
     assert "traditional_sidereal_origin_wrap" not in context
 
 
-def test_unverified_binding_retains_unqualified_status(monkeypatch):
+def test_unverified_binding_retains_unqualified_status(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(origin, "binding_distribution_version", lambda *args: "0.0")
     context = {}
     assert origin.traditional_lahiri_origin_wrap(1825399.072, context) is None
     assert context["traditional_sidereal_origin_wrap"]["status"] == "not_applied"
 
 
-def test_auxiliary_position_gap_retains_the_valid_origin_repair(monkeypatch):
+def test_auxiliary_position_gap_retains_the_valid_origin_repair(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from fatebridge.core.astro import longitude_motion as shared
     from fatebridge.core.astro.position_motion import AuxiliaryPositionModelChange
     from fatebridge.core.astro.source_session import source_session
     from fatebridge.core.compressed_ephemeris import audit_compressed_endpoints
-    from fatebridge.core.jyotish_longitude_motion import longitude_motion
+    from fatebridge.core.jyotish.jyotish_longitude_motion import longitude_motion
 
     e.configure_ephemeris_path(str(ROOT / "ephe"))
     row = next(
@@ -266,7 +288,9 @@ def test_auxiliary_position_gap_retains_the_valid_origin_repair(monkeypatch):
     )
 
 
-def test_jpl_origin_uses_the_selected_return_flag_without_claiming_vector_evidence(jpl):
+def test_jpl_origin_uses_the_selected_return_flag_without_claiming_vector_evidence(
+    jpl,
+) -> None:
     e.ephemeris_call("set_sid_mode", e.swe.SIDM_LAHIRI, 0, 0)
     context = {}
     assert origin.traditional_lahiri_origin_wrap(2451545.0, context) == 0
@@ -276,12 +300,12 @@ def test_jpl_origin_uses_the_selected_return_flag_without_claiming_vector_eviden
     assert policy["current_returned_flags"] == policy["requested_origin_flags"]
 
 
-def test_shared_motion_schema_and_numeric_text_use_the_repaired_sign():
+def test_shared_motion_schema_and_numeric_text_use_the_repaired_sign() -> None:
     from fatebridge.core.astro.longitude_motion import corrected_longitude_motion
     from fatebridge.core.astro.native_motion import context_motion
+    from fatebridge.core.contracts.output_astrodice import DiceLongitudeMotion
+    from fatebridge.core.contracts.output_charts import LongitudeMotionPolicy
     from fatebridge.core.local_techniques.otherbu import _motion_snapshot_line
-    from fatebridge.core.output_astrodice import DiceLongitudeMotion
-    from fatebridge.core.output_charts import LongitudeMotionPolicy
 
     e.configure_ephemeris_path(str(ROOT / "ephe"))
     row = next(

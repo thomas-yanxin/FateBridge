@@ -18,8 +18,8 @@ rest = _shared_rest
 
 @pytest.mark.parametrize("key", ["knowledge_read", "gua_lookup"])
 def test_unobserved_default_source_is_not_resolved_for_text_tools(
-    key, monkeypatch, surface_calls
-):
+    key: str, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     monkeypatch.delenv("FATEBRIDGE_SOLAR_TERM_MODEL", raising=False)
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     monkeypatch.setattr(de440_solar, "_profile", unavailable)
@@ -69,8 +69,8 @@ def test_unobserved_default_source_is_not_resolved_for_text_tools(
     ],
 )
 def test_consumed_default_source_remains_a_structured_failure(
-    key, monkeypatch, surface_calls
-):
+    key, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     monkeypatch.delenv("FATEBRIDGE_SOLAR_TERM_MODEL", raising=False)
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     monkeypatch.setattr(de440_solar, "_profile", unavailable)
@@ -86,7 +86,9 @@ def test_consumed_default_source_remains_a_structured_failure(
     assert http.json()["retryable"] is cli["retryable"] is False
 
 
-def test_strict_native_jpl_does_not_resolve_the_unused_packaged_default(monkeypatch):
+def test_strict_native_jpl_does_not_resolve_the_unused_packaged_default(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from fatebridge.core.solar_model_policy import (
         solar_model_cache_key,
         solar_model_environment_receipt,
@@ -103,8 +105,8 @@ def test_strict_native_jpl_does_not_resolve_the_unused_packaged_default(monkeypa
 
 @pytest.mark.parametrize("mode", ["spk", "de440", "analytic"])
 def test_explicit_conflict_is_rejected_before_loading_any_unused_data(
-    monkeypatch, mode
-):
+    monkeypatch: pytest.MonkeyPatch, mode: str
+) -> None:
     from fatebridge.core import almanac
 
     monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "de440.eph")

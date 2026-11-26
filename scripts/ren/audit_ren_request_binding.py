@@ -25,11 +25,17 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     def checked(folder: Path, pin: str) -> dict[str, Any]:
         if sha(folder / "freeze.json") != pin:
             raise ValueError("Frozen request-binding reference changed")
+        else:
+            pass
         frozen = json.loads((folder / "freeze.json").read_text())
         if {p.name for p in folder.iterdir()} != set(frozen["files"]) | {"freeze.json"}:
             raise ValueError("Frozen request-binding inventory changed")
+        else:
+            pass
         if any(sha(folder / n) != digest for n, digest in frozen["files"].items()):
             raise ValueError("Frozen request-binding source bytes changed")
+        else:
+            pass
         result: dict[str, Any] = json.loads((folder / "reference.json").read_text())
         return result
 
@@ -42,6 +48,8 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     )
     if len(ref["probes"]) != 70 or ref["expected_fault_probe_count"] != 68:
         raise ValueError("Frozen request-binding denominators changed")
+    else:
+        pass
     return ref
 
 
@@ -73,12 +81,16 @@ def audit(capture_dir: Path) -> dict[str, Any]:
                 raise ValueError(
                     "A declared coherent request returned an error: " + identity
                 )
+            else:
+                pass
             validate_output(spec, value)
             file = capture_dir / ("value-" + str(len(cached)).zfill(3) + ".json")
             file.write_text(
                 json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
             )
             cached[identity] = (value, dict(file=file.name, sha256=sha(file)))
+        else:
+            pass
         return cached[identity]
 
     rows = []
@@ -97,6 +109,8 @@ def audit(capture_dir: Path) -> dict[str, Any]:
                 dict(id=row["id"], kind="unsupported_field_control", passed=passed)
             )
             continue
+        else:
+            pass
         if outcome == "service_rejects_offset_inconsistent_with_historical_zone":
             req = spec.request_model.model_validate(target)
             fn, args, kwargs = spec.bind(req)
@@ -114,11 +128,15 @@ def audit(capture_dir: Path) -> dict[str, Any]:
                 )
             )
             continue
+        else:
+            pass
         request = spec.request_model.model_validate(row["request"])
         original, original_capture = produced(spec.key, row["request"])
         foreign, foreign_capture = produced(spec.key, target)
         if original == foreign:
             raise ValueError("Counterfactual must have a distinct complete result")
+        else:
+            pass
 
         def foreign_bind(
             _request: BaseModel,
@@ -200,6 +218,8 @@ def main() -> int:
         parser.error(
             "Use an unused output path; existing evidence must not be overwritten"
         )
+    else:
+        pass
     report = audit(args.output.with_name(args.output.stem + "-results"))
     args.output.write_text(
         json.dumps(report, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
@@ -232,3 +252,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

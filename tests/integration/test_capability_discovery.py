@@ -7,21 +7,21 @@ self-describing MCP transport flags.
 
 from __future__ import annotations
 
-import inspect
-from typing import get_args
+import asyncio
+import json
 
+import pytest
 from fastapi.testclient import TestClient
+from fastmcp import Client
 
 from fatebridge.api import app
 from fatebridge.application.description import describe_spec
+from fatebridge.cli import run
+from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG, mcp_specs, rest_specs
-from fatebridge.transports.mcp import _make_mcp_fn
+from tests.support.transports import cached_mcp_app, discover_capabilities, rest
 
-# Intentional single-surface tools — test-locked 口径 aliases: a nested-model REST
-# variant + its flat MCP twin, plus the legacy aggregate alias. If this set
-# changes, the parity tests below fail on purpose so the change is reviewed.
-_REST_ONLY = {"astro_relative"}
-_MCP_ONLY = {"analyze_destiny", "astro_relative_chart"}
+__all__ = ["rest"]
 
 
 def _tools_payload() -> dict:
@@ -47,34 +47,79 @@ def test_tools_endpoint_records_are_well_formed() -> None:
             assert {"name", "type", "required", "description"} <= param.keys()
 
 
-def test_describe_spec_does_not_claim_phantom_mcp_for_rest_only_tools() -> None:
-    by_key = {s.key: s for s in CATALOG}
-    for key in _REST_ONLY:
-        assert describe_spec(by_key[key])["surfaces"]["mcp_name"] is None
-
-
-def test_every_tool_is_dual_surface_or_documented_single_surface() -> None:
-    rest_only = {s.key for s in CATALOG if s.rest_path and not s.mcp_name}
-    mcp_only = {s.key for s in CATALOG if s.mcp_name and not s.rest_path}
-    assert (
-        rest_only == _REST_ONLY
-    ), "REST-only tools changed; if intentional, update the documented allow-list"
-    assert (
-        mcp_only == _MCP_ONLY
-    ), "MCP-only tools changed; if intentional, update the documented allow-list"
+def test_every_tool_declares_the_same_public_name_across_surfaces() -> None:
+    for spec in CATALOG:
+        surfaces = describe_spec(spec)["surfaces"]
+        assert surfaces["rest_path"]
+        assert surfaces["mcp_name"] == spec.tool_name
+        assert surfaces["cli"]
 
 
 def test_mcp_transport_flags_are_self_describing() -> None:
-    spec = next(s for s in CATALOG if s.mcp_name)
-    fn = _make_mcp_fn(
-        spec,
-        render_response=lambda *a, **k: "",
-        render_error=lambda *a, **k: "",
-    )
-    sig = inspect.signature(fn)
-    for flag in ("compact", "include_snapshot_text", "fields"):
-        annotation = sig.parameters[flag].annotation
-        descriptions = [
-            getattr(meta, "description", None) for meta in get_args(annotation)[1:]
+    async def fetch():
+        async with Client(create_mcp_app()) as client:
+            tool = next(
+                t for t in await client.list_tools() if t.name == "run_calculation"
+            )
+            return tool.input_schema["properties"]
+
+    properties = asyncio.run(fetch())
+    assert "compact" not in properties
+    assert properties["detail"]["default"] == "compact"
+    assert properties["detail"]["enum"] == ["compact", "standard", "audit"]
+    for flag in (
+        "include_snapshot_text",
+        "fields",
+        "strict_fields",
+        "response_char_limit",
+    ):
+        assert properties[flag]["description"]
+
+
+def test_reference_discovery_uses_public_names_and_resources(
+    rest: TestClient, capsys: pytest.CaptureFixture[str]
+) -> None:
+    names = {"export_formats", "export_parse", "knowledge_catalog", "knowledge_read"}
+    records = {}
+    for name in sorted(names):
+        response = rest.get(
+            "/api/tools", params={"tool": name, "surface": "mcp", "detail": "summary"}
+        )
+        assert response.status_code == 200, response.text
+        (record,) = response.json()["tools"]
+        assert record["tool"] == record["surfaces"]["mcp_name"] == name
+        assert (
+            run(["discover", "--tool", name, "--surface", "mcp", "--detail", "summary"])
+            == 0
+        )
+        assert json.loads(capsys.readouterr().out)["tools"] == [record]
+        records[name] = record["surfaces"]
+
+    retired = {"export_registry", "knowledge_registry", "calculate_knowledge_read"}
+    for name in sorted(retired):
+        assert rest.get("/api/tools", params={"tool": name}).status_code == 422
+        assert run(["discover", "--tool", name]) == 1
+        assert json.loads(capsys.readouterr().out)["issues"] == [
+            {"path": "tool", "code": "unknown_tool"}
         ]
-        assert any(descriptions), f"MCP flag {flag!r} has no description"
+
+    async def read_resources() -> None:
+        async with Client(cached_mcp_app(families="export,knowledge")) as client:
+            assert set(await discover_capabilities(client)) == names
+            for name in sorted(names):
+                manifest = json.loads(
+                    (await client.read_resource(f"fatebridge://tools/{name}"))[0].text
+                )
+                (contract,) = manifest["tools"]
+                assert contract["tool"] == name
+                assert contract["surfaces"] == records[name]
+            for name in sorted(retired):
+                result = await client.call_tool(
+                    "run_calculation",
+                    {"tool": name, "arguments": {}},
+                    raise_on_error=False,
+                )
+                assert result.is_error
+                assert result.structured_content["error_code"] == "unknown_tool"
+
+    asyncio.run(read_resources())

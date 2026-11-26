@@ -26,11 +26,13 @@ def output(which=0):
 
 
 @pytest.mark.parametrize("case", REF["cases"], ids=lambda x: x["id"])
-def test_manual_symbolic_positions_then_new_derived_course(case):
+def test_manual_symbolic_positions_then_new_derived_course(case) -> None:
     ordinary = observe_jinkou(dict(case, ground=case["natal"]))
     # The six handwritten expectations are checked before the new API call.
     if case["diurnal"] == (case["hour"] in "卯辰巳午未申"):
         assert [r["content"] for r in ordinary["rows"]] == case["expected"]
+    else:
+        pass
     value = observe(case)
     assert value["source_sha256"] == REF["source_sha256"]
     assert value["source_url"] == REF["source_url"] and value["original_pdf_pages"] == [
@@ -44,7 +46,7 @@ def test_manual_symbolic_positions_then_new_derived_course(case):
 
 
 @pytest.mark.parametrize("which", range(4))
-def test_natal_course_needs_only_confirmed_natal_fact_not_age_or_gender(which):
+def test_natal_course_needs_only_confirmed_natal_fact_not_age_or_gender(which) -> None:
     value = output(which)["jinkou"]
     natal = value["natal_course"]
     assert value["overview"]["di_fen"] == "酉"
@@ -107,8 +109,8 @@ def corrupt(value, fault):
 @pytest.mark.parametrize("fault", PROTOCOL["faults"])
 @pytest.mark.parametrize("project", [False, True])
 def test_natal_facts_and_full_child_reject_corruption_before_projection(
-    fault, project, monkeypatch, surface_calls
-):
+    fault, project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     bad = corrupt(output(), fault)
     with pytest.raises(execution.OutputContractError):
         execution.validate_output(SPEC, bad)
@@ -117,6 +119,8 @@ def test_natal_facts_and_full_child_reject_corruption_before_projection(
     def broken(spec, request):
         if spec.key == "jinkou":
             spec = replace(spec, bind=lambda _: (lambda: copy.deepcopy(bad), (), {}))
+        else:
+            pass
         return original(spec, request)
 
     monkeypatch.setattr(execution, "execute_spec", broken)
@@ -128,6 +132,8 @@ def test_natal_facts_and_full_child_reject_corruption_before_projection(
         params.update(fields="analysis_type", strict_fields="true")
         opts.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
+    else:
+        pass
     http, mcp, code, cli = surface_calls(
         SPEC, payload, params=params, options=opts, flags=flags, cli_first=False
     )
@@ -140,16 +146,20 @@ def test_natal_facts_and_full_child_reject_corruption_before_projection(
 
 
 @pytest.mark.parametrize("project", [False, True])
-def test_three_ports_deliver_full_separate_natal_course(project, surface_calls):
+def test_three_ports_deliver_full_separate_natal_course(
+    project: bool, surface_calls
+) -> None:
     payload = dict(PROTOCOL["public_payload"], natal_branch="子")
     fields = ["four_pillars", "jinkou.overview", "jinkou.natal_course"]
-    params = [("as_of", AS_OF), ("response_char_limit", "0")]
-    opts = {}
-    flags = ["--response-char-limit", "0"]
+    params = [("as_of", AS_OF), ("response_char_limit", "0"), ("detail", "audit")]
+    opts = {"detail": "audit"}
+    flags = ["--response-char-limit", "0", "--detail", "audit"]
     if project:
         params += [("fields", p) for p in fields] + [("strict_fields", "true")]
         opts.update(fields=fields, strict_fields=True)
         flags += ["--fields", *fields, "--strict-fields", "true"]
+    else:
+        pass
     http, mcp, code, cli = surface_calls(
         SPEC, payload, params=params, options=opts, flags=flags, cli_first=False
     )
@@ -161,9 +171,11 @@ def test_three_ports_deliver_full_separate_natal_course(project, surface_calls):
         assert body["jinkou"]["overview"]["di_fen"] == "酉"
     if not project:
         assert "[京本本命另课]" in http.json()["snapshot_text"]
+    else:
+        pass
 
 
-def test_both_natal_and_annual_courses_coexist_without_recursion():
+def test_both_natal_and_annual_courses_coexist_without_recursion() -> None:
     payload = dict(
         PROTOCOL["public_payload"],
         birth_year_ganzhi="甲子",
@@ -181,8 +193,8 @@ def test_both_natal_and_annual_courses_coexist_without_recursion():
     assert main["overview"]["di_fen"] == "酉"
 
 
-def test_sparse_natal_views_preserve_absence_and_explicit_unknown():
-    from fatebridge.core.output_chinese import Jinkou, JinkouNatalCourse
+def test_sparse_natal_views_preserve_absence_and_explicit_unknown() -> None:
+    from fatebridge.core.contracts.output_chinese import Jinkou, JinkouNatalCourse
 
     for value in [{}, {"natal_branch": None}, {"status": "calculated"}]:
         assert (
@@ -197,19 +209,21 @@ def test_sparse_natal_views_preserve_absence_and_explicit_unknown():
     "field", ["course_ground_is_observed", "birth_year_calendar_boundary_verified"]
 )
 @pytest.mark.parametrize("bad", [True, 0, 1])
-def test_partial_natal_flags_cannot_invent_observation_or_certification(field, bad):
+def test_partial_natal_flags_cannot_invent_observation_or_certification(
+    field: str, bad: bool | int
+) -> None:
     from pydantic import ValidationError
 
-    from fatebridge.core.output_chinese import JinkouNatalCourse
+    from fatebridge.core.contracts.output_chinese import JinkouNatalCourse
 
     with pytest.raises(ValidationError):
         JinkouNatalCourse.model_validate({field: bad})
 
 
-def test_natal_course_does_not_claim_comprehensive_judgement():
+def test_natal_course_does_not_claim_comprehensive_judgement() -> None:
     from pydantic import ValidationError
 
-    from fatebridge.core.output_chinese import JinkouNatalCourse
+    from fatebridge.core.contracts.output_chinese import JinkouNatalCourse
 
     with pytest.raises(ValidationError):
         JinkouNatalCourse.model_validate({"comprehensive_judgement": "已认证大吉"})
@@ -217,8 +231,8 @@ def test_natal_course_does_not_claim_comprehensive_judgement():
 
 @pytest.mark.parametrize("section", ["京本本命另课", "京本行年另课"])
 def test_both_derived_courses_are_registered_and_individually_exportable(
-    section, surface_calls
-):
+    section: str, surface_calls
+) -> None:
     payload = dict(
         PROTOCOL["public_payload"], natal_branch="子", selected_sections=[section]
     )

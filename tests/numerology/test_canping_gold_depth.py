@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.canping_texts import (
+from fatebridge.core.numerology.canping_texts import (
     INHERITED_PATH,
     collation_summary,
     lookup_record,
@@ -32,7 +32,9 @@ REREADINGS = {
 
 
 @pytest.mark.parametrize("row,kind", CELLS)
-def test_every_gold_cell_keeps_its_number_column_page_and_reading_state(row, kind):
+def test_every_gold_cell_keeps_its_number_column_page_and_reading_state(
+    row, kind
+) -> None:
     n = int(row["number"])
     result = lookup_record("金", n, kind)
     revision = REREADINGS.get((n, kind))
@@ -40,6 +42,8 @@ def test_every_gold_cell_keeps_its_number_column_page_and_reading_state(row, kin
     selected = result["selection"]
     if revision:
         assert selected["reading_revision"]["previous_text"] == row[kind]
+    else:
+        pass
     assert selected["number"] == n and selected["kind"] == kind
     assert selected["corpus_key"] == f"金.{n}.{kind}"
     assert selected["source_pdf_page"] == int(row["pdf_page"])
@@ -51,9 +55,13 @@ def test_every_gold_cell_keeps_its_number_column_page_and_reading_state(row, kin
     if selected["cell_status"] == "source_reading_uncertain":
         assert selected["editorial_unknown_marker"] == "□"
         assert selected["reading_uncertainties"]
+    else:
+        pass
 
 
-def test_full_gold_scope_and_source_bytes_do_not_count_uncertainty_as_complete():
+def test_full_gold_scope_and_source_bytes_do_not_count_uncertainty_as_complete() -> (
+    None
+):
     assert len(ROWS) == len({r["number"] for r in ROWS}) == 78
     assert len(CELLS) == 234
     assert (
@@ -101,7 +109,7 @@ def test_full_gold_scope_and_source_bytes_do_not_count_uncertainty_as_complete()
 @pytest.mark.parametrize("pair", REFERENCE["numbered_content_correspondence"])
 def test_eleven_number_body_pairings_follow_printed_headers_without_remapping_numbers(
     pair,
-):
+) -> None:
     raw = json.loads(INHERITED_PATH.read_text())["parts"]["金"]
     n = pair["source_number"]
     for kind in ("male", "female", "luck"):
@@ -121,7 +129,9 @@ def test_eleven_number_body_pairings_follow_printed_headers_without_remapping_nu
     )
 
 
-def test_printed_circles_and_faded_spans_are_not_filled_or_copied_between_columns():
+def test_printed_circles_and_faded_spans_are_not_filled_or_copied_between_columns() -> (
+    None
+):
     assert lookup_record("金", 2920, "female")["text"] == "青繩曾係足，何事○伐柯。"
     assert lookup_record("金", 2518, "luck")["text"] == "吞釣魚上鉤，沈機大小○。"
     assert lookup_record("金", 3314, "luck")["text"] == "蕙蘭花□，各自逞馨香。"
@@ -136,6 +146,8 @@ def test_printed_circles_and_faded_spans_are_not_filled_or_copied_between_column
     )
 
 
-def test_literal_unusual_readings_and_word_order_are_not_emended_by_familiarity():
+def test_literal_unusual_readings_and_word_order_are_not_emended_by_familiarity() -> (
+    None
+):
     assert lookup_record("金", 2409, "male")["text"] == "花鈿委地戶，沙暖見春雲。"
     assert lookup_record("金", 2615, "luck")["text"] == "木生毫末間，從微須著至。"

@@ -2,20 +2,42 @@
 
 from __future__ import annotations
 
-from typing import Any
+from collections.abc import Mapping
+from typing import TypedDict
 
 UNITS = {"year": "年", "month": "节月", "day": "日", "hour": "时辰"}
 SOURCE = "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷01"
 
 
-def counter_cycles(
-    core: dict[str, Any], *, calculation_mode: str | None
-) -> dict[str, Any]:
-    """Bind 360/60/72 positions to this core's full counter and actual ju.
+class CounterGroup(TypedDict):
+    number: int
+    position: int
+    size: int
 
-    Group coordinates do not adjudicate a source caption or the alignment of
-    an adapter's origin with actual sexagenary time. No ganzhi is inferred.
-    """
+
+class CounterCycles(TypedDict):
+    ruleset_id: str
+    version: str
+    source: str
+    paths_relative_to: str
+    counter_path: str
+    actual_ju_path: str
+    calculation_mode: str
+    counter_unit: str
+    calendar_ganzhi_alignment: str
+    scope: str
+    counter: int
+    completed_cycles_before_current360: int
+    position360: int
+    actual_kook_number: int
+    ji60: CounterGroup
+    yuan72: CounterGroup
+
+
+def counter_cycles(
+    core: Mapping[str, object], *, calculation_mode: str | None
+) -> CounterCycles:
+    """Bind cycle positions to the selected counter and actual ju."""
     mode = "year" if calculation_mode is None else calculation_mode
     counter, ju = core.get("accumulation"), core.get("kook_number")
     if (
@@ -52,7 +74,7 @@ def counter_cycles(
     }
 
 
-def counter_cycles_text(cycles: dict[str, Any]) -> str:
+def counter_cycles_text(cycles: CounterCycles) -> str:
     """Render stored arithmetic evidence, never recalculate from a clock."""
     ji, yuan = cycles["ji60"], cycles["yuan72"]
     return (

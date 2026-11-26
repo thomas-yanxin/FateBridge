@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from .common import SEXAGENARY_INDEX
-from .jinkou_sources import SCAN_SHA256, SCAN_URL
+from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
+from fatebridge.core.metaphysics.jinkou_sources import SCAN_SHA256, SCAN_URL
 
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 MONTHS = "寅卯辰巳午未申酉戌亥子丑"

@@ -19,7 +19,9 @@ AUDIT = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(AUDIT)
 
 
-def test_literal_roles_and_entire_synthetic_space_keep_full_corpus_denominators():
+def test_literal_roles_and_entire_synthetic_space_keep_full_corpus_denominators() -> (
+    None
+):
     report = AUDIT.audit()
     assert report["literal_structure_count"] == 2
     assert all(r["matched"] for r in report["literal_structure_checks"])
@@ -54,7 +56,9 @@ def test_literal_roles_and_entire_synthetic_space_keep_full_corpus_denominators(
         ("亥", "辰", "戌", False, False),
     ],
 )
-def test_god_and_general_are_not_interchangeable(god, general, ground, p63, p64):
+def test_god_and_general_are_not_interchangeable(
+    god: str, general: str, ground: str, p63: bool, p64: bool
+) -> None:
     result = structural_patterns(
         AUDIT.synthetic_rows(god, general, ground), day_ganzhi="乙卯"
     )
@@ -65,12 +69,14 @@ def test_god_and_general_are_not_interchangeable(god, general, ground, p63, p64)
         item = next(p for p in result["matched"] if p["id"] == "P64")
         assert "第三位将神戌" in item["reading"]
         assert item["original_pdf_page"] == 123
+    else:
+        pass
 
 
 @pytest.mark.parametrize("change", ["edit", "missing", "extra"])
 def test_new_collation_cannot_overwrite_or_hide_the_original_reference(
-    tmp_path, change
-):
+    tmp_path: Path, change: str
+) -> None:
     corpus = tmp_path / "reference"
     shutil.copytree(AUDIT.CORPUS, corpus)
     p = corpus / "reference.json"
@@ -89,8 +95,8 @@ def test_new_collation_cannot_overwrite_or_hide_the_original_reference(
 @pytest.mark.parametrize("hour,expected", [(14, True), (12, False)])
 @pytest.mark.parametrize("project", [False, True])
 def test_actual_four_positions_and_snapshot_agree_across_three_surfaces(
-    hour, expected, project, surface_calls
-):
+    hour: int, expected: bool, project: bool, surface_calls
+) -> None:
     spec = SPECS["jinkou"]
     payload = dict(
         analysis_year=2026,
@@ -123,6 +129,8 @@ def test_actual_four_positions_and_snapshot_agree_across_three_surfaces(
             "false",
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec, payload, params=params, options=options, flags=flags
     )
@@ -147,3 +155,5 @@ def test_actual_four_positions_and_snapshot_agree_across_three_surfaces(
             )
             assert exported["included"]
             assert ("天门入地户课（地击卦）" in exported["content"]) is expected
+        else:
+            pass

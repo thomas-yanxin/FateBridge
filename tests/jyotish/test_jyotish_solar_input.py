@@ -15,7 +15,7 @@ LMT = dict(
 )
 
 
-def test_explicit_lmt_native_and_periods_equal_the_known_civil_instant():
+def test_explicit_lmt_native_and_periods_equal_the_known_civil_instant() -> None:
     solar = calculate_core_chart_analysis(**LMT, chart_variant="india_chart")
     assert "error" not in solar, solar
     assert solar["person_info"]["utc_datetime"] == "1879-05-14T22:20:00+00:00"
@@ -35,6 +35,7 @@ def test_explicit_lmt_native_and_periods_equal_the_known_civil_instant():
 
 import hashlib
 import json
+from dataclasses import replace
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -44,13 +45,16 @@ from pydantic import ValidationError
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.birth_clock import resolve_solar_birth_clock
-from fatebridge.core.jyotish import build_india
+from fatebridge.core.jyotish.jyotish import build_india
 from fatebridge.core.requests.astrology import (
     AstroChartPolyRequest,
     AstroIndiaRequest,
     AstroVimshottariRequest,
 )
-from tests.jyotish.test_jyotish_sources import data18, restore_runtime  # noqa: F401
+from tests.unit_test.fixtures.jyotish_sources import (  # noqa: F401
+    data18,
+    restore_runtime,
+)
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 REFERENCE = json.loads((FIXTURES / "jyotish-solar-input-reference.json").read_text())
@@ -74,7 +78,7 @@ def payload(wall, basis, longitude):
 
 
 @pytest.mark.parametrize("row", REFERENCE["cases"])
-def test_independent_solar_labels_preserve_the_three_nasa_epochs_and_sky(row):
+def test_independent_solar_labels_preserve_the_three_nasa_epochs_and_sky(row) -> None:
     data = payload(
         datetime.fromisoformat(row["input_wall_datetime"]),
         row["basis"],
@@ -90,13 +94,32 @@ def test_independent_solar_labels_preserve_the_three_nasa_epochs_and_sky(row):
     assert context["input_clock_basis"] == row["basis"]
     assert context["recorded_datetime"] is None
     assert context["birth_timezone_role"] == "UTC_carrier_for_solar_input"
-    civil = calculate_core_chart_analysis(
-        **payload(actual, "civil", row["longitude"]),
-        birth_timezone="UTC",
-        chart_variant="india_chart",
+    civil_data = {**payload(actual, "civil", row["longitude"]), "birth_timezone": "UTC"}
+    civil = calculate_core_chart_analysis(**civil_data, chart_variant="india_chart")
+    assert "error" not in civil, civil
+    civil_context = civil["india"]["profile"]["clock_context"]
+    assert civil_context["calculation_utc_datetime"] == actual.isoformat()
+
+    # Re-entering a microsecond UTC label constructs a new TT/UT1 pair.
+    # Compare all chart fields with the same retained physical epoch.
+    solar_birth = build_astro_birth_info(
+        **{key: value for key, value in data.items() if key != "divisions"},
+        preserve_instant=True,
+        require_resolved_timezone=True,
+    )
+    assert solar_birth.require_utc_datetime == actual
+    assert solar_birth.native_epoch is not None
+    civil_birth = build_astro_birth_info(
+        **{key: value for key, value in civil_data.items() if key != "divisions"},
+        preserve_instant=True,
+        require_resolved_timezone=True,
+    )
+    aligned = build_india(
+        replace(civil_birth, native_epoch=solar_birth.native_epoch),
+        divisions=data["divisions"],
     )
     for key in ["charts", "nakshatras", "strengths", "reading_basis", "topic_evidence"]:
-        assert result["india"][key] == civil["india"][key], key
+        assert result["india"][key] == aligned[key], key
     jd = result["india"]["profile"]["julian_day_tt"]
     with runtime.preserve_ephemeris_path():
         runtime.swe.set_sid_mode(runtime.swe.SIDM_LAHIRI, 0, 0)
@@ -115,7 +138,7 @@ def test_independent_solar_labels_preserve_the_three_nasa_epochs_and_sky(row):
         assert error < REFERENCE["sky_tolerance_arcseconds"], (row, body["body"], error)
 
 
-def test_independent_reference_provenance_and_epoch_count_are_honest():
+def test_independent_reference_provenance_and_epoch_count_are_honest() -> None:
     for name, expected in REFERENCE["source_hashes"].items():
         assert hashlib.sha256((FIXTURES / name).read_bytes()).hexdigest() == expected
     assert len(REFERENCE["cases"]) == 36
@@ -127,7 +150,9 @@ def test_independent_reference_provenance_and_epoch_count_are_honest():
 
 
 @pytest.mark.parametrize("basis", ["local_mean_solar", "local_apparent_solar"])
-def test_solar_input_interval_maps_its_wall_bounds_before_sampling_all_periods(basis):
+def test_solar_input_interval_maps_its_wall_bounds_before_sampling_all_periods(
+    basis: str,
+) -> None:
     wall = datetime(2000, 2, 29, 23, 1, 17, 123456)
     data = payload(wall, basis, 10)
     result = calculate_vimshottari(
@@ -139,10 +164,11 @@ def test_solar_input_interval_maps_its_wall_bounds_before_sampling_all_periods(b
     stage = result["vimshottari"]["birth_time_sensitivity"]
     assert interval["input_wall_start"] == (wall - timedelta(minutes=1)).isoformat()
     assert interval["input_wall_end"] == (wall + timedelta(minutes=1)).isoformat()
-    born = datetime.fromisoformat(result["person_info"]["utc_datetime"])
     subset = stage["samples"]
-    first = born + timedelta(seconds=subset[0]["offset_seconds"])
-    last = born + timedelta(seconds=subset[-1]["offset_seconds"])
+    first, last = (
+        datetime.fromisoformat(sample["time_quantization"]["reference_epoch_utc"])
+        for sample in (subset[0], subset[-1])
+    )
     assert first.isoformat() == interval["calculation_utc_start"]
     assert last.isoformat() == interval["calculation_utc_end"]
     for actual, label in [
@@ -166,19 +192,21 @@ def test_solar_input_interval_maps_its_wall_bounds_before_sampling_all_periods(b
     )
 
 
-def test_expanded_physical_interval_is_not_clamped_to_481_points():
-    from fatebridge.core.jyotish_clock import birth_grid
+def test_expanded_physical_interval_is_not_clamped_to_481_points() -> None:
+    from fatebridge.core.jyotish.jyotish_clock import birth_grid
 
     data = payload(datetime(2000, 1, 2, 12), "local_apparent_solar", 10)
     birth = build_astro_birth_info(
         **{k: v for k, v in data.items() if k != "divisions"}
     )
-    offsets, interval = birth_grid(birth, 120, "auto")
+    grid = birth_grid(birth, 120, "auto")
+    offsets = [offset for offset, _ in grid.samples]
+    points = [sample.tt.days for _, sample in grid.samples]
     assert offsets[0] < 0 < offsets[-1]
-    assert offsets[-1] - offsets[0] > 14400
-    assert len(offsets) > 481
-    assert 0 in offsets
-    assert all(0 < b - a <= 30 for a, b in zip(offsets, offsets[1:]))
+    assert (points[-1] - points[0]) * 86400 > 14400
+    assert len(points) > 481
+    assert offsets[grid.nominal_index] == 0
+    assert all(0 < (b - a) * 86400 <= 30 for a, b in zip(points, points[1:]))
 
 
 @pytest.mark.parametrize(
@@ -187,10 +215,12 @@ def test_expanded_physical_interval_is_not_clamped_to_481_points():
 @pytest.mark.parametrize(
     "conflict", [{"birth_timezone": "UTC"}, {"use_true_solar_time": True}]
 )
-def test_double_clock_corrections_are_rejected(model, conflict):
+def test_double_clock_corrections_are_rejected(model, conflict) -> None:
     data = {**LMT, **conflict}
     if model is AstroChartPolyRequest:
         data["chart_variant"] = "india_chart"
+    else:
+        pass
     with pytest.raises(ValidationError, match="Local solar birth clocks"):
         model.model_validate(data)
     assert "error" in calculate_vimshottari(
@@ -198,7 +228,7 @@ def test_double_clock_corrections_are_rejected(model, conflict):
     )
 
 
-def test_solar_digits_in_a_civil_DST_gap_are_not_relocalized_as_zone_time():
+def test_solar_digits_in_a_civil_DST_gap_are_not_relocalized_as_zone_time() -> None:
     data = payload(datetime(2024, 3, 10, 2, 30), "local_mean_solar", -74)
     result = calculate_core_chart_analysis(
         **data, birth_place="纽约", chart_variant="india_chart"
@@ -211,7 +241,7 @@ def test_solar_digits_in_a_civil_DST_gap_are_not_relocalized_as_zone_time():
     assert result["person_info"]["birth_timezone"] == "UTC"
 
 
-def test_independent_target_zone_preserves_equal_physical_analysis_instants():
+def test_independent_target_zone_preserves_equal_physical_analysis_instants() -> None:
     a = calculate_vimshottari(
         **LMT,
         analysis_year=2026,
@@ -238,7 +268,7 @@ def test_independent_target_zone_preserves_equal_physical_analysis_instants():
     assert a["person_info"]["utc_datetime"] == b["person_info"]["utc_datetime"]
 
 
-def test_invalid_target_zone_or_DST_gap_is_not_hidden_by_solar_birth_input():
+def test_invalid_target_zone_or_DST_gap_is_not_hidden_by_solar_birth_input() -> None:
     for zone in ["Not/AZone", ""]:
         assert "error" in calculate_vimshottari(
             **LMT, analysis_year=2026, analysis_timezone=zone
@@ -257,8 +287,8 @@ def test_invalid_target_zone_or_DST_gap_is_not_hidden_by_solar_birth_input():
 
 def test_strict_LAT_conversion_rejects_early_fallback_instead_of_later_masking(
     data18,
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # The controlled retflag transition needs genuine, valid Swiss contexts.
     # Otherwise an inherited native slot can reject the forged SWIEPH flag
     # before this test reaches the intended mixed-model comparison.
@@ -273,6 +303,8 @@ def test_strict_LAT_conversion_rejects_early_fallback_instead_of_later_masking(
             return coords, (flag & ~7) | (
                 runtime.swe.FLG_MOSEPH if len(calls) == 1 else runtime.swe.FLG_SWIEPH
             )
+        else:
+            pass
         return result
 
     monkeypatch.setattr(runtime, "ephemeris_call", mixed)
@@ -293,7 +325,9 @@ def test_strict_LAT_conversion_rejects_early_fallback_instead_of_later_masking(
     assert len(calls) == 2
 
 
-def test_domain_cannot_upgrade_a_previously_automatic_LAT_conversion_to_strict():
+def test_domain_cannot_upgrade_a_previously_automatic_LAT_conversion_to_strict() -> (
+    None
+):
     birth = build_astro_birth_info(
         **{
             k: v
@@ -308,7 +342,9 @@ def test_domain_cannot_upgrade_a_previously_automatic_LAT_conversion_to_strict()
 
 
 @pytest.mark.parametrize("basis", ["local_mean_solar", "local_apparent_solar"])
-def test_mean_model_window_uses_converted_TT_rather_than_original_solar_year(basis):
+def test_mean_model_window_uses_converted_TT_rather_than_original_solar_year(
+    basis: str,
+) -> None:
     data = payload(datetime(2051, 1, 1), basis, 180)
     result = calculate_core_chart_analysis(
         **data, chart_variant="india_chart", cheshta_model="simon1994_j2000"
@@ -324,8 +360,8 @@ def test_mean_model_window_uses_converted_TT_rather_than_original_solar_year(bas
 @pytest.mark.parametrize("basis", ["local_mean_solar", "local_apparent_solar"])
 @pytest.mark.parametrize("radius", [0, 1e-10])
 def test_zero_and_unresolvable_solar_uncertainty_keep_the_nominal_instant(
-    basis, radius
-):
+    basis: str, radius: float | int
+) -> None:
     result = calculate_vimshottari(
         **payload(datetime(2000, 2, 29, 23, 1, 17, 123456), basis, 10),
         analysis_year=2026,

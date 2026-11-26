@@ -22,14 +22,20 @@ def audit() -> dict:
     for name, digest in freeze["files"].items():
         if hashlib.sha256((folder / name).read_bytes()).hexdigest() != digest:
             failures.append({"kind": "frozen_projection_identity", "file": name})
+        else:
+            pass
     source = de440_solar.source_receipt(de440_solar.CANPING_MODEL_ID)
     if source["source_kernel_sha256"] != protocol["source_kernel"]["sha256"]:
         failures.append({"kind": "projection_source_kernel_changed"})
+    else:
+        pass
     reference = json.loads((folder / "reference.json").read_bytes())
     states = json.loads((folder / "states.json").read_bytes())
     years = list(range(2201, 2321))
     if [r["year"] for r in reference["rows"]] != years or len(states["rows"]) != 1440:
         failures.append({"kind": "complete_projection_cohort"})
+    else:
+        pass
     roots = []
     tolerance = protocol["reference_evaluator"]["root_tolerance_seconds"]
     for row in reference["rows"]:
@@ -48,6 +54,8 @@ def audit() -> dict:
             roots.append({"year": year, "mode": mode, "residual_seconds_tt": error})
             if abs(error) > tolerance:
                 failures.append({"kind": "projection_root_residual", **roots[-1]})
+            else:
+                pass
     position, velocity = [], []
     for row in states["rows"]:
         p, v = de440_solar.state(
@@ -62,6 +70,8 @@ def audit() -> dict:
         or max(velocity) > protocol["state_sampling"]["velocity_tolerance_km_per_day"]
     ):
         failures.append({"kind": "projection_original_state_residual"})
+    else:
+        pass
     return {
         "checks_passed": not failures,
         "failures": failures,
@@ -107,3 +117,5 @@ if __name__ == "__main__":
         )
     )
     raise SystemExit(0 if report["checks_passed"] else 1)
+else:
+    pass

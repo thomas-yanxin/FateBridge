@@ -10,11 +10,14 @@ from pydantic import ValidationError
 from fatebridge.application.examples import evidence_views
 from fatebridge.application.projection import project_fields
 from fatebridge.core import almanac
-from fatebridge.core.canping_schedule_validation import require_schedule_binding
+from fatebridge.core.contracts.output_chinese import CanpingTiming
 from fatebridge.core.local_techniques.canping import build_canping_result
-from fatebridge.core.output_chinese import CanpingTiming
+from fatebridge.core.numerology.canping_schedule_validation import (
+    require_schedule_binding,
+)
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import NumerologySourceError
+from tests.support.solar_source_facts import HKO_TERM_LONGITUDES
 
 REFERENCES = json.loads(
     (Path(__file__).parents[1] / "data/canping/first_row_inputs.json").read_bytes()
@@ -22,10 +25,9 @@ REFERENCES = json.loads(
 SPEC = next(s for s in CATALOG if s.key == "canping")
 # HKO table1, transcribed independently of the production name/angle arrays:
 # https://www.hko.gov.hk/sc/gts/time/24solarterms.htm
-from tests.support.solar_source_facts import HKO_TERM_LONGITUDES
 
 
-def test_literal_term_targets_match_the_published_hko_table():
+def test_literal_term_targets_match_the_published_hko_table() -> None:
     assert len(HKO_TERM_LONGITUDES) == 24
     assert dict(zip(almanac.SOLAR_TERM_NAMES, almanac.SOLAR_TERM_LONGITUDES)) == (
         HKO_TERM_LONGITUDES
@@ -41,7 +43,9 @@ def native_model(monkeypatch):
 @pytest.mark.parametrize(
     "profile", ["bazi_appendix_v1", "bazi_continuous_v1", "legacy_minggong_v1"]
 )
-def test_published_policy_view_keeps_first_row_without_entire_timeline(profile):
+def test_published_policy_view_keeps_first_row_without_entire_timeline(
+    profile: str,
+) -> None:
     r = next(r for r in REFERENCES if r["arguments"]["dayun_method"] == profile)
     out = build_canping_result(**r["arguments"])
     fields = evidence_views(SPEC)["timing_policy"]["fields"]
@@ -67,8 +71,8 @@ FAULTS = [
 @pytest.mark.parametrize("summary", ["first_row", "first_period"])
 @pytest.mark.parametrize("path,value", FAULTS)
 def test_wrong_summary_facts_cannot_survive_complete_output_validation(
-    summary, path, value
-):
+    summary: str, path, value
+) -> None:
     out = deepcopy(
         next(
             build_canping_result(**r["arguments"])
@@ -86,7 +90,7 @@ def test_wrong_summary_facts_cannot_survive_complete_output_validation(
         require_schedule_binding(out)
 
 
-def test_coherent_but_wrong_two_summaries_do_not_override_the_actual_row():
+def test_coherent_but_wrong_two_summaries_do_not_override_the_actual_row() -> None:
     out = deepcopy(
         next(
             build_canping_result(**r["arguments"])
@@ -102,7 +106,7 @@ def test_coherent_but_wrong_two_summaries_do_not_override_the_actual_row():
         require_schedule_binding(out)
 
 
-def test_nonempty_summaries_cannot_survive_an_empty_actual_sequence():
+def test_nonempty_summaries_cannot_survive_an_empty_actual_sequence() -> None:
     out = build_canping_result(**REFERENCES[0]["arguments"])
     out["canping_timing"]["first_row"] = deepcopy(out["dayun"][0])
     out["dayun"] = []
@@ -110,7 +114,7 @@ def test_nonempty_summaries_cannot_survive_an_empty_actual_sequence():
         require_schedule_binding(out)
 
 
-def test_empty_actual_sequence_does_not_invent_a_missing_summary():
+def test_empty_actual_sequence_does_not_invent_a_missing_summary() -> None:
     CanpingTiming.model_validate({"first_row": None, "first_period": None})
     require_schedule_binding({"dayun": [], "canping_timing": {}})
 
@@ -127,7 +131,9 @@ def test_empty_actual_sequence_does_not_invent_a_missing_summary():
         "year_start_boundary",
     ],
 )
-def test_legacy_partial_row_does_not_gain_actual_dates_or_query_identity(key):
+def test_legacy_partial_row_does_not_gain_actual_dates_or_query_identity(
+    key: str,
+) -> None:
     value = {
         "year_start_boundary": {},
         "start_age": 1,
@@ -140,7 +146,7 @@ def test_legacy_partial_row_does_not_gain_actual_dates_or_query_identity(key):
         )
 
 
-def test_partial_schema_preserves_omission_and_known_legacy_null():
+def test_partial_schema_preserves_omission_and_known_legacy_null() -> None:
     for value in [
         {},
         {"first_row": None},

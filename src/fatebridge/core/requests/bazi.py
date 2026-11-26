@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
-
 from pydantic import Field
 
 from fatebridge.core.metaphysics.common import SEXAGENARY_CYCLE
@@ -50,23 +48,23 @@ class BaziDimensionRequest(BaziClockRequest):
     知道大运；dayun_pillar / liunian_pillar 为可选覆盖。
     """
 
-    analysis_year: Optional[int] = Field(
+    analysis_year: int | None = Field(
         default=None, description="Analysis year (defaults to current year)"
     )
-    analysis_month: Optional[int] = Field(
+    analysis_month: int | None = Field(
         default=None, ge=1, le=12, description="Analysis month (1-12)"
     )
-    analysis_day: Optional[int] = Field(
+    analysis_day: int | None = Field(
         default=None, ge=1, le=31, description="Analysis day (1-31)"
     )
-    dayun_pillar: Optional[str] = Field(
+    dayun_pillar: str | None = Field(
         default=None,
         min_length=2,
         max_length=2,
         pattern=PILLAR_PATTERN,
         description="Optional override: exactly one valid sexagenary pillar, e.g. '甲子'",
     )
-    liunian_pillar: Optional[str] = Field(
+    liunian_pillar: str | None = Field(
         default=None,
         min_length=2,
         max_length=2,
@@ -78,14 +76,14 @@ class BaziDimensionRequest(BaziClockRequest):
 class BaziBirthRequest(BaziClockRequest):
     """Request model for standalone BaZi birth output."""
 
-    analysis_year: Optional[int] = Field(default=None, description="Analysis year")
-    analysis_month: Optional[int] = Field(
+    analysis_year: int | None = Field(default=None, description="Analysis year")
+    analysis_month: int | None = Field(
         default=None, ge=1, le=12, description="Analysis month (1-12)"
     )
-    analysis_day: Optional[int] = Field(
+    analysis_day: int | None = Field(
         default=None, ge=1, le=31, description="Analysis day (1-31)"
     )
-    selected_sections: List[str] = Field(
+    selected_sections: list[str] = Field(
         default_factory=list,
         description="Optional snapshot section titles for filtered export payload",
     )

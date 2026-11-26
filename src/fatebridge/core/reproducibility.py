@@ -1,7 +1,7 @@
 """Declarative replay conditions, distinct from MCP environment-effect hints."""
 
 from dataclasses import dataclass
-from typing import Any, Dict, Tuple, Type
+from typing import Literal, TypedDict
 
 from pydantic import BaseModel
 
@@ -16,13 +16,26 @@ BAZI_ANALYSIS_CLOCK_TOOLS = frozenset(
 )
 
 
+class ReproducibilityManifest(TypedDict):
+    deterministic: Literal["conditional", "fixed_input_and_environment"]
+    may_use_current_time: bool
+    current_time_fields: list[str]
+    random_seed_field: str | None
+    requires_seed_for_replay: bool
+    seed_condition: str | None
+    replay_controls: list[str]
+    scope: str
+    environment_sensitive: bool
+
+
 @dataclass(frozen=True)
 class ReproducibilityPolicy:
-    current_time_fields: Tuple[str, ...] = ()
+    current_time_fields: tuple[str, ...] = ()
     implicit_current_time: bool = False
     random_seed_field: str = ""
+    seed_condition: str | None = None
 
-    def as_manifest(self) -> Dict[str, Any]:
+    def as_manifest(self) -> ReproducibilityManifest:
         return {
             "deterministic": (
                 "conditional"
@@ -37,21 +50,17 @@ class ReproducibilityPolicy:
             "current_time_fields": list(self.current_time_fields),
             "random_seed_field": self.random_seed_field or None,
             "requires_seed_for_replay": bool(self.random_seed_field),
-            "seed_condition": (
-                "method=coin without coins/lines/binary hexagram codes"
-                if self.random_seed_field
-                else None
-            ),
+            "seed_condition": self.seed_condition,
             "replay_controls": ["as_of", "trace_id", "parent_run_id"],
             "scope": "business_payload; excludes run_metadata and output shaping",
             "environment_sensitive": True,
         }
 
 
-def policy_for(key: str, model: Type[BaseModel]) -> ReproducibilityPolicy:
+def policy_for(key: str, model: type[BaseModel]) -> ReproducibilityPolicy:
     """Default policies for the current catalog, overridable on new ToolSpecs."""
     fields = model.model_fields
-    clock_fields: Tuple[str, ...] = ()
+    clock_fields: tuple[str, ...] = ()
     date_fields = ("analysis_year", "analysis_month", "analysis_day")
     if key in BAZI_ANALYSIS_CLOCK_TOOLS:
         clock_fields = (*date_fields, "analysis_hour", "analysis_minute")
@@ -83,4 +92,9 @@ def policy_for(key: str, model: Type[BaseModel]) -> ReproducibilityPolicy:
         current_time_fields=clock_fields,
         implicit_current_time=key == "analyze_destiny",
         random_seed_field="seed" if key == "sixyao" else "",
+        seed_condition=(
+            "method=coin without coins/lines/binary hexagram codes"
+            if key == "sixyao"
+            else None
+        ),
     )

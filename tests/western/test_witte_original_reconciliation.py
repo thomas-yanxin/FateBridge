@@ -4,12 +4,13 @@ import copy
 import hashlib
 import json
 import sys
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
 from fatebridge.application.examples import call_guidance, evidence_views
-from fatebridge.core.output_midpoints import MidpointAnalysis
+from fatebridge.core.contracts.output_midpoints import MidpointAnalysis
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.western import replay_witte_meridian_sources as replayer
 from scripts.western.audit_other_chart_schools import day_meridian_check
@@ -21,7 +22,9 @@ def source():
     return json.loads(data)
 
 
-def test_printed_operations_explain_184_minutes_and_retain_separate_four_minutes():
+def test_printed_operations_explain_184_minutes_and_retain_separate_four_minutes() -> (
+    None
+):
     report = replayer.replay(source())
     assert report["printed_arithmetic_checks_passed"]
     assert report["table_rows"] == 13
@@ -45,7 +48,7 @@ def test_printed_operations_explain_184_minutes_and_retain_separate_four_minutes
     assert report["empirical_outcomes"] == 0
 
 
-def test_equalizing_the_1923_cusp_is_a_failed_source_replay():
+def test_equalizing_the_1923_cusp_is_a_failed_source_replay() -> None:
     fixture = copy.deepcopy(source())
     fixture["table"][4]["natal_cusp"] = [7, 7, 15]
     report = replayer.replay(fixture)
@@ -57,15 +60,15 @@ def test_equalizing_the_1923_cusp_is_a_failed_source_replay():
     )
 
 
-def test_monthly_phase_typo_is_retained_as_a_failure():
+def test_monthly_phase_typo_is_retained_as_a_failure() -> None:
     fixture = copy.deepcopy(source())
     fixture["table"][0]["solar_phase"][2] = 47
     assert not replayer.replay(fixture)["printed_arithmetic_checks_passed"]
 
 
 def test_modified_transcription_is_rejected_before_receipt_is_created(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     fixture = tmp_path / "changed.json"
     fixture.write_bytes(replayer.FIXTURE.read_bytes() + b"\n")
     destination = tmp_path / "receipt.json"
@@ -76,7 +79,7 @@ def test_modified_transcription_is_rejected_before_receipt_is_created(
     assert not destination.exists()
 
 
-def test_public_comparison_rejects_invalid_historical_angle():
+def test_public_comparison_rejects_invalid_historical_angle() -> None:
     with pytest.raises(ValidationError):
         MidpointAnalysis.model_validate(
             {
@@ -91,7 +94,9 @@ def test_public_comparison_rejects_invalid_historical_angle():
         )
 
 
-def test_aggregate_audit_retains_historical_status_and_does_not_accept_full_original():
+def test_aggregate_audit_retains_historical_status_and_does_not_accept_full_original() -> (
+    None
+):
     report = day_meridian_check()
     assert report["selected_1924_equation_replay_matches"]
     assert report["source_reconciliation"]["printed_arithmetic_checks_passed"]
@@ -106,7 +111,9 @@ def test_aggregate_audit_retains_historical_status_and_does_not_accept_full_orig
     assert report["full_original_numerical_horoscopes_accepted"] == 0
 
 
-def test_published_day_meridian_card_reads_the_comparison_and_retained_residual():
+def test_published_day_meridian_card_reads_the_comparison_and_retained_residual() -> (
+    None
+):
     spec = next(row for row in CATALOG if row.key == "astro_germany")
     guidance = call_guidance(spec)["daily_meridian"]
     card = evidence_views(spec)["daily_meridian"]

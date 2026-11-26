@@ -12,12 +12,12 @@ from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
 from fatebridge.application.examples import evidence_views
-from fatebridge.core.metaphysics import hko_term_dates as domain
-from fatebridge.core.output_chinese import RenTermDependency
-from fatebridge.core.output_ren_term_dates import (
+from fatebridge.core.contracts.output_chinese import RenTermDependency
+from fatebridge.core.contracts.output_ren_term_dates import (
     RenPublishedDateReference,
     require_complete_published_dates,
 )
+from fatebridge.core.metaphysics import hko_term_dates as domain
 from fatebridge.core.public_output import same_public_value
 from scripts.astronomy.build_hko_term_dates import build, encoded
 from scripts.ren.audit_ren_hko_dates import CORPUS, reference
@@ -59,6 +59,8 @@ def payload(key, index=5):
     )
     if key == "jinkou":
         p["di_fen"] = "酉"
+    else:
+        pass
     if key == "liureng_runyear":
         p.update(
             birth_year=1950,
@@ -68,6 +70,8 @@ def payload(key, index=5):
             birth_timezone="Asia/Shanghai",
             gender="女",
         )
+    else:
+        pass
     return p
 
 
@@ -77,7 +81,9 @@ def raw(key="liureng_gods"):
     return fn(*args, **kw)
 
 
-def test_catalogue_reproduces_all200_pinned_sources_without_calculator_answers():
+def test_catalogue_reproduces_all200_pinned_sources_without_calculator_answers() -> (
+    None
+):
     assert (
         encoded(build())
         == (CORPUS / "catalogue.json").read_bytes()
@@ -89,7 +95,9 @@ def test_catalogue_reproduces_all200_pinned_sources_without_calculator_answers()
 
 
 @pytest.mark.parametrize("fault", ["edit", "refreeze", "extra", "remove"])
-def test_reference_denominators_and_labels_cannot_be_changed(fault, tmp_path):
+def test_reference_denominators_and_labels_cannot_be_changed(
+    fault: str, tmp_path: Path
+) -> None:
     p = tmp_path / "corpus"
     shutil.copytree(CORPUS, p)
     if fault == "edit":
@@ -106,8 +114,8 @@ def test_reference_denominators_and_labels_cannot_be_changed(fault, tmp_path):
 
 
 def test_runtime_reference_corruption_fails_without_using_unchecked_labels(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     p = tmp_path / "data/astronomy"
     p.mkdir(parents=True)
     (p / "hko-term-dates-v1.json").write_text("{}")
@@ -123,7 +131,7 @@ def test_runtime_reference_corruption_fails_without_using_unchecked_labels(
 
 
 @pytest.mark.parametrize("year", [1800, 1900, 2101, 2200])
-def test_outside_years_stay_unknown_rather_than_false_or_true(year):
+def test_outside_years_stay_unknown_rather_than_false_or_true(year: int) -> None:
     r = domain.published_date_reference(
         "小寒", datetime(year, 1, 5, tzinfo=timezone.utc)
     )
@@ -133,7 +141,9 @@ def test_outside_years_stay_unknown_rather_than_false_or_true(year):
     RenPublishedDateReference.model_validate(r)
 
 
-def test_reference_year_and_day_use_fixed08_not_analysis_zone_or_true_solar_label():
+def test_reference_year_and_day_use_fixed08_not_analysis_zone_or_true_solar_label() -> (
+    None
+):
     m = datetime(1927, 9, 8, 16, 5, tzinfo=timezone.utc)
     r = domain.published_date_reference("白露", m)
     for h in [-12, -5, 8, 14]:
@@ -174,7 +184,9 @@ def test_reference_year_and_day_use_fixed08_not_analysis_zone_or_true_solar_labe
         ("instant_accuracy_certified", 0),
     ],
 )
-def test_reference_cannot_contradict_its_present_term_and_instant(field, value):
+def test_reference_cannot_contradict_its_present_term_and_instant(
+    field: str, value: bool | int | str
+) -> None:
     r = domain.published_date_reference(
         "大寒", datetime.fromisoformat("1979-01-20T15:59:54+00:00")
     )
@@ -183,7 +195,9 @@ def test_reference_cannot_contradict_its_present_term_and_instant(field, value):
         RenPublishedDateReference.model_validate(r)
 
 
-def test_partial_reference_checks_only_copresent_facts_but_dependency_anchor_cannot_be_spliced():
+def test_partial_reference_checks_only_copresent_facts_but_dependency_anchor_cannot_be_spliced() -> (
+    None
+):
     RenPublishedDateReference.model_validate(dict(status="date_mismatch"))
     r = domain.published_date_reference(
         "大寒", datetime.fromisoformat("1979-01-20T15:59:54+00:00")
@@ -208,7 +222,7 @@ def test_partial_reference_checks_only_copresent_facts_but_dependency_anchor_can
 @pytest.mark.parametrize(
     "fault", ["missing", "duplicate", "status", "zero", "name", "scope"]
 )
-def test_full_policy_cannot_drop_or_forge_reference_evidence(fault):
+def test_full_policy_cannot_drop_or_forge_reference_evidence(fault: str) -> None:
     p = raw()["liureng"]["calendar_policy"]
     r = p["solar_term_dependencies"][1]
     if fault == "missing":
@@ -230,13 +244,15 @@ def test_full_policy_cannot_drop_or_forge_reference_evidence(fault):
 @pytest.mark.parametrize("key", ["liureng_gods", "jinkou"])
 @pytest.mark.parametrize("index", range(7))
 def test_old_seven_date_disagreements_survive_all_three_protocols(
-    key, index, surface_calls
-):
+    key: str, index, surface_calls
+) -> None:
     s = SPECS[key]
     p = payload(key, index)
     prefix = "jinkou" if key == "jinkou" else "liureng"
     fields = evidence_views(s)["published_term_dates"]["fields"]
-    opts = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
+    opts = dict(
+        detail="audit", fields=fields, strict_fields=True, include_snapshot_text=False
+    )
     http, mcp, code, cli = surface_calls(
         s, p, projection={**opts, "response_char_limit": 0}
     )
@@ -258,7 +274,7 @@ def test_old_seven_date_disagreements_survive_all_three_protocols(
     assert same_public_value(terms, internal["solar_term_dependencies"])
 
 
-def test_runyear_snapshot_shows_same_dependency_conflict_and_reference_scope():
+def test_runyear_snapshot_shows_same_dependency_conflict_and_reference_scope() -> None:
     result = raw("liureng_runyear")
     text = result["snapshot_text"]
     p = result["liureng"]["calendar_policy"]
@@ -275,8 +291,8 @@ def test_runyear_snapshot_shows_same_dependency_conflict_and_reference_scope():
 
 @pytest.mark.parametrize("project", [False, True])
 def test_three_protocols_reject_deleted_or_changed_reference_before_projection(
-    project, monkeypatch, surface_calls
-):
+    project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     s = SPECS["liureng_gods"]
     p = payload("liureng_gods")
     bad = raw()
@@ -288,6 +304,8 @@ def test_three_protocols_reject_deleted_or_changed_reference_before_projection(
     def broken(spec, request):
         if spec.key == s.key:
             spec = replace(spec, bind=lambda _: (lambda: copy.deepcopy(bad), (), {}))
+        else:
+            pass
         return original(spec, request)
 
     monkeypatch.setattr(execution, "execute_spec", broken)
@@ -298,6 +316,8 @@ def test_three_protocols_reject_deleted_or_changed_reference_before_projection(
         params += [("fields", "four_pillars"), ("strict_fields", "true")]
         flags += ["--fields", "four_pillars", "--strict-fields", "true"]
         opts = dict(fields=["four_pillars"], strict_fields=True)
+    else:
+        pass
     h, m, code, c = surface_calls(
         s, p, params=params, options=opts, flags=flags, cli_first=False
     )
@@ -308,7 +328,7 @@ def test_three_protocols_reject_deleted_or_changed_reference_before_projection(
     )
 
 
-def test_same_published_day_does_not_claim_the_synthetic_noon_is_a_solar_root():
+def test_same_published_day_does_not_claim_the_synthetic_noon_is_a_solar_root() -> None:
     # Deliberately hypothetical noon: the reference predicate certifies no instant.
     r = domain.published_date_reference(
         "大寒", datetime.fromisoformat("1979-01-21T12:00:00+08:00")
@@ -320,8 +340,8 @@ def test_same_published_day_does_not_claim_the_synthetic_noon_is_a_solar_root():
 @pytest.mark.parametrize("year", [1800, 2200])
 @pytest.mark.parametrize("key", ["liureng_gods", "jinkou"])
 def test_valid_public_year_outside_hko_keeps_calculation_and_unknown_reference(
-    year, key
-):
+    year: int, key: str
+) -> None:
     s = SPECS[key]
     p = payload(key)
     p["analysis_year"] = year

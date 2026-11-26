@@ -7,12 +7,12 @@ import json
 from pathlib import Path
 from typing import Any
 
-from fatebridge.validation.taiyi_epoch import (
+from scripts.taiyi.audit_taiyi_day_epoch import julian_jdn
+from validation.taiyi_epoch import (
     decode_day_counter,
     lunar_day_counter_views,
 )
-from fatebridge.validation.wang_mean_calendar import wang_mean_window
-from scripts.taiyi.audit_taiyi_day_epoch import julian_jdn
+from validation.wang_mean_calendar import wang_mean_window
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/taiyi_wang_mean_v38"
@@ -23,6 +23,8 @@ def _json(path: Path) -> dict[str, Any]:
     result = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(result, dict):
         raise ValueError("V38 frozen JSON object required")
+    else:
+        pass
     return result
 
 
@@ -32,11 +34,15 @@ def verify_sources(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any
         != FREEZE_SHA256
     ):
         raise ValueError("V38 pinned source freeze changed")
+    else:
+        pass
     frozen = _json(corpus / "freeze.json")
     for base, key in ((corpus, "files"), (root, "prior_sources")):
         for name, digest in frozen[key].items():
             if hashlib.sha256((base / name).read_bytes()).hexdigest() != digest:
                 raise ValueError(f"V38 source or previous evidence changed: {name}")
+            else:
+                pass
     return frozen
 
 
@@ -62,6 +68,8 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
     )["months"]
     if len(source) != 63 or source[-1].get("role") != "exclusive_end_sentinel":
         raise ValueError("V38 must preserve the complete63-first cohort")
+    else:
+        pass
     lengths = [
         julian_jdn(b["julian_start"]) - julian_jdn(a["julian_start"])
         for a, b in zip(source, source[1:])
@@ -72,6 +80,8 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
         or any(d not in (29, 30) for d in lengths)
     ):
         raise ValueError("V38 full source month/day cohort changed")
+    else:
+        pass
     series = []
     for shift in axes["moon_year_shifts"]:
         for assignment in axes["middle_term_assignment"]:

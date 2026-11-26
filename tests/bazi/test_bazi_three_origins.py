@@ -1,8 +1,9 @@
 """命宫 / 身宫 / 胎元 (三元) 数值回归。
 
-基线为 lunar_python (de-facto 标准八字库) 的 getMingGong / getShenGong /
-getTaiYuan，在 300 张随机盘上与本模块的算法逐一核对一致。这里冻结 8 张代表盘
-(含晚子时、各五行局、命宫支环绕等情形) 防止 命宫天干 / 身宫 回归。
+保留 8 张历史冻结盘，覆盖晚子时和命宫支环绕等情形。原注释称其与
+lunar_python 的 getMingGong / getShenGong / getTaiYuan 比较过 300 张随机盘，
+但未保存 seed、完整输入输出或运行来源；该说法不作为独立验收证据。
+本文件仅断言三元干支，不认证完整历法、纳音、十神或传统方法的唯一性。
 
 历史 bug:
 - 命宫天干曾用「月柱干 + 月支→命宫支 的 mod-12 位移」推导，与天干 mod-10
@@ -20,7 +21,7 @@ import pytest
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.services.bazi import _build_three_origins
 
-# (year, month, day, hour, minute): {origin: 干支}  —— 真值取自 lunar_python
+# (year, month, day, hour, minute): {origin: 干支} —— 历史冻结值，来源限度见文件说明
 _CASES = {
     (2000, 12, 10, 9, 55): {"minggong": "戊子", "shengong": "壬午", "taiyuan": "己卯"},
     (1990, 6, 15, 14, 30): {"minggong": "庚辰", "shengong": "戊寅", "taiyuan": "癸酉"},
@@ -35,7 +36,7 @@ _CASES = {
 
 
 @pytest.mark.parametrize("birth,expected", list(_CASES.items()))
-def test_three_origins_match_lunar_python(birth, expected):
+def test_three_origins_match_lunar_python(birth, expected) -> None:
     pillars = BaZiCalendar.get_four_pillars(datetime(*birth), "Asia/Shanghai")
     origins = _build_three_origins(pillars)
     actual = {key: origins[key]["pillar"] for key in expected}

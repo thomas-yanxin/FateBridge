@@ -1,10 +1,4 @@
-"""Check maintained Markdown links, heading anchors, fences and JSON offline.
-
-Run from any directory with the repository's Python interpreter. This checks
-inline and reference Markdown links and HTML href/src attributes.
-Remote URLs and prose claims are not checked.
-Runtime examples and generated contracts have their own validation commands.
-"""
+"""Check local links, heading anchors, fences and JSON in maintained Markdown."""
 
 from __future__ import annotations
 
@@ -29,11 +23,16 @@ class HtmlLinks(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
         self.links: list[tuple[int, str]] = []
+        self.anchors: set[str] = set()
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         for name, value in attrs:
             if name in {"href", "src"} and value:
                 self.links.append((self.getpos()[0], value))
+            elif name == "id" and value:
+                self.anchors.add(value)
+            else:
+                pass
 
 
 @dataclass
@@ -67,17 +66,23 @@ def inspect_markdown(text: str) -> Document:
                     document.json_blocks += 1
                     try:
                         json.loads("\n".join(body))
-                    except ValueError as error:
+                    except json.JSONDecodeError as error:
                         document.errors.append(f"{opened_at}: invalid JSON: {error}")
+                else:
+                    pass
                 fence = ""
             else:
                 body.append(line)
             continue
+        else:
+            pass
         if marker:
             html.feed("\n")
             fence, language = marker[1], marker[2].strip().lower()
             opened_at, body = number, []
             continue
+        else:
+            pass
         heading = HEADING.match(line)
         if heading:
             title = re.sub(r"\[([^]]+)\]\([^)]*\)", r"\1", heading[1])
@@ -87,6 +92,8 @@ def inspect_markdown(text: str) -> Document:
                 suffix += 1
                 anchor = f"{slug}-{suffix}"
             document.anchors.add(anchor)
+        else:
+            pass
         # Code spans are literal even when they contain Markdown-like text.
         prose = re.sub(r"(`+).*?\1", "", line)
         html.feed(prose + "\n")
@@ -95,6 +102,8 @@ def inspect_markdown(text: str) -> Document:
             key = " ".join(definition[1].lower().split())
             definitions.setdefault(key, definition[2].strip("<>"))
             continue
+        else:
+            pass
         for match in REFERENCE.finditer(prose):
             key = " ".join((match[2] or match[1]).lower().split())
             references.append((number, key))
@@ -106,6 +115,7 @@ def inspect_markdown(text: str) -> Document:
                 target = target.split(maxsplit=1)[0] if target else ""
             document.links.append((number, target))
     html.close()
+    document.anchors.update(html.anchors)
     document.links.extend(html.links)
     for number, key in references:
         if key in definitions:
@@ -114,6 +124,8 @@ def inspect_markdown(text: str) -> Document:
             document.errors.append(f"{number}: undefined link reference: {key}")
     if fence:
         document.errors.append(f"{opened_at}: unclosed code fence")
+    else:
+        pass
     return document
 
 
@@ -153,6 +165,8 @@ def main(argv: list[str] | None = None) -> int:
             url = urlsplit(target)
             if url.scheme or url.netloc:
                 continue
+            else:
+                pass
             checked_links += 1
             destination = (
                 (path.parent / unquote(url.path)).resolve() if url.path else path
@@ -163,19 +177,27 @@ def main(argv: list[str] | None = None) -> int:
                 linked = documents.get(destination)
                 if linked is None:
                     linked = inspect_markdown(destination.read_text(encoding="utf-8"))
+                else:
+                    pass
                 if unquote(url.fragment) not in linked.anchors:
                     errors.append(f"{label}:{number}: missing heading anchor: {target}")
+                else:
+                    pass
+            else:
+                pass
     json_paths = sorted((ROOT / "docs" / "examples").rglob("*.json")) + sorted(
         (ROOT / "examples").rglob("*.json")
     )
     for path in json_paths:
         try:
             json.loads(path.read_text(encoding="utf-8"))
-        except ValueError as error:
+        except (json.JSONDecodeError, UnicodeDecodeError) as error:
             errors.append(f"{path.relative_to(ROOT)}: invalid JSON: {error}")
     if errors:
         print("\n".join(errors))
         return 1
+    else:
+        pass
     blocks = sum(document.json_blocks for document in documents.values())
     print(
         f"OK: {len(documents)} Markdown files, {checked_links} local links, "
@@ -186,3 +208,5 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -5,7 +5,7 @@ from copy import deepcopy
 import pytest
 
 from fatebridge.core.classical_candidate_selection import build_candidate_selection
-from fatebridge.core.output_candidate_selection import CandidateSelection
+from fatebridge.core.contracts.output_candidate_selection import CandidateSelection
 from tests.support.transports import SPECS, business
 from tests.support.transports import rest as _shared_rest
 from tests.support.transports import surface_calls
@@ -31,7 +31,7 @@ rest = _shared_rest
 )
 def test_hidden_helpers_cannot_replace_the_source_revelation_prerequisite(
     values, wealth, seal
-):
+) -> None:
     pillars = dict(zip(ORDER, map(tuple, values)))
     before = deepcopy(pillars)
     selection = build_candidate_selection(pillars)
@@ -58,7 +58,9 @@ def test_hidden_helpers_cannot_replace_the_source_revelation_prerequisite(
     CandidateSelection.model_validate(selection)
 
 
-def test_revelation_requirement_is_not_extended_to_the_distinct_metal_water_route():
+def test_revelation_requirement_is_not_extended_to_the_distinct_metal_water_route() -> (
+    None
+):
     pillars = dict(zip(ORDER, map(tuple, ("壬申", "壬子", "庚午", "丁丑"))))
     selection = build_candidate_selection(pillars)
     row = next(r for r in selection["paths"] if r["id"] == "hurt_officer")
@@ -94,15 +96,32 @@ def test_revelation_requirement_is_not_extended_to_the_distinct_metal_water_rout
         (("庚子", "壬寅", "癸巳"), "丁巳", "戊午"),
     ],
 )
-def test_revelation_gate_is_a_role_rule_for_every_day_stem(base, revealed, hidden_only):
+def test_revelation_gate_is_a_role_rule_for_every_day_stem(
+    base, revealed: str, hidden_only: str
+) -> None:
+    revealed_month_use = {"丁未": "己未", "丙辰": "戊辰"}.get(base[1])
     for hour, expected in (
         (revealed, "requires_force_adjudication"),
         (hidden_only, "observable_prerequisite_not_met"),
     ):
-        selection = build_candidate_selection(
-            dict(zip(ORDER, map(tuple, (*base, hour))))
-        )
+        pillars = dict(zip(ORDER, map(tuple, (*base, hour))))
+        selection = build_candidate_selection(pillars)
+        if revealed_month_use is not None:
+            # 未 and 辰 need an actual month-use witness before helper checks.
+            assert all(r["id"] != "hurt_wealth_seal" for r in selection["paths"])
+            pillars["month"] = tuple(revealed_month_use)
+            selection = build_candidate_selection(pillars)
+        else:
+            pass
         row = next(r for r in selection["paths"] if r["id"] == "hurt_wealth_seal")
+        if revealed_month_use is not None:
+            assert row["month_use_match"] == {
+                "status": "matched",
+                "witness_ids": [f"month:revealed:{revealed_month_use[0]}"],
+                "pending_witness_ids": [],
+            }
+        else:
+            pass
         observations = {r["id"]: r for r in row["observed_conditions"]}
         assert row["status"] == expected
         assert observations["helper_presence:正财/偏财"]["status"] == "matched"
@@ -118,8 +137,8 @@ def test_revelation_gate_is_a_role_rule_for_every_day_stem(base, revealed, hidde
     [(0, "requires_force_adjudication"), (17, "observable_prerequisite_not_met")],
 )
 def test_revelation_precondition_matches_across_three_public_surfaces(
-    hour, status, surface_calls
-):
+    hour: int, status: str, surface_calls
+) -> None:
     spec = SPECS["bazi_birth"]
     # Fictional fully specified interface controls; source person identity is
     # not inferred from matching four pillars or this selected civil date.
@@ -169,5 +188,5 @@ def test_revelation_precondition_matches_across_three_public_surfaces(
         selection = value["bazi_birth"]["structure_profile"]["candidate_selection"]
         row = next(r for r in selection["paths"] if r["id"] == "hurt_wealth_seal")
         assert row["status"] == status
-        assert selection["method_id"] == "month_path_conditions_v4"
+        assert selection["method_id"] == "month_path_conditions_v5"
         assert row["formation_status"] == "not_adjudicated"

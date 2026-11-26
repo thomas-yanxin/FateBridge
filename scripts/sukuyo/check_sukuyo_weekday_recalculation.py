@@ -18,9 +18,11 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 if not __package__:
     sys.path.insert(0, str(ROOT / "src"))
+else:
+    pass
 
-from fatebridge.core import sukuyo_historical_calendar
-from fatebridge.core.sukuyo_weekday import (
+from fatebridge.core.sukuyo import sukuyo_historical_calendar
+from fatebridge.core.sukuyo.sukuyo_weekday import (
     RECALCULATION_SOURCE,
     civil_weekday,
     classical_mean_cycle_arithmetic,
@@ -34,6 +36,8 @@ def verify_recalculation(capture_dir: Path | None = None) -> dict[str, Any]:
     fixture = json.loads(FIXTURE.read_bytes())
     if json.loads(RECALCULATION_SOURCE.read_bytes()) != fixture["source"]:
         raise ValueError("Selected recalculation source changed")
+    else:
+        pass
     captures = []
     if capture_dir is not None:
         for row in fixture["captured_pages"]:
@@ -42,6 +46,8 @@ def verify_recalculation(capture_dir: Path | None = None) -> dict[str, Any]:
                 != row["sha256"]
             ):
                 raise ValueError("Manuscript image fingerprint changed")
+            else:
+                pass
             captures.append(row["file"])
         if (
             hashlib.sha256(
@@ -50,6 +56,10 @@ def verify_recalculation(capture_dir: Path | None = None) -> dict[str, Any]:
             != fixture["source"]["manifest_sha256"]
         ):
             raise ValueError("Manuscript manifest changed")
+        else:
+            pass
+    else:
+        pass
     mean_example = fixture["mean_example"]
     mean = classical_mean_cycle_arithmetic(mean_example["cycles"])
     solar_example = fixture["solar_example"]
@@ -91,6 +101,8 @@ def verify_recalculation(capture_dir: Path | None = None) -> dict[str, Any]:
     errors = [row["field"] for row in controls if row["computed"] != row["printed"]]
     if mean["nominal_days"] != mean_example["nominal_days"]:
         errors.append("nominal_days")
+    else:
+        pass
     # Independent source-table lookup by the text's lunar label, not by a date
     # selected to make the expected weekday fit.
     example = fixture["final_weekday_example"]
@@ -103,10 +115,14 @@ def verify_recalculation(capture_dir: Path | None = None) -> dict[str, Any]:
     ]
     if len(matching) != 1:
         raise ValueError("Printed lunar example has no unique NAOJ month label")
+    else:
+        pass
     civil = date.fromordinal(matching[0])
     weekday = civil_weekday(civil.isoformat(), "UTC+09:00")
     if weekday["luminary"] != example["printed_weekday"]:
         errors.append("one_lunar_label_weekday_control")
+    else:
+        pass
     accumulated = Fraction(example["printed_mean_accumulated_days"])
     quotient, remainder = divmod(accumulated, 7)
     candidate = example["quotient_reading"]
@@ -172,3 +188,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -1,13 +1,16 @@
 """Analytic controls and malformed-source refusal, independent of ephemeris fits."""
 
+import gzip
+import hashlib
+import json
 import math
 import struct
 from pathlib import Path
 
 import pytest
 
+from fatebridge.core.astro.chebyshev import chebyshev_kinematics
 from fatebridge.core.astro.jpl_kinematics import (
-    chebyshev_kinematics,
     checked_fixed_acceleration,
     source_kinematics,
 )
@@ -16,20 +19,50 @@ from fatebridge.utils.errors import EphemerisSourceError
 FIXTURE = Path(__file__).parents[1] / "data/astrodice/tables/de441-j2000.eph"
 
 
+def test_fixed_source_polynomials_preserve_raw_and_complete_unit_targets() -> None:
+    raw = (
+        Path(__file__).parents[1] / "data/chebyshev-source-controls-v1.json.gz"
+    ).read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == (
+        "483ecd7a4daf8ce84736b1bda302b6ee412a419fae472d75a187aa75dbd0d817"
+    )
+    reference = json.loads(gzip.decompress(raw))
+    assert reference["provenance"]["reference_before_candidate_outputs"]
+    assert len(reference["rows"]) == 4446
+    polynomials = {p["poly_id"]: p for p in reference["polynomials"]}
+    assert len(polynomials) == 342
+    for row in reference["rows"]:
+        polynomial = polynomials[row["poly_id"]]
+        result = chebyshev_kinematics(
+            [float.fromhex(v) for v in polynomial["coefficient_hex"]],
+            float.fromhex(row["x_hex"]),
+        )
+        assert [v.hex() for v in result.scaled()] == row["raw_expected_hex"], row[
+            "case_id"
+        ]
+        span = polynomial["width_days_exact"]
+        width = int(span["numerator"]) / int(span["denominator"])
+        au = polynomial["AU_divisor_hex"]
+        divisor = 1.0 if au is None else float.fromhex(au)
+        assert [v.hex() for v in result.scaled(2 / width, divisor)] == row[
+            "source_units_expected_hex"
+        ], row["case_id"]
+
+
 @pytest.mark.parametrize("x", [-1.0, -0.5, 0.0, 0.25, 1.0])
-def test_known_chebyshev_value_and_both_derivatives(x):
+def test_known_chebyshev_value_and_both_derivatives(x) -> None:
     # 2 + 3*T1 - 5*T2 + 7*T3, derived without the implementation.
     expected = (
         7 - 18 * x - 10 * x * x + 28 * x**3,
         -18 - 20 * x + 84 * x * x,
         -20 + 168 * x,
     )
-    assert chebyshev_kinematics([2, 3, -5, 7], x) == expected
+    assert chebyshev_kinematics([2, 3, -5, 7], x).scaled() == expected
 
 
 @pytest.mark.parametrize("c", [[4.0], [4.0, 3.0]])
-def test_constant_and_affine_have_zero_second_derivative(c):
-    result = chebyshev_kinematics(c, 0.25)
+def test_constant_and_affine_have_zero_second_derivative(c) -> None:
+    result = chebyshev_kinematics(c, 0.25).scaled()
     assert result[2] == 0
     assert result[1] == (0 if len(c) == 1 else 3)
 
@@ -37,13 +70,13 @@ def test_constant_and_affine_have_zero_second_derivative(c):
 @pytest.mark.parametrize(
     "c,x", [([], 0), ([math.nan], 0), ([1], math.nan), ([1], 1.01)]
 )
-def test_invalid_polynomial_is_rejected(c, x):
+def test_invalid_polynomial_is_rejected(c, x) -> None:
     with pytest.raises(EphemerisSourceError):
         chebyshev_kinematics(c, x)
 
 
 @pytest.mark.parametrize("angle", [0.0, 0.7, math.pi / 2])
-def test_two_vector_frame_recovers_known_proper_rotation(angle):
+def test_two_vector_frame_recovers_known_proper_rotation(angle) -> None:
     raw = [1.0, 0.2, 0.3, -0.004, 0.02, 0.003, -0.0003, 0.00002, 0.00001]
     c, s = math.cos(angle), math.sin(angle)
 
@@ -57,7 +90,7 @@ def test_two_vector_frame_recovers_known_proper_rotation(angle):
 
 
 @pytest.mark.parametrize("bad", ["length", "state", "collinear", "nan"])
-def test_rotation_does_not_normalize_away_a_changed_source(bad):
+def test_rotation_does_not_normalize_away_a_changed_source(bad: str) -> None:
     raw = [1, 0, 0, 0, 0.02, 0, -0.0003, 0, 0]
     native = [1, 0, 0, 0, 0.02, 0]
     if bad == "length":
@@ -73,7 +106,7 @@ def test_rotation_does_not_normalize_away_a_changed_source(bad):
 
 
 @pytest.mark.parametrize("body", ["Mercury", "Venus", "Earth", "Moon", "Sun", "Mars"])
-def test_selected_record_and_units_are_explicit(body):
+def test_selected_record_and_units_are_explicit(body: str) -> None:
     state, policy = source_kinematics(FIXTURE, 2451545.0, body)
     assert len(state) == 9 and all(math.isfinite(v) for v in state)
     assert policy["record_start"] <= 2451545.0 <= policy["record_end"]
@@ -83,10 +116,27 @@ def test_selected_record_and_units_are_explicit(body):
     assert policy["observational_accuracy_certified"] is False
 
 
+@pytest.mark.parametrize("body", ["Sun", "Mercury", "Earth", "Moon"])
+def test_original_source_complete_kinematics_round_after_earth_moon_combination(
+    body: str,
+) -> None:
+    reference = json.loads(
+        (Path(__file__).parents[1] / "data/source-kinematics-j2000-v1.json").read_text()
+    )
+    assert (
+        hashlib.sha256(FIXTURE.read_bytes()).hexdigest()
+        == reference["provenance"]["direct_file_sha256"]
+    )
+    state, _ = source_kinematics(FIXTURE, 2451545.0, body)
+    assert [v.hex() for v in state] == reference["source_kinematics"][body]
+
+
 @pytest.mark.parametrize(
     "problem", ["truncated", "nan_record", "wrong_grid", "outside", "unknown_body"]
 )
-def test_bad_sources_never_degrade_to_numerical_differences(tmp_path, problem):
+def test_bad_sources_never_degrade_to_numerical_differences(
+    tmp_path: Path, problem: str
+) -> None:
     path = tmp_path / "source.eph"
     data = bytearray(FIXTURE.read_bytes())
     epoch, body = 2451545.0, "Earth"
@@ -106,7 +156,9 @@ def test_bad_sources_never_degrade_to_numerical_differences(tmp_path, problem):
 
 
 @pytest.mark.parametrize("side", [-1, 0, 1])
-def test_wide_origin_preserves_one_ulp_before_a_record_boundary(tmp_path, side):
+def test_wide_origin_preserves_one_ulp_before_a_record_boundary(
+    tmp_path: Path, side
+) -> None:
     # Manufactured sparse address-layout test, not an astronomical reference.
     header = bytearray(FIXTURE.read_bytes()[:8144])
     start = -3000000.5

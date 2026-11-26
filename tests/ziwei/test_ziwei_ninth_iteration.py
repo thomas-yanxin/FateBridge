@@ -3,6 +3,8 @@
 import asyncio
 import json
 from copy import deepcopy
+from datetime import datetime
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -22,13 +24,14 @@ from fatebridge.services.metaphysics import (
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.birth_input import create_person_info
 from scripts.ziwei.audit_ziwei import FIXTURES, hko_rows
+from tests.support.transports import call_calculation
 
 MANIFEST = json.loads((FIXTURES / "clock_manifest.json").read_text())
 BIRTH = MANIFEST["cases"][0]["input"]
 TARGET = dict(target_year=2027, target_month=6, target_day=15, target_hour=12)
 
 
-def test_clock_receipts_keep_external_day_cells_and_unverified_age_boundary():
+def test_clock_receipts_keep_external_day_cells_and_unverified_age_boundary() -> None:
     r = audit.audit_clock_basis(hko_rows, FIXTURES)
     assert r["independent_input_cases"] == 9
     assert r["profile_receipts_checked"] == 18
@@ -39,7 +42,9 @@ def test_clock_receipts_keep_external_day_cells_and_unverified_age_boundary():
     assert all(all(x["checks"].values()) for x in r["civil_age_boundary_receipts"])
 
 
-def test_clock_audit_rejects_wrong_reference_date_instead_of_learning_it(monkeypatch):
+def test_clock_audit_rejects_wrong_reference_date_instead_of_learning_it(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = audit.calculate_ziwei_birth
 
     def wrong(*args, **kwargs):
@@ -51,7 +56,7 @@ def test_clock_audit_rejects_wrong_reference_date_instead_of_learning_it(monkeyp
     assert len(audit.audit_clock_basis(hko_rows, FIXTURES)["differences"]) == 18
 
 
-def test_clock_source_checksum_is_required(tmp_path):
+def test_clock_source_checksum_is_required(tmp_path: Path) -> None:
     (tmp_path / "clock_manifest.json").write_bytes(
         (FIXTURES / "clock_manifest.json").read_bytes()
     )
@@ -63,7 +68,7 @@ def test_clock_source_checksum_is_required(tmp_path):
         audit.audit_clock_basis(hko_rows, tmp_path)
 
 
-def test_solar_label_is_not_reinterpreted_as_a_different_seasonal_instant():
+def test_solar_label_is_not_reinterpreted_as_a_different_seasonal_instant() -> None:
     seed = _build_person_seed(
         create_person_info(
             birth_year=2024,
@@ -76,15 +81,18 @@ def test_solar_label_is_not_reinterpreted_as_a_different_seasonal_instant():
             gender="男",
         )
     )
-    assert seed.corrected_datetime.hour < 15
+    assert seed.clock.time_parts[0] < 15
     assert seed.calendar_context["current_solar_term"]["name"] == "立春"
     # Treating that solar label as a second civil instant gives a different
     # seasonal result. This is an invariant check, not a new term-time oracle.
-    previous, _ = get_adjacent_solar_terms(seed.corrected_datetime, seed.timezone)
+    solar_as_civil = datetime(*seed.clock.date_parts, *seed.clock.time_parts)
+    previous, _ = get_adjacent_solar_terms(solar_as_civil, seed.timezone)
     assert previous.name == "大寒"
 
 
-def test_cny_receipt_does_not_overwrite_calculated_chart_or_hide_date_difference():
+def test_cny_receipt_does_not_overwrite_calculated_chart_or_hide_date_difference() -> (
+    None
+):
     result = calculate_ziwei_birth(create_person_info(**BIRTH))
     chart, context = result["ziwei_birth"], result["analysis_context"]
     b = chart["calendar_basis"]
@@ -103,7 +111,7 @@ def test_cny_receipt_does_not_overwrite_calculated_chart_or_hide_date_difference
     assert not b["classical_clock_rule_verified"]
 
 
-def test_physical_prebirth_guard_and_current_civil_age_use_actual_endpoints():
+def test_physical_prebirth_guard_and_current_civil_age_use_actual_endpoints() -> None:
     person = create_person_info(**BIRTH)
     earlier = calculate_ziwei_horoscope(
         person,
@@ -133,12 +141,13 @@ def test_physical_prebirth_guard_and_current_civil_age_use_actual_endpoints():
 
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
-@pytest.mark.parametrize(
-    "key,path", [("ziwei_birth", "birth"), ("ziwei_horoscope", "horoscope")]
-)
+@pytest.mark.parametrize("key", ["ziwei_birth", "ziwei_horoscope"])
 def test_calendar_evidence_is_typed_and_equal_in_rest_native_mcp_cli(
-    profile, key, path, monkeypatch, capsys
-):
+    profile: str,
+    key: str,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -160,7 +169,7 @@ def test_calendar_evidence_is_typed_and_equal_in_rest_native_mcp_cli(
         response_char_limit=0,
     )
     rest = TestClient(api.app).post(
-        "/api/cn/ziwei/" + path,
+        spec.rest_path,
         json=inputs,
         params=[
             ("as_of", options["as_of"]),
@@ -173,12 +182,12 @@ def test_calendar_evidence_is_typed_and_equal_in_rest_native_mcp_cli(
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            return await client.call_tool(
-                key, {**inputs, **options}, raise_on_error=False
+            return await call_calculation(
+                client, spec.tool_name, {**inputs, **options}, raise_on_error=False
             )
 
     native = asyncio.run(call())
-    args = [key]
+    args = [spec.tool_name]
     for name, value in inputs.items():
         args += ["--" + name.replace("_", "-"), str(value)]
     args += [
@@ -210,6 +219,8 @@ def test_calendar_evidence_is_typed_and_equal_in_rest_native_mcp_cli(
             == "target_lunar_year_in_birth_timezone_minus_birth_civil_lunar_year_plus_one"
         )
         b = b["birth"]
+    else:
+        pass
     assert b["date_shift_days"] == 1
     assert b["placement_lunar_date"]["year"] == 1984
     assert b["civil_date_lunar_date"]["year"] == 1983

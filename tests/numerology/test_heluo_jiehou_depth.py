@@ -8,17 +8,19 @@ from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
+from pytest import MonkeyPatch
 
-from fatebridge.core import heluo_jiehou as jh
-from fatebridge.core.heluo import solar_term
-from fatebridge.core.heluo_hexagrams import _gua_tables
-from fatebridge.core.local_techniques.heluo import build_heluo_result
-from fatebridge.core.output_heluo_jiehou import (
+from fatebridge.core.contracts.output_heluo_jiehou import (
     HeluoJiehouEvidence,
     JiehouLiteral,
     JiehouNominalDay,
 )
+from fatebridge.core.heluo import heluo_jiehou as jh
+from fatebridge.core.heluo.heluo import solar_term
+from fatebridge.core.heluo.heluo_hexagrams import _gua_tables
+from fatebridge.core.local_techniques.heluo import build_heluo_result
 from fatebridge.utils.errors import NumerologySourceError
+from scripts.numerology import audit_numerology as audit
 
 ROOT = Path(__file__).parents[1] / "fixtures/heluo_jiehou_v1"
 REF = json.loads((ROOT / "reference.json").read_text())
@@ -38,7 +40,7 @@ def evidence(term="冬至", quarter="坎"):
     )
 
 
-def test_source_witnesses_and_reading_limits():
+def test_source_witnesses_and_reading_limits() -> None:
     for w in REF["images"]:
         assert (
             hashlib.sha256((ROOT / w["file"]).read_bytes()).hexdigest() == w["sha256"]
@@ -55,7 +57,7 @@ def test_source_witnesses_and_reading_limits():
 
 
 @pytest.mark.parametrize("expected", REF["term_rows"])
-def test_all_twenty_four_direct_term_assignments(expected):
+def test_all_twenty_four_direct_term_assignments(expected) -> None:
     row = jh.term_assignment(expected["term"])
     assert {k: row[k] for k in expected} == expected
     bits = {
@@ -68,18 +70,18 @@ def test_all_twenty_four_direct_term_assignments(expected):
 
 
 @pytest.mark.parametrize("simple,traditional", list(jh.ALIASES.items()))
-def test_named_aliases_preserve_the_same_primary_row(simple, traditional):
+def test_named_aliases_preserve_the_same_primary_row(simple, traditional) -> None:
     assert jh.term_assignment(simple) == jh.term_assignment(traditional)
 
 
 @pytest.mark.parametrize("name", [None, True, 0, "", "初候", "春分后五日"])
-def test_no_fuzzy_term_or_imputed_hou(name):
+def test_no_fuzzy_term_or_imputed_hou(name: bool | int | str | None) -> None:
     with pytest.raises(ValueError):
         jh.term_assignment(name)
 
 
 @pytest.mark.parametrize("expected", REF["hou_rows"])
-def test_all_seventy_two_literal_labels_are_preserved(expected):
+def test_all_seventy_two_literal_labels_are_preserved(expected) -> None:
     row = next(
         r
         for r in jh.literal_hou_table()
@@ -90,7 +92,7 @@ def test_all_seventy_two_literal_labels_are_preserved(expected):
     JiehouLiteral.model_validate(row)
 
 
-def test_four_polarity_differences_are_not_corrected_into_agreement():
+def test_four_polarity_differences_are_not_corrected_into_agreement() -> None:
     bad = [r for r in jh.literal_hou_table() if not r["yao_polarity_agrees"]]
     actual = [
         dict(
@@ -108,7 +110,7 @@ def test_four_polarity_differences_are_not_corrected_into_agreement():
             JiehouLiteral.model_validate({**row, "yao_polarity_agrees": True})
 
 
-def test_sixty_order_is_all_gua_except_the_four_term_bases():
+def test_sixty_order_is_all_gua_except_the_four_term_bases() -> None:
     order = jh._source()["gua_order"]
     assert order == REF["gua_order"] and len(order) == len(set(order)) == 60
     assert set(order) == set(_gua_tables()[0]) - {
@@ -121,7 +123,7 @@ def test_sixty_order_is_all_gua_except_the_four_term_bases():
 
 
 @pytest.mark.parametrize("row", REF["nominal_day_probes"])
-def test_independent_manual_nominal_slots(row):
+def test_independent_manual_nominal_slots(row) -> None:
     actual = jh.nominal_hou_day(row["offset"], model=CONTINUOUS)
     assert (actual["gua"], actual["position"]) == (row["gua"], row["pos"])
     assert actual["derived_only"] is True
@@ -129,7 +131,7 @@ def test_independent_manual_nominal_slots(row):
     JiehouNominalDay.model_validate(actual)
 
 
-def test_nominal_cycle_has_360_slots_and_does_not_become_365_civil_days():
+def test_nominal_cycle_has_360_slots_and_does_not_become_365_civil_days() -> None:
     rows = [jh.nominal_hou_day(n, model=CONTINUOUS) for n in range(360)]
     assert set(Counter(r["gua"] for r in rows).values()) == {6}
     assert Counter(r["position"] for r in rows) == {n: 60 for n in range(1, 7)}
@@ -138,13 +140,13 @@ def test_nominal_cycle_has_360_slots_and_does_not_become_365_civil_days():
 
 
 @pytest.mark.parametrize("offset", [True, False, -1, 360, 365, 0.0, "0", None])
-def test_no_silent_year_wrap_or_coercion(offset):
+def test_no_silent_year_wrap_or_coercion(offset) -> None:
     with pytest.raises(ValueError):
         jh.nominal_hou_day(offset, model=CONTINUOUS)
 
 
 @pytest.mark.parametrize("probe", MODEL_REF["probes"])
-def test_two_explicit_models_keep_distinct_independent_manual_slots(probe):
+def test_two_explicit_models_keep_distinct_independent_manual_slots(probe) -> None:
     for model, key in zip(MODEL_REF["models"], ("continuous", "caption_first")):
         actual = jh.nominal_hou_day(probe["offset"], model=model)
         assert (actual["gua"], actual["position"]) == (
@@ -154,7 +156,7 @@ def test_two_explicit_models_keep_distinct_independent_manual_slots(probe):
         assert actual["model"] == model
 
 
-def test_no_implicit_or_favorable_model_selection():
+def test_no_implicit_or_favorable_model_selection() -> None:
     with pytest.raises(TypeError):
         jh.nominal_hou_day(3)
     for model in (None, True, "best_fit", ""):
@@ -175,7 +177,7 @@ def test_no_implicit_or_favorable_model_selection():
         HeluoJiehouEvidence.model_validate(p)
 
 
-def test_printed_caption_conflicts_remain_in_the_actual_comparison():
+def test_printed_caption_conflicts_remain_in_the_actual_comparison() -> None:
     rows = jh.caption_comparison(model=CONTINUOUS)
     assert [r["printed"] for r in rows] == REF["caption"]["rows"]
     assert [r["derived"]["gua"] for r in rows] == REF["caption"][
@@ -186,7 +188,7 @@ def test_printed_caption_conflicts_remain_in_the_actual_comparison():
     assert all(r["printed"]["gua"] == "山雷頤" for r in rows)
 
 
-def test_fifteen_day_projection_does_not_rewrite_eleven_printed_positions():
+def test_fifteen_day_projection_does_not_rewrite_eleven_printed_positions() -> None:
     rows = jh.term_start_comparisons(model=CONTINUOUS)
     expected = [
         "大寒",
@@ -224,14 +226,16 @@ def test_fifteen_day_projection_does_not_rewrite_eleven_printed_positions():
         {"counts": {"nominal_gua_days": True}},
     ],
 )
-def test_typed_evidence_rejects_promoting_reconstruction_or_changing_context(patch):
+def test_typed_evidence_rejects_promoting_reconstruction_or_changing_context(
+    patch,
+) -> None:
     p = evidence()
     p.update(patch)
     with pytest.raises(ValidationError):
         HeluoJiehouEvidence.model_validate(p)
 
 
-def test_typed_views_allow_only_the_known_partial_facts():
+def test_typed_views_allow_only_the_known_partial_facts() -> None:
     HeluoJiehouEvidence.model_validate(dict(selected_term_gua=dict(position=2)))
     p = evidence()
     HeluoJiehouEvidence.model_validate(p)
@@ -250,7 +254,7 @@ def test_typed_views_allow_only_the_known_partial_facts():
         dict(precision="guessed"),
     ],
 )
-def test_inconsistent_computed_context_is_an_internal_source_fault(patch):
+def test_inconsistent_computed_context_is_an_internal_source_fault(patch) -> None:
     context = dict(
         term="冬至",
         quarter="坎",
@@ -263,7 +267,7 @@ def test_inconsistent_computed_context_is_an_internal_source_fault(patch):
     assert error.value.reason == "runtime_heluo_jiehou_context_conflict"
 
 
-def test_same_run_trace_snapshot_and_returned_rows_are_detached():
+def test_same_run_trace_snapshot_and_returned_rows_are_detached() -> None:
     r = build_heluo_result(
         date="2026-01-06", time="12:00", gender="男", use_true_solar_time=False
     )
@@ -282,7 +286,9 @@ def test_same_run_trace_snapshot_and_returned_rows_are_detached():
     assert jh.literal_hou_table()[5]["raw_yao"] == "初六"
 
 
-def test_every_hko_2026_term_brackets_the_named_term_gua_without_fixed_fifteen_days():
+def test_every_hko_2026_term_brackets_the_named_term_gua_without_fixed_fifteen_days() -> (
+    None
+):
     refs = json.loads((ROOT.parent / "calendar_hko_v1/reference.json").read_text())
     cases = [c for c in refs["cases"] if c["year"] == 2026]
     assert len(cases) == 24
@@ -307,8 +313,8 @@ def test_every_hko_2026_term_brackets_the_named_term_gua_without_fixed_fifteen_d
 
 @pytest.mark.parametrize("fault", ["missing", "literal_correction", "identity"])
 def test_source_digest_blocks_unversioned_literal_corrections(
-    fault, tmp_path, monkeypatch
-):
+    fault: str, tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     p = tmp_path / "source.json"
     if fault != "missing":
         data = json.loads(jh.SOURCE_PATH.read_text())
@@ -317,6 +323,8 @@ def test_source_digest_blocks_unversioned_literal_corrections(
         else:
             data["ruleset_id"] = "another_printing"
         p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
+    else:
+        pass
     jh._source.cache_clear()
     try:
         monkeypatch.setattr(jh, "SOURCE_PATH", p)
@@ -327,8 +335,9 @@ def test_source_digest_blocks_unversioned_literal_corrections(
         jh._source.cache_clear()
 
 
-def test_audit_rejects_selecting_the_caption_fitting_model(monkeypatch):
-    from scripts.numerology import audit_numerology as audit
+def test_audit_rejects_selecting_the_caption_fitting_model(
+    monkeypatch: MonkeyPatch,
+) -> None:
 
     original = jh.jiehou_evidence
 
@@ -343,8 +352,9 @@ def test_audit_rejects_selecting_the_caption_fitting_model(monkeypatch):
     assert {"kind": "heluo_jiehou_unestablished_model_or_date"} in result["failures"]
 
 
-def test_audit_rejects_erasing_literal_polarity_differences(monkeypatch):
-    from scripts.numerology import audit_numerology as audit
+def test_audit_rejects_erasing_literal_polarity_differences(
+    monkeypatch: MonkeyPatch,
+) -> None:
 
     original = jh.literal_hou_table
 
@@ -361,8 +371,9 @@ def test_audit_rejects_erasing_literal_polarity_differences(monkeypatch):
     assert {"kind": "heluo_jiehou_literal_polarity_differences"} in result["failures"]
 
 
-def test_audit_rejects_omitting_the_model_with_caption_differences(monkeypatch):
-    from scripts.numerology import audit_numerology as audit
+def test_audit_rejects_omitting_the_model_with_caption_differences(
+    monkeypatch: MonkeyPatch,
+) -> None:
 
     original = jh.jiehou_evidence
 
@@ -380,7 +391,7 @@ def test_audit_rejects_omitting_the_model_with_caption_differences(monkeypatch):
 @pytest.mark.parametrize(
     "fault", ["duplicated", "mixed_start", "wrong_term", "partial_wrong_position"]
 )
-def test_typed_models_preserve_model_coverage_and_term_context(fault):
+def test_typed_models_preserve_model_coverage_and_term_context(fault: str) -> None:
     p = evidence()
     if fault == "duplicated":
         p["reconstruction_models"] = [p["reconstruction_models"][1]] * 2

@@ -7,12 +7,12 @@ import zipfile
 from fractions import Fraction
 from pathlib import Path
 
-from fatebridge.core.lilly_fortitudes import (
+from fatebridge.core.astro.lilly_fortitudes import (
     MEAN_MOTION_ARCSECONDS,
     ROW_SPECS,
     evaluate_fortitudes,
 )
-from fatebridge.core.output_western import LillyFortitudes
+from fatebridge.core.contracts.output_western import LillyFortitudes
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE_SHA256 = "31a64976c3ca8650de975cf53cf76972741788dc81f51021278087f8ef962f6e"
@@ -90,6 +90,8 @@ def audit():
         if row["code"] == "F17":
             assert row["condition"] == "regulus_within_five_degrees"
             row["condition"] = correction["corrected_rows"]["F17"]["condition"]
+        else:
+            pass
     assert actual_rows == frozen_rows and len(actual_rows) == 41
     assert MEAN_MOTION_ARCSECONDS == reference["mean_daily_motion_arcseconds"]
     states, inputs = worked_inputs(reference)
@@ -183,3 +185,5 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

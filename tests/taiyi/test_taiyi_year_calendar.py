@@ -4,7 +4,8 @@ import asyncio
 import hashlib
 import json
 import shutil
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -14,23 +15,29 @@ import fatebridge.api as api
 from fatebridge.application.examples import suggested_fields
 from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_chinese import Taiyi
 from fatebridge.core.metaphysics.taiyi import build_taiyi_board
 from fatebridge.core.metaphysics.taiyi_year_calendar import (
     DEFAULT_YEAR_PROFILE,
     HISTORICAL_YEAR_PROFILE,
     historical_year_context,
 )
-from fatebridge.core.output_chinese import Taiyi
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_year_calendar import CORPUS, audit, public_case
 from tests.support.reference_data import resolve
-from tests.taiyi.test_taiyi_periods import seed_at
-from tests.taiyi.test_taiyi_transports import _same_run_payload
+from tests.support.transports import SPECS, call_calculation
+from tests.unit_test.fixtures.taiyi import (
+    historical_year_payload,
+    same_run_payload,
+    seed_at,
+)
 
 
-def test_complete_printed_cohort_and_classical_example_have_separate_denominators():
+def test_complete_printed_cohort_and_classical_example_have_separate_denominators() -> (
+    None
+):
     r = audit()
     assert r["required_month_start_anchors"] == r["matching_month_start_anchors"] == 63
     assert r["complete_month_intervals"] == 62
@@ -59,7 +66,7 @@ def test_complete_printed_cohort_and_classical_example_have_separate_denominator
         ("0385-01-28", 385),
     ],
 )
-def test_each_historical_year_boundary_on_real_public_chain(d, y):
+def test_each_historical_year_boundary_on_real_public_chain(d: str, y: int) -> None:
     start = date.fromisoformat(d)
     r = public_case(start.year, start.month, start.day)
     b = r["taiyi"]
@@ -81,7 +88,9 @@ def test_each_historical_year_boundary_on_real_public_chain(d, y):
 
 
 @pytest.mark.parametrize("d,m", [("0382-10-25", 9), ("0385-06-25", 5)])
-def test_original_bold_repeated_month_is_leap_not_a_renumbered_month(d, m):
+def test_original_bold_repeated_month_is_leap_not_a_renumbered_month(
+    d: str, m: int
+) -> None:
     start = date.fromisoformat(d)
     a = historical_year_context(start)
     b = historical_year_context(start - timedelta(days=1))
@@ -90,7 +99,7 @@ def test_original_bold_repeated_month_is_leap_not_a_renumbered_month(d, m):
     assert a["year"] == b["year"]
 
 
-def test_same_julian_label_mistaken_as_gregorian_changes_the_annual_ju():
+def test_same_julian_label_mistaken_as_gregorian_changes_the_annual_ju() -> None:
     good = public_case(385, 1, 28)["taiyi"]
     wrong = public_case(385, 1, 27)["taiyi"]
     assert (
@@ -105,7 +114,9 @@ def test_same_julian_label_mistaken_as_gregorian_changes_the_annual_ju():
     assert good["calendar_rules"]["input_calendar"] == "proleptic_gregorian"
 
 
-def test_historical_year_is_not_replaced_by_solar_pillar_year_or_corrected_day():
+def test_historical_year_is_not_replaced_by_solar_pillar_year_or_corrected_day() -> (
+    None
+):
     r = calculate_taiyi_analysis(
         analysis_year=385,
         analysis_month=1,
@@ -125,7 +136,7 @@ def test_historical_year_is_not_replaced_by_solar_pillar_year_or_corrected_day()
     assert r["calendar_context"]["lunar_calendar"] is None
 
 
-def test_original_annual_default_and_explicit_default_are_unchanged():
+def test_original_annual_default_and_explicit_default_are_unchanged() -> None:
     a = calculate_taiyi_analysis(
         analysis_year=2026,
         analysis_month=4,
@@ -154,7 +165,7 @@ def test_original_annual_default_and_explicit_default_are_unchanged():
 
 
 @pytest.mark.parametrize("d", ["0381-02-10", "0386-02-16", "1561-10-20", "2026-04-04"])
-def test_historical_profile_never_extrapolates_or_falls_back(d):
+def test_historical_profile_never_extrapolates_or_falls_back(d: str) -> None:
     day = date.fromisoformat(d)
     with pytest.raises(ValueError, match="仅覆盖"):
         historical_year_context(day)
@@ -163,8 +174,7 @@ def test_historical_profile_never_extrapolates_or_falls_back(d):
 
 
 @pytest.mark.parametrize("profile", [True, False, 12, {}, [], "unknown"])
-def test_invalid_profile_fails_as_domain_validation(profile):
-    from datetime import datetime
+def test_invalid_profile_fails_as_domain_validation(profile) -> None:
 
     with pytest.raises(ValueError, match="year_profile"):
         build_taiyi_board(
@@ -172,7 +182,7 @@ def test_invalid_profile_fails_as_domain_validation(profile):
         )
 
 
-def test_each_historical_fact_is_projection_safe_and_typed():
+def test_each_historical_fact_is_projection_safe_and_typed() -> None:
     b = public_case()["taiyi"]
     for key in b["calendar_rules"]["historical_calendar"]:
         field = "taiyi.calendar_rules.historical_calendar." + key
@@ -183,7 +193,9 @@ def test_each_historical_fact_is_projection_safe_and_typed():
 
 
 @pytest.mark.parametrize("attempt", ["drop_month", "drop_raw_counter", "change_image"])
-def test_entire_cohort_and_original_scans_cannot_be_reduced(tmp_path, attempt):
+def test_entire_cohort_and_original_scans_cannot_be_reduced(
+    tmp_path: Path, attempt: str
+) -> None:
     c = tmp_path / "v12"
     shutil.copytree(CORPUS, c)
     manifest_path = c / "manifest.json"
@@ -196,6 +208,8 @@ def test_entire_cohort_and_original_scans_cannot_be_reduced(tmp_path, attempt):
         with pytest.raises(ValueError, match="指纹"):
             audit(c)
         return
+    else:
+        pass
     p = c / "month-starts.json"
     data = json.loads(p.read_text())
     if attempt == "drop_month":
@@ -206,34 +220,11 @@ def test_entire_cohort_and_original_scans_cannot_be_reduced(tmp_path, attempt):
     for row in manifest["source_files"]:
         if row["file"] == p.name:
             row["sha256"] = hashlib.sha256(p.read_bytes()).hexdigest()
+        else:
+            pass
     manifest_path.write_text(json.dumps(manifest))
     with pytest.raises(ValueError, match="完整五年.*63"):
         audit(c)
-
-
-def payload(key, day="0385-07-01", mode="year"):
-    if key == "taiyi":
-        d = date.fromisoformat(day)
-        return {
-            "analysis_year": d.year,
-            "analysis_month": d.month,
-            "analysis_day": d.day,
-            "analysis_hour": 12,
-            "analysis_timezone": "+08:00",
-            "use_true_solar_time": False,
-            "calculation_mode": mode,
-            "year_profile": HISTORICAL_YEAR_PROFILE,
-        }
-    return {
-        "date": day,
-        "time": "12:00:00",
-        "zone": "+08:00",
-        "use_true_solar_time": False,
-        "taiyi_options": {
-            "calculation_mode": mode,
-            "year_profile": HISTORICAL_YEAR_PROFILE,
-        },
-    }
 
 
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
@@ -241,19 +232,25 @@ def payload(key, day="0385-07-01", mode="year"):
     "day,expected_year", [("0385-01-27", 384), ("0385-01-28", 385)]
 )
 def test_historical_year_source_facts_match_real_rest_mcp_cli(
-    monkeypatch, capsys, key, day, expected_year
-):
-    p = payload(key, day)
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    key: str,
+    day: str,
+    expected_year: int,
+) -> None:
+    p = historical_year_payload(key, day)
     fields = ["taiyi.calendar_rules", "taiyi.core_board", "snapshot_text"]
     if key == "sanshiunited":
         fields += ["synthesis.limitations"]
+    else:
+        pass
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
         "API_KEY_AUTHENTICATOR",
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
-    route = "/api/cn/taiyi" if key == "taiyi" else "/api/divination/sanshiunited"
+    route = "/api/taiyi" if key == "taiyi" else "/api/divination/sanshi"
     rest = TestClient(api.app).post(
         route,
         json=p,
@@ -267,8 +264,9 @@ def test_historical_year_source_facts_match_real_rest_mcp_cli(
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            r = await client.call_tool(
-                key,
+            r = await call_calculation(
+                client,
+                SPECS[key].tool_name,
                 {
                     **p,
                     "fields": fields,
@@ -280,7 +278,7 @@ def test_historical_year_source_facts_match_real_rest_mcp_cli(
             return r.structured_content
 
     mcp = asyncio.run(invoke())
-    args = [key]
+    args = [SPECS[key].tool_name]
     for k, v in p.items():
         args += [
             "--" + k.replace("_", "-"),
@@ -295,30 +293,37 @@ def test_historical_year_source_facts_match_real_rest_mcp_cli(
     assert mcp["taiyi"]["calendar_rules"]["year"] == expected_year
     if key == "sanshiunited":
         assert "未认证三式共同古历" in mcp["synthesis"]["limitations"][0]
+    else:
+        pass
 
 
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 @pytest.mark.parametrize("mode", ["month", "day", "hour"])
 def test_year_profile_wrong_mode_is_rejected_on_actual_transports(
-    monkeypatch, capsys, key, mode
-):
-    p = payload(key, mode=mode)
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    key: str,
+    mode: str,
+) -> None:
+    p = historical_year_payload(key, mode=mode)
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
         "API_KEY_AUTHENTICATOR",
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
-    route = "/api/cn/taiyi" if key == "taiyi" else "/api/divination/sanshiunited"
+    route = "/api/taiyi" if key == "taiyi" else "/api/divination/sanshi"
     r = TestClient(api.app).post(route, json=p)
     assert r.status_code == 400
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(key, p, raise_on_error=False)
+            return await call_calculation(
+                client, SPECS[key].tool_name, p, raise_on_error=False
+            )
 
     assert asyncio.run(invoke()).is_error
-    args = [key]
+    args = [SPECS[key].tool_name]
     for k, v in p.items():
         args += [
             "--" + k.replace("_", "-"),
@@ -331,23 +336,24 @@ def test_year_profile_wrong_mode_is_rejected_on_actual_transports(
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 @pytest.mark.parametrize("day", ["0385-01-27", "0385-01-28"])
 def test_published_historical_year_first_view_keeps_source_and_limitations_inline(
-    key, day
-):
+    key: str, day: str
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     fields = suggested_fields(spec, view="historical_year_calendar")
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            r = await client.call_tool(
-                key,
+            r = await call_calculation(
+                client,
+                SPECS[key].tool_name,
                 {
-                    **payload(key, day),
+                    **historical_year_payload(key, day),
                     "fields": fields,
                     "strict_fields": True,
                     "include_snapshot_text": False,
                 },
             )
-            return await _same_run_payload(client, r)
+            return await same_run_payload(client, r)
 
     r = asyncio.run(invoke())
     b = r["taiyi"]

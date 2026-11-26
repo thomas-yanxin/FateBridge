@@ -20,7 +20,7 @@ from fatebridge.services.metaphysics import (
     calculate_jinkou_analysis,
     calculate_liureng_gods,
 )
-from tests.ren.test_ren_classical_depth import AUDIT as V1
+from scripts.ren import audit_ren_classical
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -39,7 +39,7 @@ def rows(elements):
     ]
 
 
-def test_depth_audit_counts_unique_boards_and_preserves_contradictions():
+def test_depth_audit_counts_unique_boards_and_preserves_contradictions() -> None:
     report = AUDIT.audit()
     assert report["implemented_excerpt_checks_passed"]
     assert len(report["checks"]) == 39  # 12 strength, 20 starts, 4 placements, 3 ties.
@@ -72,15 +72,17 @@ def test_depth_audit_counts_unique_boards_and_preserves_contradictions():
 
 
 @pytest.mark.parametrize("case", REFERENCE["jinkou-internal"]["cases"])
-def test_twelve_explicit_internal_strength_examples(case):
+def test_twelve_explicit_internal_strength_examples(case) -> None:
     strength = internal_strength(rows(case["elements"]))
     assert strength["anchor_element"] == case["anchor"]
     assert strength["powers"]["贵神"] == case["god_power"]
     assert strength["status"] == "resolved_excerpt"
 
 
-def test_seasonal_and_internal_powers_are_independent_and_traced():
-    board = V1.observe_jinkou(V1.load_frozen_corpus()["cases"]["cases"][0])
+def test_seasonal_and_internal_powers_are_independent_and_traced() -> None:
+    board = audit_ren_classical.observe_jinkou(
+        audit_ren_classical.load_frozen_corpus()["cases"]["cases"][0]
+    )
     assert [r["seasonal_power"] for r in board["rows"]] == ["相", "休", "休", "囚"]
     assert [r["internal_power"] for r in board["rows"]] == ["死", "旺", "旺", "休"]
     assert all("power" not in r for r in board["rows"])
@@ -93,7 +95,7 @@ def test_seasonal_and_internal_powers_are_independent_and_traced():
     )
 
 
-def test_multiple_uncontrolled_phases_do_not_invent_a_strongest_or_use_rule():
+def test_multiple_uncontrolled_phases_do_not_invent_a_strongest_or_use_rule() -> None:
     strength = internal_strength(rows("木火木火"))
     assert strength["candidate_elements"] == ["木", "火"]
     assert strength["anchor_element"] is None
@@ -107,7 +109,7 @@ def test_multiple_uncontrolled_phases_do_not_invent_a_strongest_or_use_rule():
 @pytest.mark.parametrize(
     "calculate", [calculate_liureng_gods, calculate_jinkou_analysis]
 )
-def test_independent_solar_correction_crosses_a_real_hour_boundary(calculate):
+def test_independent_solar_correction_crosses_a_real_hour_boundary(calculate) -> None:
     # NOAA's Meeus spreadsheet formula at 2026-04-04T12:57Z gives EoT
     # -2.946410 min; longitude 121.5E adds 6 min => +3.053590 min.
     # Thus apparent time passes 21:00; the old seasonal sinusoid missed it.
@@ -131,18 +133,20 @@ def test_independent_solar_correction_crosses_a_real_hour_boundary(calculate):
     assert result["four_pillars"]["hour"] == {"stem": "癸", "branch": "亥"}
     if "jinkou" in result:
         assert result["jinkou"]["overview"]["di_fen"] == "亥"
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
     "bad_rows", [[], rows("木火土"), rows("木火土X"), [rows("木火土金")[0]] * 4]
 )
-def test_invalid_four_positions_are_rejected(bad_rows):
+def test_invalid_four_positions_are_rejected(bad_rows) -> None:
     with pytest.raises(ValueError):
         internal_strength(bad_rows)
 
 
-def test_noble_profiles_change_only_the_da_liuren_gods():
-    seed = V1.make_seed(dict(day="甲辰", hour="卯"))
+def test_noble_profiles_change_only_the_da_liuren_gods() -> None:
+    seed = audit_ren_classical.make_seed(dict(day="甲辰", hour="卯"))
     common = build_liureng_board(seed, month_general_override="亥")
     source = build_liureng_board(
         seed, month_general_override="亥", guiren_profile="tanyuan_xieji_v1"
@@ -166,17 +170,20 @@ def test_noble_profiles_change_only_the_da_liuren_gods():
 @pytest.mark.parametrize(
     "model", [LiuRengGodsRequest, LiuRengRunyearRequest, JinkouAnalysisRequest]
 )
-def test_unknown_noble_profile_cannot_fall_back_to_another_school(model):
+def test_unknown_noble_profile_cannot_fall_back_to_another_school(model) -> None:
     with pytest.raises(ValidationError):
         model.model_validate(dict(guiren_profile="whatever"))
     with pytest.raises(ValueError, match="配置"):
         build_liureng_board(
-            V1.make_seed(dict(day="甲子", hour="午")), guiren_profile="whatever"
+            audit_ren_classical.make_seed(dict(day="甲子", hour="午")),
+            guiren_profile="whatever",
         )
 
 
 @pytest.mark.parametrize("change", ["labels", "missing", "extra"])
-def test_v2_freeze_rejects_drift_without_changing_v1(tmp_path, change):
+def test_v2_freeze_rejects_drift_without_changing_v1(
+    tmp_path: Path, change: str
+) -> None:
     target = tmp_path / "reference"
     shutil.copytree(AUDIT.CORPUS, target)
     if change == "labels":
@@ -190,11 +197,11 @@ def test_v2_freeze_rejects_drift_without_changing_v1(tmp_path, change):
         (target / "hidden.json").write_text("{}")
     with pytest.raises(ValueError, match="Reference"):
         AUDIT.load_reference(target)
-    assert V1.load_frozen_corpus()["cases"]["unresolved"]
+    assert audit_ren_classical.load_frozen_corpus()["cases"]["unresolved"]
 
 
 @pytest.mark.parametrize("name", ["collation.json", "selected-pages.pdf"])
-def test_scan_evidence_cannot_silently_change(tmp_path, name):
+def test_scan_evidence_cannot_silently_change(tmp_path: Path, name: str) -> None:
     target = tmp_path / "scan"
     shutil.copytree(AUDIT.SCAN_CORPUS, target)
     path = target / name

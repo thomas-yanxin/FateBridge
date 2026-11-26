@@ -30,7 +30,7 @@ store = _shared_store
 
 
 @pytest.mark.parametrize("view", ["roots", "stem_roots"])
-def test_published_root_views_match_three_protocols(view, surface_calls):
+def test_published_root_views_match_three_protocols(view: str, surface_calls) -> None:
     spec = SPECS["timing_analysis"]
     fields = suggested_fields(spec, view=view)
     options = dict(
@@ -66,7 +66,7 @@ def test_published_root_views_match_three_protocols(view, surface_calls):
 
 def test_bounded_first_view_retains_full_same_run_and_snapshot_uses_root_receipt(
     rest, store
-):
+) -> None:
     spec = SPECS["timing_analysis"]
     response = rest.post(
         spec.rest_path,

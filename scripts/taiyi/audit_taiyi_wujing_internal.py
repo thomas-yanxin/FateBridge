@@ -20,13 +20,19 @@ def verify(corpus: Path = CORPUS) -> dict[str, Any]:
 
     if sha(corpus / "freeze.json") != FREEZE_SHA:
         raise ValueError("武经书内算路冻结指纹不符")
+    else:
+        pass
     frozen = json.loads((corpus / "freeze.json").read_text())
     for name, expected in frozen["files"].items():
         if Path(name).name != name or sha(corpus / name) != expected:
             raise ValueError(f"武经书内算路来源指纹不符：{name}")
+        else:
+            pass
     for name, expected in frozen["source_pins"].items():
         if sha(ROOT / name) != expected:
             raise ValueError(f"武经既有来源与原报告指纹不符：{name}")
+        else:
+            pass
     data = {
         key: json.loads((corpus / filename).read_text())
         for key, filename in {
@@ -45,24 +51,38 @@ def verify(corpus: Path = CORPUS) -> dict[str, Any]:
         or any(set(r["camps"]) != {"main", "guest"} for r in rows)
     ):
         raise ValueError("武经144局288个原两算槽位不得减删")
+    else:
+        pass
     return data
 
 
 def name_position(literal: Any, profile: dict[str, Any], hypothesis: str) -> str | None:
     if hypothesis not in HYPOTHESES:
         raise ValueError("未预登记的名位假设")
+    else:
+        pass
     if not isinstance(literal, str):
         return None
+    else:
+        pass
     normalized = literal.translate(str.maketrans(profile["glyph_only_normalization"]))
     candidates = [e for e in profile["entries"] if normalized.startswith(e["name"])]
     if len(candidates) != 1:
         return None
+    else:
+        pass
     entry = candidates[0]
     if hypothesis == "swap_only_yin_yang_de":
         if entry["name"] == "陰德":
             return "乾"
+        else:
+            pass
         if entry["name"] == "陽德":
             return "丑"
+        else:
+            pass
+    else:
+        pass
     return str(entry["position"])
 
 
@@ -73,14 +93,20 @@ def count_trace(
     points = reference["points_in_declared_forward_order"]
     if start not in points or stop not in reference["palace_numbers"]:
         return {"value": None, "reason": "source_position_unknown", "steps": []}
+    else:
+        pass
     if start == stop:
         return {"value": None, "reason": "same_start_stop_unadjudicated", "steps": []}
+    else:
+        pass
     index = points.index(start)
     steps = []
     for offset in range(16):
         position = points[(index + offset) % 16]
         if position == stop:
             break
+        else:
+            pass
         weight = reference["palace_numbers"].get(position, 1 if offset == 0 else 0)
         steps.append({"position": position, "value": weight})
     return {
@@ -147,6 +173,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         }
         if len(rows) != 288 or len({(r["id"], r["camp"]) for r in rows}) != 288:
             raise ValueError("武经两算完整分母不符")
+        else:
+            pass
         hypotheses.append(
             {
                 "hypothesis": hypothesis,
@@ -226,3 +254,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

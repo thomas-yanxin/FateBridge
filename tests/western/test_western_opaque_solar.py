@@ -24,7 +24,14 @@ from fatebridge.core.astro.time_scales import ut1_from_tt
 from fatebridge.services.astrology import calculate_core_chart_analysis
 from fatebridge.utils.errors import EphemerisSourceError
 from scripts.western.audit_western_reference_points import audit_opaque_solar_positions
-from tests.support.transports import SPECS, business, native, rest, surface_calls
+from tests.support.transports import (
+    SPECS,
+    business,
+    cached_output_validator,
+    native,
+    rest,
+    surface_calls,
+)
 
 DATA = Path(__file__).parents[1] / "data/astro/mercury-opaque-solar"
 ORIGINAL = (
@@ -63,7 +70,7 @@ def separation(a, b):
 
 
 @pytest.mark.local_data
-def test_original_7070_pairs_all_frames_keep_original_tolerance_and_reference():
+def test_original_7070_pairs_all_frames_keep_original_tolerance_and_reference() -> None:
     assert hashlib.sha256(ORIGINAL.read_bytes()).hexdigest() == ORIGINAL_SHA
     result = audit_opaque_solar_positions()
     assert result["body_epoch_pairs"] == result["expected_body_epoch_pairs"] == 7070
@@ -76,7 +83,7 @@ def test_original_7070_pairs_all_frames_keep_original_tolerance_and_reference():
 
 
 @pytest.mark.local_data
-def test_original_native_transparent_sun_mismatch_is_not_relabelled_as_pass():
+def test_original_native_transparent_sun_mismatch_is_not_relabelled_as_pass() -> None:
     corpus = json.loads(ORIGINAL.read_text())
     row = corpus["cases"][1]["rows"]["Mercury"][477]
     tt = row["julian_day_tt"]
@@ -99,7 +106,9 @@ def test_original_native_transparent_sun_mismatch_is_not_relabelled_as_pass():
 
 
 @pytest.mark.local_data
-def test_paired_jpl_observer_and_lt_stellar_raw_prove_opaque_policy_without_production():
+def test_paired_jpl_observer_and_lt_stellar_raw_prove_opaque_policy_without_production() -> (
+    None
+):
     observer_header, observer = source_rows("mercury-opacity")
     vector_header, vectors = source_rows("mercury-lt-stellar-vector")
     solar_header, solar = source_rows("sun-radius")
@@ -127,7 +136,9 @@ def test_paired_jpl_observer_and_lt_stellar_raw_prove_opaque_policy_without_prod
 
 
 @pytest.mark.local_data
-def test_nine_additional_horizons_visibility_controls_keep_full_exterior_deflection():
+def test_nine_additional_horizons_visibility_controls_keep_full_exterior_deflection() -> (
+    None
+):
     _, observer = source_rows("mercury-opacity")
     _, vectors = source_rows("mercury-lt-stellar-vector")
     for row, vector in zip(observer, vectors, strict=True):
@@ -155,10 +166,12 @@ def test_nine_additional_horizons_visibility_controls_keep_full_exterior_deflect
                 )
                 > 0.28
             )
+        else:
+            pass
 
 
 @pytest.mark.local_data
-def test_nine_offgrid_horizons_holdout_epochs_keep_original_numerical_line():
+def test_nine_offgrid_horizons_holdout_epochs_keep_original_numerical_line() -> None:
     _, observer = source_rows("mercury-offgrid-holdout")
     corpus = json.loads(ORIGINAL.read_text())
     original_epochs = {
@@ -184,7 +197,9 @@ def test_nine_offgrid_horizons_holdout_epochs_keep_original_numerical_line():
 
 @pytest.mark.local_data
 @pytest.mark.parametrize("body,target", [("Uranus", 7), ("Neptune", 8), ("Pluto", 9)])
-def test_outer_system_positions_against_two_year_daily_horizons_reference(body, target):
+def test_outer_system_positions_against_two_year_daily_horizons_reference(
+    body: str, target: int
+) -> None:
     directory = DATA.parent / "outer-opaque-solar"
     raw_provenance = (directory / "provenance.json").read_bytes()
     assert hashlib.sha256(raw_provenance).hexdigest() == (
@@ -229,7 +244,7 @@ def test_outer_system_positions_against_two_year_daily_horizons_reference(body, 
         math.nextafter(float(opaque_solar.SOLAR_RADIUS_AU), math.inf),
     ],
 )
-def test_limb_geometry_uses_exact_supplied_values_without_epsilon(height):
+def test_limb_geometry_uses_exact_supplied_values_without_epsilon(height) -> None:
     with localcontext() as context:
         context.prec = 100
         radius = Decimal(695700000) / Decimal(149597870700)
@@ -242,7 +257,9 @@ def test_limb_geometry_uses_exact_supplied_values_without_epsilon(height):
     )
 
 
-def test_finite_ray_does_not_occult_a_foreground_target_or_a_sun_behind_observer():
+def test_finite_ray_does_not_occult_a_foreground_target_or_a_sun_behind_observer() -> (
+    None
+):
     assert opaque_solar.opaque_solar_intersection(
         [1.0, 0.0, 0.0], [-1.0, 0.0, 0.0], [0.0, 0.0, 0.0]
     )
@@ -255,7 +272,7 @@ def test_finite_ray_does_not_occult_a_foreground_target_or_a_sun_behind_observer
 
 
 @pytest.mark.local_data
-def test_real_retarded_bracket_satisfies_independent_decimal_light_cone():
+def test_real_retarded_bracket_satisfies_independent_decimal_light_cone() -> None:
     actual = opaque_solar.opaque_solar_positions(2460398.8333333335, ["Venus"])
     position = actual["positions"][0]
     proof = position["light_time_solution"]
@@ -291,8 +308,8 @@ def test_real_retarded_bracket_satisfies_independent_decimal_light_cone():
 
 
 def test_named_model_rejects_unavailable_barycentric_source_without_native_fallback(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     with pytest.raises(EphemerisSourceError):
         opaque_solar.opaque_solar_positions(2459892.375, ["Mercury"])
@@ -300,7 +317,9 @@ def test_named_model_rejects_unavailable_barycentric_source_without_native_fallb
 
 @pytest.mark.parametrize("flag", ["FLG_ICRS", "FLG_SPEED"])
 @pytest.mark.local_data
-def test_coordinate_contract_fault_remains_explicit(flag, monkeypatch):
+def test_coordinate_contract_fault_remains_explicit(
+    flag: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     original = opaque_solar.runtime.ephemeris_call
 
     def fault(*args, **kwargs):
@@ -328,8 +347,8 @@ PAYLOAD = dict(
 
 
 def test_missing_optional_erfa_is_a_clear_503_on_actual_transports(
-    monkeypatch, tmp_path, surface_calls
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, surface_calls
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.setattr(opaque_solar, "find_spec", lambda name: None)
     spec = SPECS["astro_chart"]
@@ -344,8 +363,8 @@ def test_missing_optional_erfa_is_a_clear_503_on_actual_transports(
 @pytest.mark.parametrize("zodiacal", [0, 1])
 @pytest.mark.local_data
 def test_default_native_chart_remains_identical_and_new_layer_is_not_mixed_into_aspects(
-    zodiacal,
-):
+    zodiacal: int,
+) -> None:
     payload = {**PAYLOAD, "zodiacal": zodiacal}
     default = calculate_core_chart_analysis(**payload)
     explicit = calculate_core_chart_analysis(**payload, apparent_model="native")
@@ -367,7 +386,9 @@ def test_default_native_chart_remains_identical_and_new_layer_is_not_mixed_into_
 
 
 @pytest.mark.local_data
-def test_explicit_model_and_schema_on_actual_rest_fastmcp_and_cli(surface_calls):
+def test_explicit_model_and_schema_on_actual_rest_fastmcp_and_cli(
+    surface_calls,
+) -> None:
     spec = SPECS["astro_chart"]
     request = {**PAYLOAD, "apparent_model": "opaque_solar"}
     fields = ["apparent_model_positions", "planets", "chart_profile.julian_day_tt"]
@@ -401,6 +422,8 @@ def test_explicit_model_and_schema_on_actual_rest_fastmcp_and_cli(surface_calls)
     }
     if selected_file:
         assert [entry["filename"] for entry in source["files"]] == [selected_file]
+    else:
+        pass
     expected_flag = 1 if selected_file else 2
     assert all(
         flag & 7 == expected_flag
@@ -411,7 +434,7 @@ def test_explicit_model_and_schema_on_actual_rest_fastmcp_and_cli(surface_calls)
     mercury = next(row for row in layer["positions"] if row["body"] == "Mercury")
     assert mercury["solar_disc_intercepted"] and not mercury["solar_deflection_applied"]
     spec.output_model.model_validate(result)
-    Draft202012Validator(spec.output_model.model_json_schema()).validate(result)
+    cached_output_validator(spec.output_model).validate(result)
     mercury["latitude"] = 91.0
     with pytest.raises(ValidationError):
         spec.output_model.model_validate(result)
@@ -426,7 +449,7 @@ def test_explicit_model_and_schema_on_actual_rest_fastmcp_and_cli(surface_calls)
 )
 def test_invalid_selector_or_unsupported_variant_is_rejected_all_transports(
     extra, surface_calls
-):
+) -> None:
     spec = SPECS["astro_chart"]
     request = {**PAYLOAD, **extra}
     response, protocol, code, cli = surface_calls(spec, request, cli_first=False)

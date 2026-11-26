@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, candidate_relation_analysis
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, candidate_relation_analysis
 from fatebridge.services.divination import calculate_sukuyo_compatibility
 
 HISTORICAL = "japanese_naoj_historical_utc09"
@@ -46,8 +46,8 @@ def names(rows):
     ],
 )
 def test_same_reconstruction_cannot_choose_opposite_priorities_for_two_people(
-    date2, expected
-):
+    date2: str, expected
+) -> None:
     result = pair(date2=date2)
     analysis = result["candidate_relation_analysis"]
     assert names(analysis["rows"]) == expected
@@ -57,7 +57,7 @@ def test_same_reconstruction_cannot_choose_opposite_priorities_for_two_people(
     assert all(not r["applied_to_primary"] for r in analysis["rows"])
 
 
-def test_unknown_halves_are_independent_even_when_rule_hypothesis_is_shared():
+def test_unknown_halves_are_independent_even_when_rule_hypothesis_is_shared() -> None:
     analysis = pair(part1=None, part2=None)["candidate_relation_analysis"]
     assert names(analysis["rows"]) == {
         ("参", "参"),
@@ -79,13 +79,13 @@ def test_unknown_halves_are_independent_even_when_rule_hypothesis_is_shared():
     assert analysis["shared_reconstruction_analysis"]["person_half_days_independent"]
 
 
-def test_only_one_unknown_half_does_not_silently_become_the_other_person_half():
+def test_only_one_unknown_half_does_not_silently_become_the_other_person_half() -> None:
     analysis = pair(part1=None)["candidate_relation_analysis"]
     assert names(analysis["rows"]) == {("参", "参"), ("毕", "参"), ("毕", "毕")}
     assert len(analysis["unconstrained_rows"]) == 4
 
 
-def test_opposite_declared_halves_retain_both_supported_results_and_models():
+def test_opposite_declared_halves_retain_both_supported_results_and_models() -> None:
     analysis = pair(part2="second_half")["candidate_relation_analysis"]
     assert names(analysis["rows"]) == {("参", "毕"), ("毕", "毕")}
     by_name = {r["person1_su27"]: r for r in analysis["rows"]}
@@ -93,7 +93,7 @@ def test_opposite_declared_halves_retain_both_supported_results_and_models():
     assert by_name["毕"]["shared_reconstruction_ids"] == [REPEATED]
 
 
-def test_supported_date_pairs_are_not_reconstructed_from_marginal_date_unions():
+def test_supported_date_pairs_are_not_reconstructed_from_marginal_date_unions() -> None:
     result = calculate_sukuyo_compatibility(
         person1_date="1341-05-23",
         person1_zone="+08:00",
@@ -113,10 +113,12 @@ def test_supported_date_pairs_are_not_reconstructed_from_marginal_date_unions():
             assert support["person1"]["calendar_date"] in {"1341-05-23", "1341-05-24"}
             if support["person1"]["calendar_date"] == "1341-05-24":
                 assert row["person1_su27"] == row["person2_su27"]
+            else:
+                pass
     assert len(result["person1"]["calendar"]["calendar_candidates"]) == 2
 
 
-def test_different_source_bundles_do_not_acquire_an_unproven_shared_binding():
+def test_different_source_bundles_do_not_acquire_an_unproven_shared_binding() -> None:
     context = calendar_mansion(
         "1341-05-24",
         zone="+09:00",
@@ -133,7 +135,7 @@ def test_different_source_bundles_do_not_acquire_an_unproven_shared_binding():
     assert (context, second) == before
 
 
-def test_incomplete_context_keeps_all_unconstrained_rows_and_does_not_prune():
+def test_incomplete_context_keeps_all_unconstrained_rows_and_does_not_prune() -> None:
     context = calendar_mansion(
         "1341-05-24",
         zone="+09:00",
@@ -151,7 +153,9 @@ def test_incomplete_context_keeps_all_unconstrained_rows_and_does_not_prune():
     assert not analysis["candidate_set_complete_within_profile"]
 
 
-def test_native_explanation_retains_unsupported_matrix_and_does_not_certify_a_source_rule():
+def test_native_explanation_retains_unsupported_matrix_and_does_not_certify_a_source_rule() -> (
+    None
+):
     result = pair()
     text = result["summary"]
     assert "共同采用同一套" in text
@@ -163,7 +167,7 @@ def test_native_explanation_retains_unsupported_matrix_and_does_not_certify_a_so
     assert not shared["historical_uniformity_established"]
 
 
-def test_both_resolved_second_halves_do_not_select_a_reconstruction_model():
+def test_both_resolved_second_halves_do_not_select_a_reconstruction_model() -> None:
     result = pair(part1="second_half", part2="second_half")
     analysis = result["candidate_relation_analysis"]
     assert result["pair"] == "命" and result["status"] == "computed"
@@ -177,7 +181,7 @@ def test_both_resolved_second_halves_do_not_select_a_reconstruction_model():
     assert "宿名虽已定，仍不能确定采用哪种重建" in result["summary"]
 
 
-def test_repeat_model_retains_earlier_short_month_even_after_a_long_month():
+def test_repeat_model_retains_earlier_short_month_even_after_a_long_month() -> None:
     result = calculate_sukuyo_compatibility(
         person1_date="1903-06-25",
         person2_date="1957-09-24",
@@ -196,7 +200,7 @@ def test_repeat_model_retains_earlier_short_month_even_after_a_long_month():
     assert len(analysis["unconstrained_rows"]) == 4
 
 
-def test_model_independent_person_is_compatible_with_both_shared_models():
+def test_model_independent_person_is_compatible_with_both_shared_models() -> None:
     result = pair(date2="1341-05-25", part2=None)
     analysis = result["candidate_relation_analysis"]
     assert len(analysis["rows"]) == 2
@@ -210,7 +214,7 @@ def test_model_independent_person_is_compatible_with_both_shared_models():
     )
 
 
-def test_missing_model_evidence_means_unknown_support_not_proven_unsupported():
+def test_missing_model_evidence_means_unknown_support_not_proven_unsupported() -> None:
     context = calendar_mansion(
         "1341-05-24",
         zone="+09:00",
@@ -243,8 +247,8 @@ def test_missing_model_evidence_means_unknown_support_not_proven_unsupported():
     ],
 )
 def test_complete_half_condition_table_from_reviewed_model_vectors(
-    part1, part2, expected
-):
+    part1: str | None, part2: str | None, expected
+) -> None:
     # These nine expected sets expand the independently reviewed A/B control
     # vectors. They are logical controls, not nine historical observations.
     analysis = pair(part1=part1, part2=part2)["candidate_relation_analysis"]
@@ -255,11 +259,13 @@ def test_complete_half_condition_table_from_reviewed_model_vectors(
             (s["person1"]["natal_su27"], s["person2"]["natal_su27"])
             for s in shared["resolved_support"]
         }
+    else:
+        pass
     assert actual == expected
     assert shared["support_coverage_complete"]
 
 
-def test_native_joint_reading_explains_each_reconstruction_predecessor():
+def test_native_joint_reading_explains_each_reconstruction_predecessor() -> None:
     text = pair()["summary"]
     assert "相邻前月有29日" in text
     assert "前半按4月30日查得参" in text
@@ -268,7 +274,7 @@ def test_native_joint_reading_explains_each_reconstruction_predecessor():
     assert "T2465十二月三十日星/室字面差异" in text
 
 
-def test_native_long_month_case_explains_earlier_short_month():
+def test_native_long_month_case_explains_earlier_short_month() -> None:
     result = calculate_sukuyo_compatibility(
         person1_date="1903-06-25",
         person2_date="1957-09-24",
@@ -280,14 +286,14 @@ def test_native_long_month_case_explains_earlier_short_month():
     assert "所用前月末为农历7月29日" in result["summary"]
 
 
-def test_resolved_joint_output_keeps_input_profile_and_source_uncertainty():
+def test_resolved_joint_output_keeps_input_profile_and_source_uncertainty() -> None:
     text = pair(part1="second_half", part2="second_half")["summary"]
     assert "输入当地日期1341-05-24，时区+09:00" in text
     assert "T2465十二月三十日星/室字面差异" in text
     assert "宿名虽已定，仍不能确定采用哪种重建" in text
 
 
-def test_model_independent_resolved_hinoo_pair_also_retains_source_reference():
+def test_model_independent_resolved_hinoo_pair_also_retains_source_reference() -> None:
     result = pair(date1="1341-05-25", date2="1341-05-26", part1=None, part2=None)
     assert result["status"] == "computed"
     assert "shared_reconstruction_analysis" not in result["candidate_relation_analysis"]
@@ -295,13 +301,15 @@ def test_model_independent_resolved_hinoo_pair_also_retains_source_reference():
     assert "写成日期未定" in result["summary"]
 
 
-def test_resolved_native_relation_keeps_both_actual_directional_meanings():
+def test_resolved_native_relation_keeps_both_actual_directional_meanings() -> None:
     result = pair(part1="second_half", part2="second_half")
     assert "前向含义：" + result["person1_to_person2"]["meaning"] in result["summary"]
     assert "反向含义：" + result["person2_to_person1"]["meaning"] in result["summary"]
 
 
-def test_native_joint_reading_identifies_actual_modern_calendar_backend_and_sources():
+def test_native_joint_reading_identifies_actual_modern_calendar_backend_and_sources() -> (
+    None
+):
     result = calculate_sukuyo_compatibility(
         person1_date="1903-06-25",
         person2_date="1957-09-24",
@@ -315,7 +323,9 @@ def test_native_joint_reading_identifies_actual_modern_calendar_backend_and_sour
         assert result[person]["calendar"]["calendar_source"] in result["summary"]
 
 
-def test_native_joint_source_explains_active_sat_capture_and_five_apparatus_notes():
+def test_native_joint_source_explains_active_sat_capture_and_five_apparatus_notes() -> (
+    None
+):
     result = pair()
     text = result["summary"]
     original = json.loads(
@@ -354,7 +364,7 @@ def test_native_joint_source_explains_active_sat_capture_and_five_apparatus_note
         assert necessary in text
 
 
-def test_native_joint_source_keeps_daybreak_separate_from_hinoo_half():
+def test_native_joint_source_keeps_daybreak_separate_from_hinoo_half() -> None:
     text = pair()["summary"]
     assert "平明" in text and "明日曉時" in text
     assert "日夜各8时" in text
@@ -362,7 +372,7 @@ def test_native_joint_source_keeps_daybreak_separate_from_hinoo_half():
     assert "Kotyk 2022" in text
 
 
-def test_native_candidate_palace_preserves_actual_ruler_variant():
+def test_native_candidate_palace_preserves_actual_ruler_variant() -> None:
     text = pair(date2="1349-07-24")["summary"]
     assert "大陽" in text and "太陽" in text
     assert "CBETA app 0387023" in text

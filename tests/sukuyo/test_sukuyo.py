@@ -8,14 +8,14 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import (
+from fatebridge.core.sukuyo.sukuyo import (
     MONTH_STARTS,
     SU27_ORDER,
     calendar_mansion,
     day_evidence,
     lunar_mansion,
 )
-from fatebridge.core.sukuyo_relations import (
+from fatebridge.core.sukuyo.sukuyo_relations import (
     RELATION_TEMPLATE,
     normalize_mansion,
     relation_between_su27,
@@ -29,7 +29,7 @@ ROOT = Path(__file__).resolve().parents[2]
 REFERENCE = json.loads((ROOT / "tests/data/sukuyo-t1299-reference.json").read_text())
 
 
-def test_month_starts_against_naoj_and_t1299_birth_example():
+def test_month_starts_against_naoj_and_t1299_birth_example() -> None:
     assert MONTH_STARTS == REFERENCE["naoj_month_starts"]
     assert (
         lunar_mansion(2, 5) == "毕"
@@ -39,7 +39,7 @@ def test_month_starts_against_naoj_and_t1299_birth_example():
         assert lunar_mansion(month, 28) == start
 
 
-def test_all_27_relations_against_independent_primary_text_example():
+def test_all_27_relations_against_independent_primary_text_example() -> None:
     for other, expected in REFERENCE["bi_example"]:
         r = relation_between_su27("毕", other)
         assert r["relation"] == expected
@@ -47,7 +47,7 @@ def test_all_27_relations_against_independent_primary_text_example():
         assert r["distance"] is None
 
 
-def test_all_729_directed_relations_and_reverse_pairs():
+def test_all_729_directed_relations_and_reverse_pairs() -> None:
     assert len(SU27_ORDER) == 27 and "牛" not in SU27_ORDER
     for a in SU27_ORDER:
         for b in SU27_ORDER:
@@ -59,7 +59,7 @@ def test_all_729_directed_relations_and_reverse_pairs():
             assert forward["sequence_group"] == forward["offset"] // 9 + 1
 
 
-def test_shared_names_and_traditional_aliases():
+def test_shared_names_and_traditional_aliases() -> None:
     assert normalize_mansion("胃") == "胃"
     assert normalize_mansion("畢") == "毕"
     assert relation_between_su27("斗", "胃")["relation"] == "親"
@@ -68,8 +68,8 @@ def test_shared_names_and_traditional_aliases():
 
 
 def test_compatibility_uses_lunar_dates_without_a_chart_or_guessed_birth_time(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.services.divination as service
 
     monkeypatch.setattr(
@@ -93,7 +93,7 @@ def test_compatibility_uses_lunar_dates_without_a_chart_or_guessed_birth_time(
     assert r["validation"]["real_world_prediction"] == "not_established"
 
 
-def test_same_mansion_does_not_turn_into_a_personality_or_success_claim():
+def test_same_mansion_does_not_turn_into_a_personality_or_success_claim() -> None:
     r = calculate_sukuyo_compatibility(
         person1_date="1990-06-15", person2_date="1990-06-15"
     )
@@ -102,7 +102,7 @@ def test_same_mansion_does_not_turn_into_a_personality_or_success_claim():
     assert "性格相同" not in r["summary"] and "概率" not in r["summary"]
 
 
-def test_timezone_conversion_changes_chinese_calendar_day_at_exact_boundary():
+def test_timezone_conversion_changes_chinese_calendar_day_at_exact_boundary() -> None:
     before = calendar_mansion("2025-01-28", "15:59:59", "UTC")
     after = calendar_mansion("2025-01-28", "16:00:00", "UTC")
     assert [before["lunar_month"], before["lunar_day"]] == [12, 29]
@@ -116,18 +116,32 @@ def test_timezone_conversion_changes_chinese_calendar_day_at_exact_boundary():
 
 
 @pytest.mark.parametrize(
+    "clock",
+    [
+        pytest.param("15:59:59.9999999", id="before-rollover"),
+        pytest.param("16:00:00.0000001", id="after-rollover"),
+    ],
+)
+def test_known_clock_rejects_submicroseconds_at_calendar_rollover(clock: str) -> None:
+    with pytest.raises(ValueError, match="representable to the microsecond"):
+        calendar_mansion("2025-01-28", clock, "+00:00")
+
+
+@pytest.mark.parametrize(
     "d,t,z",
     [
         ("2024-03-10", "02:30:00", "America/New_York"),
         ("2024-11-03", "01:30:00", "America/New_York"),
     ],
 )
-def test_ambiguous_unknown_or_nonexistent_time_cannot_select_a_calendar_day(d, t, z):
+def test_ambiguous_unknown_or_nonexistent_time_cannot_select_a_calendar_day(
+    d: str, t: str, z: str
+) -> None:
     with pytest.raises(ValueError):
         calendar_mansion(d, t, z)
 
 
-def test_leap_month_is_partial_until_an_explicit_convention_is_selected():
+def test_leap_month_is_partial_until_an_explicit_convention_is_selected() -> None:
     params = dict(person1_date="2025-07-25", person2_date="2025-03-04")
     partial = calculate_sukuyo_compatibility(**params)
     assert partial["status"] == "partial" and partial["pair"] is None
@@ -144,13 +158,13 @@ def test_leap_month_is_partial_until_an_explicit_convention_is_selected():
 
 
 @pytest.mark.parametrize("d", ["1900-12-31", "2100-01-01", "2025-02-30"])
-def test_outside_declared_calendar_scope_or_invalid_date_fails(d):
+def test_outside_declared_calendar_scope_or_invalid_date_fails(d: str) -> None:
     with pytest.raises(ValueError):
         calendar_mansion(d)
 
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
-def test_every_published_hko_day_in_1901_2099_and_chinese_supplement():
+def test_every_published_hko_day_in_1901_2099_and_chinese_supplement() -> None:
     spec = importlib.util.spec_from_file_location(
         "sukuyo_reference_builder", ROOT / "scripts/sukuyo/fetch_sukuyo_reference.py"
     )
@@ -181,13 +195,17 @@ def test_every_published_hko_day_in_1901_2099_and_chinese_supplement():
         ("1978-09-02", [7, 30, False]),
     ],
 )
-def test_published_calendar_corrections_change_the_mansion_input(civil, expected):
+def test_published_calendar_corrections_change_the_mansion_input(
+    civil: str, expected
+) -> None:
     r = calendar_mansion(civil)
     assert [r["lunar_month"], r["lunar_day"], r["is_leap_month"]] == expected
     assert r["calendar_correction"] == "sukuyo_hko_corrections_v1"
 
 
-def test_suzhan_exposes_calendar_evidence_and_default_equatorial_research_model():
+def test_suzhan_exposes_calendar_evidence_and_default_equatorial_research_model() -> (
+    None
+):
     r = calculate_suzhan_analysis(
         lat="31n13", lon="121e28", date="2025-03-04", time="12:00:00", zone="+08:00"
     )
@@ -200,7 +218,7 @@ def test_suzhan_exposes_calendar_evidence_and_default_equatorial_research_model(
     assert len(r["rulesets"]["unresolved"]) >= 3
 
 
-def test_seven_nature_groups_and_special_days_match_upper_volume():
+def test_seven_nature_groups_and_special_days_match_upper_volume() -> None:
     for group, mansions in REFERENCE["upper_natures"].items():
         for mansion in mansions:
             r = day_evidence(
@@ -226,7 +244,7 @@ def test_seven_nature_groups_and_special_days_match_upper_volume():
             assert label in r["special_day_labels"]
 
 
-def test_personal_sanjiu_day_preserves_upper_lower_ye_conflict():
+def test_personal_sanjiu_day_preserves_upper_lower_ye_conflict() -> None:
     context = calendar_mansion("2025-03-04")  # 毕, nine steps after 女.
     r = day_evidence(context, natal_mansion="女")
     assert r["personal_day"]["relation"]["relation"] == "業"
@@ -243,11 +261,13 @@ def test_personal_sanjiu_day_preserves_upper_lower_ye_conflict():
     assert r["sukuyo"]["personal_day"]["textual_conflict"] is True
 
 
-def test_same_run_claim_checker_rejects_invented_mansion_and_reversed_relation():
+def test_same_run_claim_checker_rejects_invented_mansion_and_reversed_relation() -> (
+    None
+):
     from fatebridge.application.execution import execute_tool
     from fatebridge.core.execution_context import ExecutionOptions
     from fatebridge.services.tool_catalog import CATALOG
-    from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
+    from validation.claims import CalculationClaim, verify_calculation_claims
 
     spec = next(s for s in CATALOG if s.key == "sukuyo_compatibility")
     result = execute_tool(
@@ -283,8 +303,8 @@ def test_same_run_claim_checker_rejects_invented_mansion_and_reversed_relation()
 
 
 def test_suzhan_guolao_mode_loads_bundled_stars_with_operator_ephemeris_env(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     import os
 
     from fatebridge.core import ephemeris_runtime

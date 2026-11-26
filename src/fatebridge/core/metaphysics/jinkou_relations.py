@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from .common import SIX_CLASH_BRANCHES
+from fatebridge.core.metaphysics.common import SIX_CLASH_BRANCHES
+from fatebridge.core.metaphysics.ren_sources import (
+    JINKOU_RELATIONS_SOURCE as SOURCE_URL,
+)
 
-SOURCE_URL = "https://upload.wikimedia.org/wikipedia/commons/e/e1/CNTS-00047981961_1_六壬神課金口訣.pdf"
 SOURCE_SHA256 = "dfa4b039f30100eb75a8fe21904256bc4e47c04538c8602d08aec9e7f7646364"
 # PDF109 reads 午亥火绝 / 子巳水绝. The web table labels the opposite phases;
 # identity of the transcription's physical base edition is unverified.

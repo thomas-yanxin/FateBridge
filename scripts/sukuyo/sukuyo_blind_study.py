@@ -3,6 +3,16 @@
 No real samples or probabilities are fabricated. Files use exclusive creation.
 """
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import json
 import os
@@ -11,8 +21,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from fatebridge.validation.predictions import Forecast, Outcome
-from fatebridge.validation.sukuyo_study import (
+from validation.predictions import Forecast, Outcome
+from validation.sukuyo_study import (
     SukuyoProtocol,
     blind_outcome_sheet,
     evaluate,
@@ -41,6 +51,8 @@ def _publish_output(path: Path, raw: bytes) -> None:
     finally:
         if temporary is not None:
             temporary.unlink(missing_ok=True)
+        else:
+            pass
 
 
 def main() -> None:
@@ -75,9 +87,13 @@ def main() -> None:
         for item in items:
             if "=" not in item:
                 parser.error("file bindings must use NAME=PATH")
+            else:
+                pass
             name, path = item.split("=", 1)
             if name in result:
                 parser.error("duplicate file binding")
+            else:
+                pass
             result[name] = Path(path).read_bytes()
         return result
 
@@ -147,3 +163,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

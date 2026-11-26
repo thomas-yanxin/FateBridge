@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 
 import pytest
+from fastapi.testclient import TestClient
+from pytest import CaptureFixture, MonkeyPatch
 
 from fatebridge.core import almanac, analytic_solar, de440_solar
 from fatebridge.utils.errors import EphemerisSourceError
@@ -71,6 +73,8 @@ def fault_resource(monkeypatch, tmp_path, fault):
         data["model_id"] = "another_model"
     elif fault == "nonfinite":
         data["orientation"]["am12"] = float("nan")
+    else:
+        pass
     content = json.dumps(data).encode()
     if fault == "duplicate_key":
         content = b'{"model_id":"fatebridge_analytic_solar_v1",' + raw[1:]
@@ -78,16 +82,20 @@ def fault_resource(monkeypatch, tmp_path, fault):
         content = b"[]"
     elif fault == "malformed":
         content = b"["
+    else:
+        pass
     package = tmp_path / "selected-source"
     target = package / RESOURCE
     target.parent.mkdir(parents=True)
     if fault != "missing":
         target.write_bytes(content)
+    else:
+        pass
     monkeypatch.setattr(analytic_solar, "files", lambda _: package)
     analytic_solar.profile.cache_clear()
 
 
-def test_reviewed_identity_is_bound_to_independently_read_primary_tables():
+def test_reviewed_identity_is_bound_to_independently_read_primary_tables() -> None:
     reference = json.loads((F / "primary-reference.json").read_bytes())
     assert reference["reviewed_profile_canonical_sha256"] == REVIEWED
     assert reference["harmonic_rows"] == 1951
@@ -111,8 +119,8 @@ def test_reviewed_identity_is_bound_to_independently_read_primary_tables():
 @pytest.mark.parametrize("fault", FAULTS)
 @pytest.mark.parametrize("consumer", ["profile", "analytic", "de440_frame"])
 def test_actual_selected_resource_fault_is_a_source_failure(
-    fault, consumer, monkeypatch, tmp_path
-):
+    fault, consumer: str, monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
     fault_resource(monkeypatch, tmp_path, fault)
     with pytest.raises(EphemerisSourceError) as caught:
         if consumer == "profile":
@@ -132,7 +140,7 @@ def test_actual_selected_resource_fault_is_a_source_failure(
     "fault",
     ["orientation", "earth_amplitude", "nutation", "source_commit", "loaded_sha256"],
 )
-def test_public_return_cannot_poison_loaded_math_or_source_receipts(fault):
+def test_public_return_cannot_poison_loaded_math_or_source_receipts(fault: str) -> None:
     public = analytic_solar.profile()
     healthy = copy.deepcopy(public)
     epochs = [2433282.5, 2451545.0, 2461075.0]
@@ -165,8 +173,8 @@ def test_public_return_cannot_poison_loaded_math_or_source_receipts(fault):
 
 
 def test_reviewed_reformatting_keeps_math_and_reports_actual_loaded_bytes(
-    monkeypatch, tmp_path
-):
+    monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
     healthy = analytic_solar.profile()
     expected = analytic_solar.solar_longitude(2461075.0)
     del healthy["loaded_sha256"]
@@ -185,8 +193,14 @@ def test_reviewed_reformatting_keeps_math_and_reports_actual_loaded_bytes(
 @pytest.mark.parametrize("mode", ["analytic", "de440"])
 @pytest.mark.parametrize("fault", ["nutation", "missing", "malformed"])
 def test_real_source_failure_is_consistent_across_three_adapters(
-    tool, mode, fault, monkeypatch, tmp_path, rest, capsys
-):
+    tool: str,
+    mode: str,
+    fault: str,
+    monkeypatch: MonkeyPatch,
+    tmp_path: Path,
+    rest: TestClient,
+    capsys: CaptureFixture[str],
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
     fault_resource(monkeypatch, tmp_path, fault)
     payload = dict(

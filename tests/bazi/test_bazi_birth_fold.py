@@ -12,8 +12,8 @@ from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.birth_clock import birth_clock_input_receipt
 from fatebridge.utils.birth_input import PersonInfo, create_person_info
 from fatebridge.utils.solar_time import normalize_birth_time
-from tests.bazi.test_bazi_birth_seconds import SPECS
 from tests.support.transports import inputs
+from tests.unit_test.fixtures.bazi_birth_clock import SPECS
 
 SHANGHAI = dict(
     birth_year=1991,
@@ -30,8 +30,8 @@ SHANGHAI = dict(
 @pytest.mark.parametrize("spec", SPECS, ids=lambda s: s.key)
 @pytest.mark.parametrize("offset,hour,fold", [("+09:00", 16, 0), ("+08:00", 17, 1)])
 def test_all_actual_bindings_preserve_selected_instant_and_original_zone(
-    spec, offset, hour, fold
-):
+    spec, offset: str, hour: int, fold: int
+) -> None:
     req = spec.request_model.model_validate(
         {**inputs(spec), **SHANGHAI, "birth_utc_offset": offset}
     )
@@ -48,7 +48,7 @@ def test_all_actual_bindings_preserve_selected_instant_and_original_zone(
 
 
 @pytest.mark.parametrize("bad", [True, 8, 8.0])
-def test_offset_has_no_numeric_or_boolean_coercion(bad):
+def test_offset_has_no_numeric_or_boolean_coercion(bad: bool | float | int) -> None:
     with pytest.raises(ValidationError):
         BaziBirthRequest(**SHANGHAI, birth_utc_offset=bad)
     with pytest.raises(ValidationError):
@@ -58,12 +58,12 @@ def test_offset_has_no_numeric_or_boolean_coercion(bad):
 @pytest.mark.parametrize(
     "bad", ["", "+8:00", "+08:60", "+15:00:01", "+07:00", "UTC+08:00"]
 )
-def test_wrong_or_malformed_selector_cannot_create_a_birth_instant(bad):
+def test_wrong_or_malformed_selector_cannot_create_a_birth_instant(bad: str) -> None:
     with pytest.raises(ValueError, match="birth_utc_offset"):
         normalize_birth_time(PersonInfo(**SHANGHAI, birth_utc_offset=bad))
 
 
-def test_omitted_offset_does_not_choose_a_fold_and_no_offset_fills_a_gap():
+def test_omitted_offset_does_not_choose_a_fold_and_no_offset_fills_a_gap() -> None:
     with pytest.raises(ValueError):
         normalize_birth_time(PersonInfo(**SHANGHAI))
     gap = {**SHANGHAI, "birth_month": 4, "birth_day": 14, "birth_hour": 2}
@@ -72,7 +72,9 @@ def test_omitted_offset_does_not_choose_a_fold_and_no_offset_fills_a_gap():
             normalize_birth_time(PersonInfo(**gap, birth_utc_offset=offset))
 
 
-def test_conflicting_direct_and_recorded_offsets_are_rejected_by_actual_instant():
+def test_conflicting_direct_and_recorded_offsets_are_rejected_by_actual_instant() -> (
+    None
+):
     person = PersonInfo(**SHANGHAI, birth_utc_offset="+09:00")
     first = normalize_birth_time(person, birth_utc_offset="+09:00:00")
     assert first.input_datetime.fold == 0
@@ -90,7 +92,9 @@ def test_conflicting_direct_and_recorded_offsets_are_rejected_by_actual_instant(
     assert normalize_birth_time(helper).input_datetime.fold == 1
 
 
-def test_opt_in_receipt_states_actual_instant_rules_and_unverified_source_precision():
+def test_opt_in_receipt_states_actual_instant_rules_and_unverified_source_precision() -> (
+    None
+):
     person = PersonInfo(**SHANGHAI, birth_utc_offset="+08:00")
     receipt = birth_clock_input_receipt(person, normalize_birth_time(person))
     assert receipt["requested_utc_offset"] == "+08:00"
@@ -105,7 +109,7 @@ def test_opt_in_receipt_states_actual_instant_rules_and_unverified_source_precis
     assert "civil_fold" not in old and "requested_utc_offset" not in old
 
 
-def test_selected_timezone_is_kept_for_future_dayun_boundaries():
+def test_selected_timezone_is_kept_for_future_dayun_boundaries() -> None:
     a = PersonInfo(**SHANGHAI, birth_utc_offset="+09:00", gender="男")
     aa = normalize_birth_time(a)
     b = a.model_copy(update={"birth_timezone": "+09:00"})
@@ -129,7 +133,7 @@ def test_selected_timezone_is_kept_for_future_dayun_boundaries():
     )
 
 
-def test_same_wall_cache_does_not_reuse_the_other_side_of_havana_jie():
+def test_same_wall_cache_does_not_reuse_the_other_side_of_havana_jie() -> None:
     base = dict(
         birth_year=2021,
         birth_month=11,
@@ -159,35 +163,37 @@ def test_same_wall_cache_does_not_reuse_the_other_side_of_havana_jie():
 
 
 def test_minute_grid_uses_each_derived_instant_offset_across_clock_rollback(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.services.timing_uncertainty as module
 
     person = PersonInfo(**{**SHANGHAI, "birth_minute": 59}, birth_utc_offset="+09:00")
     seen = []
-    original = module.normalize_birth_time
+    rebase = module.rebase_birth_clock
 
-    def observe(sample, **kwargs):
-        result = original(sample, **kwargs)
-        seen.append(
-            (sample.birth_utc_offset, result.input_datetime.astimezone(timezone.utc))
-        )
-        return result
+    def observe(template, instant):
+        sample = rebase(template, instant)
+        seen.append(sample.input_datetime)
+        return sample
 
-    monkeypatch.setattr(module, "normalize_birth_time", observe)
+    monkeypatch.setattr(module, "rebase_birth_clock", observe)
     result = module.analyze_birth_time_range(
         person, 1, analysis_moment=datetime(2026, 1, 1)
     )
     assert result["sample_count"] == 3
-    assert [x[0] for x in seen] == ["+09:00", "+09:00", "+09:00", "+08:00"]
-    assert [x[1] for x in seen[1:]] == [
+    assert [(moment.utcoffset(), moment.fold) for moment in seen] == [
+        (timedelta(hours=9), 0),
+        (timedelta(hours=9), 0),
+        (timedelta(hours=8), 1),
+    ]
+    assert [moment.astimezone(timezone.utc) for moment in seen] == [
         datetime(1991, 9, 14, 16, 58, tzinfo=timezone.utc) + timedelta(minutes=k)
         for k in range(3)
     ]
 
 
 @pytest.mark.parametrize("key", ["ziwei_birth", "ziwei_horoscope", "liureng_runyear"])
-def test_existing_public_offset_consumers_keep_their_explicit_keyword(key):
+def test_existing_public_offset_consumers_keep_their_explicit_keyword(key: str) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     values = {**inputs(spec), **SHANGHAI, "birth_utc_offset": "+09:00"}
     values.pop("birth_second")
@@ -196,7 +202,7 @@ def test_existing_public_offset_consumers_keep_their_explicit_keyword(key):
     assert kwargs["birth_utc_offset"] == "+09:00"
 
 
-def test_ren_birth_clock_direct_record_and_keyword_cannot_disagree():
+def test_ren_birth_clock_direct_record_and_keyword_cannot_disagree() -> None:
     from fatebridge.core.metaphysics.ren_calendar import resolve_runyear_birth_clock
 
     wall = datetime(1991, 9, 15, 1, 30, 59)
@@ -213,7 +219,7 @@ def test_ren_birth_clock_direct_record_and_keyword_cannot_disagree():
         )
 
 
-def test_ren_direct_known_second_is_used_before_chronology_comparison():
+def test_ren_direct_known_second_is_used_before_chronology_comparison() -> None:
     from fatebridge.services.metaphysics import calculate_liureng_runyear
 
     person = PersonInfo(**{**SHANGHAI, "birth_second": 59}, birth_utc_offset="+08:00")
@@ -243,8 +249,8 @@ def test_ren_direct_known_second_is_used_before_chronology_comparison():
     ],
 )
 def test_apparent_clock_uses_the_selected_instant_in_named_and_fixed_zone_controls(
-    zone, wall, longitude, offsets, monkeypatch
-):
+    zone: str, wall: str, longitude, offsets, monkeypatch: pytest.MonkeyPatch
+) -> None:
     import fatebridge.utils.solar_time as module
 
     observed = []

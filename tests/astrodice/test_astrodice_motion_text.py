@@ -26,12 +26,12 @@ def rendered(row):
     DATA["rows"],
     ids=lambda r: f"{r['inputs']['date']}:{r['inputs']['zodiacal']}:{r['backend']}",
 )
-def test_rendered_real_motion_has_every_stored_term_once(row):
+def test_rendered_real_motion_has_every_stored_term_once(row) -> None:
     rows = verify(rendered(row))
     assert len(rows) == len(row["objects"])
 
 
-def test_zero_analytic_term_is_still_evidence():
+def test_zero_analytic_term_is_still_evidence() -> None:
     motion = {
         "longitude_speed": 1.0,
         "native_longitude_speed": 1.0,
@@ -51,7 +51,7 @@ def test_zero_analytic_term_is_still_evidence():
     "mutation",
     ["omit", "duplicate", "changed_value", "changed_total", "false_sign", "invented"],
 )
-def test_independent_text_reader_rejects_fidelity_laundering(mutation):
+def test_independent_text_reader_rejects_fidelity_laundering(mutation: str) -> None:
     row = copy.deepcopy(next(r for r in DATA["rows"] if not r["inputs"]["zodiacal"]))
     result = rendered(row)
     moon = next(o for o in row["objects"] if o["id"] == "Moon")

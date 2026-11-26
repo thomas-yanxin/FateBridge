@@ -4,12 +4,14 @@ import math
 
 import pytest
 
-from fatebridge.core import human_design_point_mass as model
+from fatebridge.core.human_design import human_design_point_mass as model
 from fatebridge.core.requests.human_design import HumanDesignRequest
 from fatebridge.utils.errors import EphemerisSourceError
 
 
-def test_point_mass_dependency_absence_is_explicit_without_native_fallback(monkeypatch):
+def test_point_mass_dependency_absence_is_explicit_without_native_fallback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(model, "find_spec", lambda _: None)
     result = model.point_mass_positions(2451545.0)
     assert result == {
@@ -19,7 +21,7 @@ def test_point_mass_dependency_absence_is_explicit_without_native_fallback(monke
     }
 
 
-def test_model_comparison_is_an_explicit_opt_in():
+def test_model_comparison_is_an_explicit_opt_in() -> None:
     request = HumanDesignRequest(
         birth_year=2000,
         birth_month=1,
@@ -34,14 +36,18 @@ def test_model_comparison_is_an_explicit_opt_in():
     ).compare_apparent_models
 
 
-def test_point_mass_rejects_non_barycentric_fallback(monkeypatch):
+def test_point_mass_rejects_non_barycentric_fallback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(model.runtime, "ephemeris_call", lambda *args: ((0.0,) * 6, 4))
     with pytest.raises(EphemerisSourceError) as failure:
         model.point_mass_positions(2451545.0)
     assert failure.value.reason == "point_mass_requires_barycentric_file_states"
 
 
-def test_candidate_root_uses_its_own_sun_across_zero_degrees(monkeypatch):
+def test_candidate_root_uses_its_own_sun_across_zero_degrees(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     calls = []
     birth = 2451545.25
 
@@ -65,7 +71,9 @@ def test_candidate_root_uses_its_own_sun_across_zero_degrees(monkeypatch):
     assert result["physical_time_error_bound_seconds"] is None
 
 
-def test_candidate_root_keeps_optional_dependency_unavailable(monkeypatch):
+def test_candidate_root_keeps_optional_dependency_unavailable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(model, "find_spec", lambda _: None)
     result = model.solve_point_mass_design_root(2451545.0)
     assert result["status"] == "unavailable"
@@ -73,7 +81,7 @@ def test_candidate_root_keeps_optional_dependency_unavailable(monkeypatch):
 
 
 @pytest.mark.local_data
-def test_preexisting_independent_solar_neighbour_reference_is_not_replaced():
+def test_preexisting_independent_solar_neighbour_reference_is_not_replaced() -> None:
     # Frozen original TT/reference, not copied from the new producer.
     result = model.point_mass_positions(2537715.3390767695)
     assert result["status"] == "computed"

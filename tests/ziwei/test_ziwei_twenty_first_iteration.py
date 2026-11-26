@@ -13,12 +13,12 @@ from pydantic import ValidationError
 
 import fatebridge.api as api
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_chinese import ZiweiNominalAgeCalendar
+from fatebridge.core.metaphysics.seed import build_analysis_seed
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart, build_ziwei_horoscope
-from fatebridge.core.output_chinese import ZiweiNominalAgeCalendar
-from fatebridge.core.ziwei_age import age_source_scope
+from fatebridge.core.ziwei.ziwei_age import age_source_scope
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import (
-    _build_analysis_seed,
     _build_person_seed,
     calculate_ziwei_birth,
     calculate_ziwei_horoscope,
@@ -26,6 +26,7 @@ from fatebridge.services.metaphysics import (
 from fatebridge.utils.birth_input import create_person_info
 from fatebridge.utils.timezones import parse_timezone_name
 from scripts.ziwei.audit_ziwei_age import audit_age_calendar
+from tests.support.transports import call_calculation
 
 FIXTURES = Path(__file__).parents[1] / "data/ziwei_independent"
 CASES = json.loads((FIXTURES / "clock_manifest.json").read_text())["cases"]
@@ -54,7 +55,9 @@ def result(birth=EAST, iso="1984-02-01T23:59:00+08:00", **kwargs):
 
 @pytest.mark.parametrize("profile", PROFILES)
 @pytest.mark.parametrize("sihua", ["rule_profile", "naj_ming_v1"])
-def test_old_failure_is_repaired_by_two_clock_endpoints_not_clamping(profile, sihua):
+def test_old_failure_is_repaired_by_two_clock_endpoints_not_clamping(
+    profile, sihua: str
+) -> None:
     before = result(rule_profile=profile, sihua_source=sihua)["ziwei_horoscope"]
     after = result(
         iso="1984-02-02T00:00:00+08:00", rule_profile=profile, sihua_source=sihua
@@ -73,7 +76,7 @@ def test_old_failure_is_repaired_by_two_clock_endpoints_not_clamping(profile, si
 
 
 @pytest.mark.parametrize("profile", PROFILES)
-def test_westward_solar_label_does_not_add_a_civil_year(profile):
+def test_westward_solar_label_does_not_add_a_civil_year(profile) -> None:
     r = result(WEST, "1984-02-02T00:09:00+08:00", rule_profile=profile)
     h = r["ziwei_horoscope"]
     assert h["nominal_age"] == 1
@@ -92,8 +95,8 @@ def test_westward_solar_label_does_not_add_a_civil_year(profile):
 )
 @pytest.mark.parametrize("zone", ["UTC", "America/New_York", "+14:00", "-12:00"])
 def test_same_target_instant_does_not_change_age_when_display_zone_changes(
-    iso, age, zone
-):
+    iso: str, age: int, zone: str
+) -> None:
     r = calculate_ziwei_horoscope(create_person_info(**EAST), **target_at(iso, zone))
     h = r["ziwei_horoscope"]
     assert h["nominal_age"] == age
@@ -107,23 +110,23 @@ def test_same_target_instant_does_not_change_age_when_display_zone_changes(
 
 
 @pytest.mark.parametrize("basis", ["birth_civil_timezone"])
-def test_physical_prebirth_guard_is_not_bypassed_by_age_choice(basis):
+def test_physical_prebirth_guard_is_not_bypassed_by_age_choice(basis: str) -> None:
     r = result(iso="1984-02-01T23:54:00+08:00", nominal_age_basis=basis)
     assert "目标时刻早于出生时刻" in r["error"]
     assert r["retryable"] is False
 
 
-def test_exact_birth_instant_is_age_one_and_requires_no_default_time_guess():
+def test_exact_birth_instant_is_age_one_and_requires_no_default_time_guess() -> None:
     r = result(iso="1984-02-01T23:55:00+08:00")
     assert r["ziwei_horoscope"]["nominal_age"] == 1
     bad = result(nominal_age_basis="unknown")
     assert "未知紫微岁序口径" in bad["error"]
 
 
-def test_core_does_not_silently_infer_age_from_a_synthetic_placement_year():
+def test_core_does_not_silently_infer_age_from_a_synthetic_placement_year() -> None:
     birth = _build_person_seed(create_person_info(**EAST))
     chart = build_ziwei_chart(birth, "男")
-    target = _build_analysis_seed(
+    target = build_analysis_seed(
         analysis_year=1984,
         analysis_month=2,
         analysis_day=1,
@@ -138,7 +141,7 @@ def test_core_does_not_silently_infer_age_from_a_synthetic_placement_year():
     assert h["nominal_age"] == 1
 
 
-def test_age_receipt_cannot_claim_classical_verification():
+def test_age_receipt_cannot_claim_classical_verification() -> None:
     a = deepcopy(result()["ziwei_horoscope"]["nominal_age_calendar"])
     ZiweiNominalAgeCalendar.model_validate(a)
     a["age_boundary_classically_verified"] = True
@@ -146,14 +149,14 @@ def test_age_receipt_cannot_claim_classical_verification():
         ZiweiNominalAgeCalendar.model_validate(a)
 
 
-def test_mutating_one_source_receipt_does_not_change_the_next_run():
+def test_mutating_one_source_receipt_does_not_change_the_next_run() -> None:
     first = result()["ziwei_horoscope"]["nominal_age_calendar"]
     first["boundary_source_evidence"]["citations"][0]["quote"] = "changed"
     later = result()["ziwei_horoscope"]["nominal_age_calendar"]
     assert later["boundary_source_evidence"]["citations"][0]["quote"] != "changed"
 
 
-def test_independent_reading_corrects_quote_without_rewriting_failed_v1():
+def test_independent_reading_corrects_quote_without_rewriting_failed_v1() -> None:
     old = json.loads((FIXTURES / "age_calendar_scope_v1/collation.json").read_text())
     new = age_source_scope()
     assert "本生時宮安斗君" in old["citations"][2]["quote"]
@@ -165,7 +168,7 @@ def test_independent_reading_corrects_quote_without_rewriting_failed_v1():
     assert not new["age_boundary_classically_verified"]
 
 
-def test_modified_v2_source_cannot_pass_its_frozen_checksum(tmp_path):
+def test_modified_v2_source_cannot_pass_its_frozen_checksum(tmp_path: Path) -> None:
     folder = tmp_path / "age_calendar_scope_v2"
     folder.mkdir()
     (folder / "manifest.json").write_bytes(
@@ -176,7 +179,7 @@ def test_modified_v2_source_cannot_pass_its_frozen_checksum(tmp_path):
         audit_age_calendar(lambda *_: [], tmp_path)
 
 
-def test_repeated_birth_clock_uses_physical_order_for_both_age_methods():
+def test_repeated_birth_clock_uses_physical_order_for_both_age_methods() -> None:
     birth = create_person_info(
         birth_year=1991,
         birth_month=9,
@@ -214,8 +217,11 @@ def test_repeated_birth_clock_uses_physical_order_for_both_age_methods():
 
 @pytest.mark.parametrize("basis,age", [("birth_civil_timezone", 2)])
 def test_age_basis_is_equal_in_real_rest_native_mcp_cli(
-    basis, age, monkeypatch, capsys
-):
+    basis: str,
+    age: int,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -235,7 +241,7 @@ def test_age_basis_is_equal_in_real_rest_native_mcp_cli(
         response_char_limit=0,
     )
     rest = TestClient(api.app).post(
-        "/api/cn/ziwei/horoscope",
+        "/api/ziwei/timing",
         json=inputs,
         params=[
             ("strict_fields", "true"),
@@ -247,12 +253,12 @@ def test_age_basis_is_equal_in_real_rest_native_mcp_cli(
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            return await client.call_tool(
-                "ziwei_horoscope", {**inputs, **options}, raise_on_error=False
+            return await call_calculation(
+                client, "ziwei_timing", {**inputs, **options}, raise_on_error=False
             )
 
     native = asyncio.run(call())
-    args = ["ziwei_horoscope"]
+    args = ["ziwei_timing"]
     for key, value in inputs.items():
         args += ["--" + key.replace("_", "-"), str(value)]
     args += [
@@ -276,3 +282,22 @@ def test_age_basis_is_equal_in_real_rest_native_mcp_cli(
     a = facts[0]["nominal_age_calendar"]
     assert a["basis"] == "birth_civil_timezone"
     assert a["physical_order_checked"] is True
+
+
+def test_nominal_age_requires_a_defined_target_date_in_birth_civil_timezone() -> None:
+    r = calculate_ziwei_horoscope(
+        create_person_info(
+            birth_year=1993,
+            birth_month=12,
+            birth_day=1,
+            birth_hour=12,
+            birth_minute=0,
+            birth_timezone="Antarctica/Vostok",
+            use_true_solar_time=False,
+            gender="男",
+        ),
+        **target_at("1994-07-01T12:00:00Z", "UTC"),
+    )
+    assert r["error_code"] == "validation_error"
+    assert r["issues"] == [{"path": "request", "code": "unresolved_timezone_offset"}]
+    assert r["retryable"] is False

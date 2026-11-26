@@ -10,12 +10,13 @@ import math
 import re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 from urllib.parse import urlencode
 
 from fatebridge.services.metaphysics import calculate_ziwei_birth
 from fatebridge.utils.birth_input import create_person_info
 from fatebridge.utils.timezones import parse_timezone_name
+from scripts.ziwei.audit_ziwei_calendar_coverage import HkoRowsReader
 
 ROOT = Path(__file__).resolve().parents[2]
 DIRECTORY = ROOT / "tests/data/ziwei_solar_jpl_v1"
@@ -32,6 +33,8 @@ def load_reference(
             != (directory / (name + ".sha256")).read_text().strip()
         ):
             raise ValueError("Solar clock source checksum mismatch: " + name)
+        else:
+            pass
         documents[name] = json.loads(raw)
     protocol, manifest = documents["protocol"], documents["manifest"]
     if (
@@ -39,6 +42,8 @@ def load_reference(
         != (directory / "protocol.sha256").read_text().strip()
     ):
         raise ValueError("Solar clock manifest belongs to a different protocol")
+    else:
+        pass
     sites = {site["id"]: site for site in protocol["sites"]}
     expected_keys = {
         (s["id"], instant) for s in sites.values() for instant in s["instants"]
@@ -48,9 +53,13 @@ def load_reference(
         raw = (directory / reply["path"]).read_bytes()
         if hashlib.sha256(raw).hexdigest() != reply["sha256"]:
             raise ValueError("Solar clock reply checksum mismatch: " + reply["path"])
+        else:
+            pass
         response = json.loads(raw)
         if "error" in response:
             raise ValueError("Solar clock reply contains an error")
+        else:
+            pass
         text, site = response["result"], sites[reply["site_id"]]
         params = reply["request_parameters"]
         wanted_tlist = " ".join(
@@ -63,6 +72,8 @@ def load_reference(
             raise ValueError(
                 "Solar clock request URL or time list differs from receipt"
             )
+        else:
+            pass
         if any(
             params[k] != v
             for k, v in {
@@ -76,6 +87,8 @@ def load_reference(
             }.items()
         ):
             raise ValueError("Solar clock request parameters differ from protocol")
+        else:
+            pass
         geo = re.search(
             r"Center geodetic\s*:\s*([-+\d.eE]+),\s*([-+\d.eE]+),\s*([-+\d.eE]+)", text
         )
@@ -86,6 +99,8 @@ def load_reference(
             or abs(float(geo[3])) > 1e-6
         ):
             raise ValueError("Solar clock reply uses a different observer site")
+        else:
+            pass
         for required in (
             "Target body name: Sun (10)",
             "{source: DE441}",
@@ -98,25 +113,35 @@ def load_reference(
                 raise ValueError(
                     "Solar clock reply lacks required declaration: " + required
                 )
+            else:
+                pass
         table = text.split("$$SOE\n", 1)[1].split("$$EOE", 1)[0]
         found = []
         for raw_row in csv.reader(io.StringIO(table)):
             if len(raw_row) != 7:
                 raise ValueError("Unexpected solar clock columns")
+            else:
+                pass
             instant = datetime.strptime(
                 raw_row[0].strip(), "%Y-%b-%d %H:%M:%S.%f"
             ).replace(tzinfo=timezone.utc)
             key = (site["id"], instant.isoformat())
             if key in rows:
                 raise ValueError("Duplicate solar clock source instant")
+            else:
+                pass
             apparent, hour_angle, dut1 = (float(raw_row[i]) for i in (3, 4, 5))
             if (
                 not all(math.isfinite(v) for v in (apparent, hour_angle, dut1))
                 or not 0 <= apparent < 24
             ):
                 raise ValueError("Invalid or unavailable solar clock source value")
+            else:
+                pass
             if abs(((apparent - hour_angle - 12 + 12) % 24 - 12) * 3600) > 0.00001:
                 raise ValueError("JPL solar time and Sun hour angle do not agree")
+            else:
+                pass
             mean_label = instant.replace(tzinfo=None) + timedelta(
                 seconds=site["longitude"] * 240 + dut1
             )
@@ -137,13 +162,17 @@ def load_reference(
             found.append(instant.isoformat())
         if set(found) != set(reply["instants"]) or len(found) != len(reply["instants"]):
             raise ValueError("Solar clock reply has missing or extra instants")
+        else:
+            pass
     if set(rows) != expected_keys or len(rows) != protocol["expected_source_points"]:
         raise ValueError("Solar clock corpus has missing or extra selected points")
+    else:
+        pass
     return protocol, [rows[key] for key in sorted(rows)]
 
 
 def audit_solar_clock(
-    hko_reader: Callable[..., list[dict[str, Any]]],
+    hko_reader: HkoRowsReader,
     fixtures: Path,
     directory: Path = DIRECTORY,
 ) -> dict[str, Any]:
@@ -159,13 +188,19 @@ def audit_solar_clock(
             raw = (fixtures / source["path"]).read_bytes()
             if hashlib.sha256(raw).hexdigest() != source["sha256"]:
                 raise ValueError("HKO solar-clock date checksum mismatch")
+            else:
+                pass
             tables[year] = {
                 r["solar"].isoformat(): r
                 for r in hko_reader(raw.decode("utf-8-sig"), year)
             }
+        else:
+            pass
         value = tables[year][label.date().isoformat()]
         if value["month"] is None or value["is_leap"] is None:
             raise ValueError("Solar clock comparison needs a complete HKO date")
+        else:
+            pass
         return dict(
             year=value["year"],
             month=value["month"],
@@ -184,6 +219,8 @@ def audit_solar_clock(
             raise ValueError(
                 "Source instant cannot be represented by minute-resolution birth input"
             )
+        else:
+            pass
         inputs = dict(
             birth_year=civil.year,
             birth_month=civil.month,
@@ -209,6 +246,8 @@ def audit_solar_clock(
                     distance_seconds=min(hour_margin, date_margin),
                 )
             )
+        else:
+            pass
         expected_hour = "子丑寅卯辰巳午未申酉戌亥"[((expected.hour + 1) // 2) % 12]
         expected_lunar = lunar(expected)
         for profile in ("iztro_2_5_8", "quanshu_v2_excerpt"):
@@ -241,6 +280,8 @@ def audit_solar_clock(
                         reference_boundary_unresolved=near_boundary,
                     )
                 )
+            else:
+                pass
             errors.append(abs(error))
             adjusted_errors.append(abs(adjusted))
             receipts.append(

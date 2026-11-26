@@ -7,9 +7,9 @@ from pathlib import Path
 
 import pytest
 
-import fatebridge.core.astrology_election as election
+import fatebridge.core.astro.astrology_election as election
 from fatebridge.core.response_models import Election
-from tests.western.test_western_election_conditions import (
+from tests.unit_test.fixtures.western_event_cases import (
     event_result,
     synthetic_subject,
 )
@@ -40,7 +40,9 @@ def synthetic_lunar_condition(monkeypatch):
 
 @pytest.mark.parametrize("asc", [0.0, math.nextafter(30.0, 0.0), 30.0, 359.0])
 @pytest.mark.parametrize("mc", [90.0, 120.0, math.nextafter(360.0, 0.0)])
-def test_four_source_roles_use_the_selected_physical_angles_without_rounding(asc, mc):
+def test_four_source_roles_use_the_selected_physical_angles_without_rounding(
+    asc, mc
+) -> None:
     subject = synthetic_subject(ascendant=(asc, None), medium_coeli=(mc, None))
     subject.houses_system_identifier = "R"
     result = election.build_election_payload(subject, topic_id="marriage")
@@ -48,7 +50,6 @@ def test_four_source_roles_use_the_selected_physical_angles_without_rounding(asc
     evidence = result["marriage_significators"]
     assert evidence["method_id"] == REFERENCE["reference_id"]
     assert evidence["full_original_text_acceptance"] is False
-    assert evidence["score_contribution"] == 0
     expected = [
         Fraction(asc),
         (Fraction(asc) + 180) % 360,
@@ -64,7 +65,7 @@ def test_four_source_roles_use_the_selected_physical_angles_without_rounding(asc
         assert row["ruler_state"]["planet"] == row["ruler"]
 
 
-def test_unknown_asc_preserves_mc_lords_and_does_not_reuse_backend_ruler():
+def test_unknown_asc_preserves_mc_lords_and_does_not_reuse_backend_ruler() -> None:
     subject = synthetic_subject(ascendant=(0.0, None), medium_coeli=(120.0, None))
     subject.houses_system_identifier = "R"
     subject.calculation_basis["angle_definition"] = {
@@ -84,15 +85,14 @@ def test_unknown_asc_preserves_mc_lords_and_does_not_reuse_backend_ruler():
     for row in [tenth, fourth]:
         assert row["ruler_state"]["longitude"] is not None
         assert row["ruler_state"]["house"] is None
-    assert result["score"] is None
 
 
 @pytest.mark.parametrize(
     "code,zodiac", [("N", "Tropic"), ("W", "Tropic"), ("R", "Sidereal")]
 )
 def test_other_selected_methods_are_unassessed_without_substituting_a_chart(
-    code, zodiac
-):
+    code: str, zodiac: str
+) -> None:
     subject = synthetic_subject()
     subject.houses_system_identifier = code
     subject.zodiac_type = zodiac
@@ -101,10 +101,9 @@ def test_other_selected_methods_are_unassessed_without_substituting_a_chart(
     assert facts["status"] == "not_assessed_for_selected_method"
     assert facts["houses"] == []
     assert facts["house_system"] == code and facts["zodiac_type"] == zodiac
-    assert result["score"] is not None
 
 
-def test_marriage_source_subset_is_not_applied_to_another_topic():
+def test_marriage_source_subset_is_not_applied_to_another_topic() -> None:
     subject = synthetic_subject()
     subject.houses_system_identifier = "R"
     assert (

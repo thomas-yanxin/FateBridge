@@ -66,7 +66,7 @@
       "retrieved_sha256": "fd64733cedf81a88dc27cede2161573c641c47c996f149cfeb919d38314317a8",
       "retrieved_bytes": 67026
     },
-    "S1": {
+    "SEAN_CURE": {
       "title": "What A Feng Shui Cure Really Is",
       "url": "https://www.masterseanchan.com/blog/what-feng-shui-cure-really-is/",
       "author": "Sean Chan",
@@ -207,7 +207,7 @@
       "source_ids": [
         "J1",
         "J2",
-        "S1",
+        "SEAN_CURE",
         "W1"
       ],
       "scope": "作者适用范围和分歧；不新增小物处方或取消另一作者判定",
@@ -241,7 +241,7 @@
       "rule_id": "workstation_source_boundaries_v1.objects",
       "source_ids": [
         "J2",
-        "S1",
+        "SEAN_CURE",
         "W1"
       ],
       "resolution": "物件路线存在署名反对意见；作者候选不是三法共识，不替代环境或方向判断"
@@ -357,7 +357,7 @@
     "workstation_source_boundaries_v1.objects": {
       "source_ids": [
         "J2",
-        "S1",
+        "SEAN_CURE",
         "W1"
       ],
       "scope": "署名分歧，不合并为处方"

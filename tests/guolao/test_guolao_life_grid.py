@@ -8,15 +8,15 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.guolao_classical import BRANCHES
-from fatebridge.core.guolao_grid import DATA, GridCell, load_grid
+from fatebridge.core.guolao.guolao_classical import BRANCHES
+from fatebridge.core.guolao.guolao_grid import DATA, GridCell, load_grid
 
 ROOT = Path(__file__).parents[2]
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-life-grid-v1"
 REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
 
 
-def test_primary_scan_runtime_matrix_and_attribution_are_fingerprinted():
+def test_primary_scan_runtime_matrix_and_attribution_are_fingerprinted() -> None:
     assert (
         hashlib.sha256((FIXTURE / REFERENCE["source_image"]).read_bytes()).hexdigest()
         == REFERENCE["source_image_sha256"]
@@ -32,17 +32,19 @@ def test_primary_scan_runtime_matrix_and_attribution_are_fingerprinted():
 
 
 @pytest.mark.parametrize("case", REFERENCE["hand_cases"])
-def test_held_primary_readings_cover_both_leaves_and_all_twelve_palaces(case):
+def test_held_primary_readings_cover_both_leaves_and_all_twelve_palaces(case) -> None:
     cell = load_grid().cell(case["palace"], case["column"])
     for field in ["numeral_value", "initial_marker", "mansion_marker"]:
         if field in case:
             assert cell[field] == case[field]
+        else:
+            pass
     assert cell["leaf"] == ("right" if case["column"] <= 14 else "left")
     assert cell["inherited_mansion"] is None
     assert cell["continuous_historical_degree"] is None
 
 
-def test_counts_distinguish_numeral_initial_and_untranscribed_marker_numbers():
+def test_counts_distinguish_numeral_initial_and_untranscribed_marker_numbers() -> None:
     g = load_grid()
     r = g.audit()
     assert len(g.rows) == 12 and all(len(row) == 30 for row in g.rows)
@@ -58,6 +60,8 @@ def test_counts_distinguish_numeral_initial_and_untranscribed_marker_numbers():
             c = g.cell(palace, column)
             if c["mansion_marker"] or c["initial_marker"]:
                 assert c["numeral_value"] is None
+            else:
+                pass
             assert c["modern_longitude"] is None
     assert not r["full_360_cell_numerical_mapping_accepted"]
     assert r["marker_attached_numerals_collated"]
@@ -65,7 +69,7 @@ def test_counts_distinguish_numeral_initial_and_untranscribed_marker_numbers():
     assert not r["fractional_tail_cells_collated"]
 
 
-def test_unmarked_restart_is_reported_without_a_guessed_star_or_repair():
+def test_unmarked_restart_is_reported_without_a_guessed_star_or_repair() -> None:
     r = load_grid().audit()
     assert len(r["unmarked_numeric_restarts"]) == 1
     jump = r["unmarked_numeric_restarts"][0]
@@ -76,7 +80,9 @@ def test_unmarked_restart_is_reported_without_a_guessed_star_or_repair():
 
 
 @pytest.mark.parametrize("case", REFERENCE["introductory_comparisons"])
-def test_image9_discrepancies_remain_and_no_column_is_chosen_to_match_them(case):
+def test_image9_discrepancies_remain_and_no_column_is_chosen_to_match_them(
+    case,
+) -> None:
     r = load_grid().compare(
         source_palace=case["source_palace"],
         target_palace=case["target_palace"],
@@ -91,7 +97,9 @@ def test_image9_discrepancies_remain_and_no_column_is_chosen_to_match_them(case)
     assert not r["used_in_native_birth_chart"]
 
 
-def test_selected_eight_older_grid_readings_still_match_the_frozen_observations():
+def test_selected_eight_older_grid_readings_still_match_the_frozen_observations() -> (
+    None
+):
     older = json.loads(
         (FIXTURE.parent / "guolao-life-degree-facsimile-v1/reference.json").read_text()
     )
@@ -104,24 +112,26 @@ def test_selected_eight_older_grid_readings_still_match_the_frozen_observations(
 
 
 @pytest.mark.parametrize("column", [True, 15.0, Fraction(15), "15", None])
-def test_columns_require_explicit_integer_indices_not_equivalent_angles(column):
+def test_columns_require_explicit_integer_indices_not_equivalent_angles(column) -> None:
     with pytest.raises(TypeError):
         load_grid().cell("子", column)
 
 
 @pytest.mark.parametrize("column", [-1, 0, 31, 360])
-def test_out_of_range_columns_are_not_wrapped_or_shifted(column):
+def test_out_of_range_columns_are_not_wrapped_or_shifted(column) -> None:
     with pytest.raises(ValueError):
         load_grid().cell("子", column)
 
 
 @pytest.mark.parametrize("palace", ["", "子丑", "Aries", "命"])
-def test_undeclared_palace_rows_are_not_inferred(palace):
+def test_undeclared_palace_rows_are_not_inferred(palace: str) -> None:
     with pytest.raises(ValueError):
         load_grid().cell(palace, 15)
 
 
-def test_initial_is_not_numeric_zero_and_mansion_marker_is_not_a_hidden_degree():
+def test_initial_is_not_numeric_zero_and_mansion_marker_is_not_a_hidden_degree() -> (
+    None
+):
     with pytest.raises(ValueError):
         GridCell(None, 0, False)
     with pytest.raises(ValueError):
@@ -136,7 +146,7 @@ def test_initial_is_not_numeric_zero_and_mansion_marker_is_not_a_hidden_degree()
     assert g.cell("子", 12)["numeral_value"] is None
 
 
-def test_matrix_is_frozen_and_missing_cells_are_not_reconstructed():
+def test_matrix_is_frozen_and_missing_cells_are_not_reconstructed() -> None:
     g = load_grid()
     rows = [list(row) for row in g.rows]
     frozen = replace(g, rows=rows)

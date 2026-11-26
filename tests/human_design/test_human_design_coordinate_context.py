@@ -8,9 +8,9 @@ from unittest.mock import patch
 import pytest
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core.human_design_apparent_positions import build_context
+from fatebridge.core.human_design.human_design_apparent_positions import build_context
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
+from validation.human_design import verify_human_design_reading
 
 REFERENCE = json.loads(
     (
@@ -37,7 +37,7 @@ def complete():
 
 def test_current_origin_units_vertex_and_reading_are_bound_without_native_replay(
     complete,
-):
+) -> None:
     context = complete["apparent_position_context"]
     assert {
         k: context["coordinate_context"][k] for k in REFERENCE["expected"]
@@ -79,8 +79,8 @@ def test_current_origin_units_vertex_and_reading_are_bound_without_native_replay
     ],
 )
 def test_current_or_unknown_contract_cannot_rehash_a_wrong_origin_or_remove_it(
-    complete, mutation
-):
+    complete, mutation: str
+) -> None:
     run = deepcopy(complete)
     frame = run["apparent_position_context"]["coordinate_context"]
     replacements = {
@@ -110,11 +110,13 @@ def test_current_or_unknown_contract_cannot_rehash_a_wrong_origin_or_remove_it(
         r["basis"].pop()
         if mutation == "unknown_drop_all":
             run["run_metadata"]["contract_sha256"] = "0" * 64
+        else:
+            pass
     assert verify_human_design_reading(run)["status"] == "rejected"
 
 
 @pytest.mark.parametrize("name", REFERENCE["native_changing_flag_bits"])
-def test_mixed_native_origin_flags_are_not_labelled_geocentric(complete, name):
+def test_mixed_native_origin_flags_are_not_labelled_geocentric(complete, name) -> None:
     c = complete["apparent_position_context"]
     batches = deepcopy(c["batches"])
     batches[0]["bodies"][0]["return_flags"] |= REFERENCE["native_changing_flag_bits"][

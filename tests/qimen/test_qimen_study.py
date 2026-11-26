@@ -10,9 +10,14 @@ from zoneinfo import ZoneInfo
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.validation import qimen_study as research
-from fatebridge.validation.predictions import Outcome, digest
-from fatebridge.validation.qimen_study import (
+from tests.unit_test.fixtures.qimen_study import AS_OF as AS_OF
+from tests.unit_test.fixtures.qimen_study import ISSUED as ISSUED
+from tests.unit_test.fixtures.qimen_study import frozen_study as frozen_study
+from tests.unit_test.fixtures.qimen_study import outcomes as outcomes
+from tests.unit_test.fixtures.qimen_study import packet as packet
+from validation import qimen_study as research
+from validation.predictions import Outcome, digest
+from validation.qimen_study import (
     Condition,
     FrozenQimenPolicy,
     QimenCasting,
@@ -25,113 +30,8 @@ from fatebridge.validation.qimen_study import (
     seal_forecasts,
 )
 
-ISSUED = datetime(2026, 12, 31, tzinfo=timezone.utc)
-AS_OF = datetime(2027, 3, 1, tzinfo=timezone.utc)
 
-
-@pytest.fixture(scope="module")
-def frozen_study():
-    policy = FrozenQimenPolicy(
-        policy_id="synthetic-adversarial-fixture-not-a-predictor",
-        target_definition="Synthetic binary event, never an empirical sample",
-        ju_method="chaibu",
-        god_profile="yanyi_text",
-        season_profile="yanyi_vol1_verse",
-        use_true_solar_time=False,
-        source_disagreement_action="use_declared_rules",
-        rules=[
-            {
-                "rule_id": "test-only-not-calibrated",
-                "all_of": [
-                    {
-                        "feature": "pattern_present",
-                        "pattern": "hidden_day_stem",
-                        "equals": False,
-                    }
-                ],
-                "probability": 0.8,
-            }
-        ],
-        fallback_probability=0.2,
-    )
-    casts = [
-        {
-            "case_id": "literal",
-            "subject_id": "synthetic-1",
-            "casting_at": "2026-01-15T16:00:00+08:00",
-            "timezone_name": "Asia/Hong_Kong",
-            "longitude": 114.17,
-        },
-        {
-            "case_id": "jia",
-            "subject_id": "synthetic-2",
-            "casting_at": "2026-01-20T16:00:00+08:00",
-            "timezone_name": "Asia/Hong_Kong",
-            "longitude": 114.17,
-        },
-        {
-            "case_id": "fold",
-            "subject_id": "synthetic-3",
-            "casting_at": "2026-11-01T05:30:00Z",
-            "timezone_name": "America/New_York",
-            "longitude": -74.0,
-        },
-    ]
-    for c in casts:
-        c.update(
-            {
-                "recorded_at": "2026-12-30T00:00:00Z",
-                "question_record_sha256": "a" * 64,
-                "question_record_reference": "synthetic question only",
-            }
-        )
-    study = StudyInput.model_validate(
-        {
-            "plan": {
-                "study_id": "synthetic-qimen-replay",
-                "data_kind": "synthetic",
-                "preregistered_at": "2025-01-01T00:00:00Z",
-                "registration_reference": "synthetic-registration-not-a-real-registry",
-                "window_start": "2027-01-01T00:00:00Z",
-                "window_end": "2027-02-01T00:00:00Z",
-                "target_definition": policy.target_definition,
-                "model_sha256": engine_fingerprint(),
-                "interpretation_policy_sha256": policy_fingerprint(policy),
-                "baseline_frozen_at": "2025-01-01T00:00:00Z",
-                "baseline_probability": 0.5,
-                "minimum_evaluable": 1,
-                "training_subject_ids": [],
-                "cohort": [
-                    {"case_id": c["case_id"], "subject_id": c["subject_id"]}
-                    for c in casts
-                ],
-            },
-            "policy": policy.model_dump(mode="json"),
-            "castings": casts,
-        }
-    )
-    return seal_forecasts(study, at=ISSUED)
-
-
-@pytest.fixture
-def packet(frozen_study):
-    return QimenCommitment.model_validate(frozen_study.model_dump(mode="json"))
-
-
-def outcomes():
-    return [
-        Outcome(
-            case_id=c,
-            occurred=False,
-            recorded_at="2027-02-02T00:00:00Z",
-            source_sha256="f" * 64,
-            source_reference="synthetic outcome only",
-        )
-        for c in ("literal", "jia", "fold")
-    ]
-
-
-def test_actual_replay_retains_unknowns_and_resolves_known_fold(packet):
+def test_actual_replay_retains_unknowns_and_resolves_known_fold(packet) -> None:
     literal = packet.evidence["literal"]
     assert literal["result"]["qimen"]["time_ganzhi"] == "壬申"
     assert literal["result"]["qimen"]["source_disagreements"]
@@ -155,7 +55,9 @@ def test_actual_replay_retains_unknowns_and_resolves_known_fold(packet):
     assert not report["validated_qimen_predictor"] and not report["authority_certified"]
 
 
-def test_dependency_failure_remains_in_ledger(packet, monkeypatch):
+def test_dependency_failure_remains_in_ledger(
+    packet, monkeypatch: pytest.MonkeyPatch
+) -> None:
     # Injected failure verifies the protocol; it is not an observed bad chart
     # or a replacement for the now-valid original fold case.
     def unavailable(**kwargs):
@@ -179,8 +81,8 @@ def test_dependency_failure_remains_in_ledger(packet, monkeypatch):
     "casting_fold,record_fold,valid", [(0, 1, True), (1, 0, False)]
 )
 def test_question_record_order_uses_actual_fold(
-    packet, casting_fold, record_fold, valid
-):
+    packet, casting_fold: int, record_fold: int, valid: bool
+) -> None:
     zone = ZoneInfo("America/New_York")
     data = packet.study.castings[-1].model_dump(mode="python")
     data.update(
@@ -213,7 +115,9 @@ def test_question_record_order_uses_actual_fold(
 
 @pytest.mark.parametrize("case", ["literal", "jia", "fold"])
 @pytest.mark.parametrize("probability", [None, 0.95])
-def test_changed_probability_or_abstention_rejected(packet, case, probability):
+def test_changed_probability_or_abstention_rejected(
+    packet, case: str, probability: float | None
+) -> None:
     forecast = next(f for f in packet.forecasts if f.case_id == case)
     forecast.probability = 0.05 if forecast.probability == probability else probability
     with pytest.raises(ValueError, match="概率或弃权"):
@@ -230,7 +134,9 @@ def test_changed_probability_or_abstention_rejected(packet, case, probability):
         ("question_record_reference", "changed"),
     ],
 )
-def test_changed_casting_rejected_even_when_decision_unchanged(packet, field, value):
+def test_changed_casting_rejected_even_when_decision_unchanged(
+    packet, field: str, value
+) -> None:
     raw = packet.model_dump(mode="json")
     raw["study"]["castings"][0][field] = value
     with pytest.raises(ValueError, match="证据未绑定"):
@@ -238,7 +144,7 @@ def test_changed_casting_rejected_even_when_decision_unchanged(packet, field, va
 
 
 @pytest.mark.parametrize("part", ["castings", "forecasts", "evidence"])
-def test_cannot_delete_failed_rows(packet, part):
+def test_cannot_delete_failed_rows(packet, part: str) -> None:
     raw = packet.model_dump(mode="json")
     if part == "castings":
         raw["study"][part].pop()
@@ -250,7 +156,7 @@ def test_cannot_delete_failed_rows(packet, part):
         audit_study(QimenCommitment.model_validate(raw), outcomes(), as_of=AS_OF)
 
 
-def test_forged_board_rejected_even_with_rehashed_receipt(packet):
+def test_forged_board_rejected_even_with_rehashed_receipt(packet) -> None:
     e = packet.evidence["literal"]
     e["result"]["qimen"]["palaces"][0]["door"] = "生门"
     packet.forecasts[0].evidence_sha256 = digest(e)
@@ -258,7 +164,9 @@ def test_forged_board_rejected_even_with_rehashed_receipt(packet):
         audit_study(packet, outcomes(), as_of=AS_OF)
 
 
-def test_policy_and_engine_changes_rejected(packet, monkeypatch):
+def test_policy_and_engine_changes_rejected(
+    packet, monkeypatch: pytest.MonkeyPatch
+) -> None:
     changed = packet.model_dump(mode="json")
     changed["study"]["policy"]["god_profile"] = "yanyi_diagrams"
     with pytest.raises(ValueError, match="解释策略"):
@@ -271,7 +179,9 @@ def test_policy_and_engine_changes_rejected(packet, monkeypatch):
         audit_study(packet, outcomes(), as_of=AS_OF)
 
 
-def test_mid_calculation_changes_rejected(packet, monkeypatch):
+def test_mid_calculation_changes_rejected(
+    packet, monkeypatch: pytest.MonkeyPatch
+) -> None:
     actual = research.engine_manifest()
     calls = iter([actual, {**actual, "changed": True}])
     monkeypatch.setattr(research, "engine_manifest", lambda: next(calls))
@@ -279,7 +189,7 @@ def test_mid_calculation_changes_rejected(packet, monkeypatch):
         seal_forecasts(packet.study, at=ISSUED)
 
 
-def test_unknown_is_not_false_and_unrelated_layers_remain_usable(packet):
+def test_unknown_is_not_false_and_unrelated_layers_remain_usable(packet) -> None:
     board = packet.evidence["jia"]["result"]["qimen"]
     policy = packet.study.policy.model_copy(deep=True)
     assert apply_policy(board, policy)["probability"] is None
@@ -295,7 +205,7 @@ def test_unknown_is_not_false_and_unrelated_layers_remain_usable(packet):
     assert apply_policy(board, policy)["probability"] == 0.8
 
 
-def test_qualifications_not_inferred_from_pattern_name(packet):
+def test_qualifications_not_inferred_from_pattern_name(packet) -> None:
     board = deepcopy(packet.evidence["literal"]["result"]["qimen"])
     policy = packet.study.policy.model_copy(deep=True)
     policy.rules[0].all_of = [
@@ -318,10 +228,12 @@ def test_qualifications_not_inferred_from_pattern_name(packet):
     for pattern in board["patterns"]:
         if pattern["rule_id"] == "door_pressure":
             pattern.pop("qualification", None)
+        else:
+            pass
     assert apply_policy(board, policy)["probability"] is None
 
 
-def test_source_conflict_abstention_policy_is_frozen(packet):
+def test_source_conflict_abstention_policy_is_frozen(packet) -> None:
     policy = packet.study.policy.model_copy(deep=True)
     policy.source_disagreement_action = "abstain"
     decision = apply_policy(packet.evidence["literal"]["result"]["qimen"], policy)
@@ -349,7 +261,7 @@ def test_source_conflict_abstention_policy_is_frozen(packet):
         {"feature": "hour_void_scope", "trigram": "坎", "equals": "maybe"},
     ],
 )
-def test_no_arbitrary_paths_fake_center_or_type_coercion(condition):
+def test_no_arbitrary_paths_fake_center_or_type_coercion(condition) -> None:
     with pytest.raises(ValidationError):
         Condition.model_validate(condition)
 
@@ -365,14 +277,16 @@ def test_no_arbitrary_paths_fake_center_or_type_coercion(condition):
         ("longitude", 181.0),
     ],
 )
-def test_no_clock_guessing_or_silent_truncation(packet, field, value):
+def test_no_clock_guessing_or_silent_truncation(
+    packet, field: str, value: float | str
+) -> None:
     casting = packet.study.castings[0].model_dump(mode="json")
     casting[field] = value
     with pytest.raises(ValueError):
         QimenCasting.model_validate(casting)
 
 
-def test_training_declaration_and_model_copy_bypass(packet):
+def test_training_declaration_and_model_copy_bypass(packet) -> None:
     study = packet.study.model_copy(deep=True)
     study.plan.training_subject_ids = None
     with pytest.raises(ValueError, match="训练主体"):
@@ -382,7 +296,7 @@ def test_training_declaration_and_model_copy_bypass(packet):
         audit_study(packet, outcomes(), as_of=AS_OF)
 
 
-def test_real_submission_cannot_backdate(packet):
+def test_real_submission_cannot_backdate(packet) -> None:
     study = packet.study.model_copy(deep=True)
     study.plan.data_kind = "real_world_submission"
     with pytest.raises(ValueError, match="回溯发布"):
@@ -393,8 +307,8 @@ def test_real_submission_cannot_backdate(packet):
     "end", ["2026-12-30T23:59:59+00:00", "2027-01-01T00:00:00+00:00"]
 )
 def test_cannot_backfill_start_time_after_window_opens_or_clock_reverses(
-    packet, monkeypatch, end
-):
+    packet, monkeypatch: pytest.MonkeyPatch, end: str
+) -> None:
     moments = iter([ISSUED, datetime.fromisoformat(end)])
 
     class Clock(datetime):
@@ -410,8 +324,8 @@ def test_cannot_backfill_start_time_after_window_opens_or_clock_reverses(
 
 
 def test_json_manifest_is_canonical_and_ephemeris_changes_invalidate_replay(
-    packet, monkeypatch
-):
+    packet, monkeypatch: pytest.MonkeyPatch
+) -> None:
     manifest = research.engine_manifest()
     assert json.loads(json.dumps(manifest)) == manifest
     changed = {**manifest, "ephemeris_inventory": [{"same-name.se1": "a" * 64}]}
@@ -420,7 +334,20 @@ def test_json_manifest_is_canonical_and_ephemeris_changes_invalidate_replay(
         audit_study(packet, outcomes(), as_of=AS_OF)
 
 
-def test_missing_feature_is_unknown_and_early_match_has_priority(packet):
+def test_registered_study_rejects_changed_native_jpl_before_calculation(
+    packet, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "other-registered-source.dat")
+
+    def unexpected_calculation(**kwargs):
+        pytest.fail("The engine must reject the changed source before casting")
+
+    monkeypatch.setattr(research, "calculate_qimen_analysis", unexpected_calculation)
+    with pytest.raises(ValueError, match="当前引擎与注册指纹不一致"):
+        seal_forecasts(packet.study, at=ISSUED)
+
+
+def test_missing_feature_is_unknown_and_early_match_has_priority(packet) -> None:
     board = packet.evidence["literal"]["result"]["qimen"]
     policy = packet.study.policy.model_copy(deep=True)
     policy.rules[0].all_of = [
@@ -436,7 +363,9 @@ def test_missing_feature_is_unknown_and_early_match_has_priority(packet):
 
 
 @pytest.mark.parametrize("malformed", ["false", 0, [], {}])
-def test_malformed_boolean_evidence_is_unknown_not_a_false_condition(packet, malformed):
+def test_malformed_boolean_evidence_is_unknown_not_a_false_condition(
+    packet, malformed
+) -> None:
     board = packet.evidence["literal"]["result"]["qimen"]
     policy = packet.study.policy.model_copy(deep=True)
     policy.rules[0].all_of = [Condition(feature="five_not_meet", equals=True)]
@@ -446,7 +375,7 @@ def test_malformed_boolean_evidence_is_unknown_not_a_false_condition(packet, mal
     assert decision["reason"] == "unknown_potentially_matching_rule"
 
 
-def test_all_abstain_is_zero_evidence(packet):
+def test_all_abstain_is_zero_evidence(packet) -> None:
     study = packet.study.model_copy(deep=True)
     study.policy.rules = []
     study.policy.fallback_probability = None
@@ -457,7 +386,7 @@ def test_all_abstain_is_zero_evidence(packet):
     assert not report["authority_certified"]
 
 
-def test_cli_round_trip(packet, tmp_path):
+def test_cli_round_trip(packet, tmp_path: Path) -> None:
     spec = importlib.util.spec_from_file_location(
         "qimen_study_cli",
         Path(__file__).parents[2] / "scripts/qimen/audit_qimen_study.py",

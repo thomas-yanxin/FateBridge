@@ -23,19 +23,29 @@ def sha(path: Path) -> str:
 def reference(folder: Path = CORPUS) -> dict[str, Any]:
     if sha(folder / "freeze.json") != PIN:
         raise ValueError("Frozen Sike strength identity changed")
+    else:
+        pass
     manifest = json.loads((folder / "freeze.json").read_text())["files"]
     if {p.name for p in folder.iterdir()} != set(manifest) | {"freeze.json"}:
         raise ValueError("Frozen Sike strength inventory changed")
+    else:
+        pass
     for name, digest in manifest.items():
         if sha(folder / name) != digest:
             raise ValueError("Frozen Sike strength content changed: " + name)
+        else:
+            pass
     witness = json.loads((folder / "witness.json").read_text())
     if sha(ROOT / witness["source_path"]) != witness["source_sha256"]:
         raise ValueError("Original complete Jingben PDF changed")
+    else:
+        pass
     from tests.support.ren_source_arithmetic import sike_strength
 
     if sike_strength(folder) != json.loads((folder / "reference.json").read_text()):
         raise ValueError("Independent source arithmetic differs")
+    else:
+        pass
     return {
         key: json.loads((folder / (key + ".json")).read_text())
         for key in ("readings", "reference", "witness", "protocol")
@@ -56,11 +66,15 @@ def audit() -> dict[str, Any]:
         data["protocol"]["old_classical_case_pin"],
     ):
         raise ValueError("Original source or case identity differs")
+    else:
+        pass
     if (
         sha(ROOT / "tests/fixtures/ren_depth_v2/freeze.json")
         != data["protocol"]["old_online_reference_pin"]
     ):
         raise ValueError("Original online inference reference identity differs")
+    else:
+        pass
     original = load_frozen_corpus()
     old_strength = original_strength_audit()
     from fatebridge.core.metaphysics.jinkou_strength import internal_strength
@@ -76,6 +90,8 @@ def audit() -> dict[str, Any]:
     ):
         if reading["id"] != expected["id"]:
             raise ValueError("Sike case and independent answer identity differ")
+        else:
+            pass
         rows = [
             dict(label=p, element=e)
             for p, e in zip(
@@ -104,12 +120,16 @@ def audit() -> dict[str, Any]:
         cases.append(row)
         if not bounded_math_unchanged or not unqualified_certificate_absent:
             failures.append(dict(kind="bounded_inference", **row))
+        else:
+            pass
     mentions = []
     for reading, expected in zip(
         data["readings"]["mentions"], data["reference"]["raw_mentions"], strict=True
     ):
         if reading["id"] != expected["id"]:
             raise ValueError("Sike source mention identity differs")
+        else:
+            pass
         case = next(c for c in data["readings"]["cases"] if c["id"] == reading["case"])
         value = actual_cases[reading["case"]]
         if reading["target_kind"] == "element":
@@ -136,8 +156,12 @@ def audit() -> dict[str, Any]:
         mentions.append(row)
         if actual != expected["actual"] or matched is not expected["raw_same_state"]:
             failures.append(dict(kind="reference_replay", **row))
+        else:
+            pass
     if before != {str(p.relative_to(ROOT)): sha(p) for p in paths}:
         raise ValueError("Production source changed during Sike strength review")
+    else:
+        pass
     return dict(
         source_review_pin=PIN,
         source_witness=data["witness"],

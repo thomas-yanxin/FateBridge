@@ -41,6 +41,8 @@ def calculate(annual=False):
     payload = dict(PAYLOAD)
     if annual:
         payload.update(birth_year_ganzhi="甲午", year_fate_age=20, gender="男")
+    else:
+        pass
     fn, args, kw = SPEC.bind(SPEC.request_model.model_validate(payload))
     return fn(*args, **kw)
 
@@ -54,12 +56,16 @@ def witness(board):
 
 
 @pytest.mark.parametrize("annual", [False, True])
-def test_full_chapter_inventory_is_delivered_without_adjudicating_the_six(annual):
+def test_full_chapter_inventory_is_delivered_without_adjudicating_the_six(
+    annual: bool,
+) -> None:
     ref = reference()
     result = calculate(annual)
     boards = [result["jinkou"]]
     if annual:
         boards.append(result["jinkou"]["year_fate"]["course"])
+    else:
+        pass
     for board in boards:
         w = witness(board)
         assert "chapter_inventory" in w, "Full chapter evidence has not reached results"
@@ -94,7 +100,9 @@ def test_full_chapter_inventory_is_delivered_without_adjudicating_the_six(annual
 
 @pytest.mark.parametrize("annual", [False, True])
 @pytest.mark.parametrize("fault", ["count", "duplicate", "hash", "missing"])
-def test_false_chapter_claims_are_rejected_for_main_and_annual_courses(fault, annual):
+def test_false_chapter_claims_are_rejected_for_main_and_annual_courses(
+    fault: str, annual: bool
+) -> None:
     result = json.loads(json.dumps(calculate(annual)))
     board = result["jinkou"]["year_fate"]["course"] if annual else result["jinkou"]
     w = witness(board)
@@ -110,7 +118,9 @@ def test_false_chapter_claims_are_rejected_for_main_and_annual_courses(fault, an
         validate_output(SPEC, result)
 
 
-def test_trace_keeps_its_existing_summary_without_inventing_a_second_inventory():
+def test_trace_keeps_its_existing_summary_without_inventing_a_second_inventory() -> (
+    None
+):
     board = calculate()["jinkou"]
     trace = next(
         t
@@ -128,11 +138,13 @@ def test_trace_keeps_its_existing_summary_without_inventing_a_second_inventory()
 @pytest.mark.parametrize("annual", [False, True])
 @pytest.mark.parametrize("project", [False, True])
 def test_chapter_source_and_nulls_survive_all_three_ports(
-    annual, project, surface_calls
-):
+    annual: bool, project: bool, surface_calls
+) -> None:
     payload = dict(PAYLOAD)
     if annual:
         payload.update(birth_year_ganzhi="甲午", year_fate_age=20, gender="男")
+    else:
+        pass
     fields = [
         "jinkou.definition_evidence.witnesses",
         "jinkou.definition_evidence.entries",
@@ -140,6 +152,8 @@ def test_chapter_source_and_nulls_survive_all_three_ports(
     ]
     if annual:
         fields.append("jinkou.year_fate.course.definition_evidence.witnesses")
+    else:
+        pass
     params = [("as_of", AS_OF), ("response_char_limit", "0")]
     flags, opts = ["--response-char-limit", "0"], {}
     if project:
@@ -156,6 +170,8 @@ def test_chapter_source_and_nulls_survive_all_three_ports(
             "false",
         ]
         opts.update(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, mcp, code, cli = surface_calls(
         SPEC, payload, params=params, options=opts, flags=flags, cli_first=False
     )

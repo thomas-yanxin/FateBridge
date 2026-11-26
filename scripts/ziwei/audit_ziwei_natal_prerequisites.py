@@ -8,8 +8,9 @@ from pathlib import Path
 from typing import Any
 
 from fatebridge.core.almanac import localize_datetime
+from fatebridge.core.metaphysics.seed import build_analysis_seed
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart, build_ziwei_horoscope
-from fatebridge.services.metaphysics import _build_analysis_seed, _build_person_seed
+from fatebridge.services.metaphysics import _build_person_seed
 from fatebridge.utils.birth_input import create_person_info
 from fatebridge.utils.civil_clock import utc_instant
 from fatebridge.utils.timezones import parse_timezone_name
@@ -68,6 +69,8 @@ def audit_natal_prerequisites(fixtures: Path = FIXTURES) -> dict[str, Any]:
                         raise ValueError(
                             "Natal source chart does not contain a unique prerequisite step"
                         )
+                    else:
+                        pass
                     expected["rule_trace"].append(deepcopy(rows[0]))
                 before = deepcopy(chart)
                 for minutes in (0, 65):
@@ -75,7 +78,7 @@ def audit_natal_prerequisites(fixtures: Path = FIXTURES) -> dict[str, Any]:
                         target = (birth + timedelta(minutes=minutes)).astimezone(
                             parse_timezone_name(zone)
                         )
-                        target_seed = _build_analysis_seed(
+                        target_seed = build_analysis_seed(
                             analysis_year=target.year,
                             analysis_month=target.month,
                             analysis_day=target.day,
@@ -108,10 +111,14 @@ def audit_natal_prerequisites(fixtures: Path = FIXTURES) -> dict[str, Any]:
                                     kind="natal_prerequisite_receipt",
                                 )
                             )
+                        else:
+                            pass
                         if chart != before:
                             differences.append(
                                 dict(case=case["id"], kind="natal_chart_mutated")
                             )
+                        else:
+                            pass
                         checks += 1
                 births += 1
     return dict(

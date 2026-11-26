@@ -5,24 +5,36 @@ from dataclasses import dataclass
 
 from pydantic import BaseModel, JsonValue, TypeAdapter
 
-from .bazhai import bazhai
-from .context_inputs import EnvironmentalContext, EnvironmentalObject
-from .jinsuo import jinsuo
-from .layout import analyze_layout
-from .models import AssessRequest, EnvironmentFeature, JinsuoRequest, Placement
-from .spatial_desktop import desktop_rule_comparisons
-from .spatial_inputs import SpatialScene
-from .spatial_outputs import EvaluatedGeometry, GeometryOutput
-from .spatial_reasoning import (
+from fatebridge.core.fengshui.bazhai import bazhai
+from fatebridge.core.fengshui.context_inputs import (
+    EnvironmentalContext,
+    EnvironmentalObject,
+)
+from fatebridge.core.fengshui.jinsuo import jinsuo
+from fatebridge.core.fengshui.layout import analyze_layout
+from fatebridge.core.fengshui.models import (
+    AssessRequest,
+    EnvironmentFeature,
+    JinsuoRequest,
+    Placement,
+)
+from fatebridge.core.fengshui.spatial_desktop import desktop_rule_comparisons
+from fatebridge.core.fengshui.spatial_inputs import SpatialScene
+from fatebridge.core.fengshui.spatial_outputs import EvaluatedGeometry, GeometryOutput
+from fatebridge.core.fengshui.spatial_reasoning import (
     ComputedSpatialFacts,
     RuleComparison,
     TimedWorkstationReading,
     conditioned_readings,
 )
-from .spatial_scene import evaluate_geometry
-from .spatial_sources import RegisteredRuleset, spatial_ruleset
-from .timeliness import timeliness_provenance
-from .workstation_inputs import EntryBarrier, ObservedCondition, WorkstationReview
+from fatebridge.core.fengshui.spatial_scene import evaluate_geometry
+from fatebridge.core.fengshui.spatial_sources import RegisteredRuleset, spatial_ruleset
+from fatebridge.core.fengshui.timeliness import timeliness_provenance
+from fatebridge.core.fengshui.workstation_inputs import (
+    EntryBarrier,
+    ObservedCondition,
+    WorkstationReview,
+)
 
 
 class FormCheckEvidence(BaseModel):

@@ -9,9 +9,13 @@ from __future__ import annotations
 
 from typing import Any
 
-from ...utils.data import HEAVENLY_STEMS
-from .common import ELEMENT_CONTROLS, ELEMENT_GENERATES, SIX_CLASH_BRANCHES
-from .jinkou_relations import SOURCE_SHA256, SOURCE_URL
+from fatebridge.core.metaphysics.common import (
+    ELEMENT_CONTROLS,
+    ELEMENT_GENERATES,
+    SIX_CLASH_BRANCHES,
+)
+from fatebridge.core.metaphysics.jinkou_relations import SOURCE_SHA256, SOURCE_URL
+from fatebridge.utils.data import HEAVENLY_STEMS
 
 TRINES = (
     ("寅午戌", "炎上课", "炎上破体课", "火", "亥子"),

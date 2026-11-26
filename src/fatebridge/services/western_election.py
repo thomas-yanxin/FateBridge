@@ -1,23 +1,23 @@
-"""
-Service surface for 择日 (electional astrology).
-
-Casts a chart for the candidate moment being evaluated and runs the electional
-scorer in :mod:`fatebridge.core.astrology_election`.
-"""
+"""Cast and render a Western electional chart."""
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any
 
+from fatebridge.core.astro.astrology_election import (
+    TOPIC_MASTER,
+    build_election_payload,
+)
 from fatebridge.core.astro.iers_ut1 import use_ut1_source
-from fatebridge.core.astrology_election import TOPIC_MASTER, build_election_payload
 from fatebridge.core.western_clock_origin import event_wall_datetime
 from fatebridge.core.western_event_clock import build_event_subject
+from fatebridge.services.snapshot_builders import (
+    format_snapshot_json,
+)
 from fatebridge.services.snapshot_builders import (
     render_snapshot_text as _render_snapshot_text,
 )
 from fatebridge.utils.errors import handle_calculation_error
-from fatebridge.utils.formatting import format_json_response
 from fatebridge.utils.house_systems import house_system_fields, normalize_house_system
 
 
@@ -29,18 +29,19 @@ def calculate_election(
     candidate_hour: int,
     candidate_minute: int = 0,
     candidate_second: int = 0,
-    timezone_name: Optional[str] = None,
+    timezone_name: str | None = None,
     longitude: float,
     latitude: float,
     topic_id: str = "marriage",
-    name: Optional[str] = None,
+    name: str | None = None,
     house_system: str = "R",
     zodiac_type: str = "Tropic",
     candidate_calendar: str = "proleptic_gregorian",
     candidate_clock_basis: str = "civil",
     candidate_hour_origin: str = "midnight",
     ut1_source: str = "swiss_delta_t",
-) -> Dict[str, Any]:
+    render_snapshot: bool = True,
+) -> dict[str, Any]:
     """评估某候选时刻对某类用事（结婚/开业/签约等非医疗活动）是否吉利。"""
     label = "择日"
     try:
@@ -93,55 +94,8 @@ def calculate_election(
                 "zodiac_type": zodiac_type,
                 "engine": "fatebridge-offline",
             }
-            score_text = (
-                f"{payload['score']}/100"
-                if payload["score"] is not None
-                else f"未完成（已声明条件的范围{payload['score_bounds'][0]}–{payload['score_bounds'][1]}，非概率区间）"
-            )
-            summary = (
-                f"择日（{payload['topic_label']}）：{payload['verdict']}，评分 "
-                f"{score_text} — {payload['recommendation']}"
-            )
-            sections = [
-                ("起盘信息", format_json_response(context, compact=False)),
-                (
-                    "历法日期换算",
-                    format_json_response(calendar_conversion, compact=False),
-                ),
-                (
-                    "钟时与物理时刻",
-                    format_json_response(clock_conversion, compact=False),
-                ),
-                (
-                    "评分与裁断",
-                    format_json_response(
-                        {
-                            "score": payload["score"],
-                            "score_bounds": payload["score_bounds"],
-                            "score_evidence": payload["score_evidence"],
-                            "scoring_policy": payload["scoring_policy"],
-                            "verdict": payload["verdict"],
-                            "has_hard_block": payload["has_hard_block"],
-                            "recommendation": payload["recommendation"],
-                            "moon": payload["moon"],
-                            "ascendant": payload["ascendant"],
-                            "significator": payload["significator"],
-                            "dignity_scope": payload["dignity_scope"],
-                            "axes": payload["axes"],
-                            "calculation_basis": payload["calculation_basis"],
-                            "solar_condition_policy": payload["solar_condition_policy"],
-                            "marriage_significators": payload["marriage_significators"],
-                        },
-                        compact=False,
-                    ),
-                ),
-                ("吉凶因子", format_json_response(payload["factors"], compact=False)),
-                (
-                    "未核算因子",
-                    format_json_response(payload["unresolved_factors"], compact=False),
-                ),
-            ]
-            return {
+            summary = f"择日（{payload['topic_label']}）候选盘，已核对星体及所选条件。"
+            result = {
                 "analysis_type": "西占择日",
                 "engine": "fatebridge-offline",
                 "analysis_context": context,
@@ -149,7 +103,45 @@ def calculate_election(
                 "clock_conversion": clock_conversion,
                 "election": payload,
                 "summary": summary,
-                "snapshot_text": _render_snapshot_text(sections),
             }
+            if render_snapshot:
+                sections = [
+                    ("起盘信息", format_snapshot_json(context)),
+                    (
+                        "历法日期换算",
+                        format_snapshot_json(calendar_conversion),
+                    ),
+                    (
+                        "钟时与物理时刻",
+                        format_snapshot_json(clock_conversion),
+                    ),
+                    (
+                        "候选盘条件",
+                        format_snapshot_json(
+                            {
+                                "condition_policy": payload["condition_policy"],
+                                "moon": payload["moon"],
+                                "ascendant": payload["ascendant"],
+                                "significator": payload["significator"],
+                                "dignity_scope": payload["dignity_scope"],
+                                "axes": payload["axes"],
+                                "calculation_basis": payload["calculation_basis"],
+                                "solar_condition_policy": payload[
+                                    "solar_condition_policy"
+                                ],
+                                "marriage_significators": payload[
+                                    "marriage_significators"
+                                ],
+                            },
+                        ),
+                    ),
+                    ("已见因子", format_snapshot_json(payload["factors"])),
+                    (
+                        "未核算因子",
+                        format_snapshot_json(payload["unresolved_factors"]),
+                    ),
+                ]
+                result["snapshot_text"] = _render_snapshot_text(sections)
+            return result
     except Exception as exc:
         return handle_calculation_error(exc, label)

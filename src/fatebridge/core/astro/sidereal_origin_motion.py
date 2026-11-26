@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import math
 from importlib.metadata import version
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.lunar_motion import SOURCE_URL, SOURCE_VERSION
@@ -27,7 +27,7 @@ NATIVE_INTERVAL_DAYS = 0.001
 
 def circular_origin_correction(
     current: float, previous: float
-) -> Tuple[float, int, float, float]:
+) -> tuple[float, int, float, float]:
     """Replace only the integer winding of two normalized degree values."""
     if not all(math.isfinite(v) and 0 <= v < 360 for v in (current, previous)):
         raise EphemerisSourceError("coordinate_values_unavailable")
@@ -43,13 +43,13 @@ def circular_origin_correction(
 
 
 def traditional_lahiri_origin_wrap(
-    julian_day_tt: float, context: Dict[str, Any]
-) -> Optional[float]:
+    julian_day_tt: float, context: dict[str, Any]
+) -> float | None:
     """Inspect the managed traditional origin, retaining its unwrapped inputs."""
     swe = runtime.swe
     native_version = str(getattr(swe, "version", "unavailable"))
     binding_version = binding_distribution_version(swe, version)
-    policy: Dict[str, Any] = {
+    policy: dict[str, Any] = {
         "method_id": METHOD_ID,
         "epoch_jd_tt": julian_day_tt,
         "native_version": native_version,
@@ -77,7 +77,7 @@ def traditional_lahiri_origin_wrap(
         raise EphemerisSourceError("coordinate_motion_unavailable")
     requested_flags = swe.FLG_SWIEPH | swe.FLG_NONUT
 
-    def read(epoch: float) -> Tuple[int, float]:
+    def read(epoch: float) -> tuple[int, float]:
         value = runtime.ephemeris_call("get_ayanamsa_ex", epoch, requested_flags)
         if not isinstance(value, (tuple, list)) or len(value) != 2:
             raise EphemerisSourceError("coordinate_values_unavailable")

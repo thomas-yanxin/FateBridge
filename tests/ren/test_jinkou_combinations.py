@@ -8,10 +8,10 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.core.contracts.output_chinese import JinkouCombinations
 from fatebridge.core.metaphysics.jinkou_combinations import trine_evidence
-from fatebridge.core.output_chinese import JinkouCombinations
 from fatebridge.services.metaphysics import _build_jinkou_snapshot_text
-from tests.ren.test_ren_classical_depth import AUDIT as V1
+from scripts.ren import audit_ren_classical
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -26,7 +26,7 @@ def by_phase(result, phase):
     return next(r for r in result["trines"] if r["element"] == phase)
 
 
-def test_all_frozen_clauses_and_full_branch_space_keep_old_disagreements():
+def test_all_frozen_clauses_and_full_branch_space_keep_old_disagreements() -> None:
     result = AUDIT.audit()
     assert result["primary_stem_clause_count"] == 12
     assert result["primary_waiting_clause_count"] == 4
@@ -43,9 +43,11 @@ def test_all_frozen_clauses_and_full_branch_space_keep_old_disagreements():
     assert prior["unevaluated_definitions"] == 6
 
 
-def test_printed_p01_reconstruction_keeps_distinct_clash_break_and_empty_facts():
+def test_printed_p01_reconstruction_keeps_distinct_clash_break_and_empty_facts() -> (
+    None
+):
     # P01's symbolic month/day/hour; not an inferred Gregorian date.
-    board = V1.observe_jinkou(
+    board = audit_ren_classical.observe_jinkou(
         dict(day="甲辰", hour="申", ground="午", general="子", month="子")
     )
     assert [r["content"] for r in board["rows"]] == ["庚", "寅", "戌", "午"]
@@ -70,8 +72,8 @@ def test_printed_p01_reconstruction_keeps_distinct_clash_break_and_empty_facts()
     "phase,branches,self_listed", [("水", "申子辰", "辰"), ("金", "巳酉丑", "巳")]
 )
 def test_trine_member_in_disruptor_list_is_not_automatically_a_broken_trine(
-    phase, branches, self_listed
-):
+    phase: str, branches: str, self_listed: str
+) -> None:
     result = trine_evidence(
         AUDIT.symbolic_rows("甲", list(branches)), day_branch="卯", month_branch="丑"
     )
@@ -85,7 +87,7 @@ def test_trine_member_in_disruptor_list_is_not_automatically_a_broken_trine(
     assert row["transformation_confirmed"] is None
 
 
-def test_two_distinct_water_members_wait_for_chen_with_scan_name_retained():
+def test_two_distinct_water_members_wait_for_chen_with_scan_name_retained() -> None:
     row = by_phase(
         trine_evidence(
             AUDIT.symbolic_rows("甲", list("申子申")),
@@ -101,8 +103,10 @@ def test_two_distinct_water_members_wait_for_chen_with_scan_name_retained():
     assert row["calendar_candidates"] is None
 
 
-def test_no_candidate_trine_does_not_create_a_hypothetical_control_judgment():
-    board = V1.observe_jinkou(dict(day="戊辰", hour="申", ground="酉", general="子"))
+def test_no_candidate_trine_does_not_create_a_hypothetical_control_judgment() -> None:
+    board = audit_ren_classical.observe_jinkou(
+        dict(day="戊辰", hour="申", ground="酉", general="子")
+    )
     row = by_phase(board["combinations"], "火")
     assert row["structural_status"] == "insufficient_members"
     assert row["human_stem_relation"] is None
@@ -110,9 +114,9 @@ def test_no_candidate_trine_does_not_create_a_hypothetical_control_judgment():
     assert "未比较人元与局" in row["basis"]
 
 
-def test_fire_clause_uses_general_dun_stem_not_its_intrinsic_earth_phase():
+def test_fire_clause_uses_general_dun_stem_not_its_intrinsic_earth_phase() -> None:
     # Synthetic standard-method chart; no original event or predicted outcome.
-    board = V1.observe_jinkou(
+    board = audit_ren_classical.observe_jinkou(
         dict(day="戊辰", hour="申", ground="午", general="子", month="子")
     )
     row = by_phase(board["combinations"], "火")
@@ -131,10 +135,12 @@ def test_fire_clause_uses_general_dun_stem_not_its_intrinsic_earth_phase():
 
 
 @pytest.mark.parametrize("day", ["甲辰", "戊辰"])
-def test_snapshot_renders_positive_conditions_without_promoting_them_to_a_verdict(day):
+def test_snapshot_renders_positive_conditions_without_promoting_them_to_a_verdict(
+    day: str,
+) -> None:
     case = dict(day=day, hour="申", ground="午", general="子", month="子")
-    board = V1.observe_jinkou(case)
-    seed = V1.make_seed(case)
+    board = audit_ren_classical.observe_jinkou(case)
+    seed = audit_ren_classical.make_seed(case)
     seed.calendar_context["next_solar_term"] = {"name": "小寒"}
     text = _build_jinkou_snapshot_text(seed=seed, jinkou=board)
     row = by_phase(board["combinations"], "火")
@@ -144,6 +150,8 @@ def test_snapshot_renders_positive_conditions_without_promoting_them_to_a_verdic
     if day == "戊辰":
         assert "将神遁干壬水克火局" in text
         assert "符合本节壬癸克火局条件" in text
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
@@ -154,12 +162,16 @@ def test_snapshot_renders_positive_conditions_without_promoting_them_to_a_verdic
         ("calendar_candidates", ["2026-10-22"]),
     ],
 )
-def test_public_schema_cannot_turn_unadjudicated_layers_into_assertions(field, value):
+def test_public_schema_cannot_turn_unadjudicated_layers_into_assertions(
+    field: str, value
+) -> None:
     with pytest.raises(ValidationError):
         JinkouCombinations.model_validate({"trines": [{field: value}]})
 
 
-def test_reference_mutation_cannot_redefine_the_acceptance_labels(tmp_path):
+def test_reference_mutation_cannot_redefine_the_acceptance_labels(
+    tmp_path: Path,
+) -> None:
     target = tmp_path / "corpus"
     shutil.copytree(AUDIT.CORPUS, target)
     path = target / "reference.json"
@@ -171,10 +183,12 @@ def test_reference_mutation_cannot_redefine_the_acceptance_labels(tmp_path):
 
 
 @pytest.mark.parametrize("day", ["甲子", "甲戌", "甲申", "甲午", "甲辰", "甲寅"])
-def test_literal_case_auxiliary_emptiness_obeys_original_frozen_xun_table(day):
+def test_literal_case_auxiliary_emptiness_obeys_original_frozen_xun_table(
+    day: str,
+) -> None:
     from scripts.ren import audit_jinkou_patterns as patterns
 
-    rules = V1.load_frozen_corpus()["rules"]
+    rules = audit_ren_classical.load_frozen_corpus()["rules"]
     label = rules["empty"][day]
     phase = label[0] if label != "无四大空亡" else None
     for stem in "甲丙戊庚壬":

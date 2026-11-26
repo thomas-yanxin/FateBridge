@@ -11,18 +11,18 @@ from types import SimpleNamespace
 import pytest
 from pydantic import ValidationError
 
-import fatebridge.core.lilly_radicality_inputs as clock
+import fatebridge.core.astro.lilly_radicality_inputs as clock
+from fatebridge.core.astro.lilly_radicality import (
+    evaluate_radicality,
+    normalize_context,
+)
 from fatebridge.core.astro.solar_events import next_solar_event
 from fatebridge.core.astro.time_scales import datetime_from_ut1, ephemeris_time
+from fatebridge.core.contracts.output_western import HoraryRadicality
 from fatebridge.core.ephemeris_runtime import (
     configure_ephemeris_path,
     configured_ephemeris_path,
 )
-from fatebridge.core.lilly_radicality import (
-    evaluate_radicality,
-    normalize_context,
-)
-from fatebridge.core.output_western import HoraryRadicality
 from fatebridge.core.predictive.native_chart import build_native_subject
 from fatebridge.core.requests.western_events import LillyRadicalityContext
 from fatebridge.utils.errors import EphemerisSourceError
@@ -87,7 +87,9 @@ def clause(value, code):
     return next(c for c in value["clauses"] if c["code"] == code)
 
 
-def test_primary_assets_inventory_natures_and_all_four_printed_affinity_examples():
+def test_primary_assets_inventory_natures_and_all_four_printed_affinity_examples() -> (
+    None
+):
     value = audit()
     assert value["source_assets_verified"] == 35
     assert value["manual_clause_inventory_checked"] == 12
@@ -105,7 +107,7 @@ def test_primary_assets_inventory_natures_and_all_four_printed_affinity_examples
 @pytest.mark.parametrize(
     "case", REFERENCE["declared_boundary_controls"], ids=lambda c: c["id"]
 )
-def test_independently_frozen_operational_boundary_controls(case):
+def test_independently_frozen_operational_boundary_controls(case) -> None:
     if "asc_degrees_in_sign" in case:
         value = review(Fraction(case["asc_degrees_in_sign"]))
         assert value["ascendant_degree_gate"]["early"] is case["early"]
@@ -121,8 +123,8 @@ def test_independently_frozen_operational_boundary_controls(case):
 
 @pytest.mark.parametrize("side,late", [(-1, False), (0, True), (1, True)])
 def test_late_ascendant_27_boundary_does_not_drop_exact_27_or_round_adjacent_doubles(
-    side, late
-):
+    side, late: bool
+) -> None:
     at = (
         27.0 if side == 0 else math.nextafter(27.0, math.inf if side > 0 else -math.inf)
     )
@@ -143,8 +145,8 @@ def test_late_ascendant_27_boundary_does_not_drop_exact_27_or_round_adjacent_dou
     ],
 )
 def test_early_exception_requires_both_reported_parts_without_age_or_appearance_inference(
-    young, agreement, expected
-):
+    young: bool | None, agreement: bool | None, expected: bool | None
+) -> None:
     value = review(
         1,
         context={
@@ -169,18 +171,22 @@ def test_early_exception_requires_both_reported_parts_without_age_or_appearance_
     ],
 )
 def test_filled_question_clock_is_not_a_certain_timed_event_exception(
-    origin, certain, expected
-):
+    origin: str | None, certain: bool | None, expected: bool | None
+) -> None:
     value = review(
         27, context={"figure_origin": origin, "event_time_certain_reported": certain}
     )
     assert value["ascendant_degree_gate"]["certain_timed_event_exception"] is expected
     if expected is True:
         assert clause(value, "C02")["status"] == "qualified_by_reported_exception"
+    else:
+        pass
     assert value["safe_to_judge"] is None
 
 
-def test_reported_age_correspondence_is_separate_from_the_numeric_ascendant_degree():
+def test_reported_age_correspondence_is_separate_from_the_numeric_ascendant_degree() -> (
+    None
+):
     missing = review(27)
     assert missing["reported_context"]["age_degree_agreement_reported"] is None
     assert clause(missing, "C02")["exception_satisfied"] is None
@@ -193,8 +199,8 @@ def test_reported_age_correspondence_is_separate_from_the_numeric_ascendant_degr
 
 @pytest.mark.parametrize("longitude", [59.999, 89.999, 239.999, 299.999, 359.999])
 def test_moon_late_degree_cutoff_stays_unknown_instead_of_borrowing_ascendant_threshold(
-    longitude,
-):
+    longitude: float,
+) -> None:
     s = states()
     s["Moon"]["longitude"] = longitude
     row = clause(review(planets=s), "C03")
@@ -204,7 +210,9 @@ def test_moon_late_degree_cutoff_stays_unknown_instead_of_borrowing_ascendant_th
 
 
 @pytest.mark.parametrize("sign_start", [30, 90, 240, 330])
-def test_void_moon_sign_qualification_never_changes_the_geometric_voc_flag(sign_start):
+def test_void_moon_sign_qualification_never_changes_the_geometric_voc_flag(
+    sign_start: int,
+) -> None:
     s = states()
     s["Moon"]["longitude"] = sign_start + 10
     value = review(planets=s, voc=True)
@@ -224,13 +232,13 @@ def test_void_moon_sign_qualification_never_changes_the_geometric_voc_flag(sign_
     assert clause(strong, "C05")["condition_present"] is True
 
 
-def test_unavailable_moon_history_is_not_a_void_moon_caution():
+def test_unavailable_moon_history_is_not_a_void_moon_caution() -> None:
     value = review(voc=None)
     assert clause(value, "C05")["condition_present"] is None
     assert not any(c["code"] == "C05" for c in value["strictures"])
 
 
-def test_seventh_topic_guard_does_not_erase_separate_saturn_clause():
+def test_seventh_topic_guard_does_not_erase_separate_saturn_clause() -> None:
     s = states()
     s["Venus"]["retrograde"] = True
     s["Venus"]["speed"] = -0.1
@@ -243,7 +251,7 @@ def test_seventh_topic_guard_does_not_erase_separate_saturn_clause():
     assert not any(c["code"] == "C06" for c in value["strictures"])
 
 
-def test_saturn_cusp_virtue_is_not_mislabeled_as_literal_geometric_occupancy():
+def test_saturn_cusp_virtue_is_not_mislabeled_as_literal_geometric_occupancy() -> None:
     s = states()
     s["Saturn"]["occupied_house"] = 12
     s["Saturn"]["house_assignment"]["assigned_house"] = 1
@@ -262,8 +270,8 @@ def test_saturn_cusp_virtue_is_not_mislabeled_as_literal_geometric_occupancy():
     "distance,combust", [(1, True), (12, False), (Fraction(1, 10), False)]
 )
 def test_ascendant_lord_solar_state_does_not_conflate_beams_cazimi_or_sun_self(
-    distance, combust
-):
+    distance, combust: bool
+) -> None:
     s = states()
     s["Mercury"]["longitude"] = Fraction(s["Sun"]["longitude"]) + distance
     value = review(65, planets=s)
@@ -272,7 +280,9 @@ def test_ascendant_lord_solar_state_does_not_conflate_beams_cazimi_or_sun_self(
     assert clause(sun_lord, "C09")["status"] == "not_applicable"
 
 
-def test_known_seventh_fall_or_bound_can_resolve_an_or_with_unspecified_unfortunate_state():
+def test_known_seventh_fall_or_bound_can_resolve_an_or_with_unspecified_unfortunate_state() -> (
+    None
+):
     # Venus in Virgo is fallen; Mercury in Virgo20 is in Saturn's printed p104 bound.
     assert clause(review(seventh="Taurus"), "C10")["condition_present"] is True
     s = states()
@@ -286,7 +296,9 @@ def test_known_seventh_fall_or_bound_can_resolve_an_or_with_unspecified_unfortun
     )
 
 
-def test_zero_score_never_supplies_equal_testimonies_and_no_caution_never_certifies_fitness():
+def test_zero_score_never_supplies_equal_testimonies_and_no_caution_never_certifies_fitness() -> (
+    None
+):
     s = states()
     for row in s.values():
         row["literal_table_balance"] = 0
@@ -300,7 +312,9 @@ def test_zero_score_never_supplies_equal_testimonies_and_no_caution_never_certif
 
 
 @pytest.mark.parametrize("value", ["true", 1, [], {"not_a_source_field": True}])
-def test_context_reports_are_strict_and_unknown_keys_not_silently_discarded(value):
+def test_context_reports_are_strict_and_unknown_keys_not_silently_discarded(
+    value,
+) -> None:
     data = value if isinstance(value, dict) else {"event_time_certain_reported": value}
     with pytest.raises(ValueError):
         normalize_context(data)
@@ -308,7 +322,7 @@ def test_context_reports_are_strict_and_unknown_keys_not_silently_discarded(valu
         LillyRadicalityContext.model_validate(data)
 
 
-def test_direct_review_never_mutates_inputs_or_turns_unknowns_into_false():
+def test_direct_review_never_mutates_inputs_or_turns_unknowns_into_false() -> None:
     s = states()
     s["Saturn"]["house_assignment"]["assigned_house"] = None
     context = {"figure_origin": "unknown", "event_time_certain_reported": False}
@@ -319,20 +333,21 @@ def test_direct_review_never_mutates_inputs_or_turns_unknowns_into_false():
     assert (s, context) == before
 
 
-def test_missing_native_clock_does_not_get_a_civil_hour_or_default_location():
+def test_missing_native_clock_does_not_get_a_civil_hour_or_default_location() -> None:
     value = clock.collect_radicality_hour(SimpleNamespace())
     assert value["hour"] is None and value["status"] == "not_computed"
 
 
 def test_clock_unavailable_and_configuration_changes_remain_explicit(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     subject = SimpleNamespace(
         julian_day=2451545.0, lng=0.0, lat=51.5, tz_str="UTC", is_diurnal=True
     )
-    monkeypatch.setattr(clock, "_planetary_hours", lambda *args: None)
+    monkeypatch.setattr(clock, "_resolve_planetary_hour", lambda *args: None)
     value = clock.collect_radicality_hour(subject)
     assert value["status"] == "unavailable" and value["hour"] is None
+    assert value["unavailable_reason"] == "sunrise_sunset_interval_unavailable"
     previous = configured_ephemeris_path()
 
     try:
@@ -346,14 +361,16 @@ def test_clock_unavailable_and_configuration_changes_remain_explicit(
                 configure_ephemeris_path(str(tmp_path))
                 return {"hour_ruler": "Mars", "is_day": True}
 
-            mutation.setattr(clock, "_planetary_hours", changed)
+            mutation.setattr(clock, "_resolve_planetary_hour", changed)
             with pytest.raises(EphemerisSourceError):
                 clock.collect_radicality_hour(subject)
     finally:
         configure_ephemeris_path(previous)
 
 
-def test_actual_apparent_sunrise_day_and_geometric_sect_keep_distinct_boundaries():
+def test_actual_apparent_sunrise_day_and_geometric_sect_keep_distinct_boundaries() -> (
+    None
+):
     jd = ephemeris_time(datetime(2024, 6, 1, tzinfo=timezone.utc)).jd_ut1
     rise = next_solar_event(
         jd,

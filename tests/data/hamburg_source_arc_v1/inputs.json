@@ -1,0 +1,302 @@
+{
+  "cases": [
+    {
+      "id": "source-pair-1-mc-neighbor--1",
+      "natal_tropical_sun": 1.0,
+      "progressed_tropical_sun": 11.1,
+      "factor_longitudes": {
+        "Sun": 1.0,
+        "Mercury": 0.0,
+        "Mars": 33.0,
+        "Midheaven": 11.099999999999998
+      },
+      "orb_degrees": 1.0,
+      "source_pair_index": 0,
+      "mc_neighbor": -1,
+      "scope": "synthetic mathematical source operands only; no ephemeris positions or study records"
+    },
+    {
+      "id": "source-pair-1-mc-neighbor-+0",
+      "natal_tropical_sun": 1.0,
+      "progressed_tropical_sun": 11.1,
+      "factor_longitudes": {
+        "Sun": 1.0,
+        "Mercury": 0.0,
+        "Mars": 33.0,
+        "Midheaven": 11.1
+      },
+      "orb_degrees": 1.0,
+      "source_pair_index": 0,
+      "mc_neighbor": 0,
+      "scope": "synthetic mathematical source operands only; no ephemeris positions or study records"
+    },
+    {
+      "id": "source-pair-1-mc-neighbor-+1",
+      "natal_tropical_sun": 1.0,
+      "progressed_tropical_sun": 11.1,
+      "factor_longitudes": {
+        "Sun": 1.0,
+        "Mercury": 0.0,
+        "Mars": 33.0,
+        "Midheaven": 11.100000000000001
+      },
+      "orb_degrees": 1.0,
+      "source_pair_index": 0,
+      "mc_neighbor": 1,
+      "scope": "synthetic mathematical source operands only; no ephemeris positions or study records"
+    },
+    {
+      "id": "source-pair-2-mc-neighbor--1",
+      "natal_tropical_sun": 350.2,
+      "progressed_tropical_sun": 10.1,
+      "factor_longitudes": {
+        "Sun": 350.2,
+        "Mercury": 0.0,
+        "Mars": 33.0,
+        "Midheaven": 20.90000000000001
+      },
+      "orb_degrees": 1.0,
+      "source_pair_index": 1,
+      "mc_neighbor": -1,
+      "scope": "synthetic mathematical source operands only; no ephemeris positions or study records"
+    },
+    {
+      "id": "source-pair-2-mc-neighbor-+0",
+      "natal_tropical_sun": 350.2,
+      "progressed_tropical_sun": 10.1,
+      "factor_longitudes": {
+        "Sun": 350.2,
+        "Mercury": 0.0,
+        "Mars": 33.0,
+        "Midheaven": 20.900000000000013
+      },
+      "orb_degrees": 1.0,
+      "source_pair_index": 1,
+      "mc_neighbor": 0,
+      "scope": "synthetic mathematical source operands only; no ephemeris positions or study records"
+    },
+    {
+      "id": "source-pair-2-mc-neighbor-+1",
+      "natal_tropical_sun": 350.2,
+      "progressed_tropical_sun": 10.1,
+      "factor_longitudes": {
+        "Sun": 350.2,
+        "Mercury": 0.0,
+        "Mars": 33.0,
+        "Midheaven": 20.900000000000016
+      },
+      "orb_degrees": 1.0,
+      "source_pair_index": 1,
+      "mc_neighbor": 1,
+      "scope": "synthetic mathematical source operands only; no ephemeris positions or study records"
+    },
+    {
+      "id": "source-pair-3-mc-neighbor--1",
+      "natal_tropical_sun": 11.1,
+      "progressed_tropical_sun": 161.1,
+      "factor_longitudes": {
+        "Sun": 11.1,
+        "Mercury": 0.0,
+        "Mars": 33.0,
+        "Midheaven": 150.99999999999997
+      },
+      "orb_degrees": 1.0,
+      "source_pair_index": 2,
+      "mc_neighbor": -1,
+      "scope": "synthetic mathematical source operands only; no ephemeris positions or study records"
+    },
+    {
+      "id": "source-pair-3-mc-neighbor-+0",
+      "natal_tropical_sun": 11.1,
+      "progressed_tropical_sun": 161.1,
+      "factor_longitudes": {
+        "Sun": 11.1,
+        "Mercury": 0.0,
+        "Mars": 33.0,
+        "Midheaven": 151.0
+      },
+      "orb_degrees": 1.0,
+      "source_pair_index": 2,
+      "mc_neighbor": 0,
+      "scope": "synthetic mathematical source operands only; no ephemeris positions or study records"
+    },
+    {
+      "id": "source-pair-3-mc-neighbor-+1",
+      "natal_tropical_sun": 11.1,
+      "progressed_tropical_sun": 161.1,
+      "factor_longitudes": {
+        "Sun": 11.1,
+        "Mercury": 0.0,
+        "Mars": 33.0,
+        "Midheaven": 151.00000000000003
+      },
+      "orb_degrees": 1.0,
+      "source_pair_index": 2,
+      "mc_neighbor": 1,
+      "scope": "synthetic mathematical source operands only; no ephemeris positions or study records"
+    },
+    {
+      "id": "source-pair-4-mc-neighbor--1",
+      "natal_tropical_sun": 270.1,
+      "progressed_tropical_sun": 10.2,
+      "factor_longitudes": {
+        "Sun": 270.1,
+        "Mercury": 0.0,
+        "Mars": 33.0,
+        "Midheaven": 101.09999999999997
+      },
+      "orb_degrees": 1.0,
+      "source_pair_index": 3,
+      "mc_neighbor": -1,
+      "scope": "synthetic mathematical source operands only; no ephemeris positions or study records"
+    },
+    {
+      "id": "source-pair-4-mc-neighbor-+0",
+      "natal_tropical_sun": 270.1,
+      "progressed_tropical_sun": 10.2,
+      "factor_longitudes": {
+        "Sun": 270.1,
+        "Mercury": 0.0,
+        "Mars": 33.0,
+        "Midheaven": 101.09999999999998
+      },
+      "orb_degrees": 1.0,
+      "source_pair_index": 3,
+      "mc_neighbor": 0,
+      "scope": "synthetic mathematical source operands only; no ephemeris positions or study records"
+    },
+    {
+      "id": "source-pair-4-mc-neighbor-+1",
+      "natal_tropical_sun": 270.1,
+      "progressed_tropical_sun": 10.2,
+      "factor_longitudes": {
+        "Sun": 270.1,
+        "Mercury": 0.0,
+        "Mars": 33.0,
+        "Midheaven": 101.1
+      },
+      "orb_degrees": 1.0,
+      "source_pair_index": 3,
+      "mc_neighbor": 1,
+      "scope": "synthetic mathematical source operands only; no ephemeris positions or study records"
+    },
+    {
+      "id": "source-pair-5-mc-neighbor--1",
+      "natal_tropical_sun": 359.9,
+      "progressed_tropical_sun": 0.1,
+      "factor_longitudes": {
+        "Sun": 359.9,
+        "Mercury": 0.0,
+        "Mars": 33.0,
+        "Midheaven": 1.2000000000000226
+      },
+      "orb_degrees": 1.0,
+      "source_pair_index": 4,
+      "mc_neighbor": -1,
+      "scope": "synthetic mathematical source operands only; no ephemeris positions or study records"
+    },
+    {
+      "id": "source-pair-5-mc-neighbor-+0",
+      "natal_tropical_sun": 359.9,
+      "progressed_tropical_sun": 0.1,
+      "factor_longitudes": {
+        "Sun": 359.9,
+        "Mercury": 0.0,
+        "Mars": 33.0,
+        "Midheaven": 1.2000000000000228
+      },
+      "orb_degrees": 1.0,
+      "source_pair_index": 4,
+      "mc_neighbor": 0,
+      "scope": "synthetic mathematical source operands only; no ephemeris positions or study records"
+    },
+    {
+      "id": "source-pair-5-mc-neighbor-+1",
+      "natal_tropical_sun": 359.9,
+      "progressed_tropical_sun": 0.1,
+      "factor_longitudes": {
+        "Sun": 359.9,
+        "Mercury": 0.0,
+        "Mars": 33.0,
+        "Midheaven": 1.200000000000023
+      },
+      "orb_degrees": 1.0,
+      "source_pair_index": 4,
+      "mc_neighbor": 1,
+      "scope": "synthetic mathematical source operands only; no ephemeris positions or study records"
+    },
+    {
+      "id": "source-pair-6-mc-neighbor--1",
+      "natal_tropical_sun": 10.1,
+      "progressed_tropical_sun": 10.1,
+      "factor_longitudes": {
+        "Sun": 10.1,
+        "Mercury": 0.0,
+        "Mars": 33.0,
+        "Midheaven": 0.9999999999999999
+      },
+      "orb_degrees": 1.0,
+      "source_pair_index": 5,
+      "mc_neighbor": -1,
+      "scope": "synthetic mathematical source operands only; no ephemeris positions or study records"
+    },
+    {
+      "id": "source-pair-6-mc-neighbor-+0",
+      "natal_tropical_sun": 10.1,
+      "progressed_tropical_sun": 10.1,
+      "factor_longitudes": {
+        "Sun": 10.1,
+        "Mercury": 0.0,
+        "Mars": 33.0,
+        "Midheaven": 1.0
+      },
+      "orb_degrees": 1.0,
+      "source_pair_index": 5,
+      "mc_neighbor": 0,
+      "scope": "synthetic mathematical source operands only; no ephemeris positions or study records"
+    },
+    {
+      "id": "source-pair-6-mc-neighbor-+1",
+      "natal_tropical_sun": 10.1,
+      "progressed_tropical_sun": 10.1,
+      "factor_longitudes": {
+        "Sun": 10.1,
+        "Mercury": 0.0,
+        "Mars": 33.0,
+        "Midheaven": 1.0000000000000002
+      },
+      "orb_degrees": 1.0,
+      "source_pair_index": 5,
+      "mc_neighbor": 1,
+      "scope": "synthetic mathematical source operands only; no ephemeris positions or study records"
+    }
+  ],
+  "operand_scope": "Six originally specified double source pairs × three adjacent represented MC operands; not six physical or natal forecasts. Both identical-source zero-arc and simple exact-difference controls retained.",
+  "construction": "MC=float((exact source arc+1) mod360), its predecessor and successor; selected before any product/reference observation.",
+  "source_sun_pairs": [
+    [
+      1.0,
+      11.1
+    ],
+    [
+      350.2,
+      10.1
+    ],
+    [
+      11.1,
+      161.1
+    ],
+    [
+      270.1,
+      10.2
+    ],
+    [
+      359.9,
+      0.1
+    ],
+    [
+      10.1,
+      10.1
+    ]
+  ]
+}

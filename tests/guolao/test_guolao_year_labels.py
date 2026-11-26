@@ -8,7 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.guolao_year_labels import DATA, shoushi_year_context
+from fatebridge.core.guolao import guolao_year_labels
+from fatebridge.core.guolao.guolao_year_labels import DATA, shoushi_year_context
 
 ROOT = Path(__file__).parents[2]
 FIXTURES = Path(__file__).parents[1] / "fixtures" / "guolao-year-labels-v1"
@@ -16,7 +17,7 @@ REFERENCE = json.loads((FIXTURES / "reference.json").read_text())
 
 
 @pytest.mark.parametrize("example", REFERENCE["worked_examples"])
-def test_named_year_and_preceding_winter_reproduce_the_selected_source(example):
+def test_named_year_and_preceding_winter_reproduce_the_selected_source(example) -> None:
     book = shoushi_year_context(source_year=example["source_year"])
     winter = shoushi_year_context(winter_year=example["winter_year"])
     assert book["input_kind"] == "source_calendar_nominal_year_label"
@@ -35,7 +36,7 @@ def test_named_year_and_preceding_winter_reproduce_the_selected_source(example):
     )
 
 
-def test_same_number_different_year_kind_cannot_silently_mean_the_same_winter():
+def test_same_number_different_year_kind_cannot_silently_mean_the_same_winter() -> None:
     book = shoushi_year_context(source_year=1599)
     winter = shoushi_year_context(winter_year=1599)
     assert book["elapsed_years"] == 318
@@ -53,7 +54,7 @@ def test_same_number_different_year_kind_cannot_silently_mean_the_same_winter():
     )
 
 
-def test_computed_source_winter_is_not_replaced_with_observed_value_to_fit():
+def test_computed_source_winter_is_not_replaced_with_observed_value_to_fit() -> None:
     book = shoushi_year_context(source_year=1608)
     assert F(book["winter_cycle_days_exact"]) == F("29.2594")
     assert F(book["winter_cycle_days_exact"]) != F(
@@ -65,24 +66,28 @@ def test_computed_source_winter_is_not_replaced_with_observed_value_to_fit():
 
 @pytest.mark.parametrize("kind", ["source_year", "winter_year"])
 @pytest.mark.parametrize("bad", [True, 1608.0, F(1608), "1608", date(1608, 1, 1)])
-def test_year_kind_requires_integer_labels_not_birth_dates_or_implicit_casts(kind, bad):
+def test_year_kind_requires_integer_labels_not_birth_dates_or_implicit_casts(
+    kind: str, bad
+) -> None:
     with pytest.raises(TypeError, match="整数"):
         shoushi_year_context(**{kind: bad})
 
 
 @pytest.mark.parametrize("kwargs", [{}, {"source_year": 1281, "winter_year": 1280}])
-def test_exactly_one_explicit_year_kind_is_required(kwargs):
+def test_exactly_one_explicit_year_kind_is_required(kwargs) -> None:
     with pytest.raises(ValueError, match="只能"):
         shoushi_year_context(**kwargs)
 
 
 @pytest.mark.parametrize("kwargs", [{"source_year": 1280}, {"winter_year": 1279}])
-def test_upward_reckoning_is_not_inferred_from_negative_elapsed_years(kwargs):
+def test_upward_reckoning_is_not_inferred_from_negative_elapsed_years(kwargs) -> None:
     with pytest.raises(ValueError, match="上考"):
         shoushi_year_context(**kwargs)
 
 
-def test_year_labels_do_not_assign_modern_dates_or_resolve_other_header_variants():
+def test_year_labels_do_not_assign_modern_dates_or_resolve_other_header_variants() -> (
+    None
+):
     value = shoushi_year_context(source_year=1608)
     for flag in [
         "modern_calendar_date_assigned",
@@ -98,7 +103,7 @@ def test_year_labels_do_not_assign_modern_dates_or_resolve_other_header_variants
     )
 
 
-def test_frozen_scans_and_metadata_support_runtime_provenance():
+def test_frozen_scans_and_metadata_support_runtime_provenance() -> None:
     source = json.loads(DATA.read_bytes())
     assert (
         hashlib.sha256(DATA.read_bytes()).hexdigest()
@@ -122,9 +127,8 @@ def test_frozen_scans_and_metadata_support_runtime_provenance():
     "key", ["reference_nominal_year_ce", "reference_winter_year_ce"]
 )
 def test_changed_epoch_metadata_fails_instead_of_fitting_an_example(
-    tmp_path, monkeypatch, key
-):
-    from fatebridge.core import guolao_year_labels
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, key: str
+) -> None:
 
     source = json.loads(DATA.read_bytes())
     source[key] += 1

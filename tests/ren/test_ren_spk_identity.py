@@ -13,7 +13,7 @@ from fatebridge.core.ephemeris_runtime import (
     configured_ephemeris_path,
 )
 from fatebridge.core.metaphysics import ren_calendar
-from fatebridge.services.metaphysics import _build_analysis_seed
+from fatebridge.core.metaphysics.seed import build_analysis_seed
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/fixtures/ren_spk_identity_v1"
@@ -37,7 +37,7 @@ def reference(folder=FIXTURE):
 PROTOCOL = reference()
 
 
-def test_identity_fault_protocol_is_frozen(tmp_path):
+def test_identity_fault_protocol_is_frozen(tmp_path: Path) -> None:
     assert len(PROTOCOL["cases"]) == 3
     assert PROTOCOL["new_astronomical_events"] == 0
     assert PROTOCOL["new_model_processes"] == 0
@@ -56,6 +56,8 @@ def actual_spk(monkeypatch, tmp_path):
     kernel = ROOT / "ephe/solar-de440.bsp"
     if not kernel.exists():
         pytest.skip("Explicit external DE440 kernel unavailable")
+    else:
+        pass
     assert hashlib.sha256(kernel.read_bytes()).hexdigest() == (
         "a4ce9bf9b3282becc9f4b2ac3cebe03a2ae7599981aabd7265fd8482fff7c4b5"
     )
@@ -66,7 +68,7 @@ def actual_spk(monkeypatch, tmp_path):
             environment.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "spk")
             environment.setenv("FATEBRIDGE_SOLAR_SPK_FILE", str(kernel))
             environment.delenv("FATEBRIDGE_JPL_FILE", raising=False)
-            yield _build_analysis_seed(
+            yield build_analysis_seed(
                 analysis_year=2026,
                 analysis_month=4,
                 analysis_day=4,
@@ -78,7 +80,7 @@ def actual_spk(monkeypatch, tmp_path):
         configure_ephemeris_path(previous)
 
 
-def test_valid_actual_spk_dependencies_keep_empty_native_flags(actual_spk):
+def test_valid_actual_spk_dependencies_keep_empty_native_flags(actual_spk) -> None:
     policy = ren_calendar.require_ren_calendar(actual_spk)
     assert all(
         v["provider"] == "jpl_spk" and v["ephemeris_retflags"] == []
@@ -87,7 +89,9 @@ def test_valid_actual_spk_dependencies_keep_empty_native_flags(actual_spk):
 
 
 @pytest.mark.parametrize("case", PROTOCOL["cases"], ids=lambda c: c["id"])
-def test_spk_cannot_borrow_native_return_flags(case, actual_spk, monkeypatch):
+def test_spk_cannot_borrow_native_return_flags(
+    case, actual_spk, monkeypatch: pytest.MonkeyPatch
+) -> None:
     original = ren_calendar.get_adjacent_solar_terms
 
     def wrong_receipt(*args, **kwargs):

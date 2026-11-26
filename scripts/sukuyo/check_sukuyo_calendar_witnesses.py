@@ -24,6 +24,8 @@ def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:
         or data != before["expected_data"]
     ):
         raise ValueError("历日校勘记录与修改前来源不一致")
+    else:
+        pass
     checked = []
     for name, path in (captures or {}).items():
         captured = path.read_bytes()
@@ -34,11 +36,15 @@ def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:
         )
         if hashlib.sha256(captured).hexdigest() != expected["sha256"]:
             raise ValueError("历日校勘实际来源字节指纹不一致")
+        else:
+            pass
         if name.endswith(".xml"):
             tree = ET.fromstring(captured)
             for paragraph in data["all_five_selected_paragraphs"]:
                 if paragraph["source_file"] != name:
                     continue
+                else:
+                    pass
                 for row in paragraph["apparatus_entries"]:
                     found = [
                         a
@@ -51,11 +57,17 @@ def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:
                         or dict(found[0].attrib) != row["app_attributes"]
                     ):
                         raise ValueError("历日校勘锚点或属性不一致")
+                    else:
+                        pass
                     readings = [
                         ET.tostring(n, encoding="unicode").strip() for n in found[0]
                     ]
                     if readings != [r["serialized_xml"] for r in row["readings"]]:
                         raise ValueError("历日校勘实际所报读法不一致")
+                    else:
+                        pass
+        else:
+            pass
         checked.append(name)
     return {
         "source_bundle_sha256": hashlib.sha256(raw).hexdigest(),
@@ -80,3 +92,5 @@ if __name__ == "__main__":
             indent=2,
         )
     )
+else:
+    pass

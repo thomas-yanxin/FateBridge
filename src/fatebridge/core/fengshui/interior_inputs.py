@@ -5,11 +5,11 @@ every furniture corner. ``toilet_wall`` identifies the shared wall at the toilet
 fixture's side, not any partition adjoining a bathroom.
 """
 
-from typing import Any, Iterable, Literal, Mapping, Optional, Set, Tuple, get_args
+from typing import Any, Iterable, Literal, Mapping, get_args
 
 from pydantic import Field, StrictBool, field_validator, model_validator
 
-from .numeric_inputs import FengshuiInput as _DeferredModel
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput as _DeferredModel
 
 InteriorRole = Literal[
     "main_entry_door",
@@ -39,7 +39,7 @@ InteriorRelationKind = Literal[
     "stove_back_against_toilet_wall",
 ]
 SUPPORTED_INTERIOR_ROLES = frozenset(get_args(InteriorRole))
-RELATION_ROLES: Mapping[str, Tuple[str, str]] = {
+RELATION_ROLES: Mapping[str, tuple[str, str]] = {
     "main_entry_door_faces_bathroom_door": ("main_entry_door", "bathroom_door"),
     "bathroom_door_faces_stove": ("bathroom_door", "stove"),
     "sharp_corner_points_at_stove": ("sharp_corner", "stove"),
@@ -62,7 +62,7 @@ class InteriorRelation(_DeferredModel):
     source_object_id: str = Field(min_length=1, max_length=100)
     target_object_id: str = Field(min_length=1, max_length=100)
     kind: InteriorRelationKind
-    present: Optional[StrictBool] = Field(
+    present: StrictBool | None = Field(
         description="必须显式提供；null为未知，照片true/false均仅为候选观察"
     )
     observation_basis: Literal["measured", "user_confirmed", "image_observed"]
@@ -88,7 +88,7 @@ def _level(floor: Any) -> Any:
 
 def validate_relation_references(
     relations: Iterable[InteriorRelation],
-    roles: Mapping[str, Set[str]],
+    roles: Mapping[str, set[str]],
     floor_maps: Mapping[str, Any],
 ) -> None:
     """Validate explicit identities and known levels, never infer from labels.
@@ -96,8 +96,8 @@ def validate_relation_references(
     An object can have both a use (desk) and a source attribute (sharp corner).
     Photo observations are candidates, including their spatial interpretation.
     """
-    relation_ids: Set[str] = set()
-    predicates: Set[Tuple[str, str, str]] = set()
+    relation_ids: set[str] = set()
+    predicates: set[tuple[str, str, str]] = set()
     for relation in relations:
         if relation.relation_id in relation_ids:
             raise ValueError("interior_relations.relation_id 不可重复")

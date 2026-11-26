@@ -3,28 +3,44 @@
 from calendar import isleap
 from datetime import date, datetime, time, timedelta, timezone, tzinfo
 from functools import lru_cache
-from typing import Any, Callable, Dict, Iterable, Optional, Tuple
+from typing import TypedDict
 
 from dateutil.relativedelta import relativedelta
+from typing_extensions import NotRequired
 
 from fatebridge.core.timing import DEFAULT_DAYUN_PERIODS, TimingAnalysis
-from fatebridge.utils.clock_events import CivilClockGap
+from fatebridge.services.birth_time_events import BirthEventRecord, UnresolvedBirthEvent
+from fatebridge.services.dayun_wall_cells import MICROSECOND, DayunWallCell
+from fatebridge.utils.clock_events import CivilClockGap, clock_offset_changes
 from fatebridge.utils.solar_time import NormalizedBirthTime
-from fatebridge.utils.timezones import (
-    parse_timezone_name,
-    timezone_transition_candidates,
-)
-
-MICROSECOND = timedelta(microseconds=1)
+from fatebridge.utils.timezones import parse_timezone_name
 
 
-def _micros(value: timedelta) -> int:
-    return (value.days * 86400 + value.seconds) * 1_000_000 + value.microseconds
+class BoundaryClockWindow(TypedDict):
+    lower_utc: str
+    upper_utc: str
+    decade_boundary_index: int
+    projected_wall_start: str
+    projected_wall_end: str
+    scan_start_utc: str
+    scan_end_utc: str
+    forward_gap_count: int
+
+
+class BoundaryClockScan(TypedDict):
+    status: str
+    timezone: NotRequired[str]
+    scan_basis: NotRequired[str]
+    boundary_count: NotRequired[int]
+    scan_step_seconds: NotRequired[int]
+    windows: NotRequired[list[BoundaryClockWindow]]
+    continuous_completeness_certified: NotRequired[bool]
+    physical_precision_certified: NotRequired[bool]
 
 
 def projected_wall_image(
     low: datetime, high: datetime, year_offset: int
-) -> Tuple[datetime, datetime]:
+) -> tuple[datetime, datetime]:
     """Enclose calendar-year addition, including the backward leap clip."""
     if low.tzinfo is not None or high.tzinfo is not None or high < low:
         raise ValueError("大运墙钟投影需要顺序明确的无时区标签")
@@ -46,55 +62,30 @@ def projected_wall_image(
 @lru_cache(maxsize=256)
 def _forward_changes_on_utc_day(
     zone: tzinfo, day: date
-) -> Tuple[Tuple[datetime, timedelta, timedelta], ...]:
+) -> tuple[tuple[datetime, timedelta, timedelta], ...]:
     """Share complete second scans between overlapping boundary images."""
     start = datetime.combine(day, time.min, tzinfo=timezone.utc)
-    candidates = timezone_transition_candidates(
-        zone, start - MICROSECOND, start + timedelta(days=1) - MICROSECOND
+    return tuple(
+        (at, previous, current)
+        for at, previous, current in clock_offset_changes(
+            zone, start - MICROSECOND, start + timedelta(days=1) - MICROSECOND
+        )
+        if current > previous
     )
-    if candidates is not None:
-        changes = []
-        for at in candidates:
-            previous = (at - MICROSECOND).astimezone(zone).utcoffset()
-            current = at.astimezone(zone).utcoffset()
-            if previous is None or current is None:
-                raise ValueError("未来跳时扫描需要明确的UTC偏移")
-            if current > previous:
-                changes.append((at, previous, current))
-        return tuple(changes)
-    previous = (start - MICROSECOND).astimezone(zone).utcoffset()
-    if previous is None:
-        raise ValueError("未来跳时扫描需要明确的UTC偏移")
-    changes = []
-    for seconds in range(86400):
-        at = start + timedelta(seconds=seconds)
-        current = at.astimezone(zone).utcoffset()
-        if current is None:
-            raise ValueError("未来跳时扫描遇到未定义的UTC偏移")
-        if current > previous:
-            changes.append((at, previous, current))
-        previous = current
-    return tuple(changes)
 
 
 @lru_cache(maxsize=256)
 def forward_gaps_for_wall_image(
     zone: tzinfo, low: datetime, high: datetime
-) -> Tuple[Tuple[CivilClockGap, ...], datetime, datetime]:
-    """Scan the loaded clock, with an offset bound rather than analysis date.
-
-    datetime offsets have magnitude strictly below24hours. Thus any transition
-    whose post-change wall label is in the image is inside this UTC window.
-    The cache binds the actual zone object, never just its display key.
-    """
+) -> tuple[tuple[CivilClockGap, ...], datetime, datetime]:
+    """Find defined forward gap ends in the projected wall clock using its loaded zone."""
     if low.tzinfo is not None or high.tzinfo is not None or high < low:
         raise ValueError("未来跳时扫描需要顺序明确的墙钟范围")
     start = (low - timedelta(days=1)).replace(tzinfo=timezone.utc)
     end = (high + timedelta(days=1)).replace(tzinfo=timezone.utc)
     if isinstance(zone, timezone):
         return (), start, end
-    # Include all integer seconds in the window. The strict24h margin keeps
-    # any relevant transition away from the scan's open starting endpoint.
+    # note (clock): Offsets are under 24 hours, so the open scan endpoint cannot hide a relevant gap.
     start = start.replace(microsecond=0)
     if end.microsecond:
         end = end.replace(microsecond=0) + timedelta(seconds=1)
@@ -121,51 +112,27 @@ def forward_gaps_for_wall_image(
 
 def collect_dayun_boundary_clock_events(
     template: NormalizedBirthTime,
-    gender: Optional[str],
-    cuts: Iterable[datetime],
-    clock_at: Callable[[datetime], NormalizedBirthTime],
-) -> Tuple[list[Dict[str, Any]], list[Dict[str, Any]], Dict[str, Any]]:
+    cells: tuple[DayunWallCell, ...],
+) -> tuple[list[BirthEventRecord], list[UnresolvedBirthEvent], BoundaryClockScan]:
     """Add finite boundary probes; do not certify continuous extrema."""
     zone = parse_timezone_name(template.timezone)
     if isinstance(zone, timezone):
         return [], [], {"status": "fixed_offset"}
-    ordered = sorted(set(cuts))
-    events: list[Dict[str, Any]] = []
-    unresolved: list[Dict[str, Any]] = []
-    windows: list[Dict[str, Any]] = []
+    events: list[BirthEventRecord] = []
+    unresolved: list[UnresolvedBirthEvent] = []
+    windows: list[BoundaryClockWindow] = []
     seen = set()
-    for left, right in zip(ordered, ordered[1:]):
-        last = right - MICROSECOND
-        birth_a, details, wall_a, offset_a = (
-            TimingAnalysis._dayun_calendar_wall_context(
-                clock_at(left).input_datetime, gender, template.timezone
-            )
-        )
-        birth_b, other, wall_b, offset_b = TimingAnalysis._dayun_calendar_wall_context(
-            clock_at(last).input_datetime, gender, template.timezone
-        )
-        forward = details["forward_direction"]
-        slope = -119 if forward else 121
-        reference = details["reference_term"]
-        if not (
-            other["forward_direction"] == forward
-            and other["reference_term"]["datetime_with_offset"]
-            == reference["datetime_with_offset"]
-            and birth_a.date() == birth_b.date()
-            and birth_a.utcoffset() == birth_b.utcoffset()
-            and (offset_a["years"], offset_a["months"])
-            == (offset_b["years"], offset_b["months"])
-            and _micros(wall_b - wall_a) == slope * _micros(last - left)
-        ):
+    for cell in cells:
+        if not cell.is_affine:
             unresolved.append(
                 dict(
-                    lower_utc=left.isoformat(),
-                    upper_utc=right.isoformat(),
+                    lower_utc=cell.lower.isoformat(),
+                    upper_utc=cell.upper.isoformat(),
                     reason="boundary_clock_wall_cell_not_affine",
                 )
             )
             continue
-        low_wall, high_wall = sorted((wall_a, wall_b))
+        low_wall, high_wall = cell.wall_range
         for index in range(DEFAULT_DAYUN_PERIODS + 1):
             try:
                 projected_low, projected_high = projected_wall_image(
@@ -177,8 +144,8 @@ def collect_dayun_boundary_clock_events(
             except (ValueError, OverflowError):
                 unresolved.append(
                     dict(
-                        lower_utc=left.isoformat(),
-                        upper_utc=right.isoformat(),
+                        lower_utc=cell.lower.isoformat(),
+                        upper_utc=cell.upper.isoformat(),
                         reason="boundary_clock_window_not_fully_representable",
                         decade_boundary_index=index,
                     )
@@ -186,8 +153,8 @@ def collect_dayun_boundary_clock_events(
                 continue
             windows.append(
                 dict(
-                    lower_utc=left.isoformat(),
-                    upper_utc=right.isoformat(),
+                    lower_utc=cell.lower.isoformat(),
+                    upper_utc=cell.upper.isoformat(),
                     decade_boundary_index=index,
                     projected_wall_start=projected_low.isoformat(),
                     projected_wall_end=projected_high.isoformat(),
@@ -200,13 +167,12 @@ def collect_dayun_boundary_clock_events(
                 for target in TimingAnalysis._dayun_wall_year_preimages(
                     gap.upper_wall, index * 10
                 ):
-                    if not low_wall <= target <= high_wall:
+                    bracket = cell.inverse(target)
+                    if bracket is None:
                         continue
-                    quotient, remainder = divmod(_micros(target - wall_a), slope)
-                    lower = left + MICROSECOND * quotient
-                    upper = lower + MICROSECOND * bool(remainder)
+                    lower, upper = bracket
                     key = (lower, upper, gap.instant_utc, index, target)
-                    if not left <= lower <= upper <= last or key in seen:
+                    if key in seen:
                         continue
                     seen.add(key)
                     events.append(
@@ -219,9 +185,9 @@ def collect_dayun_boundary_clock_events(
                             bracket_width_seconds=(upper - lower).total_seconds(),
                             source=dict(
                                 policy="three_days_one_year_calendar_v1",
-                                direction="顺行" if forward else "逆行",
-                                reference_jie=reference["name"],
-                                reference_at_utc=reference["datetime_with_offset"],
+                                direction="顺行" if cell.is_forward else "逆行",
+                                reference_jie=cell.reference_term.name,
+                                reference_at_utc=cell.reference_timestamp,
                                 future_gap_at_utc=gap.instant_utc.isoformat(),
                                 future_gap_start_wall=gap.lower_wall.isoformat(),
                                 future_gap_end_wall=gap.upper_wall.isoformat(),

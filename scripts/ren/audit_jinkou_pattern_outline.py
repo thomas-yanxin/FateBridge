@@ -25,21 +25,31 @@ def sha(path: Path) -> str:
 def reference(folder: Path = CORPUS) -> dict[str, Any]:
     if sha(folder / "freeze.json") != PIN:
         raise ValueError("Frozen pattern outline manifest identity changed")
+    else:
+        pass
     manifest = json.loads((folder / "freeze.json").read_text())
     if set(manifest) != {"reference.json", "protocol.json", "source-reading.json"} or {
         p.name for p in folder.iterdir()
     } != set(manifest) | {"freeze.json"}:
         raise ValueError("Frozen pattern outline inventory changed")
+    else:
+        pass
     if any(sha(folder / n) != h for n, h in manifest.items()):
         raise ValueError("Frozen pattern outline reference changed")
+    else:
+        pass
     ref: dict[str, Any] = json.loads((folder / "reference.json").read_text())
     if (
         sha(ROOT / "tests/fixtures/jinkou_patterns_v1/freeze.json")
         != ref["original_reference_freeze_sha256"]
     ):
         raise ValueError("Original64 reference changed")
+    else:
+        pass
     if len(ref["entries"]) != 64:
         raise ValueError("Original64 definition identities required")
+    else:
+        pass
     return ref
 
 
@@ -213,8 +223,8 @@ def audit() -> dict[str, Any]:
     bad, valid = probes()
     from pydantic import BaseModel, ValidationError
 
-    from fatebridge.core.output_chinese import Jinkou
-    from fatebridge.core.output_ren_patterns import (
+    from fatebridge.core.contracts.output_chinese import Jinkou
+    from fatebridge.core.contracts.output_ren_patterns import (
         JinkouPatternEvaluation,
         JinkouPatternMatch,
         JinkouPatterns,
@@ -311,12 +321,16 @@ def main() -> None:
         ).encode()
         args.capture_business.write_bytes(gzip.compress(raw, mtime=0))
         result["business_baseline_sha256"] = sha(args.capture_business)
+    else:
+        pass
     if args.compare_business:
         before = json.loads(gzip.decompress(args.compare_business.read_bytes()))
         after = business_results()
         result["business_compared"] = len(after)
         result["business_unchanged"] = before == after
         result["selected_outline_checks_passed"] &= before == after
+    else:
+        pass
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     print(
         json.dumps({k: v for k, v in result.items() if k != "rows"}, ensure_ascii=False)
@@ -326,3 +340,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

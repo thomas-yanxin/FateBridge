@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation.sukuyo_historical_sources import (
+from validation.sukuyo_historical_sources import (
     REFORM_MONTH,
     MonthStart,
     _sequence_errors,
@@ -29,7 +29,7 @@ def naoj(year):
     return parse_naoj(raw, year)
 
 
-def test_astronomical_year_zero_is_retained_as_context_for_gregorian_year_one():
+def test_astronomical_year_zero_is_retained_as_context_for_gregorian_year_one() -> None:
     rows = naoj(0)
     november = next(row for row in rows if (row.year, row.month) == (0, 11))
     assert november.ordinal == -18
@@ -47,19 +47,19 @@ def test_astronomical_year_zero_is_retained_as_context_for_gregorian_year_one():
         date(1872, 12, 31),
     ],
 )
-def test_gregorian_index_matches_standard_library_without_a_1582_cutover(civil):
+def test_gregorian_index_matches_standard_library_without_a_1582_cutover(civil) -> None:
     assert gregorian_ordinal(civil.year, civil.month, civil.day) == civil.toordinal()
 
 
 @pytest.mark.parametrize(
     "fields", [(0, 2, 30), (100, 2, 29), (1, 0, 1), (1, 13, 1), (1, 1, True)]
 )
-def test_invalid_gregorian_dates_are_rejected(fields):
+def test_invalid_gregorian_dates_are_rejected(fields) -> None:
     with pytest.raises(ValueError):
         gregorian_ordinal(*fields)
 
 
-def test_two_publishers_agree_on_806_new_year_under_explicit_gregorian_input():
+def test_two_publishers_agree_on_806_new_year_under_explicit_gregorian_input() -> None:
     first = naoj(806)[0]
     assert (first.ordinal, first.year, first.month, first.leap) == (
         date(806, 1, 28).toordinal(),
@@ -73,7 +73,7 @@ def test_two_publishers_agree_on_806_new_year_under_explicit_gregorian_input():
     assert month == first and length == 29
 
 
-def test_meiji_reform_month_is_two_days_not_a_missing_28_or_29_day_record():
+def test_meiji_reform_month_is_two_days_not_a_missing_28_or_29_day_record() -> None:
     final = naoj(1872)[-1]
     assert final == MonthStart(REFORM_MONTH, 1872, 12, False)
     raw = base64.b64decode(PRIMARY["hutime"]["raw_response_base64"])
@@ -85,7 +85,7 @@ def test_meiji_reform_month_is_two_days_not_a_missing_28_or_29_day_record():
     assert _sequence_errors([invalid], invalid.ordinal + 2)
 
 
-def test_wrong_naoj_year_and_hutime_flag_or_resource_are_rejected():
+def test_wrong_naoj_year_and_hutime_flag_or_resource_are_rejected() -> None:
     raw = base64.b64decode(PRIMARY["naoj"][0]["raw_csv_base64"])
     with pytest.raises(ValueError):
         parse_naoj(raw, 1)

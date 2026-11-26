@@ -24,6 +24,8 @@ def audit_civil_fold(fixtures: Path = FIXTURES) -> dict[str, Any]:
     raw = (root / manifest["source"]["path"]).read_bytes()
     if hashlib.sha256(raw).hexdigest() != manifest["source"]["sha256"]:
         raise ValueError("Ziwei civil fold source checksum mismatch")
+    else:
+        pass
     rules = [
         line.split()
         for line in raw.decode().splitlines()
@@ -42,6 +44,8 @@ def audit_civil_fold(fixtures: Path = FIXTURES) -> dict[str, Any]:
         "S",
     ] not in rules:
         raise ValueError("Missing frozen PRC autumn rule")
+    else:
+        pass
     if [
         "Rule",
         "PRC",
@@ -55,6 +59,8 @@ def audit_civil_fold(fixtures: Path = FIXTURES) -> dict[str, Any]:
         "D",
     ] not in rules:
         raise ValueError("Missing frozen PRC spring rule")
+    else:
+        pass
     differences: list[dict[str, Any]] = []
     receipts, chronology = [], []
     for profile in ("iztro_2_5_8", "quanshu_v2_excerpt"):
@@ -82,6 +88,8 @@ def audit_civil_fold(fixtures: Path = FIXTURES) -> dict[str, Any]:
                     if result.get("error"):
                         differences.append(dict(case=case["id"], error=result["error"]))
                         continue
+                    else:
+                        pass
                     basis = result["ziwei_birth"]["calendar_basis"]
                     clock = basis.get("civil_clock", {})
                     checks = {
@@ -110,6 +118,8 @@ def audit_civil_fold(fixtures: Path = FIXTURES) -> dict[str, Any]:
                             basis["time_input"]["daylight_saving_minutes"]
                             == case["expected_dst_minutes"]
                         )
+                    else:
+                        pass
                     if not all(checks.values()):
                         differences.append(
                             dict(
@@ -120,6 +130,8 @@ def audit_civil_fold(fixtures: Path = FIXTURES) -> dict[str, Any]:
                                 checks=checks,
                             )
                         )
+                    else:
+                        pass
                     receipts.append(
                         dict(
                             case=case["id"],
@@ -159,6 +171,8 @@ def audit_civil_fold(fixtures: Path = FIXTURES) -> dict[str, Any]:
                 differences.append(
                     dict(chronology=case, profile=profile, error=result.get("error"))
                 )
+            else:
+                pass
             chronology.append(dict(input=case, profile=profile, matches=matches))
     return dict(
         method_id=manifest["method_id"],

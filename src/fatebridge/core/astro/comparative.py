@@ -214,7 +214,6 @@ def build_comparative_geometry(
         "uncertainty_minutes": uncertainty["uncertainty_minutes"],
         "sample_count": None,
         "continuous_interval_proven": False,
-        "sample_frequency_is_probability": False,
         "summary": None,
         "point_spans": None,
         "samples": None,
@@ -225,6 +224,7 @@ def build_comparative_geometry(
                 "recorded_interval_end_utc",
                 "maximum_recorded_sample_gap_seconds",
                 "represented_radius_seconds",
+                "recorded_physical_grid",
                 "clock_policy",
                 "input_clock_basis",
                 "recorded_interval_start_clock",
@@ -307,10 +307,13 @@ def build_comparative_geometry(
         for sample in samples
     ):
         raise EphemerisSourceError("comparative_geometry_inputs")
-    offsets = [_number(sample["offset_seconds"]) for sample in samples]
-    if offsets != sorted(set(offsets)) or Fraction(0) not in offsets:
-        raise EphemerisSourceError("comparative_geometry_inputs")
-    nominal_index = offsets.index(Fraction(0))
+    if (grid := uncertainty.get("recorded_physical_grid")) is not None:
+        nominal_index = grid["nominal_sample_index"]
+    else:
+        offsets = [_number(sample["offset_seconds"]) for sample in samples]
+        if offsets != sorted(set(offsets)) or Fraction(0) not in offsets:
+            raise EphemerisSourceError("comparative_geometry_inputs")
+        nominal_index = offsets.index(Fraction(0))
     zero = samples[nominal_index]
     if (
         _number(zero["julian_day_tt"]) != _number(layer["profile"]["julian_day_tt"])

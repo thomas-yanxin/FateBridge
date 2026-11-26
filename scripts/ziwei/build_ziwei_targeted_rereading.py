@@ -23,6 +23,8 @@ def build() -> dict[str, Any]:
             raise ValueError(
                 "Targeted rereading source checksum mismatch: " + record["path"]
             )
+        else:
+            pass
     report_path = FROZEN / manifest["independent_first_reading_report"]
     report = json.loads(report_path.read_text())
     target_inputs = manifest["target_inputs"]
@@ -34,6 +36,8 @@ def build() -> dict[str, Any]:
         (6, 8),
     } or len(target_inputs) != 5:
         raise ValueError("The five targeted inputs changed")
+    else:
+        pass
     literal_labels = {
         21: {"二十一", "廿一"},
         11: {"十一"},
@@ -101,6 +105,8 @@ def main() -> int:
     if args.check:
         if not TARGET.is_file() or TARGET.read_text() != text:
             raise SystemExit("Targeted Ziwei rereading disclosure is stale")
+        else:
+            pass
     else:
         TARGET.write_text(text)
     return 0
@@ -108,3 +114,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -1,13 +1,15 @@
 """Current local HKO source identity gates run before candidate calculations."""
 
+from pathlib import Path
+
 import pytest
 
 from scripts.ren import audit_ren_boundary_decisions as audit
 
 
 def test_changed_annual_manifest_is_rejected_before_reading_any_candidate(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     ref = audit.reference()
     monkeypatch.setattr(audit, "reference", lambda: ref)
     monkeypatch.setattr(audit, "ROOT", tmp_path)

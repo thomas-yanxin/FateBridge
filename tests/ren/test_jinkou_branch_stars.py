@@ -4,22 +4,23 @@ import copy
 import json
 import shutil
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
 from fatebridge.application.examples import evidence_views
-from fatebridge.core.metaphysics.jinkou_branch_stars import branch_stars
-from fatebridge.core.output_chinese import Jinkou
-from fatebridge.core.output_jinkou_branch_stars import (
+from fatebridge.core.contracts.output_chinese import Jinkou
+from fatebridge.core.contracts.output_jinkou_branch_stars import (
     JinkouBranchStars,
     require_complete_branch_stars,
 )
+from fatebridge.core.metaphysics.jinkou_branch_stars import branch_stars
 from scripts.ren.audit_jinkou_branch_stars import CORPUS, reference
-from tests.ren.test_jinkou_natal import raw
-from tests.ren.test_ren_transports import PAYLOAD
 from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
+from tests.unit_test.fixtures.jinkou_courses import natal_branch_output
+from tests.unit_test.fixtures.ren_protocol import REN_PROTOCOL_PAYLOAD
 
 REF = reference()
 SPEC = SPECS["jinkou"]
@@ -36,7 +37,7 @@ def value(case=None):
 
 
 @pytest.mark.parametrize("c", REF["synthetic_cases"], ids=lambda c: c["id"])
-def test_predeclared_original_target_examples(c):
+def test_predeclared_original_target_examples(c) -> None:
     result = value(c)
     JinkouBranchStars.model_validate(result)
     observed = {
@@ -48,7 +49,7 @@ def test_predeclared_original_target_examples(c):
     assert result["complete_classical_conformance"] is False
 
 
-def test_month_horse_is_distinct_from_day_horse_and_soil_strength_profile():
+def test_month_horse_is_distinct_from_day_horse_and_soil_strength_profile() -> None:
     v = value()
     assert v["day_ganzhi"] == "甲申" and v["month_building_branch"] == "寅"
     assert next(c["target"] for c in v["checks"] if c["id"] == "yima") == "申"
@@ -57,7 +58,9 @@ def test_month_horse_is_distinct_from_day_horse_and_soil_strength_profile():
 
 
 @pytest.mark.parametrize("fault", ["edit", "delete", "extra"])
-def test_frozen_source_and_denominators_cannot_be_replaced(tmp_path, fault):
+def test_frozen_source_and_denominators_cannot_be_replaced(
+    tmp_path: Path, fault: str
+) -> None:
     d = tmp_path / "copy"
     shutil.copytree(CORPUS, d)
     if fault == "edit":
@@ -89,7 +92,7 @@ def test_frozen_source_and_denominators_cannot_be_replaced(tmp_path, fault):
         "effect",
     ],
 )
-def test_copresent_facts_do_not_allow_conflated_targets(fault):
+def test_copresent_facts_do_not_allow_conflated_targets(fault: str) -> None:
     v = copy.deepcopy(value())
     if fault == "day_horse":
         v["checks"][2]["target"] = "寅"
@@ -117,7 +120,7 @@ def test_copresent_facts_do_not_allow_conflated_targets(fault):
         JinkouBranchStars.model_validate(v)
 
 
-def test_sparse_views_retain_only_requested_facts_and_validate_known_context():
+def test_sparse_views_retain_only_requested_facts_and_validate_known_context() -> None:
     v = value()
     partial = {"checks": v["checks"], "month_building_branch": "寅"}
     assert (
@@ -136,8 +139,8 @@ def test_sparse_views_retain_only_requested_facts_and_validate_known_context():
     "star,target", [("tianma", "卯"), ("yima", "卯"), ("tianshe", "乙丑")]
 )
 def test_omitted_calendar_does_not_allow_targets_absent_from_the_named_rule(
-    star, target
-):
+    star: str, target: str
+) -> None:
     checks = copy.deepcopy(value()["checks"])
     next(c for c in checks if c["id"] == star)["target"] = target
     with pytest.raises(ValidationError):
@@ -147,8 +150,8 @@ def test_omitted_calendar_does_not_allow_targets_absent_from_the_named_rule(
 @pytest.mark.parametrize(
     "fault", ["missing", "trace", "duplicate_trace", "forged_trace", "prune"]
 )
-def test_complete_result_retains_all_explanation_dependencies(fault):
-    b = json.loads(json.dumps(raw()["jinkou"]))
+def test_complete_result_retains_all_explanation_dependencies(fault: str) -> None:
+    b = json.loads(json.dumps(natal_branch_output()["jinkou"]))
     trace = next(
         t for t in b["rule_trace"] if t["rule_id"] == "jinkou.jingben_branch_stars"
     )
@@ -166,9 +169,9 @@ def test_complete_result_retains_all_explanation_dependencies(fault):
         require_complete_branch_stars(b)
 
 
-def test_published_view_on_real_rest_native_mcp_and_cli(surface_calls):
+def test_published_view_on_real_rest_native_mcp_and_cli(surface_calls) -> None:
     fields = evidence_views(SPEC)["branch_stars"]["fields"]
-    payload = dict(PAYLOAD, di_fen="酉")
+    payload = dict(REN_PROTOCOL_PAYLOAD, di_fen="酉")
     opts = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
     h, m, code, c = surface_calls(
         SPEC,
@@ -187,9 +190,9 @@ def test_published_view_on_real_rest_native_mcp_and_cli(surface_calls):
 @pytest.mark.parametrize("fault", ["missing", "wrong_year", "trace"])
 @pytest.mark.parametrize("project", [False, True])
 def test_domain_faults_fail_on_all_ports_before_projection(
-    fault, project, monkeypatch, surface_calls
-):
-    bad = json.loads(json.dumps(raw()))
+    fault: str, project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
+    bad = json.loads(json.dumps(natal_branch_output()))
     b = bad["jinkou"]
     v = b["branch_stars"]
     t = next(
@@ -215,6 +218,8 @@ def test_domain_faults_fail_on_all_ports_before_projection(
             actual = replace(
                 actual, bind=lambda _: (lambda: copy.deepcopy(bad), (), {})
             )
+        else:
+            pass
         return original(actual, request)
 
     monkeypatch.setattr(execution, "execute_spec", broken)
@@ -225,15 +230,24 @@ def test_domain_faults_fail_on_all_ports_before_projection(
         params.update(fields="analysis_type", strict_fields="true")
         opts.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
+    else:
+        pass
     h, m, code, c = surface_calls(
-        SPEC, PAYLOAD, params=params, options=opts, flags=flags, cli_first=False
+        SPEC,
+        REN_PROTOCOL_PAYLOAD,
+        params=params,
+        options=opts,
+        flags=flags,
+        cli_first=False,
     )
     assert h.status_code == 500 and m.is_error and code == 1
     assert c["error_code"] == "internal_error"
 
 
-def test_snapshot_reports_each_actual_target_and_match_without_invented_effect():
-    b = raw()
+def test_snapshot_reports_each_actual_target_and_match_without_invented_effect() -> (
+    None
+):
+    b = natal_branch_output()
     v = b["jinkou"]["branch_stars"]
     for c in v["checks"]:
         anchor_label = {
@@ -253,8 +267,8 @@ def test_snapshot_reports_each_actual_target_and_match_without_invented_effect()
     assert v["scope"] in b["snapshot_text"]
 
 
-def test_star_body_cannot_borrow_god_occupied_position():
-    request = SPEC.request_model.model_validate(dict(PAYLOAD, di_fen="子"))
+def test_star_body_cannot_borrow_god_occupied_position() -> None:
+    request = SPEC.request_model.model_validate(dict(REN_PROTOCOL_PAYLOAD, di_fen="子"))
     fn, args, kwargs = SPEC.bind(request)
     b = fn(*args, **kwargs)["jinkou"]
     earth = b["overview"]["guishen"]["earth_branch"]

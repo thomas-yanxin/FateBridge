@@ -12,6 +12,8 @@ def inject_canping_output(monkeypatch, output):
     def bound_output(spec, request):
         if spec.key == "canping":
             spec = replace(spec, bind=lambda _: (lambda: deepcopy(output), (), {}))
+        else:
+            pass
         return original(spec, request)
 
     monkeypatch.setattr(execution, "execute_spec", bound_output)

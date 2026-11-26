@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import Any, Mapping, Tuple
+from typing import Any, Mapping
 
 from fatebridge.utils.data import BRANCH_HIDDEN_STEMS, STEM_ELEMENTS, Element
 
@@ -20,7 +20,7 @@ SOURCE = {
 }
 
 
-def build_element_presence(pillars: Mapping[str, Tuple[str, str]]) -> dict[str, Any]:
+def build_element_presence(pillars: Mapping[str, tuple[str, str]]) -> dict[str, Any]:
     """List actual stems, principal hidden qi and all hidden qi without force votes.
 
     Include the day stem in visible occurrences. Principal hidden occurrences

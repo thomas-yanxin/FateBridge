@@ -17,22 +17,17 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao, guolao_moira
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.services.astrology import calculate_core_chart_analysis
+from fatebridge.core.astro.time_scales import ephemeris_time
+from fatebridge.core.guolao import guolao, guolao_moira
 from tests.fixtures.surface_payloads import astro_payload
+from tests.unit_test.fixtures.guolao import chart
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 
 
-def chart(**changes):
-    return calculate_core_chart_analysis(
-        **{**astro_payload(), "chart_variant": "guolao_chart", **changes}
-    )
-
-
-def test_seven_physical_bodies_against_21_frozen_nasa_positions():
+def test_seven_physical_bodies_against_21_frozen_nasa_positions() -> None:
     fixture = json.loads((FIXTURES / "jyotish-horizons.json").read_text())
     cache = {}
     errors = []
@@ -52,6 +47,8 @@ def test_seven_physical_bodies_against_21_frozen_nasa_positions():
                     birth_minute=dt.minute,
                     birth_timezone="UTC",
                 )
+            else:
+                pass
             body = next(
                 b
                 for b in cache[row["utc"]]["guolao"]["bodies"]
@@ -67,7 +64,7 @@ def test_seven_physical_bodies_against_21_frozen_nasa_positions():
     )  # predeclared model-difference tolerance, not a global guarantee
 
 
-def test_tt_ut1_and_proleptic_gregorian_are_explicit():
+def test_tt_ut1_and_proleptic_gregorian_are_explicit() -> None:
     result = chart(
         birth_year=2000,
         birth_month=2,
@@ -104,7 +101,7 @@ def test_tt_ut1_and_proleptic_gregorian_are_explicit():
     )
 
 
-def test_solar_clock_cannot_change_physical_instant_or_chart():
+def test_solar_clock_cannot_change_physical_instant_or_chart() -> None:
     off = chart(birth_longitude=75.0, birth_latitude=39.0, use_true_solar_time=False)
     on = chart(birth_longitude=75.0, birth_latitude=39.0, use_true_solar_time=True)
     assert off["guolao"]["bodies"] == on["guolao"]["bodies"]
@@ -124,7 +121,7 @@ def test_solar_clock_cannot_change_physical_instant_or_chart():
     assert not on["guolao"]["profile"]["solar_clock_changes_instant"]
 
 
-def test_future_utc_does_not_claim_known_leap_seconds():
+def test_future_utc_does_not_claim_known_leap_seconds() -> None:
     result = chart(birth_year=2030)
     assert result["guolao"]["profile"]["future_leap_seconds_assumed_unchanged"]
     assert not chart()["guolao"]["profile"]["future_leap_seconds_assumed_unchanged"]
@@ -133,12 +130,14 @@ def test_future_utc_does_not_claim_known_leap_seconds():
 @pytest.mark.parametrize(
     "hour,minute,branch", [(22, 59, "亥"), (23, 0, "子"), (0, 59, "子"), (1, 0, "丑")]
 )
-def test_life_count_hour_branch_wrap_is_explicit(hour, minute, branch):
+def test_life_count_hour_branch_wrap_is_explicit(
+    hour: int, minute: int, branch: str
+) -> None:
     result = chart(birth_hour=hour, birth_minute=minute, use_true_solar_time=False)
     assert result["guolao"]["life_palace"]["birth_hour_branch"] == branch
 
 
-def test_functional_palaces_are_independent_of_astronomical_house_selection():
+def test_functional_palaces_are_independent_of_astronomical_house_selection() -> None:
     whole, unequal = chart(hsys=0), chart(hsys=3)
     assert whole["guolao"]["life_palace"] == unequal["guolao"]["life_palace"]
     assert whole["guolao"]["palaces"] == unequal["guolao"]["palaces"]
@@ -149,7 +148,7 @@ def test_functional_palaces_are_independent_of_astronomical_house_selection():
 
 
 @pytest.mark.parametrize("hour", [20, 2])
-def test_polar_summer_daylight_is_not_a_civil_hour_rule(hour):
+def test_polar_summer_daylight_is_not_a_civil_hour_rule(hour: int) -> None:
     result = chart(
         birth_year=2026,
         birth_month=6,
@@ -168,7 +167,7 @@ def test_polar_summer_daylight_is_not_a_civil_hour_rule(hour):
 @pytest.mark.parametrize(
     "month,day,expected", [(11, 1, "秋"), (11, 10, "冬"), (2, 1, "冬"), (2, 10, "春")]
 )
-def test_season_uses_solar_term_boundaries(month, day, expected):
+def test_season_uses_solar_term_boundaries(month: int, day: int, expected: str) -> None:
     assert (
         chart(birth_year=2026, birth_month=month, birth_day=day)["guolao"][
             "conditions"
@@ -178,7 +177,9 @@ def test_season_uses_solar_term_boundaries(month, day, expected):
 
 
 @pytest.mark.parametrize("day,hour", [(10, 2), (3, 1)])
-def test_ambiguous_or_nonexistent_dst_clock_rejected_before_solar_display(day, hour):
+def test_ambiguous_or_nonexistent_dst_clock_rejected_before_solar_display(
+    day: int, hour: int
+) -> None:
     month = 3 if day == 10 else 11
     result = chart(
         birth_year=2024,
@@ -193,14 +194,16 @@ def test_ambiguous_or_nonexistent_dst_clock_rejected_before_solar_display(day, h
     assert "guolao" not in result
 
 
-def test_no_swiss_is_an_explicit_error_not_a_precise_mansion_fallback(monkeypatch):
+def test_no_swiss_is_an_explicit_error_not_a_precise_mansion_fallback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(runtime, "swe", None)
     result = chart()
     assert "error" in result
     assert "guolao" not in result
 
 
-def test_mansion_membership_against_independent_exact_interval_search():
+def test_mansion_membership_against_independent_exact_interval_search() -> None:
     boundaries = chart()["guolao"]["mansion_boundaries"]
     ordered = sorted(boundaries, key=lambda b: b["right_ascension"])
     assert len({b["star"] for b in boundaries}) == 28
@@ -228,7 +231,7 @@ def test_mansion_membership_against_independent_exact_interval_search():
     assert max(widths) - min(widths) > 20
 
 
-def test_mansion_uses_equatorial_coordinate_not_sidereal_zodiac_label():
+def test_mansion_uses_equatorial_coordinate_not_sidereal_zodiac_label() -> None:
     tropical, sidereal = chart(zodiacal=0), chart(zodiacal=1)
     assert (
         tropical["guolao"]["planetary_mansions"]
@@ -240,7 +243,9 @@ def test_mansion_uses_equatorial_coordinate_not_sidereal_zodiac_label():
     )
 
 
-def test_primary_edition_lord_tables_and_unresolved_epoch_are_not_silently_fixed():
+def test_primary_edition_lord_tables_and_unresolved_epoch_are_not_silently_fixed() -> (
+    None
+):
     source = json.loads((FIXTURES / "guolao-classical-source.json").read_text())
     transcription = source["transcription"]
     assert "".join(guolao.PALACE_BRANCHES) == transcription["palace_branches"]
@@ -255,7 +260,7 @@ def test_primary_edition_lord_tables_and_unresolved_epoch_are_not_silently_fixed
     assert not source["acceptance"]["purple_cloud_epoch"]
 
 
-def test_directional_five_element_relations_include_benefactor_and_constraint():
+def test_directional_five_element_relations_include_benefactor_and_constraint() -> None:
     # Explicit independent matrix, rows=target 木火土金水, cols=other 木火土金水.
     expected = [
         "同主 我生 我克 克我 生我",
@@ -274,14 +279,14 @@ def test_directional_five_element_relations_include_benefactor_and_constraint():
     [(315.0, "冬", "春"), (45.0, "春", "夏"), (135.0, "夏", "秋"), (225.0, "秋", "冬")],
 )
 def test_season_never_rounds_a_preboundary_value_into_the_next_season(
-    boundary, before, after
-):
+    boundary: float, before: str, after: str
+) -> None:
     assert guolao.season(math.nextafter(boundary, -math.inf)) == before
     assert guolao.season(boundary) == after
     assert guolao.season(math.nextafter(boundary, math.inf)) == after
 
 
-def test_missing_dependencies_cannot_fire_legacy_patterns():
+def test_missing_dependencies_cannot_fire_legacy_patterns() -> None:
     # Before repair _rel(-1,+4/-4) fabricated two valid noble-related positions.
     no_noble = guolao_moira.calculate(
         {"asc_lon": None, "planet_signidx": {"日": 3, "月": 7}, "is_day": True}
@@ -313,21 +318,19 @@ def test_missing_dependencies_cannot_fire_legacy_patterns():
     )
 
 
-def test_reading_quotes_this_calculation_and_preserves_research_limitations():
+def test_chart_preserves_rule_evidence_and_research_limitations() -> None:
     result = chart()
     g = result["guolao"]
     assert len(g["bodies"]) == 11
     assert len(g["rule_trace"]) == 15
     assert len(g["palaces"]) == 12
     life = g["life_palace"]
-    assert life["branch"] in result["interpretation"]["signature"]
-    assert life["palace_lord"] in result["interpretation"]["signature"]
     assert life["mansion"] is None and life["longitude"] is None
-    assert "命度与命宿未定" in result["interpretation"]["signature"]
     assert life["method"] == "source_hour_count_with_declared_research_inputs_v1"
     assert not any(p["name"] == "命坐两歧" for p in g["moira_patterns"])
-    assert g["moon_mansion"] in result["interpretation"]["emotional_style"]
-    assert "西方" not in result["interpretation"]["signature"]
+    moon = next(body for body in g["bodies"] if body["id"] == "Moon")
+    assert g["moon_mansion"] == moon["mansion"]["su28"]
+    assert "interpretation" not in result and "interpretation_evidence" not in result
     assert not g["validation"]["classical_acceptance_passed"]
     assert g["validation"]["real_world_prediction_status"] == "not_tested"
     assert not g["validation"]["full_marks_established"]
@@ -335,7 +338,7 @@ def test_reading_quotes_this_calculation_and_preserves_research_limitations():
     assert all(p["dignity"] is None for p in result["planets"])
 
 
-def test_native_gods_use_the_collated_edition_table():
+def test_native_gods_use_the_collated_edition_table() -> None:
     result = chart()
     g = result["guolao"]
     god = g["god_positions"]
@@ -343,7 +346,7 @@ def test_native_gods_use_the_collated_edition_table():
     assert god["branches"] == {"天贵": "丑", "玉贵": "未", "岁驾": "午"}
     assert g["god_sign_index"] == {"天贵": 9, "玉贵": 3, "岁驾": 4}
     assert god["selected_noble"] == ("天贵" if g["conditions"]["is_day"] else "玉贵")
-    assert god["selected_noble_branch"] in result["interpretation"]["variant_note"]
+    assert god["selected_noble_branch"] == god["branches"][god["selected_noble"]]
     assert "底本贵人及岁驾宫支" in result["snapshot_export"]["export_text"]
     audit = g["purple_model_audit"]
     assert not audit["historical_period_used_as_modern_longitude"]
@@ -353,7 +356,7 @@ def test_native_gods_use_the_collated_edition_table():
     ) == Fraction(audit["source_rounding_discrepancy_days"])
 
 
-def test_parallel_workers_have_identical_physical_results():
+def test_parallel_workers_have_identical_physical_results() -> None:
     birth = build_astro_birth_info(**astro_payload())
     expected = guolao.positions(birth)
     with ThreadPoolExecutor(max_workers=3) as pool:
@@ -361,7 +364,9 @@ def test_parallel_workers_have_identical_physical_results():
     assert all(r == expected for r in results)
 
 
-def test_other_catalogue_and_operator_environment_survive_guolao(monkeypatch, tmp_path):
+def test_other_catalogue_and_operator_environment_survive_guolao(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     directory = tmp_path
     source = (
         Path(__file__).parents[2] / "src/fatebridge/data/western_stars/sefstars.txt"
@@ -385,7 +390,9 @@ def test_other_catalogue_and_operator_environment_survive_guolao(monkeypatch, tm
             swe.close()
 
 
-def test_catalogue_lookup_failure_restores_operator_environment(monkeypatch):
+def test_catalogue_lookup_failure_restores_operator_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", "/operator/declared/ephemeris")
 
     def failure(*args, **kwargs):
@@ -398,8 +405,9 @@ def test_catalogue_lookup_failure_restores_operator_environment(monkeypatch):
     assert os.environ["SE_EPHE_PATH"] == "/operator/declared/ephemeris"
 
 
-def test_shared_time_conversion_initializes_a_fresh_worker_after_catalogue_close():
-    from fatebridge.core.astro.time_scales import ephemeris_time
+def test_shared_time_conversion_initializes_a_fresh_worker_after_catalogue_close() -> (
+    None
+):
 
     def in_new_worker(_):
         with runtime.preserve_ephemeris_path():

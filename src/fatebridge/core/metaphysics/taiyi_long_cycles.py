@@ -1,16 +1,13 @@
-"""The ten annual markers in Jinjing volume five, with separate epochs.
-
-This is not the 1,937,281-year epoch of the eight generals. The source gives
-285,011, 13,331 and 3,361 at 724 CE for different families. Keep every epoch,
-counting step and unlocated extra palace visible rather than shifting labels.
-"""
+"""Calculate the distinct annual marker epochs in Jinjing volume five."""
 
 from __future__ import annotations
 
 import json
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal, TypedDict
+
+from typing_extensions import NotRequired
 
 from fatebridge.core.metaphysics.taiyi_geometry import PALACES
 
@@ -18,6 +15,10 @@ SOURCE = "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/�
 RULESET_ID = "jinjing_annual_ten_markers_v1"
 BRANCH_SEQUENCE = tuple("戌亥子丑寅卯辰巳午未申酉")
 TWELVE_PALACES = tuple("123456789") + ("绛", "明", "玉")
+REFERENCE_YEAR = 724
+SANJI_REFERENCE_ACCUMULATION_YEARS = 285011
+LONG_CYCLE_REFERENCE_ACCUMULATION_YEARS = 13331
+SHORT_CYCLE_REFERENCE_ACCUMULATION_YEARS = 3361
 FOUR_ORIGINS = {"sishen": "1", "tianyi": "6", "diyi": "9", "zhifu": "5"}
 LABELS = {
     "junji": "君基",
@@ -47,21 +48,80 @@ SECTIONS = {
 }
 
 
+class AnnualMarker(TypedDict):
+    position: str
+    palace: str
+    accumulation: int
+    cycle_length: int
+    cycle_year: int
+    years_per_position: int
+    position_index: int
+    year_in_palace: int
+    palace_number: int | None
+    space: Literal[
+        "taiyi_nine_palaces", "three_extra_palaces_unmapped", "sixteen_palaces"
+    ]
+    label: NotRequired[str]
+    source_section: NotRequired[str]
+    epoch_id: NotRequired[str]
+    source_method: NotRequired[str]
+    source_reference: NotRequired[str]
+    source_edition: NotRequired[str]
+    table_position: NotRequired[str]
+    table_row: NotRequired[str]
+    table_yuan: NotRequired[str]
+    classical_palace_name: NotRequired[str]
+    administration_phase: NotRequired[str]
+    table_disagreement: NotRequired[bool]
+
+
+class AnnualEpoch(TypedDict):
+    year: int
+    accumulation: int
+    equivalent_short_epoch_accumulation: NotRequired[int]
+    equivalence_modulus: NotRequired[int]
+
+
+class AnnualRuleset(TypedDict):
+    id: str
+    version: str
+    author: str
+    classical_author: str
+    source: str
+    classical_conformance: str
+    classical_acceptance_passed: bool
+
+
+class AnnualLongCycles(TypedDict):
+    status: Literal["computed"]
+    year: int
+    time_granularity: Literal["year"]
+    ruleset: AnnualRuleset
+    epochs: dict[str, AnnualEpoch]
+    records: dict[str, AnnualMarker]
+    counting_convention: str
+    interpretation_scope: str
+    unresolved: list[str]
+
+
 def _rotated(sequence: tuple[str, ...], start: str) -> tuple[str, ...]:
-    i = sequence.index(start)
-    return sequence[i:] + sequence[:i]
+    start_index = sequence.index(start)
+    return sequence[start_index:] + sequence[:start_index]
 
 
 def _moving_marker(
-    accumulation: int, sequence: tuple[str, ...], years: int
-) -> dict[str, Any]:
+    accumulation: int, sequence: tuple[str, ...], years_per_position: int
+) -> AnnualMarker:
     if type(accumulation) is not int or accumulation < 1:
         raise ValueError("太乙年运积数必须是正整数")
-    cycle_length = len(sequence) * years
+    cycle_length = len(sequence) * years_per_position
     offset = (accumulation - 1) % cycle_length
-    index, in_position = divmod(offset, years)
+    index, in_position = divmod(offset, years_per_position)
     position = sequence[index]
     number = int(position) if position.isdigit() else None
+    space: Literal[
+        "taiyi_nine_palaces", "three_extra_palaces_unmapped", "sixteen_palaces"
+    ]
     if number is not None:
         palace = PALACES[number]
         space = "taiyi_nine_palaces"
@@ -79,20 +139,14 @@ def _moving_marker(
         "accumulation": accumulation,
         "cycle_length": cycle_length,
         "cycle_year": offset + 1,
-        "years_per_position": years,
+        "years_per_position": years_per_position,
         "position_index": index,
         "year_in_palace": in_position + 1,
     }
 
 
-def four_spirit_records(accumulation: int) -> dict[str, dict[str, Any]]:
-    """Each three-year dwell traverses 1..9,绛,明,玉 from its source origin.
-
-    The missing Siku 地乙 paragraph is corroborated by NCL-06604 pp. 73/74.
-    Its epoch remains the Siku epoch, not an uncollated Ming value.
-    The raw table remains an independent audit; its
-    直符 middle-yuan column has unresolved disagreements with the prose rule.
-    """
+def four_spirit_records(accumulation: int) -> dict[str, AnnualMarker]:
+    """Compare three-year palace dwells with the printed 180-year table."""
     result = {
         name: _moving_marker(accumulation, _rotated(TWELVE_PALACES, start), 3)
         for name, start in FOUR_ORIGINS.items()
@@ -118,6 +172,13 @@ def four_spirit_records(accumulation: int) -> dict[str, dict[str, Any]]:
             record["source_edition"] = (
                 "四库积年及三元表；明钞本地乙推法补证起九行序，未替换积年"
             )
+        elif name == "zhifu":
+            record["source_reference"] = (
+                "https://commons.wikimedia.org/wiki/File:CADAL06056495_太乙金鏡式經·卷五~卷十.djvu?page=15"
+            )
+            record["source_edition"] = (
+                "四库全书本卷五正文起五顺行；第16图表头下中元33格分歧未裁定，原表另列"
+            )
     return result
 
 
@@ -131,14 +192,14 @@ def _source_table() -> dict[str, Any]:
     return data
 
 
-def annual_long_cycles(year: int) -> dict[str, Any]:
+def annual_long_cycles(year: int) -> AnnualLongCycles:
     if type(year) is not int or not 1 <= year <= 9999:
         raise ValueError("太乙年运需要1至9999之间的整数公元年份")
-    delta = year - 724
-    sanji = 285011 + delta
-    long_count = 13331 + delta
-    short_count = 3361 + delta
-    records = {
+    elapsed_years = year - REFERENCE_YEAR
+    sanji = SANJI_REFERENCE_ACCUMULATION_YEARS + elapsed_years
+    long_count = LONG_CYCLE_REFERENCE_ACCUMULATION_YEARS + elapsed_years
+    short_count = SHORT_CYCLE_REFERENCE_ACCUMULATION_YEARS + elapsed_years
+    records: dict[str, AnnualMarker] = {
         "junji": _moving_marker(sanji, BRANCH_SEQUENCE, 30),
         "chenji": _moving_marker(sanji, BRANCH_SEQUENCE, 3),
         "minji": _moving_marker(sanji, BRANCH_SEQUENCE, 1),
@@ -150,20 +211,15 @@ def annual_long_cycles(year: int) -> dict[str, Any]:
         "xiaoyou": _moving_marker(short_count, tuple("12346789"), 3),
         **four_spirit_records(short_count),
     }
-    for key, record in records.items():
-        record.update(
-            label=LABELS[key],
-            source_section=SECTIONS[key],
-            epoch_id=(
-                "sanji"
-                if key in {"junji", "chenji", "minji"}
-                else (
-                    "long_you_wufu"
-                    if key in {"wufu", "dayou", "dayou_tianmu"}
-                    else "short_you_spirits"
-                )
-            ),
-        )
+    for marker_name, record in records.items():
+        record["label"] = LABELS[marker_name]
+        record["source_section"] = SECTIONS[marker_name]
+        if marker_name in {"junji", "chenji", "minji"}:
+            record["epoch_id"] = "sanji"
+        elif marker_name in {"wufu", "dayou", "dayou_tianmu"}:
+            record["epoch_id"] = "long_you_wufu"
+        else:
+            record["epoch_id"] = "short_you_spirits"
     wufu_names = {"1": "黄秘", "3": "黄始", "9": "黄室", "7": "黄庭", "5": "玄师"}
     records["wufu"]["classical_palace_name"] = wufu_names[records["wufu"]["position"]]
     records["dayou"]["administration_phase"] = ("治天", "治地", "治人")[
@@ -187,13 +243,19 @@ def annual_long_cycles(year: int) -> dict[str, Any]:
         },
         "epochs": {
             "sanji": {
-                "year": 724,
-                "accumulation": 285011,
+                "year": REFERENCE_YEAR,
+                "accumulation": SANJI_REFERENCE_ACCUMULATION_YEARS,
                 "equivalent_short_epoch_accumulation": 611,
                 "equivalence_modulus": 360,
             },
-            "long_you_wufu": {"year": 724, "accumulation": 13331},
-            "short_you_spirits": {"year": 724, "accumulation": 3361},
+            "long_you_wufu": {
+                "year": REFERENCE_YEAR,
+                "accumulation": LONG_CYCLE_REFERENCE_ACCUMULATION_YEARS,
+            },
+            "short_you_spirits": {
+                "year": REFERENCE_YEAR,
+                "accumulation": SHORT_CYCLE_REFERENCE_ACCUMULATION_YEARS,
+            },
         },
         "counting_convention": "积数含本年；每宫年序1至行率，满行率后的次年换宫；三元五纪按连续180年解释。",
         "records": records,

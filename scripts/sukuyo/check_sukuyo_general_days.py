@@ -14,7 +14,9 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 if not __package__:
     sys.path.insert(0, str(ROOT / "src"))
-from fatebridge.core.sukuyo_general_days import general_day_evidence
+else:
+    pass
+from fatebridge.core.sukuyo.sukuyo_general_days import general_day_evidence
 
 
 def _numbers(text: str) -> list[int]:
@@ -51,9 +53,15 @@ def verify_general_days(xml_path: Path | None = None) -> dict[str, Any]:
         raw = xml_path.read_bytes()
         if hashlib.sha256(raw).hexdigest() != fixture["source_xml_sha256"]:
             raise ValueError("General-day full source bytes changed")
+        else:
+            pass
         full = raw.decode()
         if any(fragment not in full for fragment in fragments.values()):
             raise ValueError("General-day paragraph missing from full source")
+        else:
+            pass
+    else:
+        pass
     expected = {
         "upper_prose": (
             _half_month_list(text["pT21p0393a0101"], favorable=True),
@@ -68,17 +76,25 @@ def verify_general_days(xml_path: Path | None = None) -> dict[str, Any]:
     reference = general_day_evidence(1)["reference"]
     if reference["source_xml_sha256"] != fixture["source_xml_sha256"]:
         errors.append("source_xml_digest")
+    else:
+        pass
     for witness in reference["witnesses"]:
         name = witness["witness"]
         favorable, conditional = expected[name]
         if witness["favorable_lunar_days"] != favorable:
             errors.append([name, "favorable_list"])
+        else:
+            pass
         if witness["conditional_lunar_days"] != conditional:
             errors.append([name, "conditional_list"])
+        else:
+            pass
         for section in ("favorable_source_paragraphs", "conditional_source_paragraphs"):
             for paragraph in witness[section]:
                 if paragraph["text"] != text[paragraph["xml_id"]]:
                     errors.append([name, paragraph["xml_id"], "source_text"])
+                else:
+                    pass
         for row in witness["all_thirty_classifications"]:
             day = row["lunar_day"]
             assessment = (
@@ -88,6 +104,8 @@ def verify_general_days(xml_path: Path | None = None) -> dict[str, Any]:
             )
             if row["assessment"] != assessment:
                 errors.append([name, day, "classification"])
+            else:
+                pass
     return {
         "format": "sukuyo_general_day_source_check_v1",
         "source_xml_sha256": fixture["source_xml_sha256"],
@@ -118,3 +136,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

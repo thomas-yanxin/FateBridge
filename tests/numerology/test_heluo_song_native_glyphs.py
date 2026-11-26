@@ -6,9 +6,10 @@ import json
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core import heluo_poems as hp
-from fatebridge.core.heluo import yao_text
+from fatebridge.core.heluo import heluo_poems as hp
+from fatebridge.core.heluo.heluo import yao_text
 from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.utils.errors import NumerologySourceError
 
@@ -44,7 +45,9 @@ def clear_poem_cache():
     hp._collation.cache_clear()
 
 
-def test_source_and_proposal_precede_prototype_but_fixture_is_not_claimed_blind():
+def test_source_and_proposal_precede_prototype_but_fixture_is_not_claimed_blind() -> (
+    None
+):
     freeze = json.loads((F / "fixture-freeze.json").read_bytes())
     assert freeze["fixture_assembly_after_prototype_code"] is True
     assert freeze["known_source_diagnostic_not_blind_or_independent"] is True
@@ -67,7 +70,7 @@ def test_source_and_proposal_precede_prototype_but_fixture_is_not_claimed_blind(
 
 
 @pytest.mark.parametrize("change", CHANGES, ids=lambda c: c["id"])
-def test_each_selected_source_glyph_uses_the_literal_proposal(change):
+def test_each_selected_source_glyph_uses_the_literal_proposal(change) -> None:
     poem = yao_text("天水訟", change["line"])["poem_sections"][change["index"] - 1]
     assert poem["text"] == expected_poem(change["line"], change["index"])["text"]
     assert change["after"] in poem["text"] and change["before"] not in poem["text"]
@@ -81,7 +84,7 @@ def test_each_selected_source_glyph_uses_the_literal_proposal(change):
 @pytest.mark.parametrize("line,index", NOTES)
 def test_all_five_notes_reach_the_actual_summary_without_independent_certification(
     line, index
-):
+) -> None:
     result = calculate_knowledge_read(domain="heluo", key=f"天水訟:{line}")
     poem = result["reference_details"]["record"]["poem_sections"][index - 1]
     expected = expected_poem(line, index)
@@ -100,7 +103,9 @@ def test_all_five_notes_reach_the_actual_summary_without_independent_certificati
     )
 
 
-def test_old_inherited_correct_words_are_not_rewritten_into_new_reading_history():
+def test_old_inherited_correct_words_are_not_rewritten_into_new_reading_history() -> (
+    None
+):
     for line in [1, 2, 4, 5, 6]:
         text = yao_text("天水訟", line)
         assert text["poem_selection"]["automatic_selection"] is False
@@ -109,12 +114,14 @@ def test_old_inherited_correct_words_are_not_rewritten_into_new_reading_history(
             assert "不須歡" in text["text_provenance"]["inherited_shige"]
             assert "困來" in text["text_provenance"]["inherited_shige"]
             assert "不須懽" in text["shige"] and "困來" in text["shige"]
+        else:
+            pass
 
 
 @pytest.mark.parametrize("change", CHANGES, ids=lambda c: c["id"])
 def test_frozen_literal_reference_detects_rebound_producer_hash(
-    change, monkeypatch, tmp_path
-):
+    change, monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
     bad = copy.deepcopy(hp._collation())
     poem = next(
         e

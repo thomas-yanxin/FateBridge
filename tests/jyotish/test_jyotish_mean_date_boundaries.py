@@ -7,14 +7,14 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.jyotish_kala import ahargana_lords, mean_date
+from fatebridge.core.jyotish.jyotish_kala import ahargana_lords, mean_date
 
 ROOT = Path(__file__).resolve().parents[2]
 REF = ROOT / "tests/fixtures/jyotish-mean-date-reference.json"
 DATA = json.loads(REF.read_text())
 
 
-def test_independent_ERFA_reference_seal_range_and_full_domain_are_retained():
+def test_independent_ERFA_reference_seal_range_and_full_domain_are_retained() -> None:
     assert (
         hashlib.sha256(REF.read_bytes()).hexdigest()
         == "da4e09518176784e7fe48a9de4f2134940673ab99d2cf516b2b1c95ec090940c"
@@ -35,14 +35,16 @@ def test_independent_ERFA_reference_seal_range_and_full_domain_are_retained():
     DATA["probes"],
     ids=lambda r: f"{r['target_midnight_ordinal']}:{r['longitude']}:{r['position']}",
 )
-def test_every_frozen_binary_midnight_probe_matches_reference_without_tolerance(row):
+def test_every_frozen_binary_midnight_probe_matches_reference_without_tolerance(
+    row,
+) -> None:
     assert row["jd_ut1"].hex() == row["jd_hex"]
     assert row["longitude"].hex() == row["longitude_hex"]
     value = mean_date(row["jd_ut1"], row["longitude"])
     assert (value.isoformat() if value else None) == row["expected_date"]
 
 
-def test_two_preexisting_primary_ahargana_examples_are_unmodified():
+def test_two_preexisting_primary_ahargana_examples_are_unmodified() -> None:
     for stamp, count, year_lord, month_lord in [
         ("1918-10-16", 714404130045, "Saturn", "Mercury"),
         ("1984-06-01", 714404154015, "Jupiter", "Venus"),

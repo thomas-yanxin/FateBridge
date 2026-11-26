@@ -16,12 +16,16 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     manifest = json.loads((corpus / "manifest.json").read_text())
     if {r["file"] for r in manifest["source_files"]} != {"sectors.json"}:
         raise ValueError("八门方位完整来源不得删除")
+    else:
+        pass
     for item in manifest["source_files"]:
         if (
             hashlib.sha256((corpus / item["file"]).read_bytes()).hexdigest()
             != item["sha256"]
         ):
             raise ValueError("八门方位来源指纹不符")
+        else:
+            pass
     case = json.loads((corpus / "sectors.json").read_text())
     if (
         len(case["cases"]) != 16
@@ -30,6 +34,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         or manifest["required_observations"] != 16
     ):
         raise ValueError("必须核全部16神，不可只测通过的后半间神")
+    else:
+        pass
     differences = [
         {**r, "computed_sector": SECTORS[r["spirit"]]}
         for r in case["cases"]

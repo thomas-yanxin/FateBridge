@@ -11,11 +11,11 @@ from __future__ import annotations
 
 import math
 from types import ModuleType
-from typing import Any, Dict, Optional, Sequence, Tuple
+from typing import Any, Sequence
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.angle_definitions import INTERSECTION_RESOLUTION_GUARD
-from fatebridge.core.astro.earth_attitude import earth_attitude
+from fatebridge.core.astro.earth_attitude import earth_attitude, physical_equator
 from fatebridge.core.astro.geometry import combine_longitudes
 from fatebridge.core.astro.horizon_precision import (
     CONVERGENCE_DEGREES,
@@ -25,19 +25,49 @@ from fatebridge.core.astro.horizon_precision import (
     aligned_longitude,
     horizon_geometry,
 )
+from fatebridge.core.astro.iers_ut1 import active_ut1
+from fatebridge.core.astro.terrestrial_observer import terrestrial_frame
+from fatebridge.core.astro.tt_epoch import TTInstant
+from fatebridge.core.astro.ut1_epoch import UT1Instant
 from fatebridge.utils.errors import EphemerisSourceError
 
 
 def _precision_geometry(
-    julian_day_ut1: float,
+    julian_day_ut1: float | UT1Instant,
     latitude: float,
     common: Sequence[float],
-    julian_day_tt: float | None = None,
+    julian_day_tt: float | TTInstant | None = None,
+    *,
+    longitude: float,
 ) -> tuple[HorizonGeometry, dict[str, Any]] | None:
-    if not isinstance(runtime.swe, ModuleType) or abs(latitude) == 90:
+    geographic_latitude = latitude
+    if not isinstance(runtime.swe, ModuleType):
         return None
-    if not all(math.isfinite(v) for v in (julian_day_ut1, latitude, *common[:3])):
+    observed = active_ut1.get() is not None
+    if not observed and abs(latitude) == 90:
+        return None
+    if not all(
+        math.isfinite(v)
+        for v in (
+            (
+                julian_day_ut1.as_float()
+                if isinstance(julian_day_ut1, UT1Instant)
+                else julian_day_ut1
+            ),
+            latitude,
+            *common[:3],
+        )
+    ):
         raise EphemerisSourceError("horizon_direction_model_unavailable")
+    if observed:
+        equator = physical_equator(
+            runtime.swe, julian_day_ut1, julian_day_tt=julian_day_tt
+        )
+        _, latitude = terrestrial_frame(
+            equator, longitude=longitude, latitude=latitude
+        ).equatorial_site()
+        if abs(latitude) == 90:
+            return None
     gap = abs((common[0] - common[1] + 180) % 360 - 180)
     # A native intersection may be snapped to a cardinal longitude even when
     # its reported ASC is far from MC/IC. |A| also screens for a small horizon
@@ -52,9 +82,12 @@ def _precision_geometry(
         )
         auxiliary_tt = attitude.equator.jd_tt
         eps = attitude.reduction.house_obliquity
-    except EphemerisSourceError:
-        raise
     except Exception as error:
+        if (
+            isinstance(error, EphemerisSourceError)
+            and error.reason != "earth_attitude_model_unavailable"
+        ):
+            raise
         raise EphemerisSourceError("horizon_direction_model_unavailable") from error
     phi, theta, e = map(math.radians, (latitude, common[2], eps))
     a = math.cos(phi) * math.cos(theta)
@@ -80,7 +113,8 @@ def _precision_geometry(
         "method_id": METHOD_ID,
         "working_decimal_digits": list(model.working_digits),
         "convergence_degrees": CONVERGENCE_DEGREES,
-        "geographic_latitude": latitude,
+        "geographic_latitude": geographic_latitude,
+        **({"rotation_axis_latitude": latitude} if observed else {}),
         "armc": float(common[2]),
         "true_obliquity": eps,
         "house_auxiliary_tt": auxiliary_tt,
@@ -99,13 +133,13 @@ def _precision_geometry(
 
 def _canonical_house_axes(
     *,
-    julian_day_ut1: float,
+    julian_day_ut1: float | UT1Instant,
     latitude: float,
     longitude: float,
     house_code: bytes,
     native_angles: Sequence[float],
     flags: int = 0,
-    julian_day_tt: float | None = None,
+    julian_day_tt: float | TTInstant | None = None,
 ) -> tuple[
     tuple[float, ...], dict[str, Any] | None, HorizonGeometry | None, Sequence[float]
 ]:
@@ -123,7 +157,9 @@ def _canonical_house_axes(
                 flags,
                 _julian_day_tt=julian_day_tt,
             )
-    precision = _precision_geometry(julian_day_ut1, latitude, physical, julian_day_tt)
+    precision = _precision_geometry(
+        julian_day_ut1, latitude, physical, julian_day_tt, longitude=longitude
+    )
     model = precision[0] if precision else None
     corrected = float(physical[0])
     if precision:
@@ -196,14 +232,14 @@ def _canonical_house_axes(
 
 def canonical_house_axes(
     *,
-    julian_day_ut1: float,
+    julian_day_ut1: float | UT1Instant,
     latitude: float,
     longitude: float,
     house_code: bytes,
     native_angles: Sequence[float],
     flags: int = 0,
-    julian_day_tt: float | None = None,
-) -> Tuple[Tuple[float, ...], Optional[Dict[str, Any]]]:
+    julian_day_tt: float | TTInstant | None = None,
+) -> tuple[tuple[float, ...], dict[str, Any] | None]:
     public, receipt, _, _ = _canonical_house_axes(
         julian_day_ut1=julian_day_ut1,
         latitude=latitude,
@@ -218,14 +254,14 @@ def canonical_house_axes(
 
 def canonical_house_geometry(
     *,
-    julian_day_ut1: float,
+    julian_day_ut1: float | UT1Instant,
     latitude: float,
     longitude: float,
     house_code: bytes,
     native_cusps: Sequence[float],
     native_angles: Sequence[float],
     flags: int = 0,
-    julian_day_tt: float | None = None,
+    julian_day_tt: float | TTInstant | None = None,
 ) -> tuple[tuple[float, ...], tuple[float, ...], dict[str, Any] | None]:
     public, receipt, model, common = _canonical_house_axes(
         julian_day_ut1=julian_day_ut1,
@@ -260,15 +296,17 @@ def canonical_house_geometry(
         ]
     elif house_code in (b"A", b"E", b"V"):
         # Swiss A/E are the same Ascendant-anchored equal house method.
-        repaired, action = aligned_longitude(
-            float(native_angles[0]),
-            float(common[1]),
-            model.ascendant_phase_from_midheaven,
+        cusps = tuple(
+            combine_longitudes(
+                float(public[0]), -15.0 if house_code == b"V" else 0.0, index * 30.0
+            )
+            for index in range(12)
         )
-        if action != "native_coordinate_retained":
-            shift = repaired - float(native_angles[0])
-            cusps = tuple(combine_longitudes(float(v), shift) for v in cusps)
-            changed = list(range(1, 13))
+        changed = [
+            index + 1
+            for index, (old, new) in enumerate(zip(native_cusps, cusps))
+            if old != new
+        ]
     elif house_code == b"P":
         # Placidus cusp1/7 are the horizon endpoints. The intermediate time-
         # fraction cusps remain native; they are not reconstructed by linear
@@ -289,12 +327,16 @@ def canonical_house_geometry(
     receipt["eastern_direction_precision"]["native_cusps"] = list(native_cusps)
     receipt["eastern_direction_precision"]["delivered_cusps"] = list(cusps)
     receipt["eastern_direction_precision"]["house_cusp_scope"] = (
-        "placidus_horizon_endpoints1_7_checked_intermediate_native_time_fraction_cusps_retained"
-        if house_code == b"P"
+        "equal_A_E_V_rebuilt_from_delivered_ASC_on_selected_precision_path"
+        if house_code in (b"A", b"E", b"V")
         else (
-            "spatial_R_C_or_equal_A_E_V_W_endpoint_correction"
-            if house_code in (b"R", b"C", b"A", b"E", b"V", b"W")
-            else "other_native_house_cusps_retained_not_requalified"
+            "placidus_horizon_endpoints1_7_checked_intermediate_native_time_fraction_cusps_retained"
+            if house_code == b"P"
+            else (
+                "spatial_R_C_or_equal_A_E_V_W_endpoint_correction"
+                if house_code in (b"R", b"C", b"W")
+                else "other_native_house_cusps_retained_not_requalified"
+            )
         )
     )
     if changed:

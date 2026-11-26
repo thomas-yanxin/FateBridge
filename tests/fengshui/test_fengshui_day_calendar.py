@@ -9,8 +9,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation import fengshui_day_calendar as audit
-from fatebridge.validation.fengshui_day_hour import load_day_hour_reference
+from validation import fengshui_day_calendar as audit
+from validation.fengshui_day_hour import load_day_hour_reference
 
 FOLDER = Path(__file__).parents[1] / "data/fengshui_day_calendar_v1"
 TABLES = Path(__file__).parents[1] / "data/fengshui_day_hour_tables_v1"
@@ -27,14 +27,16 @@ def result():
     )
 
 
-def test_capture_precedes_candidate_model():
+def test_capture_precedes_candidate_model() -> None:
     assert hashlib.sha256((FOLDER / "reference.json").read_bytes()).hexdigest() == (
         "6961056b2e02c14345854983ef888cd05570672a5738de02c6f97930b269979d"
     )
     assert reference()["frozen_before_candidate_probe"] is True
 
 
-def test_independent_published_calendars_conform_only_at_declared_granularity(result):
+def test_independent_published_calendars_conform_only_at_declared_granularity(
+    result,
+) -> None:
     assert result["independent_published_day_cases"] == 730
     assert result["day_ganzhi_differences"] == []
     assert result["independent_published_term_date_cases"] == 48
@@ -47,7 +49,7 @@ def test_independent_published_calendars_conform_only_at_declared_granularity(re
     )
 
 
-def test_first_column_policy_discards_most_source_cells(result):
+def test_first_column_policy_discards_most_source_cells(result) -> None:
     policy = result["latest_first_column"]
     assert result["civil_dates_probed"] == 365
     assert policy["distinct_printed_day_cells_reached"] == 360
@@ -56,7 +58,7 @@ def test_first_column_policy_discards_most_source_cells(result):
     assert policy["complete_table_coverage"] is False
 
 
-def test_full_window_policy_has_actual_date_counterexample(result):
+def test_full_window_policy_has_actual_date_counterexample(result) -> None:
     policy = result["retained_full_windows"]
     assert policy["ambiguous_civil_dates"] == 245
     assert policy["uncovered_civil_dates"] == []
@@ -75,7 +77,7 @@ def test_full_window_policy_has_actual_date_counterexample(result):
     assert witness["source_certified_selection"] is False
 
 
-def test_table_header_carry_preserves_real_early_entry_date(result):
+def test_table_header_carry_preserves_real_early_entry_date(result) -> None:
     # HKO gives 夏至 on June 21; the source heading admits Jiazi after 芒种.
     # This tests the stated hypothesis, never certifies actual hour/day policy.
     row = next(
@@ -88,7 +90,7 @@ def test_table_header_carry_preserves_real_early_entry_date(result):
     )
 
 
-def test_successful_civil_calendar_never_awards_other_axes(result):
+def test_successful_civil_calendar_never_awards_other_axes(result) -> None:
     for key in (
         "calendar_table_selection_verified",
         "day_hour_boundary_policy_verified",
@@ -99,7 +101,9 @@ def test_successful_civil_calendar_never_awards_other_axes(result):
         assert result[key] is False
 
 
-def test_real_day_algorithm_regression_turns_calendar_gate_red(monkeypatch):
+def test_real_day_algorithm_regression_turns_calendar_gate_red(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = audit.almanac.get_day_ganzhi
     monkeypatch.setattr(
         audit.almanac,
@@ -117,7 +121,9 @@ def test_real_day_algorithm_regression_turns_calendar_gate_red(monkeypatch):
     assert output["retained_full_windows"]["ambiguity_witness"]["ganzhi"] == "甲子"
 
 
-def test_term_algorithm_regression_turns_calendar_gate_red(monkeypatch):
+def test_term_algorithm_regression_turns_calendar_gate_red(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = audit.solar_term_resolution
 
     def shifted(year, name, zone):
@@ -129,6 +135,8 @@ def test_term_algorithm_regression_turns_calendar_gate_red(monkeypatch):
                     datetime.fromisoformat(resolution["moment"]) + timedelta(days=1)
                 ).isoformat(),
             }
+        else:
+            pass
         return resolution
 
     monkeypatch.setattr(audit, "solar_term_resolution", shifted)
@@ -154,7 +162,7 @@ def test_term_algorithm_regression_turns_calendar_gate_red(monkeypatch):
         "short_probe",
     ],
 )
-def test_incomplete_or_malformed_reference_cannot_turn_green(mutation):
+def test_incomplete_or_malformed_reference_cannot_turn_green(mutation: str) -> None:
     data = reference()
     if mutation == "empty_days":
         data["days"] = []
@@ -179,7 +187,7 @@ def test_incomplete_or_malformed_reference_cannot_turn_green(mutation):
 
 
 @pytest.mark.parametrize("file", sorted(audit._CAPTURE_NAMES))
-def test_capture_byte_changes_rejected(tmp_path, file):
+def test_capture_byte_changes_rejected(tmp_path: Path, file) -> None:
     folder = tmp_path / "capture"
     shutil.copytree(FOLDER, folder)
     (folder / file).write_bytes(b"changed")
@@ -187,7 +195,7 @@ def test_capture_byte_changes_rejected(tmp_path, file):
         audit.load_day_calendar_reference(folder)
 
 
-def test_omitted_capture_manifest_entry_rejected(tmp_path):
+def test_omitted_capture_manifest_entry_rejected(tmp_path: Path) -> None:
     folder = tmp_path / "capture"
     shutil.copytree(FOLDER, folder)
     manifest = json.loads((folder / "hashes.json").read_text())
@@ -197,7 +205,9 @@ def test_omitted_capture_manifest_entry_rejected(tmp_path):
         audit.load_day_calendar_reference(folder)
 
 
-def test_rehashed_transcription_must_still_match_raw_primary_capture(tmp_path):
+def test_rehashed_transcription_must_still_match_raw_primary_capture(
+    tmp_path: Path,
+) -> None:
     folder = tmp_path / "capture"
     shutil.copytree(FOLDER, folder)
     data = reference()
@@ -211,7 +221,7 @@ def test_rehashed_transcription_must_still_match_raw_primary_capture(tmp_path):
         audit.load_day_calendar_reference(folder)
 
 
-def test_research_does_not_mutate_primary_observations():
+def test_research_does_not_mutate_primary_observations() -> None:
     data, tables = reference(), load_day_hour_reference(TABLES)
     before = deepcopy((data, tables))
     audit.audit_calendar_selection_hypotheses(data, tables)

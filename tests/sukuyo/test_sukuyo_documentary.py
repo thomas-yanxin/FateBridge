@@ -1,18 +1,24 @@
 """Documentary layers must not silently become calendar or action policy."""
 
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_calendar_text import calendar_day_evidence
-from fatebridge.core.sukuyo_directions import source_bundle, travel_direction_evidence
-from fatebridge.core.sukuyo_documentary import with_text_layers
-from fatebridge.core.sukuyo_lower import lower_mansion_evidence
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_calendar_text import calendar_day_evidence
+from fatebridge.core.sukuyo.sukuyo_directions import (
+    source_bundle,
+    travel_direction_evidence,
+)
+from fatebridge.core.sukuyo.sukuyo_documentary import with_text_layers
+from fatebridge.core.sukuyo.sukuyo_lower import lower_mansion_evidence
 from scripts.sukuyo.check_sukuyo_documentary_primary import verify_documentary_primary
 
 
-def test_sukuyo_wall_opposition_preserves_main_and_inline_without_changing_activity():
+def test_sukuyo_wall_opposition_preserves_main_and_inline_without_changing_activity() -> (
+    None
+):
     result = day_evidence(
         calendar_mansion("2025-04-22", "12:00:00"),
         activity="travel",
@@ -34,7 +40,7 @@ def test_sukuyo_wall_opposition_preserves_main_and_inline_without_changing_activ
     assert "同向出行证言相反" in text
 
 
-def test_sukuyo_paired_already_above_clause_keeps_both_passages_and_detaches():
+def test_sukuyo_paired_already_above_clause_keeps_both_passages_and_detaches() -> None:
     original = next(
         r for r in source_bundle()["rules"] if r["rule_id"] == "t1299_direction_05"
     )
@@ -54,7 +60,7 @@ def test_sukuyo_paired_already_above_clause_keeps_both_passages_and_detaches():
     )
 
 
-def test_sukuyo_prohibition_and_unreleasing_note_remain_separate():
+def test_sukuyo_prohibition_and_unreleasing_note_remain_separate() -> None:
     record = travel_direction_evidence("轸")["selected_records"][0]
     passage = record["source_passages"][0]
     assert "不得向北路行" in passage["main_text"]
@@ -63,7 +69,7 @@ def test_sukuyo_prohibition_and_unreleasing_note_remain_separate():
     assert lower_mansion_evidence("壁")["topic_rules"]
 
 
-def test_sukuyo_japanese_body_comparison_preserves_all_thirty_primary_days():
+def test_sukuyo_japanese_body_comparison_preserves_all_thirty_primary_days() -> None:
     differences = []
     favorable = {1, 3, 5, 7, 10, 11, 13, 16, 18, 20, 22, 25, 26, 28}
     upper = {2, 6, 9, 12, 17, 21, 24, 27, 29}
@@ -84,6 +90,8 @@ def test_sukuyo_japanese_body_comparison_preserves_all_thirty_primary_days():
             for r in comparison["primary_general_day_comparison"]
         ):
             differences.append(day)
+        else:
+            pass
         assert comparison["current_body_list_membership"] == (
             "listed_favorable"
             if day in {1, 3, 5, 7, 9, 11, 13, 18, 20, 22, 24, 26, 28}
@@ -95,7 +103,7 @@ def test_sukuyo_japanese_body_comparison_preserves_all_thirty_primary_days():
     assert differences == [9, 10, 16, 24, 25]
 
 
-def test_sukuyo_unaccepted_margin_and_correlated_sequence_are_not_admitted():
+def test_sukuyo_unaccepted_margin_and_correlated_sequence_are_not_admitted() -> None:
     first = calendar_day_evidence(16)["japanese_selected_reference"]
     assert first["current_body_list_membership"] == "unlisted"
     assert first["unaccepted_marginal_annotation"]["normalized_transcription"] is None
@@ -116,7 +124,7 @@ def test_sukuyo_unaccepted_margin_and_correlated_sequence_are_not_admitted():
     )
 
 
-def test_sukuyo_new_witness_does_not_resolve_leap_short_month_order():
+def test_sukuyo_new_witness_does_not_resolve_leap_short_month_order() -> None:
     calendar = calendar_mansion(
         "1957-09-24",
         calendar_profile="hinoo_t1299_host27",
@@ -130,7 +138,9 @@ def test_sukuyo_new_witness_does_not_resolve_leap_short_month_order():
     assert "闰月补配优先次序" in day["reading_text"]
 
 
-def test_sukuyo_primary_placement_checker_and_changed_full_source(tmp_path):
+def test_sukuyo_primary_placement_checker_and_changed_full_source(
+    tmp_path: Path,
+) -> None:
     report = verify_documentary_primary()
     assert report["errors"] == [] and report["selected_paragraphs"] == 17
     assert not report["independent_image_transcription_or_human_collation"]
@@ -144,8 +154,8 @@ def test_sukuyo_primary_placement_checker_and_changed_full_source(tmp_path):
     "date,membership", [("2025-01-08", "listed_favorable"), ("2025-01-24", "unlisted")]
 )
 def test_sukuyo_new_manuscript_time_clause_is_not_lost_in_native_reading(
-    date, membership
-):
+    date: str, membership: str
+) -> None:
     day = day_evidence(
         calendar_mansion(date, "12:00:00"),
         activity="travel",
@@ -161,8 +171,8 @@ def test_sukuyo_new_manuscript_time_clause_is_not_lost_in_native_reading(
     assert not reference["selected_body_time_restrictions"]["clock_conversion_computed"]
 
 
-def test_sukuyo_own_direction_clause_does_not_claim_following_already_above():
-    from fatebridge.core.sukuyo_documentary import text_placement_label
+def test_sukuyo_own_direction_clause_does_not_claim_following_already_above() -> None:
+    from fatebridge.core.sukuyo.sukuyo_documentary import text_placement_label
 
     own = travel_direction_evidence("毕")["selected_records"][0]
     paired = travel_direction_evidence("角")["selected_records"][0]
@@ -171,7 +181,7 @@ def test_sukuyo_own_direction_clause_does_not_claim_following_already_above():
     assert "连属" in text_placement_label(paired)
 
 
-def test_sukuyo_known_southbound_is_retained_when_north_clause_is_unmatched():
+def test_sukuyo_known_southbound_is_retained_when_north_clause_is_unmatched() -> None:
     day = day_evidence(
         calendar_mansion("2025-01-08", "12:00:00"),
         activity="travel",
@@ -183,7 +193,9 @@ def test_sukuyo_known_southbound_is_retained_when_north_clause_is_unmatched():
     assert "行向不自动代表远行" in day["reading_text"]
 
 
-def test_sukuyo_native_candidate_directions_keep_complete_scope_and_actual_input():
+def test_sukuyo_native_candidate_directions_keep_complete_scope_and_actual_input() -> (
+    None
+):
     calendar = calendar_mansion(
         "1957-09-24",
         calendar_profile="hinoo_t1299_host27",
@@ -209,8 +221,8 @@ def test_sukuyo_native_candidate_directions_keep_complete_scope_and_actual_input
     ],
 )
 def test_sukuyo_native_explains_confirmed_religious_learning_input(
-    date, basis, zone, time
-):
+    date: str, basis: str, zone: str, time: str
+) -> None:
     day = day_evidence(
         calendar_mansion(date, time, zone=zone, calendar_basis=basis),
         activity="study",
@@ -223,7 +235,9 @@ def test_sukuyo_native_explains_confirmed_religious_learning_input(
 
 
 @pytest.mark.parametrize("details", [[], ["monastic_dharma_request"]])
-def test_sukuyo_native_keeps_declared_input_separate_from_inferred_class(details):
+def test_sukuyo_native_keeps_declared_input_separate_from_inferred_class(
+    details,
+) -> None:
     day = day_evidence(
         calendar_mansion("2025-01-07", "12:00:00"),
         activity="study",

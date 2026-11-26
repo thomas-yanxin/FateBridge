@@ -8,8 +8,9 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish import build_india, topic_evidence
-from fatebridge.core.jyotish_ashtakavarga import (
+from fatebridge.core.contracts.output_jyotish import JyotishIndia
+from fatebridge.core.jyotish.jyotish import build_india, topic_evidence
+from fatebridge.core.jyotish.jyotish_ashtakavarga import (
     HOUSE_ROWS,
     REFERENCES,
     RULE,
@@ -17,7 +18,6 @@ from fatebridge.core.jyotish_ashtakavarga import (
     SampleGrid,
     calculate,
 )
-from fatebridge.core.output_jyotish import JyotishIndia
 from tests.fixtures.surface_payloads import astro_payload
 from tests.support.reference_data import resolve
 
@@ -28,7 +28,7 @@ PRIMARY = json.loads(PRIMARY_BYTES)
 ORACLE = json.loads(ORACLE_BYTES)
 
 
-def test_preimplementation_references_and_all_768_literal_cells_are_unchanged():
+def test_preimplementation_references_and_all_768_literal_cells_are_unchanged() -> None:
     assert (
         hashlib.sha256(PRIMARY_BYTES).hexdigest()
         == "702f1dc3798c3f56bde06bdbb6a797fe607aac04208f499761698bd56facfd13"
@@ -45,7 +45,7 @@ def test_preimplementation_references_and_all_768_literal_cells_are_unchanged():
 
 
 @pytest.mark.parametrize("case", ORACLE["rows"], ids=lambda c: c["name"])
-def test_all_preimplementation_external_outputs_match_exactly(case):
+def test_all_preimplementation_external_outputs_match_exactly(case) -> None:
     result = calculate(case["signs"])
     assert result["prastara"] == case["PAV"]
     assert result["bhinna"] == case["BAV"]
@@ -54,7 +54,7 @@ def test_all_preimplementation_external_outputs_match_exactly(case):
     assert result["samudaya_total"] == 337
 
 
-def test_printed_example_and_mercury_prastara_preserve_the_authors_notation():
+def test_printed_example_and_mercury_prastara_preserve_the_authors_notation() -> None:
     chart = PRIMARY["chart6"]
     result = calculate(chart["input_sign_indices"])
     assert result["prastara"]["Mercury"] == chart["Mercury_PAV"]
@@ -67,14 +67,14 @@ def test_printed_example_and_mercury_prastara_preserve_the_authors_notation():
 
 
 @pytest.mark.parametrize("bad", [True, -1, 12, 1.0, "1", None, float("nan")])
-def test_sign_inputs_cannot_be_boolean_missing_or_nonintegral(bad):
+def test_sign_inputs_cannot_be_boolean_missing_or_nonintegral(bad) -> None:
     signs = dict.fromkeys(REFERENCES, 0)
     signs["Moon"] = bad
     with pytest.raises(ValueError):
         calculate(signs)
 
 
-def test_missing_and_extra_contributors_are_not_filled_or_counted():
+def test_missing_and_extra_contributors_are_not_filled_or_counted() -> None:
     signs = dict.fromkeys(REFERENCES, 0)
     with pytest.raises(ValueError):
         calculate({k: v for k, v in signs.items() if k != "Ascendant"})
@@ -82,7 +82,7 @@ def test_missing_and_extra_contributors_are_not_filled_or_counted():
         calculate({**signs, "Rahu": 0})
 
 
-def test_grid_keeps_own_ascendant_column_instead_of_nominal_counts():
+def test_grid_keeps_own_ascendant_column_instead_of_nominal_counts() -> None:
     grid = SampleGrid(["D1"])
     raw = {"longitudes": dict.fromkeys(REFERENCES[:7], 1.0), "ascendant": 29.9}
     grid.observe(-30.0, raw)
@@ -113,7 +113,9 @@ def india():
     )
 
 
-def test_every_returned_varga_has_typed_counts_and_resolving_nominal_claims(india):
+def test_every_returned_varga_has_typed_counts_and_resolving_nominal_claims(
+    india,
+) -> None:
     JyotishIndia.model_validate(india)
     av = india["ashtakavarga"]
     assert set(av["charts"]) == set(india["charts"])
@@ -139,12 +141,14 @@ def test_every_returned_varga_has_typed_counts_and_resolving_nominal_claims(indi
             assert nominal[key] == av["charts"][name][key]
 
 
-def test_topic_counts_and_all_contribution_paths_resolve_in_same_result(india):
+def test_topic_counts_and_all_contribution_paths_resolve_in_same_result(india) -> None:
     found = []
     for topic in india["topic_evidence"].values():
         for factor in topic["factors"]:
             if factor["rule_id"] != RULE:
                 continue
+            else:
+                pass
             found.append(factor)
             assert resolve({"india": india}, factor["fact_path"]) == factor["fact"]
             context = factor["calculation_context"]
@@ -154,11 +158,16 @@ def test_topic_counts_and_all_contribution_paths_resolve_in_same_result(india):
                 *context["method_context"]["input_claims"],
             ]:
                 assert resolve({"india": india}, row["fact_path"]) == row["value"]
-            assert "名义生时" in factor["traditional_interpretation"]
+            assert (
+                context["method_context"]["reference_instant"]
+                == "nominal_birth_instant"
+            )
     assert len(found) == 5
 
 
-def test_mismatched_contributor_or_table_cannot_receive_faithful_topic_evidence(india):
+def test_mismatched_contributor_or_table_cannot_receive_faithful_topic_evidence(
+    india,
+) -> None:
     for key in ["bhinna", "prastara"]:
         bad = copy.deepcopy(india["ashtakavarga"])
         if key == "bhinna":
@@ -183,8 +192,8 @@ def test_mismatched_contributor_or_table_cannot_receive_faithful_topic_evidence(
     ],
 )
 def test_mutated_provenance_cannot_borrow_valid_counts_for_false_source_claims(
-    india, field
-):
+    india, field: str
+) -> None:
     bad = copy.deepcopy(india["ashtakavarga"])
     packet = bad["charts"]["D1"]
     if field == "input_claim_value":

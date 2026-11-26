@@ -6,10 +6,11 @@ import json
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core import heluo_poems as hp
-from fatebridge.core import heluo_texts as ht
-from fatebridge.core.heluo import yao_text
+from fatebridge.core.heluo import heluo_poems as hp
+from fatebridge.core.heluo import heluo_texts as ht
+from fatebridge.core.heluo.heluo import yao_text
 from fatebridge.services.knowledge import calculate_knowledge_read
 from tests.support.heluo_source_facts import PENDING_COUNT
 
@@ -41,7 +42,7 @@ def clear_sources():
         fn.cache_clear()
 
 
-def test_frozen_readings_precede_consumer_and_preserve_withdrawals():
+def test_frozen_readings_precede_consumer_and_preserve_withdrawals() -> None:
     freeze = json.loads(
         (W / "reviewed-literal-freeze-before-candidate.json").read_bytes()
     )
@@ -59,7 +60,7 @@ def test_frozen_readings_precede_consumer_and_preserve_withdrawals():
 @pytest.mark.parametrize(
     "entry", LITERAL["commentary"], ids=lambda e: f"guan-{e['line']}"
 )
-def test_complete_header_and_all_parented_sections(entry):
+def test_complete_header_and_all_parented_sections(entry) -> None:
     actual = yao_text(entry["hexagram"], entry["line"])
     assert actual["yaoci"] == entry["yaoci"]
     assert actual["detail"] == "".join(s["text"] for s in entry["sections"])
@@ -87,7 +88,7 @@ def test_complete_header_and_all_parented_sections(entry):
 
 
 @pytest.mark.parametrize("entry", LITERAL["poems"], ids=lambda e: f"shi-{e['line']}")
-def test_every_poem_and_actual_printed_clause_boundary(entry):
+def test_every_poem_and_actual_printed_clause_boundary(entry) -> None:
     actual = yao_text(entry["hexagram"], entry["line"])
     assert actual["shige"] == "\n".join(p["text"] for p in entry["poems"])
     assert len(actual["poem_sections"]) == entry["printed_heading_count"]
@@ -108,7 +109,9 @@ def test_every_poem_and_actual_printed_clause_boundary(entry):
     "gua,line,layer",
     [("風地觀", 4, "commentary"), ("地水師", 2, "poems"), ("地水師", 5, "poems")],
 )
-def test_unresolved_choice_is_visible_in_actual_summary_and_notes(gua, line, layer):
+def test_unresolved_choice_is_visible_in_actual_summary_and_notes(
+    gua: str, line: int, layer: str
+) -> None:
     text = yao_text(gua, line)
     snapshot = ht.text_status_snapshot(text)
     assert "字形未决" in snapshot
@@ -134,8 +137,8 @@ def test_unresolved_choice_is_visible_in_actual_summary_and_notes(gua, line, lay
     ],
 )
 def test_frozen_reference_still_detects_synchronized_data_and_producer_rebinding(
-    kind, word, replacement, monkeypatch, tmp_path
-):
+    kind: str, word: str, replacement: str, monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
     module, path_attr, digest_attr = (
         (ht, "COLLATION_PATH", "HEADER_CONTENT_SHA256")
         if kind == "headers"

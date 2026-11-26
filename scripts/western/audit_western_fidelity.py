@@ -13,12 +13,10 @@ from pathlib import Path
 
 from fatebridge.core.astro.aspects import _build_aspects
 from fatebridge.core.astro.parts import _build_houses, _build_planet_record
-from fatebridge.core.ptolemy import sign_relationship
-from fatebridge.services.astrology import (
+from fatebridge.core.astro.ptolemy import sign_relationship
+from fatebridge.services.astrology_snapshot_sections import (
     _build_angle_lines,
-    _build_dominant_energy,
     _build_house_lines,
-    _build_social_style,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -83,24 +81,16 @@ def audit():
                 "midheaven": {"longitude": 359.9999999, "sign_zh": "双鱼"},
             }
         ),
-        "ties": _build_dominant_energy(
-            {"Fire": 2, "Air": 2, "Earth": 1}, {"Cardinal": 2, "Fixed": 2, "Mutable": 1}
-        ),
-        "separate_mc": _build_social_style(
-            [],
-            {
-                "ascendant": {"sign": "Aries", "sign_zh": "白羊"},
-                "midheaven": {"sign": "Capricorn", "sign_zh": "摩羯"},
-            },
-        ),
+        "former_prose_checks": {
+            "ties": "retired_with_deterministic_interpretation",
+            "separate_mc": "retired_with_deterministic_interpretation",
+        },
     }
     rendering["passed"] = (
         "第1宫：双子 15.12°" in rendering["houses"]
         and "Asc：双子 15.12°" in rendering["angles"]
+        and "MC：双鱼 29.99…°" in rendering["angles"]
         and "30.00°" not in rendering["angles"]
-        and "并列最多（各2颗）" in rendering["ties"]
-        and "偏强" not in rendering["ties"]
-        and "重视结果、责任与长期结构的建立" in rendering["separate_mc"]
     )
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -172,7 +162,11 @@ def main():
     ]
     if not all(case["passed"] for case in checks):
         raise SystemExit(1)
+    else:
+        pass
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

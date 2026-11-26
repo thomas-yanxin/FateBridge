@@ -60,7 +60,7 @@
         "reference_frame": "fixed_physical_palace",
         "lookup": "palaces[confirmed_direction]",
         "source_ids": [
-          "FOUNDATION_S4"
+          "S4"
         ]
       },
       {
@@ -73,7 +73,7 @@
           "facing"
         ],
         "source_ids": [
-          "FOUNDATION_S4",
+          "S4",
           "SHEN_VOLUME2_REFERENCE"
         ]
       },
@@ -81,7 +81,7 @@
         "reference_frame": "bazhai_you_nian",
         "lookup": "bazhai_you_nian_references[actual_bazhai_star_name]",
         "source_ids": [
-          "FOUNDATION_S3"
+          "S3"
         ]
       },
       {
@@ -105,8 +105,8 @@
           "element": "木"
         },
         "source_ids": [
-          "FOUNDATION_S3",
-          "FOUNDATION_S4"
+          "S3",
+          "S4"
         ]
       },
       {
@@ -120,8 +120,8 @@
           "element": "水"
         },
         "source_ids": [
-          "FOUNDATION_S3",
-          "FOUNDATION_S4"
+          "S3",
+          "S4"
         ]
       }
     ],
@@ -795,14 +795,14 @@
           "role": "fixed_palace",
           "use": "先查物理宫位的固定数、卦、五行；不能随年星移动",
           "source_ids": [
-            "FOUNDATION_S4"
+            "S4"
           ]
         },
         {
           "role": "annual_star",
           "use": "按实际年盘的临宫星号查逐星主题；不代替历史宅盘",
           "source_ids": [
-            "FOUNDATION_S4",
+            "S4",
             "JOEY_YAP_2018_STAR_THEMES"
           ]
         },
@@ -829,7 +829,7 @@
     "bazhai": {
       "status": "reference_only",
       "source_ids": [
-        "FOUNDATION_S3",
+        "S3",
         "FATEBRIDGE_OBSERVATION_REFERENCE"
       ],
       "references": [
@@ -845,7 +845,7 @@
           "engine_scope": "location_direction与door_facing分别记录；不由门位推门向",
           "locator": "《八宅明镜》卷下：修造论",
           "source_ids": [
-            "FOUNDATION_S3",
+            "S3",
             "FATEBRIDGE_OBSERVATION_REFERENCE"
           ]
         },
@@ -861,7 +861,7 @@
           "engine_scope": "床位与headboard分别比较；床头向是本版本应用约定，梁、门线等另属形态事实",
           "locator": "《八宅明镜》卷下：修造论、歌断（床宫门对论）",
           "source_ids": [
-            "FOUNDATION_S3",
+            "S3",
             "FATEBRIDGE_OBSERVATION_REFERENCE"
           ]
         },
@@ -877,7 +877,7 @@
           "engine_scope": "stove location和fire_mouth两个作用域；现代电磁灶无明确传统火门时保留缺失，不从旋钮、电线或厨门猜向",
           "locator": "《八宅明镜》卷下：修造论；本版本现代适用性说明",
           "source_ids": [
-            "FOUNDATION_S3",
+            "S3",
             "FATEBRIDGE_OBSERVATION_REFERENCE"
           ]
         }

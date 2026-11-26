@@ -4,9 +4,11 @@ import argparse
 import hashlib
 import json
 from fractions import Fraction as Q
+from functools import partial
 from pathlib import Path
 
 from scripts.astrodice.astrodice_clock_interval import I
+from scripts.astrodice.astrodice_current_sampling import sample_lunar
 from scripts.astrodice.astrodice_lunar_pipeline import BIAS, PLAN_SHA, plan, write_new
 from scripts.astrodice.astrodice_source_slope_bounds import pi_bounds
 from scripts.astrodice.verify_astrodice_lunar_pipeline import verify
@@ -37,17 +39,19 @@ def within(value, limit):
 
 
 def audit(run, split, reference_path, sampler=None, *, jpl_file=None):
-    from scripts.astrodice.astrodice_current_sampling import sample_lunar
 
     if sampler is None:
-        from functools import partial
 
         sampler = partial(sample_lunar, jpl_file=jpl_file)
+    else:
+        pass
     protocol = plan(run)
     reference = json.loads(reference_path.read_text())
     verify(run, reference_path)
     if reference["split"] != split:
         raise ValueError("Independent reference split detached")
+    else:
+        pass
     scale = 648000 / I(*pi_bounds())
     rows = []
     for index, (case, ref) in enumerate(zip(protocol[split], reference["rows"])):
@@ -68,6 +72,8 @@ def audit(run, split, reference_path, sampler=None, *, jpl_file=None):
                 or Q(native["native_numeric_jd"]) != Q(ref["exact_binary64_numeric_jd"])
             ):
                 raise ValueError("Native row rebound from frozen input")
+            else:
+                pass
             row = {
                 **case,
                 "backend": (
@@ -87,6 +93,8 @@ def audit(run, split, reference_path, sampler=None, *, jpl_file=None):
                 )
                 rows.append(row)
                 continue
+            else:
+                pass
             actual_model = native["production_return"][1]
             expected_model = "swieph" if backend == "swieph" else "jpl"
             policy = native["metadata"]["lunar_light_time"][
@@ -172,7 +180,7 @@ def audit(run, split, reference_path, sampler=None, *, jpl_file=None):
     }
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", type=Path, required=True)
     parser.add_argument("--split", choices=("development", "heldout"), required=True)
@@ -187,3 +195,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

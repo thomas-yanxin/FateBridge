@@ -14,7 +14,7 @@ import math
 from decimal import Decimal, localcontext
 from fractions import Fraction
 from importlib.resources import files
-from typing import Any, Dict, List, Optional, Sequence, Tuple, TypedDict
+from typing import Any, Sequence, TypedDict
 
 from fatebridge.core import ephemeris_runtime
 from fatebridge.core.astro import moshier_lunar_geometry, reference_frames, runtime
@@ -43,6 +43,7 @@ MOSHIER_LUNAR_METHOD_ID = (
     "native_moshier_forward_moon_backward_earth_decimal_reduction_v1"
 )
 Vector = Sequence[Decimal]
+MoshierGeometricStates = dict[tuple[float, int, int], tuple[Decimal, ...]]
 
 
 class SourceVelocityReceipt(TypedDict):
@@ -57,18 +58,18 @@ class SourceVelocityReceipt(TypedDict):
 
 class LunarSourceVelocityReceipt(SourceVelocityReceipt):
     lunar_operator: SourceVelocityReceipt
-    lunar_geometry: Dict[str, str]
+    lunar_geometry: dict[str, str]
 
 
 class ReductionReceipt(TypedDict):
     frame_orthogonality_error: float
     epoch_remainder_days: float
-    solar_interpolation_branch: Dict[str, object]
+    solar_interpolation_branch: dict[str, object]
     ephemeris_model: str
-    source_velocity: Optional[SourceVelocityReceipt]
+    source_velocity: SourceVelocityReceipt | None
 
 
-def mass_profile() -> List[Tuple[Decimal, Decimal]]:
+def mass_profile() -> list[tuple[Decimal, Decimal]]:
     """Check the reviewed source table on every fallback sample, without caching."""
     try:
         raw = (
@@ -88,19 +89,19 @@ def dot(a: Vector, b: Vector) -> Decimal:
     return sum((x * y for x, y in zip(a, b)), Decimal(0))
 
 
-def add(a: Vector, b: Vector) -> List[Decimal]:
+def add(a: Vector, b: Vector) -> list[Decimal]:
     return [x + y for x, y in zip(a, b)]
 
 
-def sub(a: Vector, b: Vector) -> List[Decimal]:
+def sub(a: Vector, b: Vector) -> list[Decimal]:
     return [x - y for x, y in zip(a, b)]
 
 
-def scale(a: Vector, value: Decimal) -> List[Decimal]:
+def scale(a: Vector, value: Decimal) -> list[Decimal]:
     return [x * value for x in a]
 
 
-def cross(a: Vector, b: Vector) -> List[Decimal]:
+def cross(a: Vector, b: Vector) -> list[Decimal]:
     return [
         a[1] * b[2] - a[2] * b[1],
         a[2] * b[0] - a[0] * b[2],
@@ -112,7 +113,7 @@ def norm(a: Vector) -> Decimal:
     return dot(a, a).sqrt()
 
 
-def unit(a: Vector) -> List[Decimal]:
+def unit(a: Vector) -> list[Decimal]:
     size = norm(a)
     if not size.is_finite() or size <= 0:
         raise EphemerisSourceError("coordinate_values_unavailable")
@@ -121,7 +122,7 @@ def unit(a: Vector) -> List[Decimal]:
 
 def stable_interpolation_cell(
     impact: Decimal, angular_radius: Decimal, observer_to_target_ratio: Decimal
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Classify the stable reduction's cell, retaining its arithmetic margin.
 
     The cross product avoids sqrt(1-dot²)'s inverse-radius-squared loss.
@@ -164,12 +165,13 @@ def reduced_longitude(
     *,
     sidereal: bool,
     trace: PhysicalEphemerisTrace,
-    contexts: Dict[str, Any],
+    contexts: dict[str, Any],
     prefix: str,
-    center_source: Dict[str, Any],
+    center_source: dict[str, Any],
     model: str = "swieph",
     source_step_days: float = 0.0625,
-) -> Tuple[float, ReductionReceipt]:
+    moshier_geometric_states: MoshierGeometricStates | None = None,
+) -> tuple[float, ReductionReceipt]:
     """Reduce shared Swiss geometric states, retaining the center file cohort.
 
     Swiss/JPL use their two iterations and geometric retarded state, restoring
@@ -180,7 +182,8 @@ def reduced_longitude(
     The source-speed operators use checked geometric polynomials.
     Shared high-precision deflection and aberration are
     transformed by native frame pairs. This is source arithmetic, not an
-    independent ephemeris or a physical accuracy bound.
+    independent ephemeris or a physical accuracy bound. The Moshier caller may
+    share checked native geometry across samples of one locked derivative.
     """
     swe = runtime.swe
     if (
@@ -207,28 +210,40 @@ def reduced_longitude(
     for name in COORDINATE_FLAGS:
         mask |= getattr(swe, name)
 
-    def state(at: float, body: int, flags: int, suffix: str) -> List[Decimal]:
-        values, returned = runtime.ephemeris_call("calc", at, body, flags)
-        assert_physical_configuration(selected)
-        expected = flags | swe.FLG_NOABERR | swe.FLG_NOGDEFL
-        if flags & (swe.FLG_J2000 | swe.FLG_SIDEREAL):
-            expected |= swe.FLG_NONUT
-        if (
-            returned < 0
-            or returned & mask != expected & mask
-            or not returned & swe.FLG_SPEED
-        ):
-            raise EphemerisSourceError("coordinate_contract_changed")
-        if runtime.ephemeris_model_from_retflag(returned) != model:
-            raise EphemerisSourceError("model_changed")
-        if len(values) != 6 or not all(math.isfinite(x) for x in values):
-            raise EphemerisSourceError("coordinate_values_unavailable")
+    def state(at: float, body: int, flags: int, suffix: str) -> list[Decimal]:
+        key = (at, body, flags)
+        geometry = (
+            moshier_geometric_states.get(key)
+            if moshier_geometric_states is not None
+            else None
+        )
+        if geometry is None:
+            values, returned = runtime.ephemeris_call("calc", at, body, flags)
+            assert_physical_configuration(selected)
+            expected = flags | swe.FLG_NOABERR | swe.FLG_NOGDEFL
+            if flags & (swe.FLG_J2000 | swe.FLG_SIDEREAL):
+                expected |= swe.FLG_NONUT
+            if (
+                returned < 0
+                or returned & mask != expected & mask
+                or not returned & swe.FLG_SPEED
+            ):
+                raise EphemerisSourceError("coordinate_contract_changed")
+            if runtime.ephemeris_model_from_retflag(returned) != model:
+                raise EphemerisSourceError("model_changed")
+            if len(values) != 6 or not all(math.isfinite(x) for x in values):
+                raise EphemerisSourceError("coordinate_values_unavailable")
+            geometry = tuple(Decimal.from_float(float(x)) for x in values)
+            if moshier_geometric_states is not None:
+                moshier_geometric_states[key] = geometry
+        else:
+            assert_physical_configuration(selected)
         factor = prefix + suffix
         context = trace.observe(factor, model, record_factor=False)
         contexts[factor] = context
         if context != center_source:
             raise EphemerisSourceError("dependency_source_window_incoherent")
-        return [Decimal.from_float(float(x)) for x in values]
+        return list(geometry)
 
     with (
         localcontext() as ctx,
@@ -250,7 +265,7 @@ def reduced_longitude(
         earth = state(epoch, swe.EARTH, fixed | origin, "_earth")
         if planet == "Moon":
             initial[:3] = moshier_lunar_geometry.equatorial(epoch, epoch)
-        source_velocity: Optional[SourceVelocityReceipt] = None
+        source_velocity: SourceVelocityReceipt | None = None
         if model == "moshier":
             # swi_moshplan uses a short backward difference inside light time
             # and aberration. Evaluating its small numerator directly injects
@@ -374,7 +389,7 @@ def reduced_longitude(
             # app_pos_etc_sun has no solar self-deflection. There is no
             # effective-mass knot in this model, rather than a selected cell.
             deflected = ray
-            source_cell: Dict[str, object] = {
+            source_cell: dict[str, object] = {
                 "method_id": "moshier_solar_no_self_deflection_v1",
                 "status": "not_in_source_model",
                 "cell": "no_solar_deflection",

@@ -7,11 +7,11 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.meihua_calendar_precision import calendar_label_precision
+from fatebridge.core.meihua.meihua_calendar_precision import calendar_label_precision
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
-from fatebridge.validation.meihua_calendar_precision import audit_calendar_precision
 from tests.support.transports import SPECS, business, rest, surface_calls
+from validation.meihua_calendar_precision import audit_calendar_precision
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_calendar_precision_v4"
 REVIEW_CASES = json.loads((REFERENCES / "review-cases.json").read_text())["cases"]
@@ -19,12 +19,14 @@ CAST_CASES = json.loads((REFERENCES / "cases.json").read_text())["cases"]
 
 
 @pytest.mark.parametrize("case", REVIEW_CASES, ids=lambda c: c["date"])
-def test_published_month_review_scope_has_explicit_edges(case):
+def test_published_month_review_scope_has_explicit_edges(case) -> None:
     result = calendar_label_precision(date.fromisoformat(case["date"]))
     assert bool(result["matched_events"]) is case["review_expected"]
     if case["review_expected"]:
         assert [e["id"] for e in result["matched_events"]] == [case["event_id"]]
         assert result["date_label_revision_may_change_month_day_and_cast"]
+    else:
+        pass
     policy = result["review_scope_policy"]
     assert policy["review_windows_are_not_published_hko_intervals"]
     assert policy["other_published_month_anchors_assumed_fixed_for_review_scope"]
@@ -34,7 +36,7 @@ def test_published_month_review_scope_has_explicit_edges(case):
     assert not result["absence_of_named_event_certifies_exactness"]
 
 
-def test_frozen_official_caveat_and_three_manual_casts_are_not_authority():
+def test_frozen_official_caveat_and_three_manual_casts_are_not_authority() -> None:
     report = audit_calendar_precision(REFERENCES)
     assert report["selected_checks_passed"], report
     assert len(report["manual_mathematical_cases"]) == 3
@@ -48,7 +50,9 @@ def test_frozen_official_caveat_and_three_manual_casts_are_not_authority():
 
 @pytest.mark.parametrize("topic", ["general", "weather"])
 @pytest.mark.parametrize("case", CAST_CASES, ids=lambda c: c["date"])
-def test_known_month_review_is_disclosed_in_both_interpretation_branches(case, topic):
+def test_known_month_review_is_disclosed_in_both_interpretation_branches(
+    case, topic: str
+) -> None:
     y, m, d = map(int, case["date"].split("-"))
     result = calculate_meihua_analysis(
         analysis_year=y,
@@ -80,9 +84,11 @@ def test_known_month_review_is_disclosed_in_both_interpretation_branches(case, t
             ]
             is None
         )
+    else:
+        pass
 
 
-def test_unlisted_day_and_non_hko_prefix_do_not_become_exactness_certificates():
+def test_unlisted_day_and_non_hko_prefix_do_not_become_exactness_certificates() -> None:
     assert (
         calendar_label_precision(date(1900, 1, 1))["status"]
         == "outside_hko_annual_table_scope"
@@ -99,7 +105,7 @@ def test_unlisted_day_and_non_hko_prefix_do_not_become_exactness_certificates():
     assert "label_precision" not in cast["meihua"]["calendar_policy"]
 
 
-def test_returned_precision_metadata_cannot_poison_later_calls():
+def test_returned_precision_metadata_cannot_poison_later_calls() -> None:
     a = calendar_label_precision(date(2057, 9, 28))
     a["source"]["url"] = "changed"
     a["matched_events"][0]["published_lunar_month"] = 1
@@ -110,7 +116,7 @@ def test_returned_precision_metadata_cannot_poison_later_calls():
     assert b["review_scope_policy"]["unlisted_boundaries_are_not_certified_exact"]
 
 
-def test_changed_reference_is_not_accepted_as_better_agreement(tmp_path):
+def test_changed_reference_is_not_accepted_as_better_agreement(tmp_path: Path) -> None:
     target = tmp_path / "refs"
     shutil.copytree(REFERENCES, target)
     path = target / "cases.json"
@@ -121,8 +127,8 @@ def test_changed_reference_is_not_accepted_as_better_agreement(tmp_path):
 
 @pytest.mark.parametrize("topic", ["general", "weather"])
 def test_publisher_review_remains_in_strict_projection_on_all_surfaces(
-    topic, surface_calls
-):
+    topic: str, surface_calls
+) -> None:
     payload = {
         "analysis_year": 2057,
         "analysis_month": 9,

@@ -26,15 +26,23 @@ def frozen_observation_check() -> dict:
         != "085cabac2afdb50a083be78acfc7b2651ab5cd7733d46985a160ededd8bfbdcb"
     ):
         raise ValueError("Independent source extraction changed")
+    else:
+        pass
     observed = json.loads(raw)
     reference = json.loads(CATALOG.read_text())
     if observed["catalog_sha256"] != hashlib.sha256(CATALOG.read_bytes()).hexdigest():
         raise ValueError("Diagram catalog changed after the source observation")
+    else:
+        pass
     if len(observed["rows"]) != 2 or len(reference["observations"]) != 2:
         raise ValueError("Source observation set incomplete")
+    else:
+        pass
     for original, row in zip(observed["rows"], reference["observations"], strict=True):
         if any(original[k] != row[k] for k in original):
             raise ValueError("Independent diagram fact mismatch")
+        else:
+            pass
     return {
         "status": "bounded_two_unproofed_diagram_facts_matched",
         "extraction_sha256": hashlib.sha256(raw).hexdigest(),
@@ -51,6 +59,8 @@ def extract_diagram(xml: str, identifier: str) -> dict:
     page = root.find(".//x:page", NS)
     if page is None:
         raise ValueError("Missing PDF page")
+    else:
+        pass
     lines = page.findall(".//x:line", NS)
     heading = "The Left Angle Cross of " + identifier
     selected = [
@@ -61,6 +71,8 @@ def extract_diagram(xml: str, identifier: str) -> dict:
     ]
     if len(selected) != 1:
         raise ValueError("Missing or ambiguous diagram heading")
+    else:
+        pass
     anchor = selected[0]
     top, bottom = float(anchor.attrib["yMin"]), float(anchor.attrib["yMax"])
     width = float(page.attrib["width"])
@@ -73,16 +85,22 @@ def extract_diagram(xml: str, identifier: str) -> dict:
     ]
     if len(numbers) != 4:
         raise ValueError("Diagram must have exactly four numerical positions")
+    else:
+        pass
     ordered = sorted(
         numbers, key=lambda w: (float(w.attrib["yMin"]), float(w.attrib["xMin"]))
     )
     ys = [float(w.attrib["yMin"]) for w in ordered]
     if not (abs(ys[0] - ys[1]) < 1 and abs(ys[2] - ys[3]) < 1 and ys[2] - ys[1] > 5):
         raise ValueError("Ambiguous diagram row positions")
+    else:
+        pass
     gates = [int(ordered[i].text) for i in [0, 2, 1, 3]]
     words = [w.text or "" for w in page.findall(".//x:word", NS)]
     if "This transcription has not been proofed." not in " ".join(words):
         raise ValueError("Missing original unproofed qualification")
+    else:
+        pass
     footer = [
         w
         for w in page.findall(".//x:word", NS)
@@ -91,6 +109,8 @@ def extract_diagram(xml: str, identifier: str) -> dict:
     ]
     if len(footer) != 1:
         raise ValueError("Missing or ambiguous printed page number")
+    else:
+        pass
     return {
         "display_identifier": identifier,
         "gates": gates,
@@ -106,6 +126,8 @@ def verify_sources(directory: Path) -> dict:
         pdf = directory / f"quarter-{expected['quarter']}.pdf"
         if hashlib.sha256(pdf.read_bytes()).hexdigest() != expected["pdf_sha256"]:
             raise ValueError("Primary PDF bytes changed")
+        else:
+            pass
         with tempfile.TemporaryDirectory(prefix="fatebridge-hd-diagram-") as temporary:
             target = Path(temporary) / "page.xml"
             subprocess.run(
@@ -125,6 +147,8 @@ def verify_sources(directory: Path) -> dict:
             actual = extract_diagram(target.read_text(), expected["display_identifier"])
         if any(actual[k] != expected[k] for k in actual):
             raise ValueError("Source diagram differs from frozen factual transcription")
+        else:
+            pass
         rows.append(
             {
                 "quarter": expected["quarter"],
@@ -153,3 +177,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

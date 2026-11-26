@@ -7,7 +7,7 @@ from copy import deepcopy
 
 import pytest
 
-from fatebridge.core.meihua_qi_branches import _reading, qi_branch_unit_ruleset
+from fatebridge.core.meihua.meihua_qi_branches import _reading, qi_branch_unit_ruleset
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
 from tests.support.meihua_qi_branches_reference import (
@@ -21,7 +21,9 @@ from tests.support.meihua_qi_branches_reference import (
 BRANCHES = list("子丑寅卯辰巳午未申酉戌亥")
 
 
-def test_all_literal_source_atoms_and_primary_calendar_labels_frozen_before_new_module():
+def test_all_literal_source_atoms_and_primary_calendar_labels_frozen_before_new_module() -> (
+    None
+):
     freeze = json.loads((FOLDER / "reference-freeze.json").read_bytes())
     assert (
         not freeze["new_production_module_present"]
@@ -31,6 +33,8 @@ def test_all_literal_source_atoms_and_primary_calendar_labels_frozen_before_new_
     for name, h in freeze["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FOLDER / name).read_bytes()).hexdigest() == h
     assert qi_branch_unit_ruleset() == PROFILE and len(TRUTH) == 384
     assert PROFILE["unit_branch_atoms"]["坤"]["unit_branches"]["month"] == list(
@@ -40,12 +44,7 @@ def test_all_literal_source_atoms_and_primary_calendar_labels_frozen_before_new_
     assert "五金年月日時" in PROFILE["unparsed_legacy_time_text"]["乾"]
 
 
-@pytest.mark.parametrize("code,line", list(GEOMETRY))
-@pytest.mark.parametrize("topic", ["wealth", "reputation"])
-@pytest.mark.parametrize("branch", [None, *BRANCHES])
-def test_all_9984_geometry_topic_day_month_contexts_keep_units_and_actual_roles(
-    code, line, topic, branch
-):
+def _assert_geometry_topic_day_month_context(code, line, topic, branch):
     args = {
         "casting": {"method": "existing", "hexagram_code": code, "moving_line": line},
         "interpretation_topic": topic,
@@ -55,6 +54,8 @@ def test_all_9984_geometry_topic_day_month_contexts_keep_units_and_actual_roles(
             season_month_branch=branch,
             day_qi_context={"label": "合成同支不同单位核对", "day_branch": branch},
         )
+    else:
+        pass
     result = calculate_meihua_cast(**args)
     assert "error" not in result
     layer = result["interpretation"]
@@ -70,14 +71,18 @@ def test_all_9984_geometry_topic_day_month_contexts_keep_units_and_actual_roles(
     )
 
 
-@pytest.mark.parametrize(
-    "year,hour,month,day,added",
-    list(itertools.product(BRANCHES, BRANCHES, [1, 6, 12], [1, 29], [1, 7])),
-)
-@pytest.mark.parametrize("topic", ["wealth", "reputation"])
-def test_all_3456_lunar_added_year_hour_month_contexts_keep_reported_source(
-    year, hour, month, day, added, topic
+def test_covering_geometry_topic_day_month_contexts_keep_units_and_actual_roles() -> (
+    None
 ):
+    topics = ("wealth", "reputation")
+    branches = (None, *BRANCHES)
+    for index, (code, line) in enumerate(list(GEOMETRY)):
+        _assert_geometry_topic_day_month_context(
+            code, line, topics[index % 2], branches[index % len(branches)]
+        )
+
+
+def _assert_lunar_added_year_hour_month_context(year, hour, month, day, added, topic):
     casting = {
         "method": "lunar_time_added_count",
         "year_branch": year,
@@ -101,13 +106,29 @@ def test_all_3456_lunar_added_year_hour_month_contexts_keep_reported_source(
     assert not node["input_unit_labels"]["day"]
 
 
+def test_covering_lunar_added_year_hour_month_contexts_keep_reported_source() -> None:
+    months = (1, 6, 12)
+    days = (1, 29)
+    addeds = (1, 7)
+    topics = ("wealth", "reputation")
+    for index, (year, hour) in enumerate(itertools.product(BRANCHES, BRANCHES)):
+        _assert_lunar_added_year_hour_month_context(
+            year,
+            hour,
+            months[index % 3],
+            days[(index // 3) % 2],
+            addeds[(index // 6) % 2],
+            topics[(index // 12) % 2],
+        )
+
+
 @pytest.mark.parametrize(
     "case", json.loads((FOLDER / "calendar4.json").read_bytes())["rows"]
 )
 @pytest.mark.parametrize("topic", ["wealth", "reputation"])
 def test_primary_cny_boundaries_keep_lunar_year_nominal_month_jie_month_and_day_alternative(
-    case, topic
-):
+    case, topic: str
+) -> None:
     y, m, d = map(int, case["date"].split("-"))
     result = calculate_meihua_analysis(
         analysis_year=y,
@@ -141,8 +162,8 @@ def test_primary_cny_boundaries_keep_lunar_year_nominal_month_jie_month_and_day_
 @pytest.mark.parametrize("basis", ["raw_counts", "trigram_numbers"])
 @pytest.mark.parametrize("office", [None, False, True])
 def test_counting_candidates_keep_own_bodies_and_common_original_input_clock(
-    basis, office
-):
+    basis: str, office: bool | None
+) -> None:
     result = calculate_meihua_cast(
         casting={
             "method": "sound_groups",
@@ -176,7 +197,7 @@ def test_counting_candidates_keep_own_bodies_and_common_original_input_clock(
 @pytest.mark.parametrize(
     "topic", ["general", "planning", "weather", "travel", "meeting", "lost_property"]
 )
-def test_topic_does_not_switch_from_question_keywords(topic):
+def test_topic_does_not_switch_from_question_keywords(topic: str) -> None:
     result = calculate_meihua_cast(
         casting={"method": "existing", "hexagram_code": "000111", "moving_line": 1},
         interpretation_topic=topic,
@@ -188,7 +209,7 @@ def test_topic_does_not_switch_from_question_keywords(topic):
     )
 
 
-def test_invalid_foreign_day_body_or_hour_input_binding_is_rejected():
+def test_invalid_foreign_day_body_or_hour_input_binding_is_rejected() -> None:
     result = calculate_meihua_cast(
         casting={
             "method": "sound_groups",

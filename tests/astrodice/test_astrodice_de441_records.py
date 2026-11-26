@@ -19,7 +19,9 @@ J2000 = Path(__file__).parents[1] / "data/astrodice/tables/de441-j2000.eph"
 
 
 @pytest.mark.parametrize("degree", range(15))
-def test_differentiated_clenshaw_matches_independent_chebyshev_identities(degree):
+def test_differentiated_clenshaw_matches_independent_chebyshev_identities(
+    degree,
+) -> None:
     x = F(7, 19)
     t0, t1 = F(1), x
     for _ in range(degree):
@@ -32,7 +34,7 @@ def test_differentiated_clenshaw_matches_independent_chebyshev_identities(degree
     assert derivative == degree * u0
 
 
-def test_full_polynomial_is_linear_in_original_coefficients():
+def test_full_polynomial_is_linear_in_original_coefficients() -> None:
     coefficients = [F(3, 7), F(-9, 16), F(5, 2), F(6, 13)]
     x = F(-2, 5)
     expected = coefficients[0] + coefficients[1] * x
@@ -43,7 +45,7 @@ def test_full_polynomial_is_linear_in_original_coefficients():
     assert clenshaw_with_derivative(coefficients, x) == (expected, derivative)
 
 
-def test_tdb_epoch_is_exact_and_is_not_a_civil_timezone():
+def test_tdb_epoch_is_exact_and_is_not_a_civil_timezone() -> None:
     assert calendar_jd_tdb("2000-01-01T12:00:00") == 2451545
     assert calendar_jd_tdb("0001-01-01T00:00:00") == F(3442851, 2)
     assert calendar_jd_tdb("2000-01-01T12:00:00.000001") - 2451545 == F(1, 86400000000)
@@ -51,7 +53,7 @@ def test_tdb_epoch_is_exact_and_is_not_a_civil_timezone():
         calendar_jd_tdb("2000-01-01T12:00:00+00:00")
 
 
-def test_excerpt_preserves_all_original_constants_and_coefficients():
+def test_excerpt_preserves_all_original_constants_and_coefficients() -> None:
     raw = J2000.read_bytes()
     h, constants = raw[:RECORD_BYTES], raw[RECORD_BYTES : 2 * RECORD_BYTES]
     records = [
@@ -66,7 +68,7 @@ def test_excerpt_preserves_all_original_constants_and_coefficients():
         mini_kernel(h, constants, [records[0], records[-1]])
 
 
-def test_exact_evaluation_retains_moon_earth_barycentric_identity():
+def test_exact_evaluation_retains_moon_earth_barycentric_identity() -> None:
     raw = J2000.read_bytes()
     meta = header(raw[:RECORD_BYTES])
     records = [
@@ -96,6 +98,6 @@ def test_exact_evaluation_retains_moon_earth_barycentric_identity():
 
 
 @pytest.mark.parametrize("value", [F(-1001, 1000), F(1001, 1000)])
-def test_source_polynomial_cannot_be_extrapolated(value):
+def test_source_polynomial_cannot_be_extrapolated(value) -> None:
     with pytest.raises(ValueError):
         clenshaw_with_derivative([1, 2, 3], value)

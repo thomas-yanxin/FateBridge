@@ -6,13 +6,19 @@ from copy import deepcopy
 from pathlib import Path
 
 import pytest
+from fastapi.testclient import TestClient
 from jsonschema import Draft202012Validator
+from pytest import CaptureFixture, MonkeyPatch
 
-from fatebridge.core import heluo_poems as hp
-from fatebridge.core import heluo_texts as ht
-from fatebridge.core.heluo import _tiaowen, yao_text
+from fatebridge.core.heluo import heluo_poems as hp
+from fatebridge.core.heluo import heluo_texts as ht
+from fatebridge.core.heluo.heluo import _tiaowen, yao_text
 from fatebridge.core.public_output import same_public_value
 from fatebridge.utils.errors import NumerologySourceError
+from scripts.numerology.audit_numerology import (
+    poem_collation_checks,
+    sui17_meng4_source_checks,
+)
 from tests.support.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
 from tests.support.transports import SPECS, business
 from tests.support.transports import rest as shared_rest
@@ -24,11 +30,7 @@ READINGS = json.loads((F / "verified-readings.json").read_bytes())
 CASES = json.loads((F / "cases.json").read_bytes())["cases"]
 
 
-def test_audit_checks_both_new_source_and_preserved_prefixes():
-    from scripts.numerology.audit_numerology import (
-        poem_collation_checks,
-        sui17_meng4_source_checks,
-    )
+def test_audit_checks_both_new_source_and_preserved_prefixes() -> None:
 
     poems = poem_collation_checks()
     assert poems["checks_passed"] and poems["failures"] == []
@@ -51,7 +53,7 @@ def isolated_native(monkeypatch, tmp_path):
         loader.cache_clear()
 
 
-def test_source_first_draft_and_all_amendments_are_retained():
+def test_source_first_draft_and_all_amendments_are_retained() -> None:
     first = json.loads((F / "first-draft-freeze.json").read_bytes())
     assert first["inherited_target_text_exposed"] is False
     for name, digest in first["files"].items():
@@ -71,7 +73,7 @@ def test_source_first_draft_and_all_amendments_are_retained():
     assert change[0]["counts_as_production_correction"] is False
 
 
-def test_source_coverage_and_pending_scope_remain_separate():
+def test_source_coverage_and_pending_scope_remain_separate() -> None:
     assert (
         ht.collation_summary()["collated_line_headers"],
         ht.collation_summary()["pending_line_headers"],
@@ -93,7 +95,9 @@ def test_source_coverage_and_pending_scope_remain_separate():
 @pytest.mark.parametrize(
     "entry", READINGS["commentaries"], ids=lambda e: str(e["line"])
 )
-def test_sui_complete_text_preserves_parent_conditions_and_original_forms(entry):
+def test_sui_complete_text_preserves_parent_conditions_and_original_forms(
+    entry,
+) -> None:
     text = yao_text("澤雷隨", entry["line"])
     sections = deepcopy(entry["sections"])
     for s in sections:
@@ -114,21 +118,29 @@ def test_sui_complete_text_preserves_parent_conditions_and_original_forms(entry)
     if entry["line"] == 2:
         assert "女子元數叶者" in sections[1]["text"]
         assert "female" not in [s["section_id"] for s in sections]
+    else:
+        pass
     if entry["line"] == 3:
         assert "成引進名" in sections[1]["text"]
         assert "女命必遭貴夫" in sections[2]["text"]
+    else:
+        pass
     if entry["line"] == 5:
         assert "善人吉士" in sections[2]["text"]
+    else:
+        pass
     if entry["line"] == 6:
         assert "unresolved" in p["commentary_review_status"]
         assert any(
             "縲" in note and "未定" in note for note in p["commentary_reading_notes"]
         )
         assert "字形未决" in ht.text_status_snapshot(text)
+    else:
+        pass
 
 
 @pytest.mark.parametrize("entry", READINGS["poems"], ids=lambda e: str(e["line"]))
-def test_meng_every_printed_poem_and_boundary_is_retained(entry):
+def test_meng_every_printed_poem_and_boundary_is_retained(entry) -> None:
     text = yao_text("山水蒙", entry["line"])
     actual = text["poem_sections"]
     assert len(actual) == len(entry["poems"])
@@ -154,12 +166,16 @@ def test_meng_every_printed_poem_and_boundary_is_retained(entry):
         assert "納婿" in actual[0]["text"] and "納婦" in text["yaoci"]
         assert "牛途" in actual[1]["text"]
         assert actual[0]["reading_notes"] and actual[1]["reading_notes"]
+    else:
+        pass
     if entry["line"] == 6:
         assert "四八尋" in actual[0]["text"]
         assert any("具體年齡或日期" in note for note in actual[0]["reading_notes"])
+    else:
+        pass
 
 
-def test_initial_case_search_failure_is_not_relabelled_as_complete():
+def test_initial_case_search_failure_is_not_relabelled_as_complete() -> None:
     initial = json.loads((F / "case-selection-result.json").read_bytes())
     extension = json.loads((F / "case-selection-extension-result.json").read_bytes())
     assert initial["candidates_evaluated"] == 4320
@@ -187,8 +203,8 @@ def test_initial_case_search_failure_is_not_relabelled_as_complete():
     ],
 )
 def test_new_source_mutations_cannot_keep_reviewed_identity(
-    fault, monkeypatch, tmp_path
-):
+    fault: str, monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
     poem = fault.startswith("meng")
     path = hp.COLLATION_PATH if poem else ht.COMMENTARY_PATH
     data = json.loads(path.read_bytes())
@@ -226,8 +242,8 @@ def test_new_source_mutations_cannot_keep_reviewed_identity(
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: f"{c['hexagram']}-{c['line']}")
 def test_actual_selected_text_and_conditions_match_all_three_adapters(
-    case, rest, tmp_path, capsys
-):
+    case, rest: TestClient, tmp_path: Path, capsys: CaptureFixture[str]
+) -> None:
     spec = SPECS["heluo"]
     fields = [
         "chart",
@@ -256,12 +272,18 @@ def test_actual_selected_text_and_conditions_match_all_three_adapters(
         assert expected["detail"] in out["snapshot_text"]
         if case["hexagram"] == "山水蒙":
             assert expected["shige"] in out["snapshot_text"]
+        else:
+            pass
         if (case["hexagram"], case["line"]) == ("澤雷隨", 6):
             assert "字形未决" in out["snapshot_text"]
+        else:
+            pass
 
 
 @pytest.mark.parametrize("key", ["澤雷隨:6", "山水蒙:2"])
-def test_knowledge_actual_three_adapters_retain_notes(key, rest, tmp_path, capsys):
+def test_knowledge_actual_three_adapters_retain_notes(
+    key: str, rest: TestClient, tmp_path: Path, capsys: CaptureFixture[str]
+) -> None:
     spec = SPECS["knowledge_read"]
     response, code, cli, mcp = run_three(
         spec,
@@ -290,8 +312,12 @@ def test_knowledge_actual_three_adapters_retain_notes(key, rest, tmp_path, capsy
     ],
 )
 def test_summary_only_knowledge_keeps_scoped_glyph_uncertainty(
-    key, label, rest, tmp_path, capsys
-):
+    key: str,
+    label: str | None,
+    rest: TestClient,
+    tmp_path: Path,
+    capsys: CaptureFixture[str],
+) -> None:
     spec = SPECS["knowledge_read"]
     response, code, cli, mcp = run_three(
         spec,
@@ -310,4 +336,6 @@ def test_summary_only_knowledge_keeps_scoped_glyph_uncertainty(
         assert ("字形未决" in summary) is (label is not None)
         if label:
             assert f"{label}字形未决：" in summary
+        else:
+            pass
         assert out["reference_only"] is True

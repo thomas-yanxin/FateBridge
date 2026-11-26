@@ -8,8 +8,12 @@ import pytest
 
 from fatebridge.core.astro.geometry import _julian_day
 from fatebridge.core.astro.time_scales import ephemeris_time
-from fatebridge.core.human_design import chart_at, chart_at_tt, longitude_activation
-from fatebridge.core.human_design_sensitivity import assess_birth_interval
+from fatebridge.core.human_design.human_design import (
+    chart_at,
+    chart_at_tt,
+    longitude_activation,
+)
+from fatebridge.core.human_design.human_design_sensitivity import assess_birth_interval
 from tests.support.ephemeris_context import empty_ephemeris_path
 
 CASE = Path(__file__).parents[1] / "fixtures/human-design-uncertainty-case.json"
@@ -24,7 +28,9 @@ CASE = Path(__file__).parents[1] / "fixtures/human-design-uncertainty-case.json"
         "2017-01-01T00:00:09+00:00",
     ],
 )
-def test_tt_sampling_and_civil_nominal_use_identical_physical_activation(date):
+def test_tt_sampling_and_civil_nominal_use_identical_physical_activation(
+    date: str,
+) -> None:
     moment = datetime.fromisoformat(date)
     with empty_ephemeris_path():
         direct = chart_at(moment)
@@ -34,7 +40,9 @@ def test_tt_sampling_and_civil_nominal_use_identical_physical_activation(date):
     assert direct["profile"] == sampled["profile"]
 
 
-def test_actual_interior_node_base_variant_is_not_visible_in_old_three_samples():
+def test_actual_interior_node_base_variant_is_not_visible_in_old_three_samples() -> (
+    None
+):
     case = json.loads(CASE.read_text())
     with empty_ephemeris_path():
         nominal = chart_at(datetime.fromisoformat(case["nominal_birth_utc"]))
@@ -67,7 +75,7 @@ def test_actual_interior_node_base_variant_is_not_visible_in_old_three_samples()
         )
 
 
-def test_mean_node_interval_does_not_invent_true_node_speed_reversal():
+def test_mean_node_interval_does_not_invent_true_node_speed_reversal() -> None:
     case = json.loads(CASE.read_text())
     with empty_ephemeris_path():
         nominal = chart_at(datetime.fromisoformat(case["nominal_birth_utc"]), "mean")
@@ -76,7 +84,7 @@ def test_mean_node_interval_does_not_invent_true_node_speed_reversal():
     assert not any(s["body"] == "NorthNode" for s in report["station_candidates"])
 
 
-def test_tt_grid_includes_a_birth_during_an_actual_inserted_utc_second():
+def test_tt_grid_includes_a_birth_during_an_actual_inserted_utc_second() -> None:
     # The half-second nominal time makes one ten-second grid point fall safely
     # within second 60 rather than at a floating-point endpoint.
     nominal = chart_at(datetime(2017, 1, 1, 0, 0, 9, 500000, tzinfo=timezone.utc))
@@ -94,7 +102,7 @@ def test_tt_grid_includes_a_birth_during_an_actual_inserted_utc_second():
     assert report["sampling"]["grid_sample_count"] == 13
 
 
-def test_tt_grid_keeps_a_historical_fractional_adjustment_without_fake_label():
+def test_tt_grid_keeps_a_historical_fractional_adjustment_without_fake_label() -> None:
     nominal = chart_at(datetime(1964, 4, 1, 0, 0, 9, 950000, tzinfo=timezone.utc))
     report = assess_birth_interval(nominal, 1, "true")
     special = [
@@ -109,7 +117,7 @@ def test_tt_grid_keeps_a_historical_fractional_adjustment_without_fake_label():
     )
 
 
-def test_chart_at_tt_preserves_exact_birth_epoch_in_a_leap_second():
+def test_chart_at_tt_preserves_exact_birth_epoch_in_a_leap_second() -> None:
     tt = (
         _julian_day(datetime(2017, 1, 1, tzinfo=timezone.utc))
         + (36 + 32.184 + 0.5) / 86400
@@ -120,7 +128,7 @@ def test_chart_at_tt_preserves_exact_birth_epoch_in_a_leap_second():
     assert abs(chart["design_solver"]["residual_degrees"]) < 1e-7
 
 
-def test_sample_interval_extent_and_variants_use_only_evaluated_tt_witnesses():
+def test_sample_interval_extent_and_variants_use_only_evaluated_tt_witnesses() -> None:
     nominal = chart_at(datetime(2024, 3, 20, 6, 30, tzinfo=timezone.utc))
     report = assess_birth_interval(nominal, 2, "true")
     lo = report["interval"]["start"]["birth_jd_tt"]
@@ -140,19 +148,21 @@ def test_sample_interval_extent_and_variants_use_only_evaluated_tt_witnesses():
 
 
 @pytest.mark.parametrize("bad", [-1, 0, 61, 1.5, True])
-def test_invalid_interval_cannot_silently_reduce_the_requested_scope(bad):
+def test_invalid_interval_cannot_silently_reduce_the_requested_scope(bad) -> None:
     nominal = chart_at(datetime(2000, 1, 1, tzinfo=timezone.utc))
     with pytest.raises(ValueError, match="1至60"):
         assess_birth_interval(nominal, bad, "true")
 
 
 @pytest.mark.parametrize("bad", [float("nan"), float("inf")])
-def test_nonfinite_physical_epoch_is_rejected(bad):
+def test_nonfinite_physical_epoch_is_rejected(bad) -> None:
     with pytest.raises(ValueError, match="有限"):
         chart_at_tt(bad)
 
 
-def test_audit_rejects_a_degraded_three_point_checker(monkeypatch):
+def test_audit_rejects_a_degraded_three_point_checker(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from scripts.human_design import audit_human_design as audit
 
     def degraded(*args, **kwargs):
@@ -169,7 +179,7 @@ def test_audit_rejects_a_degraded_three_point_checker(monkeypatch):
     assert audit.interval_regression_check()["status"] == "failed"
 
 
-def test_interval_audit_restores_the_ephemeris_operator_configuration():
+def test_interval_audit_restores_the_ephemeris_operator_configuration() -> None:
     import os
 
     from fatebridge.core import ephemeris_runtime

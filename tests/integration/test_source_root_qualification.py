@@ -1,23 +1,28 @@
 """Root class and actual survival must precede structural capacity decisions."""
 
 from copy import deepcopy
+from dataclasses import replace
 
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.bazi_evidence import build_natal_evidence
+from fatebridge.core.bazi.bazi_evidence import build_natal_evidence
+from fatebridge.core.contracts.output_root_qualification import RootQualification
 from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.output_root_qualification import RootQualification
 from fatebridge.core.root_qualification import root_qualification_snapshot_lines
-from tests.bazi.test_strength_v2 import pillars, score
+from fatebridge.core.strength import DEFAULT_POLICY
+from tests.unit_test.fixtures.bazi_strength import (
+    bazi_pillars,
+    evaluate_pillar_strength,
+)
 
 
 def root(result, position):
     return next(r for r in result["root_qualifications"] if r["pillar"] == position)
 
 
-def test_yang_growth_is_a_real_heavy_root_even_when_not_the_branch_primary_qi():
-    result = score("壬寅 壬寅 庚辰 辛巳")
+def test_yang_growth_is_a_real_heavy_root_even_when_not_the_branch_primary_qi() -> None:
+    result = evaluate_pillar_strength("壬寅 壬寅 庚辰 辛巳")
     seat = root(result, "hour")
     assert seat["kind"] == "yang_growth_root"
     assert seat["matching_hidden_stems"] == ["庚"]
@@ -29,12 +34,12 @@ def test_yang_growth_is_a_real_heavy_root_even_when_not_the_branch_primary_qi():
     assert result["structural_decision"]["rule"] == "weighted_balance"
 
 
-def test_yin_growth_without_hidden_element_and_minor_root_cannot_be_heavy():
-    result = score("己巳 癸酉 癸未 庚申")
+def test_yin_growth_without_hidden_element_and_minor_root_cannot_be_heavy() -> None:
+    result = evaluate_pillar_strength("己巳 癸酉 癸未 庚申")
     assert root(result, "month")["initial_hidden_mass"] == 0
     assert root(result, "hour")["kind"] == "other_hidden_root"
     assert not root(result, "hour")["qualified_for_structural_rule"]
-    result = score("辛酉 丁酉 丁卯 辛酉")
+    result = evaluate_pillar_strength("辛酉 丁酉 丁卯 辛酉")
     assert all(
         not r["qualified_for_structural_rule"] for r in result["root_qualifications"]
     )
@@ -43,8 +48,8 @@ def test_yin_growth_without_hidden_element_and_minor_root_cannot_be_heavy():
     )
 
 
-def test_damaged_growth_root_is_not_restored_by_a_source_label():
-    result = score("壬寅 戊申 壬辰 壬寅")
+def test_damaged_growth_root_is_not_restored_by_a_source_label() -> None:
+    result = evaluate_pillar_strength("壬寅 戊申 壬辰 壬寅")
     seat = root(result, "month")
     assert seat["kind"] == "yang_growth_root"
     assert seat["remaining_hidden_mass"] > 0
@@ -52,24 +57,29 @@ def test_damaged_growth_root_is_not_restored_by_a_source_label():
     assert not seat["qualified_for_structural_rule"]
 
 
-def test_two_healthy_growth_roots_now_reach_the_existing_structural_rule():
+def test_two_healthy_growth_roots_now_reach_the_existing_structural_rule() -> None:
     # Synthetic, internally consistent pillars, not an independent source label.
-    result = score("乙亥 壬午 甲辰 乙亥")
+    result = evaluate_pillar_strength("乙亥 壬午 甲辰 乙亥")
     assert result["structural_decision"]["numerical_label"] == "中和"
     assert result["structural_decision"]["vigorous_roots"] == ["year", "hour"]
     assert (
         result["structural_decision"]["rule"]
-        == "multiple_vigorous_roots_and_visible_support"
+        == "multiple_vigorous_roots_and_rooted_visible_support"
     )
     assert result["strength_level"] == "强"
     # Controlled engineering damage: an active clash by itself need not
     # reduce these stronger roots below the retained-root threshold.
-    damaged = score("乙亥 壬巳 甲辰 乙亥", clash_winner=0.5, clash_loser=0.5)
+    damaged = evaluate_pillar_strength(
+        "乙亥 壬巳 甲辰 乙亥",
+        policy=replace(DEFAULT_POLICY, clash_winner=0.5, clash_loser=0.5),
+    )
     assert not damaged["structural_decision"]["vigorous_roots"]
 
 
-def test_shared_receipt_is_copied_without_recomputing_or_accepting_invented_roots():
-    chart = pillars("壬寅 壬寅 庚辰 辛巳")
+def test_shared_receipt_is_copied_without_recomputing_or_accepting_invented_roots() -> (
+    None
+):
+    chart = bazi_pillars("壬寅 壬寅 庚辰 辛巳")
     strength = ElementAnalysis.analyze_day_master_strength(chart)
     context = build_natal_evidence(chart, strength)["strength_context"]
     assert (
@@ -94,7 +104,7 @@ def test_shared_receipt_is_copied_without_recomputing_or_accepting_invented_root
     )
 
 
-def test_rounded_display_cannot_change_the_raw_root_qualification_gate():
+def test_rounded_display_cannot_change_the_raw_root_qualification_gate() -> None:
     initial = 0.7
     remaining = initial * 0.75
     # Division puts this fraction just below 0.75; multiplication still equals
@@ -117,10 +127,13 @@ def test_rounded_display_cannot_change_the_raw_root_qualification_gate():
     RootQualification.model_validate({"qualified_for_structural_rule": True})
 
 
-def test_snapshot_reads_supplied_qualifications_instead_of_recomputing_a_chart():
-    a = score("乙亥 壬午 甲辰 乙亥")
+def test_snapshot_reads_supplied_qualifications_instead_of_recomputing_a_chart() -> (
+    None
+):
+    a = evaluate_pillar_strength("乙亥 壬午 甲辰 乙亥")
     text = "\n".join(root_qualification_snapshot_lines(a))
-    assert "结构判级：强；数值原判：中和" in text
+    assert "工程结构政策档：强；数值原判：中和" in text
+    assert "至少两处健全根且另有实际通根的透干印比" in text
     assert "阳长生根" in text and "工程约定" in text
     supplied = deepcopy(a)
     supplied["root_qualifications"][0]["qualified_for_structural_rule"] = False
@@ -129,3 +142,15 @@ def test_snapshot_reads_supplied_qualifications_instead_of_recomputing_a_chart()
         root_qualification_snapshot_lines(supplied)
     )
     assert root_qualification_snapshot_lines({}) == []
+
+
+def test_snapshot_explains_complete_same_element_bureau() -> None:
+    assessment = evaluate_pillar_strength("甲寅 丁卯 甲辰 乙亥")
+    assert (
+        assessment["structural_decision"]["rule"]
+        == "complete_same_element_bureau_with_surviving_vigorous_roots"
+    )
+    basis_line = root_qualification_snapshot_lines(assessment)[0]
+    assert basis_line.endswith(
+        "本次依据：同类完整会合局透出目标五行，且至少两处实际根达到保留门槛。"
+    )

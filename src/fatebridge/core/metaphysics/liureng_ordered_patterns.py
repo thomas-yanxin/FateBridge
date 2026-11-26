@@ -5,8 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
-
-from ...utils.data import EARTHLY_BRANCHES
+from fatebridge.utils.data import EARTHLY_BRANCHES
 
 PATTERNS = (
     ("zhuolun", "斫轮", "卯戌巳"),

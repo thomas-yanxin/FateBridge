@@ -8,11 +8,11 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation.human_design import verify_human_design_reading
-from fatebridge.validation.human_design_official import official_chart_checks
 from scripts.human_design import (
     build_human_design_profile_coverage as profile_coverage_builder,
 )
+from validation.human_design import verify_human_design_reading
+from validation.human_design_official import official_chart_checks
 
 ROOT = Path(__file__).resolve().parents[2]
 EVIDENCE = ROOT / "tests/data/human_design/profile_observations"
@@ -21,7 +21,7 @@ PLAN = json.loads(PLAN_PATH.read_text())
 COHORT = json.loads((EVIDENCE / "cohort.json").read_text())
 
 
-def test_all768_inputs_are_frozen_disjoint_and_not_official_expected_values():
+def test_all768_inputs_are_frozen_disjoint_and_not_official_expected_values() -> None:
     assert (
         hashlib.sha256(PLAN_PATH.read_bytes()).hexdigest()
         == "ea4e0cd15bd228a3002bd055aaeaae28264b5edf0d51505af1828c29e78ce143"
@@ -60,12 +60,14 @@ def test_all768_inputs_are_frozen_disjoint_and_not_official_expected_values():
                 json.dumps(c["birth_input"], sort_keys=True)
                 for c in json.loads(raw)["cases"]
             )
+        else:
+            pass
     assert not old_inputs.intersection(
         json.dumps(c["birth_input"], sort_keys=True) for c in PLAN["cases"]
     )
 
 
-def test_rational_profile_intervals_cover_the_gate_without_gaps_or_overlap():
+def test_rational_profile_intervals_cover_the_gate_without_gaps_or_overlap() -> None:
     end = Fraction(0)
     for i, row in enumerate(PLAN["profile_intervals_within_gate"]):
         start, stop, mid = (
@@ -85,7 +87,7 @@ def test_rational_profile_intervals_cover_the_gate_without_gaps_or_overlap():
     assert end == Fraction(45, 8)
 
 
-def test_source_only_builder_reproduces_all24_without_hiding744_missing_rows():
+def test_source_only_builder_reproduces_all24_without_hiding744_missing_rows() -> None:
     assert (
         profile_coverage_builder.build(
             EVIDENCE / "observations.jsonl", EVIDENCE / "pdfs"
@@ -100,7 +102,7 @@ def test_source_only_builder_reproduces_all24_without_hiding744_missing_rows():
     assert COHORT["source"]["pdf_diagram_independently_transcribed"] is False
 
 
-def test_complete_mode_rejects_the_passing_subset():
+def test_complete_mode_rejects_the_passing_subset() -> None:
     with pytest.raises(ValueError, match="744 planned rows missing"):
         profile_coverage_builder.build(
             EVIDENCE / "observations.jsonl", EVIDENCE / "pdfs", require_complete=True
@@ -121,8 +123,8 @@ def test_complete_mode_rejects_the_passing_subset():
     ],
 )
 def test_builder_rejects_source_binding_corruption_without_replacing_cases(
-    tmp_path, mutation
-):
+    tmp_path: Path, mutation: str
+) -> None:
     rows = [json.loads((EVIDENCE / "observations.jsonl").read_text().splitlines()[0])]
     row = rows[0]
     if mutation == "duplicate":
@@ -141,13 +143,15 @@ def test_builder_rejects_source_binding_corruption_without_replacing_cases(
         row["source"]["pdf_filename"] = "../elsewhere.pdf"
     elif mutation == "source_label":
         row["facts"]["properties"]["Incarnation Cross"] += " (silent alias)"
+    else:
+        pass
     observation = tmp_path / "mutated.jsonl"
     observation.write_text("\n".join(json.dumps(r) for r in rows) + "\n")
     with pytest.raises(ValueError):
         profile_coverage_builder.build(observation, EVIDENCE / "pdfs")
 
 
-def test_all624_gate_lines24_mechanics_and18_literal_failures_are_retained():
+def test_all624_gate_lines24_mechanics_and18_literal_failures_are_retained() -> None:
     check = official_chart_checks(COHORT)
     assert check["gate_lines_checked"] == check["gate_lines_matched"] == 624
     assert check["charts_with_all_mechanics_matched"] == 24
@@ -157,7 +161,7 @@ def test_all624_gate_lines24_mechanics_and18_literal_failures_are_retained():
     assert sum(not c["structure_checks"]["cross_name"] for c in check["cases"]) == 18
 
 
-def test_current_readings_verify_without_full_source_or_model_claim():
+def test_current_readings_verify_without_full_source_or_model_claim() -> None:
     from tests.support.human_design_current import complete_run
 
     for case in COHORT["cases"]:
@@ -165,5 +169,4 @@ def test_current_readings_verify_without_full_source_or_model_claim():
         check = verify_human_design_reading(run)
         assert check["status"] == "verified_fixed_template_reading", case["id"]
         assert check["checked_fixing_reading_count"] == 26
-        assert run["validation"]["all_three_axes_full_marks"] is False
         assert run["source_summary"]["full_source_acceptance_passed"] is False

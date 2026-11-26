@@ -30,24 +30,32 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     }
     if not required <= {item["file"] for item in manifest["source_files"]}:
         raise ValueError("不得删除原典或完整验收集的来源记录")
+    else:
+        pass
     for item in manifest["source_files"]:
         if (
             hashlib.sha256((corpus / item["file"]).read_bytes()).hexdigest()
             != item["sha256"]
         ):
             raise ValueError("冻结来源指纹不符：" + item["file"])
+        else:
+            pass
     table = json.loads((corpus / "four-spirit-cases.json").read_text())
     if (
         sorted(r["year_index"] for r in table["rows"]) != list(range(1, 61))
         or set(table["columns"]) != COLUMNS
     ):
         raise ValueError("卷五原表必须包含全部60行及12列，不得删除失败项")
+    else:
+        pass
     differences = []
     passed = 0
     by_star = {s: {"checked": 0, "matching": 0} for s in STARS}
     for row in table["rows"]:
         if set(row["expected"]) != COLUMNS:
             raise ValueError("每行必须核对全部12个原表宫位")
+        else:
+            pass
         for field, expected in row["expected"].items():
             star, yuan = field.split(".")
             acc = row["year_index"] + 60 * YUANS.index(yuan)

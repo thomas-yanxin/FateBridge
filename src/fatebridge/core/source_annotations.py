@@ -13,10 +13,11 @@ from fatebridge.core.source_identity import (
     PUBLISHER_NOTE,
     validate_identity_index,
 )
+from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
 
 ORDER = ("year", "month", "day", "hour")
 GRADES = {"强", "中和", "弱"}
-SOURCE_DATA_SHA256 = "3f38d35ed00c7bfa8c5539a579c33b66d451fde840fbf01eb6d2a7abfd099170"
+SOURCE_DATA_SHA256 = "3ba7c414676f1fca250471cfcfcde442c06c80f046c1797471a46adde5085bc5"
 
 
 @lru_cache(maxsize=1)
@@ -86,7 +87,6 @@ def _index() -> Tuple[Dict[tuple, list], Dict[str, Any]]:
         "total_registered_records": data["record_count"],
         "total_registered_literal_inputs": data["literal_input_count"],
         "total_registered_strength_constraints": len(constraints),
-        "all_records_previously_exposed": True,
         "total_registered_editorial_annotations": len(notes),
         "total_registered_source_identity_witnesses": sum(
             "source_identity_revision" in row for row in data["records"]
@@ -155,7 +155,7 @@ def compare_strength_bounds(
         "claims": claims,
         "exact_strength_label_assigned": False,
         "new_independent_validation_credit": 0,
-        "scope": "集合约束单独核对，不把未违反约束计为三档标签相符；不覆盖计算，不认证原典或预测效度。",
+        "scope": "按已登记的原文编释核对集合约束。符合约束只表示工程档在允许集合内，原典三档和预测效度另待验证。",
     }
 
 
@@ -258,13 +258,52 @@ def annotation_comparison_summary(comparison: Mapping[str, Any]) -> str:
     if not bounds.get("claim_count"):
         return summary
     if bounds["status"] == "contradictory_registered_bounds":
-        suffix = "保留的集合约束彼此冲突，未选择性舍弃。"
+        suffix = "已登记的编释集合约束彼此冲突，返回了全部约束。"
     elif bounds["status"] == "current_grade_missing":
-        suffix = "原典另有集合约束，当前等级缺失，尚不能核对。"
+        suffix = "已登记的编释另有集合约束，等待当前工程档以供核对。"
     elif bounds["violated_count"]:
-        suffix = f"另有{bounds['violated_count']}条原典集合约束被当前计算违反；不能以未裁定三档标签掩盖该差异。"
+        suffix = f"有{bounds['violated_count']}条已登记的编释集合约束被当前计算违反，具体依据见对应约束。"
     else:
-        suffix = "当前计算未违反已登记集合约束；这不等于已确定原典三档强弱。"
+        suffix = "当前工程档符合已登记的编释集合约束，原典三档强弱另待裁定。"
     if bounds["conflicts_with_retained_exact_annotations"]:
         suffix += "集合约束与保留三档编释也有冲突，均已保留。"
     return summary + suffix
+
+
+def pillar_values(case: Mapping[str, Any]) -> list[str]:
+    raw = case["pillars"]
+    values = [raw[k] for k in ORDER] if isinstance(raw, dict) else list(raw)
+    if len(values) != 4 or any(
+        not isinstance(p, str)
+        or len(p) != 2
+        or p[0] not in HEAVENLY_STEMS
+        or p[1] not in EARTHLY_BRANCHES
+        for p in values
+    ):
+        raise ValueError("Literal source pillars are malformed; do not guess a repair")
+    return values
+
+
+def input_consistency(values: list[str]) -> dict[str, Any]:
+    """Check modern internal formulas, never infer a historical birth instant."""
+    positions = [
+        (HEAVENLY_STEMS.index(p[0]), EARTHLY_BRANCHES.index(p[1])) for p in values
+    ]
+    year, month, day, hour = positions
+    expected_month = HEAVENLY_STEMS[(2 * (year[0] % 5) + 2 + (month[1] - 2) % 12) % 10]
+    expected_hour = HEAVENLY_STEMS[(2 * (day[0] % 5) + hour[1]) % 10]
+    checks = {
+        "sexagenary_pairs": all(s % 2 == b % 2 for s, b in positions),
+        "month_stem_matches_recorded_year": values[1][0] == expected_month,
+        "hour_stem_matches_recorded_day": values[3][0] == expected_hour,
+    }
+    return {
+        **checks,
+        "all_three_modern_checks_match": all(checks.values()),
+        "expected_month_stem_under_modern_rule": expected_month,
+        "expected_hour_stem_under_modern_rule": expected_hour,
+        "zi_hour_clock_and_day_boundary_unresolved": hour[1] == 0,
+        "literal_source_changed": False,
+        "historical_birth_datetime_verified": False,
+        "scope": "五虎遁、五鼠遁及六十甲子内部关系核对；不认证录文、公历出生瞬间、子时口径或节后日序，不修改源柱。",
+    }

@@ -12,11 +12,11 @@ from jsonschema import Draft202012Validator
 from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
+from fatebridge.core.contracts.output_liuren_emptiness import LiurenEmptinessEvidence
 from fatebridge.core.metaphysics.liureng_emptiness import (
     apply_year_fate_emptiness,
     emptiness_evidence,
 )
-from fatebridge.core.output_liuren_emptiness import LiurenEmptinessEvidence
 from tests.fixtures.ren_anchors import ANCHOR_PAYLOADS as PAYLOADS
 from tests.support.ren_anchors import anchor_output as raw
 from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
@@ -31,7 +31,7 @@ MOD.loader.exec_module(AUDIT)
 REFERENCE = AUDIT.reference()
 
 
-def test_partial_example_and_generated_contexts_have_distinct_denominators():
+def test_partial_example_and_generated_contexts_have_distinct_denominators() -> None:
     r = AUDIT.audit()
     assert r["engineering_checks_passed"] and r["implementation_unchanged"]
     assert len(r["literal_xun_anchors"]) == 6
@@ -46,7 +46,7 @@ def test_partial_example_and_generated_contexts_have_distinct_denominators():
 
 
 @pytest.mark.parametrize("kind", ["edit", "prune", "missing", "extra", "refreeze"])
-def test_frozen_source_readings_cannot_be_retuned(tmp_path, kind):
+def test_frozen_source_readings_cannot_be_retuned(tmp_path: Path, kind: str) -> None:
     p = tmp_path / "corpus"
     shutil.copytree(AUDIT.CORPUS, p)
     if kind in ("edit", "prune"):
@@ -68,7 +68,7 @@ def test_frozen_source_readings_cannot_be_retuned(tmp_path, kind):
 
 
 @pytest.mark.parametrize("case", REFERENCE["synthetic_cases"], ids=lambda c: c["id"])
-def test_handwritten_contexts_keep_sky_empty_when_earth_is_exempt(case):
+def test_handwritten_contexts_keep_sky_empty_when_earth_is_exempt(case) -> None:
     e = emptiness_evidence(**AUDIT.context(case))
     LiurenEmptinessEvidence.model_validate(e)
     by_sky = {r["sky_branch"]: r for r in e["rows"]}
@@ -86,7 +86,7 @@ def test_handwritten_contexts_keep_sky_empty_when_earth_is_exempt(case):
 @pytest.mark.parametrize(
     "kind", ["day", "branch", "missing", "nonrotation", "wrong_shift"]
 )
-def test_invalid_calculation_context_is_rejected(kind):
+def test_invalid_calculation_context_is_rejected(kind: str) -> None:
     c = AUDIT.context(REFERENCE["synthetic_cases"][0])
     if kind == "day":
         c["day_ganzhi"] = "甲丑"
@@ -107,7 +107,9 @@ def test_invalid_calculation_context_is_rejected(kind):
     "key", ["liureng_gods", "liureng_runyear", "jinkou", "sanshiunited"]
 )
 @pytest.mark.parametrize("project", [False, True])
-def test_empty_scope_is_same_on_rest_mcp_cli(key, project, surface_calls):
+def test_empty_scope_is_same_on_rest_mcp_cli(
+    key: str, project: bool, surface_calls
+) -> None:
     spec = SPECS[key]
     fields = [
         (
@@ -138,6 +140,8 @@ def test_empty_scope_is_same_on_rest_mcp_cli(key, project, surface_calls):
             "false",
         ]
         options.update(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec,
         PAYLOADS[key],
@@ -192,8 +196,8 @@ def test_empty_scope_is_same_on_rest_mcp_cli(key, project, surface_calls):
 )
 @pytest.mark.parametrize("project", [False, True])
 def test_bad_empty_explanation_facts_fail_before_projection(
-    kind, project, monkeypatch, surface_calls
-):
+    kind: str, project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     key = "liureng_gods"
     spec = SPECS[key]
     bad = raw()
@@ -221,6 +225,8 @@ def test_bad_empty_explanation_facts_fail_before_projection(
     if kind != "delete":
         with pytest.raises(ValidationError):
             spec.output_model.model_validate(bad)
+    else:
+        pass
     with pytest.raises(execution.OutputContractError):
         execution.validate_output(spec, bad)
     original = execution.execute_spec
@@ -230,6 +236,8 @@ def test_bad_empty_explanation_facts_fail_before_projection(
             actual = replace(
                 actual, bind=lambda _: (lambda: copy.deepcopy(bad), (), {})
             )
+        else:
+            pass
         return original(actual, request)
 
     monkeypatch.setattr(execution, "execute_spec", broken)
@@ -240,6 +248,8 @@ def test_bad_empty_explanation_facts_fail_before_projection(
         params.update(fields="analysis_type", strict_fields="true")
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec,
         PAYLOADS[key],
@@ -257,7 +267,9 @@ def test_bad_empty_explanation_facts_fail_before_projection(
 @pytest.mark.parametrize(
     "field", ["day_ganzhi", "role_conditions", "nianming_status", "rows"]
 )
-def test_partial_projection_remains_partial_but_full_output_requires_evidence(field):
+def test_partial_projection_remains_partial_but_full_output_requires_evidence(
+    field: str,
+) -> None:
     bad = raw()
     bad["liureng"]["emptiness_evidence"].pop(field)
     SPECS["liureng_gods"].output_model.model_validate(bad)
@@ -265,7 +277,7 @@ def test_partial_projection_remains_partial_but_full_output_requires_evidence(fi
         execution.validate_output(SPECS["liureng_gods"], bad)
 
 
-def test_projected_unknown_verdict_cannot_become_false():
+def test_projected_unknown_verdict_cannot_become_false() -> None:
     v = {
         "comprehensive_judgement": None,
         "nianming_status": "inputs_not_available",
@@ -275,7 +287,7 @@ def test_projected_unknown_verdict_cannot_become_false():
         LiurenEmptinessEvidence.model_validate({"comprehensive_judgement": False})
 
 
-def test_known_natal_exempts_its_seat_even_when_annual_is_missing():
+def test_known_natal_exempts_its_seat_even_when_annual_is_missing() -> None:
     spec = SPECS["liureng_runyear"]
     payload = {
         **PAYLOADS["liureng_runyear"],
@@ -294,7 +306,7 @@ def test_known_natal_exempts_its_seat_even_when_annual_is_missing():
     assert "本命书地盘戌；本空，依年命条不作空论" in result["snapshot_text"]
 
 
-def test_internally_consistent_empty_rules_cannot_replace_same_run_year_fate():
+def test_internally_consistent_empty_rules_cannot_replace_same_run_year_fate() -> None:
     spec = SPECS["liureng_runyear"]
     fn, args, kw = spec.bind(
         spec.request_model.model_validate(PAYLOADS["liureng_runyear"])
@@ -307,7 +319,7 @@ def test_internally_consistent_empty_rules_cannot_replace_same_run_year_fate():
         execution.validate_output(spec, result)
 
 
-def test_new_empty_scope_has_default_and_selected_snapshot_export():
+def test_new_empty_scope_has_default_and_selected_snapshot_export() -> None:
     spec = SPECS["liureng_gods"]
     payload = dict(PAYLOADS["liureng_gods"])
     payload.pop("selected_sections", None)
@@ -324,8 +336,8 @@ def test_new_empty_scope_has_default_and_selected_snapshot_export():
 
 
 @pytest.mark.parametrize("anchor", ["board", "transmissions"])
-def test_present_board_anchors_work_without_projected_four_pillars(anchor):
-    from fatebridge.core.output_chinese import Liuren
+def test_present_board_anchors_work_without_projected_four_pillars(anchor: str) -> None:
+    from fatebridge.core.contracts.output_chinese import Liuren
 
     full = raw()["liureng"]
     evidence = copy.deepcopy(full["emptiness_evidence"])

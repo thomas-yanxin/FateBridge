@@ -7,8 +7,9 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.divination import derive_meihua_hexagram
-from fatebridge.validation import meihua_weather_reachability as support
-from fatebridge.validation.meihua_weather_policy_v2 import canonical_sha256
+from fatebridge.core.meihua import meihua_weather
+from validation import meihua_weather_reachability as support
+from validation.meihua_weather_policy_v2 import canonical_sha256
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_weather_reachability_v1"
 ARITHMETIC = json.loads((FIXTURE / "modular288.json").read_bytes())["rows"]
@@ -20,7 +21,9 @@ def report():
     return support.audit_time_weather_reachability()
 
 
-def test_reference_provenance_and_distinct_specification_and_python_commitments():
+def test_reference_provenance_and_distinct_specification_and_python_commitments() -> (
+    None
+):
     manifest = json.loads((FIXTURE / "manifest.json").read_bytes())
     assert manifest["modular_reference_precedes_new_module"]
     assert manifest["producer_probe_precedes_new_module"]
@@ -28,6 +31,8 @@ def test_reference_provenance_and_distinct_specification_and_python_commitments(
     for name, expected in manifest["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == expected
     assert (
         canonical_sha256(json.loads((FIXTURE / "policy.json").read_bytes()))
@@ -36,7 +41,7 @@ def test_reference_provenance_and_distinct_specification_and_python_commitments(
 
 
 @pytest.mark.parametrize("index", range(288))
-def test_all_independent_modular_geometries_and_a_second_period(index, report):
+def test_all_independent_modular_geometries_and_a_second_period(index, report) -> None:
     expected = ARITHMETIC[index]
     assert report["arithmetic_cases"][index] == expected
     hour = support.BRANCHES[expected["hour_number"] - 1]
@@ -59,7 +64,7 @@ def test_all_independent_modular_geometries_and_a_second_period(index, report):
 @pytest.mark.parametrize("hour_number", range(1, 13))
 def test_every_symbolic_trace_and_decision_matches_frozen_before_probe(
     hour_number, report
-):
+) -> None:
     actual = [r for r in report["state_cases"] if r["hour_number"] == hour_number]
     expected = [r for r in TRACES if r["hour_number"] == hour_number]
     assert len(actual) == len(expected) == 120
@@ -73,7 +78,7 @@ def test_every_symbolic_trace_and_decision_matches_frozen_before_probe(
 
 def test_noon_theorem_has_complete_context_coverage_without_outcome_or_clock_selection(
     report,
-):
+) -> None:
     noon = [r for r in report["state_cases"] if r["hour_number"] == 7]
     assert len({(r["s_residue"], r["season"]) for r in noon}) == 120
     assert all(r["decision"]["label"] in {"dry", "abstain"} for r in noon)
@@ -100,9 +105,8 @@ def test_noon_theorem_has_complete_context_coverage_without_outcome_or_clock_sel
 
 
 def test_attached_legacy_result_metadata_cannot_change_any_trace_or_label(
-    monkeypatch, report
-):
-    from fatebridge.core import meihua_weather
+    monkeypatch: pytest.MonkeyPatch, report
+) -> None:
 
     monkeypatch.setattr(
         meihua_weather,

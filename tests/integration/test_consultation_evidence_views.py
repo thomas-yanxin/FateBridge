@@ -19,6 +19,7 @@ from fatebridge.application.examples import (
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.mcp_result_delivery import read_full_result
+from tests.support.transports import call_calculation
 
 
 def spec_for(key):
@@ -26,14 +27,15 @@ def spec_for(key):
 
 
 @pytest.mark.asyncio
-async def test_published_knowledge_query_can_resolve_an_actual_aspect_source():
+async def test_published_knowledge_query_can_resolve_an_actual_aspect_source() -> None:
     guidance = call_guidance(spec_for("knowledge_read"))
     registry = call_guidance(spec_for("knowledge_registry"))
     async with Client(create_mcp_app()) as client:
         catalog = await original_payload(
             client,
-            await client.call_tool(
-                "knowledge_registry",
+            await call_calculation(
+                client,
+                "knowledge_catalog",
                 {
                     "domain": "astro",
                     "fields": registry["output_fields"],
@@ -49,18 +51,27 @@ async def test_published_knowledge_query_can_resolve_an_actual_aspect_source():
         )
         payload = await original_payload(
             client,
-            await client.call_tool(
+            await call_calculation(
+                client,
                 "knowledge_read",
                 {
                     **guidance["astro_aspect_query"],
-                    "fields": ["title", "lines", "source", "citation"],
+                    "fields": [
+                        "title",
+                        "lines",
+                        "source",
+                        "citation",
+                        "provenance.reference_only",
+                    ],
                     "strict_fields": True,
                     "include_snapshot_text": False,
                 },
             ),
         )
-        assert payload["lines"] and payload["source"]
-        assert "astro/aspect/90" in payload["citation"]
+        assert "相位角：90°" in payload["lines"]
+        assert payload["source"] == "fatebridge_rule_references"
+        assert "Tetrabiblos I.13" in payload["citation"]
+        assert payload["provenance"]["reference_only"] is True
 
 
 async def original_payload(client, result):
@@ -70,7 +81,8 @@ async def original_payload(client, result):
 
 async def call_view(client, key, view=None, **overrides):
     spec = spec_for(key)
-    return await client.call_tool(
+    return await call_calculation(
+        client,
         spec.tool_name,
         {
             **example_input(spec),
@@ -87,7 +99,7 @@ async def call_view(client, key, view=None, **overrides):
 @pytest.mark.parametrize(
     "mode", ["compare", "composite", "influence", "timespace", "marks"]
 )
-async def test_named_relationship_mode_keeps_its_primary_evidence(mode):
+async def test_named_relationship_mode_keeps_its_primary_evidence(mode: str) -> None:
     spec = spec_for("astro_relative_chart")
     card = evidence_views(spec)[mode]
     # Exercise actual engine aliases, including the unintuitive Synastry mapping.
@@ -131,6 +143,8 @@ async def test_named_relationship_mode_keeps_its_primary_evidence(mode):
                 )
                 if view is not None:
                     assert "chart" not in payload
+                else:
+                    pass
             else:
                 assert len(payload["chart"]["planets"]) >= 10
                 assert payload["chart"]["angles"] and payload["chart"]["aspects"]
@@ -138,11 +152,13 @@ async def test_named_relationship_mode_keeps_its_primary_evidence(mode):
             if view is not None:
                 assert "inner_chart" not in payload and "outer_chart" not in payload
                 assert "in_to_out_midpoint" not in payload
+            else:
+                pass
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("key", ["qimen", "sixyao"])
-async def test_divination_views_keep_palaces_and_line_cast_facts(key):
+async def test_divination_views_keep_palaces_and_line_cast_facts(key: str) -> None:
     async with Client(create_mcp_app()) as client:
         payload = await original_payload(client, await call_view(client, key))
     if key == "qimen":
@@ -162,7 +178,9 @@ async def test_divination_views_keep_palaces_and_line_cast_facts(key):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("view", [None, "stage", "annual", "short_term"])
-async def test_western_timing_views_preserve_time_bounds_and_relevant_positions(view):
+async def test_western_timing_views_preserve_time_bounds_and_relevant_positions(
+    view: str | None,
+) -> None:
     async with Client(create_mcp_app()) as client:
         payload = await original_payload(
             client, await call_view(client, "western_timing_analysis", view)
@@ -171,49 +189,71 @@ async def test_western_timing_views_preserve_time_bounds_and_relevant_positions(
         firdaria = payload["time_lords"]["firdaria"]
         for name in ["current_major", "current_sub"]:
             assert firdaria[name]["start"] < firdaria[name]["end"]
+    else:
+        pass
     if view in [None, "annual"]:
         assert payload["returns"]["solar_return"]["sun"]["house"]
         assert payload["returns"]["solar_return"]["ascendant"]["sign"]
+    else:
+        pass
     if view in [None, "short_term"]:
         transit = payload["transits"]["current_transit"]
         assert isinstance(transit["hits"], list) and transit["hits"]
         assert all("orb" in hit for hit in transit["hits"])
+    else:
+        pass
     if view == "stage":
         assert "transits" not in payload and "directions" not in payload
+    else:
+        pass
     if view == "annual":
         assert (
             payload["directions"]["given_year"]["year_start"]
             < payload["directions"]["given_year"]["year_end"]
         )
+    else:
+        pass
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "dimension",
-    ["marriage", "romance", "education", "personality", "relatives", "children"],
+    "dimension,ten_god,visible_in,hidden_in,dayun_palace_hits",
+    [
+        ("marriage", "正财", [], ["day"], 0),
+        ("romance", "正财", [], ["day"], 0),
+        ("education", "正印", [], ["year"], 1),
+        ("personality", "比肩", ["year"], ["month", "hour"], 0),
+        ("relatives", "正印", [], ["year"], 1),
+        ("children", "正官", [], ["year"], 1),
+    ],
 )
-async def test_bazi_topic_starter_preserves_structure_and_its_own_timing(dimension):
+async def test_bazi_topic_starter_preserves_structure_and_its_own_timing(
+    dimension: str, ten_god: str, visible_in, hidden_in, dayun_palace_hits: int
+) -> None:
     async with Client(create_mcp_app()) as client:
         payload = await original_payload(
             client, await call_view(client, "bazi_" + dimension)
         )
     analysis = payload[dimension + "_analysis"]
-    assert len(analysis) >= 5
     assert analysis["timing_context"]["analysis_date"] == "2026-10-20"
-    structure = {
-        "marriage": "spouse_palace",
-        "romance": "peach_blossom",
-        "education": "study_stars",
-        "personality": "dominant_traits",
-        "relatives": "palaces",
-        "children": "child_palace",
-    }[dimension]
-    assert analysis[structure]
+    first_view = analysis["evidence_chain"]["topic"]["first_view"]
+    assert first_view["natal_stars"][0] == {
+        "ten_god": ten_god,
+        "visible_in": visible_in,
+        "hidden_in": hidden_in,
+    }
+    assert [(layer["layer"], layer["pillar"]) for layer in first_view["timing"]] == [
+        ("dayun", "甲申"),
+        ("liunian", "丙午"),
+    ]
+    assert first_view["timing"][0]["palace_relation_count"] == dayun_palace_hits
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("view", ["classical_detail", "fixed_stars", "planetary_hours"])
-async def test_natal_deep_views_read_real_branches_without_other_details(view):
+async def test_natal_deep_views_read_real_branches_without_other_details(
+    view: str,
+) -> None:
     async with Client(create_mcp_app()) as client:
         payload = await original_payload(
             client, await call_view(client, "astro_chart", view)
@@ -242,26 +282,29 @@ async def test_natal_deep_views_read_real_branches_without_other_details(view):
 
 
 @pytest.mark.asyncio
-async def test_views_are_published_in_all_descriptions_and_aliases_are_not_guessed():
+async def test_views_are_discoverable_on_demand_and_aliases_are_not_guessed() -> None:
     async with Client(create_mcp_app()) as client:
-        tools = {t.name: t for t in await client.list_tools()}
-    for key in [
-        "astro_relative_chart",
-        "astro_chart",
-        "qimen",
-        "sixyao",
-        "western_timing_analysis",
-    ]:
-        spec = spec_for(key)
-        views = evidence_views(spec)
-        assert describe_spec(spec)["evidence_views"] == views
-        assert describe_input_spec(spec)["evidence_views"] == views
-        assert (
-            json.dumps(views, ensure_ascii=False) in tools[spec.tool_name].description
-        )
-    assert evidence_views(spec_for("astro_relative")) == evidence_views(
-        spec_for("astro_relative_chart")
-    )
+        tools = await client.list_tools()
+        for key in [
+            "astro_relative_chart",
+            "astro_chart",
+            "qimen",
+            "sixyao",
+            "western_timing_analysis",
+        ]:
+            spec = spec_for(key)
+            views = evidence_views(spec)
+            uri = f"fatebridge://tools/{spec.tool_name}/input"
+            assert all(
+                json.dumps(views, ensure_ascii=False) not in (tool.description or "")
+                for tool in tools
+            )
+            resource = json.loads((await client.read_resource(uri))[0].text)
+            assert resource["tools"][0]["evidence_views"] == json.loads(
+                json.dumps(views)
+            )
+            assert describe_spec(spec)["evidence_views"] == views
+            assert describe_input_spec(spec)["evidence_views"] == views
     with pytest.raises(ValueError, match="Unknown evidence view"):
         suggested_fields(spec_for("qimen"), view="invented")
 
@@ -270,7 +313,9 @@ async def test_views_are_published_in_all_descriptions_and_aliases_are_not_guess
 @pytest.mark.parametrize(
     "key,view", [("qimen", "directional"), ("western_timing_analysis", "short_term")]
 )
-async def test_task_evidence_agrees_across_rest_mcp_and_cli(key, view, capsys):
+async def test_task_evidence_agrees_across_rest_mcp_and_cli(
+    key: str, view: str, capsys: pytest.CaptureFixture[str]
+) -> None:
     spec = spec_for(key)
     fields = suggested_fields(spec, view=view)
     as_of = "2026-10-20T12:00:00+08:00"
@@ -310,7 +355,7 @@ async def test_task_evidence_agrees_across_rest_mcp_and_cli(key, view, capsys):
 
 
 @pytest.mark.asyncio
-async def test_full_export_keeps_full_original_run_despite_new_task_views():
+async def test_full_export_keeps_full_original_run_despite_new_task_views() -> None:
     async with Client(create_mcp_app()) as client:
         result = await call_view(
             client, "astro_relative_chart", relative_mode="Composite", fields=None

@@ -5,6 +5,7 @@ import hashlib
 import json
 import shutil
 from datetime import datetime
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -13,9 +14,10 @@ from pydantic import ValidationError
 
 import fatebridge.api as api
 from fatebridge.application.examples import suggested_fields
+from fatebridge.application.result_delivery import RESULT_STORE
 from fatebridge.core.almanac import get_lunar_context
+from fatebridge.core.contracts.output_chinese import Taiyi
 from fatebridge.core.metaphysics import taiyi_year
-from fatebridge.core.output_chinese import Taiyi
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from scripts.taiyi.audit_taiyi_civil_calendar import (
@@ -24,9 +26,12 @@ from scripts.taiyi.audit_taiyi_civil_calendar import (
     public_input,
     verify_sources,
 )
-from tests.support.transports import SPECS, business, call_cli
-from tests.taiyi.test_taiyi_periods import seed_at
-from tests.taiyi.test_taiyi_transports import _same_run_payload
+from tests.support.transports import SPECS, business, call_calculation, call_cli
+from tests.unit_test.fixtures.taiyi import (
+    historical_year_payload,
+    same_run_payload,
+    seed_at,
+)
 
 CASES = json.loads((CORPUS / "cases.json").read_text())["cases"]
 
@@ -42,7 +47,7 @@ def rest(monkeypatch):
     return TestClient(api.app)
 
 
-def test_frozen_institutional_rows_and_original_cases_are_retained():
+def test_frozen_institutional_rows_and_original_cases_are_retained() -> None:
     verify_sources()
     assert [c["id"] for c in CASES] == [
         "prefix_1900",
@@ -61,8 +66,8 @@ def test_frozen_institutional_rows_and_original_cases_are_retained():
 
 @pytest.mark.parametrize("update_freeze", [False, True])
 def test_source_or_expectation_tampering_cannot_change_original_acceptance(
-    tmp_path, update_freeze
-):
+    tmp_path: Path, update_freeze: bool
+) -> None:
     corpus = tmp_path / "corpus"
     shutil.copytree(CORPUS, corpus)
     target = corpus / "cases.json"
@@ -74,13 +79,17 @@ def test_source_or_expectation_tampering_cannot_change_original_acceptance(
         freeze = json.loads(path.read_text())
         freeze["files"][target.name] = hashlib.sha256(target.read_bytes()).hexdigest()
         path.write_text(json.dumps(freeze))
+    else:
+        pass
     with pytest.raises(ValueError, match="V27"):
         verify_sources(corpus)
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
 @pytest.mark.parametrize("solar", [False, True])
-def test_year_uses_input_civil_lunar_date_and_keeps_actual_source(case, solar):
+def test_year_uses_input_civil_lunar_date_and_keeps_actual_source(
+    case, solar: bool
+) -> None:
     result = calculate_taiyi_analysis(**public_input(case, solar=solar))
     assert "taiyi" in result, result
     board = result["taiyi"]
@@ -113,11 +122,15 @@ def test_year_uses_input_civil_lunar_date_and_keeps_actual_source(case, solar):
             result["analysis_context"]["lunar_display"]
             != lunar["display"].split("年", 1)[1]
         )
+    else:
+        pass
     Taiyi.model_validate(board)
     assert board["ruleset"]["classical_acceptance_passed"] is False
 
 
-def test_stored_source_is_a_copy_of_the_one_conversion_already_used(monkeypatch):
+def test_stored_source_is_a_copy_of_the_one_conversion_already_used(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     seed = seed_at(datetime(2026, 2, 17, 0, 5), zone="+08:00", solar=True, longitude=0)
     source = get_lunar_context(seed.input_datetime, timezone_name=seed.timezone)
     source["conversion_source"] = {
@@ -155,7 +168,9 @@ def test_stored_source_is_a_copy_of_the_one_conversion_already_used(monkeypatch)
         ("conversion_source", "HKO"),
     ],
 )
-def test_new_output_facts_are_strict_and_projection_compatible(field, value):
+def test_new_output_facts_are_strict_and_projection_compatible(
+    field: str, value: bool | int | str
+) -> None:
     Taiyi.model_validate({"calendar_rules": {"civil_lunar_calendar": {"year": 2026}}})
     with pytest.raises(ValidationError):
         Taiyi.model_validate(
@@ -163,7 +178,7 @@ def test_new_output_facts_are_strict_and_projection_compatible(field, value):
         )
 
 
-def test_boundary_audit_separates_local_fix_from_full_calendar_acceptance():
+def test_boundary_audit_separates_local_fix_from_full_calendar_acceptance() -> None:
     report = audit()
     assert report["fictional_boundary_cases"] == report["matching_calendar_dates"] == 3
     assert report["civil_date_evidence_and_text_checks_passed"] is True
@@ -178,8 +193,8 @@ def test_boundary_audit_separates_local_fix_from_full_calendar_acceptance():
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
 def test_actual_rest_mcp_cli_preserve_calendar_evidence_and_both_clocks(
-    rest, tmp_path, capsys, key, case
-):
+    rest, tmp_path: Path, capsys: pytest.CaptureFixture[str], key: str, case
+) -> None:
     spec = SPECS[key]
     data = (
         public_input(case)
@@ -214,7 +229,8 @@ def test_actual_rest_mcp_cli_preserve_calendar_evidence_and_both_clocks(
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
+            result = await call_calculation(
+                client,
                 spec.tool_name,
                 {
                     **data,
@@ -225,20 +241,20 @@ def test_actual_rest_mcp_cli_preserve_calendar_evidence_and_both_clocks(
                 },
                 raise_on_error=False,
             )
-            body = await _same_run_payload(client, result, require_business_inline=True)
+            body = await same_run_payload(client, result, require_business_inline=True)
             # Separately fetch snapshot evidence from its own same-run payload.
-            result_text = await client.call_tool(
+            result_text = await call_calculation(
+                client,
                 spec.tool_name,
                 {**data, "fields": [*fields, "snapshot_text"], "strict_fields": True},
                 raise_on_error=False,
             )
-            full_text = await _same_run_payload(client, result_text)
+            full_text = await same_run_payload(client, result_text)
             return body, full_text
 
     protocol_body, text_body = asyncio.run(protocol())
     # REST/CLI delivery references are transport-specific, so retrieve using the
     # retained application run rather than comparing references or recomputing.
-    from fatebridge.application.result_delivery import RESULT_STORE
 
     def retained(body):
         ref = body.get("result_delivery")
@@ -258,16 +274,16 @@ def test_actual_rest_mcp_cli_preserve_calendar_evidence_and_both_clocks(
 
 
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
-def test_new_year_view_preserves_selected_historical_calendar(key):
-    from tests.taiyi.test_taiyi_year_calendar import payload
+def test_new_year_view_preserves_selected_historical_calendar(key: str) -> None:
 
     spec = SPECS[key]
-    data = payload(key, day="0385-01-28")
+    data = historical_year_payload(key, day="0385-01-28")
     view = "year_calendar" if key == "taiyi" else "taiyi_year_calendar"
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
+            result = await call_calculation(
+                client,
                 spec.tool_name,
                 {
                     **data,
@@ -277,7 +293,7 @@ def test_new_year_view_preserves_selected_historical_calendar(key):
                 },
                 raise_on_error=False,
             )
-            return await _same_run_payload(client, result, require_business_inline=True)
+            return await same_run_payload(client, result, require_business_inline=True)
 
     body = asyncio.run(protocol())
     calendar = body["taiyi"]["calendar_rules"]

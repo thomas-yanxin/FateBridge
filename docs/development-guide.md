@@ -133,28 +133,27 @@ uv run --locked --extra dev mypy src/fatebridge/
 
 1. 先改 `src/fatebridge/core/*` 或 `src/fatebridge/analysis/*`。
 2. 在 `src/fatebridge/services/*` 封装成对 transport 友好的返回结构。
-3. 在 `src/fatebridge/core/requests/` 的对应领域模块定义 Pydantic 请求模型，调用方直接导入定义模块。
-   大型独立领域也可拆为领域模型（如 `core/fengshui/models.py`）。在 `core/response_models.py` 声明响应根字段，复用 `core/output_*.py` 的专业嵌套类型，或在 ToolSpec 显式绑定领域 `output_model`；根输出继承 `ProjectedOutput` 以声明兼容投影警告，嵌套业务模型继承 `PartialOutput`，字段需支持投影缺省。动态字典键保持开放，值和列表条目应使用领域模型；同名但语义不同的根字段按工具覆写，避免以宽泛 union 掩盖错误。模型只校验、不回写响应。新增字段须检查真实构建器、可空与非默认分支，不能只照一个快照收紧类型。新工具缺少输出声明会在目录加载时失败。
+3. 在 `src/fatebridge/core/requests/` 的对应领域模块定义 Pydantic 请求模型，调用方直接导入定义模块。 大型独立领域也可拆为领域模型（如 `core/fengshui/models.py`）。在 `core/response_models.py` 声明响应根字段，复用 `core/output_*.py` 的专业嵌套类型，或在 ToolSpec 显式绑定领域 `output_model`；根输出继承 `ProjectedOutput` 以声明兼容投影警告，嵌套业务模型继承 `PartialOutput`，字段需支持投影缺省。动态字典键保持开放，值和列表条目应使用领域模型；同名但语义不同的根字段按工具覆写，避免以宽泛 union 掩盖错误。模型只校验、不回写响应。新增字段须检查真实构建器、可空与非默认分支，不能只照一个快照收紧类型。新工具缺少输出声明会在目录加载时失败。
 4. 在 `src/fatebridge/services/catalog/` 的对应领域 `SPECS` 追加一个 `ToolSpec`；新领域还须接入 `tool_catalog.py` 的有序装配。声明的 REST / MCP 入口及 CLI 可支持的命令会自动派生，常规新增不需要再改 `api.py`、`mcp_server.py` 或 `cli.py`。`execution_hints` 默认描述已有本地只读计算；新增外部访问或写入能力时须声明实际环境影响，不能用 `idempotentHint` 表示结果确定性。
-5. 在 `tests/` 增加能力测试。三端 parity 由 `tests/integration/test_full_surface_validation.py` 自动覆盖，记得为新工具补一个代表性的 payload fixture。
-   修改输出合同时运行 `tests/integration/test_output_projection_contracts.py`：检查全目录可投影对象的必填字段、当前代表请求的合法叶路径，以及原生 MCP 客户端与 REST、CLI 的结果。可经点路径裁剪的对象不能要求兄弟字段同时存在；数组条目与始终整块保留的 `run_metadata` 可保留必填事实。
+5. 在 `tests/` 增加能力测试，为新工具补一个代表请求。[完整接口验证](../tests/integration/test_full_surface_validation.py) 运行所有已登记的 REST 与 MCP 请求。[投影合同测试](../tests/integration/test_output_projection_contracts.py) 检查可投影对象的必填字段、代表请求的合法叶路径及三端投影结果。可经点路径裁剪的对象不能要求兄弟字段同时存在；数组条目与始终整块保留的 `run_metadata` 可保留必填事实。
 6. 更新 `docs/api-reference.md`、`docs/algorithm-coverage.md` 与相关方法说明；接口或首轮字段变化时重建调用合同。工具计数、文档覆盖和实际发现接口均有对应检查。
 
 家居风水的 `cli_request_file=True` 同时启用 JSON 对象／数组参数与 `--request-file`；新增复杂工具需明确启用、补嵌套校验与文件合并测试，不能仅依据模型顶层是否嵌套声称 CLI 可用。规则数据必须登记来源类别、版本、适用范围与约定，独立比较事实记录提交与 SHA-256；详见 [家居风水维护](fengshui.md#验证与维护)。
 
 ### 只改 transport 行为，不改算法
 
-调整某一端的参数绑定时，修改 `src/fatebridge/transports/rest.py` / `transports/mcp.py` 的注册器，或 `services/catalog/` 的相应绑定。共同的字段投影、快照选项和预算交付在 `application/response_delivery.py` 维护，JSON 格式化只负责序列化。按影响范围补充：
+调整某一端的参数绑定时，修改 `src/fatebridge/transports/rest.py` 或 `src/fatebridge/mcp_server.py` 的注册器，也可调整 `services/catalog/` 的相应领域绑定。共同的字段投影、快照选项和预算交付在 `application/response_delivery.py` 维护，JSON 格式化只负责序列化。按影响范围补充：
 
 - request model 验证用例；
-- `tests/integration/test_full_surface_validation.py` 覆盖的三端 parity。
+- 按受影响入口运行 [REST、MCP 代表请求](../tests/integration/test_full_surface_validation.py)、[CLI 接入](../tests/integration/test_cli.py)及[三端投影合同](../tests/integration/test_output_projection_contracts.py)测试。
 
 这样可以避免三端接入层继续漂移。
 
 ## 设计约束
 
-编码与审查遵循 [AGENTS.md 的代码简洁与边界原则](../AGENTS.md#代码简洁与边界)，职责和导入方向见[架构说明](architecture.md#分层职责)。领域计算留在 `core` / `analysis`，服务在 `services`，工具由 `services/catalog/` 装配；REST、MCP、CLI 共享执行与输出合同。
+编码与审查遵循 [AGENTS.md 的代码审查原则](../AGENTS.md#代码审查)，职责和导入方向见[架构说明](architecture.md#分层职责)。领域计算留在 `core` / `analysis`，服务在 `services`，工具由 `services/catalog/` 装配；REST、MCP、CLI 共享执行与输出合同。
 
+- 新增结果字段时，说明它由哪些输入和规则得到、调用方如何复核。经典条目由知识工具按需交付。行业映射、现代心理类比和个性化建议由 Agent 结合对话生成。
 - 出生资料复用 `create_person_info`、`normalize_birth_time`、`resolve_birth_place_context`；分析时刻经 `services.timing_clock` 归一化，隐式当前时间读取 `core.execution_context.current_datetime`。
 - 共享出生响应使用 `services.birth_payload.build_destiny_payload`，时运状态使用 `services.timing_state.build_current_timing_state`；快照、历法查询分别在 `timing_snapshots`、`calendar_tools`，构造器不回调上层用例服务。
 - 可读文本和分节交付沿用 `snapshot_text`、`snapshot_export`、`parse_export_content`；执行回执、重放与投影由 `application` 管理。
@@ -164,7 +163,7 @@ uv run --locked --extra dev mypy src/fatebridge/
 
 ## 测试策略
 
-测试从已安装的 `src` 包导入，使用 pytest 的 `importlib` 模式；根 `conftest.py` 排除原始资料目录，测试不各自修改 `sys.path`。通用协议调用在 `tests/support/transports.py`，风水协议辅助在 `tests/support/fengshui_transports.py`，代表请求和原生客户端辅助在 `tests/fixtures/`；领域测试直接依赖这些定义，避免通过另一领域的测试文件间接加载。共享辅助与独立参考的入口见[测试索引](../tests/README.md)。`test_runtime_contracts.py`、`test_request_catalog_isolation.py` 分别核对运行时隔离和新进程目录加载。
+测试从已安装的 `src` 包导入，使用 pytest 的 `importlib` 模式；根 `conftest.py` 排除原始资料目录，测试不各自修改 `sys.path`。通用协议调用在 `tests/support/transports.py`，风水协议辅助在 `tests/support/fengshui_transports.py`，代表请求和原生客户端辅助在 `tests/fixtures/`；领域测试直接依赖这些定义，避免通过另一领域的测试文件间接加载。共享辅助与独立参考的入口见[测试索引](../tests/README.md)。[`test_runtime_and_errors.py`](../tests/integration/test_runtime_and_errors.py) 核对运行时配置与错误处理，[`test_ci_regressions.py`](../tests/integration/test_ci_regressions.py) 核对新进程加载目录时是否隔离领域引擎。
 
 共享计算或合同变化需核对 REST、MCP、CLI 的当前未舍入事实、错误和严格投影。独立期望值来自手算、外部数值或指定原典，并注明坐标系、时标、后端、日期范围、容差及未裁定项；复制生产公式、三端相同和 Schema 合法均不能单独证明计算正确。
 
@@ -196,17 +195,17 @@ git diff --check
 
 `docs/contracts/` 的逐工具 JSON 与索引由 `scripts/build_codex_call_contracts.py` 从实际 MCP 输入 Schema 和共享首轮字段生成，不能手改生成文件。根 `AGENTS.md` 不嵌入这些大合同。接口或首轮字段变化后先运行生成器，再用 `--check` 核对。工具发现直接读取中央目录，不再维护独立主题 YAML 或生成的场景清单。
 
-完整执行的必需业务根在 `core/response_models.py` 声明；嵌套必需事实使用 `FullFact[T]` 或 `PresentFact[T]`，由完整执行上下文递归核验，规则在完整执行时核对。公开投影允许缺少兄弟字段与合法 null，投影读取不启用完整执行上下文。不能为接收错误输出而放宽声明；相关验证从 `test_complete_output_contracts.py`、`test_algorithm_review_repairs.py` 和对应领域测试开始。
+在 `core/response_models.py` 声明必需业务根，为嵌套必需事实使用具体字段类型上的 `Annotated` 和 `FULL_FACT` 或 `PRESENT_FACT`。常规执行检查必需根和已登记的必需事实；测试设置 `FATEBRIDGE_STRICT_OUTPUT_VALIDATION=1`，在完整执行上下文递归核验嵌套事实与领域约束。公开投影允许缺少兄弟字段与合法 null，投影读取不启用完整执行上下文。不能为接收错误输出而放宽声明；相关验证从 `test_complete_output_contracts.py`、`test_algorithm_review_repairs.py` 和对应领域测试开始。
 
 ### 最低同步面
 
-接口或能力范围变化至少检查 README、API 参考和算法覆盖矩阵；涉及调用字段时同步生成合同。结构变化更新架构说明，删除支持的入口更新故障排除中的升级说明。非生成源页面的导航或措辞调整通常无需改生成数据；生成器 `--check` 报告源文件散列变化时，重新生成后审查差异。
+接口或能力范围变化至少检查 README、API 参考和算法覆盖矩阵；涉及调用字段时同步生成合同。结构变化更新架构说明，删除支持的入口更新故障排除中的升级说明。只改导航或措辞时直接运行 `--check`。若检查报告生成文件缺失或内容不同，运行生成器并审阅差异。
 
 当前维护文档与具体实现应相互指向；历史审计只作为特定版本证据。一轮修改的测试数量、临时回执与工作区路径写在验收报告中，不作为长期能力承诺。历史报告并入专题时标明日期、模型与范围，保留失败和未决项，并与当前使用步骤分开。
 
 ## CI、打包与发布
 
-发布从干净 checkout 构建，并核对 wheel 的 Python 模块和 JSON 与当前源码清单一致。删除源模块后，旧 `build/lib` 的增量残留可能仍进入 wheel，因此发布构建应使用全新的工作目录。
+发布从干净 checkout 构建，并核对 wheel 包含运行所需的规则数据、随包星历、原生源码、许可证及 `py.typed`。离线 `validation/` 从源码检出运行，DE441 系数分片按[星历安装说明](ephemeris.md)单独提供。安装后从 checkout 之外读取 IERS C04 时钟和方向表，并检查 CLI、REST 与 MCP 入口。发布构建使用全新的工作目录，避免 `build/lib` 的增量残留把已删除的模块带入 wheel。
 
 日常整理使用[仓库维护](repository-maintenance.md)中的预览与清理命令。构建缓存与当前参考分别维护；退役材料按实际依赖清理，不按扩展名误删当前来源或完整性校验。
 
@@ -223,23 +222,16 @@ CI 的 `locked` 作业检查 `uv.lock`、安装环境、命令入口与真实 st
 
 版本来自 `src/fatebridge/__init__.py::__version__`。发布时递增该版本并同步更新 CHANGELOG；`publish.yml` 在 `master` 的 push CI 成功完成后，检出该次 CI 实际测试的提交，查询 PyPI，仅在版本尚未发布时构建 sdist/wheel。版本已存在则跳过构建与发布；查询失败则停止，不把网络错误当成新版本。流程不会自动递增版本，因此普通提交沿用已发布版本时不会更新 PyPI。
 
-GitHub Release published 入口继续保留，并要求标签严格匹配 `v<包版本>`；已经由 `master` 自动发布的版本会跳过。两个入口串行执行，检查元数据、JSON 数据、`py.typed` 和安装包运行情况后，通过 PyPI Trusted Publishing 发布。PyPI 的 Trusted Publisher 须匹配仓库实际 owner/name、`publish.yml` 与 GitHub `pypi` environment；若该 environment 设置了人工审批，发布仍需审批。新增数据文件需确认被 `pyproject.toml` 的 package-data 覆盖。
+GitHub Release published 入口继续保留，并要求标签严格匹配 `v<包版本>`；已经由 `master` 自动发布的版本会跳过。两个入口串行执行，构建和安装包检查通过后使用 PyPI Trusted Publishing 发布。PyPI 的 Trusted Publisher 须匹配仓库实际 owner/name、`publish.yml` 与 GitHub `pypi` environment；若该 environment 设置了人工审批，发布仍需审批。新增数据文件需确认被 `pyproject.toml` 的 package-data 覆盖。
 
-新版本的 PyPI 上传成功后，独立的 `github_release` 作业使用 `contents: write` 创建
-`v<包版本>` 标签和 GitHub Release，目标为同一个实际构建并发布的提交；其余作业继续
-保留各自最小权限。已有 Release 保持原样，已有标签须指向该发布提交，否则停止，
-不会移动标签。普通同版本提交跳过同步，不把较新的 master 冒充已发布包的源码。
-Release 自动附加变更记录，并按 GitHub 的版本／日期规则选择 Latest。
+新版本的 PyPI 上传成功后，独立的 `github_release` 作业使用 `contents: write` 创建 `v<包版本>` 标签和 GitHub Release，目标为同一个实际构建并发布的提交；其余作业继续 保留各自最小权限。已有 Release 保持原样，已有标签须指向该发布提交，否则停止， 不会移动标签。普通同版本提交跳过同步，不把较新的 master 冒充已发布包的源码。 Release 自动附加变更记录，并按 GitHub 的版本／日期规则选择 Latest。
 
-若 PyPI 已上传而 GitHub 同步失败，优先在原工作流使用 **Re-run failed jobs**，保留
-成功的检查与上传作业及其输出。完整重跑会因版本已存在而跳过上传和同步。也可先从
-原发布作业的 checkout 日志及 PyPI provenance 核实完整源码 SHA，再用有仓库发布权限
-的 `GH_TOKEN` 或 `GITHUB_TOKEN` 执行以下恢复命令（将版本、SHA 与仓库替换为核实值）：
+若 PyPI 已上传而 GitHub 同步失败，优先在原工作流使用 **Re-run failed jobs**，保留 成功的检查与上传作业及其输出。完整重跑会因版本已存在而跳过上传和同步。也可先从 原发布作业的 checkout 日志及 PyPI provenance 核实完整源码 SHA，再用有仓库发布权限 的 `GH_TOKEN` 或 `GITHUB_TOKEN` 执行以下恢复命令（将版本、SHA 与仓库替换为核实值）：
 
 ```bash
 uv run --locked --extra dev python scripts/sync_github_release.py \
-  --version 0.1.1 --sha fee5e5a4373327e65f3b91e002121d49c18ee49c \
-  --repo thomas-yanxin/FateBridge
+  --version "<已发布版本>" --sha "<已核实的源码提交 SHA>" \
+  --repo "<OWNER/REPOSITORY>"
 ```
 
 ## 提交前检查

@@ -18,8 +18,8 @@ from fatebridge.core.western_event_clock import build_event_subject
     [(AstroElectionRequest, "candidate"), (AstroHoraryRequest, "question")],
 )
 def test_confirmed_seconds_survive_request_binding_and_reject_fractional_labels(
-    model, prefix
-):
+    model, prefix: str
+) -> None:
     inputs = {
         f"{prefix}_year": 2001,
         f"{prefix}_month": 10,
@@ -58,8 +58,8 @@ def test_confirmed_seconds_survive_request_binding_and_reject_fractional_labels(
     ],
 )
 def test_seconds_are_preserved_across_calendar_and_noon_carry(
-    parts, calendar, origin, expected
-):
+    parts, calendar: str, origin: str, expected: str
+) -> None:
     wall, calendar_receipt, origin_receipt = event_wall_datetime(
         *parts[:5], calendar, origin, second=parts[5]
     )
@@ -69,7 +69,7 @@ def test_seconds_are_preserved_across_calendar_and_noon_carry(
     assert origin_receipt["normalized_wall_datetime"] == expected
 
 
-def test_published_second_label_reaches_the_physical_civil_epoch():
+def test_published_second_label_reaches_the_physical_civil_epoch() -> None:
     subject, receipt = build_event_subject(
         name="Published2001chartreference",
         local_datetime=datetime(2001, 10, 19, 8, 15, 39),
@@ -85,7 +85,7 @@ def test_published_second_label_reaches_the_physical_civil_epoch():
     assert not receipt["input_clock_accuracy_certified"]
 
 
-def test_lmt_second_label_is_a_ut1_label_and_not_truncated_to_the_minute():
+def test_lmt_second_label_is_a_ut1_label_and_not_truncated_to_the_minute() -> None:
     subject, receipt = build_event_subject(
         name="Synthetic second label",
         local_datetime=datetime(2000, 1, 1, 1, 0, 59),
@@ -100,7 +100,7 @@ def test_lmt_second_label_is_a_ut1_label_and_not_truncated_to_the_minute():
     assert receipt["solar_conversion"]["solar_model_call_count"] == 0
 
 
-def test_subsecond_event_label_is_rejected_instead_of_silently_truncated():
+def test_subsecond_event_label_is_rejected_instead_of_silently_truncated() -> None:
     with pytest.raises(ValueError, match="whole.second"):
         build_event_subject(
             name="Unsupported subsecond label",

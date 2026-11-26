@@ -5,29 +5,28 @@ It derives alternatives from the same charts that produced current findings.
 Element cycles are calculated relationships, not an invented object cure rule.
 """
 
-from typing import Any, Dict, List
+from typing import Any
 
-from fatebridge.core.hexagram_relations import ELEMENT_CONTROLS, ELEMENT_GENERATES
-
-from .actions import (
+from fatebridge.core.fengshui.actions import (
     FORM_ACTION_ROUTES,
     apply_permission,
     permission_state,
     sharp_corner_target_actions,
 )
-from .bazhai import placement_application
-from .context import analyze_environmental_context
-from .directions import rule_data
-from .interior_rules import analyze_interior_relations
-from .layout_supplements import analyze_supplements
-from .materials import analyze_material_facts
-from .models import AssessRequest
-from .natal_interpretation import analyze_natal_interpretation
-from .surface import summarize_analysis_progress
-from .workstation import analyze_workstation
+from fatebridge.core.fengshui.bazhai import placement_application
+from fatebridge.core.fengshui.context import analyze_environmental_context
+from fatebridge.core.fengshui.directions import rule_data
+from fatebridge.core.fengshui.interior_rules import analyze_interior_relations
+from fatebridge.core.fengshui.layout_supplements import analyze_supplements
+from fatebridge.core.fengshui.materials import analyze_material_facts
+from fatebridge.core.fengshui.models import AssessRequest
+from fatebridge.core.fengshui.natal_interpretation import analyze_natal_interpretation
+from fatebridge.core.fengshui.surface import summarize_analysis_progress
+from fatebridge.core.fengshui.workstation import analyze_workstation
+from fatebridge.core.hexagram_relations import ELEMENT_CONTROLS, ELEMENT_GENERATES
 
 
-def element_relationships(element: str) -> Dict[str, str]:
+def element_relationships(element: str) -> dict[str, str]:
     """All five directed relationships; never confuse drain with control."""
     return {
         "same_element": element,
@@ -44,20 +43,20 @@ def element_relationships(element: str) -> Dict[str, str]:
 
 def _summarize_layout_progress(
     req: AssessRequest,
-    missing: List[str],
-    options: List[Dict[str, Any]],
-    findings: List[Dict[str, Any]],
-    environment: List[Dict[str, Any]],
-    supplements: Dict[str, Any],
-    natal_interpretation: Dict[str, Any] | None = None,
-    environmental_context: Dict[str, Any] | None = None,
-    extra_reviews: List[Dict[str, Any]] | None = None,
+    missing: list[str],
+    options: list[dict[str, Any]],
+    findings: list[dict[str, Any]],
+    environment: list[dict[str, Any]],
+    supplements: dict[str, Any],
+    natal_interpretation: dict[str, Any] | None = None,
+    environmental_context: dict[str, Any] | None = None,
+    extra_reviews: list[dict[str, Any]] | None = None,
     reference_basis_count: int = 0,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Summarize reviewed records separately from optional physical actions."""
     progress_counts = dict(supported=0, confirmed_unsupported=0, unknown=0)
-    progress_actions: List[Dict[str, Any]] = []
-    progress_pending: List[Dict[str, Any]] = []
+    progress_actions: list[dict[str, Any]] = []
+    progress_pending: list[dict[str, Any]] = []
     limited = supplements["annual_remedies"]["status"] == "unsupported_year"
     constraints = {c.object_id: c for c in req.layout_constraints}
     surface = supplements.get("surface_analysis")
@@ -434,11 +433,11 @@ def _summarize_layout_progress(
     )
 
 
-def analyze_layout(req: AssessRequest, layers: Dict[str, Any]) -> Dict[str, Any]:
-    findings: List[Dict[str, Any]] = []
-    options: List[Dict[str, Any]] = []
-    elements: List[Dict[str, Any]] = []
-    missing: List[str] = []
+def analyze_layout(req: AssessRequest, layers: dict[str, Any]) -> dict[str, Any]:
+    findings: list[dict[str, Any]] = []
+    options: list[dict[str, Any]] = []
+    elements: list[dict[str, Any]] = []
+    missing: list[str] = []
     if (
         not layers
         and not req.form_observations
@@ -466,7 +465,7 @@ def analyze_layout(req: AssessRequest, layers: Dict[str, Any]) -> Dict[str, Any]
     bazhai = layers.get("bazhai", {})
     if bazhai.get("house_orientation_context", {}).get("status") == "candidate_only":
         missing.append("house.unambiguous_sitting_trigram")
-    findings_by_object: Dict[str, List[Dict[str, Any]]] = {}
+    findings_by_object: dict[str, list[dict[str, Any]]] = {}
     for finding in bazhai.get("placement_findings", []):
         findings_by_object.setdefault(finding["object_id"], []).append(finding)
     charts = []
@@ -506,7 +505,7 @@ def analyze_layout(req: AssessRequest, layers: Dict[str, Any]) -> Dict[str, Any]
             )
     annual_table = rule_data("annual_stars")
 
-    def add_element(entry: Dict[str, Any], star: Dict[str, Any]) -> None:
+    def add_element(entry: dict[str, Any], star: dict[str, Any]) -> None:
         elements.append(
             {
                 **entry,
@@ -709,9 +708,12 @@ def analyze_layout(req: AssessRequest, layers: Dict[str, Any]) -> Dict[str, Any]
             else:
                 missing.extend(monthly["missing_inputs"])
         if "xuankong_natal" in layers:
-            if not natal.get("candidates"):
+            natal_charts = natal.get("candidates") or (
+                [natal["chart"]] if natal.get("chart") is not None else []
+            )
+            if not natal_charts:
                 missing.extend(natal["missing_inputs"])
-            for candidate in natal.get("candidates", []):
+            for candidate in natal_charts:
                 palace = candidate["palaces"][location]
                 entry = {
                     **common,

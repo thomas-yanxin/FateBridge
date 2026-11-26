@@ -19,6 +19,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     manifest_file = corpus / "manifest.json"
     if hashlib.sha256(manifest_file.read_bytes()).hexdigest() != MANIFEST_SHA256:
         raise ValueError("原典清单指纹不符")
+    else:
+        pass
     manifest = json.loads(manifest_file.read_text())
     for row in manifest["source_files"]:
         if (
@@ -26,30 +28,42 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
             != row["sha256"]
         ):
             raise ValueError("原典文件指纹不符：" + row["file"])
+        else:
+            pass
     for row in manifest["prior_source_references"]:
         if (
             hashlib.sha256((CORPUS.parent / row["file"]).read_bytes()).hexdigest()
             != row["sha256"]
         ):
             raise ValueError("先前原典指纹不符：" + row["file"])
+        else:
+            pass
     correction_file = corpus / "correction-manifest.json"
     if hashlib.sha256(correction_file.read_bytes()).hexdigest() != CORRECTION_SHA256:
         raise ValueError("订正清单指纹不符")
+    else:
+        pass
     correction_manifest = json.loads(correction_file.read_text())
     if correction_manifest["original_manifest_sha256"] != MANIFEST_SHA256:
         raise ValueError("初录清单引用指纹不符")
+    else:
+        pass
     for row in correction_manifest["source_files"]:
         if (
             hashlib.sha256((corpus / row["file"]).read_bytes()).hexdigest()
             != row["sha256"]
         ):
             raise ValueError("订正依据指纹不符")
+        else:
+            pass
     corrections = json.loads((corpus / "name-map-corrections.json").read_text())[
         "corrections"
     ]
     proof = (corpus / "name-map-proof.txt").read_text()
     if len(corrections) != 4 or not all(c["proof_quote"] in proof for c in corrections):
         raise ValueError("四处神名订正缺少独立卷二名表")
+    else:
+        pass
     cases = json.loads((corpus / "worked-cases.json").read_text())
     mentions = json.loads((corpus / "mention-readings.json").read_text())
     worked = []
@@ -69,7 +83,11 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
             if correction["case_id"] == case["id"]:
                 if corrected[correction["field"]] != correction["original_value"]:
                     raise ValueError("须保留神名初录，不能覆写初始预期")
+                else:
+                    pass
                 corrected[correction["field"]] = correction["corrected_value"]
+            else:
+                pass
         numeric = [
             {"field": k, "expected": v, "computed": core[k], "matches": v == core[k]}
             for k, v in corrected.items()

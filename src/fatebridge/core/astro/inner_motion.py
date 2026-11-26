@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 from importlib.metadata import version
 from pathlib import Path
-from typing import Any, Dict, Optional, Sequence, Tuple
+from typing import Any, Sequence
 
 from fatebridge.core.astro import reference_frames, runtime
 from fatebridge.core.astro.continuous_lahiri import frame_state
@@ -38,9 +38,9 @@ def complete_inner_rate(
     model: str,
     *,
     sidereal: bool = False,
-    source_trace: Optional[PhysicalEphemerisTrace] = None,
-) -> Tuple[Optional[float], Dict[str, Any]]:
-    policy: Dict[str, Any] = {
+    source_trace: PhysicalEphemerisTrace | None = None,
+) -> tuple[float | None, dict[str, Any]]:
+    policy: dict[str, Any] = {
         "method_id": METHOD_ID,
         "epoch_jd_tt": epoch,
         "ephemeris_model": model,
@@ -56,7 +56,7 @@ def complete_inner_rate(
         "scope": "Derivative of the declared unrounded source model on its recorded local polynomial and solar-mass branches, plus the checked analytic date frame. The native numerical argument is retained without physical clock conversion. Displayed native positions are unchanged. Mathematical source agreement is not an observational or prediction certificate.",
     }
 
-    def unavailable(reason: str) -> Tuple[None, Dict[str, Any]]:
+    def unavailable(reason: str) -> tuple[None, dict[str, Any]]:
         policy.update(status="not_applied", reason=reason)
         return None, policy
 

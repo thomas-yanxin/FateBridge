@@ -3,28 +3,36 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from functools import lru_cache
 from typing import Any
 
-from ...utils.civil_clock import format_utc_offset, resolve_civil_clock, utc_instant
-from ...utils.errors import EphemerisSourceError
-from ...utils.places import DEFAULT_BIRTH_TIMEZONE, resolve_birth_place_context
-from ...utils.timezones import timezone_rules_metadata
-from ..almanac import (
+from fatebridge.core import de440_solar
+from fatebridge.core.aa1996_solar import MODEL_ID as AA1996_SOLAR_MODEL
+from fatebridge.core.almanac import (
     SolarTerm,
     get_adjacent_solar_terms,
     get_bazi_month_boundaries,
     get_solar_terms_for_year,
     is_calculated_solar_term,
-    localize_datetime,
 )
-from ..analytic_solar import MODEL_ID as ANALYTIC_SOLAR_MODEL
-from ..solar_term_runtime import loaded_clock_profile_key
-from .common import MetaphysicsSeed
-from .hko_term_dates import published_date_reference
-from .ren_term_longitude import validate_term_longitude
-from .ren_term_point import validate_term_point
+from fatebridge.core.analytic_solar import MODEL_ID as ANALYTIC_SOLAR_MODEL
+from fatebridge.core.astro import time_scales, utc_policy
+from fatebridge.core.de440_solar import EXTENDED_MODEL_ID as DE440_EXTENDED_MODEL
+from fatebridge.core.de440_solar import MODEL_ID as DE440_SOLAR_MODEL
+from fatebridge.core.de441_solar import MODEL_ID as DE441_SOLAR_MODEL
+from fatebridge.core.metaphysics.common import MetaphysicsSeed
+from fatebridge.core.metaphysics.hko_term_dates import published_date_reference
+from fatebridge.core.metaphysics.ren_term_longitude import validate_term_longitude
+from fatebridge.core.metaphysics.ren_term_point import validate_term_point
+from fatebridge.core.solar_term_runtime import loaded_clock_profile_key
+from fatebridge.core.spk_solar import MODEL_ID as SPK_SOLAR_MODEL
+from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_SOLAR_MODEL
+from fatebridge.utils.civil_clock import format_utc_offset, resolve_civil_clock
+from fatebridge.utils.civil_time import NominalClockLabel, UTCCalendar, utc_calendar
+from fatebridge.utils.errors import EphemerisSourceError
+from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE, resolve_birth_place_context
+from fatebridge.utils.timezones import timezone_rules_metadata
 
 
 def resolve_runyear_birth_zone(
@@ -73,15 +81,14 @@ def resolve_runyear_birth_clock(
     recorded_offset: str | None = None,
 ) -> tuple[datetime, dict[str, Any]]:
     """Validate the birth civil label independently of the analysis clock."""
-    try:
-        civil = resolve_civil_clock(
-            wall, timezone_name, explicit_offset, recorded_offset=recorded_offset
-        )
-    except ValueError as error:
-        raise ValueError(
-            "行年出生民用时刻："
-            + str(error).replace("analysis_utc_offset", "birth_utc_offset")
-        ) from error
+    civil = resolve_civil_clock(
+        wall,
+        timezone_name,
+        explicit_offset,
+        offset_field="birth_utc_offset",
+        timezone_field="birth_timezone",
+        recorded_offset=recorded_offset,
+    )
     offset = civil.utcoffset()
     assert offset is not None
     return civil, {
@@ -95,12 +102,12 @@ def resolve_runyear_birth_clock(
         "was_ambiguous": civil.replace(fold=0).utcoffset()
         != civil.replace(fold=1).utcoffset(),
         "fold": civil.fold,
-        "instant_utc": utc_instant(civil).isoformat(),
+        "instant_utc": utc_calendar(civil).isoformat(),
         "timezone_rules": timezone_rules_metadata(timezone_name),
     }
 
 
-def _term_time_scale(moment: datetime) -> dict[str, Any]:
+def _term_time_scale(moment: datetime | UTCCalendar) -> dict[str, Any]:
     # A repeated civil moment can have new expiry/source metadata even if
     # its numerical UTC/TT conversion is unchanged. Keep the receipt on the
     # same loaded profile as the term solver, not merely on the same moment.
@@ -114,13 +121,12 @@ def _term_time_scale(moment: datetime) -> dict[str, Any]:
 
 
 @lru_cache(maxsize=2048)
-def _term_time_scale_cached(moment: datetime, _profile: str) -> dict[str, Any]:
-    from fatebridge.core.astro.utc_policy import leap_table
+def _term_time_scale_cached(
+    moment: datetime | UTCCalendar, _profile: str
+) -> dict[str, Any]:
 
-    from ..astro.time_scales import ephemeris_time
-
-    epoch = ephemeris_time(moment)
-    table = leap_table()
+    epoch = time_scales.ephemeris_time(moment)
+    table = utc_policy.leap_table()
     return {
         "solver_time_scale": "TT",
         "civil_time_method": epoch.method,
@@ -160,9 +166,7 @@ def require_ren_solar_term(term: SolarTerm) -> None:
     ):
         raise RuntimeError("独立太阳模型不能借用原生星历返回标志")
     if not is_calculated_solar_term(term):
-        raise RuntimeError(
-            "六壬与金口诀需要 swisseph 或具名独立太阳模型的天文交气，不能以线性或未知节气值起课"
-        )
+        raise EphemerisSourceError("solar_term_source_unverified")
     if provider == "swisseph":
         if term.ephemeris_model not in {"swieph", "moshier", "jpl"}:
             raise RuntimeError("六壬与金口诀交气的实际星历模型未知，不能认证计算来源")
@@ -180,9 +184,8 @@ def require_ren_solar_term(term: SolarTerm) -> None:
         ):
             raise RuntimeError("六壬与金口诀交气模型回执与原生返回标志不一致")
     if provider == "jpl_de440":
-        from ..de440_solar import source_receipt
 
-        expected = source_receipt(term.ephemeris_model)
+        expected = de440_solar.source_receipt(term.ephemeris_model)
         details = term.solar_model_details or {}
         # Canonical JSON also distinguishes true/1 and false/0. Compare every
         # source/geometry claim, not just the orbit hash or provider string.
@@ -199,7 +202,7 @@ def require_ren_solar_term(term: SolarTerm) -> None:
         ):
             raise EphemerisSourceError("solar_de440_invalid")
     try:
-        validate_term_point(term.solar_model_details, term.moment, complete=True)
+        validate_term_point(term.solar_model_details, term.calendar, complete=True)
     except EphemerisSourceError:
         raise
     except (TypeError, ValueError, OverflowError) as exc:
@@ -221,8 +224,8 @@ def require_ren_calendar(
     month_general_override: str | None = None,
     analysis_utc_offset: str | None = None,
 ) -> dict[str, Any]:
-    civil = localize_datetime(seed.input_datetime, seed.timezone)
-    clock = seed.corrected_datetime
+    civil = seed.input_datetime
+    clock = seed.clock
     current, following = get_adjacent_solar_terms(civil, seed.timezone)
     month, next_month, _, _ = get_bazi_month_boundaries(civil, seed.timezone)
     spring = next(
@@ -243,38 +246,40 @@ def require_ren_calendar(
         {
             "role": role,
             "name": term.name,
-            "civil_moment": term.moment.isoformat(),
+            **(
+                {"civil_moment": term.calendar.isoformat()}
+                if term.has_defined_local_clock
+                else {
+                    "civil_moment": term.calendar.utc.isoformat(),
+                    "local_clock_status": "undefined",
+                }
+            ),
             "provider": term.resolution_provider,
             "ephemeris_model": term.ephemeris_model,
             "ephemeris_retflags": list(term.ephemeris_retflags),
             "ephemeris_library_version": term.ephemeris_library_version,
             "published_date_reference": published_date_reference(
-                term.name, term.moment
+                term.name, term.calendar
             ),
             **(
                 {"solar_model_details": term.as_dict()["solar_model_details"]}
                 if term.solar_model_details is not None
                 else {}
             ),
+            **_term_time_scale(term.calendar.utc),
         }
         for role, term in term_dependencies
     ]
-    for entry in dependencies:
-        entry.update(_term_time_scale(datetime.fromisoformat(entry["civil_moment"])))
     result: dict[str, Any] = {
         "mode": "civil_instant_checked",
         "civil_datetime": civil.isoformat(),
-        "civil_instant_utc": civil.astimezone(timezone.utc).isoformat(),
+        "civil_instant_utc": utc_calendar(civil).isoformat(),
         "day_hour_clock": "apparent_solar" if seed.applied_true_solar else "civil",
-        "corrected_clock": (
-            clock.replace(tzinfo=None).isoformat()
-            if seed.applied_true_solar
-            else clock.isoformat()
-        ),
+        "corrected_clock": seed.clock_isoformat(),
         "day_boundary": "23:00",
-        "effective_day_date": (
-            clock.date() + timedelta(days=int(clock.hour == 23))
-        ).isoformat(),
+        "effective_day_date": NominalClockLabel(
+            clock.ordinal + int(clock.time_parts[0] == 23), 0
+        ).date_isoformat(),
         "effective_day_ganzhi": "".join(seed.pillars["day"]),
         "year_month_clock": "civil_instant",
         "month_general_clock": (
@@ -300,12 +305,6 @@ def require_ren_calendar(
         "precision_status": "TT_solver_explicit_civil_time_policy_not_full_domain_certification",
         "scope": "23时子初换日为当前软件约定；真太阳钟只用于日时柱，交节仍用民用瞬间；天文求解使用TT，1960年前采用历史UT1标记约定，1960年用SOFA历史UTC偏移与日漂移，1961至1971年用IERS历史UTC漂移，其后用冻结闰秒表；未来闰秒保持末值是假设。小数秒仅数值分辨率，提供者状态不代替独立天文精度核验",
     }
-    from fatebridge.core.aa1996_solar import MODEL_ID as AA1996_SOLAR_MODEL
-    from fatebridge.core.de440_solar import EXTENDED_MODEL_ID as DE440_EXTENDED_MODEL
-    from fatebridge.core.de440_solar import MODEL_ID as DE440_SOLAR_MODEL
-    from fatebridge.core.de441_solar import MODEL_ID as DE441_SOLAR_MODEL
-    from fatebridge.core.spk_solar import MODEL_ID as SPK_SOLAR_MODEL
-    from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_SOLAR_MODEL
 
     if any(
         t["ephemeris_model"]
@@ -332,11 +331,8 @@ def require_ren_calendar(
                 else "per_dependency_named_models"
             ),
             "horizons_frame_equivalence_certified": False,
-            "source_url": (
-                current.solar_model_details["source_url"]
-                if current.solar_model_details
-                else "https://www.astro.com/swisseph/swephprg.htm"
-            ),
+            "source_url": (current.solar_model_details or {}).get("source_url")
+            or result["solar_longitude_definition"]["source_url"],
             "source_section": "Per-boundary model details: ERFA epv00/pfw06/nut00b or native Swiss source",
             "scope": "逐交气列出实际模型；具名解析模型使用ERFA简化VSOP2000、IAU2006/P03与IAU2000B日期真黄道。没有将其更名为Swiss默认IERS2010或认证与Horizons参考系等同；TT替代TDB及作者范围警告见各边界元数据。",
         }
@@ -369,7 +365,7 @@ def require_ren_calendar(
         resolved = resolve_civil_clock(
             civil.replace(tzinfo=None, fold=0), seed.timezone, analysis_utc_offset
         )
-        if utc_instant(resolved) != utc_instant(civil):
+        if utc_calendar(resolved) != utc_calendar(civil):
             raise ValueError("明确UTC偏移与起课实际民用瞬间不一致")
         offset = resolved.utcoffset()
         assert offset is not None
@@ -384,7 +380,7 @@ def require_ren_calendar(
                 != resolved.replace(fold=1).utcoffset()
             ),
             "fold": resolved.fold,
-            "instant_utc": utc_instant(resolved).isoformat(),
+            "instant_utc": utc_calendar(resolved).isoformat(),
             "timezone_rules": timezone_rules_metadata(seed.timezone),
         }
     return result

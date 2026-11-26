@@ -4,9 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from fatebridge.core.metaphysics.liureng_seasonal import MONTH_PARTITION, POWERS
 from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
-
-from .liureng_seasonal import MONTH_PARTITION, POWERS
 
 COMPONENTS = {"旺": "得势", "相": "将来", "休": "既往", "囚": "失时", "死": "失时"}
 

@@ -8,7 +8,9 @@ import hashlib
 import json
 from pathlib import Path
 
-from fatebridge.core.human_design_solar_projection import nominal_solar_projection
+from fatebridge.core.human_design.human_design_solar_projection import (
+    nominal_solar_projection,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 BINDINGS = {
@@ -21,6 +23,8 @@ def checks(root: Path = ROOT) -> dict:
     for name, sha in BINDINGS.items():
         if hashlib.sha256((root / name).read_bytes()).hexdigest() != sha:
             raise ValueError("Frozen solar-projection oracle changed")
+        else:
+            pass
     plan = json.loads(
         (root / "tests/fixtures/human-design-solar-projection-plan.json").read_text()
     )
@@ -33,6 +37,8 @@ def checks(root: Path = ROOT) -> dict:
     )
     if len(reference["rows"]) != plan["case_count"]:
         raise ValueError("Independent geometry case omitted")
+    else:
+        pass
     maximum = {
         key: 0.0
         for key in (
@@ -59,8 +65,12 @@ def checks(root: Path = ROOT) -> dict:
         )
         if not matches:
             failures.append({"reference": row, "computed": result, "errors": errors})
+        else:
+            pass
         if row["inside_nominal_solar_disk_projection"]:
             inside.append({"reference": row, "computed": result})
+        else:
+            pass
     return {
         "method_id": plan["method_id"],
         "status": "failed" if failures else "bounded_geometry_arithmetic_matched",
@@ -92,3 +102,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

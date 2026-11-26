@@ -1,0 +1,249 @@
+{
+  "scope": "Frozen selected-source constants for candidate-blind R26 arithmetic reference, before reference/candidate operations. Natural relationships transcribed from visually read Santhanam printed40 table, consistent with registered current Aiyar table; no claim to adjudicate all alternate doctrines.",
+  "planet_order": [
+    "Sun",
+    "Moon",
+    "Mars",
+    "Mercury",
+    "Jupiter",
+    "Venus",
+    "Saturn"
+  ],
+  "war_planets": [
+    "Mars",
+    "Mercury",
+    "Jupiter",
+    "Venus",
+    "Saturn"
+  ],
+  "deep_exaltation_degrees": {
+    "Sun": "10",
+    "Moon": "33",
+    "Mars": "298",
+    "Mercury": "165",
+    "Jupiter": "95",
+    "Venus": "357",
+    "Saturn": "200"
+  },
+  "moolatrikona_sign_zero_based": {
+    "Sun": 4,
+    "Moon": 1,
+    "Mars": 0,
+    "Mercury": 5,
+    "Jupiter": 8,
+    "Venus": 6,
+    "Saturn": 10
+  },
+  "rasi_lords": [
+    "Mars",
+    "Venus",
+    "Mercury",
+    "Moon",
+    "Sun",
+    "Mercury",
+    "Venus",
+    "Mars",
+    "Jupiter",
+    "Saturn",
+    "Saturn",
+    "Jupiter"
+  ],
+  "sapta_divisions": [
+    1,
+    2,
+    3,
+    7,
+    9,
+    12,
+    30
+  ],
+  "natural_relationships": {
+    "Sun": {
+      "friends": [
+        "Moon",
+        "Mars",
+        "Jupiter"
+      ],
+      "enemies": [
+        "Venus",
+        "Saturn"
+      ]
+    },
+    "Moon": {
+      "friends": [
+        "Sun",
+        "Mercury"
+      ],
+      "enemies": []
+    },
+    "Mars": {
+      "friends": [
+        "Sun",
+        "Moon",
+        "Jupiter"
+      ],
+      "enemies": [
+        "Mercury"
+      ]
+    },
+    "Mercury": {
+      "friends": [
+        "Sun",
+        "Venus"
+      ],
+      "enemies": [
+        "Moon"
+      ]
+    },
+    "Jupiter": {
+      "friends": [
+        "Sun",
+        "Moon",
+        "Mars"
+      ],
+      "enemies": [
+        "Mercury",
+        "Venus"
+      ]
+    },
+    "Venus": {
+      "friends": [
+        "Mercury",
+        "Saturn"
+      ],
+      "enemies": [
+        "Sun",
+        "Moon"
+      ]
+    },
+    "Saturn": {
+      "friends": [
+        "Mercury",
+        "Venus"
+      ],
+      "enemies": [
+        "Sun",
+        "Moon",
+        "Mars"
+      ]
+    }
+  },
+  "temporary_friend_relative_houses": [
+    2,
+    3,
+    4,
+    10,
+    11,
+    12
+  ],
+  "compound_score_names": {
+    "-2": "great_enemy",
+    "-1": "enemy",
+    "0": "neutral",
+    "1": "friend",
+    "2": "great_friend"
+  },
+  "saptavargaja_profiles": {
+    "santhanam_27": {
+      "weights": {
+        "moolatrikona": "45",
+        "own_sign": "30",
+        "great_friend": "20",
+        "friend": "15",
+        "neutral": "10",
+        "enemy": "4",
+        "great_enemy": "2"
+      },
+      "moola_scope": "all_seven_sign_assignments"
+    },
+    "raman_30": {
+      "weights": {
+        "moolatrikona": "45",
+        "own_sign": "30",
+        "great_friend": "45/2",
+        "friend": "15",
+        "neutral": "15/2",
+        "enemy": "15/4",
+        "great_enemy": "15/8"
+      },
+      "moola_scope": "D1_only"
+    }
+  },
+  "drekkana_profiles": {
+    "santhanam_27_6": {
+      "groups": [
+        [
+          "Sun",
+          "Mars",
+          "Jupiter"
+        ],
+        [
+          "Moon",
+          "Venus"
+        ],
+        [
+          "Mercury",
+          "Saturn"
+        ]
+      ],
+      "virupa": "15"
+    },
+    "raman_36": {
+      "groups": [
+        [
+          "Sun",
+          "Mars",
+          "Jupiter"
+        ],
+        [
+          "Mercury",
+          "Saturn"
+        ],
+        [
+          "Moon",
+          "Venus"
+        ]
+      ],
+      "virupa": "15",
+      "unresolved_other_book_summary": "60; retain, not applied"
+    }
+  },
+  "oja_virupa": "15",
+  "kendra_virupa_by_house_mod3": [
+    "60",
+    "30",
+    "15"
+  ],
+  "dig_weak_points": {
+    "Sun": "IC",
+    "Moon": "MC",
+    "Mars": "IC",
+    "Mercury": "DSC",
+    "Jupiter": "DSC",
+    "Venus": "MC",
+    "Saturn": "ASC"
+  },
+  "bimba_arcseconds": {
+    "Mars": "94/10",
+    "Mercury": "66/10",
+    "Jupiter": "1904/10",
+    "Venus": "166/10",
+    "Saturn": "158"
+  },
+  "through_hora": [
+    "nathonnatha_bala",
+    "paksha_bala",
+    "tribhaga_bala",
+    "abda_bala",
+    "masa_bala",
+    "dina_bala",
+    "hora_bala"
+  ],
+  "excluded_prewar": [
+    "ayana_bala",
+    "cheshta_bala",
+    "naisargika_bala",
+    "drik_bala"
+  ],
+  "coefficient_no_source_change": true
+}

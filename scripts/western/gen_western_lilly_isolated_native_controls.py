@@ -28,6 +28,8 @@ def collect(protocol: Path) -> dict:
             flags, offset = swe.get_ayanamsa_ex(case["tt"], swe.FLG_SWIEPH)
             if flags < 0:
                 raise ValueError("Native ayanamsha failed")
+            else:
+                pass
             state, flags = swe.calc(
                 case["tt"],
                 getattr(swe, name.upper()),
@@ -35,6 +37,8 @@ def collect(protocol: Path) -> dict:
             )
             if flags < 0:
                 raise ValueError("Native position failed")
+            else:
+                pass
             positions[name] = {"longitude": state[0], "flags": flags}
         rows.append({**case, "ayanamsha_tt": offset, "positions": positions})
     return {
@@ -61,3 +65,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

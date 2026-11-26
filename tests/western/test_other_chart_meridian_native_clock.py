@@ -1,4 +1,4 @@
-"""Match the actual native house epoch before global path restoration.
+"""Match the explicit TT and the arguments consumed by Swiss X.
 
 These are non-vector geometry probes. A short JPL fixture selects the runtime
 policy; epochs outside its vector interval do not certify planetary coverage.
@@ -48,45 +48,68 @@ def selected_jpl(monkeypatch, tmp_path):
 @pytest.mark.parametrize("jd", [1500000.25, 2000000.25, 2451545.0, 2800000.25])
 @pytest.mark.parametrize("sidereal", [False, True])
 def test_reported_native_clock_exactly_matches_house_backend(
-    selected_jpl, monkeypatch, jd, sidereal
-):
+    selected_jpl, monkeypatch: pytest.MonkeyPatch, jd: float, sidereal: bool
+) -> None:
     swe = runtime.swe
     flags = swe.FLG_SIDEREAL if sidereal else 0
-    actual_houses = swe.houses_ex
-    entry_epochs = []
+    actual_houses = swe.houses_armc
+    actual_calc = swe.calc
+    actual_ayanamsha = swe.get_ayanamsa_ex
+    entries = []
+    ecliptic_epochs = []
+    ayanamsha_observations = []
 
-    def capture_house_entry(tjdut, lat, lon, hsys, flags):
-        # Capture the C house routine's first operand in its actual native
-        # context. preserve_ephemeris_path resets the JPL state on exit, so a
-        # subsequent deltat_ex call is not an equivalent reference context.
-        entry_epochs.append((hsys, tjdut + swe.deltat_ex(tjdut, flags)))
-        return actual_houses(tjdut, lat, lon, hsys, flags)
+    def capture_house_entry(armc, lat, obliquity, hsys, sun_declination):
+        entries.append((hsys, armc, obliquity))
+        return actual_houses(armc, lat, obliquity, hsys, sun_declination)
 
-    monkeypatch.setattr(swe, "houses_ex", capture_house_entry)
+    def capture_calc(tt, body, flags):
+        if body == swe.ECL_NUT:
+            ecliptic_epochs.append(tt)
+        else:
+            pass
+        return actual_calc(tt, body, flags)
+
+    def capture_ayanamsha(tt, flags):
+        outcome = actual_ayanamsha(tt, flags)
+        ayanamsha_observations.append((tt, outcome[1]))
+        return outcome
+
+    monkeypatch.setattr(swe, "houses_armc", capture_house_entry)
+    monkeypatch.setattr(swe, "calc", capture_calc)
+    monkeypatch.setattr(swe, "get_ayanamsa_ex", capture_ayanamsha)
+    expected_tt = jd + 0.001
     with runtime.preserve_ephemeris_path():
         swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
         _, physical = runtime.ephemeris_call("houses_ex", jd, 30.0, 10.0, b"E", flags)
+        entries.clear()
+        ecliptic_epochs.clear()
+        ayanamsha_observations.clear()
         result = native_meridian_houses(
             julian_day_ut1=jd,
-            julian_day_tt=jd + 0.001,
+            julian_day_tt=expected_tt,
             latitude=30.0,
             longitude=10.0,
             sidereal=sidereal,
             physical_angles=physical,
         )
-        assert entry_epochs[-1][0] == b"X"
-        expected_tt = entry_epochs[-1][1]
-        expected_epsilon = swe.calc(expected_tt, swe.ECL_NUT, 0)[0][0]
-        expected_offset = (
-            swe.get_ayanamsa_ex(expected_tt, flags)[1] if sidereal else 0.0
-        )
     profile = result["profile"]
+    assert entries == [(b"X", profile["armc"], profile["true_obliquity"])]
+    assert expected_tt in ecliptic_epochs
+    if sidereal:
+        assert ayanamsha_observations
+        assert set(ayanamsha_observations) == {
+            (expected_tt, profile["ayanamsha_apparent"])
+        }
+    else:
+        assert ayanamsha_observations == []
+        assert profile["ayanamsha_apparent"] == 0.0
     assert profile["native_angle_julian_day_tt"] == expected_tt
-    assert profile["true_obliquity"] == expected_epsilon
-    assert profile["ayanamsha_apparent"] == expected_offset
     for row in result["cusps"]:
         expected = (
-            vector_longitude(row["right_ascension"], expected_epsilon) - expected_offset
+            vector_longitude(row["right_ascension"], profile["true_obliquity"])
+            + profile["source_ecliptic_longitude_origin"]
+            - profile["ayanamsha_apparent"]
         )
         assert abs(signed(row["longitude"], expected)) <= 1e-8
 
@@ -94,8 +117,8 @@ def test_reported_native_clock_exactly_matches_house_backend(
 @HAS_SWE
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_service_meridian_replay_preserves_strict_jpl_physical_sources(
-    selected_jpl, zodiacal
-):
+    selected_jpl, zodiacal: int
+) -> None:
     result = calculate_germany_chart_analysis(
         name="虚构：子午角度历元回归",
         birth_year=2000,

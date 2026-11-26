@@ -1,49 +1,57 @@
+"""Exercise configured runtime behavior and public errors across transports."""
+
 import asyncio
 import json
 import os
+from pathlib import Path
+from threading import get_ident
+from typing import Literal, NoReturn, Protocol
 
 import pytest
-from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from fastmcp import Client
+from fastmcp.client.client import CallToolResult
+from pydantic import BaseModel
 
-import fatebridge.api as api
 import fatebridge.api as api_module
-import fatebridge.application.execution as execution
 import fatebridge.mcp_server as mcp
+from fatebridge.application.execution import execute_tool
+from fatebridge.application.tool_spec import ServiceResult, ToolSpec
 from fatebridge.cli import run as cli_run
+from fatebridge.core import ephemeris_runtime
+from fatebridge.core.execution_context import ExecutionOptions
+from fatebridge.core.predictive import _common as predictive_runtime
+from fatebridge.core.receipt_models import RunMetadata
 from fatebridge.core.requests.bazi import BaziBirthRequest
-from fatebridge.core.requests.western_timing import WesternTimingRequest
+from fatebridge.services import run_metadata
 from fatebridge.utils.errors import error_response_payload, handle_calculation_error
 from fatebridge.utils.formatting import format_json_response
 from fatebridge.utils.runtime import load_runtime_env, parse_allowed_origins
 from tests.fixtures.surface_payloads import REST_POST_CASES, astro_payload
 from tests.fixtures.transports import rest_handler
-
-calculate_birth = rest_handler("bazi_birth")
-calculate_western_timing = rest_handler("western_timing_analysis")
+from tests.support.transports import call_calculation
 
 
 def test_load_runtime_env_reads_local_env_without_overriding_existing_values(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     env_path = tmp_path / ".env"
-    env_path.write_text(
-        "API_PORT=9000\nLOG_LEVEL=debug\nALLOWED_ORIGINS=http://a.test, http://b.test\n",
-        encoding="utf-8",
-    )
+    env_path.write_text("API_PORT=9000\nLOG_LEVEL=debug\n", encoding="utf-8")
 
-    monkeypatch.delenv("API_PORT", raising=False)
+    monkeypatch.setenv("API_PORT", "0")
+    monkeypatch.delenv("API_PORT")
     monkeypatch.setenv("LOG_LEVEL", "WARNING")
 
-    loaded = load_runtime_env(env_path)
+    dotenv_settings = load_runtime_env(env_path)
 
-    assert loaded["API_PORT"] == "9000"
+    assert dotenv_settings["API_PORT"] == "9000"
     assert os.environ["API_PORT"] == "9000"
     assert os.environ["LOG_LEVEL"] == "WARNING"
 
 
-def test_parse_allowed_origins_filters_blank_entries(monkeypatch):
+def test_parse_allowed_origins_filters_blank_entries(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setenv(
         "ALLOWED_ORIGINS", "http://a.test, http://b.test,  ,http://c.test"
     )
@@ -55,7 +63,7 @@ def test_parse_allowed_origins_filters_blank_entries(monkeypatch):
     ]
 
 
-def test_handle_calculation_error_returns_structured_validation_payload():
+def test_handle_calculation_error_returns_structured_validation_payload() -> None:
     payload = handle_calculation_error(ValueError("出生日期无效"), "命理分析计算")
 
     assert payload["error"] == "出生日期无效"
@@ -64,7 +72,7 @@ def test_handle_calculation_error_returns_structured_validation_payload():
     assert payload["retryable"] is False
 
 
-def test_error_response_serialization_preserves_structured_error_metadata():
+def test_error_response_serialization_preserves_structured_error_metadata() -> None:
     payload = {
         "error": "运行依赖缺失",
         "error_code": "dependency_missing",
@@ -85,17 +93,33 @@ def test_error_response_serialization_preserves_structured_error_metadata():
     }
 
 
-def test_calculate_birth_route_executes_service_via_threadpool(monkeypatch):
-    captured = {}
+def test_calculate_birth_route_executes_service_via_threadpool(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The REST route must run the calculation off its event loop thread."""
+    route_thread_id = get_ident()
+    calculation_thread_ids: list[int] = []
 
-    async def fake_run_in_threadpool(func, *args, **kwargs):
-        captured["func"] = func
-        captured["args"] = args
-        captured["kwargs"] = kwargs
-        return func(*args, **kwargs)
+    def observe_calculation_thread(
+        spec: ToolSpec,
+        request: BaseModel,
+        *,
+        options: ExecutionOptions,
+        fields: list[str] | None,
+        include_snapshot_text: bool | None,
+    ) -> ServiceResult:
+        calculation_thread_ids.append(get_ident())
+        assert spec.key == "bazi_birth"
+        assert isinstance(request, BaziBirthRequest) and request.name == "张三"
+        return execute_tool(
+            spec,
+            request,
+            options=options,
+            fields=fields,
+            include_snapshot_text=include_snapshot_text,
+        )
 
-    monkeypatch.setattr(api_module, "run_in_threadpool", fake_run_in_threadpool)
-
+    monkeypatch.setattr(api_module, "execute_tool", observe_calculation_thread)
     request = BaziBirthRequest(
         name="张三",
         gender="男",
@@ -109,46 +133,35 @@ def test_calculate_birth_route_executes_service_via_threadpool(monkeypatch):
         birth_place="上海",
     )
 
-    result = asyncio.run(calculate_birth(request))
+    birth_route = rest_handler("bazi_birth")
+    result = asyncio.run(birth_route(request))
 
     assert result["analysis_type"] == "八字命盘"
-    assert result["run_metadata"]["tool_name"] == "bazi_birth"
+    assert result["run_metadata"]["tool_name"] == "bazi_birth_chart"
     assert result["run_metadata"]["engine"] == "fatebridge-offline"
     assert result["run_metadata"]["run_id"]
     assert result["run_metadata"]["trace_id"]
     assert result["run_metadata"]["generated_at"]
-    from fatebridge.application.execution import execute_tool
-
-    assert captured["func"] is execute_tool
-    assert captured["args"][0].key == "bazi_birth"
-    assert captured["args"][1].name == "张三"
+    (calculation_thread_id,) = calculation_thread_ids
+    assert calculation_thread_id != route_thread_id
 
 
-def test_western_timing_route_uses_structured_service_error_status(monkeypatch):
-    async def fake_run_in_threadpool(func, *args, **kwargs):
-        return {
-            "error": "运行依赖缺失",
-            "error_code": "dependency_missing",
-            "status_code": 503,
-            "retryable": False,
-        }
+def test_western_timing_route_uses_structured_service_error_status(
+    rest: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A missing native dependency must reach the caller as HTTP 503."""
+    monkeypatch.setattr(predictive_runtime, "swe", None)
+    response = rest.post("/api/astrology/timing", json=astro_payload())
 
-    monkeypatch.setattr(api_module, "run_in_threadpool", fake_run_in_threadpool)
-
-    request = WesternTimingRequest(**astro_payload())
-
-    with pytest.raises(HTTPException) as exc_info:
-        asyncio.run(calculate_western_timing(request))
-
-    assert exc_info.value.status_code == 503
-    assert exc_info.value.detail == {
-        "error": "运行依赖缺失",
+    assert response.status_code == 503
+    assert response.json() == {
+        "error": "西占推运与返照分析所需依赖缺失，请检查运行环境",
         "error_code": "dependency_missing",
         "retryable": False,
     }
 
 
-def test_ready_endpoint_reports_required_and_optional_checks():
+def test_ready_endpoint_reports_required_and_optional_checks() -> None:
     api_module._reset_runtime_state_for_tests()
 
     client = TestClient(api_module.app)
@@ -166,7 +179,23 @@ def test_ready_endpoint_reports_required_and_optional_checks():
     assert isinstance(payload["checks"]["western_predictive_runtime"]["ok"], bool)
 
 
-def test_metrics_endpoint_exposes_request_counters():
+def test_ready_requires_available_offline_ephemeris(
+    rest: TestClient, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("FATEBRIDGE_DE441_DIR", str(tmp_path))
+
+    response = rest.get("/ready")
+    assert response.status_code == 200
+    assert response.json()["checks"]["offline_astrology"]["fallback_available"] is False
+
+    monkeypatch.setattr(ephemeris_runtime, "swe", None)
+    response = rest.get("/ready")
+    assert response.status_code == 503
+    assert response.json()["status"] == "not_ready"
+    assert response.json()["checks"]["offline_astrology"]["ok"] is False
+
+
+def test_metrics_endpoint_exposes_request_counters() -> None:
     api_module._reset_runtime_state_for_tests()
 
     client = TestClient(api_module.app)
@@ -195,7 +224,7 @@ def test_metrics_endpoint_exposes_request_counters():
     assert "fatebridge_api_key_daily_quota" not in response.text
 
 
-def test_repeated_public_requests_succeed():
+def test_repeated_public_requests_succeed() -> None:
     api_module._reset_runtime_state_for_tests()
     client = TestClient(api_module.app)
 
@@ -204,7 +233,9 @@ def test_repeated_public_requests_succeed():
         assert response.status_code == 200
 
 
-def test_api_key_auth_rejects_missing_key_when_configured(monkeypatch):
+def test_api_key_auth_rejects_missing_key_when_configured(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     api_module._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api_module,
@@ -218,8 +249,7 @@ def test_api_key_auth_rejects_missing_key_when_configured(monkeypatch):
     response = client.post("/api/divination/gua", json={"query": "乾"})
 
     assert response.status_code == 401
-    # REST errors render as a flat top-level envelope (matching MCP/CLI), not
-    # nested under FastAPI's ``detail`` key.
+    assert response.headers["WWW-Authenticate"] == "APIKey"
     assert response.json() == {
         "error": "缺少或无效的 API key",
         "error_code": "authentication_required",
@@ -227,7 +257,9 @@ def test_api_key_auth_rejects_missing_key_when_configured(monkeypatch):
     }
 
 
-def test_api_key_auth_keeps_ready_endpoint_public(monkeypatch):
+def test_api_key_auth_keeps_ready_endpoint_public(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     api_module._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api_module,
@@ -244,7 +276,9 @@ def test_api_key_auth_keeps_ready_endpoint_public(monkeypatch):
     assert response.json()["status"] == "ready"
 
 
-def test_repeated_authenticated_requests_succeed(monkeypatch):
+def test_repeated_authenticated_requests_succeed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     api_module._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api_module,
@@ -263,93 +297,117 @@ def test_repeated_authenticated_requests_succeed(monkeypatch):
         assert response.status_code == 200
 
 
-def test_value_error_logged_as_warning_without_traceback(caplog):
-    """A user/domain input rejection (ValueError -> 400) must not log a full
-    stack trace; that floods the error log with crash-looking noise."""
-    import logging
-
-    with caplog.at_level(logging.WARNING, logger="fatebridge.utils.errors"):
-        handle_calculation_error(ValueError("未识别的六十四卦名称：ZZZ"), "卦义检索")
-
-    records = [r for r in caplog.records if r.name == "fatebridge.utils.errors"]
-    assert records, "expected a log record"
-    for rec in records:
-        assert rec.levelno == logging.WARNING
-        assert rec.exc_info is None  # no traceback attached
+def test_validation_feedback_is_only_returned_to_the_caller(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    message = "未识别的时区：private-name-ephemeris"
+    payload = handle_calculation_error(ValueError(message), "测试操作")
+    assert payload["error"] == message
+    assert payload["error_code"] == "validation_error"
+    assert "private-name-ephemeris" not in caplog.text
 
 
-def test_internal_error_logged_at_error_with_traceback(caplog):
-    """A genuine internal fault (-> 500) should still log ERROR + traceback."""
-    import logging
-
-    with caplog.at_level(logging.WARNING, logger="fatebridge.utils.errors"):
-        payload = handle_calculation_error(RuntimeError("boom"), "测试操作")
-
+def test_internal_error_logs_type_and_location_without_exception_text(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    try:
+        raise RuntimeError("private-runtime-ephemeris")
+    except RuntimeError as exc:
+        payload = handle_calculation_error(exc, "测试操作")
     assert payload["error_code"] == "internal_error"
-    err_records = [
-        r
-        for r in caplog.records
-        if r.name == "fatebridge.utils.errors" and r.levelno == logging.ERROR
-    ]
-    assert err_records, "expected an ERROR record for an internal fault"
-    assert any(r.exc_info is not None for r in err_records)
+    assert "RuntimeError" in caplog.text
+    assert (
+        "test_internal_error_logs_type_and_location_without_exception_text:"
+        in caplog.text
+    )
+    assert "private-runtime-ephemeris" not in caplog.text
+    assert "private-runtime-ephemeris" not in payload["error"]
+
+
+def test_mcp_outer_argument_validation_returns_structured_feedback(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    async def call() -> CallToolResult:
+        async with Client(mcp.app) as client:
+            return await client.call_tool(
+                "run_calculation",
+                {
+                    "tool": "bazi_birth_chart",
+                    "arguments": "private-mcp-input",
+                    "trace_id": "outer-validation",
+                },
+                raise_on_error=False,
+            )
+
+    result = asyncio.run(call())
+    assert result.is_error
+    payload = result.structured_content
+    assert payload["trace_id"] == "outer-validation"
+    assert payload["error_code"] == "validation_error" and not payload["retryable"]
+    (issue,) = payload["issues"]
+    assert issue["path"] == "arguments" and issue["code"] == "dict_type"
+    assert issue["message"]
+    assert "private-mcp-input" not in caplog.text
+
+
+class RuntimeApproximationCheck(Protocol):
+    def __call__(self, record: ServiceResult, /) -> bool: ...
 
 
 @pytest.mark.parametrize("stage", ["attachment", "validation"])
 def test_metadata_failures_are_internal_and_correlated_in_all_transports(
-    monkeypatch, capsys, caplog, stage
-):
-    from fatebridge.services import run_metadata
+    rest: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    caplog: pytest.LogCaptureFixture,
+    stage: Literal["attachment", "validation"],
+) -> None:
+    """Runtime receipt failures must keep correlation and hide exception text."""
 
-    def fail(*args, **kwargs):
+    def fail(
+        record: ServiceResult,
+        *,
+        tool_name: str | None = None,
+        approximate_record: RuntimeApproximationCheck | None = None,
+    ) -> NoReturn:
+        # note (metadata): Both receipt boundaries accept the full record and neither may expose it on failure.
         raise ValueError("private-server-error")
 
     if stage == "attachment":
-        monkeypatch.setattr(run_metadata, "attach_run_metadata", fail)
+        monkeypatch.setattr(run_metadata, "build_run_metadata", fail)
     else:
-        original = execution.validate_output
+        monkeypatch.setattr(RunMetadata, "model_validate", fail)
 
-        def validate(spec, result, **kwargs):
-            if "run_metadata" in result:
-                raise execution.OutputContractError("private-server-error")
-            return original(spec, result, **kwargs)
-
-        monkeypatch.setattr(execution, "validate_output", validate)
-
-    monkeypatch.setattr(
-        api,
-        "API_KEY_AUTHENTICATOR",
-        api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
-    )
-    inputs = REST_POST_CASES["/api/cn/bazi/birth"]()
+    inputs = REST_POST_CASES["/api/bazi/birth-chart"]()
     controls = {"trace_id": "review-trace", "parent_run_id": "review-parent"}
-    http = TestClient(api.app).post("/api/cn/bazi/birth", json=inputs, params=controls)
+    http = rest.post("/api/bazi/birth-chart", json=inputs, params=controls)
 
-    async def call():
+    async def call() -> CallToolResult:
         async with Client(mcp.app) as client:
-            return await client.call_tool(
-                "bazi_birth", {**inputs, **controls}, raise_on_error=False
+            return await call_calculation(
+                client, "bazi_birth_chart", {**inputs, **controls}, raise_on_error=False
             )
 
     protocol = asyncio.run(call())
-    args = ["bazi_birth"]
+    args = ["bazi_birth_chart"]
     for key, value in {**inputs, **controls}.items():
         if value is not None:
             args += [
                 "--" + key.replace("_", "-"),
                 json.dumps(value) if isinstance(value, bool) else str(value),
             ]
+        else:
+            pass
     code = cli_run(args)
     cli_output = json.loads(capsys.readouterr().out)
     assert http.status_code == 500 and protocol.is_error and code == 1
-    assert json.loads(protocol.content[0].text) == protocol.structured_content
     payloads = [http.json(), protocol.structured_content, cli_output]
     for payload in payloads:
         assert payload["error_code"] == "internal_error"
         assert payload["trace_id"] == controls["trace_id"]
         assert payload["parent_run_id"] == controls["parent_run_id"]
         assert "private" not in json.dumps(payload)
-    # REST conveys status on the HTTP response; MCP also labels the operation.
+    # note (parity): HTTP status and MCP operation labels are transport metadata.
     normalized = [
         {
             key: value
@@ -359,9 +417,5 @@ def test_metadata_failures_are_internal_and_correlated_in_all_transports(
         for payload in payloads
     ]
     assert normalized[0] == normalized[1] == normalized[2]
-    # Sanitization must preserve the actual failure in server-side diagnostics.
-    assert any(
-        record.exc_info and "private-server-error" in str(record.exc_info[1])
-        for record in caplog.records
-        if record.name == "fatebridge.utils.errors"
-    )
+    assert "private-server-error" not in caplog.text
+    assert "ValueError" in caplog.text and ".fail:" in caplog.text

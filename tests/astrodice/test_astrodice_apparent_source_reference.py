@@ -23,7 +23,7 @@ FIXTURE = (
 )
 
 
-def test_dual_chain_product_quotient_and_sqrt_match_closed_derivative():
+def test_dual_chain_product_quotient_and_sqrt_match_closed_derivative() -> None:
     with localcontext() as context:
         context.prec = 70
         t = D(3, 1)
@@ -33,7 +33,7 @@ def test_dual_chain_product_quotient_and_sqrt_match_closed_derivative():
         assert abs(result.v - N(13).sqrt() / 7) < N("1e-65")
 
 
-def test_source_chebyshev_velocity_remains_differentiable_through_epoch_chain():
+def test_source_chebyshev_velocity_remains_differentiable_through_epoch_chain() -> None:
     t = D("0.5", 1)
     x = t * t
     p, dp_dx = clenshaw([D(0), D(0), D(0), D(1)], x)
@@ -44,7 +44,9 @@ def test_source_chebyshev_velocity_remains_differentiable_through_epoch_chain():
 
 
 @pytest.mark.parametrize("index", range(7))
-def test_dual_source_states_match_the_previously_independent_rational_reference(index):
+def test_dual_source_states_match_the_previously_independent_rational_reference(
+    index,
+) -> None:
     row = json.loads((FIXTURE / "geometric-reference.json").read_text())["rows"][index]
     expected = row["states_at_binary64_argument_au_and_au_per_day"]
     body = "Mercury" if index in (0, 1, 3, 5) else "Venus"
@@ -62,13 +64,17 @@ def test_dual_source_states_match_the_previously_independent_rational_reference(
                 assert abs(position.d - velocity.v) < N("1e-85")
 
 
-def test_zero_observer_velocity_keeps_aberration_position_and_spatial_derivative():
+def test_zero_observer_velocity_keeps_aberration_position_and_spatial_derivative() -> (
+    None
+):
     ray = [D(1, 2), D(3, -1), D(4, 5)]
     result = aberration(ray, [D(0), D(0), D(0)])
     assert [(v.v, v.d) for v in result] == [(v.v, v.d) for v in ray]
 
 
-def test_legacy_sample_does_not_certify_light_time_convergence_or_horizons_clock():
+def test_legacy_sample_does_not_certify_light_time_convergence_or_horizons_clock() -> (
+    None
+):
     row = json.loads((FIXTURE / "geometric-reference.json").read_text())["rows"][2]
     result = sample(
         Reader(FIXTURE, 2),
@@ -86,18 +92,20 @@ def test_legacy_sample_does_not_certify_light_time_convergence_or_horizons_clock
 
 
 @pytest.mark.parametrize("impact", [0, 0.01, 1.0])
-def test_profile_knots_are_not_silently_given_a_single_derivative(impact):
+def test_profile_knots_are_not_silently_given_a_single_derivative(
+    impact: float | int,
+) -> None:
     profile = [("1.000", "1.000000"), ("0.010", "0.002767"), ("0.000", "0.000000")]
     with pytest.raises(ValueError):
         enclosed_mass(D(impact, 1), profile)
 
 
-def test_source_reader_cannot_silently_substitute_venus_for_an_unplanned_body():
+def test_source_reader_cannot_silently_substitute_venus_for_an_unplanned_body() -> None:
     with pytest.raises(ValueError, match="body"):
         Reader(FIXTURE, 0).states(D(2451545, 1), "Mars")
 
 
-def test_profile_value_at_a_knot_survives_when_its_derivative_is_unqualified():
+def test_profile_value_at_a_knot_survives_when_its_derivative_is_unqualified() -> None:
     profile = [("1.000", "1.000000"), ("0.010", "0.002767"), ("0.000", "0.000000")]
     value, cell = enclosed_mass(D(0.01), profile, allow_knot_value=True)
     assert value.v == N.from_float(0.002767)
@@ -106,10 +114,14 @@ def test_profile_value_at_a_knot_survives_when_its_derivative_is_unqualified():
         enclosed_mass(D(0.01, 1), profile)
 
 
-def test_reference_derivative_exception_does_not_erase_qualified_position(monkeypatch):
+def test_reference_derivative_exception_does_not_erase_qualified_position(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     def point(*args, seed=1, **kwargs):
         if seed:
             raise ValueError("Known source profile knot")
+        else:
+            pass
         return {"direction_icrf": ["1", "0", "0"]}
 
     monkeypatch.setattr(

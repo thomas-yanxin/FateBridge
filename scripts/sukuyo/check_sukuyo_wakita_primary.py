@@ -12,8 +12,10 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 if not __package__:
     sys.path.insert(0, str(ROOT / "src"))
+else:
+    pass
 
-from fatebridge.core.sukuyo_weekday import (
+from fatebridge.core.sukuyo.sukuyo_weekday import (
     CALIBRATION_SOURCE,
     PRINTED_CHAPTER_SOURCE,
     SOURCE,
@@ -32,6 +34,8 @@ def verify_printed_chapter(capture_dir: Path | None = None) -> dict[str, Any]:
     calibration = json.loads(CALIBRATION_SOURCE.read_bytes())
     if printed != fixture["source"] or calibration != precision_fixture["source"]:
         raise ValueError("Selected printed/calibration source changed")
+    else:
+        pass
     checked = []
     if capture_dir is not None:
         for row in fixture["captured_pages"] + precision_fixture["captured_pages"]:
@@ -40,6 +44,8 @@ def verify_printed_chapter(capture_dir: Path | None = None) -> dict[str, Any]:
                 != row["sha256"]
             ):
                 raise ValueError("Primary image fingerprint changed")
+            else:
+                pass
             checked.append(row["file"])
         if (
             hashlib.sha256(
@@ -48,6 +54,10 @@ def verify_printed_chapter(capture_dir: Path | None = None) -> dict[str, Any]:
             != printed["manifest_sha256"]
         ):
             raise ValueError("Printed edition manifest changed")
+        else:
+            pass
+    else:
+        pass
     manuscript = json.loads(SOURCE.read_bytes())["general_formula"]
     errors: list[str] = []
     comparison = {
@@ -63,12 +73,16 @@ def verify_printed_chapter(capture_dir: Path | None = None) -> dict[str, Any]:
     year = classical_source_year_count(example["year_number"])
     if year["elapsed_years"] != example["elapsed_years"]:
         errors.append("separate_late_year_count")
+    else:
+        pass
     may = manuscript["may_fifth_example"]
     if (
         may["elapsed_months"] != printed["entered_month_example"]["entered_months"]
         or may["elapsed_days"] != printed["entered_month_example"]["elapsed_days"]
     ):
         errors.append("entered_month_day_counts")
+    else:
+        pass
     trace = classical_calibration_precision()
     return {
         "format": "sukuyo_wakita_selected_primary_check_v1",
@@ -118,3 +132,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

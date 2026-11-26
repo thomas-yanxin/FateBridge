@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Optional
+from datetime import MAXYEAR, MINYEAR
+from typing import Annotated
 
 from pydantic import Field, model_validator
+from pydantic_core import PydanticCustomError
 
 from fatebridge.core.requests.base import _DeferredModel
 from fatebridge.utils.birth_input import MAX_PERSON_BIRTH_YEAR, MIN_PERSON_BIRTH_YEAR
@@ -13,11 +15,11 @@ from fatebridge.utils.birth_input import MAX_PERSON_BIRTH_YEAR, MIN_PERSON_BIRTH
 class FateBridgeRequest(_DeferredModel):
     """Request model for individual destiny analysis"""
 
-    name: Optional[str] = Field(
+    name: str | None = Field(
         default="未提供",
         description="姓名（可选，仅用于结果快照中的标识，不参与计算）",
     )
-    gender: Optional[str] = Field(
+    gender: str | None = Field(
         default="未知",
         description=(
             "性别（可选但建议提供：影响大运顺逆排布与部分六亲判断）。"
@@ -33,13 +35,13 @@ class FateBridgeRequest(_DeferredModel):
     birth_day: int = Field(ge=1, le=31, description="Birth day (1-31)")
     birth_hour: int = Field(ge=0, le=23, description="Birth hour (0-23)")
     birth_minute: int = Field(default=0, ge=0, le=59, description="Birth minute (0-59)")
-    birth_place: Optional[str] = Field(
+    birth_place: str | None = Field(
         default="未提供", description="Birth place (optional)"
     )
-    birth_timezone: Optional[str] = Field(
+    birth_timezone: str | None = Field(
         default=None, description="Birth timezone (IANA name or UTC offset)"
     )
-    birth_longitude: Optional[float] = Field(
+    birth_longitude: float | None = Field(
         default=None, ge=-180, le=180, description="Birth longitude (optional)"
     )
     use_true_solar_time: bool = Field(
@@ -55,7 +57,7 @@ class FateBridgeRequest(_DeferredModel):
 class BaziClockRequest(FateBridgeRequest):
     """Known clock components and explicit civil-offset selection for BaZi."""
 
-    birth_utc_offset: Optional[str] = Field(
+    birth_utc_offset: str | None = Field(
         default=None,
         strict=True,
         description=(
@@ -66,7 +68,7 @@ class BaziClockRequest(FateBridgeRequest):
         ),
     )
 
-    birth_second: Optional[int] = Field(
+    birth_second: int | None = Field(
         default=None,
         ge=0,
         le=59,
@@ -84,20 +86,27 @@ class BaziClockRequest(FateBridgeRequest):
             self.birth_second is not None
             and "birth_minute" not in self.model_fields_set
         ):
-            raise ValueError("birth_second需要显式提供birth_minute；不能替未知分钟填0")
+            raise PydanticCustomError(
+                "birth_second_requires_minute",
+                "birth_second需要显式提供birth_minute；不能替未知分钟填0",
+                {"path": "birth_minute", "required_with": "birth_second"},
+            )
         return self
+
+
+AstroBirthYear = Annotated[int, Field(ge=MINYEAR, le=MAXYEAR)]
 
 
 class AstroBirthRequest(_DeferredModel):
     """Base birth request model for offline astrology endpoints."""
 
-    name: Optional[str] = Field(default="未提供", description="Name (optional)")
-    birth_year: int = Field(description="Birth year, e.g., 1990")
+    name: str | None = Field(default="未提供", description="Name (optional)")
+    birth_year: AstroBirthYear = Field(description="Birth year, e.g., 1990")
     birth_month: int = Field(ge=1, le=12, description="Birth month (1-12)")
     birth_day: int = Field(ge=1, le=31, description="Birth day (1-31)")
     birth_hour: int = Field(ge=0, le=23, description="Birth hour (0-23)")
     birth_minute: int = Field(default=0, ge=0, le=59, description="Birth minute (0-59)")
-    birth_timezone: Optional[str] = Field(
+    birth_timezone: str | None = Field(
         default=None,
         description=(
             "Birth timezone (IANA name or UTC offset). Optional: when omitted, "
@@ -110,4 +119,4 @@ class AstroBirthRequest(_DeferredModel):
     )
     birth_longitude: float = Field(ge=-180, le=180, description="Birth longitude")
     birth_latitude: float = Field(ge=-90, le=90, description="Birth latitude")
-    birth_place: Optional[str] = Field(default="未提供", description="Birth place")
+    birth_place: str | None = Field(default="未提供", description="Birth place")

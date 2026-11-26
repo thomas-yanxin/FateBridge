@@ -8,7 +8,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from .common import ELEMENT_CONTROLS, ELEMENT_GENERATES
+from fatebridge.core.metaphysics.common import ELEMENT_CONTROLS, ELEMENT_GENERATES
 
 CATALOG_SHA256 = "dff1e69e6dcbc69ce9ebe4dc53c6e2f2ca785f2dc20eceb5214fb38494ed043b"
 LABELS = {

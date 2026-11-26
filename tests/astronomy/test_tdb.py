@@ -20,7 +20,7 @@ RATE_REFERENCE = json.loads(
 
 
 @pytest.mark.parametrize("row", REFERENCE["rows"])
-def test_shared_geocentric_tdb_matches_uncontracted_original_erfa_c(row):
+def test_shared_geocentric_tdb_matches_uncontracted_original_erfa_c(row) -> None:
     # Installed ERFA's seven stricter-line misses remain in the frozen rows.
     assert tdb.geocentric_tdb_state(row["tt_days"]).seconds == pytest.approx(
         row["uncontracted_original_C_seconds"], rel=0, abs=REFERENCE["gate_seconds"]
@@ -28,7 +28,7 @@ def test_shared_geocentric_tdb_matches_uncontracted_original_erfa_c(row):
 
 
 @pytest.mark.parametrize("row", RATE_REFERENCE["rows"])
-def test_complete_time_derivative_matches_independent_complex_step(row):
+def test_complete_time_derivative_matches_independent_complex_step(row) -> None:
     actual = tdb.geocentric_tdb_state(row["tt_days"]).rate_seconds_per_TT_day
     assert (
         abs(actual - float(row["rate_seconds_per_TT_day"]))
@@ -36,7 +36,9 @@ def test_complete_time_derivative_matches_independent_complex_step(row):
     )
 
 
-def test_tdb_source_identity_failure_is_not_used_as_orbital_data(monkeypatch, tmp_path):
+def test_tdb_source_identity_failure_is_not_used_as_orbital_data(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     folder = tmp_path / "data/astronomy"
     folder.mkdir(parents=True)
     (folder / "geocentric-tdb-v1.json").write_bytes(b"{}")

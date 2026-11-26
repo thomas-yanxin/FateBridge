@@ -12,10 +12,10 @@ from fatebridge.services.metaphysics import (
     calculate_ziwei_rules,
 )
 from fatebridge.utils.birth_input import create_person_info
-from tests.fixtures.transports import mcp_text
+from tests.fixtures.transports import mcp_payload
 
 
-def test_calculate_ziwei_birth_returns_twelve_palaces():
+def test_calculate_ziwei_birth_returns_twelve_palaces() -> None:
     person = create_person_info(
         birth_year=1994,
         birth_month=8,
@@ -73,6 +73,8 @@ def test_calculate_ziwei_birth_returns_twelve_palaces():
             if detail["mutagen"] is not None:
                 assert detail["label"] == f"{detail['name']}{detail['mutagen']}"
                 assert detail["mutagen"] in {"化禄", "化权", "化科", "化忌"}
+            else:
+                pass
 
     snapshot = result["snapshot_text"]
 
@@ -82,7 +84,7 @@ def test_calculate_ziwei_birth_returns_twelve_palaces():
     assert re.search(r"[一-鿿]+\([庙旺得利平不陷]\)", snapshot)
 
 
-def test_calculate_ziwei_birth_supports_selected_export_sections():
+def test_calculate_ziwei_birth_supports_selected_export_sections() -> None:
     person = create_person_info(
         birth_year=1994,
         birth_month=8,
@@ -105,7 +107,7 @@ def test_calculate_ziwei_birth_supports_selected_export_sections():
     assert "[起盘信息]" not in result["snapshot_export"]["export_text"]
 
 
-def test_calculate_ziwei_rules_supports_year_stem_filter():
+def test_calculate_ziwei_rules_supports_year_stem_filter() -> None:
     result = calculate_ziwei_rules(year_stem="甲")
 
     assert result["analysis_type"] == "紫微规则库"
@@ -125,7 +127,7 @@ def test_calculate_ziwei_rules_supports_year_stem_filter():
     assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 
-def test_calculate_ziwei_rules_supports_selected_export_sections():
+def test_calculate_ziwei_rules_supports_selected_export_sections() -> None:
     result = calculate_ziwei_rules(
         year_stem="甲",
         selected_sections=["规则概览", "当前天干四化"],
@@ -140,7 +142,7 @@ def test_calculate_ziwei_rules_supports_selected_export_sections():
     assert "[四化总表]" not in result["snapshot_export"]["export_text"]
 
 
-def test_calculate_liureng_gods_returns_core_sections():
+def test_calculate_liureng_gods_returns_core_sections() -> None:
     result = calculate_liureng_gods(
         analysis_year=2026,
         analysis_month=4,
@@ -166,7 +168,7 @@ def test_calculate_liureng_gods_returns_core_sections():
     assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 
-def test_calculate_liureng_runyear_uses_birth_context():
+def test_calculate_liureng_runyear_uses_birth_context() -> None:
     person = create_person_info(
         birth_year=1994,
         birth_month=8,
@@ -200,7 +202,9 @@ def test_calculate_liureng_runyear_uses_birth_context():
     assert result["runyear"]["ganzhi"] in result["snapshot_text"]
 
 
-def test_liureng_runyear_independent_of_birth_pillars(monkeypatch):
+def test_liureng_runyear_independent_of_birth_pillars(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # 大六壬行年以「分析时刻」起课，不依赖出生四柱的构建。
     # 回归测试：曾有一处废弃的 _build_person_seed(person) 调用，会让非法出生数据
     # 误使整个行年分析报错。即便出生四柱构建失败，行年分析也应正常返回。
@@ -237,7 +241,7 @@ def test_liureng_runyear_independent_of_birth_pillars(monkeypatch):
     assert result["runyear"]["engine"] == "fatebridge-offline"
 
 
-def test_calculate_liureng_gods_distinguishes_liuhe_style():
+def test_calculate_liureng_gods_distinguishes_liuhe_style() -> None:
     # A 六合 relation is not a transmission method. Multiple thieves require
     # 涉害 after 比用, rather than unconditionally being labelled 重审.
     result = calculate_liureng_gods(
@@ -256,7 +260,7 @@ def test_calculate_liureng_gods_distinguishes_liuhe_style():
     assert result["liureng"]["board_style"] == "涉害"
 
 
-def test_calculate_liureng_gods_uses_zeike_transmission_rule():
+def test_calculate_liureng_gods_uses_zeike_transmission_rule() -> None:
     # Independent daliurenpython reference: 辛酉日, +5 sky offset.
     result = calculate_liureng_gods(
         analysis_year=2028,
@@ -277,7 +281,7 @@ def test_calculate_liureng_gods_uses_zeike_transmission_rule():
     ]
 
 
-def test_calculate_liureng_gods_uses_fanyin_transmission_rule():
+def test_calculate_liureng_gods_uses_fanyin_transmission_rule() -> None:
     # 经典返吟条件：月将 与 占时 正好相冲。 2026-01-01 冬至期 月将=丑，故占时需落 未时
     # (丑冲未)，即 13:00-15:00。14:00 = 未时。
     result = calculate_liureng_gods(
@@ -300,7 +304,7 @@ def test_calculate_liureng_gods_uses_fanyin_transmission_rule():
     assert transmissions["final"]["branch"] == "巳"
 
 
-def test_calculate_liureng_gods_uses_fuyin_transmission_rule():
+def test_calculate_liureng_gods_uses_fuyin_transmission_rule() -> None:
     # 六乙日伏吟 first lesson is a genuine 下贼上 (乙木克辰土), so the
     # stem's upper god starts the chain. Initial self-punishment then moves
     # to the branch god; a self-punishing middle moves to its opposing god.
@@ -323,7 +327,7 @@ def test_calculate_liureng_gods_uses_fuyin_transmission_rule():
     ]
 
 
-def test_calculate_liureng_gods_prefers_zeike_over_yaoke():
+def test_calculate_liureng_gods_prefers_zeike_over_yaoke() -> None:
     # 2026-01-01 18:00 (乙亥日酉时, 月将丑) 四课上下存在 下贼上 (课4 未克卯)，
     # 依 贼克优先 于 遥克 原则，应以 重审 为课体，而非 遥克。选用课 index=4。
     result = calculate_liureng_gods(
@@ -342,7 +346,7 @@ def test_calculate_liureng_gods_prefers_zeike_over_yaoke():
     assert result["liureng"]["meta"]["selected_lesson_index"] == 4
 
 
-def test_calculate_liureng_gods_bazhuan_day_still_prefers_direct_clash():
+def test_calculate_liureng_gods_bazhuan_day_still_prefers_direct_clash() -> None:
     # 甲寅日 is an 八专 day, but 酉金克甲木 in the first lesson takes
     # precedence over the no-clash 八专 method.
     result = calculate_liureng_gods(
@@ -358,7 +362,7 @@ def test_calculate_liureng_gods_bazhuan_day_still_prefers_direct_clash():
     assert result["liureng"]["meta"]["selected_lesson_relation"] == "上克下"
 
 
-def test_calculate_liureng_gods_remote_clash_precedes_bieze():
+def test_calculate_liureng_gods_remote_clash_precedes_bieze() -> None:
     result = calculate_liureng_gods(
         analysis_year=2026,
         analysis_month=1,
@@ -376,7 +380,7 @@ def test_calculate_liureng_gods_remote_clash_precedes_bieze():
     ] == ["申", "辰", "子"]
 
 
-def test_calculate_liureng_gods_marks_zhongshen_detail():
+def test_calculate_liureng_gods_marks_zhongshen_detail() -> None:
     # 重审课 = 下贼上。 2026-01-06 09:00 (庚辰日巳时) 月将=丑。四课中 课2 上子下辰为下贼上
     # (辰土克子水)，发用从 课2，整体课体为 "重审"。
     result = calculate_liureng_gods(
@@ -395,7 +399,7 @@ def test_calculate_liureng_gods_marks_zhongshen_detail():
     assert any(pattern["name"] == "重审课" for pattern in result["liureng"]["patterns"])
 
 
-def test_calculate_liureng_gods_first_lesson_uses_stem_element():
+def test_calculate_liureng_gods_first_lesson_uses_stem_element() -> None:
     result = calculate_liureng_gods(
         analysis_year=2026,
         analysis_month=1,
@@ -412,7 +416,7 @@ def test_calculate_liureng_gods_first_lesson_uses_stem_element():
     assert any(pattern["name"] == "重审课" for pattern in result["liureng"]["patterns"])
 
 
-def test_calculate_qimen_analysis_returns_nine_palaces():
+def test_calculate_qimen_analysis_returns_nine_palaces() -> None:
     result = calculate_qimen_analysis(
         analysis_year=2026,
         analysis_month=4,
@@ -495,7 +499,7 @@ def test_calculate_qimen_analysis_returns_nine_palaces():
     assert "值符：天芮在坤二宫" in result["snapshot_text"]
 
 
-def test_calculate_qimen_analysis_applies_qimen_options_and_snapshot_text():
+def test_calculate_qimen_analysis_applies_qimen_options_and_snapshot_text() -> None:
     default_result = calculate_qimen_analysis(
         analysis_year=2028,
         analysis_month=4,
@@ -525,7 +529,7 @@ def test_calculate_qimen_analysis_applies_qimen_options_and_snapshot_text():
     assert "定局所用节气：清明" in optioned_result["snapshot_text"]
 
 
-def test_calculate_qimen_analysis_supports_selected_export_sections():
+def test_calculate_qimen_analysis_supports_selected_export_sections() -> None:
     result = calculate_qimen_analysis(
         analysis_year=2028,
         analysis_month=4,
@@ -549,7 +553,7 @@ def test_calculate_qimen_analysis_supports_selected_export_sections():
     assert "[八宫详解]" not in result["snapshot_export"]["export_text"]
 
 
-def test_calculate_taiyi_analysis_returns_sixteen_palaces():
+def test_calculate_taiyi_analysis_returns_sixteen_palaces() -> None:
     result = calculate_taiyi_analysis(
         analysis_year=2026,
         analysis_month=4,
@@ -577,7 +581,7 @@ def test_calculate_taiyi_analysis_returns_sixteen_palaces():
     assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 
-def test_calculate_liureng_gods_supports_selected_export_sections():
+def test_calculate_liureng_gods_supports_selected_export_sections() -> None:
     result = calculate_liureng_gods(
         analysis_year=2026,
         analysis_month=4,
@@ -601,7 +605,7 @@ def test_calculate_liureng_gods_supports_selected_export_sections():
     assert "[四课]" not in result["snapshot_export"]["export_text"]
 
 
-def test_calculate_taiyi_analysis_supports_selected_export_sections():
+def test_calculate_taiyi_analysis_supports_selected_export_sections() -> None:
     result = calculate_taiyi_analysis(
         analysis_year=2026,
         analysis_month=4,
@@ -620,7 +624,7 @@ def test_calculate_taiyi_analysis_supports_selected_export_sections():
     assert "[太乙盘]" not in result["snapshot_export"]["export_text"]
 
 
-def test_calculate_jinkou_analysis_returns_four_positions():
+def test_calculate_jinkou_analysis_returns_four_positions() -> None:
     result = calculate_jinkou_analysis(
         analysis_year=2026,
         analysis_month=4,
@@ -660,7 +664,7 @@ def test_calculate_jinkou_analysis_returns_four_positions():
     assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 
-def test_calculate_jinkou_analysis_does_not_borrow_liureng_transmission_rule():
+def test_calculate_jinkou_analysis_does_not_borrow_liureng_transmission_rule() -> None:
     result = calculate_jinkou_analysis(
         analysis_year=2026,
         analysis_month=1,
@@ -682,7 +686,7 @@ def test_calculate_jinkou_analysis_does_not_borrow_liureng_transmission_rule():
     )
 
 
-def test_calculate_jinkou_analysis_supports_selected_export_sections():
+def test_calculate_jinkou_analysis_supports_selected_export_sections() -> None:
     result = calculate_jinkou_analysis(
         analysis_year=2026,
         analysis_month=4,
@@ -702,7 +706,7 @@ def test_calculate_jinkou_analysis_supports_selected_export_sections():
     assert "[四位神煞]" not in result["snapshot_export"]["export_text"]
 
 
-def test_ziwei_horoscope_request_requires_target_datetime():
+def test_ziwei_horoscope_request_requires_target_datetime() -> None:
     from fatebridge.core.requests.metaphysics import ZiweiHoroscopeRequest
 
     req = ZiweiHoroscopeRequest(
@@ -735,7 +739,7 @@ def test_ziwei_horoscope_request_requires_target_datetime():
         )
 
 
-def test_calculate_ziwei_horoscope_returns_six_scopes_and_snapshot():
+def test_calculate_ziwei_horoscope_returns_six_scopes_and_snapshot() -> None:
     from fatebridge.services.metaphysics import calculate_ziwei_horoscope
 
     person = create_person_info(
@@ -769,7 +773,7 @@ def test_calculate_ziwei_horoscope_returns_six_scopes_and_snapshot():
     assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 
-def test_calculate_ziwei_horoscope_supports_selected_sections():
+def test_calculate_ziwei_horoscope_supports_selected_sections() -> None:
     from fatebridge.services.metaphysics import calculate_ziwei_horoscope
 
     person = create_person_info(
@@ -792,8 +796,8 @@ def test_calculate_ziwei_horoscope_supports_selected_sections():
     assert "[起盘信息]" not in result["snapshot_export"]["export_text"]
 
 
-def test_ziwei_horoscope_registered_on_all_surfaces():
+def test_ziwei_horoscope_registered_on_all_surfaces() -> None:
     from fatebridge.services.tool_catalog import mcp_specs, rest_specs
 
     assert any(getattr(s, "key", None) == "ziwei_horoscope" for s in rest_specs())
-    assert any(getattr(s, "mcp_name", None) == "ziwei_horoscope" for s in mcp_specs())
+    assert any(s.tool_name == "ziwei_timing" for s in mcp_specs())

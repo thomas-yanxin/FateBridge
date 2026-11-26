@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation.meihua_weather_feasibility import (
+from validation.meihua_weather_feasibility import (
     attainable_binary_skill_bound,
     audit_feasibility_vector,
 )
@@ -20,13 +20,17 @@ def bound(labels):
     return attainable_binary_skill_bound(cases, dict(zip(cases, labels)))
 
 
-def test_preimplementation_enumeration_and_locked_primary_vector_are_preserved():
+def test_preimplementation_enumeration_and_locked_primary_vector_are_preserved() -> (
+    None
+):
     manifest = json.loads((REFERENCE / "manifest.json").read_text())
     assert manifest["implementation_absent"]
     assert not manifest["expected_values_generated_by_production"]
     for name, digest in manifest["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((REFERENCE / name).read_bytes()).hexdigest() == digest
     rows = json.loads((REFERENCE / "brute-force-cases.json").read_text())["cases"]
     assert len(rows) == 119
@@ -38,7 +42,7 @@ def test_preimplementation_enumeration_and_locked_primary_vector_are_preserved()
         )
 
 
-def test_all3279_small_forecast_vectors_against335922_outcome_assignments():
+def test_all3279_small_forecast_vectors_against335922_outcome_assignments() -> None:
     forecasts = outcomes = 0
     for n in range(1, 8):
         for labels in product(["rain", "dry", "abstain"], repeat=n):
@@ -57,7 +61,9 @@ def test_all3279_small_forecast_vectors_against335922_outcome_assignments():
     assert (forecasts, outcomes) == (3279, 335922)
 
 
-def test_existing_primary_cannot_pass_even_if_all49_categorical_forecasts_are_right():
+def test_existing_primary_cannot_pass_even_if_all49_categorical_forecasts_are_right() -> (
+    None
+):
     saved = json.loads((REFERENCE / "primary273-vector.json").read_text())
     result = attainable_binary_skill_bound(
         saved["cohort_case_ids"], saved["forecast_labels"]
@@ -74,7 +80,7 @@ def test_existing_primary_cannot_pass_even_if_all49_categorical_forecasts_are_ri
     assert not result["observed_outcomes_used"]
 
 
-def test_coverage_alone_does_not_make_one_class_forecasts_competitive():
+def test_coverage_alone_does_not_make_one_class_forecasts_competitive() -> None:
     result = bound(["rain"] * 365)
     assert result["maximum_possible_correct_credit"] == 365
     assert result["exact_maximum_margin_over_better_constant"] == 0
@@ -84,7 +90,7 @@ def test_coverage_alone_does_not_make_one_class_forecasts_competitive():
     ]
 
 
-def test_two_classes_and_high_coverage_are_possibility_not_a_probability():
+def test_two_classes_and_high_coverage_are_possibility_not_a_probability() -> None:
     result = bound(["rain", "dry"])
     assert result["exact_maximum_margin_over_better_constant"] == 1
     assert result["passing_is_possible_for_some_complete_binary_outcomes"]
@@ -92,7 +98,7 @@ def test_two_classes_and_high_coverage_are_possibility_not_a_probability():
     assert result["supplied_cohort_seal_authenticated"] is False
 
 
-def test_verified_vector_integrity_does_not_turn_impossible_score_into_a_pass():
+def test_verified_vector_integrity_does_not_turn_impossible_score_into_a_pass() -> None:
     manifest = json.loads((REFERENCE / "manifest.json").read_text())
     report = audit_feasibility_vector(
         REFERENCE / "primary273-vector.json",
@@ -104,7 +110,9 @@ def test_verified_vector_integrity_does_not_turn_impossible_score_into_a_pass():
     assert bound["cannot_strictly_beat_better_constant_for_any_complete_outcome_vector"]
 
 
-def test_vector_tampering_is_rejected_before_any_feasibility_calculation(tmp_path):
+def test_vector_tampering_is_rejected_before_any_feasibility_calculation(
+    tmp_path: Path,
+) -> None:
     p = tmp_path / "vector.json"
     p.write_bytes((REFERENCE / "primary273-vector.json").read_bytes())
     expected = hashlib.sha256(p.read_bytes()).hexdigest()
@@ -113,7 +121,9 @@ def test_vector_tampering_is_rejected_before_any_feasibility_calculation(tmp_pat
         audit_feasibility_vector(p, expected_sha256=expected)
 
 
-def test_duplicate_json_keys_cannot_silently_replace_an_unfavorable_label(tmp_path):
+def test_duplicate_json_keys_cannot_silently_replace_an_unfavorable_label(
+    tmp_path: Path,
+) -> None:
     p = tmp_path / "vector.json"
     p.write_text(
         '{"cohort_case_ids":["a","b"],'
@@ -126,7 +136,7 @@ def test_duplicate_json_keys_cannot_silently_replace_an_unfavorable_label(tmp_pa
 
 
 @pytest.mark.parametrize("commitment", [None, True, "A" * 64, "0" * 63])
-def test_invalid_commitment_cannot_be_treated_as_a_verified_input(commitment):
+def test_invalid_commitment_cannot_be_treated_as_a_verified_input(commitment) -> None:
     with pytest.raises(ValueError, match="recorded lowercase SHA-256"):
         audit_feasibility_vector(
             REFERENCE / "primary273-vector.json", expected_sha256=commitment
@@ -151,6 +161,6 @@ def test_invalid_commitment_cannot_be_treated_as_a_verified_input(commitment):
 )
 def test_incomplete_duplicate_or_unknown_inputs_do_not_get_a_feasibility_claim(
     cases, labels
-):
+) -> None:
     with pytest.raises(ValueError):
         attainable_binary_skill_bound(cases, labels)

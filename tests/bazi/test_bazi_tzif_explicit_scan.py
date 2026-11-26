@@ -1,4 +1,4 @@
-"""Index only hash-bound explicit TZif periods; preserve full-scan fallback."""
+"""Check hash-bound TZif indexing and the loaded-clock fallback."""
 
 import hashlib
 import io
@@ -14,8 +14,7 @@ from fatebridge.services.dayun_boundary_clock_events import (
 )
 from fatebridge.utils import timezones
 from fatebridge.utils.clock_events import _clock_changes_near_day, clock_scan_bounds
-from fatebridge.utils.errors import EphemerisSourceError
-from fatebridge.utils.tzif_transitions import explicit_transition_seconds
+from fatebridge.utils.tzif_transitions import read_tzif_transitions
 
 ROOT = Path(__file__).resolve().parents[2]
 STUDY = ROOT / "tests/data/bazi/tzif"
@@ -29,7 +28,23 @@ def serial(rows):
     ]
 
 
-def test_full597_explicit_tables_equal_frozen_stdlib_reference():
+@pytest.mark.parametrize(
+    "zone,wall,reason",
+    [
+        ("Africa/Monrovia", datetime(1972, 1, 7, 0, 44), "跳时区间"),
+        ("Pacific/Kwajalein", datetime(1969, 9, 30, 1, 30), "重复区间"),
+    ],
+)
+def test_standard_offset_changes_have_a_civil_clock_diagnostic(
+    zone: str, wall, reason: str
+) -> None:
+    local = wall.replace(tzinfo=timezones.parse_timezone_name(zone))
+    assert local.dst() == local.replace(fold=1).dst() == timedelta(0)
+    with pytest.raises(ValueError, match=f"时区偏移变动造成的{reason}"):
+        timezones.validate_local_clock(local)
+
+
+def test_full597_explicit_tables_equal_frozen_stdlib_reference() -> None:
     path = STUDY / "reference-first.json"
     assert (
         hashlib.sha256(path.read_bytes()).hexdigest()
@@ -40,13 +55,15 @@ def test_full597_explicit_tables_equal_frozen_stdlib_reference():
     for key, record in REFERENCE["tables"].items():
         data = (STUDY / "all-declared-tzif" / key).read_bytes()
         assert hashlib.sha256(data).hexdigest() == record["tzif_sha256"]
-        assert explicit_transition_seconds(data) == tuple(record["transition_seconds"])
+        index = read_tzif_transitions(data)
+        assert index is not None
+        assert index.seconds == tuple(record["transition_seconds"])
 
 
 @pytest.mark.parametrize(
     "record", REFERENCE["exhaustive_days"], ids=lambda r: r["zone"]
 )
-def test_day_and_nine_day_events_equal_complete_original_scans(record):
+def test_day_and_nine_day_events_equal_complete_original_scans(record) -> None:
     zone = timezones.parse_timezone_name(record["zone"])
     day = date.fromisoformat(record["day"])
     assert serial(_clock_changes_near_day(zone, day)) == record["near_changes"]
@@ -56,7 +73,9 @@ def test_day_and_nine_day_events_equal_complete_original_scans(record):
     )
 
 
-def test_index_is_complete_for_every_registered_explicit_transition(monkeypatch):
+def test_index_is_complete_for_every_registered_explicit_transition(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # The reference describes these frozen bytes, not a later installed IANA revision.
     monkeypatch.setattr(
         timezones,
@@ -75,6 +94,8 @@ def test_index_is_complete_for_every_registered_explicit_transition(monkeypatch)
             values = record["transition_seconds"]
             if not values:
                 continue
+            else:
+                pass
             zone = timezones.parse_timezone_name(key)
             # No intermediate cache parsing: even near cache capacity the exact
             # loaded object is kept. Each candidate is checked on both sides.
@@ -94,7 +115,7 @@ def test_index_is_complete_for_every_registered_explicit_transition(monkeypatch)
         timezones._parse_timezone_name_cached.cache_clear()
 
 
-def test_bounds_and_loaded_object_identity_never_infer_footer_or_foreign_data():
+def test_index_scope_checks_endpoints_tail_rules_and_loaded_object_identity() -> None:
     key = "America/New_York"
     zone = timezones.parse_timezone_name(key)
     low, high = clock_scan_bounds(date(2020, 3, 8))
@@ -107,19 +128,28 @@ def test_bounds_and_loaded_object_identity_never_infer_footer_or_foreign_data():
     )
     assert timezones.timezone_transition_candidates(foreign, low, high) is None
     future_low, future_high = clock_scan_bounds(date(2100, 3, 14))
-    assert (
-        timezones.timezone_transition_candidates(zone, future_low, future_high) is None
+    assert timezones.timezone_transition_candidates(zone, future_low, future_high) == (
+        datetime(2100, 3, 14, 7, tzinfo=timezone.utc),
     )
     assert timezones.timezone_transition_candidates(timezone.utc, low, high) is None
     assert (
         timezones.timezone_transition_candidates(
             timezones.parse_timezone_name("Etc/GMT"), low, high
         )
-        is None
+        == ()
     )
+    recife = timezones.parse_timezone_name("America/Recife")
+    last = datetime(2002, 2, 17, 2, tzinfo=timezone.utc)
+    upper = last + timedelta(seconds=2)
+    assert timezones.timezone_transition_candidates(
+        recife, last - timedelta(microseconds=1), upper
+    ) == (last,)
+    assert timezones.timezone_transition_candidates(recife, last, upper) == ()
 
 
-def test_footer_window_and_foreign_object_call_the_original_scanner(monkeypatch):
+def test_footer_window_and_foreign_object_call_the_original_scanner(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # Force exactly the production fallback branch, with a counting tzinfo
     # facade. This detects accidental coarser endpoint sampling.
     from datetime import tzinfo
@@ -141,13 +171,16 @@ def test_footer_window_and_foreign_object_call_the_original_scanner(monkeypatch)
     assert zone.calls >= 86401
 
 
-def test_current_rules_drift_still_fails_before_index_use(monkeypatch):
+def test_transition_index_uses_the_same_loaded_rules_without_a_second_read(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     zone = timezones.parse_timezone_name("America/New_York")
     low, high = clock_scan_bounds(date(2020, 3, 8))
-    original = timezones._timezone_bytes
-    monkeypatch.setattr(
-        timezones, "_timezone_bytes", lambda key: original(key) + b"changed"
-    )
-    with pytest.raises(EphemerisSourceError) as error:
-        timezones.timezone_transition_candidates(zone, low, high)
-    assert error.value.reason == "timezone_rules_changed"
+    expected = timezones.timezone_transition_candidates(zone, low, high)
+
+    def fail_on_read(key):
+        raise AssertionError("Loaded timezone rules must not reread TZif bytes")
+
+    monkeypatch.setattr(timezones, "_timezone_bytes", fail_on_read)
+    assert expected
+    assert timezones.timezone_transition_candidates(zone, low, high) == expected

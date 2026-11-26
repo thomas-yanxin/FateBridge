@@ -2,9 +2,17 @@
 
 import math
 from fractions import Fraction
-from typing import Any, Dict, List
+from typing import Any, TypedDict
 
 from fatebridge.core.astro.geometry import _sign_name
+
+
+class ThirteenSectorRecord(TypedDict):
+    sector: int
+    cusp_longitude: float
+    end_longitude: float
+    width_degrees: float
+    sign: str
 
 
 def _display_degree(value: Fraction) -> float:
@@ -13,22 +21,30 @@ def _display_degree(value: Fraction) -> float:
     return math.nextafter(display, -math.inf) if Fraction(display) > value else display
 
 
-def thirteen_sectors(ascendant: float) -> List[Dict[str, Any]]:
-    anchor = Fraction(ascendant) % 360
-    width = Fraction(360, 13)
-    return [
-        {
-            "sector": number + 1,
-            "cusp_longitude": _display_degree((anchor + number * width) % 360),
-            "end_longitude": _display_degree((anchor + (number + 1) * width) % 360),
-            "width_degrees": float(width),
-            "sign": _sign_name(_display_degree((anchor + number * width) % 360)),
-        }
-        for number in range(13)
-    ]
+def thirteen_sectors(ascendant: float) -> list[ThirteenSectorRecord]:
+    anchor_degrees = Fraction(ascendant) % 360
+    width_degrees = Fraction(360, 13)
+    sectors: list[ThirteenSectorRecord] = []
+    for sector_index in range(13):
+        cusp_longitude = _display_degree(
+            (anchor_degrees + sector_index * width_degrees) % 360
+        )
+        end_longitude = _display_degree(
+            (anchor_degrees + (sector_index + 1) * width_degrees) % 360
+        )
+        sectors.append(
+            {
+                "sector": sector_index + 1,
+                "cusp_longitude": cusp_longitude,
+                "end_longitude": end_longitude,
+                "width_degrees": float(width_degrees),
+                "sign": _sign_name(cusp_longitude),
+            }
+        )
+    return sectors
 
 
-def sector_profile(ascendant: float) -> Dict[str, Any]:
+def sector_profile(ascendant: float) -> dict[str, Any]:
     return {
         "ruleset_id": "fatebridge_equal13_v1",
         "author": "FateBridge",

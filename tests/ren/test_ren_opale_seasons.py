@@ -19,7 +19,7 @@ AUDIT = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(AUDIT)
 
 
-def test_complete_source_annotations_and_overlapping_denominators():
+def test_complete_source_annotations_and_overlapping_denominators() -> None:
     ref = AUDIT.reference()
     assert {k: len(v) for k, v in ref.items()} == {
         "seasons": 504,
@@ -42,8 +42,8 @@ def test_complete_source_annotations_and_overlapping_denominators():
 @pytest.mark.parametrize("name", AUDIT.FROZEN)
 @pytest.mark.parametrize("change", ["source", "freeze", "inventory"])
 def test_frozen_references_reject_edits_resealing_and_extra_files(
-    tmp_path, name, change
-):
+    tmp_path: Path, name, change: str
+) -> None:
     target = tmp_path / name
     shutil.copytree(AUDIT.FIXTURES / name, target)
     path = (
@@ -62,7 +62,7 @@ def test_frozen_references_reject_edits_resealing_and_extra_files(
 @pytest.mark.parametrize(
     "change", ["omitted", "duplicate", "wrong_scale", "wrong_year", "aware_label"]
 )
-def test_raw_seasons_refuse_a_pruned_or_relabelled_cohort(change):
+def test_raw_seasons_refuse_a_pruned_or_relabelled_cohort(change: str) -> None:
     data = json.loads(
         (AUDIT.FIXTURES / "ren_opale_seasons_v1/historical-ut1.json").read_text()
     )
@@ -91,7 +91,9 @@ def synthetic_clock(moment):
 @pytest.mark.parametrize(
     "seconds, passed", [(1, True), (-1, True), (1.000001, False), (-1.000001, False)]
 )
-def test_original_one_second_threshold_and_utc_offset_are_literal(seconds, passed):
+def test_original_one_second_threshold_and_utc_offset_are_literal(
+    seconds, passed: bool
+) -> None:
     case = next(r for r in AUDIT.reference()["seasons"] if r["timescale"] == "UTC")
     utc = datetime.fromisoformat(case["published_label"]).replace(tzinfo=timezone.utc)
     moment = (utc + timedelta(seconds=seconds)).astimezone(timezone(timedelta(hours=8)))
@@ -110,7 +112,9 @@ def test_original_one_second_threshold_and_utc_offset_are_literal(seconds, passe
 @pytest.mark.parametrize(
     "route, count", [("seasons", 504), ("documented_tt", 244), ("source_clock_tt", 288)]
 )
-def test_missing_production_events_keep_the_full_declared_denominator(route, count):
+def test_missing_production_events_keep_the_full_declared_denominator(
+    route: str, count: int
+) -> None:
     report = AUDIT.comparison(AUDIT.reference()[route], {}, route, synthetic_clock)
     assert report["expected_count"] == count and report["compared_count"] == 0
     assert len(report["calculation_errors"]) == count
@@ -119,7 +123,7 @@ def test_missing_production_events_keep_the_full_declared_denominator(route, cou
 
 
 @pytest.mark.parametrize("kind", ["naive", "fallback", "nonfinite", "exception"])
-def test_unusable_calculations_remain_errors(kind):
+def test_unusable_calculations_remain_errors(kind: str) -> None:
     cases = AUDIT.reference()["source_clock_tt"][:1]
     case = cases[0]
     actual = {
@@ -132,9 +136,13 @@ def test_unusable_calculations_remain_errors(kind):
     def convert(moment):
         if kind == "exception":
             raise RuntimeError("clock unavailable")
+        else:
+            pass
         clock = synthetic_clock(moment)
         if kind == "nonfinite":
             clock.jd_tt = float("nan")
+        else:
+            pass
         return clock
 
     report = AUDIT.comparison(cases, actual, "source_clock_tt", convert)
@@ -142,7 +150,7 @@ def test_unusable_calculations_remain_errors(kind):
     assert not report["all_comparisons_passed"]
 
 
-def test_later_tt_diagnostics_cannot_overwrite_the_original_minute_gate():
+def test_later_tt_diagnostics_cannot_overwrite_the_original_minute_gate() -> None:
     pmo = {
         "expected_count": 3024,
         "minute_criterion": {"max_absolute_difference_seconds": 30},

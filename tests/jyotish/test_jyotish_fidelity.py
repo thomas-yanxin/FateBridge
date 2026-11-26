@@ -1,8 +1,14 @@
 """Faithfulness regressions for actual uncertainty and conditional strengths."""
 
+import copy
+
+import pytest
+
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish import build_india
+from fatebridge.core.jyotish.jyotish import build_india
+from fatebridge.core.jyotish.jyotish_evidence import strength_context
 from fatebridge.services.astrology import calculate_core_chart_analysis
+from fatebridge.services.jyotish import calculate_vimshottari
 
 CUSP = dict(
     birth_year=1990,
@@ -16,7 +22,7 @@ CUSP = dict(
 )
 
 
-def test_real_moon_star_and_pada_variants_survive_with_only_d1_exported():
+def test_real_moon_star_and_pada_variants_survive_with_only_d1_exported() -> None:
     result = build_india(
         build_astro_birth_info(**CUSP), divisions=[], birth_time_uncertainty_minutes=2
     )
@@ -31,7 +37,7 @@ def test_real_moon_star_and_pada_variants_survive_with_only_d1_exported():
     )
 
 
-def test_native_reading_does_not_present_nominal_moon_star_as_unique_for_the_interval():
+def test_native_result_exposes_moon_star_and_pada_alternatives() -> None:
     result = calculate_core_chart_analysis(
         **CUSP,
         chart_variant="india_chart",
@@ -39,38 +45,32 @@ def test_native_reading_does_not_present_nominal_moon_star_as_unique_for_the_int
         birth_time_uncertainty_minutes=2,
     )
     assert "名义" in result["summary"]
-    emotional = result["interpretation"]["vedic"]["emotional_style"]
-    assert "Magha" in emotional and "Purva Phalguni" in emotional
-    assert "第4足" in emotional and "第1足" in emotional
-
-
-import copy
-
-import pytest
-
-from fatebridge.core.jyotish_evidence import strength_context, strength_text
-from fatebridge.services.jyotish import calculate_vimshottari
+    basis = result["india"]["reading_basis"]
+    assert basis["options_basis"] == "sampled_grid"
+    assert {(row["name"], row["pada"]) for row in basis["moon_nakshatra_options"]} >= {
+        ("Magha", 4),
+        ("Purva Phalguni", 1),
+    }
 
 
 @pytest.mark.parametrize(
-    "values,summary,status,word",
+    "values,summary,status",
     [
-        ((10.0, 10.0), 10.0, "computed_consensus", "一致"),
-        ((10.0, 20.0), None, "conditional_results", "不能当作零或缺项"),
-        ((None, None), None, "unavailable", "不能补成零"),
-        ((10.0, None), None, "partially_computed", "1/2"),
+        ((10.0, 10.0), 10.0, "computed_consensus"),
+        ((10.0, 20.0), None, "conditional_results"),
+        ((None, None), None, "unavailable"),
+        ((10.0, None), None, "partially_computed"),
     ],
 )
-def test_strength_prose_distinguishes_consensus_conditions_missing_and_partial(
-    values, summary, status, word
-):
+def test_strength_context_distinguishes_consensus_conditions_missing_and_partial(
+    values, summary: float | None, status: str
+) -> None:
     component = {
         "summary": {"Mercury": summary},
         "scenarios": {k: {"Mercury": v} for k, v in zip(["a", "b"], values)},
     }
     context = strength_context("kala_bala", "Mercury", component)
     assert context["value_status"] == status
-    assert word in strength_text(context)
     assert context["computed_scenario_count"] == sum(v is not None for v in values)
     assert (
         context["scenarios"][0]["fact_path"]
@@ -78,7 +78,7 @@ def test_strength_prose_distinguishes_consensus_conditions_missing_and_partial(
     )
 
 
-def test_global_component_gap_does_not_misclassify_a_computed_ruler():
+def test_global_component_gap_does_not_misclassify_a_computed_ruler() -> None:
     component = {
         "status": "partial_components",
         "summary": {"Sun": 10.0, "Mercury": None},
@@ -97,7 +97,7 @@ def test_global_component_gap_does_not_misclassify_a_computed_ruler():
     ]
 
 
-def test_explanation_refuses_a_summary_that_contradicts_its_own_branches():
+def test_explanation_refuses_a_summary_that_contradicts_its_own_branches() -> None:
     for summary in [0, 10.0, 30.0]:
         component = {
             "summary": {"Sun": summary},
@@ -115,8 +115,8 @@ def test_explanation_refuses_a_summary_that_contradicts_its_own_branches():
     ],
 )
 def test_omitted_range_does_not_turn_into_measured_stability(
-    uncertainty, mode, expected_status
-):
+    uncertainty: int | None, mode: str, expected_status: str
+) -> None:
     result = build_india(
         build_astro_birth_info(**CUSP),
         divisions=[],
@@ -128,9 +128,13 @@ def test_omitted_range_does_not_turn_into_measured_stability(
     assert basis["reference"] == "nominal_birth_instant"
     if uncertainty == 0:
         assert result["birth_time_sensitivity"]["sample_count"] == 1
+    else:
+        pass
 
 
-def test_vimshottari_does_not_silently_omit_candidate_births_later_than_target():
+def test_vimshottari_does_not_silently_omit_candidate_births_later_than_target() -> (
+    None
+):
     result = calculate_vimshottari(
         **CUSP,
         divisions=[],
@@ -155,11 +159,11 @@ def test_vimshottari_does_not_silently_omit_candidate_births_later_than_target()
     assert "名义生时" in result["summary"]
 
 
-def test_all_embedded_branch_claims_verify_against_the_same_original_run():
+def test_all_embedded_branch_claims_verify_against_the_same_original_run() -> None:
     from fatebridge.application.execution import execute_tool
     from fatebridge.core.execution_context import ExecutionOptions
     from fatebridge.services.tool_catalog import CATALOG
-    from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
+    from validation.claims import CalculationClaim, verify_calculation_claims
 
     spec = next(s for s in CATALOG if s.key == "astro_india")
     body = execute_tool(
@@ -178,6 +182,8 @@ def test_all_embedded_branch_claims_verify_against_the_same_original_run():
             context = factor.get("calculation_context")
             if not context:
                 continue
+            else:
+                pass
             for row in [*context["scenarios"], *context["constraints"]]:
                 claims.append(
                     CalculationClaim(
@@ -195,7 +201,9 @@ def test_all_embedded_branch_claims_verify_against_the_same_original_run():
     assert verify_calculation_claims(body, tampered)["status"] == "rejected"
 
 
-def test_unselected_model_is_unavailable_without_claiming_birth_data_is_missing():
+def test_unselected_model_is_unavailable_without_claiming_birth_data_is_missing() -> (
+    None
+):
     component = {
         "summary": {"Mars": None},
         "scenarios": {"a": {"Mars": None}},
@@ -216,22 +224,28 @@ def test_unselected_model_is_unavailable_without_claiming_birth_data_is_missing(
             "value": "mean_model_unadjudicated",
         },
     ]
-    assert "不一概当成用户资料不足" in strength_text(context)
 
 
 @pytest.mark.native_engine_fault
 def test_star_change_alone_marks_sensitivity_even_if_discrete_strengths_are_fixed(
-    monkeypatch,
-):
-    from fatebridge.core import jyotish
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from fatebridge.core.jyotish import jyotish
 
     birth = build_astro_birth_info(**CUSP)
-    fixed = build_india(birth, divisions=[])["strengths"]["sthana_bala"]
-    monkeypatch.setattr(
-        jyotish,
-        "calculate_sthana",
-        lambda raw, profile, drekkana_profile: copy.deepcopy(fixed),
-    )
+    original = jyotish.resolve_sthana
+    fixed = None
+
+    def fixed_sthana(longitudes, ascendant, profile, drekkana_profile):
+        nonlocal fixed
+        if fixed is None:
+            fixed = original(longitudes, ascendant, profile, drekkana_profile)
+        else:
+            pass
+        return fixed
+
+    monkeypatch.setattr(jyotish, "resolve_sthana", fixed_sthana)
+    build_india(birth, divisions=[])
     result = build_india(birth, divisions=[], birth_time_uncertainty_minutes=2)
     sensitivity = result["birth_time_sensitivity"]
     assert not any(sensitivity["alternatives"].values())

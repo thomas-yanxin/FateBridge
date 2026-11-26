@@ -43,13 +43,19 @@ def geometries(branches):
         seats = [i for i, b in enumerate(branches) if b in group]
         if set(branches[i] for i in seats) == set(group):
             rows.append((kind, target, tuple(ORDER[i] for i in seats)))
+        else:
+            pass
     for pair in combinations(range(4), 2):
         target = PAIRS.get(frozenset(branches[i] for i in pair))
         if target is not None:
             rows.append(("六合", target, tuple(ORDER[i] for i in pair)))
+        else:
+            pass
     for group, peak, target in HALF:
         for pair in combinations(range(4), 2):
             observed = set(branches[i] for i in pair)
             if len(observed) == 2 and peak in observed and observed < set(group):
                 rows.append(("半合", target, tuple(ORDER[i] for i in pair)))
+            else:
+                pass
     return rows

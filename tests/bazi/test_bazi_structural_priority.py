@@ -15,7 +15,7 @@ def evaluate(text):
     )
 
 
-def test_original_gs12_root_capacity_is_not_vetoed_by_weighted_share():
+def test_original_gs12_root_capacity_is_not_vetoed_by_weighted_share() -> None:
     # 1947 Ren commentary, PDF209: 火長夏天，旺之極矣. The retained
     # source label and four pillars are unchanged; no biography is scored.
     result = evaluate("癸丑 戊午 丙午 壬辰")
@@ -27,7 +27,7 @@ def test_original_gs12_root_capacity_is_not_vetoed_by_weighted_share():
     assert result["strength_level"] == "强"
 
 
-def test_root_override_really_requires_command_and_multiple_surviving_roots():
+def test_root_override_really_requires_command_and_multiple_surviving_roots() -> None:
     for control in ("癸丑 辛酉 丙午 壬辰", "癸丑 戊午 丙子 壬辰"):
         result = evaluate(control)
         assert (
@@ -36,6 +36,6 @@ def test_root_override_really_requires_command_and_multiple_surviving_roots():
         )
 
 
-def test_month_command_alone_does_not_override_a_controlling_front():
+def test_month_command_alone_does_not_override_a_controlling_front() -> None:
     result = evaluate("辛酉 辛卯 甲申 辛酉")
     assert result["strength_level"] != "强"

@@ -6,14 +6,13 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core import ephemeris_runtime as e
-from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.astro.time_scales import datetime_from_tt
-from fatebridge.core.jyotish import positions
-from fatebridge.core.jyotish_strength import physical_state
-from tests.jyotish.test_jyotish_sources import (  # noqa: F401
+from fatebridge.core.jyotish.jyotish import positions
+from fatebridge.core.jyotish.jyotish_strength import physical_state
+from tests.unit_test.fixtures.jyotish_sources import (  # noqa: F401
     birth,
     data18,
     edge_birth,
+    from_tt,
     restore_runtime,
 )
 
@@ -24,25 +23,8 @@ REF = json.loads(
 )
 
 
-def from_tt(jd):
-    moment = datetime_from_tt(jd)
-    return build_astro_birth_info(
-        birth_year=moment.year,
-        birth_month=moment.month,
-        birth_day=moment.day,
-        birth_hour=moment.hour,
-        birth_minute=moment.minute,
-        birth_second=moment.second,
-        birth_microsecond=moment.microsecond,
-        birth_timezone="UTC",
-        birth_longitude=0,
-        birth_latitude=0,
-        preserve_instant=True,
-    )
-
-
 @pytest.mark.parametrize("row", REF["rows"], ids=lambda r: r["date_tt"])
-def test_d1_sun_uses_qualified_rate_and_keeps_original_failed_native_value(row):
+def test_d1_sun_uses_qualified_rate_and_keeps_original_failed_native_value(row) -> None:
     e.configure_ephemeris_path(str(Path(__file__).resolve().parents[2] / "ephe"))
     raw = positions(from_tt(row["jd_tt"]), ephemeris_policy="require_data_files")
     assert raw["julian_day_tt"] == row["jd_tt"]
@@ -65,7 +47,7 @@ def test_d1_sun_uses_qualified_rate_and_keeps_original_failed_native_value(row):
     assert all(len(f["sha256"]) == 64 for f in context["source_files"])
 
 
-def test_all_nine_rates_have_honest_per_body_coverage_and_antipode():
+def test_all_nine_rates_have_honest_per_body_coverage_and_antipode() -> None:
     e.configure_ephemeris_path(str(Path(__file__).resolve().parents[2] / "ephe"))
     raw = positions(birth(), ephemeris_policy="require_data_files")
     states = raw["physical_states"]
@@ -96,7 +78,7 @@ def test_all_nine_rates_have_honest_per_body_coverage_and_antipode():
     )
 
 
-def test_missing_auxiliary_file_retains_only_exactly_reproduced_center(data18):
+def test_missing_auxiliary_file_retains_only_exactly_reproduced_center(data18) -> None:
     from datetime import timedelta
 
     subject = edge_birth()
@@ -117,7 +99,9 @@ def test_missing_auxiliary_file_retains_only_exactly_reproduced_center(data18):
 
 
 @pytest.mark.parametrize("speed", [-1e-20, 0, 1e-20])
-def test_combustion_uses_reported_rate_without_native_substitution_or_zero_clamp(speed):
+def test_combustion_uses_reported_rate_without_native_substitution_or_zero_clamp(
+    speed,
+) -> None:
     state = physical_state("Mercury", 13, 0, 0, speed, native_speed=-speed)
     assert state["longitude_speed_native_degrees_per_day"] == -speed
     assert state["longitude_speed_degrees_per_day"] == speed

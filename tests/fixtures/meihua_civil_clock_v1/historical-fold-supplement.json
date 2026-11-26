@@ -1,0 +1,24 @@
+{
+  "prepared_at": "2026-10-22T10:25:59.174536+00:00",
+  "prepared_after_implementation_before_testing_these_supplemental_outputs": true,
+  "expected_method": "Manual subtraction from IANA2026e Asia/Shanghai8:05:43 until1901 then8:00; local1900Dec31 23:55 occurs twice. Published tzdb record, not observed historical clock practice.",
+  "expected_elapsed_seconds_between_instants": 343,
+  "cases": [
+    {
+      "id": "shanghai-1900-fold-earlier",
+      "zone": "Asia/Shanghai",
+      "wall": "1900-12-31T23:55:00",
+      "offset": "+08:05:43",
+      "utc": "1900-12-31T15:49:17+00:00",
+      "fold": 0
+    },
+    {
+      "id": "shanghai-1900-fold-later",
+      "zone": "Asia/Shanghai",
+      "wall": "1900-12-31T23:55:00",
+      "offset": "+08:00",
+      "utc": "1900-12-31T15:55:00+00:00",
+      "fold": 1
+    }
+  ]
+}

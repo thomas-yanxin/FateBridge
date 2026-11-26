@@ -1,29 +1,28 @@
 """Bounded activity references and explicit entry/barrier relationships."""
 
-from typing import TYPE_CHECKING, Any, Dict, List
+from typing import Any
 
-from .directions import rule_data
-from .natal_interpretation import _ordered_relationship
-from .workstation_sources import desktop_reference, provenance
-
-if TYPE_CHECKING:
-    from .models import AssessRequest
+from fatebridge.core.fengshui.directions import rule_data
+from fatebridge.core.fengshui.models import AssessRequest
+from fatebridge.core.fengshui.natal_interpretation import _ordered_relationship
+from fatebridge.core.fengshui.workstation_sources import desktop_reference, provenance
 
 
 def _pending(
     path: str, object_id: str, reason: str, required_for: str = "assessment"
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     return dict(
         path=path, object_id=object_id, reason=reason, required_for=required_for
     )
 
 
-def analyze_workstation(req: "AssessRequest", layers: Dict[str, Any]) -> Dict[str, Any]:
+def analyze_workstation(req: AssessRequest, layers: dict[str, Any]) -> dict[str, Any]:
     review = req.workstation_review
-    findings: List[Dict[str, Any]] = []
-    missing: List[str] = []
-    pending: List[Dict[str, Any]] = []
-    actions: List[Dict[str, Any]] = []
+    assert review is not None
+    findings: list[dict[str, Any]] = []
+    missing: list[str] = []
+    pending: list[dict[str, Any]] = []
+    actions: list[dict[str, Any]] = []
     counts = dict(supported=0, confirmed_unsupported=0, unknown=0)
     rules = []
     trace = []

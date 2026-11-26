@@ -5,11 +5,12 @@ import json
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core import heluo_poems as hp
-from fatebridge.core.heluo import _tiaowen, yao_text
-from fatebridge.core.heluo_texts import SOURCE_PDF_SHA256
-from fatebridge.core.heluo_timing import _selected_text
+from fatebridge.core.heluo import heluo_poems as hp
+from fatebridge.core.heluo.heluo import _tiaowen, yao_text
+from fatebridge.core.heluo.heluo_texts import SOURCE_PDF_SHA256
+from fatebridge.core.heluo.heluo_timing import _selected_text
 from fatebridge.utils.errors import NumerologySourceError
 
 ROOT = Path(__file__).parents[1] / "fixtures/heluo_poem_source_v1"
@@ -17,7 +18,7 @@ REF = json.loads((ROOT / "reference.json").read_bytes())
 VERIFIED = json.loads((ROOT / "verified-readings.json").read_bytes())
 
 
-def test_poem_witness_and_discovery_draft_identities_are_retained():
+def test_poem_witness_and_discovery_draft_identities_are_retained() -> None:
     for witness in REF["images"]:
         assert (
             hashlib.sha256((ROOT / witness["file"]).read_bytes()).hexdigest()
@@ -47,7 +48,7 @@ def test_poem_witness_and_discovery_draft_identities_are_retained():
 
 
 @pytest.mark.parametrize("entry", VERIFIED["entries"])
-def test_every_printed_poem_and_label_is_adopted_with_its_own_source(entry):
+def test_every_printed_poem_and_label_is_adopted_with_its_own_source(entry) -> None:
     line = entry["line"]
     result = yao_text("乾為天", line)
     inherited = _tiaowen()["乾為天"]["yao"][str(line)]
@@ -86,7 +87,7 @@ def test_every_printed_poem_and_label_is_adopted_with_its_own_source(entry):
         "source_specific_lexical_differences"
     ],
 )
-def test_selected_witness_differences_do_not_silently_emend_the_book(entry):
+def test_selected_witness_differences_do_not_silently_emend_the_book(entry) -> None:
     result = yao_text("乾為天", entry["line"])
     assert (
         entry["adopted"] in result["shige"]
@@ -109,8 +110,8 @@ def test_selected_witness_differences_do_not_silently_emend_the_book(entry):
     ],
 )
 def test_nonempty_source_forgery_cannot_borrow_the_collated_identity(
-    fault, monkeypatch, tmp_path
-):
+    fault: str, monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
     data = json.loads(hp.COLLATION_PATH.read_bytes())
     if fault == "text":
         data["entries"][0]["poems"][0]["text"] = "非空伪文"
@@ -134,6 +135,8 @@ def test_nonempty_source_forgery_cannot_borrow_the_collated_identity(
         )
     elif fault == "heading":
         data["entries"][0]["heading_pdf_page"] = 3
+    else:
+        pass
     path = tmp_path / "fault.json"
     path.write_text(json.dumps(data, ensure_ascii=False))
     hp._collation.cache_clear()
@@ -149,8 +152,8 @@ def test_nonempty_source_forgery_cannot_borrow_the_collated_identity(
 
 
 def test_formatting_changes_loaded_byte_hash_but_not_the_content_identity(
-    monkeypatch, tmp_path
-):
+    monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
     raw = hp.COLLATION_PATH.read_bytes()
     data = json.loads(raw)
     path = tmp_path / "format.json"

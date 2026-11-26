@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.meihua_omen_reversal import _reading
+from fatebridge.core.meihua.meihua_omen_reversal import _reading
 from fatebridge.core.requests.meihua import MeihuaCastRequest
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
@@ -38,20 +38,24 @@ def observation(kind):
     return {"manifestation": kind, "label": "虚构明确已报原文类别工程例"}
 
 
-def test_independent_literal_body_cases_and_draft_source_precede_implementation():
+def test_independent_literal_body_cases_and_draft_source_precede_implementation() -> (
+    None
+):
     m = json.loads((FIXTURE / "manifest.json").read_bytes())
     assert not m["implementation_present_at_reference_freeze"]
     assert not m["new_expected_values_from_production"]
     for name, digest in m["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
     assert REF["new_body_category_contexts"] == 16
 
 
 @pytest.mark.parametrize("body", list(REF["body_elements"]))
 @pytest.mark.parametrize("kind", KINDS)
-def test_two_explicit_symbols_on_all_eight_actual_original_bodies(body, kind):
+def test_two_explicit_symbols_on_all_eight_actual_original_bodies(body, kind) -> None:
     out = calculate_meihua_cast(
         casting=cast(body), external_observations=[observation(kind)]
     )
@@ -86,7 +90,6 @@ def test_two_explicit_symbols_on_all_eight_actual_original_bodies(body, kind):
         layer["full_internal_external_synthesis"]
         is layer["real_outcome"]
         is layer["event_time"]
-        is layer["success_probability"]
         is None
     )
     assert layer["independent_verified_observations"] == 0
@@ -99,7 +102,9 @@ def test_two_explicit_symbols_on_all_eight_actual_original_bodies(body, kind):
         "cases"
     ],
 )
-def test_every_human_branch_keeps_both_symbols_and_each_candidate_own_body(topic, case):
+def test_every_human_branch_keeps_both_symbols_and_each_candidate_own_body(
+    topic, case
+) -> None:
     out = calculate_meihua_cast(
         casting={
             "method": "object_count",
@@ -132,7 +137,9 @@ def test_every_human_branch_keeps_both_symbols_and_each_candidate_own_body(topic
     assert statuses == case["expected_weapon_body_matches"]
 
 
-def test_common_valued_and_bad_symbols_never_become_unqualified_current_outcomes():
+def test_common_valued_and_bad_symbols_never_become_unqualified_current_outcomes() -> (
+    None
+):
     for kind, body, value in [
         ("gold_silver_treasure", "震", "not_auspicious_symbol"),
         ("weapon", "坎", "not_inauspicious_symbol"),
@@ -148,7 +155,9 @@ def test_common_valued_and_bad_symbols_never_become_unqualified_current_outcomes
     assert "不替换实物资格" in out["summary"]
 
 
-def test_old_material_exceptions_remain_and_generic_categories_do_not_infer_new_class():
+def test_old_material_exceptions_remain_and_generic_categories_do_not_infer_new_class() -> (
+    None
+):
     records = [
         observation(k)
         for k in [
@@ -171,7 +180,7 @@ def test_old_material_exceptions_remain_and_generic_categories_do_not_infer_new_
     assert "body_relative_symbols" not in old["interpretation"]["external_omens"]
 
 
-def test_time_entry_uses_actual_body_and_source_paths():
+def test_time_entry_uses_actual_body_and_source_paths() -> None:
     out = calculate_meihua_analysis(
         analysis_year=2026,
         analysis_month=10,
@@ -191,7 +200,7 @@ def test_time_entry_uses_actual_body_and_source_paths():
 @pytest.mark.parametrize(
     "change", ["body", "relation", "kind", "body_path", "record_index", "element"]
 )
-def test_wrong_body_relation_or_record_binding_is_rejected(change):
+def test_wrong_body_relation_or_record_binding_is_rejected(change: str) -> None:
     out = calculate_meihua_cast(
         casting=cast("坎"), external_observations=[observation("weapon")]
     )
@@ -216,7 +225,9 @@ def test_wrong_body_relation_or_record_binding_is_rejected(change):
 
 
 @pytest.mark.parametrize("kind", KINDS)
-def test_weather_and_full_quiet_context_cannot_accept_reported_external_items(kind):
+def test_weather_and_full_quiet_context_cannot_accept_reported_external_items(
+    kind,
+) -> None:
     base = {"casting": cast("坎"), "external_observations": [observation(kind)]}
     with pytest.raises(ValidationError):
         MeihuaCastRequest.model_validate({**base, "interpretation_topic": "weather"})
@@ -234,7 +245,7 @@ def test_weather_and_full_quiet_context_cannot_accept_reported_external_items(ki
         )
 
 
-def test_cached_profile_and_original_input_are_not_mutated():
+def test_cached_profile_and_original_input_are_not_mutated() -> None:
     values = [observation("weapon")]
     before = copy.deepcopy(values)
     out = calculate_meihua_cast(casting=cast("坎"), external_observations=values)

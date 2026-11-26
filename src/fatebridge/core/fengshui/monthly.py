@@ -6,14 +6,14 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, cast
 
-from .directions import rule_data, wrap9
-from .models import MonthlyRequest
-from .monthly_integrity import validate_monthly_layer
-from .monthly_time import solar_month_context
+from fatebridge.core.fengshui.directions import rule_data, wrap9
+from fatebridge.core.fengshui.models import MonthlyRequest
+from fatebridge.core.fengshui.monthly_integrity import validate_monthly_layer
+from fatebridge.core.fengshui.monthly_time import solar_month_context
 
 
 @lru_cache(maxsize=1)
-def _bundle() -> Dict[str, Any]:
+def _bundle() -> dict[str, Any]:
     return cast(
         Dict[str, Any],
         json.loads(
@@ -22,7 +22,7 @@ def _bundle() -> Dict[str, Any]:
     )
 
 
-def monthly_provenance() -> Dict[str, Any]:
+def monthly_provenance() -> dict[str, Any]:
     data = _bundle()
     return {
         **deepcopy(data["ruleset"]),
@@ -34,7 +34,7 @@ def monthly_provenance() -> Dict[str, Any]:
     }
 
 
-def monthly_position_reading(layer: Dict[str, Any]) -> Dict[str, Any]:
+def monthly_position_reading(layer: dict[str, Any]) -> dict[str, Any]:
     """Consume already calculated fields; no fresh clock or star computation."""
     statements: list[dict[str, Any]] = []
     if layer["status"] == "complete":
@@ -100,7 +100,7 @@ def monthly_position_reading(layer: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def monthly_stars(req: MonthlyRequest) -> Dict[str, Any]:
+def monthly_stars(req: MonthlyRequest) -> dict[str, Any]:
     time = solar_month_context(
         req.effective_solar_year,
         req.solar_month_number,
@@ -109,7 +109,7 @@ def monthly_stars(req: MonthlyRequest) -> Dict[str, Any]:
     )
     year = time["effective_solar_year"]
     complete = year is not None and time["solar_month_number"] is not None
-    result: Dict[str, Any] = {
+    result: dict[str, Any] = {
         "status": "complete" if complete else "partial",
         "time_context": time,
         "palaces": {},

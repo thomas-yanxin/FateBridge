@@ -1,11 +1,11 @@
 """Observed attributes and an optional representation-use question, not natal needs."""
 
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import Field, StrictBool, field_validator, model_validator
 
-from .numeric_inputs import FengshuiInput as _DeferredModel
-from .workstation_inputs import MaterialApplication
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput as _DeferredModel
+from fatebridge.core.fengshui.workstation_inputs import MaterialApplication
 
 Material = Literal[
     "wood",
@@ -47,20 +47,20 @@ ElementUse = Literal[
 class MaterialShapeFact(_DeferredModel):
     fact_id: str = Field(min_length=1, max_length=100)
     object_id: str = Field(min_length=1, max_length=100)
-    material: Optional[Material] = None
-    shape: Optional[Shape] = None
-    colour: Optional[Colour] = None
-    element_use: Optional[ElementUse] = Field(
+    material: Material | None = None
+    shape: Shape | None = None
+    colour: Colour | None = None
+    element_use: ElementUse | None = Field(
         default=None,
         description="用户明确询问该物可否充当某元素代表物；不是所需/喜用元素，不证明任意宫位需要它或可立即摆放",
     )
     observation_basis: Literal["measured", "user_confirmed", "image_observed"]
     evidence: str = Field(min_length=1, max_length=1000)
-    plant_alive: Optional[StrictBool] = Field(
+    plant_alive: StrictBool | None = Field(
         default=None,
         description="仅living_plant的存活状态；不得由绿色/照片外观补为确认存活",
     )
-    application: Optional[MaterialApplication] = Field(
+    application: MaterialApplication | None = Field(
         default=None,
         description="显式选AFSI附加条件；属性资格与尺度/运行/目标绑定分开，不认证摆位或效力",
     )

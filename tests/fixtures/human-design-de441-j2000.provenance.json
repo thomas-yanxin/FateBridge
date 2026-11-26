@@ -1,0 +1,62 @@
+{
+  "source_url": "https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de441/linux_m13000p17000.441",
+  "download_parts": [
+    {
+      "part": "header",
+      "source_range": [
+        0,
+        16287
+      ],
+      "bytes": 16288,
+      "sha256": "0e2f22c81d148dc346713c1beee78b23551a74d4e5d6649f1da66fe8c41f8ca5",
+      "headers": {
+        "Server": "nginx",
+        "Date": "Thu, 22 Oct 2026 04:45:06 GMT",
+        "Content-Type": "application/octet-stream",
+        "Content-Length": "16288",
+        "Last-Modified": "Thu, 04 Mar 2021 19:26:26 GMT",
+        "ETag": "\"60413462-a637d410\"",
+        "Content-Range": "bytes 0-16287/2788676624"
+      }
+    },
+    {
+      "part": "coefficients",
+      "source_range": [
+        1394326096,
+        1394374959
+      ],
+      "bytes": 48864,
+      "sha256": "31b1521aadb960769ce569acf11eb6baf7a08bc9929edc6e4dac8cbf3eeb3088",
+      "headers": {
+        "Server": "nginx",
+        "Date": "Thu, 22 Oct 2026 04:45:07 GMT",
+        "Content-Type": "application/octet-stream",
+        "Content-Length": "48864",
+        "Last-Modified": "Thu, 04 Mar 2021 19:26:26 GMT",
+        "ETag": "\"60413462-a637d410\"",
+        "Content-Range": "bytes 1394326096-1394374959/2788676624"
+      }
+    }
+  ],
+  "source_record_count": 6,
+  "record_bytes": 8144,
+  "native_range_tt": [
+    2451408.5,
+    2451600.5
+  ],
+  "coefficients_unmodified": true,
+  "modified_header_byte_ranges": [
+    [
+      2652,
+      2667
+    ]
+  ],
+  "fixture_sha256": "3be5b3e84b7d0fcf7507d0f37b4097ab573550b5925e77981828b962c1315824",
+  "fixture_bytes": 65152,
+  "fixture_only": true,
+  "complete_original_kernel": false,
+  "old_astrodice_coefficient_overlap_exact": true,
+  "transport": "HTTPS certificate validation through native truststore; no verification bypass",
+  "scope": "Six contiguous original DE441 records. Only the coverage doubles in the original header were changed. A 192-day fixture for the unchanged 110-to-70-day HD root bracket, not full DE441 epoch acceptance.",
+  "response_header_scope": "Selected source transport headers only; no cookies or credential headers. Full retrieval record retained in the task cache."
+}

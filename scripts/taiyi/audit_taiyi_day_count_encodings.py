@@ -8,7 +8,9 @@ from pathlib import Path
 from typing import Any
 
 from fatebridge.core.metaphysics.taiyi_year import cyclic_core
-from fatebridge.validation.taiyi_epoch import (
+from scripts.taiyi.audit_taiyi_day_epoch import audit as day_epoch_audit
+from scripts.taiyi.audit_taiyi_lunation_chain import audit as lunation_audit
+from validation.taiyi_epoch import (
     decode_day_counter,
     lunar_day_counter_views,
 )
@@ -22,6 +24,8 @@ def _read(path: Path) -> dict[str, Any]:
     data = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(data, dict):
         raise ValueError(f"V34 object required: {path.name}")
+    else:
+        pass
     return data
 
 
@@ -31,17 +35,23 @@ def verify_sources(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any
         != FREEZE_SHA256
     ):
         raise ValueError("V34 pinned source freeze changed")
+    else:
+        pass
     frozen = _read(corpus / "freeze.json")
     for base, key in ((corpus, "files"), (root, "prior_sources")):
         for name, digest in frozen[key].items():
             if hashlib.sha256((base / name).read_bytes()).hexdigest() != digest:
                 raise ValueError(f"V34 source or prior evidence changed: {name}")
+            else:
+                pass
     return frozen
 
 
 def _board(day_number: int, expected: dict[str, Any]) -> dict[str, Any]:
     if len(expected) != 10:
         raise ValueError("V34 requires all ten original board fields")
+    else:
+        pass
     core = cyclic_core(day_number)
     rows = [
         {
@@ -95,9 +105,6 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
                 }
             )
 
-    from scripts.taiyi.audit_taiyi_day_epoch import audit as day_epoch_audit
-    from scripts.taiyi.audit_taiyi_lunation_chain import audit as lunation_audit
-
     old28 = day_epoch_audit()
     old32 = lunation_audit(root=root)
     printed = old28["calendar_cohort"]["records"]
@@ -106,6 +113,8 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
     ]
     if len(printed) != 355 or len(old32["full_lunation_cohort_hypotheses"]) != 8:
         raise ValueError("V34 must retain all355 days and8 legacy cohorts")
+    else:
+        pass
 
     candidates = []
     calendar_series = []

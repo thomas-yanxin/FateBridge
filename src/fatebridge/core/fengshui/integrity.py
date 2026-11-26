@@ -4,7 +4,7 @@ These are engineering invariants of the selected nine-star flight calculation.
 They do not certify source conformity, input selection or predictive efficacy.
 """
 
-from typing import Any, Dict
+from typing import Any
 
 from fatebridge.utils.errors import FengshuiCalculationError
 
@@ -19,11 +19,11 @@ def _require(condition: bool, reason: str) -> None:
 
 
 def validate_natal_chart(
-    chart: Dict[str, Any],
+    chart: dict[str, Any],
     *,
     period: int,
-    facing: Dict[str, Any],
-    sitting: Dict[str, Any],
+    facing: dict[str, Any],
+    sitting: dict[str, Any],
     mode: str,
 ) -> None:
     """Check identity, all representations, flight order and trace agreement.

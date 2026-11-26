@@ -2,34 +2,32 @@
 
 from __future__ import annotations
 
-from fractions import Fraction
-from typing import Any, Dict
+from typing import Any
 
 from fatebridge.core.astro.geometry import longitude_float
-
-from ._common import (
+from fatebridge.core.predictive._common import (
     collect_aspect_hits,
     extract_reference_longitudes,
     longitude_to_point_dict,
     point_absolute_position,
+    source_arc_positions,
 )
-from .progressions import ProgressionCalculationOptions
+from fatebridge.core.predictive.native_chart import NativeSubject
+from fatebridge.core.predictive.progressions import ProgressionCalculationOptions
 
 
 def build_solar_arc_payload(
-    natal_subject: Any,
-    progressed_subject: Any,
+    natal_subject: NativeSubject,
+    progressed_subject: NativeSubject,
     *,
     progression_options: ProgressionCalculationOptions | None = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     natal_longitudes = extract_reference_longitudes(natal_subject)
-    arc_degrees = (
-        Fraction(point_absolute_position(progressed_subject, "Sun"))
-        - Fraction(point_absolute_position(natal_subject, "Sun"))
-    ) % 360
-    directed_points: Dict[str, Fraction] = {}
-    for point_name, longitude in natal_longitudes.items():
-        directed_points[point_name] = (Fraction(longitude) + arc_degrees) % 360
+    arc_degrees, directed_points = source_arc_positions(
+        natal_longitudes,
+        point_absolute_position(natal_subject, "Sun"),
+        point_absolute_position(progressed_subject, "Sun"),
+    )
     hits = collect_aspect_hits(
         source_longitudes=directed_points,
         target_longitudes=natal_longitudes,
@@ -48,9 +46,12 @@ def build_solar_arc_payload(
         "moon": longitude_to_point_dict(
             "Moon", longitude_float(directed_points["Moon"])
         ),
-        "ascendant": longitude_to_point_dict(
-            "Ascendant",
-            longitude_float(directed_points["Ascendant"]),
+        "ascendant": (
+            longitude_to_point_dict(
+                "Ascendant", longitude_float(directed_points["Ascendant"])
+            )
+            if "Ascendant" in directed_points
+            else None
         ),
         "medium_coeli": longitude_to_point_dict(
             "Medium_Coeli",

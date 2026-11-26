@@ -5,7 +5,7 @@ FateBridge divination services.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from fatebridge.core.almanac import (
     LUNAR_SUPPORTED_SOLAR_END,
@@ -14,8 +14,10 @@ from fatebridge.core.almanac import (
 )
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.divination import build_meihua_interpretation, lookup_gua
-from fatebridge.core.gua_meanings import caution_phrase
-from fatebridge.core.heluo_months import DEFAULT_MONTH_ASSIGNMENT, MonthAssignmentMethod
+from fatebridge.core.heluo.heluo_months import (
+    DEFAULT_MONTH_ASSIGNMENT,
+    MonthAssignmentMethod,
+)
 from fatebridge.core.local_techniques.canping import build_canping_result
 from fatebridge.core.local_techniques.heluo import build_heluo_result
 from fatebridge.core.local_techniques.otherbu import build_otherbu_result
@@ -23,23 +25,51 @@ from fatebridge.core.local_techniques.sanshi import build_sanshiunited_result
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from fatebridge.core.local_techniques.suzhan import build_suzhan_result
 from fatebridge.core.local_techniques.tongshefa import build_tongshefa_result
-from fatebridge.core.meihua import build_meihua_evidence
-from fatebridge.core.meihua_calendar_precision import calendar_label_precision
-from fatebridge.core.meihua_clock import resolve_meihua_clock
-from fatebridge.core.meihua_clock_resolution import MeihuaUnspecifiedClockError
-from fatebridge.core.meihua_external import apply_external_omens
-from fatebridge.core.meihua_solar_reference import (
+from fatebridge.core.meihua.meihua import build_meihua_evidence
+from fatebridge.core.meihua.meihua_calendar_precision import calendar_label_precision
+from fatebridge.core.meihua.meihua_clock import resolve_meihua_clock
+from fatebridge.core.meihua.meihua_clock_input import (
+    apply_clock_input_notice,
+    clock_components,
+)
+from fatebridge.core.meihua.meihua_clock_resolution import MeihuaUnspecifiedClockError
+from fatebridge.core.meihua.meihua_day_qi import apply_day_qi, civil_day_qi_context
+from fatebridge.core.meihua.meihua_external import apply_external_omens
+from fatebridge.core.meihua.meihua_motion import apply_motion_context
+from fatebridge.core.meihua.meihua_observation import apply_observation_context
+from fatebridge.core.meihua.meihua_qi_branches import (
+    apply_qi_branch_timing_references,
+)
+from fatebridge.core.meihua.meihua_qi_days import apply_qi_day_timing_references
+from fatebridge.core.meihua.meihua_reputation import apply_reputation_supplement
+from fatebridge.core.meihua.meihua_situational import apply_situational_responses
+from fatebridge.core.meihua.meihua_solar_reference import (
     solar_reference_notice,
     solar_term_date_reference,
 )
+from fatebridge.core.meihua.meihua_stage_emphasis import apply_stage_emphasis
+from fatebridge.core.meihua.meihua_timing import apply_postheaven_count_reference
+from fatebridge.core.meihua.meihua_trigram_symbols import (
+    apply_trigram_relation_symbols,
+)
 from fatebridge.core.metaphysics.ren_gods import DEFAULT_GUIREN_PROFILE, GuirenProfile
 from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
-from fatebridge.core.sukuyo import (
+from fatebridge.core.sukuyo.sukuyo import (
     calendar_mansion,
     candidate_relation_analysis,
     rulesets,
 )
-from fatebridge.core.sukuyo_relations import relation_between_su27
+from fatebridge.core.sukuyo.sukuyo_calendar_basis import basis_parameters
+from fatebridge.core.sukuyo.sukuyo_compatibility_text import (
+    candidate_compatibility_reading,
+    joint_reconstruction_contract,
+)
+from fatebridge.core.sukuyo.sukuyo_dayan_advance import research_scope, scope_lines
+from fatebridge.core.sukuyo.sukuyo_historical_calendar import (
+    compatibility_reference_notes,
+)
+from fatebridge.core.sukuyo.sukuyo_padas import palace_reference
+from fatebridge.core.sukuyo.sukuyo_relations import relation_between_su27
 from fatebridge.core.zhouyi import classical_hexagram
 from fatebridge.services.snapshot_builders import (
     build_snapshot_export as _build_snapshot_export,
@@ -57,7 +87,7 @@ def _build_gua_lookup_snapshot_text(
     *,
     query: str,
     lookup_mode: str,
-    result: Dict[str, Any],
+    result: dict[str, Any],
 ) -> str:
     query_lines = [
         f"查询：{query}",
@@ -76,63 +106,40 @@ def _build_gua_lookup_snapshot_text(
     if upper:
         structure_lines.append(
             f"上卦：{upper.get('name', '无')} / {upper.get('nature', '无')} / "
-            f"{upper.get('element', '无')} / {upper.get('keywords', '无')}"
+            f"{upper.get('element', '无')}"
         )
     if lower:
         structure_lines.append(
             f"下卦：{lower.get('name', '无')} / {lower.get('nature', '无')} / "
-            f"{lower.get('element', '无')} / {lower.get('keywords', '无')}"
+            f"{lower.get('element', '无')}"
         )
 
-    meaning_lines = [
-        f"主题：{result.get('theme', '无')}",
-    ]
-    if result.get("judgement"):
-        meaning_lines.append(f"判断：{result['judgement']}")
-    if result.get("guidance"):
-        meaning_lines.append(f"建议：{result['guidance']}")
-    if result.get("image"):
-        meaning_lines.append(f"卦象：{result['image']}")
-    if result.get("favorable"):
-        meaning_lines.append(f"可为：{result['favorable']}")
-    if result.get("caution"):
-        meaning_lines.append(f"风险：{result['caution']}")
-    if result.get("summary"):
-        meaning_lines.append(f"摘要：{result['summary']}")
-
-    classical = result.get("classical") or {}
+    sections = [("查询信息", query_lines), ("卦象结构", structure_lines)]
+    classical = result.get("classical")
     if classical:
-        meaning_lines.extend(
+        sections.extend(
             [
-                f"《周易》卦辞原文：{classical['guaci']}",
-                f"《象传》大象原文：{classical['daxiang']}",
-                *[f"{line['label']}：{line['text']}" for line in classical["yaoci"]],
+                (
+                    "经文",
+                    [
+                        f"《周易》卦辞：{classical['guaci']}",
+                        f"《象传》大象：{classical['daxiang']}",
+                        *[
+                            f"{line['label']}：{line['text']}"
+                            for line in classical["yaoci"]
+                        ],
+                    ],
+                ),
+                ("来源", [classical["source_url"], classical["edition_status"]]),
             ]
         )
-    source_lines = [
-        "现代释义来源：FateBridge 离线卦义库；不是原文",
-        "引用：fatebridge.core.gua_meanings / lookup_gua",
-        *(
-            [f"原文来源：{classical['source_url']}", classical["edition_status"]]
-            if classical
-            else []
-        ),
-    ]
-
-    return _render_snapshot_text(
-        [
-            ("查询信息", query_lines),
-            ("卦象结构", structure_lines),
-            ("义理摘要", meaning_lines),
-            ("来源", source_lines),
-        ]
-    )
+    return _render_snapshot_text(sections)
 
 
 def _build_gua_meiyi_snapshot_text(
     *,
-    queries: List[str],
-    results: Dict[str, Dict[str, Any]],
+    queries: list[str],
+    results: dict[str, dict[str, Any]],
     summary: str,
 ) -> str:
     overview_lines = [
@@ -142,31 +149,15 @@ def _build_gua_meiyi_snapshot_text(
     ]
     result_lines: list[str] = []
     for query in queries:
-        item = results.get(query) or {}
-        result_lines.append(
-            f"{query} -> {item.get('name', '未知')} ({item.get('lookup_type', '未知')})"
-        )
-        if item.get("theme"):
-            result_lines.append(f"主题：{item['theme']}")
-        if item.get("judgement"):
-            result_lines.append(f"判断：{item['judgement']}")
-        if item.get("guidance"):
-            result_lines.append(f"建议：{item['guidance']}")
-        if item.get("desc"):
-            result_lines.append(f"摘要：{item['desc']}")
-        result_lines.append("")
-    if result_lines and result_lines[-1] == "":
-        result_lines.pop()
-
-    source_lines = [
-        "来源：FateBridge 离线卦义库",
-        "引用：fatebridge.core.gua_meanings / lookup_gua",
-    ]
+        item = results[query]
+        result_lines.append(f"{query} -> {item['name']}（{item['code']}）")
+        if classical := item.get("classical"):
+            result_lines.append(f"《周易》卦辞：{classical['guaci']}")
+            result_lines.append(f"来源：{classical['source_url']}")
     return _render_snapshot_text(
         [
             ("查询概览", overview_lines),
-            ("批量结果", result_lines or ["无"]),
-            ("来源", source_lines),
+            ("批量结果", result_lines),
         ]
     )
 
@@ -178,21 +169,21 @@ def calculate_meihua_analysis(
     analysis_month: int,
     analysis_day: int,
     analysis_hour: int,
-    analysis_minute: Optional[int] = None,
-    analysis_second: Optional[int] = None,
-    analysis_timezone: Optional[str] = None,
-    analysis_utc_offset: Optional[str] = None,
-    question: Optional[str] = None,
+    analysis_minute: int | None = None,
+    analysis_second: int | None = None,
+    analysis_timezone: str | None = None,
+    analysis_utc_offset: str | None = None,
+    question: str | None = None,
     interpretation_topic: str = "general",
-    weather_context: Optional[Dict[str, Any]] = None,
-    external_observations: Optional[list[Dict[str, Any]]] = None,
-    matter_scenario: Optional[str] = None,
-    observer_activity: Optional[str] = None,
-    observation_context: Optional[Dict[str, Any]] = None,
-    response_context: Optional[dict[str, Any]] = None,
-    reputation_context: Optional[dict[str, Any]] = None,
-    _clock_supplied_components: Optional[list[str]] = None,
-) -> Dict:
+    weather_context: dict[str, Any] | None = None,
+    external_observations: list[dict[str, Any]] | None = None,
+    matter_scenario: str | None = None,
+    observer_activity: str | None = None,
+    observation_context: dict[str, Any] | None = None,
+    response_context: dict[str, Any] | None = None,
+    reputation_context: dict[str, Any] | None = None,
+    _clock_supplied_components: list[str] | None = None,
+) -> dict[str, Any]:
     """
     梅花时卦分析工具 - 按指定时刻生成本卦、变卦、互卦、错卦、综卦与体用关系。
     """
@@ -223,7 +214,6 @@ def calculate_meihua_analysis(
             "analysis_second须为已确认的0至59整秒；未知时省略，不支持闰秒标签60。",
             [{"path": "analysis_second", "code": "invalid_civil_second"}],
         ).as_result()
-    from fatebridge.core.meihua_clock_input import clock_components
 
     supplied_clock = clock_components(
         analysis_minute, analysis_second, _clock_supplied_components
@@ -254,18 +244,8 @@ def calculate_meihua_analysis(
             str(error),
             [{"path": "analysis_timezone", "code": "unresolved_timezone_offset"}],
         ).as_result()
-    except ValueError:
-        return ParameterError(
-            "起卦钟时、时区或UTC偏移无效；重复钟时须给与该时区相符的analysis_utc_offset，不存在的钟时不能靠偏移补成有效。",
-            [
-                {"path": "analysis_datetime", "code": "invalid_local_clock"},
-                *(
-                    [{"path": "analysis_utc_offset", "code": "invalid_clock_or_offset"}]
-                    if analysis_utc_offset is not None
-                    else []
-                ),
-            ],
-        ).as_result()
+    except ParameterError as error:
+        return {**error.as_result(), "status_code": 422}
     if (
         not LUNAR_SUPPORTED_SOLAR_START
         <= analysis_datetime.date()
@@ -322,7 +302,6 @@ def calculate_meihua_analysis(
         "cuo_hexagram",
         "zong_hexagram",
     ):
-        meihua[key]["meaning_source_kind"] = "modern_editorial_summary"
         meihua[key]["classical"] = classical_hexagram(meihua[key]["binary_code"])
     meihua.update(
         build_meihua_evidence(
@@ -351,7 +330,6 @@ def calculate_meihua_analysis(
     meihua["calendar_policy"]["solar_term_date_reference"] = solar_reference
     interpretation = build_meihua_interpretation(
         meihua,
-        question or "",
         interpretation_topic=interpretation_topic,
         weather_context=weather_context,
     )
@@ -397,7 +375,6 @@ def calculate_meihua_analysis(
             else None
         ),
     )
-    from fatebridge.core.meihua_stage_emphasis import apply_stage_emphasis
 
     apply_stage_emphasis(
         meihua,
@@ -405,7 +382,6 @@ def calculate_meihua_analysis(
         matter_scenario=options.matter_scenario,
         scenario_fact_path="analysis_context.matter_scenario",
     )
-    from fatebridge.core.meihua_motion import apply_motion_context
 
     apply_motion_context(
         meihua,
@@ -413,10 +389,8 @@ def calculate_meihua_analysis(
         observer_activity=options.observer_activity,
         observer_fact_path="analysis_context.observer_activity",
     )
-    from fatebridge.core.meihua_timing import apply_postheaven_count_reference
 
     apply_postheaven_count_reference(meihua, interpretation)
-    from fatebridge.core.meihua_observation import apply_observation_context
 
     normalized_observation = (
         options.observation_context.model_dump(mode="json")
@@ -429,7 +403,6 @@ def calculate_meihua_analysis(
         normalized_observation,
         context_fact_path="analysis_context.observation_context",
     )
-    from fatebridge.core.meihua_day_qi import apply_day_qi, civil_day_qi_context
 
     apply_day_qi(
         meihua,
@@ -442,7 +415,6 @@ def calculate_meihua_analysis(
             else None
         ),
     )
-    from fatebridge.core.meihua_situational import apply_situational_responses
 
     normalized_response = (
         options.response_context.model_dump(mode="json")
@@ -459,10 +431,8 @@ def calculate_meihua_analysis(
     if reference_notice is not None:
         interpretation["solar_term_date_reference_notice"] = reference_notice
         interpretation["comprehensive_judgement"] += " " + reference_notice
-    from fatebridge.core.meihua_trigram_symbols import apply_trigram_relation_symbols
 
     apply_trigram_relation_symbols(meihua, interpretation)
-    from fatebridge.core.meihua_reputation import apply_reputation_supplement
 
     normalized_reputation = (
         options.reputation_context.model_dump(mode="json", exclude_none=True)
@@ -475,13 +445,10 @@ def calculate_meihua_analysis(
         context=normalized_reputation,
         context_fact_path="analysis_context.reputation_context",
     )
-    from fatebridge.core.meihua_qi_days import apply_qi_day_timing_references
 
     apply_qi_day_timing_references(meihua, interpretation)
-    from fatebridge.core.meihua_qi_branches import apply_qi_branch_timing_references
 
     apply_qi_branch_timing_references(meihua, interpretation)
-    from fatebridge.core.meihua_clock_input import apply_clock_input_notice
 
     apply_clock_input_notice(interpretation, clock_resolution)
     return {
@@ -536,8 +503,8 @@ def calculate_gua_lookup(
     *,
     query: str,
     lookup_mode: str = "auto",
-    selected_sections: Optional[List[str]] = None,
-) -> Dict:
+    selected_sections: list[str] | None = None,
+) -> dict[str, Any]:
     """
     卦义检索工具 - 支持六十四卦与八卦的离线义理查询。
     """
@@ -557,7 +524,7 @@ def calculate_gua_lookup(
         "query": query,
         "lookup_mode": lookup_mode,
         "result": result,
-        "summary": result["summary"],
+        "summary": f"{result['name']}（{result['code']}）",
         "snapshot_text": snapshot_text,
         "snapshot_export": snapshot_export,
     }
@@ -566,9 +533,9 @@ def calculate_gua_lookup(
 @calculation_guard("梅易卦义")
 def calculate_gua_meiyi(
     *,
-    name: List[str],
-    selected_sections: Optional[List[str]] = None,
-) -> Dict[str, Any]:
+    name: list[str],
+    selected_sections: list[str] | None = None,
+) -> dict[str, Any]:
     """
     梅易卦义辅助工具 - 批量返回偏梅花易数语境的卦义说明。
     """
@@ -576,28 +543,8 @@ def calculate_gua_meiyi(
     if not queries:
         raise ValueError("name 至少需要提供一个卦名或卦码。")
 
-    results: Dict[str, Dict[str, Any]] = {}
-    ordered_names: List[str] = []
-    for query in queries:
-        item = lookup_gua(query, lookup_mode="auto")
-        desc = (
-            f"{item['name']}：{item.get('theme', '当前之势')}。"
-            f"{item.get('judgement') or item.get('guidance', '')}"
-            f"宜{item.get('favorable', '顺势推进')}，"
-            f"忌{caution_phrase(item.get('caution', '失衡冒进'))}。"
-        )
-        results[query] = {
-            "name": item["name"],
-            "lookup_type": item["lookup_type"],
-            "theme": item.get("theme"),
-            "judgement": item.get("judgement"),
-            "guidance": item.get("guidance"),
-            "classical": item.get("classical"),
-            "meaning_source_kind": "modern_editorial_summary",
-            "desc": desc,
-            "text": desc,
-        }
-        ordered_names.append(item["name"])
+    results = {query: lookup_gua(query) for query in queries}
+    ordered_names = [results[query]["name"] for query in queries]
 
     summary = f"共查询{len(queries)}项梅易卦义：{'、'.join(ordered_names)}。"
     snapshot_text = _build_gua_meiyi_snapshot_text(
@@ -624,17 +571,19 @@ def calculate_gua_meiyi(
 @calculation_guard("统摄法分析")
 def calculate_tongshefa_analysis(
     *,
-    taiyin: Optional[str] = None,
-    taiyang: Optional[str] = None,
-    shaoyang: Optional[str] = None,
-    shaoyin: Optional[str] = None,
-) -> Dict[str, Any]:
-    """统摄法分析工具。"""
-    return build_tongshefa_result(
-        taiyin=taiyin,
-        taiyang=taiyang,
-        shaoyang=shaoyang,
-        shaoyin=shaoyin,
+    taiyin: str | None = None,
+    taiyang: str | None = None,
+    shaoyang: str | None = None,
+    shaoyin: str | None = None,
+) -> dict[str, Any]:
+    """Calculate the four-trigram TongSheFa comparison."""
+    return dict(
+        build_tongshefa_result(
+            taiyin=taiyin,
+            taiyang=taiyang,
+            shaoyang=shaoyang,
+            shaoyin=shaoyin,
+        )
     )
 
 
@@ -643,18 +592,18 @@ def calculate_canping_analysis(
     *,
     date: str,
     time: str,
-    zone: Optional[str] = None,
-    birth_utc_offset: Optional[str] = None,
-    lat: Optional[str] = None,
-    lon: Optional[str] = None,
-    gps_lat: Optional[float] = None,
-    gps_lon: Optional[float] = None,
-    gender: Optional[str] = None,
+    zone: str | None = None,
+    birth_utc_offset: str | None = None,
+    lat: str | None = None,
+    lon: str | None = None,
+    gps_lat: float | None = None,
+    gps_lon: float | None = None,
+    gender: str | None = None,
     method: str = "gu",
     dayun_method: str = "bazi_appendix_v1",
-    analysis_datetime: Optional[str] = None,
+    analysis_datetime: str | None = None,
     use_true_solar_time: bool = True,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """邵子参评数 / 金锁银匙分析工具。"""
     return build_canping_result(
         date=date,
@@ -678,19 +627,19 @@ def calculate_heluo_analysis(
     *,
     date: str,
     time: str,
-    zone: Optional[str] = None,
-    birth_utc_offset: Optional[str] = None,
-    lat: Optional[str] = None,
-    lon: Optional[str] = None,
-    gps_lat: Optional[float] = None,
-    gps_lon: Optional[float] = None,
-    gender: Optional[str] = None,
+    zone: str | None = None,
+    birth_utc_offset: str | None = None,
+    lat: str | None = None,
+    lon: str | None = None,
+    gps_lat: float | None = None,
+    gps_lon: float | None = None,
+    gender: str | None = None,
     use_true_solar_time: bool = True,
-    analysis_year: Optional[int] = None,
-    month_index: Optional[int] = None,
-    day_index: Optional[int] = None,
+    analysis_year: int | None = None,
+    month_index: int | None = None,
+    day_index: int | None = None,
     month_assignment_method: MonthAssignmentMethod = DEFAULT_MONTH_ASSIGNMENT,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """河洛理数分析工具。"""
     return build_heluo_result(
         date=date,
@@ -715,24 +664,25 @@ def calculate_sixyao_analysis(
     *,
     date: str,
     time: str,
-    zone: Optional[str] = None,
-    lat: Optional[str] = None,
-    lon: Optional[str] = None,
-    gps_lat: Optional[float] = None,
-    gps_lon: Optional[float] = None,
-    question: Optional[str] = None,
-    gua_code: Optional[str] = None,
-    changed_code: Optional[str] = None,
-    lines: Optional[List[Dict[str, Any]]] = None,
+    zone: str | None = None,
+    lat: str | None = None,
+    lon: str | None = None,
+    gps_lat: float | None = None,
+    gps_lon: float | None = None,
+    question: str | None = None,
+    gua_code: str | None = None,
+    changed_code: str | None = None,
+    lines: list[dict[str, Any]] | None = None,
     method: str = "auto",
-    coins: Optional[List[int]] = None,
-    seed: Optional[int] = None,
-    focus_line: Optional[int] = None,
-    focus_kinship: Optional[str] = None,
-    focus_kind: Optional[str] = None,
+    coins: list[int] | None = None,
+    seed: int | None = None,
+    focus_line: int | None = None,
+    focus_kinship: str | None = None,
+    focus_kind: str | None = None,
     timing_days: int = 0,
-    event_horizon: Optional[str] = None,
-) -> Dict[str, Any]:
+    event_horizon: str | None = None,
+    render_snapshot: bool = True,
+) -> dict[str, Any]:
     """六爻 / 易卦分析工具。"""
     return build_sixyao_result(
         date=date,
@@ -754,6 +704,7 @@ def calculate_sixyao_analysis(
         focus_kind=focus_kind,
         timing_days=timing_days,
         event_horizon=event_horizon,
+        render_snapshot=render_snapshot,
     )
 
 
@@ -761,12 +712,12 @@ def calculate_sixyao_analysis(
 def calculate_suzhan_analysis(
     *,
     date: str,
-    time: Optional[str] = None,
-    zone: Optional[str] = None,
-    lat: Optional[str] = None,
-    lon: Optional[str] = None,
-    gps_lat: Optional[float] = None,
-    gps_lon: Optional[float] = None,
+    time: str | None = None,
+    zone: str | None = None,
+    lat: str | None = None,
+    lon: str | None = None,
+    gps_lat: float | None = None,
+    gps_lon: float | None = None,
     szchart: int = 0,
     szshape: int = 0,
     house_start_mode: int = 1,
@@ -774,15 +725,16 @@ def calculate_suzhan_analysis(
     hsys: int = 8,
     zodiacal: int = 0,
     leap_month_policy: str = "unresolved",
-    natal_mansion: Optional[str] = None,
+    natal_mansion: str | None = None,
     mansion_method: str = "equatorial_research28",
-    activity: Optional[str] = None,
-    activity_details: Optional[List[str]] = None,
+    activity: str | None = None,
+    activity_details: list[str] | None = None,
     calendar_profile: str = "t1299_fullmoon27",
-    calendar_day_part: Optional[str] = None,
-    textual_pada: Optional[int] = None,
+    calendar_day_part: str | None = None,
+    textual_pada: int | None = None,
     calendar_basis: str = "chinese_hko_utc08",
-) -> Dict[str, Any]:
+    chart_requested: bool = False,
+) -> dict[str, Any]:
     """宿占 / 宿盘分析工具。"""
     return build_suzhan_result(
         date=date,
@@ -807,6 +759,7 @@ def calculate_suzhan_analysis(
         calendar_day_part=calendar_day_part,
         textual_pada=textual_pada,
         calendar_basis=calendar_basis,
+        chart_requested=chart_requested,
     )
 
 
@@ -815,20 +768,20 @@ def calculate_sukuyo_compatibility(
     *,
     person1_name: str = "甲方",
     person1_date: str,
-    person1_time: Optional[str] = None,
-    person1_zone: Optional[str] = None,
+    person1_time: str | None = None,
+    person1_zone: str | None = None,
     person2_name: str = "乙方",
     person2_date: str,
-    person2_time: Optional[str] = None,
-    person2_zone: Optional[str] = None,
+    person2_time: str | None = None,
+    person2_zone: str | None = None,
     leap_month_policy: str = "unresolved",
     calendar_profile: str = "t1299_fullmoon27",
-    person1_calendar_day_part: Optional[str] = None,
-    person2_calendar_day_part: Optional[str] = None,
-    person1_textual_pada: Optional[int] = None,
-    person2_textual_pada: Optional[int] = None,
+    person1_calendar_day_part: str | None = None,
+    person2_calendar_day_part: str | None = None,
+    person1_textual_pada: int | None = None,
+    person2_textual_pada: int | None = None,
     calendar_basis: str = "chinese_hko_utc08",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """按显式宿主历法月日定本命宿，依T1299三九法返回双向关系。"""
     contexts = [
         calendar_mansion(
@@ -850,7 +803,6 @@ def calculate_sukuyo_compatibility(
             calendar_basis=calendar_basis,
         ),
     ]
-    from fatebridge.core.sukuyo_padas import palace_reference
 
     people = [
         {
@@ -866,7 +818,6 @@ def calculate_sukuyo_compatibility(
         )
     ]
     first, second = (p["natal_su27"] for p in people)
-    from fatebridge.core.sukuyo_calendar_basis import basis_parameters
 
     calendar_label = basis_parameters(calendar_basis)[3]
     resolved = first is not None and second is not None
@@ -894,10 +845,6 @@ def calculate_sukuyo_compatibility(
         or calendar_profile == "hinoo_t1299_host27"
         or any(c.get("printed_edition_reference") for c in contexts)
     ):
-        from fatebridge.core.sukuyo_compatibility_text import (
-            candidate_compatibility_reading,
-        )
-
         if forward is not None and reverse is not None:
             summary += f"前向含义：{forward['meaning']}反向含义：{reverse['meaning']}"
         summary += candidate_compatibility_reading(
@@ -907,21 +854,7 @@ def calculate_sukuyo_compatibility(
             [p["palace_reference"] for p in people],
         )
     if calendar_basis == "japanese_naoj_historical_utc09":
-        from fatebridge.core.sukuyo_historical_calendar import (
-            compatibility_reference_notes,
-        )
-
         summary += compatibility_reference_notes(contexts, [person1_name, person2_name])
-    from fatebridge.core.sukuyo_commentarial_clock import (
-        commentarial_boundary_reference,
-    )
-    from fatebridge.core.sukuyo_xuanying import source_chain_lines
-
-    source_reference = commentarial_boundary_reference()[
-        "standalone_xuanying_reference"
-    ]
-    summary += "".join(source_chain_lines(source_reference))
-    from fatebridge.core.sukuyo_dayan_advance import research_scope, scope_lines
 
     fixed_research_scope = research_scope()
     # Only the first item is the full-table overview. Later items describe a
@@ -934,7 +867,7 @@ def calculate_sukuyo_compatibility(
         f"未知行号为{unknown_rows}，作者横杠未补成不进；"
         "这份全表参考与双方本次历日分别交付，未覆盖任何一方的宿主、配宿或原典半日。"
     )
-    result: Dict[str, Any] = {
+    result: dict[str, Any] = {
         "analysis_type": "宿曜双人相性 / T1299三九法",
         "status": "computed" if resolved else "partial",
         "su27_basis": contexts[0]["mansion_method_id"],
@@ -944,7 +877,6 @@ def calculate_sukuyo_compatibility(
         "person1_to_person2": forward,
         "person2_to_person1": reverse,
         "candidate_relation_analysis": candidate_analysis,
-        "standalone_xuanying_reference": source_reference,
         "fixed_host_research_scope": fixed_research_scope,
         "rulesets": rulesets(calendar_profile, calendar_basis),
         "interpretation_contract": {
@@ -960,10 +892,6 @@ def calculate_sukuyo_compatibility(
         "summary": summary,
     }
     if candidate_analysis.get("shared_reconstruction_analysis"):
-        from fatebridge.core.sukuyo_compatibility_text import (
-            joint_reconstruction_contract,
-        )
-
         result["interpretation_contract"]["joint_reconstruction"] = (
             joint_reconstruction_contract(candidate_analysis)
         )
@@ -982,22 +910,22 @@ def calculate_sukuyo_compatibility(
 @calculation_guard("占星骰子分析")
 def calculate_otherbu_analysis(
     *,
-    date: Optional[str] = None,
-    time: Optional[str] = None,
-    zone: Optional[str] = None,
-    lat: Optional[str] = None,
-    lon: Optional[str] = None,
-    gps_lat: Optional[float] = None,
-    gps_lon: Optional[float] = None,
+    date: str | None = None,
+    time: str | None = None,
+    zone: str | None = None,
+    lat: str | None = None,
+    lon: str | None = None,
+    gps_lat: float | None = None,
+    gps_lon: float | None = None,
     tradition: bool = False,
-    sign: Optional[str] = None,
-    house: Optional[int] = None,
-    planet: Optional[str] = None,
-    question: Optional[str] = None,
+    sign: str | None = None,
+    house: int | None = None,
+    planet: str | None = None,
+    question: str | None = None,
     hsys: int = 8,
     zodiacal: int = 0,
     fortune_method: str = "sect_reversing",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """西洋游戏 / 占星骰子分析工具。"""
     return build_otherbu_result(
         date=date,
@@ -1023,19 +951,19 @@ def calculate_sanshiunited_analysis(
     *,
     date: str,
     time: str,
-    zone: Optional[str] = None,
-    lat: Optional[str] = None,
-    lon: Optional[str] = None,
-    gps_lat: Optional[float] = None,
-    gps_lon: Optional[float] = None,
-    qimen_options: Optional[Dict[str, Any]] = None,
-    taiyi_options: Optional[Dict[str, Any]] = None,
-    liureng_yue: Optional[str] = None,
-    liureng_is_diurnal: Optional[bool] = None,
+    zone: str | None = None,
+    lat: str | None = None,
+    lon: str | None = None,
+    gps_lat: float | None = None,
+    gps_lon: float | None = None,
+    qimen_options: dict[str, Any] | None = None,
+    taiyi_options: dict[str, Any] | None = None,
+    liureng_yue: str | None = None,
+    liureng_is_diurnal: bool | None = None,
     liureng_guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
-    selected_sections: Optional[List[str]] = None,
+    selected_sections: list[str] | None = None,
     use_true_solar_time: bool = True,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """三式合一本地聚合工具。"""
     result = build_sanshiunited_result(
         date=date,

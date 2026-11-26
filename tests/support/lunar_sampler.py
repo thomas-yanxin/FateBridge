@@ -6,7 +6,7 @@ an independent physical ephemeris reference.
 
 from fractions import Fraction
 
-from fatebridge.core.horary_motion import solve_lunar_contacts
+from fatebridge.core.astro.horary_motion import solve_lunar_contacts
 
 
 def sampled_motion(moon, others):

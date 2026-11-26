@@ -7,7 +7,7 @@ from pathlib import Path
 from fatebridge.core import ephemeris_runtime as e
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish import build_india
+from fatebridge.core.jyotish.jyotish import build_india
 from fatebridge.utils.errors import EphemerisSourceError
 
 mode = sys.argv[1]
@@ -25,9 +25,13 @@ value = 63.9 if mode in {"file", "alias", "stale_small", "manual_small"} else 40
 if mode.startswith("stale"):
     e.configure_ephemeris_path(str(custom))
     e.ephemeris_call("deltat_ex", 2451545.0, e.swe.FLG_SWIEPH)
+else:
+    pass
 e.configure_ephemeris_path(str(custom if mode in {"file", "alias"} else empty))
 if mode in {"manual", "manual_small"}:
     e.swe.set_delta_t_userdef(value / 86400)
+else:
+    pass
 real = runtime.ephemeris_call
 fault = {"transient_geometry": "houses_ex"}.get(mode)
 
@@ -39,11 +43,15 @@ def transient(operation, *args, **kwargs):
             return real(operation, *args, **kwargs)
         finally:
             e.swe.set_delta_t_userdef(e.swe.DELTAT_AUTOMATIC)
+    else:
+        pass
     return real(operation, *args, **kwargs)
 
 
 if fault:
     runtime.ephemeris_call = transient
+else:
+    pass
 if mode == "transient_events":
     from fatebridge.core.astro import solar_events
 
@@ -57,6 +65,8 @@ if mode == "transient_events":
             e.swe.set_delta_t_userdef(e.swe.DELTAT_AUTOMATIC)
 
     solar_events.solar_observation = transient_sun
+else:
+    pass
 birth = build_astro_birth_info(
     birth_year=2000,
     birth_month=1,

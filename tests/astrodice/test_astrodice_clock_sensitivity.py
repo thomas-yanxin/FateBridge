@@ -14,14 +14,14 @@ from scripts.astrodice.diagnose_astrodice_de441_clock import (
 )
 
 
-def test_machin_bounds_contain_the_known_fifty_digit_pi_value():
+def test_machin_bounds_contain_the_known_fifty_digit_pi_value() -> None:
     low, high = pi_bounds()
     known = F("3.14159265358979323846264338327950288419716939937510")
     assert low < known < high
     assert high - low < F(1, 10**44)
 
 
-def test_arctangent_quadrant_sign_and_zero_are_preserved():
+def test_arctangent_quadrant_sign_and_zero_are_preserved() -> None:
     low, high = atan_bounds(F(1, 3), 8)
     assert atan_bounds(F(-1, 3), 8) == (-high, -low)
     assert atan_bounds(0, 2) == (0, 0)
@@ -32,7 +32,7 @@ def test_arctangent_quadrant_sign_and_zero_are_preserved():
     assert a[0] + b[0] < ph / 4 < a[1] + b[1]
 
 
-def test_geometric_ra_change_is_invariant_to_independent_positive_ray_scales():
+def test_geometric_ra_change_is_invariant_to_independent_positive_ray_scales() -> None:
     original, shifted = [F(2), F(1)], [F(2) + F(1, 10**7), F(1)]
     expected = ra_shift_arcsec(original, shifted)
     assert expected[1] < 0
@@ -45,12 +45,14 @@ def test_geometric_ra_change_is_invariant_to_independent_positive_ray_scales():
     assert reverse == (-expected[1], -expected[0])
 
 
-def test_an_opposite_ray_cannot_be_treated_as_a_tiny_local_ra_change():
+def test_an_opposite_ray_cannot_be_treated_as_a_tiny_local_ra_change() -> None:
     with pytest.raises(ValueError, match="local branch"):
         ra_shift_arcsec([F(2), F(1)], [F(-2), F(-1)])
 
 
-def test_frozen_clock_proxies_preserve_all_original_witnesses_and_no_new_grade():
+def test_frozen_clock_proxies_preserve_all_original_witnesses_and_no_new_grade() -> (
+    None
+):
     fixtures = Path(__file__).parents[1] / "data/astrodice/reference_sets"
     clock = fixtures / "fixture-de441-clock-v1"
     result = diagnose(

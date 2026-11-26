@@ -22,7 +22,9 @@ EXAMPLE = json.loads(
 
 
 @pytest.mark.parametrize("case", EXAMPLE["cases"], ids=lambda case: case["id"])
-def test_original_symbolic_example_with_separately_labelled_numeric_witness(case):
+def test_original_symbolic_example_with_separately_labelled_numeric_witness(
+    case,
+) -> None:
     result = midpoint_geometry(case["positions"], orb_degrees=0.0)
     contacts = result["dials"][str(case["midpoint_period"])]["four_factor_contacts"]
     row = next(row for row in contacts if row["equation"] == case["midpoint_equation"])
@@ -40,9 +42,13 @@ def test_original_symbolic_example_with_separately_labelled_numeric_witness(case
         assert (
             reading["sensitive_point_longitude"] == reading["occupant_longitude"] == 25
         )
+    else:
+        pass
 
 
-def test_sum_equivalence_doubles_both_period_and_orb_in_every_returned_contact():
+def test_sum_equivalence_doubles_both_period_and_orb_in_every_returned_contact() -> (
+    None
+):
     rng = random.Random(714019)
     values = {str(index): rng.uniform(-400, 700) for index in range(10)}
     result = midpoint_geometry(values)
@@ -71,7 +77,9 @@ def test_sum_equivalence_doubles_both_period_and_orb_in_every_returned_contact()
     "period,occupant,expected",
     [(90, 26.9999, True), (90, 27.0001, False), (45, 115.0, False)],
 )
-def test_original_reading_requires_actual_direct_occupancy(period, occupant, expected):
+def test_original_reading_requires_actual_direct_occupancy(
+    period: int, occupant: float, expected: bool
+) -> None:
     result = midpoint_geometry(
         {"Mars": 10.0, "Jupiter": 30.0, "Zeus": 15.0, "Midheaven": occupant}
     )
@@ -83,7 +91,7 @@ def test_original_reading_requires_actual_direct_occupancy(period, occupant, exp
     assert any("source_interpretation" in row for row in rows) == expected
 
 
-def test_short_arc_is_selected_before_rounding_at_the_antipodal_discontinuity():
+def test_short_arc_is_selected_before_rounding_at_the_antipodal_discontinuity() -> None:
     result = seven_planet_view(
         [{"id": "Sun", "longitude": 0.0}, {"id": "Moon", "longitude": 180.00001}]
     )
@@ -94,7 +102,9 @@ def test_short_arc_is_selected_before_rounding_at_the_antipodal_discontinuity():
     assert midpoint["computed_from_unrounded"] is True
 
 
-def test_exact_antipodal_seven_planet_view_reports_both_endpoints_without_order_bias():
+def test_exact_antipodal_seven_planet_view_reports_both_endpoints_without_order_bias() -> (
+    None
+):
     factors = [{"id": "Sun", "longitude": 0.0}, {"id": "Moon", "longitude": 180.0}]
     for sequence in (factors, factors[::-1]):
         row = seven_planet_view(sequence)["midpoints"][0]
@@ -103,7 +113,7 @@ def test_exact_antipodal_seven_planet_view_reports_both_endpoints_without_order_
         assert row["antipodal_inputs"] is True
 
 
-def test_legacy_contact_cannot_cross_orb_boundary_due_to_display_rounding():
+def test_legacy_contact_cannot_cross_orb_boundary_due_to_display_rounding() -> None:
     factors = [
         {"id": "Sun", "longitude": 0.0},
         {"id": "Moon", "longitude": 20.0},
@@ -115,7 +125,7 @@ def test_legacy_contact_cannot_cross_orb_boundary_due_to_display_rounding():
     )
 
 
-def test_existing_planet_major_contact_order_is_preserved_after_precision_fix():
+def test_existing_planet_major_contact_order_is_preserved_after_precision_fix() -> None:
     result = seven_planet_view(
         [
             {"id": "Sun", "longitude": 0.0},
@@ -133,7 +143,9 @@ def test_existing_planet_major_contact_order_is_preserved_after_precision_fix():
     ] == expected
 
 
-def test_sector_evidence_reconstructs_decision_even_when_client_rounding_crosses_cusp():
+def test_sector_evidence_reconstructs_decision_even_when_client_rounding_crosses_cusp() -> (
+    None
+):
     edge = float(Fraction(360, 13))
     value = math.nextafter(edge, math.inf)
     record = _build_planet_record(
@@ -155,7 +167,9 @@ def test_sector_evidence_reconstructs_decision_even_when_client_rounding_crosses
 
 @pytest.mark.skipif(runtime.swe is None, reason="Swiss Ephemeris required")
 @pytest.mark.parametrize("year", [2035, 2100])
-def test_future_native_layer_uses_same_explicit_time_policy_as_its_base_chart(year):
+def test_future_native_layer_uses_same_explicit_time_policy_as_its_base_chart(
+    year: int,
+) -> None:
     result = calculate_germany_chart_analysis(**{**astro_payload(), "birth_year": year})
     profile = result["midpoint_analysis"]["profile"]
     base = result["base_chart"]["chart_profile"]
@@ -168,7 +182,7 @@ def test_future_native_layer_uses_same_explicit_time_policy_as_its_base_chart(ye
     ) * 86400 == pytest.approx(69.184, abs=5e-5)
 
 
-def test_same_source_reading_on_two_dials_keeps_one_claim_identity():
+def test_same_source_reading_on_two_dials_keeps_one_claim_identity() -> None:
     geometry = midpoint_geometry(
         {"Mars": 10.0, "Jupiter": 30.0, "Zeus": 15.0, "Midheaven": 25.0},
         orb_degrees=0.0,

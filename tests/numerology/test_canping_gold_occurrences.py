@@ -7,8 +7,9 @@ import os
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core import canping_texts as texts
+from fatebridge.core.numerology import canping_texts as texts
 from fatebridge.utils.errors import NumerologySourceError
 
 FIXTURE = Path(
@@ -23,7 +24,7 @@ UNMATCHED = [row for row in REFERENCE["rows"] if row["printed_number"] == 2328]
 
 
 @pytest.mark.parametrize("row", MATCHED)
-def test_same_printed_number_column_and_actual_pages(row):
+def test_same_printed_number_column_and_actual_pages(row) -> None:
     result = texts.lookup_record("金", row["printed_number"], row["kind"])
     witness = next(
         w
@@ -40,10 +41,12 @@ def test_same_printed_number_column_and_actual_pages(row):
     if row["printed_number"] == 3322:
         assert witness["number_occurrence_ambiguous"] is True
         assert witness["number_occurrence_count"] == 2
+    else:
+        pass
 
 
 @pytest.mark.parametrize("row", UNMATCHED)
-def test_printed2328_observations_cannot_be_assigned_to3328(row):
+def test_printed2328_observations_cannot_be_assigned_to3328(row) -> None:
     data = texts.source_readings(comparison=True)
     observed = next(
         item for item in data["unmatched_observations"] if item["kind"] == row["kind"]
@@ -65,7 +68,7 @@ def test_printed2328_observations_cannot_be_assigned_to3328(row):
     assert alignment["observed_printed_other_number"] == 2328
 
 
-def test_observed_and_registered_denominators_include_unmatched_cells():
+def test_observed_and_registered_denominators_include_unmatched_cells() -> None:
     result = texts.witness_summary()
     assert result["version"] == "1.2.0"
     assert result["cells_examined"] == 72
@@ -106,7 +109,7 @@ def test_observed_and_registered_denominators_include_unmatched_cells():
     assert primary["visually_examined_cells"] == primary["total_cells"] == 1170
 
 
-def test_primary_source_identity_and_previous_water_witness_literals():
+def test_primary_source_identity_and_previous_water_witness_literals() -> None:
     source = json.loads((FIXTURE / "witness-data-before.json").read_text())
     assert len(source["entries"]) == 36
     assert texts.source_readings(comparison=True)["entries"][:36] == source["entries"]
@@ -119,7 +122,9 @@ def test_primary_source_identity_and_previous_water_witness_literals():
 @pytest.mark.parametrize(
     "fault", ["renumber", "apply", "erase", "page", "swap_literal", "promote"]
 )
-def test_positive_reviewed_source_rejects_nonempty_false_bindings(monkeypatch, fault):
+def test_positive_reviewed_source_rejects_nonempty_false_bindings(
+    monkeypatch: MonkeyPatch, fault: str
+) -> None:
     original = texts._loaded
     baseline = texts.source_readings(comparison=True)
     assert (
@@ -159,7 +164,7 @@ def test_positive_reviewed_source_rejects_nonempty_false_bindings(monkeypatch, f
     assert caught.value.as_result()["retryable"] is False
 
 
-def test_source_pdf_native_pages_and_initial_wrong_readings_are_preserved():
+def test_source_pdf_native_pages_and_initial_wrong_readings_are_preserved() -> None:
     assert (
         hashlib.sha256((FIXTURE / REFERENCE["source_pdf"]).read_bytes()).hexdigest()
         == REFERENCE["source_pdf_sha256"]

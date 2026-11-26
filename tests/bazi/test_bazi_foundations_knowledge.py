@@ -30,7 +30,7 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def test_pinned_primary_source_and_quoted_spans_are_reproducible():
+def test_pinned_primary_source_and_quoted_spans_are_reproducible() -> None:
     review = load(FIXTURE / "curation-review.json")
     manifest = load(FIXTURE / "source-manifest.json")
     assert digest(FIXTURE / "source-manifest.json") == review["source_manifest_sha256"]
@@ -51,7 +51,7 @@ def test_pinned_primary_source_and_quoted_spans_are_reproducible():
 
 
 @pytest.mark.parametrize("key", KEYS)
-def test_each_concept_separates_primary_program_and_editorial_attribution(key):
+def test_each_concept_separates_primary_program_and_editorial_attribution(key) -> None:
     result = calculate_knowledge_read(domain="bazi", key=key)
     assert result["category"] == "basics" and "error" not in result
     curation = result["provenance"]["entry_curation"]
@@ -84,12 +84,14 @@ def test_each_concept_separates_primary_program_and_editorial_attribution(key):
 @pytest.mark.parametrize("key", KEYS)
 @pytest.mark.parametrize("category", [None, "basics"])
 def test_concepts_are_identical_on_rest_mcp_cli_with_bare_and_explicit_keys(
-    key, category, surface_calls
-):
+    key, category: str | None, surface_calls
+) -> None:
     spec = SPECS["knowledge_read"]
     payload = {"domain": "bazi", "key": key}
     if category is not None:
         payload["category"] = category
+    else:
+        pass
     opts = {"include_snapshot_text": False, "response_char_limit": 0}
     http, protocol, code, cli = surface_calls(
         spec, payload, projection=opts, cli_first=False
@@ -108,7 +110,7 @@ def test_concepts_are_identical_on_rest_mcp_cli_with_bare_and_explicit_keys(
 @pytest.mark.parametrize("key", KEYS)
 def test_strict_projection_preserves_actual_source_and_supplement_on_three_transports(
     key, surface_calls
-):
+) -> None:
     spec = SPECS["knowledge_read"]
     payload = {"domain": "bazi", "key": key}
     fields = [
@@ -140,7 +142,9 @@ def test_strict_projection_preserves_actual_source_and_supplement_on_three_trans
     )
 
 
-def test_unknown_terms_stay_errors_and_nested_sources_cannot_mutate_cached_entries():
+def test_unknown_terms_stay_errors_and_nested_sources_cannot_mutate_cached_entries() -> (
+    None
+):
     missing = calculate_knowledge_read(domain="bazi", key="未收录的基础术语")
     assert missing["error_code"] == "knowledge.bazi.unknown_key"
     first = calculate_knowledge_read(domain="bazi", key="四柱")
@@ -154,7 +158,9 @@ def test_unknown_terms_stay_errors_and_nested_sources_cannot_mutate_cached_entri
 
 
 @pytest.mark.parametrize("mode", ["replace_category", "shadow_key", "invalid_schema"])
-def test_invalid_supplement_cannot_override_old_knowledge(mode, tmp_path, monkeypatch):
+def test_invalid_supplement_cannot_override_old_knowledge(
+    mode: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     replacement = load(BUNDLE)
     if mode == "replace_category":
         replacement["categories"] = {"ten_gods": {"正官": {"tips": ["wrong"]}}}

@@ -9,12 +9,14 @@ from pydantic import ValidationError
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro import native_execution, runtime
-from fatebridge.core.human_design_sample_witness import unpack_sample_witnesses
-from fatebridge.core.human_design_sensitivity import assess_birth_interval
+from fatebridge.core.human_design.human_design_sample_witness import (
+    unpack_sample_witnesses,
+)
+from fatebridge.core.human_design.human_design_sensitivity import assess_birth_interval
 from fatebridge.services.human_design import calculate_human_design
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
-from fatebridge.validation.human_design_clocks import verify_clock_records
+from validation.human_design import verify_human_design_reading
+from validation.human_design_clocks import verify_clock_records
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = next(s for s in CATALOG if s.key == "human_design")
@@ -43,13 +45,13 @@ def complete():
 
 
 @pytest.mark.parametrize("case", PROBES["mutations"], ids=lambda c: c["id"])
-def test_all_nine_original_rehashed_ordinary_clock_probes(complete, case):
+def test_all_nine_original_rehashed_ordinary_clock_probes(complete, case) -> None:
     value = deepcopy(complete)
     set_path(value, case["path"], case["replacement"])
     assert verify_human_design_reading((value))["status"] == "rejected"
 
 
-def test_original_nonnominal_UT1_failure_with_entire_interval_rebuilt(complete):
+def test_original_nonnominal_UT1_failure_with_entire_interval_rebuilt(complete) -> None:
     value = deepcopy(complete)
     set_path(
         value,
@@ -126,15 +128,15 @@ def mutate(value, case):
 
 
 @pytest.mark.parametrize("case", MUTATIONS)
-def test_design_reference_and_observation_contradictions(complete, case):
+def test_design_reference_and_observation_contradictions(complete, case) -> None:
     value = deepcopy(complete)
     mutate(value, case)
     assert verify_human_design_reading((value))["status"] == "rejected", case
 
 
 def test_complete_interval_replay_uses_no_native_or_private_worker_calls(
-    complete, monkeypatch
-):
+    complete, monkeypatch: pytest.MonkeyPatch
+) -> None:
     def forbidden(*args, **kwargs):
         raise AssertionError("Reading replay called the native producer")
 
@@ -165,7 +167,9 @@ def test_complete_interval_replay_uses_no_native_or_private_worker_calls(
         (1990, 0, "+05:30"),
     ],
 )
-def test_declared_calendar_eras_and_explicit_timezone_controls(year, second, zone):
+def test_declared_calendar_eras_and_explicit_timezone_controls(
+    year: int, second: int, zone: str
+) -> None:
     args = dict(
         PROBES["input"],
         birth_year=year,
@@ -184,6 +188,8 @@ def test_declared_calendar_eras_and_explicit_timezone_controls(year, second, zon
         result = calculate_human_design(**args)
         verify_clock_records(result)
         return
+    else:
+        pass
     result = execute_tool(SPEC, SPEC.request_model(**args))
     verify_clock_records(result)
     check = verify_human_design_reading(result)
@@ -200,7 +206,9 @@ def cycle_run():
     )
 
 
-def test_cycle_replay_uses_no_native_or_private_worker_calls(cycle_run, monkeypatch):
+def test_cycle_replay_uses_no_native_or_private_worker_calls(
+    cycle_run, monkeypatch: pytest.MonkeyPatch
+) -> None:
     def forbidden(*args, **kwargs):
         raise AssertionError("Cycle replay called the native producer")
 
@@ -217,7 +225,7 @@ def test_cycle_replay_uses_no_native_or_private_worker_calls(cycle_run, monkeypa
     "case",
     ["cycle_reference_UTC", "cycle_contact_UTC", "cycle_contact_future_assumption"],
 )
-def test_cycle_clock_contradictions_after_rehash(cycle_run, case):
+def test_cycle_clock_contradictions_after_rehash(cycle_run, case: str) -> None:
     value = deepcopy(cycle_run)
     if case == "cycle_reference_UTC":
         value["cycle_context"]["reference_utc"] = "2031-01-01T00:00:00+00:00"
@@ -234,7 +242,9 @@ def test_cycle_clock_contradictions_after_rehash(cycle_run, case):
     assert verify_human_design_reading((value))["status"] == "rejected"
 
 
-def test_execution_receipt_fields_are_not_misread_as_business_clock_charts(complete):
+def test_execution_receipt_fields_are_not_misread_as_business_clock_charts(
+    complete,
+) -> None:
     value = deepcopy(complete)
     value["run_metadata"]["clock_named_input_witnesses"] = {
         "birth_utc": "field locator",

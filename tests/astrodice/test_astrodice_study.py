@@ -9,9 +9,9 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.core.astro.astrology_tables import SIGNS
 from fatebridge.core.astrodice import METHOD_ID, PLANETS
-from fatebridge.core.astrology_tables import SIGNS
-from fatebridge.validation.astrodice_study import (
+from validation.astrodice_study import (
     DiceObservation,
     FrozenDicePolicy,
     audit_study,
@@ -19,7 +19,7 @@ from fatebridge.validation.astrodice_study import (
     make_forecasts,
     policy_fingerprint,
 )
-from fatebridge.validation.predictions import Outcome, StudyPlan
+from validation.predictions import Outcome, StudyPlan
 
 ISSUED = datetime(2027, 1, 2, tzinfo=timezone.utc)
 AS_OF = datetime(2027, 3, 1, tzinfo=timezone.utc)
@@ -75,7 +75,7 @@ def study():
     return plan, policy, records, forecasts, outcomes
 
 
-def test_dice_evidence_and_metrics_are_recomputed_but_not_certified(study):
+def test_dice_evidence_and_metrics_are_recomputed_but_not_certified(study) -> None:
     plan, policy, records, forecasts, outcomes = study
     report = audit_study(plan, policy, records, forecasts, outcomes, as_of=AS_OF)
     assert report["metrics"]["brier_score"] == pytest.approx(0.04)
@@ -105,7 +105,7 @@ def test_dice_evidence_and_metrics_are_recomputed_but_not_certified(study):
 )
 def test_hindsight_probability_abstention_hash_and_late_roll_are_rejected(
     study, change
-):
+) -> None:
     plan, policy, records, forecasts, outcomes = study
     forecasts[0] = forecasts[0].model_copy(update=change)
     with pytest.raises(ValueError):
@@ -122,14 +122,14 @@ def test_hindsight_probability_abstention_hash_and_late_roll_are_rejected(
 )
 def test_changed_identity_physical_evidence_and_outcome_window_records_are_rejected(
     study, change
-):
+) -> None:
     plan, policy, records, forecasts, outcomes = study
     records[0] = records[0].model_copy(update=change)
     with pytest.raises(ValueError):
         audit_study(plan, policy, records, forecasts, outcomes, as_of=AS_OF)
 
 
-def test_changed_roll_is_rejected_even_if_probability_is_unchanged(study):
+def test_changed_roll_is_rejected_even_if_probability_is_unchanged(study) -> None:
     plan, policy, records, forecasts, outcomes = study
     changed = records[1].model_dump(mode="json")
     changed["roll"]["house"] = 2  # Both policy cells are 0.2.
@@ -140,7 +140,9 @@ def test_changed_roll_is_rejected_even_if_probability_is_unchanged(study):
 
 @pytest.mark.parametrize("which", ["observations", "forecasts"])
 @pytest.mark.parametrize("operation", ["drop", "duplicate", "add"])
-def test_no_subset_selection_or_duplicated_cases(study, which, operation):
+def test_no_subset_selection_or_duplicated_cases(
+    study, which: str, operation: str
+) -> None:
     plan, policy, records, forecasts, outcomes = study
     rows = records if which == "observations" else forecasts
     if operation == "drop":
@@ -161,14 +163,16 @@ def test_no_subset_selection_or_duplicated_cases(study, which, operation):
         ("target_definition", "A redefined success event"),
     ],
 )
-def test_version_code_and_event_definition_cannot_drift(study, field, value):
+def test_version_code_and_event_definition_cannot_drift(
+    study, field: str, value
+) -> None:
     plan, policy, records, forecasts, outcomes = study
     policy = policy.model_copy(update={field: value})
     with pytest.raises(ValueError):
         audit_study(plan, policy, records, forecasts, outcomes, as_of=AS_OF)
 
 
-def test_policy_must_cover_full_space_without_defaults(study):
+def test_policy_must_cover_full_space_without_defaults(study) -> None:
     _, policy, *_ = study
     data = policy.model_dump(mode="json")
     data["probabilities"].pop("Mercury|Virgo|0")
@@ -179,7 +183,7 @@ def test_policy_must_cover_full_space_without_defaults(study):
         FrozenDicePolicy.model_validate(data)
 
 
-def test_reordered_json_has_same_semantic_policy_commitment(study):
+def test_reordered_json_has_same_semantic_policy_commitment(study) -> None:
     _, policy, *_ = study
     data = policy.model_dump(mode="json")
     data["probabilities"] = dict(reversed(list(data["probabilities"].items())))
@@ -188,7 +192,7 @@ def test_reordered_json_has_same_semantic_policy_commitment(study):
     ) == policy_fingerprint(policy)
 
 
-def test_missing_outcome_and_abstention_remain_in_registered_denominator(study):
+def test_missing_outcome_and_abstention_remain_in_registered_denominator(study) -> None:
     plan, policy, records, forecasts, outcomes = study
     policy.probabilities["Mercury|Virgo|1"] = None
     plan.model_sha256 = policy_fingerprint(policy)
@@ -202,8 +206,11 @@ def test_missing_outcome_and_abstention_remain_in_registered_denominator(study):
 
 
 def test_cli_writes_auditable_files_without_overwriting(
-    study, tmp_path, monkeypatch, capsys
-):
+    study,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     plan, policy, records, _, outcomes = study
     script = (
         Path(__file__).resolve().parents[2]

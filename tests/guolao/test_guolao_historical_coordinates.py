@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.guolao_classical import MANSIONS, HistoricalMansions
-from fatebridge.core.guolao_coordinates import (
+from fatebridge.core.guolao.guolao_classical import MANSIONS, HistoricalMansions
+from fatebridge.core.guolao.guolao_coordinates import (
     NLC166_MANSIONS,
     NLC166_PALACES,
     PROFILES,
@@ -36,11 +36,11 @@ NLC = REFERENCE["nlc166_transcription"]
         ),
     ],
 )
-def test_primary_artifact_bytes_are_frozen(file, expected):
+def test_primary_artifact_bytes_are_frozen(file, expected) -> None:
     assert hashlib.sha256((FIXTURE / file).read_bytes()).hexdigest() == expected
 
 
-def test_scan_circle_and_28_widths_match_selected_source_not_luwei_emendation():
+def test_scan_circle_and_28_widths_match_selected_source_not_luwei_emendation() -> None:
     assert NLC166_MANSIONS.circle_du == F(NLC["circle_du"])
     assert NLC166_MANSIONS.widths_du == tuple(map(F, NLC["widths_du"]))
     assert sum(NLC166_MANSIONS.widths_du) == F("365.2575")
@@ -51,13 +51,17 @@ def test_scan_circle_and_28_widths_match_selected_source_not_luwei_emendation():
 
 @pytest.mark.parametrize("profile_key", PROFILES)
 @pytest.mark.parametrize("row", NLC["twelve_entrances"], ids=lambda r: r["branch"])
-def test_each_named_entrance_and_both_sides_against_source(profile_key, row):
+def test_each_named_entrance_and_both_sides_against_source(profile_key, row) -> None:
     profile = PROFILES[profile_key]
     degree = row["degree_du"]
     if profile_key == "wikisource":
         for variant in REFERENCE["wikisource"]["variants_against_selected_nlc_scan"]:
             if variant["branch"] == row["branch"]:
                 degree = variant["wikisource_du"]
+            else:
+                pass
+    else:
+        pass
     epsilon = F(1, 10**70)
     at = profile.from_mansion(row["mansion"], F(degree))
     assert at["branch"] == row["branch"]
@@ -73,7 +77,7 @@ def test_each_named_entrance_and_both_sides_against_source(profile_key, row):
 @pytest.mark.parametrize("case", REFERENCE["independent_coordinate_cases"])
 def test_hand_arithmetic_source_cases_including_real_edition_classification_change(
     case,
-):
+) -> None:
     result = PROFILES[case["profile"]].from_mansion(
         case["mansion"], F(case["degree_du"])
     )
@@ -82,7 +86,7 @@ def test_hand_arithmetic_source_cases_including_real_edition_classification_chan
 
 
 @pytest.mark.parametrize("profile", list(PROFILES.values()), ids=lambda p: p.profile_id)
-def test_all_mansion_edges_and_negative_full_circle_round_trip(profile):
+def test_all_mansion_edges_and_negative_full_circle_round_trip(profile) -> None:
     angle = F()
     for mansion, width in zip(MANSIONS, map(F, NLC["widths_du"])):
         for delta in (F(), width / 2, width - F(1, 10**60)):
@@ -101,7 +105,7 @@ def test_all_mansion_edges_and_negative_full_circle_round_trip(profile):
 
 
 @pytest.mark.parametrize("profile", list(PROFILES.values()), ids=lambda p: p.profile_id)
-def test_actual_palace_widths_close_without_30_degree_modulus(profile):
+def test_actual_palace_widths_close_without_30_degree_modulus(profile) -> None:
     total = sum((profile.width(e.branch) for e in profile.entrances), F())
     assert total == F("365.2575")
     assert len({profile.width(e.branch) for e in profile.entrances}) > 1
@@ -119,7 +123,7 @@ def test_actual_palace_widths_close_without_30_degree_modulus(profile):
         WIKISOURCE_PALACES.from_palace("丑", F(29))
 
 
-def test_two_profile_variants_remain_distinct_and_digitized_passage_is_pinned():
+def test_two_profile_variants_remain_distinct_and_digitized_passage_is_pinned() -> None:
     first = {e.branch: e.degree_du for e in NLC166_PALACES.entrances}
     second = {e.branch: e.degree_du for e in WIKISOURCE_PALACES.entrances}
     assert {key for key in first if first[key] != second[key]} == {"丑", "巳"}
@@ -134,7 +138,9 @@ def test_two_profile_variants_remain_distinct_and_digitized_passage_is_pinned():
 
 
 @pytest.mark.parametrize("value", [1.0, 1, True, "1", None])
-def test_implicit_units_or_float_coordinates_rejected(value):
+def test_implicit_units_or_float_coordinates_rejected(
+    value: bool | float | int | str | None,
+) -> None:
     for profile in PROFILES.values():
         with pytest.raises(TypeError):
             profile.locate(value)
@@ -144,7 +150,9 @@ def test_implicit_units_or_float_coordinates_rejected(value):
             profile.from_palace("丑", value)
 
 
-def test_float_table_constructor_cannot_round_an_interior_offset_to_mansion_end():
+def test_float_table_constructor_cannot_round_an_interior_offset_to_mansion_end() -> (
+    None
+):
     # Before the fix this table accepted float widths and locate(2-1e-30)
     # returned 亢,1.0. The exact offset is 1-1e-30 and must be below its width.
     with pytest.raises(TypeError, match="Fraction"):
@@ -156,7 +164,7 @@ def test_float_table_constructor_cannot_round_an_interior_offset_to_mansion_end(
     assert exact.locate(F(2) - tiny) == ("亢", F(1) - tiny)
 
 
-def test_input_collections_cannot_mutate_a_validated_coordinate_table():
+def test_input_collections_cannot_mutate_a_validated_coordinate_table() -> None:
     widths = [F(1)] * 28
     table = HistoricalMansions("synthetic_exact", F(28), widths)
     widths[0] = F(2)
@@ -169,7 +177,7 @@ def test_input_collections_cannot_mutate_a_validated_coordinate_table():
     assert profile.audit() == before
 
 
-def test_invalid_profiles_and_noncanonical_local_offsets_are_rejected():
+def test_invalid_profiles_and_noncanonical_local_offsets_are_rejected() -> None:
     profile = NLC166_PALACES
     with pytest.raises(ValueError, match="十二个不同"):
         replace(profile, entrances=(profile.entrances[0],) * 12)

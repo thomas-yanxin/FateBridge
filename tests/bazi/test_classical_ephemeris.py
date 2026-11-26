@@ -26,8 +26,12 @@ from fatebridge.core.classical_western import (
     is_retrograde,
     out_of_bounds,
 )
+from fatebridge.core.contracts.output_charts import AlmutenFiguris
 from fatebridge.core.ephemeris_runtime import swe
-from fatebridge.services.astrology import calculate_core_chart_analysis
+from fatebridge.services.astrology import (
+    _build_almuten_figuris_line,
+    calculate_core_chart_analysis,
+)
 
 _SWE_AVAILABLE = swe is not None
 _requires_swe = pytest.mark.skipif(
@@ -52,31 +56,31 @@ _NATAL = dict(
 # ── pure: retrograde / out-of-bounds ──────────────────────────────────────────
 
 
-def test_is_retrograde_sign_of_speed():
+def test_is_retrograde_sign_of_speed() -> None:
     assert is_retrograde(-0.001) is True
     assert is_retrograde(0.5) is False
     # Exactly stationary counts as direct (not yet crossed into retrograde).
     assert is_retrograde(0.0) is False
 
 
-def test_is_retrograde_unknown_speed_is_none():
+def test_is_retrograde_unknown_speed_is_none() -> None:
     # Offline approximate engine supplies no speed → "unknown", never fabricated.
     assert is_retrograde(None) is None
 
 
-def test_out_of_bounds_brackets_the_solar_limit():
+def test_out_of_bounds_brackets_the_solar_limit() -> None:
     assert out_of_bounds(23.41, 23.4) is True
     assert out_of_bounds(-23.41, 23.4) is True  # symmetric
     assert out_of_bounds(23.39, 23.4) is False
     assert out_of_bounds(0.0, 23.4) is False
 
 
-def test_out_of_bounds_unknown_declination_is_none():
+def test_out_of_bounds_unknown_declination_is_none() -> None:
     assert out_of_bounds(None) is None
     assert out_of_bounds(24.0) is None
 
 
-def test_build_planet_classical_degrades_without_ephemeris():
+def test_build_planet_classical_degrades_without_ephemeris() -> None:
     # No speed / declination passed (the swe-is-None path): both flags unknown.
     entry = build_planet_classical(
         planet="Mars",
@@ -91,7 +95,7 @@ def test_build_planet_classical_degrades_without_ephemeris():
     assert entry["out_of_bounds"] is None
 
 
-def test_build_planet_classical_threads_speed_and_declination():
+def test_build_planet_classical_threads_speed_and_declination() -> None:
     entry = build_planet_classical(
         planet="Saturn",
         sign="Taurus",
@@ -111,7 +115,7 @@ def test_build_planet_classical_threads_speed_and_declination():
 # ── pure: Almuten Figuris ─────────────────────────────────────────────────────
 
 
-def test_almuten_figuris_sums_dignities_across_points():
+def test_almuten_figuris_sums_dignities_across_points() -> None:
     # Aries throughout, daytime: Mars (domicile 5 + triplicity... ) and the term/
     # face lords accumulate. The winner must be the planet with the largest
     # cross-point total, and that total must equal the max in `totals`.
@@ -126,7 +130,7 @@ def test_almuten_figuris_sums_dignities_across_points():
     assert set(result["points"]) == {"Sun", "Moon", "Ascendant"}
 
 
-def test_almuten_figuris_skips_missing_points():
+def test_almuten_figuris_skips_missing_points() -> None:
     # Only the points supplied count — a syzygy-less (offline) chart still elects.
     points = {"Sun": {"sign": "Leo", "degree_in_sign": 0.0}}
     result = build_almuten_figuris(points, is_day=True)
@@ -135,13 +139,13 @@ def test_almuten_figuris_skips_missing_points():
     assert list(result["points"]) == ["Sun"]
 
 
-def test_almuten_figuris_empty_is_none():
+def test_almuten_figuris_empty_is_none() -> None:
     result = build_almuten_figuris({}, is_day=True)
     assert result["winner"] is None
     assert result["totals"] == {}
 
 
-def test_almuten_figuris_tie_breaks_to_slower_planet():
+def test_almuten_figuris_tie_breaks_to_slower_planet() -> None:
     # Construct a symmetric tie and confirm the Chaldean (slowest-first) winner is
     # deterministic across repeated builds.
     points = {
@@ -151,6 +155,61 @@ def test_almuten_figuris_tie_breaks_to_slower_planet():
     first = build_almuten_figuris(points, is_day=True)["winner"]
     second = build_almuten_figuris(points, is_day=True)["winner"]
     assert first == second
+
+
+@pytest.mark.parametrize(
+    "included,missing",
+    [
+        (("Sun", "Moon", "Ascendant", "fortune", "syzygy"), ()),
+        (("Sun", "Moon", "Ascendant", "fortune"), ("syzygy",)),
+        (("Sun",), ("Moon", "Ascendant", "fortune", "syzygy")),
+        ((), ("Sun", "Moon", "Ascendant", "fortune", "syzygy")),
+    ],
+)
+def test_almuten_figuris_method_delivery_and_projection(included, missing) -> None:
+    # Synthetic input-coverage shapes, not physical charts or a numeric oracle.
+    result = build_almuten_figuris(
+        {point: {"sign": "Aries", "degree_in_sign": 5.0} for point in included},
+        is_day=True,
+    )
+    method = result["method"]
+    assert method["included_points"] == list(included)
+    assert method["missing_points"] == list(missing)
+    assert method["source_profile"] == "mixed_dorothean_egyptian_lilly"
+    assert method["is_day"] is True
+    assert method["historical_method_status"] == "selected_mixed_subset"
+    assert method["source_refs"]
+    assert all(reference["scope"] for reference in method["source_refs"])
+    AlmutenFiguris.model_validate(result)
+
+    projected = AlmutenFiguris.model_validate(
+        {"method": {"missing_points": list(missing)}}
+    )
+    assert projected.model_fields_set == {"method"}
+    assert projected.method is not None
+    assert projected.method.model_fields_set == {"missing_points"}
+    assert projected.method.missing_points == list(missing)
+    assert projected.method.is_day is None
+
+    text = _build_almuten_figuris_line({"classical": {"almuten_figuris": result}})
+    assert f"本次{len(included)}个可得点的本质尊贵汇总" in text
+    assert "固定Chaldean顺序" in text
+    assert "完整历史命主程序未认证" in text
+    labels = {
+        "Sun": "日",
+        "Moon": "月",
+        "Ascendant": "命",
+        "fortune": "福",
+        "syzygy": "朔望",
+    }
+    if missing:
+        expected_missing = (
+            "未纳入点：" + "、".join(labels[point] for point in missing) + "。"
+        )
+        assert expected_missing in text
+    else:
+        assert "未纳入点：" not in text
+    assert ("无可用参与点。" in text) == (not included)
 
 
 # ── integration: real ephemeris invariants on the natal chart ─────────────────
@@ -163,14 +222,14 @@ def natal_chart():
 
 
 @_requires_swe
-def test_every_planet_has_retro_and_oob_flags(natal_chart):
+def test_every_planet_has_retro_and_oob_flags(natal_chart) -> None:
     for entry in natal_chart["classical"]["planets"].values():
         assert "retrograde" in entry and isinstance(entry["retrograde"], bool)
         assert "out_of_bounds" in entry and isinstance(entry["out_of_bounds"], bool)
 
 
 @_requires_swe
-def test_dec_2000_jupiter_and_saturn_are_retrograde(natal_chart):
+def test_dec_2000_jupiter_and_saturn_are_retrograde(natal_chart) -> None:
     # Real sky: both outer benefic/malefic were retrograde in Dec 2000.
     planets = natal_chart["classical"]["planets"]
     assert planets["Jupiter"]["retrograde"] is True
@@ -181,7 +240,7 @@ def test_dec_2000_jupiter_and_saturn_are_retrograde(natal_chart):
 
 
 @_requires_swe
-def test_prenatal_syzygy_precedes_birth_and_is_a_lunation(natal_chart):
+def test_prenatal_syzygy_precedes_birth_and_is_a_lunation(natal_chart) -> None:
     info = build_astro_birth_info(use_true_solar_time=True, **_NATAL)
     birth_jd = _julian_day(info.utc_datetime)
     syzygy = natal_chart["classical"]["syzygy"]
@@ -196,7 +255,7 @@ def test_prenatal_syzygy_precedes_birth_and_is_a_lunation(natal_chart):
 
 
 @_requires_swe
-def test_almuten_figuris_uses_five_points_and_winner_leads(natal_chart):
+def test_almuten_figuris_uses_five_points_and_winner_leads(natal_chart) -> None:
     figuris = natal_chart["classical"]["almuten_figuris"]
     # With swe present all five hylegic points resolve.
     assert set(figuris["points"]) == {
@@ -212,7 +271,7 @@ def test_almuten_figuris_uses_five_points_and_winner_leads(natal_chart):
 
 
 @_requires_swe
-def test_snapshot_renders_mingzhu_section_and_retrograde():
+def test_snapshot_renders_mingzhu_section_and_retrograde() -> None:
     payload = calculate_core_chart_analysis(
         chart_variant="hellen_chart", use_true_solar_time=True, **_NATAL
     )

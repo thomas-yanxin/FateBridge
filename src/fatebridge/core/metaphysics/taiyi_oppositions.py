@@ -12,6 +12,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
+from fatebridge.core.metaphysics.taiyi_geometry import PALACES, RING
+
 DATA_SHA256 = "1a9e976fd86cde5ef00739850d96514017c5aec64d79d993cece15753a2049f0"
 ACTORS = {
     "wenchang_palace": "文昌",
@@ -43,7 +45,6 @@ def annotation_notes() -> dict[int, dict[str, Any]]:
 
 def opposition_assessment(core: dict[str, Any]) -> dict[str, Any]:
     """No recasting or numeric override; source notes only compare supplied facts."""
-    from fatebridge.core.metaphysics.taiyi_geometry import PALACES, RING
 
     taiyi = core["taiyi_palace"]
     center = RING.index(taiyi)

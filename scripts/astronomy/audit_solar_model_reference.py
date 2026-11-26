@@ -51,6 +51,8 @@ def audit(reference_path: Path | None = None) -> ModelAudit:
     assert len(expected) == len(reference["rows"])
     if reference_path is None:
         assert len(expected) == 96
+    else:
+        pass
     assert (
         reference.get("production_imports", reference.get("production_imported"))
         is False
@@ -74,6 +76,8 @@ def audit(reference_path: Path | None = None) -> ModelAudit:
                     key = (year, index)
                     if key not in expected:
                         continue
+                    else:
+                        pass
                     assert term.resolution_provider == PROVIDER
                     assert term.ephemeris_model == MODEL_ID
                     assert term.ephemeris_retflags == ()
@@ -101,6 +105,8 @@ def audit(reference_path: Path | None = None) -> ModelAudit:
                     midpoint = (low + high) / 2
                     if midpoint in (low, high):
                         break
+                    else:
+                        pass
                     state, flag = almanac.ephemeris_call(
                         "calc", midpoint, swe.SUN, swe.FLG_MOSEPH
                     )
@@ -175,3 +181,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -8,9 +8,9 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import sukuyo_naoj_adjustments as module
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_historical_calendar import date_reference
+from fatebridge.core.sukuyo import sukuyo_naoj_adjustments as module
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_historical_calendar import date_reference
 
 FIXTURE = (
     Path(__file__).parents[1] / "data/sukuyo-naoj-adjustments-before-code-v1.json.gz"
@@ -21,7 +21,7 @@ def frozen():
     return json.loads(gzip.decompress(FIXTURE.read_bytes()))
 
 
-def test_all303_source_table_rows_retained_in_their_original_categories():
+def test_all303_source_table_rows_retained_in_their_original_categories() -> None:
     fixture = frozen()
     data = json.loads(module.SOURCE.read_bytes())
     assert (
@@ -51,7 +51,7 @@ def test_all303_source_table_rows_retained_in_their_original_categories():
     assert sum(row["kind"] == "month_start_adjustment" for row in actual) == 209
 
 
-def test_all276_adjustments_match_before_code_dates_cycles_and_literal_facts():
+def test_all276_adjustments_match_before_code_dates_cycles_and_literal_facts() -> None:
     fixture = frozen()
     data = json.loads(module.SOURCE.read_bytes())
     facts = {row["id"]: row for row in data["monthly_rows"]}
@@ -84,7 +84,9 @@ def test_all276_adjustments_match_before_code_dates_cycles_and_literal_facts():
         assert not reference["scope"]["host_fields_changed"]
 
 
-def test_all23155_host_months_bind_complete_post_adjustment_keys_without_leakage():
+def test_all23155_host_months_bind_complete_post_adjustment_keys_without_leakage() -> (
+    None
+):
     fixture = frozen()
     expected = {}
     for row in fixture["before_production_binding"]["rows"]:
@@ -103,7 +105,7 @@ def test_all23155_host_months_bind_complete_post_adjustment_keys_without_leakage
     assert len(seen) == 276
 
 
-def test_julian_printed_dates_and_month_renaming_are_not_double_applied():
+def test_julian_printed_dates_and_month_renaming_are_not_double_applied() -> None:
     ref = date_reference(date(768, 7, 23))["published_calendar_adjustment_reference"]
     label, start = ref["selected_month_records"]
     assert label["before_month_key"] == [768, 6, False]
@@ -127,7 +129,7 @@ def test_julian_printed_dates_and_month_renaming_are_not_double_applied():
     )
 
 
-def test_catalogue_absence_and_detached_output_do_not_rewrite_history():
+def test_catalogue_absence_and_detached_output_do_not_rewrite_history() -> None:
     calendar = calendar_mansion(
         "0820-03-22",
         "00:15:00",
@@ -149,7 +151,9 @@ def test_catalogue_absence_and_detached_output_do_not_rewrite_history():
 
 
 @pytest.mark.parametrize("part", [None, "first_half", "second_half"])
-def test_complete_current_leap_month_conditions_are_still_delivered(part):
+def test_complete_current_leap_month_conditions_are_still_delivered(
+    part: str | None,
+) -> None:
     args = {"calendar_day_part": part} if part else {}
     calendar = calendar_mansion(
         "0768-07-23",
@@ -191,8 +195,8 @@ def test_complete_current_leap_month_conditions_are_still_delivered(part):
     ],
 )
 def test_dropping_any_source_category_or_changing_date_convention_requires_revalidation(
-    monkeypatch, tmp_path, field
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, field: str
+) -> None:
     data = json.loads(module.SOURCE.read_bytes())
     if field == "date_convention_source":
         data[field]["declared"] = "Treat all literal dates as Gregorian"
@@ -207,7 +211,7 @@ def test_dropping_any_source_category_or_changing_date_convention_requires_reval
         )
 
 
-def test_unlisted_post1582_month_still_explains_the_requested_date_convention():
+def test_unlisted_post1582_month_still_explains_the_requested_date_convention() -> None:
     calendar = calendar_mansion(
         "1697-01-23",
         "05:45:00",

@@ -23,6 +23,8 @@ def source_readings(corpus: Path = CORPUS) -> dict[str, Any]:
     raw = (corpus / "freeze-original.json").read_bytes()
     if hashlib.sha256(raw).hexdigest() != FREEZE:
         raise ValueError("Dangshi source freeze changed")
+    else:
+        pass
     original = json.loads(raw)
     frozen = json.loads((corpus / "freeze.json").read_text())
     noble_path = "tests/fixtures/taiyi_dangshi_noble_v40/freeze.json"
@@ -33,6 +35,8 @@ def source_readings(corpus: Path = CORPUS) -> dict[str, Any]:
         != original["prior_sources"][noble_path]
     ):
         raise ValueError("Dangshi original noble source commitment changed")
+    else:
+        pass
     noble_original = json.loads(noble_original_raw)
     noble_raw = (ROOT / noble_path).read_bytes()
     noble = json.loads(noble_raw)
@@ -47,6 +51,8 @@ def source_readings(corpus: Path = CORPUS) -> dict[str, Any]:
         },
     }:
         raise ValueError("Dangshi noble source projection changed")
+    else:
+        pass
     prior_sources = {
         name: digest
         for name, digest in original["prior_sources"].items()
@@ -55,11 +61,15 @@ def source_readings(corpus: Path = CORPUS) -> dict[str, Any]:
     prior_sources[noble_path] = hashlib.sha256(noble_raw).hexdigest()
     if frozen != {**original, "prior_sources": prior_sources}:
         raise ValueError("Dangshi case source projection changed")
+    else:
+        pass
     for folder, manifest in ((noble_corpus, noble), (corpus, frozen)):
         for base, key in ((folder, "files"), (ROOT, "prior_sources")):
             for name, expected in manifest[key].items():
                 if hashlib.sha256((base / name).read_bytes()).hexdigest() != expected:
                     raise ValueError(f"Frozen source changed: {name}")
+                else:
+                    pass
     result: dict[str, Any] = json.loads((corpus / "readings.json").read_text())
     return result
 
@@ -73,10 +83,14 @@ def audit() -> dict[str, Any]:
         for witness in collation["witnesses"]
     ):
         raise ValueError("Dangshi collation source binding changed")
+    else:
+        pass
     if collation["literal_variant"]["readings"] != {
         edition["id"]: edition["marker_gods"][-1] for edition in source["editions"]
     }:
         raise ValueError("Dangshi collation replaced an edition reading")
+    else:
+        pass
     args = source["conditional_inputs"]
     core = cyclic_core(args["cycle_index"], yin=args["yin"])
     core_rows = [
@@ -239,3 +253,5 @@ if __name__ == "__main__":
         )
     )
     raise SystemExit(1)
+else:
+    pass

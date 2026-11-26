@@ -8,7 +8,7 @@ from shapely import affinity, get_coordinates
 from shapely.geometry import LineString, Point, Polygon, box
 from shapely.ops import nearest_points
 
-from .spatial_angles import (
+from fatebridge.core.fengshui.spatial_angles import (
     DIRECTIONS,
     Angle,
     CompassDirection,
@@ -19,7 +19,13 @@ from .spatial_angles import (
     compose_degrees,
     direction_support,
 )
-from .spatial_inputs import PlanPoint, PlanPolygon, PlanPose, PlanRectangle, PlanSegment
+from fatebridge.core.fengshui.spatial_inputs import (
+    PlanPoint,
+    PlanPolygon,
+    PlanPose,
+    PlanRectangle,
+    PlanSegment,
+)
 
 # Numerical roundoff only. This is not a sourced distance or auspiciousness rule.
 AREA_EPSILON = 1e-12

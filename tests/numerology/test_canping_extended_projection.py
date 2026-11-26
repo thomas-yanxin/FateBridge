@@ -6,11 +6,12 @@ import json
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
 from fatebridge.core import almanac
-from fatebridge.core import canping_solar as solar
 from fatebridge.core import de440_solar as de440
 from fatebridge.core.local_techniques.canping import build_canping_result
+from fatebridge.core.numerology import canping_solar as solar
 from fatebridge.utils.errors import EphemerisSourceError
 
 ROOT = Path(__file__).parents[1] / "fixtures/canping_extended_projection_v1"
@@ -50,7 +51,7 @@ def event(year):
     )
 
 
-def test_frozen_original_references_and_source_identity_are_preserved():
+def test_frozen_original_references_and_source_identity_are_preserved() -> None:
     freeze = json.loads((ROOT / "freeze.json").read_bytes())
     for name, expected in freeze["files"].items():
         assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == expected
@@ -63,7 +64,7 @@ def test_frozen_original_references_and_source_identity_are_preserved():
     assert de440.source_receipt(NEW)["accuracy_certified"] is False
 
 
-def test_every_predeclared_root_and_original_state_matches_independent_reader():
+def test_every_predeclared_root_and_original_state_matches_independent_reader() -> None:
     reference = json.loads((ROOT / "reference.json").read_bytes())
     states = json.loads((ROOT / "states.json").read_bytes())
     assert reference["production_imports"] is states["production_imports"] is False
@@ -76,6 +77,8 @@ def test_every_predeclared_root_and_original_state_matches_independent_reader():
         error = abs(details["selected_crossing_jd_tt"] - expected["jd_tt"]) * 86400
         if error > P["reference_evaluator"]["root_tolerance_seconds"]:
             failures.append((expected["year"], error))
+        else:
+            pass
         assert details["numerical_epoch_representation"] == "explicit_two_part_tt"
         assert details["selection_policy"] == P["new_policy_id"]
         assert details["historical_ut1_convention"] is (expected["year"] == 1699)
@@ -99,7 +102,9 @@ def test_every_predeclared_root_and_original_state_matches_independent_reader():
 @pytest.mark.parametrize("mode", ["auto", "de440"])
 @pytest.mark.parametrize("method", ["bazi_appendix_v1", "bazi_continuous_v1"])
 @pytest.mark.parametrize("date", ["1700-01-03", "2201-05-15", "2300-05-15"])
-def test_complete120_years_without_native_substitution(mode, method, date, monkeypatch):
+def test_complete120_years_without_native_substitution(
+    mode: str, method: str, date: str, monkeypatch: MonkeyPatch
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
     out = build_canping_result(
         date=date,
@@ -132,8 +137,8 @@ def test_complete120_years_without_native_substitution(mode, method, date, monke
     ],
 )
 def test_private_event_permission_never_authorizes_an_unrelated_origin_or_horizon(
-    year, origin, bazi, horizon, monkeypatch
-):
+    year: int, origin: int, bazi: int, horizon: bool | int, monkeypatch: MonkeyPatch
+) -> None:
     def refuse(*args, **kwargs):
         pytest.fail("An invalid caller must not load the additional data")
 
@@ -149,19 +154,23 @@ def test_private_event_permission_never_authorizes_an_unrelated_origin_or_horizo
 
 
 @pytest.mark.parametrize("year", [1699, 2420])
-def test_warm_private_roots_do_not_expand_standalone_year_api(year):
+def test_warm_private_roots_do_not_expand_standalone_year_api(year: int) -> None:
     event(year)
     with pytest.raises(ValueError, match="1700..2300"):
         almanac.get_solar_terms_for_year(year, "UTC")
 
 
 @pytest.mark.parametrize("mode", ["native", "analytic", "aa1996"])
-def test_explicit_other_modes_do_not_select_additional_de440_events(mode, monkeypatch):
+def test_explicit_other_modes_do_not_select_additional_de440_events(
+    mode: str, monkeypatch: MonkeyPatch
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
     assert solar._extended_event_profile(2420, 2300, mode, None) is None
 
 
-def test_strict_native_jpl_override_does_not_select_additional_de440(monkeypatch):
+def test_strict_native_jpl_override_does_not_select_additional_de440(
+    monkeypatch: MonkeyPatch,
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
     assert (
         solar._extended_event_profile(2420, 2300, "auto", "required-native.eph") is None
@@ -170,8 +179,8 @@ def test_strict_native_jpl_override_does_not_select_additional_de440(monkeypatch
 
 @pytest.mark.parametrize("fault", ["missing", "crc", "frame", "scope", "rehash"])
 def test_selected_corrupt_profile_fails_without_native_fallback(
-    fault, tmp_path, monkeypatch
-):
+    fault: str, tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     folder = tmp_path / "data/astronomy"
     folder.mkdir(parents=True)
     for name in [
@@ -197,7 +206,7 @@ def test_selected_corrupt_profile_fails_without_native_fallback(
     else:
         data = bytearray(gzip.decompress(binary.read_bytes()))
         data[40] ^= 1
-        packed = gzip.compress(data, mtime=0)
+        packed = gzip.compress(data, compresslevel=1, mtime=0)
         binary.write_bytes(packed)
         manifest["compressed_sha256"] = hashlib.sha256(packed).hexdigest()
         manifest["uncompressed_sha256"] = hashlib.sha256(data).hexdigest()
@@ -213,12 +222,16 @@ def test_selected_corrupt_profile_fails_without_native_fallback(
     assert error.value.reason == "solar_de440_invalid"
 
 
-def test_unused_new_data_are_not_a_dependency_of_old_inputs(monkeypatch):
+def test_unused_new_data_are_not_a_dependency_of_old_inputs(
+    monkeypatch: MonkeyPatch,
+) -> None:
     original = de440._profile
 
     def load(profile=de440.MODEL_ID):
         if profile == NEW:
             raise EphemerisSourceError("solar_de440_invalid")
+        else:
+            pass
         return original(profile)
 
     monkeypatch.setattr(de440, "_profile", load)
@@ -228,7 +241,9 @@ def test_unused_new_data_are_not_a_dependency_of_old_inputs(monkeypatch):
     assert row["record"]["ephemeris_model"] == "fatebridge_de440_solar_canping_v1"
 
 
-def test_source_environment_change_is_not_misreported_as_an_input_error(monkeypatch):
+def test_source_environment_change_is_not_misreported_as_an_input_error(
+    monkeypatch: MonkeyPatch,
+) -> None:
     original = solar._extended_root
 
     def mutate(*args):

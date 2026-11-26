@@ -2,46 +2,51 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import date
 from typing import Any
 
 from fatebridge.core.almanac import (
     get_day_ganzhi,
     localize_datetime,
 )
+from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX, MetaphysicsSeed
+from fatebridge.core.metaphysics.taiyi_board import assemble_board, calendar_summary
+from fatebridge.core.metaphysics.taiyi_clock import (
+    SOLAR_ANCHOR_SCOPE,
+    nominal_clock_label,
+    validate_seed_civil_clock,
+)
+from fatebridge.core.metaphysics.taiyi_gates import attach_gate_board
 from fatebridge.core.metaphysics.taiyi_geometry import BRANCHES, SOURCES
-
-from .common import SEXAGENARY_INDEX, MetaphysicsSeed
-from .taiyi_clock import validate_seed_civil_clock
-from .taiyi_hour import KEY_SOURCE
-from .taiyi_origin_selection import winter_origin_selection
-from .taiyi_periods import SOLAR_ANCHOR_SCOPE, _clock, _previous_term
-from .taiyi_ten_jing import attach_ten_jing
-from .taiyi_year import assemble_board, calendar_summary, cyclic_core
+from fatebridge.core.metaphysics.taiyi_historical import source_date_reference
+from fatebridge.core.metaphysics.taiyi_hour import KEY_SOURCE
+from fatebridge.core.metaphysics.taiyi_origin_selection import winter_origin_selection
+from fatebridge.core.metaphysics.taiyi_period_frame import previous_solar_term
+from fatebridge.core.metaphysics.taiyi_ten_jing import attach_ten_jing
+from fatebridge.core.metaphysics.taiyi_year import cyclic_core
+from fatebridge.utils.civil_time import NominalClockLabel
 
 KEY_DAY_PROFILE = "key_day_winter_jiazi_v1"
 
 
-def key_day_origin(winter_clock: datetime, target_clock: datetime) -> dict[str, Any]:
-    if winter_clock.tzinfo is not None or target_clock.tzinfo is not None:
-        raise ValueError("日计须先确定所选钟面，再传无时区钟面")
-    winter_day = winter_clock.date()
-    winter_ganzhi = get_day_ganzhi(winter_day.year, winter_day.month, winter_day.day)
-    origin_ordinal = winter_day.toordinal() - SEXAGENARY_INDEX[winter_ganzhi]
+def key_day_origin(
+    winter_clock: NominalClockLabel, target_clock: NominalClockLabel
+) -> dict[str, Any]:
+    winter_ganzhi = get_day_ganzhi(*winter_clock.date_parts)
+    origin_ordinal = winter_clock.ordinal - SEXAGENARY_INDEX[winter_ganzhi]
     if origin_ordinal < 1:
         raise ValueError("冬至前甲子超出可表达日历范围")
-    origin = datetime.fromordinal(origin_ordinal)
-    target = target_clock.date()
-    count = target.toordinal() - origin_ordinal + 1
+    origin = NominalClockLabel(origin_ordinal, 0)
+    count = target_clock.ordinal - origin_ordinal + 1
     if count < 1:
         raise ValueError("日计日期早于冬至前甲子")
     return {
         "source": KEY_SOURCE,
         "winter_clock": winter_clock.isoformat(),
         "winter_day_ganzhi": winter_ganzhi,
-        "origin_effective_date": origin.date().isoformat(),
-        "target_effective_date": target.isoformat(),
-        "target_day_ganzhi": get_day_ganzhi(target.year, target.month, target.day),
+        "origin_effective_date": origin.date_isoformat(),
+        "target_effective_date": target_clock.date_isoformat(),
+        "target_day_ganzhi": get_day_ganzhi(*target_clock.date_parts),
         "accumulation": count,
         "day_boundary": "00:00_selected_clock_modern_convention",
         "same_day_jiazi_included": True,
@@ -53,11 +58,12 @@ def key_day_origin(winter_clock: datetime, target_clock: datetime) -> dict[str, 
     }
 
 
-def key_day_numeric_board(count: int, ruler: str, yin: bool) -> dict[str, Any]:
+def key_day_numeric_board(
+    count: int, ruler: str, yin: bool, *, shiji_profile: str | None = None
+) -> dict[str, Any]:
     """The same numeric chain used by the date adapter and source audit."""
-    from .taiyi_gates import attach_gate_board
 
-    core = cyclic_core(count, yin=yin)
+    core = cyclic_core(count, yin=yin, shiji_profile=shiji_profile)
     if ruler != BRANCHES[(count - 1) % 12]:
         raise ValueError("从甲子起计的积日与所给日支不一致")
     core.update(
@@ -98,22 +104,25 @@ def key_day_numeric_board(count: int, ruler: str, yin: bool) -> dict[str, Any]:
     return board
 
 
-def build_key_day_board(seed: MetaphysicsSeed, gender: str) -> dict[str, Any]:
-    from .taiyi_historical import source_date_reference
+def build_key_day_board(
+    seed: MetaphysicsSeed, gender: str, *, shiji_profile: str | None = None
+) -> dict[str, Any]:
 
     instant = localize_datetime(seed.input_datetime, seed.timezone)
     validate_seed_civil_clock(seed)
-    anchor = _previous_term(instant, ("冬至", "夏至"))
-    winter = _previous_term(instant, ("冬至",))
-    target_clock = _clock(instant, seed)
-    origin = key_day_origin(_clock(winter.moment, seed), target_clock)
+    anchor = previous_solar_term(instant, ("冬至", "夏至"))
+    winter = previous_solar_term(instant, ("冬至",))
+    target_clock = nominal_clock_label(instant, seed)
+    origin = key_day_origin(nominal_clock_label(winter.calendar, seed), target_clock)
     origin.update(
-        winter_anchor_utc=winter.moment.astimezone(timezone.utc).isoformat(),
+        winter_anchor_utc=winter.calendar.utc.isoformat(),
         winter_anchor_provider=winter.resolution_provider,
     )
     count = origin["accumulation"]
     ruler = origin["target_day_ganzhi"][1]
-    board = key_day_numeric_board(count, ruler, anchor.name == "夏至")
+    board = key_day_numeric_board(
+        count, ruler, anchor.name == "夏至", shiji_profile=shiji_profile
+    )
     board.update(
         style_label="太乙金钥匙续集·日计现代日期适配",
         accumulation_label=f"日计冬至前甲子积日：{count}",
@@ -132,7 +141,7 @@ def build_key_day_board(seed: MetaphysicsSeed, gender: str) -> dict[str, Any]:
             "civil_datetime": instant.isoformat(),
             "timezone": seed.timezone,
             "anchor_name": anchor.name,
-            "anchor_utc": anchor.moment.astimezone(timezone.utc).isoformat(),
+            "anchor_utc": anchor.calendar.utc.isoformat(),
             "anchor_provider": anchor.resolution_provider,
             "counter": count,
             "palace_day_number": (count - 1) % 3 + 1,
@@ -188,8 +197,13 @@ def build_key_day_board(seed: MetaphysicsSeed, gender: str) -> dict[str, Any]:
         long_cycle_summary={"status": "not_computed_for_selected_mode"},
         extra_palace_marks=[],
     )
-    reference = source_date_reference(
-        target_clock.date(), "day", count, origin["target_day_ganzhi"]
+    year, month, day = target_clock.date_parts
+    reference = (
+        source_date_reference(
+            date(year, month, day), "day", count, origin["target_day_ganzhi"]
+        )
+        if 1 <= year <= 9999
+        else None
     )
     if reference:
         board["calendar_rules"]["historical_date_reference"] = reference

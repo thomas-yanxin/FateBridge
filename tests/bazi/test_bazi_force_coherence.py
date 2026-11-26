@@ -6,8 +6,8 @@ from copy import deepcopy
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.output_bazi_evidence import BaziEvidenceChain
-from fatebridge.core.output_classical_force import (
+from fatebridge.core.contracts.output_bazi_evidence import BaziEvidenceChain
+from fatebridge.core.contracts.output_classical_force import (
     ClassicalForceComponents,
     EngineeringForceComposition,
     ForceComponent,
@@ -15,7 +15,7 @@ from fatebridge.core.output_classical_force import (
 
 
 @pytest.mark.parametrize("share", ["0", "1/2", "1"])
-def test_zero_exact_total_cannot_have_a_defined_body_share(share):
+def test_zero_exact_total_cannot_have_a_defined_body_share(share: str) -> None:
     with pytest.raises(ValidationError):
         EngineeringForceComposition.model_validate(
             {
@@ -41,7 +41,9 @@ def force(body, seal, basis="unrounded_same_assessment", **composition):
 
 @pytest.mark.parametrize("share", [0.0, 0.5, 1.0])
 @pytest.mark.parametrize("basis", ["unrounded_same_assessment"])
-def test_zero_recorded_float_total_cannot_have_a_defined_body_share(share, basis):
+def test_zero_recorded_float_total_cannot_have_a_defined_body_share(
+    share: float, basis: str
+) -> None:
     with pytest.raises(ValidationError):
         ClassicalForceComponents.model_validate(
             force(0.0, 0.0, basis, body_within_support_share=share)
@@ -59,8 +61,8 @@ def test_zero_recorded_float_total_cannot_have_a_defined_body_share(share, basis
     ],
 )
 def test_supplied_composition_cannot_contradict_its_own_recorded_float_components(
-    basis, fault
-):
+    basis: str, fault
+) -> None:
     with pytest.raises(ValidationError):
         ClassicalForceComponents.model_validate(
             force(1.0, 3.0, basis, comparison_basis=basis, **fault)
@@ -76,7 +78,7 @@ def test_supplied_composition_cannot_contradict_its_own_recorded_float_component
         ("engineering_energy_unrounded", float("inf")),
     ],
 )
-def test_budget_energy_facts_must_be_finite_and_nonnegative(key, value):
+def test_budget_energy_facts_must_be_finite_and_nonnegative(key: str, value) -> None:
     with pytest.raises(ValidationError):
         ForceComponent.model_validate({key: value})
 
@@ -122,14 +124,14 @@ def test_budget_energy_facts_must_be_finite_and_nonnegative(key, value):
 )
 def test_known_same_chain_strength_receipt_and_force_facts_cannot_be_mixed(
     context, force_value
-):
+) -> None:
     with pytest.raises(ValidationError):
         BaziEvidenceChain.model_validate(
             {"strength_context": context, "force_components": force_value}
         )
 
 
-def test_correct_zero_positive_and_float_exact_disagreements_survive():
+def test_correct_zero_positive_and_float_exact_disagreements_survive() -> None:
     for basis in ["unrounded_same_assessment"]:
         ClassicalForceComponents.model_validate(
             force(
@@ -175,7 +177,7 @@ def test_correct_zero_positive_and_float_exact_disagreements_survive():
     )
 
 
-def test_projection_subsets_keep_missing_unknown_and_never_insert_facts():
+def test_projection_subsets_keep_missing_unknown_and_never_insert_facts() -> None:
     paths = [
         ("components", "body", "engineering_energy_unrounded"),
         ("components", "seal", "engineering_energy_unrounded"),
@@ -194,6 +196,8 @@ def test_projection_subsets_keep_missing_unknown_and_never_insert_facts():
         for use, path in zip(flags, paths):
             if not use:
                 continue
+            else:
+                pass
             src = complete
             dst = value
             for part in path[:-1]:

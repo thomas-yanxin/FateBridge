@@ -8,15 +8,17 @@ from pathlib import Path
 
 import pytest
 
-import fatebridge.core.guolao_nijl_grid as module
-from fatebridge.core.guolao_classical import BRANCHES
-from fatebridge.core.guolao_grid import load_grid
+import fatebridge.core.guolao.guolao_nijl_grid as module
+from fatebridge.core.guolao.guolao_classical import BRANCHES
+from fatebridge.core.guolao.guolao_grid import load_grid
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/fixtures/guolao-nijl-grid-v1"
 
 
-def test_frozen_original_full_literal_rows_and_read_views_have_bound_fingerprints():
+def test_frozen_original_full_literal_rows_and_read_views_have_bound_fingerprints() -> (
+    None
+):
     reference = json.loads((FIXTURE / "reference.json").read_text())
     assert (
         hashlib.sha256((FIXTURE / reference["source_file"]).read_bytes()).hexdigest()
@@ -56,7 +58,7 @@ def test_frozen_original_full_literal_rows_and_read_views_have_bound_fingerprint
     assert not reference["second_independent_collator"]
 
 
-def test_all360_runtime_cells_equal_the_prior_frozen_literal_collation():
+def test_all360_runtime_cells_equal_the_prior_frozen_literal_collation() -> None:
     """A transcription-to-contract check, not independent source truth."""
     held = json.loads(
         (FIXTURE / "literal-rows-before-domain-comparison.json").read_text()
@@ -93,8 +95,13 @@ def test_all360_runtime_cells_equal_the_prior_frozen_literal_collation():
     ],
 )
 def test_six_directly_collated_loci_preserve_both_named_scan_readings(
-    palace, column, marker, text, value, base_text
-):
+    palace: str,
+    column: int,
+    marker: str,
+    text: str,
+    value: int | None,
+    base_text: str | None,
+) -> None:
     before = load_grid().cell(palace, column)
     cell = module.literal_cell(palace=palace, column=column)["cell"]
     assert cell["mansion_marker"] == marker
@@ -105,7 +112,7 @@ def test_six_directly_collated_loci_preserve_both_named_scan_readings(
     assert load_grid().cell(palace, column) == before
 
 
-def test_full_comparison_keeps_all354_matches_and_six_differences():
+def test_full_comparison_keeps_all354_matches_and_six_differences() -> None:
     result = module.compare_ma591()
     assert result["compared_cells"] == len(result["cells"]) == 360
     assert result["matching_cells"] == 354 and result["different_cells"] == 6
@@ -124,7 +131,7 @@ def test_full_comparison_keeps_all354_matches_and_six_differences():
     assert not result["life_degree_accepted"]
 
 
-def test_complete_visible_readings_do_not_turn_three_initial_marks_into_zero():
+def test_complete_visible_readings_do_not_turn_three_initial_marks_into_zero() -> None:
     audit = module.audit_nijl_grid()
     assert audit["regular_numeral_cells"] == 310
     assert audit["initial_marker_cells"] == 10
@@ -150,8 +157,8 @@ def test_complete_visible_readings_do_not_turn_three_initial_marks_into_zero():
 
 
 def test_selected_nijl_table_does_not_load_a_different_witness_to_fill_values(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     def unavailable():
         pytest.fail("NIJL literal query must not use another witness's values")
 
@@ -164,7 +171,9 @@ def test_selected_nijl_table_does_not_load_a_different_witness_to_fill_values(
     )
 
 
-def test_modified_unpinned_runtime_transcription_is_rejected(monkeypatch, tmp_path):
+def test_modified_unpinned_runtime_transcription_is_rejected(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     path = tmp_path / "changed.json"
     data = json.loads(module.DATA.read_text())
     data["rows"][0]["cells"][1]["numeral_value"] = 9
@@ -178,8 +187,8 @@ def test_modified_unpinned_runtime_transcription_is_rejected(monkeypatch, tmp_pa
     "fault", ["source", "order", "short_row", "missing", "duplicate"]
 )
 def test_structural_source_guards_even_with_a_caller_replaced_digest(
-    fault, monkeypatch, tmp_path
-):
+    fault: str, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     data = json.loads(module.DATA.read_text())
     if fault == "source":
         data["source_image_sha256"] = "another-scan"
@@ -202,8 +211,8 @@ def test_structural_source_guards_even_with_a_caller_replaced_digest(
 
 
 def test_comparison_cannot_silently_rebind_to_a_changed_ma591_transcription(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(
         module, "load_grid", lambda: replace(load_grid(), data_sha256="x")
     )
@@ -217,7 +226,9 @@ def test_comparison_cannot_silently_rebind_to_a_changed_ma591_transcription(
     )
 
 
-def test_complete_nijl_table_keeps_both_selected_intro_numeric_counterexamples():
+def test_complete_nijl_table_keeps_both_selected_intro_numeric_counterexamples() -> (
+    None
+):
     result = module.compare_intro_examples()
     assert [r["example"]["id"] for r in result["cases"]] == [
         "luwei_xu6_xing5",
@@ -235,7 +246,9 @@ def test_complete_nijl_table_keeps_both_selected_intro_numeric_counterexamples()
     assert result["real_world_prediction_cases"] == 0
 
 
-def test_original_example_mutation_cannot_remove_the_failed_rows(monkeypatch, tmp_path):
+def test_original_example_mutation_cannot_remove_the_failed_rows(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     data = json.loads(module.EXAMPLES.read_text())
     data["cases"].pop(0)
     path = tmp_path / "incomplete-examples.json"
@@ -248,6 +261,23 @@ def test_original_example_mutation_cannot_remove_the_failed_rows(monkeypatch, tm
 @pytest.mark.parametrize(
     "palace,column", [("子", 0), ("子", 31), ("unknown", 1), ("子", True), ("子", 1.0)]
 )
-def test_literal_inputs_do_not_round_wrap_or_guess_columns(palace, column):
+def test_literal_inputs_do_not_round_wrap_or_guess_columns(
+    palace: str, column: bool | float | int
+) -> None:
     with pytest.raises((TypeError, ValueError)):
         module.literal_cell(palace=palace, column=column)
+
+
+def test_selected_grid_witnesses_keep_the_frozen_bytes_and_base_binding():
+    raw = (ROOT / "validation/data/guolao/grid-witnesses-v1.json").read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == (
+        "fa82d461ad618368e67089b7de0aeb18edfaaf80a64a9019bd65bc7511a217fe"
+    )
+    binding = json.loads(raw)["base_binding"]
+    base = load_grid()
+    assert binding == {
+        "source_id": base.source_id,
+        "source_image_sha256": base.source_image_sha256,
+        "data_sha256": base.data_sha256,
+        "marker_data_sha256": base.marker_data_sha256,
+    }

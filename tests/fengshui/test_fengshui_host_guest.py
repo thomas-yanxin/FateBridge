@@ -17,14 +17,14 @@ from fatebridge.core.fengshui.xuankong import _bundle, _chart
 from fatebridge.services import fengshui as service
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import FengshuiCalculationError
-from fatebridge.validation.fengshui_host_guest import (
+from tests.support.fengshui_transports import SPECS, mcp_call
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
+from validation.fengshui_host_guest import (
     audit_host_guest_reference,
     load_host_guest_reference,
 )
-from fatebridge.validation.fengshui_reading import verify_fengshui_reading
-from tests.support.fengshui_transports import mcp_call
-from tests.support.mcp_result_assertions import without_transport
-from tests.support.transports import rest_client
+from validation.fengshui_reading import verify_fengshui_reading
 
 SOURCE = Path(__file__).parents[1] / "data/fengshui_host_guest_v1"
 
@@ -50,7 +50,9 @@ def analysis(result):
     return result["layers"]["xuankong_natal"]["interpretation"]["host_guest_analysis"]
 
 
-def test_all_source_roles_stay_in_the_denominator_without_per_case_basis_switching():
+def test_all_source_roles_stay_in_the_denominator_without_per_case_basis_switching() -> (
+    None
+):
     report = audit_host_guest_reference(load_host_guest_reference(SOURCE))
     assert report["scoped_operation_definitions_passed"] is True
     assert report["derived_operation_cases"] == 81
@@ -70,7 +72,9 @@ def test_all_source_roles_stay_in_the_denominator_without_per_case_basis_switchi
     assert report["real_world_prediction_established"] is False
 
 
-def test_every_declared_numeric_chart_and_both_modes_use_eight_separate_relations():
+def test_every_declared_numeric_chart_and_both_modes_use_eight_separate_relations() -> (
+    None
+):
     for period in range(1, 10):
         for index in range(24):
             for mode in ("lower", "replacement"):
@@ -88,9 +92,11 @@ def test_every_declared_numeric_chart_and_both_modes_use_eight_separate_relation
                         a["literal_clause_comparison"]["matched"] is None
                         for a in item["axes"].values()
                     )
+                else:
+                    pass
 
 
-def test_opposite_host_direction_reverses_operations_for_all_star_pairs():
+def test_opposite_host_direction_reverses_operations_for_all_star_pairs() -> None:
     opposite = {
         "生入": "生出",
         "生出": "生入",
@@ -108,7 +114,9 @@ def test_opposite_host_direction_reverses_operations_for_all_star_pairs():
         assert host_guest.classify(5, other)["label"] == "比和"
 
 
-def test_axis_pair_and_period_pair_stay_visible_when_only_one_matches_a_clause():
+def test_axis_pair_and_period_pair_stay_visible_when_only_one_matches_a_clause() -> (
+    None
+):
     result = executed(inputs())
     a = analysis(result)["candidates"][0]["axes"]["facing"]
     assert [r["label"] for r in a["relations"]] == ["克出", "比和", "克入", "克出"]
@@ -143,10 +151,23 @@ def test_axis_pair_and_period_pair_stay_visible_when_only_one_matches_a_clause()
     )
 
 
+def test_served_host_guest_verifier_rejects_a_changed_source_locator() -> None:
+    result = executed(inputs())
+    source_ruleset = next(
+        ruleset
+        for ruleset in result["rulesets"]
+        if ruleset["ruleset_id"] == "shen_2011_host_guest_v1"
+    )
+    source_ruleset["source_citations"]["HGT1"]["locator"] = "错误页码"
+    report = verify_fengshui_reading(result, trusted_payload=deepcopy(result))
+    assert report["status"] == "rejected"
+    assert {"code": "host_guest_inconsistent"} in report["errors"]
+
+
 @pytest.mark.parametrize("period,facing,page", [(7, "乙", 381), (3, "戌", 399)])
 def test_repeated_shan_in_original_text_is_not_silently_changed_to_xiang(
-    period, facing, page
-):
+    period: int, facing: str, page: int
+) -> None:
     index = next(i for i, m in enumerate(_bundle()["mountains"]) if m["name"] == facing)
     chart = _chart(period, (index, "lower", "Literal repeated source noun"))
     natal = {"candidates": [chart]}
@@ -164,7 +185,7 @@ def test_repeated_shan_in_original_text_is_not_silently_changed_to_xiang(
     )
 
 
-def test_default_profile_and_wang_timeliness_are_orthogonal_to_host_guest():
+def test_default_profile_and_wang_timeliness_are_orthogonal_to_host_guest() -> None:
     value = inputs()
     default = deepcopy(value)
     default["interpretation"] = {}
@@ -185,7 +206,7 @@ def test_default_profile_and_wang_timeliness_are_orthogonal_to_host_guest():
     assert analysis(explicit)["overall_auspiciousness"] == "not_produced"
 
 
-def test_no_chart_and_multiple_candidates_preserve_their_actual_scope():
+def test_no_chart_and_multiple_candidates_preserve_their_actual_scope() -> None:
     value = host_guest.analyze({})
     assert host_guest.validate({"host_guest_analysis": value}, {})["relations"] == 0
     assert value["status"] == "no_computed_chart"
@@ -201,8 +222,8 @@ def test_no_chart_and_multiple_candidates_preserve_their_actual_scope():
 
 
 def test_rehashed_source_reading_cannot_replace_the_before_implementation_oracle(
-    tmp_path,
-):
+    tmp_path: Path,
+) -> None:
     folder = tmp_path / "source"
     shutil.copytree(SOURCE, folder)
     value = json.loads((folder / "reference.json").read_text())
@@ -262,8 +283,8 @@ def corrupt(value, fault):
     ],
 )
 def test_independent_validator_rejects_semantic_errors_even_with_self_consistent_labels(
-    fault,
-):
+    fault: str,
+) -> None:
     chart = _chart(6, (9, "lower", "Synthetic integrity test"))
     natal = {"candidates": [chart]}
     value = corrupt(host_guest.analyze(natal), fault)
@@ -285,8 +306,12 @@ def test_independent_validator_rejects_semantic_errors_even_with_self_consistent
     ],
 )
 def test_wrong_relations_are_rejected_on_all_protocols_with_reading_disabled_and_projection(
-    monkeypatch, tmp_path, capsys, tool, fault
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    tool: str,
+    fault: str,
+) -> None:
     original = natal_interpretation.analyze_host_guest
     monkeypatch.setattr(
         natal_interpretation,
@@ -297,8 +322,10 @@ def test_wrong_relations_are_rejected_on_all_protocols_with_reading_disabled_and
     value["interpretation"]["include_calculation_reading"] = False
     if tool == "assess":
         value = {"methods": ["xuankong_natal"], "xuankong": value}
+    else:
+        pass
     http = rest_client(monkeypatch).post(
-        "/api/fengshui/" + tool,
+        SPECS[tool].rest_path,
         json=value,
         params={"fields": "status", "strict_fields": "true"},
     )
@@ -309,7 +336,7 @@ def test_wrong_relations_are_rejected_on_all_protocols_with_reading_disabled_and
     path.write_text(json.dumps(value))
     code = run(
         [
-            "fengshui_" + tool,
+            SPECS[tool].tool_name,
             "--request-file",
             str(path),
             "--fields",
@@ -326,7 +353,9 @@ def test_wrong_relations_are_rejected_on_all_protocols_with_reading_disabled_and
         assert "calculation_reading" not in result
 
 
-def test_service_seal_also_rejects_mutation_after_the_domain_guard(monkeypatch):
+def test_service_seal_also_rejects_mutation_after_the_domain_guard(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = service.analyze_natal_interpretation
 
     def wrong(*args, **kwargs):
@@ -340,16 +369,21 @@ def test_service_seal_also_rejects_mutation_after_the_domain_guard(monkeypatch):
 
 @pytest.mark.parametrize("tool", ["xuankong_natal", "assess"])
 def test_valid_source_difference_is_delivered_successfully_and_equally_on_all_protocols(
-    monkeypatch, tmp_path, capsys, tool
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    tool: str,
+) -> None:
     value = inputs()
     if tool == "assess":
         value = {"methods": ["xuankong_natal"], "xuankong": value}
-    http = rest_client(monkeypatch).post("/api/fengshui/" + tool, json=value)
+    else:
+        pass
+    http = rest_client(monkeypatch).post(SPECS[tool].rest_path, json=value)
     mcp = asyncio.run(mcp_call(tool, value))
     path = tmp_path / "input.json"
     path.write_text(json.dumps(value))
-    code = run(["fengshui_" + tool, "--request-file", str(path)])
+    code = run([SPECS[tool].tool_name, "--request-file", str(path)])
     cli = json.loads(capsys.readouterr().out)
     assert http.status_code == 200 and not mcp.is_error and code == 0
     assert (
@@ -366,8 +400,8 @@ def test_valid_source_difference_is_delivered_successfully_and_equally_on_all_pr
 
 
 def test_offline_guard_rejects_an_actual_fault_run_with_its_genuine_served_receipt(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = natal_interpretation.analyze_host_guest
     with monkeypatch.context() as disabled:
         disabled.setattr(
@@ -386,7 +420,7 @@ def test_offline_guard_rejects_an_actual_fault_run_with_its_genuine_served_recei
     assert checked["host_guest_coverage_verified"] is False
 
 
-def test_new_profile_is_explicit_and_invalid_ids_fail_request_validation():
+def test_new_profile_is_explicit_and_invalid_ids_fail_request_validation() -> None:
     value = inputs()
     value["interpretation"]["host_guest_ruleset_id"] = "invented_unified_authority"
     with pytest.raises(ValueError):

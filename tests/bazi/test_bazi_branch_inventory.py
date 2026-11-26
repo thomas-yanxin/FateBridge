@@ -7,8 +7,9 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core import bazi_evidence
-from fatebridge.core.bazi_evidence import build_natal_evidence
+from fatebridge.core.bazi import bazi_evidence
+from fatebridge.core.bazi.bazi_evidence import build_natal_evidence
+from fatebridge.core.branch_candidates import build_branch_combination_candidates
 from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.passage_relations import build_passage_relation_context
 from fatebridge.services.source_comparison import calculate_bazi_source_compare
@@ -59,7 +60,7 @@ def _with_literal_candidate_additions(chart, without_inventory, inventory):
 @pytest.mark.parametrize("values,identity", COUNTEREXAMPLES)
 def test_four_first_counterexamples_expose_suppressed_half_on_both_domain_outputs(
     values, identity
-):
+) -> None:
     chart = dict(zip(ORDER, map(tuple, values)))
     strength = ElementAnalysis.analyze_day_master_strength(chart)
     natal = build_natal_evidence(chart, strength)
@@ -80,11 +81,11 @@ def test_four_first_counterexamples_expose_suppressed_half_on_both_domain_output
             assert (identity in node["potential_branch_candidate_refs"]) == bool(
                 set(carriers) & set(row["positions"])
             )
+        else:
+            pass
 
 
-def test_missing_or_unknown_effects_do_not_manufacture_known_empty_screen():
-    from fatebridge.core.branch_candidates import build_branch_combination_candidates
-
+def test_missing_or_unknown_effects_do_not_manufacture_known_empty_screen() -> None:
     chart = dict(zip(ORDER, map(tuple, ["癸酉", "甲子", "丁卯", "乙巳"])))
     absent = build_branch_combination_candidates(chart, {})
     assert absent["effects_status"] == "not_supplied"
@@ -109,7 +110,22 @@ def test_missing_or_unknown_effects_do_not_manufacture_known_empty_screen():
     )
 
 
-def test_partial_context_without_pillars_does_not_invent_inventory():
+def test_matching_partial_event_preserves_reference_with_unknown_status() -> None:
+    chart = dict(zip(ORDER, [("甲", "子"), ("乙", "丑"), ("戊", "午"), ("庚", "寅")]))
+    partial_receipt = {
+        "relations": [{"kind": "六合", "positions": ["year", "month"], "target": "土"}]
+    }
+    result = build_branch_combination_candidates(chart, partial_receipt)
+    recorded_pair = next(
+        candidate for candidate in result["candidates"] if candidate["kind"] == "六合"
+    )
+    assert recorded_pair["screen_decision"] == "recorded_event"
+    assert recorded_pair["actual_event_refs"] == ["assessment.relations:0"]
+    assert recorded_pair["current_statuses"] is None
+    assert result["screen_status"] == "not_identified"
+
+
+def test_partial_context_without_pillars_does_not_invent_inventory() -> None:
     chart = dict(zip(ORDER, map(tuple, ["甲子", "丙寅", "甲午", "庚申"])))
     strength = ElementAnalysis.analyze_day_master_strength(chart)
     natal = build_natal_evidence(chart, strength)
@@ -120,9 +136,9 @@ def test_partial_context_without_pillars_does_not_invent_inventory():
     assert all("potential_branch_candidate_refs" not in n for n in partial["nodes"])
 
 
-def test_current408_inventory_is_read_only_and_exactly_additive(monkeypatch):
-    from fatebridge.core.branch_candidates import build_branch_combination_candidates
-
+def test_current408_inventory_is_read_only_and_exactly_additive(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     def without_inventory(passage, assessment, *, pillars=None):
         return build_passage_relation_context(passage, assessment)
 
@@ -182,9 +198,13 @@ def test_current408_inventory_is_read_only_and_exactly_additive(monkeypatch):
     assert count == 408
 
 
-def test_known_inventory_contradictions_are_rejected_without_filling_partial_facts():
+def test_known_inventory_contradictions_are_rejected_without_filling_partial_facts() -> (
+    None
+):
     from fatebridge.core.branch_candidates import build_branch_combination_candidates
-    from fatebridge.core.output_branch_candidates import BranchCombinationCandidates
+    from fatebridge.core.contracts.output_branch_candidates import (
+        BranchCombinationCandidates,
+    )
 
     chart = dict(zip(ORDER, map(tuple, ["癸酉", "甲子", "丁卯", "乙巳"])))
     value = build_branch_combination_candidates(
@@ -223,9 +243,11 @@ def test_known_inventory_contradictions_are_rejected_without_filling_partial_fac
         "known_partial_carrier",
     ],
 )
-def test_cross_receipt_contradictions_survive_partial_projection(fault):
-    from fatebridge.core.output_bazi_evidence import BaziEvidenceChain
-    from fatebridge.core.output_source_annotations import SourceCurrentCalculation
+def test_cross_receipt_contradictions_survive_partial_projection(fault: str) -> None:
+    from fatebridge.core.contracts.output_bazi_evidence import BaziEvidenceChain
+    from fatebridge.core.contracts.output_source_annotations import (
+        SourceCurrentCalculation,
+    )
 
     chart = dict(zip(ORDER, map(tuple, ["癸酉", "甲子", "丁卯", "乙巳"])))
     strength = ElementAnalysis.analyze_day_master_strength(chart)
@@ -260,7 +282,7 @@ def test_cross_receipt_contradictions_survive_partial_projection(fault):
             "screen_status": "reconstructed_v8",
         }
         with pytest.raises(ValidationError):
-            from fatebridge.core.output_branch_candidates import (
+            from fatebridge.core.contracts.output_branch_candidates import (
                 BranchCombinationCandidates,
             )
 

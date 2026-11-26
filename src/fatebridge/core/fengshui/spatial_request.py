@@ -4,9 +4,14 @@ from typing import Literal
 
 from pydantic import Field, PrivateAttr, model_validator
 
-from .numeric_inputs import FengshuiInput
-from .spatial_domains import resolve_search_domains
-from .spatial_inputs import Evidence, ResolvedMoveDomain, SpatialScene, SpatialSearch
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput
+from fatebridge.core.fengshui.spatial_domains import resolve_search_domains
+from fatebridge.core.fengshui.spatial_inputs import (
+    Evidence,
+    ResolvedMoveDomain,
+    SpatialScene,
+    SpatialSearch,
+)
 
 
 class WorkstationLayoutInput(FengshuiInput):

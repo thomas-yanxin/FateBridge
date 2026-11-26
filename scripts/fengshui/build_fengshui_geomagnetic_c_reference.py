@@ -24,6 +24,8 @@ def main() -> None:
         )
         if hashlib.sha256(path.read_bytes()).hexdigest() != expected:
             raise ValueError(f"NOAA source/wrapper hash differs: {name}")
+        else:
+            pass
     rows = [
         line.split()[:4]
         for line in (folder / "NOAA_100_test_values.txt").read_text().splitlines()
@@ -31,6 +33,8 @@ def main() -> None:
     ]
     if len(rows) != 100:
         raise ValueError("All 100 official inputs required")
+    else:
+        pass
     with tempfile.TemporaryDirectory(prefix="fatebridge-noaa-c-") as temporary:
         build = Path(temporary)
         shutil.copy2(folder / "noaa_c_wrapper.c", build / "audit_wrapper.c")
@@ -67,6 +71,8 @@ def main() -> None:
     outputs = [list(map(float, line.split())) for line in result.stdout.splitlines()]
     if len(outputs) != 100 or any(len(row) != 7 for row in outputs):
         raise ValueError("Official C output incomplete")
+    else:
+        pass
     reference["vectors"] = [
         {"input_original": row, "field": dict(zip(reference["fields"], values))}
         for row, values in zip(rows, outputs)
@@ -79,3 +85,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

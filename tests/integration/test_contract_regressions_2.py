@@ -5,6 +5,7 @@ import asyncio
 import copy
 import json
 from fractions import Fraction
+from pathlib import Path
 from typing import Annotated, Optional, Union
 
 import pytest
@@ -19,6 +20,7 @@ from fatebridge import api
 from fatebridge.application import execution
 from fatebridge.application.discovery import select_mcp_specs
 from fatebridge.cli import run
+from fatebridge.cli_arguments import _add_field_argument, _argument_type
 from fatebridge.core import almanac, solar_term_clock
 from fatebridge.core.astro import runtime
 from fatebridge.diagnostics import diagnose
@@ -30,16 +32,29 @@ from fatebridge.services.astrology import (
 )
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
-from fatebridge.validation.house_roles import audit_specialty_house_roles
-from tests.evaluation.test_gauquelin_request_guard import HOUSE_SPECS, payload
-from tests.support.transports import SPECS, native, rest, surface_calls
-from tests.western.test_other_chart_angle_qualification import PAYLOAD
+from fatebridge.utils.house_systems import normalize_house_system
+from tests.support.transports import (
+    SPECS,
+    cached_mcp_app,
+    cached_output_validator,
+    call_calculation,
+    capability_contracts,
+    native,
+    rest,
+    surface_calls,
+)
+from tests.unit_test.fixtures.house_system import (
+    HOUSE_SYSTEM_SPECS,
+    house_system_payload,
+)
+from tests.unit_test.fixtures.western_specialty import SPECIALTY_CHART_REQUEST
+from validation.house_roles import audit_specialty_house_roles
 
 
 @pytest.mark.parametrize("field", ["lookup_mode", "selected_sections"])
 def test_subject_null_nonnullable_field_is_rejected_on_three_protocols(
-    field, surface_calls
-):
+    field: str, surface_calls
+) -> None:
     spec = SPECS["gua_lookup"]
     payload = {"query": "111111", field: None}
     http, protocol, code, cli = surface_calls(spec, payload, cli_first=False)
@@ -48,7 +63,9 @@ def test_subject_null_nonnullable_field_is_rejected_on_three_protocols(
     assert field in str(cli["issues"])
 
 
-def test_explicit_cli_flag_overrides_null_subject_value(tmp_path, capsys):
+def test_explicit_cli_flag_overrides_null_subject_value(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     subject = tmp_path / "null-lookup.json"
     subject.write_text(json.dumps({"query": "111111", "lookup_mode": None}))
     code = run(
@@ -66,7 +83,9 @@ def test_explicit_cli_flag_overrides_null_subject_value(tmp_path, capsys):
     assert code == 0 and "error_code" not in output
 
 
-def test_profile_keeps_explicit_null_instead_of_default_zero(tmp_path, capsys):
+def test_profile_keeps_explicit_null_instead_of_default_zero(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     subject = tmp_path / "null-minute.json"
     subject.write_text(
         json.dumps(
@@ -100,7 +119,9 @@ def test_profile_keeps_explicit_null_instead_of_default_zero(tmp_path, capsys):
     assert "bazi_birth" not in child
 
 
-def test_omitted_optional_value_still_uses_declared_default(tmp_path, capsys):
+def test_omitted_optional_value_still_uses_declared_default(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     subject = tmp_path / "omitted-lookup.json"
     subject.write_text(json.dumps({"query": "111111"}))
     code = run(
@@ -119,18 +140,20 @@ def test_omitted_optional_value_still_uses_declared_default(tmp_path, capsys):
         Annotated[Union[int, str], "example"],
     ],
 )
-def test_textual_union_branch_is_not_discarded(annotation):
-    assert cli._argument_type(annotation) is str
+def test_textual_union_branch_is_not_discarded(annotation) -> None:
+    assert _argument_type(annotation) is str
 
 
-def test_numeric_strictness_optional_and_list_items_still_reach_pydantic_as_integers():
+def test_numeric_strictness_optional_and_list_items_still_reach_pydantic_as_integers() -> (
+    None
+):
     class Numeric(BaseModel):
         count: Optional[StrictInt] = None
         items: list[Annotated[int, Field(ge=0)]]
 
     parser = argparse.ArgumentParser()
     for name, field in Numeric.model_fields.items():
-        cli._add_field_argument(parser, name, field)
+        _add_field_argument(parser, name, field)
     namespace = parser.parse_args(["--count", "3", "--items", "0", "2"])
     result = Numeric.model_validate(vars(namespace))
     assert result.count == 3 and result.items == [0, 2]
@@ -141,10 +164,12 @@ def test_numeric_strictness_optional_and_list_items_still_reach_pydantic_as_inte
     "value,expected", [("P", "P"), ("R", "R"), ("X", "X"), ("3", "P"), ("8", "D")]
 )
 def test_supported_house_flags_on_every_live_tool_reach_the_shared_dispatch(
-    value, expected, monkeypatch, tmp_path, capsys
-):
-    from fatebridge.utils.house_systems import normalize_house_system
-
+    value: str,
+    expected: str,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     captured = []
 
     def stop_at_dispatch(spec, request, *args, **kwargs):
@@ -156,10 +181,16 @@ def test_supported_house_flags_on_every_live_tool_reach_the_shared_dispatch(
         }
 
     monkeypatch.setattr(cli, "execute_tool", stop_at_dispatch)
-    for spec in HOUSE_SPECS:
+    for spec in HOUSE_SYSTEM_SPECS:
         subject = tmp_path / f"{spec.key}.json"
         subject.write_text(
-            json.dumps({k: v for k, v in payload(spec).items() if k != "house_system"})
+            json.dumps(
+                {
+                    k: v
+                    for k, v in house_system_payload(spec).items()
+                    if k != "house_system"
+                }
+            )
         )
         capsys.readouterr()
         code = cli.run(
@@ -173,19 +204,19 @@ def test_supported_house_flags_on_every_live_tool_reach_the_shared_dispatch(
         )
         assert captured[-1][0] == spec.key
         assert normalize_house_system(captured[-1][1]) == expected
-    assert len(captured) == len(HOUSE_SPECS)
+    assert len(captured) == len(HOUSE_SYSTEM_SPECS)
 
 
 def test_documented_gauquelin_direct_flags_return_shared_validation_error(
-    monkeypatch, capsys
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     def forbidden(*args, **kwargs):
         raise AssertionError("invalid direct flags reached calculation")
 
     monkeypatch.setattr(cli, "execute_tool", forbidden)
     code = cli.run(
         [
-            "astro_horary",
+            "horary_chart",
             "--question-year",
             "2000",
             "--question-month",
@@ -209,14 +240,15 @@ def test_documented_gauquelin_direct_flags_return_shared_validation_error(
     assert body["issues"][0] == {
         "path": "house_system",
         "code": "unsupported_house_system",
+        "message": body["error"],
     }
 
 
 @pytest.mark.parametrize("include_metadata", [False, True])
 @pytest.mark.parametrize("typed_source", [False, True])
 def test_dispatch_preserves_source_failure_and_plain_input_error_semantics(
-    monkeypatch, include_metadata, typed_source
-):
+    monkeypatch: pytest.MonkeyPatch, include_metadata: bool, typed_source: bool
+) -> None:
     spec = next(s for s in CATALOG if s.key == "fengshui_xuankong_natal")
     request = spec.request_model.model_validate(
         {
@@ -232,12 +264,13 @@ def test_dispatch_preserves_source_failure_and_plain_input_error_semantics(
     def failed(*args):
         if typed_source:
             raise EphemerisSourceError("solar_de440_invalid")
-        raise ValueError("private raw input details must not be echoed")
+        else:
+            pass
+        raise ValueError("birth_longitude 缺少已确认的经度")
 
     monkeypatch.setattr(execution, "execute_spec", failed)
     result = execution.execute_tool(spec, request, include_metadata=include_metadata)
     assert "run_metadata" not in result
-    assert "private raw input" not in str(result)
     assert result["retryable"] is False
     if typed_source:
         assert result["error_code"] == "ephemeris_source_inconsistent"
@@ -247,28 +280,34 @@ def test_dispatch_preserves_source_failure_and_plain_input_error_semantics(
         ]
     else:
         assert result["error_code"] == "validation_error"
+        assert result["error"] == "birth_longitude 缺少已确认的经度"
 
 
-def test_default_profile_preserves_every_published_tool():
+def test_default_profile_preserves_every_published_tool() -> None:
     assert {s.tool_name for s in select_mcp_specs(CATALOG)} == {
         s.tool_name for s in CATALOG if s.mcp_name
     }
 
 
-def test_profile_doctor_matches_real_child_and_registration_environment():
+def test_profile_doctor_matches_real_child_and_registration_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("FATEBRIDGE_DE441_DIR", raising=False)
     result = diagnose(mcp=True, family="bazi")
     assert result["ok"], result
-    assert result["mcp_tool_count"] == result["mcp"]["tool_count"]
-    assert result["codex"]["config"]["env"] == {"FATEBRIDGE_MCP_FAMILIES": "bazi"}
+    assert result["mcp_tool_count"] == result["mcp"]["tool_count"] == 4
+    assert result["codex"]["config"]["env"] == {
+        "FATEBRIDGE_MCP_FAMILIES": "bazi",
+    }
 
 
-def test_all_published_parameters_explain_their_role():
+def test_all_published_parameters_explain_their_role() -> None:
     async def run():
-        async with Client(create_mcp_app()) as client:
-            for tool in await client.list_tools():
-                schema = tool.model_dump(by_alias=True)["inputSchema"]
+        async with Client(cached_mcp_app()) as client:
+            for tool in (await capability_contracts(client)).values():
+                schema = tool["input_schema"]
                 for name, field in schema["properties"].items():
-                    assert field.get("description"), (tool.name, name)
+                    assert field.get("description"), (tool["tool"], name)
 
     asyncio.run(run())
     # Project budget for a self-contained server introduction, per OpenAI guidance.
@@ -290,7 +329,9 @@ def test_all_published_parameters_explain_their_role():
         ),
     ],
 )
-def test_native_result_preserves_sdk_independent_wire_contract(payload, failed):
+def test_native_result_preserves_sdk_independent_wire_contract(
+    payload, failed: bool
+) -> None:
     result = protocol_result(payload, failed=failed)
     assert result.is_error is failed
     converted = result.to_mcp_result()
@@ -307,7 +348,9 @@ def test_native_result_preserves_sdk_independent_wire_contract(payload, failed):
     assert wire["structuredContent"] == payload
     assert wire["isError"] is failed
     assert "structured_content" not in wire and "is_error" not in wire
-    assert json.loads(wire["content"][0]["text"]) == payload
+    assert wire["content"] == (
+        [{"type": "text", "text": payload["error"]}] if failed else []
+    )
 
 
 @pytest.mark.parametrize(
@@ -315,8 +358,13 @@ def test_native_result_preserves_sdk_independent_wire_contract(payload, failed):
 )
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_mixed_pair_catalogue_across_three_surfaces(
-    monkeypatch, capsys, tmp_path, key, variant, zodiacal
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+    key: str,
+    variant: str | None,
+    zodiacal: int,
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     payload = {
         "name": "虚构：交错因素接口验收",
@@ -333,6 +381,8 @@ def test_mixed_pair_catalogue_across_three_surfaces(
     }
     if variant:
         payload["chart_variant"] = variant
+    else:
+        pass
     fields = [
         "midpoint_analysis.factors",
         "midpoint_analysis.solar_arc_analysis.profile",
@@ -358,8 +408,9 @@ def test_mixed_pair_catalogue_across_three_surfaces(
     )
 
     async def native():
-        async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
+        async with Client(cached_mcp_app()) as client:
+            return await call_calculation(
+                client,
                 spec.tool_name,
                 {
                     **payload,
@@ -395,7 +446,7 @@ def test_mixed_pair_catalogue_across_three_surfaces(
     assert response.status_code == 200, response.text
     assert not protocol.is_error, protocol.content
     assert code == 0, cli
-    assert protocol.structured_content == json.loads(protocol.content[0].text)
+    validator = cached_output_validator(spec.output_model)
     bodies = []
     for label, body in [
         ("rest", response.json()),
@@ -405,7 +456,7 @@ def test_mixed_pair_catalogue_across_three_surfaces(
         (tmp_path / (label + ".json")).write_text(
             json.dumps(body, sort_keys=True, ensure_ascii=False, allow_nan=False)
         )
-        Draft202012Validator(spec.output_model.model_json_schema()).validate(body)
+        validator.validate(body)
         bodies.append({k: v for k, v in body.items() if k != "run_metadata"})
     assert bodies[0] == bodies[1] == bodies[2]
     layer = bodies[0]["midpoint_analysis"]
@@ -450,8 +501,13 @@ def test_mixed_pair_catalogue_across_three_surfaces(
     ],
 )
 def test_actual_native_calendar_carries_each_clock_policy(
-    year, method, historical, future, monkeypatch, tmp_path
-):
+    year: int,
+    method: str,
+    historical: bool,
+    future: bool,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
@@ -488,8 +544,8 @@ def test_actual_native_calendar_carries_each_clock_policy(
     ],
 )
 def test_policy_failure_on_selected_root_cannot_become_linear(
-    error, reason, monkeypatch, tmp_path
-):
+    error, reason: str, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
@@ -508,7 +564,9 @@ def test_policy_failure_on_selected_root_cannot_become_linear(
     assert "private" not in str(caught.value.as_result())
 
 
-def test_original_policy_source_error_is_preserved(monkeypatch):
+def test_original_policy_source_error_is_preserved(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     error = EphemerisSourceError("solar_spk_changed")
 
     calls = []
@@ -539,8 +597,8 @@ def test_original_policy_source_error_is_preserved(monkeypatch):
 )
 @pytest.mark.parametrize("key", ["bazi_birth", "astro_chart"])
 def test_place_only_input_infers_the_same_point_on_all_surfaces(
-    key, place, timezone, longitude, surface_calls
-):
+    key: str, place: str, timezone: str, longitude, surface_calls
+) -> None:
     spec = SPECS[key]
     payload = dict(
         birth_year=2000,
@@ -577,8 +635,8 @@ def test_place_only_input_infers_the_same_point_on_all_surfaces(
 @pytest.mark.parametrize("kind", ["germany", "chart13"])
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_actual_native_calls_separate_selected_houses_reference_angles_and_partition(
-    monkeypatch, kind, zodiacal
-):
+    monkeypatch: pytest.MonkeyPatch, kind: str, zodiacal: int
+) -> None:
     original = runtime.ephemeris_call
     calls = []
 
@@ -586,11 +644,13 @@ def test_actual_native_calls_separate_selected_houses_reference_angles_and_parti
         result = original(name, *args, **kwargs)
         if name == "houses_ex":
             calls.append((args, result))
+        else:
+            pass
         return result
 
     monkeypatch.setattr(runtime, "ephemeris_call", observed)
     request = {
-        **PAYLOAD,
+        **SPECIALTY_CHART_REQUEST,
         "birth_longitude": 10.0,
         "birth_latitude": 20.0,
         "zodiacal": zodiacal,
@@ -641,7 +701,7 @@ def test_actual_native_calls_separate_selected_houses_reference_angles_and_parti
     assert "declared_base_house_system_differs_from_recorded_base" in wrong["issues"]
 
 
-def test_unrecorded_reference_model_is_not_inferred_from_the_house_label():
+def test_unrecorded_reference_model_is_not_inferred_from_the_house_label() -> None:
     payload = {
         "base_chart": {
             "chart_profile": {
@@ -667,12 +727,12 @@ def test_unrecorded_reference_model_is_not_inferred_from_the_house_label():
 
 
 @pytest.mark.parametrize("code", [True, 1.0, -1, 9, "1"])
-def test_invalid_requested_codes_do_not_become_partial_evidence(code):
+def test_invalid_requested_codes_do_not_become_partial_evidence(code) -> None:
     with pytest.raises(ValueError, match="integer0..8"):
         audit_specialty_house_roles({}, requested_hsys=code)
 
 
-def test_a_house_label_alone_does_not_certify_unrecorded_specialty_roles():
+def test_a_house_label_alone_does_not_certify_unrecorded_specialty_roles() -> None:
     profile = {
         "house_system": "alcabitus",
         "house_system_code": 1,

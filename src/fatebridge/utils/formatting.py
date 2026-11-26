@@ -2,28 +2,37 @@
 
 import json
 from datetime import datetime
-from typing import Dict, Optional, Tuple
+
+from pydantic import JsonValue
+
+from fatebridge.utils.civil_time import NominalClockLabel
 
 
 def format_birth_datetime_display(
-    birth_datetime: datetime,
+    birth_datetime: datetime | NominalClockLabel,
     include_minutes: bool = False,
     *,
     include_seconds: bool = False,
 ) -> str:
     """Format birth datetime for user-facing API responses."""
+    label = (
+        NominalClockLabel.from_local_datetime(birth_datetime)
+        if isinstance(birth_datetime, datetime)
+        else birth_datetime
+    )
+    year, month, day = label.date_parts
+    hour, minute, second, microsecond = label.time_parts
+    display = f"{year:04d}年{month:02d}月{day:02d}日 {hour:02d}时"
+    if include_minutes or include_seconds:
+        display += f"{minute:02d}分"
     if include_seconds:
-        fraction = (
-            f".{birth_datetime.microsecond:06d}" if birth_datetime.microsecond else ""
-        )
-        return birth_datetime.strftime("%Y年%m月%d日 %H时%M分%S") + fraction + "秒"
-    if include_minutes:
-        return birth_datetime.strftime("%Y年%m月%d日 %H时%M分")
-    return birth_datetime.strftime("%Y年%m月%d日 %H时")
+        fraction = f".{microsecond:06d}" if microsecond else ""
+        display += f"{second:02d}{fraction}秒"
+    return display
 
 
 def format_clock_datetime(
-    moment: datetime, *, include_seconds: Optional[bool] = None
+    moment: datetime, *, include_seconds: bool | None = None
 ) -> str:
     """Retain computed subminute values without changing old whole-minute labels."""
     if include_seconds is False:
@@ -37,16 +46,9 @@ def format_clock_datetime(
 
 
 def create_pillar_dict(
-    pillars: Dict[str, Tuple[str, str]],
-) -> Dict[str, Dict[str, str]]:
-    """创建标准化的四柱字典格式
-
-    Args:
-        pillars: 四柱数据
-
-    Returns:
-        标准化的四柱字典
-    """
+    pillars: dict[str, tuple[str, str]],
+) -> dict[str, dict[str, str]]:
+    """Name the stem and branch of each of the four pillars."""
     return {
         "year": {"stem": pillars["year"][0], "branch": pillars["year"][1]},
         "month": {"stem": pillars["month"][0], "branch": pillars["month"][1]},
@@ -56,19 +58,11 @@ def create_pillar_dict(
 
 
 def format_json_response(
-    data: object,
+    data: JsonValue,
     *,
     compact: bool = True,
 ) -> str:
-    """统一的JSON格式化函数
-
-    Args:
-        data: 要格式化的数据字典
-        compact: 是否输出紧凑 JSON
-
-    Returns:
-        格式化的JSON字符串
-    """
+    """Serialize JSON with Unicode text and the chosen spacing."""
     if compact:
         return json.dumps(data, ensure_ascii=False, separators=(",", ":"))
     return json.dumps(data, ensure_ascii=False, indent=2)

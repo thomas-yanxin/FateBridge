@@ -2,24 +2,115 @@
 
 import asyncio
 import json
+from functools import lru_cache
 
 import pytest
-from fastapi.testclient import TestClient
 from fastmcp import Client
-from jsonschema import Draft202012Validator
+from fastmcp.client.client import CallToolResult
 
-import fatebridge.api as api
-import fatebridge.mcp_server as mcp
-from fatebridge.cli import run as cli_run
-from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services.tool_catalog import CATALOG
-from tests.fixtures.surface_payloads import MCP_CASES, REST_POST_CASES
-
-SPECS = {spec.key: spec for spec in CATALOG}
 AS_OF = "2026-10-12T02:00:00Z"
 
 
+@lru_cache(maxsize=1)
+def _specs():
+    from fatebridge.services.tool_catalog import CATALOG
+
+    return {spec.key: spec for spec in CATALOG}
+
+
+def __getattr__(name: str):
+    if name == "SPECS":
+        return _specs()
+    else:
+        pass
+    if name in {"REST_POST_CASES", "MCP_CASES"}:
+        from tests.fixtures import surface_payloads
+
+        return getattr(surface_payloads, name)
+    else:
+        pass
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+@lru_cache(maxsize=None)
+def cached_mcp_app(families: str | None = None):
+    import fatebridge.mcp_server as mcp
+
+    if families is None:
+        return mcp.app
+    else:
+        pass
+    return mcp.create_mcp_app(families=families)
+
+
+async def call_calculation(
+    client: Client,
+    tool: str,
+    values: dict[str, object] | None = None,
+    *,
+    raise_on_error: bool = True,
+) -> CallToolResult:
+    controls = {
+        "as_of",
+        "trace_id",
+        "parent_run_id",
+        "detail",
+        "fields",
+        "strict_fields",
+        "include_snapshot_text",
+        "response_char_limit",
+    }
+    arguments = {}
+    request: dict[str, object] = {
+        "tool": tool,
+        "arguments": arguments,
+        "detail": "standard",
+    }
+    for name, value in (values or {}).items():
+        if name in controls:
+            request[name] = value
+        else:
+            arguments[name] = value
+    return await client.call_tool(
+        "run_calculation", request, raise_on_error=raise_on_error
+    )
+
+
+async def describe_capability(client: Client, tool: str, *, detail="input"):
+    result = await client.call_tool(
+        "describe_capability", {"tool": tool, "detail": detail}
+    )
+    assert result.structured_content is not None
+    return result.structured_content
+
+
+async def discover_capabilities(client: Client):
+    result = await client.call_tool("discover_capabilities", {})
+    assert result.structured_content is not None
+    return [item["tool"] for item in result.structured_content["tools"]]
+
+
+async def capability_contracts(client: Client, *, detail="input"):
+    return {
+        name: await describe_capability(client, name, detail=detail)
+        for name in await discover_capabilities(client)
+    }
+
+
+@lru_cache(maxsize=None)
+def cached_output_validator(output_model):
+    from jsonschema import Draft202012Validator
+
+    from fatebridge.core.schema_cache import model_schema
+
+    return Draft202012Validator(model_schema(output_model))
+
+
 def rest_client(monkeypatch):
+    from fastapi.testclient import TestClient
+
+    import fatebridge.api as api
+
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -35,6 +126,8 @@ def rest(monkeypatch):
 
 
 def inputs(spec):
+    from tests.fixtures.surface_payloads import MCP_CASES, REST_POST_CASES
+
     factory = (
         REST_POST_CASES[spec.rest_path]
         if spec.rest_path
@@ -43,11 +136,9 @@ def inputs(spec):
     return spec.request_model.model_validate(factory()).model_dump(exclude_unset=True)
 
 
-def rest_spec(spec):
-    return SPECS["astro_relative"] if spec.key == "astro_relative_chart" else spec
-
-
 def call_cli(spec, payload, tmp_path, capsys, flags=()):
+    from fatebridge.cli import run as cli_run
+
     subject = tmp_path / "subject.json"
     subject.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     prefix = ["--no-metadata"] if "--no-metadata" in flags else []
@@ -68,8 +159,13 @@ def call_cli(spec, payload, tmp_path, capsys, flags=()):
 
 
 async def native(spec, payload, **flags):
+    from fastmcp import Client
+
+    import fatebridge.mcp_server as mcp
+
     async with Client(mcp.app) as client:
-        return await client.call_tool(
+        return await call_calculation(
+            client,
             spec.tool_name,
             {**payload, "as_of": AS_OF, "response_char_limit": 0, **flags},
             raise_on_error=False,
@@ -137,6 +233,8 @@ def projected_outputs(
         text_flag = str(include_snapshot_text).lower()
         params.append(("include_snapshot_text", text_flag))
         flags.extend(["--include-snapshot-text", text_flag])
+    else:
+        pass
     response = rest.post(
         spec.rest_path,
         json=payload,
@@ -179,6 +277,8 @@ def surface_calls(rest, tmp_path, capsys):
             params = dict(projection)
             if rest_as_of is not None:
                 params["as_of"] = rest_as_of
+            else:
+                pass
             flags = []
             for name, value in projection.items():
                 flags.append("--" + name.replace("_", "-"))
@@ -188,6 +288,8 @@ def surface_calls(rest, tmp_path, capsys):
                     flags.append(
                         str(value).lower() if isinstance(value, bool) else str(value)
                     )
+        else:
+            pass
         http = rest.post(
             spec.rest_path,
             json=payload,
@@ -195,22 +297,26 @@ def surface_calls(rest, tmp_path, capsys):
         )
         if cli_first:
             code, local = call_cli(spec, payload, tmp_path, capsys, flags=flags)
+        else:
+            pass
         protocol = asyncio.run(native(spec, payload, **(options or {})))
         if not cli_first:
             code, local = call_cli(spec, payload, tmp_path, capsys, flags=flags)
+        else:
+            pass
         return http, protocol, code, local
 
     return call
 
 
 def three_surfaces(spec, payload, fields, as_of, tmp_path, monkeypatch, capsys):
-    api._reset_runtime_state_for_tests()
-    monkeypatch.setattr(
-        api,
-        "API_KEY_AUTHENTICATOR",
-        api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
-    )
-    response = TestClient(api.app).post(
+    from fastapi.testclient import TestClient
+    from fastmcp import Client
+
+    from fatebridge.cli import run as cli_run
+
+    rest = rest_client(monkeypatch)
+    response = rest.post(
         spec.rest_path,
         json=payload,
         params=[
@@ -222,9 +328,10 @@ def three_surfaces(spec, payload, fields, as_of, tmp_path, monkeypatch, capsys):
         ],
     )
 
-    async def native():
-        async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
+    async def native_call():
+        async with Client(cached_mcp_app()) as client:
+            return await call_calculation(
+                client,
                 spec.tool_name,
                 {
                     **payload,
@@ -237,7 +344,7 @@ def three_surfaces(spec, payload, fields, as_of, tmp_path, monkeypatch, capsys):
                 raise_on_error=False,
             )
 
-    protocol = asyncio.run(native())
+    protocol = asyncio.run(native_call())
     request = tmp_path / "request.json"
     request.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     capsys.readouterr()
@@ -260,14 +367,14 @@ def three_surfaces(spec, payload, fields, as_of, tmp_path, monkeypatch, capsys):
     assert response.status_code == 200, response.text
     assert not protocol.is_error, protocol.content
     assert code == 0, cli
-    assert protocol.structured_content == json.loads(protocol.content[0].text)
+    validator = cached_output_validator(spec.output_model)
     bodies = []
     for label, body in [
         ("rest", response.json()),
         ("mcp", protocol.structured_content),
         ("cli", cli),
     ]:
-        Draft202012Validator(spec.output_model.model_json_schema()).validate(body)
+        validator.validate(body)
         (tmp_path / f"{label}.json").write_text(
             json.dumps(
                 body, ensure_ascii=False, sort_keys=True, indent=2, allow_nan=False

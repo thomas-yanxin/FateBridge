@@ -14,10 +14,10 @@ from fatebridge.cli import run
 from fatebridge.core.fengshui.city_gate_inputs import CityGateRequest
 from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.services.fengshui import calculate_xuankong_natal
-from fatebridge.validation.fengshui import audit_city_gate_reference
-from tests.support.fengshui_transports import mcp_call
+from tests.support.fengshui_transports import SPECS, mcp_call
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import rest_client
+from validation.fengshui import audit_city_gate_reference
 
 FOLDER = Path(__file__).parents[1] / "data/fengshui_city_gate_v1"
 REFERENCE = json.loads((FOLDER / "reference.json").read_text())
@@ -83,7 +83,7 @@ def observation(**facts):
     }
 
 
-def test_original_page_fingerprints_and_source_edition_are_explicit():
+def test_original_page_fingerprints_and_source_edition_are_explicit() -> None:
     for image in REFERENCE["images"]:
         assert (
             hashlib.sha256((FOLDER / image["file"]).read_bytes()).hexdigest()
@@ -93,7 +93,7 @@ def test_original_page_fingerprints_and_source_edition_are_explicit():
     assert "978-7-5117-0801-4" in REFERENCE["source"]["G2"]["source_version"]
 
 
-def test_source_audit_keeps_negative_cases_and_detects_new_disagreements():
+def test_source_audit_keeps_negative_cases_and_detects_new_disagreements() -> None:
     audit = audit_city_gate_reference(REFERENCE)
     assert audit["checked"] == audit["matched"] == 20
     assert not audit["whole_book_conformity_established"]
@@ -107,23 +107,25 @@ def test_source_audit_keeps_negative_cases_and_detects_new_disagreements():
 
 
 @pytest.mark.parametrize("case", REFERENCE["zi_gate_nine_periods"])
-def test_all_nine_printed_zi_gate_period_clauses(case):
+def test_all_nine_printed_zi_gate_period_clauses(case) -> None:
     actual = gate(request(case["facing"], case["period"]), case["gate"])
     assert actual["seed_star_number"] == case["seed"]
     assert actual["mapped_mountain"] == case["mapped_mountain"]
     assert actual["reference_star_reaches_gate_by_reverse_flight"] == case["eligible"]
     if case["eligible"]:
         assert actual["star_at_gate"] == case["period"]
+    else:
+        pass
 
 
 @pytest.mark.parametrize("case", REFERENCE["same_yuan_gates"])
-def test_printed_adjacent_same_yuan_examples(case):
+def test_printed_adjacent_same_yuan_examples(case) -> None:
     actual = analysis(request(case["facing"]))["candidates"][0]["gates"]
     assert {g["mountain"]["name"] for g in actual} == set(case["gates"])
 
 
 @pytest.mark.parametrize("case", REFERENCE["specific_numeric_cases"])
-def test_specific_original_gate_examples(case):
+def test_specific_original_gate_examples(case) -> None:
     actual = gate(request(case["facing"], case["period"]), case["gate"])
     assert actual["reference_star_reaches_gate_by_reverse_flight"] == case["eligible"]
     for source_key, result_key in [
@@ -132,9 +134,11 @@ def test_specific_original_gate_examples(case):
     ]:
         if source_key in case:
             assert actual[result_key] == case[source_key]
+        else:
+            pass
 
 
-def test_numeric_gate_does_not_require_inventing_natal_period_or_site_facts():
+def test_numeric_gate_does_not_require_inventing_natal_period_or_site_facts() -> None:
     result = calculate_xuankong_natal(**request())
     raw = result["layers"]["xuankong_natal"]
     a = raw["city_gate_analysis"]
@@ -149,7 +153,7 @@ def test_numeric_gate_does_not_require_inventing_natal_period_or_site_facts():
     assert "独立沈氏城门" in result["snapshot_text"]
 
 
-def test_reference_period_does_not_overwrite_historical_natal_numbers():
+def test_reference_period_does_not_overwrite_historical_natal_numbers() -> None:
     data = {
         **request(),
         "period": {
@@ -173,7 +177,7 @@ def test_reference_period_does_not_overwrite_historical_natal_numbers():
     ]
 
 
-def test_image_and_uncertain_bearing_preserve_conditionality():
+def test_image_and_uncertain_bearing_preserve_conditionality() -> None:
     obs = observation(
         water_present=True,
         encircling_form_present=True,
@@ -197,7 +201,7 @@ def test_image_and_uncertain_bearing_preserve_conditionality():
     )
 
 
-def test_multiple_openings_exclude_pattern_even_when_numeric_rule_matches():
+def test_multiple_openings_exclude_pattern_even_when_numeric_rule_matches() -> None:
     g = gate(
         request(
             observations=[
@@ -218,7 +222,7 @@ def test_multiple_openings_exclude_pattern_even_when_numeric_rule_matches():
     )
 
 
-def test_confirmed_sole_opening_and_three_way_patterns_keep_actual_conditions():
+def test_confirmed_sole_opening_and_three_way_patterns_keep_actual_conditions() -> None:
     for facts in [
         dict(encircling_form_present=True, sole_opening_with_water=True),
         dict(
@@ -274,7 +278,7 @@ def test_confirmed_sole_opening_and_three_way_patterns_keep_actual_conditions():
         },
     ],
 )
-def test_invalid_explicit_inputs_match_runtime_and_published_schema(patch):
+def test_invalid_explicit_inputs_match_runtime_and_published_schema(patch) -> None:
     with pytest.raises(ValidationError):
         CityGateRequest.model_validate(patch)
     assert list(
@@ -282,9 +286,15 @@ def test_invalid_explicit_inputs_match_runtime_and_published_schema(patch):
     )
 
 
-@pytest.mark.parametrize("tool", ["xuankong_natal", "assess"])
+@pytest.mark.parametrize("tool", ["xuankong_house_chart", "assess"])
 @pytest.mark.parametrize("period", [1, 2])
-def test_city_gate_matches_rest_mcp_cli(monkeypatch, tmp_path, capsys, tool, period):
+def test_city_gate_matches_rest_mcp_cli(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    tool: str,
+    period: int,
+) -> None:
     data = request(
         period=period,
         observations=(
@@ -295,7 +305,10 @@ def test_city_gate_matches_rest_mcp_cli(monkeypatch, tmp_path, capsys, tool, per
     )
     if tool == "assess":
         data = {"methods": ["xuankong_natal"], "xuankong": data}
-    http = rest_client(monkeypatch).post("/api/fengshui/" + tool, json=data)
+    else:
+        pass
+    spec = next(s for s in SPECS.values() if s.tool_name == "fengshui_" + tool)
+    http = rest_client(monkeypatch).post(spec.rest_path, json=data)
     protocol = asyncio.run(mcp_call(tool, data))
     path = tmp_path / "gate.json"
     path.write_text(json.dumps(data))
@@ -313,16 +326,17 @@ def test_city_gate_matches_rest_mcp_cli(monkeypatch, tmp_path, capsys, tool, per
     assert zi["combined_condition_match"] is (period == 2)
 
 
-def test_real_mcp_strict_projection_preserves_branch_and_provenance():
+def test_real_mcp_strict_projection_preserves_branch_and_provenance() -> None:
     result = asyncio.run(
         mcp_call(
-            "xuankong_natal",
+            "xuankong_house_chart",
             {
                 **request(),
                 "fields": [
                     "layers.xuankong_natal.city_gate_analysis",
                     "coverage.city_gate_status",
                     "rulesets",
+                    "source_catalog",
                     "rule_trace",
                 ],
                 "strict_fields": True,
@@ -333,11 +347,16 @@ def test_real_mcp_strict_projection_preserves_branch_and_provenance():
     assert not result.is_error
     assert result.structured_content["coverage"]["city_gate_status"] == "complete"
     a = result.structured_content["layers"]["xuankong_natal"]["city_gate_analysis"]
-    assert a["ruleset"]["sources"][0]["source_id"] == "G1"
+    assert "G1" in a["ruleset"]["source_ids"]
+    assert result.structured_content["source_catalog"]["G1"]["url"].startswith(
+        "https://"
+    )
     assert len(a["candidates"][0]["gates"]) == 2
 
 
-def test_city_gate_observations_respect_explicit_unconfirmed_floorplan_geometry():
+def test_city_gate_observations_respect_explicit_unconfirmed_floorplan_geometry() -> (
+    None
+):
     data = {
         "methods": ["xuankong_natal"],
         "xuankong": request(observations=[observation(water_present=True)]),
@@ -359,7 +378,7 @@ def test_city_gate_observations_respect_explicit_unconfirmed_floorplan_geometry(
     assert AssessRequest.model_validate(data)
 
 
-def test_complete_nine_by_twenty_four_domain_keeps_each_gate_chart_and_yuan():
+def test_complete_nine_by_twenty_four_domain_keeps_each_gate_chart_and_yuan() -> None:
     for period in range(1, 10):
         for facing in ANGLES:
             a = analysis(request(facing, period))

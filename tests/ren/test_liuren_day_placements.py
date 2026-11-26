@@ -10,12 +10,12 @@ import pytest
 from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
+from fatebridge.core.contracts.output_liuren_day_placements import LiurenDayPlacements
+from fatebridge.core.contracts.output_ren_anchors import require_complete_ren_anchors
 from fatebridge.core.metaphysics.liureng_day_placements import (
     day_placement_patterns,
     day_placements_trace,
 )
-from fatebridge.core.output_liuren_day_placements import LiurenDayPlacements
-from fatebridge.core.output_ren_anchors import require_complete_ren_anchors
 from scripts.ren.audit_liuren_day_placements import CORPUS, expected_facts, reference
 from tests.fixtures.ren_anchors import ANCHOR_PAYLOADS as PAYLOADS
 from tests.support.ren_anchors import anchor_output as raw
@@ -36,7 +36,7 @@ def sky(rotation):
     return {b: branches[(i + rotation) % 12] for i, b in enumerate(branches)}
 
 
-def test_complete_independent_reference_keeps_all_twelve_headings():
+def test_complete_independent_reference_keeps_all_twelve_headings() -> None:
     excluded, pending = 0, 0
     for case in DATA["contexts"]:
         value = day_placement_patterns(case["day_ganzhi"], case["sky_by_earth"])
@@ -73,17 +73,21 @@ def test_complete_independent_reference_keeps_all_twelve_headings():
         ),
     ],
 )
-def test_direction_and_stem_phase_discriminators(day, rotation, yes, no):
+def test_direction_and_stem_phase_discriminators(
+    day: str, rotation: int, yes, no
+) -> None:
     value = day_placement_patterns(day, sky(rotation))
     assert set(yes) <= set(value["matched_ids"])
     assert not set(no) & set(value["matched_ids"])
     if day == "乙丑":
         assert value["day_stem_house"] == "辰" and value["day_stem_element"] == "木"
         assert value["element_relations"]["stem_controls_branch"] is True
+    else:
+        pass
 
 
 @pytest.mark.parametrize("fault", ["bytes", "coordinated_rehash", "extra", "missing"])
-def test_reference_identity_cannot_be_rewritten(tmp_path, fault):
+def test_reference_identity_cannot_be_rewritten(tmp_path: Path, fault: str) -> None:
     folder = tmp_path / "source"
     shutil.copytree(CORPUS, folder)
     path = folder / "reference.json"
@@ -95,6 +99,8 @@ def test_reference_identity_cannot_be_rewritten(tmp_path, fault):
             manifest = json.loads((folder / "freeze.json").read_text())
             manifest["files"]["reference.json"] = sha(path)
             (folder / "freeze.json").write_text(json.dumps(manifest))
+        else:
+            pass
     elif fault == "extra":
         (folder / "extra.json").write_text("{}")
     else:
@@ -115,7 +121,9 @@ def test_reference_identity_cannot_be_rewritten(tmp_path, fault):
         ("甲子", {**sky(0), "子": "丑", "丑": "子"}),
     ],
 )
-def test_invalid_day_or_noncyclic_board_is_not_guessed(day, mapping):
+def test_invalid_day_or_noncyclic_board_is_not_guessed(
+    day: str | None, mapping
+) -> None:
     with pytest.raises(ValueError):
         day_placement_patterns(day, mapping)
 
@@ -134,7 +142,7 @@ def test_invalid_day_or_noncyclic_board_is_not_guessed(day, mapping):
         "conformance",
     ],
 )
-def test_present_evidence_cannot_relabel_facts(fault):
+def test_present_evidence_cannot_relabel_facts(fault: str) -> None:
     value = day_placement_patterns("乙丑", sky(9))
     if fault == "source":
         value["source_sha256"] = "invented"
@@ -158,7 +166,7 @@ def test_present_evidence_cannot_relabel_facts(fault):
         LiurenDayPlacements.model_validate(value)
 
 
-def test_sparse_projection_keeps_only_observed_facts_and_unknowns():
+def test_sparse_projection_keeps_only_observed_facts_and_unknowns() -> None:
     LiurenDayPlacements.model_validate({"matched_ids": ["D01"]})
     LiurenDayPlacements.model_validate(
         {"evaluations": [{"name": c["name"]} for c in DATA["reading"]["clauses"]]}
@@ -173,7 +181,7 @@ def test_sparse_projection_keeps_only_observed_facts_and_unknowns():
         {"element_relations": {"invented_relation": True}},
     ],
 )
-def test_sparse_facts_cannot_invent_relation_keys_or_adjudicate_unknowns(value):
+def test_sparse_facts_cannot_invent_relation_keys_or_adjudicate_unknowns(value) -> None:
     with pytest.raises(ValidationError):
         LiurenDayPlacements.model_validate(value)
 
@@ -205,8 +213,8 @@ def original_results():
     ],
 )
 def test_full_output_binds_evidence_to_actual_board_and_one_trace(
-    original_results, key, fault
-):
+    original_results, key: str, fault: str
+) -> None:
     value = copy.deepcopy(original_results[key])
     board = value["liureng"]
     evidence = board["day_placement_patterns"]
@@ -219,6 +227,8 @@ def test_full_output_binds_evidence_to_actual_board_and_one_trace(
         board.pop("day_placement_patterns")
         if fault == "old_version":
             board["ruleset"]["version"] = "0.0.0"
+        else:
+            pass
     elif fault == "foreign_consistent":
         day = "乙丑" if evidence["day_ganzhi"] != "乙丑" else "甲子"
         fake = day_placement_patterns(day, evidence["sky_by_earth"])
@@ -243,7 +253,9 @@ def test_full_output_binds_evidence_to_actual_board_and_one_trace(
     "key", ["liureng_gods", "liureng_runyear", "jinkou", "sanshiunited"]
 )
 @pytest.mark.parametrize("project", [False, True])
-def test_real_rest_mcp_cli_return_same_new_facts(key, project, surface_calls):
+def test_real_rest_mcp_cli_return_same_new_facts(
+    key: str, project: bool, surface_calls
+) -> None:
     spec = SPECS[key]
     path = "liureng.day_placement_patterns"
     params = [("as_of", AS_OF), ("response_char_limit", "0")]
@@ -264,6 +276,8 @@ def test_real_rest_mcp_cli_return_same_new_facts(key, project, surface_calls):
             "false",
         ]
         options.update(fields=[path], strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec,
         PAYLOADS[key],
@@ -289,8 +303,8 @@ def test_real_rest_mcp_cli_return_same_new_facts(key, project, surface_calls):
 
 @pytest.mark.parametrize("project", [False, True])
 def test_broken_evidence_is_rejected_before_projection_on_all_ports(
-    project, monkeypatch, surface_calls
-):
+    project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     key = "liureng_gods"
     spec = SPECS[key]
     value = raw(key)
@@ -311,6 +325,8 @@ def test_broken_evidence_is_rejected_before_projection_on_all_ports(
         params += [("fields", "four_pillars"), ("strict_fields", "true")]
         flags += ["--fields", "four_pillars", "--strict-fields", "true"]
         options.update(fields=["four_pillars"], strict_fields=True)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec,
         PAYLOADS[key],

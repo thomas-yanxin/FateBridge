@@ -36,17 +36,19 @@ from fatebridge.core.astro.reference import (
     PLANET_SWISSEPH_IDS,
     TRADITIONAL_PLANETS,
 )
+from fatebridge.core.astro.tt_epoch import TTInstant
+from fatebridge.core.astro.ut1_epoch import UT1Instant
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
 from fatebridge.core.jpl_ephemeris import configured_jpl_file
 from fatebridge.utils.errors import EphemerisSourceError
 
 
 def _swisseph_angles(
-    julian_day: float,
+    julian_day: float | UT1Instant,
     longitude: float,
     latitude: float,
     *,
-    julian_day_tt: float | None = None,
+    julian_day_tt: float | TTInstant | None = None,
 ) -> Optional[Dict[str, Any]]:
     if runtime.swe is None:
         return None
@@ -60,25 +62,27 @@ def _swisseph_angles(
                 b"E",
                 _julian_day_tt=julian_day_tt,
             )
-            ascmc, convention = canonical_house_axes(
-                julian_day_ut1=julian_day,
-                julian_day_tt=julian_day_tt,
-                latitude=latitude,
-                longitude=longitude,
-                house_code=b"E",
-                native_angles=ascmc,
-            )
-            definition = native_ecliptic_horizon_angle_definition(
-                julian_day_ut1=julian_day,
-                julian_day_tt=julian_day_tt,
-                latitude=latitude,
-                armc=float(ascmc[2]),
-            )
     except EphemerisSourceError:
         raise
-    except Exception as error:
+    except runtime.native_ephemeris_errors() as error:
         runtime._log_swe_runtime_failure("houses_ex", error)
         return None
+    with runtime.preserve_ephemeris_path():
+        ascmc, convention = canonical_house_axes(
+            julian_day_ut1=julian_day,
+            julian_day_tt=julian_day_tt,
+            latitude=latitude,
+            longitude=longitude,
+            house_code=b"E",
+            native_angles=ascmc,
+        )
+        definition = native_ecliptic_horizon_angle_definition(
+            julian_day_ut1=julian_day,
+            julian_day_tt=julian_day_tt,
+            latitude=latitude,
+            longitude=longitude,
+            armc=float(ascmc[2]),
+        )
     result: Dict[str, Any] = {
         "ascendant": normalize_angle(float(ascmc[0])),
         "midheaven": normalize_angle(float(ascmc[1])),
@@ -100,21 +104,28 @@ def _swisseph_planet_state(
     planet: str,
     julian_day: Optional[float] = None,
     *,
-    julian_day_tt: Optional[float] = None,
+    julian_day_tt: float | TTInstant | None = None,
     source_trace: Optional[PhysicalEphemerisTrace] = None,
     motion_metadata: Optional[Dict[str, Any]] = None,
     correct_motion: bool = True,
+    include_declination: bool = True,
 ) -> Optional[Tuple[Dict[str, float], str]]:
     """One coherent physical state, with optional shared batch file tracing.
 
-    Explicit TT needs no Earth-rotation epoch. An unavailable equatorial
-    position leaves declination unknown. A changed source is a consistency
-    error, never an orbital approximation trigger.
+    Explicit TT needs no Earth-rotation epoch. The default includes
+    declination and its source observations; ecliptic-only callers can omit
+    that query. An unavailable requested equatorial position leaves
+    declination unknown. A changed source is a consistency error, never an
+    orbital approximation trigger.
     """
     if runtime.swe is None or planet not in PLANET_SWISSEPH_IDS:
         return None
     operation = "calc" if julian_day_tt is not None else "calc_ut"
-    epoch = julian_day_tt if julian_day_tt is not None else julian_day
+    epoch = (
+        TTInstant.from_value(julian_day_tt).as_float()
+        if julian_day_tt is not None
+        else julian_day
+    )
     if epoch is None or not math.isfinite(epoch):
         raise ValueError("A finite TT or UT1 Julian day is required")
     trace = source_trace if source_trace is not None else PhysicalEphemerisTrace()
@@ -133,7 +144,7 @@ def _swisseph_planet_state(
             )
         except EphemerisSourceError:
             raise
-        except Exception as error:
+        except runtime.native_ephemeris_errors() as error:
             runtime._log_swe_runtime_failure(operation, error)
             return None
         assert_physical_configuration(selected)
@@ -205,41 +216,42 @@ def _swisseph_planet_state(
                     context=motion_metadata,
                 )
             )
-        try:
-            if planet == "Moon":
-                equatorial, eq_flag, eq_policy = coherent_lunar_native_state(
-                    operation,
-                    epoch,
-                    runtime.swe.FLG_SWIEPH | runtime.swe.FLG_EQUATORIAL,
-                    motion_tt,
-                    model,
-                    trace,
-                )
-                if motion_metadata is not None:
-                    motion_metadata.setdefault("lunar_source_windows", {})[
-                        "equatorial"
-                    ] = eq_policy
+        if include_declination:
+            try:
+                if planet == "Moon":
+                    equatorial, eq_flag, eq_policy = coherent_lunar_native_state(
+                        operation,
+                        epoch,
+                        runtime.swe.FLG_SWIEPH | runtime.swe.FLG_EQUATORIAL,
+                        motion_tt,
+                        model,
+                        trace,
+                    )
+                    if motion_metadata is not None:
+                        motion_metadata.setdefault("lunar_source_windows", {})[
+                            "equatorial"
+                        ] = eq_policy
+                else:
+                    equatorial, eq_flag = runtime.ephemeris_call(
+                        operation,
+                        epoch,
+                        PLANET_SWISSEPH_IDS[planet],
+                        runtime.swe.FLG_SWIEPH | runtime.swe.FLG_EQUATORIAL,
+                    )
+            except EphemerisSourceError:
+                raise
+            except runtime.native_ephemeris_errors() as error:
+                runtime._log_swe_runtime_failure(operation + "(equatorial)", error)
             else:
-                equatorial, eq_flag = runtime.ephemeris_call(
-                    operation,
-                    epoch,
-                    PLANET_SWISSEPH_IDS[planet],
-                    runtime.swe.FLG_SWIEPH | runtime.swe.FLG_EQUATORIAL,
-                )
-        except EphemerisSourceError:
-            raise
-        except Exception as error:
-            runtime._log_swe_runtime_failure(operation + "(equatorial)", error)
-        else:
-            if eq_flag >= 0:
-                if runtime.ephemeris_model_from_retflag(eq_flag) != model:
-                    raise EphemerisSourceError("coordinate_model_changed")
-                if physical:
-                    trace.observe(planet, model)
-                _, declination, _ = require_spherical_coordinates(
-                    equatorial, eq_flag, native=runtime.swe, equatorial=True
-                )
-                state["declination"] = declination
+                if eq_flag >= 0:
+                    if runtime.ephemeris_model_from_retflag(eq_flag) != model:
+                        raise EphemerisSourceError("coordinate_model_changed")
+                    if physical:
+                        trace.observe(planet, model)
+                    _, declination, _ = require_spherical_coordinates(
+                        equatorial, eq_flag, native=runtime.swe, equatorial=True
+                    )
+                    state["declination"] = declination
         assert_physical_configuration(selected)
         if source_trace is None:
             trace.finish()
@@ -260,13 +272,13 @@ def _build_planet_states(
     chart_variant: str,
     julian_day: float,
     *,
-    julian_day_tt: Optional[float] = None,
+    julian_day_tt: float | TTInstant | None = None,
     source_trace: Optional[PhysicalEphemerisTrace] = None,
     motion_metadata: Optional[Dict[str, Any]] = None,
 ) -> PlanetStateBatch:
     """Build one batch; a caller-supplied trace keeps its outer endpoint owner."""
     if configured_jpl_file() is not None and runtime.swe is None:
-        raise ImportError(
+        raise ModuleNotFoundError(
             "Swiss Ephemeris is required for explicitly selected JPL mode"
         )
     planet_names = _planet_set(chart_variant)

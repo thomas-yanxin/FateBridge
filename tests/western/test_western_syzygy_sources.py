@@ -26,7 +26,7 @@ INPUTS = json.loads((FIXTURE / "inputs.json").read_text())
 def test_every_source_context_matches_the_actual_native_call(
     index,
     syzygy_source_profile,  # noqa: F811 - pytest fixture dependency
-):
+) -> None:
     row = INPUTS[index]
     expected = next(
         r
@@ -45,6 +45,8 @@ def test_every_source_context_matches_the_actual_native_call(
         assert (
             result["ephemeris_source"]["models_by_body"] == expected["models_by_body"]
         )
+    else:
+        pass
     if result is not None:
         assert witness.entries
         assert result["ephemeris_source"]["absolute_accuracy_certified"] is False
@@ -52,11 +54,17 @@ def test_every_source_context_matches_the_actual_native_call(
             assert context["minimum_jd_tt"] <= context["maximum_jd_tt"]
             if context["model"] == "moshier":
                 assert context["file_ids"] == []
+            else:
+                pass
+    else:
+        pass
 
 
 @pytest.mark.parametrize("body", ["SUN", "MOON"])
 @pytest.mark.parametrize("flag_name", PROTOCOL["frame_fault_names"])
-def test_lunation_helper_rejects_unrequested_frames(body, flag_name, monkeypatch):
+def test_lunation_helper_rejects_unrequested_frames(
+    body: str, flag_name, monkeypatch: pytest.MonkeyPatch
+) -> None:
     original = runtime.ephemeris_call
 
     def changed(operation, *args, **kwargs):
@@ -70,7 +78,9 @@ def test_lunation_helper_rejects_unrequested_frames(body, flag_name, monkeypatch
 
 @pytest.mark.parametrize("body", ["SUN", "MOON"])
 @pytest.mark.parametrize("fault", PROTOCOL["motion_faults"])
-def test_lunation_helper_rejects_missing_or_invalid_motion(body, fault, monkeypatch):
+def test_lunation_helper_rejects_missing_or_invalid_motion(
+    body: str, fault, monkeypatch: pytest.MonkeyPatch
+) -> None:
     original = runtime.ephemeris_call
 
     def changed(operation, *args, **kwargs):
@@ -90,7 +100,9 @@ def test_lunation_helper_rejects_missing_or_invalid_motion(body, fault, monkeypa
 
 
 @pytest.mark.parametrize("reason", ["coordinate_contract_changed", "changed_during"])
-def test_optional_lunation_never_hides_a_source_integrity_error(reason, monkeypatch):
+def test_optional_lunation_never_hides_a_source_integrity_error(
+    reason: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     def broken(*args, **kwargs):
         raise EphemerisSourceError(reason)
 
@@ -100,7 +112,9 @@ def test_optional_lunation_never_hides_a_source_integrity_error(reason, monkeypa
     assert error.value.reason == reason
 
 
-def test_lahiri_event_display_rejects_a_different_native_frame(monkeypatch):
+def test_lahiri_event_display_rejects_a_different_native_frame(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = runtime.ephemeris_call
     changed = []
 
@@ -109,6 +123,8 @@ def test_lahiri_event_display_rejects_a_different_native_frame(monkeypatch):
         if operation == "calc" and args[2] & runtime.swe.FLG_SIDEREAL:
             changed.append(args[0])
             return result[0], result[1] | runtime.swe.FLG_EQUATORIAL
+        else:
+            pass
         return result
 
     monkeypatch.setattr(runtime, "ephemeris_call", fault)

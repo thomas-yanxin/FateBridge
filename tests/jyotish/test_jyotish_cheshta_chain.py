@@ -4,8 +4,8 @@ import copy
 
 import pytest
 
-from fatebridge.core.jyotish_evidence import cheshta_ruler_provenance
-from fatebridge.core.jyotish_mean import STAR_PLANETS
+from fatebridge.core.jyotish.jyotish_evidence import cheshta_ruler_provenance
+from fatebridge.core.jyotish.jyotish_mean import STAR_PLANETS
 from tests.jyotish.test_jyotish_ruler_provenance import computed  # noqa: F401
 
 FAULTS = [
@@ -65,7 +65,7 @@ def mutate(packet, planet, fault):
 @pytest.mark.parametrize("fault", FAULTS)
 def test_same_terminal_value_does_not_authenticate_inconsistent_operands(
     computed, planet, fault
-):
+) -> None:
     motion = copy.deepcopy(computed["strengths"]["cheshta_bala"])
     mutate(motion, planet, fault)
     with pytest.raises(ValueError, match="model inputs"):
@@ -73,7 +73,9 @@ def test_same_terminal_value_does_not_authenticate_inconsistent_operands(
 
 
 @pytest.mark.parametrize("planet", ["Sun", "Moon", *STAR_PLANETS])
-def test_source_label_must_agree_with_the_rule_the_receipt_names(computed, planet):
+def test_source_label_must_agree_with_the_rule_the_receipt_names(
+    computed, planet
+) -> None:
     motion = copy.deepcopy(computed["strengths"]["cheshta_bala"])
     motion["source_id"] = "an_unrelated_author"
     with pytest.raises(ValueError, match="declared source"):
@@ -81,7 +83,7 @@ def test_source_label_must_agree_with_the_rule_the_receipt_names(computed, plane
 
 
 @pytest.mark.parametrize("planet", STAR_PLANETS)
-def test_a_valid_receipt_does_not_mutate_same_run_inputs(computed, planet):
+def test_a_valid_receipt_does_not_mutate_same_run_inputs(computed, planet) -> None:
     motion = copy.deepcopy(computed["strengths"]["cheshta_bala"])
     before = copy.deepcopy(motion)
     receipt = cheshta_ruler_provenance(
@@ -95,8 +97,8 @@ def test_a_valid_receipt_does_not_mutate_same_run_inputs(computed, planet):
     "fault", ["branch_removed", "non_numeric_value", "boolean_value"]
 )
 def test_arc_shape_and_scalar_type_cannot_masquerade_as_computed_values(
-    computed, fault
-):
+    computed, fault: str
+) -> None:
     motion = copy.deepcopy(computed["strengths"]["cheshta_bala"])
     arc = motion["model_context"]["planet_evidence"]["Mars"]["arc"]
     if fault == "branch_removed":

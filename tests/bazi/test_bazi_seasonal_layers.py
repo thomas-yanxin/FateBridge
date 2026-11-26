@@ -13,11 +13,11 @@ from fatebridge.core.classical import (
     classical_snapshot_lines,
     seasonal_climate_god,
 )
-from fatebridge.core.output_classical_seasonal import SeasonalClimateReference
-from tests.bazi.test_bazi_year_contract import TOPICS
+from fatebridge.core.contracts.output_classical_seasonal import SeasonalClimateReference
 from tests.support.transports import SPECS, business, inputs
 from tests.support.transports import rest as _shared_rest
 from tests.support.transports import surface_calls
+from tests.unit_test.fixtures.bazi_year_cases import TOPICS
 
 rest = _shared_rest
 
@@ -32,7 +32,7 @@ PILLARS = {
 }
 
 
-def test_source_profile_is_frozen_and_not_mislabelled_as_a_blind_trial():
+def test_source_profile_is_frozen_and_not_mislabelled_as_a_blind_trial() -> None:
     frozen = (FIXTURE / "source-collation.json").read_bytes()
     assert (
         hashlib.sha256(frozen).hexdigest()
@@ -51,7 +51,7 @@ def test_source_profile_is_frozen_and_not_mislabelled_as_a_blind_trial():
 
 
 @pytest.mark.parametrize("branch", list("寅卯辰巳午未申酉戌亥子丑"))
-def test_each_jia_month_keeps_its_distinct_outline_and_body(branch):
+def test_each_jia_month_keeps_its_distinct_outline_and_body(branch) -> None:
     result = seasonal_climate_god("甲", branch)
     assert result["source_layers"] == SOURCE["months"][branch]
     assert result["source_ref"] == SOURCE["source"]
@@ -62,7 +62,7 @@ def test_each_jia_month_keeps_its_distinct_outline_and_body(branch):
     assert set(summary["listed_stems"]) == {result["primary"], *result["secondary"]}
 
 
-def test_rank_disagreements_and_half_month_unknown_are_not_overwritten():
+def test_rank_disagreements_and_half_month_unknown_are_not_overwritten() -> None:
     for month, body in [
         ("申", ["丁", "庚"]),
         ("酉", ["丁", "丙", "庚"]),
@@ -77,7 +77,9 @@ def test_rank_disagreements_and_half_month_unknown_are_not_overwritten():
     assert june["source_layers"]["chart_conditions_status"] == "not_adjudicated"
 
 
-def test_observations_use_actual_positions_without_inventing_hidden_or_visible_stems():
+def test_observations_use_actual_positions_without_inventing_hidden_or_visible_stems() -> (
+    None
+):
     result = seasonal_climate_god("甲", "酉", PILLARS)
     by_stem = {row["stem"]: row for row in result["stem_observations"]}
     assert by_stem["丁"] == {
@@ -96,7 +98,9 @@ def test_observations_use_actual_positions_without_inventing_hidden_or_visible_s
     )
 
 
-def test_snapshot_keeps_outline_and_body_conditions_instead_of_a_final_use_claim():
+def test_snapshot_keeps_outline_and_body_conditions_instead_of_a_final_use_claim() -> (
+    None
+):
     lines = "\n".join(classical_snapshot_lines(build_classical_overview(PILLARS)))
     assert "调候简表候选：首列庚" in lines
     assert "丁先、丙次、庚再次" in lines
@@ -104,7 +108,9 @@ def test_snapshot_keeps_outline_and_body_conditions_instead_of_a_final_use_claim
     assert "调候用神：主用" not in lines
 
 
-def test_reference_contract_does_not_promote_lookup_or_pending_sources_to_acceptance():
+def test_reference_contract_does_not_promote_lookup_or_pending_sources_to_acceptance() -> (
+    None
+):
     with pytest.raises(ValidationError):
         SeasonalClimateReference.model_validate(
             {"chart_adjudication_status": "adjudicated"}
@@ -122,10 +128,48 @@ def test_reference_contract_does_not_promote_lookup_or_pending_sources_to_accept
 
 
 @pytest.mark.parametrize("topic", TOPICS)
-@pytest.mark.parametrize("birth_day,reviewed", [(16, True), (17, False)])
+@pytest.mark.parametrize(
+    "birth_day,primary,body_pages,stem_sequence,source_status,source_id",
+    [
+        pytest.param(
+            16,
+            "庚",
+            [33, 34],
+            ["丁", "丙", "庚"],
+            "selected_jia_passages_not_full_acceptance",
+            None,
+            id="16-jia-you",
+        ),
+        pytest.param(
+            17,
+            "癸",
+            [61, 62, 63],
+            ["癸", "丙", "丁"],
+            "selected_wu_yi_passages_not_full_acceptance",
+            "qiongtong_xu_qianqian_yi_you_v1",
+            id="17-yi-you",
+        ),
+        pytest.param(
+            19,
+            "甲",
+            [115, 116, 117, 118],
+            ["甲", "丙", "庚"],
+            "selected_ding_autumn_passages_not_full_acceptance",
+            "qiongtong_xu_qianqian_ding_autumn_v1",
+            id="19-ding-you",
+        ),
+    ],
+)
 def test_ten_published_views_preserve_source_review_and_positions_on_three_surfaces(
-    topic, birth_day, reviewed, surface_calls
-):
+    topic,
+    birth_day: int,
+    primary: str,
+    body_pages,
+    stem_sequence,
+    source_status: str,
+    source_id: str | None,
+    surface_calls,
+) -> None:
     spec = SPECS["bazi_" + topic]
     payload = {
         **inputs(spec),
@@ -153,10 +197,13 @@ def test_ten_published_views_preserve_source_review_and_positions_on_three_surfa
         climate = climate[part]
     assert climate["chart_adjudication_status"] == "not_performed"
     assert climate["stem_observations"]
-    if reviewed:
-        assert climate["source_layers"]["body"]["pdf_pages"] == [33, 34]
-        assert climate["source_layers"]["body"]["stem_sequence"] == ["丁", "丙", "庚"]
-        assert climate["primary"] == "庚"
+    assert climate["source_review_status"] == source_status
+    assert climate["primary"] == primary
+    assert climate["source_layers"]["body"]["pdf_pages"] == body_pages
+    assert climate["source_layers"]["body"]["stem_sequence"] == stem_sequence
+    assert climate["source_layers"]["chart_conditions_status"] == "not_adjudicated"
+    if source_id is not None:
+        assert climate["source_ref"]["id"] == source_id
+        assert climate["source_ref"]["body_pdf_pages"] == body_pages
     else:
-        assert climate["source_review_status"] == "source_not_collated"
-        assert "source_ref" not in climate
+        pass

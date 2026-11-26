@@ -4,13 +4,12 @@ from __future__ import annotations
 
 from typing import Any
 
+from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
+from fatebridge.core.metaphysics.liureng_branch_relations import branch_pair_facts
 from fatebridge.core.metaphysics.liureng_cross_harmony_convention import CONVENTION
+from fatebridge.core.metaphysics.liureng_transmissions import STEM_HOUSES
 from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
-
-from ...utils.data import EARTHLY_BRANCHES
-from .common import SEXAGENARY_INDEX
-from .liureng_branch_relations import branch_pair_facts
-from .liureng_transmissions import STEM_HOUSES
+from fatebridge.utils.data import EARTHLY_BRANCHES
 
 SOURCE = "https://zh.wikisource.org/w/index.php?oldid=763692&title=六壬大全_(四庫全書本)/卷09"
 SOURCE_SHA = "78431acbfbd9d2f27dd65d5ec9e04e3921d6ded8896836f9b0e2b2b72a728127"

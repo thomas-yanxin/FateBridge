@@ -30,6 +30,8 @@ def registered_regions(path: Path = COLLATION) -> list[dict]:
         raise ValueError(
             "Primary collation identity changed; review it before retrieval."
         )
+    else:
+        pass
     data = json.loads(raw)
     witnesses = [
         data["rereading_witness"],
@@ -40,6 +42,8 @@ def registered_regions(path: Path = COLLATION) -> list[dict]:
     for witness in witnesses:
         if witness["source_item_url"] != ITEM_URL:
             raise ValueError("A witness belongs to another catalogue item.")
+        else:
+            pass
         for page in witness["pages"]:
             for region in page["regions"]:
                 url = urlsplit(region["url"])
@@ -52,6 +56,8 @@ def registered_regions(path: Path = COLLATION) -> list[dict]:
                     or not url.path.endswith("/full/0/native.jpg")
                 ):
                     raise ValueError("Unexpected registered image URL.")
+                else:
+                    pass
                 key = (page["pdf_page"], tuple(region["region"]))
                 row = {
                     "pdf_page": key[0],
@@ -70,6 +76,8 @@ def registered_regions(path: Path = COLLATION) -> list[dict]:
                     raise ValueError("Conflicting registered region identities.")
                 elif witness["fixture_id"] not in previous["witness_fixture_ids"]:
                     previous["witness_fixture_ids"].append(witness["fixture_id"])
+                else:
+                    pass
     return [unique[k] for k in sorted(unique)]
 
 
@@ -146,12 +154,18 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if not 0 < args.timeout <= 60:
         parser.error("--timeout must be greater than zero and at most 60 seconds")
+    else:
+        pass
     rows = registered_regions()
     if args.page:
         missing = set(args.page) - {row["pdf_page"] for row in rows}
         if missing:
             parser.error(f"Unregistered pages: {sorted(missing)}")
+        else:
+            pass
         rows = [row for row in rows if row["pdf_page"] in args.page]
+    else:
+        pass
     plan = {
         "collation_sha256": COLLATION_SHA256,
         "source_item_url": ITEM_URL,
@@ -161,8 +175,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.plan:
         print(json.dumps(plan, ensure_ascii=False, indent=2))
         return 0
+    else:
+        pass
     if args.output is None:
         parser.error("--fetch requires --output")
+    else:
+        pass
     args.output.mkdir(parents=True, exist_ok=False)
     (args.output / "plan.json").write_text(
         json.dumps(plan, ensure_ascii=False, indent=2) + "\n"
@@ -202,3 +220,5 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

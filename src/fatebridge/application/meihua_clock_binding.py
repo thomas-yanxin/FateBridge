@@ -1,28 +1,35 @@
 """Carry original request presence and check the full clock receipt before projection."""
 
-import inspect
 from datetime import datetime, timedelta
-from typing import Any, Callable
+from fractions import Fraction
 
-from pydantic import BaseModel
+from pydantic import BaseModel, JsonValue
 
-from fatebridge.application.bindings import raw_invoke
-from fatebridge.application.tool_spec import Bind, ServiceResult
-from fatebridge.core.meihua_clock_iso import parse_meihua_clock_label
-from fatebridge.core.meihua_clock_resolution import (
+from fatebridge.application.bindings import LazyService, raw_invoke
+from fatebridge.application.tool_spec import (
+    Bind,
+    BoundServiceCall,
+    ResolvedService,
+    ServiceResult,
+)
+from fatebridge.core.contracts.output_civil_time import CivilPointEvidence
+from fatebridge.core.meihua.meihua_clock_iso import parse_meihua_clock_label
+from fatebridge.core.meihua.meihua_clock_resolution import (
     resolve_meihua_civil_clock as resolve_civil_clock,
 )
+from fatebridge.core.requests.divination import MeihuaAnalysisRequest
 from fatebridge.utils.civil_clock import (
     format_utc_offset,
     utc_instant,
 )
+from fatebridge.utils.civil_time import utc_calendar
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 from fatebridge.utils.timezones import timezone_rules_metadata
 
 COMPONENTS = ("year", "month", "day", "hour", "minute", "second")
 
 
-def supplied_clock_components(request: BaseModel) -> list[str]:
+def supplied_clock_components(request: MeihuaAnalysisRequest) -> list[str]:
     return [
         n
         for n in COMPONENTS
@@ -31,34 +38,29 @@ def supplied_clock_components(request: BaseModel) -> list[str]:
     ]
 
 
-def meihua_time_invoke(service: Callable[..., ServiceResult]) -> Bind:
-    base = raw_invoke(service)
+def meihua_time_invoke(service: LazyService | ResolvedService) -> Bind:
+    bind_service = raw_invoke(service)
 
-    def bind(
-        request: BaseModel,
-    ) -> tuple[Callable[..., ServiceResult], tuple[Any, ...], dict[str, Any]]:
-        resolved, args, kwargs = base(request)
-        if "_clock_supplied_components" in inspect.signature(resolved).parameters:
-            kwargs["_clock_supplied_components"] = supplied_clock_components(request)
-        return resolved, args, kwargs
+    def bind(request: BaseModel) -> BoundServiceCall:
+        assert isinstance(request, MeihuaAnalysisRequest)
+        bound_call = BoundServiceCall(*bind_service(request))
+        bound_call.keyword_arguments["_clock_supplied_components"] = (
+            supplied_clock_components(request)
+        )
+        assert not bound_call.positional_arguments
+        return bound_call
 
     return bind
 
 
-def require_meihua_clock_binding(result: dict[str, Any], request: BaseModel) -> None:
+def require_meihua_clock_binding(
+    result: ServiceResult, request: MeihuaAnalysisRequest
+) -> None:
     """Check request presence independently of the producer's receipt builder."""
     supplied = supplied_clock_components(request)
     omitted = [n for n in ["minute", "second"] if n not in supplied]
     clock = result["meihua"]["calendar_policy"]["civil_clock_resolution"]
     receipt = clock["input_components"]
-    labels = {"minute": "分钟", "second": "秒数"}
-    statement = (
-        f"钟时计算参考为{clock['local_datetime']}；"
-        + "、".join(f"{labels[n]}未提供，计算补00" for n in omitted)
-        + "。季令等解释仅对应此参考时刻；未知钟时范围未评估，不据补位推定记录精度、误差区间或稳定性。"
-        if omitted
-        else "已提供分、秒分量；输入位数不认证记录的实际精度，也未声明测量误差区间。"
-    )
     expected = {
         "policy_id": "meihua_clock_components_v1",
         "version": "1.0.0",
@@ -74,9 +76,8 @@ def require_meihua_clock_binding(result: dict[str, Any], request: BaseModel) -> 
         "calendar_stability": "not_assessed",
         "observed_precision_certified": False,
         "original_text_uniquely_prescribes_this_precision": False,
-        "statement": statement,
     }
-    if set(receipt) != set(expected):
+    if receipt.keys() != expected.keys() | {"statement"}:
         raise ValueError("梅花钟时输入记录的版本或字段范围不符")
     for name, value in expected.items():
         if type(receipt[name]) is not type(value) or receipt[name] != value:
@@ -88,24 +89,13 @@ def require_meihua_clock_binding(result: dict[str, Any], request: BaseModel) -> 
     wanted = [v if v is not None else 0 for v in values]
     if [getattr(nominal, n) for n in COMPONENTS] != wanted:
         raise ValueError("梅花名义钟时与本次请求的计算分量不符")
-    traces = [
-        s["result"]
-        for s in result["meihua"]["rule_trace"]
-        if s["rule_id"] == "civil_clock_resolution"
-    ]
     if (
-        traces != [clock]
-        or result["calendar_context"]["lunar_calendar"]["meihua"]["calendar_policy"][
+        result["calendar_context"]["lunar_calendar"]["meihua"]["calendar_policy"][
             "civil_clock_resolution"
         ]
         != clock
     ):
         raise ValueError("梅花钟时输入记录与时间轨迹不符")
-    text = result["interpretation"]["comprehensive_judgement"]
-    if result["summary"] != text:
-        raise ValueError("梅花摘要与解释不一致")
-    if text.count(receipt["statement"]) != (1 if omitted else 0):
-        raise ValueError("梅花摘要没有如实说明计算补位")
     scope = result["interpretation"]["evidence_scope"]["clock_input"]
     if (
         scope["path"]
@@ -119,10 +109,10 @@ def require_meihua_clock_binding(result: dict[str, Any], request: BaseModel) -> 
     require_meihua_instant_binding(result, request)
 
 
-def _same_clock_record(actual: Any, expected: Any, path: str) -> None:
+def _same_clock_record(actual: JsonValue, expected: JsonValue, path: str) -> None:
     if type(actual) is not type(expected):
         raise ValueError("梅花钟时记录类型不符：" + path)
-    if isinstance(expected, dict):
+    if isinstance(expected, dict) and isinstance(actual, dict):
         if set(actual) != set(expected):
             raise ValueError("梅花钟时记录字段不符：" + path)
         for key, value in expected.items():
@@ -131,7 +121,7 @@ def _same_clock_record(actual: Any, expected: Any, path: str) -> None:
         raise ValueError("梅花钟时记录与请求不符：" + path)
 
 
-def _clock_datetime(value: Any, path: str, *, aware: bool) -> datetime:
+def _clock_datetime(value: JsonValue, path: str, *, aware: bool) -> datetime:
     if type(value) is not str:
         raise ValueError("梅花时刻须为字符串：" + path)
     parsed = parse_meihua_clock_label(value)
@@ -140,7 +130,7 @@ def _clock_datetime(value: Any, path: str, *, aware: bool) -> datetime:
     return parsed
 
 
-def _local_clock_matches(value: Any, expected: datetime, path: str) -> None:
+def _local_clock_matches(value: JsonValue, expected: datetime, path: str) -> None:
     actual = _clock_datetime(value, path, aware=True)
     if (
         actual.replace(tzinfo=None) != expected.replace(tzinfo=None)
@@ -150,38 +140,49 @@ def _local_clock_matches(value: Any, expected: datetime, path: str) -> None:
         raise ValueError("梅花本地钟时或实际时刻与请求不符：" + path)
 
 
-def _utc_clock_matches(value: Any, expected: datetime, path: str) -> None:
+def _utc_clock_matches(value: JsonValue, expected: datetime, path: str) -> None:
     actual = _clock_datetime(value, path, aware=True)
     if actual.utcoffset() != timedelta(0) or utc_instant(actual) != expected:
         raise ValueError("梅花UTC时刻与请求不符：" + path)
 
 
-def _elapsed_matches(actual: Any, expected: float, path: str) -> None:
-    # Exclude bool; NaN/inf also cannot equal the finite datetime difference.
+def _elapsed_matches(actual: JsonValue, expected: float, path: str) -> None:
+    # note (clock): Boolean values cannot serve as elapsed clock measurements.
     if type(actual) not in {int, float} or actual != expected:
         raise ValueError("梅花UTC钟面间隔不符：" + path)
 
 
-def require_meihua_instant_binding(result: dict[str, Any], request: BaseModel) -> None:
-    """Bind the declared request to every published civil-moment consumer.
-
-    Resolve only the input clock, not the producer's self-reported UTC and not
-    astronomy or lunar rules. These are nominal UTC-label differences; datetime
-    omits leap seconds, so this is not a TAI/TT elapsed-time certificate.
-    """
-    values: list[Any] = [getattr(request, "analysis_" + n) for n in COMPONENTS]
-    wall = datetime(
-        values[0],
-        values[1],
-        values[2],
-        values[3],
-        values[4] if values[4] is not None else 0,
-        values[5] if values[5] is not None else 0,
+def _solar_term_day(record: dict[str, JsonValue], path: str) -> Fraction:
+    if "civil_point" not in record:
+        raise ValueError("梅花节气缺少精确民用主点：" + path)
+    display = record.get("datetime_utc") or record["datetime_with_offset"]
+    calendar = utc_calendar(_clock_datetime(display, path, aware=True))
+    evidence = CivilPointEvidence.model_validate(
+        record["civil_point"], context={"full_result": True}
     )
-    zone = getattr(request, "analysis_timezone") or DEFAULT_BIRTH_TIMEZONE
-    offset = getattr(request, "analysis_utc_offset")
+    point = evidence.known_point()
+    if point is None or point.as_calendar() != calendar:
+        raise ValueError("梅花节气主点与民用显示不一致：" + path)
+    return point.day
+
+
+def require_meihua_instant_binding(
+    result: ServiceResult, request: MeihuaAnalysisRequest
+) -> None:
+    """Verify all retained civil clock consumers against the original request."""
+    wall = datetime(
+        request.analysis_year,
+        request.analysis_month,
+        request.analysis_day,
+        request.analysis_hour,
+        request.analysis_minute if request.analysis_minute is not None else 0,
+        request.analysis_second if request.analysis_second is not None else 0,
+    )
+    zone = request.analysis_timezone or DEFAULT_BIRTH_TIMEZONE
+    offset = request.analysis_utc_offset
     local = resolve_civil_clock(wall, zone, offset)
     actual_utc = utc_instant(local)
+    actual_day = utc_calendar(local).julian_day_exact()
     resolved_offset = local.utcoffset()
     if resolved_offset is None:
         raise ValueError("梅花请求没有有效UTC偏移")
@@ -204,7 +205,7 @@ def require_meihua_instant_binding(result: dict[str, Any], request: BaseModel) -
     clock = result["meihua"]["calendar_policy"]["civil_clock_resolution"]
     _local_clock_matches(clock["local_datetime"], local, "clock.local_datetime")
     _utc_clock_matches(clock["instant_utc"], actual_utc, "clock.instant_utc")
-    expected_clock = {
+    expected_clock: dict[str, JsonValue] = {
         "ruleset_id": "meihua_civil_clock_v1",
         "version": "1.0.0",
         "rule_kind": "software_convention",
@@ -216,11 +217,13 @@ def require_meihua_instant_binding(result: dict[str, Any], request: BaseModel) -
         "timezone": zone,
         "input_utc_offset": offset,
         "resolved_utc_offset": offset_label,
-        # Equivalent ISO separators and UTC Z notation retain the same facts.
+        # note (clock): Equivalent ISO separators and UTC Z notation retain the same facts.
         "local_datetime": clock["local_datetime"],
         "instant_utc": clock["instant_utc"],
         "fold": local.fold,
-        "timezone_rules": timezone_rules_metadata(zone),
+        "timezone_rules": {
+            name: identity for name, identity in timezone_rules_metadata(zone).items()
+        },
         "calendar_zone_replaced_by_offset": False,
         "clock_label_precision": precision,
         "original_text_uniquely_prescribes_IANA_or_fold": False,
@@ -240,22 +243,30 @@ def require_meihua_instant_binding(result: dict[str, Any], request: BaseModel) -
         expected_clock,
         "civil_clock_resolution",
     )
-    ac, cc = result["analysis_context"], result["calendar_context"]
+    analysis_context = result["analysis_context"]
+    calendar_context = result["calendar_context"]
     for path, value in [
-        ("analysis_context.analysis_datetime", ac["analysis_datetime"]),
-        ("calendar_context.solar_datetime", cc["solar_datetime"]),
+        ("analysis_context.analysis_datetime", analysis_context["analysis_datetime"]),
+        ("calendar_context.solar_datetime", calendar_context["solar_datetime"]),
     ]:
         if _clock_datetime(value, path, aware=False) != wall:
             raise ValueError("梅花民用钟面与请求不符：" + path)
-    for label, context in [("analysis_context", ac), ("calendar_context", cc)]:
+    for label, context in [
+        ("analysis_context", analysis_context),
+        ("calendar_context", calendar_context),
+    ]:
         _same_clock_record(context["timezone"], zone, label + ".timezone")
     _same_clock_record(
-        ac["civil_utc_offset"], offset_label, "analysis_context.civil_utc_offset"
+        analysis_context["civil_utc_offset"],
+        offset_label,
+        "analysis_context.civil_utc_offset",
     )
     _utc_clock_matches(
-        ac["civil_instant_utc"], actual_utc, "analysis_context.civil_instant_utc"
+        analysis_context["civil_instant_utc"],
+        actual_utc,
+        "analysis_context.civil_instant_utc",
     )
-    for cast in [result["meihua"], cc["lunar_calendar"]["meihua"]]:
+    for cast in [result["meihua"], calendar_context["lunar_calendar"]["meihua"]]:
         traces = [
             r for r in cast["rule_trace"] if r["rule_id"] == "civil_clock_resolution"
         ]
@@ -267,7 +278,7 @@ def require_meihua_instant_binding(result: dict[str, Any], request: BaseModel) -
             {"timezone": zone, "utc_offset": offset},
             "rule_trace.inputs",
         )
-    month = cc["bazi_month_boundary"]
+    month = calendar_context["bazi_month_boundary"]
     _local_clock_matches(
         month["comparison_datetime"], local, "bazi_month_boundary.comparison_datetime"
     )
@@ -276,54 +287,52 @@ def require_meihua_instant_binding(result: dict[str, Any], request: BaseModel) -
         "utc_instant_seconds",
         "bazi_month_boundary.elapsed_basis",
     )
-    start = _clock_datetime(
-        month["start_term"]["datetime_with_offset"], "month.start_term", aware=True
-    )
-    end = _clock_datetime(
-        month["next_term"]["datetime_with_offset"], "month.next_term", aware=True
-    )
-    before, after = utc_instant(start), utc_instant(end)
-    if not before <= actual_utc < after:
+    before = _solar_term_day(month["start_term"], "month.start_term")
+    after = _solar_term_day(month["next_term"], "month.next_term")
+    if not before <= actual_day < after:
         raise ValueError("梅花实际时刻不在所列节月区间")
-    elapsed = (actual_utc - before).total_seconds()
-    remaining = (after - actual_utc).total_seconds()
+    elapsed = actual_day - before
+    remaining = after - actual_day
     _elapsed_matches(
-        month["elapsed_seconds_since_start"], elapsed, "month.elapsed_since"
-    )
-    _elapsed_matches(
-        month["elapsed_seconds_until_next"], remaining, "month.elapsed_until"
-    )
-    _elapsed_matches(
-        month["days_since_start"], round(elapsed / 86400, 4), "month.days_since"
+        month["elapsed_seconds_since_start"],
+        float(elapsed * 86400),
+        "month.elapsed_since",
     )
     _elapsed_matches(
-        month["days_until_next"], round(remaining / 86400, 4), "month.days_until"
+        month["elapsed_seconds_until_next"],
+        float(remaining * 86400),
+        "month.elapsed_until",
     )
-    previous, upcoming = cc["current_solar_term"], cc["next_solar_term"]
-    previous_utc = utc_instant(
-        _clock_datetime(
-            previous["datetime_with_offset"], "current_solar_term", aware=True
-        )
+    _elapsed_matches(
+        month["days_since_start"], round(float(elapsed), 4), "month.days_since"
     )
-    next_utc = utc_instant(
-        _clock_datetime(upcoming["datetime_with_offset"], "next_solar_term", aware=True)
+    _elapsed_matches(
+        month["days_until_next"], round(float(remaining), 4), "month.days_until"
     )
-    if not previous_utc <= actual_utc < next_utc:
+    previous, upcoming = (
+        calendar_context["current_solar_term"],
+        calendar_context["next_solar_term"],
+    )
+    previous_day = _solar_term_day(previous, "current_solar_term")
+    next_day = _solar_term_day(upcoming, "next_solar_term")
+    if not previous_day <= actual_day < next_day:
         raise ValueError("梅花实际时刻不在所列相邻节气区间")
     _same_clock_record(
-        ac["current_jieqi"], previous["name"], "analysis_context.current_jieqi"
+        analysis_context["current_jieqi"],
+        previous["name"],
+        "analysis_context.current_jieqi",
     )
     _same_clock_record(
-        ac["next_jieqi"], upcoming["name"], "analysis_context.next_jieqi"
+        analysis_context["next_jieqi"], upcoming["name"], "analysis_context.next_jieqi"
     )
-    delta = cc["solar_term_delta"]
+    delta = calendar_context["solar_term_delta"]
     _elapsed_matches(
         delta["days_since_current"],
-        round((actual_utc - previous_utc).total_seconds() / 86400, 4),
+        round(float(actual_day - previous_day), 4),
         "solar_term_delta.days_since_current",
     )
     _elapsed_matches(
         delta["days_until_next"],
-        round((next_utc - actual_utc).total_seconds() / 86400, 4),
+        round(float(next_day - actual_day), 4),
         "solar_term_delta.days_until_next",
     )

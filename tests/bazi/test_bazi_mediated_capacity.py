@@ -12,7 +12,9 @@ rest = _shared_rest
 
 
 @pytest.mark.parametrize("key", KEYS)
-def test_new_source_conditions_survive_rest_native_mcp_and_cli(key, surface_calls):
+def test_new_source_conditions_survive_rest_native_mcp_and_cli(
+    key, surface_calls
+) -> None:
     spec = SPECS["knowledge_read"]
     payload = {"domain": "bazi", "category": "classical_force_semantics", "key": key}
     options = {"include_snapshot_text": True, "response_char_limit": 0}
@@ -48,3 +50,5 @@ def test_new_source_conditions_survive_rest_native_mcp_and_cli(key, surface_call
     if key == "暖局与用神":
         assert "用神必在酉金" in value["snapshot_text"]
         assert "用神不在丙火而在辰土" in value["snapshot_text"]
+    else:
+        pass

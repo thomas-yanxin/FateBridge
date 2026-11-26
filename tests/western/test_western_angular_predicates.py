@@ -15,7 +15,7 @@ from fatebridge.core.astro.aspects import (
     _build_directional_relative_aspects,
     _build_directional_relative_midpoints,
     _get_dynamic_orb,
-    _match_cross_aspect,
+    _match_cross_aspect_fraction,
 )
 from fatebridge.core.astro.geometry import combine_longitudes
 from fatebridge.core.astro.relationship_geometry import unique_midpoint
@@ -38,7 +38,7 @@ from tests.support.western_angular_reference import (
 )
 
 
-def test_original_wrap_counterexample_is_rejected_without_changing_radius():
+def test_original_wrap_counterexample_is_rejected_without_changing_radius() -> None:
     rows = [
         {"id": "Mercury", "longitude": 0.5000000000000001},
         {"id": "Saturn", "longitude": 352.5},
@@ -53,17 +53,19 @@ def test_original_wrap_counterexample_is_rejected_without_changing_radius():
     )
 
 
-def test_all_dynamic_orbs_keep_the_published_float_policy():
+def test_all_dynamic_orbs_keep_the_published_float_policy() -> None:
     for a in RADII:
         for b in RADII:
             for name, _ in ANGLES:
                 limit = (RADII[a] + RADII[b]) / 2
                 if name in {"sextile", "square"}:
                     limit *= 0.8
+                else:
+                    pass
                 assert _get_dynamic_orb(a, b, name) == limit
 
 
-def test_direct_wrapped_swapped_and_random_matches_against_decimal():
+def test_direct_wrapped_swapped_and_random_matches_against_decimal() -> None:
     cases = []
     for _, angle in ANGLES:
         for radius in (0.0, 1.5, 3.0, 6.0, 8.0):
@@ -89,18 +91,17 @@ def test_direct_wrapped_swapped_and_random_matches_against_decimal():
         for _ in range(1000)
     )
     for a, b, radius in cases:
-        assert _match_cross_aspect(a, b, radius) == reference_match(a, b, radius), (
-            a,
-            b,
-            radius,
-        )
-        for pair in (("Mercury", "Saturn"), ("Sun", "Mars")):
-            assert _match_cross_aspect(a, b, radius, *pair) == reference_match(
-                a, b, radius, pair
+        for pair in (None, ("Mercury", "Saturn"), ("Sun", "Mars")):
+            match = _match_cross_aspect_fraction(a, b, radius, *(pair or ()))
+            actual = (
+                None
+                if match is None
+                else {"aspect": match[0], "delta": float(match[1])}
             )
+            assert actual == reference_match(a, b, radius, pair), (a, b, radius, pair)
 
 
-def test_relationship_midpoints_and_reflections_use_unrounded_coordinates():
+def test_relationship_midpoints_and_reflections_use_unrounded_coordinates() -> None:
     tiny = math.nextafter(0.0, 1.0)
     cases = [
         (0, 180),
@@ -147,7 +148,7 @@ def test_relationship_midpoints_and_reflections_use_unrounded_coordinates():
                 assert actual == expected
 
 
-def test_formula_delivery_preserves_each_half_open_sign_partition():
+def test_formula_delivery_preserves_each_half_open_sign_partition() -> None:
     tiny = math.nextafter(0.0, 1.0)
     for boundary in range(30, 361, 30):
         result = combine_longitudes(float(boundary), -tiny)
@@ -156,7 +157,9 @@ def test_formula_delivery_preserves_each_half_open_sign_partition():
     assert unique_midpoint(-tiny, 60) < 30
 
 
-def test_predictive_fixed_orb_and_relationship_dynamic_orb_share_exact_separation():
+def test_predictive_fixed_orb_and_relationship_dynamic_orb_share_exact_separation() -> (
+    None
+):
     for source, target in (
         (0.5000000000000001, 352.5),
         (-math.ulp(0.0), 3.0),
@@ -179,7 +182,7 @@ def test_predictive_fixed_orb_and_relationship_dynamic_orb_share_exact_separatio
         )
 
 
-def test_instantaneous_phase_does_not_step_past_perfection():
+def test_instantaneous_phase_does_not_step_past_perfection() -> None:
     tiny = math.ulp(0.0)
     cases = [
         (0, 13, 0.1, 0, 0),
@@ -216,7 +219,7 @@ def test_instantaneous_phase_does_not_step_past_perfection():
 
 
 @pytest.mark.parametrize("angle", [0.0, 60.0, 90.0, 120.0, 180.0])
-def test_phase_at_each_exact_angle_and_adjacent_double(angle):
+def test_phase_at_each_exact_angle_and_adjacent_double(angle: float) -> None:
     for target in (
         math.nextafter(angle, -math.inf),
         angle,
@@ -229,7 +232,9 @@ def test_phase_at_each_exact_angle_and_adjacent_double(angle):
             )
 
 
-def test_classical_motion_evidence_and_delivery_keep_exact_and_unknown_distinct():
+def test_classical_motion_evidence_and_delivery_keep_exact_and_unknown_distinct() -> (
+    None
+):
     positions = [
         {"id": "Moon", "sign": "Aries", "longitude": 0.0},
         {"id": "Saturn", "sign": "Aries", "longitude": 0.1},
@@ -257,7 +262,7 @@ def test_classical_motion_evidence_and_delivery_keep_exact_and_unknown_distinct(
         assert "未检验未来成相及完整原典条件" in rendered
 
 
-def test_combustion_and_nodal_thresholds_reject_the_wrap_counterexample():
+def test_combustion_and_nodal_thresholds_reject_the_wrap_counterexample() -> None:
     tiny = math.ulp(0.0)
     assert combustion_state(-tiny, 8.5) == "under_beams"
     positions = [{"id": "Moon", "sign": "Aries", "longitude": -tiny}]
@@ -267,7 +272,7 @@ def test_combustion_and_nodal_thresholds_reject_the_wrap_counterexample():
 
 
 @pytest.mark.parametrize("radius", [float("nan"), float("inf"), -1, 181])
-def test_invalid_thresholds_are_rejected_even_for_empty_inputs(radius):
+def test_invalid_thresholds_are_rejected_even_for_empty_inputs(radius) -> None:
     for call in (
         lambda: _build_aspects([], radius),
         lambda: _build_directional_relative_aspects([], [], radius),

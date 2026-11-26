@@ -3,33 +3,40 @@
 import hashlib
 import json
 from contextlib import nullcontext
+from dataclasses import replace
 from datetime import datetime, timedelta, timezone
+from fractions import Fraction
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import pytest
 from pydantic import ValidationError
+from pytest import MonkeyPatch
 
 from fatebridge.core.almanac import get_solar_terms_for_year, is_calculated_solar_term
+from fatebridge.core.contracts.output_numerology import HeluoSeasonalNumbers
 from fatebridge.core.de441_solar import MODEL_ID as DE441_MODEL
 from fatebridge.core.de441_solar import PROVIDER as DE441_PROVIDER
-from fatebridge.core.heluo import calculate, judge, solar_term
-from fatebridge.core.heluo_seasonal import (
+from fatebridge.core.heluo.heluo import calculate, judge, solar_term
+from fatebridge.core.heluo.heluo_seasonal import (
     SOURCE_SHA256,
     numerical_conditions,
     seasonal_number_evidence,
     seasonal_snapshot,
 )
-from fatebridge.core.output_numerology import HeluoSeasonalNumbers
 from fatebridge.services.divination import calculate_heluo_analysis
-from fatebridge.utils.civil_time import ZonedCalendar
+from fatebridge.utils.civil_time import (
+    ZonedCalendar,
+    nominal_calendar_bracket,
+    utc_calendar,
+)
 from tests.support.ephemeris_context import empty_ephemeris_path
 
 ROOT = Path(__file__).parents[1] / "fixtures/numerology_nlc_v1"
 REF = json.loads((ROOT / "seasonal-reference.json").read_text())
 
 
-def test_eleven_source_pages_and_rule_derivation_are_preserved():
+def test_eleven_source_pages_and_rule_derivation_are_preserved() -> None:
     manifest = json.loads((ROOT / "seasonal-manifest.json").read_text())
     assert manifest["pdf_sha256"] == REF["source_pdf_sha256"] == SOURCE_SHA256
     assert [r["pdf_page"] for r in manifest["images"]] == list(range(64, 75))
@@ -42,7 +49,7 @@ def test_eleven_source_pages_and_rule_derivation_are_preserved():
 
 
 @pytest.mark.parametrize("case", REF["pattern_cases"])
-def test_all_literal_number_patterns_against_hand_derived_probes(case):
+def test_all_literal_number_patterns_against_hand_derived_probes(case) -> None:
     rows = numerical_conditions(case["tian"], case["di"])
     assert len(rows) == len(REF["formulas"]) == 11
     assert [r["rule_id"] for r in rows if r["matched"]] == case["ids"]
@@ -50,7 +57,7 @@ def test_all_literal_number_patterns_against_hand_derived_probes(case):
 
 
 @pytest.mark.parametrize("case", REF["season_cases"])
-def test_original_six_windows_keep_their_gaps_and_overlaps(case):
+def test_original_six_windows_keep_their_gaps_and_overlaps(case) -> None:
     birth = datetime.fromisoformat(case["at"])
     result = seasonal_number_evidence(case["tian"], case["di"], birth)
     windows = result["seasonal_windows"]
@@ -65,8 +72,8 @@ def test_original_six_windows_keep_their_gaps_and_overlaps(case):
 
 @pytest.mark.parametrize("model_context", ["runtime", "empty_native_path"])
 def test_independent_hko_minutes_bracket_every_start_and_end_in_three_years(
-    model_context,
-):
+    model_context: str,
+) -> None:
     # Retain the external minutes and transition probes. A provider's name is
     # provenance, not the accuracy oracle; match it to the actual solved term.
     context = (
@@ -86,6 +93,8 @@ def test_independent_hko_minutes_bracket_every_start_and_end_in_three_years(
                 term_cache[year] = {
                     t.name: t for t in get_solar_terms_for_year(year, "+00:00")
                 }
+            else:
+                pass
             return term_cache[year][name]
 
         for rule in REF["windows"]:
@@ -93,6 +102,8 @@ def test_independent_hko_minutes_bracket_every_start_and_end_in_three_years(
                 for case in reference["cases"]:
                     if case["term"] != boundary:
                         continue
+                    else:
+                        pass
                     moment = datetime.fromisoformat(case["at"])
                     solved = term(case["year"], boundary)
                     assert is_calculated_solar_term(solved)
@@ -122,26 +133,39 @@ def test_independent_hko_minutes_bracket_every_start_and_end_in_three_years(
                             if model_context == "empty_native_path":
                                 assert actual.resolution_provider == DE441_PROVIDER
                                 assert actual.ephemeris_model == DE441_MODEL
+                            else:
+                                pass
                     assert values == ([False, True] if starting else [True, False])
                     observed.add((rule["id"], boundary, case["year"]))
         assert len(observed) == 36  # Reused external term brackets, not new horoscopes.
 
 
-def test_boundary_is_inclusive_on_start_and_exclusive_on_end():
+def test_boundary_is_inclusive_on_start_and_exclusive_on_end() -> None:
     at = datetime.fromisoformat("2026-02-10T12:00:00+08:00")
     windows = seasonal_number_evidence(31, 34, at)["seasonal_windows"]
     for row in windows:
-        for boundary, active in (("start_at", True), ("end_at", False)):
-            result = seasonal_number_evidence(
-                31, 34, datetime.fromisoformat(row[boundary])
-            )
-            selected = next(
-                w for w in result["seasonal_windows"] if w["rule_id"] == row["rule_id"]
-            )
-            assert selected["active"] is active
+        for edge, active in (("start", True), ("end", False)):
+            record = row[edge + "_source"]["civil_point"]
+            point = Fraction(int(record["numerator"]), int(record["denominator"]))
+            _, upper = nominal_calendar_bracket(point)
+            first = datetime.fromisoformat(upper.isoformat())
+            displayed = datetime.fromisoformat(row[edge + "_at"])
+            displayed_after = utc_calendar(displayed).julian_day_exact() >= point
+            for moment, expected in (
+                (displayed, active if displayed_after else not active),
+                (first - datetime.resolution, not active),
+                (first, active),
+            ):
+                result = seasonal_number_evidence(31, 34, moment)
+                selected = next(
+                    w
+                    for w in result["seasonal_windows"]
+                    if w["rule_id"] == row["rule_id"]
+                )
+                assert selected["active"] is expected
 
 
-def test_physical_instant_is_identical_across_timezones_and_dst():
+def test_physical_instant_is_identical_across_timezones_and_dst() -> None:
     # This interval crosses New York's 2026 autumn clock change.
     at = datetime.fromisoformat("2026-11-01T06:30:00Z")
     reference = seasonal_number_evidence(31, 52, at)
@@ -151,7 +175,7 @@ def test_physical_instant_is_identical_across_timezones_and_dst():
         )
 
 
-def test_surplus_parity_and_literal_overlaps_are_not_rewritten_as_exclusive():
+def test_surplus_parity_and_literal_overlaps_are_not_rewritten_as_exclusive() -> None:
     a = seasonal_number_evidence(30, 30, None)
     assert a["matched_pattern_ids"] == [
         "lone_yang_unpaired",
@@ -165,7 +189,7 @@ def test_surplus_parity_and_literal_overlaps_are_not_rewritten_as_exclusive():
     assert "尚未裁定综合得中或葉否" in seasonal_snapshot(b)
 
 
-def test_exact_reference_is_not_a_completed_seasonal_middle_assessment():
+def test_exact_reference_is_not_a_completed_seasonal_middle_assessment() -> None:
     at = datetime.fromisoformat("2026-02-10T12:00:00+08:00")
     result = seasonal_number_evidence(25, 30, at)
     assert result["numbers"]["tian"]["comparison"] == "正数"
@@ -177,7 +201,7 @@ def test_exact_reference_is_not_a_completed_seasonal_middle_assessment():
     assert "数值条件未量化" in seasonal_snapshot(result)
 
 
-def test_strong_number_is_assessed_separately_from_its_seasonal_window():
+def test_strong_number_is_assessed_separately_from_its_seasonal_window() -> None:
     a = seasonal_number_evidence(42, 52, datetime(2026, 1, 15, tzinfo=timezone.utc))
     b = seasonal_number_evidence(42, 52, datetime(2026, 4, 15, tzinfo=timezone.utc))
     assert a["numbers"] == b["numbers"]
@@ -189,7 +213,9 @@ def test_strong_number_is_assessed_separately_from_its_seasonal_window():
     assert b_high["numeric_band_match"] and b_high["active"]
 
 
-def test_extremely_weak_ranges_and_high_thresholds_preserve_their_source_limits():
+def test_extremely_weak_ranges_and_high_thresholds_preserve_their_source_limits() -> (
+    None
+):
     for tian, di, t_expected, d_expected in [
         (4, 8, "至弱", "至弱"),
         (8, 12, "至弱", "至弱"),
@@ -213,7 +239,7 @@ def test_extremely_weak_ranges_and_high_thresholds_preserve_their_source_limits(
     assert "超出所核数段，不外推" in seasonal_snapshot(beyond)
 
 
-def test_missing_birth_instant_has_no_seasonal_or_current_date_fallback():
+def test_missing_birth_instant_has_no_seasonal_or_current_date_fallback() -> None:
     evidence = seasonal_number_evidence(31, 34, None)
     assert evidence["seasonal_status"] == "not_evaluated_missing_birth_instant"
     assert evidence["birth_instant_utc"] is None and evidence["seasonal_windows"] == []
@@ -242,7 +268,7 @@ def test_missing_birth_instant_has_no_seasonal_or_current_date_fallback():
     assert high["seasonal_numbers"]["numbers"]["tian"]["extreme_band"] == "太过"
 
 
-def test_published_evidence_and_snapshot_use_same_run_facts_and_birth_instant():
+def test_published_evidence_and_snapshot_use_same_run_facts_and_birth_instant() -> None:
     args = dict(date="2026-02-10", time="12:00:00", zone="Asia/Shanghai", gender="女")
     a = calculate_heluo_analysis(**args, lon="75", use_true_solar_time=False)
     b = calculate_heluo_analysis(**args, lon="75", use_true_solar_time=True)
@@ -267,12 +293,12 @@ def test_published_evidence_and_snapshot_use_same_run_facts_and_birth_instant():
 @pytest.mark.parametrize(
     "values", [(True, 30), (25, False), (0, 30), (25, -1), (25.0, 30)]
 )
-def test_invalid_or_coerced_counts_cannot_enter_the_rules(values):
+def test_invalid_or_coerced_counts_cannot_enter_the_rules(values) -> None:
     with pytest.raises(ValueError):
         seasonal_number_evidence(*values, None)
 
 
-def test_naive_birth_is_not_silently_assigned_a_timezone():
+def test_naive_birth_is_not_silently_assigned_a_timezone() -> None:
     with pytest.raises(ValueError):
         seasonal_number_evidence(31, 34, datetime(2026, 2, 10))
 
@@ -286,13 +312,14 @@ def test_naive_birth_is_not_silently_assigned_a_timezone():
         {"complete_assessment": True},
     ],
 )
-def test_corrupt_or_overclaimed_facts_fail_the_strict_contract(payload):
+def test_corrupt_or_overclaimed_facts_fail_the_strict_contract(payload) -> None:
     with pytest.raises(ValidationError):
         HeluoSeasonalNumbers.model_validate(payload)
 
 
-def test_hko_check_still_rejects_a_two_minute_error_with_valid_provider(monkeypatch):
-    from dataclasses import replace
+def test_hko_check_still_rejects_a_two_minute_error_with_valid_provider(
+    monkeypatch: MonkeyPatch,
+) -> None:
 
     original = get_solar_terms_for_year
 

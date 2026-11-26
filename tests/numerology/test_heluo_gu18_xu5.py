@@ -6,11 +6,13 @@ from copy import deepcopy
 from pathlib import Path
 
 import pytest
+from fastapi.testclient import TestClient
+from pytest import CaptureFixture, MonkeyPatch
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core import heluo_poems as hp
-from fatebridge.core import heluo_texts as ht
-from fatebridge.core.heluo import _tiaowen, yao_text
+from fatebridge.core.heluo import heluo_poems as hp
+from fatebridge.core.heluo import heluo_texts as ht
+from fatebridge.core.heluo.heluo import _tiaowen, yao_text
 from fatebridge.core.local_techniques.heluo import build_heluo_result
 from fatebridge.services.knowledge import calculate_knowledge_read
 from tests.support.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
@@ -39,7 +41,7 @@ def independent_source_cache(monkeypatch, tmp_path):
         f.cache_clear()
 
 
-def test_source_first_drafts_and_all_withdrawals_remain_hashed():
+def test_source_first_drafts_and_all_withdrawals_remain_hashed() -> None:
     for name in [
         "first-draft-freeze.json",
         "source-only-verified-freeze.json",
@@ -61,7 +63,7 @@ def test_source_first_drafts_and_all_withdrawals_remain_hashed():
     assert final["new_independent_readers"] == 0
 
 
-def test_current_source_coverage_and_pending_groups_remain_explicit():
+def test_current_source_coverage_and_pending_groups_remain_explicit() -> None:
     assert (
         ht.collation_summary()["collated_line_headers"],
         ht.collation_summary()["pending_line_headers"],
@@ -82,7 +84,7 @@ def test_current_source_coverage_and_pending_groups_remain_explicit():
 @pytest.mark.parametrize(
     "entry", READINGS["commentaries"], ids=lambda e: str(e["line"])
 )
-def test_complete_gu_commentary_keeps_source_words_and_parent_conditions(entry):
+def test_complete_gu_commentary_keeps_source_words_and_parent_conditions(entry) -> None:
     result = yao_text("山風蠱", entry["line"])
     expected = [dict(s, applicability=None) for s in entry["sections"]]
     assert result["yaoci"] == entry["yaoci"]
@@ -101,13 +103,19 @@ def test_complete_gu_commentary_keeps_source_words_and_parent_conditions(entry):
             in result["text_provenance"]["commentary_review_status"]
         )
         assert "女命勤儉持家" in expected[-1]["text"]
+    else:
+        pass
     if entry["line"] == 4:
         assert "不能設施" in expected[1]["text"]
         assert "一變為鼎九四" in expected[-1]["text"]
+    else:
+        pass
 
 
 @pytest.mark.parametrize("entry", READINGS["poems"], ids=lambda e: str(e["line"]))
-def test_all16_xu_poems_keep_individual_order_clause_boundaries_and_uncertainty(entry):
+def test_all16_xu_poems_keep_individual_order_clause_boundaries_and_uncertainty(
+    entry,
+) -> None:
     result = yao_text("水天需", entry["line"])
     expected = deepcopy(entry["poems"])
     for p in expected:
@@ -116,6 +124,8 @@ def test_all16_xu_poems_keep_individual_order_clause_boundaries_and_uncertainty(
             p["review_status"] = (
                 "single_reader_native_pixel_collation; glyph_choice_unresolved; independent_second_review_pending"
             )
+        else:
+            pass
     assert result["poem_sections"] == expected
     assert result["shige"] == "\n".join(p["text"] for p in expected)
     assert result["poem_selection"]["selected_poem_indices"] == []
@@ -130,7 +140,7 @@ def test_all16_xu_poems_keep_individual_order_clause_boundaries_and_uncertainty(
     assert result["verdict"] == old["verdict"]
 
 
-def test_gu4_annual_ding4_reference_does_not_replace_actual_natal_phase():
+def test_gu4_annual_ding4_reference_does_not_replace_actual_natal_phase() -> None:
     text = yao_text("山風蠱", 4)
     (ref,) = text["commentary_cross_references"]
     assert ref["source_lines"] == [0, 1, 1, 0, 0, 1]
@@ -156,7 +166,9 @@ def test_gu4_annual_ding4_reference_does_not_replace_actual_natal_phase():
 
 
 @pytest.mark.parametrize("key", ["山風蠱:2", "山風蠱:4", "水天需:4", "水天需:5"])
-def test_reference_summary_preserves_new_source_notes_and_condition_scope(key):
+def test_reference_summary_preserves_new_source_notes_and_condition_scope(
+    key: str,
+) -> None:
     result = calculate_knowledge_read(domain="heluo", key=key)
     record = result["reference_details"]["record"]
     notes = record["text_provenance"].get("commentary_reading_notes", [])
@@ -169,6 +181,8 @@ def test_reference_summary_preserves_new_source_notes_and_condition_scope(key):
     if key == "山風蠱:4":
         assert "一變為鼎九四" in "\n".join(result["lines"])
         assert "不替代正式卦盘" in "\n".join(result["lines"])
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
@@ -183,8 +197,8 @@ def test_reference_summary_preserves_new_source_notes_and_condition_scope(key):
     ],
 )
 def test_actual_temporary_source_tampering_is_rejected_before_projection(
-    kind, monkeypatch, tmp_path
-):
+    kind: str, monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
     if kind.startswith("header"):
         module, attr = ht, "COLLATION_PATH"
     elif kind.startswith("commentary"):
@@ -238,7 +252,9 @@ def test_actual_temporary_source_tampering_is_rejected_before_projection(
 @pytest.mark.parametrize(
     "key", ["山風蠱:2", "山風蠱:4", "水天需:2", "水天需:5", "水天需:6"]
 )
-def test_source_reference_rest_cli_and_mcp_contracts(key, rest, tmp_path, capsys):
+def test_source_reference_rest_cli_and_mcp_contracts(
+    key: str, rest: TestClient, tmp_path: Path, capsys: CaptureFixture[str]
+) -> None:
     response, code, cli, mcp = run_three(
         SPECS["knowledge_read"],
         dict(domain="heluo", key=key),
@@ -255,3 +271,5 @@ def test_source_reference_rest_cli_and_mcp_contracts(key, rest, tmp_path, capsys
     assert record["commentary_branch_selection"]["selected_section_ids"] == []
     if key.startswith("水天需"):
         assert record["poem_selection"]["selected_poem_indices"] == []
+    else:
+        pass

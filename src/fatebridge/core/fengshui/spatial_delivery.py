@@ -2,12 +2,19 @@
 
 from pydantic import BaseModel, JsonValue, TypeAdapter
 
-from .models import AssessRequest
-from .spatial_layout import geometry_output, measured_assessment
-from .spatial_outputs import EvaluatedGeometry, MeasuredLayoutOutput
-from .spatial_search import search_measured_layouts
-from .spatial_sources import RegisteredRuleset, research_coverage, spatial_limitations
-from .surface import summarize_analysis_progress
+from fatebridge.core.fengshui.models import AssessRequest
+from fatebridge.core.fengshui.spatial_layout import geometry_output, measured_assessment
+from fatebridge.core.fengshui.spatial_outputs import (
+    EvaluatedGeometry,
+    MeasuredLayoutOutput,
+)
+from fatebridge.core.fengshui.spatial_search import search_measured_layouts
+from fatebridge.core.fengshui.spatial_sources import (
+    RegisteredRuleset,
+    research_coverage,
+    spatial_limitations,
+)
+from fatebridge.core.fengshui.surface import summarize_analysis_progress
 
 
 class ProgressFacts(BaseModel):

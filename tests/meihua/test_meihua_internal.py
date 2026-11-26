@@ -10,15 +10,15 @@ import pytest
 from jsonschema import Draft202012Validator
 from pydantic import TypeAdapter, ValidationError
 
-from fatebridge.core.meihua_countercontrol import (
+from fatebridge.core.meihua.meihua_countercontrol import (
     build_internal_countercontrol,
     internal_control_ruleset,
 )
 from fatebridge.core.requests.meihua import MeihuaCasting
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
-from fatebridge.validation.meihua_internal import audit_internal_controls
 from tests.support.transports import SPECS, business, rest, surface_calls
+from validation.meihua_internal import audit_internal_controls
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_internal_v1"
 BUNDLE = json.loads((REFERENCES / "cases.json").read_text())
@@ -37,7 +37,7 @@ def resolve(result, path):
 @pytest.mark.parametrize("topic", TOPICS)
 def test_original_worked_diagram_and_direct_control_survive_every_human_affairs_topic(
     case, topic
-):
+) -> None:
     out = calculate_meihua_cast(casting=case["casting"], interpretation_topic=topic)
     assert "error" not in out
     cast, control = out["meihua"], out["interpretation"]["internal_countercontrol"]
@@ -68,19 +68,14 @@ def test_original_worked_diagram_and_direct_control_survive_every_human_affairs_
         assert "仍保留原有克体" in out["summary"]
     else:
         assert not relief
-    assert (
-        control["net_verdict"]
-        is control["event_time"]
-        is control["success_probability"]
-        is None
-    )
+    assert control["net_verdict"] is control["event_time"] is None
     assert cast["calendar_policy"]["is_leap_month"] is None
     assert not cast["calendar_policy"]["actual_month_length_validated"]
     assert cast["seasonal_strength"] is None
     assert cast["counting_variants"] == []
 
 
-def test_wang_relief_does_not_delete_fire_draining_body_or_recursively_cancel():
+def test_wang_relief_does_not_delete_fire_draining_body_or_recursively_cancel() -> None:
     out = calculate_meihua_cast(casting=CASES[1]["casting"])
     c = out["interpretation"]["internal_countercontrol"]
     assert "耗泄关系仍须同看" in out["summary"]
@@ -99,7 +94,9 @@ def test_wang_relief_does_not_delete_fire_draining_body_or_recursively_cancel():
     assert edge["controller_relation_to_body"] == "体生用"
 
 
-def test_support_can_be_constrained_without_turning_into_attack_or_counting_three_votes():
+def test_support_can_be_constrained_without_turning_into_attack_or_counting_three_votes() -> (
+    None
+):
     out = calculate_meihua_cast(casting=BUNDLE["synthetic_probes"][0]["casting"])
     c = out["interpretation"]["internal_countercontrol"]
     q = c["qualifications"][0]
@@ -120,7 +117,7 @@ def test_support_can_be_constrained_without_turning_into_attack_or_counting_thre
 
 
 @pytest.mark.parametrize("branch", [None, "子", "午"])
-def test_weak_or_unknown_fire_is_not_silently_disabled(branch):
+def test_weak_or_unknown_fire_is_not_silently_disabled(branch: str | None) -> None:
     out = calculate_meihua_cast(casting=CASES[0]["casting"], season_month_branch=branch)
     c = out["interpretation"]["internal_countercontrol"]
     assert any(
@@ -137,11 +134,15 @@ def test_weak_or_unknown_fire_is_not_silently_disabled(branch):
             )["strength"]
             == "衰"
         )
+    else:
+        pass
 
 
 @pytest.mark.parametrize("basis", ["raw_counts", "trigram_numbers"])
 @pytest.mark.parametrize("topic", ["general", "transaction"])
-def test_each_count_candidate_uses_own_geometry_and_fact_paths(basis, topic):
+def test_each_count_candidate_uses_own_geometry_and_fact_paths(
+    basis: str, topic: str
+) -> None:
     out = calculate_meihua_cast(
         casting={
             "method": "sound_groups",
@@ -170,7 +171,7 @@ def test_each_count_candidate_uses_own_geometry_and_fact_paths(basis, topic):
     )
 
 
-def test_time_branch_receives_same_control_layer_without_changing_calendar():
+def test_time_branch_receives_same_control_layer_without_changing_calendar() -> None:
     out = calculate_meihua_analysis(
         analysis_year=2057,
         analysis_month=9,
@@ -190,7 +191,7 @@ def test_time_branch_receives_same_control_layer_without_changing_calendar():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_weather_branch_does_not_import_internal_body_use_controls(case):
+def test_weather_branch_does_not_import_internal_body_use_controls(case) -> None:
     out = calculate_meihua_cast(casting=case["casting"], interpretation_topic="weather")
     assert out["interpretation"]["internal_countercontrol"] is None
     assert out["interpretation"]["weather"] is not None
@@ -208,12 +209,12 @@ def test_weather_branch_does_not_import_internal_body_use_controls(case):
         {"line_sum_basis": "raw_counts"},
     ],
 )
-def test_added_count_rejects_invalid_or_mixed_method_parameters(change):
+def test_added_count_rejects_invalid_or_mixed_method_parameters(change) -> None:
     with pytest.raises(ValidationError):
         TypeAdapter(MeihuaCasting).validate_python({**CASES[0]["casting"], **change})
 
 
-def test_added_count_never_fills_missing_year_day_hour_or_count():
+def test_added_count_never_fills_missing_year_day_hour_or_count() -> None:
     for key in [
         "year_branch",
         "lunar_month",
@@ -227,7 +228,7 @@ def test_added_count_never_fills_missing_year_day_hour_or_count():
             TypeAdapter(MeihuaCasting).validate_python(value)
 
 
-def test_frozen_reference_and_unresolved_acceptance_boundaries():
+def test_frozen_reference_and_unresolved_acceptance_boundaries() -> None:
     report = audit_internal_controls(REFERENCES)
     assert report["selected_checks_passed"], report
     assert report["source_worked_calculation_count"] == 3
@@ -241,7 +242,7 @@ def test_frozen_reference_and_unresolved_acceptance_boundaries():
     assert not report["predictive_efficacy_established"]
 
 
-def test_declared_synthetic_mutual_erratum_follows_literal_line_positions():
+def test_declared_synthetic_mutual_erratum_follows_literal_line_positions() -> None:
     code = "011101"
     # Explicit one-based 2,3,4 and 3,4,5, independent of the production helper.
     lower = code[1] + code[2] + code[3]
@@ -250,13 +251,13 @@ def test_declared_synthetic_mutual_erratum_follows_literal_line_positions():
     assert lower + upper == "111110"
 
 
-def test_source_profile_copy_is_isolated():
+def test_source_profile_copy_is_isolated() -> None:
     one = internal_control_ruleset()
     one["rules"][0]["quote"] = "changed"
     assert internal_control_ruleset()["rules"][0]["quote"] != "changed"
 
 
-def test_tampering_with_oracle_fails_even_after_rehash(tmp_path):
+def test_tampering_with_oracle_fails_even_after_rehash(tmp_path: Path) -> None:
     d = tmp_path / "fixtures/meihua_internal_v1"
     shutil.copytree(REFERENCES, d)
     for name in [
@@ -283,8 +284,8 @@ def test_tampering_with_oracle_fails_even_after_rehash(tmp_path):
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
 @pytest.mark.parametrize("topic", ["general", "transaction"])
 def test_added_count_control_and_projection_agree_on_rest_mcp_cli(
-    case, topic, surface_calls
-):
+    case, topic: str, surface_calls
+) -> None:
     spec = SPECS["meihua_cast"]
     fields = [
         "meihua.seed",

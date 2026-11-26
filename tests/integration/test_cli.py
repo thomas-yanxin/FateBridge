@@ -1,27 +1,22 @@
 """CLI surface tests — the CLI is built from the same central tool catalog."""
 
+import argparse
+import importlib.util
 import json
+import sys
+from pathlib import Path
 
 import pytest
 
 from fatebridge.application.execution import result_is_error
 from fatebridge.cli import run
+from fatebridge.cli_arguments import _BooleanFlagAction
 from fatebridge.services.tool_catalog import CATALOG
 
 
-def test_nested_model_tool_gives_hint_not_crash(capsys):
-    # astro_relative uses a nested request model -> CLI-unsupported, but should
-    # print a helpful hint (pointing at the flat variant) and exit 2. The hint
-    # is JSON on stdout so a json.loads(stdout) consumer parses it cleanly.
-    code = run(["astro_relative"])
-    out = capsys.readouterr().out
-    payload = json.loads(out)
-    assert code == 2
-    assert payload["error_code"] == "cli_unsupported"
-    assert "astro_relative_chart" in payload["error"]
-
-
-def test_missing_required_flag_emits_json_on_stdout(capsys):
+def test_missing_required_flag_emits_json_on_stdout(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     # A missing required flag is an argparse-level error. It must still land on
     # stdout as valid JSON (not an empty stdout + usage text on stderr), so an
     # agent that parses stdout gets actionable feedback instead of a PARSE-ERR.
@@ -33,12 +28,12 @@ def test_missing_required_flag_emits_json_on_stdout(capsys):
     assert "birth" in payload["error"]
 
 
-def test_result_is_error_uses_shared_envelope():
+def test_result_is_error_uses_shared_envelope() -> None:
     assert result_is_error({"error": "x"}) is True
     assert result_is_error({"ok": 1}) is False
 
 
-def test_cli_runs_bazi_dimension(capsys):
+def test_cli_runs_bazi_dimension(capsys: pytest.CaptureFixture[str]) -> None:
     code = run(
         [
             "bazi_romance",
@@ -59,12 +54,14 @@ def test_cli_runs_bazi_dimension(capsys):
     out = capsys.readouterr().out
     payload = json.loads(out)
     assert code == 0
-    assert payload["analysis_type"] == "八字正缘桃花分析"
+    assert payload["analysis_type"] == "八字桃花星宫取证"
     assert "romance_analysis" in payload
     assert isinstance(payload.get("run_metadata"), dict)
 
 
-def test_cli_fields_projection_trims_payload(capsys):
+def test_cli_fields_projection_trims_payload(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     code = run(
         [
             "bazi_romance",
@@ -88,14 +85,16 @@ def test_cli_fields_projection_trims_payload(capsys):
     payload = json.loads(out)
     assert code == 0
     assert set(payload) <= {"analysis_type", "run_metadata"}
-    assert payload["analysis_type"] == "八字正缘桃花分析"
+    assert payload["analysis_type"] == "八字桃花星宫取证"
     assert "romance_analysis" not in payload
 
 
-def test_cli_fields_dotted_subpath_prunes_block(capsys):
+def test_cli_fields_dotted_subpath_prunes_block(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     code = run(
         [
-            "bazi_birth",
+            "bazi_birth_chart",
             "--birth-year",
             "1990",
             "--birth-month",
@@ -119,7 +118,7 @@ def test_cli_fields_dotted_subpath_prunes_block(capsys):
     assert isinstance(payload.get("run_metadata"), dict)
 
 
-def test_cli_runs_knowledge_read(capsys):
+def test_cli_runs_knowledge_read(capsys: pytest.CaptureFixture[str]) -> None:
     code = run(
         ["knowledge_read", "--domain", "bazi", "--category", "wealth", "--key", "财库"]
     )
@@ -129,14 +128,16 @@ def test_cli_runs_knowledge_read(capsys):
     assert payload["title"].startswith("财库")
 
 
-def test_describe_flat_tool_emits_schema_and_example(capsys):
+def test_describe_flat_tool_emits_schema_and_example(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     code = run(["describe", "bazi_wealth"])
     out = capsys.readouterr().out
     info = json.loads(out)
     assert code == 0
     assert info["tool"] == "bazi_wealth"
     assert info["surfaces"]["cli"] is True
-    assert info["surfaces"]["rest_path"] == "/api/cn/bazi/wealth"
+    assert info["surfaces"]["rest_path"] == "/api/bazi/wealth"
     by = next(p for p in info["parameters"] if p["name"] == "birth_year")
     assert by["required"] is True
     assert by["type"] == "int"
@@ -146,19 +147,22 @@ def test_describe_flat_tool_emits_schema_and_example(capsys):
     assert "--birth-year" in info["cli_example"]
 
 
-def test_describe_nested_tool_still_describes_with_hint(capsys):
-    # Nested-model tools can't run on the CLI, but describe must still work and
-    # point the agent at the right surface.
-    code = run(["describe", "astro_relative"])
+def test_describe_relationship_tool_lists_shared_surface(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    code = run(["describe", "relationship_chart"])
     out = capsys.readouterr().out
     info = json.loads(out)
     assert code == 0
-    assert info["surfaces"]["cli"] is False
-    assert "cli_hint" in info
-    assert "cli_example" not in info
+    assert info["tool"] == "relationship_chart"
+    assert info["surfaces"]["rest_path"] == "/api/astrology/relationship-chart"
+    assert info["surfaces"]["cli"] is True
+    assert info["cli_example"].startswith("fatebridge relationship_chart")
 
 
-def test_describe_unknown_tool_returns_nonzero(capsys):
+def test_describe_unknown_tool_returns_nonzero(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     code = run(["describe", "no_such_tool"])
     payload = json.loads(capsys.readouterr().out)
     assert code == 2
@@ -166,7 +170,9 @@ def test_describe_unknown_tool_returns_nonzero(capsys):
     assert "no_such_tool" in payload["error"]
 
 
-def test_describe_without_tool_returns_usage(capsys):
+def test_describe_without_tool_returns_usage(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     code = run(["describe"])
     payload = json.loads(capsys.readouterr().out)
     assert code == 2
@@ -174,7 +180,9 @@ def test_describe_without_tool_returns_usage(capsys):
     assert "describe" in payload["error"]
 
 
-def test_cli_validation_error_returns_nonzero(capsys):
+def test_cli_validation_error_returns_nonzero(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     # Invalid month (passes argparse int parse, fails pydantic le=12) -> exit 1.
     code = run(
         [
@@ -198,7 +206,9 @@ def test_cli_validation_error_returns_nonzero(capsys):
     assert payload["error_code"] == "validation_error"
 
 
-def test_cli_invalid_input_renders_clean_error_shape(capsys):
+def test_cli_invalid_input_renders_clean_error_shape(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     # Bad input renders the same generic, structured error shape REST/MCP
     # use (status_code 400, validation_error) instead of a raw exception string.
     code = run(
@@ -220,35 +230,39 @@ def test_cli_invalid_input_renders_clean_error_shape(capsys):
     assert payload["status_code"] == 422
     assert payload["error_code"] == "validation_error"
     assert payload["issues"] == [
-        {"path": "birth_date", "code": "invalid_calendar_date"}
+        {
+            "path": "birth_date",
+            "code": "invalid_calendar_date",
+            "message": "无效的公历日期，请核对年、月、日及闰年。",
+        }
     ]
 
 
-def _bool_flag_parser():
-    import argparse
-
-    from fatebridge.cli import _BooleanFlagAction
-
+@pytest.mark.parametrize(
+    ("arguments", "expected"),
+    [
+        ([], False),
+        (["--flag"], True),
+        (["--flag", "true"], True),
+        (["--flag", "false"], False),
+        (["--flag=false"], False),
+        (["--flag", "no"], False),
+        (["--no-flag"], False),
+    ],
+)
+def test_bool_flag_accepts_bare_negated_and_explicit_values(
+    arguments: list[str], expected: bool
+) -> None:
+    """One flag supports both shell switch syntax and explicit boolean values."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--flag", dest="flag", action=_BooleanFlagAction, default=False)
-    return parser
+    assert parser.parse_args(arguments).flag is expected
 
 
-def test_bool_flag_accepts_bare_negated_and_explicit_values():
-    parser = _bool_flag_parser()
-    assert parser.parse_args([]).flag is False
-    assert parser.parse_args(["--flag"]).flag is True
-    assert parser.parse_args(["--flag", "true"]).flag is True
-    assert parser.parse_args(["--flag", "false"]).flag is False
-    assert parser.parse_args(["--flag=false"]).flag is False
-    assert parser.parse_args(["--flag", "no"]).flag is False
-    assert parser.parse_args(["--no-flag"]).flag is False
-
-
-def test_cli_bool_flag_explicit_value_runs(capsys):
+def test_cli_bool_flag_explicit_value_runs(capsys: pytest.CaptureFixture[str]) -> None:
     code = run(
         [
-            "bazi_birth",
+            "bazi_birth_chart",
             "--birth-year",
             "2000",
             "--birth-month",
@@ -269,13 +283,29 @@ def test_cli_bool_flag_explicit_value_runs(capsys):
     assert not result_is_error(payload)
 
 
-def test_cli_astro_chart_accepts_gender_flag(capsys):
+def test_ipip_ratings_preserve_an_unanswered_interior_slot(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """A null rating leaves item 2 unanswered and keeps the next rating on item 3."""
+    command = ["ipip_big_five", "--no-metadata", "--compact"]
+    assert run([*command, "--responses", '{"1":5,"3":4}']) == 0
+    expected = json.loads(capsys.readouterr().out)
+    assert run([*command, "--ratings", "5", "null", "4"]) == 0
+    captured = capsys.readouterr()
+    assert json.loads(captured.out) == expected
+    assert expected["answered_count"] == 2
+    assert captured.err == ""
+
+
+def test_cli_astro_chart_accepts_gender_flag(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     # astro_chart accepts --gender for uniform batch calling (same arg set as the
     # BaZi/ZiWei tools), even though gender is ignored in the chart math. It must
     # not die with `unrecognized arguments: --gender`.
     code = run(
         [
-            "astro_chart",
+            "astrology_chart",
             "--birth-year",
             "2000",
             "--birth-month",
@@ -299,12 +329,14 @@ def test_cli_astro_chart_accepts_gender_flag(capsys):
     assert payload.get("snapshot_text")
 
 
-def test_cli_bool_flag_unparseable_value_emits_json_usage_error(capsys):
+def test_cli_bool_flag_unparseable_value_emits_json_usage_error(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     # A non-boolean value is an argparse-level usage error: still valid JSON on
     # stdout (exit 2), carrying an actionable hint rather than an empty stdout.
     code = run(
         [
-            "bazi_birth",
+            "bazi_birth_chart",
             "--birth-year",
             "2000",
             "--birth-month",
@@ -324,12 +356,14 @@ def test_cli_bool_flag_unparseable_value_emits_json_usage_error(capsys):
     assert "true/false" in payload["error"]
 
 
-def _write(path, text):
+def _write(path: Path, text: str) -> str:
     path.write_text(text, encoding="utf-8")
     return str(path)
 
 
-def test_subject_file_supplies_required_and_optional_fields(tmp_path, capsys):
+def test_subject_file_supplies_required_and_optional_fields(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     # A JSON profile alone (no birth flags on the command line) must drive a
     # full run: required fields satisfy argparse via relaxation, and optional
     # fields like gender reach the model instead of being shadowed by defaults.
@@ -350,7 +384,7 @@ def test_subject_file_supplies_required_and_optional_fields(tmp_path, capsys):
             }
         ),
     )
-    code = run(["bazi_birth", "--subject-file", subject])
+    code = run(["bazi_birth_chart", "--subject-file", subject])
     payload = json.loads(capsys.readouterr().out)
     assert code == 0
     chart = payload["bazi_birth"]
@@ -361,7 +395,9 @@ def test_subject_file_supplies_required_and_optional_fields(tmp_path, capsys):
     assert hour["stem"] + hour["branch"] == "庚辰"
 
 
-def test_cli_flag_overrides_subject_file(tmp_path, capsys):
+def test_cli_flag_overrides_subject_file(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     subject = _write(
         tmp_path / "s.json",
         json.dumps(
@@ -374,14 +410,16 @@ def test_cli_flag_overrides_subject_file(tmp_path, capsys):
             }
         ),
     )
-    code = run(["bazi_birth", "--subject-file", subject, "--birth-year", "1990"])
+    code = run(["bazi_birth_chart", "--subject-file", subject, "--birth-year", "1990"])
     payload = json.loads(capsys.readouterr().out)
     assert code == 0
     year = payload["bazi_birth"]["four_pillars"]["year"]
     assert year["stem"] + year["branch"] == "庚午"  # 1990, not 1988 (戊辰)
 
 
-def test_subject_file_reused_across_tools(tmp_path, capsys):
+def test_subject_file_reused_across_tools(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     subject = _write(
         tmp_path / "s.json",
         json.dumps(
@@ -398,7 +436,7 @@ def test_subject_file_reused_across_tools(tmp_path, capsys):
             }
         ),
     )
-    code = run(["ziwei_birth", "--subject-file", subject])
+    code = run(["ziwei_birth_chart", "--subject-file", subject])
     payload = json.loads(capsys.readouterr().out)
     assert code == 0
     # This CLI-surface test only proves the subject-file drives ziwei; the exact
@@ -408,32 +446,56 @@ def test_subject_file_reused_across_tools(tmp_path, capsys):
     assert isinstance(ming_gong, str) and len(ming_gong) == 2
 
 
-def test_subject_file_missing_path_is_usage_error(capsys):
-    code = run(["bazi_birth", "--subject-file", "/no/such/file.json"])
+def test_subject_file_missing_path_is_usage_error(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    code = run(["bazi_birth_chart", "--subject-file", "/no/such/file.json"])
     payload = json.loads(capsys.readouterr().out)
     assert code == 2
     assert payload["error_code"] == "usage_error"
 
 
-def test_subject_file_yaml_is_supported(tmp_path, capsys):
-    import importlib.util
-
-    if importlib.util.find_spec("yaml") is None:  # optional dependency
-        import pytest
-
+def test_subject_file_yaml_is_supported(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    if importlib.util.find_spec("yaml") is None:
         pytest.skip("pyyaml not installed")
+    else:
+        pass
     subject = _write(
         tmp_path / "s.yaml",
         "gender: 女\nbirth_year: 1988\nbirth_month: 8\nbirth_day: 8\n"
         "birth_hour: 8\n",
     )
-    code = run(["bazi_birth", "--subject-file", subject])
+    code = run(["bazi_birth_chart", "--subject-file", subject])
     payload = json.loads(capsys.readouterr().out)
     assert code == 0
     assert payload["bazi_birth"]["person_info"]["gender"] == "女"
 
 
-def _full_subject(tmp_path):
+def test_missing_yaml_dependency_only_blocks_yaml_subjects(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Base installations can read JSON and give an actionable YAML usage error."""
+    monkeypatch.setitem(sys.modules, "yaml", None)
+    subject = {"birth_year": 1988, "birth_month": 8, "birth_day": 8, "birth_hour": 8}
+    json_path = _write(tmp_path / "subject.json", json.dumps(subject))
+    yaml_path = _write(
+        tmp_path / "subject.yaml",
+        "\n".join(f"{name}: {value}" for name, value in subject.items()),
+    )
+
+    assert run(["bazi_birth_chart", "--subject-file", json_path, "--compact"]) == 0
+    assert "bazi_birth" in json.loads(capsys.readouterr().out)
+    assert run(["bazi_birth_chart", "--subject-file", yaml_path]) == 2
+    captured = capsys.readouterr()
+    failure = json.loads(captured.out)
+    assert failure["error_code"] == "usage_error"
+    assert "pyyaml" in failure["error"]
+    assert captured.err == ""
+
+
+def _full_subject(tmp_path: Path) -> str:
     return _write(
         tmp_path / "subject.json",
         json.dumps(
@@ -454,7 +516,9 @@ def _full_subject(tmp_path):
     )
 
 
-def test_profile_runs_default_three_systems(tmp_path, capsys):
+def test_profile_runs_default_three_systems(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     code = run(["profile", "--subject-file", _full_subject(tmp_path)])
     payload = json.loads(capsys.readouterr().out)
     assert code == 0
@@ -470,7 +534,9 @@ def test_profile_runs_default_three_systems(tmp_path, capsys):
     assert "angles" in chart["astro"]
 
 
-def test_profile_accepts_aliases_and_subset(tmp_path, capsys):
+def test_profile_accepts_aliases_and_subset(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     code = run(
         ["profile", "--systems", "八字,健康", "--subject-file", _full_subject(tmp_path)]
     )
@@ -479,7 +545,9 @@ def test_profile_accepts_aliases_and_subset(tmp_path, capsys):
     assert list(payload["profile"].keys()) == ["八字", "健康"]
 
 
-def test_profile_cli_flag_overrides_subject(tmp_path, capsys):
+def test_profile_cli_flag_overrides_subject(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     code = run(
         [
             "profile",
@@ -497,7 +565,9 @@ def test_profile_cli_flag_overrides_subject(tmp_path, capsys):
     assert year["stem"] + year["branch"] == "庚午"  # 1990 wins over file's 1988
 
 
-def test_profile_legs_share_one_birth_instant_when_tz_omitted(tmp_path, capsys):
+def test_profile_legs_share_one_birth_instant_when_tz_omitted(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     # Regression: the astro leg's model once defaulted birth_timezone='UTC'. Left
     # to that default, the western leg interpreted a China wall-clock time as UTC,
     # landing ~8h off the Chinese legs (e.g. 09:55 -> 18:0x UTC) and producing a
@@ -542,12 +612,10 @@ def test_profile_legs_share_one_birth_instant_when_tz_omitted(tmp_path, capsys):
     assert payload["profile"]["bazi"]["bazi_birth"]["time_algorithm"] == "真太阳时"
 
 
-def test_profile_unifies_instant_even_for_uncatalogued_place(tmp_path, capsys):
-    # 海安 is not in the offline place catalog, so no timezone can be derived
-    # from the name. The BaZi normalizer falls back to DEFAULT_BIRTH_TIMEZONE
-    # (Asia/Shanghai); the profile must apply the SAME fallback to the astro leg
-    # so an uncatalogued China birth does not silently leave the western leg on
-    # its 'UTC' default (the original bug for this very subject).
+@pytest.mark.parametrize("place", ["海安", "Unknown Birthplace"])
+def test_profile_resolves_place_without_guessing_a_timezone(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], place: str
+) -> None:
     subject = _write(
         tmp_path / "s.json",
         json.dumps(
@@ -559,7 +627,7 @@ def test_profile_unifies_instant_even_for_uncatalogued_place(tmp_path, capsys):
                 "birth_day": 10,
                 "birth_hour": 9,
                 "birth_minute": 55,
-                "birth_place": "海安",
+                "birth_place": place,
                 "birth_longitude": 120.45,
                 "birth_latitude": 32.54,
             }
@@ -567,14 +635,124 @@ def test_profile_unifies_instant_even_for_uncatalogued_place(tmp_path, capsys):
     )
     code = run(["profile", "--systems", "bazi,astro", "--subject-file", subject])
     payload = json.loads(capsys.readouterr().out)
-    assert code == 0
-    astro_pi = payload["profile"]["astro"]["person_info"]
-    assert astro_pi["birth_timezone"] != "UTC"
-    # 09:55 +08:00 (with a small true-solar shift) is an early-UTC instant.
-    assert astro_pi["utc_datetime"].startswith("2000-12-10T0")
+    assert payload["profile"]["bazi"]["bazi_birth"]["four_pillars"]
+    astro = payload["profile"]["astro"]
+    if place == "海安":
+        assert code == 0
+        assert astro["person_info"]["birth_timezone"] == "Asia/Shanghai"
+    else:
+        assert code == 1
+        assert astro["error_code"] == "validation_error"
+        assert "birth_timezone" in astro["error"]
 
 
-def test_profile_unknown_system_is_usage_error(tmp_path, capsys):
+def test_profile_preserves_the_recorded_solar_clock_basis(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    subject = _write(
+        tmp_path / "solar.json",
+        json.dumps(
+            {
+                "gender": "男",
+                "birth_year": 1950,
+                "birth_month": 1,
+                "birth_day": 2,
+                "birth_hour": 12,
+                "birth_place": "London",
+                "birth_clock_basis": "local_mean_solar",
+                "use_true_solar_time": False,
+            }
+        ),
+    )
+    flags = ["--subject-file", subject, "--include-snapshot-text", "false"]
+    assert run(["profile", "--systems", "vedic_chart", *flags]) == 0
+    person = json.loads(capsys.readouterr().out)["profile"]["vedic_chart"][
+        "person_info"
+    ]
+    assert person["utc_datetime"] == "1950-01-02T12:00:30.177600+00:00"
+    assert person["clock_conversion"]["input_clock_basis"] == "local_mean_solar"
+
+    assert (
+        run(
+            [
+                "profile",
+                "--systems",
+                "vedic_chart,bazi_birth_chart",
+                *flags,
+                "--fields",
+                "profile.vedic_chart.person_info",
+                "profile.bazi_birth_chart.bazi_birth.four_pillars",
+                "--strict-fields",
+            ]
+        )
+        == 1
+    )
+    legs = json.loads(capsys.readouterr().out)["profile"]
+    assert legs["vedic_chart"]["person_info"] == person
+    assert legs["bazi_birth_chart"]["issues"] == [
+        {
+            "path": "birth_clock_basis",
+            "code": "extra_forbidden",
+            "message": "Extra inputs are not permitted",
+        }
+    ]
+
+
+def test_profile_invalid_place_reaches_child_request_validation(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    subject_path = Path(_full_subject(tmp_path))
+    subject = json.loads(subject_path.read_text(encoding="utf-8"))
+    del subject["birth_timezone"]
+    subject["birth_place"] = ["上海"]
+    subject_path.write_text(json.dumps(subject), encoding="utf-8")
+
+    assert (
+        run(
+            [
+                "profile",
+                "--systems",
+                "bazi",
+                "--subject-file",
+                str(subject_path),
+                "--fields",
+                "profile.bazi.bazi_birth.four_pillars",
+                "--strict-fields",
+            ]
+        )
+        == 1
+    )
+    payload = json.loads(capsys.readouterr().out)
+    error = payload["profile"]["bazi"]
+    assert error["error_code"] == "validation_error"
+    assert [(issue["path"], issue["code"]) for issue in error["issues"]] == [
+        ("birth_place", "string_type")
+    ]
+    assert error["trace_id"] == payload["run_metadata"]["trace_id"]
+
+    assert (
+        run(
+            [
+                "profile",
+                "--systems",
+                "bazi",
+                "--subject-file",
+                str(subject_path),
+                "--fields",
+                "profile.bazi.error.message",
+                "--strict-fields",
+            ]
+        )
+        == 1
+    )
+    assert json.loads(capsys.readouterr().out)["issues"] == [
+        {"path": "profile.bazi.error.message", "code": "non_object_projection_path"}
+    ]
+
+
+def test_profile_unknown_system_is_usage_error(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     code = run(
         ["profile", "--systems", "bazi,foo", "--subject-file", _full_subject(tmp_path)]
     )
@@ -584,7 +762,9 @@ def test_profile_unknown_system_is_usage_error(tmp_path, capsys):
     assert "foo" in payload["error"]
 
 
-def test_profile_missing_required_is_usage_error(capsys):
+def test_profile_missing_required_is_usage_error(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     code = run(["profile", "--systems", "bazi"])
     payload = json.loads(capsys.readouterr().out)
     assert code == 2
@@ -593,10 +773,14 @@ def test_profile_missing_required_is_usage_error(capsys):
 
 
 @pytest.mark.parametrize("value", [True, None])
-@pytest.mark.parametrize("command", ["bazi_birth", "profile"])
+@pytest.mark.parametrize("command", ["bazi_birth_chart", "profile"])
 def test_subject_file_rejects_unknown_keys_before_calculation(
-    tmp_path, capsys, monkeypatch, command, value
-):
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+    command: str,
+    value: bool | None,
+) -> None:
     subject_path = _full_subject(tmp_path)
     with open(subject_path, encoding="utf-8") as stream:
         subject = json.load(stream)
@@ -611,31 +795,199 @@ def test_subject_file_rejects_unknown_keys_before_calculation(
     payload = json.loads(capsys.readouterr().out)
     assert code == 1
     assert payload["error_code"] == "validation_error"
-    assert payload["issues"] == [{"path": "birth_huor", "code": "extra_forbidden"}]
+    assert payload["issues"] == [
+        {
+            "path": "birth_huor",
+            "code": "extra_forbidden",
+            "message": "Extra inputs are not permitted",
+        }
+    ]
     assert payload["trace_id"] == "subject-typo"
 
 
-@pytest.mark.parametrize("command", ["bazi_birth", "ziwei_birth", "astro_chart"])
+@pytest.mark.parametrize(
+    "command", ["bazi_birth_chart", "ziwei_birth_chart", "astrology_chart"]
+)
 def test_full_subject_file_remains_reusable_across_current_birth_contracts(
-    tmp_path, capsys, command
-):
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], command: str
+) -> None:
     code = run([command, "--subject-file", _full_subject(tmp_path)])
     payload = json.loads(capsys.readouterr().out)
     assert code == 0
     assert "error_code" not in payload
 
 
-def test_subject_file_rejects_tool_options_not_in_selected_contract(tmp_path, capsys):
+def test_subject_file_rejects_tool_options_not_in_selected_contract(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     subject_path = _full_subject(tmp_path)
     with open(subject_path, encoding="utf-8") as stream:
         subject = json.load(stream)
     subject["hsys"] = 8
     _write(tmp_path / "subject.json", json.dumps(subject))
-    code = run(["bazi_birth", "--subject-file", subject_path])
+    code = run(["bazi_birth_chart", "--subject-file", subject_path])
     payload = json.loads(capsys.readouterr().out)
     assert code == 1
-    assert payload["issues"] == [{"path": "hsys", "code": "extra_forbidden"}]
-    code = run(["astro_chart", "--subject-file", subject_path])
+    assert payload["issues"] == [
+        {
+            "path": "hsys",
+            "code": "extra_forbidden",
+            "message": "Extra inputs are not permitted",
+        }
+    ]
+    code = run(["astrology_chart", "--subject-file", subject_path])
     payload = json.loads(capsys.readouterr().out)
     assert code == 0
     assert payload["chart_profile"]["house_system_code"] == 8
+
+
+def test_profile_compact_matches_standalone_and_supports_runtime_projection(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    subject = _full_subject(tmp_path)
+    as_of = "2026-10-12T12:00:00+08:00"
+
+    assert (
+        run(
+            [
+                "bazi_birth_chart",
+                "--subject-file",
+                subject,
+                "--detail",
+                "compact",
+                "--as-of",
+                as_of,
+                "--compact",
+            ]
+        )
+        == 0
+    )
+    standalone_raw = capsys.readouterr().out
+    standalone = json.loads(standalone_raw)
+
+    assert (
+        run(
+            [
+                "profile",
+                "--systems",
+                "bazi",
+                "--subject-file",
+                subject,
+                "--detail",
+                "compact",
+                "--as-of",
+                as_of,
+                "--compact",
+            ]
+        )
+        == 0
+    )
+    profile_raw = capsys.readouterr().out
+    assert len(profile_raw) < 4096
+    profile_payload = json.loads(profile_raw)
+    leg = profile_payload["profile"]["bazi"]
+    assert "snapshot_text" not in leg
+    assert "runtime" not in leg["run_metadata"]
+    assert {k: v for k, v in leg.items() if k != "run_metadata"} == {
+        k: v for k, v in standalone.items() if k != "run_metadata"
+    }
+    assert (
+        leg["run_metadata"]["parent_run_id"]
+        == profile_payload["run_metadata"]["run_id"]
+    )
+    assert (
+        leg["run_metadata"]["trace_id"] == profile_payload["run_metadata"]["trace_id"]
+    )
+
+    assert (
+        run(
+            [
+                "profile",
+                "--systems",
+                "bazi",
+                "--subject-file",
+                subject,
+                "--detail",
+                "compact",
+                "--as-of",
+                as_of,
+                "--fields",
+                "profile.bazi.run_metadata.runtime",
+                "--strict-fields",
+                "--compact",
+            ]
+        )
+        == 0
+    )
+    runtime_payload = json.loads(capsys.readouterr().out)
+    runtime_leg = runtime_payload["profile"]["bazi"]
+    assert runtime_leg["run_metadata"]["runtime"]["package_version"]
+
+    assert (
+        run(
+            [
+                "profile",
+                "--systems",
+                "bazi",
+                "--subject-file",
+                subject,
+                "--detail",
+                "compact",
+                "--as-of",
+                as_of,
+                "--fields",
+                "profile.bazi.bazi_birth.day_master",
+                "--strict-fields",
+                "--compact",
+            ]
+        )
+        == 0
+    )
+    projected = json.loads(capsys.readouterr().out)
+    assert set(projected["profile"]["bazi"]["bazi_birth"]) == {"day_master"}
+
+    assert (
+        run(
+            [
+                "profile",
+                "--systems",
+                "bazi",
+                "--subject-file",
+                subject,
+                "--detail",
+                "compact",
+                "--as-of",
+                as_of,
+                "--fields",
+                "profile.bazi",
+                "profile.bazi.bazi_birth.ten_gods",
+                "--strict-fields",
+            ]
+        )
+        == 0
+    )
+    expanded = json.loads(capsys.readouterr().out)["profile"]["bazi"]["bazi_birth"]
+    assert expanded["four_pillars"] == leg["bazi_birth"]["four_pillars"]
+    assert expanded["ten_gods"]
+
+    assert (
+        run(
+            [
+                "profile",
+                "--systems",
+                "bazi",
+                "--subject-file",
+                subject,
+                "--detail",
+                "compact",
+                "--fields",
+                "profile.bazi.missing",
+                "--strict-fields",
+            ]
+        )
+        == 1
+    )
+    err = json.loads(capsys.readouterr().out)
+    assert err["issues"] == [
+        {"path": "profile.bazi.missing", "code": "unknown_projection_path"}
+    ]

@@ -20,6 +20,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     raw = (corpus / "manifest.json").read_bytes()
     if hashlib.sha256(raw).hexdigest() != MANIFEST_SHA256:
         raise ValueError("须保留实施前的完整12条注记清单")
+    else:
+        pass
     manifest = json.loads(raw)
     for item in manifest["source_files"] + manifest["prior_source_references"]:
         if (
@@ -27,9 +29,13 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
             != item["sha256"]
         ):
             raise ValueError(f"来源指纹不符：{item['file']}")
+        else:
+            pass
     notes = json.loads((corpus / "opposition-notes.json").read_text())["records"]
     if tuple(row["ju"] for row in notes) != REQUIRED_JU:
         raise ValueError("不能删去原注、异称或阳53的附带外迫")
+    else:
+        pass
     results = []
     for note in notes:
         core = cyclic_core(note["ju"])
@@ -61,6 +67,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     ]
     if len(extra) != 1 or extra[0]["source_name"] != "外迫":
         raise ValueError("阳53的外迫反例必须保留")
+    else:
+        pass
     return {
         "completion_claim": False,
         "selected_annotation_records": 12,

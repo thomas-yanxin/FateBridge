@@ -7,10 +7,12 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator
 
+import fatebridge.api as api
+from fatebridge.application import result_delivery as delivery
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
-from tests.liuyao.test_liuyao_clash_transports import all_surfaces
-from tests.support.result_delivery import assert_same_run_receipt
-from tests.support.transports import SPECS, business, rest, surface_calls
+from tests.support.result_delivery import assert_same_run_receipt, reconstruct
+from tests.support.transports import SPECS, business
+from tests.unit_test.fixtures.liuyao import all_surfaces
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_focus_v25"
 CASES = json.loads((REFERENCE / "cases.json").read_text())["cases"]
@@ -46,7 +48,7 @@ def assert_focus(detail, case):
     assert "作为受生爻" in focus["target_explanation"]
 
 
-def test_focus_examples_and_initial_annotation_error_are_frozen():
+def test_focus_examples_and_initial_annotation_error_are_frozen() -> None:
     frozen = json.loads((REFERENCE / "case-freeze.json").read_text())
     for name, digest in frozen["files_sha256"].items():
         assert hashlib.sha256((REFERENCE / name).read_bytes()).hexdigest() == digest
@@ -55,7 +57,9 @@ def test_focus_examples_and_initial_annotation_error_are_frozen():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda case: case["id"])
-def test_focused_source_target_and_explanation_follow_the_same_calculation(case):
+def test_focused_source_target_and_explanation_follow_the_same_calculation(
+    case,
+) -> None:
     result = build_sixyao_result(**payload(case))
     detail = result["liuyao_evidence"]["conditional_analysis"]["generation_conditions"]
     assert_focus(detail, case)
@@ -83,7 +87,7 @@ def test_focused_source_target_and_explanation_follow_the_same_calculation(case)
         {"focus_line": None},
     ],
 )
-def test_other_focus_kinds_do_not_borrow_visible_parent_generation(extra):
+def test_other_focus_kinds_do_not_borrow_visible_parent_generation(extra) -> None:
     result = build_sixyao_result(**{**payload(CASES[0]), **extra})
     analysis = result["liuyao_evidence"]["conditional_analysis"]
     assert analysis["generation_conditions"]["focus"] is None
@@ -93,8 +97,8 @@ def test_other_focus_kinds_do_not_borrow_visible_parent_generation(extra):
 @pytest.mark.parametrize("case", CASES, ids=lambda case: case["id"])
 @pytest.mark.parametrize("leaf_only", [False, True])
 def test_qualified_focus_survives_strict_projection_on_all_three_surfaces(
-    case, leaf_only, rest, tmp_path, capsys
-):
+    case, leaf_only: bool, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     fields = (
         [
             ROOT + ".focus." + part
@@ -125,11 +129,12 @@ def test_qualified_focus_survives_strict_projection_on_all_three_surfaces(
 
 @pytest.mark.parametrize("case", CASES, ids=lambda case: case["id"])
 def test_focused_qualification_is_recovered_from_the_same_hash_verified_run(
-    case, rest, tmp_path, capsys, monkeypatch
-):
-    import fatebridge.api as api
-    from fatebridge.application import result_delivery as delivery
-    from tests.support.result_delivery import reconstruct
+    case,
+    rest,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     store = delivery.ResultStore(tmp_path / "focused-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)
@@ -147,7 +152,7 @@ def test_focused_qualification_is_recovered_from_the_same_hash_verified_run(
         assert reconstruct(store, result_id, ROOT + ".focus") == detail["focus"]
 
 
-def test_misspelled_new_source_leaf_is_rejected_consistently(surface_calls):
+def test_misspelled_new_source_leaf_is_rejected_consistently(surface_calls) -> None:
     spec = SPECS["sixyao"]
     field = ROOT + ".focus.source_conditon_match"
     response, protocol, code, cli = surface_calls(

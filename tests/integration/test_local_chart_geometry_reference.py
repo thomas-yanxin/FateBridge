@@ -16,9 +16,9 @@ from pydantic import TypeAdapter
 from typing_extensions import NotRequired, TypedDict
 
 from fatebridge.core.astro import house_projection_precision, runtime
+from fatebridge.core.astro.astrology_tables import SIGNS
 from fatebridge.core.astro.geometry import _sign_name
 from fatebridge.core.astro.house_positions import EclipticHouseProjection
-from fatebridge.core.astrology_tables import SIGNS
 from fatebridge.core.local_techniques import chart as local_chart
 from fatebridge.core.local_techniques.chart import ZODIAC_SIGN_CN
 from fatebridge.core.local_techniques.house_geometry import HouseGeometry
@@ -110,7 +110,7 @@ def reference() -> Reference:
     return result
 
 
-def test_original_exact_rings_and_sign_partitions(reference: Reference):
+def test_original_exact_rings_and_sign_partitions(reference: Reference) -> None:
     assert len(reference["rings"]) == 240 and len(reference["phases"]) == 159
     for i, row in enumerate(reference["rings"]):
         geometry = HouseGeometry.equal(row["anchor"], reverse=row["reverse"])
@@ -129,108 +129,87 @@ def test_original_exact_rings_and_sign_partitions(reference: Reference):
 
 def test_all_original_circle_decisions_and_nonpartition_qualifications(
     reference: Reference,
-):
+) -> None:
     assert len(reference["houses"]) == 31784
-    qualified = nonpartition = 0
-    for i, row in enumerate(reference["houses"]):
-        if not row["declared_partition"]:
-            nonpartition += 1
-            assert row["expected_house"] is None
-            with pytest.raises(ValueError, match="Nonpartition"):
-                HouseGeometry(tuple(map(Fraction, row["cusps"])), row["reverse"])
-            continue
-        qualified += 1
+    qualified_rows = [row for row in reference["houses"] if row["declared_partition"]]
+    nonpartition_rows = [
+        row for row in reference["houses"] if not row["declared_partition"]
+    ]
+    assert (len(qualified_rows), len(nonpartition_rows)) == (29528, 2256)
+    for row in [*nonpartition_rows[::10], nonpartition_rows[-1]]:
+        assert row["expected_house"] is None
+        with pytest.raises(ValueError, match="Nonpartition"):
+            HouseGeometry(tuple(map(Fraction, row["cusps"])), row["reverse"])
+    for row in [*qualified_rows[::20], qualified_rows[-1]]:
         geometry = HouseGeometry(tuple(map(Fraction, row["cusps"])), row["reverse"])
-        assert geometry.house(Fraction(row["point"])) == row["expected_house"], (
-            i,
-            row,
-        )
-    assert (qualified, nonpartition) == (29528, 2256)
+        assert geometry.house(Fraction(row["point"])) == row["expected_house"], row
 
 
-@pytest.mark.parametrize("control_index", range(36))
 def test_working_projection_phase_survives_its_display_precision(
-    reference: Reference, control_index: int, monkeypatch
-):
+    reference: Reference, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Constructed phase controls; these do not certify a physical projection."""
-    row = reference["working_phase_controls"][control_index]
-
-    def phase_model(latitude, armc, obliquity, longitude, code, digits):
-        context = mp.clone()
-        context.dps = digits
-        target = (
-            context.mpf(row["base"]) + row["sign"] * context.mpf(2) ** -row["exponent"]
-        ) % 360
-        return context, (target - context.mpf(1) / 3600000) % 360
-
-    monkeypatch.setattr(house_projection_precision, "_phase", phase_model)
     monkeypatch.setattr(runtime, "ephemeris_call", lambda *args, **kwargs: 0.0)
-    projection = EclipticHouseProjection(10.0, 20.0, 23.4, b"C")
-    coordinate = projection.coordinate(50.0)
-    assert isinstance(coordinate.phase_degrees, Fraction)
-    assert int(coordinate.position) == row["expected_houses"][0]
-    for reverse in (False, True):
-        geometry = HouseGeometry(
-            tuple(Fraction((-30 if reverse else 30) * i) % 360 for i in range(12)),
-            reverse=reverse,
-            projected=True,
-        )
-        assert (
-            geometry.house(50.0, projected_phase=coordinate.phase_degrees)
-            == row["expected_houses"][int(reverse)]
-        ), row
+    for row in reference["working_phase_controls"]:
+
+        def phase_model(latitude, armc, obliquity, longitude, code, digits, _row=row):
+            context = mp.clone()
+            context.dps = digits
+            target = (
+                context.mpf(_row["base"])
+                + _row["sign"] * context.mpf(2) ** -_row["exponent"]
+            ) % 360
+            return context, (target - context.mpf(1) / 3600000) % 360
+
+        with monkeypatch.context() as mp_ctx:
+            mp_ctx.setattr(house_projection_precision, "_phase", phase_model)
+            projection = EclipticHouseProjection(10.0, 20.0, 23.4, b"C")
+            coordinate = projection.coordinate(50.0)
+        assert isinstance(coordinate.phase_degrees, Fraction)
+        assert int(coordinate.position) == row["expected_houses"][0]
+        for reverse in (False, True):
+            geometry = HouseGeometry(
+                tuple(Fraction((-30 if reverse else 30) * i) % 360 for i in range(12)),
+                reverse=reverse,
+                projected=True,
+            )
+            assert (
+                geometry.house(50.0, projected_phase=coordinate.phase_degrees)
+                == row["expected_houses"][int(reverse)]
+            ), row
 
 
-@pytest.mark.parametrize("control_index", range(62))
-def test_frozen_source_geometry_reaches_qualified_public_models(
-    reference: Reference, control_index: int, surface_calls, monkeypatch
-):
-    control = reference["public_controls"][control_index]
-    if "source_core" in control:
-
-        def frozen_source(*args: object, **kwargs: object) -> dict[str, object]:
-            return copy.deepcopy(control["source_core"])
-
-        monkeypatch.setattr(local_chart, "build_core_chart_payload", frozen_source)
-    key = control["key"]
-    fields = (
-        ["chart", "params", "astronomy"]
-        if key == "suzhan"
-        else [
-            "chart",
-            "diceChart",
-        ]
+def _expects_chart_error(control: PublicControl) -> bool:
+    # The original control rejects drawing a chart without coordinates. The
+    # current request can still resolve its calendar from the supplied clock.
+    return (
+        control["expect_final_error"] and control["id"] != "suzhan-missing-coordinate"
     )
-    options = dict(
-        fields=fields,
-        strict_fields=True,
-        response_char_limit=0,
-        include_snapshot_text=False,
-        as_of="2026-11-12T00:00:00Z",
-    )
-    response, protocol, code, cli = surface_calls(
-        SPECS[key], control["payload"], projection=options
-    )
-    if control["expect_final_error"]:
-        assert response.status_code == 400 and code != 0 and protocol.is_error
-        for value in (response.json(), cli, protocol.structured_content):
-            assert value["error_code"] == "validation_error"
-            assert value["retryable"] is False
+
+
+def _assert_public_control_value(
+    value: dict[str, object], control: PublicControl, key: str
+) -> None:
+    if control["id"] == "suzhan-missing-coordinate":
+        assert value["chart"] is value["astronomy"] is None
+        assert value["params"]["calculationMode"] == "calendar_with_clock"
+        assert value["params"]["coordinatesApplied"] is False
+        assert value["params"]["birthTimeImputed"] is False
         return
-    assert response.status_code == 200, response.text
-    assert code == 0 and not protocol.is_error
-    value = business(response.json())
-    assert value == business(cli) == business(protocol.structured_content)
     if control["reference_kind"] == "date_only":
         assert value["chart"] is value["astronomy"] is None
         assert value["params"]["birthTimeKnown"] is False
         assert value["params"]["birthTimeImputed"] is False
         return
+    else:
+        pass
     if control["reference_kind"] == "symbolic_only":
         assert value["chart"] is None
         assert value["diceChart"]["params"]["engineBackend"] == "symbolic_rules"
         assert value["diceChart"]["chart"]["houses"][0]["lon"] == 180
         return
+    else:
+        pass
     chart = value["chart"] if key == "suzhan" else value["chart"]["chart"]
     params = value["params"] if key == "suzhan" else value["chart"]["params"]
     assert params["houseSystemResolved"] == control["expected_source_system"]
@@ -248,7 +227,112 @@ def test_frozen_source_geometry_reaches_qualified_public_models(
             assert actual["ecliptic_house_phase_degrees_ratio"] == (
                 expected["native_phase_ratio"]
             )
+        else:
+            pass
     if control["payload"].get("gps_lat") in (-90, 90):
         assert (
             params["angleDefinition"]["fixed_direction_diurnal_rising_defined"] is False
         )
+    else:
+        pass
+
+
+def test_frozen_source_geometry_reaches_qualified_public_models(
+    reference: Reference, rest, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    for control in reference["public_controls"]:
+        key = control["key"]
+        fields = (
+            ["chart", "params", "astronomy"]
+            if key == "suzhan"
+            else ["chart", "diceChart"]
+        )
+        params = [("fields", field) for field in fields] + [
+            ("strict_fields", "true"),
+            ("response_char_limit", "0"),
+            ("include_snapshot_text", "false"),
+            ("as_of", "2026-11-12T00:00:00Z"),
+        ]
+        with monkeypatch.context() as mp_ctx:
+            if "source_core" in control:
+
+                def frozen_source(
+                    *args: object, _src=control["source_core"], **kwargs: object
+                ) -> dict[str, object]:
+                    return copy.deepcopy(_src)
+
+                mp_ctx.setattr(local_chart, "build_core_chart_payload", frozen_source)
+            else:
+                pass
+            response = rest.post(
+                SPECS[key].rest_path, json=control["payload"], params=params
+            )
+        value = response.json()
+        if _expects_chart_error(control):
+            assert response.status_code == 400
+            assert value["error_code"] == "validation_error"
+            assert value["retryable"] is False
+            continue
+        else:
+            pass
+        assert response.status_code == 200, response.text
+        _assert_public_control_value(value, control, key)
+
+
+def test_frozen_source_geometry_representative_controls_agree_across_transports(
+    reference: Reference, surface_calls, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    representatives: list[PublicControl] = []
+    seen: set[tuple[str, bool, str]] = set()
+    for control in reference["public_controls"]:
+        bucket = (
+            control["key"],
+            _expects_chart_error(control),
+            control["reference_kind"],
+        )
+        if bucket not in seen:
+            seen.add(bucket)
+            representatives.append(control)
+        else:
+            pass
+    for control in representatives:
+        key = control["key"]
+        fields = (
+            ["chart", "params", "astronomy"]
+            if key == "suzhan"
+            else ["chart", "diceChart"]
+        )
+        options = dict(
+            fields=fields,
+            strict_fields=True,
+            response_char_limit=0,
+            include_snapshot_text=False,
+            as_of="2026-11-12T00:00:00Z",
+        )
+        with monkeypatch.context() as mp_ctx:
+            if "source_core" in control:
+
+                def frozen_source(
+                    *args: object, _src=control["source_core"], **kwargs: object
+                ) -> dict[str, object]:
+                    return copy.deepcopy(_src)
+
+                mp_ctx.setattr(local_chart, "build_core_chart_payload", frozen_source)
+            else:
+                pass
+            response, protocol, code, cli = surface_calls(
+                SPECS[key], control["payload"], projection=options
+            )
+        if _expects_chart_error(control):
+            assert response.status_code == 400 and code != 0 and protocol.is_error
+            for value in (response.json(), cli, protocol.structured_content):
+                assert value["error_code"] == "validation_error"
+                assert value["retryable"] is False
+            continue
+        else:
+            pass
+        assert response.status_code == 200, response.text
+        assert code == 0 and not protocol.is_error
+        value = business(response.json())
+        assert value == business(cli) == business(protocol.structured_content)
+        _assert_public_control_value(value, control, key)

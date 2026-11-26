@@ -5,19 +5,22 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from .spatial_angles import angular_delta, compose_degrees
-from .spatial_geometry import (
+from fatebridge.core.fengshui.spatial_angles import angular_delta, compose_degrees
+from fatebridge.core.fengshui.spatial_geometry import (
     GeometryFrame,
     inverse_point,
     rectangle_xy,
     transform_rectangle,
 )
-from .spatial_inputs import PlanPoint, SpatialScene
-from .spatial_outputs import EvaluatedGeometry
-from .spatial_reasoning import RuleComparison
-from .spatial_sources import RegisteredRuleset, desktop_compass_rules
-from .surface import surface_provenance
-from .surface_inputs import PLANT_REPRESENTATIONS
+from fatebridge.core.fengshui.spatial_inputs import PlanPoint, SpatialScene
+from fatebridge.core.fengshui.spatial_outputs import EvaluatedGeometry
+from fatebridge.core.fengshui.spatial_reasoning import RuleComparison
+from fatebridge.core.fengshui.spatial_sources import (
+    RegisteredRuleset,
+    desktop_compass_rules,
+)
+from fatebridge.core.fengshui.surface import surface_provenance
+from fatebridge.core.fengshui.surface_inputs import PLANT_REPRESENTATIONS
 
 
 class BaguaEntry(BaseModel):

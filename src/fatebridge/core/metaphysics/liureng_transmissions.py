@@ -11,8 +11,12 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
-from ...utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
-from .common import ELEMENT_CONTROLS, branch_element_text, stem_element_text
+from fatebridge.core.metaphysics.common import (
+    ELEMENT_CONTROLS,
+    branch_element_text,
+    stem_element_text,
+)
+from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
 
 STEM_HOUSES = dict(zip(HEAVENLY_STEMS, "寅辰巳未巳未申戌亥丑"))
 PUNISHMENT = dict(zip("寅巳申丑戌未子卯辰午酉亥", "巳申寅戌未丑卯子辰午酉亥"))

@@ -7,16 +7,12 @@ not silently identified with the ERFA00B linear-angle/fixed-offset variant.
 import hashlib
 import json
 import re
-import sys
 from fractions import Fraction as Q
 from pathlib import Path
 
 from scripts.astrodice.astrodice_clock_interval import A, cross, dot, norm, scale
+from scripts.astrodice.astrodice_reference_data import verify_material
 from scripts.astrodice.astrodice_tt_models import pi_interval, sine
-
-if not __package__:
-    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-
 
 PLAN_SHA = "6f3cc7e38645bf69c40ca072599f5718cd9a86b6da3bb4be1b505cb7b40414b5"
 INPUT_SHA = "8e463d5ac5b94e2d7cf8e3eff1174e55d14bd8ae999869a3f8ad7092852f8c1d"
@@ -39,7 +35,6 @@ def sha(path):
 
 
 def load(run):
-    from scripts.astrodice.astrodice_reference_data import verify_material
 
     path = run / "plan-before-evaluation.json"
     verify_material(path)
@@ -54,6 +49,8 @@ def array(raw, name):
     match = re.search(r"\b" + name + r"\s*\[[^;=]*=\s*\{(.*?)\};", clean(raw), re.S)
     if match is None:
         raise ValueError("Source array absent: " + name)
+    else:
+        pass
     return re.findall(r"[+-]?(?:\d+\.\d*|\.\d+|\d+)(?:[eE][+-]?\d+)?", match[1])
 
 
@@ -101,6 +98,8 @@ def nutation(t, data, *, erfa_variant=False):
     if erfa_variant:
         psi -= Q("0.000135") * radians
         eps += Q("0.000388") * radians
+    else:
+        pass
     return psi, eps
 
 

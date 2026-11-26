@@ -48,7 +48,7 @@ METHODS = [
 @pytest.mark.parametrize("tool,field,invalid,valid", METHODS)
 def test_supported_methods_survive_and_unsupported_methods_fail_at_the_request_boundary(
     tool, field, invalid, valid
-):
+) -> None:
     spec = SPECS[tool]
     base = representative_inputs(spec)
     for value in valid:
@@ -62,7 +62,7 @@ def test_supported_methods_survive_and_unsupported_methods_fail_at_the_request_b
 @pytest.mark.parametrize("tool,field,invalid,_valid", METHODS)
 def test_unknown_methods_are_rejected_by_rest_mcp_and_cli(
     tool, field, invalid, _valid, surface_calls
-):
+) -> None:
     spec = SPECS[tool]
     inputs = {**representative_inputs(spec), field: invalid}
     http, protocol, code, cli = surface_calls(spec, inputs)

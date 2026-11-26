@@ -1,6 +1,7 @@
 """Guard on-demand call contracts against interface and projection drift."""
 
 import asyncio
+from pathlib import Path
 
 import pytest
 from fastmcp import Client
@@ -12,6 +13,7 @@ from fatebridge.services.tool_catalog import CATALOG
 from scripts import build_codex_call_contracts as builder
 from tests.fixtures.mcp_result_delivery import read_full_result
 from tests.support.result_delivery import store
+from tests.support.transports import cached_mcp_app, call_calculation
 
 
 @pytest.fixture(scope="module")
@@ -21,8 +23,8 @@ def published_contracts():
 
 @pytest.mark.asyncio
 async def test_normally_loaded_contracts_match_current_public_interface(
-    published_contracts, monkeypatch
-):
+    published_contracts, monkeypatch: pytest.MonkeyPatch
+) -> None:
     async def contracts():
         return published_contracts
 
@@ -32,7 +34,7 @@ async def test_normally_loaded_contracts_match_current_public_interface(
 
 def test_contract_publication_ignores_object_order_but_preserves_constraints(
     published_contracts,
-):
+) -> None:
     baseline = builder.render_files(published_contracts)
 
     def reverse_objects(value):
@@ -41,8 +43,12 @@ def test_contract_publication_ignores_object_order_but_preserves_constraints(
                 key: reverse_objects(item)
                 for key, item in reversed(list(value.items()))
             }
+        else:
+            pass
         if isinstance(value, list):
             return [reverse_objects(item) for item in value]
+        else:
+            pass
         return value
 
     reordered = reverse_objects(published_contracts)
@@ -55,8 +61,8 @@ def test_contract_publication_ignores_object_order_but_preserves_constraints(
 @pytest.mark.asyncio
 @pytest.mark.parametrize("change", ["missing", "changed", "obsolete"])
 async def test_contract_generation_repairs_drift_and_removes_retired_json(
-    tmp_path, monkeypatch, change
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, change: str
+) -> None:
     async def contracts():
         return [{"tool": "active", "input": {"type": "object"}}]
 
@@ -86,7 +92,7 @@ async def test_contract_generation_repairs_drift_and_removes_retired_json(
 
 def test_published_contract_keeps_required_time_and_solar_flag_constraints(
     published_contracts,
-):
+) -> None:
     record = next(item for item in published_contracts if item["tool"] == "bazi_career")
     spec = next(s for s in CATALOG if s.tool_name == record["tool"])
     params = example_input(spec)
@@ -105,16 +111,15 @@ def test_published_contract_keeps_required_time_and_solar_flag_constraints(
 @pytest.mark.asyncio
 async def test_published_stage_view_retains_actual_period_boundaries(
     published_contracts, store
-):
+) -> None:
     """A on-demand contract must support stage reading without rediscovery."""
     record = next(
-        item
-        for item in published_contracts
-        if item["tool"] == "western_timing_analysis"
+        item for item in published_contracts if item["tool"] == "western_timing"
     )
     spec = next(s for s in CATALOG if s.tool_name == record["tool"])
-    async with Client(create_mcp_app()) as client:
-        result = await client.call_tool(
+    async with Client(cached_mcp_app()) as client:
+        result = await call_calculation(
+            client,
             record["tool"],
             {
                 **example_input(spec),
@@ -134,88 +139,70 @@ async def test_published_stage_view_retains_actual_period_boundaries(
 @pytest.mark.local_data
 async def test_only_published_inputs_and_views_are_enough_for_real_mcp_calls(
     published_contracts, store
-):
-    from tests.support.compatibility_reference import (
-        assert_source_condition_score_reference,
-    )
-
+) -> None:
     records = published_contracts
     specs = {s.tool_name: s for s in CATALOG}
-    async with Client(create_mcp_app()) as client:
+    async with Client(cached_mcp_app()) as client:
         for record in records:
-            params = {
-                **example_input(specs[record["tool"]]),
-                **record["first_view"],
-                "as_of": "2026-10-12T12:00:00+08:00",
-            }
-            validate(params, record["input"])
-            result = await client.call_tool(record["tool"], params)
+            arguments = example_input(specs[record["tool"]])
+            validate(arguments, record["input"])
+            result = await client.call_tool(
+                "run_calculation",
+                {
+                    "tool": record["tool"],
+                    "arguments": arguments,
+                    **record["first_view"],
+                    "as_of": "2026-10-12T12:00:00+08:00",
+                },
+            )
             assert not result.is_error
             payload = await read_full_result(client, result.structured_content)
             assert (
-                payload["run_metadata"]["tool_name"]
-                == specs[record["tool"]].run_metadata_name
+                payload["run_metadata"]["tool_name"] == specs[record["tool"]].tool_name
             )
             if record["tool"] == "bazi_career":
-                # Published 庚午 辛巳 庚辰 辛巳: non-day stems have weight 1,
-                # all four branches' hidden stems weight .5. This is a manual
-                # occurrence ledger, not values copied from the program.
                 career = payload["career_analysis"]
-                assert career["dominant_ten_gods"]["weighted_counts"] == {
-                    "比肩": 2,
-                    "劫财": 2,
-                    "食神": 0,
-                    "伤官": 0.5,
-                    "正财": 0.5,
-                    "偏财": 0,
-                    "正官": 0.5,
-                    "七杀": 1,
-                    "正印": 0.5,
-                    "偏印": 1.5,
-                }
-                assert {
-                    s["label"]: s["score_delta"]
-                    for s in career["career_structure"]["rule_signals"]
-                } == {
-                    "官印相生": 15,
-                    "食伤生财": 10,
-                    "财官双美": 8,
-                }
-                # The engineering policy's 强 branch adds 5; this is an
-                # uncalibrated rule index, not a classical force judgment.
-                assert career["career_structure"]["score"] == min(
-                    95, 60 + 15 + 10 + 8 + 5
+                first_view = career["evidence_chain"]["topic"]["first_view"]
+                assert first_view["natal_stars"] == [
+                    {"ten_god": "正官", "visible_in": [], "hidden_in": ["year"]},
+                    {
+                        "ten_god": "七杀",
+                        "visible_in": [],
+                        "hidden_in": ["month", "hour"],
+                    },
+                ]
+                assert career["timing_context"]["analysis_datetime"] == (
+                    "2026-10-12T00:00:00+08:00"
                 )
-                structure = career["career_structure"]
-                assert structure["engineering_index"]["strength_level"] == "强"
-                assert structure["score_kind"] == "uncalibrated_rule_index"
-                assert structure["formation_status"] == "heuristic_candidate_only"
-                assert "timing_context" in payload["career_analysis"]
-            elif record["tool"] == "two_person_compatibility":
-                # The source-force policy has no adjudicated preference here.
-                # The score ledger retains its separate engineering reference.
-                first = payload["person_info"]["person1"]["preference_assessment"]
-                assert first["useful_elements"] == first["avoid_elements"] == []
-                assert first["assessment_status"] == "not_adjudicated"
-                assert set(first["conditional_elements"]) == {
-                    "木",
-                    "火",
-                    "土",
-                    "金",
-                    "水",
+            elif record["tool"] == "bazi_compatibility":
+                for person in ("person1", "person2"):
+                    assert set(payload["natal_contexts"][person]["four_pillars"]) == {
+                        "year",
+                        "month",
+                        "day",
+                        "hour",
+                    }
+                assert payload["cross_chart_relations"]["pairs"]
+            elif record["tool"] == "horary_chart":
+                horary = payload["horary"]
+                assert horary["perfection"] == {
+                    "status": "source_conditions_incomplete"
                 }
-                assert first["neutral_elements"] == []
-                assert_source_condition_score_reference(
-                    payload["summary"], payload["detailed_analysis"]
+                assert horary["significators"]["querent"]["planet"]
+                assert horary["significators"]["quesited"]["planet"]
+            elif record["tool"] == "bazi_timing":
+                assert payload["personal_info"]["analysis_datetime"] == (
+                    "2026-10-12 00:00"
                 )
-                assert "score_basis" in payload["traditional_compatibility"]
-            elif record["tool"] == "timing_analysis":
-                assert "analysis_calendar" in payload
-                assert "time_adjustment" in payload["personal_info"]
+                calendar = payload["analysis_calendar"]["analysis_date_context"]
+                assert calendar["timezone"] == "Asia/Shanghai"
+                assert calendar["current_solar_term"]["name"] == "寒露"
+                assert calendar["next_solar_term"]["name"] == "霜降"
+                assert calendar["bazi_month_boundary"]["branch"] == "戌"
             elif record["tool"] == "fengshui_assess":
                 assert "layout_analysis" in payload
                 assert "calculation_scope" in payload["layout_analysis"]
-            elif record["tool"] == "western_timing_analysis":
+            elif record["tool"] == "western_timing":
                 assert (
                     payload["analysis_context"]["analysis_datetime"]
                     == "2026-10-14T12:00:00+08:00"
@@ -224,21 +211,28 @@ async def test_only_published_inputs_and_views_are_enough_for_real_mcp_calls(
                     payload["transits"]["current_transit"]["analysis_datetime"]
                     == "2026-10-14T12:00:00+08:00"
                 )
+            else:
+                pass
 
 
 @pytest.mark.asyncio
-async def test_fengshui_first_views_deliver_resolvable_rule_sources():
+async def test_fengshui_first_views_deliver_resolvable_rule_sources() -> None:
     """A successful calculation must also leave enough evidence to cite it."""
-    async with Client(create_mcp_app(families="fengshui")) as client:
+    async with Client(cached_mcp_app(families="fengshui")) as client:
         for spec in CATALOG:
             if spec.family != "fengshui" or not spec.mcp_name:
                 continue
+            else:
+                pass
             example = example_input(spec)
             if example is None:
                 assert spec.key == "fengshui_monthly_stars"
                 # Explicit confirmed-month fixture, independent of any user.
                 example = {"effective_solar_year": 2026, "solar_month_number": 1}
-            result = await client.call_tool(
+            else:
+                pass
+            result = await call_calculation(
+                client,
                 spec.tool_name,
                 {
                     **example,
@@ -250,13 +244,17 @@ async def test_fengshui_first_views_deliver_resolvable_rule_sources():
             assert not result.is_error
             payload = await read_full_result(client, result.structured_content)
             assert payload["rulesets"] and payload["rule_trace"]
-            sources = {}
+            sources = payload["source_catalog"]
+            assert sources and all(
+                source["title"] and source["url"] for source in sources.values()
+            )
+            ruleset_ids = set()
             for ruleset in payload["rulesets"]:
                 assert ruleset["version"]
-                records = {s["source_id"]: s for s in ruleset["sources"]}
-                assert set(ruleset["source_ids"]) <= records.keys()
-                for source in records.values():
-                    assert source["title"] and source["url"]
-                sources.update(records)
+                ruleset_ids.add(ruleset["ruleset_id"])
+                assert set(ruleset["source_ids"]) <= sources.keys()
+                assert ruleset["source_citations"].keys() == set(ruleset["source_ids"])
+                assert "sources" not in ruleset
             for trace in payload["rule_trace"]:
+                assert trace["ruleset_id"] in ruleset_ids
                 assert set(trace["source_ids"]) <= sources.keys()

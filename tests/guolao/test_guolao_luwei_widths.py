@@ -8,16 +8,16 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.guolao_classical import MANSIONS, HistoricalMansions
-from fatebridge.core.guolao_coordinates import NLC166_MANSIONS
-from fatebridge.core.guolao_widths import DATA, WidthReading, load_row
+from fatebridge.core.guolao.guolao_classical import MANSIONS, HistoricalMansions
+from fatebridge.core.guolao.guolao_coordinates import NLC166_MANSIONS
+from fatebridge.core.guolao.guolao_widths import DATA, WidthReading, load_row
 
 ROOT = Path(__file__).parents[2]
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-luwei-widths-v1"
 REF = json.loads((FIXTURE / "reference.json").read_text())
 
 
-def test_fresh_primary_image_metadata_and_corrected_crops_are_fingerprinted():
+def test_fresh_primary_image_metadata_and_corrected_crops_are_fingerprinted() -> None:
     assert (
         hashlib.sha256((FIXTURE / REF["source_image"]).read_bytes()).hexdigest()
         == REF["source_image_sha256"]
@@ -39,7 +39,9 @@ def test_fresh_primary_image_metadata_and_corrected_crops_are_fingerprinted():
 @pytest.mark.parametrize(
     "mansion,value", list(zip(MANSIONS, REF["widths_under_quarter_policy"]))
 )
-def test_all28_held_readings_including_the_large_stomach_difference(mansion, value):
+def test_all28_held_readings_including_the_large_stomach_difference(
+    mansion, value
+) -> None:
     r = load_row().audit(quarter_policy="quarter_marks")
     e = next(e for e in r["entries"] if e["mansion"] == mansion)
     assert F(e["literal_width_du_exact"]) == F(value)
@@ -47,7 +49,7 @@ def test_all28_held_readings_including_the_large_stomach_difference(mansion, val
     assert not e["accepted_modern_width"]
 
 
-def test_full_sum_and_four_panels_do_not_become_an_independent_source_circle():
+def test_full_sum_and_four_panels_do_not_become_an_independent_source_circle() -> None:
     r = load_row().audit(quarter_policy="quarter_marks")
     values = [F(e["literal_width_du_exact"]) for e in r["entries"]]
     assert [sum(values[i : i + 7]) for i in range(0, 28, 7)] == list(
@@ -70,7 +72,9 @@ def test_full_sum_and_four_panels_do_not_become_an_independent_source_circle():
         )
 
 
-def test_uninterpreted_quarter_marks_block_full_sum_and_later_cumulative_values():
+def test_uninterpreted_quarter_marks_block_full_sum_and_later_cumulative_values() -> (
+    None
+):
     r = load_row().audit(quarter_policy="uninterpreted_marks")
     assert r["resolved_widths"] == 26
     assert F(r["sum_of_resolved_widths_du_exact"]) == F(
@@ -98,7 +102,9 @@ def test_uninterpreted_quarter_marks_block_full_sum_and_later_cumulative_values(
     assert not entries["觜"]["whole_degree_unit_printed"]
 
 
-def test_exact_eight_source_differences_and_their_cumulative_effect_are_retained():
+def test_exact_eight_source_differences_and_their_cumulative_effect_are_retained() -> (
+    None
+):
     r = load_row().audit(quarter_policy="quarter_marks")
     differences = {
         e["mansion"]: F(e["comparison"]["literal_difference_du_exact"])
@@ -131,8 +137,8 @@ def test_exact_eight_source_differences_and_their_cumulative_effect_are_retained
     ],
 )
 def test_local_passage_bounds_retain_missingness_and_cannot_accept_a_full_profile(
-    quarter_policy, whole_policy, known
-):
+    quarter_policy: str, whole_policy: str, known: int
+) -> None:
     r = load_row().audit_passages(
         quarter_policy=quarter_policy, whole_degree_policy=whole_policy
     )
@@ -149,12 +155,12 @@ def test_local_passage_bounds_retain_missingness_and_cannot_accept_a_full_profil
 
 
 @pytest.mark.parametrize("value", [True, 0.0, F(0), "0"])
-def test_implicit_numerical_components_are_rejected(value):
+def test_implicit_numerical_components_are_rejected(value) -> None:
     with pytest.raises(TypeError):
         WidthReading("角", "零", value, None, None)
 
 
-def test_invalid_or_incomplete_rows_are_not_silently_reordered_or_backfilled():
+def test_invalid_or_incomplete_rows_are_not_silently_reordered_or_backfilled() -> None:
     row = load_row()
     with pytest.raises(ValueError):
         replace(row, readings=row.readings[:-1])
@@ -176,7 +182,7 @@ def test_invalid_or_incomplete_rows_are_not_silently_reordered_or_backfilled():
         row.audit_passages(quarter_policy="quarter_marks", whole_degree_policy="guess")
 
 
-def test_local_bounds_detect_an_outside_offset_without_repairing_the_width():
+def test_local_bounds_detect_an_outside_offset_without_repairing_the_width() -> None:
     row = load_row()
     changed = tuple(
         WidthReading("胃", "一度", 1, None, None) if r.mansion == "胃" else r

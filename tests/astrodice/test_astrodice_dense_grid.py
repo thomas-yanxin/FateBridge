@@ -49,7 +49,9 @@ def dense_plan():
     return plan
 
 
-def test_all_old_constraints_are_retained_with_the_same_full_printing_interval():
+def test_all_old_constraints_are_retained_with_the_same_full_printing_interval() -> (
+    None
+):
     row = linear_row()
     a, b, baseline, scale = system(row, None, 810, 5, 0)
     dense_a, dense_b, dense_baseline, dense_scale = system(
@@ -61,7 +63,7 @@ def test_all_old_constraints_are_retained_with_the_same_full_printing_interval()
     assert old < new and len(dense_a) == 2 * len(a)
 
 
-def test_a_new_five_second_observation_is_actually_constrained():
+def test_a_new_five_second_observation_is_actually_constrained() -> None:
     row = linear_row()
     before = system(row, None, 60, 3, 0)
     row["samples"]["5"]["printed_angles"][0] = "359.999900000"
@@ -71,7 +73,7 @@ def test_a_new_five_second_observation_is_actually_constrained():
 
 
 @pytest.mark.parametrize("point", ["5", "10"])
-def test_no_new_or_old_missing_node_is_ignored(point):
+def test_no_new_or_old_missing_node_is_ignored(point: str) -> None:
     row = linear_row()
     row["samples"][point] = None
     q = quality(row, [], step_seconds=5)
@@ -82,7 +84,7 @@ def test_no_new_or_old_missing_node_is_ignored(point):
         quality(row, [], step_seconds=5)
 
 
-def test_a_certificate_cannot_silently_switch_between_coarse_and_dense_grids():
+def test_a_certificate_cannot_silently_switch_between_coarse_and_dense_grids() -> None:
     with pytest.raises(ValueError, match="reference grid changed"):
         replay_interval(
             linear_row(), {"window_seconds": 60, "odd_order": 3}, step_seconds=5
@@ -92,25 +94,37 @@ def test_a_certificate_cannot_silently_switch_between_coarse_and_dense_grids():
 @pytest.mark.parametrize(
     "change", ["method", "step", "window", "order", "line", "nodes"]
 )
-def test_dense_policy_changes_are_rejected(change):
+def test_dense_policy_changes_are_rejected(change: str) -> None:
     p = dense_plan()
     if change == "method":
         p["local_interval_method_id"] = "other"
+    else:
+        pass
     if change == "step":
         p["local_grid_step_seconds"] = 10
+    else:
+        pass
     if change == "window":
         p["local_windows_seconds"] = p["local_windows_seconds"][1:]
+    else:
+        pass
     if change == "order":
         p["local_orders"] = [5]
+    else:
+        pass
     if change == "line":
         p["fixed_reference_convergence_arcsec_per_day"] = 0.0021
+    else:
+        pass
     if change == "nodes":
         p["explicit_offsets_seconds"]["Venus"].remove(5)
+    else:
+        pass
     with pytest.raises(ValueError):
         audit.reference_grid(p)
 
 
-def test_old_policy_remains_identical_and_dense_policy_is_explicit():
+def test_old_policy_remains_identical_and_dense_policy_is_explicit() -> None:
     assert audit.reference_grid(json.loads((OLD / "protocol.json").read_text())) == (
         audit.METHOD,
         10,
@@ -122,8 +136,8 @@ def test_old_policy_remains_identical_and_dense_policy_is_explicit():
 
 
 def test_parent_conflict_cannot_be_overridden_by_a_passing_dense_model(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     row = linear_row()
     parent = copy.deepcopy(row)
     parent["id"] = "old"
@@ -167,6 +181,6 @@ def test_parent_conflict_cannot_be_overridden_by_a_passing_dense_model(
         audit.replay(p, r, tmp_path, p, certificates)
 
 
-def test_parent_paths_are_all_or_none():
+def test_parent_paths_are_all_or_none() -> None:
     with pytest.raises(ValueError, match="All four"):
         audit.parent_from_args(SimpleNamespace(parent_reference=Path("parent.json")))

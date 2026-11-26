@@ -9,8 +9,8 @@ import pytest
 
 from fatebridge.core.local_techniques.qimen import _qimen_stem_context_lines
 from fatebridge.services.metaphysics import calculate_qimen_analysis
-from fatebridge.validation.qimen_calendar_stems import audit_calendar_stems
-from fatebridge.validation.qimen_study import Condition, FrozenQimenPolicy, apply_policy
+from validation.qimen_calendar_stems import audit_calendar_stems
+from validation.qimen_study import Condition, FrozenQimenPolicy, apply_policy
 
 BUNDLE = Path(__file__).parents[1] / "fixtures/qimen_classical_v7"
 REFERENCE = json.loads((BUNDLE / "sources-and-anchors.json").read_text())
@@ -32,7 +32,9 @@ def calculate(at, *, solar=False, longitude=114.17):
 
 @pytest.mark.parametrize("case", REFERENCE["calendar_cases"], ids=lambda c: c["date"])
 @pytest.mark.parametrize("solar", [False, True])
-def test_hko_first_day_date_and_independently_advanced_ganzhi(case, solar):
+def test_hko_first_day_date_and_independently_advanced_ganzhi(
+    case, solar: bool
+) -> None:
     at = datetime.fromisoformat(case["date"]).replace(hour=12)
     anchor = calculate(at, solar=solar)["qimen"]["stem_context"]["lunar_month_start"]
     assert anchor["anchor_date"] == case["date"]
@@ -45,7 +47,7 @@ def test_hko_first_day_date_and_independently_advanced_ganzhi(case, solar):
     )
 
 
-def test_two_printed_stem_examples_are_distinct_from_fifteen_modern_dates():
+def test_two_printed_stem_examples_are_distinct_from_fifteen_modern_dates() -> None:
     report = audit_calendar_stems(BUNDLE)
     assert report["printed_literal_stem_examples"] == 2
     assert report["calendar_reference_count"] == 15
@@ -57,7 +59,9 @@ def test_two_printed_stem_examples_are_distinct_from_fifteen_modern_dates():
 
 
 @pytest.mark.parametrize("date", ["2026-02-05T12:00", "2025-01-30T12:00"])
-def test_both_orders_of_lichun_and_lunar_new_year_keep_year_candidates_unselected(date):
+def test_both_orders_of_lichun_and_lunar_new_year_keep_year_candidates_unselected(
+    date: str,
+) -> None:
     q = calculate(datetime.fromisoformat(date))["qimen"]
     year = q["stem_context"]["year"]
     assert year["status"] == "unresolved_year_boundary"
@@ -77,7 +81,7 @@ def test_both_orders_of_lichun_and_lunar_new_year_keep_year_candidates_unselecte
     assert "年界待核" in "\n".join(_qimen_stem_context_lines(q))
 
 
-def test_jia_year_and_jia_month_start_never_adopt_matching_hidden_instrument():
+def test_jia_year_and_jia_month_start_never_adopt_matching_hidden_instrument() -> None:
     q = calculate(datetime(2024, 2, 10, 0))["qimen"]
     for role in ("year", "lunar_month_start"):
         anchor = q["stem_context"][role]
@@ -91,7 +95,7 @@ def test_jia_year_and_jia_month_start_never_adopt_matching_hidden_instrument():
     )
 
 
-def test_month_start_uses_civil_midnight_not_bazi_zi_hour_or_solar_label():
+def test_month_start_uses_civil_midnight_not_bazi_zi_hour_or_solar_label() -> None:
     before = calculate(datetime(2026, 1, 18, 23, 30))["qimen"]
     midnight = calculate(datetime(2026, 1, 19, 0, 5), solar=True, longitude=100.0)
     anchor = midnight["qimen"]["stem_context"]["lunar_month_start"]
@@ -102,7 +106,9 @@ def test_month_start_uses_civil_midnight_not_bazi_zi_hour_or_solar_label():
     assert anchor["effective_stem"] == "癸"
 
 
-def test_actual_month_block_is_gui_not_bazi_month_ji_and_keeps_same_stem_group():
+def test_actual_month_block_is_gui_not_bazi_month_ji_and_keeps_same_stem_group() -> (
+    None
+):
     result = calculate(datetime(2026, 1, 21, 9))
     q = result["qimen"]
     match = next(p for p in q["patterns"] if p["rule_id"] == "lunar_month_start_block")
@@ -119,7 +125,9 @@ def test_actual_month_block_is_gui_not_bazi_month_ji_and_keeps_same_stem_group()
     "rule,role",
     [("year_stem_block", "year"), ("lunar_month_start_block", "lunar_month_start")],
 )
-def test_frozen_research_policy_treats_unresolved_new_features_as_unknown(rule, role):
+def test_frozen_research_policy_treats_unresolved_new_features_as_unknown(
+    rule: str, role: str
+) -> None:
     q = calculate(datetime(2024, 2, 10, 0))["qimen"]
     policy = FrozenQimenPolicy(
         policy_id="synthetic",
@@ -148,7 +156,7 @@ def test_frozen_research_policy_treats_unresolved_new_features_as_unknown(rule, 
     )
 
 
-def test_no_calendar_guess_outside_table_support():
+def test_no_calendar_guess_outside_table_support() -> None:
     q = calculate(datetime(1800, 6, 1, 12))["qimen"]
     assert all(
         q["stem_context"][role]["status"] == "calendar_anchor_unavailable"
@@ -164,7 +172,7 @@ def test_no_calendar_guess_outside_table_support():
     )
 
 
-def test_cannot_delete_hard_reference_rows_or_change_pdf(tmp_path):
+def test_cannot_delete_hard_reference_rows_or_change_pdf(tmp_path: Path) -> None:
     bundle = tmp_path / "fixture"
     shutil.copytree(BUNDLE, bundle)
     path = bundle / "sources-and-anchors.json"

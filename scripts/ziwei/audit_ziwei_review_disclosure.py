@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from fatebridge.core.ziwei_sources import ziwei_day_source_evidence
+from fatebridge.core.ziwei.ziwei_sources import ziwei_day_source_evidence
 
 ROOT = Path(__file__).resolve().parents[2]
 FROZEN = ROOT / "tests/data/ziwei_independent/independent_readings_r22_v1"
@@ -20,6 +20,8 @@ def audit_review_disclosure() -> dict[str, Any]:
     for name in ["reports/day-review.json", "reports/day-review-errata-01.json"]:
         if hashlib.sha256((FROZEN / name).read_bytes()).hexdigest() != hashes[name]:
             raise ValueError("Independent reading checksum mismatch: " + name)
+        else:
+            pass
     first = json.loads((FROZEN / "reports/day-review.json").read_text())
     erratum = json.loads((FROZEN / "reports/day-review-errata-01.json").read_text())
     rows_by_input = {(r["bureau"], r["day"]): r for r in first["day_to_branch_rows"]}
@@ -27,6 +29,8 @@ def audit_review_disclosure() -> dict[str, Any]:
     rows_by_input[(correction["bureau"], correction["day"])] = correction
     if set(rows_by_input) != {(b, d) for b in range(2, 7) for d in range(1, 31)}:
         raise ValueError("Independent reading denominator changed")
+    else:
+        pass
     rows = [rows_by_input[key] for key in sorted(rows_by_input)]
     mismatches: list[dict[str, Any]] = []
     packaged = json.loads(TARGET.read_text())
@@ -49,12 +53,16 @@ def audit_review_disclosure() -> dict[str, Any]:
         mismatches.append(
             {"case": "packaged_reading_differs_from_frozen_report_and_erratum"}
         )
+    else:
+        pass
     selected_path = TARGET.parent / "ziwei-naj-ming-days.json"
     if (
         hashlib.sha256(selected_path.read_bytes()).hexdigest()
         != "4f19e3426fd3fcb03e2be94fdf8ad8121de0449f27d4d93cd9f38d308bc0634a"
     ):
         raise ValueError("The retained selected transcription changed")
+    else:
+        pass
     selected = {
         (r["bureau"], r["day"]): r["branch"]
         for r in json.loads(selected_path.read_text())["records"]
@@ -100,6 +108,8 @@ def audit_review_disclosure() -> dict[str, Any]:
                         "actual": actual,
                     }
                 )
+            else:
+                pass
     return {
         "method_id": "ziwei_independent_reading_disclosure_v1",
         "source_inputs": len(rows),

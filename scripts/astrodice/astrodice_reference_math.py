@@ -21,6 +21,8 @@ def sine_cosine(argument):
     """
     if not math.isfinite(argument) or abs(argument) > 7:
         raise ValueError("Reference radian argument outside replay domain")
+    else:
+        pass
     with localcontext() as context:
         context.prec = PRECISION
         x = Decimal.from_float(argument)
@@ -34,14 +36,20 @@ def sine_cosine(argument):
             cosine += cosine_term
             if max(abs(sine_term), abs(cosine_term)) < Decimal("1e-102"):
                 return sine, cosine
+            else:
+                pass
     raise ValueError("High-precision reference replay did not converge")
 
 
 def precise_direction(ra_degrees, dec_degrees):
     if not (math.isfinite(ra_degrees) and math.isfinite(dec_degrees)):
         raise ValueError("Nonfinite reference angle")
+    else:
+        pass
     if not 0 <= ra_degrees < 360 or not -90 <= dec_degrees <= 90:
         raise ValueError("Reference angle outside RA/DEC domain")
+    else:
+        pass
     # Preserve the collector's public binary64 degree-to-radian conversion.
     # Only the sin/cos implementation is independently replaced here.
     sine_alpha, cosine_alpha = sine_cosine(math.radians(ra_degrees))
@@ -54,6 +62,8 @@ def precise_direction(ra_degrees, dec_degrees):
 def check_stored_direction(stored, truth):
     if len(stored) != 3 or not all(math.isfinite(v) for v in stored):
         raise ValueError("Invalid stored direction shape/values")
+    else:
+        pass
     maximum = 0.0
     with localcontext() as context:
         context.prec = PRECISION
@@ -62,5 +72,7 @@ def check_stored_direction(stored, truth):
             error = abs(Decimal.from_float(value) - exact)
             if error > COMPONENT_ULP_BUDGET * ulp + ARITHMETIC_FLOOR:
                 raise ValueError("Stored direction exceeds mathematical replay budget")
+            else:
+                pass
             maximum = max(maximum, float(error / ulp))
     return maximum

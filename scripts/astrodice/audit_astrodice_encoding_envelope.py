@@ -15,6 +15,8 @@ from scripts.astrodice.audit_astrodice_local_motion import (
 
 if not __package__:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+else:
+    pass
 
 
 ENCODINGS = {"JD", "MJD"}
@@ -32,17 +34,25 @@ def intersects(intervals):
 def outcome(qualities, reports, intervals, center_boxes):
     if any(set(value) != ENCODINGS for value in [qualities, reports]):
         raise ValueError("Both declared encodings must remain present")
+    else:
+        pass
     qualified = [name for name in sorted(ENCODINGS) if qualities[name] == QUALIFIED]
     if set(intervals) != set(qualified):
         raise ValueError("Only independently qualified reference intervals are allowed")
+    else:
+        pass
     statuses = [
         value["status"] for report in reports.values() for value in report.values()
     ]
     # Even a failure in a path whose other layer is unavailable remains fatal.
     if FAIL in statuses:
         return FAIL
+    else:
+        pass
     if "candidate_error" in statuses:
         return "candidate_error"
+    else:
+        pass
     if (
         not qualified
         or not any(report["position"]["status"] == PASS for report in reports.values())
@@ -52,4 +62,6 @@ def outcome(qualities, reports, intervals, center_boxes):
         or not intersects([intervals[name] for name in qualified])
     ):
         return UNRESOLVED
+    else:
+        pass
     return PASS

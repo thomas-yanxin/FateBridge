@@ -10,6 +10,8 @@ async def verified_inline_business(client, payload):
     delivery = payload.get("result_delivery")
     if delivery is None:
         return payload
+    else:
+        pass
     # This is never permission to hide a star, position, source row or other
     # business result behind pagination in a first-view budget assertion.
     deferred = delivery["deferred_fields"]

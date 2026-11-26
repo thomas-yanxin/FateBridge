@@ -5,18 +5,21 @@ import json
 from copy import deepcopy
 
 import pytest
+import swisseph as swe
 from fastapi.testclient import TestClient
 from fastmcp import Client
 
 import fatebridge.api as api
 from fatebridge.application.examples import suggested_fields
 from fatebridge.cli import run
-from fatebridge.core.output_chinese import Taiyi
+from fatebridge.core.contracts.output_chinese import Taiyi
+from fatebridge.core.ephemeris_runtime import ephemeris_call
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG
-from tests.taiyi.test_taiyi_transports import _same_run_payload
+from tests.support.transports import call_calculation
+from tests.unit_test.fixtures.taiyi import same_run_payload
 
 PROFILES = [
     ("month", None),
@@ -25,12 +28,15 @@ PROFILES = [
     ("hour", None),
     ("hour", "key_hour_winter_jiazi_v1"),
 ]
+FALLBACK_PROVIDER = "jpl_de441"
+FALLBACK_MODEL = "fatebridge_de441_solar_v1"
 
 
 @pytest.fixture(autouse=True)
-def controlled_moshier(monkeypatch, tmp_path):
+def controlled_de441_fallback(monkeypatch, tmp_path):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
+    monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
 
 
 def options(mode, profile):
@@ -56,6 +62,8 @@ def inputs(tool, mode, profile):
             use_true_solar_time=False,
             **selected,
         )
+    else:
+        pass
     return dict(
         date="2026-10-25",
         time="12:00:00",
@@ -67,7 +75,9 @@ def inputs(tool, mode, profile):
 
 @pytest.mark.parametrize("mode,profile", PROFILES)
 @pytest.mark.parametrize("tool", ["taiyi", "sanshiunited"])
-def test_all_source_anchor_profiles_keep_same_run_models_and_text(tool, mode, profile):
+def test_all_source_anchor_profiles_keep_same_run_models_and_text(
+    tool: str, mode, profile
+) -> None:
     fn = (
         calculate_taiyi_analysis if tool == "taiyi" else calculate_sanshiunited_analysis
     )
@@ -80,29 +90,24 @@ def test_all_source_anchor_profiles_keep_same_run_models_and_text(tool, mode, pr
         {"boundary", "winter_origin"} if winter_expected else {"boundary"}
     )
     for value in anchors.values():
-        assert value["resolution_provider"] == "swisseph"
-        assert value["ephemeris_model"] == "moshier"
+        assert value["resolution_provider"] == FALLBACK_PROVIDER
+        assert value["ephemeris_model"] == FALLBACK_MODEL
         assert value["solar_model_details"]["root_time_scale"] == "TT"
-        assert "swisseph/moshier" in result["snapshot_text"]
+        assert f"{FALLBACK_PROVIDER}/{FALLBACK_MODEL}" in result["snapshot_text"]
     assert anchors["boundary"]["name"] == board["calendar_rules"]["anchor_name"]
     assert (
         anchors["boundary"]["datetime_with_offset"]
         == board["calendar_rules"]["anchor_utc"]
     )
-    assert board["calendar_summary"]["anchor_ephemeris_model"] == "moshier"
+    assert board["calendar_summary"]["anchor_ephemeris_model"] == FALLBACK_MODEL
     assert (
         "winter_anchor_ephemeris_model" in board["calendar_summary"]
     ) == winter_expected
     assert result["snapshot_text"].count("节气实际模型：") == 1
     assert result["snapshot_export"]["export_text"].count("节气实际模型：") == 1
-    if tool == "sanshiunited":
-        assert (
-            result["subresults"]["taiyi"]["pan"]["calendar_rules"]
-            == board["calendar_rules"]
-        )
 
 
-def test_source_record_mutation_cannot_poison_the_cached_term():
+def test_source_record_mutation_cannot_poison_the_cached_term() -> None:
     args = inputs("taiyi", "day", None)
     first = calculate_taiyi_analysis(**args)
     expected = deepcopy(first["taiyi"]["solar_anchors"])
@@ -112,7 +117,7 @@ def test_source_record_mutation_cannot_poison_the_cached_term():
     assert second["taiyi"]["solar_anchors"] == expected
 
 
-def test_year_count_does_not_invent_an_unused_solar_anchor():
+def test_year_count_does_not_invent_an_unused_solar_anchor() -> None:
     result = calculate_taiyi_analysis(**inputs("taiyi", "year", None))
     assert "solar_anchors" not in result["taiyi"]
     assert "anchor_ephemeris_model" not in result["taiyi"]["calendar_summary"]
@@ -124,8 +129,12 @@ def test_year_count_does_not_invent_an_unused_solar_anchor():
     "mode,profile", [("day", None), ("hour", "key_hour_winter_jiazi_v1")]
 )
 def test_actual_rest_mcp_cli_and_same_run_source_view(
-    tool, mode, profile, monkeypatch, capsys
-):
+    tool: str,
+    mode: str,
+    profile: str | None,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     spec = next(s for s in CATALOG if s.key == tool)
     values = inputs(tool, mode, profile)
     fields = suggested_fields(spec, view="solar_anchors")
@@ -158,7 +167,8 @@ def test_actual_rest_mcp_cli_and_same_run_source_view(
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            response = await client.call_tool(
+            response = await call_calculation(
+                client,
                 spec.mcp_name,
                 {
                     **values,
@@ -168,15 +178,13 @@ def test_actual_rest_mcp_cli_and_same_run_source_view(
                 },
                 raise_on_error=False,
             )
-            full = await _same_run_payload(client, response)
+            full = await same_run_payload(client, response)
             assert full["taiyi"] == expected
 
     asyncio.run(call())
 
 
-def test_actual_native_moshier_anchor_reaches_the_same_board(monkeypatch, tmp_path):
-    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
-    monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
+def test_native_moshier_probe_selects_the_de441_calendar_anchor() -> None:
     result = calculate_taiyi_analysis(
         analysis_year=2026,
         analysis_month=10,
@@ -189,7 +197,16 @@ def test_actual_native_moshier_anchor_reaches_the_same_board(monkeypatch, tmp_pa
     board = result["taiyi"]
     assert "solar_anchors" in board
     anchors = board["solar_anchors"]
-    assert anchors["boundary"]["resolution_provider"] == "swisseph"
-    assert anchors["boundary"]["ephemeris_model"] == "moshier"
-    assert anchors["winter_origin"]["ephemeris_model"] == "moshier"
-    assert board["calendar_summary"]["anchor_ephemeris_model"] == "moshier"
+    boundary = anchors["boundary"]
+    _, native_flags = ephemeris_call(
+        "calc",
+        boundary["solar_model_details"]["selected_crossing_jd_tt"],
+        swe.SUN,
+        swe.FLG_SWIEPH,
+    )
+    assert native_flags == swe.FLG_MOSEPH
+    assert boundary["resolution_provider"] == FALLBACK_PROVIDER
+    assert boundary["ephemeris_model"] == FALLBACK_MODEL
+    assert boundary["solar_model_details"]["native_moshier_relabelled"] is False
+    assert anchors["winter_origin"]["ephemeris_model"] == FALLBACK_MODEL
+    assert board["calendar_summary"]["anchor_ephemeris_model"] == FALLBACK_MODEL

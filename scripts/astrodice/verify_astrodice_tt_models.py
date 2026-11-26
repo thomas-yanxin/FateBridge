@@ -30,6 +30,8 @@ class NativeModel:
     def __init__(self, raw):
         if hashlib.sha256(raw).hexdigest() != AUTHOR_SHA:
             raise ValueError("Independent author source changed")
+        else:
+            pass
         self.folder = tempfile.TemporaryDirectory(prefix="astrodice-author-clock-")
         root = Path(self.folder.name)
         (root / "dtdb.c").write_bytes(raw)
@@ -42,6 +44,8 @@ class NativeModel:
         }
         if set(re.findall(rb"ERFA_[A-Z0-9]+", raw)) != {x.encode() for x in macros}:
             raise ValueError("Unexpected author constant dependency")
+        else:
+            pass
         (root / "erfam.h").write_text(
             "".join(f"#define {k} {v}\n" for k, v in macros.items())
         )
@@ -55,10 +59,16 @@ class NativeModel:
                 compilers.append(
                     (str(llvm), ["-isysroot", str(sdk), "-fuse-ld=" + str(linker)])
                 )
+            else:
+                pass
+        else:
+            pass
         self.compilation_attempts = []
         for compiler, flags in compilers:
             if compiler is None:
                 continue
+            else:
+                pass
             result = subprocess.run(
                 [
                     compiler,
@@ -84,6 +94,8 @@ class NativeModel:
             )
             if result.returncode == 0:
                 break
+            else:
+                pass
         else:
             raise ValueError(
                 "Author C compilation unavailable: " + str(self.compilation_attempts)
@@ -115,16 +127,22 @@ def verify(run, cohort):
     for name, h in plan["inputs_sha256"].items():
         if digest(run / name) != h:
             raise ValueError("Independent input seal changed: " + name)
+        else:
+            pass
     if plan["original_lines"] != {
         "position_arcsec": "0.02",
         "daily_rate_arcsec_per_day": "0.002",
         "reference_quality_arcsec_per_day": "0.002",
     }:
         raise ValueError("Original error line changed")
+    else:
+        pass
     if sorted(
         p["extra_binary64_ULPs"] for p in plan["numerical_tube_profiles"].values()
     ) != [0, 64]:
         raise ValueError("Original source tube changed")
+    else:
+        pass
     predictions = json.loads((run / "predictions-before-queries.json").read_text())
     saved = json.loads((run / (cohort + "-first-analysis.json")).read_text())
     if (
@@ -132,6 +150,8 @@ def verify(run, cohort):
         or saved["cohort"] != cohort
     ):
         raise ValueError("Analysis identity changed")
+    else:
+        pass
     if (
         saved["physical_time_model_certified"]
         or saved["full_goal_complete"]
@@ -140,11 +160,17 @@ def verify(run, cohort):
         or saved["retained_overall_numeric_gate_exit_code"] != 1
     ):
         raise ValueError("Unsupported acceptance promotion")
+    else:
+        pass
     expected = [q for q in plan["queries"] if q["cohort"] == cohort]
     if saved["new_TT_source_conditions"] != (5 if cohort == "B" else 0):
         raise ValueError("Source-condition count changed")
+    else:
+        pass
     if [r["id"] for r in saved["queries"]] != [q["id"] for q in expected]:
         raise ValueError("Query population changed")
+    else:
+        pass
     native = NativeModel((run / "authority/dtdb.c").read_bytes())
     endpoints = boxes = 0
     details = []
@@ -152,9 +178,13 @@ def verify(run, cohort):
         for query, group in zip(expected, saved["queries"]):
             if any(group[k] != query[k] for k in ("body", "encoding")):
                 raise ValueError("Source query metadata changed")
+            else:
+                pass
             raw, receipt = wire(run, query)
             if receipt["status"] != 200:
                 raise ValueError("Unavailable source query")
+            else:
+                pass
             rows = [
                 r
                 for r in raw_rows(raw, query, query["cases"], plan)
@@ -162,6 +192,8 @@ def verify(run, cohort):
             ]
             if [r["case_id"] for r in rows] != [r["case_id"] for r in group["rows"]]:
                 raise ValueError("Source row population changed")
+            else:
+                pass
             for original, record in zip(rows, group["rows"]):
                 case = next(c for c in query["cases"] if c["id"] == record["case_id"])
                 e, b = vector_proof(run, query["body"], case, original, record, plan)
@@ -174,6 +206,8 @@ def verify(run, cohort):
                     low, high = map(Q, pred["predicted_TDB_minus_TT_seconds"])
                     if not low <= (a - tt) * 86400 <= (b - tt) * 86400 <= high:
                         raise ValueError("TT/TDB labels conflated")
+                    else:
+                        pass
                     actual = native.offset(tt, model)
                     if (
                         b < a
@@ -183,6 +217,8 @@ def verify(run, cohort):
                         <= high + ARITHMETIC_SECONDS
                     ):
                         raise ValueError("Author C arithmetic replay differs")
+                    else:
+                        pass
                     scope = (
                         (
                             "documented_1950_2050_DE405_comparison"
@@ -197,6 +233,8 @@ def verify(run, cohort):
                         or pred["physical_model_error_certified"]
                     ):
                         raise ValueError("Model error scope promoted")
+                    else:
+                        pass
                     for profile, inv in record["profiles"].items():
                         result = record["models"][model][profile]
                         if inv["status"] != "bracketed":
@@ -225,6 +263,8 @@ def verify(run, cohort):
                             raise ValueError(
                                 "Clock discrepancy or qualification changed"
                             )
+                        else:
+                            pass
                         details.append(
                             {
                                 "query": query["id"],
@@ -249,7 +289,7 @@ def verify(run, cohort):
     }
 
 
-def main():
+def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--run", type=Path, required=True)
     p.add_argument("--cohort", choices=("A", "B"), required=True)
@@ -263,3 +303,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

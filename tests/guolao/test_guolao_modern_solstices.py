@@ -3,13 +3,14 @@
 import hashlib
 import json
 import math
+from datetime import date
 from fractions import Fraction as F
 from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_modern_time as modern
-from fatebridge.validation import guolao_modern_solstices as audit
+from fatebridge.core.guolao import guolao_modern_time as modern
+from validation import guolao_modern_solstices as audit
 
 FIXTURES = Path(__file__).parents[1] / "fixtures/guolao-modern-solstices-v1"
 SOURCE = json.loads(audit.DATA.read_bytes())
@@ -20,7 +21,7 @@ COMPLETE = [p for p in QUERIES if p.name != "coarse.query.json"]
 @pytest.mark.parametrize("query", COMPLETE, ids=lambda p: p.stem)
 def test_every_complete_raw_response_preserves_all_requested_times_and_declared_frame(
     query,
-):
+) -> None:
     params = json.loads(query.read_bytes())
     name = query.name.removesuffix(".query.json")
     result = audit.parse_horizons_observer(
@@ -34,7 +35,7 @@ def test_every_complete_raw_response_preserves_all_requested_times_and_declared_
     assert result["signature"] == {"source": "NASA/JPL Horizons API", "version": "1.0"}
 
 
-def test_initial_truncated80_rows_are_rejected_as_reference_not_salvaged():
+def test_initial_truncated80_rows_are_rejected_as_reference_not_salvaged() -> None:
     query = json.loads((FIXTURES / "coarse.query.json").read_bytes())
     assert len(query["requested_tt_jds_exact"]) == 294
     with pytest.raises(ValueError, match="不完整"):
@@ -50,8 +51,7 @@ def test_initial_truncated80_rows_are_rejected_as_reference_not_salvaged():
 )
 def test_full_fixed_window_native_root_and_subsecond_external_bracket_both_retained(
     case,
-):
-    from datetime import date
+) -> None:
 
     row = case["case"]
     start = (
@@ -74,7 +74,9 @@ def test_full_fixed_window_native_root_and_subsecond_external_bracket_both_retai
 @pytest.mark.parametrize(
     "row", SOURCE["historical_clock_rows"], ids=lambda row: row["case_id"]
 )
-def test_each_historical_clock_separates_time_scale_longitude_and_equation_of_time(row):
+def test_each_historical_clock_separates_time_scale_longitude_and_equation_of_time(
+    row,
+) -> None:
     parts = modern.historical_clock_components(
         F(row["tt_jd_exact"]),
         F(row["TDB_minus_UT1_seconds"]),
@@ -92,7 +94,7 @@ def test_each_historical_clock_separates_time_scale_longitude_and_equation_of_ti
     assert not parts["UTC_assigned"]
 
 
-def test_clock_sign_units_and_year_policy_with_a_constructed_UT1_midnight():
+def test_clock_sign_units_and_year_policy_with_a_constructed_UT1_midnight() -> None:
     tt = F("2415020.5") + F(100, 86400)
     row = modern.historical_clock_components(
         tt,
@@ -117,7 +119,9 @@ def test_clock_sign_units_and_year_policy_with_a_constructed_UT1_midnight():
 
 
 @pytest.mark.parametrize("year", [1962, 2000, 2026, True, "1280", 0])
-def test_post1962_TDB_UTC_and_invalid_years_cannot_be_misused_as_UT1(year):
+def test_post1962_TDB_UTC_and_invalid_years_cannot_be_misused_as_UT1(
+    year: bool | int | str,
+) -> None:
     with pytest.raises(ValueError):
         modern.historical_clock_components(
             F(2451545),
@@ -135,6 +139,8 @@ def _fake_native(monkeypatch, *, speed=1, flag=None):
         longitude = float((F(jd) - 100) % 360)
         if longitude == 360:
             longitude = math.nextafter(360, 0)
+        else:
+            pass
         return (longitude, 0, 1, speed, 0, 0), (
             flag if flag is not None else modern.swe.FLG_MOSEPH | modern.swe.FLG_SPEED
         )
@@ -143,8 +149,8 @@ def _fake_native(monkeypatch, *, speed=1, flag=None):
 
 
 def test_zero_degree_wrap_start_inclusion_end_exclusion_and_opposite_direction_guard(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     _fake_native(monkeypatch)
     crossing = modern.solar_crossing_tt(0, 99, 101)
     assert F(crossing["selected_jd_tt_exact"]) == 100
@@ -157,13 +163,17 @@ def test_zero_degree_wrap_start_inclusion_end_exclusion_and_opposite_direction_g
 
 
 @pytest.mark.parametrize("speed", [0, -1, float("nan"), float("inf")])
-def test_bad_solar_motion_is_rejected_instead_of_becoming_a_root(monkeypatch, speed):
+def test_bad_solar_motion_is_rejected_instead_of_becoming_a_root(
+    monkeypatch: pytest.MonkeyPatch, speed
+) -> None:
     _fake_native(monkeypatch, speed=speed)
     with pytest.raises(ValueError, match="无效"):
         modern.solar_crossing_tt(0, 99, 101)
 
 
-def test_backend_switch_or_fallback_is_not_accepted(monkeypatch):
+def test_backend_switch_or_fallback_is_not_accepted(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     _fake_native(monkeypatch, flag=modern.swe.FLG_SWIEPH | modern.swe.FLG_SPEED)
     with pytest.raises(ValueError, match="Moshier"):
         modern.solar_crossing_tt(0, 99, 101)
@@ -180,12 +190,12 @@ def test_backend_switch_or_fallback_is_not_accepted(monkeypatch):
         (0, float("nan"), 101),
     ],
 )
-def test_invalid_TT_targets_or_windows_have_no_implicit_defaults(args):
+def test_invalid_TT_targets_or_windows_have_no_implicit_defaults(args) -> None:
     with pytest.raises((TypeError, ValueError)):
         modern.solar_crossing_tt(*args)
 
 
-def test_all_frozen_source_requests_and_postcomparison_diagnostic_hashes():
+def test_all_frozen_source_requests_and_postcomparison_diagnostic_hashes() -> None:
     initial = json.loads((FIXTURES / "reference.json").read_bytes())
     later = json.loads((FIXTURES / "postcomparison-frame-reference.json").read_bytes())
     assert initial["data_sha256"] == hashlib.sha256(audit.DATA.read_bytes()).hexdigest()
@@ -201,6 +211,8 @@ def test_all_frozen_source_requests_and_postcomparison_diagnostic_hashes():
         for artifact in reference["artifacts"]:
             if artifact["path"] == "collect-horizons.py":
                 continue  # Archived collector code is no longer a runtime fixture.
+            else:
+                pass
             raw = (FIXTURES / artifact["path"]).read_bytes()
             assert len(raw) == artifact["bytes"]
             assert hashlib.sha256(raw).hexdigest() == artifact["sha256"]
@@ -209,7 +221,9 @@ def test_all_frozen_source_requests_and_postcomparison_diagnostic_hashes():
     assert later["diagnostic_reference_not_unseen_holdout"]
 
 
-def test_complete_audit_does_not_select_source_typo_or_clock_by_smallest_modern_error():
+def test_complete_audit_does_not_select_source_typo_or_clock_by_smallest_modern_error() -> (
+    None
+):
     result = audit.audit_modern_solstices()
     assert len(result["all14_fixed_window_modern_events"]) == 14
     assert len(result["all12_historical_clock_comparisons"]) == 12
@@ -230,7 +244,9 @@ def test_complete_audit_does_not_select_source_typo_or_clock_by_smallest_modern_
     assert not result["four_axis_perfect_scores_established"]
 
 
-def test_optional_DE441_common_frame_diagnostic_requires_actual_files_and_retains_default_date_difference():
+def test_optional_DE441_common_frame_diagnostic_requires_actual_files_and_retains_default_date_difference() -> (
+    None
+):
     result = audit.audit_frame_diagnostic(include_swieph=True)
     assert len(result["records"]) == 28
     for row in result["records"]:
@@ -244,3 +260,22 @@ def test_optional_DE441_common_frame_diagnostic_requires_actual_files_and_retain
                 v["jpl_denum"] == 441
                 for v in row["inertial_state"]["observed_source_files"]
             )
+        else:
+            pass
+
+
+@pytest.mark.parametrize("mutation", ["duplicate_bracket", "missing_source_hash"])
+def test_changed_reference_bytes_are_rejected(tmp_path, monkeypatch, mutation):
+    original = audit.DATA.read_bytes()
+    reference = json.loads(original)
+    assert (json.dumps(reference, indent=2) + "\n").encode() == original
+    if mutation == "duplicate_bracket":
+        reference["reference_brackets"][-1] = reference["reference_brackets"][-2]
+    else:
+        del reference["source_component_data_hashes"]["gnomon-epoch-v1.json"]
+    data = tmp_path / audit.DATA.name
+    data.write_bytes((json.dumps(reference, indent=2) + "\n").encode())
+    monkeypatch.setattr(audit, "DATA", data)
+
+    with pytest.raises(ValueError, match="固定参考文件哈希改变"):
+        audit.load_reference()

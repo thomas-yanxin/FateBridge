@@ -3,6 +3,7 @@
 import asyncio
 import json
 from datetime import timedelta
+from pathlib import Path
 
 import pytest
 from fastmcp import Client
@@ -21,29 +22,13 @@ from tests.support.mcp_result_assertions import (
     same_run_projected_response,
     without_transport,
 )
-from tests.support.transports import rest_client
+from tests.support.transports import call_calculation, rest_client
+from tests.unit_test.fixtures.fengshui_layout import (
+    facing_only,
+)
 
 
-def facing_only():
-    return {
-        "methods": ["bazhai"],
-        "analyze_layout": True,
-        "occupants": [
-            {"subject_id": "a", "birth_date": "2000-12-10", "gender_convention": "male"}
-        ],
-        "placements": [
-            {
-                "object_id": "table",
-                "purpose": "desk",
-                "facing_direction": "W",
-                "facing_role": "desk_facing",
-                "subject_id": "a",
-            }
-        ],
-    }
-
-
-def test_nonboundary_date_needs_no_hour_and_preserves_minggua():
+def test_nonboundary_date_needs_no_hour_and_preserves_minggua() -> None:
     actual = calculate_minggua(birth_date="2000-12-10", gender_convention="male")
     reference = calculate_minggua(effective_birth_year=2000, gender_convention="male")
     assert actual["status"] == "complete"
@@ -67,8 +52,8 @@ def test_nonboundary_date_needs_no_hour_and_preserves_minggua():
     ],
 )
 def test_independent_five_element_relation_table(
-    element, generator, drain, controller, controlled
-):
+    element: str, generator: str, drain: str, controller: str, controlled: str
+) -> None:
     assert element_relationships(element) == {
         "same_element": element,
         "generating_element": generator,
@@ -78,7 +63,7 @@ def test_independent_five_element_relation_table(
     }
 
 
-def test_boundary_date_keeps_uncertainty_and_timezone():
+def test_boundary_date_keeps_uncertainty_and_timezone() -> None:
     for zone in ["Asia/Shanghai", "UTC", "America/New_York"]:
         day = lichun(2026, zone).date()
         for offset, year in [(-1, 2025), (1, 2026)]:
@@ -104,6 +89,175 @@ def test_boundary_date_keeps_uncertainty_and_timezone():
     assert civil["status"] == "complete"
 
 
+def test_january_minggua_distinguishes_unspecified_local_clock_from_date() -> None:
+    zone = "Antarctica/Vostok"
+    instant = calculate_minggua(
+        birth_at="1994-07-01T13:00:00+01:00",
+        timezone_name=zone,
+        year_boundary="january_1",
+        gender_convention="male",
+    )["layers"]["minggua"]
+    time = instant["time_context"]
+    assert time["effective_year"] is None
+    assert time["effective_year_status"] == "requires_confirmation"
+    assert time["local_moment"] is None
+    assert time["local_clock_status"] == "undefined"
+    assert time["utc_moment"] == "1994-07-01T12:00:00Z"
+    assert time["valid_from"] is None and time["valid_until"] is None
+    assert instant["status"] == "partial" and instant["candidates"] == []
+    assert instant["missing_inputs"] == [
+        "occupants.occupant.confirmed_effective_birth_year_due_to_undefined_local_clock"
+    ]
+
+    for birth in ({"birth_date": "1994-07-01"}, {"effective_birth_year": 1994}):
+        explicit = calculate_minggua(
+            **birth,
+            timezone_name=zone,
+            year_boundary="january_1",
+            gender_convention="male",
+        )["layers"]["minggua"]
+        assert explicit["status"] == "complete"
+        assert explicit["time_context"]["effective_year"] == 1994
+        assert "local_moment" not in explicit["time_context"]
+        assert explicit["candidates"][0]["palace_number"] == 6
+
+
+@pytest.mark.parametrize(
+    ("zone", "birth_at", "year", "valid_from", "valid_until"),
+    [
+        (
+            "Antarctica/Davis",
+            "1964-07-01T12:00:00Z",
+            1964,
+            "1964-01-01T00:00:00+07:00",
+            None,
+        ),
+        (
+            "Antarctica/Davis",
+            "1969-07-01T12:00:00Z",
+            1969,
+            None,
+            "1970-01-01T00:00:00+07:00",
+        ),
+        (
+            "Antarctica/Vostok",
+            "1957-12-20T12:00:00Z",
+            1957,
+            None,
+            "1958-01-01T00:00:00+07:00",
+        ),
+        (
+            "Antarctica/Vostok",
+            "1994-11-02T05:00:00Z",
+            1994,
+            "1994-01-01T00:00:00+07:00",
+            "1995-01-01T00:00:00+07:00",
+        ),
+    ],
+)
+def test_january_minggua_keeps_known_year_with_unspecified_interval_endpoint(
+    zone: str, birth_at: str, year: int, valid_from: str | None, valid_until: str | None
+) -> None:
+    person = calculate_minggua(
+        birth_at=birth_at,
+        timezone_name=zone,
+        year_boundary="january_1",
+        gender_convention="female",
+    )["layers"]["minggua"]
+    time = person["time_context"]
+    assert person["status"] == "complete" and len(person["candidates"]) == 1
+    assert person["missing_inputs"] == []
+    assert time["effective_year"] == year
+    assert time["valid_from"] == valid_from
+    assert time["valid_until"] == valid_until
+    assert time["interval_policy"] == "start_inclusive_end_exclusive"
+
+
+@pytest.mark.parametrize(
+    ("zone", "birth_at", "year", "valid_from", "valid_until"),
+    [
+        (
+            "America/Phoenix",
+            "1944-01-01T06:00:00Z",
+            1944,
+            "1944-01-01T00:00:00-06:00",
+            "1943-12-31T23:01:00-07:00",
+        ),
+        (
+            "America/Phoenix",
+            "1944-01-01T06:01:00Z",
+            1943,
+            "1943-12-31T23:01:00-07:00",
+            "1944-01-01T00:00:00-07:00",
+        ),
+        (
+            "America/Phoenix",
+            "1944-01-01T07:00:00Z",
+            1944,
+            "1944-01-01T00:00:00-07:00",
+            "1945-01-01T00:00:00-07:00",
+        ),
+        (
+            "Asia/Kathmandu",
+            "1985-12-31T18:29:59Z",
+            1985,
+            "1985-01-01T00:00:00+05:30",
+            "1986-01-01T00:15:00+05:45",
+        ),
+        (
+            "Asia/Kathmandu",
+            "1985-12-31T18:30:00Z",
+            1986,
+            "1986-01-01T00:15:00+05:45",
+            "1987-01-01T00:00:00+05:45",
+        ),
+    ],
+)
+def test_january_minggua_uses_actual_query_interval_across_clock_changes(
+    zone: str, birth_at: str, year: int, valid_from: str, valid_until: str
+) -> None:
+    person = calculate_minggua(
+        birth_at=birth_at,
+        timezone_name=zone,
+        year_boundary="january_1",
+        gender_convention="female",
+    )["layers"]["minggua"]
+    time = person["time_context"]
+    assert person["status"] == "complete"
+    assert time["effective_year"] == year
+    assert time["valid_from"] == valid_from
+    assert time["valid_until"] == valid_until
+    assert time["interval_policy"] == "start_inclusive_end_exclusive"
+
+
+def test_lichun_minggua_date_waits_for_confirmed_year_if_boundary_has_no_local_date() -> (
+    None
+):
+    query = {"birth_date": "1994-02-03", "gender_convention": "male"}
+    closed = calculate_minggua(**query, timezone_name="Antarctica/Vostok")["layers"][
+        "minggua"
+    ]
+    utc = calculate_minggua(**query, timezone_name="UTC")["layers"]["minggua"]
+    time = closed["time_context"]
+    boundary = time["boundary_resolution"]
+    assert boundary["local_clock_status"] == "undefined"
+    assert (
+        boundary["civil_point"]
+        == utc["time_context"]["boundary_resolution"]["civil_point"]
+    )
+    assert time["birth_date"] == "1994-02-03"
+    assert "local_moment" not in time and "utc_moment" not in time
+    assert time["effective_year"] is None
+    assert time["effective_year_status"] == "requires_confirmation"
+    assert closed["status"] == "partial" and closed["candidates"] == []
+    assert closed["missing_inputs"] == [
+        "occupants.occupant.confirmed_effective_birth_year_due_to_undefined_local_clock"
+    ]
+    assert utc["status"] == "complete"
+    assert utc["time_context"]["effective_year"] == 1993
+    assert utc["candidates"][0]["palace_number"] == 7
+
+
 @pytest.mark.parametrize(
     "extra",
     [
@@ -113,12 +267,12 @@ def test_boundary_date_keeps_uncertainty_and_timezone():
         {"birth_date": "2000-12-10", "birth_at": "2000-12-10T09:55:00+08:00"},
     ],
 )
-def test_birth_date_validation(extra):
+def test_birth_date_validation(extra) -> None:
     with pytest.raises(ValidationError):
         MingguaRequest.model_validate(extra)
 
 
-def test_facing_only_is_computed_without_invented_location():
+def test_facing_only_is_computed_without_invented_location() -> None:
     actual = assess(**facing_only())
     assert actual["status"] == actual["layout_analysis"]["status"] == "partial"
     assert (
@@ -140,7 +294,7 @@ def test_facing_only_is_computed_without_invented_location():
     assert elem["application_scope"] == "element_relation_only_not_object_prescription"
 
 
-def test_no_house_or_hour_is_required_to_return_existing_personal_finding():
+def test_no_house_or_hour_is_required_to_return_existing_personal_finding() -> None:
     req = facing_only()
     req.pop("methods")
     req.pop("analyze_layout")
@@ -151,7 +305,7 @@ def test_no_house_or_hour_is_required_to_return_existing_personal_finding():
         BazhaiRequest(placements=[{"object_id": "empty", "purpose": "desk"}])
 
 
-def test_location_and_facing_options_obey_stove_rules_independently():
+def test_location_and_facing_options_obey_stove_rules_independently() -> None:
     req = payload("assess")
     req["analyze_layout"] = True
     actual = assess(**req)
@@ -175,7 +329,7 @@ def test_location_and_facing_options_obey_stove_rules_independently():
     )
 
 
-def test_unknown_personal_convention_does_not_create_confirmed_consensus():
+def test_unknown_personal_convention_does_not_create_confirmed_consensus() -> None:
     req = facing_only()
     req["occupants"][0].pop("gender_convention")
     actual = assess(**req)["layout_analysis"]["adjustment_options"][0]
@@ -185,7 +339,7 @@ def test_unknown_personal_convention_does_not_create_confirmed_consensus():
     assert actual["resolution"] == "no_confirmed_scope"
 
 
-def test_house_and_person_disagreement_has_no_single_best_direction():
+def test_house_and_person_disagreement_has_no_single_best_direction() -> None:
     req = facing_only()
     req["house"] = {"sitting_trigram": "乾"}
     actual = assess(**req)["layout_analysis"]["adjustment_options"][0]
@@ -204,7 +358,9 @@ def test_house_and_person_disagreement_has_no_single_best_direction():
         ("stove", "fire_mouth"),
     ],
 )
-def test_annual_location_is_independent_of_facing_and_object_purpose(purpose, role):
+def test_annual_location_is_independent_of_facing_and_object_purpose(
+    purpose: str, role: str
+) -> None:
     inputs = {
         "methods": ["annual_stars"],
         "effective_year": 2026,
@@ -234,7 +390,7 @@ def test_annual_location_is_independent_of_facing_and_object_purpose(purpose, ro
     ) == ("土", "金", "木")
 
 
-def test_no_location_does_not_project_facing_into_annual_palace():
+def test_no_location_does_not_project_facing_into_annual_palace() -> None:
     req = facing_only()
     req["methods"] = ["annual_stars"]
     req["effective_year"] = 2026
@@ -245,7 +401,7 @@ def test_no_location_does_not_project_facing_into_annual_palace():
     assert actual["layout_analysis"]["element_relationships"] == []
 
 
-def test_natal_candidates_and_three_roles_are_not_collapsed():
+def test_natal_candidates_and_three_roles_are_not_collapsed() -> None:
     inputs = {
         "methods": ["xuankong_natal"],
         "analyze_layout": True,
@@ -270,7 +426,7 @@ def test_natal_candidates_and_three_roles_are_not_collapsed():
     } == {"period", "mountain", "facing"}
 
 
-def test_unknown_sand_water_produces_no_adjustment_prescription():
+def test_unknown_sand_water_produces_no_adjustment_prescription() -> None:
     inputs = payload("assess")
     inputs["analyze_layout"] = True
     inputs["features"][0]["classification"] = "unknown"
@@ -286,7 +442,7 @@ def test_unknown_sand_water_produces_no_adjustment_prescription():
     )
 
 
-def test_opt_in_analysis_preserves_existing_calculation_values():
+def test_opt_in_analysis_preserves_existing_calculation_values() -> None:
     inputs = payload("assess")
     base = assess(**inputs)
     extended = assess(**{**inputs, "analyze_layout": True})
@@ -305,12 +461,18 @@ def test_opt_in_analysis_preserves_existing_calculation_values():
         {"methods": ["annual_stars"], "effective_year": 2026, "analyze_layout": True},
     ],
 )
-def test_extended_layout_matches_rest_mcp_cli(monkeypatch, tmp_path, capsys, inputs):
+def test_extended_layout_matches_rest_mcp_cli(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    inputs,
+) -> None:
     from fatebridge.mcp_server import create_mcp_app
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
+            return await call_calculation(
+                client,
                 "fengshui_assess",
                 {"response_char_limit": 0, **inputs},
                 raise_on_error=False,
@@ -333,12 +495,13 @@ def test_extended_layout_matches_rest_mcp_cli(monkeypatch, tmp_path, capsys, inp
         Draft202012Validator(schema).validate(result)
 
 
-def test_strict_projected_analysis_works_on_real_mcp():
+def test_strict_projected_analysis_works_on_real_mcp() -> None:
     from fatebridge.mcp_server import create_mcp_app
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            response = await client.call_tool(
+            response = await call_calculation(
+                client,
                 "fengshui_assess",
                 {
                     **facing_only(),
@@ -363,7 +526,7 @@ def test_strict_projected_analysis_works_on_real_mcp():
     assert result["run_metadata"]["tool_name"] == "fengshui_assess"
 
 
-def test_layout_uses_existing_tools_no_special_workspace_entry():
+def test_layout_uses_existing_tools_no_special_workspace_entry() -> None:
     names = {s.key for s in CATALOG if s.family == "fengshui"}
     assert names == {
         "fengshui_directions",

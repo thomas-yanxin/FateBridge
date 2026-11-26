@@ -26,14 +26,19 @@ from typing import Any, Iterator, Optional
 from fatebridge.core.astro_models import native_rotation_call
 from fatebridge.core.compressed_ephemeris import compressed_endpoint_call
 from fatebridge.core.ephemeris_installation import (
-    MAX_EPHEMERIS_PATH_BYTES,
+    has_project_ephemeris_files,
     verified_user_ephemeris_dir,
+)
+from fatebridge.core.ephemeris_paths import (
+    MAX_EPHEMERIS_PATH_BYTES,
+    ephemeris_search_path_fits,
 )
 from fatebridge.core.jpl_ephemeris import (
     check_jpl_result,
     configured_jpl_file,
     prepare_jpl_call,
 )
+from fatebridge.core.physical_source_observation import native_call_policy
 from fatebridge.utils.errors import EphemerisSourceError
 
 try:  # pragma: no cover - optional runtime dependency
@@ -52,16 +57,13 @@ _THREAD_STATE = local()
 # Some native builds share this path across threads. Keep both caches under
 # the same lock; other builds still require each thread's own initialization.
 _LAST_APPLIED_PATH: tuple[int, str | None] | None = None
-# Swiss 2.10's AS_MAXCH=256 reserves a trailing separator and file-name space.
-# Longer inputs are silently replaced by the library's compiled default path.
-_MAX_EPHE_PATH_BYTES = MAX_EPHEMERIS_PATH_BYTES
 
 
 def _validated_ephemeris_path(path: Optional[str]) -> Optional[str]:
-    if path and ("\0" in path or len(os.fsencode(path)) > _MAX_EPHE_PATH_BYTES):
+    if path and not ephemeris_search_path_fits(path):
         raise ValueError(
             "Swiss Ephemeris search path must contain no NUL and fit within "
-            f"{_MAX_EPHE_PATH_BYTES} encoded bytes; otherwise the library silently uses its default"
+            f"{MAX_EPHEMERIS_PATH_BYTES} encoded bytes; otherwise the library silently uses its default"
         )
     return path or None
 
@@ -76,7 +78,7 @@ def default_ephe_dir() -> Optional[str]:
     environment or function paths are handled by configure_ephemeris_path first.
     """
     candidate = _PROJECT_ROOT / "ephe"
-    if candidate.is_dir() and any(candidate.glob("*.se1")):
+    if has_project_ephemeris_files(candidate):
         return str(candidate)
     return verified_user_ephemeris_dir()
 
@@ -160,8 +162,6 @@ def preserve_ephemeris_path() -> Iterator[None]:
 def ephemeris_call(operation: str, *args: Any, **kwargs: Any) -> Any:
     """Run a direct Swiss Ephemeris call outside third-party path changes."""
     global _LAST_APPLIED_PATH
-    from fatebridge.core.physical_source_observation import native_call_policy
-
     with (
         _EPHEMERIS_LOCK,
         native_call_policy(
@@ -174,7 +174,7 @@ def ephemeris_call(operation: str, *args: Any, **kwargs: Any) -> Any:
         ) as observe,
     ):
         if swe is None:
-            raise ImportError("swisseph is unavailable")
+            raise ModuleNotFoundError("swisseph is unavailable")
         selected = configured_ephemeris_path()
         signature = (id(swe), selected)
         if (
@@ -244,6 +244,17 @@ def ephemeris_model_from_retflag(retflag: int) -> str:
     if retflag & swe.FLG_SWIEPH:
         return "swieph"
     return "unknown"
+
+
+def native_ephemeris_errors(
+    swe_module: object = None,
+) -> tuple[type[BaseException], ...]:
+    """Return expected native/numerical failure classes without masking logic bugs."""
+    target = swe if swe_module is None else swe_module
+    swe_error = getattr(target, "Error", None)
+    if isinstance(swe_error, type) and issubclass(swe_error, BaseException):
+        return (swe_error, RuntimeError, OSError, OverflowError, ValueError)
+    return (RuntimeError, OSError, OverflowError, ValueError)
 
 
 # Apply any operator-supplied ephemeris path at import time so it is in effect

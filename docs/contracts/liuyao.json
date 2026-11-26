@@ -1,0 +1,415 @@
+{
+  "evidence_views": {
+    "line_reading": {
+      "fields": [
+        "input_normalized",
+        "nongli",
+        "current_hexagram",
+        "changed_hexagram",
+        "moving_lines",
+        "lines",
+        "hexagram_info",
+        "liuyao_evidence",
+        "classical_text_evidence",
+        "summary"
+      ],
+      "when": "读取逐爻纳支、世应、原典动爻及月令动静条件；focus_line/focus_kinship为明确取用前提，日级候选不等于事件应期"
+    },
+    "void_conditions": {
+      "fields": [
+        "current_hexagram",
+        "liuyao_evidence.conditional_analysis.void_conditions.focus",
+        "liuyao_evidence.conditional_analysis.penalty_conditions.focus"
+      ],
+      "when": "查所选用爻原旬空、空亡条件及寅日生扶资格；未选用爻则保留空焦点，不代选"
+    },
+    "void_conditions_overview": {
+      "fields": [
+        "current_hexagram",
+        "input_normalized.event_horizon",
+        "lines",
+        "liuyao_evidence.calendar_conventions.month_branch",
+        "liuyao_evidence.calendar_conventions.day_ganzhi",
+        "liuyao_evidence.calendar_conventions.xunkong",
+        "liuyao_evidence.conditional_analysis.void_conditions.lines",
+        "liuyao_evidence.conditional_analysis.void_conditions.hidden",
+        "liuyao_evidence.conditional_analysis.void_conditions.textual_issues",
+        "liuyao_evidence.conditional_analysis.void_conditions.horizon_status",
+        "liuyao_evidence.conditional_analysis.void_conditions.scope",
+        "liuyao_evidence.conditional_analysis.penalty_conditions.lines"
+      ],
+      "when": "无明确用爻时，查六条明爻和实际伏神的原旬旬空与空／不空条件，核对原文疑义及使用范围。保留问事近远、总旺衰未决的条件，不代选用爻。超出响应预算时，按 result_delivery 读取同一 run 的证据。"
+    }
+  },
+  "first_view": {
+    "fields": [
+      "input_normalized",
+      "nongli",
+      "current_hexagram",
+      "changed_hexagram",
+      "moving_lines",
+      "lines",
+      "hexagram_info",
+      "liuyao_evidence",
+      "classical_text_evidence",
+      "summary"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "$defs": {
+      "SixYaoLineRequest": {
+        "additionalProperties": false,
+        "description": "One six-yao line item.",
+        "properties": {
+          "change": {
+            "default": false,
+            "description": "Whether the line is moving",
+            "title": "Change",
+            "type": "boolean"
+          },
+          "god": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional six-god label",
+            "title": "God"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional line label",
+            "title": "Name"
+          },
+          "value": {
+            "description": "0 for yin, 1 for yang",
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Value",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "value"
+        ],
+        "title": "SixYaoLineRequest",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Request model for sixyao.",
+    "properties": {
+      "changed_code": {
+        "anyOf": [
+          {
+            "pattern": "^[01]{6}$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Changed hexagram code, initial line first",
+        "title": "Changed Code"
+      },
+      "coins": {
+        "anyOf": [
+          {
+            "items": {
+              "maximum": 9,
+              "minimum": 6,
+              "type": "integer"
+            },
+            "maxItems": 6,
+            "minItems": 6,
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "摇钱起卦六掷之和（初爻→上爻），每掷为三枚铜钱之和 6/7/8/9（字面=2、背面=3）。提供则按真实摇出的铜钱结果装卦。",
+        "title": "Coins"
+      },
+      "date": {
+        "description": "Date string, e.g. 2028-04-06",
+        "title": "Date",
+        "type": "string"
+      },
+      "event_horizon": {
+        "anyOf": [
+          {
+            "enum": [
+              "near",
+              "long_term"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "调用方已明确问近事near或久远long_term时传入；用于原典进退条件，未给保持待定，不从timing_days推断",
+        "title": "Event Horizon"
+      },
+      "focus_kind": {
+        "anyOf": [
+          {
+            "enum": [
+              "visible",
+              "changed",
+              "hidden",
+              "month",
+              "day"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "明确取本爻visible、实际变爻changed、已列伏神hidden、月建month或日辰day；日月不带爻位，未指定时保留本变候选",
+        "title": "Focus Kind"
+      },
+      "focus_kinship": {
+        "anyOf": [
+          {
+            "enum": [
+              "父母",
+              "兄弟",
+              "子孙",
+              "妻财",
+              "官鬼"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "明确选用的六亲；多现保留候选，与focus_line并用时须一致",
+        "title": "Focus Kinship"
+      },
+      "focus_line": {
+        "anyOf": [
+          {
+            "maximum": 6,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "调用方明确选定的用神爻位，初爻为1；默认取本爻，focus_kind可选变爻或已列伏神",
+        "title": "Focus Line"
+      },
+      "gps_lat": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "GPS latitude",
+        "title": "Gps Lat"
+      },
+      "gps_lon": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "GPS longitude",
+        "title": "Gps Lon"
+      },
+      "gua_code": {
+        "anyOf": [
+          {
+            "pattern": "^[01]{6}$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Current hexagram code, initial line first",
+        "title": "Gua Code"
+      },
+      "lat": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "31n13",
+        "description": "Latitude text or decimal",
+        "title": "Lat"
+      },
+      "lines": {
+        "description": "Optional six lines, initial line first",
+        "items": {
+          "$ref": "#/$defs/SixYaoLineRequest"
+        },
+        "maxItems": 6,
+        "title": "Lines",
+        "type": "array"
+      },
+      "lon": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "121e28",
+        "description": "Longitude text or decimal",
+        "title": "Lon"
+      },
+      "method": {
+        "default": "auto",
+        "description": "起卦方式：auto（默认，缺卦则按时刻时间起卦）/ coin（真·摇钱起卦，系统随机六掷）/ time（时间起卦）。提供 coins/lines/gua_code 时优先使用所提供的卦，重复输入必须一致。",
+        "title": "Method",
+        "type": "string"
+      },
+      "question": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Question or topic",
+        "title": "Question"
+      },
+      "seed": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "随机摇钱起卦的随机种子（method=coin 且未提供 coins 时），用于复现同一卦。",
+        "title": "Seed"
+      },
+      "time": {
+        "description": "Time string, e.g. 09:33:00",
+        "title": "Time",
+        "type": "string"
+      },
+      "timing_days": {
+        "default": 0,
+        "description": "按已明确的用爻列未来0至60个干支日的条件候选；0不展开，不是事件发生保证",
+        "maximum": 60,
+        "minimum": 0,
+        "title": "Timing Days",
+        "type": "integer"
+      },
+      "zone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "+08:00",
+        "description": "Timezone spec",
+        "title": "Zone"
+      }
+    },
+    "required": [
+      "date",
+      "time"
+    ],
+    "title": "SixYaoRequest",
+    "type": "object"
+  },
+  "method_contracts": [
+    {
+      "comparison_requirements": [
+        "相同方法合同、实现与数据版本、选项及实际计算层"
+      ],
+      "dependencies": [
+        "validated_request"
+      ],
+      "error_sources": [
+        "civil_clock",
+        "solar_clock",
+        "calendar_model",
+        "rule_adjudication"
+      ],
+      "implementation_refs": [
+        "src/fatebridge/core/local_techniques/sixyao.py"
+      ],
+      "limitations": [
+        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
+        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
+      ],
+      "method_id": "fatebridge.sixyao_cast_and_yao_relations.contract_v1",
+      "output_paths": [
+        "cast",
+        "current_code",
+        "current_hexagram"
+      ],
+      "prerequisites": [
+        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
+      ],
+      "quantity_kind": "traditional_rule_result",
+      "role": "calculation",
+      "selector_fields": [
+        "method"
+      ],
+      "source_refs": [
+        "docs/liuyao-depth-audit.md"
+      ],
+      "unit": "categorical",
+      "validation_scope": {
+        "numerical": "method_specific_reference_required",
+        "real_world_validity": "not_established",
+        "source_conformity": "not_fully_accepted"
+      }
+    }
+  ],
+  "tool": "liuyao"
+}

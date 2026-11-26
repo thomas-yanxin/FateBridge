@@ -1,6 +1,6 @@
 """Caller-confirmed day branch, independent of inferred or current dates."""
 
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import Field, model_validator
 
@@ -14,7 +14,7 @@ class MeihuaDayQiContext(_DeferredModel):
     ] = Field(
         description="Caller-confirmed day branch, never the hour/year branch or lunar day number"
     )
-    declared_day_boundary: Optional[Literal["local_midnight", "zi_start"]] = Field(
+    declared_day_boundary: Literal["local_midnight", "zi_start"] | None = Field(
         default=None,
         description="Optional caller-declared convention; without a civil date it is not verified or used to infer another date/branch",
     )

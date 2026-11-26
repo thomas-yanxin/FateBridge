@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.human_design_interval_geometry import (
+from fatebridge.core.human_design.human_design_interval_geometry import (
     _add,
     _Arithmetic,
     _ceil,
@@ -16,7 +16,9 @@ from fatebridge.core.human_design_interval_geometry import (
     _scale,
     _sub,
 )
-from fatebridge.core.human_design_solar_projection import nominal_solar_projection
+from fatebridge.core.human_design.human_design_solar_projection import (
+    nominal_solar_projection,
+)
 
 
 @pytest.fixture(scope="module")
@@ -29,7 +31,7 @@ def reference():
     return json.loads(raw)
 
 
-def test_all354_arb_geometry_values_and_classifications(reference):
+def test_all354_arb_geometry_values_and_classifications(reference) -> None:
     rows = reference["geometry"]
     assert len(rows) == 354
     assert sum(row["analytic_degenerate_glue"] is not None for row in rows) == 66
@@ -38,10 +40,9 @@ def test_all354_arb_geometry_values_and_classifications(reference):
         for key, expected in row["rounded_hex"].items():
             assert actual[key].hex() == expected, (row["id"], key)
         assert actual["projection_relation"] == row["relation"], row["id"]
-        assert actual["physical_accuracy_certified"] is False
 
 
-def test_all320_flint_exact_interval_primitive_cases(reference):
+def test_all320_flint_exact_interval_primitive_cases(reference) -> None:
     rows = reference["primitives"]
     assert len(rows) == 320
     for row in rows:

@@ -2,17 +2,24 @@
 
 import subprocess as subprocess
 from pathlib import Path
-from typing import Any, Iterator, Literal
 
-from fatebridge.validation.evaluation_environment import NativeSelection
+from pydantic import JsonValue
 
-Case = dict[str, Any]
-Event = dict[str, Any]
-Grade = dict[str, Any]
+from validation.agent_grading import GRADING_POLICY as GRADING_POLICY
+from validation.agent_grading import _same_argument_path as _same_argument_path
+from validation.agent_grading import error_response as error_response
+from validation.agent_grading import expected_error_call as expected_error_call
+from validation.agent_grading import grade_case as grade_case
+from validation.agent_grading import matches_expected_error as matches_expected_error
+from validation.agent_grading import observations as observations
+from validation.agent_grading import walk as walk
+from validation.evaluation_environment import NativeSelection
+
+Case = dict[str, JsonValue]
+RunRecord = dict[str, JsonValue]
 
 ROOT: Path
 EVALUATION_DOCS_EXCLUDED: set[str]
-GRADING_POLICY: Literal["observed_tool_contracts_v3"]
 
 def source_files(
     root: Path = ..., *, extra_files: tuple[str, ...] = ...
@@ -26,21 +33,6 @@ def freeze_source(
     *,
     extra_files: tuple[str, ...] = ...,
 ) -> dict[str, str]: ...
-def walk(value: Any) -> Iterator[dict[str, Any]]: ...
-def observations(events: list[Event]) -> tuple[list[Event], list[str]]: ...
-def error_response(result: dict[str, Any]) -> dict[str, Any] | None: ...
-def matches_expected_error(actual: Any, expected: Any) -> bool: ...
-def expected_error_call(call: Event, expected: Any) -> bool: ...
-def grade_case(
-    case: Case,
-    events: list[Event],
-    final: str,
-    returncode: int,
-    captured_tool_records: list[Event] | None = ...,
-) -> Grade: ...
-def _same_argument_path(
-    arguments: dict[str, Any], path: str, expected: Any
-) -> bool: ...
 def prepare_workspace(workspace: Path, source: Path = ...) -> None: ...
 def prepare_case_workspace(workspace: Path, source: Path, case: Case) -> None: ...
 def command_for(
@@ -62,7 +54,7 @@ def run_case(
     source: Path = ...,
     native_selection: NativeSelection | None = ...,
     native_working_directory: Path | None = ...,
-) -> Grade: ...
+) -> RunRecord: ...
 def model_prompt(case: Case) -> str: ...
 async def prepare_references(
     cases: list[Case],
@@ -70,5 +62,5 @@ async def prepare_references(
     source: Path,
     native_selection: NativeSelection | None = ...,
     native_working_directory: Path | None = ...,
-) -> list[dict[str, Any]]: ...
+) -> list[dict[str, JsonValue]]: ...
 def main() -> int: ...

@@ -22,8 +22,18 @@ from fatebridge.core.astro.reference_angles import (
     UNRESOLVED_REFERENCE_BASES,
     reference_angle_basis,
 )
+from fatebridge.core.astro.sensitivity_timing import (
+    SpecialtySampleTime,
+    SpecialtySampleTimes,
+)
+from fatebridge.core.astro.solar_arc_state import (
+    KEY_POLICY,
+    SolarArcSampleUnavailable,
+    SolarArcState,
+)
 from fatebridge.core.astro.solar_ephemeris import SolarEphemerisBatch
-from fatebridge.core.astro.time_scales import ephemeris_time
+from fatebridge.core.astro.time_scales import EphemerisTime, ephemeris_time
+from fatebridge.core.astro.tt_epoch import TTInstant
 
 RULESET = "witte1924_ecliptic_day_meridian_v1"
 MERIDIAN_KEYS = (
@@ -82,7 +92,7 @@ def _signed(first: float, second: float) -> Fraction:
 def day_meridian_coordinates(
     natal_upper_meridian: float,
     natal_tropical_sun: float,
-    solar_arc: float,
+    solar_arc: float | Fraction,
     target_tropical_sun: float,
 ) -> Dict[str, float]:
     """IC(day) = IC(natal) + solar arc - Sun(natal) + Sun(target).
@@ -114,7 +124,10 @@ def day_meridian_coordinates(
 
 
 def target_sun_state(
-    moment: datetime, *, _batch: SolarEphemerisBatch | None = None
+    moment: datetime,
+    *,
+    _batch: SolarEphemerisBatch | None = None,
+    _scales: EphemerisTime | None = None,
 ) -> Dict[str, Any]:
     """Actual target Sun; an equal TT epoch reuses the batch observation."""
     if _batch is None:
@@ -125,7 +138,7 @@ def target_sun_state(
     if moment.utcoffset() is None:
         raise ValueError("Target Sun requires a timezone-aware instant")
     moment = moment.astimezone(timezone.utc)
-    scales = ephemeris_time(moment)
+    scales = _scales if _scales is not None else ephemeris_time(moment)
     swe = runtime.swe
     if swe is None or scales.jd_tt is None:
         raise ValueError("Swiss Ephemeris is required for the target Sun")
@@ -184,7 +197,9 @@ def _qualified_coordinates(
 def build_day_meridian(
     *,
     natal_upper_meridian: float,
-    solar_profile: Mapping[str, Any],
+    solar_state: SolarArcState,
+    sun_observations: Sequence[Mapping[str, object]],
+    sample_states: Sequence[SolarArcState | SolarArcSampleUnavailable],
     target: Mapping[str, Any],
     uncertainty: Mapping[str, Any],
     samples: Sequence[Mapping[str, Any]],
@@ -192,10 +207,16 @@ def build_day_meridian(
     native_factors: Sequence[Mapping[str, Any]],
     nominal_effective_utc: str,
     supported_key_years: tuple[float, float],
+    sample_times: SpecialtySampleTimes | None = None,
+    nominal_clock: SpecialtySampleTime | None = None,
+    nominal_birth_tt: TTInstant | None = None,
+    analysis_tt: TTInstant | None = None,
 ) -> Dict[str, Any]:
     coherence = day_meridian_input_coherence(
         natal_upper_meridian=natal_upper_meridian,
-        solar_profile=solar_profile,
+        solar_state=solar_state,
+        sun_observations=sun_observations,
+        sample_states=sample_states,
         target=target,
         uncertainty=uncertainty,
         samples=samples,
@@ -204,11 +225,15 @@ def build_day_meridian(
         nominal_effective_utc=nominal_effective_utc,
         supported_key_years=supported_key_years,
         calculate=day_meridian_coordinates,
+        sample_times=sample_times,
+        nominal_clock=nominal_clock,
+        nominal_birth_tt=nominal_birth_tt,
+        analysis_tt=analysis_tt,
     )
     coordinates = day_meridian_coordinates(
         natal_upper_meridian,
-        solar_profile["natal_tropical_sun"],
-        solar_profile["solar_arc_degrees"],
+        solar_state.natal_tropical_sun,
+        solar_state.arc,
         target["target_tropical_sun"],
     )
     nominal_definition = native_profile.get("angle_definition")
@@ -218,11 +243,11 @@ def build_day_meridian(
         "status": uncertainty["status"],
         "uncertainty_minutes": uncertainty["uncertainty_minutes"],
         "continuous_interval_proven": False,
-        "sample_frequency_is_probability": False,
         "scope": "Upper/lower symbolic day-meridian coordinates only, not contact-set or interpretation stability",
         **{
             key: uncertainty[key]
             for key in (
+                "recorded_physical_grid",
                 "recorded_interval_start_utc",
                 "recorded_interval_end_utc",
                 "maximum_recorded_sample_gap_seconds",
@@ -316,7 +341,7 @@ def build_day_meridian(
             **target,
             **({"angle_definition": nominal_definition} if nominal_definition else {}),
             "source_formula": "IC.day = IC.natal + solar_arc - Sun.natal.tropical + Sun.target.tropical; MC.day = IC.day + 180; modulo360",
-            "year_key_policy": solar_profile["key_policy"],
+            "year_key_policy": KEY_POLICY,
             "display_frame": "Natal chart frame held fixed; both Sun inputs tropical",
             "meridians_are_observations": False,
         },

@@ -11,15 +11,17 @@ import pytest
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro import native_execution, runtime
-from fatebridge.core.human_design import chart_at_tt
-from fatebridge.core.human_design_root_interpretations import (
+from fatebridge.core.human_design.human_design import chart_at_tt
+from fatebridge.core.human_design.human_design_root_interpretations import (
     FAMILY_SCOPE,
     SCOPE,
     root_interpretations,
 )
-from fatebridge.core.human_design_solar_root_validation import verify_solar_root_context
+from fatebridge.core.human_design.human_design_solar_root_validation import (
+    verify_solar_root_context,
+)
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
+from validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[2]
 PLAN_PATH = ROOT / "tests/fixtures/human-design-comparison-basis-plan.json"
@@ -75,8 +77,8 @@ def assert_basis(run):
 @pytest.mark.parametrize("mode", ["true", "mean"])
 @pytest.mark.parametrize("backend", ["swieph", "moshier"])
 def test_actual_public_output_and_original_endpoint_scope(
-    mode, backend, monkeypatch, tmp_path
-):
+    mode: str, backend: str, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv(
         "SE_EPHE_PATH", str(ROOT / "ephe" if backend == "swieph" else tmp_path)
     )
@@ -119,7 +121,9 @@ def test_actual_public_output_and_original_endpoint_scope(
 
 
 @pytest.mark.parametrize("mode", ["true", "mean"])
-def test_actual_platform_control_has_earlier_same_later_candidates(mode, monkeypatch):
+def test_actual_platform_control_has_earlier_same_later_candidates(
+    mode: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(ROOT / "ephe"))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     # Platform-specific actual observations; the original public five above
@@ -167,8 +171,8 @@ def actual_public():
 @pytest.mark.parametrize("target", ["outer", "interpretation"])
 @pytest.mark.parametrize("kind", PLAN["negative_cases"])
 def test_rehashed_detached_comparison_is_rejected_without_native(
-    actual_public, kind, target
-):
+    actual_public, kind, target: str
+) -> None:
     run = deepcopy(actual_public)
     original = deepcopy(run)
     row = family(run)["candidates"][1]
@@ -223,7 +227,9 @@ def test_rehashed_detached_comparison_is_rejected_without_native(
         ((1.0, 2.0), None),
     ],
 )
-def test_invalid_explicit_comparison_context_never_becomes_a_reading(epochs, index):
+def test_invalid_explicit_comparison_context_never_becomes_a_reading(
+    epochs, index
+) -> None:
     with pytest.raises(ValueError):
         root_interpretations(
             [], [[], []], comparison_epochs=epochs, family_candidate_index=index
@@ -231,7 +237,7 @@ def test_invalid_explicit_comparison_context_never_becomes_a_reading(epochs, ind
 
 
 @pytest.mark.parametrize("count", [0, 1, 3])
-def test_selected_comparison_requires_exactly_two_charts(count):
+def test_selected_comparison_requires_exactly_two_charts(count: int) -> None:
     with pytest.raises(ValueError, match="requires two charts"):
         root_interpretations(
             [],

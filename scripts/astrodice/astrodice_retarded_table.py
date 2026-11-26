@@ -28,6 +28,8 @@ def parse(raw, query, cases, plan):
     data = json.loads(raw)
     if data.get("error"):
         raise ValueError("Service error: " + str(data["error"]))
+    else:
+        pass
     text = data["result"]
     prefix, body = text.split("$$SOE")
     body, _ = body.split("$$EOE")
@@ -43,6 +45,8 @@ def parse(raw, query, cases, plan):
     ]:
         if not re.search(pattern, prefix):
             raise ValueError("LT vector identity/units/time/column header changed")
+        else:
+            pass
     rows = []
     seen = set()
     for cells in csv.reader(body.strip().splitlines()):
@@ -53,6 +57,8 @@ def parse(raw, query, cases, plan):
             or not all(math.isfinite(float(v)) for v in c[:1] + c[2:11])
         ):
             raise ValueError("Nonfinite or unplanned LT vector columns")
+        else:
+            pass
         near = [
             x
             for x in cases
@@ -61,6 +67,8 @@ def parse(raw, query, cases, plan):
         ]
         if len(near) != 1 or near[0]["id"] in seen:
             raise ValueError("Ambiguous LT vector row")
+        else:
+            pass
         case = near[0]
         seen.add(case["id"])
         error = Q(c[0]) - Q(case["nominal_JD"])
@@ -81,6 +89,8 @@ def parse(raw, query, cases, plan):
         )
     if seen != {c["id"] for c in cases}:
         raise ValueError("Original LT vector cases missing")
+    else:
+        pass
     return rows
 
 
@@ -100,6 +110,8 @@ def compare(vector, observer, profile, plan):
     distance = norm(states[:3])
     if distance.bounds()[0] <= 0:
         raise ValueError("Nonpositive LT vector distance")
+    else:
+        pass
     projection = sum((p * v for p, v in zip(states[:3], states[3:])), I()) / distance
     light, rg, rr = map(
         value,
@@ -166,6 +178,8 @@ def analyze(run, cohort):
     for query in plan["queries"]:
         if query["cohort"] != cohort or query["kind"] != "LT_vector":
             continue
+        else:
+            pass
         raw = (run / "responses" / (query["id"] + ".raw")).read_bytes()
         receipt = json.loads(
             (run / "responses" / (query["id"] + ".receipt.json")).read_text()
@@ -178,6 +192,8 @@ def analyze(run, cohort):
         }
         if sha(raw) != receipt["raw_sha256"]:
             raise ValueError("Original vector changed")
+        else:
+            pass
         spec = plan["observer_bindings"][cohort][query["encoding"]]
         oq = spec["query"]
         obsroot = run / spec["root"]
@@ -188,11 +204,15 @@ def analyze(run, cohort):
         require_matching_time_batches(oq, query)
         if sha(oraw) != oreceipt["raw_sha256"]:
             raise ValueError("Original observation changed")
+        else:
+            pass
         group["observation_raw_sha256"] = sha(oraw)
         obs = classify(oraw, oreceipt["status"], oq, cases, plan)
         try:
             if receipt["status"] != 200 or obs["status"] != "supported":
                 raise ValueError("Unavailable vector or observation")
+            else:
+                pass
             rows = parse(raw, query, cases, plan)
             lookup = {r["case_id"]: r for r in obs["rows"]}
             for row in rows:
@@ -220,3 +240,5 @@ if __name__ == "__main__":
     p.add_argument("--cohort", choices=["A", "B"], required=True)
     a = p.parse_args()
     save(a.run / (a.cohort + "-first-analysis.json"), analyze(a.run, a.cohort))
+else:
+    pass

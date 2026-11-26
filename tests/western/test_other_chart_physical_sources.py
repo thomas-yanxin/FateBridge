@@ -3,7 +3,6 @@
 import copy
 import hashlib
 import json
-import os
 import shutil
 from collections import Counter
 from pathlib import Path
@@ -12,11 +11,6 @@ import pytest
 
 from fatebridge.core import ephemeris_runtime as e
 from fatebridge.core.astro import ephemeris, physical_sources
-from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.astro.ephemeris_integrity import (
-    load_ephemeris_manifest,
-    verify_ephemeris_bytes,
-)
 from fatebridge.core.astro.midpoints import PHYSICAL_BODIES, _native_factors
 from fatebridge.core.astro.orbits import ORBITAL_MODEL, ApproximateEphemeris
 from fatebridge.core.astro.physical_sources import (
@@ -28,72 +22,17 @@ from fatebridge.core.astro.time_scales import datetime_from_tt
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.support.transports import rest as rest
 from tests.support.transports import surface_calls as surface_calls
+from tests.unit_test.fixtures.western_ephemeris import (
+    birth,
+)
+from tests.unit_test.fixtures.western_ephemeris import (
+    ephemeris_files as ephemeris_files,
+)
+from tests.unit_test.fixtures.western_ephemeris import (
+    restore_configuration as restore_configuration,
+)
 
 pytestmark = pytest.mark.skipif(e.swe is None, reason="Swiss Ephemeris required")
-
-
-@pytest.fixture(autouse=True)
-def restore_configuration(monkeypatch):
-    previous = e.configured_ephemeris_path()
-    previous_env = os.environ.get("SE_EPHE_PATH")
-    monkeypatch.delenv("SE_EPHE_PATH", raising=False)
-    yield
-    if previous_env is None:
-        monkeypatch.delenv("SE_EPHE_PATH", raising=False)
-    else:
-        monkeypatch.setenv("SE_EPHE_PATH", previous_env)
-    e.configure_ephemeris_path(previous if previous is not None else "")
-
-
-@pytest.fixture
-def ephemeris_files(tmp_path):
-    source = Path(
-        os.environ.get(
-            "FATEBRIDGE_TEST_EPHE_DIR",
-            str(Path(__file__).resolve().parents[2] / "ephe"),
-        )
-    )
-    manifest = load_ephemeris_manifest()
-    for name in ("sepl_18.se1", "semo_18.se1", "sepl_24.se1", "semo_24.se1"):
-        if not (source / name).is_file():
-            pytest.fail(
-                "This integration test requires separately acquired, pinned Swiss files: "
-                "uv run --locked --extra dev python -m fatebridge.fetch_ephe --years 1800 2500"
-            )
-        verify_ephemeris_bytes(name, (source / name).read_bytes(), manifest)
-    target = tmp_path / "ephe"
-    target.mkdir()
-    for name in ("sepl_18.se1", "semo_18.se1"):
-        shutil.copy2(source / name, target / name)
-        # Frozen integration inputs are read-only. Only private disposable
-        # copies may be mutated by the file-change regression on every OS.
-        (target / name).chmod(0o644)
-    return source, target
-
-
-def birth(moment=None):
-    if moment is None:
-        return build_astro_birth_info(
-            birth_year=2000,
-            birth_month=1,
-            birth_day=1,
-            birth_hour=12,
-            birth_timezone="UTC",
-            birth_longitude=0,
-            birth_latitude=0,
-        )
-    return build_astro_birth_info(
-        birth_year=moment.year,
-        birth_month=moment.month,
-        birth_day=moment.day,
-        birth_hour=moment.hour,
-        birth_minute=moment.minute,
-        birth_second=moment.second,
-        birth_microsecond=moment.microsecond,
-        birth_timezone="UTC",
-        birth_longitude=0,
-        birth_latitude=0,
-    )
 
 
 def edge_birth(directory):
@@ -104,7 +43,7 @@ def edge_birth(directory):
     return birth(datetime_from_tt(edge))
 
 
-def test_actual_se1_headers_hashes_and_factor_references(ephemeris_files):
+def test_actual_se1_headers_hashes_and_factor_references(ephemeris_files) -> None:
     _, directory = ephemeris_files
     e.configure_ephemeris_path(str(directory))
     result = _native_factors(birth(), False, include_hypothetical=False)
@@ -137,8 +76,8 @@ def test_actual_se1_headers_hashes_and_factor_references(ephemeris_files):
     [("moshier", "library_builtin"), (ORBITAL_MODEL, "packaged_analytic_model")],
 )
 def test_analytical_fallback_never_claims_stale_file_contexts(
-    ephemeris_files, model, status
-):
+    ephemeris_files, model, status: str
+) -> None:
     _, directory = ephemeris_files
     e.configure_ephemeris_path(str(directory))
     e.ephemeris_call("calc", 2451545.0, e.swe.SUN, e.swe.FLG_SWIEPH)
@@ -158,7 +97,9 @@ def test_analytical_fallback_never_claims_stale_file_contexts(
     }
 
 
-def test_missing_file_introspection_is_unavailable_not_invented(monkeypatch):
+def test_missing_file_introspection_is_unavailable_not_invented(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.delattr(e.swe, "get_current_file_data")
     trace = PhysicalEphemerisTrace()
     trace.observe("Sun", "swieph")
@@ -169,8 +110,8 @@ def test_missing_file_introspection_is_unavailable_not_invented(monkeypatch):
 
 
 def test_file_mutation_after_first_observation_is_rejected(
-    ephemeris_files, monkeypatch
-):
+    ephemeris_files, monkeypatch: pytest.MonkeyPatch
+) -> None:
     _, directory = ephemeris_files
     e.configure_ephemeris_path(str(directory))
     original = e.swe.calc
@@ -180,6 +121,8 @@ def test_file_mutation_after_first_observation_is_rejected(
         if args[1] == e.swe.MOON:
             path = directory / "sepl_18.se1"
             path.write_bytes(path.read_bytes() + b"changed-after-first-observation")
+        else:
+            pass
         return value
 
     monkeypatch.setattr(e.swe, "calc", mutate_after_moon)
@@ -187,7 +130,9 @@ def test_file_mutation_after_first_observation_is_rejected(
         _native_factors(birth(), False, include_hypothetical=False)
 
 
-def test_real_partial_coverage_cannot_be_called_pure_time_sensitivity(ephemeris_files):
+def test_real_partial_coverage_cannot_be_called_pure_time_sensitivity(
+    ephemeris_files,
+) -> None:
     _, directory = ephemeris_files
     center = edge_birth(directory)
     with pytest.raises(
@@ -200,7 +145,7 @@ def test_real_partial_coverage_cannot_be_called_pure_time_sensitivity(ephemeris_
 
 def test_complete_adjacent_segments_preserve_the_whole_declared_interval(
     ephemeris_files,
-):
+) -> None:
     source, directory = ephemeris_files
     center = edge_birth(directory)
     for name in ("sepl_24.se1", "semo_24.se1"):
@@ -233,7 +178,7 @@ def sample_source():
     }
 
 
-def test_per_factor_model_swaps_are_detected_even_if_aggregate_set_is_equal():
+def test_per_factor_model_swaps_are_detected_even_if_aggregate_set_is_equal() -> None:
     first = sample_source()
     second = copy.deepcopy(first)
     second["by_factor"] = {"Sun": {"model": "moshier"}, "Moon": {"model": "swieph"}}
@@ -253,7 +198,9 @@ def test_per_factor_model_swaps_are_detected_even_if_aggregate_set_is_equal():
         ("sha256", "b" * 64, "file changed across"),
     ],
 )
-def test_same_model_label_cannot_hide_changed_data(field, value, message):
+def test_same_model_label_cannot_hide_changed_data(
+    field: str, value, message: str
+) -> None:
     first = sample_source()
     second = copy.deepcopy(first)
     second["files"][0][field] = value
@@ -263,7 +210,7 @@ def test_same_model_label_cannot_hide_changed_data(field, value, message):
         cohort.add(second)
 
 
-def test_adjacent_segment_with_the_same_edition_is_allowed():
+def test_adjacent_segment_with_the_same_edition_is_allowed() -> None:
     first = sample_source()
     second = copy.deepcopy(first)
     second["files"][0].update(filename="sepl_24.se1", sha256="b" * 64)
@@ -273,7 +220,9 @@ def test_adjacent_segment_with_the_same_edition_is_allowed():
     assert cohort.add(copy.deepcopy(second)) == 1
 
 
-def test_nominal_and_sampled_models_must_also_agree(monkeypatch):
+def test_nominal_and_sampled_models_must_also_agree(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from fatebridge.core.astro import sensitivity
 
     first = sample_source()
@@ -313,8 +262,12 @@ def test_nominal_and_sampled_models_must_also_agree(monkeypatch):
     ],
 )
 def test_partial_data_error_and_complete_interval_across_three_surfaces(
-    ephemeris_files, monkeypatch, key, variant, surface_calls
-):
+    ephemeris_files,
+    monkeypatch: pytest.MonkeyPatch,
+    key: str,
+    variant: str | None,
+    surface_calls,
+) -> None:
     from fatebridge.services.tool_catalog import CATALOG
 
     source, directory = ephemeris_files
@@ -335,6 +288,8 @@ def test_partial_data_error_and_complete_interval_across_three_surfaces(
     }
     if variant:
         payload["chart_variant"] = variant
+    else:
+        pass
     spec = next(s for s in CATALOG if s.key == key)
     path = (
         "midpoint_analysis.time_sensitivity"
@@ -353,7 +308,7 @@ def test_partial_data_error_and_complete_interval_across_three_surfaces(
         spec, payload, projection=options, cli_first=False
     )
     assert rest.status_code == 503 and protocol.is_error and code == 1
-    for error in (rest.json(), json.loads(protocol.content[0].text), cli):
+    for error in (rest.json(), protocol.structured_content, cli):
         assert error["error_code"] == "ephemeris_source_inconsistent"
         assert "Physical ephemeris model changed across" in error["error"]
         assert error["issues"] == [
@@ -382,8 +337,8 @@ def test_partial_data_error_and_complete_interval_across_three_surfaces(
 
 @pytest.mark.parametrize("borrowed", [False, True])
 def test_actual_batch_hashes_once_at_identity_and_once_at_its_owner_endpoint(
-    ephemeris_files, monkeypatch, borrowed
-):
+    ephemeris_files, monkeypatch: pytest.MonkeyPatch, borrowed: bool
+) -> None:
     _, directory = ephemeris_files
     e.configure_ephemeris_path(str(directory))
     original = physical_sources._file_digest
@@ -405,12 +360,14 @@ def test_actual_batch_hashes_once_at_identity_and_once_at_its_owner_endpoint(
         assert set(reads.values()) == {1}
         source = trace.finish()
         assert set(source["by_factor"]) == set(PHYSICAL_BODIES)
+    else:
+        pass
     assert set(reads.values()) == {2}
 
 
 def test_borrowed_batch_owner_still_rejects_changed_file_before_delivery(
     ephemeris_files,
-):
+) -> None:
     _, directory = ephemeris_files
     e.configure_ephemeris_path(str(directory))
     trace = PhysicalEphemerisTrace()

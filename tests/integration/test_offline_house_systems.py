@@ -44,7 +44,7 @@ def _birth_info():
     return build_astro_birth_info(**payload)
 
 
-def test_build_houses_equal_mc_anchors_on_midheaven():
+def test_build_houses_equal_mc_anchors_on_midheaven() -> None:
     """equal_mc's 1st cusp sits 90° after the MC, not at the ascendant."""
     ascendant = 252.05
     midheaven = 176.48
@@ -54,7 +54,9 @@ def test_build_houses_equal_mc_anchors_on_midheaven():
         assert house["cusp_longitude"] == pytest.approx(expected, abs=1e-4)
 
 
-def test_offline_equal_mc_is_mc_anchored_not_ascendant(monkeypatch):
+def test_offline_equal_mc_is_mc_anchored_not_ascendant(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """With swisseph disabled, equal_mc cusps anchor on the MC, not the ASC."""
     monkeypatch.setattr(astrology_core, "swe", None)
     # chart13 still defaults to equal_mc, so it drives the lenient offline
@@ -77,10 +79,12 @@ def test_offline_equal_mc_is_mc_anchored_not_ascendant(monkeypatch):
     assert first_cusp != pytest.approx(normalize_angle(ascendant), abs=1e-2)
 
 
-def test_offline_equal_mc_matches_swisseph(monkeypatch):
+def test_offline_equal_mc_matches_swisseph(monkeypatch: pytest.MonkeyPatch) -> None:
     """Offline equal_mc placements must equal the swisseph ('D') placements."""
     if astrology_core.swe is None:
         pytest.skip("swisseph not installed")
+    else:
+        pass
     # chart13 still defaults to equal_mc (the natal `chart` default is now
     # Placidus), so it exercises the offline equal_mc fallback against swisseph.
     synth13 = {**_SYNTH, "chart_variant": "chart13"}
@@ -96,7 +100,7 @@ def test_offline_equal_mc_matches_swisseph(monkeypatch):
     assert offline == online
 
 
-def test_offline_quadrant_request_fails_loud(monkeypatch):
+def test_offline_quadrant_request_fails_loud(monkeypatch: pytest.MonkeyPatch) -> None:
     """Offline Placidus can't be computed — fail loudly rather than fake it.
 
     swisseph is a hard dependency; a missing one is a broken install, not a
@@ -110,10 +114,12 @@ def test_offline_quadrant_request_fails_loud(monkeypatch):
         build_core_chart_payload(_birth_info(), chart_variant="chart", hsys=3)
 
 
-def test_online_quadrant_request_is_untouched():
+def test_online_quadrant_request_is_untouched() -> None:
     """With swisseph present, Placidus stays Placidus."""
     if astrology_core.swe is None:
         pytest.skip("swisseph not installed")
+    else:
+        pass
     chart = calculate_core_chart_analysis(**_SYNTH, hsys=3)
     profile = chart["chart_profile"]
     assert profile["house_system"] == "placidus"
@@ -137,12 +143,14 @@ def test_online_quadrant_request_is_untouched():
         ("Regiomontanus", "regiomontanus"),
     ],
 )
-def test_astro_house_system_accepts_string_and_integer(value, expected_key) -> None:
+def test_astro_house_system_accepts_string_and_integer(
+    value: int | str, expected_key: str
+) -> None:
     info = _resolve_offline_house_system(value, context_label="test")
     assert info["key"] == expected_key
 
 
 @pytest.mark.parametrize("bad", ["", None, "nonsense", 99, "equal"])
-def test_astro_house_system_rejects_unknown(bad) -> None:
+def test_astro_house_system_rejects_unknown(bad: int | str | None) -> None:
     with pytest.raises(ValueError):
         _resolve_offline_house_system(bad, context_label="test")

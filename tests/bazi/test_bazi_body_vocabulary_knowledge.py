@@ -18,7 +18,7 @@ def read(path):
     return json.loads(path.read_text())
 
 
-def test_source_voices_and_engineering_boundaries_survive_revision():
+def test_source_voices_and_engineering_boundaries_survive_revision() -> None:
     card = read(ROOT / BUNDLE)["categories"]["classical_force_semantics"][KEY]
     curation = card["curation"]
     assert curation["source_refs"][1]["author"] == "李雨田增補"
@@ -50,7 +50,9 @@ def test_source_voices_and_engineering_boundaries_survive_revision():
     assert curation["review_status"].endswith("external_review_pending")
 
 
-def test_revised_vocabulary_is_identical_across_rest_native_mcp_and_cli(surface_calls):
+def test_revised_vocabulary_is_identical_across_rest_native_mcp_and_cli(
+    surface_calls,
+) -> None:
     spec = SPECS["knowledge_read"]
     payload = {"domain": "bazi", "category": "classical_force_semantics", "key": KEY}
     options = {"include_snapshot_text": True, "response_char_limit": 0}

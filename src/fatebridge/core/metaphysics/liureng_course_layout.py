@@ -7,13 +7,111 @@ A compatible pair may still never be selected by a given four-lesson board.
 from __future__ import annotations
 
 import copy
-from typing import Any
+from typing import Any, TypedDict
 
-from ...utils.data import EARTHLY_BRANCHES
-from .common import GUI_REN_SEQUENCE
-from .liureng_life_stages import life_stage_cycle
-from .ren_gods import GuirenProfile, noble_start
-from .ren_sources import JINGWEI_SCAN_SHA256, JINGWEI_SOURCE
+from fatebridge.core.metaphysics.common import GUI_REN_SEQUENCE, rotate_sequence
+from fatebridge.core.metaphysics.liureng_life_stages import life_stage_cycle
+from fatebridge.core.metaphysics.ren_gods import (
+    DEFAULT_GUIREN_PROFILE,
+    GuirenProfile,
+    noble_start,
+)
+from fatebridge.core.metaphysics.ren_sources import JINGWEI_SCAN_SHA256, JINGWEI_SOURCE
+from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
+
+LIURENG_MONTH_GENERAL_BY_TERM = {
+    "大寒": "子",
+    "立春": "子",
+    "雨水": "亥",
+    "惊蛰": "亥",
+    "春分": "戌",
+    "清明": "戌",
+    "谷雨": "酉",
+    "立夏": "酉",
+    "小满": "申",
+    "芒种": "申",
+    "夏至": "未",
+    "小暑": "未",
+    "大暑": "午",
+    "立秋": "午",
+    "处暑": "巳",
+    "白露": "巳",
+    "秋分": "辰",
+    "寒露": "辰",
+    "霜降": "卯",
+    "立冬": "卯",
+    "小雪": "寅",
+    "大雪": "寅",
+    "冬至": "丑",
+    "小寒": "丑",
+}
+
+
+LIURENG_GUIREN_REVERSED_EARTH = frozenset("巳午未申酉戌")
+
+
+def _liureng_month_general_for_term(current_term: str) -> str:
+    if current_term not in LIURENG_MONTH_GENERAL_BY_TERM:
+        raise ValueError(f"未知节气 {current_term!r}，不能用月建代替月将")
+    return LIURENG_MONTH_GENERAL_BY_TERM[current_term]
+
+
+def _liureng_month_general_on_hour(
+    *,
+    hour_branch: str,
+    month_general_branch: str,
+) -> dict[str, str]:
+    earth_order = rotate_sequence(EARTHLY_BRANCHES, hour_branch)
+    sky_order = rotate_sequence(EARTHLY_BRANCHES, month_general_branch)
+    return {
+        earth_branch: sky_order[index] for index, earth_branch in enumerate(earth_order)
+    }
+
+
+class TwelveGodLayout(TypedDict):
+    sky_by_earth: dict[str, str]
+    god_by_sky: dict[str, str]
+    noble_start_branch: str
+    noble_earth_branch: str
+    is_reverse: bool
+
+
+def twelve_god_layout(
+    *,
+    hour_branch: str,
+    month_general_branch: str,
+    day_stem: str,
+    is_diurnal: bool,
+    guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
+) -> TwelveGodLayout:
+    """Lay out supplied symbolic conditions without inventing a civil date.
+
+    The normal board builder resolves calendar/diurnal conditions first, then
+    uses this same layout. A source-conditioned replay cannot certify those
+    upstream conditions or a Taiyi four-corner lodging rule.
+    """
+    if (
+        hour_branch not in tuple(EARTHLY_BRANCHES)
+        or month_general_branch not in tuple(EARTHLY_BRANCHES)
+        or day_stem not in tuple(HEAVENLY_STEMS)
+        or type(is_diurnal) is not bool
+    ):
+        raise ValueError("十二神将布置需要明确的时支、月将、日干与昼夜条件")
+    start = noble_start(day_stem, is_diurnal, guiren_profile)
+    sky = _liureng_month_general_on_hour(
+        hour_branch=hour_branch, month_general_branch=month_general_branch
+    )
+    earth = next(branch for branch, upper in sky.items() if upper == start)
+    reverse = earth in LIURENG_GUIREN_REVERSED_EARTH
+    branches = rotate_sequence(EARTHLY_BRANCHES, start, reverse=reverse)
+    return {
+        "sky_by_earth": sky,
+        "god_by_sky": dict(zip(branches, GUI_REN_SEQUENCE)),
+        "noble_start_branch": start,
+        "noble_earth_branch": earth,
+        "is_reverse": reverse,
+    }
+
 
 PROFILES: tuple[GuirenProfile, ...] = ("liuren_common_v1", "tanyuan_xieji_v1")
 BASIS = {

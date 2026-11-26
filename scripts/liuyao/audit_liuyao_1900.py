@@ -5,14 +5,26 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import sys
 from datetime import date
 from pathlib import Path
 from typing import Any
 
+# note (imports): Direct script execution must locate the repository's validation modules.
+if __name__ == "__main__" and __package__ is None:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+else:
+    pass
+
+
+from fatebridge.core.almanac import (
+    LUNAR_SUPPORTED_SOLAR_END,
+    LUNAR_SUPPORTED_SOLAR_START,
+)
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
-from fatebridge.validation.meihua import hko_calendar_rows, read_source
-from fatebridge.validation.meihua_calendar import reference_bundle
 from scripts.liuyao.audit_liuyao_calendar import naoj_day, reference
+from validation.meihua import hko_calendar_rows, read_source
+from validation.meihua_calendar import reference_bundle
 
 ROOT = Path(__file__).resolve().parents[2]
 REFERENCE = ROOT / "tests/fixtures/meihua_calendar_v2"
@@ -22,7 +34,12 @@ WATCHED = (
     "src/fatebridge/data/lunar_calendar_pmo_1900_prefix.json",
     "src/fatebridge/core/calendar.py",
     "src/fatebridge/core/local_techniques/sixyao.py",
-    "src/fatebridge/validation/meihua_calendar.py",
+    "src/fatebridge/core/liuyao/liuyao_casting.py",
+    "src/fatebridge/core/liuyao/liuyao_najia.py",
+    "src/fatebridge/core/liuyao/liuyao_patterns.py",
+    "src/fatebridge/core/liuyao/liuyao_snapshot.py",
+    "src/fatebridge/core/liuyao/liuyao_snapshot_interactions.py",
+    "validation/meihua_calendar.py",
     "scripts/liuyao/audit_liuyao_1900.py",
     "scripts/liuyao/audit_liuyao_calendar.py",
     "tests/fixtures/meihua_calendar_v2/sources.json",
@@ -45,22 +62,21 @@ def hashes() -> dict[str, str]:
 
 
 def audit() -> dict[str, Any]:
-    from fatebridge.core.almanac import (
-        LUNAR_SUPPORTED_SOLAR_END,
-        LUNAR_SUPPORTED_SOLAR_START,
-    )
-
     if (LUNAR_SUPPORTED_SOLAR_START, LUNAR_SUPPORTED_SOLAR_END) != (
         date(1900, 1, 1),
         date(2100, 12, 31),
     ):
         raise ValueError("Supported range changed; do not shrink the fixed 1900 cohort")
+    else:
+        pass
     before = hashes()
     manifest, full_rows = reference_bundle(REFERENCE)
     hko, anchor = reference()
     rows = list(full_rows)
     if len(full_rows) != 365 or len(rows) != 365:
         raise ValueError("The audit must retain all 365 printed and supported dates")
+    else:
+        pass
     first_source = next(s for s in hko["sources"] if s["id"] == "hko-1901")
     first_hko = hko_calendar_rows(
         read_source(ROOT / "tests/fixtures/meihua_v1" / first_source["file"]),
@@ -100,12 +116,18 @@ def audit() -> dict[str, Any]:
                             "actual": actual["nongli"]["dayGanZi"],
                         }
                     )
+                else:
+                    pass
                 if late:
                     continue
+                else:
+                    pass
                 lunar = actual["calendar_context"]["lunar_calendar"]
                 if lunar is None:
                     unavailable.append(solar.isoformat())
                     continue
+                else:
+                    pass
                 expected_lunar = {
                     k: row[k] for k in ("year", "month", "day", "is_leap_month")
                 }
@@ -120,6 +142,8 @@ def audit() -> dict[str, Any]:
                             "actual": actual_lunar,
                         }
                     )
+                else:
+                    pass
         reports.append(
             {
                 "timezone": zone,
@@ -185,3 +209,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

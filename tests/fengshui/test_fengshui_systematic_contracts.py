@@ -2,12 +2,13 @@
 
 import asyncio
 import json
+from pathlib import Path
 
 import pytest
 from fastmcp import Client
 from jsonschema import Draft202012Validator
 
-from fatebridge.application.description import mcp_description
+from fatebridge.application.description import describe_input_spec
 from fatebridge.application.examples import suggested_fields
 from fatebridge.cli import run
 from fatebridge.core.fengshui.output import FengshuiOutput
@@ -16,7 +17,14 @@ from fatebridge.services.fengshui import assess
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.fengshui_transports import mcp_call
 from tests.support.mcp_result_assertions import without_transport
-from tests.support.transports import rest_client
+from tests.support.transports import describe_capability, rest_client
+from tests.unit_test.fixtures.fengshui_layout import (
+    candidate_features,
+    proposal_request,
+)
+from tests.unit_test.fixtures.fengshui_reading import (
+    assess_input,
+)
 
 
 def orientation():
@@ -53,6 +61,8 @@ def floor_request(complete_usage=False):
             usage_confirmed=True,
             usage_evidence="已完整核对一层实际住用范围，明确不包含p",
         )
+    else:
+        pass
     return {
         "methods": [],
         "environmental_context": {
@@ -88,6 +98,8 @@ def floor_request(complete_usage=False):
 def case_input(case):
     if case.startswith("floor_"):
         return floor_request(case == "floor_confirmed_absence")
+    else:
+        pass
     if case == "symbolic_only":
         return dict(
             methods=[],
@@ -97,6 +109,8 @@ def case_input(case):
                 household_members=[person()],
             ),
         )
+    else:
+        pass
     if case == "bazhai_scope":
         return dict(
             methods=["bazhai"],
@@ -111,6 +125,8 @@ def case_input(case):
                 household_members=[person()],
             ),
         )
+    else:
+        pass
     inputs = dict(
         scene="workstation",
         house=dict(sitting_trigram="坎"),
@@ -121,6 +137,8 @@ def case_input(case):
     )
     if case == "priority_explicit":
         inputs["methods"] = ["bazhai"]
+    else:
+        pass
     return inputs
 
 
@@ -136,8 +154,11 @@ def case_input(case):
     ],
 )
 def test_systematic_findings_agree_across_actual_transports(
-    monkeypatch, tmp_path, capsys, case
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    case: str,
+) -> None:
     inputs = case_input(case)
     http = rest_client(monkeypatch).post("/api/fengshui/assess", json=inputs)
     protocol = asyncio.run(mcp_call("assess", inputs))
@@ -189,6 +210,8 @@ def test_systematic_findings_agree_across_actual_transports(
                 assert (
                     body["coverage"]["analysis_progress"]["assessment_complete"] is True
                 )
+            else:
+                pass
         else:
             assert list(body["layers"]) == ["bazhai"]
             assert body["coverage"]["requested_analysis_status"] == "complete"
@@ -213,8 +236,8 @@ def test_systematic_findings_agree_across_actual_transports(
 
 
 def test_published_guidance_and_strict_first_view_work_without_context(
-    monkeypatch, tmp_path, capsys
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     inputs = dict(
         scene="workstation",
         methods=[],
@@ -232,8 +255,8 @@ def test_published_guidance_and_strict_first_view_work_without_context(
     )
     spec = next(s for s in CATALOG if s.key == "fengshui_assess")
     assert (
-        "只有提供environmental_context时才追加layout_analysis.environmental_context"
-        in mcp_description(spec)
+        "首轮fields追加layout_analysis.environmental_context"
+        in describe_input_spec(spec)["call_guidance"]["environmental_context"]
     )
     fields = suggested_fields(spec) + ["method_policy"]
     controls = dict(
@@ -272,12 +295,12 @@ def test_published_guidance_and_strict_first_view_work_without_context(
     assert "environmental_context" not in http.json()["layout_analysis"]
 
 
-def test_live_schema_publishes_usage_and_household_scope():
+def test_live_schema_publishes_usage_and_household_scope() -> None:
     async def inspect():
         async with Client(create_mcp_app(families="fengshui")) as client:
-            return next(
-                t for t in await client.list_tools() if t.name == "fengshui_assess"
-            ).model_dump(by_alias=True)["inputSchema"]
+            return (await describe_capability(client, "fengshui_assess"))[
+                "input_schema"
+            ]
 
     schema = asyncio.run(inspect())
     encoded = json.dumps(schema)
@@ -291,8 +314,11 @@ def test_live_schema_publishes_usage_and_household_scope():
     "case", ["current_usage", "candidate_usage", "static_floor", "north_reference"]
 )
 def test_inconsistent_usage_or_static_scope_is_rejected_by_all_transports(
-    monkeypatch, tmp_path, capsys, case
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    case: str,
+) -> None:
     if case == "current_usage":
         inputs = floor_request(True)
         inputs["environmental_context"]["floors"][0]["object_ids"] = ["desk"]
@@ -302,9 +328,6 @@ def test_inconsistent_usage_or_static_scope_is_rejected_by_all_transports(
             )
         ]
     else:
-        from tests.fengshui.test_fengshui_candidate_features import (
-            inputs as candidate_features,
-        )
 
         inputs = candidate_features(fresh=True)
         source = dict(
@@ -334,6 +357,8 @@ def test_inconsistent_usage_or_static_scope_is_rejected_by_all_transports(
             )
         elif case == "static_floor":
             target["object_ids"].append("fixed_wall")
+        else:
+            pass
         inputs["layout_alternatives"][0]["environmental_context"] = dict(
             orientation=orientation(), floors=[target]
         )
@@ -341,6 +366,8 @@ def test_inconsistent_usage_or_static_scope_is_rejected_by_all_transports(
             inputs["layout_alternatives"][0]["environmental_context"]["orientation"][
                 "north_reference"
             ] = "true"
+        else:
+            pass
     http = rest_client(monkeypatch).post("/api/fengshui/assess", json=inputs)
     protocol = asyncio.run(mcp_call("assess", inputs))
     path = tmp_path / "矛盾范围.json"
@@ -353,10 +380,7 @@ def test_inconsistent_usage_or_static_scope_is_rejected_by_all_transports(
     )
 
 
-def test_static_feature_keeps_original_floor_when_candidate_context_omits_it():
-    from tests.fengshui.test_fengshui_candidate_features import (
-        inputs as candidate_features,
-    )
+def test_static_feature_keeps_original_floor_when_candidate_context_omits_it() -> None:
 
     inputs = candidate_features(fresh=True)
     source = dict(
@@ -387,9 +411,10 @@ def test_static_feature_keeps_original_floor_when_candidate_context_omits_it():
 
 
 @pytest.mark.parametrize("natal", [False, True])
-def test_candidate_comparisons_include_each_selected_flying_star_layer(natal):
+def test_candidate_comparisons_include_each_selected_flying_star_layer(
+    natal: bool,
+) -> None:
     if natal:
-        from tests.fengshui.test_xuankong_interpretation_contracts import assess_input
 
         inputs = assess_input()
         inputs.update(
@@ -411,7 +436,6 @@ def test_candidate_comparisons_include_each_selected_flying_star_layer(natal):
         )
         expected = {"xuankong_natal"}
     else:
-        from tests.fengshui.test_fengshui_planning import proposal_request
 
         inputs = proposal_request()
         expected = {"annual_stars", "bazhai"}

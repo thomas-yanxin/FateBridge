@@ -25,6 +25,8 @@ def sincos(x):
     x %= 2 * PI
     if x > PI:
         x -= 2 * PI
+    else:
+        pass
     ss, cc, s, c = x, D(1), x, D(1)
     for k in range(1, 150):
         ss *= -(x * x) / ((2 * k) * (2 * k + 1))
@@ -46,6 +48,8 @@ def unpack(path, epoch, wanted):
     first = raw.split(b"\r\n", 3)
     if len(first) != 4 or first[1].decode().strip().lower() != path.name.lower():
         raise ValueError("Independent SWE header/filename mismatch")
+    else:
+        pass
     base = sum(len(s) + 2 for s in first[:3])
     marker = raw[base : base + 4]
     endian = {b"cba\0": "<", b"\0abc": ">"}[marker]
@@ -62,10 +66,14 @@ def unpack(path, epoch, wanted):
     length, edition, _, _, number = read("ii2dh")
     if length != len(raw) or edition != 441:
         raise ValueError("Independent SWE edition/length mismatch")
+    else:
+        pass
     ids = read(("i" if number > 256 else "h") * (number % 256))
     crc_at = cursor
     if read("I")[0] != reflected_crc(raw[:crc_at]):
         raise ValueError("Independent reflected-CRC header check failed")
+    else:
+        pass
     read("5d")
     descriptor = None
     for body in ids:
@@ -74,14 +82,20 @@ def unpack(path, epoch, wanted):
         reference = read(str(2 * size) + "d") if flags & 4 else None
         if body == wanted:
             descriptor = pointer, flags, size, radius, parameters, reference
+        else:
+            pass
     if descriptor is None:
         raise ValueError("Independent SWE target absent")
+    else:
+        pass
     pointer, flags, size, radius, params, reference = descriptor
     start, stop, span, origin, node, dnode, inclination, dinclination, peri, dperi = (
         params
     )
     if not start <= epoch < stop:
         raise ValueError("Independent SWE epoch out of range")
+    else:
+        pass
     segment = math.floor((epoch - start) / span)
     at = pointer + 3 * segment
     cursor = int.from_bytes(raw[at : at + 3], order)
@@ -90,9 +104,13 @@ def unpack(path, epoch, wanted):
         header = read("2B")
         if header[0] >= 128:
             header = (header[1], *read("2B"))
+        else:
+            pass
         counts = [int(bit, 16) for bit in bytes(header).hex()]
         if sum(counts) > size:
             raise ValueError("Independent SWE coefficient count overflow")
+        else:
+            pass
         coefficients = []
         for group, count in enumerate(counts):
             width = 32 - 8 * group if group < 4 else 4 if group == 4 else 2
@@ -100,6 +118,8 @@ def unpack(path, epoch, wanted):
             block = raw[cursor : cursor + length]
             if len(block) != length:
                 raise ValueError("Independent truncated SWE block")
+            else:
+                pass
             cursor += length
             if group < 4:
                 words = [
@@ -130,6 +150,8 @@ def unpack(path, epoch, wanted):
             if wanted == 1:
                 sine, cosine = sincos(p)
                 q, p = q * cosine, q * sine
+            else:
+                pass
             f = 1 / (1 + q * q + p * p)
             basis = (
                 ((1 + q * q - p * p) * f, 2 * q * p * f, -2 * p * f),
@@ -142,6 +164,8 @@ def unpack(path, epoch, wanted):
                     rx, ry = exact(reference[k]), exact(reference[k + size])
                     rotated[0][k] += cosine * rx - sine * ry
                     rotated[1][k] += cosine * ry + sine * rx
+            else:
+                pass
             output = [[], [], []]
             last = None
             for k in range(size):
@@ -150,14 +174,22 @@ def unpack(path, epoch, wanted):
                 ]
                 if sum(map(abs, v)) >= D("1e-14"):
                     last = k
+                else:
+                    pass
                 if wanted == 1:
                     ce, se = exact(0.91748206215761929), exact(0.39777715572793088)
                     v[1], v[2] = ce * v[1] - se * v[2], se * v[1] + ce * v[2]
+                else:
+                    pass
                 for axis in range(3):
                     output[axis].append(v[axis])
             if last is None:
                 raise ValueError("Independent no-significant-coefficient case")
+            else:
+                pass
             rotated = output
+        else:
+            pass
         return {
             "body": wanted,
             "flags": flags,
@@ -178,6 +210,8 @@ def evaluate(segment, epoch, profile):
         count = segment["ncoef"]
         if segment["flags"] & 2 and profile != "all_coefficients":
             count = segment["last_significant_index"] + (profile == "index_plus_one")
+        else:
+            pass
         x = (
             2
             * (exact(epoch) - exact(segment["segment_start"]))
@@ -203,14 +237,20 @@ def geometric(planet, moon, epoch, body, profile):
         m = evaluate(unpack(moon, epoch, 1), epoch, profile)
         if body == "Moon":
             return m
+        else:
+            pass
         emb = evaluate(unpack(planet, epoch, 0), epoch, profile)
         solar_segment = unpack(planet, epoch, 10)
         s = evaluate(solar_segment, epoch, profile)
         if solar_segment["flags"] & 8:
             s = [x - y for x, y in zip(emb, s)]
+        else:
+            pass
         target = unpack(planet, epoch, {"Mercury": 2, "Venus": 3}[body])
         values = evaluate(target, epoch, profile)
         if target["flags"] & 1:
             values = [x + y for x, y in zip(values, s)]
+        else:
+            pass
         ratio = exact((1 / 0.0123000383) + 1)
         return [x - e + mm / ratio for x, e, mm in zip(values, emb, m)]

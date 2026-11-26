@@ -7,129 +7,41 @@ from fractions import Fraction
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.analysis.compatibility import AdvancedCompatibility, RelationshipType
-from fatebridge.analysis.health import HealthAnalysis
-from fatebridge.analysis.marriage import MarriageAnalysis
-from fatebridge.core.bazi_evidence import build_natal_evidence
+from fatebridge.core.bazi.bazi_evidence import (
+    build_natal_evidence,
+    build_topic_evidence,
+)
+from fatebridge.core.contracts.output_bazi_evidence import BaziEvidenceChain
+from fatebridge.core.contracts.output_branch_candidates import (
+    validate_punishment_resolution,
+)
+from fatebridge.core.contracts.output_source_annotations import SourceCurrentCalculation
 from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.output_bazi_evidence import BaziEvidenceChain
-from fatebridge.core.output_branch_candidates import validate_punishment_resolution
-from fatebridge.core.output_source_annotations import SourceCurrentCalculation
 from fatebridge.core.strength import STRENGTH_METHOD_ID
 from fatebridge.utils.data import Element, count_element_distribution
 
 
-@pytest.mark.parametrize("is_male", [True, False])
+@pytest.mark.parametrize("gender,stem1,stem2", [("男", "戊", "己"), ("女", "庚", "辛")])
 @pytest.mark.parametrize(
     "order", [("year", "month", "day", "hour"), ("hour", "day", "month", "year")]
 )
-def test_spouse_stars_at_both_ends_do_not_select_timing_by_iteration_order(
-    is_male, order
-):
-    # Both visible spouse-star conventions hit the year and hour positions.
-    # The existing rules attach opposite ordinal cues to those positions;
-    # there is no declared priority that lets one silently replace the other.
-    p = {
-        "year": ("戊" if is_male else "庚", "辰"),
-        "month": ("丙", "午"),
-        "day": ("甲", "子"),
-        "hour": ("己" if is_male else "辛", "巳"),
-    }
-    result = MarriageAnalysis._predict_marriage_timing(
-        {key: p[key] for key in order}, "甲", "子", is_male
+def test_spouse_stars_preserve_both_ends_independent_of_iteration_order(
+    gender: str, stem1: str, stem2: str, order
+) -> None:
+    pillars = dict(
+        year=(stem1, "辰"), month=("丙", "午"), day=("甲", "子"), hour=(stem2, "巳")
     )
-    assert result["marriage_tendency"] == "早晚信号并存，未裁定"
-    assert any("早婚倾向" in note for note in result["tendency_notes"])
-    assert any("晚婚倾向" in note for note in result["tendency_notes"])
-
-
-@pytest.mark.parametrize("reverse", [False, True])
-@pytest.mark.parametrize("count", [1, 2, 3])
-def test_favorable_conflict_explanation_reconciles_with_actual_deduction(
-    reverse, count
-):
-    selected = ["木", "火", "土"][:count]
-    first = {
-        "structure_profile": {"engineering_reference": {"useful_elements": selected}}
-    }
-    second = {
-        "structure_profile": {"engineering_reference": {"avoid_elements": selected}}
-    }
-    if reverse:
-        first, second = second, first
-    result = AdvancedCompatibility._analyze_favorable_synergy(first, second)
-    deltas = [
-        int(re.search(r"\((-?\d+)\)$", row).group(1)) for row in result["score_basis"]
-    ]
-    assert result["score"] == 60 + sum(deltas) == 60 - 8 * count
-
-
-@pytest.mark.parametrize("count", [1, 2, 3, 4])
-@pytest.mark.parametrize(
-    "dimension,base,cap",
-    [("favorable_synergy", 60, 8), ("ten_gods_relationship", 65, 10)],
-)
-def test_shared_ten_god_bonus_is_included_in_the_public_score_explanation(
-    count, dimension, base, cap
-):
-    selected = ["正印", "偏印", "食神", "伤官"][:count]
-    person = {
-        "day_master": {"stem": "甲"},
-        "structure_profile": {"engineering_reference": {"useful_ten_gods": selected}},
-    }
-    result = (
-        AdvancedCompatibility._analyze_favorable_synergy(person, person)
-        if dimension == "favorable_synergy"
-        else AdvancedCompatibility._analyze_ten_gods_relationship(
-            person, person, RelationshipType.GENERAL
-        )
+    ordered = {name: pillars[name] for name in order}
+    topic = build_topic_evidence(
+        build_natal_evidence(ordered), ordered, "marriage", gender, None, None
     )
-    deltas = [
-        int(re.search(r"\(([+-]?\d+)\)$", row).group(1))
-        for row in result["score_basis"]
-    ]
-    assert result["score"] == base + sum(deltas) == base + min(cap, count * 3)
-
-
-def test_conflicting_marriage_cues_match_rest_mcp_and_cli(monkeypatch):
-    from fastapi.testclient import TestClient
-
-    import fatebridge.api as api
-    from tests.evaluation.test_agentic_replay import business, cli, native
-
-    # Fabricated regression input: 戊辰 / 戊午 / 甲午 / 戊辰.
-    # Birth facts and timing overrides are explicit in all three calls.
-    inputs = {
-        "name": "虚构婚期相反信号回归",
-        "birth_year": 1988,
-        "birth_month": 6,
-        "birth_day": 8,
-        "birth_hour": 8,
-        "birth_minute": 0,
-        "birth_second": 0,
-        "gender": "男",
-        "birth_timezone": "+08:00",
-        "use_true_solar_time": False,
-        "dayun_pillar": "甲子",
-        "liunian_pillar": "丙午",
+    visible = {
+        (row["pillar"], row["stem"])
+        for rows in topic["stars"].values()
+        for row in rows
+        if row["location"] == "天干"
     }
-    controls = {"as_of": "2026-11-03T10:00:00+08:00", "response_char_limit": 0}
-    monkeypatch.setattr(
-        api,
-        "API_KEY_AUTHENTICATOR",
-        api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
-    )
-    response = TestClient(api.app).post(
-        "/api/cn/bazi/marriage", json=inputs, params=controls
-    )
-    protocol = native("bazi_marriage", inputs, controls)
-    code, local = cli("bazi_marriage", inputs, controls)
-    assert response.status_code == 200 and not protocol.is_error and code == 0
-    expected = business(response.json())
-    assert expected == business(protocol.structured_content) == business(local)
-    assert expected["marriage_analysis"]["marriage_timing"]["marriage_tendency"] == (
-        "早晚信号并存，未裁定"
-    )
+    assert visible == {("year", stem1), ("hour", stem2)}
 
 
 @pytest.mark.parametrize(
@@ -142,7 +54,9 @@ def test_conflicting_marriage_cues_match_rest_mcp_and_cli(monkeypatch):
         ("亥子", {"木": "相", "火": "死", "土": "囚", "金": "休", "水": "旺"}),
     ],
 )
-def test_all_twelve_month_branches_follow_literal_seasonal_table(months, phases):
+def test_all_twelve_month_branches_follow_literal_seasonal_table(
+    months: str, phases
+) -> None:
     for branch in months:
         assert ElementAnalysis.seasonal_phases(branch) == phases
         pillars = dict(
@@ -161,7 +75,7 @@ def test_all_twelve_month_branches_follow_literal_seasonal_table(months, phases)
         assert "element_seasonal_phase" in result["element_distribution_basis"]
 
 
-def test_corrected_phases_feed_exact_budget_without_changing_weights():
+def test_corrected_phases_feed_exact_budget_without_changing_weights() -> None:
     pillars = dict(
         zip(
             ("year", "month", "day", "hour"),
@@ -209,8 +123,8 @@ def test_corrected_phases_feed_exact_budget_without_changing_weights():
     ],
 )
 def test_current_punishment_contract_and_retired_method_rejection(
-    method,
-):
+    method: str,
+) -> None:
     invalid = [
         {
             "kind": "刑",
@@ -225,6 +139,8 @@ def test_current_punishment_contract_and_retired_method_rejection(
         with pytest.raises(ValidationError, match="只接收当前旺衰计算回执"):
             SourceCurrentCalculation.model_validate(payload)
         return
+    else:
+        pass
     with pytest.raises(ValueError, match="实际会合覆盖"):
         validate_punishment_resolution(method, invalid)
     with pytest.raises(ValidationError, match="实际会合覆盖"):
@@ -248,12 +164,12 @@ def test_current_punishment_contract_and_retired_method_rejection(
         ("亥", {"木": 1.3, "火": 0, "土": 0, "金": 0, "水": 0.8}),
     ],
 )
-def test_all_twelve_branches_match_hand_counted_weights(branch, expected):
+def test_all_twelve_branches_match_hand_counted_weights(branch: str, expected) -> None:
     actual = count_element_distribution({"day": ("甲", branch)})
     assert {element.value: value for element, value in actual.items()} == expected
 
 
-def test_four_pillars_match_hand_counted_weights():
+def test_four_pillars_match_hand_counted_weights() -> None:
     pillars = {
         "year": ("庚", "午"),
         "month": ("辛", "巳"),
@@ -286,39 +202,10 @@ def test_four_pillars_match_hand_counted_weights():
         ("癸", {"木": 0, "火": 0, "土": 0, "金": 0, "水": 1.8}),
     ],
 )
-def test_all_ten_stems_match_hand_counted_weights(stem, expected):
+def test_all_ten_stems_match_hand_counted_weights(stem: str, expected) -> None:
     actual = count_element_distribution({"day": (stem, "子")})
     assert {element.value: value for element, value in actual.items()} == expected
 
 
-def test_empty_input_includes_every_element_zero_initialised():
+def test_empty_input_includes_every_element_zero_initialised() -> None:
     assert count_element_distribution({}) == {element: 0.0 for element in Element}
-
-
-@pytest.mark.parametrize(
-    "chart,element,status,climate,warm,cold",
-    [
-        (["丁卯", "己卯", "辛卯", "辛亥"], "木", "盘内偏多", "寒暖均衡", 2.0, 2.8),
-        (["甲子", "辛巳", "辛卯", "癸卯"], "土", "盘内偏少", "偏寒湿", 1.1, 4.1),
-        (["丙寅", "戊寅", "庚寅", "戊申"], "水", "盘内偏少", "偏燥热", 5.1, 2.1),
-    ],
-)
-def test_cultural_element_weight_thresholds_include_exact_boundary(
-    chart, element, status, climate, warm, cold
-):
-    # Exact rational controls under the declared 1, 1/2, 3/10 policy:
-    # 2.7 equals 1.8 times mean 1.5; 4.1-1.1 and 5.1-2.1 both equal 3.
-    # These are cultural weight labels, not clinical constitution assessments.
-    pillars = dict(zip(("year", "month", "day", "hour"), map(tuple, chart)))
-    result = HealthAnalysis.analyze_health(pillars)
-    findings = result["organ_analysis"]["findings"]
-    assert (
-        next(row["status"] for row in findings if row["element"] == element) == status
-    )
-    constitution = result["constitution"]
-    assert constitution["climate"] == climate
-    assert (constitution["warm_strength"], constitution["cold_strength"]) == (
-        warm,
-        cold,
-    )
-    assert result["is_medical_assessment"] is False

@@ -8,8 +8,10 @@ from pathlib import Path
 import pytest
 
 import fatebridge
-from fatebridge.validation.meihua_weather_scope_study import audit_scope_weather_study
+from fatebridge.core.meihua.meihua_weather import weather_ruleset
 from tests.support.transports import SPECS, business, rest, surface_calls
+from validation.meihua_weather_policy_v2 import canonical_sha256
+from validation.meihua_weather_scope_study import audit_scope_weather_study
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/meihua_weather_policy_v3/plan.json"
 
@@ -43,6 +45,8 @@ def protocol_shell(tmp_path, *, plan_change=None):
     plan = json.loads(REFERENCE.read_text())
     if plan_change:
         plan_change(plan)
+    else:
+        pass
     put(base / "plan.json", plan)
     put(base / "engine-source-sha256.json", manifest)
     put(
@@ -52,23 +56,23 @@ def protocol_shell(tmp_path, *, plan_change=None):
     return base
 
 
-def test_source_change_stops_before_any_observation_or_scoring(tmp_path):
+def test_source_change_stops_before_any_observation_or_scoring(tmp_path: Path) -> None:
     base = protocol_shell(tmp_path)
-    (base / "engine/src/fatebridge/validation/meihua_weather_policy_v3.py").write_text(
-        "changed"
-    )
+    (base / "engine/validation/meihua_weather_policy_v3.py").write_text("changed")
     with pytest.raises(ValueError, match="Locked study source"):
         audit_scope_weather_study(base)
 
 
-def test_source_manifest_path_escape_stops_before_file_read(tmp_path):
+def test_source_manifest_path_escape_stops_before_file_read(tmp_path: Path) -> None:
     base = protocol_shell(tmp_path)
     put(base / "engine-source-sha256.json", {"../outside": "irrelevant"})
     with pytest.raises(ValueError, match="Locked study source"):
         audit_scope_weather_study(base)
 
 
-def test_missing_target_day_cannot_create_a_perfect_smaller_cohort(tmp_path):
+def test_missing_target_day_cannot_create_a_perfect_smaller_cohort(
+    tmp_path: Path,
+) -> None:
     base = protocol_shell(
         tmp_path, plan_change=lambda p: p["cohorts"][p["primary_cohort"]].pop()
     )
@@ -76,7 +80,9 @@ def test_missing_target_day_cannot_create_a_perfect_smaller_cohort(tmp_path):
         audit_scope_weather_study(base)
 
 
-def test_switching_to_better_looking_context_after_results_is_rejected(tmp_path):
+def test_switching_to_better_looking_context_after_results_is_rejected(
+    tmp_path: Path,
+) -> None:
     base = protocol_shell(
         tmp_path, plan_change=lambda p: p.update(primary_scenario="season_not_supplied")
     )
@@ -84,7 +90,7 @@ def test_switching_to_better_looking_context_after_results_is_rejected(tmp_path)
         audit_scope_weather_study(base)
 
 
-def test_changed_forecast_file_fails_its_pre_outcome_seal(tmp_path):
+def test_changed_forecast_file_fails_its_pre_outcome_seal(tmp_path: Path) -> None:
     base = protocol_shell(tmp_path)
     put(base / "generated/forecasts.json", [])
     put(base / "generated/forecast-seal.json", {"files": {"forecasts.json": "wrong"}})
@@ -92,7 +98,9 @@ def test_changed_forecast_file_fails_its_pre_outcome_seal(tmp_path):
         audit_scope_weather_study(base)
 
 
-def test_duplicate_date_scenarios_cannot_be_counted_as_new_samples(tmp_path):
+def test_duplicate_date_scenarios_cannot_be_counted_as_new_samples(
+    tmp_path: Path,
+) -> None:
     base = protocol_shell(tmp_path)
     row = {
         "cohort": "retrospective_2024",
@@ -111,8 +119,8 @@ def test_duplicate_date_scenarios_cannot_be_counted_as_new_samples(tmp_path):
 
 @pytest.mark.parametrize("tool", ["meihua_analysis", "meihua_cast"])
 def test_current_negative_study_is_exposed_without_replacing_old_records(
-    tool, surface_calls
-):
+    tool: str, surface_calls
+) -> None:
     spec = SPECS[tool]
     payload = {"interpretation_topic": "weather"}
     if tool == "meihua_cast":
@@ -157,9 +165,7 @@ def test_current_negative_study_is_exposed_without_replacing_old_records(
         assert not current["daypart_readings_observationally_validated_in_this_cohort"]
 
 
-def test_source_rule_profile_is_not_mutated_to_link_its_own_evaluation():
-    from fatebridge.core.meihua_weather import weather_ruleset
-    from fatebridge.validation.meihua_weather_policy_v2 import canonical_sha256
+def test_source_rule_profile_is_not_mutated_to_link_its_own_evaluation() -> None:
 
     plan = json.loads(REFERENCE.read_text())
     assert canonical_sha256(weather_ruleset()) == plan["profile_canonical_sha256"]

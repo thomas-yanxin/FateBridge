@@ -4,7 +4,7 @@
 
 ## 选择与资料
 
-本命用 `astro_india_chart`（或 `astro_chart` 的 `chart_variant=india_chart`，二选一）；达沙用 `astro_vimshottari`。已确认的公历出生日期、钟时、城市／位置与时区按实际 Schema 整理；未知生时不能猜。默认民用时刻，不沿用八字的太阳时默认。城市可由引擎解析，无需先索取坐标。
+本命用 `vedic_chart`（或 `astrology_chart` 的 `chart_variant=india_chart`，二选一）；达沙用 `vimshottari_dasha`。已确认的公历出生日期、钟时、城市／位置与时区按实际 Schema 整理；未知生时不能猜。默认民用时刻，不沿用八字的太阳时默认。城市可由引擎解析，无需先索取坐标。
 
 核心固定 Lahiri 恒星黄道与整宫制，`node_mode` 区分平／真交点，Ketu 与 Rahu 相对。显式旧式宫制／黄道覆盖仍可取历史参考，但 `india.status=configuration_not_supported` 时不能补写印占分盘。缺少星历时不以低精度轨道冒充分盘或达沙。
 
@@ -16,21 +16,21 @@
 
 | 本轮任务 | 卡／工具 | 主证 |
 | --- | --- | --- |
-| 本命、做事特点 | `natal` / `astro_india_chart` | `india.charts.D1`、`nakshatras`、`topic_evidence.personality` |
-| 事业结构 | `career` / `astro_india_chart` | D1 与 D10 的第十宫、宫主落宫、尊贵与实际 graha drishti；主题 factors 区分事实和传统含义 |
-| 单人伴侣相处 | `relationship` / `astro_india_chart` | D1 与 D9 第七宫相关事实；D9 也涉及 dharma，不单独判婚姻成败 |
-| 指定分盘 | `divisions` / `astro_india_chart` | 实际 D1／D2／D3／D7／D9／D10／D12／D30；D30只给星座与整宫，其余分盘坐标是线性显示约定；未计算分盘不能补写 |
-| 阶段、目标钟时 | `stage` / `astro_vimshottari` | `current_major/current_sub` 真实起止、`birth_balance`、年长、`natal_ruler_context` 及对应本命结构 |
+| 本命、做事特点 | `natal` / `vedic_chart` | `india.charts.D1`、`nakshatras`、`topic_evidence.personality` |
+| 事业结构 | `career` / `vedic_chart` | D1 与 D10 的第十宫、宫主落宫、尊贵与实际 graha drishti；主题 factors 区分事实和传统含义 |
+| 单人伴侣相处 | `relationship` / `vedic_chart` | D1 与 D9 第七宫相关事实；D9 也涉及 dharma，不单独判婚姻成败 |
+| 指定分盘 | `divisions` / `vedic_chart` | 实际 D1／D2／D3／D7／D9／D10／D12／D30；D30只给星座与整宫，其余分盘坐标是线性显示约定；未计算分盘不能补写 |
+| 阶段、目标钟时 | `stage` / `vimshottari_dasha` | `current_major/current_sub` 真实起止、`birth_balance`、年长、`natal_ruler_context` 及对应本命结构 |
 
 印占只用 `india` 内独立规则。顶层 `classical/aspects` 等西占字段为历史兼容参考，不能把西占入庙、容许度或现代星座文案归为印占。印占相位为所选整宫 graha drishti；本版不赋予节点相位／尊贵。旧 dignity 是星座层标签；D1 physical_state.degree_condition 另含 moolatrikona 度数、Baladi 与独立 Uchcha Bala（0–60 Virupa），须同步核对。任何分盘变换坐标不套用 D1 物理速度、燃烧或最高点距离。dispositor_relationship 是有方向的星体关系，不当作人的友敌。完整 Shadbala、其他作者的燃烧规则与复杂 Yoga 未验收，不从解读补齐。combustion 是 Santhanam 第 7 章注释表的角距条件，核对 source_layer=translator_commentary、方向、阈值及 boundary/ambiguous；不直接当作真实可见性、现实失能或所有 Yoga 已失效。
 
-`topic_evidence` 中 `engine_facts` 是计算，`traditional_meaning/factors` 是有来源的传统解释；用户现实行动单独说明。不把入旺当能力认证、落陷当失败或术语连成必然事件。宫主联系可以讨论工作职责或相处议题，不由个人盘直接判断对方心意、信用与双人互动。
+`topic_evidence.engine_facts` 列出选中的宫位，`factors` 提供宫主、尊贵、分项力量、相位及其来源。各分项的 `calculation_context` 保留条件分支和缺项；Agent 按问题解释传统宫主联系和用户可采取的行动。伴侣心意、信用与双人互动须结合独立的现实资料。
 
 ## 时间口径与来源
 
 Vimshottari 以月宿为种子；次运从原始完整主运开始分配，不能把出生剩余主运重新均分。`year_basis` 的恒星年／365.2425 日固定年／360 日 savana 年不可混用。出生与分析时刻均须有效，DST 重复钟时用明确偏移消歧；日期级目标默认零点，年／月缺日的锚点见工具说明，不能称全年逐段已审。
 
-`timeline_scope` 为目标所在 120 年规则周期，其第一段可从出生前开始；120 年不是寿命估计。阶段边界与出生误差敏感性不能包装成事件会在该日发生。`astro_vedicprog` 的恒星二次推运不等同于此达沙。
+`timeline_scope` 为目标所在 120 年规则周期，其第一段可从出生前开始；120 年不是寿命估计。阶段边界与出生误差敏感性不能包装成事件会在该日发生。`sidereal_progressions` 的恒星二次推运不等同于此达沙。
 
 最终解释保留本次 `india.profile/ruleset_id/rulesets/rule_trace`，注明实际返回的版本与对应规则来源：[P.V.R. Narasimha Rao, Vedic Astrology: An Integrated Approach](https://www.vedicastrologer.org/articles/vedic_astro_textbook.pdf)，天文口径参考 [Swiss Ephemeris Programmer's Manual](https://www.astro.com/swisseph/swephprg.htm)。来源与软件数值对照不证明预测有效。
 
@@ -59,9 +59,9 @@ profile.time_scale_context 保留行星 TT、模型 UT1、IERS 表来源与到�
 Kala与星战须沿同一月亮／水星分支解释；同经、黄经零点、多星同时交战或缺少前置力量的参与者仍未知，不当0。上游作者差异仍保留，不认证单一原典完整六力；Ayana固定常数的越界保留，不自行截断。Cheshta默认仅日月有值，五星平均模型未选择；明确需要五星深层计算时可选cheshta_model=simon1994_j2000，读取model_context的出生TT、共同J2000框架、平均／几何真位置、来源与逐星过程。只覆盖1900–2050出生TT窗口；它是独立现代长期平均模型，不认证Raman1900原表，不能把D1的Lahiri视位置、真太阳、速度标签或拟合／瞬时轨道根数冒充平均位置。越界缺失只约束该层，不否定其他已返回证据；生时抽样的模型状态变化必须保留。仍不补齐完整六力总分，不把条件分支、抽样覆盖或模型日出当现实预测成绩。来源及限制见[平均运动模型审计](../../../scripts/jyotish/audit_jyotish_motion.py)。
 
 
-名义盘与条件证据：先核对`india.reading_basis`。未给误差是not_assessed，不能自行补0；星宿／宿足候选来自同一UTC网格，不只看分盘星座。名义上升、月宿、达沙结果不能冒充整个生时范围唯一成立。`calculation_context`里的computed_consensus、conditional_results、unavailable、partially_computed分别解释，直接使用其同run分支数值和约束，不挑较高分支；全局component部分结果不自动外推到另一个宫主。没有数值不一概是用户缺资料，先区分未选模型、年代范围、未裁定规则及实际输入缺项。Vimshottari的requested/evaluated_sample_count和omitted_samples须保留，不把被略过的候选写成已覆盖。开发回归案例、结构化事实核验、独立模型输出审阅和独立现实事件验收分别报告，不能互相冒充。
+名义盘与条件证据：先核对`india.reading_basis`。未给误差是not_assessed，不能自行补0；星宿／宿足候选来自同一 TT 网格，不只看分盘星座。名义上升、月宿、达沙结果不能冒充整个生时范围唯一成立。`calculation_context`里的computed_consensus、conditional_results、unavailable、partially_computed分别解释，直接使用其同run分支数值和约束，不挑较高分支；全局component部分结果不自动外推到另一个宫主。没有数值不一概是用户缺资料，先区分未选模型、年代范围、未裁定规则及实际输入缺项。Vimshottari的requested/evaluated_sample_count和omitted_samples须保留，不把被略过的候选写成已覆盖。开发回归案例、结构化事实核验、独立模型输出审阅和独立现实事件验收分别报告，不能互相冒充。
 
-Vimshottari v10：生时给定范围按同一最长30秒UTC网格读取 `stage_variants`，不能仅看旧 `samples` 端点／中心子集。完整网格计数与子集计数分开；目标早于候选出生逐点略过。同一候选运主的本命条件只用该候选生时的 `natal_ruler_contexts`，按 `sample_segments` 网格序号关联，不能拼接不同样本的有利条件；顶层 `natal_ruler_context` 只属名义盘。连续区段、相邻变化夹区及边界最小最大值均属离散样本证据，不表示精确生时、所有中间边界或事件日期。D30候选仍仅星座与宫位，不能补盘内度数。
+Vimshottari v10：生时给定范围按同一物理间距至多 30 SI 秒的 TT 网格读取 `stage_variants`，不能仅看旧 `samples` 端点／中心子集。完整网格计数与子集计数分开；目标早于候选出生或该样点缺少可用 UTC 公历键时，达沙逐点略过；物理样点仍可用于星位。同一候选运主的本命条件只用该候选生时的 `natal_ruler_contexts`，按 `sample_segments` 网格序号关联，不能拼接不同样本的有利条件；顶层 `natal_ruler_context` 只属名义盘。连续区段、相邻变化夹区及边界最小最大值均属离散样本证据，不表示精确生时、所有中间边界或事件日期。D30候选仍仅星座与宫位，不能补盘内度数。
 
 v11物理时刻：印占`use_true_solar_time=true`只显示太阳钟，不重定位民用出生时刻。解释依据仍用`india`的实际UTC／TT盘面；`india.profile.clock_context.solar_wall_datetime`无时区，不当另一出生或分析时间。太阳钟显示跨日、跨年或数字落入民用DST缺口，不改变物理时刻或Simon模型窗口。用户资料若明确是历史LAT/LMT，不能用此开关冒充钟制转换，也不能凭拟合推断钟制；v12可明确选择civil/local_mean_solar/local_apparent_solar，不能把原始太阳钟当民用后开显示开关。
 

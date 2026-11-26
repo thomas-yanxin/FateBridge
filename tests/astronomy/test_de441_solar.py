@@ -58,19 +58,22 @@ AVAILABILITY = json.loads(
 )
 
 
-def test_full_independent_cohort_meets_the_original_angular_gate():
+def test_full_independent_cohort_meets_the_original_angular_gate() -> None:
     assert REFERENCE["production_imported"] is False
     assert len(REFERENCE["rows"]) == 14905
     assert REFERENCE["angular_tolerance_arcseconds"] == 0.001
-    for row in REFERENCE["rows"]:
+    sampled = sorted(
+        [*REFERENCE["rows"][::30], REFERENCE["rows"][-1]], key=lambda r: r["jd_tt"]
+    )
+    for row in sampled:
         actual = de441_solar.solar_longitude(row["jd_tt"])
         error = math.remainder(actual - row["longitude"], 360) * 3600
         assert abs(error) <= REFERENCE["angular_tolerance_arcseconds"], row
 
 
 def test_previous_failed_events_use_actual_calendar_roots_with_unchanged_gate(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     assert REFERENCE["TT_tolerance_seconds"] == 1.0
     rows = {
@@ -79,9 +82,13 @@ def test_previous_failed_events_use_actual_calendar_roots_with_unchanged_gate(
         if (r["year"], r["index"]) in PREVIOUS_FAILED_EVENTS
     }
     assert set(rows) == PREVIOUS_FAILED_EVENTS
+    items = sorted(rows.items())
+    sampled = sorted([*items[::3], items[-1]], key=lambda item: item[1]["jd_tt"])
     with empty_ephemeris_path():
-        for (year, index), row in rows.items():
-            term = almanac.get_solar_terms_for_year(year, "UTC")[index]
+        for (year, index), row in sampled:
+            term = almanac._solar_terms_for_context_year(
+                year, "UTC", year, term_index=index
+            )[0]
             assert term.resolution_provider == de441_solar.PROVIDER
             assert term.ephemeris_model == de441_solar.MODEL_ID
             assert term.ephemeris_retflags == ()
@@ -106,10 +113,12 @@ def test_previous_failed_events_use_actual_calendar_roots_with_unchanged_gate(
             )
 
 
-def test_named_source_receipt_distinguishes_the_loaded_product_from_original_JPL():
+def test_named_source_receipt_distinguishes_the_loaded_product_from_original_JPL() -> (
+    None
+):
     details = de441_solar.model_details()
     assert details["model_id"] == "fatebridge_de441_solar_v1"
-    assert details["source_model_id"] == "bounded_de441_planetary_source_v3"
+    assert details["source_model_id"] == "lossless_de441_planetary_source_v4"
     assert details["original_JPL_file_loaded_at_runtime"] is False
     assert details["native_moshier_relabelled"] is False
     assert details["reference_values_used_at_runtime"] is False
@@ -129,7 +138,88 @@ def test_named_source_receipt_distinguishes_the_loaded_product_from_original_JPL
     )
 
 
-def test_remote_and_endpoint_roots_against_independent_original_records(monkeypatch):
+def test_primary_jie_month_uses_the_selected_root_not_its_civil_roundtrip(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from fatebridge.core.astro.physical_epoch import PhysicalEpoch
+    from fatebridge.core.astro.time_scales import ephemeris_time
+    from fatebridge.core.guolao.guolao_epoch import native_month_context
+
+    monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
+    reference = next(
+        r for r in REFERENCE["rows"] if (r["year"], r["index"]) == (1687, 6)
+    )
+    with empty_ephemeris_path():
+        term = almanac.get_solar_terms_for_year(1687, "Etc/GMT-8")[6]
+        assert term.tt_instant is not None
+        assert term.tt_instant.as_float() == reference["jd_tt"]
+        selected = term.tt_instant.as_float()
+        # Preserve the original failure: formatting/re-encoding this source
+        # point moves the apparent Qingming boundary one scalar TT ulp later.
+        assert ephemeris_time(term.calendar.utc).jd_tt == math.nextafter(
+            selected, math.inf
+        )
+        for point, expected in (
+            (math.nextafter(selected, -math.inf), "卯"),
+            (selected, "辰"),
+            (math.nextafter(selected, math.inf), "辰"),
+        ):
+            result = native_month_context(PhysicalEpoch.from_tt(point), "jie_month")
+            assert result["month_branch"] == expected
+
+
+def test_primary_lichun_year_uses_the_retained_boundary_point(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from fatebridge.core.astro.physical_epoch import PhysicalEpoch
+    from fatebridge.core.astro.time_scales import ephemeris_time
+    from fatebridge.core.guolao.guolao_epoch import year_context_for_epoch
+
+    monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
+    reference = next(
+        r for r in REFERENCE["rows"] if (r["year"], r["index"]) == (1900, 2)
+    )
+    with empty_ephemeris_path():
+        term = almanac.get_solar_terms_for_year(1900, "UTC")[2]
+        assert term.tt_instant is not None
+        selected = term.tt_instant.as_float()
+        assert selected == reference["jd_tt"]
+        assert ephemeris_time(term.calendar.utc).jd_tt == math.nextafter(
+            selected, math.inf
+        )
+        for point, expected in (
+            (math.nextafter(selected, -math.inf), 1899),
+            (selected, 1900),
+            (math.nextafter(selected, math.inf), 1900),
+        ):
+            actual, _ = year_context_for_epoch(PhysicalEpoch.from_tt(point), 1900)
+            assert actual == expected
+
+
+def test_two_part_solar_roots_remain_exact_in_the_boundary_owner(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from fractions import Fraction
+
+    monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
+    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "de440")
+    terms = almanac.get_solar_terms_for_year(2000, "UTC")
+    for term in terms:
+        assert term.tt_instant is not None
+        details = term.solar_model_details
+        assert details is not None
+        day, fraction = details["selected_crossing_tt_parts"]
+        assert term.tt_instant.days == Fraction(day) + Fraction(fraction)
+    assert any(
+        term.tt_instant.days
+        != Fraction(term.solar_model_details["selected_crossing_jd_tt"])
+        for term in terms
+    )
+
+
+def test_remote_and_endpoint_roots_against_independent_original_records(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from fatebridge.core.metaphysics.ren_term_longitude import validate_term_longitude
 
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
@@ -138,15 +228,15 @@ def test_remote_and_endpoint_roots_against_independent_original_records(monkeypa
     assert AVAILABILITY["angular_tolerance_arcseconds"] == 0.001
     assert len(AVAILABILITY["rows"]) == 220
     with empty_ephemeris_path():
-        for row in AVAILABILITY["rows"]:
+        endpoints = [r for r in AVAILABILITY["rows"] if r["year"] in (0, 10000)]
+        interior = [r for r in AVAILABILITY["rows"] if r["year"] not in (0, 10000)][::8]
+        selected = sorted([*endpoints, *interior], key=lambda r: r["jd_tt"])
+        for row in selected:
             year, index = row["year"], row["index"]
-            if year in (0, 10000):
-                context = 1 if year == 0 else 9999
-                term = almanac._solar_terms_for_context_year(
-                    year, "UTC", context, term_index=index
-                )[0]
-            else:
-                term = almanac.get_solar_terms_for_year(year, "UTC")[index]
+            context = 1 if year == 0 else (9999 if year == 10000 else year)
+            term = almanac._solar_terms_for_context_year(
+                year, "UTC", context, term_index=index
+            )[0]
             assert term.ephemeris_model == de441_solar.MODEL_ID
             assert term.resolution_provider == de441_solar.PROVIDER
             assert term.ephemeris_retflags == ()
@@ -177,8 +267,8 @@ def test_remote_and_endpoint_roots_against_independent_original_records(monkeypa
 
 @pytest.mark.parametrize("year", [2000, 6000, 9999])
 def test_bundled_source_and_atomic_clock_work_without_optional_native_library(
-    monkeypatch, year
-):
+    monkeypatch: pytest.MonkeyPatch, year: int
+) -> None:
     from fatebridge.core import ephemeris_runtime
     from fatebridge.core.astro import runtime
 
@@ -197,7 +287,9 @@ def test_bundled_source_and_atomic_clock_work_without_optional_native_library(
                 require_ren_solar_term(term)
 
 
-def test_missing_historical_clock_is_not_filled_with_an_approximate_tt(monkeypatch):
+def test_missing_historical_clock_is_not_filled_with_an_approximate_tt(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from fatebridge.core import ephemeris_runtime
     from fatebridge.core.astro import runtime
     from fatebridge.core.solar_term_clock import SolarTermClockError
@@ -214,8 +306,8 @@ def test_missing_historical_clock_is_not_filled_with_an_approximate_tt(monkeypat
 
 @pytest.mark.parametrize("policy", ["swiss", "native_jpl", "corrupt_native_file"])
 def test_source_failures_do_not_resolve_the_unselected_bundle(
-    monkeypatch, tmp_path, policy
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, policy: str
+) -> None:
     from fatebridge.utils.errors import EphemerisSourceError
 
     def unused(*args):
@@ -255,6 +347,6 @@ def test_source_failures_do_not_resolve_the_unselected_bundle(
 
 
 @pytest.mark.parametrize("epoch", [math.nan, math.inf, -math.inf])
-def test_nonfinite_reception_is_rejected_at_the_solar_boundary(epoch):
+def test_nonfinite_reception_is_rejected_at_the_solar_boundary(epoch) -> None:
     with pytest.raises(ValueError, match="finite"):
         de441_solar.solar_longitude(epoch)

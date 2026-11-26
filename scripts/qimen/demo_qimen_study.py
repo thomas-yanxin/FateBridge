@@ -1,12 +1,22 @@
 """Run an explicitly synthetic, all-abstaining Qimen study workflow."""
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import hashlib
 import json
 from datetime import datetime
 from pathlib import Path
 
-from fatebridge.validation.qimen_study import (
+from validation.qimen_study import (
     FrozenQimenPolicy,
     StudyInput,
     audit_study,
@@ -120,6 +130,8 @@ def main() -> int:
             )
         raw["plan"]["baseline_forecasts"] = baselines
         study = StudyInput.model_validate(raw)
+    else:
+        pass
     commitment = seal_forecasts(
         study, at=datetime.fromisoformat("2026-12-31T00:00:00+00:00")
     )
@@ -149,6 +161,8 @@ def main() -> int:
     }
     if any((args.output_dir / name).exists() for name in outputs):
         raise FileExistsError("示例输出已存在；使用新目录保留旧封存记录")
+    else:
+        pass
     args.output_dir.mkdir(parents=True, exist_ok=True)
     for name, content in outputs.items():
         with (args.output_dir / name).open("x", encoding="utf-8") as stream:
@@ -174,3 +188,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -1,0 +1,422 @@
+{
+  "call_guidance": {
+    "ephemeris_policy": "Read guolao.profile.ephemeris_provenance and, when requested, timing.profile.ephemeris_provenance. Seven physical bodies retain actual ecliptic/equatorial models and flags; incompatible frame models are rejected. Mean node/apogee and symbolic extras remain nonphysical. Fixed-star flags can echo SWIEPH while the actual Earth observer uses Moshier, so read both. Operator-selected strict JPL applies to the full required calculation, including year solar-term dependencies, and does not fall back. This provenance is not a complete file attestation, full original-text acceptance, absolute astronomical accuracy bound or outcome prediction certificate.",
+    "longitude_motion": "Seven physical bodies expose corrected tropical longitude_speed plus longitude_speed_native and separately reported correction terms. Read natal/target profile.longitude_motion for the actual model, native-version applicability, derivative convergence and observed file contexts. A selected sidereal zodiac changes zodiac_longitude, not these tropical rates. Mean/symbolic extras are unmodified. Guolao Moshier rates differentiate its own analytical apparent positions with version-gated binary-step and joint directional checks; nonconvergence stays explicitly unapplied. This does not remove physical-model error or enable the separate unsupported barycentric lunar light-time formula. No speed correction establishes precise station times, a classical judgement or real-world prediction.",
+    "nobles": "Native god_positions uses Lu Wei catalogue bundle vols.1-2 Tianyi day/Yutang night tables, including Wu/Geng same-branch exception. Read the disclosed year-boundary policy.",
+    "patterns": "Read guolao.moira_patterns rule_id and evidence.inputs/granularity with guolao.bodies, palaces, rulesets and rule_trace. profile.pattern_model_id identifies the selected condition model. Same-palace conditions do not establish a life degree or exact conjunction.",
+    "purple": "purple_model_audit distinguishes the facsimile printed 365.2564-du table from the author's 365.2575-du reference circle; the modern epoch remains unresolved. Source 中积 days are not Julian days or modern longitude; do not normalize or silently change the fit.",
+    "reference_houses": "angles, houses and planets.house are astronomical references in the selected zodiac; Lahiri houses use native Swiss sidereal cusps. Functional guolao.palaces are separately counted from source life branch, not replaced by astronomical houses. Read profile.reference_geometry: missing requested cusps yield houses=[] and planets.house=null; independently available angles may remain. Geographic poles have null reference angles. This partial reference layer does not negate calculated bodies, mansions or functional palaces.",
+    "scope": "guolao_research_v7; source ordinal life-palace counting with declared modern solar-palace/hour/term-endpoint conventions; life degree and mansion unresolved; modern equatorial research anchors; optional reference geometry reports unavailable cusps without changing functional palaces or substituting houses Apparent solar hour now reuses this run's geocentric Sun RA and estimated UT1 apparent sidereal angle. The solar display is a naive label, not a civil timezone or a new instant; measured DUT1 and physical subsecond accuracy are not certified. Read guolao.profile.apparent_solar_clock for operands and hour-boundary distance.",
+    "solar_time": "Recorded physical instant remains fixed; optional apparent solar clock determines birth-hour branch and may change life palace and dependent patterns.",
+    "target_instant": "Only pass analysis_datetime for an explicitly specified target instant with timezone offset, at or after recorded birth. Omission returns timing.status=not_requested. Read timing.small_limit with its LiChun research year policy and timing.transit_bodies for the geocentric target sky. natal_functional_palace refers to the natal reverse-counted palaces. Four extras retain disclosed models, including uncalibrated purple. For monthly limits, pass guolao_month_basis=jie_month or chinese_lunar_utc8 with analysis_datetime. The second uses fixed UTC+08 civil dates. Intercalary birth or target months stay unassigned. Read timing.month_limit for the status, selected month basis, operands and source."
+  },
+  "evidence_views": {
+    "astronomy": {
+      "fields": [
+        "person_info",
+        "guolao.profile",
+        "guolao.conditions",
+        "guolao.bodies",
+        "guolao.purple_model_audit",
+        "guolao.mansion_boundaries"
+      ],
+      "purpose": "检查时间尺度、七政两帧模型与黄经速度分项、非物理点、距星地球观测者及研究宿度；来源和修正状态不作全域精度认证"
+    },
+    "classical": {
+      "fields": [
+        "guolao.life_palace",
+        "guolao.palaces",
+        "guolao.rulesets",
+        "guolao.rule_trace",
+        "guolao.god_positions",
+        "guolao.purple_model_audit",
+        "guolao.validation"
+      ],
+      "purpose": "核对宫主度主归属与未验收依赖"
+    },
+    "patterns": {
+      "fields": [
+        "guolao.bodies",
+        "guolao.moira_patterns",
+        "guolao.rule_trace",
+        "guolao.validation"
+      ],
+      "purpose": "核对政余格局的具名条件、参与星体和计算证据"
+    },
+    "timing": {
+      "fields": [
+        "guolao.timing",
+        "guolao.life_palace",
+        "guolao.palaces",
+        "guolao.rulesets",
+        "guolao.rule_trace",
+        "guolao.validation"
+      ],
+      "purpose": "显式analysis_datetime的小限逆数及当时十一曜研究位置；未给目标则not_requested，不据此生成完整流年或现实事件概率"
+    }
+  },
+  "first_view": {
+    "fields": [
+      "person_info",
+      "guolao.life_palace",
+      "guolao.conditions",
+      "guolao.bodies",
+      "guolao.rulesets",
+      "guolao.validation"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "description": "Explicit target instant for the partial Guolao temporal research layer.",
+    "properties": {
+      "analysis_datetime": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional ISO target instant with timezone offset, at or after recorded birth. Returns source-ordinal small-limit palace with declared LiChun year policy and actual geocentric target seven bodies / four-extra models. Omit for natal only; no implicit today, full classical temporal judgement or event probability.",
+        "title": "Analysis Datetime"
+      },
+      "birth_clock_basis": {
+        "default": "civil",
+        "description": "Confirmed basis of the supplied birth label. Civil retains its timezone policy. LMT/LAT use longitude and the shared modeled UT1/TT inverse; omit birth_timezone. LMT uses its recorded label for the nominal hour unless use_true_solar_time=true selects the same natal Sun's apparent hour without changing the epoch. LAT already supplies an apparent label; either flag keeps its nominal input hour and applies no second correction. Do not infer an unknown historical clock basis. When UTC is outside datetime range, second60, or lacks a unique label, Guolao retains native TT/UT1 without a surrogate civil instant. Solar-day numerical ambiguity, unavailable month calendars, source coverage and native ordering ties remain explicit limits; no classical clock calibration or prediction certification.",
+        "enum": [
+          "civil",
+          "local_mean_solar",
+          "local_apparent_solar"
+        ],
+        "title": "Birth Clock Basis",
+        "type": "string"
+      },
+      "birth_day": {
+        "description": "Birth day (1-31)",
+        "maximum": 31,
+        "minimum": 1,
+        "title": "Birth Day",
+        "type": "integer"
+      },
+      "birth_hour": {
+        "description": "Birth hour (0-23)",
+        "maximum": 23,
+        "minimum": 0,
+        "title": "Birth Hour",
+        "type": "integer"
+      },
+      "birth_latitude": {
+        "anyOf": [
+          {
+            "maximum": 90,
+            "minimum": -90,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth latitude. Optional for core chart endpoints when FateBridge can infer it from a supported birth_place.",
+        "title": "Birth Latitude"
+      },
+      "birth_longitude": {
+        "anyOf": [
+          {
+            "maximum": 180,
+            "minimum": -180,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth longitude. Optional for core chart endpoints when FateBridge can infer it from a supported birth_place.",
+        "title": "Birth Longitude"
+      },
+      "birth_microsecond": {
+        "default": 0,
+        "description": "Explicit fraction of the recorded birth second. Preserved in the physical instant and solar-hour calculation; datetime resolution does not certify source-clock or astronomical accuracy.",
+        "maximum": 999999,
+        "minimum": 0,
+        "title": "Birth Microsecond",
+        "type": "integer"
+      },
+      "birth_minute": {
+        "default": 0,
+        "description": "Birth minute (0-59)",
+        "maximum": 59,
+        "minimum": 0,
+        "title": "Birth Minute",
+        "type": "integer"
+      },
+      "birth_month": {
+        "description": "Birth month (1-12)",
+        "maximum": 12,
+        "minimum": 1,
+        "title": "Birth Month",
+        "type": "integer"
+      },
+      "birth_place": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未提供",
+        "description": "Birth place",
+        "title": "Birth Place"
+      },
+      "birth_second": {
+        "default": 0,
+        "description": "Recorded birth second, if known. Omitted seconds use the start of the supplied minute; this does not certify exact recording precision. Leap-second labels are not represented.",
+        "maximum": 59,
+        "minimum": 0,
+        "title": "Birth Second",
+        "type": "integer"
+      },
+      "birth_timezone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "For civil input: IANA name or explicit UTC offset; omit only if birth_place resolves a timezone. Unresolved missing timezones are rejected and are not defaulted to UTC. For explicit LMT/LAT input this field must be omitted: a solar label is not a civil timezone. Converted UTC labels and native TT/UT1 are computation references, not inferred historical zones; no surrogate datetime is created for second60 or out-of-range UTC labels.",
+        "title": "Birth Timezone"
+      },
+      "birth_year": {
+        "description": "Birth year, e.g., 1990",
+        "maximum": 9999,
+        "minimum": 1,
+        "title": "Birth Year",
+        "type": "integer"
+      },
+      "ephemeris_policy": {
+        "default": "auto",
+        "description": "Guolao retains its existing observed source rules; the Western require_data_files request policy is not implemented for this variant.",
+        "enum": [
+          "auto",
+          "require_data_files"
+        ],
+        "title": "Ephemeris Policy",
+        "type": "string"
+      },
+      "gender": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未知",
+        "description": "性别（可选，仅用于结果标识；西方星盘计算不使用性别）。接受此字段是为了让同一套出生信息可以原样喂给八字/紫微/星盘等工具，避免批量调用时'有的工具收、有的不收'造成的反复试错。",
+        "title": "Gender"
+      },
+      "guolao_month_basis": {
+        "anyOf": [
+          {
+            "enum": [
+              "jie_month",
+              "chinese_lunar_utc8"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional Guolao monthly-limit research policy; requires analysis_datetime. jie_month uses calculated Jie boundaries with Yin=month 1; chinese_lunar_utc8 uses regular Chinese lunar month numbers on UTC+08 civil dates and leaves intercalary birth/target months unassigned. Neither mapping is certified by the cited edition. The annual small limit keeps its declared LiChun year policy. Omit to leave the monthly layer unrequested.",
+        "title": "Guolao Month Basis"
+      },
+      "guolao_seasonal_anchor_policy": {
+        "anyOf": [
+          {
+            "enum": [
+              "term_instants",
+              "source_solar_days_winter_exclusive",
+              "source_solar_days_winter_inclusive"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional Guolao anchor policy. term_instants preserves v7. source_solar_days_winter_exclusive/inclusive require use_true_solar_time=true or an explicit LAT input: use the same Sun/UT1 apparent-solar day, include the whole Major Cold, summer-solstice and Minor Heat days, and exclude/include the winter-solstice day. These explicit v8 hypotheses do not adjudicate historical day boundaries or predictive validity; numerical ambiguity and model changes error without fallback.",
+        "title": "Guolao Seasonal Anchor Policy"
+      },
+      "hsys": {
+        "anyOf": [
+          {
+            "maximum": 8,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional offline house system override; if omitted, FateBridge keeps each chart variant's historical default. Explicit values currently support 0=whole_sign, 1=Alcabitus, 2=Regiomontanus, 3=Placidus, 4=Koch, 5=Vehlow Equal, 6=Polich Page, 7=Sripati, 8=equal_mc Explicit values must be integer codes0..8; boolean, floating-point, blank and out-of-range values are rejected.",
+        "title": "Hsys"
+      },
+      "name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未提供",
+        "description": "Name (optional)",
+        "title": "Name"
+      },
+      "use_true_solar_time": {
+        "default": false,
+        "description": "Rebase the birth clock onto true solar time (longitude + equation of time). Default OFF: western astrology conventionally casts on the recorded civil (zone) clock time. Set true to align the western chart with the BaZi engine's apparent-solar instant. Guolao and Indian charts preserve the recorded civil instant and report the solar clock separately.",
+        "title": "Use True Solar Time",
+        "type": "boolean"
+      },
+      "zodiacal": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional offline zodiac override; if omitted, FateBridge keeps each chart variant's historical default. Explicit values currently support 0=tropical and 1=sidereal(Lahiri-like)",
+        "title": "Zodiacal"
+      }
+    },
+    "required": [
+      "birth_year",
+      "birth_month",
+      "birth_day",
+      "birth_hour"
+    ],
+    "title": "AstroGuolaoRequest",
+    "type": "object"
+  },
+  "method_contracts": [
+    {
+      "comparison_requirements": [
+        "相同方法合同、实现与数据版本、选项及实际计算层"
+      ],
+      "dependencies": [
+        "validated_request"
+      ],
+      "error_sources": [
+        "civil_clock",
+        "observer_location",
+        "earth_rotation",
+        "ephemeris_model",
+        "numerical_solver",
+        "display_quantization",
+        "rule_adjudication"
+      ],
+      "implementation_refs": [
+        "src/fatebridge/core/astro/chart.py"
+      ],
+      "limitations": [
+        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
+        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
+      ],
+      "method_id": "fatebridge.western_natal_geometry.contract_v1",
+      "output_paths": [
+        "planets",
+        "chart_profile",
+        "guolao"
+      ],
+      "prerequisites": [
+        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
+      ],
+      "quantity_kind": "astronomy_and_rule_result",
+      "role": "calculation",
+      "selector_fields": [
+        "ephemeris_policy",
+        "birth_clock_basis",
+        "guolao_month_basis",
+        "guolao_seasonal_anchor_policy"
+      ],
+      "source_refs": [
+        "docs/western-astrology.md"
+      ],
+      "unit": "per_field",
+      "validation_scope": {
+        "numerical": "method_specific_reference_required",
+        "real_world_validity": "not_established",
+        "source_conformity": "not_fully_accepted"
+      }
+    },
+    {
+      "comparison_requirements": [
+        "相同方法合同、实现与数据版本、选项及实际计算层"
+      ],
+      "dependencies": [
+        "validated_request"
+      ],
+      "error_sources": [
+        "civil_clock",
+        "earth_rotation",
+        "ephemeris_model",
+        "rule_adjudication"
+      ],
+      "implementation_refs": [
+        "src/fatebridge/core/astro/chart.py"
+      ],
+      "limitations": [
+        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
+        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
+      ],
+      "method_id": "fatebridge.guolao_mansions_and_rules.contract_v1",
+      "output_paths": [
+        "planets",
+        "chart_profile",
+        "guolao"
+      ],
+      "prerequisites": [
+        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
+      ],
+      "quantity_kind": "astronomy_and_rule_result",
+      "role": "calculation",
+      "selector_fields": [
+        "ephemeris_policy",
+        "birth_clock_basis",
+        "guolao_month_basis",
+        "guolao_seasonal_anchor_policy"
+      ],
+      "source_refs": [
+        "docs/algorithm-coverage.md"
+      ],
+      "unit": "per_field",
+      "validation_scope": {
+        "numerical": "method_specific_reference_required",
+        "real_world_validity": "not_established",
+        "source_conformity": "not_fully_accepted"
+      }
+    }
+  ],
+  "tool": "guolao_chart"
+}

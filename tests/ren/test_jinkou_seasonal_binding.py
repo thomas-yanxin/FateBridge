@@ -10,7 +10,7 @@ import pytest
 from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
-from fatebridge.core.output_chinese import JinkouCourse
+from fatebridge.core.contracts.output_chinese import JinkouCourse
 from fatebridge.core.public_output import same_public_value
 from tests.support.transports import AS_OF, REST_POST_CASES, SPECS, rest, surface_calls
 
@@ -42,7 +42,7 @@ def output():
     return fn(*args, **kw)
 
 
-def test_primary_25_cells_keep_month_duration_and_daily_rules_unresolved():
+def test_primary_25_cells_keep_month_duration_and_daily_rules_unresolved() -> None:
     from fatebridge.core.metaphysics.jinkou_seasonal import seasonal_power
 
     for season, states in REF["seasons"].items():
@@ -55,13 +55,13 @@ def test_primary_25_cells_keep_month_duration_and_daily_rules_unresolved():
 
 
 @pytest.mark.parametrize("fault", FAULTS)
-def test_full_main_and_annual_basis_is_required_and_calculation_bound(fault):
+def test_full_main_and_annual_basis_is_required_and_calculation_bound(fault) -> None:
     with pytest.raises(execution.OutputContractError):
         execution.validate_output(SPEC, AUDIT.corrupt(output(), fault))
 
 
 @pytest.mark.parametrize("fault", ["seasonal_power", "basis", "invalid_month"])
-def test_partial_course_uses_its_present_month_anchor(fault):
+def test_partial_course_uses_its_present_month_anchor(fault: str) -> None:
     with pytest.raises(ValidationError):
         JinkouCourse.model_validate(AUDIT.corrupt(output(), "sparse_" + fault))
 
@@ -69,14 +69,16 @@ def test_partial_course_uses_its_present_month_anchor(fault):
 @pytest.mark.parametrize("fault", FAULTS)
 @pytest.mark.parametrize("project", [False, True])
 def test_contradictory_explanation_is_rejected_before_projection_on_three_ports(
-    fault, project, monkeypatch, surface_calls
-):
+    fault, project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     bad = AUDIT.corrupt(output(), fault)
     original = execution.execute_spec
 
     def broken(spec, request):
         if spec.key == SPEC.key:
             spec = replace(spec, bind=lambda _: (lambda: copy.deepcopy(bad), (), {}))
+        else:
+            pass
         return original(spec, request)
 
     monkeypatch.setattr(execution, "execute_spec", broken)
@@ -87,6 +89,8 @@ def test_contradictory_explanation_is_rejected_before_projection_on_three_ports(
         params.update(fields="analysis_type", strict_fields="true")
         opts.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         SPEC, PAYLOAD, params=params, options=opts, flags=flags, cli_first=False
     )
@@ -94,7 +98,7 @@ def test_contradictory_explanation_is_rejected_before_projection_on_three_ports(
     assert cli["error_code"] == "internal_error"
 
 
-def test_projection_does_not_invent_missing_month_or_five_state_values():
+def test_projection_does_not_invent_missing_month_or_five_state_values() -> None:
     for value in (
         {},
         {"rows": [{"seasonal_power": "旺"}]},
@@ -111,16 +115,18 @@ def test_projection_does_not_invent_missing_month_or_five_state_values():
 
 @pytest.mark.parametrize("project", [False, True])
 def test_correct_main_and_annual_explanations_survive_three_ports(
-    project, surface_calls
-):
+    project: bool, surface_calls
+) -> None:
     fields = ["jinkou.overview.power_basis", "jinkou.rows", "jinkou.year_fate.course"]
-    params = [("as_of", AS_OF), ("response_char_limit", "0")]
-    flags = ["--response-char-limit", "0"]
-    opts = {}
+    params = [("as_of", AS_OF), ("response_char_limit", "0"), ("detail", "audit")]
+    flags = ["--response-char-limit", "0", "--detail", "audit"]
+    opts = {"detail": "audit"}
     if project:
         params += [("fields", f) for f in fields] + [("strict_fields", "true")]
         flags += ["--fields", *fields, "--strict-fields", "true"]
         opts.update(fields=fields, strict_fields=True)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         SPEC, PAYLOAD, params=params, options=opts, flags=flags, cli_first=False
     )

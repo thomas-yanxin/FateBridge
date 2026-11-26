@@ -4,8 +4,13 @@ from __future__ import annotations
 
 from typing import Any
 
-from .common import MetaphysicsSeed
-from .jinkou_year_fate import SOURCE_SHA256, SOURCE_URL, confirmed_natal_branch
+from fatebridge.core.metaphysics.common import MetaphysicsSeed
+from fatebridge.core.metaphysics.jinkou import build_jinkou_board
+from fatebridge.core.metaphysics.jinkou_year_fate import (
+    SOURCE_SHA256,
+    SOURCE_URL,
+    confirmed_natal_branch,
+)
 
 
 def natal_course_metadata(
@@ -57,7 +62,6 @@ def build_natal_course(
     gender: str,
     is_diurnal: bool | None,
 ) -> dict[str, Any]:
-    from .jinkou import build_jinkou_board
 
     result = natal_course_metadata(birth_year_ganzhi, natal_branch)
     result["course"] = None

@@ -15,7 +15,7 @@ from fatebridge.core.astro.day_meridian import (
     day_meridian_coordinates,
     target_sun_state,
 )
-from fatebridge.core.output_midpoints import MidpointAnalysis
+from fatebridge.core.contracts.output_midpoints import MidpointAnalysis
 from fatebridge.services.astrology import calculate_germany_chart_analysis
 from tests.fixtures.surface_payloads import astro_payload
 
@@ -34,7 +34,7 @@ def _independent_circle(degrees):
     return math.degrees(math.atan2(z.imag, z.real)) % 360
 
 
-def test_witte1924_original_printed_equation_and_preserved_1923_difference():
+def test_witte1924_original_printed_equation_and_preserved_1923_difference() -> None:
     case = ORIGINAL["example"]
     lower = _source_degrees(case["natal_lower_meridian"])
     arc = Fraction(case["solar_arc_degrees_minutes"][0]) + Fraction(
@@ -63,7 +63,7 @@ def test_witte1924_original_printed_equation_and_preserved_1923_difference():
 
 
 @pytest.mark.parametrize("value", [math.nan, math.inf, -math.inf])
-def test_day_meridian_rejects_nonfinite_inputs_in_each_operand(value):
+def test_day_meridian_rejects_nonfinite_inputs_in_each_operand(value) -> None:
     for index in range(4):
         operands = [200.0, 310.0, 43.0, 1.0]
         operands[index] = value
@@ -71,7 +71,7 @@ def test_day_meridian_rejects_nonfinite_inputs_in_each_operand(value):
             day_meridian_coordinates(*operands)
 
 
-def test_day_meridian_preserves_wrap_side_and_does_not_become_plain_solar_arc():
+def test_day_meridian_preserves_wrap_side_and_does_not_become_plain_solar_arc() -> None:
     tiny = math.nextafter(0.0, -math.inf)
     result = day_meridian_coordinates(0.0, 0.0, 0.0, tiny)
     assert 0 < result["upper_meridian_longitude"] < 360
@@ -91,7 +91,7 @@ def test_day_meridian_preserves_wrap_side_and_does_not_become_plain_solar_arc():
 
 @HAS_SWE
 @pytest.mark.parametrize("row", HORIZONS["rows"], ids=lambda r: r["utc"])
-def test_actual_target_sun_uses_independent_recorded_horizons_positions(row):
+def test_actual_target_sun_uses_independent_recorded_horizons_positions(row) -> None:
     state = target_sun_state(datetime.fromisoformat(row["utc"]))
     delta = abs(
         (state["target_tropical_sun"] - row["apparent_ecliptic_longitude"] + 180) % 360
@@ -106,8 +106,8 @@ def test_actual_target_sun_uses_independent_recorded_horizons_positions(row):
 @HAS_SWE
 @pytest.mark.parametrize("uncertainty", [None, 0, 5])
 def test_day_meridian_replays_every_confirmed_birth_sample_without_inventing_precision(
-    uncertainty,
-):
+    uncertainty: int | None,
+) -> None:
     result = calculate_germany_chart_analysis(
         **astro_payload(),
         analysis_datetime=datetime(2026, 1, 1, tzinfo=timezone.utc),
@@ -135,7 +135,6 @@ def test_day_meridian_replays_every_confirmed_birth_sample_without_inventing_pre
     sensitivity = day["birth_time_sensitivity"]
     assert sensitivity["uncertainty_minutes"] == uncertainty
     assert sensitivity["continuous_interval_proven"] is False
-    assert sensitivity["sample_frequency_is_probability"] is False
     if uncertainty is None:
         assert sensitivity["status"] == "not_assessed"
         assert "samples" not in sensitivity
@@ -163,6 +162,8 @@ def test_day_meridian_replays_every_confirmed_birth_sample_without_inventing_pre
                 ]
                 == 0
             )
+        else:
+            pass
     invalid = {
         "solar_arc_analysis": {
             "daily_meridian": {"profile": {"upper_meridian_longitude": "not-a-number"}}
@@ -173,7 +174,9 @@ def test_day_meridian_replays_every_confirmed_birth_sample_without_inventing_pre
 
 
 @HAS_SWE
-def test_sidereal_display_and_birth_instant_keep_the_method_and_layers_distinct():
+def test_sidereal_display_and_birth_instant_keep_the_method_and_layers_distinct() -> (
+    None
+):
     args = {
         **astro_payload(),
         "analysis_datetime": datetime(2026, 1, 1, tzinfo=timezone.utc),
@@ -194,7 +197,9 @@ def test_sidereal_display_and_birth_instant_keep_the_method_and_layers_distinct(
     assert "solar_arc_analysis" not in nominal
 
 
-def test_target_sun_rejects_unknown_offset_and_missing_ephemeris(monkeypatch):
+def test_target_sun_rejects_unknown_offset_and_missing_ephemeris(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     with pytest.raises(ValueError, match="timezone"):
         target_sun_state(datetime(2000, 1, 1))
     monkeypatch.setattr(runtime, "swe", None)
@@ -203,7 +208,7 @@ def test_target_sun_rejects_unknown_offset_and_missing_ephemeris(monkeypatch):
 
 
 @HAS_SWE
-def test_day_meridian_at_the_effective_birth_instant_returns_natal_angles():
+def test_day_meridian_at_the_effective_birth_instant_returns_natal_angles() -> None:
     layer = calculate_germany_chart_analysis(
         birth_year=2000,
         birth_month=1,

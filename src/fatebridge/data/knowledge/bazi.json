@@ -437,14 +437,8 @@
       "天乙贵人": {
         "title": "天乙贵人",
         "tips": [
-          "天乙贵人为八字中最吉之神煞。",
-          "天乙贵人主逢凶化吉、贵人相助。",
-          "命带天乙贵人者，一生贵人运佳，遇难呈祥。",
-          "==",
           "**查法：**以日干查四柱地支。",
-          "甲戊庚见丑未，乙己见子申，丙丁见亥酉，辛见寅午，壬见卯巳，癸见卯巳。",
-          "==",
-          "**影响：**主有贵人相助，化险为夷，事业有成。"
+          "甲戊庚见丑未，乙己见子申，丙丁见亥酉，辛见寅午，壬癸见卯巳。"
         ]
       },
       "文昌": {
@@ -478,8 +472,8 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/analysis/education.py",
-              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
           "source_tip_indices": [
@@ -503,124 +497,74 @@
       "桃花": {
         "title": "桃花（咸池）",
         "tips": [
-          "桃花主异性缘、风流、才华、魅力。",
-          "命带桃花者，异性缘佳，有艺术气质。",
-          "桃花过多则风流好色，感情复杂。",
-          "==",
           "**查法：**以年支或日支查四柱地支。",
-          "申子辰见酉，寅午戌见卯，亥卯未见子，巳酉丑见午。",
-          "==",
-          "**影响：**主异性缘佳、有魅力，但需防烂桃花。"
+          "申子辰见酉，寅午戌见卯，亥卯未见子，巳酉丑见午。"
         ]
       },
       "驿马": {
         "title": "驿马",
         "tips": [
-          "驿马主奔波、变动、出行、迁移。",
-          "命带驿马者，一生多变动，适合流动性工作。",
-          "==",
           "**查法：**以年支或日支查四柱地支。",
-          "申子辰见寅，寅午戌见申，亥卯未见巳，巳酉丑见亥。",
-          "==",
-          "**影响：**主奔波劳碌、变动频繁，利出行、迁移。"
+          "申子辰见寅，寅午戌见申，亥卯未见巳，巳酉丑见亥。"
         ]
       },
       "华盖": {
         "title": "华盖",
         "tips": [
-          "华盖主聪明、孤高、艺术、宗教。",
-          "命带华盖者，聪明好学，有艺术天赋，但性格孤僻。",
-          "==",
           "**查法：**以年支或日支查四柱地支。",
-          "申子辰见辰，寅午戌见戌，亥卯未见未，巳酉丑见丑。",
-          "==",
-          "**影响：**主聪明好学、有艺术天赋，但孤独感强。"
+          "申子辰见辰，寅午戌见戌，亥卯未见未，巳酉丑见丑。"
         ]
       },
       "天德贵人": {
         "title": "天德贵人",
         "tips": [
-          "天德贵人为吉星，主逢凶化吉、品德高尚。",
-          "命带天德者，一生少灾祸，有贵人相助。",
-          "==",
           "**查法：**以月支查四柱天干或地支。",
-          "正月见丁，二月见申，三月见壬，四月见辛，五月见亥，六月见甲，七月见癸，八月见寅，九月见丙，十月见乙，十一月见巳，十二月见庚。",
-          "==",
-          "**影响：**主品德高尚、逢凶化吉、贵人相助。"
+          "寅见丁，卯见申，辰见壬，巳见辛，午见亥，未见甲，申见癸，酉见寅，戌见丙，亥见乙，子见巳，丑见庚。"
         ]
       },
       "月德贵人": {
         "title": "月德贵人",
         "tips": [
-          "月德贵人为吉星，主阴德、福报、化解灾祸。",
-          "命带月德者，一生有福报，遇难呈祥。",
-          "==",
           "**查法：**以月支查四柱天干。",
-          "寅午戌月见丙，申子辰月见壬，亥卯未月见甲，巳酉丑月见庚。",
-          "==",
-          "**影响：**主有福报、阴德庇佑、化解灾祸。"
+          "寅午戌月见丙，申子辰月见壬，亥卯未月见甲，巳酉丑月见庚。"
         ]
       },
       "将星": {
         "title": "将星",
         "tips": [
-          "将星主领导力、权威、组织能力。",
-          "命带将星者，有领导才能，适合管理岗位。",
-          "==",
           "**查法：**以年支或日支查四柱地支。",
-          "申子辰见子，寅午戌见午，亥卯未见卯，巳酉丑见酉。",
-          "==",
-          "**影响：**主有领导力、组织能力强、事业有成。"
+          "申子辰见子，寅午戌见午，亥卯未见卯，巳酉丑见酉。"
         ]
       },
       "金舆": {
         "title": "金舆",
         "tips": [
-          "金舆主富贵、车马、享受。",
-          "命带金舆者，生活富足，有车马之福。",
-          "==",
           "**查法：**以日干查四柱地支。",
-          "甲龙乙蛇丙午羊，丁未申庚戌亥藏，辛逢丑癸逢寅位，此是金舆一例详。",
-          "==",
-          "**影响：**主生活富足、有车马之福、享受生活。"
+          "当前盘面采用：甲见辰，乙见巳，丙戊见未，丁己见申，庚见戌，辛见亥，壬见丑，癸见寅。",
+          "旧资料所载口诀：「甲龙乙蛇丙午羊，丁未申庚戌亥藏，辛逢丑癸逢寅位，此是金舆一例详。」"
         ]
       },
       "孤辰寡宿": {
         "title": "孤辰寡宿",
         "tips": [
-          "孤辰寡宿主孤独、独立、晚婚。",
-          "命带孤辰寡宿者，性格独立，婚姻较晚。",
-          "==",
-          "**查法：**以年支或日支查四柱地支。",
-          "亥子丑见寅为孤辰、见戌为寡宿；寅卯辰见巳为孤辰、见丑为寡宿；巳午未见申为孤辰、见辰为寡宿；申酉戌见亥为孤辰、见未为寡宿。",
-          "==",
-          "**影响：**主性格独立、内心孤独、婚姻较晚。"
+          "**查法：**当前盘面以日支查四柱地支。",
+          "亥子丑见寅为孤辰、见戌为寡宿；寅卯辰见巳为孤辰、见丑为寡宿；巳午未见申为孤辰、见辰为寡宿；申酉戌见亥为孤辰、见未为寡宿。"
         ]
       },
       "红鸾天喜": {
         "title": "红鸾天喜",
         "tips": [
-          "红鸾天喜主婚恋喜事、感情顺遂。",
-          "命带红鸾天喜者，异性缘佳，感情生活丰富。",
-          "==",
           "**查法：**以年支查四柱地支。",
           "红鸾：子见卯、丑见寅、寅见丑、卯见子、辰见亥、巳见戌、午见酉、未见申、申见未、酉见午、戌见巳、亥见辰。",
-          "天喜：子见酉、丑见申、寅见未、卯见午、辰见巳、巳见辰、午见卯、未见寅、申见丑、酉见子、戌见亥、亥见戌。",
-          "==",
-          "**影响：**主婚恋喜事、感情顺遂、桃花运佳。"
+          "天喜：子见酉、丑见申、寅见未、卯见午、辰见巳、巳见辰、午见卯、未见寅、申见丑、酉见子、戌见亥、亥见戌。"
         ]
       },
       "学堂词馆": {
         "title": "学堂词馆",
         "tips": [
-          "学堂词馆主学业、文采、考试。",
-          "命带学堂词馆者，学习能力强，文采出众。",
-          "==",
           "**查法：**以日干查四柱地支。",
           "学堂：甲见亥、乙见午、丙见寅、丁见酉、戊见寅、己见酉、庚见巳、辛见子、壬见申、癸见卯。",
-          "词馆：甲见寅、乙见卯、丙见巳、丁见午、戊见巳、己见午、庚见申、辛见酉、壬见亥、癸见子。",
-          "==",
-          "**影响：**主学业有成、文采出众、利考试。"
+          "词馆：甲见寅、乙见卯、丙见巳、丁见午、戊见巳、己见午、庚见申、辛见酉、壬见亥、癸见子。"
         ]
       }
     },
@@ -630,7 +574,7 @@
         "tips": [
           "所选原典以月令为取用入口，再以四柱配合辨成败；不是四柱任有正官就已成正官格。",
           "财生官、印护官是条件路径；还须查伤官、刑冲、财印的位置与是否妨碍，不能列一组对所有官格都适用的喜忌。",
-          "实际输出应先核对monthly_structure.structure_god或evidence_chain.month_command.selected_god，再读透藏、根气、位置和制化前提；候选名与星的共现不认证成格。",
+          "实际输出应先核对monthly_structure.use_resolution或evidence_chain.month_command.use_resolution的全部适用见证，再读透藏、根气、位置和制化前提；structure_god/selected_god只是单锚参考，会支十神类不自动指明正偏，见证并存不认证成格或喜忌。",
           "官格标签不证明品行、领导能力、职业资格或适合仕途。"
         ],
         "curation": {
@@ -671,7 +615,7 @@
         "tips": [
           "月令七杀候选与全局杀格成立是两层判断，七杀有字或有根不等于制化已适当。",
           "原典列食神制杀、杀印等路径，须另查制化是否过重、财是否妨碍或另有合去；不可把财、比劫一概列忌。",
-          "实际输出应先核对monthly_structure.structure_god或evidence_chain.month_command.selected_god，再读透藏、根气、位置和制化前提；候选名与星的共现不认证成格。",
+          "实际输出应先核对monthly_structure.use_resolution或evidence_chain.month_command.use_resolution的全部适用见证，再读透藏、根气、位置和制化前提；structure_god/selected_god只是单锚参考，会支十神类不自动指明正偏，见证并存不认证成格或喜忌。",
           "不由格名推断魄力、压力、危险、职业或现实成败。"
         ],
         "curation": {
@@ -712,7 +656,7 @@
         "tips": [
           "月令食神候选须再查生财、制杀、逢印等不同路径，不能由食神出现就断已成格。",
           "原典食神生财分身食财相对力量与财根；食神逢印、杀印或财护食也各有前提，不能统一认定印必夺食、官杀必破格。",
-          "实际输出应先核对monthly_structure.structure_god或evidence_chain.month_command.selected_god，再读透藏、根气、位置和制化前提；候选名与星的共现不认证成格。",
+          "实际输出应先核对monthly_structure.use_resolution或evidence_chain.month_command.use_resolution的全部适用见证，再读透藏、根气、位置和制化前提；structure_god/selected_god只是单锚参考，会支十神类不自动指明正偏，见证并存不认证成格或喜忌。",
           "食神名称不证明才华、收入保障、生活层次或某一行业适合度。"
         ],
         "curation": {
@@ -753,7 +697,7 @@
         "tips": [
           "所选月令为伤官时，仍须分生财、佩印、带杀及带官等条件路径。",
           "原典对金水伤官等气候情境另论，不能把见官直接等同有祸；印与财的适用也须看身、伤、印及位置配置。",
-          "实际输出应先核对monthly_structure.structure_god或evidence_chain.month_command.selected_god，再读透藏、根气、位置和制化前提；候选名与星的共现不认证成格。",
+          "实际输出应先核对monthly_structure.use_resolution或evidence_chain.month_command.use_resolution的全部适用见证，再读透藏、根气、位置和制化前提；structure_god/selected_god只是单锚参考，会支十神类不自动指明正偏，见证并存不认证成格或喜忌。",
           "格名不鉴定叛逆、创造力、职业水平或现实制度冲突。"
         ],
         "curation": {
@@ -794,7 +738,7 @@
         "tips": [
           "月令正财候选不等于财富、理财能力或生活稳定性已经成立。",
           "生克上食伤生财，不是“伤官泄财”；财生官、食神生财、财印并用等须各查力量、根气、位置及是否相碍，印也不是一律为喜。",
-          "实际输出应先核对monthly_structure.structure_god或evidence_chain.month_command.selected_god，再读透藏、根气、位置和制化前提；候选名与星的共现不认证成格。",
+          "实际输出应先核对monthly_structure.use_resolution或evidence_chain.month_command.use_resolution的全部适用见证，再读透藏、根气、位置和制化前提；structure_god/selected_god只是单锚参考，会支十神类不自动指明正偏，见证并存不认证成格或喜忌。",
           "持续收入是现代讨论类比，不能由正财名称鉴定收益、收入正当性或职业适合度。"
         ],
         "curation": {
@@ -835,7 +779,7 @@
         "tips": [
           "正财、偏财先是日主所克之干的阴阳分类；月令偏财候选须再看全局配合。",
           "财生官、食神生财、财印相配和比劫争财不能只凭星名定喜忌，须查月令取用、透藏、财根及救应。",
-          "实际输出应先核对monthly_structure.structure_god或evidence_chain.month_command.selected_god，再读透藏、根气、位置和制化前提；候选名与星的共现不认证成格。",
+          "实际输出应先核对monthly_structure.use_resolution或evidence_chain.month_command.use_resolution的全部适用见证，再读透藏、根气、位置和制化前提；structure_god/selected_god只是单锚参考，会支十神类不自动指明正偏，见证并存不认证成格或喜忌。",
           "偏财格不证明投资能力、横财、交易优势或经商适合度。"
         ],
         "curation": {
@@ -876,7 +820,7 @@
         "tips": [
           "所选印格条件须把日主与印分别判断；身印合计的工程强弱标签不能代替原典的身、印相对力量。",
           "原典明确有身印两旺用食伤泄气、印多用财等分支，不能把食伤一概列为印格忌神，也不能把财一概判为坏印。",
-          "实际输出应先核对monthly_structure.structure_god或evidence_chain.month_command.selected_god，再读透藏、根气、位置和制化前提；候选名与星的共现不认证成格。",
+          "实际输出应先核对monthly_structure.use_resolution或evidence_chain.month_command.use_resolution的全部适用见证，再读透藏、根气、位置和制化前提；structure_god/selected_god只是单锚参考，会支十神类不自动指明正偏，见证并存不认证成格或喜忌。",
           "印格不证明学历、记忆、文化修养或现实职称；既有原典强弱反例仍未解决。"
         ],
         "curation": {
@@ -919,7 +863,7 @@
         "tips": [
           "偏印与正印先是生我之干的阴阳分类；印格的可用路径仍需所选月令与全局条件。",
           "所选印格、食神段落分别讨论用食伤泄气、用财及逢枭等配置；偏印出现不自动成为夺食，也不意味着“无特殊忌神”。",
-          "实际输出应先核对monthly_structure.structure_god或evidence_chain.month_command.selected_god，再读透藏、根气、位置和制化前提；候选名与星的共现不认证成格。",
+          "实际输出应先核对monthly_structure.use_resolution或evidence_chain.month_command.use_resolution的全部适用见证，再读透藏、根气、位置和制化前提；structure_god/selected_god只是单锚参考，会支十神类不自动指明正偏，见证并存不认证成格或喜忌。",
           "不从偏印格断技能高低、研究能力或某种职业资质。"
         ],
         "curation": {
@@ -962,7 +906,7 @@
         "tips": [
           "建禄先核对日干实际禄位是否在月支；当前实现用明确禄座表，不把任意本气比劫都标建禄。",
           "所选原典把建禄与月劫同论，以透干会支另查财、官、杀、食等取用。禄位成立不等于全局日主一定强旺，更不直接等于已成格。",
-          "实际输出应先核对monthly_structure.structure_god或evidence_chain.month_command.selected_god，再读透藏、根气、位置和制化前提；候选名与星的共现不认证成格。",
+          "实际输出应先核对monthly_structure.use_resolution或evidence_chain.month_command.use_resolution的全部适用见证，再读透藏、根气、位置和制化前提；structure_god/selected_god只是单锚参考，会支十神类不自动指明正偏，见证并存不认证成格或喜忌。",
           "建禄不证明自立、祖业状况、创业能力或白手起家；禄座资格与全局力量分开核对。"
         ],
         "curation": {
@@ -1005,7 +949,7 @@
         "tips": [
           "保留旧查询键，先核对所选阳刃规则的五阳干及实际月支资格；“甲日卯月”描述月刃，不是日坐羊刃。",
           "原典刃用官杀仍须核对根、制伏、合杀或合官是否使其失去作用、财印相随及伤食的具体角色；刃杀共现不认证驾杀成格。",
-          "实际输出应先核对monthly_structure.structure_god或evidence_chain.month_command.selected_god，再读透藏、根气、位置和制化前提；候选名与星的共现不认证成格。",
+          "实际输出应先核对monthly_structure.use_resolution或evidence_chain.month_command.use_resolution的全部适用见证，再读透藏、根气、位置和制化前提；structure_god/selected_god只是单锚参考，会支十神类不自动指明正偏，见证并存不认证成格或喜忌。",
           "阳刃或七杀不构成人身危险、权威、军警医疗职业或创业成败结论。"
         ],
         "curation": {
@@ -1053,10 +997,9 @@
           "**方位与时序：**《礼记·月令》以立春盛德在木、迎春东郊，属于春与东方的礼制时序对应；不能单凭这项对应选个人吉方、判断某月旺衰或指定出行时刻。",
           "**颜色：**《月令》列青衣、苍玉；绿色是现代配色近似。古代颜色名、现代配色与个人幸运色效力是不同主张。",
           "**数字：**《五行大义》分木的生数三、成数八；《月令》本项数为八。3、8是历史数理对应，不是已经验证的幸运数或预测概率。",
-          "**行业举例：**教育、文化、园林、医药、纺织属于本项目现代编辑类比，不是上述古籍给出的职业适配表；选择须结合能力、经验和实际岗位条件。",
           "**医籍文化对应：**《素问·阴阳应象大论》列肝—筋—目，《灵枢·本输》列肝合胆。此为所选古代医籍的分类，不是八字测得的器官状态、疾病风险或现代解剖结论。",
           "**计算层：**本程序的木元素出现量、工程旺衰与上述原典象义分别读取；旺弱标签不测量智力、诚信、主见或心理健康，也不据此认定身体、生育功能。",
-          "**出处与适用：**方位时序、颜色、数字和医籍分类按各自原文核对；《月令》的祭先脏不是《素问》的在藏对应。现代行业与配色另作编辑类比，未完成独立书影校勘或专家验收。"
+          "**出处与适用：**方位时序、颜色、数字和医籍分类按各自原文核对；《月令》的祭先脏与《素问》的在藏对应分属两套分类。"
         ],
         "curation": {
           "method_id": "primary_element_correspondence_curation_v1",
@@ -1174,10 +1117,9 @@
           "**方位与时序：**《礼记·月令》以立夏盛德在火、迎夏南郊，属于夏与南方的礼制时序对应；不能单凭这项对应选个人吉方、判断某月旺衰或指定出行时刻。",
           "**颜色：**《月令》列朱衣、赤玉；紫色是现代配色类比。古代颜色名、现代配色与个人幸运色效力是不同主张。",
           "**数字：**《五行大义》分火的生数二、成数七；《月令》本项数为七。2、7是历史数理对应，不是已经验证的幸运数或预测概率。",
-          "**行业举例：**互联网、电子、餐饮、传媒、娱乐属于本项目现代编辑类比，不是上述古籍给出的职业适配表；选择须结合能力、经验和实际岗位条件。",
           "**医籍文化对应：**《素问·阴阳应象大论》列心—脉—舌，《灵枢·本输》列心合小肠。此为所选古代医籍的分类，不是八字测得的器官状态、疾病风险或现代解剖结论。",
           "**计算层：**本程序的火元素出现量、工程旺衰与上述原典象义分别读取；旺弱标签不测量智力、诚信、主见或心理健康，也不据此认定身体、生育功能。",
-          "**出处与适用：**方位时序、颜色、数字和医籍分类按各自原文核对；《月令》的祭先脏不是《素问》的在藏对应。现代行业与配色另作编辑类比，未完成独立书影校勘或专家验收。"
+          "**出处与适用：**方位时序、颜色、数字和医籍分类按各自原文核对；《月令》的祭先脏与《素问》的在藏对应分属两套分类。"
         ],
         "curation": {
           "method_id": "primary_element_correspondence_curation_v1",
@@ -1295,10 +1237,9 @@
           "**方位与时序：**《月令》另列中央土；《五行大义》另说土王四季、不独名一时。当前辰戌丑未的土支分类不等于每月全程土司令；分日说法有不同来源，须另核已选规则。",
           "**颜色：**《月令》列黄衣、黄玉；棕色是现代配色类比。古代颜色名、现代配色与个人幸运色效力是不同主张。",
           "**数字：**《五行大义》分土的生数五、成数十；《月令》本项数为五。5、10是历史数理对应，不是已经验证的幸运数或预测概率。",
-          "**行业举例：**房地产、农业、矿业、仓储、人力资源属于本项目现代编辑类比，不是上述古籍给出的职业适配表；选择须结合能力、经验和实际岗位条件。",
           "**医籍文化对应：**《素问·阴阳应象大论》列脾—肉—口，《灵枢·本输》列脾合胃。此为所选古代医籍的分类，不是八字测得的器官状态、疾病风险或现代解剖结论。",
           "**计算层：**本程序的土元素出现量、工程旺衰与上述原典象义分别读取；旺弱标签不测量智力、诚信、主见或心理健康，也不据此认定身体、生育功能。",
-          "**出处与适用：**方位时序、颜色、数字和医籍分类按各自原文核对；《月令》的祭先脏不是《素问》的在藏对应。现代行业与配色另作编辑类比，未完成独立书影校勘或专家验收。"
+          "**出处与适用：**方位时序、颜色、数字和医籍分类按各自原文核对；《月令》的祭先脏与《素问》的在藏对应分属两套分类。"
         ],
         "curation": {
           "method_id": "primary_element_correspondence_curation_v1",
@@ -1416,10 +1357,9 @@
           "**方位与时序：**《礼记·月令》以立秋盛德在金、迎秋西郊，属于秋与西方的礼制时序对应；不能单凭这项对应选个人吉方、判断某月旺衰或指定出行时刻。",
           "**颜色：**《月令》列白衣、白玉；银色是现代材质配色类比。古代颜色名、现代配色与个人幸运色效力是不同主张。",
           "**数字：**《五行大义》分金的生数四、成数九；《月令》本项数为九。4、9是历史数理对应，不是已经验证的幸运数或预测概率。",
-          "**行业举例：**金融、法律、机械、汽车、珠宝属于本项目现代编辑类比，不是上述古籍给出的职业适配表；选择须结合能力、经验和实际岗位条件。",
           "**医籍文化对应：**《素问·阴阳应象大论》列肺—皮毛—鼻，《灵枢·本输》列肺合大肠。此为所选古代医籍的分类，不是八字测得的器官状态、疾病风险或现代解剖结论。",
           "**计算层：**本程序的金元素出现量、工程旺衰与上述原典象义分别读取；旺弱标签不测量智力、诚信、主见或心理健康，也不据此认定身体、生育功能。",
-          "**出处与适用：**方位时序、颜色、数字和医籍分类按各自原文核对；《月令》的祭先脏不是《素问》的在藏对应。现代行业与配色另作编辑类比，未完成独立书影校勘或专家验收。"
+          "**出处与适用：**方位时序、颜色、数字和医籍分类按各自原文核对；《月令》的祭先脏与《素问》的在藏对应分属两套分类。"
         ],
         "curation": {
           "method_id": "primary_element_correspondence_curation_v1",
@@ -1537,10 +1477,9 @@
           "**方位与时序：**《礼记·月令》以立冬盛德在水、迎冬北郊，属于冬与北方的礼制时序对应；不能单凭这项对应选个人吉方、判断某月旺衰或指定出行时刻。",
           "**颜色：**《月令》列黑衣、玄玉；蓝色是现代配色类比。古代颜色名、现代配色与个人幸运色效力是不同主张。",
           "**数字：**《五行大义》分水的生数一、成数六；《月令》本项数为六。1、6是历史数理对应，不是已经验证的幸运数或预测概率。",
-          "**行业举例：**贸易、物流、旅游、水产、咨询属于本项目现代编辑类比，不是上述古籍给出的职业适配表；选择须结合能力、经验和实际岗位条件。",
           "**医籍文化对应：**《素问·阴阳应象大论》列肾—骨—耳，《灵枢·本输》列肾合膀胱。此为所选古代医籍的分类，不是八字测得的器官状态、疾病风险或现代解剖结论。",
           "**计算层：**本程序的水元素出现量、工程旺衰与上述原典象义分别读取；旺弱标签不测量智力、诚信、主见或心理健康，也不据此认定身体、生育功能。",
-          "**出处与适用：**方位时序、颜色、数字和医籍分类按各自原文核对；《月令》的祭先脏不是《素问》的在藏对应。现代行业与配色另作编辑类比，未完成独立书影校勘或专家验收。"
+          "**出处与适用：**方位时序、颜色、数字和医籍分类按各自原文核对；《月令》的祭先脏与《素问》的在藏对应分属两套分类。"
         ],
         "curation": {
           "method_id": "primary_element_correspondence_curation_v1",
@@ -1656,8 +1595,7 @@
       "身财两停": {
         "title": "身财两停",
         "tips": [
-          "传统术语指身与财的相对力量适当，须审月令、根、位置和制化；计数相近或模型判中和不足以裁定。",
-          "本工具财务规则索引只是固定模型输出；实际收入、守财能力及财务稳定性须以现实记录核实。"
+          "传统术语指身与财的相对力量适当，须审月令、根、位置和制化；计数相近或模型判中和不足以裁定。"
         ]
       },
       "财多身弱": {
@@ -1678,8 +1616,7 @@
         "title": "食伤生财",
         "tips": [
           "五行上食伤能生财；原典食神生财路径仍须核对月令、财根及身食财的相对力量，食伤与财共现不等于成格。",
-          "条文范围：《秘本子平真诠》国图藏本PDF76–78〈论食神〉；食神章条件不能直接泛化为所有伤官组合。",
-          "技术、产品或内容变现属于现代讨论类比，实际收益须由技能、需求、成本和执行记录核实。"
+          "条文范围：《秘本子平真诠》国图藏本PDF76–78〈论食神〉；食神章条件不能直接泛化为所有伤官组合。"
         ]
       },
       "比劫夺财": {
@@ -1701,15 +1638,13 @@
       "正财": {
         "title": "正财",
         "tips": [
-          "十神定义：日主所克、阴阳相异的干。透干及全部藏干的位置应分别保留。",
-          "持续收入、薪资或经营是现代类比；“正”不鉴定收入正当性、稳定性、品行或理财能力。"
+          "十神定义：日主所克、阴阳相异的干。透干及全部藏干的位置应分别保留。"
         ]
       },
       "偏财": {
         "title": "偏财",
         "tips": [
-          "十神定义：日主所克、阴阳相同的干。透藏、根与位置不由单一出现量代替。",
-          "项目、交易或其他非固定收入是现代类比；“偏”不证明投资能力、横财、收益或风险偏好。"
+          "十神定义：日主所克、阴阳相同的干。透藏、根与位置不由单一出现量代替。"
         ]
       }
     },
@@ -1717,151 +1652,342 @@
       "五行藏象": {
         "title": "五行藏象：旧术语与程序计数的区别",
         "tips": [
-          "旧资料用五行与脏腑名称作传统对应。本条只解释这一术语层，相关医籍版本的逐条校核仍待完成。",
-          "当前报告的element_distribution来自干支及藏干的符号计数和权重，findings.status只与五行平均权重作比较。",
+          "本卡以“五行藏象”整理传统配属名称；所选《素问·金匮真言论》扫描页54–57分别列木—肝、火—心、土—脾、金—肺、水—肾，只支持这一文化词义背景，不代表完整藏象体系或医学事实。",
+          "八字健康专题的element_presence记录原局天干、地支与藏干的出现位置，以及按该范围判得的缺位。",
           "盘内缺失、偏多或偏少不构成脏腑功能、症状或疾病结论；现实身体情况需要现实医疗评估。"
         ],
         "curation": {
-          "method_id": "bazi_health_scope_cleanup_v1",
-          "entry_revision": 1,
-          "curated_on": "2026-10-22",
-          "classification": "computational_scope_and_legacy_terminology_cleanup",
-          "review_status": "computational_scope_only_correspondence_source_pending",
-          "validation_status": "medical_inference_not_supported_source_attribution_pending",
-          "source_refs": [],
-          "implementation_refs": [
+          "method_id": "bazi_health_correspondence_curation_v2",
+          "entry_revision": 2,
+          "curated_on": "2026-11-18",
+          "classification": "selected_cultural_correspondences_and_computational_scope",
+          "review_status": "selected_suwen_scan_reading_external_expert_review_pending",
+          "validation_status": "selected_cultural_correspondences_not_medical_or_prediction_validation",
+          "source_refs": [
             {
-              "source_path": "src/fatebridge/analysis/health.py",
-              "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
+              "author": "古籍原文不认定单一作者；唐王冰注，宋林亿等校正",
+              "title": "重廣補注黃帝內經素問·金匱真言論篇第四",
+              "edition": "四部丛刊，影上海涵芬馆藏明翻北宋本；影印发行年份未核",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=Page%3ASibu_Congkan0357-%E7%8E%8B%E5%86%B0-%E9%87%8D%E5%BB%A3%E8%A3%9C%E6%B3%A8%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%E7%B4%A0%E5%95%8F-5-1.djvu%2F54&oldid=1100773",
+              "source_sha256": "191d7421eef39c62ac5e569c5964a310a6933a5d2ab4462f4ba294e61c088ea5",
+              "source_revision_id": 1100773,
+              "source_locator": "卷第一〈金匱真言論篇第四〉，DjVu扫描页54（非已核印刷叶号），固定修订1100773；所列目标句书影已读，页面转录标未校对，SHA256标识捕获的固定HTML",
+              "supporting_tip_indexes": [
+                0
+              ],
+              "support_scope": "仅支持tip[0]的文化配属背景。木—肝的传统配属：正文同段列入通于肝、其类草木，木精为王冰注语。不为tip[1]的软件专题字段背书；tip[2]是本软件的交付边界，古籍不构成临床验证或现实效度证据，也不证明旧Xingque资料由此摘录。"
+            },
+            {
+              "author": "古籍原文不认定单一作者；唐王冰注，宋林亿等校正",
+              "title": "重廣補注黃帝內經素問·金匱真言論篇第四",
+              "edition": "四部丛刊，影上海涵芬馆藏明翻北宋本；影印发行年份未核",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=Page%3ASibu_Congkan0357-%E7%8E%8B%E5%86%B0-%E9%87%8D%E5%BB%A3%E8%A3%9C%E6%B3%A8%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%E7%B4%A0%E5%95%8F-5-1.djvu%2F55&oldid=1100774",
+              "source_sha256": "d6c2370d8ae5a2638062680c848b7c62e6db981120c21d61534f17f2e57b1673",
+              "source_revision_id": 1100774,
+              "source_locator": "卷第一〈金匱真言論篇第四〉，DjVu扫描页55（非已核印刷叶号），固定修订1100774；所列目标句书影已读，页面转录标未校对，SHA256标识捕获的固定HTML",
+              "supporting_tip_indexes": [
+                0
+              ],
+              "support_scope": "仅支持tip[0]的文化配属背景。火—心的传统配属：正文同段列心与其类火；不把注语与正文混作单一作者。不为tip[1]的软件专题字段背书；tip[2]是本软件的交付边界，古籍不构成临床验证或现实效度证据，也不证明旧Xingque资料由此摘录。"
+            },
+            {
+              "author": "古籍原文不认定单一作者；唐王冰注，宋林亿等校正",
+              "title": "重廣補注黃帝內經素問·金匱真言論篇第四",
+              "edition": "四部丛刊，影上海涵芬馆藏明翻北宋本；影印发行年份未核",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=Page%3ASibu_Congkan0357-%E7%8E%8B%E5%86%B0-%E9%87%8D%E5%BB%A3%E8%A3%9C%E6%B3%A8%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%E7%B4%A0%E5%95%8F-5-1.djvu%2F56&oldid=1100775",
+              "source_sha256": "74f48a1fe7477d975c0e5b670d2d61d1ac18b84685224daa83699132930abc74",
+              "source_revision_id": 1100775,
+              "source_locator": "卷第一〈金匱真言論篇第四〉，DjVu扫描页56（非已核印刷叶号），固定修订1100775；所列目标句书影已读，页面转录标未校对，SHA256标识捕获的固定HTML",
+              "supporting_tip_indexes": [
+                0
+              ],
+              "support_scope": "仅支持tip[0]的文化配属背景。土—脾、金—肺的传统配属：正文分别列脾与其类土、肺与其类金。不为tip[1]的软件专题字段背书；tip[2]是本软件的交付边界，古籍不构成临床验证或现实效度证据，也不证明旧Xingque资料由此摘录。"
+            },
+            {
+              "author": "古籍原文不认定单一作者；唐王冰注，宋林亿等校正",
+              "title": "重廣補注黃帝內經素問·金匱真言論篇第四",
+              "edition": "四部丛刊，影上海涵芬馆藏明翻北宋本；影印发行年份未核",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=Page%3ASibu_Congkan0357-%E7%8E%8B%E5%86%B0-%E9%87%8D%E5%BB%A3%E8%A3%9C%E6%B3%A8%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%E7%B4%A0%E5%95%8F-5-1.djvu%2F57&oldid=1100776",
+              "source_sha256": "43b689dccb39cafac23e3c172f18c47dc9f5bcac07acb15bffd00b227d6fcd18",
+              "source_revision_id": 1100776,
+              "source_locator": "卷第一〈金匱真言論篇第四〉，DjVu扫描页57（非已核印刷叶号），固定修订1100776；所列目标句书影已读，页面转录标未校对，SHA256标识捕获的固定HTML",
+              "supporting_tip_indexes": [
+                0
+              ],
+              "support_scope": "仅支持tip[0]的文化配属背景。水—肾的传统配属：正文同段列肾与其类水。不为tip[1]的软件专题字段背书；tip[2]是本软件的交付边界，古籍不构成临床验证或现实效度证据，也不证明旧Xingque资料由此摘录。"
             }
           ],
-          "legacy_correspondence_status": "not_collated",
-          "citation": "FateBridge实现范围与旧术语释义；医籍对应的版本校核待完成，不作医学推断。"
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "support_scope": "专题返回的盘内位置、五行对应与输出范围；不是医学文献或医疗效力证据。"
+            }
+          ],
+          "legacy_correspondence_status": "selected_sources_identified_legacy_origin_unverified",
+          "citation": "FateBridge文化词义编释，非逐字引文；王冰注、林亿等校正《重廣補注黃帝內經素問》四部丛刊影明翻北宋本，卷一〈金匮真言论〉扫描54–57，只取五行—五藏配属；旧Xingque包历史出处未定。",
+          "definition_basis": "tip[0]为所选五行—五藏原文的限域编释；“五行藏象”为本卡整理总称，非已核同名原文，六府及完整藏象体系不在此四页的接受范围。新选具名来源不证明旧Xingque包的历史出处；独立专家、全书及现实效度尚未接受。",
+          "tip_attribution": {
+            "0": "selected_classical_cultural_correspondence_only; cross-passage synthesis where explicitly stated",
+            "1": "implementation_scope_only; core/bazi_evidence.py; not supported by medical classics",
+            "2": "editorial_delivery_boundary; no clinical validation or medical inference"
+          },
+          "source_attribution_rule": "古籍来源仅归tip[0]；tip[1]保留实现引用，tip[2]为交付边界。素问只核选页书影，灵枢只核固定数字转录；二者不混作独立专家验收或现代医学证据。"
         }
       },
       "木主肝胆": {
         "title": "木与肝胆：传统对应的范围",
         "tips": [
-          "木主肝胆是旧知识包的对应名称；本条保留查询键，医籍原文与印本归属尚待逐条校核，不把这个名称当作医学事实。",
-          "报告中的木只表示命盘五行符号及其权重；“盘内偏多”等标签描述木相对其他四类的计数，不是人体检查结果。",
+          "“木与肝胆”是本卡跨段整理的传统查询名：《素问·金匮真言论》扫描页54列木—肝，《灵枢·本输》固定数字转录列肝合胆；后者原叶仍待影印复核，不把两段拼成同一句原文或医学事实。",
+          "命盘中的木指四柱明干与藏干的五行归属。",
           "可解释木的透藏、计数和传统名称，不能据此推断肝胆、视力、神经或情绪疾病。"
         ],
         "curation": {
-          "method_id": "bazi_health_scope_cleanup_v1",
-          "entry_revision": 1,
-          "curated_on": "2026-10-22",
-          "classification": "computational_scope_and_legacy_terminology_cleanup",
-          "review_status": "computational_scope_only_correspondence_source_pending",
-          "validation_status": "medical_inference_not_supported_source_attribution_pending",
-          "source_refs": [],
-          "implementation_refs": [
+          "method_id": "bazi_health_correspondence_curation_v2",
+          "entry_revision": 2,
+          "curated_on": "2026-11-18",
+          "classification": "selected_cultural_correspondences_and_computational_scope",
+          "review_status": "selected_scan_and_digital_text_reading_lingshu_scan_and_external_expert_review_pending",
+          "validation_status": "selected_cultural_correspondences_not_medical_or_prediction_validation",
+          "source_refs": [
             {
-              "source_path": "src/fatebridge/analysis/health.py",
-              "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
+              "author": "古籍原文不认定单一作者；唐王冰注，宋林亿等校正",
+              "title": "重廣補注黃帝內經素問·金匱真言論篇第四",
+              "edition": "四部丛刊，影上海涵芬馆藏明翻北宋本；影印发行年份未核",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=Page%3ASibu_Congkan0357-%E7%8E%8B%E5%86%B0-%E9%87%8D%E5%BB%A3%E8%A3%9C%E6%B3%A8%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%E7%B4%A0%E5%95%8F-5-1.djvu%2F54&oldid=1100773",
+              "source_sha256": "191d7421eef39c62ac5e569c5964a310a6933a5d2ab4462f4ba294e61c088ea5",
+              "source_revision_id": 1100773,
+              "source_locator": "卷第一〈金匱真言論篇第四〉，DjVu扫描页54（非已核印刷叶号），固定修订1100773；所列目标句书影已读，页面转录标未校对，SHA256标识捕获的固定HTML",
+              "supporting_tip_indexes": [
+                0
+              ],
+              "support_scope": "仅支持tip[0]的文化配属背景。木—肝的传统配属：正文同段列入通于肝、其类草木，木精为王冰注语。不为tip[1]的软件专题字段背书；tip[2]是本软件的交付边界，古籍不构成临床验证或现实效度证据，也不证明旧Xingque资料由此摘录。"
+            },
+            {
+              "author": "古籍原文不认定单一作者；宋史崧音释",
+              "title": "靈樞經（四庫全書本）·本輸第二",
+              "edition": "维基文库固定数字转录640546；对应原叶书影、原印叶号及发行年份未核",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E9%9D%88%E6%A8%9E%E7%B6%93_%28%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC%29%2F%E5%8D%B701&oldid=640546",
+              "source_sha256": "d04c52bbe8a6f01171cf0888d61474760ff331978ff6eb17e07c7223b92c1ed1",
+              "source_revision_id": 640546,
+              "source_locator": "卷一〈本輸第二〉后部五藏六府相合段；只读固定数字转录，未完成同版原叶影印校勘，SHA256标识捕获HTML",
+              "supporting_tip_indexes": [
+                0
+              ],
+              "support_scope": "仅支持tip[0]的肝合胆的传统藏府相合关系；与《素问》五行—五藏段连接属于本卡显式跨段整理，不是单句原文。不是软件权重、医疗或现实效度依据，也不证明旧Xingque资料的历史来源。"
             }
           ],
-          "legacy_correspondence_status": "not_collated",
-          "citation": "FateBridge实现范围与旧术语释义；医籍对应的版本校核待完成，不作医学推断。"
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "support_scope": "专题返回的盘内位置、五行对应与输出范围；不是医学文献或医疗效力证据。"
+            }
+          ],
+          "legacy_correspondence_status": "selected_sources_identified_legacy_origin_unverified",
+          "citation": "FateBridge文化词义编释，非逐字引文；王冰注、林亿等校正《重廣補注黃帝內經素問》四部丛刊影明翻北宋本，卷一〈金匮真言论〉扫描54的木—肝，另与《灵枢经》四库本卷一〈本输〉固定数字转录640546的肝合胆跨段整理；灵枢原叶未核，旧Xingque包历史出处未定。",
+          "definition_basis": "tip[0]显式连接《素问》木—肝与《灵枢》肝—胆；这是跨段术语整理，未获得一句“木主肝胆”的直接原叶引文。新选具名来源不证明旧Xingque包的历史出处；独立专家、全书及现实效度尚未接受。",
+          "tip_attribution": {
+            "0": "selected_classical_cultural_correspondence_only; cross-passage synthesis where explicitly stated",
+            "1": "implementation_scope_only; core/bazi_evidence.py; not supported by medical classics",
+            "2": "editorial_delivery_boundary; no clinical validation or medical inference"
+          },
+          "source_attribution_rule": "古籍来源仅归tip[0]；tip[1]保留实现引用，tip[2]为交付边界。素问只核选页书影，灵枢只核固定数字转录；二者不混作独立专家验收或现代医学证据。"
         }
       },
       "火主心": {
         "title": "火与心：传统对应的范围",
         "tips": [
-          "火主心是旧知识包的传统对应名称，其医籍版本归属仍待逐条校核。",
+          "《素问·金匮真言论》扫描页55在同段列心与其类火；“火主心”在本卡只表示这一传统配属名称，不表示火决定心功能或命盘测得身体状态。",
           "当前程序把火的干支权重列入五行分布；这与医学测得的循环或身体指标是不同数据来源。",
           "火多火少可描述盘内结构，不能转换成心脏、血压、睡眠或精神健康判断。"
         ],
         "curation": {
-          "method_id": "bazi_health_scope_cleanup_v1",
-          "entry_revision": 1,
-          "curated_on": "2026-10-22",
-          "classification": "computational_scope_and_legacy_terminology_cleanup",
-          "review_status": "computational_scope_only_correspondence_source_pending",
-          "validation_status": "medical_inference_not_supported_source_attribution_pending",
-          "source_refs": [],
-          "implementation_refs": [
+          "method_id": "bazi_health_correspondence_curation_v2",
+          "entry_revision": 2,
+          "curated_on": "2026-11-18",
+          "classification": "selected_cultural_correspondences_and_computational_scope",
+          "review_status": "selected_suwen_scan_reading_external_expert_review_pending",
+          "validation_status": "selected_cultural_correspondences_not_medical_or_prediction_validation",
+          "source_refs": [
             {
-              "source_path": "src/fatebridge/analysis/health.py",
-              "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
+              "author": "古籍原文不认定单一作者；唐王冰注，宋林亿等校正",
+              "title": "重廣補注黃帝內經素問·金匱真言論篇第四",
+              "edition": "四部丛刊，影上海涵芬馆藏明翻北宋本；影印发行年份未核",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=Page%3ASibu_Congkan0357-%E7%8E%8B%E5%86%B0-%E9%87%8D%E5%BB%A3%E8%A3%9C%E6%B3%A8%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%E7%B4%A0%E5%95%8F-5-1.djvu%2F55&oldid=1100774",
+              "source_sha256": "d6c2370d8ae5a2638062680c848b7c62e6db981120c21d61534f17f2e57b1673",
+              "source_revision_id": 1100774,
+              "source_locator": "卷第一〈金匱真言論篇第四〉，DjVu扫描页55（非已核印刷叶号），固定修订1100774；所列目标句书影已读，页面转录标未校对，SHA256标识捕获的固定HTML",
+              "supporting_tip_indexes": [
+                0
+              ],
+              "support_scope": "仅支持tip[0]的文化配属背景。火—心的传统配属：正文同段列心与其类火；不把注语与正文混作单一作者。不为tip[1]的软件专题字段背书；tip[2]是本软件的交付边界，古籍不构成临床验证或现实效度证据，也不证明旧Xingque资料由此摘录。"
             }
           ],
-          "legacy_correspondence_status": "not_collated",
-          "citation": "FateBridge实现范围与旧术语释义；医籍对应的版本校核待完成，不作医学推断。"
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "support_scope": "专题返回的盘内位置、五行对应与输出范围；不是医学文献或医疗效力证据。"
+            }
+          ],
+          "legacy_correspondence_status": "selected_sources_identified_legacy_origin_unverified",
+          "citation": "FateBridge文化词义编释，非逐字引文；王冰注、林亿等校正《重廣補注黃帝內經素問》四部丛刊影明翻北宋本，卷一〈金匮真言论〉扫描55，只取火—心配属；旧Xingque包历史出处未定。",
+          "definition_basis": "tip[0]按所选原文的同段传统配属解释“主”，不把它改写为生理控制关系。新选具名来源不证明旧Xingque包的历史出处；独立专家、全书及现实效度尚未接受。",
+          "tip_attribution": {
+            "0": "selected_classical_cultural_correspondence_only; cross-passage synthesis where explicitly stated",
+            "1": "implementation_scope_only; core/bazi_evidence.py; not supported by medical classics",
+            "2": "editorial_delivery_boundary; no clinical validation or medical inference"
+          },
+          "source_attribution_rule": "古籍来源仅归tip[0]；tip[1]保留实现引用，tip[2]为交付边界。素问只核选页书影，灵枢只核固定数字转录；二者不混作独立专家验收或现代医学证据。"
         }
       },
       "土主脾胃": {
         "title": "土与脾胃：传统对应的范围",
         "tips": [
-          "土主脾胃是旧资料沿用的对应名称，相关原文与版本还未完成逐条核对。",
+          "“土与脾胃”是本卡跨段整理的传统查询名：《素问·金匮真言论》扫描页56列土—脾，《灵枢·本输》固定数字转录列脾合胃；后者原叶仍待影印复核，不当作同一句土—胃原文或医学效力证据。",
           "程序中的土是干支五行分类与权重，偏多或偏少按同盘五类相对数值生成，不包含消化、体重或身体检查资料。",
           "本条提供传统词语与计算范围说明，不从土的计数给出疾病或调理方向。"
         ],
         "curation": {
-          "method_id": "bazi_health_scope_cleanup_v1",
-          "entry_revision": 1,
-          "curated_on": "2026-10-22",
-          "classification": "computational_scope_and_legacy_terminology_cleanup",
-          "review_status": "computational_scope_only_correspondence_source_pending",
-          "validation_status": "medical_inference_not_supported_source_attribution_pending",
-          "source_refs": [],
-          "implementation_refs": [
+          "method_id": "bazi_health_correspondence_curation_v2",
+          "entry_revision": 2,
+          "curated_on": "2026-11-18",
+          "classification": "selected_cultural_correspondences_and_computational_scope",
+          "review_status": "selected_scan_and_digital_text_reading_lingshu_scan_and_external_expert_review_pending",
+          "validation_status": "selected_cultural_correspondences_not_medical_or_prediction_validation",
+          "source_refs": [
             {
-              "source_path": "src/fatebridge/analysis/health.py",
-              "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
+              "author": "古籍原文不认定单一作者；唐王冰注，宋林亿等校正",
+              "title": "重廣補注黃帝內經素問·金匱真言論篇第四",
+              "edition": "四部丛刊，影上海涵芬馆藏明翻北宋本；影印发行年份未核",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=Page%3ASibu_Congkan0357-%E7%8E%8B%E5%86%B0-%E9%87%8D%E5%BB%A3%E8%A3%9C%E6%B3%A8%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%E7%B4%A0%E5%95%8F-5-1.djvu%2F56&oldid=1100775",
+              "source_sha256": "74f48a1fe7477d975c0e5b670d2d61d1ac18b84685224daa83699132930abc74",
+              "source_revision_id": 1100775,
+              "source_locator": "卷第一〈金匱真言論篇第四〉，DjVu扫描页56（非已核印刷叶号），固定修订1100775；所列目标句书影已读，页面转录标未校对，SHA256标识捕获的固定HTML",
+              "supporting_tip_indexes": [
+                0
+              ],
+              "support_scope": "仅支持tip[0]的文化配属背景。土—脾、金—肺的传统配属：正文分别列脾与其类土、肺与其类金。不为tip[1]的软件专题字段背书；tip[2]是本软件的交付边界，古籍不构成临床验证或现实效度证据，也不证明旧Xingque资料由此摘录。"
+            },
+            {
+              "author": "古籍原文不认定单一作者；宋史崧音释",
+              "title": "靈樞經（四庫全書本）·本輸第二",
+              "edition": "维基文库固定数字转录640546；对应原叶书影、原印叶号及发行年份未核",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E9%9D%88%E6%A8%9E%E7%B6%93_%28%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC%29%2F%E5%8D%B701&oldid=640546",
+              "source_sha256": "d04c52bbe8a6f01171cf0888d61474760ff331978ff6eb17e07c7223b92c1ed1",
+              "source_revision_id": 640546,
+              "source_locator": "卷一〈本輸第二〉后部五藏六府相合段；只读固定数字转录，未完成同版原叶影印校勘，SHA256标识捕获HTML",
+              "supporting_tip_indexes": [
+                0
+              ],
+              "support_scope": "仅支持tip[0]的脾合胃的传统藏府相合关系；与《素问》五行—五藏段连接属于本卡显式跨段整理，不是单句原文。不是软件权重、医疗或现实效度依据，也不证明旧Xingque资料的历史来源。"
             }
           ],
-          "legacy_correspondence_status": "not_collated",
-          "citation": "FateBridge实现范围与旧术语释义；医籍对应的版本校核待完成，不作医学推断。"
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "support_scope": "专题返回的盘内位置、五行对应与输出范围；不是医学文献或医疗效力证据。"
+            }
+          ],
+          "legacy_correspondence_status": "selected_sources_identified_legacy_origin_unverified",
+          "citation": "FateBridge文化词义编释，非逐字引文；王冰注、林亿等校正《重廣補注黃帝內經素問》四部丛刊影明翻北宋本，卷一〈金匮真言论〉扫描56的土—脾，另与《灵枢经》四库本卷一〈本输〉固定数字转录640546的脾合胃跨段整理；灵枢原叶未核，旧Xingque包历史出处未定。",
+          "definition_basis": "tip[0]显式连接《素问》土—脾与《灵枢》脾—胃；这是跨段术语整理，非一句“土主脾胃”的逐字引文。新选具名来源不证明旧Xingque包的历史出处；独立专家、全书及现实效度尚未接受。",
+          "tip_attribution": {
+            "0": "selected_classical_cultural_correspondence_only; cross-passage synthesis where explicitly stated",
+            "1": "implementation_scope_only; core/bazi_evidence.py; not supported by medical classics",
+            "2": "editorial_delivery_boundary; no clinical validation or medical inference"
+          },
+          "source_attribution_rule": "古籍来源仅归tip[0]；tip[1]保留实现引用，tip[2]为交付边界。素问只核选页书影，灵枢只核固定数字转录；二者不混作独立专家验收或现代医学证据。"
         }
       },
       "金主肺": {
         "title": "金与肺：传统对应的范围",
         "tips": [
-          "金主肺是旧知识包的对应名称，医籍原文与版本仍待逐条校核。",
+          "《素问·金匮真言论》扫描页56在同段列肺与其类金；本卡据此解释传统金—肺配属名称，不把古典语汇自动等同现代呼吸、皮肤或免疫系统的验证模型。",
           "报告中金的权重、透藏及其相对标签属于命盘符号资料，不包含呼吸、皮肤或免疫系统的测量。",
           "可以解读金在该盘中的分类与生克关系，不把它转成器官功能、疾病风险或处置建议。"
         ],
         "curation": {
-          "method_id": "bazi_health_scope_cleanup_v1",
-          "entry_revision": 1,
-          "curated_on": "2026-10-22",
-          "classification": "computational_scope_and_legacy_terminology_cleanup",
-          "review_status": "computational_scope_only_correspondence_source_pending",
-          "validation_status": "medical_inference_not_supported_source_attribution_pending",
-          "source_refs": [],
-          "implementation_refs": [
+          "method_id": "bazi_health_correspondence_curation_v2",
+          "entry_revision": 2,
+          "curated_on": "2026-11-18",
+          "classification": "selected_cultural_correspondences_and_computational_scope",
+          "review_status": "selected_suwen_scan_reading_external_expert_review_pending",
+          "validation_status": "selected_cultural_correspondences_not_medical_or_prediction_validation",
+          "source_refs": [
             {
-              "source_path": "src/fatebridge/analysis/health.py",
-              "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
+              "author": "古籍原文不认定单一作者；唐王冰注，宋林亿等校正",
+              "title": "重廣補注黃帝內經素問·金匱真言論篇第四",
+              "edition": "四部丛刊，影上海涵芬馆藏明翻北宋本；影印发行年份未核",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=Page%3ASibu_Congkan0357-%E7%8E%8B%E5%86%B0-%E9%87%8D%E5%BB%A3%E8%A3%9C%E6%B3%A8%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%E7%B4%A0%E5%95%8F-5-1.djvu%2F56&oldid=1100775",
+              "source_sha256": "74f48a1fe7477d975c0e5b670d2d61d1ac18b84685224daa83699132930abc74",
+              "source_revision_id": 1100775,
+              "source_locator": "卷第一〈金匱真言論篇第四〉，DjVu扫描页56（非已核印刷叶号），固定修订1100775；所列目标句书影已读，页面转录标未校对，SHA256标识捕获的固定HTML",
+              "supporting_tip_indexes": [
+                0
+              ],
+              "support_scope": "仅支持tip[0]的文化配属背景。土—脾、金—肺的传统配属：正文分别列脾与其类土、肺与其类金。不为tip[1]的软件专题字段背书；tip[2]是本软件的交付边界，古籍不构成临床验证或现实效度证据，也不证明旧Xingque资料由此摘录。"
             }
           ],
-          "legacy_correspondence_status": "not_collated",
-          "citation": "FateBridge实现范围与旧术语释义；医籍对应的版本校核待完成，不作医学推断。"
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "support_scope": "专题返回的盘内位置、五行对应与输出范围；不是医学文献或医疗效力证据。"
+            }
+          ],
+          "legacy_correspondence_status": "selected_sources_identified_legacy_origin_unverified",
+          "citation": "FateBridge文化词义编释，非逐字引文；王冰注、林亿等校正《重廣補注黃帝內經素問》四部丛刊影明翻北宋本，卷一〈金匮真言论〉扫描56，只取金—肺配属；旧Xingque包历史出处未定。",
+          "definition_basis": "tip[0]只解释所选原文金—肺的文化配属，不接受由命盘权重到现代人体系统的扩展。新选具名来源不证明旧Xingque包的历史出处；独立专家、全书及现实效度尚未接受。",
+          "tip_attribution": {
+            "0": "selected_classical_cultural_correspondence_only; cross-passage synthesis where explicitly stated",
+            "1": "implementation_scope_only; core/bazi_evidence.py; not supported by medical classics",
+            "2": "editorial_delivery_boundary; no clinical validation or medical inference"
+          },
+          "source_attribution_rule": "古籍来源仅归tip[0]；tip[1]保留实现引用，tip[2]为交付边界。素问只核选页书影，灵枢只核固定数字转录；二者不混作独立专家验收或现代医学证据。"
         }
       },
       "水主肾": {
         "title": "水与肾：传统对应的范围",
         "tips": [
-          "水主肾是旧资料的传统对应名称，其医籍出处与版本尚待逐条核对。",
+          "《素问·金匮真言论》扫描页57在同段列肾与其类水；本卡只解释传统水—肾配属名称，保留古典文本语境，不替代现代肾功能或生殖医学定义。",
           "程序计量的是干支与藏干的水类权重，盘内有无与偏多少不表示人体水分、肾功能或生殖情况。",
           "本条解释词语及软件范围，不由水的计数提出病症、生育能力或治疗时机结论。"
         ],
         "curation": {
-          "method_id": "bazi_health_scope_cleanup_v1",
-          "entry_revision": 1,
-          "curated_on": "2026-10-22",
-          "classification": "computational_scope_and_legacy_terminology_cleanup",
-          "review_status": "computational_scope_only_correspondence_source_pending",
-          "validation_status": "medical_inference_not_supported_source_attribution_pending",
-          "source_refs": [],
-          "implementation_refs": [
+          "method_id": "bazi_health_correspondence_curation_v2",
+          "entry_revision": 2,
+          "curated_on": "2026-11-18",
+          "classification": "selected_cultural_correspondences_and_computational_scope",
+          "review_status": "selected_suwen_scan_reading_external_expert_review_pending",
+          "validation_status": "selected_cultural_correspondences_not_medical_or_prediction_validation",
+          "source_refs": [
             {
-              "source_path": "src/fatebridge/analysis/health.py",
-              "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
+              "author": "古籍原文不认定单一作者；唐王冰注，宋林亿等校正",
+              "title": "重廣補注黃帝內經素問·金匱真言論篇第四",
+              "edition": "四部丛刊，影上海涵芬馆藏明翻北宋本；影印发行年份未核",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=Page%3ASibu_Congkan0357-%E7%8E%8B%E5%86%B0-%E9%87%8D%E5%BB%A3%E8%A3%9C%E6%B3%A8%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%E7%B4%A0%E5%95%8F-5-1.djvu%2F57&oldid=1100776",
+              "source_sha256": "43b689dccb39cafac23e3c172f18c47dc9f5bcac07acb15bffd00b227d6fcd18",
+              "source_revision_id": 1100776,
+              "source_locator": "卷第一〈金匱真言論篇第四〉，DjVu扫描页57（非已核印刷叶号），固定修订1100776；所列目标句书影已读，页面转录标未校对，SHA256标识捕获的固定HTML",
+              "supporting_tip_indexes": [
+                0
+              ],
+              "support_scope": "仅支持tip[0]的文化配属背景。水—肾的传统配属：正文同段列肾与其类水。不为tip[1]的软件专题字段背书；tip[2]是本软件的交付边界，古籍不构成临床验证或现实效度证据，也不证明旧Xingque资料由此摘录。"
             }
           ],
-          "legacy_correspondence_status": "not_collated",
-          "citation": "FateBridge实现范围与旧术语释义；医籍对应的版本校核待完成，不作医学推断。"
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "support_scope": "专题返回的盘内位置、五行对应与输出范围；不是医学文献或医疗效力证据。"
+            }
+          ],
+          "legacy_correspondence_status": "selected_sources_identified_legacy_origin_unverified",
+          "citation": "FateBridge文化词义编释，非逐字引文；王冰注、林亿等校正《重廣補注黃帝內經素問》四部丛刊影明翻北宋本，卷一〈金匮真言论〉扫描57，只取水—肾配属；旧Xingque包历史出处未定。",
+          "definition_basis": "tip[0]只解释所选原文水—肾的文化配属，不由盘内有无或偏多少推断实际生理状态。新选具名来源不证明旧Xingque包的历史出处；独立专家、全书及现实效度尚未接受。",
+          "tip_attribution": {
+            "0": "selected_classical_cultural_correspondence_only; cross-passage synthesis where explicitly stated",
+            "1": "implementation_scope_only; core/bazi_evidence.py; not supported by medical classics",
+            "2": "editorial_delivery_boundary; no clinical validation or medical inference"
+          },
+          "source_attribution_rule": "古籍来源仅归tip[0]；tip[1]保留实现引用，tip[2]为交付边界。素问只核选页书影，灵枢只核固定数字转录；二者不混作独立专家验收或现代医学证据。"
         }
       },
       "七杀攻身": {
@@ -1895,8 +2021,8 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/analysis/health.py",
-              "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "support_scope": "专题返回的盘内位置、五行对应与输出范围；不是医学文献或医疗效力证据。"
             }
           ],
           "legacy_correspondence_status": "not_used_for_medical_inference",
@@ -1933,8 +2059,8 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/analysis/health.py",
-              "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "support_scope": "专题返回的盘内位置、五行对应与输出范围；不是医学文献或医疗效力证据。"
             }
           ],
           "legacy_correspondence_status": "not_used_for_medical_inference",
@@ -1948,7 +2074,7 @@
         "tips": [
           "所选《秘本子平真诠》以官杀配子女，同时明说不可拘于官杀，须另看时支、子星与全局喜忌；不能把一个星的有无当作结论。",
           "当前模块按男命官杀、女命食伤取对应；女命食伤规则的扫描本出处本轮仍待校勘，不伪托为上述子平段落已经核准。",
-          "性别未知时程序保留官杀与食伤四类，并参计数；child_star.weight统计非日干每次1、各支每个对应藏干每次0.5，不是孩子人数或有效力量。",
+          "性别未知时并列官杀与食伤两套对应。输出保留每颗星所在柱位和透藏。",
           "这些是命主盘内的传统对应，不判断子女性情、成就、亲疏、是否生育或何时生育；未见星也不表示亲人缺席。"
         ],
         "curation": {
@@ -1974,8 +2100,8 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/analysis/children.py",
-              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
           "source_tip_indices": [
@@ -2026,8 +2152,8 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/analysis/children.py",
-              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
           "source_tip_indices": [
@@ -2076,8 +2202,8 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/analysis/children.py",
-              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
           "source_tip_indices": [
@@ -2100,7 +2226,7 @@
         "title": "生育时机",
         "tips": [
           "所选原典论子女须合宫分、子星与全局条件，不提供已经过现代结果验证的生育窗口；原文人数、性别及经历断言不作当前预测依据。",
-          "children_timing只对已提供的大运、流年柱，记录其天干是否属当前子女星及其支是否与时支六合、六冲；没有计算日级受孕概率、妊娠状态或医学适宜性。",
+          "专题读取当期大运、流年或显式覆盖柱，列出明干与藏干子女星及其与时支的关系。",
           "本轮未取得时间关系不表示没有子女缘；取得传统触点也不能据此安排备孕、生育、检查或治疗日期。"
         ],
         "curation": {
@@ -2126,8 +2252,8 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/analysis/children.py",
-              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
           "source_tip_indices": [
@@ -2152,7 +2278,7 @@
         "title": "印星主学历",
         "tips": [
           "所选《秘本子平真诠》论印分印格用官、身印两旺用食伤及印重用财等条件；正偏印同格论，不把印的出现量等同有效力量。",
-          "本模块study_stars.seal_weight是正偏印的固定加权出现量；education_level是未校准规则索引，尚未裁定上述成格、旺衰及喜忌。",
+          "学业专题列出正偏印的实际透藏位置及相关结构条件。",
           "学历、记忆与学习能力需要实际学习记录和测评；不能由有印、无印或印多推出学历高低、依赖或思想保守。"
         ],
         "curation": {
@@ -2180,8 +2306,8 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/analysis/education.py",
-              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
           "source_tip_indices": [
@@ -2204,7 +2330,7 @@
         "title": "官印相生",
         "tips": [
           "所选原典的印格用官需分官印双全、印根、身印轻重与是否被财食破坏；印生身、官生印是生克方向，官印共现不自动满足路径和成格。",
-          "当前模块把官杀与印的加权计数均至少1记为一项规则条件；此处合并官杀，不把七杀计数误说成已经成立的正官生印。",
+          "专题的格局条件逐项核对正官、印星、月令与根气，并保留全局力量和成格待裁定状态。",
           "官印相生是传统条件术语，不由它认定高学历、考试录取、体制岗位或社会名位。"
         ],
         "curation": {
@@ -2231,8 +2357,8 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/analysis/education.py",
-              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
           "source_tip_indices": [
@@ -2255,7 +2381,7 @@
         "title": "食伤主才华",
         "tips": [
           "原典将食神、伤官分别讨论：生财、制杀、佩印或用官各有身、印、食伤的轻重、根气、季候和位置条件。身印两旺可用食伤泄气，不能一概称食伤无印便定力不足。",
-          "本模块food_hurt_weight合计食神与伤官出现量；subject_orientation按印、食伤、官杀计数列出全部最高项，表达与制作是现代主题类比。",
+          "学业专题分别列出食神和伤官的星位、透藏与根气。",
           "传统吐秀、文学象义不测量智力或创造力，也不能据此决定专业、深造资格或孩子的才能。"
         ],
         "curation": {
@@ -2287,8 +2413,8 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/analysis/education.py",
-              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
           "source_tip_indices": [
@@ -2338,8 +2464,8 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/analysis/education.py",
-              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
           "source_tip_indices": [
@@ -2364,7 +2490,7 @@
         "title": "财破印（学业破格）",
         "tips": [
           "财克印是生克关系，财是否破印仍须审所用之印、身印力量、财根、位置与合制。所选原典同时有印重身强用财、合财存印及合印存财等分支，不能把财印同现都判破格。",
-          "当前模块仅在财计数至少2且印计数大于0、不超过1时扣固定规则分；没有据此算出财已经克坏印，也未完成官星通关或比劫救应的有效力量裁定。",
+          "专题保留财、印的星位及根气，供对照位置与救应条件。",
           "不从这个规则条件断求学中断、经济困境或动机；现实学习计划须依据课程、资金和实际时间安排。"
         ],
         "curation": {
@@ -2392,8 +2518,8 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/analysis/education.py",
-              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
           "source_tip_indices": [
@@ -2416,7 +2542,7 @@
         "title": "伤官见官（学途波折）",
         "tips": [
           "所选原典要求分别察气候、强弱、喜忌和位置；金水伤官用官以及非金水的化伤为财、生官等变法均有具体条件，不能把见官或缺印一概判败。",
-          "当前模块只检查非日干同时透伤官、正官且印计数低于1，触发固定规则扣分；未判定有效制伤、护官、化财或救应。",
+          "专题分别交付伤官和正官的透藏位置、印星与根气，供核对其条件。",
           "伤官见官不认证与师长冲突、学途波折或现实违规；缺印也不证明无人支持或不宜求学。"
         ],
         "curation": {
@@ -2445,8 +2571,8 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/analysis/education.py",
-              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
           "source_tip_indices": [
@@ -2478,7 +2604,7 @@
         "title": "十神定性格",
         "tips": [
           "比劫、食伤、财、官杀、印是相对日主的关系分类；行为风格映射属于本工具的现代类比。",
-          "按实际计数保留全部并列和次项，不由枚举顺序挑唯一主性格；权重不是经过心理测量的特质强度。",
+          "专题保留十神的明干、藏干与根气位置。",
           "解释应对照用户的实际经历，不用十神标签认定他人的人格或行为。"
         ]
       },
@@ -2495,7 +2621,7 @@
         "title": "六亲取象",
         "tips": [
           "所选《秘本子平真诠》以正印配母、偏财配父、正财配妻、官杀配子女、比肩配兄弟；原文另察所在柱位、喜忌与有力无力，取象不等于现实状况。",
-          "当前relatives模块只统计父星偏财、母星正印及比肩劫财同辈，性别参数不改变这两项父母星映射；不把它说成已测量亲疏或实际支持。",
+          "六亲专题列出偏财、正印、比肩、劫财的实际位置。查询具名传统条目时，可按条文选取相应星位。",
           "女命配偶及子女的另一套对应不由本段核准；其他原典的阴阳干取法差异也不能无声明混入当前计数，相关扫描本归属仍待校勘。",
           "同一亲属的传统星、宫位和现实关系须分开；未见对应星不能断亲人缺席，计数高也不保证获得帮助。"
         ],
@@ -2521,8 +2647,8 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/analysis/relatives.py",
-              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
           "source_tip_indices": [
@@ -2547,8 +2673,8 @@
         "title": "六亲宫位",
         "tips": [
           "所选子平本宫分按年、月、日、时分别配祖、父、妻、子。星的取象与宫位另分，不能把年月日时的次序或月柱一概主兄弟说成该段原文。",
-          "当前模块保留年柱与月柱，分别检查它们的支与日支是否六合、六冲；模块沿用年柱祖上／父母、月柱父母／兄弟的说明，范围不等于上述原典宫分。",
-          "接口的未命中只表示这四项检查未命中，不代表现实关系平稳；合冲不推出离乡、聚散、刑伤或亲人遭遇。"
+          "六亲专题保留年柱、月柱及各自在盘内的地支关系。专题选取的柱位范围不等于上述原典宫分。",
+          "接口的未命中只表示未检出相应关系，不代表现实关系平稳；合冲不推出离乡、聚散、刑伤或亲人遭遇。"
         ],
         "curation": {
           "entry_revision": 1,
@@ -2574,8 +2700,8 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/analysis/relatives.py",
-              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
           "source_tip_indices": [
@@ -2598,7 +2724,7 @@
         "title": "比劫论兄弟姐妹",
         "tips": [
           "所选原典以比肩类比兄弟，并另审全局喜忌及有力无力；不能只凭身强弱标签就决定手足相助或分夺。",
-          "当前siblings.sibling_star_weight合计比肩、劫财的加权出现量，support另列印比计数；未裁定比劫帮身、夺财或实际资源大小。",
+          "六亲专题逐项返回比肩、劫财的柱位与透藏。",
           "传统同辈取象不换算兄弟姐妹人数、朋友品行、借贷或合伙结果；现实助力以沟通、资源和具体承诺核实。"
         ],
         "curation": {
@@ -2623,8 +2749,8 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/analysis/relatives.py",
-              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
+              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
             }
           ],
           "source_tip_indices": [
@@ -2706,13 +2832,13 @@
       "身重印轻": {
         "title": "身重印轻：两个力量维度",
         "tips": [
-          "所选原典直接称茅状元例为身重印轻，列壬寅、戊申、壬辰、壬寅，位于印格论用偏官的上下文。",
+          "所选原典直接称馬參政例为身重印轻，列壬寅、戊申、壬辰、壬寅，位于印格论用偏官的上下文。",
           "身重与印轻是分别指向日主和印的判断，不能只看印星数量，也不能用一个现代合计标签替代。",
           "此例已在既有34例开发后对照中登记，正式v2的中和与原文身重映射强的分歧仍保留；本条不是新增独立成功样本。"
         ],
         "curation": {
           "method_id": "ziping_force_terms_v1",
-          "entry_revision": 1,
+          "entry_revision": 2,
           "classification": "selected_classical_semantics_known_development_examples",
           "source_refs": [
             {
@@ -2731,19 +2857,19 @@
           "known_overlap": "bazi_root_force_experiment_v1; not new independent observations",
           "validation_status": "text_semantics_not_model_force_adjudication",
           "citation": "FateBridge限域编释；沈孝瞻《秘本子平真诠》；国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行；PDF73,74；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典分支与编辑边界分开，非逐字引文。",
-          "curated_on": "2026-10-22"
+          "curated_on": "2026-11-22"
         }
       },
       "身轻印重": {
         "title": "身轻印重：身与印不能合并判定",
         "tips": [
-          "所选原典直接称马参政例为身轻印重，列己巳、癸酉、癸未、庚申，与茅状元例并举。",
+          "所选原典直接称茅狀元例为身轻印重，列己巳、癸酉、癸未、庚申，与馬參政例并举。",
           "印重可以与身轻同时成立；把生扶都合并为一个强弱指标，会丢失本段论用官杀或食伤所需的区分。",
           "此例已在既有34例中登记。正式v2输出强而原文为身轻的分歧尚未解决；同次force_components分别列身印资料，未自动认证原典结论。"
         ],
         "curation": {
           "method_id": "ziping_force_terms_v1",
-          "entry_revision": 1,
+          "entry_revision": 2,
           "classification": "selected_classical_semantics_known_development_examples",
           "source_refs": [
             {
@@ -2762,7 +2888,7 @@
           "known_overlap": "bazi_root_force_experiment_v1; not new independent observations",
           "validation_status": "text_semantics_not_model_force_adjudication",
           "citation": "FateBridge限域编释；沈孝瞻《秘本子平真诠》；国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行；PDF73,74；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典分支与编辑边界分开，非逐字引文。",
-          "curated_on": "2026-10-22"
+          "curated_on": "2026-11-22"
         }
       },
       "身杀两停": {
@@ -3121,7 +3247,7 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "src/fatebridge/analysis/career.py",
+              "source_path": "src/fatebridge/core/bazi_evidence.py",
               "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
             },
             {
@@ -3565,17 +3691,19 @@
           "现行工程模型按目录位置分配三藏干的4/7、2/7、1/7，再结合柱位与既定作用规则。巳的当前目录为丙、庚、戊，因此庚与戊的份额分别为2/7、1/7。这是未校准工程预算，不是上述章节给出的力量系数，也不是司令天数。",
           "交换目录中庚、戊会改变工程预算的归属；要核对同次账本和受影响条件，不能只因某批命例更符合标签就换序或改权重。本轮没有采用另一种排列。",
           "解释身印、根气或通关时，分别读取原局成员、同次剩余预算、所选原典条件和未裁定字段；工程数值大小不能补成原典身印轻重，候选路径也不能补成有效接引。",
-          "本条为所选完整章节的同开发者书影校读与实现说明，未完成独立专家或新增条件的真实模型解释验收。旧反例与首次失败保留；可复现、出处对应和现实预测效度分别验证。"
+          "本条为所选完整章节的同开发者书影校读与实现说明，未完成独立专家或新增条件的真实模型解释验收。旧反例与首次失败保留；可复现、出处对应和现实预测效度分别验证。",
+          "酉月始文，雍正刊本与四库本均列庚七日、辛二十三日，合三十日。续表有异文。雍正刊本卷二扫描31列辛二十日、庚七日、丁三日，合三十日。四库本原PDF70列辛二十日、庚七日、丁五日，合三十二日。各按底本保留，不校齐日数。现行引擎未采用这两版司令日历，实体藏干和力量预算另据各自规则。"
         ],
         "curation": {
           "method_id": "hidden_ordinal_and_month_duty_source_scope_v1",
-          "entry_revision": 1,
-          "curated_on": "2026-10-26",
+          "entry_revision": 2,
+          "curated_on": "2026-11-22",
           "classification": "selected_complete_chapter_and_uncalibrated_engineering_policy",
           "classical_condition_tip_indexes": [
             1,
             2,
-            3
+            3,
+            8
           ],
           "implementation_tip_indexes": [
             4,
@@ -3617,13 +3745,26 @@
               "supporting_tip_indexes": [
                 1,
                 2,
-                3
+                3,
+                8
               ],
-              "support_scope": "完整章首、十二月文字与表列、醉醒子评议及章末范围；不支持固定工程力权、已采用司令日历或全局旺衰定理。",
+              "support_scope": "完整章首、十二月文字与表列、醉醒子评议及章末范围；不支持固定工程力权、已采用司令日历或全局旺衰定理。酉月始文见PDF68，续表见PDF70。",
               "developer_inferences": [
                 "列次变化不构成唯一力量排序",
                 "名义司事日数不直接用作现行预算系数"
               ]
+            },
+            {
+              "author": "明·萬民英",
+              "title": "三命通會·卷二·論人元司事",
+              "edition": "清雍正刊本，日本国立公文书馆藏，305-0295，旧藏昌平坂学问所",
+              "source_url": "https://www.digital.archives.go.jp/item/4919180",
+              "source_sha256": "05731d25d20d5ff4bf06787749242515a37cce7fad431c5a0ca4ec4cd52260b6",
+              "source_locator": "卷二子件4919180，IIIF扫描30酉月始文、31左幅自中缝起第五栏续表（自1计扫描序号）。SHA256对应扫描31留存JPEG。",
+              "supporting_tip_indexes": [
+                8
+              ],
+              "support_scope": "仅支持本版酉月始文和续表的字面日数。两版均未据此选定现行司令日历或改变力量预算。"
             }
           ],
           "implementation_refs": [
@@ -3651,7 +3792,7 @@
           "real_world_predictive_validity": "not_tested",
           "calculation_effect": "none",
           "coefficient_adoption": "unchanged_uncalibrated_policy",
-          "citation": "明·萬民英《三命通會》卷二·論人元司事，CADAL06066038，原PDF66–73及74上下文；工程分配另据FateBridge当前实现。"
+          "citation": "明·萬民英《三命通會》卷二·論人元司事，CADAL06066038，原PDF66–73及74上下文。酉月异文另校日本国立公文书馆藏清雍正刊本，305-0295，卷二子件4919180，IIIF扫描30–31。工程分配另据FateBridge当前实现。"
         }
       }
     }

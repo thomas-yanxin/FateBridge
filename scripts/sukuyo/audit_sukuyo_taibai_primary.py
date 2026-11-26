@@ -14,6 +14,8 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 if not __package__:
     sys.path.insert(0, str(ROOT))
+else:
+    pass
 
 from scripts.sukuyo.audit_sukuyo_t2465_primary import SATQuotationParser
 
@@ -34,12 +36,18 @@ def _render(node: ET.Element, apps: list[ET.Element], ming: bool) -> str:
     def walk(current: ET.Element) -> None:
         if current.tag.endswith("}anchor"):
             anchors[current.attrib[XML_ID]] = sum(map(len, parts))
+        else:
+            pass
         if current.text:
             parts.append(current.text)
+        else:
+            pass
         for child in current:
             walk(child)
             if child.tail:
                 parts.append(child.tail)
+            else:
+                pass
 
     walk(node)
     text = "".join(parts)
@@ -56,8 +64,12 @@ def _render(node: ET.Element, apps: list[ET.Element], ming: bool) -> str:
                 edits.append(
                     (anchors[begin], anchors[end], "".join(reading.itertext()))
                 )
+            else:
+                pass
         for begin_offset, end_offset, replacement in sorted(edits, reverse=True):
             text = text[:begin_offset] + replacement + text[end_offset:]
+    else:
+        pass
     return re.sub(r"\s+", "", text)
 
 
@@ -68,6 +80,8 @@ def verify_primary(
     apps = [_fragment(text) for text in fixture["selected_apparatus_xml"]]
     if len(apps) != 13:
         raise ValueError("Taibai apparatus is incomplete")
+    else:
+        pass
     for app, expected in zip(apps, fixture["selected_apparatus"]):
         lemma = app.find("t:lem", NS)
         reading = next(
@@ -87,9 +101,13 @@ def verify_primary(
             != expected
         ):
             raise ValueError("Apparatus metadata differs from its raw XML")
+        else:
+            pass
     paragraphs = [_fragment(text) for text in fixture["selected_xml_fragments"]]
     if len(paragraphs) != 12:
         raise ValueError("Taibai source paragraph selection changed")
+    else:
+        pass
     for paragraph, expected in zip(paragraphs, fixture["selected_xml_paragraphs"]):
         if (
             paragraph.attrib[XML_ID] != expected["xml_id"]
@@ -97,34 +115,46 @@ def verify_primary(
             or _render(paragraph, apps, True) != expected["ming_apparatus_reading"]
         ):
             raise ValueError("Taibai paragraph/apparatus reconstruction differs")
+        else:
+            pass
     parser = SATQuotationParser()
     for row in fixture["selected_html_quotations"]:
         parser.feed(row["html"])
     expected_lines = {"0399b29", *[f"0399c{n:02}" for n in range(1, 19)]}
     if set(parser.lines) != expected_lines:
         raise ValueError("SAT Taibai quotation line set changed")
+    else:
+        pass
     source = json.loads(
         (ROOT / "src/fatebridge/data/sukuyo_t1299_taibai.json").read_bytes()
     )
     if source["source_sha256"] != fixture["source_sha256"] or len(source["rows"]) != 10:
         raise ValueError("Taibai source/table identity differs")
+    else:
+        pass
     for row, primary in zip(source["rows"], fixture["selected_xml_paragraphs"][1:11]):
         if (
             row["taisho_text"] != primary["taisho_text"]
             or row["ming_apparatus_text"] != primary["ming_apparatus_reading"]
         ):
             raise ValueError("Runtime Taibai table differs from the printed row")
+        else:
+            pass
         sat = re.sub(
             r"[\s＊]+", "", "".join(parser.lines[primary["locator"].split("_")[-1][1:]])
         )
         if sat != row["taisho_text"]:
             raise ValueError("SAT and CBETA Taibai table rows differ")
+        else:
+            pass
     if (
         source["apparatus"] != fixture["selected_apparatus"]
         or source["publisher_primary"]["known_apparatus_literal_differences"]
         != fixture["publisher_apparatus_literal_findings"]
     ):
         raise ValueError("Source apparatus or recorded literal differences changed")
+    else:
+        pass
     doctrine = fixture["selected_xml_paragraphs"][-1]
     if (
         source["doctrine"]["taisho_text"] != doctrine["taisho_text"]
@@ -132,6 +162,8 @@ def verify_primary(
         != doctrine["ming_apparatus_reading"]
     ):
         raise ValueError("Taibai doctrine does not retain both selected readings")
+    else:
+        pass
     if (
         source["publisher_primary"]["response_sha256"]
         != fixture["publisher_html_response_sha256"]
@@ -139,6 +171,8 @@ def verify_primary(
         != fixture["publisher_html_response_bytes"]
     ):
         raise ValueError("Runtime publisher reference fingerprint differs")
+    else:
+        pass
     deletion = next(a for a in apps if a.attrib["from"] == "#beg0399022")
     deletion_lemma = deletion.find("t:lem", NS)
     if (
@@ -147,11 +181,15 @@ def verify_primary(
         or _render(paragraphs[10], apps, True) != ""
     ):
         raise ValueError("Ming sky-row deletion was lost")
+    else:
+        pass
     if (
         "年疫死後多虚消耗" not in parser.notes["0399c13"][0]
         or "巳來" not in parser.notes["0399c13"][0]
     ):
         raise ValueError("SAT literal apparatus findings were normalized away")
+    else:
+        pass
     if source_xml:
         raw = source_xml.read_bytes()
         if hashlib.sha256(raw).hexdigest() != fixture["source_sha256"] or any(
@@ -162,6 +200,10 @@ def verify_primary(
             ]
         ):
             raise ValueError("Private full XML differs from its selected source bytes")
+        else:
+            pass
+    else:
+        pass
     if publisher_html:
         raw = publisher_html.read_bytes()
         if (
@@ -175,11 +217,17 @@ def verify_primary(
             raise ValueError(
                 "Private full SAT response differs from selected quotations"
             )
+        else:
+            pass
         if (
             len(set(re.findall(r'<a name="(\d{4}[abc]\d\d)"', raw.decode("utf-8"))))
             != fixture["publisher_html_line_anchor_count"]
         ):
             raise ValueError("SAT response line extent changed")
+        else:
+            pass
+    else:
+        pass
     return {
         "format": "sukuyo_taibai_primary_check_v1",
         "source_xml_sha256": fixture["source_sha256"],
@@ -214,8 +262,12 @@ def main() -> None:
     rendered = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
     if args.output:
         args.output.write_text(rendered)
+    else:
+        pass
     print(rendered, end="")
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

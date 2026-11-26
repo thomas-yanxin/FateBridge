@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-import fatebridge.validation.meihua_weather_reference_study as module
+import validation.meihua_weather_reference_study as module
 from tests.support.transports import SPECS, business, rest, surface_calls
 
 
@@ -39,6 +39,8 @@ def shell(tmp_path, change=None):
     }
     if change:
         change(plan, parent)
+    else:
+        pass
     put(base / "plan.json", plan)
     put(base / "parent/plan.json", parent)
     implementation = Path(module.__file__).parent
@@ -64,21 +66,21 @@ def shell(tmp_path, change=None):
     "field", ["threshold_mm", "climatology_training", "study_kind"]
 )
 def test_protocol_cannot_choose_new_threshold_training_years_or_preregistration(
-    tmp_path, field
-):
+    tmp_path: Path, field: str
+) -> None:
     base = shell(tmp_path, lambda p, _: p.update({field: "changed"}))
     with pytest.raises(ValueError, match="fixed scope"):
         module.audit_weather_reference_study(base)
 
 
-def test_changed_source_stops_before_any_observation_scoring(tmp_path):
+def test_changed_source_stops_before_any_observation_scoring(tmp_path: Path) -> None:
     base = shell(tmp_path)
     put(base / "plan.json", {})
     with pytest.raises(ValueError, match="Locked reference"):
         module.audit_weather_reference_study(base)
 
 
-def test_lock_path_escape_is_not_a_replacement_source(tmp_path):
+def test_lock_path_escape_is_not_a_replacement_source(tmp_path: Path) -> None:
     base = shell(tmp_path)
     put(
         base / "reference-lock.json",
@@ -88,19 +90,23 @@ def test_lock_path_escape_is_not_a_replacement_source(tmp_path):
         module.audit_weather_reference_study(base)
 
 
-def test_all_old_cohort_dates_still_required_even_for_a_posthoc_reference(tmp_path):
+def test_all_old_cohort_dates_still_required_even_for_a_posthoc_reference(
+    tmp_path: Path,
+) -> None:
     base = shell(tmp_path, lambda _, p: p["cohorts"]["retrospective_2024"].pop())
     with pytest.raises(ValueError, match="Every original locked date"):
         module.audit_weather_reference_study(base)
 
 
-def test_unknown_or_reordered_scenario_cannot_replace_the_old_primary(tmp_path):
+def test_unknown_or_reordered_scenario_cannot_replace_the_old_primary(
+    tmp_path: Path,
+) -> None:
     base = shell(tmp_path, lambda _, p: p["scenario_order"].reverse())
     with pytest.raises(ValueError, match="cohorts and scenarios"):
         module.audit_weather_reference_study(base)
 
 
-def test_normals_parser_selects0_1mm_column_and_all_twelve_months():
+def test_normals_parser_selects0_1mm_column_and_all_twelve_months() -> None:
     rows = [
         f"<tr><td>{month_name[m]}</td><td>999</td><td>80</td><td>{m}.00</td><td>25</td><td>50</td></tr>"
         for m in range(1, 13)
@@ -115,8 +121,8 @@ def test_normals_parser_selects0_1mm_column_and_all_twelve_months():
 
 @pytest.mark.parametrize("tool", ["meihua_analysis", "meihua_cast"])
 def test_conditional_reference_counts_and_unknown_vintages_survive_all_surfaces(
-    tool, surface_calls
-):
+    tool: str, surface_calls
+) -> None:
     spec = SPECS[tool]
     payload = {"interpretation_topic": "weather"}
     if tool == "meihua_cast":

@@ -43,6 +43,8 @@ def syzygy_profile_directories(tmp_path_factory):
                 r["name"] for r in PROTOCOL["profiles"][profile]
             }
             prepared[profile] = target
+        else:
+            pass
         return prepared[profile]
 
     return directory

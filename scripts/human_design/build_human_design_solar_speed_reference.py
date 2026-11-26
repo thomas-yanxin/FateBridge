@@ -40,6 +40,8 @@ def extract(ephe: Path):
                 calls += 1
                 if flags != mask | 256:
                     raise ValueError("Unexpected coordinate or fallback flags")
+                else:
+                    pass
                 return float(values[0]) % 360
 
             natal = sun(birth)
@@ -55,6 +57,8 @@ def extract(ephe: Path):
                 if value == 0:
                     lo = hi = mid
                     break
+                else:
+                    pass
                 if value > 0:
                     lo = mid
                 else:
@@ -100,9 +104,13 @@ def main():
     if args.check:
         if TARGET.read_text() != value:
             raise SystemExit("Native lattice reference drifted")
+        else:
+            pass
     else:
         TARGET.write_text(value)
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

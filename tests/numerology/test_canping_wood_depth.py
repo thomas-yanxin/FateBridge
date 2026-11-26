@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.canping_texts import collation_summary, lookup_record
+from fatebridge.core.numerology.canping_texts import collation_summary, lookup_record
 
 ROOT = Path(__file__).parents[1] / "fixtures/canping_wood_v1"
 REFERENCE = json.loads((ROOT / "reference.json").read_text())
@@ -26,7 +26,9 @@ REREADINGS = {
 
 
 @pytest.mark.parametrize("row,kind", CELLS)
-def test_all_wood_cells_keep_literal_text_column_page_and_reading_state(row, kind):
+def test_all_wood_cells_keep_literal_text_column_page_and_reading_state(
+    row, kind
+) -> None:
     n = int(row["number"])
     result = lookup_record("木", n, kind)
     selection = result["selection"]
@@ -34,6 +36,8 @@ def test_all_wood_cells_keep_literal_text_column_page_and_reading_state(row, kin
     assert result["text"] == (revision["text"] if revision else row[kind])
     if revision:
         assert selection["reading_revision"]["previous_text"] == row[kind]
+    else:
+        pass
     assert selection["number"] == n and selection["kind"] == kind
     assert selection["corpus_key"] == f"木.{n}.{kind}"
     assert selection["source_pdf_page"] == int(row["pdf_page"])
@@ -45,9 +49,13 @@ def test_all_wood_cells_keep_literal_text_column_page_and_reading_state(row, kin
     if selection["cell_status"] == "source_reading_uncertain":
         assert selection["reading_uncertainties"]
         assert ("editorial_unknown_marker" in selection) == ("□" in row[kind])
+    else:
+        pass
 
 
-def test_wood_scope_reuses_boundary_witnesses_and_excludes_uncertainty_without_double_counting():
+def test_wood_scope_reuses_boundary_witnesses_and_excludes_uncertainty_without_double_counting() -> (
+    None
+):
     assert len(ROWS) == len({r["number"] for r in ROWS}) == 78
     assert len(CELLS) == 234
     assert (
@@ -93,7 +101,9 @@ def test_wood_scope_reuses_boundary_witnesses_and_excludes_uncertainty_without_d
 
 @pytest.mark.parametrize("number", [2816, 2917, 3315, 2424])
 @pytest.mark.parametrize("kind", ["male", "female", "luck"])
-def test_obscured_wood_headers_keep_all_columns_provisional(number, kind):
+def test_obscured_wood_headers_keep_all_columns_provisional(
+    number: int, kind: str
+) -> None:
     selected = lookup_record("木", number, kind)["selection"]
     assert selected["number"] == number
     assert selected["row_status"] == "present"
@@ -104,7 +114,7 @@ def test_obscured_wood_headers_keep_all_columns_provisional(number, kind):
     assert "inherited_number" not in selected
 
 
-def test_wood_printed_circles_are_not_filled_from_inherited_text():
+def test_wood_printed_circles_are_not_filled_from_inherited_text() -> None:
     assert lookup_record("木", 3115, "luck")["text"] == "登高○○○，傳命探梅花。"
     assert lookup_record("木", 2208, "luck")["text"] == "藍橋玉壺○，鴛鴦解鳴雨。"
     assert lookup_record("木", 2412, "female")["text"] == "還解○香祝，清虛度化生。"
@@ -120,7 +130,7 @@ def test_wood_printed_circles_are_not_filled_from_inherited_text():
     )
 
 
-def test_unusual_wood_readings_are_not_emended_to_familiar_phrases():
+def test_unusual_wood_readings_are_not_emended_to_familiar_phrases() -> None:
     assert lookup_record("木", 3309, "male")["text"] == "牛溲馬渤功，不假金丹術。"
     assert lookup_record("木", 2513, "female")["text"] == "風蒲美轉定，能化青蛇銅。"
     assert lookup_record("木", 2313, "female")["text"] == "日口任東風，女子貞不字。"

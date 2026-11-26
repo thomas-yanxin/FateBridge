@@ -3,13 +3,16 @@
 import copy
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 
 from scripts.ren.audit_jinkou_sike_strength import CORPUS, audit, reference, sha
 
 
-def test_entire_five_example_cohort_preserves_missing_months_and_duplicate_quotation():
+def test_entire_five_example_cohort_preserves_missing_months_and_duplicate_quotation() -> (
+    None
+):
     data = reference()
     cases = data["readings"]["cases"]
     assert len(cases) == 5
@@ -23,7 +26,7 @@ def test_entire_five_example_cohort_preserves_missing_months_and_duplicate_quota
     assert data["witness"]["blinded"] is False
 
 
-def test_source_failures_unknown_layer_and_old_failed_row_remain_visible():
+def test_source_failures_unknown_layer_and_old_failed_row_remain_visible() -> None:
     result = audit()
     assert result["engineering_guard_passed"] is True
     assert result["all_raw_strength_mentions_agree"] is False
@@ -52,8 +55,8 @@ def test_source_failures_unknown_layer_and_old_failed_row_remain_visible():
 
 
 def test_case_specific_fire_override_is_detected_instead_of_hiding_raw_difference(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.core.metaphysics.jinkou_strength as production
 
     original = production.internal_strength
@@ -62,6 +65,8 @@ def test_case_specific_fire_override_is_detected_instead_of_hiding_raw_differenc
         value = copy.deepcopy(original(rows))
         if [r["element"] for r in rows] == list("木水金火"):
             value["anchor_element"] = "火"
+        else:
+            pass
         return value
 
     monkeypatch.setattr(production, "internal_strength", wrong)
@@ -74,7 +79,9 @@ def test_case_specific_fire_override_is_detected_instead_of_hiding_raw_differenc
 @pytest.mark.parametrize(
     "field", ["daily_five_states_adjudicated", "complete_classical_acceptance"]
 )
-def test_new_chapter_does_not_authorize_an_unqualified_certificate(monkeypatch, field):
+def test_new_chapter_does_not_authorize_an_unqualified_certificate(
+    monkeypatch: pytest.MonkeyPatch, field: str
+) -> None:
     import fatebridge.core.metaphysics.jinkou_strength as production
 
     original = production.internal_strength
@@ -92,8 +99,8 @@ def test_new_chapter_does_not_authorize_an_unqualified_certificate(monkeypatch, 
 
 @pytest.mark.parametrize("fault", ["image", "coordinated_answer_and_manifest"])
 def test_changing_source_or_rehashing_a_fixed_answer_does_not_redefine_acceptance(
-    tmp_path, fault
-):
+    tmp_path: Path, fault: str
+) -> None:
     shutil.copytree(CORPUS, tmp_path / "reference")
     folder = tmp_path / "reference"
     if fault == "image":

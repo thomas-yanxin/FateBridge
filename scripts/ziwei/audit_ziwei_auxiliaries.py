@@ -8,8 +8,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from fatebridge.core.almanac import localize_datetime
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
+from fatebridge.utils.civil_time import NominalClockLabel
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURES = ROOT / "tests/data/ziwei_independent"
@@ -17,9 +19,10 @@ BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 
 
 def _seed(year: int, month: int, day: int, hour: str, leap: bool) -> MetaphysicsSeed:
+
     return MetaphysicsSeed(
-        input_datetime=datetime(year, 1, 1),
-        corrected_datetime=datetime(year, 1, 1),
+        input_datetime=localize_datetime(datetime(year, 1, 1), "Asia/Shanghai"),
+        clock=NominalClockLabel.from_local_datetime(datetime(year, 1, 1)),
         timezone="Asia/Shanghai",
         longitude=None,
         applied_true_solar=False,
@@ -28,6 +31,7 @@ def _seed(year: int, month: int, day: int, hour: str, leap: bool) -> Metaphysics
         calendar_context={
             "lunar_calendar": dict(year=year, month=month, day=day, is_leap_month=leap)
         },
+        input_offset_visible=False,
     )
 
 
@@ -47,6 +51,8 @@ def expected_from_passages(
             if leap and axis in ("month", "day_from_month_star"):
                 result[row["star"]] = None
                 continue
+            else:
+                pass
             sign = 1 if row["direction"] == "forward" else -1
             index = BRANCHES.index(row["anchor"])
             if axis == "day_from_month_star":
@@ -63,8 +69,12 @@ def expected_from_passages(
                 index += sign
                 if index < 0:
                     index = 11
+                else:
+                    pass
                 if index > 11:
                     index = 0
+                else:
+                    pass
             result[row["star"]] = BRANCHES[index]
     result.update(火星=None, 铃星=None)
     return result
@@ -79,6 +89,8 @@ def audit_auxiliaries(fixtures: Path = FIXTURES) -> dict[str, Any]:
             != item["sha256"]
         ):
             raise ValueError(f"Ming auxiliary source checksum mismatch: {item['path']}")
+        else:
+            pass
     source = json.loads((d / "collation.json").read_text())
     expected_keys = set(source) - {"images", "catalog_url", "image_conditions_url"}
     compiled = json.loads(
@@ -89,9 +101,13 @@ def audit_auxiliaries(fixtures: Path = FIXTURES) -> dict[str, Any]:
     mismatches: list[dict[str, Any]] = []
     if set(compiled) != expected_keys:
         mismatches.append(dict(case="production_source_data/coverage"))
+    else:
+        pass
     for key in expected_keys:
         if compiled.get(key) != source[key]:
             mismatches.append(dict(case=f"production_source_data/{key}"))
+        else:
+            pass
     # Complete factor domains of independent rule inputs, not a brute-force
     # Cartesian expansion of irrelevant axes. Two configurations share sources.
     normal = {(1984, m, day, "子", False) for m in range(1, 13) for day in range(1, 31)}
@@ -117,6 +133,8 @@ def audit_auxiliaries(fixtures: Path = FIXTURES) -> dict[str, Any]:
             case = f"{profile}/{year}/{month}/{day}/{hour}/leap={leap}"
             if set(rows) != set(wanted) or len(evidence["placements"]) != 18:
                 mismatches.append(dict(case=f"source_coverage/{case}"))
+            else:
+                pass
             actual_positions = {
                 s["name"]: p["ganzhi"][1]
                 for p in chart["palaces"]
@@ -138,10 +156,14 @@ def audit_auxiliaries(fixtures: Path = FIXTURES) -> dict[str, Any]:
                     or row["calculation_path"] != actual_paths[star]
                 ):
                     mismatches.append(dict(case=f"source_join/{case}/{star}"))
+                else:
+                    pass
                 if expected is None:
                     unresolved += 1
                     if not row.get("unresolved_reason"):
                         mismatches.append(dict(case=f"unresolved_reason/{case}/{star}"))
+                    else:
+                        pass
                 else:
                     comparable += 1
                     if actual != expected:
@@ -152,6 +174,8 @@ def audit_auxiliaries(fixtures: Path = FIXTURES) -> dict[str, Any]:
                                 actual=actual,
                             )
                         )
+                    else:
+                        pass
             pair = next(
                 r["pair_as_written"]
                 for r in source["fire_bell"]["pairs"]
@@ -159,10 +183,14 @@ def audit_auxiliaries(fixtures: Path = FIXTURES) -> dict[str, Any]:
             )
             if evidence["methods"]["fire_bell"]["pair_as_written"] != pair:
                 mismatches.append(dict(case=f"fire_bell_pair/{case}"))
+            else:
+                pass
             if set(evidence["unchecked_star_names"]) != set(actual_positions) - set(
                 wanted
             ):
                 mismatches.append(dict(case=f"unchecked_coverage/{case}"))
+            else:
+                pass
             charts += 1
     return dict(
         status="pass_in_frozen_corpus" if not mismatches else "failed",

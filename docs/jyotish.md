@@ -4,7 +4,7 @@
 
 阅读导航：[输入与来源](#坐标速度与来源限制) · [力量与未决项](#力量口径与未裁定分支) · [计算范围](#计算范围与来源) · [接口](#接口与独立视图) · [示例](#可复制的虚构示例) · [验证](#数值与软件验证)
 
-当前提供`parashari_lahiri_core_v29`有限Parashari实现。`astro_india_chart`（REST `/api/astro/india`）计算本命与分盘，`astro_vimshottari`（REST `/api/astro/vimshottari`）计算月宿主运／次运。CLI、REST和MCP共用领域服务；源码可用范围、已发布包及部署验收分别报告。
+当前提供`parashari_lahiri_core_v29`有限Parashari实现。`vedic_chart`（REST `/api/astrology/vedic-chart`）计算本命与分盘，`vimshottari_dasha`（REST `/api/astrology/vimshottari-dasha`）计算月宿主运／次运。CLI、REST和MCP共用领域服务；源码可用范围、已发布包及部署验收分别报告。
 
 民用出生时刻须明确合法`birth_timezone`或可支持且不歧义的`birth_place`。未知时区在计算前拒绝，坐标与太阳钟显示不能代替出生钟制。已知历史LMT／LAT另由明确的`birth_clock_basis`输入；历史时标约定不认证真实地方钟。
 
@@ -38,7 +38,7 @@ Simon模型的派生平均太阳现从Earth的精确长期多项式加180后再�
 
 Ketu由同次Rahu精确加180°得到。分盘、星宿与宿足使用这项未舍入派生关系，名义盘和时间误差采样采用同一口径；返回的经度仍为浮点数。独立传入的手工原盘继续尊重其显式Ketu值，不据Rahu重建。边界与三端回归见[对点分区测试](../tests/western/test_western_antipodes.py)，不构成独立天文精度认证。
 
-`india.reading_basis`明确按所填出生时刻的名义值计算。没有给出生时误差时，`options_basis=nominal_only`且敏感性仍为`not_assessed`，不能当作已证实精确；给定误差后，星宿、宿主及宿足与分盘使用同一最多30秒UTC网格。`nakshatra_alternatives`列出发生变化的星体／上升及覆盖数，覆盖数不是概率；没有列出变化也不证明连续区间内没有边界。原生解读会把名义月宿与抽样候选一并陈述，达沙摘要也明确使用名义生时。
+`india.reading_basis`明确按所填出生时刻的名义值计算。没有给出生时误差时，`options_basis=nominal_only`且敏感性仍为`not_assessed`，不能当作已证实精确；给定误差后，星宿、宿主及宿足与分盘使用同一物理 TT 网格，相邻样点最多间隔 30 SI 秒。`nakshatra_alternatives`列出发生变化的星体／上升及覆盖数，覆盖数不是概率；没有列出变化也不证明连续区间内没有边界。原生解读会把名义月宿与抽样候选一并陈述，达沙摘要也明确使用名义生时。
 
 每项主题力量的`calculation_context`携带该宫主自己的条件数值、实际同run字段路径、模型／性质约束和局部不可用依据。`computed_consensus`是已算分支一致，`conditional_results`是分支都已计算但结果不同，`unavailable`是当前无可用数值，`partially_computed`是部分分支有值；共识不等于原典裁定。不能把null统一写成零、漏算或用户资料不足，也不能由某个星体的全局缺项否定另一个宫主的已算结果。
 
@@ -48,7 +48,7 @@ Vimshottari生时端点／中心样本若晚于目标，返回`omitted_samples`�
 
 `kala_bala.components.yuddha_bala`按已核验页图的Raman76–77计算：遍历五星全部10对，以最短黄经差严格小于1度检索候选；两星独立交战时，取Sthana、Dig及Natha至Hora的同分支合计差，除以原书固定Bimba系数差，按较小黄经者加、另一星减。该前置合计不含Ayana、Cheshta、Drik、Naisargika或星战自身。固定盘面系数不是当前测得的角直径，不按天文距离动态替换，也不自行截断到60。
 
-计算保留每一分支的输入、前置合计、分母、加减量及来源。原生计算的 `prewar_basis` 另给 `exact_paksha_virupa`，复核前置合计时用它替换同条 `inputs.paksha_bala` 的浮点显示值。水星／月亮性质未裁定时保持相关分支；最终Kala按同一分支相加，不能先拿不唯一的分量摘要相加。同经或跨黄经零点的独立星战虽未裁定胜者，前置输入齐全时仍能算出无符号加减量，但两星获配的正负值继续缺失；连成三颗以上的同时交战或缺少前置输入时，加减量也保持缺失。独立的另一对可计算。生时网格记录候选／判定变化及每个分支范围，范围与覆盖数均不是概率。
+计算保留每一分支的输入、前置合计、分母、加减量及来源。原生计算的 `prewar_basis.exact_inputs_virupa` 按同条 `inputs` 的全部键交付精确分数或 `null`；复核前置合计时对这些分数求和，最后才转换浮点显示值。水星／月亮性质未裁定时保持相关分支；最终Kala按同一分支相加，不能先拿不唯一的分量摘要相加。同经或跨黄经零点的独立星战虽未裁定胜者，前置输入齐全时仍能算出无符号加减量，但两星获配的正负值继续缺失；连成三颗以上的同时交战或缺少前置输入时，加减量也保持缺失。独立的另一对可计算。生时网格记录候选／判定变化及每个分支范围，范围与覆盖数均不是概率。
 
 这是Raman星战公式对本次已声明力量输入的应用：上游仍各有Santhanam／所选七分盘读法，不认证完整单一Raman六力。Santhanam27.20给出另一公式，不混作同一规则。给定输入的算术与独立参考见[星战测试](../tests/jyotish/test_jyotish_war.py)。
 
@@ -59,6 +59,8 @@ Vimshottari生时端点／中心样本若晚于目标，返回`omitted_samples`�
 此前v5只按盈亏处理月亮性质；原书还列有第八日窗口的另一表述。v6保留这项作者内分歧及边界日段，不能挑较高分或把条件分支当概率。新增赤道坐标与日出事件均有后端记录，严格星历模式覆盖两者；无极地日出不造默认时间。新JPL请求超时后，用原有21个JPL黄道位置及独立ERFA转换复核赤道帧，没有冒充新增数据。
 
 时间分量的公式与来源检查见[时间力测试](../tests/jyotish/test_jyotish_kala.py)。完整六力总量仍为null，未给出强弱达标排名。
+
+`arithmetic_policy=unrounded_temporal_source_values_v1` 表示Natha、Paksha及Ayana在同次时间力／运动力计算中保留精确源公式值，仅在输出处舍入；星战仍只取Natha至Hora，Ayana不进入星战前置合计。Sthana、Dig继续作为上游已交付的二进制输入，本策略不恢复它们原公式的全部精度。固定36组输入的3,782个字段已与独立FLINT参考实际比较，原94项严格最近binary64差异消除；原1e-12粗门槛在修复前已通过。该有限算术对照不认证完整六力、原典争议或预测效度，见[精度验收](precision-acceptance.md#时间力源值在星战与合计中的延迟舍入)。
 
 ## 方向力、自然力与相位力
 
@@ -78,7 +80,7 @@ Santhanam第26章与27.19现另有未施用来源字段，记录译文／注解�
 
 水星“好／坏关联”的精确判据尚未裁定，不用同星座或燃烧阈值擅自补成定论。`drik_bala.scenarios` 分别保存水星为传统 benefic／malefic 的结果及逐星贡献；v6同时保留月亮盈亏与原书第53节第八日窗口的不同读法，有分歧或边界不明时保留分类分支。`summary` 仅在所有分支值相同时给数值，否则为 `null`；null不表示零或没有相位，分支也不是成功概率上下界。正负号仅表示所选传统规则，不能直接翻译成现实事件吉凶。
 
-生时误差沿同一UTC网格给方向力连续范围及相位各分类分支的范围与样本覆盖数，覆盖数不是概率。`shadbala_assessment` 仍未完成：Kala、Cheshta及相位分类裁定未齐，总量为null，不拼完整六力总分或达标排名。对应检查见[力量分量测试](../tests/jyotish/test_jyotish_balas.py)与[相位计算链测试](../tests/jyotish/test_jyotish_drik_chain.py)。
+生时误差沿同一 TT 网格给方向力连续范围及相位各分类分支的范围与样本覆盖数，覆盖数不是概率。`shadbala_assessment` 仍未完成：Kala、Cheshta及相位分类裁定未齐，总量为null，不拼完整六力总分或达标排名。对应检查见[力量分量测试](../tests/jyotish/test_jyotish_balas.py)与[相位计算链测试](../tests/jyotish/test_jyotish_drik_chain.py)。
 
 
 ## 计算范围与来源
@@ -101,11 +103,11 @@ Santhanam第26章与27.19现另有未施用来源字段，记录译文／注解�
 
 规则来源为 [P.V.R. Narasimha Rao《Vedic Astrology: An Integrated Approach》](https://www.vedicastrologer.org/articles/vedic_astro_textbook.pdf)，重点为第 2–4、6、10、16 章；天文接口来源为 [Swiss Ephemeris Programmer's Manual](https://www.astro.com/swisseph/swephprg.htm)。采用书中有限规则；有分歧的节点尊贵、节点相位和共主没有纳入本版本。`india.rulesets/rule_trace` 保留来源和规则 ID。
 
-规则、来源和教材冲突的检查见[深度规则测试](../tests/jyotish/test_jyotish_depth.py)。仍未覆盖完整 Shadbala（已实现位置力五分量、方向力与自然力，相位力保留分类分支）、八分法占据读法的唯一裁定与未决削减分支及事件推断、其他作者燃烧规则与真实出没可见性、复杂 Yoga 成格验收、D1/D2/D3/D7/D9/D10/D12/D30 以外分盘、其他 Dasha、出生时校正。`astro_vedicprog` 是已有的恒星二次推运，与本页的 Vimshottari 分开。
+规则、来源和教材冲突的检查见[深度规则测试](../tests/jyotish/test_jyotish_depth.py)。仍未覆盖完整 Shadbala（已实现位置力五分量、方向力与自然力，相位力保留分类分支）、八分法占据读法的唯一裁定与未决削减分支及事件推断、其他作者燃烧规则与真实出没可见性、复杂 Yoga 成格验收、D1/D2/D3/D7/D9/D10/D12/D30 以外分盘、其他 Dasha、出生时校正。`sidereal_progressions` 是已有的恒星二次推运，与本页的 Vimshottari 分开。
 
 ## 接口与独立视图
 
-`astro_india_chart` 接受 `node_mode`、`divisions`、`birth_time_uncertainty_minutes`、`ephemeris_policy`、`saptavargaja_profile`、`cheshta_model`。`divisions` 默认为 `[9,10]`，可选不重复的 `2,3,7,9,10,12,30` 或 `[]`；D1 始终计算。`[]` 只控制导出的分盘，位置强度仍计算内部所需的七盘星座。`astro_chart` 的 `chart_variant=india_chart` 接受相同选项；其他盘型允许协议自动传入中性的默认值，拒绝非默认印占设置。
+`vedic_chart` 接受 `node_mode`、`divisions`、`birth_time_uncertainty_minutes`、`ephemeris_policy`、`saptavargaja_profile`、`cheshta_model`。`divisions` 默认为 `[9,10]`，可选不重复的 `2,3,4,7,9,10,12,16,20,24,27,30,40,45,60` 或 `[]`；D1 始终计算。`[]` 只控制导出的分盘，位置强度仍计算内部所需的七盘星座。`astrology_chart` 的 `chart_variant=india_chart` 接受相同选项；其他盘型允许协议自动传入中性的默认值，拒绝非默认印占设置。
 
 独立印占证据在 `india.profile/nakshatras/charts/topic_evidence/birth_time_sensitivity`。印度盘顶层通用西占字段是另一个公开参考视图，不能把其中西占尊贵、相位容许度或现代星座文案解释为印占规则。两种坐标算法可能因原生恒星实现与历史岁差平移存在微差，印占分盘与达沙始终使用 `india` 原生数据。
 
@@ -121,7 +123,7 @@ Santhanam第26章与27.19现另有未施用来源字段，记录译文／注解�
 
 ## 时间与不确定性
 
-`astro_vimshottari` 使用出生地时区解释 `analysis_year/month/day/hour/minute`。显式年份未给月／日时各取 1；显式月份未给日时取 1；未给年份时从冻结调用时刻 `as_of` 取出生时区年份，完全未给日期时取该本地日期。未给钟时取 `00:00`。这是内部锚点，不等于全年时间线扫描。
+`vimshottari_dasha` 按 `analysis_timezone` 解释目标年月日和钟时。省略该时区时，民用出生沿用出生时区，太阳钟出生使用 UTC。显式年份未给月或日时各取 1，显式月份未给日时取 1。未给年份时从调用时刻在目标时区的投影取年，完全未给日期时取当地日期。`as_of` 可以冻结这个调用时刻。未给钟时取 `00:00`，作为分期查询的单个锚点。
 
 | `year_basis` | 固定日数 | 默认 |
 | --- | --- | --- |
@@ -133,15 +135,15 @@ Santhanam第26章与27.19现另有未施用来源字段，记录译文／注解�
 
 边界采用 `[start,end)`，输出为带 UTC 偏移的 ISO 时间。时间线是**目标所在的 120 年规则周期**，首运可始于出生前；`timeline_scope.cycle_index=0` 表示以出生主运起点开始的周期。超过该周期的目标定位到后续相同规则周期。120 年不是寿命估计，计算出的微秒位不代表出生记录或现实事件有该精度。
 
-`astro_vimshottari`可选`dasha_depth=2..6`，默认2层MD／AD；3至6层依次加入PD、SD、PAD、DAD。`vimshottari.subdivisions.current_levels`返回当前完整运主链，`siblings_by_level`列出每个当前父期的九个子期；原有`timeline`继续只含九个MD与81个AD。内核按完整父期递归，从完整MD起点保留有理数偏移，输出边界只舍入一次；不将出生剩余期重新分割。生时抽样以完整`period_lord_chain`分组，宫主上下文来自各自候选。读取视图`evidence_views.dasha_levels`前须显式选择大于2的深度。来源与递归边界检查见[达沙细分测试](../tests/jyotish/test_jyotish_dasha_levels.py)；层级细分不代表现实事件精度。
+`vimshottari_dasha`可选`dasha_depth=2..6`，默认2层MD／AD；3至6层依次加入PD、SD、PAD、DAD。`vimshottari.subdivisions.current_levels`返回当前完整运主链，`siblings_by_level`列出每个当前父期的九个子期；原有`timeline`继续只含九个MD与81个AD。内核按完整父期递归，从完整MD起点保留有理数偏移，输出边界只舍入一次；不将出生剩余期重新分割。生时抽样以完整`period_lord_chain`分组，宫主上下文来自各自候选。读取视图`evidence_views.dasha_levels`前须显式选择大于2的深度。来源与递归边界检查见[达沙细分测试](../tests/jyotish/test_jyotish_dasha_levels.py)；层级细分不代表现实事件精度。
 
-拒绝不存在或有歧义的 DST 钟时；重复时刻可用明确 UTC 偏移消歧。经纬度或城市解析范围由现有出生工具处理。
+目标当地钟面须存在、唯一且有已定义的 UTC 偏移。偏移切换产生的跳时或重时也可能来自标准时间调整。若记录已确认实际偏移，可在目标时区字段使用该固定偏移。SDK 构盘可接收已选回拨分支的出生记录，并核验记录对应的 UTC。IANA 时区的 `-00` 当地类型没有定义偏移，不能作为目标钟面或用于补齐日期的调用钟面。 [RFC 9636 §3.2](https://www.rfc-editor.org/rfc/rfc9636.html#section-3.2) · [固定历史对照](precision-acceptance.md#jyotish-civil-fold-round126)
 
 民用钟时转换到 UTC 后，1972 年起使用随包冻结的 IERS TAI−UTC 表取得 TT，再由 Swiss Delta-T 模型估计 UT1。不能把 UTC 数字直接视作 UT1，也不让远期日期悄悄切换输入语义。`india.profile.time_scale_context` 回显来源名称、表的到期日和 `future_leap_seconds_assumed_unchanged`；过期后沿用最后偏移是明确假设。1961–1971年改用[IERS历史UTC偏移／日漂移表](https://hpiers.obspm.fr/eoppc/bul/bulc/UTC-TAI.history)，1960年另用[IAU SOFA](https://www.iausofa.org/2023-10-11c)的标准关系；1960年前保留 UT1 输入假设并返回 `julian_day_utc=null`。1960年也回显UTC的实际来源，不认证出生钟或地方授时实现。可选的太阳钟时重定位会改变计算时刻，不能理解为同一物理时刻的另一种显示。
 
-`birth_time_uncertainty_minutes` 仅填用户确认的正负范围，最大 120 分钟。未给范围标记 `not_assessed`，不默认精确；给定范围按 UTC 区间最多 30 秒网格比较上升和九曜在各分盘的星座／宫位，输出实际变体，并记录 D1 度数区间／Baladi／顺逆行变体及 Uchcha Bala、Sthana 五分量与总量的抽样范围。`no_change_on_sample_grid` 仅表示抽样未见变化，不保证区间内没有边界。达沙复用同一完整网格比较目标时刻的主运／次运，`stage_variants` 保留全部抽样组合及对应生时下的宫位、宫主和D1条件；不能把名义盘上下文套到其他候选。
+`birth_time_uncertainty_minutes` 仅填用户确认的正负范围，最大 120 分钟。未给范围标记 `not_assessed`，不默认精确；给定范围以实际 TT 建格，相邻样点至多相隔 30 SI 秒，比较上升和九曜在各分盘的星座／宫位，输出实际变体，并记录 D1 度数区间／Baladi／顺逆行变体及 Uchcha Bala、Sthana 五分量与总量的抽样范围。`no_change_on_sample_grid` 仅表示抽样未见变化，不保证区间内没有边界。达沙复用同一完整网格比较目标时刻的主运／次运，`stage_variants` 保留全部抽样组合及对应生时下的宫位、宫主和D1条件；不能把名义盘上下文套到其他候选。
 
-`sample_segments` 保留不连续出现的区段，`adjacent_stage_change_brackets` 只夹定相邻样本间的变化，不声称精确边界。`period_boundary_ranges` 和度数范围是样本最小最大值，不是置信区间；跨零度时数值范围可能很宽。`requested_sample_count/evaluated_sample_count/omitted_samples` 针对完整网格，目标早于候选出生的每个点均显式略过；另列去重后的实际时刻数量。旧 `samples` 保留端点与中心子集，其计数另列 `endpoint_subset_*`。顶层 `natal_ruler_context` 明确只对应名义生时。地点误差未纳入该敏感性分析。
+`sample_segments` 保留不连续出现的区段，`adjacent_stage_change_brackets` 只夹定相邻样本间的变化，不声称精确边界。`period_boundary_ranges` 和度数范围是样本最小最大值，不是置信区间；跨零度时数值范围可能很宽。`requested_sample_count/evaluated_sample_count/omitted_samples` 针对完整网格。目标早于候选出生的点单列省略。正闰秒或历史 UTC 无唯一历法键的样点仍计算星位，达沙按 `no_supported_birth_calendar_key` 省略该点，保留物理时标回执。普通样点沿用 UTC 公历的分期口径。旧 `samples` 保留端点与中心子集，其计数另列 `endpoint_subset_*`。顶层 `natal_ruler_context` 明确只对应名义生时。地点误差未纳入该敏感性分析。
 
 `cheshta_model=simon1994_j2000` 的 `model_context` 回显出生TT、平均多项式来源、共同坐标框架、逐星几何后端和角度过程。适用窗口为 `[1900-01-01 TT,2051-01-01 TT)`；越界只保留该层缺失，其他本命证据可继续返回。生时抽样跨过窗口会记录模型状态变化；网格覆盖不是概率。`analysis_year` 不改变本命模型的适用窗口。严格星历模式也检查新增J2000几何位置的后端。TT代入TDB慢变平均参数是一项显式近似，并不把全部时间尺度视为相同。
 
@@ -151,14 +153,14 @@ Santhanam第26章与27.19现另有未施用来源字段，记录译文／注解�
 
 ```bash
 uv sync --locked --extra dev
-uv run --locked --extra dev fatebridge astro_india_chart \
+uv run --locked --extra dev fatebridge vedic_chart \
   --name 演示甲 --birth-year 1990 --birth-month 4 --birth-day 6 \
   --birth-hour 9 --birth-minute 33 --birth-place 上海 \
   --node-mode mean --divisions 9 10 --birth-time-uncertainty-minutes 5 \
   --fields india.profile india.charts india.topic_evidence india.birth_time_sensitivity india.rulesets india.rule_trace \
   --strict-fields --no-include-snapshot-text
 
-uv run --locked --extra dev fatebridge astro_vimshottari \
+uv run --locked --extra dev fatebridge vimshottari_dasha \
   --name 演示甲 --birth-year 1990 --birth-month 4 --birth-day 6 \
   --birth-hour 9 --birth-minute 33 --birth-place 上海 \
   --analysis-year 2026 --analysis-month 10 --analysis-day 22 \
@@ -170,7 +172,7 @@ uv run --locked --extra dev fatebridge astro_vimshottari \
 显式选择现代五星平均模型的独立示例：
 
 ```bash
-uv run --locked --extra dev fatebridge astro_india_chart \
+uv run --locked --extra dev fatebridge vedic_chart \
   --name 演示甲 --birth-year 1990 --birth-month 4 --birth-day 6 \
   --birth-hour 9 --birth-minute 33 --birth-place 上海 \
   --cheshta-model simon1994_j2000 \
@@ -181,7 +183,7 @@ uv run --locked --extra dev fatebridge astro_india_chart \
 REST 的 `fields/strict_fields/include_snapshot_text` 是查询参数；出生与计算选项放请求体：
 
 ```bash
-curl -sS -X POST 'http://127.0.0.1:8010/api/astro/vimshottari?fields=analysis_context&fields=vimshottari.current_major&fields=vimshottari.current_sub&strict_fields=true&include_snapshot_text=false' \
+curl -sS -X POST 'http://127.0.0.1:8010/api/astrology/vimshottari-dasha?fields=analysis_context&fields=vimshottari.current_major&fields=vimshottari.current_sub&strict_fields=true&include_snapshot_text=false' \
   -H 'Content-Type: application/json' \
   -d '{"name":"演示甲","birth_year":1990,"birth_month":4,"birth_day":6,"birth_hour":9,"birth_minute":33,"birth_place":"上海","analysis_year":2026,"analysis_month":10,"analysis_day":22,"analysis_hour":12,"analysis_minute":0,"year_basis":"sidereal_365_25636"}'
 ```
@@ -243,6 +245,8 @@ uv run --locked --extra dev pytest -q tests/jyotish/test_jyotish_independent_aud
 
 `india.strengths.sthana_bala` 返回七个物理天体的 Uchcha、Saptavargaja、Ojayugma、Kendradi、Drekkana 五分量及总量。单位为 Virupa，60 Virupa 为 1 Rupa；没有人为归一化的满分。节点及上升不填虚构的零分，完整 Shadbala 仍标记 `not_complete`。逐盘关系取 D1 本命位置，不能在各分盘重新计算临时友敌。
 
+位置力总量／Rupa及来源比较分别从未舍入的源式结果交付，不保证等于显示叶项相加；名义盘和生时网格也将同次精确Sthana／Dig传入星战，而不反馈显示值。直接传入的独立浮点操作数仍按其实际值计算，缺项保持未知。[本轮有限算术对照](precision-acceptance.md#jyotish-positional-source-chain)与完整六力、物理星历或现实预测验收分开。
+
 `saptavargaja_profile` 仅选择七分盘分量的读法：
 
 | 参数 | 系数：moola／own／great friend／friend／neutral／enemy／great enemy | moola 作用域 |
@@ -262,7 +266,7 @@ uv run --locked --extra dev pytest -q tests/jyotish/test_jyotish_sthana.py tests
 查看完整位置分量的虚构示例：
 
 ```bash
-uv run --locked --extra dev fatebridge astro_india_chart \
+uv run --locked --extra dev fatebridge vedic_chart \
   --name 演示甲 --birth-year 1990 --birth-month 4 --birth-day 6 \
   --birth-hour 9 --birth-minute 33 --birth-place 上海 \
   --divisions 2 3 7 9 10 12 30 --saptavargaja-profile santhanam_27 \
@@ -276,6 +280,8 @@ uv run --locked --extra dev fatebridge astro_india_chart \
 
 `india.profile.clock_context`列出记录时刻、计算UTC、显示开关、无时区的`solar_wall_datetime`、修正分钟及来源。太阳钟标签可能跨日／跨年，甚至与某个IANA夏令时缺失钟时的数字相同；它不是该时区的另一个时间戳，不改变出生日期、达沙起点、分析日期锚点或平均模型窗口。太阳钟显示使用同一TT、模型UT1与视太阳时角，不把UTC直接当作实测UT1，也不认证记录精度或实测地球自转。
 
+已定义的民用出生时刻可在时区换算后落到 UTC 年 0 或 10000。印占本命沿用共享公历日序交付该时点。同一个日序也用于 Vimshottari 的完整分期，首主运可起于公元 1 年以前。分期仍按 86,400 秒名义日、共同历元和半开区间计算，分析年上限仍为 9800。太阳钟面超出可表示年份时单独标为不可用。 [固定三端与独立分期对照](precision-acceptance.md#india-birth-utc-calendar-round190)
+
 已知历史LAT／LMT记录按其真实钟制和明确的`birth_clock_basis`转换，不能先当民用资料再打开显示开关。直接领域调用也拒绝已经太阳时重定位而与记录时刻不一致的旧`AstroBirthInfo`。
 
 ## 已知历史太阳钟输入
@@ -284,10 +290,10 @@ uv run --locked --extra dev fatebridge astro_india_chart \
 
 LMT以东经正向加在UT1上；LAT再涉及视太阳均时差。换算沿用共享TT／UT1及历史UTC规则，原钟面无时区，输出的UTC载体在1960年前仍是历史UT1约定。`person_info.clock_conversion`与`india.profile.clock_context`同时保留原标签、钟制、经度、转换时刻、数值往返残差和实际太阳后端；数值残差不认证原记录准确。严格星历政策也检查LAT逆算的每次太阳坐标和误差区间端点。
 
-太阳钟的误差范围按原钟面加减分钟后先换算端点，再建立最长30秒的物理UTC网格，不强行当成对称UTC分钟，也不把点数截成481。达沙的`analysis_timezone`可另选目标民用时区；省略时民用出生沿用其时区，太阳钟出生明确默认UTC。该参数不改变出生换算，不把目标钟时重新当LMT/LAT。
+太阳钟的误差范围按原钟面加减分钟后先换算端点，保留两端的 TT 和 UT1，再建立间距至多 30 SI 秒的 TT 网格，不强行当成对称UTC分钟，也不把点数截成481。达沙的`analysis_timezone`可另选目标民用时区；省略时民用出生沿用其时区，太阳钟出生明确默认UTC。该参数不改变出生换算，不把目标钟时重新当LMT/LAT。
 
 ```bash
-uv run --locked --extra dev fatebridge astro_vimshottari \
+uv run --locked --extra dev fatebridge vimshottari_dasha \
   --birth-year 1879 --birth-month 5 --birth-day 14 --birth-hour 23 \
   --birth-longitude 10 --birth-latitude 53.55 \
   --birth-clock-basis local_mean_solar --analysis-year 2026 \

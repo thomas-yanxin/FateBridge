@@ -4,17 +4,16 @@ from __future__ import annotations
 
 from typing import Any
 
-from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
-
-from ...utils.data import EARTHLY_BRANCHES
-from .common import (
+from fatebridge.core.metaphysics.common import (
     GUI_REN_SEQUENCE,
     SEXAGENARY_INDEX,
     branch_element_text,
     kongwang_for_ganzhi,
 )
-from .liureng_seasonal import MONTH_PARTITION, POWERS
-from .ren_gods import GuirenProfile, noble_start
+from fatebridge.core.metaphysics.liureng_seasonal import MONTH_PARTITION, POWERS
+from fatebridge.core.metaphysics.ren_gods import GuirenProfile, noble_start
+from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
+from fatebridge.utils.data import EARTHLY_BRANCHES
 
 RULE_ID = "liuren.tanyuan_god_yin"
 

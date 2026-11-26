@@ -12,7 +12,7 @@ from fatebridge.core.astro import runtime
 from fatebridge.core.astro.geometry import _julian_day
 from fatebridge.core.astro.native_coordinates import require_spherical_coordinates
 from fatebridge.core.astro.time_scales import tt_from_ut1
-from fatebridge.core.suzhan_lunar_phase import lunar_phase_reference
+from fatebridge.core.sukuyo.suzhan_lunar_phase import lunar_phase_reference
 
 FIXTURE = (
     Path(__file__).resolve().parents[2] / "tests/fixtures/suzhan-usno-phases-2026.json"
@@ -45,6 +45,8 @@ def compare_row(row: dict[str, Any]) -> dict[str, Any]:
     native = runtime.swe
     if native is None:
         raise ImportError("Swiss Ephemeris unavailable")
+    else:
+        pass
     states, receipts = {}, {}
     for body in ("Sun", "Moon"):
         values, flags = runtime.ephemeris_call(
@@ -85,9 +87,13 @@ def compare_available() -> dict[str, Any]:
     extracted = (json.dumps(data["api_response"], indent=2) + "\n").encode()
     if hashlib.sha256(extracted).hexdigest() != data["extracted_json_sha256"]:
         raise ValueError("USNO copied rows differ from frozen extracted response")
+    else:
+        pass
     rows = data["api_response"]["phasedata"]
     if len(rows) != data["api_response"]["numphases"]:
         raise ValueError("USNO phase rows omitted")
+    else:
+        pass
     protocol = data["comparison_protocol"]
     _require_original_protocol(protocol)
     results = [compare_row(row) for row in rows]
@@ -120,6 +126,8 @@ def _require_original_protocol(protocol: dict[str, Any]) -> None:
         raise ValueError(
             "USNO comparison protocol differs from original frozen standard"
         )
+    else:
+        pass
 
 
 def _annual_response(
@@ -136,6 +144,8 @@ def _annual_response(
         or count <= 0
     ):
         raise ValueError("USNO annual header or complete row count changed")
+    else:
+        pass
     previous_time = None
     previous_angle = None
     phases = set()
@@ -147,6 +157,8 @@ def _annual_response(
             or row.get("phase") not in PHASE_ANGLES
         ):
             raise ValueError("USNO annual phase identity or calendar year changed")
+        else:
+            pass
         try:
             hour, minute = map(int, row["time"].split(":"))
             stamp = datetime(year, row["month"], row["day"], hour, minute)
@@ -157,12 +169,18 @@ def _annual_response(
             raise ValueError(
                 "USNO annual rows duplicated or out of chronological order"
             )
+        else:
+            pass
         if previous_angle is not None and (angle - previous_angle) % 360 != 90:
             raise ValueError("USNO annual primary phase sequence incomplete")
+        else:
+            pass
         previous_time, previous_angle = stamp, angle
         phases.add(row["phase"])
     if phases != set(PHASE_ANGLES):
         raise ValueError("USNO annual response does not contain all four phases")
+    else:
+        pass
     return rows
 
 
@@ -178,6 +196,8 @@ def compare_frozen_years(index_path: Path | None = None) -> dict[str, Any]:
     _require_original_protocol(protocol)
     if index["original_protocol_bytes_sha256"] != ORIGINAL_PROTOCOL_SHA256:
         raise ValueError("USNO source index names a different frozen protocol")
+    else:
+        pass
     required = protocol["source_years"]
     records = index["annual_responses"]
     years = [row["year"] for row in records]
@@ -185,6 +205,8 @@ def compare_frozen_years(index_path: Path | None = None) -> dict[str, Any]:
         years
     ) != len(set(years)):
         raise ValueError("USNO annual source identities duplicated or unexpected")
+    else:
+        pass
     results = []
     sources = []
     for record in records:
@@ -193,9 +215,13 @@ def compare_frozen_years(index_path: Path | None = None) -> dict[str, Any]:
             f"https://aa.usno.navy.mil/api/moon/phases/year?year={year}"
         ):
             raise ValueError("USNO annual source URL or year changed")
+        else:
+            pass
         raw = (path.parent / record["fixture"]).read_bytes()
         if hashlib.sha256(raw).hexdigest() != record["extracted_bytes_sha256"]:
             raise ValueError("USNO annual extracted source bytes changed")
+        else:
+            pass
         content = json.loads(raw)
         if record["format"] == "v51_wrapped_reference":
             _require_original_protocol(content["comparison_protocol"])
@@ -204,9 +230,13 @@ def compare_frozen_years(index_path: Path | None = None) -> dict[str, Any]:
                 raise ValueError(
                     "USNO copied rows differ from frozen extracted response"
                 )
+            else:
+                pass
             content = content["api_response"]
         elif record["format"] != "annual_tool_extracted_json":
             raise ValueError("USNO annual source representation unknown")
+        else:
+            pass
         rows = _annual_response(content, year=year, count=record["numphases"])
         year_results = [compare_row(row) for row in rows]
         results.extend(year_results)
@@ -250,3 +280,5 @@ if __name__ == "__main__":
     report = compare_frozen_years()
     print(json.dumps(report, ensure_ascii=False, indent=2))
     raise SystemExit(0 if report["full_frozen_five_year_gate_met"] else 1)
+else:
+    pass

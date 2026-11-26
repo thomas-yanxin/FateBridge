@@ -64,6 +64,8 @@ def fetch(dates, protocol, archive, label):
             "rows": [],
             "error": response.get("error", response.get("result", "")),
         }
+    else:
+        pass
     rows = []
     for raw in csv.reader(
         io.StringIO(response["result"].split("$$SOE\n", 1)[1].split("$$EOE", 1)[0])
@@ -73,6 +75,8 @@ def fetch(dates, protocol, archive, label):
         )
         if match is None:
             raise ValueError("Unexpected lunar reference epoch format")
+        else:
+            pass
         year, month, day, hour, minute, second = match.groups()
         date = datetime(
             int(year), MONTHS[month], int(day), int(hour), int(minute), int(second)
@@ -80,6 +84,8 @@ def fetch(dates, protocol, archive, label):
         ra, dec = map(float, raw[3:5])
         if not math.isfinite(ra) or not math.isfinite(dec):
             raise ValueError("Nonfinite lunar reference position")
+        else:
+            pass
         rows.append(
             {
                 "date_tt": date,
@@ -91,6 +97,8 @@ def fetch(dates, protocol, archive, label):
         )
     if len(rows) != len(dates) or {r["date_tt"] for r in rows} != set(dates):
         raise ValueError("Lunar request epoch coverage mismatch")
+    else:
+        pass
     return {**record, "rows": rows}
 
 
@@ -112,15 +120,21 @@ def generate(args):
             raise RuntimeError(
                 "Lunar reference dependencies differ from frozen versions"
             )
+        else:
+            pass
     original = json.loads(args.development_reference.read_text())
     if (
         hashlib.sha256(args.development_reference.read_bytes()).hexdigest()
         != protocol["development_reference_sha256"]
     ):
         raise ValueError("Development reference identity changed")
+    else:
+        pass
     centers = protocol["development_dates_tt"] + protocol["holdout_dates_tt"]
     if len(centers) != len(set(centers)):
         raise ValueError("Lunar development and holdout dates overlap")
+    else:
+        pass
     samples = sorted(
         {
             (datetime.fromisoformat(c) + timedelta(seconds=offset)).isoformat()
@@ -146,7 +160,13 @@ def generate(args):
                         raise ValueError(
                             "Lunar reference collection failed: " + single["error"]
                         )
+                    else:
+                        pass
                     missing.append({"date_tt": date, "reason": single["error"]})
+                else:
+                    pass
+        else:
+            pass
         print(
             f"Journalled {min(offset + 20, len(samples))}/{len(samples)} apparent lunar positions",
             flush=True,
@@ -157,6 +177,8 @@ def generate(args):
         m["date_tt"] for m in missing
     } != set(samples):
         raise ValueError("Lunar probe coverage is incomplete or duplicated")
+    else:
+        pass
     rows = []
     for date in centers:
         required = [
@@ -195,6 +217,10 @@ def generate(args):
                     chosen,
                     protocol["frame_derivative_step_days"],
                 )
+            else:
+                pass
+        else:
+            pass
         rows.append(row)
     if any(
         name == prefix or name.startswith(prefix + ".")
@@ -202,6 +228,8 @@ def generate(args):
         for prefix in ["fatebridge", "swisseph"]
     ):
         raise RuntimeError("Lunar reference imported forbidden implementation")
+    else:
+        pass
     previous_missing = [
         r["unavailable_requested_epochs"]
         for r in original["references"]
@@ -235,3 +263,5 @@ if __name__ == "__main__":
     args.output.write_text(
         json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
     )
+else:
+    pass

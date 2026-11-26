@@ -21,6 +21,7 @@ from fatebridge.utils.errors import EphemerisSourceError
 
 POLICY_ID = "compressed_file_endpoint_context_v5"
 SOURCE_URL = "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c#L2163-L2179"
+_FileWindows = tuple[tuple[str, float, float, int], ...]
 _AUDIT: ContextVar[dict[str, Any] | None] = ContextVar(
     "compressed_endpoint_audit", default=None
 )
@@ -172,7 +173,7 @@ def endpoint_context_evidence() -> dict[str, Any]:
     }
 
 
-def _windows(native: Any) -> tuple[tuple[Any, ...], ...] | None:
+def _windows(native: Any) -> _FileWindows | None:
     getter = getattr(native, "get_current_file_data", None)
     if not callable(getter):
         return None
@@ -194,7 +195,7 @@ def _public_windows(windows: tuple[tuple[Any, ...], ...]) -> list[dict[str, Any]
     return [
         dict(
             slot=slot,
-            filename=Path(w[0]).name,
+            filename=_path_name(w[0]),
             start_jd_tt=float(w[1]),
             end_jd_tt=float(w[2]),
             de_number=int(w[3]),
@@ -230,12 +231,11 @@ def _physical_slots(native: Any, body: int, flags: int) -> tuple[int, ...]:
 
 
 def _physical_windows(
-    native: Any, body: int, flags: int
-) -> tuple[tuple[Any, ...], ...] | None:
+    native: Any, body: int, flags: int, observed: _FileWindows | None
+) -> _FileWindows | None:
     slots = _physical_slots(native, body, flags)
     if not slots:
         return ()
-    observed = _windows(native)
     return None if observed is None else tuple(observed[slot] for slot in slots)
 
 
@@ -276,11 +276,11 @@ def _post_call_endpoint_guard(
     args: tuple[Any, ...],
     kwargs: dict[str, Any],
     invoke: Callable[[Any, str, tuple[Any, ...], dict[str, Any]], Any],
-) -> Any:
-    """Preserve ordinary returns exactly; never substitute an anchor's state."""
+) -> tuple[Any, _FileWindows | None]:
+    """Return the native value and its final same-call full-slot observation."""
     result = invoke(native, operation, args, kwargs)
     if operation not in {"calc", "calc_ut"}:
-        return result
+        return result, None
     body = args[1] if len(args) > 1 else kwargs.get("planet")
     # Physical Sun through Pluto and Earth. Analytical nodes/fictitious factors
     # can leave unrelated file slots populated and must not trigger this rule.
@@ -289,12 +289,12 @@ def _post_call_endpoint_guard(
         or body not in {*range(10), 14}
         or not _is_swiss(native, result)
     ):
-        return result
+        return result, None
     instant = (
         args[0] if args else kwargs.get("tjdet" if operation == "calc" else "tjdut")
     )
     if instant is None or not math.isfinite(instant):
-        return result
+        return result, None
     flags = (
         args[2]
         if len(args) > 2
@@ -303,14 +303,15 @@ def _post_call_endpoint_guard(
     epoch = float(instant)
     if operation == "calc_ut":
         epoch += native.deltat_ex(epoch, result[1] & _model_mask(native))
-    initial = _physical_windows(native, body, result[1])
+    observed = _windows(native) if _physical_slots(native, body, result[1]) else None
+    initial = _physical_windows(native, body, result[1], observed)
     if initial is None:
-        return result
+        return result, None
     pad = 64 * math.ulp(epoch)
     ends = [w[2] for w in initial if len(w) == 4 and w[0] and abs(epoch - w[2]) <= pad]
     if not ends:
         _require_observer_windows(native, body, result[1], epoch, initial)
-        return result
+        return result, observed
     if not _valid(initial):
         raise EphemerisSourceError("compressed_endpoint_unresolved")
     if (
@@ -339,7 +340,8 @@ def _post_call_endpoint_guard(
             raise EphemerisSourceError("model_changed")
         if result[1] != original[1]:
             raise EphemerisSourceError("coordinate_contract_changed")
-        selected = _physical_windows(native, body, result[1])
+        observed = _windows(native)
+        selected = _physical_windows(native, body, result[1], observed)
         if selected is None or not _valid(selected):
             raise EphemerisSourceError("compressed_endpoint_unresolved")
         if [w[3] for w in selected] != [w[3] for w in initial]:
@@ -379,7 +381,11 @@ def _post_call_endpoint_guard(
                     audit["records"][key] = record
                 else:
                     audit["omitted"] += 1
-            return result
+            if operation == "calc_ut":
+                # Delta-T can update native tidal/source context. Do not carry
+                # an observation across that native operation.
+                observed = _windows(native)
+            return result, observed
         ends = [w[2] for w in selected if abs(epoch - w[2]) <= pad]
         if not ends:
             break
@@ -422,7 +428,7 @@ def _lunar_light_path(
         | native.FLG_J2000
         | native.FLG_ICRS
     )
-    geometric = _post_call_endpoint_guard(
+    geometric, _ = _post_call_endpoint_guard(
         native, "calc", (epoch, native.MOON, geometric_flags), {}, invoke
     )
     if not _is_swiss(native, geometric):
@@ -457,7 +463,7 @@ def _lunar_light_path(
             "status": "already_covered",
             "selected_windows": _public_windows(initial),
         }
-    primed = _post_call_endpoint_guard(
+    primed, _ = _post_call_endpoint_guard(
         native,
         "calc",
         (retarded, native.MOON, geometric_flags | native.FLG_BARYCTR),
@@ -477,7 +483,7 @@ def _lunar_light_path(
         raise EphemerisSourceError("edition_changed")
     if len(primed[0]) != 6 or not all(math.isfinite(v) for v in primed[0]):
         raise EphemerisSourceError("coordinate_values_unavailable")
-    reception = _post_call_endpoint_guard(
+    reception, _ = _post_call_endpoint_guard(
         native, "calc", (epoch, native.MOON, geometric_flags), {}, invoke
     )
     if not _is_swiss(native, reception):
@@ -552,9 +558,11 @@ def _solar_light_path(
         | native.FLG_ICRS
     )
 
-    def state(at: float, body: int, barycentric: bool, label: str) -> tuple:
+    def state(
+        at: float, body: int, barycentric: bool, label: str
+    ) -> tuple[tuple[tuple[float, ...], int], _FileWindows | None]:
         requested = base | (native.FLG_BARYCTR if barycentric else 0)
-        values, returned = _post_call_endpoint_guard(
+        (values, returned), observed = _post_call_endpoint_guard(
             native, "calc", (at, body, requested), {}, invoke
         )
         required = (
@@ -578,7 +586,6 @@ def _solar_light_path(
             raise EphemerisSourceError("coordinate_contract_changed")
         if len(values) != 6 or not all(math.isfinite(v) for v in values):
             raise EphemerisSourceError("coordinate_values_unavailable")
-        observed = _windows(native) if _is_swiss(native, (values, returned)) else None
         policy["states"][label] = {
             "epoch_jd_tt": at,
             "body_id": body,
@@ -591,33 +598,39 @@ def _solar_light_path(
                 else []
             ),
         }
-        return values, returned
+        return (values, returned), observed
 
-    def selected() -> tuple:
-        observed = _windows(native)
+    def selected(observed: _FileWindows | None) -> _FileWindows:
         if observed is None or not _valid(observed):
             raise EphemerisSourceError("dependency_source_window_incoherent")
         if len({w[3] for w in observed}) != 1:
             raise EphemerisSourceError("edition_changed")
         return observed
 
-    probe = state(epoch, native.SUN, False, "initial_backend_probe")
+    probe, observed = state(epoch, native.SUN, False, "initial_backend_probe")
     if not _is_swiss(native, probe):
         return {
             **policy,
             "status": "not_applied",
             "reason": "geometric_backend_not_swiss",
         }
-    earth, earth_flags = state(epoch, native.EARTH, True, "initial_observer")
-    sun, sun_flags = state(epoch, native.SUN, True, "initial_sun")
+    (earth, earth_flags), observed = state(
+        epoch, native.EARTH, True, "initial_observer"
+    )
+    (sun, sun_flags), observed = state(epoch, native.SUN, True, "initial_sun")
     if not _is_swiss(native, (earth, earth_flags)) or not _is_swiss(
         native, (sun, sun_flags)
     ):
         raise EphemerisSourceError("model_changed")
-    initial = selected()
+    initial = selected(observed)
     policy["initial_windows"] = _public_windows(initial)
 
-    def iterations(observer: Any, solar: Any, prefix: str) -> list[float] | None:
+    def iterations(
+        observer: tuple[float, ...],
+        solar: tuple[float, ...],
+        observed: _FileWindows | None,
+        prefix: str,
+    ) -> tuple[list[float] | None, _FileWindows | None]:
         epochs = []
         for index in range(2):
             displacement = [a - b for a, b in zip(observer[:3], solar[:3])]
@@ -630,48 +643,56 @@ def _solar_light_path(
             at = epoch - delay
             if not math.isfinite(delay) or delay <= 0 or not math.isfinite(at):
                 raise EphemerisSourceError("coordinate_values_unavailable")
-            windows = selected()
+            windows = selected(observed)
             if not all(w[1] <= at <= epoch <= w[2] for w in windows):
-                backend = state(at, native.SUN, False, prefix + f"_backend_{index}")
+                backend, observed = state(
+                    at, native.SUN, False, prefix + f"_backend_{index}"
+                )
                 if not _is_swiss(native, backend):
-                    return None
-            solar, returned = state(at, native.SUN, True, prefix + f"_sun_{index}")
+                    return None, observed
+            (solar, returned), observed = state(
+                at, native.SUN, True, prefix + f"_sun_{index}"
+            )
             if not _is_swiss(native, (solar, returned)):
                 raise EphemerisSourceError("model_changed")
             epochs.append(at)
-        return epochs
+        return epochs, observed
 
-    epochs = iterations(earth, sun, "selection")
+    epochs, observed = iterations(earth, sun, observed, "selection")
     if epochs is None:
         return {
             **policy,
             "status": "restore_before_auxiliary_fallback",
             "reason": "retarded_auxiliary_backend_not_swiss",
         }
-    common = selected()
+    common = selected(observed)
     if [w[3] for w in initial] != [w[3] for w in common] or not all(
         w[1] <= min(epochs) <= epoch <= w[2] for w in common
     ):
         raise EphemerisSourceError("dependency_source_window_incoherent")
 
-    def reception(prefix: str) -> tuple:
-        earth, returned_earth = state(epoch, native.EARTH, True, prefix + "_observer")
-        sun, returned_sun = state(epoch, native.SUN, True, prefix + "_sun")
+    def reception(
+        prefix: str,
+    ) -> tuple[tuple[float, ...], tuple[float, ...], _FileWindows | None]:
+        (earth, returned_earth), observed = state(
+            epoch, native.EARTH, True, prefix + "_observer"
+        )
+        (sun, returned_sun), observed = state(epoch, native.SUN, True, prefix + "_sun")
         if not _is_swiss(native, (earth, returned_earth)) or not _is_swiss(
             native, (sun, returned_sun)
         ):
             raise EphemerisSourceError("model_changed")
-        if selected() != common:
+        if selected(observed) != common:
             raise EphemerisSourceError("dependency_source_window_incoherent")
-        return earth, sun
+        return earth, sun, observed
 
-    earth, sun = reception("coherent")
+    earth, sun, observed = reception("coherent")
     changed = initial != common
     if changed:
-        refined = iterations(earth, sun, "refined")
+        refined, observed = iterations(earth, sun, observed, "refined")
         if (
             refined is None
-            or selected() != common
+            or selected(observed) != common
             or not all(w[1] <= min(refined) <= epoch <= w[2] for w in common)
         ):
             raise EphemerisSourceError("dependency_source_window_incoherent")
@@ -738,7 +759,7 @@ def _planet_light_path(
         at: float, target: int, barycentric: bool, label: str, *, probe: bool = False
     ) -> tuple[Any, int]:
         required_flags = base | (native.FLG_BARYCTR if barycentric else 0)
-        values, returned = _post_call_endpoint_guard(
+        (values, returned), _ = _post_call_endpoint_guard(
             native, "calc", (at, target, required_flags), {}, invoke
         )
         required = (
@@ -890,8 +911,7 @@ def _external_solar_rebuild(
         return initial
     if solar["status"] not in {"already_covered", "reselected_common_window"}:
         raise EphemerisSourceError("dependency_source_window_incoherent")
-    result = _post_call_endpoint_guard(native, operation, args, kwargs, invoke)
-    windows = _windows(native)
+    result, windows = _post_call_endpoint_guard(native, operation, args, kwargs, invoke)
     if (
         not _is_swiss(native, result)
         or result[1] != initial[1]
@@ -999,7 +1019,7 @@ def compressed_endpoint_call(
         if dependent is not None and operation in {"calc", "calc_ut"}:
             if operation != "calc" or instant != dependent:
                 raise EphemerisSourceError("dependency_source_window_incoherent")
-        result = _post_call_endpoint_guard(native, operation, args, kwargs, invoke)
+        result, _ = _post_call_endpoint_guard(native, operation, args, kwargs, invoke)
         if audit is None and dependent is None and eligible and body == native.SUN:
             return _external_solar_rebuild(
                 native, operation, args, kwargs, instant, flags, result, invoke
@@ -1094,14 +1114,21 @@ def compressed_endpoint_call(
                 {},
                 invoke,
             )
-    result = _post_call_endpoint_guard(native, operation, args, kwargs, invoke)
+    result, observed = _post_call_endpoint_guard(
+        native, operation, args, kwargs, invoke
+    )
     if len(result[0]) != 6 or not all(math.isfinite(x) for x in result[0]):
         raise EphemerisSourceError("coordinate_values_unavailable")
     epoch = float(instant)
     if operation == "calc_ut":
         epoch += native.deltat_ex(epoch, result[1] & _model_mask(native))
+        observed = (
+            _windows(native)
+            if _is_swiss(native, result) and _physical_slots(native, body, result[1])
+            else None
+        )
     windows = (
-        _physical_windows(native, body, result[1])
+        _physical_windows(native, body, result[1], observed)
         if _is_swiss(native, result)
         else None
     )
@@ -1217,3 +1244,14 @@ def compressed_endpoint_call(
         }
     )
     return result
+
+
+_PATH_NAMES: dict[str, str] = {}
+
+
+def _path_name(name: str) -> str:
+    cached = _PATH_NAMES.get(name)
+    if cached is None:
+        cached = Path(name).name
+        _PATH_NAMES[name] = cached
+    return cached

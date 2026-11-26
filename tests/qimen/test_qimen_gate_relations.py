@@ -15,16 +15,17 @@ import fatebridge.api as api
 from fatebridge.application.execution import execute_tool
 from fatebridge.cli import run
 from fatebridge.core.execution_context import ExecutionOptions
-from fatebridge.core.qimen_gate_relations import (
+from fatebridge.core.qimen.qimen_gate_relations import (
     describe_gate_relations,
     gate_palace_relation,
 )
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation import qimen_gate_relations as gate_audit
-from fatebridge.validation.claims import CalculationClaim
-from fatebridge.validation.qimen import verify_qimen_pattern_quotes
-from fatebridge.validation.qimen_gate_relations import audit_gate_relations
+from tests.support.transports import call_calculation
+from validation import qimen_gate_relations as gate_audit
+from validation.claims import CalculationClaim
+from validation.qimen import verify_qimen_pattern_quotes
+from validation.qimen_gate_relations import audit_gate_relations
 
 BUNDLE = Path(__file__).parents[1] / "fixtures/qimen_classical_v11"
 REF = json.loads((BUNDLE / "sources-and-gate-relations.json").read_text())
@@ -89,7 +90,7 @@ MATRIX = {
 }
 
 
-def test_frozen_paragraph_keeps_four_names_and_eleven_literal_pairs():
+def test_frozen_paragraph_keeps_four_names_and_eleven_literal_pairs() -> None:
     r = audit_gate_relations(BUNDLE)
     assert r["disagreements"] == []
     assert r["source_relation_definition_count"] == r["derived_witness_count"] == 4
@@ -107,8 +108,8 @@ def test_frozen_paragraph_keeps_four_names_and_eleven_literal_pairs():
     "corruption", ["same_name", "outcome", "extra_printed_example"]
 )
 def test_auditor_checks_real_outputs_instead_of_declaring_limits(
-    monkeypatch, corruption
-):
+    monkeypatch: pytest.MonkeyPatch, corruption: str
+) -> None:
     original = gate_audit.gate_palace_relation
 
     def altered(door, trigram):
@@ -126,6 +127,8 @@ def test_auditor_checks_real_outputs_instead_of_declaring_limits(
                 "scope": "literal_door_palace_observation_not_global_door_classification",
                 "outcome_inference_allowed": False,
             }
+        else:
+            pass
         return e
 
     monkeypatch.setattr(gate_audit, "gate_palace_relation", altered)
@@ -143,7 +146,7 @@ def test_auditor_checks_real_outputs_instead_of_declaring_limits(
 
 
 @pytest.mark.parametrize("door,trigram", list(product(DOORS, PALACES)))
-def test_all_64_pairs_preserve_direction_and_independent_naming(door, trigram):
+def test_all_64_pairs_preserve_direction_and_independent_naming(door, trigram) -> None:
     r = gate_palace_relation(door, trigram)
     expected = MATRIX[DOORS[door]]["木火土金水".index(PALACES[trigram])]
     assert (r["door_element"], r["palace_element"]) == (DOORS[door], PALACES[trigram])
@@ -157,13 +160,15 @@ def test_all_64_pairs_preserve_direction_and_independent_naming(door, trigram):
     )
 
 
-def test_false_verse_pressure_does_not_erase_prose_xiong_pressure():
+def test_false_verse_pressure_does_not_erase_prose_xiong_pressure() -> None:
     r = gate_palace_relation("开门", "离")
     assert r["verse_door_pressure"] is False and r["prose_label"] == "凶迫"
     assert r["palace_restricts_door"] is True
 
 
-def test_ji_pressure_does_not_become_good_outcome_or_global_jing_classification():
+def test_ji_pressure_does_not_become_good_outcome_or_global_jing_classification() -> (
+    None
+):
     r = gate_palace_relation("景门", "兑")
     assert r["prose_label"] == "吉迫"
     assert r["printed_example"]["category"] == "吉门被迫"
@@ -173,7 +178,7 @@ def test_ji_pressure_does_not_become_good_outcome_or_global_jing_classification(
     assert gate_palace_relation("开门", "乾")["prose_label"] is None
 
 
-def test_returned_profile_does_not_mutate_labels():
+def test_returned_profile_does_not_mutate_labels() -> None:
     p = describe_gate_relations()
     p["prose_labels_by_relation"]["door_controls_palace"] = "吉利"
     assert (
@@ -186,7 +191,9 @@ def test_returned_profile_does_not_mutate_labels():
     "door,trigram",
     [("中门", "中"), ("开门", "中"), ("开", "震"), (None, "震"), ("开门", "东")],
 )
-def test_invalid_or_missing_plane_does_not_become_no_pressure(door, trigram):
+def test_invalid_or_missing_plane_does_not_become_no_pressure(
+    door: str | None, trigram: str
+) -> None:
     with pytest.raises(ValueError):
         gate_palace_relation(door, trigram)
 
@@ -202,7 +209,9 @@ def test_invalid_or_missing_plane_does_not_become_no_pressure(door, trigram):
         "pdf",
     ],
 )
-def test_source_audit_cannot_shed_awkward_names_or_examples(tmp_path, mutation):
+def test_source_audit_cannot_shed_awkward_names_or_examples(
+    tmp_path: Path, mutation: str
+) -> None:
     target = tmp_path / "bundle"
     shutil.copytree(BUNDLE, target)
     path = target / "sources-and-gate-relations.json"
@@ -227,7 +236,9 @@ def test_source_audit_cannot_shed_awkward_names_or_examples(tmp_path, mutation):
 @pytest.mark.parametrize(
     "change", ["direction", "label", "scope", "outcome", "prose_judgment"]
 )
-def test_whole_quote_rejects_direction_reversal_or_auspicious_rebranding(change):
+def test_whole_quote_rejects_direction_reversal_or_auspicious_rebranding(
+    change: str,
+) -> None:
     spec = next(s for s in CATALOG if s.tool_name == "qimen")
     payload = execute_tool(
         spec,
@@ -273,7 +284,9 @@ def test_whole_quote_rejects_direction_reversal_or_auspicious_rebranding(change)
 
 
 @pytest.mark.parametrize("hour", [6, 12])
-def test_gate_evidence_and_snapshot_agree_in_real_transports(monkeypatch, capsys, hour):
+def test_gate_evidence_and_snapshot_agree_in_real_transports(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], hour: int
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -297,7 +310,7 @@ def test_gate_evidence_and_snapshot_agree_in_real_transports(monkeypatch, capsys
         response_char_limit=0,
     )
     response = TestClient(api.app).post(
-        "/api/cn/qimen",
+        "/api/qimen",
         json=payload,
         params=[
             ("as_of", controls["as_of"]),
@@ -309,8 +322,8 @@ def test_gate_evidence_and_snapshot_agree_in_real_transports(monkeypatch, capsys
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                "qimen", {**payload, **controls}, raise_on_error=False
+            return await call_calculation(
+                client, "qimen", {**payload, **controls}, raise_on_error=False
             )
 
     native = asyncio.run(protocol())
@@ -352,6 +365,8 @@ def test_gate_evidence_and_snapshot_agree_in_real_transports(monkeypatch, capsys
     for p in b["qimen"]["palaces"]:
         if p["trigram"] == "中":
             continue
+        else:
+            pass
         e = p["evidence"]
         r = e["door_palace_relation"]
         assert e["door_pressure"] == r["verse_door_pressure"]

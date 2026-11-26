@@ -17,7 +17,7 @@ from scripts.astrodice.verify_astrodice_nonuniform_reference import (
 )
 
 
-def test_arbitrary_rational_nodes_match_separate_moment_solution():
+def test_arbitrary_rational_nodes_match_separate_moment_solution() -> None:
     nodes = [Q(-3, 2), Q(-1, 7), Q(2, 3), Q(7, 5), Q(19, 4), Q(83, 11)]
     coefficients = [Q(2, 7), Q(-11, 3), Q(5), Q(19, 13), Q(-1, 9), Q(8, 11)]
     values = [polynomial(coefficients, x) for x in nodes]
@@ -48,7 +48,7 @@ def fixture():
     return angles, epochs
 
 
-def test_full_population_and_baseline_independently_reconstruct():
+def test_full_population_and_baseline_independently_reconstruct() -> None:
     angles, epochs = fixture()
     a, b, base, scale = system(angles, epochs, 1440, 5, 0)
     aa, bb, baseline, other = independent_system(angles, epochs, 1440, 5, 0)
@@ -62,7 +62,7 @@ def test_full_population_and_baseline_independently_reconstruct():
     assert abs((left - right) / 10) > Q("1e-12")
 
 
-def test_missing_or_duplicate_time_nodes_are_not_dropped_to_fit():
+def test_missing_or_duplicate_time_nodes_are_not_dropped_to_fit() -> None:
     angles, epochs = fixture()
     angles.pop(5)
     with pytest.raises(ValueError, match="population"):
@@ -73,7 +73,7 @@ def test_missing_or_duplicate_time_nodes_are_not_dropped_to_fit():
         system(angles, epochs, 1440, 5, 0)
 
 
-def test_exact_interval_contains_analytic_derivative_on_asymmetric_nodes():
+def test_exact_interval_contains_analytic_derivative_on_asymmetric_nodes() -> None:
     pytest.importorskip(
         "scipy",
         reason="Optional reference solver; run the frozen solver environment for this test",

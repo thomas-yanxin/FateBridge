@@ -8,15 +8,17 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+import fatebridge.core.almanac as almanac
+import fatebridge.core.ephemeris_runtime as runtime
 from fatebridge.core.requests.meihua import MeihuaCastRequest
 from fatebridge.services.meihua import calculate_meihua_cast
-from fatebridge.validation.meihua_casting import audit_explicit_casts
+from validation.meihua_casting import audit_explicit_casts
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_casting_v1"
 CASES = json.loads((REFERENCES / "cases.json").read_text())["cases"]
 
 
-def test_all_frozen_original_examples_and_rule_probes():
+def test_all_frozen_original_examples_and_rule_probes() -> None:
     report = audit_explicit_casts(REFERENCES)
     assert report["selected_calculation_checks_passed"]
     assert report["original_worked_example_count"] == 9
@@ -26,7 +28,9 @@ def test_all_frozen_original_examples_and_rule_probes():
     assert report["real_world_prospective_sample_count"] == 0
 
 
-def test_oracle_tampering_is_rejected_and_disagreement_cannot_pass(tmp_path):
+def test_oracle_tampering_is_rejected_and_disagreement_cannot_pass(
+    tmp_path: Path,
+) -> None:
     reference = tmp_path / "fixtures/meihua_casting_v1"
     shutil.copytree(REFERENCES, reference)
     shutil.copytree(
@@ -50,7 +54,7 @@ def test_oracle_tampering_is_rejected_and_disagreement_cannot_pass(tmp_path):
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_method_source_and_original_inputs_are_preserved(case):
+def test_method_source_and_original_inputs_are_preserved(case) -> None:
     r = calculate_meihua_cast(casting=case["input"])
     cast = r["meihua"]
     assert cast["seed"]["moving_line"] == case["expected"]["moving_line"]
@@ -66,7 +70,7 @@ def test_method_source_and_original_inputs_are_preserved(case):
 
 
 @pytest.mark.parametrize("hour", ["子", "巳", "酉", "亥"])
-def test_existing_cast_does_not_use_clock_or_recast(hour):
+def test_existing_cast_does_not_use_clock_or_recast(hour: str) -> None:
     # The input has no clock parameter; an unrelated question must not alter it.
     supplied = {"method": "existing", "hexagram_code": "111111", "moving_line": 6}
     r = calculate_meihua_cast(casting=supplied, question=f"虚构{hour}时的原卦复盘")
@@ -76,7 +80,7 @@ def test_existing_cast_does_not_use_clock_or_recast(hour):
     assert r["meihua"]["calendar_policy"]["hour_basis"] == "not_used_for_cast"
 
 
-def test_zhang_chi_excludes_cun_and_chi_cun_excludes_fen():
+def test_zhang_chi_excludes_cun_and_chi_cun_excludes_fen() -> None:
     a = calculate_meihua_cast(
         casting={"method": "length_zhang_chi", "zhang": 12, "chi": 3, "cun": 1}
     )
@@ -98,7 +102,7 @@ def test_zhang_chi_excludes_cun_and_chi_cun_excludes_fen():
     assert c["meihua"]["seed"]["ignored_components"] == {"fen": 9}
 
 
-def test_sound_counts_above_eight_do_not_hide_the_unchosen_convention():
+def test_sound_counts_above_eight_do_not_hide_the_unchosen_convention() -> None:
     raw = {
         "method": "sound_groups",
         "first_count": 12,
@@ -120,7 +124,7 @@ def test_sound_counts_above_eight_do_not_hide_the_unchosen_convention():
     assert a["meihua"]["changed_hexagram"] != b["meihua"]["changed_hexagram"]
 
 
-def test_odd_character_partition_and_glyph_counts_are_not_dictionary_guesses():
+def test_odd_character_partition_and_glyph_counts_are_not_dictionary_guesses() -> None:
     r = calculate_meihua_cast(
         casting={"method": "text_strokes", "strokes": [6, 8, 3], "text": "示例字"}
     )
@@ -133,7 +137,7 @@ def test_odd_character_partition_and_glyph_counts_are_not_dictionary_guesses():
     assert r["meihua"]["seed"]["raw_upper_number"] == 7
 
 
-def test_counting_ambiguity_can_reverse_body_use_and_must_remain_visible():
+def test_counting_ambiguity_can_reverse_body_use_and_must_remain_visible() -> None:
     result = calculate_meihua_cast(
         casting={
             "method": "sound_groups",
@@ -150,7 +154,7 @@ def test_counting_ambiguity_can_reverse_body_use_and_must_remain_visible():
     assert result["summary"].startswith("原声数与卦序数取爻有分歧")
 
 
-def test_season_context_changes_only_seasonal_interpretation():
+def test_season_context_changes_only_seasonal_interpretation() -> None:
     source = CASES[5]["input"]
     a = calculate_meihua_cast(casting=source)
     b = calculate_meihua_cast(casting=source, season_month_branch="子")
@@ -160,9 +164,9 @@ def test_season_context_changes_only_seasonal_interpretation():
     assert a["meihua"]["seasonal_strength"] is None
 
 
-def test_explicit_facts_work_without_lunar_or_ephemeris_backends(monkeypatch):
-    import fatebridge.core.almanac as almanac
-    import fatebridge.core.ephemeris_runtime as runtime
+def test_explicit_facts_work_without_lunar_or_ephemeris_backends(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     monkeypatch.setattr(almanac, "LunarDate", None)
     monkeypatch.setattr(runtime, "swe", None)
@@ -209,6 +213,6 @@ def test_explicit_facts_work_without_lunar_or_ephemeris_backends(monkeypatch):
         },
     ],
 )
-def test_absent_ambiguous_or_mixed_method_inputs_are_rejected(casting):
+def test_absent_ambiguous_or_mixed_method_inputs_are_rejected(casting) -> None:
     with pytest.raises(ValidationError):
         MeihuaCastRequest(casting=casting)

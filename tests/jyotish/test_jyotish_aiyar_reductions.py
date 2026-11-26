@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import jyotish_aiyar_reductions as aiyar
-from fatebridge.core import jyotish_pinda as rao
+from fatebridge.core.jyotish import jyotish_aiyar_reductions as aiyar
+from fatebridge.core.jyotish import jyotish_pinda as rao
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 PRIMARY_PATH = FIXTURES / "jyotish-aiyar-reductions-primary.json"
@@ -17,7 +17,7 @@ PRIMARY = json.loads(PRIMARY_PATH.read_text())
 REFERENCE = json.loads(REFERENCE_PATH.read_text())
 
 
-def test_source_arithmetic_and_old_reference_fingerprints_are_not_refreshed():
+def test_source_arithmetic_and_old_reference_fingerprints_are_not_refreshed() -> None:
     assert hashlib.sha256(PRIMARY_PATH.read_bytes()).hexdigest() == (
         "2b651e9ada312af07fb0e61903c6d78e692032d0bb9077597850220aece5a959"
     )
@@ -36,35 +36,35 @@ def test_source_arithmetic_and_old_reference_fingerprints_are_not_refreshed():
     assert PRIMARY["real_event_cases"] == REFERENCE["real_event_cases"] == 0
 
 
-@pytest.mark.parametrize("case", REFERENCE["trinal_cases"])
-def test_all729_original_trinal_inputs(case):
-    row = [0] * 12
-    row[0], row[4], row[8] = case["before"]
-    result, _ = aiyar.trinal(row)
-    assert [result[i] for i in [0, 4, 8]] == case["after"]
+def test_all729_original_trinal_inputs() -> None:
+    for case in REFERENCE["trinal_cases"]:
+        row = [0] * 12
+        row[0], row[4], row[8] = case["before"]
+        result, _ = aiyar.trinal(row)
+        assert [result[i] for i in [0, 4, 8]] == case["after"]
 
 
-@pytest.mark.parametrize("case", REFERENCE["coowned_cases"])
-def test_all1620_pair_counts_and_occupancy_patterns(case):
-    row = [0] * 12
-    for sign, value in zip(case["pair"], case["before"]):
-        row[sign] = value
-    positions = [i for i, flag in zip(case["pair"], case["occupied"]) if flag]
-    result, _ = aiyar.coowned(row, positions)
-    assert [result[i] for i in case["pair"]] == case["after"]
+def test_all1620_pair_counts_and_occupancy_patterns() -> None:
+    for case in REFERENCE["coowned_cases"]:
+        row = [0] * 12
+        for sign, value in zip(case["pair"], case["before"]):
+            row[sign] = value
+        positions = [i for i, flag in zip(case["pair"], case["occupied"]) if flag]
+        result, _ = aiyar.coowned(row, positions)
+        assert [result[i] for i in case["pair"]] == case["after"]
 
 
-@pytest.mark.parametrize("case", REFERENCE["full_rows"], ids=lambda c: c["case_id"])
-def test_all637_exposed_full_input_rows_under_this_distinct_source(case):
-    original = copy.deepcopy(case)
-    actual = aiyar.reduce_row(case["before"], case["occupied_signs"])
-    assert case == original
-    assert all(actual[k] == case[k] for k in ["trikona", "sodhita", "reduced_sum"])
-    assert len(actual["trikona_steps"]) == 4
-    assert len(actual["coowned_steps"]) == 5
+def test_all637_exposed_full_input_rows_under_this_distinct_source() -> None:
+    for case in REFERENCE["full_rows"]:
+        original = copy.deepcopy(case)
+        actual = aiyar.reduce_row(case["before"], case["occupied_signs"])
+        assert case == original
+        assert all(actual[k] == case[k] for k in ["trikona", "sodhita", "reduced_sum"])
+        assert len(actual["trikona_steps"]) == 4
+        assert len(actual["coowned_steps"]) == 5
 
 
-def test_the_printed_mars_example_and_single_pass_rule_are_both_retained():
+def test_the_printed_mars_example_and_single_pass_rule_are_both_retained() -> None:
     example = PRIMARY["worked_mars"]
     actual = aiyar.reduce_row(example["input_bav"], example["occupied_signs"])
     assert actual["trikona"] == actual["sodhita"] == example["trikona"]
@@ -76,7 +76,9 @@ def test_the_printed_mars_example_and_single_pass_rule_are_both_retained():
     assert "Pinda" not in actual and "rasi_pinda" not in actual
 
 
-def test_author_profiles_keep_distinct_two_zero_and_single_occupied_equal_cases():
+def test_author_profiles_keep_distinct_two_zero_and_single_occupied_equal_cases() -> (
+    None
+):
     row = [0] * 12
     row[0] = row[7] = 2
     signs = {**dict.fromkeys(rao.PLANETS, 4), "Sun": 0}
@@ -95,9 +97,8 @@ def test_author_profiles_keep_distinct_two_zero_and_single_occupied_equal_cases(
     assert old["rasi_pinda"] is None
 
 
-@pytest.mark.parametrize(
-    "row",
-    [
+def test_invalid_count_domains_are_rejected() -> None:
+    for row in (
         [],
         [0] * 11,
         [0] * 13,
@@ -105,16 +106,12 @@ def test_author_profiles_keep_distinct_two_zero_and_single_occupied_equal_cases(
         [-1] + [0] * 11,
         [9] + [0] * 11,
         [0.5] + [0] * 11,
-    ],
-)
-def test_invalid_count_domains_are_rejected(row):
-    with pytest.raises(ValueError, match="twelve integer"):
-        aiyar.reduce_row(row, [0])
+    ):
+        with pytest.raises(ValueError, match="twelve integer"):
+            aiyar.reduce_row(row, [0])
 
 
-@pytest.mark.parametrize(
-    "positions", [[True], [-1], [12], [0.0], [0, 0], list(range(8))]
-)
-def test_occupancy_indices_are_explicit_and_not_silently_coerced(positions):
-    with pytest.raises(ValueError, match="distinct integer"):
-        aiyar.reduce_row([0] * 12, positions)
+def test_occupancy_indices_are_explicit_and_not_silently_coerced() -> None:
+    for positions in ([True], [-1], [12], [0.0], [0, 0], list(range(8))):
+        with pytest.raises(ValueError, match="distinct integer"):
+            aiyar.reduce_row([0] * 12, positions)

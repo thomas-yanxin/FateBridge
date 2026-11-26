@@ -1,8 +1,4 @@
-"""Build the optional named AA1996 Sun library from pinned external sources.
-
-The modified Swiss binary and its source conditions remain in the explicit
-output directory. They are not included in FateBridge's default wheel.
-"""
+"""Build the optional AA1996 Sun library from pinned native source files."""
 
 from __future__ import annotations
 
@@ -31,21 +27,21 @@ def source_profile() -> tuple[dict[str, Any], str]:
     raw = (
         files("fatebridge").joinpath("data/astronomy/aa1996-solar-v1.json").read_bytes()
     )
-    data: dict[str, Any] = json.loads(raw)
-    if data.get("model_id") != MODEL_ID or data.get("abi_version") != 1:
+    profile: dict[str, Any] = json.loads(raw)
+    if profile.get("model_id") != MODEL_ID or profile.get("abi_version") != 1:
         raise ValueError("Invalid AA1996 source profile")
-    return data, hashlib.sha256(raw).hexdigest()
+    return profile, hashlib.sha256(raw).hexdigest()
 
 
-def _archive(source: dict[str, Any], supplied: Path | None, target: Path) -> Path:
+def _archive(source: dict[str, str], supplied: Path | None, target: Path) -> Path:
     if supplied is not None:
-        data = supplied.read_bytes()
+        archive_bytes = supplied.read_bytes()
     else:
         with urllib.request.urlopen(source["url"], timeout=30) as response:
-            data = response.read()
-    if hashlib.sha256(data).hexdigest() != source["sha256"]:
+            archive_bytes = response.read()
+    if hashlib.sha256(archive_bytes).hexdigest() != source["sha256"]:
         raise ValueError("AA1996 build archive does not match pinned source bytes")
-    target.write_bytes(data)
+    target.write_bytes(archive_bytes)
     return target
 
 
@@ -55,7 +51,7 @@ def build(
     swiss_archive: Path | None = None,
     aa56_archive: Path | None = None,
     compiler: str | None = None,
-) -> dict[str, Any]:
+) -> dict[str, int | str]:
     system = platform.system()
     if system not in {"Darwin", "Linux"}:
         raise ValueError("AA1996 source builder currently supports macOS and Linux")
@@ -72,15 +68,15 @@ def build(
     aa56 = _archive(profile["sources"]["aa56"], aa56_archive, archives / "aa56.zip")
     expected: dict[str, str] = profile["calculation_files_sha256"]
     with tarfile.open(swiss) as bundle:
-        for item in bundle:
-            parts = Path(item.name).parts
+        for archive_member in bundle:
+            parts = Path(archive_member.name).parts
             if (
-                item.isfile()
+                archive_member.isfile()
                 and len(parts) == 3
                 and parts[1] == "libswe"
                 and parts[2] in expected
             ):
-                member = bundle.extractfile(item)
+                member = bundle.extractfile(archive_member)
                 if member is None:
                     raise ValueError("Pinned native source member could not be read")
                 with member:
@@ -211,7 +207,7 @@ int fatebridge_aa1996_solar(double tt, double *out, char *error) {{
         method.restype = ctypes.c_char_p
         if method().decode("ascii") != expected_value:
             raise ValueError("Built AA1996 model marker mismatch")
-    manifest = dict(
+    manifest: dict[str, int | str] = dict(
         model_id=MODEL_ID,
         version=profile["version"],
         abi_version=1,

@@ -44,8 +44,10 @@ def example():
     return c, s
 
 
-def test_first_real_missing_reference_keeps_failure_without_native_recalculation():
-    from fatebridge.core.human_design_time import solve_design_epoch_tt
+def test_first_real_missing_reference_keeps_failure_without_native_recalculation() -> (
+    None
+):
+    from fatebridge.core.human_design.human_design_time import solve_design_epoch_tt
 
     c = json.loads(
         (ROOT / "tests/data/human_design/solar-missing-endpoint-case.json").read_text()
@@ -65,8 +67,8 @@ def test_first_real_missing_reference_keeps_failure_without_native_recalculation
 
 @pytest.mark.parametrize("missing", [10.0, 10.0001])
 def test_missing_reference_observation_is_never_inferred_from_a_matching_selected_value(
-    missing,
-):
+    missing: float,
+) -> None:
     c, s = example()
     s["numerical_precision"]["local_solar_lattice"]["samples"] = [
         r
@@ -83,7 +85,7 @@ def test_missing_reference_observation_is_never_inferred_from_a_matching_selecte
     assert aggregate["bounded_numeric_conformance_passed"] is False
 
 
-def test_complete_matching_control_retains_every_old_local_check():
+def test_complete_matching_control_retains_every_old_local_check() -> None:
     c, s = example()
     r = compare_case(c, s)
     assert r["strict_root_equal"] is True
@@ -95,7 +97,9 @@ def test_complete_matching_control_retains_every_old_local_check():
     assert report["reference_binding"]["frozen_content_bound"] is False
 
 
-def test_report_retains_a_failed_calculation_then_continues_every_required_row():
+def test_report_retains_a_failed_calculation_then_continues_every_required_row() -> (
+    None
+):
     c, s = example()
     broken = {**c, "label": "unavailable-control", "birth_jd_tt": 99.0}
     reference = {"cases": [broken, c]}
@@ -104,6 +108,8 @@ def test_report_retains_a_failed_calculation_then_continues_every_required_row()
     def solve(tt, **kwargs):
         if tt == 99:
             raise RuntimeError("observed calculation failure")
+        else:
+            pass
         return {"solver": s}
 
     r = compare(reference, solve=solve)
@@ -123,7 +129,7 @@ def test_report_retains_a_failed_calculation_then_continues_every_required_row()
     assert r["bounded_numeric_conformance_passed"] is False
 
 
-def test_wrong_current_residual_cannot_hide_behind_equal_frozen_root():
+def test_wrong_current_residual_cannot_hide_behind_equal_frozen_root() -> None:
     c, s = example()
     s["numerical_precision"]["selected"]["residual_degrees"] = 1.0
     r = compare({"cases": [c]}, solve=lambda *a, **k: {"solver": s})
@@ -132,7 +138,9 @@ def test_wrong_current_residual_cannot_hide_behind_equal_frozen_root():
     assert not r["bounded_numeric_conformance_passed"]
 
 
-def test_a_matching_fake_producer_and_deleted_real_failure_cannot_certify_a_subset():
+def test_a_matching_fake_producer_and_deleted_real_failure_cannot_certify_a_subset() -> (
+    None
+):
     import sys
     from fractions import Fraction
 
@@ -191,7 +199,7 @@ def test_a_matching_fake_producer_and_deleted_real_failure_cannot_certify_a_subs
     assert report["bounded_numeric_conformance_passed"] is False
 
 
-def test_content_binding_rejects_reordering_even_with_all244_rows():
+def test_content_binding_rejects_reordering_even_with_all244_rows() -> None:
     import sys
 
     filename = (
@@ -215,8 +223,8 @@ def test_content_binding_rejects_reordering_even_with_all244_rows():
 
 
 def test_strict_cli_rejects_numerically_matching_but_unbound_reference(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     import sys
 
     from scripts.human_design import check_human_design_solar_speed_lattice as checker

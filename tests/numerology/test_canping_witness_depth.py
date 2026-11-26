@@ -6,9 +6,11 @@ import json
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core.canping import _verses
-from fatebridge.core.canping_texts import (
+import fatebridge.core.numerology.canping_texts as module
+from fatebridge.core.numerology.canping import _verses
+from fatebridge.core.numerology.canping_texts import (
     WITNESSES_PATH,
     _witness_corpus,
     collation_summary,
@@ -25,7 +27,7 @@ ROWS = list(
 
 
 @pytest.mark.parametrize("row", ROWS)
-def test_literal_same_element_number_and_column_witness(row):
+def test_literal_same_element_number_and_column_witness(row) -> None:
     selected = lookup_record("水", int(row["number"]), row["kind"])
     witness = selected["selection"]["witnesses"][0]
     assert witness["text"] == row["text"]
@@ -44,7 +46,7 @@ def test_literal_same_element_number_and_column_witness(row):
         assert witness["text_status"] == "source_cell_visually_collated"
 
 
-def test_witness_hashes_and_uncertainty_do_not_inflate_primary_collation():
+def test_witness_hashes_and_uncertainty_do_not_inflate_primary_collation() -> None:
     assert (
         hashlib.sha256((ROOT / "literal.tsv").read_bytes()).hexdigest()
         == REFERENCE["literal_sha256"]
@@ -84,7 +86,9 @@ def test_witness_hashes_and_uncertainty_do_not_inflate_primary_collation():
         (2344, "female", "春歸當斷○，梅子釀酸時。", "春歸當斷路，梅子釀酸時。"),
     ],
 )
-def test_inherited_reading_can_have_another_edition_basis(number, kind, main, other):
+def test_inherited_reading_can_have_another_edition_basis(
+    number: int, kind: str, main: str, other: str
+) -> None:
     row = lookup_record("水", number, kind)
     assert row["text"] == main and row["selection"]["inherited_text"] == other
     witness = row["selection"]["witnesses"][0]
@@ -92,7 +96,7 @@ def test_inherited_reading_can_have_another_edition_basis(number, kind, main, ot
     assert witness["relation"] == "different_text"
 
 
-def test_uncertain_primary_is_not_completed_by_a_clear_witness():
+def test_uncertain_primary_is_not_completed_by_a_clear_witness() -> None:
     row = lookup_record("水", 2538, "female")
     assert row["text"] == "荷葉疊青錢，□鴦永向風。"
     witness = row["selection"]["witnesses"][0]
@@ -101,7 +105,7 @@ def test_uncertain_primary_is_not_completed_by_a_clear_witness():
     assert row["selection"]["cell_status"] == "source_reading_uncertain"
 
 
-def test_both_editions_uncertain_stay_uncertain_and_columns_do_not_leak():
+def test_both_editions_uncertain_stay_uncertain_and_columns_do_not_leak() -> None:
     row = lookup_record("水", 2249, "female")
     assert row["selection"]["witnesses"][0]["relation"] == "both_readings_uncertain"
     resolved = lookup_record("水", 2449, "female")
@@ -116,7 +120,7 @@ def test_both_editions_uncertain_stay_uncertain_and_columns_do_not_leak():
     assert "witnesses" not in lookup_record("水", 2449, None)["selection"]
 
 
-def test_snapshot_distinguishes_actual_reading_and_unselected_counterpart():
+def test_snapshot_distinguishes_actual_reading_and_unselected_counterpart() -> None:
     v = _verses("水", {"numShun": 2332, "numNi": 2536}, "male")
     text = selection_snapshot(v)
     assert "商山秦嶺花" in text and "鐵柱" in text
@@ -124,7 +128,7 @@ def test_snapshot_distinguishes_actual_reading_and_unselected_counterpart():
     assert v["textShun"].startswith("南山") and "鐵杵" in v["textNi"]
 
 
-def test_witness_result_and_summary_are_isolated():
+def test_witness_result_and_summary_are_isolated() -> None:
     row = lookup_record("水", 2332, "male")
     row["selection"]["witnesses"][0]["text"] = "changed"
     summary = witness_summary()
@@ -135,8 +139,9 @@ def test_witness_result_and_summary_are_isolated():
     assert witness_summary()["source_title"] != "changed"
 
 
-def test_duplicate_or_untagged_uncertain_witnesses_are_rejected(monkeypatch):
-    import fatebridge.core.canping_texts as module
+def test_duplicate_or_untagged_uncertain_witnesses_are_rejected(
+    monkeypatch: MonkeyPatch,
+) -> None:
 
     original = json.loads(json.dumps(_witness_corpus()))
     duplicate = json.loads(json.dumps(original))
@@ -147,6 +152,8 @@ def test_duplicate_or_untagged_uncertain_witnesses_are_rejected(monkeypatch):
     for row in original["entries"]:
         if row.get("reading_uncertainties"):
             del row["reading_uncertainties"]
+        else:
+            pass
     monkeypatch.setattr(module, "_loaded", lambda path: {"data": original})
     with pytest.raises(ValueError, match="编辑方框"):
         module._witness_corpus()

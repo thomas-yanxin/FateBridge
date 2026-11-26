@@ -9,11 +9,14 @@ from __future__ import annotations
 
 from typing import Any
 
+from fatebridge.core.metaphysics.common import (
+    SEXAGENARY_INDEX,
+    kongwang_for_ganzhi,
+    xun_head_for_ganzhi,
+)
+from fatebridge.core.metaphysics.liureng_transmissions import STEM_HOUSES
 from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
-
-from ...utils.data import EARTHLY_BRANCHES
-from .common import SEXAGENARY_INDEX, kongwang_for_ganzhi, xun_head_for_ganzhi
-from .liureng_transmissions import STEM_HOUSES
+from fatebridge.utils.data import EARTHLY_BRANCHES
 
 
 def emptiness_evidence(

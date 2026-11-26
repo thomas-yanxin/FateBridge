@@ -9,7 +9,10 @@ from pathlib import Path
 
 if not __package__:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+else:
+    pass
 
+from scripts.astrodice.astrodice_reference_data import verify_material
 from scripts.astrodice.verify_astrodice_display_frame import (
     constant,
     data_from_primary,
@@ -23,9 +26,14 @@ from scripts.astrodice.verify_astrodice_lunar_split import (
 from scripts.astrodice.verify_astrodice_lunar_split import model as lunar
 from scripts.astrodice.verify_astrodice_lunar_split import tdb_label
 from scripts.astrodice.verify_astrodice_observer_clock import (
+    add,
     cover,
+    divide,
     independent_pi,
+    mul,
     rounded,
+    square,
+    sub,
 )
 from scripts.astrodice.verify_astrodice_taylor_remainder import (
     R,
@@ -47,6 +55,8 @@ class InnerSource(LunarSource):
     def state_derivatives(self, t, body):
         if body in ("Earth", "Moon"):
             return super().state_derivatives(t, body)
+        else:
+            pass
         return self.group_derivatives(t, {"Mercury": 0, "Venus": 1, "Sun": 10}[body])
 
 
@@ -83,8 +93,12 @@ def inner(case, body, epoch, data, profile):
             if r1 < low <= high < r0:
                 mass = m0 + (impact - r0) * ((m1 - m0) / (r1 - r0))
                 break
+            else:
+                pass
         if mass is None:
             raise ValueError("Independent solar cell/axis unresolved")
+        else:
+            pass
     strength = (
         mass
         * (2 * Q(float.fromhex(data["GM_sun_hex"])) / Q(299792458**2 * 149597870700))
@@ -112,9 +126,13 @@ def inner(case, body, epoch, data, profile):
 def check_vector(computed, saved):
     if len(computed) != len(saved):
         raise ValueError("Reference vector shape changed")
+    else:
+        pass
     for exact, value in zip(computed, saved):
         if set(value) != {"value", "derivative"}:
             raise ValueError("Derivative field omitted")
+        else:
+            pass
         cover(exact.v[0], value["value"])
         cover(exact.v[1], value["derivative"])
 
@@ -122,8 +140,6 @@ def check_vector(computed, saved):
 def verify(run, path):
     def sha(p):
         return hashlib.sha256(p.read_bytes()).hexdigest()
-
-    from scripts.astrodice.astrodice_reference_data import verify_material
 
     verify_material(run / "plan-before-evaluation.json")
     plan = json.loads((run / "plan-before-evaluation.json").read_text())
@@ -136,16 +152,22 @@ def verify(run, path):
         or saved["old_gates"] != {"production": 2, "overall": 1}
     ):
         raise ValueError("Reference identity or claim promoted")
+    else:
+        pass
     expected = [(i, b) for i, c in enumerate(plan[split]) for b in c["bodies"]]
     if [(r["case_index"], r["body"]) for r in saved["rows"]] != expected or len(
         saved["frames"]
     ) != len(plan[split]):
         raise ValueError("Planned reference population omitted/rebound")
+    else:
+        pass
     data = data_from_primary(run)
     if saved["coefficient_sha256"] != sha(
         run / "frame-coefficients-before-evaluation.json"
     ):
         raise ValueError("Coefficient digest detached")
+    else:
+        pass
     profile = json.loads(
         Path(
             "tests/data/astrodice/reference_sets/fixture-apparent-source-v1/source-solar-profile.json"
@@ -164,6 +186,8 @@ def verify(run, path):
             or stored["exact_binary64_numeric_jd"] != str(epoch)
         ):
             raise ValueError("Frame epoch rebound")
+        else:
+            pass
         for kind in ("mean", "true"):
             for row, record in zip(frame[kind], stored[kind]):
                 check_vector(row, record)
@@ -178,6 +202,8 @@ def verify(run, path):
             or Q(row["native_numeric_jd"]) != epoch
         ):
             raise ValueError("Source target/epoch rebound")
+        else:
+            pass
         try:
             if row["body"] == "Moon":
                 raw = lunar(
@@ -197,6 +223,8 @@ def verify(run, path):
         except Exception as error:
             if row["status"] != "reference_unavailable":
                 raise
+            else:
+                pass
             results.append(
                 {
                     "case_index": row["case_index"],
@@ -208,18 +236,13 @@ def verify(run, path):
             continue
         if row["status"] != "ready":
             raise ValueError("A computed independent source row was omitted")
+        else:
+            pass
         displayed = project(frames[row["case_index"]], direction, data)
         check_vector(direction, row["source_direction"])
         check_vector(displayed, row["displayed_direction"])
         x, y = displayed[:2]
         rate = (x.v[0][0], x.v[0][1])
-        from scripts.astrodice.verify_astrodice_observer_clock import (
-            add,
-            divide,
-            mul,
-            square,
-            sub,
-        )
 
         rate = divide(
             sub(mul(x.v[0], y.v[1]), mul(y.v[0], x.v[1])),
@@ -246,7 +269,7 @@ def verify(run, path):
     }
 
 
-def main():
+def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--run", type=Path, required=True)
     p.add_argument("--reference", type=Path, required=True)
@@ -260,3 +283,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

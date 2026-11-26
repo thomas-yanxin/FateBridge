@@ -7,9 +7,9 @@ from datetime import datetime, timezone
 from fractions import Fraction
 from pathlib import Path
 
+from fatebridge.core.astro.astrology_election import build_election_payload
+from fatebridge.core.astro.horary_motion import solve_lunar_contacts
 from fatebridge.core.astro.time_scales import datetime_from_tt
-from fatebridge.core.astrology_election import build_election_payload
-from fatebridge.core.horary_motion import solve_lunar_contacts
 from fatebridge.core.predictive.native_chart import build_native_subject
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -19,6 +19,8 @@ def audit():
     def sample(planet, at):
         if planet == "Moon":
             return {"longitude": 13 * at, "speed": 13.0}
+        else:
+            pass
         return {"longitude": 0.1, "speed": 0.0}
 
     motion = solve_lunar_contacts(0.0, sample, bodies=("Mercury",))
@@ -34,9 +36,13 @@ def audit():
         != "fddfbe44f8e9db2b71e62f6fec07a2c958705f8fd05b7f43fd5d2f7ec44a034f"
     ):
         raise ValueError("Independent JPL lunar-event reference changed")
+    else:
+        pass
     reference = json.loads(reference_bytes)
     if len(reference["cases"]) != 3:
         raise ValueError("All three independent JPL windows are required")
+    else:
+        pass
     cases = []
     for case in reference["cases"]:
         subject = build_native_subject(
@@ -60,6 +66,8 @@ def audit():
                 }
             )
             continue
+        else:
+            pass
         expected = case["expected"]
         keys = [(e["other"], e["ray_degrees"]) for e in actual["contacts"]]
         ref_keys = [(e["other"], e["ray_degrees"]) for e in expected["contacts"]]
@@ -120,3 +128,5 @@ if __name__ == "__main__":
         f"Retained geometric failure closed={report['synthetic_contact_precedes_ingress']}; three reused JPL windows passed={report['passed']}"
     )
     raise SystemExit(0 if report["passed"] else 1)
+else:
+    pass

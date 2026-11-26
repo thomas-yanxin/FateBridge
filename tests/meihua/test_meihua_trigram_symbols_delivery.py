@@ -15,6 +15,7 @@ from fatebridge.core.public_output import same_public_value
 from fatebridge.core.requests.meihua import MeihuaCasting
 from fatebridge.services.meihua import calculate_meihua_cast
 from tests.fixtures.mcp_result_delivery import read_full_result
+from tests.support.transports import call_calculation
 
 METHODS = [
     {"method": "existing", "hexagram_code": "010111", "moving_line": 4},
@@ -64,7 +65,9 @@ METHODS = [
 FIELD = "interpretation.trigram_relation_symbols"
 
 
-def test_diagnostics_cover_every_public_method_without_claiming_an_unseen_holdout():
+def test_diagnostics_cover_every_public_method_without_claiming_an_unseen_holdout() -> (
+    None
+):
     schema = TypeAdapter(MeihuaCasting).json_schema()
     assert set(schema["discriminator"]["mapping"]) == {p["method"] for p in METHODS}
     expected = os.environ.get("MEIHUA_V41_EXPECTED_PACKAGE_ROOT")
@@ -72,13 +75,15 @@ def test_diagnostics_cover_every_public_method_without_claiming_an_unseen_holdou
         assert (
             Path(fatebridge.__file__).resolve().is_relative_to(Path(expected).resolve())
         )
+    else:
+        pass
 
 
 @pytest.mark.parametrize("casting", METHODS, ids=lambda p: p["method"])
 @pytest.mark.parametrize("topic", ["general", "wealth", "weather"])
 def test_each_valid_public_method_retains_symbol_evidence_or_weather_null(
-    casting, topic
-):
+    casting, topic: str
+) -> None:
     TypeAdapter(MeihuaCasting).validate_python(casting)
     result = calculate_meihua_cast(casting=casting, interpretation_topic=topic)
     assert "error" not in result, result
@@ -89,16 +94,13 @@ def test_each_valid_public_method_retains_symbol_evidence_or_weather_null(
         assert layer["selected"]["body"] == result["meihua"]["body_trigram"]["name"]
         assert len(layer["selected"]["role_evaluations"]) == 4
         assert layer["effective_role_or_global_synthesis"] == "not_computed"
-        assert (
-            layer["event_time"]
-            is layer["real_outcome"]
-            is layer["success_probability"]
-            is None
-        )
+        assert layer["event_time"] is layer["real_outcome"] is None
 
 
 @pytest.mark.asyncio
-async def test_bounded_stdio_read_restores_complete_same_run_field(tmp_path):
+async def test_bounded_stdio_read_restores_complete_same_run_field(
+    tmp_path: Path,
+) -> None:
     package_root = Path(
         os.environ.get(
             "MEIHUA_V41_EXPECTED_PACKAGE_ROOT",
@@ -120,7 +122,8 @@ async def test_bounded_stdio_read_restores_complete_same_run_field(tmp_path):
         log_file=tmp_path / "stdio.log",
     )
     async with Client(transport) as client:
-        reply = await client.call_tool(
+        reply = await call_calculation(
+            client,
             "meihua_cast",
             {
                 "casting": METHODS[0],

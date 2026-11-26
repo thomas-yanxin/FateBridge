@@ -7,19 +7,19 @@ from unittest.mock import patch
 
 import pytest
 
-from fatebridge.core import human_design_knowledge as base
-from fatebridge.core import human_design_knowledge_v6 as hd
-from fatebridge.services.human_design_context_lines import (
-    build_human_design_context_packet,
-)
+from fatebridge.core.human_design import human_design_knowledge as base
+from fatebridge.core.human_design import human_design_knowledge_v6 as hd
 from fatebridge.utils.errors import EphemerisSourceError
-from fatebridge.validation.human_design_context_lines import (
-    verify_human_design_context_packet,
-)
 from tests.support.reference_data import read, sha
 from tests.support.transports import SPECS, business
 from tests.support.transports import rest as shared_rest
 from tests.support.transports import run_three
+from validation.human_design_context_lines import (
+    verify_human_design_context_packet,
+)
+from validation.human_design_context_packet import (
+    build_human_design_context_packet,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 E = ROOT / "tests/data/human_design/gate5"
@@ -27,7 +27,9 @@ rest = shared_rest
 LOCATOR_SHA = "6efc0b43f31b16ee7923c239fea686a150c2dd61597aebf65fdaec998c53baca"
 
 
-def test_all384_v6_source_inventories_preserve_previous_facts_and_non_gate5_meanings():
+def test_all384_v6_source_inventories_preserve_previous_facts_and_non_gate5_meanings() -> (
+    None
+):
     for gate in range(1, 65):
         for line in range(1, 7):
             key = f"{gate}.{line}"
@@ -48,11 +50,15 @@ def test_all384_v6_source_inventories_preserve_previous_facts_and_non_gate5_mean
             assert new["actual_fixing_state"] is new["selected_polarity"] is None
             if len(available) != 2:
                 assert "另一极性" not in new["selection_policy"]
+            else:
+                pass
             if gate != 5:
                 new = deepcopy(new)
                 new.pop("source_available_polarities")
                 new["selection_policy"] = old["selection_policy"]
                 assert new == old
+            else:
+                pass
 
 
 @pytest.mark.parametrize(
@@ -66,7 +72,9 @@ def test_all384_v6_source_inventories_preserve_previous_facts_and_non_gate5_mean
         (6, "Neptune", None),
     ],
 )
-def test_six_lines_match_independent_page_locators_and_available_poles(line, up, down):
+def test_six_lines_match_independent_page_locators_and_available_poles(
+    line: int, up: str, down: str | None
+) -> None:
     p = E / "gate5-independent-source-locators-v2.json"
     assert sha(p) == LOCATOR_SHA
     fact = read(p)["rows"][line - 1]
@@ -93,14 +101,16 @@ def test_six_lines_match_independent_page_locators_and_available_poles(line, up,
         assert record["source_polarity_text_note"]["printed_no_polarity"] is True
         assert record["source_polarity_text_note"]["mechanical_rule_changed"] is False
         assert "另一极性" not in record["selection_policy"]
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
     "key", ["5.1", "5.2", "5.3", "5.4", "5.5", "5.6", "2.3", "64.6"]
 )
 def test_real_rest_mcp_cli_reading_with_nullable_missing_pole(
-    key, rest, tmp_path, capsys
-):
+    key: str, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     response, code, cli, mcp = run_three(
         SPECS["knowledge_read"],
         {"domain": "human_design", "category": "lines_v6", "key": key},
@@ -127,8 +137,8 @@ def test_real_rest_mcp_cli_reading_with_nullable_missing_pole(
     ],
 )
 def test_rehashed_invalid_catalogue_cannot_invent_poles_or_acceptance(
-    fault, tmp_path, monkeypatch
-):
+    fault: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     data = json.loads(hd.CATALOGUE_PATH.read_text())
     row = data["rows"][-1]
     if fault == "invented_detriment":
@@ -166,7 +176,9 @@ def packet56():
     return source, packet
 
 
-def test_actual_fixed56_has_no_invented_detriment_or_changed_mechanics(packet56):
+def test_actual_fixed56_has_no_invented_detriment_or_changed_mechanics(
+    packet56,
+) -> None:
     source, packet = packet56
     assert (
         verify_human_design_context_packet(
@@ -192,7 +204,9 @@ def test_actual_fixed56_has_no_invented_detriment_or_changed_mechanics(packet56)
     "fault",
     ["invented_text", "invented_pole", "wrong_fixing", "drop_note", "wrong_version"],
 )
-def test_complete_context_replay_rejects_new_pole_and_text_forgery(packet56, fault):
+def test_complete_context_replay_rejects_new_pole_and_text_forgery(
+    packet56, fault: str
+) -> None:
     source, original = packet56
     packet = deepcopy(original)
     row = next(

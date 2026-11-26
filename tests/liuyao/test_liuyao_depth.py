@@ -18,19 +18,25 @@ from pydantic import ValidationError
 from fatebridge.core.almanac import build_calendar_context, get_solar_terms_for_year
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.divination import derive_meihua_hexagram, lookup_hexagram_by_code
-from fatebridge.core.liuyao_evidence import ADVANCES, branch_facts, xunkong
-from fatebridge.core.local_techniques.sixyao import (
-    _LIUCHONG_HEXAGRAM_CODES,
-    _LIUHE_HEXAGRAM_CODES,
-    _build_sixyao_enrichment,
-    _coin_lines_and_meta,
-    _derive_changed_code,
-    _derive_gua_code,
-    build_sixyao_result,
+from fatebridge.core.liuyao.liuyao_casting import (
+    cast_hexagram_code,
+    cast_lines_from_codes,
+    changed_hexagram_code,
+    coin_cast,
 )
+from fatebridge.core.liuyao.liuyao_evidence import ADVANCES, branch_facts, xunkong
+from fatebridge.core.liuyao.liuyao_najia import build_sixyao_enrichment
+from fatebridge.core.liuyao.liuyao_patterns import (
+    LIUCHONG_HEXAGRAM_CODES,
+    LIUHE_HEXAGRAM_CODES,
+)
+from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from fatebridge.core.requests.divination import SixYaoRequest
 from fatebridge.core.zhouyi import classical_hexagram
+from fatebridge.utils.civil_time import utc_calendar
 from scripts.catalogs.build_zhouyi_corpus import build
+from scripts.liuyao.build_liuyao_month_break_profile import build as month_break_profile
+from scripts.liuyao.build_liuyao_penalty_profile import build as penalty_profile
 from scripts.liuyao.build_profile import build_profile
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
@@ -49,7 +55,7 @@ CODES = ["".join(bits) for bits in product("01", repeat=6)]
 INPUT = {"date": "2026-10-22", "time": "12:00:00", "zone": "Asia/Shanghai"}
 
 
-def test_frozen_sources_and_packaged_corpus_are_reproducible():
+def test_frozen_sources_and_packaged_corpus_are_reproducible() -> None:
     reference_source = json.loads((CHART_REFERENCE_DIR / "source.json").read_text())
     reference_bytes = (CHART_REFERENCE_DIR / "reference.json.gz").read_bytes()
     assert (
@@ -86,7 +92,7 @@ def test_frozen_sources_and_packaged_corpus_are_reproducible():
     assert sum(c["special"] is not None for c in CORPUS["chapters"]) == 2
 
 
-def test_all_palaces_and_shiying_match_independent_published_table():
+def test_all_palaces_and_shiying_match_independent_published_table() -> None:
     table = SOURCE["index"]["wikitext"].split("== 分宮卦象次序表 ==")[1]
     table = re.sub(r"-\{([^{}]+)\}-", r"\1", table)
     rows = [
@@ -110,7 +116,7 @@ def test_all_palaces_and_shiying_match_independent_published_table():
                 )
             )
             code = reference[short]
-            info, _ = _build_sixyao_enrichment(code, code, "甲")
+            info, _ = build_sixyao_enrichment(code, code, "甲")
             assert info["current_palace"] == palace
             assert info["shi_line"] == [6, 1, 2, 3, 4, 5, 4, 3][index]
             assert abs(info["shi_line"] - info["ying_line"]) == 3
@@ -122,7 +128,7 @@ def test_all_palaces_and_shiying_match_independent_published_table():
     for palace in SCAN_TABLES["palaces"]:
         for index, (upper, lower) in enumerate(palace["upper_lower"]):
             code = SCAN_TABLES["trigrams"][lower] + SCAN_TABLES["trigrams"][upper]
-            info, _ = _build_sixyao_enrichment(code, code, "甲")
+            info, _ = build_sixyao_enrichment(code, code, "甲")
             assert info["current_palace"] == palace["palace"]
             assert info["current_palace_element"] == palace["element"]
             assert info["shi_line"] == SCAN_TABLES["subject_positions"][index]
@@ -131,10 +137,10 @@ def test_all_palaces_and_shiying_match_independent_published_table():
     assert checked_from_scan == set(CODES)
 
 
-def test_nazhi_of_all_64_hexagrams_matches_frozen_chapter_four():
+def test_nazhi_of_all_64_hexagrams_matches_frozen_chapter_four() -> None:
     for upper, lower in product(SCAN_TABLES["trigrams"], repeat=2):
         code = SCAN_TABLES["trigrams"][lower] + SCAN_TABLES["trigrams"][upper]
-        _, lines = _build_sixyao_enrichment(code, code, "甲")
+        _, lines = build_sixyao_enrichment(code, code, "甲")
         assert "".join(line["branch"] for line in lines) == (
             SCAN_TABLES["pure_branches"][lower]["branches"][:3]
             + SCAN_TABLES["pure_branches"][upper]["branches"][3:]
@@ -155,29 +161,35 @@ def test_nazhi_of_all_64_hexagrams_matches_frozen_chapter_four():
     }
     for code in CODES:
         gua = lookup_hexagram_by_code(code)
-        _, lines = _build_sixyao_enrichment(code, code, "甲")
+        _, lines = build_sixyao_enrichment(code, code, "甲")
         assert [row["branch"] for row in lines] == tables[gua["lower"]["name"]][
             0
         ] + tables[gua["upper"]["name"]][1]
 
 
-def test_all_ten_six_clash_and_eight_six_combination_hexagrams():
+def test_all_ten_six_clash_and_eight_six_combination_hexagrams() -> None:
     clashes, combinations = set(), set()
     partner = dict(zip("子丑寅亥卯戌辰酉巳申午未", "丑子亥寅戌卯酉辰申巳未午"))
     branches = "子丑寅卯辰巳午未申酉戌亥"
     for code in CODES:
-        _, lines = _build_sixyao_enrichment(code, code, "甲")
+        _, lines = build_sixyao_enrichment(code, code, "甲")
         pairs = [(lines[i]["branch"], lines[i + 3]["branch"]) for i in range(3)]
         if all((branches.index(a) - branches.index(b)) % 12 == 6 for a, b in pairs):
             clashes.add(code)
+        else:
+            pass
         if all(partner[a] == b for a, b in pairs):
             combinations.add(code)
-    assert clashes == _LIUCHONG_HEXAGRAM_CODES
-    assert combinations == _LIUHE_HEXAGRAM_CODES
+        else:
+            pass
+    assert clashes == LIUCHONG_HEXAGRAM_CODES
+    assert combinations == LIUHE_HEXAGRAM_CODES
     assert len(clashes) == 10 and len(combinations) == 8
 
 
-def test_need_to_song_matches_zengshan_chapter_seven_without_static_transformations():
+def test_need_to_song_matches_zengshan_chapter_seven_without_static_transformations() -> (
+    None
+):
     result = build_sixyao_result(**INPUT, gua_code="111010", changed_code="010111")
     assert result["hexagram_info"]["current_palace"] == "坤"
     assert result["moving_lines"] == [1, 3, 4, 6]
@@ -256,10 +268,16 @@ def test_need_to_song_matches_zengshan_chapter_seven_without_static_transformati
                     )
                     assert "跨章适用" in proof["application_interpretation"]
                     expected_sources.add(proof["application_source_url"])
+                else:
+                    pass
             assert row["sources"] == sorted(expected_sources)
+        else:
+            pass
         for source in row["sources"]:
             if "oldid=" in source:
                 continue
+            else:
+                pass
             scan = result["liuyao_evidence"]["conditional_analysis"]["classical_scan"]
             document, page = source.rsplit("#page=", 1)
             assert document == scan["source"]["url"]
@@ -278,17 +296,23 @@ def test_need_to_song_matches_zengshan_chapter_seven_without_static_transformati
                 collated_pages.update(
                     p for c in hidden["clauses"] for p in c["pdf_pages"]
                 )
+            else:
+                pass
             if row["rule_id"] == "current_void_fill_directed_control":
 
                 profile = build_profile("void_control")
                 assert profile["source"]["sha256"] == scan["source"]["sha256"]
                 collated_pages.update(c["pdf_page"] for c in profile["clauses"])
+            else:
+                pass
             if row["rule_id"] == "role_condition_effects":
                 role_source = json.loads(
                     (FIXTURES / "liuyao_effects_v4/profile.json").read_text()
                 )["source"]
                 assert role_source["sha256"] == scan["source"]["sha256"]
                 collated_pages.update(role_source["pages"])
+            else:
+                pass
             if row["rule_id"] == "separate_body_region_and_active_line_fanfu":
 
                 profile = build_profile("fanfu")
@@ -296,6 +320,8 @@ def test_need_to_song_matches_zengshan_chapter_seven_without_static_transformati
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]
                 )
+            else:
+                pass
             if row["rule_id"] == "void_conditions_and_outgoing_obstructions":
 
                 profile = build_profile("void")
@@ -303,11 +329,15 @@ def test_need_to_song_matches_zengshan_chapter_seven_without_static_transformati
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]
                 )
+            else:
+                pass
             if row["rule_id"] == "activity_control_targets_and_injured_static_control":
 
                 profile = build_profile("control")
                 assert profile["source"]["sha256"] == scan["source"]["sha256"]
                 collated_pages.update(c["pdf_page"] for c in profile["clauses"])
+            else:
+                pass
             if row["rule_id"] == "day_clash_break_fill_and_moving_scatter":
 
                 profile = build_profile("clash")
@@ -315,6 +345,8 @@ def test_need_to_song_matches_zengshan_chapter_seven_without_static_transformati
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]
                 )
+            else:
+                pass
             if row["rule_id"] == "outgoing_generation_and_target_reception":
 
                 profile = build_profile("generation")
@@ -322,6 +354,8 @@ def test_need_to_song_matches_zengshan_chapter_seven_without_static_transformati
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]
                 )
+            else:
+                pass
             if row["rule_id"] == "back_generation_support_for_original_actions":
 
                 profile = build_profile("rescue")
@@ -329,6 +363,8 @@ def test_need_to_song_matches_zengshan_chapter_seven_without_static_transformati
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]
                 )
+            else:
+                pass
             if row["rule_id"] == "successive_generation_path_conditions":
 
                 profile = build_profile("routing")
@@ -336,6 +372,8 @@ def test_need_to_song_matches_zengshan_chapter_seven_without_static_transformati
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]
                 )
+            else:
+                pass
             if row["rule_id"] == "partial_stage_query_knowledge":
 
                 profile = build_profile("stage")
@@ -343,6 +381,8 @@ def test_need_to_song_matches_zengshan_chapter_seven_without_static_transformati
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]
                 )
+            else:
+                pass
             if row["rule_id"] == "earth_cessation_independent_support_exception":
 
                 profile = build_profile("cessation")
@@ -350,6 +390,8 @@ def test_need_to_song_matches_zengshan_chapter_seven_without_static_transformati
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]
                 )
+            else:
+                pass
             if row["rule_id"] == "metal_si_day_growth_month_support":
 
                 profile = build_profile("growth")
@@ -357,26 +399,26 @@ def test_need_to_song_matches_zengshan_chapter_seven_without_static_transformati
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]
                 )
+            else:
+                pass
             if row["rule_id"] == "si_yin_shen_scoped_growth_exclusion":
-                from scripts.liuyao.build_liuyao_penalty_profile import (
-                    build as penalty_profile,
-                )
 
                 profile = penalty_profile()
                 assert profile["source"]["sha256"] == scan["source"]["sha256"]
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]
                 )
+            else:
+                pass
             if row["rule_id"] == "day_value_month_only_opposition_exception":
-                from scripts.liuyao.build_liuyao_month_break_profile import (
-                    build as month_break_profile,
-                )
 
                 profile = month_break_profile()
                 assert profile["source"]["sha256"] == scan["source"]["sha256"]
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]
                 )
+            else:
+                pass
             assert int(page) in collated_pages
             raw = FIXTURES / "liuyao_scan_v3" / scan["source"]["file"]
             assert (
@@ -384,23 +426,31 @@ def test_need_to_song_matches_zengshan_chapter_seven_without_static_transformati
             )
 
 
-def test_every_coin_configuration_has_exact_base_changed_and_moving_lines():
+def test_explicit_empty_changed_code_does_not_create_static_lines() -> None:
+    """Reject an explicit empty changed code at the line mounting boundary."""
+    with pytest.raises(ValueError, match="0/1"):
+        cast_lines_from_codes("111111", "")
+
+
+def test_every_coin_configuration_has_exact_base_changed_and_moving_lines() -> None:
     for reference in CHART_REFERENCE["rows"]:
         tosses = reference["coins"]
-        lines, _ = _coin_lines_and_meta(list(tosses))
-        assert _derive_gua_code(lines) == reference["current_code"]
-        assert _derive_changed_code(lines) == reference["changed_code"]
+        cast = coin_cast(list(tosses))
+        lines = cast.lines
+        assert [toss["sum"] for toss in cast.tosses] == tosses
+        assert cast_hexagram_code(lines) == reference["current_code"]
+        assert changed_hexagram_code(lines) == reference["changed_code"]
         assert [i + 1 for i, line in enumerate(lines) if line["change"]] == (
             reference["moving_lines"]
         )
-        assert _derive_gua_code(lines) == "".join(str(n % 2) for n in tosses)
-        assert _derive_changed_code(lines) == "".join(
+        assert cast_hexagram_code(lines) == "".join(str(n % 2) for n in tosses)
+        assert changed_hexagram_code(lines) == "".join(
             "1" if n in (6, 7) else "0" for n in tosses
         )
         assert [line["change"] for line in lines] == [n in (6, 9) for n in tosses]
 
 
-def test_all_4096_base_changed_pairs_keep_static_lines_untransformed():
+def test_all_4096_base_changed_pairs_keep_static_lines_untransformed() -> None:
     for current in CODES:
         for changed in CODES:
             result = build_sixyao_result(
@@ -416,9 +466,11 @@ def test_all_4096_base_changed_pairs_keep_static_lines_untransformed():
             ):
                 assert info[actual_key] == reference[expected_key]
             for line, foreign in zip(result["lines"], reference["lines"], strict=True):
-                keys = ["branch", "element", "liuqin", "shi_ying"]
+                keys = ["stem", "branch", "element", "liuqin", "shi_ying"]
                 if line["change"]:
-                    keys.extend(["changed_branch", "changed_liuqin"])
+                    keys.extend(["changed_stem", "changed_branch", "changed_liuqin"])
+                else:
+                    assert "changed_stem" not in line
                 assert {key: line[key] for key in keys} == {
                     key: foreign[key] for key in keys
                 }
@@ -430,6 +482,8 @@ def test_all_4096_base_changed_pairs_keep_static_lines_untransformed():
                 assert not set(region["static_comparison_positions"]) & set(expected)
                 if not region["trigram_changed"]:
                     assert region["nazhi_relation"] == "未动"
+                else:
+                    pass
             for transformed in fanfu["moving_line_relations"]:
                 p = transformed["position"]
                 assert (
@@ -439,6 +493,8 @@ def test_all_4096_base_changed_pairs_keep_static_lines_untransformed():
             if not expected:
                 assert not result["pattern_flags"]["liuchong_changed"]
                 assert not result["pattern_flags"]["liuhe_changed"]
+            else:
+                pass
             assert [
                 v["position"] for v in result["classical_text_evidence"]["moving_yaoci"]
             ] == expected
@@ -452,6 +508,8 @@ def test_all_4096_base_changed_pairs_keep_static_lines_untransformed():
                 if edge["source_kind"] == "changed":
                     assert edge["source_position"] in expected
                     assert edge["source_position"] == edge["target_position"]
+                else:
+                    pass
             conditional = result["liuyao_evidence"]["conditional_analysis"]
             for candidate in conditional["three_harmony"]["candidates"]:
                 members = candidate["members"]
@@ -471,10 +529,14 @@ def test_all_4096_base_changed_pairs_keep_static_lines_untransformed():
                     )
                     assert {m["position"] for m in members} == endpoints
                     assert endpoints <= set(expected)
+                else:
+                    pass
                 if candidate["status"] == "formation_conditions_matched":
                     assert len(branches) == 3
                     assert len(candidate["active_positions"]) >= 2
                     assert candidate["obstructions"] == []
+                else:
+                    pass
             present_kinships = {r["liuqin"] for r in result["lines"]} | {
                 r["changed_liuqin"] for r in result["lines"] if r["change"]
             }
@@ -484,7 +546,7 @@ def test_all_4096_base_changed_pairs_keep_static_lines_untransformed():
             )
 
 
-def test_six_gods_for_all_ten_stems_match_independent_source_table():
+def test_six_gods_for_all_ten_stems_match_independent_source_table() -> None:
     raw = next(
         p["wikitext"] for p in ZENGSHAN["chapters"] if p["title"].endswith("/18")
     )
@@ -496,13 +558,13 @@ def test_six_gods_for_all_ten_stems_match_independent_source_table():
         [x.strip().translate(names) for x in row.split("||")] for row in reversed(rows)
     ]
     for stem, column in zip("甲乙丙丁戊己庚辛壬癸", [0, 0, 1, 1, 2, 3, 4, 4, 5, 5]):
-        _, lines = _build_sixyao_enrichment("111111", "111111", stem)
+        _, lines = build_sixyao_enrichment("111111", "111111", stem)
         assert [line["liushen"] for line in lines] == [row[column] for row in groups]
     assert {
         (row["code"], row["day_stem"]) for row in CHART_REFERENCE["spirit_rows"]
     } == set(product(CODES, "甲乙丙丁戊己庚辛壬癸"))
     for row in CHART_REFERENCE["spirit_rows"]:
-        _, lines = _build_sixyao_enrichment(row["code"], row["code"], row["day_stem"])
+        _, lines = build_sixyao_enrichment(row["code"], row["code"], row["day_stem"])
         assert [line["liushen"] for line in lines] == row["spirits"]
 
 
@@ -517,14 +579,18 @@ def test_six_gods_for_all_ten_stems_match_independent_source_table():
         ("甲寅", "子丑"),
     ],
 )
-def test_xunkong_matches_all_sixty_sexagenary_days(day_ganzhi, expected):
+def test_xunkong_matches_all_sixty_sexagenary_days(
+    day_ganzhi: str, expected: str
+) -> None:
     stems, branches = "甲乙丙丁戊己庚辛壬癸", "子丑寅卯辰巳午未申酉戌亥"
     start = branches.index(day_ganzhi[1])
     for day in range(10):
         assert xunkong(stems[day] + branches[(start + day) % 12]) == list(expected)
 
 
-def test_flags_do_not_infer_xunkong_means_ineffective_or_day_clash_means_hidden_movement():
+def test_flags_do_not_infer_xunkong_means_ineffective_or_day_clash_means_hidden_movement() -> (
+    None
+):
     facts = branch_facts("子", "子", "午", ["子", "丑"])
     assert facts["is_month_branch"] and facts["is_day_clash"] and facts["is_xunkong"]
     assert "is_andong" not in facts and "is_ineffective" not in facts
@@ -540,7 +606,9 @@ def test_flags_do_not_infer_xunkong_means_ineffective_or_day_clash_means_hidden_
     assert "戌" not in ADVANCES
 
 
-def test_fugua_candidates_only_fill_missing_categories_and_keep_flying_relations():
+def test_fugua_candidates_only_fill_missing_categories_and_keep_flying_relations() -> (
+    None
+):
     result = build_sixyao_result(**INPUT, gua_code="100000")  # 坤宫地雷复
     hidden = result["liuyao_evidence"]["hidden_spirits"]
     # 寅木官鬼 already appears at 初爻, so only 父母 is missing.
@@ -552,22 +620,15 @@ def test_fugua_candidates_only_fill_missing_categories_and_keep_flying_relations
     )
 
 
-def test_original_verses_are_distinct_from_modern_summaries_and_copy_safe():
+def test_original_verses_are_copy_safe() -> None:
     result = build_sixyao_result(**INPUT, gua_code="111111", changed_code="000000")
     assert result["descriptions"]["111111"]["卦辞"] == "乾：元亨。利貞。"
     assert result["descriptions"]["111111"]["象曰"] == "天行健，君子以自強不息。"
-    assert (
-        result["current_hexagram"]["meaning_source_kind"] == "modern_editorial_summary"
-    )
     texts = result["classical_text_evidence"]
     assert len(texts["moving_yaoci"]) == 6
     assert texts["all_moving_special"] == {"label": "用九", "text": "見羣龍无首，吉。"}
     result["current_hexagram"]["classical"]["yaoci"][0]["text"] = "altered"
     assert classical_hexagram("111111")["yaoci"][0]["text"] == "潛龍勿用。"
-    assert (
-        result["liuyao_evidence"]["prediction_validation"]["status"]
-        == "not_established"
-    )
     result["liuyao_evidence"]["source_revisions"]["4"]["revision"] = -1
     fresh = build_sixyao_result(**INPUT, gua_code="111111")
     assert fresh["liuyao_evidence"]["source_revisions"]["4"]["revision"] == 2100293
@@ -590,7 +651,7 @@ def test_original_verses_are_distinct_from_modern_summaries_and_copy_safe():
         {"coins": [7] * 6, "gua_code": "000000"},
     ],
 )
-def test_invalid_or_conflicting_inputs_never_silently_change_the_cast(bad):
+def test_invalid_or_conflicting_inputs_never_silently_change_the_cast(bad) -> None:
     with pytest.raises(ValueError):
         build_sixyao_result(**INPUT, **bad)
 
@@ -605,12 +666,12 @@ def test_invalid_or_conflicting_inputs_never_silently_change_the_cast(bad):
         {"gua_code": "111x111"},
     ],
 )
-def test_request_schema_preserves_strict_values(bad):
+def test_request_schema_preserves_strict_values(bad) -> None:
     with pytest.raises(ValidationError):
         SixYaoRequest.model_validate({**INPUT, **bad})
 
 
-def test_lunar_year_is_used_between_lichun_and_lunar_new_year():
+def test_lunar_year_is_used_between_lichun_and_lunar_new_year() -> None:
     # HKO: lunar new year is 2026-02-17; 立春 precedes it on 02-04.
     moment = datetime(2026, 2, 10, 12)
     pillars = BaZiCalendar.get_four_pillars(moment, timezone_name="Asia/Shanghai")
@@ -625,7 +686,7 @@ def test_lunar_year_is_used_between_lichun_and_lunar_new_year():
     assert lunar["meihua"] == expected
 
 
-def test_midnight_lunar_date_and_23_hour_ganzhi_are_separate_explicit_clocks():
+def test_midnight_lunar_date_and_23_hour_ganzhi_are_separate_explicit_clocks() -> None:
     before = build_sixyao_result(date="2026-02-16", time="22:59:59", gua_code="111111")
     late = build_sixyao_result(date="2026-02-16", time="23:00:00", gua_code="111111")
     assert before["nongli"]["dayGanZi"] != late["nongli"]["dayGanZi"]
@@ -633,7 +694,19 @@ def test_midnight_lunar_date_and_23_hour_ganzhi_are_separate_explicit_clocks():
     assert "23:00" in late["liuyao_evidence"]["calendar_conventions"]["day_boundary"]
 
 
-def test_every_2026_lunar_date_matches_hko_published_table():
+def test_fractional_offset_carry_changes_the_late_zi_day_and_hour() -> None:
+    result = build_sixyao_result(
+        date="2026-11-03",
+        time="22:59:59.9999999-00:00:00.0000001",
+        zone="UTC",
+        gua_code="101010",
+    )
+    calendar = result["nongli"]
+    assert calendar["birth"] == "2026-11-03 23:00:00"
+    assert (calendar["dayGanZi"], calendar["time"]) == ("壬午", "庚子")
+
+
+def test_every_2026_lunar_date_matches_hko_published_table() -> None:
     metadata = json.loads((FIXTURES / "liuyao-hko-2026.metadata.json").read_text())
     assert (
         hashlib.sha256((FIXTURES / "liuyao-hko-2026.txt").read_bytes()).hexdigest()
@@ -704,7 +777,9 @@ def test_every_2026_lunar_date_matches_hko_published_table():
         )
 
 
-def test_all_24_solar_term_dates_match_hko_and_twelve_jie_switch_month_at_instant():
+def test_all_24_solar_term_dates_match_hko_and_twelve_jie_switch_month_at_instant() -> (
+    None
+):
     raw = (FIXTURES / "liuyao-hko-2026.txt").read_text(encoding="utf-8-sig")
     rows = re.findall(r"2026年(\d+)月(\d+)日\s+\S+\s+星期\S[ \t]+([^\s]+)", raw)
     names = str.maketrans(
@@ -731,11 +806,20 @@ def test_all_24_solar_term_dates_match_hko_and_twelve_jie_switch_month_at_instan
     for term in get_solar_terms_for_year(2026):
         assert (term.moment.month, term.moment.day) == published[term.name]
         if term.name in month_starts:
+            _, ceiling = term.point.nominal_calendar_bracket()
+            at_clock = ceiling.as_datetime()
+            assert at_clock is not None
+            before_clock = at_clock - timedelta(microseconds=1)
+            assert (
+                utc_calendar(before_clock).julian_day_exact()
+                < term.point.day
+                <= ceiling.julian_day_exact()
+            )
             before = BaZiCalendar.get_four_pillars(
-                term.moment - timedelta(microseconds=1), timezone_name="Asia/Shanghai"
+                before_clock, timezone_name="Asia/Shanghai"
             )
-            at = BaZiCalendar.get_four_pillars(
-                term.moment, timezone_name="Asia/Shanghai"
-            )
+            at = BaZiCalendar.get_four_pillars(at_clock, timezone_name="Asia/Shanghai")
             assert at["month"][1] == month_starts[term.name]
             assert at["month"] != before["month"]
+        else:
+            pass

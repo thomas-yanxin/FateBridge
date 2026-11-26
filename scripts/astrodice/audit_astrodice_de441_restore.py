@@ -50,6 +50,8 @@ def reference_axes(row, protocol):
     h = protocol["selected_step_seconds"][row["body"]]
     if h != 43200 or protocol["steps_seconds"][row["body"]] != [21600, 43200]:
         raise ValueError("Unplanned reference step selection")
+    else:
+        pass
     weights = interpolation_weights()
     velocity = row["derivatives_per_tt_day"][str(h)]
     printing = 0.0
@@ -70,6 +72,8 @@ def reference_axes(row, protocol):
     alpha_scale2 = dot(pa, pa)
     if alpha_scale2 < 0.0001:
         raise ValueError("Ill-conditioned reference tangent geometry")
+    else:
+        pass
     mids = [
         dot(velocity, pa) * AS_PER_RADIAN / alpha_scale2,
         dot(velocity, pd) * AS_PER_RADIAN,
@@ -95,12 +99,16 @@ def grade_frames(frames):
         v["conditional_error_lower_arcsec_per_day"] > RATE_LINE for v in frames.values()
     ):
         return FAIL
+    else:
+        pass
     if any(
         not v["reference"]["frame_check_qualified"]
         or v["conditional_error_upper_arcsec_per_day"] > RATE_LINE
         for v in frames.values()
     ):
         return UNRESOLVED
+    else:
+        pass
     return PASS
 
 
@@ -114,6 +122,8 @@ def require_lunar_policy(metadata):
         or fixed["status"] != "applied"
     ):
         raise ValueError("Frozen lunar derivative was not fully applied")
+    else:
+        pass
 
 
 def candidate_position(row, model, trace):
@@ -139,6 +149,8 @@ def candidate_position(row, model, trace):
         or not all(math.isfinite(v) for v in native)
     ):
         raise ValueError("ICRF source/coordinate contract changed")
+    else:
+        pass
     trace.observe("Moon_independent_position_layer", model)
     return {
         **position_comparison(row, native[:3]),
@@ -159,6 +171,8 @@ def candidate_rate(row, protocol, model, trace):
     )
     if returned_model != model:
         raise ValueError("Declared physical source was not used")
+    else:
+        pass
     lahiri = native_lahiri_positions(
         ["Moon"],
         julian_day_ut1=jd,
@@ -208,6 +222,8 @@ def audit(args):
         or protocol["fixed_reference_convergence_arcsec_per_day"] != RATE_LINE
     ):
         raise ValueError("Frozen cohort or fixed numerical lines changed")
+    else:
+        pass
     from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 
     trace = PhysicalEphemerisTrace()
@@ -291,3 +307,5 @@ if __name__ == "__main__":
         p.add_argument("--" + name, type=Path, required=True)
     p.add_argument("--model", choices=["swieph", "jpl"], required=True)
     raise SystemExit(audit(p.parse_args()))
+else:
+    pass

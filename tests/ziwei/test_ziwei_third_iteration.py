@@ -3,13 +3,13 @@
 import json
 import shutil
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart, build_ziwei_horoscope
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from scripts.ziwei.audit_ziwei import (
     FIXTURES,
     audit_depth_classical,
@@ -18,9 +18,12 @@ from scripts.ziwei.audit_ziwei import (
 )
 from scripts.ziwei.audit_ziwei_phase import audit_phase_days, new_moons
 from scripts.ziwei.ziwei_conditional_inputs import synthetic_birth_clock
+from validation.claims import CalculationClaim, verify_calculation_claims
 
 
-def test_nasa_new_moons_cover_335_pre_hko_days_without_claiming_month_numbering():
+def test_nasa_new_moons_cover_335_pre_hko_days_without_claiming_month_numbering() -> (
+    None
+):
     result = audit_phase_days()
     assert result["lunar_day_cells_checked"] == 335
     assert result["new_moon_boundaries_in_range"] == 12
@@ -29,14 +32,16 @@ def test_nasa_new_moons_cover_335_pre_hko_days_without_claiming_month_numbering(
     assert result["limits"] and not result["mismatches"]
 
 
-def test_phase_parser_does_not_take_full_moon_when_new_moon_column_is_empty():
+def test_phase_parser_does_not_take_full_moon_when_new_moon_column_is_empty() -> None:
     source = (FIXTURES / "nasa-phases1901.html").read_text(encoding="utf-8")
     moments = new_moons(source)
     first = moments[0]
     assert first.strftime("%Y-%m-%d %H:%M") == "1901-01-20 14:36"
 
 
-def test_selected_ming_scan_collation_retains_edition_differences_and_unknowns():
+def test_selected_ming_scan_collation_retains_edition_differences_and_unknowns() -> (
+    None
+):
     result = audit_ming_scan()
     assert result["scan_frames_frozen"] == 6
     assert result["noble_placement_checks"] == 40
@@ -51,7 +56,7 @@ def test_selected_ming_scan_collation_retains_edition_differences_and_unknowns()
     assert not result["whole_book_acceptance_passed"]
 
 
-def test_ming_scan_bytes_are_required_not_just_a_citation_url(tmp_path):
+def test_ming_scan_bytes_are_required_not_just_a_citation_url(tmp_path: Path) -> None:
     shutil.copytree(FIXTURES / "naj_ming", tmp_path / "naj_ming")
     page = tmp_path / "naj_ming/frame_0075.jpg"
     page.write_bytes(page.read_bytes() + b"changed")
@@ -59,7 +64,7 @@ def test_ming_scan_bytes_are_required_not_just_a_citation_url(tmp_path):
         audit_ming_scan(tmp_path)
 
 
-def test_whole_pinned_source_and_independent_depth_vectors():
+def test_whole_pinned_source_and_independent_depth_vectors() -> None:
     result = audit_depth_classical()
     assert result["source_revision"] == 1963110
     assert result["void_pairs_checked"] == 60
@@ -72,7 +77,9 @@ def test_whole_pinned_source_and_independent_depth_vectors():
     assert not result["whole_book_acceptance_passed"]
 
 
-def test_full_source_checksum_rejects_drift_without_replacing_expectations(tmp_path):
+def test_full_source_checksum_rejects_drift_without_replacing_expectations(
+    tmp_path: Path,
+) -> None:
     manifest = json.loads((FIXTURES / "depth_manifest.json").read_text())
     shutil.copy2(FIXTURES / "depth_manifest.json", tmp_path)
     for item in manifest["files"]:
@@ -85,8 +92,8 @@ def test_full_source_checksum_rejects_drift_without_replacing_expectations(tmp_p
 
 @pytest.mark.parametrize("year,primary", [(1984, "戌"), (1985, "亥")])
 def test_pinned_text_keeps_both_xun_voids_without_changing_software_profile(
-    year, primary
-):
+    year: int, primary: str
+) -> None:
     software = build_ziwei_chart(synthetic_seed(year), "男")
     classic = build_ziwei_chart(
         synthetic_seed(year), "男", rule_profile="quanshu_v2_excerpt"
@@ -104,7 +111,7 @@ def test_pinned_text_keeps_both_xun_voids_without_changing_software_profile(
     assert software["reading_view"]["star_occurrence_count"] == 66
 
 
-def test_annual_virtues_and_flying_stars_are_not_natal_or_boshi_stars():
+def test_annual_virtues_and_flying_stars_are_not_natal_or_boshi_stars() -> None:
     chart = build_ziwei_chart(
         synthetic_seed(1992), "男", rule_profile="quanshu_v2_excerpt"
     )
@@ -124,6 +131,10 @@ def test_annual_virtues_and_flying_stars_are_not_natal_or_boshi_stars():
     assert target["白虎"]["branch"] == "卯"
     assert target["官府"]["branch"] == "亥"
     assert target["官府"]["system_id"] == "annual_four_flying_stars"
+    assert target["年解"]["branch"] == "卯"
+    assert target["年解"]["basis_branch"] == "未"
+    assert target["年解"]["system_id"] == "iztro_2_5_8_horoscope"
+    assert len(target) == len(annual["flowing_stars"]) == 17
     assert all(
         s["scope"] == "流年" and not s["natal_stars_relocated"] for s in target.values()
     )
@@ -142,7 +153,7 @@ def test_annual_virtues_and_flying_stars_are_not_natal_or_boshi_stars():
         assert record["scope_palace_name"] == palace["scope_palace_name"]
 
 
-def test_three_sha_returns_only_the_group_the_text_explicitly_supplies():
+def test_three_sha_returns_only_the_group_the_text_explicitly_supplies() -> None:
     chart = build_ziwei_chart(
         synthetic_seed(1984), "男", rule_profile="quanshu_v2_excerpt"
     )
@@ -163,7 +174,7 @@ def test_three_sha_returns_only_the_group_the_text_explicitly_supplies():
     )
 
 
-def test_textual_symbolism_is_not_a_new_sihua_assignment():
+def test_textual_symbolism_is_not_a_new_sihua_assignment() -> None:
     chart = build_ziwei_chart(
         synthetic_seed(1984), "男", rule_profile="quanshu_v2_excerpt"
     )
@@ -181,7 +192,7 @@ def test_textual_symbolism_is_not_a_new_sihua_assignment():
     assert chart["void_systems"]["source_name_mapping"]["天空地劫诀中的天空"] == "地空"
 
 
-def test_actual_receipt_does_not_accept_textual_huacai_as_natal_huake():
+def test_actual_receipt_does_not_accept_textual_huacai_as_natal_huake() -> None:
     spec = next(s for s in CATALOG if s.key == "ziwei_birth")
     request = spec.request_model.model_validate(
         dict(

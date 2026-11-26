@@ -4,12 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import json
-import sys
 from pathlib import Path
 from typing import Any
-
-if __package__ in {None, ""}:
-    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from fatebridge.core.almanac import get_day_ganzhi
 from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
@@ -48,6 +44,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         "month-worked.json",
     }:
         raise ValueError("完整月段及矛盾门段、历表不得删除")
+    else:
+        pass
     if {r["file"] for r in m["prior_source_references"]} != {
         "../taiyi_jinjing_v5/worked-cases.json",
         "../taiyi_jinjing_v5/manifest.json",
@@ -55,6 +53,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         "../taiyi_jinjing_v9/manifest.json",
     }:
         raise ValueError("原V5四课例与V9祖数来源必须保留")
+    else:
+        pass
     for item in (
         m["source_files"] + m["prior_source_references"] + [m["source_reference"]]
     ):
@@ -63,6 +63,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
             != item["sha256"]
         ):
             raise ValueError("月计冻结指纹不符：" + item["file"])
+        else:
+            pass
     case = json.loads((corpus / "month-worked.json").read_text())
     observations = case["observations"]
     if (
@@ -72,6 +74,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         or case["input"] != {"year": 1561, "nominal_month": 9}
     ):
         raise ValueError("29要求含5处门段差异和缺局数，不得改输入或择优删除")
+    else:
+        pass
     result = public_case()
     b = result["taiyi"]
     matches, differences, unknown = [], [], []

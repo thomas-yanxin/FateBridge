@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -11,11 +12,13 @@ from fastmcp import Client
 import fatebridge.api as api
 from fatebridge.cli import run
 from fatebridge.core import ephemeris_runtime as e
-from fatebridge.core import guolao, guolao_timing
 from fatebridge.core.astro.birth import build_astro_birth_info
+from fatebridge.core.guolao import guolao, guolao_timing
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
+from tests.support.transports import call_calculation
+from tests.unit_test.fixtures.guolao import fixed_moshier as fixed_moshier
 
 CASES = json.loads(
     (Path(__file__).parents[1] / "data/guolao/native_frame_cases.json").read_bytes()
@@ -31,21 +34,6 @@ BIRTH = dict(
     birth_latitude=40,
     use_true_solar_time=True,
 )
-
-
-@pytest.fixture(autouse=True)
-def fixed_moshier(tmp_path, monkeypatch):
-    previous = e.configured_ephemeris_path()
-    monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
-    monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
-    e.swe.close()
-    e.configure_ephemeris_path(str(tmp_path))
-    try:
-        yield
-    finally:
-        monkeypatch.undo()
-        e.swe.close()
-        e.configure_ephemeris_path(previous if previous is not None else "")
 
 
 def inject_case(monkeypatch, case):
@@ -84,6 +72,8 @@ def inject_case(monkeypatch, case):
         )
         if not selected:
             return original(operation, *args, **kwargs)
+        else:
+            pass
         calls.append((operation, args))
         if change in ["RADIANS", "J2000", "missing_EQUATORIAL", "missing_extra_speed"]:
             changed = list(args)
@@ -96,9 +86,13 @@ def inject_case(monkeypatch, case):
                 )
             # Native library supplies actual alternate coordinates and flags.
             return original(operation, *changed, **kwargs)
+        else:
+            pass
         result = original(operation, *args, **kwargs)
         if change == "altitude_91":
             return result[0], 91.0, result[2]
+        else:
+            pass
         values, flag = list(result[0]), result[-1]
         if change == "declination_91":
             values[1] = 91.0
@@ -122,8 +116,8 @@ def inject_case(monkeypatch, case):
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["site"] + "-" + c["change"])
 def test_every_held_alternate_contract_is_rejected_before_consumption(
-    monkeypatch, case
-):
+    monkeypatch: pytest.MonkeyPatch, case
+) -> None:
     calls = inject_case(monkeypatch, case)
     with pytest.raises(EphemerisSourceError):
         guolao.positions(build_astro_birth_info(**BIRTH), correct_motion=False)
@@ -140,9 +134,8 @@ def test_every_held_alternate_contract_is_rejected_before_consumption(
     ],
 )
 def test_target_sky_uses_the_same_contract_instead_of_bypassing_observer_checks(
-    monkeypatch, site
-):
-    from datetime import datetime
+    monkeypatch: pytest.MonkeyPatch, site: str
+) -> None:
 
     birth = build_astro_birth_info(**BIRTH)
     natal = guolao.build_chart(birth)
@@ -174,12 +167,18 @@ def test_target_sky_uses_the_same_contract_instead_of_bypassing_observer_checks(
     ],
 )
 def test_rejected_contract_agrees_across_actual_rest_mcp_cli(
-    monkeypatch, capsys, tool, case, reason
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    tool: str,
+    case,
+    reason: str,
+) -> None:
     spec = next(s for s in CATALOG if s.key == tool)
     payload = dict(BIRTH)
     if tool == "astro_chart":
         payload["chart_variant"] = "guolao_chart"
+    else:
+        pass
     calls = inject_case(monkeypatch, case)
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
@@ -192,11 +191,11 @@ def test_rejected_contract_agrees_across_actual_rest_mcp_cli(
 
     async def native_call():
         async with Client(create_mcp_app()) as client:
-            native = await client.call_tool(
-                spec.tool_name, payload, raise_on_error=False
+            native = await call_calculation(
+                client, spec.tool_name, payload, raise_on_error=False
             )
             assert native.is_error
-            return json.loads(native.content[0].text)
+            return native.structured_content
 
     native = asyncio.run(native_call())
     arguments = [spec.tool_name]

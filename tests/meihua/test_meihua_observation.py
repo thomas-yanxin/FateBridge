@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.meihua_observation import quiet_context_ruleset
+from fatebridge.core.meihua.meihua_observation import quiet_context_ruleset
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
 
@@ -34,7 +34,7 @@ def calculate(context=None, **extra):
     return calculate_meihua_cast(casting=CAST, observation_context=context, **extra)
 
 
-def test_frozen_source_and_ternary_truth_values_precede_implementation():
+def test_frozen_source_and_ternary_truth_values_precede_implementation() -> None:
     manifest = json.loads((FIXTURE / "manifest.json").read_text())
     assert not manifest["implementation_present"]
     assert not manifest["expected_values_from_production"]
@@ -42,6 +42,8 @@ def test_frozen_source_and_ternary_truth_values_precede_implementation():
     for name, digest in manifest["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
     assert json.loads((FIXTURE / "live-source-recheck.json").read_text())[
         "same_bytes_as_pinned_original"
@@ -50,7 +52,7 @@ def test_frozen_source_and_ternary_truth_values_precede_implementation():
 
 @pytest.mark.parametrize("topic", TOPICS)
 @pytest.mark.parametrize("case", CASES, ids=lambda case: case["id"])
-def test_complete_ternary_context_on_all_human_branches(case, topic):
+def test_complete_ternary_context_on_all_human_branches(case, topic) -> None:
     result = calculate(case["input"], interpretation_topic=topic)
     assert "error" not in result
     layer = result["interpretation"]["observation_context"]
@@ -72,7 +74,7 @@ def test_complete_ternary_context_on_all_human_branches(case, topic):
 
 @pytest.mark.parametrize("field", ["quiet_room", "nothing_heard", "nothing_seen"])
 @pytest.mark.parametrize("value", [0, 1, 1.0, "true", "false", "unknown", [], {}])
-def test_declaration_flags_do_not_coerce_non_boolean_values(field, value):
+def test_declaration_flags_do_not_coerce_non_boolean_values(field: str, value) -> None:
     assert "error" in calculate({"label": "虚构", field: value})
 
 
@@ -80,11 +82,13 @@ def test_declaration_flags_do_not_coerce_non_boolean_values(field, value):
     "value",
     [{}, {"label": ""}, {"label": " "}, {"label": "虚构", "unknown_flag": True}],
 )
-def test_missing_blank_or_unrecognized_context_is_not_completed_by_defaults(value):
+def test_missing_blank_or_unrecognized_context_is_not_completed_by_defaults(
+    value,
+) -> None:
     assert "error" in calculate(value)
 
 
-def test_label_question_and_inner_moving_line_do_not_fill_external_facts():
+def test_label_question_and_inner_moving_line_do_not_fill_external_facts() -> None:
     assert (
         calculate(question="虚构：我在静室，什么也没听见看见")["interpretation"][
             "observation_context"
@@ -105,7 +109,7 @@ def test_label_question_and_inner_moving_line_do_not_fill_external_facts():
     )
 
 
-def test_declared_quiet_no_perception_cannot_also_request_external_omens():
+def test_declared_quiet_no_perception_cannot_also_request_external_omens() -> None:
     assert "error" in calculate(
         MET, external_observations=[{"manifestation": "soil", "label": "虚构外应"}]
     )
@@ -135,13 +139,15 @@ def test_declared_quiet_no_perception_cannot_also_request_external_omens():
         ),
     ],
 )
-def test_explicit_perception_source_conflicts_are_rejected(casting, context):
+def test_explicit_perception_source_conflicts_are_rejected(casting, context) -> None:
     assert "error" in calculate_meihua_cast(
         casting=casting, observation_context=context
     )
 
 
-def test_a_single_vision_flag_does_not_assign_a_modality_to_all_observed_sources():
+def test_a_single_vision_flag_does_not_assign_a_modality_to_all_observed_sources() -> (
+    None
+):
     result = calculate_meihua_cast(
         casting={
             "method": "observed_trigrams",
@@ -163,7 +169,7 @@ def test_a_single_vision_flag_does_not_assign_a_modality_to_all_observed_sources
     )
 
 
-def test_each_count_candidate_keeps_own_body_and_month_strength_paths():
+def test_each_count_candidate_keeps_own_body_and_month_strength_paths() -> None:
     result = calculate_meihua_cast(
         casting={"method": "object_count", "count": 11, "hour_branch": "丑"},
         season_month_branch="申",
@@ -185,7 +191,9 @@ def test_each_count_candidate_keeps_own_body_and_month_strength_paths():
         )
 
 
-def test_time_entry_preserves_known_seed_values_without_inventing_strength_synthesis():
+def test_time_entry_preserves_known_seed_values_without_inventing_strength_synthesis() -> (
+    None
+):
     result = calculate_meihua_analysis(
         analysis_year=2026,
         analysis_month=10,
@@ -202,7 +210,7 @@ def test_time_entry_preserves_known_seed_values_without_inventing_strength_synth
     assert result["analysis_context"]["observation_context"]["quiet_room"] is True
 
 
-def test_weather_does_not_apply_quiet_body_use_rule_or_change_negative_study():
+def test_weather_does_not_apply_quiet_body_use_rule_or_change_negative_study() -> None:
     assert "error" in calculate(MET, interpretation_topic="weather")
     result = calculate(interpretation_topic="weather")
     assert result["interpretation"]["observation_context"] is None
@@ -217,7 +225,9 @@ def test_weather_does_not_apply_quiet_body_use_rule_or_change_negative_study():
     ) == (273, 29, 158, False)
 
 
-def test_selected_facsimile_words_and_cache_are_not_normalized_to_other_witness():
+def test_selected_facsimile_words_and_cache_are_not_normalized_to_other_witness() -> (
+    None
+):
     profile = quiet_context_ruleset()
     assert profile["quote"].startswith("凡應占在靜室占無所聞見")
     assert profile["comparison_source"]["quote"].startswith("凡占在靜室，無所聞見")

@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from fractions import Fraction
 from typing import TypedDict
 
+from fatebridge.core.astro.astrology_tables import SIGNS
 from fatebridge.core.astro.geometry import Angle, angle_fraction, longitude_float
-from fatebridge.core.astrology_tables import SIGNS
 
 
 class HouseRecord(TypedDict):

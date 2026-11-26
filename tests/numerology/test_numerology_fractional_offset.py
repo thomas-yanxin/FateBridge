@@ -3,7 +3,7 @@
 import hashlib
 import json
 from copy import deepcopy
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
 
@@ -12,6 +12,13 @@ from jsonschema import Draft202012Validator
 from pydantic import ValidationError
 
 from fatebridge.application.execution import validate_output
+from fatebridge.core.contracts.output_canping_solar import CanpingSolarBoundary
+from fatebridge.core.contracts.output_chinese import CHINESE_TOOL_FIELDS, SolarTerm
+from fatebridge.core.contracts.output_heluo_solar import HeluoSolarBoundary
+from fatebridge.core.contracts.output_numerology import (
+    NumerologyBirthClock,
+    NumerologyEvidence,
+)
 from fatebridge.core.execution_context import (
     ExecutionOptions,
     call_clock,
@@ -19,13 +26,10 @@ from fatebridge.core.execution_context import (
 )
 from fatebridge.core.local_techniques.canping import build_canping_result
 from fatebridge.core.local_techniques.heluo import build_heluo_result
-from fatebridge.core.output_canping_solar import CanpingSolarBoundary
-from fatebridge.core.output_chinese import CHINESE_TOOL_FIELDS, SolarTerm
-from fatebridge.core.output_heluo_solar import HeluoSolarBoundary
-from fatebridge.core.output_numerology import NumerologyBirthClock, NumerologyEvidence
 from fatebridge.core.requests.divination import CanpingRequest, HeluoRequest
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.utils.civil_clock import parse_iso_datetime, utc_instant
+from fatebridge.utils.civil_clock import utc_instant
+from fatebridge.utils.iso_clock import parse_iso_datetime
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/numerology_fractional_offset_v1"
 REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
@@ -52,7 +56,7 @@ def payload(case):
     )
 
 
-def test_source_first_reference_and_primary_bytes_are_unchanged():
+def test_source_first_reference_and_primary_bytes_are_unchanged() -> None:
     seal = json.loads((FIXTURE / "reference-seal.json").read_text())
     assert hashlib.sha256((FIXTURE / "reference.json").read_bytes()).hexdigest() == (
         seal["reference_sha256"]
@@ -69,7 +73,7 @@ def test_source_first_reference_and_primary_bytes_are_unchanged():
 
 
 @pytest.mark.parametrize("case", REFERENCE["iso_parse_cases"], ids=lambda c: c["id"])
-def test_iso_offsets_match_independent_integer_microsecond_instants(case):
+def test_iso_offsets_match_independent_integer_microsecond_instants(case) -> None:
     at = parse_iso_datetime(case["text"])
     assert at.utcoffset() // timedelta(microseconds=1) == (
         case["expected_offset_microseconds"]
@@ -79,7 +83,9 @@ def test_iso_offsets_match_independent_integer_microsecond_instants(case):
 
 @pytest.mark.parametrize("model,build", PAIRS)
 @pytest.mark.parametrize("case", REFERENCE["clock_cases"], ids=lambda c: c["id"])
-def test_numerology_receipts_keep_fractional_offsets_and_validate(model, build, case):
+def test_numerology_receipts_keep_fractional_offsets_and_validate(
+    model, build, case
+) -> None:
     request = model(**payload(case))
     result = build(**request.model_dump())
     validate_output(
@@ -120,6 +126,8 @@ def test_numerology_receipts_keep_fractional_offsets_and_validate(model, build, 
             assert utc_instant(parse_iso_datetime(row["end_at"])) == utc_instant(
                 parse_iso_datetime(hi["record"]["datetime_with_offset"])
             )
+    else:
+        pass
 
 
 @pytest.mark.parametrize("method", ["bazi_appendix_v1", "bazi_continuous_v1"])
@@ -127,8 +135,8 @@ def test_numerology_receipts_keep_fractional_offsets_and_validate(model, build, 
     "case", REFERENCE["canping_query_cases"], ids=lambda c: c["id"]
 )
 def test_canping_queries_respect_actual_birth_microsecond_and_return_same_instant(
-    method, case
-):
+    method: str, case
+) -> None:
     args = {
         **payload(case["birth"]),
         "analysis_datetime": case["query_iso"],
@@ -156,7 +164,9 @@ def test_canping_queries_respect_actual_birth_microsecond_and_return_same_instan
 
 @pytest.mark.parametrize("model,build", PAIRS)
 @pytest.mark.parametrize("zone", ["0.0000001", "-0.0000001"])
-def test_solar_wall_correction_does_not_replace_the_civil_instant(model, build, zone):
+def test_solar_wall_correction_does_not_replace_the_civil_instant(
+    model, build, zone: str
+) -> None:
     case = next(
         c
         for c in REFERENCE["clock_cases"]
@@ -179,7 +189,7 @@ def test_solar_wall_correction_does_not_replace_the_civil_instant(model, build, 
 @pytest.mark.parametrize(
     "seconds", [0.00036, -0.00036, 19800.00036, -19800.00036, 54822]
 )
-def test_fractional_offset_receipt_is_independently_projectable(seconds):
+def test_fractional_offset_receipt_is_independently_projectable(seconds) -> None:
     value = NumerologyBirthClock(civil_utc_offset_seconds=seconds)
     assert value.model_dump(exclude_unset=True) == {"civil_utc_offset_seconds": seconds}
 
@@ -188,7 +198,9 @@ def test_fractional_offset_receipt_is_independently_projectable(seconds):
     "seconds",
     [float("nan"), float("inf"), -float("inf"), 86400, -86400, True, "0.00036"],
 )
-def test_offset_metadata_rejects_nonfinite_out_of_range_and_coerced_values(seconds):
+def test_offset_metadata_rejects_nonfinite_out_of_range_and_coerced_values(
+    seconds,
+) -> None:
     with pytest.raises(ValidationError):
         NumerologyBirthClock(civil_utc_offset_seconds=seconds)
 
@@ -196,7 +208,7 @@ def test_offset_metadata_rejects_nonfinite_out_of_range_and_coerced_values(secon
 @pytest.mark.parametrize("wrong_seconds", [0, -0.00036, 0.000361])
 def test_fractional_clock_coherence_still_rejects_truncated_or_wrong_offsets(
     wrong_seconds,
-):
+) -> None:
     case = REFERENCE["clock_cases"][0]
     clock = dict(
         civil_datetime=case["civil_iso"],
@@ -207,7 +219,7 @@ def test_fractional_clock_coherence_still_rejects_truncated_or_wrong_offsets(
         NumerologyBirthClock(**clock)
 
 
-def test_correct_offset_does_not_hide_a_wrong_utc_receipt():
+def test_correct_offset_does_not_hide_a_wrong_utc_receipt() -> None:
     case = REFERENCE["clock_cases"][0]
     clock = dict(
         civil_datetime=case["civil_iso"],
@@ -224,27 +236,30 @@ def test_correct_offset_does_not_hide_a_wrong_utc_receipt():
 
 
 @pytest.mark.parametrize("text", ["2000-01-01T00:00:00.000360", "2000-01-01+00.000360"])
-def test_naive_clocks_remain_naive_even_when_separator_resembles_an_offset(text):
+def test_naive_clocks_remain_naive_even_when_separator_resembles_an_offset(
+    text: str,
+) -> None:
     assert parse_iso_datetime(text) == datetime(2000, 1, 1, microsecond=360)
     assert parse_iso_datetime(text).tzinfo is None
 
 
 @pytest.mark.parametrize("text", [None, 8, "not-a-date", "2000-01-01T00:00:00+24:00"])
-def test_invalid_iso_inputs_keep_their_rejection(text):
+def test_invalid_iso_inputs_keep_their_rejection(text: int | str | None) -> None:
     with pytest.raises((ValueError, TypeError)):
         parse_iso_datetime(text)
 
 
 @pytest.mark.parametrize("model,build", PAIRS)
-def test_whole_second_confirmation_cannot_replace_a_fractional_fixed_zone(model, build):
+def test_whole_second_confirmation_cannot_replace_a_fractional_fixed_zone(
+    model, build
+) -> None:
     args = {**payload(REFERENCE["clock_cases"][0]), "birth_utc_offset": "+00:00"}
     with pytest.raises(ValueError, match="不一致"):
         build(**model(**args).model_dump())
 
 
 @pytest.mark.parametrize("case", REFERENCE["clock_cases"], ids=lambda c: c["id"])
-def test_public_asof_and_direct_call_clock_keep_the_same_frozen_instant(case):
-    from datetime import timezone
+def test_public_asof_and_direct_call_clock_keep_the_same_frozen_instant(case) -> None:
 
     options = ExecutionOptions(as_of=case["civil_iso"])
     assert options.as_of == case["utc"].replace("+00:00", "Z")
@@ -255,7 +270,7 @@ def test_public_asof_and_direct_call_clock_keep_the_same_frozen_instant(case):
 
 
 @pytest.mark.parametrize("case", REFERENCE["clock_cases"], ids=lambda c: c["id"])
-def test_outer_solar_receipts_preserve_the_independently_known_instant(case):
+def test_outer_solar_receipts_preserve_the_independently_known_instant(case) -> None:
     # Synthetic DTO timestamps exercise serialization, not real solar events.
     SolarTerm(
         datetime=case["wall"].replace("T", " "),
@@ -276,7 +291,9 @@ def test_outer_solar_receipts_preserve_the_independently_known_instant(case):
     ],
     ids=lambda c: c["id"],
 )
-def test_outer_solar_receipts_do_not_accept_offsets_or_utc_instants_lost_to_zero(case):
+def test_outer_solar_receipts_do_not_accept_offsets_or_utc_instants_lost_to_zero(
+    case,
+) -> None:
     with pytest.raises(ValidationError, match="utc_offset_seconds不一致"):
         SolarTerm(datetime_with_offset=case["civil_iso"], utc_offset_seconds=0)
     record = {"datetime_with_offset": case["civil_iso"]}
@@ -287,12 +304,14 @@ def test_outer_solar_receipts_do_not_accept_offsets_or_utc_instants_lost_to_zero
 
 
 @pytest.mark.parametrize("key", ["heluo", "canping"])
-def test_declared_numerology_roots_are_in_the_actual_public_model(key):
+def test_declared_numerology_roots_are_in_the_actual_public_model(key: str) -> None:
     spec = SPECS[key]
     assert set(CHINESE_TOOL_FIELDS[key]) <= set(spec.output_model.model_fields)
     assert "numerology_evidence" in spec.required_output_fields
     if key == "canping":
         assert "canping_timing" in spec.required_output_fields
+    else:
+        pass
     # Schema projections can omit the evidence root, but cannot make supplied
     # contradictory evidence opaque by treating it as an extension field.
     spec.output_model.model_validate({})
@@ -315,7 +334,7 @@ SCHEMA_BOUNDS = json.loads(
 )
 
 
-def test_schema_bounds_reference_is_a_retained_post_c4_addendum():
+def test_schema_bounds_reference_is_a_retained_post_c4_addendum() -> None:
     seal = json.loads((FIXTURE / "schema-bounds-addendum-seal.json").read_text())
     assert (
         hashlib.sha256(
@@ -332,7 +351,7 @@ def test_schema_bounds_reference_is_a_retained_post_c4_addendum():
 @pytest.mark.parametrize(
     "case", SCHEMA_BOUNDS["cases"], ids=lambda c: str(c["seconds"])
 )
-def test_public_json_schema_and_runtime_agree_on_offset_range(key, case):
+def test_public_json_schema_and_runtime_agree_on_offset_range(key: str, case) -> None:
     spec = SPECS[key]
     schema = spec.output_model.model_json_schema()
     Draft202012Validator.check_schema(schema)

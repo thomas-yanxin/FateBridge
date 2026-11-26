@@ -1,9 +1,6 @@
-"""Explicit acquisition of a full content-pinned DE441 file or continuous span.
+"""Install a pinned full DE441 kernel or prepare a continuous source span.
 
-The full-file pin comes from FateBridge's independent-reader record, not a
-NASA-published checksum. Span mode retains original coefficient words with
-HTTP range/ETag identity and does not claim a full remote-file checksum. Acquisition does not change the default backend
-or certify astronomical accuracy. Existing invalid files are left unchanged.
+Full-file identity uses a local content pin. Span identity uses HTTP ranges and a shared ETag.
 """
 
 from __future__ import annotations
@@ -13,14 +10,16 @@ import hashlib
 import json
 import math
 import os
+import re
 import ssl
 import struct
 import sys
 import tempfile
 import urllib.request
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, BinaryIO, Callable, Final, Optional, Sequence
+from typing import BinaryIO, Final, Literal, Protocol, TypedDict
 
 import certifi
 
@@ -29,7 +28,6 @@ from fatebridge.core.ephemeris_installation import (
     user_ephemeris_dir,
 )
 from fatebridge.core.jpl_ephemeris import jpl_header
-from fatebridge.utils.errors import EphemerisSourceError
 
 
 @dataclass(frozen=True)
@@ -42,6 +40,36 @@ class _KernelSpec:
     end_jd_tdb: float
 
 
+class KernelVerification(TypedDict):
+    filename: str
+    bytes: int
+    sha256: str
+    time_scale: Literal["TDB"]
+    start_julian_day_tdb: float
+    end_julian_day_tdb: float
+    de_number: int
+    file_content_verified: bool
+    astronomical_accuracy_certified: bool
+
+
+class AcquisitionReceipt(TypedDict, total=False):
+    existing_verified_file_reused: bool
+    network_request_performed: bool
+    url: str
+    expected_bytes: int
+    expected_sha256: str
+    verification_disabled: bool
+    http_status: int
+    headers: dict[str, str]
+    received_bytes: int
+    file_content_verified: bool
+    final_metadata: KernelVerification
+
+
+class DownloadProgress(Protocol):
+    def __call__(self, received_bytes: int, expected_bytes: int, /) -> None: ...
+
+
 DE441: Final = _KernelSpec(
     "linux_m13000p17000.441",
     "https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de441/linux_m13000p17000.441",
@@ -51,6 +79,7 @@ DE441: Final = _KernelSpec(
     7930192.5,
 )
 _CHUNK = 1024 * 1024
+PROGRESS_INTERVAL_BYTES = 256 * 1024 * 1024
 
 
 def _signature(path: Path) -> tuple[int, int, int, int]:
@@ -58,11 +87,13 @@ def _signature(path: Path) -> tuple[int, int, int, int]:
     return state.st_dev, state.st_ino, state.st_size, state.st_mtime_ns
 
 
-def _verify(path: Path, spec: _KernelSpec) -> dict[str, Any]:
+def _verify(path: Path, spec: _KernelSpec) -> KernelVerification:
     if path.is_symlink() or not path.is_file():
         raise ValueError("Kernel must be a regular file, not a symlink")
-    before = _signature(path)
-    if before[2] != spec.bytes:
+    original_device, original_inode, original_size_bytes, original_mtime_ns = (
+        _signature(path)
+    )
+    if original_size_bytes != spec.bytes:
         raise ValueError("Kernel size does not match the fixed content pin")
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -74,7 +105,8 @@ def _verify(path: Path, spec: _KernelSpec) -> dict[str, Any]:
     if (
         header["start_julian_day_tdb"] != spec.start_jd_tdb
         or header["end_julian_day_tdb"] != spec.end_jd_tdb
-        or _signature(path) != before
+        or _signature(path)
+        != (original_device, original_inode, original_size_bytes, original_mtime_ns)
     ):
         raise ValueError("Kernel header or file changed during verification")
     return {
@@ -90,7 +122,7 @@ def _verify(path: Path, spec: _KernelSpec) -> dict[str, Any]:
     }
 
 
-def verify_de441(path: Path) -> dict[str, Any]:
+def verify_de441(path: Path) -> KernelVerification:
     return _verify(path, DE441)
 
 
@@ -102,32 +134,35 @@ def _acquire(
     destination: Path,
     spec: _KernelSpec,
     *,
-    ca_file: Optional[Path] = None,
-    progress: Optional[Callable[[int, int], None]] = None,
-    receipt: Optional[dict[str, Any]] = None,
+    ca_file: Path | None = None,
+    progress: DownloadProgress | None = None,
+    receipt: AcquisitionReceipt | None = None,
 ) -> Path:
-    if not ephemeris_path_fits(destination):
+    if not ephemeris_path_fits(destination, filename=spec.filename):
         raise ValueError(
-            "Choose a shorter destination within native search-path limits"
+            "Choose a destination within native path limits and without search-path delimiters"
         )
     target = destination / spec.filename
     if target.exists() or target.is_symlink():
         _verify(target, spec)
         if receipt is not None:
-            receipt.update(
-                existing_verified_file_reused=True, network_request_performed=False
-            )
+            receipt["existing_verified_file_reused"] = True
+            receipt["network_request_performed"] = False
         return target
     destination.mkdir(parents=True, exist_ok=True)
-    descriptor, name = tempfile.mkstemp(prefix=".de441-download-", dir=destination)
-    pending = Path(name)
-    operational = receipt if receipt is not None else {}
+    descriptor, staging_name = tempfile.mkstemp(
+        prefix=".de441-download-", dir=destination
+    )
+    pending = Path(staging_name)
+    operational: AcquisitionReceipt = receipt if receipt is not None else {}
     operational.update(
-        url=spec.url,
-        expected_bytes=spec.bytes,
-        expected_sha256=spec.sha256,
-        verification_disabled=False,
-        network_request_performed=False,
+        {
+            "url": spec.url,
+            "expected_bytes": spec.bytes,
+            "expected_sha256": spec.sha256,
+            "verification_disabled": False,
+            "network_request_performed": False,
+        }
     )
     try:
         with os.fdopen(descriptor, "wb") as output:
@@ -145,11 +180,8 @@ def _acquire(
             with urllib.request.urlopen(
                 request, timeout=60, context=context
             ) as response:
-                operational.update(
-                    network_request_performed=True,
-                    http_status=response.status,
-                    headers=dict(response.headers.items()),
-                )
+                operational["http_status"] = response.status
+                operational["headers"] = dict(response.headers.items())
                 if response.status != 200 or response.headers.get("Content-Range"):
                     raise ValueError(
                         "Full acquisition requires an unambiguous HTTP 200 response"
@@ -173,24 +205,24 @@ def _acquire(
                 output.flush()
                 os.fsync(output.fileno())
         metadata = _verify(pending, spec)
-        # Same-directory hard-link creation is atomic and never overwrites an
-        # existing target, including one created by another process meanwhile.
+        # note (installation): Publish an exclusive hard link so an existing file survives.
         try:
             os.link(pending, target)
         except FileExistsError:
             _verify(target, spec)
-        operational.update(file_content_verified=True, final_metadata=metadata)
+        operational["file_content_verified"] = True
+        operational["final_metadata"] = metadata
         return target
     finally:
         pending.unlink(missing_ok=True)
 
 
 def fetch_de441(
-    destination: Optional[Path] = None,
+    destination: Path | None = None,
     *,
-    ca_file: Optional[Path] = None,
-    progress: Optional[Callable[[int, int], None]] = None,
-    receipt: Optional[dict[str, Any]] = None,
+    ca_file: Path | None = None,
+    progress: DownloadProgress | None = None,
+    receipt: AcquisitionReceipt | None = None,
 ) -> Path:
     return _acquire(
         destination if destination is not None else default_dest(),
@@ -201,16 +233,14 @@ def fetch_de441(
     )
 
 
-SOURCE_URL = (
-    "https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de441/linux_m13000p17000.441"
-)
+SOURCE_URL = DE441.url
 RECORD_BYTES = 8144
 CHUNK_RECORDS = 4096
 
 
 def stream_sha256(source: BinaryIO) -> str:
     digest = hashlib.sha256()
-    for chunk in iter(lambda: source.read(1024 * 1024), b""):
+    for chunk in iter(lambda: source.read(_CHUNK), b""):
         digest.update(chunk)
     return digest.hexdigest()
 
@@ -265,12 +295,22 @@ def source_range(
         timeout=45,
     ) as response:
         raw = response.read(size + 1)
-        received = dict(response.headers)
-        content_range = received.get("Content-Range", "")
+        identity_fields = {"content-range": "Content-Range", "etag": "ETag"}
+        received = {
+            identity_fields.get(name.lower(), name): value
+            for name, value in response.headers.items()
+        }
+        content_range = re.fullmatch(
+            r"bytes ([0-9]+)-([0-9]+)/([0-9]+)",
+            received.get("Content-Range", ""),
+            flags=re.IGNORECASE,
+        )
         if (
             response.status != 206
             or len(raw) != size
-            or not content_range.startswith(f"bytes {start}-{end}/")
+            or content_range is None
+            or (int(content_range[1]), int(content_range[2])) != (start, end)
+            or int(content_range[3]) <= end
             or not received.get("ETag")
             or (etag is not None and received["ETag"] != etag)
         ):
@@ -347,7 +387,7 @@ def prepare(output: Path, start_year: int, end_year: int) -> dict[str, object]:
                 manifest["active_range"] = {"start": offset, "bytes": size}
                 save()
                 block, response_headers = source_range(offset, size, headers["ETag"])
-                if response_headers["Content-Range"].split("/")[1] != str(total):
+                if int(response_headers["Content-Range"].split("/")[1]) != total:
                     raise ValueError("Original DE441 object extent changed")
                 for k in range(count):
                     record = block[k * RECORD_BYTES : (k + 1) * RECORD_BYTES]
@@ -390,7 +430,7 @@ def prepare(output: Path, start_year: int, end_year: int) -> dict[str, object]:
         )
         partial.rename(output)
         save()
-    except (OSError, ValueError, struct.error, EphemerisSourceError) as error:
+    except (OSError, ValueError, struct.error) as error:
         manifest.update(
             status="failed", error_type=type(error).__name__, error=str(error)
         )
@@ -426,7 +466,7 @@ def verify(output: Path) -> dict[str, object]:
     return manifest
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dest", type=Path, default=None)
     parser.add_argument(
@@ -464,7 +504,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                         "span preparation requires --start-year and --end-year"
                     )
                 result = prepare(args.output, start_year, end_year)
-        except (OSError, ValueError, EphemerisSourceError) as error:
+        except (OSError, ValueError) as error:
             print(f"error: {error}", file=sys.stderr)
             return 1
         print(json.dumps(result, indent=2))
@@ -477,22 +517,31 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         if args.verify_only:
             verify_de441(path)
         else:
-            last = [-1]
+            last_milestone = -1
 
-            def progress(done: int, total: int) -> None:
-                milestone = done // (256 * 1024 * 1024)
-                if milestone != last[0] or done == total:
-                    print(f"DE441 {done}/{total} bytes", flush=True)
-                    last[0] = milestone
+            def progress(received_bytes: int, total_bytes: int) -> None:
+                nonlocal last_milestone
+                milestone = received_bytes // PROGRESS_INTERVAL_BYTES
+                if milestone != last_milestone or received_bytes == total_bytes:
+                    print(f"DE441 {received_bytes}/{total_bytes} bytes", flush=True)
+                    last_milestone = milestone
 
             path = fetch_de441(destination, ca_file=args.ca_file, progress=progress)
-    except (OSError, ValueError, EphemerisSourceError) as error:
+    except (OSError, ValueError) as error:
         print(f"error: {error}", file=sys.stderr)
         return 1
     print(f"Full content pin verified: {path}")
-    print(
-        f"Select explicitly with SE_EPHE_PATH={destination} and FATEBRIDGE_JPL_FILE={DE441.filename}; restart the client before use."
-    )
+    if args.verify_only and not ephemeris_path_fits(
+        destination, filename=DE441.filename
+    ):
+        print(
+            "Swiss Ephemeris cannot load the file from this path. "
+            "Copy the verified file to a Swiss-compatible directory before use."
+        )
+    else:
+        print(
+            f"Select explicitly with SE_EPHE_PATH={destination} and FATEBRIDGE_JPL_FILE={DE441.filename}; restart the client before use."
+        )
     return 0
 
 

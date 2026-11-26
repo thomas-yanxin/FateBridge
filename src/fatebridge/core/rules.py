@@ -2,28 +2,19 @@
 BaZi rules and pattern analysis.
 """
 
-from collections import defaultdict
-from typing import (
-    Any,
-    Dict,
-    Iterable,
-    List,
-    Literal,
-    Mapping,
-    Optional,
-    Tuple,
-    TypedDict,
-)
+from typing import Any, Iterable, Literal, Mapping, TypedDict
 
-from ..utils.data import (
-    BRANCH_CLASH_PAIRS,
+from fatebridge.core.bazi.bazi_branch_facts import (
+    check_clash_patterns,
+    check_harmony_patterns,
+)
+from fatebridge.core.classical_candidate_selection import build_candidate_selection
+from fatebridge.core.elements import ElementAnalysis
+from fatebridge.core.useful_elements import resolve_useful_elements
+from fatebridge.utils.data import (
     BRANCH_COMBINATION_ELEMENT,
     BRANCH_ELEMENTS,
-    BRANCH_HARM_PAIRS,
-    BRANCH_HARMONY_PAIRS,
     BRANCH_HIDDEN_STEMS,
-    BRANCH_PUNISHMENT_GROUPS,
-    BRANCH_TRIPLE_COMBINATIONS,
     BRANCH_TRIPLE_ELEMENTS,
     DESTRUCTION_CYCLE,
     GENERATION_CYCLE,
@@ -34,18 +25,11 @@ from ..utils.data import (
     TenGod,
     get_ten_god,
 )
-from .bazi_branch_facts import (
-    check_clash_patterns,
-    check_harmony_patterns,
-    classify_triple_members,
-)
-from .classical_candidate_selection import build_candidate_selection
-from .useful_elements import resolve_useful_elements
 
 
 class StemRelation(TypedDict):
-    stems: List[str]
-    pillars: List[str]
+    stems: list[str]
+    pillars: list[str]
     name: str
 
 
@@ -56,9 +40,9 @@ class StemCombination(StemRelation):
 class StemPatterns(TypedDict):
     pair_scope: Literal["adjacent_visible_stems"]
     transformation_status: Literal["not_adjudicated"]
-    combinations: List[StemCombination]
-    clashes: List[StemRelation]
-    controls: List[StemRelation]
+    combinations: list[StemCombination]
+    clashes: list[StemRelation]
+    controls: list[StemRelation]
 
 
 class BaZiRules:
@@ -83,7 +67,7 @@ class BaZiRules:
 
     @staticmethod
     def check_stem_patterns(
-        pillars: Dict[str, Tuple[str, str]],
+        pillars: dict[str, tuple[str, str]],
     ) -> StemPatterns:
         """Match adjacent visible stems without adjudicating transformation.
 
@@ -152,9 +136,9 @@ class BaZiRules:
         return patterns
 
     @staticmethod
-    def _ordered_unique(items: Iterable[Optional[str]]) -> List[str]:
+    def _ordered_unique(items: Iterable[str | None]) -> list[str]:
         seen: set[str] = set()
-        result: List[str] = []
+        result: list[str] = []
         for item in items:
             if item and item not in seen:
                 seen.add(item)
@@ -162,28 +146,28 @@ class BaZiRules:
         return result
 
     @staticmethod
-    def _get_element_enum_by_value(element_value: str) -> Optional[Element]:
+    def _get_element_enum_by_value(element_value: str) -> Element | None:
         for element_enum in Element:
             if element_enum.value == element_value:
                 return element_enum
         return None
 
     @staticmethod
-    def _get_generating_element(target: Element) -> Optional[Element]:
+    def _get_generating_element(target: Element) -> Element | None:
         for element_enum, generated in GENERATION_CYCLE.items():
             if generated == target:
                 return element_enum
         return None
 
     @staticmethod
-    def _get_destroying_element(target: Element) -> Optional[Element]:
+    def _get_destroying_element(target: Element) -> Element | None:
         for element_enum, destroyed in DESTRUCTION_CYCLE.items():
             if destroyed == target:
                 return element_enum
         return None
 
     @staticmethod
-    def _element_for_ten_god(day_stem: str, ten_god: str) -> Optional[str]:
+    def _element_for_ten_god(day_stem: str, ten_god: str) -> str | None:
         day_element = STEM_ELEMENTS[day_stem][0]
         if ten_god in {TenGod.COMPARE.value, TenGod.ROB_WEALTH.value}:
             return day_element.value
@@ -200,8 +184,8 @@ class BaZiRules:
         return None
 
     @staticmethod
-    def _derive_ten_gods_from_elements(day_stem: str, elements: List[str]) -> List[str]:
-        ten_gods: List[str] = []
+    def _derive_ten_gods_from_elements(day_stem: str, elements: list[str]) -> list[str]:
+        ten_gods: list[str] = []
         day_element = STEM_ELEMENTS[day_stem][0]
         for element_value in elements:
             element_enum = BaZiRules._get_element_enum_by_value(element_value)
@@ -227,7 +211,7 @@ class BaZiRules:
 
     @staticmethod
     def _get_significant_gods(
-        pillars: Dict[str, Tuple[str, str]],
+        pillars: dict[str, tuple[str, str]],
         day_stem: str,
     ) -> set[str]:
         significant = set()
@@ -249,9 +233,9 @@ class BaZiRules:
 
     @staticmethod
     def _build_structure_candidates(
-        pillars: Dict[str, Tuple[str, str]],
+        pillars: dict[str, tuple[str, str]],
         day_stem: str,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         branches = [branch for _, branch in pillars.values()]
         sig_gods = BaZiRules._get_significant_gods(pillars, day_stem)
 
@@ -266,7 +250,7 @@ class BaZiRules:
             day_stem, TenGod.HURT_OFFICER.value
         )
 
-        candidates: List[Dict[str, Any]] = []
+        candidates: list[dict[str, Any]] = []
 
         blade_branch = BaZiRules.YANG_BLADE_BRANCHES.get(day_stem)
         if (
@@ -389,7 +373,7 @@ class BaZiRules:
     @staticmethod
     def _describe_day_master_impact(
         day_element_value: str,
-        result_element_value: Optional[str],
+        result_element_value: str | None,
     ) -> str:
         if not result_element_value:
             return "主要体现为气机扰动，需要结合被触动的五行再看。"
@@ -413,9 +397,9 @@ class BaZiRules:
 
     @staticmethod
     def _describe_structure_impact(
-        result_element_value: Optional[str],
-        structure_profile: Dict[str, Any],
-        affected_elements: Optional[List[str]] = None,
+        result_element_value: str | None,
+        structure_profile: dict[str, Any],
+        affected_elements: list[str] | None = None,
     ) -> str:
         dominant = structure_profile.get("dominant_structure", {}) or {}
         structure_label = dominant.get("label", "当前格局")
@@ -440,12 +424,12 @@ class BaZiRules:
 
     @staticmethod
     def build_structure_profile(
-        pillars: Dict[str, Tuple[str, str]],
-        element_analysis: Dict[str, Any],
-        harmony_patterns: Optional[Mapping[str, object]] = None,
-        clash_patterns: Optional[Mapping[str, object]] = None,
-        special_patterns: Optional[Mapping[str, object]] = None,
-    ) -> Dict[str, Any]:
+        pillars: dict[str, tuple[str, str]],
+        element_analysis: dict[str, Any],
+        harmony_patterns: Mapping[str, object] | None = None,
+        clash_patterns: Mapping[str, object] | None = None,
+        special_patterns: Mapping[str, object] | None = None,
+    ) -> dict[str, Any]:
         day_stem = pillars["day"][0]
         day_master = element_analysis["day_master"]
         day_strength = day_master["engineering_index"]["strength_level"]
@@ -456,22 +440,31 @@ class BaZiRules:
         recognized_structures = BaZiRules._build_structure_candidates(pillars, day_stem)
         candidate_selection = build_candidate_selection(pillars)
         selected_month = candidate_selection["selected_month"]
+        month_uses = candidate_selection["month_use_resolution"]
+        month_description = (
+            "；".join(w["label"] for w in month_uses["witnesses"])
+            or "暂无已建模取用见证"
+        )
+        month_reason = f"月令{selected_month['branch']}：{month_description}；见证并存不等于成格、喜忌或最终取用已定。"
         dominant_structure = {
-            "key": "selected_month_reference",
-            "label": selected_month["label"],
+            "key": "month_use_reference",
+            "label": "月令取用见证参考",
             "formation_status": "not_adjudicated",
-            "reason": f"月令{selected_month['branch']}按同次{selected_month['selection_rule']}选{selected_month['ten_god']}；月令主类不等于完整成格或取用已定。",
+            "reason": month_reason,
             "useful_elements": [],
             "avoid_elements": [],
             "useful_ten_gods": [],
         }
         secondary_structures = recognized_structures
         decision_basis = [
-            dominant_structure["reason"],
+            month_reason,
             f"工程扶抑模型判为{day_strength}；身、印及食财官杀的相对力量另列待判条件。",
             "原典取用路径按月令分列，未由十神共现或固定优先级选定；旧优先候选仅供追溯。",
         ]
-        if selected_month["basis_status"] == "original_and_selected_differ":
+        if (
+            month_uses["policy_scope"] != "miscellaneous_qi_source"
+            and selected_month["basis_status"] == "original_and_selected_differ"
+        ):
             decision_basis.append(
                 f"月令本气为{selected_month['original_main_qi']['ten_god']}，当前有限规则所选为{selected_month['ten_god']}；是否变格、兼格仍待裁定，不以透干即抹去本气。"
             )
@@ -497,7 +490,7 @@ class BaZiRules:
         decision_basis.append(
             "扶抑、原典待判路径、旧共现候选与调候分层保留；未裁定的旧候选不单独授予全局喜忌，未入喜不自动为忌。"
         )
-        structure_profile: Dict[str, Any] = {
+        structure_profile: dict[str, Any] = {
             **resolution,
             "dominant_structure": dominant_structure,
             "candidate_selection": candidate_selection,
@@ -546,19 +539,17 @@ class BaZiRules:
         return structure_profile
 
     @staticmethod
-    def chart_useful_profile(pillars: Dict[str, Tuple[str, str]]) -> Dict[str, Any]:
+    def chart_useful_profile(pillars: dict[str, tuple[str, str]]) -> dict[str, Any]:
         """Use the same layered resolver in birth and specialty analyses."""
-        from .elements import ElementAnalysis
-
         return BaZiRules.build_structure_profile(
             pillars, ElementAnalysis.comprehensive_analysis(pillars)
         )
 
     @staticmethod
     def analyze_harmony_effects(
-        pillars: Dict[str, Tuple[str, str]],
-        structure_profile: Dict[str, Any],
-    ) -> List[Dict[str, Any]]:
+        pillars: dict[str, tuple[str, str]],
+        structure_profile: dict[str, Any],
+    ) -> list[dict[str, Any]]:
         harmony_patterns = check_harmony_patterns(pillars)
         clash_patterns = check_clash_patterns(pillars)
 
@@ -566,7 +557,7 @@ class BaZiRules:
         day_element = STEM_ELEMENTS[day_stem][0].value
         useful_elements = set(structure_profile.get("useful_elements", []))
         avoid_elements = set(structure_profile.get("avoid_elements", []))
-        events: List[Dict[str, Any]] = []
+        events: list[dict[str, Any]] = []
 
         for item in harmony_patterns.get("three_harmony", []):
             branches = item["branches"]
@@ -740,486 +731,3 @@ class BaZiRules:
             )
 
         return events
-
-    @staticmethod
-    def _classify_combined_event(
-        *,
-        event_type: str,
-        result_element: Optional[str],
-        affected_elements: List[str],
-        structure_profile1: Optional[Dict[str, Any]],
-        structure_profile2: Optional[Dict[str, Any]],
-    ) -> Tuple[str, str]:
-        profiles = [structure_profile1 or {}, structure_profile2 or {}]
-        useful_hits = 0
-        avoid_hits = 0
-
-        for profile in profiles:
-            useful_elements = set(profile.get("useful_elements", []))
-            avoid_elements = set(profile.get("avoid_elements", []))
-
-            if result_element:
-                if result_element in useful_elements:
-                    useful_hits += 1
-                if result_element in avoid_elements:
-                    avoid_hits += 1
-            else:
-                if useful_elements & set(affected_elements):
-                    avoid_hits += 1
-                elif avoid_elements & set(affected_elements):
-                    useful_hits += 1
-
-        if event_type in {"three_harmony", "half_harmony", "six_harmony"}:
-            if avoid_hits >= 2:
-                return "risk", "对双方格局都形成明显干扰。"
-            if useful_hits >= 2:
-                return "supportive", "对双方格局都形成支持。"
-            if useful_hits and avoid_hits:
-                return "tension", "一方受益而另一方承压，属于拉扯型事件。"
-            if useful_hits or avoid_hits:
-                return (
-                    "unresolved",
-                    "仅一方取用参考有命中；另一方效力未定，不据此认定双向受益或承压。",
-                )
-            return "unresolved", "已见名义合局，双方取用效力未定，不据此计为支持。"
-
-        if avoid_hits >= 2:
-            return "risk", "冲击双方可用之气，风险较高。"
-        return "tension", "事件带来明显张力，需要结合格局取用判断。"
-
-    @staticmethod
-    def analyze_combined_chart_events(
-        pillars1: Dict[str, Tuple[str, str]],
-        pillars2: Dict[str, Tuple[str, str]],
-        structure_profile1: Optional[Dict[str, Any]] = None,
-        structure_profile2: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
-        combined_entries: List[Dict[str, Any]] = []
-        for person_label, pillars in (("person1", pillars1), ("person2", pillars2)):
-            for pillar_name, (stem, branch) in pillars.items():
-                combined_entries.append(
-                    {
-                        "person": person_label,
-                        "pillar": pillar_name,
-                        "stem": stem,
-                        "branch": branch,
-                    }
-                )
-
-        branch_sources: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
-        for entry in combined_entries:
-            branch_sources[entry["branch"]].append(
-                {
-                    "person": entry["person"],
-                    "pillar": entry["pillar"],
-                    "stem": entry["stem"],
-                }
-            )
-
-        events: List[Dict[str, Any]] = []
-        supportive_patterns: List[Dict[str, Any]] = []
-        tension_patterns: List[Dict[str, Any]] = []
-        risk_patterns: List[Dict[str, Any]] = []
-        unresolved_patterns: List[Dict[str, Any]] = []
-
-        def _append_event(event: Dict[str, Any]) -> None:
-            events.append(event)
-            summary = {
-                "label": event["label"],
-                "type": event["type"],
-                "description": event["description"],
-                "result_element": event.get("result_element"),
-                "source_scope": event.get("source_scope"),
-                "source_map": event.get("source_map", {}),
-            }
-            if event["classification"] == "supportive":
-                supportive_patterns.append(summary)
-            elif event["classification"] == "risk":
-                risk_patterns.append(summary)
-            elif event["classification"] == "unresolved":
-                unresolved_patterns.append(summary)
-            else:
-                tension_patterns.append(summary)
-
-        for combo, element in BRANCH_TRIPLE_ELEMENTS.items():
-            present_branches = [
-                branch for branch in combo if branch_sources.get(branch)
-            ]
-            membership = classify_triple_members("".join(combo), present_branches)
-            if membership == "complete":
-                source_scope = (
-                    "cross_person"
-                    if len(
-                        {
-                            source["person"]
-                            for branch in combo
-                            for source in branch_sources[branch]
-                        }
-                    )
-                    > 1
-                    else branch_sources[combo[0]][0]["person"]
-                )
-                classification, description = BaZiRules._classify_combined_event(
-                    event_type="three_harmony",
-                    result_element=element.value,
-                    affected_elements=[
-                        BRANCH_ELEMENTS[branch][0].value for branch in combo
-                    ],
-                    structure_profile1=structure_profile1,
-                    structure_profile2=structure_profile2,
-                )
-                _append_event(
-                    {
-                        "type": "three_harmony",
-                        "label": f"{''.join(combo)}三合{element.value}局",
-                        "branches": list(combo),
-                        "result_element": element.value,
-                        "source_map": {
-                            branch: branch_sources[branch] for branch in combo
-                        },
-                        "source_scope": source_scope,
-                        "classification": classification,
-                        "description": description,
-                    }
-                )
-            elif membership == "peak_pair":
-                classification, description = BaZiRules._classify_combined_event(
-                    event_type="half_harmony",
-                    result_element=element.value,
-                    affected_elements=[
-                        BRANCH_ELEMENTS[branch][0].value for branch in present_branches
-                    ],
-                    structure_profile1=structure_profile1,
-                    structure_profile2=structure_profile2,
-                )
-                _append_event(
-                    {
-                        "type": "half_harmony",
-                        "label": f"{''.join(present_branches)}半合{element.value}局",
-                        "branches": present_branches,
-                        "result_element": element.value,
-                        "source_map": {
-                            branch: branch_sources[branch]
-                            for branch in present_branches
-                        },
-                        "source_scope": (
-                            "cross_person"
-                            if len(
-                                {
-                                    source["person"]
-                                    for branch in present_branches
-                                    for source in branch_sources[branch]
-                                }
-                            )
-                            > 1
-                            else branch_sources[present_branches[0]][0]["person"]
-                        ),
-                        "classification": classification,
-                        "description": description,
-                    }
-                )
-
-        for pair in BRANCH_HARMONY_PAIRS:
-            if branch_sources.get(pair[0]) and branch_sources.get(pair[1]):
-                result_element = BRANCH_COMBINATION_ELEMENT[frozenset(pair)].value
-                classification, description = BaZiRules._classify_combined_event(
-                    event_type="six_harmony",
-                    result_element=result_element,
-                    affected_elements=[
-                        BRANCH_ELEMENTS[pair[0]][0].value,
-                        BRANCH_ELEMENTS[pair[1]][0].value,
-                    ],
-                    structure_profile1=structure_profile1,
-                    structure_profile2=structure_profile2,
-                )
-                _append_event(
-                    {
-                        "type": "six_harmony",
-                        "label": f"{pair[0]}{pair[1]}六合",
-                        "branches": list(pair),
-                        "result_element": result_element,
-                        "source_map": {
-                            pair[0]: branch_sources[pair[0]],
-                            pair[1]: branch_sources[pair[1]],
-                        },
-                        "source_scope": (
-                            "cross_person"
-                            if len(
-                                {
-                                    source["person"]
-                                    for branch in pair
-                                    for source in branch_sources[branch]
-                                }
-                            )
-                            > 1
-                            else branch_sources[pair[0]][0]["person"]
-                        ),
-                        "classification": classification,
-                        "description": description,
-                    }
-                )
-
-        conflict_pairs = [
-            ("six_clash", BRANCH_CLASH_PAIRS, "六冲"),
-            ("six_harm", BRANCH_HARM_PAIRS, "六害"),
-        ]
-        for event_type, pair_list, label_suffix in conflict_pairs:
-            for pair in pair_list:
-                if branch_sources.get(pair[0]) and branch_sources.get(pair[1]):
-                    affected_elements = [
-                        BRANCH_ELEMENTS[pair[0]][0].value,
-                        BRANCH_ELEMENTS[pair[1]][0].value,
-                    ]
-                    classification, description = BaZiRules._classify_combined_event(
-                        event_type=event_type,
-                        result_element=None,
-                        affected_elements=affected_elements,
-                        structure_profile1=structure_profile1,
-                        structure_profile2=structure_profile2,
-                    )
-                    _append_event(
-                        {
-                            "type": event_type,
-                            "label": f"{pair[0]}{pair[1]}{label_suffix}",
-                            "branches": list(pair),
-                            "result_element": None,
-                            "source_map": {
-                                pair[0]: branch_sources[pair[0]],
-                                pair[1]: branch_sources[pair[1]],
-                            },
-                            "source_scope": (
-                                "cross_person"
-                                if len(
-                                    {
-                                        source["person"]
-                                        for branch in pair
-                                        for source in branch_sources[branch]
-                                    }
-                                )
-                                > 1
-                                else branch_sources[pair[0]][0]["person"]
-                            ),
-                            "classification": classification,
-                            "description": description,
-                        }
-                    )
-
-        combined_branches = [entry["branch"] for entry in combined_entries]
-        for punishment_set in BRANCH_PUNISHMENT_GROUPS:
-            if len(punishment_set) == 3 and all(
-                branch in combined_branches for branch in punishment_set
-            ):
-                affected_elements = [
-                    BRANCH_ELEMENTS[branch][0].value for branch in punishment_set
-                ]
-                classification, description = BaZiRules._classify_combined_event(
-                    event_type="three_punishment",
-                    result_element=None,
-                    affected_elements=affected_elements,
-                    structure_profile1=structure_profile1,
-                    structure_profile2=structure_profile2,
-                )
-                _append_event(
-                    {
-                        "type": "three_punishment",
-                        "label": f"{''.join(punishment_set)}三刑",
-                        "branches": list(punishment_set),
-                        "result_element": None,
-                        "source_map": {
-                            branch: branch_sources[branch] for branch in punishment_set
-                        },
-                        "source_scope": (
-                            "cross_person"
-                            if len(
-                                {
-                                    source["person"]
-                                    for branch in punishment_set
-                                    for source in branch_sources[branch]
-                                }
-                            )
-                            > 1
-                            else branch_sources[punishment_set[0]][0]["person"]
-                        ),
-                        "classification": classification,
-                        "description": description,
-                    }
-                )
-
-        day_stem1, day_branch1 = pillars1["day"]
-        day_stem2, day_branch2 = pillars2["day"]
-        day_element1 = STEM_ELEMENTS[day_stem1][0].value
-        day_element2 = STEM_ELEMENTS[day_stem2][0].value
-        day_element_enum1 = STEM_ELEMENTS[day_stem1][0]
-        day_element_enum2 = STEM_ELEMENTS[day_stem2][0]
-        stem_control = (
-            DESTRUCTION_CYCLE[day_element_enum1] == day_element_enum2
-            or DESTRUCTION_CYCLE[day_element_enum2] == day_element_enum1
-        )
-        branch_clash = any(
-            (day_branch1 == left and day_branch2 == right)
-            or (day_branch1 == right and day_branch2 == left)
-            for left, right in BRANCH_CLASH_PAIRS
-        )
-        if stem_control and branch_clash:
-            avoid1 = set((structure_profile1 or {}).get("avoid_elements", []))
-            avoid2 = set((structure_profile2 or {}).get("avoid_elements", []))
-            classification = (
-                "risk"
-                if day_element2 in avoid1 and day_element1 in avoid2
-                else "tension"
-            )
-            _append_event(
-                {
-                    "type": "tian_ke_di_chong",
-                    "label": "天克地冲",
-                    "branches": [day_branch1, day_branch2],
-                    "result_element": None,
-                    "source_map": {
-                        day_branch1: [
-                            {"person": "person1", "pillar": "day", "stem": day_stem1}
-                        ],
-                        day_branch2: [
-                            {"person": "person2", "pillar": "day", "stem": day_stem2}
-                        ],
-                    },
-                    "source_scope": "cross_person",
-                    "classification": classification,
-                    "description": "日干存在相克、日支同时六冲，属于高吸引与高摩擦并存的张力型关系。",
-                }
-            )
-
-        return {
-            "events": events,
-            "supportive_patterns": supportive_patterns,
-            "tension_patterns": tension_patterns,
-            "risk_patterns": risk_patterns,
-            "unresolved_patterns": unresolved_patterns,
-        }
-
-    @staticmethod
-    def calculate_compatibility_score(
-        pillars1: Dict[str, Tuple[str, str]], pillars2: Dict[str, Tuple[str, str]]
-    ) -> Dict[str, Any]:
-        """Calculate basic compatibility score between two BaZi charts."""
-        compatibility: Dict[str, Any] = {
-            "harmony_score": 0,
-            "clash_score": 0,
-            "overall_score": 0,
-            "details": [],
-        }
-
-        # Extract branches by pillar position so details can name which
-        # pillar of each person is being matched (avoids "巳与申六合 x4"
-        # deduped output that hides whether each hit is a real new match
-        # or just a display repeat).
-        pillar_keys = ("year", "month", "day", "hour")
-        pillar_labels = {"year": "年", "month": "月", "day": "日", "hour": "时"}
-        branches1 = [(pk, pillars1[pk][1]) for pk in pillar_keys if pk in pillars1]
-        branches2 = [(pk, pillars2[pk][1]) for pk in pillar_keys if pk in pillars2]
-
-        for pk1, b1 in branches1:
-            for pk2, b2 in branches2:
-                for harmony_pair in BRANCH_HARMONY_PAIRS:
-                    if (b1, b2) in [harmony_pair, harmony_pair[::-1]]:
-                        compatibility["harmony_score"] += 2
-                        compatibility["details"].append(
-                            f"一方{pillar_labels[pk1]}支{b1} × 二方{pillar_labels[pk2]}支{b2}：六合"
-                        )
-
-                for clash_pair in BRANCH_CLASH_PAIRS:
-                    if (b1, b2) in [clash_pair, clash_pair[::-1]]:
-                        compatibility["clash_score"] += 2
-                        compatibility["details"].append(
-                            f"一方{pillar_labels[pk1]}支{b1} × 二方{pillar_labels[pk2]}支{b2}：六冲"
-                        )
-
-                # Check six harm (一方对二方某支相害；视为轻度减分)
-                for harm_pair in BRANCH_HARM_PAIRS:
-                    if (b1, b2) in [harm_pair, harm_pair[::-1]]:
-                        compatibility["clash_score"] += 1
-                        compatibility["details"].append(
-                            f"一方{pillar_labels[pk1]}支{b1} × 二方{pillar_labels[pk2]}支{b2}：六害"
-                        )
-
-                # Use the same peak-required pair convention as natal facts,
-                # the force ledger and candidate inventory. End pairs are arches.
-                for triple in BRANCH_TRIPLE_COMBINATIONS:
-                    if classify_triple_members(triple, (b1, b2)) == "peak_pair":
-                        pair = tuple(sorted((b1, b2)))
-                        key = ("half_harmony", pk1, pk2, pair)
-                        if key not in compatibility.setdefault("_half_seen", set()):
-                            compatibility["_half_seen"].add(key)
-                            compatibility["harmony_score"] += 3
-                            compatibility["details"].append(
-                                f"一方{pillar_labels[pk1]}支{b1} × 二方{pillar_labels[pk2]}支{b2}：半合{triple[0]}{triple[1]}{triple[2]}局"
-                            )
-
-        # Cross-chart triple harmony (三合): awarded once per distinct 三合 set
-        # that has at least one branch from each person — matches the
-        # "合盘构成三刑" convention used by the advanced analyzer.
-        branches1_set = {b for _, b in branches1}
-        branches2_set = {b for _, b in branches2}
-        for triple in BRANCH_TRIPLE_COMBINATIONS:
-            required = set(triple)
-            covered_by_1 = required & branches1_set
-            covered_by_2 = required & branches2_set
-            if (
-                covered_by_1
-                and covered_by_2
-                and required <= (covered_by_1 | covered_by_2)
-            ):
-                compatibility["harmony_score"] += 5
-                compatibility["details"].append(f"合盘构成{''.join(triple)}三合")
-
-        # Cross-chart triple punishment (三刑): symmetric reward with 三合.
-        for punishment in BRANCH_PUNISHMENT_GROUPS:
-            if len(punishment) != 3:
-                continue
-            required = set(punishment)
-            covered_by_1 = required & branches1_set
-            covered_by_2 = required & branches2_set
-            if (
-                covered_by_1
-                and covered_by_2
-                and required <= (covered_by_1 | covered_by_2)
-            ):
-                compatibility["clash_score"] += 5
-                compatibility["details"].append(f"合盘构成{''.join(punishment)}三刑")
-
-        compatibility.pop("_half_seen", None)
-
-        # Check day pillar compatibility (most important)
-        day_stem1, day_branch1 = pillars1["day"]
-        day_stem2, day_branch2 = pillars2["day"]
-
-        # Day branch harmony/clash has higher weight
-        for harmony_pair in BRANCH_HARMONY_PAIRS:
-            if (day_branch1, day_branch2) in [harmony_pair, harmony_pair[::-1]]:
-                compatibility["harmony_score"] += 5
-                compatibility["details"].append(
-                    f"日支{day_branch1}与{day_branch2}六合(重要)"
-                )
-
-        for clash_pair in BRANCH_CLASH_PAIRS:
-            if (day_branch1, day_branch2) in [clash_pair, clash_pair[::-1]]:
-                compatibility["clash_score"] += 5
-                compatibility["details"].append(
-                    f"日支{day_branch1}与{day_branch2}六冲(重要)"
-                )
-
-        compatibility["overall_score"] = (
-            compatibility["harmony_score"] - compatibility["clash_score"]
-        )
-
-        if compatibility["overall_score"] >= 8:
-            compatibility["level"] = "非常匹配"
-        elif compatibility["overall_score"] >= 4:
-            compatibility["level"] = "比较匹配"
-        elif compatibility["overall_score"] >= 0:
-            compatibility["level"] = "一般匹配"
-        elif compatibility["overall_score"] >= -4:
-            compatibility["level"] = "需要磨合"
-        else:
-            compatibility["level"] = "不太匹配"
-
-        return compatibility

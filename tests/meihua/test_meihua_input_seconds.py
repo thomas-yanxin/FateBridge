@@ -7,16 +7,19 @@ from datetime import datetime, timedelta, timezone
 import pytest
 from pydantic import ValidationError
 
+import fatebridge.services.divination as service
 from fatebridge.core.requests.divination import MeihuaAnalysisRequest
 from fatebridge.services.divination import calculate_meihua_analysis
-from tests.meihua.test_meihua_civil_clock import CASES as CLOCKS
-from tests.meihua.test_meihua_civil_clock import parameters as clock_parameters
 from tests.support.meihua_input_seconds_reference import FOLDER, cases, parameters
+from tests.unit_test.fixtures.meihua_civil_clock import (
+    CIVIL_CLOCK_CASES,
+    civil_clock_parameters,
+)
 
 CASES = cases()
 
 
-def test_reference_keeps_all_jie_and_zhongqi_with_shared_dynamics_limit():
+def test_reference_keeps_all_jie_and_zhongqi_with_shared_dynamics_limit() -> None:
     protocol = json.loads((FOLDER / "protocol.json").read_bytes())
     assert protocol["frozen_before_production_edits"]
     assert protocol["shared_DE440_dynamics_not_independent_observations"]
@@ -30,7 +33,9 @@ def test_reference_keeps_all_jie_and_zhongqi_with_shared_dynamics_limit():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_both_sides_of_independent_solar_roots_select_actual_month_and_term(case):
+def test_both_sides_of_independent_solar_roots_select_actual_month_and_term(
+    case,
+) -> None:
     outputs = []
     for side in ["before", "after"]:
         out = calculate_meihua_analysis(**parameters(case[side]))
@@ -76,8 +81,9 @@ def test_both_sides_of_independent_solar_roots_select_actual_month_and_term(case
 
 
 @pytest.mark.parametrize("second", [True, False, -1, 60, 1.0, 1.5, "1", {}, []])
-def test_invalid_or_coerced_seconds_never_reach_calendar(second, monkeypatch):
-    import fatebridge.services.divination as service
+def test_invalid_or_coerced_seconds_never_reach_calendar(
+    second, monkeypatch: pytest.MonkeyPatch
+) -> None:
 
     args = parameters(CASES[0]["after"])
     args["analysis_second"] = second
@@ -95,7 +101,7 @@ def test_invalid_or_coerced_seconds_never_reach_calendar(second, monkeypatch):
     assert out["issues"][0]["path"] == "analysis_second" and not called
 
 
-def test_omitted_null_and_explicit_zero_keep_the_same_instant_and_cast():
+def test_omitted_null_and_explicit_zero_keep_the_same_instant_and_cast() -> None:
     args = parameters(CASES[0]["before"])
     args.pop("analysis_second")
     omitted = calculate_meihua_analysis(**args)
@@ -132,6 +138,10 @@ def test_omitted_null_and_explicit_zero_keep_the_same_instant_and_cast():
                 if parent.get(key):
                     assert parent[key].startswith(evidence["statement"] + " ")
                     parent[key] = parent[key].removeprefix(evidence["statement"] + " ")
+                else:
+                    pass
+        else:
+            pass
     clock.pop("input_second")
     clock["clock_label_precision"] = omitted["meihua"]["calendar_policy"][
         "civil_clock_resolution"
@@ -140,7 +150,7 @@ def test_omitted_null_and_explicit_zero_keep_the_same_instant_and_cast():
 
 
 @pytest.mark.parametrize("second", range(60))
-def test_seconds_within_a_regular_minute_never_add_to_seed(second):
+def test_seconds_within_a_regular_minute_never_add_to_seed(second) -> None:
     args = dict(
         analysis_year=2025,
         analysis_month=5,
@@ -159,9 +169,9 @@ def test_seconds_within_a_regular_minute_never_add_to_seed(second):
     )
 
 
-@pytest.mark.parametrize("case", CLOCKS["valid"], ids=lambda c: c["id"])
-def test_seconds_survive_both_fold_choices_and_non_hour_offsets(case):
-    out = calculate_meihua_analysis(**clock_parameters(case), analysis_second=37)
+@pytest.mark.parametrize("case", CIVIL_CLOCK_CASES["valid"], ids=lambda c: c["id"])
+def test_seconds_survive_both_fold_choices_and_non_hour_offsets(case) -> None:
+    out = calculate_meihua_analysis(**civil_clock_parameters(case), analysis_second=37)
     clock = out["meihua"]["calendar_policy"]["civil_clock_resolution"]
     expected = datetime.fromisoformat(case["utc"]) + timedelta(seconds=37)
     assert clock["instant_utc"] == expected.isoformat()
@@ -169,9 +179,9 @@ def test_seconds_survive_both_fold_choices_and_non_hour_offsets(case):
     assert clock["resolved_utc_offset"] == case["offset"]
 
 
-@pytest.mark.parametrize("case", CLOCKS["invalid"], ids=lambda c: c["id"])
-def test_adding_seconds_does_not_rescue_gaps_or_invalid_offsets(case):
-    out = calculate_meihua_analysis(**clock_parameters(case), analysis_second=37)
+@pytest.mark.parametrize("case", CIVIL_CLOCK_CASES["invalid"], ids=lambda c: c["id"])
+def test_adding_seconds_does_not_rescue_gaps_or_invalid_offsets(case) -> None:
+    out = calculate_meihua_analysis(**civil_clock_parameters(case), analysis_second=37)
     assert out["error_code"] == "validation_error" and out["retryable"] is False
 
 
@@ -182,7 +192,9 @@ def test_adding_seconds_does_not_rescue_gaps_or_invalid_offsets(case):
         ("2025-05-10T23:59:59+08:00", "2025-05-11T00:00:00+08:00"),
     ],
 )
-def test_known_seconds_do_not_move_civil_day_or_double_hour_early(before, after):
+def test_known_seconds_do_not_move_civil_day_or_double_hour_early(
+    before: str, after: str
+) -> None:
     left = calculate_meihua_analysis(**parameters(before))
     right = calculate_meihua_analysis(**parameters(after))
     assert left["meihua"]["seed"] != right["meihua"]["seed"]

@@ -8,10 +8,10 @@ from pathlib import Path
 from typing import Any
 
 from fatebridge.core.metaphysics.ziwei import (
-    _palace_for_nominal_age,
     build_ziwei_chart,
     build_ziwei_horoscope,
 )
+from fatebridge.core.ziwei.ziwei_horoscope import palace_for_nominal_age
 from scripts.ziwei.audit_ziwei_limits import _seed
 from scripts.ziwei.ziwei_conditional_inputs import synthetic_birth_clock
 
@@ -24,20 +24,28 @@ def audit_activation(fixtures: Path = FIXTURES) -> dict[str, Any]:
     reference_path = fixtures / software["path"]
     if hashlib.sha256(reference_path.read_bytes()).hexdigest() != software["sha256"]:
         raise ValueError("Decade activation software reference checksum mismatch")
+    else:
+        pass
     reference = json.loads(reference_path.read_text())
     for label, row in software["pre_decade_rows_asserted_as_differences"].items():
         if reference[label]["scopes"]["大限"] != row:
             raise ValueError("Declared pre-decade software difference changed")
+        else:
+            pass
     for rel, digest in source["source_manifest_sha256"].items():
         p = fixtures / rel
         if hashlib.sha256(p.read_bytes()).hexdigest() != digest:
             raise ValueError(f"Decade activation source manifest mismatch: {rel}")
+        else:
+            pass
         for row in json.loads(p.read_text())["files"]:
             if (
                 hashlib.sha256((p.parent / row["path"]).read_bytes()).hexdigest()
                 != row["sha256"]
             ):
                 raise ValueError(f"Decade activation source checksum mismatch: {rel}")
+            else:
+                pass
     mismatches: list[dict[str, Any]] = []
     before = started = chart_inputs = 0
     bureaus = set()
@@ -56,9 +64,13 @@ def audit_activation(fixtures: Path = FIXTURES) -> dict[str, Any]:
                 chart_inputs += 1
                 if chart["wuxing_ju"]["number"] != first:
                     mismatches.append(dict(case="conditional_bureau_premise"))
+                else:
+                    pass
                 formal_first = "命宫"
                 if profile == "quanshu_v2_excerpt":
                     formal_first = "父母宫" if gender == "男" else "兄弟宫"
+                else:
+                    pass
                 for age in range(1, first + 2):
                     h = build_ziwei_horoscope(
                         birth_seed=synthetic_birth_clock(
@@ -98,7 +110,7 @@ def audit_activation(fixtures: Path = FIXTURES) -> dict[str, Any]:
                             }
                         )
                         try:
-                            _palace_for_nominal_age(chart["palaces"], age)
+                            palace_for_nominal_age(chart["palaces"], age)
                         except ValueError:
                             checks["formal_lookup_rejects_substitution"] = True
                         else:
@@ -122,6 +134,8 @@ def audit_activation(fixtures: Path = FIXTURES) -> dict[str, Any]:
                                 failed=failed,
                             )
                         )
+                    else:
+                        pass
     return {
         "method_id": source["id"],
         "conditional_chart_inputs": chart_inputs,

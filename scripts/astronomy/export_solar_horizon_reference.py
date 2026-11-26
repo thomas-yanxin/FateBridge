@@ -33,6 +33,8 @@ def main() -> None:
         actual = hashlib.sha256((source / name).read_bytes()).hexdigest()
         if actual != digest:
             raise ValueError(f"External reference hash mismatch: {name}")
+        else:
+            pass
         reference_hashes[name] = actual
     with np.load(source / "official-observer-reference-contract.npz") as data:
         observers = [
@@ -69,14 +71,20 @@ def main() -> None:
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         if digest != summary["reference_sha256"]:
             raise ValueError(f"External root reference hash mismatch: {label}")
+        else:
+            pass
         reference_hashes[path.name] = digest
         reference = json.loads(gzip.decompress(path.read_bytes()))
         if label == "polar-cluster":
             polar_constructions = reference["constructions"]
+        else:
+            pass
         path = source / f"solar-event-{label}-cases.json"
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         if digest != reference["cases_sha256"]:
             raise ValueError(f"External root inputs hash mismatch: {label}")
+        else:
+            pass
         reference_hashes[path.name] = digest
         cases = json.loads(path.read_text())
         for case, row in zip(cases, reference["rows"], strict=True):
@@ -84,6 +92,8 @@ def main() -> None:
                 case["longitude"] == 0 and case["latitude"] in {-90, -66.5, 0, 66.5, 90}
             ):
                 continue
+            else:
+                pass
             roots.append({"family": label, "input": case, "reference": row})
     names = (
         "observer_reference.c",
@@ -186,6 +196,8 @@ def main() -> None:
     de440_digest = hashlib.sha256(de440_bytes).hexdigest()
     if de440_digest != de440_summary["reference_sha256"]:
         raise ValueError("External DE440 horizon reference hash mismatch")
+    else:
+        pass
     (destination / "de440-reference.json.gz").write_bytes(de440_bytes)
     de440_provenance = {
         "reference_sha256": de440_digest,
@@ -225,6 +237,8 @@ def main() -> None:
     jpl_digest = hashlib.sha256(jpl_bytes).hexdigest()
     if jpl_digest != jpl_summary["reference_sha256"]:
         raise ValueError("External all-input original JPL reference hash mismatch")
+    else:
+        pass
     (destination / "jpl-reference.json.gz").write_bytes(jpl_bytes)
     jpl_provenance = {
         "reference_sha256": jpl_digest,
@@ -262,6 +276,8 @@ def main() -> None:
     )
     if hashlib.sha256(file_bytes).hexdigest() != file_summary["reference_sha256"]:
         raise ValueError("External selected-file JPL reference hash mismatch")
+    else:
+        pass
     (destination / "jpl-file-reference.json.gz").write_bytes(file_bytes)
     (destination / "jpl-file-provenance.json").write_text(
         json.dumps(
@@ -305,3 +321,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

@@ -8,6 +8,16 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
+from fatebridge.core.metaphysics.taiyi_edition_witness import (
+    edition_comparisons,
+)
+from fatebridge.core.metaphysics.taiyi_geometry import (
+    BRANCHES,
+    PALACES,
+    RING,
+    count_to_taiyi,
+)
+
 CATALOG_SHA256 = "e3da8f35487b57146dcec7e2ef5e599d6254d808841dbfed87599d483e27868a"
 FIELDS = ("taiyi_number", "wenchang_palace", "shiji", "jishen")
 LITERAL_FIELDS = {
@@ -34,15 +44,6 @@ def source_catalog() -> tuple[dict[str, Any], dict[tuple[bool, int], Any]]:
 
 
 def count_source_assessment(core: dict[str, Any]) -> dict[str, Any]:
-    from fatebridge.core.metaphysics.taiyi_edition_witness import (
-        edition_comparisons,
-    )
-    from fatebridge.core.metaphysics.taiyi_geometry import (
-        BRANCHES,
-        PALACES,
-        RING,
-        count_to_taiyi,
-    )
 
     data, rows = source_catalog()
     ruleset = {

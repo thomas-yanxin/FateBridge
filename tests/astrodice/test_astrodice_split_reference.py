@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 
+from scripts.astrodice import audit_astrodice_split_candidate as candidate
 from scripts.astrodice.audit_astrodice_split_reference import (
     GENERATOR_SHA256,
     REFERENCE_SHA256,
@@ -25,7 +26,7 @@ def inputs():
     ]
 
 
-def test_frozen_split_reference_replays_every_source_state_and_stencil():
+def test_frozen_split_reference_replays_every_source_state_and_stencil() -> None:
     assert (
         hashlib.sha256(
             (FIXTURES / "lunar-split-tdb-reference.json").read_bytes()
@@ -56,7 +57,9 @@ def test_frozen_split_reference_replays_every_source_state_and_stencil():
         (5373484, 0.25, -1e-5),
     ],
 )
-def test_split_time_preserves_small_increments_across_calendar_edges(jd0, small, delta):
+def test_split_time_preserves_small_increments_across_calendar_edges(
+    jd0: int, small: float, delta
+) -> None:
     a, b = shifted(jd0, small, delta)
     expected = Fraction(jd0) + Fraction(small) + Fraction(delta)
     actual = Fraction(a) + Fraction(b)
@@ -65,6 +68,8 @@ def test_split_time_preserves_small_increments_across_calendar_edges(jd0, small,
     if delta == 1e-12:
         assert (jd0 + small) + delta == jd0 + small
         assert actual != Fraction(jd0) + Fraction(small)
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
@@ -80,7 +85,7 @@ def test_split_time_preserves_small_increments_across_calendar_edges(jd0, small,
         "direction_shape",
     ],
 )
-def test_split_reference_rejects_mutated_evidence(change):
+def test_split_reference_rejects_mutated_evidence(change: str) -> None:
     protocol, reference = copy.deepcopy(inputs())
     row = reference["rows"][0]
     sample = row["samples"]["0"]
@@ -113,9 +118,8 @@ def test_split_reference_rejects_mutated_evidence(change):
     ],
 )
 def test_candidate_receipt_never_promotes_the_tdb_study_to_tt(
-    monkeypatch, code, status
-):
-    from scripts.astrodice import audit_astrodice_split_candidate as candidate
+    monkeypatch: pytest.MonkeyPatch, code: int, status: str
+) -> None:
 
     monkeypatch.setattr(
         candidate,

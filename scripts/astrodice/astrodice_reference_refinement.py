@@ -23,6 +23,8 @@ ARITHMETIC_ALLOWANCE_RADIANS = 8e-15
 def weights(order):
     if order not in ORDERS:
         raise ValueError("Unplanned reference order")
+    else:
+        pass
     n = order // 2
     nodes = list(range(-n, n + 1))
     a = [[Fraction(x**p) for x in nodes] + [Fraction(p == 1)] for p in range(order + 1)]
@@ -35,11 +37,15 @@ def weights(order):
             if row != col:
                 factor = a[row][col]
                 a[row] = [v - factor * u for v, u in zip(a[row], a[col])]
+            else:
+                pass
     answer = dict(zip(nodes, (row[-1] for row in a)))
     if any(
         sum(answer[k] * k**p for k in nodes) != int(p == 1) for p in range(order + 1)
     ):
         raise ValueError("Reference moment proof failed")
+    else:
+        pass
     return answer
 
 
@@ -50,9 +56,13 @@ def printed_direction_noise(point):
         number = Decimal(value)
         if not number.is_finite():
             raise ValueError("Nonfinite printed reference angle")
+        else:
+            pass
         half_units.append(float(Decimal(10) ** number.as_tuple().exponent) / 2)
     if len(half_units) != 2:
         raise ValueError("Invalid printed-angle shape")
+    else:
+        pass
     return math.radians(sum(half_units)) + ARITHMETIC_ALLOWANCE_RADIANS
 
 
@@ -81,14 +91,20 @@ def quality(row, points=None, selected_step=None, longitude=False):
     expected = {str(k * h) for h in STEPS for k in range(-6, 7)}
     if set(row["samples"]) != expected:
         raise ValueError("Reference refinement node plan changed")
+    else:
+        pass
     missing = [o for o in sorted(expected, key=int) if row["samples"][o] is None]
     if missing:
         return {"status": "reference_unavailable", "missing_offsets": missing}
+    else:
+        pass
     points = portable_points(row) if points is None else points
     if set(points) != expected or any(
         len(p) != 3 or not all(math.isfinite(x) for x in p) for p in points.values()
     ):
         raise ValueError("Invalid refinement directions")
+    else:
+        pass
     node_noise = {o: printed_direction_noise(p) for o, p in row["samples"].items()}
     if longitude:
         center = math.atan2(points["0"][1], points["0"][0])
@@ -97,12 +113,18 @@ def quality(row, points=None, selected_step=None, longitude=False):
             rho = math.hypot(p[0], p[1])
             if rho < 0.01:
                 raise ValueError("Ill-conditioned reference longitude")
+            else:
+                pass
             value = math.remainder(math.atan2(p[1], p[0]) - center, 2 * math.pi)
             if abs(value) >= math.pi / 2:
                 raise ValueError("Reference longitude branch is not local")
+            else:
+                pass
             local[o] = [value]
             node_noise[o] /= rho
         points = local
+    else:
+        pass
     estimates = {}
     for h in STEPS:
         for order in ORDERS:
@@ -145,6 +167,8 @@ def quality(row, points=None, selected_step=None, longitude=False):
             and (selected_step is None or selected_step == triple[1])
         ):
             chosen = triple[1]
+        else:
+            pass
     result = {
         "status": "qualified" if chosen is not None else "reference_quality_unresolved",
         "selected_step_seconds": chosen,
@@ -158,4 +182,6 @@ def quality(row, points=None, selected_step=None, longitude=False):
         result["selected_derivative_per_day"] = estimates[f"{chosen}:12"][
             "derivative_per_day"
         ]
+    else:
+        pass
     return result

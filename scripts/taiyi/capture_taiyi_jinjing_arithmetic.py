@@ -9,18 +9,20 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from fatebridge.core.metaphysics import taiyi_year
+from fatebridge.core.metaphysics.taiyi_source_alignment import (
+    count_source_assessment,
+)
 from scripts.taiyi.audit_taiyi_jinjing_arithmetic import FREEZE_SHA, ROOT, verify
 
 
 def capture() -> dict[str, Any]:
     data = verify()
-    from fatebridge.core.metaphysics import taiyi_year
-    from fatebridge.core.metaphysics.taiyi_source_alignment import (
-        count_source_assessment,
-    )
 
     if not Path(taiyi_year.__file__).resolve().is_relative_to(ROOT / "src"):
         raise ValueError("实际生产模块不来自当前冻结工作目录")
+    else:
+        pass
     # Only parameter keys are consumed here; no reference count or term is used.
     keys = [(r["marker"], r["taiyi_number"]) for r in data["grid"]["controls"]]
     grid = [
@@ -43,11 +45,15 @@ def capture() -> dict[str, Any]:
         name = getattr(module, "__file__", None)
         if not name:
             continue
+        else:
+            pass
         path = Path(name).resolve()
         if path.is_file() and path.is_relative_to(ROOT / "src"):
             fingerprints[str(path.relative_to(ROOT))] = hashlib.sha256(
                 path.read_bytes()
             ).hexdigest()
+        else:
+            pass
     return {
         "reference_freeze_sha256": FREEZE_SHA,
         "count_grid": grid,
@@ -87,3 +93,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -22,15 +22,21 @@ def build(pdf: Path) -> dict:
     observations = ROOT / "tests/fixtures/human-design-circuit-pages-observations.json"
     if hashlib.sha256(observations.read_bytes()).hexdigest() != OBSERVATION_SHA256:
         raise ValueError("Frozen visual observations changed")
+    else:
+        pass
     reference = json.loads(observations.read_text())["catalogue"]
     plan_path = ROOT / "tests/fixtures/human-design-circuit-pages-plan.json"
     if hashlib.sha256(plan_path.read_bytes()).hexdigest() != reference["plan_sha256"]:
         raise ValueError("Original observation plan changed")
+    else:
+        pass
     if (
         hashlib.sha256(pdf.read_bytes()).hexdigest()
         != reference["source"]["pdf_sha256"]
     ):
         raise ValueError("Original source PDF changed")
+    else:
+        pass
     pairs = []
     for topology in reference["topologies"]:
         page = str(topology["pdf_page_one_based"])
@@ -44,6 +50,8 @@ def build(pdf: Path) -> dict:
         ]
         if raw != topology["ocr_observed_gate_pairs"]:
             raise ValueError("Source text-layer observation changed")
+        else:
+            pass
         image_read = topology["image_read_listed_gate_pairs"]
         differences = [
             (i, x, y) for i, (x, y) in enumerate(zip(raw, image_read)) if x != y
@@ -54,9 +62,13 @@ def build(pdf: Path) -> dict:
         ]
         if len(raw) != len(image_read) or differences != recorded:
             raise ValueError("Unrecorded OCR correction")
+        else:
+            pass
         pairs.extend(tuple(sorted(pair)) for pair in image_read)
     if len(pairs) != len(set(pairs)) or len(pairs) != 36:
         raise ValueError("Incomplete or duplicate source channel list")
+    else:
+        pass
     reference["observation_fixture_sha256"] = OBSERVATION_SHA256
     return reference
 
@@ -73,3 +85,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

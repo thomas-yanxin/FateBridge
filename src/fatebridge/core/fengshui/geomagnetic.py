@@ -2,21 +2,21 @@
 
 import math
 from copy import deepcopy
+from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import JsonValue, TypeAdapter
 from typing_extensions import TypedDict
 
+from fatebridge.core.fengshui.directions import bearing_context
+from fatebridge.core.fengshui.geomagnetic_inputs import GeomagneticReference
 from fatebridge.core.geomagnetic_field import (
     IMPLEMENTATION_ID,
     WmmCoefficient,
     wmm2025_field,
 )
-
-from .directions import bearing_context
-from .geomagnetic_inputs import GeomagneticReference
 
 
 class _GeomagneticRuleset(TypedDict):
@@ -85,8 +85,8 @@ def field_zone(horizontal_nt: float) -> str:
 
 def geomagnetic_reference(
     req: GeomagneticReference,
-    bearing_degrees: Optional[float] = None,
-    north_reference: Optional[Literal["magnetic", "true"]] = None,
+    bearing_degrees: float | None = None,
+    north_reference: Literal["magnetic", "true"] | None = None,
 ) -> GeomagneticResult:
     data = _bundle()
     value = wmm2025_field(
@@ -125,11 +125,22 @@ def geomagnetic_reference(
         if north_reference not in ("magnetic", "true"):
             raise ValueError("换算方位必须明确原始north_reference")
         target = "magnetic" if north_reference == "true" else "true"
-        angle = bearing_degrees + (-value.d if target == "magnetic" else value.d)
+        # Partition the exact sum of the supplied heading and delivered D.
+        # Rounding that sum first can move it onto a different sector edge.
+        angle = (
+            Fraction(bearing_degrees)
+            + (-Fraction(value.d) if target == "magnetic" else Fraction(value.d))
+        ) % 360
         conversion.update(
             status="model_candidate",
             input=bearing_context(bearing_degrees, north_reference),
             candidate=bearing_context(angle, target),
+            arithmetic_method="exact_binary64_heading_conversion_v1",
+            angle_exact={
+                "numerator": str(angle.numerator),
+                "denominator": str(angle.denominator),
+            },
+            classification_basis="supplied_heading_and_delivered_declination_before_display_rounding",
         )
     return {
         "calculation_status": "complete",

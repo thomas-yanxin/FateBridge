@@ -7,9 +7,9 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import sukuyo_dayan_reconstruction as model
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_historical_calendar import date_reference
+from fatebridge.core.sukuyo import sukuyo_dayan_reconstruction as model
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_historical_calendar import date_reference
 
 FIXTURE = Path(__file__).parents[1] / "data/sukuyo-dayan-model-all-months-v1.json.gz"
 
@@ -22,7 +22,7 @@ def project(value):
     }
 
 
-def test_complete1212_months_both_models_equal_before_code_reference_exactly():
+def test_complete1212_months_both_models_equal_before_code_reference_exactly() -> None:
     reference = json.loads(gzip.decompress(FIXTURE.read_bytes()))
     assert reference["reference_commit"] == "26751a8cce76b989680586e4b8ab15abb0ef3ad8"
     rows = reference["all_month_rows"]
@@ -55,7 +55,9 @@ def test_complete1212_months_both_models_equal_before_code_reference_exactly():
         assert not result["host_calendar_or_month_labels_independently_verified"]
 
 
-def test_all327_printed_rows_recomputed_without_replacing_decision_or_conflicts():
+def test_all327_printed_rows_recomputed_without_replacing_decision_or_conflicts() -> (
+    None
+):
     source = json.loads(
         (model.SOURCE.parent / "sukuyo_dayan_advance_2022.json").read_bytes()
     )
@@ -84,9 +86,11 @@ def test_all327_printed_rows_recomputed_without_replacing_decision_or_conflicts(
         if printed["row_number"] == 263:
             assert previous["author_proposed_day_shift_from_literal"] is None
             assert actual["remainder_units"]["numerator"] == 23
+        else:
+            pass
 
 
-def test_all1212_months_are_exposed_even_when_not_in_the327_row_table():
+def test_all1212_months_are_exposed_even_when_not_in_the327_row_table() -> None:
     reference = json.loads(gzip.decompress(FIXTURE.read_bytes()))
     for row in reference["all_month_rows"]:
         reference_date = date.fromordinal(row["host_ordinal"])
@@ -104,8 +108,8 @@ def test_all1212_months_are_exposed_even_when_not_in_the327_row_table():
 
 @pytest.mark.parametrize("change", ["drop_solar", "drop_lunar", "epoch", "rounding"])
 def test_source_coefficients_and_policy_changes_require_revalidation(
-    monkeypatch, tmp_path, change
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, change: str
+) -> None:
     data = json.loads(model.SOURCE.read_bytes())
     if change == "drop_solar":
         data["solar_rows"].pop()
@@ -123,17 +127,19 @@ def test_source_coefficients_and_policy_changes_require_revalidation(
 
 
 @pytest.mark.parametrize("ordinal,year", [(True, 768), (280000, False), (1.5, 768)])
-def test_selector_requires_explicit_integer_inputs(ordinal, year):
+def test_selector_requires_explicit_integer_inputs(
+    ordinal: bool | float | int, year: bool | int
+) -> None:
     with pytest.raises(ValueError, match="整数"):
         model.reconstruct_new_moon(ordinal, year)
 
 
-def test_midmonth_is_not_silently_reinterpreted_as_a_different_month_start():
+def test_midmonth_is_not_silently_reinterpreted_as_a_different_month_start() -> None:
     with pytest.raises(ValueError, match="三日"):
         model.reconstruct_new_moon(date(768, 8, 5).toordinal(), 768)
 
 
-def test_source_policy_values_are_not_a_physical_clock_or_a_calendar_override():
+def test_source_policy_values_are_not_a_physical_clock_or_a_calendar_override() -> None:
     calendar = calendar_mansion(
         "0806-07-23",
         "05:45:00",
@@ -177,8 +183,8 @@ def test_source_policy_values_are_not_a_physical_clock_or_a_calendar_override():
     ],
 )
 def test_scope_and_current_input_applicability_are_both_explained(
-    civil, basis, applied
-):
+    civil: str, basis: str, applied: bool
+) -> None:
     calendar = calendar_mansion(civil, "00:15:00", calendar_basis=basis)
     day = day_evidence(calendar)
     reference = day["calendar_day"]["clock_doctrine"][

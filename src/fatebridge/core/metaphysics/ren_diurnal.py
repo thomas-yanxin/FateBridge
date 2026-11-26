@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from ...utils.data import EARTHLY_BRANCHES
+from fatebridge.utils.data import EARTHLY_BRANCHES
 
 DAY_BRANCHES = "卯辰巳午未申"
 

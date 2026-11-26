@@ -25,7 +25,9 @@ pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
 
 @pytest.mark.parametrize("epoch", [2451545.0, 2460465.7716340744, 5373484.25])
 @pytest.mark.parametrize("delay", [0.0, 0.005003, 0.0123456789])
-def test_epoch_parts_recover_the_exact_binary_input_difference(epoch, delay):
+def test_epoch_parts_recover_the_exact_binary_input_difference(
+    epoch: float, delay: float
+) -> None:
     rounded, remainder = epoch_subtraction_remainder(epoch, delay)
     with localcontext() as context:
         context.prec = 80
@@ -35,7 +37,7 @@ def test_epoch_parts_recover_the_exact_binary_input_difference(epoch, delay):
 
 
 @pytest.mark.parametrize("epoch,delay", [(math.nan, 0.1), (1.0, -1), (1.0, math.inf)])
-def test_bad_epoch_or_delay_is_rejected(epoch, delay):
+def test_bad_epoch_or_delay_is_rejected(epoch, delay) -> None:
     with pytest.raises(EphemerisSourceError):
         epoch_subtraction_remainder(epoch, delay)
 
@@ -45,8 +47,8 @@ def test_bad_epoch_or_delay_is_rejected(epoch, delay):
     "body,epoch", [("Venus", 2460465.7716340744), ("Mercury", 2459891.96875)]
 )
 def test_near_sun_sampling_uses_a_stable_plateau_and_keeps_native_positions(
-    body, epoch, sidereal
-):
+    body: str, epoch: float, sidereal: bool
+) -> None:
     swe = runtime.swe
     with runtime.preserve_ephemeris_path():
         runtime.ephemeris_call("set_sid_mode", swe.SIDM_LAHIRI, 0.0, 0.0)
@@ -56,6 +58,8 @@ def test_near_sun_sampling_uses_a_stable_plateau_and_keeps_native_positions(
         model = runtime.ephemeris_model_from_retflag(returned)
         if model not in {"swieph", "jpl"}:
             pytest.skip("Physical Swiss/JPL data required for retarded-epoch audit")
+        else:
+            pass
         rate, policy = position_motion.complete_position_rate(
             body, epoch, original, model, sidereal=sidereal
         )
@@ -90,7 +94,9 @@ def test_near_sun_sampling_uses_a_stable_plateau_and_keeps_native_positions(
 
 
 @pytest.mark.parametrize("problem", ["frame", "model", "values", "configuration"])
-def test_auxiliary_states_cannot_drift_between_models_or_frames(problem, monkeypatch):
+def test_auxiliary_states_cannot_drift_between_models_or_frames(
+    problem: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     swe = runtime.swe
     original = runtime.ephemeris_call
     raw, returned = original(
@@ -99,6 +105,8 @@ def test_auxiliary_states_cannot_drift_between_models_or_frames(problem, monkeyp
     model = runtime.ephemeris_model_from_retflag(returned)
     if model not in {"swieph", "jpl"}:
         pytest.skip("Physical Swiss/JPL data required for retarded-epoch audit")
+    else:
+        pass
 
     def changed(operation, *args, **kwargs):
         values, flags = original(operation, *args, **kwargs)

@@ -4,18 +4,18 @@ This is a conservative conflict policy, not a new classical scoring system.
 Seasonal lookup and pattern presence remain conditional references.
 """
 
-from typing import Any, Dict, List, Literal, Tuple, TypedDict
+from typing import Any, Literal, TypedDict
 
 from typing_extensions import NotRequired
 
-from ..utils.data import (
+from fatebridge.core.classical import seasonal_climate_god
+from fatebridge.core.classical_from_child import build_from_child_reference
+from fatebridge.utils.data import (
     BRANCH_HIDDEN_STEMS,
     GENERATION_CYCLE,
     STEM_ELEMENTS,
     Element,
 )
-from .classical import seasonal_climate_god
-from .classical_from_child import build_from_child_reference
 
 
 class ClimateStemReference(TypedDict):
@@ -38,10 +38,10 @@ class PreferenceLayer(TypedDict):
 
 
 def resolve_useful_elements(
-    pillars: Dict[str, Tuple[str, str]],
-    element_analysis: Dict[str, Any],
-    structures: List[Dict[str, Any]],
-) -> Dict[str, Any]:
+    pillars: dict[str, tuple[str, str]],
+    element_analysis: dict[str, Any],
+    structures: list[dict[str, Any]],
+) -> dict[str, Any]:
     day_stem = pillars["day"][0]
     day_element = STEM_ELEMENTS[day_stem][0]
     day_master = element_analysis["day_master"]

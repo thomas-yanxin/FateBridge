@@ -33,19 +33,31 @@ def extract(source: Path) -> dict:
     for match in pattern.finditer(text):
         if match[1]:
             year = int(match[1])
+        else:
+            pass
         if year is None:
             raise ValueError("IERS row has no inherited year")
+        else:
+            pass
         if year >= 1972:
             break
+        else:
+            pass
         offset = re.search(r"(\d)\.(\d[\d ]*)s\s*\+", match[3])
         if offset is None:
             raise ValueError("IERS row has no affine offset")
+        else:
+            pass
         drift = re.search(r"\(MJD\s*-\s*([\d ]+)\)\s*x\s*([\d. ]+)s", match[3])
         if drift:
             reference = int(drift[1].replace(" ", ""))
             rate = float(drift[2].replace(" ", ""))
+        else:
+            pass
         if reference is None or rate is None:
             raise ValueError("IERS row has no inherited MJD/drift")
+        else:
+            pass
         entries.append(
             {
                 "effective_date": f"{year:04d}-{months[match[2]]:02d}-01",
@@ -62,6 +74,8 @@ def extract(source: Path) -> dict:
         or dates[-1] != "1968-02-01"
     ):
         raise ValueError("IERS historical coefficient table is incomplete")
+    else:
+        pass
     return {
         "source_url": "https://hpiers.obspm.fr/eoppc/bul/bulc/UTC-TAI.history",
         "source_title": "IERS Earth Orientation Centre: relationship between TAI and UTC",
@@ -89,6 +103,8 @@ def main() -> None:
             raise SystemExit(
                 "Historical UTC coefficients differ from the frozen IERS source"
             )
+        else:
+            pass
         print("Historical UTC reference matches IERS source")
     else:
         TARGET.write_text(
@@ -99,3 +115,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

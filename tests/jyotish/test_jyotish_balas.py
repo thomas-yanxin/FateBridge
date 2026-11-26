@@ -9,8 +9,8 @@ import pytest
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish import build_india, positions
-from fatebridge.core.jyotish_balas import (
+from fatebridge.core.jyotish.jyotish import build_india, positions
+from fatebridge.core.jyotish.jyotish_balas import (
     PLANETS,
     aspect_strength,
     aspect_value,
@@ -18,7 +18,7 @@ from fatebridge.core.jyotish_balas import (
     directional_strength,
     natural_strength,
 )
-from fatebridge.core.jyotish_evidence import strength_context, strength_text
+from fatebridge.core.jyotish.jyotish_evidence import strength_context
 from tests.fixtures.surface_payloads import astro_payload
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
@@ -29,16 +29,18 @@ ORACLE = json.loads((FIXTURES / "jyotish-balas-reference.json").read_text())
 @pytest.mark.parametrize(
     "angle,expected", tuple(zip(PRIMARY["base_angles"], PRIMARY["base_virupa"]))
 )
-def test_primary_ordinary_aspect_table(angle, expected):
+def test_primary_ordinary_aspect_table(angle, expected) -> None:
     assert aspect_value("Sun", 0, angle)["value"] == expected
 
 
 @pytest.mark.parametrize("planet,angle,expected", PRIMARY["special_cases"])
-def test_literal_special_additions_without_invented_sixty_cap(planet, angle, expected):
+def test_literal_special_additions_without_invented_sixty_cap(
+    planet, angle, expected
+) -> None:
     assert aspect_value(planet, 0, angle)["value"] == expected
 
 
-def test_directed_angles_match_primary_book_pairs_and_are_not_symmetric():
+def test_directed_angles_match_primary_book_pairs_and_are_not_symmetric() -> None:
     data = PRIMARY["raman_directed_example53"]
     for aspector, target, (degrees, minutes) in data["pair_examples"]:
         a = sum(
@@ -55,7 +57,9 @@ def test_directed_angles_match_primary_book_pairs_and_are_not_symmetric():
     assert aspect_value("Sun", 75, 0)["value"] == 7.5
 
 
-def test_partition_sides_use_exact_input_ratios_and_keep_special_discontinuities():
+def test_partition_sides_use_exact_input_ratios_and_keep_special_discontinuities() -> (
+    None
+):
     for longitude in [60.0, 90.0, 120.0, 150.0, 180.0, 210.0, 240.0, 270.0, 300.0]:
         left = math.nextafter(longitude, -math.inf)
         assert directed_angle(0, left) < Fraction(longitude)
@@ -70,7 +74,7 @@ def test_partition_sides_use_exact_input_ratios_and_keep_special_discontinuities
         aspect_value("Rahu", 0, 180)
 
 
-def test_directional_hand_arithmetic_uses_cardinal_points_and_folds_wrap():
+def test_directional_hand_arithmetic_uses_cardinal_points_and_folds_wrap() -> None:
     row = PRIMARY["zero_asc_90_mc_diagonal"]
     result = directional_strength(
         {"ascendant": 0.0, "midheaven": 90.0, "longitudes": row["longitudes"]}
@@ -105,7 +109,9 @@ def test_directional_hand_arithmetic_uses_cardinal_points_and_folds_wrap():
         assert directional_strength(raw)["summary"][planet] == 0
 
 
-def test_natural_coefficients_follow_primary_exact_sevenths_without_false_photometry():
+def test_natural_coefficients_follow_primary_exact_sevenths_without_false_photometry() -> (
+    None
+):
     result = natural_strength()
     for planet, numerator in PRIMARY["natural_exact_numerators_over7"].items():
         assert result["summary"][planet] == float(Fraction(numerator, 7))
@@ -113,7 +119,9 @@ def test_natural_coefficients_follow_primary_exact_sevenths_without_false_photom
     assert set(result["summary"]) == set(PLANETS)
 
 
-def test_conditional_nature_results_keep_negative_values_and_unknown_separate_from_zero():
+def test_conditional_nature_results_keep_negative_values_and_unknown_separate_from_zero() -> (
+    None
+):
     case = PRIMARY["hand_conditional_case"]
     result = aspect_strength(case["longitudes"])
     assert result["summary"]["Sun"] is None
@@ -138,7 +146,7 @@ def test_conditional_nature_results_keep_negative_values_and_unknown_separate_fr
     assert len(zero["scenarios"]) == 4
 
 
-def test_drik_rounding_cannot_turn_distinct_nature_sums_into_consensus():
+def test_drik_rounding_cannot_turn_distinct_nature_sums_into_consensus() -> None:
     target = math.nextafter(30.0, math.inf)
     chart = dict.fromkeys(PLANETS, target)
     chart.update(Mercury=0.0, Jupiter=210.0)
@@ -149,7 +157,6 @@ def test_drik_rounding_cannot_turn_distinct_nature_sums_into_consensus():
     assert "Sun" in result["conditional_targets"]
     context = strength_context("drik_bala", "Sun", result)
     assert context["value_status"] == "conditional_results"
-    assert "未舍入值有差异" in strength_text(context)
 
     chart["Sun"] = 30.0
     result = aspect_strength(chart)
@@ -166,7 +173,9 @@ def test_drik_rounding_cannot_turn_distinct_nature_sums_into_consensus():
         (270, ["benefic", "malefic"]),
     ],
 )
-def test_phase_boundaries_preserve_conditional_classification(moon, options):
+def test_phase_boundaries_preserve_conditional_classification(
+    moon: int, options
+) -> None:
     result = aspect_strength({**dict.fromkeys(PLANETS, 0.0), "Moon": float(moon)})
     assert result["nature_context"]["moon_options"] == options
     assert len(result["scenarios"]) == len(options) * 2
@@ -174,8 +183,8 @@ def test_phase_boundaries_preserve_conditional_classification(moon, options):
 
 @pytest.mark.parametrize("case", ORACLE["examples"])
 def test_balas_against_isolated_pyjhora_with_unfolded_method_failure_retained(
-    case, monkeypatch, tmp_path
-):
+    case, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     y, m, d = case["date"]
     h, minute, _ = case["time"]
@@ -226,15 +235,20 @@ def test_balas_against_isolated_pyjhora_with_unfolded_method_failure_retained(
             assert actual_dig["summary"][p] == pytest.approx(
                 120 - value, abs=0.0051, rel=0
             )
+        else:
+            pass
 
 
-def test_integrated_missing_branches_and_same_grid_sensitivity_are_explicit():
+def test_integrated_missing_branches_and_same_grid_sensitivity_are_explicit() -> None:
     india = build_india(
-        build_astro_birth_info(**astro_payload()), birth_time_uncertainty_minutes=1
+        build_astro_birth_info(**astro_payload()),
+        birth_time_uncertainty_minutes=1,
+        cheshta_model="unadjudicated",
     )
     strengths = india["strengths"]
     assessment = strengths["shadbala_assessment"]
     assert assessment["total_virupa"] is None
+    assert "shadbala_summary" not in strengths
     assert "cheshta_bala_five_star_mean_model" in assessment["missing"]
     assert assessment["conditional"] == ["drik_bala", "kala_bala"]
     assert assessment["partial"] == ["cheshta_bala"]
@@ -250,7 +264,7 @@ def test_integrated_missing_branches_and_same_grid_sensitivity_are_explicit():
             assert band["sample_count"] == 5
 
 
-def test_midheaven_against_independent_meridian_ecliptic_intersection():
+def test_midheaven_against_independent_meridian_ecliptic_intersection() -> None:
     # Shared sidereal-time/obliquity inputs; independent spherical construction
     # checks returned MC/axis choice, not an independent astronomical ephemeris.
     for longitude, latitude in [

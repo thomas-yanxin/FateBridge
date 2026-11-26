@@ -13,15 +13,18 @@ from fastmcp import Client
 from pydantic import ValidationError
 
 import fatebridge.api as api
+from fatebridge.application.examples import suggested_fields
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_sanshi import SanshiSynthesis
 from fatebridge.core.metaphysics import liureng, sanshi_correspondences
-from fatebridge.core.output_sanshi import SanshiSynthesis
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi import audit_taiyi_dangshi_case as source_audit
 from scripts.taiyi.audit_taiyi_dangshi_case import audit
 from scripts.taiyi.audit_taiyi_dangshi_case import source_readings as readings
+from tests.support.transports import call_calculation
+from tests.unit_test.fixtures.taiyi import same_run_payload
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/taiyi_dangshi_case_v41"
@@ -40,8 +43,8 @@ FREEZE = "aa2c0929a54a50f68b162cd7210e758b8b92a3f4036b858da3bad4ca8fe0b13f"
     ],
 )
 def test_original_source_chain_rejects_replacement_and_coordinated_rehash(
-    tmp_path, monkeypatch, fault
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fault: str
+) -> None:
     noble_name = "tests/fixtures/taiyi_dangshi_noble_v40"
     case_name = "tests/fixtures/taiyi_dangshi_case_v41"
     for name in (noble_name, case_name):
@@ -53,6 +56,8 @@ def test_original_source_chain_rejects_replacement_and_coordinated_rehash(
             if not target.exists():
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(ROOT / path, target)
+            else:
+                pass
     corpus = tmp_path / case_name
     noble = tmp_path / noble_name
     manifest = json.loads((corpus / "freeze.json").read_text())
@@ -85,7 +90,7 @@ def test_original_source_chain_rejects_replacement_and_coordinated_rehash(
         readings(corpus)
 
 
-def test_corner_lists_both_actual_branches_without_selecting_a_god():
+def test_corner_lists_both_actual_branches_without_selecting_a_god() -> None:
     source = readings()
     board = {"twelve_board": source["manual_conditional_board_expected"]}
     helper = getattr(sanshi_correspondences, "liuren_at_taiyi_palace", None)
@@ -97,7 +102,9 @@ def test_corner_lists_both_actual_branches_without_selecting_a_god():
     assert [r["god"] for r in row["sector_candidates"]] == ["勾陈", "青龙"]
 
 
-def test_pure_ren_layout_can_use_the_source_context_without_inventing_a_ce_date():
+def test_pure_ren_layout_can_use_the_source_context_without_inventing_a_ce_date() -> (
+    None
+):
     source = readings()
     helper = getattr(liureng, "twelve_god_layout", None)
     assert helper is not None
@@ -119,7 +126,9 @@ def test_pure_ren_layout_can_use_the_source_context_without_inventing_a_ce_date(
 @pytest.mark.parametrize(
     "number,branches", [(1, "戌亥"), (3, "丑寅"), (7, "未申"), (9, "辰巳")]
 )
-def test_all_four_corners_preserve_both_branches_and_actual_paths(number, branches):
+def test_all_four_corners_preserve_both_branches_and_actual_paths(
+    number: int, branches: str
+) -> None:
     source = readings()
     rows = list(reversed(source["manual_conditional_board_expected"]))
     original = deepcopy(rows)
@@ -138,7 +147,7 @@ def test_all_four_corners_preserve_both_branches_and_actual_paths(number, branch
 
 @pytest.mark.parametrize("branch", list("丑寅辰巳未申戌亥"))
 @pytest.mark.parametrize("failure", ["missing", "duplicate"])
-def test_either_bad_corner_branch_rejects_the_join(branch, failure):
+def test_either_bad_corner_branch_rejects_the_join(branch, failure: str) -> None:
     rows = deepcopy(readings()["manual_conditional_board_expected"])
     number = next(
         n
@@ -152,7 +161,7 @@ def test_either_bad_corner_branch_rejects_the_join(branch, failure):
 
 
 @pytest.mark.parametrize("number,branch", [(8, "子"), (4, "卯"), (2, "午"), (6, "酉")])
-def test_cardinal_is_still_one_exact_actual_row(number, branch):
+def test_cardinal_is_still_one_exact_actual_row(number: int, branch: str) -> None:
     rows = readings()["manual_conditional_board_expected"]
     result = sanshi_correspondences.liuren_at_taiyi_palace(
         number, {"twelve_board": rows}
@@ -165,13 +174,15 @@ def test_cardinal_is_still_one_exact_actual_row(number, branch):
     }
 
 
-def test_center_keeps_no_branch_candidates_or_lodging():
+def test_center_keeps_no_branch_candidates_or_lodging() -> None:
     result = sanshi_correspondences.liuren_at_taiyi_palace(5, {"twelve_board": []})
     assert result == {"status": "not_assessed", "reason": "中宫无直接地支，不自动寄坤"}
 
 
 @pytest.mark.parametrize("number", [True, False, "9", None, 0, 10])
-def test_bad_palace_does_not_coerce_to_a_branch(number):
+def test_bad_palace_does_not_coerce_to_a_branch(
+    number: bool | int | str | None,
+) -> None:
     with pytest.raises(ValueError, match="实际太乙宫数"):
         sanshi_correspondences.liuren_at_taiyi_palace(number, {"twelve_board": []})
 
@@ -187,7 +198,9 @@ def test_bad_palace_does_not_coerce_to_a_branch(number):
         ("guiren_profile", "best"),
     ],
 )
-def test_pure_layout_requires_explicit_symbolic_conditions(field, value):
+def test_pure_layout_requires_explicit_symbolic_conditions(
+    field: str, value: int | str | None
+) -> None:
     args = dict(
         hour_branch="寅", month_general_branch="卯", day_stem="庚", is_diurnal=True
     )
@@ -196,7 +209,7 @@ def test_pure_layout_requires_explicit_symbolic_conditions(field, value):
         liureng.twelve_god_layout(**args)
 
 
-def test_source_case_preserves_edition_difference_and_unselected_lodging():
+def test_source_case_preserves_edition_difference_and_unselected_lodging() -> None:
     report = audit()
     assert report["source_freeze_sha256"] == FREEZE
     assert report["core_matching_rows"] == len(report["core_rows"]) == 10
@@ -222,7 +235,7 @@ def test_source_case_preserves_edition_difference_and_unselected_lodging():
     assert report["new_complete_dated_joint_cases_passed"] == 0
 
 
-def test_collation_keeps_the_facsimile_variant_separate_from_an_emendation():
+def test_collation_keeps_the_facsimile_variant_separate_from_an_emendation() -> None:
     review = audit()["source_collation"]
     variant = review["literal_variant"]
     assert review["source_case_freeze_sha256"] == FREEZE
@@ -238,7 +251,7 @@ def test_collation_keeps_the_facsimile_variant_separate_from_an_emendation():
     assert witnesses["siku_same_leaf_parallel"]["literal"] == "常侍玄命在天空"
 
 
-def test_known_case_reverse_constraints_never_select_a_production_lodging():
+def test_known_case_reverse_constraints_never_select_a_production_lodging() -> None:
     report = audit()
     review = report["source_collation"]["lodging_review"]
     assert review["unrepresented_palaces"] == [1, 3, 5]
@@ -250,6 +263,8 @@ def test_known_case_reverse_constraints_never_select_a_production_lodging():
                 control["control_role"] == "predeclared_modern_night_negative_control"
             )
             continue
+        else:
+            pass
         assert control["control_role"] == "explicit_source_morning_condition"
         ming, siku = control["editions"]
         # Read the existing hand board: 巳→午/青龙, 申→酉/太常,
@@ -274,8 +289,8 @@ def test_known_case_reverse_constraints_never_select_a_production_lodging():
 
 @pytest.mark.parametrize("fault", ["case_commitment", "page_commitment", "literal"])
 def test_collation_rejects_rebound_sources_and_silent_literal_correction(
-    tmp_path, monkeypatch, fault
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fault: str
+) -> None:
     source = readings()
     shutil.copyfile(CORPUS / "freeze-original.json", tmp_path / "freeze-original.json")
     review = json.loads((CORPUS / "collation.json").read_text())
@@ -304,7 +319,9 @@ def actual():
     )
 
 
-def test_actual_snapshot_and_export_keep_both_candidates_and_the_limitation(actual):
+def test_actual_snapshot_and_export_keep_both_candidates_and_the_limitation(
+    actual,
+) -> None:
     SanshiSynthesis.model_validate(actual["synthesis"])
     section = next(
         s for s in actual["snapshot_export"]["sections"] if s["title"] == "三式宫位对应"
@@ -331,17 +348,21 @@ def test_actual_snapshot_and_export_keep_both_candidates_and_the_limitation(actu
     )
 
 
-def test_join_reads_modified_actual_facts_instead_of_recalculating_or_ranking(actual):
+def test_join_reads_modified_actual_facts_instead_of_recalculating_or_ranking(
+    actual,
+) -> None:
     ren = deepcopy(actual["liureng"])
     for row in ren["twelve_board"]:
         if row["earth_branch"] == "辰":
             row["god"] = "独立算路检验值"
+        else:
+            pass
     row = sanshi_correspondences.liuren_at_taiyi_palace(9, ren)
     assert [c["god"] for c in row["sector_candidates"]][0] == "独立算路检验值"
     assert row["status"] == "not_assessed" and "god" not in row
 
 
-def test_projection_rejects_bad_candidate_types():
+def test_projection_rejects_bad_candidate_types() -> None:
     with pytest.raises(ValidationError):
         SanshiSynthesis.model_validate(
             {
@@ -357,8 +378,11 @@ def test_projection_rejects_bad_candidate_types():
 @pytest.mark.parametrize("profile", ["liuren_common_v1", "tanyuan_xieji_v1"])
 @pytest.mark.parametrize("mode", ["year", "hour"])
 def test_sector_candidates_survive_rest_mcp_cli_projection(
-    monkeypatch, capsys, profile, mode
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    profile: str,
+    mode: str,
+) -> None:
     spec = next(s for s in CATALOG if s.key == "sanshiunited")
     fields = ["synthesis.palace_correspondences", "synthesis.time_scopes"]
     payload = dict(
@@ -398,14 +422,17 @@ def test_sector_candidates_survive_rest_mcp_cli_projection(
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                "sanshiunited", {**payload, **opts}, raise_on_error=False
+            result = await call_calculation(
+                client,
+                "sanshi_combined_chart",
+                {**payload, **opts},
+                raise_on_error=False,
             )
             assert not result.is_error, result
             return result.structured_content
 
     protocol = asyncio.run(invoke())
-    argv = ["sanshiunited"]
+    argv = ["sanshi_combined_chart"]
     for key, value in payload.items():
         argv += [
             "--" + key.replace("_", "-"),
@@ -434,16 +461,15 @@ def test_sector_candidates_survive_rest_mcp_cli_projection(
 
 
 @pytest.mark.parametrize("profile", ["liuren_common_v1", "tanyuan_xieji_v1"])
-def test_default_mcp_budget_keeps_same_run_sector_candidates(profile):
-    from fatebridge.application.examples import suggested_fields
-    from tests.taiyi.test_taiyi_transports import _same_run_payload
+def test_default_mcp_budget_keeps_same_run_sector_candidates(profile: str) -> None:
 
     spec = next(s for s in CATALOG if s.key == "sanshiunited")
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                "sanshiunited",
+            result = await call_calculation(
+                client,
+                "sanshi_combined_chart",
                 dict(
                     date="2026-06-21",
                     time="17:00:02",
@@ -457,7 +483,7 @@ def test_default_mcp_budget_keeps_same_run_sector_candidates(profile):
                 ),
                 raise_on_error=False,
             )
-            body = await _same_run_payload(client, result)
+            body = await same_run_payload(client, result)
             entries = body["synthesis"]["palace_correspondences"]["entries"]
             assert any(
                 len(r["liureng"].get("sector_candidates", [])) == 2 for r in entries

@@ -2,6 +2,9 @@
 
 import json
 import struct
+from http.client import parse_headers
+from io import BytesIO
+from pathlib import Path
 
 import pytest
 
@@ -46,8 +49,8 @@ def source_bytes():
 
 
 def test_preparation_copies_every_original_record_and_retains_guards(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     original = source_bytes()
     calls = []
 
@@ -99,13 +102,15 @@ def test_preparation_copies_every_original_record_and_retains_guards(
 
 
 def test_failed_download_preserves_manifest_without_installing_source(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     original = source_bytes()
 
     def failing(start, size, etag=None):
         if start:
             raise OSError("interrupted original source transfer")
+        else:
+            pass
         return original[:size], {
             "ETag": '"source-object"',
             "Content-Range": f"bytes 0-{size - 1}/{len(original)}",
@@ -122,8 +127,38 @@ def test_failed_download_preserves_manifest_without_installing_source(
     assert not output.exists()
 
 
-@pytest.mark.parametrize("fault", ["status", "range", "etag", "short"])
-def test_original_http_range_cannot_silently_become_another_object(monkeypatch, fault):
+@pytest.mark.parametrize("content_range", ["bytes 0-15/100", "BYTES 00-015/0100"])
+def test_original_http_range_accepts_valid_spelling_variants(
+    monkeypatch: pytest.MonkeyPatch, content_range: str
+) -> None:
+    class Response(BytesIO):
+        status = 206
+        headers = parse_headers(
+            BytesIO(
+                f"content-range: {content_range}\r\n".encode() + b'eTAG: "source"\r\n'
+                b"Content-Type: application/octet-stream\r\n\r\n"
+            )
+        )
+
+    monkeypatch.setattr(
+        prepare.urllib.request, "urlopen", lambda *args, **kwargs: Response(b"x" * 16)
+    )
+    assert prepare.source_range(0, 16, '"source"') == (
+        b"x" * 16,
+        {
+            "Content-Range": content_range,
+            "ETag": '"source"',
+            "Content-Type": "application/octet-stream",
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "fault", ["status", "range", "extent", "malformed_extent", "etag", "short"]
+)
+def test_original_http_range_cannot_silently_become_another_object(
+    monkeypatch: pytest.MonkeyPatch, fault: str
+) -> None:
     class Response:
         status = 206
         headers = {"Content-Range": "bytes 0-15/100", "ETag": '"source"'}
@@ -143,8 +178,14 @@ def test_original_http_range_cannot_silently_become_another_object(monkeypatch, 
         response.status = 200
     elif fault == "range":
         response.headers["Content-Range"] = "bytes 16-31/100"
+    elif fault == "extent":
+        response.headers["Content-Range"] = "bytes 0-15/15"
+    elif fault == "malformed_extent":
+        response.headers["Content-Range"] = "bytes 0-15/100/extra"
     elif fault == "etag":
         response.headers["ETag"] = '"different"'
+    else:
+        pass
     monkeypatch.setattr(
         prepare.urllib.request, "urlopen", lambda *args, **kwargs: response
     )
@@ -164,8 +205,8 @@ def test_original_http_range_cannot_silently_become_another_object(monkeypatch, 
     ],
 )
 def test_full_file_and_span_cli_parameters_are_explicitly_separated(
-    monkeypatch, arguments
-):
+    monkeypatch: pytest.MonkeyPatch, arguments
+) -> None:
     monkeypatch.setattr(
         prepare.urllib.request,
         "urlopen",

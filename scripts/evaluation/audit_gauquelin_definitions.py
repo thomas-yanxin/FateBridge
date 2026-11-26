@@ -7,6 +7,16 @@ the previous methods0..2 numerically unchanged, not source agreement.
 
 from __future__ import annotations
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import gzip
 import hashlib
@@ -15,8 +25,8 @@ from collections import Counter
 from pathlib import Path
 
 from fatebridge.core.astro import runtime
-from fatebridge.validation.gauquelin import decode_final3, method_profile
 from scripts.evaluation.audit_gauquelin_cfepp import native_sector
+from validation.gauquelin import decode_final3, method_profile
 
 ROOT = Path(__file__).resolve().parents[2]
 PROTOCOL = ROOT / "tests/fixtures/gauquelin-definitions-protocol.json"
@@ -31,27 +41,39 @@ def read_baseline(data: bytes) -> tuple[dict, str]:
     policy_bytes = BASELINE_POLICY.read_bytes()
     if hashlib.sha256(policy_bytes).hexdigest() != BASELINE_POLICY_SHA256:
         raise ValueError("frozen_platform_baseline_policy_hash_mismatch")
+    else:
+        pass
     approved = json.loads(policy_bytes)["baselines"]
     if data.startswith(b"\x1f\x8b"):
         data = gzip.decompress(data)
+    else:
+        pass
     digest = hashlib.sha256(data).hexdigest()
     if digest not in approved.values():
         raise ValueError("frozen_baseline_hash_mismatch")
+    else:
+        pass
     return json.loads(data), digest
 
 
 def compare(data: bytes, baseline: dict, baseline_sha256: str) -> dict:
     if runtime.swe is None:
         raise RuntimeError("Swiss Ephemeris required; no approximate substitute")
+    else:
+        pass
     protocol_bytes = PROTOCOL.read_bytes()
     if hashlib.sha256(protocol_bytes).hexdigest() != PROTOCOL_SHA256:
         raise ValueError("frozen_definitions_protocol_hash_mismatch")
+    else:
+        pass
     protocol = json.loads(protocol_bytes)
     parameters = protocol["request_parameters"]
     source = decode_final3(data)
     old = {row["case_id"]: row for row in baseline["rows"]}
     if list(old) != [row["case_id"] for row in source]:
         raise ValueError("baseline_source_identity_mismatch")
+    else:
+        pass
     rows = []
     for row in source:
         result = {
@@ -61,8 +83,12 @@ def compare(data: bytes, baseline: dict, baseline_sha256: str) -> dict:
         if row["issues"]:
             rows.append(result)
             continue
+        else:
+            pass
         if old[row["case_id"]]["source_line_sha256"] != row["source_line_sha256"]:
             raise ValueError("baseline_source_line_mismatch")
+        else:
+            pass
         dt = row["universal"]
         jd = float(
             runtime.ephemeris_call(
@@ -102,6 +128,8 @@ def compare(data: bytes, baseline: dict, baseline_sha256: str) -> dict:
                         "distance_to_12_sector_boundary",
                     )
                 )
+            else:
+                pass
         rows.append(result)
     cohorts = {}
     for cohort in ("published_1066", "supplementary_54"):
@@ -185,6 +213,8 @@ def main() -> int:
     args = parser.parse_args()
     if args.output.exists():
         raise FileExistsError("Output must not exist; preserve earlier diagnostics")
+    else:
+        pass
     baseline, baseline_sha256 = read_baseline(args.baseline.read_bytes())
     result = compare(args.source.read_bytes(), baseline, baseline_sha256)
     args.output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n")
@@ -211,3 +241,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

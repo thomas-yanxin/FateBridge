@@ -136,6 +136,17 @@ PREFERRED = {
 }
 
 
+# Verified city names keyed by GeoNames populated-place ID.
+# UNGEGN City Details 178; GeoNames 2028462 alternate names.
+WORLD_CITY_ALIASES = {
+    "GN:2028462": ("Ulaanbaatar", "Улаанбаатар"),
+    # Government of Jersey, Government Services in Union Street.
+    "GN:3042091": ("St Helier",),
+    # Guernsey Economic & Financial Crime Bureau, contact address.
+    "GN:3042287": ("St Peter Port",),
+}
+
+
 def dump(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
 
@@ -152,6 +163,8 @@ def gcj02_to_wgs84(lon: float, lat: float) -> tuple[float, float]:
     """
     if not (72.004 <= lon <= 137.8347 and 0.8293 <= lat <= 55.8271):
         return lon, lat
+    else:
+        pass
 
     def offset(xlon: float, ylat: float) -> tuple[float, float]:
         x, y = xlon - 105, ylat - 35
@@ -194,6 +207,8 @@ def gcj02_to_wgs84(lon: float, lat: float) -> tuple[float, float]:
         guess_lat -= ey
         if max(abs(ex), abs(ey)) < 1e-9:
             break
+        else:
+            pass
     return round(guess_lon, 6), round(guess_lat, 6)
 
 
@@ -235,16 +250,24 @@ def build(source: Path) -> None:
         prefix = int(row["id"][:2])
         if prefix > 82 or prefix == 71:
             continue
+        else:
+            pass
         code = row["ext_id"][:6]
         if code in {"110100", "120100", "310100", "500100", "500200"}:
             continue
+        else:
+            pass
         key = f"CN:{code}"
         if key in china:
             continue
+        else:
+            pass
         if code.endswith("0000"):
             level = "municipality" if prefix in {11, 12, 31, 50} else "province"
             if prefix in {81, 82}:
                 level = "special_region"
+            else:
+                pass
             parent = None
         elif code.endswith("00"):
             level, parent = "city", f"CN:{code[:2]}0000"
@@ -255,9 +278,13 @@ def build(source: Path) -> None:
             parent = f"CN:{pcode}" if pcode != code else f"CN:{code[:2]}0000"
             if pcode in {"110100", "120100", "310100", "500100", "500200"}:
                 parent = f"CN:{code[:2]}0000"
+            else:
+                pass
         full, short = row["ext_name"], row["name"]
         if full.endswith("市"):
             short = full[:-1]
+        else:
+            pass
         canonical = short if level != "county" or full.endswith("市") else full
         old = legacy_by_name.get(short) or legacy_by_name.get(full)
         aliases = [full, short, row["pinyin"], row["pinyin"].replace(" ", "")]
@@ -269,9 +296,13 @@ def build(source: Path) -> None:
                 for a in old["aliases"]
                 if a in {full, short} or a not in current_names
             ]
+        else:
+            pass
         raw = points[row["id"]]["geo"]
         if raw == "EMPTY":
             raise ValueError(f"Missing Chinese coordinate: {key} {full}")
+        else:
+            pass
         lon, lat = map(float, raw.split())
         wlon, wlat = gcj02_to_wgs84(lon, lat)
         china[key] = dict(
@@ -304,6 +335,8 @@ def build(source: Path) -> None:
     for r in china.values():
         if r["parent"] not in china and r["parent"] is not None:
             r["parent"] = f"CN:{r['id'][3:5]}0000"
+        else:
+            pass
 
     tw = geonames(source / "TW.zip", "TW.txt")
     tw_admin = [r for r in tw if r[7] in {"ADM2", "ADM3"}]
@@ -336,6 +369,8 @@ def build(source: Path) -> None:
         full = next((a for a in chinese if a.endswith(suffixes)), None)
         if full is None:
             raise ValueError(f"Missing Taiwan administrative name: {row[:4]}")
+        else:
+            pass
         short = full[:-1]
         city = row[7] == "ADM2" and full.endswith("市")
         canonical = short if city else full
@@ -354,11 +389,17 @@ def build(source: Path) -> None:
             ]
             if seats:
                 point = max(seats, key=lambda r: int(r[14]))
+            else:
+                pass
+        else:
+            pass
         # Historical names such as 臺灣省 for New Taipei would corrupt parent
         # matching. Only use current Chinese administrative names here.
         aliases = [full, *([short] if len(short) > 1 else []), row[1], row[2]]
         if canonical in legacy_by_name:
             aliases += legacy_by_name[canonical]["aliases"]
+        else:
+            pass
         china[f"GN:{row[0]}"] = dict(
             id=f"GN:{row[0]}",
             canonical_name=canonical,
@@ -385,6 +426,8 @@ def build(source: Path) -> None:
                 continent=r[8],
                 aliases=variants([r[0], r[1], r[4], COUNTRY_ZH.get(r[0], "")]),
             )
+        else:
+            pass
     countries["US"]["aliases"] += ["USA", "United States of America", "美國"]
     countries["GB"]["aliases"] += ["UK", "Great Britain", "英國"]
     countries["CN"]["aliases"] += ["中国", "中國", "中华人民共和国", "PRC"]
@@ -417,6 +460,8 @@ def build(source: Path) -> None:
     for r in rows:
         if r[0] not in selected:
             continue
+        else:
+            pass
         aliases = [
             r[1],
             r[2],
@@ -424,10 +469,13 @@ def build(source: Path) -> None:
         ]
         canonical = r[1]
         key = f"GN:{r[0]}"
+        aliases.extend(WORLD_CITY_ALIASES.get(key, ()))
         for name, preferred in PREFERRED.items():
             if key == preferred and name in legacy_by_name:
                 canonical = name
                 aliases += legacy_by_name[name]["aliases"]
+            else:
+                pass
         world.append(
             dict(
                 id=key,
@@ -455,6 +503,8 @@ def build(source: Path) -> None:
     for old in legacy:
         if old["level"] == "province":
             continue
+        else:
+            pass
         candidates = [
             r
             for r in [*china.values(), *world]
@@ -463,6 +513,8 @@ def build(source: Path) -> None:
         ]
         if len(candidates) == 1:
             preferred_aliases[old["canonical_name"]] = candidates[0]["id"]
+        else:
+            pass
     for filename, records in (
         ("china.json", list(china.values())),
         ("world.json", world),
@@ -546,24 +598,38 @@ def audit() -> None:
     for filename, expected in manifest["files"].items():
         if digest(DEST / filename) != expected:
             raise ValueError(f"Catalog checksum mismatch: {filename}")
+        else:
+            pass
     records = json.loads(
         (DEST / "china.json").read_text(encoding="utf-8")
     ) + json.loads((DEST / "world.json").read_text(encoding="utf-8"))
     ids = {r["id"] for r in records}
     if len(ids) != len(records):
         raise ValueError("Duplicate place IDs")
+    else:
+        pass
     for r in records:
         if not (-180 <= r["longitude"] <= 180 and -90 <= r["latitude"] <= 90):
             raise ValueError(f"Invalid coordinate: {r['id']}")
+        else:
+            pass
         lookup_timezone(r["timezone"])
         if r["parent"] is not None and r["parent"] not in ids:
             raise ValueError(f"Missing parent: {r['id']}")
+        else:
+            pass
         if not r["aliases"]:
             raise ValueError(f"Missing aliases: {r['id']}")
+        else:
+            pass
         if r["source"] == "areacity":
             expected_lon, expected_lat = gcj02_to_wgs84(*r["source_coordinates"])
             if (r["longitude"], r["latitude"]) != (expected_lon, expected_lat):
                 raise ValueError(f"Coordinate conversion drift: {r['id']}")
+            else:
+                pass
+        else:
+            pass
     cn = [r for r in records if r["source"] == "areacity" and int(r["id"][3:5]) < 71]
     codes = sorted(
         r["id"][3:]
@@ -572,8 +638,12 @@ def audit() -> None:
     )
     if codes != manifest["mainland_county_city_codes"] or len(codes) != 397:
         raise ValueError("Incomplete mainland county-city coverage")
+    else:
+        pass
     if sum(r["level"] == "city" for r in cn) != 333:
         raise ValueError("Incomplete mainland prefecture coverage")
+    else:
+        pass
     by_id = {r["id"]: r for r in records}
     for r in records:
         seen = {r["id"]}
@@ -581,6 +651,8 @@ def audit() -> None:
         while parent is not None:
             if parent in seen:
                 raise ValueError(f"Cyclic hierarchy: {r['id']}")
+            else:
+                pass
             seen.add(parent)
             parent = by_id[parent]["parent"]
     world = [r for r in records if r["country"] != "CN"]
@@ -601,6 +673,8 @@ def audit() -> None:
     )
     if actual_counts != manifest["counts"]:
         raise ValueError("Catalog count manifest is stale")
+    else:
+        pass
     counts = Counter(
         "AM" if r["continent"] in {"NA", "SA"} else r["continent"] for r in world
     )
@@ -610,6 +684,8 @@ def audit() -> None:
         or min(counts.values()) < 30
     ):
         raise ValueError("Insufficient five-continent coverage")
+    else:
+        pass
     print(json.dumps(manifest["counts"], ensure_ascii=False, indent=2))
 
 
@@ -634,3 +710,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

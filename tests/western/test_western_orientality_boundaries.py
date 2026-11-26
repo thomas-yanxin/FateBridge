@@ -9,9 +9,9 @@ import pytest
 from jsonschema import Draft202012Validator
 
 import fatebridge.core.classical_western as classical
-import fatebridge.core.output_charts as contracts
-from fatebridge.core.astrology_tables import SIGNS
-from fatebridge.core.ptolemy import build_ptolemy_layer
+import fatebridge.core.contracts.output_charts as contracts
+from fatebridge.core.astro.astrology_tables import SIGNS
+from fatebridge.core.astro.ptolemy import build_ptolemy_layer
 from tests.support.reference_data import verify_source_files
 from tests.support.transports import SPECS, business, native, rest, surface_calls
 
@@ -33,13 +33,15 @@ def decode(value):
     )
 
 
-def test_independent_preedit_reference_seal_and_rejected_input_attempt_are_retained():
+def test_independent_preedit_reference_seal_and_rejected_input_attempt_are_retained() -> (
+    None
+):
     verify_source_files(FIXTURE)
     assert len(PUBLIC) == 42
 
 
 @pytest.mark.parametrize("row", ANGLES, ids=lambda row: row["id"])
-def test_literal_neighbours_keep_their_preedit_independent_phase(row):
+def test_literal_neighbours_keep_their_preedit_independent_phase(row) -> None:
     assert (
         classical.orientality(decode(row["planet"]), decode(row["sun"]))
         == row["expected"]
@@ -47,7 +49,9 @@ def test_literal_neighbours_keep_their_preedit_independent_phase(row):
 
 
 @pytest.mark.parametrize("row", NATIVE)
-def test_native_coordinates_propagate_phase_to_mercury_sect_without_new_astrometry(row):
+def test_native_coordinates_propagate_phase_to_mercury_sect_without_new_astrometry(
+    row,
+) -> None:
     longitude, sun, phase = row["mercury"], row["sun"], row["expected"]
     assert classical.orientality(longitude, sun) == phase
     own = None if phase is None else "day" if phase == "oriental" else "night"
@@ -75,14 +79,16 @@ def test_native_coordinates_propagate_phase_to_mercury_sect_without_new_astromet
 
 @pytest.mark.parametrize("value", [math.nan, math.inf, -math.inf])
 @pytest.mark.parametrize("slot", ["sun", "planet"])
-def test_nonfinite_coordinates_never_become_an_occidental_result(value, slot):
+def test_nonfinite_coordinates_never_become_an_occidental_result(
+    value, slot: str
+) -> None:
     with pytest.raises(ValueError):
         classical.orientality(
             value if slot == "planet" else 1, value if slot == "sun" else 1
         )
 
 
-def test_missing_sun_and_exact_coincidence_keep_unknown_semantics():
+def test_missing_sun_and_exact_coincidence_keep_unknown_semantics() -> None:
     assert classical.orientality(1, None) is None
     assert classical.orientality(1, 1) is None
     assert classical.orientality(361, 1) is None
@@ -98,8 +104,8 @@ def test_missing_sun_and_exact_coincidence_keep_unknown_semantics():
     ],
 )
 def test_policy_cannot_claim_unperformed_observation_or_author_endpoint_acceptance(
-    field,
-):
+    field: str,
+) -> None:
     model = getattr(contracts, "OrientalityPolicy", None)
     assert model is not None
     policy = classical.orientality_policy()
@@ -111,8 +117,8 @@ def test_policy_cannot_claim_unperformed_observation_or_author_endpoint_acceptan
 
 @pytest.mark.parametrize("row", PUBLIC, ids=lambda row: row["id"])
 def test_all_frozen_event_inputs_across_public_rest_mcp_and_cli(
-    row, tmp_path, surface_calls
-):
+    row, tmp_path: Path, surface_calls
+) -> None:
     spec = SPECS[row["key"]]
     prefix = "base_chart." if row["key"] == "astro_germany" else ""
     fields = [prefix + key for key in ["person_info", "planets", "classical"]]

@@ -3,13 +3,16 @@
 import hashlib
 import json
 from datetime import datetime, timedelta, timezone
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
 
+from fatebridge.core.astro.astrology_events import find_cardinal_ingress_utc
 from fatebridge.core.astro.birth import build_astro_birth_info
+from fatebridge.core.astro.ptolemy import build_ptolemy_layer
 from fatebridge.core.astro.time_scales import datetime_from_tt, ephemeris_time
-from fatebridge.core.astrology_events import find_cardinal_ingress_utc
+from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.ephemeris_runtime import preserve_ephemeris_path, swe
 from fatebridge.core.predictive._common import (
     build_natal_subject,
@@ -23,7 +26,6 @@ from fatebridge.core.predictive.primary_directions import (
     point_equatorial_position,
 )
 from fatebridge.core.predictive.returns import build_return_payload, governing_return_tt
-from fatebridge.core.ptolemy import build_ptolemy_layer
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 POSITIONS = json.loads((FIXTURES / "western-horizons.json").read_text())
@@ -66,7 +68,7 @@ def moshier(monkeypatch, tmp_path):
 
 
 @pytest.mark.parametrize("reference", POSITIONS["references"], ids=lambda r: r["body"])
-def test_timing_positions_against_independent_nasa(reference, moshier):
+def test_timing_positions_against_independent_nasa(reference, moshier) -> None:
     assert (
         hashlib.sha256(reference["response"]["result"].encode()).hexdigest()
         == reference["response_sha256"]
@@ -87,7 +89,7 @@ def test_timing_positions_against_independent_nasa(reference, moshier):
 @pytest.mark.parametrize(
     "case", RETURNS["cases"], ids=lambda c: f"{c['planet']}-{c['case_id']}"
 )
-def test_return_against_independently_solved_nasa_event(case, moshier):
+def test_return_against_independently_solved_nasa_event(case, moshier) -> None:
     natal = subject_at(datetime.fromisoformat(case["birth_utc"]))
     analysis = datetime.fromisoformat(case["analysis_utc"])
     key = "solar_return" if case["planet"] == "Sun" else "lunar_return"
@@ -115,7 +117,7 @@ def test_return_against_independently_solved_nasa_event(case, moshier):
     assert angular_error(actual, result["solver"]["target_longitude"]) * 3600 < 0.002
 
 
-def test_return_reference_recordings_and_fixed_tolerances():
+def test_return_reference_recordings_and_fixed_tolerances() -> None:
     assert RETURNS["tolerances_seconds"] == {"Sun": 120, "Moon": 15}
     assert len(RETURNS["cases"]) == 6
     for recording in RETURNS["recordings"]:
@@ -126,7 +128,7 @@ def test_return_reference_recordings_and_fixed_tolerances():
 
 
 @pytest.mark.parametrize("body,minimum_days", [(swe.SUN, 360), (swe.MOON, 25)])
-def test_governing_return_switches_at_actual_event(body, minimum_days):
+def test_governing_return_switches_at_actual_event(body, minimum_days: int) -> None:
     analysis = ephemeris_time(datetime(2026, 1, 1, tzinfo=timezone.utc)).jd_tt
     root = governing_return_tt(body, 150.0, analysis)
     after = governing_return_tt(body, 150.0, root + 1 / 86400)
@@ -135,7 +137,9 @@ def test_governing_return_switches_at_actual_event(body, minimum_days):
     assert root - before > minimum_days
 
 
-def test_unbracketed_return_fails_instead_of_inventing_future_event(monkeypatch):
+def test_unbracketed_return_fails_instead_of_inventing_future_event(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(
         "fatebridge.core.predictive.returns._longitude_tt", lambda *a, **k: 123.0
     )
@@ -143,7 +147,7 @@ def test_unbracketed_return_fails_instead_of_inventing_future_event(monkeypatch)
         governing_return_tt(swe.SUN, 150.0, 2461000.0)
 
 
-def test_native_chart_preserves_fractional_seconds():
+def test_native_chart_preserves_fractional_seconds() -> None:
     instant = datetime(2024, 3, 20, 6, 30, tzinfo=timezone.utc)
     first = subject_at(instant)
     second = subject_at(instant + timedelta(seconds=0.5))
@@ -153,19 +157,19 @@ def test_native_chart_preserves_fractional_seconds():
 
 
 @pytest.mark.parametrize("year", [1500, 1900, 1969, 1972, 2017, 2026, 2099])
-def test_tt_civil_round_trip_uses_same_historical_and_future_policy(year):
+def test_tt_civil_round_trip_uses_same_historical_and_future_policy(year: int) -> None:
     instant = datetime(year, 5, 17, 3, 12, 34, 500000, tzinfo=timezone.utc)
     restored = datetime_from_tt(ephemeris_time(instant).jd_tt)
     assert abs((restored - instant).total_seconds()) < 0.0002
 
 
-def test_unrepresentable_utc_leap_second_is_explicit():
+def test_unrepresentable_utc_leap_second_is_explicit() -> None:
     midnight_tt = ephemeris_time(datetime(2017, 1, 1, tzinfo=timezone.utc)).jd_tt
     with pytest.raises(ValueError, match="UTC leap second"):
         datetime_from_tt(midnight_tt - 0.5 / 86400)
 
 
-def test_polar_latitude_is_preserved_and_undefined_placidus_fails():
+def test_polar_latitude_is_preserved_and_undefined_placidus_fails() -> None:
     instant = datetime(2024, 6, 21, 12, tzinfo=timezone.utc)
     whole_sign = subject_at(instant, latitude=80.0, house="W")
     assert whole_sign.lat == 80.0
@@ -182,7 +186,7 @@ def test_polar_latitude_is_preserved_and_undefined_placidus_fails():
         build_reprojected_mundane_primary_direction_chart_layers,
     ],
 )
-def test_zero_arc_direction_restores_original_chart(zodiac, builder):
+def test_zero_arc_direction_restores_original_chart(zodiac: str, builder) -> None:
     birth = build_astro_birth_info(
         birth_year=1990,
         birth_month=5,
@@ -199,12 +203,67 @@ def test_zero_arc_direction_restores_original_chart(zodiac, builder):
         original = getattr(natal, point_attribute_name(name))
         assert angular_error(directed["absolute_degree"], original.abs_pos) <= 0.000051
     context = build_primary_direction_equatorial_context(birth)
-    _, declination = point_equatorial_position("Medium_Coeli", natal, **context)
+    _, declination = point_equatorial_position("Medium_Coeli", natal, context=context)
     assert abs(declination) > 1
 
 
+def test_primary_direction_context_retains_tt_until_native_source_boundary(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    if swe is None:
+        pytest.skip("Swiss Ephemeris is required for the native source boundary")
+    else:
+        pass
+    from fatebridge.core.predictive import primary_directions
+
+    birth = build_astro_birth_info(
+        birth_year=1979,
+        birth_month=11,
+        birth_day=21,
+        birth_hour=17,
+        birth_minute=17,
+        birth_timezone="UTC",
+        birth_longitude=120.0,
+        birth_latitude=30.0,
+    )
+    # Gregorian UTC label plus the declared18s atomic offset and32.184s.
+    expected = TTInstant(Fraction(8799117194591, 3600000))
+    assert Fraction(expected.as_float()) != expected.days
+    natal = build_natal_subject(birth, house_system="W")
+    physical_targets = []
+    sdk_epochs = []
+    actual_attitude = primary_directions.earth_attitude
+    actual_call = primary_directions.ephemeris_call
+
+    def observe_attitude(module, jd_ut1, *, julian_day_tt=None):
+        physical_targets.append(julian_day_tt)
+        return actual_attitude(module, jd_ut1, julian_day_tt=julian_day_tt)
+
+    def observe_call(operation, *args, **kwargs):
+        if operation == "calc":
+            sdk_epochs.append(args[0])
+        else:
+            pass
+        return actual_call(operation, *args, **kwargs)
+
+    monkeypatch.setattr(primary_directions, "earth_attitude", observe_attitude)
+    monkeypatch.setattr(primary_directions, "ephemeris_call", observe_call)
+    context = build_primary_direction_equatorial_context(birth)
+    point_equatorial_position("Sun", natal, context=context)
+
+    assert context.tt.days == expected.days
+    assert len(physical_targets) == 2
+    assert all(
+        isinstance(target, TTInstant) and target.days == expected.days
+        for target in physical_targets
+    )
+    assert len(sdk_epochs) == 1
+    assert type(sdk_epochs[0]) is float
+    assert sdk_epochs[0] == expected.as_float()
+
+
 @pytest.mark.parametrize("term", ["春分", "夏至", "秋分", "冬至"])
-def test_cardinal_ingress_against_hong_kong_observatory(term):
+def test_cardinal_ingress_against_hong_kong_observatory(term: str) -> None:
     reference = json.loads(
         (Path(__file__).parents[1] / "data/bazi-timing-hko-2026.json").read_text()
     )
@@ -217,7 +276,7 @@ def test_cardinal_ingress_against_hong_kong_observatory(term):
 
 
 @pytest.mark.parametrize("case", FORTUNE["cases"])
-def test_robbins_iii10_fortune_uses_same_formula_day_and_night(case):
+def test_robbins_iii10_fortune_uses_same_formula_day_and_night(case) -> None:
     layer = build_ptolemy_layer(
         {"Sun": case["Sun"], "Moon": case["Moon"]},
         case["sect"],
@@ -229,7 +288,7 @@ def test_robbins_iii10_fortune_uses_same_formula_day_and_night(case):
     assert layer["lot_of_fortune"]["source_url"].endswith("3B%2A.html#10")
 
 
-def test_robbins_fortune_wrap_and_missing_ascendant():
+def test_robbins_fortune_wrap_and_missing_ascendant() -> None:
     positions = {"Sun": 350.0, "Moon": 10.0}
     assert (
         build_ptolemy_layer(positions, "night", tropical=True, ascendant=355)[
@@ -243,7 +302,9 @@ def test_robbins_fortune_wrap_and_missing_ascendant():
 
 
 @pytest.mark.parametrize("semiarc", [0.0, 180.0, float("nan")])
-def test_circumpolar_semiarc_is_not_clamped_into_fictitious_coordinates(semiarc):
+def test_circumpolar_semiarc_is_not_clamped_into_fictitious_coordinates(
+    semiarc,
+) -> None:
     from fatebridge.core.predictive.primary_directions import (
         hour_angle_from_mundane_coordinate,
         mundane_semiarc_position,
@@ -255,7 +316,7 @@ def test_circumpolar_semiarc_is_not_clamped_into_fictitious_coordinates(semiarc)
         hour_angle_from_mundane_coordinate(90, semiarc_degrees=semiarc)
 
 
-def test_sidereal_whole_sign_cusps_and_rates_match_actual_coordinate_system():
+def test_sidereal_whole_sign_cusps_and_rates_match_actual_coordinate_system() -> None:
     instant = datetime(2026, 3, 20, 12, tzinfo=timezone.utc)
     first = subject_at(instant, zodiac="Sidereal", house="W")
     second = subject_at(instant + timedelta(seconds=10), zodiac="Sidereal", house="W")
@@ -266,13 +327,15 @@ def test_sidereal_whole_sign_cusps_and_rates_match_actual_coordinate_system():
     ) / first.sun.speed * 86400 == pytest.approx(10, abs=0.001)
 
 
-def test_case_sensitive_swiss_sunshine_house_variant_is_preserved():
+def test_case_sensitive_swiss_sunshine_house_variant_is_preserved() -> None:
     chart = subject_at(datetime(2026, 3, 20, 12, tzinfo=timezone.utc), house="i")
     assert chart.houses_system_identifier == "i"
 
 
 @pytest.mark.parametrize("month,day,hour", [(3, 10, 2), (11, 3, 1)])
-def test_analysis_wall_clock_rejects_dst_gap_and_fold(month, day, hour):
+def test_analysis_wall_clock_rejects_dst_gap_and_fold(
+    month: int, day: int, hour: int
+) -> None:
     from fatebridge.core.predictive._common import build_analysis_datetime
 
     birth = build_astro_birth_info(

@@ -7,8 +7,10 @@ from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
+from pytest import MonkeyPatch
 
-from fatebridge.core.canping import (
+from fatebridge.core.numerology import canping_texts
+from fatebridge.core.numerology.canping import (
     _verses,
     build_snapshot_text,
     calculate,
@@ -16,7 +18,7 @@ from fatebridge.core.canping import (
     liunian_series,
     nayin_element,
 )
-from fatebridge.core.canping_texts import (
+from fatebridge.core.numerology.canping_texts import (
     COLLATION_PATH,
     _loaded,
     collation_summary,
@@ -44,7 +46,7 @@ ARGS = dict(
 @pytest.mark.parametrize("row,kind,text", CASES)
 def test_thirteen_literal_source_cells_use_the_actual_number_and_column(
     row, kind, text
-):
+) -> None:
     record = lookup_record(row["element"], row["number"], kind)
     assert record["text"] == text
     selected = record["selection"]
@@ -57,7 +59,7 @@ def test_thirteen_literal_source_cells_use_the_actual_number_and_column(
     )
 
 
-def test_original_thirteen_witnesses_remain_with_expanded_global_scope():
+def test_original_thirteen_witnesses_remain_with_expanded_global_scope() -> None:
     summary = collation_summary()
     assert summary["sha256"] == hashlib.sha256(COLLATION_PATH.read_bytes()).hexdigest()
     assert summary["source_pdf_sha256"] == REFERENCE["source_pdf_sha256"]
@@ -75,7 +77,7 @@ def test_original_thirteen_witnesses_remain_with_expanded_global_scope():
     assert "independent_second_review_pending" in summary["review_status"]
 
 
-def test_two_wrong_keys_are_corrected_without_editing_the_inherited_corpus():
+def test_two_wrong_keys_are_corrected_without_editing_the_inherited_corpus() -> None:
     for element, wrong, right in (("火", 3838, 2838), ("土", 3372, 3373)):
         raw = inherited_corpus()["parts"][element]
         assert str(wrong) in raw and str(right) not in raw
@@ -93,7 +95,9 @@ def test_two_wrong_keys_are_corrected_without_editing_the_inherited_corpus():
     assert earth["pair_resolution"]["distinct_numbers"] == 1
 
 
-def test_both_direction_numbers_can_have_only_one_local_row_as_the_source_allows():
+def test_both_direction_numbers_can_have_only_one_local_row_as_the_source_allows() -> (
+    None
+):
     forward = _verses("水", compute_number("子", "丑", "水"), "luck")
     reverse = _verses("水", compute_number("丑", "子", "水"), "luck")
     assert (forward["numShun"], forward["numNi"]) == (2231, 3231)
@@ -104,7 +108,7 @@ def test_both_direction_numbers_can_have_only_one_local_row_as_the_source_allows
     assert forward["selectionNi"]["cell_status"] == "row_absent_in_local_corpus"
 
 
-def test_printed_blank_missing_and_reviewed_rows_stay_distinct():
+def test_printed_blank_missing_and_reviewed_rows_stay_distinct() -> None:
     verses = _verses("火", compute_number("丑", "卯", "火"), "female")
     assert (verses["numShun"], verses["numNi"]) == (2335, 3135)
     assert verses["selectionShun"]["cell_status"] == "source_printed_blank"
@@ -120,8 +124,9 @@ def test_printed_blank_missing_and_reviewed_rows_stay_distinct():
     assert reviewed["source_pdf_page"] == 97
 
 
-def test_partial_overlay_simulation_keeps_unreviewed_fallback_explicit(monkeypatch):
-    from fatebridge.core import canping_texts
+def test_partial_overlay_simulation_keeps_unreviewed_fallback_explicit(
+    monkeypatch: MonkeyPatch,
+) -> None:
 
     partial = copy.deepcopy(canping_texts._collation())
     partial["entries"] = [
@@ -139,7 +144,7 @@ def test_partial_overlay_simulation_keeps_unreviewed_fallback_explicit(monkeypat
 
 
 @pytest.mark.parametrize("element", list("水火木金土"))
-def test_unreachable_special_verse_is_not_a_cross_column_fallback(element):
+def test_unreachable_special_verse_is_not_a_cross_column_fallback(element) -> None:
     for kind in ("male", "female", "luck"):
         row = lookup_record(element, 2869, kind)
         assert row["text"] == ""
@@ -154,7 +159,7 @@ def test_unreachable_special_verse_is_not_a_cross_column_fallback(element):
     assert inherited_corpus()["special"]["2869"]["text"]  # retained archival input
 
 
-def test_unspecified_raw_gender_keeps_numbers_without_selecting_male_text():
+def test_unspecified_raw_gender_keeps_numbers_without_selecting_male_text() -> None:
     r = calculate(**ARGS)
     assert r["gender"] is None and r["kindMain"] is None
     assert r["benming"]["numShun"] == r["benming"]["numNi"] == 3306
@@ -167,7 +172,7 @@ def test_unspecified_raw_gender_keeps_numbers_without_selecting_male_text():
 
 
 @pytest.mark.parametrize("alias", ["女", "female", "FEMALE", "F", " f "])
-def test_raw_gender_aliases_share_the_female_column(alias):
+def test_raw_gender_aliases_share_the_female_column(alias: str) -> None:
     r = calculate(**ARGS, gender=alias)
     assert r == calculate(**ARGS, gender="女")
     assert r["kindMain"] == "female" and r["gender"] == "女"
@@ -175,17 +180,19 @@ def test_raw_gender_aliases_share_the_female_column(alias):
 
 
 @pytest.mark.parametrize("bad", [True, False, 0, 1, "", "未知", "typo", [], {}])
-def test_invalid_gender_cannot_select_any_column(bad):
+def test_invalid_gender_cannot_select_any_column(bad) -> None:
     with pytest.raises(ValueError):
         calculate(**ARGS, gender=bad)
 
 
 @pytest.mark.parametrize("bad", [None, True, 0, "", "甲", "甲丑", "庚午extra"])
-def test_nayin_does_not_trim_invalid_year_inputs_to_a_valid_pair(bad):
+def test_nayin_does_not_trim_invalid_year_inputs_to_a_valid_pair(
+    bad: bool | int | str | None,
+) -> None:
     assert nayin_element(bad) == ""
 
 
-def test_shared_luck_column_does_not_depend_on_unselected_natal_gender():
+def test_shared_luck_column_does_not_depend_on_unselected_natal_gender() -> None:
     series = liunian_series(
         year_gz="甲子",
         month_branch="寅",
@@ -198,7 +205,7 @@ def test_shared_luck_column_does_not_depend_on_unselected_natal_gender():
     assert series["rows"][0]["verses"]["selectionShun"]["kind"] == "luck"
 
 
-def test_selection_and_summary_cannot_mutate_loaded_source_data():
+def test_selection_and_summary_cannot_mutate_loaded_source_data() -> None:
     before = inherited_corpus()
     selected = lookup_record("火", 2838, "male")
     selected["selection"]["reading_notes"].append("污染")
@@ -210,7 +217,9 @@ def test_selection_and_summary_cannot_mutate_loaded_source_data():
     assert inherited_corpus() == before
 
 
-def test_loaded_hash_identifies_cached_content_after_a_file_replacement(tmp_path):
+def test_loaded_hash_identifies_cached_content_after_a_file_replacement(
+    tmp_path: Path,
+) -> None:
     p = tmp_path / "source.json"
     p.write_text('{"text":"first"}')
     first = _loaded(p)

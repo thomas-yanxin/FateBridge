@@ -14,8 +14,9 @@ from fatebridge.core.fengshui.models import XuankongRequest
 from fatebridge.core.fengshui.xuankong import xuankong_natal
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.fengshui import calculate_xuankong_natal
-from fatebridge.validation.fengshui_reading import verify_fengshui_reading
+from fatebridge.utils.formatting import format_json_response
 from tests.fixtures.mcp_result_delivery import read_full_result
+from tests.support.fengshui_transports import SPECS
 from tests.support.mcp_result_assertions import (
     same_run_projected_response,
     without_transport,
@@ -24,23 +25,17 @@ from tests.support.result_delivery import (
     assert_same_run_receipt as assert_stored_result,
 )
 from tests.support.result_delivery import store
-from tests.support.transports import rest_client
-
-
-def request(period=7, facing=60, **extra):
-    return {
-        "house": {"facing_degrees": facing, "north_reference": "magnetic"},
-        "period": {
-            "basis": "expert_confirmed",
-            "period_number": period,
-            "evidence": "虚构固定宅盘，用于原书数表与引擎差异核对",
-        },
-        **extra,
-    }
+from tests.support.transports import call_calculation, rest_client
+from tests.unit_test.fixtures.fengshui_reading import (
+    source_comparison_request as request,
+)
+from validation.fengshui_reading import verify_fengshui_reading
 
 
 @pytest.mark.parametrize("period,facing", [(7, 60), (4, 270), (1, 90)])
-def test_known_printed_disagreements_reach_the_actual_response(period, facing):
+def test_known_printed_disagreements_reach_the_actual_response(
+    period: int, facing: int
+) -> None:
     output = calculate_xuankong_natal(**request(period, facing))
     natal = output["layers"]["xuankong_natal"]
     comparison = natal["source_comparison"]
@@ -65,9 +60,11 @@ def test_known_printed_disagreements_reach_the_actual_response(period, facing):
         ]
         assert row["diagram"]["pdf_page"] == 353
         assert "原图5、计算2" in output["snapshot_text"]
+    else:
+        pass
 
 
-def test_packaged_corpus_contains_every_frozen_source_row_without_correction():
+def test_packaged_corpus_contains_every_frozen_source_row_without_correction() -> None:
     root = Path(__file__).parents[2]
     packaged = json.loads(
         (
@@ -97,7 +94,7 @@ def test_packaged_corpus_contains_every_frozen_source_row_without_correction():
         }
 
 
-def test_all_216_lower_candidates_retain_every_audited_disagreement():
+def test_all_216_lower_candidates_retain_every_audited_disagreement() -> None:
     observed = {}
     prose_profiles = diagram_numerals = matched_numerals = 0
     for period in range(1, 10):
@@ -117,6 +114,8 @@ def test_all_216_lower_candidates_retain_every_audited_disagreement():
                     len(row["prose"]["differences"]),
                     len(row["diagram"]["differences"]),
                 )
+            else:
+                pass
     assert prose_profiles == 213
     assert diagram_numerals == 5832 and matched_numerals == 5831
     assert observed == {
@@ -127,7 +126,7 @@ def test_all_216_lower_candidates_retain_every_audited_disagreement():
     }
 
 
-def test_every_boundary_candidate_is_compared_without_selecting_one_mode():
+def test_every_boundary_candidate_is_compared_without_selecting_one_mode() -> None:
     for index in range(24):
         result = xuankong_natal(
             XuankongRequest.model_validate(request(7, index * 15 + 7.5))
@@ -148,10 +147,14 @@ def test_every_boundary_candidate_is_compared_without_selecting_one_mode():
                     row["source_section"]["prose_comparison_status"]
                     == "not_transcribed_or_compared"
                 )
+            else:
+                pass
             assert row["source_angle_applicability_verified"] is False
 
 
-def test_comparison_does_not_mutate_or_repair_an_invalid_literal_matching_chart():
+def test_comparison_does_not_mutate_or_repair_an_invalid_literal_matching_chart() -> (
+    None
+):
     chart = xuankong_natal(XuankongRequest.model_validate(request()))["chart"]
     original = deepcopy(chart)
     source_comparison.compare_natal_sources([chart])
@@ -172,7 +175,9 @@ def test_comparison_does_not_mutate_or_repair_an_invalid_literal_matching_chart(
     assert result["whole_book_conformity_established"] is False
 
 
-def test_arbitrary_permutation_preserving_wrong_cells_are_not_hidden_by_integrity():
+def test_arbitrary_permutation_preserving_wrong_cells_are_not_hidden_by_integrity() -> (
+    None
+):
     chart = xuankong_natal(XuankongRequest.model_validate(request(2, 180)))["chart"]
     for role in source_comparison.ROLES:
         for index, first in enumerate(source_comparison.DIRECTIONS):
@@ -192,7 +197,9 @@ def test_arbitrary_permutation_preserving_wrong_cells_are_not_hidden_by_integrit
 
 
 @pytest.mark.parametrize("mode", ["missing", "replacement"])
-def test_uncomputed_has_no_match_and_replacement_only_receives_numeric_comparison(mode):
+def test_uncomputed_has_no_match_and_replacement_only_receives_numeric_comparison(
+    mode: str,
+) -> None:
     request_data = {} if mode == "missing" else request(7, 126)
     output = calculate_xuankong_natal(**request_data)
     summary = output["coverage"]["natal_source_comparison"]
@@ -206,8 +213,8 @@ def test_uncomputed_has_no_match_and_replacement_only_receives_numeric_compariso
 
 
 def test_packaged_source_cannot_be_silently_corrected_to_the_engine(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     raw = json.loads(source_comparison.DATA.read_text())
     row = next(
         r for r in raw["rows"] if r["period"] == 7 and r["facing_mountain"] == "寅"
@@ -228,8 +235,13 @@ def test_packaged_source_cannot_be_silently_corrected_to_the_engine(
 @pytest.mark.parametrize("period,facing", [(7, 60), (4, 270), (9, 180), (7, 126)])
 @pytest.mark.parametrize("name", ["xuankong_natal", "assess"])
 def test_source_comparison_matches_actual_rest_mcp_cli(
-    monkeypatch, tmp_path, capsys, period, facing, name
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    period: int,
+    facing: int,
+    name: str,
+) -> None:
     inputs = request(period, facing)
     if name == "assess":
         inputs = {
@@ -237,18 +249,20 @@ def test_source_comparison_matches_actual_rest_mcp_cli(
             "house": inputs["house"],
             "xuankong": {"period": inputs["period"]},
         }
+    else:
+        pass
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                "fengshui_" + name, {**inputs, "response_char_limit": 0}
+            return await call_calculation(
+                client, SPECS[name].tool_name, {**inputs, "response_char_limit": 0}
             )
 
-    response = rest_client(monkeypatch).post("/api/fengshui/" + name, json=inputs)
+    response = rest_client(monkeypatch).post(SPECS[name].rest_path, json=inputs)
     protocol = asyncio.run(call())
     path = tmp_path / "source-case.json"
     path.write_text(json.dumps(inputs, ensure_ascii=False))
-    code = run(["fengshui_" + name, "--request-file", str(path)])
+    code = run([SPECS[name].tool_name, "--request-file", str(path)])
     cli = json.loads(capsys.readouterr().out)
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     assert (
@@ -262,7 +276,9 @@ def test_source_comparison_matches_actual_rest_mcp_cli(
     )
 
 
-def test_fixed_reading_includes_both_printed_and_computed_values_with_complete_basis():
+def test_fixed_reading_includes_both_printed_and_computed_values_with_complete_basis() -> (
+    None
+):
     inputs = request(
         interpretation={
             "current_period_number": 9,
@@ -288,7 +304,7 @@ def test_fixed_reading_includes_both_printed_and_computed_values_with_complete_b
     )
 
 
-def test_evaluation_period_does_not_change_the_historical_source_row():
+def test_evaluation_period_does_not_change_the_historical_source_row() -> None:
     expected = calculate_xuankong_natal(**request())["layers"]["xuankong_natal"][
         "source_comparison"
     ]
@@ -304,7 +320,9 @@ def test_evaluation_period_does_not_change_the_historical_source_row():
         assert result["layers"]["xuankong_natal"]["source_comparison"] == expected
 
 
-def test_invalid_computation_preserves_both_integrity_and_source_difference_flags():
+def test_invalid_computation_preserves_both_integrity_and_source_difference_flags() -> (
+    None
+):
     chart = xuankong_natal(XuankongRequest.model_validate(request()))["chart"]
     chart["palaces"]["E"]["mountain_star_number"] = 1
     chart["mountain_chart"]["E"] = 1
@@ -316,7 +334,7 @@ def test_invalid_computation_preserves_both_integrity_and_source_difference_flag
 
 
 @pytest.mark.parametrize("name", ["xuankong_natal", "assess"])
-def test_default_mcp_budget_keeps_source_difference_facts(name):
+def test_default_mcp_budget_keeps_source_difference_facts(name: str) -> None:
     inputs = request()
     if name == "assess":
         inputs = {
@@ -324,11 +342,14 @@ def test_default_mcp_budget_keeps_source_difference_facts(name):
             "house": inputs["house"],
             "xuankong": {"period": inputs["period"]},
         }
+    else:
+        pass
 
     async def call():
         async with Client(create_mcp_app(families="fengshui")) as client:
-            response = await client.call_tool(
-                "fengshui_" + name,
+            response = await call_calculation(
+                client,
+                SPECS[name].tool_name,
                 {
                     **inputs,
                     "fields": [
@@ -359,8 +380,8 @@ def test_default_mcp_budget_keeps_source_difference_facts(name):
 
 @pytest.mark.parametrize("name", ["xuankong_natal", "assess"])
 def test_same_run_full_pages_and_independent_receipt_preserve_source_disagreement(
-    name, store
-):
+    name: str, store
+) -> None:
     inputs = request(
         interpretation={
             "current_period_number": 9,
@@ -376,14 +397,20 @@ def test_same_run_full_pages_and_independent_receipt_preserve_source_disagreemen
                 "interpretation": inputs["interpretation"],
             },
         }
+    else:
+        pass
 
     async def call():
         async with Client(create_mcp_app(families="fengshui")) as client:
-            response = await client.call_tool(
-                "fengshui_" + name,
+            response = await call_calculation(
+                client,
+                SPECS[name].tool_name,
                 {**inputs, "fields": None, "response_char_limit": 4096},
             )
-            assert not response.is_error and len(response.content[0].text) <= 4096
+            assert (
+                not response.is_error
+                and len(format_json_response(response.structured_content)) <= 4096
+            )
             ref = response.structured_content["result_delivery"]
             original = await read_full_result(client, response.structured_content)
             trusted = store.get(ref["result_id"])

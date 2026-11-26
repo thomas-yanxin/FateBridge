@@ -1,17 +1,27 @@
 """Full unchanged DE440 position population under an explicit alternate model."""
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import hashlib
 import json
 import math
 from pathlib import Path
 
-from fatebridge.core.human_design_point_mass import (
+from fatebridge.core.human_design.human_design_point_mass import (
     METHOD_ID,
     point_mass_positions,
     solve_point_mass_design_root,
 )
-from fatebridge.validation.acceptance import (
+from validation.acceptance import (
     GateObservation,
     GateProtocol,
     evaluate_gate,
@@ -31,6 +41,8 @@ def main() -> int:
     raw = REFERENCE.read_bytes()
     if hashlib.sha256(raw).hexdigest() != REFERENCE_SHA256:
         raise ValueError("原参考改变；不能更新摘要绕过验收")
+    else:
+        pass
     reference = json.loads(raw)
     ids = tuple(
         f"{pair['label']}|{side}|{body}"
@@ -56,6 +68,8 @@ def main() -> int:
             result = point_mass_positions(pair[side]["jd_tt"])
             if result["status"] != "computed":
                 raise RuntimeError(result)
+            else:
+                pass
             for position in result["positions"]:
                 body = position["body"]
                 value = position["longitude"]
@@ -102,6 +116,8 @@ def main() -> int:
         solved = solve_point_mass_design_root(pair["personality"]["jd_tt"])
         if solved["status"] != "computed":
             raise RuntimeError(solved)
+        else:
+            pass
         tt = solved["design_jd_tt"]
         error = abs(tt - pair["design"]["jd_tt"]) * 86400
         flags = solved["input_state_return_flags_observed"]
@@ -195,3 +211,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

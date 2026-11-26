@@ -17,7 +17,9 @@ from fatebridge.utils.birth_input import create_person_info
 @pytest.mark.parametrize(
     "stem,branch", list(zip("甲乙丙丁戊己庚辛壬癸", "寅卯巳午巳午申酉亥子"))
 )
-def test_lu_qualification_uses_actual_seat_even_when_main_qi_is_not_peer(stem, branch):
+def test_lu_qualification_uses_actual_seat_even_when_main_qi_is_not_peer(
+    stem, branch
+) -> None:
     chart = {
         "year": ("庚", "申"),
         "month": ("甲", branch),
@@ -31,7 +33,7 @@ def test_lu_qualification_uses_actual_seat_even_when_main_qi_is_not_peer(stem, b
 
 
 @pytest.mark.parametrize("stem,branch", list(zip("甲丙戊庚壬", "卯午午酉子")))
-def test_yang_blade_is_qualified_by_seat_not_main_hidden_god(stem, branch):
+def test_yang_blade_is_qualified_by_seat_not_main_hidden_god(stem, branch) -> None:
     chart = {
         "year": ("庚", "申"),
         "month": ("甲", branch),
@@ -44,7 +46,9 @@ def test_yang_blade_is_qualified_by_seat_not_main_hidden_god(stem, branch):
     assert result["seat_qualification"]["is_yang_blade"]
 
 
-def test_miscellaneous_qi_preserves_revealed_meeting_without_claiming_transformation():
+def test_miscellaneous_qi_preserves_revealed_meeting_without_claiming_transformation() -> (
+    None
+):
     chart = {
         "year": ("壬", "戌"),
         "month": ("丁", "未"),
@@ -52,17 +56,27 @@ def test_miscellaneous_qi_preserves_revealed_meeting_without_claiming_transforma
         "hour": ("乙", "卯"),
     }
     result = determine_monthly_structure(chart, "戊")
-    assert result["label"] == "正官格"
+    assert result["legacy_selection_label"] == "正官格"
     assert result["selection_rule"] == "misc_revealed_meeting_support"
+    assert {w["ten_god"] for w in result["use_resolution"]["witnesses"]} == {
+        "正印",
+        "正官",
+    }
     assert not result["is_special"]
     # Removing the actual 卯 changes this prerequisite, rather than preserving
     # a source-case lookup answer for every chart with these four stems.
     changed = determine_monthly_structure({**chart, "hour": ("乙", "酉")}, "戊")
     assert changed["selection_rule"] == "revealed_rank"
-    assert changed["label"] == "正印格"
+    assert changed["legacy_selection_label"] == "正印格"
+    # The old half-meeting priority is retained as history. Both actual
+    # revelations remain source uses even after that old prerequisite changes.
+    assert {w["ten_god"] for w in changed["use_resolution"]["witnesses"]} == {
+        "正印",
+        "正官",
+    }
 
 
-def test_original_officer_god_survives_revealed_seal_with_legacy_audit_label():
+def test_original_officer_god_survives_revealed_seal_with_legacy_audit_label() -> None:
     chart = {
         "year": ("甲", "申"),
         "month": ("壬", "申"),
@@ -75,7 +89,7 @@ def test_original_officer_god_survives_revealed_seal_with_legacy_audit_label():
     assert result["selection_rule"] == "officer_with_wealth_seal_support"
 
 
-def test_birth_time_range_detects_hour_boundary_and_preserves_nominal_inputs():
+def test_birth_time_range_detects_hour_boundary_and_preserves_nominal_inputs() -> None:
     person = create_person_info(
         2000, 5, 1, 1, birth_minute=0, gender="男", use_true_solar_time=False
     )
@@ -98,7 +112,7 @@ def test_birth_time_range_detects_hour_boundary_and_preserves_nominal_inputs():
     )
 
 
-def test_small_range_crosses_decade_selection_without_changing_natal_pillars():
+def test_small_range_crosses_decade_selection_without_changing_natal_pillars() -> None:
     person = create_person_info(
         1990,
         5,
@@ -134,7 +148,7 @@ def test_small_range_crosses_decade_selection_without_changing_natal_pillars():
     assert "采样数量不是概率" in snapshot
 
 
-def test_uncertainty_is_not_invented_when_no_range_was_supplied():
+def test_uncertainty_is_not_invented_when_no_range_was_supplied() -> None:
     person = create_person_info(2000, 5, 1, 10, gender="男", use_true_solar_time=False)
     assert "birth_time_sensitivity" not in calculate_dayun_analysis(
         person, analysis_age=30
@@ -146,7 +160,9 @@ def test_uncertainty_is_not_invented_when_no_range_was_supplied():
 
 
 @pytest.mark.parametrize("hour,scope", [(1, "sensitive"), (10, "partial")])
-def test_unknown_gender_retains_birth_range_and_independent_timing(hour, scope):
+def test_unknown_gender_retains_birth_range_and_independent_timing(
+    hour: int, scope: str
+) -> None:
     person = create_person_info(
         2000, 5, 1, hour, birth_minute=0, gender=None, use_true_solar_time=False
     )
@@ -169,7 +185,7 @@ def test_unknown_gender_retains_birth_range_and_independent_timing(hour, scope):
     assert "未计算（顺逆所需性别未提供）" in result["snapshot_text"]
 
 
-def test_utc_sampling_keeps_both_clocks_in_a_dst_fold():
+def test_utc_sampling_keeps_both_clocks_in_a_dst_fold() -> None:
     person = create_person_info(
         2000,
         10,
@@ -189,7 +205,7 @@ def test_utc_sampling_keeps_both_clocks_in_a_dst_fold():
     assert sensitive["birth_at_range"]["end"].endswith("-05:00")
 
 
-def test_current_timing_state_keeps_independent_layers_without_gender():
+def test_current_timing_state_keeps_independent_layers_without_gender() -> None:
     person = create_person_info(
         2000, 5, 1, 0, birth_minute=0, gender=None, use_true_solar_time=False
     )
@@ -212,7 +228,9 @@ def test_current_timing_state_keeps_independent_layers_without_gender():
 
 
 @pytest.mark.parametrize("month,day,hour", [(4, 2, 2), (10, 29, 1)])
-def test_nonexistent_or_ambiguous_birth_clock_is_rejected(month, day, hour):
+def test_nonexistent_or_ambiguous_birth_clock_is_rejected(
+    month: int, day: int, hour: int
+) -> None:
     person = create_person_info(
         2000,
         month,

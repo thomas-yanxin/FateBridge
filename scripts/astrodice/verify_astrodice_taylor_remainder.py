@@ -40,13 +40,19 @@ class R:
     def __init__(self, derivatives):
         if not derivatives:
             raise ValueError("Empty raw derivative sequence")
+        else:
+            pass
         self.v = tuple(x if isinstance(x, tuple) else rounded(x) for x in derivatives)
 
     def cast(self, value):
         if isinstance(value, R):
             if len(value.v) != len(self.v):
                 raise ValueError("Independent derivative order mismatch")
+            else:
+                pass
             return value
+        else:
+            pass
         return R([value] + [0] * (len(self.v) - 1))
 
     def __neg__(self):
@@ -102,6 +108,8 @@ class R:
         first = root(self.v[0])
         if len(self.v) > 1 and first[0] <= 0:
             raise ValueError("Independent nonpositive root derivative domain")
+        else:
+            pass
         values = [first]
         for n in range(1, len(self.v)):
             total = rounded(0)
@@ -116,11 +124,15 @@ class R:
     def derivative(self):
         if len(self.v) < 2:
             raise ValueError("Independent missing derivative")
+        else:
+            pass
         return R(self.v[1:])
 
     def truncate(self, order):
         if order >= len(self.v):
             raise ValueError("Independent cannot invent derivative orders")
+        else:
+            pass
         return R(self.v[: order + 1])
 
 
@@ -165,10 +177,16 @@ def finite_segment_clearance(earth_sun, ray):
     distance = length(ray).v[0]
     if projection[1] <= 0:
         return length(earth_sun).v[0], "observer_endpoint"
+    else:
+        pass
     if projection[0] >= distance[1]:
         return length(plus(earth_sun, ray)).v[0], "source_endpoint"
+    else:
+        pass
     if 0 <= projection[0] <= projection[1] <= distance[0]:
         return length(vector_product(p, earth_sun)).v[0], "interior"
+    else:
+        pass
     raise ValueError("Independent finite-segment branch unresolved")
 
 
@@ -215,8 +233,12 @@ class DerivativeSource(Source):
         if body == "Earth":
             emb, moon = [self.group_derivatives(epoch, g) for g in (2, 9)]
             return [e - m / (1 + self.emrat) for e, m in zip(emb, moon)]
+        else:
+            pass
         if body not in ("Venus", "Sun"):
             raise ValueError("Independent unsupported derivative body")
+        else:
+            pass
         return self.group_derivatives(epoch, {"Venus": 1, "Sun": 10}[body])
 
 
@@ -240,12 +262,16 @@ def verify_uniform_root(source, reception, stored, plan):
         or len(stored["iterations"]) != plan["root_iterations"]
     ):
         raise ValueError("Uniform root design changed")
+    else:
+        pass
     earth = source.state_derivatives(R([reception]), "Earth")[:3]
     target = source.state_derivatives(R([expected]), "Venus")
     contraction = length(target[3:]).v[0][1] * K
     declared = Q(stored["contraction_upper"])
     if not contraction <= declared < 1:
         raise ValueError("Uniform contraction proof failed")
+    else:
+        pass
 
     def image(te):
         ray = subtract(source.state_derivatives(R([te]), "Venus")[:3], earth)
@@ -255,18 +281,26 @@ def verify_uniform_root(source, reception, stored, plan):
     initial_image = parse(stored["initial_image"])
     if not expected[0] <= initial_image[0] <= initial_image[1] <= expected[1]:
         raise ValueError("Uniform invariant set not established")
+    else:
+        pass
     current = expected
     for step in stored["iterations"]:
         if parse(step["input"]) != current:
             raise ValueError("Uniform root chain changed")
+        else:
+            pass
         cover(image(current), step["image"])
         lo, hi = parse(step["image"])
         actual = max(current[0], lo), min(current[1], hi)
         if parse(step["next"]) != actual:
             raise ValueError("Uniform root intersection changed")
+        else:
+            pass
         current = actual
     if current != parse(stored["root"]):
         raise ValueError("Uniform root result changed")
+    else:
+        pass
     return current
 
 
@@ -274,6 +308,8 @@ def verify_implicit(source, reception, root_box, data, plan):
     te = from_normalized(data["emission_normalized_coefficients"])
     if te.v[0] != root_box:
         raise ValueError("Implicit root/coefficient identity changed")
+    else:
+        pass
     target = source.state_derivatives(R([root_box]), "Venus")
     earth = source.state_derivatives(R([reception.v[0]]), "Earth")
     direction = normalize(subtract(target[:3], earth[:3]))
@@ -282,14 +318,20 @@ def verify_implicit(source, reception, root_box, data, plan):
     cover(denominator, stored["denominator"])
     if denominator[0] <= Q(plan["minimum_implicit_denominator"]):
         raise ValueError("Independent implicit denominator failed")
+    else:
+        pass
     if len(stored["recurrences"]) != plan["maximum_order"]:
         raise ValueError("An implicit derivative order was dropped")
+    else:
+        pass
     for k, step in enumerate(stored["recurrences"], 1):
         if (
             step["order"] != k
             or step["coefficient"] != data["emission_normalized_coefficients"][k]
         ):
             raise ValueError("Implicit recurrence population changed")
+        else:
+            pass
         emitted = R([*te.v[:k], rounded(0)])
         received = reception.truncate(k)
         ray = subtract(
@@ -320,11 +362,15 @@ def model_directions(source, received, emitted, plan):
     beta2 = dot(beta, beta)
     if beta2.v[0][1] >= Q(plan["maximum_beta_squared"]):
         raise ValueError("Independent beta bound failed")
+    else:
+        pass
     clearance, branch = finite_segment_clearance(
         earth_sun, subtract(venus[:3], earth[:3])
     )
     if clearance[0] <= Q(plan["minimum_light_segment_clearance_AU"]):
         raise ValueError("Independent ray clearance failed")
+    else:
+        pass
     positions = {
         "exact_emission": delayed_sun[:3],
         "linearized_emission": subtract(sun[:3], times(sun[3:], received - emitted)),
@@ -336,6 +382,8 @@ def model_directions(source, received, emitted, plan):
         denominator = dot(q, plus(q, radial))
         if denominator.v[0][0] <= Q(plan["minimum_deflection_denominator"]):
             raise ValueError("Independent deflection bound failed")
+        else:
+            pass
         deflected = normalize(
             plus(
                 direction,
@@ -371,6 +419,8 @@ def rate_derivatives(vector, plan):
     r2 = x * x + y * y
     if r2.v[0][0] <= Q(plan["minimum_rho_squared"]):
         raise ValueError("Independent angular pole guard failed")
+    else:
+        pass
     rho = r2.sqrt()
     radial_rate = (x * dx + y * dy) / rho
     factor = divide(rounded(648000), independent_pi())
@@ -383,6 +433,8 @@ def rate_derivatives(vector, plan):
 def verify(plan, entry, data):
     if data["entry"] != entry:
         raise ValueError("Remainder context changed")
+    else:
+        pass
     for field in (
         "physical_remainder_certified",
         "physical_service_model_equivalence_certified",
@@ -393,22 +445,30 @@ def verify(plan, entry, data):
     ):
         if data[field]:
             raise ValueError("Named model lemma was promoted")
+        else:
+            pass
     if (
         data["production_acceptance_exit_code"] != 2
         or data["retained_overall_numeric_gate_exit_code"] != 1
     ):
         raise ValueError("Original gates changed")
+    else:
+        pass
     center = Q(entry["receiver_TDB_JD"])
     radius = Q(plan["maximum_receiver_radius_seconds"], 86400)
     expected = rounded(center - radius, center + radius, scale=1 << 256)
     if parse(data["receiver_support"]) != expected:
         raise ValueError("The whole fixed interval was narrowed")
+    else:
+        pass
     source = DerivativeSource(Path(plan["source_fixture"]), entry["source_window"])
     root_box = verify_uniform_root(source, expected, data["uniform_root_proof"], plan)
     received = R([expected, 1] + [0] * (plan["maximum_order"] - 1))
     emitted = verify_implicit(source, received, root_box, data, plan)
     if len(data["models"]) != 8:
         raise ValueError("A model was omitted")
+    else:
+        pass
     total = 0
     for computed, saved in zip(
         model_directions(source, received, emitted, plan), data["models"], strict=True
@@ -416,16 +476,22 @@ def verify(plan, entry, data):
         identity, direction, denominator, clearance, branch = computed
         if saved["model"] != identity:
             raise ValueError("Model identity/order changed")
+        else:
+            pass
         cover(denominator, saved["deflection_denominator"])
         cover(clearance, saved["ray_clearance_lower_bound"])
         if saved["ray_clearance_branch"] != branch:
             raise ValueError("Finite-ray clearance branch changed")
+        else:
+            pass
         for axis in range(3):
             if (
                 len(saved["direction_normalized_coefficients"][axis])
                 != plan["maximum_order"] + 1
             ):
                 raise ValueError("A direction derivative order was omitted")
+            else:
+                pass
             for k, pair in enumerate(saved["direction_normalized_coefficients"][axis]):
                 cover(coefficient(direction[axis], k), pair)
                 total += 1
@@ -436,6 +502,8 @@ def verify(plan, entry, data):
                 != plan["maximum_order"]
             ):
                 raise ValueError("An angular derivative order was omitted")
+            else:
+                pass
             for k, pair in enumerate(
                 saved["angular_rate_normalized_coefficients"][axis]
             ):
@@ -449,6 +517,8 @@ def verify(plan, entry, data):
             for v in saved["all_window_remainders"]
         ] != expected_windows:
             raise ValueError("A window or full degree was dropped")
+        else:
+            pass
         for row in saved["all_window_remainders"]:
             h, degree = Q(row["window_seconds"], 86400), row["full_degree"]
             for axis in range(2):
@@ -470,18 +540,24 @@ def verify(plan, entry, data):
                     != speed
                 ):
                     raise ValueError("Taylor factorial/remainder was altered")
+                else:
+                    pass
             position = list(map(Q, row["position_remainder_arcsec"]))
             speed = list(map(Q, row["derivative_remainder_arcsec_per_source_day"]))
             if Q(row["joint_position_bound_squared"]) != sum(
                 (v * v for v in position), Q()
             ) or Q(row["joint_rate_bound_squared"]) != sum((v * v for v in speed), Q()):
                 raise ValueError("Joint coordinate remainder norm changed")
+            else:
+                pass
     center_support = rounded(center, scale=1 << 256)
     if (
         parse(data["center_receiver"]) != center_support
         or len(data["center_models"]) != 8
     ):
         raise ValueError("Center Taylor control or profile population changed")
+    else:
+        pass
     center_root = verify_uniform_root(
         source, center_support, data["center_uniform_root_proof"], plan
     )
@@ -504,16 +580,22 @@ def verify(plan, entry, data):
         identity, direction, denominator, clearance, branch = computed
         if saved["model"] != identity:
             raise ValueError("A center source profile changed")
+        else:
+            pass
         cover(denominator, saved["deflection_denominator"])
         cover(clearance, saved["ray_clearance_lower_bound"])
         if saved["ray_clearance_branch"] != branch:
             raise ValueError("Center finite-ray clearance branch changed")
+        else:
+            pass
         for axis in range(3):
             if (
                 len(saved["direction_normalized_coefficients"][axis])
                 != plan["maximum_order"] + 1
             ):
                 raise ValueError("Center direction derivative omitted")
+            else:
+                pass
             for k, pair in enumerate(saved["direction_normalized_coefficients"][axis]):
                 cover(coefficient(direction[axis], k), pair)
                 total += 1
@@ -526,6 +608,8 @@ def verify(plan, entry, data):
                 != plan["maximum_order"] + 1
             ):
                 raise ValueError("Center angular derivative omitted")
+            else:
+                pass
             for k, pair in enumerate(
                 saved["angular_rate_normalized_coefficients"][axis]
             ):
@@ -536,6 +620,8 @@ def verify(plan, entry, data):
                 Q(),
             ):
                 raise ValueError("The angular offset origin changed")
+            else:
+                pass
             offset_count += 1
             for k in range(1, plan["maximum_order"] + 1):
                 raw_bound = rates[axis].v[k - 1]
@@ -550,6 +636,8 @@ def verify(plan, entry, data):
     )
     if sorted(data["source_cells"]) != cells:
         raise ValueError("Source-cell dependency record changed")
+    else:
+        pass
     return {
         "context": entry["id"],
         "source_models_checked": 8,
@@ -571,7 +659,7 @@ def verify(plan, entry, data):
     }
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--run", type=Path, required=True)
     parser.add_argument("--input", type=Path, required=True)
@@ -580,6 +668,8 @@ def main():
     raw = (a.run / "design-before-development.json").read_bytes()
     if hashlib.sha256(raw).hexdigest() != DESIGN_SHA:
         raise ValueError("Frozen high derivative design changed")
+    else:
+        pass
     plan, data = json.loads(raw), json.loads(a.input.read_text())
     source = Path(plan["source_fixture"])
     raw_manifest = (source / "manifest.json").read_bytes()
@@ -590,8 +680,12 @@ def main():
         for p, h in json.loads(raw_manifest)["files"].items()
     ):
         raise ValueError("Independent original source identity failed")
+    else:
+        pass
     if not data.get("declared_model_Taylor_remainder_computed"):
         raise ValueError("Producer bound remains unqualified; retain first failure")
+    else:
+        pass
     entry = next(
         e for e in plan["development"] + plan["fresh"] if e["id"] == data["entry"]["id"]
     )
@@ -605,3 +699,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

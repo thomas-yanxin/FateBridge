@@ -36,6 +36,8 @@ def separation(a, b):
         length = math.hypot(*v)
         if not length or not math.isfinite(length):
             raise ValueError("Invalid direction")
+        else:
+            pass
         return [x / length for x in v]
 
     a, b = normalized(a), normalized(b)
@@ -124,6 +126,8 @@ def audit(run, cohort, index):
         row = result["rows"][index]
         if row["id"] != selected["id"]:
             raise ValueError("Reference condition identity changed")
+        else:
+            pass
         references[encoding] = row
     from fatebridge.core.astro import runtime
     from fatebridge.core.astro.native_coordinates import COORDINATE_FLAGS
@@ -132,6 +136,8 @@ def audit(run, cohort, index):
 
     if not Path(runtime.__file__).resolve().is_relative_to(root):
         raise ValueError("Native sampler imported outside project")
+    else:
+        pass
     swe = runtime.swe
     source = json.loads((run / "source-records/geometric-reference.json").read_text())[
         "rows"
@@ -143,6 +149,8 @@ def audit(run, cohort, index):
         or os.environ.get("FATEBRIDGE_JPL_FILE") != kernel.name
     ):
         raise ValueError("Diagnostic kernel configuration changed")
+    else:
+        pass
     epoch = float(Q(selected["exact_numeric_JD_fraction"]))
     trace = PhysicalEphemerisTrace()
     base = (
@@ -175,6 +183,8 @@ def audit(run, cohort, index):
                 or not all(math.isfinite(v) for v in vector)
             ):
                 raise ValueError("Actual source, coordinate or vector contract changed")
+            else:
+                pass
             trace.observe(selected["body"] + "_" + mode, "jpl")
             states[mode] = {
                 "status": "computed",
@@ -200,6 +210,8 @@ def audit(run, cohort, index):
             states["default"]["state_xyz_AU_and_AU_per_day"][:3],
             states["default_after_controls"]["state_xyz_AU_and_AU_per_day"][:3],
         )
+    else:
+        pass
     comparisons = {}
     inside = (
         selected["nominal_source_background_ray"]
@@ -210,6 +222,8 @@ def audit(run, cohort, index):
         if point is None:
             comparisons[encoding] = {"status": "reference_unavailable"}
             continue
+        else:
+            pass
         tests = {}
         for mode, state in states.items():
             tests[mode] = (
@@ -274,8 +288,12 @@ if __name__ == "__main__":
     a = p.parse_args()
     if a.output.exists():
         raise FileExistsError(a.output)
+    else:
+        pass
     result = audit(a.run, a.cohort, a.case_index)
     with a.output.open("x") as f:
         json.dump(result, f, indent=2)
         f.write("\n")
     print(result["case"]["id"], "position models recorded")
+else:
+    pass

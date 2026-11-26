@@ -13,14 +13,15 @@ from pydantic import ValidationError
 import fatebridge.api as api
 from fatebridge.application.discovery import select_mcp_specs
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_chinese import ZiweiChildhoodLimit
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
-from fatebridge.core.output_chinese import ZiweiChildhoodLimit
-from fatebridge.core.ziwei_childhood import childhood_limit
+from fatebridge.core.ziwei.ziwei_childhood import childhood_limit
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.ziwei.audit_ziwei_independent_readings import audit_independent_readings
 from scripts.ziwei.audit_ziwei_limits import _seed
 from tests.fixtures.mcp_receipt import verified_inline_business
+from tests.support.transports import call_calculation, discover_capabilities
 
 SOURCE = json.loads(
     (
@@ -30,7 +31,7 @@ SOURCE = json.loads(
 )
 
 
-def test_independent_reading_cannot_hide_the_failed_first_pass_or_unknowns():
+def test_independent_reading_cannot_hide_the_failed_first_pass_or_unknowns() -> None:
     result = audit_independent_readings()
     assert result["requested_day_inputs"] == 150
     assert result["original_report_single_direct_inputs"] == 147
@@ -54,7 +55,9 @@ def test_independent_reading_cannot_hide_the_failed_first_pass_or_unknowns():
     assert result["clock_review_reported_failed_attempts"] == 16
 
 
-def test_independent_review_rejects_a_rewritten_raw_first_answer(tmp_path):
+def test_independent_review_rejects_a_rewritten_raw_first_answer(
+    tmp_path: Path,
+) -> None:
     name = "independent_readings_r22_v1"
     fixtures = Path(__file__).parents[1] / "data/ziwei_independent"
     shutil.copytree(fixtures / name, tmp_path / name)
@@ -67,15 +70,16 @@ def test_independent_review_rejects_a_rewritten_raw_first_answer(tmp_path):
 
 
 @pytest.mark.parametrize("family", [None, "metaphysics"])
-def test_family_advertises_and_executes_ziwei_rules(family):
+def test_family_advertises_and_executes_ziwei_rules(family: str | None) -> None:
     selected = select_mcp_specs(CATALOG, family=family)
     assert "ziwei_rules" in {s.key for s in selected}
 
     async def call():
         async with Client(create_mcp_app(families=family)) as client:
-            tools = {t.name for t in await client.list_tools()}
+            tools = set(await discover_capabilities(client))
             assert "ziwei_rules" in tools
-            result = await client.call_tool(
+            result = await call_calculation(
+                client,
                 "ziwei_rules",
                 {
                     "year_stem": "庚",
@@ -98,7 +102,7 @@ def test_family_advertises_and_executes_ziwei_rules(family):
 
 
 @pytest.mark.parametrize("age", [1, 6, 7, 15])
-def test_uncertain_glyph_is_disclosed_without_extrapolating_the_verse(age):
+def test_uncertain_glyph_is_disclosed_without_extrapolating_the_verse(age: int) -> None:
     chart = build_ziwei_chart(_seed(1984), "男")
     result = childhood_limit(chart, age)
     assert result["source_reading"] == SOURCE["quote"]
@@ -127,7 +131,9 @@ def test_uncertain_glyph_is_disclosed_without_extrapolating_the_verse(age):
         ("natal_stars_are_not_childhood_transformations", False),
     ],
 )
-def test_public_output_cannot_certify_unverified_childhood_rules(field, value):
+def test_public_output_cannot_certify_unverified_childhood_rules(
+    field: str, value: bool
+) -> None:
     with pytest.raises(ValidationError):
         ZiweiChildhoodLimit.model_validate({field: value})
     assert ZiweiChildhoodLimit.model_validate({}).model_fields_set == set()
@@ -136,8 +142,12 @@ def test_public_output_cannot_certify_unverified_childhood_rules(field, value):
 @pytest.mark.parametrize("year,age", [(1984, 1), (1990, 7)])
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 def test_childhood_caveat_survives_rest_native_mcp_cli_with_original_budget(
-    year, age, profile, monkeypatch, capsys
-):
+    year: int,
+    age: int,
+    profile: str,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -169,7 +179,7 @@ def test_childhood_caveat_survives_rest_native_mcp_cli_with_original_budget(
         response_char_limit=8192,
     )
     rest = TestClient(api.app).post(
-        "/api/cn/ziwei/horoscope",
+        "/api/ziwei/timing",
         json=inputs,
         params=[
             ("strict_fields", "true"),
@@ -181,14 +191,14 @@ def test_childhood_caveat_survives_rest_native_mcp_cli_with_original_budget(
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            result = await client.call_tool(
-                "ziwei_horoscope", {**inputs, **options}, raise_on_error=False
+            result = await call_calculation(
+                client, "ziwei_timing", {**inputs, **options}, raise_on_error=False
             )
             assert not result.is_error, result.content
             return await verified_inline_business(client, result.structured_content)
 
     native = asyncio.run(call())
-    args = ["ziwei_horoscope"]
+    args = ["ziwei_timing"]
     for key, value in inputs.items():
         args.extend(["--" + key.replace("_", "-"), str(value)])
     args.extend(

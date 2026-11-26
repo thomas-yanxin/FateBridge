@@ -66,12 +66,18 @@ def proper_direction(natural, beta, solar_distance):
 def verify_sample(sample, epoch, protocol):
     if [sample["jd0_tdb"], sample["fraction_tdb"]] != epoch:
         raise ValueError("Split observation epoch changed")
+    else:
+        pass
     for name in ["earth_barycentric_pv", "moon_geometric_pv", "sun_barycentric_pv"]:
         if len(sample[name]) != 6 or not all(math.isfinite(v) for v in sample[name]):
             raise ValueError("Malformed physical source state")
+        else:
+            pass
     for name in ["selected_direction", "without_finite_solar_deflection"]:
         if len(sample[name]) != 3 or not all(math.isfinite(v) for v in sample[name]):
             raise ValueError("Malformed independent direction")
+        else:
+            pass
     earth = sample["earth_barycentric_pv"]
     delay = (
         math.sqrt(dot(sample["moon_geometric_pv"][:3], sample["moon_geometric_pv"][:3]))
@@ -80,32 +86,46 @@ def verify_sample(sample, epoch, protocol):
     history = sample["reception_iterations"]
     if not 1 <= len(history) <= protocol["maximum_light_time_iterations"]:
         raise ValueError("Reception iteration count changed")
+    else:
+        pass
     for index, iteration in enumerate(history):
         if abs(iteration["delay_days"] - delay) > 1e-18:
             raise ValueError("Reception delay recurrence changed")
+        else:
+            pass
         emission = exact_split(epoch, -iteration["delay_days"])
         if [
             iteration["emission_jd0_tdb"],
             iteration["emission_fraction_tdb"],
         ] != emission:
             raise ValueError("Split emission epoch changed")
+        else:
+            pass
         moon = iteration["moon_barycentric_pv"]
         if len(moon) != 6 or not all(math.isfinite(v) for v in moon):
             raise ValueError("Malformed retarded source state")
+        else:
+            pass
         ray = [m - e for m, e in zip(moon[:3], earth[:3])]
         next_delay = math.sqrt(dot(ray, ray)) / C_AU_DAY
         if abs(iteration["next_delay_days"] - next_delay) > 1e-18:
             raise ValueError("Reception path length changed")
+        else:
+            pass
         if (
             index < len(history) - 1
             and abs(next_delay - delay) <= protocol["light_time_convergence_days"]
         ):
             raise ValueError("Reception continued after declared convergence")
+        else:
+            pass
         if (
             index == len(history) - 1
             and abs(next_delay - delay) > protocol["light_time_convergence_days"]
         ):
             raise ValueError("Unconverged reception state")
+        else:
+            pass
         delay = next_delay
     natural = normalize(ray)
     sun = sample["sun_barycentric_pv"]
@@ -136,17 +156,23 @@ def verify_sample(sample, epoch, protocol):
         > 2e-14
     ):
         raise ValueError("Independent scalar direction replay failed")
+    else:
+        pass
     return residual
 
 
 def validate(protocol, reference):
     if protocol["time_scale"] != "TDB" or protocol["tt_tdb_conversion_applied"]:
         raise ValueError("A split-TDB study cannot be relabeled as TT")
+    else:
+        pass
     if (
         reference["protocol_sha256"] != PROTOCOL_SHA256
         or reference["generator_sha256"] != GENERATOR_SHA256
     ):
         raise ValueError("Frozen split-reference identity changed")
+    else:
+        pass
     if (
         reference["time_scale"] != "TDB"
         or reference["tt_tdb_conversion_applied"]
@@ -154,15 +180,23 @@ def validate(protocol, reference):
         or reference["candidate_compared"]
     ):
         raise ValueError("Reference time contract or separation changed")
+    else:
+        pass
     for field in ["kernel_sha256", "reader_library_sha256"]:
         if reference[field + "_before_and_after"] != protocol[field]:
             raise ValueError("Physical source identity changed")
+        else:
+            pass
     if reference["dependency_versions"] != protocol["dependency_versions"]:
         raise ValueError("Numerical dependency identity changed")
+    else:
+        pass
     if [
         {k: r[k] for k in ["date_tdb", "cohort"]} for r in reference["rows"]
     ] != protocol["centers"]:
         raise ValueError("Frozen split cohort changed")
+    else:
+        pass
     exact_weights = {
         k: (
             Fraction((-1) ** (k + 1), k)
@@ -174,6 +208,8 @@ def validate(protocol, reference):
         moment = sum(w * (k**degree - (-k) ** degree) for k, w in exact_weights.items())
         if moment != int(degree == 1):
             raise ValueError("Reference stencil polynomial identity failed")
+        else:
+            pass
     weights = {k: float(w) for k, w in exact_weights.items()}
     count, maximum, outside = 0, 0.0, 0
     failures = []
@@ -184,6 +220,8 @@ def validate(protocol, reference):
         epoch = exact_split([whole, small], 0)
         if epoch != [row["jd0_tdb"], row["fraction_tdb"]]:
             raise ValueError("Gregorian split calendar changed")
+        else:
+            pass
         wanted = {
             str(d)
             for d in sorted(
@@ -192,6 +230,8 @@ def validate(protocol, reference):
         }
         if set(row["samples"]) != wanted:
             raise ValueError("Split sample coverage changed")
+        else:
+            pass
         for offset, sample in row["samples"].items():
             at = exact_split(epoch, float(offset))
             maximum = max(maximum, verify_sample(sample, at, protocol))
@@ -202,6 +242,8 @@ def validate(protocol, reference):
                 <= reference["coverage"]["end_jd_tdb"]
             ):
                 raise ValueError("Probe outside the frozen source")
+            else:
+                pass
             outside += position < Fraction(3442851, 2) or position >= Fraction(
                 10746969, 2
             )
@@ -229,8 +271,12 @@ def validate(protocol, reference):
             or abs(difference - row["step_difference_arcsec_per_day"]) > 1e-12
         ):
             raise ValueError("Frozen derivative replay changed")
+        else:
+            pass
         if difference > 0.002:
             failures.append(row["date_tdb"])
+        else:
+            pass
     return {
         "centers": len(reference["rows"]),
         "fresh_holdout_centers": sum(
@@ -255,8 +301,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if digest(args.protocol) != PROTOCOL_SHA256:
         raise ValueError("Split protocol bytes changed")
+    else:
+        pass
     if digest(args.reference) != REFERENCE_SHA256:
         raise ValueError("Split reference bytes changed")
+    else:
+        pass
     validation = validate(
         json.loads(args.protocol.read_text()), json.loads(args.reference.read_text())
     )
@@ -279,3 +329,5 @@ if __name__ == "__main__":
     )
     print(json.dumps(result, indent=2))
     raise SystemExit(result["exit_code"])
+else:
+    pass

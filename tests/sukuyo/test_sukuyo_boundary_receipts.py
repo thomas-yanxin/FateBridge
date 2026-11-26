@@ -4,8 +4,8 @@ from datetime import date
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence, rulesets
-from fatebridge.core.sukuyo_special_days import (
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence, rulesets
+from fatebridge.core.sukuyo.sukuyo_special_days import (
     scope_for_weekday_basis,
     special_day_evidence,
 )
@@ -38,7 +38,7 @@ def assert_same_boundary(day, offset):
 @pytest.mark.parametrize("basis,entered,reference,offset", BASES)
 def test_known_clock_preserves_selected_host_day_in_all_weekday_layers(
     basis, entered, reference, offset
-):
+) -> None:
     calendar = calendar_mansion(entered, "00:30:00", "+09:00", calendar_basis=basis)
     assert calendar["calendar_date"] == reference
     assert (
@@ -62,7 +62,7 @@ def test_known_clock_preserves_selected_host_day_in_all_weekday_layers(
     assert "已知民用钟时不表示已确定古代平明日界" in text
 
 
-def test_next_host_day_reading_explains_same_instant_and_both_timezones():
+def test_next_host_day_reading_explains_same_instant_and_both_timezones() -> None:
     calendar = calendar_mansion(
         "2000-01-01",
         "23:30:00",
@@ -83,7 +83,7 @@ def test_next_host_day_reading_explains_same_instant_and_both_timezones():
 @pytest.mark.parametrize("basis,entered,reference,offset", BASES)
 def test_unknown_clock_keeps_each_reference_day_and_its_boundary(
     basis, entered, reference, offset
-):
+) -> None:
     calendar = calendar_mansion(entered, zone="+00:00", calendar_basis=basis)
     assert calendar["status"] == "partial"
     day = day_evidence(calendar)
@@ -100,7 +100,7 @@ def test_unknown_clock_keeps_each_reference_day_and_its_boundary(
     assert "未补造出生时刻" in day["reading_text"]
 
 
-def test_date_only_same_host_reading_does_not_invent_an_observed_clock():
+def test_date_only_same_host_reading_does_not_invent_an_observed_clock() -> None:
     calendar = calendar_mansion("2000-01-01", zone="+08:00")
     text = day_evidence(calendar)["reading_text"]
     assert "仅知输入当地日期2000-01-01（输入时区+08:00）" in text
@@ -110,12 +110,14 @@ def test_date_only_same_host_reading_does_not_invent_an_observed_clock():
 
 
 @pytest.mark.parametrize("basis", ["", "UTC+09:00", "classical_daybreak", None])
-def test_special_lookup_rejects_unestablished_or_missing_boundary(basis):
+def test_special_lookup_rejects_unestablished_or_missing_boundary(
+    basis: str | None,
+) -> None:
     with pytest.raises(ValueError, match="七曜依据"):
         special_day_evidence("尾", 0, weekday_basis=basis)
 
 
-def test_special_lookup_cannot_default_a_missing_boundary():
+def test_special_lookup_cannot_default_a_missing_boundary() -> None:
     with pytest.raises(TypeError, match="weekday_basis"):
         special_day_evidence("尾", 0)
 
@@ -123,7 +125,9 @@ def test_special_lookup_cannot_default_a_missing_boundary():
 @pytest.mark.parametrize(
     "changed", ["metadata changed", "现代UTC+08历日现代UTC+08历日"]
 )
-def test_changed_or_ambiguous_metadata_anchor_requires_revalidation(changed):
+def test_changed_or_ambiguous_metadata_anchor_requires_revalidation(
+    changed: str,
+) -> None:
     with pytest.raises(ValueError, match="占位已改变"):
         scope_for_weekday_basis(changed, "modern_utc_plus09_civil_midnight")
 
@@ -136,8 +140,8 @@ def test_changed_or_ambiguous_metadata_anchor_requires_revalidation(changed):
     ],
 )
 def test_native_reading_explains_both_derivations_and_separates_manuscript_evidence(
-    civil, adjacent, repeated
-):
+    civil: str, adjacent: str, repeated: str
+) -> None:
     day = day_evidence(
         calendar_mansion(
             civil,
@@ -158,7 +162,9 @@ def test_native_reading_explains_both_derivations_and_separates_manuscript_evide
     assert day["calendar"]["natal_su27"] is None
 
 
-def test_explicit_second_half_keeps_bounded_source_conditions_in_native_reading():
+def test_explicit_second_half_keeps_bounded_source_conditions_in_native_reading() -> (
+    None
+):
     day = day_evidence(
         calendar_mansion(
             "2024-08-04",
@@ -172,7 +178,7 @@ def test_explicit_second_half_keeps_bounded_source_conditions_in_native_reading(
     assert "不据所选例题裁定补配次序或半日钟时" in day["reading_text"]
 
 
-def test_default_profile_does_not_inherit_hinoo_manuscript_claims():
+def test_default_profile_does_not_inherit_hinoo_manuscript_claims() -> None:
     day = day_evidence(calendar_mansion("2025-03-04"))
     # The library also holds the separately identified RB00017017 print.
     # Check Hinoo evidence itself, not a shared institution's name.

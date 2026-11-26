@@ -11,14 +11,14 @@ from fatebridge.core.astro import position_motion as motion
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.core.astro.solar_motion_branch import solar_interpolation_branch
-from fatebridge.core.output_charts import CompletePositionMotion
+from fatebridge.core.contracts.output_charts import CompletePositionMotion
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.support.ephemeris_case_runtime import native_ephemeris_files
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 
 
-def test_reference_was_sealed_before_production_changes():
+def test_reference_was_sealed_before_production_changes() -> None:
     wanted = {
         "western-solar-disc-motion-protocol.json": "1df6532ce9914a4f67380bf90896c94f4c221e445bd60db21994055b9ca92497",
         "western-solar-disc-motion-reference.json": "2679711e81a769c22dfeee8a75d327d543f0d9aa7eaad1b876d4895fe04096b1",
@@ -39,7 +39,9 @@ def test_reference_was_sealed_before_production_changes():
 @pytest.mark.parametrize("count", [13, 25])
 @pytest.mark.parametrize("direction", [-1, 1])
 @pytest.mark.parametrize("power", range(7))
-def test_one_sided_fit_has_degree_six_exactness_at_wrap(count, direction, power):
+def test_one_sided_fit_has_degree_six_exactness_at_wrap(
+    count: int, direction, power
+) -> None:
     nodes = motion.DIRECTIONAL_POLYNOMIALS[count][0]
     step = 0.0625
     center = 359.9 + (1 if power == 0 else 0)
@@ -51,8 +53,8 @@ def test_one_sided_fit_has_degree_six_exactness_at_wrap(count, direction, power)
 @pytest.mark.parametrize("epoch", [0.0, 2451545.0, 5373484.25])
 @pytest.mark.parametrize("longitude", [0.0, 74.0, 226.0, 359.99])
 def test_refinement_budget_is_derived_from_representability_not_known_dates(
-    epoch, longitude
-):
+    epoch: float, longitude: float
+) -> None:
     steps, policy = motion.refinement_budget(epoch, longitude)
     assert steps[-1] >= policy["estimated_roundoff_floor_days"]
     assert steps[-1] / 2 < policy["estimated_roundoff_floor_days"]
@@ -65,7 +67,7 @@ def test_refinement_budget_is_derived_from_representability_not_known_dates(
                 assert (epoch + delta) - epoch == delta
 
 
-def test_a_known_nearby_source_knot_allows_only_the_homogeneous_direction():
+def test_a_known_nearby_source_knot_allows_only_the_homogeneous_direction() -> None:
     def provider(delta):
         return 100 + 0.4 * delta + 2 * max(0, delta - 1e-5)
 
@@ -87,7 +89,7 @@ def test_a_known_nearby_source_knot_allows_only_the_homogeneous_direction():
     )
 
 
-def test_an_unknown_center_never_becomes_an_unconstrained_one_sided_escape():
+def test_an_unknown_center_never_becomes_an_unconstrained_one_sided_escape() -> None:
     result = motion.homogeneous_side_derivative(
         [0.1, 0.05, 0.025],
         lambda _: pytest.fail("No derivative without a verified interior cell"),
@@ -96,7 +98,9 @@ def test_an_unknown_center_never_becomes_an_unconstrained_one_sided_escape():
     assert result["status"] == "not_converged" and not result["levels"]
 
 
-def test_all_eligible_sides_must_agree_even_if_one_would_give_a_desired_answer():
+def test_all_eligible_sides_must_agree_even_if_one_would_give_a_desired_answer() -> (
+    None
+):
     result = motion.homogeneous_side_derivative(
         [2.0**-i for i in range(5, 17)],
         lambda x: 100 + 0.4 * x + abs(x),
@@ -107,7 +111,7 @@ def test_all_eligible_sides_must_agree_even_if_one_would_give_a_desired_answer()
     assert result["levels"][-1]["disagreement_arcsec_per_day"] > 0.0002
 
 
-def test_direction_set_changes_reset_three_level_evidence():
+def test_direction_set_changes_reset_three_level_evidence() -> None:
     branch = lambda x: {"cell": 5 if x < 0.5 else 6}
     provider = lambda x: 100 + 0.4 * x
     result = motion.homogeneous_side_derivative(
@@ -125,8 +129,8 @@ def test_direction_set_changes_reset_three_level_evidence():
     "planet,epoch", [("Venus", 2460465.8966340744), ("Mercury", 2459892.46875)]
 )
 def test_real_old_failure_or_false_plateau_has_a_typed_fixed_line_receipt(
-    planet, epoch, sidereal, native_ephemeris_files
-):
+    planet: str, epoch: float, sidereal: bool, native_ephemeris_files
+) -> None:
     swe = runtime.swe
     with runtime.preserve_ephemeris_path():
         runtime.ephemeris_call("set_sid_mode", swe.SIDM_LAHIRI, 0.0, 0.0)
@@ -139,6 +143,8 @@ def test_real_old_failure_or_false_plateau_has_a_typed_fixed_line_receipt(
             pytest.skip(
                 "Source-model numerical checks require the disclosed Swiss files"
             )
+        else:
+            pass
         rate, policy = motion.complete_position_rate(
             planet, epoch, raw, model, sidereal=sidereal
         )
@@ -170,8 +176,8 @@ def test_real_old_failure_or_false_plateau_has_a_typed_fixed_line_receipt(
 
 @pytest.mark.parametrize("problem", ["model", "frame", "values", "configuration"])
 def test_solar_cell_probe_retains_physical_source_guards(
-    problem, monkeypatch, native_ephemeris_files
-):
+    problem: str, monkeypatch: pytest.MonkeyPatch, native_ephemeris_files
+) -> None:
     original = runtime.ephemeris_call
     raw, ret = original(
         "calc",
@@ -181,6 +187,8 @@ def test_solar_cell_probe_retains_physical_source_guards(
     )
     if runtime.ephemeris_model_from_retflag(ret) != "swieph":
         pytest.skip("Physical Swiss files required for source guard test")
+    else:
+        pass
 
     def changed(operation, *args, **kwargs):
         values, flags = original(operation, *args, **kwargs)
@@ -201,7 +209,9 @@ def test_solar_cell_probe_retains_physical_source_guards(
         )
 
 
-def test_a_solar_mass_knot_is_not_certified_as_an_interior_cell(monkeypatch):
+def test_a_solar_mass_knot_is_not_certified_as_an_interior_cell(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     swe = runtime.swe
     radius = math.radians(959.63 / 3600)
     sine = 0.37 * radius
@@ -216,6 +226,8 @@ def test_a_solar_mass_knot_is_not_certified_as_an_interior_cell(monkeypatch):
         returned = flags | swe.FLG_NONUT
         if flags & swe.FLG_TRUEPOS:
             returned |= swe.FLG_NOABERR | swe.FLG_NOGDEFL
+        else:
+            pass
         return values, returned
 
     class Trace:

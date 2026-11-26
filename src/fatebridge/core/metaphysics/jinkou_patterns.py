@@ -9,20 +9,21 @@ from __future__ import annotations
 
 from typing import Any
 
-from fatebridge.core.metaphysics.jinkou_pattern_tables import (
-    JINKOU_SCAN_SHA256,
-    JINKOU_SCAN_URL,
-)
-
-from ...utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
-from .common import (
+from fatebridge.core.metaphysics.common import (
     ELEMENT_CONTROLS,
     branch_element_text,
     kongwang_for_ganzhi,
     stem_element_text,
     xun_head_for_ganzhi,
 )
-from .jinkou_stems import wuzidun_stem
+from fatebridge.core.metaphysics.jinkou_pattern_proofs import condition_evidence
+from fatebridge.core.metaphysics.jinkou_pattern_tables import (
+    JINKOU_SCAN_SHA256,
+    JINKOU_SCAN_URL,
+)
+from fatebridge.core.metaphysics.jinkou_sources import use_sources
+from fatebridge.core.metaphysics.jinkou_stems import wuzidun_stem
+from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
 
 CATALOG = (
     ("鬼合身课", "阴害卦", 96),
@@ -229,7 +230,6 @@ def structural_patterns(
 ) -> dict[str, Any]:
     if len(rows) != 4 or [r["label"] for r in rows] != ["人元", "贵神", "将神", "地分"]:
         raise ValueError("格局需要按人元、贵神、将神、地分排列的四位")
-    from .jinkou_pattern_proofs import condition_evidence
 
     condition_facts, condition_groups, values = condition_evidence(
         rows, day_ganzhi=day_ganzhi
@@ -324,7 +324,6 @@ def structural_patterns(
 def use_evidence(
     rows: list[dict[str, Any]], strength: dict[str, Any], *, polarity_position: str
 ) -> dict[str, Any]:
-    from .jinkou_sources import use_sources
 
     row = next(r for r in rows if r["label"] == polarity_position)
     controllers = [

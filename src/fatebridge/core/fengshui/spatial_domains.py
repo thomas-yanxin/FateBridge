@@ -5,8 +5,13 @@ from math import ceil, floor, prod
 
 from shapely.geometry import Point, box
 
-from .spatial_geometry import polygon_xy
-from .spatial_inputs import PlanPoint, ResolvedMoveDomain, SpatialScene, SpatialSearch
+from fatebridge.core.fengshui.spatial_geometry import polygon_xy
+from fatebridge.core.fengshui.spatial_inputs import (
+    PlanPoint,
+    ResolvedMoveDomain,
+    SpatialScene,
+    SpatialSearch,
+)
 
 
 def resolve_search_domains(

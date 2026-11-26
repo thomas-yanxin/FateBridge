@@ -27,6 +27,8 @@ def main(argv=None):
     if digest != source["kernel_sha256"]:
         if options.verify_only:
             raise ValueError("The pinned DE440 reference kernel is missing or corrupt")
+        else:
+            pass
         target.parent.mkdir(parents=True, exist_ok=True)
         descriptor, name = tempfile.mkstemp(dir=target.parent, suffix=".download")
         os.close(descriptor)
@@ -38,12 +40,18 @@ def main(argv=None):
                 raise ValueError(
                     "Downloaded DE440 bytes do not match the declared source"
                 )
+            else:
+                pass
             temporary.replace(target)
         finally:
             temporary.unlink(missing_ok=True)
+    else:
+        pass
     print(json.dumps({"path": str(target), "sha256": digest, "source": source["url"]}))
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

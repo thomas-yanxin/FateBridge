@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from .taiyi_eye_relations import ANNOTATIONS, PROFILE, SCOPE
+from fatebridge.core.metaphysics.taiyi_eye_relations import ANNOTATIONS, PROFILE, SCOPE
 
 SOURCE = "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷04#推五將發不發"
 CLAUSES = (

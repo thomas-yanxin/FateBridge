@@ -1,10 +1,10 @@
 """Selected Shen fixed-ground zero/regular deity and independently observed forms."""
 
-from typing import List, Literal, Optional
+from typing import Literal
 
 from pydantic import ConfigDict, Field, StrictBool, model_validator
 
-from .numeric_inputs import FengshuiInput as _DeferredModel
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput as _DeferredModel
 
 
 class LingzhengObservation(_DeferredModel):
@@ -21,9 +21,9 @@ class LingzhengObservation(_DeferredModel):
         }
     )
     direction: Literal["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
-    high_solid_terrain_present: Optional[StrictBool] = None
-    low_lying_terrain_present: Optional[StrictBool] = None
-    river_water_present: Optional[StrictBool] = Field(
+    high_solid_terrain_present: StrictBool | None = None
+    low_lying_terrain_present: StrictBool | None = None
+    river_water_present: StrictBool | None = Field(
         default=None,
         description="原按语河流的外部水体存在事实；一般有水、室内水杯、水景或摆件不能直接代替河流",
     )
@@ -65,14 +65,14 @@ class FixedLingzhengRequest(_DeferredModel):
         }
     )
     ruleset_id: Literal["shen_fixed_lingzheng_v1"] = "shen_fixed_lingzheng_v1"
-    five_period_half: Optional[Literal["first_decade", "second_decade"]] = Field(
+    five_period_half: Literal["first_decade", "second_decade"] | None = Field(
         default=None,
         description="仅明确评价五运时确认前十年或后十年，不从历史宅运或系统日期推断",
     )
-    half_evidence: Optional[str] = Field(
+    half_evidence: str | None = Field(
         default=None, min_length=1, max_length=1000, pattern=r"\S"
     )
-    observations: List[LingzhengObservation] = Field(
+    observations: list[LingzhengObservation] = Field(
         default_factory=list,
         max_length=8,
         json_schema_extra={

@@ -32,8 +32,12 @@ def validate_header(record, target, aliases):
     target_match = re.search(r"Target body name:.*\((\d+)\)", text)
     if target_match is None or int(target_match[1]) not in aliases[str(target)]:
         raise ValueError("Unexpected target reference point")
+    else:
+        pass
     if "Center body name: Earth (399)" not in text:
         raise ValueError("Unexpected observer center")
+    else:
+        pass
     for label in (
         "Date__(TT)__HR:MN:SC.fff",
         "RA_(ICRF-a-app)",
@@ -41,6 +45,8 @@ def validate_header(record, target, aliases):
     ):
         if label not in text:
             raise ValueError("Unexpected apparent frame/time/coordinate header")
+        else:
+            pass
 
 
 def generate(args):
@@ -48,9 +54,13 @@ def generate(args):
     for package, expected in protocol["versions"].items():
         if importlib.metadata.version(package) != expected:
             raise ValueError("Independent reference dependency changed")
+        else:
+            pass
     dates = protocol["dates_tt"]
     if len(dates) != len(set(dates)):
         raise ValueError("Duplicate protocol epoch")
+    else:
+        pass
     samples = sorted(
         {
             (datetime.fromisoformat(date) + timedelta(seconds=offset)).isoformat()
@@ -77,6 +87,8 @@ def generate(args):
                 record = original_record
                 if "error" not in record:
                     validate_header(record, target, protocol["target_id_aliases"])
+                else:
+                    pass
             except (subprocess.CalledProcessError, ValueError) as error:
                 # Keep the original journal if the transport succeeded but
                 # its returned contract failed. Never freeze it as valid rows.
@@ -91,6 +103,8 @@ def generate(args):
                     record["raw_response_utf8"] = (error.output or b"").decode(
                         errors="replace"
                     )
+                else:
+                    pass
                 (args.archive / f"{label}-failure.json").write_text(
                     json.dumps(record, indent=2) + "\n"
                 )
@@ -99,6 +113,8 @@ def generate(args):
         points = {row["date_tt"]: row["icrf_unit_direction"] for row in source}
         if len(points) != len(source) or not set(points) <= set(samples):
             raise ValueError("Duplicate or unrequested reference position")
+        else:
+            pass
         rows = []
         for date in dates:
             required = [
@@ -145,6 +161,8 @@ def generate(args):
                     )
                     * 3600
                 )
+            else:
+                pass
             rows.append(row)
         targets.append(
             {"body": body, "target_id": target, "batches": batches, "rows": rows}
@@ -160,6 +178,8 @@ def generate(args):
     ]
     if forbidden:
         raise RuntimeError("Reference collector imported the production engine")
+    else:
+        pass
     return {
         "collected_at_utc": datetime.now(timezone.utc).isoformat(),
         "protocol_sha256": digest(args.protocol),
@@ -176,7 +196,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.output.exists():
         raise SystemExit("Refuse to replace an earlier reference")
+    else:
+        pass
     result = generate(args)
     args.output.write_text(
         json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
     )
+else:
+    pass

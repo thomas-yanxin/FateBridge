@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo_waterclock import (
+from fatebridge.core.sukuyo.sukuyo_waterclock import (
     source_specific_time_lines,
     source_specific_time_reference,
 )
@@ -14,7 +14,7 @@ from fatebridge.core.sukuyo_waterclock import (
 FIXTURE = Path(__file__).parents[1] / "data/sukuyo-upstream-before-production-v76.json"
 
 
-def test_entire_source_first_reference_is_delivered():
+def test_entire_source_first_reference_is_delivered() -> None:
     evidence = source_specific_time_reference()["daybreak_source_comparison"][
         "upstream_collation"
     ]
@@ -22,7 +22,7 @@ def test_entire_source_first_reference_is_delivered():
     assert evidence["baseline_acquisition_flags_describe_round"] == 75
 
 
-def test_dawn_spans_are_literal_contextual_endpoints_not_clock_constants():
+def test_dawn_spans_are_literal_contextual_endpoints_not_clock_constants() -> None:
     evidence = source_specific_time_reference()["daybreak_source_comparison"][
         "upstream_collation"
     ]["source_data"]
@@ -40,7 +40,9 @@ def test_dawn_spans_are_literal_contextual_endpoints_not_clock_constants():
     assert not evidence["scope"]["birth_calendar_override_applied"]
 
 
-def test_native_delivers_acquisition_without_asserting_transmission_or_priority():
+def test_native_delivers_acquisition_without_asserting_transmission_or_priority() -> (
+    None
+):
     text = "\n".join(source_specific_time_lines(source_specific_time_reference()))
     for literal in (
         "安居五缘的第三项",
@@ -78,8 +80,8 @@ def test_native_delivers_acquisition_without_asserting_transmission_or_priority(
         "remove_foreign_note",
     ],
 )
-def test_corrupted_upstream_claims_or_layers_require_re_review(change):
-    from fatebridge.core.sukuyo_upstream_dawn import validate_upstream_reference
+def test_corrupted_upstream_claims_or_layers_require_re_review(change: str) -> None:
+    from fatebridge.core.sukuyo.sukuyo_upstream_dawn import validate_upstream_reference
 
     data = copy.deepcopy(json.loads(FIXTURE.read_bytes())["source_data"])
     if change == "claim_quotation_identity":
@@ -112,7 +114,7 @@ def test_corrupted_upstream_claims_or_layers_require_re_review(change):
         validate_upstream_reference(data)
 
 
-def test_aruna_exact_line_break_positions_are_delivered():
+def test_aruna_exact_line_break_positions_are_delivered() -> None:
     reference = source_specific_time_reference()["daybreak_source_comparison"][
         "upstream_collation"
     ]["source_data"]

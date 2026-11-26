@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from typing import List
-
 from fatebridge.application.bindings import lazy_service, person_invoke, raw_invoke
-from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.application.domain_validators import validate_ren_output
+from fatebridge.application.tool_spec import ServiceResult, ToolSpec
 from fatebridge.core.requests.metaphysics import (
     JinkouAnalysisRequest,
     LiuRengGodsRequest,
@@ -56,7 +55,61 @@ calculate_ziwei_rules = lazy_service(
     "fatebridge.services.metaphysics", "calculate_ziwei_rules"
 )
 
-SPECS: List[ToolSpec] = [
+
+def _compact_qimen(result: ServiceResult) -> ServiceResult:
+    board = result["qimen"]
+    return {
+        **result,
+        "qimen": {
+            **board,
+            "palaces": [
+                {key: value for key, value in palace.items() if key != "evidence"}
+                for palace in board["palaces"]
+            ],
+        },
+    }
+
+
+def _compact_ziwei_horoscope(result: ServiceResult) -> ServiceResult:
+    horoscope = result["ziwei_horoscope"]
+    fields = {
+        "scope",
+        "status",
+        "unavailable_reason",
+        "first_age",
+        "palace_name",
+        "scope_palace_role",
+        "branch",
+        "stem",
+        "stem_origin",
+        "mutagen",
+    }
+    return {
+        **result,
+        "ziwei_horoscope": {
+            **{
+                key: value for key, value in horoscope.items() if key != "annual_cycles"
+            },
+            "scopes": [
+                {key: value for key, value in scope.items() if key in fields}
+                for scope in horoscope["scopes"]
+            ],
+        },
+    }
+
+
+def _compact_ziwei_rules(result: ServiceResult) -> ServiceResult:
+    return {
+        **result,
+        "rule_catalogue": {
+            key: value
+            for key, value in result["rule_catalogue"].items()
+            if key != "named_patterns"
+        },
+    }
+
+
+SPECS: list[ToolSpec] = [
     ToolSpec(
         key="ziwei_birth",
         bind=person_invoke(calculate_ziwei_birth, also_pass=("birth_utc_offset",)),
@@ -65,19 +118,22 @@ SPECS: List[ToolSpec] = [
         operation_label_zh="紫微命盘",
         family="metaphysics",
         cpu_bound=True,
-        rest_path="/api/cn/ziwei/birth",
-        mcp_name="ziwei_birth",
+        rest_path="/api/ziwei/birth-chart",
+        mcp_name="ziwei_birth_chart",
+        optional_snapshot=True,
     ),
     ToolSpec(
         key="ziwei_horoscope",
         bind=person_invoke(calculate_ziwei_horoscope, also_pass=("birth_utc_offset",)),
         request_model=ZiweiHoroscopeRequest,
-        summary="紫微斗数运限（六层索引与独立童限；四化继承所选表，未起大限时该层为空，未含全部流曜飞宫）。",
+        summary="紫微斗数运限（六层索引与独立童限；四化继承所选表，未起大限时大限为空，未知性别仅大限/小限标不可定而流年/月/日/时与虚岁正常返回，未含全部流曜飞宫）。",
         operation_label_zh="紫微运限",
         family="metaphysics",
         cpu_bound=True,
-        rest_path="/api/cn/ziwei/horoscope",
-        mcp_name="ziwei_horoscope",
+        rest_path="/api/ziwei/timing",
+        mcp_name="ziwei_timing",
+        optional_snapshot=True,
+        compact_view=_compact_ziwei_horoscope,
     ),
     ToolSpec(
         key="ziwei_rules",
@@ -85,12 +141,14 @@ SPECS: List[ToolSpec] = [
         request_model=ZiweiRulesRequest,
         summary=(
             "紫微斗数规则查表：按年干返回四化等规则参照，供解读时查证；"
-            "起命盘用 ziwei_birth，看运限用 ziwei_horoscope。"
+            "起命盘用 ziwei_birth_chart，看运限用 ziwei_timing。"
         ),
         operation_label_zh="紫微规则",
         family="metaphysics",
-        rest_path="/api/cn/ziwei/rules",
+        rest_path="/api/ziwei/rules",
         mcp_name="ziwei_rules",
+        optional_snapshot=True,
+        compact_view=_compact_ziwei_rules,
     ),
     ToolSpec(
         key="liureng_gods",
@@ -103,8 +161,9 @@ SPECS: List[ToolSpec] = [
         operation_label_zh="六壬课",
         family="metaphysics",
         cpu_bound=True,
-        rest_path="/api/cn/liureng/gods",
-        mcp_name="liureng_gods",
+        rest_path="/api/liuren/chart",
+        mcp_name="liuren_chart",
+        output_validators=(validate_ren_output,),
     ),
     ToolSpec(
         key="liureng_runyear",
@@ -115,13 +174,14 @@ SPECS: List[ToolSpec] = [
         request_model=LiuRengRunyearRequest,
         summary=(
             "六壬行年：按农历虚岁推男女行年，并以分析时刻起六壬课；"
-            "没有逐流月预测。问具体单事用 liureng_gods。"
+            "没有逐流月预测。问具体单事用 liuren_chart。"
         ),
         operation_label_zh="六壬流年",
         family="metaphysics",
         cpu_bound=True,
-        rest_path="/api/cn/liureng/runyear",
-        mcp_name="liureng_runyear",
+        rest_path="/api/liuren/timing/yearly",
+        mcp_name="liuren_yearly_timing",
+        output_validators=(validate_ren_output,),
     ),
     ToolSpec(
         key="qimen",
@@ -129,13 +189,14 @@ SPECS: List[ToolSpec] = [
         request_model=QimenAnalysisRequest,
         summary=(
             "奇门遁甲：问方位选择 / 行动时机 / 谋略布局（含趋吉避凶方位）；"
-            "问单事成败用 sixyao，看大势国运用 taiyi。"
+            "问单事成败用 liuyao，看大势国运用 taiyi。"
         ),
         operation_label_zh="奇门遁甲",
         family="metaphysics",
         cpu_bound=True,
-        rest_path="/api/cn/qimen",
+        rest_path="/api/qimen",
         mcp_name="qimen",
+        compact_view=_compact_qimen,
     ),
     ToolSpec(
         key="taiyi",
@@ -150,7 +211,7 @@ SPECS: List[ToolSpec] = [
         operation_label_zh="太乙",
         family="metaphysics",
         cpu_bound=True,
-        rest_path="/api/cn/taiyi",
+        rest_path="/api/taiyi",
         mcp_name="taiyi",
     ),
     ToolSpec(
@@ -164,7 +225,8 @@ SPECS: List[ToolSpec] = [
         operation_label_zh="金口诀",
         family="metaphysics",
         cpu_bound=True,
-        rest_path="/api/cn/jinkou",
+        rest_path="/api/jinkou",
         mcp_name="jinkou",
+        output_validators=(validate_ren_output,),
     ),
 ]

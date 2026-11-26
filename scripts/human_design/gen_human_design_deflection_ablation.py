@@ -27,15 +27,23 @@ def derive(output: Path) -> None:
 
     if output.exists():
         raise FileExistsError(output)
+    else:
+        pass
     if hashlib.sha256(ABLATION_PLAN.read_bytes()).hexdigest() != ABLATION_SHA256:
         raise ValueError("Declared ablation changed")
+    else:
+        pass
     fixed = plan()
     for name, expected in fixed["reference_versions"].items():
         if version(name) != expected:
             raise ValueError("Independent reference dependency changed")
+        else:
+            pass
     path = ROOT / fixed["de440_kernel_path"]
     if hashlib.sha256(path.read_bytes()).hexdigest() != KERNEL_SHA256:
         raise ValueError("Independent kernel changed")
+    else:
+        pass
     kernel = load_file(str(path))
     try:
         ts = load.timescale(builtin=True)
@@ -77,3 +85,5 @@ def derive(output: Path) -> None:
 
 if __name__ == "__main__":
     derive(Path(sys.argv[1]))
+else:
+    pass

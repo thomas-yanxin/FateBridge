@@ -6,7 +6,7 @@ resolve a physical Ascendant when the shared angle model says it cannot.
 
 from __future__ import annotations
 
-from typing import Any, Dict, Mapping
+from typing import Any, Mapping
 
 UNRESOLVED_REFERENCE_BASES = frozenset(
     {"backend_numeric_convention_only", "geographic_pole_meridian_convention"}
@@ -32,13 +32,13 @@ def reference_angle_basis(
 
 
 def qualify_reference_geometry(
-    geometry: Dict[str, Any], definition: Mapping[str, Any] | None
+    geometry: dict[str, Any], definition: Mapping[str, Any] | None
 ) -> None:
     """Annotate only rows that actually depend on a qualified reference angle."""
     if not definition:
         return
 
-    def qualify(row: Dict[str, Any], names: list[str]) -> None:
+    def qualify(row: dict[str, Any], names: list[str]) -> None:
         bases = {
             name: basis
             for name in names
@@ -50,7 +50,7 @@ def qualify_reference_geometry(
                 basis in UNRESOLVED_REFERENCE_BASES for basis in bases.values()
             )
 
-    def qualify_reading(row: Dict[str, Any]) -> None:
+    def qualify_reading(row: dict[str, Any]) -> None:
         qualify(row, list(row.get("factor_longitudes", {})))
         if row.get("physical_reference_geometry_resolved") is False:
             row.setdefault("backend_reading_zh", row["reading_zh"])

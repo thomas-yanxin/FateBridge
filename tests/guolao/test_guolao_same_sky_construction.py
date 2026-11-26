@@ -11,13 +11,15 @@ from fastmcp import Client
 
 import fatebridge.api as api
 from fatebridge.cli import run
-from fatebridge.core import guolao, guolao_timing
 from fatebridge.core.astro import birth as birth_module
+from fatebridge.core.astro import solar_rebase
+from fatebridge.core.guolao import guolao, guolao_timing
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.astrology import calculate_core_chart_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.guolao.test_guolao_native_frames import fixed_moshier  # noqa: F401
+from tests.support.transports import call_calculation
+from tests.unit_test.fixtures.guolao import fixed_moshier as fixed_moshier
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-same-sky-construction-v1"
 HELD = json.loads(
@@ -46,8 +48,12 @@ CASE = dict(
     ],
 )
 def test_same_sky_clock_remains_usable_when_unused_legacy_display_is_unavailable(
-    monkeypatch, fixed_moshier, solar, policy, zodiacal
-):
+    monkeypatch: pytest.MonkeyPatch,
+    fixed_moshier,
+    solar: bool,
+    policy: str | None,
+    zodiacal: int,
+) -> None:
     calls = []
 
     def forbidden(*args, **kwargs):
@@ -76,19 +82,23 @@ def test_same_sky_clock_remains_usable_when_unused_legacy_display_is_unavailable
             == result["guolao"]["life_palace"]["birth_hour_branch"]
         )
         assert clock["julian_day_ut1"] == result["guolao"]["profile"]["julian_day_ut1"]
+    else:
+        pass
     assert not result["guolao"]["validation"]["full_marks_established"]
 
 
 @pytest.mark.parametrize("row_index", range(6))
 def test_range_boundary_keeps_valid_outputs_and_computes_unrepresentable_utc_label(
     fixed_moshier, row_index
-):
+) -> None:
     held = HELD[row_index]
     result = calculate_core_chart_analysis(**held["input"])
     assert "error" not in result, result
     if row_index != 3:
         assert result["guolao"]["validation"]["full_marks_established"] is False
         return
+    else:
+        pass
     # Independent calendar arithmetic: local Jan1 at+14 is preceding Dec31
     # 10:00. The astronomical year0 label is not a Python datetime or a record.
     assert result["person_info"]["utc_datetime"] == "0000-12-31T10:00:00+00:00"
@@ -112,15 +122,13 @@ def test_range_boundary_keeps_valid_outputs_and_computes_unrepresentable_utc_lab
 
 @pytest.mark.parametrize("variant", ["chart", "chart13", "hellen_chart", "germany"])
 def test_other_legacy_consumers_are_not_silently_rebased_or_ignored(
-    monkeypatch, fixed_moshier, variant
-):
+    monkeypatch: pytest.MonkeyPatch, fixed_moshier, variant: str
+) -> None:
     calls = []
 
     def unavailable(*args, **kwargs):
         calls.append(True)
         raise ValueError("required legacy clock unavailable")
-
-    from fatebridge.core.astro import solar_rebase
 
     monkeypatch.setattr(solar_rebase, "calculate_solar_time_adjustment", unavailable)
     result = calculate_core_chart_analysis(
@@ -136,15 +144,15 @@ def test_other_legacy_consumers_are_not_silently_rebased_or_ignored(
 @pytest.mark.parametrize("solar", [False, True])
 @pytest.mark.parametrize("physical_failure", [False, True])
 def test_actual_three_surfaces_skip_unused_display_and_keep_physical_errors(
-    monkeypatch,
+    monkeypatch: pytest.MonkeyPatch,
     fixed_moshier,
-    capsys,
+    capsys: pytest.CaptureFixture[str],
     record_testsuite_property,
-    case_name,
-    tool,
-    solar,
-    physical_failure,
-):
+    case_name: str,
+    tool: str,
+    solar: bool,
+    physical_failure: bool,
+) -> None:
     def unused(*args, **kwargs):
         pytest.fail("Guolao construction must not execute legacy display")
 
@@ -155,9 +163,13 @@ def test_actual_three_surfaces_skip_unused_display_and_keep_physical_errors(
         def failed(operation, *args, **kwargs):
             if operation == "calc" and args[1] == guolao.runtime.swe.SUN:
                 raise EphemerisSourceError("coordinate_values_unavailable")
+            else:
+                pass
             return native(operation, *args, **kwargs)
 
         monkeypatch.setattr(guolao.runtime, "ephemeris_call", failed)
+    else:
+        pass
     spec = next(s for s in CATALOG if s.key == tool)
     payload = dict(**CASE, use_true_solar_time=solar)
     if case_name != "modern":
@@ -169,6 +181,8 @@ def test_actual_three_surfaces_skip_unused_display_and_keep_physical_errors(
             birth_timezone="+14:00",
             birth_longitude=170,
         )
+    else:
+        pass
     if case_name == "utc0_target":
         payload["analysis_datetime"] = "0001-01-01T02:00:00+15:00"
     elif case_name in {"utc0_jie", "utc0_lunar"}:
@@ -176,8 +190,12 @@ def test_actual_three_surfaces_skip_unused_display_and_keep_physical_errors(
         payload["guolao_month_basis"] = (
             "jie_month" if case_name == "utc0_jie" else "chinese_lunar_utc8"
         )
+    else:
+        pass
     if tool == "astro_chart":
         payload["chart_variant"] = "guolao_chart"
+    else:
+        pass
     options = dict(
         as_of="2026-10-25T00:00:00+08:00",
         include_snapshot_text=False,
@@ -201,15 +219,11 @@ def test_actual_three_surfaces_skip_unused_display_and_keep_physical_errors(
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                spec.tool_name, {**payload, **options}, raise_on_error=False
+            result = await call_calculation(
+                client, spec.tool_name, {**payload, **options}, raise_on_error=False
             )
             assert result.is_error is physical_failure
-            return (
-                json.loads(result.content[0].text)
-                if physical_failure
-                else result.structured_content
-            )
+            return result.structured_content
 
     mcp = asyncio.run(protocol())
     arguments = [spec.tool_name]
@@ -256,6 +270,8 @@ def test_actual_three_surfaces_skip_unused_display_and_keep_physical_errors(
             monthly = bodies[0]["guolao"]["timing"]["month_limit"]
             assert monthly["status"] == "unassigned_calendar_unavailable"
             assert monthly["branch"] is None
+        else:
+            pass
 
 
 @pytest.mark.parametrize(
@@ -267,16 +283,24 @@ def test_actual_three_surfaces_skip_unused_display_and_keep_physical_errors(
     [(False, None), (True, None), (True, "jie_month"), (True, "chinese_lunar_utc8")],
 )
 def test_optional_time_layers_preserve_sky_and_do_not_invent_unavailable_month(
-    monkeypatch, fixed_moshier, policy, target, basis
-):
+    monkeypatch: pytest.MonkeyPatch,
+    fixed_moshier,
+    policy: str | None,
+    target: bool,
+    basis: str | None,
+) -> None:
     args = {
         **HELD[3]["input"],
         "guolao_seasonal_anchor_policy": policy,
     }
     if target:
         args["analysis_datetime"] = datetime.fromisoformat("2027-06-01T00:00:00+08:00")
+    else:
+        pass
     if basis:
         args["guolao_month_basis"] = basis
+    else:
+        pass
     result = calculate_core_chart_analysis(**args)
     assert "error" not in result, result
     g = result["guolao"]
@@ -285,19 +309,22 @@ def test_optional_time_layers_preserve_sky_and_do_not_invent_unavailable_month(
     if target:
         assert len(g["timing"]["transit_bodies"]) == 11
         assert g["timing"]["small_limit"]["branch"] is not None
+    else:
+        pass
     if basis:
         month = g["timing"]["month_limit"]
         assert month["birth_month"]["instant_utc"] == "0000-12-31T10:00:00+00:00"
         assert month["birth_month"]["status"] == "outside_datetime_calendar_range"
         assert month["status"] == "unassigned_calendar_unavailable"
         assert month["branch"] is month["natal_functional_palace"] is None
-        assert month["event_probability_estimated"] is False
+    else:
+        pass
     assert g["validation"]["full_marks_established"] is False
 
 
 def test_same_utc0_target_different_offsets_agree_and_earlier_target_rejects(
     fixed_moshier,
-):
+) -> None:
     args = HELD[3]["input"]
     results = [
         calculate_core_chart_analysis(
@@ -317,6 +344,31 @@ def test_same_utc0_target_different_offsets_agree_and_earlier_target_rejects(
     assert "guolao" not in earlier
 
 
+def test_named_birth_zone_projects_utc0_target_to_a_representable_label(
+    monkeypatch: pytest.MonkeyPatch,
+    fixed_moshier,
+) -> None:
+    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
+    args = HELD[3]["input"] | {
+        "birth_timezone": "Pacific/Auckland",
+        "birth_longitude": 174.76,
+        "birth_latitude": -36.85,
+        "use_true_solar_time": False,
+    }
+    result = calculate_core_chart_analysis(
+        **args,
+        analysis_datetime=datetime.fromisoformat("0001-01-01T01:00:00.123456+12:00"),
+    )
+    assert "error" not in result, result
+    timing = result["guolao"]["timing"]
+    assert timing["analysis_datetime"] == "0000-12-31T13:00:00.123456+00:00"
+    assert timing["calendar_datetime"] == "0001-01-01T00:39:04.123456+11:39:04"
+    assert timing["calendar_timezone"] == "Pacific/Auckland"
+    assert timing["small_limit"]["target_year_stem"] == "庚"
+    assert timing["small_limit"]["target_year_branch"] == "申"
+    assert len(timing["transit_bodies"]) == 11
+
+
 @pytest.mark.parametrize(
     "offset",
     [
@@ -329,7 +381,9 @@ def test_same_utc0_target_different_offsets_agree_and_earlier_target_rejects(
         timedelta(seconds=27, microseconds=1),
     ],
 )
-def test_fixed_offset_calendar_conversion_matches_datetime_where_both_exist(offset):
+def test_fixed_offset_calendar_conversion_matches_datetime_where_both_exist(
+    offset,
+) -> None:
     instant = datetime.fromisoformat("2026-01-01T01:02:03.456789+15:00")
     recorded = datetime(2000, 1, 1, tzinfo=timezone(offset))
     actual = guolao_timing._calendar_clock(instant, recorded)

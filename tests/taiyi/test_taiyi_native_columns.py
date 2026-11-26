@@ -2,6 +2,7 @@
 
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 
@@ -16,7 +17,7 @@ from scripts.taiyi.audit_taiyi_native_columns import (
 from scripts.taiyi.build_taiyi_source_alignment import source_data
 
 
-def test_native_source_keeps_all_fields_and_all_disagreements():
+def test_native_source_keeps_all_fields_and_all_disagreements() -> None:
     result = audit()
     assert result["required_rows"] == 144
     assert result["selected_semantic_observations"] == 864
@@ -41,7 +42,7 @@ def test_native_source_keeps_all_fields_and_all_disagreements():
     assert result["new_dated_cases"] == 0
 
 
-def test_initial_manual_errors_are_preserved_and_corrected_from_named_columns():
+def test_initial_manual_errors_are_preserved_and_corrected_from_named_columns() -> None:
     result = source_readings()
     entries = result["corrections"]["entries"]
     assert [(r["id"], r["field"], r["initial"], r["selected"]) for r in entries] == [
@@ -56,7 +57,7 @@ def test_initial_manual_errors_are_preserved_and_corrected_from_named_columns():
     assert len(first["differences"]) == 4 and not first["corrections_applied"]
 
 
-def test_every_returned_source_column_has_its_frozen_native_location():
+def test_every_returned_source_column_has_its_frozen_native_location() -> None:
     native = source_readings()
     catalog = {r["id"]: r for r in source_data()["rows"]}
     for row in native["rows"]:
@@ -85,7 +86,7 @@ def test_every_returned_source_column_has_its_frozen_native_location():
 
 @pytest.mark.parametrize("field", ["wenchang_palace", "shiji", "jishen"])
 @pytest.mark.parametrize("value", ["", "子丑"])
-def test_empty_and_multiple_positions_are_unassessed(field, value):
+def test_empty_and_multiple_positions_are_unassessed(field: str, value: str) -> None:
     result = count_source_assessment({**cyclic_core(1), field: value})
     assert result["status"] == "not_assessed"
     assert result["positions"] == result["counts"] == result["facsimile_readings"] == []
@@ -99,7 +100,9 @@ def test_empty_and_multiple_positions_are_unassessed(field, value):
         ("jishen", "子丑寅卯辰巳午未申酉戌亥"),
     ],
 )
-def test_legitimate_single_positions_are_not_rejected_or_regenerated(field, positions):
+def test_legitimate_single_positions_are_not_rejected_or_regenerated(
+    field: str, positions: str
+) -> None:
     for position in positions:
         result = count_source_assessment({**cyclic_core(1), field: position})
         assert result["status"] == "assessed_selected_table_columns"
@@ -118,7 +121,7 @@ def test_legitimate_single_positions_are_not_rejected_or_regenerated(field, posi
         "manifest.json",
     ],
 )
-def test_changed_oracle_or_source_image_is_rejected(tmp_path, name):
+def test_changed_oracle_or_source_image_is_rejected(tmp_path: Path, name: str) -> None:
     corpus = tmp_path / "source"
     shutil.copytree(CORPUS, corpus)
     with (corpus / name).open("ab") as f:

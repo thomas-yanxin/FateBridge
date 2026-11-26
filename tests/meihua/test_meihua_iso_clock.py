@@ -21,14 +21,18 @@ SPEC = next(s for s in CATALOG if s.key == "meihua_analysis")
 
 
 @pytest.mark.parametrize("row", CASES, ids=lambda r: r["id"])
-def test_frozen_clock_label_semantics_or_explicit_rejection(row):
+def test_frozen_clock_label_semantics_or_explicit_rejection(row) -> None:
     if not row["valid"]:
         with pytest.raises(ValueError):
             _clock_datetime(row["text"], "frozen_clock_label", aware=row["aware"])
         return
+    else:
+        pass
     at = _clock_datetime(row["text"], "frozen_clock_label", aware=row["aware"])
     if "expected_wall" in row:
         assert at.replace(tzinfo=None).isoformat() == row["expected_wall"]
+    else:
+        pass
     if row["aware"]:
         assert at.astimezone(timezone.utc).isoformat() == row["expected_UTC"]
         assert at.utcoffset().total_seconds() * 1000000 == row["offset_microseconds"]
@@ -37,7 +41,7 @@ def test_frozen_clock_label_semantics_or_explicit_rejection(row):
 
 
 @pytest.mark.parametrize("row", PACKETS, ids=lambda r: r["id"])
-def test_complete_controlled_packets_are_bound_before_public_execution(row):
+def test_complete_controlled_packets_are_bound_before_public_execution(row) -> None:
     req = MeihuaAnalysisRequest(**row["request"])
     if row["should_succeed"]:
         require_meihua_clock_binding(deepcopy(row["packet"]), req)
@@ -49,6 +53,8 @@ def test_complete_controlled_packets_are_bound_before_public_execution(row):
     assert ("error" not in result) is row["should_succeed"]
     if not row["should_succeed"]:
         assert result["error_code"] == "internal_error" and result["retryable"] is True
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
@@ -60,6 +66,6 @@ def test_complete_controlled_packets_are_bound_before_public_execution(row):
         ("2000-W01-4T09:17:43+00:00", False),
     ],
 )
-def test_awareness_is_checked_after_portable_decoding(text, aware):
+def test_awareness_is_checked_after_portable_decoding(text: str, aware: bool) -> None:
     with pytest.raises(ValueError, match="时区信息不符"):
         _clock_datetime(text, "awareness", aware=aware)

@@ -12,7 +12,8 @@ from fastmcp import Client
 from fastmcp.client.transports import StdioTransport
 
 import scripts.evaluate_agent as evaluator
-from fatebridge.validation.evaluation_environment import (
+from tests.support.transports import call_calculation
+from validation.evaluation_environment import (
     METHOD,
     NATIVE_ENVIRONMENT_KEYS,
     capture_selection,
@@ -55,11 +56,12 @@ def settings(command):
 
 
 def test_capture_roundtrip_preserves_unset_empty_and_exact_values_without_secrets(
-    tmp_path,
-):
+    tmp_path: Path,
+) -> None:
     source = {
         "SE_EPHE_PATH": "/verified/path with spaces",
         "FATEBRIDGE_JPL_FILE": "",
+        "FATEBRIDGE_DE441_DIR": "/verified/de441 archive",
         "OPENAI_API_KEY": "do-not-forward",
         "UNRELATED_TEST_SECRET": "hidden",
     }
@@ -74,6 +76,7 @@ def test_capture_roundtrip_preserves_unset_empty_and_exact_values_without_secret
     assert selected_environment(loaded) == {
         "SE_EPHE_PATH": source["SE_EPHE_PATH"],
         "FATEBRIDGE_JPL_FILE": "",
+        "FATEBRIDGE_DE441_DIR": source["FATEBRIDGE_DE441_DIR"],
     }
     ambient = {**source, "FATEBRIDGE_SOLAR_TERM_MODEL": "later-ambient-mode"}
     actual = process_environment(loaded, ambient)
@@ -87,7 +90,7 @@ def test_capture_roundtrip_preserves_unset_empty_and_exact_values_without_secret
 @pytest.mark.parametrize(
     "fault", ["extra_key", "missing_key", "boolean", "integer", "nul"]
 )
-def test_no_undeclared_or_unrepresentable_selector_is_accepted(fault):
+def test_no_undeclared_or_unrepresentable_selector_is_accepted(fault: str) -> None:
     value = capture_selection({})
     if fault == "extra_key":
         value["OPENAI_API_KEY"] = "secret"
@@ -102,7 +105,9 @@ def test_no_undeclared_or_unrepresentable_selector_is_accepted(fault):
 @pytest.mark.parametrize(
     "fault", ["changed_bytes", "unknown_method", "extra_metadata", "unknown_selector"]
 )
-def test_a_new_hash_cannot_legitimize_an_unknown_config_schema(tmp_path, fault):
+def test_a_new_hash_cannot_legitimize_an_unknown_config_schema(
+    tmp_path: Path, fault: str
+) -> None:
     record = {"method_id": METHOD, "values": capture_selection({})}
     original = selection_bytes(record["values"])
     if fault == "unknown_method":
@@ -111,6 +116,8 @@ def test_a_new_hash_cannot_legitimize_an_unknown_config_schema(tmp_path, fault):
         record["all_accuracy_certified"] = True
     elif fault == "unknown_selector":
         record["values"]["UNRELATED_TEST_SECRET"] = "hidden"
+    else:
+        pass
     raw = json.dumps(record).encode()
     p = tmp_path / "bad.json"
     p.write_bytes(raw)
@@ -119,11 +126,18 @@ def test_a_new_hash_cannot_legitimize_an_unknown_config_schema(tmp_path, fault):
         load_selection(p, expected)
 
 
+@pytest.mark.parametrize("capture_payloads", [False, True])
 def test_run_case_clears_later_inherited_choices_and_keeps_exact_mcp_settings(
-    monkeypatch, tmp_path
-):
-    chosen = capture_selection({"SE_EPHE_PATH": "/frozen/empty-directory"})
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capture_payloads: bool
+) -> None:
+    chosen = capture_selection(
+        {
+            "SE_EPHE_PATH": "/frozen/empty-directory",
+            "FATEBRIDGE_DE441_DIR": "/frozen/de441 archive",
+        }
+    )
     monkeypatch.setenv("SE_EPHE_PATH", "/later/ambient-files")
+    monkeypatch.setenv("FATEBRIDGE_DE441_DIR", "/later/archive")
     monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "/later/kernel.eph")
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "later-mode")
 
@@ -137,6 +151,8 @@ def test_run_case_clears_later_inherited_choices_and_keeps_exact_mcp_settings(
         seen.append((command, kwargs["env"]))
         target = tmp_path / "one"
         (target / "answer.txt").write_text("无需计算。")
+        if capture_payloads:
+            (target / "mcp-calls.jsonl").touch()
         kwargs["stdout"].write(
             json.dumps(
                 {
@@ -155,16 +171,32 @@ def test_run_case_clears_later_inherited_choices_and_keeps_exact_mcp_settings(
         "no_calculation": True,
         "allowed_tools": [],
         "manual_review": [],
+        "capture_payloads": capture_payloads,
     }
     result = evaluator.run_case(
-        "unused-cli", case, tmp_path, 10, native_selection=chosen
+        "unused-cli",
+        case,
+        tmp_path,
+        10,
+        source=ROOT,
+        native_selection=chosen,
+        native_working_directory=tmp_path,
     )
     assert result["mechanical_checks_passed"]
     command, env = seen[0]
     assert env["SE_EPHE_PATH"] == chosen["SE_EPHE_PATH"]
+    assert env["FATEBRIDGE_DE441_DIR"] == chosen["FATEBRIDGE_DE441_DIR"]
     assert "FATEBRIDGE_JPL_FILE" not in env and "FATEBRIDGE_SOLAR_TERM_MODEL" not in env
     config = settings(command)
+    if capture_payloads:
+        entry = ROOT / "validation/agent_capture.py"
+        assert entry.is_file()
+        assert config["mcp_servers.fatebridge.args"][-1] == str(entry)
     assert config["mcp_servers.fatebridge.env.SE_EPHE_PATH"] == chosen["SE_EPHE_PATH"]
+    assert (
+        config["mcp_servers.fatebridge.env.FATEBRIDGE_DE441_DIR"]
+        == chosen["FATEBRIDGE_DE441_DIR"]
+    )
     assert "mcp_servers.fatebridge.env.FATEBRIDGE_JPL_FILE" not in config
     assert os.environ["SE_EPHE_PATH"] == "/later/ambient-files"
 
@@ -172,11 +204,13 @@ def test_run_case_clears_later_inherited_choices_and_keeps_exact_mcp_settings(
 @pytest.mark.asyncio
 @pytest.mark.parametrize("empty", [False, True])
 async def test_reference_and_constructed_model_mcp_use_one_frozen_selection(
-    monkeypatch, tmp_path, empty
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, empty: bool
+) -> None:
     selected_path = tmp_path / "empty" if empty else ROOT / "ephe"
     if empty:
         selected_path.mkdir()
+    else:
+        pass
     chosen = capture_selection({"SE_EPHE_PATH": str(selected_path)})
     # Every later ambient setting intentionally disagrees with the fixed input.
     monkeypatch.setenv("SE_EPHE_PATH", str(ROOT / "ephe" if empty else tmp_path))
@@ -203,7 +237,8 @@ async def test_reference_and_constructed_model_mcp_use_one_frozen_selection(
             log_file=tmp_path / "model-arm-stderr.log",
         )
     ) as client:
-        response = await client.call_tool(
+        response = await call_calculation(
+            client,
             "human_design",
             {
                 **CASE["reference_request"]["arguments"],
@@ -233,16 +268,20 @@ async def test_reference_and_constructed_model_mcp_use_one_frozen_selection(
 
 @pytest.mark.parametrize("fault", ["missing_hash", "missing_path", "changed_bytes"])
 def test_invalid_reused_selection_stops_before_cli_or_model(
-    monkeypatch, tmp_path, fault
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, fault: str
+) -> None:
     raw = selection_bytes(capture_selection({}))
     path = tmp_path / "native.json"
     path.write_bytes(raw)
     args = ["evaluate_agent", "--output", str(tmp_path / "out")]
     if fault != "missing_path":
         args += ["--native-environment", str(path)]
+    else:
+        pass
     if fault != "missing_hash":
         args += ["--native-environment-sha256", "0" * 64]
+    else:
+        pass
     monkeypatch.setattr(sys, "argv", args)
     monkeypatch.setattr(
         "fatebridge.diagnostics.resolve_codex_cli",
@@ -257,7 +296,9 @@ def test_invalid_reused_selection_stops_before_cli_or_model(
 @pytest.mark.parametrize(
     "fault", [None, "changed_stage", "changed_bytes", "missing_metadata", "legacy"]
 )
-def test_stage_binding_never_reconstructs_or_substitutes_a_selection(tmp_path, fault):
+def test_stage_binding_never_reconstructs_or_substitutes_a_selection(
+    tmp_path: Path, fault: str | None
+) -> None:
     prepared, run = tmp_path / "prepared", tmp_path / "model-run"
     prepared.mkdir()
     run.mkdir()
@@ -283,6 +324,8 @@ def test_stage_binding_never_reconstructs_or_substitutes_a_selection(tmp_path, f
     elif fault == "legacy":
         (run / "report.json").write_text("{}")
         (prepared / "preparation.json").write_text("{}")
+    else:
+        pass
     if fault in {"changed_stage", "changed_bytes", "missing_metadata", "legacy"}:
         with pytest.raises(ValueError):
             verify_stage_selection(prepared, run)

@@ -9,7 +9,9 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation import fengshui_solar_terms as audit
+from fatebridge.core import almanac
+from fatebridge.core.de441_solar import MODEL_ID as DE441_MODEL_ID
+from validation import fengshui_solar_terms as audit
 
 FOLDER = Path(__file__).parents[1] / "data/fengshui_all_terms_v1"
 
@@ -21,7 +23,7 @@ def reference():
 
 def test_full_declared_range_contains_both_jie_and_qi_without_dropping_endpoints(
     reference,
-):
+) -> None:
     assert len(reference["rows"]) == 10104
     assert reference["rows"][0]["year"] == 1784
     assert reference["rows"][-1]["year"] == 2204
@@ -32,7 +34,7 @@ def test_full_declared_range_contains_both_jie_and_qi_without_dropping_endpoints
 
 def test_existing421_lichun_reference_is_preserved_and_independently_reproduced(
     reference,
-):
+) -> None:
     previous = json.loads(
         (FOLDER.parent / "fengshui_lichun_tt/reference.json").read_text()
     )
@@ -45,8 +47,8 @@ def test_existing421_lichun_reference_is_preserved_and_independently_reproduced(
 
 @pytest.mark.parametrize("name", sorted(audit.CAPTURE_HASHES))
 def test_changed_or_self_rehashed_capture_cannot_replace_the_frozen_reference(
-    tmp_path, name
-):
+    tmp_path: Path, name
+) -> None:
     folder = tmp_path / "capture"
     shutil.copytree(FOLDER, folder)
     (folder / name).write_text("{}")
@@ -78,7 +80,9 @@ def test_changed_or_self_rehashed_capture_cannot_replace_the_frozen_reference(
         "different_dependency",
     ],
 )
-def test_incomplete_or_relabelled_protocol_cannot_be_accepted(reference, mutation):
+def test_incomplete_or_relabelled_protocol_cannot_be_accepted(
+    reference, mutation: str
+) -> None:
     value = deepcopy(reference)
     if mutation == "missing_year":
         del value["rows"][:24]
@@ -122,13 +126,28 @@ def actual_resolution(reference, monkeypatch):
 
 def test_actual_named_root_and_serialized_civil_output_both_meet_gate(
     actual_resolution,
-):
+) -> None:
     row, resolution = actual_resolution
     checked = audit.compare_resolution(row, resolution)
     assert checked["within_tolerance"] is True
     assert abs(checked["selected_root_difference_seconds_tt"]) <= 1.0
     assert abs(checked["civil_roundtrip_difference_seconds_tt"]) <= 1.0
     assert resolution["ephemeris_model"] == "fatebridge_de440_solar_v1"
+
+
+def test_bundled_de441_requires_both_the_civil_clock_and_raw_root(
+    reference, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
+    monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
+    monkeypatch.setattr(almanac, "swe", None)
+    row = next(r for r in reference["rows"] if (r["year"], r["term"]) == (2026, "夏至"))
+    resolution = audit.solar_term_resolution(2026, "夏至", "UTC")
+    assert resolution["ephemeris_model"] == DE441_MODEL_ID
+    assert audit.compare_resolution(row, resolution)["within_tolerance"] is True
+
+    del resolution["solar_model_details"]["selected_crossing_jd_tt"]
+    assert audit.compare_resolution(row, resolution)["within_tolerance"] is False
 
 
 @pytest.mark.parametrize(
@@ -144,8 +163,8 @@ def test_actual_named_root_and_serialized_civil_output_both_meet_gate(
     ],
 )
 def test_real_result_mutations_cannot_hide_behind_other_correct_fields(
-    actual_resolution, mutation
-):
+    actual_resolution, mutation: str
+) -> None:
     row, value = deepcopy(actual_resolution)
     if mutation == "civil":
         value["moment"] = (
@@ -166,6 +185,8 @@ def test_real_result_mutations_cannot_hide_behind_other_correct_fields(
     assert audit.compare_resolution(row, value)["within_tolerance"] is False
 
 
-def test_simplified_date_hypotheses_are_not_promoted_by_more_astronomy(reference):
+def test_simplified_date_hypotheses_are_not_promoted_by_more_astronomy(
+    reference,
+) -> None:
     assert "not absolute observed UTC" in reference["protocol"]["scope"]
     assert "original-book date-table selection" in reference["protocol"]["scope"]

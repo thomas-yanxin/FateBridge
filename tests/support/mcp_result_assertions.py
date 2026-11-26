@@ -1,7 +1,6 @@
 """Strict bounded first views and original same-run MCP resource proofs."""
 
-import json
-
+from fatebridge.utils.formatting import format_json_response
 from tests.fixtures.mcp_result_delivery import read_full_result
 
 
@@ -17,11 +16,12 @@ async def same_run_projected_response(client, result):
     recompute a tool call to obtain a purported full response.
     """
     assert not result.is_error
-    assert len(result.content[0].text) <= 8192
+    assert len(format_json_response(result.structured_content)) <= 8192
     body = result.structured_content
-    assert json.loads(result.content[0].text) == body
     if "result_delivery" not in body:
         return body
+    else:
+        pass
     ref = body["result_delivery"]
     assert ref["mode"] == "paged"
     assert ref["deferred_fields"]

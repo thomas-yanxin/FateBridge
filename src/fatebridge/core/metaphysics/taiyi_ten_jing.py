@@ -9,8 +9,7 @@ from __future__ import annotations
 from typing import Any
 
 from fatebridge.core.metaphysics.taiyi_geometry import PALACES, RING
-
-from .taiyi_hour import KEY_SOURCE
+from fatebridge.core.metaphysics.taiyi_hour import KEY_SOURCE
 
 HEAVEN_TIME_RULE_SOURCES = {
     "key_annual_example": "https://upload.wikimedia.org/wikipedia/commons/1/19/NLC892-411999021066-66022_%E5%A4%AA%E4%B9%99%E9%87%91%E9%91%B0%E5%8C%99.pdf#page=33",

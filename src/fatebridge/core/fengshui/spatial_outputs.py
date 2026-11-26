@@ -5,16 +5,15 @@ from typing import Literal
 
 from pydantic import BaseModel, JsonValue
 
-from fatebridge.core.output_base import PartialOutput
-
-from .layout_inputs import FormObservation
-from .spatial_angles import CompassDirection
-from .spatial_inputs import (
+from fatebridge.core.contracts.output_base import PartialOutput
+from fatebridge.core.fengshui.layout_inputs import FormObservation
+from fatebridge.core.fengshui.spatial_angles import CompassDirection
+from fatebridge.core.fengshui.spatial_inputs import (
     PlanPoint,
     RelativePosition,
     ResolvedMoveDomain,
 )
-from .spatial_sources import ResearchCoverage
+from fatebridge.core.fengshui.spatial_sources import ResearchCoverage
 
 
 class GeometryCheck(BaseModel):

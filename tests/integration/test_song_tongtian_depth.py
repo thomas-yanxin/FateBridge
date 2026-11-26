@@ -20,7 +20,7 @@ def frac(r):
 
 
 @pytest.mark.parametrize("row", REFERENCE["printed_worked_calculations"])
-def test_mei_printed_working_is_reproduced_without_rewriting_observations(row):
+def test_mei_printed_working_is_reproduced_without_rewriting_observations(row) -> None:
     result = song.source_term_remainder(
         profile_id=PROFILE, accumulated_years=row["accumulated"], term_index=0
     )
@@ -39,10 +39,14 @@ def test_mei_printed_working_is_reproduced_without_rewriting_observations(row):
     if "alternate_two_place" in row:
         assert result["ganzhi_day"] != row["alternate_two_place"]["ganzhi"]
         assert result["source_small_remainder"] != row["alternate_two_place"]["small"]
+    else:
+        pass
 
 
 @pytest.mark.parametrize("row", REFERENCE["derived_worksheets"])
-def test_preimplementation_derived_worksheets_are_separate_from_printed_cases(row):
+def test_preimplementation_derived_worksheets_are_separate_from_printed_cases(
+    row,
+) -> None:
     result = song.source_qi_sequence(profile_id=PROFILE, year_label=row["year"])
     assert result["accumulated_years"] == row["accumulated"]
     trace = result["winter_correction"]
@@ -55,7 +59,9 @@ def test_preimplementation_derived_worksheets_are_separate_from_printed_cases(ro
         assert actual["ganzhi_day"] == expected["ganzhi"]
 
 
-def test_source_constants_are_not_mixed_with_interlinear_calendars_or_annotations():
+def test_source_constants_are_not_mixed_with_interlinear_calendars_or_annotations() -> (
+    None
+):
     result = song.source_qi_sequence(profile_id=PROFILE, year_label=1194)
     assert result["source_reference_accumulated_years"] == 3830
     assert result["source_reference_year_caption"] == "绍熙五年甲寅"
@@ -77,7 +83,9 @@ def test_source_constants_are_not_mixed_with_interlinear_calendars_or_annotation
     }
 
 
-def test_two_half_up_steps_cannot_be_replaced_by_bankers_or_final_only_rounding():
+def test_two_half_up_steps_cannot_be_replaced_by_bankers_or_final_only_rounding() -> (
+    None
+):
     p = song._PROFILES[PROFILE]
     _, first_tie = song._winter_units(p, 4330)  # distance500, 6.35 -> 6.4
     assert frac(first_tie["rounded_chant_source_units"]) == Fraction(32, 5)
@@ -98,7 +106,7 @@ def test_two_half_up_steps_cannot_be_replaced_by_bankers_or_final_only_rounding(
     )
 
 
-def test_cumulative_endpoint_does_not_hide_secular_next_winter_difference():
+def test_cumulative_endpoint_does_not_hide_secular_next_winter_difference() -> None:
     current = song.source_qi_sequence(profile_id=PROFILE, year_label=1281)
     following = song.source_qi_sequence(profile_id=PROFILE, year_label=1282)
     assert frac(current["recomputed_next_winter_minus_endpoint_days"]) == -Fraction(
@@ -112,7 +120,7 @@ def test_cumulative_endpoint_does_not_hide_secular_next_winter_difference():
     assert "not_separately_recomputed" in current["terms"][24]["endpoint_policy"]
 
 
-def test_existing_kai_xi_case_retains_day_and_before_daxue_disagreements():
+def test_existing_kai_xi_case_retains_day_and_before_daxue_disagreements() -> None:
     link = REFERENCE["date_link"]
     dila = json.loads(
         (ROOT.parent / "heluo_historical_calendar_v1/dila-excerpt.json").read_text()
@@ -135,7 +143,7 @@ def test_existing_kai_xi_case_retains_day_and_before_daxue_disagreements():
     assert not REFERENCE["date_link"]["birth_clock_resolved"]
 
 
-def test_frozen_pages_prior_anchors_and_source_scope():
+def test_frozen_pages_prior_anchors_and_source_scope() -> None:
     for item in REFERENCE["images"]:
         assert (
             hashlib.sha256((ROOT / item["file"]).read_bytes()).hexdigest()
@@ -152,8 +160,8 @@ def test_frozen_pages_prior_anchors_and_source_scope():
 
 
 def test_audit_rejects_loss_of_secular_correction_without_hiding_source_conflicts(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from dataclasses import replace
 
     from scripts.numerology.audit_numerology import tongtian_source_checks

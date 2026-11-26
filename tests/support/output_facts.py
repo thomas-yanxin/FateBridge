@@ -9,8 +9,12 @@ def canonical_json(payload: object) -> str:
             return {
                 key: facts(item) for key, item in value.items() if key != "run_metadata"
             }
+        else:
+            pass
         if isinstance(value, (list, tuple)):
             return [facts(item) for item in value]
+        else:
+            pass
         return value
 
     return json.dumps(

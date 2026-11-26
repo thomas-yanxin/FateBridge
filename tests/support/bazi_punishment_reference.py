@@ -45,6 +45,8 @@ def remaining_masses(branches, punishment):
         for q, other in list(zip(ORDER, branches))[i + 1 :]:
             if CONFLICT[b] != other:
                 continue
+            else:
+                pass
             a, c = powers[PRINCIPAL[b]], powers[PRINCIPAL[other]]
             m, n = (
                 (Fraction(3, 4), Fraction(3, 4))
@@ -59,6 +61,8 @@ def remaining_masses(branches, punishment):
     for p, b in zip(ORDER, branches):
         if b in PUNISHED:
             losses[p] = min(losses[p], punishment)
+        else:
+            pass
     return {
         (p, s): mass * losses[p] for p, roots in initial.items() for s, mass in roots
     }

@@ -16,12 +16,18 @@ def build() -> dict[str, Any]:
     for name, digest in frozen["sha256"].items():
         if hashlib.sha256((REFERENCE / name).read_bytes()).hexdigest() != digest:
             raise ValueError(f"Frozen penalty reference changed: {name}")
+        else:
+            pass
     profile: dict[str, Any] = json.loads((REFERENCE / "profile.json").read_text())
     source = (REFERENCE / profile["source"]["file"]).resolve()
     if not source.is_relative_to((ROOT / "tests/fixtures").resolve()):
         raise ValueError("Penalty source escaped fixtures")
+    else:
+        pass
     if hashlib.sha256(source.read_bytes()).hexdigest() != profile["source"]["sha256"]:
         raise ValueError("Original penalty scan changed")
+    else:
+        pass
     errata = REFERENCE / "quotation-errata.json"
     if (
         hashlib.sha256(errata.read_bytes()).hexdigest()
@@ -30,6 +36,8 @@ def build() -> dict[str, Any]:
         ]
     ):
         raise ValueError("Penalty quotation erratum changed")
+    else:
+        pass
     correction = json.loads(errata.read_text())
     assert correction["profile_sha256"] == frozen["sha256"]["profile.json"]
     clause = next(c for c in profile["clauses"] if c["id"] == correction["clause_id"])
@@ -42,6 +50,8 @@ def build() -> dict[str, Any]:
     ].items():
         if hashlib.sha256((precedence / name).read_bytes()).hexdigest() != digest:
             raise ValueError(f"Frozen precedence reference changed: {name}")
+        else:
+            pass
     profile["precedence"] = json.loads((precedence / "adjudication.json").read_text())
     assert profile["precedence"]["source_sha256"] == profile["source"]["sha256"]
     profile["ruleset_version"] = "2.0.0"
@@ -59,6 +69,8 @@ def main() -> None:
     if args.check:
         if OUTPUT.read_text() != text:
             raise SystemExit("Penalty profile is stale")
+        else:
+            pass
     else:
         OUTPUT.write_text(text)
     print("Scoped penalty clauses, frozen cases and original scan verified")
@@ -66,3 +78,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

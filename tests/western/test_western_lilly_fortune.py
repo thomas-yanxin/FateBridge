@@ -9,14 +9,14 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
-from fatebridge.core.astrology_horary import _planet_state
-from fatebridge.core.lilly_fortune import evaluate_fortune
-from fatebridge.core.lilly_house_assignment import (
+from fatebridge.core.astro.astrology_horary import _planet_state
+from fatebridge.core.astro.lilly_fortune import evaluate_fortune
+from fatebridge.core.astro.lilly_house_assignment import (
     HOUSE_ATTRIBUTES,
     assign_cusp_virtue,
     assign_from_cusps,
 )
-from fatebridge.core.output_western import LillyFortune, LillyHouseAssignment
+from fatebridge.core.contracts.output_western import LillyFortune, LillyHouseAssignment
 from fatebridge.core.predictive.native_chart import build_native_subject
 from scripts.western.audit_western_lilly_fortune import audit
 from tests.western.test_western_lilly_fortitudes import inputs, result, row
@@ -43,7 +43,7 @@ def by_code(value, code):
     return next(r for r in value["rows"] if r["code"] == code)
 
 
-def test_all_printed_rows_and_arithmetic_preserve_failed_original_application():
+def test_all_printed_rows_and_arithmetic_preserve_failed_original_application() -> None:
     value = audit()
     assert value["source_assets_verified"] == 34
     assert value["printed_table_rows_verified"] == 28
@@ -74,8 +74,8 @@ def test_all_printed_rows_and_arithmetic_preserve_failed_original_application():
     ],
 )
 def test_five_degree_boundary_uses_exact_gap_before_any_display_rounding(
-    house, delta, expected_advance
-):
+    house: int, delta, expected_advance: bool
+) -> None:
     # The input gap is preserved as a dyadic fraction, avoiding rounded subtraction.
     value = assign_cusp_virtue(-Fraction(delta), house, -30, 0)
     assert value["assigned_house"] == (house % 12 + 1 if expected_advance else house)
@@ -85,15 +85,17 @@ def test_five_degree_boundary_uses_exact_gap_before_any_display_rounding(
 
 @pytest.mark.parametrize("offset,assigned", [(1, 1), (3, None), (5, 2)])
 def test_narrow_house_uses_nearest_cusp_and_retains_equal_distance_ambiguity(
-    offset, assigned
-):
+    offset: int, assigned: int | None
+) -> None:
     value = assign_cusp_virtue(offset, 1, 0, 6)
     assert value["assigned_house"] == assigned
     if assigned is None:
         assert value["unavailable_reason"] == "equal_nearest_cusps_within_five_degrees"
+    else:
+        pass
 
 
-def test_no_same_sign_gate_and_no_change_to_geometric_or_role_house():
+def test_no_same_sign_gate_and_no_change_to_geometric_or_role_house() -> None:
     r = assign_cusp_virtue(29, 1, 10, 31)
     assert r["geometric_house"] == 1 and r["assigned_house"] == 2
     subject = SimpleNamespace(
@@ -112,7 +114,9 @@ def test_no_same_sign_gate_and_no_change_to_geometric_or_role_house():
     assert subject.saturn.abs_pos == 357 and subject.saturn.house == "Twelfth_House"
 
 
-def test_complete_ring_is_verified_and_native_projected_occupancy_is_not_overridden():
+def test_complete_ring_is_verified_and_native_projected_occupancy_is_not_overridden() -> (
+    None
+):
     cusps = list(range(0, 360, 30))
     assert assign_from_cusps(357, cusps)["assigned_house"] == 1
     assert assign_from_cusps(0, cusps)["assigned_house"] == 1
@@ -126,7 +130,9 @@ def test_complete_ring_is_verified_and_native_projected_occupancy_is_not_overrid
     assert bad["assigned_house"] is None and "partition" in bad["unavailable_reason"]
 
 
-def test_fortitude_rows_use_source_assignment_and_missing_assignment_is_not_zero():
+def test_fortitude_rows_use_source_assignment_and_missing_assignment_is_not_zero() -> (
+    None
+):
     states, data = inputs()
     states["Mars"]["house_assignment"] = {
         "assigned_house": 6,
@@ -145,8 +151,8 @@ def test_fortitude_rows_use_source_assignment_and_missing_assignment_is_not_zero
     "house,code,expected", [(6, "N09", -4), (8, "N08", -4), (12, "N07", -5)]
 )
 def test_fortune_has_its_own_house_table_not_the_planet_debility_weights(
-    house, code, expected
-):
+    house: int, code: str, expected
+) -> None:
     r = fortune(house=house)
     assert by_code(r, code)["contribution"] == expected
     assert by_code(r, "P11")["contribution"] == 0
@@ -164,23 +170,27 @@ def test_fortune_has_its_own_house_table_not_the_planet_debility_weights(
     ],
 )
 def test_virgo_conditional_sign_bonus_and_malefic_terms_use_selected_lilly_table(
-    longitude, term, bonus
-):
+    longitude: float | int, term: str, bonus: int
+) -> None:
     r = fortune(longitude=longitude)
     assert r["bound_lord"] == term
     assert by_code(r, "P04")["contribution"] == bonus
     if term == "Saturn":
         assert by_code(r, "N06")["contribution"] == -2
+    else:
+        pass
 
 
-def test_aries_zero_row_is_preserved_and_not_treated_as_missing():
+def test_aries_zero_row_is_preserved_and_not_treated_as_missing() -> None:
     r = fortune(longitude=10)
     assert by_code(r, "Z01")["satisfied"] is True
     assert by_code(r, "Z01")["contribution"] == 0
     assert len(r["rows"]) == r["row_count"] == 28
 
 
-def test_cancellation_below_circle_boundary_keeps_nested_coordinate_inside_same_interval():
+def test_cancellation_below_circle_boundary_keeps_nested_coordinate_inside_same_interval() -> (
+    None
+):
     states = {"Sun": {"longitude": 5e-324}, "Moon": {"longitude": 0.0}}
     r = evaluate_fortune(0.0, states, {}, cusps=list(range(0, 360, 30)))
     assert Fraction(r["exact_longitude"]) == 360 - Fraction(5e-324)
@@ -189,7 +199,9 @@ def test_cancellation_below_circle_boundary_keeps_nested_coordinate_inside_same_
     assert r["house_assignment"]["assigned_house"] == 1
 
 
-def test_actual_night_whole_sign_chart_uses_physical_ascendant_and_keeps_other_lot_method_separate():
+def test_actual_night_whole_sign_chart_uses_physical_ascendant_and_keeps_other_lot_method_separate() -> (
+    None
+):
     subject = build_native_subject(
         name="night formula control",
         local_datetime=datetime(2024, 6, 1, 2, 30, tzinfo=ZoneInfo("Asia/Shanghai")),
@@ -217,8 +229,8 @@ def test_actual_night_whole_sign_chart_uses_physical_ascendant_and_keeps_other_l
     [("Regulus", "P14", 6, 6), ("Spica", "P15", 5, 5), ("Algol", "N10", -4, 5)],
 )
 def test_declared_star_range_retains_exact_boundary_and_distinct_fortune_weight(
-    star, code, points, orb
-):
+    star: str, code: str, points, orb: int
+) -> None:
     states, data = inputs()
     asc = Fraction(75) + states["Sun"]["longitude"] - states["Moon"]["longitude"]
     data["star_longitudes"][star] = 75.0 + orb
@@ -228,7 +240,9 @@ def test_declared_star_range_retains_exact_boundary_and_distinct_fortune_weight(
     assert by_code(evaluate_fortune(asc, states, data), code)["satisfied"] is False
 
 
-def test_grouped_aspects_count_once_and_fortune_has_no_self_aspect_or_fake_motion():
+def test_grouped_aspects_count_once_and_fortune_has_no_self_aspect_or_fake_motion() -> (
+    None
+):
     states, data = inputs()
     states["Jupiter"]["longitude"] = states["Venus"]["longitude"] = Fraction(80)
     lon = 80 + states["Sun"]["longitude"] - states["Moon"]["longitude"]
@@ -244,7 +258,9 @@ def test_grouped_aspects_count_once_and_fortune_has_no_self_aspect_or_fake_motio
     assert r["formula"]["reverses_at_night"] is False
 
 
-def test_unknown_nodes_stars_cusps_and_core_positions_never_produce_a_complete_sum():
+def test_unknown_nodes_stars_cusps_and_core_positions_never_produce_a_complete_sum() -> (
+    None
+):
     states, data = inputs()
     snapshot = copy.deepcopy((states, data))
     r = evaluate_fortune(123, states, {})
@@ -255,7 +271,9 @@ def test_unknown_nodes_stars_cusps_and_core_positions_never_produce_a_complete_s
     assert (states, data) == snapshot
 
 
-def test_free_solar_condition_is_not_confused_with_unknown_or_given_sun_points():
+def test_free_solar_condition_is_not_confused_with_unknown_or_given_sun_points() -> (
+    None
+):
     states, data = inputs()
     clear = fortune(longitude=300)
     assert by_code(clear, "P16")["satisfied"] is True
@@ -268,7 +286,9 @@ def test_free_solar_condition_is_not_confused_with_unknown_or_given_sun_points()
 
 
 @pytest.mark.parametrize("value", [math.nan, math.inf, -math.inf])
-def test_nonfinite_inputs_are_rejected_before_formula_or_house_classification(value):
+def test_nonfinite_inputs_are_rejected_before_formula_or_house_classification(
+    value,
+) -> None:
     with pytest.raises(ValueError):
         fortune(value)
     with pytest.raises(ValueError):

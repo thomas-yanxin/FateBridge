@@ -7,21 +7,27 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_witness_research import (
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_witness_research import (
     NATIVE_SOURCE,
     native_followup_reference,
 )
-from tests.sukuyo.test_sukuyo_witness_research import EXPECTED as ORIGINAL
-from tests.sukuyo.test_sukuyo_witness_research import critical
+from tests.unit_test.fixtures.sukuyo_readings import critical
 
 ROOT = Path(__file__).resolve().parents[2]
+ORIGINAL = json.loads(
+    (
+        ROOT / "tests/data/sukuyo-witness-research-before-production-v84.json"
+    ).read_bytes()
+)["expected_bundle"]
 REFERENCE = json.loads(
     (ROOT / "tests/data/sukuyo-native-followup-before-code-v92.json").read_bytes()
 )
 
 
-def test_new_reference_matches_precode_observations_and_keeps_old_record_exact():
+def test_new_reference_matches_precode_observations_and_keeps_old_record_exact() -> (
+    None
+):
     result = critical()
     previous = result["image_witness_research"]
     assert {
@@ -40,7 +46,7 @@ def test_new_reference_matches_precode_observations_and_keeps_old_record_exact()
     assert not any(later["acceptance"].values())
 
 
-def test_mistaken_correction_and_disagreements_are_not_silently_overwritten():
+def test_mistaken_correction_and_disagreements_are_not_silently_overwritten() -> None:
     later = critical()["image_witness_native_followup"]
     count = later["naoj_count"]
     assert count["historical_root_first"] == "八千四百二十字"
@@ -60,7 +66,7 @@ def test_mistaken_correction_and_disagreements_are_not_silently_overwritten():
 
 
 @pytest.mark.parametrize("field", ["id", "source_bundle_sha256"])
-def test_later_reference_cannot_attach_to_another_old_source(field):
+def test_later_reference_cannot_attach_to_another_old_source(field: str) -> None:
     altered = copy.deepcopy(critical()["image_witness_research"])
     altered[field] = "changed"
     with pytest.raises(ValueError, match="此前冻结参考不一致"):
@@ -72,8 +78,8 @@ def test_later_reference_cannot_attach_to_another_old_source(field):
     [("1903-06-25", ["鬼", "参"], "参"), ("1957-09-24", ["角", "轸"], "角")],
 )
 def test_new_images_do_not_resolve_overlap_but_do_not_erase_a_known_half(
-    date, first_candidates, second_mansion
-):
+    date: str, first_candidates, second_mansion: str
+) -> None:
     for part in (None, "first_half", "second_half"):
         result = calendar_mansion(
             date, calendar_profile="hinoo_t1299_host27", calendar_day_part=part
@@ -93,7 +99,7 @@ def test_new_images_do_not_resolve_overlap_but_do_not_erase_a_known_half(
         assert "未重新统计全文" in text
 
 
-def test_default_profile_does_not_inherit_the_hinoo_image_followup():
+def test_default_profile_does_not_inherit_the_hinoo_image_followup() -> None:
     result = calendar_mansion("1903-06-25")
     assert result["profile_calculation"]["hinoo_source"] is None
     assert "后续冻结采集" not in day_evidence(result, "室", "travel")["reading_text"]

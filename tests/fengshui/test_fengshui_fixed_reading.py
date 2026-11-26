@@ -11,57 +11,23 @@ import pytest
 from jsonschema import Draft202012Validator
 
 from fatebridge.application import result_delivery as delivery
-from fatebridge.application.execution import execute_tool
 from fatebridge.cli import run
 from fatebridge.core.fengshui.reading import build_natal_reading
 from fatebridge.services.fengshui import calculate_xuankong_natal
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.fengshui_reading import verify_fengshui_reading
-from tests.support.fengshui_transports import mcp_call
+from fatebridge.utils.formatting import format_json_response
+from tests.support.fengshui_transports import SPECS, mcp_call
 from tests.support.mcp_result_assertions import without_transport
-from tests.support.transports import rest_client
+from tests.support.transports import call_calculation, rest_client
+from tests.unit_test.fixtures.fengshui_reading import (
+    executed,
+)
+from tests.unit_test.fixtures.fengshui_reading import reading_inputs as inputs
+from tests.unit_test.fixtures.fengshui_reading import trusted
+from validation.fengshui_reading import verify_fengshui_reading
 
 
-def inputs(current=8, angle=0, forms=None, half=None):
-    interpretation = {
-        "include_calculation_reading": True,
-        "timeliness_ruleset_id": "wang_zhongzhou_timeliness_v1",
-        "fixed_lingzheng": {},
-        "external_forms": forms or [],
-    }
-    if current is not None:
-        interpretation.update(
-            current_period_number=current, period_evidence="独立评价运"
-        )
-    if half:
-        interpretation["fixed_lingzheng"].update(
-            five_period_half=half, half_evidence="明确五运分段"
-        )
-    return {
-        "house": {"facing_degrees": angle, "north_reference": "magnetic"},
-        "period": {
-            "basis": "expert_confirmed",
-            "period_number": 2,
-            "evidence": "独立历史宅运",
-        },
-        "city_gate": {
-            "reference_period_number": 9,
-            "period_evidence": "独立城门参考运",
-        },
-        "interpretation": interpretation,
-    }
-
-
-def executed(req=None, tool="xuankong_natal"):
-    spec = next(s for s in CATALOG if s.key == "fengshui_" + tool)
-    return execute_tool(spec, spec.request_model.model_validate(req or inputs()))
-
-
-def trusted(payload):
-    return {"trusted_payload": deepcopy(payload)}
-
-
-def test_reading_defaults_on_with_selected_interpretation_and_can_be_disabled():
+def test_reading_defaults_on_with_selected_interpretation_and_can_be_disabled() -> None:
     req = inputs()
     plain = deepcopy(req)
     plain["interpretation"]["include_calculation_reading"] = False
@@ -107,7 +73,7 @@ def test_reading_defaults_on_with_selected_interpretation_and_can_be_disabled():
     )
 
 
-def test_unknown_period_fifth_halves_and_bearing_candidates_are_retained():
+def test_unknown_period_fifth_halves_and_bearing_candidates_are_retained() -> None:
     unknown = calculate_xuankong_natal(**inputs(None))["calculation_reading"]
     assert "当前评价运为未确认" in unknown["text"]
     assert "互用数字未确定" in unknown["text"]
@@ -133,7 +99,9 @@ def test_unknown_period_fifth_halves_and_bearing_candidates_are_retained():
     assert "宅盘待确认候选" in result["calculation_reading"]["text"]
 
 
-def test_missing_historical_period_does_not_hide_independent_fixed_ground_facts():
+def test_missing_historical_period_does_not_hide_independent_fixed_ground_facts() -> (
+    None
+):
     result = calculate_xuankong_natal(
         interpretation={
             "current_period_number": 8,
@@ -154,8 +122,8 @@ def test_missing_historical_period_does_not_hide_independent_fixed_ground_facts(
     [(True, "measured"), (False, "user_confirmed"), (True, "image_observed")],
 )
 def test_positive_negative_and_photo_facts_are_explained_without_full_verdict(
-    observed, basis
-):
+    observed: bool, basis: str
+) -> None:
     req = inputs(
         8,
         forms=[
@@ -183,7 +151,9 @@ def test_positive_negative_and_photo_facts_are_explained_without_full_verdict(
         assert "指定存在条件未满足，不等于整体不利" in text
 
 
-def test_noncurrent_and_unsupported_placement_meanings_and_counterfacts_survive():
+def test_noncurrent_and_unsupported_placement_meanings_and_counterfacts_survive() -> (
+    None
+):
     req = inputs(7)
     params = {
         "methods": ["xuankong_natal"],
@@ -204,7 +174,9 @@ def test_noncurrent_and_unsupported_placement_meanings_and_counterfacts_survive(
     )
 
 
-def test_verifier_requires_complete_original_payload_and_independent_trusted_receipt():
+def test_verifier_requires_complete_original_payload_and_independent_trusted_receipt() -> (
+    None
+):
     result = executed()
     anchor = trusted(result)
     assert (
@@ -238,8 +210,8 @@ def test_verifier_requires_complete_original_payload_and_independent_trusted_rec
     ],
 )
 def test_even_a_trusted_malformed_reading_cannot_pass_template_or_coverage_checks(
-    mutation,
-):
+    mutation: str,
+) -> None:
     req = inputs(5)
     req["city_gate"]["reference_period_number"] = 8
     params = {
@@ -296,7 +268,7 @@ def test_even_a_trusted_malformed_reading_cannot_pass_template_or_coverage_check
     )
 
 
-def test_future_unknown_rule_version_fails_closed_without_losing_calculation():
+def test_future_unknown_rule_version_fails_closed_without_losing_calculation() -> None:
     result = calculate_xuankong_natal(**inputs())
     result["rulesets"][0]["version"] = "99.0.0"
     reading = build_natal_reading(result)
@@ -304,7 +276,7 @@ def test_future_unknown_rule_version_fails_closed_without_losing_calculation():
     assert result["layers"]["xuankong_natal"]["chart"]["palaces"]
 
 
-def test_candidate_raw_negative_and_unknown_applicability_are_both_explained():
+def test_candidate_raw_negative_and_unknown_applicability_are_both_explained() -> None:
     req = inputs(5)
     req["interpretation"]["fixed_lingzheng"]["observations"] = [
         dict(
@@ -325,7 +297,7 @@ def test_candidate_raw_negative_and_unknown_applicability_are_both_explained():
     assert "本候选存在条件运算不符合" in text
 
 
-def test_branch_and_registered_source_version_must_agree():
+def test_branch_and_registered_source_version_must_agree() -> None:
     result = calculate_xuankong_natal(**inputs())
     result["layers"]["xuankong_natal"]["interpretation"]["fixed_lingzheng_analysis"][
         "ruleset"
@@ -335,11 +307,16 @@ def test_branch_and_registered_source_version_must_agree():
 
 @pytest.mark.parametrize("tool", ["xuankong_natal", "assess"])
 def test_reading_and_verification_match_rest_mcp_cli(
-    monkeypatch, tmp_path, capsys, tool
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    tool: str,
+) -> None:
     req = inputs(5)
     if tool == "assess":
         req = {"methods": ["xuankong_natal"], "xuankong": req}
+    else:
+        pass
     spec = next(s for s in CATALOG if s.key == "fengshui_" + tool)
     http = rest_client(monkeypatch).post(spec.rest_path, json=req)
     assert http.status_code == 200, http.text
@@ -347,7 +324,7 @@ def test_reading_and_verification_match_rest_mcp_cli(
     assert not protocol.is_error
     p = tmp_path / "reading.json"
     p.write_text(json.dumps(req))
-    assert run(["fengshui_" + tool, "--request-file", str(p)]) == 0
+    assert run([SPECS[tool].tool_name, "--request-file", str(p)]) == 0
     cli = json.loads(capsys.readouterr().out)
     assert (
         without_transport(http.json())
@@ -363,8 +340,8 @@ def test_reading_and_verification_match_rest_mcp_cli(
 
 
 def test_bounded_same_run_full_readback_can_be_verified_without_recalculation(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setattr(
         delivery, "RESULT_STORE", delivery.ResultStore(tmp_path / "results")
     )
@@ -375,7 +352,8 @@ def test_bounded_same_run_full_readback_can_be_verified_without_recalculation(
         from fatebridge.mcp_server import create_mcp_app
 
         async with Client(create_mcp_app(families="fengshui")) as client:
-            result = await client.call_tool(
+            result = await call_calculation(
+                client,
                 "fengshui_assess",
                 {
                     "methods": ["xuankong_natal"],
@@ -383,7 +361,10 @@ def test_bounded_same_run_full_readback_can_be_verified_without_recalculation(
                     "response_char_limit": 4096,
                 },
             )
-            assert not result.is_error and len(result.content[0].text) <= 4096
+            assert (
+                not result.is_error
+                and len(format_json_response(result.structured_content)) <= 4096
+            )
             shaped = result.structured_content
             ref = shaped["result_delivery"]
             manifest = json.loads(
@@ -406,7 +387,9 @@ def test_bounded_same_run_full_readback_can_be_verified_without_recalculation(
     asyncio.run(check())
 
 
-def test_separately_saved_receipt_and_audit_command_detect_changes(tmp_path):
+def test_separately_saved_receipt_and_audit_command_detect_changes(
+    tmp_path: Path,
+) -> None:
     result = executed()
     payload = tmp_path / "payload.json"
     receipt = tmp_path / "receipt.json"
@@ -447,8 +430,8 @@ def test_separately_saved_receipt_and_audit_command_detect_changes(tmp_path):
     ],
 )
 def test_fixed_comparison_explains_the_actual_source_of_candidacy(
-    current, angle, phrase
-):
+    current: int, angle: float | int, phrase: str
+) -> None:
     reading = calculate_xuankong_natal(**inputs(current, angle))["calculation_reading"]
     assert reading["status"] == "rendered"
     statements = [s for s in reading["statements"] if s["kind"] == "fixed_form"]

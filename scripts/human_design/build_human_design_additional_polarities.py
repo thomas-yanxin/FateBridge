@@ -34,6 +34,8 @@ def extract(pdf: Path) -> dict:
     source_sha = hashlib.sha256(pdf.read_bytes()).hexdigest()
     if source_sha != legacy["source"]["pdf_sha256"]:
         raise ValueError("Different source PDF: edition review required")
+    else:
+        pass
     pages = subprocess.check_output(
         ["pdftotext", "-layout", str(pdf), "-"], text=True
     ).split("\f")
@@ -48,6 +50,8 @@ def extract(pdf: Path) -> dict:
         heads = list(re.finditer(r"(?m)^([1-6])\s", text))
         if [int(m[1]) for m in heads] != [6, 5, 4, 3, 2, 1]:
             raise ValueError(f"Incomplete layout line headings at gate{gate}")
+        else:
+            pass
         for index, head in enumerate(heads):
             line = int(head[1])
             block = text[
@@ -66,6 +70,8 @@ def extract(pdf: Path) -> dict:
                     raise ValueError(
                         "Additional planet has no distinct original marker"
                     )
+                else:
+                    pass
                 facts.append(
                     {
                         "fact_id": f"{gate}.{line}.{role}.{match[1]}",
@@ -110,9 +116,13 @@ def main():
     if args.check:
         if not TARGET.is_file() or TARGET.read_text() != value:
             raise SystemExit("Additional-polarity source facts drifted")
+        else:
+            pass
     else:
         TARGET.write_text(value)
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

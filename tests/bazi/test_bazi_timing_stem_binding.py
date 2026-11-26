@@ -6,10 +6,14 @@ from fractions import Fraction as Q
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.core.contracts.output_timing import TimingInteractions
+from fatebridge.core.contracts.output_timing_strength import TimingRootEffectLayer
 from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.output_timing import TimingInteractions
 from fatebridge.core.timing_interactions import analyze_timing_interactions
-from fatebridge.core.timing_strength import StrengthProjectionBaseline
+from fatebridge.core.timing_strength import (
+    StrengthProjectionBaseline,
+    timing_strength_snapshot_lines,
+)
 from tests.support.bazi_strength_reference_v3 import (
     PHASE_FACTORS,
     reconstruct,
@@ -44,7 +48,7 @@ def projection(values, timing):
     return full["strength_projection"], a
 
 
-def test_unique_time_stem_changes_only_the_existing_month_stem_budget():
+def test_unique_time_stem_changes_only_the_existing_month_stem_budget() -> None:
     result, baseline = projection(
         ("乙卯", "己卯", "辛卯", "癸卯"),
         {"dayun": {"stem": "甲", "branch": "寅"}},
@@ -83,8 +87,8 @@ def test_unique_time_stem_changes_only_the_existing_month_stem_budget():
 @pytest.mark.parametrize("pair", ["甲己", "乙庚", "丙辛", "丁壬", "戊癸"])
 @pytest.mark.parametrize("reverse", [False, True])
 def test_all_five_pairs_both_directions_match_independent_existing_budget_math(
-    pair, reverse
-):
+    pair: str, reverse: bool
+) -> None:
     target, incoming = pair[::-1] if reverse else pair
     other = next(s for s in STEMS if s not in pair)
 
@@ -131,8 +135,8 @@ def test_all_five_pairs_both_directions_match_independent_existing_budget_math(
     ],
 )
 def test_day_match_repeated_partner_and_existing_combination_remain_blocked(
-    values, incoming
-):
+    values, incoming: str
+) -> None:
     result, _ = projection(values, {"dayun": {"stem": incoming, "branch": "寅"}})
     row = result["layers"][0]
     assert row["status"] == "blocked" and row["blocker_relation_ids"]
@@ -142,9 +146,11 @@ def test_day_match_repeated_partner_and_existing_combination_remain_blocked(
         assert any(
             r.startswith("natal.relations:") for r in row["blocker_relation_ids"]
         )
+    else:
+        pass
 
 
-def test_time_layers_do_not_compete_or_accumulate_into_a_fifth_natal_column():
+def test_time_layers_do_not_compete_or_accumulate_into_a_fifth_natal_column() -> None:
     values = ("乙卯", "己卯", "辛卯", "癸卯")
     first, _ = projection(values, {"dayun": {"stem": "甲", "branch": "寅"}})
     both, _ = projection(
@@ -160,7 +166,7 @@ def test_time_layers_do_not_compete_or_accumulate_into_a_fifth_natal_column():
 
 
 @pytest.mark.parametrize("layer", ["liunian", "liuyue", "liuri", "liushi"])
-def test_dayun_source_is_not_extended_to_other_time_scales(layer):
+def test_dayun_source_is_not_extended_to_other_time_scales(layer: str) -> None:
     result, _ = projection(
         ("乙卯", "己卯", "辛卯", "癸卯"),
         {layer: {"stem": "甲", "branch": "寅"}},
@@ -174,7 +180,7 @@ def test_dayun_source_is_not_extended_to_other_time_scales(layer):
     assert result["stem_binding_source"]["supported_layer"] == "dayun"
 
 
-def test_stem_retention_contract_rejects_invented_negative_or_excess_budget():
+def test_stem_retention_contract_rejects_invented_negative_or_excess_budget() -> None:
     result, _ = projection(
         ("乙卯", "己卯", "辛卯", "癸卯"), {"dayun": {"stem": "甲", "branch": "寅"}}
     )
@@ -186,4 +192,65 @@ def test_stem_retention_contract_rejects_invented_negative_or_excess_budget():
     changed = deepcopy(result)
     changed["layers"][0]["stem_retention_factors_exact"]["day"] = "17/20"
     with pytest.raises(ValidationError):
+        TimingInteractions.model_validate({"strength_projection": changed})
+
+
+@pytest.mark.parametrize(
+    "values,layer,incoming,expected_reasons",
+    [
+        (("乙卯", "己卯", "辛卯", "癸卯"), "dayun", "甲", []),
+        (("乙卯", "己卯", "辛卯", "癸卯"), "liunian", "甲", ["unsupported_time_layer"]),
+        (("乙卯", "己卯", "辛卯", "癸卯"), "dayun", "丙", ["day_master_partner"]),
+        (("己卯", "己卯", "辛卯", "癸卯"), "dayun", "甲", ["multiple_natal_partners"]),
+        (("甲子", "乙卯", "辛卯", "己卯"), "dayun", "甲", ["competing_natal_stem"]),
+        (
+            ("甲子", "己卯", "辛卯", "癸卯"),
+            "dayun",
+            "甲",
+            ["competing_natal_stem", "existing_natal_combination"],
+        ),
+    ],
+)
+def test_independent_pair_graph_separates_matches_admission_and_applied_budget(
+    values, layer, incoming, expected_reasons
+):
+    """A structural match must not conceal why its budget remains unavailable."""
+    result, _ = projection(values, {layer: {"stem": incoming, "branch": "寅"}})
+    row = result["layers"][0]
+    complement = dict(zip("甲乙丙丁戊己庚辛壬癸", "己庚辛壬癸甲乙丙丁戊"))
+    partners = [
+        position
+        for position, value in zip(ORDER, values)
+        if value[0] == complement[incoming]
+    ]
+    expected_edges = [
+        f"stem_combination:natal.{position}+timing.{layer}" for position in partners
+    ]
+    review = row["stem_binding_review"]
+    assert review["natal_partner_positions"] == partners
+    assert review["candidate_relation_ids"] == expected_edges
+    assert review["review_reasons"] == expected_reasons
+    assert review["budget_admission"] == ("blocked" if expected_reasons else "eligible")
+    assert review["budget_applied"] is (not expected_reasons)
+    if expected_reasons:
+        assert row["status"] == "blocked"
+        assert row["energies_exact"] == row["stem_retention_factors_exact"] == {}
+        assert "本层未施加运干预算" in timing_strength_snapshot_lines(result)[0]
+    else:
+        assert row["support_share_exact"] == "17/4377"
+
+
+def test_eligible_stem_pair_does_not_claim_application_when_a_branch_blocks_the_layer():
+    result, _ = projection(
+        ("乙卯", "己卯", "辛卯", "癸卯"),
+        {"dayun": {"stem": "甲", "branch": "戌"}},
+    )
+    row = result["layers"][0]
+    assert row["status"] == "blocked"
+    assert row["stem_binding_review"]["budget_admission"] == "eligible"
+    assert row["stem_binding_review"]["budget_applied"] is False
+    assert row["energies_exact"] == {}
+    changed = deepcopy(result)
+    changed["layers"][0]["stem_binding_review"]["budget_applied"] = True
+    with pytest.raises(ValidationError, match="阻塞的岁运层"):
         TimingInteractions.model_validate({"strength_projection": changed})

@@ -42,9 +42,13 @@ def validate_reference(protocol, fixture, development_reference):
     )
     if fixture["previous_original_missing_epochs"] != previous_missing:
         raise ValueError("Original missing lunar endpoint evidence changed")
+    else:
+        pass
     dates = protocol["development_dates_tt"] + protocol["holdout_dates_tt"]
     if len(dates) != len(set(dates)):
         raise ValueError("Lunar cohorts overlap")
+    else:
+        pass
     wanted = {
         (datetime.fromisoformat(d) + timedelta(seconds=o)).isoformat()
         for d in dates
@@ -65,9 +69,13 @@ def validate_reference(protocol, fixture, development_reference):
             or hashlib.sha256(text.encode()).hexdigest() != batch["result_sha256"]
         ):
             raise ValueError("Lunar raw reference identity changed")
+        else:
+            pass
         for key, value in protocol["reference_parameters"].items():
             if batch["parameters"].get(key) != value:
                 raise ValueError("Lunar reference time/frame/target contract changed")
+            else:
+                pass
         labels = re.findall(r"'([^']+)'", batch["parameters"]["TLIST"])
         requested = set()
         for label in labels:
@@ -76,16 +84,24 @@ def validate_reference(protocol, fixture, development_reference):
             )
             if match is None:
                 raise ValueError("Lunar reference calendar request changed")
+            else:
+                pass
             y, m, d, h, mi, s = match.groups()
             requested.add(
                 datetime(int(y), months[m], int(d), int(h), int(mi), int(s)).isoformat()
             )
         if len(requested) != len(labels) or not requested <= wanted:
             raise ValueError("Lunar reference requested epoch coverage changed")
+        else:
+            pass
         if "error" in batch:
             if "No ephemeris" not in batch["error"]:
                 raise ValueError("Unexplained lunar reference error")
+            else:
+                pass
             continue
+        else:
+            pass
         if not all(
             label in text
             for label in [
@@ -98,11 +114,15 @@ def validate_reference(protocol, fixture, development_reference):
             raise ValueError(
                 "Lunar reference returned coordinate/target header changed"
             )
+        else:
+            pass
         table = list(
             csv.reader(io.StringIO(text.split("$$SOE\n", 1)[1].split("$$EOE", 1)[0]))
         )
         if len(table) != len(batch["rows"]):
             raise ValueError("Lunar raw and parsed counts differ")
+        else:
+            pass
         returned = set()
         for row, columns in zip(batch["rows"], table):
             match = re.fullmatch(
@@ -111,17 +131,23 @@ def validate_reference(protocol, fixture, development_reference):
             )
             if match is None:
                 raise ValueError("Lunar raw epoch format changed")
+            else:
+                pass
             y, m, d, h, mi, s = match.groups()
             date = datetime(
                 int(y), months[m], int(d), int(h), int(mi), int(s)
             ).isoformat()
             if date != row["date_tt"] or date in points:
                 raise ValueError("Lunar parsed epochs differ or are duplicated")
+            else:
+                pass
             angles = [row["ra_degrees"], row["dec_degrees"]]
             if angles != list(map(float, columns[3:5])) or row["printed_values"] != [
                 v.strip() for v in columns[3:5]
             ]:
                 raise ValueError("Lunar parsed angles differ from raw response")
+            else:
+                pass
             unit = unit_and_rate(*angles, 0, 0)[0]
             stored = row["icrf_unit_direction"]
             if (
@@ -129,21 +155,31 @@ def validate_reference(protocol, fixture, development_reference):
                 or max(abs(a - b) for a, b in zip(unit, stored)) > 1e-15
             ):
                 raise ValueError("Lunar unit vector differs from raw angles")
+            else:
+                pass
             # Preserve the frozen binary64 values through the stencil. Small
             # cross-platform libm differences must not be amplified by subtraction.
             points[date] = stored
             returned.add(date)
         if returned != requested:
             raise ValueError("Lunar raw request and response epochs differ")
+        else:
+            pass
     for item in fixture["missing_probe_epochs"]:
         if "No ephemeris" not in item["reason"] or item["date_tt"] not in wanted:
             raise ValueError("Lunar missing epoch lacks evidence")
+        else:
+            pass
         missing.add(item["date_tt"])
     if set(points) & missing or set(points) | missing != wanted:
         raise ValueError("Lunar probe coverage incomplete")
+    else:
+        pass
     rows = fixture["rows"]
     if len(rows) != len(dates) or [r["date_tt"] for r in rows] != dates:
         raise ValueError("Lunar center coverage changed")
+    else:
+        pass
     for row in rows:
         date = row["date_tt"]
         value = datetime.fromisoformat(date)
@@ -164,10 +200,16 @@ def validate_reference(protocol, fixture, development_reference):
             or row["missing_probe_epochs"] != unavailable
         ):
             raise ValueError("Lunar center metadata changed")
+        else:
+            pass
         if row["status"] != ("incomplete" if unavailable else "available"):
             raise ValueError("Lunar missing probes cannot pass")
+        else:
+            pass
         if unavailable:
             continue
+        else:
+            pass
         rates = {
             str(step): seven_point(points, date, step)
             for step in protocol["seven_point_steps_seconds"]
@@ -181,10 +223,14 @@ def validate_reference(protocol, fixture, development_reference):
             or abs(row["stencil_difference_arcsec_per_day"] - difference) > 1e-12
         ):
             raise ValueError("Lunar derivative differs from frozen stencil")
+        else:
+            pass
         if ("erfa_display_frame" in row) != (
             date in protocol["modern_display_dates_tt"]
         ):
             raise ValueError("Lunar independent display coverage changed")
+        else:
+            pass
 
 
 def audit(protocol, fixture):
@@ -219,6 +265,8 @@ def audit(protocol, fixture):
                 }
             )
             continue
+        else:
+            pass
         jd = row["jd_tt"]
         metadata = {}
         state, model = ephemeris._swisseph_planet_state(
@@ -239,9 +287,13 @@ def audit(protocol, fixture):
             or "longitude_speed_rotation_correction" in lahiri
         ):
             raise ValueError("Lunar sidereal correction propagation failed")
+        else:
+            pass
         native, returned = runtime.ephemeris_call("calc", jd, swe.MOON, flags)
         if runtime.ephemeris_model_from_retflag(returned) != model:
             raise ValueError("Lunar audit model mismatch")
+        else:
+            pass
         geo, _ = runtime.ephemeris_call("calc", jd, swe.MOON, flags | swe.FLG_TRUEPOS)
         radius = math.hypot(*geo[:3])
         tau = radius / LIGHT_SPEED_AU_PER_DAY
@@ -290,6 +342,8 @@ def audit(protocol, fixture):
                 case[name + "_display_error_arcsec_per_day"] = (
                     abs(speed - display) * 3600
                 )
+        else:
+            pass
         cases.append(case)
     available = [c for c in cases if c["status"] == "available"]
     metrics = [
@@ -358,6 +412,8 @@ def audit_other_display_rates(reference):
         for row in target["rows"]:
             if "erfa_display_frame" not in row:
                 continue
+            else:
+                pass
             state, model = ephemeris._swisseph_planet_state(
                 target["body"],
                 row["jd_tt"],
@@ -417,9 +473,13 @@ if __name__ == "__main__":
     fixture = json.loads(args.reference.read_text())
     if digest(args.protocol) != fixture["protocol_sha256"]:
         raise ValueError("Lunar frozen protocol identity changed")
+    else:
+        pass
     previous_path = args.reference.with_name("apparent-position-derivative.json")
     if digest(previous_path) != protocol["development_reference_sha256"]:
         raise ValueError("Lunar development reference identity changed")
+    else:
+        pass
     validate_reference(protocol, fixture, json.loads(previous_path.read_text()))
     result = audit(protocol, fixture)
     result["existing_modern_display_diagnostics"] = audit_other_display_rates(
@@ -438,3 +498,5 @@ if __name__ == "__main__":
         )
     )
     raise SystemExit(result["exit_code"])
+else:
+    pass

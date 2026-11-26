@@ -15,7 +15,7 @@ from tests.support.meihua_households_reference import (
 )
 
 
-def test_source_and_decisions_remain_frozen_before_new_chapter_production():
+def test_source_and_decisions_remain_frozen_before_new_chapter_production() -> None:
     freeze = json.loads((FOLDER / "reference-freeze.json").read_bytes())
     assert not freeze["new_production_implemented_before_freeze"]
     assert freeze["reused_geometries"] == 384
@@ -23,6 +23,8 @@ def test_source_and_decisions_remain_frozen_before_new_chapter_production():
     for name, digest in freeze["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FOLDER / name).read_bytes()).hexdigest() == digest
 
 
@@ -31,7 +33,7 @@ def test_source_and_decisions_remain_frozen_before_new_chapter_production():
 )
 def test_all_768_reused_geometry_topic_contexts_keep_literal_variants_roles_and_unknowns(
     case,
-):
+) -> None:
     result = calculate_meihua_cast(
         casting={
             "method": "existing",
@@ -60,8 +62,8 @@ TOPICS = [
 @pytest.mark.parametrize("topic", TOPICS)
 @pytest.mark.parametrize("basis", ["raw_counts", "trigram_numbers"])
 def test_every_explicit_chapter_candidate_explains_its_own_chapter_instead_of_generic_initial_judgement(
-    topic, basis
-):
+    topic, basis: str
+) -> None:
     result = calculate_meihua_cast(
         casting={
             "method": "sound_groups",
@@ -98,10 +100,12 @@ def test_every_explicit_chapter_candidate_explains_its_own_chapter_instead_of_ge
     assert len({row["topic_clause"]["quote"] for row in rows}) == 2
     if topic in {"household", "dwelling"}:
         validate(result, topic)
+    else:
+        pass
 
 
 @pytest.mark.parametrize("topic", ["household", "dwelling"])
-def test_new_chapter_does_not_recast_the_analysis_clock_or_calendar(topic):
+def test_new_chapter_does_not_recast_the_analysis_clock_or_calendar(topic: str) -> None:
     arguments = {
         "analysis_year": 2026,
         "analysis_month": 2,
@@ -127,7 +131,7 @@ def test_new_chapter_does_not_recast_the_analysis_clock_or_calendar(topic):
         assert result["meihua"][key] == baseline["meihua"][key]
 
 
-def test_household_words_in_question_do_not_change_default_branch():
+def test_household_words_in_question_do_not_change_default_branch() -> None:
     result = calculate_meihua_cast(
         casting={"method": "existing", "hexagram_code": "000000", "moving_line": 1},
         question="家宅、屋舍",
@@ -146,8 +150,8 @@ def test_household_words_in_question_do_not_change_default_branch():
     ],
 )
 def test_independent_content_checks_reject_automatic_source_emendation_or_candidate_summary_borrowing(
-    mutation,
-):
+    mutation: str,
+) -> None:
     result = calculate_meihua_cast(
         casting={
             "method": "sound_groups",

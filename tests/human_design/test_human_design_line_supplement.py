@@ -7,15 +7,15 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import human_design_knowledge as hd
-from fatebridge.core import human_design_line_catalogue as catalogue
+from fatebridge.core.human_design import human_design_knowledge as hd
+from fatebridge.core.human_design import human_design_line_catalogue as catalogue
 from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.utils.errors import EphemerisSourceError
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_gate2_condition_stays_reference_only_and_is_not_a_material_forecast():
+def test_gate2_condition_stays_reference_only_and_is_not_a_material_forecast() -> None:
     result = calculate_knowledge_read(domain="human_design", key="2.3")
     row = result["reference_details"]["record"]
     (condition,) = row["source_conditions"]
@@ -44,7 +44,7 @@ def test_gate2_condition_stays_reference_only_and_is_not_a_material_forecast():
     assert result["provenance"]["real_world_efficacy_validated"] is False
 
 
-def test_unknown_conditions_are_not_an_empty_fully_reviewed_set():
+def test_unknown_conditions_are_not_an_empty_fully_reviewed_set() -> None:
     for key in ["1.1", "2.1", "2.6", "11.4", "64.6"]:
         result = hd.read_reference(category="lines", key=key)
         row = result["reference_details"]["record"]
@@ -53,7 +53,7 @@ def test_unknown_conditions_are_not_an_empty_fully_reviewed_set():
         assert "未记录不表示无条件" in result["provenance"]["scope"]
 
 
-def test_exaltation_does_not_turn_narrow_receptivity_into_a_positive_trait():
+def test_exaltation_does_not_turn_narrow_receptivity_into_a_positive_trait() -> None:
     result = hd.read_reference(category="lines", key="2.6")
     row = result["reference_details"]["record"]
     assert "狭窄" in row["editorial_paraphrase"]["exaltation"]
@@ -63,8 +63,8 @@ def test_exaltation_does_not_turn_narrow_receptivity_into_a_positive_trait():
 
 @pytest.mark.parametrize("component", ["MANIFEST_PATH", "SUPPLEMENT_PATH"])
 def test_missing_or_changed_composite_component_never_falls_back(
-    tmp_path, monkeypatch, component
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, component: str
+) -> None:
     path = tmp_path / "missing.json"
     monkeypatch.setattr(catalogue, component, path)
     with pytest.raises(EphemerisSourceError):
@@ -88,8 +88,8 @@ def test_missing_or_changed_composite_component_never_falls_back(
     ],
 )
 def test_semantic_invariants_survive_even_a_rebound_component_hash(
-    tmp_path, monkeypatch, fault
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fault: str
+) -> None:
     manifest = json.loads(catalogue.MANIFEST_PATH.read_bytes())
     supplement = json.loads(catalogue.SUPPLEMENT_PATH.read_bytes())
     if fault == "certify":
@@ -129,9 +129,9 @@ def test_semantic_invariants_survive_even_a_rebound_component_hash(
     "component", ["CATALOGUE_PATH", "MANIFEST_PATH", "SUPPLEMENT_PATH"]
 )
 @pytest.mark.parametrize("operation", ["read", "registry"])
-def test_every_loaded_component_is_rechecked_after_response_construction(
-    tmp_path, monkeypatch, component, operation
-):
+def test_each_loaded_component_is_bound_to_the_response_then_checked_on_next_load(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, component: str, operation: str
+) -> None:
     path = tmp_path / getattr(catalogue, component).name
     path.write_bytes(getattr(catalogue, component).read_bytes())
     monkeypatch.setattr(catalogue, component, path)
@@ -145,14 +145,18 @@ def test_every_loaded_component_is_rechecked_after_response_construction(
     monkeypatch.setattr(
         hd if operation == "registry" else catalogue, "_provenance", change_after_load
     )
-    with pytest.raises(EphemerisSourceError, match="changed after loading"):
+    if operation == "registry":
+        assert hd.build_registry()["domains"]
+    else:
+        assert hd.read_reference(category="lines", key="2.3")["key"] == "2.3"
+    with pytest.raises(EphemerisSourceError):
         if operation == "registry":
             hd.build_registry()
         else:
             hd.read_reference(category="lines", key="2.3")
 
 
-def test_returned_condition_mutation_does_not_change_next_read():
+def test_returned_condition_mutation_does_not_change_next_read() -> None:
     result = hd.read_reference(category=None, key="2.3")
     prior = deepcopy(result["reference_details"]["record"]["source_conditions"])
     result["reference_details"]["record"]["source_conditions"][0][

@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[2]
 REFERENCE = ROOT / "tests/fixtures/jyotish-endpoint-reference.json"
 
 
-def test_endpoint_reference_is_independent_and_complete():
+def test_endpoint_reference_is_independent_and_complete() -> None:
     reference = validate_reference(REFERENCE)
     assert hashlib.sha256(REFERENCE.read_bytes()).hexdigest() == REFERENCE_SHA256
     assert len(reference["expected_directions"]) == 8
@@ -33,12 +33,14 @@ def test_endpoint_reference_is_independent_and_complete():
             names = [alias.name for alias in node.names]
         elif isinstance(node, ast.ImportFrom):
             names = [node.module or ""]
+        else:
+            pass
         assert not any(
             name == "swisseph" or name.startswith("fatebridge") for name in names
         )
 
 
-def test_extended_reference_has_correct_physical_targets():
+def test_extended_reference_has_correct_physical_targets() -> None:
     path = REFERENCE.with_name("jyotish-endpoint-extended-reference.json")
     reference = validate_reference(path)
     assert hashlib.sha256(path.read_bytes()).hexdigest() == EXTENDED_REFERENCE_SHA256
@@ -59,13 +61,17 @@ def test_extended_reference_has_correct_physical_targets():
             names = [alias.name for alias in node.names]
         elif isinstance(node, ast.ImportFrom):
             names = [node.module or ""]
+        else:
+            pass
         assert not any(
             name == "swisseph" or name.startswith("fatebridge") for name in names
         )
 
 
 @pytest.mark.parametrize("changed", ["missing_case", "raw_response", "threshold"])
-def test_altered_endpoint_reference_cannot_replace_original_failures(changed, tmp_path):
+def test_altered_endpoint_reference_cannot_replace_original_failures(
+    changed: str, tmp_path: Path
+) -> None:
     reference = json.loads(REFERENCE.read_text())
     if changed == "missing_case":
         reference["expected_directions"].pop()

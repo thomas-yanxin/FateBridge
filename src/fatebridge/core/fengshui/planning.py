@@ -4,20 +4,20 @@ This is an engineering feasibility policy, not another Feng Shui lineage.
 There are no invented scores, prescription rules, or inferred floorplan facts.
 """
 
-from typing import Any, Dict, List
+from typing import Any
 
-from .actions import permission_state
-from .bazhai import bazhai
-from .jinsuo import jinsuo
-from .layout import analyze_layout
-from .models import AssessRequest, JinsuoRequest
+from fatebridge.core.fengshui.actions import permission_state
+from fatebridge.core.fengshui.bazhai import bazhai
+from fatebridge.core.fengshui.jinsuo import jinsuo
+from fatebridge.core.fengshui.layout import analyze_layout
+from fatebridge.core.fengshui.models import AssessRequest, JinsuoRequest
 
 
-def evaluate_alternatives(req: AssessRequest, layers: Dict[str, Any]) -> Dict[str, Any]:
+def evaluate_alternatives(req: AssessRequest, layers: dict[str, Any]) -> dict[str, Any]:
     constraints = {c.object_id: c for c in req.layout_constraints}
     current_placements = {p.object_id: p for p in req.placements}
     current_forms = {o.object_id: o for o in req.form_observations}
-    findings: List[Dict[str, Any]] = []
+    findings: list[dict[str, Any]] = []
     for candidate in req.layout_alternatives:
         # Never transfer old entrance/backing observations after a move or turn.
         proposal_features = [
@@ -159,14 +159,14 @@ def evaluate_alternatives(req: AssessRequest, layers: Dict[str, Any]) -> Dict[st
                     (r.kind, r.source_object_id, r.target_object_id)
                     for r in fresh.interior_relations
                 }
-                for relation in old_relations:
+                for interior_relation in old_relations:
                     if (
-                        relation.kind,
-                        relation.source_object_id,
-                        relation.target_object_id,
+                        interior_relation.kind,
+                        interior_relation.source_object_id,
+                        interior_relation.target_object_id,
                     ) not in fresh_relations:
                         missing.append(
-                            f"{branch}.interior_relations.{relation.relation_id}"
+                            f"{branch}.interior_relations.{interior_relation.relation_id}"
                         )
                 for fact in old_materials:
                     if fact.application:

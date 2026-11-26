@@ -14,9 +14,11 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 if not __package__:
     sys.path.insert(0, str(ROOT / "src"))
-from fatebridge.core.sukuyo_calendar_text import calendar_day_evidence
-from fatebridge.core.sukuyo_documentary import CLOCK_POSITION
-from fatebridge.core.sukuyo_sources import load_source
+else:
+    pass
+from fatebridge.core.sukuyo.sukuyo_calendar_text import calendar_day_evidence
+from fatebridge.core.sukuyo.sukuyo_documentary import CLOCK_POSITION
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 
 def main_text(raw: str, after_anchor: str | None = None) -> str:
@@ -30,18 +32,28 @@ def main_text(raw: str, after_anchor: str | None = None) -> str:
         tag = element.tag.rsplit("}", 1)[-1]
         if tag in {"note", "rdg", "mulu"}:
             return
+        else:
+            pass
         if element.get("{http://www.w3.org/XML/1998/namespace}id") == after_anchor:
             active = True
+        else:
+            pass
         if active and element.text:
             output.append(element.text)
+        else:
+            pass
         for child in element:
             visit(child)
             if active and child.tail:
                 output.append(child.tail)
+            else:
+                pass
 
     visit(node)
     if not active:
         raise ValueError("Selected position anchor not found")
+    else:
+        pass
     return "".join("".join(output).split())
 
 
@@ -62,11 +74,15 @@ def verify_clock_position(
     errors: list[Any] = []
     if [special, clock] != [r["normalized_base_text"] for r in bundle["blocks"]]:
         errors.append("selected_span_text")
+    else:
+        pass
     counts = [len(re.findall("[\u3400-\u9fff]", row)) for row in [special, clock]]
     if counts != [248, 93] or counts != [
         r["cjk_character_count"] for r in bundle["blocks"]
     ]:
         errors.append(["selected_span_counts", counts])
+    else:
+        pass
     notes = {}
     for number, raw_notes in fixture["raw_selected_note_elements"].items():
         notes[number] = [
@@ -80,19 +96,29 @@ def verify_clock_position(
         "note_records"
     ] or notes["0398014"] != bundle["adjacent_variant"]["note_records"]:
         errors.append("selected_apparatus")
+    else:
+        pass
     if any("∞" not in row["text"] for n in ["0398015", "0399016"] for row in notes[n]):
         errors.append("position_symbol_missing")
+    else:
+        pass
     if (
         bundle["source_sha256"] != fixture["source_sha256"]
         or bundle["source_url"] != fixture["source_url"]
     ):
         errors.append("publisher_provenance")
+    else:
+        pass
     if bundle["symbol_reference"] != fixture["symbol_reference"]:
         errors.append("symbol_reference_changed")
+    else:
+        pass
     if xml_path:
         raw = xml_path.read_bytes()
         if hashlib.sha256(raw).hexdigest() != fixture["source_sha256"]:
             raise ValueError("Full position source bytes changed")
+        else:
+            pass
         decoded = raw.decode()
         for fragment in [
             *paragraphs.values(),
@@ -104,6 +130,10 @@ def verify_clock_position(
         ]:
             if fragment not in decoded:
                 errors.append("fragment_missing_from_full_source")
+            else:
+                pass
+    else:
+        pass
     if symbol_capture:
         raw = symbol_capture.read_bytes()
         if (
@@ -111,6 +141,8 @@ def verify_clock_position(
             != bundle["symbol_reference"]["selected_capture_sha256"]
         ):
             raise ValueError("Selected symbol capture bytes changed")
+        else:
+            pass
         capture = json.loads(raw)
         if (
             bundle["symbol_reference"]["selected_explanation"]
@@ -118,6 +150,10 @@ def verify_clock_position(
             or capture["full_html_downloaded"]
         ):
             errors.append("selected_legend_scope")
+        else:
+            pass
+    else:
+        pass
     for day in range(1, 31):
         result = calendar_day_evidence(day)
         reference = result["clock_doctrine"]["textual_position_reference"]
@@ -128,6 +164,8 @@ def verify_clock_position(
             or reference["leap_short_month_priority_established"]
         ):
             errors.append(["position_promoted_to_policy", day])
+        else:
+            pass
     return {
         "format": "sukuyo_clock_position_check_v1",
         "source_bundle_sha256": source.sha256,
@@ -164,3 +202,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

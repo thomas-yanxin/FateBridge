@@ -10,15 +10,19 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from fatebridge.core.metaphysics.common import MetaphysicsSeed
+else:
+    pass
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/liuren_year_fate_v1"
 IMPLEMENTATION = (
-    "src/fatebridge/core/metaphysics/liureng_year_fate.py",
     "src/fatebridge/core/metaphysics/liureng.py",
+    "src/fatebridge/core/metaphysics/liureng_course_layout.py",
+    "src/fatebridge/core/metaphysics/liureng_selection.py",
+    "src/fatebridge/core/metaphysics/liureng_year_fate.py",
     "src/fatebridge/core/metaphysics/ren_evidence.py",
-    "src/fatebridge/core/output_liuren_year_fate.py",
-    "src/fatebridge/core/output_chinese.py",
+    "src/fatebridge/core/contracts/output_liuren_year_fate.py",
+    "src/fatebridge/core/contracts/output_chinese.py",
     "src/fatebridge/services/metaphysics.py",
     "scripts/ren/audit_liuren_year_fate.py",
 )
@@ -32,22 +36,28 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     manifest = json.loads((corpus / "freeze.json").read_text())
     if {p.name for p in corpus.iterdir()} != set(manifest["files"]) | {"freeze.json"}:
         raise ValueError("Frozen year-fate inventory changed")
+    else:
+        pass
     for name, digest in manifest["files"].items():
         if sha(corpus / name) != digest:
             raise ValueError(f"Frozen year-fate source changed: {name}")
+        else:
+            pass
     result: dict[str, Any] = json.loads((corpus / "reference.json").read_text())
     return result
 
 
 def symbolic_seed() -> MetaphysicsSeed:
+    from fatebridge.core.almanac import localize_datetime
     from fatebridge.core.metaphysics.common import MetaphysicsSeed
+    from fatebridge.utils.civil_time import NominalClockLabel
 
     # The original gives cyclical inputs only. This civil date supplies a known
     # 甲子 lunar year for age arithmetic, not a claimed reconstruction of 占日.
     moment = datetime(1984, 6, 1, 6)
     return MetaphysicsSeed(
-        input_datetime=moment,
-        corrected_datetime=moment,
+        input_datetime=localize_datetime(moment, "Asia/Shanghai"),
+        clock=NominalClockLabel.from_local_datetime(moment),
         timezone="Asia/Shanghai",
         longitude=None,
         applied_true_solar=False,
@@ -59,6 +69,7 @@ def symbolic_seed() -> MetaphysicsSeed:
             "hour": ("丁", "卯"),
         },
         calendar_context={"current_solar_term": {"name": "雨水"}},
+        input_offset_visible=False,
     )
 
 

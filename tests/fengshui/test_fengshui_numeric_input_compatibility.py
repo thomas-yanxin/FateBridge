@@ -46,18 +46,20 @@ CASES = [
 def _adapter(module, model, field):
     cls = getattr(import_module("fatebridge.core.fengshui." + module), model)
     info = cls.model_fields[field]
-    return TypeAdapter(Annotated[info.annotation, *info.metadata])
+    return TypeAdapter(Annotated[(info.annotation, *info.metadata)])
 
 
 @pytest.mark.parametrize("module,model,field,value", CASES)
 def test_every_declared_numeric_or_calendar_field_accepts_within_range_fact(
     module, model, field, value
-):
+) -> None:
     expected = value
     if isinstance(value, str):
         expected = (
             datetime.fromisoformat(value) if "T" in value else date.fromisoformat(value)
         )
+    else:
+        pass
     assert _adapter(module, model, field).validate_python(value) == expected
 
 
@@ -67,7 +69,7 @@ def test_every_declared_numeric_or_calendar_field_accepts_within_range_fact(
 )
 def test_numeric_strings_are_rejected_even_when_number_is_within_range(
     module, model, field, value
-):
+) -> None:
     adapter = _adapter(module, model, field)
     assert adapter.validate_python(value) == value
     with pytest.raises(ValidationError):

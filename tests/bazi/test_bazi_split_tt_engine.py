@@ -11,7 +11,7 @@ from fatebridge.core.astro.tt_epoch import TTInstant
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_time_smaller_than_a_scalar_jd_ulp_reaches_the_actual_orbit():
+def test_time_smaller_than_a_scalar_jd_ulp_reaches_the_actual_orbit() -> None:
     day, fraction = 2457754.0, 0.501
     following = fraction + 1e-10
     assert day + fraction == day + following
@@ -20,7 +20,7 @@ def test_time_smaller_than_a_scalar_jd_ulp_reaches_the_actual_orbit():
     ) != de440_solar.solar_longitude_parts(day, following)
 
 
-def test_full_split_root_bracket_is_preserved_without_scalar_reassembly():
+def test_full_split_root_bracket_is_preserved_without_scalar_reassembly() -> None:
     result = de440_solar.longitude_crossing_tt_parts(285, 2457754.5, 2457765.5)
     low, high = (TTInstant.from_parts(*p) for p in result["tt_bracket_parts"])
     root = TTInstant.from_parts(*result["tt_parts"])
@@ -30,14 +30,14 @@ def test_full_split_root_bracket_is_preserved_without_scalar_reassembly():
 
 
 @pytest.mark.parametrize("value", [math.inf, math.nan])
-def test_nonfinite_fraction_is_rejected_before_any_source_evaluation(value):
+def test_nonfinite_fraction_is_rejected_before_any_source_evaluation(value) -> None:
     with pytest.raises(ValueError, match="finite"):
         de440_solar.state((0, 3), 0, fractional_day=value)
     with pytest.raises(ValueError, match="finite"):
         de440_solar.solar_longitude_parts(2451545, value)
 
 
-def test_split_vector_matches_original_kernel_clenshaw_at_record_boundaries():
+def test_split_vector_matches_original_kernel_clenshaw_at_record_boundaries() -> None:
     SPK = pytest.importorskip("jplephem.spk").SPK
 
     kernel = SPK.open(str(ROOT / "ephe/solar-de440.bsp"))

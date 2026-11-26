@@ -48,6 +48,8 @@ def atomic_write(path: Path, data: bytes) -> None:
 def build(commit: str, cache_dir: Path, output: Path) -> Dict[str, Any]:
     if not re.fullmatch(r"[0-9a-f]{40}", commit):
         raise ValueError("An explicit full upstream commit SHA is required")
+    else:
+        pass
     tree_url = (
         f"https://api.github.com/repos/{REPOSITORY}/git/trees/{commit}?recursive=1"
     )
@@ -55,6 +57,8 @@ def build(commit: str, cache_dir: Path, output: Path) -> Dict[str, Any]:
     tree = json.loads(raw_tree)
     if tree.get("truncated"):
         raise ValueError("Upstream tree is truncated; refusing an incomplete manifest")
+    else:
+        pass
     entries = [
         row
         for row in tree["tree"]
@@ -62,6 +66,8 @@ def build(commit: str, cache_dir: Path, output: Path) -> Dict[str, Any]:
     ]
     if not entries:
         raise ValueError("No root ephemeris files found")
+    else:
+        pass
     base_url = f"https://raw.githubusercontent.com/{REPOSITORY}/{commit}/ephe"
     cache_dir.mkdir(parents=True, exist_ok=True)
     atomic_write(cache_dir / "upstream-tree.json", raw_tree)
@@ -77,10 +83,16 @@ def build(commit: str, cache_dir: Path, output: Path) -> Dict[str, Any]:
         ).hexdigest()
         if len(data) != row["size"] or blob != row["sha"]:
             raise ValueError(f"{name}: bytes do not match pinned upstream Git blob")
+        else:
+            pass
         if not data.startswith(b"SW"):
             raise ValueError(f"{name}: upstream object is not ephemeris data")
+        else:
+            pass
         if not target.exists():
             atomic_write(target, data)
+        else:
+            pass
         return name, {
             "bytes": len(data),
             "sha256": hashlib.sha256(data).hexdigest(),
@@ -99,8 +111,12 @@ def build(commit: str, cache_dir: Path, output: Path) -> Dict[str, Any]:
                 errors.append(f"{futures[future]}: {error}")
             if (len(files) + len(errors)) % 20 == 0:
                 print(f"Checked {len(files)} files; {len(errors)} errors", flush=True)
+            else:
+                pass
     if errors:
         raise ValueError("No manifest written:\n" + "\n".join(errors))
+    else:
+        pass
     manifest = {
         "schema_version": 1,
         "id": "swiss_ephemeris_data_v1",
@@ -128,3 +144,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

@@ -1,0 +1,450 @@
+{
+  "bound": {
+    "may6_1988_synthetic": {
+      "request": {
+        "birth_year": 1988,
+        "birth_month": 5,
+        "birth_day": 6,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "swieph"
+    },
+    "may6_2030_synthetic": {
+      "request": {
+        "birth_year": 2030,
+        "birth_month": 5,
+        "birth_day": 6,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "swieph"
+    },
+    "may6_2023_synthetic": {
+      "request": {
+        "birth_year": 2023,
+        "birth_month": 5,
+        "birth_day": 6,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "swieph"
+    },
+    "j2000_control_synthetic": {
+      "request": {
+        "birth_year": 2000,
+        "birth_month": 1,
+        "birth_day": 1,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "swieph"
+    },
+    "may6_1988_early_synthetic": {
+      "request": {
+        "birth_year": 1988,
+        "birth_month": 5,
+        "birth_day": 6,
+        "birth_hour": 0,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "swieph"
+    }
+  },
+  "context": {
+    "1971_backend_base_interval": {
+      "request": {
+        "birth_year": 1971,
+        "birth_month": 12,
+        "birth_day": 1,
+        "birth_hour": 0,
+        "birth_minute": 58,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 1
+      },
+      "backend": "swieph"
+    },
+    "mean_j2000_interval": {
+      "request": {
+        "birth_year": 2000,
+        "birth_month": 1,
+        "birth_day": 1,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "mean",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 1
+      },
+      "backend": "swieph"
+    },
+    "strict_jpl_j2000": {
+      "request": {
+        "birth_year": 2000,
+        "birth_month": 1,
+        "birth_day": 1,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": false,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "jpl"
+    },
+    "gate14_transition_interval": {
+      "request": {
+        "birth_year": 2023,
+        "birth_month": 5,
+        "birth_day": 6,
+        "birth_hour": 10,
+        "birth_minute": 27,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 1
+      },
+      "backend": "swieph"
+    },
+    "retained_root_family_control": {
+      "request": {
+        "birth_year": 2390,
+        "birth_month": 1,
+        "birth_day": 1,
+        "birth_hour": 11,
+        "birth_minute": 58,
+        "birth_second": 1,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": false,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "swieph"
+    },
+    "moshier_root_family_control": {
+      "request": {
+        "birth_year": 2390,
+        "birth_month": 1,
+        "birth_day": 1,
+        "birth_hour": 11,
+        "birth_minute": 58,
+        "birth_second": 1,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": false,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "moshier"
+    }
+  },
+  "gate3": {
+    "gate3": {
+      "request": {
+        "birth_year": 1988,
+        "birth_month": 4,
+        "birth_day": 19,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "swieph"
+    }
+  },
+  "gate4": {
+    "1971_backend_base_interval": {
+      "request": {
+        "birth_year": 1971,
+        "birth_month": 12,
+        "birth_day": 1,
+        "birth_hour": 0,
+        "birth_minute": 58,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 1
+      },
+      "backend": "swieph"
+    },
+    "mean_j2000_interval": {
+      "request": {
+        "birth_year": 2000,
+        "birth_month": 1,
+        "birth_day": 1,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "mean",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 1
+      },
+      "backend": "swieph"
+    },
+    "strict_jpl_j2000": {
+      "request": {
+        "birth_year": 2000,
+        "birth_month": 1,
+        "birth_day": 1,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": false,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "jpl"
+    },
+    "gate14_transition_interval": {
+      "request": {
+        "birth_year": 2023,
+        "birth_month": 5,
+        "birth_day": 6,
+        "birth_hour": 10,
+        "birth_minute": 27,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 1
+      },
+      "backend": "swieph"
+    },
+    "retained_root_family_control": {
+      "request": {
+        "birth_year": 2390,
+        "birth_month": 1,
+        "birth_day": 1,
+        "birth_hour": 11,
+        "birth_minute": 58,
+        "birth_second": 1,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": false,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "swieph"
+    },
+    "moshier_root_family_control": {
+      "request": {
+        "birth_year": 2390,
+        "birth_month": 1,
+        "birth_day": 1,
+        "birth_hour": 11,
+        "birth_minute": 58,
+        "birth_second": 1,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": false,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "moshier"
+    },
+    "existing_complete_cycle_receipt": {
+      "request": {
+        "birth_year": 1863,
+        "birth_month": 10,
+        "birth_day": 25,
+        "birth_hour": 15,
+        "birth_minute": 1,
+        "birth_second": 33,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 0,
+        "cycle_reference_datetime": "1920-01-01T00:00:00+00:00"
+      },
+      "backend": "swieph"
+    },
+    "gate3_april1988_synthetic": {
+      "request": {
+        "birth_year": 1988,
+        "birth_month": 4,
+        "birth_day": 19,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "swieph"
+    },
+    "synthetic2000-08-11": {
+      "request": {
+        "birth_year": 2000,
+        "birth_month": 8,
+        "birth_day": 11,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "swieph"
+    },
+    "synthetic2000-08-12": {
+      "request": {
+        "birth_year": 2000,
+        "birth_month": 8,
+        "birth_day": 12,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "swieph"
+    },
+    "synthetic2000-08-13": {
+      "request": {
+        "birth_year": 2000,
+        "birth_month": 8,
+        "birth_day": 13,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "swieph"
+    },
+    "synthetic2000-08-14": {
+      "request": {
+        "birth_year": 2000,
+        "birth_month": 8,
+        "birth_day": 14,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "swieph"
+    },
+    "synthetic2000-08-15": {
+      "request": {
+        "birth_year": 2000,
+        "birth_month": 8,
+        "birth_day": 15,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "swieph"
+    },
+    "synthetic2000-08-16": {
+      "request": {
+        "birth_year": 2000,
+        "birth_month": 8,
+        "birth_day": 16,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "swieph"
+    },
+    "synthetic2000-08-17": {
+      "request": {
+        "birth_year": 2000,
+        "birth_month": 8,
+        "birth_day": 17,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true",
+        "require_swiss_files": true,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "swieph"
+    }
+  },
+  "gate5": {
+    "gate5": {
+      "request": {
+        "birth_year": 1976,
+        "birth_month": 12,
+        "birth_day": 8,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "mean",
+        "require_swiss_files": false,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "swieph"
+    }
+  },
+  "gate6": {
+    "gate6": {
+      "request": {
+        "birth_year": 1976,
+        "birth_month": 9,
+        "birth_day": 17,
+        "birth_hour": 18,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "mean",
+        "require_swiss_files": false,
+        "birth_time_uncertainty_minutes": 0
+      },
+      "backend": "swieph"
+    }
+  }
+}

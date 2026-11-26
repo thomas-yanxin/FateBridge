@@ -5,6 +5,7 @@ from __future__ import annotations
 import contextlib
 import importlib
 import json
+import logging
 import os
 import sys
 from pathlib import Path
@@ -12,12 +13,13 @@ from queue import Queue
 from threading import Thread
 from typing import Any
 
-# -I ignores the caller's PYTHONPATH. Resolve the package beside this script,
-# including in an installed wheel, instead of an unrelated editable checkout.
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+logger = logging.getLogger(__name__)
 
 
 def main() -> None:
+    """Serve one request after resolving the isolated executable's package path."""
+    from pydantic import JsonValue
+
     from fatebridge.core.astro import native_execution as execution
     from fatebridge.core.astro.iers_ut1 import use_ut1_source
     from fatebridge.core.compressed_ephemeris import audit_compressed_endpoints
@@ -81,10 +83,17 @@ def main() -> None:
             options = execution.decode(request["kwargs"])
             if request["observer"]:
 
-                def observe(*args: Any) -> None:
-                    send({"kind": "sample", "args": execution.encode(args)})
-                    ack = acknowledgements.get()
-                    if json.loads(ack) != {"kind": "continue"}:
+                def observe(
+                    offset_seconds: float, sample: dict[str, JsonValue]
+                ) -> None:
+                    send(
+                        {
+                            "kind": "sample",
+                            "args": execution.encode((offset_seconds, sample)),
+                        }
+                    )
+                    acknowledgement = acknowledgements.get()
+                    if json.loads(acknowledgement) != {"kind": "continue"}:
                         raise execution.NativeExecutionError(
                             "Invalid sample acknowledgement"
                         )
@@ -104,7 +113,7 @@ def main() -> None:
                     result = function(*arguments, **options)
             finally:
                 auxiliary.check()
-            response = {
+            response: dict[str, JsonValue] = {
                 "kind": "result",
                 "value": execution.encode_result(result),
             }
@@ -125,9 +134,12 @@ def main() -> None:
                 "kind": "result",
                 "error": {"type": "value", "message": str(error)},
             }
-        except ImportError:
+        except ModuleNotFoundError:
             response = {"kind": "result", "error": {"type": "import"}}
         except Exception:
+            logger.error(
+                "Unexpected failure while processing a private native calculation"
+            )
             response = {"kind": "result", "error": {"type": "internal"}}
         send({**response, "clock_reads": clock.reads})
         # Avoid interpreter shutdown while the pipe reader holds a buffered-I/O
@@ -136,4 +148,6 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    # note (native IPC): Isolated execution must resolve the package beside this entry.
+    sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
     main()

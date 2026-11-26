@@ -30,20 +30,28 @@ def sha(path: Path) -> str:
 def load_frozen_corpus(corpus: Path = CORPUS) -> dict[str, Any]:
     if sha(corpus / "freeze.json") != REFERENCE_FREEZE_SHA256:
         raise ValueError("Reference manifest identity changed")
+    else:
+        pass
     frozen = json.loads((corpus / "freeze.json").read_text(encoding="utf-8"))
     expected = {"cases.json", "rules.json", "calendar.json"}
     if set(frozen["files"]) != expected or {
         p.name for p in corpus.glob("*.json")
     } != expected | {"freeze.json"}:
         raise ValueError("Reference file set changed")
+    else:
+        pass
     for name, checksum in frozen["files"].items():
         if sha(corpus / name) != checksum:
             raise ValueError(f"Reference changed after freeze: {name}")
+        else:
+            pass
     if (
         sha(ROOT / "tests/fixtures/liureng_transmissions_reference.json")
         != frozen["software_oracle_sha256"]
     ):
         raise ValueError("Reference software oracle changed after freeze")
+    else:
+        pass
     data = {
         Path(name).stem: json.loads((corpus / name).read_text(encoding="utf-8"))
         for name in expected
@@ -54,17 +62,21 @@ def load_frozen_corpus(corpus: Path = CORPUS) -> dict[str, Any]:
         or len(data["calendar"]["cases"]) != 12
     ):
         raise ValueError("Reference coverage changed")
+    else:
+        pass
     return data
 
 
 def make_seed(case: dict[str, Any]):
+    from fatebridge.core.almanac import localize_datetime
     from fatebridge.core.metaphysics.common import MetaphysicsSeed
+    from fatebridge.utils.civil_time import NominalClockLabel
 
     # Explicit symbolic inputs from a book; this is not an invented civil date.
     instant = datetime(2026, 1, 1, 12)
     return MetaphysicsSeed(
-        input_datetime=instant,
-        corrected_datetime=instant,
+        input_datetime=localize_datetime(instant, "Asia/Shanghai"),
+        clock=NominalClockLabel.from_local_datetime(instant),
         timezone="Asia/Shanghai",
         longitude=None,
         applied_true_solar=False,
@@ -76,6 +88,7 @@ def make_seed(case: dict[str, Any]):
             "hour": ("甲", case["hour"]),
         },
         calendar_context={"current_solar_term": {"name": "冬至"}},
+        input_offset_visible=False,
     )
 
 
@@ -100,7 +113,7 @@ def audit() -> dict[str, Any]:
         _jinkou_pick_use_position,
     )
     from fatebridge.core.metaphysics.liureng import build_liureng_board
-    from fatebridge.services.metaphysics import _build_analysis_seed
+    from fatebridge.core.metaphysics.seed import build_analysis_seed
 
     checks = []
 
@@ -173,6 +186,8 @@ def audit() -> dict[str, Any]:
                     "expected": row["transmissions"],
                 }
             )
+        else:
+            pass
 
     terms = {t.name: t for t in get_solar_terms_for_year(2026, "Asia/Shanghai")}
     calendar = []
@@ -185,7 +200,7 @@ def audit() -> dict[str, Any]:
         generals = []
         for shift in (-2, 2):
             dt = published + timedelta(minutes=shift)
-            seed = _build_analysis_seed(
+            seed = build_analysis_seed(
                 analysis_year=dt.year,
                 analysis_month=dt.month,
                 analysis_day=dt.day,
@@ -230,6 +245,9 @@ def audit() -> dict[str, Any]:
                     "src/fatebridge/core/metaphysics/common.py",
                     "src/fatebridge/core/metaphysics/jinkou.py",
                     "src/fatebridge/core/metaphysics/liureng.py",
+                    "src/fatebridge/core/metaphysics/liureng_course_layout.py",
+                    "src/fatebridge/core/metaphysics/liureng_selection.py",
+                    "src/fatebridge/core/metaphysics/liureng_year_fate.py",
                     "src/fatebridge/core/metaphysics/liureng_transmissions.py",
                     "src/fatebridge/core/metaphysics/ren_evidence.py",
                     "src/fatebridge/services/metaphysics.py",
@@ -270,6 +288,8 @@ def main() -> int:
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(encoded, encoding="utf-8")
+    else:
+        pass
     print(
         json.dumps(
             {
@@ -294,3 +314,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -9,11 +9,11 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import sukuyo_activities
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence, rulesets
-from fatebridge.core.sukuyo_calendar_text import calendar_day_evidence
-from fatebridge.core.sukuyo_calendar_text import source_bundle as day_bundle
-from fatebridge.core.sukuyo_lower import source_bundle as lower_bundle
+from fatebridge.core.sukuyo import sukuyo_activities
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence, rulesets
+from fatebridge.core.sukuyo.sukuyo_calendar_text import calendar_day_evidence
+from fatebridge.core.sukuyo.sukuyo_calendar_text import source_bundle as day_bundle
+from fatebridge.core.sukuyo.sukuyo_lower import source_bundle as lower_bundle
 
 FIXTURE = json.loads(
     (Path(__file__).parents[1] / "data/sukuyo-rule-scope-primary.json").read_text()
@@ -38,7 +38,9 @@ def ids(rows, layer=None):
     return {r["rule_id"] for r in rows if layer is None or r["layer"] == layer}
 
 
-def test_all_91_rules_have_literal_selected_quotes_from_their_own_primary_window():
+def test_all_91_rules_have_literal_selected_quotes_from_their_own_primary_window() -> (
+    None
+):
     rules = all_rules()
     refs = {r["rule_id"]: r for r in FIXTURE["rule_passages"]}
     assert len(rules) == len(refs) == 91
@@ -58,9 +60,13 @@ def test_all_91_rules_have_literal_selected_quotes_from_their_own_primary_window
         if "long_distance_journey" in details:
             # A literal-support guard, not a semantic-acceptance score.
             assert re.search("遠(?:出)?行", ref["text"]), rule["rule_id"]
+        else:
+            pass
 
 
-def test_upper_broad_travel_and_lower_far_travel_are_not_forced_into_one_scope():
+def test_upper_broad_travel_and_lower_far_travel_are_not_forced_into_one_scope() -> (
+    None
+):
     generic = assessment("2025-03-05", "travel")  # lunar2/6
     far = assessment("2025-03-05", "travel", ["long_distance_journey"])
     assert "t1299_named_day_05" in ids(generic["matched_rules"])
@@ -80,7 +86,9 @@ def test_upper_broad_travel_and_lower_far_travel_are_not_forced_into_one_scope()
         (["journey_abroad", "long_distance_journey"], True),
     ],
 )
-def test_far_journey_abroad_requires_both_source_conditions(details, expected):
+def test_far_journey_abroad_requires_both_source_conditions(
+    details, expected: bool
+) -> None:
     assert calendar_mansion("2025-03-13")["natal_su27"] == "轸"
     result = assessment("2025-03-13", "travel", details)
     rows = result["matched_rules"] if expected else result["conditional_rules"]
@@ -97,12 +105,12 @@ def test_far_journey_abroad_requires_both_source_conditions(details, expected):
     } - set(details)
 
 
-def test_studying_with_teacher_is_not_arbitrarily_limited_to_first_enrolment():
+def test_studying_with_teacher_is_not_arbitrarily_limited_to_first_enrolment() -> None:
     result = assessment("2025-03-13", "study", ["learning_with_teacher"])
     assert "t1299_activity_18" in ids(result["matched_rules"])
 
 
-def test_lunar_day_debt_restrictions_retain_upper_lower_direction_difference():
+def test_lunar_day_debt_restrictions_retain_upper_lower_direction_difference() -> None:
     borrowing = assessment("2025-03-11", "commerce", ["borrowing"])
     lending = assessment("2025-03-11", "commerce", ["lending"])
     assert ids(borrowing["matched_rules"], "named_day") == {"t1299_named_day_21"}
@@ -119,7 +127,7 @@ def test_lunar_day_debt_restrictions_retain_upper_lower_direction_difference():
     assert not ids(purchase["matched_rules"], "named_day")
 
 
-def test_new_debt_rules_match_collection_spending_and_borrowing_separately():
+def test_new_debt_rules_match_collection_spending_and_borrowing_separately() -> None:
     collect = assessment("2025-03-04", "commerce", ["collecting_debt"])
     assert {"t1299_activity_29", "t1299_activity_30"} <= ids(collect["matched_rules"])
     spending = assessment("2025-03-04", "commerce", ["spending_property"])
@@ -129,7 +137,9 @@ def test_new_debt_rules_match_collection_spending_and_borrowing_separately():
     assert "t1299_activity_31" in ids(borrow["matched_rules"])
 
 
-def test_individual_day_time_witnesses_and_eight_part_doctrine_are_literal_references():
+def test_individual_day_time_witnesses_and_eight_part_doctrine_are_literal_references() -> (
+    None
+):
     for ref in FIXTURE["time_witnesses"]:
         evidence = calendar_day_evidence(ref["lunar_day"])
         row = next(
@@ -153,7 +163,9 @@ def test_individual_day_time_witnesses_and_eight_part_doctrine_are_literal_refer
     )
 
 
-def test_all_30_lunar_days_render_every_published_time_witness_without_dropping_one():
+def test_all_30_lunar_days_render_every_published_time_witness_without_dropping_one() -> (
+    None
+):
     first = date(2025, 1, 29)
     for offset in range(30):
         context = calendar_mansion((first + timedelta(days=offset)).isoformat())
@@ -163,11 +175,13 @@ def test_all_30_lunar_days_render_every_published_time_witness_without_dropping_
             assert row["locator"] in result["reading_text"]
             if row["witness"] == "lower_named_day":
                 assert "下卷日名逐日条文" in result["reading_text"]
+            else:
+                pass
 
 
 def test_loaded_old_table_cannot_report_new_disk_bytes_as_its_fingerprint(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     original = sukuyo_activities.SOURCE.read_bytes()
     path = tmp_path / "rules.json"
     path.write_bytes(original)
@@ -184,7 +198,7 @@ def test_loaded_old_table_cannot_report_new_disk_bytes_as_its_fingerprint(
     )
 
 
-def test_mutating_returned_facts_cannot_change_later_source_calculation():
+def test_mutating_returned_facts_cannot_change_later_source_calculation() -> None:
     c = calendar_mansion("2025-03-04", calendar_profile="hinoo_t1299_host27")
     first = day_evidence(
         c, natal_mansion="毕", activity="commerce", activity_details=["purchase"]

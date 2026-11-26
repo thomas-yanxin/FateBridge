@@ -22,6 +22,8 @@ def sha(path: Path) -> str:
 def reference(path: Path = CORPUS) -> dict[str, Any]:
     if sha(path / "freeze.json") != FREEZE_SHA256:
         raise ValueError("Frozen course source manifest changed")
+    else:
+        pass
     frozen = json.loads((path / "freeze.json").read_text())["files"]
     if set(frozen) != {
         "source.pdf",
@@ -31,11 +33,17 @@ def reference(path: Path = CORPUS) -> dict[str, Any]:
         "protocol.json",
     }:
         raise ValueError("Frozen course source inventory changed")
+    else:
+        pass
     if {p.name for p in path.iterdir()} != set(frozen) | {"freeze.json"}:
         raise ValueError("Frozen course source inventory has missing or extra files")
+    else:
+        pass
     for name, digest in frozen.items():
         if sha(path / name) != digest:
             raise ValueError("Frozen course source bytes changed: " + name)
+        else:
+            pass
     return dict(
         readings=json.loads((path / "readings.json").read_text()),
         life=json.loads((path / "life-reference.json").read_text()),
@@ -100,6 +108,8 @@ def audit() -> dict[str, Any]:
         rows.append(row)
         if not ok:
             failures.append(row)
+        else:
+            pass
         for i in got:
             counts[i] += 1
     structural = []
@@ -124,6 +134,8 @@ def audit() -> dict[str, Any]:
         counts["B01"] += got
         if expected != got:
             failures.append(row)
+        else:
+            pass
     for triple in itertools.product(BRANCHES, repeat=3):
         got = course_conditions("甲子", transmissions(list(triple), "贵人", "子"))[
             "structural_patterns"
@@ -140,6 +152,8 @@ def audit() -> dict[str, Any]:
         counts["B02"] += got
         if expected != got:
             failures.append(row)
+        else:
+            pass
     # Independent sexagenary positions: ten days per xun, last = first+9.
     for n, first, final in itertools.product(range(60), BRANCHES, BRANCHES):
         day = STEMS[n % 10] + BRANCHES[n % 12]
@@ -163,6 +177,8 @@ def audit() -> dict[str, Any]:
         counts["B03"] += got
         if expected != got:
             failures.append(row)
+        else:
+            pass
     return dict(
         source_reference_sha256=FREEZE_SHA256,
         selected_literal_clauses=len(clauses),

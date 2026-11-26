@@ -7,13 +7,14 @@ import pytest
 from fatebridge.core.almanac import get_solar_terms_for_year, localize_datetime
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.local_techniques.chart import _build_metaphysics_seed
+from fatebridge.core.metaphysics.seed import build_analysis_seed
 from fatebridge.core.timing import TimingAnalysis
 from fatebridge.services.bazi import _resolve_analysis_date, calculate_bazi_birth
 from fatebridge.services.birth_context import (
     build_birth_computation_context as _build_birth_computation_context,
 )
 from fatebridge.services.calendar_tools import calculate_nongli_time
-from fatebridge.services.metaphysics import _build_analysis_seed, _build_person_seed
+from fatebridge.services.metaphysics import _build_person_seed
 from fatebridge.services.timing import calculate_dayun_analysis
 from fatebridge.utils.birth_input import create_person_info
 from fatebridge.utils.timezones import parse_timezone_name
@@ -35,7 +36,9 @@ def _person(moment: datetime, *, longitude: float = 116.4074):
 
 @pytest.mark.parametrize("term_name", ["立春", "惊蛰", "清明", "立夏", "小寒"])
 @pytest.mark.parametrize("direction", [-1, 1])
-def test_solar_adjustment_does_not_move_seasonal_boundary(term_name, direction):
+def test_solar_adjustment_does_not_move_seasonal_boundary(
+    term_name: str, direction
+) -> None:
     term = next(
         term
         for term in get_solar_terms_for_year(2024, "Asia/Shanghai")
@@ -62,12 +65,12 @@ def test_solar_adjustment_does_not_move_seasonal_boundary(term_name, direction):
     )
 
 
-def test_beijing_lichun_birth_and_metaphysics_paths_keep_civil_year_month():
+def test_beijing_lichun_birth_and_metaphysics_paths_keep_civil_year_month() -> None:
     moment = datetime(2024, 2, 4, 16, 30)
     person = _person(moment)
     seeds = [
         _build_person_seed(person),
-        _build_analysis_seed(
+        build_analysis_seed(
             analysis_year=2024,
             analysis_month=2,
             analysis_day=4,
@@ -112,7 +115,7 @@ def test_beijing_lichun_birth_and_metaphysics_paths_keep_civil_year_month():
     assert nongli["jieqi"] == "立春"
 
 
-def test_solar_clock_crossing_midnight_preserves_existing_lunar_and_day_rules():
+def test_solar_clock_crossing_midnight_preserves_existing_lunar_and_day_rules() -> None:
     person = _person(datetime(2024, 2, 10, 0, 10), longitude=60)
     context = _build_birth_computation_context(person)
     solar_clock = context.normalized_birth_time.corrected_datetime
@@ -124,7 +127,7 @@ def test_solar_clock_crossing_midnight_preserves_existing_lunar_and_day_rules():
     )
 
 
-def test_dayun_boundaries_use_civil_instant_after_solar_correction():
+def test_dayun_boundaries_use_civil_instant_after_solar_correction() -> None:
     moment = datetime(2024, 2, 4, 16, 30)
     person = _person(moment)
     expected = TimingAnalysis.calculate_dayun_start_details(moment, "男")
@@ -137,7 +140,7 @@ def test_dayun_boundaries_use_civil_instant_after_solar_correction():
     "value, hours",
     [("5.5", 5.5), ("UTC+8", 8), ("+0530", 5.5), ("-05:30", -5.5)],
 )
-def test_normalization_and_calendar_share_offset_parser(value, hours):
+def test_normalization_and_calendar_share_offset_parser(value: str, hours) -> None:
     moment = datetime(2024, 2, 4, 16, 30)
     expected = timedelta(hours=hours)
     assert parse_timezone_name(value).utcoffset(moment) == expected
@@ -154,14 +157,14 @@ def test_normalization_and_calendar_share_offset_parser(value, hours):
     "value",
     ["UTC+08:90", "+08:60", "UTC-8:-30", "UTC+24", "UTC+15:01", "1e3"],
 )
-def test_normalization_and_calendar_reject_malformed_offsets(value):
+def test_normalization_and_calendar_reject_malformed_offsets(value: str) -> None:
     with pytest.raises(ValueError, match="Invalid birth timezone"):
         parse_timezone_name(value)
     with pytest.raises(ValueError, match="Invalid birth timezone"):
         localize_datetime(datetime(2024, 2, 4), value)
 
 
-def test_complete_invalid_analysis_date_is_rejected():
+def test_complete_invalid_analysis_date_is_rejected() -> None:
     with pytest.raises(ValueError, match="day is out of range"):
         _resolve_analysis_date(2025, 2, 31)
     result = calculate_bazi_birth(
@@ -174,7 +177,9 @@ def test_complete_invalid_analysis_date_is_rejected():
     assert _resolve_analysis_date(2024, 2, 29) == datetime(2024, 2, 29)
 
 
-def test_partial_analysis_date_keeps_default_clamping(monkeypatch):
+def test_partial_analysis_date_keeps_default_clamping(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(
         "fatebridge.services.bazi.current_local_datetime",
         lambda: datetime(2025, 2, 15),

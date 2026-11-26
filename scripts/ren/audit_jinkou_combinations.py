@@ -15,8 +15,9 @@ IMPLEMENTATION = (
     "src/fatebridge/core/metaphysics/jinkou_combinations.py",
     "src/fatebridge/core/metaphysics/jinkou.py",
     "src/fatebridge/core/metaphysics/ren_evidence.py",
-    "src/fatebridge/core/output_chinese.py",
+    "src/fatebridge/core/contracts/output_chinese.py",
     "src/fatebridge/core/export_contracts.py",
+    "src/fatebridge/core/export_presets.py",
     "src/fatebridge/services/metaphysics.py",
     "scripts/ren/audit_jinkou_combinations.py",
     "scripts/ren/audit_jinkou_patterns.py",
@@ -34,13 +35,19 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
         p.name for p in corpus.iterdir()
     } != expected | {"freeze.json"}:
         raise ValueError("Frozen combinations inventory changed")
+    else:
+        pass
     for name, checksum in frozen["files"].items():
         if sha(corpus / name) != checksum:
             raise ValueError(f"Frozen combinations reference changed: {name}")
+        else:
+            pass
     ref = json.loads((corpus / "reference.json").read_text())
     for name, checksum in ref["references"].items():
         if sha(ROOT / name) != checksum:
             raise ValueError(f"Referenced original corpus changed: {name}")
+        else:
+            pass
     return ref
 
 
@@ -150,6 +157,8 @@ def audit() -> dict[str, Any]:
                 )
             ):
                 failures.append(dict(branches=branches, name=expected["name"]))
+            else:
+                pass
     from scripts.ren import audit_jinkou_patterns as patterns
     from scripts.ren.audit_ren_classical import load_frozen_corpus
 
@@ -168,6 +177,8 @@ def audit() -> dict[str, Any]:
                 auxiliary_checks += 1
                 if row["si_da_kong"] != (row["element"] == empty_phase):
                     auxiliary_failures.append(dict(day=day, position=row["label"]))
+                else:
+                    pass
     corrections = []
     cycle = ["甲乙丙丁戊己庚辛壬癸"[i % 10] + BRANCHES[i % 12] for i in range(60)]
     for case in patterns.load_reference()["cases"]:
@@ -187,6 +198,8 @@ def audit() -> dict[str, Any]:
                         corrected_derived_flag=row["si_da_kong"],
                     )
                 )
+            else:
+                pass
     unchanged = before == {name: sha(ROOT / name) for name in IMPLEMENTATION}
     selected = (
         unchanged

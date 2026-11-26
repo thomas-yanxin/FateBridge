@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.almanac import localize_datetime
-from fatebridge.core.output_chinese import SolarTerm
+from fatebridge.core.contracts.output_chinese import SolarTerm
 from fatebridge.services.timing_clock import resolve_analysis_moment
 from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.timezones import parse_timezone_name
@@ -17,7 +17,7 @@ from fatebridge.utils.timezones import parse_timezone_name
 REFERENCE = Path(__file__).parents[1] / "data/zoned_calendar_temporal_v1"
 
 
-def test_every_independent_temporal_label_and_epoch_microsecond():
+def test_every_independent_temporal_label_and_epoch_microsecond() -> None:
     path = REFERENCE / "oracle.json.gz"
     raw = path.read_bytes()
     assert (
@@ -56,9 +56,11 @@ def test_every_independent_temporal_label_and_epoch_microsecond():
                 == row["local_parts"]
             )
             assert ZonedCalendar.from_datetime(converted).utc == utc
+        else:
+            pass
 
 
-def test_every_declared_zone_matches_the_official_iana_c_implementation():
+def test_every_declared_zone_matches_the_official_iana_c_implementation() -> None:
     path = (
         REFERENCE.parents[1] / "fixtures/zoned-calendar-iana2026f-reference-v1.json.gz"
     )
@@ -86,8 +88,8 @@ def test_every_declared_zone_matches_the_official_iana_c_implementation():
     ],
 )
 def test_analysis_reference_keeps_the_real_instant_at_civil_year_edges(
-    local, zone, expected_utc
-):
+    local: str, zone: str, expected_utc: str
+) -> None:
     moment = datetime.fromisoformat(local)
     resolution = resolve_analysis_moment(
         "liuyue_analysis",
@@ -106,7 +108,7 @@ def test_analysis_reference_keeps_the_real_instant_at_civil_year_edges(
     "text",
     ["0000-12-06T01:32:06.707714+00:00", "+010000-01-05T23:59:59.999999-08:00"],
 )
-def test_auxiliary_solar_labels_validate_without_clipping_the_year(text):
+def test_auxiliary_solar_labels_validate_without_clipping_the_year(text: str) -> None:
     clock = ZonedCalendar.from_isoformat(text)
     legacy = clock.isoformat(sep=" ", include_offset=False)
     result = SolarTerm.model_validate(
@@ -123,7 +125,7 @@ def test_auxiliary_solar_labels_validate_without_clipping_the_year(text):
         )
 
 
-def test_calendar_labels_require_an_offset_and_keep_invalid_dates_invalid():
+def test_calendar_labels_require_an_offset_and_keep_invalid_dates_invalid() -> None:
     with pytest.raises(ValueError, match="aware"):
         ZonedCalendar.from_datetime(datetime(2000, 1, 1))
     with pytest.raises(ValueError, match="aware"):

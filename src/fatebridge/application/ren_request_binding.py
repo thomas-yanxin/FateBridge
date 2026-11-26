@@ -1,17 +1,28 @@
-"""Bind complete Ren results to the actual request, before any projection.
-
-This repeats the domain's seed and small input-derived metadata checks, not
-board construction. It does not certify astronomy, a classical reading or a
-prediction, and never changes the returned object or fills missing user data.
-"""
+"""Bind Ren results to the submitted civil clock and rule selections."""
 
 from __future__ import annotations
 
-import json
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Any
 
 from pydantic import BaseModel
+
+from fatebridge.application.bindings import _build_person
+from fatebridge.application.tool_spec import ServiceResult
+from fatebridge.core.almanac import localize_datetime
+from fatebridge.core.metaphysics.jinkou_year_fate import confirmed_natal_branch
+from fatebridge.core.metaphysics.ren_diurnal import resolve_diurnal
+from fatebridge.core.requests.divination import SanShiUnitedRequest
+from fatebridge.core.requests.metaphysics import (
+    JinkouAnalysisRequest,
+    LiuRengGodsRequest,
+    LiuRengRunyearRequest,
+)
+from fatebridge.utils.birth_input import normalize_gender
+from fatebridge.utils.civil_clock import resolve_civil_clock
+from fatebridge.utils.civil_time import utc_calendar
+from fatebridge.utils.json_values import same_value
+from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 
 TOOLS = frozenset({"liureng_gods", "liureng_runyear", "jinkou", "sanshiunited"})
 MISSING = object()
@@ -27,9 +38,7 @@ def _get(value: Any, path: str) -> Any:
 
 def _same(value: Any, path: str, expected: Any) -> None:
     actual = _get(value, path)
-    if actual is MISSING or json.dumps(
-        actual, sort_keys=True, allow_nan=False
-    ) != json.dumps(expected, sort_keys=True, allow_nan=False):
+    if actual is MISSING or not same_value(actual, expected):
         raise ValueError("完整六壬结果的" + path + "与本次请求不符")
 
 
@@ -42,181 +51,143 @@ def _mapping(actual: Any, expected: dict[str, Any], prefix: str = "") -> None:
             _same(actual, path, value)
 
 
-def _gender(holder: Any, path: str, expected: Any) -> None:
-    from fatebridge.utils.birth_input import normalize_gender
-
+def _gender(holder: Any, path: str, expected: str | None) -> None:
     actual = _get(holder, path)
     if actual is MISSING or normalize_gender(actual) != normalize_gender(expected):
         raise ValueError("完整六壬结果的性别来源与本次请求不符")
 
 
 def require_request_binding(
-    key: str, result: dict[str, Any], request: BaseModel
+    key: str, result: ServiceResult, request: BaseModel
 ) -> None:
-    """Validate an unprojected success against independently bound inputs."""
+    """Check request facts against the same run's recorded operands."""
     if key not in TOOLS:
         return
-    from fatebridge.application.bindings import _build_person
-    from fatebridge.core.almanac import get_lunar_context, localize_datetime
+    # note (catalog): These engine helpers load only when validating a Ren result.
     from fatebridge.core.local_techniques.chart import (
-        _build_metaphysics_analysis_context,
-        _build_metaphysics_seed,
         _normalize_date_text,
         _normalize_time_text,
+        _resolve_coordinates,
+        parse_local_datetime,
     )
-    from fatebridge.core.metaphysics.jinkou_natal_course import natal_course_metadata
-    from fatebridge.core.metaphysics.jinkou_year_fate import ordinal_year_fate
-    from fatebridge.core.metaphysics.liureng import (
-        _liureng_month_general_for_term,
-        build_liureng_runyear,
-    )
+    from fatebridge.core.metaphysics.liureng import _liureng_month_general_for_term
     from fatebridge.core.metaphysics.ren_calendar import (
         resolve_runyear_birth_clock,
         resolve_runyear_birth_zone,
     )
-    from fatebridge.core.metaphysics.ren_diurnal import resolve_diurnal
-    from fatebridge.services.metaphysics import (
-        _analysis_context_payload,
-        _build_analysis_seed,
-    )
-    from fatebridge.utils.civil_clock import (
-        format_utc_offset,
-        resolve_civil_clock,
-        utc_instant,
-    )
-    from fatebridge.utils.formatting import create_pillar_dict
-    from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 
-    data = request.model_dump()
-    gender: Any
+    gender: str | None
     if key == "sanshiunited":
+        assert isinstance(request, SanShiUnitedRequest)
+        date_text = _normalize_date_text(request.date)
+        time_text = _normalize_time_text(request.time)
+        zone = request.zone or DEFAULT_BIRTH_TIMEZONE
+        serialized_options = request.model_dump(
+            include={"qimen_options", "taiyi_options"}
+        )
         normalized = {
-            "date": _normalize_date_text(data["date"]),
-            "time": _normalize_time_text(data["time"]),
-            "zone": data.get("zone") or DEFAULT_BIRTH_TIMEZONE,
-            "lat": data.get("lat"),
-            "lon": data.get("lon"),
-            "gpsLat": data.get("gps_lat"),
-            "gpsLon": data.get("gps_lon"),
-            "qimen_options": data.get("qimen_options") or {},
-            "taiyi_options": data.get("taiyi_options") or {},
-            "liureng_yue": data.get("liureng_yue"),
-            "liureng_is_diurnal": data.get("liureng_is_diurnal"),
-            "liureng_guiren_profile": data["liureng_guiren_profile"],
-            "use_true_solar_time": data["use_true_solar_time"],
+            "date": date_text,
+            "time": time_text,
+            "zone": zone,
+            "lat": request.lat,
+            "lon": request.lon,
+            "gpsLat": request.gps_lat,
+            "gpsLon": request.gps_lon,
+            "qimen_options": serialized_options["qimen_options"] or {},
+            "taiyi_options": serialized_options["taiyi_options"] or {},
+            "liureng_yue": request.liureng_yue,
+            "liureng_is_diurnal": request.liureng_is_diurnal,
+            "liureng_guiren_profile": request.liureng_guiren_profile,
+            "use_true_solar_time": request.use_true_solar_time,
         }
         _same(result, "input_normalized", normalized)
-        seed = _build_metaphysics_seed(
-            date_text=normalized["date"],
-            time_text=normalized["time"],
-            timezone_name=normalized["zone"],
-            lat=data.get("lat"),
-            lon=data.get("lon"),
-            gps_lat=data.get("gps_lat"),
-            gps_lon=data.get("gps_lon"),
-            use_true_solar_time=data["use_true_solar_time"],
+        civil = parse_local_datetime(date_text, time_text, zone, validate_wall=True)
+        longitude: float | None
+        _, longitude = _resolve_coordinates(
+            lat=request.lat,
+            lon=request.lon,
+            gps_lat=request.gps_lat,
+            gps_lon=request.gps_lon,
         )
-        context = _build_metaphysics_analysis_context(seed)
+        applied_solar = request.use_true_solar_time
         ren_result = _get(result, "subresults.liureng_gods")
-        profile = data["liureng_guiren_profile"]
-        explicit = data.get("liureng_is_diurnal")
-        override = data.get("liureng_yue")
+        profile = request.liureng_guiren_profile
+        explicit = request.liureng_is_diurnal
+        override = request.liureng_yue
         gender = "未知"
         offset = None
-        _mapping(result, context, "analysis_context.")
+        _same(result, "analysis_context", _get(ren_result, "analysis_context"))
     else:
-        seed = _build_analysis_seed(
-            **{
-                name: data[name]
-                for name in (
-                    "analysis_year",
-                    "analysis_month",
-                    "analysis_day",
-                    "analysis_hour",
-                    "analysis_minute",
-                    "analysis_second",
-                    "analysis_timezone",
-                    "analysis_utc_offset",
-                    "analysis_longitude",
-                    "use_true_solar_time",
-                )
-            },
-            # person_invoke currently does not forward this service flag.
-            true_solar_explicit=(
-                True
-                if key == "liureng_runyear"
-                else "use_true_solar_time" in request.model_fields_set
+        assert isinstance(request, (LiuRengGodsRequest, LiuRengRunyearRequest))
+        zone = request.analysis_timezone or DEFAULT_BIRTH_TIMEZONE
+        offset = request.analysis_utc_offset
+        civil = resolve_civil_clock(
+            datetime(
+                request.analysis_year,
+                request.analysis_month,
+                request.analysis_day,
+                request.analysis_hour,
+                request.analysis_minute,
+                request.analysis_second,
             ),
+            zone,
+            offset,
         )
-        context = _analysis_context_payload(seed)
+        longitude = request.analysis_longitude
+        if (
+            request.use_true_solar_time
+            and longitude is None
+            and (
+                key == "liureng_runyear"
+                or "use_true_solar_time" in request.model_fields_set
+            )
+        ):
+            raise ValueError("显式真太阳时请求需要经度")
+        applied_solar = request.use_true_solar_time and longitude is not None
         ren_result = result
-        profile = data["guiren_profile"]
-        explicit = data.get("is_diurnal")
+        profile = request.guiren_profile
+        explicit = request.is_diurnal
         override = None
-        gender = data.get("gender")
-        offset = data.get("analysis_utc_offset")
-
-    if not isinstance(ren_result, dict):
-        raise ValueError("本次请求缺少完整六壬计算对象")
-    _mapping(ren_result, context, "analysis_context.")
-    _mapping(ren_result, create_pillar_dict(seed.pillars), "four_pillars.")
-    civil = localize_datetime(seed.input_datetime, seed.timezone)
-    clock = seed.corrected_datetime
+        gender = request.gender
+    _mapping(
+        ren_result,
+        dict(
+            input_datetime=civil.strftime("%Y-%m-%d %H:%M:%S"),
+            timezone=zone,
+            longitude=longitude,
+            time_algorithm="真太阳时" if applied_solar else "直接时间",
+        ),
+        "analysis_context.",
+    )
+    calendar = _get(ren_result, "calendar_context")
     policy = dict(
         civil_datetime=civil.isoformat(),
-        civil_instant_utc=utc_instant(civil).isoformat(),
-        day_hour_clock="apparent_solar" if seed.applied_true_solar else "civil",
-        corrected_clock=(
-            clock.replace(tzinfo=None).isoformat()
-            if seed.applied_true_solar
-            else clock.isoformat()
-        ),
-        effective_day_date=(
-            clock.date() + timedelta(days=int(clock.hour == 23))
-        ).isoformat(),
-        effective_day_ganzhi="".join(seed.pillars["day"]),
+        civil_instant_utc=utc_calendar(civil).isoformat(),
+        day_hour_clock="apparent_solar" if applied_solar else "civil",
         month_general_override=override,
     )
-    _mapping(ren_result, policy, "calendar_context.ren_calendar_policy.")
+    _mapping(calendar, policy, "ren_calendar_policy.")
+    clock = calendar["ren_calendar_policy"].get("civil_clock_resolution")
     if offset is None:
-        if (
-            _get(ren_result, "calendar_context.ren_calendar_policy").get(
-                "civil_clock_resolution"
-            )
-            is not None
-        ):
+        if clock is not None:
             raise ValueError("不能把未指定的起课UTC偏移改称显式选择")
     else:
-        resolved = resolve_civil_clock(
-            civil.replace(tzinfo=None, fold=0), seed.timezone, offset
-        )
-        resolved_offset = resolved.utcoffset()
-        if resolved_offset is None:
-            raise ValueError("起课UTC偏移未能解析为实际时刻")
         _mapping(
-            ren_result,
+            clock,
             dict(
-                method="explicit_offset_checked_against_analysis_timezone",
-                timezone=seed.timezone,
                 input_utc_offset=offset,
-                resolved_utc_offset=format_utc_offset(resolved_offset),
-                wall_datetime=resolved.replace(tzinfo=None).isoformat(),
-                was_ambiguous=(
-                    resolved.replace(fold=0).utcoffset()
-                    != resolved.replace(fold=1).utcoffset()
-                ),
-                fold=resolved.fold,
-                instant_utc=utc_instant(resolved).isoformat(),
+                fold=civil.fold,
+                instant_utc=policy["civil_instant_utc"],
             ),
-            "calendar_context.ren_calendar_policy.civil_clock_resolution.",
         )
-    board = _get(ren_result, "liureng")
+    board = _get(result, "liureng")
     _mapping(board, policy, "calendar_policy.")
     _same(board, "meta.guiren_profile", profile)
-    hour = seed.pillars["hour"][1]
-    _mapping(board, resolve_diurnal(hour, explicit), "meta.diurnal_evidence.")
+    hour = ren_result["four_pillars"]["hour"]["branch"]
+    diurnal = resolve_diurnal(hour, explicit)
+    _mapping(board, diurnal, "meta.diurnal_evidence.")
     _gender(board, "meta.questioner_gender", gender)
-    current_term = seed.calendar_context["current_solar_term"]["name"]
+    current_term = calendar["current_solar_term"]["name"]
     general = override or _liureng_month_general_for_term(current_term)
     _same(board, "month_general.branch", general)
     _same(
@@ -226,44 +197,50 @@ def require_request_binding(
     )
 
     if key == "jinkou":
+        assert isinstance(request, JinkouAnalysisRequest)
         jinkou = _get(result, "jinkou")
         _mapping(jinkou, policy, "calendar_policy.")
-        _same(jinkou, "overview.di_fen", data.get("di_fen") or hour)
+        _same(jinkou, "overview.di_fen", request.di_fen or hour)
         _same(
             jinkou,
             "overview.di_fen_source",
             (
                 "explicit"
-                if data.get("di_fen")
+                if request.di_fen
                 else "hour_branch_fallback_not_observed_direction"
             ),
         )
         _gender(jinkou, "overview.gender", gender)
-        _mapping(jinkou, resolve_diurnal(hour, explicit), "overview.diurnal_evidence.")
-        natal = natal_course_metadata(
-            data.get("birth_year_ganzhi"), data.get("natal_branch")
+        _mapping(jinkou, diurnal, "overview.diurnal_evidence.")
+        birth_ganzhi = request.birth_year_ganzhi
+        natal_branch = request.natal_branch
+        age = request.year_fate_age
+        natal = dict(
+            birth_year_ganzhi=birth_ganzhi,
+            natal_branch=confirmed_natal_branch(birth_ganzhi, natal_branch, age),
+            natal_branch_source=(
+                "explicit_natal_branch"
+                if natal_branch is not None
+                else (
+                    "explicit_birth_year_ganzhi"
+                    if birth_ganzhi is not None
+                    else "missing"
+                )
+            ),
         )
-        annual = ordinal_year_fate(
-            birth_year_ganzhi=data.get("birth_year_ganzhi"),
-            age=data.get("year_fate_age"),
-            gender=gender,
-        )
-        annual["natal_branch"] = natal["natal_branch"]
-        annual["natal_branch_source"] = natal["natal_branch_source"]
         _mapping(jinkou, natal, "natal_course.")
-        _mapping(jinkou, annual, "year_fate.")
+        _mapping(jinkou, dict(natal, age_ordinal=age), "year_fate.")
+        _gender(jinkou, "year_fate.gender", gender)
         for wrapper in ("natal_course", "year_fate"):
             child = _get(jinkou, wrapper + ".course")
             if child is not None:
                 _mapping(child, policy, "calendar_policy.")
-                _mapping(
-                    child, resolve_diurnal(hour, explicit), "overview.diurnal_evidence."
-                )
+                _mapping(child, diurnal, "overview.diurnal_evidence.")
                 _gender(child, "overview.gender", gender)
-
-    if key == "liureng_runyear":
+    elif key == "liureng_runyear":
+        assert isinstance(request, LiuRengRunyearRequest)
         person = _build_person(
-            data,
+            request.model_dump(),
             true_solar_explicit="use_true_solar_time" in request.model_fields_set,
             supplied_fields=request.model_fields_set,
         )
@@ -280,24 +257,35 @@ def require_request_binding(
                 person.birth_second or 0,
             ),
             zone,
-            data.get("birth_utc_offset"),
+            request.birth_utc_offset,
             recorded_offset=person.birth_utc_offset,
         )
         birth_clock.update(zone_source)
         _mapping(result, birth_clock, "runyear.birth_civil_clock.")
-        if utc_instant(civil) < utc_instant(birth):
+        if (
+            utc_calendar(civil).julian_day_exact()
+            < utc_calendar(birth).julian_day_exact()
+        ):
             raise ValueError("成功行年结果不能绑定到出生前的分析瞬间")
-        lunar = get_lunar_context(birth, timezone_name=zone)
-        if lunar is None:
-            raise ValueError("成功行年结果缺少请求出生日期的农历年")
-        birth_lunar_year = lunar.get("year")
-        if type(birth_lunar_year) is not int:
-            raise ValueError("成功行年结果的出生农历年不是有效整数")
-        expected = build_liureng_runyear(
-            seed,
-            gender=person.gender or "未知",
-            birth_year=person.birth_year,
-            birth_lunar_year=birth_lunar_year,
-            age_reference_timezone=zone,
+        _gender(result, "runyear.gender", person.gender)
+        analysis_civil = localize_datetime(civil, zone)
+        years = result["runyear"]["age_calendar"]
+        birth_year = years["birth_lunar_year"]
+        analysis_year = years["analysis_lunar_year"]
+        age = analysis_year - birth_year + 1
+        if (
+            birth_year not in (birth.year - 1, birth.year)
+            or analysis_year not in (analysis_civil.year - 1, analysis_civil.year)
+            or age < 1
+        ):
+            raise ValueError("行年农历年份与同次民用年份范围不符")
+        _mapping(
+            result["runyear"],
+            dict(
+                age=age,
+                birth_lunar_year=birth_year,
+                age_calendar=dict(
+                    timezone=zone, analysis_civil_datetime=analysis_civil.isoformat()
+                ),
+            ),
         )
-        _mapping(result, expected, "runyear.")

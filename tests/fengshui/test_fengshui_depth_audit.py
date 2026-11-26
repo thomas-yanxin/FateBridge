@@ -20,11 +20,12 @@ from fatebridge.services.fengshui import (
     calculate_xuankong_natal,
 )
 from fatebridge.utils.errors import EphemerisSourceError
-from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
-from fatebridge.validation.fengshui import audit_classical_reference
 from tests.support.fengshui_transports import mcp_call
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import rest_client
+from tests.unit_test.fixtures.fengshui_reading import natal_request as natal
+from validation.claims import CalculationClaim, verify_calculation_claims
+from validation.fengshui import audit_classical_reference
 
 REFERENCE = json.loads(
     (
@@ -38,18 +39,7 @@ FACSIMILE = json.loads(
 )
 
 
-def natal(period=7, angle=0):
-    return {
-        "house": {"facing_degrees": angle, "north_reference": "magnetic"},
-        "period": {
-            "basis": "expert_confirmed",
-            "period_number": period,
-            "evidence": "Source-based numeric example; no real house",
-        },
-    }
-
-
-def test_literal_sources_keep_all_280_comparisons_and_three_disputes():
+def test_literal_sources_keep_all_280_comparisons_and_three_disputes() -> None:
     result = audit_classical_reference(REFERENCE, FACSIMILE)
     assert result["counts"] == {
         "bazhai": {"checked": 64, "matched": 64},
@@ -69,7 +59,7 @@ def test_literal_sources_keep_all_280_comparisons_and_three_disputes():
     assert all(c["engine_matches_facsimile"] for c in result["facsimile_spot_checks"])
 
 
-def test_facsimile_page_pixels_and_unresolved_source_status_remain_verifiable():
+def test_facsimile_page_pixels_and_unresolved_source_status_remain_verifiable() -> None:
     folder = Path(__file__).parents[1] / "data/fengshui_classical_v1"
     for item in FACSIMILE["images"]:
         assert (
@@ -86,14 +76,14 @@ def test_facsimile_page_pixels_and_unresolved_source_status_remain_verifiable():
 
 
 @pytest.mark.parametrize("part", ["shen_cases", "you_nian_verses"])
-def test_discarding_source_rows_cannot_manufacture_acceptance(part):
+def test_discarding_source_rows_cannot_manufacture_acceptance(part: str) -> None:
     changed = deepcopy(REFERENCE)
     changed[part].pop()
     with pytest.raises(ValueError):
         audit_classical_reference(changed)
 
 
-def test_new_source_disagreements_are_reported_without_allowlist():
+def test_new_source_disagreements_are_reported_without_allowlist() -> None:
     changed = deepcopy(REFERENCE)
     changed["shen_cases"][0]["mountain_seed"] = 9
     result = audit_classical_reference(changed)
@@ -111,8 +101,8 @@ def test_new_source_disagreements_are_reported_without_allowlist():
     ],
 )
 def test_source_named_structures_are_historical_numeric_facts(
-    period, angle, label, mountain_at, facing_at
-):
+    period: int, angle: int, label: str, mountain_at: str, facing_at: str
+) -> None:
     result = calculate_xuankong_natal(**natal(period, angle))
     chart = result["layers"]["xuankong_natal"]["chart"]
     structure = chart["structure"]
@@ -125,7 +115,7 @@ def test_source_named_structures_are_historical_numeric_facts(
     assert "不代表当前旺衰、外局匹配或现实吉凶" in result["snapshot_text"]
 
 
-def test_source_seven_period_wu_zi_full_chart_combination_of_ten():
+def test_source_seven_period_wu_zi_full_chart_combination_of_ten() -> None:
     chart = calculate_xuankong_natal(**natal())["layers"]["xuankong_natal"]["chart"]
     pairs = chart["structure"]["combination_of_ten"]
     assert len(pairs) == 3
@@ -138,7 +128,7 @@ def test_source_seven_period_wu_zi_full_chart_combination_of_ten():
     assert set(matched["palace_sums"].values()) == {10}
 
 
-def test_current_evaluation_period_never_rewrites_historical_structure():
+def test_current_evaluation_period_never_rewrites_historical_structure() -> None:
     request = natal()
     baseline = calculate_xuankong_natal(**request)["layers"]["xuankong_natal"]["chart"]
     for period in (8, 9, 1):
@@ -155,8 +145,8 @@ def test_current_evaluation_period_never_rewrites_historical_structure():
 @pytest.mark.parametrize("days", [-30, 30, 150])
 @pytest.mark.parametrize("zone", ["Asia/Shanghai", "UTC", "America/New_York"])
 def test_missing_crossing_rejects_even_events_distant_from_the_boundary(
-    monkeypatch, days, zone
-):
+    monkeypatch: pytest.MonkeyPatch, days, zone: str
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     almanac.get_solar_terms_for_year.cache_clear()
@@ -177,7 +167,9 @@ def test_missing_crossing_rejects_even_events_distant_from_the_boundary(
         almanac.get_solar_terms_for_year.cache_clear()
 
 
-def test_unavailable_end_boundary_rejects_the_whole_validity_interval(monkeypatch):
+def test_unavailable_end_boundary_rejects_the_whole_validity_interval(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     original = almanac._solar_term_utc_via_swe
 
@@ -196,7 +188,9 @@ def test_unavailable_end_boundary_rejects_the_whole_validity_interval(monkeypatc
 @pytest.mark.parametrize(
     "zone", ["Asia/Shanghai", "UTC", "America/New_York", "Pacific/Auckland"]
 )
-def test_fengshui_year_period_and_birth_follow_independent_published_instants(zone):
+def test_fengshui_year_period_and_birth_follow_independent_published_instants(
+    zone: str,
+) -> None:
     from fatebridge.services.fengshui import calculate_minggua
 
     existing = json.loads(
@@ -249,19 +243,23 @@ def test_fengshui_year_period_and_birth_follow_independent_published_instants(zo
 
 
 def test_new_structure_and_timing_match_all_three_transports(
-    monkeypatch, tmp_path, capsys
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     request = natal()
     request["period"] = {
         "basis": "first_occupancy",
         "event_at": "2024-02-05T12:00:00+08:00",
         "evidence": "Confirmed historical event",
     }
-    http = rest_client(monkeypatch).post("/api/fengshui/xuankong_natal", json=request)
+    http = rest_client(monkeypatch).post(
+        "/api/fengshui/xuankong-house-chart", json=request
+    )
     protocol = asyncio.run(mcp_call("xuankong_natal", request))
     request_file = tmp_path / "natal.json"
     request_file.write_text(json.dumps(request))
-    assert run(["fengshui_xuankong_natal", "--request-file", str(request_file)]) == 0
+    assert (
+        run(["fengshui_xuankong_house_chart", "--request-file", str(request_file)]) == 0
+    )
     cli = json.loads(capsys.readouterr().out)
     assert http.status_code == 200 and not protocol.is_error
     assert (

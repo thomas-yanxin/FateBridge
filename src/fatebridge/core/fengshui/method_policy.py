@@ -5,57 +5,27 @@ historical house period, compass sector, or a favourable result.
 """
 
 from collections.abc import Mapping
-from typing import Any, Dict, List, Optional
+from typing import Any
+
+from fatebridge.core.fengshui.method_details import (
+    method_reference_provenance,
+    reference_data,
+)
+from fatebridge.core.fengshui.models import AssessRequest, EnvironmentFeature, Method
 
 
-def select_methods(value: Mapping[str, Any]) -> List[str]:
-    """Normalize only automatic selection; explicit lists retain their order."""
-    explicit = value.get("methods")
-    if explicit is not None:
-        return list(explicit)
-    selected = []
-    # Both layers belong to flying stars, but an annual chart is never a
-    # substitute for a historical natal chart. Keep their inputs independent.
-    if value.get("xuankong") is not None:
-        selected.append("xuankong_natal")
-    if value.get("effective_year") is not None or value.get("query_at") is not None:
-        selected.append("annual_stars")
-    if value.get("monthly") is not None:
-        selected.append("monthly_stars")
-    spatial = value.get("workstation_layout") or {}
-    spatial_features = any(
-        body.get("sand_water") is not None
-        for body in spatial.get("scene", {}).get("bodies", [])
-    )
-    if (
-        value.get("features")
-        or spatial_features
-        or any(
-            (
-                candidate.get("features")
-                if isinstance(candidate, Mapping)
-                else getattr(candidate, "features", None)
-            )
-            for candidate in (value.get("layout_alternatives") or [])
-        )
-    ):
-        selected.append("jinsuo")
-    if value.get("house") or value.get("occupants"):
-        selected.append("bazhai")
-    return selected
-
-
-def _input_scopes(value: Mapping[str, Any]) -> Dict[str, List[Dict[str, Any]]]:
-    """Check required input presence; never resolve or calculate a chart."""
-    placements = value.get("placements") or []
-    candidates = value.get("layout_alternatives") or []
+def _input_scopes(request: AssessRequest) -> dict[Method, list[dict[str, Any]]]:
+    """Describe which required facts were supplied."""
     current_locations = [
-        p["object_id"] for p in placements if p.get("location_direction") is not None
+        placement.object_id
+        for placement in request.placements
+        if placement.location_direction is not None
     ]
     candidate_locations = [
-        c["candidate_id"]
-        for c in candidates
-        if c.get("placement") and c["placement"].get("location_direction") is not None
+        candidate.candidate_id
+        for candidate in request.layout_alternatives
+        if candidate.placement is not None
+        and candidate.placement.location_direction is not None
     ]
     chart_scope = {
         "scope": "shared_chart_reference",
@@ -65,97 +35,102 @@ def _input_scopes(value: Mapping[str, Any]) -> Dict[str, List[Dict[str, Any]]]:
     }
     annual_missing = (
         ["annual_stars.query_at_or_effective_year"]
-        if value.get("effective_year") is None and value.get("query_at") is None
+        if request.effective_year is None and request.query_at is None
         else []
     )
-    natal = value.get("xuankong") or {}
-    natal_house = natal.get("house") or value.get("house") or {}
+    natal = request.xuankong
+    natal_house = (natal.house if natal is not None else None) or request.house
     natal_missing = []
     if (
-        natal_house.get("facing_degrees") is None
-        or natal_house.get("north_reference") != "magnetic"
+        natal_house is None
+        or natal_house.facing_degrees is None
+        or natal_house.north_reference != "magnetic"
     ):
         natal_missing.append("xuankong_natal.house.facing_degrees_magnetic")
-    if natal.get("period") is None:
+    if natal is None or natal.period is None:
         natal_missing.append("xuankong_natal.period")
 
-    features = value.get("features") or []
+    features = request.features
 
-    def feature_missing(records: List[Dict[str, Any]], empty: str) -> List[str]:
+    def feature_missing(records: list[EnvironmentFeature], empty: str) -> list[str]:
         return (
             [empty]
             if not records
             else [
-                f"features.{record['object_id']}.single_confirmed_classification"
+                f"features.{record.object_id}.single_confirmed_classification"
                 for record in records
-                if record["classification"] not in {"sand", "water"}
+                if record.classification not in {"sand", "water"}
             ]
         )
 
     feature_scopes = [
         {
             "scope": "current_environment",
-            "object_ids": [f["object_id"] for f in features],
+            "object_ids": [feature.object_id for feature in features],
             "missing_inputs": feature_missing(
                 features, "confirmed_environment_features"
             ),
         }
     ]
-    current_feature_ids = {f["object_id"] for f in features}
-    for candidate in candidates:
-        fresh = candidate.get("features") or []
-        if not fresh and candidate["object_id"] not in current_feature_ids:
+    current_feature_ids = {feature.object_id for feature in features}
+    for candidate in request.layout_alternatives:
+        fresh = candidate.features
+        if not fresh and candidate.object_id not in current_feature_ids:
             continue
         feature_scopes.append(
             {
                 "scope": "candidate_environment",
-                "candidate_id": candidate["candidate_id"],
-                "object_ids": [f["object_id"] for f in fresh],
+                "candidate_id": candidate.candidate_id,
+                "object_ids": [feature.object_id for feature in fresh],
                 "missing_inputs": feature_missing(
-                    fresh, f"layout_alternatives.{candidate['candidate_id']}.features"
+                    fresh, f"layout_alternatives.{candidate.candidate_id}.features"
                 ),
             }
         )
     house = natal_house
     personal_missing = []
-    if house.get("sitting_trigram") is None and house.get("facing_degrees") is None:
+    if house is None or (
+        house.sitting_trigram is None and house.facing_degrees is None
+    ):
         personal_missing.append("house.sitting_trigram_or_confirmed_facing")
-    occupants = value.get("occupants") or []
+    occupants = request.occupants
     if not occupants:
         personal_missing.append("occupants")
     for occupant in occupants:
-        prefix = f"occupants.{occupant['subject_id']}"
-        if all(
-            occupant.get(field) is None
-            for field in ("birth_date", "birth_at", "effective_birth_year")
+        prefix = f"occupants.{occupant.subject_id}"
+        if (
+            occupant.birth_date is None
+            and occupant.birth_at is None
+            and occupant.effective_birth_year is None
         ):
             personal_missing.append(
                 f"{prefix}.birth_date_or_birth_at_or_effective_birth_year"
             )
-        if occupant.get("gender_convention") is None:
+        if occupant.gender_convention is None:
             personal_missing.append(f"{prefix}.gender_convention")
-    scopes = {
+    scopes: dict[Method, list[dict[str, Any]]] = {
         "annual_stars": [{**chart_scope, "missing_inputs": annual_missing}],
         "xuankong_natal": [{**chart_scope, "missing_inputs": natal_missing}],
         "jinsuo": feature_scopes,
         "bazhai": [
             {
                 "scope": "shared_house_and_independent_person_minggua",
-                "subject_ids": [o["subject_id"] for o in occupants],
+                "subject_ids": [occupant.subject_id for occupant in occupants],
                 "current_location_object_ids": current_locations,
                 "candidate_location_ids": candidate_locations,
                 "missing_inputs": personal_missing,
             }
         ],
     }
-    monthly = value.get("monthly") or {}
+    monthly = request.monthly
     monthly_time_present = (
-        monthly.get("query_at") is not None
+        request.query_at is not None
+        if monthly is None
+        else monthly.query_at is not None
         or (
-            monthly.get("effective_solar_year") is not None
-            and monthly.get("solar_month_number") is not None
+            monthly.effective_solar_year is not None
+            and monthly.solar_month_number is not None
         )
-        or (not value.get("monthly") and value.get("query_at") is not None)
     )
     scopes["monthly_stars"] = [
         {
@@ -180,12 +155,12 @@ def _input_scopes(value: Mapping[str, Any]) -> Dict[str, List[Dict[str, Any]]]:
 
 
 def method_policy(
-    request: Any,
+    request: AssessRequest,
     *,
-    explicit_methods: Optional[bool] = None,
-    layer_results: Optional[Mapping[str, Any]] = None,
-    candidate_results: Optional[List[Dict[str, Any]]] = None,
-) -> Dict[str, Any]:
+    explicit_methods: bool | None = None,
+    layer_results: Mapping[str, Any] | None = None,
+    candidate_results: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     """Describe the policy without treating unrequested layers as failures.
 
     ``explicit_methods`` may be supplied by the service before Pydantic
@@ -194,15 +169,13 @@ def method_policy(
     layers are never calculated here to answer an availability question.
     Candidate layer statuses remain independent of those current results.
     """
-    from .method_details import method_reference_provenance, reference_data
-
-    value = request if isinstance(request, Mapping) else request.model_dump()
-    selected = select_methods(value)
+    selected = request.selected_methods
     policy = reference_data("policy")
-    local = value.get("scene") in {"workstation", "shared_rental"}
-    placements = value.get("placements") or []
+    local = request.scene in {"workstation", "shared_rental"}
     locations = [
-        p["object_id"] for p in placements if p.get("location_direction") is not None
+        placement.object_id
+        for placement in request.placements
+        if placement.location_direction is not None
     ]
     selected_families = []
     layer_families = {
@@ -216,15 +189,17 @@ def method_policy(
         family = layer_families[method]
         if family not in selected_families:
             selected_families.append(family)
-    input_scopes = _input_scopes(value)
-    candidate_ids = [c["candidate_id"] for c in value.get("layout_alternatives") or []]
+    input_scopes = _input_scopes(request)
+    candidate_ids = [
+        candidate.candidate_id for candidate in request.layout_alternatives
+    ]
     candidate_records = {c["candidate_id"]: c for c in candidate_results or []}
-    availability: Dict[str, Dict[str, Any]] = {}
+    availability: dict[str, dict[str, Any]] = {}
     for method, scopes in input_scopes.items():
         actual = (layer_results or {}).get(method) if method in selected else None
         actual_status = actual.get("status") if actual is not None else None
         missing = list(actual.get("missing_inputs", [])) if actual is not None else []
-        candidate_calculations: List[Dict[str, Any]] = []
+        candidate_calculations: list[dict[str, Any]] = []
         for candidate_id in candidate_ids:
             candidate_layer = (
                 candidate_records.get(candidate_id, {})
@@ -303,8 +278,8 @@ def method_policy(
                         else (
                             "automatic_scope_not_requested"
                             if priority["method"] == "bazhai"
-                            and not value.get("placements")
-                            and value.get("scene") != "home"
+                            and not request.placements
+                            and request.scene != "home"
                             else "automatic_missing_inputs"
                         )
                     )
@@ -455,11 +430,11 @@ def method_policy(
         "fact_availability": {
             "provided_location_object_ids": locations,
             "location_claim_scope": "supplied_placements_subject_to_context_orientation_gate",
-            "annual_reference_supplied": value.get("effective_year") is not None
-            or value.get("query_at") is not None,
-            "natal_inputs_supplied": value.get("xuankong") is not None,
-            "jinsuo_features_supplied": bool(value.get("features")),
-            "occupants_supplied": bool(value.get("occupants")),
+            "annual_reference_supplied": request.effective_year is not None
+            or request.query_at is not None,
+            "natal_inputs_supplied": request.xuankong is not None,
+            "jinsuo_features_supplied": bool(request.features),
+            "occupants_supplied": bool(request.occupants),
         },
         "supplemental_rules": {
             "indoor_forms": "explicit_authored_observations_only",

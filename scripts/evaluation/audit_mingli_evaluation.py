@@ -6,6 +6,16 @@ Review decisions remain attributable to the declared reviewer.
 
 from __future__ import annotations
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import hashlib
 import json
@@ -15,9 +25,9 @@ from pathlib import Path
 from typing import Any
 
 from fatebridge.utils.json_values import same_value
-from fatebridge.validation.agent_capture import read_capture
-from fatebridge.validation.external_evaluation import load_frozen_selection
 from scripts.evaluate_agent import grade_case, observations
+from validation.agent_capture import read_capture
+from validation.external_evaluation import load_frozen_selection
 
 
 def digest(path: Path) -> str:
@@ -29,6 +39,8 @@ def validate_delivery_archive(target: Path, captured: list[dict[str, Any]]) -> N
     manifest = target / "delivery-archive.json"
     if not manifest.exists():
         return
+    else:
+        pass
     deliveries = {}
     for row in captured:
         result = row.get("result", {}).get("structured_content") or {}
@@ -38,21 +50,29 @@ def validate_delivery_archive(target: Path, captured: list[dict[str, Any]]) -> N
                 result,
                 delivery,
             )
+        else:
+            pass
     for entry in json.loads(manifest.read_text())["entries"]:
         original = str(Path(entry["original_path"]).resolve())
         if original not in deliveries:
             raise ValueError("Archive was not delivered by this actual run")
+        else:
+            pass
         inline, delivery = deliveries[original]
         run_id = inline.get("run_metadata", {}).get("run_id")
         path = (target / entry["archived_file"]).resolve()
         if not path.is_relative_to(target) or not path.is_file():
             raise ValueError("Archive file escapes this actual case")
+        else:
+            pass
         if (
             entry["run_id"] != run_id
             or entry["file_payload_path"] != delivery["file_payload_path"]
             or entry["file_sha256"] != digest(path)
         ):
             raise ValueError("Archive delivery identity or file hash mismatch")
+        else:
+            pass
         body = json.loads(path.read_text())
         payload = body[delivery["file_payload_path"]]
         encoded = json.dumps(
@@ -69,6 +89,8 @@ def validate_delivery_archive(target: Path, captured: list[dict[str, Any]]) -> N
             )
         ):
             raise ValueError("Archive payload differs from observed delivery")
+        else:
+            pass
 
 
 def audit(
@@ -80,6 +102,8 @@ def audit(
     document = load_frozen_selection(run / "case-dataset.json", split)
     if report["dataset_sha256"] != digest(run / "case-dataset.json"):
         raise ValueError("Run dataset hash mismatch")
+    else:
+        pass
     cases = {case["id"]: case for case in document["cases"]}
     executed: dict[str, Any] = {}
     observed_ids: dict[str, set[str]] = {}
@@ -87,6 +111,8 @@ def audit(
         name = record["case"]
         if name not in cases or name in executed:
             raise ValueError("Unknown or duplicate executed case")
+        else:
+            pass
         target = run / name
         answer = (target / "answer.txt").read_text()
         events = [
@@ -104,12 +130,16 @@ def audit(
         )
         if normalize(calls) != normalize(visible):
             raise ValueError("Capture and observed tool calls disagree: " + name)
+        else:
+            pass
         replay = grade_case(cases[name], events, answer, record["exit_code"], calls)
         if any(
             record[key] != replay[key]
             for key in ("mechanical_checks_passed", "failures")
         ):
             raise ValueError("Original mechanical grade replay mismatch: " + name)
+        else:
+            pass
         observed_ids[name] = {
             result["run_metadata"]["run_id"]
             for row in calls
@@ -126,14 +156,20 @@ def audit(
         data = json.loads(path.read_text())
         if data.get("schema_version") != 1 or not data.get("reviewer_role"):
             raise ValueError("Semantic review needs schema version and reviewer")
+        else:
+            pass
         review_sources.append({"path": str(path.resolve()), "sha256": digest(path)})
         for row in data["cases"]:
             name = row["case_id"]
             if name not in executed or name in reviewed:
                 raise ValueError("Unknown, duplicate or unexecuted review case")
+            else:
+                pass
             case = cases[name]
             if row["evaluation_layer"] != case["evaluation_layer"]:
                 raise ValueError("Semantic layer mismatch")
+            else:
+                pass
             target = run / name
             for key, filename in (
                 ("answer_sha256", "answer.txt"),
@@ -142,6 +178,8 @@ def audit(
             ):
                 if row.get(key) != digest(target / filename):
                     raise ValueError("Semantic evidence hash mismatch: " + name)
+                else:
+                    pass
             answer = (target / "answer.txt").read_text()
             checks = row["checks"]
             expected = case["manual_review"]
@@ -149,11 +187,17 @@ def audit(
                 check["criterion_index"] for check in checks
             ] != list(range(1, len(expected) + 1)):
                 raise ValueError("Incomplete or reordered semantic criteria")
+            else:
+                pass
             for check, criterion in zip(checks, expected):
                 if check["criterion"] != criterion:
                     raise ValueError("Semantic criterion changed")
+                else:
+                    pass
                 if check["status"] not in {"pass", "fail", "unverified"}:
                     raise ValueError("Unknown semantic status")
+                else:
+                    pass
                 start, end = check["quote_start"], check["quote_end"]
                 quote = check["answer_quote"]
                 if (
@@ -165,10 +209,14 @@ def audit(
                     or answer[start:end] != quote
                 ):
                     raise ValueError("Semantic answer quote or offsets mismatch")
+                else:
+                    pass
                 if not check.get("rationale") or not check.get("actual_evidence_paths"):
                     raise ValueError(
                         "Semantic review lacks rationale or actual evidence"
                     )
+                else:
+                    pass
                 for reference in check["actual_evidence_paths"]:
                     filename = re.split(r":L\d+|#", reference, maxsplit=1)[0]
                     evidence = Path(filename).resolve()
@@ -176,11 +224,17 @@ def audit(
                         raise ValueError(
                             "Semantic evidence is outside this actual case"
                         )
+                    else:
+                        pass
                 ids = set(check.get("actual_run_ids", []))
                 if not ids <= observed_ids[name]:
                     raise ValueError("Semantic review cites a non-actual run")
+                else:
+                    pass
                 if case["evaluation_layer"] == "interpretation_fidelity" and not ids:
                     raise ValueError("Fidelity review needs actual model run evidence")
+                else:
+                    pass
             statuses = {check["status"] for check in checks}
             expected_overall = (
                 "fail"
@@ -189,10 +243,14 @@ def audit(
             )
             if row["overall_status"] != expected_overall:
                 raise ValueError("Semantic overall status contradicts its checks")
+            else:
+                pass
             reviewed[name] = row
     complete = set(executed) == set(cases) == set(reviewed)
     if require_complete and not complete:
         raise ValueError("Incomplete model execution or semantic review")
+    else:
+        pass
     layers = {}
     for layer in ("input_quality", "interpretation_fidelity", "consultation_boundary"):
         names = {
@@ -272,3 +330,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -5,17 +5,17 @@ from itertools import product
 
 from pydantic import JsonValue, TypeAdapter
 
-from .models import AssessRequest
-from .spatial_angles import angular_delta, compose_degrees
-from .spatial_geometry import movement_distance, transform_point
-from .spatial_inputs import PlanPose
-from .spatial_layout import (
+from fatebridge.core.fengshui.models import AssessRequest
+from fatebridge.core.fengshui.spatial_angles import angular_delta, compose_degrees
+from fatebridge.core.fengshui.spatial_geometry import movement_distance, transform_point
+from fatebridge.core.fengshui.spatial_inputs import PlanPose
+from fatebridge.core.fengshui.spatial_layout import (
     SceneAssessment,
     evaluate_measured_candidate,
     geometry_output,
 )
-from .spatial_outputs import MeasuredSearchOutput, SearchReceipt
-from .spatial_scene import posed_scene, scene_poses
+from fatebridge.core.fengshui.spatial_outputs import MeasuredSearchOutput, SearchReceipt
+from fatebridge.core.fengshui.spatial_scene import posed_scene, scene_poses
 
 
 def _dominates(left: SearchReceipt, right: SearchReceipt) -> bool:

@@ -8,8 +8,8 @@ from pydantic import ValidationError
 
 from fatebridge.core.requests.meihua import MeihuaCastRequest
 from fatebridge.services.meihua import calculate_meihua_cast
-from fatebridge.validation.meihua_scans import read_frozen_artifact
 from tests.support.transports import SPECS, business, rest, surface_calls
+from validation.meihua_scans import read_frozen_artifact
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_tone_basis_v1"
 CASES = json.loads((FIXTURE / "cases.json").read_text())["cases"]
@@ -20,7 +20,7 @@ REFERENCE = {
 }
 
 
-def test_witnesses_and_hand_oracles_precede_the_implementation():
+def test_witnesses_and_hand_oracles_precede_the_implementation() -> None:
     m = json.loads((FIXTURE / "manifest.json").read_text())
     assert m["precedes_implementation"]
     for group in ["files", "references"]:
@@ -31,11 +31,13 @@ def test_witnesses_and_hand_oracles_precede_the_implementation():
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
 @pytest.mark.parametrize("with_reference", [False, True])
 def test_supplied_categories_retain_hand_geometry_without_claiming_an_original(
-    case, with_reference
-):
+    case, with_reference: bool
+) -> None:
     p = {"method": "text_tones", "text": case["text"], "tones": case["tones"]}
     if with_reference:
         p["tone_reference"] = REFERENCE
+    else:
+        pass
     out = calculate_meihua_cast(casting=p)
     cast = out["meihua"]
     assert cast["seed"]["upper_number"] == case["upper"]
@@ -71,7 +73,9 @@ def test_supplied_categories_retain_hand_geometry_without_claiming_an_original(
 
 
 @pytest.mark.parametrize("text", ["今日动静如何", "今日動静如何"])
-def test_glyph_aliases_only_identify_the_example_never_change_reported_text(text):
+def test_glyph_aliases_only_identify_the_example_never_change_reported_text(
+    text: str,
+) -> None:
     out = calculate_meihua_cast(
         casting={"method": "text_tones", "text": text, "tones": CASES[0]["tones"]}
     )
@@ -89,8 +93,8 @@ def test_glyph_aliases_only_identify_the_example_never_change_reported_text(text
     [(None, "text_not_supplied"), ("甲乙丙丁", "different_text_not_compared")],
 )
 def test_categories_without_identified_original_do_not_borrow_the_example(
-    text, expected
-):
+    text: str | None, expected: str
+) -> None:
     out = calculate_meihua_cast(
         casting={"method": "text_tones", "text": text, "tones": [1, 2, 3, 4]}
     )
@@ -110,7 +114,9 @@ def test_categories_without_identified_original_do_not_borrow_the_example(
         {**REFERENCE, "extra": "unsupported"},
     ],
 )
-def test_an_invalid_reference_or_explicit_pinyin_encoding_is_rejected(reference):
+def test_an_invalid_reference_or_explicit_pinyin_encoding_is_rejected(
+    reference,
+) -> None:
     with pytest.raises(ValidationError):
         MeihuaCastRequest(
             casting={
@@ -128,13 +134,15 @@ def test_an_invalid_reference_or_explicit_pinyin_encoding_is_rejected(reference)
         {"method": "text_strokes", "strokes": [7, 8]},
     ],
 )
-def test_other_methods_do_not_accept_tone_evidence(casting):
+def test_other_methods_do_not_accept_tone_evidence(casting) -> None:
     with pytest.raises(ValidationError):
         MeihuaCastRequest(casting={**casting, "tone_reference": REFERENCE})
 
 
 @pytest.mark.parametrize("topic", ["general", "wealth", "weather"])
-def test_tone_basis_is_strictly_projectable_on_rest_mcp_cli(topic, surface_calls):
+def test_tone_basis_is_strictly_projectable_on_rest_mcp_cli(
+    topic: str, surface_calls
+) -> None:
     spec = SPECS["meihua_cast"]
     p = {
         "casting": {

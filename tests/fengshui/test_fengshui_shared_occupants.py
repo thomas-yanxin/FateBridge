@@ -4,6 +4,7 @@ import asyncio
 import json
 from copy import deepcopy
 from itertools import combinations
+from pathlib import Path
 
 import pytest
 from fastmcp import Client
@@ -14,7 +15,7 @@ from fatebridge.cli import run
 from fatebridge.core.fengshui.models import AssessRequest, Placement
 from fatebridge.services.fengshui import assess
 from tests.support.mcp_result_assertions import without_transport
-from tests.support.transports import rest_client
+from tests.support.transports import call_calculation, rest_client
 
 RESIDENTS = [
     {"subject_id": "a", "effective_birth_year": 1990, "gender_convention": "male"},
@@ -40,6 +41,8 @@ def request(purpose="bed", selected=None):
     }
     if selected is not None:
         placement["subject_ids"] = selected
+    else:
+        pass
     return {
         "methods": ["bazhai"],
         "analyze_layout": True,
@@ -53,7 +56,7 @@ def request(purpose="bed", selected=None):
 @pytest.mark.parametrize("selected", SUBSETS)
 def test_shared_subset_matches_same_users_in_isolation_for_all_directions(
     purpose, selected
-):
+) -> None:
     """Adding an unrelated resident cannot change this object's judgments."""
     for direction in ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]:
         inputs = request(purpose, selected)
@@ -82,7 +85,7 @@ def test_shared_subset_matches_same_users_in_isolation_for_all_directions(
         assert subjects == set(selected) | {"home"}
 
 
-def test_subset_removes_unrelated_person_from_common_direction_intersection():
+def test_subset_removes_unrelated_person_from_common_direction_intersection() -> None:
     shared = assess(**request(selected=["a", "b"]))["layout_analysis"][
         "adjustment_options"
     ][0]
@@ -91,7 +94,9 @@ def test_subset_removes_unrelated_person_from_common_direction_intersection():
     assert all_residents["agreed_matching_directions"] == []
 
 
-def test_single_occupant_selector_and_subset_are_compatible_without_output_change():
+def test_single_occupant_selector_and_subset_are_compatible_without_output_change() -> (
+    None
+):
     plural = request(selected=["a"])
     single = deepcopy(plural)
     single["placements"][0].pop("subject_ids")
@@ -100,7 +105,9 @@ def test_single_occupant_selector_and_subset_are_compatible_without_output_chang
     assert assess(**request(selected=["a", "b", "c"])) == assess(**request())
 
 
-def test_unselected_candidates_do_not_enter_element_binding_or_cross_scope_effects():
+def test_unselected_candidates_do_not_enter_element_binding_or_cross_scope_effects() -> (
+    None
+):
     inputs = request(selected=["a", "b"])
     inputs.update(
         methods=["bazhai", "annual_stars"],
@@ -137,7 +144,7 @@ def test_unselected_candidates_do_not_enter_element_binding_or_cross_scope_effec
         {"subject_id": "a", "subject_ids": ["a", "b"]},
     ],
 )
-def test_runtime_and_published_schema_reject_invalid_scope(scope):
+def test_runtime_and_published_schema_reject_invalid_scope(scope) -> None:
     placement = {**request()["placements"][0], **scope}
     with pytest.raises(ValidationError):
         Placement.model_validate(placement)
@@ -146,7 +153,7 @@ def test_runtime_and_published_schema_reject_invalid_scope(scope):
     )
 
 
-def test_subset_references_must_exist_in_the_request():
+def test_subset_references_must_exist_in_the_request() -> None:
     with pytest.raises(ValidationError, match="未提供的住户"):
         AssessRequest.model_validate(request(selected=["a", "missing"]))
 
@@ -154,7 +161,7 @@ def test_subset_references_must_exist_in_the_request():
 @pytest.mark.parametrize(
     "scope", [{"subject_ids": None}, {"subject_id": None, "subject_ids": ["a", "b"]}]
 )
-def test_explicit_null_is_consistent_between_schema_and_runtime(scope):
+def test_explicit_null_is_consistent_between_schema_and_runtime(scope) -> None:
     placement = {**request()["placements"][0], **scope}
     Placement.model_validate(placement)
     Draft202012Validator(Placement.model_json_schema()).validate(placement)
@@ -162,22 +169,30 @@ def test_explicit_null_is_consistent_between_schema_and_runtime(scope):
 
 @pytest.mark.parametrize("name", ["bazhai", "assess"])
 def test_shared_subset_has_the_same_scope_on_rest_mcp_cli(
-    name, monkeypatch, tmp_path, capsys
-):
+    name: str,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     from fatebridge.mcp_server import create_mcp_app
 
     inputs = request(selected=["a", "b"])
     if name == "bazhai":
         inputs.pop("methods")
         inputs.pop("analyze_layout")
+    else:
+        pass
     fields = ["layers.bazhai.placement_findings"]
     if name == "assess":
         fields.append("layout_analysis.adjustment_options")
+    else:
+        pass
     controls = {"fields": fields, "strict_fields": True, "include_snapshot_text": False}
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
+            return await call_calculation(
+                client,
                 "fengshui_" + name,
                 {**inputs, "response_char_limit": 0, **controls},
             )

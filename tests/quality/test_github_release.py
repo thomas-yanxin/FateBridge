@@ -24,13 +24,21 @@ def github(monkeypatch):
                 assert payload == {"ref": "refs/tags/v0.1.1", "sha": SHA}
                 state["sha"] = payload["sha"]
                 return {}
+            else:
+                pass
             assert path == "releases"
             state["release"] = {"html_url": URL, "draft": False}
             return state["release"]
+        else:
+            pass
         if path == "git/ref/tags/v0.1.1":
             return {"ref": "refs/tags/v0.1.1"} if state["sha"] else None
+        else:
+            pass
         if path == "commits/refs/tags/v0.1.1":
             return {"sha": state["sha"]}
+        else:
+            pass
         assert path == "releases/tags/v0.1.1"
         return state["release"]
 
@@ -38,7 +46,7 @@ def github(monkeypatch):
     return state
 
 
-def test_create_release_and_retry_without_mutations(github):
+def test_create_release_and_retry_without_mutations(github) -> None:
     assert sync_github_release.sync_release("owner/FateBridge", "0.1.1", SHA) == URL
     assert len(github["writes"]) == 2
     payload = github["writes"][1][1]
@@ -51,23 +59,25 @@ def test_create_release_and_retry_without_mutations(github):
     assert len(github["writes"]) == 2
 
 
-def test_existing_tag_without_release_recovers(github):
+def test_existing_tag_without_release_recovers(github) -> None:
     github["sha"] = SHA
     assert sync_github_release.sync_release("owner/FateBridge", "0.1.1", SHA) == URL
     assert [path for path, _ in github["writes"]] == ["releases"]
 
 
 @pytest.mark.parametrize("has_release", [True, False])
-def test_conflicting_tag_is_never_moved(github, has_release):
+def test_conflicting_tag_is_never_moved(github, has_release: bool) -> None:
     github["sha"] = "b" * 40
     if has_release:
         github["release"] = {"html_url": URL, "draft": False}
+    else:
+        pass
     with pytest.raises(ValueError, match="does not point to published commit"):
         sync_github_release.sync_release("owner/FateBridge", "0.1.1", SHA)
     assert github["writes"] == []
 
 
-def test_existing_draft_is_not_published_implicitly(github):
+def test_existing_draft_is_not_published_implicitly(github) -> None:
     github["sha"] = SHA
     github["release"] = {"html_url": URL, "draft": True}
     with pytest.raises(ValueError, match="draft release"):
@@ -76,7 +86,7 @@ def test_existing_draft_is_not_published_implicitly(github):
 
 
 @pytest.mark.parametrize("sha", ["master", "abc123", "", "0" * 39])
-def test_release_requires_an_exact_commit(github, sha):
+def test_release_requires_an_exact_commit(github, sha) -> None:
     with pytest.raises(ValueError, match="exact published commit"):
         sync_github_release.sync_release("owner/FateBridge", "0.1.1", sha)
     assert github["writes"] == []
@@ -84,7 +94,9 @@ def test_release_requires_an_exact_commit(github, sha):
 
 @pytest.mark.parametrize("status", [404, 403, 429, 500])
 @pytest.mark.parametrize("payload", [None, {"tag_name": "v0.1.1"}])
-def test_only_get_404_is_absence(monkeypatch, status, payload):
+def test_only_get_404_is_absence(
+    monkeypatch: pytest.MonkeyPatch, status: int, payload
+) -> None:
     monkeypatch.setenv("GH_TOKEN", "fixture-token")
 
     def request(req, timeout):
@@ -93,6 +105,8 @@ def test_only_get_404_is_absence(monkeypatch, status, payload):
         assert timeout == 30
         if payload is not None:
             assert json.loads(req.data) == payload
+        else:
+            pass
         raise HTTPError(req.full_url, status, "fixture", {}, None)
 
     monkeypatch.setattr(sync_github_release, "urlopen", request)
@@ -103,7 +117,7 @@ def test_only_get_404_is_absence(monkeypatch, status, payload):
             sync_github_release.github_api("owner/FateBridge", "releases", payload)
 
 
-def test_github_response_and_network_error(monkeypatch):
+def test_github_response_and_network_error(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("GITHUB_TOKEN", "fixture-token")
     monkeypatch.delenv("GH_TOKEN", raising=False)
     monkeypatch.setattr(

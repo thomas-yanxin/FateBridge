@@ -4,7 +4,7 @@ import hashlib
 
 import pytest
 
-from fatebridge.validation.gauquelin_linkage import (
+from validation.gauquelin_linkage import (
     _link_index,
     _parse_corrections,
     _parse_ertel,
@@ -31,7 +31,7 @@ def source(*rows):
     return "header\n" * 6 + "".join(rows) + " \n\n.close\n"
 
 
-def test_unicode_uses_character_columns_and_preserves_source_line_bytes():
+def test_unicode_uses_character_columns_and_preserves_source_line_bytes() -> None:
     original = row(1, 96, name="Épreuve-虚构", cp="12")
     parsed = _parse_ertel(source("\n", original))
     assert len(parsed) == 1
@@ -49,7 +49,7 @@ def test_unicode_uses_character_columns_and_preserves_source_line_bytes():
     }
 
 
-def test_raw_collisions_and_out_of_range_ids_cannot_be_silently_overwritten():
+def test_raw_collisions_and_out_of_range_ids_cannot_be_silently_overwritten() -> None:
     parsed = _parse_ertel(source(row(1, 96), row(2, 96), row(3, 1921), row(4)))
     index, summary = _link_index(parsed, {})
     assert [r["ertel_id"] for r in index[96]] == [1, 2]
@@ -69,7 +69,7 @@ def test_raw_collisions_and_out_of_range_ids_cannot_be_silently_overwritten():
     assert parsed[3]["raw_cfepp_id"] is None
 
 
-def test_zero_missing_cross_id_is_unknown_not_a_new_person():
+def test_zero_missing_cross_id_is_unknown_not_a_new_person() -> None:
     parsed = _parse_ertel(source(row(1, "0", source="GMIND", gnr="", cp="0")))
     assert parsed[0]["raw_cfepp_id"] is None
     assert parsed[0]["literal_cfepp_field"] == "0"
@@ -79,7 +79,9 @@ def test_zero_missing_cross_id_is_unknown_not_a_new_person():
     assert _link_index(parsed, {})[1]["unlinked_ertel_rows"] == 1
 
 
-def test_starred_para_pool_stays_distinct_from_same_number_in_published_sample():
+def test_starred_para_pool_stays_distinct_from_same_number_in_published_sample() -> (
+    None
+):
     parsed = _parse_ertel(source(row(1, cp="26"), row(2, cp="* 26")))
     assert [r["raw_comite_para_id"] for r in parsed] == ["26", "* 26"]
     assert [r["comite_para_number"] for r in parsed] == [26, 26]
@@ -98,12 +100,14 @@ def test_starred_para_pool_stays_distinct_from_same_number_in_published_sample()
         (source("short\n"), "truncated_ertel_source_row"),
     ],
 )
-def test_malformed_rows_are_errors_not_dropped_from_the_cohort(text, error):
+def test_malformed_rows_are_errors_not_dropped_from_the_cohort(
+    text, error: str
+) -> None:
     with pytest.raises(ValueError, match=error):
         _parse_ertel(text)
 
 
-def test_only_active_literal_corrections_are_read_without_running_php():
+def test_only_active_literal_corrections_are_read_without_running_php() -> None:
     text = """<?php
     const ERTEL_CFEPP = [
         // 3619 => 218, // a possible identity confusion, not an active correction
@@ -116,11 +120,11 @@ def test_only_active_literal_corrections_are_read_without_running_php():
 
 
 @pytest.mark.parametrize("entries", ["1 => 2,\n1 => 3,", "1 => 1121,", "0 => 2,"])
-def test_invalid_corrections_cannot_overwrite_a_previous_entry(entries):
+def test_invalid_corrections_cannot_overwrite_a_previous_entry(entries: str) -> None:
     with pytest.raises(ValueError, match="invalid_or_duplicate_linkage_correction"):
         _parse_corrections("const ERTEL_CFEPP = [\n" + entries + "\n];")
 
 
-def test_public_audit_rejects_unpinned_sources_before_any_linkage():
+def test_public_audit_rejects_unpinned_sources_before_any_linkage() -> None:
     with pytest.raises(ValueError, match="pinned_ertel_source_hash_mismatch"):
         audit_cfepp_linkage(b"", source(row(1)).encode(), b"", b"")

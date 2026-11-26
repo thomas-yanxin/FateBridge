@@ -10,14 +10,14 @@ import pytest
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.core import ephemeris_runtime as ephe
-from fatebridge.core import human_design_cycle_sources as sources
-from fatebridge.core import human_design_cycles as cycles
 from fatebridge.core.astro import runtime
-from fatebridge.core.human_design import chart_at_tt
+from fatebridge.core.human_design import human_design_cycle_sources as sources
+from fatebridge.core.human_design import human_design_cycles as cycles
+from fatebridge.core.human_design.human_design import chart_at_tt
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
-from fatebridge.validation.human_design import verify_human_design_reading
 from tests.support.ephemeris_context import empty_ephemeris_path
+from validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -40,8 +40,8 @@ def private_ephemeris(tmp_path, monkeypatch):
 
 @pytest.mark.parametrize("tamper", ["file_bytes", "slot_edition", "temporary_path"])
 def test_cycle_refuses_changed_source_even_when_every_native_model_flag_stays_swiss(
-    private_ephemeris, monkeypatch, tmp_path, tamper
-):
+    private_ephemeris, monkeypatch: pytest.MonkeyPatch, tmp_path: Path, tamper: str
+) -> None:
     # These controlled eight-day searches test source consistency, not returns.
     monkeypatch.setattr(cycles, "HORIZON_DAYS", 8.0)
     chart = chart_at_tt(2451544.5)
@@ -52,6 +52,8 @@ def test_cycle_refuses_changed_source_even_when_every_native_model_flag_stays_sw
     other = tmp_path / "same-data-other-path"
     if tamper == "temporary_path":
         shutil.copytree(private_ephemeris, other)
+    else:
+        pass
 
     def native(operation, *args, **kwargs):
         nonlocal native_chiron_calls
@@ -62,17 +64,27 @@ def test_cycle_refuses_changed_source_even_when_every_native_model_flag_stays_sw
             if tamper == "file_bytes" and native_chiron_calls == 2:
                 with (private_ephemeris / "seas_18.se1").open("ab") as handle:
                     handle.write(b"source-change-regression")
+            else:
+                pass
             if tamper == "temporary_path":
                 if native_chiron_calls == 2:
                     os.environ["SE_EPHE_PATH"] = str(other)
                 elif native_chiron_calls == 3:
                     os.environ["SE_EPHE_PATH"] = str(private_ephemeris)
+                else:
+                    pass
+            else:
+                pass
+        else:
+            pass
         return result
 
     def metadata(slot):
         row = getter(slot)
         if tamper == "slot_edition" and slot == 2 and native_chiron_calls >= 2:
             return (*row[:3], row[3] + 1)
+        else:
+            pass
         return row
 
     monkeypatch.setattr(runtime, "ephemeris_call", native)
@@ -94,8 +106,8 @@ def test_cycle_refuses_changed_source_even_when_every_native_model_flag_stays_sw
 
 
 def test_chiron_keeps_asteroid_file_even_with_analytical_earth_and_stale_planet_slots(
-    private_ephemeris, monkeypatch
-):
+    private_ephemeris, monkeypatch: pytest.MonkeyPatch
+) -> None:
     # Populate physical slots, then explicitly select a directory with only the
     # asteroid file. Native Earth calculations must actually fall to Moshier.
     runtime.ephemeris_call("calc", 2451544.5, 6, 258)
@@ -121,8 +133,8 @@ def test_chiron_keeps_asteroid_file_even_with_analytical_earth_and_stale_planet_
 
 
 def test_endpoint_hash_detects_byte_change_even_when_stat_signature_is_unchanged(
-    private_ephemeris, monkeypatch
-):
+    private_ephemeris, monkeypatch: pytest.MonkeyPatch
+) -> None:
     runtime.ephemeris_call("calc", 2451544.5, 15, 258)
     source = sources.CycleSourceTrace()
     source.observe("Chiron", "swieph")
@@ -135,7 +147,9 @@ def test_endpoint_hash_detects_byte_change_even_when_stat_signature_is_unchanged
     assert caught.value.reason == "changed_during"
 
 
-def test_missing_introspection_is_reported_as_unidentified_not_certified(monkeypatch):
+def test_missing_introspection_is_reported_as_unidentified_not_certified(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(runtime, "swe", SimpleNamespace())
     source = sources.CycleSourceTrace()
     source.observe("Chiron", "moshier")
@@ -162,12 +176,14 @@ def source_run(request):
     if request.param:
         with empty_ephemeris_path():
             return execute_tool(spec, spec.request_model(**data))
+    else:
+        pass
     return execute_tool(spec, spec.request_model(**data))
 
 
 def test_full_source_context_indices_replay_all_evaluations_without_private_paths(
     source_run,
-):
+) -> None:
     assert (
         verify_human_design_reading(source_run)["status"]
         == "verified_fixed_template_reading"
@@ -197,7 +213,9 @@ def test_full_source_context_indices_replay_all_evaluations_without_private_path
         "unused_context",
     ],
 )
-def test_rehashing_cannot_certify_or_detach_source_contexts(source_run, tamper):
+def test_rehashing_cannot_certify_or_detach_source_contexts(
+    source_run, tamper: str
+) -> None:
     run = deepcopy(source_run)
     context = run["cycle_context"]
     source = context["source_evidence"]
@@ -231,11 +249,14 @@ def test_rehashing_cannot_certify_or_detach_source_contexts(source_run, tamper):
 
 @pytest.mark.parametrize("birth_tt", [2378496.5, 2378496.50016])
 def test_first_1800_cycles_bind_a_coherent_native_natal_epoch_before_long_searches(
-    birth_tt,
-):
-    chart = chart_at_tt(birth_tt, require_swiss_files=True)
+    birth_tt: float,
+) -> None:
+    captured = sources.CycleBirthSources()
+    chart = chart_at_tt(
+        birth_tt, require_swiss_files=True, source_observer=captured.observe
+    )
     result = cycles.calculate_cycle_context(
-        chart, "1866-01-01T00:00:00Z", require_swiss_files=True
+        chart, "1866-01-01T00:00:00Z", require_swiss_files=True, birth_sources=captured
     )
     assert result["status"] == "computed_finite_search"
     for body in result["bodies"]:
@@ -246,11 +267,13 @@ def test_first_1800_cycles_bind_a_coherent_native_natal_epoch_before_long_search
                 if a["body"] == body["body"]
             )
             assert body["natal_longitude"] == natal["longitude"]
+        else:
+            pass
 
 
 def test_original_natal_observations_are_reused_after_time_conversion_resets_caches(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     captured = sources.CycleBirthSources()
     chart = chart_at_tt(
         2378496.5, require_swiss_files=True, source_observer=captured.observe
@@ -262,6 +285,8 @@ def test_original_natal_observations_are_reused_after_time_conversion_resets_cac
     def native(operation, *args, **kwargs):
         if operation == "calc" and args[0] == 2378496.5 and args[1] in (6, 7):
             repeated.append(args[1])
+        else:
+            pass
         return original(operation, *args, **kwargs)
 
     monkeypatch.setattr(runtime, "ephemeris_call", native)

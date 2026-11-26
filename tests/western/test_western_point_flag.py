@@ -17,7 +17,7 @@ FIXTURE = Path(__file__).parents[1] / "data/astro/point_flag"
 PROTOCOL = json.loads((FIXTURE / "protocol.json").read_text())
 
 
-def test_flag_contract_and_expected_packets_are_frozen_before_candidate():
+def test_flag_contract_and_expected_packets_are_frozen_before_candidate() -> None:
     verify_source_files(FIXTURE)
     assert PROTOCOL["source_constant"]["value"] == 1048576
     assert runtime.swe.FLG_CENTER_BODY == 1048576
@@ -29,7 +29,7 @@ def test_flag_contract_and_expected_packets_are_frozen_before_candidate():
 @pytest.mark.parametrize(
     "case", PROTOCOL["cases"], ids=lambda c: str(c["returned_flags"])
 )
-def test_spherical_contract_requires_the_default_reference_point(case):
+def test_spherical_contract_requires_the_default_reference_point(case) -> None:
     args = dict(
         native=runtime.swe,
         equatorial=case["equatorial"],
@@ -49,8 +49,8 @@ def test_spherical_contract_requires_the_default_reference_point(case):
 
 @pytest.mark.parametrize("equatorial", [False, True])
 def test_actual_native_state_rejects_reference_point_flag_drift(
-    equatorial, monkeypatch
-):
+    equatorial: bool, monkeypatch: pytest.MonkeyPatch
+) -> None:
     original = runtime.ephemeris_call
     swe = runtime.swe
 
@@ -63,6 +63,8 @@ def test_actual_native_state_rejects_reference_point_flag_drift(
         ):
             values, flags = result
             return values, flags | 1048576
+        else:
+            pass
         return result
 
     monkeypatch.setattr(runtime, "ephemeris_call", changed)
@@ -71,7 +73,9 @@ def test_actual_native_state_rejects_reference_point_flag_drift(
     assert caught.value.reason == "coordinate_contract_changed"
 
 
-def test_solar_source_receipt_rejects_the_same_unrequested_point_override(monkeypatch):
+def test_solar_source_receipt_rejects_the_same_unrequested_point_override(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = runtime.ephemeris_call
     swe = runtime.swe
     calls = []
@@ -82,6 +86,8 @@ def test_solar_source_receipt_rejects_the_same_unrequested_point_override(monkey
             values, flags = result
             calls.append(flags)
             return values, flags | 1048576
+        else:
+            pass
         return result
 
     monkeypatch.setattr(runtime, "ephemeris_call", changed)

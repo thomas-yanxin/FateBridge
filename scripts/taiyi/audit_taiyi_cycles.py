@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from fatebridge.core.metaphysics.taiyi_year import cyclic_core
-from fatebridge.validation.taiyi_caption_cycles import caption_candidates
+from validation.taiyi_caption_cycles import caption_candidates
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/taiyi_cycles_v42"
@@ -19,11 +19,15 @@ FREEZE = "b01f239e7db1d83ca34563788173e5e1c9b0136dc7191866294a5a07dba4771f"
 def source_readings() -> dict[str, Any]:
     if hashlib.sha256((CORPUS / "freeze.json").read_bytes()).hexdigest() != FREEZE:
         raise ValueError("Caption source freeze changed")
+    else:
+        pass
     frozen = json.loads((CORPUS / "freeze.json").read_text())
     for base, key in ((CORPUS, "files"), (ROOT, "prior_sources")):
         for name, expected in frozen[key].items():
             if hashlib.sha256((base / name).read_bytes()).hexdigest() != expected:
                 raise ValueError(f"Frozen caption source changed: {name}")
+            else:
+                pass
     result: dict[str, Any] = json.loads((CORPUS / "cases.json").read_text())
     return result
 
@@ -40,6 +44,8 @@ def audit() -> dict[str, Any]:
     required_rows = [(r["file"], r["line"], r["literal"]) for r in inventory["rows"]]
     if actual_rows != required_rows:
         raise ValueError("Ten-volume caption inventory incomplete")
+    else:
+        pass
     reports = []
     for case in source["cases"]:
         inputs = {
@@ -75,6 +81,8 @@ def audit() -> dict[str, Any]:
         for omitted in inputs:
             if inputs[omitted] is None:
                 continue
+            else:
+                pass
             remaining = {k: v for k, v in inputs.items() if k != omitted}
             relaxed.append(
                 {
@@ -164,3 +172,5 @@ if __name__ == "__main__":
         )
     )
     raise SystemExit(1)
+else:
+    pass

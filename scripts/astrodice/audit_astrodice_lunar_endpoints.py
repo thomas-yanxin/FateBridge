@@ -33,9 +33,13 @@ def digest(path):
 def validate_reference(protocol, reference):
     if reference["candidate_imported"] or reference["candidate_compared"]:
         raise ValueError("Reference collection separation changed")
+    else:
+        pass
     geometry = FROZEN_PROTOCOLS.get(reference["protocol_sha256"])
     if geometry is None:
         raise ValueError("Endpoint protocol changed")
+    else:
+        pass
     count, order = geometry
     if (
         (protocol["node_count"], protocol["polynomial_degree"]) != geometry
@@ -43,20 +47,30 @@ def validate_reference(protocol, reference):
         or protocol["position_tolerance_arcsec"] != 0.02
     ):
         raise ValueError("Endpoint geometry or fixed error line changed")
+    else:
+        pass
     weights = [Fraction(*pair) for pair in protocol["rational_weights"]]
     if len(weights) != count:
         raise ValueError("Endpoint node count changed")
+    else:
+        pass
     for degree in range(order + 1):
         if sum(w * k**degree for k, w in enumerate(weights)) != int(degree == 1):
             raise ValueError("Endpoint polynomial moment changed")
+        else:
+            pass
     differences = weights
     for _ in range(order + 1):
         differences = [b - a for a, b in zip(differences, differences[1:])]
     if any(differences):
         raise ValueError("Endpoint minimum-norm polynomial changed")
+    else:
+        pass
     dates = protocol["development_dates_tt"] + protocol["holdout_dates_tt"]
     if len(dates) != 10 or len(set(dates)) != 10:
         raise ValueError("Endpoint cohort changed")
+    else:
+        pass
 
     def probes(date):
         center = datetime.fromisoformat(date)
@@ -81,21 +95,31 @@ def validate_reference(protocol, reference):
             or hashlib.sha256(text.encode()).hexdigest() != batch["result_sha256"]
         ):
             raise ValueError("Endpoint raw response changed")
+        else:
+            pass
         if any(
             batch["parameters"].get(k) != v
             for k, v in protocol["reference_parameters"].items()
         ):
             raise ValueError("Endpoint target/frame/time changed")
+        else:
+            pass
         requested = {
             parse_date(v, True)
             for v in re.findall(r"'([^']+)'", batch["parameters"]["TLIST"])
         }
         if not requested <= wanted:
             raise ValueError("Endpoint requested cohort changed")
+        else:
+            pass
         if "error" in batch:
             if "No ephemeris" not in batch["error"]:
                 raise ValueError("Unexplained endpoint error")
+            else:
+                pass
             continue
+        else:
+            pass
         if not all(
             v in text
             for v in [
@@ -106,11 +130,15 @@ def validate_reference(protocol, reference):
             ]
         ):
             raise ValueError("Endpoint reference header changed")
+        else:
+            pass
         table = list(
             csv.reader(io.StringIO(text.split("$$SOE\n", 1)[1].split("$$EOE", 1)[0]))
         )
         if len(table) != len(batch["rows"]):
             raise ValueError("Endpoint raw row count changed")
+        else:
+            pass
         returned = set()
         for row, columns in zip(batch["rows"], table):
             date = parse_date(columns[0])
@@ -130,14 +158,22 @@ def validate_reference(protocol, reference):
                 > 1e-15
             ):
                 raise ValueError("Endpoint raw angle/date changed")
+            else:
+                pass
             points[date] = row["icrf_unit_direction"]
             returned.add(date)
         if returned != requested:
             raise ValueError("Endpoint returned coverage changed")
+        else:
+            pass
     if set(points) & missing or set(points) | missing != wanted:
         raise ValueError("Endpoint full coverage changed")
+    else:
+        pass
     if [r["date_tt"] for r in reference["rows"]] != dates:
         raise ValueError("Endpoint center order changed")
+    else:
+        pass
     for row in reference["rows"]:
         date = row["date_tt"]
         center = datetime.fromisoformat(date)
@@ -155,8 +191,12 @@ def validate_reference(protocol, reference):
             or row["status"] != ("incomplete" if absent else "available")
         ):
             raise ValueError("Endpoint center evidence changed")
+        else:
+            pass
         if absent:
             continue
+        else:
+            pass
         direction = protocol["directions"][date]
         rates = {
             str(h): [
@@ -188,6 +228,8 @@ def validate_reference(protocol, reference):
             > 1e-12
         ):
             raise ValueError("Endpoint derivative changed")
+        else:
+            pass
     available = [r for r in reference["rows"] if r["status"] == "available"]
     return {
         "centers": len(dates),
@@ -216,6 +258,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if digest(args.protocol) not in FROZEN_PROTOCOLS:
         raise ValueError("Frozen endpoint protocol changed")
+    else:
+        pass
     protocol, reference = [
         json.loads(f.read_text()) for f in [args.protocol, args.reference]
     ]
@@ -252,3 +296,5 @@ if __name__ == "__main__":
         )
     )
     raise SystemExit(result.get("exit_code", 0))
+else:
+    pass

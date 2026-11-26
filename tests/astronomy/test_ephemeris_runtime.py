@@ -1,6 +1,7 @@
 """Unit tests for the shared Swiss Ephemeris runtime helpers."""
 
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 from threading import local
 from types import SimpleNamespace
 
@@ -24,7 +25,9 @@ def preserve_configured_path(monkeypatch):
     monkeypatch.setattr(ephemeris_runtime, "verified_user_ephemeris_dir", lambda: None)
 
 
-def test_configure_ephemeris_path_uses_explicit_argument(monkeypatch):
+def test_configure_ephemeris_path_uses_explicit_argument(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     swe = pytest.importorskip("swisseph")
     captured = {}
     monkeypatch.setattr(
@@ -37,7 +40,7 @@ def test_configure_ephemeris_path_uses_explicit_argument(monkeypatch):
     assert captured["path"] == "/tmp/fatebridge-ephe"
 
 
-def test_configure_ephemeris_path_reads_env(monkeypatch):
+def test_configure_ephemeris_path_reads_env(monkeypatch: pytest.MonkeyPatch) -> None:
     swe = pytest.importorskip("swisseph")
     captured = {}
     monkeypatch.setattr(
@@ -51,7 +54,9 @@ def test_configure_ephemeris_path_reads_env(monkeypatch):
     assert captured["path"] == "/data/ephe"
 
 
-def test_configure_ephemeris_path_initialises_default_without_custom_path(monkeypatch):
+def test_configure_ephemeris_path_initialises_default_without_custom_path(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     swe = pytest.importorskip("swisseph")
     calls = []
     monkeypatch.setattr(swe, "set_ephe_path", lambda path: calls.append(path))
@@ -62,7 +67,9 @@ def test_configure_ephemeris_path_initialises_default_without_custom_path(monkey
     assert calls == [""]
 
 
-def test_configure_ephemeris_path_falls_back_to_default_dir(monkeypatch):
+def test_configure_ephemeris_path_falls_back_to_default_dir(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     swe = pytest.importorskip("swisseph")
     captured = {}
     monkeypatch.setattr(
@@ -75,7 +82,9 @@ def test_configure_ephemeris_path_falls_back_to_default_dir(monkeypatch):
     assert captured["path"] == "/proj/ephe"
 
 
-def test_nonempty_env_is_reported_as_the_library_override(monkeypatch):
+def test_nonempty_env_is_reported_as_the_library_override(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     swe = pytest.importorskip("swisseph")
     captured = {}
     monkeypatch.setattr(
@@ -90,7 +99,9 @@ def test_nonempty_env_is_reported_as_the_library_override(monkeypatch):
     assert captured["path"] == "/env/ephe"
 
 
-def test_default_ephe_dir_detects_se1_files(tmp_path, monkeypatch):
+def test_default_ephe_dir_detects_se1_files(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     ephe = tmp_path / "ephe"
     ephe.mkdir()
     (ephe / "sepl_18.se1").write_bytes(b"SWdata")
@@ -99,7 +110,9 @@ def test_default_ephe_dir_detects_se1_files(tmp_path, monkeypatch):
     assert ephemeris_runtime.default_ephe_dir() == str(ephe)
 
 
-def test_default_ephe_dir_ignores_empty_dir(tmp_path, monkeypatch):
+def test_default_ephe_dir_ignores_empty_dir(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     (tmp_path / "ephe").mkdir()
     monkeypatch.setattr(ephemeris_runtime, "_PROJECT_ROOT", tmp_path)
 
@@ -107,13 +120,28 @@ def test_default_ephe_dir_ignores_empty_dir(tmp_path, monkeypatch):
     assert ephemeris_runtime.default_ephe_dir() is None
 
 
-def test_default_ephe_dir_absent(tmp_path, monkeypatch):
+def test_default_ephe_dir_falls_back_when_se1_match_is_directory(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    (tmp_path / "ephe" / "sepl_18.se1").mkdir(parents=True)
+    cache = tmp_path / "cache"
+    monkeypatch.setattr(ephemeris_runtime, "_PROJECT_ROOT", tmp_path)
+    monkeypatch.setattr(
+        ephemeris_runtime, "verified_user_ephemeris_dir", lambda: str(cache)
+    )
+
+    assert ephemeris_runtime.default_ephe_dir() == str(cache)
+
+
+def test_default_ephe_dir_absent(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setattr(ephemeris_runtime, "_PROJECT_ROOT", tmp_path)
 
     assert ephemeris_runtime.default_ephe_dir() is None
 
 
-def test_ephemeris_model_from_retflag_maps_known_flags():
+def test_ephemeris_model_from_retflag_maps_known_flags() -> None:
     swe = pytest.importorskip("swisseph")
 
     assert ephemeris_model_from_retflag(swe.FLG_SWIEPH) == "swieph"
@@ -121,20 +149,24 @@ def test_ephemeris_model_from_retflag_maps_known_flags():
     assert ephemeris_model_from_retflag(swe.FLG_JPLEPH) == "jpl"
 
 
-def test_ephemeris_model_from_retflag_flags_errors():
+def test_ephemeris_model_from_retflag_flags_errors() -> None:
     pytest.importorskip("swisseph")
 
     assert ephemeris_model_from_retflag(-1) == "error"
 
 
-def test_ephemeris_model_from_retflag_unavailable(monkeypatch):
+def test_ephemeris_model_from_retflag_unavailable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(ephemeris_runtime, "swe", None)
 
     assert ephemeris_model_from_retflag(2) == "unavailable"
     assert configure_ephemeris_path("/whatever") is None
 
 
-def test_direct_calls_initialise_each_worker_and_changed_path_once(monkeypatch):
+def test_direct_calls_initialise_each_worker_and_changed_path_once(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     state = local()
     applied = []
 
@@ -181,7 +213,9 @@ def test_direct_calls_initialise_each_worker_and_changed_path_once(monkeypatch):
     assert applied == ["/first", "/second", "/second"]
 
 
-def test_time_scale_conversion_succeeds_as_first_call_in_fresh_thread(monkeypatch):
+def test_time_scale_conversion_succeeds_as_first_call_in_fresh_thread(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     swe = pytest.importorskip("swisseph")
     monkeypatch.setattr(ephemeris_runtime, "_configured_path", None)
     monkeypatch.delenv("SE_EPHE_PATH", raising=False)

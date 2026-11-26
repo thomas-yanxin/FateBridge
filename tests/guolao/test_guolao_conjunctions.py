@@ -9,8 +9,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_conjunctions as c
-from fatebridge.core.guolao_historical import shoushi_winter_cycle
+from fatebridge.core.guolao import guolao_conjunctions as c
+from fatebridge.core.guolao.guolao_historical import shoushi_winter_cycle
 
 ROOT = Path(__file__).parents[2]
 FIXTURE = ROOT / "tests/fixtures/guolao-conjunctions-v1"
@@ -19,10 +19,12 @@ G = c.GUJIN_COMPONENTS
 L = c.LI_1996
 
 
-def test_named_constants_and_primary_scan_bytes_are_pinned():
+def test_named_constants_and_primary_scan_bytes_are_pinned() -> None:
     for row in REFERENCE["artifacts"]:
         if row["path"].endswith("-cli-stdout.json"):
             continue  # Retired program output is not an independent source.
+        else:
+            pass
         assert (
             hashlib.sha256((FIXTURE / row["path"]).read_bytes()).hexdigest()
             == row["sha256"]
@@ -38,7 +40,9 @@ def test_named_constants_and_primary_scan_bytes_are_pinned():
 
 @pytest.mark.parametrize("profile", [G, L])
 @pytest.mark.parametrize("phase", [F(), F("182.62125"), F("365.2425"), F("-365.2425")])
-def test_two_solstices_and_full_cycles_have_zero_solar_correction(profile, phase):
+def test_two_solstices_and_full_cycles_have_zero_solar_correction(
+    profile, phase
+) -> None:
     value = c.solar_correction(phase, profile_id=profile)
     assert F(value["signed_correction_ancient_du_exact"]) == 0
     assert value["modern_degrees"] is None
@@ -53,7 +57,9 @@ def test_two_solstices_and_full_cycles_have_zero_solar_correction(profile, phase
         ("350", "縮", "末", "24600"),
     ],
 )
-def test_all_four_primary_solar_branches(phase, expected_phase, limit, coeff):
+def test_all_four_primary_solar_branches(
+    phase: str, expected_phase: str, limit: str, coeff: str
+) -> None:
     value = c.solar_correction(F(phase), profile_id=G)
     assert (value["phase"], value["limit"]) == (expected_phase, limit)
     assert value["polynomial_coefficients"][1] == coeff
@@ -63,14 +69,14 @@ def test_all_four_primary_solar_branches(phase, expected_phase, limit, coeff):
 
 
 @pytest.mark.parametrize("cut", [F("88.909225"), F("276.333275")])
-def test_printed_initial_solar_endpoint_and_both_sides(cut):
+def test_printed_initial_solar_endpoint_and_both_sides(cut) -> None:
     epsilon = F(1, 10**12)
     assert c.solar_correction(cut - epsilon, profile_id=G)["limit"] == "初"
     assert c.solar_correction(cut, profile_id=G)["limit"] == "初"
     assert c.solar_correction(cut + epsilon, profile_id=G)["limit"] == "末"
 
 
-def test_paper_coefficient_is_not_silently_changed_to_fit_table():
+def test_paper_coefficient_is_not_silently_changed_to_fit_table() -> None:
     phase = F("97.9993")
     g = c.solar_correction(phase, profile_id=G)
     p = c.solar_correction(phase, profile_id=L)
@@ -87,7 +93,7 @@ def test_paper_coefficient_is_not_silently_changed_to_fit_table():
     assert abs(F(p["signed_correction_ancient_du_exact"]) - F("2.3754")) > F(".07")
 
 
-def test_primary_lunar_polynomial_at_one_limit_is_exact_signed_ancient_du():
+def test_primary_lunar_polynomial_at_one_limit_is_exact_signed_ancient_du() -> None:
     fast = c.lunar_correction(F(5, 61), profile_id=G)  # 1/12.2 day
     slow = c.lunar_correction(F("13.7773") + F(5, 61), profile_id=G)
     assert F(fast["polynomial_argument_limits_exact"]) == 1
@@ -95,7 +101,7 @@ def test_primary_lunar_polynomial_at_one_limit_is_exact_signed_ancient_du():
     assert F(slow["signed_correction_ancient_du_exact"]) == F(".11081575")
 
 
-def test_primary_12_point_2_and_168_do_not_close_and_are_not_normalized():
+def test_primary_12_point_2_and_168_do_not_close_and_are_not_normalized() -> None:
     at = c.lunar_correction(F("13.7773"), profile_id=G)
     assert at["phase"] == "疾"  # literal 轉中已下
     assert F(at["half_month_limit_closure_residual_exact"]) == F(".08306")
@@ -108,7 +114,7 @@ def test_primary_12_point_2_and_168_do_not_close_and_are_not_normalized():
     assert after["argument_within_printed_limits"]
 
 
-def test_paper_terminal_model_also_reports_its_small_overlap_without_clipping():
+def test_paper_terminal_model_also_reports_its_small_overlap_without_clipping() -> None:
     value = c.lunar_correction(F("6.8881"), profile_id=L)
     assert F(value["polynomial_argument_limits_exact"]) > 84
     assert value["signed_correction_ancient_du_exact"] is None
@@ -124,7 +130,9 @@ def test_paper_terminal_model_also_reports_its_small_overlap_without_clipping():
         ("20.8293", 25, 26),
     ],
 )
-def test_all_published_velocity_piece_boundaries_and_either_side(boundary, at, after):
+def test_all_published_velocity_piece_boundaries_and_either_side(
+    boundary: str, at: int, after: int
+) -> None:
     point = F(boundary)
     epsilon = F(1, 10**12)
     assert c.li_1996_lunar_velocity(point - epsilon)["equation_number"] == at
@@ -132,7 +140,9 @@ def test_all_published_velocity_piece_boundaries_and_either_side(boundary, at, a
     assert c.li_1996_lunar_velocity(point + epsilon)["equation_number"] == after
 
 
-def test_published_velocity_units_and_constant_bands_are_not_modern_daily_speed():
+def test_published_velocity_units_and_constant_bands_are_not_modern_daily_speed() -> (
+    None
+):
     assert F(c.li_1996_lunar_velocity(F())["velocity_ancient_du_per_limit_exact"]) == F(
         "1.20701575"
     )
@@ -144,7 +154,7 @@ def test_published_velocity_units_and_constant_bands_are_not_modern_daily_speed(
     assert F("13.36875") * F(".082") != F("1.0962")
 
 
-def test_complete_published_first_conjunction_and_820_unit_conversion():
+def test_complete_published_first_conjunction_and_820_unit_conversion() -> None:
     middle = shoushi_winter_cycle(19).zhongji_days
     value = c.source_conjunction(middle, 0, profile_id=L)
     assert F(value["runyu_days_exact"]) == F("20.123145")
@@ -163,7 +173,9 @@ def test_complete_published_first_conjunction_and_820_unit_conversion():
     assert not value["sunrise_shift_applied_to_new_moon"]
 
 
-def test_primary_components_never_borrow_paper_velocity_or_emit_a_calendar_date():
+def test_primary_components_never_borrow_paper_velocity_or_emit_a_calendar_date() -> (
+    None
+):
     middle = shoushi_winter_cycle(318).zhongji_days
     for index in [0, 2, 4, 12, 24]:
         g = c.source_conjunction(middle, index, profile_id=G)
@@ -178,7 +190,9 @@ def test_primary_components_never_borrow_paper_velocity_or_emit_a_calendar_date(
 
 
 @pytest.mark.parametrize("index,shift,day", [(2, 1, "戊寅"), (9, -1, "癸卯")])
-def test_true_correction_crossing_midnight_uses_unwrapped_day_total(index, shift, day):
+def test_true_correction_crossing_midnight_uses_unwrapped_day_total(
+    index: int, shift, day: str
+) -> None:
     value = c.source_conjunction(
         shoushi_winter_cycle(19).zhongji_days, index, profile_id=L
     )
@@ -196,8 +210,8 @@ def _command(monkeypatch, capsys, args):
 
 
 def test_all_28_paper_rows_are_audited_including_formula_and_identity_failures(
-    monkeypatch, capsys
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     report = _command(
         monkeypatch,
         capsys,
@@ -247,8 +261,8 @@ def test_all_28_paper_rows_are_audited_including_formula_and_identity_failures(
     ],
 )
 def test_real_cli_year_paths_preserve_named_profile_and_index(
-    monkeypatch, capsys, args
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], args
+) -> None:
     result = _command(
         monkeypatch, capsys, [*args, "--profile", L, "--lunation-index", "0"]
     )
@@ -259,7 +273,7 @@ def test_real_cli_year_paths_preserve_named_profile_and_index(
 
 
 @pytest.mark.parametrize("bad", [0, True, "1", 2451545.0, None])
-def test_fraction_units_required(bad):
+def test_fraction_units_required(bad: bool | float | int | str | None) -> None:
     for fn in [c.solar_correction, c.lunar_correction]:
         with pytest.raises(TypeError, match="Fraction"):
             fn(bad, profile_id=G)
@@ -270,19 +284,19 @@ def test_fraction_units_required(bad):
 
 
 @pytest.mark.parametrize("bad", [None, "auto", "shoushi", 1, []])
-def test_profile_cannot_be_guessed(bad):
+def test_profile_cannot_be_guessed(bad) -> None:
     with pytest.raises(ValueError, match="具名"):
         c.source_conjunction(F(), 0, profile_id=bad)
 
 
 @pytest.mark.parametrize("bad", [True, "1", F(1), 1.0, None])
-def test_index_is_an_explicit_integer(bad):
+def test_index_is_an_explicit_integer(bad) -> None:
     with pytest.raises(TypeError, match="整数"):
         c.source_conjunction(F(), bad, profile_id=G)
 
 
 @pytest.mark.parametrize("middle,index", [(F(-1), 0), (F(), -1)])
-def test_negative_lower_reckoning_is_not_inferred(middle, index):
+def test_negative_lower_reckoning_is_not_inferred(middle, index) -> None:
     with pytest.raises(ValueError, match="非负"):
         c.source_conjunction(middle, index, profile_id=G)
 
@@ -291,8 +305,8 @@ def test_negative_lower_reckoning_is_not_inferred(middle, index):
     "field,value", [("runying_days", "20.1850"), ("terminal_limit_method", "guess")]
 )
 def test_parameter_mixing_or_unknown_limit_algorithm_fails_closed(
-    tmp_path, monkeypatch, field, value
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, field: str, value: str
+) -> None:
     data = json.loads(c.DATA.read_bytes())
     data["profiles"][G][field] = value
     path = tmp_path / "bad.json"
@@ -313,7 +327,9 @@ def test_parameter_mixing_or_unknown_limit_algorithm_fails_closed(
         ["--paper-table", "missing.csv", "--profile", G],
     ],
 )
-def test_cli_requires_explicit_mode_profile_and_index(monkeypatch, capsys, args):
+def test_cli_requires_explicit_mode_profile_and_index(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], args
+) -> None:
     with pytest.raises(SystemExit) as error:
         _command(monkeypatch, capsys, args)
     assert error.value.code == 2

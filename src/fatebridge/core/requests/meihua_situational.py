@@ -1,6 +1,6 @@
 """Reported same-cast contexts for four selected NLC ten-response headings."""
 
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import Field, StrictBool, model_validator
 
@@ -34,16 +34,16 @@ class MeihuaResponseContext(_DeferredModel):
         json_schema_extra={"const": True},
         description="Caller explicitly confirms these are reported actual conditions at this casting episode, not desired/future outcomes. Presence/classification is not independently verified",
     )
-    querent_position: Optional[MeihuaQuerentPosition] = None
-    weather: Optional[
-        list[Literal["clear", "rain", "snow", "rain_or_snow", "wind", "thunder"]]
-    ] = Field(
+    querent_position: MeihuaQuerentPosition | None = None
+    weather: (
+        list[Literal["clear", "rain", "snow", "rain_or_snow", "wind", "thunder"]] | None
+    ) = Field(
         default=None,
         min_length=1,
         max_length=6,
         description="Reported present conditions corresponding to 晴明/雨/雪/雨雪未分/風/雷. 雨雪皆配坎, but坎體宜雨does not uniquely establish a preference for snow; rain_or_snow keeps that condition pending. Human-matter 天時應 only; not a future weather prediction or daily rain label. Unknown omit/null; multiple observations retained without voting",
     )
-    setting: Optional[
+    setting: (
         list[
             Literal[
                 "bamboo_woodland",
@@ -53,13 +53,14 @@ class MeihuaResponseContext(_DeferredModel):
                 "earth_or_tiles",
             ]
         ]
-    ] = Field(
+        | None
+    ) = Field(
         default=None,
         min_length=1,
         max_length=5,
         description="Reported place at the cast: 竹林/江河溪澗池沼/五金/窰竈爐火/土瓦. Keep all source trigram candidates; never infer setting from address, objects, question or unseen scene",
     )
-    human: Optional[
+    human: (
         list[
             Literal[
                 "elderly_man",
@@ -70,7 +71,8 @@ class MeihuaResponseContext(_DeferredModel):
                 "weeping_encountered",
             ]
         ]
-    ] = Field(
+        | None
+    ) = Field(
         default=None,
         min_length=1,
         max_length=6,

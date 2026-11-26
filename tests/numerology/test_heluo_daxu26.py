@@ -4,18 +4,27 @@ import json
 from pathlib import Path
 
 import pytest
+from fastapi.testclient import TestClient
+from pytest import CaptureFixture, MonkeyPatch
 
-from fatebridge.core import heluo_texts as ht
-from fatebridge.core.heluo import gua_lines, lines_to_gua, yao_text
+from fatebridge.core.heluo import heluo_texts as ht
+from fatebridge.core.heluo.heluo import gua_lines, lines_to_gua, yao_text
+from fatebridge.core.local_techniques.heluo import build_heluo_result
 from fatebridge.services.knowledge import calculate_knowledge_read
+from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import NumerologySourceError
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as shared_rest
+from tests.support.transports import run_three
 
 W = Path(__file__).parents[1] / "data/heluo"
 LITERAL = json.loads((W / "reviewed-literals-v1.json").read_bytes())
 
 
 @pytest.mark.parametrize("e", LITERAL["entries"], ids=lambda e: str(e["line"]))
-def test_six_exact_headers_and_24_complete_parents_with_unassessed_applicability(e):
+def test_six_exact_headers_and_24_complete_parents_with_unassessed_applicability(
+    e,
+) -> None:
     t = yao_text("山天大畜", e["line"])
     assert t["yaoci"] == e["yaoci"] and t["detail"] == "".join(
         s["text"] for s in e["sections"]
@@ -33,7 +42,7 @@ def test_six_exact_headers_and_24_complete_parents_with_unassessed_applicability
 )
 def test_references_preserve_printed_and_unprinted_target_positions_and_source_parents(
     ref,
-):
+) -> None:
     t = yao_text("山天大畜", ref["source_line"])
     rows = t.get("commentary_cross_references", [])
     assert len(rows) == 1
@@ -74,8 +83,8 @@ def test_references_preserve_printed_and_unprinted_target_positions_and_source_p
 
 @pytest.mark.parametrize("line", [1, 3])
 def test_tentative_readings_stay_qualified_and_never_gain_repair_or_certification_credit(
-    line,
-):
+    line: int,
+) -> None:
     t = yao_text("山天大畜", line)
     assert "字形未决" in ht.text_status_snapshot(t)
     notes = (
@@ -90,7 +99,9 @@ def test_tentative_readings_stay_qualified_and_never_gain_repair_or_certificatio
 @pytest.mark.parametrize(
     "e", LITERAL["entries"], ids=lambda e: "knowledge-" + str(e["line"])
 )
-def test_all_knowledge_surfaces_keep_the_real_source_notes_and_unassessed_selection(e):
+def test_all_knowledge_surfaces_keep_the_real_source_notes_and_unassessed_selection(
+    e,
+) -> None:
     out = calculate_knowledge_read(domain="heluo", key=f"山天大畜:{e['line']}")
     assert out["reference_details"]["record"]["detail"] == "".join(
         s["text"] for s in e["sections"]
@@ -106,7 +117,9 @@ def test_all_knowledge_surfaces_keep_the_real_source_notes_and_unassessed_select
     )
 
 
-def test_dictionary_gloss_is_explicit_editorial_context_not_raw_commentary_or_glyph_proof():
+def test_dictionary_gloss_is_explicit_editorial_context_not_raw_commentary_or_glyph_proof() -> (
+    None
+):
     t = yao_text("山天大畜", 3)
     notes = t["text_provenance"]["commentary_reading_notes"]
     gloss = next(n for n in notes if "编校词义说明" in n)
@@ -123,8 +136,8 @@ def test_dictionary_gloss_is_explicit_editorial_context_not_raw_commentary_or_gl
 
 @pytest.mark.parametrize("fault", ["body", "parent", "qualification", "position"])
 def test_modified_source_or_qualification_cannot_keep_the_bound_identity(
-    fault, monkeypatch, tmp_path
-):
+    fault: str, monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
     data = json.loads(ht.COMMENTARY_PATH.read_bytes())
     e = next(
         (e for e in data["entries"] if (e["hexagram"], e["line"]) == ("山天大畜", 3)),
@@ -156,12 +169,6 @@ def test_modified_source_or_qualification_cannot_keep_the_bound_identity(
         ht._commentary_collation.cache_clear()
 
 
-from fatebridge.core.local_techniques.heluo import build_heluo_result
-from fatebridge.services.tool_catalog import CATALOG
-from tests.support.transports import SPECS, business
-from tests.support.transports import rest as shared_rest
-from tests.support.transports import run_three
-
 rest = shared_rest
 CASES = json.loads((W / "daxu_case_inputs.json").read_bytes())["cases"]
 
@@ -173,7 +180,7 @@ def source_calendar(monkeypatch):
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: str(c["line"]))
-def test_six_complete_calculations_keep_math_and_the_formal_houtian(case):
+def test_six_complete_calculations_keep_math_and_the_formal_houtian(case) -> None:
     line = case["line"]
     actual = build_heluo_result(**case["payload"])
     assert actual["chart"][case["phase"]]["name"] == "山天大畜"
@@ -191,12 +198,14 @@ def test_six_complete_calculations_keep_math_and_the_formal_houtian(case):
             and ref["target_line"] == 6
             and ref["source_section_id"] == "buxie"
         )
+    else:
+        pass
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: str(c["line"]))
 def test_actual_three_calculation_adapters_keep_selected_source_and_qualifications(
-    case, rest, tmp_path, capsys
-):
+    case, rest: TestClient, tmp_path: Path, capsys: CaptureFixture[str]
+) -> None:
     fields = [
         "chart",
         "four_pillars",
@@ -239,8 +248,8 @@ def test_actual_three_calculation_adapters_keep_selected_source_and_qualificatio
     "e", LITERAL["entries"], ids=lambda e: "knowledge-" + str(e["line"])
 )
 def test_actual_three_knowledge_adapters_keep_editorial_and_printed_material_distinct(
-    e, rest, tmp_path, capsys
-):
+    e, rest: TestClient, tmp_path: Path, capsys: CaptureFixture[str]
+) -> None:
     spec = next(s for s in CATALOG if s.key == "knowledge_read")
     key = f"山天大畜:{e['line']}"
     response, code, cli, mcp = run_three(
@@ -266,3 +275,5 @@ def test_actual_three_knowledge_adapters_keep_editorial_and_printed_material_dis
             assert note in out["snapshot_text"] and note in "\n".join(out["lines"])
         if e["line"] == 3:
             assert "编校词义说明（非原文，不作字形证据）" in out["snapshot_text"]
+        else:
+            pass

@@ -9,8 +9,8 @@ from typing import Any
 
 from fatebridge.core.metaphysics.taiyi_year import yearly_core
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
-from fatebridge.validation.taiyi_epoch import sexagenary_hypothesis
 from scripts.taiyi.audit_taiyi_day_epoch import calendar_cohort
+from validation.taiyi_epoch import sexagenary_hypothesis
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/taiyi_jinjing_v32"
@@ -21,6 +21,8 @@ def _json(path: Path) -> dict[str, Any]:
     data = json.loads(path.read_text())
     if not isinstance(data, dict):
         raise ValueError(f"V32 source object required: {path.name}")
+    else:
+        pass
     return data
 
 
@@ -30,11 +32,15 @@ def verify_sources(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any
         != FREEZE_SHA256
     ):
         raise ValueError("V32 pinned source freeze changed")
+    else:
+        pass
     frozen = _json(corpus / "freeze.json")
     for base, key in ((corpus, "files"), (root, "prior_sources")):
         for name, digest in frozen[key].items():
             if hashlib.sha256((base / name).read_bytes()).hexdigest() != digest:
                 raise ValueError(f"V32 frozen source changed: {name}")
+            else:
+                pass
     return frozen
 
 
@@ -50,10 +56,14 @@ def serial_lunations(
     numbers = [*constants.values(), annual, months, profile["step_integer"]]
     if any(type(v) is not int or v < 1 for v in numbers):
         raise ValueError("V32 positive integral source constants required")
+    else:
+        pass
     denominator = constants["day_denominator"]
     remainder = profile["step_remainder"]
     if type(remainder) is not int or not 0 <= remainder < denominator:
         raise ValueError("V32 step remainder must be within source denominator")
+    else:
+        pass
     initial_months = annual * constants["chapter_months"] // constants["chapter_years"]
     initial_day_units = initial_months * constants["month_numerator"]
     step_units = profile["step_integer"] * denominator + remainder
@@ -119,6 +129,8 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
                 raise ValueError(
                     f"V32 engineering representative clock failed: {result}"
                 )
+            else:
+                pass
             board = result["taiyi"]
             cycle = (board["core_board"]["accumulation"] - 1) % 360
             actual = {
@@ -156,6 +168,8 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
     cohort = calendar_cohort(_json(prior / "liang-504-months.json"))
     if cohort["mismatches"]:
         raise ValueError("V32 prior printed-calendar reconstruction drifted")
+    else:
+        pass
     printed = _json(prior / "liang-504-months.json")["months"]
     reference_firsts = [r for r in cohort["records"] if r["day"] == 1]
     reference_firsts.append(

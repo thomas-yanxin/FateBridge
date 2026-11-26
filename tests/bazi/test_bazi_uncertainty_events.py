@@ -4,11 +4,17 @@ import gzip
 import hashlib
 import json
 from datetime import datetime, timedelta, timezone
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
+import fatebridge.services.birth_time_events as events
+import fatebridge.utils.solar_time as clock
 from fatebridge.core.almanac import SolarTerm
+from fatebridge.core.contracts.output_timing import BirthTimeEvent
+from fatebridge.services.birth_time_events import collect_natal_event_probes
 from fatebridge.services.timing_uncertainty import analyze_birth_time_range
 from fatebridge.utils.birth_input import PersonInfo
 from fatebridge.utils.civil_time import ZonedCalendar
@@ -40,8 +46,17 @@ SELECTED = list(
 )
 
 
+RETAINED_LIQIU = next(
+    row
+    for row in json.loads(
+        (Path(__file__).parents[1] / "data/retained_civil_points_v1.json").read_text()
+    )["rows"]
+    if row["name"] == "立秋"
+)
+
+
 @pytest.mark.parametrize("row", SELECTED, ids=lambda r: r["id"])
-def test_actual_range_includes_the_frozen_intermediate_month_hour_state(row):
+def test_actual_range_includes_the_frozen_intermediate_month_hour_state(row) -> None:
     person = PersonInfo(**row["input"])
     before = person.model_dump()
     result = analyze_birth_time_range(person, 1, analysis_moment=datetime(2102, 1, 1))
@@ -68,10 +83,8 @@ def test_actual_range_includes_the_frozen_intermediate_month_hour_state(row):
 
 @pytest.mark.parametrize("root_seconds", [85, 95, 89.9998])
 def test_apparent_clock_probes_both_event_orders_and_preserves_overlapping_brackets(
-    root_seconds, monkeypatch
-):
-    import fatebridge.services.birth_time_events as events
-    import fatebridge.utils.solar_time as clock
+    root_seconds: float | int, monkeypatch: pytest.MonkeyPatch
+) -> None:
 
     # Synthetic kernel control, not an independent physical equation-of-time vector.
     monkeypatch.setattr(clock, "calculate_equation_of_time_minutes", lambda _: 0.0)
@@ -124,13 +137,17 @@ def test_apparent_clock_probes_both_event_orders_and_preserves_overlapping_brack
         assert result.payload["unresolved_event_orders"]
     assert result.payload["continuous_completeness_certified"] is False
     assert result.payload["physical_precision_certified"] is False
+    jie_event = next(e for e in result.payload["events"] if e["kind"] == "jie")
+    assert jie_event["lower_utc"] == jie_event["upper_utc"] == jie_at.isoformat()
+    assert jie_event["bracket_width_seconds"] == 0.0
     for event in result.payload["events"]:
         if event["kind"] == "solar_clock":
             assert event["bracket_width_seconds"] <= 0.001
+        else:
+            pass
 
 
-def test_zero_range_does_not_invent_an_interval_or_duplicate_a_point():
-    from fatebridge.services.birth_time_events import collect_natal_event_probes
+def test_zero_range_does_not_invent_an_interval_or_duplicate_a_point() -> None:
 
     person = PersonInfo(
         birth_year=2000,
@@ -153,7 +170,7 @@ def test_zero_range_does_not_invent_an_interval_or_duplicate_a_point():
     assert result.payload["continuous_completeness_certified"] is False
 
 
-def test_closed_end_boundary_is_retained_as_its_own_point_state():
+def test_closed_end_boundary_is_retained_as_its_own_point_state() -> None:
     person = PersonInfo(
         birth_year=2000,
         birth_month=5,
@@ -176,7 +193,9 @@ def test_closed_end_boundary_is_retained_as_its_own_point_state():
     assert endpoint["pillars"]["hour"][-1] == "丑"
 
 
-def test_raw_fold_event_uses_distinct_physical_instants_without_mutating_source():
+def test_raw_fold_event_uses_distinct_physical_instants_without_mutating_source() -> (
+    None
+):
     person = PersonInfo(
         birth_year=1991,
         birth_month=9,
@@ -205,9 +224,9 @@ def test_raw_fold_event_uses_distinct_physical_instants_without_mutating_source(
     assert person.model_dump() == original
 
 
-def test_nonmonotone_synthetic_anchors_remain_unresolved(monkeypatch):
-    import fatebridge.services.birth_time_events as events
-    import fatebridge.utils.solar_time as clock
+def test_nonmonotone_synthetic_anchors_remain_unresolved(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     monkeypatch.setattr(
         clock, "calculate_equation_of_time_minutes", lambda at: -2.0 * at.minute
@@ -232,3 +251,108 @@ def test_nonmonotone_synthetic_anchors_remain_unresolved(monkeypatch):
     assert result.payload["status"] == "partial_unresolved_event_order"
     assert result.payload["unresolved_event_orders"]
     assert result.payload["continuous_completeness_certified"] is False
+
+
+def test_jie_event_encloses_the_original_retained_point_and_observed_states() -> None:
+
+    row = RETAINED_LIQIU
+    floor = datetime.fromisoformat(row["display_utc"])
+    person = PersonInfo(
+        birth_year=2024,
+        birth_month=8,
+        birth_day=7,
+        birth_hour=0,
+        birth_minute=9,
+        birth_second=16,
+        birth_timezone="UTC",
+        use_true_solar_time=False,
+    )
+    center = datetime(2024, 8, 7, 0, 9, 16, tzinfo=timezone.utc)
+    result = collect_natal_event_probes(
+        normalize_birth_time(person),
+        center - timedelta(minutes=1),
+        center + timedelta(minutes=1),
+    )
+    event = next(e for e in result.payload["events"] if e["kind"] == "jie")
+    assert event["name"] == "立秋"
+    assert event["civil_point"] == {
+        "unit": "nominal_gregorian_day",
+        "numerator": row["civil_numerator"],
+        "denominator": row["civil_denominator"],
+        "excluded_before": None,
+    }
+    assert event["lower_utc"] == floor.isoformat()
+    assert (
+        event["upper_utc"]
+        == event["at_utc"]
+        == (floor + timedelta(microseconds=1)).isoformat()
+    )
+    assert event["bracket_width_seconds"] == 0.000001
+    assert event["bracket_basis"] == "nominal_gregorian_microsecond_enclosure_v1"
+    BirthTimeEvent.model_validate(event, context={"full_result": True})
+    observed = {
+        p.normalized.input_datetime: "".join(p.pillars["month"]) for p in result.probes
+    }
+    assert [
+        observed[floor + timedelta(microseconds=shift)] for shift in [-1, 0, 1]
+    ] == ["辛未", "辛未", "壬申"]
+    assert result.payload["continuous_completeness_certified"] is False
+
+
+@pytest.mark.parametrize(
+    "low_shift,high_shift,expected_jie_count", [(0, 0, 0), (0, 1, 1), (1, 1, 0)]
+)
+def test_jie_range_membership_uses_the_source_point(
+    low_shift: int, high_shift: int, expected_jie_count: int
+) -> None:
+
+    row = RETAINED_LIQIU
+    floor = datetime.fromisoformat(row["display_utc"])
+    template = normalize_birth_time(
+        PersonInfo(
+            birth_year=2024,
+            birth_month=8,
+            birth_day=7,
+            birth_hour=0,
+            birth_minute=9,
+            birth_second=16,
+            birth_timezone="UTC",
+            use_true_solar_time=False,
+        )
+    )
+    result = collect_natal_event_probes(
+        template,
+        floor + timedelta(microseconds=low_shift),
+        floor + timedelta(microseconds=high_shift),
+    )
+    assert len([e for e in result.payload["events"] if e["kind"] == "jie"]) == (
+        expected_jie_count
+    )
+
+
+def test_projected_nominal_event_does_not_invent_a_missing_cap() -> None:
+
+    row = RETAINED_LIQIU
+    floor = datetime.fromisoformat(row["display_utc"])
+    record = {
+        "kind": "jie",
+        "bracket_basis": "nominal_gregorian_microsecond_enclosure_v1",
+        "civil_point": {
+            "unit": "nominal_gregorian_day",
+            "numerator": row["civil_numerator"],
+            "denominator": row["civil_denominator"],
+        },
+        "lower_utc": floor.isoformat(),
+        "upper_utc": (floor + timedelta(microseconds=1)).isoformat(),
+    }
+    projected = BirthTimeEvent.model_validate(record)
+    assert projected.civil_point is not None
+    assert projected.civil_point.known_day() == Fraction(
+        int(row["civil_numerator"]), int(row["civil_denominator"])
+    )
+    assert projected.civil_point.known_point() is None
+    assert (
+        "excluded_before" not in projected.model_dump(exclude_unset=True)["civil_point"]
+    )
+    with pytest.raises(ValidationError, match="微秒格点上包"):
+        BirthTimeEvent.model_validate({**record, "upper_utc": floor.isoformat()})

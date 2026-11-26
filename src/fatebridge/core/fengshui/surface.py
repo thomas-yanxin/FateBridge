@@ -4,21 +4,19 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, cast
+from typing import Any, Dict, cast
 
-from .surface_inputs import PLANT_REPRESENTATIONS, SurfaceItem
-
-if TYPE_CHECKING:
-    from .models import AssessRequest
+from fatebridge.core.fengshui.models import AssessRequest
+from fatebridge.core.fengshui.surface_inputs import PLANT_REPRESENTATIONS, SurfaceItem
 
 
 @lru_cache(maxsize=1)
-def _data() -> Dict[str, Any]:
+def _data() -> dict[str, Any]:
     path = Path(__file__).parents[2] / "data/fengshui/desktop-bagua-v1.json"
     return cast(Dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
-def surface_provenance() -> Dict[str, Any]:
+def surface_provenance() -> dict[str, Any]:
     data = _data()
     rule = cast(Dict[str, Any], deepcopy(data["ruleset"]))
     rule["sources"] = [
@@ -30,16 +28,16 @@ def surface_provenance() -> Dict[str, Any]:
 
 
 def summarize_analysis_progress(
-    missing: List[str],
-    counts: Dict[str, int],
-    actions: List[Dict[str, Any]],
-    pending: List[Dict[str, Any]],
+    missing: list[str],
+    counts: dict[str, int],
+    actions: list[dict[str, Any]],
+    pending: list[dict[str, Any]],
     *,
     count_unit: str,
     limited: bool = False,
     conditional_basis_count: int = 0,
     reference_basis_count: int = 0,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Separate review completeness from whether a candidate can be executed.
 
     Counts describe supplied items/checks and candidate actions, never the number
@@ -133,18 +131,18 @@ def summarize_analysis_progress(
     }
 
 
-def evaluate_surfaces(req: "AssessRequest") -> Dict[str, Any]:
-    findings: List[Dict[str, Any]] = []
-    missing: List[str] = []
+def evaluate_surfaces(req: AssessRequest) -> dict[str, Any]:
+    findings: list[dict[str, Any]] = []
+    missing: list[str] = []
     constraints = {c.object_id: c for c in req.surface_constraints}
-    uncovered: List[str] = []
+    uncovered: list[str] = []
     counts = dict(supported=0, confirmed_unsupported=0, unknown=0)
-    all_actions: List[Dict[str, Any]] = []
-    pending: List[Dict[str, Any]] = []
+    all_actions: list[dict[str, Any]] = []
+    pending: list[dict[str, Any]] = []
     for surface in req.surface_layouts:
         constraint = constraints.get(surface.object_id)
-        options: List[Dict[str, Any]] = []
-        item_findings: List[Dict[str, Any]] = []
+        options: list[dict[str, Any]] = []
+        item_findings: list[dict[str, Any]] = []
         selected = [e for e in _data()["entries"] if surface.goal in e["goals"]]
         if surface.observation_basis == "image_observed":
             missing.append(
@@ -226,7 +224,7 @@ def evaluate_surfaces(req: "AssessRequest") -> Dict[str, Any]:
             ]
             # No matching object is an explicit optional representation, not an
             # instruction to purchase or to reclassify an unrelated possession.
-            candidates: List[Optional[SurfaceItem]] = list(items) if items else [None]
+            candidates: list[SurfaceItem | None] = list(items) if items else [None]
             for item in candidates:
                 retain = (
                     item is not None
@@ -292,7 +290,7 @@ def evaluate_surfaces(req: "AssessRequest") -> Dict[str, Any]:
                     )
                 )
                 action_id = f"surface-{len(all_actions) + len(options)}"
-                action_pending: List[Dict[str, Any]] = []
+                action_pending: list[dict[str, Any]] = []
 
                 def need(path: str, reason: str) -> None:
                     action_pending.append(

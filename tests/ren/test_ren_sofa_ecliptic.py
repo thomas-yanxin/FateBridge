@@ -15,7 +15,7 @@ AUDIT = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(AUDIT)
 
 
-def test_same_113_anchors_and_independent_frame_transforms_keep_scope():
+def test_same_113_anchors_and_independent_frame_transforms_keep_scope() -> None:
     ref = AUDIT.reference()
     assert len(ref["reference"]["records"]) == 113
     assert {r["label_time_scale"] for r in ref["reference"]["records"]} == {
@@ -30,7 +30,7 @@ def test_same_113_anchors_and_independent_frame_transforms_keep_scope():
     assert ref["protocol"]["transform"]["apply_observed_eop"] is False
 
 
-def test_actual_default_coordinates_match_the_transformed_directions_only():
+def test_actual_default_coordinates_match_the_transformed_directions_only() -> None:
     result = AUDIT.audit()
     assert result["expected_count"] == result["compared_count"] == 113
     assert (
@@ -61,7 +61,7 @@ def test_actual_default_coordinates_match_the_transformed_directions_only():
 
 
 @pytest.mark.parametrize("change", ["edit", "missing", "extra"])
-def test_frozen_reference_inventory_is_complete(tmp_path, change):
+def test_frozen_reference_inventory_is_complete(tmp_path: Path, change: str) -> None:
     corpus = tmp_path / "corpus"
     shutil.copytree(AUDIT.CORPUS, corpus)
     path = corpus / "reference.json"
@@ -75,7 +75,7 @@ def test_frozen_reference_inventory_is_complete(tmp_path, change):
         AUDIT.reference(corpus)
 
 
-def test_fallback_model_is_reported_without_relabelling_it_swiss():
+def test_fallback_model_is_reported_without_relabelling_it_swiss() -> None:
     from tests.support.ephemeris_context import empty_ephemeris_path
 
     with empty_ephemeris_path():

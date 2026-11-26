@@ -1,6 +1,7 @@
 """Chapter variants stay explicit; neither labels nor outcomes choose a rule."""
 
 import json
+import shutil
 from copy import deepcopy
 from itertools import product
 from pathlib import Path
@@ -13,21 +14,21 @@ from fatebridge.core.metaphysics.qimen import (
     _qimen_pan_earth,
     _qimen_zhifu_zhishi,
 )
-from fatebridge.core.qimen_profiles import (
+from fatebridge.core.qimen.qimen_profiles import (
     GOD_PROFILES,
     SEASON_PROFILES,
     describe_profiles,
     star_season_state,
 )
 from fatebridge.services.divination import calculate_sanshiunited_analysis
-from fatebridge.validation.qimen import audit_chapter_profiles
-from tests.qimen.test_qimen_depth import fixed_board, seed
+from tests.unit_test.fixtures.qimen import fixed_board, seed
+from validation.qimen import audit_chapter_profiles
 
 BUNDLE = Path(__file__).parents[1] / "fixtures/qimen_classical_v4"
 REFERENCE = json.loads((BUNDLE / "sources-and-profiles.json").read_text())
 
 
-def test_frozen_chapter_audit_keeps_coverage_separate_from_whole_book():
+def test_frozen_chapter_audit_keeps_coverage_separate_from_whole_book() -> None:
     report = audit_chapter_profiles(BUNDLE)
     assert report["god_diagram_cases"] == 4
     assert report["god_palace_observations"] == 32
@@ -40,7 +41,7 @@ def test_frozen_chapter_audit_keeps_coverage_separate_from_whole_book():
 
 
 @pytest.mark.parametrize("case", REFERENCE["god_diagrams"], ids=lambda c: c["id"])
-def test_four_scanned_god_circles_including_both_centre_hosts(case):
+def test_four_scanned_god_circles_including_both_centre_hosts(case) -> None:
     earth = _qimen_pan_earth(f'{case["dun"]}{"一二三四五六七八九"[case["ju"]-1]}局上元')
     leader = _qimen_zhifu_zhishi(case["hour"], earth, dun_type=case["dun"])
     palaces = _qimen_build_palaces(
@@ -58,7 +59,7 @@ def test_four_scanned_god_circles_including_both_centre_hosts(case):
 @pytest.mark.parametrize("dun,number", list(product(["阳遁", "阴遁"], range(1, 10))))
 def test_label_profile_preserves_every_star_door_stem_and_slot_in_1080_boards(
     dun, number
-):
+) -> None:
     for index in range(60):
         hour = (
             "甲乙丙丁戊己庚辛壬癸"[index % 10] + "子丑寅卯辰巳午未申酉戌亥"[index % 12]
@@ -77,13 +78,17 @@ def test_label_profile_preserves_every_star_door_stem_and_slot_in_1080_boards(
                     ("白虎", "勾陈"),
                     ("玄武", "朱雀"),
                 ]
+            else:
+                pass
         assert sorted(
             p["god_sequence_index"] for p in diagrams if p["trigram"] != "中"
         ) == list(range(8))
 
 
 @pytest.mark.parametrize("profile", SEASON_PROFILES)
-def test_season_definition_and_god_roles_follow_actual_profile(monkeypatch, profile):
+def test_season_definition_and_god_roles_follow_actual_profile(
+    monkeypatch: pytest.MonkeyPatch, profile
+) -> None:
     b = fixed_board(
         monkeypatch,
         {"dun": "阳遁", "ju": 1, "hour": "甲子"},
@@ -109,11 +114,12 @@ def test_season_definition_and_god_roles_follow_actual_profile(monkeypatch, prof
             meaning = palace["evidence"]["god_interpretation"]
             assert meaning["interpretation_status"] == "name_only_not_equated"
             assert meaning["outcome_inferred"] is False
+        else:
+            pass
     assert b["assessment"]["classical_conformance"] == "partial_excerpt"
-    assert b["assessment"]["real_world_efficacy"] == "not_tested"
 
 
-def test_verse_table_and_prose_differences_are_retained_instead_of_normalized():
+def test_verse_table_and_prose_differences_are_retained_instead_of_normalized() -> None:
     assert [star_season_state("水", "水", p) for p in SEASON_PROFILES] == [
         "相",
         "旺",
@@ -137,8 +143,8 @@ def test_verse_table_and_prose_differences_are_retained_instead_of_normalized():
 
 
 def test_default_profile_keeps_qualifications_and_cannot_mutate_global_definition(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     b = fixed_board(monkeypatch, {"dun": "阴遁", "ju": 5, "hour": "甲子"})
     assert b["god_profile"] == "yanyi_text"
     assert b["season_profile"] == "yanyi_vol1_verse"
@@ -150,6 +156,8 @@ def test_default_profile_keeps_qualifications_and_cannot_mutate_global_definitio
             meaning = palace["evidence"]["god_interpretation"]
             assert meaning["qualification_evaluated"] is False
             assert "得奇门会合" in meaning["source_qualification"]
+        else:
+            pass
     original = deepcopy(GOD_PROFILES)
     described = describe_profiles(b["god_profile"], b["season_profile"])
     described["god"]["sequence"][0] = "changed"
@@ -158,12 +166,12 @@ def test_default_profile_keeps_qualifications_and_cannot_mutate_global_definitio
 
 @pytest.mark.parametrize("name", ["god_profile", "season_profile"])
 @pytest.mark.parametrize("value", [None, {}, [], 1, True, "automatic_best"])
-def test_invalid_profile_has_a_clear_validation_error(name, value):
+def test_invalid_profile_has_a_clear_validation_error(name: str, value) -> None:
     with pytest.raises(ValueError, match=name):
         build_qimen_with_options(seed(), {name: value})
 
 
-def test_sanshi_passes_source_profiles_into_qimen_and_readable_snapshot():
+def test_sanshi_passes_source_profiles_into_qimen_and_readable_snapshot() -> None:
     result = calculate_sanshiunited_analysis(
         date="2026-01-19",
         time="23:00",
@@ -176,7 +184,6 @@ def test_sanshi_passes_source_profiles_into_qimen_and_readable_snapshot():
     )
     assert "error" not in result, result
     assert result["qimen"]["god_profile"] == "yanyi_diagrams"
-    assert result["subresults"]["qimen"]["pan"] == result["qimen"]
     assert "卷四圆图八神（yanyi_diagrams）" in result["snapshot_text"]
     assert "卷三九星旺衰正文（yanyi_vol3_prose）" in result["snapshot_text"]
 
@@ -184,8 +191,9 @@ def test_sanshi_passes_source_profiles_into_qimen_and_readable_snapshot():
 @pytest.mark.parametrize(
     "change", ["pdf", "diagram", "missing_diagram", "missing_month"]
 )
-def test_source_audit_refuses_corrupt_or_reduced_reference(tmp_path, change):
-    import shutil
+def test_source_audit_refuses_corrupt_or_reduced_reference(
+    tmp_path: Path, change: str
+) -> None:
 
     shutil.copytree(BUNDLE, tmp_path / "qimen_classical_v4")
     shutil.copytree(

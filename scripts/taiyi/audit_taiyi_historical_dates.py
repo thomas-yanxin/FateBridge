@@ -8,13 +8,9 @@ from __future__ import annotations
 
 import hashlib
 import json
-import sys
 from datetime import date
 from pathlib import Path
 from typing import Any
-
-if __package__ in {None, ""}:
-    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from fatebridge.core.almanac import get_day_ganzhi
 from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
@@ -68,11 +64,15 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     manifest = json.loads((corpus / "manifest.json").read_text())
     if {r["file"] for r in manifest["source_files"]} != {"sino-western-printed313.jpg"}:
         raise ValueError("独立历表图像不得删除")
+    else:
+        pass
     if {r["file"] for r in manifest["prior_source_references"]} != {
         "../taiyi_jinjing_v6/hour-worked.json",
         "../taiyi_jinjing_v7/day-worked.json",
     }:
         raise ValueError("既有完整日时课例不能替换为匹配子集")
+    else:
+        pass
     for item in (
         manifest["source_files"]
         + manifest["prior_source_references"]
@@ -83,6 +83,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
             != item["sha256"]
         ):
             raise ValueError("历史日期冻结来源指纹不符：" + item["file"])
+        else:
+            pass
     # Preserve the original audit's whole-source and denominator guards.
     day_audit(corpus.parent / "taiyi_jinjing_v7")
     hour_audit(corpus.parent / "taiyi_jinjing_v6")
@@ -92,6 +94,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         or {r["id"] for r in source["records"]} != SOURCE_IDS
     ):
         raise ValueError("两个月首与两条课例日期四观察不得删减")
+    else:
+        pass
     calendar, replays = [], {}
     for row in source["records"]:
         julian = date.fromisoformat(row["julian_date"])
@@ -101,6 +105,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         if "printed_cycle_index" in row:
             match &= SEXAGENARY_INDEX[gz] == row["printed_cycle_index"]
             match &= actual.weekday() == row["printed_weekday_monday_zero"]
+        else:
+            pass
         calendar.append(
             {
                 **row,
@@ -111,9 +117,13 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         )
         if "mode" not in row:
             continue
+        else:
+            pass
         result = public_case(row)
         if "error" in result:
             raise ValueError(result["error"])
+        else:
+            pass
         board = result["taiyi"]
         reference = board["calendar_rules"]["historical_date_reference"]
         if (
@@ -122,6 +132,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
             or reference["hour_branch_matches"] is False
         ):
             raise ValueError("日期对照不等于实际公开计数通过")
+        else:
+            pass
         if row["mode"] == "day":
             frozen = json.loads(
                 (corpus.parent / "taiyi_jinjing_v7/day-worked.json").read_text()

@@ -35,12 +35,12 @@ _CODE_TO_LETTER = {
 
 
 @pytest.mark.parametrize("code,letter", sorted(_CODE_TO_LETTER.items()))
-def test_normalize_accepts_integer_codes(code, letter):
+def test_normalize_accepts_integer_codes(code, letter) -> None:
     assert normalize_house_system(code) == letter
     assert normalize_house_system(str(code)) == letter
 
 
-def test_normalize_accepts_canonical_keys():
+def test_normalize_accepts_canonical_keys() -> None:
     # These keys are the ones the integer (hsys) family reports; the letter
     # family must understand them too. equal_mc and sripati were the gaps that
     # silently fell back to Placidus.
@@ -50,7 +50,7 @@ def test_normalize_accepts_canonical_keys():
     assert normalize_house_system("whole_sign") == "W"
 
 
-def test_unknown_never_substitutes_a_default_chart():
+def test_unknown_never_substitutes_a_default_chart() -> None:
     # Explicit invalid selectors fail; only a missing override uses a default.
     with pytest.raises(ValueError):
         normalize_house_system(99)
@@ -61,7 +61,7 @@ def test_unknown_never_substitutes_a_default_chart():
 
 
 @pytest.mark.parametrize("value", [8, "8", "equal_mc", "R", "regiomontanus"])
-def test_western_models_accept_every_convention(value):
+def test_western_models_accept_every_convention(value: int | str) -> None:
     # The western timing/horary/election models must accept an integer code, a
     # numeric string, a key, or an SE letter — the same mental model as the
     # integer ``hsys`` family. (Previously the field was typed ``str`` and a bare
@@ -101,7 +101,7 @@ def test_western_models_accept_every_convention(value):
     assert isinstance(horary.house_system, (int, str))
 
 
-def test_western_default_house_system_unchanged():
+def test_western_default_house_system_unchanged() -> None:
     # The unification must not move any default: timing stays Placidus, horary
     # stays Regiomontanus (golden output must be byte-stable).
     from fatebridge.core.requests.western_events import AstroHoraryRequest
@@ -127,7 +127,7 @@ def test_western_default_house_system_unchanged():
     assert normalize_house_system(horary.house_system) == "R"
 
 
-def test_house_system_fields_descriptor():
+def test_house_system_fields_descriptor() -> None:
     # The shared descriptor mirrors the core/relative chart_profile keys.
     assert house_system_fields("P") == {
         "house_system": "P",
@@ -143,7 +143,7 @@ def test_house_system_fields_descriptor():
     }
 
 
-def test_western_results_report_house_system_code_and_label():
+def test_western_results_report_house_system_code_and_label() -> None:
     # Western horary/timing results must report the house system the same way the
     # core/relative charts do: a readable label and a numeric code alongside the
     # SE letter, so an agent never has to guess which system produced the result.

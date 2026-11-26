@@ -11,7 +11,7 @@ from __future__ import annotations
 import math
 from fractions import Fraction
 from itertools import combinations, combinations_with_replacement
-from typing import Any, Dict, Mapping
+from typing import Any, Mapping
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.angle_definitions import (
@@ -19,12 +19,16 @@ from fatebridge.core.astro.angle_definitions import (
     native_ecliptic_horizon_angle_definition,
 )
 from fatebridge.core.astro.birth import AstroBirthInfo
+from fatebridge.core.astro.earth_attitude import physical_equator
 from fatebridge.core.astro.fictitious_elements import fictitious_element_source
+from fatebridge.core.astro.house_axes import canonical_house_axes
+from fatebridge.core.astro.iers_ut1 import active_ut1
 from fatebridge.core.astro.meridian_houses import (
     native_meridian_houses,
     unavailable_meridian_houses,
 )
 from fatebridge.core.astro.meridian_placement import attach_factor_placement
+from fatebridge.core.astro.physical_epoch import PhysicalEpoch
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.core.astro.profiles import native_factor_model
 from fatebridge.core.astro.reference import PHYSICAL_BODIES
@@ -37,9 +41,9 @@ from fatebridge.core.astro.sensitive import (
     original_example_reading,
     sensitive_equivalence,
 )
-from fatebridge.core.astro.time_scales import ephemeris_time
+from fatebridge.core.astro.terrestrial_observer import terrestrial_frame
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
-from fatebridge.utils.errors import EphemerisSourceError
+from fatebridge.utils.errors import EphemerisCalculationError, EphemerisSourceError
 
 RULESET = "hamburg_midpoint_geometry_v3"
 HYPOTHETICAL_BODIES = (
@@ -52,7 +56,7 @@ HYPOTHETICAL_BODIES = (
     "Vulkanus",
     "Poseidon",
 )
-SOURCES: list[Dict[str, Any]] = [
+SOURCES: list[dict[str, Any]] = [
     SENSITIVE_SOURCE,
     {
         "id": "rudolph_1979_17laws",
@@ -96,7 +100,7 @@ def _angle(value: float) -> Fraction:
     return Fraction(value) % 360
 
 
-def midpoint_axis(first: float, second: float) -> Dict[str, Any]:
+def midpoint_axis(first: float, second: float) -> dict[str, Any]:
     """The unordered pair of diametrically opposite midpoints.
 
     A 180-degree pair has no unique shorter-arc midpoint. Its symmetry axis is
@@ -119,7 +123,7 @@ def _residual(first: Fraction, second: Fraction, period: int) -> Fraction:
 
 def midpoint_geometry(
     longitudes: Mapping[str, float], *, orb_degrees: float = 1.0
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Both dial geometries; fixed, inclusive one-degree policy by default.
 
     Two-factor contacts use each unordered pair once per dial. Three-factor
@@ -146,7 +150,7 @@ def midpoint_geometry(
             }
         )
     orb = Fraction(orb_degrees)
-    dials: Dict[str, Dict[str, Any]] = {}
+    dials: dict[str, dict[str, Any]] = {}
     for period in (90, 45):
         doubles, triples, quadruples = [], [], []
         for a, b in combinations(sorted(points), 2):
@@ -253,14 +257,16 @@ def _native_factors(
     *,
     include_hypothetical: bool = True,
     include_meridian_houses: bool = False,
-) -> Dict[str, Any]:
+    epoch: PhysicalEpoch | None = None,
+) -> dict[str, Any]:
     swe = runtime.swe
     if swe is None:
         raise ValueError("Native midpoint factors require Swiss Ephemeris")
-    times = ephemeris_time(birth.require_utc_datetime)
-    if times.jd_tt is None:
+    times = epoch.time if epoch is not None else birth.time_scales
+    tt = times.tt
+    if tt is None:
         raise ValueError("Native midpoint factors require dynamical TT")
-    jd_tt, jd_ut1 = times.jd_tt, times.jd_ut1
+    jd_tt, jd_ut1 = tt.as_float(), times.ut1
     factors = []
     meridian_inputs = []
     models = set()
@@ -291,7 +297,12 @@ def _native_factors(
                     else getattr(swe, name.upper())
                 )
             )
-            coords, flag = runtime.ephemeris_call("calc", jd_tt, body_id, flags)
+            try:
+                coords, flag = runtime.ephemeris_call("calc", jd_tt, body_id, flags)
+            except swe.Error as error:
+                raise EphemerisCalculationError(
+                    "Native ephemeris factor calculation failed"
+                ) from error
             if flag < 0 or not math.isfinite(coords[0]):
                 raise ValueError(
                     f"Swiss Ephemeris cannot calculate midpoint factor {name}"
@@ -361,13 +372,34 @@ def _native_factors(
             birth.longitude,
             reference_house_code,
             reference_house_flags,
-            _julian_day_tt=jd_tt,
+            _julian_day_tt=tt,
         )
-        angle_definition = geographic_pole_angle_definition(birth.latitude) or (
+        angles, _ = canonical_house_axes(
+            julian_day_ut1=jd_ut1,
+            julian_day_tt=tt,
+            latitude=birth.latitude,
+            longitude=birth.longitude,
+            house_code=reference_house_code,
+            native_angles=angles,
+            flags=reference_house_flags,
+        )
+        pole_frame = (
+            terrestrial_frame(
+                physical_equator(runtime.swe, jd_ut1, julian_day_tt=tt),
+                longitude=birth.longitude,
+                latitude=birth.latitude,
+            )
+            if abs(birth.latitude) == 90 and active_ut1.get() is not None
+            else None
+        )
+        angle_definition = geographic_pole_angle_definition(
+            birth.latitude, frame=pole_frame
+        ) or (
             native_ecliptic_horizon_angle_definition(
                 julian_day_ut1=jd_ut1,
-                julian_day_tt=jd_tt,
+                julian_day_tt=tt,
                 latitude=birth.latitude,
+                longitude=birth.longitude,
                 armc=float(angles[2]),
             )
         )
@@ -405,7 +437,7 @@ def _native_factors(
         meridian = (
             native_meridian_houses(
                 julian_day_ut1=jd_ut1,
-                julian_day_tt=jd_tt,
+                julian_day_tt=tt,
                 latitude=birth.latitude,
                 longitude=birth.longitude,
                 sidereal=sidereal,
@@ -434,7 +466,7 @@ def _native_factors(
         "ephemeris_models": sorted(models),
         "ephemeris_model_scope": "physical_bodies",
         "julian_day_tt": jd_tt,
-        "julian_day_ut1": jd_ut1,
+        "julian_day_ut1": jd_ut1.as_float(),
         "julian_day_utc": times.jd_utc,
         "time_scale_method": times.method,
         "future_leap_seconds_assumed_unchanged": times.future_leap_seconds_assumed_unchanged,
@@ -446,8 +478,8 @@ def _native_factors(
 
 
 def build_midpoint_analysis(
-    birth: AstroBirthInfo, base: Dict[str, Any]
-) -> Dict[str, Any]:
+    birth: AstroBirthInfo, base: dict[str, Any]
+) -> dict[str, Any]:
     """A native geometry layer beside the retained seven-planet legacy view."""
     sidereal = base["chart_profile"]["zodiac"] == "sidereal"
     if runtime.swe is None:
@@ -497,7 +529,7 @@ def build_midpoint_analysis(
         "profile": {
             "zodiac": "sidereal_lahiri" if sidereal else "tropical",
             "calendar": "proleptic_gregorian",
-            "time_scale": "shared ephemeris_time: TT for factors, estimated UT1 for angles; future leap assumption reported",
+            "time_scale": "shared birth time scales: TT for factors, selected UT1 for angles; retained solar solution and future leap assumption reported",
             "orb_degrees": 1.0,
             "orb_policy": "inclusive; implementation choice, not a unique original rule",
             "coordinate_rounding_before_comparison": False,

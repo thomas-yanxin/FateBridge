@@ -18,7 +18,7 @@ def text(q):
         return format(Decimal(q.numerator) / Decimal(q.denominator), ".40f")
 
 
-def test_exact_affine_contractor_proves_an_interior_root():
+def test_exact_affine_contractor_proves_an_interior_root() -> None:
     step = krawczyk_step(
         [I(-1, 1), I(-1, 1)],
         [[-1, 0], [0, 1]],
@@ -33,7 +33,7 @@ def test_exact_affine_contractor_proves_an_interior_root():
     ]
 
 
-def test_affine_root_outside_search_is_not_a_global_nonexistence_claim():
+def test_affine_root_outside_search_is_not_a_global_nonexistence_claim() -> None:
     step = krawczyk_step(
         [I(-1, 1), I(-1, 1)],
         [[-1, 0], [0, 1]],
@@ -44,7 +44,7 @@ def test_affine_root_outside_search_is_not_a_global_nonexistence_claim():
     assert not step["strict_image_interior"]
 
 
-def test_singular_map_is_not_promoted_by_a_small_residual():
+def test_singular_map_is_not_promoted_by_a_small_residual() -> None:
     step = krawczyk_step(
         [I(-1, 1), I(-1, 1)], [[0, 0], [0, 0]], [[I(), I()], [I(), I()]], [I(), I()]
     )
@@ -72,6 +72,8 @@ def analytic(
                     A(),
                     A(),
                 ]
+            else:
+                pass
             return [
                 A(),
                 (u + epsilon * u * u) / 86400,
@@ -92,6 +94,8 @@ def analytic(
                 Q(0),
                 Q(0),
             ]
+        else:
+            pass
         return [
             Q(0),
             (u + epsilon * u * u) / 86400,
@@ -144,8 +148,8 @@ def analytic(
 
 @pytest.mark.parametrize("epsilon", [Q(0), Q(1, 10)])
 def test_known_linear_and_nonlinear_roots_are_inside_proved_source_enclosures(
-    monkeypatch, epsilon
-):
+    monkeypatch: pytest.MonkeyPatch, epsilon
+) -> None:
     result = analytic(monkeypatch, epsilon)
     assert (
         result["status"] == "enclosed"
@@ -161,7 +165,9 @@ def test_known_linear_and_nonlinear_roots_are_inside_proved_source_enclosures(
     assert result["continuous_Newtonian_LT_vector_model_not_refuted"] is False
 
 
-def test_selected_two_equations_cannot_hide_an_unused_component_failure(monkeypatch):
+def test_selected_two_equations_cannot_hide_an_unused_component_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     result = analytic(monkeypatch, wrong_third=True)
     assert result["selected_equations_parametric_unique_root_proved"]
     assert result["source_position_components_compatible"] == [True, True, False]
@@ -172,26 +178,34 @@ def test_selected_two_equations_cannot_hide_an_unused_component_failure(monkeypa
     )
 
 
-def test_parallel_source_velocities_remain_conditioning_unknown(monkeypatch):
+def test_parallel_source_velocities_remain_conditioning_unknown(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     result = analytic(monkeypatch, parallel=True)
     assert result["status"] == "conditioning_unknown" and result["history"] == []
     assert not result["selected_equations_parametric_unique_root_proved"]
 
 
-def test_boundary_root_is_not_given_a_strict_interior_certificate(monkeypatch):
+def test_boundary_root_is_not_given_a_strict_interior_certificate(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     result = analytic(monkeypatch, reception_root=Q(1))
     assert result["status"] == "enclosed"
     assert not result["selected_equations_parametric_unique_root_proved"]
 
 
-def test_outside_root_keeps_frozen_support_and_failure(monkeypatch):
+def test_outside_root_keeps_frozen_support_and_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     result = analytic(monkeypatch, reception_root=Q(2))
     assert result["status"] == "no_source_root_in_frozen_support"
     assert result["history"][-1]["empty_intersection"]
     assert not result["selected_equations_parametric_unique_root_proved"]
 
 
-def test_nested_enclosures_may_add_a_refutation_without_changing_old_predicate():
+def test_nested_enclosures_may_add_a_refutation_without_changing_old_predicate() -> (
+    None
+):
     witness = []
     assert (
         predicate_layers(
@@ -213,7 +227,7 @@ def test_nested_enclosures_may_add_a_refutation_without_changing_old_predicate()
     ]
 
 
-def test_refinement_cannot_turn_an_original_refutation_into_agreement():
+def test_refinement_cannot_turn_an_original_refutation_into_agreement() -> None:
     witness = []
     assert (
         predicate_layers(
@@ -229,13 +243,13 @@ def test_refinement_cannot_turn_an_original_refutation_into_agreement():
     assert not witness
 
 
-def test_misreported_original_interval_predicate_is_rejected():
+def test_misreported_original_interval_predicate_is_rejected() -> None:
     with pytest.raises(ValueError, match="predicate changed"):
         predicate_layers(
             "x", True, ["-1", "-1/2"], (Q(-9, 10), Q(-6, 10)), (Q(0), Q(1, 10)), []
         )
 
 
-def test_independent_refinement_must_be_inside_the_original_source_enclosure():
+def test_independent_refinement_must_be_inside_the_original_source_enclosure() -> None:
     with pytest.raises(ValueError, match="not covered"):
         predicate_layers("x", True, ["-1", "1"], (Q(2), Q(3)), (Q(0), Q(1, 10)), [])

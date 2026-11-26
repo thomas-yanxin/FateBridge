@@ -2,25 +2,27 @@
 
 import hashlib
 import json
-from copy import deepcopy
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
-from fatebridge.core.liuyao_metal_change import PROFILE as OWN_PROFILE
-from fatebridge.core.liuyao_metal_moving import PROFILE, moving_support_context
+from fatebridge.core.contracts.output_liuyao_growth import (
+    GrowthLine,
+    MetalMovingSupport,
+)
+from fatebridge.core.contracts.output_liuyao_hidden import HiddenReception
+from fatebridge.core.liuyao.liuyao_metal_change import PROFILE as OWN_PROFILE
+from fatebridge.core.liuyao.liuyao_metal_moving import PROFILE, moving_support_context
 from scripts.liuyao.build_profile import build_profile
-from tests.liuyao.test_liuyao_conditions import conditional_case
+from tests.unit_test.fixtures.liuyao import (
+    conditional_case,
+    cyclic_support_case,
+    read_condition_path,
+)
 
 BASE = Path(__file__).parents[1] / "fixtures/liuyao_metal_moving_v34"
 CASES = json.loads((BASE / "cases.json").read_text())["cases"]
-
-
-def read_path(result, path):
-    value = {"liuyao_evidence": {"conditional_analysis": result}}
-    for part in path.split("."):
-        value = value[int(part)] if isinstance(value, list) else value[part]
-    return value
 
 
 def check(result, case):
@@ -69,6 +71,8 @@ def check(result, case):
         assert outer["ruleset_version"] == "18.0.0"
     if "expected_target_reception" in case:
         assert pair["target_reception_condition"] is case["expected_target_reception"]
+    else:
+        pass
     if "expected_target_source" in case:
         if adjudication is not None:
             assert (
@@ -81,6 +85,8 @@ def check(result, case):
             assert any(a["location"] == "month" for a in g["other_oppositions"])
         else:
             assert target["condition_match"] is case["expected_target_source"]
+    else:
+        pass
     if case["expected_growth"] is True:
         assert not g["day_control_in_calendar_oppositions"]
         proof = g["moving_support"]
@@ -96,10 +102,12 @@ def check(result, case):
             )
             for step in candidate["root_proof"]:
                 assert step["position"] != 6 and step.get("source_position") != 6
-                actor = read_path(result, step["source_path"])
+                actor = read_condition_path(result, step["source_path"])
                 assert actor["branch"] == step["branch"]
         if case.get("retained_month_control"):
             assert any(x["location"] == "month" for x in g["other_oppositions"])
+        else:
+            pass
         if case.get("target_own_back_control"):
             if adjudication is not None:
                 assert not any(
@@ -107,16 +115,20 @@ def check(result, case):
                 )
             else:
                 assert any(x["location"] == "changed" for x in g["other_oppositions"])
+        else:
+            pass
         if case.get("target_month_break"):
             assert result["lines"][5]["monthly_strength"]["category"] == "月破"
             assert any(x["location"] == "month" for x in g["other_oppositions"])
+        else:
+            pass
     else:
         assert g["day_control_in_calendar_oppositions"] is True
     assert all("_metal_si_moving_support" not in x for x in result["lines"])
     return g
 
 
-def test_original_book_profile_and_preregistered_inputs():
+def test_original_book_profile_and_preregistered_inputs() -> None:
     assert build_profile("metal_moving") == PROFILE
     frozen = json.loads((BASE / "freeze.json").read_text())["files_sha256"]
     for name, h in frozen.items():
@@ -125,68 +137,17 @@ def test_original_book_profile_and_preregistered_inputs():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_moving_earth_source_and_receiver_remain_separate(case):
+def test_moving_earth_source_and_receiver_remain_separate(case) -> None:
     check(conditional_case(case), case)
-
-
-def cycle(anchors=None):
-    # Adversarial DTO graph, not six legally mounted lines or extra chart cases.
-    elements = ["土", "火", "木", "水", "金", "金"]
-    branches = ["戌", "午", "寅", "子", "申", "酉"]
-    lines = [
-        dict(position=i + 1, element=e, branch=b, change=i < 5)
-        for i, (e, b) in enumerate(zip(elements, branches))
-    ]
-    parent = {1: 2, 2: 3, 3: 4, 4: 5, 5: 1}
-    rows = []
-    for p in range(1, 7):
-        supports = []
-        if p in parent:
-            q = parent[p]
-            supports.append(
-                dict(
-                    location="visible",
-                    position=q,
-                    branch=branches[q - 1],
-                    source_grounded=True,
-                    held=False,
-                    activity_pending=False,
-                )
-            )
-        supports += deepcopy((anchors or {}).get(p, []))
-        rows.append(dict(position=p, strength=dict(supports=supports)))
-    generation = dict(
-        sources=[
-            dict(
-                position=i + 1,
-                branch=b,
-                condition_match=True,
-                activity_condition_match=i < 5,
-                source_path=f"sources.{i}",
-            )
-            for i, b in enumerate(branches)
-        ],
-        generations=[
-            dict(source_position=q, target_position=p, benefit_now=True)
-            for p, q in parent.items()
-        ],
-    )
-    return dict(
-        element="金",
-        subject_position=6,
-        lines=lines,
-        assessment=dict(lines=rows),
-        generation=generation,
-        day_ganzhi="乙巳",
-        source_path="growth.moving_support",
-    )
 
 
 @pytest.mark.parametrize(
     "anchor",
     ["none", "other_metal_si", "queried_metal", "earth_si", "earth_changed_si"],
 )
-def test_source_true_or_cycle_cannot_prove_its_own_independent_root(anchor):
+def test_source_true_or_cycle_cannot_prove_its_own_independent_root(
+    anchor: str,
+) -> None:
     anchors = {
         "none": {},
         "other_metal_si": {5: [dict(location="day", branch="巳")]},
@@ -196,14 +157,14 @@ def test_source_true_or_cycle_cannot_prove_its_own_independent_root(anchor):
             1: [dict(location="changed", branch="巳", back_generation_condition=True)]
         },
     }
-    result = moving_support_context(**cycle(anchors[anchor]))
+    result = moving_support_context(**cyclic_support_case(anchors[anchor]))
     assert result["condition_match"] is False
     assert result["candidates"][0]["source_condition_match"] is True
     assert result["candidates"][0]["independent_root_proven"] is False
 
 
 @pytest.mark.parametrize("anchor", ["month_wood", "day_fire", "qualified_own_back"])
-def test_independent_anchor_resolves_a_real_dependency_path(anchor):
+def test_independent_anchor_resolves_a_real_dependency_path(anchor: str) -> None:
     anchors = {
         "month_wood": {3: [dict(location="month", branch="亥")]},
         "day_fire": {2: [dict(location="day", branch="巳")]},
@@ -211,7 +172,7 @@ def test_independent_anchor_resolves_a_real_dependency_path(anchor):
             1: [dict(location="changed", branch="午", back_generation_condition=True)]
         },
     }
-    result = moving_support_context(**cycle(anchors[anchor]))
+    result = moving_support_context(**cyclic_support_case(anchors[anchor]))
     assert result["condition_match"] is True
     proof = result["candidates"][0]["root_proof"]
     assert proof[0]["location"] in ("day", "month", "changed")
@@ -219,8 +180,8 @@ def test_independent_anchor_resolves_a_real_dependency_path(anchor):
     assert all(x["position"] != 6 and x.get("source_position") != 6 for x in proof)
 
 
-def test_hidden_subject_does_not_borrow_a_different_visible_subject_identity():
-    args = cycle({6: [dict(location="month", branch="丑")]})
+def test_hidden_subject_does_not_borrow_a_different_visible_subject_identity() -> None:
+    args = cyclic_support_case({6: [dict(location="month", branch="丑")]})
     args["subject_position"] = None
     # The added metal has no declared supporting edge to the cycle.
     result = moving_support_context(**args)
@@ -228,19 +189,14 @@ def test_hidden_subject_does_not_borrow_a_different_visible_subject_identity():
     assert result["condition_match"] is False
 
 
-def test_partial_output_accepts_only_the_new_proof_object():
-    from fatebridge.core.output_liuyao_growth import GrowthLine
-    from fatebridge.core.output_liuyao_hidden import HiddenReception
+def test_partial_output_accepts_only_the_new_proof_object() -> None:
 
     for model in (GrowthLine, HiddenReception):
         value = model.model_validate({"moving_support": {"condition_match": True}})
         assert value.moving_support.condition_match is True
 
 
-def test_output_rejects_a_boolean_in_place_of_root_steps():
-    from pydantic import ValidationError
-
-    from fatebridge.core.output_liuyao_growth import MetalMovingSupport
+def test_output_rejects_a_boolean_in_place_of_root_steps() -> None:
 
     with pytest.raises(ValidationError):
         MetalMovingSupport.model_validate({"candidates": [{"root_proof": False}]})

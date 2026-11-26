@@ -10,12 +10,14 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.astro.sensitivity import _sample_birth
 from tests.support.ephemeris_case_runtime import (
     native_ephemeris_files_module as native_ephemeris_files_module,
 )
 from tests.support.reference_data import verify_source_files
+from tests.support.solar_clock_grid import (
+    civil_solar_birth,
+    verify_recorded_grid_solar_reset,
+)
 
 pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
 
@@ -27,10 +29,18 @@ COHERENT = json.loads(
 COHERENT_BY_UTC = {
     row["utc"]: row for row in COHERENT["rows"] if row["source"] == "swiss_delta_t"
 }
+COHERENT_TT_BY_ID = {
+    row["id"]: row["tt_days"]
+    for row in json.loads(
+        (
+            FIXTURE.parent / "solar_clock_coherence/same-definition-reference.json"
+        ).read_text()
+    )["rows"]
+}
 LINE_SECONDS = 0.0002
 
 
-def test_independent_model_reference_identity():
+def test_independent_model_reference_identity() -> None:
     verify_source_files(FIXTURE)
     assert len(REFERENCE["rows"]) == 96
     assert REFERENCE["fatebridge_imported"] is False
@@ -57,28 +67,26 @@ def test_independent_model_reference_identity():
     ],
 )
 @pytest.mark.parametrize("row", REFERENCE["rows"], ids=lambda r: r["utc"])
-def test_rebase_matches_frozen_ut1_model(row, route):
+def test_rebase_matches_frozen_ut1_model(row, route: str) -> None:
     moment = datetime.fromisoformat(row["utc"])
-    offset = {
-        "sensitivity_forward_minute": timedelta(minutes=1),
-        "sensitivity_backward_minute": timedelta(minutes=-1),
-    }.get(route, timedelta())
-    recorded = moment - offset
-    birth = build_astro_birth_info(
-        birth_year=recorded.year,
-        birth_month=recorded.month,
-        birth_day=recorded.day,
-        birth_hour=recorded.hour,
-        birth_minute=recorded.minute,
-        birth_timezone="UTC",
-        birth_longitude=0,
-        birth_latitude=40,
-        use_true_solar_time=True,
-    )
-    if route != "nominal":
-        birth = _sample_birth(birth, offset)
-    actual_seconds = (birth.require_utc_datetime - moment).total_seconds()
-    assert (
-        abs(actual_seconds - COHERENT_BY_UTC[row["utc"]]["eot_seconds"]) <= LINE_SECONDS
-    )
-    assert birth.recorded_datetime == moment
+    offset_seconds = {
+        "sensitivity_forward_minute": 60,
+        "sensitivity_backward_minute": -60,
+    }.get(route, 0)
+    recorded = moment - timedelta(seconds=offset_seconds)
+    birth = civil_solar_birth(recorded)
+    coherent = COHERENT_BY_UTC[row["utc"]]
+    if route == "nominal":
+        actual = birth.require_utc_datetime
+        assert birth.recorded_datetime == moment
+    else:
+        actual = verify_recorded_grid_solar_reset(
+            birth,
+            moment,
+            offset_seconds,
+            COHERENT_TT_BY_ID[coherent["id"]],
+            coherent["eot_seconds"],
+            LINE_SECONDS,
+        )
+    actual_seconds = (actual - moment).total_seconds()
+    assert abs(actual_seconds - coherent["eot_seconds"]) <= LINE_SECONDS

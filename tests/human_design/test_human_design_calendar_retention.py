@@ -61,7 +61,9 @@ def cohort(monkeypatch):
     return pairs, positions, root
 
 
-def test_batch_and_root_exceptions_retain_all_rows_and_continue(cohort, monkeypatch):
+def test_batch_and_root_exceptions_retain_all_rows_and_continue(
+    cohort, monkeypatch: pytest.MonkeyPatch
+) -> None:
     pairs, positions, root = cohort
     calls = []
 
@@ -69,11 +71,15 @@ def test_batch_and_root_exceptions_retain_all_rows_and_continue(cohort, monkeypa
         calls.append((backend, epoch))
         if epoch == 1.0:
             raise RuntimeError("unavailable native batch")
+        else:
+            pass
         return positions(epoch, mode, backend)
 
     def sometimes_root(epoch, backend):
         if epoch == 0.0:
             raise OSError("unavailable root dependency")
+        else:
+            pass
         return root(epoch, backend)
 
     monkeypatch.setattr(audit, "positions_at_tt", sometimes_positions)
@@ -105,8 +111,8 @@ def test_batch_and_root_exceptions_retain_all_rows_and_continue(cohort, monkeypa
     "change", ["missing_body", "nan", "inf", "negative", "string", "boolean"]
 )
 def test_one_malformed_position_does_not_delete_other_positions(
-    cohort, monkeypatch, change
-):
+    cohort, monkeypatch: pytest.MonkeyPatch, change: str
+) -> None:
     _, positions, _ = cohort
 
     def malformed(epoch, mode, backend):
@@ -122,6 +128,8 @@ def test_one_malformed_position_does_not_delete_other_positions(
                     "string": "1.0",
                     "boolean": True,
                 }[change]
+        else:
+            pass
         return result
 
     monkeypatch.setattr(audit, "positions_at_tt", malformed)
@@ -136,8 +144,8 @@ def test_one_malformed_position_does_not_delete_other_positions(
 
 
 def test_all_unavailable_has_null_maxima_and_keeps_both_full_cohorts(
-    cohort, monkeypatch
-):
+    cohort, monkeypatch: pytest.MonkeyPatch
+) -> None:
     def fail(*args, **kwargs):
         raise RuntimeError("all unavailable")
 
@@ -158,8 +166,8 @@ def test_all_unavailable_has_null_maxima_and_keeps_both_full_cohorts(
 
 @pytest.mark.parametrize("change", ["fallback", "flags", "model", "missing_flags"])
 def test_exact_numeric_match_cannot_hide_wrong_position_backend(
-    cohort, monkeypatch, change
-):
+    cohort, monkeypatch: pytest.MonkeyPatch, change: str
+) -> None:
     _, positions, _ = cohort
 
     def altered(epoch, mode, backend):
@@ -174,6 +182,8 @@ def test_exact_numeric_match_cannot_hide_wrong_position_backend(
                     value["ephemeris_model"] = "jpl"
                 else:
                     value.pop("return_flags")
+        else:
+            pass
         return result
 
     monkeypatch.setattr(audit, "positions_at_tt", altered)
@@ -194,8 +204,8 @@ def test_exact_numeric_match_cannot_hide_wrong_position_backend(
     "change", ["fallback", "missing", "wrong_body", "wrong_role", "zero_count"]
 )
 def test_exact_root_match_requires_actual_solar_backend_observations(
-    cohort, monkeypatch, change
-):
+    cohort, monkeypatch: pytest.MonkeyPatch, change: str
+) -> None:
     _, _, root = cohort
 
     def altered(epoch, backend):
@@ -225,14 +235,16 @@ def test_exact_root_match_requires_actual_solar_backend_observations(
 
 @pytest.mark.parametrize("value", [float("nan"), float("inf"), "2.0", True, 1e308])
 def test_invalid_root_retains_later_cases_and_serializes_finitely(
-    cohort, monkeypatch, value
-):
+    cohort, monkeypatch: pytest.MonkeyPatch, value
+) -> None:
     _, _, root = cohort
 
     def altered(epoch, backend):
         result = root(epoch, backend)
         if epoch == 0.0:
             result["solver"]["design_jd_tt"] = value
+        else:
+            pass
         return result
 
     monkeypatch.setattr(audit, "_root_result", altered)
@@ -244,7 +256,7 @@ def test_invalid_root_retains_later_cases_and_serializes_finitely(
     json.dumps(result, allow_nan=False)
 
 
-def test_finite_synthetic_success_is_still_not_full_calendar_acceptance(cohort):
+def test_finite_synthetic_success_is_still_not_full_calendar_acceptance(cohort) -> None:
     result = audit.checks()
     assert result["status"] == "additional_bounded_match"
     assert result["complete_calendar_acceptance"] is False
@@ -252,7 +264,9 @@ def test_finite_synthetic_success_is_still_not_full_calendar_acceptance(cohort):
     assert result["authority_certified"] is False
 
 
-def test_empty_real_observer_does_not_infer_solar_backend(monkeypatch):
+def test_empty_real_observer_does_not_infer_solar_backend(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # A solver replacement returning only its numerical result makes no
     # observed native call. The actual guard must report that absence.
     monkeypatch.setattr(

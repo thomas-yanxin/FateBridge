@@ -31,20 +31,30 @@ def reference(corpus: Path = F) -> dict[str, Any]:
         "freeze.json"
     }:
         raise ValueError("Frozen clock-profile inventory changed")
+    else:
+        pass
     for name in names:
         if (
             hashlib.sha256((corpus / name).read_bytes()).hexdigest()
             != frozen["files"][name]
         ):
             raise ValueError("Frozen clock-profile protocol changed")
+        else:
+            pass
     for row in json.loads((corpus / "source-links.json").read_text())["sources"]:
         if hashlib.sha256((R / row["path"]).read_bytes()).hexdigest() != row["sha256"]:
             raise ValueError("Frozen clock-profile coefficient source changed")
+        else:
+            pass
     value = json.loads((corpus / "protocol.json").read_text())
     if not isinstance(value, dict):
         raise ValueError("Frozen clock-profile protocol must be an object")
+    else:
+        pass
     if len(value["historical_cases"]) != 2 or len(value["receipt_cases"]) != 2:
         raise ValueError("All four clock-profile faults are required")
+    else:
+        pass
     return value
 
 
@@ -95,6 +105,8 @@ def dynamical_jd(moment: datetime) -> float:
     value = time_scales.ephemeris_time(moment).jd_tt
     if value is None:
         raise RuntimeError("Clock-profile experiment requires TT conversion")
+    else:
+        pass
     return value
 
 
@@ -234,3 +246,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

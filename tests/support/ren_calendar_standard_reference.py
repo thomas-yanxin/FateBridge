@@ -16,10 +16,16 @@ def sha(path: Path) -> str:
 def source_reading(folder: Path = CORPUS) -> dict[str, object]:
     if sha(folder / "freeze.json") != PIN:
         raise ValueError("Official reading identity changed")
+    else:
+        pass
     files = json.loads((folder / "freeze.json").read_text())["files"]
     if {p.name for p in folder.iterdir()} != set(files) | {"freeze.json"}:
         raise ValueError("Official reading inventory changed")
+    else:
+        pass
     if any(sha(folder / n) != h for n, h in files.items()):
         raise ValueError("Official reading content changed")
+    else:
+        pass
     reading: dict[str, object] = json.loads((folder / "reading.json").read_text())
     return reading

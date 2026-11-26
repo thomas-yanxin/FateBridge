@@ -33,13 +33,19 @@ def sha(p: Path) -> str:
 def reference(folder: Path = CORPUS) -> dict[str, Any]:
     if sha(folder / "freeze.json") != FREEZE_SHA:
         raise ValueError("Frozen progression manifest changed")
+    else:
+        pass
     manifest = json.loads((folder / "freeze.json").read_text())
     if set(manifest["files"]) != {"reference.json", "source-pages.pdf"} or {
         p.name for p in folder.iterdir()
     } != {"reference.json", "source-pages.pdf", "freeze.json"}:
         raise ValueError("Frozen progression inventory changed")
+    else:
+        pass
     if any(sha(folder / n) != h for n, h in manifest["files"].items()):
         raise ValueError("Frozen progression reference changed")
+    else:
+        pass
     ref: dict[str, Any] = json.loads((folder / "reference.json").read_text())
     if (
         len(ref["literal_examples"]) != 8
@@ -49,6 +55,8 @@ def reference(folder: Path = CORPUS) -> dict[str, Any]:
         or len(ref["day_empty_pairs"]) != 6
     ):
         raise ValueError("Complete progression denominators required")
+    else:
+        pass
     return ref
 
 
@@ -75,6 +83,8 @@ def expected(ref: dict[str, Any], day: str, branches: list[str]) -> dict[str, An
             reading, conditional = "见空不拘原进退说", None
         else:
             reading = "前进多阻" if direction == "进" else "后退有妨"
+    else:
+        pass
     return dict(
         kind=kind,
         sequence_direction=direction,
@@ -95,10 +105,12 @@ def audit() -> dict[str, Any]:
     ] + [Path(__file__).resolve()]
     before = {str(p.relative_to(ROOT)): sha(p) for p in paths}
     ref = reference()
+    from fatebridge.core.contracts.output_chinese import Liuren
+    from fatebridge.core.contracts.output_liuren_progression import (
+        require_complete_progression,
+    )
     from fatebridge.core.metaphysics.liureng import build_liureng_board
     from fatebridge.core.metaphysics.liureng_progression import transmission_progression
-    from fatebridge.core.output_chinese import Liuren
-    from fatebridge.core.output_liuren_progression import require_complete_progression
     from scripts.ren.audit_ren_classical import make_seed
 
     failures: list[dict[str, Any]] = []
@@ -119,6 +131,8 @@ def audit() -> dict[str, Any]:
         )
         if got != exp:
             failures.append(dict(day=day, branches=branches, actual=got, expected=exp))
+        else:
+            pass
     synthetic = []
     for c in ref["synthetic_cases"]:
         got = transmission_progression(c["day"], c["branches"])
@@ -149,6 +163,8 @@ def audit() -> dict[str, Any]:
         matched = {k: got[k] for k in KEYS} == exp
         if not matched:
             failures.append(dict(day=day, general=general, actual=got, expected=exp))
+        else:
+            pass
         boards.append(
             dict(
                 day=day,

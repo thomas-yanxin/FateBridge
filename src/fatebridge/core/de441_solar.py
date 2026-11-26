@@ -13,7 +13,7 @@ from fatebridge.core.astro.analytic_observer import (
     LIGHT_TIME_METHOD,
     AnalyticObserver,
 )
-from fatebridge.core.astro.de441_source import source_details
+from fatebridge.core.astro.de441_source import MANIFEST_SHA256, source_details
 from fatebridge.core.astro.nutation import (
     COEFFICIENT_SHA256 as NUTATION_COEFFICIENT_SHA256,
 )
@@ -28,14 +28,23 @@ from fatebridge.core.astro.tdb import COEFFICIENT_SHA256 as TDB_COEFFICIENT_SHA2
 
 MODEL_ID = "fatebridge_de441_solar_v1"
 PROVIDER = "jpl_de441"
+# Static identity can describe a possible fallback before any data are needed.
+# Calculated positions and provenance still verify the selected source bytes.
+CACHE_IDENTITY = (
+    MODEL_ID,
+    MANIFEST_SHA256,
+    FRAME_COEFFICIENT_SHA256,
+    NUTATION_COEFFICIENT_SHA256,
+    TDB_COEFFICIENT_SHA256,
+)
 
 
 def solar_longitude(jd_tt: float) -> float:
     """Geocentric apparent native-frame longitude at the given TT point."""
     if not math.isfinite(jd_tt):
         raise ValueError("Solar TT Julian day must be finite")
-    motion = AnalyticObserver().apparent_state("Sun", jd_tt - 2451545.0)
-    x, y, _ = mean_j2000_apparent_ecliptic(motion.position, jd_tt)
+    position = AnalyticObserver().apparent_position("Sun", jd_tt - 2451545.0)
+    x, y, _ = mean_j2000_apparent_ecliptic(position, jd_tt)
     return math.degrees(math.atan2(y, x)) % 360.0
 
 

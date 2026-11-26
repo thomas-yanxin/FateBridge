@@ -4,8 +4,8 @@ from copy import deepcopy
 
 import pytest
 
-from fatebridge.core import sukuyo_compatibility_text as delivery
-from fatebridge.core.sukuyo import calendar_mansion, candidate_relation_analysis
+from fatebridge.core.sukuyo import sukuyo_compatibility_text as delivery
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, candidate_relation_analysis
 from fatebridge.services.divination import calculate_sukuyo_compatibility
 
 
@@ -25,7 +25,7 @@ def ordinary():
     return calendar_mansion("2025-01-29", zone="+09:00")
 
 
-def test_applied_contract_describes_filtered_rows_and_preserved_matrix(hinoo):
+def test_applied_contract_describes_filtered_rows_and_preserved_matrix(hinoo) -> None:
     analysis = candidate_relation_analysis(hinoo, hinoo)
     text = delivery.joint_reconstruction_contract(analysis)
     assert "applied" in text and "unconstrained_rows" in text
@@ -35,11 +35,15 @@ def test_applied_contract_describes_filtered_rows_and_preserved_matrix(hinoo):
 
 
 @pytest.mark.parametrize("resolved", [False, True])
-def test_not_shared_does_not_promise_a_nonexistent_matrix_key(hinoo, resolved):
+def test_not_shared_does_not_promise_a_nonexistent_matrix_key(
+    hinoo, resolved: bool
+) -> None:
     first = deepcopy(hinoo)
     second = deepcopy(hinoo)
     if resolved:
         first["natal_su27"] = second["natal_su27"] = "毕"
+    else:
+        pass
     second["profile_calculation"]["source_bundle_sha256"] = "different"
     analysis = candidate_relation_analysis(first, second)
     assert analysis["shared_reconstruction_analysis"]["status"] == "not_shared"
@@ -51,12 +55,14 @@ def test_not_shared_does_not_promise_a_nonexistent_matrix_key(hinoo, resolved):
 
 
 @pytest.mark.parametrize("resolved", [False, True])
-def test_incomplete_never_means_rows_were_filtered(hinoo, resolved):
+def test_incomplete_never_means_rows_were_filtered(hinoo, resolved: bool) -> None:
     first = deepcopy(hinoo)
     second = deepcopy(hinoo)
     if resolved:
         first["calendar_day_part"] = second["calendar_day_part"] = "second_half"
         first["natal_su27"] = second["natal_su27"] = "毕"
+    else:
+        pass
     second["profile_calculation"][
         "candidate_set_complete_under_declared_reconstructions"
     ] = False
@@ -73,7 +79,7 @@ def test_incomplete_never_means_rows_were_filtered(hinoo, resolved):
         assert "unconstrained_rows" in text
 
 
-def test_resolved_support_delivers_every_actual_model_date_half_tuple(hinoo):
+def test_resolved_support_delivers_every_actual_model_date_half_tuple(hinoo) -> None:
     resolved = deepcopy(hinoo)
     resolved["calendar_day_part"] = "second_half"
     resolved["natal_su27"] = "毕"
@@ -90,7 +96,7 @@ def test_resolved_support_delivers_every_actual_model_date_half_tuple(hinoo):
     assert text.count("乙方1341-05-24、后半、宿毕") == 2
 
 
-def test_null_half_is_not_invented_from_model_independent_support(hinoo):
+def test_null_half_is_not_invented_from_model_independent_support(hinoo) -> None:
     resolved = deepcopy(hinoo)
     resolved["calendar_day_part"] = "second_half"
     resolved["natal_su27"] = "毕"
@@ -106,7 +112,7 @@ def test_null_half_is_not_invented_from_model_independent_support(hinoo):
 
 def test_ordinary_envelope_has_positive_profile_evidence_and_actual_completeness(
     ordinary,
-):
+) -> None:
     contexts = [ordinary, ordinary]
     analysis = {
         "status": "candidate_only",
@@ -129,8 +135,8 @@ def test_ordinary_envelope_has_positive_profile_evidence_and_actual_completeness
     ["missing_profile", "missing_method", "source", "assignment", "method", "leaf"],
 )
 def test_missing_or_conflicting_metadata_cannot_establish_ordinary_inapplicability(
-    ordinary, mutation
-):
+    ordinary, mutation: str
+) -> None:
     context = deepcopy(ordinary)
     profile = context["profile_calculation"]
     if mutation == "missing_profile":
@@ -157,7 +163,7 @@ def test_missing_or_conflicting_metadata_cannot_establish_ordinary_inapplicabili
     )
 
 
-def test_hinoo_without_precedence_is_not_an_ordinary_profile(ordinary, hinoo):
+def test_hinoo_without_precedence_is_not_an_ordinary_profile(ordinary, hinoo) -> None:
     context = deepcopy(hinoo)
     context["profile_calculation"]["short_month_assignment"] = None
     analysis = {"status": "candidate_only", "rows": [{}]}
@@ -170,7 +176,7 @@ def test_hinoo_without_precedence_is_not_an_ordinary_profile(ordinary, hinoo):
 @pytest.mark.parametrize("bad_candidates", [{}, "unverified", [None]])
 def test_malformed_branch_structure_cannot_establish_profile_scope(
     ordinary, bad_candidates
-):
+) -> None:
     context = deepcopy(ordinary)
     context["calendar_candidates"] = bad_candidates
     assert (
@@ -181,7 +187,7 @@ def test_malformed_branch_structure_cannot_establish_profile_scope(
     )
 
 
-def test_explicit_but_null_shared_object_is_not_silently_overridden(ordinary):
+def test_explicit_but_null_shared_object_is_not_silently_overridden(ordinary) -> None:
     assert (
         delivery.ordinary_candidate_envelope_reading(
             [ordinary, ordinary],
@@ -195,14 +201,14 @@ def test_explicit_but_null_shared_object_is_not_silently_overridden(ordinary):
     )
 
 
-def test_unknown_shared_status_is_not_treated_as_applied():
+def test_unknown_shared_status_is_not_treated_as_applied() -> None:
     text = delivery.joint_reconstruction_contract(
         {"shared_reconstruction_analysis": {"status": "new_unknown"}, "rows": []}
     )
     assert "状态未识别" in text and "rows仅列" not in text
 
 
-def test_service_uses_state_specific_contract_and_resolved_support():
+def test_service_uses_state_specific_contract_and_resolved_support() -> None:
     result = calculate_sukuyo_compatibility(
         person1_date="1341-05-24",
         person2_date="1341-05-24",

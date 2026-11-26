@@ -1,0 +1,47 @@
+{
+  "birth_utc": "2000-01-01T12:00:00+00:00",
+  "cap_utc": "2000-02-10T12:00:00+00:00",
+  "birth_utc_nominal_jd": "2451545",
+  "tt_minus_utc_seconds": "64.184",
+  "progressed_window_nominal_days": "40",
+  "max_age_years": "40",
+  "targets_degrees": [
+    0,
+    45,
+    90,
+    135,
+    180,
+    225,
+    270,
+    315
+  ],
+  "target_names": {
+    "0": "elongation_0_degrees",
+    "45": "elongation_45_degrees",
+    "90": "elongation_90_degrees",
+    "135": "elongation_135_degrees",
+    "180": "elongation_180_degrees",
+    "225": "elongation_225_degrees",
+    "270": "elongation_270_degrees",
+    "315": "elongation_315_degrees"
+  },
+  "target_name_scope": "Independent angle identities; traditional names/interpretations are not adjudicated by this numerical oracle.",
+  "ephe_path": "~/Desktop/FateBridge/ephe",
+  "library_paths": {
+    "author_C": "~/.codex/artifacts/fatebridge-celestial-frame-20261114/libauthor_swiss_2_10_03_contract.dylib",
+    "calceph": "~/.codex/artifacts/fatebridge-celestial-frame-20261114/calceph-build/src/libcalceph.2.1.1.dylib",
+    "sofa": "~/.codex/artifacts/fatebridge-celestial-frame-20261114/libofficial_sofa.dylib",
+    "kernel": "~/.codex/artifacts/fatebridge-celestial-frame-20261114/original-de440.bsp"
+  },
+  "flags": 258,
+  "bodies": {
+    "Sun": 0,
+    "Moon": 1
+  },
+  "geocentric": true,
+  "zodiac": "apparent_tropical_true_date_ecliptic_equinox",
+  "input_authority_plan": "~/.codex/artifacts/fatebridge-audit-20261117-round22/classical-angle-discovery/numerical-release/numerical-release-plan.json",
+  "input_authority_sha256": "43b899cb3c6ff08e4a1136d4b415dd9da5b9be0a162b7832463ebdd5b0a3aa64",
+  "window_membership": "exact_birth_TT < exact_source_IEEE_TT <= exact_cap_TT",
+  "grid_source_epoch_qualification": "Source query epochs are nearest binary64 points to independent exact quarter-day grid; never relabeled as the exact grid points."
+}

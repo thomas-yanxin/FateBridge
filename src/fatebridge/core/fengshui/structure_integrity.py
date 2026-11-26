@@ -7,9 +7,8 @@ for its historical interpretation, author terminology or real-world efficacy.
 from itertools import combinations
 from typing import Any
 
+from fatebridge.core.fengshui.integrity import FLIGHT_PATH, PALACE_NUMBERS, ROLES
 from fatebridge.utils.errors import FengshuiCalculationError
-
-from .integrity import FLIGHT_PATH, PALACE_NUMBERS, ROLES
 
 OUTER = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
 PARENTAL = ([1, 4, 7], [2, 5, 8], [3, 6, 9])

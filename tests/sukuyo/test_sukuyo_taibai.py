@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_taibai import SOURCE, taibai_direction_reference
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_taibai import SOURCE, taibai_direction_reference
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.sukuyo.audit_sukuyo_taibai_primary import verify_primary
 
@@ -17,7 +17,9 @@ PRIMARY = json.loads(
 
 
 @pytest.mark.parametrize("day,location,direction", PRIMARY["manual_day_locations"])
-def test_all_30_days_against_independent_printed_triples(day, location, direction):
+def test_all_30_days_against_independent_printed_triples(
+    day, location, direction
+) -> None:
     result = taibai_direction_reference(day)
     assert result["lunar_day"] == day
     assert (result["location"], result["horizontal_direction"]) == (location, direction)
@@ -46,7 +48,9 @@ def test_all_30_days_against_independent_printed_triples(day, location, directio
     assert not ming["applied_to_primary"]
 
 
-def test_primary_table_and_apparatus_verifier_does_not_claim_private_full_bytes():
+def test_primary_table_and_apparatus_verifier_does_not_claim_private_full_bytes() -> (
+    None
+):
     report = verify_primary()
     assert report["selected_xml_paragraphs"] == 12
     assert report["selected_sat_quotation_lines"] == 19
@@ -60,12 +64,14 @@ def test_primary_table_and_apparatus_verifier_does_not_claim_private_full_bytes(
 
 
 @pytest.mark.parametrize("day", [0, 31, -1, True, False, 1.0, "1", None])
-def test_invalid_or_noninteger_day_is_not_coerced_into_source_table(day):
+def test_invalid_or_noninteger_day_is_not_coerced_into_source_table(day) -> None:
     with pytest.raises(ValueError):
         taibai_direction_reference(day)
 
 
-def test_gregorian_day_and_hinoo_mansion_substitution_do_not_replace_lunar_day():
+def test_gregorian_day_and_hinoo_mansion_substitution_do_not_replace_lunar_day() -> (
+    None
+):
     day = day_evidence(calendar_mansion("2025-03-04"))
     assert day["calendar"]["lunar_day"] == 5
     assert day["taibai_direction_reference"]["location"] == "西方"
@@ -87,7 +93,7 @@ def test_gregorian_day_and_hinoo_mansion_substitution_do_not_replace_lunar_day()
     assert halves[0]["taibai_direction_reference"]["lunar_day"] == 1
 
 
-def test_known_lunar_day_survives_unresolved_leap_mansion():
+def test_known_lunar_day_survives_unresolved_leap_mansion() -> None:
     result = day_evidence(
         calendar_mansion(
             "2017-06-24", zone="+09:00", calendar_basis="japanese_hutime_1002_1_utc09"
@@ -97,7 +103,7 @@ def test_known_lunar_day_survives_unresolved_leap_mansion():
     assert result["taibai_direction_reference"]["location"] == "東方"
 
 
-def test_unknown_and_incomplete_dates_keep_every_conditional_reference():
+def test_unknown_and_incomplete_dates_keep_every_conditional_reference() -> None:
     complete = day_evidence(calendar_mansion("2025-02-07", zone="UTC"))
     assert complete["taibai_direction_reference"] is None
     assert [
@@ -116,7 +122,9 @@ def test_unknown_and_incomplete_dates_keep_every_conditional_reference():
     )
 
 
-def test_sky_and_below_ground_have_no_fabricated_horizontal_bearing_or_activity():
+def test_sky_and_below_ground_have_no_fabricated_horizontal_bearing_or_activity() -> (
+    None
+):
     for day, realm in [(9, "below_ground"), (10, "above_sky")]:
         reference = taibai_direction_reference(day)
         assert reference["realm"] == realm and reference["horizontal_direction"] is None
@@ -134,7 +142,7 @@ def test_sky_and_below_ground_have_no_fabricated_horizontal_bearing_or_activity(
     )
 
 
-def test_returned_edition_doctrine_and_apparatus_are_detached():
+def test_returned_edition_doctrine_and_apparatus_are_detached() -> None:
     first = taibai_direction_reference(10)
     first["witnesses"][1]["location"] = "天上"
     first["doctrine"]["movement_alignment_definition_established"] = True
@@ -145,7 +153,7 @@ def test_returned_edition_doctrine_and_apparatus_are_detached():
     assert len(later["table_apparatus"]) == 13
 
 
-def test_public_taibai_projection_has_typed_witnesses_and_uncomputed_flags():
+def test_public_taibai_projection_has_typed_witnesses_and_uncomputed_flags() -> None:
     spec = next(s for s in CATALOG if s.key == "suzhan")
     defs = spec.output_model.model_json_schema()["$defs"]
     assert "taibai_direction_reference" in defs["SukuyoDay"]["properties"]

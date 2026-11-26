@@ -26,6 +26,16 @@
 
 ## 固定参考与结果
 
+2026-11-18的后续实现将节气的数值比较坐标从微秒显示格点移到保留的精确民用点：`SolarTerm.point`由同一个TT反解取得，不从显示标签重建。`utc_key`继续表示显示格点，独立日历fixture仍只有其原标签精度。相邻窗口、立春岁首、十二节月、农历节气上下文和起运名义日差消费同一保留点；`elapsed_days_between`先作精确分数差，再单次转浮点。下表和后文原始有界队列的数值、失败及日期不据此改写。新增数值传播资料见[保留点控制](../tests/data/retained_civil_points_v1.json)，物理交点精度仍需独立星历／观测判据。
+
+同日[节令主点与名义包络](#固定参考与结果)使出生事件的Jie范围成员、游标和名义carry使用实际typed来源，事件按名义微秒floor／ceil外包，原LiQiu显示零宽点纠正为1微秒包络。原两整秒范围的六次三端完整业务相同，原根、六旧context及全部旧probe事实保持；这不证明实际wall进位阈或连续完备。起运details与wall原浮点操作次序仍保持，理想半偶舍入的±1/240输入微秒偏移和当前float误差继续未解决。
+
+[起运的数值范围](#固定参考与结果)再将实际wall偏移改为保留名义跨度乘整系数后单次半偶舍入，details旧float显示不变。固定小暑源的四个微秒出生偏移／wall各1微秒误差消除；原198候选中174来源匹配、24前提不匹配全部保留。精确量化在固定source／方向、民用日期／偏移、整年／月cell内满足相邻输入微秒对应偏移±120微秒，从而支持原逆像的−119／121离散wall斜率；原54固定target的两个假零宽括区间消除，跨cell和连续完整性没有因此通过。合法整秒范围请求的六次三端完整业务相同，不把内部微秒反例称为直接整秒出生误差。
+
+[保留的 TT 主点](precision-acceptance.md#retained-primary-tt)补全TT主点在共享时钟、离线星历、框架、几何与worker中的传递，原65536原子时刻的主点全部保留源精确值，旧标量仍全部劣于SOFA两部。两部适配初版的16190项较差没有被主点零误差掩盖；改为最近标量加精确残差后，从同一已保存主点重放的65536项表示误差均更小，没有重调65536时钟队列。此项只裁定固定源算式与表示；原UTC历史端点、调整域、UT1、真实钟时和太阳物理未决均保持，详见[精度分层](precision-acceptance.md#retained-primary-tt)。
+
+[第十五批](precision-acceptance.md#solar-guolao-primary-tt)继续让太阳钟forward及果老实际目标消费主点，UT1逆解只保原IEEE来源。固定原2024立春root不变，六个限定native／有效标签控制的年／节月成员各2/6→6/6；原生LMT至固定1978目标的TT间隔误差约−3.44181微秒→0。秒60回执保持原载体，不移午夜；普通solar calendar及未执行历史日期hint不因此通过。旧200微秒guard、原SDK模型及下表早期队列的资格均不改写。
+
 | 子项 | 固定范围与结果 | 资格 |
 | --- | --- | --- |
 | Gregorian及实际时区算术 | Temporal 0.5.1、Node22.22.2／ICU78.2／tz2025c，4392例的历元微秒、七个当地字段与UTC偏移完全一致；全部带偏移标签可还原同一UTC瞬间 | 包括辅助年0／10000；是所选时区模型，不是古代钟时观测或未来法律认证 |
@@ -50,30 +60,28 @@
 ## 来源与复现
 
 - [Temporal原实现及版本](https://github.com/js-temporal/temporal-polyfill/tree/v0.5.1)与[ZonedDateTime定义](https://tc39.es/proposal-temporal/docs/zoneddatetime.html)。[冻结输入、包完整性及生成器](../tests/data/zoned_calendar_temporal_v1/README.md)保留于测试资料。
-- [Swiss2.10.03固定C求根器](https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c)使用1毫角秒内部停止线；[ERFA](https://github.com/liberfa/erfa/tree/v2.0.1/src)提供独立TT／TAI／UTC钟时链。
-- [lunar-python固定Solar历制](https://github.com/6tail/lunar-python/blob/1645ad3b3653635e5cb31b0c6df22b5e4298f8ce/lunar_python/Solar.py)和[sxtwl固定JD历制](https://github.com/yuangu/sxtwl_cpp/blob/f78cd5e0cfca4661cfe5af2f06d630fff5b0c051/src/JD.cpp)。离散规则及原73,414日队列另见[八字关系核对](bazi-relations-audit.md)。
+- [Swiss2.10.03固定C求根器](https://github.com/astrorigin/swisseph)使用1毫角秒内部停止线；[ERFA](https://github.com/liberfa/erfa/tree/v2.0.1/src)提供独立TT／TAI／UTC钟时链。
+- [lunar-python固定Solar历制](https://github.com/6tail/lunar-python)和[sxtwl固定JD历制](https://github.com/yuangu/sxtwl_cpp)。离散规则及原73,414日队列另见[八字关系核对](bazi-relations-audit.md)。
 - [IANA2026f原始发行记录](https://github.com/eggert/tz/blob/2026f/NEWS)、[官方代码包](https://data.iana.org/time-zones/releases/tzcode2026f.tar.gz)与[官方资料包](https://data.iana.org/time-zones/releases/tzdata2026f.tar.gz)。本机使用Homebrew LLVM／LLD、现有CLT SDK实际重编C实现，未接受或修改Xcode许可；原编译失败日志和所有归档指纹保留。
 
 持久回归见[时区算术](../tests/astronomy/test_zoned_calendar.py)与[历法边界](../tests/astronomy/test_calendar_year_edges.py)。后者的实时336点原生比较标记`local_data`，需要固定Swiss文件；普通窗口回归使用独立冻结钟时字段，不冒称现场重新求根。原始请求、源码前像、参考生成器、失败输出与完整比较在本轮外部审查档案`fatebridge-calendar-boundary-oracle-20261111`保留。
 
 ## 共享历法源码职责与所选官方年表
 
-2026-11-12继续补齐共享历法职责，而非以函数数推定算法总数。以下六个模块的完整函数体已审读，56个模块／类定义和2个嵌套定义均有具名职责。22个模块／类计算或选择职责、2个嵌套计算职责细分为70项审查内容；34个支持职责单列。太阳求根委派的轨道模型、共同钟时反解、时区输入资格及梅花取数另有所有者，不在此重复登记为新算法。
+共享历法按实际计算、来源选择和交付职责分别维护。当前逐函数映射见[源码职责索引](algorithm-inventory.md)，阅读数量不作为算法总数或精度结论。
 
-| 模块 | 定义数 | 计算或选择职责 | 支持职责 |
-| --- | --- | --- | --- |
-| [almanac](../src/fatebridge/core/almanac.py) | 37＋2嵌套 | 16＋2嵌套：农历主库及三个年份的局部年表修正；UTC时间差；Gregorian JDN及民用日干支；原生黄经搜索、二分和首个穿越后TT浮点；具名解析库的交点委派；年表来源选择；相邻窗口；立春岁首、十二节月及农历上下文 | 21项，见下文 |
-| [1900有限补表](../src/fatebridge/core/lunar_1900_prefix.py) | 3 | 1：1900年1月1至30日的有限出版日序 | 2：`_load`、`source_for` |
-| [2100有限补表](../src/fatebridge/core/lunar_supplement.py) | 3 | 1：官方月首半开区间及相对日序 | 2：`_load`、`source_for` |
-| [太阳来源政策](../src/fatebridge/core/solar_model_policy.py) | 7 | 4：`de440_selected`、`de440_profile_for_year`、`solar_context_input_years`、`solar_model_cache_key`的结果选择政策 | 3：模式名校验、既有解析查询适配、配置／已观察来源回执 |
-| [原生根钟时适配](../src/fatebridge/core/solar_term_clock.py) | 4 | 0：共同`time_scales`所有者负责实际钟时反解 | 4：错误交付、TT点意图适配、datetime可表示性及政策回执 |
-| [运行环境身份](../src/fatebridge/core/solar_term_runtime.py) | 2 | 0：不另求天文量 | 2：实际已加载钟时资料摘要及所选文件／模型缓存身份 |
+| 模块 | 计算与选择 | 支持边界 |
+| --- | --- | --- |
+| [almanac](../src/fatebridge/core/almanac.py) | 农历主库与局部年表修正、Gregorian日序、原生黄经求根、所选解析库交点、立春岁首与节月 | 复用共同钟时和时区所有者；缓存按实际来源区分；结果保留求解点及来源 |
+| [1900有限补表](../src/fatebridge/core/lunar_1900_prefix.py) | 1900年1月1至30日的有限出版日序 | 保留原始来源与范围 |
+| [2100有限补表](../src/fatebridge/core/lunar_supplement.py) | 官方月首半开区间及相对日序 | 保留原始来源与范围 |
+| [太阳来源政策](../src/fatebridge/core/solar_model_policy.py) | `de440_selected`、`de440_profile_for_year`、`solar_context_input_years`及`solar_model_cache_key` | 模式名校验、配置与实际观察来源分别交付 |
+| [原生根钟时适配](../src/fatebridge/core/solar_term_clock.py) | 委派共同`time_scales`反解，保留TT与民用点 | `native_solar_root_point`及Calendar载体供生产消费；钟时失败有明确错误，政策回执另列 |
+| [运行环境身份](../src/fatebridge/core/solar_term_runtime.py) | 不另求天文量 | 实际已加载钟时资料及所选文件／模型的缓存身份 |
 
-`almanac`的21项支持职责逐一为`SolarTerm.moment`、`SolarTerm.utc_key`、`SolarTerm.date_key`、`SolarTerm.day_ganzhi`、`SolarTerm.as_dict`、`is_calculated_solar_term`、`require_calculated_solar_term`、`localize_datetime`、`current_local_datetime`、`_solar_term_search_anchor_utc`、`_solar_terms_for_context_year`、`_get_solar_terms_for_year_cached`、`get_solar_term_environment_key`、`get_jieqi_year_grid`、`get_bazi_month_context`、`_format_lunar_year`、`_lunar_supplement_source`、`_lunar_supported_range_payload`、`lunar_supported_range_message`、`_safe_lunar_date_from_solar`及`build_calendar_context`。它们包含委派或结果组装，不作为21种独立算法。
+`localize_datetime`仅适配共同的时区解析和UTC载体。重复／不存在当地钟时由公开输入边界的`resolve_civil_clock`及其时区校验负责，不能从这个适配函数本身声称已经校验。日干支按民用午夜换日；八字晚子时由`resolve_bazi_effective_date`另处理。农历日序和日时柱可消费明确选择的真太阳时钟，季节比较则继续使用实际民用瞬间。该轮审读时`elapsed_days_between`先取得浮点秒数再除86400，未对两次浮点表示作独立数值验收；2026-11-18的后续实现改为精确名义日差后单次转浮点，原审读结论仍按原版本保留。
 
-`localize_datetime`仅适配共同的时区解析和UTC载体。重复／不存在当地钟时由公开输入边界的`resolve_civil_clock`及其时区校验负责，不能从这个适配函数本身声称已经校验。日干支按民用午夜换日；八字晚子时由`resolve_bazi_effective_date`另处理。农历日序和日时柱可消费明确选择的真太阳时钟，季节比较则继续使用实际民用瞬间。`elapsed_days_between`当前先取得浮点秒数再除86400；此职责审读未对该两次浮点表示作新的独立数值验收。
-
-静态消费候选来自实际导入及调用表达式，按文件、行号和符号保留；它不等同于动态可达性。`analytic_selected`及`native_solar_root_datetime`当前由既有回归直接消费，生产求根分别使用所选缓存键和Calendar载体；二者保留既有接口，不冒列为额外公开算法。分支、资料缺失和来源资格仍须各自核对，58个定义不是58项精度通过。
+静态消费候选来自实际导入及调用表达式，按文件、行号和符号保留；它不等同于动态可达性。模型选择通过所选缓存键执行，已解根由保留点与Calendar载体传给实际消费者。分支、资料缺失和来源资格分别核对，静态定义数量不表示精度通过。
 
 本轮在预先固定1933、1954、1978、2033、2057、2089、2097、2100年后，新下载每个目标年及其前一年的16份[香港天文台年表](https://www.hko.gov.hk/tc/gts/time/conversion.htm)。独立读取印刷日期标签，并从前一年月首接续一月，未从FateBridge取得初始农历月日。所选8年的全部2920日、11680个年／月／日／闰月字段与当前实现相符。其中2594日独立于主库实现，2100年2月9日起326日与生产补表采用同一官方资料，只核对忠实转换。原始文件、HTTP记录、预声明标准、解析器和全部比较均保留。
 
@@ -99,7 +107,7 @@
 
 固定参考保留全部597个时区名称及别名，对应344种文件字节身份；1901至2099年的40,195个显式转换点各取七个预声明秒偏移，共281,365条记录。加上597个各时区控制、60日乘24小时的1,440个排柱控制、120个晚子时控制及3个最初见证，总计283,525条。其中51条使用`-00`未知本地时间标签，单列观察，不认证当地法定钟时。别名、重叠时刻和控制记录不能相加为独立样本。
 
-日柱、时柱和纳音通过实际执行固定[6tail/lunar-python原作者代码](https://github.com/6tail/lunar-python/tree/1645ad3b3653635e5cb31b0c6df22b5e4298f8ce)取得，提交为`1645ad3b3653635e5cb31b0c6df22b5e4298f8ce`，明确选择23:00换日口径。查询实际钟时、时柱和纳音是修改前已固定的门槛；原有整点时间字符串的差异另列观察，没有事后将它全部算成数值错误。
+日柱、时柱和纳音通过实际执行固定[6tail/lunar-python原作者代码](https://github.com/6tail/lunar-python)取得，明确选择23:00换日口径。查询实际钟时、时柱和纳音是修改前已固定的门槛；原有整点时间字符串的差异另列观察，没有事后将它全部算成数值错误。
 
 | 原固定队列 | 修改前 | 修改后源码及独立Python 3.10安装包 |
 | --- | --- | --- |
@@ -140,6 +148,33 @@
 
 本轮没有重启聊天已连接进程，没有把可调用、缓存隔离、日序正确、模型来源资格及预测效力合并为通过。完整语义盘点和全部算法SOTA目标仍未完成；外部档案`fatebridge-celestial-frame-20261114/almanac-semantic-v1`保留原始参考、全部差异、安装包、脚本和测试记录。
 
+## 派生太阳钟与民用时区的边界
+
+共享历法的日／时钟面可以是已校正的太阳钟；交节与节月边界则由原民用瞬间决定。
+太阳钟不是待解析的民用输入。[USNO均时差定义](https://aa.usno.navy.mil/faq/eqtime)
+区分视太阳钟、平太阳钟与民用钟，[IANA](https://www.iana.org/time-zones/theory)
+记录民用时区及跳时规则，不能用民用缺口的UTC往返改写太阳钟标签。
+
+原共享总装先给太阳钟附上地区时区，再传给农历上下文；农历日期读取还重复
+进行一次时区投影。纽约2026-03-08的民用03:30校正为02:23后，农历上下文
+错误显示03:23，梅花取数为寅时，四柱却为己丑。Apia2011-12-31的民用02:00
+校正落在太阳钟12月30日，原逻辑又跳回12月31日，农历十二月初六误作初七。
+
+现在总装传递原日／时输入，农历换算只读取已解析的日期；已有aware民用输入
+仍按真实瞬间投影，原civil_datetime仍负责交节。没有增加兼容层、时区特例或
+默认时刻。六壬历表审计中的唯一私有调用者同步直接传日期。
+
+[冻结参考与来源](../tests/data/solar_clock_labels_v1/README.md)包含纽约、巴黎、
+悉尼、Lord Howe、Apia及正常对照共8个输入。原5项钟面漂移均保留，其中4项
+影响农历／时支／起卦离散结果，Lord Howe半小时漂移没有跨所选时支。
+修复后同一8项符合sxtwl2.0.6、HKO公布日表及原文取数的独立离散参考，
+生产实际太阳钟标签也全部保留；原3项正常对照未改判。
+纽约和Apia另在REST、FastMCP客户端和CLI核对完整及严格投影结果，业务事实一致。
+
+参考中直接Swiss均时差与生产使用同一模型族，只作派生标签诊断，不授予独立
+均时差或物理秒级精度认证。农历公布日表只核对所选日期的中国农历映射，
+不裁定每个时区应使用何种天文日界，也不认证全连续时域、全部传统规则或预测效果。
+
 ## 原生构建与跨环境数值差异
 
 2026-11-15继续核对上述参平和果老差异。两个环境的PySwissEph均为2.10.3.2、Swiss核心均报2.10.03，但原生二进制不同；Python3.10安装包的二进制与重新下载的[官方PyPI发行文件](https://pypi.org/project/pyswisseph/2.10.3.2/#files)完全相同。版本号相同不能单独保证浮点结果逐位相同。
@@ -159,3 +194,79 @@
 单独安装相同FateBridge轮子及原104个固定版本依赖，仅将Swiss扩展替换为未改源码、显式`-ffp-contract=on`的对照构建，再运行原16工具的REST、独立CLI及新stdio MCP，共48次调用。各端可用；完整业务事实仅排除`run_metadata`后，环境内部及与原源码环境的48组逐端比较均精确一致。它们是原16个场景的重复，不增加独立精度样本。
 
 本轮没有修改FateBridge计算、依赖要求、输出字段或比较门槛，也没有要求所有安装用户编译原生扩展。原官方轮子两工具、264处浮点差异的精确门槛仍记录失败；新构建对照不能回写其结果。独立物理精度、传统来源与全算法SOTA验收继续未完成。全部原始状态、四种编译配置、各条结果及完整协议返回保留于外部档案`fatebridge-celestial-frame-20261114/native-reproducibility-v1`。
+
+<a id="native-event-membership"></a>
+
+## 原生事件的TT成员与显示标签
+
+第十七批继续处理已有主点传播根因，新增根因计数为零。`astrology_events`的原生黄经求根仍以Swiss标量TT为操作数；`TTInstant.from_float`只保留这个IEEE值，不恢复此前民用时刻的低位。事件现在以同一不可变对象保存源TT和原逆解显示，最近点、去重与多重回归的过去`<=`／未来`>`选择只消费源TT。SDK仍返回原datetime类型，服务直接读取已分侧结果；世俗入宫盘把已解点交给既有`PhysicalEpoch`与起盘器，不从标签重建时刻。
+
+固定出生／参考2001-01-25 03:00 UTC时，木星查询TT均为2451934.6257428704、目标黄经为61.18774508129519°，原逆解标签却为03:00:00.000001 UTC。原路径将这个同原生查询点的事件列为未来，最近过去误取2000-07-06。现在同点保留在原生过去侧，下一次为当日14:15:48.136051 UTC；原`+1µs`标签不改。两个1990年同刻负控的`−12µs`／`−1µs`标签同样保持。该例的原生标量本身比精确民用来源TT晚约1.088µs，因此不能把同原生TT当成同精确民用点，更不能据此认证连续物理根严格不晚于分析时刻。
+
+输入与准则先于观察冻结：原四个2026季节交点、木星2001停滞控制及2002热带／Lahiri顺序控制、原2025土星／平均月交点，以及三个原出生标签的同刻控制，共12例。独立进程不导入FateBridge，按相同固定Swiss2.10.03与两份原生文件调用作者C `solcross`和`calc`，另用精确源坐标残差与独立二分核对固定窗口。四季交点与作者C相差0或一个TT间隔，春／秋的约40.233µs差来自保留的交点后侧选端；这不是独立动力学精度认证。原1毫角秒数值线、已有DE421的30秒物理比较线、来源／文件一致性、64步细化和8次显示同侧校验都未放宽。
+
+同一队列的三同刻原生成员控制2/3→3/3，其余11例的完整时刻输出不变。前后各40,660条实际motion记录完整保留，只有修正案例末尾两次结果核验查询改变，不能称全部调用相同。另四次真实领域服务调用复用原四季交点与原北京地点，实际起盘TT均等于冻结的求根点，原入宫标签均不变，完整JSON无需回退编码器即可序列化；它们不是四个新独立输入，也不是完整服务前像比较。公开同刻请求已在REST、新stdio MCP及CLI的修改前完整复现，三端业务事实仅排除顶层`run_metadata`后相同；修改后及春分服务的三端观察另按共同源码冻结记录，不以领域观察冒充协议验收。
+
+三项聚焦回归已补入原事件／多重回归文件但未运行；未执行项目测试、收集、CI、格式、类型、构建或清单检查，也没有重跑原65,536队列。原[Round14十六次标量别名](precision-acceptance.md#retained-target-tt)、连续／停滞擦触完备性、钟时与物理误差及旧模型比较失败均保留。独立参考涵盖全部 12 例，另检查了限定范围内的三端行为单列，不能据此宣布全算法或预测SOTA。
+
+共同最终源码冻结后，原返照请求的三端after及春分盘三端after共6次均成功，各场景完整业务仅排顶层`run_metadata`后三端相同，1,482生产Python／JSON路径在窗口内稳定。原返照每端13处完整变化包括土星、木星、北交点的最近／下次UTC与本地标签及摘要，全部保留；春分UTC为2026-03-20T14:45:57.445059，只有after观察。此协议范围不替代独立源比较，也不改变连续物理端点未决。
+
+<a id="qimen-private-calendar-guards"></a>
+## 奇门置闰的私有日序与实际来源（R32）
+
+公开有效时刻的置闰调度需要前一年大雪，并续排到下一立春。原实现将内部日期键再交给`datetime`／`fromordinal`，因而让合法年1／9999请求被私有年0／10000阻断。[Python官方日期范围及ordinal合同](https://docs.python.org/3.13/library/datetime.html)区分这两个边界及软件自己的整数 Gregorian 日序。R32 调度直接消费已解钟面与 SolarTerm 的日序，只在索引和交付边界格式化，退役显示反解和整年 seed 两个私有辅助函数。R32 沿用当时的 `>=9` 日期序差，R57 按[四库明例](qimen-depth-audit.md#qimen-zhirun-inclusive-days-round57)改为首尾并数满九日。
+
+固定原六例为年1／99／999／9999的7月15日12UTC和2026年1月／7月15日12UTC；另封两端点为年1元旦00UTC和9999年末23UTC，全部solar=false、+00:00、zhirun。BEFORE各一次：原六例2错误／4成功，另两例2错误。前两年1错误为解析00001206大雪时year0越界；9999年7月在年表续排、年末23时更早在有效日期formatter遇year10000。所有原400／nonretryable错误、完整自然轨迹及分母保存。当前同八请求各一次均完整返回，原四成功的完整业务按类型和float.hex递归0差异。末年23时的实际有效日序为3652060／10000-01-01，公开输入仍为9999-12-31。
+
+共享来源叶只查询三个实际anchor：前一年索引22、当年10和22；每个先按既有`_solar_term_source_year`选择模型，保邻年自身profile及仅限原边界的输入年授权，源验证后再查派生cache。三anchor的UTC日序／微秒、provider／model及完整source_model_details与原保存操作数逐值相同。古远／端点本轮实际为swisseph／swieph，2026为包内DE440，不冒称都走DE441或古历复原。本机year0原24节气实际可解，没有观察到多余全年依赖的源域失败；本机低年strftime也补齐四位，均不算新实测失败。
+
+来源回执复用同一三anchor选择，移除为了provider披露再求整邻年以及`date()+timedelta`的额外载体限制。`term_grid_years_observed`表示其中确有锚点被观察的年份，不能据此称全年已读。拆补只披露已有current_solar_term；另封2026年7月15日12UTC及9999年末23UTC两个after-only拆补例，provider／年份／ju_term与该来源一致，没有伪造旧版比较。HKO已封三现代干支锚及独立4／100／400整数历法先生成的日序、day／符头／三元目标，在全部10次AFTER均符合；没有独立小时干或完整古盘oracle。
+
+以上是BEFORE8、AFTER10次服务调用，原六／续二／拆补二分别列账，没有重试或重跑原典、天文参考。两个原端点请求另各一次经REST、新stdioMCP、CLI，共6公开调用，协议及领域均成功；每例完整业务只排顶层run_metadata后三端0差异。所选request Schema与R31声明相同；输出模型及完整MCP定义只核当前窗口稳定，没有完整历史outputSchema对照。1488生产路径及已冻结资产端点稳定；原生来源的配置列表不等于完整原子读集，35份额外配置se1未纳入本协议lane即时前像，其跨更大窗口的旧封印对账另列，不伪称即时全量文件见证。
+
+累计独立改进仍26，本项是既有历法范围家族续修。旧测试仅自然迁接cache与真实来源依赖，没有运行pytest、collection、CI、格式／类型、build或checker。原九项奇门典籍义务、古代／未来物理时钟、真太阳全域和现实预测均未升格。完整原始证据分别在外置R32的`qimen-priority-discovery/`、`qimen-endpoint-continuation/`、`qimen-after-observation/`及`qimen-protocol-continuity/`。
+
+<a id="nominal-clock-labels-round33"></a>
+## 共享太阳标签、物理民用时刻与 UTC 端点（R33）
+
+R32 的四个拒绝均未启用太阳时。本轮另在原始输入阶段固定四例：奇门年1元旦00UTC／经度−180和9999年末23UTC／经度+180，均显式太阳时及置闰；两个库级均时差控制为`0001-01-01T00:12:00+08:00`和`9999-12-31T23:12:00-08:00`。后两例不是突破 Person 1900—2100 范围的个人咨询。BEFORE 各一次，前两例在服务层名义`datetime+timedelta`溢出并实际返回`internal_error/500`；后两例在 UTC `astimezone` 溢出、尚未调用原生库。原错误、完整分母及被动操作数均保存，不将返回了错误信封当成功。
+
+先以既有独立编译 Swiss Ephemeris 2.10.03 原作者 C 的`swe_julday`及`swe_time_equ`执行四个固定源输入。原文规定输入 UT、返回 LAT−LMT 的日数；本产品仍明确 UTC 近似 UT1，不引入实测 DUT1 或其他太阳模型。新进程 close／set_ephe_path、不设 JPL，四次显式均时差均 status0／空消息／有限；另四次 Sun2050 与两次文件槽快照按各自调用保存，不能冒作 time_equ 内部跟踪。`set_ephe_path`的隐式 J2000 Moon 工作另注，四个显式 API 不是全部原生工作。原 C 与 SDK 的构建和内部来源资格保持分开。
+
+独立脚本只消费产品修改前已封的 source／BEFORE 操作数，依实际 CPython 3.12.13 `timedelta(minutes=given_total)`量化，再以独立整数4／100／400 Gregorian 运算进日；没有把浮点分钟换成理想 Fraction 后重新舍入。三份既有 HKO 干支锚、独立小时干表与已读《遁甲演义》符头／三元规则仅支持相应条件事实。固定目标与脚本、源及运行时身份先封，AFTER 不参与目标生成；农历与完整置闰古盘没有本轮独立 oracle。
+
+共享种子现只保存已解析 aware 民用时刻与`NominalClockLabel(ordinal, microseconds_of_day)`；服务数字入口和本地文本／坐标入口共用一个领域修正与装配所有者。太阳标签没有时区，不反推真实 UTC／TT，不存另一份 corrected datetime。原经度／均时差／DST 运算关联与 timedelta 微秒取整不变；年／月及来源年份仍取实际民用时刻，日／时和农历取所选标签，农历先核原表范围才创建 date。Person 适配沿用已算出生校正，不重复求 EOT。ISO 解析移至无依赖叶，明确偏移的实际瞬间核对使用既有 UTC 日序而不要求 UTC datetime；未知偏移、gap、未选择 fold 及 offset mismatch 继续拒绝。太乙各自零时／23时、起算资格与来源范围保持，六壬 TT 同点校验仍比较原微秒量化标签，不降为字符串相等或删除来源验证。
+
+AFTER 固定四例各一次：两个奇门均返回完整九宫，实际标签分别为`0000-12-31T11:51:38.151076`、`+010000-01-01T10:58:59.275890`，其日／时、符头／元与先封条件目标一致。两个均时差库调用均有限，hour／JD hex 与原 C 均2／2相同，**严格 EOT 位级只1／2相同**。B1 的 SDK days 为`-0x1.75dd1453d505bp-8`，原 C 为`-0x1.75dd1453d4fa5p-8`；分钟分别为`-0x1.06df724af1c80p+3`与`-0x1.06df724af1c00p+3`。这项严格未通过原样保留，没有调容差、改输入／目标或据小差宣告物理准确；也未据此诊断另一个产品根因。
+
+独立的现代四控制为2026年1月／7月奇门和3月六壬／9月金口诀，均显式真太阳并跨至前／后一天。BEFORE4 与 AFTER4 各一次，全部完整成功，完整业务逐类型、逐键／数组及 float.hex 比较0差异，未排除任何字段。它们不是四项新独立优化；原四与现代四分别列账。两次 AFTER 均126资产／1490生产源码以及全部37配置 se1 即时前后身份无漂移，文件窗口不等于原生原子读集。
+
+另选9个受影响工具的12个固定场景经 REST、新 stdio MCP 和独立 CLI，共36次实际调用，全部领域与协议成功；同场景完整业务仅去顶层 run_metadata 后三端0差异。原两奇门与现代六壬／金口诀四请求直接沿用；河洛、参评、三式、太乙月／日／金钥匙时计、农历与有界紫微共八例仅作 AFTER 控制，不造旧版或独立精度比较。十二份保存体的 strict_fields 投影及部分输出模型均接受，没有再次调用引擎。9份 input Schema 与 R32 声明相同；实际 output Schema 与完整 MCP 定义只核同窗稳定，不捏造历史 outputSchema。1490生产源码和133冻结资产含全部37 se1 前后相同；Pydantic 原 warning、各端日志和完整返回保留，真实模型、常驻聊天进程、安装与部署未验。
+
+累计独立根因仍26，本轮是既有历法表示家族的共享传播闭包，字段、函数和样例数量不增信用。原测试仅迁 owner、真实 carrier 与相关 spy，原规则断言和失败保留；新八输入回归只固定 source／BEFORE 条件操作数，不使用 AFTER 结果，仍未运行。pytest、collection、CI、格式／类型、build、合同／清单 checker 继续0。B1、原物理精度线、奇门九义务、太乙六壬异文及现实效度均未改判。
+
+上述8领域与36协议观察对应当时生产实现的计算范围。窗口结束后的独立静态 peer 另发现新五字段`SolarTimeAdjustment`需要沿西占`solar_rebase_adjustment`的返回注解传播，最终 v2 仅增加该类型 import 并将首 tuple 元素注解从任意可写 dict 改为该 TypedDict。原装饰器、参数及完整函数体 AST 不变，没有新计算或公开字段；它不算数值优化，也没有为纯类型传播重跑业务。v1 完整封印与 v2 静态类型差异分别保存，不能将 v1 的字节窗口冒称最终 v2 全字节未变。
+
+<a id="retained-domain-carriers-round34"></a>
+## 河洛、参评与六壬来源的端点闭包（R34）
+
+R34从R33最终1490生产Python／JSON路径零漂移继续，固定六个无太阳校正的公开领域请求先各执行一次：六壬下端和参评legacy上端完整成功；河洛两端因UTC扩年字符串被datetime解析器拒绝，参评默认下端因UTC datetime转换溢出，金口诀上端因额外Moshier预飞超域而失败。所有原始结果、异常、浮点位值和被动轨迹保留，未按成功样本替换失败输入。
+
+河洛现在用既有ZonedCalendar读取UTC显示边界，仍要求原文本零偏移、同一节气／象限与精度；候卦两条件重建及原表冲突不改。参评默认附录路径从唯一typed DayunStartResolution取实际target_term.calendar，用所选出生区的整数日序计算民用日期差；不再取bounded moment或从太阳JSON重建已知主点。UTC比较、生日标签读取、查询和source context复用既有整数历。年0立春只沿origin1共享邻界许可取得，不成为独立公开年表；三日折岁、生日加法、fold／gap政策、十二运及120年／121界均未缩短，输出完整性与同次来源绑定校验未放松。
+
+原六AFTER各一次，全部完整返回。两原成功控制的完整raw字节分别相同，独立递归类型／float.hex比较0差异，无字段排除。给定BEFORE小寒源操作数，C01实际民用差4天、整1年、余1舍弃，首运0002-01-01、十二运末0122-01-01，符合先封独立整数参考；实际生成120行、121个立春边界，模型均swieph，origin1／pillar-year0及唯一derived year0如实交付。这121个新源事件只能作为AFTER实际准入操作数作区间一致性核对，不冒称旧gold或独立天文根。古代UTC／DeltaT／源物理精度及未知农历仍未由此通过。
+
+金口诀上端的独立来源适用域根因见[河洛、参评与六壬的来源端点](#retained-domain-carriers-round34)。连续配运profile共享TimingAnalysis的UTC datetime往返另列未观察义务，本轮不复制算法或宣称它已支持该端点；年9999后的生日、上端默认120年序和其他来源域也未由当前六例证明。
+
+共同运行版本为已登记的源码与资料版本，领域六例的52资产及全部37配置se1即时前后无漂移，不是原生原子读集。较早的严格 EOT B1、原太阳／物理门槛、奇门九义务和传统异文未改判。
+
+<a id="continuous-carrier-round35"></a>
+## 连续配运的合法下端与比较载体（R35）
+
+固定0001-01-01 00:00 +14、明确出生offset及男性、无太阳校正，将配运设为bazi_continuous_v1。BEFORE真实失败发生于共享TimingAnalysis._resolve_dayun_calendar_boundary的birth.astimezone(UTC)：本地合法年份1对应UTC年0，bounded datetime溢出。已算出的首运wall为0002-05-14T12:03:05.355487+14:00，节气、保留跨度与原量化均匹配先封条件参考；不能把比较载体错误归成源域或量化器错误。
+
+当前同一函数复用localize_datetime／ZonedCalendar作同区往返，用utc_calendar的精确日点比较；保持relativedelta年截取、原360／30换算、单次微秒量化、fold0／gap-forward和首界晚fold救援。未复制Canping公式、扩大公开年份、添加来源开关或截短十二运、120行及121实际立春界。
+
+固定三输入AFTER各一次REST，另仅C01各一次fresh MCP／CLI，共五调用：均领域完整，C01三端全业务0差且条件参考／13界标签和24点字段符合。原63门中的61通过、2个控制全业务连续性失败保持；C02／M01分别177／961差，均为既有public_output完整性字段移除，共同字段type／float.hex差0。实际未变public_value只作用于两份保存的内部BEFORE，派生同边界差0／0；这不是观察到的公开BEFORE、重放或原门改判。
+
+该观察窗为已登记的源码与资料版本，仍实际运行v3来源；73资产（含37se1与14v3块）前后0漂移。随后v4切换不冒作本五调用的来源。旧111fold／124gap、上端120年、物理太阳根与未来时区等未重跑；本修复属既有日历载体根因传播，新增独立根因0。完整证据在外置R35的canping-continuous-discovery。

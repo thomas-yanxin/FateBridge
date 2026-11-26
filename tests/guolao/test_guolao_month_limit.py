@@ -14,13 +14,15 @@ from pydantic import ValidationError
 import fatebridge.api as api
 from fatebridge.application.execution import execute_tool
 from fatebridge.cli import run
-from fatebridge.core import guolao_classical as c
-from fatebridge.core import guolao_monthly as monthly
+from fatebridge.core.guolao import guolao_classical as c
+from fatebridge.core.guolao import guolao_monthly as monthly
 from fatebridge.core.requests.astrology import AstroChartPolyRequest, AstroGuolaoRequest
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.astrology import calculate_core_chart_analysis
+from fatebridge.services.catalog.astro_bindings import _astro_chart_bind
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.surface_payloads import astro_payload
+from tests.support.transports import call_calculation
 
 FIXTURES = Path(__file__).parents[1] / "fixtures" / "guolao-month-limit-v1"
 SOURCE = json.loads(monthly.DATA.read_text())
@@ -28,7 +30,7 @@ HKO = json.loads((FIXTURES / "hko-reference.json").read_text())
 AS_OF = "2026-10-22T12:00:00+08:00"
 
 
-def test_raw_original_witness_and_independent_calendar_receipts_are_preserved():
+def test_raw_original_witness_and_independent_calendar_receipts_are_preserved() -> None:
     fetch = json.loads((FIXTURES / "source-fetch.json").read_text())
     assert fetch["sha256"] == SOURCE["source_image_sha256"]
     assert (
@@ -49,7 +51,7 @@ def test_raw_original_witness_and_independent_calendar_receipts_are_preserved():
 @pytest.mark.parametrize("number,branch", SOURCE["example"]["month_branches"].items())
 def test_monthly_cycle_matches_every_month_actually_printed_in_the_example(
     number, branch
-):
+) -> None:
     e = SOURCE["example"]
     annual = c.small_limit_branch(
         e["life_branch"], e["birth_year_branch"], e["target_year_branch"]
@@ -58,7 +60,7 @@ def test_monthly_cycle_matches_every_month_actually_printed_in_the_example(
     assert c.month_limit_branch(annual, e["birth_month"], int(number)) == branch
 
 
-def test_month_cycle_preserves_birth_month_anchor_and_reverse_adjacent_steps():
+def test_month_cycle_preserves_birth_month_anchor_and_reverse_adjacent_steps() -> None:
     for branch in c.BRANCHES:
         for month in range(1, 13):
             assert c.month_limit_branch(branch, month, month) == branch
@@ -75,7 +77,9 @@ def test_month_cycle_preserves_birth_month_anchor_and_reverse_adjacent_steps():
 
 @pytest.mark.parametrize("bad", [True, None, 1.0, "5", 0, 13])
 @pytest.mark.parametrize("index", [0, 1])
-def test_month_ordinals_reject_missing_coerced_and_out_of_range_inputs(bad, index):
+def test_month_ordinals_reject_missing_coerced_and_out_of_range_inputs(
+    bad: bool | float | int | str | None, index: int
+) -> None:
     months = [5, 6]
     months[index] = bad
     with pytest.raises(ValueError):
@@ -83,7 +87,7 @@ def test_month_ordinals_reject_missing_coerced_and_out_of_range_inputs(bad, inde
 
 
 @pytest.mark.parametrize("case", HKO["cases"], ids=lambda c: c["date"])
-def test_utc8_lunar_month_and_leap_flag_against_independent_hko_table(case):
+def test_utc8_lunar_month_and_leap_flag_against_independent_hko_table(case) -> None:
     actual = monthly.month_context(
         datetime.fromisoformat(case["date"] + "T12:00:00+08:00"), "chinese_lunar_utc8"
     )
@@ -94,7 +98,7 @@ def test_utc8_lunar_month_and_leap_flag_against_independent_hko_table(case):
     assert actual["timezone"] == "UTC+08:00"
 
 
-def test_lunar_calendar_uses_fixed_utc8_rather_than_historical_shanghai_dst():
+def test_lunar_calendar_uses_fixed_utc8_rather_than_historical_shanghai_dst() -> None:
     # HKO: leap fifth month begins 1990-06-23. Shanghai then used UTC+09.
     before = monthly.month_context(
         datetime.fromisoformat("1990-06-22T15:30:00+00:00"), "chinese_lunar_utc8"
@@ -107,7 +111,9 @@ def test_lunar_calendar_uses_fixed_utc8_rather_than_historical_shanghai_dst():
     assert after["is_leap_month"] and after["lunar_day"] == 1
 
 
-def test_jie_month_change_brackets_independent_hko_minute_and_consumes_exact_boundary():
+def test_jie_month_change_brackets_independent_hko_minute_and_consumes_exact_boundary() -> (
+    None
+):
     # HKO's retained raw XML replaces the retired duplicate JSON transcription.
     raw = (
         Path(__file__).parents[1] / "fixtures/calendar_hko_v1/24SolarTerms_2026.xml"
@@ -134,7 +140,7 @@ def test_jie_month_change_brackets_independent_hko_minute_and_consumes_exact_bou
     assert monthly.month_context(edge, "jie_month")["month_number"] == 1
 
 
-def test_lunar_month_turns_at_utc8_midnight_not_the_request_offset_midnight():
+def test_lunar_month_turns_at_utc8_midnight_not_the_request_offset_midnight() -> None:
     edge = datetime.fromisoformat("2027-06-05T00:00:00+08:00")
     assert (
         monthly.month_context(edge - timedelta(microseconds=1), "chinese_lunar_utc8")[
@@ -149,7 +155,7 @@ def test_lunar_month_turns_at_utc8_midnight_not_the_request_offset_midnight():
 
 
 @pytest.mark.parametrize("basis", ["jie_month", "chinese_lunar_utc8"])
-def test_unknown_or_naive_month_inputs_do_not_pick_a_calendar(basis):
+def test_unknown_or_naive_month_inputs_do_not_pick_a_calendar(basis: str) -> None:
     with pytest.raises(ValueError):
         monthly.month_context(datetime(2027, 6, 5), basis)
     with pytest.raises(ValueError):
@@ -159,7 +165,9 @@ def test_unknown_or_naive_month_inputs_do_not_pick_a_calendar(basis):
 
 
 @pytest.mark.parametrize("request_model", [AstroGuolaoRequest, AstroChartPolyRequest])
-def test_selected_month_basis_requires_target_and_correct_variant(request_model):
+def test_selected_month_basis_requires_target_and_correct_variant(
+    request_model,
+) -> None:
     with pytest.raises(ValidationError, match="guolao_month_basis"):
         request_model.model_validate(
             {**astro_payload(), "guolao_month_basis": "jie_month"}
@@ -182,6 +190,8 @@ def test_selected_month_basis_requires_target_and_correct_variant(request_model)
                     "analysis_datetime": "2027-06-05T12:00:00+08:00",
                 }
             )
+    else:
+        pass
 
 
 def chart(*, basis=None, target="2027-06-05T12:00:00+08:00", **kwargs):
@@ -193,7 +203,9 @@ def chart(*, basis=None, target="2027-06-05T12:00:00+08:00", **kwargs):
     )
 
 
-def test_native_basis_changes_only_month_assignment_and_records_all_dependencies():
+def test_native_basis_changes_only_month_assignment_and_records_all_dependencies() -> (
+    None
+):
     plain = chart()
     assert "month_limit" not in plain["guolao"]["timing"]
     a, b = chart(basis="jie_month"), chart(basis="chinese_lunar_utc8")
@@ -213,12 +225,7 @@ def test_native_basis_changes_only_month_assignment_and_records_all_dependencies
             m["ordinal_rule_collated"]
             and not m["calendar_mapping_classical_acceptance"]
         )
-        assert not m["event_probability_estimated"]
-        assert r["interpretation_evidence"]["month_limit"]["source_paths"] == [
-            "guolao.timing.month_limit"
-        ]
-        assert f"月限在{branch}" in r["interpretation"]["month_limit"]
-        assert r["interpretation"]["month_limit"] in r["snapshot_text"]
+        assert f"月限（{m['month_basis']}）：{branch}。" in r["snapshot_text"]
         assert r["guolao"]["rule_trace"][:-1] == plain["guolao"]["rule_trace"]
         assert r["guolao"]["rule_trace"][-1]["outputs"]["month_limit_branch"] == branch
         assert r["guolao"]["rulesets"][:-1] == plain["guolao"]["rulesets"]
@@ -228,8 +235,51 @@ def test_native_basis_changes_only_month_assignment_and_records_all_dependencies
             assert r[key] == plain[key]
 
 
+@pytest.mark.parametrize(
+    "longitude,lunar_month,lunar_day,branch",
+    [
+        (120 + 2**-30, 4, 29, "巳"),
+        (120, 5, 1, "午"),
+        (120 - 2**-30, 5, 1, "午"),
+    ],
+)
+def test_lunar_month_uses_exact_pre_atomic_mean_solar_source_date(
+    longitude, lunar_month: int, lunar_day: int, branch: str
+) -> None:
+    # HKO 1950, p. 1: June 14/15 are lunar 4/29 and 5/1 respectively.
+    # A longitude step of 2**-30 degrees shifts UTC+08 by less than 0.5 us.
+    result = calculate_core_chart_analysis(
+        chart_variant="guolao_chart",
+        birth_year=1950,
+        birth_month=6,
+        birth_day=15,
+        birth_hour=0,
+        birth_latitude=25,
+        birth_longitude=longitude,
+        birth_clock_basis="local_mean_solar",
+        analysis_datetime=datetime.fromisoformat("2027-06-05T12:00:00+08:00"),
+        guolao_month_basis="chinese_lunar_utc8",
+    )
+    monthly = result["guolao"]["timing"]["month_limit"]
+    birth = monthly["birth_month"]
+    assert birth["calendar_datetime"] == "1950-06-15T00:00:00+08:00"
+    assert (birth["month_number"], birth["lunar_day"], monthly["branch"]) == (
+        lunar_month,
+        lunar_day,
+        branch,
+    )
+    if lunar_month == 4:
+        assert birth["calendar_date"] == "1950-06-14"
+        assert (
+            birth["calendar_lookup_basis"]
+            == "retained_nominal_source_point_fixed_utc8_date"
+        )
+    else:
+        pass
+
+
 @pytest.mark.parametrize("basis", ["jie_month", "chinese_lunar_utc8"])
-def test_true_solar_display_cannot_change_the_month_calendar_inputs(basis):
+def test_true_solar_display_cannot_change_the_month_calendar_inputs(basis: str) -> None:
     a, b = chart(basis=basis), chart(
         basis=basis, use_true_solar_time=True, birth_longitude=-170
     )
@@ -246,8 +296,8 @@ def test_true_solar_display_cannot_change_the_month_calendar_inputs(basis):
 
 @pytest.mark.parametrize("birth_leap", [False, True])
 def test_intercalary_month_stays_unassigned_while_year_and_sky_remain_available(
-    birth_leap,
-):
+    birth_leap: bool,
+) -> None:
     r = chart(
         basis="chinese_lunar_utc8",
         target="2025-07-25T12:00:00+08:00",
@@ -259,15 +309,12 @@ def test_intercalary_month_stays_unassigned_while_year_and_sky_remain_available(
     assert m["target_month"]["is_leap_month"]
     assert m["birth_month"]["is_leap_month"] is birth_leap
     assert m["branch"] is None and m["natal_functional_palace"] is None
-    assert (
-        "闰月" in r["interpretation"]["month_limit"]
-        and "未分配" in r["interpretation"]["month_limit"]
-    )
+    assert "月限（chinese_lunar_utc8）：未分配。" in r["snapshot_text"]
     assert g["timing"]["small_limit"]["branch"] in c.BRANCHES
     assert len(g["timing"]["transit_bodies"]) == 11
 
 
-def test_unavailable_lunar_table_does_not_fabricate_a_month():
+def test_unavailable_lunar_table_does_not_fabricate_a_month() -> None:
     m = monthly.build_month_limit(
         annual_branch="戌",
         birth_instant=datetime.fromisoformat("1990-04-06T09:33:00+08:00"),
@@ -284,8 +331,11 @@ def test_unavailable_lunar_table_does_not_fabricate_a_month():
     "target", ["2027-06-05T12:00:00+08:00", "2025-07-25T12:00:00+08:00"]
 )
 def test_selected_month_layer_projects_identically_on_rest_native_mcp_cli(
-    monkeypatch, capsys, basis, target
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    basis: str,
+    target: str,
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -300,8 +350,7 @@ def test_selected_month_layer_projects_identically_on_rest_native_mcp_cli(
     }
     fields = [
         "guolao.timing.month_limit",
-        "interpretation.month_limit",
-        "interpretation_evidence.month_limit",
+        "guolao.timing.small_limit",
     ]
     options = {
         "as_of": AS_OF,
@@ -325,8 +374,8 @@ def test_selected_month_layer_projects_identically_on_rest_native_mcp_cli(
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                spec.tool_name, {**payload, **options}, raise_on_error=False
+            return await call_calculation(
+                client, spec.tool_name, {**payload, **options}, raise_on_error=False
             )
 
     native = asyncio.run(protocol())
@@ -358,8 +407,8 @@ def test_selected_month_layer_projects_identically_on_rest_native_mcp_cli(
 
 @pytest.mark.parametrize("basis", ["jie_month", "chinese_lunar_utc8"])
 def test_generic_guolao_entry_matches_dedicated_and_germany_default_binding_still_works(
-    basis,
-):
+    basis: str,
+) -> None:
     specs = {s.key: s for s in CATALOG}
     p = {
         **astro_payload(),
@@ -379,7 +428,6 @@ def test_generic_guolao_entry_matches_dedicated_and_germany_default_binding_stil
         include_metadata=False,
     )
     assert a == b
-    from fatebridge.services.catalog.astro_bindings import _astro_chart_bind
 
     req = AstroChartPolyRequest.model_validate(
         {**astro_payload(), "chart_variant": "germany"}

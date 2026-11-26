@@ -1,6 +1,6 @@
 """Progressive catalog discovery shared by REST, CLI and MCP resources."""
 
-from typing import Any, Dict, List, Literal, Optional, Set
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, ValidationError
 
@@ -18,31 +18,31 @@ ToolSurface = Literal["rest", "mcp", "cli"]
 
 class DiscoveryQuery(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    family: Optional[str] = None
-    q: Optional[str] = None
-    tool: Optional[str] = None
-    surface: Optional[ToolSurface] = None
-    detail: Literal["summary", "full"] = "full"
+    family: str | None = None
+    q: str | None = None
+    tool: str | None = None
+    surface: ToolSurface | None = None
+    detail: Literal["index", "summary", "full"] = "full"
 
 
 def select_mcp_specs(
-    specs: List[ToolSpec],
+    specs: list[ToolSpec],
     *,
-    family: Optional[str] = None,
-) -> List[ToolSpec]:
+    family: str | None = None,
+) -> list[ToolSpec]:
     """Select an explicit MCP loading profile without changing domain contracts."""
     return select_specs(specs, family=family, surface="mcp")
 
 
 def select_specs(
-    specs: List[ToolSpec],
+    specs: list[ToolSpec],
     *,
-    family: Optional[str] = None,
-    q: Optional[str] = None,
-    tool: Optional[str] = None,
-    surface: Optional[ToolSurface] = None,
-    allowed_names: Optional[Set[str]] = None,
-) -> List[ToolSpec]:
+    family: str | None = None,
+    q: str | None = None,
+    tool: str | None = None,
+    surface: ToolSurface | None = None,
+    allowed_names: set[str] | None = None,
+) -> list[ToolSpec]:
     """Filter declarations before materializing any expensive schemas."""
     selected = specs
     if family is not None:
@@ -84,7 +84,6 @@ def select_specs(
             if needle
             in " ".join(
                 (
-                    spec.key,
                     spec.tool_name,
                     spec.summary,
                     spec.operation_label_zh,
@@ -96,15 +95,15 @@ def select_specs(
 
 
 def discover_specs(
-    specs: List[ToolSpec],
+    specs: list[ToolSpec],
     *,
-    family: Optional[str] = None,
-    q: Optional[str] = None,
-    tool: Optional[str] = None,
-    surface: Optional[str] = None,
+    family: str | None = None,
+    q: str | None = None,
+    tool: str | None = None,
+    surface: str | None = None,
     detail: str = "full",
-    allowed_names: Optional[Set[str]] = None,
-) -> Dict[str, Any]:
+    allowed_names: set[str] | None = None,
+) -> dict[str, Any]:
     try:
         query = DiscoveryQuery.model_validate(
             dict(
@@ -121,7 +120,18 @@ def discover_specs(
     selected = select_specs(
         specs, **query.model_dump(exclude={"detail"}), allowed_names=allowed_names
     )
-    describe = summarize_spec if query.detail == "summary" else describe_spec
+    if query.detail == "index":
+        tools = [
+            {
+                "tool": spec.tool_name,
+                "family": spec.family,
+                "label": spec.operation_label_zh,
+            }
+            for spec in selected
+        ]
+    else:
+        describe = summarize_spec if query.detail == "summary" else describe_spec
+        tools = [describe(spec) for spec in selected]
     return {
         # Counts retain their original global-catalog meaning under filtering.
         "counts": {
@@ -131,5 +141,5 @@ def discover_specs(
         },
         "matched_count": len(selected),
         "detail": query.detail,
-        "tools": [describe(spec) for spec in selected],
+        "tools": tools,
     }

@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish import build_india, vimshottari
+from fatebridge.core.jyotish.jyotish import build_india, vimshottari
 
 REFERENCE = json.loads(
     (Path(__file__).parents[1] / "fixtures/jyotish-reference.json").read_text()
@@ -16,8 +16,8 @@ REFERENCE = json.loads(
 
 @pytest.mark.parametrize("case", REFERENCE["examples"])
 def test_d1_d9_d10_and_all_81_antardasha_starts_against_pyjhora(
-    case, monkeypatch, tmp_path
-):
+    case, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     # The frozen oracle used Moshier; an operator's nonempty path must not win.
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     year, month, day = case["date"]
@@ -49,6 +49,8 @@ def test_d1_d9_d10_and_all_81_antardasha_starts_against_pyjhora(
                 # Bound this separately (0.0036 arcsec in D1); do not loosen
                 # physical-planet or dasha tolerances to hide node noise.
                 tolerance = 1e-6
+            else:
+                pass
             assert planet["longitude"] == pytest.approx(
                 sign * 30 + degree, abs=tolerance * varga["division"], rel=0
             )

@@ -1,5 +1,6 @@
 """Hand-computed pairs, enumerated missingness and closed-form logit MLE."""
 
+import hashlib
 import itertools
 import json
 import math
@@ -14,7 +15,8 @@ from zoneinfo import ZoneInfo
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.validation.guolao_career import (
+from validation import guolao_career
+from validation.guolao_career import (
     CareerOutcome,
     CareerStudyPlan,
     PairedCareerForecast,
@@ -25,7 +27,7 @@ from fatebridge.validation.guolao_career import (
     analysis_code_fingerprint,
     evaluate_career_study,
 )
-from fatebridge.validation.predictions import digest
+from validation.predictions import digest
 
 AS_OF = datetime(2028, 2, 1, tzinfo=timezone.utc)
 
@@ -97,7 +99,7 @@ def evaluate(p, f, o, **changes):
     return evaluate_career_study(p, f, o, as_of=changes.get("as_of", AS_OF))
 
 
-def test_hand_scores_include_abstention_at_its_person_specific_baseline():
+def test_hand_scores_include_abstention_at_its_person_specific_baseline() -> None:
     report = evaluate(
         plan(),
         [forecast(0, 0.9, 0.4), forecast(1, 0.8, 0.3), forecast(2, None, 0.2)],
@@ -116,7 +118,7 @@ def test_hand_scores_include_abstention_at_its_person_specific_baseline():
     assert not report["primary"]["prespecified_sample_comparison_passed"]
 
 
-def test_sharp_full_cohort_bounds_match_all_binary_completions():
+def test_sharp_full_cohort_bounds_match_all_binary_completions() -> None:
     submitted = [forecast(0, 0.9, 0.4), forecast(1, 0.8, 0.3), forecast(2, None, 0.2)]
     report = evaluate(plan(), submitted, [outcome(0, True)])
     completed = []
@@ -140,7 +142,7 @@ def test_sharp_full_cohort_bounds_match_all_binary_completions():
     assert not report["primary"]["prespecified_sample_comparison_passed"]
 
 
-def test_missing_forecast_is_not_converted_to_an_explicit_abstention():
+def test_missing_forecast_is_not_converted_to_an_explicit_abstention() -> None:
     report = evaluate(plan(2), [forecast(0, 0.9)], [outcome(0, True), outcome(1, True)])
     assert report["rows"][1]["status"] == "missing_forecast"
     assert not report["rows"][1]["abstained"]
@@ -150,7 +152,7 @@ def test_missing_forecast_is_not_converted_to_an_explicit_abstention():
     )
 
 
-def test_empty_records_have_no_score_or_fictitious_effectiveness():
+def test_empty_records_have_no_score_or_fictitious_effectiveness() -> None:
     report = evaluate(plan(), [], [])
     assert report["primary"]["mean_paired_brier_difference"] is None
     assert report["primary"]["uncertainty"]["interval"] is None
@@ -159,7 +161,7 @@ def test_empty_records_have_no_score_or_fictitious_effectiveness():
     assert not report["authority_certified"]
 
 
-def test_pending_window_never_scores_partial_outcomes():
+def test_pending_window_never_scores_partial_outcomes() -> None:
     report = evaluate(
         plan(),
         [forecast(i, 0.6) for i in range(3)],
@@ -170,7 +172,7 @@ def test_pending_window_never_scores_partial_outcomes():
     assert all(r["status"] == "window_pending" for r in report["rows"])
 
 
-def test_future_entered_result_stays_pending_at_analysis_cutoff():
+def test_future_entered_result_stays_pending_at_analysis_cutoff() -> None:
     report = evaluate(
         plan(2),
         [forecast(0, 0.7), forecast(1, 0.8)],
@@ -191,7 +193,7 @@ def test_future_entered_result_stays_pending_at_analysis_cutoff():
         {"case_id": "unregistered"},
     ],
 )
-def test_leakage_and_model_substitution_are_rejected(change):
+def test_leakage_and_model_substitution_are_rejected(change) -> None:
     with pytest.raises(ValueError):
         evaluate(plan(), [forecast(0, 0.5, **change)], [])
 
@@ -206,7 +208,9 @@ def test_leakage_and_model_substitution_are_rejected(change):
         {"baseline_probability": True},
     ],
 )
-def test_forecast_cannot_change_information_set_or_hide_probability_type(change):
+def test_forecast_cannot_change_information_set_or_hide_probability_type(
+    change,
+) -> None:
     with pytest.raises(ValidationError):
         (
             forecast(0, 0.5, **change)
@@ -215,14 +219,14 @@ def test_forecast_cannot_change_information_set_or_hide_probability_type(change)
         )
 
 
-def test_missing_abstention_reason_and_registration_draft_do_not_run():
+def test_missing_abstention_reason_and_registration_draft_do_not_run() -> None:
     with pytest.raises(ValidationError):
         forecast(0, None, abstention_reason=None)
     with pytest.raises(ValidationError):
         CareerStudyPlan.model_validate({"state": "draft_not_registered_no_data"})
 
 
-def test_train_overlap_code_change_and_duplicate_records_are_rejected():
+def test_train_overlap_code_change_and_duplicate_records_are_rejected() -> None:
     with pytest.raises(ValidationError):
         plan(training_subject_ids=["synthetic-subject-0"])
     with pytest.raises(ValueError):
@@ -245,12 +249,14 @@ def test_train_overlap_code_change_and_duplicate_records_are_rejected():
         },
     ],
 )
-def test_window_endpoints_and_incomplete_followup_are_rejected(change):
+def test_window_endpoints_and_incomplete_followup_are_rejected(change) -> None:
     with pytest.raises(ValueError):
         evaluate(plan(), [], [outcome(0, True, **change)])
 
 
-def test_event_at_inclusive_start_is_valid_but_unblinded_declaration_blocks_gate():
+def test_event_at_inclusive_start_is_valid_but_unblinded_declaration_blocks_gate() -> (
+    None
+):
     report = evaluate(
         plan(2),
         [forecast(0, 0.9), forecast(1, 0.8)],
@@ -265,7 +271,7 @@ def test_event_at_inclusive_start_is_valid_but_unblinded_declaration_blocks_gate
     assert not report["primary"]["prespecified_sample_comparison_passed"]
 
 
-def test_analytic_logit_calibration_intercept_slope_and_information_intervals():
+def test_analytic_logit_calibration_intercept_slope_and_information_intervals() -> None:
     # Three independent binomial groups have event rates exactly generated by
     # logit(rate)=log(2)+logit(p); score equations vanish at a=log(2), b=1.
     pairs = [
@@ -291,6 +297,61 @@ def test_analytic_logit_calibration_intercept_slope_and_information_intervals():
     )
 
 
+def test_calibration_matches_frozen_reference_across_predictor_scales() -> None:
+    folder = Path(__file__).parents[1] / "data/guolao_calibration_scale_v1"
+    raw = (folder / "reference.json").read_bytes()
+    assert (
+        hashlib.sha256(raw).hexdigest()
+        == (folder / "reference.json.sha256").read_text().strip()
+    )
+    reference = json.loads(raw)
+    assert len(reference["cases"]) == reference["case_count"] == 17
+    numeric_fields, undefined_cases = 0, 0
+    for row in reference["cases"]:
+        fit = _calibration_fit([tuple(pair) for pair in row["pairs"]])
+        assert fit["status"] == row["expected_status"], row["id"]
+        if row["kind"] == "original_undefined_control":
+            undefined_cases += 1
+            assert fit["intercept"] is fit["slope"] is fit["intervals"] is None
+            continue
+        else:
+            pass
+        target = row["targets"]
+        assert fit["intercept"] == pytest.approx(
+            float(target["intercept"]), rel=0, abs=1e-8
+        )
+        if row["kind"] == "symmetric_fixed_binomial_groups":
+            scale = float(row["L"])
+            assert fit["slope"] * scale == pytest.approx(
+                float(target["slope_times_L"]), rel=0, abs=1e-8
+            )
+            for key, expected in (
+                ("intercept", target["intercept_interval"]),
+                ("slope", target["slope_interval_times_L"]),
+            ):
+                actual = fit["intervals"][key]
+                if key == "slope":
+                    actual = [value * scale for value in actual]
+                else:
+                    pass
+                assert actual == pytest.approx(
+                    [float(value) for value in expected], rel=0, abs=1e-7
+                )
+        else:
+            assert fit["slope"] == pytest.approx(
+                float(target["slope"]), rel=0, abs=1e-8
+            )
+            for key in ("intercept", "slope"):
+                assert fit["intervals"][key] == pytest.approx(
+                    [float(value) for value in target["intervals"][key]],
+                    rel=0,
+                    abs=1e-7,
+                )
+        numeric_fields += 6
+    assert numeric_fields == reference["numeric_fields"] == 66
+    assert undefined_cases == 6
+
+
 @pytest.mark.parametrize(
     "pairs,status",
     [
@@ -305,12 +366,14 @@ def test_analytic_logit_calibration_intercept_slope_and_information_intervals():
         ),
     ],
 )
-def test_calibration_does_not_manufacture_finite_coefficients(pairs, status):
+def test_calibration_does_not_manufacture_finite_coefficients(
+    pairs, status: str
+) -> None:
     r = _calibration_fit(pairs)
     assert r["status"] == status and r["intercept"] is None and r["slope"] is None
 
 
-def test_calibration_bins_use_both_sides_of_float_boundaries_and_empty_nulls():
+def test_calibration_bins_use_both_sides_of_float_boundaries_and_empty_nulls() -> None:
     pairs = [(math.nextafter(0.3, -math.inf), 0), (0.3, 1), (1.0, 1)]
     bins = _metrics(pairs, 0.5)["calibration_bins"]
     assert len(bins) == 10
@@ -319,7 +382,7 @@ def test_calibration_bins_use_both_sides_of_float_boundaries_and_empty_nulls():
     assert bins[9]["upper_inclusive"]
 
 
-def test_paired_bootstrap_is_reproducible_and_degenerate_bca_stays_undefined():
+def test_paired_bootstrap_is_reproducible_and_degenerate_bca_stays_undefined() -> None:
     a = _paired_bootstrap([-0.3, 0.2, -0.1, 0.4])
     b = _paired_bootstrap([-0.3, 0.2, -0.1, 0.4])
     assert a == b and a["status"] == "computed"
@@ -330,7 +393,7 @@ def test_paired_bootstrap_is_reproducible_and_degenerate_bca_stays_undefined():
     assert degenerate["status"] == "degenerate_observed_losses_BCa_undefined"
 
 
-def test_bca_against_independent_frozen_scipy_component_reference():
+def test_bca_against_independent_frozen_scipy_component_reference() -> None:
     fixture = json.loads(
         (
             Path(__file__).parents[1]
@@ -342,7 +405,7 @@ def test_bca_against_independent_frozen_scipy_component_reference():
     assert result["interval"] == pytest.approx(fixture["interval"], abs=1e-12)
 
 
-def test_no_reordering_no_selective_abstention_and_zero_baseline_division():
+def test_no_reordering_no_selective_abstention_and_zero_baseline_division() -> None:
     p = plan(2)
     f = [forecast(0, None, 0.0), forecast(1, None, 1.0)]
     o = [outcome(0, False), outcome(1, True)]
@@ -358,7 +421,7 @@ def test_no_reordering_no_selective_abstention_and_zero_baseline_division():
     assert a["real_world_efficacy"] == "not_established_by_synthetic_data"
 
 
-def test_research_cli_schema_and_real_json_round_trip(tmp_path):
+def test_research_cli_schema_and_real_json_round_trip(tmp_path: Path) -> None:
     root = Path(__file__).parents[2]
     script = root / "scripts/guolao/audit_guolao_career_study.py"
     schema = subprocess.run(
@@ -404,7 +467,7 @@ def test_research_cli_schema_and_real_json_round_trip(tmp_path):
     assert not report["authority_certified"]
 
 
-def test_positive_prespecified_comparison_can_pass_without_authority_claim():
+def test_positive_prespecified_comparison_can_pass_without_authority_claim() -> None:
     n = 20
     p = plan(n, minimum_evaluable=10, minimum_brier_improvement=0.03)
     submitted = [forecast(i, 0.9 if i % 2 else 0.1, 0.3 + 0.02 * i) for i in range(n)]
@@ -417,13 +480,15 @@ def test_positive_prespecified_comparison_can_pass_without_authority_claim():
     assert report["real_world_efficacy"] == "not_established_by_synthetic_data"
 
 
-def test_naive_analysis_clock_and_future_registration_are_rejected():
+def test_naive_analysis_clock_and_future_registration_are_rejected() -> None:
     for as_of in [datetime(2028, 2, 1), datetime(2026, 10, 31, tzinfo=timezone.utc)]:
         with pytest.raises(ValueError):
             evaluate(plan(), [], [], as_of=as_of)
 
 
-def test_confirmed_positive_survives_later_loss_but_negative_needs_full_followup():
+def test_confirmed_positive_survives_later_loss_but_negative_needs_full_followup() -> (
+    None
+):
     known = outcome(0, True, window_complete_through="2027-06-01T00:00:00Z")
     report = evaluate(plan(2), [forecast(0, 0.9), forecast(1, 0.8)], [known])
     assert report["observed_pair_count"] == 1
@@ -435,8 +500,9 @@ def test_confirmed_positive_survives_later_loss_but_negative_needs_full_followup
         )
 
 
-def test_source_change_during_analysis_is_not_given_a_frozen_code_receipt(monkeypatch):
-    from fatebridge.validation import guolao_career
+def test_source_change_during_analysis_is_not_given_a_frozen_code_receipt(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     registered = plan()
     values = iter([registered.analysis_code_sha256, "0" * 64])
@@ -447,7 +513,7 @@ def test_source_change_during_analysis_is_not_given_a_frozen_code_receipt(monkey
         evaluate(registered, [], [])
 
 
-def test_dst_fold_cannot_pass_a_late_forecast_as_before_the_window():
+def test_dst_fold_cannot_pass_a_late_forecast_as_before_the_window() -> None:
     zone = ZoneInfo("America/New_York")
     start = datetime(2027, 11, 7, 1, 30, tzinfo=zone, fold=0)
     issued = datetime(2027, 11, 7, 1, 15, tzinfo=zone, fold=1)
@@ -458,7 +524,7 @@ def test_dst_fold_cannot_pass_a_late_forecast_as_before_the_window():
         evaluate(p, [forecast(0, 0.5, issued_at=issued)], [])
 
 
-def test_a_physically_ordered_fold_window_is_valid_and_offsets_are_canonical():
+def test_a_physically_ordered_fold_window_is_valid_and_offsets_are_canonical() -> None:
     zone = ZoneInfo("America/New_York")
     start = datetime(2027, 11, 7, 1, 30, tzinfo=zone, fold=0)
     end = datetime(2027, 11, 7, 1, 15, tzinfo=zone, fold=1)
@@ -483,8 +549,8 @@ def test_a_physically_ordered_fold_window_is_valid_and_offsets_are_canonical():
     ],
 )
 def test_small_brier_difference_uses_exact_double_oracle_without_absolute_tolerance(
-    augmented, baseline, outcome
-):
+    augmented, baseline, outcome: int
+) -> None:
     a, b, y = Fraction(augmented), Fraction(baseline), Fraction(outcome)
     expected = float((a - y) ** 2 - (b - y) ** 2)
     assert expected != 0

@@ -5,10 +5,13 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_special_days import source_bundle, special_day_evidence
+from fatebridge.core.sukuyo.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_special_days import (
+    source_bundle,
+    special_day_evidence,
+)
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.sukuyo import required_quote_paths
+from validation.sukuyo import required_quote_paths
 
 PRIMARY = json.loads(
     (Path(__file__).parents[1] / "data/sukuyo-special-days-primary.json").read_text()
@@ -26,7 +29,7 @@ def comparison(result, witness):
     return next(w for w in result["comparisons"] if w["witness"] == witness)
 
 
-def test_all_84_slots_have_source_clauses_and_substantive_apparatus():
+def test_all_84_slots_have_source_clauses_and_substantive_apparatus() -> None:
     bundle = source_bundle()
     assert bundle["source_sha256"] == PRIMARY["source_sha256"]
     assert sum(len(w["rows"]) for w in bundle["witnesses"]) == 84
@@ -53,6 +56,8 @@ def test_all_84_slots_have_source_clauses_and_substantive_apparatus():
                 or row["weekday_index"] != row["source_main_weekday_index"]
             ):
                 assert row["apparatus"] and not row["source_clause_is_witness_reading"]
+            else:
+                pass
     for rule in bundle["activity_rules"]:
         label = "甘露" if rule["selectors"] == ["甘露"] else "罗刹"
         source = next(
@@ -63,7 +68,7 @@ def test_all_84_slots_have_source_clauses_and_substantive_apparatus():
         assert all(excerpt in source["text"] for excerpt in rule["source_excerpts"])
 
 
-def test_all_756_mansion_weekday_witness_cells_against_primary_tables():
+def test_all_756_mansion_weekday_witness_cells_against_primary_tables() -> None:
     # The four manually transcribed tables in the primary fixture supply the
     # oracle, including the unresolved main-text 冒 and 底. No runtime output
     # or the new production table is used to generate expected labels.
@@ -99,11 +104,13 @@ def test_all_756_mansion_weekday_witness_cells_against_primary_tables():
                         if unresolved
                         else expected != result["primary"]["matched_labels"]
                     )
+                else:
+                    pass
                 checked += 1
     assert checked == 756
 
 
-def test_ming_alternatives_do_not_change_the_selected_main_text():
+def test_ming_alternatives_do_not_change_the_selected_main_text() -> None:
     tail = reference_evidence("尾", 2)
     well = reference_evidence("井", 2)
     assert tail["primary"]["matched_labels"] == ["甘露"]
@@ -134,8 +141,8 @@ def test_ming_alternatives_do_not_change_the_selected_main_text():
 
 @pytest.mark.parametrize("name,weekday,literal", [("胃", 0, "冒"), ("氐", 4, "底")])
 def test_lower_unidentified_literals_are_not_silently_normalized(
-    name, weekday, literal
-):
+    name: str, weekday: int, literal: str
+) -> None:
     result = reference_evidence(name, weekday)
     lower = comparison(result, "lower_taisho")
     assert result["primary"]["matched_labels"] == ["罗刹"]
@@ -146,7 +153,7 @@ def test_lower_unidentified_literals_are_not_silently_normalized(
     assert not comparison(result, "lower_ming_apparatus")["applied_to_primary"]
 
 
-def test_ganlu_learning_requires_religious_scope_and_retains_each_volume():
+def test_ganlu_learning_requires_religious_scope_and_retains_each_volume() -> None:
     context = calendar_mansion("2025-04-15")
     assert context["natal_su27"] == "尾"
     generic = day_evidence(context, activity="study")
@@ -180,7 +187,9 @@ def test_ganlu_learning_requires_religious_scope_and_retains_each_volume():
     )
 
 
-def test_unknown_lower_source_caution_remains_pending_even_with_a_favorable_clause():
+def test_unknown_lower_source_caution_remains_pending_even_with_a_favorable_clause() -> (
+    None
+):
     # Sunday with 轸 matches known 甘露, but lower 冒 remains unresolved.
     result = day_evidence(
         calendar_mansion("2025-09-21"),
@@ -201,7 +210,7 @@ def test_unknown_lower_source_caution_remains_pending_even_with_a_favorable_clau
     assert not result["special_day_evidence"]["physical_lunar_conjunction_evaluated"]
 
 
-def test_partial_mansion_candidates_never_become_selected_special_days():
+def test_partial_mansion_candidates_never_become_selected_special_days() -> None:
     result = reference_evidence(None, 1, ["毕", "心"])
     assert result["primary"]["matched_labels"] == []
     assert not result["primary"]["labels_complete_for_selected_day"]
@@ -220,7 +229,7 @@ def test_partial_mansion_candidates_never_become_selected_special_days():
     )
 
 
-def test_schema_context_and_return_isolation_preserve_source_comparison():
+def test_schema_context_and_return_isolation_preserve_source_comparison() -> None:
     for invalid in [-1, 7, True, 2.0]:
         with pytest.raises(ValueError):
             reference_evidence("尾", invalid)

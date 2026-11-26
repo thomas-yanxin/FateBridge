@@ -15,7 +15,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Literal
 
-from .taiyi_historical import julian_to_proleptic_gregorian
+from fatebridge.core.metaphysics.taiyi_historical import julian_to_proleptic_gregorian
 
 TaiyiYearProfile = Literal[
     "jinjing_year_lunar_civil_v1",

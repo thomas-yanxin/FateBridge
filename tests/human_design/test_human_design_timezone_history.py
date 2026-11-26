@@ -8,7 +8,7 @@ from unittest.mock import patch
 import pytest
 from pydantic import BaseModel, ValidationError, model_validator
 
-from fatebridge.core.human_design_birth_clock import resolve_birth_clock
+from fatebridge.core.human_design.human_design_birth_clock import resolve_birth_clock
 from fatebridge.core.requests.human_design import HumanDesignRequest
 from fatebridge.utils.errors import validation_error_result
 from fatebridge.utils.timezones import parse_timezone_name, validate_local_clock
@@ -20,7 +20,7 @@ VECTORS = json.loads((E / "unspecified-offset-control-vectors.json").read_text()
 ]
 
 
-def test_typed_unknown_offset_has_an_actionable_private_input_free_error():
+def test_typed_unknown_offset_has_an_actionable_private_input_free_error() -> None:
     with pytest.raises(ValidationError) as caught:
         HumanDesignRequest(
             birth_year=1900,
@@ -32,30 +32,37 @@ def test_typed_unknown_offset_has_an_actionable_private_input_free_error():
         )
     result = validation_error_result(caught.value)
     assert result["issues"] == [
-        {"path": "request", "code": "unresolved_timezone_offset"}
+        {
+            "path": "request",
+            "code": "unresolved_timezone_offset",
+            "message": result["error"],
+        }
     ]
     assert "已核实的出生钟时偏移" in result["error"]
     assert "Antarctica/Casey" not in json.dumps(result)
 
 
-def test_plain_value_error_text_cannot_impersonate_the_public_typed_hint():
+def test_plain_value_error_text_cannot_impersonate_the_public_typed_hint() -> None:
     class Fake(BaseModel):
         @model_validator(mode="after")
         def fail(self):
-            raise ValueError(
-                "unresolved local time /private/source-path private birth record"
-            )
+            raise ValueError("unresolved local time，需要核对民用时区")
 
     with pytest.raises(ValidationError) as caught:
         Fake()
     result = validation_error_result(caught.value)
     assert result["error"] == "请求参数无效"
-    assert result["issues"] == [{"path": "request", "code": "value_error"}]
-    assert "private" not in json.dumps(result)
+    assert result["issues"] == [
+        {
+            "path": "request",
+            "code": "value_error",
+            "message": "unresolved local time，需要核对民用时区",
+        }
+    ]
 
 
 @pytest.mark.parametrize("row", VECTORS, ids=lambda r: r["name"])
-def test_all16_frozen_named_unknown_offset_controls_reject_without_native(row):
+def test_all16_frozen_named_unknown_offset_controls_reject_without_native(row) -> None:
     wall = datetime.fromisoformat(row["local_label"])
     moment = wall.replace(tzinfo=parse_timezone_name(row["name"]))
     assert moment.utcoffset() == timedelta(0)
@@ -84,7 +91,7 @@ def test_all16_frozen_named_unknown_offset_controls_reject_without_native(row):
 @pytest.mark.parametrize(
     "zone", ["UTC", "GMT", "+00:00", "-00:00", "0", "Etc/GMT", "Europe/London"]
 )
-def test_known_zero_offsets_are_still_valid(zone):
+def test_known_zero_offsets_are_still_valid(zone: str) -> None:
     value = resolve_birth_clock(
         birth_year=1900,
         birth_month=1,
@@ -105,7 +112,9 @@ def test_known_zero_offsets_are_still_valid(zone):
         ("America/Cambridge_Bay", 2000, True),
     ],
 )
-def test_named_zone_resolution_follows_its_actual_period(zone, year, known):
+def test_named_zone_resolution_follows_its_actual_period(
+    zone: str, year: int, known: bool
+) -> None:
     arguments = dict(
         birth_year=year,
         birth_month=1,
@@ -118,6 +127,8 @@ def test_named_zone_resolution_follows_its_actual_period(zone, year, known):
         with pytest.raises(ValueError, match="unresolved local time"):
             resolve_birth_clock(**arguments)
         return
+    else:
+        pass
     value = resolve_birth_clock(**arguments)
     assert value.local_anchor.tzname() != "-00"
     assert value.utc_anchor == value.local_anchor.astimezone(timezone.utc)

@@ -1,7 +1,7 @@
-"""Timing use cases composed from shared states and separate snapshot renderers."""
+"""Compute BaZi time pillars, term boundaries, and pillar relationships."""
 
 from copy import deepcopy
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 from fatebridge.analysis.timing_effects import TimingEffectsAnalysis
 from fatebridge.core.almanac import (
@@ -9,97 +9,62 @@ from fatebridge.core.almanac import (
     current_local_datetime,
     get_jieqi_year_grid,
 )
-from fatebridge.core.timing import TimingAnalysis
 from fatebridge.services.birth_context import build_birth_computation_context
 from fatebridge.services.snapshot_builders import (
     build_snapshot_export as _build_snapshot_export,
 )
-from fatebridge.services.snapshot_builders import (
-    render_snapshot_lines as _render_snapshot_text,
-)
 from fatebridge.services.timing_clock import (
+    AnalysisClockReference,
     age_only_reference,
-    analysis_clock_snapshot_lines,
     resolve_analysis_moment,
+)
+from fatebridge.services.timing_periods import (
+    calculate_liunian_analysis,
+    calculate_liuri_analysis,
+    calculate_liushi_analysis,
+    calculate_liuyue_analysis,
 )
 from fatebridge.services.timing_snapshots import (
     _build_comprehensive_timing_snapshot_text,
     _build_dayun_snapshot_text,
     _build_jieqi_timeline_snapshot_text,
-    _build_liunian_snapshot_text,
-    _build_liuri_snapshot_text,
-    _build_liushi_snapshot_text,
-    _build_liuyue_snapshot_text,
+    with_analysis_reference,
+    with_birth_clock_reference,
 )
 from fatebridge.services.timing_state import (
     build_current_timing_state,
     calculate_analysis_age,
-    compute_life_dimensions_for_moment,
     enrich_jieqi_timeline,
     enrich_liuyue_timeline,
     serialize_element_effects,
 )
 from fatebridge.services.timing_uncertainty import analyze_birth_time_range
-from fatebridge.utils.birth_clock import birth_clock_snapshot_lines
 from fatebridge.utils.birth_input import PersonInfo, normalize_gender
 from fatebridge.utils.errors import calculation_guard
 from fatebridge.utils.formatting import create_pillar_dict, format_clock_datetime
 
-
-def _with_birth_clock_reference(
-    result: Dict[str, Any], *, technique: str, selected_sections: Optional[List[str]]
-) -> Dict[str, Any]:
-    lines = birth_clock_snapshot_lines(result["calendar_context"]["birth_time_input"])
-    # Keep this evidence inside the published query section so filtered exports
-    # retain it. Unknown section titles are deliberately excluded by the parser.
-    marker = "[查询信息]\n"
-    if marker not in result["snapshot_text"]:
-        raise ValueError("时运快照缺少查询信息，无法交付出生钟时输入依据")
-    result["snapshot_text"] = result["snapshot_text"].replace(
-        marker, marker + "\n".join(lines) + "\n", 1
-    )
-    result["snapshot_export"] = _build_snapshot_export(
-        technique=technique,
-        snapshot_text=result["snapshot_text"],
-        selected_sections=selected_sections,
-    )
-    return result
-
-
-def _with_analysis_reference(
-    result: Dict[str, Any],
-    reference: Dict[str, Any],
-    *,
-    technique: str,
-    selected_sections: Optional[List[str]],
-) -> Dict[str, Any]:
-    result["analysis_reference"] = reference
-    lines = analysis_clock_snapshot_lines(reference)
-    if lines:
-        result["snapshot_text"] += "\n\n" + _render_snapshot_text(
-            [("分析时刻依据", lines)]
-        )
-        result["snapshot_export"] = _build_snapshot_export(
-            technique=technique,
-            snapshot_text=result["snapshot_text"],
-            selected_sections=selected_sections,
-        )
-    return _with_birth_clock_reference(
-        result, technique=technique, selected_sections=selected_sections
-    )
+__all__ = [
+    "calculate_comprehensive_timing",
+    "calculate_dayun_analysis",
+    "calculate_jieqi_timeline_analysis",
+    "calculate_liunian_analysis",
+    "calculate_liuri_analysis",
+    "calculate_liushi_analysis",
+    "calculate_liuyue_analysis",
+]
 
 
 @calculation_guard("时运分析计算")
 def calculate_comprehensive_timing(
     person: PersonInfo,
-    analysis_year: Optional[int] = None,
-    analysis_month: Optional[int] = None,
-    analysis_age: Optional[int] = None,
-    analysis_day: Optional[int] = None,
-    analysis_hour: Optional[int] = None,
-    analysis_minute: Optional[int] = None,
-    selected_sections: Optional[List[str]] = None,
-    birth_time_uncertainty_minutes: Optional[int] = None,
+    analysis_year: int | None = None,
+    analysis_month: int | None = None,
+    analysis_age: int | None = None,
+    analysis_day: int | None = None,
+    analysis_hour: int | None = None,
+    analysis_minute: int | None = None,
+    selected_sections: list[str] | None = None,
+    birth_time_uncertainty_minutes: int | None = None,
 ) -> Dict:
     """
     计算时运分析，包括大运、流年、流月、流日、流时的影响分析
@@ -142,7 +107,7 @@ def calculate_comprehensive_timing(
     )
     current_age = timing_result["current_age"]
 
-    result: Dict[str, Any] = {
+    result: dict[str, Any] = {
         "analysis_type": "综合时运分析",
         "personal_info": {
             "name": person.name,
@@ -172,7 +137,7 @@ def calculate_comprehensive_timing(
     if "dayun_info" in dayun_analysis:
         dayun_info = dayun_analysis["dayun_info"]
         age_info = dayun_analysis["age_info"]
-        dayun_section: Dict[str, Any] = {
+        dayun_section: dict[str, Any] = {
             "current_dayun": dayun_info["pillar"],
             "stem": dayun_info["stem"],
             "branch": dayun_info["branch"],
@@ -204,7 +169,7 @@ def calculate_comprehensive_timing(
 
     liunian_analysis = timing_result["liunian_analysis"]
     liunian_info = liunian_analysis["liunian_info"]
-    liunian_section: Dict[str, Any] = {
+    liunian_section: dict[str, Any] = {
         "pillar": liunian_info["pillar"],
         "stem": liunian_info["stem"],
         "branch": liunian_info["branch"],
@@ -288,7 +253,7 @@ def calculate_comprehensive_timing(
     if isinstance(timeline, dict):
         timeline.pop("periods", None)
     result["dayun_analysis"]["first_view"] = first_view
-    return _with_analysis_reference(
+    return with_analysis_reference(
         result,
         resolution.reference,
         technique="timing_analysis",
@@ -299,14 +264,14 @@ def calculate_comprehensive_timing(
 @calculation_guard("大运分析计算")
 def calculate_dayun_analysis(
     person: PersonInfo,
-    analysis_age: Optional[int] = None,
-    selected_sections: Optional[List[str]] = None,
-    analysis_year: Optional[int] = None,
-    analysis_month: Optional[int] = None,
-    analysis_day: Optional[int] = None,
-    analysis_hour: Optional[int] = None,
-    analysis_minute: Optional[int] = None,
-    birth_time_uncertainty_minutes: Optional[int] = None,
+    analysis_age: int | None = None,
+    selected_sections: list[str] | None = None,
+    analysis_year: int | None = None,
+    analysis_month: int | None = None,
+    analysis_day: int | None = None,
+    analysis_hour: int | None = None,
+    analysis_minute: int | None = None,
+    birth_time_uncertainty_minutes: int | None = None,
 ) -> Dict:
     """
     大运分析工具 - 专门分析指定年龄的大运情况
@@ -325,7 +290,7 @@ def calculate_dayun_analysis(
     if analysis_age is not None and any(part is not None for part in date_parts):
         raise ValueError("analysis_age年龄参考不能与analysis_*分析日期同时使用")
     analysis_moment = None
-    analysis_reference = age_only_reference()
+    analysis_reference: AnalysisClockReference = age_only_reference()
     if analysis_age is None:
         resolution = resolve_analysis_moment(
             "dayun_analysis",
@@ -352,7 +317,7 @@ def calculate_dayun_analysis(
         analysis_moment=analysis_moment,
     )
 
-    result: Dict[str, Any] = {
+    result: dict[str, Any] = {
         "analysis_type": "大运专项分析",
         "personal_info": {
             "name": person.name,
@@ -370,22 +335,16 @@ def calculate_dayun_analysis(
         "calendar_context": birth_context.birth_calendar_context,
     }
 
-    dayun_info: Optional[Dict[str, Any]] = None
-    element_effects: Dict[str, Any] = {}
-
     if "dayun_info" in dayun_result:
         dayun_info = dayun_result["dayun_info"]
         age_info = dayun_result["age_info"]
-        element_effects = dayun_result["element_effects"]
 
         result["dayun_info"] = {
             "current_dayun": dayun_info["pillar"],
             "stem": dayun_info["stem"],
             "branch": dayun_info["branch"],
             "start_age": age_info["start_age"],
-            # Ceiling/minimum-one is a software display convention.
-            # Keep the raw conversion beside its legacy two-decimal display
-            # so an age just above3 can explain an integer display4.
+            # note (dayun): Retain the raw age behind the two-decimal display and integer ceiling.
             "start_age_precise": age_info.get("start_age_precise"),
             "start_age_unrounded": age_info.get("start_age_unrounded"),
             "dayun_age": age_info["dayun_age"],
@@ -397,7 +356,9 @@ def calculate_dayun_analysis(
             "end_at": dayun_info["end_at"],
         }
 
-        result["element_effects"] = serialize_element_effects(element_effects)
+        result["element_effects"] = serialize_element_effects(
+            dayun_result["element_effects"]
+        )
 
         result["summary"] = dayun_result["summary"]
     else:
@@ -425,9 +386,9 @@ def calculate_dayun_analysis(
         normalized_birth_datetime=birth_date,
         timezone_name=normalized_birth_time.timezone,
         analysis_age=analysis_age,
-        dayun_info=result.get("dayun_info") or dayun_info,
-        element_effects=result.get("element_effects", element_effects),
-        summary=result.get("summary", "大运信息不可用"),
+        dayun_info=result["dayun_info"],
+        element_effects=result.get("element_effects", {}),
+        summary=result["summary"],
         birth_time_sensitivity=result.get("birth_time_sensitivity"),
     )
     result["snapshot_text"] = snapshot_text
@@ -437,7 +398,7 @@ def calculate_dayun_analysis(
         selected_sections=selected_sections,
     )
 
-    return _with_analysis_reference(
+    return with_analysis_reference(
         result,
         analysis_reference,
         technique="dayun_analysis",
@@ -445,472 +406,11 @@ def calculate_dayun_analysis(
     )
 
 
-@calculation_guard("流年分析计算")
-def calculate_liunian_analysis(
-    person: PersonInfo,
-    target_year: int,
-    selected_sections: Optional[List[str]] = None,
-) -> Dict:
-    """
-    流年分析工具 - 专门分析指定年份的流年影响
-    """
-    birth_context = build_birth_computation_context(person)
-    normalized_birth_time = birth_context.normalized_birth_time
-    birth_date = normalized_birth_time.corrected_datetime
-
-    liunian_result = TimingEffectsAnalysis.analyze_liunian_effects(
-        birth_context.birth_pillars,
-        target_year,
-        original_element_counts=birth_context.original_element_counts,
-    )
-
-    liunian_info = liunian_result["liunian_info"]
-    element_effects = liunian_result["element_effects"]
-    summary = liunian_result["summary"]
-    snapshot_text = _build_liunian_snapshot_text(
-        person_name=person.name,
-        birth_datetime=normalized_birth_time.input_datetime,
-        normalized_birth_datetime=birth_date,
-        timezone_name=normalized_birth_time.timezone,
-        target_year=target_year,
-        liunian_info=liunian_info,
-        element_effects=element_effects,
-        summary=summary,
-    )
-    snapshot_export = _build_snapshot_export(
-        technique="liunian_analysis",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
-
-    result: Dict[str, Any] = {
-        "analysis_type": "流年专项分析",
-        "personal_info": {
-            "name": person.name,
-            "target_year": target_year,
-            "birth_datetime": format_clock_datetime(
-                normalized_birth_time.input_datetime,
-                include_seconds=person.birth_second is not None,
-            ),
-            "normalized_birth_datetime": format_clock_datetime(
-                birth_date, include_seconds=person.birth_second is not None
-            ),
-            "time_adjustment": normalized_birth_time.as_dict(),
-        },
-        "calendar_context": birth_context.birth_calendar_context,
-        "target_year_jieqi": get_jieqi_year_grid(
-            target_year, normalized_birth_time.timezone
-        ),
-        "liunian_info": {
-            "pillar": liunian_info["pillar"],
-            "stem": liunian_info["stem"],
-            "branch": liunian_info["branch"],
-            "element": liunian_info["element"],
-        },
-        "element_effects": serialize_element_effects(element_effects),
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
-    }
-
-    result["summary"] = summary
-    return _with_birth_clock_reference(
-        result, technique="liunian_analysis", selected_sections=selected_sections
-    )
-
-
-@calculation_guard("流月分析计算")
-def calculate_liuyue_analysis(
-    person: PersonInfo,
-    analysis_year: Optional[int] = None,
-    analysis_month: Optional[int] = None,
-    analysis_day: Optional[int] = None,
-    analysis_hour: Optional[int] = None,
-    analysis_minute: Optional[int] = None,
-    selected_sections: Optional[List[str]] = None,
-) -> Dict:
-    """
-    流月分析工具 - 专门分析指定日期所在节令月的影响
-    """
-    birth_context = build_birth_computation_context(person)
-    normalized_birth_time = birth_context.normalized_birth_time
-    birth_date = normalized_birth_time.corrected_datetime
-
-    resolution = resolve_analysis_moment(
-        "liuyue_analysis",
-        normalized_birth_time.timezone,
-        analysis_year=analysis_year,
-        analysis_month=analysis_month,
-        analysis_day=analysis_day,
-        analysis_hour=analysis_hour,
-        analysis_minute=analysis_minute,
-    )
-    analysis_date = resolution.moment
-    analysis_year, analysis_month = analysis_date.year, analysis_date.month
-    analysis_day = analysis_date.day
-    analysis_calendar_context = build_calendar_context(
-        analysis_date,
-        timezone_name=normalized_birth_time.timezone,
-    )
-    liuyue_info = TimingAnalysis.calculate_liuyue(
-        analysis_year,
-        analysis_month,
-        target_day=analysis_day,
-        timezone_name=normalized_birth_time.timezone,
-        target_date=analysis_date,
-    )
-    liunian_analysis: Optional[Dict[str, Any]] = (
-        TimingEffectsAnalysis.analyze_liunian_effects(
-            birth_context.birth_pillars,
-            analysis_year,
-            original_element_counts=birth_context.original_element_counts,
-            moment=analysis_date,
-            timezone_name=normalized_birth_time.timezone,
-        )
-    )
-
-    liuyue_result = TimingEffectsAnalysis.analyze_liuyue_comprehensive(
-        birth_context.birth_pillars,
-        analysis_year,
-        analysis_month,
-        include_liunian=True,
-        target_day=analysis_day,
-        timezone_name=normalized_birth_time.timezone,
-        target_date=analysis_date,
-        liuyue_info=liuyue_info,
-        liunian_analysis=liunian_analysis,
-        original_element_counts=birth_context.original_element_counts,
-    )
-
-    liuyue_analysis = liuyue_result["liuyue_analysis"]
-    liuyue_info = liuyue_analysis["liuyue_info"]
-    detailed_analysis = liuyue_analysis["detailed_analysis"]
-    element_effects = liuyue_analysis["element_effects"]
-    liunian_analysis = liuyue_result.get("liunian_analysis")
-    liunian_info: Optional[Dict[str, Any]] = None
-    if liunian_analysis:
-        liunian_info = liunian_analysis["liunian_info"]
-    summary = liuyue_result["comprehensive_summary"]
-    snapshot_text = _build_liuyue_snapshot_text(
-        person_name=person.name,
-        birth_datetime=normalized_birth_time.input_datetime,
-        normalized_birth_datetime=birth_date,
-        timezone_name=normalized_birth_time.timezone,
-        analysis_date=analysis_date,
-        analysis_calendar_context=analysis_calendar_context,
-        liuyue_info=liuyue_info,
-        liunian_info=liunian_info,
-        detailed_analysis=detailed_analysis,
-        element_effects=element_effects,
-        combination_effects=liuyue_result.get("combination_effects", {}),
-        summary=summary,
-    )
-    snapshot_export = _build_snapshot_export(
-        technique="liuyue_analysis",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
-
-    result: Dict[str, Any] = {
-        "analysis_type": "流月专项分析",
-        "personal_info": {
-            "name": person.name,
-            "analysis_date": analysis_date.strftime("%Y-%m-%d"),
-            "analysis_datetime": analysis_date.strftime("%Y-%m-%d %H:%M"),
-            "birth_datetime": format_clock_datetime(
-                normalized_birth_time.input_datetime,
-                include_seconds=person.birth_second is not None,
-            ),
-            "normalized_birth_datetime": format_clock_datetime(
-                birth_date, include_seconds=person.birth_second is not None
-            ),
-            "time_adjustment": normalized_birth_time.as_dict(),
-        },
-        "calendar_context": birth_context.birth_calendar_context,
-        "analysis_calendar": {
-            "analysis_date_context": analysis_calendar_context,
-        },
-        "target_year_jieqi": get_jieqi_year_grid(
-            analysis_year, normalized_birth_time.timezone
-        ),
-        "liuyue_info": {
-            "pillar": liuyue_info["pillar"],
-            "stem": liuyue_info["stem"],
-            "branch": liuyue_info["branch"],
-            "element": liuyue_info["element"],
-            "nayin": liuyue_info["nayin"],
-            "solar_term_window": liuyue_info["solar_term_window"],
-        },
-        "detailed_analysis": {
-            "stem_relation": detailed_analysis["shishen_analysis"]["stem_relation"],
-            "branch_relations": detailed_analysis["branch_relations"],
-            "fortune_analysis": detailed_analysis["fortune_analysis"],
-            "suggestions": detailed_analysis["suggestions"],
-        },
-        "element_effects": serialize_element_effects(element_effects),
-        "combination_effects": liuyue_result.get("combination_effects", {}),
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
-    }
-
-    if liunian_info is not None:
-        result["liunian_info"] = {
-            "pillar": liunian_info["pillar"],
-            "stem": liunian_info["stem"],
-            "branch": liunian_info["branch"],
-            "element": liunian_info["element"],
-        }
-
-    result["summary"] = summary
-    return _with_analysis_reference(
-        result,
-        resolution.reference,
-        technique="liuyue_analysis",
-        selected_sections=selected_sections,
-    )
-
-
-@calculation_guard("流日分析计算")
-def calculate_liuri_analysis(
-    person: PersonInfo,
-    analysis_year: Optional[int] = None,
-    analysis_month: Optional[int] = None,
-    analysis_day: Optional[int] = None,
-    analysis_hour: Optional[int] = None,
-    analysis_minute: Optional[int] = None,
-    selected_sections: Optional[List[str]] = None,
-) -> Dict:
-    """
-    流日分析工具 - 专门分析指定日期的流日影响
-    """
-    birth_context = build_birth_computation_context(person)
-    normalized_birth_time = birth_context.normalized_birth_time
-    birth_date = normalized_birth_time.corrected_datetime
-
-    resolution = resolve_analysis_moment(
-        "liuri_analysis",
-        normalized_birth_time.timezone,
-        analysis_year=analysis_year,
-        analysis_month=analysis_month,
-        analysis_day=analysis_day,
-        analysis_hour=analysis_hour,
-        analysis_minute=analysis_minute,
-    )
-    analysis_date = resolution.moment
-    analysis_year, analysis_month = analysis_date.year, analysis_date.month
-    analysis_day = analysis_date.day
-    analysis_calendar_context = build_calendar_context(
-        analysis_date,
-        timezone_name=normalized_birth_time.timezone,
-    )
-    liuri_info = TimingAnalysis.calculate_liuri(
-        analysis_date,
-        timezone_name=normalized_birth_time.timezone,
-    )
-
-    liuri_result = TimingEffectsAnalysis.analyze_liuri_effects(
-        birth_context.birth_pillars,
-        analysis_date,
-        timezone_name=normalized_birth_time.timezone,
-        liuri_info=liuri_info,
-        original_element_counts=birth_context.original_element_counts,
-    )
-
-    liuri_info = liuri_result["liuri_info"]
-    element_effects = liuri_result["element_effects"]
-    summary = liuri_result["enhanced_summary"]
-    snapshot_text = _build_liuri_snapshot_text(
-        person_name=person.name,
-        birth_datetime=normalized_birth_time.input_datetime,
-        normalized_birth_datetime=birth_date,
-        timezone_name=normalized_birth_time.timezone,
-        analysis_date=analysis_date,
-        analysis_calendar_context=analysis_calendar_context,
-        liuri_info=liuri_info,
-        element_effects=element_effects,
-        summary=summary,
-    )
-    snapshot_export = _build_snapshot_export(
-        technique="liuri_analysis",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
-
-    result: Dict[str, Any] = {
-        "analysis_type": "流日专项分析",
-        "personal_info": {
-            "name": person.name,
-            "birth_datetime": format_clock_datetime(
-                normalized_birth_time.input_datetime,
-                include_seconds=person.birth_second is not None,
-            ),
-            "normalized_birth_datetime": format_clock_datetime(
-                birth_date, include_seconds=person.birth_second is not None
-            ),
-            "analysis_date": analysis_date.strftime("%Y-%m-%d"),
-            "analysis_datetime": analysis_date.strftime("%Y-%m-%d %H:%M"),
-            "time_adjustment": normalized_birth_time.as_dict(),
-        },
-        "calendar_context": birth_context.birth_calendar_context,
-        "analysis_calendar": {
-            "analysis_date_context": analysis_calendar_context,
-        },
-        "liuri_info": {
-            "pillar": liuri_info["pillar"],
-            "stem": liuri_info["stem"],
-            "branch": liuri_info["branch"],
-            "element": liuri_info["element"],
-            "weekday": liuri_info["weekday"],
-        },
-        "element_effects": serialize_element_effects(element_effects),
-        "summary": summary,
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
-    }
-
-    return _with_analysis_reference(
-        result,
-        resolution.reference,
-        technique="liuri_analysis",
-        selected_sections=selected_sections,
-    )
-
-
-@calculation_guard("流时分析计算")
-def calculate_liushi_analysis(
-    person: PersonInfo,
-    analysis_year: Optional[int] = None,
-    analysis_month: Optional[int] = None,
-    analysis_day: Optional[int] = None,
-    analysis_hour: Optional[int] = None,
-    analysis_minute: Optional[int] = None,
-    selected_sections: Optional[List[str]] = None,
-) -> Dict:
-    """
-    流时分析工具 - 专门分析指定时刻的流时影响
-    """
-    birth_context = build_birth_computation_context(person)
-    normalized_birth_time = birth_context.normalized_birth_time
-    birth_date = normalized_birth_time.corrected_datetime
-
-    resolution = resolve_analysis_moment(
-        "liushi_analysis",
-        normalized_birth_time.timezone,
-        analysis_year=analysis_year,
-        analysis_month=analysis_month,
-        analysis_day=analysis_day,
-        analysis_hour=analysis_hour,
-        analysis_minute=analysis_minute,
-    )
-    analysis_date = resolution.moment
-    analysis_year, analysis_month = analysis_date.year, analysis_date.month
-    analysis_day = analysis_date.day
-    analysis_calendar_context = build_calendar_context(
-        analysis_date,
-        timezone_name=normalized_birth_time.timezone,
-    )
-    liushi_info = TimingAnalysis.calculate_liushi(
-        analysis_date,
-        timezone_name=normalized_birth_time.timezone,
-    )
-
-    liushi_result = TimingEffectsAnalysis.analyze_liushi_effects(
-        birth_context.birth_pillars,
-        analysis_date,
-        timezone_name=normalized_birth_time.timezone,
-        liushi_info=liushi_info,
-        original_element_counts=birth_context.original_element_counts,
-    )
-
-    liushi_info = liushi_result["liushi_info"]
-    life_assessment = compute_life_dimensions_for_moment(
-        birth_context,
-        analysis_date,
-        liushi_pillar=(liushi_info["stem"], liushi_info["branch"]),
-    )
-    detailed_analysis = liushi_result["detailed_analysis"]
-    element_effects = liushi_result["element_effects"]
-    summary = liushi_result["enhanced_summary"]
-    snapshot_text = _build_liushi_snapshot_text(
-        person_name=person.name,
-        birth_datetime=normalized_birth_time.input_datetime,
-        normalized_birth_datetime=birth_date,
-        timezone_name=normalized_birth_time.timezone,
-        analysis_date=analysis_date,
-        analysis_calendar_context=analysis_calendar_context,
-        liushi_info=liushi_info,
-        detailed_analysis={
-            "stem_relation": detailed_analysis["shishen_analysis"]["stem_relation"],
-            "branch_relations": detailed_analysis["branch_relations"],
-            "fortune_analysis": detailed_analysis["fortune_analysis"],
-            "suggestions": detailed_analysis["suggestions"],
-        },
-        element_effects=element_effects,
-        summary=summary,
-    )
-    snapshot_export = _build_snapshot_export(
-        technique="liushi_analysis",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
-
-    result = {
-        "analysis_type": "流时专项分析",
-        "personal_info": {
-            "name": person.name,
-            "birth_datetime": format_clock_datetime(
-                normalized_birth_time.input_datetime,
-                include_seconds=person.birth_second is not None,
-            ),
-            "normalized_birth_datetime": format_clock_datetime(
-                birth_date, include_seconds=person.birth_second is not None
-            ),
-            "analysis_date": analysis_date.strftime("%Y-%m-%d"),
-            "analysis_datetime": analysis_date.strftime("%Y-%m-%d %H:%M"),
-            "time_adjustment": normalized_birth_time.as_dict(),
-        },
-        "calendar_context": birth_context.birth_calendar_context,
-        "analysis_calendar": {
-            "analysis_date_context": analysis_calendar_context,
-        },
-        "liushi_info": {
-            "pillar": liushi_info["pillar"],
-            "stem": liushi_info["stem"],
-            "branch": liushi_info["branch"],
-            "element": liushi_info["element"],
-            "nayin": liushi_info["nayin"],
-            "hour": liushi_info["hour"],
-            "analysis_datetime": liushi_info["analysis_datetime"],
-            "shichen": liushi_info["shichen"],
-        },
-        "detailed_analysis": {
-            "stem_relation": detailed_analysis["shishen_analysis"]["stem_relation"],
-            "branch_relations": detailed_analysis["branch_relations"],
-            "fortune_analysis": detailed_analysis["fortune_analysis"],
-            "suggestions": detailed_analysis["suggestions"],
-        },
-        "element_effects": serialize_element_effects(element_effects),
-        "life_dimensions": life_assessment["scores"],
-        "life_dimensions_assessment": {
-            key: value for key, value in life_assessment.items() if key != "scores"
-        },
-        "summary": summary,
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
-    }
-
-    return _with_analysis_reference(
-        result,
-        resolution.reference,
-        technique="liushi_analysis",
-        selected_sections=selected_sections,
-    )
-
-
 @calculation_guard("节气时间轴分析计算")
 def calculate_jieqi_timeline_analysis(
     person: PersonInfo,
-    target_year: Optional[int] = None,
-    selected_sections: Optional[List[str]] = None,
+    target_year: int | None = None,
+    selected_sections: list[str] | None = None,
 ) -> Dict:
     """
     节气节点时间轴分析 - 输出全年 24 节气节点的流月/流日切换信息
@@ -932,6 +432,12 @@ def calculate_jieqi_timeline_analysis(
         f"{target_year}年共生成{len(jieqi_timeline)}个节气节点时间轴，"
         f"覆盖全年流月与流日切换。"
     )
+    if any("analysis_anchor_status" in item for item in jieqi_timeline):
+        unavailable = sum("analysis_anchor_status" in item for item in jieqi_timeline)
+        summary = (
+            f"{target_year}年共生成{len(jieqi_timeline)}个节气节点，"
+            f"其中{unavailable}个区间没有可重放的当地整分。"
+        )
     snapshot_text = _build_jieqi_timeline_snapshot_text(
         person_name=person.name,
         birth_datetime=normalized_birth_time.input_datetime,
@@ -969,6 +475,6 @@ def calculate_jieqi_timeline_analysis(
         "snapshot_text": snapshot_text,
         "snapshot_export": snapshot_export,
     }
-    return _with_birth_clock_reference(
+    return with_birth_clock_reference(
         result, technique="jieqi_timeline_analysis", selected_sections=selected_sections
     )

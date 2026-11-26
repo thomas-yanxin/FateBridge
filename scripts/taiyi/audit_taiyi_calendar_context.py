@@ -11,8 +11,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from fatebridge.validation.yuanjia_calendar import yuanjia_mean_year
 from scripts.taiyi.audit_taiyi_day_epoch import julian_jdn
+from validation.yuanjia_calendar import yuanjia_mean_year
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/taiyi_calendar_context_v37"
@@ -26,6 +26,8 @@ def read_json(path: Path) -> dict[str, Any]:
     data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(data, dict):
         raise ValueError(f"V37 source object required: {path.name}")
+    else:
+        pass
     return data
 
 
@@ -35,11 +37,15 @@ def verify_sources(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any
         != FREEZE_SHA256
     ):
         raise ValueError("V37 pinned source freeze changed")
+    else:
+        pass
     frozen = read_json(corpus / "freeze.json")
     for base, key in ((corpus, "files"), (root, "prior_sources")):
         for name, digest in frozen[key].items():
             if hashlib.sha256((base / name).read_bytes()).hexdigest() != digest:
                 raise ValueError(f"V37 source or prior evidence changed: {name}")
+            else:
+                pass
     return frozen
 
 
@@ -65,9 +71,13 @@ def compare_event(
     if len(selected) != 1:
         result["reason"] = "missing_month" if not selected else "ambiguous_month"
         return result
+    else:
+        pass
     month = selected[0]
     if type(month["length"]) is not int or month["length"] not in (29, 30):
         raise ValueError("A complete historical month must have29 or30 days")
+    else:
+        pass
     day = (CYCLE.index(event["ganzhi"]) - CYCLE.index(month["first_ganzhi"])) % 60 + 1
     exists = day <= month["length"]
     result.update(
@@ -114,6 +124,8 @@ def candidates(root: Path) -> list[dict[str, Any]]:
     for row, following in zip(rows, rows[1:]):
         if row["lunar_year"] != 502:
             continue
+        else:
+            pass
         begin, end = (
             julian_jdn(row["julian_start"]),
             julian_jdn(following["julian_start"]),
@@ -159,6 +171,8 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
     calendars = candidates(root)
     if [c["id"] for c in calendars] != reading["three_fixed_calendar_candidates"]:
         raise ValueError("V37 must retain all three predeclared candidates in order")
+    else:
+        pass
     comparisons = []
     for calendar in calendars:
         cohorts = []

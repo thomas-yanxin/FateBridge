@@ -8,7 +8,8 @@ import json
 import os
 from pathlib import Path
 
-from fatebridge.core import canping_solar, de440_solar
+from fatebridge.core import de440_solar
+from fatebridge.core.numerology import canping_solar
 from fatebridge.core.solar_model_policy import DE440_SOFTWARE_YEARS
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -24,6 +25,8 @@ def audit() -> dict:
             failures.append(
                 {"kind": "extended_projection_reference_identity", "file": n}
             )
+        else:
+            pass
     sources = [
         de440_solar.source_receipt(profile)
         for profile in (
@@ -39,14 +42,20 @@ def audit() -> dict:
                     "model": source["model_id"],
                 }
             )
+        else:
+            pass
     if list(DE440_SOFTWARE_YEARS) != protocol["public_input_years_preserved"]:
         failures.append({"kind": "public_range_changed_without_requalification"})
+    else:
+        pass
     refs = json.loads((folder / "reference.json").read_bytes())
     states = json.loads((folder / "states.json").read_bytes())
     if [r["year"] for r in refs["rows"]] != protocol["reference_years"] or len(
         states["rows"]
     ) != 1452:
         failures.append({"kind": "complete_reference_cohort"})
+    else:
+        pass
     env_names = ["FATEBRIDGE_SOLAR_TERM_MODEL", "FATEBRIDGE_JPL_FILE"]
     original = {n: os.environ.get(n) for n in env_names}
     os.environ["FATEBRIDGE_SOLAR_TERM_MODEL"] = "de440"
@@ -77,6 +86,8 @@ def audit() -> dict:
             )
             if error > protocol["reference_evaluator"]["root_tolerance_seconds"]:
                 failures.append({"kind": "extended_projection_root_error", **roots[-1]})
+            else:
+                pass
             wanted = (
                 "fatebridge_de440_solar_extended_v1" if low else protocol["model_id"]
             )
@@ -87,6 +98,8 @@ def audit() -> dict:
                 failures.append(
                     {"kind": "extended_projection_source_substitution", "year": year}
                 )
+            else:
+                pass
         for row in states["rows"]:
             profile = (
                 "fatebridge_de440_solar_extended_v1"
@@ -115,6 +128,8 @@ def audit() -> dict:
                 failures.append(
                     {"kind": "extended_projection_original_state_error", **item}
                 )
+            else:
+                pass
     finally:
         for n, v in original.items():
             if v is None:
@@ -161,3 +176,5 @@ if __name__ == "__main__":
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     print({k: v for k, v in result.items() if k not in ["roots", "state_residuals"]})
     raise SystemExit(0 if result["checks_passed"] else 1)
+else:
+    pass

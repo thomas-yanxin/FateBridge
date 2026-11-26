@@ -4,7 +4,7 @@
 
 阅读导航：[骰面输入](#输入) · [知识与来源](#知识范围与来源) · [天象背景](#独立天象背景) · [运动与日速](#瞬时运动与速度核验) · [坐标与参考](#坐标含义太阳高度与独立视运动参考) · [验证边界](#验证范围与现实预测)
 
-`otherbu` 解读用户已有的三枚骰面，规则版本 `astrodice_symbolic_v7`。它不代替用户抽骰，不接收塔罗牌阵。缺失或无效骰面会被拒绝，不再默认为太阳、白羊、一宫。
+`interpret_astrology_dice` 解读用户已有的三枚骰面，规则版本 `astrodice_symbolic_v7`。它不代替用户抽骰，不接收塔罗牌阵。缺失或无效骰面会被拒绝，不再默认为太阳、白羊、一宫。
 
 ## 输入
 
@@ -15,18 +15,18 @@
 仅解读骰面不需要日期、地点或出生资料：
 
 ```bash
-uv run --locked --extra dev fatebridge otherbu \
+uv run --locked --extra dev fatebridge interpret_astrology_dice \
   --planet Mercury --sign Virgo --house 6 \
   --question '虚构示例：合作沟通中应核对什么？' \
-  --fields planet sign symbolic_details interpretation rulesets rule_trace validation \
+  --fields method_id planet sign house symbolic_details rulesets rule_trace validation \
   --strict-fields
 ```
 
-MCP 可直接传 `{"planet":"☊","sign":"处女座","house":11}`。默认首轮视图保留解释、规则、出处和验证边界；视图名不是请求参数。REST 的投影参数放在 URL query：
+MCP 通过 `run_calculation` 传入 `tool="interpret_astrology_dice"` 与 `arguments={"planet":"☊","sign":"处女座","house":11}`。默认首轮视图保留骰面条件、规则出处与验证状态；视图名不是请求参数。REST 的投影参数放在 URL query：
 
 ```bash
 curl -sS -X POST \
-  'http://localhost:8010/api/divination/otherbu?fields=planet&fields=symbolic_details&fields=interpretation&fields=rulesets&fields=rule_trace&fields=validation&strict_fields=true&include_snapshot_text=false' \
+  'http://localhost:8010/api/divination/astrology-dice/interpret?fields=method_id&fields=planet&fields=sign&fields=house&fields=symbolic_details&fields=rulesets&fields=rule_trace&fields=validation&strict_fields=true&include_snapshot_text=false' \
   -H 'Content-Type: application/json' \
   -d '{"planet":"Mercury","sign":"Virgo","house":6}'
 ```
@@ -35,7 +35,7 @@ curl -sS -X POST \
 
 有效本地年 1／9999 的 UTC 标签可能跨到天文年 0／公历年 10000。现在保留该物理时刻及扩展年份字符串，例如 `0000-12-31T10:00:00+00:00`、`+010000-01-01T11:59:00+00:00`，不裁剪输入日期。UTC 整数日序、微秒、固定闰秒假设和三种协议的限定验收见UTC 跨年界修复；Python `datetime` 不能直接解析这些扩展标签。
 
-同时提供文本坐标和 GPS 坐标时，两者须一致（数值比较容差 `1e-9°`，经度按圆周比较，`180°/-180°` 等价）；该容差仅吸收表示误差，不宣称实地定位精度。无效或空白的任一已提供别名均会拒绝，GPS 布尔值不能变成 `0/1°`。有精确 GPS 而文本坐标只是约数时，只提交已核对的 GPS 一组即可。`chart.params.birthLatitude/birthLongitude` 和快照保留实际用于计算的浮点坐标。
+同时提供文本坐标和 GPS 坐标时，解析后的两个数值须相差至多 `1e-9°`。纬度用绝对差，经度用圆周最短距离，因此 `180°/-180°` 等价。比较用解析结果的精确差值，容差适用于输入一致性。任一已提供别名若无效或空白，请求会被拒绝。GPS 布尔值也会被拒绝。有精确 GPS 而文本坐标只是约数时，只提交已核对的 GPS 一组即可。`chart.params.birthLatitude/birthLongitude` 和快照保留实际用于计算的浮点坐标。 [固定阈值对照](precision-acceptance.md#astrodice-alias-distance-round120)
 
 `tradition`、`hsys`、`zodiacal`、`fortune_method` 仅影响附加天象。它们不重写骰面，不把骰面的星座转换为恒星黄道，也不因 `tradition=true` 删除用户投出的外行星或交点。
 
@@ -50,13 +50,13 @@ curl -sS -X POST \
 | 七曜三分性 | Claudius Ptolemy，《Tetrabiblos》，F. E. Robbins，Loeb 1940，卷一 [I.18](https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Ptolemy/Tetrabiblos/1B%2A.html#18)；另核对 Ashmand 1822 的 XXI 章 | 分别保留昼、夜条件；不为骰面假定昼夜，不采用 Dorotheus 的轮替三主星表 |
 | 七曜昼夜分派 | 同译本 [I.7](https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Ptolemy/Tetrabiblos/1B%2A.html#7) | 太阳、木星、土星为昼曜，月亮、金星、火星为夜曜；水星按晨星／昏星保留条件，不据此选定骰面对应的实际盘昼夜 |
 | 七曜喜乐宫 | William Lilly，《Christian Astrology》，1647，pp.51–56，[原文转录](https://www.skyscript.co.uk/lilly_houses.html) | 水星1、月亮3、金星5、火星6、太阳9、木星11、土星12；只核对骰面宫号关系，不移用原文的生死、灾祸或临床断言 |
-| 现代解释与示意轮 | FateBridge contributors，`astrodice_symbolic_v7` | 中文词义、元素/模式、角续果宫、现实核对提示及假设整宫轮，明确标作产品约定，不伪称原典直译 |
+| 符号分类与示意轮 | FateBridge contributors，`astrodice_symbolic_v7` | 元素、模式、角续果宫与假设整宫轮 |
 
 `symbolic_details.sign_condition.condition_evidence` 固定按 `domicile/exaltation/detriment/fall` 返回四项依据。七曜的 `matched` 是 `true/false`；超出七曜范围则为 `null`，对应 `basis_signs=null`，不能解释为四项均被否定。每项保留适用星座、推导方式、实际规则集和具体来源页。入庙使用 Ashmand XX，擢升和落陷使用 XXII；失势的对宫定义另引 Deborah Houlding [作者说明第二部分](https://www.skyscript.co.uk/dig2.html)，不再将混合结果全部挂在托勒密条文下。检索定位、短引文和页面 SHA-256 保留在来源见证（本地数据：`../tests/data/astrodice/tables/detriment-source.json`）。合成的 `sign_relationships` 规则属于 FateBridge，另列 `supporting_ruleset_ids`。
 
-`interpretation.evidence` 把每段解释的 `text_path` 映射到实际 `fact_paths`、`rule_ids`、`ruleset_ids` 与解释类型。现代关键词、传统含义的现代转述、昼夜条件解释、现实核对提示分别标明；转述没有被标为原文引文。键名如 `condition_meanings_0` 可用点路径投影，`text_path` 才是实际文字位置。所有引用路径均针对同一份完整业务结果；只读了摘要的调用方应按同一 run 取回所需字段，不能为补来源另算一盘。现有 `verify_calculation_claims` 可核验这些字段的同 run 引述；它不认证任意自由文本语义。
+用 `symbolic_details` 读取星座、喜乐宫、三角与昼夜条件。`rule_trace` 与 `rulesets` 给出实际规则和版本。Agent 可按对话选择需要的层，再从同一 run 读齐。
 
-问题原文仍在 `question` 和 `input_normalized.question` 中完整保留。快照的“问题原文（JSON引用）”及 `question_adjustment` 使用可逆的单行引用：换行、Unicode 行分隔符及引号不能伪造 `[符号解释]` 或 `[依据与边界]` 章节。问题内容不作为计算断语，`question_adjustment` 的依据类型为 `user_context`。
+问题原文保存在 `question` 与 `input_normalized.question`。快照单行引用该文本，骰面与结构条件独立计算。
 
 `symbolic_details.sign_condition.conditions` 允许多个关系同时存在，例如水星处女座同时 `domicile/exaltation`，水星双鱼座同时 `detriment/fall`。不使用互斥标签，不给三王星或交点强套七曜尊贵。`domicile_ruler` 是骰面星座的传统守护星；若恰为骰面本身，`dispositor_status=self_symbolic` 表示已知的符号自定位；否则为 `not_in_roll`，不得从假设轮或天象背景补写其骰面位置、定位星链或互容。
 
@@ -73,6 +73,8 @@ curl -sS -X POST \
 恒星黄道背景采用 Swiss Ephemeris 的原生 Lahiri 接口：星体位置与速度使用 `FLG_SIDEREAL`，宫头与角度使用原生恒星黄道宫位接口。旧实现把含章动的视黄经减去不含章动的平均偏移，核验样例中造成约4–18角秒偏差；现已修复。`chart.params.chart_profile` 的 `sidereal_position_method`、`sidereal_house_method`、`ayanamsha_includes_nutation` 保留实际方法，`ayanamsha` 与 `ayanamsha_mean` 分别保留含章动和平均偏移，不能混作同一数值。地平线、赤纬和太阳昼夜条件仍使用实际天球坐标，不能用恒星黄道黄经代替。无 Swiss 运行时时仍明确标为偏移近似，不冒充原生计算。
 
 原生接口一致性验证只证明符合声明的方法，独立 NASA/JPL 样本仍负责天文参考核对；二者均不能外推为全历元正确或占卜有效。依据见 [Swiss Ephemeris §12.2、§15.4](https://www.astro.com/swisseph/swephprg.htm)，对应检查见[恒星黄道测试](../tests/astrodice/test_astrodice_sidereal.py)。
+
+工具发现列出符号和可选天象两个方法。实际交付 `chart` 的运行才在 `calculation_evidence` 中登记天象方法及其秒和角度来源预算。`diceChart` 属于符号方法，表示所投骰面的位置。`tradition`、`hsys`、`zodiacal` 和 `fortune_method` 是天象方法的选择器。 [方法登记](computation-evidence.md#方法登记)
 
 `fortune_method` 选择附加天象福点的具体公式：
 
@@ -131,7 +133,7 @@ uv run --locked --extra dev python -m fatebridge.fetch_jpl \
 ```bash
 SE_EPHE_PATH=/absolute/path/to/raw-jpl \
 FATEBRIDGE_JPL_FILE=linux_m13000p17000.441 \
-uv run --locked --extra dev python -m fatebridge.cli otherbu \
+uv run --locked --extra dev python -m fatebridge.cli interpret_astrology_dice \
   --planet Jupiter --sign Aries --house 0 \
   --date 2000-01-01 --time 12:00 --zone UTC --gps-lat 51.5 --gps-lon 0
 ```
@@ -243,17 +245,17 @@ uv run --locked --extra dev python -m scripts.astrodice.audit_astrodice_apparent
 
 `rulers_by_sect.day/night` 继续列首要主星及原文明确列出的条件共管主星，`matches_by_sect` 继续只比较这些所列角色。`match_definition` 保留这一口径，`roles_by_sect` 用 `primary/co_ruler/assigned_not_selected/not_assigned/outside_seven_planet_scope` 说明具体关系。比如木星白羊座属于火象三角总体分派，但昼条件所列首要主星为太阳：`in_assigned_group=true`、`matches_by_sect.day=false`、`roles_by_sect.day=assigned_not_selected`；夜条件则为木星首要治理。原解释“不属于该组”在v6中修正为对总体分派和具体条件角色的分别说明。
 
-水象保留火星与昼金星／夜月亮共管。`sect=null` 保留未知；三王星、交点的总体匹配及条件匹配均为 `null`，不是 `false`。`interpretation.triplicity_meaning` 和 `conditional_triplicity` 规则链同步呈现总体分派与昼夜条件，附加天象不会替骰面选择昼夜。`sign_condition.unassessed` 中的 `applied_triplicity_sect` 仍表示尚未选定适用条件。原典转录及反例见三角分派参考表（本地数据：`../tests/data/astrodice/tables/triangle-assignment-robbins-1940.json`）和v6原典角色审计。
+水象保留火星与昼金星／夜月亮共管。`sect=null` 保留未知；三王星、交点的总体匹配及条件匹配均为 `null`，不是 `false`。`symbolic_details.triplicity_condition` 和 `conditional_triplicity` 规则链同步呈现总体分派与昼夜条件，附加天象不会替骰面选择昼夜。`sign_condition.unassessed` 中的 `applied_triplicity_sect` 仍表示尚未选定适用条件。原典转录及反例见三角分派参考表（本地数据：`../tests/data/astrodice/tables/triangle-assignment-robbins-1940.json`）和v6原典角色审计。
 
 `symbolic_details.planet_sect_condition` 在v7补入同译本I.7的星体昼夜分派。`natural_sect` 是原典对星体的分派：太阳、木星、土星为 `day`；月亮、金星、火星为 `night`。土星和火星的分派按原文的调和原则说明，不能按“冷就属夜、干热就属昼”倒推。它也不是I.18的三分性治理角色，例如木星是昼曜，不改变其在火象三角的夜条件首要治理角色。
 
-水星的 `natural_sect=null`；`assignments_by_solar_phase` 同时保留 `morning_star=day`、`evening_star=night`，表示尚缺晨昏条件，不把“兼具两种条件”输出成一个已选定的 `neutral` 派别。三王星、交点超出七曜范围，分派和条件表均为 `null`。所有骰面均保留 `solar_phase/applied_chart_sect/matches_chart_sect=null`；骰面宫号不决定太阳高度，独立天象背景也不为符号骰面补上观测位置。新增解释、规则链和快照均引用同一字段及I.7来源，见原典标注（本地数据：`../tests/data/astrodice/tables/planet-sect-robbins-1940.json`）。
+水星的 `natural_sect=null`；`assignments_by_solar_phase` 同时保留 `morning_star=day`、`evening_star=night`，表示尚缺晨昏条件，不把“兼具两种条件”输出成一个已选定的 `neutral` 派别。三王星、交点超出七曜范围，分派和条件表均为 `null`。所有骰面均保留 `solar_phase/applied_chart_sect/matches_chart_sect=null`；骰面宫号不决定太阳高度，独立天象背景也不为符号骰面补上观测位置。结构结果及规则链保留同一I.7来源，见原典标注（本地数据：`../tests/data/astrodice/tables/planet-sect-robbins-1940.json`）。
 
 三枚骰面没有精确度数、两颗星的实际相对位置或实际盘的昼夜条件，因此不计算界、面、度数尊贵、出入相、逆行、燃烧、是否合派／逆派、接纳或精确应期。星体的原典昼夜分派与这些未计算项分别保留。没有列出四种星座关系不等于“游离”或“毫无尊贵”。
 
 假设整宫轮以骰面星座位于骰面宫为约定，向前后排满十二星座。`symbolic_house_ring` 与 `houses_ruled_by_rolled_planet` 仅展示这种约定下的议题连接；轮上的宫首经度不是实际宫头，第一宫不是计算出的上升点。没有出生盘输入时，不做出生盘比较。
 
-每项结果保留 `rulesets` 的作者、版本、来源 URL／仓库相对路径、来源类型和范围，以及 `rule_trace` 的输入、命中规则和结果。现代关键词和现实建议不冒充原典引文；附加天象也不能为骰面解释补充不存在的事实。
+每项结果保留 `rulesets` 的作者、版本、来源 URL／仓库相对路径、来源类型和范围，以及 `rule_trace` 的输入、命中规则和结果。附加天象与骰面条件分别交付。
 
 ## 验证范围与现实预测
 

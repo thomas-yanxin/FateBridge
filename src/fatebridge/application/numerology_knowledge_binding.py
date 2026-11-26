@@ -1,25 +1,24 @@
-"""Bind new knowledge facts to the actual request and source revision pre-projection."""
+"""Check the identity of the numerology reference selected for delivery."""
 
-from pydantic import BaseModel
-
-from fatebridge.core.numerology_knowledge import DOMAINS
+from fatebridge.application.tool_spec import ServiceResult
+from fatebridge.core.numerology.numerology_knowledge import DOMAINS, parse_cell_key
+from fatebridge.core.requests.reference import (
+    KnowledgeReadRequest,
+    KnowledgeRegistryRequest,
+)
 from fatebridge.utils.errors import NumerologySourceError
-from fatebridge.utils.json_digest import canonical_bytes
 
 
 def require_reference_binding(
-    key: str, result: dict, request: BaseModel | None
+    result: ServiceResult, request: KnowledgeReadRequest | KnowledgeRegistryRequest
 ) -> None:
-    if request is None or key not in {"knowledge_read", "knowledge_registry"}:
-        return
-    data = request.model_dump()
-    domain = data["domain"]
+    domain = request.domain
     selected = domain.strip() if domain is not None else None
     active = selected in DOMAINS or result.get("domain") in DOMAINS
-    if key == "knowledge_registry":
+    if isinstance(request, KnowledgeRegistryRequest):
         active = (
             active
-            or selected in (None, "")
+            or domain in (None, "")
             or any(
                 isinstance(d, dict) and d.get("domain") in DOMAINS
                 for d in result.get("domains", [])
@@ -27,25 +26,26 @@ def require_reference_binding(
         )
     if not active:
         return
-    from fatebridge.services.knowledge import (
-        calculate_knowledge_read,
-        calculate_knowledge_registry,
-    )
-
-    service = (
-        calculate_knowledge_read
-        if key == "knowledge_read"
-        else calculate_knowledge_registry
-    )
-    expected = service(**data)
-    try:
-        matches = "error" not in expected and all(
-            field in result and canonical_bytes(result[field]) == canonical_bytes(value)
-            for field, value in expected.items()
+    if isinstance(request, KnowledgeReadRequest):
+        category = (request.category or "").strip()
+        requested = (request.key or "").strip()
+        actual_category = result.get("category")
+        cell = parse_cell_key(requested) if actual_category == "text_cells" else None
+        if cell is not None:
+            element, number, kind = cell
+            requested = f"{element}.{number}.{kind or 'unselected'}"
+        matches = (
+            selected in DOMAINS
+            and result.get("domain") == selected
+            and result.get("key") == requested
+            and (not category or actual_category == category)
         )
-    except (TypeError, ValueError) as exc:
-        raise NumerologySourceError(
-            "runtime_numerology_knowledge_binding_conflict"
-        ) from exc
+    else:
+        domains = result.get("domains") or []
+        present = {row.get("domain") for row in domains}
+        if selected in DOMAINS:
+            matches = selected in present and len(domains) == 1
+        else:
+            matches = domain in (None, "") and set(DOMAINS) <= present
     if not matches:
         raise NumerologySourceError("runtime_numerology_knowledge_binding_conflict")

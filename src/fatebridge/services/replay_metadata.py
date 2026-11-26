@@ -4,25 +4,62 @@ import os
 import platform
 from functools import lru_cache
 from importlib.metadata import PackageNotFoundError, version
-from typing import Any, Dict, List, Optional
+from typing import TypedDict
 
-from pydantic import BaseModel
+from pydantic import BaseModel, JsonValue
+from typing_extensions import NotRequired
 
 from fatebridge import __version__
+from fatebridge.application.tool_spec import ServiceResult, ToolSpec
+from fatebridge.core import ephemeris_runtime, solar_model_policy
+from fatebridge.core.de440_solar import EXTENDED_MODEL_ID
+from fatebridge.core.de440_solar import MODEL_ID as DE440_MODEL_ID
 from fatebridge.core.ephemeris_paths import ephemeris_search_directories
-from fatebridge.core.evidence_graph import execution_evidence
+from fatebridge.core.error_budget import declared_error_budget
 from fatebridge.core.execution_context import CallClock, ExecutionOptions
-from fatebridge.core.public_output import public_payload
-from fatebridge.core.reproducibility import BAZI_ANALYSIS_CLOCK_TOOLS
-from fatebridge.utils.json_digest import digest
+from fatebridge.fetch_vsop2013 import MODEL_ID as VSOP2013_MODEL_ID
 
 METADATA_SCHEMA_VERSION = "2.0"
 
 
+class EffectiveTimeReceipt(TypedDict):
+    as_of: str
+    clock_timezones: list[str]
+
+
+class DeterminismReceipt(TypedDict):
+    uses_current_time: bool
+    current_time_fields_defaulted: list[str]
+    randomness_used: bool
+    seed_generated: bool
+    replayable_with_receipt: bool
+    scope: str
+
+
+class ReplayReceipt(TypedDict):
+    as_of: str
+    overrides: dict[str, JsonValue]
+    requires_original_input: bool
+
+
+class ExecutionReceipt(TypedDict):
+    metadata_schema_version: str
+    package_version: str
+    duration_ms: float
+    effective_time: EffectiveTimeReceipt
+    determinism: DeterminismReceipt
+    replay: ReplayReceipt
+    warnings: list[str]
+    parent_run_id: NotRequired[str]
+    runtime: NotRequired[dict[str, JsonValue]]
+    provenance: NotRequired[dict[str, list[str]]]
+    calculation_evidence: NotRequired[dict[str, JsonValue]]
+
+
 @lru_cache(maxsize=1)
-def environment_receipt() -> Dict[str, Any]:
+def environment_receipt() -> dict[str, JsonValue]:
     """Snapshot immutable deployment inputs once per process, without Git calls."""
-    dependencies: Dict[str, Optional[str]] = {}
+    dependencies: dict[str, JsonValue] = {}
     for package in (
         "pydantic",
         "pyswisseph",
@@ -35,27 +72,33 @@ def environment_receipt() -> Dict[str, Any]:
             dependencies[package] = version(package)
         except PackageNotFoundError:
             dependencies[package] = None
-    receipt = {
+    return {
         "package_version": __version__,
         "python": platform.python_version(),
         "platform": platform.system() + "-" + platform.machine(),
         "dependencies": dependencies,
     }
-    return receipt
 
 
-def ephemeris_inventory() -> Dict[str, Any]:
-    """List configured relative filenames; actual models are reported separately."""
-    from fatebridge.core import ephemeris_runtime
-
-    files = []
+def ephemeris_inventory() -> dict[str, JsonValue]:
+    """List readable directory entries without judging source availability."""
+    files: list[JsonValue] = []
+    unlisted_directory_indices: list[JsonValue] = []
     for index, root in enumerate(
         ephemeris_search_directories(
             ephemeris_runtime.effective_ephemeris_search_path()
         )
     ):
-        for path in sorted(root.iterdir()) if root.is_dir() else ():
-            if path.is_file() and (
+        if not root.is_dir():
+            continue
+        try:
+            paths = sorted(root.iterdir())
+        except PermissionError:
+            # note (ephemeris): Search permission allows opening known files without enumerating the directory.
+            unlisted_directory_indices.append(index)
+            continue
+        for path in paths:
+            if (
                 path.suffix == ".se1"
                 or path.name
                 in {
@@ -66,17 +109,22 @@ def ephemeris_inventory() -> Dict[str, Any]:
                     "swe_deltat.txt",
                     "sedeltat.txt",
                 }
-            ):
+            ) and path.is_file():
                 files.append(f"{index}/{path.name}")
     return {
         "scope": "configured_filenames; actual models/sources are reported separately",
         "files": files,
+        **(
+            {"unlisted_directory_indices": unlisted_directory_indices}
+            if unlisted_directory_indices
+            else {}
+        ),
     }
 
 
-def provenance_values(payload: Dict[str, Any]) -> Dict[str, List[str]]:
+def provenance_values(payload: ServiceResult) -> dict[str, list[str]]:
     """Small allowlist of non-personal policy facts that survive projection."""
-    keys = {
+    provenance_fields = {
         "ephemeris_model",
         "rule_version",
         "ruleset_version",
@@ -90,108 +138,64 @@ def provenance_values(payload: Dict[str, Any]) -> Dict[str, List[str]]:
         "ruleset_id",
         "bundle_version",
         "method_id",
+        "resolution_policy",
     }
-    found: Dict[str, set[str]] = {}
-    queue: List[Any] = [payload]
+    found: dict[str, set[str]] = {}
+    queue: list[JsonValue] = [payload]
+    seen: set[int] = set()
     while queue:
         current = queue.pop()
+        if id(current) in seen:
+            continue
+        seen.add(id(current))
         if isinstance(current, dict):
-            if isinstance(current.get("ruleset_id"), str) and isinstance(
-                current.get("version"), str
-            ):
+            ruleset_id = current.get("ruleset_id")
+            ruleset_version = current.get("version")
+            if isinstance(ruleset_id, str) and isinstance(ruleset_version, str):
                 found.setdefault("ruleset", set()).add(
-                    current["ruleset_id"] + "@" + current["version"]
+                    f"{ruleset_id}@{ruleset_version}"
                 )
-            for key, value in current.items():
-                if key in keys and isinstance(value, str):
-                    found.setdefault(key, set()).add(value)
-                elif isinstance(value, (dict, list)):
+            for field_name, value in current.items():
+                if field_name in provenance_fields and isinstance(value, str):
+                    found.setdefault(field_name, set()).add(value)
+                elif isinstance(value, (dict, list, tuple)):
                     queue.append(value)
-        elif isinstance(current, list):
-            queue.extend(current)
-    return {key: sorted(values) for key, values in sorted(found.items())}
+        elif isinstance(current, (list, tuple)):
+            queue.extend(
+                item for item in current if isinstance(item, (dict, list, tuple))
+            )
+    return {field_name: sorted(values) for field_name, values in sorted(found.items())}
 
 
-def execution_receipt(
-    spec: Any,
-    request: Any,
-    result: Dict[str, Any],
+def runtime_receipt(
+    observed_provenance: dict[str, list[str]],
     *,
-    clock: CallClock,
-    options: ExecutionOptions,
-    elapsed_ms: float,
-    generated_seed: bool,
-) -> Dict[str, Any]:
-    policy = spec.reproducibility
-    as_of = clock.instant.isoformat().replace("+00:00", "Z")
-    inputs = request.model_dump(mode="json")
+    include_astronomy: bool = True,
+) -> dict[str, JsonValue]:
+    if not include_astronomy and "ephemeris_model" not in observed_provenance:
+        return dict(environment_receipt())
 
-    # These omissions affect either fail-loud solar behavior or the declared
-    # birth-clock input components, even when the nominal values are equal.
-    # A null/omitted second has the same unknown meaning and needs no extra bit.
-    supplied_paths: set[str] = set()
-
-    def semantic_presence(model: BaseModel, prefix: str = "") -> List[str]:
-        present = []
-        for field in type(model).model_fields:
-            if field in model.model_fields_set:
-                supplied_paths.add(prefix + field)
-            value = getattr(model, field)
-            if isinstance(value, BaseModel):
-                present.extend(semantic_presence(value, prefix + field + "."))
-            elif (
-                field.endswith(("use_true_solar_time", "birth_minute"))
-                or (
-                    spec.key == "meihua_analysis"
-                    and not prefix
-                    and field == "analysis_minute"
-                    and value is not None
-                )
-            ) and field in model.model_fields_set:
-                present.append(prefix + field)
-        return present
-
-    presence = sorted(semantic_presence(request))
-    input_digest = digest(
-        {"tool_key": spec.key, "inputs": inputs, "presence": presence}
+    configured_solar_mode = (
+        os.environ.get(solar_model_policy.ENVIRONMENT_NAME, "auto").strip().lower()
     )
-    body = {key: value for key, value in result.items() if key != "run_metadata"}
-    observed_provenance = provenance_values(body)
-    environment = environment_receipt()
-    from fatebridge.core.solar_model_policy import (
-        ENVIRONMENT_NAME,
-        MODES,
-        solar_model_environment_receipt,
-    )
-
-    configured_solar_mode = os.environ.get(ENVIRONMENT_NAME, "auto").strip().lower()
-    from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_MODEL_ID
-
-    vsop2013_observed = VSOP2013_MODEL_ID in observed_provenance.get(
-        "ephemeris_model", []
-    )
-    spk_observed = "fatebridge_jpl_spk_solar_v1" in observed_provenance.get(
-        "ephemeris_model", []
-    )
-    from fatebridge.core.de440_solar import (
-        EXTENDED_MODEL_ID,
-    )
-    from fatebridge.core.de440_solar import MODEL_ID as DE440_MODEL_ID
-
+    observed_models = observed_provenance.get("ephemeris_model", [])
+    has_vsop2013 = VSOP2013_MODEL_ID in observed_models
+    has_spk = "fatebridge_jpl_spk_solar_v1" in observed_models
     de440_observed_models = sorted(
-        {DE440_MODEL_ID, EXTENDED_MODEL_ID}
-        & set(observed_provenance.get("ephemeris_model", []))
+        {DE440_MODEL_ID, EXTENDED_MODEL_ID} & set(observed_models)
     )
-    de440_observed = bool(de440_observed_models)
+    has_de440 = bool(de440_observed_models)
     if (
-        (configured_solar_mode == "vsop2013" and not vsop2013_observed)
-        or (configured_solar_mode == "spk" and not spk_observed)
-        or (configured_solar_mode in {"auto", "de440"} and not de440_observed)
-        or configured_solar_mode not in MODES
+        (configured_solar_mode == "vsop2013" and not has_vsop2013)
+        or (configured_solar_mode == "spk" and not has_spk)
+        or (configured_solar_mode in {"auto", "de440"} and not has_de440)
+        or configured_solar_mode not in solar_model_policy.MODES
     ):
-        solar_policy_receipt = solar_model_environment_receipt(resolve_source=False)
+        solar_policy_receipt = solar_model_policy.solar_model_environment_receipt(
+            resolve_source=False
+        )
     else:
-        solar_policy_receipt = solar_model_environment_receipt(
+        solar_policy_receipt = solar_model_policy.solar_model_environment_receipt(
             observed_de440_models=(
                 de440_observed_models
                 if EXTENDED_MODEL_ID in de440_observed_models
@@ -199,27 +203,35 @@ def execution_receipt(
             )
         )
 
-    environment = {
-        **environment,
+    return {
+        **environment_receipt(),
         "ephemeris": ephemeris_inventory(),
         "solar_term_policy": solar_policy_receipt,
     }
-    time_defaults = [
-        field for field in policy.current_time_fields if inputs.get(field) is None
-    ]
-    if spec.key in BAZI_ANALYSIS_CLOCK_TOOLS:
-        # Read the resolver's actual decision. Missing fields may be fixed
-        # constants in explicit partial queries, rather than clock-derived.
-        reference = result.get("analysis_reference")
-        if isinstance(reference, dict):
-            time_defaults = list(reference["defaulted_from_clock"])
-    random_used = False
-    if spec.key == "sixyao":
-        from fatebridge.core.local_techniques.sixyao import needs_random_coin_cast
 
-        random_used = needs_random_coin_cast(inputs)
-    overrides = {"seed": inputs["seed"]} if random_used else {}
-    return {
+
+def execution_receipt(
+    spec: ToolSpec,
+    request: BaseModel,
+    result: ServiceResult,
+    *,
+    clock: CallClock,
+    options: ExecutionOptions,
+    elapsed_ms: float,
+    generated_seed: bool,
+    replay_overrides: dict[str, JsonValue],
+    compact_receipt: bool = False,
+) -> ExecutionReceipt:
+    policy = spec.reproducibility
+    as_of = clock.instant.isoformat().replace("+00:00", "Z")
+    time_defaults = [
+        field
+        for field in policy.current_time_fields
+        if getattr(request, field, None) is None
+    ]
+    if spec.resolve_time_defaults is not None:
+        time_defaults = spec.resolve_time_defaults(result, time_defaults)
+    receipt: ExecutionReceipt = {
         "metadata_schema_version": METADATA_SCHEMA_VERSION,
         "package_version": __version__,
         "duration_ms": round(elapsed_ms, 3),
@@ -228,31 +240,14 @@ def execution_receipt(
             "uses_current_time": bool(clock.reads)
             and bool(time_defaults or policy.implicit_current_time),
             "current_time_fields_defaulted": time_defaults if clock.reads else [],
-            "randomness_used": random_used,
+            "randomness_used": bool(replay_overrides),
             "seed_generated": generated_seed,
             "replayable_with_receipt": True,
             "scope": "business payload in identical implementation/data/runtime; metadata IDs and duration vary",
         },
-        "runtime": environment,
-        "provenance": observed_provenance,
-        **(
-            {
-                "calculation_evidence": execution_evidence(
-                    spec.methods,
-                    inputs,
-                    public_payload(body),
-                    input_digest,
-                    frozenset(supplied_paths),
-                    frozenset({"seed"}) if generated_seed else frozenset(),
-                    digest(environment),
-                )
-            }
-            if spec.methods
-            else {}
-        ),
         "replay": {
             "as_of": as_of,
-            "overrides": overrides,
+            "overrides": replay_overrides,
             "requires_original_input": True,
         },
         "warnings": (
@@ -263,9 +258,37 @@ def execution_receipt(
             )
             + (["random_seed_generated"] if generated_seed else [])
         ),
-        **(
-            {"parent_run_id": options.parent_run_id}
-            if options.parent_run_id is not None
-            else {}
-        ),
     }
+    if options.parent_run_id is not None:
+        receipt["parent_run_id"] = options.parent_run_id
+    if compact_receipt:
+        return receipt
+
+    observed_provenance = provenance_values(
+        {key: value for key, value in result.items() if key != "run_metadata"}
+    )
+    receipt["runtime"] = runtime_receipt(
+        observed_provenance, include_astronomy=spec.uses_astronomy_runtime
+    )
+    receipt["provenance"] = observed_provenance
+    if spec.methods and options.detail == "audit":
+        methods = [
+            method
+            for method in spec.methods
+            if method.requires_non_null_output is None
+            or result.get(method.requires_non_null_output) is not None
+        ]
+        receipt["calculation_evidence"] = {
+            "registered_methods": [method.as_manifest() for method in methods],
+            "error_budget": declared_error_budget(
+                tuple(source for method in methods for source in method.error_sources),
+                {
+                    "birth_time_uncertainty_minutes": getattr(
+                        request, "birth_time_uncertainty_minutes", None
+                    ),
+                    "birth_clock_basis": getattr(request, "birth_clock_basis", "civil"),
+                },
+                "this_run",
+            ),
+        }
+    return receipt

@@ -13,12 +13,12 @@ from fatebridge.core.metaphysics.taiyi_year import (
     general_for_count,
     structural_patterns,
 )
-from fatebridge.validation.taiyi_epoch import (
+from scripts.taiyi.audit_taiyi_day_epoch import calendar_cohort
+from scripts.taiyi.taiyi_origin_sources import day_token_evidence
+from validation.taiyi_epoch import (
     accumulation_hypothesis,
     sexagenary_hypothesis,
 )
-from scripts.taiyi.audit_taiyi_day_epoch import calendar_cohort
-from scripts.taiyi.taiyi_origin_sources import day_token_evidence
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/taiyi_jinjing_v31"
@@ -41,6 +41,8 @@ def _json(path: Path) -> dict[str, Any]:
     data = json.loads(path.read_text())
     if not isinstance(data, dict):
         raise ValueError(f"V31 object required: {path.name}")
+    else:
+        pass
     return data
 
 
@@ -50,11 +52,15 @@ def verify_sources(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any
         != FREEZE_SHA256
     ):
         raise ValueError("V31 pinned source freeze changed")
+    else:
+        pass
     freeze = _json(corpus / "freeze.json")
     for base, key in ((corpus, "files"), (root, "prior_sources")):
         for name, digest in freeze[key].items():
             if hashlib.sha256((base / name).read_bytes()).hexdigest() != digest:
                 raise ValueError(f"V31 frozen source changed: {name}")
+            else:
+                pass
     return freeze
 
 
@@ -62,6 +68,8 @@ def compare_board(accumulation: int, expected: dict[str, Any]) -> dict[str, Any]
     """Retain every printed field, including upstream positions when counts match."""
     if set(expected) != set(BOARD_FIELDS):
         raise ValueError("V31 requires all ten source fields")
+    else:
+        pass
     core = cyclic_core(accumulation)
     observations = [
         {

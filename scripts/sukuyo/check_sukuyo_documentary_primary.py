@@ -13,9 +13,11 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 if not __package__:
     sys.path.insert(0, str(ROOT / "src"))
-from fatebridge.core.sukuyo_calendar_text import calendar_day_evidence
-from fatebridge.core.sukuyo_documentary import JAPANESE, LAYERS
-from fatebridge.core.sukuyo_sources import load_source
+else:
+    pass
+from fatebridge.core.sukuyo.sukuyo_calendar_text import calendar_day_evidence
+from fatebridge.core.sukuyo.sukuyo_documentary import JAPANESE, LAYERS
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 
 def paragraph_layers(raw: str) -> tuple[str, list[dict[str, str]]]:
@@ -32,6 +34,8 @@ def paragraph_layers(raw: str) -> tuple[str, list[dict[str, str]]]:
             child.text = None
             for nested in list(child):
                 child.remove(nested)
+        else:
+            pass
     return "".join(node.itertext()).replace("\n", "").strip(), notes
 
 
@@ -49,33 +53,51 @@ def verify_documentary_primary(
     errors: list[Any] = []
     if japanese.data != curated:
         errors.append("facsimile_curation_changed")
+    else:
+        pass
     if layers.data["rule_passages"] != fixture["rule_passages"]:
         errors.append("rule_passage_binding_changed")
+    else:
+        pass
     if set(layers.data["passages"]) != set(fixture["raw_selected_xml_paragraphs"]):
         errors.append("paragraph_selection_changed")
+    else:
+        pass
     full_xml = None
     if xml_path:
         raw = xml_path.read_bytes()
         if hashlib.sha256(raw).hexdigest() != fixture["source_sha256"]:
             raise ValueError("Documentary full source bytes changed")
+        else:
+            pass
         full_xml = raw.decode()
+    else:
+        pass
     for identifier, raw in fixture["raw_selected_xml_paragraphs"].items():
         main, notes = paragraph_layers(raw)
         actual = layers.data["passages"][identifier]
         if main != actual["main_text"] or notes != actual["inline_notes"]:
             errors.append([identifier, "placement_or_text"])
+        else:
+            pass
         if full_xml is not None and raw not in full_xml:
             errors.append([identifier, "fragment_missing_from_full_source"])
+        else:
+            pass
     checked_images = []
     ref = japanese.data["source_reference"]
     if capture_dir:
         manifest_bytes = (capture_dir / "nijl-100223664-manifest.json").read_bytes()
         if hashlib.sha256(manifest_bytes).hexdigest() != ref["manifest_sha256"]:
             raise ValueError("Facsimile manifest bytes changed")
+        else:
+            pass
         manifest = json.loads(manifest_bytes)
         canvases = manifest["sequences"][0]["canvases"]
         if len(canvases) != ref["manifest_canvas_count"]:
             errors.append("canvas_count")
+        else:
+            pass
         for image in ref["images"]:
             # Captures retain institutional files privately; no images in package.
             matches = [
@@ -85,10 +107,16 @@ def verify_documentary_primary(
             ]
             if len(matches) != 1 or matches[0].stat().st_size != image["bytes"]:
                 raise ValueError("Selected facsimile image bytes changed or missing")
+            else:
+                pass
             canvas = canvases[image["canvas_index_one_based"] - 1]
             if canvas["@id"] != image["canvas_id"]:
                 errors.append("selected_canvas_identity")
+            else:
+                pass
             checked_images.append(image["canvas_index_one_based"])
+    else:
+        pass
     differences = []
     for day in range(1, 31):
         result = calendar_day_evidence(day)
@@ -98,14 +126,20 @@ def verify_documentary_primary(
             for r in comparison["primary_general_day_comparison"]
         ):
             differences.append(day)
+        else:
+            pass
         if (
             result["clock_evaluation_status"] != "not_computed"
             or comparison["applied_to_primary"]
             or comparison["leap_short_month_priority_established"]
         ):
             errors.append(["comparison_promoted_to_policy", day])
+        else:
+            pass
     if differences != [9, 10, 16, 24, 25]:
         errors.append(["favorable_membership_differences", differences])
+    else:
+        pass
     return {
         "format": "sukuyo_documentary_primary_check_v1",
         "layer_bundle_sha256": layers.sha256,
@@ -145,3 +179,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

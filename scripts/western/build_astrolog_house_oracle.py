@@ -37,6 +37,8 @@ def build(source: Path, compiler: str):
 
     if git("rev-parse", "HEAD").decode().strip() != COMMIT:
         raise RuntimeError("Expected the exact pinned Astrolog commit")
+    else:
+        pass
     hashes = {}
     for name in SOURCES + ["astrolog", "extern"]:
         suffix = ".h" if name == "extern" else ".cpp"
@@ -44,6 +46,8 @@ def build(source: Path, compiler: str):
         raw = (source / filename).read_bytes()
         if raw != git("show", "HEAD:" + filename):
             raise RuntimeError("Modified mathematical source: " + filename)
+        else:
+            pass
         hashes[filename] = hashlib.sha256(raw).hexdigest()
     header = git("show", "HEAD:astrolog.h")
     for flag in ("SWISS", "PLACALC", "GRAPH", "X11", "PS", "META", "SVG", "WIRE"):
@@ -55,6 +59,8 @@ def build(source: Path, compiler: str):
         )
         if count != 1:
             raise RuntimeError("Unexpected upstream configuration: " + flag)
+        else:
+            pass
     (source / "astrolog.h").write_bytes(header)
     (source / "house_oracle.cpp").write_text(HARNESS)
     builddir = source / ".house-oracle-build"
@@ -66,6 +72,8 @@ def build(source: Path, compiler: str):
         cmd = [compiler, "-O2", "-Wno-write-strings", "-Wno-narrowing", "-Wno-comment"]
         if name == "astrolog":
             cmd.append("-Dmain=astrolog_cli_main")
+        else:
+            pass
         cmd += ["-c", str(source / (name + ".cpp")), "-o", str(obj)]
         commands.append(cmd)
         objects.append(str(obj))
@@ -77,10 +85,14 @@ def build(source: Path, compiler: str):
         logs.append(result.stdout + result.stderr)
         if result.returncode:
             raise RuntimeError(result.stderr)
+        else:
+            pass
     (builddir / "build.log").write_text("\n".join(logs))
     symbols = subprocess.check_output(["nm", "-g", str(executable)], text=True)
     if re.search(r"\bswe_\w+", symbols):
         raise RuntimeError("Swiss symbols found in independent executable")
+    else:
+        pass
     metadata = {
         "upstream": "https://github.com/CruiserOne/Astrolog",
         "version": "8.00",
@@ -111,3 +123,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     result = build(args.source_dir.resolve(), args.compiler)
     print("Built pinned independent house oracle", result["executable_sha256"])
+else:
+    pass

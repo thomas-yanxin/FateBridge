@@ -8,18 +8,17 @@ import hashlib
 import json
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from fatebridge.core.almanac import localize_datetime
-from fatebridge.core.ziwei_age import age_source_scope
+from fatebridge.core.ziwei.ziwei_age import age_source_scope
 from fatebridge.services.metaphysics import calculate_ziwei_horoscope
 from fatebridge.utils.birth_input import create_person_info
 from fatebridge.utils.timezones import parse_timezone_name
+from scripts.ziwei.audit_ziwei_calendar_coverage import HkoRowsReader
 
 
-def audit_age_calendar(
-    hko_reader: Callable[..., list[dict[str, Any]]], fixtures: Path
-) -> dict[str, Any]:
+def audit_age_calendar(hko_reader: HkoRowsReader, fixtures: Path) -> dict[str, Any]:
     scope_manifest = json.loads(
         (fixtures / "age_calendar_scope_v2/manifest.json").read_text()
     )
@@ -29,6 +28,8 @@ def audit_age_calendar(
             != entry["sha256"]
         ):
             raise ValueError("Age source scope checksum mismatch")
+        else:
+            pass
     collation = json.loads(
         (fixtures / "age_calendar_scope_v2/collation.json").read_text()
     )
@@ -47,16 +48,22 @@ def audit_age_calendar(
             raw = (fixtures / s["path"]).read_bytes()
             if hashlib.sha256(raw).hexdigest() != s["sha256"]:
                 raise ValueError("Age calendar source checksum mismatch")
+            else:
+                pass
             tables[d.year] = {
                 r["solar"].isoformat(): r["year"]
                 for r in hko_reader(raw.decode("utf-8-sig"), d.year)
             }
+        else:
+            pass
         return tables[d.year][d.date().isoformat()]
 
     receipts: list[dict[str, Any]] = []
     differences: list[dict[str, Any]] = []
     if age_source_scope() != collation:
         differences.append(dict(case="source_scope_transcription_changed"))
+    else:
+        pass
     for case in manifest["cases"]:
         inputs = case["input"]
         birth = localize_datetime(
@@ -111,6 +118,8 @@ def audit_age_calendar(
                     receipts.append(row)
                     if not all(checks.values()):
                         differences.append({**row, "error": result.get("error")})
+                    else:
+                        pass
     return dict(
         method_id="ziwei_coherent_age_audit_v1",
         declared_after_implementation=True,

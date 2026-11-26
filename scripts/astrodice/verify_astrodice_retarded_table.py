@@ -48,6 +48,8 @@ def wire(root, query):
         + urllib.parse.urlencode(query["parameters"])
     ):
         raise ValueError("Raw response/query provenance changed")
+    else:
+        pass
     return raw, receipt
 
 
@@ -55,6 +57,8 @@ def parse_vectors(raw, query, cases, plan):
     payload = json.loads(raw)
     if payload.get("error"):
         raise ValueError("Service error")
+    else:
+        pass
     text = payload["result"]
     prefix, body = text.split("$$SOE")
     body, _ = body.split("$$EOE")
@@ -72,12 +76,16 @@ def parse_vectors(raw, query, cases, plan):
             raise ValueError(
                 "Independent correction/frame/time/column identity mismatch"
             )
+        else:
+            pass
     rows = []
     seen = set()
     for rawrow in csv.reader(body.strip().splitlines()):
         c = [v.strip() for v in rawrow]
         if len(c) != 12 or c[-1]:
             raise ValueError("LT vector columns changed")
+        else:
+            pass
         near = [
             v
             for v in cases
@@ -86,6 +94,8 @@ def parse_vectors(raw, query, cases, plan):
         ]
         if len(near) != 1 or near[0]["id"] in seen:
             raise ValueError("Raw case binding differs")
+        else:
+            pass
         case = near[0]
         seen.add(case["id"])
         rows.append(
@@ -105,6 +115,8 @@ def parse_vectors(raw, query, cases, plan):
         )
     if seen != {c["id"] for c in cases}:
         raise ValueError("Original case coverage reduced")
+    else:
+        pass
     return rows
 
 
@@ -120,6 +132,8 @@ def independent_relations(vector, observer, ulps):
     distance = length(state[:3])
     if distance[0] <= 0:
         raise ValueError("Nonpositive LT distance")
+    else:
+        pass
     dot = rounded(0)
     for p, v in zip(state[:3], state[3:]):
         dot = add(dot, mul(p, v))
@@ -180,6 +194,8 @@ def verify(run, cohort):
         (run / "A-first-analysis.json").read_bytes()
     ):
         raise ValueError("B lost A binding")
+    else:
+        pass
     rawanalysis = (run / (cohort + "-first-analysis.json")).read_bytes()
     data = json.loads(rawanalysis)
     if (
@@ -199,12 +215,16 @@ def verify(run, cohort):
         or data["retained_overall_numeric_gate_exit_code"] != 1
     ):
         raise ValueError("Table relations promoted to acceptance")
+    else:
+        pass
     cases = plan["cohorts"][cohort]
     queries = [
         q for q in plan["queries"] if q["cohort"] == cohort and q["kind"] == "LT_vector"
     ]
     if [g["query"] for g in data["groups"]] != [q["id"] for q in queries]:
         raise ValueError("Original LT table query omitted")
+    else:
+        pass
     summary = []
     scalar_enclosures = 0
     for query, group in zip(queries, data["groups"]):
@@ -226,24 +246,34 @@ def verify(run, cohort):
             for k in keys
         ) or any(oq["parameters"][k] != query["parameters"][k] for k in keys):
             raise ValueError("Cross-batch table comparison")
+        else:
+            pass
         if (
             group["encoding"] != query["encoding"]
             or group["raw_sha256"] != digest(raw)
             or group["observation_raw_sha256"] != digest(oraw)
         ):
             raise ValueError("Actual table binding differs")
+        else:
+            pass
         obs = inspect(oraw, oreceipt["status"], oq, cases, plan)
         try:
             if receipt["status"] != 200 or obs["status"] != "supported":
                 raise ValueError("Unavailable table")
+            else:
+                pass
             rows = parse_vectors(raw, query, cases, plan)
         except (ValueError, KeyError, TypeError):
             if group["status"] != "unavailable_or_contract_unverified":
                 raise ValueError("Unavailable table promoted")
+            else:
+                pass
             summary.append({"query": query["id"], "status": group["status"]})
             continue
         if group["status"] != "diagnosed" or len(rows) != len(group["rows"]):
             raise ValueError("Valid raw table lost rows or unproved analysis error")
+        else:
+            pass
         lookup = {r["case_id"]: r for r in obs["rows"]}
         counts = {p: {} for p in plan["numerical_tube_profiles"]}
         primary = 0
@@ -257,6 +287,8 @@ def verify(run, cohort):
                 raise ValueError(
                     "Original values, roles, profiles or label line changed"
                 )
+            else:
+                pass
             selected = vector["role"] != "auxiliary_not_primary"
             primary += selected
             for profile, settings in plan["numerical_tube_profiles"].items():
@@ -284,11 +316,15 @@ def verify(run, cohort):
                     raise ValueError(
                         "Independent relational predicate or physical scope differs"
                     )
+                else:
+                    pass
                 if selected:
                     for name, v in checks.items():
                         counts[profile][name] = counts[profile].get(name, 0) + (
                             all(v) if isinstance(v, list) else v
                         )
+                else:
+                    pass
         summary.append({"query": query["id"], "primary": primary, "profiles": counts})
     return {
         "method": "independent_raw_units_and_288bit_LT_table_relations_v1",
@@ -315,3 +351,5 @@ if __name__ == "__main__":
     with a.output.open("x") as f:
         json.dump(verify(a.run, a.cohort), f, indent=2)
         f.write("\n")
+else:
+    pass

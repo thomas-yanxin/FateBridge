@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from .common import LIURENG_GUIREN_DAY, LIURENG_GUIREN_NIGHT
+from fatebridge.core.metaphysics.common import LIURENG_GUIREN_DAY, LIURENG_GUIREN_NIGHT
 
 GuirenProfile = Literal["liuren_common_v1", "tanyuan_xieji_v1"]
 DEFAULT_GUIREN_PROFILE: GuirenProfile = "liuren_common_v1"

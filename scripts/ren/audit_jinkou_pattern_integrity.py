@@ -12,8 +12,8 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/jinkou_pattern_integrity_v1"
 IMPLEMENTATION = (
-    "src/fatebridge/core/output_ren_patterns.py",
-    "src/fatebridge/core/output_chinese.py",
+    "src/fatebridge/core/contracts/output_ren_patterns.py",
+    "src/fatebridge/core/contracts/output_chinese.py",
     "src/fatebridge/core/metaphysics/jinkou_patterns.py",
     "scripts/ren/audit_jinkou_pattern_integrity.py",
 )
@@ -27,17 +27,25 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     frozen = json.loads((corpus / "freeze.json").read_text())
     if {p.name for p in corpus.iterdir()} != set(frozen["files"]) | {"freeze.json"}:
         raise ValueError("Frozen pattern-integrity inventory changed")
+    else:
+        pass
     for name, digest in frozen["files"].items():
         if sha(corpus / name) != digest:
             raise ValueError("Frozen pattern-integrity reference changed")
+        else:
+            pass
     data: dict[str, Any] = json.loads((corpus / "reference.json").read_text())
     if sha(ROOT / data["source_reference"]) != data["source_reference_sha256"]:
         raise ValueError("Original 64-case reference changed")
+    else:
+        pass
     if (
         data["catalog_ids"] != [f"P{i:02}" for i in range(1, 65)]
         or len(data["faults"]) != 20
     ):
         raise ValueError("Complete integrity probe inventory required")
+    else:
+        pass
     return data
 
 
@@ -117,9 +125,9 @@ def audit() -> dict[str, Any]:
     before = {n: sha(ROOT / n) for n in IMPLEMENTATION}
     from pydantic import ValidationError
 
+    from fatebridge.core.contracts.output_chinese import JinkouPatterns
     from fatebridge.core.metaphysics.jinkou import GUISHEN_IDENTITIES
     from fatebridge.core.metaphysics.jinkou_patterns import structural_patterns
-    from fatebridge.core.output_chinese import JinkouPatterns
 
     data = baseline()
     faults = []

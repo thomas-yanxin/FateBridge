@@ -15,15 +15,15 @@ from fatebridge.core import ephemeris_runtime as e
 from fatebridge.core.astro.position_motion import complete_position_rate
 from fatebridge.core.astro.source_session import source_session
 from fatebridge.core.compressed_ephemeris import audit_compressed_endpoints
-from tests.jyotish.test_jyotish_sources import restore_runtime  # noqa: F401
+from tests.unit_test.fixtures.jyotish_sources import restore_runtime  # noqa: F401
 
 
 @pytest.mark.parametrize("year", range(600, 9601, 600))
 @pytest.mark.parametrize("planet", ["Mercury", "Venus", "Mars"])
 @pytest.mark.parametrize("sidereal", [False, True])
 def test_owned_derivative_keeps_center_and_fixed_line_at_file_start(
-    year, planet, sidereal
-):
+    year, planet: str, sidereal: bool
+) -> None:
     e.configure_ephemeris_path(str(Path(__file__).resolve().parents[2] / "ephe"))
     epoch = float(
         Fraction(date(year, 1, 1).toordinal())
@@ -34,6 +34,8 @@ def test_owned_derivative_keeps_center_and_fixed_line_at_file_start(
     if sidereal:
         e.ephemeris_call("set_sid_mode", e.swe.SIDM_LAHIRI, 0, 0)
         flags |= e.swe.FLG_SIDEREAL
+    else:
+        pass
     with audit_compressed_endpoints(), source_session() as session:
         raw, returned = e.ephemeris_call(
             "calc", epoch, getattr(e.swe, planet.upper()), flags

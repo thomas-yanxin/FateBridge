@@ -88,7 +88,7 @@ def _loaded_image(function: Any, expected: Path, digest: str) -> str:
 
 
 class _Source:
-    def __init__(self, path: Path, signature: tuple[int, ...]):
+    def __init__(self, path: Path, signature: tuple[int, ...]) -> None:
         self.path, self.signature = path, signature
         try:
             self.profile, self.profile_sha256 = source_profile()
@@ -255,7 +255,6 @@ class _Source:
             derived_lichun_scope=deepcopy(self.profile["derived_lichun_scope"]),
             native_moshier_relabelled=False,
             accuracy_certified=False,
-            source_identity_scope="Locally built and actually loaded binary/profile identity; not upstream signature, atomic external-file immutability or all-epoch physical/civil accuracy",
         )
 
     def key(self) -> tuple[Any, ...]:
