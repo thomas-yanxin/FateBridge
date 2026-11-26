@@ -1,8 +1,8 @@
-"""Projection-compatible receipts for the actual Canping annual boundaries."""
+"""Projection-compatible receipts for Canping annual boundaries."""
 
 from typing import Literal
 
-from pydantic import Field, JsonValue, ValidationInfo, model_validator
+from pydantic import JsonValue, ValidationInfo, model_validator
 
 from fatebridge.core.contracts.output_base import PartialOutput
 from fatebridge.core.contracts.output_civil_time import (
@@ -13,7 +13,7 @@ from fatebridge.utils.civil_time import ZonedCalendar
 
 
 class CanpingInterval(PartialOutput):
-    """Numerical half-open bounds and their independent display adapters."""
+    """Half-open interval labels and optional point bounds."""
 
     start_at: str | None = None
     end_at: str | None = None
@@ -71,25 +71,7 @@ class CanpingSolarBoundary(PartialOutput):
     ) = None
 
     @model_validator(mode="after")
-    def same_instant(self, info: ValidationInfo) -> "CanpingSolarBoundary":
-        if (
-            info.context
-            and info.context.get("full_result")
-            and self.record is not None
-            and self.record.comparison_policy == "retained_nominal_civil_point_v1"
-            and any(
-                value is None
-                for value in (
-                    self.year,
-                    self.instant_utc,
-                    self.selection,
-                    self.record.name,
-                    self.record.resolution_provider,
-                    self.record.ephemeris_model,
-                )
-            )
-        ):
-            raise ValueError("完整立春主点收据缺少年份、选择或实际模型身份。")
+    def same_instant(self) -> "CanpingSolarBoundary":
         if self.instant_utc is not None:
             at = ZonedCalendar.from_isoformat(self.instant_utc).utc
             civil = self.record.display_with_offset if self.record is not None else None
@@ -112,10 +94,7 @@ class CanpingSolarContext(PartialOutput):
     de440_extended_projection_profile_used: bool | None = None
     registered_public_input_years: list[int] | None = None
     qualified_origin_civil_year_ranges: list[list[int]] | None = None
-    public_model_years_extended: Literal[False] | None = Field(
-        default=None,
-        description="仅说明本派生许可不扩大独立公开年界，不陈述配置本身的公开年份范围。",
-    )
+    public_model_years_extended: Literal[False] | None = None
     not_a_lifespan_estimate: Literal[True] | None = None
     leap_table_expires_at: str | None = None
     scope: str | None = None
@@ -129,5 +108,5 @@ class CanpingSolarContext(PartialOutput):
                 self.boundary_count is not None
                 and self.boundary_count != self.horizon_years + 1
             ):
-                raise ValueError("年序边界不能截短。")
+                raise ValueError("立春边界数量须为年序范围加1。")
         return self

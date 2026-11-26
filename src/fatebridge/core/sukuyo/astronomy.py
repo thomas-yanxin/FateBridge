@@ -1,8 +1,4 @@
-"""Modern instantaneous Moon-Sun longitude reference, separate from T1299.
-
-This consumes the already guarded, same-epoch geocentric apparent tropical
-coordinates. It neither calls an ephemeris nor assigns a sunrise calendar day.
-"""
+"""Consolidated Sukuyo equatorial 28-mansion projection and Moon-Sun elongation phase."""
 
 from __future__ import annotations
 
@@ -11,21 +7,13 @@ from fractions import Fraction
 from typing import Any
 
 from fatebridge.core.astro import runtime
+from fatebridge.core.astro.birth import AstroBirthInfo
 from fatebridge.core.astro.native_coordinates import COORDINATE_FLAGS
+from fatebridge.core.guolao.guolao import mansion_at, positions
 from fatebridge.utils.errors import EphemerisSourceError
 
-METHOD = "modern_geocentric_apparent_elongation_tithi12_v1"
-DEFINITIONS = [
-    {
-        "id": "imd_positional_astronomy_panchang_explanation",
-        "role": "Modern tithi spans successive 12 degree Moon-Sun longitude differences; instantaneous segmentation only here.",
-    },
-    {
-        "id": "usno_primary_phase_definition_archived_by_ntsb",
-        "locator": "PDF page 4, USNO primary-phase definition",
-        "role": "Apparent ecliptic Moon minus Sun longitude 0, 90, 180, 270 degrees defines the four primary phases.",
-    },
-]
+METHOD = "modern_equatorial_research_anchors_v1"
+LUNAR_PHASE_METHOD = "modern_geocentric_apparent_elongation_tithi12_v1"
 
 
 def _finite(value: Any) -> float:
@@ -41,11 +29,7 @@ def _finite(value: Any) -> float:
 
 
 def lunar_phase_reference(raw: dict[str, Any]) -> dict[str, Any]:
-    """Use captured longitudes, not rounded chart degrees or equatorial RA.
-
-    Binary input ratios decide half-open intervals before float conversion.
-    Precision here describes arithmetic, not uncertainty of the ephemeris.
-    """
+    """Compute instantaneous Moon-Sun elongation and 12-degree tithi segment."""
     native = runtime.swe
     if native is None:
         raise ModuleNotFoundError("现代月日黄经差需要Swiss Ephemeris坐标来源。")
@@ -53,8 +37,8 @@ def lunar_phase_reference(raw: dict[str, Any]) -> dict[str, Any]:
     for name in COORDINATE_FLAGS:
         coordinate_mask |= getattr(native, name)
     source_mask = native.FLG_SWIEPH | native.FLG_MOSEPH | native.FLG_JPLEPH
-    longitudes = {}
-    sources = {}
+    longitudes: dict[str, float] = {}
+    sources: dict[str, dict[str, Any]] = {}
     try:
         tt = _finite(raw["julian_day_tt"])
         ut1 = _finite(raw["julian_day_ut1"])
@@ -78,22 +62,17 @@ def lunar_phase_reference(raw: dict[str, Any]) -> dict[str, Any]:
             if receipt["ecliptic_model"] != model:
                 raise EphemerisSourceError("coordinate_model_changed")
             longitudes[body] = value
-            sources[body] = {
-                "ecliptic_model": model,
-                "ecliptic_return_flags": flags,
-            }
+            sources[body] = {"ecliptic_model": model, "ecliptic_return_flags": flags}
     except (KeyError, TypeError) as error:
         raise EphemerisSourceError("coordinate_values_unavailable") from error
 
     angle = (Fraction(longitudes["Moon"]) - Fraction(longitudes["Sun"])) % 360
     segment = int(angle // 12)
     lower, upper = segment * 12, (segment + 1) * 12
-    # Float export must not contradict the exact half-open segment near an
-    # endpoint (including a small negative difference rounded up to 360).
     display = max(float(lower), min(float(angle), math.nextafter(upper, -math.inf)))
     distance = min(angle - lower, upper - angle)
     return {
-        "method_id": METHOD,
+        "method_id": LUNAR_PHASE_METHOD,
         "coordinate_frame": "geocentric_apparent_tropical_ecliptic_equinox_of_date",
         "coordinate_unit": "modern_degree_360",
         "julian_day_tt": tt,
@@ -101,14 +80,6 @@ def lunar_phase_reference(raw: dict[str, Any]) -> dict[str, Any]:
         "source_longitudes": longitudes,
         "ephemeris_provenance": sources,
         "elongation_degrees": display,
-        "elongation_exact_binary_ratio": {
-            # Decimal strings preserve integers beyond JavaScript's 53 bits
-            # on REST/MCP JSON transports. Exactness concerns binary inputs,
-            # not uncertainty of the physical coordinates.
-            "numerator": str(angle.numerator),
-            "denominator": str(angle.denominator),
-        },
-        "display_adjusted_for_half_open_interval": display != float(angle),
         "modern_tithi": {
             "index": segment + 1,
             "half": "waxing" if segment < 15 else "waning",
@@ -117,15 +88,66 @@ def lunar_phase_reference(raw: dict[str, Any]) -> dict[str, Any]:
             "lower_degrees_inclusive": lower,
             "upper_degrees_exclusive": upper,
             "distance_to_nearest_boundary_degrees": float(distance),
-            "interval_convention": "[12*(index-1),12*index); exact 180 starts modern waning 1",
         },
-        "definitions": [dict(row) for row in DEFINITIONS],
         "calendar_day_assigned": False,
-        "sunrise_day_or_tithi_end_times_computed": False,
-        "lunar_star_conjunction_computed": False,
-        "ancient_ritual_condition_evaluated": False,
-        "historical_day_boundary_or_half_established": False,
-        "leap_short_month_priority_established": False,
-        "ephemeris_accuracy_certified": False,
-        "scope": "同次TT的现代月日视黄经差与12度角距分段；不是T1299历日日号、日出历日或T1796仪轨定日的认证，不改变日界、主宿或闰小月候选。二进制算术边界不代表物理时刻精度或现实预测效力。",
     }
+
+
+def build_equatorial_mansions(birth: AstroBirthInfo) -> dict[str, Any]:
+    """Compute geocentric 28 equatorial mansion positions for the 7 luminaries."""
+    if runtime.swe is None:
+        raise ModuleNotFoundError(
+            "天文不等宽宿度需要Swiss Ephemeris；不静默降级为等分示意。"
+        )
+    raw = positions(
+        birth,
+        hsys=0,
+        zodiacal=0,
+        observer_geometry=False,
+        correct_motion=False,
+    )
+    bodies = [
+        {
+            "id": name,
+            "longitude": state["longitude"],
+            "latitude": state["latitude"],
+            "right_ascension": state["right_ascension"],
+            "declination": state["declination"],
+            "mansion": mansion_at(state["right_ascension"], raw["boundaries"]),
+        }
+        for name, state in raw["states"].items()
+    ]
+    return {
+        "method_id": METHOD,
+        "coordinate_frame": "geocentric_apparent_true_equator_equinox_of_date",
+        "coordinate_unit": "modern_degree_360",
+        "utc_datetime": birth.utc_isoformat,
+        "julian_day_tt": raw["julian_day_tt"],
+        "julian_day_ut1": raw["julian_day_ut1"],
+        "ephemeris_models": raw["models"],
+        "lunar_phase_reference": lunar_phase_reference(raw),
+        "bodies": bodies,
+        "boundaries": raw["boundaries"],
+        "classical_boundary_acceptance": False,
+    }
+
+
+def apply_equatorial_mansions(chart: dict[str, Any], astronomy: dict[str, Any]) -> None:
+    by_name = {body["id"]: body for body in astronomy["bodies"]}
+    for point in chart["objects"]:
+        point.pop("su28", None)
+        point.pop("su28_degree", None)
+        if point["id"] not in by_name:
+            point["su28_unavailable_reason"] = "outside_seven_physical_luminaries_scope"
+            continue
+        body = by_name[point["id"]]
+        mansion = body["mansion"]
+        point.update(
+            su28=mansion["su28"].removesuffix("宿"),
+            su28_method=METHOD,
+            su28_degree=mansion["degree_in_mansion"],
+            su28_width=mansion["mansion_width"],
+            right_ascension=body["right_ascension"],
+            declination=body["declination"],
+            su28_boundary_distance=mansion["boundary_distance"],
+        )

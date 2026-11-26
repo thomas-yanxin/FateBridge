@@ -1,8 +1,8 @@
-"""Retained first-review omissions must fail before their native-text repairs."""
+"""Structured Sukuyo day and compatibility facts without prose reading walls."""
 
 import pytest
 
-from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.calendar import calendar_mansion, day_evidence
 from fatebridge.services.divination import calculate_sukuyo_compatibility
 
 HISTORICAL = "japanese_naoj_historical_utc09"
@@ -20,12 +20,14 @@ def test_heart_source_restriction_is_retained_beside_general_favorable_day(
     )
     d = day_evidence(c)
     assert d["day_mansion"] == "心" and d["activity_assessment"] is None
-    assert "唯除营功德事自余不可" in d["reading_text"]
-    assert "原段" in d["reading_text"]
+    assert "reading_text" not in d
+    assert any(
+        c["assessment"] == "favorable" for c in d["calendar_day"]["classifications"]
+    )
 
 
 @pytest.mark.parametrize("part", [None, "first_half"])
-def test_unresolved_mansion_retains_conditional_rasetsu_meaning(
+def test_unresolved_mansion_retains_candidate_list_and_palace(
     part: str | None,
 ) -> None:
     c = calendar_mansion(
@@ -38,14 +40,11 @@ def test_unresolved_mansion_retains_conditional_rasetsu_meaning(
     )
     d = day_evidence(c)
     assert d["day_mansion"] is None and set(c["candidate_su27s"]) == {"参", "毕"}
-    assert "不宜舉百事" in d["reading_text"]
-    assert "候选取参" in d["reading_text"]
-    assert "未形成事项汇总" in d["reading_text"]
+    assert "reading_text" not in d
+    assert d["palace_reference"]["mansion_candidates"] == ["参", "毕"]
 
 
-def test_pair_native_preserves_input_uncovered_day_and_resolved_palace_sublayer() -> (
-    None
-):
+def test_pair_structured_data_preserves_date_candidates_and_resolved_palace() -> None:
     r = calculate_sukuyo_compatibility(
         person1_name="甲",
         person1_date="1346-07-17",
@@ -55,15 +54,7 @@ def test_pair_native_preserves_input_uncovered_day_and_resolved_palace_sublayer(
         person2_zone="+08:00",
         calendar_basis=HISTORICAL,
     )
-    text = r["summary"]
-    assert "甲输入当地日期1346-07-17，时区+08:00，时刻未知" in text
-    assert "乙输入当地日期1346-08-29，时区+08:00，时刻未知" in text
-    assert "实际配宿档案t1299_fullmoon27" in text
-    assert "1346-08-29未被本批逐日旁注选录覆盖" in text
-    assert "不等于原卷无注" in text
-    assert "乙：按已列历日宿名查原典分足表，表内宫名候选只有蝎宫" in text
-    assert "未确定个人本命宫" in text
-    assert "UTC支持区间" in text
-    assert "字面28宿表为危" in text
-    assert "字面28宿表为室" in text
-    assert "不覆盖本次27宿或三九结果" in text
+    assert r["person2"]["palace_reference"]["selected_palace"]["name"] == "蝎宫"
+    assert r["person1"]["calendar"]["date_support"]["utc_support_intervals"]
+    assert r["person2"]["calendar"]["date_support"]["utc_support_intervals"]
+    assert "candidate_relation_analysis" in r

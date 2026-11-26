@@ -11,7 +11,8 @@ from fatebridge.core.contracts.output_heluo_month import (
     HeluoSeasonalNumbers,
 )
 from fatebridge.core.contracts.output_heluo_qi import HeluoBodyEvidence, HeluoPhaseQi
-from fatebridge.core.heluo.heluo_structure import OPERATORS, _name
+from fatebridge.core.heluo.judgment import OPERATORS
+from fatebridge.core.heluo.judgment import _structure_name as _name
 
 
 class HeluoRulerMinisterSeat(PartialOutput):
