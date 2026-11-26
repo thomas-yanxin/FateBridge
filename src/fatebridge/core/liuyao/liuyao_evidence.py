@@ -10,18 +10,12 @@ from copy import deepcopy
 from datetime import datetime
 from typing import Any
 
+from fatebridge.core.liuyao.liuyao_judgment import build_conditional_analysis
 from fatebridge.core.liuyao.liuyao_relations import (
     _SOURCE_MANIFEST,
     ADVANCES,
-)
-from fatebridge.core.liuyao.liuyao_relations import BRANCHES as BRANCHES
-from fatebridge.core.liuyao.liuyao_relations import COMBINES as COMBINES
-from fatebridge.core.liuyao.liuyao_relations import CONTROLS as CONTROLS
-from fatebridge.core.liuyao.liuyao_relations import ELEMENTS
-from fatebridge.core.liuyao.liuyao_relations import GENERATES as GENERATES
-from fatebridge.core.liuyao.liuyao_relations import SOURCES
-from fatebridge.core.liuyao.liuyao_relations import STEMS as STEMS
-from fatebridge.core.liuyao.liuyao_relations import (
+    ELEMENTS,
+    SOURCES,
     branch_facts,
     element_relation,
     xunkong,
@@ -45,9 +39,6 @@ def build_liuyao_evidence(
     timing_days: int = 0,
     event_horizon: str | None = None,
 ) -> dict[str, Any]:
-    # Kept lazy because the conditional layer reuses this module's pure
-    # relation primitives; no conditional work runs during catalog loading.
-
     void = xunkong(day_ganzhi)
     day = day_ganzhi[1]
     rows = []
@@ -131,9 +122,6 @@ def build_liuyao_evidence(
             "sources": [SOURCES[5], SOURCES[28]],
         }
     )
-    # note (imports): Other divination services must not initialize Liuyao rule profiles.
-    from fatebridge.core.liuyao.liuyao_judgment import build_conditional_analysis
-
     conditional = build_conditional_analysis(
         lines=lines,
         hidden=hidden,

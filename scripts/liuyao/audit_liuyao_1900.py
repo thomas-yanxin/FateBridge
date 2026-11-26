@@ -5,17 +5,9 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import sys
 from datetime import date
 from pathlib import Path
 from typing import Any
-
-# note (imports): Direct script execution must locate the repository's validation modules.
-if __name__ == "__main__" and __package__ is None:
-    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-else:
-    pass
-
 
 from fatebridge.core.almanac import (
     LUNAR_SUPPORTED_SOLAR_END,

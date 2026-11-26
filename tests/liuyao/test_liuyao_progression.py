@@ -11,8 +11,8 @@ from fatebridge.core.contracts.output_liuyao_conditions import (
     ProgressClause,
     ProgressConditions,
 )
-from fatebridge.core.liuyao.liuyao_evidence import ADVANCES
 from fatebridge.core.liuyao.liuyao_progression import PROFILE
+from fatebridge.core.liuyao.liuyao_relations import ADVANCES
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from fatebridge.core.requests.divination import SixYaoRequest
 from scripts.liuyao.build_profile import build_profile

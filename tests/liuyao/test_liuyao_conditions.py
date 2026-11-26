@@ -8,15 +8,14 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.core.liuyao.liuyao_focus import kinship, role_against_focus
 from fatebridge.core.liuyao.liuyao_judgment import (
     MANIFEST,
-    STAGES,
     build_conditional_analysis,
     clash,
-    kinship,
     month_strength,
-    role_against_focus,
 )
+from fatebridge.core.liuyao.liuyao_stages import STAGES
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from fatebridge.core.requests.divination import SixYaoRequest
 from tests.unit_test.fixtures.liuyao import conditional_case, mounted_lines

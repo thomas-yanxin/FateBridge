@@ -4,17 +4,9 @@ import argparse
 import hashlib
 import json
 import logging
-import sys
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
-
-# note (imports): Direct script execution must locate the repository's validation modules.
-if __name__ == "__main__" and __package__ is None:
-    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-else:
-    pass
-
 
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from validation.meihua import (

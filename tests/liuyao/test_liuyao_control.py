@@ -11,7 +11,7 @@ from fatebridge.core.contracts.output_liuyao_control import (
     DirectedControl,
 )
 from fatebridge.core.liuyao.liuyao_control import PROFILE, build_control_conditions
-from fatebridge.core.liuyao.liuyao_judgment import STAGES
+from fatebridge.core.liuyao.liuyao_stages import STAGES
 from scripts.liuyao.build_profile import build_profile
 from tests.unit_test.fixtures.liuyao import conditional_case
 from tests.unit_test.fixtures.liuyao import mounted_lines as mounted
