@@ -1,6 +1,6 @@
 # 梅花易数计算、原典与验证
 
-`meihua_analysis` 以指定公历钟时查中国农历，执行《梅花易數》年月日時起例。`meihua_cast` 接收物件数量、声音、长度、已核定字形／四声、端法资料或已有单动爻卦。REST、MCP、CLI 共用计算；不以通过软件测试宣布全书符合或现实预测有效。
+`meihua_time_cast` 以指定公历钟时查中国农历，执行《梅花易數》年月日時起例。`meihua_cast` 接收物件数量、声音、长度、已核定字形／四声、端法资料或已有单动爻卦。REST、MCP、CLI 共用计算；不以通过软件测试宣布全书符合或现实预测有效。
 
 [文档中心](README.md) · [时间入口合同](contracts/meihua_time_cast.json) · [显式起卦合同](contracts/meihua_cast.json)
 
@@ -20,7 +20,7 @@
 
 共享易卦层负责八卦爻序、六十四卦身份、本互错综变、体用关系、名义年月日時取数和卦名查询。`gua_lookup` 和 `gua_meanings` 按卦名或卦码查询结构，六十四卦附《周易》经文和版本出处。Agent 可按实际问题解释选定的卦爻和原文，并结合用户提供的现实背景提出建议。
 
-本轮修复两处实际问题。原八卦返回值与全局表共用可变爻数组，直接使用 Python 领域函数的调用者改动结果后会污染下一次计算；现在由共同交付函数复制爻数组，152个预先固定的隔离探针从全部失败降至0。该问题不表示远程 JSON 客户端可以修改服务器内存。原名称查询拒绝部分标准短名和繁体全名；现在从既有卦图和已归属的《周易》篇名派生精确索引，支持 `临`、`臨`、`天澤履`、`雷風恆`、`天山遯` 等，不另维护一套手写64卦别名表。八纯卦单名在 `auto` 模式仍取八卦，明确 `hexagram` 才取六爻卦；批量查询可用全名或六码选六爻卦。无法识别的爻序不再默认套用乾卦。
+返回的爻数组与全局表隔离，调用者修改一次 Python 结果不会污染后续计算。名称索引从既有卦图和《周易》篇名派生，支持标准短名和繁体全名，包括 `临`、`臨`、`天澤履`、`雷風恆`、`天山遯`。八纯卦单名在 `auto` 模式取八卦，明确 `hexagram` 才取六爻卦；批量查询可用全名或六码选六爻卦。无法识别的爻序返回错误。
 
 参考在对应修复前固定，原始失败、不同实现的原返回及脚本错误记录均保留。来源包括[《梅花易數》卷一固定转录](https://zh.wikisource.org/w/index.php?oldid=2690596&title=梅花易數/卷一)、[《周易》公布卦图表](https://zh.wikisource.org/wiki/周易)和[《臨》固定转录](https://zh.wikisource.org/w/index.php?title=周易/臨&oldid=2106146)，并实际执行 [muyen 原作者实现的固定提交](https://github.com/muyen/meihua-yishu) 与 [handsomejustin 原作者实现的固定提交](https://github.com/handsomejustin/meihua-yi)。这些开源实现是独立比较对象，不因此获得权威认证。新增原典依据是数字转录，未据此宣称完整影印校勘。
 
@@ -30,15 +30,12 @@
 | 51,840组年支、名义月日、时支 | 固定原作者取数和所选结构字段0差异，只含192种不同结构，不是51,840个独立几何结果；不检查真实月长、闰月或公历换日 |
 | 625条名称／模式记录 | 537条有效、88条无效，实际509组不同查询／模式；原351条有效记录失败，修复后0差异。另19个无效私有三爻输入全部明确失败；重复别名不重复计作算法 |
 | 4,096组卦码与动爻集合 | 经文选择位置、变卦卦辞及乾坤全变的用九／用六0差异。其中4,032组实际运行对照实现，64组空集合只作边界控制；不认证原文措辞或占断效力 |
-| 当前源码与Python 3.10安装包 | 上述有限范围均复核；25个场景、8个公开工具共150次真实REST、独立CLI和全新stdio MCP调用，完整业务结果一致，仅剔除运行元数据。没有重启当前聊天已连接的旧进程，也不作部署或全分支通过声明 |
 
-另外3种固定无效输入在两种环境的三端共调用18次，均返回不可重试的输入错误；只对齐错误消息、错误码和重试资格，完整运输层错误封装另存，不冒充完整响应相等。全新MCP还核对两个查询工具的所选公开参数说明和单卦工具摘要。源码REST父进程实际观察到本轮审读的33个函数，3个声明类不获函数调用信用；观察到进入函数不等于所有分支或传统来源通过。
+输入错误和三端业务结果按[公开调用测试](../tests/meihua/test_meihua_current_options.py)核对；传输层封装与运行元数据分别处理。领域计算、协议交付和真实模型解释的验收范围分别记录。
 
 对照实现的差异没有通过修改参考来抹平。第二个实现有72条形式记录、12种不同本卦的名称与公布卦图不符；另8条取互结果涉及直接取本卦之互与所选乾坤取变卦之互的规则差别，分别保留。独立 OpenCC 字形转换还保留两处差异：`遯／遁` 未自动合并、`乾為天` 被通用转换器写成 `干为天`；没有为了获得全等另加转换覆盖，也没有把通用字形转换器当作卦名裁定来源。
 
 完整公历时间入口另取576条固定 `UTC+08:00` 标签，不能当作历史上海法定钟时。与第一个实现相比，294条结构不同（正午9条、23时285条），其中9个日期各两个钟时共18条原始农历日不同。重新下载香港天文台 [1933年](https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1933c.txt)、[1954年](https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1954c.txt)、[1978年](https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1978c.txt) 公布历表核对这18条日标签，FateBridge为0差异，第三方为18条；另有3条底层日期不同而卦图恰好相同。历表同时是生产修正的既有依据，此次只是新下载的公布值核验，不冒充独立天文精度证明。FateBridge明确按民用午夜换日，对照实现按23时换日，完整294条分歧仍保留，未重判为全入口通过。
-
-原含72,723日固定审计的完整测试文件在第一处修复版本通过122项，耗时约35分钟。随后名称修复的最终源码通过140项，保留并单独注明该长审计1项未重跑；未把两个版本的结果相加或宣称最终版本完成整文件重跑。上述证据只覆盖所列数学、来源身份、输入边界和运行层，尚不足以宣布本领域或全项目达到SOTA。
 
 ## 入口、输入与取数
 
@@ -181,11 +178,11 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"observe
 
 已确认分钟、秒数时，分别可选传入严格整数 `analysis_minute=0..59`、`analysis_second=0..59`。两者未知时省略或传 `null`，数值计算分别补00；这只是参考时刻，不代表事件确实发生在整点或整分。明确传0与省略可定位同一参考时刻，但保留不同的已提供分量。分、秒只定位钟时，不另加到年月日時起卦的取数。`60`、布尔、字符串和小数均拒绝；本接口不表达闰秒标签。
 
-读取 `meihua.calendar_policy.civil_clock_resolution.input_components` 核对已提供分量、缺失项与计算补位。来源只证明本次校验请求的字段记录，不认证现场时钟精度。未知分量不自动解释成截断、四舍五入、某个误差范围或整段历法稳定；`uncertainty_interval=null`、`calendar_stability=not_assessed`。摘要明确提示季令解释仅对应该参考时刻，不能扩成整个未知时段的结论。REST、CLI与MCP保留同一规则，含旧请求默认分钟0的本地兼容情形。详见钟时输入来源审查。完整结果会从本次请求重核UTC、偏移、fold及历法比较时刻，字段筛选之前拒绝互相矛盾的记录；有效时间表示保持，详见时刻绑定审查。
+读取 `meihua.calendar_policy.civil_clock_resolution.input_components` 核对已提供分量、缺失项与计算补位。来源只证明当前请求的字段记录，不认证现场时钟精度。未知分量不自动解释成截断、四舍五入、某个误差范围或整段历法稳定；`uncertainty_interval=null`、`calendar_stability=not_assessed`。摘要明确提示季令解释仅对应该参考时刻，不能扩成整个未知时段的结论。REST、CLI与MCP保留同一规则。完整结果从当前请求重核UTC、偏移、fold及历法比较时刻，在字段筛选之前拒绝互相矛盾的记录。见[钟时分量](../tests/meihua/test_meihua_clock_input.py)与[时刻绑定回归](../tests/meihua/test_meihua_instant_binding.py)。
 
-返回时间记录的ISO解析保留小数秒偏移。`+00:00:00.000001`含非零偏移，不能按`Z`或零偏移UTC接受；`+00:00:00.000000`等合法等价表示仍可核对。这不扩展上述请求分、秒或明确偏移的输入格式，也不认证微秒级天文精度。原8个失败样本及扩展故障、合法对照、原来源门槛见偏移保真审查。
+返回时间记录的ISO解析保留小数秒偏移。`+00:00:00.000001`含非零偏移，不能按`Z`或零偏移UTC接受；`+00:00:00.000000`等合法等价表示仍可核对。这不扩展上述请求分、秒或明确偏移的输入格式，也不认证微秒级天文精度。见[偏移绑定回归](../tests/meihua/test_meihua_fractional_binding.py)。
 
-返回时间记录由专用解析器按固定的软件约定解码，避免 Python 版本不同而改变周日期、基本日期或小数偏移的含义；空小数、越界分秒和无法精确表示的非零微秒以下位会拒绝，额外尾零仍可接受。它不扩展请求字段，也不把软件时间精度当作天文测量精度。冻结样本、Python 官方来源和各版本的实际验证范围见时间文本兼容审查。
+返回时间记录由专用解析器按固定的软件约定解码，避免 Python 版本不同而改变周日期、基本日期或小数偏移的含义；空小数、越界分秒和无法精确表示的非零微秒以下位会拒绝，额外尾零仍可接受。它不扩展请求字段，也不把软件时间精度当作天文测量精度。见[ISO钟时回归](../tests/meihua/test_meihua_iso_clock.py)。
 
 例如固定参照中的2000年小寒位于香港钟时09:00:40附近，09:00:38与09:00:43的农历日期、时支及起卦数相同，节气月支分别为子、丑。秒级输入让接口能够表达两侧时刻，不改变太阳求根算法，也不认证用户钟表、历史UTC或预测精度。现有7项香港天文台节气日期分歧仍保留。紫金山天文台的[国家标准解读](https://pmo.cas.cn/xwdt2019/kpdt2019/202203/P020240201504886119982.pdf)提出用于日期判断的朔与节气计算须达到1秒要求；本次接口修复不等于已通过整套农历编算标准。
 
@@ -195,7 +192,7 @@ uv run --locked --extra dev fatebridge meihua_time_cast --analysis-year 2000 --a
 
 秒数实现前锁定的48次节气两侧参照（本地数据：`../tests/fixtures/meihua_input_seconds_v1/manifest.json`）覆盖2000、2025年全部节与中气，没有删去跨分钟的6次；42次两侧落在同一分钟。TT参照由独立实现读取DE440生成，再用[USNO公布的TAI−UTC表](https://maia.usno.navy.mil/ser7/tai-utc.dat)转换两年的现代UTC，两者仍共享DE440动力学，不能当作独立天文观测或现实占验。秒数审查保留变更范围与验收状态。
 
-`meihua_analysis`可同时接收`analysis_timezone`及`analysis_utc_offset`。偏移格式为`±HH:MM`或`±HH:MM:SS`，须与给定地区在该钟时的规则相符；偏移只选择实际时刻，不替换命名时区。没有给偏移时，重复钟时仍拒绝；跳过的钟时或整日始终不能用偏移救回。公历日期和时支继续取原地区的民用钟时，四柱交节比较则使用已确认的同一个UTC时刻。
+`meihua_time_cast`可同时接收`analysis_timezone`及`analysis_utc_offset`。偏移格式为`±HH:MM`或`±HH:MM:SS`，须与给定地区在该钟时的规则相符；偏移只选择实际时刻，不替换命名时区。没有给偏移时，重复钟时仍拒绝；跳过的钟时或整日始终不能用偏移救回。公历日期和时支继续取原地区的民用钟时，四柱交节比较则使用已确认的同一个UTC时刻。
 
 [NIST的2026年规则](https://www.nist.gov/pml/time-and-frequency-division/popular-links/daylight-saving-time-dst)列明美国11月1日回拨：纽约`01:30`配`-04:00`为`05:30 UTC`，配`-05:00`为`06:30 UTC`。两者的地区、钟表日期和时支相同，不能为了体现差异而强求不同卦；两次交节比较的实际经过时长须相差3600秒。Lord Howe的半小时回拨按1800秒处理，不能一律写成一小时。
 
@@ -237,7 +234,7 @@ uv run --locked --extra dev fatebridge meihua_time_cast --analysis-year 2026 --a
 
 同年同名事件若返回不同交节时刻，状态为 `inconsistent_returned_instants`，保留各条事实路径，摘要说明本次时间依据存在冲突。缺少带偏移时刻时不猜时区；1900年或2101年事件没有本层年表，不否定该输入的其他有效计算。日标签相同、来源对照或软件测试通过均未建立现实预测效力。
 
-日期对照按公开结果绑定的同一钟面语法读取事件标签。带偏移的标签须保留全部可表示分量，越界时分秒、空小数或无法保留的非零尾数会留下不可比较状态及原标签。日本国立天文台的次级分钟标签审计也使用这个解析入口。 [固定钟面对照](precision-acceptance.md#meihua-solar-clock-profile-round49)
+日期对照按公开结果绑定的同一钟面语法读取事件标签。带偏移的标签须保留全部可表示分量，越界时分秒、空小数或无法保留的非零尾数会留下不可比较状态及原标签。日本国立天文台的次级分钟标签审计也使用这个解析入口。 见[太阳钟面对照](../tests/meihua/test_meihua_solar_iso.py)。
 
 仓库根目录可运行下面的合成输入，读取已离开相邻节气对、但仍作为月令起点的大雪记录：
 
@@ -268,7 +265,7 @@ uv run --locked --extra dev fatebridge meihua_time_cast \
 
 首轮字段及 `reading/audit` 字段卡见[生成调用合同](contracts/meihua_time_cast.json)。字段卡是 `fields` 的参考，不新增 `view` 参数；详细解释沿用同次结果。
 
-真实模型解释另按[梅花语义验收](#来源与规则范围)准备和执行。10个虚构单轮案例不等于已验收；只读MCP参照与模型实际收到的回执分开记录，未运行、未审阅和失败均保留。
+真实模型自由文本解释尚未完成独立语义验收；计算参照与模型实际收到的回执须分别核对。
 
 ### 内卦之间的制约
 
@@ -276,7 +273,7 @@ uv run --locked --extra dev fatebridge meihua_time_cast \
 
 井变升中离火制兑金；丰变震中初用离火也制体互兑金，但离火同时泄木体。原书保留“亦不纯美”，当前解释也同时呈现制金与耗泄，不据一个制约关系输出唯一好坏。季令弱或未知不自动删除五行制约；制约者自身再受克仅列为事实，尚未裁定多层先后、强弱与外应的综合结果。天时分支仍不分体用，该字段为 `null`。
 
-每个取数候选保留自己的这层证据及事实路径。一般、题篇摘要均说明相关直接制约；完整图与原文可用 `internal_control` 字段卡核对。两条所选字句和三则原书算例仅作有限计算、文本符合性检查，助手目读不作独立专家鉴定，书中的应验故事不计入现实预测样本。修改前固定材料及保留原始手推错误的勘误见参考清单（本地数据：`../tests/fixtures/meihua_internal_v1/manifest.json`），审计。
+每个取数候选保留自己的这层证据及事实路径。一般、题篇摘要均说明相关直接制约；完整图与原文可用 `internal_control` 字段卡核对。两条所选字句和三则原书算例仅作有限计算、文本符合性检查，助手目读不作独立专家鉴定，书中的应验故事不计入现实预测样本。修改前固定材料及保留原始手推错误的勘误见参考清单（本地数据：`../tests/fixtures/meihua_internal_v1/manifest.json`）；见[内卦制约回归](../tests/meihua/test_meihua_internal.py)。
 
 ### 内卦的紧次与生体迟速条件
 
@@ -372,7 +369,7 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"object_
 
 所选影印与固定转录的差异保留：巽克体段“謀事乃南方之人／謀事乃東南方之人”、坎生体“水邊人進入／水邊人進利”、兑生体“市口之人／帶口之人”。所选版按目见记录，不因通常巽属东南或更通顺的读法改字；这些差异未获独立专家裁定。原文各“或”为备选列举，不自动指认现实人物、姓氏、性别、地点、来财或不利事件。身心、灾祸等旧称仅为史料原句，不生成临床、灾祸或人生断言。
 
-此层不改旧卦形、历法、原摘要或天气解释，天时分支为null。得失概率、应期、现实结果和有效综合结论仍不计算。`trigram_symbols`字段卡可单独读取本层与受制、旺衰和候选；完整资源仍读取同run分页。范围、协议和失败记录
+此层不改旧卦形、历法、原摘要或天气解释，天时分支为null。得失概率、应期、现实结果和有效综合结论仍不计算。`trigram_symbols`字段卡可单独读取本层与受制、旺衰和候选；完整资源仍读取同run分页。完整字段的有界分页见[同run交付回归](../tests/meihua/test_meihua_trigram_symbols_delivery.py)。
 
 ### 内卦、外物与占者的动静
 
@@ -442,8 +439,6 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"existin
 
 没有搜索最近匹配日，也没有生成实际应期、收支、名成、处分或现实窗口。本层保留 96 条规则原子及其事实范围。
 
-历史完整结果比较先核当前已审查的条件、引文和角色，再按窄范围还原历史表示；不重写原期望。原始失败与迁移后检查分别报告。
-
 ## 问事专题与现场外应
 
 ### 人事题篇与版本
@@ -487,7 +482,7 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"existin
 
 显式选择`interpretation_topic=household`读取文明书局本家宅章，`dwelling`读取屋舍章；问句不自动选篇。家宅影印「比利」与转录「比和」的对应未裁定，五行相同时`topic_reading.source_relation_condition=null`，不能自动套家宅安稳句；屋舍保留「資財冷退／資財衰退」两份文字。家宅生体转引只核所列四个实际内卦辅助角色，完整内外范围及跨章净结论仍为未定。两章均不构成风水现场评估、住宅安全鉴定、失盗或财务结果、选房迁居许可及日期预测。
 
-所有显式人事题篇的`casting_readings[i].traditional_judgement`使用该候选自身`topic_clause`的题篇、原体、初用、引句与限定，随后保留自身受制、旺衰、求财补充及后续附层。一般阶段文本保留在`traditional_stage_readings`，不拿泛体用模板代替题篇初始含义。完整证据、原始失败及范围
+所有显式人事题篇的`casting_readings[i].traditional_judgement`使用该候选自身`topic_clause`的题篇、原体、初用、引句与限定，随后保留自身受制、旺衰、求财补充及后续附层。一般阶段文本保留在`traditional_stage_readings`，不拿泛体用模板代替题篇初始含义。见[家宅与屋舍回归](../tests/meihua/test_meihua_households.py)。
 
 ### 已报外应的实物与形色资格
 
@@ -530,7 +525,7 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"existin
 uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"existing","hexagram_code":"111010","moving_line":1}' --external-observations '[{"manifestation":"weapon","label":"虚构明确已报原文兵刃的工程例"}]' --fields meihua.body_trigram interpretation.external_omens summary --strict-fields true --include-snapshot-text false --response-char-limit 0
 ```
 
-本层只实现两则原体限定，不实现同段的临床、生死、生产判断，不认证现场或现实结果，也未完成内外、旺衰及多应的净综合。材料、候选算术更正及验证范围。
+本层只实现两则原体限定，不实现同段的临床、生死、生产判断，不认证现场或现实结果，也未完成内外、旺衰及多应的净综合。材料与候选关系见[宝象与凶器回归](../tests/meihua/test_meihua_omen_reversal.py)。
 
 ### 求财补充句的内卦关系
 
@@ -567,7 +562,7 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"existin
 uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"existing","hexagram_code":"111101","moving_line":1}' --response-context '{"label":"虚构现场工程示例","same_casting_episode_confirmed":true,"weather":["thunder"],"setting":["metal_place"]}' --fields meihua.body_trigram interpretation.situational_responses summary --strict-fields true --include-snapshot-text false --response-char-limit 0
 ```
 
-同次完整静室无所闻见声明不能同时附带已报现场事实；已闻笑语也不能与`nothing_heard=true`并存。未知资料、单一知觉字段或别的输入不补成矛盾。该层仅适用于人事体用分支，`interpretation_topic=weather`拒绝；不改卦、不自动识别场景，不合成完整十应、年月日旺衰、现实结果、概率或应期，也不改变旧研究标签、入组或分母。范围与验证
+同次完整静室无所闻见声明不能同时附带已报现场事实；已闻笑语也不能与`nothing_heard=true`并存。未知资料、单一知觉字段或别的输入不补成矛盾。该层仅适用于人事体用分支，`interpretation_topic=weather`拒绝；不改卦、不自动识别场景，不合成完整十应、年月日旺衰、现实结果、概率或应期，也不改变旧研究标签、入组或分母。见[现场响应回归](../tests/meihua/test_meihua_situational.py)。
 
 ### 失物占的体用与变用方位类象
 
@@ -579,7 +574,7 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"existin
 
 影印本与固定转录1441921保留“公廨／公榭”“倉廩／倉稟”“舟車／舟居”“庖廚／皰廚”“爐／爐冶”等字句差异。影印页经放大复核，将初读“倉庫”更正为“倉廩”；初读和更正记录随冻结参考保留。图像与所选字句仍是助手选段阅读，未经独立人工专家鉴定，不能据此宣称校勘定本。
 
-“物不失矣”仅是比和条款的历史占辞，不能否认已报遗失，也不能断言已找回。地点为原文类象；没有现场参照原点、数值方位角、坐标、实际位置或搜索许可。`real_location/loss_or_recovery_verified/event_time` 保持 null。详见失物章选段与变用绑定审查。工程检查不计作新的现实占验，也不改变已有天气研究的失败、未到期计划或四项未满分状态。
+“物不失矣”仅是比和条款的历史占辞，不能否认已报遗失，也不能断言已找回。地点为原文类象；没有现场参照原点、数值方位角、坐标、实际位置或搜索许可。`real_location/loss_or_recovery_verified/event_time` 保持 null。见[失物章与变用绑定回归](../tests/meihua/test_meihua_lost_property.py)。工程检查不计作新的现实占验；已有天气研究的负结果及未到期计划分别保留。
 
 ### 求名占的在任条件与原文时序方道
 
@@ -593,7 +588,7 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"existin
 
 八卦時序保存影印原字和固定转录对照。震“春二月／春三月”、乾“五金／一四九”、巽“時日月／時月日”及所列月份等差异未裁定，不转换成公历月份、经过天数或应验日期。所选在任句“上責罰／上司責罰”“退職／退居”等也分别保留。影印读稿由本次助手核读，尚无独立专家认证；权威藏本的出处不能代替语义和现实预测验证。
 
-`topic` 和 `topic_audit` 字段卡均已含上述依据；每个 `casting_readings.topic_clause.chapter_qualifications` 应独立读取。REST、MCP、CLI 共用新输入合同；已有客户端须以当前连接实际 Schema 为准。详见审查。
+`topic` 和 `topic_audit` 字段卡均已含上述依据；每个 `casting_readings.topic_clause.chapter_qualifications` 应独立读取。REST、MCP、CLI 共用新输入合同；已有客户端须以当前连接实际 Schema 为准。见[求名章回归](../tests/meihua/test_meihua_reputation.py)。
 
 ### 行人占的原体与初用参照
 
@@ -641,7 +636,7 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"sound_g
 uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"sound_groups","first_count":1,"second_count":9,"hour_branch":"丑"}' --interpretation-topic dining --season-month-branch 子 --fields interpretation.topic_reading interpretation.casting_readings --strict-fields true --include-snapshot-text false --response-char-limit 0
 ```
 
-上例两种口径均为初始比和，原数动六爻、卦序数动四爻，却有不同互变及食象制约；同一初始章句不能替代各候选自身酒食象。原页、身／体异文及实现前算术见冻结清单（本地数据：`../tests/fixtures/meihua_dining_v1/manifest.json`），验证范围。4,992组上下文复用384种卦形和13种节月状态，不是独立现实观测。
+上例两种口径均为初始比和，原数动六爻、卦序数动四爻，却有不同互变及食象制约；同一初始章句不能替代各候选自身酒食象。原页、身／体异文及实现前算术见冻结清单（本地数据：`../tests/fixtures/meihua_dining_v1/manifest.json`）；见[饮食章回归](../tests/meihua/test_meihua_dining.py)。4,992组上下文复用384种卦形和13种节月状态，不是独立现实观测。
 
 历史天气研究的已发2008条预测、1004个唯一目标日期、13057条来源观测与研究政策身份保留在 `tests/data/meihua/weather_evidence/`。独立核对原273日主队列仍为正确贡献29、始终无雨基线158；该负结果不由当前producer重算或改判，不代表当前预测已有改进。缺失出版时点、非盲回顾、未知真实性与未获现实效度认证的范围继续保留。
 
@@ -729,7 +724,7 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"existin
 
 原PDF索引63的所选字序为“乾兌為霜雪霰雹”，固定转录1441921为“乾、兌為霜雪雹霰”，两者分别记录，不为统一顺序而改原文。索引64的“震離為電為雷應在夏天”“乾兌為霜為雪驗於冬月”另列为季令依据。本层不把“日”改写成晴或无雨，不把日、电、虹、霓解释成同时发生，也不擅自把霰、虹、霓定义为现代可评分观测量。
 
-本项逐条核对季令条件，全章制化、无制例外和综合优先级仍待裁定。新增真实观测和独立模型语义验收均为 0。原页、四项新增选段与雷象的对照、实现前 1,920 组参照见固定材料（`../tests/fixtures/meihua_weather_attributions_v1/manifest.json`），范围及验证
+本项逐条核对季令条件，全章制化、无制例外和综合优先级仍待裁定。新增真实观测和独立模型语义验收均为 0。原页、四项新增选段与雷象的对照、实现前 1,920 组参照见固定材料（`../tests/fixtures/meihua_weather_attributions_v1/manifest.json`）；见[天时类象回归](../tests/meihua/test_meihua_weather_attributions.py)。
 
 #### 1.7.0的朝暮与未定时段
 
@@ -779,7 +774,7 @@ uv run --locked --extra dev python -m pytest -q tests/meihua
 
 人工初版坤卦探针曾把体互与用互对调；更正记录保存在冻结的 `adjudications.json`，保留原值、逐爻推导及原文依据，没有为匹配程序修改算法。扩展历法验证时完整纳入200个年度，没有按匹配率选择年份。
 
-1900年支持日期另有独立公布历表；当前日期范围和分母见上表。臺北市立天文科學教育館[原始发布页](https://tam.gov.taipei/News_Content.aspx?n=2D5F18609004C0CE&s=AC19298B0509F078&sms=3AABB000A3E78431)、PDF、365个印刷单元格和人工目验锚点先冻结，再与生产计算比较；不由生产算法反向生成预期。1900年另核对固定 `UTC+08:00` 与 `Asia/Shanghai`，两个时区仍只计335个独有日期，起卦年支、月日、午时支均一致。1900年底农历十一月初十与香港历表1901年初的十一连续；原有支持起止日期保持不变。这个结果补齐日期标签的证据缺口，该范围没有因此改写历法算法，也不扩张为历法所有细节或预测效力满分。
+1900年支持日期另有独立公布历表；当前日期范围和分母见上表。臺北市立天文科學教育館[原始发布页](https://tam.gov.taipei/News_Content.aspx?n=2D5F18609004C0CE&s=AC19298B0509F078&sms=3AABB000A3E78431)、PDF、365个印刷单元格和人工目验锚点先冻结，再与生产计算比较；不由生产算法反向生成预期。1900年另核对固定 `UTC+08:00` 与 `Asia/Shanghai`，两个时区仍只计365个独有日期，起卦年支、月日、午时支均一致。1900年底农历十一月初十与香港历表1901年初的十一连续；原有支持起止日期保持不变。这个结果补齐日期标签的证据缺口，该范围没有因此改写历法算法，也不扩张为历法所有细节或预测效力满分。
 
 尚未完成物数超八和单组声音计数口径的唯一裁定、自动现场取象、自动音韵或字形取画、完整外应、精确事件应期及全书分类占断；原八个人事题篇分别保留原四章20条、出行／谒见10条、失物5条及行人5条；另支持家宅/屋舍十个文字分支，其中家宅比利的关系条件未裁定，另列求财成分、出行偏好、失物8卦方位类象、行人初用受生受克及外应资格。出行多字、舟陆等角色范围及末句主语仍未裁定，未完成全章综合；天时层仅覆盖所列条件条款。卷三存在「觀梅恒卦」等疑似讹误，不能用程序结果反向校改原文消除分歧。
 
