@@ -13,14 +13,14 @@ from pydantic import ValidationError
 from fatebridge.core.contracts.output_chinese import Taiyi
 from fatebridge.core.local_techniques.sanshi import _build_taiyi_with_options
 from fatebridge.core.metaphysics.seed import build_analysis_seed
-from fatebridge.core.metaphysics.taiyi_year import (
+from fatebridge.core.metaphysics.taiyi_board import structural_patterns
+from fatebridge.core.metaphysics.taiyi_counts import count_labels
+from fatebridge.core.metaphysics.taiyi_geometry import (
     PALACES,
-    count_categories,
     count_to_taiyi,
     general_for_count,
-    structural_patterns,
-    yearly_core,
 )
+from fatebridge.core.metaphysics.taiyi_year import yearly_core
 from fatebridge.core.requests.metaphysics import TaiyiAnalysisRequest
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.metaphysics import (
@@ -95,7 +95,7 @@ def test_audit_cannot_be_gamed_by_removing_disagreements(
         audit(corpus)
 
 
-def test_volume_two_worked_example_and_count_categories() -> None:
+def test_volume_two_worked_example_and_count_labels() -> None:
     trace = count_to_taiyi("亥", 9)
     assert trace["count"] == 16
     assert [(p["palace"], p["value"]) for p in trace["path"]] == [
@@ -106,9 +106,9 @@ def test_volume_two_worked_example_and_count_categories() -> None:
     ]
     # Fifteen is not a complete 10/5/1 decomposition. The later literal
     # 杜塞 classification is named, not converted into a physical gate result.
-    assert count_categories(15) == ["杜塞（淘金歌）"]
-    assert count_categories(10) == ["无人"]
-    assert count_categories(11) == ["无地"]
+    assert count_labels(15) == ["杜塞（淘金歌）"]
+    assert count_labels(10) == ["无人"]
+    assert count_labels(11) == ["无地"]
     same = count_to_taiyi("艮", 3)
     assert same["count"] == 3
     assert same["terminal_excluded"] is False

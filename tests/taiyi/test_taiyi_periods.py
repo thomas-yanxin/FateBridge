@@ -14,8 +14,9 @@ from fatebridge.core.almanac import get_solar_terms_for_year
 from fatebridge.core.local_techniques.sanshi import _build_taiyi_with_options
 from fatebridge.core.metaphysics import taiyi_period_frame as frames
 from fatebridge.core.metaphysics import taiyi_periods as periods
+from fatebridge.core.metaphysics.taiyi_board import structural_patterns
 from fatebridge.core.metaphysics.taiyi_hour import double_hour_slot
-from fatebridge.core.metaphysics.taiyi_year import cyclic_core, structural_patterns
+from fatebridge.core.metaphysics.taiyi_year import cyclic_core
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.metaphysics import (
     calculate_taiyi_analysis,

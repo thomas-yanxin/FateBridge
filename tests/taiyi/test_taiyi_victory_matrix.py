@@ -16,16 +16,13 @@ from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
 from fatebridge.core.contracts.output_chinese import Taiyi
 from fatebridge.core.contracts.output_taiyi_matrix import TaiyiVictoryMatrixAssessment
+from fatebridge.core.metaphysics.taiyi_board import assemble_board
+from fatebridge.core.metaphysics.taiyi_geometry import PALACES, count_to_taiyi
 from fatebridge.core.metaphysics.taiyi_victory_matrix import (
     victory_matrix_assessment,
     victory_matrix_text,
 )
-from fatebridge.core.metaphysics.taiyi_year import (
-    PALACES,
-    assemble_board,
-    count_to_taiyi,
-    cyclic_core,
-)
+from fatebridge.core.metaphysics.taiyi_year import cyclic_core
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_victory_matrix import audit

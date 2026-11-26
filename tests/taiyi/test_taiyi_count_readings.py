@@ -18,10 +18,11 @@ from fatebridge.core.contracts.output_taiyi_counts import TaiyiCountReading
 from fatebridge.core.metaphysics.taiyi_counts import (
     contextual_harmony,
     count_assessment,
+    count_labels,
     count_reading,
     counts_text,
 )
-from fatebridge.core.metaphysics.taiyi_year import count_categories, cyclic_core
+from fatebridge.core.metaphysics.taiyi_year import cyclic_core
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG
@@ -49,7 +50,7 @@ def test_all_five_source_profiles_and_unresolved_words_remain_visible() -> None:
 def test_complete_frozen_domain_not_only_easy_or_harmonious_values(case) -> None:
     n = case["count"]
     row = count_reading(n)
-    assert count_categories(n) == case["expected_labels"]
+    assert count_labels(n) == case["expected_labels"]
     assert row["missing_labels"] == case["expected_missing"]
     assert row["three_talents_inferred"] is case["expected_fullness_inference"]
     assert row["duse"] is case["expected_duse"]
@@ -65,7 +66,7 @@ def test_invalid_count_is_not_coerced_or_extended_to_fit_source_variants(
     with pytest.raises(ValueError):
         count_reading(value)
     with pytest.raises(ValueError):
-        count_categories(value)
+        count_labels(value)
 
 
 def test_all_5120_same_core_context_combinations_use_their_own_reference() -> None:

@@ -7,12 +7,9 @@ import json
 from pathlib import Path
 from typing import Any
 
-from fatebridge.core.metaphysics.taiyi_year import (
-    count_to_taiyi,
-    cyclic_core,
-    general_for_count,
-    structural_patterns,
-)
+from fatebridge.core.metaphysics.taiyi_board import structural_patterns
+from fatebridge.core.metaphysics.taiyi_geometry import count_to_taiyi, general_for_count
+from fatebridge.core.metaphysics.taiyi_year import cyclic_core
 from scripts.taiyi.audit_taiyi_day_epoch import calendar_cohort
 from scripts.taiyi.taiyi_origin_sources import day_token_evidence
 from validation.taiyi_epoch import (

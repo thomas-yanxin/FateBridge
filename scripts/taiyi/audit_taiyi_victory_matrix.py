@@ -5,12 +5,12 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from fatebridge.core.metaphysics.taiyi_victory_matrix import victory_matrix_assessment
-from fatebridge.core.metaphysics.taiyi_year import (
+from fatebridge.core.metaphysics.taiyi_geometry import (
     PALACES,
     count_to_taiyi,
     general_for_count,
 )
+from fatebridge.core.metaphysics.taiyi_victory_matrix import victory_matrix_assessment
 from scripts.taiyi.build_taiyi_victory_matrix import CORPUS, source_data
 
 

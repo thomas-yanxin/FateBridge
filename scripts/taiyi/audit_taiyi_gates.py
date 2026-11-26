@@ -7,12 +7,9 @@ import json
 from pathlib import Path
 from typing import Any
 
+from fatebridge.core.metaphysics.taiyi_board import assemble_board
 from fatebridge.core.metaphysics.taiyi_gates import attach_gate_board, gate_cycle
-from fatebridge.core.metaphysics.taiyi_year import (
-    assemble_board,
-    cyclic_core,
-    yearly_core,
-)
+from fatebridge.core.metaphysics.taiyi_year import cyclic_core, yearly_core
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/taiyi_jinjing_v5"
