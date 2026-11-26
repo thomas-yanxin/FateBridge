@@ -90,12 +90,6 @@ def test_source_only_manifest_cannot_replace_or_reduce_original_evidence(
         source_readings(corpus)
 
 
-def test_sanshi_exposes_an_explicit_noble_profile_without_changing_default() -> None:
-    field = SanShiUnitedRequest.model_fields.get("liureng_guiren_profile")
-    assert field is not None
-    assert field.default == "liuren_common_v1"
-
-
 @pytest.mark.parametrize("mode", [None, "year", "month", "day", "hour"])
 def test_comparison_uses_the_actual_mode_summary_including_default_year(
     mode: str | None,
@@ -116,6 +110,7 @@ def test_comparison_uses_the_actual_mode_summary_including_default_year(
         == (mode or "year")
     )
     assert actual["whole_dangshi_method_acceptance_passed"] is False
+    assert actual["actual_profile"] == "liuren_common_v1"
 
 
 @pytest.mark.parametrize("profile", ["liuren_common_v1", "tanyuan_xieji_v1"])

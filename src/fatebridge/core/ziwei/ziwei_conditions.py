@@ -143,5 +143,4 @@ def structural_condition_evidence(
         scope=source["scope"],
         actual_assignments_modified=False,
         whole_book_acceptance_passed=False,
-        real_world_efficacy="not_tested",
     )

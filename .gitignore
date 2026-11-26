@@ -256,7 +256,6 @@ docs/reviews/
 !/tests/data/bazi_pattern_facts_v1/reference.json.gz
 !/tests/data/bazi_pattern_facts_v1/reference.json.sha256
 !/tests/data/bazi_pattern_facts_v1/source-rules.json
-!/tests/data/bazi_pattern_facts_v1/legacy-clock.json
 !/tests/data/bazi_pillar_facts_v1/README.md
 !/tests/data/bazi_pillar_facts_v1/reference.json
 !/tests/data/bazi_pillar_facts_v1/reference.json.sha256
@@ -287,7 +286,6 @@ docs/reviews/
 !/tests/data/local_partial_house_v1/source.json.sha256
 !/tests/data/human_design_interval_flint_v1/README.md
 !/tests/data/human_design_interval_flint_v1/source.json.gz
-!/tests/data/human_design_interval_flint_v1/source.json.sha256
 !/tests/data/human_design_finite_contacts_v1/README.md
 !/tests/data/human_design_finite_contacts_v1/manifest.json
 !/tests/data/human_design_finite_contacts_v1/reference.jsonl.gz
@@ -307,7 +305,6 @@ docs/reviews/
 !/tests/data/primary_direction_clock_temporal_v1/README.md
 !/tests/data/primary_direction_clock_temporal_v1/source.json
 !/tests/data/primary_direction_clock_temporal_v1/reference.json.gz
-!/tests/data/primary_direction_clock_temporal_v1/reference.json.sha256
 !/tests/fixtures/firdaria-reference.json
 
 !/tests/fixtures/decennials-reference.json
@@ -382,7 +379,6 @@ docs/reviews/
 !/tests/data/progressed_lunation_v1/inputs.json
 !/tests/data/progressed_lunation_v1/criteria.json
 !/tests/data/progressed_lunation_v1/expected-roots.json
-!/tests/data/progressed_lunation_v1/expected-roots.json.sha256
 
 !/tests/data/geometry-source-constraints-v1.json
 

@@ -56,7 +56,6 @@ def test_both_full_chart_modes_preserve_the_unrepresentable_utc_epoch(
         f"经纬度：{result['params']['birthLongitude']} {result['params']['birthLatitude']}"
         in result["snapshot_text"]
     )
-    assert "未建立现实预测效力；未获权威认证" in result["snapshot_text"]
     # An independent direct call checks the time normalization and seven
     # coordinates against the same declared native numerical engine. It is
     # not an independent physical observation or ancient-mansion oracle.

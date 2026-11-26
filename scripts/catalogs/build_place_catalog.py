@@ -17,6 +17,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
+from opencc import OpenCC
 from pytz import timezone as lookup_timezone
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -218,8 +219,6 @@ def geonames(path: Path, member: str) -> list[list[str]]:
 
 
 def build(source: Path) -> None:
-    from opencc import OpenCC  # Development-only dependency; never used at runtime.
-
     simplified, traditional = OpenCC("t2s"), OpenCC("s2t")
 
     def variants(values: list[str]) -> list[str]:
@@ -232,10 +231,10 @@ def build(source: Path) -> None:
             }
         )
 
-    legacy = json.loads(
+    alias_overrides = json.loads(
         (ROOT / "scripts/data/place_alias_overrides.json").read_text(encoding="utf-8")
     )
-    legacy_by_name = {r["canonical_name"]: r for r in legacy}
+    alias_overrides_by_name = {r["canonical_name"]: r for r in alias_overrides}
     csv.field_size_limit(10_000_000)
     with (source / "ok_data_level3.csv").open(encoding="utf-8-sig") as handle:
         names = list(csv.DictReader(handle))
@@ -286,7 +285,7 @@ def build(source: Path) -> None:
         else:
             pass
         canonical = short if level != "county" or full.endswith("市") else full
-        old = legacy_by_name.get(short) or legacy_by_name.get(full)
+        old = alias_overrides_by_name.get(short) or alias_overrides_by_name.get(full)
         aliases = [full, short, row["pinyin"], row["pinyin"].replace(" ", "")]
         if old and old["level"] == level:
             canonical = old["canonical_name"]
@@ -396,8 +395,8 @@ def build(source: Path) -> None:
         # Historical names such as 臺灣省 for New Taipei would corrupt parent
         # matching. Only use current Chinese administrative names here.
         aliases = [full, *([short] if len(short) > 1 else []), row[1], row[2]]
-        if canonical in legacy_by_name:
-            aliases += legacy_by_name[canonical]["aliases"]
+        if canonical in alias_overrides_by_name:
+            aliases += alias_overrides_by_name[canonical]["aliases"]
         else:
             pass
         china[f"GN:{row[0]}"] = dict(
@@ -471,9 +470,9 @@ def build(source: Path) -> None:
         key = f"GN:{r[0]}"
         aliases.extend(WORLD_CITY_ALIASES.get(key, ()))
         for name, preferred in PREFERRED.items():
-            if key == preferred and name in legacy_by_name:
+            if key == preferred and name in alias_overrides_by_name:
                 canonical = name
-                aliases += legacy_by_name[name]["aliases"]
+                aliases += alias_overrides_by_name[name]["aliases"]
             else:
                 pass
         world.append(
@@ -500,7 +499,7 @@ def build(source: Path) -> None:
         )
     DEST.mkdir(parents=True, exist_ok=True)
     preferred_aliases = dict(PREFERRED)
-    for old in legacy:
+    for old in alias_overrides:
         if old["level"] == "province":
             continue
         else:

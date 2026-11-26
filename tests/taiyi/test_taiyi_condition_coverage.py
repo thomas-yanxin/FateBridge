@@ -16,13 +16,14 @@ from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
 from fatebridge.core.contracts.output_chinese import Taiyi
 from fatebridge.core.contracts.output_taiyi_conditions import TaiyiConditionClause
+from fatebridge.core.metaphysics.taiyi_board import structural_patterns
 from fatebridge.core.metaphysics.taiyi_conditions import (
     conditions_text,
     conjunction,
     five_general_conditions,
     update_conjunction,
 )
-from fatebridge.core.metaphysics.taiyi_year import cyclic_core, structural_patterns
+from fatebridge.core.metaphysics.taiyi_year import cyclic_core
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG

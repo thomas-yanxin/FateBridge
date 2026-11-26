@@ -417,7 +417,6 @@ def build_meihua_interpretation(
             "line_oracles_scope": "本次动爻以 is_active 标出，其余是各爻单独变化的卦图参照。",
             "external_omens": "not_collected",
             "event_timing": "not_computed",
-            "real_world_efficacy": "not_tested",
         },
         "comprehensive_judgement": comprehensive,
     }

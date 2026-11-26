@@ -10,49 +10,28 @@ from typing import Any, Literal
 
 from fatebridge.core.astro.birth import AstroBirthInfo, build_astro_birth_info
 from fatebridge.core.astro.chart import build_core_chart_payload, build_midpoint_payload
+from fatebridge.core.astro.opaque_solar import opaque_solar_positions
 from fatebridge.core.astro.relationship import build_relative_payload
+from fatebridge.core.astro.sensitivity import enrich_specialty_sensitivity
+from fatebridge.core.astro.solar_arc import enrich_solar_arc
 from fatebridge.core.export_parser import parse_export_content
+from fatebridge.core.guolao.guolao_anchor_days import POLICIES
 from fatebridge.core.guolao.guolao_birth_clock import coherent_guolao_solar_call
+from fatebridge.core.guolao.guolao_timing import enrich_guolao_timing
+from fatebridge.core.jyotish.jyotish_display import normalize_solar_display
 from fatebridge.core.jyotish.jyotish_sources import coherent_india_call
-from fatebridge.services.astrology_classical_snapshot import (
-    _build_almuten_figuris_line as _build_almuten_figuris_line,
-)
-from fatebridge.services.astrology_classical_snapshot import (
-    _build_classical_lines as _build_classical_lines,
-)
-from fatebridge.services.astrology_classical_snapshot import (
-    _build_classical_patterns_lines as _build_classical_patterns_lines,
-)
-from fatebridge.services.astrology_classical_snapshot import (
-    _build_fixed_stars_lines as _build_fixed_stars_lines,
-)
 from fatebridge.services.astrology_snapshot import _build_chart_snapshot
-from fatebridge.services.astrology_snapshot_sections import (
-    _build_angle_lines as _build_angle_lines,
-)
-from fatebridge.services.astrology_snapshot_sections import (
-    _build_house_lines as _build_house_lines,
-)
-from fatebridge.services.astrology_snapshot_sections import (
-    _build_planet_lines as _build_planet_lines,
-)
 from fatebridge.services.astrology_snapshot_sections import _chart_calculation_notes
+from fatebridge.services.jyotish import enrich_india_chart
+from fatebridge.services.structured_snapshot import render_structured_snapshot_text
+from fatebridge.utils.errors import calculation_guard
 
 __all__ = [
     "SUPPORTED_CHART_VARIANTS",
     "calculate_core_chart_analysis",
     "calculate_germany_chart_analysis",
     "calculate_relative_chart_analysis",
-    "_build_almuten_figuris_line",
-    "_build_angle_lines",
-    "_build_classical_lines",
-    "_build_classical_patterns_lines",
-    "_build_fixed_stars_lines",
-    "_build_house_lines",
-    "_build_planet_lines",
 ]
-from fatebridge.services.structured_snapshot import render_structured_snapshot_text
-from fatebridge.utils.errors import calculation_guard
 
 SUPPORTED_CHART_VARIANTS = {
     "chart",
@@ -130,8 +109,6 @@ def calculate_core_chart_analysis(
     back to the bundled approximate orbital model when it is not.
     """
     if guolao_seasonal_anchor_policy is not None:
-        from fatebridge.core.guolao.guolao_anchor_days import POLICIES
-
         if chart_variant != "guolao_chart":
             raise ValueError(
                 "guolao_seasonal_anchor_policy requires chart_variant=guolao_chart"
@@ -246,8 +223,6 @@ def calculate_core_chart_analysis(
         # before that valid calculation. Keep only the requested clock policy.
         birth_info = replace(birth_info, applied_true_solar=use_true_solar_time)
     if chart_variant == "india_chart":
-        from fatebridge.core.jyotish.jyotish_display import normalize_solar_display
-
         birth_info, _ = normalize_solar_display(
             birth_info, ephemeris_policy, requested=use_true_solar_time
         )
@@ -264,8 +239,6 @@ def calculate_core_chart_analysis(
         **anchor_options,
     )
     if chart_variant == "guolao_chart":
-        from fatebridge.core.guolao.guolao_timing import enrich_guolao_timing
-
         enrich_guolao_timing(
             result,
             birth_info,
@@ -284,8 +257,6 @@ def calculate_core_chart_analysis(
             *_chart_calculation_notes(result),
         ]
     if chart_variant == "india_chart":
-        from fatebridge.services.jyotish import enrich_india_chart
-
         enrich_india_chart(
             result,
             birth_info,
@@ -298,8 +269,6 @@ def calculate_core_chart_analysis(
             birth_time_uncertainty_minutes=birth_time_uncertainty_minutes,
         )
     if chart_variant == "chart13":
-        from fatebridge.core.astro.sensitivity import enrich_specialty_sensitivity
-
         enrich_specialty_sensitivity(
             result,
             birth_info,
@@ -308,8 +277,6 @@ def calculate_core_chart_analysis(
         )
     result.update(_build_chart_snapshot(result, chart_variant))
     if apparent_model == "opaque_solar":
-        from fatebridge.core.astro.opaque_solar import opaque_solar_positions
-
         result["apparent_model_positions"] = opaque_solar_positions(
             result["chart_profile"]["julian_day_tt"]
         )
@@ -363,16 +330,12 @@ def calculate_germany_chart_analysis(
         hsys=hsys,
         zodiacal=zodiacal,
     )
-    from fatebridge.core.astro.sensitivity import enrich_specialty_sensitivity
-
     sample_times = enrich_specialty_sensitivity(
         result,
         birth_info,
         kind="germany",
         uncertainty_minutes=birth_time_uncertainty_minutes,
     )
-    from fatebridge.core.astro.solar_arc import enrich_solar_arc
-
     enrich_solar_arc(result, birth_info, analysis_datetime, sample_times=sample_times)
     return result
 

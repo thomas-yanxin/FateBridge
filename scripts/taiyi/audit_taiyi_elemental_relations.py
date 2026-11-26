@@ -6,11 +6,12 @@ import json
 from pathlib import Path
 from typing import Any
 
+from fatebridge.core.metaphysics.taiyi_board import structural_patterns
 from fatebridge.core.metaphysics.taiyi_elemental_relations import (
     element_relation,
     elemental_guan_assessment,
 )
-from fatebridge.core.metaphysics.taiyi_year import cyclic_core, structural_patterns
+from fatebridge.core.metaphysics.taiyi_year import cyclic_core
 from scripts.taiyi.build_taiyi_elemental_relations import CORPUS, source_data
 
 

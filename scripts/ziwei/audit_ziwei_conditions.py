@@ -453,7 +453,6 @@ def audit_conditions(fixtures: Path = FIXTURES) -> dict[str, Any]:
                             scope=prior["scope"],
                             actual_assignments_modified=False,
                             whole_book_acceptance_passed=False,
-                            real_world_efficacy="not_tested",
                         )
                         if strict(
                             {

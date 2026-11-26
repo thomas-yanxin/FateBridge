@@ -352,7 +352,7 @@ uv run --locked --extra dev pytest -q tests/western/test_western_lunations_hours
 
 南交点保留北交点加180°的精确派生关系，再判断分座与宫位。普通宫头仍用半开区间；折返宫头的R／T投影把同一精确关系传入已有高精度几何，不改投影方法、相位偏移或精度上限。公开经度仍为浮点显示值，精确派生比值另记在投影检查中；C只扩展内部精确输入兼容，极点原有限制保留。回归见[对点分区](../tests/western/test_western_antipodes.py)和[对点归宫](../tests/western/test_western_antipode_houses.py)。这些检查不提高原星历坐标的物理精度。
 
-旧27等分宿辅助函数用浮点近似的13⅓°作整除，40°、80°等精确边界曾落入前一宿，导致印度盘通用顶层与 `india` 专业层不一致。现在27等分及旧28等分示意层均按原黄经的精确有理值分类；`legacy_equal28` 的宿名和 `su28_degree` 也从同一未舍入黄经计算，再保留原有4位 `lon` 显示。90°整点的斗宿内度为0；两侧坐标即使同显90°，归宿仍可不同。全部宿界与相邻float、两个印度入口及旧宿占分支的三端控制回归见[等分宿界测试](../tests/astronomy/test_equal_lunar_sectors.py)。所修的是既有等分算法，果老研究盘具名不等距赤经宿界保持独立；现代不等宽宿度仍可超过30°，不把等分示意覆盖到未分配的现代点。
+印度占星的等分二十七宿按未舍入黄经分类。40°、80° 等边界归入下一宿。独立算术与两个印度占星入口由[等分宿界测试](../tests/astronomy/test_equal_lunar_sectors.py)核对。宿曜天文星图按当日视赤经与现代距星计算七曜的不等宽宿位。
 
 本命、关系盘和推运的数值坐标保留计算精度，星座、宫位、相位及古典条件均使用未舍入值。四位小数舍入曾让白羊末度同时显示为黄经30°、星座内30°，并让刚超过8°容许度的相位进入结果。现在坐标满足黄经 `[0,360)`、星座内度数 `[0,30)`；`chart_profile.aspect_policy` 集中交代现代容许度政策；`aspect_evidence` 保留逐项的 `separation/exact_angle/orb/orb_limit/rule_id`，可直接核算。常规 `aspects` 仍给出完整命中列表与未舍入的偏离度，首轮摘要无需重复每条的政策元数据。公开模型拒绝不可能的坐标。
 
@@ -861,8 +861,6 @@ uv run --locked --extra dev python -m scripts.western.audit_western_event_paths 
 
 Lilly1647第33、48、107、115、126、127、180页影印重新读取并核对原冻结字节；宫位次序、宫位计分、两列容许度与月亮传光条件分别保留。第180页福点实例及整盘七曜计分仍有原有分歧，不能靠改变五度规则或计分把它们改判为通过。原书不同版本、独立专家校勘、完整成事条件和现实预测继续另行验收。
 
-本轮196项相关回归通过。三个既有场景在源码和新建Python3.10安装环境完成18次REST、独立CLI和新stdio MCP调用：各环境三端及跨环境完整业务字段相同，仅排除`run_metadata`；相较上一冻结版本，逐字段变化仅为上述日行说明。源码REST观察到11个具名定义，但不代表全部分支或完整方法通过。当前聊天连接进程、部署和全仓CI未在此项验收。
-
 ### 接触顺序统一与语义职责补审
 
 居宫条件、卜卦事件路径和婚姻择日现在共用同一接触选择实现。它按闭根区间下端点选取未来最早或既往最晚候选，不依赖输入数组或舍入后的代表时刻。与其他区间重叠、触及提问边界、前面还有未分类接触或相关未决区间时，候选继续披露，顺序资格保持未知；只有资格明确时才赋予前次／下次角色。删除原居宫模块中的重复分类器，没有增加物理求根、评分或并列规则。
@@ -980,8 +978,6 @@ uv run --locked --extra dev python -m scripts.western.audit_western_fidelity --o
 
 原始来源、全部模型分歧、错误请求、安装包、完整返回和测试记录保留于外部档案`fatebridge-celestial-frame-20261114/classical-semantic-v1`。本轮没有重启聊天已连接进程；完整传统裁定、各星历物理精度、全仓语义清查与SOTA目标仍未完成。
 
-第十七批共同源码冻结后的返照与春分盘共6次REST／新stdio MCP／CLI调用均成功，完整业务只排顶层运行回执后三端一致。返照原请求的13处每端变化完整保留，涉及土星、木星和北交点的前后侧及摘要；春分盘仅有after三端观察，不能作为修改前后服务对照。
-
 <a id="retained-ut1-round37"></a>
 
 ## 保留UT1源点与实际接口边界
@@ -993,8 +989,6 @@ uv run --locked --extra dev python -m scripts.western.audit_western_fidelity --o
 内部private-worker封套分别用整数分子／分母传TT与UT1；这不是新的公开参数。公开C04选择仍限实际支持它的卜卦／择日请求，择日只评估单个候选时刻，未新增搜索窗口。普通Guolao LMT公开请求保其真实native_epoch，但该路线不经过private-worker，不能代替独立library codec证据。公开字段继续交付浮点JD，完整输出与严格投影的实际边界分别记录。
 
 这里追求的是保留可得源点的数值关系。[IERS2010第5章](https://iers-conventions.obspm.fr/content/chapter5/icc5.pdf)将ERA、原点差及极移等步骤分开。R35至R39封存的旧线性C04路径当时尚未加入极移、CIP偏移与日内潮汐；现行R40方法及其有限验收见[下节](#modern-c04-eop-round40)。形式sigma仍不是完整物理误差界。旧源域、0.2ms守卫、23638／70911观察、原Astropy及原生构建失败均保原资格；R35原字表示通过也不升级成地球自转物理精度或global SOTA。
-
-本轮当前仅独立静态peer确认所审32源闭包无剩余具体实现阻断，12新增节点不是12个算法或根因。两既定整秒点的保存数值对照中，10项限定gate各2/2，原source／TT／NPB／EO保持，给定源点RNE与显式IEEE旧GAST分别核对。这是条件数值关系，不是瞬时实测EOP或全域舍入证明。直接clock/frame的AFTER首流程出现观察器资格失败，原失败与另行恢复结果分列，不能称原流程全部成功。本段运行状态仅记本轮静态冻结时：四例公共BEFORE及一次D-library BEFORE已封存，十二次公共AFTER仍进行，D-library后续阶段单独存档；最终资格以R37外置报告／[精度验收](precision-acceptance.md)为准，本段不随运行进度更新。未以计划或源码审读声称三端、codec、全域数值、传统或预测通过。R36 EOT固定点负发现及旧B1严格1/2继续原样保留。
 
 <a id="event-quantity-and-window-reuse-round38"></a>
 ## 事件采样的实际消费量与同次来源观察
@@ -1016,4 +1010,4 @@ uv run --locked --extra dev python -m scripts.western.audit_western_fidelity --o
 
 真实公开观察共12次：C04普通2024择日与Swiss普通盘，两版各REST／fresh stdio MCP／CLI。每版三端完整业务一致，Swiss同端前后0差；C04每端53处真实变化完整保留，涉及时标／四节点回执、宫轴、姿态与快照，不能称跨版JSON相同。只有顶层run_metadata排除，实际Schema／MCP定义及差异另存，wrapper虽exit0仍有原Pydantic alias warning与INFO日志。结构化hash脱敏而快照保留hash的既有不对称未关闭，不称公开hashverified。公开两臂原预冻973／1067项也未纳入实际加载的 `_virtualenv.py`；这是独立于数学候选startup漏项的公开环境资格缺口。两者均不倒签或重跑，只授已选资产／源码端点稳定，不称全部运行依赖已预绑定。
 
-[便携参考来源](../tests/data/astro/iers_c04/modern-eop-v1.provenance.json)只复制已先封的独立区间与原SOFA结果，不取候选输出作gold；新／迁移pytest仅编写未运行。旧22线性控制、23638日／70911点和9个zero-EOP几何目标保作具名历史，不授现模型全域通过。原Fortran七控制未运行；native houses／azalt正逆／事件源的独立数值验收、完整物理／传统／预测与SOTA继续pending。root已按有限证据接受瞬时C04时钟模型与物理姿态／receiver／ENU一致性两项根本差距，累计31→33，不按定义、字段或案例另计。严格超过50的项目测试门尚未达到，项目测试、收集、CI、格式、类型、checker、构建及生成合同／检查仍未运行；唯一声明manifest导出另见[本轮精度记录](precision-acceptance.md#modern-c04-eop-round40)，不授完整物理、native house／azalt数值或SOTA资格。
+[便携参考来源](../tests/data/astro/iers_c04/modern-eop-v1.provenance.json)记录独立区间与原SOFA结果。线性C04历史控制与现行瞬时模型分别验收；当前模型的来源、数值门槛和未决条件见[精度记录](precision-acceptance.md#modern-c04-eop-round40)。

@@ -14,9 +14,9 @@ from fatebridge.core.classical_western import (
     whole_sign_aspect,
 )
 from fatebridge.core.ephemeris_runtime import swe
-from fatebridge.services.astrology import (
+from fatebridge.services.astrology import calculate_core_chart_analysis
+from fatebridge.services.astrology_classical_snapshot import (
     _build_classical_patterns_lines,
-    calculate_core_chart_analysis,
 )
 
 

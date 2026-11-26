@@ -14,7 +14,12 @@ from fatebridge.core.metaphysics.common import (
     ELEMENT_GENERATES,
     SIX_CLASH_BRANCHES,
 )
-from fatebridge.core.metaphysics.jinkou_relations import SOURCE_SHA256, SOURCE_URL
+from fatebridge.core.metaphysics.ren_sources import (
+    JINKOU_RELATIONS_SCAN_SHA256 as SOURCE_SHA256,
+)
+from fatebridge.core.metaphysics.ren_sources import (
+    JINKOU_RELATIONS_SOURCE as SOURCE_URL,
+)
 from fatebridge.utils.data import HEAVENLY_STEMS
 
 TRINES = (

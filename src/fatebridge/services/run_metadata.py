@@ -3,18 +3,13 @@
 from collections import deque
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Protocol
 from uuid import uuid4
 
 from pydantic import JsonValue
 
-from fatebridge.application.tool_spec import ServiceResult
+from fatebridge.application.tool_spec import ApproximationDetector, ServiceResult
 
 DEFAULT_ENGINE = "fatebridge-offline"
-
-
-class ApproximationDetector(Protocol):
-    def __call__(self, record: dict[str, JsonValue], /) -> bool: ...
 
 
 @dataclass(frozen=True, kw_only=True)

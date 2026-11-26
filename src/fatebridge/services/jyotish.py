@@ -9,11 +9,8 @@ from typing_extensions import Required, Unpack
 
 from fatebridge.core.astro.birth import AstroBirthInfo, build_astro_birth_info
 from fatebridge.core.execution_context import current_datetime
-from fatebridge.core.jyotish.jyotish import (
-    LABELS,
-    build_india,
-    validate_clock,
-)
+from fatebridge.core.jyotish.jyotish import build_india
+from fatebridge.core.jyotish.jyotish_charts import LABELS
 from fatebridge.core.jyotish.jyotish_dasha_grid import DashaGrid
 from fatebridge.core.jyotish.jyotish_dasha_levels import (
     QUANTIZATION_RULE,
@@ -24,7 +21,11 @@ from fatebridge.core.jyotish.jyotish_display import normalize_solar_display
 from fatebridge.core.jyotish.jyotish_sources import coherent_sources
 from fatebridge.services.structured_snapshot import render_structured_snapshot_text
 from fatebridge.utils.errors import ParameterError, calculation_guard
-from fatebridge.utils.timezones import is_unspecified_local_time, parse_timezone_name
+from fatebridge.utils.timezones import (
+    is_unspecified_local_time,
+    parse_timezone_name,
+    validate_local_clock,
+)
 
 
 def enrich_india_chart(
@@ -164,7 +165,7 @@ def calculate_vimshottari(
             "分析钟时的当地 UTC 偏移未指定。请提供有效的分析时区或已核实的 UTC 偏移。",
             [{"path": "analysis_timezone", "code": "unresolved_timezone_offset"}],
         ).as_result()
-    validate_clock(analysis, "分析钟时")
+    validate_local_clock(analysis, clock_label="分析钟时")
     grid = DashaGrid(analysis, year_basis, divisions, dasha_depth)
     india = build_india(
         birth,

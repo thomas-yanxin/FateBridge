@@ -9,7 +9,8 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish.jyotish import GRAHAS, build_india, positions
+from fatebridge.core.jyotish.jyotish import build_india, positions
+from fatebridge.core.jyotish.jyotish_charts import GRAHAS
 from fatebridge.core.jyotish.jyotish_sthana import (
     COMPONENTS,
     calculate_sthana,

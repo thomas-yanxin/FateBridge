@@ -108,7 +108,7 @@ REST 本机启动命令为 `API_HOST=127.0.0.1 fatebridge-api`。默认端口 `8
 
 源码使用 Python `src` 布局。FastAPI、FastMCP 与 CLI 通过中央 `ToolSpec` 目录调用共享执行层和领域服务；分层与数据流见[架构说明](docs/architecture.md)。依赖声明在 [pyproject.toml](pyproject.toml)，开发解析版本由 [uv.lock](uv.lock) 固定。
 
-文档、算法、接口和测试均欢迎贡献。先按[贡献指南](CONTRIBUTING.md)准备改动，再按[开发指南](docs/development-guide.md)选择检查。文档写作要求见[维护指南](docs/documentation-guide.md)。纯文档改动的起始检查：
+文档、算法、接口和测试均欢迎贡献。先按[贡献指南](CONTRIBUTING.md)准备改动，再按[开发指南](docs/development-guide.md)选择检查。文档写作要求见[维护指南](docs/development-guide.md#文档写作)。纯文档改动的起始检查：
 
 ```bash
 uv run --locked --extra dev python scripts/check_docs.py

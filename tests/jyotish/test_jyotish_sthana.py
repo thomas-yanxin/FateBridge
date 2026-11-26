@@ -9,7 +9,8 @@ import pytest
 
 from fatebridge.core.astro.astrology_tables import SIGNS
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish.jyotish import GRAHAS, build_india, divisional_chart
+from fatebridge.core.jyotish.jyotish import build_india
+from fatebridge.core.jyotish.jyotish_charts import GRAHAS, divisional_chart
 from fatebridge.core.jyotish.jyotish_sthana import (
     COMPONENTS,
     calculate_sthana,

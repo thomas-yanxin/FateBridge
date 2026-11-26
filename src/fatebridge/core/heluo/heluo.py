@@ -35,9 +35,6 @@ from fatebridge.core.heluo.heluo_solar_context import (
     solar_term_huagong as solar_term_huagong,
 )
 from fatebridge.core.heluo.heluo_structure import body_structure
-from fatebridge.core.heluo.heluo_yuantang import PURE_HOUR_TO_YAO as PURE_HOUR_TO_YAO
-from fatebridge.core.heluo.heluo_yuantang import YANG_HOURS as YANG_HOURS
-from fatebridge.core.heluo.heluo_yuantang import YIN_HOURS as YIN_HOURS
 from fatebridge.core.heluo.heluo_yuantang import placement as yuantang_placement
 from fatebridge.core.heluo.heluo_yuantang import resolve_half_year
 from fatebridge.core.heluo.heluo_yuantang import (

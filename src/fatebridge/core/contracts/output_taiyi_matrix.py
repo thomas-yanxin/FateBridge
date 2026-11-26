@@ -80,7 +80,6 @@ class TaiyiVictoryMatrixAssessment(PartialOutput):
     table_applicability_verified: StrictBool | None = None
     source_outcome_applied: StrictBool | None = None
     classical_acceptance_passed: StrictBool | None = None
-    real_world_efficacy: str | None = None
     status: str | None = None
     reason: str | None = None
     source_cell: TaiyiMatrixCell | None = None

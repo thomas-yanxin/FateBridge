@@ -158,5 +158,4 @@ def build_internal_countercontrol(
         "full_internal_external_synthesis": "not_computed",
         "net_verdict": None,
         "event_time": None,
-        "real_world_efficacy": "not_established",
     }

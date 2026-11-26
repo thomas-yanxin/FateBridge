@@ -46,6 +46,19 @@ from fatebridge.core.astro.time_scales import (
 )
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.astro.ut1_epoch import UT1Instant
+from fatebridge.core.classical_western import (
+    build_almuten_figuris,
+    build_classical_patterns,
+    build_dispositor_layer,
+    build_fixed_star_layer,
+    build_lots_layer,
+    build_planet_classical,
+    build_temperament,
+    build_topic_almutens,
+    orientality_policy,
+    planetary_hour_sequence,
+    solar_condition_policy,
+)
 from fatebridge.core.ephemeris_runtime import lock_ephemeris_configuration
 from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.errors import EphemerisSourceError
@@ -255,8 +268,6 @@ def _resolve_planetary_hour(
         raise ValueError("Unknown planetary weekday clock basis")
     if runtime.swe is None:
         return None
-    from fatebridge.core.classical_western import planetary_hour_sequence
-
     query = UT1Instant.from_value(julian_day)
     search_day = query.as_float()
     search_end = search_day + 2
@@ -416,24 +427,7 @@ def _build_classical_layer(
     lot_longitudes: dict[str, Fraction] | None = None,
     houses_resolved: bool = True,
 ) -> dict[str, Any]:
-    """Hellenistic/medieval condition layer — the chart's ``classical`` block.
-
-    Builds planetary conditions, dispositor chains, house almutens, lots,
-    prenatal syzygy, Almuten Figuris and temperament. Public coverage and
-    precision boundaries are documented in ``docs/algorithm-coverage.md``.
-    Imported lazily so optional classical layers load only when requested.
-    """
-    from fatebridge.core.classical_western import (
-        build_almuten_figuris,
-        build_dispositor_layer,
-        build_lots_layer,
-        build_planet_classical,
-        build_temperament,
-        build_topic_almutens,
-        orientality_policy,
-        solar_condition_policy,
-    )
-
+    """Build planetary conditions, almutens, lots, syzygy and temperament."""
     states = states or {}
     obliquity = None
     if runtime.swe is None:
@@ -577,8 +571,6 @@ def _build_fixed_stars(
     The catalogue is bundled. Missing native positions are explicitly marked
     unavailable, separately from a computed empty conjunction list.
     """
-    from fatebridge.core.classical_western import build_fixed_star_layer
-
     points = {planet["id"]: planet["longitude"] for planet in planets}
     if ascendant is not None:
         points["Ascendant"] = normalize_angle(ascendant)
@@ -606,8 +598,6 @@ def _build_classical_patterns(
     ``states`` carries per-planet speed for translation/
     collection of light; the North Node longitude drives nodal bending. Classical rules
     share tables through astrology_tables."""
-    from fatebridge.core.classical_western import build_classical_patterns
-
     states = states or {}
     speeds = {
         pid: state["longitude_speed"]

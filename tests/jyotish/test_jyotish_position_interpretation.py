@@ -4,7 +4,7 @@ import copy
 from datetime import datetime, timedelta, timezone
 
 from fatebridge.core.astro.sensitivity_grid import civil_recorded_sample
-from fatebridge.core.jyotish.jyotish import GRAHAS, divisional_chart
+from fatebridge.core.jyotish.jyotish_charts import GRAHAS, divisional_chart
 from fatebridge.core.jyotish.jyotish_dasha_grid import DashaGrid
 
 

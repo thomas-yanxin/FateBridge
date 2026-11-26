@@ -118,7 +118,7 @@ Codex 使用 `[mcp_servers.fatebridge]`；其他 host 的 `mcpServers` JSON 不�
   --strict-fields --compact
 ```
 
-`describe` 区分两种输出：`cli_usage` 是需替换占位符的语法模板；有 `cli_example` 时，该命令使用已验证的虚构输入，可直接执行。目录 key（如 `astro_hellen`）与公开名称（`hellenistic_chart`）均可用于 CLI、describe 和发现查询；MCP 的 `tools/call` 使用现行 `mcp_name`，也兼容该工具先前发布的名称。`surfaces.cli_name` 明确标出正式命令。
+`describe` 区分两种输出：`cli_usage` 是需替换占位符的语法模板；有 `cli_example` 时，该命令使用已验证的虚构输入，可直接执行。CLI、describe 和发现查询使用 `surfaces.cli_name` 标出的公开名称。MCP 用 `run_calculation` 的 `tool` 指定能力名，业务输入放入 `arguments`；四个协议入口及完整交付见[接入指南](agent-guide.md#fastmcp)。
 
 `profile` 按实际工具去重，`bazi,八字` 只计算一次并保留第一个标签；空体系列表会报错。单个体系失败时退出码为 1，即使只投影成功体系也会保留失败项，不能把部分失败解释为全部成功。`--no-include-snapshot-text` 移除各子结果顶层快照；导出文本仍可能保留，需要更小输出时用 `--fields`。
 

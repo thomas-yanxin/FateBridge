@@ -5,6 +5,10 @@ import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from fatebridge.application.meihua_clock_binding import supplied_clock_components
+from fatebridge.core.requests.divination import MeihuaAnalysisRequest
+from fatebridge.services.divination import calculate_meihua_analysis
+
 FOLDER = Path(__file__).parents[1] / "fixtures/meihua_instant_binding_v1"
 MANIFEST_SHA256 = "16b58b953f0ec190ab604fc1ea81de67eea519d1bf805a7972063ee2c9b4d0ad"
 
@@ -26,10 +30,6 @@ def load():
 
 
 def new_result(case):
-    from fatebridge.application.meihua_clock_binding import supplied_clock_components
-    from fatebridge.core.requests.divination import MeihuaAnalysisRequest
-    from fatebridge.services.divination import calculate_meihua_analysis
-
     request = MeihuaAnalysisRequest(**case["arguments"])
     result = calculate_meihua_analysis(
         **case["arguments"],

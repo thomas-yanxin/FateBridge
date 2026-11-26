@@ -6,7 +6,7 @@ stay visible rather than resolving them by changing a computed door or stem.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any
 
 from fatebridge.core.qimen.qimen_geometry import QimenLeaders
 
@@ -31,14 +31,14 @@ MEANINGS = {
 
 
 def build_combinations(
-    board: Dict[str, Any],
+    board: dict[str, Any],
     *,
     leader: QimenLeaders,
     source: str,
-    existing_patterns: List[Dict[str, Any]],
-) -> List[Dict[str, Any]]:
+    existing_patterns: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
     """Read the actual layers, including hosted stems, with no time-table shortcut."""
-    result: List[Dict[str, Any]] = []
+    result: list[dict[str, Any]] = []
     for index, palace in enumerate(board["palaces"]):
         if palace["trigram"] == "中":
             continue
@@ -48,16 +48,16 @@ def build_combinations(
         def append(
             rule_id: str,
             name: str,
-            facts: Dict[str, Any],
+            facts: dict[str, Any],
             *,
             section: str,
-            scan_pages: List[int],
+            scan_pages: list[int],
             condition: str,
             observed: bool,
-            blockers: List[str] | None = None,
-            conflicts: List[str] | None = None,
+            blockers: list[str] | None = None,
+            conflicts: list[str] | None = None,
             same_leader_required: bool = False,
-            identity_binding: Dict[str, Any] | None = None,
+            identity_binding: dict[str, Any] | None = None,
         ) -> None:
             source_disagreements = list(board.get("source_disagreements", []))
             result.append(

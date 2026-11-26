@@ -1,5 +1,3 @@
-from fractions import Fraction
-
 import pytest
 
 from fatebridge.core.ephemeris_runtime import swe
@@ -484,10 +482,7 @@ def test_calculate_suzhan_analysis_returns_chart_and_snapshot() -> None:
     assert "˚" in result["snapshot_text"]
 
 
-@pytest.mark.parametrize("mansion_method", ["equatorial_research28", "legacy_equal28"])
-def test_suzhan_uses_shared_local_chart_runtime(
-    mansion_method: str, surface_calls
-) -> None:
+def test_suzhan_uses_shared_local_chart_runtime(surface_calls) -> None:
     local_chart = _build_local_chart_response(
         date_text="2028-04-06",
         time_text="09:33:00",
@@ -504,7 +499,6 @@ def test_suzhan_uses_shared_local_chart_runtime(
         zone="+08:00",
         lat="31n13",
         lon="121e28",
-        mansion_method=mansion_method,
     )
     expected_precision, expected_backend = _expected_offline_engine()
     local_sun = next(
@@ -517,44 +511,28 @@ def test_suzhan_uses_shared_local_chart_runtime(
     assert local_chart["chart"]["houses"] == suzhan_result["chart"]["houses"]
     assert local_chart["chart"]["angles"] == suzhan_result["chart"]["angles"]
     # The mansion label and degree share the declared model; physical zodiac
-    # and house facts still use the same chart runtime under both methods.
+    # and house facts use the same chart runtime.
     mansion_fields = {"su28", "su28_degree"}
     assert {k: v for k, v in local_sun.items() if k not in mansion_fields} == {
         k: suzhan_sun[k] for k in local_sun if k not in mansion_fields
     }
-    if mansion_method == "equatorial_research28":
-        sky = suzhan_result["astronomy"]
-        source = next(body for body in sky["bodies"] if body["id"] == "Sun")
-        boundary = next(
-            b for b in sky["boundaries"] if b["su28"] == source["mansion"]["su28"]
-        )
-        assert (
-            suzhan_sun["su28_method"]
-            == sky["method_id"]
-            == "modern_equatorial_research_anchors_v1"
-        )
-        assert suzhan_sun["su28"] == source["mansion"]["su28"].removesuffix("宿")
-        assert (
-            suzhan_sun["su28_degree"]
-            == (source["right_ascension"] - boundary["right_ascension"]) % 360
-        )
-        # Independent equal-band definition on the unrounded source longitude.
-        # The four-decimal displayed longitude is not the calculation input.
-        longitude = Fraction(source["longitude"]) % 360
-        sector = int(longitude * 28 / 360)
-        assert local_sun["su28_degree"] == float(longitude - sector * Fraction(360, 28))
-        assert local_sun["lon"] == source["longitude"]
-        # This original failing clock is a counterexample to equating RA
-        # mansion degrees with the legacy equal-ecliptic-band coordinates.
-        assert suzhan_sun["su28"] != local_sun["su28"]
-        assert suzhan_sun["su28_degree"] != local_sun["su28_degree"]
-    else:
-        assert suzhan_sun == local_sun
-        assert suzhan_result["astronomy"] is None
-        assert (
-            suzhan_result["params"]["su28Method"]
-            == "legacy_equal_ecliptic28_illustration"
-        )
+    sky = suzhan_result["astronomy"]
+    source = next(body for body in sky["bodies"] if body["id"] == "Sun")
+    boundary = next(
+        b for b in sky["boundaries"] if b["su28"] == source["mansion"]["su28"]
+    )
+    assert (
+        suzhan_sun["su28_method"]
+        == sky["method_id"]
+        == "modern_equatorial_research_anchors_v1"
+    )
+    assert suzhan_sun["su28"] == source["mansion"]["su28"].removesuffix("宿")
+    assert (
+        suzhan_sun["su28_degree"]
+        == (source["right_ascension"] - boundary["right_ascension"]) % 360
+    )
+    assert local_sun["lon"] == source["longitude"]
+    assert "su28" not in local_sun
     assert local_chart["params"]["enginePrecision"] == expected_precision
     assert local_chart["params"]["engineBackend"] == expected_backend
 
@@ -564,7 +542,6 @@ def test_suzhan_uses_shared_local_chart_runtime(
         zone="+08:00",
         lat="31n13",
         lon="121e28",
-        mansion_method=mansion_method,
     )
     spec = SPECS["suzhan"]
     fields = ["params.su28Method", "chart", "astronomy"]

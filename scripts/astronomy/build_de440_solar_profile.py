@@ -12,6 +12,8 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
+from jplephem.spk import SPK  # type: ignore[import-untyped]
+
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/data/bazi_de440_default_v1"
 MODEL_ID = "fatebridge_de440_solar_v1"
@@ -23,8 +25,6 @@ def encoded(value: Any) -> bytes:
 
 
 def build(kernel_path: Path) -> tuple[bytes, dict[str, Any], bytes]:
-    from jplephem.spk import SPK  # type: ignore[import-untyped]
-
     protocol = json.loads((FIXTURE / "protocol.json").read_text())
     kernel_sha = hashlib.sha256(kernel_path.read_bytes()).hexdigest()
     if kernel_sha != protocol["source_kernel"]["sha256"]:

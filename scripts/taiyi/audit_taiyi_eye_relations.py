@@ -12,8 +12,9 @@ import json
 from pathlib import Path
 from typing import Any
 
+from fatebridge.core.metaphysics.taiyi_board import structural_patterns
 from fatebridge.core.metaphysics.taiyi_eye_relations import PROFILE
-from fatebridge.core.metaphysics.taiyi_year import cyclic_core, structural_patterns
+from fatebridge.core.metaphysics.taiyi_year import cyclic_core
 
 CORPUS = Path(__file__).resolve().parents[2] / "tests/fixtures/taiyi_jinjing_v13"
 MANIFEST_SHA256 = "4ece71115af3ee5da8148d755fabaeca835b78a9b41b06b68b8f745c3746c9c9"

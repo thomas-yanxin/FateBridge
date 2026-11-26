@@ -10,14 +10,9 @@ from fatebridge.core.almanac import (
     lunar_supported_range_message,
 )
 from fatebridge.core.metaphysics.common import MetaphysicsSeed, chinese_numeral
-from fatebridge.core.metaphysics.taiyi_board import assemble_board as assemble_board
-from fatebridge.core.metaphysics.taiyi_board import calendar_summary as calendar_summary
-from fatebridge.core.metaphysics.taiyi_board import (
-    structural_patterns as structural_patterns,
-)
+from fatebridge.core.metaphysics.taiyi_board import assemble_board, calendar_summary
 from fatebridge.core.metaphysics.taiyi_civil_calendar import civil_lunar_evidence
 from fatebridge.core.metaphysics.taiyi_counts import count_labels
-from fatebridge.core.metaphysics.taiyi_evidence import evidence_text as evidence_text
 from fatebridge.core.metaphysics.taiyi_gates import attach_gate_board
 from fatebridge.core.metaphysics.taiyi_geometry import (
     BRANCHES,
@@ -37,11 +32,6 @@ from fatebridge.core.metaphysics.taiyi_year_calendar import (
 )
 
 RULESET_ID = "jinjing_year_core_v1"
-
-
-def count_categories(count: int) -> list[str]:
-    """Literal missing-count labels, named numeric inference and sourced 杜塞."""
-    return count_labels(count)
 
 
 def cyclic_core(
@@ -102,8 +92,8 @@ def cyclic_core(
         ),
         "main_count": home["count"],
         "guest_count": guest_count,
-        "main_count_des": count_categories(home["count"]),
-        "guest_count_des": count_categories(guest_count),
+        "main_count_des": count_labels(home["count"]),
+        "guest_count_des": count_labels(guest_count),
         "main_general": main_general,
         "guest_general": guest_general,
         "main_vice_general": main_general * 3 % 10,
@@ -193,7 +183,6 @@ def build_year_board(
                 "time_granularity": "year",
                 "classical_conformance": "partial_with_unresolved_rule_table_disagreements",
                 "classical_acceptance_passed": False,
-                "real_world_efficacy": "not_tested",
                 "unresolved": [
                     "卷三阳局39主算25、局50主算6已核CADAL06056494影像111/112页，依卷二通则算得35/16；底本表文与通则冲突，待外部裁定。",
                     "岁首采用现代农历正月初一的工程约定，未完成古历岁首复原。",

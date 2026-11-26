@@ -726,7 +726,6 @@ def calculate_suzhan_analysis(
     zodiacal: int = 0,
     leap_month_policy: str = "unresolved",
     natal_mansion: str | None = None,
-    mansion_method: str = "equatorial_research28",
     activity: str | None = None,
     activity_details: list[str] | None = None,
     calendar_profile: str = "t1299_fullmoon27",
@@ -752,7 +751,6 @@ def calculate_suzhan_analysis(
         zodiacal=zodiacal,
         leap_month_policy=leap_month_policy,
         natal_mansion=natal_mansion,
-        mansion_method=mansion_method,
         activity=activity,
         activity_details=activity_details,
         calendar_profile=calendar_profile,
@@ -884,10 +882,6 @@ def calculate_sukuyo_compatibility(
             "pair_labels": "六类配对标签只归类有向结果，不是原典六级吉凶或成功概率。",
             "palace_reference": "双方宫名仅按历日宿名和显式textual_pada查原典分足表；未定实际出生足位或本命宫，也未据此合成宫位相性或分数。",
             "research_reference": "fixed_host_research_scope是具名研究全表与固定NAOJ月首方向比较，不是双方本月选行、历日算法或关系预测；未知及不利行完整保留。",
-        },
-        "validation": {
-            "real_world_prediction": "not_established",
-            "authority_certified": False,
         },
         "summary": summary,
     }

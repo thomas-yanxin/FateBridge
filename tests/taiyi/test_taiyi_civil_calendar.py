@@ -18,6 +18,7 @@ from fatebridge.application.result_delivery import RESULT_STORE
 from fatebridge.core.almanac import get_lunar_context
 from fatebridge.core.contracts.output_chinese import Taiyi
 from fatebridge.core.metaphysics import taiyi_year
+from fatebridge.core.metaphysics.taiyi_evidence import evidence_text
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from scripts.taiyi.audit_taiyi_civil_calendar import (
@@ -153,7 +154,7 @@ def test_stored_source_is_a_copy_of_the_one_conversion_already_used(
     source["conversion_source"]["extension"]["untouched"].append(4)
     assert evidence["conversion_source"]["extension"]["untouched"] == [1, 2, 3]
     # Rendering reads the same board; no hidden recalculation for the text.
-    assert "2026年正月初一" in taiyi_year.evidence_text(board)
+    assert "2026年正月初一" in evidence_text(board)
     assert len(calls) == 1
 
 

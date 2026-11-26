@@ -153,10 +153,16 @@ def test_all_day_clock_references_keep_day_list_separate_from_actual_lighting(
             "not_adjudicated" if required else "not_applicable"
         )
         assert "noble_day_type" not in actual
+        assert info["clock_convention"] == "6<=hour<18"
         if hour is None or required is None:
             assert info["clock_matches_required"] is None
         else:
-            pass
+            clock_lighting = (
+                "day"
+                if hour in (6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17)
+                else "night"
+            )
+            assert info["clock_matches_required"] is (clock_lighting == required)
 
 
 def test_source_day_hour_arch_pairs_and_all_year_month_fillings(reference) -> None:
@@ -198,22 +204,6 @@ def test_source_day_hour_arch_pairs_and_all_year_month_fillings(reference) -> No
                 if rule["target"] in (year, month)
                 else "not_adjudicated"
             )
-
-
-def test_labeled_clock_reference_preserves_the_frozen_legacy_computation() -> None:
-    for row in json.loads((DATA / "legacy-clock.json").read_text())["cases"]:
-        day = row["day"]
-        pillars = {
-            "year": ("甲", "子"),
-            "month": ("丙", "寅"),
-            "day": (day[0], day[1]),
-            "hour": ("庚", "申"),
-        }
-        actual = analyze_special_patterns(pillars, row["hour"])
-        assert actual["noble_day_reference"]["clock_matches_required"] == row["matches"]
-        assert (
-            actual["noble_day_reference"]["actual_lighting_status"] == "not_adjudicated"
-        )
 
 
 def test_source_lu_pairs_and_visible_stems_do_not_create_transformation(

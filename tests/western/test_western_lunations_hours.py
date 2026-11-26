@@ -139,7 +139,9 @@ def test_sidereal_syzygy_keeps_event_and_uses_event_epoch_native_lahiri() -> Non
 
 
 def test_full_moon_figuris_point_is_not_labeled_as_new_moon() -> None:
-    from fatebridge.services.astrology import _build_almuten_figuris_line
+    from fatebridge.services.astrology_classical_snapshot import (
+        _build_almuten_figuris_line,
+    )
 
     info = build_astro_birth_info(
         birth_year=2026,

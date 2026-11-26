@@ -59,17 +59,17 @@ CLI 可直接运行；REST 默认端口为 `8010`；MCP 默认通过 stdio 由�
 | 需要查什么 | 入口 |
 | --- | --- |
 | 工具、参数、端点和错误 | [API 参考](api-reference.md) · [按需调用合同](contracts/README.md) |
-| 实现覆盖、依赖与近似路径 | [算法覆盖矩阵](algorithm-coverage.md) · [细粒度源码索引](algorithm-inventory.md) · [当前算法状态](algorithm-status.md) |
+| 实现覆盖、依赖与近似路径 | [算法覆盖矩阵](algorithm-coverage.md) · [当前算法状态](algorithm-status.md) |
 | 模块职责、数据流与共享历法依赖 | [架构说明](architecture.md) |
 | 太阳、近太阳位置及月球日速的固定队列 | [分项精度验收](precision-acceptance.md) |
 | 方法登记、误差预算、证据图与固定总体验收 | [计算证据合同](computation-evidence.md) |
 | 扩展、测试、CI、打包与发布 | [开发指南](development-guide.md) · [脚本索引](../scripts/README.md) · [测试索引](../tests/README.md) |
-| 文档分工、写作与来源维护 | [文档写作与维护](documentation-guide.md) |
-| 仓库维护与本地清理 | [仓库维护](repository-maintenance.md) |
+| 文档分工、写作与来源维护 | [文档写作与维护](development-guide.md#文档写作) |
+| 仓库维护与本地清理 | [仓库维护](development-guide.md#仓库维护) |
 | 真实模型的调用与解释质量 | [Agent 行为验收](agent-evaluation.md) |
 | 外部命例评估 | [MingLi-Bench](mingli-bench-evaluation.md) |
 | 计算引用、现实预测与奇门研究绑定 | [验证方法](prediction-validation.md) |
 
 ## 文档维护
 
-文档按入门、操作、参考和解释分工，写作与信源规则见[文档写作与维护](documentation-guide.md)。修改后按[开发指南](development-guide.md#文档维护与验证)检查链接、示例和生成物。文档检查不验证外部数值、原典读法或模型解释。
+文档按入门、操作、参考和解释分工，写作与信源规则见[文档写作与维护](development-guide.md#文档写作)。修改后按[开发指南](development-guide.md#文档维护与验证)检查链接、示例和生成物。文档检查不验证外部数值、原典读法或模型解释。

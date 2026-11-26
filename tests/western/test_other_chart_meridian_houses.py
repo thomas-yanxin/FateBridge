@@ -48,7 +48,7 @@ def test_natal_cusps_and_every_confirmed_sample_replay_in_their_actual_angle_fra
     factors = {row["id"]: row["longitude"] for row in layer["factors"]}
     assert meridian["status"] == "computed"
     assert meridian["original_text_conformance"] == "not_assessed"
-    assert meridian["real_world_efficacy"] == "not_tested"
+    assert "real_world_efficacy" not in meridian
     assert profile["physical_ascendant"] == factors["Ascendant"]
     assert profile["physical_midheaven"] == factors["Midheaven"]
     assert profile["first_cusp_definition"] == "equatorial_ascendant"

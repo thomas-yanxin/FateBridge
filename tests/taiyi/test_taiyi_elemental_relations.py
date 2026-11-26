@@ -16,12 +16,13 @@ from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
 from fatebridge.core.contracts.output_chinese import Taiyi
 from fatebridge.core.contracts.output_taiyi_elemental import TaiyiElementalAssessment
+from fatebridge.core.metaphysics.taiyi_board import assemble_board
 from fatebridge.core.metaphysics.taiyi_elemental_relations import (
     element_relation,
     elemental_guan_assessment,
     elemental_relations_text,
 )
-from fatebridge.core.metaphysics.taiyi_year import assemble_board, cyclic_core
+from fatebridge.core.metaphysics.taiyi_year import cyclic_core
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_elemental_relations import audit

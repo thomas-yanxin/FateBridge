@@ -3,15 +3,13 @@
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from importlib.resources import files
 from typing import Any
 
-from fatebridge.core.astro.julian_day import _julian_day
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.astro.utc_policy import leap_table
-from fatebridge.core.human_design.human_design_clock_observation import METHOD
 from fatebridge.core.public_output import same_public_value
 from fatebridge.utils.timezones import parse_timezone_name, validate_local_clock
 
@@ -127,18 +125,6 @@ def resolve_birth_clock(
     return BirthClock(local, utc, local_label, utc_label, True, tt, evidence)
 
 
-def replay_birth_clock(clock: BirthClock, *, method: str | None) -> BirthClock:
-    """Reproduce the old scalar only when verifying an earlier receipt."""
-    if clock.evidence is None or method != METHOD:
-        return clock
-    effective = clock.utc_anchor + timedelta(seconds=1)
-    tt = (
-        _julian_day(effective)
-        + (clock.evidence["tai_minus_utc_during_leap_seconds"] + 32.184) / 86400
-    )
-    return replace(clock, jd_tt=tt, evidence={**clock.evidence, "jd_tt": tt})
-
-
 def birth_clock_reading(proof: dict[str, Any]) -> str:
     return (
         f"当地出生标签{proof['local_label']}对应UTC {proof['utc_label']}，已按冻结IERS记录确认正闰秒。"
@@ -169,10 +155,7 @@ def verify_birth_clock(payload: dict[str, Any]) -> None:
         ):
             raise ValueError("闰秒出生缺少冻结日历见证")
         return
-    clock = replay_birth_clock(
-        resolve_birth_clock(**proof["input"]),
-        method=payload.get("clock_evidence", {}).get("method_id"),
-    )
+    clock = resolve_birth_clock(**proof["input"])
     if (
         not clock.leap_second
         or not same_public_value(proof, clock.evidence)

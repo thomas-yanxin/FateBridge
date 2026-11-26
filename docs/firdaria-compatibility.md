@@ -80,8 +80,6 @@ Birchfield 三个附表有 16 处水星／金星位置与正文规则及 Döşer
 
 [Morinus所选提交](https://github.com/shin10567/Morinus-Source-Codes)用于公历模式的日期级对照，原模块实际执行，只适配输出词汇。它不接收出生钟时，所选版本的闰日出生会报错，不能认证亚日精度或本命天文。[Cosmic Patterns公开示例](https://www.astrosoftware.com/Firdaria.htm)的无交点版本只在首70年与所选顺序可比；其日粒度表在固定UTC年轴、UTC日期解释下相合，但未公布确切年常量和显示时区，不能由此推定内部设置或秒级符合。实际Temporal参考则独立核对所声明的名义时间模型，不认证物理计时或传统预测。
 
-来源只支撑传统算法与版本沿革，不证明现实预测效力。
-
 ## 年限、顺序与日夜盘
 
 固定年限为太阳 10、金星 8、水星 13、月亮 9、土星 11、木星 12、火星 7、北交 3、南交 2，总和严格为 75。
@@ -172,4 +170,4 @@ uv sync --locked --extra dev
 uv run --locked --extra dev python -m pytest -q tests/western/test_firdaria_reference.py tests/western/test_firdaria_transports.py
 ```
 
-生产核心没有依赖测试内的参考函数。通过只限实际运行的模型、样本与环境，不表示所有第三方产品、原典、物理精度或现实预测通过。返回时间线最多12段，`current_major/current_sub`独立覆盖查询时刻。旧默认快照的出处和原失败保留，当前默认的完整时间线由实际Temporal独立参考核对。
+生产核心不依赖测试内的参考函数。返回时间线最多12段，`current_major/current_sub`独立覆盖查询时刻；固定时间线由Temporal独立参考核对。

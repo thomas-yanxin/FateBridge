@@ -16,8 +16,8 @@ from fatebridge.core.astro.inner_source import (
 )
 from fatebridge.core.astro.jpl_kinematics import checked_fixed_acceleration
 from fatebridge.core.astro.jpl_records import source_records
-from fatebridge.core.astro.lunar_tropical_frame import nutation
 from fatebridge.core.astro.native_identity import binding_distribution_version
+from fatebridge.core.astro.nutation import nutation
 from fatebridge.core.astro.physical_sources import (
     PhysicalEphemerisTrace,
     assert_physical_configuration,

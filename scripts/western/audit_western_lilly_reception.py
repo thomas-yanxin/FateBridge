@@ -126,15 +126,6 @@ def audit():
         "independent_expert_review": False,
         "independent_astronomy_oracle": False,
         "scope": "Seven-planet selected table and printed p112 examples only; not critical-edition, full-book judgement, actual-model behaviour or outcome certification",
-        "source_sha256": {
-            rel: hashlib.sha256((ROOT / rel).read_bytes()).hexdigest()
-            for rel in [
-                "src/fatebridge/core/astro/lilly.py",
-                "src/fatebridge/core/astro/horary_conditions.py",
-                "src/fatebridge/core/classical_western.py",
-                "scripts/western/audit_western_lilly_reception.py",
-            ]
-        },
     }
 
 

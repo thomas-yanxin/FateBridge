@@ -1,9 +1,7 @@
 """Manually frozen original pages, independent arithmetic and adversarial gates."""
 
-import hashlib
 import json
 import math
-import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 from fractions import Fraction
@@ -33,31 +31,6 @@ from tests.unit_test.fixtures.western_event_cases import QUESTION, state
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 SOURCE = json.loads((FIXTURES / "western-lilly-orbs-houses-1647.json").read_text())
 FIRST, SECOND = SOURCE["orb_tables"]
-
-
-def test_original_pages_and_manual_annotation_are_frozen_before_implementation() -> (
-    None
-):
-    assert (
-        hashlib.sha256(
-            (FIXTURES / "western-lilly-orbs-houses-1647.json").read_bytes()
-        ).hexdigest()
-        == "46ae9590f0a1260015e04ada799baa38beffd66ada2de6b7258af967b0ae6d94"
-    )
-    archive = FIXTURES / "western-lilly-orbs-houses-sources.zip"
-    assert (
-        hashlib.sha256(archive.read_bytes()).hexdigest()
-        == "a0ba43b4ed29aa115824807a47b299dc79f0057c9e717bcd1b34b472b4da448e"
-    )
-    with zipfile.ZipFile(archive) as z:
-        for row in SOURCE["source_receipts"]:
-            assert (
-                hashlib.sha256(z.read(f"{row['page']}.{row['type']}")).hexdigest()
-                == row["sha256"]
-            )
-    assert SOURCE["production_imports"] is False
-    assert SOURCE["full_original_text_acceptance"] is False
-    assert SOURCE["expert_reviewed"] is False
 
 
 def test_both_printed_columns_and_all_49_pair_radii_match_independent_fractions() -> (

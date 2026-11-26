@@ -49,7 +49,6 @@ class TaiyiElementalAssessment(PartialOutput):
     role_scope: str | None = None
     method_scope: str | None = None
     scope: str | None = None
-    real_world_efficacy: str | None = None
     implemented_spatial_guan: TaiyiElementalSpatial | None = None
     status: str | None = None
     reason: str | None = None

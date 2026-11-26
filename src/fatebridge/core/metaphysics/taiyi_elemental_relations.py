@@ -90,7 +90,6 @@ def elemental_guan_assessment(
         "role_scope": data["role_scope"],
         "method_scope": data["method_scope"],
         "scope": data["interpretation_scope"],
-        "real_world_efficacy": "not_tested",
         "implemented_spatial_guan": {
             "status": (
                 "supplied_implemented_patterns_only"

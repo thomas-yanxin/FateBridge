@@ -39,7 +39,6 @@ def ruleset_metadata(
         "source_kind": "online_transcription_not_collated_edition",
         "classical_conformance": "partial_excerpt",
         "classical_acceptance_passed": False,
-        "real_world_efficacy": "not_tested",
         "conventions": {
             "month_general": "中气换将；用实际民用时刻判断交气，不用太阳钟偏移后的时刻",
             "diurnal": "默认卯至申为昼，酉至寅为夜；未按地点计算星出星没",

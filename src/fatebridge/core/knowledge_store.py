@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import re
 from collections.abc import Mapping
 from copy import deepcopy
@@ -125,7 +124,6 @@ class KnowledgeSupplementReceipt(TypedDict):
     id: str
     version: int
     source_file: str
-    sha256: str
     categories: list[SupplementCategory]
 
 
@@ -211,7 +209,6 @@ def load_knowledge_bundles() -> dict[str, KnowledgeBundle]:
                 "id": supplement_id,
                 "version": supplement["version"],
                 "source_file": "data/knowledge/" + filename,
-                "sha256": hashlib.sha256(raw).hexdigest(),
                 "categories": [
                     {
                         "name": name,

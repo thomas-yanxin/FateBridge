@@ -12,6 +12,8 @@ import math
 from fractions import Fraction
 from typing import Any
 
+from mpmath import mp  # type: ignore[import-untyped]
+
 from fatebridge.core.astro.astrology_tables import (
     DOMICILE_RULERS,
     EGYPTIAN_BOUNDS_BY_SIGN,
@@ -28,6 +30,7 @@ from fatebridge.core.astro.geometry import (
     combine_longitudes_exact,
     longitude_float,
 )
+from fatebridge.core.fixed_stars import build_layer
 
 # Chaldean decan faces — each sign's three 10° faces, Chaldean order from Mars at
 # 0° Aries. Ported verbatim from horosa data/dignities.js FACES (lowercased there).
@@ -367,8 +370,6 @@ def ecliptic_out_of_bounds(longitude: float, latitude: float, obliquity: float) 
     inputs are retained at 96 digits; no body-name shortcut or deadband.
     https://github.com/liberfa/erfa/blob/v2.0.1/src/numat.c
     """
-    from mpmath import mp  # type: ignore[import-untyped]
-
     ctx = mp.clone()
     ctx.dps = 96
     lam, beta, eps = (
@@ -380,8 +381,6 @@ def ecliptic_out_of_bounds(longitude: float, latitude: float, obliquity: float) 
     )
     return bool(abs(z) > abs(sine_obliquity))
 
-
-# ── almuten (essential-dignity rulership of a degree) + dispositors ──
 
 # Reverse of EXALTATION_SIGNS: sign → the planet exalted there (7 of 12 signs).
 EXALT_RULER_BY_SIGN: dict[str, str] = {
@@ -631,8 +630,6 @@ def build_topic_almutens(
     return topic
 
 
-# ── Arabic lots (parts) ──
-
 # Lot formulas: lon = (a + b − c) mod 360, with day/night reversal. Marker keys
 # index into the longitude table (asc / sun / moon / planets).
 # Ported verbatim from horosa data/lots.js (卜卦构建清单 §1.5).
@@ -712,8 +709,6 @@ def build_lots_layer(
         }
     return out
 
-
-# ── [古典格局] relational patterns ──────────────────────────────
 
 BENEFICS = frozenset({"Jupiter", "Venus"})
 MALEFICS = frozenset({"Mars", "Saturn"})
@@ -1090,8 +1085,6 @@ def build_classical_patterns(
     }
 
 
-# ── fixed stars (恒星) ──────────────────────────────────────────────
-
 # Curated classical catalogue: the 15 Behenian stars + 5 notable bright stars.
 # Numerical positions come from the separate SIMBAD ICRS catalogue and native
 # apparent model. This table contains cited traditional natures and labels.
@@ -1190,8 +1183,6 @@ def build_fixed_star_layer(
     julian_day_tt: float | None = None,
     sidereal: bool = False,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    from fatebridge.core.fixed_stars import build_layer
-
     return build_layer(
         points,
         julian_day,
@@ -1201,8 +1192,6 @@ def build_fixed_star_layer(
         orb=orb,
     )
 
-
-# ── dodekatemoria (12分度) + melothesia (身体部位) + temperament (气质) ──
 
 # Sign → governed body parts (head-to-foot). Ported verbatim from horosa
 # data/signs.js body_parts (卜卦构建清单 §1.6).

@@ -140,8 +140,7 @@
         "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.profile",
         "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.contact_counts",
         "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.sources",
-        "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.limitations",
-        "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.real_world_efficacy"
+        "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.limitations"
       ],
       "purpose": "Mixed-pair method, grouped relation counts and invariant-vs-dependent scope; counts are not timing accuracy. Request the same-run dials separately only when the actual equations are needed.",
       "when": "用户明确指定德国盘太阳弧目标时刻；通用入口须chart_variant=germany。analysis_datetime未给出时不计算。"
@@ -155,7 +154,6 @@
         "midpoint_analysis.reading_guide",
         "midpoint_analysis.limitations",
         "midpoint_analysis.original_text_conformance",
-        "midpoint_analysis.real_world_efficacy",
         "midpoint_analysis.interpretations",
         "midpoint_analysis.time_sensitivity.status",
         "midpoint_analysis.time_sensitivity.uncertainty_minutes",
@@ -169,8 +167,7 @@
         "midpoint_analysis.solar_arc_analysis.profile",
         "midpoint_analysis.solar_arc_analysis.sources",
         "midpoint_analysis.solar_arc_analysis.rule_trace",
-        "midpoint_analysis.solar_arc_analysis.original_text_conformance",
-        "midpoint_analysis.solar_arc_analysis.real_world_efficacy"
+        "midpoint_analysis.solar_arc_analysis.original_text_conformance"
       ],
       "purpose": "实际年长钥匙、原刊时角算术及未采纳状态"
     },
@@ -230,7 +227,6 @@
         "midpoint_analysis.solar_arc_analysis.original_table_1925.worked_example",
         "midpoint_analysis.solar_arc_analysis.original_table_1925.limitations",
         "midpoint_analysis.solar_arc_analysis.original_table_1925.full_original_method_accepted",
-        "midpoint_analysis.solar_arc_analysis.original_table_1925.real_world_efficacy",
         "midpoint_analysis.solar_arc_analysis.profile.key_policy"
       ],
       "purpose": "Witte1925原表、未定格与分步插值算例"
@@ -245,7 +241,6 @@
       "midpoint_analysis.reading_guide",
       "midpoint_analysis.limitations",
       "midpoint_analysis.original_text_conformance",
-      "midpoint_analysis.real_world_efficacy",
       "midpoint_analysis.interpretations",
       "midpoint_analysis.time_sensitivity.status",
       "midpoint_analysis.time_sensitivity.uncertainty_minutes",

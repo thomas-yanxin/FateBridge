@@ -89,7 +89,11 @@ def audit():
                         raise RuntimeError(result["error"])
                     else:
                         pass
-                    charts = result.get("marks_charts", {"pair": result["chart"]})
+                    charts = (
+                        result["marks_charts"]
+                        if mode == "Marks"
+                        else {"pair": result["chart"]}
+                    )
                     variants.append(
                         {
                             "mode": mode,
@@ -102,7 +106,9 @@ def audit():
                                 }
                                 for key, value in charts.items()
                             },
-                            "passed": all(
+                            "passed": set(charts)
+                            == ({"inner", "outer"} if mode == "Marks" else {"pair"})
+                            and all(
                                 value["chart_profile"]["derivation_policy"][
                                     "positions_from_single_instant"
                                 ]
@@ -116,25 +122,6 @@ def audit():
                     )
     finally:
         configure_ephemeris_path(previous)
-    files = [
-        "src/fatebridge/core/astro/relationship_geometry.py",
-        "src/fatebridge/core/astro/relationship_charts.py",
-        "src/fatebridge/core/astro/relationship.py",
-        "src/fatebridge/core/astro/layout.py",
-        "src/fatebridge/core/astro/aspects.py",
-        "src/fatebridge/core/requests/astrology.py",
-        "src/fatebridge/services/catalog/astro_bindings.py",
-        "src/fatebridge/services/catalog/astrology.py",
-        "src/fatebridge/services/astrology.py",
-        "src/fatebridge/core/contracts/output_charts.py",
-        "src/fatebridge/core/response_models.py",
-        "tests/western/test_western_relationship_geometry.py",
-        "tests/western/test_western_relationship_transports.py",
-        "tests/western/test_predictive_dates_and_runtime.py",
-        "src/fatebridge/core/ephemeris_runtime.py",
-        "scripts/western/audit_western_relationship.py",
-        "scripts/western/gen_western_relationship_reference.py",
-    ]
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "platform": platform.system() + "-" + platform.machine(),
@@ -155,10 +142,6 @@ def audit():
         "variants_and_marks_recipe": variants,
         "source_annotations": json.loads(METHODS.read_text()),
         "source_annotation_sha256": hashlib.sha256(METHODS.read_bytes()).hexdigest(),
-        "code_sha256": {
-            name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
-            for name in files
-        },
         "validation_limits": {
             "all_geographic_pairs_validated": False,
             "original_davison_book_collated": False,

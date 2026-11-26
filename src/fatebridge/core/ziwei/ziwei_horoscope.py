@@ -104,7 +104,6 @@ def _horoscope_scope(
     branch = palace["ganzhi"][1]
     return {
         "scope": scope,
-        "palace_name": palace["name"],
         # The index names the natal palace occupied by this scope's Ming
         # activity index. It is not a rotated scope-specific functional palace.
         "scope_palace_role": "ming_palace_activity_index",
@@ -166,7 +165,6 @@ def _unavailable_gender_scope(
 ) -> dict[str, Any]:
     record: dict[str, Any] = {
         "scope": scope,
-        "palace_name": None,
         "scope_palace_role": None,
         "natal_palace_name": None,
         "branch": None,
@@ -257,7 +255,6 @@ def build_ziwei_horoscope(
         # Retain the scope slot with explicit nulls so absence is observable.
         daxian = {
             "scope": "大限",
-            "palace_name": None,
             "scope_palace_role": None,
             "natal_palace_name": None,
             "branch": None,

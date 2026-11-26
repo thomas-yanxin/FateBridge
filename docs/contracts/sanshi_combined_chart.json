@@ -35,8 +35,7 @@
         "taiyi.counter_cycles",
         "taiyi.calendar_summary",
         "taiyi.ruleset.id",
-        "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy"
+        "taiyi.ruleset.classical_acceptance_passed"
       ],
       "purpose": "核太乙所选计法的完整计数与60/72组内位置；先区分年/月/日/时层，不把局号当完整时实或实际时柱。"
     },
@@ -118,7 +117,6 @@
         "taiyi.core_board.taiyi_number",
         "taiyi.core_board.suijun",
         "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy",
         "synthesis.time_scopes",
         "synthesis.limitations"
       ],
@@ -196,8 +194,7 @@
         "liureng.ruleset.source_title",
         "liureng.ruleset.source_urls",
         "liureng.ruleset.classical_conformance",
-        "liureng.ruleset.classical_acceptance_passed",
-        "liureng.ruleset.real_world_efficacy"
+        "liureng.ruleset.classical_acceptance_passed"
       ],
       "purpose": "查五将同方位的奇门星门神；六壬四正直接对应，四维并列同方位两支实际神将且不选寄支，中五不寄宫。"
     },
@@ -239,11 +236,9 @@
         "liureng.ruleset.source_urls",
         "liureng.ruleset.classical_conformance",
         "liureng.ruleset.classical_acceptance_passed",
-        "liureng.ruleset.real_world_efficacy",
         "synthesis.noble_source_assessment",
         "synthesis.time_scopes",
-        "synthesis.limitations",
-        "synthesis.real_world_efficacy"
+        "synthesis.limitations"
       ],
       "purpose": "首轮读取三式关键事实与来源、贵人本位逐版对照，保留完整三传；四课、太乙逐项依据或宫位对应按需深读，未读内容不视为不存在。"
     },
@@ -273,7 +268,6 @@
         "taiyi.calendar_summary",
         "taiyi.count_source_assessment",
         "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy",
         "synthesis.time_scopes"
       ],
       "purpose": "分辨主客算差异在源位置还是同位置加总；保留原字、所选书影层和当前同盘事实。仅选定卷三四位置/两算，不认证全书或古历。"
@@ -283,7 +277,6 @@
         "taiyi.calendar_summary",
         "taiyi.count_assessment",
         "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy",
         "synthesis.time_scopes"
       ],
       "purpose": "核查主客算的原条缺数、足数推导、杜塞数格、分源和数与太乙/二目各自阴阳配数；保留源差异和未决，不裁成总体胜负。"
@@ -317,7 +310,6 @@
         "taiyi.calendar_summary",
         "taiyi.elemental_guan_assessment",
         "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy",
         "synthesis.time_scopes"
       ],
       "purpose": "按同盘文昌/始击实际十六神核二目五行生克，与旧空间同宫关分开；保留卷四日计适用和角色语境，原断不裁为整体胜负。"
@@ -334,8 +326,7 @@
         "taiyi.core_board.main_vice_general",
         "taiyi.core_board.guest_general",
         "taiyi.core_board.guest_vice_general",
-        "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy"
+        "taiyi.ruleset.classical_acceptance_passed"
       ],
       "purpose": "分读李法正宫与同方二将夹持几何，保留实际宫位、源路径和未决；间神不并宫，不以未命中否定全部挟闭/四郭。"
     },
@@ -372,7 +363,6 @@
         "taiyi.calendar_summary",
         "taiyi.opposition_assessment",
         "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy",
         "synthesis.time_scopes"
       ],
       "purpose": "核六主体实际对宫，中五无环向；主方格/对原名并列，保留阳53附带外迫不符。几何事实不代替五将合取或原典名称统一验收。"
@@ -386,7 +376,6 @@
         "taiyi.shiji_derivation",
         "taiyi.count_source_assessment.summary",
         "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy",
         "synthesis.time_scopes"
       ],
       "purpose": "核本盘计神加和德艮后顺行十六神的逐步天地对应，以实际文昌取始击；步数为间隔，不是主客算。原表差异继续保留，不把推步相符当全书符合。"
@@ -404,10 +393,8 @@
         "taiyi.victory_matrix_assessment.status",
         "taiyi.victory_matrix_assessment.table_applicability_verified",
         "taiyi.victory_matrix_assessment.classical_acceptance_passed",
-        "taiyi.victory_matrix_assessment.real_world_efficacy",
         "taiyi.calendar_summary",
-        "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy"
+        "taiyi.ruleset.classical_acceptance_passed"
       ],
       "purpose": "核同次盘对应胜败钤原栏、几何比较与未决范围；原栏胜败不直接应用于本盘。"
     },
@@ -428,7 +415,6 @@
         "taiyi.ruleset.id",
         "taiyi.ruleset.version",
         "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy",
         "synthesis.time_scopes",
         "synthesis.limitations"
       ],
@@ -483,10 +469,8 @@
       "liureng.ruleset.source_urls",
       "liureng.ruleset.classical_conformance",
       "liureng.ruleset.classical_acceptance_passed",
-      "liureng.ruleset.real_world_efficacy",
       "synthesis.time_scopes",
-      "synthesis.limitations",
-      "synthesis.real_world_efficacy"
+      "synthesis.limitations"
     ],
     "include_snapshot_text": false,
     "strict_fields": true

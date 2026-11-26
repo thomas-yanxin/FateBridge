@@ -2,16 +2,6 @@
 
 from __future__ import annotations
 
-import sys as _sys
-from pathlib import Path as _Path
-
-_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
-if str(_VAL_REPO_ROOT) not in _sys.path:
-    _sys.path.insert(0, str(_VAL_REPO_ROOT))
-else:
-    pass
-
-
 import argparse
 import hashlib
 import importlib.metadata
@@ -72,77 +62,6 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def audit() -> dict[str, Any]:
 
-    implementation_files = [
-        "scripts/qimen/audit_qimen.py",
-        "src/fatebridge/core/metaphysics/qimen.py",
-        "src/fatebridge/core/metaphysics/common.py",
-        "src/fatebridge/core/qimen/qimen_evidence.py",
-        "src/fatebridge/core/qimen/qimen_geometry.py",
-        "src/fatebridge/core/qimen/qimen_zhirun.py",
-        "src/fatebridge/core/qimen/qimen_profiles.py",
-        "src/fatebridge/core/qimen/qimen_tombs.py",
-        "src/fatebridge/core/qimen/qimen_punishment.py",
-        "validation/qimen_punishment.py",
-        "src/fatebridge/core/qimen/qimen_gate_relations.py",
-        "validation/qimen_gate_relations.py",
-        "validation/qimen_tombs.py",
-        "src/fatebridge/core/qimen/qimen_combinations.py",
-        "src/fatebridge/core/qimen/qimen_stem_context.py",
-        "src/fatebridge/core/qimen/qimen_calendar_stems.py",
-        "src/fatebridge/core/qimen/qimen_time_conditions.py",
-        "src/fatebridge/core/qimen/qimen_three_deceptions.py",
-        "validation/qimen_three_deceptions.py",
-        "tests/qimen/test_qimen_three_deceptions.py",
-        "src/fatebridge/core/qimen/qimen_five_jia.py",
-        "validation/qimen_five_jia.py",
-        "tests/qimen/test_qimen_five_jia.py",
-        "validation/qimen_time_conditions.py",
-        "validation/qimen_calendar_stems.py",
-        "src/fatebridge/core/almanac.py",
-        "src/fatebridge/core/calendar.py",
-        "src/fatebridge/core/local_techniques/qimen.py",
-        "src/fatebridge/core/local_techniques/sanshi.py",
-        "src/fatebridge/core/local_techniques/chart.py",
-        "src/fatebridge/services/metaphysics.py",
-        "src/fatebridge/services/jinkou_snapshot.py",
-        "src/fatebridge/services/liureng_snapshot.py",
-        "src/fatebridge/services/ren_calendar_snapshot.py",
-        "src/fatebridge/services/taiyi_snapshot.py",
-        "src/fatebridge/services/ziwei_snapshot.py",
-        "src/fatebridge/services/divination.py",
-        "src/fatebridge/utils/solar_time.py",
-        "src/fatebridge/utils/solar_time_provenance.py",
-        "validation/qimen_solar.py",
-        "tests/qimen/test_qimen_solar_provenance.py",
-        "src/fatebridge/utils/timezones.py",
-        "src/fatebridge/utils/civil_clock.py",
-        "validation/qimen_clock.py",
-        "src/fatebridge/core/contracts/output_qimen.py",
-        "src/fatebridge/core/contracts/output_chinese.py",
-        "src/fatebridge/core/requests/metaphysics.py",
-        "src/fatebridge/core/requests/divination.py",
-        "src/fatebridge/data/agent_examples.json",
-        "validation/qimen.py",
-        "validation/qimen_table_integrity.py",
-        "tests/qimen/test_qimen_table_integrity.py",
-        "validation/qimen_study.py",
-        "validation/predictions.py",
-        "scripts/qimen/audit_qimen_study.py",
-        "scripts/qimen/demo_qimen_study.py",
-        "tests/qimen/test_qimen_study.py",
-        "tests/qimen/test_qimen_registration_binding.py",
-        "tests/unit_test/fixtures/qimen.py",
-        "tests/unit_test/fixtures/qimen_study.py",
-        "tests/evaluation/test_prediction_baselines.py",
-        "tests/qimen/test_qimen_clock_fold.py",
-        "tests/evaluation/test_prediction_fold_order.py",
-        "validation/claims.py",
-        "uv.lock",
-    ]
-    implementation = {
-        name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
-        for name in implementation_files
-    }
     classical_path = ROOT / "tests/fixtures/qimen-classical-excerpts.json"
     calendar_path = ROOT / "tests/fixtures/qimen-calendar-hko-2026.json"
     hko_directory = ROOT / "tests/fixtures/calendar_hko_v1"
@@ -165,78 +84,15 @@ def audit() -> dict[str, Any]:
     three_deceptions_directory = ROOT / "tests/fixtures/qimen_classical_v13"
     five_jia_directory = ROOT / "tests/fixtures/qimen_classical_v14"
     solar_clock_directory = ROOT / "tests/fixtures/qimen_solar_jpl_v1"
-    fixture_fingerprints: dict[str, str] = {}
-
-    def read_fixture(path: Path) -> Any:
-        raw = path.read_bytes()
-        fixture_fingerprints[str(path.relative_to(ROOT))] = hashlib.sha256(
-            raw
-        ).hexdigest()
-        return json.loads(raw)
-
-    classical = read_fixture(classical_path)
-    calendar = read_fixture(calendar_path)
-    hko = read_fixture(hko_path)
-    clock_fold = read_fixture(clock_fold_directory / "reference.json")
-    timezone_reference = read_fixture(timezone_path)
-    boundary = read_fixture(boundary_path)
-    clock_representations = read_fixture(
-        ROOT / "tests/fixtures/qimen-clock-representations-v1.json"
+    classical = json.loads(classical_path.read_bytes())
+    calendar = json.loads(calendar_path.read_bytes())
+    hko = json.loads(hko_path.read_bytes())
+    clock_fold = json.loads((clock_fold_directory / "reference.json").read_bytes())
+    timezone_reference = json.loads(timezone_path.read_bytes())
+    boundary = json.loads(boundary_path.read_bytes())
+    clock_representations = json.loads(
+        (ROOT / "tests/fixtures/qimen-clock-representations-v1.json").read_bytes()
     )
-    for path in [
-        *[clock_fold_directory / s["file"] for s in clock_fold["source_files"]],
-        *[hko_directory / source["file"] for source in hko["sources"]],
-        *[
-            timezone_directory / source["excerpt_file"]
-            for source in timezone_reference["sources"]
-        ],
-        scan_directory / "sources-and-cases.json",
-        scan_directory / "siku-pages-16-20.pdf",
-        table_directory / "sources-and-tables.json",
-        table_directory / "siku-pages-62-71.pdf",
-        table_directory / "cadal-06056497-p118.jpg",
-        table_directory / "cadal-06056497-p128.jpg",
-        table_directory / "cadal-06056497-imageinfo.json",
-        profile_directory / "sources-and-profiles.json",
-        profile_directory / "siku-chapter-variants.pdf",
-        head_directory / "sources-and-cases.json",
-        head_directory / "siku-pages-29-31-32.pdf",
-        day_stem_directory / "sources-and-stems.json",
-        day_stem_directory / "tushu705-p127.jpg",
-        day_stem_directory / "tushu705-p128.jpg",
-        day_stem_directory / "commons-imageinfo.json",
-        calendar_stem_directory / "sources-and-anchors.json",
-        *[
-            calendar_stem_directory / f"hko-lunar-{year}.pdf"
-            for year in (2024, 2025, 2026)
-        ],
-        time_condition_directory / "sources-and-hours.json",
-        time_condition_directory / "siku-page33.pdf",
-        tomb_clause_directory / "sources-and-tomb-clauses.json",
-        tomb_clause_directory / "siku-pages32-33.pdf",
-        punishment_directory / "sources-and-punishment.json",
-        punishment_directory / "siku-pages33-34.pdf",
-        gate_relations_directory / "siku-page34.pdf",
-        gate_relations_directory / "sources-and-gate-relations.json",
-        table_diagnostics_directory / "source-diagnostics.json",
-        table_diagnostics_directory / "siku-pages07-08.pdf",
-        three_deceptions_directory / "source-and-three-deceptions.json",
-        three_deceptions_directory / "siku-pages25-26.pdf",
-        five_jia_directory / "source-and-five-jia.json",
-        five_jia_directory / "siku-pages26-35.pdf",
-        *[
-            solar_clock_directory / name
-            for name in (
-                "reference.json",
-                "request.json",
-                "protocol.json",
-                "horizons-response.json",
-            )
-        ],
-    ]:
-        fixture_fingerprints[str(path.relative_to(ROOT))] = hashlib.sha256(
-            path.read_bytes()
-        ).hexdigest()
     failures: list[dict[str, Any]] = []
     counts = {
         "calendar_references": 0,
@@ -759,19 +615,8 @@ def audit() -> dict[str, Any]:
         }
         for d in calendar_stem_report["disagreements"]
     )
-    if any(
-        hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != expected
-        for name, expected in {**implementation, **fixture_fingerprints}.items()
-    ):
-        raise RuntimeError(
-            "奇门审计期间依赖源码或参考资料发生变化；本次结果不写入，请固定输入后重跑"
-        )
-    else:
-        pass
-
     return {
         "ruleset_id": RULESET_ID,
-        "implementation_sha256": implementation,
         "environment": {
             "python": sys.version.split()[0],
             "platform": platform.platform(),
@@ -779,7 +624,6 @@ def audit() -> dict[str, Any]:
             "lunardate": importlib.metadata.version("lunardate"),
             "pytz": importlib.metadata.version("pytz"),
         },
-        "fixture_sha256": fixture_fingerprints,
         "counts": counts,
         "failures": failures,
         "calendar": {

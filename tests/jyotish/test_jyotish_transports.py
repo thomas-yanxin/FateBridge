@@ -14,7 +14,7 @@ from fatebridge.application.description import describe_spec
 from fatebridge.application.execution import execute_tool
 from fatebridge.cli import run
 from fatebridge.core.execution_context import ExecutionOptions
-from fatebridge.core.jyotish.jyotish import YEAR_DAYS
+from fatebridge.core.jyotish.jyotish_dasha_levels import YEAR_DAYS
 from fatebridge.core.jyotish.jyotish_strength import SOURCE as STRENGTH_SOURCE
 from fatebridge.core.public_output import same_public_value
 from fatebridge.services.tool_catalog import CATALOG

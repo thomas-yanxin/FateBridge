@@ -56,9 +56,6 @@ def test_frozen_hko_cells_and_classical_vectors_have_separate_denominators() -> 
     assert classical["unresolved_source_items"]
     assert classical["status"] == "partial"
     assert not classical["whole_book_acceptance_passed"]
-    assert not result["full_acceptance_passed"]
-    assert result["real_world_prediction"]["score"] is None
-    assert result["real_world_prediction"]["independent_outcomes"] == 0
 
 
 @pytest.mark.parametrize(

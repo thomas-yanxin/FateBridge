@@ -7,12 +7,12 @@
 | 实际数据 | 对象身份与能回答的部分 | 不能改称 |
 | --- | --- | --- |
 | `ziwei_birth.palaces` 每项 `name/ganzhi/stars_detail`；命身另看 `ming_gong/shen_gong` | 本命十二宫；`stars_detail.name/brightness/mutagen` 是本命星、亮度与本命四化 | 目标年份的流年官禄／财帛等功能宫 |
-| `ziwei_horoscope.scopes` 的 `scope/scope_palace_role/natal_palace_name/branch/palace_ganzhi` | `scope_palace_role=ming_palace_activity_index` 时，是该运限命宫活动索引所临的本命宫；旧 `palace_name` 是兼容名 | 该运限同名功能宫；如所临本命迁移宫不等于已完整审查流年迁移宫 |
+| `ziwei_horoscope.scopes` 的 `scope/scope_palace_role/natal_palace_name/branch/palace_ganzhi` | `scope_palace_role=ming_palace_activity_index` 时，是该运限命宫活动索引所临的本命宫 | 该运限同名功能宫；如所临本命迁移宫不等于已完整审查流年迁移宫 |
 | `scopes[].palace_map` 的 `scope_palace_name/branch/natal_palace_name/natal_palace_ganzhi` | 引擎计算的该层十二宫功能名映射；`natal_stars_detail` 仍是本命星位 | 全部流曜、飞宫四化或某流派完整动态盘；旧部署缺此表时不能手补为引擎结果 |
 
-普通动态首轮取实际合同的 `analysis_context`、`birth_context`、`ziwei_horoscope.ruleset/interpretation_scope/nominal_age/calendar_rules/scopes`。`scopes` 数组整体取回，再按 `scope` 选本次需要的大限、流年等层；不编 `scopes.流年` 或数字索引投影。核对 `analysis_context.context_role=target`、`analysis_datetime` 及其时区；`birth_context` 用于出生处理核对。旧部署若仍把出生日期放在 `analysis_context`，不能将出生日期冒充目标回执；按实际可核验目标范围说明，不把缺回显解释成整张盘无用。
+普通动态首轮取实际合同的 `analysis_context`、`birth_context`、`ziwei_horoscope.ruleset/interpretation_scope/nominal_age/calendar_rules/scopes`。`scopes` 数组整体取回，再按 `scope` 选本次需要的大限、流年等层；不编 `scopes.流年` 或数字索引投影。核对 `analysis_context.context_role=target`、`analysis_datetime` 及其时区；`birth_context` 用于出生处理核对。
 
-上述 `birth_context` 是动态接口新增字段；本命 `ziwei_birth_chart` 的出生回执仍是 `analysis_context/person_info`，不能因两工具资料相似而复制投影路径。
+`birth_context` 是动态接口的出生回执；本命 `ziwei_birth_chart` 的出生回执仍是 `analysis_context/person_info`，不能因两工具资料相似而复制投影路径。
 
 本命首轮使用实际合同发布的 `evidence_views.natal`。`reading_view.palaces` 保留全部本命星曜，`stars[].name/brightness/mutagen` 与完整 `palaces[].stars_detail` 对应；`null_star_fields_omitted` 声明缺少的亮度／四化属性等于完整字段的 `null`，不能补造。`major_stars=[]` 只代表没有十四主星，继续读取同宫 `stars`。`sanfang_sizheng_branches` 按 `sanfang_branch_order` 与同一视图十二宫关联，不在首轮复制四遍星曜。结构问题需要展开时用 `structure` 视图，查规则步骤用 `rules` 视图；用户要完整结果时仍首次 `fields=null`。
 
@@ -58,7 +58,7 @@
 
 运限的 `evidence_views.source_rules` 返回 `ziwei_horoscope.source_comparison`。大限分别给明文首宫和当前首宫，默认命宫起与明文邻宫起不同，摘录配置才按邻宫起；岁数比较以给定五行局起岁为前提。童限替代记录不能说成已验证正式大限。小限只核对给定岁序后的顺逆和落支；现代农历岁首计虚岁仍是单独约定。斗君仅在普通生月核对，出生闰月的期待值留空，不能把斗君吻合扩成全部流月、流日、流时和动态四化符合。火铃的 `positions_under_selected_reading` 是明确选择的年支定点读法，现代作者自序只作读法存在的补证，不能据此宣称已取得明刊唯一历史解释或借用作者自述准确率。
 
-历法依据使用 `evidence_views.calendar` 的 `calendar_basis`：`placement_lunar_date` 才是当前盘的排盘农历；`civil_date_lunar_date` 是输入钟表日期查表结果；`reference_lunar_date` 是同一实际时刻转固定 UTC+08 后的日期查表结果。先看摘要的 `lunar_date_basis/calendar_date_shift_days`，跨日再展开，不将三个值混写。现行外国民用日期采用既有日期表，未按当地时区重算朔日；节气仍用物理时刻。原典时钟选择未认证。春节附近出生太阳日期与目标钟表日期混用可使现有岁序小于1，该边界明确未支持；不能解读为实际早于出生，也不能自行补成虚岁1或改出生年。
+历法依据使用 `evidence_views.calendar` 的 `calendar_basis`：`placement_lunar_date` 才是当前盘的排盘农历；`civil_date_lunar_date` 是输入钟表日期查表结果；`reference_lunar_date` 是同一实际时刻转固定 UTC+08 后的日期查表结果。先看摘要的 `lunar_date_basis/calendar_date_shift_days`，跨日再展开，不将三个值混写。现行外国民用日期采用既有日期表，未按当地时区重算朔日；节气仍用物理时刻。原典时钟选择未认证。岁序统一按出生民用时区的两端农历年计算，不能混用出生太阳排盘年份与目标钟表年份。目标是否早于出生按实际瞬间判断，不靠钳制岁序或改写出生年解决。
 
 童限专题使用 `evidence_views.childhood` 的 `childhood_limit`：明刊卷三安童限诀明示一至六岁之命、财、疾厄、妻、福、官禄，现对应现代宫名并连接该宫真实本命星曜。它与正式大限分列；`scopes` 的大限在起岁前标记 `status=not_started`，宫位、宫干和四化为空，不用童限替代。不能把童限给定岁序落宫说成正式大限或第七层动态四化。`natal_stars_detail.mutagen` 仍是本命四化，`childhood_sihua_supported=false`；当前软件岁首的年龄计算尚未获原典认证。七岁以后本批未得唯一规则时，`status=unresolved_from_source`、宫位为空，仅限制该童限规则，不否定六层运限或本命星曜；也不能把“十五命宫看端的”自行补成完整七至十五岁排法。
 

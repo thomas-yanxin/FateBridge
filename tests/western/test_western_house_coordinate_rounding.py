@@ -85,18 +85,30 @@ class _Case:
 
 
 FIXTURE = Path(__file__).parents[1] / "data/house_coordinate_rounding_arb_v1"
-PAYLOAD_HASHES = {
-    "inputs.json": "6dccb27c0cc269aaa6952a401e76b76fa6f4d53c4de4ccd526a806bedc4f5e2f",
-    "reference.jsonl.gz": "61f8283c98afb0390e7aa17bdcd20a098c6ee7cdc91971b6ccc69aca1472cd76",
-    "native-diagnostic-inputs.json": "0ecfa3ae4e900dbccbb52f0ccfe2e8d314cd8ef849b8b057787e1aaa83e08efe",
-}
+
+
+class ReferenceFile(TypedDict):
+    file: Literal["inputs.json", "reference.jsonl.gz", "native-diagnostic-inputs.json"]
+    sha256: str
+
+
+class ReferenceProvenance(TypedDict):
+    fixture_payloads: list[ReferenceFile]
 
 
 def _load_cases() -> list[_Case]:
-    # Validate the owned JSON boundary once; the test consumes typed records.
-    payloads = {name: (FIXTURE / name).read_bytes() for name in PAYLOAD_HASHES}
-    for name, expected in PAYLOAD_HASHES.items():
-        assert hashlib.sha256(payloads[name]).hexdigest() == expected, name
+    provenance = TypeAdapter(ReferenceProvenance).validate_json(
+        (FIXTURE / "provenance.json").read_bytes()
+    )
+    payloads = {
+        file_record["file"]: (FIXTURE / file_record["file"]).read_bytes()
+        for file_record in provenance["fixture_payloads"]
+    }
+    for file_record in provenance["fixture_payloads"]:
+        filename = file_record["file"]
+        assert (
+            hashlib.sha256(payloads[filename]).hexdigest() == file_record["sha256"]
+        ), filename
     supplied = TypeAdapter(_InputBundle).validate_json(payloads["inputs.json"])["rows"]
     reference_adapter = TypeAdapter(_Reference)
     references = [

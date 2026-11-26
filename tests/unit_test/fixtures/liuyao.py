@@ -12,7 +12,8 @@ from jsonschema import Draft202012Validator
 from pytest import CaptureFixture
 
 from fatebridge.core.liuyao.liuyao_casting import cast_lines_from_codes
-from fatebridge.core.liuyao.liuyao_judgment import build_conditional_analysis, kinship
+from fatebridge.core.liuyao.liuyao_focus import kinship
+from fatebridge.core.liuyao.liuyao_judgment import build_conditional_analysis
 from fatebridge.core.liuyao.liuyao_najia import build_sixyao_enrichment
 from fatebridge.core.liuyao.liuyao_relations import ELEMENTS
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result

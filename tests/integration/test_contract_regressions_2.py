@@ -469,7 +469,7 @@ def test_mixed_pair_catalogue_across_three_surfaces(
         mixed["profile"]["birth_time_contact_sensitivity"]
         == "not_assessed_for_this_catalogue"
     )
-    assert mixed["real_world_efficacy"] == "not_tested"
+
     for period in (90, 45):
         dial = mixed["dials"][str(period)]
         assert dial["arc_dependent_contacts"] and dial["arc_invariant_contacts"]

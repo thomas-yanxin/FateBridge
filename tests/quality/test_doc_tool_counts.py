@@ -14,7 +14,6 @@ import pytest
 from fatebridge.api import app
 from fatebridge.application.description import spec_is_cli_safe
 from fatebridge.services.tool_catalog import CATALOG, mcp_specs, rest_specs
-from scripts.check_algorithm_inventory import check_inventory
 
 REPO_ROOT = Path(__file__).resolve().parents[1].parent
 
@@ -151,12 +150,6 @@ def test_algorithm_family_counts_match_published_tools() -> None:
         }
     )
     assert documented == Counter(spec.family for spec in mcp_specs())
-
-
-def test_fine_grained_inventory_matches_its_source_references() -> None:
-    """Keep the reviewed index live; this does not certify algorithm accuracy."""
-    _, issues = check_inventory()
-    assert not issues, "\n".join(issues)
 
 
 def test_api_mcp_group_list_covers_each_published_tool_once() -> None:

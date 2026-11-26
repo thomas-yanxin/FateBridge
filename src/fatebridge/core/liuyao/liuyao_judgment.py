@@ -28,9 +28,7 @@ from fatebridge.core.liuyao.liuyao_complex import (
     scan_profile,
 )
 from fatebridge.core.liuyao.liuyao_control import build_control_conditions
-from fatebridge.core.liuyao.liuyao_focus import kinship as kinship
 from fatebridge.core.liuyao.liuyao_focus import resolve_focus
-from fatebridge.core.liuyao.liuyao_focus import role_against_focus as role_against_focus
 from fatebridge.core.liuyao.liuyao_growth import build_growth_conditions
 from fatebridge.core.liuyao.liuyao_hidden import qualify_hidden_reception
 from fatebridge.core.liuyao.liuyao_metal_change import INTERNAL_KEY as OWN_SI_KEY

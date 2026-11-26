@@ -24,12 +24,12 @@ from fatebridge.core.liuyao.liuyao_casting import (
     changed_hexagram_code,
     coin_cast,
 )
-from fatebridge.core.liuyao.liuyao_evidence import ADVANCES, branch_facts, xunkong
 from fatebridge.core.liuyao.liuyao_najia import build_sixyao_enrichment
 from fatebridge.core.liuyao.liuyao_patterns import (
     LIUCHONG_HEXAGRAM_CODES,
     LIUHE_HEXAGRAM_CODES,
 )
+from fatebridge.core.liuyao.liuyao_relations import ADVANCES, branch_facts, xunkong
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from fatebridge.core.requests.divination import SixYaoRequest
 from fatebridge.core.zhouyi import classical_hexagram

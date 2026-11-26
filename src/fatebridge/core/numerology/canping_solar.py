@@ -29,6 +29,7 @@ from fatebridge.core.solar_model_policy import (
     VSOP2013_SOFTWARE_YEARS,
     solar_model_policy,
 )
+from fatebridge.core.solar_term_runtime import solar_term_cache_context
 from fatebridge.utils.civil_time import ZonedCalendar, utc_calendar
 from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.utils.timezones import parse_timezone_name
@@ -179,8 +180,6 @@ def resolve_projection_boundary(
         raise ValueError("投影边界必须属于已给出生年与原有1至120年范围。")
     mode, jpl = solar_model_policy(), configured_jpl_file()
     if mode == "vsop2013":
-        from fatebridge.core.solar_term_runtime import solar_term_cache_context
-
         # Validate the real origin and strict-JPL policy before any derived cache.
         solar_term_cache_context(almanac.swe, year=origin_civil_year)
     extended = _extended_event_profile(year, origin_civil_year, mode, jpl)

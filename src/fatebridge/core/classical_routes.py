@@ -10,6 +10,7 @@ from typing import Any, Mapping
 
 from fatebridge.core.classical_stages import STAGE_PROFILE_ID, twelve_life_stage
 from fatebridge.core.month_use import match_month_uses
+from fatebridge.core.source_identity import ZIPING_ZHENQUAN_NLC_SCAN_URL
 from fatebridge.utils.data import (
     DESTRUCTION_CYCLE,
     GENERATION_CYCLE,
@@ -27,7 +28,7 @@ SOURCE = {
     "author": "沈孝瞻",
     "title": "秘本子平真诠·成败救应、相神及食伤诸章",
     "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
-    "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+    "source_url": ZIPING_ZHENQUAN_NLC_SCAN_URL,
     "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
     "formalization": "FateBridge 星位路径 v1；只裁定本条计算事实，未裁定全局成败。",
 }

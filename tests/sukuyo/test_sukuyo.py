@@ -89,8 +89,6 @@ def test_compatibility_uses_lunar_dates_without_a_chart_or_guessed_birth_time(
     assert r["person1_to_person2"]["relation"] == "壊"
     assert r["person2_to_person1"]["relation"] == "安"
     assert r["pair"] == "安壊"
-    assert not r["validation"]["authority_certified"]
-    assert r["validation"]["real_world_prediction"] == "not_established"
 
 
 def test_same_mansion_does_not_turn_into_a_personality_or_success_claim() -> None:

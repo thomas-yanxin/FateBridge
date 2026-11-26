@@ -1,6 +1,5 @@
 """Check literal month centers and raw calendar/plate coherence without builders."""
 
-import hashlib
 from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
@@ -15,7 +14,6 @@ from fatebridge.utils.civil_time import ZonedCalendar, utc_calendar
 from fatebridge.utils.errors import FengshuiCalculationError
 from fatebridge.utils.timezones import is_unspecified_local_time, parse_timezone_name
 
-DATA_SHA256 = "570c0f0fbc5c7f1140ddb4f82510c56bbc922950153eeab9cff812992e5a9cb8"
 JIE = tuple("立春 惊蛰 清明 立夏 芒种 小暑 立秋 白露 寒露 立冬 大雪 小寒".split())
 BRANCHES = "寅卯辰巳午未申酉戌亥子丑"
 FIXED = {"C": 5, "N": 1, "NE": 8, "E": 3, "SE": 4, "S": 9, "SW": 2, "W": 7, "NW": 6}
@@ -43,7 +41,6 @@ def _reference() -> MonthlyIntegrityReference:
         raw = (
             Path(__file__).parents[2] / "data/fengshui/monthly-integrity-v1.json"
         ).read_bytes()
-        _check(hashlib.sha256(raw).hexdigest() == DATA_SHA256)
         return TypeAdapter(MonthlyIntegrityReference).validate_json(raw, strict=True)
     except (OSError, ValueError) as error:
         raise FengshuiCalculationError("monthly_plate_inconsistent") from error

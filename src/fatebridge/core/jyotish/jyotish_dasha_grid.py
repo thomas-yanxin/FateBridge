@@ -14,7 +14,7 @@ from typing import Any
 
 from fatebridge.core.astro.sensitivity_grid import RecordedBirthSample
 from fatebridge.core.astro.tt_epoch import TTInstant
-from fatebridge.core.jyotish.jyotish import (
+from fatebridge.core.jyotish.jyotish_charts import (
     divisional_chart,
     partition_longitudes,
 )

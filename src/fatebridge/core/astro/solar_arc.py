@@ -647,7 +647,6 @@ def enrich_solar_arc(
             "Contact counts and sample counts are not probabilities; different dials are not independent evidence",
         ],
         "original_text_conformance": "not_assessed",
-        "real_world_efficacy": "not_tested",
     }
     mixed = layer["solar_arc_analysis"]["mixed_pair_geometry"]
     mixed["birth_time_sensitivity"] = mixed_pair_sensitivity(

@@ -84,7 +84,6 @@
         "candidate_relation_analysis",
         "rulesets",
         "interpretation_contract",
-        "validation",
         "summary"
       ],
       "purpose": "原典三九双向关系与解释约束"
@@ -102,7 +101,6 @@
       "candidate_relation_analysis",
       "rulesets",
       "interpretation_contract",
-      "validation",
       "summary"
     ],
     "include_snapshot_text": false,

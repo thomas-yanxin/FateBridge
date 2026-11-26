@@ -1,3 +1,5 @@
+"""Ziwei timing scopes and calendar-derived transformation assignments."""
+
 import pytest
 
 from fatebridge.core.metaphysics.seed import build_analysis_seed
@@ -43,7 +45,6 @@ def test_horoscope_has_six_scopes_with_expected_shape() -> None:
     for s in h["scopes"]:
         assert set(s.keys()) == {
             "scope",
-            "palace_name",
             "scope_palace_role",
             "natal_palace_name",
             "mutagen_natal_links",

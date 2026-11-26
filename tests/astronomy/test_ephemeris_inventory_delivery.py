@@ -1,17 +1,15 @@
-from pathlib import Path
-
-from fatebridge.utils.formatting import format_json_response
-
 """Large runtime inventories remain lossless without crowding out the analysis."""
 
 import copy
 import json
+from pathlib import Path
 
 import pytest
 
 from fatebridge.application import result_delivery as delivery
 from fatebridge.application.examples import suggested_fields
 from fatebridge.services import replay_metadata
+from fatebridge.utils.formatting import format_json_response
 from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
 from tests.support.result_delivery import reconstruct, store
 from tests.support.transports import SPECS, inputs, rest, surface_calls

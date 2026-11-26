@@ -14,13 +14,14 @@ from fatebridge.application.examples import suggested_fields
 from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
 from fatebridge.core.contracts.output_chinese import Taiyi
+from fatebridge.core.metaphysics.taiyi_board import assemble_board
 from fatebridge.core.metaphysics.taiyi_enclosures import (
     PAIR_PROFILE,
     enclosure_assessment,
     enclosures_text,
     general_pair_enclosures,
 )
-from fatebridge.core.metaphysics.taiyi_year import assemble_board, cyclic_core
+from fatebridge.core.metaphysics.taiyi_year import cyclic_core
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_general_pairs import CORPUS, audit

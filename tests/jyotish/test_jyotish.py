@@ -7,16 +7,14 @@ import pytest
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish.jyotish import (
-    GRAHAS,
+from fatebridge.core.jyotish.jyotish import build_india
+from fatebridge.core.jyotish.jyotish_charts import GRAHAS, dignity, divisional_chart
+from fatebridge.core.jyotish.jyotish_dasha_levels import (
     YEAR_DAYS,
-    build_india,
-    dignity,
-    divisional_chart,
     nakshatra,
-    varga_longitude,
     vimshottari,
 )
+from fatebridge.core.jyotish.jyotish_vargas import varga_longitude
 from fatebridge.services.astrology import calculate_core_chart_analysis
 from fatebridge.services.jyotish import calculate_vimshottari
 from tests.fixtures.surface_payloads import astro_payload
@@ -188,6 +186,22 @@ def test_india_core_contains_nine_grahas_sources_and_theme_factors() -> None:
     assert "D10 上升" in result["snapshot_text"]
     assert "历史参考" in result["snapshot_text"]
     assert "vedicastrologer.org" in result["snapshot_text"]
+
+
+def test_extended_divisions_are_consistent_with_reported_coverage() -> None:
+    """D4 and D60 were computed while coverage still listed them as unavailable."""
+    birth = build_astro_birth_info(**astro_payload())
+    result = build_india(birth, divisions=[4, 60])
+    assert set(result["charts"]) == {"D1", "D4", "D60"}
+    assert {"D1", "D4", "D60"} <= set(result["coverage"]["implemented"])
+    assert (
+        next(
+            restriction
+            for restriction in result["coverage"]["not_implemented"]
+            if restriction.startswith("vargas_other_than_")
+        )
+        == "vargas_other_than_D1_D2_D3_D4_D7_D9_D10_D12_D16_D20_D24_D27_D30_D40_D45_D60"
+    )
 
 
 def test_true_nodes_division_selection_and_birth_time_grid() -> None:

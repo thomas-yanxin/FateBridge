@@ -1,8 +1,4 @@
-"""
-Qi Men (奇门) snapshot rendering and options over a metaphysics seed.
-
-Pure relocation from the package facade.
-"""
+"""Render Qimen snapshots and validate supported chart options."""
 
 from __future__ import annotations
 
@@ -47,14 +43,6 @@ def _build_qimen_nine_grid_lines(qimen: dict[str, Any]) -> list[str]:
                 f"{'/'.join([palace['star'], *palace.get('hosted_stars', [])]) if palace.get('star') else '无'}/"
                 f"{palace.get('god') or '无'}"
             )
-            if palace.get("content_palace") and (
-                palace.get("content_palace") != palace.get("name")
-                or palace.get("content_trigram") != palace.get("trigram")
-            ):
-                cell += (
-                    f" <- {palace.get('content_palace', '无')}/"
-                    f"{palace.get('content_trigram', '无')}"
-                )
             cells.append(cell)
         rows.append(" | ".join(cells))
     return rows
@@ -279,18 +267,6 @@ def build_qimen_snapshot_text(*, seed: MetaphysicsSeed, qimen: dict[str, Any]) -
     zhifu_palace = palace_map.get(zhifu.get("palace"), {})
     zhishi_palace = palace_map.get(zhishi.get("palace"), {})
 
-    def _content_note(item: dict[str, Any]) -> str:
-        if not item.get("content_palace"):
-            return ""
-        if item.get("content_palace") == item.get("palace") and item.get(
-            "content_trigram"
-        ) == item.get("trigram"):
-            return ""
-        return (
-            f"；内容来源：{item.get('content_palace', '无')} / "
-            f"{item.get('content_trigram', '无')}"
-        )
-
     sections = [
         (
             "起盘信息",
@@ -324,14 +300,8 @@ def build_qimen_snapshot_text(*, seed: MetaphysicsSeed, qimen: dict[str, Any]) -
             "盘面要素",
             join_lines(
                 [
-                    (
-                        f"值符：{zhifu.get('star', '无')}在{zhifu.get('palace', '无')}"
-                        + _content_note(zhifu)
-                    ),
-                    (
-                        f"值使：{zhishi.get('door', '无')}在{zhishi.get('palace', '无')}"
-                        + _content_note(zhishi)
-                    ),
+                    f"值符：{zhifu.get('star', '无')}在{zhifu.get('palace', '无')}",
+                    f"值使：{zhishi.get('door', '无')}在{zhishi.get('palace', '无')}",
                     f"布局：{qimen.get('layout', 'direct')}",
                     f"规则版本：{(qimen.get('rulesets') or [{}])[0].get('id', '无')}",
                     f"八神口径：{qimen['rule_profiles']['god']['title']}（{qimen['god_profile']}）",
@@ -366,7 +336,6 @@ def build_qimen_snapshot_text(*, seed: MetaphysicsSeed, qimen: dict[str, Any]) -
                     ),
                     qimen["rule_profiles"]["god"]["variant_note"],
                     qimen["rule_profiles"]["season"]["variant_note"],
-                    "对应规则只在其覆盖范围内成立；传统规则匹配不等于现实事件预测。",
                     *_render_qimen_source_disagreements(qimen),
                     *[_render_qimen_pattern_line(p) for p in qimen.get("patterns", [])],
                 ]

@@ -10,16 +10,13 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.contracts.output_taiyi_gates import TaiyiGates
+from fatebridge.core.metaphysics.taiyi_board import assemble_board
 from fatebridge.core.metaphysics.taiyi_gates import (
     attach_gate_board,
     gate_cycle,
     gate_frame,
 )
-from fatebridge.core.metaphysics.taiyi_year import (
-    assemble_board,
-    cyclic_core,
-    yearly_core,
-)
+from fatebridge.core.metaphysics.taiyi_year import cyclic_core, yearly_core
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from scripts.taiyi.audit_taiyi_gates import CORPUS, audit, worked_board
 from tests.support.reference_data import resolve as _resolve

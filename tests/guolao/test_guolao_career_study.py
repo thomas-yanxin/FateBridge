@@ -423,9 +423,9 @@ def test_no_reordering_no_selective_abstention_and_zero_baseline_division() -> N
 
 def test_research_cli_schema_and_real_json_round_trip(tmp_path: Path) -> None:
     root = Path(__file__).parents[2]
-    script = root / "scripts/guolao/audit_guolao_career_study.py"
+    module = "scripts.guolao.audit_guolao_career_study"
     schema = subprocess.run(
-        [sys.executable, str(script), "--schema"],
+        [sys.executable, "-m", module, "--schema"],
         cwd=root,
         text=True,
         capture_output=True,
@@ -450,7 +450,8 @@ def test_research_cli_schema_and_real_json_round_trip(tmp_path: Path) -> None:
     output = tmp_path / "report.json"
     args = [
         sys.executable,
-        str(script),
+        "-m",
+        module,
         "--as-of",
         AS_OF.isoformat(),
         "--output",

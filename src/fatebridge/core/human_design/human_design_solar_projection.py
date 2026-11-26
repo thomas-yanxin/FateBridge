@@ -10,6 +10,10 @@ import math
 from collections.abc import Sequence
 from typing import Any
 
+from fatebridge.core.human_design.human_design_interval_geometry import (
+    portable_projection_scalars,
+)
+
 NOMINAL_SOLAR_RADIUS_M = 695700000
 ASTRONOMICAL_UNIT_M = 149597870700
 ARITHMETIC_RESOLUTION_RADIANS = 1e-12
@@ -35,10 +39,6 @@ def nominal_solar_projection(
     sun: Sequence[float], target: Sequence[float]
 ) -> dict[str, Any]:
     """Portable interval geometry, independently rounded for each scalar."""
-    from fatebridge.core.human_design.human_design_interval_geometry import (
-        portable_projection_scalars,
-    )
-
     solar, other = _coordinates(sun), _coordinates(target)
     return {
         **portable_projection_scalars(

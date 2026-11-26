@@ -8,6 +8,8 @@
 
 `rule_profile` 保留 `iztro_2_5_8` 与 `quanshu_v2_excerpt`，分别表达软件对照配置与限定原典摘录配置。`sihua_source=rule_profile` 沿用所选配置；`naj_ming_v1` 显式采用明刊原页四化表。选择其中一表不代表整部原典已获验收。
 
+`brightness_source=rule_profile` 沿用基础配置的本命庙旺表；也可独立选择 `iztro_2_5_8`、`quanshu_v2_selected_table` 或 `ziwei_doushu_qs`、`ziwei_doushu_xd1`、`ziwei_doushu_zz`、`ziwei_doushu_xd2` 四张固定版本软件对照表。各表保留自身地支顺序、等级、星名对应和未记载单元格，不跨表补值，也不改变安星、四化或运限规则。显式选表时 `ruleset.brightness_table` 返回来源、版本与表式。
+
 本命保留命身宫、五行局、十四主星、辅星、四化、庙旺表、三方四正、长生与博士循环、旬空及相关宫位证据。完整三合视图不自动成为吉凶评级。年干四化使用所选农历年；不能把八字立春年柱挪作紫微农历年。
 
 闰月、日界、早晚子时、火铃顺逆、限宫首位和附星采用所选规则集。原书缺文、同图疑字及版本异读随规则来源和盘内比较返回，不用当前程序通则填补原字。`independent_review` 等状态只约束实际已复读内容，不认证未审阅章节。
@@ -57,5 +59,3 @@
 uv run --locked --extra dev python -m pytest -n0 tests/ziwei/test_ziwei_depth_transports.py tests/ziwei/test_ziwei_horoscope_crosscheck.py tests/ziwei/test_ziwei_twenty_first_iteration.py
 uv run --locked --extra dev python -m scripts.ziwei.audit_ziwei_natal --fixtures tests/data/ziwei_independent/natal_factor_grid_v1 --output /tmp/ziwei-natal-factor-grid-audit.json
 ```
-
-精确的索引、可复现结果和局部文字符合度不证明现实预测有效。整书、全部流派、未知生时、连续未来时间以及实际事件预测仍需各自的独立验收。

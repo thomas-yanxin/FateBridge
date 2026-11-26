@@ -934,7 +934,6 @@ from tests.unit_test.fixtures.sukuyo_transports import (
                 "person1_to_person2",
                 "person2_to_person1",
                 "rulesets",
-                "validation",
             ],
         ),
         (
@@ -989,7 +988,7 @@ from tests.unit_test.fixtures.sukuyo_transports import (
                 "lon": "121e28",
                 "date": "2025-03-04",
                 "time": "12:00:00",
-                "mansion_method": "legacy_equal28",
+                "doubing_su28": False,
             },
             ["astronomy", "params", "sukuyo.day_mansion"],
         ),

@@ -203,8 +203,8 @@ class PhysicalEpoch:
         calendar = utc_calendar(moment) if isinstance(moment, datetime) else moment
         return cls(
             ephemeris_time(calendar),
-            moment.isoformat(),
-            moment if isinstance(moment, datetime) else calendar.as_datetime(),
+            calendar.isoformat(),
+            calendar.as_datetime(),
             False,
             CivilPoint(calendar.julian_day_exact()),
         )

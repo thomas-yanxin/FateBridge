@@ -667,7 +667,7 @@
       "status", "su27_basis", "person1.name", "person1.natal_su27", "person2.name",
       "person2.natal_su27", "person1_to_person2", "person2_to_person1", "pair",
       "candidate_relation_analysis", "rulesets.calendar", "rulesets.relations",
-      "interpretation_contract", "validation"
+      "interpretation_contract"
     ],
     "otherbu": [
       "method_id", "planet", "sign", "house", "rulesets", "validation",
@@ -935,10 +935,8 @@
       "liureng.ruleset.source_urls",
       "liureng.ruleset.classical_conformance",
       "liureng.ruleset.classical_acceptance_passed",
-      "liureng.ruleset.real_world_efficacy",
       "synthesis.time_scopes",
-      "synthesis.limitations",
-      "synthesis.real_world_efficacy"
+      "synthesis.limitations"
     ],
     "otherbu": [
       "method_id",
@@ -1342,7 +1340,6 @@
       "midpoint_analysis.reading_guide",
       "midpoint_analysis.limitations",
       "midpoint_analysis.original_text_conformance",
-      "midpoint_analysis.real_world_efficacy",
       "midpoint_analysis.interpretations",
       "midpoint_analysis.time_sensitivity.status",
       "midpoint_analysis.time_sensitivity.uncertainty_minutes",
@@ -1377,7 +1374,6 @@
       "candidate_relation_analysis",
       "rulesets",
       "interpretation_contract",
-      "validation",
       "summary"
     ],
     "suzhan": [
@@ -2333,8 +2329,7 @@
           "taiyi.counter_cycles",
           "taiyi.calendar_summary",
           "taiyi.ruleset.id",
-          "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy"
+          "taiyi.ruleset.classical_acceptance_passed"
         ]
       },
       "year_core": {
@@ -2505,8 +2500,7 @@
           "taiyi.core_board.main_vice_general",
           "taiyi.core_board.guest_general",
           "taiyi.core_board.guest_vice_general",
-          "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy"
+          "taiyi.ruleset.classical_acceptance_passed"
         ]
       },
       "historical_year_calendar": {
@@ -2517,8 +2511,7 @@
           "taiyi.core_board.kook_number",
           "taiyi.core_board.taiyi_number",
           "taiyi.core_board.suijun",
-          "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy"
+          "taiyi.ruleset.classical_acceptance_passed"
         ]
       },
       "oppositions": {
@@ -2526,8 +2519,7 @@
         "fields": [
           "taiyi.calendar_summary",
           "taiyi.opposition_assessment",
-          "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy"
+          "taiyi.ruleset.classical_acceptance_passed"
         ]
       },
       "counts": {
@@ -2535,8 +2527,7 @@
         "fields": [
           "taiyi.calendar_summary",
           "taiyi.count_assessment",
-          "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy"
+          "taiyi.ruleset.classical_acceptance_passed"
         ]
       },
       "shiji_derivation": {
@@ -2548,8 +2539,7 @@
           "taiyi.core_board.shiji",
           "taiyi.shiji_derivation",
           "taiyi.count_source_assessment.summary",
-          "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy"
+          "taiyi.ruleset.classical_acceptance_passed"
         ]
       },
       "count_sources": {
@@ -2557,8 +2547,7 @@
         "fields": [
           "taiyi.calendar_summary",
           "taiyi.count_source_assessment",
-          "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy"
+          "taiyi.ruleset.classical_acceptance_passed"
         ]
       },
       "elemental_relations": {
@@ -2566,8 +2555,7 @@
         "fields": [
           "taiyi.calendar_summary",
           "taiyi.elemental_guan_assessment",
-          "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy"
+          "taiyi.ruleset.classical_acceptance_passed"
         ]
       },
       "victory_matrix": {
@@ -2584,10 +2572,8 @@
           "taiyi.victory_matrix_assessment.status",
           "taiyi.victory_matrix_assessment.table_applicability_verified",
           "taiyi.victory_matrix_assessment.classical_acceptance_passed",
-          "taiyi.victory_matrix_assessment.real_world_efficacy",
           "taiyi.calendar_summary",
-          "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy"
+          "taiyi.ruleset.classical_acceptance_passed"
         ]
       },
       "year_calendar": {
@@ -2607,8 +2593,7 @@
           "taiyi.core_board.heshen",
           "taiyi.ruleset.id",
           "taiyi.ruleset.version",
-          "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy"
+          "taiyi.ruleset.classical_acceptance_passed"
         ]
       },
       "clock_basis": {
@@ -2622,8 +2607,7 @@
           "taiyi.core_board.jishen",
           "taiyi.core_board.heshen",
           "taiyi.ruleset.id",
-          "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy"
+          "taiyi.ruleset.classical_acceptance_passed"
         ]
       },
       "solar_anchors": {
@@ -2655,8 +2639,7 @@
           "taiyi.counter_cycles",
           "taiyi.calendar_summary",
           "taiyi.ruleset.id",
-          "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy"
+          "taiyi.ruleset.classical_acceptance_passed"
         ]
       },
       "scoped_evidence": {
@@ -2698,11 +2681,9 @@
           "liureng.ruleset.source_urls",
           "liureng.ruleset.classical_conformance",
           "liureng.ruleset.classical_acceptance_passed",
-          "liureng.ruleset.real_world_efficacy",
           "synthesis.noble_source_assessment",
           "synthesis.time_scopes",
-          "synthesis.limitations",
-          "synthesis.real_world_efficacy"
+          "synthesis.limitations"
         ]
       },
       "taiyi_depth": {
@@ -2760,8 +2741,7 @@
           "liureng.ruleset.source_title",
           "liureng.ruleset.source_urls",
           "liureng.ruleset.classical_conformance",
-          "liureng.ruleset.classical_acceptance_passed",
-          "liureng.ruleset.real_world_efficacy"
+          "liureng.ruleset.classical_acceptance_passed"
         ]
       },
       "annual_cycles": {
@@ -2919,8 +2899,7 @@
           "taiyi.core_board.main_vice_general",
           "taiyi.core_board.guest_general",
           "taiyi.core_board.guest_vice_general",
-          "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy"
+          "taiyi.ruleset.classical_acceptance_passed"
         ]
       },
       "historical_year_calendar": {
@@ -2932,7 +2911,6 @@
           "taiyi.core_board.taiyi_number",
           "taiyi.core_board.suijun",
           "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy",
           "synthesis.time_scopes",
           "synthesis.limitations"
         ]
@@ -2943,7 +2921,6 @@
           "taiyi.calendar_summary",
           "taiyi.opposition_assessment",
           "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy",
           "synthesis.time_scopes"
         ]
       },
@@ -2953,7 +2930,6 @@
           "taiyi.calendar_summary",
           "taiyi.count_assessment",
           "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy",
           "synthesis.time_scopes"
         ]
       },
@@ -2967,7 +2943,6 @@
           "taiyi.shiji_derivation",
           "taiyi.count_source_assessment.summary",
           "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy",
           "synthesis.time_scopes"
         ]
       },
@@ -2977,7 +2952,6 @@
           "taiyi.calendar_summary",
           "taiyi.count_source_assessment",
           "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy",
           "synthesis.time_scopes"
         ]
       },
@@ -2987,7 +2961,6 @@
           "taiyi.calendar_summary",
           "taiyi.elemental_guan_assessment",
           "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy",
           "synthesis.time_scopes"
         ]
       },
@@ -3005,10 +2978,8 @@
           "taiyi.victory_matrix_assessment.status",
           "taiyi.victory_matrix_assessment.table_applicability_verified",
           "taiyi.victory_matrix_assessment.classical_acceptance_passed",
-          "taiyi.victory_matrix_assessment.real_world_efficacy",
           "taiyi.calendar_summary",
-          "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy"
+          "taiyi.ruleset.classical_acceptance_passed"
         ]
       },
       "taiyi_year_calendar": {
@@ -3029,7 +3000,6 @@
           "taiyi.ruleset.id",
           "taiyi.ruleset.version",
           "taiyi.ruleset.classical_acceptance_passed",
-          "taiyi.ruleset.real_world_efficacy",
           "synthesis.time_scopes",
           "synthesis.limitations"
         ]
@@ -3542,8 +3512,7 @@
           "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.profile",
           "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.contact_counts",
           "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.sources",
-          "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.limitations",
-          "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.real_world_efficacy"
+          "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.limitations"
         ]
       },
       "ashtakavarga_source_profiles": {
@@ -5829,7 +5798,6 @@
           "midpoint_analysis.reading_guide",
           "midpoint_analysis.limitations",
           "midpoint_analysis.original_text_conformance",
-          "midpoint_analysis.real_world_efficacy",
           "midpoint_analysis.interpretations",
           "midpoint_analysis.time_sensitivity.status",
           "midpoint_analysis.time_sensitivity.uncertainty_minutes",
@@ -5951,8 +5919,7 @@
           "midpoint_analysis.solar_arc_analysis.profile",
           "midpoint_analysis.solar_arc_analysis.sources",
           "midpoint_analysis.solar_arc_analysis.rule_trace",
-          "midpoint_analysis.solar_arc_analysis.original_text_conformance",
-          "midpoint_analysis.solar_arc_analysis.real_world_efficacy"
+          "midpoint_analysis.solar_arc_analysis.original_text_conformance"
         ]
       },
       "witte1925_table": {
@@ -5965,7 +5932,6 @@
           "midpoint_analysis.solar_arc_analysis.original_table_1925.worked_example",
           "midpoint_analysis.solar_arc_analysis.original_table_1925.limitations",
           "midpoint_analysis.solar_arc_analysis.original_table_1925.full_original_method_accepted",
-          "midpoint_analysis.solar_arc_analysis.original_table_1925.real_world_efficacy",
           "midpoint_analysis.solar_arc_analysis.profile.key_policy"
         ]
       },
@@ -5983,8 +5949,7 @@
           "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.profile",
           "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.contact_counts",
           "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.sources",
-          "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.limitations",
-          "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.real_world_efficacy"
+          "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.limitations"
         ]
       },
       "mixed_pair_sensitivity": {
@@ -6133,7 +6098,6 @@
           "candidate_relation_analysis",
           "rulesets",
           "interpretation_contract",
-          "validation",
           "summary"
         ]
       },

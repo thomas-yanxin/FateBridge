@@ -46,7 +46,6 @@ def unavailable_meridian_houses() -> dict[str, Any]:
         "version": "1",
         "sources": [SOURCE, SWISS_SOURCE],
         "original_text_conformance": "not_assessed",
-        "real_world_efficacy": "not_tested",
     }
 
 
@@ -179,7 +178,6 @@ def native_meridian_houses(
             "Sampled birth-time ranges do not establish continuous stability, measured Earth orientation, input accuracy or event probabilities",
         ],
         "original_text_conformance": "not_assessed",
-        "real_world_efficacy": "not_tested",
     }
 
 

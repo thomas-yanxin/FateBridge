@@ -6,12 +6,13 @@ import json
 import os
 from collections.abc import Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, NamedTuple, Protocol
+from typing import NamedTuple, Protocol
 
 import pytest
 from fastapi.testclient import TestClient
 from fastmcp import Client
 from fastmcp.client.client import CallToolResult
+from httpx2 import Response
 
 import fatebridge.api as api
 from fatebridge.application import result_delivery as delivery
@@ -36,14 +37,11 @@ from tests.support.transports import (
     surface_calls,
 )
 
-if TYPE_CHECKING:
-    from httpx2 import Response
-
 __all__ = ["rest", "store", "surface_calls"]
 
 
 class SurfaceResponse(NamedTuple):
-    rest: "Response"
+    rest: Response
     mcp: CallToolResult
     cli_exit_code: int
     cli: ServiceResult
@@ -273,7 +271,6 @@ def test_supplementary_receipt_details_do_not_displace_complete_business(
         "run_metadata.provenance",
         "run_metadata.determinism",
     ]
-    assert "business_output_sha256" not in result["run_metadata"]
     assert result["run_metadata"]["runtime"]["ephemeris_files_count"] == 1
     restored = copy.deepcopy(result["run_metadata"])
     for path in ref["deferred_fields"]:

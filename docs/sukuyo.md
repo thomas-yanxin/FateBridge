@@ -33,7 +33,9 @@
 当前合成研究协议检验资料绑定、盲法、完整上下文承诺与统计门槛；合成结果不建立现实有效性。来源校读、软件正确性、解释忠实与真实预测分别验收，分数不表示关系成功概率。
 
 ```bash
-uv run --locked --extra dev pytest -n0 tests/sukuyo/test_sukuyo_profiles.py tests/sukuyo/test_sukuyo_historical_calendar.py tests/sukuyo/test_sukuyo_transports.py
+uv run --locked --extra dev python -m pytest -q tests/sukuyo
 ```
+
+来源脚本按[脚本索引](../scripts/README.md)约定使用 `python -m scripts.sukuyo.<模块>` 入口。完整来源回归及聚合审计需要另外准备 `tests/data` 中的独立转录与采集资料；当前源码检出不附带这些资料，缺项时检查明确失败，不能据可收集的子集称完整来源验证通过。`--capture` 可指定实际出版方采集文件；未提供采集文件的检查不表示重新下载或完成全本校勘。
 
 具体候选、来源与限制随同一次结果交付；完整资料读取同一run的 `result_delivery`，不通过重算替换结果。

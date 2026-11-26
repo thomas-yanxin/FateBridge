@@ -12,11 +12,11 @@ from fatebridge.core.astro.parts import _build_houses, _build_planet_record
 from fatebridge.core.astro.ptolemy import build_ptolemy_layer, sign_relationship
 from fatebridge.core.classical_western import build_planet_classical, ninth_part
 from fatebridge.core.predictive._common import longitude_to_point_dict
-from fatebridge.services.astrology import (
+from fatebridge.services.astrology import calculate_core_chart_analysis
+from fatebridge.services.astrology_snapshot_sections import (
     _build_angle_lines,
     _build_house_lines,
     _build_planet_lines,
-    calculate_core_chart_analysis,
 )
 from tests.unit_test.fixtures.western_natal import GREENWICH_EQUINOX_BIRTH as BIRTH
 

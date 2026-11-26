@@ -7,7 +7,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 from functools import cache
 from importlib.resources import files
-from typing import Dict, List, Literal, Optional, Tuple, TypedDict
+from typing import Literal, TypedDict
 
 from fatebridge.core.ziwei.ziwei_rulesets import (
     DEFAULT_ZIWEI_PROFILE,
@@ -34,20 +34,19 @@ BRIGHTNESS_SOURCE_DESCRIPTION = (
     "取 Renhuai123/ziwei-doushu 固定版本软件对照表。空格为 null，不跨表补值。"
     "安星、历法、四化及运限起法仍按各自规则。"
 )
-_SEVEN_GRADES = tuple("庙旺得利平不陷")
-_FIVE_GRADES = tuple("庙旺平闲陷")
-_COMPATIBILITY_VARIANTS = {
+SEVEN_GRADES = tuple("庙旺得利平不陷")
+FIVE_GRADES = tuple("庙旺平闲陷")
+COMPATIBILITY_VARIANTS = {
     "ziwei_doushu_qs": "QS",
     "ziwei_doushu_xd1": "XD1",
     "ziwei_doushu_zz": "ZZ",
     "ziwei_doushu_xd2": "XD2",
 }
 
-_MUTAGEN_SUFFIXES: Tuple[str, ...] = ("化禄", "化权", "化科", "化忌")
+MUTAGEN_SUFFIXES: tuple[str, ...] = ("化禄", "化权", "化科", "化忌")
 
 # star name -> 12 brightness values (寅-indexed); None = not applicable.
-ZIWEI_STAR_BRIGHTNESS: Dict[str, List[Optional[str]]] = {
-    # --- 14 主星 ---
+ZIWEI_STAR_BRIGHTNESS: dict[str, list[str | None]] = {
     "紫微": ["旺", "旺", "得", "旺", "庙", "庙", "旺", "旺", "得", "旺", "平", "庙"],
     "天机": ["得", "旺", "利", "平", "庙", "陷", "得", "旺", "利", "平", "庙", "陷"],
     "太阳": ["旺", "庙", "旺", "旺", "旺", "得", "得", "陷", "不", "陷", "陷", "不"],
@@ -62,7 +61,6 @@ ZIWEI_STAR_BRIGHTNESS: Dict[str, List[Optional[str]]] = {
     "天梁": ["庙", "庙", "庙", "陷", "庙", "旺", "陷", "得", "庙", "陷", "庙", "旺"],
     "七杀": ["庙", "旺", "庙", "平", "旺", "庙", "庙", "庙", "庙", "平", "旺", "庙"],
     "破军": ["得", "陷", "旺", "平", "庙", "旺", "得", "陷", "旺", "平", "庙", "旺"],
-    # --- 辅煞星 with brightness ---
     "文昌": ["陷", "利", "得", "庙", "陷", "利", "得", "庙", "陷", "利", "得", "庙"],
     "文曲": ["平", "旺", "得", "庙", "陷", "旺", "得", "庙", "陷", "旺", "得", "庙"],
     "火星": ["庙", "利", "陷", "得", "庙", "利", "陷", "得", "庙", "利", "陷", "得"],
@@ -77,28 +75,34 @@ class _BrightnessMetadata(TypedDict):
     source_kind: str
     source_url: str
     version: str
-    branch_order: List[str]
-    grade_scale: List[str]
-    aliases: Dict[str, str]
+    branch_order: list[str]
+    grade_scale: list[str]
+    aliases: dict[str, str]
     blank_meaning: str
+
+
+class BrightnessRulesetFields(TypedDict):
+    brightness_rule: str
+    brightness_table: _BrightnessMetadata
+    unresolved: list[str]
 
 
 @dataclass(frozen=True)
 class ZiweiBrightnessTable:
     _metadata: _BrightnessMetadata
-    _branch_index: Dict[str, int]
-    _rows: Dict[str, List[Optional[str]]]
+    _branch_index: dict[str, int]
+    _rows: dict[str, list[str | None]]
 
     @property
     def id(self) -> str:
         return self._metadata["id"]
 
-    def lookup(self, star: str, branch: str) -> Optional[str]:
+    def lookup(self, star: str, branch: str) -> str | None:
         row = self._rows.get(self._metadata["aliases"].get(star, star))
         index = self._branch_index.get(branch)
         return row[index] if row is not None and index is not None else None
 
-    def ruleset_fields(self, unresolved: List[str]) -> Dict[str, object]:
+    def ruleset_fields(self, unresolved: list[str]) -> BrightnessRulesetFields:
         return {
             "brightness_rule": self.id,
             "brightness_table": deepcopy(self._metadata),
@@ -113,16 +117,16 @@ class ZiweiBrightnessTable:
 
 class _QuanshuBrightness(TypedDict):
     source: str
-    branch_order: List[str]
-    brightness: Dict[str, List[Optional[str]]]
+    branch_order: list[str]
+    brightness: dict[str, list[str | None]]
 
 
 class _CompatibilityBrightness(TypedDict):
     source: str
     revision: str
-    branch_order: List[str]
-    name_aliases: Dict[str, str]
-    tables: Dict[str, Dict[str, List[Optional[str]]]]
+    branch_order: list[str]
+    name_aliases: dict[str, str]
+    tables: dict[str, dict[str, list[str | None]]]
 
 
 @cache
@@ -137,7 +141,7 @@ def _compatibility_brightness() -> _CompatibilityBrightness:
 
 @cache
 def _brightness_table(table_id: str) -> ZiweiBrightnessTable:
-    grades = _SEVEN_GRADES
+    grades = SEVEN_GRADES
     expected_branches = ZIWEI_BRANCH_SEQUENCE
     if table_id == "iztro_2_5_8":
         rows = ZIWEI_STAR_BRIGHTNESS
@@ -159,7 +163,7 @@ def _brightness_table(table_id: str) -> ZiweiBrightnessTable:
         version = "oldid=1963110"
         aliases = {}
     else:
-        variant = _COMPATIBILITY_VARIANTS.get(table_id)
+        variant = COMPATIBILITY_VARIANTS.get(table_id)
         if variant is None:
             raise ParameterError(
                 f"不支持的紫微庙旺表：{table_id!r}",
@@ -179,7 +183,7 @@ def _brightness_table(table_id: str) -> ZiweiBrightnessTable:
         version = compatibility["revision"]
         aliases = compatibility["name_aliases"]
         if variant in {"ZZ", "XD2"}:
-            grades = _FIVE_GRADES
+            grades = FIVE_GRADES
     if branches != expected_branches or any(
         len(row) != len(branches) for row in rows.values()
     ):
@@ -218,18 +222,15 @@ def lookup_star_brightness(
     *,
     rule_profile: str = DEFAULT_ZIWEI_PROFILE,
     brightness_source: ZiweiBrightnessSource = "rule_profile",
-) -> Optional[str]:
+) -> str | None:
     """Return the selected table's literal label, or None with no recorded cell."""
     validate_rule_profile(rule_profile)
     return brightness_table_for(rule_profile, brightness_source).lookup(star, branch)
 
 
-def split_star_mutagen(star_label: str) -> Tuple[str, Optional[str]]:
-    """Split a possibly mutagen-suffixed star label.
-
-    ``"紫微化科"`` -> ``("紫微", "化科")``; ``"天府"`` -> ``("天府", None)``.
-    """
-    for suffix in _MUTAGEN_SUFFIXES:
+def split_star_mutagen(star_label: str) -> tuple[str, str | None]:
+    """Separate a star name from its optional transformation suffix."""
+    for suffix in MUTAGEN_SUFFIXES:
         if star_label.endswith(suffix):
             return star_label[: -len(suffix)], suffix
     return star_label, None

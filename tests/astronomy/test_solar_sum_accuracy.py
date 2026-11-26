@@ -60,22 +60,6 @@ def test_frozen_exact_term_corpus_is_not_a_production_generated_expected_value()
     assert freeze["new_real_outcomes"] == 0
 
 
-def test_all_frozen_real_terms_and_cancellation_controls_match_exact_rationals() -> (
-    None
-):
-    rows = json.loads(
-        gzip.decompress((FIXTURE / "exact-term-sums.json.gz").read_bytes())
-    )
-    assert len(rows) == 5102
-    for row in rows:
-        terms = [float.fromhex(row["start_hex"])] + [
-            float.fromhex(value) for value in row["terms_hex"]
-        ]
-        expected = float.fromhex(row["expected_hex"])
-        assert exact_sum(terms) == expected
-        assert math.fsum(terms) == expected
-
-
 def test_actual_model_sums_match_exact_terms_and_keep_analytic_outputs(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

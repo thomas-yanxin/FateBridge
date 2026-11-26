@@ -20,13 +20,10 @@ import pytest
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish.jyotish import (
-    divisional_chart,
-    nakshatra,
-    positions,
-    varga_longitude,
-    vimshottari,
-)
+from fatebridge.core.jyotish.jyotish import positions
+from fatebridge.core.jyotish.jyotish_charts import divisional_chart
+from fatebridge.core.jyotish.jyotish_dasha_levels import nakshatra, vimshottari
+from fatebridge.core.jyotish.jyotish_vargas import varga_longitude
 from tests.support.ephemeris_case_runtime import native_ephemeris_files  # noqa: F401
 from tests.support.reference_data import read
 

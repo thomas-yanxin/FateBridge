@@ -58,7 +58,6 @@ def sector_profile(ascendant: float) -> dict[str, Any]:
         "coordinate_system": "same longitude frame as chart_profile; independent of the selected 12-house division",
         "astronomical_constellations": False,
         "original_text_conformance": "not_applicable_to_custom_partition",
-        "real_world_efficacy": "not_tested",
         "sources": [
             {
                 "id": "iau_constellations",

@@ -315,7 +315,6 @@ def build_meihua_evidence(
                 "exact_event_timing",
                 "all_topic_judgements",
             ],
-            "real_world_efficacy": "not_tested",
             "authority_certified": False,
         },
     }

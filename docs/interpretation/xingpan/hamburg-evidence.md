@@ -22,7 +22,7 @@
 
 - 原生 `midpoint_analysis` 有 22 因素，包括八个**数学假设点**；`contains_hypothetical` 与因素 `kind/model` 必须保留。这些点不是 NASA/JPL 观测到的天体。顶层七曜 `midpoints/midpoint_aspects` 与原生 90°／45°盘的因素范围和容许度不同。
 - v3 的 `dials.*.two_factor_contacts` 是两个不同因素的本命硬相位。`A=B` 只表示折叠度盘接近：按 `aspect_degrees` 说明 0／45／90／135／180° 类型，按 `separation_degrees` 说明实际夹角，保留 `signed_orb/orb`。`factor_offset_degrees` 是 A−B 的全圆方向偏移，不等于模 180° 的中点轴偏移；180° 对冲不能叫合相。`unique_two_factor_pair_count` 跨盘按因素对去重，仍不是独立事件证据数。几何命中本身不提供尚未审读的原书关键词。
-- `profile.hypothetical_element_source` 说明用库内置参数还是外部 `seorbel.txt`，后者附文件 SHA-256；因素的 `element_name` 保留实际名字。不要把物理星体的 Moshier／Swiss 返回标志当成“假设点也必定用默认轨道”的证据。自定义轨道版本未对照出版社星历时，不套用默认模型已验收的结论。
+- `profile.hypothetical_element_source` 说明用库内置参数还是外部 `seorbel.txt`；因素的 `element_name` 保留实际名字。不要把物理星体的 Moshier／Swiss 返回标志当成“假设点也必定用默认轨道”的证据。自定义轨道版本未对照出版社星历时，不套用默认模型已验收的结论。
 - `A/B=C/D` 的折叠关系不自动表示 `A+B-C=D` 在完整 360°圆上直接占据。核对 `sensitive_point.occupancy/direct_orb`；`folded_only` 不能说成直接合相。中点式转和差式的周期与容许度都加倍，不能混用角偏差。
 - 当前原文含义只覆盖 Udo Rudolph《ABC für Planetenbilder》1996 首版、出版社摘页**印刷页 14／PDF 第 6 页**的 `MA+JU-ZE=MC` 示例。实际 `interpretations` 命中后，才可归因为关于个人目标与行动成效的象征讨论；保留 `source_id/source_section/basis_expression/direct_orb_degrees/maximum_orb_degrees`。
 - `interpretations=[]` 只表示当前没有生成这条限定解释；参考未定时不能把空列表当作已知未命中。它不表示整部书没有其他解释，也不能补写未核对的关键字。相同 `claim_id` 在不同度盘或零弧图重复出现只算同一坐标依据，不增加证据权重。
@@ -58,7 +58,7 @@
 
 ## Witte1924比较换基与镜点
 
-使用`comparative_geometry`视图读取`midpoint_analysis.comparative_geometry`摘要。五个锚点及四点坐标是本命资料的象征几何，镜像轴用实际原生白羊点；恒星显示不能直接按数值0°／90°套轴。框架内名为Aries Point的输入因素同样旋转，轴基准仍取`profile.native_aries_point_longitude`。`defined_anchor_identity`只表示锚点坐标按定义抵消，不能把未解析物理ASC／MC说成已经确定；实际坐标为null时保留其后端形式值限定。生时偏移只覆盖已确认有限样点，不是连续界或概率。原表四行残差仍在，不套用未读的地球宫、事件或第五版反映点章节。规则与完整原表。
+使用`comparative_geometry`视图读取`midpoint_analysis.comparative_geometry`摘要。五个锚点及四点坐标是本命资料的象征几何，镜像轴用实际原生白羊点；恒星显示不能直接按数值0°／90°套轴。框架内名为Aries Point的输入因素同样旋转，轴基准仍取`profile.native_aries_point_longitude`。`defined_anchor_identity`只表示锚点坐标按定义抵消，不能把未解析物理ASC／MC说成已经确定；实际坐标为null时保留其后端形式值限定。生时偏移只覆盖已确认有限样点，不是连续界或概率。原表四行残差仍在，不套用未读的地球宫、事件或第五版反映点章节。规则与完整原表见[比较几何审计](../../../scripts/western/audit_witte_comparative.py)。
 
 ## 交付时保留来源和含义
 

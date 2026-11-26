@@ -8,22 +8,19 @@ from typing import Any
 from fatebridge.core.almanac import build_calendar_context
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.divination import lookup_hexagram_by_code
+from fatebridge.core.liuyao.liuyao_calendar_models import month_model_comparison
 from fatebridge.core.liuyao.liuyao_casting import (
     CoinToss,
     cast_hexagram_code,
     cast_lines_from_codes,
     changed_hexagram_code,
     coin_cast,
-)
-from fatebridge.core.liuyao.liuyao_casting import (
-    needs_random_coin_cast as needs_random_coin_cast,
-)
-from fatebridge.core.liuyao.liuyao_casting import (
     normalize_cast_lines,
     random_coin_tosses,
     validate_hexagram_code,
 )
 from fatebridge.core.liuyao.liuyao_evidence import build_liuyao_evidence
+from fatebridge.core.liuyao.liuyao_fanfu import build_fanfu_evidence
 from fatebridge.core.liuyao.liuyao_najia import (
     BAGONG_BASES,
     build_sixyao_enrichment,
@@ -318,8 +315,6 @@ def build_sixyao_result(
         event_horizon=event_horizon,
     )
 
-    from fatebridge.core.liuyao.liuyao_calendar_models import month_model_comparison
-
     month_context = context["calendar_context"]["bazi_month_boundary"]
     comparison = month_model_comparison(
         context["moment"],
@@ -331,8 +326,6 @@ def build_sixyao_result(
     )
     if comparison is not None:
         evidence["calendar_conventions"]["month_model_comparison"] = comparison
-
-    from fatebridge.core.liuyao.liuyao_fanfu import build_fanfu_evidence
 
     # The full changed chart is a structural comparison. It must never
     # populate changed_branch on an original static line.

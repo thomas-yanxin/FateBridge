@@ -10,8 +10,7 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.contracts.output_jyotish import DashaExactFraction, Vimshottari
-from fatebridge.core.jyotish.jyotish import vimshottari
-from fatebridge.core.jyotish.jyotish_dasha_levels import active_levels
+from fatebridge.core.jyotish.jyotish_dasha_levels import active_levels, vimshottari
 from fatebridge.services.jyotish import calculate_vimshottari
 from tests.fixtures.surface_payloads import astro_payload
 from tests.support.ephemeris_case_runtime import native_ephemeris_files  # noqa: F401

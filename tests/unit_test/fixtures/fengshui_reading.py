@@ -1,6 +1,5 @@
 """Shared natal inputs and independent printed chart examples."""
 
-import json
 from copy import deepcopy
 from pathlib import Path
 
@@ -12,10 +11,6 @@ from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.fengshui import payload
 
 PRINTED_CHART_FOLDER = Path(__file__).parents[2] / "data/fengshui_structure_reading_v1"
-
-PRINTED_CHART_REFERENCE = json.loads(
-    (PRINTED_CHART_FOLDER / "printed-charts.json").read_text()
-)
 
 MOUNTAINS = natal_rules()["mountains"]
 

@@ -247,7 +247,6 @@ def build_seasonal_qualification(
         "net_verdict": None,
         "event_time": None,
         "summary": "".join(parts),
-        "real_world_efficacy": "not_established",
     }
 
     result["volume3_qualification"] = build_strength_exceptions(role_rows, control)

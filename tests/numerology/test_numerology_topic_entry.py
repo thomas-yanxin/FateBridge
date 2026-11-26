@@ -163,7 +163,8 @@ def test_reference_capture_labels_full_catalog_before_any_model(
             pass
 
         async def call_tool(self, name, arguments, raise_on_error=False):
-            assert name == "heluo" and arguments["fields"] is None
+            assert name == "run_calculation" and arguments["tool"] == "heluo"
+            assert arguments["fields"] is None
             return SimpleNamespace(
                 is_error=False,
                 structured_content={"run_metadata": {"run_id": "reference-only"}},

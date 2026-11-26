@@ -37,8 +37,8 @@ from fatebridge.core.metaphysics.taiyi_dangshi import (
     noble_source_assessment,
     noble_source_text,
 )
+from fatebridge.core.metaphysics.taiyi_evidence import evidence_text
 from fatebridge.core.metaphysics.taiyi_long_cycles import long_cycle_text
-from fatebridge.core.metaphysics.taiyi_year import evidence_text
 from fatebridge.utils.formatting import create_pillar_dict
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 
@@ -96,7 +96,6 @@ def _source_profiles(qimen: dict[str, Any], liureng: dict[str, Any]) -> dict[str
                 "source_urls",
                 "classical_conformance",
                 "classical_acceptance_passed",
-                "real_world_efficacy",
             )
             if key in ruleset
         }
@@ -391,7 +390,6 @@ def build_sanshiunited_result(
             "noble_source_assessment": noble_assessment,
             "agreement": "not_assessed_without_shared_event_and_adjudication_rule",
             "independent_evidence_count": None,
-            "real_world_efficacy": "not_tested",
             "limitations": [
                 (
                     (

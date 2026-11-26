@@ -7,7 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from fatebridge.core.public_output import public_value
+from fatebridge.core.public_output import public_value, same_public_value
 from fatebridge.utils.errors import FengshuiCalculationError
 
 DATA_SHA256 = "11e5b866a930baebe2dc4c6145e6bc2c9d4c3ecff994e83ea63b7f984beb7659"
@@ -173,30 +173,42 @@ def validate_author_geometries(
     natal: dict[str, Any],
     *,
     current: int | None,
-    require_current_version: bool = False,
+    expected_selected: bool = False,
 ) -> dict[str, int]:
     """Bind every role's trace to the actual candidate, not its copied numbers."""
     counts = {"checked": 0, "diagram_derived": 0, "five_table_only": 0, "unknown": 0}
     try:
         profile = interpretation.get("timeliness_ruleset")
+        author_traces = [
+            record
+            for record in interpretation["rule_trace"]
+            if record["rule_id"] == "wang_zhongzhou_timeliness_v1.basic_phase"
+        ]
         if profile is None:
-            _require(not require_current_version)
-            return counts
-        _require(profile["ruleset_id"] == "wang_zhongzhou_timeliness_v1")
-        modern = profile["version"] == "1.1.0"
-        _require(
-            modern or (profile["version"] == "1.0.0" and not require_current_version)
-        )
-        if modern:
+            _require(not expected_selected and not author_traces)
             _require(
                 all(
-                    public_value(
-                        profile["geometry_provenance"]["source_diagrams"][layout]
-                    )
-                    == public_value(_facts()[layout])
-                    for layout in ("earlier_heaven", "later_heaven")
+                    "author_classification" not in palace["timeliness"][role]
+                    for candidate in interpretation["candidates"]
+                    for palace in candidate["palaces"].values()
+                    for role in ("mountain", "facing")
                 )
             )
+            return counts
+        traces_by_identity = {
+            (record["candidate_id"], record["direction"], record["star_role"]): record
+            for record in author_traces
+        }
+        _require(len(traces_by_identity) == len(author_traces))
+        _require(profile["ruleset_id"] == "wang_zhongzhou_timeliness_v1")
+        _require(profile["version"] == "1.1.0")
+        _require(
+            all(
+                public_value(profile["geometry_provenance"]["source_diagrams"][layout])
+                == public_value(_facts()[layout])
+                for layout in ("earlier_heaven", "later_heaven")
+            )
+        )
         _require(
             type(interpretation["current_period_context"]["number"]) is type(current)
         )
@@ -248,8 +260,19 @@ def validate_author_geometries(
                         and author["current_period_number"] == current
                     )
                     validate_author_phase(author, number=number, current=current)
-                    if not modern:
-                        continue
+                    _require(
+                        same_public_value(
+                            traces_by_identity[
+                                (candidate["candidate_id"], direction, role)
+                            ],
+                            {
+                                "candidate_id": candidate["candidate_id"],
+                                "direction": direction,
+                                "star_role": role,
+                                **author,
+                            },
+                        )
+                    )
                     value = author["mutual_use_reference"]["geometry"]
                     validate_mutual_geometry(value, number=number, current=current)
                     counts["checked"] += 1
@@ -262,6 +285,7 @@ def validate_author_geometries(
                             )
                         )
                     ] += 1
+        _require(counts["checked"] == len(author_traces))
         return counts
     except (KeyError, TypeError, IndexError, AttributeError) as error:
         raise FengshuiCalculationError("natal_mutual_geometry_inconsistent") from error
@@ -270,7 +294,7 @@ def validate_author_geometries(
 def validate_author_phase(
     author: dict[str, Any], *, number: int, current: int | None
 ) -> None:
-    """Validate the old basic-table contract too, without awarding new geometry."""
+    """Validate basic phase and printed membership independently of geometry."""
     offset = None if current is None else (number - current) % 9
     phase = "unknown"
     if offset is not None:

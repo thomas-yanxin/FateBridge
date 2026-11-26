@@ -116,7 +116,6 @@ class TaiyiRuleset(PartialOutput):
     time_granularity: str | None = None
     classical_conformance: str | None = None
     classical_acceptance_passed: bool | None = None
-    real_world_efficacy: str | None = None
     unresolved: list[str] | None = None
 
 

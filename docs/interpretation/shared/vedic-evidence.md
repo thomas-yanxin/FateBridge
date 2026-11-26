@@ -85,9 +85,7 @@ v17在`clock_context.source_comparison`回显原钟面重算、原始太阳来�
 
 实际原因为`position_motion_not_converged`时，是运动差分没有满足内部收敛线；不能自动解释为出生资料不足、文件缺失或人生事件不确定。补齐文件不保证解除数值收敛错误，应保留被拒绝状态并转工程核查。冻结验收快照中2400年连接处的两个建盘入口限制是预期失败，未计为准确度通过；其他已独立返回的有效层仍按其证据范围解释。
 
-Delta-T／UT1来源仍有已复现的缺口：旧外部表或固定值设置可能影响上升，当前物理星历来源及complete状态不能排除这种运行时历史。若已确认有这类设置或可复现异常，应由工程入口核对新进程与实际时间来源，再从原始资料复算；不能让咨询用户补生时、改钟时或把差异解释为吉凶。普通新线程在本轮macOS与Linux绑定表现不同，不作为跨平台修复保证。Delta-T状态与当前支持范围见[时间来源测试](../../../tests/jyotish/test_jyotish_sources.py)；未接入的防护原型不算现行能力。
-
-完整原生上下文：v18的`india.profile.native_execution_context`说明本次计算使用新exec进程及辅助时间文件的首末完整性核对范围。它解决共享进程的旧Delta-T／固定值污染；不是测得UT1、辅助表数值正确或现实预测有效的证明。当前选中的外部表仍会影响结果，不能把隔离等同于自动纠正运行者输入的表。当前回归入口见[钟时来源测试](../../../tests/jyotish/test_jyotish_clock_sources.py)。
+完整原生上下文：读取`india.profile.native_execution_context`核对本次新exec进程及辅助时间文件的首末完整性范围。隔离解决共享进程的旧Delta-T／固定值污染，当前选中的外部表仍会影响结果；complete不认证测得UT1或辅助表数值正确。来源异常转工程入口核对新进程、实际时间来源及所选表，再从原始资料复算，不能让咨询用户补生时、改钟时或把差异解释为吉凶。Delta-T范围见[时间来源测试](../../../tests/jyotish/test_jyotish_sources.py)，隔离回归见[钟时来源测试](../../../tests/jyotish/test_jyotish_clock_sources.py)。
 
 v19可选太阳时显示使用记录时刻的共享TT／模型UT1与太阳时角，读取`clock_context.solar_display_context`核对实际来源。其`solar_wall_datetime`不带时区，`physical_instant_shifted=false`；不能将墙钟标签再作民用时间重排，不能把微秒格式当作出生资料或实测地球自转精度。SDK旧派生标签可以重算，已确认的记录钟时与物理UTC保持不变。
 
@@ -95,8 +93,6 @@ v19可选太阳时显示使用记录时刻的共享TT／模型UT1与太阳时角
 
 若`native_execution_context.compressed_file_endpoint_policy`有修正记录，先区分原生端点星位修正与后续保持传入中心的求导。`original_native_state/selected_native_state`说明计算上下文造成的数值修正，`selection_anchor_jd_tt`不是替代生时；按实际`input_instant_shifted`与原`julian_day_tt`核对。记录中的调用数和重复记录不是独立天文样本或预测命中数。普通木星／土星采用系统质心，不能将它们说成已计算另需旗标和卫星文件的本体中心；缺少对应层或错误时不补造。检查范围见[端点审计](../../../scripts/jyotish/audit_jyotish_endpoints.py)。
 
-若`chart_profile.apparent_position_policy`把某物理天体标为`behind_solar_disc`／`virtual_continuous_solar_disc_extension`，它是模型太阳内部的虚拟方向，不是已证明可观测的星位；即使与另一软件残差低于阈值，也不认证实际观测精度。不得把未返回该分类当作已排除这一状态；独立印度／达沙输出对此层的直接提示仍待完善。
-
 v2私有坐标来源：以`india.profile.native_coordinate_contexts`逐项核对原TT和实际帧；`original_native_state=null`／`native_state_changed=null`表示没有先计算不可信的旧目标，不能解读为旧星位精确保留或已量化其变化。`native_execution_context`中的修正计数可包含预选太阳，不是不同出生或事件的数量。原生日出搜索和第三方直接调用仍不是逐点认证的范围。
 
-印度／达沙已直接返回`india.profile.apparent_position_policy`与D1逐星`native_position_interpretation`；达沙同生时的运主分组保留其离散含义。读到虚拟方向仍可解释本次数学坐标下的传统规则，但不得说成可观测星位已获实测认证；不能把该物理含义搬到D9／D10的盘内坐标。不同样本的区域变化须保留，调用数、分组数、数值一致性均不是预测命中率。
+印度／达沙直接返回`india.profile.apparent_position_policy`与D1逐星`native_position_interpretation`；达沙同生时的运主分组保留其离散含义。`behind_solar_disc`／`virtual_continuous_solar_disc_extension`表示模型太阳内部的虚拟方向，仍可解释本次数学坐标下的传统规则，但不认证可观测星位或实测精度，软件残差低于门槛也不例外。未返回该分类不等于已排除该状态，不能把物理含义搬到D9／D10的盘内坐标。不同样本的区域变化须保留，调用数、分组数、数值一致性均不是预测命中率。

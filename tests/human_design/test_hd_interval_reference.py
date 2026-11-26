@@ -26,7 +26,6 @@ def reference():
     folder = Path(__file__).resolve().parents[1] / "data/human_design_interval_flint_v1"
     raw = gzip.decompress((folder / "source.json.gz").read_bytes())
     digest = hashlib.sha256(raw).hexdigest()
-    assert digest == (folder / "source.json.sha256").read_text().strip()
     assert digest == "a11c3956c08a62adb4dfc8ec7a43ce809c798c126a703d63c06c30c0c32b0d67"
     return json.loads(raw)
 

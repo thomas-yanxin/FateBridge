@@ -93,7 +93,8 @@ def test_scope_transformations_join_to_actual_natal_star_data(birth) -> None:
         palace = next(
             p for p in natal["palaces"] if p["ganzhi"] == scope["palace_ganzhi"]
         )
-        assert scope["natal_palace_name"] == scope["palace_name"] == palace["name"]
+        assert scope["natal_palace_name"] == palace["name"]
+        assert "palace_name" not in scope
         assert len(scope["mutagen_natal_links"]) == 4
         for link in scope["mutagen_natal_links"]:
             assert link["status"] == "matched"

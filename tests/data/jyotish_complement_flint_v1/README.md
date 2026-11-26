@@ -27,7 +27,7 @@ formulas are independently rounded; no intermediate displayed complement is used
 
 The original5608solar cases and4664Nathonnatha cases/19600failed scalar fields are
 retained, with all inputs and outputs, outside the repository at
-`/Users/thomas/.codex/artifacts/fatebridge-jyotish-complement-precision-20261112/`.
+the external archive `fatebridge-jyotish-complement-precision-20261112`.
 After the arithmetic fix all four fixed batches match. Ordinary tests read
 frozen expectations; they do not regenerate them from production.
 

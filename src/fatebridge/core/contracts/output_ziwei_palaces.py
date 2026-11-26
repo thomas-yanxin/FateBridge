@@ -111,7 +111,6 @@ class ZiweiRuleset(PartialOutput):
     brightness_table: ZiweiBrightnessTableReceipt | None = None
     classical_conformance: str | None = None
     unresolved: list[str] | None = None
-    real_world_efficacy: str | None = None
 
 
 class ZiweiRuleTrace(PartialOutput):

@@ -292,7 +292,7 @@ _TOOL_FIELDS = {
     "canping": "analysis_context analysis_type benming calendar_context day_palace_branch dayun element four_pillars input_normalized liunian_series ming_gong part_name summary numerology_evidence canping_timing",
     "heluo": "analysis_context analysis_type calendar_context chart dayun four_pillars input_normalized judge solar_term summary numerology_evidence heluo_timing jiehou_evidence",
     "suzhan": "analysis_type astronomy chart input_normalized params rulesets sukuyo validation summary",
-    "sukuyo_compatibility": "analysis_type status pair person1 person1_to_person2 person2 person2_to_person1 candidate_relation_analysis su27_basis rulesets interpretation_contract validation summary",
+    "sukuyo_compatibility": "analysis_type status pair person1 person1_to_person2 person2 person2_to_person1 candidate_relation_analysis su27_basis rulesets interpretation_contract summary",
     "otherbu": "analysis_type chart diceChart house input_normalized planet question sign summary method_id symbolic_details rulesets rule_trace validation",
     "sanshiunited": "analysis_context analysis_type input_normalized liureng qimen subresults summary taiyi",
     "ziwei_birth": "analysis_context analysis_type calendar_context four_pillars person_info ziwei_birth",

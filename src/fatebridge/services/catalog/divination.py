@@ -92,7 +92,7 @@ calculate_tongshefa_analysis = lazy_service(
 
 
 def _sixyao_needs_seed(data: dict[str, ServiceInput]) -> bool:
-    from fatebridge.core.local_techniques.sixyao import needs_random_coin_cast
+    from fatebridge.core.liuyao.liuyao_casting import needs_random_coin_cast
 
     return needs_random_coin_cast(data)
 

@@ -226,7 +226,6 @@ def enrich_qimen_evidence(
             "source_kind": "online_transcription_with_selected_scan_comparison",
             "scan_collation": {
                 "source": SCAN_SOURCE,
-                "source_sha256": "58f7596ff01debe06f447ecbd3a67be4b95a5ab45df98defb04c943f1537f8d3",
                 "pages": [
                     7,
                     13,

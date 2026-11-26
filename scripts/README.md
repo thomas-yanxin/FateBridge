@@ -15,7 +15,6 @@ uv run --locked --extra dev python scripts/run_ci_checks.py
 | 任务 | 入口 |
 | --- | --- |
 | 文档链接、代码块和 JSON 语法 | [check_docs.py](check_docs.py) |
-| 细粒度算法清单的计数、入口和源码引用 | [check_algorithm_inventory.py](check_algorithm_inventory.py)，只检查索引一致性，不认证算法覆盖或精度 |
 | 连续星历系数的无损存储 | [astronomy/build_coefficient_archives.py](astronomy/build_coefficient_archives.py)，从五份原始DE440提取暂存件及连续DE441源构建两个运行时档案；`--check`核对分发数据，使用方法见[星历说明](../docs/ephemeris.md) |
 | 按需调用合同 | [build_codex_call_contracts.py](build_codex_call_contracts.py)；生成后用 `--check` 核对 |
 | 自包含 CI 集合 | [run_ci_checks.py](run_ci_checks.py)，分片插件为 [ci_sharding.py](ci_sharding.py) |
@@ -54,7 +53,7 @@ uv run --locked --extra dev python -m scripts.astronomy.audit_solar_model_refere
 
 新增脚本放入所属领域，先检查现有入口能否扩展；通用开发命令才留在顶层。领域之间用完整包路径导入，领域命令优先使用 `python -m scripts.<领域>.<模块>`；明确支持的直接文件入口另行验证。不要给移动后的脚本另留一份兼容包装。
 
-独立参考生成器即使不被生产代码导入，也可能承担来源复现职责。退役前检查测试、CI、文档、其他脚本及原始来源记录；保存仍有价值的参考、失败与取得方法。原始资料在 `tests/data/`、`tests/fixtures/` 或外部固定档案中维护，不混入脚本目录。完整规则见[仓库维护](../docs/repository-maintenance.md)。
+独立参考生成器即使不被生产代码导入，也可能承担来源复现职责。退役前检查测试、CI、文档、其他脚本及原始来源记录；保存仍有价值的参考、失败与取得方法。原始资料在 `tests/data/`、`tests/fixtures/` 或外部固定档案中维护，不混入脚本目录。完整规则见[仓库维护](../docs/development-guide.md#仓库维护)。
 
 太阳TT固定参考使用 [astronomy/build_solar_term_reference.py](astronomy/build_solar_term_reference.py) 生成自带生成源码的独立资料包，读取与固定身份校验由 [astronomy/solar_term_reference.py](astronomy/solar_term_reference.py) 维护。复现环境、内核和范围见[资料说明](../tests/data/solar_tt_de440_v1/README.md)；日常回归使用 `tests/astronomy/test_solar_term_reference.py`。接受外部矩阵的TT诊断保留模块入口 `uv run --locked --extra dev python -m scripts.ren.audit_ren_model_tt --help`，分别报告现行参考来源、旧侧件缺口和原刊载分钟失败。
 
@@ -76,7 +75,6 @@ WMM2025精确WGS84参考由[独立多项式生成器](fengshui/build_fengshui_wm
 | --- | --- |
 | 梅花取数、历表、原典和天气规则 | `uv run --locked --extra dev python -m pytest -q tests/meihua`；研究绑定统一用 `python -m scripts.meihua.audit_meihua_weather_study --check trace`；检查项可选 `trace`、`calendar`、`solar` 或 `context-capacity`，原始资料与报告路径另行指定；参考采集保留独立入口 |
 | 六爻来源配置 | `python -m scripts.liuyao.build_profile --check`；可在 `--check` 前选 `role`、`strength` 等配置，专门扫描／勘误仍由对应构建器处理 |
-| 八字未来时钟 | [执行器](bazi/audit_bazi_dayun_future_clocks_shard.py)默认完整单片，分片时明确提供索引与数量；[合并器](bazi/merge_bazi_future_clock_shards.py)校验完整队列、顺序、未知与失败 |
 | 人类图 Profile | [完整队列审计](human_design/audit_human_design_profile_full_coverage.py)，保留19／193例、768计划及缺项 |
 | 参评 DE440 投影资料 | `python -m scripts.numerology.build_canping_projection_profile --kernel <de440.bsp> --profile original --check`；第二份固定队列用 `--profile extended`，两份协议与原始字节分别验证 |
 | AA1996来源构建 | `python -m fatebridge.fetch_aa1996`，见[太阳后端](../docs/solar-backends.md) |

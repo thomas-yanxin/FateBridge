@@ -16,6 +16,7 @@ from fatebridge.application.examples import suggested_fields
 from fatebridge.cli import run
 from fatebridge.core.contracts.output_chinese import TaiyiCounterCycles
 from fatebridge.core.metaphysics import taiyi_year
+from fatebridge.core.metaphysics.taiyi_board import assemble_board
 from fatebridge.core.metaphysics.taiyi_cycles import counter_cycles, counter_cycles_text
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.divination import calculate_sanshiunited_analysis
@@ -45,7 +46,7 @@ def test_full887_counter_is_retained_with_different_sixty_and_seventy_two_positi
 ):
     core = taiyi_year.cyclic_core(887)
     core.update(suijun="子", heshen="丑")
-    board = taiyi_year.assemble_board(core, calculation_mode="hour")
+    board = assemble_board(core, calculation_mode="hour")
     assert "counter_cycles" in board
     cycles = board["counter_cycles"]
     assert cycles["counter"] == board["core_board"]["accumulation"] == 887

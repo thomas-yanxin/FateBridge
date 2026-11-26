@@ -25,3 +25,6 @@ JINKOU_SCAN_URL = "https://upload.wikimedia.org/wikipedia/commons/1/10/CNTS-0004
 
 
 JINKOU_RELATIONS_SOURCE = "https://upload.wikimedia.org/wikipedia/commons/e/e1/CNTS-00047981961_1_六壬神課金口訣.pdf"
+JINKOU_RELATIONS_SCAN_SHA256 = (
+    "dfa4b039f30100eb75a8fe21904256bc4e47c04538c8602d08aec9e7f7646364"
+)

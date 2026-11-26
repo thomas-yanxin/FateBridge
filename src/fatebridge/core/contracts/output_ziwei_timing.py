@@ -78,7 +78,6 @@ class ZiweiScope(PartialOutput):
     branch_index: int | None = None
     stem: str | None = None
     palace_ganzhi: str | None = None
-    palace_name: str | None = None
     scope_palace_role: str | None = None
     natal_palace_name: str | None = None
     mutagen: dict[str, str] | None = None

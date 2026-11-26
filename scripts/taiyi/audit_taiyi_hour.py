@@ -8,12 +8,14 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Any
 
+from fatebridge.core.metaphysics.taiyi_board import assemble_board
 from fatebridge.core.metaphysics.taiyi_gates import (
     attach_gate_board,
     key_hour_gate_cycle,
 )
+from fatebridge.core.metaphysics.taiyi_geometry import BRANCHES
 from fatebridge.core.metaphysics.taiyi_hour import KEY_HOUR_PROFILE
-from fatebridge.core.metaphysics.taiyi_year import BRANCHES, assemble_board, cyclic_core
+from fatebridge.core.metaphysics.taiyi_year import cyclic_core
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/taiyi_jinjing_v6"

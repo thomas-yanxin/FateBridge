@@ -18,6 +18,10 @@ from fatebridge.core.astro.aberration_math import (
     aberration_position_jvp,
     longitude_rate_change,
 )
+from fatebridge.core.astro.jpl_kinematics import (
+    checked_fixed_acceleration,
+    source_kinematics,
+)
 from fatebridge.core.astro.motion_source_window import observed_windows
 from fatebridge.core.compressed_ephemeris import preserve_native_observer_sample_context
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
@@ -275,11 +279,6 @@ def lunar_observer_remainder(
         check_context()
         estimates = []
         if model == "jpl":
-            from fatebridge.core.astro.jpl_kinematics import (
-                checked_fixed_acceleration,
-                source_kinematics,
-            )
-
             raw, source_policy = source_kinematics(Path(context[0][0]), epoch, "Earth")
             acceleration, rotation_policy = checked_fixed_acceleration(
                 raw, earth_center[0]

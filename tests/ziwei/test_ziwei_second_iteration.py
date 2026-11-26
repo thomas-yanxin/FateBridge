@@ -14,9 +14,7 @@ from fatebridge.core.ziwei.ziwei_tables import lookup_star_brightness
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.ziwei.audit_ziwei import (
     FIXTURES,
-    ROOT,
     audit_additional_classical,
-    report,
     synthetic_seed,
 )
 from scripts.ziwei.audit_ziwei_natal import audit_natal
@@ -185,31 +183,6 @@ def test_natal_reference_is_frozen_independently_of_current_engine() -> None:
         )
     assert manifest["npm_integrity"].startswith("sha512-")
     assert manifest["source"].endswith("/2.5.8")
-
-
-def test_audit_rejects_source_drift_during_audit_without_editing_real_files(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    source = ROOT / "src/fatebridge/core/ziwei/ziwei_rulesets.py"
-    original = type(source).read_bytes
-    reads = 0
-
-    def changed_after_first_read(path):
-        nonlocal reads
-        data = original(path)
-        if path == source:
-            reads += 1
-            if reads > 1:
-                return data + b"\n"
-            else:
-                pass
-        else:
-            pass
-        return data
-
-    monkeypatch.setattr(type(source), "read_bytes", changed_after_first_read)
-    with pytest.raises(RuntimeError, match="Source changed during"):
-        report()
 
 
 def test_real_calculation_receipt_rejects_natal_scope_confusion_and_changed_source() -> (

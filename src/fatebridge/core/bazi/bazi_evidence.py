@@ -52,6 +52,7 @@ from fatebridge.core.hidden_carriers import (
 from fatebridge.core.month_duty_reference import build_month_duty_reference
 from fatebridge.core.month_use import match_month_uses
 from fatebridge.core.passage_relations import build_passage_relation_context
+from fatebridge.core.source_identity import ZIPING_ZHENQUAN_NLC_SCAN_URL
 from fatebridge.core.star_occurrences import build_star_occurrences
 from fatebridge.core.timing_carriers import SCOPE as CARRIER_SCOPE
 from fatebridge.core.timing_carriers import SOURCE as CARRIER_SOURCE
@@ -76,10 +77,7 @@ from fatebridge.utils.data import (
 
 Pillars = Mapping[str, tuple[str, str]]
 ORDER = ("year", "month", "day", "hour")
-SOURCE_URL = (
-    "https://upload.wikimedia.org/wikipedia/commons/f/fe/"
-    "NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf"
-)
+SOURCE_URL = ZIPING_ZHENQUAN_NLC_SCAN_URL
 RULESETS = [
     {
         "id": "ziping_prerequisites_v1",

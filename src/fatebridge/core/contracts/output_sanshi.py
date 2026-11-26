@@ -74,7 +74,6 @@ class SanshiSourceProfile(PartialOutput):
     source_title: str | None = None
     classical_conformance: str | None = None
     classical_acceptance_passed: bool | None = None
-    real_world_efficacy: str | None = None
     unresolved_count: int | None = None
 
 
@@ -124,5 +123,4 @@ class SanshiSynthesis(PartialOutput):
     noble_source_assessment: NobleSourceAssessment | None = None
     agreement: str | None = None
     independent_evidence_count: int | None = None
-    real_world_efficacy: str | None = None
     limitations: list[str] | None = None

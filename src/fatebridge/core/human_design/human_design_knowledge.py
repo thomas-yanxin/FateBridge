@@ -4,6 +4,13 @@ from __future__ import annotations
 
 from copy import deepcopy
 
+from fatebridge.core.human_design import (
+    human_design_knowledge_v3,
+    human_design_knowledge_v4,
+    human_design_knowledge_v5,
+    human_design_knowledge_v6,
+    human_design_knowledge_v7,
+)
 from fatebridge.core.human_design.human_design_line_catalogue import (
     DOMAIN,
     SOURCE,
@@ -21,14 +28,6 @@ from fatebridge.core.human_design.human_design_references import (
 
 def build_registry() -> dict:
     with coherent_human_design_references():
-        from fatebridge.core.human_design import (
-            human_design_knowledge_v3,
-            human_design_knowledge_v4,
-            human_design_knowledge_v5,
-            human_design_knowledge_v6,
-            human_design_knowledge_v7,
-        )
-
         data, raw = _catalogue()
         provenance = _provenance(data, raw)
         categories = [
@@ -71,33 +70,14 @@ def build_registry() -> dict:
 
 def read_reference(*, category: str | None, key: str | None) -> dict:
     if category == "lines_v7":
-        from fatebridge.core.human_design.human_design_knowledge_v7 import (
-            read_reference as read_v7,
-        )
-
-        return read_v7(key=key)
-    if category == "lines_v6":
-        from fatebridge.core.human_design.human_design_knowledge_v6 import (
-            read_reference as read_v6,
-        )
-
-        return read_v6(key=key)
-    if category == "lines_v5":
-        from fatebridge.core.human_design.human_design_knowledge_v5 import (
-            read_reference as read_v5,
-        )
-
-        return read_v5(key=key)
-    if category == "lines_v4":
-        from fatebridge.core.human_design.human_design_knowledge_v4 import (
-            read_reference as read_v4,
-        )
-
-        return read_v4(key=key)
-    if category == "lines_v3":
-        from fatebridge.core.human_design.human_design_knowledge_v3 import (
-            read_reference as read_v3,
-        )
-
-        return read_v3(key=key)
-    return read_base_reference(category=category, key=key)
+        return human_design_knowledge_v7.read_reference(key=key)
+    elif category == "lines_v6":
+        return human_design_knowledge_v6.read_reference(key=key)
+    elif category == "lines_v5":
+        return human_design_knowledge_v5.read_reference(key=key)
+    elif category == "lines_v4":
+        return human_design_knowledge_v4.read_reference(key=key)
+    elif category == "lines_v3":
+        return human_design_knowledge_v3.read_reference(key=key)
+    else:
+        return read_base_reference(category=category, key=key)

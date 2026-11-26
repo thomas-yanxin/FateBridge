@@ -315,13 +315,9 @@ def liunian_series(
     start_age: int = 1,
     end_age: int = 120,
 ) -> dict[str, Any]:
-    """全表流年：自 ``start_age`` 至 ``end_age`` 虚岁逐岁起数。
+    """按虚岁与实际大运支逐岁起数，起运前不生成编号或诗文。
 
-    太岁(当年年支)替日宫支、当时大运支替时支起数；每岁按虚岁定位所属大运。
-    ``birth_year`` 是出生年柱对应的起始年标签；立春前可能比公历出生年小一。
-    未提供出生瞬间的固定四柱调用不能静默接受与年柱矛盾的年标签。
-    未知公历年（None，兼容旧0）仍按已知年干支推进相对年序，不猜世纪。
-    起运年龄之前没有活动大运，不生成流年编号或诗文；本表不映射UTC区间。
+    birth_year 为年柱对应的起始年标签；None 只推进相对干支年序，不映射UTC区间。
     """
     if (
         type(start_age) is not int
@@ -332,9 +328,9 @@ def liunian_series(
         raise ValueError("年序年龄范围须为从1起的有序整数。")
     if type(qiyun_age) is not int or qiyun_age < 0:
         raise ValueError("起运年龄须为明确的非负整数。")
-    if birth_year is not None and (type(birth_year) is not int or birth_year < 0):
-        raise ValueError("公历年标签须为正整数；未知用None或0，不能用布尔值代替。")
-    if birth_year and _year_ganzhi(birth_year) != year_gz:
+    if birth_year is not None and (type(birth_year) is not int or birth_year < 1):
+        raise ValueError("公历年标签须为正整数；未知用None，不能用布尔值代替。")
+    if birth_year is not None and _year_ganzhi(birth_year) != year_gz:
         raise ValueError("流年起始年标签须与出生年柱一致；立春前不能直接用公历出生年。")
     result = calculate(
         year_gz=year_gz,
@@ -369,7 +365,7 @@ def liunian_series(
 
     rows: list[dict[str, Any]] = []
     for age in range(start_age, end_age + 1):
-        year = birth_year + age - 1 if birth_year else None
+        year = birth_year + age - 1 if birth_year is not None else None
         ganzhi = cycle[(birth_cycle_index + age - 1) % 60]
         taisui = ganzhi[1]
         row: dict[str, Any] = {
@@ -399,10 +395,10 @@ def liunian_series(
         "dayun": dayun,
         "rows": rows,
         "qiyunAge": qiyun_age,
-        "birth_pillar_year": birth_year or None,
+        "birth_pillar_year": birth_year,
         "year_boundary": (
             "provided_year_labels_only"
-            if birth_year
+            if birth_year is not None
             else "relative_ganzhi_year_labels_only"
         ),
         "age_policy": "relative_sexagenary_year_ordinal; no_actual_boundaries",

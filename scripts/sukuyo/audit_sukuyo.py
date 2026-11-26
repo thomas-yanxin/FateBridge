@@ -12,250 +12,91 @@ import hashlib
 import importlib.metadata
 import json
 import platform
-import sys
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest.mock import patch
+
+import pytz
+
+import fatebridge.core.sukuyo.sukuyo_sanjiu_days as sanjiu_days
+from fatebridge.core import ephemeris_runtime
+from fatebridge.core.astro.birth import build_astro_birth_info
+from fatebridge.core.sukuyo.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_activities import source_bundle
+from fatebridge.core.sukuyo.sukuyo_calendar_text import (
+    calendar_day_evidence,
+    month_table_variant,
+)
+from fatebridge.core.sukuyo.sukuyo_calendar_text import (
+    source_bundle as day_source_bundle,
+)
+from fatebridge.core.sukuyo.sukuyo_clothing import clothing_reference
+from fatebridge.core.sukuyo.sukuyo_date_support import local_date_support
+from fatebridge.core.sukuyo.sukuyo_directions import (
+    source_bundle as direction_source_bundle,
+)
+from fatebridge.core.sukuyo.sukuyo_historical_calendar import (
+    lunar_fields as historical_fields,
+)
+from fatebridge.core.sukuyo.sukuyo_lower import source_bundle as lower_source_bundle
+from fatebridge.core.sukuyo.sukuyo_lower_methods import (
+    source_bundle as method_source_bundle,
+)
+from fatebridge.core.sukuyo.sukuyo_padas import palace_reference, reference_cell
+from fatebridge.core.sukuyo.sukuyo_padas import source_bundle as pada_source_bundle
+from fatebridge.core.sukuyo.sukuyo_profiles import SOURCE as profile_source_path
+from fatebridge.core.sukuyo.sukuyo_profiles import fullmoon_calculation
+from fatebridge.core.sukuyo.sukuyo_profiles import (
+    source_bundle as profile_source_bundle,
+)
+from fatebridge.core.sukuyo.sukuyo_six_palaces import six_palace_reference
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.sukuyo_special_days import (
+    source_bundle as special_source_bundle,
+)
+from fatebridge.core.sukuyo.sukuyo_special_days import special_day_evidence
+from fatebridge.core.sukuyo.sukuyo_taibai import taibai_direction_reference
+from fatebridge.core.sukuyo.suzhan_astronomy import build_equatorial_mansions
+from fatebridge.services.divination import calculate_sukuyo_compatibility
+from scripts.sukuyo.audit_sukuyo_clothing_primary import (
+    verify_primary as verify_clothing_primary,
+)
+from scripts.sukuyo.audit_sukuyo_t2465_primary import verify_primary
+from scripts.sukuyo.audit_sukuyo_taibai_primary import (
+    verify_primary as verify_taibai_primary,
+)
+from scripts.sukuyo.build_sukuyo_historical_calendar import (
+    read_fixture as read_historical_fixture,
+)
+from scripts.sukuyo.build_sukuyo_japanese_calendar import (
+    normalize as normalize_japanese,
+)
+from scripts.sukuyo.build_sukuyo_japanese_calendar import (
+    read_fixture as read_japanese_fixture,
+)
+from scripts.sukuyo.check_sukuyo_clock_position import verify_clock_position
+from scripts.sukuyo.check_sukuyo_documentary_dates import verify_documentary_controls
+from scripts.sukuyo.check_sukuyo_documentary_primary import verify_documentary_primary
+from scripts.sukuyo.check_sukuyo_guchureki_clock import verify_guchureki_clock
+from scripts.sukuyo.check_sukuyo_hinoo_critical import (
+    verify_primary as verify_hinoo_critical,
+)
+from scripts.sukuyo.check_sukuyo_historical_daily import verify_daily_controls
+from scripts.sukuyo.check_sukuyo_historical_weekday import verify_weekday
+from scripts.sukuyo.check_sukuyo_printed_special import verify_printed_special
+from scripts.sukuyo.check_sukuyo_time_units import verify_time_primary
+from scripts.sukuyo.check_sukuyo_wakita_primary import verify_printed_chapter
+from scripts.sukuyo.check_sukuyo_weekday_arithmetic import verify_arithmetic
+from scripts.sukuyo.check_sukuyo_weekday_recalculation import verify_recalculation
+from scripts.sukuyo.fetch_sukuyo_reference import published_rows, read_sources
+from validation.sukuyo_calendar_sources import audit_candidate
+from validation.sukuyo_historical_sources import normalize as normalize_historical
 
 ROOT = Path(__file__).resolve().parents[2]
 
-SOURCE_PATHS = [
-    "src/fatebridge/data/sukuyo_comparative_time_units.json",
-    "scripts/sukuyo/check_sukuyo_time_units.py",
-    "tests/sukuyo/test_sukuyo_time_origin.py",
-    "tests/data/sukuyo-comparative-time-primary.json",
-    "src/fatebridge/core/sukuyo/sukuyo_printed_special.py",
-    "src/fatebridge/data/sukuyo_wakita_special_days.json",
-    "scripts/sukuyo/check_sukuyo_printed_special.py",
-    "tests/sukuyo/test_sukuyo_printed_special.py",
-    "tests/data/sukuyo-wakita-special-primary.json",
-    "tests/sukuyo/test_sukuyo_sky_snapshot.py",
-    "src/fatebridge/data/sukuyo_wakita_weekday.json",
-    "src/fatebridge/data/sukuyo_t30107_calibration.json",
-    "scripts/sukuyo/check_sukuyo_wakita_primary.py",
-    "tests/sukuyo/test_sukuyo_wakita_primary.py",
-    "tests/data/sukuyo-wakita-weekday-primary.json",
-    "tests/data/sukuyo-calibration-precision-primary.json",
-    "src/fatebridge/data/sukuyo_t30107_recalculation.json",
-    "scripts/sukuyo/check_sukuyo_weekday_recalculation.py",
-    "tests/sukuyo/test_sukuyo_weekday_recalculation.py",
-    "tests/data/sukuyo-weekday-recalculation-primary.json",
-    "src/fatebridge/core/sukuyo/sukuyo_weekday.py",
-    "src/fatebridge/data/sukuyo_t30107_weekday_arithmetic.json",
-    "scripts/sukuyo/check_sukuyo_weekday_arithmetic.py",
-    "tests/sukuyo/test_sukuyo_weekday_arithmetic.py",
-    "tests/data/sukuyo-weekday-arithmetic-primary.json",
-    "src/fatebridge/core/sukuyo/sukuyo_clothing.py",
-    "src/fatebridge/data/sukuyo_t1299_clothing.json",
-    "scripts/sukuyo/audit_sukuyo_clothing_primary.py",
-    "tests/sukuyo/test_sukuyo_clothing.py",
-    "tests/data/sukuyo-clothing-primary.json",
-    "scripts/sukuyo/check_sukuyo_historical_weekday.py",
-    "tests/data/sukuyo-historical-weekday-primary.json",
-    "scripts/sukuyo/check_sukuyo_documentary_dates.py",
-    "tests/data/sukuyo-documentary-dates.json",
-    "tests/sukuyo/test_sukuyo_day_cycle.py",
-    "src/fatebridge/core/sukuyo/sukuyo_taibai.py",
-    "src/fatebridge/data/sukuyo_t1299_taibai.json",
-    "tests/sukuyo/test_sukuyo_taibai.py",
-    "tests/data/sukuyo-taibai-primary.json",
-    "scripts/sukuyo/audit_sukuyo_taibai_primary.py",
-    "src/fatebridge/core/sukuyo/sukuyo_historical_calendar.py",
-    "validation/sukuyo_historical_sources.py",
-    "src/fatebridge/data/sukuyo_japanese_historical_v1.json",
-    "scripts/sukuyo/build_sukuyo_historical_calendar.py",
-    "scripts/sukuyo/fetch_sukuyo_historical_calendars.py",
-    "scripts/sukuyo/check_sukuyo_historical_daily.py",
-    "tests/sukuyo/test_sukuyo_historical_calendar.py",
-    "tests/sukuyo/test_sukuyo_historical_sources.py",
-    "tests/data/sukuyo-historical-edge-probes.json",
-    "tests/data/sukuyo_historical_calendar_v1/captures.zip",
-    "tests/data/sukuyo_historical_calendar_v1/manifest.json",
-    "tests/data/sukuyo_historical_daily_controls_v1/captures.zip",
-    "tests/data/sukuyo_historical_daily_controls_v1/manifest.json",
-    "uv.lock",
-    "pyproject.toml",
-    "src/fatebridge/core/sukuyo/sukuyo.py",
-    "src/fatebridge/core/sukuyo/sukuyo_calendar_basis.py",
-    "src/fatebridge/core/sukuyo/sukuyo_japanese_calendar.py",
-    "src/fatebridge/core/sukuyo/sukuyo_date_support.py",
-    "src/fatebridge/core/sukuyo/sukuyo_profiles.py",
-    "src/fatebridge/core/sukuyo/sukuyo_hinoo_critical.py",
-    "src/fatebridge/data/sukuyo_t2465_critical.json",
-    "scripts/sukuyo/check_sukuyo_hinoo_critical.py",
-    "tests/sukuyo/test_sukuyo_hinoo_critical.py",
-    "tests/sukuyo/test_sukuyo_boundary_receipts.py",
-    "tests/data/sukuyo-t2465-kyoto-primary.json",
-    "src/fatebridge/core/sukuyo/sukuyo_lower.py",
-    "src/fatebridge/core/sukuyo/sukuyo_lower_methods.py",
-    "src/fatebridge/core/sukuyo/sukuyo_padas.py",
-    "src/fatebridge/core/sukuyo/sukuyo_sources.py",
-    "src/fatebridge/core/sukuyo/sukuyo_activities.py",
-    "src/fatebridge/core/sukuyo/sukuyo_calendar_text.py",
-    "src/fatebridge/core/sukuyo/sukuyo_calendar_reading.py",
-    "src/fatebridge/core/sukuyo/sukuyo_hinoo_text.py",
-    "src/fatebridge/core/sukuyo/sukuyo_daily_source_reading.py",
-    "src/fatebridge/core/sukuyo/sukuyo_activity_day_reading.py",
-    "src/fatebridge/core/sukuyo/sukuyo_directions.py",
-    "src/fatebridge/core/sukuyo/sukuyo_special_days.py",
-    "src/fatebridge/core/sukuyo/sukuyo_sanjiu_days.py",
-    "src/fatebridge/core/sukuyo/sukuyo_six_palaces.py",
-    "src/fatebridge/core/sukuyo/suzhan_astronomy.py",
-    "src/fatebridge/core/guolao/guolao.py",
-    "src/fatebridge/core/fixed_star_paths.py",
-    "src/fatebridge/core/astro/time_scales.py",
-    "src/fatebridge/core/astro/birth.py",
-    "src/fatebridge/core/ephemeris_runtime.py",
-    "src/fatebridge/core/contracts/output_reference.py",
-    "src/fatebridge/core/requests/divination.py",
-    "src/fatebridge/core/requests/compatibility.py",
-    "src/fatebridge/services/divination.py",
-    "src/fatebridge/core/response_models.py",
-    "src/fatebridge/core/local_techniques/suzhan.py",
-    "validation/sukuyo_study.py",
-    "validation/sukuyo.py",
-    "validation/sukuyo_calendar_sources.py",
-    "validation/claims.py",
-    "src/fatebridge/data/agent_examples.json",
-    "src/fatebridge/data/sukuyo_calendar_corrections.json",
-    "src/fatebridge/data/sukuyo_japanese_daily_v1.json",
-    "src/fatebridge/data/sukuyo_t1299_activities.json",
-    "src/fatebridge/data/sukuyo_t1299_days.json",
-    "src/fatebridge/data/sukuyo_t1299_travel_directions.json",
-    "src/fatebridge/data/sukuyo_t1299_special_days.json",
-    "src/fatebridge/data/sukuyo_t1299_sanjiu_days.json",
-    "src/fatebridge/data/sukuyo_t1299_six_palaces.json",
-    "src/fatebridge/data/sukuyo_t1299_calendar_profiles.json",
-    "src/fatebridge/data/sukuyo_t1299_lower_mansions.json",
-    "src/fatebridge/data/sukuyo_t1299_lower_methods.json",
-    "src/fatebridge/data/sukuyo_t1299_palace_padas.json",
-    "src/fatebridge/data/guolao/sefstars.txt",
-    "src/fatebridge/data/guolao/sources.json",
-    "tests/data/sukuyo_hko_v1/official_texts.zip",
-    "tests/data/sukuyo_hutime_v1/captures.zip",
-    "tests/data/sukuyo_hutime_v1/manifest.json",
-    "tests/data/sukuyo_hutime_daily_v1/captures.zip",
-    "tests/data/sukuyo_hutime_daily_v1/manifest.json",
-    "tests/data/sukuyo-equatorial-horizons.json",
-    "tests/data/sukuyo-activity-primary-excerpts.json",
-    "tests/data/sukuyo-t1299-calendar-primary.json",
-    "tests/data/sukuyo-fullmoon-primary.json",
-    "tests/data/sukuyo-lower-primary.json",
-    "tests/data/sukuyo-palace-pada-primary.json",
-    "tests/data/sukuyo-rule-scope-primary.json",
-    "tests/data/sukuyo-lower-methods-primary.json",
-    "tests/data/sukuyo-time-gloss-primary.json",
-    "tests/data/sukuyo-directions-primary.json",
-    "tests/data/sukuyo-special-days-primary.json",
-    "tests/data/sukuyo-hinoo-primary-cache.json",
-    "tests/data/sukuyo-t2465-downloaded-primary.json",
-    "tests/data/sukuyo-six-palaces-primary.json",
-    "tests/data/sukuyo-sanjiu-days-primary.json",
-    "tests/data/sukuyo-action-scope-primary.json",
-    "tests/data/sukuyo-t1299-reference.json",
-    "tests/sukuyo/test_sukuyo_profiles.py",
-    "tests/sukuyo/test_sukuyo_lower.py",
-    "tests/sukuyo/test_sukuyo_padas.py",
-    "tests/sukuyo/test_sukuyo_rule_scope.py",
-    "tests/sukuyo/test_sukuyo_lower_methods.py",
-    "tests/sukuyo/test_sukuyo_transports.py",
-    "tests/unit_test/fixtures/sukuyo_transports.py",
-    "tests/unit_test/fixtures/sukuyo_readings.py",
-    "tests/sukuyo/test_sukuyo_date_support.py",
-    "tests/data/sukuyo_date_support_v1/reference.json",
-    "tests/data/sukuyo_date_support_v1/northamerica-excerpts.txt",
-    "tests/data/sukuyo_date_support_v1/asia-excerpts.txt",
-    "tests/data/sukuyo_date_support_v1/australasia-excerpts.txt",
-    "tests/data/sukuyo_date_support_v1/europe-excerpts.txt",
-    "tests/sukuyo/test_sukuyo_calendar_text.py",
-    "tests/sukuyo/test_sukuyo_time_gloss.py",
-    "tests/sukuyo/test_sukuyo_directions.py",
-    "tests/sukuyo/test_sukuyo_special_days.py",
-    "tests/sukuyo/test_sukuyo_source_capture.py",
-    "tests/sukuyo/test_sukuyo_six_palaces.py",
-    "tests/sukuyo/test_sukuyo_t2465_primary.py",
-    "tests/sukuyo/test_sukuyo_sanjiu_days.py",
-    "tests/sukuyo/test_contract_regressions_2.py",
-    "tests/sukuyo/test_sukuyo_japanese_sources.py",
-    "tests/sukuyo/test_sukuyo_japanese_calendar.py",
-    "tests/sukuyo/test_sukuyo_action_scope.py",
-    "scripts/sukuyo/audit_sukuyo.py",
-    "scripts/sukuyo/audit_sukuyo_t2465_primary.py",
-    "scripts/sukuyo/fetch_sukuyo_reference.py",
-    "scripts/sukuyo/audit_sukuyo_japanese_candidate.py",
-    "scripts/sukuyo/freeze_sukuyo_japanese_candidate.py",
-    "scripts/sukuyo/build_sukuyo_japanese_calendar.py",
-    "scripts/sukuyo/check_sukuyo_wheel.py",
-    "docs/interpretation/shared/sukuyo-evidence.md",
-    "docs/interpretation/shared/fatebridge-engine.md",
-]
-
-
-def sha(path: str) -> str:
-    return hashlib.sha256((ROOT / path).read_bytes()).hexdigest()
-
 
 def audit() -> dict:
-    # CLI runs in a fresh process. Record bytes before importing domain code,
-    # so a concurrent edit cannot silently give old loaded code new file hashes.
-    before = {p: sha(p) for p in SOURCE_PATHS}
-    fresh_domain_import = not any(
-        n == "fatebridge" or n.startswith("fatebridge.") for n in sys.modules
-    )
-    from fatebridge.core import ephemeris_runtime
-    from fatebridge.core.astro.birth import build_astro_birth_info
-    from fatebridge.core.sukuyo.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
-    from fatebridge.core.sukuyo.sukuyo_activities import source_bundle
-    from fatebridge.core.sukuyo.sukuyo_calendar_text import (
-        calendar_day_evidence,
-        month_table_variant,
-    )
-    from fatebridge.core.sukuyo.sukuyo_calendar_text import (
-        source_bundle as day_source_bundle,
-    )
-    from fatebridge.core.sukuyo.sukuyo_date_support import local_date_support
-    from fatebridge.core.sukuyo.sukuyo_directions import (
-        source_bundle as direction_source_bundle,
-    )
-    from fatebridge.core.sukuyo.sukuyo_lower import source_bundle as lower_source_bundle
-    from fatebridge.core.sukuyo.sukuyo_lower_methods import (
-        source_bundle as method_source_bundle,
-    )
-    from fatebridge.core.sukuyo.sukuyo_padas import palace_reference, reference_cell
-    from fatebridge.core.sukuyo.sukuyo_padas import source_bundle as pada_source_bundle
-    from fatebridge.core.sukuyo.sukuyo_profiles import SOURCE as profile_source_path
-    from fatebridge.core.sukuyo.sukuyo_profiles import fullmoon_calculation
-    from fatebridge.core.sukuyo.sukuyo_profiles import (
-        source_bundle as profile_source_bundle,
-    )
-    from fatebridge.core.sukuyo.sukuyo_sanjiu_days import (
-        personal_day_witnesses,
-    )
-    from fatebridge.core.sukuyo.sukuyo_sanjiu_days import (
-        source_bundle as sanjiu_source_bundle,
-    )
-    from fatebridge.core.sukuyo.sukuyo_sources import load_source
-    from fatebridge.core.sukuyo.sukuyo_special_days import (
-        source_bundle as special_source_bundle,
-    )
-    from fatebridge.core.sukuyo.sukuyo_special_days import special_day_evidence
-    from fatebridge.core.sukuyo.suzhan_astronomy import build_equatorial_mansions
-    from fatebridge.services.divination import calculate_sukuyo_compatibility
-    from scripts.sukuyo.build_sukuyo_japanese_calendar import (
-        normalize as normalize_japanese,
-    )
-    from scripts.sukuyo.build_sukuyo_japanese_calendar import (
-        read_fixture as read_japanese_fixture,
-    )
-    from scripts.sukuyo.check_sukuyo_clock_position import verify_clock_position
-    from scripts.sukuyo.check_sukuyo_documentary_primary import (
-        verify_documentary_primary,
-    )
-    from scripts.sukuyo.check_sukuyo_guchureki_clock import verify_guchureki_clock
-    from scripts.sukuyo.check_sukuyo_printed_special import verify_printed_special
-    from scripts.sukuyo.check_sukuyo_time_units import verify_time_primary
-    from scripts.sukuyo.fetch_sukuyo_reference import published_rows, read_sources
-    from validation.sukuyo_calendar_sources import audit_candidate
 
     official = read_sources()
     manifest = json.loads((ROOT / "tests/data/sukuyo_hko_v1/manifest.json").read_text())
@@ -283,10 +124,11 @@ def audit() -> dict:
     errors = []
     # Audit the shipped, file-free Moshier fallback, not a local SE1 installation.
     with (
-        patch.object(
-            ephemeris_runtime, "_configured_path", "/tmp/fatebridge-sukuyo-audit-no-se1"
+        TemporaryDirectory(prefix="fatebridge-sukuyo-audit-") as empty_ephemeris,
+        patch.object(ephemeris_runtime, "_configured_path", empty_ephemeris),
+        patch.dict(
+            "os.environ", {"SE_EPHE_PATH": empty_ephemeris, "FATEBRIDGE_JPL_FILE": ""}
         ),
-        patch.dict("os.environ", {"SE_EPHE_PATH": ""}),
     ):
         for ref in fixture["references"]:
             if (
@@ -313,6 +155,10 @@ def audit() -> dict:
                             birth_longitude=0,
                         )
                     )
+                    if outputs[utc]["ephemeris_models"] != ["moshier"]:
+                        raise ValueError("File-free coordinate audit requires Moshier")
+                    else:
+                        pass
                 else:
                     pass
                 actual = next(
@@ -677,7 +523,6 @@ def audit() -> dict:
         }
         for kind in ("tools", "suggested_fields", "call_guidance", "evidence_views")
     }
-    import pytz
 
     support_reference = json.loads(
         (ROOT / "tests/data/sukuyo_date_support_v1/reference.json").read_text()
@@ -1104,7 +949,7 @@ def audit() -> dict:
     sanjiu_paragraphs = {p["id"]: p["text"] for p in sanjiu_primary["paragraphs"]}
     sanjiu_errors = []
     for label in sanjiu_primary["expected_relations"]:
-        evidence = personal_day_witnesses(label)
+        evidence = sanjiu_days.personal_day_witnesses(label)
         for row in [*evidence["witnesses"], evidence["priority_clause"]]:
             if not all(
                 q in sanjiu_paragraphs[row["primary_paragraph_id"]]
@@ -1113,7 +958,7 @@ def audit() -> dict:
                 sanjiu_errors.append([label, row["locator"]])
             else:
                 pass
-    sanjiu_bundle = sanjiu_source_bundle()
+    sanjiu_bundle = sanjiu_days.source_bundle()
     for rule in sanjiu_bundle["activity_rules"]:
         if not any(
             all(q in text for q in rule["source_excerpts"])
@@ -1290,17 +1135,6 @@ def audit() -> dict:
             else:
                 pass
             japanese_count += 1
-    from fatebridge.core.sukuyo.sukuyo_historical_calendar import (
-        lunar_fields as historical_fields,
-    )
-    from scripts.sukuyo.build_sukuyo_historical_calendar import (
-        read_fixture as read_historical_fixture,
-    )
-    from scripts.sukuyo.check_sukuyo_documentary_dates import (
-        verify_documentary_controls,
-    )
-    from scripts.sukuyo.check_sukuyo_historical_daily import verify_daily_controls
-    from validation.sukuyo_historical_sources import normalize as normalize_historical
 
     historical_files, historical_manifest = read_historical_fixture(
         ROOT / "tests/data/sukuyo_historical_calendar_v1"
@@ -1351,16 +1185,10 @@ def audit() -> dict:
             historical_pipeline_count += 1
     historical_daily = verify_daily_controls()
     historical_documentary = verify_documentary_controls()
-    from scripts.sukuyo.check_sukuyo_historical_weekday import verify_weekday
 
     historical_weekday = verify_weekday()
-    from fatebridge.core.sukuyo.sukuyo_six_palaces import six_palace_reference
-    from scripts.sukuyo.audit_sukuyo_t2465_primary import verify_primary
 
     hinoo_downloaded_primary = verify_primary()
-    from scripts.sukuyo.check_sukuyo_hinoo_critical import (
-        verify_primary as verify_hinoo_critical,
-    )
 
     hinoo_critical_primary = verify_hinoo_critical()
     primary_edition = profile_source_bundle()["hinoo_addendum"][
@@ -1414,20 +1242,12 @@ def audit() -> dict:
             six_errors.append(["primary_quote", natal])
         else:
             pass
-    from fatebridge.core.sukuyo.sukuyo_taibai import taibai_direction_reference
-    from scripts.sukuyo.audit_sukuyo_taibai_primary import (
-        verify_primary as verify_taibai_primary,
-    )
 
     taibai_primary = json.loads(
         (ROOT / "tests/data/sukuyo-taibai-primary.json").read_bytes()
     )
     taibai_errors = []
     taibai_source_check = verify_taibai_primary()
-    from fatebridge.core.sukuyo.sukuyo_clothing import clothing_reference
-    from scripts.sukuyo.audit_sukuyo_clothing_primary import (
-        verify_primary as verify_clothing_primary,
-    )
 
     clothing_source_check = verify_clothing_primary()
     clothing_errors = []
@@ -1470,9 +1290,6 @@ def audit() -> dict:
             taibai_errors.append(["unestablished_claim", lunar_day])
         else:
             pass
-    from scripts.sukuyo.check_sukuyo_wakita_primary import verify_printed_chapter
-    from scripts.sukuyo.check_sukuyo_weekday_arithmetic import verify_arithmetic
-    from scripts.sukuyo.check_sukuyo_weekday_recalculation import verify_recalculation
 
     result = {
         "format": "sukuyo_scoped_audit_v26",
@@ -1553,12 +1370,6 @@ def audit() -> dict:
         "japanese_calendar_source_candidate": audit_candidate(
             ROOT / "tests/data/sukuyo_hutime_v1"
         ),
-        "active_goal_axes": [
-            "calendar_accuracy",
-            "named_classical_source_fidelity",
-            "interpretation_fidelity",
-            "real_world_prediction",
-        ],
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "runtime": {
             "python": platform.python_version(),
@@ -1566,7 +1377,6 @@ def audit() -> dict:
             "pyswisseph": importlib.metadata.version("pyswisseph"),
             "lunardate": importlib.metadata.version("lunardate"),
         },
-        "inputs_sha256": {p: sha(p) for p in SOURCE_PATHS},
         "calendar": {
             "source": "https://www.hko.gov.hk/en/gts/time/conversion.htm",
             "range": [calendar_rows[0][0], calendar_rows[-1][0]],
@@ -1608,11 +1418,15 @@ def audit() -> dict:
                 }
                 for instant, output in outputs.items()
             ],
-            "catalogue_hashes_match_declared_audit_inputs": all(
+            "catalogue_hashes_match_source_files": all(
                 output["catalogue_sha256"]
-                == before["src/fatebridge/data/guolao/sefstars.txt"]
+                == hashlib.sha256(
+                    (ROOT / "src/fatebridge/data/guolao/sefstars.txt").read_bytes()
+                ).hexdigest()
                 and output["catalogue_sources_sha256"]
-                == before["src/fatebridge/data/guolao/sources.json"]
+                == hashlib.sha256(
+                    (ROOT / "src/fatebridge/data/guolao/sources.json").read_bytes()
+                ).hexdigest()
                 for output in outputs.values()
             ),
             "scope": "Seven geocentric physical luminaries at six fixed instants; no claim about all epochs, ancient anchor choices or real-world prediction.",
@@ -1793,13 +1607,10 @@ def audit() -> dict:
         },
         "real_world_validation": {
             "real_world_sample_count": 0,
-            "sample_count_basis": "User confirmed no real samples in this task; no outcome data are loaded by this audit.",
+            "sample_count_basis": "No outcome data are loaded by this audit.",
             "status": "prospective_workflow_prepared_not_registered",
             "performance_metrics": None,
-            "part_of_active_goal": True,
         },
-        "three_axis_complete": False,
-        "four_axis_complete": False,
         "authority_certified": False,
         "unresolved": [
             "Tang/Japanese historical calendars; source collation and intercalary/short-month precedence",
@@ -1811,19 +1622,10 @@ def audit() -> dict:
         ],
     }
 
-    after = {p: sha(p) for p in SOURCE_PATHS}
-    changed = [p for p in SOURCE_PATHS if before[p] != after[p]]
-    result["audit_input_stability"] = {
-        "method": "hash_all_declared_inputs_before_domain_imports_and_after_audit",
-        "fresh_domain_import": fresh_domain_import,
-        "changed_inputs": changed,
-        "all_declared_inputs_stable_across_run": not changed,
-        "coherent_fresh_import_window": fresh_domain_import and not changed,
-    }
     return result
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
@@ -1849,22 +1651,13 @@ def main():
                 "japanese_reference_pipeline_days": result[
                     "japanese_reference_calendar"
                 ]["full_calendar_pipeline_days_checked"],
-                "fresh_domain_import": result["audit_input_stability"][
-                    "fresh_domain_import"
-                ],
-                "audit_inputs_changed": result["audit_input_stability"][
-                    "changed_inputs"
-                ],
             }
         )
     )
     if (
-        not result["audit_input_stability"]["coherent_fresh_import_window"]
-        or result["calendar"]["mismatch_dates"]
+        result["calendar"]["mismatch_dates"]
         or not result["physical_coordinates"]["within_tolerance"]
-        or not result["physical_coordinates"][
-            "catalogue_hashes_match_declared_audit_inputs"
-        ]
+        or not result["physical_coordinates"]["catalogue_hashes_match_source_files"]
         or not result["classical_activity"]["danger_marriage_conflict_preserved"]
         or result["classical_calendar"]["mismatches"]
         or result["classical_calendar"]["fullmoon_mismatches"]

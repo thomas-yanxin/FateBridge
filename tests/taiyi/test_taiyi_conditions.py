@@ -9,15 +9,12 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.contracts.output_taiyi_conditions import TaiyiConditionAssessment
+from fatebridge.core.metaphysics.taiyi_board import structural_patterns
 from fatebridge.core.metaphysics.taiyi_conditions import (
     conjunction,
     five_general_conditions,
 )
-from fatebridge.core.metaphysics.taiyi_year import (
-    cyclic_core,
-    structural_patterns,
-    yearly_core,
-)
+from fatebridge.core.metaphysics.taiyi_year import cyclic_core, yearly_core
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from scripts.taiyi.audit_taiyi_historical import audit
 from tests.support.reference_data import resolve

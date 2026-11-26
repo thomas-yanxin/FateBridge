@@ -6,7 +6,7 @@
 
 ## 方法登记
 
-当前 92 条公开目录记录关联 65 个唯一 `method_id`，由 `services/method_registration.py` 登记。新增工具没有登记会在目录装配时失败。出生计算、各时运层、数算与卦象、各中式盘、西占各推运与事件、印占、人类图、风水以及知识与导出分别登记。人类图可选太阳点质量模型有独立方法、前提及输出范围。
+当前 93 条公开目录记录关联 66 个唯一 `method_id`，由 `services/method_registration.py` 登记。新增工具没有登记会在目录装配时失败。出生计算、各时运层、数算与卦象、各中式盘、西占各推运与事件、印占、人类图、风水以及知识与导出分别登记。人类图可选太阳点质量模型有独立方法、前提及输出范围。
 
 `bazi_source_compare` 直接使用给定四柱，登记字面排柱校核与来源对照。`ziwei_rules` 按所选规则查询资料，登记紫微规则目录。两者的声明误差源均为 `rule_adjudication`。`ziwei_birth`、`ziwei_horoscope` 和 `ziwei_rules` 均将实际生效的 `sihua_source` 列为方法选择器。
 

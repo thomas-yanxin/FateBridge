@@ -11,6 +11,7 @@ from fatebridge.core.astro.lunar_motion import (
     SOURCE_VERSION,
     lunar_light_time_correction,
 )
+from fatebridge.core.astro.lunar_tropical_frame import complete_lunar_tropical_rate
 from fatebridge.core.astro.native_identity import binding_distribution_version
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.core.astro.position_motion import TARGETS, complete_position_rate
@@ -166,10 +167,6 @@ def corrected_longitude_motion(
         else native + light + spatial + (source_remainder or 0.0) + rotation
     )
     if planet == "Moon" and not sidereal:
-        from fatebridge.core.astro.lunar_tropical_frame import (
-            complete_lunar_tropical_rate,
-        )
-
         fixed = metadata.get("lunar_light_time", {}).get(
             "fixed_frame_source_derivative"
         )

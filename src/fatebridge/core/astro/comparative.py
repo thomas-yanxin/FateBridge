@@ -247,7 +247,6 @@ def build_comparative_geometry(
         "birth_time_sensitivity": sensitivity,
         "sources": [SOURCE],
         "original_text_conformance": "not_assessed",
-        "real_world_efficacy": "not_tested",
         "limitations": [
             "Selected geometric reconstruction, not the complete original text, Earth-house assignment or original event/mortality claims",
             "All modern native factors reuse the same algebra; the printed source table contains only12 factors and does not interpret every modern hypothetical factor",

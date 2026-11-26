@@ -2,6 +2,9 @@
 
 from typing import Any
 
+DITIAN_SUI_CHANWEI_SCAN_URL = "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf"
+ZIPING_ZHENQUAN_NLC_SCAN_URL = "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf"
+
 PDF_SHA256 = "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620"
 PUBLISHER_IMAGE_SHA256 = (
     "431ca7b415d6e72c4f1492b87df112f26e6f26c6a229a810baf37387bd53359c"

@@ -143,9 +143,6 @@ ASPECTS = [
 ]
 
 
-HARMONIOUS_ASPECTS = {"conjunction", "sextile", "trine"}
-
-
 RELATIVE_MODE_LABELS_ZH = {
     "compare": "比较盘",
     "composite": "组合盘",

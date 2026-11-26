@@ -6,12 +6,10 @@ MetaphysicsSeed bridge live here; reusable text rendering lives in snapshot.
 
 from __future__ import annotations
 
-import math
 from datetime import datetime
 from fractions import Fraction
 from typing import Any
 
-from fatebridge.core.astro.reference import SU28
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.seed import build_metaphysics_seed
 from fatebridge.utils.civil_time import (
@@ -32,9 +30,6 @@ from ..astro.geometry import (
 )
 from .house_geometry import HouseGeometry, HouseRecord
 from .snapshot import join_lines
-
-SU28_NAMES = [name.removesuffix("宿") for name in SU28]
-
 
 ZODIAC_SIGN_CN = {
     "Aries": "白羊座",
@@ -115,12 +110,6 @@ def parse_local_datetime(
     if validate_wall:
         validate_local_clock(moment, allow_ambiguous=allow_ambiguous)
     return moment
-
-
-def _su28_position(longitude: float | Fraction) -> tuple[str, float]:
-    index, remainder = divmod((angle_fraction(longitude) % 360) * 28, 360)
-    degree = min(float(remainder / 28), math.nextafter(360 / 28, 0.0))
-    return SU28_NAMES[int(index)], degree
 
 
 def _resolve_coordinates(
@@ -239,7 +228,6 @@ def _build_point_object(
     point_id: str,
     longitude: float | Fraction,
     geometry: HouseGeometry | None,
-    include_su28: bool,
     projected_phase: Fraction | None = None,
     house_longitude: Fraction | None = None,
 ) -> dict[str, Any]:
@@ -260,8 +248,6 @@ def _build_point_object(
     }
     if projected_phase is not None:
         payload["ecliptic_house_phase_degrees_ratio"] = str(projected_phase)
-    if include_su28:
-        payload["su28"], payload["su28_degree"] = _su28_position(phase)
     return payload
 
 
@@ -269,7 +255,6 @@ def _adapt_chart_objects(
     core_payload: dict[str, Any],
     *,
     tradition: bool,
-    include_su28: bool,
     geometry: HouseGeometry | None,
     preserve_core_houses: bool = False,
     fortune_house_longitude: Fraction | None = None,
@@ -309,8 +294,6 @@ def _adapt_chart_objects(
         }
         if projected_phase is not None:
             payload["ecliptic_house_phase_degrees_ratio"] = str(projected_phase)
-        if include_su28:
-            payload["su28"], payload["su28_degree"] = _su28_position(source_longitude)
         objects.append(payload)
 
     north_node = next((item for item in objects if item["id"] == "North Node"), None)
@@ -331,7 +314,6 @@ def _adapt_chart_objects(
                 point_id="South Node",
                 longitude=south_node_longitude,
                 geometry=geometry,
-                include_su28=include_su28,
                 projected_phase=(
                     Fraction(phase_text) if phase_text is not None else None
                 ),
@@ -353,7 +335,6 @@ def _adapt_chart_objects(
                 longitude=float(fortune["longitude"]),
                 house_longitude=None if projected else fortune_house_longitude,
                 geometry=geometry,
-                include_su28=include_su28,
                 projected_phase=(
                     Fraction(phase_text) if phase_text is not None else None
                 ),
@@ -373,7 +354,6 @@ def _build_local_chart_response(
     gps_lat: float | None = None,
     gps_lon: float | None = None,
     tradition: bool = False,
-    include_su28: bool = True,
     chart_variant: str = "chart",
     house_start_mode: int = 1,
     shape_mode: int = 0,
@@ -433,7 +413,6 @@ def _build_local_chart_response(
     objects = _adapt_chart_objects(
         core_payload,
         tradition=tradition,
-        include_su28=include_su28,
         geometry=house_geometry,
         fortune_house_longitude=lot_longitudes.get("fortune"),
         preserve_core_houses=allow_extended_hsys
@@ -444,9 +423,9 @@ def _build_local_chart_response(
         core_payload.get("context_geometry") if preserve_context_geometry else None
     )
     if geometry is not None:
-        if house_start_mode == 2 or shape_mode % 2 or include_su28:
+        if house_start_mode == 2 or shape_mode % 2:
             raise ValueError(
-                "Unrounded context geometry requires the original house layout and no mansion overlay"
+                "Unrounded context geometry requires the original house layout"
             )
         houses = geometry["houses"]
         objects = [

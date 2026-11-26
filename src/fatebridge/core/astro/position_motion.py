@@ -15,6 +15,7 @@ from importlib.metadata import version
 from typing import Any, Callable, Sequence
 
 from fatebridge.core.astro import runtime
+from fatebridge.core.astro.inner_motion import complete_inner_rate
 from fatebridge.core.astro.lunar_motion import SOURCE_VERSION
 from fatebridge.core.astro.motion_source_window import (
     CenterWindowProbe,
@@ -390,8 +391,6 @@ def complete_position_rate(
     if not math.isfinite(julian_day_tt):
         raise EphemerisSourceError("coordinate_values_unavailable")
     if model == "jpl" and planet in {"Mercury", "Venus"}:
-        from fatebridge.core.astro.inner_motion import complete_inner_rate
-
         analytic, analytic_policy = complete_inner_rate(
             planet,
             julian_day_tt,

@@ -146,4 +146,4 @@
 
 `result_delivery` 的全文是本次请求实际保留的payload。摘要 `fields` 调用即使读完交付物，也只能称本次投影结果全文。完整业务须首次 `fields=null`，再读取同次交付，不通过重算或拼接不同run改称完整。
 
-程序的 `classical_acceptance_passed=false` 和 `real_world_efficacy=not_tested` 要按实际范围说明，不把课例回归当现实命中率。传统提示对应哪些现实条件、如何观察及何时复盘应另说清。来源疑文、影印页及专项验收见[六壬与金口诀审计](../../liuren-jinkou-audit.md)。
+按 `classical_acceptance_passed` 及相关来源范围说明课例对照，不把课例回归当现实命中率。传统提示对应哪些现实条件、如何观察及何时复盘应另说清。来源疑文、影印页及专项验收见[六壬与金口诀审计](../../liuren-jinkou-audit.md)。

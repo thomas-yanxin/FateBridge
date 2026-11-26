@@ -6,8 +6,10 @@ from typing import Any
 
 from fatebridge.core.local_techniques.snapshot import join_lines
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
+from fatebridge.core.metaphysics.taiyi_evidence import (
+    evidence_text as taiyi_evidence_text,
+)
 from fatebridge.core.metaphysics.taiyi_long_cycles import long_cycle_text
-from fatebridge.core.metaphysics.taiyi_year import evidence_text as taiyi_evidence_text
 from fatebridge.services.snapshot_builders import render_snapshot_text
 
 

@@ -13,6 +13,7 @@ from fatebridge.application.execution import execute_tool
 from fatebridge.cli import run
 from fatebridge.core.fengshui import natal_interpretation as engine
 from fatebridge.core.fengshui.mutual_geometry import (
+    validate_author_geometries,
     validate_author_phase,
     validate_mutual_geometry,
 )
@@ -179,6 +180,14 @@ def test_served_reading_coverage_is_bound_to_the_actual_available_derivation(
     assert checked["author_geometry_five_table_only_count"] == five
     assert checked["author_geometry_unknown_count"] == unknown
     assert checked["author_geometry_coverage_verified"] is (derived > 0)
+    reordered = json.loads(json.dumps(result, sort_keys=True))
+    natal = reordered["layers"]["xuankong_natal"]
+    assert (
+        validate_author_geometries(natal["interpretation"], natal, current=current)[
+            "checked"
+        ]
+        == 18
+    )
     assert (
         sum(
             s["kind"] == "mutual_use_geometry"
@@ -242,17 +251,64 @@ def test_injected_author_errors_are_rejected_on_all_protocols(
         assert "calculation_reading" not in result
 
 
-def test_service_seal_cannot_accept_a_self_consistent_but_wrong_candidate_star(
+@pytest.mark.parametrize(
+    "fault",
+    [
+        "candidate_star",
+        "obsolete_version",
+        "missing_profile",
+        "trace_phase",
+        "trace_boolean",
+        "trace_duplicate",
+        "trace_missing",
+    ],
+)
+def test_service_rejects_wrong_candidate_and_incomplete_author_contract(
     monkeypatch: pytest.MonkeyPatch,
+    fault: str,
 ) -> None:
+    """Selected author output requires its current version and matching candidate."""
     original = service.analyze_natal_interpretation
 
     def wrong(*args, **kwargs):
         value = original(*args, **kwargs)
-        candidate = value["candidates"][0]
-        candidate["palaces"]["N"]["mountain_star_number"] = 9
+        if fault == "candidate_star":
+            value["candidates"][0]["palaces"]["N"]["mountain_star_number"] = 9
+        elif fault == "obsolete_version":
+            value["timeliness_ruleset"]["version"] = "1.0.0"
+        elif fault == "missing_profile":
+            value.pop("timeliness_ruleset")
+        else:
+            record = next(
+                record
+                for record in value["rule_trace"]
+                if record["rule_id"] == "wang_zhongzhou_timeliness_v1.basic_phase"
+                and (fault != "trace_boolean" or record["star_number"] == 1)
+            )
+            if fault == "trace_phase":
+                record["phase"] = "wrong"
+            elif fault == "trace_boolean":
+                record["star_number"] = True
+            elif fault == "trace_duplicate":
+                value["rule_trace"].append(deepcopy(record))
+            else:
+                value["rule_trace"].remove(record)
         return value
 
     monkeypatch.setattr(service, "analyze_natal_interpretation", wrong)
     result = executed(inputs())
     assert result["error_code"] == "fengshui_calculation_inconsistent"
+
+
+@pytest.mark.parametrize("fault", ["obsolete_version", "missing_profile"])
+def test_saved_author_metadata_cannot_skip_geometry_validation(fault: str) -> None:
+    """Saved author records must not bypass validation through missing or old metadata."""
+    result = executed(inputs())
+    interpretation = result["layers"]["xuankong_natal"]["interpretation"]
+    if fault == "obsolete_version":
+        interpretation["timeliness_ruleset"]["version"] = "1.0.0"
+    else:
+        interpretation.pop("timeliness_ruleset")
+    checked = verify_fengshui_reading(result, trusted_payload=deepcopy(result))
+    assert checked["status"] != "verified_served_fixed_reading"
+    assert {"code": "author_mutual_geometry_inconsistent"} in checked["errors"]

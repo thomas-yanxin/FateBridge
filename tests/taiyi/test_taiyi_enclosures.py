@@ -15,13 +15,10 @@ from fatebridge.application.examples import suggested_fields
 from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
 from fatebridge.core.contracts.output_chinese import Taiyi
+from fatebridge.core.metaphysics.taiyi_board import assemble_board
 from fatebridge.core.metaphysics.taiyi_conditions import five_general_conditions
 from fatebridge.core.metaphysics.taiyi_enclosures import principal_enclosures
-from fatebridge.core.metaphysics.taiyi_year import (
-    assemble_board,
-    cyclic_core,
-    yearly_core,
-)
+from fatebridge.core.metaphysics.taiyi_year import cyclic_core, yearly_core
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG

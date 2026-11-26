@@ -127,7 +127,6 @@ QIMEN_DOOR_TO_TRIGRAM: dict[str, str] = {
     "死门": "坤",
     "惊门": "兑",
     "开门": "乾",
-    "中门": "坤",
 }
 
 

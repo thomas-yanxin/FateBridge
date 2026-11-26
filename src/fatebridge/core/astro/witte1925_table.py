@@ -236,5 +236,4 @@ def source_table_analysis() -> dict[str, Any]:
             "All numbers describe the source table or its historical worked example; none is substituted into the current chart or interpreted as a real-event forecast",
         ],
         "full_original_method_accepted": False,
-        "real_world_efficacy": "not_tested",
     }

@@ -107,7 +107,7 @@ Start REST locally with `API_HOST=127.0.0.1 fatebridge-api`. The default port is
 
 The package uses a Python `src` layout. FastAPI, FastMCP, and CLI adapters call shared execution and domain services through a central `ToolSpec` catalog. See [architecture](docs/architecture.md). Dependencies are declared in [pyproject.toml](pyproject.toml), with development resolutions pinned in [uv.lock](uv.lock).
 
-Contributions to documentation, algorithms, interfaces, and tests are welcome. Follow [CONTRIBUTING](CONTRIBUTING.md) and select checks from the [development guide](docs/development-guide.md). See the [documentation writing guide (Chinese)](docs/documentation-guide.md). Start documentation-only validation with:
+Contributions to documentation, algorithms, interfaces, and tests are welcome. Follow [CONTRIBUTING](CONTRIBUTING.md) and select checks from the [development guide](docs/development-guide.md). See the [documentation writing guide (Chinese)](docs/development-guide.md#文档写作). Start documentation-only validation with:
 
 ```bash
 uv run --locked --extra dev python scripts/check_docs.py

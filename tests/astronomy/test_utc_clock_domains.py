@@ -43,6 +43,30 @@ REFERENCE = json.loads(
 
 
 @pytest.mark.parametrize(
+    ("civil_label", "utc_label", "has_datetime_carrier"),
+    [
+        ("2026-07-01T12:00:00+08:00", "2026-07-01T04:00:00+00:00", True),
+        ("2026-07-01T12:00:00-05:00", "2026-07-01T17:00:00+00:00", True),
+        (
+            "2026-07-01T12:00:00+00:00:01.123456",
+            "2026-07-01T11:59:58.876544+00:00",
+            True,
+        ),
+        ("9999-12-31T23:00:00-08:00", "+010000-01-01T07:00:00+00:00", False),
+    ],
+)
+def test_physical_epoch_delivers_utc_instead_of_the_input_wall_label(
+    civil_label: str, utc_label: str, has_datetime_carrier: bool
+) -> None:
+    epoch = PhysicalEpoch.from_civil(datetime.fromisoformat(civil_label))
+    assert epoch.utc_label == utc_label
+    if has_datetime_carrier:
+        assert epoch.utc_datetime == datetime.fromisoformat(utc_label)
+    else:
+        assert epoch.utc_datetime is None
+
+
+@pytest.mark.parametrize(
     "label,method,future",
     [
         ("1960-04-01T12:00:00+00:00", "SOFA_1960_UTC_drift_to_TT", False),
