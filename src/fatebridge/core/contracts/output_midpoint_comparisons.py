@@ -43,7 +43,6 @@ class SolarArcAnalysis(PartialOutput):
     rule_trace: list[GeometryRuleTrace] | None = None
     limitations: list[str] | None = None
     original_text_conformance: str | None = None
-    real_world_efficacy: str | None = None
 
 
 class MeridianHouseCusp(PartialOutput):
@@ -128,7 +127,6 @@ class MeridianFactorPlacement(PartialOutput):
     scope: str | None = None
     sources: list[GeometrySource] | None = None
     full_original_method_accepted: bool | None = None
-    real_world_efficacy: str | None = None
 
 
 class MeridianHouseAnalysis(PartialOutput):
@@ -145,7 +143,6 @@ class MeridianHouseAnalysis(PartialOutput):
     rule_trace: list[GeometryRuleTrace] | None = None
     limitations: list[str] | None = None
     original_text_conformance: str | None = None
-    real_world_efficacy: str | None = None
 
 
 class ComparativePointSystem(PartialOutput):
@@ -254,5 +251,4 @@ class ComparativeGeometry(PartialOutput):
     birth_time_sensitivity: ComparativeSensitivity | None = None
     sources: list[GeometrySource] | None = None
     original_text_conformance: str | None = None
-    real_world_efficacy: str | None = None
     limitations: list[str] | None = None

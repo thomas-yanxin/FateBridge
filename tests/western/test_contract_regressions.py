@@ -456,7 +456,7 @@ def test_native_two_factor_layer_covers_all_factors_without_invented_readings() 
     assert trace["source_id"] == "rudolph_1979_17laws"
     assert trace["source_sections"] == ["13", "16"]
     assert layer["original_text_conformance"] == "not_assessed"
-    assert layer["real_world_efficacy"] == "not_tested"
+    assert "real_world_efficacy" not in layer
 
 
 @pytest.mark.parametrize(

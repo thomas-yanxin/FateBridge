@@ -275,7 +275,6 @@ def _build_weather_one(
             "weather_seasonal_text_basis": "新增秋金晴、冬坎雪、春土雨三句按卷二固定转录1441921计算；所选文明书局冬句无坎之水、春句坤兌与转录坤艮不同，字形和主语不静默补齐。",
             "weather_daypart_scope": "仅按离在艮上暮雨朝晴保留朝暮原文时段；不换算具体钟时、日出日落或日期，不把未定时段当全天，不以此裁定离互艮宫。",
             "weather_attributions_scope": "另列文明书局本霜雪霰雹、日电虹霓及既有雷类象的明示季令核对；不是实况、制化综合或旧研究标签映射，旧研究不认证此补充的预测效力。",
-            "real_world_efficacy": "not_established",
             "research_validation_scope": "specified_historical_policy_cohorts_only_no_prospective_or_global_prediction_acceptance",
         },
         "comprehensive_judgement": summary,

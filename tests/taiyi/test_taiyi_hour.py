@@ -224,7 +224,7 @@ def test_output_snapshots_explain_selected_counter_and_do_not_claim_gates_passed
     )
     assert board["condition_assessment"]["menju_jiangfa"] is None
     assert board["ruleset"]["classical_acceptance_passed"] is False
-    assert board["ruleset"]["real_world_efficacy"] == "not_tested"
+
     assert "原文33，按本盘算路32" in result["snapshot_text"]
 
 

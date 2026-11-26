@@ -180,7 +180,6 @@ def victory_matrix_assessment(
         "table_applicability_verified": False,
         "source_outcome_applied": False,
         "classical_acceptance_passed": False,
-        "real_world_efficacy": "not_tested",
     }
     n, eye, taiyi = (
         core.get("taiyi_number"),

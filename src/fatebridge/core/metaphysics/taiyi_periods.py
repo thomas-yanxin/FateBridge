@@ -205,7 +205,6 @@ def build_period_board(
                 "time_granularity": "solar_month" if mode == "month" else "double_hour",
                 "classical_conformance": "partial_with_unresolved_table_and_calendar_adaptation_questions",
                 "classical_acceptance_passed": False,
-                "real_world_efficacy": "not_tested",
                 "unresolved": [
                     "阳局39/50及阴局多处表文与通则不一致，未据程序修改原典读数。",
                     "以现代天文节气实刻适配原典规则，尚未复原书中缺讹的历法常数。",

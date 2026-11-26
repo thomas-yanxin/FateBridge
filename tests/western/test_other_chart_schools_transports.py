@@ -40,7 +40,6 @@ SPECS = {spec.key: spec for spec in CATALOG}
             [
                 "midpoint_analysis.profile",
                 "midpoint_analysis.dials.90",
-                "midpoint_analysis.real_world_efficacy",
             ],
             {},
         ),
@@ -173,7 +172,6 @@ SPECS = {spec.key: spec for spec in CATALOG}
                     "midpoint_analysis.solar_arc_analysis.interpretations",
                     "midpoint_analysis.solar_arc_analysis.birth_time_sensitivity",
                     "midpoint_analysis.solar_arc_analysis.daily_meridian",
-                    "midpoint_analysis.solar_arc_analysis.real_world_efficacy",
                 ],
                 {
                     "name": "虚构：太阳弧接口验收",
@@ -280,7 +278,7 @@ def test_full_geometry_delivery_is_the_same_run_and_hashes_exact_bytes(
     )
     assert complete["run_metadata"]["run_id"] == response["run_metadata"]["run_id"]
     assert len(complete["midpoint_analysis"]["midpoint_axes"]) == 253
-    assert complete["midpoint_analysis"]["real_world_efficacy"] == "not_tested"
+    assert "real_world_efficacy" not in complete["midpoint_analysis"]
 
 
 @pytest.mark.parametrize(

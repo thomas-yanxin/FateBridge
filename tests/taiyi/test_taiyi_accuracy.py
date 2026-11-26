@@ -304,5 +304,5 @@ def test_sanshi_does_not_conflate_yearly_background_with_hourly_event() -> None:
     assert result["taiyi"] == call_taiyi()["taiyi"]
     assert result["synthesis"]["time_scopes"]["taiyi"] == "year"
     assert result["synthesis"]["independent_evidence_count"] is None
-    assert result["synthesis"]["real_world_efficacy"] == "not_tested"
+
     assert "[合参范围]" in result["snapshot_text"]

@@ -55,7 +55,6 @@ def unavailable_mixed_pairs(
         "limitations": [
             "No native factors or arc; no empty-contact conclusion inferred"
         ],
-        "real_world_efficacy": "not_tested",
     }
 
 
@@ -189,5 +188,4 @@ def mixed_pair_geometry(
             "Birth-time contact sensitivity is separate and, when computed, covers only the confirmed finite grid; no continuous stability, keyword or real event probability is inferred",
         ],
         "full_original_method_accepted": False,
-        "real_world_efficacy": "not_tested",
     }

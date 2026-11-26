@@ -177,7 +177,7 @@ def test_corrected_facts_survive_each_transport_and_field_projection(
             assert dependency["leap_table_expires_at"]
             assert dependency["leap_table_source"]
         assert board["ruleset"]["classical_acceptance_passed"] is False
-        assert board["ruleset"]["real_world_efficacy"] == "not_tested"
+
         if key == "jinkou":
             diurnal = board["overview"]["diurnal_evidence"]
             assert board["overview"]["is_diurnal"] is False

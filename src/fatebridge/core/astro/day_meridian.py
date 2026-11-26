@@ -366,5 +366,4 @@ def build_day_meridian(
             "Birth-time spans cover samples only; geographic, timezone-rule and ephemeris uncertainty are not propagated",
         ],
         "original_text_conformance": "not_assessed",
-        "real_world_efficacy": "not_tested",
     }

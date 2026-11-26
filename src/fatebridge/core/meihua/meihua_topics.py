@@ -371,7 +371,6 @@ def build_topic_interpretation(cast: dict[str, Any], topic: str) -> dict[str, An
             "counting_candidate_readings": "各候选按自己的原体、用和同一已报节月匹配所选章句，不借用主候选结论。",
             "external_omens": "not_collected",
             "event_timing": "not_computed",
-            "real_world_efficacy": "not_established",
             "not_implemented": [
                 "full_themed_chapter_synthesis",
                 (

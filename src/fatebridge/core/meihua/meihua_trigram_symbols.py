@@ -180,7 +180,6 @@ def apply_trigram_relation_symbols(
         "source_variants_used_to_override_selected_edition": False,
         "repeated_roles_are_independent_observations": False,
         "effective_role_or_global_synthesis": "not_computed",
-        "real_world_efficacy": "not_established",
         "real_outcome": None,
         "event_time": None,
     }

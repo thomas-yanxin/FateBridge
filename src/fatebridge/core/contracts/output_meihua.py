@@ -100,7 +100,6 @@ class MeihuaEvidenceScope(PartialOutput):
     implemented: list[str] | None = None
     not_implemented: list[str] | None = None
     interpretation_basis: str | None = None
-    real_world_efficacy: str | None = None
     authority_certified: bool | None = None
 
 

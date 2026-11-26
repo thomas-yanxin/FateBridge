@@ -244,7 +244,7 @@ def test_germany_publishes_native_geometry_with_bounded_claims() -> None:
     assert len(layer["midpoint_axes"]) == 253
     assert layer["profile"]["coordinate_rounding_before_comparison"] is False
     assert layer["original_text_conformance"] == "not_assessed"
-    assert layer["real_world_efficacy"] == "not_tested"
+    assert "real_world_efficacy" not in layer
     # Preserve the published legacy list; the new layer has its own identity.
     assert len(result["midpoints"]) == 21
 

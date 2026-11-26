@@ -220,7 +220,7 @@ def test_source_directed_mc_reading_keeps_layer_identity_and_uncertainty_evidenc
     assert sum(matches) == pattern["present_sample_count"]
     assert reading["birth_time_sampled_status"] == "varies_across_samples"
     assert directed["profile"]["directed_factors_are_observations"] is False
-    assert directed["real_world_efficacy"] == "not_tested"
+    assert "real_world_efficacy" not in directed
 
 
 @HAS_SWE

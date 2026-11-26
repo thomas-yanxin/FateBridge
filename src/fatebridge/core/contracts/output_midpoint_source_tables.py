@@ -81,7 +81,6 @@ class Witte1925SourceTable(PartialOutput):
     worked_example: SourceTableWorkedExample | None = None
     limitations: list[str] | None = None
     full_original_method_accepted: bool | None = None
-    real_world_efficacy: str | None = None
 
 
 class MixedPairContact(ReferenceAngleGeometry):
@@ -206,4 +205,3 @@ class MixedPairGeometry(PartialOutput):
     sources: list[GeometrySource] | None = None
     limitations: list[str] | None = None
     full_original_method_accepted: bool | None = None
-    real_world_efficacy: str | None = None

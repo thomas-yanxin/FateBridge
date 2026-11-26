@@ -175,7 +175,6 @@ def attach_factor_placement(
         "source_example_reconciliation": "Witte1924 p59 printed comparison remains unreconciled against the two predeclared obliquity models; no fitted correction adopted",
         "sources": [SOURCE],
         "full_original_method_accepted": False,
-        "real_world_efficacy": "not_tested",
     }
 
 

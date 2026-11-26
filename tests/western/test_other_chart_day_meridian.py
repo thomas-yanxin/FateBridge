@@ -116,7 +116,7 @@ def test_day_meridian_replays_every_confirmed_birth_sample_without_inventing_pre
     solar = result["solar_arc_analysis"]
     day = solar["daily_meridian"]
     profile = day["profile"]
-    assert day["real_world_efficacy"] == "not_tested"
+    assert "real_world_efficacy" not in day
     assert day["original_text_conformance"] == "not_assessed"
     comparison = day["source_comparison"]
     assert comparison["status"] == "printed_arithmetic_difference_explained"

@@ -489,7 +489,6 @@ def build_midpoint_analysis(
             "reason": "Swiss Ephemeris is required for native unrounded factors",
             "meridian_houses": unavailable_meridian_houses(),
             "sources": SOURCES,
-            "real_world_efficacy": "not_tested",
         }
     native = _native_factors(birth, sidereal, include_meridian_houses=True)
     result = midpoint_geometry(
@@ -627,5 +626,4 @@ def build_midpoint_analysis(
             "1961-1971 UTC uses IERS rate/offset changes; earlier input is treated as UT1; birth-location and birth-time uncertainty are not assessed",
         ],
         "original_text_conformance": "not_assessed",
-        "real_world_efficacy": "not_tested",
     }

@@ -174,7 +174,6 @@ def build_key_day_board(
             "time_granularity": "selected_clock_day",
             "classical_conformance": "partial_with_source_and_calendar_questions",
             "classical_acceptance_passed": False,
-            "real_world_efficacy": "not_tested",
             "unresolved": [
                 "零时/同日甲子是现代约定；选定课例日期另有独立历表对照，完整古历未复原。",
                 "图43主算32、合神三宫与正文33、午不合，双方保留。",

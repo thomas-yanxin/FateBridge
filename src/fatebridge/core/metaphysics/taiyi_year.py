@@ -183,7 +183,6 @@ def build_year_board(
                 "time_granularity": "year",
                 "classical_conformance": "partial_with_unresolved_rule_table_disagreements",
                 "classical_acceptance_passed": False,
-                "real_world_efficacy": "not_tested",
                 "unresolved": [
                     "卷三阳局39主算25、局50主算6已核CADAL06056494影像111/112页，依卷二通则算得35/16；底本表文与通则冲突，待外部裁定。",
                     "岁首采用现代农历正月初一的工程约定，未完成古历岁首复原。",

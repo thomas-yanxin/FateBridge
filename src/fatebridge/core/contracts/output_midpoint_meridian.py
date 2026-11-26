@@ -126,4 +126,3 @@ class DayMeridianAnalysis(PartialOutput):
     rule_trace: list[GeometryRuleTrace] | None = None
     limitations: list[str] | None = None
     original_text_conformance: str | None = None
-    real_world_efficacy: str | None = None

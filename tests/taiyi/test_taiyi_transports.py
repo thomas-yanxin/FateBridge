@@ -148,7 +148,7 @@ def test_published_first_views_preserve_evidence_under_default_limits(
         }
         assert {p["status"] for p in assessment["unassessed"]} == {"not_assessed"}
         assert body["taiyi"]["ruleset"]["classical_acceptance_passed"] is False
-        assert body["taiyi"]["ruleset"]["real_world_efficacy"] == "not_tested"
+        assert "real_world_efficacy" not in body["taiyi"]["ruleset"]
     elif view in {"gates", "taiyi_gates", "gate_comparison", "taiyi_gate_comparison"}:
         gates = body["taiyi"]["gates"]
         if mode == "hour" and hour_profile is None:
@@ -173,7 +173,7 @@ def test_published_first_views_preserve_evidence_under_default_limits(
         else:
             assert cycles["status"] == "not_computed_for_selected_mode"
     else:
-        assert body["taiyi"]["ruleset"]["real_world_efficacy"] == "not_tested"
+        assert "real_world_efficacy" not in body["taiyi"]["ruleset"]
     if key == "sanshiunited" and view is None:
         assert body["synthesis"]["source_profiles"]["qimen"]
         profiles = body["qimen"]["rule_profiles"]
@@ -335,7 +335,7 @@ def test_taiyi_evidence_across_real_transports(
         assert taiyi["calendar_rules"]["calculation_mode"] == mode
         assert "12:00:02" in taiyi["calendar_rules"]["civil_datetime"]
     assert taiyi["ruleset"]["classical_acceptance_passed"] is False
-    assert taiyi["ruleset"]["real_world_efficacy"] == "not_tested"
+    assert "real_world_efficacy" not in taiyi["ruleset"]
     assert "= " + str(taiyi["core_board"]["main_count"]) in bodies[0]["snapshot_text"]
 
 
