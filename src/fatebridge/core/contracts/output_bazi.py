@@ -1,16 +1,17 @@
-"""Stable nested facts, with projection-compatible optional fields.
+"""Stable nested facts for BaZi single-dimension analyses."""
 
-Validate existing payloads without reserialization; dynamic map keys and
-extension fields remain open. Definitions follow the service builders.
-"""
+from __future__ import annotations
 
 from typing import Literal
 
 from pydantic import ConfigDict
 
 from fatebridge.core.contracts.output_base import OpenJsonValue, PartialOutput
-from fatebridge.core.contracts.output_bazi_evidence import BaziEvidenceChain
-from fatebridge.core.contracts.output_chinese_calendar import CalendarContext, SolarTerm
+from fatebridge.core.contracts.output_chinese_calendar import (
+    CalendarContext,
+    FourPillars,
+    SolarTerm,
+)
 
 
 class TimingOverrides(PartialOutput):
@@ -27,20 +28,36 @@ class DimensionTimingContext(PartialOutput):
     year_boundary_policy: Literal["lichun_exact_moment"] | None = None
     boundary_status: Literal["year_boundary_day", "not_year_boundary_day"] | None = None
     boundaries_on_date: list[SolarTerm] | None = None
-    boundary_scope: str | None = None
-    hourly_evidence: dict[str, OpenJsonValue] | None = None
     dayun_pillar: str | None = None
     liunian_pillar: str | None = None
     source: str | None = None
     dayun_status: str | None = None
-    limitations: list[str] | None = None
-    # The timing engine reports fractional years (for example 28.7).
+    message: str | None = None
     dayun_age: float | None = None
-    dayun_age_basis: str | None = None
     dayun_selection_basis: str | None = None
     dayun_start_at: str | None = None
     dayun_end_at: str | None = None
+    child_limit: dict[str, OpenJsonValue] | None = None
+    xiaoyun_pillar: str | None = None
+    xiaoyun: dict[str, OpenJsonValue] | None = None
     overridden: TimingOverrides | None = None
+
+
+class TopicFacts(PartialOutput):
+    topic: str | None = None
+    four_pillars: FourPillars | None = None
+    day_master: dict[str, OpenJsonValue] | None = None
+    favorable_elements: list[str] | None = None
+    avoid_elements: list[str] | None = None
+    dominant_structure: str | None = None
+    seasonal_climate: dict[str, OpenJsonValue] | None = None
+    element_distribution: dict[str, float] | None = None
+    element_seasonal_phase: dict[str, str] | None = None
+    natal_stars: list[dict[str, OpenJsonValue]] | None = None
+    markers: list[dict[str, OpenJsonValue]] | None = None
+    palace_relations: dict[str, list[dict[str, OpenJsonValue]]] | None = None
+    natal_groups: list[dict[str, OpenJsonValue]] | None = None
+    timing_layers: list[dict[str, OpenJsonValue]] | None = None
 
 
 class DimensionOutput(PartialOutput):
@@ -48,4 +65,4 @@ class DimensionOutput(PartialOutput):
 
     calendar_context: CalendarContext | None = None
     timing_context: DimensionTimingContext | None = None
-    evidence_chain: BaziEvidenceChain | None = None
+    topic_facts: TopicFacts | None = None

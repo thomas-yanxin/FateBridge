@@ -5,9 +5,10 @@ from datetime import datetime, timezone
 
 import pytest
 
-from fatebridge.core import almanac, timing
-from fatebridge.core.calendar import BaZiCalendar
-from fatebridge.core.timing import TimingAnalysis
+from fatebridge.core import almanac
+from fatebridge.core.bazi import timing
+from fatebridge.core.bazi.calendar import BaZiCalendar
+from fatebridge.core.bazi.timing import TimingAnalysis
 from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.support.transports import SPECS, inputs, native

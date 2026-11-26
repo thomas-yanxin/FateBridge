@@ -1,17 +1,15 @@
-"""Literal source-study interface; never reconstruct a person's birth record."""
+"""Literal classical-source index comparison; never reconstruct a birth datetime."""
+
+from __future__ import annotations
 
 from typing import Any
 
-from fatebridge.core.branch_candidates import build_branch_combination_candidates
-from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.energy_provenance import build_energy_provenance
-from fatebridge.core.source_annotations import (
-    annotation_comparison_summary,
+from fatebridge.core.bazi.sources import (
     compare_registered_annotations,
     input_consistency,
     pillar_values,
 )
-from fatebridge.utils.data import STEM_ELEMENTS
+from fatebridge.core.bazi.strength import analyze_elements_and_structure
 from fatebridge.utils.errors import calculation_guard
 from fatebridge.utils.formatting import create_pillar_dict
 
@@ -26,8 +24,9 @@ def calculate_bazi_source_compare(
     pillars = {
         p: (s[0], s[1]) for p, s in zip(("year", "month", "day", "hour"), values)
     }
-    current = ElementAnalysis.analyze_day_master_strength(pillars)
-    comparison = compare_registered_annotations(pillars, current["strength_level"])
+    analysis = analyze_elements_and_structure(pillars)
+    strength_level = analysis["day_master"]["strength"]
+    comparison = compare_registered_annotations(pillars, strength_level)
     return {
         "analysis_type": "原典字面四柱与当前模型核对",
         "four_pillars": create_pillar_dict(pillars),
@@ -35,23 +34,12 @@ def calculate_bazi_source_compare(
             **input_consistency(values),
             "input_kind": "literal_four_pillars",
             "birth_datetime_reconstructed": False,
-            "calendar_accuracy_assessed": False,
         },
         "current_calculation": {
-            "strength_level": current["strength_level"],
-            "engineering_index": current["engineering_index"],
-            "classical_adjudication": current["classical_adjudication"],
-            "method_id": current["assessment"]["method_id"],
-            "assessment": current["assessment"],
-            "energy_provenance": build_energy_provenance(
-                current["assessment"], STEM_ELEMENTS[pillars["day"][0]][0].value
-            ),
-            "branch_combination_candidates": build_branch_combination_candidates(
-                pillars, current["assessment"]
-            ),
-            "calculation_overridden": False,
+            "strength_level": strength_level,
+            "day_master": analysis["day_master"],
+            "favorable_elements": analysis["favorable_elements"],
+            "dominant_structure": analysis["structure_profile"]["dominant_structure"],
         },
         "source_comparison": comparison,
-        "summary": annotation_comparison_summary(comparison)
-        + " 比较等级为工程政策标签；原典力量另见classical_adjudication，未裁定不以工程档回填。",
     }

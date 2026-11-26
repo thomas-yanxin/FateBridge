@@ -5,7 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import de440_solar
+from fatebridge.core import almanac, de440_solar
+from fatebridge.core.bazi.calendar import BaZiCalendar
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.support.transports import SPECS, business, call_cli, inputs, native
 
@@ -20,6 +21,7 @@ def test_comprehensive_default_source_matches_its_actual_mcp_and_cli_surfaces(
     monkeypatch.delenv("FATEBRIDGE_SOLAR_TERM_MODEL", raising=False)
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
+    almanac.get_solar_terms_for_year.cache_clear()
     spec = SPECS["bazi_overview"]
     assert spec.rest_path == "/api/bazi/overview"
     payload = {**inputs(spec), "use_true_solar_time": False}
@@ -38,10 +40,7 @@ def test_comprehensive_default_source_matches_its_actual_mcp_and_cli_surfaces(
         term = result["calendar_context"]["current_solar_term"]
         assert term["resolution_provider"] == "jpl_de440"
         assert term["ephemeris_model"] == de440_solar.MODEL_ID
-        assert (
-            de440_solar.MODEL_ID
-            in result["run_metadata"]["provenance"]["ephemeris_model"]
-        )
+        assert result["run_metadata"]["engine_is_approximate"] is False
 
 
 def test_comprehensive_default_data_failure_cannot_return_a_complete_report(
@@ -54,6 +53,9 @@ def test_comprehensive_default_data_failure_cannot_return_a_complete_report(
 
     monkeypatch.delenv("FATEBRIDGE_SOLAR_TERM_MODEL", raising=False)
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
+    monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
+    almanac.get_solar_terms_for_year.cache_clear()
+    BaZiCalendar._get_four_pillars_cached.cache_clear()
     monkeypatch.setattr(de440_solar, "_profile", unavailable)
     spec = SPECS["bazi_overview"]
     payload = {**inputs(spec), "use_true_solar_time": False}

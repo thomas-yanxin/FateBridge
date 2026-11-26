@@ -1,6 +1,7 @@
-"""Compute BaZi time pillars, term boundaries, and pillar relationships."""
+"""Compute BaZi time pillars, Dayun/小运, and timing interactions."""
 
-from copy import deepcopy
+from __future__ import annotations
+
 from typing import Any
 
 from fatebridge.analysis.timing_effects import TimingEffectsAnalysis
@@ -9,6 +10,7 @@ from fatebridge.core.almanac import (
     current_local_datetime,
     get_jieqi_year_grid,
 )
+from fatebridge.core.bazi.calendar import ChangshengSchool, DutyProfile, ZiHourPolicy
 from fatebridge.services.birth_context import build_birth_computation_context
 from fatebridge.services.timing_clock import (
     AnalysisClockReference,
@@ -54,11 +56,19 @@ def calculate_comprehensive_timing(
     analysis_hour: int | None = None,
     analysis_minute: int | None = None,
     birth_time_uncertainty_minutes: int | None = None,
+    *,
+    zi_hour_policy: ZiHourPolicy = "day_rollover_at_23",
+    changsheng_school: ChangshengSchool = "fire_earth_same_palace",
+    duty_profile: DutyProfile = "sanming",
+    include_timelines: bool = False,
 ) -> dict[str, Any]:
-    """
-    计算时运分析，包括大运、流年、流月、流日、流时的影响分析
-    """
-    birth_context = build_birth_computation_context(person)
+    """综合时运分析：大运（或起运前小运+童限）、流年、流月、流日、流时及完整干支交互。"""
+    birth_context = build_birth_computation_context(
+        person,
+        zi_hour_policy=zi_hour_policy,
+        changsheng_school=changsheng_school,
+        duty_profile=duty_profile,
+    )
     normalized_birth_time = birth_context.normalized_birth_time
     input_birth_datetime = normalized_birth_time.input_datetime
     birth_date = normalized_birth_time.corrected_datetime
@@ -73,21 +83,9 @@ def calculate_comprehensive_timing(
         analysis_minute=analysis_minute,
     )
     analysis_date = resolution.moment
-    analysis_year, analysis_month = analysis_date.year, analysis_date.month
     analysis_calendar_context = build_calendar_context(
         analysis_date,
         timezone_name=normalized_birth_time.timezone,
-    )
-    analysis_year_jieqi = get_jieqi_year_grid(
-        analysis_year, normalized_birth_time.timezone
-    )
-    liuyue_timeline = enrich_liuyue_timeline(
-        birth_context,
-        target_year=analysis_year,
-    )
-    jieqi_timeline = enrich_jieqi_timeline(
-        birth_context,
-        target_year=analysis_year,
     )
     timing_result = build_current_timing_state(
         birth_context,
@@ -95,6 +93,20 @@ def calculate_comprehensive_timing(
         analysis_age=analysis_age,
     )
     current_age = timing_result["current_age"]
+
+    analysis_calendar: dict[str, Any] = {
+        "analysis_date_context": analysis_calendar_context,
+    }
+    if include_timelines:
+        analysis_calendar["analysis_year_jieqi"] = get_jieqi_year_grid(
+            analysis_date.year, normalized_birth_time.timezone
+        )
+        analysis_calendar["liuyue_timeline"] = enrich_liuyue_timeline(
+            birth_context, target_year=analysis_date.year
+        )
+        analysis_calendar["jieqi_timeline"] = enrich_jieqi_timeline(
+            birth_context, target_year=analysis_date.year
+        )
 
     result: dict[str, Any] = {
         "analysis_type": "综合时运分析",
@@ -110,16 +122,12 @@ def calculate_comprehensive_timing(
             "analysis_date": analysis_date.strftime("%Y-%m-%d"),
             "analysis_datetime": analysis_date.strftime("%Y-%m-%d %H:%M"),
             "current_age": current_age,
+            "zi_hour_policy": zi_hour_policy,
             "time_adjustment": normalized_birth_time.as_dict(),
         },
         "birth_pillars": create_pillar_dict(birth_context.birth_pillars),
         "calendar_context": birth_context.birth_calendar_context,
-        "analysis_calendar": {
-            "analysis_date_context": analysis_calendar_context,
-            "analysis_year_jieqi": analysis_year_jieqi,
-            "liuyue_timeline": liuyue_timeline,
-            "jieqi_timeline": jieqi_timeline,
-        },
+        "analysis_calendar": analysis_calendar,
     }
 
     dayun_analysis = timing_result["dayun_analysis"]
@@ -127,9 +135,12 @@ def calculate_comprehensive_timing(
         dayun_info = dayun_analysis["dayun_info"]
         age_info = dayun_analysis["age_info"]
         dayun_section: dict[str, Any] = {
+            "status": "active",
             "current_dayun": dayun_info["pillar"],
             "stem": dayun_info["stem"],
             "branch": dayun_info["branch"],
+            "stem_ten_god": dayun_info["stem_ten_god"],
+            "nayin": dayun_info["nayin"],
             "start_age": age_info["start_age"],
             "start_age_precise": age_info.get("start_age_precise"),
             "start_age_unrounded": age_info.get("start_age_unrounded"),
@@ -137,38 +148,44 @@ def calculate_comprehensive_timing(
             "years_in_period": age_info["years_in_period"],
             "direction": age_info.get("direction"),
             "selection_basis": age_info["selection_basis"],
-            "elapsed_year_basis": age_info["elapsed_year_basis"],
             "start_at": dayun_info["start_at"],
             "end_at": dayun_info["end_at"],
-            "summary": dayun_analysis["summary"],
-        }
-        # Preserve structured element changes for clients reading the combined
-        # timing response, without requiring them to parse summary text.
-        if "element_effects" in dayun_analysis:
-            dayun_section["element_effects"] = serialize_element_effects(
+            "child_limit": dayun_analysis["child_limit"],
+            "natal_relations": dayun_info["natal_relations"],
+            "shensha": dayun_info["shensha"],
+            "element_effects": serialize_element_effects(
                 dayun_analysis["element_effects"]
-            )
+            ),
+        }
         result["dayun_analysis"] = dayun_section
+    elif dayun_analysis.get("status") == "before_dayun":
+        result["dayun_analysis"] = {
+            "status": "before_dayun",
+            "current_dayun": None,
+            "child_limit": dayun_analysis["child_limit"],
+            "xiaoyun": dayun_analysis["xiaoyun_info"],
+            "xiaoyun_timeline": dayun_analysis["xiaoyun_timeline"],
+            "first_dayun": dayun_analysis["first_dayun"],
+            "element_effects": serialize_element_effects(
+                dayun_analysis["element_effects"]
+            ),
+        }
     else:
         result["dayun_analysis"] = {
-            "error": dayun_analysis.get("message", "大运信息不可用"),
             "status": dayun_analysis.get("status"),
+            "current_dayun": None,
+            "message": dayun_analysis.get("message", "大运信息不可用"),
         }
     result["dayun_analysis"]["timing_context"] = dayun_analysis["timing_context"]
 
     liunian_analysis = timing_result["liunian_analysis"]
     liunian_info = liunian_analysis["liunian_info"]
-    liunian_section: dict[str, Any] = {
-        "pillar": liunian_info["pillar"],
-        "stem": liunian_info["stem"],
-        "branch": liunian_info["branch"],
-        "summary": liunian_analysis["summary"],
-    }
-    if "element_effects" in liunian_analysis:
-        liunian_section["element_effects"] = serialize_element_effects(
+    result["liunian_analysis"] = {
+        **liunian_info,
+        "element_effects": serialize_element_effects(
             liunian_analysis["element_effects"]
-        )
-    result["liunian_analysis"] = liunian_section
+        ),
+    }
 
     liuyue_analysis = timing_result["liuyue_analysis"]
     liuyue_info = liuyue_analysis["liuyue_info"]
@@ -176,7 +193,8 @@ def calculate_comprehensive_timing(
         "pillar": liuyue_info["pillar"],
         "stem": liuyue_info["stem"],
         "branch": liuyue_info["branch"],
-        "summary": liuyue_analysis["summary"],
+        "nayin": liuyue_info["nayin"],
+        "detailed_analysis": liuyue_analysis["detailed_analysis"],
     }
 
     liuri_analysis = timing_result["liuri_analysis"]
@@ -185,7 +203,9 @@ def calculate_comprehensive_timing(
         "pillar": liuri_info["pillar"],
         "stem": liuri_info["stem"],
         "branch": liuri_info["branch"],
-        "summary": liuri_analysis["summary"],
+        "nayin": liuri_info["nayin"],
+        "weekday": liuri_info["weekday"],
+        "detailed_analysis": liuri_analysis["detailed_analysis"],
     }
 
     liushi_analysis = timing_result["liushi_analysis"]
@@ -194,12 +214,14 @@ def calculate_comprehensive_timing(
         "pillar": liushi_info["pillar"],
         "stem": liushi_info["stem"],
         "branch": liushi_info["branch"],
+        "nayin": liushi_info["nayin"],
         "hour": liushi_info["hour"],
-        "summary": liushi_analysis["summary"],
+        "detailed_analysis": liushi_analysis["detailed_analysis"],
     }
 
-    combined_effects = timing_result["combined_effects"]
-    result["combined_effects"] = serialize_element_effects(combined_effects)
+    result["combined_effects"] = serialize_element_effects(
+        timing_result["combined_effects"]
+    )
     result["interaction_analysis"] = timing_result["interaction_analysis"]
     if birth_time_uncertainty_minutes is not None:
         result["birth_time_sensitivity"] = analyze_birth_time_range(
@@ -208,17 +230,6 @@ def calculate_comprehensive_timing(
             analysis_moment=analysis_date if analysis_age is None else None,
             analysis_age=analysis_age,
         )
-
-    result["comprehensive_summary"] = timing_result["comprehensive_summary"]
-
-    # Keep every current-period fact/status. The starter view omits only the
-    # complete twelve-period table; full JSON retains its original timeline.
-    first_view = deepcopy(result["dayun_analysis"])
-    context = first_view.get("timing_context")
-    timeline = context.get("timeline") if isinstance(context, dict) else None
-    if isinstance(timeline, dict):
-        timeline.pop("periods", None)
-    result["dayun_analysis"]["first_view"] = first_view
     result["analysis_reference"] = resolution.reference
     return result
 
@@ -233,11 +244,18 @@ def calculate_dayun_analysis(
     analysis_hour: int | None = None,
     analysis_minute: int | None = None,
     birth_time_uncertainty_minutes: int | None = None,
+    *,
+    zi_hour_policy: ZiHourPolicy = "day_rollover_at_23",
+    changsheng_school: ChangshengSchool = "fire_earth_same_palace",
+    duty_profile: DutyProfile = "sanming",
 ) -> dict[str, Any]:
-    """
-    大运分析工具 - 专门分析指定年龄的大运情况
-    """
-    birth_context = build_birth_computation_context(person)
+    """大运专项分析：包含起运童限(X年Y月Z日)、交运时刻与干支、十年一运及起运前小运。"""
+    birth_context = build_birth_computation_context(
+        person,
+        zi_hour_policy=zi_hour_policy,
+        changsheng_school=changsheng_school,
+        duty_profile=duty_profile,
+    )
     normalized_birth_time = birth_context.normalized_birth_time
     birth_date = normalized_birth_time.corrected_datetime
 
@@ -299,37 +317,47 @@ def calculate_dayun_analysis(
     if "dayun_info" in dayun_result:
         dayun_info = dayun_result["dayun_info"]
         age_info = dayun_result["age_info"]
-
         result["dayun_info"] = {
+            "status": "active",
             "current_dayun": dayun_info["pillar"],
             "stem": dayun_info["stem"],
             "branch": dayun_info["branch"],
+            "stem_ten_god": dayun_info["stem_ten_god"],
+            "nayin": dayun_info["nayin"],
             "start_age": age_info["start_age"],
-            # note (dayun): Retain the raw age behind the two-decimal display and integer ceiling.
             "start_age_precise": age_info.get("start_age_precise"),
             "start_age_unrounded": age_info.get("start_age_unrounded"),
             "dayun_age": age_info["dayun_age"],
             "years_in_period": age_info["years_in_period"],
             "direction": age_info.get("direction"),
             "selection_basis": age_info["selection_basis"],
-            "elapsed_year_basis": age_info["elapsed_year_basis"],
             "start_at": dayun_info["start_at"],
             "end_at": dayun_info["end_at"],
+            "child_limit": dayun_result["child_limit"],
+            "natal_relations": dayun_info["natal_relations"],
+            "shensha": dayun_info["shensha"],
         }
-
         result["element_effects"] = serialize_element_effects(
             dayun_result["element_effects"]
         )
-
-        result["summary"] = dayun_result["summary"]
-    else:
-        result["summary"] = dayun_result.get("message", "大运信息不可用")
+    elif dayun_result.get("status") == "before_dayun":
         result["dayun_info"] = {
-            "status": dayun_result["status"],
+            "status": "before_dayun",
             "current_dayun": None,
-            "message": result["summary"],
-            "selection_basis": dayun_result["timing_context"]["selection_basis"],
+            "child_limit": dayun_result["child_limit"],
+            "xiaoyun": dayun_result["xiaoyun_info"],
+            "xiaoyun_timeline": dayun_result["xiaoyun_timeline"],
+            "first_dayun": dayun_result["first_dayun"],
             "first_start_at": dayun_result["timing_context"]["timeline"]["start_at"],
+        }
+        result["element_effects"] = serialize_element_effects(
+            dayun_result["element_effects"]
+        )
+    else:
+        result["dayun_info"] = {
+            "status": dayun_result.get("status"),
+            "current_dayun": None,
+            "message": dayun_result.get("message", "大运信息不可用"),
         }
 
     result["timing_context"] = dayun_result["timing_context"]
@@ -340,7 +368,6 @@ def calculate_dayun_analysis(
             analysis_moment=analysis_moment,
             analysis_age=analysis_age if analysis_moment is None else None,
         )
-
     result["analysis_reference"] = analysis_reference
     return result
 
@@ -349,37 +376,26 @@ def calculate_dayun_analysis(
 def calculate_jieqi_timeline_analysis(
     person: PersonInfo,
     analysis_year: int | None = None,
+    *,
+    zi_hour_policy: ZiHourPolicy = "day_rollover_at_23",
+    changsheng_school: ChangshengSchool = "fire_earth_same_palace",
+    duty_profile: DutyProfile = "sanming",
 ) -> dict[str, Any]:
-    """
-    节气节点时间轴分析 - 输出全年 24 节气节点的流月/流日切换信息
-    """
-    birth_context = build_birth_computation_context(person)
+    birth_context = build_birth_computation_context(
+        person,
+        zi_hour_policy=zi_hour_policy,
+        changsheng_school=changsheng_school,
+        duty_profile=duty_profile,
+    )
     normalized_birth_time = birth_context.normalized_birth_time
     birth_date = normalized_birth_time.corrected_datetime
-
     target_year = (
         analysis_year
         if analysis_year is not None
         else current_local_datetime(normalized_birth_time.timezone).year
     )
-
-    jieqi_timeline = enrich_jieqi_timeline(
-        birth_context,
-        target_year=target_year,
-    )
-
+    jieqi_timeline = enrich_jieqi_timeline(birth_context, target_year=target_year)
     target_year_jieqi = get_jieqi_year_grid(target_year, normalized_birth_time.timezone)
-    summary = (
-        f"{target_year}年共生成{len(jieqi_timeline)}个节气节点时间轴，"
-        f"覆盖全年流月与流日切换。"
-    )
-    if any("analysis_anchor_status" in item for item in jieqi_timeline):
-        unavailable = sum("analysis_anchor_status" in item for item in jieqi_timeline)
-        summary = (
-            f"{target_year}年共生成{len(jieqi_timeline)}个节气节点，"
-            f"其中{unavailable}个区间没有可重放的当地整分。"
-        )
-
     return {
         "analysis_type": "节气节点时间轴分析",
         "personal_info": {
@@ -397,5 +413,4 @@ def calculate_jieqi_timeline_analysis(
         "calendar_context": birth_context.birth_calendar_context,
         "target_year_jieqi": target_year_jieqi,
         "jieqi_timeline": jieqi_timeline,
-        "summary": summary,
     }

@@ -18,8 +18,7 @@ from datetime import datetime
 
 import pytest
 
-from fatebridge.core.calendar import BaZiCalendar
-from fatebridge.services.bazi import _build_three_origins
+from fatebridge.core.bazi.calendar import BaZiCalendar, build_three_origins
 
 # (year, month, day, hour, minute): {origin: 干支} —— 历史冻结值，来源限度见文件说明
 _CASES = {
@@ -38,6 +37,6 @@ _CASES = {
 @pytest.mark.parametrize("birth,expected", list(_CASES.items()))
 def test_three_origins_match_lunar_python(birth, expected) -> None:
     pillars = BaZiCalendar.get_four_pillars(datetime(*birth), "Asia/Shanghai")
-    origins = _build_three_origins(pillars)
+    origins = build_three_origins(pillars)
     actual = {key: origins[key]["pillar"] for key in expected}
     assert actual == expected

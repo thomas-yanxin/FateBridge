@@ -1,4 +1,4 @@
-"""Bazi tool declarations and domain binding helpers."""
+"""Bazi tool declarations and domain compact views."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from fatebridge.application.bindings import (
     service_ref,
 )
 from fatebridge.application.domain_validators import validate_bazi_anchors
-from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.application.tool_spec import ServiceResult, ToolSpec
 from fatebridge.core.reproducibility import ReproducibilityPolicy
 
 _BAZI_REQ = "fatebridge.core.requests.bazi"
@@ -19,50 +19,59 @@ calculate_bazi_birth = service_ref("fatebridge.services.bazi", "calculate_bazi_b
 calculate_bazi_source_compare = service_ref(
     "fatebridge.services.source_comparison", "calculate_bazi_source_compare"
 )
-
-
 calculate_bazi_career = service_ref("fatebridge.services.bazi", "calculate_bazi_career")
-
-
 calculate_bazi_children = service_ref(
     "fatebridge.services.bazi", "calculate_bazi_children"
 )
-
-
 calculate_bazi_education = service_ref(
     "fatebridge.services.bazi", "calculate_bazi_education"
 )
-
-
 calculate_bazi_health = service_ref("fatebridge.services.bazi", "calculate_bazi_health")
-
-
 calculate_bazi_marriage = service_ref(
     "fatebridge.services.bazi", "calculate_bazi_marriage"
 )
-
-
 calculate_bazi_personality = service_ref(
     "fatebridge.services.bazi", "calculate_bazi_personality"
 )
-
-
 calculate_bazi_relatives = service_ref(
     "fatebridge.services.bazi", "calculate_bazi_relatives"
 )
-
-
 calculate_bazi_romance = service_ref(
     "fatebridge.services.bazi", "calculate_bazi_romance"
 )
-
-
 calculate_bazi_wealth = service_ref("fatebridge.services.bazi", "calculate_bazi_wealth")
-
-
-calculate_destiny_analysis = service_ref(
-    "fatebridge.services.calculation", "calculate_destiny_analysis"
+calculate_bazi_overview = service_ref(
+    "fatebridge.services.bazi", "calculate_bazi_overview"
 )
+
+
+def _compact_bazi_overview(result: ServiceResult) -> ServiceResult:
+    return {
+        k: v for k, v in result.items() if k not in {"calendar_context", "patterns"}
+    }
+
+
+def _compact_bazi_birth(result: ServiceResult) -> ServiceResult:
+    birth = result.get("bazi_birth")
+    if not isinstance(birth, dict):
+        return result
+    compact_birth = {
+        k: v
+        for k, v in birth.items()
+        if k
+        not in {"calendar_context", "analysis_calendar_context", "patterns", "shensha"}
+    }
+    return {"analysis_type": result.get("analysis_type"), "bazi_birth": compact_birth}
+
+
+def _compact_bazi_dimension(result: ServiceResult) -> ServiceResult:
+    cleaned: ServiceResult = {}
+    for key, val in result.items():
+        if key.endswith("_analysis") and isinstance(val, dict):
+            cleaned[key] = {k: v for k, v in val.items() if k != "calendar_context"}
+        else:
+            cleaned[key] = val
+    return cleaned
 
 
 def _bazi_dimension_spec(
@@ -72,11 +81,12 @@ def _bazi_dimension_spec(
         name=f"bazi_{name}",
         bind=bind_person(service),
         request_model_loader=request_model_ref(_BAZI_REQ, model_name),
-        summary=f"{label}取证：四柱星位、传统前提与大运流年触点。",
+        summary=f"{label}：四柱星宫、大运流年交互与专题取证。",
         operation_label_zh=label,
         family="bazi",
         rest_path=f"/api/bazi/{name}",
         cpu_bound=True,
+        compact_view=_compact_bazi_dimension,
         output_validators=(validate_bazi_anchors,),
     )
 
@@ -84,15 +94,16 @@ def _bazi_dimension_spec(
 SPECS: list[ToolSpec] = [
     ToolSpec(
         name="bazi_overview",
-        bind=bind_person(calculate_destiny_analysis),
+        bind=bind_person(calculate_bazi_overview),
         request_model_loader=request_model_ref(
             "fatebridge.core.requests.birth", "BaziClockRequest"
         ),
-        summary="八字综合命理：命盘、喜用神与格局；仅需四柱十神用 bazi_birth_chart。",
+        summary="八字综合命理：命盘、格局、调候、喜用神与司令分野；完整盘式用 bazi_birth_chart。",
         operation_label_zh="命理分析",
         family="bazi",
         rest_path="/api/bazi/overview",
         cpu_bound=True,
+        compact_view=_compact_bazi_overview,
         reproducibility=ReproducibilityPolicy(implicit_current_time=True),
         output_validators=(validate_bazi_anchors,),
     ),
@@ -100,11 +111,12 @@ SPECS: list[ToolSpec] = [
         name="bazi_birth_chart",
         bind=bind_person(calculate_bazi_birth),
         request_model_loader=request_model_ref(_BAZI_REQ, "BaziBirthRequest"),
-        summary="八字标准命盘：四柱、十神、五行与大运概略；喜用格局用 bazi_overview。",
+        summary="八字标准命盘：四柱、三垣/胎息、十神、神煞、空亡、司令、大运/小运概略。",
         operation_label_zh="八字命盘",
         family="bazi",
         rest_path="/api/bazi/birth-chart",
         cpu_bound=True,
+        compact_view=_compact_bazi_birth,
         output_validators=(validate_bazi_anchors,),
     ),
     _bazi_dimension_spec(
@@ -145,6 +157,12 @@ SPECS: list[ToolSpec] = [
         operation_label_zh="原典四柱核对",
         family="bazi",
         rest_path="/api/bazi/compare-sources",
+        required_output_fields=(
+            "four_pillars",
+            "input_context",
+            "current_calculation",
+            "source_comparison",
+        ),
         cpu_bound=True,
     ),
 ]

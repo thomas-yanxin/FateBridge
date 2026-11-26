@@ -1,6 +1,4 @@
-"""
-Standalone BaZi tool surfaces for FateBridge.
-"""
+"""Standalone BaZi tool surfaces for FateBridge."""
 
 from __future__ import annotations
 
@@ -15,20 +13,30 @@ from fatebridge.core.almanac import (
     get_solar_terms_for_year,
     localize_datetime,
 )
-from fatebridge.core.bazi.bazi_evidence import (
-    build_natal_evidence,
-    build_topic_evidence,
+from fatebridge.core.bazi.calendar import (
+    BaZiCalendar,
+    ChangshengSchool,
+    DutyProfile,
+    ZiHourPolicy,
+    build_taixi,
+    build_three_origins,
 )
-from fatebridge.core.bazi.bazi_star_tables import (
+from fatebridge.core.bazi.relations import (
+    collect_target_branch_relations,
+    group_relations,
+    pair_relations,
+)
+from fatebridge.core.bazi.shensha import (
+    GU_CHEN_TARGETS,
+    GUA_SU_TARGETS,
     HONG_LUAN_TARGETS,
     PEACH_BLOSSOM_TARGETS,
     TIAN_XI_TARGETS,
     WEN_CHANG_TARGETS,
+    build_shensha_profile,
 )
-from fatebridge.core.calendar import BaZiCalendar
-from fatebridge.core.classical import build_classical_overview
-from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX, kongwang_for_ganzhi
-from fatebridge.core.timing import TimingAnalysis
+from fatebridge.core.bazi.timing import TimingAnalysis
+from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
 from fatebridge.services.birth_context import (
     BirthComputationContext,
     build_birth_computation_context,
@@ -41,201 +49,32 @@ from fatebridge.services.timing_state import (
 from fatebridge.utils.birth_input import PersonInfo, normalize_gender
 from fatebridge.utils.data import (
     BRANCH_HIDDEN_STEMS,
-    EARTHLY_BRANCHES,
-    HEAVENLY_STEMS,
-    get_nayin,
+    TenGod,
     get_ten_god,
+    iter_pillar_gods,
 )
 from fatebridge.utils.errors import (
     ParameterError,
     calculation_guard,
     handle_calculation_error,
 )
+from fatebridge.utils.formatting import create_pillar_dict
 
-PILLAR_LABELS = {
-    "year": "年柱",
-    "month": "月柱",
-    "day": "日柱",
-    "hour": "时柱",
-    "taiyuan": "胎元",
-    "minggong": "命宫",
-    "shengong": "身宫",
-}
+_ORDER = ("year", "month", "day", "hour")
 
-MONTH_HOUR_ORDER = [
-    "寅",
-    "卯",
-    "辰",
-    "巳",
-    "午",
-    "未",
-    "申",
-    "酉",
-    "戌",
-    "亥",
-    "子",
-    "丑",
-]
-
-
-TRAVEL_HORSE_TARGETS = (
-    (("申", "子", "辰"), "寅"),
-    (("寅", "午", "戌"), "申"),
-    (("亥", "卯", "未"), "巳"),
-    (("巳", "酉", "丑"), "亥"),
-)
-
-HUA_GAI_TARGETS = (
-    (("申", "子", "辰"), "辰"),
-    (("寅", "午", "戌"), "戌"),
-    (("亥", "卯", "未"), "未"),
-    (("巳", "酉", "丑"), "丑"),
-)
-
-TIAN_YI_TARGETS = {
-    "甲": ["丑", "未"],
-    "戊": ["丑", "未"],
-    "庚": ["丑", "未"],
-    "乙": ["子", "申"],
-    "己": ["子", "申"],
-    "丙": ["亥", "酉"],
-    "丁": ["亥", "酉"],
-    "辛": ["寅", "午"],
-    "壬": ["卯", "巳"],
-    "癸": ["卯", "巳"],
-}
-
-
-# --- 天德贵人 (Heavenly Virtue Noble) ---
-# 按月支查天德所在
-TIAN_DE_TARGETS = {
-    "子": "巳",
-    "丑": "庚",
-    "寅": "丁",
-    "卯": "申",
-    "辰": "壬",
-    "巳": "辛",
-    "午": "亥",
-    "未": "甲",
-    "申": "癸",
-    "酉": "寅",
-    "戌": "丙",
-    "亥": "乙",
-}
-
-# --- 月德贵人 (Monthly Virtue Noble) ---
-# 按月支查月德所在
-YUE_DE_TARGETS = {
-    "子": "壬",
-    "丑": "庚",
-    "寅": "丙",
-    "卯": "甲",
-    "辰": "壬",
-    "巳": "庚",
-    "午": "丙",
-    "未": "甲",
-    "申": "壬",
-    "酉": "庚",
-    "戌": "丙",
-    "亥": "甲",
-}
-
-# --- 将星 (General Star) ---
-JIANG_XING_TARGETS = (
-    (("申", "子", "辰"), "子"),
-    (("寅", "午", "戌"), "午"),
-    (("亥", "卯", "未"), "卯"),
-    (("巳", "酉", "丑"), "酉"),
-)
-
-# --- 金舆 (Golden Carriage) ---
-JIN_YU_TARGETS = {
-    "甲": "辰",
-    "乙": "巳",
-    "丙": "未",
-    "丁": "申",
-    "戊": "未",
-    "己": "申",
-    "庚": "戌",
-    "辛": "亥",
-    "壬": "丑",
-    "癸": "寅",
-}
-
-# --- 亡神 (Lost Spirit) ---
-WANG_SHEN_TARGETS = (
-    (("申", "子", "辰"), "亥"),
-    (("寅", "午", "戌"), "巳"),
-    (("亥", "卯", "未"), "寅"),
-    (("巳", "酉", "丑"), "申"),
-)
-
-# --- 劫煞 (Robbery Sha) ---
-JIE_SHA_TARGETS = (
-    (("申", "子", "辰"), "巳"),
-    (("寅", "午", "戌"), "亥"),
-    (("亥", "卯", "未"), "申"),
-    (("巳", "酉", "丑"), "寅"),
-)
-
-# --- 孤辰 (Lonely Star) ---
-GU_CHEN_TARGETS = {
-    "子": "寅",
-    "丑": "寅",
-    "寅": "巳",
-    "卯": "巳",
-    "辰": "巳",
-    "巳": "申",
-    "午": "申",
-    "未": "申",
-    "申": "亥",
-    "酉": "亥",
-    "戌": "亥",
-    "亥": "寅",
-}
-
-# --- 寡宿 (Widow Star) ---
-GUA_SU_TARGETS = {
-    "子": "戌",
-    "丑": "戌",
-    "寅": "丑",
-    "卯": "丑",
-    "辰": "丑",
-    "巳": "辰",
-    "午": "辰",
-    "未": "辰",
-    "申": "未",
-    "酉": "未",
-    "戌": "未",
-    "亥": "戌",
-}
-
-# --- 学堂 (Study Hall) ---
-XUE_TANG_TARGETS = {
-    "甲": "亥",
-    "乙": "午",
-    "丙": "寅",
-    "丁": "酉",
-    "戊": "寅",
-    "己": "酉",
-    "庚": "巳",
-    "辛": "子",
-    "壬": "申",
-    "癸": "卯",
-}
-
-# --- 词馆 (Literary Hall) ---
-CI_GUAN_TARGETS = {
-    "甲": "寅",
-    "乙": "卯",
-    "丙": "巳",
-    "丁": "午",
-    "戊": "巳",
-    "己": "午",
-    "庚": "申",
-    "辛": "酉",
-    "壬": "亥",
-    "癸": "子",
+_TOPICS: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
+    "career": (
+        ("正官", "七杀", "正印", "偏印", "食神", "伤官", "正财", "偏财"),
+        ("month",),
+    ),
+    "wealth": (("正财", "偏财", "食神", "伤官", "比肩", "劫财"), ()),
+    "education": (("正印", "偏印", "食神", "伤官", "正官", "七杀"), ("month",)),
+    "personality": (tuple(g.value for g in TenGod), ()),
+    "health": ((), ()),
+    "relatives": (("偏财", "正印", "比肩", "劫财"), ("year", "month")),
+    "marriage": ((), ("day",)),
+    "romance": ((), ("day",)),
+    "children": ((), ("hour",)),
 }
 
 
@@ -260,294 +99,8 @@ def _resolve_analysis_date(
     year = analysis_year if analysis_year is not None else now.year
     month = analysis_month if analysis_month is not None else now.month
     day = analysis_day if analysis_day is not None else now.day
-    if all(
-        value is not None for value in (analysis_year, analysis_month, analysis_day)
-    ):
-        return datetime(year, month, day)
-    # Clamp the day to the resolved month so a partial date (e.g. only
-    # analysis_day=31) combined with the current month never raises a
-    # clock-dependent "day is out of range" error.
     last_day = calendar.monthrange(year, month)[1]
     return datetime(year, month, min(day, last_day))
-
-
-def _cycle_stem(stem: str, steps: int) -> str:
-    return HEAVENLY_STEMS[(HEAVENLY_STEMS.index(stem) + steps) % len(HEAVENLY_STEMS)]
-
-
-def _palace_stem(year_stem: str, position: int) -> str:
-    """五虎遁: 给定年干, 取第 position 宫 (寅=1 … 丑=12) 的天干。
-
-    命宫 / 身宫 的天干随宫位由年干起五虎遁定 (寅宫起干 = (年干序+1)*2),
-    而非由月柱「相对位移」推导——后者把地支 mod-12 的位移直接喂给天干
-    mod-10 的循环, 在宫位环绕到月支之前时会漏掉 12 mod 10 = 2 而偏 +2。
-    """
-    year_gan_index = HEAVENLY_STEMS.index(year_stem)
-    gan_index = (year_gan_index + 1) * 2 + position
-    while gan_index > 10:
-        gan_index -= 10
-    return HEAVENLY_STEMS[gan_index - 1]
-
-
-def _build_origin_payload(
-    *,
-    label_key: str,
-    stem: str,
-    branch: str,
-    day_stem: str,
-) -> dict[str, Any]:
-    return {
-        "label": PILLAR_LABELS[label_key],
-        "stem": stem,
-        "branch": branch,
-        "pillar": f"{stem}{branch}",
-        "nayin": get_nayin(stem, branch),
-        "hidden_stems": BRANCH_HIDDEN_STEMS.get(branch, []),
-        "ten_god": get_ten_god(day_stem, stem).value,
-    }
-
-
-def _build_three_origins(
-    pillars: dict[str, tuple[str, str]],
-) -> dict[str, dict[str, Any]]:
-    year_stem = pillars["year"][0]
-    month_stem, month_branch = pillars["month"]
-    day_stem = pillars["day"][0]
-    hour_branch = pillars["hour"][1]
-
-    taiyuan = _build_origin_payload(
-        label_key="taiyuan",
-        stem=_cycle_stem(month_stem, 1),
-        branch=EARTHLY_BRANCHES[
-            (EARTHLY_BRANCHES.index(month_branch) + 3) % len(EARTHLY_BRANCHES)
-        ],
-        day_stem=day_stem,
-    )
-
-    # 月支按寅起 (寅=1 … 丑=12)。
-    month_order = MONTH_HOUR_ORDER.index(month_branch) + 1
-
-    # 命宫: 月支序 + 时支序 (时支同样寅起), 和 ≥14 用 26 减, 否则 14 减;
-    # 余数即命宫宫位 (寅=1)，天干由年干起五虎遁定。
-    ming_hour_order = MONTH_HOUR_ORDER.index(hour_branch) + 1
-    ming_position = month_order + ming_hour_order
-    ming_position = 26 - ming_position if ming_position >= 14 else 14 - ming_position
-    ming_branch = MONTH_HOUR_ORDER[ming_position - 1]
-    ming_stem = _palace_stem(year_stem, ming_position)
-
-    # 身宫: 月支序 (寅起) + 时支序 (子起), 和 >12 减 12; 天干同样年干起五虎遁。
-    shen_hour_order = EARTHLY_BRANCHES.index(hour_branch) + 1
-    shen_position = month_order + shen_hour_order
-    if shen_position > 12:
-        shen_position -= 12
-    shen_branch = MONTH_HOUR_ORDER[shen_position - 1]
-    shen_stem = _palace_stem(year_stem, shen_position)
-
-    return {
-        "taiyuan": taiyuan,
-        "minggong": _build_origin_payload(
-            label_key="minggong",
-            stem=ming_stem,
-            branch=ming_branch,
-            day_stem=day_stem,
-        ),
-        "shengong": _build_origin_payload(
-            label_key="shengong",
-            stem=shen_stem,
-            branch=shen_branch,
-            day_stem=day_stem,
-        ),
-    }
-
-
-def _find_group_target(
-    source_branch: str, mappings: tuple[tuple[tuple[str, ...], str], ...]
-) -> str | None:
-    for group, target in mappings:
-        if source_branch in group:
-            return target
-    return None
-
-
-def _collect_branch_hits(
-    target_branches: list[str],
-    positions: dict[str, str],
-) -> list[str]:
-    hits: list[str] = []
-    for key, branch in positions.items():
-        if branch in target_branches:
-            hits.append(f"{PILLAR_LABELS[key]}{branch}")
-    return hits
-
-
-def _collect_stem_or_branch_hits(
-    target: str,
-    stem_positions: dict[str, str],
-    branch_positions: dict[str, str],
-) -> list[str]:
-    """Collect hits for a target that can be either a stem or a branch."""
-    hits: list[str] = []
-    if target in HEAVENLY_STEMS:
-        for key, stem in stem_positions.items():
-            if stem == target:
-                hits.append(f"{PILLAR_LABELS[key]}{stem}")
-    else:
-        for key, branch in branch_positions.items():
-            if branch == target:
-                hits.append(f"{PILLAR_LABELS[key]}{branch}")
-    return hits
-
-
-def _build_shensha_entries(
-    *,
-    pillars: dict[str, tuple[str, str]],
-    three_origins: dict[str, dict[str, Any]],
-) -> list[dict[str, str]]:
-    branch_positions = {
-        "year": pillars["year"][1],
-        "month": pillars["month"][1],
-        "day": pillars["day"][1],
-        "hour": pillars["hour"][1],
-        "taiyuan": three_origins["taiyuan"]["branch"],
-        "minggong": three_origins["minggong"]["branch"],
-        "shengong": three_origins["shengong"]["branch"],
-    }
-    stem_positions = {
-        "year": pillars["year"][0],
-        "month": pillars["month"][0],
-        "day": pillars["day"][0],
-        "hour": pillars["hour"][0],
-        "taiyuan": three_origins["taiyuan"]["stem"],
-        "minggong": three_origins["minggong"]["stem"],
-        "shengong": three_origins["shengong"]["stem"],
-    }
-    day_stem = pillars["day"][0]
-    year_branch = pillars["year"][1]
-    day_branch = pillars["day"][1]
-
-    entries: list[dict[str, str]] = []
-    for key, (stem, branch) in pillars.items():
-        entries.append(
-            {
-                "label": f"{PILLAR_LABELS[key]}纳音",
-                "value": get_nayin(stem, branch),
-            }
-        )
-    for origin_key, origin in three_origins.items():
-        entries.append(
-            {
-                "label": f"{PILLAR_LABELS[origin_key]}纳音",
-                "value": origin["nayin"],
-            }
-        )
-
-    year_peach = _find_group_target(year_branch, PEACH_BLOSSOM_TARGETS)
-    day_peach = _find_group_target(day_branch, PEACH_BLOSSOM_TARGETS)
-    year_horse = _find_group_target(year_branch, TRAVEL_HORSE_TARGETS)
-    day_horse = _find_group_target(day_branch, TRAVEL_HORSE_TARGETS)
-    year_huagai = _find_group_target(year_branch, HUA_GAI_TARGETS)
-    day_huagai = _find_group_target(day_branch, HUA_GAI_TARGETS)
-    year_jiangxing = _find_group_target(year_branch, JIANG_XING_TARGETS)
-    day_jiangxing = _find_group_target(day_branch, JIANG_XING_TARGETS)
-    year_wangshen = _find_group_target(year_branch, WANG_SHEN_TARGETS)
-    day_wangshen = _find_group_target(day_branch, WANG_SHEN_TARGETS)
-    year_jiesha = _find_group_target(year_branch, JIE_SHA_TARGETS)
-    day_jiesha = _find_group_target(day_branch, JIE_SHA_TARGETS)
-
-    month_branch = pillars["month"][1]
-    tian_de_target = TIAN_DE_TARGETS.get(month_branch)
-    yue_de_target = YUE_DE_TARGETS.get(month_branch)
-
-    rule_rows: list[tuple[str, list[str]]] = [
-        ("年支桃花", [year_peach] if year_peach else []),
-        ("日支桃花", [day_peach] if day_peach else []),
-        ("年支驿马", [year_horse] if year_horse else []),
-        ("日支驿马", [day_horse] if day_horse else []),
-        ("年支华盖", [year_huagai] if year_huagai else []),
-        ("日支华盖", [day_huagai] if day_huagai else []),
-        ("日主天乙贵人", TIAN_YI_TARGETS.get(day_stem, [])),
-        (
-            "日主文昌",
-            [WEN_CHANG_TARGETS[day_stem]] if day_stem in WEN_CHANG_TARGETS else [],
-        ),
-        ("年支将星", [year_jiangxing] if year_jiangxing else []),
-        ("日支将星", [day_jiangxing] if day_jiangxing else []),
-        ("日主金舆", [JIN_YU_TARGETS[day_stem]] if day_stem in JIN_YU_TARGETS else []),
-        ("年支亡神", [year_wangshen] if year_wangshen else []),
-        ("日支亡神", [day_wangshen] if day_wangshen else []),
-        ("年支劫煞", [year_jiesha] if year_jiesha else []),
-        ("日支劫煞", [day_jiesha] if day_jiesha else []),
-        (
-            "日支孤辰",
-            [GU_CHEN_TARGETS[day_branch]] if day_branch in GU_CHEN_TARGETS else [],
-        ),
-        (
-            "日支寡宿",
-            [GUA_SU_TARGETS[day_branch]] if day_branch in GUA_SU_TARGETS else [],
-        ),
-        (
-            "年支红鸾",
-            (
-                [HONG_LUAN_TARGETS[year_branch]]
-                if year_branch in HONG_LUAN_TARGETS
-                else []
-            ),
-        ),
-        (
-            "年支天喜",
-            [TIAN_XI_TARGETS[year_branch]] if year_branch in TIAN_XI_TARGETS else [],
-        ),
-        (
-            "日主学堂",
-            [XUE_TANG_TARGETS[day_stem]] if day_stem in XUE_TANG_TARGETS else [],
-        ),
-        (
-            "日主词馆",
-            [CI_GUAN_TARGETS[day_stem]] if day_stem in CI_GUAN_TARGETS else [],
-        ),
-        (
-            "年柱空亡",
-            list(kongwang_for_ganzhi(f"{pillars['year'][0]}{pillars['year'][1]}")),
-        ),
-        ("日柱空亡", list(kongwang_for_ganzhi(f"{day_stem}{day_branch}"))),
-    ]
-
-    for label, targets in rule_rows:
-        hits = _collect_branch_hits(targets, branch_positions) if targets else []
-        entries.append(
-            {
-                "label": label,
-                "value": "、".join(hits) if hits else "未触发",
-            }
-        )
-
-    # 天德/月德需要同时检查天干和地支位置
-    if tian_de_target:
-        tian_de_hits = _collect_stem_or_branch_hits(
-            tian_de_target, stem_positions, branch_positions
-        )
-        entries.append(
-            {
-                "label": "天德",
-                "value": "、".join(tian_de_hits) if tian_de_hits else "未触发",
-            }
-        )
-    else:
-        entries.append({"label": "天德", "value": "未触发"})
-    if yue_de_target:
-        yue_de_hits = _collect_stem_or_branch_hits(
-            yue_de_target, stem_positions, branch_positions
-        )
-        entries.append(
-            {
-                "label": "月德",
-                "value": "、".join(yue_de_hits) if yue_de_hits else "未触发",
-            }
-        )
-    else:
-        entries.append({"label": "月德", "value": "未触发"})
-
-    return entries
 
 
 def _build_timing_overview(
@@ -559,6 +112,7 @@ def _build_timing_overview(
     timing_state = build_current_timing_state(
         birth_context,
         analysis_date=analysis_date,
+        include_interactions=False,
     )
     dayun_result = timing_state["dayun_analysis"]
     liunian_result = timing_state["liunian_analysis"]
@@ -566,31 +120,36 @@ def _build_timing_overview(
     liuri_result = timing_state["liuri_analysis"]
     liushi_result = timing_state["liushi_analysis"]
 
-    dayun_payload: dict[str, Any]
     if "dayun_info" in dayun_result:
-        dayun_payload = {
+        dayun_payload: dict[str, Any] = {
             "pillar": dayun_result["dayun_info"]["pillar"],
             "start_age": dayun_result["age_info"]["start_age"],
             "start_age_precise": dayun_result["age_info"].get("start_age_precise"),
-            "start_age_unrounded": dayun_result["age_info"].get("start_age_unrounded"),
             "dayun_age": dayun_result["age_info"]["dayun_age"],
             "years_in_period": dayun_result["age_info"]["years_in_period"],
             "selection_basis": dayun_result["age_info"]["selection_basis"],
             "start_at": dayun_result["dayun_info"]["start_at"],
             "end_at": dayun_result["dayun_info"]["end_at"],
-            "summary": dayun_result.get("summary", ""),
+            "child_limit": dayun_result.get("child_limit"),
+        }
+    elif dayun_result.get("status") == "before_dayun":
+        dayun_payload = {
+            "pillar": None,
+            "status": "before_dayun",
+            "child_limit": dayun_result["child_limit"],
+            "xiaoyun": dayun_result["xiaoyun_info"],
+            "first_dayun": dayun_result["first_dayun"],
         }
     else:
         dayun_payload = {
             "pillar": None,
-            "summary": dayun_result.get("message", "大运信息不可用"),
             "status": dayun_result.get("status"),
+            "message": dayun_result.get("message", "大运信息不可用"),
         }
 
     liuyue_info = liuyue_result["liuyue_info"]
     liuri_info = liuri_result["liuri_info"]
     liushi_info = liushi_result["liushi_info"]
-
     current_solar_term_name = (
         (analysis_calendar_context or {})
         .get("current_solar_term", {})
@@ -605,22 +164,19 @@ def _build_timing_overview(
         "dayun": dayun_payload,
         "liunian": {
             "pillar": liunian_result["liunian_info"]["pillar"],
-            "summary": liunian_result.get("summary", ""),
+            "stem_ten_god": liunian_result["liunian_info"]["stem_ten_god"],
         },
         "liuyue": {
             "pillar": liuyue_info["pillar"],
-            "summary": liuyue_result.get("summary", ""),
             "start_term": liuyue_info["solar_term_window"]["start_term"]["name"],
             "end_term": liuyue_info["solar_term_window"]["next_term"]["name"],
         },
         "liuri": {
             "pillar": liuri_info["pillar"],
-            "summary": liuri_result.get("summary", ""),
             "weekday": liuri_info["weekday"],
         },
         "liushi": {
             "pillar": liushi_info["pillar"],
-            "summary": liushi_result.get("summary", ""),
             "hour": liushi_info["hour"],
             "shichen": liushi_info["shichen"],
         },
@@ -631,6 +187,23 @@ def _build_timing_overview(
     }
 
 
+@calculation_guard("命理分析计算")
+def calculate_bazi_overview(
+    person: PersonInfo,
+    *,
+    zi_hour_policy: ZiHourPolicy = "day_rollover_at_23",
+    changsheng_school: ChangshengSchool = "fire_earth_same_palace",
+    duty_profile: DutyProfile = "sanming",
+) -> dict[str, Any]:
+    context = build_birth_computation_context(
+        person,
+        zi_hour_policy=zi_hour_policy,
+        changsheng_school=changsheng_school,
+        duty_profile=duty_profile,
+    )
+    return build_destiny_payload(context)
+
+
 @calculation_guard("八字命盘")
 def calculate_bazi_birth(
     person: PersonInfo,
@@ -638,8 +211,16 @@ def calculate_bazi_birth(
     analysis_year: int | None = None,
     analysis_month: int | None = None,
     analysis_day: int | None = None,
+    zi_hour_policy: ZiHourPolicy = "day_rollover_at_23",
+    changsheng_school: ChangshengSchool = "fire_earth_same_palace",
+    duty_profile: DutyProfile = "sanming",
 ) -> dict[str, Any]:
-    birth_context = build_birth_computation_context(person)
+    birth_context = build_birth_computation_context(
+        person,
+        zi_hour_policy=zi_hour_policy,
+        changsheng_school=changsheng_school,
+        duty_profile=duty_profile,
+    )
     normalized = birth_context.normalized_birth_time
     analysis_date = _resolve_analysis_date(
         analysis_year,
@@ -648,15 +229,17 @@ def calculate_bazi_birth(
         timezone_name=normalized.timezone,
     )
     base_analysis = build_destiny_payload(birth_context)
-    three_origins = _build_three_origins(birth_context.birth_pillars)
-    shensha_entries = _build_shensha_entries(
+    three_origins = build_three_origins(birth_context.birth_pillars)
+    taixi = build_taixi(birth_context.birth_pillars)
+    shensha_profile = build_shensha_profile(
         pillars=birth_context.birth_pillars,
         three_origins=three_origins,
+        taixi=taixi,
     )
-    classical_overview = build_classical_overview(birth_context.birth_pillars)
     analysis_pillars = BaZiCalendar.get_four_pillars(
         analysis_date,
         timezone_name=normalized.timezone,
+        zi_hour_policy=zi_hour_policy,
     )
     analysis_calendar_context = build_calendar_context(
         analysis_date,
@@ -677,35 +260,31 @@ def calculate_bazi_birth(
             "person_info": base_analysis["person_info"],
             "four_pillars": base_analysis["four_pillars"],
             "three_origins": three_origins,
+            "taixi": taixi,
             "day_master": base_analysis["day_master"],
             "element_distribution": base_analysis["element_distribution"],
+            "element_seasonal_phase": base_analysis["element_seasonal_phase"],
             "favorable_elements": base_analysis["favorable_elements"],
             "favorable_elements_status": base_analysis["favorable_elements_status"],
-            "engineering_favorable_elements": base_analysis[
-                "engineering_favorable_elements"
-            ],
+            "avoid_elements": base_analysis["avoid_elements"],
             "structure_profile": base_analysis["structure_profile"],
+            "intra_month_duty": base_analysis["intra_month_duty"],
             "ten_gods": base_analysis["ten_gods"],
             "patterns": base_analysis["patterns"],
+            "kongwang": shensha_profile["kongwang"],
+            "shensha": shensha_profile["natal_entries"],
+            "shensha_triggered": shensha_profile["triggered_natal"],
+            "three_origins_shensha": shensha_profile["three_origins_entries"],
             "calendar_context": base_analysis["calendar_context"],
             "analysis_calendar_context": analysis_calendar_context,
             "timing_overview": timing_overview,
-            "shensha": shensha_entries,
-            "classical": classical_overview,
         },
     }
-
-
-# 八字专项分析服务（财运 / 健康 / 子女 / 学业）
-# 每个服务从出生信息构建四柱，调用对应分析模块，返回统一结构：
-#   {"analysis_type": ..., "<dim>_analysis": {...}}
-# 同时支撑 FastAPI 端点与 FastMCP 工具，避免重复构盘逻辑。
 
 
 def _parse_pillar_str(
     pillar_str: str | None, field_name: str = "pillar"
 ) -> tuple[str, str] | None:
-    """Only absent overrides default; explicit invalid pillars are rejected."""
     if pillar_str is None:
         return None
     if not isinstance(pillar_str, str) or pillar_str not in SEXAGENARY_INDEX:
@@ -721,7 +300,6 @@ def _derive_current_pillars(
     analysis_date: datetime,
     gender: str,
 ) -> tuple[tuple[str, str] | None, tuple[str, str] | None, dict[str, Any]]:
-    """从命盘 + 分析日期内部推算当前大运、流年柱（用户无需自己知道大运）。"""
     normalized = birth_context.normalized_birth_time
     timezone_name = normalized.timezone
     dayun_result = TimingEffectsAnalysis.analyze_dayun_effects(
@@ -740,8 +318,6 @@ def _derive_current_pillars(
         analysis_date.year, moment=analysis_date, timezone_name=timezone_name
     )["pillar"]
     anchor = localize_datetime(analysis_date, timezone_name)
-    # Date-only dimension APIs retain their historical midnight anchor. Expose
-    # the boundary rather than treating an arbitrary clock time as equivalent.
     year_boundaries = [
         term
         for term in get_solar_terms_for_year(anchor.year, timezone_name)
@@ -749,7 +325,7 @@ def _derive_current_pillars(
         and term.has_defined_local_clock
         and term.moment.date() == anchor.date()
     ]
-    context = {
+    context: dict[str, Any] = {
         "analysis_date": analysis_date.strftime("%Y-%m-%d"),
         "analysis_datetime": anchor.isoformat(),
         "timezone": timezone_name,
@@ -760,12 +336,6 @@ def _derive_current_pillars(
             "year_boundary_day" if year_boundaries else "not_year_boundary_day"
         ),
         "boundaries_on_date": [term.as_dict() for term in year_boundaries],
-        "boundary_scope": "只核验流年立春年界，不代表已扫描大运或全年时段边界。",
-        "hourly_evidence": {
-            "tool": "bazi_timing",
-            "fields": ["personal_info.analysis_datetime", "liunian_analysis"],
-            "when": "问题涉及交节当日钟时或跨工具时点比较时，按实际目标analysis_hour/minute补证；不把本零点锚点当作全天结果。",
-        },
         "dayun_pillar": dayun_pillar_str,
         "liunian_pillar": liunian_pillar_str,
         "dayun_age": (dayun_result.get("age_info") or {}).get("dayun_age"),
@@ -776,18 +346,182 @@ def _derive_current_pillars(
         "dayun_end_at": (dayun_result.get("dayun_info") or {}).get("end_at"),
         "source": "auto-derived",
     }
-    if "status" in dayun_result:
+    if dayun_result.get("status") == "before_dayun":
+        context["dayun_status"] = "before_dayun"
+        context["child_limit"] = dayun_result["child_limit"]
+        context["xiaoyun_pillar"] = dayun_result["xiaoyun_info"]["pillar"]
+        context["xiaoyun"] = dayun_result["xiaoyun_info"]
+    elif "status" in dayun_result:
         context["dayun_status"] = (
             "unavailable_gender_direction"
             if dayun_result["status"] == "unavailable_missing_gender"
             else dayun_result["status"]
         )
-        context["limitations"] = [dayun_result["message"]]
+        context["message"] = dayun_result.get("message")
     return (
         _parse_pillar_str(dayun_pillar_str),
         _parse_pillar_str(liunian_pillar_str),
         context,
     )
+
+
+def _build_lean_topic_facts(
+    *,
+    context: BirthComputationContext,
+    topic: str,
+    gender: str,
+    dayun: tuple[str, str] | None,
+    liunian: tuple[str, str] | None,
+) -> dict[str, Any]:
+    pillars = context.birth_pillars
+    day_stem = pillars["day"][0]
+    norm_gender = normalize_gender(gender)
+    focus, palaces = _TOPICS[topic]
+
+    if topic in ("marriage", "romance", "children"):
+        male = ("正官", "七杀") if topic == "children" else ("正财", "偏财")
+        female = ("食神", "伤官") if topic == "children" else ("正官", "七杀")
+        focus = (
+            male
+            if norm_gender == "男"
+            else female if norm_gender == "女" else male + female
+        )
+
+    gods: dict[str, list[dict[str, str]]] = {g.value: [] for g in TenGod}
+    for entry in iter_pillar_gods({n: pillars[n] for n in _ORDER}, day_stem):
+        gods[entry.ten_god.value].append(
+            {
+                "pillar": entry.pillar,
+                "stem": entry.char,
+                "branch": entry.branch,
+                "location": entry.location,
+            }
+        )
+
+    natal_stars = [
+        {
+            "ten_god": god,
+            "visible_in": [e["pillar"] for e in gods[god] if e["location"] == "天干"],
+            "hidden_in": [
+                f"{e['pillar']}({e['branch']})"
+                for e in gods[god]
+                if e["location"] == "地支藏干"
+            ],
+        }
+        for god in focus
+        if gods[god]
+    ]
+
+    temporal = {
+        n: p for n, p in (("dayun", dayun), ("liunian", liunian)) if p is not None
+    }
+
+    marker_targets: list[tuple[str, str, str]] = []
+    if topic == "education":
+        marker_targets.append(("文昌", "day_stem", WEN_CHANG_TARGETS[day_stem]))
+    if topic in ("marriage", "romance"):
+        yb = pillars["year"][1]
+        marker_targets.extend(
+            (
+                ("红鸾", "year_branch", HONG_LUAN_TARGETS[yb]),
+                ("天喜", "year_branch", TIAN_XI_TARGETS[yb]),
+            )
+        )
+        for pos in ("year", "day"):
+            b = pillars[pos][1]
+            t = next(target for grp, target in PEACH_BLOSSOM_TARGETS if b in grp)
+            marker_targets.append(("咸池", f"{pos}_branch", t))
+    if topic == "marriage":
+        yb = pillars["year"][1]
+        marker_targets.extend(
+            (
+                ("孤辰", "year_branch", GU_CHEN_TARGETS[yb]),
+                ("寡宿", "year_branch", GUA_SU_TARGETS[yb]),
+            )
+        )
+
+    markers = [
+        {
+            "name": name,
+            "anchor": anchor,
+            "target_branch": target,
+            "natal_positions": [p for p in _ORDER if pillars[p][1] == target],
+            "timing_layers": [
+                layer for layer, (_, b) in temporal.items() if b == target
+            ],
+        }
+        for name, anchor, target in marker_targets
+    ]
+
+    timing_layers = []
+    for layer_name, (t_stem, t_branch) in temporal.items():
+        incoming_gods = [
+            {
+                "stem": t_stem,
+                "location": "天干",
+                "ten_god": get_ten_god(day_stem, t_stem).value,
+                "in_topic": get_ten_god(day_stem, t_stem).value in focus,
+            },
+            *[
+                {
+                    "stem": h,
+                    "location": "地支藏干",
+                    "ten_god": get_ten_god(day_stem, h).value,
+                    "in_topic": get_ten_god(day_stem, h).value in focus,
+                }
+                for h in BRANCH_HIDDEN_STEMS[t_branch]
+            ],
+        ]
+        rels = collect_target_branch_relations(
+            t_branch, pillars, layer_name, target_stem=t_stem
+        )
+        palace_hits = [
+            r
+            for r in rels
+            if r.get("with_pillar") in palaces
+            or any(p in palaces for p in r.get("with_pillars", ()))
+        ]
+        timing_layers.append(
+            {
+                "layer": layer_name,
+                "pillar": f"{t_stem}{t_branch}",
+                "stars": incoming_gods,
+                "natal_relations": rels,
+                "palace_hits": palace_hits,
+            }
+        )
+
+    natal_palaces = {
+        palace: [
+            r
+            for other in _ORDER
+            if other != palace
+            for r in pair_relations(palace, other, pillars)
+        ]
+        for palace in palaces
+    }
+
+    ea = context.element_analysis
+    return {
+        "topic": topic,
+        "four_pillars": create_pillar_dict(pillars),
+        "day_master": {
+            "stem": day_stem,
+            "element": ea["day_master"]["element"],
+            "strength": ea["day_master"]["strength"],
+        },
+        "favorable_elements": ea["favorable_elements"],
+        "avoid_elements": ea["avoid_elements"],
+        "dominant_structure": ea["structure_profile"]["dominant_structure"]["label"],
+        "seasonal_climate": ea["structure_profile"]["seasonal_climate"],
+        "element_distribution": ea["element_distribution"],
+        "element_seasonal_phase": ea["element_seasonal_phase"],
+        "natal_stars": natal_stars,
+        "markers": markers,
+        "palace_relations": natal_palaces,
+        "natal_groups": group_relations(pillars),
+        "timing_layers": timing_layers,
+    }
 
 
 def _run_bazi_dimension_analysis(
@@ -800,22 +534,21 @@ def _run_bazi_dimension_analysis(
     analysis_day: int | None = None,
     dayun_pillar: str | None = None,
     liunian_pillar: str | None = None,
+    zi_hour_policy: ZiHourPolicy = "day_rollover_at_23",
+    changsheng_school: ChangshengSchool = "fire_earth_same_palace",
+    duty_profile: DutyProfile = "sanming",
 ) -> dict[str, Any]:
-    """通用八字专项分析执行器。
-
-    大运、流年默认由命盘 + 分析日期（默认今天，或 analysis_year/month/day）内部推算，
-    用户无需自己知道大运；如显式传入 dayun_pillar / liunian_pillar 则作为覆盖。
-    """
     try:
-        # Validate explicit overrides before any birth/timing work. A typo must
-        # not silently turn into an automatically calculated pillar.
         dayun = _parse_pillar_str(dayun_pillar, "dayun_pillar")
         liunian = _parse_pillar_str(liunian_pillar, "liunian_pillar")
-        birth_context = build_birth_computation_context(person)
-        pillars = birth_context.birth_pillars
+        birth_context = build_birth_computation_context(
+            person,
+            zi_hour_policy=zi_hour_policy,
+            changsheng_school=changsheng_school,
+            duty_profile=duty_profile,
+        )
         gender = normalize_gender(person.gender)
 
-        timing_context: dict[str, Any]
         if dayun is None or liunian is None:
             analysis_date = _resolve_analysis_date(
                 analysis_year,
@@ -837,52 +570,36 @@ def _run_bazi_dimension_analysis(
             timing_context["dayun_pillar"] = "".join(dayun) if dayun else None
             timing_context["liunian_pillar"] = "".join(liunian) if liunian else None
             if timing_context["overridden"]["dayun_pillar"]:
-                # A reviewable automatic age is independent of the supplied pillar.
                 timing_context.update(
                     dayun_status="explicit_override",
                     dayun_selection_basis=None,
                     dayun_start_at=None,
                     dayun_end_at=None,
-                    dayun_age_basis=(
-                        "auto_derived_reference_not_override_pillar_age"
-                        if timing_context.get("dayun_age") is not None
-                        else "unavailable_for_override"
-                    ),
                 )
-                if "limitations" in timing_context:
-                    timing_context["limitations"] = []
         else:
-            # Explicit pillars still have a provenance contract. They do not
-            # have an automatically derived age/date; do not invent those.
             timing_context = {
                 "dayun_pillar": "".join(dayun),
                 "liunian_pillar": "".join(liunian),
                 "source": "explicit_pillar_overrides",
                 "dayun_status": "explicit_override",
-                "dayun_selection_basis": None,
-                "dayun_start_at": None,
-                "dayun_end_at": None,
-                "dayun_age_basis": "unavailable_for_override",
                 "overridden": {"dayun_pillar": True, "liunian_pillar": True},
             }
 
-        analysis: dict[str, Any] = {
-            "calendar_context": birth_context.birth_calendar_context,
-            "timing_context": timing_context,
+        topic_facts = _build_lean_topic_facts(
+            context=birth_context,
+            topic=topic,
+            gender=gender,
+            dayun=dayun,
+            liunian=liunian,
+        )
+        return {
+            "analysis_type": analysis_type,
+            f"{topic}_analysis": {
+                "calendar_context": birth_context.birth_calendar_context,
+                "timing_context": timing_context,
+                "topic_facts": topic_facts,
+            },
         }
-        evidence = build_natal_evidence(
-            pillars, birth_context.element_analysis["day_master"]
-        )
-        evidence["topic"] = build_topic_evidence(
-            evidence,
-            pillars,
-            topic,
-            gender,
-            dayun,
-            liunian,
-        )
-        analysis["evidence_chain"] = evidence
-        return {"analysis_type": analysis_type, f"{topic}_analysis": analysis}
     except ParameterError as exc:
         return exc.as_result()
     except Exception as exc:
@@ -901,6 +618,9 @@ def _make_bazi_dimension_service(
         analysis_day: int | None = None,
         dayun_pillar: str | None = None,
         liunian_pillar: str | None = None,
+        zi_hour_policy: ZiHourPolicy = "day_rollover_at_23",
+        changsheng_school: ChangshengSchool = "fire_earth_same_palace",
+        duty_profile: DutyProfile = "sanming",
     ) -> dict[str, Any]:
         return _run_bazi_dimension_analysis(
             person,
@@ -911,19 +631,20 @@ def _make_bazi_dimension_service(
             analysis_day=analysis_day,
             dayun_pillar=dayun_pillar,
             liunian_pillar=liunian_pillar,
+            zi_hour_policy=zi_hour_policy,
+            changsheng_school=changsheng_school,
+            duty_profile=duty_profile,
         )
 
     return service
 
 
-calculate_bazi_marriage = _make_bazi_dimension_service("marriage", "八字婚姻取证")
-calculate_bazi_career = _make_bazi_dimension_service("career", "八字事业取证")
-calculate_bazi_wealth = _make_bazi_dimension_service("wealth", "八字财星取证")
-calculate_bazi_health = _make_bazi_dimension_service("health", "八字五行寒暖取证")
-calculate_bazi_children = _make_bazi_dimension_service("children", "八字子女星宫取证")
-calculate_bazi_education = _make_bazi_dimension_service("education", "八字学业取证")
-calculate_bazi_personality = _make_bazi_dimension_service(
-    "personality", "八字十神结构取证"
-)
-calculate_bazi_relatives = _make_bazi_dimension_service("relatives", "八字六亲取证")
-calculate_bazi_romance = _make_bazi_dimension_service("romance", "八字桃花星宫取证")
+calculate_bazi_marriage = _make_bazi_dimension_service("marriage", "八字婚姻分析")
+calculate_bazi_career = _make_bazi_dimension_service("career", "八字事业分析")
+calculate_bazi_wealth = _make_bazi_dimension_service("wealth", "八字财运分析")
+calculate_bazi_health = _make_bazi_dimension_service("health", "八字健康分析")
+calculate_bazi_children = _make_bazi_dimension_service("children", "八字子女分析")
+calculate_bazi_education = _make_bazi_dimension_service("education", "八字学业分析")
+calculate_bazi_personality = _make_bazi_dimension_service("personality", "八字性格分析")
+calculate_bazi_relatives = _make_bazi_dimension_service("relatives", "八字六亲分析")
+calculate_bazi_romance = _make_bazi_dimension_service("romance", "八字正缘桃花分析")

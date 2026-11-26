@@ -111,7 +111,15 @@ def test_relationship_facts_match_across_transports(
         assert set(body["natal_contexts"]) == {"person1", "person2"}
         assert body["cross_chart_relations"]["pairs"]
         assert body["directional_ten_gods"]["person1_to_person2"]["target"] == "person2"
-    for key in ("natal_contexts", "cross_chart_relations", "directional_ten_gods"):
+    for key in (
+        "natal_contexts",
+        "cross_chart_relations",
+        "directional_ten_gods",
+        "nayin_comparison",
+        "day_pillar_synergy",
+        "element_complementarity",
+        "cross_shensha",
+    ):
         assert bodies[0][key] == bodies[1][key] == bodies[2][key]
 
 
@@ -135,4 +143,6 @@ def test_career_semantics_match_rest_mcp_cli(
     assert career[0] == career[1] == career[2]
     assert career[0]["timing_context"]["dayun_pillar"] == "甲申"
     assert career[0]["timing_context"]["liunian_pillar"] == "丙午"
-    assert career[0]["evidence_chain"]["topic"]["stars"]["正官"]
+    assert any(
+        star["ten_god"] == "正官" for star in career[0]["topic_facts"]["natal_stars"]
+    )

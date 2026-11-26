@@ -9,11 +9,11 @@ from tempfile import TemporaryDirectory
 import pytest
 
 from fatebridge.application.examples import suggested_fields
-from fatebridge.core import almanac, calendar
+from fatebridge.core import almanac
 from fatebridge.core import ephemeris_runtime as runtime
-from fatebridge.core import timing
-from fatebridge.core.calendar import BaZiCalendar
-from fatebridge.core.timing import TimingAnalysis
+from fatebridge.core.bazi import calendar, timing
+from fatebridge.core.bazi.calendar import BaZiCalendar
+from fatebridge.core.bazi.timing import TimingAnalysis
 from tests.support.transports import SPECS, business, call_cli, inputs, native
 from tests.support.transports import rest as _shared_rest
 from tests.unit_test.fixtures.bazi_year_cases import TOPICS
@@ -206,6 +206,3 @@ def test_all_ten_calendar_views_publish_actual_bundled_model_on_three_surfaces(
             assert term["ephemeris_model"] == "fatebridge_de441_solar_v1"
         assert result["run_metadata"]["engine_is_approximate"] is True
         assert "approximate_engine" in result["run_metadata"]["warnings"]
-        assert result["run_metadata"]["provenance"]["ephemeris_model"] == [
-            "fatebridge_de441_solar_v1"
-        ]

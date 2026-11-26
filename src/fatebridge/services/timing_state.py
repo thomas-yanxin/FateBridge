@@ -1,4 +1,6 @@
-"""Shared timing-layer computation and timeline enrichment from one birth context."""
+"""Shared timing-layer computation from one birth context."""
+
+from __future__ import annotations
 
 from datetime import datetime
 from typing import Any, TypedDict
@@ -9,9 +11,7 @@ from fatebridge.analysis.timing_element_shares import (
     ElementShareCountingBasis,
     TimingElementEffects,
 )
-from fatebridge.core.timing import TimingAnalysis
-from fatebridge.core.timing_interactions import analyze_timing_interactions
-from fatebridge.core.timing_strength import StrengthProjectionBaseline
+from fatebridge.core.bazi.timing import TimingAnalysis, analyze_timing_interactions
 from fatebridge.services.birth_context import BirthComputationContext
 
 
@@ -22,7 +22,6 @@ def calculate_analysis_age(
 ) -> int:
     if explicit_age is not None:
         return explicit_age
-
     age = analysis_date.year - birth_datetime.year
     if (analysis_date.month, analysis_date.day) < (
         birth_datetime.month,
@@ -35,8 +34,6 @@ def calculate_analysis_age(
 class SerializedTimingElementEffects(TypedDict):
     overall_effect: str
     element_changes: dict[str, ElementShareChange]
-    method_id: str
-    interpretation_scope: str
     counting_basis: ElementShareCountingBasis
 
 
@@ -50,8 +47,6 @@ def serialize_element_effects(
             for element, change in element_effects["element_changes"].items()
             if change["change"] != 0
         },
-        "method_id": element_effects["method_id"],
-        "interpretation_scope": element_effects["interpretation_scope"],
         "counting_basis": element_effects["counting_basis"],
     }
 
@@ -61,9 +56,11 @@ def build_current_timing_state(
     *,
     analysis_date: datetime,
     analysis_age: int | None = None,
+    include_interactions: bool = True,
 ) -> dict[str, Any]:
-    """Build the current timing analyses once from shared birth context."""
+    """Build current Dayun/小运, 流年, 流月, 流日, 流时 and full interactions."""
     timezone_name = birth_context.normalized_birth_time.timezone
+    zi_hour_policy = birth_context.zi_hour_policy
     current_age = calculate_analysis_age(
         birth_context.normalized_birth_time.input_datetime,
         analysis_date,
@@ -79,10 +76,12 @@ def build_current_timing_state(
     liuri_info = TimingAnalysis.calculate_liuri(
         analysis_date,
         timezone_name=timezone_name,
+        zi_hour_policy=zi_hour_policy,
     )
     liushi_info = TimingAnalysis.calculate_liushi(
         analysis_date,
         timezone_name=timezone_name,
+        zi_hour_policy=zi_hour_policy,
     )
     dayun_analysis = TimingEffectsAnalysis.analyze_dayun_effects(
         birth_context.birth_pillars,
@@ -117,6 +116,7 @@ def build_current_timing_state(
         timezone_name=timezone_name,
         liuri_info=liuri_info,
         original_element_counts=birth_context.original_element_counts,
+        zi_hour_policy=zi_hour_policy,
     )
     liushi_analysis = TimingEffectsAnalysis.analyze_liushi_effects(
         birth_context.birth_pillars,
@@ -124,6 +124,7 @@ def build_current_timing_state(
         timezone_name=timezone_name,
         liushi_info=liushi_info,
         original_element_counts=birth_context.original_element_counts,
+        zi_hour_policy=zi_hour_policy,
     )
 
     combined_timing_pillars: dict[str, dict[str, str]] = {}
@@ -131,6 +132,11 @@ def build_current_timing_state(
         combined_timing_pillars["dayun"] = {
             "stem": dayun_analysis["dayun_info"]["stem"],
             "branch": dayun_analysis["dayun_info"]["branch"],
+        }
+    elif "xiaoyun_info" in dayun_analysis:
+        combined_timing_pillars["xiaoyun"] = {
+            "stem": dayun_analysis["xiaoyun_info"]["stem"],
+            "branch": dayun_analysis["xiaoyun_info"]["branch"],
         }
     combined_timing_pillars["liunian"] = {
         "stem": liunian_analysis["liunian_info"]["stem"],
@@ -154,9 +160,8 @@ def build_current_timing_state(
         combined_timing_pillars,
         original_element_counts=birth_context.original_element_counts,
     )
-    natal_assessment = birth_context.element_analysis["day_master"]["assessment"]
 
-    return {
+    state: dict[str, Any] = {
         "analysis_date": analysis_date,
         "current_age": current_age,
         "dayun_analysis": dayun_analysis,
@@ -165,38 +170,13 @@ def build_current_timing_state(
         "liuri_analysis": liuri_analysis,
         "liushi_analysis": liushi_analysis,
         "combined_effects": combined_effects,
-        "interaction_analysis": analyze_timing_interactions(
+    }
+    if include_interactions:
+        state["interaction_analysis"] = analyze_timing_interactions(
             birth_context.birth_pillars,
             combined_timing_pillars,
-            strength_baseline=StrengthProjectionBaseline(
-                method_id=natal_assessment["method_id"],
-                strength_level=birth_context.element_analysis["day_master"][
-                    "engineering_index"
-                ]["strength_level"],
-                numerical_label=natal_assessment["threshold_arithmetic"][
-                    "numerical_label"
-                ],
-                support_share_exact=natal_assessment["threshold_arithmetic"][
-                    "share_exact"
-                ],
-                energies_exact=natal_assessment["threshold_arithmetic"][
-                    "energies_exact"
-                ],
-                parameters=natal_assessment["parameters"],
-                seasonal_phases=natal_assessment["seasonal_phases"],
-                seasonal_factors=natal_assessment["seasonal_factors"],
-                relations=natal_assessment["relations"],
-            ),
-        ),
-        "comprehensive_summary": TimingEffectsAnalysis._generate_comprehensive_summary(
-            dayun_analysis,
-            liunian_analysis,
-            liuyue_analysis,
-            liuri_analysis,
-            combined_effects,
-            liushi_analysis=liushi_analysis,
-        ),
-    }
+        )
+    return state
 
 
 def enrich_liuyue_timeline(
@@ -206,8 +186,7 @@ def enrich_liuyue_timeline(
 ) -> list[dict[str, Any]]:
     timezone_name = birth_context.normalized_birth_time.timezone
     liuyue_timeline = TimingAnalysis.calculate_liuyue_timeline(
-        target_year,
-        timezone_name=timezone_name,
+        target_year, timezone_name=timezone_name
     )
     for item in liuyue_timeline:
         if "analysis_anchor" not in item:
@@ -224,7 +203,6 @@ def enrich_liuyue_timeline(
             original_element_counts=birth_context.original_element_counts,
         )
         item["overall_effect"] = liuyue_effect["element_effects"]["overall_effect"]
-        item["summary"] = liuyue_effect["enhanced_summary"]
     return liuyue_timeline
 
 
@@ -235,13 +213,11 @@ def enrich_jieqi_timeline(
 ) -> list[dict[str, Any]]:
     timezone_name = birth_context.normalized_birth_time.timezone
     jieqi_timeline = TimingAnalysis.calculate_jieqi_transition_timeline(
-        target_year,
-        timezone_name=timezone_name,
+        target_year, timezone_name=timezone_name
     )
     for item in jieqi_timeline:
         if "analysis_anchor" not in item:
             continue
-        anchor = datetime.strptime(item["analysis_anchor"], "%Y-%m-%d %H:%M:%S")
         liuyue_pillar = item["liuyue"]
         liuri_pillar = item["liuri"]
         node_effect = TimingEffectsAnalysis.analyze_element_strength_changes(
@@ -258,17 +234,5 @@ def enrich_jieqi_timeline(
             },
             original_element_counts=birth_context.original_element_counts,
         )
-        liuri_effect = TimingEffectsAnalysis.analyze_liuri_effects(
-            birth_context.birth_pillars,
-            anchor,
-            timezone_name=timezone_name,
-            liuri_info=liuri_pillar,
-            original_element_counts=birth_context.original_element_counts,
-        )
         item["overall_effect"] = node_effect["overall_effect"]
-        item["liuri_summary"] = liuri_effect["enhanced_summary"]
-        item["summary"] = (
-            f"{item['jieqi']['name']}节点，流月{liuyue_pillar['pillar']}，"
-            f"流日{liuri_pillar['pillar']}，{node_effect['overall_effect']}"
-        )
     return jieqi_timeline

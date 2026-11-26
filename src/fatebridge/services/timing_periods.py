@@ -1,10 +1,13 @@
 """BaZi flow analyses from the annual to the hourly layer."""
 
+from __future__ import annotations
+
 from typing import Any
 
 from fatebridge.analysis.timing_effects import TimingEffectsAnalysis
 from fatebridge.core.almanac import build_calendar_context, get_jieqi_year_grid
-from fatebridge.core.timing import TimingAnalysis
+from fatebridge.core.bazi.calendar import ChangshengSchool, DutyProfile, ZiHourPolicy
+from fatebridge.core.bazi.timing import TimingAnalysis
 from fatebridge.services.birth_context import build_birth_computation_context
 from fatebridge.services.timing_clock import resolve_analysis_moment
 from fatebridge.services.timing_state import serialize_element_effects
@@ -17,11 +20,18 @@ from fatebridge.utils.formatting import format_clock_datetime
 def calculate_liunian_analysis(
     person: PersonInfo,
     analysis_year: int,
+    *,
+    zi_hour_policy: ZiHourPolicy = "day_rollover_at_23",
+    changsheng_school: ChangshengSchool = "fire_earth_same_palace",
+    duty_profile: DutyProfile = "sanming",
 ) -> dict[str, Any]:
-    """
-    流年分析工具 - 专门分析指定年份的流年影响
-    """
-    birth_context = build_birth_computation_context(person)
+    """流年专项分析：包含年柱干支、十神、纳音、与命局完整刑冲合害破暗合及流年神煞。"""
+    birth_context = build_birth_computation_context(
+        person,
+        zi_hour_policy=zi_hour_policy,
+        changsheng_school=changsheng_school,
+        duty_profile=duty_profile,
+    )
     normalized_birth_time = birth_context.normalized_birth_time
     birth_date = normalized_birth_time.corrected_datetime
 
@@ -33,7 +43,6 @@ def calculate_liunian_analysis(
 
     liunian_info = liunian_result["liunian_info"]
     element_effects = liunian_result["element_effects"]
-    summary = liunian_result["summary"]
 
     return {
         "analysis_type": "流年专项分析",
@@ -50,17 +59,8 @@ def calculate_liunian_analysis(
             "time_adjustment": normalized_birth_time.as_dict(),
         },
         "calendar_context": birth_context.birth_calendar_context,
-        "target_year_jieqi": get_jieqi_year_grid(
-            analysis_year, normalized_birth_time.timezone
-        ),
-        "liunian_info": {
-            "pillar": liunian_info["pillar"],
-            "stem": liunian_info["stem"],
-            "branch": liunian_info["branch"],
-            "element": liunian_info["element"],
-        },
+        "liunian_info": liunian_info,
         "element_effects": serialize_element_effects(element_effects),
-        "summary": summary,
     }
 
 
@@ -72,11 +72,18 @@ def calculate_liuyue_analysis(
     analysis_day: int | None = None,
     analysis_hour: int | None = None,
     analysis_minute: int | None = None,
+    *,
+    zi_hour_policy: ZiHourPolicy = "day_rollover_at_23",
+    changsheng_school: ChangshengSchool = "fire_earth_same_palace",
+    duty_profile: DutyProfile = "sanming",
 ) -> dict[str, Any]:
-    """
-    流月分析工具 - 专门分析指定日期所在节令月的影响
-    """
-    birth_context = build_birth_computation_context(person)
+    """流月专项分析：包含节令月干支、十神、与命局及流年完整交互关系及神煞。"""
+    birth_context = build_birth_computation_context(
+        person,
+        zi_hour_policy=zi_hour_policy,
+        changsheng_school=changsheng_school,
+        duty_profile=duty_profile,
+    )
     normalized_birth_time = birth_context.normalized_birth_time
     birth_date = normalized_birth_time.corrected_datetime
 
@@ -90,8 +97,11 @@ def calculate_liuyue_analysis(
         analysis_minute=analysis_minute,
     )
     analysis_date = resolution.moment
-    analysis_year, analysis_month = analysis_date.year, analysis_date.month
-    analysis_day = analysis_date.day
+    analysis_year, analysis_month, analysis_day = (
+        analysis_date.year,
+        analysis_date.month,
+        analysis_date.day,
+    )
     analysis_calendar_context = build_calendar_context(
         analysis_date,
         timezone_name=normalized_birth_time.timezone,
@@ -103,16 +113,13 @@ def calculate_liuyue_analysis(
         timezone_name=normalized_birth_time.timezone,
         target_date=analysis_date,
     )
-    liunian_analysis: dict[str, Any] | None = (
-        TimingEffectsAnalysis.analyze_liunian_effects(
-            birth_context.birth_pillars,
-            analysis_year,
-            original_element_counts=birth_context.original_element_counts,
-            moment=analysis_date,
-            timezone_name=normalized_birth_time.timezone,
-        )
+    liunian_analysis = TimingEffectsAnalysis.analyze_liunian_effects(
+        birth_context.birth_pillars,
+        analysis_year,
+        original_element_counts=birth_context.original_element_counts,
+        moment=analysis_date,
+        timezone_name=normalized_birth_time.timezone,
     )
-
     liuyue_result = TimingEffectsAnalysis.analyze_liuyue_comprehensive(
         birth_context.birth_pillars,
         analysis_year,
@@ -130,13 +137,9 @@ def calculate_liuyue_analysis(
     liuyue_info = liuyue_analysis["liuyue_info"]
     detailed_analysis = liuyue_analysis["detailed_analysis"]
     element_effects = liuyue_analysis["element_effects"]
-    liunian_analysis = liuyue_result.get("liunian_analysis")
-    liunian_info: dict[str, Any] | None = None
-    if liunian_analysis:
-        liunian_info = liunian_analysis["liunian_info"]
-    summary = liuyue_result["comprehensive_summary"]
+    liunian_info = liunian_analysis["liunian_info"]
 
-    result: dict[str, Any] = {
+    return {
         "analysis_type": "流月专项分析",
         "personal_info": {
             "name": person.name,
@@ -152,12 +155,7 @@ def calculate_liuyue_analysis(
             "time_adjustment": normalized_birth_time.as_dict(),
         },
         "calendar_context": birth_context.birth_calendar_context,
-        "analysis_calendar": {
-            "analysis_date_context": analysis_calendar_context,
-        },
-        "target_year_jieqi": get_jieqi_year_grid(
-            analysis_year, normalized_birth_time.timezone
-        ),
+        "analysis_calendar": {"analysis_date_context": analysis_calendar_context},
         "liuyue_info": {
             "pillar": liuyue_info["pillar"],
             "stem": liuyue_info["stem"],
@@ -168,23 +166,15 @@ def calculate_liuyue_analysis(
         },
         "detailed_analysis": {
             "stem_relation": detailed_analysis["shishen_analysis"]["stem_relation"],
+            "hidden_stems": detailed_analysis["shishen_analysis"]["hidden_stems"],
             "branch_relations": detailed_analysis["branch_relations"],
+            "shensha": detailed_analysis["shensha"],
         },
         "element_effects": serialize_element_effects(element_effects),
         "combination_effects": liuyue_result.get("combination_effects", {}),
+        "liunian_info": liunian_info,
+        "analysis_reference": resolution.reference,
     }
-
-    if liunian_info is not None:
-        result["liunian_info"] = {
-            "pillar": liunian_info["pillar"],
-            "stem": liunian_info["stem"],
-            "branch": liunian_info["branch"],
-            "element": liunian_info["element"],
-        }
-
-    result["summary"] = summary
-    result["analysis_reference"] = resolution.reference
-    return result
 
 
 @calculation_guard("流日分析计算")
@@ -195,11 +185,18 @@ def calculate_liuri_analysis(
     analysis_day: int | None = None,
     analysis_hour: int | None = None,
     analysis_minute: int | None = None,
+    *,
+    zi_hour_policy: ZiHourPolicy = "day_rollover_at_23",
+    changsheng_school: ChangshengSchool = "fire_earth_same_palace",
+    duty_profile: DutyProfile = "sanming",
 ) -> dict[str, Any]:
-    """
-    流日分析工具 - 专门分析指定日期的流日影响
-    """
-    birth_context = build_birth_computation_context(person)
+    """流日专项分析：包含流日干支、十神、完整地支交互（含刑害破暗合三合三会）与神煞。"""
+    birth_context = build_birth_computation_context(
+        person,
+        zi_hour_policy=zi_hour_policy,
+        changsheng_school=changsheng_school,
+        duty_profile=duty_profile,
+    )
     normalized_birth_time = birth_context.normalized_birth_time
     birth_date = normalized_birth_time.corrected_datetime
 
@@ -213,28 +210,19 @@ def calculate_liuri_analysis(
         analysis_minute=analysis_minute,
     )
     analysis_date = resolution.moment
-    analysis_year, analysis_month = analysis_date.year, analysis_date.month
-    analysis_day = analysis_date.day
     analysis_calendar_context = build_calendar_context(
         analysis_date,
         timezone_name=normalized_birth_time.timezone,
     )
-    liuri_info = TimingAnalysis.calculate_liuri(
-        analysis_date,
-        timezone_name=normalized_birth_time.timezone,
-    )
-
     liuri_result = TimingEffectsAnalysis.analyze_liuri_effects(
         birth_context.birth_pillars,
         analysis_date,
         timezone_name=normalized_birth_time.timezone,
-        liuri_info=liuri_info,
         original_element_counts=birth_context.original_element_counts,
+        zi_hour_policy=zi_hour_policy,
     )
-
     liuri_info = liuri_result["liuri_info"]
-    element_effects = liuri_result["element_effects"]
-    summary = liuri_result["enhanced_summary"]
+    detailed = liuri_result["detailed_analysis"]
 
     return {
         "analysis_type": "流日专项分析",
@@ -252,18 +240,24 @@ def calculate_liuri_analysis(
             "time_adjustment": normalized_birth_time.as_dict(),
         },
         "calendar_context": birth_context.birth_calendar_context,
-        "analysis_calendar": {
-            "analysis_date_context": analysis_calendar_context,
-        },
+        "analysis_calendar": {"analysis_date_context": analysis_calendar_context},
         "liuri_info": {
             "pillar": liuri_info["pillar"],
             "stem": liuri_info["stem"],
             "branch": liuri_info["branch"],
             "element": liuri_info["element"],
+            "nayin": liuri_info["nayin"],
             "weekday": liuri_info["weekday"],
+            "zi_hour_policy": liuri_info["zi_hour_policy"],
+            "late_zi_rollover_applied": liuri_info["late_zi_rollover_applied"],
         },
-        "element_effects": serialize_element_effects(element_effects),
-        "summary": summary,
+        "detailed_analysis": {
+            "stem_relation": detailed["shishen_analysis"]["stem_relation"],
+            "hidden_stems": detailed["shishen_analysis"]["hidden_stems"],
+            "branch_relations": detailed["branch_relations"],
+            "shensha": detailed["shensha"],
+        },
+        "element_effects": serialize_element_effects(liuri_result["element_effects"]),
         "analysis_reference": resolution.reference,
     }
 
@@ -276,11 +270,18 @@ def calculate_liushi_analysis(
     analysis_day: int | None = None,
     analysis_hour: int | None = None,
     analysis_minute: int | None = None,
+    *,
+    zi_hour_policy: ZiHourPolicy = "day_rollover_at_23",
+    changsheng_school: ChangshengSchool = "fire_earth_same_palace",
+    duty_profile: DutyProfile = "sanming",
 ) -> dict[str, Any]:
-    """
-    流时分析工具 - 专门分析指定时刻的流时影响
-    """
-    birth_context = build_birth_computation_context(person)
+    """流时专项分析：包含流时干支、十神、完整地支交互及神煞。"""
+    birth_context = build_birth_computation_context(
+        person,
+        zi_hour_policy=zi_hour_policy,
+        changsheng_school=changsheng_school,
+        duty_profile=duty_profile,
+    )
     normalized_birth_time = birth_context.normalized_birth_time
     birth_date = normalized_birth_time.corrected_datetime
 
@@ -294,29 +295,19 @@ def calculate_liushi_analysis(
         analysis_minute=analysis_minute,
     )
     analysis_date = resolution.moment
-    analysis_year, analysis_month = analysis_date.year, analysis_date.month
-    analysis_day = analysis_date.day
     analysis_calendar_context = build_calendar_context(
         analysis_date,
         timezone_name=normalized_birth_time.timezone,
     )
-    liushi_info = TimingAnalysis.calculate_liushi(
-        analysis_date,
-        timezone_name=normalized_birth_time.timezone,
-    )
-
     liushi_result = TimingEffectsAnalysis.analyze_liushi_effects(
         birth_context.birth_pillars,
         analysis_date,
         timezone_name=normalized_birth_time.timezone,
-        liushi_info=liushi_info,
         original_element_counts=birth_context.original_element_counts,
+        zi_hour_policy=zi_hour_policy,
     )
-
     liushi_info = liushi_result["liushi_info"]
     detailed_analysis = liushi_result["detailed_analysis"]
-    element_effects = liushi_result["element_effects"]
-    summary = liushi_result["enhanced_summary"]
 
     return {
         "analysis_type": "流时专项分析",
@@ -329,14 +320,11 @@ def calculate_liushi_analysis(
             "normalized_birth_datetime": format_clock_datetime(
                 birth_date, include_seconds=person.birth_second is not None
             ),
-            "analysis_date": analysis_date.strftime("%Y-%m-%d"),
             "analysis_datetime": analysis_date.strftime("%Y-%m-%d %H:%M"),
             "time_adjustment": normalized_birth_time.as_dict(),
         },
         "calendar_context": birth_context.birth_calendar_context,
-        "analysis_calendar": {
-            "analysis_date_context": analysis_calendar_context,
-        },
+        "analysis_calendar": {"analysis_date_context": analysis_calendar_context},
         "liushi_info": {
             "pillar": liushi_info["pillar"],
             "stem": liushi_info["stem"],
@@ -344,14 +332,14 @@ def calculate_liushi_analysis(
             "element": liushi_info["element"],
             "nayin": liushi_info["nayin"],
             "hour": liushi_info["hour"],
-            "analysis_datetime": liushi_info["analysis_datetime"],
             "shichen": liushi_info["shichen"],
         },
         "detailed_analysis": {
             "stem_relation": detailed_analysis["shishen_analysis"]["stem_relation"],
+            "hidden_stems": detailed_analysis["shishen_analysis"]["hidden_stems"],
             "branch_relations": detailed_analysis["branch_relations"],
+            "shensha": detailed_analysis["shensha"],
         },
-        "element_effects": serialize_element_effects(element_effects),
-        "summary": summary,
+        "element_effects": serialize_element_effects(liushi_result["element_effects"]),
         "analysis_reference": resolution.reference,
     }

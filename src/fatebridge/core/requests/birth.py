@@ -3,11 +3,16 @@
 from __future__ import annotations
 
 from datetime import MAXYEAR, MINYEAR
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import Field, model_validator
 from pydantic_core import PydanticCustomError
 
+from fatebridge.core.bazi.calendar import (
+    ChangshengSchool,
+    DutyProfile,
+    ZiHourPolicy,
+)
 from fatebridge.core.requests.base import FateBridgeBaseRequest
 from fatebridge.utils.birth_input import MAX_PERSON_BIRTH_YEAR, MIN_PERSON_BIRTH_YEAR
 
@@ -84,6 +89,26 @@ class BaziClockRequest(FateBridgeRequest):
             "未知请省略或传null；沿用00秒作为兼容计算参考，并返回省略分量说明，"
             "不代表已知出生在整分、不推定误差区间或记录精度。不接受闰秒60。"
         ),
+    )
+    zi_hour_policy: ZiHourPolicy = Field(
+        default="day_rollover_at_23",
+        description=(
+            "早晚子时（23:00–23:59）流派：day_rollover_at_23（sect=1，23时换日柱，五鼠遁按次日干）"
+            " | night_zi_same_day_next_hour_stem（sect=2，夜子时日柱不换，时干按次日五鼠遁）"
+            " | night_zi_same_day_same_hour_stem（夜子时日柱不换，时干按当日五鼠遁）。"
+        ),
+    )
+    changsheng_school: ChangshengSchool = Field(
+        default="fire_earth_same_palace",
+        description=(
+            "十二长生流派：fire_earth_same_palace（火土同宫，戊随丙、己随丁）"
+            " | water_earth_same_palace（水土同宫，戊随壬、己随癸）"
+            " | five_element_same_stage（五行同生同死）。"
+        ),
+    )
+    duty_profile: DutyProfile = Field(
+        default="sanming",
+        description="人元司令分野分日表：sanming（三命通会）| yuanhai（渊海子平）| 6tail | ditian（滴天髓）。",
     )
 
     @model_validator(mode="after")

@@ -7,12 +7,15 @@ code can enrich responses without recomputing 24 solar terms on every call.
 
 from __future__ import annotations
 
+import json
 import logging
 import math
+from bisect import bisect_right
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from fractions import Fraction
 from functools import lru_cache
+from importlib.resources import files
 from typing import Any, TypedDict
 
 try:
@@ -44,12 +47,6 @@ from fatebridge.core.ephemeris_runtime import (
     swe,
 )
 from fatebridge.core.execution_context import current_datetime
-from fatebridge.core.lunar_1900_prefix import START as LUNAR_PREFIX_START
-from fatebridge.core.lunar_1900_prefix import convert as _prefix_lunar_date
-from fatebridge.core.lunar_1900_prefix import source_for as _prefix_lunar_source
-from fatebridge.core.lunar_supplement import END as LUNAR_SUPPLEMENT_END
-from fatebridge.core.lunar_supplement import convert as _supplement_lunar_date
-from fatebridge.core.lunar_supplement import source_for as _later_lunar_source
 from fatebridge.core.solar_term_runtime import solar_term_cache_context
 from fatebridge.utils.civil_time import (
     CivilPoint,
@@ -181,6 +178,10 @@ LUNAR_DAY_NAMES = {
     30: "三十",
 }
 
+LUNAR_PREFIX_START = date(1900, 1, 1)
+LUNAR_PREFIX_END = date(1900, 1, 30)
+LUNAR_SUPPLEMENT_START = date(2100, 2, 9)
+LUNAR_SUPPLEMENT_END = date(2100, 12, 31)
 LUNAR_SUPPORTED_SOLAR_START = LUNAR_PREFIX_START
 LUNAR_SUPPORTED_SOLAR_END = LUNAR_SUPPLEMENT_END
 
@@ -198,6 +199,127 @@ class _LunarDateValue:
     month: int
     day: int
     isLeapMonth: bool
+
+
+@lru_cache(maxsize=1)
+def _load_1900_prefix() -> dict[str, Any]:
+    raw: dict[str, Any] = json.loads(
+        files("fatebridge.data")
+        .joinpath("lunar_calendar_pmo_1900_prefix.json")
+        .read_text(encoding="utf-8")
+    )
+    if (
+        raw["method_id"] != "pmo_1900_january_prefix_v1"
+        or raw["solar_start"] != LUNAR_PREFIX_START.isoformat()
+        or raw["solar_end"] != LUNAR_PREFIX_END.isoformat()
+        or raw["lunar_year"] != 1899
+        or raw["lunar_month"] != 12
+        or raw["lunar_first_day"] != 1
+        or raw["is_leap_month"] is not False
+    ):
+        raise ValueError("紫台1900年一月农历补表的版本、月序或范围不一致")
+    return raw
+
+
+@lru_cache(maxsize=1)
+def _load_2100_supplement() -> (
+    tuple[tuple[date, ...], tuple[int, ...], tuple[bool, ...], int, dict[str, str]]
+):
+    raw = json.loads(
+        files("fatebridge.data")
+        .joinpath("lunar_calendar_hko_2100.json")
+        .read_text(encoding="utf-8")
+    )
+    if (
+        raw["method_id"] != "hko_2100_month_starts_v1"
+        or raw["solar_start"] != LUNAR_SUPPLEMENT_START.isoformat()
+        or raw["solar_end"] != LUNAR_SUPPLEMENT_END.isoformat()
+        or raw["lunar_year"] != 2100
+    ):
+        raise ValueError("农历补充年表的版本或范围不一致")
+    starts = tuple(date.fromisoformat(m["solar_start"]) for m in raw["months"])
+    months = tuple(m["month"] for m in raw["months"])
+    leap = tuple(m["is_leap_month"] for m in raw["months"])
+    if (
+        months != tuple(range(1, 13))
+        or starts[0] != LUNAR_SUPPLEMENT_START
+        or starts[-1] > LUNAR_SUPPLEMENT_END
+        or any((b - a).days not in (29, 30) for a, b in zip(starts, starts[1:]))
+        or any(type(v) is not bool or v for v in leap)
+    ):
+        raise ValueError("2100年官方农历月首数据不完整或无序")
+    source = raw["source"]
+    meta = {
+        "method_id": raw["method_id"],
+        "publisher": source["publisher"],
+        "title": source["title"],
+        "retrieved_on": source["retrieved_on"],
+        "calendar_convention": "HKO UTC+08 civil-date mapping applied to the supplied local calendar date; not an independent astronomical validation of every timezone or solar-time correction.",
+    }
+    return starts, months, leap, int(raw["lunar_year"]), meta
+
+
+def _prefix_lunar_date(solar_date: date) -> tuple[int, int, int, bool] | None:
+    if not LUNAR_PREFIX_START <= solar_date <= LUNAR_PREFIX_END:
+        return None
+    raw = _load_1900_prefix()
+    return (
+        raw["lunar_year"],
+        raw["lunar_month"],
+        (solar_date - LUNAR_PREFIX_START).days + 1,
+        False,
+    )
+
+
+def _prefix_lunar_source(solar_date: date) -> dict[str, str] | None:
+    if not LUNAR_PREFIX_START <= solar_date <= LUNAR_PREFIX_END:
+        return None
+    raw = _load_1900_prefix()
+    return {"method_id": raw["method_id"], **raw["source"]}
+
+
+def _supplement_lunar_date(solar_date: date) -> tuple[int, int, int, bool] | None:
+    if not LUNAR_SUPPLEMENT_START <= solar_date <= LUNAR_SUPPLEMENT_END:
+        return None
+    starts, months, leap, lunar_year, _ = _load_2100_supplement()
+    index = bisect_right(starts, solar_date) - 1
+    return (
+        lunar_year,
+        months[index],
+        (solar_date - starts[index]).days + 1,
+        leap[index],
+    )
+
+
+def _later_lunar_source(solar_date: date) -> dict[str, str] | None:
+    if not LUNAR_SUPPLEMENT_START <= solar_date <= LUNAR_SUPPLEMENT_END:
+        return None
+    return dict(_load_2100_supplement()[4])
+
+
+def historical_timezone_advisory(
+    moment: datetime, timezone_name: str
+) -> dict[str, Any] | None:
+    """Surface an explicit advisory when historical Shanghai tzdata (+09:00) applies."""
+    if timezone_name != "Asia/Shanghai":
+        return None
+    if not (1900 <= moment.year <= 1949):
+        return None
+    offset = moment.utcoffset()
+    if offset is None:
+        return None
+    hours = offset.total_seconds() / 3600.0
+    if abs(hours - 8.0) > 1e-6:
+        return {
+            "code": "historical_timezone_ambiguous",
+            "timezone": timezone_name,
+            "applied_utc_offset_hours": hours,
+            "message": (
+                f"{moment.date().isoformat()} 在 IANA Asia/Shanghai 下使用 UTC+{hours:g}；"
+                "1900–1949 年战时/民国不同地区标准时存在口径分歧，若已知当时实际采用东八区请显式传 +08:00。"
+            ),
+        }
+    return None
 
 
 @lru_cache(maxsize=2048)
@@ -1335,7 +1457,7 @@ def build_calendar_context(
     if lunar_context is None:
         lunar_support["reason"] = lunar_supported_range_message()
 
-    return {
+    result: dict[str, Any] = {
         "timezone": timezone_name,
         # Use the same fractional civil clock consumed by term comparisons.
         # Truncation here makes opposite sides of a boundary print identically.
@@ -1357,3 +1479,7 @@ def build_calendar_context(
         "lunar_calendar": lunar_context,
         "lunar_calendar_support": lunar_support,
     }
+    tz_advisory = historical_timezone_advisory(seasonal_moment, timezone_name)
+    if tz_advisory is not None:
+        result["timezone_advisory"] = tz_advisory
+    return result

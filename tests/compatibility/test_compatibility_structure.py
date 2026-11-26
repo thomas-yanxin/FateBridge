@@ -1,13 +1,17 @@
 """Check natal structure and cross-participant BaZi evidence."""
 
-from fatebridge.core.bazi.bazi_branch_facts import (
+from fatebridge.core.bazi.compatibility import (
+    analyze_cross_shensha,
+    analyze_day_pillar_synergy,
+    analyze_element_complementarity,
+    analyze_nayin_compatibility,
+    cross_chart_relations,
+)
+from fatebridge.core.bazi.relations import (
     check_clash_patterns,
     check_harmony_patterns,
 )
-from fatebridge.core.bazi.bazi_evidence import cross_chart_relations
-from fatebridge.core.bazi.bazi_pattern_facts import analyze_special_patterns
-from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.rules import BaZiRules
+from fatebridge.core.bazi.strength import analyze_elements_and_structure
 from fatebridge.services.calculation import calculate_destiny_analysis
 from fatebridge.utils.birth_input import create_person_info
 
@@ -20,64 +24,112 @@ def test_build_structure_profile_detects_yang_ren_jia_sha() -> None:
         "hour": ("庚", "午"),
     }
 
-    element_analysis = ElementAnalysis.comprehensive_analysis(pillars)
-    structure_profile = BaZiRules.build_structure_profile(
-        pillars=pillars,
-        element_analysis=element_analysis,
-        harmony_patterns=check_harmony_patterns(pillars),
-        clash_patterns=check_clash_patterns(pillars),
-        special_patterns=analyze_special_patterns(pillars),
-    )
+    element_analysis = analyze_elements_and_structure(pillars)
+    structure_profile = element_analysis["structure_profile"]
 
+    assert structure_profile["assessment_status"] == "adjudicated"
+    assert structure_profile["useful_elements"]
     dominant = structure_profile["dominant_structure"]
-    assert dominant["key"] == "month_use_reference"
-    assert dominant["formation_status"] == "not_adjudicated"
-    assert dominant["useful_ten_gods"] == []
-
-    selection = structure_profile["candidate_selection"]
-    assert selection["selected_month"]["label"] == "月刃格"
-    assert selection["selected_month"]["selection_rule"] == "qualified_yang_blade_seat"
-    assert selection["chosen_path_id"] is None
-    path = next(row for row in selection["paths"] if row["id"] == "blade_killer")
-    assert path["status"] == "requires_force_adjudication"
-    assert set(path["observed_conditions"][0]["star_refs"]) == {
-        "year:stem:庚",
-        "year:hidden:庚",
-        "hour:stem:庚",
-    }
-    candidate = next(
-        item
+    assert dominant["key"] == "yue_ren"
+    assert dominant["label"] == "月刃格"
+    assert dominant["formation_status"] == "formed"
+    assert "羊刃驾杀" in dominant["rescues"]
+    assert any(
+        item["key"] == "yang_ren_jia_sha" and item["formation_status"] == "formed"
         for item in structure_profile["recognized_structures"]
-        if item["key"] == "yang_ren_jia_sha"
     )
-    assert candidate["label"] == "羊刃驾杀"
-    assert candidate["formation_status"] == "candidate_only"
 
 
-def test_analyze_harmony_effects_returns_structured_event_payload() -> None:
+def test_analyze_harmony_patterns_detects_three_harmony() -> None:
     pillars = {
         "year": ("甲", "寅"),
         "month": ("丙", "午"),
         "day": ("戊", "戌"),
         "hour": ("辛", "卯"),
     }
-    element_analysis = ElementAnalysis.comprehensive_analysis(pillars)
-    structure_profile = BaZiRules.build_structure_profile(
-        pillars=pillars,
-        element_analysis=element_analysis,
-        harmony_patterns=check_harmony_patterns(pillars),
-        clash_patterns=check_clash_patterns(pillars),
-        special_patterns=analyze_special_patterns(pillars),
+    element_analysis = analyze_elements_and_structure(pillars)
+    harmonies = check_harmony_patterns(pillars)
+
+    assert any(
+        triple["branches"] == ["寅", "午", "戌"] and triple["type"] == "三合火局"
+        for triple in harmonies["three_harmony"]
     )
+    assert element_analysis["favorable_elements"]
 
-    events = BaZiRules.analyze_harmony_effects(pillars, structure_profile)
 
-    triple_event = next(event for event in events if event["type"] == "three_harmony")
-    assert triple_event["result_element"] == "火"
-    assert "strengthens" in triple_event
-    assert "consumes" in triple_event
-    assert "impact_on_day_master" in triple_event
-    assert "impact_on_structure" in triple_event
+def test_cross_chart_includes_six_breaks_and_hidden_combinations() -> None:
+    first = {
+        "year": ("甲", "子"),
+        "month": ("丙", "寅"),
+        "day": ("甲", "午"),
+        "hour": ("庚", "辰"),
+    }
+    second = {
+        "year": ("乙", "酉"),
+        "month": ("丁", "丑"),
+        "day": ("己", "亥"),
+        "hour": ("辛", "未"),
+    }
+    merged = cross_chart_relations(first, second)
+    kinds = {row["kind"] for row in merged["pairs"]}
+    assert "六破" in kinds  # 子-酉
+    assert "暗合" in kinds  # 寅-丑, 午-亥
+
+    assert ["子", "酉"] in check_clash_patterns(
+        {
+            "year": ("甲", "子"),
+            "month": ("乙", "酉"),
+            "day": ("丙", "寅"),
+            "hour": ("丁", "卯"),
+        }
+    )["six_break"]
+    assert check_harmony_patterns(
+        {
+            "year": ("甲", "寅"),
+            "month": ("乙", "丑"),
+            "day": ("丙", "午"),
+            "hour": ("丁", "亥"),
+        }
+    )["hidden_harmony"]
+
+
+def test_nayin_day_pillar_synergy_complementarity_and_cross_shensha() -> None:
+    first = {
+        "year": ("庚", "午"),
+        "month": ("辛", "巳"),
+        "day": ("甲", "子"),
+        "hour": ("庚", "辰"),
+    }
+    second = {
+        "year": ("辛", "未"),
+        "month": ("丁", "亥"),
+        "day": ("己", "丑"),
+        "hour": ("丙", "寅"),
+    }
+    nayin = analyze_nayin_compatibility(first, second)
+    assert nayin["person1_year_nayin"] == "路旁土"
+    assert nayin["person2_year_nayin"] == "路旁土"
+    assert nayin["relation"] == "比和"
+
+    synergy = analyze_day_pillar_synergy(first, second)
+    assert synergy["stem_combination"] is True  # 甲己合
+    assert synergy["branch_six_harmony"] is True  # 子丑合
+    assert synergy["yuanyang_he"] is True
+
+    comp = analyze_element_complementarity(
+        ["水", "木"],
+        ["火", "土"],
+        {"金": 20.0, "木": 10.0, "水": 10.0, "火": 40.0, "土": 20.0},
+        ["火", "土"],
+        ["水", "木"],
+        {"金": 15.0, "木": 30.0, "水": 35.0, "火": 10.0, "土": 10.0},
+    )
+    assert "水" in comp["person2_supports_person1_useful"]
+    assert "火" in comp["person1_supports_person2_useful"]
+
+    shensha = analyze_cross_shensha(first, second)
+    assert "person1_activated_by_person2" in shensha
+    assert "person2_activated_by_person1" in shensha
 
 
 def test_analyze_combined_chart_events_detects_cross_person_three_harmony() -> None:
@@ -125,8 +177,9 @@ def test_calculate_destiny_analysis_exposes_structure_profile() -> None:
     assert (
         result["favorable_elements"] == result["structure_profile"]["useful_elements"]
     )
-    assert "recognized_structures" in result["patterns"]["special"]
-    assert "metadata" in result["patterns"]["special"]
+    assert result["structure_profile"]["assessment_status"] == "adjudicated"
+    assert result["structure_profile"]["dominant_structure"]["key"]
+    assert "harmony" in result["patterns"]
 
 
 def test_cross_chart_day_stem_control_and_branch_clash_are_two_facts() -> None:

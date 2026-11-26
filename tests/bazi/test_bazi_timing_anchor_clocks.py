@@ -5,9 +5,9 @@ from fractions import Fraction
 
 import pytest
 
-import fatebridge.core.timing as timing
+import fatebridge.core.bazi.timing as timing
 from fatebridge.core.almanac import SolarTerm
-from fatebridge.core.timing import TimingAnalysis
+from fatebridge.core.bazi.timing import TimingAnalysis
 from fatebridge.utils.civil_time import CivilPoint, ZonedCalendar
 from fatebridge.utils.timezones import parse_timezone_name, validate_local_clock
 from tests.support.transports import SPECS, business

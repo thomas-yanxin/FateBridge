@@ -3,11 +3,11 @@ from datetime import datetime
 
 import pytest
 
+import fatebridge.core.bazi.strength as bazi_strength
 import fatebridge.services.bazi as bazi_module
 import fatebridge.services.birth_context as birth_context_module
 from fatebridge.analysis.timing_effects import TimingEffectsAnalysis
-from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.timing import TimingAnalysis
+from fatebridge.core.bazi.timing import TimingAnalysis
 from fatebridge.utils.birth_input import create_person_info
 from tests.fixtures.transports import rest_handler
 
@@ -96,8 +96,8 @@ def test_analyze_element_strength_changes_skips_full_comprehensive_analysis(
         raise AssertionError("comprehensive_analysis should not be used here")
 
     monkeypatch.setattr(
-        ElementAnalysis,
-        "comprehensive_analysis",
+        bazi_strength,
+        "analyze_elements_and_structure",
         fail_if_called,
     )
 
@@ -148,7 +148,7 @@ def test_analyze_liuyue_effects_reuses_precomputed_liuyue(
     )
 
     assert result["liuyue_info"]["pillar"] == liuyue_info["pillar"]
-    assert result["enhanced_summary"]
+    assert "branch_relations" in result["detailed_analysis"]
 
 
 def test_analyze_liuri_effects_reuses_precomputed_liuri(
@@ -179,7 +179,7 @@ def test_analyze_liuri_effects_reuses_precomputed_liuri(
     )
 
     assert result["liuri_info"]["pillar"] == liuri_info["pillar"]
-    assert result["enhanced_summary"]
+    assert "branch_relations" in result["detailed_analysis"]
 
 
 @pytest.mark.asyncio

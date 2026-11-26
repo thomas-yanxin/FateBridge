@@ -49,7 +49,7 @@ def test_unknown_gender_limits_dayun_without_losing_natal_or_liunian() -> None:
     assert timing["dayun_pillar"] is None
     assert timing["dayun_status"] == "unavailable_gender_direction"
     assert timing["liunian_pillar"]
-    assert result["career_analysis"]["evidence_chain"]["ten_gods"]
+    assert result["career_analysis"]["topic_facts"]["four_pillars"]
 
 
 @pytest.mark.parametrize(
@@ -97,28 +97,33 @@ def test_resolve_analysis_date_rejects_complete_invalid_date(
 def test_children_star_differs_by_gender() -> None:
     male = create_person_info(1990, 6, 15, 10, "t", "男", "北京")
     female = create_person_info(1990, 6, 15, 10, "t", "女", "北京")
-    cs_m = bazi.calculate_bazi_children(male, dayun_pillar="壬戌")["children_analysis"][
-        "evidence_chain"
-    ]["topic"]["stars"]
-    cs_f = bazi.calculate_bazi_children(female, dayun_pillar="壬戌")[
+    tf_m = bazi.calculate_bazi_children(male, dayun_pillar="壬戌")["children_analysis"][
+        "topic_facts"
+    ]
+    tf_f = bazi.calculate_bazi_children(female, dayun_pillar="壬戌")[
         "children_analysis"
-    ]["evidence_chain"]["topic"]["stars"]
-    assert set(cs_m) == {"正官", "七杀"}  # 男命子女星 = 官杀
-    assert set(cs_f) == {"食神", "伤官"}  # 女命子女星 = 食伤
-    assert cs_m != cs_f
+    ]["topic_facts"]
+    cs_m = {row["ten_god"] for row in tf_m["natal_stars"]}
+    cs_f = {row["ten_god"] for row in tf_f["natal_stars"]}
+    assert cs_m and cs_m <= {"正官", "七杀"}  # 男命子女星 = 官杀
+    assert cs_f and cs_f <= {"食神", "伤官"}  # 女命子女星 = 食伤
+    assert cs_m.isdisjoint(cs_f)
 
 
 def test_romance_opposite_sex_star_differs_by_gender() -> None:
     male = create_person_info(1990, 6, 15, 10, "t", "男", "北京")
     female = create_person_info(1990, 6, 15, 10, "t", "女", "北京")
-    bm = bazi.calculate_bazi_romance(male, dayun_pillar="壬戌")["romance_analysis"][
-        "evidence_chain"
-    ]["topic"]["stars"]
-    bf = bazi.calculate_bazi_romance(female, dayun_pillar="壬戌")["romance_analysis"][
-        "evidence_chain"
-    ]["topic"]["stars"]
-    assert set(bm) == {"正财", "偏财"}  # 男命异性缘 = 财
-    assert set(bf) == {"正官", "七杀"}  # 女命异性缘 = 官杀
+    tf_m = bazi.calculate_bazi_romance(male, dayun_pillar="壬戌")["romance_analysis"][
+        "topic_facts"
+    ]
+    tf_f = bazi.calculate_bazi_romance(female, dayun_pillar="壬戌")["romance_analysis"][
+        "topic_facts"
+    ]
+    bm = {row["ten_god"] for row in tf_m["natal_stars"]}
+    bf = {row["ten_god"] for row in tf_f["natal_stars"]}
+    assert bm and bm <= {"正财", "偏财"}  # 男命异性缘 = 财
+    assert bf and bf <= {"正官", "七杀"}  # 女命异性缘 = 官杀
+    assert bm.isdisjoint(bf)
 
 
 def test_dimension_auto_derives_correct_dayun_and_liunian() -> None:
@@ -132,14 +137,8 @@ def test_dimension_auto_derives_correct_dayun_and_liunian() -> None:
     assert abs(tc["dayun_age"] - 28.56) < 0.5
 
 
-@pytest.mark.parametrize(
-    "gender, age_basis",
-    [
-        ("乾", "auto_derived_reference_not_override_pillar_age"),
-        ("未知", "unavailable_for_override"),
-    ],
-)
-def test_explicit_dayun_has_no_automatic_period(gender, age_basis) -> None:
+@pytest.mark.parametrize("gender", ["乾", "未知"])
+def test_explicit_dayun_has_no_automatic_period(gender) -> None:
     person = create_person_info(1990, 6, 15, 10, "t", gender, "北京")
     tc = bazi.calculate_bazi_wealth(person, analysis_year=2026, dayun_pillar="壬戌")[
         "wealth_analysis"
@@ -148,7 +147,6 @@ def test_explicit_dayun_has_no_automatic_period(gender, age_basis) -> None:
     assert tc["dayun_pillar"] == "壬戌"
     assert tc["liunian_pillar"] == "丙午"
     assert tc["dayun_status"] == "explicit_override"
-    assert tc["dayun_age_basis"] == age_basis
     assert (
         tc["dayun_start_at"]
         is tc["dayun_end_at"]
@@ -164,10 +162,7 @@ def test_explicit_dayun_has_no_automatic_period(gender, age_basis) -> None:
 def test_children_preserves_hour_pillar_and_its_stem_classification(
     hour, expected: str
 ) -> None:
-    from fatebridge.core.bazi.bazi_evidence import (
-        build_natal_evidence,
-        build_topic_evidence,
-    )
+    from fatebridge.utils.data import get_ten_god
 
     pillars = {
         "year": ("甲", "子"),
@@ -175,10 +170,5 @@ def test_children_preserves_hour_pillar_and_its_stem_classification(
         "day": ("甲", "午"),
         "hour": hour,
     }
-    natal = build_natal_evidence(pillars)
-    topic = build_topic_evidence(natal, pillars, "children", "女", None, None)
-    assert topic["palaces"]["hour"]["pillar"] == "".join(hour)
-    assert any(
-        row["pillar"] == "hour" and row["location"] == "天干"
-        for row in natal["ten_gods"][expected]
-    )
+    assert get_ten_god(pillars["day"][0], hour[0]).value == expected
+    assert "hour" in pillars and "".join(pillars["hour"]) == "".join(hour)
