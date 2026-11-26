@@ -5,20 +5,16 @@ from __future__ import annotations
 from datetime import datetime, time
 from typing import Any
 
-from fatebridge.core.numerology.numerology_clock_policy import (
+from fatebridge.core.numerology.numerology_inputs import (
+    CLOCK_INPUT_POLICY_ID,
+    CLOCK_INPUT_SCOPE,
     CLOCK_POLICY_ID,
+    DISPLAY_SCOPE,
     ParsedBirthClock,
+    birth_clock_input_record,
     parse_birth_clock,
 )
 from fatebridge.utils.errors import NumerologySourceError
-
-CLOCK_INPUT_POLICY_ID = "numerology_clock_text_provenance_v1"
-CLOCK_INPUT_SCOPE = (
-    "记录所给钟时分量与计算补位；文本格式不认证出生记录的实际精度，不据此推定误差区间。"
-)
-DISPLAY_SCOPE = (
-    "输出日期的小数或秒位不提升出生记录的实际精度；未据文本格式推定误差区间。"
-)
 
 
 def preserve_birth_clock_text(value: object) -> str:
@@ -29,40 +25,6 @@ def preserve_birth_clock_text(value: object) -> str:
 def clock_input_representation(value: object) -> dict[str, Any]:
     """Build a receipt for the validated text of a birth clock."""
     return birth_clock_input_record(parse_birth_clock(value))
-
-
-def birth_clock_input_record(birth_clock: ParsedBirthClock) -> dict[str, Any]:
-    """Record text components separately from numerical clock defaults."""
-    supplied_components = ["hour", "minute"]
-    omitted_components: list[str]
-    calculation_defaults: dict[str, int]
-    if birth_clock.fractional_digits:
-        supplied_components.extend(("second", "fractional_second"))
-        omitted_components = []
-        calculation_defaults = {}
-        detail = f"已提供时、分、秒及{birth_clock.fractional_digits}位小数秒；这些位数不认证记录的实际精度。"
-    elif birth_clock.has_explicit_seconds:
-        supplied_components.append("second")
-        omitted_components = ["fractional_second"]
-        calculation_defaults = {"microsecond": 0}
-        detail = "已提供时、分、秒，未提供小数秒；微秒=0仅为计算参考值。"
-    else:
-        omitted_components = ["second", "fractional_second"]
-        calculation_defaults = {"second": 0, "microsecond": 0}
-        detail = "仅提供时、分；秒=0和微秒=0仅为计算参考值。"
-    return {
-        "policy_id": CLOCK_INPUT_POLICY_ID,
-        "supplied_text": birth_clock.supplied_text,
-        "normalized_clock": birth_clock.normalized_clock,
-        "supplied_components": supplied_components,
-        "omitted_components": omitted_components,
-        "fractional_digits": birth_clock.fractional_digits,
-        "calculation_defaults": calculation_defaults,
-        "uncertainty_interval": None,
-        "observed_precision_certified": False,
-        "scope": CLOCK_INPUT_SCOPE,
-        "statement": f"出生钟时输入：{birth_clock.supplied_text}，{detail}{DISPLAY_SCOPE}",
-    }
 
 
 def require_clock_input_binding(

@@ -2,7 +2,7 @@
 
 from typing import Any, Literal
 
-from pydantic import ValidationInfo, model_validator
+from pydantic import model_validator
 
 from fatebridge.core.contracts.output_base import PartialOutput
 from fatebridge.core.contracts.output_canping_rows import CanpingRow
@@ -12,7 +12,6 @@ from fatebridge.core.contracts.output_canping_solar import (
     CanpingSolarContext,
 )
 from fatebridge.core.contracts.output_chinese_calendar import Object
-from fatebridge.utils.civil_time import ZonedCalendar
 
 
 class CanpingSeries(PartialOutput):
@@ -29,114 +28,15 @@ class CanpingSeries(PartialOutput):
     age_policy: str | None = None
 
     @model_validator(mode="after")
-    def coherent_annual_points(self, info: ValidationInfo) -> "CanpingSeries":
-        exact = self.comparison_policy == "retained_nominal_civil_point_v1"
-        full = bool(info.context and info.context.get("full_result"))
-        if (
-            full
-            and (
-                self.year_boundary == "lichun"
-                or self.solar_context is not None
-                or self.year_boundaries is not None
-            )
-            and not exact
-        ):
-            raise ValueError("实际立春年序缺少主点比较政策。")
-        if (
-            full
-            and exact
-            and (
-                not self.rows
-                or not self.year_boundaries
-                or self.birth_pillar_year is None
-                or self.solar_context is None
-                or any(
-                    value is None
-                    for value in (
-                        self.solar_context.birth_instant_utc,
-                        self.solar_context.timezone,
-                        self.solar_context.origin_civil_year,
-                        self.solar_context.origin_bazi_year,
-                        self.solar_context.horizon_years,
-                        self.solar_context.boundary_count,
-                    )
-                )
-            )
-        ):
-            raise ValueError("完整精确年序缺少出生、范围或实际年界。")
-        boundaries: dict[int, CanpingSolarBoundary] = {}
-        for boundary in self.year_boundaries or []:
-            if boundary.year is not None:
-                if boundary.year in boundaries:
-                    raise ValueError("立春年界年份重复。")
-                boundaries[boundary.year] = boundary
-            if (
-                full
-                and exact
-                and (
-                    boundary.year is None
-                    or boundary.record is None
-                    or boundary.record.comparison_policy != self.comparison_policy
-                    or boundary.record.civil_point is None
-                )
-            ):
-                raise ValueError("精确年序缺少实际立春主点。")
-        context = self.solar_context
-        birth = (
-            ZonedCalendar.from_isoformat(
-                context.birth_instant_utc
-            ).utc.julian_day_exact()
-            if context is not None and context.birth_instant_utc is not None
-            else None
-        )
-        previous_end = None
+    def coherent_annual_points(self) -> "CanpingSeries":
         previous_year = None
         for row in self.rows or []:
-            if (
-                full
-                and exact
-                and (
-                    row.comparison_policy != self.comparison_policy
-                    or row.year is None
-                    or row.segments is None
-                )
-            ):
-                raise ValueError("完整精确年序缺少年份、主点政策或分段。")
-            start = row.start_point.known_day() if row.start_point is not None else None
-            end = row.end_point.known_day() if row.end_point is not None else None
-            if start is not None and previous_end is not None and start != previous_end:
-                raise ValueError("配运年序数值区间不连续。")
             if row.year is not None and previous_year is not None:
                 if row.year != previous_year + 1:
                     raise ValueError("配运年序年份不连续。")
-            if row.year is not None:
-                for year, actual, beginning in (
-                    (row.year, start, True),
-                    (row.year + 1, end, False),
-                ):
-                    year_boundary = boundaries.get(year)
-                    if full and exact and year_boundary is None:
-                        raise ValueError("配运年序没有绑定实际年度立春。")
-                    point = (
-                        year_boundary.record.civil_point
-                        if year_boundary is not None
-                        and year_boundary.record is not None
-                        else None
-                    )
-                    expected = point.known_day() if point is not None else None
-                    if expected is not None and beginning and birth is not None:
-                        expected = max(expected, birth)
-                    if (
-                        expected is not None
-                        and actual is not None
-                        and expected != actual
-                    ):
-                        raise ValueError("配运年界或出生裁剪与实际主点不一致。")
-            previous_end, previous_year = end, row.year
+            previous_year = row.year
+        context = self.solar_context
         if context is not None:
-            if self.year_boundaries is not None and context.boundary_count is not None:
-                if len(self.year_boundaries) != context.boundary_count:
-                    raise ValueError("实际立春回执数与年序上下文不一致。")
             if self.rows is not None and context.horizon_years is not None:
                 if len(self.rows) != context.horizon_years:
                     raise ValueError("实际年序行数与声明的范围不一致。")
@@ -184,37 +84,10 @@ class CanpingTiming(PartialOutput):
     first_period: CanpingRow | None = None
 
     @model_validator(mode="after")
-    def coherent_schedule_source_map(self, info: ValidationInfo) -> "CanpingTiming":
+    def coherent_schedule_source_map(self) -> "CanpingTiming":
         basis = self.schedule_basis
         known_profile = self.profile_id or (basis.profile_id if basis else None)
         known_start = self.start_at or (basis.actual_start_at if basis else None)
-        full = bool(info.context and info.context.get("full_result"))
-        mapped = known_profile in {"bazi_appendix_v1", "bazi_continuous_v1"} and (
-            known_start is not None
-            or basis is not None
-            and basis.has_actual_date_mapping is True
-        )
-        if full and mapped and self.comparison_policy is None:
-            raise ValueError("实际日期配运缺少主点比较政策。")
-        if known_profile == "legacy_minggong_v1" and self.comparison_policy is not None:
-            raise ValueError("无实际日期的旧命宫方法不能声明精确民用区间。")
-        if full and self.comparison_policy == "retained_nominal_civil_point_v1":
-            if any(
-                value is None
-                for value in (
-                    self.first_row,
-                    self.first_period,
-                    self.solar_year_context,
-                    self.birth_at,
-                    self.timezone,
-                )
-            ):
-                raise ValueError("完整日期配运缺少实际首运或出生年序上下文。")
-            for row in (self.first_row, self.first_period, self.selected):
-                if row is not None and row.comparison_policy != self.comparison_policy:
-                    raise ValueError("日期配运摘要缺少同一主点比较政策。")
-            if self.selected is not None and self.selected.at is None:
-                raise ValueError("完整查询摘要缺少实际查询时刻。")
         if self.first_row is not None:
             if known_profile == "legacy_minggong_v1" or (
                 basis is not None and basis.has_actual_date_mapping is False
@@ -222,15 +95,10 @@ class CanpingTiming(PartialOutput):
                 for key in (
                     "start_at",
                     "end_at",
-                    "start_point",
-                    "end_point",
-                    "comparison_policy",
                     "start_age",
                     "end_age",
                     "at",
                     "dayun_index",
-                    "year_start_boundary",
-                    "year_end_boundary",
                 ):
                     if getattr(self.first_row, key) is not None:
                         raise ValueError(

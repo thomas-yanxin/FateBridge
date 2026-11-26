@@ -10,8 +10,12 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any, Literal, Sequence, cast
 
-from fatebridge.core.sukuyo.sukuyo_documentary import with_text_layers
-from fatebridge.core.sukuyo.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.texts import (
+    conjunction_doctrine,
+    load_source,
+    lower_mansion_evidence,
+    with_text_layers,
+)
 
 SOURCE = Path(__file__).resolve().parents[2] / "data/sukuyo_t1299_lower_mansions.json"
 SukuyoActivityDetail = Literal[

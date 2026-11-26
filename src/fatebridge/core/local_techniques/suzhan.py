@@ -10,12 +10,12 @@ from fatebridge.core.local_techniques.chart import (
     _normalize_date_text,
     _normalize_time_text,
 )
-from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence, rulesets
-from fatebridge.core.sukuyo.suzhan_astronomy import (
+from fatebridge.core.sukuyo.astronomy import (
     METHOD,
     apply_equatorial_mansions,
     build_equatorial_mansions,
 )
+from fatebridge.core.sukuyo.calendar import calendar_mansion, day_evidence, rulesets
 from fatebridge.utils.coordinates import parse_geo_coordinate
 from fatebridge.utils.house_systems import InvalidHouseSystemError, house_system_fields
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE

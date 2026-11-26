@@ -5,7 +5,7 @@ from typing import Annotated, Literal
 from pydantic import BeforeValidator, Field, JsonValue, model_validator
 
 from fatebridge.core.contracts.output_base import PartialOutput
-from fatebridge.core.numerology.canping_schedule_basis import (
+from fatebridge.core.numerology.timing import (
     APPLIED,
     LEGACY,
     SUMMARIES,

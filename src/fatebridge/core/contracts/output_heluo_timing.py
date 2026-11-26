@@ -5,7 +5,7 @@ from typing import Annotated, Any, Literal
 from pydantic import BeforeValidator, Field, JsonValue, model_validator
 
 from fatebridge.core.contracts.output_base import PartialOutput
-from fatebridge.core.heluo.heluo_timing import CYCLE
+from fatebridge.core.heluo.timing import CYCLE
 
 
 class HeluoTimingRow(PartialOutput):

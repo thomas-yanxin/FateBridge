@@ -1,4 +1,4 @@
-"""Shared definitions, independent of the domain entry point."""
+"""Shared schedule validation for Canping outputs."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from fatebridge.core.contracts.output_chinese import (
     CanpingSeries,
     CanpingTiming,
 )
-from fatebridge.core.numerology.canping_schedule_basis import (
+from fatebridge.core.numerology.timing import (
     APPLIED,
     LEGACY,
     build_schedule_basis,
@@ -35,17 +35,11 @@ def _registered_facts_match(actual: object, expected: object) -> bool:
 
 
 def _known_facts_agree(actual: object, expected: object) -> bool:
-    """Compare shared facts; an explicitly null civil cap is a known fact."""
     if actual is None or expected is None:
         return True
     if isinstance(actual, dict) and isinstance(expected, dict):
         return all(
-            (
-                actual[key] is expected[key]
-                if key == "excluded_before"
-                and (actual[key] is None or expected[key] is None)
-                else _known_facts_agree(actual[key], expected[key])
-            )
+            _known_facts_agree(actual[key], expected[key])
             for key in actual.keys() & expected.keys()
         )
     if isinstance(actual, list) and isinstance(expected, list):
@@ -61,12 +55,7 @@ def _require_interval_binding(
     periods: list[CanpingRow] | None,
     clock: object,
 ) -> None:
-    """Bind present numerical intervals to the actual same-run schedule.
-
-    This checks retained facts, never solves another solar event or rebuilds a
-    known event from its JSON receipt. The ordinary-label cap affects display;
-    only the point coordinate defines schedule membership.
-    """
+    """Bind present schedule facts without requiring legacy Fraction/year_boundaries."""
     context = series.solar_context if series is not None else None
     if context is not None and timing.solar_year_context is not None:
         if not _known_facts_agree(
@@ -74,12 +63,6 @@ def _require_interval_binding(
             timing.solar_year_context.model_dump(exclude_unset=True),
         ):
             raise ValueError("配运上下文与同次实际年序不一致。")
-    if series is not None and (
-        timing.comparison_policy is not None
-        and series.comparison_policy is not None
-        and timing.comparison_policy != series.comparison_policy
-    ):
-        raise ValueError("查询与年序的主点比较政策不一致。")
     birth_labels = [timing.birth_at]
     birth_labels.extend(
         value.birth_instant_utc
@@ -121,103 +104,37 @@ def _require_interval_binding(
     ):
         raise ValueError("实际大运序号重复。")
     for row in series.rows or []:
-        for segment in row.segments or []:
-            start = segment.start_point.known_day() if segment.start_point else None
-            end = segment.end_point.known_day() if segment.end_point else None
-            if segment.status == "not_started" and periods:
-                first = periods[0].start_point
-                first_day = first.known_day() if first is not None else None
-                if first_day is not None and end is not None and end > first_day:
-                    raise ValueError("未起运分段越过实际首运起点。")
-            if segment.status != "active" or segment.dayun_index is None:
-                continue
-            period = period_by_index.get(segment.dayun_index)
+        if row.status == "active" and row.dayun_index is not None:
+            period = period_by_index.get(row.dayun_index)
             if period is None:
                 if periods is not None and all(p.index is not None for p in periods):
                     raise ValueError("年内分段引用了不存在的实际大运。")
                 continue
             for actual, expected in (
-                (segment.dayunBranch, period.branch),
-                (segment.dayun_pillar, period.pillar),
+                (row.dayunBranch, period.branch),
+                (row.dayun_pillar, period.pillar),
             ):
                 if actual is not None and expected is not None and actual != expected:
-                    raise ValueError("年内分段的大运身份与实际大运不一致。")
-            lower = period.start_point.known_day() if period.start_point else None
-            upper = period.end_point.known_day() if period.end_point else None
-            if (start is not None and lower is not None and start < lower) or (
-                end is not None and upper is not None and end > upper
-            ):
-                raise ValueError("活动分段超出所引实际大运的数值区间。")
-        if row.segments is not None and len(row.segments) == 1:
-            if not _known_facts_agree(
-                row.model_dump(exclude_unset=True),
-                row.segments[0].model_dump(exclude_unset=True),
-            ):
-                raise ValueError("单段年序摘要与实际分段不一致。")
+                    raise ValueError("年序大运身份与实际大运不一致。")
     selected = timing.selected
-    if selected is None:
-        return
-    boundaries = {
-        boundary.year: boundary
-        for boundary in series.year_boundaries or []
-        if boundary.year is not None
-    }
-    if selected.year is not None:
-        for selected_boundary, year in (
-            (selected.year_start_boundary, selected.year),
-            (selected.year_end_boundary, selected.year + 1),
-        ):
-            matching_boundary = boundaries.get(year)
-            if selected_boundary is not None and matching_boundary is not None:
-                if not _known_facts_agree(
-                    selected_boundary.model_dump(exclude_unset=True),
-                    matching_boundary.model_dump(exclude_unset=True),
-                ):
-                    raise ValueError("查询立春收据与同次实际年界不一致。")
-    if selected.at is None or series.rows is None:
+    if selected is None or selected.at is None:
         return
     at = ZonedCalendar.from_isoformat(selected.at).utc.julian_day_exact()
-    complete_rows = True
-    match = None
-    for row in series.rows:
-        lower = row.start_point.known_day() if row.start_point else None
-        upper = row.end_point.known_day() if row.end_point else None
-        if lower is None or upper is None:
-            complete_rows = False
-        elif lower <= at < upper:
-            match = row
-            break
-    if match is None:
-        if complete_rows:
-            raise ValueError("查询时刻不在同次实际年序的半开范围内。")
-        return
-    for selected_fact, matching_fact in (
-        (selected.year, match.year),
-        (selected.ganzhi, match.ganzhi),
-    ):
+    if selected.start_at is not None:
+        if at < ZonedCalendar.from_isoformat(selected.start_at).utc.julian_day_exact():
+            raise ValueError("查询时刻早于所选区间起点。")
+    if selected.end_at is not None:
+        if at >= ZonedCalendar.from_isoformat(selected.end_at).utc.julian_day_exact():
+            raise ValueError("查询时刻不早于所选区间终点。")
+    if selected.year is not None and series.rows:
+        match_row = next((r for r in series.rows if r.year == selected.year), None)
         if (
-            selected_fact is not None
-            and matching_fact is not None
-            and selected_fact != matching_fact
+            match_row is not None
+            and selected.ganzhi is not None
+            and match_row.ganzhi is not None
         ):
-            raise ValueError("查询年份与数值时刻所属的实际年序不一致。")
-    if match.segments is None:
-        return
-    complete_segments = True
-    for segment in match.segments:
-        lower = segment.start_point.known_day() if segment.start_point else None
-        upper = segment.end_point.known_day() if segment.end_point else None
-        if lower is None or upper is None:
-            complete_segments = False
-        elif lower <= at < upper:
-            if not _known_facts_agree(
-                selected.model_dump(exclude_unset=True),
-                segment.model_dump(exclude_unset=True),
-            ):
-                raise ValueError("查询所选区间或条文与实际年内分段不一致。")
-            return
-    if complete_segments:
-        raise ValueError("查询时刻没有对应的实际年内分段。")
+            if selected.ganzhi != match_row.ganzhi:
+                raise ValueError("查询年份与实际年序干支不一致。")
 
 
 def require_schedule_binding(
@@ -227,13 +144,7 @@ def require_schedule_binding(
         tuple[CanpingTiming, CanpingSeries | None, list[CanpingRow] | None] | None
     ) = None,
 ) -> None:
-    """Validate present receipts before transport projection can hide a conflict.
-
-    Missing context in a partial library result remains unknown. Where the
-    actual timing and birth clock are present, compare against those facts;
-    internal agreement of a forged source map is insufficient.
-    """
-
+    """Validate present receipts before transport projection."""
     timing = result.get("canping_timing")
     if not isinstance(timing, dict) or timing.get("schedule_basis") is None:
         return
@@ -258,9 +169,6 @@ def require_schedule_binding(
         ):
             raise ValueError("实际配运序为空，不能保留非空首行或首运摘要。")
         if isinstance(rows, list) and rows:
-            # Compare against the actual calculation, not just two internally
-            # agreeing summaries. This also checks text, column, numbers, ages
-            # and both boundaries before projection can remove the full rows.
             for key in ("first_row", "first_period"):
                 if key not in timing:
                     continue

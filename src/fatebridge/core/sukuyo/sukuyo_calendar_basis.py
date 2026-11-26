@@ -3,13 +3,7 @@
 from __future__ import annotations
 
 from datetime import date
-from types import ModuleType
-from typing import Literal
-
-from fatebridge.core.sukuyo import (
-    sukuyo_historical_calendar,
-    sukuyo_japanese_calendar,
-)
+from typing import Any, Literal
 
 SukuyoCalendarBasis = Literal[
     "chinese_hko_utc08",
@@ -37,11 +31,13 @@ def basis_identifiers(basis: str) -> tuple[str, str]:
     raise ValueError("未知的宿曜宿主历法标识")
 
 
-def japanese_calendar_reader(basis: str) -> ModuleType:
+def japanese_calendar_reader(basis: str) -> Any:
+    from fatebridge.core.sukuyo.calendar import _hutime_reader, _naoj_reader
+
     if basis == JAPANESE_CALENDAR_BASIS:
-        return sukuyo_japanese_calendar
+        return _hutime_reader()
     if basis == HISTORICAL_CALENDAR_BASIS:
-        return sukuyo_historical_calendar
+        return _naoj_reader()
     raise ValueError("未知的日本参考历法，不能回退其他资料")
 
 
