@@ -18,7 +18,7 @@ class MethodGroup:
 GROUPS: tuple[MethodGroup, ...] = (
     MethodGroup(
         method_name="bazi_natal",
-        consuming_tools="analyze_destiny bazi_birth bazi_marriage bazi_career bazi_wealth bazi_health bazi_children bazi_education bazi_personality bazi_relatives bazi_romance two_person_compatibility timing_analysis dayun_analysis liunian_analysis liuyue_analysis liuri_analysis liushi_analysis",
+        consuming_tools="bazi_overview bazi_birth_chart bazi_marriage bazi_career bazi_wealth bazi_health bazi_children bazi_education bazi_personality bazi_relatives bazi_romance bazi_compatibility bazi_timing bazi_luck_cycles bazi_yearly_timing bazi_monthly_timing bazi_daily_timing bazi_hourly_timing",
         implementation_path="services/birth_context.py",
         source_path="docs/algorithm-coverage.md",
         quantity_kind="traditional_rule_result",
@@ -32,7 +32,7 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
     MethodGroup(
         method_name="bazi_source_collation",
-        consuming_tools="bazi_source_compare",
+        consuming_tools="compare_bazi_sources",
         implementation_path="services/source_comparison.py",
         source_path="docs/algorithm-coverage.md",
         quantity_kind="source_comparison",
@@ -41,7 +41,7 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
     MethodGroup(
         method_name="bazi_timing_layers",
-        consuming_tools="timing_analysis dayun_analysis liunian_analysis liuyue_analysis liuri_analysis liushi_analysis",
+        consuming_tools="bazi_timing bazi_luck_cycles bazi_yearly_timing bazi_monthly_timing bazi_daily_timing bazi_hourly_timing",
         implementation_path="services/timing_state.py",
         source_path="docs/algorithm-coverage.md",
         quantity_kind="traditional_rule_result",
@@ -55,7 +55,7 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
     MethodGroup(
         method_name="solar_term_crossings",
-        consuming_tools="jieqi_timeline_analysis jieqi_year",
+        consuming_tools="solar_term_timeline solar_terms_for_year",
         implementation_path="services/calendar_tools.py",
         source_path="docs/ephemeris.md",
         quantity_kind="event_time",
@@ -70,7 +70,7 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
     MethodGroup(
         method_name="chinese_calendar_conversion",
-        consuming_tools="nongli_time",
+        consuming_tools="lunar_calendar_time",
         implementation_path="services/calendar_tools.py",
         source_path="docs/ephemeris.md",
         quantity_kind="calendar_conversion",
@@ -79,7 +79,7 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
     MethodGroup(
         method_name="hexagram_lookup",
-        consuming_tools="gua_lookup gua_meiyi",
+        consuming_tools="gua_lookup gua_meanings",
         implementation_path="services/divination.py",
         source_path="docs/algorithm-coverage.md",
         quantity_kind="reference_text",
@@ -88,7 +88,7 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
     MethodGroup(
         method_name="meihua_cast_and_rules",
-        consuming_tools="meihua_analysis meihua_cast",
+        consuming_tools="meihua_time_cast meihua_cast",
         implementation_path="services/divination.py",
         source_path="docs/algorithm-coverage.md",
         quantity_kind="traditional_rule_result",
@@ -97,7 +97,7 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
     MethodGroup(
         method_name="tongshefa_symbolic_rules",
-        consuming_tools="tongshefa",
+        consuming_tools="combine_four_gua",
         implementation_path="services/divination.py",
         source_path="docs/algorithm-coverage.md",
         quantity_kind="symbolic_rule_result",
@@ -106,7 +106,7 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
     MethodGroup(
         method_name="sixyao_cast_and_yao_relations",
-        consuming_tools="sixyao",
+        consuming_tools="liuyao",
         implementation_path="core/local_techniques/sixyao.py",
         source_path="docs/algorithm-coverage.md",
         quantity_kind="traditional_rule_result",
@@ -147,7 +147,7 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
     MethodGroup(
         method_name="sanshi_correspondence",
-        consuming_tools="sanshiunited",
+        consuming_tools="sanshi_combined_chart",
         implementation_path="services/divination.py",
         source_path="docs/algorithm-coverage.md",
         quantity_kind="spatial_symbolic_correspondence",
@@ -161,7 +161,7 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
     MethodGroup(
         method_name="ziwei_natal_and_temporal_rules",
-        consuming_tools="ziwei_birth ziwei_horoscope",
+        consuming_tools="ziwei_birth_chart ziwei_timing",
         implementation_path="services/metaphysics.py",
         source_path="docs/algorithm-coverage.md",
         quantity_kind="traditional_rule_result",
@@ -184,7 +184,7 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
     MethodGroup(
         method_name="liuren_course_and_transmissions",
-        consuming_tools="liureng_gods liureng_runyear sanshiunited",
+        consuming_tools="liuren_chart liuren_yearly_timing sanshi_combined_chart",
         implementation_path="services/metaphysics.py",
         source_path="docs/algorithm-coverage.md",
         quantity_kind="traditional_rule_result",
@@ -198,7 +198,7 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
     MethodGroup(
         method_name="qimen_rotating_board",
-        consuming_tools="qimen sanshiunited",
+        consuming_tools="qimen sanshi_combined_chart",
         implementation_path="services/metaphysics.py",
         source_path="docs/algorithm-coverage.md",
         quantity_kind="traditional_rule_result",
@@ -212,7 +212,7 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
     MethodGroup(
         method_name="taiyi_four_counts",
-        consuming_tools="taiyi sanshiunited",
+        consuming_tools="taiyi sanshi_combined_chart",
         implementation_path="services/metaphysics.py",
         source_path="docs/algorithm-coverage.md",
         quantity_kind="integer_and_rule_result",
@@ -239,17 +239,8 @@ GROUPS: tuple[MethodGroup, ...] = (
         ),
     ),
     MethodGroup(
-        method_name="export_sections",
-        consuming_tools="export_registry export_parse",
-        implementation_path="services/export_tools.py",
-        source_path="docs/api-reference.md",
-        quantity_kind="reference_text",
-        measurement_unit="categorical",
-        error_sources=(),
-    ),
-    MethodGroup(
         method_name="knowledge_source_lookup",
-        consuming_tools="knowledge_registry knowledge_read",
+        consuming_tools="knowledge_catalog knowledge_read",
         implementation_path="services/knowledge.py",
         source_path="docs/api-reference.md",
         quantity_kind="reference_text",
@@ -274,7 +265,7 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
     MethodGroup(
         method_name="western_natal_geometry",
-        consuming_tools="astro_chart astro_chart13 astro_hellen astro_guolao astro_india astro_vimshottari astro_germany astro_relative_chart",
+        consuming_tools="astrology_chart thirteen_sector_chart hellenistic_chart guolao_chart vedic_chart vimshottari_dasha hamburg_midpoint_chart relationship_chart",
         implementation_path="core/astro/chart.py",
         source_path="docs/algorithm-coverage.md",
         quantity_kind="astronomy_and_rule_result",
@@ -291,7 +282,7 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
     MethodGroup(
         method_name="jyotish_vargas_strength_and_dasha",
-        consuming_tools="astro_chart astro_india astro_vimshottari",
+        consuming_tools="vedic_chart vimshottari_dasha",
         implementation_path="core/jyotish/jyotish.py",
         source_path="docs/algorithm-coverage.md",
         quantity_kind="astronomy_and_rule_result",
@@ -306,7 +297,7 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
     MethodGroup(
         method_name="guolao_mansions_and_rules",
-        consuming_tools="astro_chart astro_guolao",
+        consuming_tools="guolao_chart",
         implementation_path="core/astro/chart.py",
         source_path="docs/algorithm-coverage.md",
         quantity_kind="astronomy_and_rule_result",
@@ -320,7 +311,7 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
     MethodGroup(
         method_name="germany_midpoint_geometry",
-        consuming_tools="astro_chart astro_germany",
+        consuming_tools="hamburg_midpoint_chart",
         implementation_path="services/astrology.py",
         source_path="docs/algorithm-coverage.md",
         quantity_kind="astronomy_and_rule_result",
@@ -335,7 +326,7 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
     MethodGroup(
         method_name="western_relationship_geometry",
-        consuming_tools="astro_relative_chart",
+        consuming_tools="relationship_chart",
         implementation_path="core/astro/relationship.py",
         source_path="docs/algorithm-coverage.md",
         quantity_kind="astronomy_and_rule_result",
@@ -402,7 +393,7 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
     MethodGroup(
         method_name="fengshui_xuankong_natal",
-        consuming_tools="fengshui_xuankong_natal fengshui_assess",
+        consuming_tools="fengshui_xuankong_house_chart fengshui_assess",
         implementation_path="services/fengshui.py",
         source_path="docs/fengshui.md",
         quantity_kind="traditional_rule_result",
@@ -416,6 +407,6 @@ GROUPS: tuple[MethodGroup, ...] = (
     ),
 )
 
-WESTERN_TIMING = "solarreturn lunarreturn transit solararc givenyear profection pd pdchart zr firdaria decennials".split()
-WESTERN_LIFESPAN = "harmonic planetary_ages triplicity_rulers lunation_phase distributions balbillus keypoints yearsystem129 planetaryarc persiandirected agepoint vedicprog jaynesprog".split()
-WESTERN_EVENTS = "mundane extrareturns horary election".split()
+WESTERN_TIMING = "solar_return lunar_return transit_chart solar_arc chart_for_year profection primary_directions primary_directions_chart zodiacal_releasing firdaria decennials".split()
+WESTERN_LIFESPAN = "harmonic_chart planetary_ages triplicity_ruler_periods lunar_phase_progressions bounds_directions balbillus_periods numeric_aspect_periods planetary_periods_129_years planetary_arc_directions persian_directions age_point sidereal_progressions declination_progressions".split()
+WESTERN_EVENTS = "mundane_ingress_chart planetary_returns horary_chart evaluate_election_time".split()

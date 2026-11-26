@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from fatebridge.application.bindings import lazy_service
+from fatebridge.application.bindings import service_ref
 from fatebridge.application.tool_spec import (
     BoundServiceCall,
     DetailLevel,
@@ -20,7 +20,7 @@ from fatebridge.core.psychometrics.ipip_big_five import (
     IpipBigFiveRequest,
 )
 
-calculate_ipip_big_five = lazy_service(
+calculate_ipip_big_five = service_ref(
     "fatebridge.services.psychometrics", "calculate_ipip_big_five"
 )
 
@@ -62,7 +62,7 @@ def _identity_detail_view(
 
 SPECS: list[ToolSpec] = [
     ToolSpec(
-        key="ipip_big_five",
+        name="ipip_big_five",
         bind=bind_ipip_big_five,
         request_model=IpipBigFiveRequest,
         output_model=IpipBigFiveOutput,
@@ -77,8 +77,6 @@ SPECS: list[ToolSpec] = [
         operation_label_zh="IPIP大五人格量表",
         family="psychometrics",
         rest_path="/api/psychometrics/ipip-big-five",
-        mcp_name="ipip_big_five",
-        include_snapshot_text=False,
         uses_astronomy_runtime=False,
         detail_view=_identity_detail_view,
         methods=(

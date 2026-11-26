@@ -40,8 +40,7 @@ def _layer(result: dict[str, Any], ruleset_id: str) -> dict[str, Any]:
     return {**result, "ruleset": provenance(ruleset_id)}
 
 
-def calculate_directions(**kwargs: Any) -> dict[str, Any]:
-    req = DirectionsRequest.model_validate(kwargs)
+def calculate_directions(req: DirectionsRequest) -> dict[str, Any]:
     bearing = None
     if req.bearing_degrees is not None:
         assert req.north_reference is not None
@@ -60,33 +59,28 @@ def calculate_directions(**kwargs: Any) -> dict[str, Any]:
     return compose_fengshui_result({"directions": _layer(result, req.ruleset_id)}, [])
 
 
-def calculate_minggua(**kwargs: Any) -> dict[str, Any]:
-    req = MingguaRequest.model_validate(kwargs)
+def calculate_minggua(req: MingguaRequest) -> dict[str, Any]:
     return compose_fengshui_result(
         {"minggua": _layer(minggua(req), req.ruleset_id)}, []
     )
 
 
-def calculate_bazhai(**kwargs: Any) -> dict[str, Any]:
-    req = BazhaiRequest.model_validate(kwargs)
+def calculate_bazhai(req: BazhaiRequest) -> dict[str, Any]:
     layer = _layer(bazhai(req), req.ruleset_id)
     return compose_fengshui_result({"bazhai": layer}, _differences({"bazhai": layer}))
 
 
-def calculate_jinsuo(**kwargs: Any) -> dict[str, Any]:
-    req = JinsuoRequest.model_validate(kwargs)
+def calculate_jinsuo(req: JinsuoRequest) -> dict[str, Any]:
     return compose_fengshui_result({"jinsuo": _layer(jinsuo(req), req.ruleset_id)}, [])
 
 
-def calculate_annual_stars(**kwargs: Any) -> dict[str, Any]:
-    req = AnnualRequest.model_validate(kwargs)
+def calculate_annual_stars(req: AnnualRequest) -> dict[str, Any]:
     return compose_fengshui_result(
         {"annual_stars": _layer(annual_stars(req), req.ruleset_id)}, []
     )
 
 
-def calculate_monthly_stars(**kwargs: Any) -> dict[str, Any]:
-    req = MonthlyRequest.model_validate(kwargs)
+def calculate_monthly_stars(req: MonthlyRequest) -> dict[str, Any]:
     return compose_fengshui_result({"monthly_stars": monthly_stars(req)}, [])
 
 
@@ -112,8 +106,7 @@ def _natal_layer(
     return layer
 
 
-def calculate_xuankong_natal(**kwargs: Any) -> dict[str, Any]:
-    req = XuankongRequest.model_validate(kwargs)
+def calculate_xuankong_natal(req: XuankongRequest) -> dict[str, Any]:
     return compose_fengshui_result(
         {"xuankong_natal": _natal_layer(req)},
         [],
@@ -197,8 +190,7 @@ def _differences(layers: dict[str, Any]) -> list[dict[str, Any]]:
     return differences
 
 
-def assess(**kwargs: Any) -> dict[str, Any]:
-    req = AssessRequest.model_validate(kwargs)
+def assess(req: AssessRequest) -> dict[str, Any]:
     original = req
     geometry = None
     if req.workstation_layout is not None:
@@ -360,7 +352,7 @@ def assess(**kwargs: Any) -> dict[str, Any]:
         (
             method_policy(
                 req,
-                explicit_methods=kwargs.get("methods") is not None,
+                explicit_methods=req.methods is not None,
                 layer_results=layers,
                 candidate_results=(layout or {})
                 .get("alternatives_analysis", {})

@@ -13,7 +13,6 @@ from fatebridge.core.response_models import (
     PartialOutput,
     ProjectedOutput,
     RunMetadata,
-    SnapshotExport,
 )
 
 
@@ -341,8 +340,6 @@ class FengshuiOutput(ProjectedOutput):
     conflicts: list[Object] | None = None
     rule_trace: list[Object] | None = None
     summary: str | None = None
-    snapshot_text: str | None = None
-    snapshot_export: SnapshotExport | None = None
     run_metadata: RunMetadata | None = None
     layout_analysis: LayoutAnalysis | None = None
 

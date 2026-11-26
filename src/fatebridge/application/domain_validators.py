@@ -25,7 +25,6 @@ from fatebridge.core.numerology.canping_schedule_validation import (
 from fatebridge.core.numerology.numerology_clock_input import (
     require_clock_input_binding as require_numerology_clock_input_binding,
 )
-from fatebridge.core.requests.astrology import AstroChartPolyRequest
 from fatebridge.core.requests.divination import (
     CanpingRequest,
     HeluoRequest,
@@ -36,9 +35,17 @@ from fatebridge.core.requests.reference import (
     KnowledgeReadRequest,
     KnowledgeRegistryRequest,
 )
-from fatebridge.core.response_models import CHART_VARIANT_TOOL_KEYS
 from fatebridge.core.sukuyo.suzhan_clock_input import require_clock_input_binding
 from fatebridge.utils.errors import EphemerisSourceError
+
+_EXPECTED_CHART_TYPES = {
+    "astrology_chart": "chart",
+    "thirteen_sector_chart": "chart13",
+    "hellenistic_chart": "hellen_chart",
+    "guolao_chart": "guolao_chart",
+    "vedic_chart": "india_chart",
+    "hamburg_midpoint_chart": "germany",
+}
 
 
 def validate_bazi_anchors(
@@ -48,7 +55,7 @@ def validate_bazi_anchors(
     _validated: BaseModel | None,
 ) -> None:
     try:
-        require_complete_bazi_anchors(spec.key, result)
+        require_complete_bazi_anchors(spec.name, result)
     except ValueError as exc:
         raise OutputContractError("完整八字输出缺少计算依据") from exc
 
@@ -60,12 +67,12 @@ def validate_ren_output(
     _validated: BaseModel | None,
 ) -> None:
     try:
-        require_complete_ren_anchors(spec.key, result)
+        require_complete_ren_anchors(spec.name, result)
     except ValueError as exc:
         raise OutputContractError("完整六壬金口诀输出缺少计算依据") from exc
     if request is not None:
         try:
-            require_request_binding(spec.key, result, request)
+            require_request_binding(spec.name, result, request)
         except EphemerisSourceError:
             raise
         except (ValueError, TypeError, KeyError, OverflowError) as exc:
@@ -137,7 +144,7 @@ def validate_knowledge_bindings(
     request: BaseModel | None,
     _validated: BaseModel | None,
 ) -> None:
-    if request is None or spec.key not in {"knowledge_read", "knowledge_registry"}:
+    if request is None or spec.name not in {"knowledge_read", "knowledge_catalog"}:
         return
     else:
         assert isinstance(request, (KnowledgeReadRequest, KnowledgeRegistryRequest))
@@ -145,40 +152,16 @@ def validate_knowledge_bindings(
     require_reference_binding(result, request)
 
 
-def validate_chart_variant_roots(
-    spec: ToolSpec, result: ServiceResult, request: BaseModel | None
-) -> None:
-    if request is None:
-        variant = result["chart_profile"]["chart_type"]
-    else:
-        assert isinstance(request, AstroChartPolyRequest)
-        variant = request.chart_variant
-    variants = spec.required_output_fields_by_variant
-    assert variants is not None
-    if variant not in variants:
-        raise OutputContractError("聚合星盘输出包含未支持的盘型")
-    if any(result.get(field) in (None, {}) for field in variants[variant]):
-        raise OutputContractError("完整聚合星盘缺少所选盘型的必需业务事实")
-
-
 def validate_astro_chart_variant(
     spec: ToolSpec,
     result: ServiceResult,
-    request: BaseModel | None,
+    _request: BaseModel | None,
     _validated: BaseModel | None,
 ) -> None:
-    actual_variant = result["chart_profile"]["chart_type"]
-    if spec.required_output_fields_by_variant is None:
-        expected_variant = next(
-            variant
-            for variant, owner in CHART_VARIANT_TOOL_KEYS.items()
-            if owner == spec.key
-        )
-    elif request is not None:
-        assert isinstance(request, AstroChartPolyRequest)
-        expected_variant = request.chart_variant
-    else:
+    expected_variant = _EXPECTED_CHART_TYPES.get(spec.name)
+    if expected_variant is None:
         return
+    actual_variant = result["chart_profile"]["chart_type"]
     if actual_variant != expected_variant:
         raise OutputContractError("星盘输出盘型与本次请求不符")
 
