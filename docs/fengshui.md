@@ -28,7 +28,7 @@
 | `/api/fengshui/jinsuo` | `fengshui_jinsuo` | `features` | 八宫砂水偏好、逐个观察判定 |
 | `/api/fengshui/annual-stars` | `fengshui_annual_stars` | `effective_year` 或含时区的 `query_at` | 当年入中星、九宫年星、立春有效期、当前元运 |
 | `/api/fengshui/monthly-stars` | `fengshui_monthly_stars` | 含时区的 `query_at`，或已确认 `effective_solar_year/solar_month_number` | 十二节换月的中性月星落宫、独立有效期与固定释义；不产生用途处方 |
-| `/api/fengshui/xuankong-house-chart` | `fengshui_xuankong_natal` | `house`、历史 `period`，按需提供测量误差及 `interpretation` | 运／山／向盘、下卦／替星与分界候选；有限解释须显式启用 |
+| `/api/fengshui/xuankong-house-chart` | `fengshui_xuankong_house_chart` | `house`、历史 `period`，按需提供测量误差及 `interpretation` | 运／山／向盘、下卦／替星与分界候选；有限解释须显式启用 |
 | `/api/fengshui/assess` | `fengshui_assess` | 已确认的住宅、住户、环境、年度或历史宅运输入；可选 `methods`、`scene`，布局时 `analyze_layout=true` | `bazhai` / `jinsuo` / `annual_stars` / `xuankong_natal` 独立分层；布局及所请求补充审查 |
 
 同一宅向的已知测量误差使用 `house.bearing_uncertainty_degrees`，在已选八宅及玄空层共同传播。八宅跨宫时保留各自宅卦及布局条件，详见[共享宅向误差](interpretation/fengshui/house-bearing-uncertainty.md)。省略误差只沿用点输入约定，不认证现场误差为零。
@@ -37,7 +37,7 @@
 
 可运行输入按用途列于[示例索引](examples/README.md)。完整约束见 `/openapi.json`、MCP `tools/list` 和 `fatebridge describe fengshui_assess`。工具分类为 `fengshui`；不加入个人 `bazi_overview` 或 `profile` 默认系统。[月紫白参考](interpretation/fengshui/monthly-stars.md)说明立春有效年、十二节换月、原表标签差异与原始回执核验；合参可显式选择 `monthly_stars` 或提供独立 `monthly`。
 
-`fengshui_xuankong_natal` 提供中州派完整运／山／向数字盘与兼向替星；聚合时显式选择 `xuankong_natal`，与年度飞星独立。定运资料、分界候选、规则版本及独立盘例见 [玄空宅盘](fengshui-xuankong.md)。
+`fengshui_xuankong_house_chart` 提供中州派完整运／山／向数字盘与兼向替星；聚合时显式选择 `xuankong_natal`，与年度飞星独立。定运资料、分界候选、规则版本及独立盘例见 [玄空宅盘](fengshui-xuankong.md)。
 
 按问题展开的资料入口：基础[规则来源](interpretation/fengshui/rule-sources.md)、[布局形态](interpretation/fengshui/layout-rules.md)、[场景与候选比较](interpretation/fengshui/scene-planning.md)、[室内关系及材质器形](interpretation/fengshui/sourced-interior-rules.md)、[玄空有限解释](interpretation/fengshui/xuankong-interpretation.md)。[BTB 桌面作者规则](interpretation/fengshui/surface-rules.md)仅在用户明确另选时使用，不作为无方位的默认替代。
 
@@ -282,7 +282,7 @@ uv run --locked --extra dev pytest -q tests/fengshui/test_fengshui.py tests/feng
 
 公开Schema用 `methods=null` 表示自动选法。MCP会物化参数默认值，因此不能发布旧三法列表为默认、再试图区分字段是否省略；null与省略在三个传输中采用相同路径，内部归一为实际方法列表。`coverage.scene_scope.selection_policy`说明选法策略，不把传输归一化后的字段错误标记为用户原始选择。
 
-未传场景且未传方法的独立形态/桌面请求同样按事实选层，不再强制补充三法资料。其余无场景旧请求保留原先八宅/金锁/年星默认，原始计算与 golden 基线保持兼容。
+未传场景且未传方法的独立形态/桌面请求同样按事实选层，不再强制补充三法资料。其余无场景请求按默认八宅／金锁／年星选层；这些默认方法仍需各自满足实际输入要求。
 
 ## 实现与规则数据
 
@@ -294,7 +294,7 @@ uv run --locked --extra dev pytest -q tests/fengshui/test_fengshui.py tests/feng
 
 ## 调用与状态合同
 
-布局主入口为 `fengshui_assess`，独立入口包括 `fengshui_directions`、`fengshui_minggua`、`fengshui_bazhai`、`fengshui_jinsuo`、`fengshui_annual_stars`、`fengshui_monthly_stars` 和 `fengshui_xuankong_natal`。按问题选择所需层，不为凑齐方法补出生、方位或宅运。
+布局主入口为 `fengshui_assess`，独立入口包括 `fengshui_directions`、`fengshui_minggua`、`fengshui_bazhai`、`fengshui_jinsuo`、`fengshui_annual_stars`、`fengshui_monthly_stars` 和 `fengshui_xuankong_house_chart`。按问题选择所需层，不为凑齐方法补出生、方位或宅运。
 
 请求拒绝未知规则版本及无效枚举；未知朝向、未知起算法或未知砂水不得静默转成默认吉凶。有效但资料不足时保留 `partial`；不合法输入走校验错误。计算状态、规则覆盖、方法优先审查和动作可执行性分别报告。
 

@@ -1,5 +1,6 @@
 """Printed arithmetic, author terminology and complete current coverage."""
 
+import json
 from copy import deepcopy
 
 import pytest
@@ -8,13 +9,15 @@ from fatebridge.core.fengshui.reading import build_natal_reading
 from fatebridge.core.fengshui.xuankong import _chart
 from fatebridge.services.fengshui import calculate_xuankong_natal
 from tests.unit_test.fixtures.fengshui_reading import (
-    PRINTED_CHART_REFERENCE as REFERENCE,
+    PRINTED_CHART_FOLDER,
+    executed,
 )
-from tests.unit_test.fixtures.fengshui_reading import executed
 from tests.unit_test.fixtures.fengshui_reading import printed_chart_request as request
 from tests.unit_test.fixtures.fengshui_reading import trusted
 from validation.fengshui_reading import verify_fengshui_reading
 from validation.fengshui_structure import audit_printed_structures
+
+REFERENCE = json.loads((PRINTED_CHART_FOLDER / "printed-charts.json").read_text())
 
 
 def statements(result, kind):

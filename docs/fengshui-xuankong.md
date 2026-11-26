@@ -4,7 +4,7 @@
 
 生成玄空数字宅盘，需要有依据的历史宅运与坐向。调用者可以追溯规则版本、核对九宫计算，并在资料支持时启用有限解释，用于空间咨询或应用集成。
 
-`fengshui_xuankong_natal` 的 REST 入口为 `POST /api/fengshui/xuankong-house-chart`，MCP 与 CLI 同名。选定版本 `xuankong_zhongzhou_v1@1.4.0` 完整计算九宫运星、山星、向星，支持下卦和中州派兼向替星。与 `layers.annual_stars` 独立；查询年份变化不改变历史宅盘。基础三法合同见[家居风水](fengshui.md)。
+`fengshui_xuankong_house_chart` 的 REST 入口为 `POST /api/fengshui/xuankong-house-chart`，MCP 与 CLI 同名。选定版本 `xuankong_zhongzhou_v1@1.4.0` 完整计算九宫运星、山星、向星，支持下卦和中州派兼向替星。与 `layers.annual_stars` 独立；查询年份变化不改变历史宅盘。基础三法合同见[家居风水](fengshui.md)。
 
 调用时先准备[历史定运与角度资料](#定运校验与角区实现)，再运行[三端示例](#三端调用)。已有数字盘需要进一步解释时，单独启用[有限解释](#显式启用有限解释)；维护者可从[独立验证](#独立验证与复现)追溯固定样本及版本分歧。
 
@@ -39,7 +39,7 @@
 ```
 
 ```bash
-curl -X POST http://localhost:8010/api/fengshui/xuankong_natal \
+curl -X POST http://localhost:8010/api/fengshui/xuankong-house-chart \
   -H 'Content-Type: application/json' \
   --data-binary @docs/examples/fengshui-xuankong.json
 
@@ -48,7 +48,7 @@ uv run --locked --extra dev fatebridge fengshui_assess --request-file docs/examp
 uv run --locked --extra dev fatebridge describe fengshui_xuankong_house_chart
 ```
 
-MCP `fengshui_xuankong_natal` 的参数就是上面 JSON 对象。认证设置与其他REST端点一致；工具目录、发现接口、JSON输出schema、错误、字段投影和运行元数据均来自共用目录。CLI也支持 `--house '{...}' --period '{...}'`；请求文件保留未知字段供模型拒绝，不静默删除。
+MCP `fengshui_xuankong_house_chart` 的参数就是上面 JSON 对象。认证设置与其他REST端点一致；工具目录、发现接口、JSON输出schema、错误、字段投影和运行元数据均来自共用目录。CLI也支持 `--house '{...}' --period '{...}'`；请求文件保留未知字段供模型拒绝，不静默删除。
 
 聚合需显式选择 `methods` 中的 `xuankong_natal`，并传 `xuankong` 请求。自动选法按场景与已知事实处理，不能假定每次都运行基础三法；详见[场景兼容与归一化](fengshui.md#场景兼容与归一化)。内层未提供 `house` 时继承顶层住宅；同时提供时必须一致。年星继续用顶层 `effective_year` 或 `query_at`；宅盘只用 `xuankong.period`，两者不互相补默认值。
 
@@ -181,4 +181,4 @@ MCP 使用同一文件中的 JSON 调用 `fengshui_assess`。读取字段、状�
 
 ## 逐候选的原书数表证据
 
-数字宅盘默认返回 `source_comparison`，分别比较固定沈氏整理本下卦正文与盘图。它不改变起盘规则、星数、历史定运或候选；摘要在 `coverage.natal_source_comparison`，已知差异可在实际结果与快照中直接读取。原书值与计算值分开，替卦未覆盖不能当作相合。完整来源、生成命令和虚构调用见运行来源比较。
+数字宅盘默认返回 `source_comparison`，分别比较固定沈氏整理本下卦正文与盘图。它不改变起盘规则、星数、历史定运或候选；摘要在 `coverage.natal_source_comparison`，已知差异可在实际结果与快照中直接读取。原书值与计算值分开；替卦比较覆盖起星图数字，未转录的起星正文仍保持未验证。完整来源、生成命令和虚构调用见运行来源比较。

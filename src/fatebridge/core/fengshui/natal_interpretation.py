@@ -381,7 +381,7 @@ def analyze_natal_interpretation(
         "overall_auspiciousness": "not_produced",
     }
     validate_author_geometries(
-        result, natal, current=current, require_current_version=author_profile
+        result, natal, current=current, expected_selected=author_profile
     )
     validate_host_guest(
         result, natal, expected_selected=config.host_guest_ruleset_id is not None

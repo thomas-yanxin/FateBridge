@@ -187,8 +187,7 @@ def _summarize_layout_progress(
                             p for a in actions for p in a["pending_confirmations"]
                         ],
                     )
-                    # Count concrete routes once; the check status is only the
-                    # backwards-compatible aggregate, not a third action.
+                    # Count concrete routes once; their summary is not another action.
                     progress_actions.extend(
                         {"status": a["action_status"], "optional": True}
                         for a in actions

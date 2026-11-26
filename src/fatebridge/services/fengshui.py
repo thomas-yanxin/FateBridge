@@ -102,8 +102,7 @@ def _natal_layer(
             layer["interpretation"],
             layer,
             current=req.interpretation.current_period_number,
-            require_current_version=req.interpretation.timeliness_ruleset_id
-            is not None,
+            expected_selected=req.interpretation.timeliness_ruleset_id is not None,
         )
         validate_host_guest(
             layer["interpretation"],

@@ -95,10 +95,4 @@ REST POST `/api/fengshui/assess` 与 MCP `fengshui_assess` 使用同一文件内
 
 尚未实现的项目包括：自动照片/户型提取、自动立极或全楼层宅盘建立、完整81组合、金锁24山全部细断、三合水法和玄空大卦、未来源化的距离/剂量/效果阈值。来源覆盖、算法工程正确性、部署同步和现实效力各自验收；既有原典数字差异和历史失败不会由新工位功能改判通过。
 
-算法完工审查读取 `research_completion_status/research_coverage`，当前总状态为 `incomplete`。清单逐项保留已完成范围、未完成范围和所需来源或验收；它独立于一次输入的 `status=complete` 和搜索 `enumeration_complete`。Kartar 的[81配对说明](https://fengshuisolutions.net/a-little-primer-on-the-flying-stars-by-kartar-diamond/)强调用途与上下文，并未给出完整逐对条件表；不能把现有有序五行运算改称完整81断法。金锁目前仍是基础砂水及角度索引，不因新增几何或转载标题而升级细断。当前覆盖与历史验收分开阅读，见下方[历史验收记录](#历史验收记录)。
-
-## 历史验收记录
-
-2026-11-04 的两批本地验收按各自冻结范围报告：首批风水族为 2603 passed；后批整族及共享检查为 2943 passed、2 failed。后批两项失败涉及并发合同变化及共享合盘的投影约束，随后分别复验通过；没有取得一次无漂移的整族全绿结果。最终相关集成检查为 248 passed，不能替代整族验收。
-
-这些历史结果不代表当前 checkout 已重新执行。原日志、安装包、来源清单、透视遮挡独立对照与并发变化记录随本地验收档案保留；逐轮正文另行归档，不作为使用前提。当前实现按上方命令验证，研究覆盖仍为 `incomplete`。
+算法完工审查读取 `research_completion_status/research_coverage`，当前总状态为 `incomplete`。清单逐项保留已完成范围、未完成范围和所需来源或验收；它独立于一次输入的 `status=complete` 和搜索 `enumeration_complete`。Kartar 的[81配对说明](https://fengshuisolutions.net/a-little-primer-on-the-flying-stars-by-kartar-diamond/)强调用途与上下文，并未给出完整逐对条件表；不能把现有有序五行运算改称完整81断法。金锁目前仍是基础砂水及角度索引，不因新增几何或转载标题而升级细断。独立几何参考、数值门槛和可复现入口见[空间几何](fengshui-geometry-audit.md)。

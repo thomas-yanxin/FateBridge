@@ -16,16 +16,15 @@ from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import rest_client
 from tests.unit_test.fixtures.fengshui_reading import (
     MOUNTAINS,
+    PRINTED_CHART_FOLDER,
+    executed,
 )
-from tests.unit_test.fixtures.fengshui_reading import (
-    PRINTED_CHART_REFERENCE as REFERENCE,
-)
-from tests.unit_test.fixtures.fengshui_reading import executed
 from tests.unit_test.fixtures.fengshui_reading import printed_chart_request as request
 from tests.unit_test.fixtures.fengshui_reading import trusted
 from validation.fengshui_opposite import audit_opposite_reference
 from validation.fengshui_reading import verify_fengshui_reading
 
+REFERENCE = json.loads((PRINTED_CHART_FOLDER / "printed-charts.json").read_text())
 FIXTURES = Path(__file__).parents[1] / "data"
 OPPOSITE_REFERENCE = json.loads(
     (FIXTURES / "fengshui_opposite_v1/reference.json").read_text()
