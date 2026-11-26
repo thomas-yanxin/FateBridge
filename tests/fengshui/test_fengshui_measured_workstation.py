@@ -16,7 +16,7 @@ from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.core.fengshui.spatial_angles import direction_support
 from fatebridge.core.fengshui.spatial_layout import prepare_spatial_request
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services.fengshui import assess as _assess
+from fatebridge.services.fengshui import calculate_fengshui_assessment as _assess
 from tests.support.fengshui_transports import mcp_call
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import call_calculation, rest_client

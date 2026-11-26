@@ -21,13 +21,13 @@ CASE = dict(
 @pytest.mark.parametrize("place", [None, "虚构的未知出生地", "通州区"])
 @pytest.mark.parametrize("variant", ["chart", "hellen_chart", "chart13", "germany"])
 @pytest.mark.parametrize("solar", [False, True])
-@pytest.mark.parametrize("zodiacal", [0, 1])
+@pytest.mark.parametrize("zodiac_type", ["Tropic", "Sidereal"])
 def test_western_service_rejects_unresolved_zone_before_sky_work(
     monkeypatch: pytest.MonkeyPatch,
     place: str | None,
     variant: str,
     solar: bool,
-    zodiacal: int,
+    zodiac_type: str,
 ) -> None:
     def forbidden(*args, **kwargs):
         pytest.fail("An unconfirmed civil timezone must not reach native calculations")
@@ -38,7 +38,7 @@ def test_western_service_rejects_unresolved_zone_before_sky_work(
         birth_place=place,
         chart_variant=variant,
         use_true_solar_time=solar,
-        zodiacal=zodiacal,
+        zodiac_type=zodiac_type,
     )
     assert result["error_code"] == "validation_error"
     assert result["status_code"] == 400 and not result["retryable"]

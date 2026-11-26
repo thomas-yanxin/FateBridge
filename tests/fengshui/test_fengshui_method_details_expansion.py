@@ -12,7 +12,7 @@ from fatebridge.core.fengshui.method_details import (
 )
 from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.output import Ruleset
-from fatebridge.services.fengshui import assess as _assess
+from fatebridge.services.fengshui import calculate_fengshui_assessment as _assess
 
 
 def assess(**kwargs):

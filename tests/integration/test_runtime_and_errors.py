@@ -235,7 +235,7 @@ def test_repeated_public_requests_succeed() -> None:
     client = TestClient(api_module.app)
 
     for _ in range(2):
-        response = client.post("/api/divination/gua", json={"query": "乾"})
+        response = client.post("/api/divination/gua", json={"queries": ["乾"]})
         assert response.status_code == 200
 
 
@@ -252,7 +252,7 @@ def test_api_key_auth_rejects_missing_key_when_configured(
         ),
     )
     client = TestClient(api_module.app)
-    response = client.post("/api/divination/gua", json={"query": "乾"})
+    response = client.post("/api/divination/gua", json={"queries": ["乾"]})
 
     assert response.status_code == 401
     assert response.headers["WWW-Authenticate"] == "APIKey"
@@ -298,7 +298,7 @@ def test_repeated_authenticated_requests_succeed(
 
     for _ in range(2):
         response = client.post(
-            "/api/divination/gua", json={"query": "乾"}, headers=headers
+            "/api/divination/gua", json={"queries": ["乾"]}, headers=headers
         )
         assert response.status_code == 200
 

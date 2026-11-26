@@ -44,7 +44,7 @@ def payload_for(date, base, changed):
     return dict(
         date=date,
         time="12:00:00",
-        zone="Asia/Shanghai",
+        timezone="Asia/Shanghai",
         gua_code=base,
         changed_code=changed,
     )

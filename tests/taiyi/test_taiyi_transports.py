@@ -219,7 +219,7 @@ def test_published_first_views_preserve_evidence_under_default_limits(
             {
                 "date": "2026-02-04",
                 "time": "12:00:00",
-                "zone": "Asia/Shanghai",
+                "timezone": "Asia/Shanghai",
                 "use_true_solar_time": False,
             },
             ["taiyi", "synthesis"],
@@ -358,8 +358,7 @@ def test_obsolete_options_rejected_by_rest_mcp_and_cli(
         "taiyi_options": obsolete,
     }
     response = TestClient(api.app).post("/api/divination/sanshi", json=payload)
-    assert response.status_code == 400
-    assert "未实现的太乙选项" in response.text
+    assert response.status_code == 422
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
@@ -385,9 +384,12 @@ def test_obsolete_options_rejected_by_rest_mcp_and_cli(
     )
     assert code != 0
     result = json.loads(capsys.readouterr().out)
+    option_name = next(iter(obsolete))
     for body in [response.json(), native.structured_content, result]:
-        assert "未实现的太乙选项" in body["error"]
-        assert next(iter(obsolete)) in body["error"]
+        assert body["error_code"] == "validation_error"
+        issue = body["issues"][0]
+        assert issue["code"] == "extra_forbidden"
+        assert option_name in issue["path"]
         assert "taiyi" not in body
 
 
@@ -411,7 +413,7 @@ def test_hour_profile_is_rejected_in_non_hour_mode_on_all_transports(
         "hour_profile": "key_hour_winter_jiazi_v1",
     }
     response = TestClient(api.app).post("/api/taiyi", json=payload)
-    assert response.status_code == 400
+    assert response.status_code == 422
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
@@ -443,7 +445,8 @@ def test_hour_profile_is_rejected_in_non_hour_mode_on_all_transports(
     body = json.loads(capsys.readouterr().out)
     assert status != 0
     for result in [response.json(), native.structured_content, body]:
-        assert "hour_profile" in result["error"]
+        assert result["error_code"] == "validation_error"
+        assert "hour_profile" in result["issues"][0]["message"]
         assert "taiyi" not in result
 
 

@@ -13,7 +13,7 @@ from pydantic import ValidationError
 
 from fatebridge.cli import run
 from fatebridge.core.fengshui.models import AssessRequest, Placement
-from fatebridge.services.fengshui import assess as _assess
+from fatebridge.services.fengshui import calculate_fengshui_assessment as _assess
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import call_calculation, rest_client
 

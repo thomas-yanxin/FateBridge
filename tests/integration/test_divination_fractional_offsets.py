@@ -149,7 +149,7 @@ def test_explicit_instant_requires_defined_target_local_time(
     payload = {
         "date": "1994-06-01",
         "time": "12:34:56.123456+00:00",
-        "zone": "Antarctica/Vostok",
+        "timezone": "Antarctica/Vostok",
         **extra,
     }
     response, protocol, code, local = surface_calls(SPECS[tool], payload)
@@ -168,7 +168,7 @@ def test_fractional_offset_and_day_pillars_agree_across_transports(
     key: str, clock, expected_clock, day, hour, surface_calls
 ) -> None:
     spec = SPECS[key]
-    payload = {"date": "2026-11-03", "time": clock, "zone": "UTC"}
+    payload = {"date": "2026-11-03", "time": clock, "timezone": "UTC"}
     if key == "liuyao":
         payload["gua_code"] = "111111"
         fields = ["nongli.birth", "nongli.dayGanZi", "nongli.time"]

@@ -137,7 +137,9 @@ def test_public_descriptor_drives_each_available_adapter_without_private_input_d
             if spec.expose_mcp:
                 record = await describe_capability(client, spec.name)
             else:
-                described = rest.get("/api/tools", params={"detail": "full"}).json()
+                described = rest.get(
+                    "/api/tools", params={"tool": spec.name, "detail": "full"}
+                ).json()
                 record = next(
                     item for item in described["tools"] if item["tool"] == key
                 )

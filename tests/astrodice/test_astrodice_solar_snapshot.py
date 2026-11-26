@@ -14,11 +14,11 @@ from tests.support.transports import call_calculation
 from tests.unit_test.fixtures.astrodice_transports import SPEC, rest
 
 
-@pytest.mark.parametrize("zodiacal", [0, 1])
+@pytest.mark.parametrize("zodiac_type", ["Tropic", "Sidereal"])
 def test_native_extension_is_explained_without_rewriting_the_dice(
     rest: TestClient,
     capsys: pytest.CaptureFixture[str],
-    zodiacal: int,
+    zodiac_type: str,
     native_ephemeris_files,
 ) -> None:
     inputs = dict(
@@ -27,10 +27,10 @@ def test_native_extension_is_explained_without_rewriting_the_dice(
         house=0,
         date="2022-11-08",
         time="21:00",
-        zone="UTC",
-        gps_lat=51.5,
-        gps_lon=0,
-        zodiacal=zodiacal,
+        timezone="UTC",
+        latitude=51.5,
+        longitude=0,
+        zodiac_type=zodiac_type,
     )
     fields = [
         "planet",

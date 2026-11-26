@@ -15,8 +15,8 @@ from fatebridge.core.fengshui.calendar import lichun
 from fatebridge.core.fengshui.layout import element_relationships
 from fatebridge.core.fengshui.models import AssessRequest, BazhaiRequest, MingguaRequest
 from fatebridge.core.fengshui.output import FengshuiOutput
-from fatebridge.services.fengshui import assess as _assess
 from fatebridge.services.fengshui import calculate_bazhai as _calculate_bazhai
+from fatebridge.services.fengshui import calculate_fengshui_assessment as _assess
 from fatebridge.services.fengshui import calculate_minggua as _calculate_minggua
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.fengshui import payload

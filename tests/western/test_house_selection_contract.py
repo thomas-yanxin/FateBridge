@@ -89,16 +89,18 @@ def test_explicit_invalid_selection_never_substitutes_another_chart(value) -> No
 
 @pytest.mark.parametrize("value", [True, False, 8.0, 3.7, 99, -1, "unknown", "", "  "])
 def test_both_request_families_reject_invalid_values_before_dispatch(value) -> None:
-    for field, specs, expected in (
-        ("house_system", HOUSE_SPECS, "invalid_house_system"),
-        ("hsys", CODE_SPECS, "invalid_house_code"),
+    for specs, expected in (
+        (HOUSE_SPECS, "invalid_house_system"),
+        (CODE_SPECS, "invalid_house_code"),
     ):
         assert specs
         for spec in specs:
             with pytest.raises(ValidationError) as caught:
-                spec.request_model.model_validate({**inputs(spec), field: value})
+                spec.request_model.model_validate(
+                    {**inputs(spec), "house_system": value}
+                )
             issue = caught.value.errors(include_input=False)[0]
-            assert issue["loc"] == (field,), spec.name
+            assert issue["loc"] == ("house_system",), spec.name
             assert issue["type"] == expected, (spec.name, issue)
 
 
@@ -151,26 +153,33 @@ def test_previously_unlabelled_codes_have_named_metadata_and_distinct_sunshine_m
         assert info["house_system_label_zh"] != code
 
 
-def test_every_representative_request_and_optional_missing_hsys_remains_valid() -> None:
+def test_every_representative_request_and_optional_missing_house_system_remains_valid() -> (
+    None
+):
     for spec in CATALOG:
         spec.request_model.model_validate(inputs(spec))
     from fatebridge.core.requests.astrology import AstroChartRequest
 
     spec = next(s for s in CATALOG if s.name == "astrology_chart")
-    assert AstroChartRequest.model_validate({**inputs(spec), "hsys": None}).hsys is None
+    assert (
+        AstroChartRequest.model_validate(
+            {**inputs(spec), "house_system": None}
+        ).house_system
+        is None
+    )
 
 
-def test_numeric_request_schema_advertises_the_actual_range() -> None:
+def test_offline_request_schema_advertises_int_range_and_accepts_canonical_names() -> (
+    None
+):
     for spec in CODE_SPECS:
-        field = spec.request_model.model_json_schema()["properties"]["hsys"]
-        shape = next(
-            (v for v in field.get("anyOf", []) if v.get("type") == "integer"), field
-        )
-        assert shape["minimum"] == 0 and shape["maximum"] == 8, spec.name
+        field = spec.request_model.model_json_schema()["properties"]["house_system"]
+        shapes = field.get("anyOf", [field])
+        assert {"integer", "string"} <= {v.get("type") for v in shapes}, spec.name
 
-
-def test_existing_strict_integer_domain_does_not_gain_string_coercion() -> None:
     spec = next(s for s in CODE_SPECS if s.name == "interpret_astrology_dice")
-    with pytest.raises(ValidationError) as caught:
-        spec.request_model.model_validate({**inputs(spec), "hsys": "3"})
-    assert caught.value.errors()[0]["type"] == "int_type"
+    for accepted in (3, "3", "P", "Placidus"):
+        validated = spec.request_model.model_validate(
+            {**inputs(spec), "house_system": accepted}
+        )
+        assert validated.house_system == accepted

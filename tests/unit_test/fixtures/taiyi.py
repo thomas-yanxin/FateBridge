@@ -50,7 +50,7 @@ def transport_payload(key: str, year: int) -> dict[str, str | bool | int]:
     return {
         "date": f"{year}-07-01",
         "time": "12:00:00",
-        "zone": "+08:00",
+        "timezone": "+08:00",
         "use_true_solar_time": False,
     }
 
@@ -95,7 +95,7 @@ def historical_year_payload(
     return {
         "date": day,
         "time": "12:00:00",
-        "zone": "+08:00",
+        "timezone": "+08:00",
         "use_true_solar_time": False,
         "taiyi_options": {
             "calculation_mode": mode,

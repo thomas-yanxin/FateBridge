@@ -84,32 +84,38 @@ def test_zero_gps_coordinates_drive_the_actual_chart_on_every_transport(
         {
             "date": "2026-10-20",
             "time": "12:00",
-            "zone": "UTC",
-            "lat": "ignored because GPS is supplied",
-            "lon": "ignored because GPS is supplied",
-            "gps_lat": 0,
-            "gps_lon": 0,
+            "timezone": "UTC",
+            "latitude": 0,
+            "longitude": 0,
         },
         monkeypatch,
         capsys,
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     for output in outputs:
-        assert output["params"]["birthLatitude"] == output["params"]["gpsLat"] == 0
-        assert output["params"]["birthLongitude"] == output["params"]["gpsLon"] == 0
+        assert (
+            output["params"]["birthLatitude"]
+            == output["input_normalized"]["latitude"]
+            == 0
+        )
+        assert (
+            output["params"]["birthLongitude"]
+            == output["input_normalized"]["longitude"]
+            == 0
+        )
     assert outputs[0]["chart"] == outputs[1]["chart"] == outputs[2]["chart"]
 
 
 @pytest.mark.parametrize(
     "coordinates",
     [
-        {"lat": "31n13"},
-        {"lon": "121e28"},
-        {"hsys": 8},
-        {"lat": "", "lon": "121e28"},
-        {"lat": "31n13", "lon": " "},
-        {"gps_lat": 0},
-        {"gps_lon": 0},
+        {"latitude": "31n13"},
+        {"longitude": "121e28"},
+        {"house_system": 8},
+        {"latitude": "", "longitude": "121e28"},
+        {"latitude": "31n13", "longitude": None},
+        {"latitude": 0},
+        {"longitude": 0},
     ],
 )
 def test_timed_suzhan_requires_both_confirmed_coordinate_components(
@@ -117,7 +123,7 @@ def test_timed_suzhan_requires_both_confirmed_coordinate_components(
 ) -> None:
     response, code, protocol, outputs = invoke(
         "suzhan",
-        {"date": "2026-10-20", "time": "12:00", "zone": "UTC", **coordinates},
+        {"date": "2026-10-20", "time": "12:00", "timezone": "UTC", **coordinates},
         monkeypatch,
         capsys,
     )
@@ -130,14 +136,14 @@ def test_timed_suzhan_requires_both_confirmed_coordinate_components(
 
 @pytest.mark.parametrize(
     "coordinates",
-    [{"lat": "0", "gps_lon": 0}, {"gps_lat": 0, "lon": "0"}],
+    [{"latitude": "0", "longitude": 0}, {"latitude": 0, "longitude": "0"}],
 )
 def test_timed_suzhan_accepts_mixed_explicit_coordinate_sources(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], coordinates
 ) -> None:
     response, code, protocol, outputs = invoke(
         "suzhan",
-        {"date": "2026-10-20", "time": "12:00", "zone": "UTC", **coordinates},
+        {"date": "2026-10-20", "time": "12:00", "timezone": "UTC", **coordinates},
         monkeypatch,
         capsys,
     )
@@ -149,7 +155,7 @@ def test_timed_suzhan_accepts_mixed_explicit_coordinate_sources(
     )
 
 
-@pytest.mark.parametrize("coordinates", [{}, {"lat": None, "lon": None}])
+@pytest.mark.parametrize("coordinates", [{}, {"latitude": None, "longitude": None}])
 def test_timed_suzhan_keeps_calendar_clock_without_coordinates(
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
@@ -157,7 +163,7 @@ def test_timed_suzhan_keeps_calendar_clock_without_coordinates(
 ) -> None:
     response, code, protocol, outputs = invoke(
         "suzhan",
-        {"date": "2026-10-20", "time": "12:00", "zone": "UTC", **coordinates},
+        {"date": "2026-10-20", "time": "12:00", "timezone": "UTC", **coordinates},
         monkeypatch,
         capsys,
     )
@@ -169,13 +175,15 @@ def test_timed_suzhan_keeps_calendar_clock_without_coordinates(
         assert output["params"]["coordinatesApplied"] is False
 
 
-@pytest.mark.parametrize("unknown_time", [{}, {"time": None, "lat": None, "lon": None}])
+@pytest.mark.parametrize(
+    "unknown_time", [{}, {"time": None, "latitude": None, "longitude": None}]
+)
 def test_untimed_suzhan_keeps_date_only_mode_without_coordinates(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], unknown_time
 ) -> None:
     response, code, protocol, outputs = invoke(
         "suzhan",
-        {"date": "2026-10-20", "zone": "UTC", **unknown_time},
+        {"date": "2026-10-20", "timezone": "UTC", **unknown_time},
         monkeypatch,
         capsys,
     )
@@ -188,7 +196,7 @@ def test_untimed_suzhan_keeps_date_only_mode_without_coordinates(
 
 
 @pytest.mark.parametrize(
-    "changes", [{"lon": "190"}, {"lat": "31N90"}, {"gps_lon": -181}]
+    "changes", [{"longitude": "190"}, {"latitude": "31N90"}, {"longitude": -181}]
 )
 def test_bad_calendar_coordinates_fail_identically(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], changes
@@ -199,7 +207,7 @@ def test_bad_calendar_coordinates_fail_identically(
         monkeypatch,
         capsys,
     )
-    assert response.status_code == 400 and code == 1 and protocol.is_error
+    assert response.status_code == 422 and code == 1 and protocol.is_error
     assert all(output["error_code"] == "validation_error" for output in outputs)
     assert all("run_metadata" not in output for output in outputs)
 
@@ -225,7 +233,7 @@ def test_nongli_rejects_unresolved_civil_clock_on_every_transport(
         {
             "date": date,
             "time": time,
-            "zone": "America/New_York",
+            "timezone": "America/New_York",
             "time_alg": time_alg,
         },
         monkeypatch,
@@ -261,8 +269,8 @@ def test_lunar_calendar_separates_civil_season_and_solar_day_across_surfaces(
         {
             "date": date,
             "time": clock,
-            "zone": "Asia/Shanghai",
-            "gps_lon": 60,
+            "timezone": "Asia/Shanghai",
+            "longitude": 60,
             "time_alg": 0,
         },
         projection={
@@ -292,7 +300,7 @@ def test_nongli_uses_selected_fold_for_seasonal_elapsed_time(surface_calls) -> N
     inputs = {
         "date": "2024-11-03",
         "time": "01:30",
-        "zone": "America/New_York",
+        "timezone": "America/New_York",
         "time_alg": 1,
     }
     elapsed_days = []
@@ -364,7 +372,7 @@ def test_removed_rollover_switch_is_rejected_on_every_transport(
             "timeGanZi",
             {"year", "time"},
         ),
-        ("gua_meanings", {"name": ["111", "000"]}, "results", {"111", "000"}),
+        ("gua_lookup", {"queries": ["111", "000"]}, "results", {"111", "000"}),
     ],
 )
 def test_canonical_helper_results_agree_without_duplicate_fields(

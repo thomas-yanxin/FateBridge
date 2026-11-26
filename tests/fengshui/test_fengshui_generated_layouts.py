@@ -15,7 +15,7 @@ from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.core.fengshui.spatial_geometry import transform_point
 from fatebridge.core.fengshui.spatial_inputs import PlanPoint, PlanPose, SpatialScene
 from fatebridge.core.fengshui.spatial_scene import evaluate_geometry
-from fatebridge.services.fengshui import assess as _assess
+from fatebridge.services.fengshui import calculate_fengshui_assessment as _assess
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.fengshui_transports import mcp_call
 from tests.support.mcp_result_assertions import without_transport

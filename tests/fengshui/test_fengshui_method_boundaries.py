@@ -4,7 +4,7 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.fengshui.models import AssessRequest
-from fatebridge.services.fengshui import assess as _assess
+from fatebridge.services.fengshui import calculate_fengshui_assessment as _assess
 from tests.fixtures.fengshui import payload
 from tests.unit_test.fixtures.fengshui_layout import (
     form,

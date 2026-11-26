@@ -14,10 +14,7 @@ from fatebridge.core.hidden_carriers import (
     hidden_target_reference,
 )
 from fatebridge.core.metaphysics.common import SEXAGENARY_CYCLE
-from fatebridge.core.timing_carriers import (
-    describe_timing_carrier,
-    timing_carrier_snapshot_lines,
-)
+from fatebridge.core.timing_carriers import describe_timing_carrier
 
 NATAL = dict(
     zip(("year", "month", "day", "hour"), map(tuple, ["己未", "丁丑", "丙戌", "戊戌"]))
@@ -153,15 +150,3 @@ def test_contract_rejects_false_cover_and_false_effectiveness_but_keeps_projecti
         )
     with pytest.raises(ValueError, match="六十甲子"):
         describe_hidden_targets("甲", "丑")
-
-
-def test_unavailable_hidden_table_keeps_legacy_text_without_inventing_target_claims() -> (
-    None
-):
-    row = describe_timing_carrier("timing.dayun", "丁", "丑", NATAL)
-    before = timing_carrier_snapshot_lines({"pillar_carriers": [row]})
-    unknown = timing_carrier_snapshot_lines(
-        {"pillar_carriers": [row], "hidden_target_carriers": None}
-    )
-    assert unknown == before
-    assert not any("另见干克真实藏干" in line for line in unknown)

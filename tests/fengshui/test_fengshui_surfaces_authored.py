@@ -18,7 +18,7 @@ from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.core.fengshui.surface_inputs import SurfaceZone
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services.fengshui import assess as _assess
+from fatebridge.services.fengshui import calculate_fengshui_assessment as _assess
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.mcp_result_assertions import (
     same_run_projected_response,

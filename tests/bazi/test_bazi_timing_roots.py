@@ -7,7 +7,6 @@ from pydantic import ValidationError
 
 from fatebridge.core.contracts.output_timing import TimingInteractions
 from fatebridge.core.timing_interactions import analyze_timing_interactions
-from fatebridge.core.timing_roots import timing_root_snapshot_lines
 
 NATAL = dict(
     zip(("year", "month", "day", "hour"), map(tuple, "甲子 丙寅 甲辰 壬戌".split()))
@@ -55,7 +54,6 @@ def test_yin_growth_is_a_reference_and_cannot_invent_a_hidden_root() -> None:
     assert row["kind"] == "yin_growth_reference"
     assert row["matching_hidden_stems"] == [] and row["hidden_element_present"] is False
     assert row["source_weight_class"] == "light_textual_reference"
-    assert "阴长生" in "".join(timing_root_snapshot_lines(result["root_context"]))
 
 
 def test_a_clash_is_linked_to_the_root_without_erasing_its_physical_stem() -> None:

@@ -370,7 +370,9 @@ def test_conflicting_clock_definitions_are_rejected(conflict, model) -> None:
         birth_clock_basis="local_mean_solar",
         **conflict,
     )
-    with pytest.raises(ValidationError, match="Local solar birth clocks"):
+    with pytest.raises(
+        ValidationError, match="Explicit solar birth labels|Local solar birth clocks"
+    ):
         model.model_validate(data)
 
 

@@ -130,7 +130,7 @@ def test_chart13_uses_declared_solar_weekday() -> None:
         birth_clock_basis="local_mean_solar",
         birth_longitude=150.0,
         birth_latitude=40.0,
-        hsys=0,
+        house_system=0,
     )
 
     hours = chart["planetary_hours"]

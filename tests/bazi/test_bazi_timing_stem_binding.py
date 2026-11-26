@@ -9,10 +9,7 @@ from pydantic import ValidationError
 from fatebridge.core.contracts.output_timing import TimingInteractions
 from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.timing_interactions import analyze_timing_interactions
-from fatebridge.core.timing_strength import (
-    StrengthProjectionBaseline,
-    timing_strength_snapshot_lines,
-)
+from fatebridge.core.timing_strength import StrengthProjectionBaseline
 from tests.support.bazi_strength_reference_v3 import (
     PHASE_FACTORS,
     reconstruct,
@@ -237,7 +234,6 @@ def test_independent_pair_graph_separates_matches_admission_and_applied_budget(
     if expected_reasons:
         assert row["status"] == "blocked"
         assert row["energies_exact"] == row["stem_retention_factors_exact"] == {}
-        assert "本层未施加运干预算" in timing_strength_snapshot_lines(result)[0]
     else:
         assert row["support_share_exact"] == "17/4377"
 

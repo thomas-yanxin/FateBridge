@@ -61,6 +61,7 @@ def test_non_metaphysics_psychometric_plugin_runs_end_to_end() -> None:
         family="psychometrics",
         rest_path="/api/psych/big-five",
         required_output_fields=("traits", "dominant_trait"),
+        uses_astronomy_runtime=False,
     )
     plugin = DomainPlugin(
         name="psychometrics",

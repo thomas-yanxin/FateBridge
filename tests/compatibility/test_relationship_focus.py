@@ -61,8 +61,8 @@ def test_relative_chart_attaches_focus_block_subset_of_synastry() -> None:
         ),
         relative_mode="Composite",
         relationship_focus="romance",
-        hsys=0,
-        zodiacal=0,
+        house_system=0,
+        zodiac_type="Tropic",
     )
 
     focus = result["relationship_profile"]["focus"]

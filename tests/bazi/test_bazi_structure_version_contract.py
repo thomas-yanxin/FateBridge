@@ -121,7 +121,9 @@ def test_current_profile_and_version_conditions_agree_on_three_surfaces(
     cli_schema = json.loads(capsys.readouterr().out)["tools"][0]["output_schema"]
     advertised = {
         tool["tool"]: tool["output_schema"]
-        for tool in rest.get("/api/tools", params={"detail": "full"}).json()["tools"]
+        for tool in rest.get(
+            "/api/tools", params={"tool": spec.name, "detail": "full"}
+        ).json()["tools"]
     }
     schemas = [
         spec.output_model.model_json_schema(),

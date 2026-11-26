@@ -6,7 +6,7 @@ from pathlib import Path
 from pydantic import JsonValue
 
 from fatebridge.core.fengshui.models import AssessRequest
-from fatebridge.services.fengshui import assess as _assess
+from fatebridge.services.fengshui import calculate_fengshui_assessment as _assess
 
 
 def measured_request(

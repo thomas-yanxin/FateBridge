@@ -37,6 +37,7 @@ def test_nonfinite_fraction_is_rejected_before_any_source_evaluation(value) -> N
         de440_solar.solar_longitude_parts(2451545, value)
 
 
+@pytest.mark.local_data
 def test_split_vector_matches_original_kernel_clenshaw_at_record_boundaries() -> None:
     SPK = pytest.importorskip("jplephem.spk").SPK
 

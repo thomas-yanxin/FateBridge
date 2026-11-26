@@ -2,8 +2,12 @@
 
 from __future__ import annotations
 
+import ast
+import asyncio
+import importlib
 import json
 import shlex
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -12,12 +16,16 @@ from jsonschema import validate
 
 import fatebridge.api as api
 from fatebridge import cli
-from fatebridge.application.description import describe_spec
-from fatebridge.application.examples import example_input
+from fatebridge.application.description import describe_spec, summarize_spec
+from fatebridge.application.discovery import discover_specs
+from fatebridge.application.examples import _examples, example_input
+from fatebridge.application.execution import execute_with_receipt
+from fatebridge.application.response_delivery import deliver_response
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
+from fatebridge.utils.errors import ParameterError
 from tests.support.transports import cached_mcp_app
 
 FORBIDDEN_SURFACE_KEYS = {
@@ -127,8 +135,6 @@ def test_three_surface_parity_on_default_compact(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     """Default detail=compact produces identical business payload across REST, MCP, CLI."""
-    import asyncio
-
     spec = next(s for s in CATALOG if s.name == tool_name)
     example = example_input(spec)
     assert example is not None
@@ -168,9 +174,27 @@ def test_three_surface_parity_on_default_compact(
     )
 
 
+FORBIDDEN_LEGACY_PARAMS = frozenset(
+    {"gps_lat", "gps_lon", "lat", "lon", "zone", "hsys", "zodiacal"}
+)
+ALLOWED_SURFACES_KEYS = frozenset({"cli", "rest", "mcp"})
+
+
+def _resolve_schema_property(schema: dict[str, object], name: str) -> dict[str, object]:
+    prop = schema["properties"][name]
+    if "$ref" in prop:
+        ref_name = prop["$ref"].rsplit("/", 1)[-1]
+        return schema["$defs"][ref_name]
+    for branch in prop.get("anyOf", []):
+        if isinstance(branch, dict) and "$ref" in branch:
+            ref_name = branch["$ref"].rsplit("/", 1)[-1]
+            return schema["$defs"][ref_name]
+    return prop
+
+
 def test_catalog_hygiene_across_all_tools() -> None:
     """Single canonical identity, valid examples, lean labels, and no cross-technique leakage."""
-    assert len(CATALOG) == 91
+    assert len(CATALOG) == 90
     assert len({spec.family for spec in CATALOG}) == 12
     assert set(ExecutionOptions.model_fields) == {"as_of", "detail"}
 
@@ -180,6 +204,9 @@ def test_catalog_hygiene_across_all_tools() -> None:
 
     names: set[str] = set()
     specs = {spec.name: spec for spec in CATALOG}
+    assert "gua_meanings" not in specs
+    assert "gua_lookup" in specs
+
     for spec in CATALOG:
         assert spec.name not in names
         names.add(spec.name)
@@ -189,9 +216,24 @@ def test_catalog_hygiene_across_all_tools() -> None:
         assert ex is not None, f"{spec.name} missing example_input"
         spec.request_model.model_validate(ex)
 
+        model_fields = set(spec.request_model.model_fields)
+        assert FORBIDDEN_LEGACY_PARAMS.isdisjoint(model_fields), (
+            spec.name,
+            model_fields & FORBIDDEN_LEGACY_PARAMS,
+        )
+
         req_props = set(spec.request_model.model_json_schema().get("properties", {}))
         out_fields = set(spec.output_model.model_fields)
         desc = describe_spec(spec)
+        summary_desc = summarize_spec(spec)
+        assert set(desc["surfaces"]) == ALLOWED_SURFACES_KEYS, (
+            spec.name,
+            desc["surfaces"],
+        )
+        assert set(summary_desc["surfaces"]) == ALLOWED_SURFACES_KEYS, (
+            spec.name,
+            summary_desc["surfaces"],
+        )
         assert FORBIDDEN_SURFACE_KEYS.isdisjoint(req_props), (spec.name, req_props)
         assert FORBIDDEN_SURFACE_KEYS.isdisjoint(out_fields), (spec.name, out_fields)
         assert FORBIDDEN_SURFACE_KEYS.isdisjoint(set(desc)), spec.name
@@ -204,6 +246,52 @@ def test_catalog_hygiene_across_all_tools() -> None:
     assert "saptavargaja_profile" not in natal_props
     assert not any(f.startswith("guolao_") for f in natal_props), natal_props
 
+    # Nested option schemas expose concrete typed properties rather than free-form dicts.
+    qimen_schema = specs["qimen"].request_model.model_json_schema()
+    assert _resolve_schema_property(qimen_schema, "qimen_options").get("properties")
+    sanshi_schema = specs["sanshi_combined_chart"].request_model.model_json_schema()
+    for field_name in ("qimen_options", "taiyi_options"):
+        assert _resolve_schema_property(sanshi_schema, field_name).get("properties")
+
     # Confirm default MCP app exposes only 2 tools and 0 resources.
     app_mcp = create_mcp_app()
     assert app_mcp is not None
+
+
+def test_discovery_summary_budget_and_full_detail_filter_guard() -> None:
+    """Default discovery stays <= 32 KiB and unfiltered detail=full is rejected."""
+    summary_payload = discover_specs(CATALOG, detail="summary")
+    summary_bytes = len(json.dumps(summary_payload, ensure_ascii=False).encode("utf-8"))
+    assert summary_bytes <= 32768, f"summary discovery exceeded 32 KiB: {summary_bytes}"
+
+    with pytest.raises(ParameterError) as exc_info:
+        discover_specs(CATALOG, detail="full")
+    assert exc_info.value.issues[0]["code"] == "filter_required_for_full_detail"
+
+
+def test_every_tool_declares_compact_fields_within_budget() -> None:
+    """Every tool declares explicit compact_fields and delivers <= 10 KiB in compact mode."""
+    compact_map = _examples().get("compact_fields", {})
+    options = ExecutionOptions(detail="compact", as_of="2026-10-12T12:00:00+08:00")
+    for spec in CATALOG:
+        assert spec.name in compact_map and compact_map[spec.name], spec.name
+        request = spec.request_model.model_validate(example_input(spec))
+        raw = execute_with_receipt(spec, request, options=options)
+        delivered = deliver_response(raw, spec=spec, detail="compact")
+        size = len(json.dumps(delivered, ensure_ascii=False).encode("utf-8"))
+        assert size <= 10240, f"{spec.name} compact output too large: {size} bytes"
+
+
+def test_package_imports_are_absolute_and_export_presets_is_deleted() -> None:
+    """src/fatebridge uses absolute imports only and fatebridge.core.export_presets stays deleted."""
+    src_root = Path(__file__).resolve().parents[2] / "src" / "fatebridge"
+    relative_imports: list[tuple[str, int]] = []
+    for path in sorted(src_root.rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom) and node.level > 0:
+                relative_imports.append((str(path.relative_to(src_root)), node.level))
+    assert not relative_imports, relative_imports
+
+    with pytest.raises(ImportError):
+        importlib.import_module("fatebridge.core.export_presets")

@@ -29,7 +29,11 @@ from fatebridge.utils.civil_time import CivilPoint, utc_calendar
 from fatebridge.utils.errors import EphemerisSourceError
 
 INPUT = dict(
-    date="2200-05-15", time="09:00", zone="UTC", gender="男", use_true_solar_time=False
+    date="2200-05-15",
+    time="09:00",
+    timezone="UTC",
+    gender="男",
+    use_true_solar_time=False,
 )
 
 
@@ -86,7 +90,7 @@ def test_january_endpoints_use_local_civil_origin_without_clipping(
     monkeypatch: MonkeyPatch, mode: str, date: str, zone: str, origin: int
 ) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
-    result = build_canping_result(**{**INPUT, "date": date, "zone": zone})
+    result = build_canping_result(**{**INPUT, "date": date, "timezone": zone})
     series = result["liunian_series"]
     assert series["birth_pillar_year"] == origin
     assert len(series["rows"]) == 120 and len(series["year_boundaries"]) == 121
@@ -146,7 +150,7 @@ def test_frozen_2001_lichun_query_keeps_original_two_part_point(
     result = build_canping_result(
         date="2000-05-15",
         time="09:00",
-        zone="UTC",
+        timezone="UTC",
         gender="男",
         use_true_solar_time=False,
         analysis_datetime=query.isoformat(),

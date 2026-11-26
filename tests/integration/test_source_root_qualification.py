@@ -1,6 +1,5 @@
 """Root class and actual survival must precede structural capacity decisions."""
 
-from copy import deepcopy
 from dataclasses import replace
 
 import pytest
@@ -9,7 +8,6 @@ from pydantic import ValidationError
 from fatebridge.core.bazi.bazi_evidence import build_natal_evidence
 from fatebridge.core.contracts.output_root_qualification import RootQualification
 from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.root_qualification import root_qualification_snapshot_lines
 from fatebridge.core.strength import DEFAULT_POLICY
 from tests.unit_test.fixtures.bazi_strength import (
     bazi_pillars,
@@ -127,30 +125,14 @@ def test_rounded_display_cannot_change_the_raw_root_qualification_gate() -> None
     RootQualification.model_validate({"qualified_for_structural_rule": True})
 
 
-def test_snapshot_reads_supplied_qualifications_instead_of_recomputing_a_chart() -> (
-    None
-):
-    a = evaluate_pillar_strength("乙亥 壬午 甲辰 乙亥")
-    text = "\n".join(root_qualification_snapshot_lines(a))
-    assert "工程结构政策档：强；数值原判：中和" in text
-    assert "至少两处健全根且另有实际通根的透干印比" in text
-    assert "阳长生根" in text and "工程约定" in text
-    supplied = deepcopy(a)
-    supplied["root_qualifications"][0]["qualified_for_structural_rule"] = False
-    supplied["root_qualifications"][0]["retention_fraction"] = 0.8
-    assert "年支亥（阳长生根，实际藏干根保留80.0%，未计入）" in "\n".join(
-        root_qualification_snapshot_lines(supplied)
-    )
-    assert root_qualification_snapshot_lines({}) == []
-
-
-def test_snapshot_explains_complete_same_element_bureau() -> None:
+def test_complete_same_element_bureau_records_structural_decision() -> None:
     assessment = evaluate_pillar_strength("甲寅 丁卯 甲辰 乙亥")
     assert (
         assessment["structural_decision"]["rule"]
         == "complete_same_element_bureau_with_surviving_vigorous_roots"
     )
-    basis_line = root_qualification_snapshot_lines(assessment)[0]
-    assert basis_line.endswith(
-        "本次依据：同类完整会合局透出目标五行，且至少两处实际根达到保留门槛。"
-    )
+    assert assessment["structural_decision"]["vigorous_roots"] == [
+        "year",
+        "month",
+        "hour",
+    ]
