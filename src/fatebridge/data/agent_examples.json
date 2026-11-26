@@ -2286,7 +2286,7 @@
     "heluo": {
       "line_conditions": "judge.line_conditions逐先后天实际元堂计算二五位、众宗及主本阴元堂阳应爻有援式。source_youyuan分别给出同阶段实际应位、阴阳和clause_match；按主本阴爻读法，不以偶数爻位代替，别本阴位字面保留。yuanTang.youYing仅先天通用阴阳相异，反向相应不能称该原句命中；未中不推出无援、现实孤立或十体总评。位序偏好不是评分，dangWei仅旧位序阴阳别名；source_dangwei.match=null，阴月未定不以至点半年补定义。可用line_conditions视图读取。",
       "evidence": "按实际chart元堂读取numerology_evidence的轨迹、条文、来源和未决规则；judge.xie仅基础命中，不能选定葉者或不葉者分支。",
-      "known_inputs": "出生时间与性别须明确提供；空白时间不能补零点。时间字段是当地钟时，时区放zone；显式零点有效。真太阳时默认开启，须明确lon或gps_lon；GPS优先，0度有效。缺失不可套上海或0度，不为通过调用自动改为钟表时。",
+      "known_inputs": "出生时间与性别须明确提供；空白时间不能补零点。时间字段是当地钟时，时区放timezone；显式零点有效。真太阳时默认开启，须明确经度longitude，0度有效。缺失不可套上海或0度，不为通过调用自动改为钟表时。",
       "birth_clock": "numerology_evidence.birth_clock保存同次民用时刻、UTC瞬间、所选计算钟面、经度来源与是否使用。钟表时未给经度为null；太阳钟面不是新的物理瞬间。可用birth_clock视图读取。",
       "body_structure": "body_structure视图按逐阶段实际六爻返回渐卦段的八条结构记录，区分三爻倒序、上下互体、全卦倒序及抽第三爻移顶。八条含六个三爻体及两个六爻卦，不是八个互体；literal_case_match为false时只是明确算子推演，不能称该卦原例已核。五命干支字表不自动选柱或用年纳音替代。此层不替换deTi或后天换卦，不直接裁定葉否。",
       "body_relations": "judge.deTi按年柱纳音与先后天实际上下体、两互体分列五行关系，完整present=null。第51页generating_qi必须同时满足无元气且卦体生纳音；第87页双向相生另列，不能反向覆盖。金人、土人口径及完整得体、合理仍待核。",
@@ -2303,7 +2303,7 @@
     },
     "canping": {
       "method": "默认gu用真实日支，ming为显式月支变法；二者规则来源与结果分别说明。",
-      "known_inputs": "出生时间与性别须明确提供；空白时间不能补零点。时间字段是当地钟时，时区放zone；显式零点有效。真太阳时默认开启，须明确lon或gps_lon；GPS优先，0度有效。缺失不可套上海或0度，不为通过调用自动改为钟表时。",
+      "known_inputs": "出生时间与性别须明确提供；空白时间不能补零点。时间字段是当地钟时，时区放timezone；显式零点有效。真太阳时默认开启，须明确经度longitude，0度有效。缺失不可套上海或0度，不为通过调用自动改为钟表时。",
       "birth_clock": "numerology_evidence.birth_clock保存同次民用时刻、UTC瞬间、所选计算钟面、经度来源与是否使用。钟表时未给经度为null；太阳钟面不是新的物理瞬间。可用birth_clock视图读取。",
       "timing": "dayun_method默认bazi_appendix_v1为卷七整数借除，continuous为现代连续折算，legacy为未核旧命宫排法。配运先读timing_policy视图：schedule_basis逐原句标applied_rule／对照，区分所选附法、另书十年背景和现代落点约定；first_row为同次实际首行，旧法保留年龄标签和取文；first_period仅为已映射日期首运摘要，旧法为null，两者均非查询当段。查询读selected，未起运不取首运代替；全运再取periods，完整立春用calendar_boundaries。",
       "evidence": "按年纳音部、顺逆编号与实际男女或岁运条文解释，缺条和缺字只表示语料缺口。",
@@ -2353,7 +2353,7 @@
     },
     "interpret_astrology_dice": {
       "input": "planet/sign/house必须是本次实际骰面；实际第N宫传house=N-1。中文、英文和符号可直接传入；缺项追问，不猜测或抽取替代结果。",
-      "context": "仅骰面解读省略date/time/zone/经纬度；若请求独立天象背景，完整传入实际资料。tradition/hsys/zodiacal仅作用于天象背景，不改变骰面。天象背景按astronomical_context视图选择fields，分页时读回同run完整投影结果。保留ephemerisReferencePoints中的系统质心、本体中心、近似及未确认参考点，不将质心写成本体中心。",
+      "context": "仅骰面解读省略date/time/timezone/经纬度；若请求独立天象背景，完整传入实际资料。tradition/house_system/zodiac_type仅作用于天象背景，不改变骰面。天象背景按astronomical_context视图选择fields。保留ephemerisReferencePoints中的系统质心、本体中心、近似及未确认参考点，不将质心写成本体中心。",
       "interpretation": "以symbolic_details和rule_trace为依据，保留rulesets版本和来源。区分自定位与未给出的其他定位星；喜乐宫是宫号关系，不是星座尊贵或成功概率。diceChart为假设整宫示意，无真实度数、相位或ASC/MC；不得从天象背景补写骰面定位星、互容或应期。",
       "validation": "星座条件按所引原典核对七曜，外行星和交点保留各自的条件状态。",
       "longitude_motion": "天象背景的十个物理天体按实际热带或Lahiri黄道读取chart.params.chart_profile.longitude_motion与chart.chart.objects[].motion。保留native_longitude_speed及修正分项，method_id来自实际求导记录；Moshier完整视位置求导不改变解析轨道，未收敛明确不应用。Lahiri包含所选零点的运动，不能复制热带速度。月亮未采用独立光行时分项不表示完整位置求导未执行；分项与整体状态分别核对。这些速度不能证明精确驻留时刻、原典整例或现实预测。"

@@ -171,11 +171,9 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
                 dependencies=(
                     "date",
                     "time",
-                    "zone",
-                    "lat",
-                    "lon",
-                    "gps_lat",
-                    "gps_lon",
+                    "timezone",
+                    "latitude",
+                    "longitude",
                 ),
                 comparison_requirements=(
                     "相同观测时刻和地点、星历、黄道和宫制、福点公式及实际参考系。",
@@ -189,7 +187,12 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
                     "src/fatebridge/core/local_techniques/otherbu.py",
                 ),
                 source_refs=("docs/astrodice.md",),
-                selector_fields=("tradition", "hsys", "zodiacal", "fortune_method"),
+                selector_fields=(
+                    "tradition",
+                    "house_system",
+                    "zodiac_type",
+                    "fortune_method",
+                ),
                 error_sources=(
                     "civil_clock",
                     "observer_location",
