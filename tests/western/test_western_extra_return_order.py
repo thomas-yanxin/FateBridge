@@ -310,7 +310,11 @@ def test_extra_returns_service_keeps_extended_utc_clock_coordinates(
         analysis_day=1,
     )
     assert "error" not in result
-    assert birth_labels == reference_labels == ["0000-12-31T23:59:00+00:00"] * 7
+    body_count = len(result["extrareturns"]["returns"])
+    assert body_count == 10
+    assert (
+        birth_labels == reference_labels == ["0000-12-31T23:59:00+00:00"] * body_count
+    )
 
 
 @pytest.mark.parametrize("latitude", [0, 80])

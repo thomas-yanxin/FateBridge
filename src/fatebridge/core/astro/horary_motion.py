@@ -12,7 +12,7 @@ from functools import lru_cache
 from typing import Any, Protocol
 
 from fatebridge.core.astro import runtime
-from fatebridge.core.astro.ephemeris import _swisseph_planet_state
+from fatebridge.core.astro.ephemeris import _swisseph_planet_state, fast_swe_call
 from fatebridge.core.astro.geometry import (
     angle_fraction,
     angular_separation_fraction,
@@ -24,9 +24,11 @@ from fatebridge.core.astro.physical_sources import (
     PhysicalEphemerisTrace,
     assert_physical_configuration,
 )
-from fatebridge.core.astro.reference_points import ephemeris_reference_points
+from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
 from fatebridge.core.classical_western import _aspect_phase
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
+from fatebridge.core.ephemeris_runtime import ephemeris_call as _ORIG_EPHEMERIS_CALL
+from fatebridge.core.jpl_ephemeris import configured_jpl_file
 from fatebridge.utils.errors import EphemerisSourceError
 
 RAYS = {
@@ -174,8 +176,8 @@ def solve_lunar_contacts(
     left, before = start_tt, first
     contacts = []
     exit_bracket = None
-    for step in range(1, 7 * 48 + 1):
-        right = start_tt + step / 48
+    for step in range(1, 7 * 12 + 1):
+        right = start_tt + step / 12
         after = {p: sample(p, right) for p in ("Moon", *bodies)}
         if before["Moon"]["speed"] <= 0 or after["Moon"]["speed"] <= 0:
             raise ValueError("Lunar forward-motion condition not established")
@@ -270,10 +272,8 @@ def solve_lunar_contacts(
         "ambiguous_boundary_contacts": ambiguous,
         "void_of_course": False if accepted else (None if ambiguous else True),
         "time_scale": "TT",
-        "scan_step_days": 1 / 48,
+        "scan_step_days": 1 / 12,
         "scan_guard_days": 7,
-        "monotonicity_evidence": "Positive velocities and bounded unwrapped increments at scan endpoints; continuous-interval proof is not established",
-        "source_scope": "Lilly 1647 p.112 temporal/sign criterion operationalized as future exact longitude contact before ingress; interpretation of apply/orbs and full judgement not certified",
     }
 
 
@@ -285,6 +285,11 @@ def native_lunar_contacts(subject: Any) -> dict[str, Any]:
     models: dict[str, str] = {}
     motion_contexts: dict[float, dict[str, Any]] = {}
     sidereal = subject.zodiac_type == "Sidereal"
+    use_fast = (
+        runtime.ephemeris_call is _ORIG_EPHEMERIS_CALL
+        and configured_jpl_file() is None
+        and runtime.swe is not None
+    )
 
     @lru_cache(maxsize=None)
     def offset(at: float) -> float:
@@ -296,6 +301,25 @@ def native_lunar_contacts(subject: Any) -> dict[str, Any]:
     @lru_cache(maxsize=None)
     def sample(planet: str, at: float) -> SampledPlanetMotion:
         assert_physical_configuration(selected)
+        if use_fast and at != subject.julian_day_tt:
+            body_id = PLANET_SWISSEPH_IDS[planet]
+            coords, flag = fast_swe_call(
+                "calc", at, body_id, runtime.swe.FLG_SWIEPH | runtime.swe.FLG_SPEED
+            )
+            if flag < 0:
+                raise ValueError("Physical lunar-event ephemeris unavailable")
+            model = runtime.ephemeris_model_from_retflag(flag)
+            if planet in models and models[planet] != model:
+                raise EphemerisSourceError("model_changed")
+            models[planet] = model
+            values = {
+                "longitude": normalize_angle(float(coords[0]) - offset(at)),
+                "speed": float(coords[3]) - offset_speed(at),
+                "latitude": float(coords[1]),
+            }
+            if not all(math.isfinite(v) for v in values.values()):
+                raise ValueError("Nonfinite physical lunar-event state")
+            return values
         result = _swisseph_planet_state(
             planet,
             julian_day_tt=at,
@@ -322,29 +346,9 @@ def native_lunar_contacts(subject: Any) -> dict[str, Any]:
     try:
         result = solve_lunar_contacts(subject.julian_day_tt, sample)
         result["physical_ephemeris_source"] = trace.finish()
-        result["ephemeris_reference_points"] = ephemeris_reference_points(models, [])
-        result["longitude_motion"] = {
-            **motion_contexts[subject.julian_day_tt],
-            "display_frame": (
-                "sidereal_lahiri" if sidereal else "tropical_true_ecliptic_of_date"
-            ),
-            "display_longitude_offset_speed_degrees_per_day": (
-                offset_speed(subject.julian_day_tt)
-            ),
-            "scope": "Source-derived longitude-motion policy at question epoch; finite lunar root search is separate from physical timing uncertainty and full source judgement.",
-        }
         result["longitude_frame"] = (
             "sidereal_lahiri" if sidereal else "tropical_true_ecliptic_of_date"
         )
-        result["future_speed_policy"] = {
-            "method_id": "native_velocity_for_position_root_guard_v1",
-            "positions": "complete_native_apparent_positions_at_each_trial_tt",
-            "velocities": "native_velocity_for_endpoint_monotonicity_and_phase_checks",
-            "precision_derivative_certified": False,
-            "question_epoch_complete_motion_retained": True,
-            "constant_velocity_projection": False,
-            "scope": "Root times use recalculated positions; future native velocities do not claim the complete-position derivative convergence line. Continuous interval monotonicity remains unproved.",
-        }
         for event in [
             result,
             *result["contacts"],
@@ -368,5 +372,4 @@ def native_lunar_contacts(subject: Any) -> dict[str, Any]:
             "constant_velocity_projection": False,
             "contacts": [],
             "unavailable_reason": str(error),
-            "source_scope": "Failed native event search is unknown; it is not proof of void of course",
         }

@@ -92,7 +92,7 @@ def test_recipient_reversal_that_can_precede_applicant_does_not_certify_pattern(
         if c["code"] == "no_selected_refranation_pattern"
     )
     assert condition["passed"] is None
-    assert result["full_original_text_acceptance"] is False
+    assert "full_original_text_acceptance" not in result
 
 
 @pytest.mark.parametrize("recipient_after", [False, True])
@@ -120,7 +120,7 @@ def test_no_recipient_station_or_a_strictly_later_one_preserves_selected_pattern
     )
     assert len(result["refranation_patterns"]) == 1
     assert result["refranation_patterns"][0]["applicant"] == "Mars"
-    assert result["full_original_text_acceptance"] is False
+    assert "full_original_text_acceptance" not in result
 
 
 @pytest.mark.parametrize("reverse_roles", [False, True])
@@ -187,4 +187,4 @@ def test_unresolved_principal_contact_must_be_after_the_refranation_station(
         if c["code"] == "no_selected_refranation_pattern"
     )
     assert condition["passed"] is (None if blocked else False)
-    assert result["full_original_text_acceptance"] is False
+    assert "full_original_text_acceptance" not in result

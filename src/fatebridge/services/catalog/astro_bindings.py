@@ -73,5 +73,9 @@ def bind_relationship_chart(
             "zodiac_type": arguments["zodiac_type"],
             "relationship_focus": arguments["relationship_focus"],
             "davison_variant": arguments["davison_variant"],
+            "composite_house_method": arguments.get(
+                "composite_house_method", "midpoint"
+            ),
+            "high_latitude_fallback": arguments.get("high_latitude_fallback", "error"),
         },
     )

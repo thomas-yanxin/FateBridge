@@ -22,7 +22,11 @@ from fatebridge.core.astro.geometry import (
     _su28,
     normalize_angle,
 )
-from fatebridge.core.astro.reference import DIGNITY_LABELS_ZH, NODE_BODIES
+from fatebridge.core.astro.reference import (
+    DIGNITY_LABELS_ZH,
+    NODE_BODIES,
+    STATION_SPEED_THRESHOLDS,
+)
 
 
 def _essential_dignity(planet: str, sign: str) -> dict[str, str] | None:
@@ -47,7 +51,7 @@ def _essential_dignity(planet: str, sign: str) -> dict[str, str] | None:
 
 
 def _build_houses(
-    ascendant: float,
+    ascendant: float | None,
     house_system: str,
     house_cusps: list[float] | None = None,
     midheaven: float | None = None,
@@ -72,15 +76,12 @@ def _build_houses(
                 }
             )
         return houses
-    if house_system == "whole_sign":
-        first_cusp = float(((Fraction(ascendant) % 360) // 30) * 30)
-    elif house_system == "equal_mc" and midheaven is not None:
-        # Equal houses anchored on the midheaven (swisseph code 'D'): the MC is
-        # the 10th cusp, so the 1st cusp sits 90° later. The true ascendant is
-        # deliberately NOT the anchor here — using it silently degrades the
-        # system into plain `equal` and shifts every house by one when the
-        # ascendant and MC+90 fall in different signs.
+    if house_system == "equal_mc" and midheaven is not None:
         first_cusp = midheaven
+    elif ascendant is None:
+        return houses
+    elif house_system == "whole_sign":
+        first_cusp = float(((Fraction(ascendant) % 360) // 30) * 30)
     else:
         first_cusp = ascendant
     for house_number in range(1, 13):
@@ -112,7 +113,7 @@ def _build_planet_record(
     planet: str,
     longitude: float,
     latitude: float,
-    ascendant: float,
+    ascendant: float | None,
     house_system: str,
     *,
     house_cusps: list[float] | None = None,
@@ -123,6 +124,10 @@ def _build_planet_record(
     include_su28: bool = False,
     zodiac_longitude: float | None = None,
     projected_house_position: float | None = None,
+    longitude_speed: float | None = None,
+    declination: float | None = None,
+    obliquity: float | None = None,
+    houses_resolved: bool = True,
 ) -> dict[str, Any]:
     effective_longitude = (
         normalize_angle(zodiac_longitude)
@@ -134,30 +139,59 @@ def _build_planet_record(
         )
     )
     sign = _sign_name(effective_longitude)
-    record = {
+    if not houses_resolved or (
+        projected_house_position is None and ascendant is None and not house_cusps
+    ):
+        house_num: int | None = None
+    elif projected_house_position is not None:
+        house_num = int(projected_house_position)
+    else:
+        house_num = _house_for_longitude(
+            effective_longitude,
+            ascendant if ascendant is not None else 0.0,
+            house_system,
+            house_cusps=house_cusps,
+        )
+    speed_val = (
+        float(longitude_speed)
+        if longitude_speed is not None and math.isfinite(longitude_speed)
+        else None
+    )
+    decl_val = (
+        float(declination)
+        if declination is not None and math.isfinite(declination)
+        else None
+    )
+    threshold = STATION_SPEED_THRESHOLDS.get(planet)
+    stationary = bool(
+        speed_val is not None and threshold is not None and abs(speed_val) < threshold
+    )
+    out_of_bounds = bool(
+        decl_val is not None
+        and obliquity is not None
+        and math.isfinite(obliquity)
+        and abs(decl_val) > abs(obliquity)
+    )
+    record: dict[str, Any] = {
         "id": planet,
         "longitude": effective_longitude,
         "latitude": latitude,
+        "longitude_speed": speed_val,
+        "retrograde": bool(speed_val is not None and speed_val < 0),
+        "stationary": stationary,
+        "declination": decl_val,
+        "out_of_bounds": out_of_bounds,
         "sign": sign,
         "sign_zh": SIGN_LABELS_ZH[sign],
         "degree_in_sign": _degree_in_sign(effective_longitude),
-        "house": (
-            int(projected_house_position)
-            if projected_house_position is not None
-            else _house_for_longitude(
-                effective_longitude,
-                ascendant,
-                house_system,
-                house_cusps=house_cusps,
-            )
-        ),
+        "house": house_num,
         "element": ELEMENT_BY_SIGN[sign],
         "modality": MODALITY_BY_SIGN[sign],
         "dignity": _essential_dignity(planet, sign),
     }
     if projected_house_position is not None:
         record["ecliptic_house_position"] = projected_house_position
-    if include_sector13:
+    if include_sector13 and ascendant is not None:
         record["sector13"] = _sector13_for_longitude(effective_longitude, ascendant)
         record["sector13_evidence"] = {
             "longitude_unrounded": effective_longitude,

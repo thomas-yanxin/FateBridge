@@ -264,9 +264,6 @@ def enrich_specialty_sensitivity(
         if "meridian_houses" in layer:
             attach_meridian_sensitivity(layer["meridian_houses"], sensitivity)
         if sensitivity["status"] != "sampled":
-            layer["comparative_geometry"] = build_comparative_geometry(
-                layer, sensitivity
-            )
             return None
         if (
             sensitivity["hypothetical_element_source"]

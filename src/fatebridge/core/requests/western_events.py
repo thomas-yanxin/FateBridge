@@ -162,6 +162,18 @@ class AstroHoraryRequest(WesternEventClockFields):
         default=None,
         description="Optional already-known reports for Lilly pp121-123 prerequisites and exceptions. Unknown reports remain unknown; do not infer age, appearance, affliction or event certainty to clear a caution.",
     )
+    turned_from_house: int | None = Field(
+        default=None,
+        ge=1,
+        le=12,
+        description="Optional base house (1-12) for derived/turned horary questions (e.g. 7 for partner).",
+    )
+    turned_house: int | None = Field(
+        default=None,
+        ge=1,
+        le=12,
+        description="Optional derived house offset (1-12) counted from turned_from_house (or quesited_house), e.g. 5th from 7th = 11th radical house.",
+    )
 
     @model_validator(mode="after")
     def _exclusive_question_clock(self) -> "AstroHoraryRequest":
@@ -226,6 +238,12 @@ class AstroElectionRequest(WesternEventClockFields):
             "Undertaking type, selecting the rule pack: marriage/business/move_in/"
             "buy_property/trade/buy_car/contract/travel/job_hunt/general; 不提供医疗择时"
         ),
+    )
+    search_window_hours: int = Field(
+        default=0,
+        ge=0,
+        le=168,
+        description="Optional candidate window scanner duration (hours, 0..168). When > 0, scans 1-hour steps forward from candidate datetime for top non-VOC, benefic-supported windows.",
     )
 
     @model_validator(mode="after")

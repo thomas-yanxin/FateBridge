@@ -73,11 +73,12 @@ def build_zodiacal_releasing_period(
     level: int,
     analysis_utc: UTCCalendar,
     loosing_of_bond: bool = False,
+    post_loosing_of_bond: bool = False,
 ) -> dict[str, Any]:
     ruler = RULER_BY_SIGN[sign_name]
     phase = classify_releasing_phase(sign_name, fortune_sign)
     # Nominal full-sign duration in the displayed unit, before parent clipping.
-    # L3's small-year count multiplies2.5 days; L4 multiplies5 hours.
+    # L3's small-year count multiplies 2.5 days; L4 multiplies 5 hours.
     duration_value = float(ZR_SIGN_PERIODS[sign_name])
     if level == 3:
         duration_value *= ZR_LEVEL_UNIT_DAYS[level]
@@ -95,6 +96,8 @@ def build_zodiacal_releasing_period(
         "start": period_start,
         "end": period_end,
         "loosing_of_bond": loosing_of_bond,
+        "post_loosing_of_bond": post_loosing_of_bond,
+        "culmination": phase["relative_sign_index"] == 10,
         "parent_sign": parent_sign,
         "parent_sign_label": sign_label(parent_sign),
         "active": period_start <= analysis_utc < period_end,
@@ -153,7 +156,7 @@ def build_releasing_level_within_interval(
     parent_sign: str,
     level: int,
     analysis_utc: UTCCalendar,
-    max_periods: int = 24,
+    max_periods: int = 48,
 ) -> list[dict[str, Any]]:
     periods: list[dict[str, Any]] = []
     current_sign = start_sign
@@ -179,6 +182,7 @@ def build_releasing_level_within_interval(
                 level=level,
                 analysis_utc=analysis_utc,
                 loosing_of_bond=loosing_of_bond,
+                post_loosing_of_bond=loosing_used and not loosing_of_bond,
             )
         )
         cursor = next_cursor
@@ -296,6 +300,24 @@ def build_zodiacal_releasing_for_lot(
             None,
         )
 
+    level_four_timeline: list[dict[str, Any]] = []
+    current_level_4 = None
+    if current_level_3 is not None:
+        level_four_timeline = build_releasing_level_within_interval(
+            start_sign=current_level_3["sign"],
+            period_start=current_level_3["start"],
+            period_end=current_level_3["end"],
+            fortune_sign=fortune_sign,
+            parent_sign=current_level_3["sign"],
+            level=4,
+            analysis_utc=analysis_utc,
+            max_periods=64,
+        )
+        current_level_4 = next(
+            (item for item in level_four_timeline if item["active"]),
+            None,
+        )
+
     return {
         "base_point": LOT_POINT_NAMES[lot_key],
         "base_point_label": LOT_LABELS[lot_key],
@@ -314,6 +336,9 @@ def build_zodiacal_releasing_for_lot(
         "current_level_3": clean_releasing_period(
             current_level_3, display_timezone=display_timezone
         ),
+        "current_level_4": clean_releasing_period(
+            current_level_4, display_timezone=display_timezone
+        ),
         "level_1_timeline": clean_releasing_timeline(
             level_one_timeline, display_timezone=display_timezone
         ),
@@ -322,6 +347,9 @@ def build_zodiacal_releasing_for_lot(
         ),
         "level_3_timeline": clean_releasing_timeline(
             level_three_timeline, display_timezone=display_timezone
+        ),
+        "level_4_timeline": clean_releasing_timeline(
+            level_four_timeline, display_timezone=display_timezone
         ),
     }
 
@@ -359,9 +387,11 @@ def _unresolved_releasing_track(lot_key: str) -> dict[str, Any]:
         "current_level_1": None,
         "current_level_2": None,
         "current_level_3": None,
+        "current_level_4": None,
         "level_1_timeline": [],
         "level_2_timeline": [],
         "level_3_timeline": [],
+        "level_4_timeline": [],
     }
 
 
@@ -377,8 +407,7 @@ def _zr_calculation_basis(fortune_sign: str | None) -> dict[str, Any]:
         "angular_reference_point": LOT_POINT_NAMES["lot_of_fortune"],
         "angular_reference_sign": fortune_sign,
         "spirit_same_sign_rule": "advance_spirit_one_sign",
-        "published_levels": [1, 2, 3],
-        "whole_procedure_certified": False,
+        "published_levels": [1, 2, 3, 4],
     }
 
 
@@ -398,22 +427,18 @@ def build_zodiacal_releasing_payload(
             "calculation_basis": basis,
             "spirit": _unresolved_releasing_track("lot_of_spirit"),
             "fortune": _unresolved_releasing_track("lot_of_fortune"),
+            "eros": _unresolved_releasing_track("lot_of_eros"),
         }
 
-    # Fixed elapsed periods use UTC coordinates, including auxiliary years.
-    # The birth zone applies only when labeling the selected endpoints.
     birth_utc = birth_info.utc_calendar
     analysis_utc = utc_calendar(analysis_datetime)
     display_timezone = parse_timezone_name(birth_info.timezone)
     lots = build_lot_payloads(natal_subject)
-    # Selected reconstruction: Brennan/Schaim, episode192 (2019-02-11),
-    # "Calculating Zodiacal Releasing Periods" and "Peak Periods".
-    # The origin advances only for coincident Spirit/Fortune signs. Natal lot
-    # longitudes stay unchanged; every track's angular reference is Fortune.
     fortune_sign = lots["lot_of_fortune"]["sign"]
     spirit_start_sign = lots["lot_of_spirit"]["sign"]
     if spirit_start_sign == fortune_sign:
         spirit_start_sign = next_sign(spirit_start_sign)
+    eros_start_sign = lots["lot_of_eros"]["sign"]
     return {
         "calculation_basis": _zr_calculation_basis(fortune_sign),
         "spirit": build_zodiacal_releasing_for_lot(
@@ -432,6 +457,15 @@ def build_zodiacal_releasing_payload(
             analysis_utc=analysis_utc,
             display_timezone=display_timezone,
             start_sign=fortune_sign,
+            fortune_sign=fortune_sign,
+        ),
+        "eros": build_zodiacal_releasing_for_lot(
+            "lot_of_eros",
+            lots["lot_of_eros"],
+            birth_utc=birth_utc,
+            analysis_utc=analysis_utc,
+            display_timezone=display_timezone,
+            start_sign=eros_start_sign,
             fortune_sign=fortune_sign,
         ),
     }

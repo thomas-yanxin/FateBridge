@@ -39,6 +39,12 @@ def _chart_calculation_notes(payload: dict[str, Any]) -> list[str]:
     ):
         qualification = payload.get("chart_profile", {}).get(field) or {}
         note = qualification.get("note_zh")
+        if field == "orbital_fallback" and not note:
+            fb = qualification.get("approximate_planets") or qualification.get(
+                "fallback_planets"
+            )
+            if fb:
+                note = f"轨道近似天体：{'、'.join(fb)}。"
         if note and note not in notes:
             notes.append(note)
     return notes
@@ -110,6 +116,9 @@ def calculate_core_chart_analysis(
     zodiac_type: str | None = None,
     use_true_solar_time: bool = False,
     node_mode: str = "mean",
+    high_latitude_fallback: str = "error",
+    include_minor_aspects: bool = False,
+    extra_bodies: list[str] | tuple[str, ...] = (),
     ephemeris_policy: str = "auto",
     saptavargaja_profile: str = "santhanam_27",
     drekkana_profile: str = "santhanam_27_6",
@@ -195,7 +204,10 @@ def calculate_core_chart_analysis(
             birth_time_uncertainty_minutes=birth_time_uncertainty_minutes,
             analysis_datetime=analysis_datetime,
         )
-    hsys = None if house_system is None else resolve_offline_house_code(house_system)
+    raw_hsys = (
+        None if house_system is None else resolve_offline_house_code(house_system)
+    )
+    hsys = "E" if raw_hsys == 9 else raw_hsys
     zodiacal = (
         None if zodiac_type is None else normalize_offline_zodiac_code(zodiac_type)
     )
@@ -258,6 +270,10 @@ def calculate_core_chart_analysis(
         chart_variant,
         hsys=hsys,
         zodiacal=zodiacal,
+        node_mode=node_mode,
+        high_latitude_fallback=high_latitude_fallback,
+        include_minor_aspects=include_minor_aspects,
+        extra_bodies=extra_bodies,
         **anchor_options,
     )
     if chart_variant == "guolao_chart":
@@ -325,11 +341,17 @@ def calculate_germany_chart_analysis(
     use_true_solar_time: bool = False,
     birth_time_uncertainty_minutes: float | None = None,
     analysis_datetime: datetime | None = None,
+    high_latitude_fallback: str = "error",
+    dial_degrees: str | None = None,
+    sensitive_point_query: str | None = None,
 ) -> dict[str, Any]:
     """
     Build the FateBridge midpoint/germany chart payload.
     """
-    hsys = None if house_system is None else resolve_offline_house_code(house_system)
+    raw_hsys = (
+        None if house_system is None else resolve_offline_house_code(house_system)
+    )
+    hsys = "E" if raw_hsys == 9 else raw_hsys
     zodiacal = (
         None if zodiac_type is None else normalize_offline_zodiac_code(zodiac_type)
     )
@@ -354,6 +376,9 @@ def calculate_germany_chart_analysis(
         birth_info,
         hsys=hsys,
         zodiacal=zodiacal,
+        high_latitude_fallback=high_latitude_fallback,
+        dial_degrees=dial_degrees,
+        sensitive_point_query=sensitive_point_query,
     )
     sample_times = enrich_specialty_sensitivity(
         result,
@@ -375,6 +400,8 @@ def calculate_relative_chart_analysis(
     zodiac_type: str = "Tropic",
     relationship_focus: Any = None,
     davison_variant: str = "uncorrected",
+    composite_house_method: str = "midpoint",
+    high_latitude_fallback: str = "error",
 ) -> dict[str, Any]:
     """
     Build synastry/composite payloads for two parties.
@@ -393,4 +420,6 @@ def calculate_relative_chart_analysis(
         zodiacal=zodiacal,
         relationship_focus=relationship_focus,
         davison_variant=davison_variant,
+        composite_house_method=composite_house_method,
+        high_latitude_fallback=high_latitude_fallback,
     )

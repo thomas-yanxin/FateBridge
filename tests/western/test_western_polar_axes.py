@@ -53,8 +53,8 @@ def test_service_summary_keeps_an_actual_partial_orbital_fallback(
     result = calculate_core_chart_analysis(
         **BIRTH, chart_variant="chart", house_system=0
     )
-    note = result["chart_profile"]["orbital_fallback"]["note_zh"]
-    assert note in result["summary"]
+    assert "Venus" in result["chart_profile"]["orbital_fallback"]["approximate_planets"]
+    assert any("轨道近似天体" in line and "Venus" in line for line in result["summary"])
 
 
 @pytest.mark.parametrize("house_system", [2, 6])

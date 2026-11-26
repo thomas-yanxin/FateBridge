@@ -395,12 +395,7 @@ def test_singular_ascendant_blocks_ascendant_dependent_results() -> None:
     )
     distributions = calculate_distributions(**singular_birth, house_system="W")
     dist_payload = distributions["distributions"]
-    assert (
-        distributions["natal_reference"]["calculation_basis"]["angle_definition"][
-            "geometric_ascendant_resolved"
-        ]
-        is False
-    )
+    assert "calculation_basis" not in distributions["natal_reference"]
     assert dist_payload["status"] == "underdetermined_ascendant"
     assert dist_payload["ascendant_resolved"] is False
     assert dist_payload["ascendant_absolute_degree"] is None

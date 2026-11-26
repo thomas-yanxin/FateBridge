@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from typing import Any
 
 from fatebridge.core.astro import runtime
@@ -9,7 +10,7 @@ from fatebridge.core.astro.angle_definitions import (
     native_ecliptic_horizon_angle_definition,
 )
 from fatebridge.core.astro.birth import AstroBirthInfo
-from fatebridge.core.astro.ephemeris import _swisseph_angles
+from fatebridge.core.astro.ephemeris import _swisseph_angles, fast_swe_call
 from fatebridge.core.astro.geometry import (
     _angles,
     _ayanamsha,
@@ -17,9 +18,13 @@ from fatebridge.core.astro.geometry import (
 )
 from fatebridge.core.astro.house_axes import canonical_house_geometry
 from fatebridge.core.astro.parts import _build_houses
-from fatebridge.core.astro.relationship_geometry import unique_midpoint
 from fatebridge.core.astro.zodiac import native_lahiri_houses
 from fatebridge.utils.errors import EphemerisSourceError
+
+
+def _unique_midpoint(a: float, b: float) -> float:
+    diff = ((b - a) + 180.0) % 360.0 - 180.0
+    return normalize_angle(a + diff / 2.0)
 
 
 def _house_cusp_values_from_payload(chart_payload: dict[str, Any]) -> list[float]:
@@ -37,7 +42,33 @@ def _midpoint_house_cusps(
     if len(left_cusps) != 12 or len(right_cusps) != 12:
         return []
     return [
-        unique_midpoint(left_cusps[index], right_cusps[index]) for index in range(12)
+        _unique_midpoint(left_cusps[index], right_cusps[index]) for index in range(12)
+    ]
+
+
+def _porphyry_cusps(ascendant: float, midheaven: float) -> list[float]:
+    """Trisect each quadrant between Ascendant, IC, Descendant, MC."""
+    ic = normalize_angle(midheaven + 180.0)
+    dsc = normalize_angle(ascendant + 180.0)
+    mc = normalize_angle(midheaven)
+    asc = normalize_angle(ascendant)
+    q1 = (ic - asc) % 360.0
+    q2 = (dsc - ic) % 360.0
+    q3 = (mc - dsc) % 360.0
+    q4 = (asc - mc) % 360.0
+    return [
+        asc,
+        normalize_angle(asc + q1 / 3.0),
+        normalize_angle(asc + 2.0 * q1 / 3.0),
+        ic,
+        normalize_angle(ic + q2 / 3.0),
+        normalize_angle(ic + 2.0 * q2 / 3.0),
+        dsc,
+        normalize_angle(dsc + q3 / 3.0),
+        normalize_angle(dsc + 2.0 * q3 / 3.0),
+        mc,
+        normalize_angle(mc + q4 / 3.0),
+        normalize_angle(mc + 2.0 * q4 / 3.0),
     ]
 
 
@@ -46,6 +77,7 @@ def _relative_house_layout(
     *,
     house_system_info: dict[str, Any],
     zodiacal_info: dict[str, Any],
+    high_latitude_fallback: str = "error",
 ) -> dict[str, Any]:
     times = birth_info.time_scales
     julian_day = times.ut1
@@ -64,6 +96,20 @@ def _relative_house_layout(
         except EphemerisSourceError:
             raise
         except Exception as error:
+            if high_latitude_fallback in {"porphyry", "whole_sign"}:
+                fallback_code = b"W" if high_latitude_fallback == "whole_sign" else b"O"
+                try:
+                    fallback_layout = native_lahiri_houses(
+                        julian_day_ut1=times.ut1,
+                        julian_day_tt=times.tt,
+                        latitude=birth_info.latitude,
+                        longitude=birth_info.longitude,
+                        house_code=fallback_code,
+                    )
+                    fallback_layout["fallback_house_system"] = high_latitude_fallback
+                    return fallback_layout
+                except Exception:
+                    pass
             runtime._log_swe_runtime_failure("houses_ex(sidereal)", error)
             raise ValueError(
                 f"原生Lahiri {house_system_info['key']}宫头计算失败，不能冒用热带宫头"
@@ -132,6 +178,7 @@ def _relative_house_layout(
             ),
         }
 
+    fallback_used: str | None = None
     try:
         with runtime.preserve_ephemeris_path():
             cusps, ascmc = runtime.ephemeris_call(
@@ -142,6 +189,13 @@ def _relative_house_layout(
                 house_system_info["swisseph_code"],
                 _julian_day_tt=times.tt,
             )
+            if (
+                high_latitude_fallback in {"porphyry", "whole_sign"}
+                and abs(birth_info.latitude) > 66.5
+                and house_system_info["key"]
+                in {"placidus", "koch", "alcabitus", "topocentric", "polich_page"}
+            ):
+                raise RuntimeError("high_latitude_quadrant_degeneracy")
             cusps, ascmc, house_axis_convention = canonical_house_geometry(
                 julian_day_ut1=julian_day,
                 julian_day_tt=times.tt,
@@ -161,10 +215,47 @@ def _relative_house_layout(
     except EphemerisSourceError:
         raise
     except Exception as error:
-        # Quadrant house systems have no honest offline equivalent: degrading to
-        # _build_houses would anchor the cusps on the ascendant while keeping the
-        # requested label, faking an approximation. Fail loud instead — mirrors
-        # the offline-mode raise in _resolve_offline_house_system.
+        if high_latitude_fallback in {"porphyry", "whole_sign"}:
+            native_angles = _swisseph_angles(
+                julian_day,
+                birth_info.longitude,
+                birth_info.latitude,
+                julian_day_tt=times.tt,
+            ) or _angles(
+                julian_day,
+                birth_info.longitude,
+                birth_info.latitude,
+                julian_day_tt=times.tt,
+            )
+            ascendant = float(native_angles["ascendant"])
+            midheaven = float(native_angles["midheaven"])
+            if ayanamsha is not None:
+                ascendant = normalize_angle(ascendant - ayanamsha)
+                midheaven = normalize_angle(midheaven - ayanamsha)
+            if high_latitude_fallback == "porphyry" and abs(birth_info.latitude) < 90.0:
+                house_cusps = _porphyry_cusps(ascendant, midheaven)
+                fallback_used = "porphyry"
+            else:
+                house_cusps = [
+                    item["cusp_longitude"]
+                    for item in _build_houses(
+                        ascendant, "whole_sign", round_coordinates=False
+                    )
+                ]
+                fallback_used = "whole_sign"
+            return {
+                "ascendant": ascendant,
+                "midheaven": midheaven,
+                "house_cusps": house_cusps,
+                "ayanamsha": ayanamsha,
+                "angle_method": "swisseph",
+                "fallback_house_system": fallback_used,
+                **(
+                    {"angle_definition": native_angles["angle_definition"]}
+                    if "angle_definition" in native_angles
+                    else {}
+                ),
+            }
         runtime._log_swe_runtime_failure("houses_ex", error)
         raise ValueError(
             f"当前输入无法计算 {house_system_info['key']} 的原生宫头"

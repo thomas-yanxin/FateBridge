@@ -448,27 +448,49 @@ def build_lunation_phase_payload(
         }
     )
     samples: dict[float, Fraction] = {}
+    from fatebridge.core.astro import runtime as _astro_rt
+    from fatebridge.core.astro.ephemeris import fast_swe_call as _fast_swe
+    from fatebridge.core.ephemeris_runtime import ephemeris_call as _orig_ephem_call
+    from fatebridge.core.jpl_ephemeris import configured_jpl_file as _jpl_file
+
+    use_fast_lunation = (
+        _astro_rt.ephemeris_call is _orig_ephem_call
+        and _jpl_file() is None
+        and _astro_rt.swe is not None
+    )
 
     def phase_at(jd_tt: float) -> Fraction:
         if jd_tt in samples:
             return samples[jd_tt]
         longitudes: list[Fraction] = []
         speeds: list[float] = []
-        for name in ("Sun", "Moon"):
-            result = _swisseph_planet_state(
-                name,
-                julian_day_tt=jd_tt,
-                source_trace=trace,
-                correct_motion=False,
-            )
-            if result is None:
-                raise ValueError("Progressed lunation ephemeris source unavailable")
-            state, _model = result
-            longitudes.append(Fraction(state["longitude"]))
-            speeds.append(state["longitude_speed"])
-        # observe() records facts; the cohort separately enforces the complete
-        # pair's unchanged model/edition across every sampled source epoch.
-        cohort.add(trace.snapshot())
+        if use_fast_lunation and jd_tt != natal_subject.tt.as_float():
+            for body_id in (_astro_rt.swe.SUN, _astro_rt.swe.MOON):
+                coords, flag = _fast_swe(
+                    "calc",
+                    jd_tt,
+                    body_id,
+                    _astro_rt.swe.FLG_SWIEPH | _astro_rt.swe.FLG_SPEED,
+                )
+                if flag < 0:
+                    raise ValueError("Progressed lunation ephemeris source unavailable")
+                longitudes.append(Fraction(float(coords[0]) % 360.0))
+                speeds.append(float(coords[3]))
+        else:
+            for name in ("Sun", "Moon"):
+                result = _swisseph_planet_state(
+                    name,
+                    julian_day_tt=jd_tt,
+                    source_trace=trace,
+                    correct_motion=False,
+                    include_declination=False,
+                )
+                if result is None:
+                    raise ValueError("Progressed lunation ephemeris source unavailable")
+                state, _model = result
+                longitudes.append(Fraction(state["longitude"]))
+                speeds.append(state["longitude_speed"])
+            cohort.add(trace.snapshot())
         if speeds[1] <= speeds[0]:
             raise ValueError("Progressed lunation requires increasing Moon–Sun motion")
         elongation = (longitudes[1] - longitudes[0]) % 360

@@ -164,7 +164,6 @@ def dwelling_clause(
         "event_history_window_tt": history.get("window_tt"),
         "event_history_completeness_scope": history.get("completeness_scope"),
         "scope": "Question-epoch literal occupancy and last/next seven-planet longitude contacts in declared finite history; no missing contact inferred, no complete source translation, reception-epoch, obstruction or reality acceptance",
-        "conditional_reading_zh": reading,
         "full_judgement_accepted": False,
         "full_original_text_acceptance": False,
     }

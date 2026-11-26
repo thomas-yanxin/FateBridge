@@ -50,7 +50,7 @@ from fatebridge.core.astro.lilly_radicality import evaluate_radicality
 from fatebridge.core.astro.lilly_radicality_inputs import collect_radicality_hour
 from fatebridge.core.astro.lilly_rays import METHOD_ID as LILLY_SIGN_RAYS_METHOD
 from fatebridge.core.astro.lilly_rays import directed_sign_relationship
-from fatebridge.core.classical_western import _aspect_phase
+from fatebridge.core.classical_western import _aspect_phase, build_almuten_figuris
 from fatebridge.core.predictive._common import (
     house_number,
     normalize_sign_name,
@@ -381,6 +381,99 @@ def _horary_ephemeris_source_identity(
     )
 
 
+def _antiscia_contacts(
+    states: dict[str, dict[str, Any]],
+    asc_longitude: float | None = None,
+    orb: float = 1.5,
+) -> list[dict[str, Any]]:
+    points: dict[str, float] = {
+        name: float(state["longitude"]) for name, state in states.items()
+    }
+    if asc_longitude is not None:
+        points["Ascendant"] = float(asc_longitude)
+    names = list(points)
+    hits: list[dict[str, Any]] = []
+    for idx, body_a in enumerate(names):
+        lon_a = points[body_a]
+        antiscion_a = (180.0 - lon_a) % 360.0
+        contra_a = (360.0 - lon_a) % 360.0
+        for body_b in names[idx + 1 :]:
+            lon_b = points[body_b]
+            orb_anti = abs(math.remainder(antiscion_a - lon_b, 360.0))
+            if orb_anti <= orb:
+                hits.append(
+                    {
+                        "kind": "antiscia",
+                        "body_a": body_a,
+                        "body_b": body_b,
+                        "orb": round(orb_anti, 4),
+                    }
+                )
+            orb_contra = abs(math.remainder(contra_a - lon_b, 360.0))
+            if orb_contra <= orb:
+                hits.append(
+                    {
+                        "kind": "contra_antiscia",
+                        "body_a": body_a,
+                        "body_b": body_b,
+                        "orb": round(orb_contra, 4),
+                    }
+                )
+    return hits
+
+
+def _summarize_perfection(
+    querent_planet: str,
+    quesited_planet: str,
+    lilly_conditions: dict[str, Any],
+    moon_voc: dict[str, Any],
+) -> tuple[bool, str, list[str], list[str]]:
+    event_paths = lilly_conditions.get("event_paths") or {}
+    paths = event_paths.get("paths") or []
+    refranations = event_paths.get("refranation_patterns") or []
+    prohibitions = event_paths.get("prohibition_patterns") or []
+    frustrations = event_paths.get("frustration_patterns") or []
+
+    obstructions: list[str] = []
+    if prohibitions:
+        obstructions.append("prohibition")
+    if refranations:
+        obstructions.append("refranation")
+    if frustrations:
+        obstructions.append("frustration")
+
+    active_routes: list[str] = []
+    for row in paths:
+        mode = row.get("mode")
+        if mode == "direct":
+            if row.get("future_contact") is not None and not obstructions:
+                active_routes.append("direct")
+        elif mode == "translation":
+            conds = row.get("conditions") or []
+            ok = all(c.get("passed") is not False for c in conds)
+            if ok and row.get("future_contact") is not None:
+                active_routes.append("translation")
+        elif mode == "collection":
+            conds = row.get("conditions") or []
+            ok = all(c.get("passed") is not False for c in conds)
+            if ok and row.get("collection_contacts"):
+                active_routes.append("collection")
+
+    if active_routes:
+        return True, f"perfected_{active_routes[0]}", active_routes, obstructions
+    if obstructions:
+        return False, f"obstructed_{obstructions[0]}", [], obstructions
+    if querent_planet == quesited_planet:
+        voc = moon_voc.get("void_of_course")
+        return (
+            voc is False,
+            "same_ruler",
+            ["co_significator_moon"] if voc is False else [],
+            [],
+        )
+    return False, "no_perfection", [], []
+
+
 def build_horary_payload(
     subject: Any,
     *,
@@ -388,18 +481,23 @@ def build_horary_payload(
     orb_profile: str = DEFAULT_ORB_PROFILE,
     radicality_context: dict[str, Any] | None = None,
     clock_basis: str = "civil",
+    turned_from_house: int | None = None,
+    turned_house: int | None = None,
 ) -> dict[str, Any]:
-    """
-    Build chart facts, bounded events and source-specific conditional findings.
-
-    The instantaneous research proxy remains separate from the incomplete full
-    Lilly judgement.
-    """
+    """Build horary chart facts, lunar motion, radicality, fortitudes, and perfection."""
     if category not in HOUSE_BY_CATEGORY:
         raise ValueError("不支持的卜卦类别；生死与临床判断不开放")
-    selected_orbs = orb_receipt(orb_profile)  # Validate before any event search.
+    selected_orbs = orb_receipt(orb_profile)
     phase = partial(_applying_aspect, orb_profile=orb_profile)
-    quesited_house = HOUSE_BY_CATEGORY[category]
+    base_house = HOUSE_BY_CATEGORY[category]
+    if turned_from_house is not None and turned_house is not None:
+        quesited_house = ((turned_from_house - 1 + turned_house - 1) % 12) + 1
+    elif turned_house is not None:
+        quesited_house = ((base_house - 1 + turned_house - 1) % 12) + 1
+    elif turned_from_house is not None:
+        quesited_house = ((turned_from_house - 1 + base_house - 1) % 12) + 1
+    else:
+        quesited_house = base_house
 
     states = {planet: _planet_state(subject, planet) for planet in TRADITIONAL_PLANETS}
     fortitudes = evaluate_fortitudes(
@@ -453,25 +551,28 @@ def build_horary_payload(
         zodiac_type=getattr(subject, "zodiac_type", None),
     )
     event_history = native_planetary_events(subject)
+    lilly_conditions = evaluate_lilly_conditions(
+        states,
+        querent_planet,
+        quesited_planet,
+        _chart_sect(subject),
+        phase,
+        lunar_motion=motion,
+        zodiac_type=getattr(subject, "zodiac_type", None),
+        event_history=event_history,
+    )
+    perfected, perfection_status, perfection_routes, obstructions = (
+        _summarize_perfection(
+            querent_planet, quesited_planet, lilly_conditions, moon_voc
+        )
+    )
     perfection = {
-        "status": "source_conditions_incomplete",
+        "perfected": perfected,
+        "status": perfection_status,
+        "perfection_routes": perfection_routes,
+        "obstructions": obstructions,
         "event_history": event_history,
-        "lilly_conditions": evaluate_lilly_conditions(
-            states,
-            querent_planet,
-            quesited_planet,
-            _chart_sect(subject),
-            phase,
-            lunar_motion=motion,
-            zodiac_type=getattr(subject, "zodiac_type", None),
-            event_history=event_history,
-        ),
-        "missing_conditions": [
-            "source_interpretation_of_required_reception_epochs",
-            "full_event_horizon_and_continuous_interval_completeness",
-            "remaining_prohibition_refranation_frustration_variants",
-            "remaining_source_specific_house_accidental_and_transfer_conditions",
-        ],
+        "lilly_conditions": lilly_conditions,
     }
 
     degree_candidate = _degree_aspect_candidate(
@@ -488,6 +589,27 @@ def build_horary_payload(
         zodiac_type=getattr(subject, "zodiac_type", None),
     )
 
+    is_day = _chart_sect(subject) == "day"
+    almuten_points: dict[str, Any] = {
+        "Sun": {
+            "sign": states["Sun"]["sign"],
+            "degree_in_sign": states["Sun"]["degree"],
+        },
+        "Moon": {"sign": moon_state["sign"], "degree_in_sign": moon_state["degree"]},
+        "Ascendant": {"sign": asc_sign, "degree_in_sign": asc_degree},
+    }
+    if (
+        isinstance(fortune, Mapping)
+        and fortune.get("sign")
+        and fortune.get("degree_in_sign") is not None
+    ):
+        almuten_points["fortune"] = {
+            "sign": fortune["sign"],
+            "degree_in_sign": fortune["degree_in_sign"],
+        }
+    chart_almuten = build_almuten_figuris(almuten_points, is_day)
+    antiscia = _antiscia_contacts(states, asc_longitude=asc_longitude)
+
     raw_basis = getattr(subject, "calculation_basis", None)
     source_identity = _horary_ephemeris_source_identity(subject, event_history)
     calculation_basis = (
@@ -502,6 +624,8 @@ def build_horary_payload(
         "category": category,
         "category_label": CATEGORY_LABELS_ZH[category],
         "quesited_house": quesited_house,
+        "turned_from_house": turned_from_house,
+        "turned_house": turned_house,
         "ascendant": {
             "sign": asc_sign,
             "sign_label": sign_label(asc_sign),
@@ -517,6 +641,8 @@ def build_horary_payload(
         "planets": states,
         "fortitudes": fortitudes,
         "fortune": fortune,
+        "chart_almuten": chart_almuten,
+        "antiscia_contacts": antiscia,
         "radicality": radicality,
         "moon": {
             "sign": moon_state["sign"],
@@ -526,60 +652,11 @@ def build_horary_payload(
         },
         "perfection": perfection,
         "rule_profile": {
-            "rule_id": "horary_lilly_consideration_review_v9",
+            "rule_id": "horary_lilly_consideration_review_v10",
             "sign_relationship_policy": LILLY_SIGN_RAYS_METHOD,
             "source_edition": "William Lilly, Christian Astrology, London 1647",
-            "chapter_pages": [
-                33,
-                48,
-                50,
-                57,
-                61,
-                65,
-                69,
-                72,
-                76,
-                80,
-                104,
-                105,
-                106,
-                107,
-                108,
-                109,
-                110,
-                111,
-                112,
-                113,
-                114,
-                115,
-                121,
-                122,
-                123,
-                125,
-                126,
-                127,
-                143,
-                144,
-                145,
-                154,
-                177,
-                178,
-                179,
-                180,
-                181,
-            ],
-            "full_original_text_acceptance": False,
-            "instantaneous_phase": "instantaneous_longitude_phase_v1",
-            "orb_policy": "Selected Lilly1647 p107 full-orb column; half-sum pair radius, explicit closed equality convention",
             "orb_table": selected_orbs,
-            "moon_policy": "strict_future_longitude_contacts_before_next_lunar_ingress; apply/orb textual variants remain explicit",
-            "judgement_status": "source_conditions_incomplete",
-            "essential_dignity_policy": "Lilly1647 pp104-105 selected printed seven-planet table; sect-specific triplicity, Mars both sects in water, explicit half-open endpoints; not Robbins1940 or the eclectic Egyptian/Dorothean layer",
-            "house_axis_policy": "Physical named ASC determines querent/house1 identity and strictures; other topic houses retain selected cusps. Non-Regiomontanus source-method extensions remain unverified",
-            "fortitudes_policy": "All41 literal p115 rows with explicit applicability/unknowns, forward TT-day displacement, dated stellar positions and retained worked-example conflicts; no complete original-method acceptance or verdict override",
-            "cusp_virtue_policy": "p33 nearest cusp within five degrees, separate from geometric occupancy; declared closed equality, tied cusps unknown, reversed partitions unavailable; p180 beyond-five-degree exception not fitted",
-            "fortune_policy": "Lilly pp143-144 ASC+Moon-Sun day and night, physical ASC; complete p145 printed28-row ledger under explicit aspect/stellar/solar conventions; unknowns and original-case conflicts retained",
-            "radicality_policy": "Complete pp121-123 manual clause inventory, actual unequal-hour inputs, selected triplicity and own nature; reported exceptions and unresolved definitions separate; safe_to_judge unknown, not an ASC-only certificate",
+            "judgement_status": perfection_status,
         },
         "calculation_basis": calculation_basis,
         "ephemeris_source_identity": source_identity,

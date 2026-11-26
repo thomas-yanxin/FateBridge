@@ -150,6 +150,8 @@ def build_relative_payload(
     zodiacal: int = 0,
     relationship_focus: str | None = None,
     davison_variant: str = "uncorrected",
+    composite_house_method: str = "midpoint",
+    high_latitude_fallback: str = "error",
 ) -> dict[str, Any]:
     """Calculate both natal charts and the selected relationship layer."""
     require_resolved_birth_timezone(inner_birth.timezone_source)
@@ -161,11 +163,13 @@ def build_relative_payload(
         inner_birth,
         house_system_info=relative_house_system,
         zodiacal_info=zodiacal_info,
+        high_latitude_fallback=high_latitude_fallback,
     )
     outer_chart = _build_relative_base_chart(
         outer_birth,
         house_system_info=relative_house_system,
         zodiacal_info=zodiacal_info,
+        high_latitude_fallback=high_latitude_fallback,
     )
     inner_to_outer_aspects = _build_directional_relative_aspects(
         inner_chart["planets"], outer_chart["planets"]
@@ -195,6 +199,8 @@ def build_relative_payload(
             outer_chart,
             house_system=relative_house_system["key"],
             zodiacal_info=zodiacal_info,
+            composite_house_method=composite_house_method,
+            midpoint_latitude=(inner_birth.latitude + outer_birth.latitude) / 2.0,
         )
     elif normalized_mode == "timespace":
         primary_chart = _build_timespace_chart(
@@ -336,7 +342,7 @@ def build_relative_payload(
     relationship_profile["focus"] = relationship_focus_block(
         relationship_focus, synastry_aspects
     )
-    return {
+    payload = {
         "relationship_profile": relationship_profile,
         "inner_chart": inner_chart,
         "outer_chart": outer_chart,
@@ -356,3 +362,11 @@ def build_relative_payload(
         "outer": outer_influence,
         "summary": summary,
     }
+    if normalized_mode == "composite" and primary_chart.get("planets"):
+        payload["composite_to_inner_aspects"] = _build_directional_relative_aspects(
+            primary_chart["planets"], inner_chart["planets"]
+        )
+        payload["composite_to_outer_aspects"] = _build_directional_relative_aspects(
+            primary_chart["planets"], outer_chart["planets"]
+        )
+    return payload

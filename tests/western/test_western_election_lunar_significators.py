@@ -82,7 +82,7 @@ def test_original_natural_and_lunar_roles_follow_the_two_adjacent_contacts(
         is second["contact_order_established"]
         is True
     )
-    assert not receipt["full_original_text_acceptance"]
+    assert "full_original_text_acceptance" not in receipt
 
 
 def test_uncertain_history_preserves_other_facts(

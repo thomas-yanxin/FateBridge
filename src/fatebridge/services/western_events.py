@@ -182,6 +182,7 @@ def calculate_extrareturns(
                     future=1,
                     sidereal=sidereal,
                     natal_motion=natal_motion,
+                    not_before_utc=birth_info.utc_calendar,
                 )
             except chiron_errors as body_err:
                 if body_name == "Chiron":

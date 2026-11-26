@@ -110,6 +110,7 @@ PLANET_LABELS = {
     "South Node": "南交点",
     "Fortune": "幸运点",
     "Spirit": "精神点",
+    "Eros": "爱神点",
 }
 
 HOUSE_NAME_TO_NUMBER = {
@@ -152,10 +153,12 @@ SWISSEPH_PLANET_IDS = {
 LOT_LABELS = {
     "lot_of_fortune": "幸运点",
     "lot_of_spirit": "精神点",
+    "lot_of_eros": "爱神点",
 }
 LOT_POINT_NAMES = {
     "lot_of_fortune": "Fortune",
     "lot_of_spirit": "Spirit",
+    "lot_of_eros": "Eros",
 }
 LOT_KEY_BY_POINT_NAME = {value: key for key, value in LOT_POINT_NAMES.items()}
 ZR_PHASE_LABELS = {
@@ -461,13 +464,21 @@ def build_lot_longitudes(natal_subject: NativeSubject) -> dict[str, Fraction]:
         return {}
     sun = point_absolute_position(natal_subject, "Sun")
     moon = point_absolute_position(natal_subject, "Moon")
+    venus = point_absolute_position(natal_subject, "Venus")
     asc = point_absolute_position(natal_subject, "Ascendant")
-    added, subtracted = (
-        (moon, sun) if determine_sect(natal_subject) == "day" else (sun, moon)
+    is_day = determine_sect(natal_subject) == "day"
+    added, subtracted = (moon, sun) if is_day else (sun, moon)
+    fortune = combine_longitudes_exact(asc, added, -subtracted)
+    spirit = combine_longitudes_exact(asc, subtracted, -added)
+    eros = (
+        combine_longitudes_exact(asc, venus, -spirit)
+        if is_day
+        else combine_longitudes_exact(asc, spirit, -venus)
     )
     return {
-        "lot_of_fortune": combine_longitudes_exact(asc, added, -subtracted),
-        "lot_of_spirit": combine_longitudes_exact(asc, subtracted, -added),
+        "lot_of_fortune": fortune,
+        "lot_of_spirit": spirit,
+        "lot_of_eros": eros,
     }
 
 
@@ -491,6 +502,7 @@ def build_subject(
     house_system: str = "P",
     zodiac_type: str = "Tropic",
     physical_epoch: PhysicalEpoch | None = None,
+    high_latitude_fallback: str = "error",
 ) -> NativeSubject:
     ensure_predictive_backend_available()
 
@@ -503,6 +515,7 @@ def build_subject(
         house_system=house_system,
         zodiac_type=zodiac_type,
         physical_epoch=physical_epoch,
+        high_latitude_fallback=high_latitude_fallback,
     )
 
 
@@ -511,6 +524,7 @@ def build_natal_subject(
     *,
     house_system: str = "P",
     zodiac_type: str = "Tropic",
+    high_latitude_fallback: str = "error",
 ) -> NativeSubject:
     require_resolved_birth_timezone(birth_info.timezone_source)
     return build_subject(
@@ -524,6 +538,7 @@ def build_natal_subject(
         house_system=house_system,
         zodiac_type=zodiac_type,
         physical_epoch=birth_info.native_epoch,
+        high_latitude_fallback=high_latitude_fallback,
     )
 
 

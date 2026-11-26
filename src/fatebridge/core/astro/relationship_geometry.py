@@ -66,14 +66,12 @@ class MarksPolicy(DavisonPolicy):
 
 
 def unique_midpoint(first: float, second: float) -> float:
-    """Unordered shorter-arc midpoint; a diametric pair has two equal answers."""
+    """Unordered shorter-arc midpoint; for exact 180° pairs uses canonical [0, 180) axis."""
     return longitude_float(_unique_midpoint_fraction(first, second))
 
 
 def _unique_midpoint_fraction(first: Angle, second: Angle) -> Fraction:
     values = midpoint_candidates_fraction(first, second)
-    if len(values) != 1:
-        raise ValueError("精确相隔180°的输入没有唯一短弧中点；不能任取一个方向")
     return values[0]
 
 

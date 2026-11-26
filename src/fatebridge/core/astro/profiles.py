@@ -13,7 +13,13 @@ from fatebridge.core.astro.reference import (
     RELATIVE_HOUSE_SYSTEM_SPECS,
     RELATIVE_ZODIACAL_LABELS_ZH,
 )
-from fatebridge.utils.house_systems import InvalidHouseSystemError, house_system_fields
+from fatebridge.utils.house_systems import (
+    InvalidHouseCodeError,
+    InvalidHouseSystemError,
+    UnsupportedGauquelinError,
+    house_system_fields,
+    resolve_offline_house_code,
+)
 
 ANALYTICAL_MEAN_NODE_MODEL = "swisseph_analytical_mean_node"
 
@@ -87,24 +93,12 @@ def _precision_label_zh(engine_precision: str) -> str:
 
 
 def _coerce_house_system_code(hsys: object) -> int | None:
-    """Translate a user-facing house-system identifier into the internal 0-8 code.
-
-    Accepts:
-    - int/str numeric values in 0..8
-    - Swiss Ephemeris single-letter codes (case-insensitive): P, K, W, R, B,
-      V, T, S, D. These match the swisseph_code bytes on each spec entry
-      and align astro/chart hsys with the house_system strings the
-      astro/timing endpoints already accept.
-    - Key strings like "placidus"/"whole_sign"/"koch" (case-insensitive),
-      matching the internal key attribute.
-
-    Returns the canonical integer code, or None if the input cannot be
-    resolved (caller raises a descriptive error)."""
+    """Translate a user-facing house-system identifier into the internal 0-9 code."""
     if hsys is None:
         return None
     try:
-        return house_system_fields(hsys)["house_system_code"]
-    except InvalidHouseSystemError:
+        return resolve_offline_house_code(hsys)
+    except (InvalidHouseSystemError, InvalidHouseCodeError, UnsupportedGauquelinError):
         return None
 
 
@@ -112,13 +106,14 @@ def _resolve_offline_house_system(hsys: Any, *, context_label: str) -> dict[str,
     resolved = _coerce_house_system_code(hsys)
     if resolved is None or resolved not in RELATIVE_HOUSE_SYSTEM_SPECS:
         raise ValueError(
-            f"{context_label}离线模式暂仅支持 hsys=0..8（整宫制、Alcabitus、Regiomontanus、Placidus、Koch、Vehlow Equal、Polich Page、Sripati、天顶为第10宫宫头的等宫制）。"
+            f"{context_label}离线模式支持 hsys=0..8 或 'E'/'equal'（整宫制、Alcabitus、Regiomontanus、Placidus、Koch、Vehlow Equal、Polich Page、Sripati、Equal MC、Equal）。"
         )
-    if runtime.swe is None and resolved != 0:
+    if runtime.swe is None and resolved not in {0, 9}:
         raise ValueError(
-            f"当前环境缺少 swisseph，{context_label}离线模式仅能在 hsys=0(整宫制) 下运行。"
+            f"当前环境缺少 swisseph，{context_label}离线模式仅能在 hsys=0(整宫制) 或 'E'(等宫制) 下运行。"
         )
-    return {"value": resolved, **RELATIVE_HOUSE_SYSTEM_SPECS[resolved]}
+    spec = RELATIVE_HOUSE_SYSTEM_SPECS[resolved]
+    return {"value": spec.get("public_code", resolved), **spec}
 
 
 def _resolve_relative_house_system(hsys: Any) -> dict[str, Any]:

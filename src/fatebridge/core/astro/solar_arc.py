@@ -590,60 +590,6 @@ def enrich_solar_arc(
             analysis_tt=analysis_scales.tt,
         ),
         "original_table_1925": source_table_analysis(),
-        "sources": [
-            *SOURCES,
-            profile["key_source_comparison"]["source"],
-            *[
-                s
-                for s in layer["sources"]
-                if s["id"] in ("udo_rudolph_1996_abc_excerpt", "rudolph_1979_17laws")
-            ],
-        ],
-        "rule_trace": [
-            {
-                "rule_id": "witte1923_constant_source_arithmetic_v1",
-                "source_id": "witte1923_progressive_constant",
-                "source_sections": ["pp.183-184"],
-                "formula": "Audit each printed h/m/s sum or difference in integer time seconds; retain mismatched printed totals",
-                "scope": "Historical source comparison only, not the current chart's selected year key or a birth-clock correction",
-            },
-            {
-                "rule_id": "hamburg.solar_arc.true_solar_arc.v1",
-                "source_id": "bonert_2007_true_solar_arc",
-                "source_sections": ["Der wahre Sonnenbogen"],
-                "formula": "arc = tropical Sun(TT_birth + elapsed_UTC_days / 365.25) - tropical Sun(TT_birth), modulo360",
-                "scope": "True Sun displacement; the fixed Julian year key and 150-key-year calculation range are FateBridge choices",
-            },
-            {
-                "rule_id": "hamburg.solar_arc.biwheel_geometry.v1",
-                "source_id": "rudolph_1979_17laws",
-                "source_sections": ["3", "13", "14", "15", "16"],
-                "formula": "Apply the natal/directed factor labels before comparing point and midpoint axes modulo90/45",
-                "scope": "Point-point, directed-point/natal-axis, natal-point/directed-axis and directed-axis/natal-axis only; no interleaved four-factor catalogue",
-            },
-            {
-                "rule_id": "hamburg.solar_arc.rotation.v1",
-                "source_id": "witte_al319_static_biwheel",
-                "source_sections": ["p.7"],
-                "formula": "directed longitude = natal longitude + same solar arc, modulo360",
-                "scope": "22 published static pairs checked by their rounding intervals; no date-to-arc or event validation inferred",
-            },
-            {
-                "rule_id": "hamburg.udo1996.directed_mc.v1",
-                "source_id": "udo_rudolph_1996_abc_excerpt",
-                "source_sections": ["printed p.14"],
-                "formula": "Mars.natal+Jupiter.natal-Zeus.natal = Midheaven.solar_arc, direct full-circle orb<=2degrees",
-                "scope": "The source explicitly also discusses occupied sensitive points with directed MC; one attributed symbolic theme only",
-            },
-        ],
-        "limitations": [
-            "Symbolic true-solar-arc biwheel, not observed future positions, event forecasts or validated efficacy",
-            "365.25-day Julian key is explicit; other year keys and birthday interpolation are not claimed equivalent",
-            "Only the named 1924 ecliptic day-meridian equation is in daily_meridian; mixed_pair_geometry adds a declared four-distinct-name uniform-arc reconstruction, not the complete Witte progression system or transits",
-            "Only the published Udo p.14 directed-MC symbolic pattern is interpreted; the full rulebook is not accepted",
-            "Contact counts and sample counts are not probabilities; different dials are not independent evidence",
-        ],
-        "original_text_conformance": "not_assessed",
     }
     mixed = layer["solar_arc_analysis"]["mixed_pair_geometry"]
     mixed["birth_time_sensitivity"] = mixed_pair_sensitivity(
@@ -685,11 +631,4 @@ def enrich_solar_arc(
             },
             layer["profile"]["angle_definition"],
         )
-    layer["limitations"] = [
-        (
-            "Selected 1923 natal Meridian cusps are in meridian_houses; optional true solar arc and the named 1924 day-meridian subset are in solar_arc_analysis. No complete Witte progression system, actual transit catalogue or validated event forecasts"
-            if item.startswith("The selected 1923 natal meridian-house geometry")
-            else item
-        )
-        for item in layer["limitations"]
-    ]
+    layer["solar_arc_analysis"] = layer["solar_arc_analysis"]

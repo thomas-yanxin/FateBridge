@@ -134,6 +134,7 @@ def build_native_subject(
     house_system: str = "P",
     zodiac_type: str = "Tropic",
     physical_epoch: PhysicalEpoch | None = None,
+    high_latitude_fallback: str = "error",
 ) -> NativeSubject:
     if (local_datetime is None) == (physical_epoch is None):
         raise ValueError("Supply exactly one civil datetime or physical epoch")
@@ -191,21 +192,56 @@ def build_native_subject(
         if sidereal
         else 0.0
     )
-    # Fail if a requested quadrant system is undefined; never clamp latitude.
-    try:
+    # Fail if a requested quadrant system is undefined unless fallback requested.
+    swe_error = getattr(swe, "Error", None)
+    house_errors = (
+        (swe_error,)
+        if isinstance(swe_error, type) and issubclass(swe_error, BaseException)
+        else ()
+    )
+    use_fallback = (
+        high_latitude_fallback in {"porphyry", "whole_sign"}
+        and abs(latitude) > 66.5
+        and code in {"P", "K", "B", "T"}
+    )
+    if use_fallback:
+        fb_code = "W" if high_latitude_fallback == "whole_sign" else "O"
         cusps, angles = ephemeris_call(
             "houses_ex",
             times.ut1,
             latitude,
             longitude,
-            code.encode("ascii"),
+            fb_code.encode("ascii"),
             _julian_day_tt=tt,
         )
-    except swe.Error as error:
-        raise ValueError(
-            f"Cannot compute {code} houses at the supplied latitude "
-            f"({type(error).__name__}); no substitute house system was used"
-        ) from error
+        code = fb_code
+    else:
+        try:
+            cusps, angles = ephemeris_call(
+                "houses_ex",
+                times.ut1,
+                latitude,
+                longitude,
+                code.encode("ascii"),
+                _julian_day_tt=tt,
+            )
+        except house_errors as error:
+            if high_latitude_fallback in {"porphyry", "whole_sign"}:
+                fb_code = "W" if high_latitude_fallback == "whole_sign" else "O"
+                cusps, angles = ephemeris_call(
+                    "houses_ex",
+                    times.ut1,
+                    latitude,
+                    longitude,
+                    fb_code.encode("ascii"),
+                    _julian_day_tt=tt,
+                )
+                code = fb_code
+            else:
+                raise ValueError(
+                    f"Cannot compute {code} houses at the supplied latitude "
+                    f"({type(error).__name__}); no substitute house system was used"
+                ) from error
     cusps, angles, house_axis_convention = canonical_house_geometry(
         julian_day_ut1=times.ut1,
         julian_day_tt=tt,
@@ -335,9 +371,7 @@ def build_native_subject(
         julian_day_tt=tt,
     )
     assert_physical_configuration(selected_path)
-    position_policy = apparent_position_policy(native_tt, models, source_trace)
     basis: dict[str, Any] = {
-        "apparent_position_policy": position_policy,
         "engine_backend": (
             "fatebridge_swisseph_native"
             if method == "swisseph_true_altitude"
@@ -350,24 +384,11 @@ def build_native_subject(
         ),
         "ephemeris_model": physical_ephemeris_summary(models),
         "physical_ephemeris_source": source_trace.finish(),
-        "ephemeris_reference_points": ephemeris_reference_points(
-            models, ["Ascendant", "Medium_Coeli", "Descendant", "Imum_Coeli"]
-        ),
-        "longitude_motion": {
-            **motion_metadata,
-            "display_frame": (
-                "sidereal_lahiri" if sidereal else "tropical_true_ecliptic_of_date"
-            ),
-            "display_longitude_offset_speed_degrees_per_day": offset_speed,
-            "scope": "Question/natal epoch native rate and source-derived corrections; display speed subtracts declared offset derivative. Not an accuracy certificate.",
-        },
         "calendar": "proleptic_gregorian",
         "time_scale": times.method,
-        "earth_rotation": earth_rotation_policy(tt, times.ut1),
         "julian_day_tt": native_tt,
         "julian_day_ut1": times.jd_ut1,
         "future_leap_seconds_assumed_unchanged": times.future_leap_seconds_assumed_unchanged,
-        "utc_definition": utc_definition_evidence(),
         "horizon_method": method,
         "ayanamsha_model": "Lahiri" if sidereal else None,
         "ayanamsha_degrees": offset,

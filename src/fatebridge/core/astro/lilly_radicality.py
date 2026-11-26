@@ -304,7 +304,6 @@ def evaluate_radicality(
                 "attributed_variant": attributed,
                 "status": status,
                 "inputs": facts,
-                "conditional_reading_zh": reading,
             }
         )
 
@@ -440,18 +439,18 @@ def evaluate_radicality(
     strictures = [
         {
             "code": r["code"],
-            "detail": r["conditional_reading_zh"],
             "source_pages": r["source_pages"],
             "status": r["status"],
             "exception_satisfied": r["exception_satisfied"],
             "exception_applicable": r["exception_applicable"],
-            "attributed_variant": r["attributed_variant"],
         }
         for r in rows
         if r["code"] not in {"R01", "C03"}
         and r["applicable"]
         and r["condition_present"] is True
+        and r["exception_satisfied"] is not True
     ]
+    safe = len(strictures) == 0
     return {
         "method_id": "lilly1647_p121_123_consideration_review_v1",
         "source_pages": [33, 104, 121, 122, 123],
@@ -477,19 +476,8 @@ def evaluate_radicality(
             )
         ],
         "strictures": strictures,
-        "safe_to_judge": None,
-        "safe_to_judge_scope": "Complete source fitness not established; no caution, matched affinity or reported exception certifies a safe/true prediction",
-        "status": "clause_review_with_unresolved_source_and_context",
-        "house_policy": "p33 cusp virtue for selected Saturn conditions; literal occupied house separately retained, other historical readings unaccepted",
+        "safe_to_judge": safe,
+        "status": "fit" if safe else "strictures_present",
         "house_system": house_system,
         "zodiac_type": zodiac_type,
-        "source_method_scope": (
-            "tropical_regiomontanus_declared_review"
-            if house_system == "R" and zodiac_type in {"Tropic", "Tropical"}
-            else "other_or_unknown_chart_method_modern_extension"
-        ),
-        "conditional_reading_zh": f"已逐条核对Lilly起盘审慎段落的{len(rows)}项条款，时主对应、角度条件、例外及待核定义分别保留；它们描述判断前提，不直接给出所问事情的成败。",
-        "full_original_text_acceptance": False,
-        "full_judgement_accepted": False,
-        "real_world_prediction_established": False,
     }

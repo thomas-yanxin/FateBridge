@@ -125,6 +125,36 @@ PLANET_SWISSEPH_IDS = (
     else {}
 )
 
+EXTRA_BODY_SWISSEPH_IDS = (
+    {
+        "Chiron": getattr(runtime.swe, "CHIRON", 15),
+        "Lilith": getattr(runtime.swe, "MEAN_APOG", 12),
+        "Ceres": getattr(runtime.swe, "CERES", 17),
+        "Pallas": getattr(runtime.swe, "PALLAS", 18),
+        "Juno": getattr(runtime.swe, "JUNO", 19),
+        "Vesta": getattr(runtime.swe, "VESTA", 20),
+        "True Node": runtime.swe.TRUE_NODE,
+    }
+    if runtime.swe is not None
+    else {}
+)
+
+STATION_SPEED_THRESHOLDS: dict[str, float] = {
+    "Mercury": 0.1,
+    "Venus": 0.1,
+    "Mars": 0.05,
+    "Jupiter": 0.02,
+    "Saturn": 0.015,
+    "Uranus": 0.008,
+    "Neptune": 0.005,
+    "Pluto": 0.004,
+    "Chiron": 0.005,
+    "Ceres": 0.02,
+    "Pallas": 0.02,
+    "Juno": 0.02,
+    "Vesta": 0.02,
+}
+
 
 TRADITIONAL_PLANETS = list(PHYSICAL_BODIES[:7])
 
@@ -140,6 +170,14 @@ ASPECTS = [
     ("square", 90.0),
     ("trine", 120.0),
     ("opposition", 180.0),
+]
+
+MINOR_ASPECTS = [
+    ("semisextile", 30.0),
+    ("semisquare", 45.0),
+    ("quintile", 72.0),
+    ("sesquiquadrate", 135.0),
+    ("quincunx", 150.0),
 ]
 
 
@@ -203,6 +241,12 @@ RELATIVE_HOUSE_SYSTEM_SPECS: dict[int, dict[str, Any]] = {
         "key": "equal_mc",
         "label_zh": "天顶为第10宫宫头的等宫制",
         "swisseph_code": b"D",
+    },
+    9: {
+        "key": "equal",
+        "label_zh": "等宫制（上升起点）",
+        "swisseph_code": b"E",
+        "public_code": None,
     },
 }
 

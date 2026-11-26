@@ -12,6 +12,7 @@ import math
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.earth_attitude import analytic_earth_attitude
+from fatebridge.core.astro.ephemeris import fast_swe_call
 from fatebridge.core.astro.native_coordinates import require_altitude
 from fatebridge.core.astro.time_scales import fallback_julian_day_tt
 from fatebridge.core.astro.tt_epoch import TTInstant
@@ -49,7 +50,7 @@ def horizon_altitude(
         raise EphemerisSourceError("coordinate_values_unavailable")
     if runtime.swe is not None:
         try:
-            result = runtime.ephemeris_call(
+            result = fast_swe_call(
                 "azalt",
                 julian_day,
                 runtime.swe.ECL2HOR,

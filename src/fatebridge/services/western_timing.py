@@ -44,11 +44,13 @@ def calculate_western_timing_analysis(
     return_timezone: str | None = None,
     house_system: str = "P",
     zodiac_type: str = "Tropic",
-    pd_method: str = "astroapp_alchabitius",
+    pd_method: str = "placidus",
     pd_time_key: str = "Ptolemy",
     pd_type: int = 0,
     pd_aspects: list[int] | None = None,
     show_pd_bounds: bool = True,
+    high_latitude_fallback: str = "error",
+    pd_direction_mode: str = "zodiacal",
 ) -> dict[str, Any]:
     """
     Build a western astrology predictive package with returns, progressions,
@@ -92,6 +94,8 @@ def calculate_western_timing_analysis(
         pd_type=pd_type,
         pd_aspects=pd_aspects,
         show_pd_bounds=show_pd_bounds,
+        high_latitude_fallback=high_latitude_fallback,
+        pd_direction_mode=pd_direction_mode,
     )
 
 
@@ -121,11 +125,13 @@ def calculate_western_timing_module_analysis(
     return_timezone: str | None = None,
     house_system: str = "P",
     zodiac_type: str = "Tropic",
-    pd_method: str = "astroapp_alchabitius",
+    pd_method: str = "placidus",
     pd_time_key: str = "Ptolemy",
     pd_type: int = 0,
     pd_aspects: list[int] | None = None,
     show_pd_bounds: bool = True,
+    high_latitude_fallback: str = "error",
+    pd_direction_mode: str = "zodiacal",
 ) -> dict[str, Any]:
     """Build a single western timing technique payload for standalone tools."""
     house_system = normalize_house_system(house_system)
@@ -167,4 +173,6 @@ def calculate_western_timing_module_analysis(
         pd_type=pd_type,
         pd_aspects=pd_aspects,
         show_pd_bounds=show_pd_bounds,
+        high_latitude_fallback=high_latitude_fallback,
+        pd_direction_mode=pd_direction_mode,
     )

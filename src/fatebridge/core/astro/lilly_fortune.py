@@ -317,7 +317,6 @@ def evaluate_fortune(
             for r in rows
             if r["satisfied"] is True
         ],
-        "conditional_reading_zh": f"Lilly 福点采用昼夜同式，已核定助力{positive}分、减损{negative}分，另有{len(unknown)}行条件待定。",
         "source_method_scope": (
             "tropical_regiomontanus_declared_p145_policy"
             if house_system == "R" and zodiac_type in {"Tropic", "Tropical"}

@@ -26,16 +26,12 @@ def collect_radicality_hour(
         "status": "not_computed",
         "unavailable_reason": "native_epoch_or_location_unavailable",
         "hour": None,
-        "horizon_policy": "Shared apparent solar-center unequal hours; sea level,1013.25hPa,0C; not a reconstructed1647 table",
-        "actual_solar_backend_verified": False,
-        "source_method_acceptance": False,
         "geometric_chart_sect": (
             "day"
             if getattr(subject, "is_diurnal", None) is True
             else "night" if getattr(subject, "is_diurnal", None) is False else None
         ),
         "hour_and_geometric_sect_differ": None,
-        "sect_comparison_policy": "Unequal-hour day uses the apparent sunrise convention; chart sect uses geometric solar center. Their boundaries can differ; neither is silently replaced to force agreement.",
     }
     at = (
         subject.ut1

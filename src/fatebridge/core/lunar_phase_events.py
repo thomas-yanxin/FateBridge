@@ -11,10 +11,10 @@ from dataclasses import dataclass
 from fractions import Fraction
 from typing import Literal, Protocol, TypedDict
 
+from fatebridge.core.astro.ephemeris import fast_swe_call
 from fatebridge.core.astro.geometry import Angle, angle_fraction
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.ephemeris_runtime import (
-    ephemeris_call,
     ephemeris_model_from_retflag,
     swe,
 )
@@ -66,9 +66,7 @@ def _phase(jd_tt: float) -> Fraction:
         raise ValueError("现代相位需要pyswisseph")
     states = []
     for body in (swe.SUN, swe.MOON):
-        state, flag = ephemeris_call(
-            "calc", jd_tt, body, swe.FLG_MOSEPH | swe.FLG_SPEED
-        )
+        state, flag = fast_swe_call("calc", jd_tt, body, swe.FLG_MOSEPH | swe.FLG_SPEED)
         if ephemeris_model_from_retflag(flag) != "moshier":
             raise ValueError("现代相位未使用声明的Moshier模型，不静默降级或改换模型")
         if not all(math.isfinite(float(state[i])) for i in (0, 3)):
@@ -133,15 +131,28 @@ def phase_crossings_tt(
             lo, hi = left, right
             angle = int(phase + distance) % 360
             residual = advance - distance
-            for _ in range(64):
+            d_lo = float(phase - angle)
+            if d_lo >= 180.0:
+                d_lo -= 360.0
+            d_hi = float(next_phase - angle)
+            if d_hi < -180.0:
+                d_hi += 360.0
+            for step in range(64):
                 mid = (lo + hi) / 2
                 if mid in (lo, hi):
                     break
-                difference = (angle_fraction(phase_at(mid)) - angle + 180) % 360 - 180
+                cand = mid
+                if step % 3 != 2:
+                    denom = d_hi - d_lo
+                    if denom != 0.0 and math.isfinite(denom):
+                        sec = lo - d_lo * (hi - lo) / denom
+                        if lo < sec < hi:
+                            cand = sec
+                difference = (angle_fraction(phase_at(cand)) - angle + 180) % 360 - 180
                 if difference < 0:
-                    lo = mid
+                    lo, d_lo = cand, float(difference)
                 else:
-                    hi, residual = mid, difference
+                    hi, residual, d_hi = cand, difference, float(difference)
             if residual >= max_residual:
                 raise ValueError("相位求根未收敛，不输出近似猜测")
             rows.append(
