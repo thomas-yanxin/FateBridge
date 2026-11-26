@@ -7,7 +7,6 @@ from pydantic import Field, StrictBool, StrictInt, model_validator
 from fatebridge.core.meihua.meihua_observation import (
     ensure_observation_method_context,
 )
-
 from fatebridge.core.requests.base import FateBridgeBaseRequest
 from fatebridge.core.requests.meihua_day_qi import MeihuaDayQiContext
 from fatebridge.core.requests.meihua_situational import MeihuaResponseContext

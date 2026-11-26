@@ -12,10 +12,11 @@ from fatebridge.application.domain_validators import (
     validate_ren_output,
     validate_suzhan_clock,
 )
-from fatebridge.application.meihua_clock_binding import meihua_time_invoke
+from fatebridge.application.meihua_clock_binding import bind_meihua_time
 from fatebridge.application.tool_spec import EvidenceViews, ServiceInput, ToolSpec
 from fatebridge.core.contracts.output_meihua_cast import MeihuaCastOutput
 from fatebridge.core.liuyao.liuyao_casting import needs_random_coin_cast
+from fatebridge.core.reproducibility import ReproducibilityPolicy
 from fatebridge.core.requests.compatibility import SukuyoCompatibilityRequest
 from fatebridge.core.requests.divination import (
     CanpingRequest,
@@ -132,7 +133,7 @@ SPECS: list[ToolSpec] = [
     ),
     ToolSpec(
         name="meihua_time_cast",
-        bind=meihua_time_invoke(calculate_meihua_analysis),
+        bind=bind_meihua_time(calculate_meihua_analysis),
         request_model=MeihuaAnalysisRequest,
         summary="梅花时间起卦：按公历钟时与时区查农历取数，返回本变互卦、初中终生克与原文来源；weather选天时条款。",
         operation_label_zh="梅花易数",
@@ -185,6 +186,10 @@ SPECS: list[ToolSpec] = [
         family="divination",
         cpu_bound=True,
         rest_path="/api/divination/liuyao",
+        reproducibility=ReproducibilityPolicy(
+            random_seed_field="seed",
+            seed_condition="method=coin without coins/lines/binary hexagram codes",
+        ),
         needs_random_seed=_sixyao_needs_seed,
     ),
     ToolSpec(
@@ -207,6 +212,7 @@ SPECS: list[ToolSpec] = [
         family="divination",
         cpu_bound=True,
         rest_path="/api/divination/heluo",
+        reproducibility=ReproducibilityPolicy(),
         output_validators=(validate_numerology_clock,),
     ),
     ToolSpec(

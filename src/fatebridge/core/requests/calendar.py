@@ -6,11 +6,11 @@ from typing import Literal
 
 from pydantic import Field, ValidationInfo, field_validator
 
-from fatebridge.core.requests.base import _DeferredModel
+from fatebridge.core.requests.base import FateBridgeBaseRequest
 from fatebridge.utils.coordinates import parse_geo_coordinate
 
 
-class LocalLocationFields(_DeferredModel):
+class LocalLocationFields(FateBridgeBaseRequest):
     """Shared timezone and coordinate fields for local calendar and divination requests."""
 
     timezone: str | None = Field(

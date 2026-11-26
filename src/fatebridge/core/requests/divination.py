@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Any, Literal
+from typing import Annotated, Literal
 
 from pydantic import (
     Field,
@@ -30,9 +30,13 @@ from fatebridge.core.numerology.numerology_inputs import (
     resolve_numerology_longitude,
     resolve_numerology_timezone,
 )
-from fatebridge.core.requests.base import AstroHouseValidatorMixin, _DeferredModel
+from fatebridge.core.requests.base import (
+    FateBridgeBaseRequest,
+    OfflineHouseValidatorMixin,
+)
 from fatebridge.core.requests.calendar import LocalLocationFields
 from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
+from fatebridge.core.requests.metaphysics import QimenOptions, TaiyiOptions
 from fatebridge.core.sukuyo.sukuyo_calendar_basis import SukuyoCalendarBasis
 from fatebridge.core.sukuyo.sukuyo_lower import (
     SukuyoActivityDetail,
@@ -40,11 +44,7 @@ from fatebridge.core.sukuyo.sukuyo_lower import (
 )
 from fatebridge.utils.birth_input import normalize_gender
 from fatebridge.utils.civil_time import UTCCalendar, parse_civil_iso_clock
-from fatebridge.utils.house_systems import (
-    OFFLINE_HOUSE_CODE_NOTE,
-    InvalidHouseSystemError,
-    house_system_fields,
-)
+from fatebridge.utils.house_systems import OFFLINE_HOUSE_CODE_NOTE
 
 
 class MeihuaAnalysisRequest(MeihuaInterpretationOptions):
@@ -81,7 +81,7 @@ class MeihuaAnalysisRequest(MeihuaInterpretationOptions):
     )
 
 
-class GuaLookupRequest(_DeferredModel):
+class GuaLookupRequest(FateBridgeBaseRequest):
     """Request model for trigram/hexagram lookup."""
 
     queries: list[str] = Field(
@@ -105,7 +105,7 @@ class GuaLookupRequest(_DeferredModel):
 _TongSheFaTrigram = Literal["乾", "兑", "离", "震", "巽", "坎", "艮", "坤"]
 
 
-class TongSheFaRequest(_DeferredModel):
+class TongSheFaRequest(FateBridgeBaseRequest):
     """Request model for tongshefa."""
 
     taiyin: _TongSheFaTrigram = Field(description="Taiyin trigram")
@@ -114,7 +114,7 @@ class TongSheFaRequest(_DeferredModel):
     shaoyin: _TongSheFaTrigram = Field(description="Shaoyin trigram")
 
 
-class SixYaoLineRequest(_DeferredModel):
+class SixYaoLineRequest(FateBridgeBaseRequest):
     """One six-yao line item."""
 
     value: StrictInt = Field(ge=0, le=1, description="0 for yin, 1 for yang")
@@ -227,32 +227,7 @@ class SixYaoRequest(LocalLocationFields):
         return self
 
 
-def _normalize_local_zodiac_type(value: object) -> object:
-    if not isinstance(value, str):
-        return value
-    token = value.strip().casefold()
-    if token in {"tropic", "tropical"}:
-        return "Tropic"
-    if token == "sidereal":
-        return "Sidereal"
-    return value
-
-
-def _validate_local_house_system(value: int | str) -> int | str:
-    if isinstance(value, bool):
-        raise ValueError("house_system 不能为布尔值")
-    try:
-        fields = house_system_fields(value, default="D")
-    except InvalidHouseSystemError as exc:
-        raise ValueError(str(exc)) from exc
-    if fields["house_system_code"] is None:
-        raise ValueError(
-            f"离线盘暂仅支持 0..8 宫制（W/B/R/P/K/V/T/S/D），不支持 {fields['house_system']}。"
-        )
-    return value
-
-
-class _LocalChartSystemFields(AstroHouseValidatorMixin, LocalLocationFields):
+class _LocalChartSystemFields(OfflineHouseValidatorMixin, LocalLocationFields):
     """Shared house-system and zodiac-type fields for offline local chart requests."""
 
     house_system: int | str = Field(
@@ -266,16 +241,6 @@ class _LocalChartSystemFields(AstroHouseValidatorMixin, LocalLocationFields):
         default="Tropic",
         description="Offline zodiac selector: Tropic (0) or Sidereal (1, Lahiri).",
     )
-
-    @field_validator("house_system")
-    @classmethod
-    def _require_offline_house_code(cls, value: int | str) -> int | str:
-        return _validate_local_house_system(value)
-
-    @field_validator("zodiac_type", mode="before")
-    @classmethod
-    def _normalize_zodiac_type(cls, value: object) -> object:
-        return _normalize_local_zodiac_type(value)
 
 
 class SuZhanRequest(_LocalChartSystemFields):
@@ -610,12 +575,12 @@ class SanShiUnitedRequest(LocalLocationFields):
         validate_default=True,
         description="Longitude text or decimal",
     )
-    qimen_options: dict[str, Any] = Field(
-        default_factory=dict,
+    qimen_options: QimenOptions = Field(
+        default_factory=QimenOptions,
         description="奇门：ju_method=zhirun（置闰）/chaibu（拆补）；god_profile=yanyi_text（默认卷三正文）/yanyi_diagrams（卷四圆图）；season_profile=yanyi_vol1_verse（默认卷一赋）/yanyi_vol3_table/yanyi_vol3_prose；仅支持转盘layout=direct和零平移",
     )
-    taiyi_options: dict[str, Any] = Field(
-        default_factory=dict,
+    taiyi_options: TaiyiOptions = Field(
+        default_factory=TaiyiOptions,
         description="太乙calculation_mode=year/month/day/hour，默认year；仅year可设year_profile=jinjing_year_historical_table_v1选381—385晋历主表，或jinjing_year_qiliang_table_v1选501—505齐梁史历表并保留502年闰标分歧；范围外拒绝，其他两术古历不因而认证；默认年计仍为通用现代农历。仅month可设month_profile=jinjing_month_jie_360_v1（默认金镜）/key_month_tianzheng_jie_v1（金钥匙天地二正，现代节月适配，门数分歧及三门未知保留）；day为金钥匙冬至前甲子积日、所选钟面零时换日，附十精及异数；仅hour可设hour_profile=jinjing_hour_solstice_v1（默认现代至点置一）或key_hour_winter_jiazi_v1（金钥匙完整积时/时支合神/四门，三门主体未决）。shiji_profile 可选《金镜》卷二推演、卷三表列始击并重算客算、或卷三表列始击与客算。接受 calculation_mode、shiji_profile 及对应计法的 year_profile、month_profile、hour_profile。阴阳遁与布盘方向由实际计法和日期决定。日计古历日期仍未复原，不按吉凶择法。",
     )
     liureng_yue: str | None = Field(

@@ -142,11 +142,11 @@ class QimenOptions(FateBridgeBaseRequest):
         default="yanyi_text",
         description="八神表：yanyi_text（默认卷三正文）或 yanyi_diagrams（卷四圆图）。",
     )
-    season_profile: Literal["yanyi_vol1_verse", "yanyi_vol3_table", "yanyi_vol3_prose"] = (
-        Field(
-            default="yanyi_vol1_verse",
-            description="九星旺衰表：yanyi_vol1_verse（默认卷一烟波钓叟赋）、yanyi_vol3_table（卷三表）或 yanyi_vol3_prose（卷三正文）。",
-        )
+    season_profile: Literal[
+        "yanyi_vol1_verse", "yanyi_vol3_table", "yanyi_vol3_prose"
+    ] = Field(
+        default="yanyi_vol1_verse",
+        description="九星旺衰表：yanyi_vol1_verse（默认卷一烟波钓叟赋）、yanyi_vol3_table（卷三表）或 yanyi_vol3_prose（卷三正文）。",
     )
 
 

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from datetime import datetime
 import types
+from datetime import datetime
 from typing import Annotated, Literal, Union, get_args, get_origin
 
 from pydantic import (
@@ -163,19 +163,6 @@ class AstroHouseValidatorMixin:
     def _normalize_zodiac_type_selection(cls, value: object) -> object:
         return normalize_zodiac_type(value)
 
-    @field_validator("hsys", mode="before", check_fields=False)
-    @classmethod
-    def _validate_numeric_house_code(cls, value: object) -> object:
-        if value is None:
-            return None
-        try:
-            parse_house_code(value)
-        except InvalidHouseCodeError:
-            raise PydanticCustomError(
-                "invalid_house_code", INVALID_HOUSE_CODE_MESSAGE
-            ) from None
-        return value
-
 
 class OfflineHouseValidatorMixin:
     """Mixin for offline chart models restricted to house codes 0..8 and Tropic/Sidereal."""
@@ -194,9 +181,7 @@ class OfflineHouseValidatorMixin:
             )
             if field is not None and _allows_none(field.annotation):
                 return None
-            raise PydanticCustomError(
-                "invalid_house_code", INVALID_HOUSE_CODE_MESSAGE
-            )
+            raise PydanticCustomError("invalid_house_code", INVALID_HOUSE_CODE_MESSAGE)
         try:
             resolve_offline_house_code(value)
         except UnsupportedGauquelinError:

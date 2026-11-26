@@ -17,6 +17,7 @@ from fatebridge.core.de440_solar import MODEL_ID as DE440_MODEL_ID
 from fatebridge.core.ephemeris_paths import ephemeris_search_directories
 from fatebridge.core.error_budget import declared_error_budget
 from fatebridge.core.execution_context import CallClock, ExecutionOptions
+from fatebridge.core.reproducibility import ReproducibilityPolicy
 from fatebridge.fetch_vsop2013 import MODEL_ID as VSOP2013_MODEL_ID
 
 METADATA_SCHEMA_VERSION = "2.0"
@@ -221,7 +222,7 @@ def execution_receipt(
     replay_overrides: dict[str, JsonValue],
     compact_receipt: bool = False,
 ) -> ExecutionReceipt:
-    policy = spec.reproducibility
+    policy = spec.reproducibility or ReproducibilityPolicy()
     as_of = clock.instant.isoformat().replace("+00:00", "Z")
     time_defaults = [
         field

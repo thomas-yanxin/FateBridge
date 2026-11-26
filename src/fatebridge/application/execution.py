@@ -17,6 +17,7 @@ from fatebridge.application.tool_spec import (
 from fatebridge.core.execution_context import ExecutionOptions, call_clock
 from fatebridge.core.public_output import public_payload
 from fatebridge.core.receipt_models import RunMetadata
+from fatebridge.core.reproducibility import ReproducibilityPolicy
 from fatebridge.services import replay_metadata, run_metadata
 from fatebridge.utils.errors import (
     DomainSourceError,
@@ -76,7 +77,7 @@ def execute_with_receipt(
 
     controls = options or ExecutionOptions()
     seed_was_generated = False
-    seed_field = spec.reproducibility.random_seed_field
+    seed_field = (spec.reproducibility or ReproducibilityPolicy()).random_seed_field
     replay_overrides: dict[str, JsonValue] = {}
     with call_clock(controls.as_of) as clock:
         started = perf_counter()

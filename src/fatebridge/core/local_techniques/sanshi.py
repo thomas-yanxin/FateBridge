@@ -45,13 +45,13 @@ def _build_taiyi_with_options(
     if not isinstance(mode, str) or mode not in {"year", "month", "day", "hour"}:
         raise ValueError("太乙calculation_mode仅支持year、month、day、hour")
     profile = normalized.get("hour_profile")
-    if "hour_profile" in normalized and not isinstance(profile, str):
+    if profile is not None and not isinstance(profile, str):
         raise ValueError("hour_profile必须是已发布时计配置名称")
     month_profile = normalized.get("month_profile")
-    if "month_profile" in normalized and not isinstance(month_profile, str):
+    if month_profile is not None and not isinstance(month_profile, str):
         raise ValueError("month_profile必须是已发布月计配置名称")
     year_profile = normalized.get("year_profile")
-    if "year_profile" in normalized and not isinstance(year_profile, str):
+    if year_profile is not None and not isinstance(year_profile, str):
         raise ValueError("year_profile必须是已发布年计配置名称")
     return build_taiyi_board(
         seed,
