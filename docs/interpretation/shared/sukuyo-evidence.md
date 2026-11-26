@@ -48,7 +48,7 @@ Hinoo另返`critical_calendar_reference.image_witness_research`时，按其中�
 - `sukuyo.six_palace_reference`：原典六个本命相对位置，命／事／意／聚／同／克分别从本命本身计第1／10／4／16／20／13宿。未给已确认本命时保留natal_mansion_required，不以历日宿代填；不随目标日期改变。seven_luminary_transits_evaluated及三九参断evaluated仍为false，不能据此称已发生七曜犯宿、六害期间或现实灾祸；此六宫宿与十二宫分足分别读取。
 - `sukuyo.taibai_direction_reference`：下卷太白所在章按calendar.lunar_day实际入月日查表，不能改用公历日、tithi、Hinoo补配宿序或实测金星。八方、中央入地与天上分别保留；后两者horizontal_direction=null，不能补0度或说成北方。明本校记删去初十、二十、三十的天上行，row_deleted_in_apparatus仅表示该见证缺行，不能说成没有太白、无影响或可以行动。明本只是所选底本校记的重建，尚无独立明刻本校勘；返回大／太、正南等字面与两数据库的校记差异。movement_alignment_evaluated=false、applied_to_activity_assessment=false时，不能把顺／逆擅定成面向／背向、顺时针／逆时针、天文顺逆行或GPS方位角，更不能抵销既有宜忌。未知历日的每个candidate_days另保留条件参考。
 - 衣事选`activity=clothing`及发布的clothing字段卡。裁缝、制作、修理、穿着及穿新衣分别确认；仅裁缝推制作、新衣穿着推穿着，不能反向推断，也不以衣事代替买衣。`royal_wearer`仅为明确王者身份。`clothing_reference`保留主文十四宿正表与“余并失”补集，明本校记“井→并”“余并失→并大吉”另列；不补并为井或给明本未列宿补入同样忌条。专章口诀和上卷裁衣原句没有进入事项汇总，必须同时说明，汇总列宜不等于全部文献一致，更不据原句断言现实疾病或灾祸。完整半日候选共同的专章表项可单独成立，宿名仍未定；候选不穷尽则不据单候选定宜。
-- 同run上下文核验v4要求完整`sukuyo.candidate_days`，单一历日为空数组。公开`suzhan`的未知时刻日期分支条文须全部保留；time省略/null后同时读取各candidate_days及其candidate_mansion_days，不能为取得星图或通过检查补钟时。衣事还须完整`clothing_reference`，通用activity主题也不能省略该见证。
+- 同run上下文核验要求完整`sukuyo.candidate_days`及`sukuyo.candidate_mansion_days`；单一历日的candidate_days可为空，未决主宿的条文仍在candidate_mansion_days中。公开`suzhan`的未知时刻日期分支条文须全部保留；time省略/null后同时读取各candidate_days及其candidate_mansion_days，不能为取得星图或通过检查补钟时。衣事还须完整`clothing_reference`，通用activity主题也不能省略该见证。
 
 - `sukuyo.lower_mansion_day`及 `sukuyo.conjunction_doctrine`：逐宿条文与文本问题，宿月配合的文献分组不可冒充实际天文月亮。
 - 整个 `sukuyo.activity_assessment`：事项、已确认细节、分层状态、全部 `matched_rules/conditional_rules`、来源和适用范围。

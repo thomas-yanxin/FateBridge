@@ -9,6 +9,8 @@ from fatebridge.core.sukuyo.sukuyo_special_days import (
     scope_for_weekday_basis,
     special_day_evidence,
 )
+from tests.unit_test.fixtures.sukuyo_readings import payload, quotes
+from validation.sukuyo import Focus, verify_sukuyo_context_claims
 
 BASES = [
     ("chinese_hko_utc08", "2000-01-01", "1999-12-31", "08"),
@@ -176,6 +178,42 @@ def test_explicit_second_half_keeps_bounded_source_conditions_in_native_reading(
     assert day["calendar"]["natal_su27"] == "张"
     assert "按此取宿，没有按民用钟时自动判半" in day["reading_text"]
     assert "不据所选例题裁定补配次序或半日钟时" in day["reading_text"]
+
+
+@pytest.mark.parametrize("focus", ["day", "activity", "clothing"])
+def test_context_quotes_cannot_omit_unresolved_mansions_on_a_single_host_day(
+    focus: Focus,
+) -> None:
+    """Single-day quotations previously passed without unresolved mansion evidence."""
+    result = payload(
+        date="1341-05-24",
+        time="12:00:00",
+        zone="+09:00",
+        calendar_basis="japanese_naoj_historical_utc09",
+        calendar_profile="hinoo_t1299_host27",
+        activity="clothing",
+        activity_details=["tailoring_garments"],
+    )
+    day = result["sukuyo"]
+    assert day["day_mansion"] is None
+    assert day["candidate_days"] == []
+    assert {branch["day_mansion"] for branch in day["candidate_mansion_days"]} == {
+        "参",
+        "毕",
+    }
+    complete = quotes(result, "clothing")
+    assert verify_sukuyo_context_claims(result, complete, focus=focus)["status"] == (
+        "verified_context_complete_quotes"
+    )
+    incomplete = [
+        claim for claim in complete if claim.path != "sukuyo.candidate_mansion_days"
+    ]
+    report = verify_sukuyo_context_claims(result, incomplete, focus=focus)
+    assert report["status"] == "rejected"
+    assert {
+        "code": "missing_interpretation_context",
+        "path": "sukuyo.candidate_mansion_days",
+    } in report["errors"]
 
 
 def test_default_profile_does_not_inherit_hinoo_manuscript_claims() -> None:

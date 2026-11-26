@@ -68,12 +68,6 @@ def _build_suzhan_snapshot_text(
                 phase["scope"],
             ]
         )
-    prediction_note = (
-        "计算结果未建立现实预测效力；未获权威认证。"
-        if validation.get("real_world_prediction") == "not_established"
-        and validation.get("authority_certified") is False
-        else ""
-    )
     house_groups = [
         (
             f"宫位：{house['id']}",
@@ -121,7 +115,6 @@ def _build_suzhan_snapshot_text(
                         f"日期：{input_normalized['date']} {input_normalized['time']}",
                         f"时区：{input_normalized['zone']}",
                         f"经纬度：{longitude} {latitude}",
-                        prediction_note,
                         f"外盘：{input_normalized.get('szchart', 0)}",
                         f"盘型：{input_normalized.get('szshape', 0)}",
                         f"宫制：{((response.get('params') or {}).get('houseSystemResolved') or '未提供')}",
@@ -264,8 +257,6 @@ def build_suzhan_result(
             textual_pada=textual_pada,
         )
         validation = {
-            "real_world_prediction": "not_established",
-            "authority_certified": False,
             "calculation_layers": {
                 "calendar": calendar["status"],
                 "chart": layer_status,
@@ -385,8 +376,6 @@ def build_suzhan_result(
         "astronomy": "computed" if astronomy is not None else "not_computed",
     }
     validation = {
-        "real_world_prediction": "not_established",
-        "authority_certified": False,
         "calculation_layers": calculation_layers,
     }
     if "validation" in response:

@@ -52,6 +52,7 @@ def required_quote_paths(focus: Focus) -> tuple[str, ...]:
             "sukuyo.directional_travel",
             "sukuyo.special_day_evidence",
             "sukuyo.candidate_days",
+            "sukuyo.candidate_mansion_days",
             *(("sukuyo.clothing_reference",) if focus == "clothing" else ()),
         )
     else:
@@ -104,7 +105,7 @@ def verify_sukuyo_context_claims(
         else:
             pass
     return {
-        "method_id": "same_run_sukuyo_context_quotes_v4",
+        "method_id": "same_run_sukuyo_context_quotes_v5",
         "status": "rejected" if errors else "verified_context_complete_quotes",
         "focus": focus,
         "required_paths": list(required),

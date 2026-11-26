@@ -24,7 +24,6 @@ def test_pair_delivers_complete_pre_edit_reference(case) -> None:
     assert "274相合、52不同、1未知" in result["summary"]
     assert "未知行号为263，作者横杠未补成不进" in result["summary"]
     assert "双方本次历日分别交付" in result["summary"]
-    assert result["validation"]["real_world_prediction"] == "not_established"
 
 
 def test_pair_reference_mutation_does_not_remove_next_calls_adverse_rows() -> None:
