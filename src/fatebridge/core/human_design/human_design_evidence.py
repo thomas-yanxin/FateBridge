@@ -63,6 +63,9 @@ from fatebridge.core.human_design.human_design_profile_partition import (
     add_profile_partition_evidence,
 )
 from fatebridge.core.human_design.human_design_references import reference_data
+from fatebridge.core.human_design.human_design_root_interpretations import (
+    root_interpretation_reading,
+)
 from fatebridge.core.human_design.human_design_source_variants import (
     cross_name_evidence,
     discrepancy_reading,
@@ -721,10 +724,6 @@ def reading_statements(chart: Dict[str, Any]) -> list[Dict[str, Any]]:
 
 
 def design_time_reading(chart: Dict[str, Any]) -> str:
-    from fatebridge.core.human_design.human_design_root_interpretations import (
-        root_interpretation_reading,
-    )
-
     solver = chart["design_solver"]
     precision = solver["numerical_precision"]
     changes = precision["observed_solar_changed_levels"]

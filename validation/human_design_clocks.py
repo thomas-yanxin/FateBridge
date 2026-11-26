@@ -8,12 +8,10 @@ from fatebridge.core.astro.historical_utc import (
     HistoricalUTCAdjustment,
     historical_utc_from_tt,
 )
-from fatebridge.core.astro.julian_day import _julian_day
 from fatebridge.core.astro.time_scales import utc_clock
 from fatebridge.core.astro.utc_policy import leap_table
 from fatebridge.core.human_design.human_design_birth_clock import (
     ConfirmedLeapSecond,
-    replay_birth_clock,
     resolve_birth_clock,
 )
 from fatebridge.core.human_design.human_design_clock_observation import (
@@ -83,6 +81,11 @@ def _close(a: float, b: float) -> None:
 class ClockReplay:
     def __init__(self, payload: dict[str, Any]) -> None:
         proof = payload["clock_evidence"]
+        reference = payload["cycle_context"].get("reference_utc")
+        precise_leap = payload.get("birth_clock_evidence") is not None or (
+            reference is not None and reference[17:19] == "60"
+        )
+        expected_method = LEAP_TT_METHOD if precise_leap else METHOD
         expected_keys = {
             "method_id",
             "input",
@@ -100,7 +103,7 @@ class ClockReplay:
             pass
         if (
             set(proof) != expected_keys
-            or proof["method_id"] not in {METHOD, LEAP_TT_METHOD}
+            or proof["method_id"] != expected_method
             or proof["scope"] != SCOPE
             or any(
                 proof[k] is not False
@@ -115,7 +118,6 @@ class ClockReplay:
             raise ValueError("Malformed or falsely certified clock evidence")
         else:
             pass
-        self.method = proof["method_id"]
         self.civil: dict[tuple[str, float, float], dict[str, Any]] = {}
         self.inverse: dict[tuple[float, float], dict[str, Any]] = {}
         self.displays: dict[float, dict[str, Any]] = {}
@@ -215,9 +217,7 @@ class ClockReplay:
             else:
                 pass
             self.check_label(label, tt)
-        clock = replay_birth_clock(
-            resolve_birth_clock(**proof["input"]), method=self.method
-        )
+        clock = resolve_birth_clock(**proof["input"])
         self.birth_clock = clock
         policy = payload["calculation_policy"]
         if (
@@ -403,13 +403,7 @@ class ClockReplay:
         validate_reference_precision(value)
         leap = reference_leap_second(value)
         if leap is not None:
-            if self.method == LEAP_TT_METHOD:
-                return leap.utc_label, leap.tt.as_float()
-            else:
-                pass
-            midnight = leap.effective.replace(microsecond=0)
-            start = _julian_day(midnight) + (leap.offset_before + 32.184) / 86400
-            return leap.utc_label, start + (leap.utc_anchor.microsecond / 1e6) / 86400
+            return leap.utc_label, leap.tt.as_float()
         else:
             pass
         moment = reference_datetime(value)

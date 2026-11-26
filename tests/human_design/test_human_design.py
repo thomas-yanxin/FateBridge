@@ -11,12 +11,17 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro import runtime
 from fatebridge.core.human_design.human_design import (
     bodygraph,
     chart_at,
     longitude_activation,
     planetary_positions,
+)
+from fatebridge.core.human_design.human_design_clock_observation import (
+    LEAP_TT_METHOD,
+    METHOD,
 )
 from fatebridge.core.human_design.human_design_evidence import reference_table_audit
 from fatebridge.core.human_design.human_design_mechanics import (
@@ -26,6 +31,8 @@ from fatebridge.core.human_design.human_design_mechanics import (
 )
 from fatebridge.core.requests.human_design import HumanDesignRequest
 from fatebridge.services.human_design import calculate_human_design
+from fatebridge.services.tool_catalog import CATALOG
+from validation.human_design_clocks import verify_clock_records
 
 ROOT = Path(__file__).resolve().parents[2]
 INPUT = dict(
@@ -385,8 +392,6 @@ def test_returned_source_evidence_cannot_mutate_later_runs() -> None:
 def test_moshier_is_explicit_and_can_be_refused(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    from fatebridge.application.execution import execute_tool
-    from fatebridge.services.tool_catalog import CATALOG
     from tests.support.ephemeris_context import empty_ephemeris_path
 
     spec = next(s for s in CATALOG if s.key == "human_design")
@@ -397,6 +402,31 @@ def test_moshier_is_explicit_and_can_be_refused(
         failure = calculate_human_design(**INPUT, require_swiss_files=True)
         assert "error" in failure
         assert "bodygraph" not in failure
+
+
+@pytest.mark.parametrize("birth_second", [59, 60])
+def test_leap_receipt_rejects_retired_clock_method(birth_second: int) -> None:
+    """A leap receipt previously accepted the retired arithmetic method label."""
+    spec = next(spec for spec in CATALOG if spec.key == "human_design")
+    run = execute_tool(
+        spec,
+        HumanDesignRequest(
+            birth_year=2016,
+            birth_month=12,
+            birth_day=31,
+            birth_hour=23,
+            birth_minute=59,
+            birth_second=birth_second,
+            birth_timezone="UTC",
+            cycle_reference_datetime="2016-12-31T23:59:60Z",
+        ),
+    )
+    assert run["clock_evidence"]["method_id"] == LEAP_TT_METHOD
+    verify_clock_records(run)
+    forged = deepcopy(run)
+    forged["clock_evidence"]["method_id"] = METHOD
+    with pytest.raises(ValueError, match="clock evidence"):
+        verify_clock_records(forged)
 
 
 @pytest.mark.parametrize("flag,longitude", [(-1, float("nan")), (0, 100.0)])
