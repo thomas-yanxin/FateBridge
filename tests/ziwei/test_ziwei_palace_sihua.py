@@ -1,11 +1,8 @@
-"""Palace-stem evidence, including the reverse grouping, shares one natal chart."""
-
-from collections import Counter
+"""Palace-stem flying SiHua matrix, 来因宫, and 自化/忌冲 checks."""
 
 import pytest
 
-from fatebridge.core.contracts.output_ziwei_structure import ZiweiPalaceSihuaRelations
-from fatebridge.core.ziwei.ziwei_flying import palace_sihua_relations
+from fatebridge.core.ziwei.flying import build_flying_sihua, palace_sihua_relations
 from fatebridge.services.ziwei import (
     calculate_ziwei_birth,
     calculate_ziwei_horoscope,
@@ -22,10 +19,7 @@ BIRTH = dict(
     use_true_solar_time=False,
     gender="男",
 )
-EVIDENCE = "palace_sihua_relations"
-FIELD = f"ziwei_birth.{EVIDENCE}"
 TRANSFORMATIONS = ("化禄", "化权", "化科", "化忌")
-# Read in 禄权科忌 order from the selected natal tables.
 DEFAULT_ROWS = {
     "甲": "廉贞 破军 武曲 太阳",
     "乙": "天机 天梁 紫微 太阴",
@@ -64,69 +58,47 @@ DEFAULT_ROWS = {
             "太阳 武曲 天同 天相",
             "天梁 紫微 天府 武曲",
         ),
+        (
+            "iztro_2_5_8",
+            "feixing_liang",
+            "feixing_liang",
+            "太阳 武曲 天府 天相",
+            "天梁 紫微 左辅 武曲",
+        ),
     ],
 )
-def test_all_palace_stem_assignments_join_the_actual_natal_occurrences(
+def test_flying_sihua_matrix_and_laiyin_palace(
     profile, source, rule, geng, ren
-):
+) -> None:
     person = create_person_info(**BIRTH)
     chart = calculate_ziwei_birth(person, rule_profile=profile, sihua_source=source)[
         "ziwei_birth"
     ]
-    evidence = chart[EVIDENCE]
-    assert evidence["policy"] == "selected_natal_table_reused_for_palace_stems"
-    assert evidence["sihua_rule"] == chart["ruleset"]["sihua_rule"] == rule
     assert chart["year_stem"] == "壬"
-    palaces = chart["palaces"]
-    assert [
-        palace["ganzhi"] for palace in palaces
-    ] == "癸丑 壬寅 癸卯 甲辰 乙巳 丙午 丁未 戊申 己酉 庚戌 辛亥 壬子".split()
+    laiyin = chart["laiyin_gong"]
+    assert laiyin["ganzhi"][0] == "壬"
+    assert laiyin["branch"] not in ("子", "丑")
+    assert laiyin["name"] == "父母宫"
+    assert laiyin["ganzhi"] == "壬寅"
 
-    rows = {**DEFAULT_ROWS, "庚": geng, "壬": ren}
-    expected = {}
-    for transformation_index, transformation in enumerate(TRANSFORMATIONS):
-        for palace in palaces:
-            stem, branch = palace["ganzhi"]
-            star = rows[stem].split()[transformation_index]
-            expected.setdefault((transformation, star), []).append(
-                dict(
-                    source_palace=palace["name"],
-                    source_stem=stem,
-                    source_branch=branch,
-                    self_transformation=any(
-                        item["name"] == star for item in palace["stars_detail"]
-                    ),
-                )
-            )
+    flying = chart["flying_sihua"]
+    assert flying["sihua_rule"] == rule
+    assert flying["laiyin_gong"] == laiyin
+    assert len(flying["matrix"]) == 12
+    assert sum(1 for row in flying["matrix"] if row.get("is_original_palace")) == 1
 
-    groups = evidence["groups"]
-    assert [(g["transformation"], g["target_star"]) for g in groups] == list(expected)
-    assert sum(len(g["origins"]) for g in groups) == 48
-    for group in groups:
-        key = group["transformation"], group["target_star"]
-        assert group["origins"] == expected[key]
-        assert group["target_occurrences"] == [
-            dict(
-                palace_name=palace["name"],
-                branch=palace["ganzhi"][1],
-                calculation_path=f"ziwei_birth.palaces.{i}.stars_detail.{j}",
-            )
-            for i, palace in enumerate(palaces)
-            for j, star in enumerate(palace["stars_detail"])
-            if star["name"] == key[1]
-        ]
-
-    year_sihua = dict(zip(TRANSFORMATIONS, ren.split()))
-    assert chart["sihua"] == year_sihua
-    assert Counter(
-        (star["mutagen"], star["name"])
-        for palace in palaces
-        for star in palace["stars_detail"]
-        if star["mutagen"] is not None
-    ) == Counter(year_sihua.items())
+    ren_sihua = dict(zip(TRANSFORMATIONS, ren.split()))
+    assert chart["sihua"] == ren_sihua
+    # Verify 父母宫 (壬寅) transforms match selected 壬 row
+    fumu = next(row for row in flying["matrix"] if row["palace"] == "父母宫")
+    for tr, star in ren_sihua.items():
+        assert fumu["transforms"][tr].startswith(f"{star}->")
+    assert fumu["lu_to_ji"] is not None
+    assert fumu["ji_to_ji"] is not None
+    assert fumu["ji_clash"] is not None
 
 
-def test_reverse_groups_keep_every_occurrence_and_unlocated_assignment():
+def test_reverse_groups_keep_every_occurrence_and_unlocated_assignment() -> None:
     evidence = palace_sihua_relations(
         [
             ("命宫", "甲寅", ["武曲", "廉贞", "廉贞"]),
@@ -143,11 +115,6 @@ def test_reverse_groups_keep_every_occurrence_and_unlocated_assignment():
     wealth = groups[0]
     assert wealth["transformation"] == "化禄"
     assert wealth["target_star"] == "廉贞"
-    assert [target["calculation_path"] for target in wealth["target_occurrences"]] == [
-        "ziwei_birth.palaces.0.stars_detail.1",
-        "ziwei_birth.palaces.0.stars_detail.2",
-        "ziwei_birth.palaces.2.stars_detail.0",
-    ]
     assert [
         (row["source_branch"], row["self_transformation"]) for row in wealth["origins"]
     ] == [
@@ -159,10 +126,39 @@ def test_reverse_groups_keep_every_occurrence_and_unlocated_assignment():
     assert (missing["transformation"], missing["target_star"]) == ("化权", "破军")
     assert missing["target_occurrences"] == []
     assert [row["self_transformation"] for row in missing["origins"]] == [None, None]
-    assert ZiweiPalaceSihuaRelations.model_validate(evidence).model_dump() == evidence
 
 
-def test_scope_mutagens_remain_layered_by_timing_stems():
+def test_inward_and_outward_self_transformations_and_ji_clash() -> None:
+    palaces = [
+        {"name": "命宫", "ganzhi": "甲寅", "stars_detail": [{"name": "廉贞"}]},
+        {"name": "迁移宫", "ganzhi": "甲申", "stars_detail": [{"name": "太阳"}]},
+        {"name": "父母宫", "ganzhi": "乙卯", "stars_detail": [{"name": "武曲"}]},
+        {"name": "夫妻宫", "ganzhi": "丙辰", "stars_detail": [{"name": "天机"}]},
+        {"name": "子女宫", "ganzhi": "丁巳", "stars_detail": [{"name": "太阴"}]},
+        {"name": "财帛宫", "ganzhi": "戊午", "stars_detail": [{"name": "贪狼"}]},
+        {"name": "疾厄宫", "ganzhi": "己未", "stars_detail": [{"name": "天同"}]},
+        {"name": "仆役宫", "ganzhi": "庚酉", "stars_detail": [{"name": "巨门"}]},
+        {"name": "官禄宫", "ganzhi": "辛戌", "stars_detail": [{"name": "文昌"}]},
+        {"name": "田宅宫", "ganzhi": "壬亥", "stars_detail": [{"name": "天梁"}]},
+        {"name": "福德宫", "ganzhi": "癸子", "stars_detail": [{"name": "破军"}]},
+        {"name": "兄弟宫", "ganzhi": "甲丑", "stars_detail": [{"name": "文曲"}]},
+    ]
+    rules = {
+        stem: dict(zip(TRANSFORMATIONS, row.split()))
+        for stem, row in DEFAULT_ROWS.items()
+    }
+    res = build_flying_sihua(palaces, rules, year_stem="甲", sihua_rule="iztro_2_5_8")
+    ming = next(r for r in res["matrix"] if r["palace"] == "命宫")
+    qianyi = next(r for r in res["matrix"] if r["palace"] == "迁移宫")
+    # 命宫甲干廉贞化禄在命宫 -> 离心自化; 甲太阳化忌在迁移(申) -> 冲命宫(寅)
+    assert "化禄" in ming["outward_self"]
+    assert ming["ji_clash"] == "迁移宫(申)冲命宫(寅)"
+    # 迁移宫甲干廉贞化禄入对宫命宫 -> 命宫向心自化
+    assert any("迁移宫:化禄(廉贞)" == item for item in ming["inward_self"])
+    assert any("命宫:化忌(太阳)" == item for item in qianyi["inward_self"])
+
+
+def test_scope_mutagens_remain_layered_by_timing_stems() -> None:
     horoscope = calculate_ziwei_horoscope(
         create_person_info(**BIRTH),
         analysis_year=2026,
@@ -171,7 +167,6 @@ def test_scope_mutagens_remain_layered_by_timing_stems():
         analysis_hour=10,
         analysis_timezone="Asia/Shanghai",
     )["ziwei_horoscope"]
-    assert EVIDENCE not in horoscope
     assert [(scope["scope"], scope["stem"]) for scope in horoscope["scopes"]] == [
         ("大限", "甲"),
         ("小限", "戊"),

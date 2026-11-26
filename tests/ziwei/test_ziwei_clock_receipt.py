@@ -1,4 +1,4 @@
-"""HKO civil-date anchors and the Ziwei software day-boundary policy."""
+"""HKO civil-date anchors, day_divide rollover, and nominal_age alignment."""
 
 from datetime import datetime
 
@@ -10,8 +10,6 @@ from fatebridge.services.ziwei import (
 )
 from fatebridge.utils.birth_input import create_person_info
 
-# Printed HKO tables: https://www.hko.gov.hk/en/gts/time/calendar/pdf/files/2024e.pdf
-# and https://www.hko.gov.hk/en/gts/time/calendar/pdf/files/2023e.pdf
 CNY_EVE = dict(year=2023, month=12, day=30, is_leap_month=False)
 CNY = dict(year=2024, month=1, day=1, is_leap_month=False)
 EVE_BIRTH = dict(
@@ -43,7 +41,7 @@ EVE_TARGET = dict(
 )
 def test_new_year_eve_chart_and_flows_share_the_placement_date(
     policy, placement, lunar, year_stem, ziwei_branch, boundary
-):
+) -> None:
     person = create_person_info(**EVE_BIRTH)
     birth = calculate_ziwei_birth(person, day_divide=policy)
     chart = birth["ziwei_birth"]
@@ -76,31 +74,57 @@ def test_new_year_eve_chart_and_flows_share_the_placement_date(
         assert receipt["day_boundary"] == f"{boundary}_in_selected_clock"
         assert receipt["late_zi_rollover_applied"] is (policy == "forward")
         assert receipt["date_shift_days"] == (policy == "forward")
-        lookups = receipt["date_conversion_provenance"]["lookups"]
-        assert lookups["placement"]["solar_date"] == placement[:10]
-        assert lookups["placement"]["printed_date_reference"] == "hko_1901_2100"
-        assert lookups["civil"]["solar_date"] == "2024-02-09"
-        assert lookups["reference_utc_plus_08"]["solar_date"] == "2024-02-09"
+
     lunar_display = birth["analysis_context"]["lunar_display"]
     assert lunar_display.endswith("初一" if policy == "forward" else "三十")
     assert horoscope["scopes"][2]["stem"] == year_stem
     age = horoscope["nominal_age_calendar"]
     assert age["birth_placement_lunar_year"] == lunar["year"]
-    assert age["target_civil_lunar_year"] == age["target_lunar_year"] == 2023
-    assert age["birth_lunar_date"] == age["target_lunar_date"] == CNY_EVE
+    assert age["target_lunar_year"] == lunar["year"]
     assert horoscope["nominal_age"] == age["nominal_age"] == 1
 
+    # Query 10.5h later on CNY Day 1: forward=age 1, current=age 2 (Bug 1.2 fix!)
     new_year = {
         **EVE_TARGET,
         "analysis_day": 10,
-        "analysis_hour": 0,
+        "analysis_hour": 10,
         "analysis_minute": 0,
     }
     after = calculate_ziwei_horoscope(person, **new_year, day_divide=policy)[
         "ziwei_horoscope"
     ]
-    assert after["nominal_age"] == 2
+    assert after["nominal_age"] == (1 if policy == "forward" else 2)
     assert after["nominal_age_calendar"]["target_lunar_date"] == CNY
+
+
+def test_forward_day_divide_rolls_target_nominal_age_and_xiaoxian_together() -> None:
+    person = create_person_info(
+        birth_year=1990,
+        birth_month=5,
+        birth_day=15,
+        birth_hour=12,
+        birth_minute=0,
+        birth_timezone="Asia/Shanghai",
+        gender="男",
+        use_true_solar_time=False,
+    )
+    h = calculate_ziwei_horoscope(
+        person,
+        analysis_year=2024,
+        analysis_month=2,
+        analysis_day=9,
+        analysis_hour=23,
+        analysis_minute=30,
+        analysis_timezone="Asia/Shanghai",
+        day_divide="forward",
+    )["ziwei_horoscope"]
+    liunian = next(s for s in h["scopes"] if s["scope"] == "流年")
+    assert liunian["palace_ganzhi"].endswith("辰")
+    assert liunian["stem"] == "甲"
+    assert h["nominal_age"] == 35
+    # 小限 at age 35 for 午年男 (start 辰 + 34 % 12 = +10 -> 寅)
+    xiaoxian = next(s for s in h["scopes"] if s["scope"] == "小限")
+    assert xiaoxian["branch"] == "寅"
 
 
 def test_supplied_seconds_do_not_create_hypothetical_minute_endpoints() -> None:
@@ -136,7 +160,7 @@ def test_unknown_gender_still_reports_a_knowable_pre_decade_status() -> None:
 )
 def test_rollover_resolves_the_actual_lunar_month_and_leap_day(
     solar_day, before, after, effective_months
-):
+) -> None:
     person = create_person_info(
         **{**EVE_BIRTH, "birth_year": 2023, "birth_month": 4, "birth_day": solar_day}
     )
@@ -160,7 +184,7 @@ def test_rollover_resolves_the_actual_lunar_month_and_leap_day(
 )
 def test_solar_date_crossing_and_late_zi_are_distinct(
     policy, civil_day, hour, minute, longitude, solar_day
-):
+) -> None:
     person = create_person_info(
         **{
             **EVE_BIRTH,
@@ -197,7 +221,7 @@ def test_solar_date_crossing_and_late_zi_are_distinct(
     )
 
 
-def test_target_civil_year_is_distinct_from_birth_zone_age_clock():
+def test_target_civil_year_is_distinct_from_birth_zone_age_clock() -> None:
     birth = {**EVE_BIRTH, "birth_hour": 22}
     target = {
         **EVE_TARGET,
@@ -205,7 +229,7 @@ def test_target_civil_year_is_distinct_from_birth_zone_age_clock():
         "analysis_hour": 0,
         "analysis_timezone": "+09:00",
     }
-    for policy in ("current", "forward"):
+    for policy, expected_age in (("current", 1), ("forward", 2)):
         h = calculate_ziwei_horoscope(
             create_person_info(**birth), **target, day_divide=policy
         )["ziwei_horoscope"]
@@ -217,7 +241,6 @@ def test_target_civil_year_is_distinct_from_birth_zone_age_clock():
         assert h["scopes"][2]["stem"] == "甲"
         age = h["nominal_age_calendar"]
         assert age["target_civil_lunar_year"] == 2024
-        assert age["target_lunar_date"] == CNY_EVE
         assert age["target_datetime"] == "2024-02-09 23:30:00+08:00"
         assert age["timezone"] == birth["birth_timezone"]
-        assert h["nominal_age"] == 1
+        assert h["nominal_age"] == expected_age

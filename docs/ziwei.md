@@ -2,27 +2,23 @@
 
 [文档中心](README.md) · [API 参考](api-reference.md) · [结果解读参考](interpretation/shared/ziwei-topic-evidence.md)
 
-紫微斗数公开入口为 `ziwei_birth_chart`、`ziwei_timing` 与 `ziwei_rules`。三者共用 `rule_profile` 与来源标注，完整输入与字段视图见[按需调用合同](contracts/README.md)。
+紫微斗数公开入口为 `ziwei_birth_chart`、`ziwei_timing` 与 `ziwei_rules`，完整输入与字段视图见[按需调用合同](contracts/README.md)。
 
-## 盘式、庙旺与四化
+## 流派、三盘与四化
 
-`rule_profile` 支持 `iztro_2_5_8`（软件对照基线）与 `quanshu_v2_excerpt`（限定原典摘录配置）。`sihua_source` 默认沿用所选配置，也可显式指定 `naj_ming_v1`（明刊四化表）；`brightness_source` 默认沿用基础配置，也可显式选择 `iztro_2_5_8`、`quanshu_v2_selected_table`、`ziwei_doushu_qs`、`ziwei_doushu_xd1`、`ziwei_doushu_zz` 或 `ziwei_doushu_xd2`。显式选表仅替换对应表层，不改变安星或运限规则。
+- `school` 支持 `default`（软件三合基线）、`zhongzhou`（中州派：年支定命主、阴男阳女天伤天使互换、单星截空、大耗/龙德/劫杀、岁破）、`quanshu`（全书卷二摘录）与 `feixing`（飞星/钦天四化矩阵与来因宫）。
+- `astro_type` 支持 `heaven`（天盘，命宫起盘）、`earth`（地盘，身宫为命宫重排）与 `human`（人盘，福德宫为命宫重排）。
+- `sihua_source` 支持 `rule_profile`、`iztro_2_5_8`、`quanshu_v2`、`naj_ming_v1`、`feixing_liang` 与 `qintian`。
+- `brightness_source` 支持 `rule_profile`、`iztro_2_5_8`、`quanshu_v2_selected_table`、`ziwei_doushu_qs`、`ziwei_doushu_xd1`、`ziwei_doushu_zz` 与 `ziwei_doushu_xd2`。
+- 本命盘返回 `ming_gong`、`shen_gong`、`laiyin_gong`、`zidou_branch`、`wuxing_ju`、`daxian_direction`、`sihua`、`chart_masters`、`calendar_cycles`、`void_systems`、`flying_sihua`（十二宫飞星四化、离心自化、向心自化、忌冲与禄转忌/忌转忌）及 36 项确定性古典 `named_patterns`。
 
-本命盘返回命身宫、五行局、十四主星、辅星、四化、庙旺表、三方四正、长生与博士循环及旬空证据；年干四化使用所选农历年，不以八字立春年柱替代。
+## 时钟、分日与岁序
 
-## 时钟与岁序
+- `day_divide` 支持 `current`（晚子 23:00–23:59 算当日）与 `forward`（晚子算次日早子，农历日序、流日/流时天干及虚岁换岁同步翻日）。
+- `year_divide` 支持 `normal`（正月初一换年，默认）与 `exact`（立春换年）。
+- `horoscope_divide` 支持 `normal`（农历月建，默认）与 `exact`（节气月建）；`natal_leap_month_policy` 统一覆盖本命与目标流月闰月规则。
+- `age_divide` 支持 `normal`（农历新年换岁）与 `birthday`（农历生日换岁）。
 
-出生民用时钟、真太阳排盘时钟与目标时钟分开记录，重复民用钟时需传 `birth_utc_offset`。真太阳日期可影响安星日界，但虚岁岁序统一按 `birth_civil_timezone` 的东亚农历正月初一 00:00 换岁；目标时刻不得早于出生时刻。
+## 大限、童限、斗君与批量运限
 
-## 大限、小限与流曜
-
-`ziwei_timing` 分层返回大限、小限、流年、流月、流日与流时；未达五行局起运岁数时，大限返回 `status=not_started`，独立童限由 `childhood_limit` 返回。`analysis_minute` 与 `analysis_timezone` 默认分别为 `0` 和 `Asia/Shanghai`。
-
-| 字段 | 含义 |
-| --- | --- |
-| `scopes[].palace_name` / `natal_palace_name` | 本层活动命宫所临的本命宫（角色见 `scope_palace_role`） |
-| `palace_map` | 本层十二宫功能与本命星位的映射 |
-| `mutagen_natal_links` | 本层四化与本命星曜、宫位的连接 |
-| `natal_prerequisites` | 同次运限内部计算的农历、年干、时支、命身宫、五行局及推导轨迹 |
-
-解读起大限岁数与局数依据时，可直接按 `evidence_views.natal_prerequisites` 投影读取，无需重复调用 `ziwei_birth_chart`。
+`ziwei_timing` 返回 `nominal_age`、`doujun_branch`（流年斗君）、1–6 岁激活态 `childhood_limit`（一命二财三疾厄，四岁夫妻五福德，六岁官禄）及 `scopes`（大限、小限、流年、流月、流日、流时）；另支持 `include_decadal_list`、`include_yearly_list`、`include_monthly_list` 一次性返回批量运限速览。

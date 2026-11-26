@@ -2,11 +2,14 @@
 
 import pytest
 
-from fatebridge.core.ziwei.ziwei_cycle_sources import year_branch_cycles
-from tests.support.transports import SPECS, projected_outputs, rest
+from fatebridge.core.ziwei.stars import year_branch_cycles
+from tests.support.transports import SPECS, projected_outputs
 
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 SUIQIAN = "岁建 晦气 丧门 贯索 官符 小耗 大耗 龙德 白虎 天德 吊客 病符".split()
+SUIQIAN_ZHONGZHOU = (
+    "岁建 晦气 丧门 贯索 官符 小耗 岁破 龙德 白虎 天德 吊客 病符".split()
+)
 JIANGQIAN = "将星 攀鞍 岁驿 息神 华盖 劫煞 灾煞 天煞 指背 咸池 月煞 亡神".split()
 BIRTH = {
     "birth_year": 1992,
@@ -35,7 +38,7 @@ TARGET = {
     + [(branch, "午未申酉戌亥子丑寅卯辰巳") for branch in "寅午戌"]
     + [(branch, "卯辰巳午未申酉戌亥子丑寅") for branch in "亥卯未"],
 )
-def test_all_year_branches_and_triad_starts(year_branch, jiang_branches):
+def test_all_year_branches_and_triad_starts(year_branch, jiang_branches) -> None:
     cycles = year_branch_cycles(year_branch, anchor_basis="natal_lunar_year_branch")
     assert cycles["year_branch"] == year_branch
     assert cycles["direction"] == "forward"
@@ -49,9 +52,17 @@ def test_all_year_branches_and_triad_starts(year_branch, jiang_branches):
     assert [(p["name"], p["branch"]) for p in cycles["jiangqian"]["positions"]] == list(
         zip(JIANGQIAN, jiang_branches, strict=True)
     )
+    zz = year_branch_cycles(
+        year_branch, anchor_basis="natal_lunar_year_branch", school="zhongzhou"
+    )
+    assert [(p["name"], p["branch"]) for p in zz["suiqian"]["positions"]] == list(
+        zip(SUIQIAN_ZHONGZHOU, sui_branches, strict=True)
+    )
 
 
-def test_annual_cycle_and_flowing_basis_match_three_surfaces(rest, tmp_path, capsys):
+def test_annual_cycle_and_flowing_basis_match_three_surfaces(
+    rest, tmp_path, capsys
+) -> None:
     fields = [
         "ziwei_horoscope.annual_cycles",
         "ziwei_horoscope.scopes",
