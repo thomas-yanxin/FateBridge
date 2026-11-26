@@ -46,39 +46,17 @@ def resolve_bazi_effective_date(
 
 
 class BaZiCalendar:
-    """
-    八字历法转换工具类，负责将公历日期转换为中国传统干支历法
+    """Resolve solar-boundary year/month pillars and selected day/hour labels."""
 
-    该类提供了完整的四柱（年月日时）计算功能，包括：
-    - 年柱计算：基于六十甲子循环
-    - 月柱计算：根据年干和月份确定月干支
-    - 日柱计算：基于基准日期的偏移量计算
-    - 时柱计算：根据日干和时辰确定时干支
-
-    基准参考点：
-    - 基准年份：1984年（甲子年）
-    - 基准日期：1984-03-31（甲子日）
-
-    Attributes:
-        BASE_YEAR (int): 基准年份，用于年柱计算
-    """
-
-    # Base reference point: 甲子年甲子月甲子日甲子时
-    # Using 1984-02-02 as base year (甲子年)
     BASE_YEAR = 1984
-
-    @staticmethod
-    def get_stem_branch_index(base_index: int, offset: int, cycle_length: int) -> int:
-        """Calculate index in stem-branch cycle."""
-        return (base_index + offset) % cycle_length
 
     @classmethod
     def calculate_year_pillar(cls, year: int) -> tuple[str, str]:
         """Calculate the year pillar (年柱) for a given year."""
         year_offset = year - cls.BASE_YEAR
 
-        stem_index = cls.get_stem_branch_index(0, year_offset, 10)  # 甲 is index 0
-        branch_index = cls.get_stem_branch_index(0, year_offset, 12)  # 子 is index 0
+        stem_index = year_offset % len(HEAVENLY_STEMS)
+        branch_index = year_offset % len(EARTHLY_BRANCHES)
 
         return HEAVENLY_STEMS[stem_index], EARTHLY_BRANCHES[branch_index]
 
@@ -136,20 +114,9 @@ class BaZiCalendar:
         hour: int | None = None,
         apply_late_zi_rollover: bool = True,
     ) -> tuple[str, str]:
-        """Calculate the day pillar (日柱) for a given date.
+        """Resolve the civil day, advancing at 23:00 when hour rollover is enabled.
 
-        When ``hour`` is provided and ``apply_late_zi_rollover`` is True
-        (default), times at 23:00-23:59 automatically roll to the next day's
-        pillar per the 晚子时/夜子时 rule. Callers that only have a civil
-        date (no hour context) can omit ``hour`` to get the original date's
-        pillar with no rollover applied — this preserves the pre-rollover
-        signature so existing callers who already did their own
-        ``resolve_bazi_effective_date`` need no changes.
-
-        Prefer passing ``hour`` when you have it: this keeps the rollover
-        invariant encapsulated here rather than scattered across callers,
-        which is what allowed _calculate_liuri_cached to silently skip it
-        for months.
+        Omit hour or disable rollover when the supplied date is already effective.
         """
         if hour is not None and apply_late_zi_rollover:
             year, month, day = resolve_bazi_effective_date(year, month, day, hour)
