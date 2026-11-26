@@ -19,61 +19,80 @@ from fatebridge.core.local_techniques.chart import (
     _normalize_date_text,
     _normalize_time_text,
 )
+from fatebridge.utils.coordinates import parse_geo_coordinate
+from fatebridge.utils.house_systems import InvalidHouseSystemError, house_system_fields
+
+
+def _resolve_otherbu_chart_options(
+    house_system: int | str, zodiac_type: str
+) -> tuple[int, str, int, str]:
+    if isinstance(house_system, bool):
+        raise ValueError("house_system不能为布尔值，仅用于附加天象盘")
+    try:
+        house_fields = house_system_fields(house_system, default="D")
+    except InvalidHouseSystemError as exc:
+        raise ValueError(str(exc)) from exc
+    hsys = house_fields["house_system_code"]
+    if hsys is None:
+        raise ValueError("house_system仅支持0..8对应宫制，仅用于附加天象盘")
+    if not isinstance(zodiac_type, str):
+        raise ValueError("zodiac_type必须为Tropic或Sidereal，仅用于附加天象盘")
+    token = zodiac_type.strip().casefold()
+    if token in {"tropic", "tropical"}:
+        return hsys, house_fields["house_system"], 0, "Tropic"
+    if token == "sidereal":
+        return hsys, house_fields["house_system"], 1, "Sidereal"
+    raise ValueError("zodiac_type必须为Tropic或Sidereal，仅用于附加天象盘")
 
 
 def build_otherbu_result(
     *,
     date: str | None = None,
     time: str | None = None,
-    zone: str | None = None,
-    lat: str | float | None = None,
-    lon: str | float | None = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    timezone: str | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     tradition: bool = False,
     sign: str | None = None,
     house: int | None = None,
     planet: str | None = None,
     question: str | None = None,
-    hsys: int = 8,
-    zodiacal: int = 0,
+    house_system: int | str = "D",
+    zodiac_type: str = "Tropic",
     fortune_method: str = "sect_reversing",
 ) -> dict[str, Any]:
     normalized_sign = normalize_sign(sign)
     normalized_planet = normalize_planet(planet)
     normalized_house = normalize_house(house)
-    if type(hsys) is not int or hsys not in range(9):
-        raise ValueError("hsys必须为0..8的整数，仅用于附加天象盘")
-    if type(zodiacal) is not int or zodiacal not in {0, 1}:
-        raise ValueError("zodiacal必须为0或1的整数，仅用于附加天象盘")
+    hsys, resolved_house_system, zodiacal, normalized_zodiac_type = (
+        _resolve_otherbu_chart_options(house_system, zodiac_type)
+    )
     if fortune_method not in FORTUNE_METHODS:
         raise ValueError("fortune_method必须为sect_reversing或ptolemy_iii10")
+    parsed_latitude = parse_geo_coordinate(latitude, axis="latitude")
+    parsed_longitude = parse_geo_coordinate(longitude, axis="longitude")
     validate_context(
         date=date,
         time=time,
-        zone=zone,
-        lat=lat,
-        lon=lon,
-        gps_lat=gps_lat,
-        gps_lon=gps_lon,
+        timezone=timezone,
+        latitude=parsed_latitude,
+        longitude=parsed_longitude,
     )
     date_text = _normalize_date_text(date) if date is not None else None
     time_text = _normalize_time_text(time) if time is not None else None
     inputs = {
         "date": date_text,
         "time": time_text,
-        "zone": zone,
-        "lat": lat,
-        "lon": lon,
-        "gpsLat": gps_lat,
-        "gpsLon": gps_lon,
+        "timezone": timezone,
+        "latitude": parsed_latitude,
+        "longitude": parsed_longitude,
         "tradition": tradition,
         "sign": normalized_sign,
         "house": normalized_house,
         "planet": normalized_planet,
         "question": question,
-        "hsys": hsys,
-        "zodiacal": zodiacal,
+        "house_system": resolved_house_system,
+        "zodiac_type": normalized_zodiac_type,
         "fortune_method": fortune_method,
     }
     evidence = build_symbolic_evidence(
@@ -109,11 +128,11 @@ def build_otherbu_result(
         base_chart = _build_local_chart_response(
             date_text=date_text,
             time_text=time_text,
-            timezone_name=zone,
-            lat=lat,
-            lon=lon,
-            gps_lat=gps_lat,
-            gps_lon=gps_lon,
+            timezone_name=timezone,
+            lat=parsed_latitude,
+            lon=parsed_longitude,
+            gps_lat=None,
+            gps_lon=None,
             tradition=tradition,
             hsys=hsys,
             zodiacal=zodiacal,

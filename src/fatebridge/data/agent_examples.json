@@ -37,14 +37,14 @@
     "heluo": {
       "date": "1990-06-15",
       "time": "09:33:00",
-      "zone": "Asia/Shanghai",
+      "timezone": "Asia/Shanghai",
       "gender": "男",
       "use_true_solar_time": false
     },
     "canping": {
       "date": "1990-06-15",
       "time": "09:33:00",
-      "zone": "Asia/Shanghai",
+      "timezone": "Asia/Shanghai",
       "gender": "男",
       "method": "gu",
       "use_true_solar_time": false
@@ -60,7 +60,7 @@
     "sanshi_combined_chart": {
       "date": "2026-04-04",
       "time": "12:00:00",
-      "zone": "Asia/Shanghai",
+      "timezone": "Asia/Shanghai",
       "use_true_solar_time": false
     },
     "interpret_astrology_dice": {
@@ -140,15 +140,17 @@
       "analysis_longitude": 116.4074
     },
     "gua_lookup": {
-      "query": "111111",
-      "lookup_mode": "hexagram"
+      "queries": [
+        "乾"
+      ],
+      "lookup_mode": "auto"
     },
     "liuyao": {
       "date": "2026-10-12",
       "time": "12:00:00",
-      "zone": "+08:00",
-      "lat": "39n54",
-      "lon": "116e24",
+      "timezone": "+08:00",
+      "latitude": "39n54",
+      "longitude": "116e24",
       "seed": 42
     },
     "knowledge_catalog": {
@@ -417,9 +419,9 @@
     "suzhan": {
       "date": "2025-03-04",
       "time": "12:00:00",
-      "zone": "+08:00",
-      "lat": "31n13",
-      "lon": "121e28",
+      "timezone": "+08:00",
+      "latitude": "31n13",
+      "longitude": "121e28",
       "natal_mansion": "奎",
       "activity": "marriage"
     },
@@ -567,14 +569,8 @@
     "lunar_calendar_time": {
       "date": "2026-04-01",
       "time": "09:00:00",
-      "zone": "Asia/Shanghai",
+      "timezone": "Asia/Shanghai",
       "time_alg": 1
-    },
-    "gua_meanings": {
-      "name": [
-        "乾",
-        "坤"
-      ]
     },
     "combine_four_gua": {
       "taiyin": "乾",
@@ -1182,14 +1178,7 @@
       "summary"
     ],
     "gua_lookup": [
-      "analysis_type",
       "lookup_mode",
-      "query",
-      "result",
-      "summary"
-    ],
-    "gua_meanings": [
-      "analysis_type",
       "queries",
       "results",
       "summary"
@@ -1312,6 +1301,322 @@
       "rule_catalogue.ruleset",
       "rule_catalogue.sihua_by_year_stem",
       "rule_catalogue.sihua_source_comparison"
+    ],
+    "taiyi": [
+      "analysis_context",
+      "taiyi.core_board",
+      "taiyi.calendar_summary",
+      "taiyi.rule_trace",
+      "taiyi.pattern_summary",
+      "taiyi.palace_marks",
+      "taiyi.center_marks",
+      "taiyi.extra_palace_marks",
+      "taiyi.ruleset",
+      "taiyi.long_cycle_summary"
+    ],
+    "sanshi_combined_chart": [
+      "analysis_context",
+      "taiyi.calendar_summary",
+      "taiyi.core_board",
+      "taiyi.pattern_summary",
+      "taiyi.ruleset",
+      "qimen.ju_text",
+      "qimen.zhifu",
+      "qimen.zhishi",
+      "qimen.stem_context.day",
+      "qimen.stem_context.hour",
+      "qimen.stem_context.day_jia_policy_automatically_selected",
+      "qimen.rule_profiles.god.id",
+      "qimen.rule_profiles.god.title",
+      "qimen.rule_profiles.god.variant_note",
+      "qimen.rule_profiles.season.id",
+      "qimen.rule_profiles.season.title",
+      "qimen.rule_profiles.season.variant_note",
+      "qimen.rule_profiles.wonder_tomb.id",
+      "qimen.rule_profiles.wonder_tomb.title",
+      "qimen.rule_profiles.wonder_tomb.variant_note",
+      "qimen.rule_profiles.wonder_tomb.source_priority_resolved",
+      "qimen.rule_profiles.wonder_tomb.whole_book_conformance_established",
+      "synthesis.source_profiles.qimen",
+      "liureng.month_general",
+      "liureng.three_transmissions",
+      "liureng.patterns",
+      "liureng.ruleset.id",
+      "liureng.ruleset.version",
+      "liureng.ruleset.source_title",
+      "liureng.ruleset.classical_conformance",
+      "liureng.ruleset.classical_acceptance_passed",
+      "synthesis.time_scopes",
+      "synthesis.limitations"
+    ],
+    "bazi_overview": [
+      "four_pillars",
+      "day_master.stem",
+      "day_master.element",
+      "day_master.polarity",
+      "day_master.strength",
+      "day_master.engineering_index",
+      "day_master.classical_adjudication",
+      "day_master.assessment.method_id",
+      "day_master.assessment.status",
+      "day_master.assessment.support_share",
+      "day_master.assessment.structural_decision",
+      "ten_gods",
+      "structure_profile.resolution_policy",
+      "structure_profile.assessment_status",
+      "structure_profile.dominant_structure",
+      "structure_profile.recognized_structures",
+      "structure_profile.useful_elements",
+      "structure_profile.avoid_elements",
+      "structure_profile.conditional_elements",
+      "structure_profile.neutral_elements",
+      "structure_profile.layers",
+      "structure_profile.conflicts",
+      "structure_profile.decision_basis",
+      "structure_profile.evidence_chain.method_id",
+      "element_distribution",
+      "element_distribution_basis",
+      "person_info"
+    ],
+    "bazi_birth_chart": [
+      "bazi_birth.four_pillars",
+      "bazi_birth.day_master"
+    ],
+    "bazi_career": [
+      "career_analysis.evidence_chain.topic.first_view",
+      "career_analysis.timing_context"
+    ],
+    "bazi_timing": [
+      "personal_info.analysis_datetime",
+      "birth_pillars",
+      "dayun_analysis.current_dayun",
+      "dayun_analysis.start_at",
+      "dayun_analysis.end_at",
+      "dayun_analysis.selection_basis",
+      "liunian_analysis.pillar",
+      "liuyue_analysis.pillar",
+      "liuri_analysis.pillar",
+      "liushi_analysis.pillar",
+      "analysis_calendar.analysis_date_context.timezone",
+      "analysis_calendar.analysis_date_context.current_solar_term.name",
+      "analysis_calendar.analysis_date_context.current_solar_term.datetime_with_offset",
+      "analysis_calendar.analysis_date_context.next_solar_term.name",
+      "analysis_calendar.analysis_date_context.next_solar_term.datetime_with_offset",
+      "analysis_calendar.analysis_date_context.bazi_month_boundary.branch"
+    ],
+    "ziwei_birth_chart": [
+      "analysis_context",
+      "ziwei_birth.ruleset",
+      "ziwei_birth.calendar_rules",
+      "ziwei_birth.ming_gong",
+      "ziwei_birth.shen_gong",
+      "ziwei_birth.reading_view",
+      "ziwei_birth.sihua",
+      "ziwei_birth.chart_masters",
+      "ziwei_birth.wuxing_ju",
+      "ziwei_birth.calendar_cycles.status",
+      "ziwei_birth.calendar_cycles.changsheng_rule",
+      "ziwei_birth.calendar_cycles.boshi_rule"
+    ],
+    "astrology_chart": [
+      "angles",
+      "chart_profile.chart_type",
+      "chart_profile.zodiac",
+      "chart_profile.zodiac_label_zh",
+      "chart_profile.house_system",
+      "chart_profile.house_system_code",
+      "chart_profile.house_system_source",
+      "chart_profile.coordinate_precision",
+      "chart_profile.ephemeris_model",
+      "chart_profile.calendar",
+      "chart_profile.time_scale",
+      "chart_profile.julian_day_tt",
+      "chart_profile.julian_day_ut1",
+      "chart_profile.horizon_method",
+      "chart_profile.angle_method",
+      "chart_profile.sect_convention",
+      "planets",
+      "aspects"
+    ],
+    "meihua_time_cast": [
+      "analysis_context.analysis_datetime",
+      "analysis_context.timezone",
+      "analysis_context.civil_utc_offset",
+      "analysis_context.civil_instant_utc",
+      "meihua.calendar_policy.day_boundary",
+      "meihua.calendar_policy.true_solar_time_applied",
+      "meihua.calendar_policy.label_precision.status",
+      "meihua.base_hexagram.name",
+      "meihua.base_hexagram.binary_code",
+      "meihua.base_hexagram.symbol",
+      "meihua.mutual_hexagram.name",
+      "meihua.mutual_hexagram.binary_code",
+      "meihua.changed_hexagram.name",
+      "meihua.changed_hexagram.binary_code",
+      "meihua.changed_hexagram.symbol",
+      "meihua.seed.moving_line",
+      "meihua.body_trigram.name",
+      "meihua.use_trigram.name",
+      "meihua.body_use_relation",
+      "meihua.stage_relations",
+      "meihua.ruleset.id",
+      "meihua.ruleset.version",
+      "interpretation.interpretation_topic",
+      "interpretation.classical_text_reference",
+      "summary"
+    ],
+    "qimen": [
+      "analysis_context",
+      "four_pillars",
+      "qimen.ju_text",
+      "qimen.dun_type",
+      "qimen.xun_head",
+      "qimen.kongwang",
+      "qimen.zhifu",
+      "qimen.zhishi",
+      "qimen.palaces",
+      "qimen.ju_method",
+      "qimen.structure",
+      "qimen.source_disagreements",
+      "qimen.engine"
+    ],
+    "fengshui_directions": [
+      "status",
+      "layers.directions",
+      "coverage",
+      "rulesets",
+      "source_catalog",
+      "rule_trace"
+    ],
+    "knowledge_read": [
+      "title",
+      "lines",
+      "source",
+      "citation"
+    ],
+    "bazi_wealth": [
+      "wealth_analysis.evidence_chain.topic.first_view",
+      "wealth_analysis.timing_context"
+    ],
+    "fengshui_jinsuo": [
+      "status",
+      "layers.jinsuo",
+      "coverage",
+      "rulesets",
+      "source_catalog",
+      "rule_trace"
+    ],
+    "fengshui_assess": [
+      "status",
+      "layout_analysis.status",
+      "layout_analysis.analysis_progress",
+      "layout_analysis.calculation_scope",
+      "layout_analysis.placement_findings",
+      "layout_analysis.form_analysis",
+      "layout_analysis.element_remedies",
+      "layout_analysis.annual_remedies",
+      "layout_analysis.supplement_statuses",
+      "layout_analysis.method_disagreements",
+      "layout_analysis.missing_inputs",
+      "coverage",
+      "rule_trace",
+      "rulesets",
+      "source_catalog"
+    ],
+    "western_timing": [
+      "analysis_context",
+      "summary",
+      "time_lords.firdaria.sect",
+      "time_lords.firdaria.current_major",
+      "time_lords.firdaria.current_sub",
+      "time_lords.annual_profection",
+      "returns.solar_return.return_datetime",
+      "returns.solar_return.return_datetime_utc",
+      "returns.solar_return.sun",
+      "returns.solar_return.moon",
+      "returns.solar_return.ascendant",
+      "returns.solar_return.medium_coeli",
+      "returns.solar_return.solver",
+      "returns.solar_return.calculation_basis.engine_backend",
+      "returns.solar_return.calculation_basis.ephemeris_model",
+      "returns.solar_return.calculation_basis.time_scale",
+      "returns.solar_return.calculation_basis.future_leap_seconds_assumed_unchanged",
+      "transits.current_transit.analysis_datetime",
+      "transits.current_transit.orb_limit",
+      "transits.current_transit.hits"
+    ],
+    "bazi_health": [
+      "health_analysis.evidence_chain.element_presence.all_listed_elements",
+      "health_analysis.evidence_chain.element_presence.absent_from_all_listed",
+      "health_analysis.evidence_chain.seasonal_reference.method_id",
+      "health_analysis.timing_context"
+    ],
+    "bazi_marriage": [
+      "marriage_analysis.evidence_chain.topic.first_view",
+      "marriage_analysis.timing_context"
+    ],
+    "bazi_romance": [
+      "romance_analysis.evidence_chain.topic.first_view",
+      "romance_analysis.timing_context"
+    ],
+    "bazi_education": [
+      "education_analysis.evidence_chain.topic.first_view",
+      "education_analysis.timing_context"
+    ],
+    "bazi_personality": [
+      "personality_analysis.evidence_chain.topic.first_view",
+      "personality_analysis.timing_context"
+    ],
+    "bazi_relatives": [
+      "relatives_analysis.evidence_chain.topic.first_view",
+      "relatives_analysis.timing_context"
+    ],
+    "bazi_children": [
+      "children_analysis.evidence_chain.topic.first_view",
+      "children_analysis.timing_context"
+    ],
+    "hamburg_midpoint_chart": [
+      "summary",
+      "midpoint_analysis.status",
+      "midpoint_analysis.profile",
+      "midpoint_analysis.contact_counts",
+      "midpoint_analysis.reading_guide",
+      "midpoint_analysis.limitations",
+      "midpoint_analysis.original_text_conformance",
+      "midpoint_analysis.interpretations",
+      "midpoint_analysis.time_sensitivity.status",
+      "midpoint_analysis.time_sensitivity.uncertainty_minutes",
+      "midpoint_analysis.unique_two_factor_pair_count",
+      "base_chart.person_info"
+    ],
+    "human_design": [
+      "birth_utc",
+      "design_utc",
+      "calculation_policy.node_mode",
+      "calculation_policy.ephemeris_model",
+      "bodygraph.type",
+      "bodygraph.subtype",
+      "bodygraph.authority",
+      "bodygraph.strategy",
+      "bodygraph.definition",
+      "bodygraph.channels",
+      "profile",
+      "variables.status",
+      "variables.code",
+      "profile_evidence.status",
+      "profile_evidence.lines",
+      "profile_evidence.geometry",
+      "source_consistency.status",
+      "source_consistency.discrepancies",
+      "validation",
+      "source_summary"
+    ],
+    "compare_bazi_sources": [
+      "four_pillars",
+      "input_context",
+      "current_calculation.strength_level",
+      "source_comparison",
+      "summary"
     ]
   },
   "suggested_fields": {
@@ -1966,7 +2271,8 @@
     "fengshui_xuankong_house_chart": {
       "natal_delivery": "普通宅盘用 evidence_views.natal_candidates，先读 period_context、orientation_context、全部 candidates 和 missing_inputs，并保留 rulesets/rule_trace。缺定运或定向资料时交付已知事实与本次待补项；缺磁向用 house.facing_degrees 配 north_reference=magnetic。边界向逐候选说明，按 candidate_id 关联盘式及依据。候选为数组，投影使用整个 candidates。",
       "natal_details": "格局读每个 candidates[].structure；需要原典数字对照时首轮用 natal_patterns，保留各候选的比对范围与未裁定项。启用 interpretation 后可读 natal_interpretation；当前评价运与历史宅运独立。若 include_calculation_reading=true（启用解释时默认），追加 calculation_reading。若指定 city_gate，追加 layers.xuankong_natal.city_gate_analysis，独立核对其参考运、状态和缺项。",
-      "natal_projection": "同次需要的视图在首轮合并 fields；result_delivery 只保留当次所选字段，分页沿同一 run 读回。兼容原始路径 layers.xuankong_natal.chart 只有唯一候选才有值；完整导出首次 fields=null。"
+      "natal_projection": "同次需要的视图在首轮合并 fields；result_delivery 只保留当次所选字段，分页沿同一 run 读回。兼容原始路径 layers.xuankong_natal.chart 只有唯一候选才有值；完整导出首次 fields=null。",
+      "conditioned_scope": "独立于年星；interpretation 显式启用 xuankong_conditioned_v1 有限解释，current_period_number 与 period_evidence 成对，外局分宫独立确认山形/水形，不复用金锁或室内靠背。"
     },
     "jinkou": {
       "month_general_scope": "jinkou.overview.month_general是依中气确定的月将本位；yuejiang是月将加时后落在地分的将神，对应四位将神行。两支可不同，解释分别说明，不将落地分的支称为中气月将本位。快照使用月将本位、将神落地分两个标签。",
@@ -2482,6 +2788,27 @@
     "bazi_compatibility": {
       "evidence": "先读双方四柱与跨盘触点。按需增加 cross_chart_relations.directional_punishments 和 directional_ten_gods。natal_matches 记录哪方原局已具备同一组关系。",
       "interpretation": "按两人的实际关系与问题解释，分别引用双方对应星位。"
+    },
+    "bazi_timing": {
+      "clock_defaults": "分析日期全省略时用 as_of/执行开始的完整当地瞬间；实际时刻与补齐来源见 analysis_reference。"
+    },
+    "bazi_luck_cycles": {
+      "clock_defaults": "日期全省略时按 as_of/执行开始的完整当地瞬间选运；analysis_age 仅作显式年龄参考，实际时刻与补齐来源见 analysis_reference。"
+    },
+    "bazi_monthly_timing": {
+      "clock_defaults": "日期全省略时用 as_of/当前完整当地瞬间，显式部分日期仍缺日取15，见 analysis_reference；solar_term_window 是十二节换月窗口，二十四节气见 analysis_calendar.analysis_date_context。"
+    },
+    "bazi_daily_timing": {
+      "clock_defaults": "日期全省略时用 as_of/当前完整当地瞬间，保留晚子时换日，实际时刻与补齐见 analysis_reference；solar_term_window 是十二节换月窗口，二十四节气见 analysis_calendar.analysis_date_context。"
+    },
+    "bazi_hourly_timing": {
+      "clock_defaults": "日期全省略时用 as_of/当前完整当地瞬间，实际时刻与补齐见 analysis_reference；时柱整点缓存不代替交气比较时刻。"
+    },
+    "fengshui_monthly_stars": {
+      "time_scope": "十二节交节时刻换月的九宫月紫白；可传含时区 query_at 或已确认的 effective_solar_year/solar_month_number，不以公历月或农历月补值，不替代年盘或宅盘，不生成布局处方。"
+    },
+    "ipip_big_five": {
+      "scoring_scope": "Goldberg (1992) 公有领域 50 题大五人格量表：action=list_items 列出题项与计分方向；action=score 对 1-5 分整数作答进行确定性正反向计分、8/10 缺题阈值折算；仅输出客观计分事实与量表出处，不输出百分位、诊断或叙事建议。"
     }
   },
   "evidence_views": {

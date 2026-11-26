@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from decimal import Decimal
-from fractions import Fraction
 from typing import Any
 
 from fatebridge.core.heluo.heluo import calculate as _heluo_calculate
@@ -48,6 +46,7 @@ from fatebridge.core.numerology.numerology_pillars import (
     verified_computed_pillars,
 )
 from fatebridge.utils.birth_input import normalize_gender
+from fatebridge.utils.coordinates import parse_geo_coordinate
 from fatebridge.utils.errors import NumerologySourceError
 from fatebridge.utils.formatting import create_pillar_dict
 
@@ -56,12 +55,10 @@ def build_heluo_result(
     *,
     date: str,
     time: str,
-    zone: str | None = None,
+    timezone: str | None = None,
     birth_utc_offset: str | None = None,
-    lat: str | int | float | Decimal | Fraction | None = None,
-    lon: str | int | float | Decimal | Fraction | None = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     gender: str | None = None,
     use_true_solar_time: bool = False,
     analysis_year: int | None = None,
@@ -73,20 +70,19 @@ def build_heluo_result(
     normalized_gender = normalize_gender(gender)
     if not isinstance(gender, str) or normalized_gender not in {"男", "女"}:
         raise ValueError("河洛相荡、寄宫和元堂需要明确gender为男或女，不能默认性别。")
-    longitude, longitude_source = resolve_numerology_longitude(
-        lon, gps_lon, use_true_solar_time
+    parsed_latitude = parse_geo_coordinate(latitude, axis="latitude")
+    parsed_longitude, longitude_source = resolve_numerology_longitude(
+        longitude, use_true_solar_time
     )
     birth_date = _normalize_date_text(date)
     birth_clock = parse_birth_clock(time)
-    timezone_name = resolve_numerology_timezone(zone)
+    timezone_name = resolve_numerology_timezone(timezone)
     input_normalized = {
         "date": birth_date,
         "time": birth_clock.normalized_clock,
-        "zone": timezone_name,
-        "lat": lat,
-        "lon": lon,
-        "gpsLat": gps_lat,
-        "gpsLon": gps_lon,
+        "timezone": timezone_name,
+        "latitude": parsed_latitude,
+        "longitude": parsed_longitude,
         "gender": normalized_gender,
         "use_true_solar_time": use_true_solar_time,
         "analysis_year": analysis_year,
@@ -107,9 +103,9 @@ def build_heluo_result(
         date_text=birth_date,
         time_text=seed_time,
         timezone_name=timezone_name,
-        lat=lat,
-        lon=longitude,
-        gps_lat=gps_lat,
+        lat=parsed_latitude,
+        lon=parsed_longitude,
+        gps_lat=None,
         gps_lon=None,
         use_true_solar_time=use_true_solar_time,
     )
@@ -169,10 +165,10 @@ def build_heluo_result(
     )
     bind_seasonal_context(st, judgment["seasonal_numbers"])
     analysis_context = _build_metaphysics_analysis_context(seed)
-    analysis_context["longitude"] = longitude
+    analysis_context["longitude"] = parsed_longitude
     clock = numerology_birth_clock(
         seed,
-        longitude,
+        parsed_longitude,
         longitude_source,
         birth_utc_offset=confirmed_offset,
         input_clock=birth_clock,

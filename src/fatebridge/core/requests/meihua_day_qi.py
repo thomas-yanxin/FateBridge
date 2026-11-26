@@ -4,10 +4,10 @@ from typing import Literal
 
 from pydantic import Field, model_validator
 
-from .base import _DeferredModel
+from fatebridge.core.requests.base import FateBridgeBaseRequest
 
 
-class MeihuaDayQiContext(_DeferredModel):
+class MeihuaDayQiContext(FateBridgeBaseRequest):
     label: str = Field(min_length=1, max_length=240)
     day_branch: Literal[
         "子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"

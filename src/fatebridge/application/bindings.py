@@ -167,7 +167,7 @@ def bind_request(service: ServiceRef | ResolvedService) -> Bind:
     def bind(request: BaseModel) -> BoundServiceCall:
         return BoundServiceCall(
             resolve_service(service),
-            (request,),  # type: ignore[arg-type]
+            (request,),
             {},
         )
 

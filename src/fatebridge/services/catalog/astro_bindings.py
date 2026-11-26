@@ -23,19 +23,19 @@ calculate_relative_chart_analysis = service_ref(
 )
 
 
-def _astro_chart_bind(
-    req: BaseModel,
+def bind_astro_natal_chart(
+    request: BaseModel,
 ) -> BoundServiceCall:
-    assert isinstance(req, AstroNatalChartRequest)
-    data = req.service_inputs()
+    assert isinstance(request, AstroNatalChartRequest)
+    arguments = request.service_inputs()
     return BoundServiceCall(
         resolve_service(calculate_core_chart_analysis),
         (),
-        {**data, "chart_variant": "chart"},
+        {**arguments, "chart_variant": "chart"},
     )
 
 
-def _astro_relative_flat_bind(
+def bind_relationship_chart(
     request: BaseModel,
 ) -> BoundServiceCall:
     arguments: dict[str, ServiceInput] = request.model_dump()

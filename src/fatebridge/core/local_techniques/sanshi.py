@@ -23,6 +23,7 @@ from fatebridge.core.metaphysics.ren_gods import DEFAULT_GUIREN_PROFILE, GuirenP
 from fatebridge.core.metaphysics.sanshi_correspondences import palace_correspondences
 from fatebridge.core.metaphysics.taiyi import build_taiyi_board
 from fatebridge.core.metaphysics.taiyi_dangshi import noble_source_assessment
+from fatebridge.utils.coordinates import parse_geo_coordinate
 from fatebridge.utils.formatting import create_pillar_dict
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 
@@ -96,11 +97,9 @@ def build_sanshiunited_result(
     *,
     date: str,
     time: str,
-    zone: str | None = None,
-    lat: Any = None,
-    lon: Any = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    timezone: str | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     qimen_options: dict[str, Any] | None = None,
     taiyi_options: dict[str, Any] | None = None,
     liureng_yue: str | None = None,
@@ -108,14 +107,17 @@ def build_sanshiunited_result(
     liureng_guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
     use_true_solar_time: bool = False,
 ) -> dict[str, Any]:
-    input_normalized = {
-        "date": _normalize_date_text(date),
-        "time": _normalize_time_text(time),
-        "zone": zone or DEFAULT_BIRTH_TIMEZONE,
-        "lat": lat,
-        "lon": lon,
-        "gpsLat": gps_lat,
-        "gpsLon": gps_lon,
+    date_text = _normalize_date_text(date)
+    time_text = _normalize_time_text(time)
+    timezone_name = timezone or DEFAULT_BIRTH_TIMEZONE
+    parsed_latitude = parse_geo_coordinate(latitude, axis="latitude")
+    parsed_longitude = parse_geo_coordinate(longitude, axis="longitude")
+    input_normalized: dict[str, Any] = {
+        "date": date_text,
+        "time": time_text,
+        "timezone": timezone_name,
+        "latitude": parsed_latitude,
+        "longitude": parsed_longitude,
         "qimen_options": qimen_options or {},
         "taiyi_options": taiyi_options or {},
         "liureng_yue": liureng_yue,
@@ -124,13 +126,13 @@ def build_sanshiunited_result(
         "use_true_solar_time": bool(use_true_solar_time),
     }
     seed = _build_metaphysics_seed(
-        date_text=input_normalized["date"],
-        time_text=input_normalized["time"],
-        timezone_name=input_normalized["zone"],
-        lat=lat,
-        lon=lon,
-        gps_lat=gps_lat,
-        gps_lon=gps_lon,
+        date_text=date_text,
+        time_text=time_text,
+        timezone_name=timezone_name,
+        lat=parsed_latitude,
+        lon=parsed_longitude,
+        gps_lat=None,
+        gps_lon=None,
         use_true_solar_time=bool(use_true_solar_time),
     )
     qimen_seed = seed
@@ -203,7 +205,7 @@ def build_sanshiunited_result(
             "common_input": {
                 "date": input_normalized["date"],
                 "time": input_normalized["time"],
-                "timezone": input_normalized["zone"],
+                "timezone": input_normalized["timezone"],
             },
             "facts": [
                 {

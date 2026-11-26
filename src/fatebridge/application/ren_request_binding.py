@@ -81,18 +81,16 @@ def require_request_binding(
         assert isinstance(request, SanShiUnitedRequest)
         date_text = _normalize_date_text(request.date)
         time_text = _normalize_time_text(request.time)
-        zone = request.zone or DEFAULT_BIRTH_TIMEZONE
+        zone = request.timezone or DEFAULT_BIRTH_TIMEZONE
         serialized_options = request.model_dump(
             include={"qimen_options", "taiyi_options"}
         )
         normalized = {
             "date": date_text,
             "time": time_text,
-            "zone": zone,
-            "lat": request.lat,
-            "lon": request.lon,
-            "gpsLat": request.gps_lat,
-            "gpsLon": request.gps_lon,
+            "timezone": zone,
+            "latitude": request.latitude,
+            "longitude": request.longitude,
             "qimen_options": serialized_options["qimen_options"] or {},
             "taiyi_options": serialized_options["taiyi_options"] or {},
             "liureng_yue": request.liureng_yue,
@@ -104,10 +102,8 @@ def require_request_binding(
         civil = parse_local_datetime(date_text, time_text, zone, validate_wall=True)
         longitude: float | None
         _, longitude = _resolve_coordinates(
-            lat=request.lat,
-            lon=request.lon,
-            gps_lat=request.gps_lat,
-            gps_lon=request.gps_lon,
+            lat=request.latitude,
+            lon=request.longitude,
         )
         applied_solar = request.use_true_solar_time
         ren_result = _get(result, "subresults.liureng_gods")

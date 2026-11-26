@@ -5,6 +5,7 @@ from __future__ import annotations
 from fatebridge.application.bindings import bind_kwargs, bind_person, service_ref
 from fatebridge.application.domain_validators import resolve_bazi_analysis_time_defaults
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
+from fatebridge.core.reproducibility import ReproducibilityPolicy
 from fatebridge.core.requests.calendar import JieqiYearRequest, NongliTimeRequest
 from fatebridge.core.requests.timing import (
     DayunAnalysisRequest,
@@ -121,12 +122,7 @@ SPECS: list[ToolSpec] = [
         name="bazi_timing",
         bind=bind_person(calculate_comprehensive_timing),
         request_model=TimingAnalysisRequest,
-        summary=(
-            "时运综合分析：一次性给出大运/流年/流月等多粒度的整合影响，想要全景时用它；"
-            "单一粒度可用 bazi_luck_cycles，或对应的 bazi_yearly_timing、"
-            "bazi_monthly_timing、bazi_daily_timing、bazi_hourly_timing。"
-            "分析日期全省略时用as_of/执行开始的完整当地瞬间，实际时刻与补齐来源见analysis_reference。"
-        ),
+        summary="时运综合：整合大运/流年/流月/流日/流时；单项用对应时机或 bazi_luck_cycles。",
         operation_label_zh="时运综合分析",
         family="timing",
         rest_path="/api/bazi/timing",
@@ -137,7 +133,7 @@ SPECS: list[ToolSpec] = [
         name="bazi_luck_cycles",
         bind=bind_person(calculate_dayun_analysis),
         request_model=DayunAnalysisRequest,
-        summary="大运交运时间轴与当前运：日期全省略时按as_of/执行开始的完整当地瞬间选运；analysis_age仅作显式年龄参考。analysis_reference记录实际时刻与补齐来源。要多粒度整合用 bazi_timing。",
+        summary="大运时间轴与当前运；省略日期按 as_of，多粒度整合用 bazi_timing。",
         operation_label_zh="大运分析",
         family="timing",
         rest_path="/api/bazi/timing/luck-cycles",
@@ -158,7 +154,7 @@ SPECS: list[ToolSpec] = [
         name="bazi_monthly_timing",
         bind=bind_person(calculate_liuyue_analysis),
         request_model=LiuyueAnalysisRequest,
-        summary="单看流月影响；日期全省略时用as_of/当前完整当地瞬间，显式部分日期仍缺日取15，见analysis_reference。solar_term_window是十二节换月窗口；二十四节气见analysis_calendar.analysis_date_context。要多粒度整合用 bazi_timing。",
+        summary="十二节换月流月分析；省略日期按 as_of，多粒度用 bazi_timing。",
         operation_label_zh="流月分析",
         family="timing",
         rest_path="/api/bazi/timing/monthly",
@@ -169,7 +165,7 @@ SPECS: list[ToolSpec] = [
         name="bazi_daily_timing",
         bind=bind_person(calculate_liuri_analysis),
         request_model=LiuriAnalysisRequest,
-        summary="单看流日影响；日期全省略时用as_of/当前完整当地瞬间，保留晚子时换日；实际时刻与补齐见analysis_reference。底层solar_term_window是十二节换月窗口；二十四节气见analysis_calendar.analysis_date_context。要多粒度整合用 bazi_timing。",
+        summary="流日分析（含晚子时换日）；省略日期按 as_of，多粒度用 bazi_timing。",
         operation_label_zh="流日分析",
         family="timing",
         rest_path="/api/bazi/timing/daily",
@@ -180,7 +176,7 @@ SPECS: list[ToolSpec] = [
         name="bazi_hourly_timing",
         bind=bind_person(calculate_liushi_analysis),
         request_model=LiushiAnalysisRequest,
-        summary="单看流时（时辰）影响；日期全省略时用as_of/当前完整当地瞬间，实际时刻与补齐见analysis_reference。时柱整点缓存不代替交气比较时刻。要多粒度整合用 bazi_timing。",
+        summary="流时（时辰）分析；省略日期按 as_of，多粒度用 bazi_timing。",
         operation_label_zh="流时分析",
         family="timing",
         rest_path="/api/bazi/timing/hourly",
@@ -195,6 +191,7 @@ SPECS: list[ToolSpec] = [
         operation_label_zh="节气时间轴分析",
         family="timing",
         rest_path="/api/calendar/solar-term-timeline",
+        reproducibility=ReproducibilityPolicy(current_time_fields=("analysis_year",)),
         compact_view=_compact_jieqi_timeline,
         cpu_bound=True,
     ),

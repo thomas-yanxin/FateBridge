@@ -1,11 +1,9 @@
 """Schema and compact capability descriptions derived from ToolSpec."""
 
 from types import UnionType
-from typing import Annotated, Any, get_args, get_origin
+from typing import Annotated, get_args, get_origin
 
 from pydantic import BaseModel
-
-UNION_ORIGINS = (UnionType, get_origin(Annotated[int, "u"] | None))
 
 from fatebridge.application.examples import (
     call_guidance,
@@ -15,8 +13,11 @@ from fatebridge.application.examples import (
     example_input,
     suggested_fields,
 )
-from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.application.tool_spec import ServiceResult, ToolSpec
+from fatebridge.core.reproducibility import ReproducibilityPolicy
 from fatebridge.core.schema_cache import model_schema
+
+UNION_ORIGINS = (UnionType, get_origin(Annotated[int, "u"] | None))
 
 
 def resolve_spec(specs: list[ToolSpec], name: str) -> ToolSpec | None:
@@ -48,21 +49,31 @@ def field_type_name(annotation: object) -> str:
     origin = get_origin(base)
     if origin is list:
         args = get_args(base)
-        inner = getattr(args[0], "__name__", str(args[0])) if args else "str"
+        inner = (
+            args[0].__name__
+            if args and isinstance(args[0], type)
+            else (str(args[0]) if args else "str")
+        )
         return f"list[{inner}]"
     if isinstance(base, type):
         return base.__name__
     return str(base)
 
 
-def describe_spec(spec: ToolSpec) -> dict[str, Any]:
+def _surfaces(spec: ToolSpec) -> dict[str, bool | str | None]:
+    return {
+        "cli": True,
+        "rest": spec.rest_path,
+        "mcp": spec.expose_mcp,
+    }
+
+
+def describe_spec(spec: ToolSpec) -> ServiceResult:
     """Describe one tool's full schemas, capabilities and available transports."""
     return _describe_contract(spec, include_output_schema=True)
 
 
-def _describe_contract(
-    spec: ToolSpec, *, include_output_schema: bool
-) -> dict[str, Any]:
+def _describe_contract(spec: ToolSpec, *, include_output_schema: bool) -> ServiceResult:
     """Build requested contracts without generating schemas that are discarded."""
     parameters = [
         {
@@ -85,7 +96,8 @@ def _describe_contract(
     guidance = call_guidance(spec)
     fields = suggested_fields(spec)
     default_fields = compact_fields(spec)
-    record: dict[str, Any] = {
+    reproducibility = spec.reproducibility or ReproducibilityPolicy()
+    record: ServiceResult = {
         **(
             {"example_input": example, "example_context": example_context()}
             if example is not None
@@ -98,7 +110,7 @@ def _describe_contract(
         "operation_label_zh": spec.operation_label_zh,
         "family": spec.family,
         "annotations": spec.execution_hints.as_annotations(),
-        "reproducibility": spec.reproducibility.as_manifest(),
+        "reproducibility": reproducibility.as_manifest(),
         "method_contract_coverage": (
             "declared_subset" if spec.methods else "not_registered"
         ),
@@ -115,12 +127,7 @@ def _describe_contract(
             "cpu_bound": spec.cpu_bound,
             "budget_scope": "process_shared_across_transports",
         },
-        "surfaces": {
-            "cli": True,
-            "cli_name": spec.name,
-            "rest_path": spec.rest_path,
-            "mcp_name": spec.name if spec.expose_mcp else None,
-        },
+        "surfaces": _surfaces(spec),
         "parameters": parameters,
         "input_schema": model_schema(spec.request_model),
         "output_fields": (
@@ -144,22 +151,17 @@ def _describe_contract(
     return record
 
 
-def summarize_spec(spec: ToolSpec) -> dict[str, Any]:
+def summarize_spec(spec: ToolSpec) -> ServiceResult:
     return {
         "tool": spec.name,
         "family": spec.family,
         "label": spec.operation_label_zh,
         "summary": spec.summary,
-        "surfaces": {
-            "cli": True,
-            "cli_name": spec.name,
-            "rest_path": spec.rest_path,
-            "mcp_name": spec.name if spec.expose_mcp else None,
-        },
+        "surfaces": _surfaces(spec),
         "method_ids": [method.method_id for method in spec.methods],
     }
 
 
-def describe_input_spec(spec: ToolSpec) -> dict[str, Any]:
+def describe_input_spec(spec: ToolSpec) -> ServiceResult:
     """Call contract with input schema and output root names; output_schema is on detail=full."""
     return _describe_contract(spec, include_output_schema=False)

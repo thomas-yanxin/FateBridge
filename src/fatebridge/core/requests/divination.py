@@ -8,7 +8,6 @@ from pydantic import (
     Field,
     StrictBool,
     StrictInt,
-    ValidationInfo,
     field_validator,
     model_validator,
 )
@@ -32,6 +31,7 @@ from fatebridge.core.numerology.numerology_inputs import (
     resolve_numerology_timezone,
 )
 from fatebridge.core.requests.base import AstroHouseValidatorMixin, _DeferredModel
+from fatebridge.core.requests.calendar import LocalLocationFields
 from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
 from fatebridge.core.sukuyo.sukuyo_calendar_basis import SukuyoCalendarBasis
 from fatebridge.core.sukuyo.sukuyo_lower import (
@@ -40,8 +40,11 @@ from fatebridge.core.sukuyo.sukuyo_lower import (
 )
 from fatebridge.utils.birth_input import normalize_gender
 from fatebridge.utils.civil_time import UTCCalendar, parse_civil_iso_clock
-from fatebridge.utils.coordinates import parse_geo_coordinate
-from fatebridge.utils.house_systems import OFFLINE_HOUSE_CODE_NOTE
+from fatebridge.utils.house_systems import (
+    OFFLINE_HOUSE_CODE_NOTE,
+    InvalidHouseSystemError,
+    house_system_fields,
+)
 
 
 class MeihuaAnalysisRequest(MeihuaInterpretationOptions):
@@ -81,21 +84,22 @@ class MeihuaAnalysisRequest(MeihuaInterpretationOptions):
 class GuaLookupRequest(_DeferredModel):
     """Request model for trigram/hexagram lookup."""
 
-    query: str = Field(
-        description="Trigram or hexagram name (source short name or common full name, simplified/traditional forms), or a 3/6-bit code from bottom to top. In auto mode the eight pure trigram names select trigrams; use hexagram for their six-line identities."
+    queries: list[str] = Field(
+        min_length=1,
+        description="Trigram or hexagram names (source short name or common full name, simplified/traditional forms), or 3/6-bit codes from bottom to top. In auto mode the eight pure trigram names select trigrams; use hexagram for their six-line identities.",
     )
-    lookup_mode: str = Field(
+    lookup_mode: Literal["auto", "hexagram", "trigram"] = Field(
         default="auto",
         description="Lookup mode: auto, hexagram, or trigram. auto keeps the eight pure names as trigrams; hexagram explicitly selects their six-line figures.",
     )
 
-
-class GuaMeiyiRequest(_DeferredModel):
-    """Request model for batch Meiyi hexagram meanings."""
-
-    name: list[str] = Field(
-        description="Trigram/hexagram names or 3/6-bit codes; source short names and simplified/traditional forms are supported. The eight pure names select trigrams in batch auto mode; use a full name or six-bit code for their hexagrams."
-    )
+    @field_validator("queries")
+    @classmethod
+    def require_non_empty_queries(cls, value: list[str]) -> list[str]:
+        cleaned = [item.strip() for item in value if item and item.strip()]
+        if not cleaned:
+            raise ValueError("queries 至少需要提供一个非空卦名或卦码。")
+        return cleaned
 
 
 _TongSheFaTrigram = Literal["乾", "兑", "离", "震", "巽", "坎", "艮", "坤"]
@@ -119,16 +123,22 @@ class SixYaoLineRequest(_DeferredModel):
     name: str | None = Field(default=None, description="Optional line label")
 
 
-class SixYaoRequest(_DeferredModel):
+class SixYaoRequest(LocalLocationFields):
     """Request model for sixyao."""
 
     date: str = Field(description="Date string, e.g. 2028-04-06")
     time: str = Field(description="Time string, e.g. 09:33:00")
-    zone: str | None = Field(default="+08:00", description="Timezone spec")
-    lat: str | None = Field(default="31n13", description="Latitude text or decimal")
-    lon: str | None = Field(default="121e28", description="Longitude text or decimal")
-    gps_lat: float | None = Field(default=None, description="GPS latitude")
-    gps_lon: float | None = Field(default=None, description="GPS longitude")
+    timezone: str | None = Field(default="+08:00", description="Timezone spec")
+    latitude: float | str | None = Field(
+        default="31n13",
+        validate_default=True,
+        description="Latitude text or decimal",
+    )
+    longitude: float | str | None = Field(
+        default="121e28",
+        validate_default=True,
+        description="Longitude text or decimal",
+    )
     question: str | None = Field(default=None, description="Question or topic")
     focus_line: StrictInt | None = Field(
         default=None,
@@ -169,7 +179,7 @@ class SixYaoRequest(_DeferredModel):
         max_length=6,
         description="Optional six lines, initial line first",
     )
-    method: str = Field(
+    method: Literal["auto", "coin", "time"] = Field(
         default="auto",
         description=(
             "起卦方式：auto（默认，缺卦则按时刻时间起卦）/ coin（真·摇钱起卦，"
@@ -189,6 +199,11 @@ class SixYaoRequest(_DeferredModel):
         default=None,
         description="随机摇钱起卦的随机种子（method=coin 且未提供 coins 时），用于复现同一卦。",
     )
+
+    @field_validator("method", mode="before")
+    @classmethod
+    def normalize_cast_method(cls, value: object) -> object:
+        return value.strip().lower() if isinstance(value, str) else value
 
     @model_validator(mode="after")
     def complete_lines(self) -> "SixYaoRequest":
@@ -212,7 +227,58 @@ class SixYaoRequest(_DeferredModel):
         return self
 
 
-class SuZhanRequest(AstroHouseValidatorMixin, _DeferredModel):
+def _normalize_local_zodiac_type(value: object) -> object:
+    if not isinstance(value, str):
+        return value
+    token = value.strip().casefold()
+    if token in {"tropic", "tropical"}:
+        return "Tropic"
+    if token == "sidereal":
+        return "Sidereal"
+    return value
+
+
+def _validate_local_house_system(value: int | str) -> int | str:
+    if isinstance(value, bool):
+        raise ValueError("house_system 不能为布尔值")
+    try:
+        fields = house_system_fields(value, default="D")
+    except InvalidHouseSystemError as exc:
+        raise ValueError(str(exc)) from exc
+    if fields["house_system_code"] is None:
+        raise ValueError(
+            f"离线盘暂仅支持 0..8 宫制（W/B/R/P/K/V/T/S/D），不支持 {fields['house_system']}。"
+        )
+    return value
+
+
+class _LocalChartSystemFields(AstroHouseValidatorMixin, LocalLocationFields):
+    """Shared house-system and zodiac-type fields for offline local chart requests."""
+
+    house_system: int | str = Field(
+        default="D",
+        description=(
+            "Offline house system selector (0..8, SE letter, or name; default 'D'/8=equal_mc)."
+            + OFFLINE_HOUSE_CODE_NOTE
+        ),
+    )
+    zodiac_type: Literal["Tropic", "Sidereal"] = Field(
+        default="Tropic",
+        description="Offline zodiac selector: Tropic (0) or Sidereal (1, Lahiri).",
+    )
+
+    @field_validator("house_system")
+    @classmethod
+    def _require_offline_house_code(cls, value: int | str) -> int | str:
+        return _validate_local_house_system(value)
+
+    @field_validator("zodiac_type", mode="before")
+    @classmethod
+    def _normalize_zodiac_type(cls, value: object) -> object:
+        return _normalize_local_zodiac_type(value)
+
+
+class SuZhanRequest(_LocalChartSystemFields):
     """Request model for suzhan."""
 
     calendar_basis: SukuyoCalendarBasis = Field(
@@ -270,17 +336,17 @@ class SuZhanRequest(AstroHouseValidatorMixin, _DeferredModel):
         default=None,
         description="已确认的当地钟时，用于按宿主时区定位历日。提供钟时和完整经纬度时计算星图。钟时未知时可省略，保留历法日期或半日候选。空字符串无效。",
     )
-    zone: str | None = Field(default="+08:00", description="Timezone spec")
-    lat: str | None = Field(
+    timezone: str | None = Field(default="+08:00", description="Timezone spec")
+    latitude: float | str | None = Field(
         default=None,
-        description="星图所需纬度，与经度成对提供。接受文本或十进制度，gps_lat优先且0有效。",
+        validate_default=True,
+        description="星图所需纬度，与经度成对提供。接受文本或十进制度，0有效。",
     )
-    lon: str | None = Field(
+    longitude: float | str | None = Field(
         default=None,
-        description="星图所需经度，与纬度成对提供。接受文本或十进制度，gps_lon优先且0有效。",
+        validate_default=True,
+        description="星图所需经度，与纬度成对提供。接受文本或十进制度，0有效。",
     )
-    gps_lat: float | None = Field(default=None, description="GPS latitude")
-    gps_lon: float | None = Field(default=None, description="GPS longitude")
     szchart: int = Field(
         default=0, description="宿占盘模式开关（透传至宿曜引擎；默认 0）"
     )
@@ -295,17 +361,6 @@ class SuZhanRequest(AstroHouseValidatorMixin, _DeferredModel):
         default=True,
         description="是否按当日视赤经和已声明现代距星标注七曜的不等宽天文宿位；历日本命宿单独计算",
     )
-    hsys: int = Field(
-        default=8,
-        ge=0,
-        le=8,
-        description="Offline house system selector; standard suzhan supports 0..8 with the same FateBridge local house semantics as core chart"
-        + OFFLINE_HOUSE_CODE_NOTE,
-    )
-    zodiacal: int = Field(
-        default=0,
-        description="Offline zodiac selector; standard suzhan supports 0=tropical and 1=sidereal(Lahiri-like)",
-    )
 
     @property
     def chart_requested(self) -> bool:
@@ -313,8 +368,8 @@ class SuZhanRequest(AstroHouseValidatorMixin, _DeferredModel):
             "szchart",
             "szshape",
             "house_start_mode",
-            "hsys",
-            "zodiacal",
+            "house_system",
+            "zodiac_type",
         }
         return bool(chart_fields & self.model_fields_set) or (
             "doubing_su28" in self.model_fields_set and self.doubing_su28
@@ -334,38 +389,71 @@ class SuZhanRequest(AstroHouseValidatorMixin, _DeferredModel):
         return self
 
 
-class CanpingRequest(_DeferredModel):
-    """Request model for canping (邵子参评数 / 金锁银匙)."""
+class NumerologyBirthRequest(LocalLocationFields):
+    """Shared birth clock, timezone, longitude and gender fields for Canping and Heluo."""
 
     date: str = Field(description=NUMEROLOGY_DATE_DESCRIPTION)
     time: str = Field(description=NUMEROLOGY_TIME_DESCRIPTION)
-    zone: str | None = Field(
+    timezone: str | None = Field(
         default=NUMEROLOGY_DEFAULT_TIMEZONE,
         description="IANA zone or UTC offset; omitted/null means fixed +08:00, not historical Asia/Shanghai. Blank/invalid zones and nonexistent clocks are rejected. Repeated clocks require a confirmed birth_utc_offset; the IANA zone remains in use for later boundaries.",
     )
     birth_utc_offset: str | None = Field(
         default=None, description=BIRTH_OFFSET_DESCRIPTION
     )
-    lat: str | None = Field(
-        default=None, description="Latitude text or decimal (optional)"
-    )
-    lon: str | None = Field(
+    latitude: float | str | None = Field(
         default=None,
+        validate_default=True,
+        description="Latitude text or decimal (optional)",
+    )
+    longitude: float | str | None = Field(
+        default=None,
+        validate_default=True,
         description="Longitude text or decimal; required when true solar time is on",
-    )
-    gps_lat: float | None = Field(default=None, description="GPS latitude")
-    gps_lon: float | None = Field(
-        default=None,
-        ge=-180,
-        le=180,
-        strict=True,
-        description="Explicit numeric GPS longitude; preferred over lon; zero is valid",
     )
     gender: str = Field(
         description=(
-            "需明确男/女：选择男女条文及附子平法配运方向；接受male/female，不默认性别。"
+            "性别 男/女 — 影响起命排运与男女条文。接受 男/女、male/female 等写法；"
+            "必须明确提供，不默认性别。"
         ),
     )
+    use_true_solar_time: bool = Field(
+        default=True,
+        description="Apply true solar time correction (needs longitude); default on — 数算 derives from the BaZi pillars",
+    )
+
+    @field_validator("gender")
+    @classmethod
+    def known_numerology_gender(cls, value: str) -> str:
+        gender = normalize_gender(value)
+        if gender not in {"男", "女"}:
+            raise ValueError("河洛与参评需要明确男/女，不能默认性别。")
+        return gender
+
+    @field_validator("time", mode="before")
+    @classmethod
+    def explicit_numerology_clock(cls, value: object) -> str:
+        return preserve_birth_clock_text(value)
+
+    @field_validator("birth_utc_offset", mode="before")
+    @classmethod
+    def confirmed_birth_offset(cls, value: object) -> str | None:
+        return normalize_numerology_utc_offset(value)
+
+    @field_validator("timezone", mode="before")
+    @classmethod
+    def explicit_numerology_timezone(cls, value: object) -> str:
+        return resolve_numerology_timezone(value)
+
+    @model_validator(mode="after")
+    def require_numerology_longitude(self) -> "NumerologyBirthRequest":
+        resolve_numerology_longitude(self.longitude, self.use_true_solar_time)
+        return self
+
+
+class CanpingRequest(NumerologyBirthRequest):
+    """Request model for canping (邵子参评数 / 金锁银匙)."""
+
     method: Literal["gu", "ming"] = Field(
         default="gu",
         description="取法: gu（默认，卷六金锁银匙用八字日支、不用月令）；ming 为月支反向变法，非该段原典算法",
@@ -380,41 +468,11 @@ class CanpingRequest(_DeferredModel):
         default=None,
         description="可选带时区ISO时刻，查询实际交运和立春年界后的当段参评数；无默认当前时刻，legacy方法不支持精确时刻查询。",
     )
-    use_true_solar_time: bool = Field(
-        default=True,
-        description="Apply true solar time correction (needs lon); default on — 数算 derives from the BaZi pillars",
-    )
-
-    @field_validator("gender")
-    @classmethod
-    def known_canping_gender(cls, value: str) -> str:
-
-        gender = normalize_gender(value)
-        if gender not in {"男", "女"}:
-            raise ValueError("参评男女条文及配运需要明确男/女，不能默认性别。")
-        return gender
-
-    @field_validator("time", mode="before")
-    @classmethod
-    def explicit_canping_clock(cls, value: object) -> str:
-
-        return preserve_birth_clock_text(value)
-
-    @field_validator("birth_utc_offset", mode="before")
-    @classmethod
-    def confirmed_birth_offset(cls, value: object) -> str | None:
-        return normalize_numerology_utc_offset(value)
-
-    @field_validator("zone", mode="before")
-    @classmethod
-    def explicit_canping_zone(cls, value: object) -> str:
-        return resolve_numerology_timezone(value)
 
     @field_validator("analysis_datetime")
     @classmethod
     def aware_canping_query(cls, value: str | None) -> str | None:
         if value is not None:
-
             at = parse_civil_iso_clock(value.replace("Z", "+00:00"))
             if not isinstance(at, UTCCalendar):
                 raise ValueError("analysis_datetime须为带时区的ISO时刻。")
@@ -422,8 +480,6 @@ class CanpingRequest(_DeferredModel):
 
     @model_validator(mode="after")
     def canping_luck_query_policy(self) -> "CanpingRequest":
-
-        resolve_numerology_longitude(self.lon, self.gps_lon, self.use_true_solar_time)
         if (
             self.dayun_method == "legacy_minggong_v1"
             and self.analysis_datetime is not None
@@ -432,47 +488,12 @@ class CanpingRequest(_DeferredModel):
         return self
 
 
-class HeluoRequest(_DeferredModel):
+class HeluoRequest(NumerologyBirthRequest):
     """Request model for heluo (河洛理数)."""
 
     month_assignment_method: MonthAssignmentMethod = Field(
         default=DEFAULT_MONTH_ASSIGNMENT,
         description="卦属月原文位置：intro_preferred_v1默认优先卦条63项，无妄缺号采用卷首8月；volume_one_table_v1采用卷首64项。晋、节、睽、震、井有底本内异号，输出保留双方；只影响卦月匹配，不解决月界或综合得时。",
-    )
-
-    date: str = Field(description=NUMEROLOGY_DATE_DESCRIPTION)
-    time: str = Field(description=NUMEROLOGY_TIME_DESCRIPTION)
-    zone: str | None = Field(
-        default=NUMEROLOGY_DEFAULT_TIMEZONE,
-        description="IANA zone or UTC offset; omitted/null means fixed +08:00, not historical Asia/Shanghai. Blank/invalid zones and nonexistent clocks are rejected. Repeated clocks require a confirmed birth_utc_offset; the IANA zone remains in use for later boundaries.",
-    )
-    birth_utc_offset: str | None = Field(
-        default=None, description=BIRTH_OFFSET_DESCRIPTION
-    )
-    lat: str | None = Field(
-        default=None, description="Latitude text or decimal (optional)"
-    )
-    lon: str | None = Field(
-        default=None,
-        description="Longitude text or decimal; required when true solar time is on",
-    )
-    gps_lat: float | None = Field(default=None, description="GPS latitude")
-    gps_lon: float | None = Field(
-        default=None,
-        ge=-180,
-        le=180,
-        strict=True,
-        description="Explicit numeric GPS longitude; preferred over lon; zero is valid",
-    )
-    gender: str = Field(
-        description=(
-            "性别 男/女 — 影响起命相盪与元堂推导。接受 男/女、male/female 等写法；"
-            "必须明确提供，不默认性别。"
-        ),
-    )
-    use_true_solar_time: bool = Field(
-        default=True,
-        description="Apply true solar time correction (needs lon); default on — 数算 derives from the BaZi pillars",
     )
     analysis_year: int | None = Field(
         default=None,
@@ -494,35 +515,8 @@ class HeluoRequest(_DeferredModel):
         description="原典三十日定式序号1..30，须传month_index；不是公历或农历生日，不提供精确应期",
     )
 
-    @field_validator("gender")
-    @classmethod
-    def known_heluo_gender(cls, value: str) -> str:
-
-        gender = normalize_gender(value)
-        if gender not in {"男", "女"}:
-            raise ValueError("河洛相荡、寄宫和元堂需要明确男/女，不能默认性别。")
-        return gender
-
-    @field_validator("time", mode="before")
-    @classmethod
-    def explicit_heluo_clock(cls, value: object) -> str:
-
-        return preserve_birth_clock_text(value)
-
-    @field_validator("birth_utc_offset", mode="before")
-    @classmethod
-    def confirmed_birth_offset(cls, value: object) -> str | None:
-        return normalize_numerology_utc_offset(value)
-
-    @field_validator("zone", mode="before")
-    @classmethod
-    def explicit_heluo_zone(cls, value: object) -> str:
-        return resolve_numerology_timezone(value)
-
     @model_validator(mode="after")
     def require_timing_parent(self) -> "HeluoRequest":
-
-        resolve_numerology_longitude(self.lon, self.gps_lon, self.use_true_solar_time)
         if self.month_index is not None and self.analysis_year is None:
             raise ValueError("month_index需要analysis_year年标签。")
         if self.day_index is not None and self.month_index is None:
@@ -530,28 +524,30 @@ class HeluoRequest(_DeferredModel):
         return self
 
 
-class OtherBuRequest(AstroHouseValidatorMixin, _DeferredModel):
+class OtherBuRequest(_LocalChartSystemFields):
     """Three actual dice faces, optionally accompanied by a separate sky chart."""
 
     date: str | None = Field(
         default=None,
-        description="Optional Gregorian date for a separate sky chart; provide time/zone/coordinates too",
+        description="Optional Gregorian date for a separate sky chart; provide time/timezone/coordinates too",
     )
     time: str | None = Field(
         default=None, description="Optional civil time for a separate sky chart"
     )
-    zone: str | None = Field(
+    timezone: str | None = Field(
         default=None,
         description="Explicit IANA timezone or UTC offset for the separate sky chart",
     )
-    lat: str | None = Field(
-        default=None, description="Latitude text or decimal; no assumed location"
+    latitude: float | str | None = Field(
+        default=None,
+        validate_default=True,
+        description="Latitude text or decimal; no assumed location",
     )
-    lon: str | None = Field(
-        default=None, description="Longitude text or decimal; no assumed location"
+    longitude: float | str | None = Field(
+        default=None,
+        validate_default=True,
+        description="Longitude text or decimal; no assumed location",
     )
-    gps_lat: float | None = Field(default=None, description="GPS latitude")
-    gps_lon: float | None = Field(default=None, description="GPS longitude")
     tradition: bool = Field(
         default=False,
         description="Exclude outer planets only from the separate sky chart; never alter the rolled face",
@@ -568,38 +564,11 @@ class OtherBuRequest(AstroHouseValidatorMixin, _DeferredModel):
     planet: str = Field(
         description="Actual face: Sun/Moon/Mercury/Venus/Mars/Jupiter/Saturn/Uranus/Neptune/Pluto/NorthNode/SouthNode; Chinese names and glyphs accepted"
     )
-    hsys: int = Field(
-        default=8,
-        ge=0,
-        le=8,
-        strict=True,
-        description="House system 0..8 for the separate sky chart; does not change the symbolic wheel",
-    )
-    zodiacal: int = Field(
-        default=0,
-        ge=0,
-        le=1,
-        strict=True,
-        description="Separate sky chart only: 0=tropical, 1=sidereal(Lahiri); never reinterprets a dice sign",
-    )
     question: str | None = Field(default=None, description="Question or topic")
     fortune_method: Literal["sect_reversing", "ptolemy_iii10"] = Field(
         default="sect_reversing",
         description="Separate sky Fortune only: sect_reversing uses day/night reversal; ptolemy_iii10 follows Robbins 1940 III.10 (ASC+Moon-Sun both day and night). Does not alter dice interpretation.",
     )
-
-    @field_validator("gps_lat", "gps_lon", mode="before")
-    @classmethod
-    def actual_gps_coordinate(cls, value: Any, info: ValidationInfo) -> float | None:
-
-        if value is None:
-            return None
-        parsed = parse_geo_coordinate(
-            value, axis="latitude" if info.field_name == "gps_lat" else "longitude"
-        )
-        if parsed is None:
-            raise ValueError("GPS坐标不可为空白")
-        return parsed
 
     @field_validator("sign")
     @classmethod
@@ -616,27 +585,31 @@ class OtherBuRequest(AstroHouseValidatorMixin, _DeferredModel):
         validate_context(
             date=self.date,
             time=self.time,
-            zone=self.zone,
-            lat=self.lat,
-            lon=self.lon,
-            gps_lat=self.gps_lat,
-            gps_lon=self.gps_lon,
+            timezone=self.timezone,
+            latitude=self.latitude,
+            longitude=self.longitude,
         )
         return self
 
 
-class SanShiUnitedRequest(_DeferredModel):
+class SanShiUnitedRequest(LocalLocationFields):
     """Request model for sanshiunited."""
 
     date: str = Field(
         description="推算公历日期，例如2028-04-06；历史儒略历标签须先明确转换，不自动切换历制。"
     )
     time: str = Field(description="Time string, e.g. 09:33:00")
-    zone: str | None = Field(default="+08:00", description="Timezone spec")
-    lat: str | None = Field(default="31n13", description="Latitude text or decimal")
-    lon: str | None = Field(default="121e28", description="Longitude text or decimal")
-    gps_lat: float | None = Field(default=None, description="GPS latitude")
-    gps_lon: float | None = Field(default=None, description="GPS longitude")
+    timezone: str | None = Field(default="+08:00", description="Timezone spec")
+    latitude: float | str | None = Field(
+        default="31n13",
+        validate_default=True,
+        description="Latitude text or decimal",
+    )
+    longitude: float | str | None = Field(
+        default="121e28",
+        validate_default=True,
+        description="Longitude text or decimal",
+    )
     qimen_options: dict[str, Any] = Field(
         default_factory=dict,
         description="奇门：ju_method=zhirun（置闰）/chaibu（拆补）；god_profile=yanyi_text（默认卷三正文）/yanyi_diagrams（卷四圆图）；season_profile=yanyi_vol1_verse（默认卷一赋）/yanyi_vol3_table/yanyi_vol3_prose；仅支持转盘layout=direct和零平移",

@@ -10,7 +10,7 @@ from pydantic_core import PydanticCustomError
 
 from fatebridge.core.contracts.output_base import PartialOutput
 from fatebridge.core.receipt_models import RunMetadata
-from fatebridge.core.requests.base import _DeferredModel
+from fatebridge.core.requests.base import FateBridgeBaseRequest
 from fatebridge.core.response_models import ProjectedOutput
 
 BigFiveDomain = Literal[
@@ -274,7 +274,7 @@ def _parse_item_id(key: object) -> int | None:
     return None
 
 
-class IpipBigFiveRequest(_DeferredModel):
+class IpipBigFiveRequest(FateBridgeBaseRequest):
     """Shared request contract for administering or scoring IPIP Big-Five 50."""
 
     action: Literal["score", "list_items"] = Field(

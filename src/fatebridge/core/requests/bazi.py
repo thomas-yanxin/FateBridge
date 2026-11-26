@@ -5,14 +5,14 @@ from __future__ import annotations
 from pydantic import Field
 
 from fatebridge.core.metaphysics.common import SEXAGENARY_CYCLE
-from fatebridge.core.requests.base import AnalysisDateFields, _DeferredModel
+from fatebridge.core.requests.base import AnalysisDateFields, FateBridgeBaseRequest
 from fatebridge.core.requests.birth import BaziClockRequest
 
 PILLAR_PATTERN = "^(?:" + "|".join(SEXAGENARY_CYCLE) + ")$"
 LITERAL_PILLAR_PATTERN = "^[甲乙丙丁戊己庚辛壬癸][子丑寅卯辰巳午未申酉戌亥]$"
 
 
-class BaziSourceCompareRequest(_DeferredModel):
+class BaziSourceCompareRequest(FateBridgeBaseRequest):
     """Retain literal text even when modern calendar checks disagree."""
 
     year_pillar: str = Field(

@@ -6,52 +6,23 @@ from typing import Literal
 
 from pydantic import Field
 
-from fatebridge.core.requests.base import AstroHouseValidatorMixin
+from fatebridge.core.requests.base import (
+    AstroHouseValidatorMixin,
+    OptionalAnalysisClockFields,
+    WesternChartSystemFields,
+)
 from fatebridge.core.requests.birth import AstroBirthRequest
 from fatebridge.core.requests.western_policy import WesternEphemerisRequest
-from fatebridge.utils.house_systems import TWELVE_HOUSE_SYSTEM_NOTE
 
 
 class WesternTimingBaseRequest(
-    AstroHouseValidatorMixin, AstroBirthRequest, WesternEphemerisRequest
+    AstroHouseValidatorMixin,
+    OptionalAnalysisClockFields,
+    WesternChartSystemFields,
+    AstroBirthRequest,
+    WesternEphemerisRequest,
 ):
     """Shared base request model for western predictive timing techniques."""
-
-    analysis_year: int | None = Field(default=None, description="Analysis year")
-    analysis_month: int | None = Field(
-        default=None, ge=1, le=12, description="Analysis month (1-12)"
-    )
-    analysis_day: int | None = Field(
-        default=None, ge=1, le=31, description="Analysis day (1-31)"
-    )
-    analysis_hour: int | None = Field(
-        default=None,
-        ge=0,
-        le=23,
-        description=(
-            "Analysis hour (0-23), in birth_timezone. "
-            "If omitted, keeps the birth hour for date-only compatibility."
-        ),
-    )
-    analysis_minute: int | None = Field(
-        default=None,
-        ge=0,
-        le=59,
-        description=(
-            "Analysis minute (0-59), in birth_timezone. "
-            "If omitted, keeps the birth minute for date-only compatibility."
-        ),
-    )
-    house_system: int | str = Field(
-        default="P",
-        description="House system, any convention: SE letter ('P'=Placidus, "
-        "'R'=Regiomontanus, 'W'=whole sign, 'D'=equal_mc), key ('placidus', "
-        "'equal_mc'), or integer code 0..8 (3=Placidus, 8=equal_mc)."
-        + TWELVE_HOUSE_SYSTEM_NOTE,
-    )
-    zodiac_type: str = Field(
-        default="Tropic", description="Zodiac type, e.g. Tropic or Sidereal"
-    )
 
 
 class WesternReturnTimingRequest(WesternTimingBaseRequest):

@@ -38,7 +38,7 @@ def supplied_clock_components(request: MeihuaAnalysisRequest) -> list[str]:
     ]
 
 
-def meihua_time_invoke(service: ServiceRef | ResolvedService) -> Bind:
+def bind_meihua_time(service: ServiceRef | ResolvedService) -> Bind:
     bind_service = bind_kwargs(service)
 
     def bind(request: BaseModel) -> BoundServiceCall:

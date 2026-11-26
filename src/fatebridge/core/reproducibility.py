@@ -5,16 +5,6 @@ from typing import Literal, TypedDict
 
 from pydantic import BaseModel
 
-BAZI_ANALYSIS_CLOCK_TOOLS = frozenset(
-    {
-        "bazi_timing",
-        "bazi_luck_cycles",
-        "bazi_monthly_timing",
-        "bazi_daily_timing",
-        "bazi_hourly_timing",
-    }
-)
-
 
 class ReproducibilityManifest(TypedDict):
     deterministic: Literal["conditional", "fixed_input_and_environment"]
@@ -57,45 +47,28 @@ class ReproducibilityPolicy:
         }
 
 
-def policy_for(name: str, model: type[BaseModel]) -> ReproducibilityPolicy:
-    """Default policies for the current catalog, overridable on new ToolSpecs."""
+def policy_for(
+    model: type[BaseModel], *, has_time_defaults: bool = False
+) -> ReproducibilityPolicy:
+    """Derive reproducibility policy from request field declarations."""
     fields = model.model_fields
-    clock_fields: tuple[str, ...] = ()
     date_fields = ("analysis_year", "analysis_month", "analysis_day")
-    if name in BAZI_ANALYSIS_CLOCK_TOOLS:
-        clock_fields = (*date_fields, "analysis_hour", "analysis_minute")
-    elif name.startswith("bazi_") or name in {
-        "vimshottari_dasha",
-        "planetary_returns",
-        "planetary_ages",
-        "planetary_arc_directions",
-        "sidereal_progressions",
-        "declination_progressions",
-        "western_timing",
-        "solar_return",
-        "lunar_return",
-        "transit_chart",
-        "solar_arc",
-        "chart_for_year",
-        "profection",
-        "primary_directions",
-        "primary_directions_chart",
-        "zodiacal_releasing",
-        "firdaria",
-        "decennials",
-    }:
+    clock_fields: tuple[str, ...] = ()
+    if has_time_defaults:
         clock_fields = tuple(
-            f for f in date_fields if f in fields and not fields[f].is_required()
+            f
+            for f in (*date_fields, "analysis_hour", "analysis_minute")
+            if f in fields and not fields[f].is_required()
         )
-    elif name == "solar_term_timeline":
-        clock_fields = ("analysis_year",)
+    elif all(f in fields and not fields[f].is_required() for f in date_fields):
+        clock_fields = date_fields
+    has_seed = "seed" in fields
     return ReproducibilityPolicy(
         current_time_fields=clock_fields,
-        implicit_current_time=name == "bazi_overview",
-        random_seed_field="seed" if name == "liuyao" else "",
+        random_seed_field="seed" if has_seed else "",
         seed_condition=(
             "method=coin without coins/lines/binary hexagram codes"
-            if name == "liuyao"
+            if has_seed
             else None
         ),
     )

@@ -29,6 +29,7 @@ SPECS: list[ToolSpec] = [
         operation_label_zh="知识目录",
         family="knowledge",
         rest_path="/api/knowledge/catalog",
+        uses_astronomy_runtime=False,
         output_validators=(validate_knowledge_bindings,),
     ),
     ToolSpec(
@@ -39,6 +40,7 @@ SPECS: list[ToolSpec] = [
         operation_label_zh="知识读取",
         family="knowledge",
         rest_path="/api/knowledge/read",
+        uses_astronomy_runtime=False,
         output_validators=(validate_knowledge_bindings,),
     ),
 ]

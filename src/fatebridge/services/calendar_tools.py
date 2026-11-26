@@ -19,17 +19,17 @@ from fatebridge.utils.solar_time import calculate_solar_time_adjustment
 def calculate_jieqi_year(
     *,
     year: int,
-    zone: str | None = None,
-    lat: str | None = None,
-    lon: str | None = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    timezone: str | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     jieqis: list[str] | None = None,
 ) -> dict[str, Any]:
     """
     全年节气辅助工具 - 生成全年 24 节气列表，并可筛选重点节气。
     """
-    timezone_name = zone or DEFAULT_BIRTH_TIMEZONE
+    timezone_name = timezone or DEFAULT_BIRTH_TIMEZONE
+    parsed_latitude = parse_geo_coordinate(latitude, axis="latitude")
+    parsed_longitude = parse_geo_coordinate(longitude, axis="longitude")
     normalized_year = int(year)
     annual_grid = get_jieqi_year_grid(normalized_year, timezone_name)
     requested_terms = jieqis or []
@@ -50,10 +50,8 @@ def calculate_jieqi_year(
         "query_context": {
             "year": normalized_year,
             "timezone": timezone_name,
-            "lat": lat,
-            "lon": lon,
-            "gps_lat": gps_lat,
-            "gps_lon": gps_lon,
+            "latitude": parsed_latitude,
+            "longitude": parsed_longitude,
             "requested_jieqis": requested_terms,
         },
         "year": normalized_year,
@@ -71,12 +69,10 @@ def calculate_nongli_time(
     *,
     date: str,
     time: str,
-    zone: str | None = None,
+    timezone: str | None = None,
     analysis_utc_offset: str | None = None,
-    lat: str | None = None,
-    lon: str | None = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     gender: Any | None = None,
     time_alg: int = 0,
     ad: int = 1,
@@ -90,17 +86,15 @@ def calculate_nongli_time(
     if time_alg not in (0, 1):
         raise ValueError("time_alg 仅支持 0（真太阳时）或 1（直接时间）。")
 
-    timezone_name = zone or DEFAULT_BIRTH_TIMEZONE
+    timezone_name = timezone or DEFAULT_BIRTH_TIMEZONE
     input_datetime = _parse_calendar_datetime(date, time)
     civil_datetime = resolve_civil_clock(
-        input_datetime, timezone_name, analysis_utc_offset, timezone_field="zone"
+        input_datetime, timezone_name, analysis_utc_offset, timezone_field="timezone"
     )
     clock = NominalClockLabel.from_local_datetime(input_datetime)
     total_correction_minutes = 0.0
-    effective_longitude = parse_geo_coordinate(
-        gps_lon if gps_lon is not None else lon, axis="longitude"
-    )
-    parse_geo_coordinate(gps_lat if gps_lat is not None else lat, axis="latitude")
+    effective_longitude = parse_geo_coordinate(longitude, axis="longitude")
+    parsed_latitude = parse_geo_coordinate(latitude, axis="latitude")
     time_algorithm_label = "直接时间"
     warnings: list[str] = []
 
@@ -116,7 +110,7 @@ def calculate_nongli_time(
             time_algorithm_label = "真太阳时"
         else:
             warnings.append(
-                "time_alg=0 需要 lon 或 gps_lon 才能计算真太阳时，已回退为直接时间。"
+                "time_alg=0 需要 longitude 才能计算真太阳时，已回退为直接时间。"
             )
 
     pillars = BaZiCalendar.get_four_pillars(
@@ -158,10 +152,8 @@ def calculate_nongli_time(
             "date": date,
             "time": time,
             "timezone": timezone_name,
-            "lat": lat,
-            "lon": lon,
-            "gps_lat": gps_lat,
-            "gps_lon": gps_lon,
+            "latitude": parsed_latitude,
+            "longitude": effective_longitude,
             "gender": gender,
             "time_alg": time_alg,
             "ad": ad,

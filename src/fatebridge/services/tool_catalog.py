@@ -15,8 +15,11 @@ from fatebridge.application.tool_spec import (
     ToolSpec,
 )
 from fatebridge.core.physical_ephemeris_policy import data_file_policy
-from fatebridge.core.reproducibility import ReproducibilityPolicy, policy_for
-from fatebridge.core.requests.western_policy import supports_western_policy_model
+from fatebridge.core.reproducibility import policy_for
+from fatebridge.core.requests.western_policy import (
+    WesternEphemerisRequest,
+    supports_western_policy_model,
+)
 from fatebridge.core.response_models import output_model_for, required_output_fields_for
 from fatebridge.services.catalog.astrology import SPECS as ASTROLOGY_SPECS
 from fatebridge.services.catalog.bazi import SPECS as BAZI_SPECS
@@ -55,8 +58,11 @@ def _western_ephemeris_execution_wrapper(
     request: BaseModel,
     run: RunService,
 ) -> ServiceResult:
-
-    mode = getattr(request, "ephemeris_policy", "auto")
+    mode = (
+        request.ephemeris_policy
+        if isinstance(request, WesternEphemerisRequest)
+        else "auto"
+    )
     try:
         with data_file_policy(mode) as policy:
             result = run()
@@ -94,9 +100,6 @@ def _enrich_builtin_spec(spec: ToolSpec) -> ToolSpec:
         or output_model_for(spec.name, western_data_policy=western_policy),
         required_output_fields=spec.required_output_fields
         or required_output_fields_for(spec.name),
-        uses_astronomy_runtime=(
-            spec.uses_astronomy_runtime if spec.family == "psychometrics" else True
-        ),
         execution_wrapper=(
             spec.execution_wrapper
             or (_western_ephemeris_execution_wrapper if western_policy else None)
@@ -107,8 +110,11 @@ def _enrich_builtin_spec(spec: ToolSpec) -> ToolSpec:
             else spec.evidence_views_builder
         ),
         reproducibility=(
-            policy_for(spec.name, spec.request_model)
-            if spec.reproducibility == ReproducibilityPolicy()
+            policy_for(
+                spec.request_model,
+                has_time_defaults=spec.resolve_time_defaults is not None,
+            )
+            if spec.reproducibility is None
             else spec.reproducibility
         ),
     )

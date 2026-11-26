@@ -4,12 +4,10 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from fatebridge.application.bindings import service_ref
+from fatebridge.application.bindings import bind_kwargs, service_ref
 from fatebridge.application.tool_spec import (
-    BoundServiceCall,
     DetailLevel,
     OutputContractError,
-    ServiceInput,
     ServiceResult,
     ToolSpec,
 )
@@ -23,12 +21,6 @@ from fatebridge.core.psychometrics.ipip_big_five import (
 calculate_ipip_big_five = service_ref(
     "fatebridge.services.psychometrics", "calculate_ipip_big_five"
 )
-
-
-def bind_ipip_big_five(request: BaseModel) -> BoundServiceCall:
-    assert isinstance(request, IpipBigFiveRequest)
-    arguments: dict[str, ServiceInput] = dict(request.service_inputs())
-    return BoundServiceCall(calculate_ipip_big_five.resolved, (), arguments)
 
 
 def _validate_ipip_output(
@@ -63,17 +55,12 @@ def _identity_detail_view(
 SPECS: list[ToolSpec] = [
     ToolSpec(
         name="ipip_big_five",
-        bind=bind_ipip_big_five,
+        bind=bind_kwargs(calculate_ipip_big_five),
         request_model=IpipBigFiveRequest,
         output_model=IpipBigFiveOutput,
         required_output_fields=("mode", "scale_id", "provenance", "summary"),
         required_output_validator=_validate_ipip_output,
-        summary=(
-            "IPIP 50题大五人格因子标记量表（Goldberg 1992 公有领域）："
-            "支持 action=list_items 列出50道题项与计分方向，"
-            "或 action=score 对1-5分整数作答进行确定性正反向计分、8/10缺题阈值折算；"
-            "仅输出客观计分事实与量表出处，不输出百分位、诊断或叙事建议。"
-        ),
+        summary="IPIP 50题大五人格量表（Goldberg 1992）：列题项或按1–5分确定性正反向计分，不含常模或诊断。",
         operation_label_zh="IPIP大五人格量表",
         family="psychometrics",
         rest_path="/api/psychometrics/ipip-big-five",

@@ -11,13 +11,13 @@ from typing import Annotated, Literal, NoReturn, get_args, get_origin
 
 from pydantic.fields import FieldInfo
 
-UNION_ORIGINS = (UnionType, get_origin(Annotated[int, "u"] | None))
-
 from fatebridge.application.description import is_model_field, unwrap_optional
-from fatebridge.application.tool_spec import ServiceResult, ToolSpec
+from fatebridge.application.tool_spec import ServiceResult
 from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.transports.flags import FIELDS_FLAG_DESC
+
+UNION_ORIGINS = (UnionType, get_origin(Annotated[int, "u"] | None))
 
 BOOL_TRUE_TOKENS = {"true", "1", "yes", "y", "on"}
 BOOL_FALSE_TOKENS = {"false", "0", "no", "n", "off"}

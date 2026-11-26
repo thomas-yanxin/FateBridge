@@ -51,30 +51,6 @@ class DayunAnalysisRequest(OptionalAnalysisClockFields, BaziClockRequest):
         default=None,
         description="日期全部省略时按本次as_of或执行开始时刻的完整当地瞬间选运；显式部分日期缺年取当前年、缺月日取1、缺时分取0。不能与analysis_age组合。 显式日期的不存在或重复钟时须用有效钟时或明确UTC偏移消歧。",
     )
-    analysis_month: int | None = Field(
-        default=None,
-        ge=1,
-        le=12,
-        description="Target local Gregorian month (1..12) for period-boundary selection. With any analysis_* date component, omitted month defaults to January. Cannot combine with analysis_age.",
-    )
-    analysis_day: int | None = Field(
-        default=None,
-        ge=1,
-        le=31,
-        description="Target local Gregorian day, validated with year/month; defaults to 1 when a date component is supplied. Cannot combine with analysis_age.",
-    )
-    analysis_hour: int | None = Field(
-        default=None,
-        ge=0,
-        le=23,
-        description="Target civil-clock hour (0..23) in the resolved birth timezone; defaults to midnight with a supplied analysis date. Used to distinguish exact luck-period boundaries, not to predict an event hour.",
-    )
-    analysis_minute: int | None = Field(
-        default=None,
-        ge=0,
-        le=59,
-        description="Target civil-clock minute (0..59); defaults to 0 with a supplied analysis date. Omit all analysis_* components to use the current/as_of instant. Cannot combine with analysis_age.",
-    )
 
     @model_validator(mode="after")
     def separate_age_and_date(self) -> DayunAnalysisRequest:

@@ -2,7 +2,7 @@
 
 import difflib
 from collections import Counter
-from typing import Any, Literal
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, ValidationError
 
@@ -12,7 +12,7 @@ from fatebridge.application.description import (
     resolve_spec,
     summarize_spec,
 )
-from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.application.tool_spec import ServiceResult, ToolSpec
 from fatebridge.utils.errors import ParameterError, validation_error_result
 
 ToolSurface = Literal["rest", "mcp", "cli"]
@@ -76,7 +76,7 @@ def select_specs(
         if resolved is None:
             candidates = sorted(spec.name for spec in selected)
             suggestions = difflib.get_close_matches(tool, candidates, n=5, cutoff=0.4)
-            issue: dict[str, Any] = {"path": "tool", "code": "unknown_tool"}
+            issue: dict[str, object] = {"path": "tool", "code": "unknown_tool"}
             if suggestions:
                 issue["constraints"] = {"suggestions": suggestions}
             raise ParameterError(f"未知工具: {tool}", [issue], status_code=404)
@@ -108,7 +108,7 @@ def discover_specs(
     surface: str | None = None,
     detail: str = "summary",
     allowed_names: set[str] | None = None,
-) -> dict[str, Any]:
+) -> ServiceResult:
     try:
         query = DiscoveryQuery.model_validate(
             dict(
@@ -122,6 +122,23 @@ def discover_specs(
     except ValidationError as exc:
         failure = validation_error_result(exc)
         raise ParameterError(failure["error"], failure["issues"]) from None
+
+    if (
+        query.detail == "full"
+        and query.tool is None
+        and query.family is None
+        and query.q is None
+    ):
+        raise ParameterError(
+            "detail=full 需配合 tool、family 或 q 过滤，避免全量输出超出上下文预算",
+            [
+                {
+                    "path": "detail",
+                    "code": "filter_required_for_full_detail",
+                    "constraints": {"require_one_of": ["tool", "family", "q"]},
+                }
+            ],
+        )
 
     pool = (
         [spec for spec in specs if spec.name in allowed_names]

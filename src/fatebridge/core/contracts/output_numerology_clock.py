@@ -125,7 +125,7 @@ class NumerologyBirthClock(PartialOutput):
     birth_instant_utc: str | None = None
     calculation_wall_clock: str | None = None
     longitude: float | None = Field(default=None, ge=-180, le=180)
-    longitude_source: Literal["lon", "gps_lon"] | None = None
+    longitude_source: Literal["longitude"] | None = None
     longitude_used: bool | None = None
     longitude_selection_policy: str | None = None
     total_correction_minutes: float | None = None
