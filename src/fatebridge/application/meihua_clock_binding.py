@@ -5,7 +5,7 @@ from fractions import Fraction
 
 from pydantic import BaseModel, JsonValue
 
-from fatebridge.application.bindings import LazyService, raw_invoke
+from fatebridge.application.bindings import ServiceRef, bind_kwargs
 from fatebridge.application.tool_spec import (
     Bind,
     BoundServiceCall,
@@ -38,8 +38,8 @@ def supplied_clock_components(request: MeihuaAnalysisRequest) -> list[str]:
     ]
 
 
-def meihua_time_invoke(service: LazyService | ResolvedService) -> Bind:
-    bind_service = raw_invoke(service)
+def meihua_time_invoke(service: ServiceRef | ResolvedService) -> Bind:
+    bind_service = bind_kwargs(service)
 
     def bind(request: BaseModel) -> BoundServiceCall:
         assert isinstance(request, MeihuaAnalysisRequest)
