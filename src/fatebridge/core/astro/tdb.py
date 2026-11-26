@@ -35,11 +35,20 @@ def _parameters() -> Parameters:
     return data
 
 
+@lru_cache(maxsize=1)
+def _reversed_groups() -> tuple[tuple[tuple[float, float, float], ...], ...]:
+    rows = _parameters()["fairhead_terms"]
+    return tuple(
+        tuple((float(a), float(f), float(ph)) for a, f, ph in reversed(rows[low:high]))
+        for low, high in ((0, 474), (474, 679), (679, 764), (764, 784), (784, 787))
+    )
+
+
 def fairhead_state(
     days_from_j2000: float | Fraction, rows: Sequence[Sequence[float]]
 ) -> TimeOffset:
     """Original geocentric seconds and analytic rate per TT argument day."""
-    t = float(Fraction(days_from_j2000) / 365250)
+    t = float(days_from_j2000) / 365250.0
     sums, rates = [], []
     sin, cos = math.sin, math.cos
     for low, high in ((0, 474), (474, 679), (679, 764), (764, 784), (784, 787)):
@@ -79,18 +88,38 @@ def geocentric_tdb_state(
     """Geocentric TDB-TT and its TT derivative, without loading any orbits."""
     if not math.isfinite(days_from_j2000):
         raise ValueError("TT relative epoch must be finite")
-    rows = _parameters()["fairhead_terms"]
     if not need_rate:
-        t = float(Fraction(days_from_j2000) / 365250)
-        return TimeOffset(_fairhead_seconds(t, rows), 0.0)
-    return fairhead_state(days_from_j2000, rows)
+        t = float(days_from_j2000) / 365250.0
+        return TimeOffset(_fairhead_seconds_groups(t, _reversed_groups()), 0.0)
+    return fairhead_state(days_from_j2000, _parameters()["fairhead_terms"])
 
 
 def fairhead_seconds(
     days_from_j2000: float | Fraction, rows: Sequence[Sequence[float]]
 ) -> float:
     """Original geocentric seconds without rate terms."""
-    return _fairhead_seconds(float(Fraction(days_from_j2000) / 365250), rows)
+    t = float(days_from_j2000) / 365250.0
+    if rows is _parameters()["fairhead_terms"]:
+        return _fairhead_seconds_groups(t, _reversed_groups())
+    return _fairhead_seconds(t, rows)
+
+
+def _fairhead_seconds_groups(
+    t: float, groups: tuple[tuple[tuple[float, float, float], ...], ...]
+) -> float:
+    sin = math.sin
+    w0, w1, w2, w3, w4 = (
+        sum(a * sin(f * t + phase) for a, f, phase in group) for group in groups
+    )
+    fairhead = t * (t * (t * (t * w4 + w3) + w2) + w1) + w0
+    masses = (
+        0.00065e-6 * sin(6069.776754 * t + 4.021194)
+        + 0.00033e-6 * sin(213.299095 * t + 5.543132)
+        - 0.00196e-6 * sin(6208.294251 * t + 5.696701)
+        - 0.00173e-6 * sin(74.781599 * t + 2.435900)
+        + 0.03638e-6 * t * t
+    )
+    return fairhead + masses
 
 
 def _fairhead_seconds(t: float, rows: Sequence[Sequence[float]]) -> float:

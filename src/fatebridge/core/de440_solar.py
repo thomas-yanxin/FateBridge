@@ -9,21 +9,21 @@ from __future__ import annotations
 
 import json
 import math
-import struct
+import sys
 import zlib
-from copy import deepcopy
+from array import array
 from dataclasses import dataclass
 from fractions import Fraction
 from functools import lru_cache
 from importlib.resources import files
-from typing import Any, TypedDict
+from typing import Any, Callable, TypedDict
 
 from fatebridge.core.analytic_solar import (
     C_AU_DAY,
     aberration,
     apparent_ecliptic,
 )
-from fatebridge.core.astro.chebyshev import chebyshev_kinematics
+from fatebridge.core.astro.chebyshev import chebyshev_eval_float, chebyshev_kinematics
 from fatebridge.core.astro.coefficient_storage import RecordBlock, unpack_records
 from fatebridge.core.astro.tdb import Parameters as TDBParameters
 from fatebridge.core.astro.tdb import fairhead_seconds
@@ -77,7 +77,7 @@ class _AtlasManifest(TypedDict):
 
 
 @lru_cache(maxsize=1)
-def _coefficient_data() -> bytes:
+def _coefficient_data() -> array[float]:
     folder = files("fatebridge").joinpath("data/astronomy")
     try:
         metadata = folder.joinpath(ATLAS_BASENAME + ".json").read_bytes()
@@ -92,13 +92,18 @@ def _coefficient_data() -> bytes:
         )
     except (OSError, ValueError, EOFError, zlib.error) as error:
         raise EphemerisSourceError("solar_de440_invalid") from error
-    return data
+    result = array("d")
+    result.frombytes(data)
+    if sys.byteorder != "little":
+        result.byteswap()
+    return result
 
 
 @dataclass(frozen=True)
 class _Profile:
     manifest: SolarManifest
-    data: bytes
+    data: array[float]
+    segments: dict[tuple[int, int], RecordSegment]
     tdb: TDBParameters
 
 
@@ -113,7 +118,8 @@ def _profile(profile_id: str = MODEL_ID) -> _Profile:
         tdb: TDBParameters = json.loads(tdb_raw)
     except (OSError, ValueError, KeyError) as error:
         raise EphemerisSourceError("solar_de440_invalid") from error
-    return _Profile(manifest, _coefficient_data(), tdb)
+    segments = {(s["center"], s["target"]): s for s in manifest["segments"]}
+    return _Profile(manifest, _coefficient_data(), segments, tdb)
 
 
 def _selected_profile(profile_id: str) -> _Profile:
@@ -139,6 +145,65 @@ def geocentric_tdb_minus_tt_relative(
     return fairhead_seconds(days_from_j2000, rows)
 
 
+def _state_from_profile(
+    p: _Profile,
+    pair: tuple[int, int],
+    tdb_day: float,
+    tdb_fraction: float,
+    *,
+    need_velocity: bool = True,
+) -> tuple[Vector, Vector]:
+    s = p.segments.get(pair)
+    if s is None:
+        raise ValueError("Unsupported DE440 solar body pair")
+    initial = s["initial_seconds_from_j2000_tdb"]
+    span = s["interval_seconds"]
+    elapsed = (tdb_day * 86400.0 - initial) + tdb_fraction * 86400.0
+    index = int(elapsed // span)
+    offset = elapsed - index * span
+    if index == s["record_count"] and offset == 0.0:
+        index -= 1
+        offset += span
+    if not 0 <= index < s["record_count"]:
+        raise EphemerisSourceError("solar_de440_range")
+    size = s["record_size_doubles"]
+    base = (s["offset_bytes"] // 8) + index * size
+    record = p.data
+    midpoint = initial + (index + 0.5) * span
+    if record[base] != midpoint or record[base + 1] != span * 0.5:
+        raise EphemerisSourceError("solar_de440_invalid")
+    x = 2.0 * offset / span - 1.0
+    if x < -1.0:
+        x = -1.0
+    elif x > 1.0:
+        x = 1.0
+    count = (size - 2) // 3
+    scale = 172800.0 / span
+    pos0, vel0 = chebyshev_eval_float(
+        record[base + 2 : base + 2 + count], x, need_derivative=need_velocity
+    )
+    pos1, vel1 = chebyshev_eval_float(
+        record[base + 2 + count : base + 2 + 2 * count],
+        x,
+        need_derivative=need_velocity,
+    )
+    pos2, vel2 = chebyshev_eval_float(
+        record[base + 2 + 2 * count : base + 2 + 3 * count],
+        x,
+        need_derivative=need_velocity,
+    )
+    if not (
+        math.isfinite(pos0)
+        and math.isfinite(pos1)
+        and math.isfinite(pos2)
+        and math.isfinite(vel0)
+        and math.isfinite(vel1)
+        and math.isfinite(vel2)
+    ):
+        raise EphemerisSourceError("solar_de440_invalid")
+    return (pos0, pos1, pos2), (vel0 * scale, vel1 * scale, vel2 * scale)
+
+
 def state(
     pair: tuple[int, int],
     tdb_days_from_j2000: float | Fraction,
@@ -156,48 +221,12 @@ def state(
     ):
         raise ValueError("TDB epoch must be finite")
     p = _selected_profile(profile_id)
-    s = next(
-        (s for s in p.manifest["segments"] if (s["center"], s["target"]) == pair),
-        None,
-    )
-    if s is None:
-        raise ValueError("Unsupported DE440 solar body pair")
-    initial, span = s["initial_seconds_from_j2000_tdb"], s["interval_seconds"]
-    # Select the original record from the supplied epoch before rounding.
-    # A rounded seconds sum can cross a source edge before local evaluation.
-    span_exact = Fraction(span)
-    elapsed = (
-        Fraction(tdb_days_from_j2000) + Fraction(fractional_day)
-    ) * 86400 - Fraction(initial)
-    index, offset = divmod(elapsed, span_exact)
-    if index == s["record_count"] and offset == 0:
-        index -= 1
-        offset += span_exact
-    if not 0 <= index < s["record_count"]:
-        raise EphemerisSourceError("solar_de440_range")
-    size = s["record_size_doubles"]
-    record = struct.unpack_from(
-        "<" + "d" * size, p.data, s["offset_bytes"] + index * size * 8
-    )
-    midpoint = initial + (index + 0.5) * span
-    if record[0] != midpoint or record[1] != span / 2:
-        raise EphemerisSourceError("solar_de440_invalid")
-    x = 2 * offset / span_exact - 1
-    count = (size - 2) // 3
-    positions, velocities = [], []
-    derivs = 1 if need_velocity else 0
-    for axis in range(3):
-        coefficients = record[2 + axis * count : 2 + (axis + 1) * count]
-        kinematics = chebyshev_kinematics(coefficients, x, derivatives=derivs)
-        value, velocity, _ = kinematics.scaled(172800 / span)
-        positions.append(value)
-        velocities.append(velocity)
-    if not all(math.isfinite(v) for v in positions + velocities):
-        raise EphemerisSourceError("solar_de440_invalid")
-    return (positions[0], positions[1], positions[2]), (
-        velocities[0],
-        velocities[1],
-        velocities[2],
+    if isinstance(tdb_days_from_j2000, Fraction):
+        day_f = float(tdb_days_from_j2000)
+        frac_f = float(tdb_days_from_j2000 - Fraction(day_f)) + fractional_day
+        return _state_from_profile(p, pair, day_f, frac_f, need_velocity=need_velocity)
+    return _state_from_profile(
+        p, pair, tdb_days_from_j2000, fractional_day, need_velocity=need_velocity
     )
 
 
@@ -212,32 +241,40 @@ def solar_longitude_parts(
     """Geocentric apparent Sun at an explicit two-part TT point."""
     if not all(math.isfinite(value) for value in (day, fraction)):
         raise ValueError("TT epoch parts must be finite")
-    relative = Fraction(day) - 2451545 + Fraction(fraction)
-    correction = geocentric_tdb_minus_tt_relative(relative, profile_id=profile_id)
-    # Keep the received and emitted epochs exact until the source record owns them.
-    tdb = relative + Fraction(correction) / 86400
-    emb, embv = state((0, 3), tdb, profile_id=profile_id)
-    earth, earthv = state((3, 399), tdb, profile_id=profile_id)
-    bary = tuple((a + b) / AU_KM for a, b in zip(emb, earth))
-    velocity = tuple((a + b) / AU_KM / C_AU_DAY for a, b in zip(embv, earthv))
-    sun_km = state((0, 10), tdb, profile_id=profile_id, need_velocity=False)[0]
-    sun = tuple(v / AU_KM for v in sun_km)
-    vector = tuple(s - e for s, e in zip(sun, bary))
-    distance_helio = math.sqrt(math.fsum(v * v for v in vector))
+    p = _selected_profile(profile_id)
+    rel_day = day - 2451545.0
+    correction = fairhead_seconds(rel_day + fraction, p.tdb["fairhead_terms"])
+    tdb_frac = fraction + correction / 86400.0
+    emb, embv = _state_from_profile(p, (0, 3), rel_day, tdb_frac)
+    earth, earthv = _state_from_profile(p, (3, 399), rel_day, tdb_frac)
+    bx = (emb[0] + earth[0]) / AU_KM
+    by = (emb[1] + earth[1]) / AU_KM
+    bz = (emb[2] + earth[2]) / AU_KM
+    vx = (embv[0] + earthv[0]) / AU_KM / C_AU_DAY
+    vy = (embv[1] + earthv[1]) / AU_KM / C_AU_DAY
+    vz = (embv[2] + earthv[2]) / AU_KM / C_AU_DAY
+    sun_km = _state_from_profile(p, (0, 10), rel_day, tdb_frac, need_velocity=False)[0]
+    dx = sun_km[0] / AU_KM - bx
+    dy = sun_km[1] / AU_KM - by
+    dz = sun_km[2] / AU_KM - bz
+    distance_helio = math.sqrt(dx * dx + dy * dy + dz * dz)
+    distance = distance_helio
     for _ in range(3):
-        delay = math.sqrt(math.fsum(v * v for v in vector)) / C_AU_DAY
-        emitted = tdb - Fraction(delay)
-        sun_km = state((0, 10), emitted, profile_id=profile_id, need_velocity=False)[0]
-        sun = tuple(v / AU_KM for v in sun_km)
-        vector = tuple(s - e for s, e in zip(sun, bary))
-    distance = math.sqrt(math.fsum(v * v for v in vector))
+        delay = distance / C_AU_DAY
+        sun_km = _state_from_profile(
+            p, (0, 10), rel_day, tdb_frac - delay, need_velocity=False
+        )[0]
+        dx = sun_km[0] / AU_KM - bx
+        dy = sun_km[1] / AU_KM - by
+        dz = sun_km[2] / AU_KM - bz
+        distance = math.sqrt(dx * dx + dy * dy + dz * dz)
     apparent = aberration(
-        (vector[0] / distance, vector[1] / distance, vector[2] / distance),
-        (velocity[0], velocity[1], velocity[2]),
+        (dx / distance, dy / distance, dz / distance),
+        (vx, vy, vz),
         distance_helio,
     )
     ecliptic = apparent_ecliptic(apparent, day, fraction)
-    return math.degrees(math.atan2(ecliptic[1], ecliptic[0])) % 360
+    return math.degrees(math.atan2(ecliptic[1], ecliptic[0])) % 360.0
 
 
 def cache_key(profile_id: str = MODEL_ID) -> tuple[str, ...]:
@@ -247,69 +284,118 @@ def cache_key(profile_id: str = MODEL_ID) -> tuple[str, ...]:
 
 def source_receipt(profile_id: str = MODEL_ID) -> dict[str, Any]:
     p = _selected_profile(profile_id)
-    return deepcopy(
-        {
-            "model_id": profile_id,
-            "version": p.manifest["version"],
-            "coefficient_storage": p.manifest["storage"],
-            "coefficient_product_producer": p.manifest["derived_product_producer"],
-            "spk_frame_id": 1,
-            "segment_coverage_tdb_jd": {
-                f"{s['center']}->{s['target']}": [
-                    2451545.0 + s["initial_seconds_from_j2000_tdb"] / 86400,
-                    2451545.0
-                    + (
-                        s["initial_seconds_from_j2000_tdb"]
-                        + s["record_count"] * s["interval_seconds"]
-                    )
-                    / 86400,
-                ]
-                for s in p.manifest["segments"]
-            },
-            "time_argument": "TDB from TT via full geocentric ERFA Fairhead dtdb",
-            "tdb_model_author_comparison_years": [1950, 2050],
-            "position_frame": "BCRS then IAU2006/P03 and IAU2000B true ecliptic of date",
-            "light_time_iterations": 3,
-            "apparent_direction_model": {
-                "tdb": "fatebridge_geocentric_erfa_dtdb_v1",
-                "tdb_observer_u_v_km": [0, 0],
-                "aberration": "ERFA_ab",
-                "solar_gravitational_potential_in_aberration": True,
-                "finite_distance_light_deflection": "not_applied",
-                "precession": "IAU2006_P03",
-                "nutation": "IAU2000B",
-            },
-            "native_moshier_relabelled": False,
-            "reference_event_table_used": False,
-            "accuracy_certified": False,
-            **(
-                {
-                    "software_solar_term_years": list(
-                        p.manifest["software_solar_term_years"]
-                    ),
-                    "projection_origin_civil_years": list(
-                        p.manifest["projection_origin_civil_years"]
-                    ),
-                    "maximum_projection_horizon_years": 120,
-                    "admitted_projection_events": ["立春"],
-                }
-                if profile_id == CANPING_EXTENDED_MODEL_ID
-                else {}
-            ),
-            **(
-                {
-                    "software_solar_term_years": list(
-                        p.manifest["software_solar_term_years"]
-                    ),
-                    "public_auto_and_de440_input_years": list(
-                        p.manifest["public_auto_and_de440_input_years"]
-                    ),
-                }
-                if profile_id == EXTENDED_MODEL_ID
-                else {}
-            ),
-        }
-    )
+    return {
+        "model_id": profile_id,
+        "version": p.manifest["version"],
+        "coefficient_storage": p.manifest["storage"],
+        "coefficient_product_producer": dict(p.manifest["derived_product_producer"]),
+        "spk_frame_id": 1,
+        "segment_coverage_tdb_jd": {
+            f"{s['center']}->{s['target']}": [
+                2451545.0 + s["initial_seconds_from_j2000_tdb"] / 86400,
+                2451545.0
+                + (
+                    s["initial_seconds_from_j2000_tdb"]
+                    + s["record_count"] * s["interval_seconds"]
+                )
+                / 86400,
+            ]
+            for s in p.manifest["segments"]
+        },
+        "time_argument": "TDB from TT via full geocentric ERFA Fairhead dtdb",
+        "tdb_model_author_comparison_years": [1950, 2050],
+        "position_frame": "BCRS then IAU2006/P03 and IAU2000B true ecliptic of date",
+        "light_time_iterations": 3,
+        "apparent_direction_model": {
+            "tdb": "fatebridge_geocentric_erfa_dtdb_v1",
+            "tdb_observer_u_v_km": [0, 0],
+            "aberration": "ERFA_ab",
+            "solar_gravitational_potential_in_aberration": True,
+            "finite_distance_light_deflection": "not_applied",
+            "precession": "IAU2006_P03",
+            "nutation": "IAU2000B",
+        },
+        "native_moshier_relabelled": False,
+        "reference_event_table_used": False,
+        "accuracy_certified": False,
+        **(
+            {
+                "software_solar_term_years": list(
+                    p.manifest["software_solar_term_years"]
+                ),
+                "projection_origin_civil_years": list(
+                    p.manifest["projection_origin_civil_years"]
+                ),
+                "maximum_projection_horizon_years": 120,
+                "admitted_projection_events": ["立春"],
+            }
+            if profile_id == CANPING_EXTENDED_MODEL_ID
+            else {}
+        ),
+        **(
+            {
+                "software_solar_term_years": list(
+                    p.manifest["software_solar_term_years"]
+                ),
+                "public_auto_and_de440_input_years": list(
+                    p.manifest["public_auto_and_de440_input_years"]
+                ),
+            }
+            if profile_id == EXTENDED_MODEL_ID
+            else {}
+        ),
+    }
+
+
+def _brent_crossing(
+    residual: Callable[[float], float],
+    lo: float,
+    hi: float,
+    flo: float,
+    fhi: float,
+    tol: float,
+) -> tuple[float, float, int]:
+    """Tighten a forward crossing bracket [lo, hi] (flo < 0 <= fhi) via Illinois-Brent."""
+    iterations = 0
+    prev, fprev = lo, flo
+    w_lo, w_hi = flo, fhi
+    for _ in range(48):
+        if hi - lo <= tol:
+            break
+        mid = 0.5 * (lo + hi)
+        if mid in (lo, hi):
+            break
+        # Try secant / inverse-quadratic step inside the interior of (lo, hi).
+        cand: float | None = None
+        if w_hi != w_lo:
+            s = hi - w_hi * (hi - lo) / (w_hi - w_lo)
+            margin = 0.05 * (hi - lo)
+            if lo + margin < s < hi - margin:
+                cand = s
+        if cand is None or iterations % 4 == 3:
+            cand = mid
+        fc = residual(cand)
+        iterations += 1
+        if fc < 0.0:
+            prev, fprev = lo, flo
+            lo, flo = cand, fc
+            w_lo = fc
+            # Illinois damping if left endpoint updated twice in a row.
+            if prev > lo or fprev < 0.0:
+                w_hi *= 0.5
+        else:
+            prev, fprev = hi, fhi
+            hi, fhi = cand, fc
+            w_hi = fc
+            if fprev >= 0.0:
+                w_lo *= 0.5
+        if fc == 0.0:
+            # Keep strict lo < hi with flo < 0 <= fhi.
+            probe = max(lo, hi - tol)
+            if probe > lo and residual(probe) < 0.0:
+                lo = probe
+            break
+    return lo, hi, iterations
 
 
 def longitude_crossing_tt(
@@ -326,16 +412,9 @@ def longitude_crossing_tt(
     flo, fhi = residual(low), residual(high)
     if not flo < 0 <= fhi or fhi - flo >= 90:
         raise ValueError("DE440 TT bracket does not contain a forward crossing")
-    iterations = 0
-    for _ in range(40):
-        middle = (low + high) / 2
-        if middle == low or middle == high:
-            break
-        if residual(middle) < 0:
-            low = middle
-        else:
-            high = middle
-        iterations += 1
+    low, high, iterations = _brent_crossing(
+        residual, low, high, flo, fhi, max(1e-11, math.ulp(low) * 2.0)
+    )
     return {
         "jd_tt": (low + high) / 2,
         "bracket_tt": [low, high],
@@ -363,16 +442,7 @@ def longitude_crossing_tt_parts(
     flo, fhi = residual(a), residual(b)
     if not flo < 0 <= fhi or fhi - flo >= 90:
         raise ValueError("DE440 TT bracket does not contain a forward crossing")
-    iterations = 0
-    for _ in range(48):
-        middle = (a + b) / 2
-        if middle in (a, b):
-            break
-        if residual(middle) < 0:
-            a = middle
-        else:
-            b = middle
-        iterations += 1
+    a, b, iterations = _brent_crossing(residual, a, b, flo, fhi, 1e-12)
     fraction = (a + b) / 2
     return {
         "jd_tt": base + fraction,

@@ -14,6 +14,7 @@ from fatebridge.core.de440_solar import MODEL_ID as DE440_MODEL_ID
 from fatebridge.core.de440_solar import cache_key as de440_cache_key
 from fatebridge.core.de440_solar import source_receipt as de440_source_receipt
 from fatebridge.core.de441_solar import CACHE_IDENTITY
+from fatebridge.core.ephemeris_runtime import has_swiss_data_files
 from fatebridge.core.jpl_ephemeris import configured_jpl_file
 from fatebridge.core.spk_solar import MODEL_ID as SPK_MODEL_ID
 from fatebridge.core.spk_solar import cache_key as spk_cache_key
@@ -110,6 +111,15 @@ def solar_model_cache_key(*, year: int | None = None) -> tuple[Any, ...]:
         return mode, "native_swiss_runtime", *CACHE_IDENTITY
     if mode == "auto" and configured_jpl_file() is not None:
         return mode, "native_strict_jpl"
+    if (
+        mode == "auto"
+        and has_swiss_data_files()
+        and (
+            year is None
+            or VALIDATED_SOFTWARE_YEARS[0] <= year <= VALIDATED_SOFTWARE_YEARS[1]
+        )
+    ):
+        return mode, "native_swiss_runtime"
     if year is not None and mode in {"auto", "de440"} and not de440_selected(year):
         # Use the native source policy outside the packaged year grid.
         # Explicit de440 has already rejected an out-of-range year above.
@@ -147,101 +157,9 @@ def solar_model_cache_key(*, year: int | None = None) -> tuple[Any, ...]:
 def solar_model_environment_receipt(
     *, resolve_source: bool = True, observed_de440_models: list[str] | None = None
 ) -> dict[str, Any]:
-    # A successful text-only lookup must not start an unused file-backed Sun
-    # calculation merely to describe its configuration. Consuming calculations
-    # have already validated the mode and still request the strict source.
-    configured = os.environ.get(ENVIRONMENT_NAME, "auto").strip().lower()
-    if not resolve_source:
-        if (
-            configured in {"auto", "de440", "spk", "aa1996", "vsop2013"}
-            or configured not in MODES
-        ):
-            return {
-                "mode": configured if configured in MODES else "invalid",
-                "source_resolution": "not_observed_in_business_output",
-                "scope": "Configuration only; no independent solar source was resolved for this receipt. Actual consumed models are reported separately in provenance.",
-            }
-    if observed_de440_models is not None:
-        mode = solar_model_policy()
-        models = sorted(set(observed_de440_models))
-        if (
-            mode not in {"auto", "de440"}
-            or not models
-            or any(m not in {DE440_MODEL_ID, EXTENDED_MODEL_ID} for m in models)
-        ):
-            raise ValueError(
-                "Observed year-grid models must be named packaged DE440 profiles"
-            )
-        receipts = [de440_source_receipt(m) for m in models]
-        common = dict(
-            mode=mode,
-            auto_software_years=list(DE440_SOFTWARE_YEARS),
-            strict_native_jpl_overrides_auto=True,
-            scope="Observed packaged year-grid sources only; derived projection profiles retain their own per-boundary identities. Range declarations do not certify civil UTC or physical accuracy.",
-        )
-        if len(receipts) == 1:
-            return {**common, **receipts[0]}
-        return {
-            **common,
-            "source_resolution": "observed_multiple_packaged_profiles",
-            "observed_model_ids": models,
-            "sources": receipts,
-        }
-    if configured == "swiss":
-        return {
-            "mode": "swiss",
-            "source_selection": "required_swiss_files",
-            "source_resolution": "configuration_only",
-            "software_input_years": list(VALIDATED_SOFTWARE_YEARS),
-            "analytical_fallback_allowed": False,
-            "scope": "Actual crossings must use SWIEPH and retain observed planet/Moon file contexts. This selection does not certify physical accuracy or atomic file reads.",
-        }
-    if configured == "native" and configured_jpl_file() is None:
-        return {
-            "mode": "native",
-            "source_selection": "native_swiss_or_bundled_de441",
-            "source_resolution": "configuration_only",
-            "analytic_source_resolved": False,
-            "scope": "Configured native selection only. Available Swiss/JPL data keep their native model; fallback uses the bundled named DE441 source and shared light-cone/frame reduction, with no borrowed native Sun flags. This configuration receipt does not prove which source a business calculation consumed or certify accuracy.",
-        }
-    key = solar_model_cache_key()
-    if key[1] == "native_strict_jpl":
-        return {
-            "mode": key[0],
-            "source_selection": "strict_native_jpl",
-            "source_resolution": "configuration_only",
-            "packaged_source_resolved": False,
-            "scope": "Strict native JPL overrides the packaged default. Actual availability and consumption are validated by the native calculation and reported in its boundaries.",
-        }
-    if key[1] == "fatebridge_de440_solar_v1":
-        return {
-            "mode": key[0],
-            **de440_source_receipt(),
-            "auto_software_years": list(DE440_SOFTWARE_YEARS),
-            "strict_native_jpl_overrides_auto": True,
-            "scope": "Packaged default candidate; actual model use is reported by each consumed boundary. Strict native JPL overrides auto and years outside the declared software range use native policy.",
-        }
-    if key[0] == "spk":
-        return {
-            "mode": "spk",
-            **spk_source_receipt(),
-            "scope": "Explicit solar SPK policy; actual consumed boundaries report their own source identity",
-        }
-    if key[0] == "vsop2013":
-        return {
-            "mode": "vsop2013",
-            **vsop2013_source_receipt(),
-            "scope": "Explicit named VSOP2013/full-Moshier-Moon solar library; actual consumed boundaries retain binary/profile identity. TT qualification is not civil UTC or whole-domain certification.",
-        }
-    if key[0] == "aa1996":
-        return {
-            "mode": "aa1996",
-            **aa1996_source_receipt(),
-            "scope": "Explicit AA1996/full-Moshier-Moon native solar library; actual consumed boundaries retain loaded binary/profile identity",
-        }
-    return {
-        "mode": key[0],
-        "model_id": key[1],
-        "auto_software_years": list(DE440_SOFTWARE_YEARS),
-        "scope": "Configured policy; actual model use is reported by each result, not inferred from this configuration",
-    }
+    """Minimal solar model mode summary without prose walls."""
+    mode = solar_model_policy()
+    receipt: dict[str, Any] = {"mode": mode}
+    if observed_de440_models:
+        receipt["observed_model_ids"] = sorted(set(observed_de440_models))
+    return receipt

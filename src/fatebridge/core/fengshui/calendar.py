@@ -185,7 +185,6 @@ def solar_term_receipt(term: almanac.SolarTerm) -> dict[str, Any]:
             if term.resolution_provider == "fatebridge_analytic"
             else "named_ephemeris_solar_crossing"
         )
-        result["solar_model_details"] = term.as_dict()["solar_model_details"]
     result["time_basis"] = {
         "root_time_scale": "TT",
         "civil_policy": clock_policy["civil_time_policy"],

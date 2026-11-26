@@ -26,6 +26,7 @@ from fatebridge.core.ephemeris_installation import (
     ephemeris_path_fits,
     user_ephemeris_dir,
 )
+from fatebridge.core.ephemeris_runtime import bump_ephemeris_generation
 from fatebridge.core.jpl_ephemeris import jpl_header
 
 
@@ -199,6 +200,7 @@ def _acquire(
             _verify(target, spec)
         operational["file_content_verified"] = True
         operational["final_metadata"] = metadata
+        bump_ephemeris_generation()
         return target
     finally:
         pending.unlink(missing_ok=True)

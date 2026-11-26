@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import os
 from contextlib import contextmanager
-from functools import partial
+from functools import lru_cache, partial
 from pathlib import Path
 from threading import RLock, local
 from typing import Any, Iterator
@@ -31,6 +31,7 @@ from fatebridge.core.ephemeris_installation import (
 )
 from fatebridge.core.ephemeris_paths import (
     MAX_EPHEMERIS_PATH_BYTES,
+    ephemeris_search_directories,
     ephemeris_search_path_fits,
 )
 from fatebridge.core.jpl_ephemeris import (
@@ -38,7 +39,6 @@ from fatebridge.core.jpl_ephemeris import (
     configured_jpl_file,
     prepare_jpl_call,
 )
-from fatebridge.core.physical_source_observation import native_call_policy
 from fatebridge.utils.errors import EphemerisSourceError
 
 try:  # pragma: no cover - optional runtime dependency
@@ -53,10 +53,48 @@ except ImportError:  # pragma: no cover - exercised only in minimal installs
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 EPHEMERIS_LOCK = RLock()
 _configured_path: str | None = None
+_EPHEMERIS_GENERATION: int = 0
 THREAD_STATE = local()
 # Some native builds share this path across threads. Keep both caches under
 # the same lock; other builds still require each thread's own initialization.
 _LAST_APPLIED_PATH: tuple[int, str | None] | None = None
+
+
+def ephemeris_generation() -> int:
+    """Return the process-local ephemeris configuration/install generation."""
+    return _EPHEMERIS_GENERATION
+
+
+def bump_ephemeris_generation() -> int:
+    """Increment the ephemeris generation when files or search paths change."""
+    global _EPHEMERIS_GENERATION
+    with EPHEMERIS_LOCK:
+        _EPHEMERIS_GENERATION += 1
+        return _EPHEMERIS_GENERATION
+
+
+@lru_cache(maxsize=16)
+def _cached_has_swiss_data_files(search_path: str | None, _generation: int) -> bool:
+    if not search_path:
+        return False
+    for directory in ephemeris_search_directories(search_path):
+        try:
+            if directory.is_dir() and any(
+                p.is_file() for p in directory.glob("sepl*.se1")
+            ):
+                return True
+        except OSError:
+            continue
+    return False
+
+
+def has_swiss_data_files() -> bool:
+    """Check once per (search_path, generation) whether planetary .se1 files exist."""
+    if swe is None:
+        return False
+    return _cached_has_swiss_data_files(
+        configured_ephemeris_path(), _EPHEMERIS_GENERATION
+    )
 
 
 def _validated_ephemeris_path(path: str | None) -> str | None:
@@ -114,8 +152,9 @@ def configure_ephemeris_path(path: str | None = None) -> str | None:
     Direct calls also initialise the path in their calling thread; configuring
     the importing thread alone is insufficient for a fresh REST worker.
     """
-    global _configured_path, _LAST_APPLIED_PATH
+    global _configured_path, _LAST_APPLIED_PATH, _EPHEMERIS_GENERATION
     with EPHEMERIS_LOCK:
+        _EPHEMERIS_GENERATION += 1
         if swe is None:
             return None
         resolved = _validated_ephemeris_path(
@@ -159,48 +198,53 @@ def preserve_ephemeris_path() -> Iterator[None]:
                 _LAST_APPLIED_PATH = signature
 
 
-def ephemeris_call(operation: str, *args: Any, **kwargs: Any) -> Any:
-    """Run a direct Swiss Ephemeris call outside third-party path changes."""
-    global _LAST_APPLIED_PATH
-    with (
-        EPHEMERIS_LOCK,
-        native_call_policy(
-            swe,
-            operation,
-            args,
-            kwargs,
-            probe_call=ephemeris_call,
-            model_from_retflag=ephemeris_model_from_retflag,
-        ) as observe,
+def _ensure_thread_ephemeris_path() -> None:
+    global _LAST_APPLIED_PATH, _EPHEMERIS_GENERATION
+    selected = configured_ephemeris_path()
+    signature = (id(swe), selected)
+    if (
+        getattr(THREAD_STATE, "signature", None) != signature
+        or _LAST_APPLIED_PATH != signature
     ):
+        swe.set_ephe_path(selected or "")
+        THREAD_STATE.signature = signature
+        if _LAST_APPLIED_PATH != signature:
+            _EPHEMERIS_GENERATION += 1
+        _LAST_APPLIED_PATH = signature
+
+
+def solcross_tt(
+    target_longitude: float, jd_start_tt: float, flags: int
+) -> tuple[float, int]:
+    """Thread-safe swe.solcross(TT) returning (jd_tt, returned_sun_flags)."""
+    with EPHEMERIS_LOCK:
         if swe is None:
             raise ModuleNotFoundError("swisseph is unavailable")
-        selected = configured_ephemeris_path()
-        signature = (id(swe), selected)
-        if (
-            getattr(THREAD_STATE, "signature", None) != signature
-            or _LAST_APPLIED_PATH != signature
-        ):
-            # deltat_ex requires initialisation even with no .se1 files.
-            # Apply once per thread/path, avoiding a cache reset on every call.
-            swe.set_ephe_path(selected or "")
-            THREAD_STATE.signature = signature
-            _LAST_APPLIED_PATH = signature
+        _ensure_thread_ephemeris_path()
+        jd_tt = float(swe.solcross(float(target_longitude), float(jd_start_tt), flags))
+        _, retflags = swe.calc(jd_tt, swe.SUN, flags)
+        return jd_tt, int(retflags)
+
+
+def ephemeris_call(operation: str, *args: Any, **kwargs: Any) -> Any:
+    """Run a direct Swiss Ephemeris call outside third-party path changes."""
+    with EPHEMERIS_LOCK:
+        if swe is None:
+            raise ModuleNotFoundError("swisseph is unavailable")
+        _ensure_thread_ephemeris_path()
         jpl = configured_jpl_file()
         invoke = partial(
             native_rotation_call,
             calculate=lambda tt, body, flags: ephemeris_call("calc", tt, body, flags),
         )
         if jpl is None:
-            return observe(
-                compressed_endpoint_call(
-                    swe,
-                    operation,
-                    args,
-                    kwargs,
-                    invoke,
-                    configured_path=configured_ephemeris_path,
-                )
+            return compressed_endpoint_call(
+                swe,
+                operation,
+                args,
+                kwargs,
+                invoke,
+                configured_path=configured_ephemeris_path,
             )
         try:
             args, kwargs, strict_result = prepare_jpl_call(
@@ -213,7 +257,7 @@ def ephemeris_call(operation: str, *args: Any, **kwargs: Any) -> Any:
             raise EphemerisSourceError("jpl_native_failed") from error
         if strict_result:
             check_jpl_result(swe, result, operation)
-        return observe(result)
+        return result
 
 
 def ephemeris_model_from_retflag(retflag: int) -> str:

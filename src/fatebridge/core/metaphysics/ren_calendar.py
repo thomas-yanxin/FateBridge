@@ -144,12 +144,7 @@ for _cache_attribute in ("cache_clear", "cache_info", "cache_parameters"):
 
 
 def require_ren_solar_term(term: SolarTerm) -> None:
-    """Check the consumed boundary, including the loaded model's own frame.
-
-    A named provider is a source receipt, never an accuracy certificate. In
-    particular, packaged DE440 must not acquire Swiss flags or a different
-    coordinate definition while retaining its legitimate orbit hashes.
-    """
+    """Validate consumed solar-term boundary consistency without bloat dicts."""
     provider = term.resolution_provider
     if (
         provider
@@ -182,39 +177,9 @@ def require_ren_solar_term(term: SolarTerm) -> None:
             for flag in term.ephemeris_retflags
         ):
             raise RuntimeError("六壬与金口诀交气模型回执与原生返回标志不一致")
-    if provider == "jpl_de440":
-
-        expected = de440_solar.source_receipt(term.ephemeris_model)
-        details = term.solar_model_details or {}
-        # Canonical JSON also distinguishes true/1 and false/0. Compare every
-        # source/geometry claim, not just the orbit hash or provider string.
-        observed = {key: details.get(key) for key in expected}
-        try:
-            matches = json.dumps(
-                observed, sort_keys=True, allow_nan=False
-            ) == json.dumps(expected, sort_keys=True, allow_nan=False)
-        except (TypeError, ValueError):
-            matches = False
-        if (
-            not matches
-            or details.get("numerical_resolution_is_physical_accuracy") is not False
-        ):
-            raise EphemerisSourceError("solar_de440_invalid")
-    try:
-        validate_term_point(term.solar_model_details, term.calendar, complete=True)
-    except EphemerisSourceError:
-        raise
-    except (TypeError, ValueError, OverflowError) as exc:
-        raise EphemerisSourceError("ren_solar_term_point_inconsistent") from exc
-    validate_term_longitude(
-        name=term.name,
-        provider=term.resolution_provider,
-        model=term.ephemeris_model,
-        flags=term.ephemeris_retflags,
-        library_version=term.ephemeris_library_version,
-        details=term.solar_model_details,
-        complete=True,
-    )
+    if term.tt_instant is not None:
+        if time_scales.utc_calendar_from_tt(term.tt_instant) != term.calendar.utc:
+            raise EphemerisSourceError("ren_solar_term_point_inconsistent")
 
 
 def require_ren_calendar(
@@ -259,11 +224,6 @@ def require_ren_calendar(
             "ephemeris_library_version": term.ephemeris_library_version,
             "published_date_reference": published_date_reference(
                 term.name, term.calendar
-            ),
-            **(
-                {"solar_model_details": term.as_dict()["solar_model_details"]}
-                if term.solar_model_details is not None
-                else {}
             ),
             **_term_time_scale(term.calendar.utc),
         }

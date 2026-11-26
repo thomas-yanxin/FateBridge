@@ -65,8 +65,7 @@ profile.cache_parameters = _profile_data.cache_parameters  # type: ignore[attr-d
 def _epoch(date1: float, date2: float, scale: float) -> float:
     if not math.isfinite(date1) or not math.isfinite(date2):
         raise ValueError("Analytic solar epoch must be finite")
-    # Keep both supplied date parts until the final interval rounding.
-    return float((Fraction(date1) - 2451545 + Fraction(date2)) / Fraction(scale))
+    return ((date1 - 2451545.0) + date2) / scale
 
 
 def _orientation(vector: Sequence[float]) -> Vector:
@@ -110,25 +109,26 @@ def earth_state(date1: float, date2: float = 0.0) -> tuple[State, State]:
     )
 
 
+@lru_cache(maxsize=1)
+def _nut00b_rows() -> tuple[tuple[float, ...], ...]:
+    return tuple(
+        tuple(float(v) for v in row) for row in reversed(_profile_data()["nut00b"])
+    )
+
+
 def nutation(date1: float, date2: float = 0.0) -> tuple[float, float]:
     t = _epoch(date1, date2, 36525.0)
-    arguments = [
-        math.fmod(a + b * t, 1296000) * AS2R
-        for a, b in [
-            (485868.249036, 1717915923.2178),
-            (1287104.79305, 129596581.0481),
-            (335779.526232, 1739527262.8478),
-            (1072260.70369, 1602961601.2090),
-            (450160.398036, -6962890.5431),
-        ]
-    ]
+    a0 = math.fmod(485868.249036 + 1717915923.2178 * t, 1296000.0) * AS2R
+    a1 = math.fmod(1287104.79305 + 129596581.0481 * t, 1296000.0) * AS2R
+    a2 = math.fmod(335779.526232 + 1739527262.8478 * t, 1296000.0) * AS2R
+    a3 = math.fmod(1072260.70369 + 1602961601.2090 * t, 1296000.0) * AS2R
+    a4 = math.fmod(450160.398036 - 6962890.5431 * t, 1296000.0) * AS2R
+    two_pi = 2.0 * math.pi
+    sin, cos, fmod = math.sin, math.cos, math.fmod
     dp = de = 0.0
-    for row in reversed(_profile_data()["nut00b"]):
-        angle = math.fmod(
-            math.fsum(a * b for a, b in zip(row[:5], arguments)), 2 * math.pi
-        )
-        si, co = math.sin(angle), math.cos(angle)
-        ps, pst, pc, ec, ect, es = row[5:]
+    for n0, n1, n2, n3, n4, ps, pst, pc, ec, ect, es in _nut00b_rows():
+        angle = fmod(n0 * a0 + n1 * a1 + n2 * a2 + n3 * a3 + n4 * a4, two_pi)
+        si, co = sin(angle), cos(angle)
         dp += (ps + pst * t) * si + pc * co
         de += (ec + ect * t) * co + es * si
     return dp * AS2R / 1e7 - 0.000135 * AS2R, de * AS2R / 1e7 + 0.000388 * AS2R

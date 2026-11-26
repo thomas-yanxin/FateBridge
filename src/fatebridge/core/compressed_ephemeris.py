@@ -12,12 +12,32 @@ from __future__ import annotations
 import math
 from contextlib import contextmanager
 from contextvars import ContextVar
+from functools import lru_cache
 from importlib.metadata import version
 from pathlib import Path
 from typing import Any, Callable, Iterator
 
 from fatebridge.core.astro.native_identity import binding_distribution_version
 from fatebridge.utils.errors import EphemerisSourceError
+
+_BINDING_VERSIONS: dict[tuple[int, str, str], str] = {}
+
+
+def _cached_binding_version(native: Any) -> str:
+    """Resolve binding distribution version once per native module identity."""
+    if binding_distribution_version is not _ORIG_BINDING_DIST_VERSION:
+        return binding_distribution_version(native, version)
+    native_ver = str(getattr(native, "version", "unavailable"))
+    file_key = str(getattr(native, "__file__", ""))
+    key = (id(native), file_key, native_ver)
+    cached = _BINDING_VERSIONS.get(key)
+    if cached is None:
+        cached = binding_distribution_version(native, version)
+        _BINDING_VERSIONS[key] = cached
+    return cached
+
+
+_ORIG_BINDING_DIST_VERSION = binding_distribution_version
 
 POLICY_ID = "compressed_file_endpoint_context_v5"
 _FileWindows = tuple[tuple[str, float, float, int], ...]
@@ -257,7 +277,7 @@ def _require_observer_windows(
         return
     if (
         str(getattr(native, "version", "unavailable")),
-        binding_distribution_version(native, version),
+        _cached_binding_version(native),
     ) != ("2.10.03", "2.10.3.2"):
         return
     if (
@@ -314,7 +334,7 @@ def _post_call_endpoint_guard(
         raise EphemerisSourceError("compressed_endpoint_unresolved")
     if (
         str(getattr(native, "version", "unavailable")),
-        binding_distribution_version(native, version),
+        _cached_binding_version(native),
     ) != ("2.10.03", "2.10.3.2"):
         raise EphemerisSourceError("compressed_endpoint_unverified")
     original = result
@@ -1007,7 +1027,7 @@ def compressed_endpoint_call(
         and isinstance(flags, int)
         and flags & _model_mask(native) in {0, native.FLG_SWIEPH}
         and str(getattr(native, "version", "unavailable")) == "2.10.03"
-        and binding_distribution_version(native, version) == "2.10.3.2"
+        and _cached_binding_version(native) == "2.10.3.2"
     )
     managed = audit is not None and _DEPENDENCY_CONTEXT.get() is None and eligible
     if not managed:
@@ -1016,10 +1036,6 @@ def compressed_endpoint_call(
             if operation != "calc" or instant != dependent:
                 raise EphemerisSourceError("dependency_source_window_incoherent")
         result, _ = _post_call_endpoint_guard(native, operation, args, kwargs, invoke)
-        if audit is None and dependent is None and eligible and body == native.SUN:
-            return _external_solar_rebuild(
-                native, operation, args, kwargs, instant, flags, result, invoke
-            )
         if (
             dependent is not None
             and operation == "calc"
