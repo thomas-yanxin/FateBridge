@@ -2,45 +2,30 @@
 
 import asyncio
 import math
-import os
 import subprocess
 import sys
-import threading
 from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
-from fastapi.testclient import TestClient
 from fastmcp import Client
-from jsonschema import Draft202012Validator
-from pydantic import TypeAdapter, ValidationError
 
-import fatebridge.mcp_server as mcp
-from fatebridge.api import app as rest_app
-from fatebridge.application.result_delivery import bound_response
 from fatebridge.core import almanac, de441_solar, solar_term_clock
 from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.ephemeris_runtime import swe
 from fatebridge.core.local_techniques.chart import _resolve_coordinates
 from fatebridge.core.local_techniques.tongshefa import build_tongshefa_result
 from fatebridge.core.metaphysics.ren_calendar import require_ren_solar_term
-from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services import run_metadata
 from fatebridge.services.run_metadata import (
     attach_run_metadata,
     engine_is_approximate,
     resolve_runtime_engine,
 )
-from fatebridge.transports.flags import ResponseCharLimit
 from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.coordinates import parse_geo_coordinate
-from fatebridge.utils.errors import EphemerisSourceError, ParameterError
-from fatebridge.utils.private_files import (
-    ensure_private_directory,
-    locked_private_file,
-    open_private_file,
-)
+from fatebridge.utils.errors import EphemerisSourceError
 from tests.support.output_facts import canonical_json
 from tests.support.transports import (
     SPECS,
@@ -105,13 +90,13 @@ def test_gps_coordinates_take_precedence_over_text_hints() -> None:
 
 def test_empty_required_clock_fails_on_every_transport(rest, surface_calls) -> None:
     cases = [
-        ("sixyao", {"method": "time"}),
-        ("sixyao", {"method": "coin", "seed": 42}),
-        ("sixyao", {"coins": [6, 7, 8, 9, 7, 8]}),
-        ("sixyao", {"gua_code": "111111"}),
-        ("sanshiunited", {}),
+        ("liuyao", {"method": "time"}),
+        ("liuyao", {"method": "coin", "seed": 42}),
+        ("liuyao", {"coins": [6, 7, 8, 9, 7, 8]}),
+        ("liuyao", {"gua_code": "111111"}),
+        ("sanshi_combined_chart", {}),
     ]
-    surface_targets = {("sixyao", "   "), ("sanshiunited", "   ")}
+    surface_targets = {("liuyao", "   "), ("sanshi_combined_chart", "   ")}
     for key, options in cases:
         spec = SPECS[key]
         for clock in ("", "   "):
@@ -232,99 +217,6 @@ def test_nonfinite_current_facts_are_rejected(value) -> None:
         canonical_json({"coordinate": value})
 
 
-def test_threads_cannot_enter_the_same_artifact_lock_together(tmp_path: Path) -> None:
-    directory = ensure_private_directory(tmp_path / "private")
-    started, acquired = threading.Event(), threading.Event()
-    errors = []
-
-    def read():
-        started.set()
-        try:
-            with locked_private_file(directory / ".lock"):
-                acquired.set()
-        except Exception as exc:
-            errors.append(exc)
-
-    with locked_private_file(directory / ".lock"):
-        thread = threading.Thread(target=read)
-        thread.start()
-        assert started.wait(5)
-        assert not acquired.wait(0.1)
-    thread.join(timeout=5)
-    assert not thread.is_alive() and not errors
-    assert acquired.is_set()
-
-
-def test_new_files_are_private_and_exclusive_creation_never_replaces_them(
-    tmp_path: Path,
-) -> None:
-    directory = ensure_private_directory(tmp_path / "private")
-    path = directory / "result"
-    fd = open_private_file(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL)
-    with os.fdopen(fd, "wb") as handle:
-        handle.write(b"private result")
-    with pytest.raises(OSError):
-        open_private_file(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL)
-    assert path.read_bytes() == b"private result"
-
-
-@pytest.mark.skipif(sys.platform == "win32", reason="POSIX mode bits")
-def test_world_readable_directory_and_file_are_rejected(tmp_path: Path) -> None:
-    directory = ensure_private_directory(tmp_path / "private")
-    path = directory / "result"
-    path.write_bytes(b"secret")
-    path.chmod(0o644)
-    with pytest.raises(RuntimeError, match="private"):
-        open_private_file(path, os.O_RDONLY)
-    directory.chmod(0o755)
-    with pytest.raises(RuntimeError, match="private"):
-        ensure_private_directory(directory)
-
-
-@pytest.mark.skipif(sys.platform != "win32", reason="native Windows ACL")
-def test_windows_rejects_directory_with_an_everyone_read_ace(tmp_path: Path) -> None:
-    import win32con
-    import win32security
-
-    directory = ensure_private_directory(tmp_path / "private")
-    descriptor = win32security.GetFileSecurity(
-        str(directory), win32security.DACL_SECURITY_INFORMATION
-    )
-    acl = descriptor.GetSecurityDescriptorDacl()
-    acl.AddAccessAllowedAce(
-        win32security.ACL_REVISION,
-        win32con.GENERIC_READ,
-        win32security.CreateWellKnownSid(win32security.WinWorldSid, None),
-    )
-    win32security.SetNamedSecurityInfo(
-        str(directory),
-        win32security.SE_FILE_OBJECT,
-        win32security.DACL_SECURITY_INFORMATION,
-        None,
-        None,
-        acl,
-        None,
-    )
-    with pytest.raises(RuntimeError, match="private"):
-        ensure_private_directory(directory)
-
-
-@pytest.mark.skipif(sys.platform != "win32", reason="native Windows junction")
-def test_windows_never_uses_a_junction_as_the_result_directory(tmp_path: Path) -> None:
-    outside = ensure_private_directory(tmp_path / "outside")
-    junction = tmp_path / "junction"
-    subprocess.run(
-        ["cmd", "/c", "mklink", "/J", str(junction), str(outside)],
-        check=True,
-        capture_output=True,
-    )
-    try:
-        with pytest.raises(OSError, match="reparse"):
-            ensure_private_directory(junction)
-    finally:
-        junction.rmdir()
-
-
 def test_domain_requests_build_nested_schemas() -> None:
     code = """
 from fatebridge.core.requests.divination import SixYaoRequest
@@ -344,7 +236,7 @@ def test_catalog_cold_import_does_not_load_domain_engines() -> None:
     code = """
 import sys
 from fatebridge.services.tool_catalog import CATALOG
-assert len({spec.key for spec in CATALOG}) == len(CATALOG)
+assert len({spec.name for spec in CATALOG}) == len(CATALOG)
 for module in ('fatebridge.services.bazi',
                'fatebridge.services.astrology', 'fatebridge.services.western_timing'):
     assert module not in sys.modules, module
@@ -353,82 +245,6 @@ for module in ('fatebridge.services.bazi',
         [sys.executable, "-c", code], capture_output=True, text=True
     )
     assert result.returncode == 0, result.stderr
-
-
-def test_rest_mcp_flags_and_renderer_agree_on_disjoint_response_budget() -> None:
-    from fastapi.openapi.utils import get_openapi
-
-    async def schema():
-        async with Client(cached_mcp_app(families="bazi")) as client:
-            tools = await client.list_tools()
-            career = next(tool for tool in tools if tool.name == "run_calculation")
-            return career.model_dump(by_alias=True)["inputSchema"]["properties"][
-                "response_char_limit"
-            ]
-
-    mcp_schema = asyncio.run(schema())
-    route = next(
-        r for r in rest_app.routes if getattr(r, "path", None) == "/api/bazi/career"
-    )
-    single_openapi = get_openapi(title="t", version="0", routes=[route])
-    rest_schema = next(
-        parameter["schema"]
-        for parameter in single_openapi["paths"]["/api/bazi/career"]["post"][
-            "parameters"
-        ]
-        if parameter["name"] == "response_char_limit"
-    )
-    validators = [Draft202012Validator(s) for s in (rest_schema, mcp_schema)]
-    for value in [0, 4096, 8192, 65536]:
-        assert all(validator.is_valid(value) for validator in validators)
-        assert TypeAdapter(ResponseCharLimit).validate_python(value) == value
-        assert bound_response({"status": "small"}, value) == {"status": "small"}
-    for value in [-1, 1, 4095, 65537]:
-        assert not any(validator.is_valid(value) for validator in validators)
-        with pytest.raises(ValidationError):
-            TypeAdapter(ResponseCharLimit).validate_python(value)
-        with pytest.raises(ParameterError):
-            bound_response({"status": "small"}, value)
-
-
-def test_explicit_zero_http_budget_and_invalid_budget_before_execution(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    import fatebridge.api as api
-    from fatebridge.application.examples import example_input
-    from fatebridge.services.tool_catalog import CATALOG
-
-    spec = next(spec for spec in CATALOG if spec.key == "bazi_career")
-    inputs = example_input(spec)
-    api._reset_runtime_state_for_tests()
-    monkeypatch.setattr(
-        api,
-        "API_KEY_AUTHENTICATOR",
-        api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
-    )
-    client = TestClient(api.app)
-    for value in [0, 4096, 65536]:
-        response = client.post(
-            spec.rest_path, json=inputs, params={"response_char_limit": value}
-        )
-        assert response.status_code == 200, response.json()
-        assert "error" not in response.json()
-        if value == 0:
-            assert "career_analysis" in response.json()
-            assert "result_delivery" not in response.json()
-        else:
-            pass
-
-    def must_not_execute(*args, **kwargs):
-        pytest.fail("invalid HTTP budget must fail before domain execution")
-
-    monkeypatch.setattr(api, "execute_tool", must_not_execute)
-    for value in [1, 4095, 65537, "invalid"]:
-        response = client.post(
-            spec.rest_path, json=inputs, params={"response_char_limit": value}
-        )
-        assert response.status_code == 422
-        assert response.json()["error_code"] == "validation_error"
 
 
 def test_attach_run_metadata_uses_explicit_name() -> None:
@@ -511,10 +327,10 @@ def test_resolve_runtime_engine_still_detects_engine() -> None:
 
 def test_native_response_preserves_the_tool_receipt_without_duplicate_text() -> None:
     spec = SPECS["gua_lookup"]
-    result = asyncio.run(native(spec, {"query": "111111"}))
+    result = asyncio.run(native(spec, {"queries": ["111111"]}))
     assert not result.is_error
     payload = result.structured_content
-    assert payload["run_metadata"]["tool_name"] == spec.tool_name
+    assert payload["run_metadata"]["tool_name"] == spec.name
     assert payload["run_metadata"]["run_id"]
     assert result.content == []
 
@@ -522,15 +338,15 @@ def test_native_response_preserves_the_tool_receipt_without_duplicate_text() -> 
 @pytest.mark.parametrize(
     "arguments",
     [
-        {"name": ["111", "000"], "include_snapshot_text": False},
-        {"name": ["111"], "fields": ["missing"], "strict_fields": True},
+        {"queries": ["111", "000"]},
+        {"queries": ["111"], "fields": ["missing"]},
     ],
 )
 def test_native_success_and_error_use_structured_content(arguments) -> None:
     async def run():
         async with Client(cached_mcp_app(families="divination")) as client:
             result = await call_calculation(
-                client, "gua_meanings", arguments, raise_on_error=False
+                client, "gua_lookup", arguments, raise_on_error=False
             )
             payload = result.structured_content
             assert result.is_error is ("error_code" in payload)
@@ -594,7 +410,7 @@ def test_invalid_or_missing_trigram_is_not_replaced_by_a_default() -> None:
 
 
 def test_empty_and_invalid_trigrams_fail_on_all_transports(rest, surface_calls) -> None:
-    spec = SPECS["tongshefa"]
+    spec = SPECS["combine_four_gua"]
     valid = {"taiyin": "巽", "taiyang": "坤", "shaoyang": "震", "shaoyin": "震"}
 
     response, protocol, code, local = surface_calls(spec, {})
@@ -630,6 +446,6 @@ def test_explicit_trigrams_build_expected_tongshefa_chart(rest, surface_calls) -
     assert result["input_normalized"] == payload
     assert result["tongshefa"]["baseLeft"]["name"] == "风雷益"
     assert result["tongshefa"]["baseRight"]["name"] == "地雷复"
-    response, protocol, code, local = surface_calls(SPECS["tongshefa"], payload)
+    response, protocol, code, local = surface_calls(SPECS["combine_four_gua"], payload)
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     assert local["tongshefa"]["baseLeft"]["name"] == "风雷益"

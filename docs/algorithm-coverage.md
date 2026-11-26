@@ -2,7 +2,7 @@
 
 [文档中心](README.md) · [核心概念](concepts.md) · [API 参考](api-reference.md)
 
-本页按中央目录 `src/fatebridge/services/tool_catalog.py` 列出 FateBridge 的 14 个 family 与 93 项计算能力，说明实现状态、依赖条件与适用边界。输入字段与参数详情见 [API 参考](api-reference.md)，结果解读指引见[方法参考](interpretation/README.md)。
+本页按中央目录 `src/fatebridge/services/tool_catalog.py` 列出 FateBridge 的 12 个 family 与 90 项计算能力，说明实现状态、依赖条件与适用边界。输入字段与参数详情见 [API 参考](api-reference.md)，结果解读指引见[方法参考](interpretation/README.md)。
 
 状态分类：
 
@@ -11,7 +11,7 @@
 - `Partial` / `Limited`：已实现明确子集，存在未覆盖或未裁定的规则范围。
 - `Excluded`：当前仓库不提供该能力。
 
-> 工具来自中央目录 `src/fatebridge/services/tool_catalog.py`。REST 公开 **93 个工具**，MCP 通过四个入口提供 **93 项业务能力**，分为 **14 个 family**。目录有 93 条记录，CLI 可执行 93 条。
+> 工具来自中央目录 `src/fatebridge/services/tool_catalog.py`。REST 公开 **90 个工具**，MCP 通过两个入口提供 **90 项业务能力**，分为 **12 个 family**。目录共有 90 条记录，CLI 可执行 90 条。
 
 ## 怎样核对一次结果
 
@@ -22,22 +22,20 @@
 | 数值与时间精度 | `chart_profile.ephemeris_model`、`time_adjustment` 与 `engine_is_approximate` | 依赖库可导入不代表已加载外部 `.se1` 星历文件 |
 | 可追溯性 | 原输入、`run_metadata`、版本、来源与环境 | 重放需保留原输入、`as_of` 与环境设置 |
 
-## 1. 总览：14 个 family / 93 个工具
+## 1. 总览：12 个 family / 90 个工具
 
 | family | 工具数 | 主题 | 总体状态 |
 | --- | --- | --- | --- |
 | `bazi` | 12 | 八字命盘、九大专项、综合命理及原典四柱核对 | Implemented |
 | `compatibility` | 2 | 双人配合（八字合婚 / 宿曜相性） | Implemented |
 | `timing` | 9 | 大运 / 流年 / 流月 / 流日 / 流时 / 节气 / 农历 | Implemented |
-| `divination` | 11 | 梅花、六爻、统摄法、参评数、河洛、宿占、占星骰、三式合参 | Implemented |
+| `divination` | 10 | 梅花、六爻、统摄法、参评数、河洛、宿占、占星骰、三式合参 | Implemented |
 | `metaphysics` | 8 | 紫微斗数、六壬、奇门、太乙、金口诀 | Implemented |
 | `astro` | 9 | 核心星盘、印占本命／分盘／达沙、果老、德国盘、人类图及关系盘 | Implemented（精度依赖星历） |
-| `western_timing` | 1 | 西占推运总览 bundle | Implemented（依赖 backend） |
-| `western_timing_tool` | 11 | 独立西占推运技法（返照/行运/主限/法达等） | Implemented（依赖 backend） |
+| `western_timing` | 12 | 西占推运总览与 11 项独立推运技法（返照/行运/主限/法达等） | Implemented（依赖 backend） |
 | `western_event` | 4 | 事件占星（世俗/卜卦/择日/多重回归） | Implemented（依赖 backend） |
 | `western_lifespan` | 13 | 传统阶段与周期技法（不用于寿命推断） | Implemented（依赖 backend） |
 | `knowledge` | 2 | 内置知识库目录与读取 | Implemented |
-| `export` | 2 | 导出协议注册表与快照解析 | Implemented |
 | `fengshui` | 8 | 公共方位、命卦、八宅、砂水、年／月紫白、玄空宅盘、分层合参 | Implemented（明确版本） |
 | `psychometrics` | 1 | Goldberg (1992) IPIP 50 题大五人格因子标记量表 | Implemented |
 | 仓库内前端 | — | 内置 Web UI | Excluded |
@@ -52,7 +50,7 @@
 | 工具 | 说明 | 状态 |
 | --- | --- | --- |
 | `bazi_overview` | 综合命理分析（八字 + 喜用 + 格局） | Implemented |
-| `bazi_birth_chart` | 离线八字命盘，完整 `snapshot_text` + 可筛选 `snapshot_export` | Implemented |
+| `bazi_birth_chart` | 离线八字命盘（四柱、三元、十神、五行、神煞与大运流年概略） | Implemented |
 | `compare_bazi_sources` | 已明确的字面四柱与登记原典编释逐项核对，不反推生日 | Implemented |
 | `bazi_marriage` | 配偶星／宫与传统婚姻象意 | Implemented，限定规则 |
 | `bazi_career` | 事业类型、行业、创业倾向与贵人方位 | Implemented |
@@ -91,8 +89,7 @@
 
 | 工具 | 说明 | 状态 |
 | --- | --- | --- |
-| `gua_lookup` | 六十四卦卦象与义理查询 | Implemented |
-| `gua_meanings` | 批量卦义查询 helper | Implemented |
+| `gua_lookup` | 八卦与六十四卦批量卦象、结构及义理查询（支持 `queries` 与 `lookup_mode`） | Implemented |
 | `meihua_time_cast` | 梅花易数时间取数、体用互变、季令与经文参照 | Implemented |
 | `meihua_cast` | 梅花物数、声音、尺寸、字占、端法、报数与已有卦起卦 | Implemented |
 | `combine_four_gua` | 统摄四卦组合分析 | Implemented，限定组合规则 |
@@ -120,7 +117,7 @@
 
 | 工具 | 说明 | 状态 |
 | --- | --- | --- |
-| `astrology_chart` | 离线核心星盘（`chart_variant` 切换标准/13扇区/希腊/果老/印占/德国盘） | Implemented / Approximate |
+| `astrology_chart` | 离线西占本命盘（可选 `apparent_model="opaque_solar"`；其他流派请直接调用独立工具） | Implemented / Approximate |
 | `thirteen_sector_chart` | 上升起点 13 等分扇区盘（自定义规则） | Implemented / Approximate |
 | `hellenistic_chart` | 离线希腊风格盘 | Implemented / Approximate |
 | `guolao_chart` | 七政四余连续坐标、研究宿界、宫主/度主与规则轨迹 | Implemented（需 Swiss） |
@@ -130,7 +127,7 @@
 | `human_design` | [人类图](human-design.md) 88° 双时刻、26 激活、36 通道与类型权威 | Implemented（限定机制） |
 | `relationship_chart` | 关系/合盘（`compare`/`composite`/`influence`/`timespace`/`marks`） | Implemented / Approximate |
 
-### 2.7 `western_timing` + `western_timing_tool` —— 西占推运（Implemented，依赖 backend）
+### 2.7 `western_timing` —— 西占推运（Implemented，依赖 backend）
 
 | 工具 | 说明 | 状态 |
 | --- | --- | --- |
@@ -174,14 +171,12 @@
 | `sidereal_progressions` | 恒星推运 | Implemented（依赖 backend） |
 | `declination_progressions` | 赤纬推运 | Implemented（依赖 backend） |
 
-### 2.10 `knowledge` + `export` —— 知识库与导出（Implemented）
+### 2.10 `knowledge` —— 知识库（Implemented）
 
 | 工具 | 说明 | 状态 |
 | --- | --- | --- |
-| `knowledge_catalog` | 列出内置知识域与分类（`astro`、`bazi`、`liureng`、`qimen`） | Implemented |
-| `knowledge_read` | 读取单条内置知识并支持导出裁剪 | Implemented |
-| `export_formats` | 返回 FateBridge 导出协议注册表 | Implemented |
-| `export_parse` | 将快照文本解析为可筛选的结构化 section | Implemented |
+| `knowledge_catalog` | 列出内置知识域与分类（`astro`、`bazi`、`liureng`、`qimen` 等） | Implemented |
+| `knowledge_read` | 读取单条内置知识条目 | Implemented |
 
 ### 2.11 `fengshui` —— 家居风水（Implemented）
 
@@ -213,8 +208,8 @@
 | 本地有 `swisseph` 且加载 `.se1` 数据 | Implemented | 本地星历路径，实际模型由 `chart_profile.ephemeris_model` 标志确定 |
 | `swisseph` 可导入但缺 `.se1` 数据 | Implemented / Approximate | 可能使用内置 Moshier 模型，以实际标志为准 |
 | 无 `swisseph` | Approximate | 回退至 FateBridge 内置近似轨道模型 |
-| 显式 `hsys` 覆盖为 `1..8` 的离线宫制 | Implemented（需 `swisseph`） | 缺失运行时时直接报错，不静默降级 |
-| `zodiacal=1` sidereal（Lahiri） | Implemented | 离线恒星黄道模式 |
+| 显式 `house_system` 覆盖为非整宫的离线宫制（如 `1..8` / `P` 等） | Implemented（需 `swisseph`） | 缺失运行时时直接报错，不静默降级 |
+| `zodiac_type="Sidereal"`（Lahiri） | Implemented | 离线恒星黄道模式 |
 
 ### 3.2 关系盘（`relationship_chart`）
 
@@ -222,14 +217,6 @@
 
 ### 3.3 西占推运 / 事件 / 寿命（`western_*` families）
 
-这四个 family 依赖本地 `swisseph` 运行时，缺失时直接返回 `dependency_missing` 而不回退轨道近似。`primary_directions` / `primary_directions_chart` 会在输出中公开坐标与近似策略。`horary_chart` 与 `evaluate_election_time` 可显式选择 `ut1_source=iers_c04`（覆盖 1962-01-01 至 2026-09-19 UTC）或默认 `swiss_delta_t`。
-
-## 4. 快照协议覆盖
-
-| 形态 | 工具范围 | 读取方式 |
-| --- | --- | --- |
-| `snapshot_text` + `snapshot_export` | 八字独立盘/专项/综合分析、双人配合、时运与历法、卦义查询、三式合参、中国术数独立盘、knowledge、核心/关系星盘（中点盘除外）、独立西占推运、八个风水工具 | 业务数据为准，支持选择的模型可按 `selected_sections` 裁剪导出 |
-| `snapshot_text`，无 `snapshot_export` | `combine_four_gua`、`liuyao`、`canping`、`heluo`、`suzhan`、`interpret_astrology_dice`、西占事件与生命周期工具 | 读取文本与结构化业务数据；需要分节时可用 `export_parse` |
-| 结构化数据，无双层快照 | `meihua_time_cast`、`hamburg_midpoint_chart`、`western_timing`、`export_formats`、`export_parse` | 直接读取业务字段 |
+这三个 family 依赖本地 `swisseph` 运行时，缺失时直接返回 `dependency_missing` 而不回退轨道近似。`primary_directions` / `primary_directions_chart` 会在输出中公开坐标与近似策略。`horary_chart` 与 `evaluate_election_time` 可显式选择 `ut1_source=iers_c04`（覆盖 1962-01-01 至 2026-09-19 UTC）或默认 `swiss_delta_t`。
 
 如果你新增或修改了接口能力，请同步更新本页，确保工具列表与中央目录保持一致。

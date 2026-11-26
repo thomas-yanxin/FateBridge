@@ -33,7 +33,7 @@ FateBridge 为 AI 应用提供本地术数、占星与心理测量计算，通�
 | 风水空间 | 八宅、基础砂水、年／月星、玄空历史宅盘、布局与实测工位 | [家居风水](docs/fengshui.md) · [现场咨询指南](docs/interpretation/fengshui/consultation.md) |
 | 心理测量 | IPIP 50 题大五人格因子标记量表（Goldberg 1992 公有领域） | [覆盖矩阵](docs/algorithm-coverage.md#212-psychometrics--心理测量量表implemented) |
 
-当前源码提供 **93 个业务 REST 路由**。MCP 通过四个入口提供 **93 项业务能力**，覆盖 **14 个 family**。中央目录含 93 条记录，CLI 可执行 93 条。三端共用公开工具名、请求字段与领域计算，见[接口边界](docs/api-reference.md#24-三端能力边界)和[算法覆盖矩阵](docs/algorithm-coverage.md)。
+当前源码提供 **90 个业务 REST 路由**。MCP 通过两个入口提供 **90 项业务能力**，覆盖 **12 个 family**。目录共有 90 条记录，CLI 可执行 90 条。三端共用公开工具名、请求字段与领域计算，见[接口边界](docs/api-reference.md#22-三端能力边界)和[算法覆盖矩阵](docs/algorithm-coverage.md)。
 
 ## 快速开始
 
@@ -71,15 +71,14 @@ fatebridge bazi_birth_chart \
   --birth-hour 10 --birth-minute 30 --gender 男 \
   --birth-place 北京 --birth-timezone Asia/Shanghai \
   --fields bazi_birth.day_master.stem bazi_birth.day_master.element \
-    bazi_birth.day_master.polarity --strict-fields --no-include-snapshot-text \
-  --response-char-limit 8192
+    bazi_birth.day_master.polarity
 ```
 
-成功时退出码为 `0`，返回日主 `庚 / 金 / 阳` 与 `run_metadata`。较大的运行证据通过 `result_delivery` 延后交付，见[结果读取](#读取与核对结果)。查询其他工具及其请求格式：
+成功时退出码为 `0`，返回日主 `庚 / 金 / 阳` 与 `run_metadata`。默认 `--detail compact` 返回核心业务字段；需要完整输出与方法依据时传 `--detail audit`。查询其他工具及其请求格式：
 
 ```bash
 fatebridge discover --family bazi
-fatebridge describe bazi_birth_chart --detail input
+fatebridge discover bazi_birth_chart
 ```
 
 ## 接入 AI 助手或应用
@@ -98,7 +97,7 @@ REST 本机启动命令为 `API_HOST=127.0.0.1 fatebridge-api`。默认端口 `8
 ## 读取与核对结果
 
 - **输入与时间**：使用已确认资料，明确时区、地点和分析时刻。未知出生小时不能用默认值或示例补齐；不同方法采用的时钟以实际返回为准。
-- **摘要与全文**：摘要使用任务所需 `fields`；完整 JSON 首次保留全部字段，收到 `result_delivery` 后读取同一 run。操作步骤见[完整结果交付](docs/agent-guide.md#完整结果交付与同次导出)。
+- **摘要与全文**：三端默认使用 `detail=compact` 返回核心业务字段；需要指定子字段时传 `fields`（严格校验路径）；需要完整结果、全部时间线与方法依据时传 `detail=audit`（`fields=null`）。操作步骤见[输出控制与结果读取](docs/agent-guide.md#输出控制与结果读取)。
 - **星历与精度**：安装 Python 库不保证读取了外部数据文件。核对实际模型、来源和近似标志；下载与验证见[星历数据](docs/ephemeris.md)。
 - **依据与限制**：软件回归、原典对照与运行依赖分别报告；`partial` 只限制对应层。共同术语见[核心概念](docs/concepts.md)。
 

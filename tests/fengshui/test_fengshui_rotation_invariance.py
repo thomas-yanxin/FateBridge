@@ -5,6 +5,7 @@ from fractions import Fraction
 
 import pytest
 
+from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.spatial_geometry import (
     ray_xy,
     rectangle_xy,
@@ -18,9 +19,13 @@ from fatebridge.core.fengshui.spatial_inputs import (
     PlanRectangle,
     PlanSegment,
 )
-from fatebridge.services.fengshui import assess
+from fatebridge.services.fengshui import calculate_fengshui_assessment as _assess
 from tests.support.transports import SPECS, business, rest, surface_calls
 from tests.unit_test.fixtures.fengshui_measured import rotation_payload as payload_for
+
+
+def assess(**kwargs):
+    return _assess(AssessRequest.model_validate(kwargs))
 
 
 @pytest.mark.parametrize("angle", [-1080, -720, -360, 0, 360, 720, 1080])
@@ -89,9 +94,9 @@ def test_rotation_boundary_facts_agree_on_actual_three_transports(
     response, protocol, code, cli = surface_calls(
         spec,
         payload,
-        params={"fields": fields, "strict_fields": True},
-        options={"fields": fields, "strict_fields": True},
-        flags=("--fields", *fields, "--strict-fields"),
+        params={"detail": "audit", "fields": fields},
+        options={"detail": "audit", "fields": fields},
+        flags=("--detail", "audit", "--fields", *fields),
     )
     assert response.status_code == 200, response.text
     assert code == 0 and not protocol.is_error

@@ -1,6 +1,6 @@
 """Describe principal relations, actual hidden roots and external natal support separately."""
 
-from typing import Any, Literal, Mapping, Sequence, TypedDict
+from typing import Literal, Mapping, Sequence, TypedDict
 
 from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
 from fatebridge.utils.data import (
@@ -17,14 +17,6 @@ SOURCE = {
     "source_author": "任鐵樵增注，李雨田校訂兼發行",
     "source_edition": "上海大東書局經售，1947年4月初版",
     "source_pdf_pages": "502–510，盖头截脚举例503，乙酉及丁酉反例506",
-}
-
-RELATION_LABELS = {
-    "same_element": "干支本气同五行",
-    "branch_generates_stem": "支本气生干",
-    "stem_generates_branch": "干生支本气",
-    "branch_overcomes_stem": "支本气克干",
-    "stem_overcomes_branch": "干克支本气",
 }
 
 SCOPE = "本柱主气生克、本柱真实藏根与原局外援分别计算。盖头按支为所喜、截脚压力按干为所喜给条件，未裁定真正喜忌与救应。长生名不是实际藏根；既有根不自动消除主气相克或泄耗。任注运年上下同看，其他时间层仅给同柱事实，不套十年运法。"
@@ -122,46 +114,6 @@ def describe_timing_carrier(
         "effective_force_status": "not_adjudicated",
         "source_ref": SOURCE["id"],
     }
-
-
-def timing_carrier_snapshot_lines(interactions: Mapping[str, Any]) -> list[str]:
-    """Format the supplied receipt without recalculating roots or suitability."""
-    rows = interactions.get("pillar_carriers") or []
-    if not rows:
-        return []
-    layers = {
-        "dayun": "大运",
-        "liunian": "流年",
-        "liuyue": "流月",
-        "liuri": "流日",
-        "liushi": "流时",
-    }
-    lines = []
-    hidden_rows = interactions.get("hidden_target_carriers") or []
-    for row in rows:
-        own = "、".join(r["stem"] for r in row["own_hidden_roots"]) or "未见"
-        lines.append(
-            f"{layers.get(row['node_id'].split('.')[-1], row['node_id'])}{row['pillar']}："
-            f"{RELATION_LABELS[row['principal_relation']]}；本柱同五行藏根{own}；"
-            f"原局外援根{len(row['external_natal_roots'])}处，分别列示。"
-        )
-        hidden: Mapping[str, Any] = next(
-            (r for r in hidden_rows if r["node_id"] == row["node_id"]),
-            {},
-        )
-        covered = [
-            t["hidden_stem"]
-            for t in hidden.get("targets", [])
-            if t["covering_candidate_if_target_desired"]
-        ]
-        if covered:
-            lines.append(
-                f"{row['pillar']}另见干克真实藏干{'、'.join(covered)}；仅在这些藏干为所喜时列盖头候选，不改述为全支受克。"
-            )
-    lines.append(
-        "盖头须以支为所喜、截脚压力须以干为所喜分别核对；本柱关系、藏根与长生名不裁定实际喜忌、救应或吉凶。"
-    )
-    return lines
 
 
 def summarize_timing_carriers(

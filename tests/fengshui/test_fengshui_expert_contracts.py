@@ -14,7 +14,7 @@ from fatebridge.cli import run
 from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services.fengshui import assess
+from fatebridge.services.fengshui import calculate_fengshui_assessment as _assess
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.fengshui_transports import mcp_call
 from tests.support.mcp_result_assertions import without_transport
@@ -23,6 +23,10 @@ from tests.unit_test.fixtures.fengshui_layout import (
     form,
     proposal_request,
 )
+
+
+def assess(**kwargs):
+    return _assess(AssessRequest.model_validate(kwargs))
 
 
 def context_request():
@@ -151,11 +155,13 @@ def test_context_matches_actual_rest_mcp_cli(
             floor.update(center_confirmed=True, floorplan_alignment_confirmed=True)
     else:
         pass
-    response = rest_client(monkeypatch).post("/api/fengshui/assess", json=inputs)
-    protocol = asyncio.run(mcp_call("assess", inputs))
+    response = rest_client(monkeypatch).post(
+        "/api/fengshui/assess", json=inputs, params={"detail": "audit"}
+    )
+    protocol = asyncio.run(mcp_call("assess", {**inputs, "detail": "audit"}))
     path = tmp_path / "专家口径.json"
     path.write_text(json.dumps(inputs, ensure_ascii=False))
-    code = run(["fengshui_assess", "--request-file", str(path)])
+    code = run(["fengshui_assess", "--request-file", str(path), "--detail", "audit"])
     cli = json.loads(capsys.readouterr().out)
     assert response.status_code == 200, response.text
     assert code == 0 and not protocol.is_error
@@ -181,7 +187,6 @@ def test_context_matches_actual_rest_mcp_cli(
             "limited" if case == "floors" else "needs_confirmation"
         )
         assert all(a["effects_inferred"] is False for a in people.values())
-        assert "人物象征对应不代替环境方位" in body["snapshot_text"]
         assert {"expert_environment_2026_10_v1", "expert_fengshui_methods_v1"} <= {
             r["ruleset_id"] for r in body["rulesets"]
         }
@@ -307,7 +312,7 @@ def test_first_view_can_request_context_and_policy_with_resolvable_sources(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     inputs = context_request()
-    spec = next(s for s in CATALOG if s.key == "fengshui_assess")
+    spec = next(s for s in CATALOG if s.name == "fengshui_assess")
     fields = suggested_fields(spec) + [
         "method_policy",
         "layout_analysis.environmental_context",
@@ -316,9 +321,8 @@ def test_first_view_can_request_context_and_policy_with_resolvable_sources(
         "/api/fengshui/assess",
         json=inputs,
         params={
+            "detail": "audit",
             "fields": fields,
-            "strict_fields": True,
-            "include_snapshot_text": False,
         },
     )
     assert response.status_code == 200, response.text

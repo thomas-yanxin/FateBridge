@@ -31,6 +31,6 @@ def relationship_payload(mode, variant):
         **{f"outer_{key}": value for key, value in B.items()},
         "relative_mode": mode,
         "davison_variant": variant,
-        "hsys": 0,
-        "zodiacal": 1,
+        "house_system": 0,
+        "zodiac_type": "Sidereal",
     }

@@ -9,13 +9,13 @@ from fatebridge.core.local_techniques.suzhan import build_suzhan_result
 from fatebridge.core.requests.divination import SuZhanRequest
 from fatebridge.services.tool_catalog import CATALOG
 
-SPEC = next(s for s in CATALOG if s.key == "suzhan")
+SPEC = next(s for s in CATALOG if s.name == "suzhan")
 
 
 @pytest.fixture(scope="module")
 def untimed():
     request = SuZhanRequest(
-        date="2024-08-04", zone="+08:00", calendar_profile="hinoo_t1299_host27"
+        date="2024-08-04", timezone="+08:00", calendar_profile="hinoo_t1299_host27"
     )
     return request, build_suzhan_result(**request.model_dump())
 
@@ -65,7 +65,7 @@ def test_correct_unknown_layers_validate_and_known_clock_still_requires_chart(
     request, result = untimed
     validate_output(SPEC, result, request=request)
     request = request.model_copy(
-        update={"time": "09:00:00", "lat": "31n13", "lon": "121e28"}
+        update={"time": "09:00:00", "latitude": "31n13", "longitude": "121e28"}
     )
     known = build_suzhan_result(**request.model_dump())
     validate_output(SPEC, known, request=request)
@@ -78,7 +78,7 @@ def test_correct_unknown_layers_validate_and_known_clock_still_requires_chart(
 def timed(untimed):
     request, _ = untimed
     request = request.model_copy(
-        update={"time": "09:00:00", "lat": "31n13", "lon": "121e28"}
+        update={"time": "09:00:00", "latitude": "31n13", "longitude": "121e28"}
     )
     return request, build_suzhan_result(**request.model_dump())
 

@@ -14,13 +14,10 @@ from fatebridge.application.tool_spec import (
     ServiceResult,
     ToolSpec,
 )
-from fatebridge.core.execution_context import (
-    ExecutionOptions,
-    call_clock,
-    correlate_error,
-)
+from fatebridge.core.execution_context import ExecutionOptions, call_clock
 from fatebridge.core.public_output import public_payload
 from fatebridge.core.receipt_models import RunMetadata
+from fatebridge.core.reproducibility import ReproducibilityPolicy
 from fatebridge.services import replay_metadata, run_metadata
 from fatebridge.utils.errors import (
     DomainSourceError,
@@ -41,19 +38,16 @@ def strict_output_validation_enabled() -> bool:
     }
 
 
-def execute_spec(
+def invoke_validated_service(
     spec: ToolSpec,
     request: BaseModel,
     *,
-    render_snapshot: bool = True,
     strict_validation: bool | None = None,
 ) -> ServiceResult:
     """Run and validate a bound domain service call."""
 
     def invoke_service() -> ServiceResult:
         bound_call = BoundServiceCall(*spec.bind(request))
-        if spec.optional_snapshot and not render_snapshot:
-            bound_call.keyword_arguments["render_snapshot"] = False
         return bound_call.service(
             *bound_call.positional_arguments, **bound_call.keyword_arguments
         )
@@ -73,36 +67,17 @@ def execute_spec(
     return result
 
 
-def execute_tool(
+def execute_with_receipt(
     spec: ToolSpec,
     request: BaseModel,
     *,
     options: ExecutionOptions | None = None,
-    include_metadata: bool = True,
-    fields: list[str] | None = None,
-    include_snapshot_text: bool | None = None,
 ) -> ServiceResult:
     """Run a validated request with a frozen clock and attach its execution receipt."""
 
     controls = options or ExecutionOptions()
-    render_snapshot = (
-        not spec.optional_snapshot
-        or controls.detail == "audit"
-        or (
-            controls.detail == "standard"
-            and (
-                spec.include_snapshot_text
-                or getattr(request, "selected_sections", None)
-            )
-        )
-        or (not fields and include_snapshot_text is True)
-        or any(
-            path.partition(".")[0] in {"snapshot_text", "snapshot_export"}
-            for path in fields or ()
-        )
-    )
     seed_was_generated = False
-    seed_field = spec.reproducibility.random_seed_field
+    seed_field = (spec.reproducibility or ReproducibilityPolicy()).random_seed_field
     replay_overrides: dict[str, JsonValue] = {}
     with call_clock(controls.as_of) as clock:
         started = perf_counter()
@@ -118,20 +93,12 @@ def execute_tool(
                     request = request.model_copy(update={seed_field: seed})
                     seed_was_generated = True
                 replay_overrides[seed_field] = seed
-            result = (
-                execute_spec(spec, request)
-                if render_snapshot
-                else execute_spec(spec, request, render_snapshot=False)
-            )
+            result = invoke_validated_service(spec, request)
         except Exception as exc:
-            return correlate_error(
-                handle_calculation_error(exc, spec.operation_label_zh), controls
-            )
+            return handle_calculation_error(exc, spec.operation_label_zh)
         elapsed_ms = (perf_counter() - started) * 1000
         if result_is_error(result):
-            return correlate_error(result, controls)
-        if not include_metadata:
-            return public_payload(result)
+            return result
         try:
             receipt = replay_metadata.execution_receipt(
                 spec,
@@ -142,34 +109,25 @@ def execute_tool(
                 elapsed_ms=elapsed_ms,
                 generated_seed=seed_was_generated,
                 replay_overrides=replay_overrides,
-                compact_receipt=controls.detail == "compact"
-                and not any(
-                    path.partition(".")[0] == "run_metadata" for path in fields or ()
-                ),
+                compact_receipt=controls.detail == "compact",
             )
             base_metadata = run_metadata.build_run_metadata(
                 result,
-                tool_name=spec.tool_name,
+                tool_name=spec.name,
                 approximate_record=spec.approximate_record,
             )
             if base_metadata["engine_is_approximate"]:
                 receipt["warnings"].append("approximate_engine")
             metadata: ServiceResult = {**base_metadata, **receipt}
-            if controls.trace_id is not None:
-                metadata["trace_id"] = controls.trace_id
             RunMetadata.model_validate(metadata)
             result = {**result, "run_metadata": metadata}
         except DomainSourceError as exc:
-            return correlate_error(
-                handle_calculation_error(exc, spec.operation_label_zh), controls
-            )
+            return handle_calculation_error(exc, spec.operation_label_zh)
         except Exception as exc:
-            # note (execution): Receipt failures retain correlation and use the server-output error envelope.
+            # note (execution): Receipt failures use the server-output error envelope.
             failure = OutputContractError("执行元数据生成失败")
             failure.__cause__ = exc
-            return correlate_error(
-                handle_calculation_error(failure, spec.operation_label_zh), controls
-            )
+            return handle_calculation_error(failure, spec.operation_label_zh)
         return public_payload(result)
 
 

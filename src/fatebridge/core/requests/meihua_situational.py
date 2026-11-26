@@ -4,14 +4,14 @@ from typing import Literal
 
 from pydantic import Field, StrictBool, model_validator
 
-from .base import _DeferredModel
+from fatebridge.core.requests.base import FateBridgeBaseRequest
 
 Direction = Literal[
     "north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"
 ]
 
 
-class MeihuaQuerentPosition(_DeferredModel):
+class MeihuaQuerentPosition(FateBridgeBaseRequest):
     direction: Direction = Field(
         description="Reported compass side occupied by the person asking at this cast; not movement heading, facing, address or the casting object's direction. No compass bearing or north-reference conversion inferred"
     )
@@ -28,7 +28,7 @@ class MeihuaQuerentPosition(_DeferredModel):
         return self
 
 
-class MeihuaResponseContext(_DeferredModel):
+class MeihuaResponseContext(FateBridgeBaseRequest):
     label: str = Field(min_length=1, max_length=240)
     same_casting_episode_confirmed: StrictBool = Field(
         json_schema_extra={"const": True},

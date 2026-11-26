@@ -10,18 +10,37 @@ from fastmcp import Client
 
 from fatebridge.cli import run
 from fatebridge.core.fengshui import calendar, xuankong
-from fatebridge.core.fengshui.models import HousePeriod
+from fatebridge.core.fengshui.models import (
+    AnnualRequest,
+    HousePeriod,
+    MingguaRequest,
+    XuankongRequest,
+)
 from fatebridge.core.fengshui.reading import build_natal_reading
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.fengshui import (
-    calculate_annual_stars,
-    calculate_minggua,
-    calculate_xuankong_natal,
+    calculate_annual_stars as _calculate_annual_stars,
+)
+from fatebridge.services.fengshui import calculate_minggua as _calculate_minggua
+from fatebridge.services.fengshui import (
+    calculate_xuankong_natal as _calculate_xuankong_natal,
 )
 from tests.support.fengshui_clock import seconds_from_boundary
 from tests.support.fengshui_transports import SPECS
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import call_calculation, rest_client
+
+
+def calculate_annual_stars(**kwargs):
+    return _calculate_annual_stars(AnnualRequest.model_validate(kwargs))
+
+
+def calculate_minggua(**kwargs):
+    return _calculate_minggua(MingguaRequest.model_validate(kwargs))
+
+
+def calculate_xuankong_natal(**kwargs):
+    return _calculate_xuankong_natal(XuankongRequest.model_validate(kwargs))
 
 
 @pytest.fixture(params=["native", "analytic"])
@@ -181,11 +200,8 @@ def test_explicit_confirmed_year_and_period_are_not_reinterpreted(clock) -> None
     assert "effective_event_year_status" not in confirmed
 
 
-def test_snapshot_and_bound_reading_distinguish_event_year_from_period(clock) -> None:
+def test_bound_reading_distinguishes_event_year_from_period(clock) -> None:
     output = calculate_xuankong_natal(**natal_input(instant()))
-    text = output["snapshot_text"]
-    assert "事件有效年待确认：2024、2025" in text
-    assert "所有候选年均属9运" in text
     reading = build_natal_reading(output)
     statement = next(
         s for s in reading["statements"] if s["kind"] == "natal_event_year"
@@ -227,14 +243,16 @@ def test_boundary_year_contract_agrees_on_actual_rest_mcp_cli(
     async def call():
         async with Client(create_mcp_app()) as client:
             return await call_calculation(
-                client, SPECS[name].tool_name, {"response_char_limit": 0, **inputs}
+                client, SPECS[name].name, {"detail": "audit", **inputs}
             )
 
-    response = rest_client(monkeypatch).post(SPECS[name].rest_path, json=inputs)
+    response = rest_client(monkeypatch).post(
+        SPECS[name].rest_path, json=inputs, params={"detail": "audit"}
+    )
     protocol = asyncio.run(call())
     path = tmp_path / "event.json"
     path.write_text(json.dumps(inputs, ensure_ascii=False))
-    code = run([SPECS[name].tool_name, "--request-file", str(path)])
+    code = run([SPECS[name].name, "--request-file", str(path), "--detail", "audit"])
     cli = json.loads(capsys.readouterr().out)
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     assert (

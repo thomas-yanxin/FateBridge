@@ -16,10 +16,17 @@ from pydantic import (
     model_validator,
 )
 
-from fatebridge.core.requests.base import AstroHouseValidatorMixin
-from fatebridge.core.requests.birth import AstroBirthRequest, AstroBirthYear
+from fatebridge.core.requests.base import (
+    OfflineHouseValidatorMixin,
+    OptionalAnalysisClockFields,
+)
+from fatebridge.core.requests.birth import AstroBirthBase
 from fatebridge.core.requests.western_policy import WesternEphemerisRequest
-from fatebridge.utils.house_systems import OFFLINE_HOUSE_CODE_NOTE
+from fatebridge.utils.house_systems import (
+    OFFLINE_HOUSE_CODE_NOTE,
+    normalize_offline_zodiac_code,
+    resolve_offline_house_code,
+)
 
 GuolaoSeasonalAnchorPolicy = Literal[
     "term_instants",
@@ -76,7 +83,7 @@ _ExactTargetDatetime = Annotated[AwareDatetime, WrapValidator(_exact_target_date
 
 
 class AstroChartRequest(
-    AstroHouseValidatorMixin, AstroBirthRequest, WesternEphemerisRequest
+    OfflineHouseValidatorMixin, AstroBirthBase, WesternEphemerisRequest
 ):
     """Request model for offline astrology chart generation."""
 
@@ -88,52 +95,21 @@ class AstroChartRequest(
             "有的不收'造成的反复试错。"
         ),
     )
-    birth_timezone: str | None = Field(  # type: ignore[assignment]
+    house_system: int | str | None = Field(
         default=None,
-        description=(
-            "Birth timezone (IANA name or UTC offset). May be resolved from a "
-            "supported birth_place; Western charts reject an unresolved civil "
-            "timezone. Coordinates cannot establish the recorded zone. Explicit "
-            "UTC is valid; never infer a historical basis by fitting a chart. "
-            "Indian charts also require a resolved civil timezone."
-        ),
-    )
-    birth_longitude: float | None = Field(  # type: ignore[assignment]
-        default=None,
-        ge=-180,
-        le=180,
-        description=(
-            "Birth longitude. Optional for core chart endpoints when FateBridge can "
-            "infer it from a supported birth_place."
-        ),
-    )
-    birth_latitude: float | None = Field(  # type: ignore[assignment]
-        default=None,
-        ge=-90,
-        le=90,
-        description=(
-            "Birth latitude. Optional for core chart endpoints when FateBridge can "
-            "infer it from a supported birth_place."
-        ),
-    )
-    hsys: int | None = Field(
-        default=None,
-        ge=0,
-        le=8,
         description=(
             "Optional offline house system override; if omitted, FateBridge keeps each "
-            "chart variant's historical default. Explicit values currently support "
-            "0=whole_sign, 1=Alcabitus, 2=Regiomontanus, 3=Placidus, 4=Koch, "
-            "5=Vehlow Equal, 6=Polich Page, 7=Sripati, 8=equal_mc"
+            "chart variant's historical default. Accepts SE letters, keys, or integer "
+            "codes 0..8 (0=whole_sign, 1=Alcabitus, 2=Regiomontanus, 3=Placidus, "
+            "4=Koch, 5=Vehlow Equal, 6=Polich Page, 7=Sripati, 8=equal_mc)."
         )
         + OFFLINE_HOUSE_CODE_NOTE,
     )
-    zodiacal: int | None = Field(
+    zodiac_type: Literal["Tropic", "Sidereal"] | None = Field(
         default=None,
         description=(
-            "Optional offline zodiac override; if omitted, FateBridge keeps each "
-            "chart variant's historical default. Explicit values currently support "
-            "0=tropical and 1=sidereal(Lahiri-like)"
+            "Optional offline zodiac override ('Tropic' or 'Sidereal'); if omitted, "
+            "FateBridge keeps each chart variant's historical default."
         ),
     )
     use_true_solar_time: bool = Field(
@@ -148,7 +124,38 @@ class AstroChartRequest(
     )
 
 
-class AstroGuolaoRequest(AstroChartRequest):
+class SolarBirthClockFields(AstroChartRequest):
+    """Shared birth clock basis and seconds for Guolao, Germany/13-sector, and India charts."""
+
+    birth_clock_basis: Literal["civil", "local_mean_solar", "local_apparent_solar"] = (
+        Field(
+            default="civil",
+            description=(
+                "Confirmed basis of the supplied birth clock label: civil uses birth_timezone; "
+                "local_mean_solar (LMT) or local_apparent_solar (LAT) uses longitude and modeled "
+                "UT1/TT with birth_timezone omitted."
+            ),
+        )
+    )
+    birth_second: int = Field(
+        default=0,
+        ge=0,
+        le=59,
+        description=(
+            "Recorded birth second (0..59), if known. Omitted seconds use the start of the "
+            "supplied minute; this does not certify exact recording precision. Leap-second labels "
+            "are not represented."
+        ),
+    )
+
+    @model_validator(mode="after")
+    def _validate_solar_birth_timezone(self) -> "SolarBirthClockFields":
+        if self.birth_clock_basis != "civil" and self.birth_timezone is not None:
+            raise ValueError("Explicit solar birth labels must omit birth_timezone")
+        return self
+
+
+class AstroGuolaoRequest(SolarBirthClockFields):
     """Explicit target instant for the partial Guolao temporal research layer."""
 
     def uses_western_ephemeris_policy(self) -> bool:
@@ -158,31 +165,12 @@ class AstroGuolaoRequest(AstroChartRequest):
         default="auto",
         description="Guolao retains its existing observed source rules; the Western require_data_files request policy is not implemented for this variant.",
     )
-
-    birth_timezone: str | None = Field(
-        default=None,
-        description="For civil input: IANA name or explicit UTC offset; omit only if birth_place resolves a timezone. Unresolved missing timezones are rejected and are not defaulted to UTC. For explicit LMT/LAT input this field must be omitted: a solar label is not a civil timezone. Converted UTC labels and native TT/UT1 are computation references, not inferred historical zones; no surrogate datetime is created for second60 or out-of-range UTC labels.",
-    )
-    birth_clock_basis: Literal["civil", "local_mean_solar", "local_apparent_solar"] = (
-        Field(
-            default="civil",
-            description="Confirmed basis of the supplied birth label. Civil retains its timezone policy. LMT/LAT use longitude and the shared modeled UT1/TT inverse; omit birth_timezone. LMT uses its recorded label for the nominal hour unless use_true_solar_time=true selects the same natal Sun's apparent hour without changing the epoch. LAT already supplies an apparent label; either flag keeps its nominal input hour and applies no second correction. Do not infer an unknown historical clock basis. When UTC is outside datetime range, second60, or lacks a unique label, Guolao retains native TT/UT1 without a surrogate civil instant. Solar-day numerical ambiguity, unavailable month calendars, source coverage and native ordering ties remain explicit limits; no classical clock calibration or prediction certification.",
-        )
-    )
-
-    birth_second: int = Field(
-        default=0,
-        ge=0,
-        le=59,
-        description="Recorded birth second, if known. Omitted seconds use the start of the supplied minute; this does not certify exact recording precision. Leap-second labels are not represented.",
-    )
     birth_microsecond: int = Field(
         default=0,
         ge=0,
         le=999999,
         description="Explicit fraction of the recorded birth second. Preserved in the physical instant and solar-hour calculation; datetime resolution does not certify source-clock or astronomical accuracy.",
     )
-
     analysis_datetime: _ExactTargetDatetime | None = Field(
         default=None,
         description="Optional ISO target instant with timezone offset, at or after recorded birth. Returns source-ordinal small-limit palace with declared LiChun year policy and actual geocentric target seven bodies / four-extra models. Omit for natal only; no implicit today, full classical temporal judgement or event probability.",
@@ -191,7 +179,6 @@ class AstroGuolaoRequest(AstroChartRequest):
         default=None,
         description="Optional Guolao monthly-limit research policy; requires analysis_datetime. jie_month uses calculated Jie boundaries with Yin=month 1; chinese_lunar_utc8 uses regular Chinese lunar month numbers on UTC+08 civil dates and leaves intercalary birth/target months unassigned. Neither mapping is certified by the cited edition. The annual small limit keeps its declared LiChun year policy. Omit to leave the monthly layer unrequested.",
     )
-
     guolao_seasonal_anchor_policy: GuolaoSeasonalAnchorPolicy | None = Field(
         default=None,
         description="Optional Guolao anchor policy. term_instants preserves v7. source_solar_days_winter_exclusive/inclusive require use_true_solar_time=true or an explicit LAT input: use the same Sun/UT1 apparent-solar day, include the whole Major Cold, summer-solstice and Minor Heat days, and exclude/include the winter-solstice day. These explicit v8 hypotheses do not adjudicate historical day boundaries or predictive validity; numerical ambiguity and model changes error without fallback.",
@@ -201,8 +188,6 @@ class AstroGuolaoRequest(AstroChartRequest):
     def _month_limit_requires_target(self) -> "AstroGuolaoRequest":
         if self.ephemeris_policy != "auto":
             raise ValueError("Western ephemeris_policy is not implemented for Guolao")
-        if self.birth_clock_basis != "civil" and self.birth_timezone is not None:
-            raise ValueError("Explicit solar birth labels must omit birth_timezone")
         if self.guolao_month_basis is not None and self.analysis_datetime is None:
             raise ValueError("guolao_month_basis requires analysis_datetime")
         if self.guolao_seasonal_anchor_policy in {
@@ -217,22 +202,8 @@ class AstroGuolaoRequest(AstroChartRequest):
         return self
 
 
-class AstroSpecialtyRequest(AstroChartRequest):
+class AstroSpecialtyRequest(SolarBirthClockFields):
     """Germany and equal13 charts with explicitly confirmed time uncertainty."""
-
-    birth_second: int = Field(
-        default=0,
-        ge=0,
-        le=59,
-        description="Recorded birth second (0..59), for Germany/equal13 charts. Omission represents the start of the supplied minute, not proof of second-level birth-time accuracy. Preserve the user's stated precision and uncertainty; do not infer missing seconds from outcomes.",
-    )
-
-    birth_clock_basis: Literal["civil", "local_mean_solar", "local_apparent_solar"] = (
-        Field(
-            default="civil",
-            description="Basis of the supplied birth clock, not a display preference. civil uses birth_timezone. Explicit local_mean_solar/LMT or local_apparent_solar/LAT uses longitude and modeled UT1/TT; omit birth_timezone and keep use_true_solar_time=false to avoid applying another correction. Never infer the basis of an ambiguous historical record by fitting a chart.",
-        )
-    )
 
     birth_time_uncertainty_minutes: float | None = Field(
         default=None,
@@ -244,9 +215,7 @@ class AstroSpecialtyRequest(AstroChartRequest):
 
     @model_validator(mode="after")
     def _solar_birth_clock_scope(self) -> "AstroSpecialtyRequest":
-        if self.birth_clock_basis != "civil" and (
-            self.birth_timezone is not None or self.use_true_solar_time
-        ):
+        if self.birth_clock_basis != "civil" and self.use_true_solar_time:
             raise ValueError(
                 "Local solar birth clocks require birth_timezone omitted and use_true_solar_time=false"
             )
@@ -262,41 +231,22 @@ class AstroGermanyRequest(AstroSpecialtyRequest):
     )
 
 
-class AstroIndiaRequest(AstroChartRequest):
+class AstroIndiaRequest(SolarBirthClockFields):
     """Lahiri Parashari subset; legacy zodiac/house overrides remain explicit."""
 
     def uses_western_ephemeris_policy(self) -> bool:
         return False
 
-    birth_timezone: str | None = Field(
-        default=None,
-        description="Civil birth timezone: explicit IANA name or UTC offset, or supported unambiguous birth_place inference. Unresolved civil timezones are rejected before sky calculations; coordinates, analysis_timezone and a solar-display request cannot establish the recorded zone. Explicit UTC is valid. Explicit LMT/LAT input requires this field omitted and a confirmed noncivil birth_clock_basis.",
-    )
-
-    birth_second: int = Field(
-        default=0,
-        ge=0,
-        le=59,
-        description="Recorded second, if known; omitted uses the beginning of the minute, not a claim of exact recording precision. Leap-second labels are not represented.",
-    )
     birth_microsecond: int = Field(
         default=0,
         ge=0,
         le=999999,
         description="Numerical fraction of the supplied second, including explicitly converted clocks; does not certify source clock precision.",
     )
-    birth_clock_basis: Literal["civil", "local_mean_solar", "local_apparent_solar"] = (
-        Field(
-            default="civil",
-            description="Basis explicitly identified in the birth record. LMT/LAT requires birth_timezone omitted and use_true_solar_time=false; east-positive longitude and shared TT/UT1 convert it to an instant. Never infer an unknown clock basis by fitting the chart or outcomes.",
-        )
-    )
-
     use_true_solar_time: bool = Field(
         default=False,
         description="Report an apparent-solar wall-clock label separately. Recorded civil birth time and its physical ephemeris instant are preserved with either setting; this option cannot select a different birth date, dasha start or mean-model window. A known historical LAT/LMT record is not a civil input and must not be guessed with this switch.",
     )
-
     node_mode: Literal["mean", "true"] = Field(
         default="mean", description="Rahu: mean or true lunar node; Ketu is opposite."
     )
@@ -339,16 +289,14 @@ class AstroIndiaRequest(AstroChartRequest):
 
     @model_validator(mode="after")
     def _solar_input_exclusions(self) -> "AstroIndiaRequest":
-        if self.birth_clock_basis != "civil" and (
-            self.birth_timezone is not None or self.use_true_solar_time
-        ):
+        if self.birth_clock_basis != "civil" and self.use_true_solar_time:
             raise ValueError(
                 "Local solar birth clocks require birth_timezone omitted and use_true_solar_time=false"
             )
         return self
 
 
-class AstroVimshottariRequest(AstroIndiaRequest):
+class AstroVimshottariRequest(OptionalAnalysisClockFields, AstroIndiaRequest):
     """Moon-nakshatra Vimshottari with reproducible UTC interval arithmetic."""
 
     dasha_depth: StrictInt = Field(
@@ -357,42 +305,16 @@ class AstroVimshottariRequest(AstroIndiaRequest):
         le=6,
         description="Vimshottari levels:2=MD/AD(default),3=PD,4=SD,5=PAD,6=DAD. Above2 adds the active ancestry and nine siblings per lower level, using complete-period fractions. The existing120-year timeline remains MD/AD only. Birth-grid variants follow all selected rulers; finer labels are not event precision or probabilities.",
     )
-
     analysis_timezone: str | None = Field(
         default=None,
         min_length=1,
         description="Civil target clock timezone, independent of the birth clock basis. Defaults to resolved birth civil timezone for civil input, or UTC for LMT/LAT input. It never changes the birth conversion or defines a solar target clock.",
     )
-
     analysis_year: int | None = Field(
         default=None,
         ge=2,
         le=9800,
         description="Gregorian target year in analysis_timezone, else resolved birth civil zone or UTC for solar birth input. Omit to use that zone's date frozen by as_of/current clock; an explicit year defaults omitted month/day to January1.",
-    )
-    analysis_month: int | None = Field(
-        default=None,
-        ge=1,
-        le=12,
-        description="Target Gregorian month (1..12). Defaults to January with an explicit analysis_year, otherwise the as_of/current local month. Supplying a month defaults an omitted day to 1.",
-    )
-    analysis_day: int | None = Field(
-        default=None,
-        ge=1,
-        le=31,
-        description="Target Gregorian day, validated against the resolved year/month. Defaults to 1 when year or month is supplied; otherwise the as_of/current local day.",
-    )
-    analysis_hour: int | None = Field(
-        default=None,
-        ge=0,
-        le=23,
-        description="Target civil-clock hour (0..23) in analysis_timezone or its declared default; defaults to00:00. Ambiguous DST target times require an explicit UTC offset for the target zone; the birth clock conversion remains independent.",
-    )
-    analysis_minute: int | None = Field(
-        default=None,
-        ge=0,
-        le=59,
-        description="Target local civil-clock minute (0..59), paired with analysis_hour; omitted minutes default to 0. The result reports the resolved analysis_datetime and UTC period boundaries.",
     )
     year_basis: Literal["sidereal_365_25636", "tropical_365_2425", "savana_360"] = (
         Field(
@@ -403,176 +325,41 @@ class AstroVimshottariRequest(AstroIndiaRequest):
 
     @model_validator(mode="after")
     def _vedic_configuration(self) -> "AstroVimshottariRequest":
-        if self.zodiacal not in {None, 1} or self.hsys not in {None, 0}:
+        hsys = (
+            None
+            if self.house_system is None
+            else resolve_offline_house_code(self.house_system)
+        )
+        zodiacal = (
+            None
+            if self.zodiac_type is None
+            else normalize_offline_zodiac_code(self.zodiac_type)
+        )
+        if zodiacal not in {None, 1} or hsys not in {None, 0}:
             raise ValueError("Vimshottari uses Lahiri sidereal / whole-sign only")
         return self
 
 
-class AstroChartPolyRequest(AstroIndiaRequest):
-    """Polymorphic astro chart request (adds a chart_variant selector)."""
+class AstroNatalChartRequest(AstroChartRequest):
+    """Natal astrology chart request with optional apparent-solar position layer."""
 
     apparent_model: Literal["native", "opaque_solar"] = Field(
         default="native",
-        description="chart only: native retains the native chart. opaque_solar additionally returns standalone geocentric apparent_model_positions, with finite-source solar deflection outside an opaque 695700 km Sun and zero deflection for intercepted rays. Requires local barycentric ephemeris files and the jpl extra. This position layer does not recompute native planets, speeds, houses, aspects or readings; its tropical IAU2006/2000A frame is explicit even for a sidereal native chart.",
-    )
-
-    ephemeris_policy: Literal["auto", "require_data_files"] = Field(
-        default="auto",
-        json_schema_extra={"x-fatebridge-western-data-policy": True},
         description=(
-            WesternEphemerisRequest.model_fields["ephemeris_policy"].description or ""
-        )
-        + " India retains its existing strict policy; Guolao accepts auto only.",
+            "native retains the native chart. opaque_solar additionally returns standalone "
+            "geocentric apparent_model_positions, with finite-source solar deflection outside "
+            "an opaque 695700 km Sun and zero deflection for intercepted rays. Requires local "
+            "barycentric ephemeris files and the jpl extra. This position layer does not "
+            "recompute native planets, speeds, houses, aspects or readings; its tropical "
+            "IAU2006/2000A frame is explicit even for a sidereal native chart."
+        ),
     )
-
-    birth_timezone: str | None = Field(
-        default=None,
-        description="Birth civil timezone: IANA name or UTC offset; a supported unambiguous birth_place may supply it. guolao_chart rejects unresolved missing timezones and does not derive a civil zone from longitude. Western variants and india_chart also reject unresolved civil zones before sky calculations; coordinates cannot establish the recorded zone. Explicit UTC is valid. Noncivil LMT/LAT input on supported variants requires this field omitted.",
-    )
-
-    use_true_solar_time: bool = Field(
-        default=False,
-        description=AstroChartRequest.model_fields["use_true_solar_time"].description,
-    )
-
-    birth_second: int = Field(
-        default=0,
-        ge=0,
-        le=59,
-        description="Recorded birth second for chart_variant=germany/chart13/india_chart/guolao_chart. Omitted seconds use the start of the supplied minute; this does not assert exact birth time. Other variants reject nonzero values.",
-    )
-
-    birth_microsecond: int = Field(
-        default=0,
-        ge=0,
-        le=999999,
-        description="Explicit fraction of the recorded birth second for india_chart/guolao_chart. Preserved numerically without certifying source-clock or astronomical accuracy. Other variants reject nonzero values.",
-    )
-
-    birth_clock_basis: Literal["civil", "local_mean_solar", "local_apparent_solar"] = (
-        Field(
-            default="civil",
-            description="Confirmed birth clock basis. LMT/LAT are supported for germany/chart13/india_chart/guolao_chart and require birth_timezone omitted. Other solar-input variants require use_true_solar_time=false; Guolao may select its apparent hour without shifting the converted epoch, and LAT already supplies its nominal apparent hour. Guolao retains native TT/UT1 when UTC has no datetime carrier; other variants keep their declared representation limits. Solar-day or native-order ambiguity and unavailable month calendars remain explicit. Unknown historical clock bases are not inferred or calibrated.",
-        )
-    )
-
-    chart_variant: str = Field(
-        default="chart",
-        description="Chart variant: chart, chart13, hellen_chart, guolao_chart, india_chart, germany",
-    )
-    analysis_datetime: _ExactTargetDatetime | None = Field(
-        default=None,
-        description="Optional timezone-aware ISO target instant. germany: true-solar-arc geometry with a 365.25-day Julian symbolic key, not future observations. guolao_chart: source-ordinal small limit plus actual geocentric target sky, with explicit research calendar/model limits and no event probability. Other variants reject this option.",
-    )
-    guolao_month_basis: Literal["jie_month", "chinese_lunar_utc8"] | None = Field(
-        default=None,
-        description=AstroGuolaoRequest.model_fields["guolao_month_basis"].description,
-    )
-    guolao_seasonal_anchor_policy: GuolaoSeasonalAnchorPolicy | None = Field(
-        default=None,
-        description=AstroGuolaoRequest.model_fields[
-            "guolao_seasonal_anchor_policy"
-        ].description,
-    )
-
-    @model_validator(mode="after")
-    def _solar_input_exclusions(self) -> "AstroChartPolyRequest":
-        # Override the Indian-only validator inherited by this shared model.
-        if self.birth_clock_basis != "civil" and (
-            self.birth_timezone is not None
-            or (self.use_true_solar_time and self.chart_variant != "guolao_chart")
-        ):
-            raise ValueError(
-                "Local solar birth clocks require birth_timezone omitted; "
-                "use_true_solar_time=true is only supported by guolao_chart"
-            )
-        return self
-
-    @model_validator(mode="after")
-    def _india_options_scope(self) -> "AstroChartPolyRequest":
-        if self.apparent_model != "native" and self.chart_variant != "chart":
-            raise ValueError("apparent_model=opaque_solar requires chart_variant=chart")
-        if self.guolao_seasonal_anchor_policy is not None:
-            if self.chart_variant != "guolao_chart":
-                raise ValueError(
-                    "guolao_seasonal_anchor_policy requires chart_variant=guolao_chart"
-                )
-            if self.guolao_seasonal_anchor_policy != "term_instants" and not (
-                self.use_true_solar_time
-                or self.birth_clock_basis == "local_apparent_solar"
-            ):
-                raise ValueError(
-                    "Solar-day anchors require use_true_solar_time=true or explicit LAT input"
-                )
-        if self.guolao_month_basis is not None and (
-            self.chart_variant != "guolao_chart" or self.analysis_datetime is None
-        ):
-            raise ValueError(
-                "guolao_month_basis requires chart_variant=guolao_chart and analysis_datetime"
-            )
-        if self.birth_clock_basis != "civil":
-            if self.chart_variant not in {
-                "germany",
-                "chart13",
-                "india_chart",
-                "guolao_chart",
-            }:
-                raise ValueError(
-                    "Noncivil birth_clock_basis requires chart_variant=germany, chart13, india_chart or guolao_chart"
-                )
-        if self.birth_second and self.chart_variant not in {
-            "germany",
-            "chart13",
-            "india_chart",
-            "guolao_chart",
-        }:
-            raise ValueError(
-                "nonzero birth_second requires chart_variant=germany, chart13, india_chart or guolao_chart"
-            )
-        if self.birth_microsecond and self.chart_variant not in {
-            "india_chart",
-            "guolao_chart",
-        }:
-            raise ValueError(
-                "nonzero birth_microsecond requires chart_variant=india_chart or guolao_chart"
-            )
-        if self.analysis_datetime is not None and self.chart_variant not in {
-            "germany",
-            "guolao_chart",
-        }:
-            raise ValueError(
-                "analysis_datetime requires chart_variant=germany or guolao_chart"
-            )
-        # MCP signatures materialize optional defaults before model validation.
-        # Accept that neutral configuration on every existing chart variant;
-        # reject Indian settings that would otherwise be silently discarded.
-        customized = (
-            self.node_mode != "mean"
-            or self.saptavargaja_profile != "santhanam_27"
-            or self.drekkana_profile != "santhanam_27_6"
-            or self.cheshta_model != "unadjudicated"
-            or self.divisions != [9, 10]
-        )
-        if self.chart_variant != "india_chart" and customized:
-            raise ValueError(
-                "custom node_mode/divisions/saptavargaja_profile/drekkana_profile/cheshta_model require chart_variant=india_chart"
-            )
-        if self.ephemeris_policy != "auto" and self.chart_variant == "guolao_chart":
-            raise ValueError("Western ephemeris_policy is not implemented for Guolao")
-        if (
-            self.birth_time_uncertainty_minutes is not None
-            and self.chart_variant not in {"india_chart", "germany", "chart13"}
-        ):
-            raise ValueError(
-                "birth_time_uncertainty_minutes requires chart_variant=india_chart, germany or chart13"
-            )
-        return self
 
     def uses_western_ephemeris_policy(self) -> bool:
-        return self.chart_variant not in {"india_chart", "guolao_chart"}
+        return True
 
 
-class AstroRelativeFlatRequest(AstroHouseValidatorMixin, WesternEphemerisRequest):
+class AstroRelativeFlatRequest(OfflineHouseValidatorMixin, WesternEphemerisRequest):
     """Flat (non-nested) relative/synastry chart request for tool surfaces."""
 
     davison_variant: Literal["uncorrected", "corrected", "spherical"] = Field(
@@ -587,13 +374,13 @@ class AstroRelativeFlatRequest(AstroHouseValidatorMixin, WesternEphemerisRequest
         default=False, description="Use apparent solar time for the outer chart"
     )
 
-    inner_birth_year: AstroBirthYear = Field(description="Inner chart birth year")
+    inner_birth_year: int = Field(ge=1, le=9999, description="Inner chart birth year")
     inner_birth_month: int = Field(ge=1, le=12, description="Inner chart birth month")
     inner_birth_day: int = Field(ge=1, le=31, description="Inner chart birth day")
     inner_birth_hour: int = Field(ge=0, le=23, description="Inner chart birth hour")
     inner_birth_longitude: float = Field(ge=-180, le=180, description="Inner longitude")
     inner_birth_latitude: float = Field(ge=-90, le=90, description="Inner latitude")
-    outer_birth_year: AstroBirthYear = Field(description="Outer chart birth year")
+    outer_birth_year: int = Field(ge=1, le=9999, description="Outer chart birth year")
     outer_birth_month: int = Field(ge=1, le=12, description="Outer chart birth month")
     outer_birth_day: int = Field(ge=1, le=31, description="Outer chart birth day")
     outer_birth_hour: int = Field(ge=0, le=23, description="Outer chart birth hour")
@@ -634,14 +421,17 @@ class AstroRelativeFlatRequest(AstroHouseValidatorMixin, WesternEphemerisRequest
             "treated an eastern wall-clock time as UTC and rotated the chart."
         ),
     )
-    hsys: int = Field(
-        default=3,
-        ge=0,
-        le=8,
-        description="House system identifier (0..8). Defaults to Placidus (3) to "
-        "match the natal chart." + OFFLINE_HOUSE_CODE_NOTE,
+    house_system: int | str = Field(
+        default="P",
+        description=(
+            "House system identifier (0..8, SE letter, or key). Defaults to Placidus ('P') "
+            "to match the natal chart."
+        )
+        + OFFLINE_HOUSE_CODE_NOTE,
     )
-    zodiacal: int = Field(default=0, description="Zodiac selector")
+    zodiac_type: Literal["Tropic", "Sidereal"] = Field(
+        default="Tropic", description="Zodiac type: Tropic or Sidereal"
+    )
     relationship_focus: str | None = Field(
         default=None,
         description=(

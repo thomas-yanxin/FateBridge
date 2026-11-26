@@ -1,17 +1,13 @@
 """Published default evidence and summaries carry their own computed qualifiers."""
 
-import json
-
 import pytest
 from fastmcp import Client
-from mcp import MCPError
 
 from fatebridge.application.examples import suggested_fields
-from tests.support.result_delivery import store
 from tests.support.transports import AS_OF, SPECS, cached_mcp_app, call_calculation
 
 
-@pytest.mark.parametrize("tool", ["meihua_cast", "meihua_analysis"])
+@pytest.mark.parametrize("tool", ["meihua_cast", "meihua_time_cast"])
 def test_first_view_and_seasonal_evidence(tool: str) -> None:
     spec = SPECS[tool]
     first_fields = suggested_fields(spec)
@@ -29,8 +25,8 @@ def test_first_view_and_seasonal_evidence(tool: str) -> None:
 
 
 @pytest.mark.asyncio
-async def test_verified_topic_page_preserves_an_empty_casting_array(store) -> None:
-    spec = SPECS["meihua_analysis"]
+async def test_topic_projection_preserves_an_empty_casting_array() -> None:
+    spec = SPECS["meihua_time_cast"]
     arguments = {
         "analysis_year": 2026,
         "analysis_month": 10,
@@ -40,21 +36,19 @@ async def test_verified_topic_page_preserves_an_empty_casting_array(store) -> No
         "interpretation_topic": "traveler",
         "as_of": AS_OF,
         "fields": suggested_fields(spec, view="topic"),
-        "strict_fields": True,
-        "include_snapshot_text": False,
-        "response_char_limit": 4096,
     }
     async with Client(cached_mcp_app(families="divination")) as client:
-        reply = await call_calculation(client, spec.tool_name, arguments)
+        reply = await call_calculation(client, spec.name, arguments)
         result = reply.structured_content
         assert result is not None
-        result_id = result["result_delivery"]["result_id"]
-        run_id = result["run_metadata"]["run_id"]
-        uri = (
-            f"fatebridge://results/{result_id}/verified/{run_id}"
-            "/fields/interpretation.casting_readings"
+        assert result["interpretation"]["casting_readings"] == []
+        bad = await call_calculation(
+            client,
+            spec.name,
+            {**arguments, "fields": ["interpretation.casting_readings.0"]},
+            raise_on_error=False,
         )
-        page = json.loads((await client.read_resource(f"{uri}/0"))[0].text)
-        assert json.loads(page["text"]) == []
-        with pytest.raises(MCPError, match="结果字段路径不存在"):
-            await client.read_resource(f"{uri}.0/0")
+        assert bad.is_error
+        assert (
+            bad.structured_content["issues"][0]["code"] == "non_object_projection_path"
+        )

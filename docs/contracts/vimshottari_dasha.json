@@ -153,9 +153,7 @@
       "india.strengths.shadbala_assessment",
       "india.strengths.kala_bala",
       "india.strengths.cheshta_bala"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,
@@ -173,7 +171,7 @@
           }
         ],
         "default": null,
-        "description": "Target Gregorian day, validated against the resolved year/month. Defaults to 1 when year or month is supplied; otherwise the as_of/current local day.",
+        "description": "Analysis day (1-31)",
         "title": "Analysis Day"
       },
       "analysis_hour": {
@@ -188,7 +186,7 @@
           }
         ],
         "default": null,
-        "description": "Target civil-clock hour (0..23) in analysis_timezone or its declared default; defaults to00:00. Ambiguous DST target times require an explicit UTC offset for the target zone; the birth clock conversion remains independent.",
+        "description": "Analysis hour (0-23)",
         "title": "Analysis Hour"
       },
       "analysis_minute": {
@@ -203,7 +201,7 @@
           }
         ],
         "default": null,
-        "description": "Target local civil-clock minute (0..59), paired with analysis_hour; omitted minutes default to 0. The result reports the resolved analysis_datetime and UTC period boundaries.",
+        "description": "Analysis minute (0-59)",
         "title": "Analysis Minute"
       },
       "analysis_month": {
@@ -218,7 +216,7 @@
           }
         ],
         "default": null,
-        "description": "Target Gregorian month (1..12). Defaults to January with an explicit analysis_year, otherwise the as_of/current local month. Supplying a month defaults an omitted day to 1.",
+        "description": "Analysis month (1-12)",
         "title": "Analysis Month"
       },
       "analysis_timezone": {
@@ -252,7 +250,7 @@
       },
       "birth_clock_basis": {
         "default": "civil",
-        "description": "Basis explicitly identified in the birth record. LMT/LAT requires birth_timezone omitted and use_true_solar_time=false; east-positive longitude and shared TT/UT1 convert it to an instant. Never infer an unknown clock basis by fitting the chart or outcomes.",
+        "description": "Confirmed basis of the supplied birth clock label: civil uses birth_timezone; local_mean_solar (LMT) or local_apparent_solar (LAT) uses longitude and modeled UT1/TT with birth_timezone omitted.",
         "enum": [
           "civil",
           "local_mean_solar",
@@ -287,7 +285,7 @@
           }
         ],
         "default": null,
-        "description": "Birth latitude. Optional for core chart endpoints when FateBridge can infer it from a supported birth_place.",
+        "description": "Birth latitude (optional)",
         "title": "Birth Latitude"
       },
       "birth_longitude": {
@@ -302,7 +300,7 @@
           }
         ],
         "default": null,
-        "description": "Birth longitude. Optional for core chart endpoints when FateBridge can infer it from a supported birth_place.",
+        "description": "Birth longitude (optional)",
         "title": "Birth Longitude"
       },
       "birth_microsecond": {
@@ -343,7 +341,7 @@
       },
       "birth_second": {
         "default": 0,
-        "description": "Recorded second, if known; omitted uses the beginning of the minute, not a claim of exact recording precision. Leap-second labels are not represented.",
+        "description": "Recorded birth second (0..59), if known. Omitted seconds use the start of the supplied minute; this does not certify exact recording precision. Leap-second labels are not represented.",
         "maximum": 59,
         "minimum": 0,
         "title": "Birth Second",
@@ -374,7 +372,7 @@
           }
         ],
         "default": null,
-        "description": "Civil birth timezone: explicit IANA name or UTC offset, or supported unambiguous birth_place inference. Unresolved civil timezones are rejected before sky calculations; coordinates, analysis_timezone and a solar-display request cannot establish the recorded zone. Explicit UTC is valid. Explicit LMT/LAT input requires this field omitted and a confirmed noncivil birth_clock_basis.",
+        "description": "Birth timezone (IANA name or UTC offset). Optional: when omitted, FateBridge may resolve it from a supported birth_place. Western charts and timing reject an unresolved civil timezone; coordinates alone do not establish a zone. Supply UTC explicitly when that is the confirmed recorded basis. Place inference does not certify historical clock accuracy.",
         "title": "Birth Timezone"
       },
       "birth_year": {
@@ -465,20 +463,21 @@
         "description": "性别（可选，仅用于结果标识；西方星盘计算不使用性别）。接受此字段是为了让同一套出生信息可以原样喂给八字/紫微/星盘等工具，避免批量调用时'有的工具收、有的不收'造成的反复试错。",
         "title": "Gender"
       },
-      "hsys": {
+      "house_system": {
         "anyOf": [
           {
-            "maximum": 8,
-            "minimum": 0,
             "type": "integer"
+          },
+          {
+            "type": "string"
           },
           {
             "type": "null"
           }
         ],
         "default": null,
-        "description": "Optional offline house system override; if omitted, FateBridge keeps each chart variant's historical default. Explicit values currently support 0=whole_sign, 1=Alcabitus, 2=Regiomontanus, 3=Placidus, 4=Koch, 5=Vehlow Equal, 6=Polich Page, 7=Sripati, 8=equal_mc Explicit values must be integer codes0..8; boolean, floating-point, blank and out-of-range values are rejected.",
-        "title": "Hsys"
+        "description": "Optional offline house system override; if omitted, FateBridge keeps each chart variant's historical default. Accepts SE letters, keys, or integer codes 0..8 (0=whole_sign, 1=Alcabitus, 2=Regiomontanus, 3=Placidus, 4=Koch, 5=Vehlow Equal, 6=Polich Page, 7=Sripati, 8=equal_mc). Explicit values must be integer codes 0..8 or supported offline house letters/names (W, B, R, P, K, V, T, S, D); boolean, floating-point, blank and unsupported values are rejected.",
+        "title": "House System"
       },
       "name": {
         "anyOf": [
@@ -530,18 +529,22 @@
         "title": "Year Basis",
         "type": "string"
       },
-      "zodiacal": {
+      "zodiac_type": {
         "anyOf": [
           {
-            "type": "integer"
+            "enum": [
+              "Tropic",
+              "Sidereal"
+            ],
+            "type": "string"
           },
           {
             "type": "null"
           }
         ],
         "default": null,
-        "description": "Optional offline zodiac override; if omitted, FateBridge keeps each chart variant's historical default. Explicit values currently support 0=tropical and 1=sidereal(Lahiri-like)",
-        "title": "Zodiacal"
+        "description": "Optional offline zodiac override ('Tropic' or 'Sidereal'); if omitted, FateBridge keeps each chart variant's historical default.",
+        "title": "Zodiac Type"
       }
     },
     "required": [
@@ -592,6 +595,7 @@
       "role": "calculation",
       "selector_fields": [
         "ephemeris_policy",
+        "house_system",
         "birth_clock_basis",
         "node_mode",
         "saptavargaja_profile",
@@ -644,6 +648,7 @@
       "role": "calculation",
       "selector_fields": [
         "ephemeris_policy",
+        "house_system",
         "birth_clock_basis",
         "node_mode",
         "saptavargaja_profile",

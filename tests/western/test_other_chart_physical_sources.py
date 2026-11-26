@@ -253,19 +253,16 @@ def test_nominal_and_sampled_models_must_also_agree(
 
 
 @pytest.mark.parametrize(
-    "key,variant",
+    "name",
     [
-        ("astro_germany", None),
-        ("astro_chart", "germany"),
-        ("astro_chart13", None),
-        ("astro_chart", "chart13"),
+        "hamburg_midpoint_chart",
+        "thirteen_sector_chart",
     ],
 )
 def test_partial_data_error_and_complete_interval_across_three_surfaces(
     ephemeris_files,
     monkeypatch: pytest.MonkeyPatch,
-    key: str,
-    variant: str | None,
+    name: str,
     surface_calls,
 ) -> None:
     from fatebridge.services.tool_catalog import CATALOG
@@ -286,21 +283,15 @@ def test_partial_data_error_and_complete_interval_across_three_surfaces(
         "birth_latitude": 0.0,
         "birth_time_uncertainty_minutes": 1.0,
     }
-    if variant:
-        payload["chart_variant"] = variant
-    else:
-        pass
-    spec = next(s for s in CATALOG if s.key == key)
+    spec = next(s for s in CATALOG if s.name == name)
     path = (
         "midpoint_analysis.time_sensitivity"
-        if key == "astro_germany" or variant == "germany"
+        if name == "hamburg_midpoint_chart"
         else "time_sensitivity"
     )
     options = {
         "fields": [path],
-        "strict_fields": True,
-        "include_snapshot_text": False,
-        "response_char_limit": 0,
+        "detail": "audit",
         "as_of": "2026-10-22T00:00:00Z",
     }
 

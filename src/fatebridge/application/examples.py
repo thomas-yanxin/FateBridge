@@ -28,7 +28,7 @@ def _examples() -> AgentExamples:
 
 def example_input(spec: ToolSpec) -> dict[str, JsonValue] | None:
     bundle = _examples()
-    source = bundle["tools"].get(spec.key)
+    source = bundle["tools"].get(spec.name)
     if source is None:
         return None
     elif isinstance(source, str):
@@ -56,22 +56,22 @@ def suggested_fields(spec: ToolSpec, *, view: str | None = None) -> list[str] | 
     if view is not None:
         views = evidence_views(spec) or {}
         if view not in views:
-            raise ValueError(f"Unknown evidence view for {spec.key}: {view}")
+            raise ValueError(f"Unknown evidence view for {spec.name}: {view}")
         else:
             return list(views[view]["fields"])
     else:
-        fields = _examples().get("suggested_fields", {}).get(spec.key)
+        fields = _examples().get("suggested_fields", {}).get(spec.name)
         return list(fields) if fields is not None else None
 
 
 def compact_fields(spec: ToolSpec) -> list[str] | None:
-    fields = _examples()["compact_fields"].get(spec.key)
+    fields = _examples()["compact_fields"].get(spec.name)
     return list(fields) if fields is not None else suggested_fields(spec)
 
 
 def evidence_views(spec: ToolSpec) -> EvidenceViews | None:
     """Return independent copies of published field selections."""
-    views = deepcopy(_examples().get("evidence_views", {}).get(spec.key))
+    views = deepcopy(_examples().get("evidence_views", {}).get(spec.name))
     if spec.evidence_views_builder is not None:
         return spec.evidence_views_builder(views)
     else:
@@ -80,4 +80,4 @@ def evidence_views(spec: ToolSpec) -> EvidenceViews | None:
 
 def call_guidance(spec: ToolSpec) -> dict[str, JsonValue] | None:
     """Return an independent copy of the tool's published call guidance."""
-    return deepcopy(_examples().get("call_guidance", {}).get(spec.key))
+    return deepcopy(_examples().get("call_guidance", {}).get(spec.name))

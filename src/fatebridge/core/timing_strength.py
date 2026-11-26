@@ -320,39 +320,3 @@ def project_timing_root_effects(
         "scope": SCOPE,
         "stem_binding_source": dict(STEM_SOURCE),
     }
-
-
-def timing_strength_snapshot_lines(projection: TimingStrengthProjection) -> list[str]:
-    """Render only the supplied result; do not rerun force for the snapshot."""
-    lines = []
-    for row in projection["layers"]:
-        if row["status"] == "blocked":
-            reason_labels: dict[StemBindingReviewReason, str] = {
-                "unsupported_time_layer": "干合来源未覆盖此时间层",
-                "multiple_natal_partners": "原局配对不唯一",
-                "day_master_partner": "配对涉及日主",
-                "competing_natal_stem": "原局另有同字运干参与竞争",
-                "existing_natal_combination": "配对涉及原局已记录干合",
-            }
-            reasons = "、".join(
-                reason_labels[reason]
-                for reason in row["stem_binding_review"]["review_reasons"]
-            )
-            lines.append(
-                f"{row['node_id']}原局预算投影："
-                + (reasons or "存在未解会合或原合冲突")
-                + "；本层未施加运干预算，未输出预算或数值档。"
-            )
-        else:
-            stem_count = sum(
-                Fraction(value) < 1
-                for value in row["stem_retention_factors_exact"].values()
-            )
-            lines.append(
-                f"{row['node_id']}单层作用：已投影{len(row['hidden_roots'])}项原局藏干根预算，冲刑损耗取最小保留、不连乘；另有{stem_count}项原局非日干预算接受唯一大运干合绊。"
-            )
-    if lines:
-        lines.append(
-            "限定投影保留原局月令，不加入时间干支能量、新根或层间救应；运干五合只折减原局非日干既有预算，0.85为工程系数；残存原局数值档不是完整行运后旺衰。"
-        )
-    return lines

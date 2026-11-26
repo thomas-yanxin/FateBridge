@@ -15,7 +15,13 @@ from fatebridge.core.astro.reference import PLANET_SEQUENCE
 from fatebridge.core.local_techniques.otherbu import build_otherbu_result
 
 FACES = {"planet": "Jupiter", "sign": "Aries", "house": 0}
-SKY = {"date": "2024-03-20", "time": "06:30", "zone": "UTC", "lat": 51.5, "lon": 0}
+SKY = {
+    "date": "2024-03-20",
+    "time": "06:30",
+    "timezone": "UTC",
+    "latitude": 51.5,
+    "longitude": 0,
+}
 APPROXIMATE = ORBITAL_MODEL
 
 
@@ -45,12 +51,14 @@ def test_pluto_fallback_is_geocentric_against_independent_moshier(year, month) -
 
 
 @pytest.mark.parametrize(
-    "failed_planet,zodiacal", list(product(PLANET_SEQUENCE, [0, 1]))
+    "failed_planet,zodiac_type", list(product(PLANET_SEQUENCE, ["Tropic", "Sidereal"]))
 )
 def test_single_failure_preserves_every_other_native_longitude(
-    monkeypatch: pytest.MonkeyPatch, failed_planet, zodiacal
+    monkeypatch: pytest.MonkeyPatch, failed_planet, zodiac_type
 ) -> None:
-    complete = build_otherbu_result(**FACES, **SKY, zodiacal=zodiacal, hsys=0)
+    complete = build_otherbu_result(
+        **FACES, **SKY, zodiac_type=zodiac_type, house_system=0
+    )
     original = ephemeris._swisseph_planet_state
     called = []
 
@@ -59,7 +67,9 @@ def test_single_failure_preserves_every_other_native_longitude(
         return None if planet == failed_planet else original(planet, *args, **kwargs)
 
     monkeypatch.setattr(ephemeris, "_swisseph_planet_state", selective)
-    partial = build_otherbu_result(**FACES, **SKY, zodiacal=zodiacal, hsys=0)
+    partial = build_otherbu_result(
+        **FACES, **SKY, zodiac_type=zodiac_type, house_system=0
+    )
     assert called == list(PLANET_SEQUENCE)
     expected = {p["id"]: p for p in complete["chart"]["chart"]["objects"]}
     actual = {p["id"]: p for p in partial["chart"]["chart"]["objects"]}
@@ -93,8 +103,8 @@ def test_single_failure_preserves_every_other_native_longitude(
         MEAN_NODE_MODEL if failed_planet == "North Node" else APPROXIMATE
     )
     assert all(models[name] != APPROXIMATE for name in models if name != failed_planet)
-    assert profile["orbital_fallback"]["note_zh"] in partial["snapshot_text"]
-    if zodiacal:
+    assert profile["orbital_fallback"]["note_zh"]
+    if zodiac_type == "Sidereal":
         methods = profile["sidereal_planetary_methods"]
         assert methods[failed_planet] == "ayanamsha_offset_approximation"
         assert all(
@@ -116,9 +126,9 @@ def test_single_failure_preserves_every_other_native_longitude(
         assert partial[key] == complete[key]
 
 
-@pytest.mark.parametrize("zodiacal", [0, 1])
+@pytest.mark.parametrize("zodiac_type", ["Tropic", "Sidereal"])
 def test_fallback_sidereal_coordinates_have_the_declared_offset_method(
-    monkeypatch: pytest.MonkeyPatch, zodiacal: int
+    monkeypatch: pytest.MonkeyPatch, zodiac_type: str
 ) -> None:
     original = ephemeris._swisseph_planet_state
     monkeypatch.setattr(
@@ -126,11 +136,19 @@ def test_fallback_sidereal_coordinates_have_the_declared_offset_method(
         "_swisseph_planet_state",
         lambda name, *a, **kw: None if name == "Pluto" else original(name, *a, **kw),
     )
-    tropical = build_otherbu_result(**FACES, **SKY, zodiacal=0, hsys=0)
-    current = build_otherbu_result(**FACES, **SKY, zodiacal=zodiacal, hsys=0)
+    tropical = build_otherbu_result(
+        **FACES, **SKY, zodiac_type="Tropic", house_system=0
+    )
+    current = build_otherbu_result(
+        **FACES, **SKY, zodiac_type=zodiac_type, house_system=0
+    )
     a = next(p for p in tropical["chart"]["chart"]["objects"] if p["id"] == "Pluto")
     b = next(p for p in current["chart"]["chart"]["objects"] if p["id"] == "Pluto")
-    offset = current["chart"]["params"]["chart_profile"]["ayanamsha"] if zodiacal else 0
+    offset = (
+        current["chart"]["params"]["chart_profile"]["ayanamsha"]
+        if zodiac_type == "Sidereal"
+        else 0
+    )
     assert b["lon"] == combine_longitudes(a["lon"], -offset)
 
 
@@ -138,7 +156,7 @@ def test_all_failures_return_explicit_per_body_approximation_without_claiming_na
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setattr(ephemeris, "_swisseph_planet_state", lambda *a, **kw: None)
-    result = build_otherbu_result(**FACES, **SKY, hsys=0)
+    result = build_otherbu_result(**FACES, **SKY, house_system=0)
     profile = result["chart"]["params"]["chart_profile"]
     assert profile["engine_precision"] == "approximate_orbital_model"
     assert profile["engine_backend"] == "fatebridge_analytic_ephemerides"
@@ -152,7 +170,7 @@ def test_no_runtime_uses_the_same_declared_approximation(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setattr(runtime, "swe", None)
-    result = build_otherbu_result(**FACES, **SKY, hsys=0)
+    result = build_otherbu_result(**FACES, **SKY, house_system=0)
     profile = result["chart"]["params"]["chart_profile"]
     assert set(profile["planetary_models"].values()) == {APPROXIMATE, MEAN_NODE_MODEL}
     assert profile["orbital_fallback"]["time_argument"] == "TT"
@@ -160,5 +178,5 @@ def test_no_runtime_uses_the_same_declared_approximation(
 
 
 def test_fully_native_sky_has_no_orbital_fallback_claim() -> None:
-    result = build_otherbu_result(**FACES, **SKY, hsys=0)
+    result = build_otherbu_result(**FACES, **SKY, house_system=0)
     assert "orbital_fallback" not in result["chart"]["params"]["chart_profile"]

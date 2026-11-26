@@ -134,9 +134,7 @@
       "liureng.calendar_policy",
       "liureng.ruleset",
       "liureng.rule_trace"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,
@@ -188,7 +186,7 @@
       },
       "analysis_second": {
         "default": 0,
-        "description": "起课钟表秒数，保留交中气和太阳时辰边界；不代表秒级预测能力。",
+        "description": "Analysis second (0-59)",
         "maximum": 59,
         "minimum": 0,
         "title": "Analysis Second",
@@ -217,7 +215,7 @@
           }
         ],
         "default": null,
-        "description": "起课民用钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与analysis_timezone共同核对并选择重复时刻，不替换命名时区规则。省略时拒绝歧义或不存在的钟时。",
+        "description": "已确认的民用 UTC 偏移，格式 ±HH:MM 或 ±HH:MM:SS，用于消歧重复钟时。",
         "title": "Analysis Utc Offset"
       },
       "analysis_year": {
@@ -260,14 +258,6 @@
         "default": null,
         "description": "显式昼贵/夜贵：true 昼、false 夜；省略按卯至申昼、酉至寅夜。未自动计算当地星没星出。",
         "title": "Is Diurnal"
-      },
-      "selected_sections": {
-        "description": "Optional snapshot section titles for filtered export payload",
-        "items": {
-          "type": "string"
-        },
-        "title": "Selected Sections",
-        "type": "array"
       },
       "use_true_solar_time": {
         "default": true,

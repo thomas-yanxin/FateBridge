@@ -5,7 +5,7 @@ does not give numeric weights, certify formation, or release stored elements.
 """
 
 from copy import deepcopy
-from typing import Any, Literal, Mapping, Sequence
+from typing import Literal, Mapping, Sequence
 
 from typing_extensions import NotRequired, TypedDict
 
@@ -91,34 +91,3 @@ def storage_movement_effect(
         "source": deepcopy(SOURCE),
         "scope": "本事件按所选原典保留土根，不自动增土或释放金木水火；土动对参与支水根的减损幅度沿用工程参数。未裁定全局制化、透干财官是否有效或成格。其他合绊、刑冲仍分别作用。",
     }
-
-
-def storage_movement_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
-    """Quote supplied event factors only; do not infer a chart from the text."""
-    labels = {"year": "年支", "month": "月支", "day": "日支", "hour": "时支"}
-    lines = []
-    for event in assessment.get("relations", []):
-        effect = event.get("storage_effect")
-        if not effect:
-            continue
-        roots = effect["root_effects"]
-        seats = list(
-            dict.fromkeys(
-                labels.get(r["pillar"], r["pillar"]) + r["branch"] for r in roots
-            )
-        )
-        factors = list(
-            dict.fromkeys(
-                f"{r['element']}根本事件保留系数{r['event_retention_multiplier']:g}"
-                for r in roots
-                if r["element"] in {"土", "水"}
-            )
-        )
-        lines.append(
-            f"四墓土冲动（{event['kind']}）：{'、'.join(seats)}；{'，'.join(factors)}。"
-        )
-    if lines:
-        lines.append(
-            "保留系数为工程约定；其他合绊等作用及最终根量另见同次回执，不据本条判开库或成格。"
-        )
-    return lines

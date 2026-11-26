@@ -2,43 +2,61 @@
 
 from __future__ import annotations
 
-from pydantic import Field
+from pydantic import Field, field_validator
 
-from fatebridge.core.requests.base import _DeferredModel
+from fatebridge.core.requests.base import FateBridgeBaseRequest
+from fatebridge.utils.coordinates import parse_geo_coordinate
 
 
-class JieqiYearRequest(_DeferredModel):
+class LocalLocationFields(FateBridgeBaseRequest):
+    """Shared timezone and coordinate fields for local calendar and divination requests."""
+
+    timezone: str | None = Field(
+        default=None,
+        description="Timezone spec (IANA name or UTC offset, e.g. Asia/Shanghai or +08:00)",
+    )
+    latitude: float | str | None = Field(
+        default=None,
+        validate_default=True,
+        description="Latitude in decimal degrees or text (e.g. 31.23 or '31n13')",
+    )
+    longitude: float | str | None = Field(
+        default=None,
+        validate_default=True,
+        description="Longitude in decimal degrees or text (e.g. 121.47 or '121e28')",
+    )
+
+    @field_validator("latitude", mode="before")
+    @classmethod
+    def _parse_local_latitude(cls, value: object) -> float | None:
+        return parse_geo_coordinate(value, axis="latitude")
+
+    @field_validator("longitude", mode="before")
+    @classmethod
+    def _parse_local_longitude(cls, value: object) -> float | None:
+        return parse_geo_coordinate(value, axis="longitude")
+
+
+class JieqiYearRequest(LocalLocationFields):
     """Request model for annual jieqi helper output."""
 
     year: int = Field(description="Target year, e.g. 2028")
-    zone: str | None = Field(default="Asia/Shanghai", description="Timezone spec")
-    lat: str | None = Field(default=None, description="Latitude text hint")
-    lon: str | None = Field(default=None, description="Longitude text hint")
-    gps_lat: float | None = Field(default=None, description="GPS latitude")
-    gps_lon: float | None = Field(default=None, description="GPS longitude")
+    timezone: str | None = Field(default="Asia/Shanghai", description="Timezone spec")
     jieqis: list[str] = Field(
         default_factory=list, description="Optional focused jieqi names"
     )
-    selected_sections: list[str] = Field(
-        default_factory=list,
-        description="Optional snapshot section titles for filtered export payload",
-    )
 
 
-class NongliTimeRequest(_DeferredModel):
+class NongliTimeRequest(LocalLocationFields):
     """Request model for nongli-time helper output."""
 
     date: str = Field(description="Date string, e.g. 2028-04-01")
     time: str = Field(description="Time string, e.g. 09:00:00")
-    zone: str | None = Field(default="Asia/Shanghai", description="Timezone spec")
+    timezone: str | None = Field(default="Asia/Shanghai", description="Timezone spec")
     analysis_utc_offset: str | None = Field(
         default=None,
         description="已确认的民用 UTC 偏移，格式 ±HH:MM 或 ±HH:MM:SS，用于消歧重复钟时",
     )
-    lat: str | None = Field(default=None, description="Latitude text hint")
-    lon: str | None = Field(default=None, description="Longitude text hint")
-    gps_lat: float | None = Field(default=None, description="GPS latitude")
-    gps_lon: float | None = Field(default=None, description="GPS longitude")
     gender: str | None = Field(
         default=None,
         description=(
@@ -55,8 +73,4 @@ class NongliTimeRequest(_DeferredModel):
     ad: int = Field(
         default=1,
         description="Common era flag; offline nongli conversion supports ad=1 only within 1900-01-01 to 2100-12-31",
-    )
-    selected_sections: list[str] = Field(
-        default_factory=list,
-        description="Optional snapshot section titles for filtered export payload",
     )

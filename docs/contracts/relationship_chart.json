@@ -135,9 +135,7 @@
       "outer.chart.angles",
       "outer.chart.houses",
       "outer.chart.planets"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,
@@ -165,13 +163,18 @@
         "type": "string",
         "x-fatebridge-western-data-policy": true
       },
-      "hsys": {
-        "default": 3,
-        "description": "House system identifier (0..8). Defaults to Placidus (3) to match the natal chart. Explicit values must be integer codes0..8; boolean, floating-point, blank and out-of-range values are rejected.",
-        "maximum": 8,
-        "minimum": 0,
-        "title": "Hsys",
-        "type": "integer"
+      "house_system": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "string"
+          }
+        ],
+        "default": "P",
+        "description": "House system identifier (0..8, SE letter, or key). Defaults to Placidus ('P') to match the natal chart. Explicit values must be integer codes 0..8 or supported offline house letters/names (W, B, R, P, K, V, T, S, D); boolean, floating-point, blank and unsupported values are rejected.",
+        "title": "House System"
       },
       "inner_birth_day": {
         "description": "Inner chart birth day",
@@ -392,11 +395,15 @@
         "description": "Relative mode selector",
         "title": "Relative Mode"
       },
-      "zodiacal": {
-        "default": 0,
-        "description": "Zodiac selector",
-        "title": "Zodiacal",
-        "type": "integer"
+      "zodiac_type": {
+        "default": "Tropic",
+        "description": "Zodiac type: Tropic or Sidereal",
+        "enum": [
+          "Tropic",
+          "Sidereal"
+        ],
+        "title": "Zodiac Type",
+        "type": "string"
       }
     },
     "required": [
@@ -451,7 +458,8 @@
       "role": "calculation",
       "selector_fields": [
         "ephemeris_policy",
-        "relative_mode"
+        "relative_mode",
+        "house_system"
       ],
       "source_refs": [
         "docs/algorithm-coverage.md"
@@ -496,7 +504,8 @@
       "role": "calculation",
       "selector_fields": [
         "ephemeris_policy",
-        "relative_mode"
+        "relative_mode",
+        "house_system"
       ],
       "source_refs": [
         "docs/algorithm-coverage.md"

@@ -117,11 +117,9 @@ def build_run_metadata(
         return existing
 
     run_id = uuid4().hex
-    trace_id = uuid4().hex
     inspection = _inspect_runtime(payload, approximate_record=approximate_record)
     return {
         "run_id": run_id,
-        "trace_id": trace_id,
         "tool_name": tool_name,
         "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "engine": inspection.engine,

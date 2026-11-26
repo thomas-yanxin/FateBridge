@@ -3,8 +3,6 @@
 import pytest
 
 from fatebridge.application.examples import suggested_fields
-from tests.support.result_delivery import reconstruct
-from tests.support.result_delivery import store as _shared_store
 from tests.support.transports import AS_OF, SPECS, business
 from tests.support.transports import rest as _shared_rest
 from tests.support.transports import surface_calls
@@ -26,19 +24,13 @@ PAYLOAD = dict(
 
 
 rest = _shared_rest
-store = _shared_store
 
 
 @pytest.mark.parametrize("view", ["roots", "stem_roots"])
 def test_published_root_views_match_three_protocols(view: str, surface_calls) -> None:
-    spec = SPECS["timing_analysis"]
+    spec = SPECS["bazi_timing"]
     fields = suggested_fields(spec, view=view)
-    options = dict(
-        fields=fields,
-        strict_fields=True,
-        include_snapshot_text=False,
-        response_char_limit=0,
-    )
+    options = dict(fields=fields, detail="audit")
     response, protocol, code, cli = surface_calls(
         spec, PAYLOAD, projection=options, cli_first=False, rest_as_of=AS_OF
     )
@@ -64,42 +56,18 @@ def test_published_root_views_match_three_protocols(view: str, surface_calls) ->
         assert all(set(r["branch_relation_ids"]) <= relations for r in context[key])
 
 
-def test_bounded_first_view_retains_full_same_run_and_snapshot_uses_root_receipt(
-    rest, store
-) -> None:
-    spec = SPECS["timing_analysis"]
+def test_root_view_retains_nodes_and_relations(rest) -> None:
+    spec = SPECS["bazi_timing"]
     response = rest.post(
         spec.rest_path,
         json=PAYLOAD,
         params=dict(
             fields=suggested_fields(spec, view="roots"),
-            strict_fields=True,
-            include_snapshot_text=False,
-            response_char_limit=8192,
             as_of=AS_OF,
         ),
     )
     assert response.status_code == 200
     value = response.json()
-    if "result_delivery" in value:
-        ref = value["result_delivery"]
-        complete = reconstruct(store, ref["result_id"])
-        assert complete["run_metadata"]["run_id"] == value["run_metadata"]["run_id"]
-    else:
-        complete = value
-    assert (
-        len(complete["interaction_analysis"]["root_context"]["day_master_roots"]) == 5
-    )
-    assert complete["interaction_analysis"]["nodes"]
-    assert complete["interaction_analysis"]["relations"]
-    full = rest.post(
-        spec.rest_path,
-        json=PAYLOAD,
-        params=dict(
-            include_snapshot_text=True,
-            response_char_limit=0,
-            as_of=AS_OF,
-        ),
-    )
-    assert full.status_code == 200
-    assert "根类与冲合刑触点分列" in full.json()["snapshot_text"]
+    assert len(value["interaction_analysis"]["root_context"]["day_master_roots"]) == 5
+    assert value["interaction_analysis"]["nodes"]
+    assert value["interaction_analysis"]["relations"]

@@ -82,7 +82,7 @@ def test_corrected_definitions_reach_rest_mcp_and_cli(
 ) -> None:
     assert get_ten_god(day, other).value == expected
     inputs = {"domain": "bazi", "category": "ten_gods", "key": expected}
-    controls = {"include_snapshot_text": False, "response_char_limit": 0}
+    controls = {"detail": "audit"}
 
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
@@ -112,9 +112,8 @@ def test_corrected_definitions_reach_rest_mcp_and_cli(
                 "ten_gods",
                 "--key",
                 expected,
-                "--no-include-snapshot-text",
-                "--response-char-limit",
-                "0",
+                "--detail",
+                "audit",
             ]
         )
         == 0

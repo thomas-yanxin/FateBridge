@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from fatebridge.application.bindings import LazyService, lazy_service, raw_invoke
+from fatebridge.application.bindings import ServiceRef, bind_kwargs, service_ref
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.requests.western_lifespan import (
     AstroAgePointRequest,
@@ -22,75 +22,74 @@ from fatebridge.core.requests.western_lifespan import (
     AstroYearSystem129Request,
 )
 
-calculate_age_point = lazy_service(
+calculate_age_point = service_ref(
     "fatebridge.services.western_lifespan", "calculate_age_point"
 )
 
 
-calculate_balbillus = lazy_service(
+calculate_balbillus = service_ref(
     "fatebridge.services.western_lifespan", "calculate_balbillus"
 )
 
 
-calculate_distributions = lazy_service(
+calculate_distributions = service_ref(
     "fatebridge.services.western_lifespan", "calculate_distributions"
 )
 
 
-calculate_harmonic_chart = lazy_service(
+calculate_harmonic_chart = service_ref(
     "fatebridge.services.western_lifespan", "calculate_harmonic_chart"
 )
 
 
-calculate_jaynesprog = lazy_service(
+calculate_jaynesprog = service_ref(
     "fatebridge.services.western_lifespan", "calculate_jaynesprog"
 )
 
 
-calculate_keypoints = lazy_service(
+calculate_keypoints = service_ref(
     "fatebridge.services.western_lifespan", "calculate_keypoints"
 )
 
 
-calculate_lunation_phase = lazy_service(
+calculate_lunation_phase = service_ref(
     "fatebridge.services.western_lifespan", "calculate_lunation_phase"
 )
 
 
-calculate_persian_directed = lazy_service(
+calculate_persian_directed = service_ref(
     "fatebridge.services.western_lifespan", "calculate_persian_directed"
 )
 
 
-calculate_planetary_ages = lazy_service(
+calculate_planetary_ages = service_ref(
     "fatebridge.services.western_lifespan", "calculate_planetary_ages"
 )
 
 
-calculate_planetary_arc = lazy_service(
+calculate_planetary_arc = service_ref(
     "fatebridge.services.western_lifespan", "calculate_planetary_arc"
 )
 
 
-calculate_triplicity_rulers = lazy_service(
+calculate_triplicity_rulers = service_ref(
     "fatebridge.services.western_lifespan", "calculate_triplicity_rulers"
 )
 
 
-calculate_vedicprog = lazy_service(
+calculate_vedicprog = service_ref(
     "fatebridge.services.western_lifespan", "calculate_vedicprog"
 )
 
 
-calculate_yearsystem129 = lazy_service(
+calculate_yearsystem129 = service_ref(
     "fatebridge.services.western_lifespan", "calculate_yearsystem129"
 )
 
 
 def _western_lifespan_spec(
     name: str,
-    tool_name: str,
-    service: LazyService,
+    service: ServiceRef,
     model: type[BaseModel],
     label: str,
     *,
@@ -99,26 +98,20 @@ def _western_lifespan_spec(
 ) -> ToolSpec:
     """Register a single-natal-chart western lifespan technique tool."""
     return ToolSpec(
-        key=f"astro_{name}",
-        bind=raw_invoke(service),
+        name=name,
+        bind=bind_kwargs(service),
         request_model=model,
-        summary=summary
-        or (
-            f"{label}：只读单张本命盘的古典「全生命周期」技法（不需目标时刻），"
-            f"输出按年龄/时段划分的人生阶段。"
-        ),
+        summary=summary or f"{label}：古典全生命周期技法（不需目标时刻）。",
         operation_label_zh=label,
         family="western_lifespan",
         cpu_bound=True,
-        rest_path=rest_path or "/api/astrology/timing/" + tool_name.replace("_", "-"),
-        mcp_name=tool_name,
+        rest_path=rest_path or "/api/astrology/timing/" + name.replace("_", "-"),
     )
 
 
 SPECS: list[ToolSpec] = [
     # --- Western lifespan techniques (single natal chart, whole-life) ------
     _western_lifespan_spec(
-        "harmonic",
         "harmonic_chart",
         calculate_harmonic_chart,
         AstroHarmonicRequest,
@@ -127,88 +120,72 @@ SPECS: list[ToolSpec] = [
     ),
     _western_lifespan_spec(
         "planetary_ages",
-        "planetary_ages",
         calculate_planetary_ages,
         AstroPlanetaryAgesRequest,
         "行星年龄",
     ),
     _western_lifespan_spec(
-        "triplicity_rulers",
         "triplicity_ruler_periods",
         calculate_triplicity_rulers,
         AstroTriplicityRulersRequest,
         "三分主星推运",
     ),
     _western_lifespan_spec(
-        "lunation_phase",
         "lunar_phase_progressions",
         calculate_lunation_phase,
         AstroLunationPhaseRequest,
         "月相推运",
-        summary=(
-            "月相推运：按出生后实际日月星历搜索八相交点，"
-            "以一名义UTC日对应一象征年龄年，返回出生后至年龄上限内的转换。"
-            "星历与时间钥随结果交付；年龄范围不是寿命估计。"
-        ),
+        summary="月相推运：按出生后实际日月八相交点推演象征年龄阶段（非寿命估计）。",
     ),
     _western_lifespan_spec(
-        "distributions",
         "bounds_directions",
         calculate_distributions,
         AstroDistributionsRequest,
         "界推运",
     ),
     _western_lifespan_spec(
-        "balbillus",
         "balbillus_periods",
         calculate_balbillus,
         AstroBalbillusRequest,
         "Balbillus 129年系统",
     ),
     _western_lifespan_spec(
-        "keypoints",
         "numeric_aspect_periods",
         calculate_keypoints,
         AstroKeypointsRequest,
         "数字相位推运",
     ),
     _western_lifespan_spec(
-        "yearsystem129",
         "planetary_periods_129_years",
         calculate_yearsystem129,
         AstroYearSystem129Request,
         "129年系统",
     ),
     _western_lifespan_spec(
-        "planetaryarc",
         "planetary_arc_directions",
         calculate_planetary_arc,
         AstroPlanetaryArcRequest,
         "行星弧方向",
     ),
     _western_lifespan_spec(
-        "persiandirected",
         "persian_directions",
         calculate_persian_directed,
         AstroPersianDirectedRequest,
         "波斯向运",
     ),
     _western_lifespan_spec(
-        "agepoint",
         "age_point",
         calculate_age_point,
         AstroAgePointRequest,
         "年龄推进点",
     ),
     _western_lifespan_spec(
-        "vedicprog",
         "sidereal_progressions",
         calculate_vedicprog,
         AstroVedicProgRequest,
         "恒星推运",
     ),
     _western_lifespan_spec(
-        "jaynesprog",
         "declination_progressions",
         calculate_jaynesprog,
         AstroJaynesProgRequest,

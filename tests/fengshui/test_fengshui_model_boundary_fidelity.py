@@ -18,16 +18,27 @@ from fatebridge.core.fengshui.calendar import (
     lichun_resolution,
     year_context,
 )
-from fatebridge.core.fengshui.models import HousePeriod, MingguaRequest
+from fatebridge.core.fengshui.models import AnnualRequest, HousePeriod, MingguaRequest
 from fatebridge.core.fengshui.monthly_time import solar_month_context
 from fatebridge.core.fengshui.xuankong import period_context
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services.fengshui import calculate_annual_stars, calculate_minggua
+from fatebridge.services.fengshui import (
+    calculate_annual_stars as _calculate_annual_stars,
+)
+from fatebridge.services.fengshui import calculate_minggua as _calculate_minggua
 from tests.fixtures.fengshui import payload
 from tests.support.fengshui_clock import seconds_from_boundary
 from tests.support.fengshui_transports import SPECS
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import call_calculation, rest_client
+
+
+def calculate_annual_stars(**kwargs):
+    return _calculate_annual_stars(AnnualRequest.model_validate(kwargs))
+
+
+def calculate_minggua(**kwargs):
+    return _calculate_minggua(MingguaRequest.model_validate(kwargs))
 
 
 @pytest.fixture(scope="module")
@@ -154,10 +165,13 @@ def test_actual_model_reading_names_its_solver_without_claiming_seconds(
     actual_model,
 ) -> None:
     result = calculate_annual_stars(effective_year=2024, timezone_name="UTC")
-    text = result["snapshot_text"]
-    assert "FateBridge解析太阳模型" in text
-    assert "不表示秒级精度已获认证" in text
-    assert "星历为Moshier" not in text
+    layer = result["layers"]["annual_stars"]
+    assert (
+        layer["time_context"]["timing"]["start_resolution"]["solar_model_details"][
+            "model_id"
+        ]
+        == "fatebridge_analytic_solar_v1"
+    )
 
 
 def test_confirmed_minggua_year_does_not_invent_a_solver_observation(
@@ -168,8 +182,6 @@ def test_confirmed_minggua_year_does_not_invent_a_solver_observation(
     assert result["status"] == "complete"
     assert "boundary_resolution" not in context
     assert "boundary_precision_policy" not in context
-    assert "FateBridge解析太阳模型" not in result["snapshot_text"]
-    assert "星历为Moshier" not in result["snapshot_text"]
 
 
 @pytest.mark.parametrize("model", ["moshier", MODEL_ID, "unknown_model"])
@@ -217,18 +229,23 @@ def test_model_reason_and_reading_match_rest_real_mcp_cli(
             "timezone_name": "UTC",
             "evidence": "虚构协议回归事件",
         }
-    response = rest_client(monkeypatch).post(SPECS[name].rest_path, json=inputs)
+    response = rest_client(monkeypatch).post(
+        SPECS[name].rest_path, json=inputs, params={"detail": "audit"}
+    )
 
     async def call():
         async with Client(create_mcp_app(families="fengshui")) as client:
             return await call_calculation(
-                client, SPECS[name].tool_name, {**inputs, "response_char_limit": 0}
+                client, SPECS[name].name, {**inputs, "detail": "audit"}
             )
 
     protocol = asyncio.run(call())
     request = tmp_path / "request.json"
     request.write_text(json.dumps(inputs))
-    assert run([SPECS[name].tool_name, "--request-file", str(request)]) == 0
+    assert (
+        run([SPECS[name].name, "--request-file", str(request), "--detail", "audit"])
+        == 0
+    )
     cli = json.loads(capsys.readouterr().out)
     assert response.status_code == 200 and not protocol.is_error
     body = response.json()

@@ -182,10 +182,6 @@ def test_india_core_contains_nine_grahas_sources_and_theme_factors() -> None:
     assert career_factor["fact"] == {
         key: career_house[key] for key in ("house", "lord", "lord_house")
     }
-    assert "D9 上升" in result["snapshot_text"]
-    assert "D10 上升" in result["snapshot_text"]
-    assert "历史参考" in result["snapshot_text"]
-    assert "印占来源：" in result["snapshot_text"]
 
 
 def test_extended_divisions_are_consistent_with_reported_coverage() -> None:
@@ -303,7 +299,10 @@ def test_native_india_uses_proleptic_gregorian_and_subsecond_instants() -> None:
 
 def test_legacy_explicit_tropical_override_does_not_fabricate_vargas() -> None:
     result = calculate_core_chart_analysis(
-        chart_variant="india_chart", zodiacal=0, hsys=3, **astro_payload()
+        chart_variant="india_chart",
+        zodiac_type="Tropic",
+        house_system=3,
+        **astro_payload(),
     )
     assert result["india"]["status"] == "configuration_not_supported"
     assert "charts" not in result["india"]

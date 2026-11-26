@@ -94,27 +94,3 @@ def build_timing_root_context(
         source=deepcopy(SOURCE),
         scope=SCOPE,
     )
-
-
-def timing_root_snapshot_lines(context: TimingRootContext) -> list[str]:
-    labels = {
-        "dayun": "大运",
-        "liunian": "流年",
-        "liuyue": "流月",
-        "liuri": "流日",
-        "liushi": "流时",
-    }
-    lines = []
-    for row in context["day_master_roots"]:
-        root = row["classification"]
-        hidden = "、".join(root["matching_hidden_stems"]) or "未见同气藏干"
-        layer = row["branch_node_id"].split(".")[-1]
-        lines.append(
-            f"{labels.get(layer, layer)}支{root['branch']}与日主{root['stem']}："
-            f"{root['label']}，{hidden}；该支有{len(row['branch_relation_ids'])}条结构触点。"
-        )
-    if lines:
-        lines.append(
-            "根类与冲合刑触点分列；未裁定行运后的有效旺衰，不能把阴长生名当真实藏根或把未见根直接判弱。"
-        )
-    return lines

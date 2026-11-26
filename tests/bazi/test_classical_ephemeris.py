@@ -29,7 +29,6 @@ from fatebridge.core.classical_western import (
 from fatebridge.core.contracts.output_charts import AlmutenFiguris
 from fatebridge.core.ephemeris_runtime import swe
 from fatebridge.services.astrology import calculate_core_chart_analysis
-from fatebridge.services.astrology_classical_snapshot import _build_almuten_figuris_line
 
 _SWE_AVAILABLE = swe is not None
 _requires_swe = pytest.mark.skipif(
@@ -189,26 +188,6 @@ def test_almuten_figuris_method_delivery_and_projection(included, missing) -> No
     assert projected.method.missing_points == list(missing)
     assert projected.method.is_day is None
 
-    text = _build_almuten_figuris_line({"classical": {"almuten_figuris": result}})
-    assert f"本次{len(included)}个可得点的本质尊贵汇总" in text
-    assert "固定Chaldean顺序" in text
-    assert "完整历史命主程序未认证" in text
-    labels = {
-        "Sun": "日",
-        "Moon": "月",
-        "Ascendant": "命",
-        "fortune": "福",
-        "syzygy": "朔望",
-    }
-    if missing:
-        expected_missing = (
-            "未纳入点：" + "、".join(labels[point] for point in missing) + "。"
-        )
-        assert expected_missing in text
-    else:
-        assert "未纳入点：" not in text
-    assert ("无可用参与点。" in text) == (not included)
-
 
 # ── integration: real ephemeris invariants on the natal chart ─────────────────
 
@@ -266,16 +245,3 @@ def test_almuten_figuris_uses_five_points_and_winner_leads(natal_chart) -> None:
     winner = figuris["winner"]
     assert winner is not None
     assert figuris["totals"][winner] == max(figuris["totals"].values())
-
-
-@_requires_swe
-def test_snapshot_renders_mingzhu_section_and_retrograde() -> None:
-    payload = calculate_core_chart_analysis(
-        chart_variant="hellen_chart", use_true_solar_time=True, **_NATAL
-    )
-    text = payload["snapshot_text"]
-    assert "[命主]" in text
-    assert "命主：" in text
-    assert "朔望：" in text
-    # Jupiter/Saturn retrograde must surface in the 古典 section.
-    assert "逆行" in text

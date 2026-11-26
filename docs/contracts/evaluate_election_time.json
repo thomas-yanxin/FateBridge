@@ -104,9 +104,7 @@
       "election.factors",
       "election.unresolved_factors",
       "election.condition_policy"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,
@@ -206,18 +204,18 @@
           }
         ],
         "default": "R",
-        "description": "House system, any convention (SE letter / key / integer code 0..8); Regiomontanus (R, code 2) is traditional for elections. Explicit values must be supported letters/names or integer codes0..8; unknown, blank, boolean and floating-point selections are rejected without substitution. Gauquelin (G) has36 clockwise sectors and is unavailable here.",
+        "description": "House system, any convention (SE letter / key / integer code 0..8); Regiomontanus (R, code 2) is traditional for horary and elections. Explicit values must be supported letters/names or integer codes0..8; unknown, blank, boolean and floating-point selections are rejected without substitution. Gauquelin (G) has36 clockwise sectors and is unavailable here.",
         "title": "House System"
       },
       "latitude": {
-        "description": "Latitude where the act will take place",
+        "description": "Latitude where the chart is cast",
         "maximum": 90,
         "minimum": -90,
         "title": "Latitude",
         "type": "number"
       },
       "longitude": {
-        "description": "Longitude where the act will take place",
+        "description": "Longitude where the chart is cast",
         "maximum": 180,
         "minimum": -180,
         "title": "Longitude",
@@ -246,7 +244,7 @@
           }
         ],
         "default": null,
-        "description": "Civil candidate timezone (IANA or UTC offset). Omitted/null with civil preserves legacy +08:00; use the known zone explicitly. Omit/null for solar clock bases, never combine both corrections.",
+        "description": "Civil timezone (IANA or UTC offset). Omitted/null with civil preserves legacy +08:00; supply the known zone explicitly. Solar clock bases must omit/null this field to prevent double correction.",
         "title": "Timezone Name"
       },
       "topic_id": {
@@ -279,18 +277,22 @@
       },
       "zodiac_type": {
         "default": "Tropic",
-        "description": "Zodiac type, e.g. Tropic or Sidereal",
+        "description": "Zodiac type: Tropic or Sidereal",
+        "enum": [
+          "Tropic",
+          "Sidereal"
+        ],
         "title": "Zodiac Type",
         "type": "string"
       }
     },
     "required": [
+      "longitude",
+      "latitude",
       "candidate_year",
       "candidate_month",
       "candidate_day",
-      "candidate_hour",
-      "longitude",
-      "latitude"
+      "candidate_hour"
     ],
     "title": "AstroElectionRequest",
     "type": "object"
@@ -319,7 +321,7 @@
         "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
         "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
       ],
-      "method_id": "fatebridge.western_election.contract_v1",
+      "method_id": "fatebridge.western_evaluate_election_time.contract_v1",
       "output_paths": [
         "election"
       ],
@@ -330,8 +332,8 @@
       "role": "calculation",
       "selector_fields": [
         "ephemeris_policy",
-        "candidate_clock_basis",
-        "house_system"
+        "house_system",
+        "candidate_clock_basis"
       ],
       "source_refs": [
         "docs/algorithm-coverage.md"

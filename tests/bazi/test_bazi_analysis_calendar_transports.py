@@ -58,13 +58,11 @@ def test_natal_and_analysis_calendars_own_their_pillars_on_three_protocols(
     ]
     controls = {
         "as_of": as_of,
+        "detail": "audit",
         "fields": fields,
-        "strict_fields": True,
-        "response_char_limit": 0,
-        "include_snapshot_text": False,
     }
     http, protocol, code, cli = surface_calls(
-        SPECS["bazi_birth"], birth, projection=controls
+        SPECS["bazi_birth_chart"], birth, projection=controls
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     assert (
@@ -107,11 +105,11 @@ def test_natal_and_analysis_calendars_own_their_pillars_on_three_protocols(
     # The public calendar entry must deliver the same complete calendar facts.
     controls["fields"] = ["calendar_context", "four_pillars"]
     http, protocol, code, cli = surface_calls(
-        SPECS["nongli_time"],
+        SPECS["lunar_calendar_time"],
         {
             "date": expected_date,
             "time": "00:00",
-            "zone": "Asia/Shanghai",
+            "timezone": "Asia/Shanghai",
             "time_alg": 1,
         },
         projection=controls,

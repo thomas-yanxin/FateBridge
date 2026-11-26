@@ -69,17 +69,3 @@ def build_stem_order_review(
         "calculation_effect": "none",
         "scope": "所选原典的月时非日干邻接候选与同次事件表分别核对；未记录不等于原典判不合。日干或别干的同字匹配只列待审，不认证争合或合去。默认天干预算、根气、旺衰、司令与通关保持；原典全章先后效力及现实应期未据此算出。",
     }
-
-
-def stem_order_review_snapshot_line(review: Mapping[str, Any]) -> str | None:
-    """Render only the supplied factual receipt, never calculate another chart."""
-    candidates = review.get("candidates")
-    if not candidates:
-        return None
-    row = candidates[0]
-    refs = row.get("recorded_relation_refs")
-    status = "事件未供" if refs is None else "事件已记录" if refs else "事件未记录"
-    return (
-        f"原典先后复核：月时{''.join(row['stems'])}为所选原典候选，{status}；"
-        "未改变默认合绊预算，合效、成化与通关仍待审。"
-    )

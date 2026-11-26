@@ -164,13 +164,3 @@ def age_only_reference() -> AnalysisAgeReference:
         "fixed_defaults": {},
         "scope": "显式年龄仅用于大运年龄参考，没有据此补造分析日时。",
     }
-
-
-def analysis_clock_snapshot_lines(reference: AnalysisClockReference) -> list[str]:
-    if reference["basis"] != "implicit_execution_clock":
-        return []
-    return [
-        f"本次分析民用瞬间：{reference['analysis_datetime']}；UTC：{reference['utc_datetime']}。",
-        "日期全部省略，使用本次as_of或执行开始时刻，未替换为月初、月中或零点。",
-        "流时表中的整点只表示时柱粒度；交气、交运与流年流月比较使用上列完整瞬间。",
-    ]

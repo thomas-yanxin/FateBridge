@@ -201,7 +201,7 @@ def test_nonconvergence_stays_explicit_and_does_not_copy_native_rate(
     assert all(row["status"] == "not_converged" for row in policy["attempts"])
 
 
-@pytest.mark.parametrize("tool", ["astro_guolao", "astro_chart"])
+@pytest.mark.parametrize("tool", ["guolao_chart"])
 @pytest.mark.parametrize("target", [None, "2000-01-02T12:00:00+00:00"])
 def test_moshier_native_and_corrected_rates_roundtrip_actual_interfaces(
     analytical,
@@ -210,7 +210,7 @@ def test_moshier_native_and_corrected_rates_roundtrip_actual_interfaces(
     tool: str,
     target: str | None,
 ) -> None:
-    spec = next(s for s in CATALOG if s.key == tool)
+    spec = next(s for s in CATALOG if s.name == tool)
     payload = dict(
         birth_year=2000,
         birth_month=1,
@@ -221,10 +221,6 @@ def test_moshier_native_and_corrected_rates_roundtrip_actual_interfaces(
         birth_latitude=0,
         use_true_solar_time=False,
     )
-    if tool == "astro_chart":
-        payload["chart_variant"] = "guolao_chart"
-    else:
-        pass
     if target:
         payload["analysis_datetime"] = target
     else:
@@ -243,10 +239,8 @@ def test_moshier_native_and_corrected_rates_roundtrip_actual_interfaces(
         pass
     options = dict(
         as_of="2000-01-02T12:00:00+00:00",
+        detail="audit",
         fields=fields,
-        strict_fields=True,
-        include_snapshot_text=False,
-        response_char_limit=0,
     )
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
@@ -259,9 +253,7 @@ def test_moshier_native_and_corrected_rates_roundtrip_actual_interfaces(
         json=payload,
         params=[
             ("as_of", options["as_of"]),
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
+            ("detail", "audit"),
             *[("fields", field) for field in fields],
         ],
     )
@@ -270,21 +262,19 @@ def test_moshier_native_and_corrected_rates_roundtrip_actual_interfaces(
     async def call():
         async with Client(create_mcp_app()) as client:
             return await call_calculation(
-                client, spec.tool_name, {**payload, **options}, raise_on_error=False
+                client, spec.name, {**payload, **options}, raise_on_error=False
             )
 
     native = asyncio.run(call())
     assert not native.is_error, native
-    args = [spec.tool_name]
+    args = [spec.name]
     for key, value in payload.items():
         args += ["--" + key.replace("_", "-"), str(value)]
     args += [
         "--as-of",
         options["as_of"],
-        "--strict-fields",
-        "--no-include-snapshot-text",
-        "--response-char-limit",
-        "0",
+        "--detail",
+        "audit",
         "--fields",
         *fields,
     ]

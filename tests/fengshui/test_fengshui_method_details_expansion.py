@@ -10,8 +10,13 @@ from fatebridge.core.fengshui.method_details import (
     method_details,
     method_reference_provenance,
 )
+from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.output import Ruleset
-from fatebridge.services.fengshui import assess
+from fatebridge.services.fengshui import calculate_fengshui_assessment as _assess
+
+
+def assess(**kwargs):
+    return _assess(AssessRequest.model_validate(kwargs))
 
 
 def walk_records(value):

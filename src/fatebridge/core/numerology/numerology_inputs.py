@@ -37,7 +37,7 @@ NUMEROLOGY_DATE_DESCRIPTION = (
 )
 NUMEROLOGY_TIME_DESCRIPTION = (
     "Known birth local time HH:MM[:SS[.ffffff]], up to six fractional digits; "
-    "required, blank is not midnight; timezone goes in zone. Supplied components "
+    "required, blank is not midnight; timezone goes in timezone. Supplied components "
     "are retained separately from zero calculation defaults. Textual digits "
     "do not certify birth-record precision or imply an uncertainty interval."
 )
@@ -53,7 +53,7 @@ def resolve_numerology_timezone(value: object) -> str:
         return NUMEROLOGY_DEFAULT_TIMEZONE
     if not isinstance(value, str) or not value.strip():
         raise ValueError(
-            "出生时区zone须为非空IANA名称或UTC偏移；未知时区不能用空白代替。"
+            "出生时区timezone须为非空IANA名称或UTC偏移；未知时区不能用空白代替。"
         )
     zone = value.strip()
     parse_timezone_name(zone)
@@ -102,24 +102,22 @@ def numerology_seed_time(
 
 
 def resolve_numerology_longitude(
-    lon: Any, gps_lon: Any, use_true_solar_time: bool
+    longitude: float | str | None, use_true_solar_time: bool
 ) -> tuple[float | None, str | None]:
-    """Match the existing GPS priority without supplying a birthplace.
+    """Validate explicit longitude without supplying a birthplace.
 
     Longitude zero is a real coordinate. The two numeric interfaces cannot
     turn missing longitude into the shared chart substrate's Shanghai default.
     """
     if type(use_true_solar_time) is not bool:
         raise ValueError("use_true_solar_time须为布尔值。")
-    source = "gps_lon" if gps_lon is not None else "lon"
-    value = gps_lon if gps_lon is not None else lon
-    longitude = parse_geo_coordinate(value, axis="longitude")
-    if longitude is None and use_true_solar_time:
+    parsed_longitude = parse_geo_coordinate(longitude, axis="longitude")
+    if parsed_longitude is None and use_true_solar_time:
         raise ValueError(
-            "河洛与参评的真太阳时需要明确出生地经度lon或gps_lon，不能套用上海经度。"
+            "河洛与参评的真太阳时需要明确出生地经度longitude，不能套用上海经度。"
             "不使用太阳时请明确设use_true_solar_time=false。"
         )
-    return longitude, source if longitude is not None else None
+    return parsed_longitude, "longitude" if parsed_longitude is not None else None
 
 
 def numerology_birth_clock(
@@ -157,7 +155,7 @@ def numerology_birth_clock(
         "longitude": longitude,
         "longitude_source": source,
         "longitude_used": seed.applied_true_solar,
-        "longitude_selection_policy": "gps_lon_preferred_over_lon; missing_not_invented",
+        "longitude_selection_policy": "explicit_longitude; missing_not_invented",
         "total_correction_minutes": seed.total_correction_minutes,
         "pillar_clock_policy": "civil_instant_for_year_month; selected_wall_clock_for_day_hour; late_zi_day_rollover",
         "precision_scope": "计算精度不提升所给出生钟时或经度的实际精度；视太阳钟面不是新的物理瞬间。",
@@ -195,40 +193,4 @@ def attach_birth_clock(evidence: dict, clock: dict) -> None:
             "source_section": "输入来源与现代民用／视太阳时换算；不是原典术数断语",
             "facts": deepcopy(clock),
         }
-    )
-
-
-def birth_clock_snapshot(clock: dict) -> str:
-    longitude = (
-        f"{clock['longitude']}°（来源{clock['longitude_source']}）"
-        if clock["longitude"] is not None
-        else "未提供，未用于钟表时计算"
-    )
-    mode = "真太阳时" if clock["mode"] == "apparent_solar" else "钟表时"
-    zone_kind = (
-        "固定偏移"
-        if clock["timezone_rules"]["database"] == "explicit_fixed_offset"
-        else "地区历史规则"
-    )
-    selected = (
-        f"已确认出生偏移：{clock['requested_utc_offset']}；"
-        f"重复钟时：{'是' if clock['civil_time_ambiguous'] else '否'}；"
-        f"fold={clock['civil_fold']}（0为回拨前、1为回拨后）；地区时区仍保留。\n"
-        if clock.get("birth_utc_offset_policy_id") == BIRTH_OFFSET_POLICY_ID
-        else ""
-    )
-    return (
-        "[出生钟时与经度]\n"
-        "日期历制：推算格里历（含1582年前），不自动切换儒略历；"
-        "年号或历史阴历须另有转换依据，当前节气计算不构成古代颁历复原。\n"
-        f"民用时刻：{clock['civil_datetime']}；UTC瞬间：{clock['birth_instant_utc']}。\n"
-        f"时区：{clock['timezone_spec']}（{zone_kind}）；未提供时区仅约定固定+08:00，不推定出生地。\n"
-        f"{selected}"
-        f"计算钟面：{clock['calculation_wall_clock']}（{mode}）；经度：{longitude}。\n"
-        "年、月及太阳交节用民用时刻的绝对瞬间；日、时柱用所选钟面。"
-        + (
-            "\n" + clock["input_representation"]["statement"]
-            if "input_representation" in clock
-            else ""
-        )
     )

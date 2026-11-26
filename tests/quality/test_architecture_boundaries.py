@@ -137,7 +137,6 @@ def test_shared_birth_and_timing_builders_do_not_import_service_entry_points(
         "fatebridge.services.birth_context",
         "fatebridge.services.birth_payload",
         "fatebridge.services.timing_state",
-        "fatebridge.services.timing_snapshots",
     ):
         assert not graph[module] & {
             "fatebridge.services.timing",

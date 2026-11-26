@@ -17,7 +17,7 @@ from tests.unit_test.fixtures.bazi_birth_clock import (
 rest = _shared_rest
 
 
-@pytest.mark.parametrize("spec", SPECS, ids=lambda s: s.key)
+@pytest.mark.parametrize("spec", SPECS, ids=lambda s: s.name)
 def test_mcp_preserves_omitted_minute_on_every_actual_bazi_and_timing_entry(
     spec,
 ) -> None:
@@ -26,9 +26,8 @@ def test_mcp_preserves_omitted_minute_on_every_actual_bazi_and_timing_entry(
         native(
             spec,
             payload,
+            detail="audit",
             fields=[receipt_path(spec)],
-            strict_fields=True,
-            include_snapshot_text=False,
         )
     )
     assert not result.is_error
@@ -39,7 +38,7 @@ def test_mcp_preserves_omitted_minute_on_every_actual_bazi_and_timing_entry(
 
 
 @pytest.mark.parametrize(
-    "key", ["analyze_destiny", "bazi_birth", "bazi_career", "timing_analysis"]
+    "key", ["bazi_overview", "bazi_birth_chart", "bazi_career", "bazi_timing"]
 )
 @pytest.mark.parametrize(
     "components,expected",
@@ -57,21 +56,15 @@ def test_component_presence_agrees_on_actual_rest_mcp_and_cli(
     tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    spec = next(s for s in SPECS if s.key == key)
+    spec = next(s for s in SPECS if s.name == key)
     payload = {**omitted_payload(spec), **components}
     flags = [
+        "--detail",
+        "audit",
         "--fields",
         receipt_path(spec),
-        "--strict-fields",
-        "true",
-        "--include-snapshot-text",
-        "false",
-        "--response-char-limit",
-        "0",
     ]
-    opts = dict(
-        fields=[receipt_path(spec)], strict_fields=True, include_snapshot_text=False
-    )
+    opts = dict(detail="audit", fields=[receipt_path(spec)])
     result = asyncio.run(native(spec, payload, **opts))
     code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
     assert not result.is_error and code == 0
@@ -83,7 +76,7 @@ def test_component_presence_agrees_on_actual_rest_mcp_and_cli(
         response = rest.post(
             spec.rest_path,
             json=payload,
-            params={"as_of": AS_OF, "response_char_limit": 0, **opts},
+            params={"as_of": AS_OF, **opts},
         )
         assert response.status_code == 200
         values.append(leaf(response.json(), receipt_path(spec)))
@@ -94,12 +87,12 @@ def test_component_presence_agrees_on_actual_rest_mcp_and_cli(
 
 
 @pytest.mark.parametrize(
-    "key", ["analyze_destiny", "bazi_birth", "bazi_career", "dayun_analysis"]
+    "key", ["bazi_overview", "bazi_birth_chart", "bazi_career", "bazi_luck_cycles"]
 )
 def test_missing_minute_is_not_filled_before_second_validation(
     key: str, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    spec = next(s for s in SPECS if s.key == key)
+    spec = next(s for s in SPECS if s.name == key)
     payload = {**omitted_payload(spec), "birth_second": 0}
     result = asyncio.run(native(spec, payload))
     code, _ = call_cli(spec, payload, tmp_path, capsys)

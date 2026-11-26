@@ -7,7 +7,7 @@
     "current_weather_study": "1.7.0实际范围检验另读weather.research_validation.current_profile_study。固定2026年1—9月主队列273日，明示起卦节月季节时49个无雨标签、29正确、224弃权；全队列正确贡献29，对比恒无雨158，未通过。2024/2025和季节未知敏感性情形分别保留，不能挑较好比例拼接或代替主队列；2008份情形记录对应1004个目标日期，不是2008独立观测。源时段配次日及未定晴象转无雨是研究假设，朝晴不等于全天无雨；午时队列未命中明确朝暮，不能验证朝暮预测。是公开资料下的追加回顾，前瞻观测与实际模型仍0，不能据工程执行成功或来源符合宣称现实预测通过。",
     "day_qi": "Read interpretation.day_qi for selected NLC1925 day-branch element and month/day strength. Keep each counting candidate own original body; no unique day trigram, inferred missing branch, five-state weights, month/day cancellation or year-month-day net verdict. At23h time entry follows declared Meihua midnight convention and retains zi-start alternative rather than borrowing Bazi day; not event timing, validated outcome or a retrospective study exclusion.",
     "external_manifestations": "external_observations接收已报manifestation类别及label描述，可选填motion=moving或stationary。未知不猜，不按问题文字或未查看场景自动分类。适用于全部人事题篇（general/planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler/household/dwelling/marriage/dining）。weather不适用。同次已确认静室且无所闻见时，不可同时提交外应。读interpretation.external_omens：raw_relation_to_body是符号关系，qualification才是文明书局卷三所选实物／形色条款资格；炉火、烛火、红紫色，锐器、饰物器皿，土、瓦器，柴薪、未伐树不可互套。未覆盖配对保持not_addressed_in_selected_pairs，不由五行归属补作用。不把真生真克术语当实测物理、临床或灾祸判断，不转成概率、数值强度或日期。每个取数候选使用自身原体，来源及两处用字差异随配置保留；不将外应与内卦投票或抵消成结局。没有资料时null仍表示未采集，非确认没有外应；12条上限仅软件保护。",
-    "first_response": "普通卦务首轮复制evidence_views.general.fields（同suggested_fields），启用strict_fields并关闭快照文本。明确选择interpretation_topic=weather时用weather卡，明确选择人事题篇时用topic卡。按实际选定的分支取证，问题文字不切换分支。需要完整JSON时首次fields=null。",
+    "first_response": "普通卦务首轮复制evidence_views.general.fields（同suggested_fields），明确选择interpretation_topic=weather时用weather卡，明确选择人事题篇时用topic卡。按实际选定的分支取证，问题文字不切换分支。需要完整JSON时首次fields=null。",
     "household_chapters": "显式household为家宅章、dwelling为屋舍章，均读topic/topic_audit已发布父字段。以本候选原体为主、初用为家宅或屋舍；不是风水空间评估、房屋检查或选房迁居许可。家宅影印比利与固定转录比和未裁定，source_relation_condition=null，五行相同不能自动套家宅安稳；屋舍體生用保留冷退/转录衰退，不改原字。家宅生体转引人事章按所列四内卦实际生体角色留路径；未见仅限该范围，不当完整内外无生。full_source_generation_condition和完整跨章净结论保持null；原体、互变、受制及旺衰分别保留，不输出住宅安全、实际失盗、资产结果、日期或概率。",
     "internal_control": "人事分支读取interpretation.internal_countercontrol：原体加初用、体互、用互、变用共五个分析角色，不是五次独立观测。用生体之卦受其他卦克则生助受限，用克体之卦受制仅取稍解其凶；原关系保留。control_edges给直接制约及制约者自身所受克，qualifications保留其对原体的关系；离火制兑金也可能同时泄木体，不能递归抵消、计票、加权、合成成败。季令弱或未知不自动关掉制约。每个计数候选自带本卦事实路径；weather分支为null。新internal_control字段卡可核对完整证据；所选影印字句目读不是独立专家、全书或现实预测认证。",
     "limits": "季令只列所选规则的旺衰，不据此生造现实概率、外应或精确应期；现实效力未验证。",
@@ -104,9 +104,7 @@
         "interpretation.evidence_scope",
         "summary"
       ],
-      "include_snapshot_text": false,
       "purpose": "核对已报外应的形色／实物资格、原体及各取数候选；保留符号关系和所选原文的不同作用类别",
-      "strict_fields": true,
       "when": "已确认外应类别及描述且选择人事分支；未知不补，weather不支持"
     },
     "external_symbol": {
@@ -116,9 +114,7 @@
         "interpretation.external_omens",
         "summary"
       ],
-      "include_snapshot_text": false,
       "purpose": "所报金银世宝、兵刃的原体限定与实物资格分列；不把不凶改成吉或安全",
-      "strict_fields": true,
       "when": "只有已报明确类别才选新manifestation，未知省略；旧金属或锐器不自动升级为新类别"
     },
     "general": {
@@ -149,9 +145,7 @@
         "interpretation.classical_text_reference",
         "summary"
       ],
-      "include_snapshot_text": false,
       "purpose": "首轮读取本互变、实际动爻经文及原体用生克。",
-      "strict_fields": true,
       "when": "interpretation_topic=general（默认）。明确选天时占用weather，明确选人事题篇用topic。"
     },
     "internal_control": {
@@ -164,9 +158,7 @@
         "meihua.seasonal_strength",
         "interpretation.internal_countercontrol",
         "summary"
-      ],
-      "include_snapshot_text": false,
-      "strict_fields": true
+      ]
     },
     "motion": {
       "description": "占者坐行立、实际外应动静与内卦符号角色分列；缺吉凶判断的条件保持待定，无日期或结局；端法且占者活动明确时另核除六前名义比例数及未知时间单位",
@@ -176,9 +168,7 @@
         "interpretation.motion_context",
         "interpretation.external_omens",
         "summary"
-      ],
-      "include_snapshot_text": false,
-      "strict_fields": true
+      ]
     },
     "obstruction_days": {
       "description": "生克并见时的条件化原文计日；明例与类推、实际角色、制约与候选分别保留，非净延迟或现实日期",
@@ -248,9 +238,7 @@
         "interpretation.situational_responses",
         "summary"
       ],
-      "include_snapshot_text": false,
       "purpose": "已报同次方应、天时应、地理应、人事应与原体符号关系；多候选及异文分列",
-      "strict_fields": true,
       "when": "仅在已提供response_context时读取；未知现场资料省略，常规reading保留原输出；不用于天时预测分支"
     },
     "solar_date_reference": {
@@ -262,9 +250,7 @@
         "interpretation.evidence_scope",
         "summary"
       ],
-      "include_snapshot_text": false,
       "purpose": "核对实际交节时刻与固定UTC+08公布日期，包含月令起终锚点；保留差异与未比较项",
-      "strict_fields": true,
       "when": "历表与计算日期不一致、官方点名近午夜或需追溯月令依据；不另起卦"
     },
     "stage_emphasis": {
@@ -294,9 +280,7 @@
         "meihua.seasonal_strength",
         "interpretation.seasonal_qualification",
         "summary"
-      ],
-      "include_snapshot_text": false,
-      "strict_fields": true
+      ]
     },
     "strength_audit": {
       "fields": [
@@ -306,9 +290,7 @@
         "interpretation.topic_reading",
         "summary",
         "interpretation.external_omens"
-      ],
-      "include_snapshot_text": false,
-      "strict_fields": true
+      ]
     },
     "topic": {
       "fields": [
@@ -375,9 +357,7 @@
         "summary",
         "interpretation.external_omens"
       ],
-      "include_snapshot_text": false,
       "purpose": "核对所选求财初始条款与补充句关系成分、各候选及制约，保留并存关系",
-      "strict_fields": true,
       "when": "interpretation_topic=wealth；不按问题文字自动切换"
     },
     "weather": {
@@ -448,9 +428,7 @@
       "interpretation.interpretation_topic",
       "interpretation.classical_text_reference",
       "summary"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "$defs": {

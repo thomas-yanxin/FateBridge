@@ -26,8 +26,7 @@ CLI 摘要调用示例（使用 `evidence_views` 字段）：
 uv run --locked --extra dev fatebridge human_design \
   --birth-year 1990 --birth-month 4 --birth-day 6 \
   --birth-hour 9 --birth-minute 33 --birth-timezone Asia/Shanghai \
-  --fields type authority profile bodygraph interpretation \
-  --strict-fields --no-include-snapshot-text
+  --fields type authority profile bodygraph interpretation
 ```
 
 ## 结构与来源边界

@@ -14,7 +14,7 @@ from fatebridge.cli import run
 from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services.fengshui import assess
+from fatebridge.services.fengshui import calculate_fengshui_assessment as _assess
 from tests.support.fengshui_transports import mcp_call
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import describe_capability, rest_client
@@ -23,6 +23,10 @@ from tests.unit_test.fixtures.fengshui_layout import (
     relation_candidate,
     relation_request,
 )
+
+
+def assess(**kwargs):
+    return _assess(AssessRequest.model_validate(kwargs))
 
 
 def case_input(case):
@@ -67,11 +71,13 @@ def test_sourced_cases_agree_across_actual_rest_mcp_cli(
     case: str,
 ) -> None:
     request = case_input(case)
-    http = rest_client(monkeypatch).post("/api/fengshui/assess", json=request)
-    protocol = asyncio.run(mcp_call("assess", request))
+    http = rest_client(monkeypatch).post(
+        "/api/fengshui/assess", json=request, params={"detail": "audit"}
+    )
+    protocol = asyncio.run(mcp_call("assess", {**request, "detail": "audit"}))
     path = tmp_path / "来源关系.json"
     path.write_text(json.dumps(request, ensure_ascii=False))
-    code = run(["fengshui_assess", "--request-file", str(path)])
+    code = run(["fengshui_assess", "--request-file", str(path), "--detail", "audit"])
     cli = json.loads(capsys.readouterr().out)
     assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error
@@ -136,10 +142,8 @@ def test_actual_mcp_schema_and_strict_projection_include_only_requested_branches
         "/api/fengshui/assess",
         json=case_input("confirmed"),
         params={
+            "detail": "audit",
             "fields": ["layout_analysis.interior_analysis", "rulesets", "rule_trace"],
-            "strict_fields": True,
-            "include_snapshot_text": False,
-            "response_char_limit": 0,
         },
     )
     assert http.status_code == 200, http.text

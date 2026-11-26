@@ -1,4 +1,4 @@
-"""Serve FateBridge calculations and result readers over HTTP."""
+"""Serve FateBridge calculations and capability discovery over HTTP."""
 
 import asyncio
 import logging
@@ -9,7 +9,7 @@ from copy import deepcopy
 from typing import Literal
 
 import uvicorn
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
@@ -39,14 +39,9 @@ load_runtime_env()
 from fatebridge import __version__ as APP_VERSION
 from fatebridge.application.compute_limits import heavy_calculation_budget
 from fatebridge.application.discovery import ToolSurface, discover_specs
-from fatebridge.application.execution import execute_tool, result_is_error
-from fatebridge.application.result_delivery import RESULT_STORE
+from fatebridge.application.execution import execute_with_receipt, result_is_error
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
-from fatebridge.core.execution_context import (
-    ExecutionOptions,
-    correlate_error,
-    safe_correlation,
-)
+from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.services.tool_catalog import CATALOG, rest_specs
 from fatebridge.transports.http_runtime import (
     API_KEY_EXEMPT_PATHS,
@@ -212,14 +207,12 @@ def _build_error_detail(result: ServiceResult) -> ServiceResult:
         error_code=result.get("error_code", "internal_error"),
         retryable=result.get("retryable", False),
         issues=result.get("issues"),
-        trace_id=result.get("trace_id"),
-        parent_run_id=result.get("parent_run_id"),
     ).model_dump(exclude_none=True)
 
 
 @app.exception_handler(RequestValidationError)
 async def _request_validation_error_envelope(
-    request: Request, exception: RequestValidationError
+    _request: Request, exception: RequestValidationError
 ) -> JSONResponse:
     issues: list[ErrorDetails] = []
     for issue in exception.errors():
@@ -236,10 +229,7 @@ async def _request_validation_error_envelope(
             issues.append(normalized_issue)
         else:
             issues.append(issue)
-    result = correlate_error(
-        validation_issues_result(issues),
-        safe_correlation(dict(request.query_params)),
-    )
+    result = validation_issues_result(issues)
     return JSONResponse(
         status_code=result["status_code"],
         content=_build_error_detail(result),
@@ -248,7 +238,7 @@ async def _request_validation_error_envelope(
 
 @app.exception_handler(HTTPException)
 async def _http_error_envelope(
-    request: Request, exception: HTTPException
+    _request: Request, exception: HTTPException
 ) -> JSONResponse:
     """Render HTTP exceptions in the common top-level error format."""
     detail = exception.detail
@@ -266,9 +256,6 @@ async def _http_error_envelope(
                 "retryable": False,
             }
         )
-    response_body = correlate_error(
-        response_body, safe_correlation(dict(request.query_params))
-    )
     return JSONResponse(status_code=exception.status_code, content=response_body)
 
 
@@ -291,27 +278,21 @@ async def _execute_service(
     request: BaseModel,
     *,
     options: ExecutionOptions,
-    fields: list[str] | None,
-    include_snapshot_text: bool | None,
 ) -> ServiceResult:
     if spec.cpu_bound:
         async with _get_heavy_calc_semaphore():
             result = await run_in_threadpool(
-                execute_tool,
+                execute_with_receipt,
                 spec,
                 request,
                 options=options,
-                fields=fields,
-                include_snapshot_text=include_snapshot_text,
             )
     else:
         result = await run_in_threadpool(
-            execute_tool,
+            execute_with_receipt,
             spec,
             request,
             options=options,
-            fields=fields,
-            include_snapshot_text=include_snapshot_text,
         )
     if result_is_error(result):
         raise HTTPException(
@@ -360,62 +341,11 @@ with warnings.catch_warnings():
                 body_parameter._type_adapter.rebuild()
 
 
-@app.get("/api/results/{result_id}")
-async def result_manifest(result_id: str) -> ServiceResult:
-    """Read the manifest of a retained result under normal API authentication."""
-    try:
-        return await run_in_threadpool(RESULT_STORE.manifest, result_id)
-    except ParameterError as exception:
-        raise HTTPException(status_code=404, detail=exception.as_result()) from None
-
-
-@app.get("/api/results/{result_id}/pages")
-async def result_page(
-    result_id: str,
-    offset: int = Query(default=0, ge=0),
-    path: str | None = Query(default=None, max_length=1000),
-) -> ServiceResult:
-    """Retrieve a bounded page or field from the original run, without recalculation."""
-    try:
-        return await run_in_threadpool(RESULT_STORE.page, result_id, offset, path)
-    except ParameterError as exception:
-        raise HTTPException(status_code=404, detail=exception.as_result()) from None
-
-
-@app.get("/api/results/{result_id}/payload")
-async def result_payload(result_id: str) -> ServiceResult:
-    """Download the selected response from the original run in one request."""
-    try:
-        return await run_in_threadpool(RESULT_STORE.get, result_id)
-    except ParameterError as exception:
-        raise HTTPException(status_code=404, detail=exception.as_result()) from None
-
-
-@app.get("/api/results/{result_id}/verified")
-async def verified_result_page(
-    result_id: str,
-    expected_run_id: str = Query(pattern=r"^[A-Za-z0-9_-]{1,128}$"),
-    offset: int = Query(default=0, ge=0),
-    path: str | None = Query(default=None, max_length=1000),
-) -> ServiceResult:
-    """Verify the full original payload before reading one bounded page."""
-    try:
-        return await run_in_threadpool(
-            RESULT_STORE.verified_page,
-            result_id,
-            expected_run_id,
-            offset,
-            path,
-        )
-    except ParameterError as exception:
-        raise HTTPException(status_code=422, detail=exception.as_result()) from None
-
-
 @app.get(
     "/api/tools",
     description=(
         "Machine-readable capability manifest for agents.\n\n"
-        "Returns the same self-describing record as ``fatebridge describe`` for every\n"
+        "Returns the same self-describing record as `fatebridge discover` for every\n"
         "catalog tool — parameters, types, surfaces, family — so an agent can\n"
         "enumerate the framework's capabilities and call conventions without scraping\n"
         "the Markdown docs. Derived from the central ToolSpec catalog, so it never\n"
@@ -427,7 +357,7 @@ async def list_tools(
     q: str | None = None,
     tool: str | None = None,
     surface: ToolSurface | None = None,
-    detail: Literal["index", "summary", "full"] = "full",
+    detail: Literal["summary", "full"] = "summary",
 ) -> ServiceResult:
     try:
         return discover_specs(
@@ -440,7 +370,7 @@ async def list_tools(
         )
     except ParameterError as exception:
         raise HTTPException(
-            status_code=422, detail=exception.as_result()
+            status_code=exception.status_code, detail=exception.as_result()
         ) from exception
 
 

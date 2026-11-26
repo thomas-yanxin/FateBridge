@@ -27,7 +27,7 @@ SHANGHAI = dict(
 )
 
 
-@pytest.mark.parametrize("spec", SPECS, ids=lambda s: s.key)
+@pytest.mark.parametrize("spec", SPECS, ids=lambda s: s.name)
 @pytest.mark.parametrize("offset,hour,fold", [("+09:00", 16, 0), ("+08:00", 17, 1)])
 def test_all_actual_bindings_preserve_selected_instant_and_original_zone(
     spec, offset: str, hour: int, fold: int
@@ -192,9 +192,11 @@ def test_minute_grid_uses_each_derived_instant_offset_across_clock_rollback(
     ]
 
 
-@pytest.mark.parametrize("key", ["ziwei_birth", "ziwei_horoscope", "liureng_runyear"])
+@pytest.mark.parametrize(
+    "key", ["ziwei_birth_chart", "ziwei_timing", "liuren_yearly_timing"]
+)
 def test_existing_public_offset_consumers_keep_their_explicit_keyword(key: str) -> None:
-    spec = next(s for s in CATALOG if s.key == key)
+    spec = next(s for s in CATALOG if s.name == key)
     values = {**inputs(spec), **SHANGHAI, "birth_utc_offset": "+09:00"}
     values.pop("birth_second")
     _, args, kwargs = spec.bind(spec.request_model.model_validate(values))

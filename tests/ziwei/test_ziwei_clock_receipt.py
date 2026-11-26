@@ -25,12 +25,12 @@ EVE_BIRTH = dict(
     use_true_solar_time=False,
 )
 EVE_TARGET = dict(
-    target_year=2024,
-    target_month=2,
-    target_day=9,
-    target_hour=23,
-    target_minute=30,
-    target_timezone="Asia/Shanghai",
+    analysis_year=2024,
+    analysis_month=2,
+    analysis_day=9,
+    analysis_hour=23,
+    analysis_minute=30,
+    analysis_timezone="Asia/Shanghai",
 )
 
 
@@ -81,10 +81,8 @@ def test_new_year_eve_chart_and_flows_share_the_placement_date(
         assert lookups["placement"]["printed_date_reference"] == "hko_1901_2100"
         assert lookups["civil"]["solar_date"] == "2024-02-09"
         assert lookups["reference_utc_plus_08"]["solar_date"] == "2024-02-09"
-    assert f"所选时钟{boundary}换日" in birth["snapshot_text"]
     lunar_display = birth["analysis_context"]["lunar_display"]
     assert lunar_display.endswith("初一" if policy == "forward" else "三十")
-    assert f"排盘农历：{lunar_display}" in birth["snapshot_text"]
     assert horoscope["scopes"][2]["stem"] == year_stem
     age = horoscope["nominal_age_calendar"]
     assert age["birth_placement_lunar_year"] == lunar["year"]
@@ -92,7 +90,12 @@ def test_new_year_eve_chart_and_flows_share_the_placement_date(
     assert age["birth_lunar_date"] == age["target_lunar_date"] == CNY_EVE
     assert horoscope["nominal_age"] == age["nominal_age"] == 1
 
-    new_year = {**EVE_TARGET, "target_day": 10, "target_hour": 0, "target_minute": 0}
+    new_year = {
+        **EVE_TARGET,
+        "analysis_day": 10,
+        "analysis_hour": 0,
+        "analysis_minute": 0,
+    }
     after = calculate_ziwei_horoscope(person, **new_year, day_divide=policy)[
         "ziwei_horoscope"
     ]
@@ -198,9 +201,9 @@ def test_target_civil_year_is_distinct_from_birth_zone_age_clock():
     birth = {**EVE_BIRTH, "birth_hour": 22}
     target = {
         **EVE_TARGET,
-        "target_day": 10,
-        "target_hour": 0,
-        "target_timezone": "+09:00",
+        "analysis_day": 10,
+        "analysis_hour": 0,
+        "analysis_timezone": "+09:00",
     }
     for policy in ("current", "forward"):
         h = calculate_ziwei_horoscope(

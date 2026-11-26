@@ -16,7 +16,7 @@
 
 ## 大限、小限与流曜
 
-`ziwei_timing` 分层返回大限、小限、流年、流月、流日与流时；未达五行局起运岁数时，大限返回 `status=not_started`，独立童限由 `childhood_limit` 返回。`target_minute` 与 `target_timezone` 默认分别为 `0` 和 `Asia/Shanghai`。
+`ziwei_timing` 分层返回大限、小限、流年、流月、流日与流时；未达五行局起运岁数时，大限返回 `status=not_started`，独立童限由 `childhood_limit` 返回。`analysis_minute` 与 `analysis_timezone` 默认分别为 `0` 和 `Asia/Shanghai`。
 
 | 字段 | 含义 |
 | --- | --- |

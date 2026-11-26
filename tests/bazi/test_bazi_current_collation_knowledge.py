@@ -13,18 +13,15 @@ ROOT = Path(__file__).resolve().parents[2]
 TARGET = ("classical_force_semantics", "物理藏根与功能根")
 
 
-def test_same_source_root_contrast_is_queryable_and_snapshot_keeps_final_judgment() -> (
-    None
-):
+def test_same_source_root_contrast_is_queryable() -> None:
     result = calculate_knowledge_read(domain="bazi", category=TARGET[0], key=TARGET[1])
     assert "error" not in result
     assert "最终以癸水仍得通根判戊癸合而不化" in result["rendered_text"]
-    assert "后造才明言合而必化" in result["snapshot_text"]
     curation = result["provenance"]["entry_curation"]
     assert curation["entry_revision"] == 2
     source = curation["source_refs"][-1]
     assert source["source_pdf_pages"] == [209, 210]
-    assert source["edition"] in result["snapshot_text"]
+    assert source["edition"]
     assert (
         curation["validation_status"] == "text_semantics_not_model_force_adjudication"
     )
@@ -47,7 +44,7 @@ def test_current_root_card_is_identical_on_rest_native_mcp_and_cli(
 ) -> None:
     spec = SPECS["knowledge_read"]
     payload = {"domain": "bazi", "category": TARGET[0], "key": TARGET[1]}
-    opts = {"include_snapshot_text": False, "response_char_limit": 0}
+    opts = {"detail": "audit"}
     http, protocol, code, cli = surface_calls(
         spec, payload, projection=opts, cli_first=False
     )

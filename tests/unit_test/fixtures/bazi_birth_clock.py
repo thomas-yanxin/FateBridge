@@ -7,20 +7,20 @@ from fatebridge.core.requests.birth import BaziClockRequest
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.transports import inputs
 
-TIMING_KEYS = {
-    "timing_analysis",
-    "dayun_analysis",
-    "liunian_analysis",
-    "liuyue_analysis",
-    "liuri_analysis",
-    "liushi_analysis",
-    "jieqi_timeline_analysis",
+TIMING_NAMES = {
+    "bazi_timing",
+    "bazi_luck_cycles",
+    "bazi_yearly_timing",
+    "bazi_monthly_timing",
+    "bazi_daily_timing",
+    "bazi_hourly_timing",
+    "solar_term_timeline",
 }
 SPECS = [
     s
     for s in CATALOG
     if (s.family == "bazi" and issubclass(s.request_model, BaziClockRequest))
-    or s.key in TIMING_KEYS
+    or s.name in TIMING_NAMES
 ]
 BASE: dict[str, JsonValue] = dict(
     birth_year=1990,
@@ -33,14 +33,10 @@ BASE: dict[str, JsonValue] = dict(
 
 
 def receipt_path(spec: ToolSpec) -> str:
-    if spec.key == "bazi_birth":
+    if spec.name == "bazi_birth_chart":
         return "bazi_birth.calendar_context.birth_time_input"
-    else:
-        pass
-    if spec.family == "bazi" and spec.key != "analyze_destiny":
-        return f"{spec.key.removeprefix('bazi_')}_analysis.calendar_context.birth_time_input"
-    else:
-        pass
+    if spec.family == "bazi" and spec.name != "bazi_overview":
+        return f"{spec.name.removeprefix('bazi_')}_analysis.calendar_context.birth_time_input"
     return "calendar_context.birth_time_input"
 
 

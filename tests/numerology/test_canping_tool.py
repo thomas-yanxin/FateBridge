@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from fatebridge.core.numerology.canping import (
-    build_snapshot_text,
     calculate,
     compute_number,
     nayin_element,
@@ -105,13 +104,6 @@ def test_canping_fixed_pillars_keep_numbers_columns_and_readings() -> None:
     )
     assert natal["verses"]["selectionNi"]["column"] == "upper_male"
     assert natal["verses"]["selectionNi"]["source_pdf_page"] == 103
-    calculation_text, source_heading, _ = build_snapshot_text(result).partition(
-        "\n\n[参评选条与来源]\n"
-    )
-    assert source_heading
-    setup, natal_text, luck_text, annual_text = calculation_text.split("\n\n")
-    luck_heading, *luck_lines = luck_text.splitlines()
-    assert luck_heading == "[大运·歲運]"
     luck = result["dayun"]
     # National Archives of Japan, 305-0271, volume 6. The Earth luck cells
     # are identified by their number and PDF page. Three forward rows are absent locally.
@@ -134,7 +126,7 @@ def test_canping_fixed_pillars_keep_numbers_columns_and_readings() -> None:
         2278: (104, "遊舟入水中，進退不由己。"),
         3379: (104, "塞翁須失馬，反禍又成福。"),
     }
-    for step, rendered, expected in zip(luck, luck_lines, expected_luck, strict=True):
+    for step, expected in zip(luck, expected_luck, strict=True):
         assert (
             step["ageStart"],
             step["ageEnd"],
@@ -150,34 +142,16 @@ def test_canping_fixed_pillars_keep_numbers_columns_and_readings() -> None:
             assert selection["kind"] == "luck"
             assert selection.get("source_pdf_page") == page
             assert verses[f"text{direction}"] == text
-        assert rendered == (
-            f"{start}-{end}岁 {branch}：顺{forward} {earth_luck[forward][1]} ／ "
-            f"逆{reverse} {earth_luck[reverse][1]}"
-        )
-    assert setup.splitlines() == [
-        "[起盘]",
-        "年纳音：土（土部）  取法：明法(月支反向)",
-        "日宫支：亥  命宫：申",
-    ]
-    assert natal_text.splitlines() == [
-        "[本命]",
-        "顺 2874：",
-        "逆 2674：義兵不用詐，背水戰何因。",
-    ]
-    assert annual_text.splitlines() == [
-        "[流年·歲運]",
-        "太岁戌/大运申：顺3175  ／ 逆2375 男兒衣祿好，女子命還危。",
-    ]
 
 
 def test_canping_service_full_shape() -> None:
     result = calculate_canping_analysis(
         date="1990-06-15",
         time="09:33:00",
-        zone="+08:00",
+        timezone="+08:00",
         gender="男",
         method="ming",
-        lon="121e28",  # Fictional test coordinate, now supplied explicitly.
+        longitude="121e28",  # Fictional test coordinate, now supplied explicitly.
     )
     assert result["analysis_type"] == "邵子参评数 / 金锁银匙"
     assert result["element"] in {"金", "木", "水", "火", "土"}
@@ -189,7 +163,6 @@ def test_canping_service_full_shape() -> None:
     # Full 120 sexagenary-year labels, with actual date segments.
     assert len(result["liunian_series"]["rows"]) == 120
     assert result["liunian_series"]["year_boundary"] == "lichun"
-    assert result["snapshot_text"].startswith("[起盘]")
 
 
 def test_canping_gu_method_uses_day_branch() -> None:

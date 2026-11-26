@@ -20,14 +20,14 @@ def test_comprehensive_default_source_matches_its_actual_mcp_and_cli_surfaces(
     monkeypatch.delenv("FATEBRIDGE_SOLAR_TERM_MODEL", raising=False)
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
-    spec = SPECS["analyze_destiny"]
+    spec = SPECS["bazi_overview"]
     assert spec.rest_path == "/api/bazi/overview"
     payload = {**inputs(spec), "use_true_solar_time": False}
-    opts = dict(include_snapshot_text=False, response_char_limit=0)
-    flags = ["--include-snapshot-text", "false", "--response-char-limit", "0"]
+    opts = dict(detail="audit")
+    flags = ["--detail", "audit"]
     if project:
-        opts.update(fields=["calendar_context"], strict_fields=True)
-        flags += ["--fields", "calendar_context", "--strict-fields", "true"]
+        opts.update(fields=["calendar_context"])
+        flags += ["--fields", "calendar_context"]
     else:
         pass
     mcp = asyncio.run(native(spec, payload, **opts))
@@ -55,7 +55,7 @@ def test_comprehensive_default_data_failure_cannot_return_a_complete_report(
     monkeypatch.delenv("FATEBRIDGE_SOLAR_TERM_MODEL", raising=False)
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     monkeypatch.setattr(de440_solar, "_profile", unavailable)
-    spec = SPECS["analyze_destiny"]
+    spec = SPECS["bazi_overview"]
     payload = {**inputs(spec), "use_true_solar_time": False}
     mcp = asyncio.run(native(spec, payload))
     code, cli = call_cli(spec, payload, tmp_path, capsys)

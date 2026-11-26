@@ -165,13 +165,12 @@ def test_birth_evidence_and_layers_match_rest_mcp_cli(
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
     controls = {
+        "detail": "audit",
         "fields": [
             "bazi_birth.day_master",
             "bazi_birth.day_master.assessment",
             "bazi_birth.structure_profile",
         ],
-        "include_snapshot_text": False,
-        "strict_fields": True,
     }
     response = TestClient(api.app).post(
         "/api/bazi/birth-chart", json=BIRTH, params=controls
@@ -182,8 +181,8 @@ def test_birth_evidence_and_layers_match_rest_mcp_cli(
     for key, value in BIRTH.items():
         args.extend(["--" + key.replace("_", "-"), str(value)])
     args += [
-        "--no-include-snapshot-text",
-        "--strict-fields",
+        "--detail",
+        "audit",
         "--fields",
         *controls["fields"],
     ]

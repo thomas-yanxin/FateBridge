@@ -99,14 +99,12 @@ rest = _shared_rest
 def test_per_stem_root_view_matches_actual_rest_native_mcp_cli(
     topic, surface_calls
 ) -> None:
-    spec = SPECS["bazi_" + topic]
+    spec = SPECS["bazi_birth_chart" if topic == "birth" else "bazi_" + topic]
     payload = {**inputs(spec), "use_true_solar_time": False}
     fields = suggested_fields(spec, view="force_roots")
     opts = {
+        "detail": "audit",
         "fields": fields,
-        "strict_fields": True,
-        "include_snapshot_text": False,
-        "response_char_limit": 0,
     }
     response, protocol, code, local = surface_calls(
         spec, payload, projection=opts, cli_first=False

@@ -42,7 +42,7 @@ FateBridge is an open-source toolkit for running Chinese metaphysics and astrolo
 
 REST API key authentication uses `FATEBRIDGE_API_KEYS` and `API_KEY_HEADER_NAME` (default `X-API-Key`). An empty key configuration disables authentication; malformed nonempty entries stop startup. Shared keys do not provide accounts, roles or per-tool authorization.
 
-`/health`, `/ready`, `/metrics`, `/docs`, `/redoc`, `/openapi.json` and `OPTIONS` are exempt from API key checks. `/api/tools` and result-delivery routes are protected when keys are configured. Keys share the service's accessible result store; they do not establish per-user result ownership. Restrict operational endpoints and isolate services when callers require separate data access.
+`/health`, `/ready`, `/metrics`, `/docs`, `/redoc`, `/openapi.json` and `OPTIONS` are exempt from API key checks. `/api/tools` and calculation endpoints are protected when keys are configured. Shared keys do not establish per-user ownership or access isolation; restrict operational endpoints and isolate services when callers require separate access boundaries.
 
 REST binds to `0.0.0.0:8010` by default. For local use set `API_HOST=127.0.0.1`. CORS controls browser origins and does not authenticate callers. Heavy-calculation concurrency controls the amount of simultaneous work in a process and does not provide a request rate limit.
 
@@ -52,6 +52,6 @@ The Python distribution does not bundle Swiss Ephemeris `.se1` data. The optiona
 
 ## Personal Data
 
-Birth information may appear in responses, snapshots, client histories and calculation logs. When the response budget triggers full-result delivery, the service writes the selected result to a private temporary directory owned by the operating-system user. POSIX uses owner-only modes and flock; Windows uses an owner-only ACL and native file locks, and rejects reparse points. These artifacts have expiry and capacity limits; they are not encrypted storage or a user account boundary.
+Birth information may appear in responses, client histories and calculation logs. FateBridge does not persist a historical run database on disk; all calculation results are returned directly in the response payload.
 
-Treat exported JSON, snapshots, result references and logs as potentially sensitive. Use fictional examples in Issues and PRs, redact diagnostics before sharing them, and apply your deployment's file-access and retention policies. The [Agent guide](docs/agent-guide.md#完整结果交付与同次导出) explains how full-result artifacts are read and verified.
+Treat exported JSON and logs as potentially sensitive. Use fictional examples in Issues and PRs, redact diagnostics before sharing them, and apply your deployment's log-retention and access policies. The [Agent guide](docs/agent-guide.md#输出控制与结果读取) explains how output detail levels and strict field projection work.

@@ -123,35 +123,3 @@ def body_evidence(
             "年纳音同五行、相生及相克均为关系事实，不单独判定完整得体、合理、葉否或现实吉凶。",
         ],
     }
-
-
-def body_snapshot(evidence: dict[str, Any]) -> str:
-    lines = [
-        "[年纳音与卦体关系]",
-        f"年柱{evidence['year_ganzhi']}，纳音{evidence['nayin']}；按实际上下体和两互体分列。",
-    ]
-    labels = {
-        "same_element": "同五行",
-        "body_generates_nayin": "卦体生纳音",
-        "nayin_generates_body": "纳音生卦体",
-        "body_controls_nayin": "卦体克纳音",
-        "nayin_controls_body": "纳音克卦体",
-    }
-    kinds = {
-        "lower": "下体",
-        "lower_nuclear": "下互体",
-        "upper_nuclear": "上互体",
-        "upper": "上体",
-    }
-    for row in evidence["bodies"]:
-        lines.append(
-            f"{row['gua']}·{kinds[row['kind']]}{row['trigram']}{row['element']}：{labels[row['relation']]}。"
-        )
-    qi = evidence["generating_qi"]
-    lines.append(
-        f"第51页无元气且卦体生纳音条件：{'匹配' if qi['condition_match'] else '未匹配'}；无元气前提{'成立' if evidence['yuanqi_absent'] else '不成立'}。"
-    )
-    lines.append(
-        "第87页双向相生另列，不能反向套用第51页规则；完整得体、合理与葉否尚未裁定。"
-    )
-    return "\n".join(lines)

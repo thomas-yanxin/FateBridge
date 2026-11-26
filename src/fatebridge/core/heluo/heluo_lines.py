@@ -135,32 +135,3 @@ def line_conditions(chart: dict[str, Any]) -> dict[str, Any]:
             "yuanTang.youYing只表示先天元堂与应爻阴阳相反；反向相应不等同本段主本有援原句命中，未中原句不推出无援或现实孤立。",
         ],
     }
-
-
-def line_snapshot(evidence: dict[str, Any]) -> str:
-    lines = [
-        "[爻位条文条件]",
-        "原文爻位次序：五、二、三四、初上；仅为位序，不是综合吉凶评分。",
-    ]
-    for row in evidence["phases"]:
-        phase = "先天" if row["phase"] == "xian" else "后天"
-        z = row["zhongzong"]
-        minority = (
-            f"唯一异爻在{z['minority_pos']}位"
-            if z["minority_pos"]
-            else "无五同一异结构"
-        )
-        lines.append(
-            f"{phase}·{row['gua']}元堂{row['pos']}位：二五君臣位{'匹配' if row['ruler_minister_seat']['match'] else '未匹配'}；"
-            f"{z['yang_count']}阳{z['yin_count']}阴，{minority}，众宗式{'匹配' if z['match'] else '未匹配'}。"
-        )
-        aid = row["source_youyuan"]
-        lines.append(
-            f"{phase}有援原句（主本阴爻读法）：元堂{aid['selected_pos']}位{'阳' if aid['selected_yang'] else '阴'}，"
-            f"应爻{aid['corresponding_pos']}位{'阳' if aid['corresponding_yang'] else '阴'}；"
-            f"阴元堂、阳应爻式{'匹配' if aid['clause_match'] else '未匹配'}。"
-        )
-    lines.append(
-        "原典当位的阴月口径未定；位序阴阳比较不代替此条。上述正面条件未匹配，不推出反面断语；十体综合未裁定。"
-    )
-    return "\n".join(lines)

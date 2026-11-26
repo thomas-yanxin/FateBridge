@@ -12,7 +12,7 @@
 | 支持 URL 的客户端、远程机器 | Streamable HTTP | 你或服务管理器 | `http://127.0.0.1:8011/mcp`，远程可通过 SSH 隧道 |
 | 普通应用 HTTP 调用 | REST，见[快速入门](getting-started.md) | 你或服务管理器 | `http://127.0.0.1:8010/api/...` |
 
-`fatebridge-mcp` 运行 stdio，HTTP 部署加载 `app`。两种入口使用同一套四工具接口和 MCP 资源。REST 独立运行。
+`fatebridge-mcp` 运行 stdio，HTTP 部署加载 `app`。两种入口使用同一套两工具接口（`discover_tools` 与 `run_calculation`），不暴露 MCP 资源。REST 独立运行。
 
 ## 安装与本地验证
 
@@ -38,7 +38,7 @@ uv run --locked --extra dev fatebridge doctor --mcp
 
 源码环境由 `uv.lock` 锁定，默认 Python 3.12。接入配置使用 doctor 返回的 `executable`，例如 `/absolute/path/to/FateBridge/.venv/bin/python`。无需先激活环境，也无需在另一个终端启动 stdio 服务。
 
-两种方式均应检查 `ok=true` 和 `mcp.ok=true`。诊断从无关临时工作目录启动独立进程，执行初始化、工具发现、资源读取与一条虚构计算。失败时查看 `mcp.stage`、`error_type` 和 `server_stderr`，修复后在同一环境重试。
+两种方式均应检查 `ok=true` 和 `mcp.ok=true`。诊断从无关临时工作目录启动独立进程，执行初始化、工具列表检查、`discover_tools` 与一条虚构计算。失败时查看 `mcp.stage`、`error_type` 和 `server_stderr`，修复后在同一环境重试。
 
 ## 注册本地 stdio
 
@@ -134,14 +134,14 @@ uv run --locked --extra dev fatebridge bazi_birth_chart `
   --birth-year 1990 --birth-month 5 --birth-day 15 `
   --birth-hour 10 --birth-minute 30 --gender 男 `
   --birth-place 北京 --birth-timezone Asia/Shanghai `
-  --fields bazi_birth.day_master --strict-fields --no-include-snapshot-text
+  --fields bazi_birth.day_master
 ```
 
 路径必须替换为本次安装的真实路径；`PYTHONUTF8=1` 使子进程使用 UTF-8。
 
 ## 工具筛选与运行环境
 
-默认四个工具覆盖全部公开能力。在客户端的 `env` 中设置 `FATEBRIDGE_MCP_FAMILIES` 可限制能力范围，例如 `"bazi,knowledge"` 或 `"fengshui"`。多个 family 取并集，空值保留全量，错误分类阻止启动。以下命令可验证独立进程：
+默认两个工具（`discover_tools` 与 `run_calculation`）覆盖全部公开能力。在客户端的 `env` 中设置 `FATEBRIDGE_MCP_FAMILIES` 可限制能力范围，例如 `"bazi,knowledge"` 或 `"fengshui"`。多个 family 取并集，空值保留全量，错误分类阻止启动。以下命令可验证独立进程：
 
 ```bash
 uv run --locked --extra dev fatebridge doctor --mcp --family fengshui
@@ -164,7 +164,7 @@ uv run --locked --extra dev fastmcp run src/fatebridge/mcp_server.py:app \
 
 ### 验证协议与计算
 
-在同机另一个终端、仓库根目录运行以下脚本，验证初始化、工具发现、资源读取与计算：
+在同机另一个终端、仓库根目录运行以下脚本，验证初始化、工具发现与计算：
 
 ```bash
 uv run --locked --extra dev python - <<'PY'
@@ -175,7 +175,9 @@ from fastmcp import Client
 async def main():
     async with Client("http://127.0.0.1:8011/mcp", timeout=30) as client:
         tools = await client.list_tools()
-        await client.read_resource("fatebridge://catalog/summary")
+        discovery = await client.call_tool("discover_tools", {"family": "bazi"})
+        if discovery.is_error:
+            raise RuntimeError(discovery.structured_content)
         result = await client.call_tool(
             "run_calculation",
             {
@@ -186,7 +188,6 @@ async def main():
                     "birth_place": "北京", "birth_timezone": "Asia/Shanghai",
                 },
                 "fields": ["bazi_birth.day_master"],
-                "strict_fields": True, "include_snapshot_text": False,
             },
             raise_on_error=False,
         )

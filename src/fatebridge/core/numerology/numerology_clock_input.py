@@ -106,7 +106,5 @@ def require_clock_input_binding(
         ]
         if len(traces) != 1 or traces[0] != clock:
             raise ValueError("Clock trace differs from output")
-        if result["snapshot_text"].count(expected["statement"]) != 1:
-            raise ValueError("Clock input statement differs from receipt")
     except (KeyError, TypeError, ValueError, AttributeError) as exc:
         raise NumerologySourceError("runtime_numerology_clock_input_conflict") from exc

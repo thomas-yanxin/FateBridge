@@ -14,20 +14,19 @@
 uv run --locked --extra dev fatebridge interpret_astrology_dice \
   --planet Mercury --sign Virgo --house 6 \
   --question '虚构示例：合作沟通中应核对什么？' \
-  --fields method_id planet sign house symbolic_details rulesets rule_trace validation \
-  --strict-fields
+  --fields method_id planet sign house symbolic_details rulesets rule_trace validation
 ```
 
 REST 请求示例（字段投影参数放在 URL query）：
 
 ```bash
 curl -sS -X POST \
-  'http://localhost:8010/api/divination/astrology-dice/interpret?fields=method_id&fields=planet&fields=sign&fields=house&fields=symbolic_details&fields=rulesets&fields=rule_trace&fields=validation&strict_fields=true&include_snapshot_text=false' \
+  'http://localhost:8010/api/divination/astrology-dice/interpret?fields=method_id&fields=planet&fields=sign&fields=house&fields=symbolic_details&fields=rulesets&fields=rule_trace&fields=validation' \
   -H 'Content-Type: application/json' \
   -d '{"planet":"Mercury","sign":"Virgo","house":6}'
 ```
 
-如需附加独立天象背景（`chart`），须同时提供公历 `date`、当地民用 `time`、时区 `zone` 及经纬度（`lat`/`lon` 或 `gps_lat`/`gps_lon`）。可选选择器 `tradition`、`hsys`、`zodiacal` 与 `fortune_method`（默认 `sect_reversing`，可选 `ptolemy_iii10`）仅作用于附加天象，不改写骰面符号。
+如需附加独立天象背景（`chart`），须同时提供公历 `date`、当地民用 `time`、时区 `timezone` 及经纬度（`latitude` / `longitude`）。可选选择器 `tradition`、`house_system`、`zodiac_type` 与 `fortune_method`（默认 `sect_reversing`，可选 `ptolemy_iii10`）仅作用于附加天象，不改写骰面符号。
 
 ## 符号规则与传统来源
 

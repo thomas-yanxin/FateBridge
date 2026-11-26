@@ -12,9 +12,12 @@ from fastmcp import Client
 from fatebridge.cli import run
 from fatebridge.core.analytic_solar import MODEL_ID
 from fatebridge.core.fengshui import monthly_time
+from fatebridge.core.fengshui.models import MonthlyRequest
 from fatebridge.core.fengshui.monthly import monthly_position_reading
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services.fengshui import calculate_monthly_stars
+from fatebridge.services.fengshui import (
+    calculate_monthly_stars as _calculate_monthly_stars,
+)
 from tests.support.fengshui_clock import seconds_from_boundary
 from tests.support.fengshui_transports import SPECS
 from tests.support.mcp_result_assertions import (
@@ -22,6 +25,10 @@ from tests.support.mcp_result_assertions import (
     without_transport,
 )
 from tests.support.transports import call_calculation, rest_client
+
+
+def calculate_monthly_stars(**kwargs):
+    return _calculate_monthly_stars(MonthlyRequest.model_validate(kwargs))
 
 
 @pytest.fixture(params=["native", "analytic"])
@@ -192,14 +199,16 @@ def test_actual_rest_mcp_cli_agree_on_candidate_month_intervals(
     async def call():
         async with Client(create_mcp_app()) as client:
             return await call_calculation(
-                client, SPECS[name].tool_name, {"response_char_limit": 0, **inputs}
+                client, SPECS[name].name, {"detail": "audit", **inputs}
             )
 
-    response = rest_client(monkeypatch).post(SPECS[name].rest_path, json=inputs)
+    response = rest_client(monkeypatch).post(
+        SPECS[name].rest_path, json=inputs, params={"detail": "audit"}
+    )
     protocol = asyncio.run(call())
     path = tmp_path / "month.json"
     path.write_text(json.dumps(inputs, ensure_ascii=False))
-    code = run([SPECS[name].tool_name, "--request-file", str(path)])
+    code = run([SPECS[name].name, "--request-file", str(path), "--detail", "audit"])
     cli = json.loads(capsys.readouterr().out)
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     assert (
@@ -256,15 +265,14 @@ def test_default_wire_budget_keeps_selected_candidate_facts(clock, name: str) ->
         async with Client(create_mcp_app()) as client:
             response = await call_calculation(
                 client,
-                SPECS[name].tool_name,
+                SPECS[name].name,
                 {
                     **inputs,
+                    "detail": "audit",
                     "fields": fields,
-                    "strict_fields": True,
-                    "include_snapshot_text": False,
                 },
             )
-            return await same_run_projected_response(client, response)
+            return response.structured_content
 
     original = asyncio.run(call())
     time = original["layers"]["monthly_stars"]["time_context"]

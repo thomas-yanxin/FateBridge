@@ -13,7 +13,7 @@ from pydantic import BaseModel, JsonValue
 
 import fatebridge.api as api_module
 import fatebridge.mcp_server as mcp_module
-from fatebridge.application.execution import execute_tool
+from fatebridge.application.execution import execute_with_receipt
 from fatebridge.cli import run
 from fatebridge.core.schema_cache import model_schema
 from fatebridge.services.tool_catalog import CATALOG
@@ -61,7 +61,6 @@ def assert_public_run_metadata(payload: dict[str, JsonValue]) -> None:
     assert metadata["tool_name"]
     assert metadata["engine"]
     assert metadata["run_id"]
-    assert metadata["trace_id"]
     assert metadata["generated_at"]
 
 
@@ -75,15 +74,7 @@ def test_rest_case_map_covers_all_business_routes() -> None:
         and not route.path.startswith("/docs")
         and not route.path.startswith("/redoc")
     }
-    # Result readers use IDs from prior calculations. Dedicated delivery tests
-    # exercise their live success, authorization and error cases.
-    result_reader_paths = {
-        "/api/results/{result_id}",
-        "/api/results/{result_id}/pages",
-        "/api/results/{result_id}/payload",
-        "/api/results/{result_id}/verified",
-    }
-    expected_paths = set(REST_GET_CASES) | set(REST_POST_CASES) | result_reader_paths
+    expected_paths = set(REST_GET_CASES) | set(REST_POST_CASES)
 
     assert expected_paths == actual_paths
 
@@ -97,10 +88,10 @@ async def test_mcp_case_map_covers_all_discovered_capabilities() -> None:
 def test_renamed_tool_accepts_only_the_public_name_on_all_surfaces(
     rest: TestClient, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    new_path = "/api/divination/gua/meanings"
-    old_path = "/api/cn/gua/meiyi"
-    new_name = "gua_meanings"
-    old_name = "gua_meiyi"
+    new_path = "/api/divination/gua"
+    old_path = "/api/divination/gua/meanings"
+    new_name = "gua_lookup"
+    old_name = "gua_meanings"
     routes_by_path = {
         r.path: r
         for r in api_module.app.routes
@@ -108,11 +99,11 @@ def test_renamed_tool_accepts_only_the_public_name_on_all_surfaces(
     }
     assert routes_by_path[new_path].operation_id == new_name
     assert old_path not in routes_by_path
-    args = {"name": ["111111"]}
+    args = {"queries": ["111111"]}
     http = rest.post(new_path, json=args)
     assert http.status_code == 200
     assert rest.post(old_path, json=args).status_code == 404
-    assert rest.get("/api/tools", params={"tool": old_name}).status_code == 422
+    assert rest.get("/api/tools", params={"tool": old_name}).status_code == 404
 
     async def call_mcp() -> list[dict[str, JsonValue]]:
         results: list[dict[str, JsonValue]] = []
@@ -121,24 +112,29 @@ def test_renamed_tool_accepts_only_the_public_name_on_all_surfaces(
                 names = await discover_capabilities(native)
                 assert new_name in names and old_name not in names
                 for endpoint, params in (
-                    ("describe_capability", {"tool": old_name}),
+                    ("discover_tools", {"tool": old_name}),
                     ("run_calculation", {"tool": old_name, "arguments": args}),
                 ):
                     rejected = await native.call_tool(
                         endpoint, params, raise_on_error=False
                     )
                     assert rejected.is_error
-                    assert rejected.structured_content["error_code"] == "unknown_tool"
+                    assert (
+                        rejected.structured_content["issues"][0]["code"]
+                        == "unknown_tool"
+                    )
                 result = await call_calculation(native, new_name, args)
                 assert result.structured_content is not None
                 results.append(result.structured_content)
         return results
 
-    assert run([old_name, "--name", "111111"]) == 2
+    assert run([old_name, "--queries", "111111"]) == 2
     assert json.loads(capsys.readouterr().out)["error_code"] == "usage_error"
-    assert run(["describe", old_name]) == 2
-    assert json.loads(capsys.readouterr().out)["error_code"] == "unknown_tool"
-    assert run([new_name, "--name", "111111"]) == 0
+    assert run(["discover", old_name]) == 2
+    err = json.loads(capsys.readouterr().out)
+    assert err["error_code"] == "validation_error"
+    assert err["issues"][0]["code"] == "unknown_tool"
+    assert run([new_name, "--queries", "111111", "--detail", "audit"]) == 0
     results = [
         http.json(),
         json.loads(capsys.readouterr().out),
@@ -171,7 +167,7 @@ def test_rest_rejects_retired_nested_relationship_payload(rest: TestClient) -> N
 def test_rest_health_endpoints_return_expected_contract(rest: TestClient) -> None:
     for path, assertion in REST_GET_CASES.items():
         response = rest.get(
-            path, params={"detail": "index"} if path == "/api/tools" else None
+            path, params={"detail": "summary"} if path == "/api/tools" else None
         )
         assert response.status_code == 200
         if path == "/metrics":
@@ -231,9 +227,9 @@ async def test_fastmcp_client_accepts_all_representative_payloads(
 def mcp_output_models() -> dict[str, type[BaseModel]]:
     # note (contracts): The schema publication test checks the same canonical models once.
     return {
-        spec.tool_name: spec.output_model
+        spec.name: spec.output_model
         for spec in CATALOG
-        if spec.mcp_name and spec.output_model is not None
+        if spec.expose_mcp and spec.output_model is not None
     }
 
 
@@ -293,11 +289,11 @@ async def test_all_published_schemas_keep_valid_shared_references() -> None:
         else:
             meta_validator.validate(schema)
 
-    by_name = {s.tool_name: s for s in CATALOG if s.mcp_name}
+    by_name = {s.name: s for s in CATALOG if s.expose_mcp}
     representatives = (
         "bazi_birth_chart",
         "astrology_chart",
-        "gua_meanings",
+        "gua_lookup",
         "fengshui_xuankong_house_chart",
         "ziwei_birth_chart",
     )
@@ -337,25 +333,19 @@ def test_rest_reserved_field_guard_rejects_clashing_model() -> None:
     class ConflictingRequest(BaseModel):
         fields: str = ""
 
-    catalog_spec = next(spec for spec in CATALOG if spec.tool_name == "gua_meanings")
+    catalog_spec = next(spec for spec in CATALOG if spec.name == "gua_lookup")
     spec = replace(catalog_spec, request_model=ConflictingRequest)
 
     app = FastAPI()
     existing_routes = list(app.routes)
     with pytest.raises(ValueError, match="reserved"):
-        register_rest(app, [spec], execute_service=execute_tool)
+        register_rest(app, [spec], execute_service=execute_with_receipt)
     assert app.routes == existing_routes
 
 
 @pytest.mark.parametrize(
     ("spec_key", "arguments", "field", "expected"),
     [
-        (
-            "export_registry",
-            {"technique": "generic"},
-            "selected_technique.key",
-            {"key": "generic"},
-        ),
         ("knowledge_read", {"domain": "qimen", "key": "休门"}, "category", "door"),
     ],
 )
@@ -373,8 +363,6 @@ def test_reference_helpers_share_strict_projection_and_clock(
         projection={
             "detail": "audit",
             "fields": [field],
-            "strict_fields": True,
-            "response_char_limit": 0,
         },
         rest_as_of=AS_OF,
     )
@@ -387,5 +375,5 @@ def test_reference_helpers_share_strict_projection_and_clock(
     for result in (response.json(), protocol.structured_content, cli):
         assert canonical_json(result) == canonical_json(cli)
         assert_public_run_metadata(result)
-        assert result["run_metadata"]["tool_name"] == spec.tool_name
+        assert result["run_metadata"]["tool_name"] == spec.name
         assert result["run_metadata"]["effective_time"]["as_of"] == AS_OF

@@ -46,9 +46,6 @@ def test_calculate_ziwei_birth_returns_twelve_palaces() -> None:
         "紫微" in "、".join(palace["stars"])
         for palace in result["ziwei_birth"]["palaces"]
     )
-    assert "[起盘信息]" in result["snapshot_text"]
-    assert "[宫位总览]" in result["snapshot_text"]
-    assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
     palaces = result["ziwei_birth"]["palaces"]
 
@@ -76,36 +73,6 @@ def test_calculate_ziwei_birth_returns_twelve_palaces() -> None:
             else:
                 pass
 
-    snapshot = result["snapshot_text"]
-
-    # brightness must render as `star(brightness)` — a brightness char in
-    # parentheses immediately after a star name (e.g. "紫微(庙)", "廉贞化禄(利)"),
-    # not merely somewhere in the text.
-    assert re.search(r"[一-鿿]+\([庙旺得利平不陷]\)", snapshot)
-
-
-def test_calculate_ziwei_birth_supports_selected_export_sections() -> None:
-    person = create_person_info(
-        birth_year=1994,
-        birth_month=8,
-        birth_day=23,
-        birth_hour=14,
-        name="张三",
-        gender="男",
-        birth_place="上海",
-        birth_minute=30,
-        birth_timezone="Asia/Shanghai",
-    )
-
-    result = calculate_ziwei_birth(
-        person,
-        selected_sections=["宫位总览"],
-    )
-
-    assert result["snapshot_export"]["selected_sections"] == ["宫位总览"]
-    assert "[宫位总览]" in result["snapshot_export"]["export_text"]
-    assert "[起盘信息]" not in result["snapshot_export"]["export_text"]
-
 
 def test_calculate_ziwei_rules_supports_year_stem_filter() -> None:
     result = calculate_ziwei_rules(year_stem="甲")
@@ -121,25 +88,6 @@ def test_calculate_ziwei_rules_supports_year_stem_filter() -> None:
         "化忌",
     }
     assert "palace_sequence" in result["rule_catalogue"]
-    assert "[规则概览]" in result["snapshot_text"]
-    assert "[四化总表]" in result["snapshot_text"]
-    assert "[当前天干四化]" in result["snapshot_text"]
-    assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
-
-
-def test_calculate_ziwei_rules_supports_selected_export_sections() -> None:
-    result = calculate_ziwei_rules(
-        year_stem="甲",
-        selected_sections=["规则概览", "当前天干四化"],
-    )
-
-    assert result["snapshot_export"]["selected_sections"] == [
-        "规则概览",
-        "当前天干四化",
-    ]
-    assert "[规则概览]" in result["snapshot_export"]["export_text"]
-    assert "[当前天干四化]" in result["snapshot_export"]["export_text"]
-    assert "[四化总表]" not in result["snapshot_export"]["export_text"]
 
 
 def test_calculate_liureng_gods_returns_core_sections() -> None:
@@ -163,9 +111,6 @@ def test_calculate_liureng_gods_returns_core_sections() -> None:
     assert result["liureng"]["three_transmissions"]["initial"]["branch"]
     assert result["liureng"]["overview"]
     assert "空" in result["liureng"]["kongwang"]
-    assert "[四课]" in result["snapshot_text"]
-    assert "[三传]" in result["snapshot_text"]
-    assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 
 def test_calculate_liureng_runyear_uses_birth_context() -> None:
@@ -198,8 +143,6 @@ def test_calculate_liureng_runyear_uses_birth_context() -> None:
     assert result["runyear"]["age"] > 0
     assert len(result["runyear"]["ganzhi"]) == 2
     assert result["liureng"]["three_transmissions"]["initial"]["branch"]
-    assert "[行年]" in result["snapshot_text"]
-    assert result["runyear"]["ganzhi"] in result["snapshot_text"]
 
 
 def test_liureng_runyear_independent_of_birth_pillars(
@@ -442,11 +385,6 @@ def test_calculate_qimen_analysis_returns_nine_palaces() -> None:
         result["qimen"]["palaces"][0]["content_trigram"]
         == result["qimen"]["palaces"][0]["trigram"]
     )
-    assert "[八宫详解]" in result["snapshot_text"]
-    assert "[九宫方盘]" in result["snapshot_text"]
-    assert "[奇门演卦]" in result["snapshot_text"]
-    assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
-    assert "离九宫" in result["snapshot_export"]["section_titles_detected"]
 
     assert result["analysis_context"]["time_algorithm"] == "真太阳时"
     assert result["analysis_context"]["corrected_datetime"].startswith(
@@ -496,10 +434,9 @@ def test_calculate_qimen_analysis_returns_nine_palaces() -> None:
     )
     assert zhifu_palace["star"] == result["qimen"]["zhifu"]["star"]
     assert zhishi_palace["door"] == result["qimen"]["zhishi"]["door"]
-    assert "值符：天芮在坤二宫" in result["snapshot_text"]
 
 
-def test_calculate_qimen_analysis_applies_qimen_options_and_snapshot_text() -> None:
+def test_calculate_qimen_analysis_applies_qimen_options() -> None:
     default_result = calculate_qimen_analysis(
         analysis_year=2028,
         analysis_month=4,
@@ -524,33 +461,6 @@ def test_calculate_qimen_analysis_applies_qimen_options_and_snapshot_text() -> N
     assert optioned_result["qimen"]["ju_term"] == "清明"
     assert optioned_result["qimen"]["ju_number"] == 7
     assert default_result["qimen"]["ju_number"] == 6
-    assert optioned_result["snapshot_text"] != default_result["snapshot_text"]
-    assert "[九宫方盘]" in optioned_result["snapshot_text"]
-    assert "定局所用节气：清明" in optioned_result["snapshot_text"]
-
-
-def test_calculate_qimen_analysis_supports_selected_export_sections() -> None:
-    result = calculate_qimen_analysis(
-        analysis_year=2028,
-        analysis_month=4,
-        analysis_day=6,
-        analysis_hour=9,
-        analysis_minute=33,
-        analysis_timezone="Asia/Shanghai",
-        analysis_longitude=121.4737,
-        selected_sections=["起盘信息", "九宫方盘", "离九宫"],
-    )
-
-    assert "[八宫详解]" in result["snapshot_text"]
-    assert result["snapshot_export"]["selected_sections"] == [
-        "起盘信息",
-        "九宫方盘",
-        "离九宫",
-    ]
-    assert "[起盘信息]" in result["snapshot_export"]["export_text"]
-    assert "[九宫方盘]" in result["snapshot_export"]["export_text"]
-    assert "[离九宫]" in result["snapshot_export"]["export_text"]
-    assert "[八宫详解]" not in result["snapshot_export"]["export_text"]
 
 
 def test_calculate_taiyi_analysis_returns_sixteen_palaces() -> None:
@@ -576,52 +486,6 @@ def test_calculate_taiyi_analysis_returns_sixteen_palaces() -> None:
     assert result["taiyi"]["core_board"]["main_calculation"] == "陽遁五十五局"
     assert result["taiyi"]["core_board"]["kook_number"] == 55
     assert result["taiyi"]["core_board"]["shiji"] == "艮"
-    assert "[太乙盘]" in result["snapshot_text"]
-    assert "[十六宫标记]" in result["snapshot_text"]
-    assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
-
-
-def test_calculate_liureng_gods_supports_selected_export_sections() -> None:
-    result = calculate_liureng_gods(
-        analysis_year=2026,
-        analysis_month=4,
-        analysis_day=4,
-        analysis_hour=21,
-        analysis_minute=18,
-        analysis_timezone="Asia/Shanghai",
-        analysis_longitude=121.4737,
-        gender="男",
-        selected_sections=["起盘信息", "三传", "概览"],
-    )
-
-    assert result["snapshot_export"]["selected_sections"] == [
-        "起盘信息",
-        "三传",
-        "概览",
-    ]
-    assert "[起盘信息]" in result["snapshot_export"]["export_text"]
-    assert "[三传]" in result["snapshot_export"]["export_text"]
-    assert "[概览]" in result["snapshot_export"]["export_text"]
-    assert "[四课]" not in result["snapshot_export"]["export_text"]
-
-
-def test_calculate_taiyi_analysis_supports_selected_export_sections() -> None:
-    result = calculate_taiyi_analysis(
-        analysis_year=2026,
-        analysis_month=4,
-        analysis_day=4,
-        analysis_hour=21,
-        analysis_minute=18,
-        analysis_timezone="Asia/Shanghai",
-        analysis_longitude=121.4737,
-        gender="男",
-        selected_sections=["起盘信息", "十六宫标记"],
-    )
-
-    assert result["snapshot_export"]["selected_sections"] == ["起盘信息", "十六宫标记"]
-    assert "[起盘信息]" in result["snapshot_export"]["export_text"]
-    assert "[十六宫标记]" in result["snapshot_export"]["export_text"]
-    assert "[太乙盘]" not in result["snapshot_export"]["export_text"]
 
 
 def test_calculate_jinkou_analysis_returns_four_positions() -> None:
@@ -658,10 +522,6 @@ def test_calculate_jinkou_analysis_returns_four_positions() -> None:
     assert result["jinkou"]["overview"]["yuejiang"]["name"]
     assert result["jinkou"]["overview"]["guishen"]["name"]
     assert result["jinkou"]["shensha"]
-    assert "[金口诀速览]" in result["snapshot_text"]
-    assert "[金口诀四位]" in result["snapshot_text"]
-    assert "[四位神煞]" in result["snapshot_text"]
-    assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 
 def test_calculate_jinkou_analysis_does_not_borrow_liureng_transmission_rule() -> None:
@@ -686,27 +546,7 @@ def test_calculate_jinkou_analysis_does_not_borrow_liureng_transmission_rule() -
     )
 
 
-def test_calculate_jinkou_analysis_supports_selected_export_sections() -> None:
-    result = calculate_jinkou_analysis(
-        analysis_year=2026,
-        analysis_month=4,
-        analysis_day=4,
-        analysis_hour=21,
-        analysis_minute=18,
-        analysis_timezone="Asia/Shanghai",
-        analysis_longitude=121.4737,
-        gender="男",
-        di_fen="酉",
-        selected_sections=["起盘信息", "金口诀四位"],
-    )
-
-    assert result["snapshot_export"]["selected_sections"] == ["起盘信息", "金口诀四位"]
-    assert "[起盘信息]" in result["snapshot_export"]["export_text"]
-    assert "[金口诀四位]" in result["snapshot_export"]["export_text"]
-    assert "[四位神煞]" not in result["snapshot_export"]["export_text"]
-
-
-def test_ziwei_horoscope_request_requires_target_datetime() -> None:
+def test_ziwei_horoscope_request_requires_analysis_datetime() -> None:
     from fatebridge.core.requests.metaphysics import ZiweiHoroscopeRequest
 
     req = ZiweiHoroscopeRequest(
@@ -715,22 +555,22 @@ def test_ziwei_horoscope_request_requires_target_datetime() -> None:
         birth_month=8,
         birth_day=23,
         birth_hour=14,
-        target_year=2026,
-        target_month=6,
-        target_day=19,
-        target_hour=14,
+        analysis_year=2026,
+        analysis_month=6,
+        analysis_day=19,
+        analysis_hour=14,
     )
     payload = req.model_dump()
-    assert payload["target_year"] == 2026
-    assert payload["target_month"] == 6
-    assert payload["target_day"] == 19
-    assert payload["target_hour"] == 14
+    assert payload["analysis_year"] == 2026
+    assert payload["analysis_month"] == 6
+    assert payload["analysis_day"] == 19
+    assert payload["analysis_hour"] == 14
 
     import pytest as _pytest
     from pydantic import ValidationError
 
     with _pytest.raises(ValidationError):
-        ZiweiHoroscopeRequest(  # missing target_* → invalid
+        ZiweiHoroscopeRequest(  # missing analysis_* → invalid
             gender="男",
             birth_year=1994,
             birth_month=8,
@@ -739,7 +579,7 @@ def test_ziwei_horoscope_request_requires_target_datetime() -> None:
         )
 
 
-def test_calculate_ziwei_horoscope_returns_six_scopes_and_snapshot() -> None:
+def test_calculate_ziwei_horoscope_returns_six_scopes() -> None:
     from fatebridge.services.metaphysics import calculate_ziwei_horoscope
 
     person = create_person_info(
@@ -751,10 +591,10 @@ def test_calculate_ziwei_horoscope_returns_six_scopes_and_snapshot() -> None:
     )
     result = calculate_ziwei_horoscope(
         person,
-        target_year=2026,
-        target_month=6,
-        target_day=19,
-        target_hour=14,
+        analysis_year=2026,
+        analysis_month=6,
+        analysis_day=19,
+        analysis_hour=14,
     )
     assert result["analysis_type"] == "紫微斗数运限"
     h = result["ziwei_horoscope"]
@@ -768,36 +608,10 @@ def test_calculate_ziwei_horoscope_returns_six_scopes_and_snapshot() -> None:
         "流日",
         "流时",
     }
-    assert "[起盘信息]" in result["snapshot_text"]
-    assert "[流年]" in result["snapshot_text"]
-    assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
-
-
-def test_calculate_ziwei_horoscope_supports_selected_sections() -> None:
-    from fatebridge.services.metaphysics import calculate_ziwei_horoscope
-
-    person = create_person_info(
-        birth_year=1994,
-        birth_month=8,
-        birth_day=23,
-        birth_hour=14,
-        gender="男",
-    )
-    result = calculate_ziwei_horoscope(
-        person,
-        target_year=2026,
-        target_month=6,
-        target_day=19,
-        target_hour=14,
-        selected_sections=["流年"],
-    )
-    assert result["snapshot_export"]["selected_sections"] == ["流年"]
-    assert "[流年]" in result["snapshot_export"]["export_text"]
-    assert "[起盘信息]" not in result["snapshot_export"]["export_text"]
 
 
 def test_ziwei_horoscope_registered_on_all_surfaces() -> None:
     from fatebridge.services.tool_catalog import mcp_specs, rest_specs
 
-    assert any(getattr(s, "key", None) == "ziwei_horoscope" for s in rest_specs())
-    assert any(s.tool_name == "ziwei_timing" for s in mcp_specs())
+    assert any(s.name == "ziwei_timing" for s in rest_specs())
+    assert any(s.name == "ziwei_timing" for s in mcp_specs())

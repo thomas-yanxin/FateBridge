@@ -35,7 +35,9 @@ from fatebridge.utils.civil_time import utc_calendar
 from fatebridge.utils.json_values import same_value
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 
-TOOLS = frozenset({"liureng_gods", "liureng_runyear", "jinkou", "sanshiunited"})
+TOOLS = frozenset(
+    {"liuren_chart", "liuren_yearly_timing", "jinkou", "sanshi_combined_chart"}
+)
 MISSING = object()
 
 
@@ -75,22 +77,20 @@ def require_request_binding(
     if key not in TOOLS:
         return
     gender: str | None
-    if key == "sanshiunited":
+    if key == "sanshi_combined_chart":
         assert isinstance(request, SanShiUnitedRequest)
         date_text = _normalize_date_text(request.date)
         time_text = _normalize_time_text(request.time)
-        zone = request.zone or DEFAULT_BIRTH_TIMEZONE
+        zone = request.timezone or DEFAULT_BIRTH_TIMEZONE
         serialized_options = request.model_dump(
             include={"qimen_options", "taiyi_options"}
         )
         normalized = {
             "date": date_text,
             "time": time_text,
-            "zone": zone,
-            "lat": request.lat,
-            "lon": request.lon,
-            "gpsLat": request.gps_lat,
-            "gpsLon": request.gps_lon,
+            "timezone": zone,
+            "latitude": request.latitude,
+            "longitude": request.longitude,
             "qimen_options": serialized_options["qimen_options"] or {},
             "taiyi_options": serialized_options["taiyi_options"] or {},
             "liureng_yue": request.liureng_yue,
@@ -102,10 +102,8 @@ def require_request_binding(
         civil = parse_local_datetime(date_text, time_text, zone, validate_wall=True)
         longitude: float | None
         _, longitude = _resolve_coordinates(
-            lat=request.lat,
-            lon=request.lon,
-            gps_lat=request.gps_lat,
-            gps_lon=request.gps_lon,
+            lat=request.latitude,
+            lon=request.longitude,
         )
         applied_solar = request.use_true_solar_time
         ren_result = _get(result, "subresults.liureng_gods")
@@ -136,7 +134,7 @@ def require_request_binding(
             request.use_true_solar_time
             and longitude is None
             and (
-                key == "liureng_runyear"
+                key == "liuren_yearly_timing"
                 or "use_true_solar_time" in request.model_fields_set
             )
         ):
@@ -235,7 +233,7 @@ def require_request_binding(
                 _mapping(child, policy, "calendar_policy.")
                 _mapping(child, diurnal, "overview.diurnal_evidence.")
                 _gender(child, "overview.gender", gender)
-    elif key == "liureng_runyear":
+    elif key == "liuren_yearly_timing":
         assert isinstance(request, LiuRengRunyearRequest)
         person = _build_person(
             request.model_dump(),

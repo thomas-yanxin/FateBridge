@@ -338,13 +338,11 @@
       "taiyi.extra_palace_marks",
       "taiyi.ruleset",
       "taiyi.long_cycle_summary"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,
-    "description": "Request model for Taiyi analysis.\n\n太乙 does NOT take 奇门's qimen_options (layout/palaceShift) — it used to\ninherit QimenAnalysisRequest purely to reuse the date/time fields, which\nleaked qimen_options onto the 太乙 schema where it is meaningless. The\nfields below are exactly what calculate_taiyi_analysis consumes.",
+    "description": "Request model for Taiyi analysis.",
     "properties": {
       "analysis_day": {
         "description": "Analysis day (1-31)",
@@ -392,7 +390,7 @@
       },
       "analysis_second": {
         "default": 0,
-        "description": "起盘秒数，用于节气实刻边界；不是秒级预测精度。",
+        "description": "Analysis second (0-59)",
         "maximum": 59,
         "minimum": 0,
         "title": "Analysis Second",
@@ -421,7 +419,7 @@
           }
         ],
         "default": null,
-        "description": "明确的输入民用UTC偏移，格式±HH:MM或±HH:MM:SS；与analysis_timezone在该钟时联合核对，用于选择夏令时回拨中的一次，不替换命名时区。省略仍拒绝重复钟时；不存在的钟时及与时区不符的偏移均拒绝。不能按盘面结果猜选偏移。",
+        "description": "已确认的民用 UTC 偏移，格式 ±HH:MM 或 ±HH:MM:SS，用于消歧重复钟时。",
         "title": "Analysis Utc Offset"
       },
       "analysis_year": {
@@ -487,14 +485,6 @@
         "default": null,
         "description": "仅month：省略为jinjing_month_jie_360_v1；key_month_tianzheng_jie_v1采用金钥匙完年乘十二、加天地二正和本月名义序，仍以现代节月为界，非完整古历月界；源文门数冲突保留，不按吉凶择法。",
         "title": "Month Profile"
-      },
-      "selected_sections": {
-        "description": "Optional snapshot section titles for filtered export payload",
-        "items": {
-          "type": "string"
-        },
-        "title": "Selected Sections",
-        "type": "array"
       },
       "shiji_profile": {
         "anyOf": [

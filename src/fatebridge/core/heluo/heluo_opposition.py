@@ -135,22 +135,3 @@ def opposition_evidence(
             "第35页整卦正对／反对图是另一结构层，不以全卦倒序代替年干支的八卦反元气映射。",
         ],
     }
-
-
-def opposition_snapshot(evidence: dict[str, Any]) -> str:
-    lines = ["[元气相反·无正而有反前提]"]
-    for row in evidence["phases"]:
-        label = "先天" if row["phase"] == "xian" else "后天"
-        for condition in row["conditions"]:
-            kind = "天" if condition["kind"] == "tian" else "地"
-            absent = "无" if condition["yuan_absent"] else "有"
-            opposite = "有" if condition["fan_present"] else "无"
-            match = "匹配" if condition["condition_match"] else "未匹配"
-            lines.append(
-                f"{label}·{row['gua']}·{kind}元气{condition['yuan_trigram']}：{absent}正体，"
-                f"{opposite}反候选{condition['fan_trigram']}；无正而有反式{match}。"
-            )
-    lines.append(
-        "各阶段按上下体和两互体分别核对；只取上下体的比较不替换本取法。反中有救与综合葉否未定。"
-    )
-    return "\n".join(lines)

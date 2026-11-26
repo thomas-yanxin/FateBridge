@@ -5,16 +5,6 @@ from typing import Literal, TypedDict
 
 from pydantic import BaseModel
 
-BAZI_ANALYSIS_CLOCK_TOOLS = frozenset(
-    {
-        "timing_analysis",
-        "dayun_analysis",
-        "liuyue_analysis",
-        "liuri_analysis",
-        "liushi_analysis",
-    }
-)
-
 
 class ReproducibilityManifest(TypedDict):
     deterministic: Literal["conditional", "fixed_input_and_environment"]
@@ -51,50 +41,34 @@ class ReproducibilityPolicy:
             "random_seed_field": self.random_seed_field or None,
             "requires_seed_for_replay": bool(self.random_seed_field),
             "seed_condition": self.seed_condition,
-            "replay_controls": ["as_of", "trace_id", "parent_run_id"],
+            "replay_controls": ["as_of"],
             "scope": "business_payload; excludes run_metadata and output shaping",
             "environment_sensitive": True,
         }
 
 
-def policy_for(key: str, model: type[BaseModel]) -> ReproducibilityPolicy:
-    """Default policies for the current catalog, overridable on new ToolSpecs."""
+def policy_for(
+    model: type[BaseModel], *, has_time_defaults: bool = False
+) -> ReproducibilityPolicy:
+    """Derive reproducibility policy from request field declarations."""
     fields = model.model_fields
-    clock_fields: tuple[str, ...] = ()
     date_fields = ("analysis_year", "analysis_month", "analysis_day")
-    if key in BAZI_ANALYSIS_CLOCK_TOOLS:
-        clock_fields = (*date_fields, "analysis_hour", "analysis_minute")
-    elif (
-        key.startswith("bazi_")
-        or key.startswith("astro_")
-        or key
-        in {
-            "western_timing_analysis",
-            "solarreturn",
-            "lunarreturn",
-            "transit",
-            "solararc",
-            "givenyear",
-            "profection",
-            "pd",
-            "pdchart",
-            "zr",
-            "firdaria",
-            "decennials",
-        }
-    ):
+    clock_fields: tuple[str, ...] = ()
+    if has_time_defaults:
         clock_fields = tuple(
-            f for f in date_fields if f in fields and not fields[f].is_required()
+            f
+            for f in (*date_fields, "analysis_hour", "analysis_minute")
+            if f in fields and not fields[f].is_required()
         )
-    elif key == "jieqi_timeline_analysis":
-        clock_fields = ("target_year",)
+    elif all(f in fields and not fields[f].is_required() for f in date_fields):
+        clock_fields = date_fields
+    has_seed = "seed" in fields
     return ReproducibilityPolicy(
         current_time_fields=clock_fields,
-        implicit_current_time=key == "analyze_destiny",
-        random_seed_field="seed" if key == "sixyao" else "",
+        random_seed_field="seed" if has_seed else "",
         seed_condition=(
             "method=coin without coins/lines/binary hexagram codes"
-            if key == "sixyao"
+            if has_seed
             else None
         ),
     )

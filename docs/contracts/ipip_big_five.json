@@ -1,8 +1,9 @@
 {
+  "call_guidance": {
+    "scoring_scope": "Goldberg (1992) 公有领域 50 题大五人格量表：action=list_items 列出题项与计分方向；action=score 对 1-5 分整数作答进行确定性正反向计分、8/10 缺题阈值折算；仅输出客观计分事实与量表出处，不输出百分位、诊断或叙事建议。"
+  },
   "first_view": {
-    "fields": null,
-    "include_snapshot_text": false,
-    "strict_fields": true
+    "fields": null
   },
   "input": {
     "additionalProperties": false,

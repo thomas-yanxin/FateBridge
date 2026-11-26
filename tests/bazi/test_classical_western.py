@@ -284,4 +284,3 @@ def test_chart_exposes_classical_layer() -> None:
         assert classical["planets"]["Pluto"]["essential"] is None
     else:
         pass
-    assert "[古典]" in result["snapshot_text"]

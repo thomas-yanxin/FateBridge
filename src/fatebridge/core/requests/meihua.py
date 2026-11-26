@@ -7,10 +7,9 @@ from pydantic import Field, StrictBool, StrictInt, model_validator
 from fatebridge.core.meihua.meihua_observation import (
     ensure_observation_method_context,
 )
-
-from .base import _DeferredModel
-from .meihua_day_qi import MeihuaDayQiContext
-from .meihua_situational import MeihuaResponseContext
+from fatebridge.core.requests.base import FateBridgeBaseRequest
+from fatebridge.core.requests.meihua_day_qi import MeihuaDayQiContext
+from fatebridge.core.requests.meihua_situational import MeihuaResponseContext
 
 Branch = Literal["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"]
 Trigram = Literal["乾", "兑", "离", "震", "巽", "坎", "艮", "坤"]
@@ -20,7 +19,7 @@ Whole = Annotated[StrictInt, Field(ge=0, le=1_000_000)]
 Tone = Annotated[StrictInt, Field(ge=1, le=4)]
 
 
-class SoundGroups(_DeferredModel):
+class SoundGroups(FateBridgeBaseRequest):
     method: Literal["sound_groups"]
     first_count: Count = Field(description="First actually heard group of sounds")
     second_count: Count = Field(
@@ -33,7 +32,7 @@ class SoundGroups(_DeferredModel):
     )
 
 
-class ObjectCount(_DeferredModel):
+class ObjectCount(FateBridgeBaseRequest):
     method: Literal["object_count"]
     count: Count = Field(
         description="Confirmed quantity of countable objects; no inferred scene count or arbitrary replacement number"
@@ -47,7 +46,7 @@ class ObjectCount(_DeferredModel):
     )
 
 
-class ObservedTrigrams(_DeferredModel):
+class ObservedTrigrams(FateBridgeBaseRequest):
     method: Literal["observed_trigrams"]
     upper_trigram: Trigram = Field(
         description="Confirmed trigram of the observed object/person; do not infer from an unseen scene"
@@ -58,7 +57,7 @@ class ObservedTrigrams(_DeferredModel):
     hour_branch: Branch
 
 
-class ObservedCategories(_DeferredModel):
+class ObservedCategories(FateBridgeBaseRequest):
     method: Literal["observed_categories"]
     subject_category: Literal[
         "elder_person", "young_person", "cow", "chicken", "dry_wood"
@@ -104,7 +103,7 @@ class ObservedCategories(_DeferredModel):
         return self
 
 
-class ZhangChi(_DeferredModel):
+class ZhangChi(FateBridgeBaseRequest):
     method: Literal["length_zhang_chi"]
     zhang: Whole
     chi: Unit
@@ -119,7 +118,7 @@ class ZhangChi(_DeferredModel):
         return self
 
 
-class ChiCun(_DeferredModel):
+class ChiCun(FateBridgeBaseRequest):
     method: Literal["length_chi_cun"]
     chi: Whole
     cun: Unit
@@ -135,7 +134,7 @@ class ChiCun(_DeferredModel):
         return self
 
 
-class MeihuaToneReference(_DeferredModel):
+class MeihuaToneReference(FateBridgeBaseRequest):
     encoding: Literal["ping_shang_qu_ru"] = Field(
         default="ping_shang_qu_ru",
         description="1/2/3/4 mean 平/上/去/入, never Mandarin pinyin tone numbers",
@@ -159,7 +158,7 @@ class MeihuaToneReference(_DeferredModel):
         return self
 
 
-class TextTones(_DeferredModel):
+class TextTones(FateBridgeBaseRequest):
     method: Literal["text_tones"]
     tones: list[Tone] = Field(
         min_length=4,
@@ -184,7 +183,7 @@ class TextTones(_DeferredModel):
         return self
 
 
-class TextStrokes(_DeferredModel):
+class TextStrokes(FateBridgeBaseRequest):
     method: Literal["text_strokes"]
     strokes: list[Count] = Field(
         min_length=2,
@@ -200,7 +199,7 @@ class TextStrokes(_DeferredModel):
         return self
 
 
-class SingleCharacter(_DeferredModel):
+class SingleCharacter(FateBridgeBaseRequest):
     method: Literal["single_character_strokes"]
     script_style: Literal["regular"] = Field(
         description="The original method requires a legible regular-script glyph, not cursive"
@@ -217,7 +216,7 @@ class SingleCharacter(_DeferredModel):
         return self
 
 
-class TextCount(_DeferredModel):
+class TextCount(FateBridgeBaseRequest):
     method: Literal["text_count"]
     character_count: StrictInt = Field(
         ge=11,
@@ -245,7 +244,7 @@ class TextCount(_DeferredModel):
         return self
 
 
-class ExistingCast(_DeferredModel):
+class ExistingCast(FateBridgeBaseRequest):
     method: Literal["existing"]
     hexagram_code: str = Field(
         pattern=r"^[01]{6}$", description="Actual existing cast, bottom line first"
@@ -255,7 +254,7 @@ class ExistingCast(_DeferredModel):
     )
 
 
-class LunarTimeAddedCount(_DeferredModel):
+class LunarTimeAddedCount(FateBridgeBaseRequest):
     method: Literal["lunar_time_added_count"]
     year_branch: Branch = Field(
         description="Confirmed lunar year branch; not a Gregorian year or Li Chun year pillar"
@@ -293,7 +292,7 @@ MeihuaCasting = Annotated[
 ]
 
 
-class MeihuaWeatherContext(_DeferredModel):
+class MeihuaWeatherContext(FateBridgeBaseRequest):
     season: Literal["spring", "summer", "autumn", "winter"] | None = Field(
         default=None,
         description="Confirmed season in the source's weather context; not inferred from a timezone or Gregorian month",
@@ -318,7 +317,7 @@ class MeihuaWeatherContext(_DeferredModel):
     )
 
 
-class MeihuaExternalObservation(_DeferredModel):
+class MeihuaExternalObservation(FateBridgeBaseRequest):
     manifestation: Literal[
         "furnace_flame",
         "candle_flame",
@@ -360,7 +359,7 @@ class MeihuaExternalObservation(_DeferredModel):
         return self
 
 
-class MeihuaObservationContext(_DeferredModel):
+class MeihuaObservationContext(FateBridgeBaseRequest):
     label: str = Field(
         min_length=1,
         max_length=240,
@@ -386,7 +385,7 @@ class MeihuaObservationContext(_DeferredModel):
         return self
 
 
-class MeihuaReputationContext(_DeferredModel):
+class MeihuaReputationContext(FateBridgeBaseRequest):
     label: str = Field(
         min_length=1,
         max_length=240,
@@ -408,7 +407,7 @@ class MeihuaReputationContext(_DeferredModel):
         return self
 
 
-class MeihuaInterpretationOptions(_DeferredModel):
+class MeihuaInterpretationOptions(FateBridgeBaseRequest):
     interpretation_topic: Literal[
         "general",
         "weather",

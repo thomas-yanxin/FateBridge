@@ -37,14 +37,14 @@
     "heluo": {
       "date": "1990-06-15",
       "time": "09:33:00",
-      "zone": "Asia/Shanghai",
+      "timezone": "Asia/Shanghai",
       "gender": "男",
       "use_true_solar_time": false
     },
     "canping": {
       "date": "1990-06-15",
       "time": "09:33:00",
-      "zone": "Asia/Shanghai",
+      "timezone": "Asia/Shanghai",
       "gender": "男",
       "method": "gu",
       "use_true_solar_time": false
@@ -57,20 +57,20 @@
       "analysis_timezone": "Asia/Shanghai",
       "use_true_solar_time": false
     },
-    "sanshiunited": {
+    "sanshi_combined_chart": {
       "date": "2026-04-04",
       "time": "12:00:00",
-      "zone": "Asia/Shanghai",
+      "timezone": "Asia/Shanghai",
       "use_true_solar_time": false
     },
-    "otherbu": {
+    "interpret_astrology_dice": {
       "planet": "Mercury",
       "sign": "Virgo",
       "house": 6,
       "question": "虚构演示：合作沟通中应核对什么？"
     },
-    "analyze_destiny": "demo",
-    "bazi_birth": "demo",
+    "bazi_overview": "demo",
+    "bazi_birth_chart": "demo",
     "bazi_marriage": "demo",
     "bazi_career": "demo",
     "bazi_wealth": "demo",
@@ -80,18 +80,18 @@
     "bazi_personality": "demo",
     "bazi_relatives": "demo",
     "bazi_romance": "demo",
-    "ziwei_birth": "demo",
+    "ziwei_birth_chart": "demo",
     "ziwei_rules": {
       "year_stem": "庚",
       "rule_profile": "quanshu_v2_excerpt"
     },
-    "astro_chart": "demo",
-    "astro_chart13": "demo",
-    "astro_hellen": "demo",
-    "astro_guolao": "demo",
-    "astro_india": "demo",
-    "astro_germany": "demo",
-    "timing_analysis": {
+    "astrology_chart": "demo",
+    "thirteen_sector_chart": "demo",
+    "hellenistic_chart": "demo",
+    "guolao_chart": "demo",
+    "vedic_chart": "demo",
+    "hamburg_midpoint_chart": "demo",
+    "bazi_timing": {
       "name": "演示甲",
       "gender": "男",
       "birth_year": 1990,
@@ -107,7 +107,7 @@
       "analysis_month": 10,
       "analysis_day": 12
     },
-    "liunian_analysis": {
+    "bazi_yearly_timing": {
       "name": "演示甲",
       "gender": "男",
       "birth_year": 1990,
@@ -119,9 +119,9 @@
       "birth_place": "北京",
       "birth_longitude": 116.4074,
       "birth_latitude": 39.9042,
-      "target_year": 2026
+      "analysis_year": 2026
     },
-    "meihua_analysis": {
+    "meihua_time_cast": {
       "analysis_year": 2026,
       "analysis_month": 10,
       "analysis_day": 12,
@@ -140,18 +140,20 @@
       "analysis_longitude": 116.4074
     },
     "gua_lookup": {
-      "query": "111111",
-      "lookup_mode": "hexagram"
+      "queries": [
+        "乾"
+      ],
+      "lookup_mode": "auto"
     },
-    "sixyao": {
+    "liuyao": {
       "date": "2026-10-12",
       "time": "12:00:00",
-      "zone": "+08:00",
-      "lat": "39n54",
-      "lon": "116e24",
+      "timezone": "+08:00",
+      "latitude": "39n54",
+      "longitude": "116e24",
       "seed": 42
     },
-    "knowledge_registry": {
+    "knowledge_catalog": {
       "domain": "bazi"
     },
     "knowledge_read": {
@@ -163,7 +165,7 @@
       "action": "list_items"
     },
     "fengshui_directions": {},
-    "two_person_compatibility": {
+    "bazi_compatibility": {
       "person1_name": "演示甲",
       "person1_gender": "男",
       "person1_birth_year": 1990,
@@ -186,7 +188,7 @@
       "person2_birth_longitude": 116.4074,
       "relationship_type": "general"
     },
-    "astro_relative_chart": {
+    "relationship_chart": {
       "inner_name": "演示甲",
       "inner_birth_year": 1990,
       "inner_birth_month": 5,
@@ -272,7 +274,7 @@
     "fengshui_annual_stars": {
       "effective_year": 2026
     },
-    "fengshui_xuankong_natal": {
+    "fengshui_xuankong_house_chart": {
       "house": {
         "object_id": "home",
         "facing_degrees": 255,
@@ -339,7 +341,7 @@
       "effective_year": 2026,
       "analyze_layout": true
     },
-    "western_timing_analysis": {
+    "western_timing": {
       "name": "演示甲",
       "gender": "男",
       "birth_year": 1990,
@@ -357,7 +359,7 @@
       "analysis_hour": 12,
       "analysis_minute": 0
     },
-    "ziwei_horoscope": {
+    "ziwei_timing": {
       "name": "演示甲",
       "gender": "男",
       "birth_year": 1990,
@@ -369,10 +371,10 @@
       "birth_place": "北京",
       "birth_longitude": 116.4074,
       "birth_latitude": 39.9042,
-      "target_year": 2026,
-      "target_month": 10,
-      "target_day": 12,
-      "target_hour": 12
+      "analysis_year": 2026,
+      "analysis_month": 10,
+      "analysis_day": 12,
+      "analysis_hour": 12
     },
     "firdaria": {
       "name": "演示甲",
@@ -392,7 +394,7 @@
       "analysis_hour": 12,
       "analysis_minute": 0
     },
-    "astro_vimshottari": {
+    "vimshottari_dasha": {
       "name": "演示甲",
       "gender": "男",
       "birth_year": 1990,
@@ -417,13 +419,13 @@
     "suzhan": {
       "date": "2025-03-04",
       "time": "12:00:00",
-      "zone": "+08:00",
-      "lat": "31n13",
-      "lon": "121e28",
+      "timezone": "+08:00",
+      "latitude": "31n13",
+      "longitude": "121e28",
       "natal_mansion": "奎",
       "activity": "marriage"
     },
-    "liureng_gods": {
+    "liuren_chart": {
       "analysis_year": 2026,
       "analysis_month": 4,
       "analysis_day": 4,
@@ -432,7 +434,7 @@
       "analysis_timezone": "Asia/Shanghai",
       "use_true_solar_time": false
     },
-    "liureng_runyear": {
+    "liuren_yearly_timing": {
       "name": "演示甲",
       "gender": "男",
       "birth_year": 1990,
@@ -479,36 +481,36 @@
       },
       "question": "虚构听声起卦示例"
     },
-    "bazi_source_compare": {
+    "compare_bazi_sources": {
       "year_pillar": "甲子",
       "month_pillar": "丙寅",
       "day_pillar": "甲子",
       "hour_pillar": "甲子"
     },
-    "solarreturn": "western_timing_demo",
-    "lunarreturn": "western_timing_demo",
-    "transit": "western_timing_demo",
-    "solararc": "western_timing_demo",
-    "givenyear": "western_timing_demo",
+    "solar_return": "western_timing_demo",
+    "lunar_return": "western_timing_demo",
+    "transit_chart": "western_timing_demo",
+    "solar_arc": "western_timing_demo",
+    "chart_for_year": "western_timing_demo",
     "profection": "western_timing_demo",
-    "pd": "western_timing_demo",
-    "pdchart": "western_timing_demo",
-    "zr": "western_timing_demo",
+    "primary_directions": "western_timing_demo",
+    "primary_directions_chart": "western_timing_demo",
+    "zodiacal_releasing": "western_timing_demo",
     "decennials": "western_timing_demo",
-    "astro_harmonic": "western_timing_demo",
-    "astro_planetary_ages": "western_timing_demo",
-    "astro_triplicity_rulers": "western_timing_demo",
-    "astro_lunation_phase": "western_timing_demo",
-    "astro_distributions": "western_timing_demo",
-    "astro_balbillus": "western_timing_demo",
-    "astro_keypoints": "western_timing_demo",
-    "astro_yearsystem129": "western_timing_demo",
-    "astro_planetaryarc": "western_timing_demo",
-    "astro_persiandirected": "western_timing_demo",
-    "astro_agepoint": "western_timing_demo",
-    "astro_vedicprog": "western_timing_demo",
-    "astro_jaynesprog": "western_timing_demo",
-    "astro_mundane": {
+    "harmonic_chart": "western_timing_demo",
+    "planetary_ages": "western_timing_demo",
+    "triplicity_ruler_periods": "western_timing_demo",
+    "lunar_phase_progressions": "western_timing_demo",
+    "bounds_directions": "western_timing_demo",
+    "balbillus_periods": "western_timing_demo",
+    "numeric_aspect_periods": "western_timing_demo",
+    "planetary_periods_129_years": "western_timing_demo",
+    "planetary_arc_directions": "western_timing_demo",
+    "persian_directions": "western_timing_demo",
+    "age_point": "western_timing_demo",
+    "sidereal_progressions": "western_timing_demo",
+    "declination_progressions": "western_timing_demo",
+    "mundane_ingress_chart": {
       "name": "虚构演示：春分入宫",
       "year": 2026,
       "ingress_term": "春分",
@@ -516,7 +518,7 @@
       "latitude": 39.9042,
       "timezone_name": "Asia/Shanghai"
     },
-    "astro_extrareturns": {
+    "planetary_returns": {
       "name": "演示甲",
       "gender": "男",
       "birth_year": 1990,
@@ -532,7 +534,7 @@
       "analysis_month": 10,
       "analysis_day": 14
     },
-    "astro_horary": {
+    "horary_chart": {
       "name": "虚构演示：问事资料核对",
       "question_year": 2024,
       "question_month": 6,
@@ -544,7 +546,7 @@
       "latitude": 39.9042,
       "category": "general"
     },
-    "astro_election": {
+    "evaluate_election_time": {
       "name": "虚构演示：候选时刻核对",
       "candidate_year": 2025,
       "candidate_month": 3,
@@ -555,61 +557,136 @@
       "longitude": 116.4074,
       "latitude": 39.9042,
       "topic_id": "general"
+    },
+    "bazi_luck_cycles": "demo",
+    "bazi_monthly_timing": "demo",
+    "bazi_daily_timing": "demo",
+    "bazi_hourly_timing": "demo",
+    "solar_term_timeline": "demo",
+    "solar_terms_for_year": {
+      "year": 2026
+    },
+    "lunar_calendar_time": {
+      "date": "2026-04-01",
+      "time": "09:00:00",
+      "timezone": "Asia/Shanghai",
+      "time_alg": 1
+    },
+    "combine_four_gua": {
+      "taiyin": "乾",
+      "taiyang": "离",
+      "shaoyang": "震",
+      "shaoyin": "坎"
+    },
+    "fengshui_monthly_stars": {
+      "effective_solar_year": 2026,
+      "solar_month_number": 3
     }
   },
   "compact_fields": {
     "fengshui_minggua": [
-      "status", "layers.minggua", "rulesets", "source_catalog", "rule_trace"
+      "status",
+      "layers.minggua",
+      "rulesets",
+      "source_catalog",
+      "rule_trace"
     ],
     "fengshui_bazhai": [
-      "status", "layers.bazhai", "rulesets", "source_catalog", "rule_trace"
+      "status",
+      "layers.bazhai",
+      "rulesets",
+      "source_catalog",
+      "rule_trace"
     ],
-    "fengshui_xuankong_natal": [
-      "status", "layers.xuankong_natal", "rulesets", "source_catalog", "rule_trace"
+    "fengshui_xuankong_house_chart": [
+      "status",
+      "layers.xuankong_natal",
+      "rulesets",
+      "source_catalog",
+      "rule_trace"
     ],
-    "jieqi_year": ["query_context", "jieqi_year", "selected_jieqi", "warnings", "summary"],
-    "jieqi_timeline_analysis": [
-      "personal_info.name", "personal_info.target_year", "personal_info.birth_datetime",
-      "personal_info.normalized_birth_datetime", "calendar_context.timezone",
-      "jieqi_timeline", "summary"
+    "solar_terms_for_year": [
+      "query_context",
+      "jieqi_year",
+      "selected_jieqi",
+      "warnings",
+      "summary"
     ],
-    "liureng_gods": [
-      "analysis_context", "four_pillars", "liureng.month_general",
-      "liureng.four_lessons", "liureng.three_transmissions", "liureng.classification",
-      "liureng.kongwang", "liureng.xun_head", "liureng.guiren_order",
-      "liureng.meta.guiren_profile", "liureng.meta.is_diurnal",
-      "liureng.meta.diurnal_basis", "liureng.calendar_policy.mode",
-      "liureng.calendar_policy.precision_status", "liureng.ruleset.id",
-      "liureng.ruleset.version", "liureng.ruleset.source_title",
+    "solar_term_timeline": [
+      "personal_info.name",
+      "personal_info.target_year",
+      "personal_info.birth_datetime",
+      "personal_info.normalized_birth_datetime",
+      "calendar_context.timezone",
+      "jieqi_timeline",
+      "summary"
+    ],
+    "liuren_chart": [
+      "analysis_context",
+      "four_pillars",
+      "liureng.month_general",
+      "liureng.four_lessons",
+      "liureng.three_transmissions",
+      "liureng.classification",
+      "liureng.kongwang",
+      "liureng.xun_head",
+      "liureng.guiren_order",
+      "liureng.meta.guiren_profile",
+      "liureng.meta.is_diurnal",
+      "liureng.meta.diurnal_basis",
+      "liureng.calendar_policy.mode",
+      "liureng.calendar_policy.precision_status",
+      "liureng.ruleset.id",
+      "liureng.ruleset.version",
+      "liureng.ruleset.source_title",
       "liureng.ruleset.classical_conformance"
     ],
-    "liureng_runyear": [
-      "analysis_context", "four_pillars", "runyear", "liureng.month_general",
-      "liureng.four_lessons", "liureng.three_transmissions", "liureng.classification",
-      "liureng.kongwang", "liureng.xun_head", "liureng.guiren_order",
-      "liureng.meta.guiren_profile", "liureng.meta.is_diurnal",
-      "liureng.meta.diurnal_basis", "liureng.calendar_policy.mode",
-      "liureng.calendar_policy.precision_status", "liureng.ruleset.id",
-      "liureng.ruleset.version", "liureng.ruleset.source_title",
+    "liuren_yearly_timing": [
+      "analysis_context",
+      "four_pillars",
+      "runyear",
+      "liureng.month_general",
+      "liureng.four_lessons",
+      "liureng.three_transmissions",
+      "liureng.classification",
+      "liureng.kongwang",
+      "liureng.xun_head",
+      "liureng.guiren_order",
+      "liureng.meta.guiren_profile",
+      "liureng.meta.is_diurnal",
+      "liureng.meta.diurnal_basis",
+      "liureng.calendar_policy.mode",
+      "liureng.calendar_policy.precision_status",
+      "liureng.ruleset.id",
+      "liureng.ruleset.version",
+      "liureng.ruleset.source_title",
       "liureng.ruleset.classical_conformance"
     ],
     "jinkou": [
-      "analysis_context", "four_pillars", "jinkou.overview", "jinkou.rows",
-      "jinkou.motions", "jinkou.internal_strength.status",
-      "jinkou.internal_strength.powers", "jinkou.patterns.matched",
-      "jinkou.patterns.evaluation_counts", "jinkou.use_evidence",
-      "jinkou.calendar_policy.mode", "jinkou.calendar_policy.precision_status",
-      "jinkou.ruleset.id", "jinkou.ruleset.version", "jinkou.ruleset.source_title",
+      "analysis_context",
+      "four_pillars",
+      "jinkou.overview",
+      "jinkou.rows",
+      "jinkou.motions",
+      "jinkou.internal_strength.status",
+      "jinkou.internal_strength.powers",
+      "jinkou.patterns.matched",
+      "jinkou.patterns.evaluation_counts",
+      "jinkou.use_evidence",
+      "jinkou.calendar_policy.mode",
+      "jinkou.calendar_policy.precision_status",
+      "jinkou.ruleset.id",
+      "jinkou.ruleset.version",
+      "jinkou.ruleset.source_title",
       "jinkou.ruleset.classical_conformance",
-      "jinkou.natal_course.status", "jinkou.natal_course.natal_branch",
-      "jinkou.natal_course.missing_inputs", "jinkou.year_fate.status",
-      "jinkou.year_fate.ganzhi", "jinkou.year_fate.missing_inputs"
+      "jinkou.natal_course.status",
+      "jinkou.natal_course.natal_branch",
+      "jinkou.natal_course.missing_inputs",
+      "jinkou.year_fate.status",
+      "jinkou.year_fate.ganzhi",
+      "jinkou.year_fate.missing_inputs"
     ],
-    "export_registry": [
-      "source_of_truth", "settings_key", "settings_version", "techniques",
-      "selected_technique"
-    ],
-    "two_person_compatibility": [
+    "bazi_compatibility": [
       "relationship_type",
       "person_info",
       "element_relationship",
@@ -618,19 +695,41 @@
       "cross_chart_relations.pairs",
       "cross_chart_relations.groups"
     ],
-    "dayun_analysis": [
-      "personal_info", "dayun_info", "element_effects", "summary", "analysis_reference"
+    "bazi_luck_cycles": [
+      "personal_info",
+      "dayun_info",
+      "element_effects",
+      "summary",
+      "analysis_reference"
     ],
-    "liunian_analysis": ["personal_info", "liunian_info", "element_effects", "summary"],
-    "liuyue_analysis": [
-      "personal_info", "liuyue_info.pillar", "liuyue_info.stem", "liuyue_info.branch",
-      "liuyue_info.element", "liuyue_info.nayin", "detailed_analysis",
-      "element_effects", "combination_effects", "liunian_info", "summary", "analysis_reference"
+    "bazi_yearly_timing": [
+      "personal_info",
+      "liunian_info",
+      "element_effects",
+      "summary"
     ],
-    "liuri_analysis": [
-      "personal_info", "liuri_info", "element_effects", "summary", "analysis_reference"
+    "bazi_monthly_timing": [
+      "personal_info",
+      "liuyue_info.pillar",
+      "liuyue_info.stem",
+      "liuyue_info.branch",
+      "liuyue_info.element",
+      "liuyue_info.nayin",
+      "detailed_analysis",
+      "element_effects",
+      "combination_effects",
+      "liunian_info",
+      "summary",
+      "analysis_reference"
     ],
-    "liushi_analysis": [
+    "bazi_daily_timing": [
+      "personal_info",
+      "liuri_info",
+      "element_effects",
+      "summary",
+      "analysis_reference"
+    ],
+    "bazi_hourly_timing": [
       "personal_info",
       "liushi_info",
       "detailed_analysis",
@@ -638,64 +737,135 @@
       "summary",
       "analysis_reference"
     ],
-    "nongli_time": [
-      "input_context", "analysis_context", "birth", "nongli", "four_pillars",
-      "yearJieqi", "jieqi", "jiedelta", "monthInt", "dayInt", "leap", "summary"
+    "lunar_calendar_time": [
+      "input_context",
+      "analysis_context",
+      "birth",
+      "nongli",
+      "four_pillars",
+      "yearJieqi",
+      "jieqi",
+      "jiedelta",
+      "monthInt",
+      "dayInt",
+      "leap",
+      "summary"
     ],
     "canping": [
-      "input_normalized", "analysis_context", "four_pillars", "element", "benming",
-      "canping_timing.profile_id", "canping_timing.start_at",
-      "canping_timing.selected", "canping_timing.first_period",
-      "numerology_evidence.rulesets", "numerology_evidence.selected_texts",
-      "numerology_evidence.unresolved_rules", "summary"
+      "input_normalized",
+      "analysis_context",
+      "four_pillars",
+      "element",
+      "benming",
+      "canping_timing.profile_id",
+      "canping_timing.start_at",
+      "canping_timing.selected",
+      "canping_timing.first_period",
+      "numerology_evidence.rulesets",
+      "numerology_evidence.selected_texts",
+      "numerology_evidence.unresolved_rules",
+      "summary"
     ],
     "heluo": [
-      "input_normalized", "analysis_context", "four_pillars", "chart",
-      "solar_term.term", "solar_term.anchor_utc", "solar_term.precision",
-      "judge.assessment_status", "judge.yuanTang", "judge.huagong", "judge.fanhua",
-      "heluo_timing.selected_annual", "heluo_timing.selected_month", "heluo_timing.selected_day",
-      "numerology_evidence.validation_status", "numerology_evidence.unresolved_rules",
+      "input_normalized",
+      "analysis_context",
+      "four_pillars",
+      "chart",
+      "solar_term.term",
+      "solar_term.anchor_utc",
+      "solar_term.precision",
+      "judge.assessment_status",
+      "judge.yuanTang",
+      "judge.huagong",
+      "judge.fanhua",
+      "heluo_timing.selected_annual",
+      "heluo_timing.selected_month",
+      "heluo_timing.selected_day",
+      "numerology_evidence.validation_status",
+      "numerology_evidence.unresolved_rules",
       "summary"
     ],
     "suzhan": [
-      "input_normalized", "sukuyo.personal_day", "sukuyo.day_mansion", "sukuyo.weekday",
-      "sukuyo.lunar_half", "sukuyo.nature", "sukuyo.nature_ruleset",
-      "sukuyo.special_day_labels", "sukuyo.interpretation_scope",
-      "sukuyo.textual_variants", "sukuyo.candidate_mansion_days", "validation", "summary"
+      "input_normalized",
+      "sukuyo.personal_day",
+      "sukuyo.day_mansion",
+      "sukuyo.weekday",
+      "sukuyo.lunar_half",
+      "sukuyo.nature",
+      "sukuyo.nature_ruleset",
+      "sukuyo.special_day_labels",
+      "sukuyo.interpretation_scope",
+      "sukuyo.textual_variants",
+      "sukuyo.candidate_mansion_days",
+      "validation",
+      "summary"
     ],
     "sukuyo_compatibility": [
-      "status", "su27_basis", "person1.name", "person1.natal_su27", "person2.name",
-      "person2.natal_su27", "person1_to_person2", "person2_to_person1", "pair",
-      "candidate_relation_analysis", "rulesets.calendar", "rulesets.relations",
+      "status",
+      "su27_basis",
+      "person1.name",
+      "person1.natal_su27",
+      "person2.name",
+      "person2.natal_su27",
+      "person1_to_person2",
+      "person2_to_person1",
+      "pair",
+      "candidate_relation_analysis",
+      "rulesets.calendar",
+      "rulesets.relations",
       "interpretation_contract"
     ],
-    "otherbu": [
-      "method_id", "planet", "sign", "house", "rulesets", "validation",
-      "symbolic_details.sign_condition", "symbolic_details.house_condition",
+    "interpret_astrology_dice": [
+      "method_id",
+      "planet",
+      "sign",
+      "house",
+      "rulesets",
+      "validation",
+      "symbolic_details.sign_condition",
+      "symbolic_details.house_condition",
       "symbolic_details.triplicity_condition.roles_by_sect",
-      "symbolic_details.planet_sect_condition.natural_sect", "summary"
+      "symbolic_details.planet_sect_condition.natural_sect",
+      "summary"
     ],
     "meihua_cast": [
-      "input_normalized", "meihua.method", "meihua.seed", "meihua.counting_variants",
-      "meihua.base_hexagram.name", "meihua.base_hexagram.symbol",
-      "meihua.changed_hexagram.name", "meihua.changed_hexagram.symbol",
-      "meihua.body_trigram", "meihua.use_trigram", "meihua.body_use_relation",
-      "meihua.stage_relations", "meihua.ruleset.id", "meihua.ruleset.version",
-      "meihua.calendar_policy", "interpretation.classical_text_reference",
+      "input_normalized",
+      "meihua.method",
+      "meihua.seed",
+      "meihua.counting_variants",
+      "meihua.base_hexagram.name",
+      "meihua.base_hexagram.symbol",
+      "meihua.changed_hexagram.name",
+      "meihua.changed_hexagram.symbol",
+      "meihua.body_trigram",
+      "meihua.use_trigram",
+      "meihua.body_use_relation",
+      "meihua.stage_relations",
+      "meihua.ruleset.id",
+      "meihua.ruleset.version",
+      "meihua.calendar_policy",
+      "interpretation.classical_text_reference",
       "interpretation.evidence_scope",
-      "interpretation.interpretation_topic", "interpretation.topic_reading.clause_id",
-      "interpretation.topic_reading.reading", "interpretation.topic_reading.quote",
-      "interpretation.casting_comparison", "summary"
+      "interpretation.interpretation_topic",
+      "interpretation.topic_reading.clause_id",
+      "interpretation.topic_reading.reading",
+      "interpretation.topic_reading.quote",
+      "interpretation.casting_comparison",
+      "summary"
     ],
-    "ziwei_horoscope": [
-      "analysis_context", "birth_context", "ziwei_horoscope.ruleset",
-      "ziwei_horoscope.interpretation_scope", "ziwei_horoscope.nominal_age",
-      "ziwei_horoscope.calendar_rules", "ziwei_horoscope.scopes",
+    "ziwei_timing": [
+      "analysis_context",
+      "birth_context",
+      "ziwei_horoscope.ruleset",
+      "ziwei_horoscope.interpretation_scope",
+      "ziwei_horoscope.nominal_age",
+      "ziwei_horoscope.calendar_rules",
+      "ziwei_horoscope.scopes",
       "ziwei_horoscope.nominal_age_calendar.method_id",
       "ziwei_horoscope.nominal_age_calendar.basis",
       "ziwei_horoscope.nominal_age_calendar.timezone"
     ],
-    "astro_chart13": [
+    "thirteen_sector_chart": [
       "chart_profile.chart_type",
       "chart_profile.zodiac",
       "chart_profile.house_system",
@@ -707,30 +877,62 @@
       "time_sensitivity.uncertainty_minutes",
       "person_info"
     ],
-    "astro_hellen": [
-      "chart_profile.chart_type", "chart_profile.zodiac", "chart_profile.house_system",
-      "chart_profile.ephemeris_model", "angles", "planets", "hellenistic",
-      "classical.sect", "classical.lots", "summary"
+    "hellenistic_chart": [
+      "chart_profile.chart_type",
+      "chart_profile.zodiac",
+      "chart_profile.house_system",
+      "chart_profile.ephemeris_model",
+      "angles",
+      "planets",
+      "hellenistic",
+      "classical.sect",
+      "classical.lots",
+      "summary"
     ],
-    "astro_guolao": [
-      "person_info", "guolao.life_palace", "guolao.conditions", "guolao.moon_mansion",
-      "guolao.planetary_mansions", "guolao.rulesets", "guolao.validation", "summary"
+    "guolao_chart": [
+      "person_info",
+      "guolao.life_palace",
+      "guolao.conditions",
+      "guolao.moon_mansion",
+      "guolao.planetary_mansions",
+      "guolao.rulesets",
+      "guolao.validation",
+      "summary"
     ],
-    "astro_india": [
-      "india.status", "india.ruleset_id", "india.ayanamsha", "india.moon_nakshatra",
-      "india.rising_nakshatra", "india.nakshatras", "india.reading_basis",
-      "india.birth_time_sensitivity", "india.coverage", "india.interpretation_scope",
-      "chart_profile.ephemeris_model", "angles", "planets", "summary"
+    "vedic_chart": [
+      "india.status",
+      "india.ruleset_id",
+      "india.ayanamsha",
+      "india.moon_nakshatra",
+      "india.rising_nakshatra",
+      "india.nakshatras",
+      "india.reading_basis",
+      "india.birth_time_sensitivity",
+      "india.coverage",
+      "india.interpretation_scope",
+      "chart_profile.ephemeris_model",
+      "angles",
+      "planets",
+      "summary"
     ],
-    "astro_vimshottari": [
-      "summary", "analysis_context", "vimshottari.current_major", "vimshottari.current_sub",
-      "vimshottari.birth_balance", "vimshottari.seed", "vimshottari.year_basis",
-      "vimshottari.year_days", "vimshottari.elapsed_time_convention",
-      "vimshottari.birth_time_sensitivity", "vimshottari.timeline_scope",
-      "vimshottari.interpretation_scope", "india.ayanamsha", "india.moon_nakshatra",
+    "vimshottari_dasha": [
+      "summary",
+      "analysis_context",
+      "vimshottari.current_major",
+      "vimshottari.current_sub",
+      "vimshottari.birth_balance",
+      "vimshottari.seed",
+      "vimshottari.year_basis",
+      "vimshottari.year_days",
+      "vimshottari.elapsed_time_convention",
+      "vimshottari.birth_time_sensitivity",
+      "vimshottari.timeline_scope",
+      "vimshottari.interpretation_scope",
+      "india.ayanamsha",
+      "india.moon_nakshatra",
       "india.reading_basis"
     ],
-    "astro_relative_chart": [
+    "relationship_chart": [
       "relationship_profile",
       "summary",
       "synastry_aspects",
@@ -749,73 +951,167 @@
       "marks_charts.outer.angles",
       "marks_charts.outer.planets"
     ],
-    "solarreturn": [
-      "analysis_context", "solarreturn.return_datetime", "solarreturn.return_datetime_utc",
-      "solarreturn.sun", "solarreturn.moon", "solarreturn.ascendant", "solarreturn.medium_coeli",
-      "solarreturn.solver", "solarreturn.calculation_basis.ephemeris_model", "summary"
+    "solar_return": [
+      "analysis_context",
+      "solar_return.return_datetime",
+      "solar_return.return_datetime_utc",
+      "solar_return.sun",
+      "solar_return.moon",
+      "solar_return.ascendant",
+      "solar_return.medium_coeli",
+      "solar_return.solver",
+      "solar_return.calculation_basis.ephemeris_model",
+      "summary"
     ],
-    "lunarreturn": [
-      "analysis_context", "lunarreturn.return_datetime", "lunarreturn.return_datetime_utc",
-      "lunarreturn.sun", "lunarreturn.moon", "lunarreturn.ascendant", "lunarreturn.medium_coeli",
-      "lunarreturn.solver", "lunarreturn.calculation_basis.ephemeris_model", "summary"
+    "lunar_return": [
+      "analysis_context",
+      "lunar_return.return_datetime",
+      "lunar_return.return_datetime_utc",
+      "lunar_return.sun",
+      "lunar_return.moon",
+      "lunar_return.ascendant",
+      "lunar_return.medium_coeli",
+      "lunar_return.solver",
+      "lunar_return.calculation_basis.ephemeris_model",
+      "summary"
     ],
-    "transit": [
-      "analysis_context", "transit.analysis_datetime", "transit.location",
-      "transit.orb_limit", "transit.exact_orb_limit", "transit.calculation_basis.ephemeris_model",
-      "transit.hits", "transit.exact_hits", "transit.house_emphasis", "summary"
+    "transit_chart": [
+      "analysis_context",
+      "transit_chart.analysis_datetime",
+      "transit_chart.location",
+      "transit_chart.orb_limit",
+      "transit_chart.exact_orb_limit",
+      "transit_chart.calculation_basis.ephemeris_model",
+      "transit_chart.hits",
+      "transit_chart.exact_hits",
+      "transit_chart.house_emphasis",
+      "summary"
     ],
-    "solararc": ["analysis_context", "solararc", "summary"],
-    "givenyear": ["analysis_context", "givenyear", "summary"],
-    "profection": ["analysis_context", "profection", "summary"],
-    "pd": [
-      "analysis_context", "pd.method", "pd.time_key", "pd.direction_mode",
-      "pd.coordinate_system", "pd.coordinate_precision", "pd.approximation",
-      "pd.current_age_years", "pd.current_arc_degrees", "pd.exact_window", "summary"
+    "solar_arc": [
+      "analysis_context",
+      "solar_arc",
+      "summary"
     ],
-    "pdchart": [
-      "analysis_context", "pdchart.analysis_datetime", "pdchart.method", "pdchart.time_key",
-      "pdchart.direction_mode", "pdchart.coordinate_system", "pdchart.coordinate_precision",
-      "pdchart.approximation", "pdchart.current_arc_degrees", "pdchart.directed_points",
-      "pdchart.directed_ascendant", "pdchart.directed_medium_coeli", "pdchart.exact_hits", "summary"
+    "chart_for_year": [
+      "analysis_context",
+      "chart_for_year",
+      "summary"
     ],
-    "zr": [
-      "analysis_context", "zr.calculation_basis", "zr.spirit.current_level_1",
-      "zr.spirit.current_level_2", "zr.spirit.current_level_3", "zr.fortune.current_level_1",
-      "zr.fortune.current_level_2", "zr.fortune.current_level_3", "summary"
+    "profection": [
+      "analysis_context",
+      "profection",
+      "summary"
     ],
-    "astro_lunation_phase": [
-      "analysis_context", "lunation_phase.system", "lunation_phase.natal_elongation_degree",
-      "lunation_phase.natal_phase", "lunation_phase.natal_phase_label",
-      "lunation_phase.progression_options", "lunation_phase.max_age_years",
-      "lunation_phase.age_basis", "lunation_phase.solver", "summary"
+    "primary_directions": [
+      "analysis_context",
+      "primary_directions.method",
+      "primary_directions.time_key",
+      "primary_directions.direction_mode",
+      "primary_directions.coordinate_system",
+      "primary_directions.coordinate_precision",
+      "primary_directions.approximation",
+      "primary_directions.current_age_years",
+      "primary_directions.current_arc_degrees",
+      "primary_directions.exact_window",
+      "summary"
     ],
-    "astro_balbillus": [
-      "analysis_context", "balbillus.system", "balbillus.start_planet", "balbillus.mode",
-      "balbillus.max_age_years", "balbillus.reduction_model", "balbillus.zodiacal_order", "summary"
+    "primary_directions_chart": [
+      "analysis_context",
+      "primary_directions_chart.analysis_datetime",
+      "primary_directions_chart.method",
+      "primary_directions_chart.time_key",
+      "primary_directions_chart.direction_mode",
+      "primary_directions_chart.coordinate_system",
+      "primary_directions_chart.coordinate_precision",
+      "primary_directions_chart.approximation",
+      "primary_directions_chart.current_arc_degrees",
+      "primary_directions_chart.directed_points",
+      "primary_directions_chart.directed_ascendant",
+      "primary_directions_chart.directed_medium_coeli",
+      "primary_directions_chart.exact_hits",
+      "summary"
     ],
-    "astro_keypoints": [
-      "analysis_context", "keypoints.system", "keypoints.release_mode",
-      "keypoints.release_sign_index", "keypoints.positions", "summary"
+    "zodiacal_releasing": [
+      "analysis_context",
+      "zodiacal_releasing.calculation_basis",
+      "zodiacal_releasing.spirit.current_level_1",
+      "zodiacal_releasing.spirit.current_level_2",
+      "zodiacal_releasing.spirit.current_level_3",
+      "zodiacal_releasing.fortune.current_level_1",
+      "zodiacal_releasing.fortune.current_level_2",
+      "zodiacal_releasing.fortune.current_level_3",
+      "summary"
     ],
-    "astro_persiandirected": [
-      "analysis_context", "persian_directed.system", "persian_directed.rate_deg_per_year",
-      "persian_directed.max_age_years", "persian_directed.hit_count", "summary"
+    "lunar_phase_progressions": [
+      "analysis_context",
+      "lunation_phase.system",
+      "lunation_phase.natal_elongation_degree",
+      "lunation_phase.natal_phase",
+      "lunation_phase.natal_phase_label",
+      "lunation_phase.progression_options",
+      "lunation_phase.max_age_years",
+      "lunation_phase.age_basis",
+      "lunation_phase.solver",
+      "summary"
     ],
-    "astro_agepoint": [
-      "analysis_context", "age_point.system", "age_point.years_per_house",
-      "age_point.cycle_years", "age_point.max_age_years", "age_point.contacts", "summary"
+    "balbillus_periods": [
+      "analysis_context",
+      "balbillus.system",
+      "balbillus.start_planet",
+      "balbillus.mode",
+      "balbillus.max_age_years",
+      "balbillus.reduction_model",
+      "balbillus.zodiacal_order",
+      "summary"
     ],
-    "astro_mundane": [
-      "analysis_context", "mundane.system", "mundane.ingress_term",
-      "mundane.ingress_datetime_utc", "mundane.ingress_datetime_local", "mundane.ascendant",
-      "mundane.medium_coeli", "mundane.points", "mundane.calculation_basis.ephemeris_model", "summary"
+    "numeric_aspect_periods": [
+      "analysis_context",
+      "keypoints.system",
+      "keypoints.release_mode",
+      "keypoints.release_sign_index",
+      "keypoints.positions",
+      "summary"
     ],
-    "astro_horary": [
-      "analysis_context", "horary.calculation_basis.ephemeris_model",
-      "horary.ascendant", "horary.quesited_house", "horary.significators.querent",
-      "horary.significators.quesited", "horary.perfection.status", "summary"
+    "persian_directions": [
+      "analysis_context",
+      "persian_directed.system",
+      "persian_directed.rate_deg_per_year",
+      "persian_directed.max_age_years",
+      "persian_directed.hit_count",
+      "summary"
     ],
-    "astro_election": [
+    "age_point": [
+      "analysis_context",
+      "age_point.system",
+      "age_point.years_per_house",
+      "age_point.cycle_years",
+      "age_point.max_age_years",
+      "age_point.contacts",
+      "summary"
+    ],
+    "mundane_ingress_chart": [
+      "analysis_context",
+      "mundane.system",
+      "mundane.ingress_term",
+      "mundane.ingress_datetime_utc",
+      "mundane.ingress_datetime_local",
+      "mundane.ascendant",
+      "mundane.medium_coeli",
+      "mundane.points",
+      "mundane.calculation_basis.ephemeris_model",
+      "summary"
+    ],
+    "horary_chart": [
+      "analysis_context",
+      "horary.calculation_basis.ephemeris_model",
+      "horary.ascendant",
+      "horary.quesited_house",
+      "horary.significators.querent",
+      "horary.significators.quesited",
+      "horary.perfection.status",
+      "summary"
+    ],
+    "evaluate_election_time": [
       "analysis_context",
       "election.calculation_basis.ephemeris_model",
       "election.topic_id",
@@ -835,19 +1131,33 @@
       "summary"
     ],
     "fengshui_annual_stars": [
-      "status", "layers.annual_stars.status", "layers.annual_stars.effective_year",
-      "layers.annual_stars.center_star_number", "layers.annual_stars.palaces",
-      "layers.annual_stars.current_period", "layers.annual_stars.missing_inputs",
-      "layers.annual_stars.interpretation_scope", "rulesets", "rule_trace", "coverage"
+      "status",
+      "layers.annual_stars.status",
+      "layers.annual_stars.effective_year",
+      "layers.annual_stars.center_star_number",
+      "layers.annual_stars.palaces",
+      "layers.annual_stars.current_period",
+      "layers.annual_stars.missing_inputs",
+      "layers.annual_stars.interpretation_scope",
+      "rulesets",
+      "rule_trace",
+      "coverage"
     ],
     "fengshui_monthly_stars": [
-      "status", "layers.monthly_stars.status", "layers.monthly_stars.year_branch",
-      "layers.monthly_stars.year_group", "layers.monthly_stars.center_star_number",
-      "layers.monthly_stars.palaces", "layers.monthly_stars.missing_inputs",
-      "layers.monthly_stars.interpretation_scope", "layers.monthly_stars.limitations",
-      "rulesets", "rule_trace", "coverage"
+      "status",
+      "layers.monthly_stars.status",
+      "layers.monthly_stars.year_branch",
+      "layers.monthly_stars.year_group",
+      "layers.monthly_stars.center_star_number",
+      "layers.monthly_stars.palaces",
+      "layers.monthly_stars.missing_inputs",
+      "layers.monthly_stars.interpretation_scope",
+      "layers.monthly_stars.limitations",
+      "rulesets",
+      "rule_trace",
+      "coverage"
     ],
-    "sixyao": [
+    "liuyao": [
       "input_normalized",
       "nongli",
       "current_code",
@@ -866,25 +1176,131 @@
       "liuyao_evidence.sources",
       "classical_text_evidence",
       "summary"
-    ]
-  },
-  "suggested_fields": {
-    "heluo": [
-      "input_normalized",
-      "four_pillars",
-      "chart",
-      "solar_term",
-      "judge",
-      "numerology_evidence"
     ],
-    "canping": [
+    "gua_lookup": [
+      "lookup_mode",
+      "queries",
+      "results",
+      "summary"
+    ],
+    "combine_four_gua": [
+      "analysis_type",
       "input_normalized",
-      "four_pillars",
-      "element",
-      "benming",
-      "canping_timing.profile_id",
-      "canping_timing.schedule_basis",
-      "numerology_evidence"
+      "tongshefa",
+      "summary"
+    ],
+    "knowledge_catalog": [
+      "domains",
+      "source",
+      "provenance"
+    ],
+    "harmonic_chart": [
+      "analysis_context",
+      "harmonic_chart.harmonic",
+      "harmonic_chart.orb",
+      "harmonic_chart.method",
+      "harmonic_chart.positions",
+      "harmonic_chart.resonant_conjunctions",
+      "summary"
+    ],
+    "planetary_ages": [
+      "analysis_context",
+      "planetary_ages.system",
+      "planetary_ages.active_planet",
+      "planetary_ages.current_age_years",
+      "planetary_ages.bands",
+      "summary"
+    ],
+    "triplicity_ruler_periods": [
+      "analysis_context",
+      "triplicity_rulers.system",
+      "triplicity_rulers.division",
+      "triplicity_rulers.element",
+      "triplicity_rulers.sect",
+      "triplicity_rulers.stages",
+      "summary"
+    ],
+    "bounds_directions": [
+      "analysis_context",
+      "distributions.system",
+      "distributions.direction_model",
+      "distributions.time_key",
+      "distributions.max_age_years",
+      "distributions.periods",
+      "summary"
+    ],
+    "planetary_periods_129_years": [
+      "analysis_context",
+      "yearsystem129.system",
+      "yearsystem129.start_planet",
+      "yearsystem129.max_age_years",
+      "yearsystem129.total_cycle_years",
+      "yearsystem129.periods",
+      "summary"
+    ],
+    "planetary_arc_directions": [
+      "analysis_context",
+      "planetary_arc.system",
+      "planetary_arc.progressed_datetime",
+      "planetary_arc.arc_source",
+      "planetary_arc.arc_degrees",
+      "planetary_arc.hits",
+      "summary"
+    ],
+    "sidereal_progressions": [
+      "analysis_context",
+      "vedic_progression.system",
+      "vedic_progression.progressed_datetime",
+      "vedic_progression.zodiac",
+      "vedic_progression.hits",
+      "summary"
+    ],
+    "declination_progressions": [
+      "analysis_context",
+      "jaynes_declination.system",
+      "jaynes_declination.progressed_datetime",
+      "jaynes_declination.orb",
+      "jaynes_declination.parallels",
+      "summary"
+    ],
+    "planetary_returns": [
+      "analysis_context",
+      "extrareturns",
+      "summary"
+    ],
+    "ipip_big_five": [
+      "mode",
+      "scale_id",
+      "domains",
+      "scale_raw_sum",
+      "scale_mean",
+      "items",
+      "provenance",
+      "summary"
+    ],
+    "firdaria": [
+      "analysis_context",
+      "firdaria.current_major",
+      "firdaria.current_sub",
+      "summary"
+    ],
+    "decennials": [
+      "analysis_context",
+      "decennials.resolved_start_planet",
+      "decennials.base_order",
+      "decennials.current_level_1",
+      "decennials.current_level_2",
+      "decennials.current_level_3",
+      "summary"
+    ],
+    "ziwei_rules": [
+      "analysis_type",
+      "engine",
+      "requested_year_stem",
+      "focused_rules",
+      "rule_catalogue.ruleset",
+      "rule_catalogue.sihua_by_year_stem",
+      "rule_catalogue.sihua_source_comparison"
     ],
     "taiyi": [
       "analysis_context",
@@ -898,7 +1314,7 @@
       "taiyi.ruleset",
       "taiyi.long_cycle_summary"
     ],
-    "sanshiunited": [
+    "sanshi_combined_chart": [
       "analysis_context",
       "taiyi.calendar_summary",
       "taiyi.core_board",
@@ -933,17 +1349,7 @@
       "synthesis.time_scopes",
       "synthesis.limitations"
     ],
-    "otherbu": [
-      "method_id",
-      "planet",
-      "sign",
-      "house",
-      "symbolic_details",
-      "rulesets",
-      "rule_trace",
-      "validation"
-    ],
-    "analyze_destiny": [
+    "bazi_overview": [
       "four_pillars",
       "day_master.stem",
       "day_master.element",
@@ -972,7 +1378,7 @@
       "element_distribution_basis",
       "person_info"
     ],
-    "bazi_birth": [
+    "bazi_birth_chart": [
       "bazi_birth.four_pillars",
       "bazi_birth.day_master"
     ],
@@ -980,11 +1386,17 @@
       "career_analysis.evidence_chain.topic.first_view",
       "career_analysis.timing_context"
     ],
-    "timing_analysis": [
-      "personal_info.analysis_datetime", "birth_pillars",
-      "dayun_analysis.current_dayun", "dayun_analysis.start_at", "dayun_analysis.end_at",
-      "dayun_analysis.selection_basis", "liunian_analysis.pillar", "liuyue_analysis.pillar",
-      "liuri_analysis.pillar", "liushi_analysis.pillar",
+    "bazi_timing": [
+      "personal_info.analysis_datetime",
+      "birth_pillars",
+      "dayun_analysis.current_dayun",
+      "dayun_analysis.start_at",
+      "dayun_analysis.end_at",
+      "dayun_analysis.selection_basis",
+      "liunian_analysis.pillar",
+      "liuyue_analysis.pillar",
+      "liuri_analysis.pillar",
+      "liushi_analysis.pillar",
       "analysis_calendar.analysis_date_context.timezone",
       "analysis_calendar.analysis_date_context.current_solar_term.name",
       "analysis_calendar.analysis_date_context.current_solar_term.datetime_with_offset",
@@ -992,7 +1404,7 @@
       "analysis_calendar.analysis_date_context.next_solar_term.datetime_with_offset",
       "analysis_calendar.analysis_date_context.bazi_month_boundary.branch"
     ],
-    "ziwei_birth": [
+    "ziwei_birth_chart": [
       "analysis_context",
       "ziwei_birth.ruleset",
       "ziwei_birth.calendar_rules",
@@ -1006,21 +1418,7 @@
       "ziwei_birth.calendar_cycles.changsheng_rule",
       "ziwei_birth.calendar_cycles.boshi_rule"
     ],
-    "ziwei_horoscope": [
-      "analysis_context",
-      "birth_context",
-      "ziwei_horoscope.ruleset",
-      "ziwei_horoscope.interpretation_scope",
-      "ziwei_horoscope.nominal_age",
-      "ziwei_horoscope.calendar_rules",
-      "ziwei_horoscope.scopes",
-      "ziwei_horoscope.nominal_age_calendar.method_id",
-      "ziwei_horoscope.nominal_age_calendar.basis",
-      "ziwei_horoscope.nominal_age_calendar.timezone",
-      "ziwei_horoscope.nominal_age_calendar.birth_lunar_year",
-      "ziwei_horoscope.nominal_age_calendar.target_lunar_year"
-    ],
-    "astro_chart": [
+    "astrology_chart": [
       "angles",
       "chart_profile.chart_type",
       "chart_profile.zodiac",
@@ -1040,21 +1438,7 @@
       "planets",
       "aspects"
     ],
-    "astro_hellen": [
-      "angles",
-      "chart_profile",
-      "hellenistic"
-    ],
-    "two_person_compatibility": [
-      "relationship_type",
-      "person_info",
-      "element_relationship",
-      "natal_contexts.person1.four_pillars",
-      "natal_contexts.person2.four_pillars",
-      "cross_chart_relations.pairs",
-      "cross_chart_relations.groups"
-    ],
-    "meihua_analysis": [
+    "meihua_time_cast": [
       "analysis_context.analysis_datetime",
       "analysis_context.timezone",
       "analysis_context.civil_utc_offset",
@@ -1081,7 +1465,380 @@
       "interpretation.classical_text_reference",
       "summary"
     ],
-    "sixyao": [
+    "qimen": [
+      "analysis_context",
+      "four_pillars",
+      "qimen.ju_text",
+      "qimen.dun_type",
+      "qimen.xun_head",
+      "qimen.kongwang",
+      "qimen.zhifu",
+      "qimen.zhishi",
+      "qimen.palaces",
+      "qimen.ju_method",
+      "qimen.structure",
+      "qimen.source_disagreements",
+      "qimen.engine"
+    ],
+    "fengshui_directions": [
+      "status",
+      "layers.directions",
+      "coverage",
+      "rulesets",
+      "source_catalog",
+      "rule_trace"
+    ],
+    "knowledge_read": [
+      "title",
+      "lines",
+      "source",
+      "citation"
+    ],
+    "bazi_wealth": [
+      "wealth_analysis.evidence_chain.topic.first_view",
+      "wealth_analysis.timing_context"
+    ],
+    "fengshui_jinsuo": [
+      "status",
+      "layers.jinsuo",
+      "coverage",
+      "rulesets",
+      "source_catalog",
+      "rule_trace"
+    ],
+    "fengshui_assess": [
+      "status",
+      "layout_analysis.status",
+      "layout_analysis.analysis_progress",
+      "layout_analysis.calculation_scope",
+      "layout_analysis.placement_findings",
+      "layout_analysis.form_analysis",
+      "layout_analysis.element_remedies",
+      "layout_analysis.annual_remedies",
+      "layout_analysis.supplement_statuses",
+      "layout_analysis.method_disagreements",
+      "layout_analysis.missing_inputs",
+      "coverage",
+      "rule_trace",
+      "rulesets",
+      "source_catalog"
+    ],
+    "western_timing": [
+      "analysis_context",
+      "summary",
+      "time_lords.firdaria.sect",
+      "time_lords.firdaria.current_major",
+      "time_lords.firdaria.current_sub",
+      "time_lords.annual_profection",
+      "returns.solar_return.return_datetime",
+      "returns.solar_return.return_datetime_utc",
+      "returns.solar_return.sun",
+      "returns.solar_return.moon",
+      "returns.solar_return.ascendant",
+      "returns.solar_return.medium_coeli",
+      "returns.solar_return.solver",
+      "returns.solar_return.calculation_basis.engine_backend",
+      "returns.solar_return.calculation_basis.ephemeris_model",
+      "returns.solar_return.calculation_basis.time_scale",
+      "returns.solar_return.calculation_basis.future_leap_seconds_assumed_unchanged",
+      "transits.current_transit.analysis_datetime",
+      "transits.current_transit.orb_limit",
+      "transits.current_transit.hits"
+    ],
+    "bazi_health": [
+      "health_analysis.evidence_chain.element_presence.all_listed_elements",
+      "health_analysis.evidence_chain.element_presence.absent_from_all_listed",
+      "health_analysis.evidence_chain.seasonal_reference.method_id",
+      "health_analysis.timing_context"
+    ],
+    "bazi_marriage": [
+      "marriage_analysis.evidence_chain.topic.first_view",
+      "marriage_analysis.timing_context"
+    ],
+    "bazi_romance": [
+      "romance_analysis.evidence_chain.topic.first_view",
+      "romance_analysis.timing_context"
+    ],
+    "bazi_education": [
+      "education_analysis.evidence_chain.topic.first_view",
+      "education_analysis.timing_context"
+    ],
+    "bazi_personality": [
+      "personality_analysis.evidence_chain.topic.first_view",
+      "personality_analysis.timing_context"
+    ],
+    "bazi_relatives": [
+      "relatives_analysis.evidence_chain.topic.first_view",
+      "relatives_analysis.timing_context"
+    ],
+    "bazi_children": [
+      "children_analysis.evidence_chain.topic.first_view",
+      "children_analysis.timing_context"
+    ],
+    "hamburg_midpoint_chart": [
+      "summary",
+      "midpoint_analysis.status",
+      "midpoint_analysis.profile",
+      "midpoint_analysis.contact_counts",
+      "midpoint_analysis.reading_guide",
+      "midpoint_analysis.limitations",
+      "midpoint_analysis.original_text_conformance",
+      "midpoint_analysis.interpretations",
+      "midpoint_analysis.time_sensitivity.status",
+      "midpoint_analysis.time_sensitivity.uncertainty_minutes",
+      "midpoint_analysis.unique_two_factor_pair_count",
+      "base_chart.person_info"
+    ],
+    "human_design": [
+      "birth_utc",
+      "design_utc",
+      "calculation_policy.node_mode",
+      "calculation_policy.ephemeris_model",
+      "bodygraph.type",
+      "bodygraph.subtype",
+      "bodygraph.authority",
+      "bodygraph.strategy",
+      "bodygraph.definition",
+      "bodygraph.channels",
+      "profile",
+      "variables.status",
+      "variables.code",
+      "profile_evidence.status",
+      "profile_evidence.lines",
+      "profile_evidence.geometry",
+      "source_consistency.status",
+      "source_consistency.discrepancies",
+      "validation",
+      "source_summary"
+    ],
+    "compare_bazi_sources": [
+      "four_pillars",
+      "input_context",
+      "current_calculation.strength_level",
+      "source_comparison",
+      "summary"
+    ]
+  },
+  "suggested_fields": {
+    "heluo": [
+      "input_normalized",
+      "four_pillars",
+      "chart",
+      "solar_term",
+      "judge",
+      "numerology_evidence"
+    ],
+    "canping": [
+      "input_normalized",
+      "four_pillars",
+      "element",
+      "benming",
+      "canping_timing.profile_id",
+      "canping_timing.schedule_basis",
+      "numerology_evidence"
+    ],
+    "taiyi": [
+      "analysis_context",
+      "taiyi.core_board",
+      "taiyi.calendar_summary",
+      "taiyi.rule_trace",
+      "taiyi.pattern_summary",
+      "taiyi.palace_marks",
+      "taiyi.center_marks",
+      "taiyi.extra_palace_marks",
+      "taiyi.ruleset",
+      "taiyi.long_cycle_summary"
+    ],
+    "sanshi_combined_chart": [
+      "analysis_context",
+      "taiyi.calendar_summary",
+      "taiyi.core_board",
+      "taiyi.pattern_summary",
+      "taiyi.ruleset",
+      "qimen.ju_text",
+      "qimen.zhifu",
+      "qimen.zhishi",
+      "qimen.stem_context.day",
+      "qimen.stem_context.hour",
+      "qimen.stem_context.day_jia_policy_automatically_selected",
+      "qimen.rule_profiles.god.id",
+      "qimen.rule_profiles.god.title",
+      "qimen.rule_profiles.god.variant_note",
+      "qimen.rule_profiles.season.id",
+      "qimen.rule_profiles.season.title",
+      "qimen.rule_profiles.season.variant_note",
+      "qimen.rule_profiles.wonder_tomb.id",
+      "qimen.rule_profiles.wonder_tomb.title",
+      "qimen.rule_profiles.wonder_tomb.variant_note",
+      "qimen.rule_profiles.wonder_tomb.source_priority_resolved",
+      "qimen.rule_profiles.wonder_tomb.whole_book_conformance_established",
+      "synthesis.source_profiles.qimen",
+      "liureng.month_general",
+      "liureng.three_transmissions",
+      "liureng.patterns",
+      "liureng.ruleset.id",
+      "liureng.ruleset.version",
+      "liureng.ruleset.source_title",
+      "liureng.ruleset.classical_conformance",
+      "liureng.ruleset.classical_acceptance_passed",
+      "synthesis.time_scopes",
+      "synthesis.limitations"
+    ],
+    "interpret_astrology_dice": [
+      "method_id",
+      "planet",
+      "sign",
+      "house",
+      "symbolic_details",
+      "rulesets",
+      "rule_trace",
+      "validation"
+    ],
+    "bazi_overview": [
+      "four_pillars",
+      "day_master.stem",
+      "day_master.element",
+      "day_master.polarity",
+      "day_master.strength",
+      "day_master.engineering_index",
+      "day_master.classical_adjudication",
+      "day_master.assessment.method_id",
+      "day_master.assessment.status",
+      "day_master.assessment.support_share",
+      "day_master.assessment.structural_decision",
+      "ten_gods",
+      "structure_profile.resolution_policy",
+      "structure_profile.assessment_status",
+      "structure_profile.dominant_structure",
+      "structure_profile.recognized_structures",
+      "structure_profile.useful_elements",
+      "structure_profile.avoid_elements",
+      "structure_profile.conditional_elements",
+      "structure_profile.neutral_elements",
+      "structure_profile.layers",
+      "structure_profile.conflicts",
+      "structure_profile.decision_basis",
+      "structure_profile.evidence_chain.method_id",
+      "element_distribution",
+      "element_distribution_basis",
+      "person_info"
+    ],
+    "bazi_birth_chart": [
+      "bazi_birth.four_pillars",
+      "bazi_birth.day_master"
+    ],
+    "bazi_career": [
+      "career_analysis.evidence_chain.topic.first_view",
+      "career_analysis.timing_context"
+    ],
+    "bazi_timing": [
+      "personal_info.analysis_datetime",
+      "birth_pillars",
+      "dayun_analysis.current_dayun",
+      "dayun_analysis.start_at",
+      "dayun_analysis.end_at",
+      "dayun_analysis.selection_basis",
+      "liunian_analysis.pillar",
+      "liuyue_analysis.pillar",
+      "liuri_analysis.pillar",
+      "liushi_analysis.pillar",
+      "analysis_calendar.analysis_date_context.timezone",
+      "analysis_calendar.analysis_date_context.current_solar_term.name",
+      "analysis_calendar.analysis_date_context.current_solar_term.datetime_with_offset",
+      "analysis_calendar.analysis_date_context.next_solar_term.name",
+      "analysis_calendar.analysis_date_context.next_solar_term.datetime_with_offset",
+      "analysis_calendar.analysis_date_context.bazi_month_boundary.branch"
+    ],
+    "ziwei_birth_chart": [
+      "analysis_context",
+      "ziwei_birth.ruleset",
+      "ziwei_birth.calendar_rules",
+      "ziwei_birth.ming_gong",
+      "ziwei_birth.shen_gong",
+      "ziwei_birth.reading_view",
+      "ziwei_birth.sihua",
+      "ziwei_birth.chart_masters",
+      "ziwei_birth.wuxing_ju",
+      "ziwei_birth.calendar_cycles.status",
+      "ziwei_birth.calendar_cycles.changsheng_rule",
+      "ziwei_birth.calendar_cycles.boshi_rule"
+    ],
+    "ziwei_timing": [
+      "analysis_context",
+      "birth_context",
+      "ziwei_horoscope.ruleset",
+      "ziwei_horoscope.interpretation_scope",
+      "ziwei_horoscope.nominal_age",
+      "ziwei_horoscope.calendar_rules",
+      "ziwei_horoscope.scopes",
+      "ziwei_horoscope.nominal_age_calendar.method_id",
+      "ziwei_horoscope.nominal_age_calendar.basis",
+      "ziwei_horoscope.nominal_age_calendar.timezone",
+      "ziwei_horoscope.nominal_age_calendar.birth_lunar_year",
+      "ziwei_horoscope.nominal_age_calendar.target_lunar_year"
+    ],
+    "astrology_chart": [
+      "angles",
+      "chart_profile.chart_type",
+      "chart_profile.zodiac",
+      "chart_profile.zodiac_label_zh",
+      "chart_profile.house_system",
+      "chart_profile.house_system_code",
+      "chart_profile.house_system_source",
+      "chart_profile.coordinate_precision",
+      "chart_profile.ephemeris_model",
+      "chart_profile.calendar",
+      "chart_profile.time_scale",
+      "chart_profile.julian_day_tt",
+      "chart_profile.julian_day_ut1",
+      "chart_profile.horizon_method",
+      "chart_profile.angle_method",
+      "chart_profile.sect_convention",
+      "planets",
+      "aspects"
+    ],
+    "hellenistic_chart": [
+      "angles",
+      "chart_profile",
+      "hellenistic"
+    ],
+    "bazi_compatibility": [
+      "relationship_type",
+      "person_info",
+      "element_relationship",
+      "natal_contexts.person1.four_pillars",
+      "natal_contexts.person2.four_pillars",
+      "cross_chart_relations.pairs",
+      "cross_chart_relations.groups"
+    ],
+    "meihua_time_cast": [
+      "analysis_context.analysis_datetime",
+      "analysis_context.timezone",
+      "analysis_context.civil_utc_offset",
+      "analysis_context.civil_instant_utc",
+      "meihua.calendar_policy.day_boundary",
+      "meihua.calendar_policy.true_solar_time_applied",
+      "meihua.calendar_policy.label_precision.status",
+      "meihua.base_hexagram.name",
+      "meihua.base_hexagram.binary_code",
+      "meihua.base_hexagram.symbol",
+      "meihua.mutual_hexagram.name",
+      "meihua.mutual_hexagram.binary_code",
+      "meihua.changed_hexagram.name",
+      "meihua.changed_hexagram.binary_code",
+      "meihua.changed_hexagram.symbol",
+      "meihua.seed.moving_line",
+      "meihua.body_trigram.name",
+      "meihua.use_trigram.name",
+      "meihua.body_use_relation",
+      "meihua.stage_relations",
+      "meihua.ruleset.id",
+      "meihua.ruleset.version",
+      "interpretation.interpretation_topic",
+      "interpretation.classical_text_reference",
+      "summary"
+    ],
+    "liuyao": [
       "input_normalized",
       "nongli",
       "current_hexagram",
@@ -1143,7 +1900,7 @@
       "wealth_analysis.evidence_chain.topic.first_view",
       "wealth_analysis.timing_context"
     ],
-    "astro_relative_chart": [
+    "relationship_chart": [
       "relationship_profile",
       "summary",
       "synastry_aspects",
@@ -1194,7 +1951,7 @@
       "source_catalog",
       "rule_trace"
     ],
-    "fengshui_xuankong_natal": [
+    "fengshui_xuankong_house_chart": [
       "status",
       "layers.xuankong_natal.status",
       "layers.xuankong_natal.period_context",
@@ -1223,7 +1980,7 @@
       "rulesets",
       "source_catalog"
     ],
-    "western_timing_analysis": [
+    "western_timing": [
       "analysis_context",
       "summary",
       "time_lords.firdaria.sect",
@@ -1280,7 +2037,7 @@
       "children_analysis.evidence_chain.topic.first_view",
       "children_analysis.timing_context"
     ],
-    "astro_india": [
+    "vedic_chart": [
       "summary",
       "india.profile",
       "india.reading_basis",
@@ -1301,7 +2058,7 @@
       "india.strengths.kala_bala",
       "india.strengths.cheshta_bala"
     ],
-    "astro_vimshottari": [
+    "vimshottari_dasha": [
       "summary",
       "analysis_context",
       "vimshottari.current_major",
@@ -1327,7 +2084,7 @@
       "india.strengths.kala_bala",
       "india.strengths.cheshta_bala"
     ],
-    "astro_germany": [
+    "hamburg_midpoint_chart": [
       "summary",
       "midpoint_analysis.status",
       "midpoint_analysis.profile",
@@ -1341,7 +2098,7 @@
       "midpoint_analysis.unique_two_factor_pair_count",
       "base_chart.person_info"
     ],
-    "astro_chart13": [
+    "thirteen_sector_chart": [
       "chart_profile",
       "sector_profile",
       "planets",
@@ -1350,7 +2107,7 @@
       "time_sensitivity.uncertainty_minutes",
       "person_info"
     ],
-    "astro_guolao": [
+    "guolao_chart": [
       "person_info",
       "guolao.life_palace",
       "guolao.conditions",
@@ -1378,7 +2135,7 @@
       "summary",
       "sukuyo.lower_methods"
     ],
-    "liureng_gods": [
+    "liuren_chart": [
       "analysis_context",
       "four_pillars",
       "liureng.month_general",
@@ -1396,7 +2153,7 @@
       "liureng.ruleset",
       "liureng.rule_trace"
     ],
-    "liureng_runyear": [
+    "liuren_yearly_timing": [
       "analysis_context",
       "four_pillars",
       "liureng.month_general",
@@ -1479,7 +2236,7 @@
       "interpretation.classical_text_reference",
       "summary"
     ],
-    "astro_horary": [
+    "horary_chart": [
       "analysis_context",
       "horary.ascendant",
       "horary.quesited_house",
@@ -1488,7 +2245,7 @@
       "horary.moon.void_of_course",
       "horary.perfection.status"
     ],
-    "astro_election": [
+    "evaluate_election_time": [
       "analysis_context",
       "calendar_conversion",
       "clock_conversion",
@@ -1502,7 +2259,7 @@
       "election.unresolved_factors",
       "election.condition_policy"
     ],
-    "bazi_source_compare": [
+    "compare_bazi_sources": [
       "four_pillars",
       "input_context",
       "current_calculation.strength_level",
@@ -1511,10 +2268,11 @@
     ]
   },
   "call_guidance": {
-    "fengshui_xuankong_natal": {
+    "fengshui_xuankong_house_chart": {
       "natal_delivery": "普通宅盘用 evidence_views.natal_candidates，先读 period_context、orientation_context、全部 candidates 和 missing_inputs，并保留 rulesets/rule_trace。缺定运或定向资料时交付已知事实与本次待补项；缺磁向用 house.facing_degrees 配 north_reference=magnetic。边界向逐候选说明，按 candidate_id 关联盘式及依据。候选为数组，投影使用整个 candidates。",
       "natal_details": "格局读每个 candidates[].structure；需要原典数字对照时首轮用 natal_patterns，保留各候选的比对范围与未裁定项。启用 interpretation 后可读 natal_interpretation；当前评价运与历史宅运独立。若 include_calculation_reading=true（启用解释时默认），追加 calculation_reading。若指定 city_gate，追加 layers.xuankong_natal.city_gate_analysis，独立核对其参考运、状态和缺项。",
-      "natal_projection": "同次需要的视图在首轮合并 fields；result_delivery 只保留当次所选字段，分页沿同一 run 读回。兼容原始路径 layers.xuankong_natal.chart 只有唯一候选才有值；完整导出首次 fields=null。"
+      "natal_projection": "同次需要的视图在首轮合并 fields；result_delivery 只保留当次所选字段，分页沿同一 run 读回。兼容原始路径 layers.xuankong_natal.chart 只有唯一候选才有值；完整导出首次 fields=null。",
+      "conditioned_scope": "独立于年星；interpretation 显式启用 xuankong_conditioned_v1 有限解释，current_period_number 与 period_evidence 成对，外局分宫独立确认山形/水形，不复用金锁或室内靠背。"
     },
     "jinkou": {
       "month_general_scope": "jinkou.overview.month_general是依中气确定的月将本位；yuejiang是月将加时后落在地分的将神，对应四位将神行。两支可不同，解释分别说明，不将落地分的支称为中气月将本位。快照使用月将本位、将神落地分两个标签。",
@@ -1528,7 +2286,7 @@
     "heluo": {
       "line_conditions": "judge.line_conditions逐先后天实际元堂计算二五位、众宗及主本阴元堂阳应爻有援式。source_youyuan分别给出同阶段实际应位、阴阳和clause_match；按主本阴爻读法，不以偶数爻位代替，别本阴位字面保留。yuanTang.youYing仅先天通用阴阳相异，反向相应不能称该原句命中；未中不推出无援、现实孤立或十体总评。位序偏好不是评分，dangWei仅旧位序阴阳别名；source_dangwei.match=null，阴月未定不以至点半年补定义。可用line_conditions视图读取。",
       "evidence": "按实际chart元堂读取numerology_evidence的轨迹、条文、来源和未决规则；judge.xie仅基础命中，不能选定葉者或不葉者分支。",
-      "known_inputs": "出生时间与性别须明确提供；空白时间不能补零点。时间字段是当地钟时，时区放zone；显式零点有效。真太阳时默认开启，须明确lon或gps_lon；GPS优先，0度有效。缺失不可套上海或0度，不为通过调用自动改为钟表时。",
+      "known_inputs": "出生时间与性别须明确提供；空白时间不能补零点。时间字段是当地钟时，时区放timezone；显式零点有效。真太阳时默认开启，须明确经度longitude，0度有效。缺失不可套上海或0度，不为通过调用自动改为钟表时。",
       "birth_clock": "numerology_evidence.birth_clock保存同次民用时刻、UTC瞬间、所选计算钟面、经度来源与是否使用。钟表时未给经度为null；太阳钟面不是新的物理瞬间。可用birth_clock视图读取。",
       "body_structure": "body_structure视图按逐阶段实际六爻返回渐卦段的八条结构记录，区分三爻倒序、上下互体、全卦倒序及抽第三爻移顶。八条含六个三爻体及两个六爻卦，不是八个互体；literal_case_match为false时只是明确算子推演，不能称该卦原例已核。五命干支字表不自动选柱或用年纳音替代。此层不替换deTi或后天换卦，不直接裁定葉否。",
       "body_relations": "judge.deTi按年柱纳音与先后天实际上下体、两互体分列五行关系，完整present=null。第51页generating_qi必须同时满足无元气且卦体生纳音；第87页双向相生另列，不能反向覆盖。金人、土人口径及完整得体、合理仍待核。",
@@ -1545,7 +2303,7 @@
     },
     "canping": {
       "method": "默认gu用真实日支，ming为显式月支变法；二者规则来源与结果分别说明。",
-      "known_inputs": "出生时间与性别须明确提供；空白时间不能补零点。时间字段是当地钟时，时区放zone；显式零点有效。真太阳时默认开启，须明确lon或gps_lon；GPS优先，0度有效。缺失不可套上海或0度，不为通过调用自动改为钟表时。",
+      "known_inputs": "出生时间与性别须明确提供；空白时间不能补零点。时间字段是当地钟时，时区放timezone；显式零点有效。真太阳时默认开启，须明确经度longitude，0度有效。缺失不可套上海或0度，不为通过调用自动改为钟表时。",
       "birth_clock": "numerology_evidence.birth_clock保存同次民用时刻、UTC瞬间、所选计算钟面、经度来源与是否使用。钟表时未给经度为null；太阳钟面不是新的物理瞬间。可用birth_clock视图读取。",
       "timing": "dayun_method默认bazi_appendix_v1为卷七整数借除，continuous为现代连续折算，legacy为未核旧命宫排法。配运先读timing_policy视图：schedule_basis逐原句标applied_rule／对照，区分所选附法、另书十年背景和现代落点约定；first_row为同次实际首行，旧法保留年龄标签和取文；first_period仅为已映射日期首运摘要，旧法为null，两者均非查询当段。查询读selected，未起运不取首运代替；全运再取periods，完整立春用calendar_boundaries。",
       "evidence": "按年纳音部、顺逆编号与实际男女或岁运条文解释，缺条和缺字只表示语料缺口。",
@@ -1572,7 +2330,7 @@
       "year_calendar": "年计核对year_calendar视图（合参taiyi_year_calendar）：civil_lunar_calendar保留输入钟表日期实际换算的年月日及本次来源；historical_calendar保留明确所选历史历表。analysis_context.lunar_display仅为校正钟面上下文，真太阳时跨日时不能替代年计日期。未单列conversion_source不补造逐日权威认证；岁首工程约定与原典裁定仍分开。",
       "civil_clock": "独立太乙可选analysis_utc_offset与analysis_timezone联合核对明确民用偏移，保留命名时区并选择回拨中的一次；缺失仍拒绝重复钟时，跳时/整日缺口或不符偏移不回退。clock_basis视图保留calendar_rules/summary的civil_clock_resolution及真实UTC、fold、运行时区规则版本。真太阳钟只是计算标签，不能再当民用钟排除。三式已有time含ISO偏移表示实际瞬间再转zone，语义与联合钟表标签核对不同。"
     },
-    "sanshiunited": {
+    "sanshi_combined_chart": {
       "scope": "按synthesis.time_scopes解释年/月/日/时计；palace_correspondences按真实方位联接五将与星门神，太乙宫数不可直接套奇门宫数。",
       "options": "taiyi_options只接受calculation_mode=year/month/day/hour及对应year_profile/month_profile/hour_profile；阴阳遁和布盘方向由实际计法与日期计算。",
       "interpretation": "三式共用输入与历法，不能当三份独立证据；未定义统一事件规则，不输出综合胜率。",
@@ -1593,9 +2351,9 @@
       "year_calendar": "年计核对year_calendar视图（合参taiyi_year_calendar）：civil_lunar_calendar保留输入钟表日期实际换算的年月日及本次来源；historical_calendar保留明确所选历史历表。analysis_context.lunar_display仅为校正钟面上下文，真太阳时跨日时不能替代年计日期。未单列conversion_source不补造逐日权威认证；岁首工程约定与原典裁定仍分开。",
       "god_yin_scope": "类神阴神按实际天将所乘支再查上神，天乙依所选昼夜表互取；与四课第二、四课的阴神称谓分层。年命上神缺项保留未知，季节本空事实不替代有效空亡及日辰德合相生，综合类神可用性仍未裁。金口诀附带六壬盘的本层不替代金口诀四位取用。"
     },
-    "otherbu": {
+    "interpret_astrology_dice": {
       "input": "planet/sign/house必须是本次实际骰面；实际第N宫传house=N-1。中文、英文和符号可直接传入；缺项追问，不猜测或抽取替代结果。",
-      "context": "仅骰面解读省略date/time/zone/经纬度；若请求独立天象背景，完整传入实际资料。tradition/hsys/zodiacal仅作用于天象背景，不改变骰面。天象背景按astronomical_context视图选择fields，分页时读回同run完整投影结果。保留ephemerisReferencePoints中的系统质心、本体中心、近似及未确认参考点，不将质心写成本体中心。",
+      "context": "仅骰面解读省略date/time/timezone/经纬度；若请求独立天象背景，完整传入实际资料。tradition/house_system/zodiac_type仅作用于天象背景，不改变骰面。天象背景按astronomical_context视图选择fields。保留ephemerisReferencePoints中的系统质心、本体中心、近似及未确认参考点，不将质心写成本体中心。",
       "interpretation": "以symbolic_details和rule_trace为依据，保留rulesets版本和来源。区分自定位与未给出的其他定位星；喜乐宫是宫号关系，不是星座尊贵或成功概率。diceChart为假设整宫示意，无真实度数、相位或ASC/MC；不得从天象背景补写骰面定位星、互容或应期。",
       "validation": "星座条件按所引原典核对七曜，外行星和交点保留各自的条件状态。",
       "longitude_motion": "天象背景的十个物理天体按实际热带或Lahiri黄道读取chart.params.chart_profile.longitude_motion与chart.chart.objects[].motion。保留native_longitude_speed及修正分项，method_id来自实际求导记录；Moshier完整视位置求导不改变解析轨道，未收敛明确不应用。Lahiri包含所选零点的运动，不能复制热带速度。月亮未采用独立光行时分项不表示完整位置求导未执行；分项与整体状态分别核对。这些速度不能证明精确驻留时刻、原典整例或现实预测。"
@@ -1630,28 +2388,28 @@
       "natal_delivery": "询问玄空宅盘时确认已选 xuankong_natal（可用 methods 显式选中）。通用 first_view 用于已执行布局分析；宅盘首读用 evidence_views.natal_candidates 取历史定运、朝向、全部候选、待补事实和来源。缺磁向用 house.facing_degrees 或 xuankong.house.facing_degrees 配同一 house 的 north_reference=magnetic。逐候选按 candidate_id 关联证据；需要格局及原典数字对照时首轮用 natal_patterns。若传 xuankong.city_gate，追加 layers.xuankong_natal.city_gate_analysis，独立核对其参考运、状态和缺项。",
       "natal_projection": "同次需要的视图在首轮合并 fields；result_delivery 只保留当次所选字段，分页沿同一 run 读回。兼容原始路径 layers.xuankong_natal.chart 只有唯一候选才有值；完整导出首次 fields=null。"
     },
-    "western_timing_analysis": {
+    "western_timing": {
       "target_clock": "analysis_hour/minute 是目标钟时，按 birth_timezone；显式0有效。省略分别沿用出生小时/分钟，仅兼容日期级调用。return_timezone转换同一时刻。",
       "delivery": "MCP默认8192字符，完整结果超限返回result_delivery。用其manifest_uri按所需字段或分页读取同一run；完整JSON重组并核对原run，不重新计算，不解析截断片段。",
       "complete_export": "用户要求完整JSON、全部时间线或完整文件时，首次fields=null，保留默认响应预算，再读取result_delivery；first_view仅用于摘要咨询，不能先投影摘要再补算全文。",
       "evidence": "首次按问题选择evidence_views.stage/annual/short_term/career的fields；事业兼阶段与目标时段用career，结合本命职业配置筛选相关hits。默认与其他视图不强制展开全部方法；fields=null仍表示全量。"
     },
-    "ziwei_horoscope": {
+    "ziwei_timing": {
       "projection": "普通摘要首次用detail=compact并省略fields，返回六层摘要；完整导出首次用detail=audit、fields=null，超限时用原result_id和run_id调用read_result并按next_offset读齐。",
-      "scopes": "专题需要完整宫位映射和四化连接时，用fields=[\"ziwei_horoscope.scopes\"]、strict_fields=true整体投影，取得六层后按scope取所需项。摘要调用省略每层palace_map及mutagen_natal_links；同次分页仅能补读已选结果。投影路径不使用层名或数字索引。",
+      "scopes": "专题需要完整宫位映射和四化连接时，用fields=[\"ziwei_horoscope.scopes\"]整体投影，取得六层后按scope取所需项。摘要调用省略每层palace_map及mutagen_natal_links；同次分页仅能补读已选结果。投影路径不使用层名或数字索引。",
       "identity": "analysis_context是目标时刻，birth_context是出生回执；scopes.palace_name/natal_palace_name表示运限命宫所临本命宫。其他本层功能宫读取palace_map.scope_palace_name；mutagen_natal_links分别标记natal_palace_name与scope_palace_name，不混淆为同一功能宫。仅功能名旋宫，未包含全部流曜、飞宫体系或事件结论。",
-      "target_clock": "target_minute默认0，target_timezone默认Asia/Shanghai，与出生时区独立；目标时刻采用钟表时间。分钟输入不证明分钟级预测。",
+      "target_clock": "analysis_minute默认0，analysis_timezone默认Asia/Shanghai，与出生时区独立；目标时刻采用钟表时间。分钟输入不证明分钟级预测。",
       "rules": "本命和运限使用同一rule_profile/version。iztro_2_5_8 1.1.2保留已起限的软件规则；quanshu_v2_excerpt 1.3.2选择闰月、四化、亮度、长生、旬空双支、部分流年星，并采用邻宫起大限和火铃年支定点读法。source_rules视图核对实际差异，岁首、小限年龄基准、闰月斗君和后续流月日时未据此认证；动态四化复用选表仍是软件约定。",
       "flowing_stars": "用flowing_stars视图读取已起大限、流年、流月、流日、流时的魁钺昌曲禄羊陀马鸾喜；流年另有年解，摘录配置另列天德、月德、丧门、吊客、白虎、官府。小限和未起或不可定大限省略流曜字段。flowing_star_basis给本层定位所用干支，流月用有效农历月柱，斗君落宫另见scopes.branch。位置公式按iztro 2.5.8同干支核对，历法或起限口径不同时需分别比较。用scope、system_id、rule_id和两种宫名区分同名星。annual_three_sha只给原文明示三支集合，逐名位置为空。",
       "childhood": "childhood视图单列明文一至六岁童限及实际本命星曜。岁序仍按已披露软件规则；后续岁序未唯一解释时留空，不把本命mutagen当童限四化，也不拿童限证明起大限前替代关系。",
       "time_input": "首轮回执time_input_status标记实际校时状态；time_input视图给出原校时过程、时区来源和地点精度。默认缺经度降级、省级代表点或仅按经度假设时区均按实际条件说明；不能把没有计算的均时差当0，也不把派生秒数当出生资料秒精度。 minute_sensitivity保留秒0；只在所选民用时分和偏移仍有效时比较59.999999秒端点。缺上端点时两项跨界标志为空；跨时辰或排盘日期时首轮上下文有time_input_minute_sensitive=true。不得替换原命盘、猜实际出生秒数、将端点当两份出生事实，或把样本误差当全局精度界。",
       "pre_decade": "大限status=not_started表示按所选五行局起岁尚未开始；宫位、宫干、四化为null，palace_map及mutagen_natal_links为空。六层索引保留但该层未计算，不把童限或其本命星曜当大限／童限四化。其他五层照实际结果解释；岁首仍未获原典认证。",
       "sihua_source": "sihua_source=rule_profile沿用基础配置；仅在明确指定明刊四化时选naj_ming_v1。三工具同选项，组合版本含+sihua.naj-ming-v1，sihua_source_url专指四化，classical_source仍是基础配置来源。庚日武同相会实际改本命标记及各层按干查表；不因此更改安星、亮度、岁序，也不认证古典运限复用或整书。",
-      "civil_offset": "birth_utc_offset与target_utc_offset分别核对出生和目标命名时区，并选择重复钟时；先后按UTC瞬间比较。偏移选择与nominal_age_basis分别记录，不能把太阳标签当成另一实际瞬间。",
+      "civil_offset": "birth_utc_offset与analysis_utc_offset分别核对出生和目标命名时区，并选择重复钟时；先后按UTC瞬间比较。偏移选择与nominal_age_basis分别记录，不能把太阳标签当成另一实际瞬间。",
       "limit_subperiods": "明刊运限分段首次按需展开limit_subperiods或limit_subperiod_details的fields；视图名不是参数。大限上/下五年依既有虚岁与实际所临十岁区间，不能用年龄末位取余。它不认证原典岁首或星曜应验几何；natal_star_groups只给原文分类与实际本命星对象，南北斗双属仍无唯一分段，小限半年起止未定，不补公历7月1日或农历七月。原文为福邻句未计算，不能只筛吉星；不变更四化、星位或给出事件断言。详尽首调选完整字段，再沿该run分页；索引run不能读回未请求的明细。",
       "calendar_sources": "calendar核时钟与日期，calendar_sources核date_conversion_provenance：lookups逐个连接实际日期、实施provider与印刷参照，implementation_sources保存所用补表原出处。1900参照TAM全年表，最初30日用PMO补表；1901—2100参照HKO，2100年2月9日后使用HKO补表。实施数据不是独立验证，既有历法数值及混合时钟岁序未借来源标记改写。长结果按首次所选fields沿同run分页取齐。 普通日期的实施者是fatebridge_lunardate_adapter_v1，包含上游库表与本系统已登记修正；逐时钟核applied_year_info_correction，按实际农历年取1933/1954/1978等登记，不按公历年份代选。编码是实施证据，不是新的独立历法观测或置信分。",
       "nominal_age_basis": "岁序采用birth_civil_timezone：两端实际瞬间均换算到出生民用时区，再以该区民用日期查农历年，正月初一00:00换岁。nominal_age_calendar给出两端计岁钟。target_civil_lunar_year另指目标原民用时区日期的农历年。day_divide统一作用于出生安星和目标流年/月/日/时：current晚子留当日，forward晚子算次日早子。两种分日均沿出生民用时区计岁。原典岁首未认证。",
-      "natal_prerequisites": "问起岁、五行局或本命前置推导时，按natal_prerequisites视图首次请求相应fields；完整JSON仍fields=null。natal_prerequisites直接携带本次运限内部已算本命的lunar_date/year_stem/hour_branch/ming_gong/shen_gong/wuxing_ju及三个原rule_trace，separate_birth_run=false，不是另一次ziwei_birth回执。按实际月时→命身→年干和命宫干支→纳音元素/局数说明连接；源文比较仍以给定农历条件为前提，不认证日期转换、甲人语义或古典岁首。出生排盘钟与nominal_age_calendar参考钟、目标流曜钟可不同，不能用计岁或目标年干覆盖此处本命年干；nayin字符串是实算纳音，原文名目比较未做时不能说该名字已校勘。"
+      "natal_prerequisites": "问起岁、五行局或本命前置推导时，按natal_prerequisites视图首次请求相应fields；完整JSON仍fields=null。natal_prerequisites直接携带本次运限内部已算本命的lunar_date/year_stem/hour_branch/ming_gong/shen_gong/wuxing_ju及三个原rule_trace，separate_birth_run=false，不是另一次ziwei_birth_chart回执。按实际月时→命身→年干和命宫干支→纳音元素/局数说明连接；源文比较仍以给定农历条件为前提，不认证日期转换、甲人语义或古典岁首。出生排盘钟与nominal_age_calendar参考钟、目标流曜钟可不同，不能用计岁或目标年干覆盖此处本命年干；nayin字符串是实算纳音，原文名目比较未做时不能说该名字已校勘。"
     },
     "firdaria": {
       "scope": "普通人生阶段问题的正常候选，窄查只用本工具，不默认运行全部西占时运。",
@@ -1663,7 +2421,7 @@
       "scope_limits": "只解释盘内分类、传统对应与关系变化，不推疾病风险，不据喜用开调理处方。",
       "depth": "evidence_chain按星位、根气与条件取证；structure_checks只审有限前提，formation_status=not_adjudicated不能解释成已成格。topic.timing使用实际生效柱，不是全年扫描；未知性别保留传统选星分支。"
     },
-    "astro_relative_chart": {
+    "relationship_chart": {
       "views": "首次按已选 relative_mode 取 evidence_views 对应 fields；suggested_fields 是未选专用视图时的安全联合，不要求每次读取全部分支。核对实际 relationship_profile.relative_mode_normalized/primary_layer。",
       "mode_aliases": "Comp→compare；Composite→composite；Synastry→influence；TimeSpace→timespace；Marks→marks；数值0..4依次对应这五种规范模式。",
       "delivery": "主层超预算时从 result_delivery 读取同一 run；投影后不能恢复首次未选字段。完整JSON首次 fields=null。",
@@ -1691,15 +2449,15 @@
       "missing_and_uncertain": "Do not fill a locally missing or unselected cell, an editorial unknown glyph or a provisional number from another column, number or edition.",
       "human_design_line_reference": "domain=human_design, category=lines, key=gate.line (e.g.1.1). All384 source locators remain; consult actual registry coverage for local paraphrases pending independent review, uncurated meanings and independent semantic acceptance. Null meanings are never replaced by profile-line themes. Preserve reference_details, citation and provenance. Select any personal polarity only from the same-run actual fixing_state and donor paths; the lookup never applies a line or predicts an outcome. Preserve1.4source ambiguity,2.3permanent2–14connection condition with unknown applicability, and2.6narrow receptivity in exaltation. Conditions not recorded are not thereby absent."
     },
-    "knowledge_registry": {
+    "knowledge_catalog": {
       "output_fields": [
         "domains",
         "source",
         "provenance"
       ],
-      "lookup": "分类与键在domains[].categories[]，数组先读所属根；strict fields不能直接填domain或categories。"
+      "lookup": "分类与键在domains[].categories[]，数组先读所属根；fields不能直接填domain或categories。"
     },
-    "astro_india": {
+    "vedic_chart": {
       "scope": "读取india内独立Parashari规则；顶层西占字段仅为历史兼容参考，不能冒充印占。",
       "physical_conditions": "D1 physical_state含度数区间、Baladi、0–60 Virupa Uchcha Bala分量、运动及Santhanam注释的太阳角距条件；核对combustion的source_layer、顺逆行、阈值和未裁定边界，不当作真实可见性或现实失能；D9/D10不套物理状态。dispositor_relationship为有方向的星体关系。",
       "time_scales": "profile.time_scale_context区分TT、模型UT1及冻结IERS闰秒假设；过期表后的future_leap_seconds_assumed_unchanged不能解释为已知未来时间精度。",
@@ -1721,7 +2479,7 @@
       "solar_component_scope": "Kala太阳依赖分开：日主/时主读连续日出对，三分力读当前相邻昼夜端点；partial_solar_brackets只限制对应分量。读取solar_context及同run constraints，不因缺其他日落抹去已有结果，也不补假日出。网格状态计数不是概率。",
       "solar_event_scope": "日出／日落支撑窗口逐项检索同一UT1日界内的连续事件；不假定每天仅一个同类事件。solar_events.enumeration的1秒仅是检索防重复步长，不是出生记录或实测精度。"
     },
-    "astro_vimshottari": {
+    "vimshottari_dasha": {
       "clock": "公历。analysis_year给定时缺月/日各取1；完全未给日期按as_of的出生时区日期，未给钟时取00:00。出生与分析时刻的DST歧义需明确UTC偏移。",
       "periods": "Moon-nakshatra，主运/次运从完整原始主运起算；UTC日历标签按每天86400名义秒的datetime口径，不表示连续原子时历时。三种年长口径明确区分，读取elapsed_time_convention。",
       "scope": "120年是规则周期，不是寿命估计；读当前ruler的本命上下文，不能将边界写成事件必发生。",
@@ -1764,7 +2522,7 @@
     "bazi_children": {
       "depth": "evidence_chain按星位、根气与条件取证；structure_checks只审有限前提，formation_status=not_adjudicated不能解释成已成格。topic.timing使用实际生效柱，不是全年扫描；未知性别保留传统选星分支。"
     },
-    "astro_germany": {
+    "hamburg_midpoint_chart": {
       "native_layer": "midpoint_analysis uses unrounded 22-factor geometry and a shared UTC/TT/UT1 policy. Sensitive-point equations double the midpoint period and orb; folded-only occupancy does not activate the direct source example. interpretations contains deduplicated, source-attributed symbolic claims only. Seven-planet top-level values also use raw coordinates.",
       "birth_time_uncertainty": "Pass user-confirmed birth_time_uncertainty_minutes (0..120), then read time_sensitivity. None is unknown, not exact. Samples vary recorded UTC before optional solar correction. Do not use event outcomes to choose a birth time, or report sample frequencies as confidence probabilities.",
       "solar_arc": "Only pass analysis_datetime when the user specifies a target instant with explicit timezone offset. The true solar arc uses actual tropical Sun displacement, including in the fixed natal Lahiri display. Directed coordinates are symbolic, not future observations; one source pattern only, no event guarantee. Read birth_time_sensitivity and preserve factor_layers. Read profile.sun_ephemeris_source for per-TT-epoch observations and file identities; natal/progressed sun_observation_indices and the daily target_sun_observation_index reference that shared batch. Equal TT epochs reuse one observation, not independent evidence. Different physical epochs may use different models, but each birth-time role must retain comparable sources. A source mismatch is a runtime-data error, not a birth-time effect; preserve the requested interval and repair its data coverage. At a supported nominal target, birth_time_sensitivity.status=partial can mean unavailable arcs or unresolved physical source references. Preserve all confirmed samples. For samples outside the declared0..150 Julian key-year domain, read computed_sample_count/unavailable_sample_count and sample.status/reason_code; do not substitute zero arc or infer absence. For computed arcs with unresolved MC, read source_pattern.resolved_condition_sample_count and unresolved_reference_sample_count and unresolved_reference_sample_indices; actual source_condition_met, source_direct_orb_degrees and directed_midheaven_longitude are null while backend_convention preserves formal values. Computed arc count is not resolved source-condition count. source_pattern.sampled_status=underdetermined is neither a known absence nor full-interval stability. Frequencies are not probabilities, and the key range is an implementation domain. The symbolic daily-meridian layer retains its own qualifications and unavailable samples.",
@@ -1798,7 +2556,7 @@
       "mixed_pairs": "For a user-confirmed analysis_datetime, mixed_pair_geometry enumerates four-distinct-name natal/solar-arc mixed pairs under the same uniform arc. Read profile and contact_counts first. Each residual group retains four equivalent factor_layer_assignments; they are not four independent hits. midpoint_arc_coefficient=0 means arc_invariant: the uniform arc cancels, so do not interpret it as a new timing trigger. Coefficients +/-0.5 identify the additional mixed-pair relations; original homogeneous-pair contacts remain in the existing dials. Source motivation is Witte1925 pp53-54; this is a named algebraic reconstruction, not his full progression/transit method. Preserve reference_angle_basis and unresolved physical references. For a confirmed birth-time interval, read mixed_pair_geometry.birth_time_sensitivity. It evaluates the entire declared mixed-pair domain on the same-run finite grid, including nominally absent relations first appearing at samples. Read present/known-absent/unknown states, the separate backend matches, and unlisted-no-observed-hit counts; an unlisted group with unknown samples is not a proven absence. Both known true and false samples prove variation even if another sample is unknown. A missing arc affects only nonzero coefficients; coefficient0 may evaluate its natal relative geometry without substituting an arc or claiming directed coordinates outside the arc domain. Arc invariance does not imply birth-time invariance. Preserve unresolved physical reference names, every sample, actual input-clock endpoints, and partial status. The grid is neither a continuous proof nor a probability distribution. There are no new source-event keywords or validated event probabilities.",
       "comparative_geometry": "Witte1924 comparative_geometry reconstructs five stated anchor rotations and the four-point mirror system from the same native factors. Coordinates are symbolic; use the actual Aries Point for tropical axes in a sidereal display. An anchor coordinate fixed by definition does not resolve its physical reference or frame orientation. Unknown inputs stay null with backend conventions separate. Confirmed birth-time samples retain every native input; sampled signed offsets are not continuous bounds or probabilities. Four printed numeric rows remain uncoordinated, and the source Earth-house labels and event claims are not applied. This is not acceptance of the separate Rulesbook mirror chapter. When exact sample coordinates are needed, select the whole midpoint_analysis.comparative_geometry.birth_time_sensitivity.samples array in the first call, then read each item's point_systems; field projection cannot descend through an array; use the actual returned coordinates and qualifiers. Full JSON requires fields=null initially, then read that same run rather than rebuilding a full result from a summary."
     },
-    "astro_chart13": {
+    "thirteen_sector_chart": {
       "geometry": "sector13 is an ascendant-relative equal partition, independent of the twelve-house selection; IAU constellations have different boundaries.",
       "birth_time_uncertainty": "Pass user-confirmed birth_time_uncertainty_minutes (0..120), then read time_sensitivity. None is unknown, not exact. Samples vary recorded UTC before optional solar correction. Do not use event outcomes to choose a birth time, or report sample frequencies as confidence probabilities.",
       "birth_seconds": "Pass birth_second only from an actually recorded clock or an explicitly identified historical clock conversion. Omission represents the start of the supplied minute, not evidence of exact seconds. Seconds propagate to UTC/TT/UT1, birth-time samples and optional directions; no outcome-driven rectification. Generic astrology_chart admits recorded seconds for germany/chart13/india_chart; use the current published variant schema for its other clock options.",
@@ -1807,7 +2565,7 @@
       "reference_angle_qualification": "When sector_profile.status=underdetermined_ascendant, no unique ASC-relative13-sector assignment exists: planets.sector13 and profile.anchor_longitude are null, thirteen_sectors is empty. backend_convention_* fields preserve replay values only. A null sector_by_sample is unknown, not a sector or absent condition; preserve every sample and computed_sample_count/unresolved_sample_count. Do not summarize known samples as full-interval stability or a probability. Ill-conditioned but resolved intersections and geographic-pole conventions retain their explicit angle_definition.",
       "house_roles": "Keep the selected base-chart12-house system separate from native reference-angle extraction, Meridian cusps and the custom13-sector partition. In the current numeric policy hsys1 is Alcabitus (SwissB), never Equal. Read actual chart_profile.house_system/house_system_code/house_system_label_zh; do not label a whole chart from a backend reference-angle call. reference_angle_model.house_code=E with cusp_output_used=false records only ASC/MC/ARMC extraction; samples carry their own model, and Germany solar-arc profile reuses the natal model. meridian_houses.profile.house_code=X identifies the separate RA cusp construction. fatebridge_equal13_v1 is the custom partition, independent of the selected12-house system. Unrecorded roles remain unknown; these labels do not establish original-text or predictive validity."
     },
-    "astro_guolao": {
+    "guolao_chart": {
       "scope": "guolao_research_v7; source ordinal life-palace counting with declared modern solar-palace/hour/term-endpoint conventions; life degree and mansion unresolved; modern equatorial research anchors; optional reference geometry reports unavailable cusps without changing functional palaces or substituting houses Apparent solar hour now reuses this run's geocentric Sun RA and estimated UT1 apparent sidereal angle. The solar display is a naive label, not a civil timezone or a new instant; measured DUT1 and physical subsecond accuracy are not certified. Read guolao.profile.apparent_solar_clock for operands and hour-boundary distance.",
       "solar_time": "Recorded physical instant remains fixed; optional apparent solar clock determines birth-hour branch and may change life palace and dependent patterns.",
       "patterns": "Read guolao.moira_patterns rule_id and evidence.inputs/granularity with guolao.bodies, palaces, rulesets and rule_trace. profile.pattern_model_id identifies the selected condition model. Same-palace conditions do not establish a life degree or exact conjunction.",
@@ -1874,7 +2632,7 @@
       "conditional_mansion_days": "单一参考历日仍有未定宿时读取sukuyo.candidate_mansion_days，保留每支半日／现代重建支持、个人三九见证和事项条件；applied_to_primary=false。主宿与顶层事项不由候选回填。candidate_days仍为跨日期分支，各日期子项保留自身候选宿证据。候选完整性false不改为已穷尽；钟时不自动判半。",
       "unknown_time": "time省略/null只计算现有历法与事项证据；params.calculationMode=calendar_date_only，birthTimeImputed=false，chart/astronomy=null。input_normalized保留所选历法、时区与输入；经纬度、宫制和盘式选项没有用于日历层。读取calendar、candidate_days及每个日期的candidate_mansion_days，不把一个已列候选当已确定。不要为了取得星图补00:00、中午或示例钟时。"
     },
-    "meihua_analysis": {
+    "meihua_time_cast": {
       "casting": "只支持年月日時取数；输入公历钟时，按指定时区查中国农历。不得把八字立春年柱代替农历年支。",
       "conventions": "春节换年、民用午夜换日、闰月沿用本月数、节月季令是明示约定；不是原文唯一裁定。",
       "reading": "用、体互、用互、变用均相对原体分析；经文按实际卦码与动爻引用。is_active=false为其他爻单动的假设参考。",
@@ -1909,7 +2667,7 @@
       "qi_day_timing": "求名/求财且day_qi已知时，topic_reading.qi_day_timing_reference按原章句实际生体/克体角色核时序明列日支，求名另保留无克体条件未全核时的原体参照；不得用原体或变用替代指定角色。坤辰戌丑未月是月限定，日支原子只取未申年月日時中的未/申；这是明列标签相符，不是五行旺衰或全时序条件。其他数字、季节、五行干支条文未解析，原子不符不等于全条件否定；在任及完整内外无克体前提另列。每个取数候选使用自己的角色与日气，23时保留午夜和子初两个输入日界标签，不挑相符者充作预测。topic/topic_audit同时包含day_qi；不搜索最近日期，不生成实际应期、收支、名成、处分或现实窗口；原天气研究失败与未来365日试验不变。",
       "qi_branch_timing": "求名/求财的topic_reading.qi_branch_timing_reference按原章句实际生体/克体角色分列年、月、日、时的明列支标签；各取数候选读自身topic_clause同名子层。年/时只用原seed，年支不以立春年或子初翌日重算。节月支与名义农历月序对应支分列，后者只是固定月序映射，闰月及完整时序含义未唯一裁定；23时日界备选不改原年支。坤辰戌丑未只另属月，未申见于四单位，月的明列支为辰戌丑未申，其他单位为未申。未知标签不补，分歧不挑相符者、不合并计票；数字、五金、土、季节与完整应期另待核，不推天干谓词，不生成最近日期、现实窗口或成败。topic/topic_audit已带原seed、历法口径、季令、日气及候选；原单独日支层仍保留。",
       "household_chapters": "显式household为家宅章、dwelling为屋舍章，均读topic/topic_audit已发布父字段。以本候选原体为主、初用为家宅或屋舍；不是风水空间评估、房屋检查或选房迁居许可。家宅影印比利与固定转录比和未裁定，source_relation_condition=null，五行相同不能自动套家宅安稳；屋舍體生用保留冷退/转录衰退，不改原字。家宅生体转引人事章按所列四内卦实际生体角色留路径；未见仅限该范围，不当完整内外无生。full_source_generation_condition和完整跨章净结论保持null；原体、互变、受制及旺衰分别保留，不输出住宅安全、实际失盗、资产结果、日期或概率。",
-      "first_response": "普通卦务首轮复制evidence_views.general.fields（同suggested_fields），启用strict_fields并关闭快照文本。明确选择interpretation_topic=weather时用weather卡，明确选择人事题篇时用topic卡。按实际选定的分支取证，问题文字不切换分支。需要完整JSON时首次fields=null。"
+      "first_response": "普通卦务首轮复制evidence_views.general.fields（同suggested_fields），明确选择interpretation_topic=weather时用weather卡，明确选择人事题篇时用topic卡。按实际选定的分支取证，问题文字不切换分支。需要完整JSON时首次fields=null。"
     },
     "human_design": {
       "time_policy": "必须提供出生小时、分钟、时区；未知生时不能套默认；人类图使用民用出生瞬间，不作真太阳时重定时。 完整输出的clock_evidence保留实际时标转换、四步DeltaT迭代与UTC显示见证；当前完整释义验收要求这些见证，并纯回放主盘、整盘后端对照、全部实际生时样本及周期标签。见证不认证原生执行、实测UT1或物理精度；旧回执保留当时版本，不补造转换记录。",
@@ -1919,7 +2677,7 @@
       "source_files": "先核对ephemeris_source_summary是否identity_incomplete及未识别上下文数；该层记录本命、设计根、范围与后端对照观察到的文件身份。身份变化为不可自动重试的ephemeris_source_inconsistent，先修复运行数据，保留原出生与范围输入。完整contexts从同次结果取回；解析平交点不依赖文件，真交点SWIEPH回显位也不证明月球文件可识别。身份／次数均非位置精度、完整原子读取集合或原生执行认证；周期搜索另读cycle_context.source_evidence。",
       "native_context": "核对native_execution_context.mechanism和lifetime；生产调用为fresh_exec_process及one_outer_human_design_operation。auxiliary_files_present是搜索候选的端点身份，不是已读证明。压缩文件诊断记录保留原值；不是完整调用认证或位置精度保证。父进程设置不作为人类图输入；辅助文件变化返回不可自动重试的ephemeris_source_inconsistent。完整释义核验继续要求原run及全部计算见证。 提供cycle_reference_datetime时，请求时刻次序校验也使用独立短进程；完整盘计算会再次按TT校验。原生辅助文件变化保持来源错误，不能通过改出生参数绕过。"
     },
-    "ziwei_birth": {
+    "ziwei_birth_chart": {
       "reading_view": "首轮用 evidence_views.natal；reading_view 保留全部星曜及非空亮度/四化，null_star_fields_omitted 声明省略字段等于完整宫位中的 null。三方四正按同一视图的地支引用关联，不搬星。结构展开使用 structure；完整JSON首次fields=null。",
       "textual_symbols": "按symbolism视图读取symbolic_properties。原文的化财、化印、遇帝为权不是本命禄权科忌赋值；elements_as_written多项时保持原文，不按软件简表擅选一项。calculation_path连回同次完整本命星位。",
       "voids": "摘录配置自1.2.0起按原文旬中空亡列两支；软件配置仍按年干阴阳显示一支。66种星名与67条落点不同，读取star_occurrence_count/distinct_star_count。古天空映射今地空，古本生年解神映射年解；不能同名合并。",
@@ -1935,7 +2693,7 @@
       "source_readings": "rule_trace的source_comparison.matches_source_record只比较初选转录；independent_review另列更正复读、直接宫位及疑读，不能用实算落宫裁定疑字或认证整表。"
     },
     "meihua_cast": {
-      "method": "casting.method为必填判别字段；所需字段只属于该方法，不混入别法参数。时间法另用meihua_analysis。",
+      "method": "casting.method为必填判别字段；所需字段只属于该方法，不混入别法参数。时间法另用meihua_time_cast。",
       "sources": "字形与传统平上去入由已确认资料给出；不能用现代普通话声调或规范字笔画替换。端法上下卦已确认，采用乾一兑二等先天卦序取数。",
       "unknowns": "没有season_month_branch时不算季令；不补当前日期或时辰。existing模式保留原卦码与动爻，不重起。",
       "conventions": "丈尺不加时且不用寸，尺寸加时而不用分；字占按具体例不暗加时。物数以实际数量取上卦、时支数取下卦，取爻保留原时支数且只加一次。物数与两段声音超八取爻有约定边界，保留line_sum_basis和counting_variants中各自的本变互、体用及stage_relations，不把默认口径当唯一原典答案。",
@@ -1971,9 +2729,9 @@
       "qi_day_timing": "求名/求财且day_qi已知时，topic_reading.qi_day_timing_reference按原章句实际生体/克体角色核时序明列日支，求名另保留无克体条件未全核时的原体参照；不得用原体或变用替代指定角色。坤辰戌丑未月是月限定，日支原子只取未申年月日時中的未/申；这是明列标签相符，不是五行旺衰或全时序条件。其他数字、季节、五行干支条文未解析，原子不符不等于全条件否定；在任及完整内外无克体前提另列。每个取数候选使用自己的角色与日气，23时保留午夜和子初两个输入日界标签，不挑相符者充作预测。topic/topic_audit同时包含day_qi；不搜索最近日期，不生成实际应期、收支、名成、处分或现实窗口；原天气研究失败与未来365日试验不变。",
       "qi_branch_timing": "求名/求财的topic_reading.qi_branch_timing_reference按原章句实际生体/克体角色分列年、月、日、时的明列支标签；各取数候选读自身topic_clause同名子层。年/时只用原seed，年支不以立春年或子初翌日重算。节月支与名义农历月序对应支分列，后者只是固定月序映射，闰月及完整时序含义未唯一裁定；23时日界备选不改原年支。坤辰戌丑未只另属月，未申见于四单位，月的明列支为辰戌丑未申，其他单位为未申。未知标签不补，分歧不挑相符者、不合并计票；数字、五金、土、季节与完整应期另待核，不推天干谓词，不生成最近日期、现实窗口或成败。topic/topic_audit已带原seed、历法口径、季令、日气及候选；原单独日支层仍保留。",
       "household_chapters": "显式household为家宅章、dwelling为屋舍章，均读topic/topic_audit已发布父字段。以本候选原体为主、初用为家宅或屋舍；不是风水空间评估、房屋检查或选房迁居许可。家宅影印比利与固定转录比和未裁定，source_relation_condition=null，五行相同不能自动套家宅安稳；屋舍體生用保留冷退/转录衰退，不改原字。家宅生体转引人事章按所列四内卦实际生体角色留路径；未见仅限该范围，不当完整内外无生。full_source_generation_condition和完整跨章净结论保持null；原体、互变、受制及旺衰分别保留，不输出住宅安全、实际失盗、资产结果、日期或概率。",
-      "first_response": "普通卦务首轮复制evidence_views.general.fields（同suggested_fields），启用strict_fields并关闭快照文本。明确选择interpretation_topic=weather时用weather卡，明确选择人事题篇时用topic卡。按实际选定的分支取证，问题文字不切换分支。需要完整JSON时首次fields=null。"
+      "first_response": "普通卦务首轮复制evidence_views.general.fields（同suggested_fields），明确选择interpretation_topic=weather时用weather卡，明确选择人事题篇时用topic卡。按实际选定的分支取证，问题文字不切换分支。需要完整JSON时首次fields=null。"
     },
-    "astro_horary": {
+    "horary_chart": {
       "interpretation_boundary": "Read the native events, Lilly conditions, and missing conditions in horary.perfection with the actual moon.motion_basis and rule_profile. Treat instantaneous aspects and same-ruler geometry as candidate facts.",
       "calendar_input": "Date labels use the explicit question_calendar/candidate_calendar, default proleptic Gregorian. Read calendar_conversion and analysis_context.input_calendar/input_date before explaining normalized datetimes. Julian dates use CE Jan1 years; do not infer regional reforms, March25 years or historical LMT/LAT. With explicit noon hour origin, retain raw calendar labels and read clock_conversion.hour_origin_conversion for the final canonical wall date; validate range after nominal day carry.",
       "clock_input": "Use explicit question_clock_basis only from confirmed clock evidence: civil / local_mean_solar / local_apparent_solar. Solar bases must omit/null timezone_name; civil omission preserves the legacy +08:00 default, not evidence of a known zone. Read clock_conversion with calendar_conversion: first normalize date labels, then resolve the declared clock to TT/UT1. Geocentric LAT is not a topocentric sundial reconstruction. Before1960 UTC-named carriers denote UT1 model labels. Never infer an original clock from ASC fit or outcome; numerical residual is not record accuracy.",
@@ -1985,7 +2743,7 @@
     "ziwei_rules": {
       "sihua_source": "sihua_source=rule_profile沿用基础配置；仅在明确指定明刊四化时选naj_ming_v1。三工具同选项，组合版本含+sihua.naj-ming-v1，sihua_source_url专指四化，classical_source仍是基础配置来源。庚日武同相会实际改本命标记及各层按干查表；不因此更改安星、亮度、岁序，也不认证古典运限复用或整书。"
     },
-    "astro_election": {
+    "evaluate_election_time": {
       "candidate_inputs": "Use the recorded candidate instant, timezone and coordinates; this is not an interval-wide optimum search.",
       "evidence_boundary": "读取 moon、axes、factors 与 unresolved_factors；婚嫁指定 Ramesey 时读取 marriage_significators 的原典条件。",
       "interpretation_boundary": "以用户明确的活动需求、备选窗口和传统方法逐条件解读。",
@@ -1996,19 +2754,19 @@
       "ut1_source": "ut1_source默认swiss_delta_t；显式iers_c04使用固定IERS20 C04最终每日合成值，仅覆盖1962-01-01 00:00至2026-09-19 00:00 UTC，需要UT1的时刻超范围拒绝；地心TT黄经事件试算不需要UT1。连续TT上先去除62项zonal模型，对UT1-TAI作四点Lagrange插值，再恢复zonal并加入声明的日内模型；不要重复叠加回执中的zonal项。clock_conversion.ut1_reference及calculation_basis.earth_rotation.ut1_reference是时标回执，其polar_motion_applied与celestial_pole_offsets_applied为false不代表几何未消费EOP；managed宫位／地平的实际极移及有来源资格的CPO看earth_rotation.terrestrial_orientation，1984年前CPO仍未资格。形式标准差和求解残差不是瞬时物理误差界，不认证完整EOP、史料钟时精度或预测效力；无外推、预测值或静默模型回退。",
       "clock_seconds": "Use candidate_second only for confirmed whole-second labels0..59; omitted defaults to0. Do not invent unknown seconds. calendar_conversion.input_clock and clock_conversion.hour_origin_conversion.input_clock preserve the second through date/noon normalization; input_granularity=second describes supported labels, not historical accuracy. Fractional seconds and directly supplied second60 are unsupported; solar inversion can still return a separately identified UTC leap-second label without truncation."
     },
-    "liureng_gods": {
+    "liuren_chart": {
       "transmission_progression_scope": "探原PDF110–111三传连茹／间断：sequence_direction只指支序；raw_branch_empty_conditional_*仅在支神本空适用假设下释读，不把坐空或天将天空替代本空。effective_direction和comprehensive_judgement仍未裁定，不从进退字样推成败、概率或应期。",
       "published_term_dates_scope": "逐项读取实际solar_term_dependencies中的published_date_reference：按固定UTC+08对照香港天文台1901—2100逐日表，日期相符只表示同一天，不认证交气秒数或全部历法。date_mismatch保留两日期，不能称官方一致或移动交界凑表；outside_published_range是无资料，不能说相符或不符。与分析时区、真太阳钟、历史时间约定及未来闰秒假设分列，金口诀仍按同次四位解释。",
       "seasonal_evidence_scope": "探原季节五态用本次月建支，不用月将支。当前季月整月配置分别计算支神、天将固有五行和地盘五态，日干五态不替代它们。真空／半空只列支神本空与季节状态的条件，天空天将及坐空不替换本空；季末十八日异法、扶助冲剋及角色例外后的有效真半未裁，不把原文效力折扣说成成功率。金口诀本课与附带六壬分开，不能借本层代替金口诀日下五态或综合取用。",
       "god_yin_scope": "类神阴神按实际天将所乘支再查上神，天乙依所选昼夜表互取；与四课第二、四课的阴神称谓分层。年命上神缺项保留未知，季节本空事实不替代有效空亡及日辰德合相生，综合类神可用性仍未裁。金口诀附带六壬盘的本层不替代金口诀四位取用。"
     },
-    "liureng_runyear": {
+    "liuren_yearly_timing": {
       "transmission_progression_scope": "探原PDF110–111三传连茹／间断：sequence_direction只指支序；raw_branch_empty_conditional_*仅在支神本空适用假设下释读，不把坐空或天将天空替代本空。effective_direction和comprehensive_judgement仍未裁定，不从进退字样推成败、概率或应期。",
       "published_term_dates_scope": "逐项读取实际solar_term_dependencies中的published_date_reference：按固定UTC+08对照香港天文台1901—2100逐日表，日期相符只表示同一天，不认证交气秒数或全部历法。date_mismatch保留两日期，不能称官方一致或移动交界凑表；outside_published_range是无资料，不能说相符或不符。与分析时区、真太阳钟、历史时间约定及未来闰秒假设分列，金口诀仍按同次四位解释。",
       "seasonal_evidence_scope": "探原季节五态用本次月建支，不用月将支。当前季月整月配置分别计算支神、天将固有五行和地盘五态，日干五态不替代它们。真空／半空只列支神本空与季节状态的条件，天空天将及坐空不替换本空；季末十八日异法、扶助冲剋及角色例外后的有效真半未裁，不把原文效力折扣说成成功率。金口诀本课与附带六壬分开，不能借本层代替金口诀日下五态或综合取用。",
       "god_yin_scope": "类神阴神按实际天将所乘支再查上神，天乙依所选昼夜表互取；与四课第二、四课的阴神称谓分层。年命上神缺项保留未知，季节本空事实不替代有效空亡及日辰德合相生，综合类神可用性仍未裁。金口诀附带六壬盘的本层不替代金口诀四位取用。"
     },
-    "astro_chart": {
+    "astrology_chart": {
       "germany_solar_arc_uncertainty": "When chart_variant=germany with analysis_datetime: At a supported nominal target, birth_time_sensitivity.status=partial can mean unavailable arcs or unresolved physical source references. Preserve all confirmed samples. For samples outside the declared0..150 Julian key-year domain, read computed_sample_count/unavailable_sample_count and sample.status/reason_code; do not substitute zero arc or infer absence. For computed arcs with unresolved MC, read source_pattern.resolved_condition_sample_count and unresolved_reference_sample_count and unresolved_reference_sample_indices; actual source_condition_met, source_direct_orb_degrees and directed_midheaven_longitude are null while backend_convention preserves formal values. Computed arc count is not resolved source-condition count. source_pattern.sampled_status=underdetermined is neither a known absence nor full-interval stability. Frequencies are not probabilities, and the key range is an implementation domain. The symbolic daily-meridian layer retains its own qualifications and unavailable samples.",
       "reference_angle_qualification": "For chart_variant=germany: Read midpoint_analysis.profile.angle_definition and the affected factor/row reference_angle_basis. A numerically unresolved ASC remains a backend convention: retained coordinates and exact formal contacts do not establish resolved physical reference geometry. The same qualification follows directed factors and solar-arc contacts. Read each same-run time_sensitivity.samples angle_definition; an ASC factor span with status=underdetermined_ascendant has no physical interval bounds. MC, orbital factors and meridian houses are not restricted by this horizon degeneracy. Geographic-pole meridian conventions have their own scope; do not conflate them with unresolved intersections. For chart_variant=chart13: When sector_profile.status=underdetermined_ascendant, no unique ASC-relative13-sector assignment exists: planets.sector13 and profile.anchor_longitude are null, thirteen_sectors is empty. backend_convention_* fields preserve replay values only. A null sector_by_sample is unknown, not a sector or absent condition; preserve every sample and computed_sample_count/unresolved_sample_count. Do not summarize known samples as full-interval stability or a probability. Ill-conditioned but resolved intersections and geographic-pole conventions retain their explicit angle_definition. For Germany source conditions, an exact geographic-pole MC is a supplied-meridian convention: read source_pattern.unresolved_reference_sample_count and source_pattern.unresolved_reference_sample_indices, resolved_condition_sample_count and condition_by_sample. Known present/absent counts exclude unknowns; backend_convention is formal evidence only. Unresolved source samples have null actual conditions/orbs/MC while computed solar arcs remain available. A source_application_status=underdetermined_reference_geometry reading states unknown applicability; backend_reading_zh is the former formal wording. Empty interpretations do not establish known absence. This differs from an unresolved ASC intersection with an independently resolved MC.",
       "house_roles": "Keep the selected base-chart12-house system separate from native reference-angle extraction, Meridian cusps and the custom13-sector partition. In the current numeric policy hsys1 is Alcabitus (SwissB), never Equal. Read actual chart_profile.house_system/house_system_code/house_system_label_zh; do not label a whole chart from a backend reference-angle call. reference_angle_model.house_code=E with cusp_output_used=false records only ASC/MC/ARMC extraction; samples carry their own model, and Germany solar-arc profile reuses the natal model. meridian_houses.profile.house_code=X identifies the separate RA cusp construction. fatebridge_equal13_v1 is the custom partition, independent of the selected12-house system. Unrecorded roles remain unknown; these labels do not establish original-text or predictive validity.",
@@ -2016,24 +2774,45 @@
       "germany_comparative_geometry": "Witte1924 comparative_geometry reconstructs five stated anchor rotations and the four-point mirror system from the same native factors. Coordinates are symbolic; use the actual Aries Point for tropical axes in a sidereal display. An anchor coordinate fixed by definition does not resolve its physical reference or frame orientation. Unknown inputs stay null with backend conventions separate. Confirmed birth-time samples retain every native input; sampled signed offsets are not continuous bounds or probabilities. Four printed numeric rows remain uncoordinated, and the source Earth-house labels and event claims are not applied. This is not acceptance of the separate Rulesbook mirror chapter. When exact sample coordinates are needed, select the whole midpoint_analysis.comparative_geometry.birth_time_sensitivity.samples array in the first call, then read each item's point_systems; field projection cannot descend through an array; use the actual returned coordinates and qualifiers. Full JSON requires fields=null initially, then read that same run rather than rebuilding a full result from a summary.",
       "germany_daily_meridian": "For chart_variant=germany with an explicitly confirmed analysis_datetime. For daily_meridian, preserve its own native MC reference qualification: unresolved dependent coordinates are null, backend_convention retains formal values, and actual Sun/arc data remain when computable. Read input_coherence for exact same-run native/grid/UTC/TT/observation-role binding, not independent astronomy. Separate unresolved_reference_sample_count from unavailable_sample_count; do not bridge unknown/unavailable adjacency or infer offsets from an unknown nominal reference. An unresolved ASC intersection alone does not restrict a resolved MC. A day_meridian_inputs503 is an internal source failure, not invalid birth data."
     },
-    "bazi_source_compare": {
+    "compare_bazi_sources": {
       "input_scope": "Only confirmedliteral4pillars, no birthdate/gender/timezone needed or inferred. Do not substitute examples.",
       "source_scope": "Exactexposedreference retrieval and currentmodel comparison, all known/unknown/conflictingrecords retained.",
       "interpretation": "当前strength_level是工程政策档；engineering_index分列工程政策档与纯数值档，classical_adjudication只交付原典力量已核结论或明确未决。保留原标签、17组历史分歧及全部集合约束，不以unknown计通过，不查命例标签回填计算。未决也不表示已判无喜用或互助。"
     },
-    "analyze_destiny": {
+    "bazi_overview": {
       "force_adjudication": "工程指数与原典力量分别读取；classical_adjudication.status=not_adjudicated及null不能回填工程强弱。favorable_elements为空须同读favorable_elements_status，不解释为已判无喜用。engineer参考集合只用于已声明工程索引，不认证原典取用或现实概率。"
     },
-    "bazi_birth": {
+    "bazi_birth_chart": {
       "force_adjudication": "工程指数与原典力量分别读取；classical_adjudication.status=not_adjudicated及null不能回填工程强弱。favorable_elements为空须同读favorable_elements_status，不解释为已判无喜用。engineer参考集合只用于已声明工程索引，不认证原典取用或现实概率。"
     },
-    "two_person_compatibility": {
+    "bazi_compatibility": {
       "evidence": "先读双方四柱与跨盘触点。按需增加 cross_chart_relations.directional_punishments 和 directional_ten_gods。natal_matches 记录哪方原局已具备同一组关系。",
       "interpretation": "按两人的实际关系与问题解释，分别引用双方对应星位。"
+    },
+    "bazi_timing": {
+      "clock_defaults": "分析日期全省略时用 as_of/执行开始的完整当地瞬间；实际时刻与补齐来源见 analysis_reference。"
+    },
+    "bazi_luck_cycles": {
+      "clock_defaults": "日期全省略时按 as_of/执行开始的完整当地瞬间选运；analysis_age 仅作显式年龄参考，实际时刻与补齐来源见 analysis_reference。"
+    },
+    "bazi_monthly_timing": {
+      "clock_defaults": "日期全省略时用 as_of/当前完整当地瞬间，显式部分日期仍缺日取15，见 analysis_reference；solar_term_window 是十二节换月窗口，二十四节气见 analysis_calendar.analysis_date_context。"
+    },
+    "bazi_daily_timing": {
+      "clock_defaults": "日期全省略时用 as_of/当前完整当地瞬间，保留晚子时换日，实际时刻与补齐见 analysis_reference；solar_term_window 是十二节换月窗口，二十四节气见 analysis_calendar.analysis_date_context。"
+    },
+    "bazi_hourly_timing": {
+      "clock_defaults": "日期全省略时用 as_of/当前完整当地瞬间，实际时刻与补齐见 analysis_reference；时柱整点缓存不代替交气比较时刻。"
+    },
+    "fengshui_monthly_stars": {
+      "time_scope": "十二节交节时刻换月的九宫月紫白；可传含时区 query_at 或已确认的 effective_solar_year/solar_month_number，不以公历月或农历月补值，不替代年盘或宅盘，不生成布局处方。"
+    },
+    "ipip_big_five": {
+      "scoring_scope": "Goldberg (1992) 公有领域 50 题大五人格量表：action=list_items 列出题项与计分方向；action=score 对 1-5 分整数作答进行确定性正反向计分、8/10 缺题阈值折算；仅输出客观计分事实与量表出处，不输出百分位、诊断或叙事建议。"
     }
   },
   "evidence_views": {
-    "fengshui_xuankong_natal": {
+    "fengshui_xuankong_house_chart": {
       "natal_candidates": {
         "fields": [
           "status",
@@ -2625,7 +3404,7 @@
         ]
       }
     },
-    "sanshiunited": {
+    "sanshi_combined_chart": {
       "counter_cycles": {
         "purpose": "核太乙所选计法的完整计数与60/72组内位置；先区分年/月/日/时层，不把局号当完整时实或实际时柱。",
         "fields": [
@@ -3025,7 +3804,7 @@
         ]
       }
     },
-    "otherbu": {
+    "interpret_astrology_dice": {
       "symbolic": {
         "purpose": "忠实解读用户已有的三骰结果，不默认抽骰或附加天象。",
         "fields": [
@@ -3070,7 +3849,7 @@
         ]
       }
     },
-    "timing_analysis": {
+    "bazi_timing": {
       "birth_time_sensitivity": {
         "when": "用户确认名义出生参考的正负UTC经过分钟范围时，传birth_time_uncertainty_minutes并读取完整候选与事件未决层；无分钟样本的事件候选不能忽略，计数不是概率，None不是精确生时",
         "fields": [
@@ -3170,7 +3949,7 @@
         ]
       }
     },
-    "astro_relative_chart": {
+    "relationship_chart": {
       "compare": {
         "when": "比较双方跨盘互动；按 A→B 与 B→A 分开读",
         "relative_mode": "compare",
@@ -3277,7 +4056,7 @@
         ]
       }
     },
-    "sixyao": {
+    "liuyao": {
       "line_reading": {
         "when": "读取逐爻纳支、世应、原典动爻及月令动静条件；focus_line/focus_kinship为明确取用前提，日级候选不等于事件应期",
         "fields": [
@@ -3319,7 +4098,7 @@
         ]
       }
     },
-    "western_timing_analysis": {
+    "western_timing": {
       "stage": {
         "when": "人生阶段，读法达主运／分运及真实起止；窄查法达可直接用 firdaria",
         "fields": [
@@ -3396,7 +4175,7 @@
         ]
       }
     },
-    "astro_chart": {
+    "astrology_chart": {
       "classical_detail": {
         "when": "用户明确问古典日夜、尊贵、定位链、宫位力主、传统点或朔望条件；按相关主题读取，不自动扩成人生报告",
         "fields": [
@@ -3476,7 +4255,7 @@
           "india.rulesets",
           "india.rule_trace"
         ],
-        "when": "未削减八分法：按具名Rao2000规则读取PAV/BAV/SAV、贡献者及本次分盘方法；计数不是概率，生时抽样变体另读敏感性。 astro_chart须指定chart_variant=india_chart。"
+        "when": "未削减八分法：按具名Rao2000规则读取PAV/BAV/SAV、贡献者及本次分盘方法；计数不是概率，生时抽样变体另读敏感性。 印度盘请直接调用 vedic_chart。"
       },
       "ashtakavarga_reductions": {
         "fields": [
@@ -3485,7 +4264,7 @@
           "india.rulesets",
           "india.rule_trace"
         ],
-        "when": "按具名Rao2000七曜占据口径读取reduction_analysis：原始BAV不改，未决相等分支为空值，保留每步来源与七曜加权。Pinda未接入事件择时或概率。 astro_chart须指定chart_variant=india_chart。"
+        "when": "按具名Rao2000七曜占据口径读取reduction_analysis：原始BAV不改，未决相等分支为空值，保留每步来源与七曜加权。Pinda未接入事件择时或概率。 印度盘请直接调用 vedic_chart。"
       },
       "mixed_pairs": {
         "when": "用户明确指定德国盘太阳弧目标时刻；通用入口须chart_variant=germany。analysis_datetime未给出时不计算。",
@@ -3799,7 +4578,7 @@
         ]
       }
     },
-    "astro_india": {
+    "vedic_chart": {
       "natal": {
         "fields": [
           "summary",
@@ -3984,7 +4763,7 @@
         "when": "核对 Santhanam 26/27.19 的译文、注解和 540 行普通相位表来源（含两处坐标标注冲突）；该来源未应用于当前 Raman Drik 计算。"
       }
     },
-    "astro_vimshottari": {
+    "vimshottari_dasha": {
       "stage": {
         "fields": [
           "summary",
@@ -5771,7 +6550,7 @@
         ]
       }
     },
-    "astro_germany": {
+    "hamburg_midpoint_chart": {
       "overview": {
         "fields": [
           "summary",
@@ -5964,7 +6743,7 @@
         ]
       }
     },
-    "astro_chart13": {
+    "thirteen_sector_chart": {
       "geometry": {
         "fields": [
           "chart_profile",
@@ -6012,7 +6791,7 @@
         "purpose": "Named Lilly solar definitions only: 17 arcminutes, same-sign 8.5-degree combustion, 17-degree beams. Keep the contradictory printed ten-degree example and explicit boundary convention unresolved; no whole-page or event-validity certification."
       }
     },
-    "astro_guolao": {
+    "guolao_chart": {
       "astronomy": {
         "fields": [
           "person_info",
@@ -6352,7 +7131,7 @@
         ]
       }
     },
-    "meihua_analysis": {
+    "meihua_time_cast": {
       "reading": {
         "purpose": "读同一次时间梅花的卦变、原体下初中终生克与季令，区分原文和现代建议",
         "fields": [
@@ -6412,9 +7191,7 @@
           "calendar_context.bazi_month_boundary",
           "interpretation.evidence_scope",
           "summary"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       },
       "weather": {
         "purpose": "先读实际命中条文、制约资格、五/六位置计数差异及旧研究负结果；不以体用判晴雨，不把raw matched当成未受制天气断言",
@@ -6507,9 +7284,7 @@
           "meihua.seasonal_strength",
           "interpretation.internal_countercontrol",
           "summary"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       },
       "strength": {
         "fields": [
@@ -6517,9 +7292,7 @@
           "meihua.seasonal_strength",
           "interpretation.seasonal_qualification",
           "summary"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       },
       "strength_audit": {
         "fields": [
@@ -6529,9 +7302,7 @@
           "interpretation.topic_reading",
           "summary",
           "interpretation.external_omens"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       },
       "civil_clock": {
         "purpose": "核对地区时区、明确偏移、实际UTC和交节比较同一时刻",
@@ -6559,9 +7330,7 @@
           "interpretation.casting_comparison",
           "summary",
           "interpretation.external_omens"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       },
       "external": {
         "purpose": "核对已报外应的形色／实物资格、原体及各取数候选；保留符号关系和所选原文的不同作用类别",
@@ -6574,9 +7343,7 @@
           "interpretation.external_omens",
           "interpretation.evidence_scope",
           "summary"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       },
       "stage_emphasis": {
         "description": "所报原文问事情境、内卦紧次及迟速／生克条件；整句条件适用不等于净作用或现实结局",
@@ -6607,9 +7374,7 @@
           "interpretation.motion_context",
           "interpretation.external_omens",
           "summary"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       },
       "quiet": {
         "purpose": "静占已报条件与未知状态、内卦资料范围；不把未采集解释为无外应",
@@ -6648,9 +7413,7 @@
           "meihua",
           "interpretation.situational_responses",
           "summary"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       },
       "external_symbol": {
         "purpose": "所报金银世宝、兵刃的原体限定与实物资格分列；不把不凶改成吉或安全",
@@ -6660,9 +7423,7 @@
           "meihua",
           "interpretation.external_omens",
           "summary"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       },
       "obstruction_days": {
         "description": "生克并见时的条件化原文计日；明例与类推、实际角色、制约与候选分别保留，非净延迟或现实日期",
@@ -6723,12 +7484,10 @@
           "interpretation.interpretation_topic",
           "interpretation.classical_text_reference",
           "summary"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       }
     },
-    "liureng_gods": {
+    "liuren_chart": {
       "core": {
         "purpose": "四课三传、旬遁空亡、探原十干十二运、贵人方向与来源；各规则口径分列，不能据此认证现实预测。",
         "fields": [
@@ -6839,7 +7598,7 @@
         ]
       }
     },
-    "liureng_runyear": {
+    "liuren_yearly_timing": {
       "core": {
         "purpose": "四课三传、旬遁空亡、探原十干十二运、本命与行年地盘上神及来源；年命干支与上神旬遁分列，未知性别不补男式。",
         "fields": [
@@ -7491,7 +8250,7 @@
         "purpose": "58.5历史通知与2001字面表、两张既有官方盘标记的未决冲突；仅比较名义盘真实触发路径，不改默认、不认证完整线义。"
       }
     },
-    "ziwei_birth": {
+    "ziwei_birth_chart": {
       "natal": {
         "purpose": "全部本命星曜落点、亮度、四化与三方四正地支引用的紧凑首轮视图；摘录配置旬空两支形成67条落点，66种星名均保留。",
         "fields": [
@@ -7709,7 +8468,7 @@
         ]
       }
     },
-    "bazi_birth": {
+    "bazi_birth_chart": {
       "roots": {
         "fields": [
           "bazi_birth.day_master",
@@ -7944,7 +8703,7 @@
         "purpose": "保留未校准工程档及独立的原典未决；物理根位不证明有效根力，空来源喜用不作否定结论。"
       }
     },
-    "analyze_destiny": {
+    "bazi_overview": {
       "roots": {
         "fields": [
           "day_master",
@@ -8282,9 +9041,7 @@
           "meihua.seasonal_strength",
           "interpretation.internal_countercontrol",
           "summary"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       },
       "strength": {
         "fields": [
@@ -8292,9 +9049,7 @@
           "meihua.seasonal_strength",
           "interpretation.seasonal_qualification",
           "summary"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       },
       "strength_audit": {
         "fields": [
@@ -8305,9 +9060,7 @@
           "summary",
           "interpretation.casting_readings",
           "interpretation.external_omens"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       },
       "text_count": {
         "purpose": "核对字数依据、软件扩展范围、计数候选与各自实际读法",
@@ -8354,9 +9107,7 @@
           "interpretation.casting_comparison",
           "summary",
           "interpretation.external_omens"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       },
       "external": {
         "purpose": "核对已报外应的形色／实物资格、原体及各取数候选；保留符号关系和所选原文的不同作用类别",
@@ -8370,9 +9121,7 @@
           "interpretation.casting_readings",
           "interpretation.evidence_scope",
           "summary"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       },
       "stage_emphasis": {
         "description": "所报原文问事情境、内卦紧次及迟速／生克条件；整句条件适用不等于净作用或现实结局",
@@ -8406,9 +9155,7 @@
           "interpretation.external_omens",
           "interpretation.casting_readings",
           "summary"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       },
       "observation_source": {
         "description": "核对已报端法类别、单一对象、八方参照、原例查表及实际起卦；不把来方改为相反行进方向",
@@ -8426,9 +9173,7 @@
           "interpretation.status",
           "interpretation.evidence_scope",
           "summary"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       },
       "quiet": {
         "purpose": "静占已报条件与未知状态、内卦资料范围；不把未采集解释为无外应",
@@ -8470,9 +9215,7 @@
           "interpretation.situational_responses",
           "interpretation.casting_readings",
           "summary"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       },
       "external_symbol": {
         "purpose": "所报金银世宝、兵刃的原体限定与实物资格分列；不把不凶改成吉或安全",
@@ -8483,9 +9226,7 @@
           "interpretation.external_omens",
           "interpretation.casting_readings",
           "summary"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       },
       "obstruction_days": {
         "description": "生克并见时的条件化原文计日；明例与类推、实际角色、制约与候选分别保留，非净延迟或现实日期",
@@ -8543,12 +9284,10 @@
           "interpretation.interpretation_topic",
           "interpretation.classical_text_reference",
           "summary"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       }
     },
-    "ziwei_horoscope": {
+    "ziwei_timing": {
       "year_branch_cycles": {
         "purpose": "按目标排盘农历年支读取流年岁前与将前十二神的完整地支序列、各自起点及软件来源。与既有流年附星、运限宫位名称分开。",
         "fields": [
@@ -8562,9 +9301,7 @@
           "birth_context",
           "ziwei_horoscope.ruleset",
           "ziwei_horoscope.scopes"
-        ],
-        "strict_fields": true,
-        "include_snapshot_text": false
+        ]
       },
       "source_rules": {
         "purpose": "核对所选大限首宫、给定岁序的小限及正常生月斗君，并区分火铃年支定点读法与软件生时推进；不认证整书、年龄岁首或全部流月日时规则。",
@@ -8756,7 +9493,7 @@
         "purpose": "核对本次运限同次计算中已生成的本命前置链：出生排盘农历与时支、命身、年干、命宫干支、纳音与局数；保留条件原文比较，不拿目标年或岁序参考年替换出生年干。未另起本命run或认证原典岁首。"
       }
     },
-    "astro_hellen": {
+    "hellenistic_chart": {
       "fixed_stars": {
         "when": "用户明确问恒星与本命星体／角度联系；读取实际命中与容许度，不将恒星标签当命定事件；核对同黄道、TT与星表来源，读取原典程度限定，未计算不等于无合相。",
         "fields": [
@@ -8798,7 +9535,7 @@
         "purpose": "Read nominal-epoch finite unbent-ray geometry and the inspected native solar mass model. A background solar-disc position is a virtual continuous extension; foreground transits differ. Unknown geometry remains unknown. This is not an optical occultation, limb-contact, detectability or physical-error certificate. Never replace native positions with a no-deflection diagnostic to pass a reference comparison."
       }
     },
-    "astro_horary": {
+    "horary_chart": {
       "lilly_sign_rays": {
         "when": "核对Lilly1647第108–109页由求问者主星向所问主星发出的左相／右相、冲相、同星座和原表不相照关系，并与实际度数相位候选分别核对。",
         "fields": [
@@ -9019,10 +9756,12 @@
       },
       "named_patterns": {
         "purpose": "按图号读取选定格表条文、条件角色、采用口径与明刊书影和转录身份。",
-        "fields": ["rule_catalogue.named_patterns"]
+        "fields": [
+          "rule_catalogue.named_patterns"
+        ]
       }
     },
-    "astro_election": {
+    "evaluate_election_time": {
       "calculation_conditions": {
         "when": "逐项比较候选时刻的行星、月亮条件、实际角点与未决因素。",
         "fields": [
@@ -9096,7 +9835,7 @@
         ]
       }
     },
-    "dayun_analysis": {
+    "bazi_luck_cycles": {
       "birth_time_sensitivity": {
         "fields": [
           "analysis_reference",
@@ -9113,7 +9852,7 @@
         "when": "核对同次完整分析瞬间、UTC偏移/fold及分析日期的补齐来源；不把默认月初、月中或整点当成当前。"
       }
     },
-    "liuyue_analysis": {
+    "bazi_monthly_timing": {
       "analysis_clock": {
         "fields": [
           "analysis_reference"
@@ -9121,7 +9860,7 @@
         "when": "核对同次完整分析瞬间、UTC偏移/fold及分析日期的补齐来源；不把默认月初、月中或整点当成当前。"
       }
     },
-    "liuri_analysis": {
+    "bazi_daily_timing": {
       "analysis_clock": {
         "fields": [
           "analysis_reference"
@@ -9129,7 +9868,7 @@
         "when": "核对同次完整分析瞬间、UTC偏移/fold及分析日期的补齐来源；不把默认月初、月中或整点当成当前。"
       }
     },
-    "liushi_analysis": {
+    "bazi_hourly_timing": {
       "analysis_clock": {
         "fields": [
           "analysis_reference"
@@ -9137,7 +9876,7 @@
         "when": "核对同次完整分析瞬间、UTC偏移/fold及分析日期的补齐来源；不把默认月初、月中或整点当成当前。"
       }
     },
-    "bazi_source_compare": {
+    "compare_bazi_sources": {
       "energy_sources": {
         "fields": [
           "four_pillars",
@@ -9182,7 +9921,7 @@
         "purpose": "按字面四柱定位开发者原页校读，保留身印、通关、寒暖和原文时序。原局与行运分别读取。有条件校读或原文功能说明时，强弱仍可未裁。不据相对天数推定出生瞬间或司令生效。校读尚未经独立专家或模型解释验收。视图字段复制到fields，视图名不是请求参数。"
       }
     },
-    "knowledge_registry": {
+    "knowledge_catalog": {
       "sources": {
         "fields": [
           "domains",

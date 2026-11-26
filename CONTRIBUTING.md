@@ -6,6 +6,8 @@
 
 阅读导航：[开始贡献](#开始贡献) · [报告问题](#报告问题) · [修改约束](#修改约束) · [验证](#提交前验证) · [提交 PR](#提交与-pull-request) · [同步 Fork](#保持-fork-同步)
 
+贡献的典型闭环为：**安装（`uv sync --locked --extra dev`）→ 复现（最小虚构请求 + `doctor`）→ 修改 → 验证（领域测试与静态检查）→ 贡献（提交与 PR）**。
+
 ## 开始贡献
 
 先检查已有 [Issues](https://github.com/thomas-yanxin/FateBridge/issues) 和 [Pull Requests](https://github.com/thomas-yanxin/FateBridge/pulls)，避免重复工作。范围较大的新能力或接口变更先在 Issue 中说明用例、输入输出与兼容策略。文档修正可直接准备 PR；页面分工与写作要求见[文档写作与维护](docs/development-guide.md#文档写作)。

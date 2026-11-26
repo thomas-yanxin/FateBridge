@@ -160,16 +160,14 @@ def test_index_uses_the_same_representable_boundaries_as_the_timeline() -> None:
         (2025, 28, "2025-02-28", "2026-02-28"),
     ],
 )
-@pytest.mark.parametrize("return_timezone", ["UTC", "America/New_York"])
 def test_leap_birth_year_and_active_month_agree_on_all_transports(
     analysis_year: int,
     analysis_day: int,
     expected_start: str,
     expected_end: str,
-    return_timezone: str,
     surface_calls,
 ) -> None:
-    spec = SPECS["givenyear"]
+    spec = SPECS["chart_for_year"]
     payload = {
         "name": "Leap boundary reference",
         "birth_year": 2000,
@@ -184,28 +182,27 @@ def test_leap_birth_year_and_active_month_agree_on_all_transports(
         "analysis_year": analysis_year,
         "analysis_month": 2,
         "analysis_day": analysis_day,
-        "return_timezone": return_timezone,
     }
     fields = [
-        "givenyear.year_start",
-        "givenyear.year_end",
-        "givenyear.monthly_profections",
-        "givenyear.annual_profection",
-        "givenyear.analysis_datetime",
+        "chart_for_year.year_start",
+        "chart_for_year.year_end",
+        "chart_for_year.monthly_profections",
+        "chart_for_year.annual_profection",
+        "chart_for_year.analysis_datetime",
     ]
     response, protocol, code, local = surface_calls(
         spec,
         payload,
-        params=[("fields", field) for field in fields],
-        options={"fields": fields},
-        flags=["--fields", *fields],
+        params=[("detail", "audit")] + [("fields", field) for field in fields],
+        options={"detail": "audit", "fields": fields},
+        flags=["--detail", "audit", "--fields", *fields],
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
-    results = [output["givenyear"] for output in outputs]
+    results = [output["chart_for_year"] for output in outputs]
     assert results[0] == results[1] == results[2]
     result = results[0]
-    zone = parse_timezone_name(return_timezone)
+    zone = parse_timezone_name("UTC")
     expected_start = datetime.fromisoformat(expected_start + "T10:30:00+00:00")
     expected_end = datetime.fromisoformat(expected_end + "T10:30:00+00:00")
     assert result["year_start"] == expected_start.astimezone(zone).isoformat()
@@ -329,23 +326,27 @@ def test_persian_hit_limit_keeps_the_first_actual_age_with_equal_display_labels(
 @pytest.mark.parametrize(
     ("tool", "field", "options"),
     [
-        ("astro_harmonic", "harmonic_chart", {"harmonic": 7}),
-        ("astro_agepoint", "age_point", {"max_age_years": 72}),
-        ("astro_persiandirected", "persian_directed", {"max_age_years": 90}),
+        ("harmonic_chart", "harmonic_chart", {"harmonic": 7}),
+        ("age_point", "age_point", {"max_age_years": 72}),
+        ("persian_directions", "persian_directed", {"max_age_years": 90}),
         (
-            "astro_balbillus",
+            "balbillus_periods",
             "balbillus",
             {"mode": "nearest", "max_age_years": 30},
         ),
         (
-            "astro_balbillus",
+            "balbillus_periods",
             "balbillus",
             {"mode": "forward", "max_age_years": 30},
         ),
-        ("zr", "zr", {"analysis_year": 2030, "analysis_month": 1, "analysis_day": 1}),
         (
-            "zr",
-            "zr",
+            "zodiacal_releasing",
+            "zodiacal_releasing",
+            {"analysis_year": 2030, "analysis_month": 1, "analysis_day": 1},
+        ),
+        (
+            "zodiacal_releasing",
+            "zodiacal_releasing",
             {
                 "birth_year": 1995,
                 "birth_month": 7,
@@ -360,8 +361,8 @@ def test_persian_hit_limit_keeps_the_first_actual_age_with_equal_display_labels(
             },
         ),
         (
-            "zr",
-            "zr",
+            "zodiacal_releasing",
+            "zodiacal_releasing",
             {
                 "birth_year": 1990,
                 "birth_month": 5,
@@ -376,8 +377,8 @@ def test_persian_hit_limit_keeps_the_first_actual_age_with_equal_display_labels(
             },
         ),
         (
-            "zr",
-            "zr",
+            "zodiacal_releasing",
+            "zodiacal_releasing",
             {
                 "birth_year": 1984,
                 "birth_month": 1,
@@ -410,18 +411,16 @@ def test_derived_calculations_reach_all_three_transports(
         **options,
     }
     fields = [field]
-    query = [("fields", field), ("strict_fields", "true")]
-    query += [("include_snapshot_text", "false"), ("response_char_limit", 0)]
+    query = [("detail", "audit"), ("fields", field)]
     http, protocol, code, cli = surface_calls(
         spec,
         inputs,
         params=query,
         options={
+            "detail": "audit",
             "fields": fields,
-            "strict_fields": True,
-            "include_snapshot_text": False,
         },
-        flags=["--fields", *fields],
+        flags=["--detail", "audit", "--fields", *fields],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error
@@ -438,7 +437,7 @@ def test_derived_calculations_reach_all_three_transports(
         assert not calculation["reduction_model"]["whole_procedure_certified"]
     else:
         pass
-    if field == "zr":
+    if field == "zodiacal_releasing":
         # Independent Kerykeion6.0.5 natal factories agree on Can/Leo and
         # Lib/Lib. Brennan/Schaim episode192 fixes Fortune as angular reference
         # and shifts only same-sign Spirit. Kerykeion's missing shift and its

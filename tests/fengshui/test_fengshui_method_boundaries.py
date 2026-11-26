@@ -4,11 +4,15 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.fengshui.models import AssessRequest
-from fatebridge.services.fengshui import assess
+from fatebridge.services.fengshui import calculate_fengshui_assessment as _assess
 from tests.fixtures.fengshui import payload
 from tests.unit_test.fixtures.fengshui_layout import (
     form,
 )
+
+
+def assess(**kwargs):
+    return _assess(AssessRequest.model_validate(kwargs))
 
 
 def unknown_orientation(**updates):

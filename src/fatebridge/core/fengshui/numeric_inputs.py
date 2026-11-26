@@ -13,7 +13,7 @@ from typing import Annotated, Any, Literal, get_args, get_origin
 from pydantic import BeforeValidator
 from pydantic_core import PydanticCustomError
 
-from fatebridge.core.requests.base import _DeferredModel
+from fatebridge.core.requests.base import FateBridgeBaseRequest
 
 UNION_ORIGINS = (types.UnionType, get_origin(Annotated[int, "u"] | None))
 
@@ -161,7 +161,7 @@ class _NumericGuard:
         return _normalize(self.annotation, value)
 
 
-class FengshuiInput(_DeferredModel):
+class FengshuiInput(FateBridgeBaseRequest):
     """Attach the same fact-type precondition to nested and flattened fields."""
 
     @classmethod

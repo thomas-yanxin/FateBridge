@@ -12,9 +12,7 @@
       "natal_contexts.person2.four_pillars",
       "cross_chart_relations.pairs",
       "cross_chart_relations.groups"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,

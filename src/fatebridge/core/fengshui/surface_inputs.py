@@ -4,7 +4,7 @@ from typing import Literal
 
 from pydantic import ConfigDict, Field, StrictBool, model_validator
 
-from fatebridge.core.fengshui.numeric_inputs import FengshuiInput as _DeferredModel
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput
 from fatebridge.core.fengshui.workstation_inputs import ObservedCondition
 
 SurfaceZone = Literal[
@@ -32,7 +32,7 @@ PLANT_REPRESENTATIONS = frozenset(
 )
 
 
-class SurfaceItem(_DeferredModel):
+class SurfaceItem(FengshuiInput):
     model_config = ConfigDict(
         json_schema_extra={
             "anyOf": [
@@ -88,7 +88,7 @@ class SurfaceItem(_DeferredModel):
         return self
 
 
-class SurfaceLayout(_DeferredModel):
+class SurfaceLayout(FengshuiInput):
     object_id: str = Field(min_length=1, max_length=100)
     ruleset_id: Literal["desktop_bagua_btb_v1"]
     shape: Literal["rectangular"]
@@ -112,7 +112,7 @@ class SurfaceLayout(_DeferredModel):
         return self
 
 
-class SurfaceConstraints(_DeferredModel):
+class SurfaceConstraints(FengshuiInput):
     """Action permissions and confirmed feasibility, not observations of qi."""
 
     object_id: str = Field(min_length=1, max_length=100)

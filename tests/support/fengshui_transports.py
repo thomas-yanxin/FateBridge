@@ -6,14 +6,12 @@ import fatebridge.mcp_server as mcp
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.transports import call_calculation
 
-SPECS = {s.key.removeprefix("fengshui_"): s for s in CATALOG if s.family == "fengshui"}
-_PUBLIC_NAMES = {
-    **{key: spec.tool_name for key, spec in SPECS.items()},
-    **{
-        spec.tool_name.removeprefix("fengshui_"): spec.tool_name
-        for spec in SPECS.values()
-    },
-}
+SPECS = {s.name.removeprefix("fengshui_"): s for s in CATALOG if s.family == "fengshui"}
+# Support xuankong_natal alias used by existing fixture helpers.
+if "xuankong_house_chart" in SPECS:
+    SPECS["xuankong_natal"] = SPECS["xuankong_house_chart"]
+
+_PUBLIC_NAMES = {key: spec.name for key, spec in SPECS.items()}
 
 
 async def mcp_call(name, inputs):
@@ -21,6 +19,6 @@ async def mcp_call(name, inputs):
         return await call_calculation(
             client,
             _PUBLIC_NAMES.get(name, "fengshui_" + name),
-            {"response_char_limit": 0, **inputs},
+            {"detail": "audit", **inputs},
             raise_on_error=False,
         )

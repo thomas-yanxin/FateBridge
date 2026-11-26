@@ -287,8 +287,6 @@ class ErrorEnvelope(BaseModel):
     error_code: str
     retryable: bool
     issues: list[ValidationIssue] | None = None
-    trace_id: str | None = None
-    parent_run_id: str | None = None
 
 
 class ParameterError(ValueError):
@@ -502,6 +500,4 @@ def error_response_payload(data: dict[str, Any], operation: str) -> dict[str, An
         "retryable": data.get("retryable", False),
         "operation": operation,
         **({"issues": data["issues"]} if "issues" in data else {}),
-        **({"trace_id": data["trace_id"]} if "trace_id" in data else {}),
-        **({"parent_run_id": data["parent_run_id"]} if "parent_run_id" in data else {}),
     }

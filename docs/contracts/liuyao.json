@@ -53,9 +53,7 @@
       "liuyao_evidence",
       "classical_text_evidence",
       "summary"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "$defs": {
@@ -224,32 +222,6 @@
         "description": "调用方明确选定的用神爻位，初爻为1；默认取本爻，focus_kind可选变爻或已列伏神",
         "title": "Focus Line"
       },
-      "gps_lat": {
-        "anyOf": [
-          {
-            "type": "number"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "GPS latitude",
-        "title": "Gps Lat"
-      },
-      "gps_lon": {
-        "anyOf": [
-          {
-            "type": "number"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "GPS longitude",
-        "title": "Gps Lon"
-      },
       "gua_code": {
         "anyOf": [
           {
@@ -264,8 +236,11 @@
         "description": "Current hexagram code, initial line first",
         "title": "Gua Code"
       },
-      "lat": {
+      "latitude": {
         "anyOf": [
+          {
+            "type": "number"
+          },
           {
             "type": "string"
           },
@@ -275,7 +250,7 @@
         ],
         "default": "31n13",
         "description": "Latitude text or decimal",
-        "title": "Lat"
+        "title": "Latitude"
       },
       "lines": {
         "description": "Optional six lines, initial line first",
@@ -286,8 +261,11 @@
         "title": "Lines",
         "type": "array"
       },
-      "lon": {
+      "longitude": {
         "anyOf": [
+          {
+            "type": "number"
+          },
           {
             "type": "string"
           },
@@ -297,11 +275,16 @@
         ],
         "default": "121e28",
         "description": "Longitude text or decimal",
-        "title": "Lon"
+        "title": "Longitude"
       },
       "method": {
         "default": "auto",
         "description": "起卦方式：auto（默认，缺卦则按时刻时间起卦）/ coin（真·摇钱起卦，系统随机六掷）/ time（时间起卦）。提供 coins/lines/gua_code 时优先使用所提供的卦，重复输入必须一致。",
+        "enum": [
+          "auto",
+          "coin",
+          "time"
+        ],
         "title": "Method",
         "type": "string"
       },
@@ -336,15 +319,7 @@
         "title": "Time",
         "type": "string"
       },
-      "timing_days": {
-        "default": 0,
-        "description": "按已明确的用爻列未来0至60个干支日的条件候选；0不展开，不是事件发生保证",
-        "maximum": 60,
-        "minimum": 0,
-        "title": "Timing Days",
-        "type": "integer"
-      },
-      "zone": {
+      "timezone": {
         "anyOf": [
           {
             "type": "string"
@@ -355,7 +330,15 @@
         ],
         "default": "+08:00",
         "description": "Timezone spec",
-        "title": "Zone"
+        "title": "Timezone"
+      },
+      "timing_days": {
+        "default": 0,
+        "description": "按已明确的用爻列未来0至60个干支日的条件候选；0不展开，不是事件发生保证",
+        "maximum": 60,
+        "minimum": 0,
+        "title": "Timing Days",
+        "type": "integer"
       }
     },
     "required": [

@@ -22,7 +22,7 @@ TOPICS = (
     "romance",
 )
 BAZI_ANCHOR_TOOLS = frozenset(
-    ("analyze_destiny", "bazi_birth", *("bazi_" + t for t in TOPICS))
+    ("bazi_overview", "bazi_birth_chart", *("bazi_" + t for t in TOPICS))
 )
 POSITIONS = ("year", "month", "day", "hour")
 
@@ -297,8 +297,8 @@ def require_complete_bazi_anchors(key: str, result: dict[str, Any]) -> None:
     """Only called on full successful results, before any transport projection."""
     if key not in BAZI_ANCHOR_TOOLS:
         return
-    if key in {"analyze_destiny", "bazi_birth"}:
-        root = result if key == "analyze_destiny" else result.get("bazi_birth")
+    if key in {"bazi_overview", "bazi_birth_chart"}:
+        root = result if key == "bazi_overview" else result.get("bazi_birth")
         r = _keys(
             root,
             "person_info four_pillars day_master element_distribution favorable_elements ten_gods patterns calendar_context structure_profile",

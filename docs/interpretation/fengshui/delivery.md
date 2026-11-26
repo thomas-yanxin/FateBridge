@@ -41,7 +41,7 @@
 | 用户明确另选 BTB 的桌面物件 | `layout_analysis.surface_analysis.findings` 的 item_findings 与 action_options，按物件覆盖和动作状态分别说明 |
 | 方向／宅盘尚未齐 | `method_policy` 与 `coverage.scene_scope` 说明实际计算层及未选原因；已完成形态仍照常解释 |
 
-字段是内部取证路径，用户不必理解字段名；可缺分支不能无条件加入严格投影。解释已有结果时复用同一 run；若结果在 `result_delivery` 中，按共享交付合同读同一份结果，不重新计算。
+字段是内部取证路径，用户不必理解字段名；可缺分支不能无条件加入严格投影。解释已有结果时直接复用，需要完整字段时使用 `detail=audit` 且 `fields=null`，不重新计算。
 
 ## 有候选时让差异可见
 

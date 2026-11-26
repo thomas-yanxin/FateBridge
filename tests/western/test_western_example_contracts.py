@@ -10,51 +10,50 @@ import pytest
 from fastmcp import Client
 from jsonschema import validate
 
-from fatebridge.application.description import describe_input_spec, spec_is_cli_safe
+from fatebridge.application.description import describe_input_spec
 from fatebridge.application.examples import example_input
 from fatebridge.cli import run as cli_run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from tests.fixtures.mcp_result_delivery import read_full_result
-from tests.support.transports import describe_capability, rest
+from tests.support.transports import call_calculation, describe_capability
 
 KEYS = [
-    "astro_chart",
-    "astro_chart13",
-    "astro_hellen",
-    "astro_germany",
-    "astro_relative_chart",
-    "western_timing_analysis",
-    "solarreturn",
-    "lunarreturn",
-    "transit",
-    "solararc",
-    "givenyear",
+    "astrology_chart",
+    "thirteen_sector_chart",
+    "hellenistic_chart",
+    "hamburg_midpoint_chart",
+    "relationship_chart",
+    "western_timing",
+    "solar_return",
+    "lunar_return",
+    "transit_chart",
+    "solar_arc",
+    "chart_for_year",
     "profection",
-    "pd",
-    "pdchart",
-    "zr",
+    "primary_directions",
+    "primary_directions_chart",
+    "zodiacal_releasing",
     "firdaria",
     "decennials",
-    "astro_harmonic",
-    "astro_planetary_ages",
-    "astro_triplicity_rulers",
-    "astro_lunation_phase",
-    "astro_distributions",
-    "astro_balbillus",
-    "astro_keypoints",
-    "astro_yearsystem129",
-    "astro_planetaryarc",
-    "astro_persiandirected",
-    "astro_agepoint",
-    "astro_vedicprog",
-    "astro_jaynesprog",
-    "astro_mundane",
-    "astro_extrareturns",
-    "astro_horary",
-    "astro_election",
+    "harmonic_chart",
+    "planetary_ages",
+    "triplicity_ruler_periods",
+    "lunar_phase_progressions",
+    "bounds_directions",
+    "balbillus_periods",
+    "numeric_aspect_periods",
+    "planetary_periods_129_years",
+    "planetary_arc_directions",
+    "persian_directions",
+    "age_point",
+    "sidereal_progressions",
+    "declination_progressions",
+    "mundane_ingress_chart",
+    "planetary_returns",
+    "horary_chart",
+    "evaluate_election_time",
 ]
-SPECS = {s.key: s for s in CATALOG}
+SPECS = {s.name: s for s in CATALOG}
 AS_OF = "2026-10-12T12:00:00+08:00"
 
 
@@ -100,7 +99,7 @@ def test_client_nested_mutations_cannot_poison_later_discovery(
 
 
 def test_missing_unrelated_examples_are_not_filled_with_a_generic_person() -> None:
-    undeclared = replace(SPECS["astro_chart"], key="_unregistered_example_probe")
+    undeclared = replace(SPECS["astrology_chart"], name="_unregistered_example_probe")
     assert example_input(undeclared) is None
     assert "example_context" not in describe_input_spec(undeclared)
 
@@ -108,10 +107,8 @@ def test_missing_unrelated_examples_are_not_filled_with_a_generic_person() -> No
 def assert_original_facts(actual, original):
     if isinstance(actual, dict):
         for key, value in actual.items():
-            if key in {"run_metadata", "result_delivery"}:
+            if key == "run_metadata":
                 continue
-            else:
-                pass
             assert key in original, key
             assert_original_facts(value, original[key])
     elif isinstance(actual, list):
@@ -129,51 +126,6 @@ def assert_requested_path(value, field):
         current = current[key]
 
 
-@pytest.mark.parametrize(
-    "changed", ["result_id", "run_id", "first_page_uri", "total_chars"]
-)
-def test_compact_readback_rejects_a_different_result_or_document(changed: str) -> None:
-    from types import SimpleNamespace
-
-    reference = {
-        "mode": "paged",
-        "result_id": "fixture-result",
-        "total_chars": 2,
-        "manifest_uri": "fatebridge://results/fixture-result",
-        "compact_reference": True,
-    }
-    manifest = {
-        "result_id": reference["result_id"],
-        "run_metadata": {"run_id": "original-run"},
-        "total_chars": 2,
-        "first_page_uri": "fatebridge://results/fixture-result/pages/0",
-    }
-    if changed == "run_id":
-        manifest["run_metadata"]["run_id"] = "different-run"
-    else:
-        manifest[changed] = {
-            "result_id": "different",
-            "first_page_uri": "fatebridge://results/different/pages/0",
-            "total_chars": 3,
-        }[changed]
-
-    class Client:
-        async def read_resource(self, uri):
-            assert uri == reference["manifest_uri"]
-            return [SimpleNamespace(text=json.dumps(manifest))]
-
-    with pytest.raises(AssertionError):
-        asyncio.run(
-            read_full_result(
-                Client(),
-                {
-                    "run_metadata": {"run_id": "original-run"},
-                    "result_delivery": reference,
-                },
-            )
-        )
-
-
 @pytest.mark.parametrize("key", KEYS)
 def test_public_descriptor_drives_each_available_adapter_without_private_input_defaults(
     key, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
@@ -182,92 +134,69 @@ def test_public_descriptor_drives_each_available_adapter_without_private_input_d
 
     async def public_call():
         async with Client(create_mcp_app()) as client:
-            if spec.mcp_name:
-                record = json.loads(
-                    (
-                        await client.read_resource(
-                            f"fatebridge://tools/{spec.tool_name}/input"
-                        )
-                    )[0].text
-                )["tools"][0]
+            if spec.expose_mcp:
+                record = await describe_capability(client, spec.name)
             else:
-                described = rest.get("/api/tools").json()
-                record = next(item for item in described["tools"] if item["key"] == key)
+                described = rest.get(
+                    "/api/tools", params={"tool": spec.name, "detail": "full"}
+                ).json()
+                record = next(
+                    item for item in described["tools"] if item["tool"] == key
+                )
             assert record["example_context"]["fictional"] is True
             assert record["example_context"]["use_as_user_default"] is False
             data = record["example_input"]
             fields = record.get("suggested_fields")
             values = []
-            if spec.mcp_name:
-                description = await describe_capability(client, spec.tool_name)
-                assert description["input_schema"] == record["input_schema"]
-                validate(data, description["input_schema"])
+            if spec.expose_mcp:
+                validate(data, record["input_schema"])
                 params = {
-                    "tool": spec.tool_name,
+                    "tool": spec.name,
                     "arguments": data,
-                    "detail": "standard",
+                    "detail": "audit",
                     "as_of": AS_OF,
-                    "fields": fields,
-                    "strict_fields": True,
-                    "include_snapshot_text": False,
-                    "response_char_limit": 0,
+                    **({"fields": fields} if fields is not None else {}),
                 }
-                run_tool = next(
-                    tool
-                    for tool in await client.list_tools()
-                    if tool.name == "run_calculation"
+                result = await call_calculation(
+                    client,
+                    spec.name,
+                    {
+                        **data,
+                        "as_of": AS_OF,
+                        "detail": "audit",
+                        **({"fields": fields} if fields is not None else {}),
+                    },
+                    raise_on_error=False,
                 )
-                validate(params, run_tool.input_schema)
-                result = await client.call_tool(
-                    run_tool.name, params, raise_on_error=False
-                )
-                assert not result.is_error
-                values.append(
-                    ("mcp", await read_full_result(client, result.structured_content))
-                )
-            else:
-                pass
+                assert not result.is_error, params
+                values.append(("mcp", result.structured_content))
             return record, values
 
     record, values = asyncio.run(public_call())
     data = record["example_input"]
     fields = record.get("suggested_fields")
     if spec.rest_path:
-        params = {
-            "as_of": AS_OF,
-            "strict_fields": "true",
-            "include_snapshot_text": "false",
-            "response_char_limit": 0,
-        }
+        params: dict[str, object] = {"as_of": AS_OF, "detail": "audit"}
         if fields is not None:
             params["fields"] = fields
-        else:
-            pass
         response = rest.post(spec.rest_path, json=data, params=params)
         assert response.status_code == 200
         values.append(("rest", response.json()))
-    else:
-        pass
-    if spec_is_cli_safe(spec):
-        assert cli_run(["describe", spec.tool_name]) == 0
-        description = json.loads(capsys.readouterr().out)
-        assert description["example_input"] == data
-        assert description["example_context"] == record["example_context"]
-        flags = ["--include-snapshot-text", "false", "--response-char-limit", "0"]
-        if fields is not None:
-            flags += ["--fields", *fields, "--strict-fields", "true"]
-        else:
-            pass
-        subject = tmp_path / "published-example.json"
-        subject.write_text(json.dumps(data))
-        code = cli_run(
-            [spec.tool_name, "--subject-file", str(subject), "--as-of", AS_OF, *flags]
-        )
-        value = json.loads(capsys.readouterr().out)
-        assert code == 0
-        values.append(("cli", value))
-    else:
-        pass
+    assert cli_run(["discover", "--tool", spec.name, "--detail", "full"]) == 0
+    description = json.loads(capsys.readouterr().out)["tools"][0]
+    assert description["example_input"] == data
+    assert description["example_context"] == record["example_context"]
+    flags = ["--detail", "audit"]
+    if fields is not None:
+        flags += ["--fields", *fields]
+    subject = tmp_path / "published-example.json"
+    subject.write_text(json.dumps(data))
+    code = cli_run(
+        [spec.name, "--request-file", str(subject), "--as-of", AS_OF, *flags]
+    )
+    value = json.loads(capsys.readouterr().out)
+    assert code == 0
+    values.append(("cli", value))
     assert values
     for surface, value in values:
         assert "error" not in value

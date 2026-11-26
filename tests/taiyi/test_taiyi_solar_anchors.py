@@ -67,7 +67,7 @@ def inputs(tool, mode, profile):
     return dict(
         date="2026-10-25",
         time="12:00:00",
-        zone="+08:00",
+        timezone="+08:00",
         use_true_solar_time=False,
         taiyi_options=selected,
     )
@@ -93,7 +93,6 @@ def test_all_source_anchor_profiles_keep_same_run_models_and_text(
         assert value["resolution_provider"] == FALLBACK_PROVIDER
         assert value["ephemeris_model"] == FALLBACK_MODEL
         assert value["solar_model_details"]["root_time_scale"] == "TT"
-        assert f"{FALLBACK_PROVIDER}/{FALLBACK_MODEL}" in result["snapshot_text"]
     assert anchors["boundary"]["name"] == board["calendar_rules"]["anchor_name"]
     assert (
         anchors["boundary"]["datetime_with_offset"]
@@ -103,8 +102,6 @@ def test_all_source_anchor_profiles_keep_same_run_models_and_text(
     assert (
         "winter_anchor_ephemeris_model" in board["calendar_summary"]
     ) == winter_expected
-    assert result["snapshot_text"].count("节气实际模型：") == 1
-    assert result["snapshot_export"]["export_text"].count("节气实际模型：") == 1
 
 
 def test_source_record_mutation_cannot_poison_the_cached_term() -> None:
@@ -121,10 +118,9 @@ def test_year_count_does_not_invent_an_unused_solar_anchor() -> None:
     result = calculate_taiyi_analysis(**inputs("taiyi", "year", None))
     assert "solar_anchors" not in result["taiyi"]
     assert "anchor_ephemeris_model" not in result["taiyi"]["calendar_summary"]
-    assert "节气实际模型：" not in result["snapshot_text"]
 
 
-@pytest.mark.parametrize("tool", ["taiyi", "sanshiunited"])
+@pytest.mark.parametrize("tool", ["taiyi", "sanshi_combined_chart"])
 @pytest.mark.parametrize(
     "mode,profile", [("day", None), ("hour", "key_hour_winter_jiazi_v1")]
 )
@@ -135,8 +131,8 @@ def test_actual_rest_mcp_cli_and_same_run_source_view(
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    spec = next(s for s in CATALOG if s.key == tool)
-    values = inputs(tool, mode, profile)
+    spec = next(s for s in CATALOG if s.name == tool)
+    values = inputs("taiyi" if tool == "taiyi" else "sanshiunited", mode, profile)
     fields = suggested_fields(spec, view="solar_anchors")
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
@@ -148,21 +144,20 @@ def test_actual_rest_mcp_cli_and_same_run_source_view(
         r = client.post(
             spec.rest_path,
             json=values,
-            params=[("fields", f) for f in fields]
-            + [("strict_fields", "true"), ("include_snapshot_text", "false")],
+            params=[("detail", "audit")] + [("fields", f) for f in fields],
         )
     assert r.status_code == 200, r.text
     expected = r.json()["taiyi"]
     argv = [
-        spec.tool_name,
-        "--strict-fields",
-        "--no-include-snapshot-text",
+        spec.name,
+        "--detail",
+        "audit",
         "--fields",
         *fields,
     ]
     for key, value in values.items():
         if key == "use_true_solar_time":
-            argv.append("--no-use-true-solar-time")
+            argv += ["--use-true-solar-time", "false"]
         else:
             argv += [
                 "--" + key.replace("_", "-"),
@@ -175,16 +170,15 @@ def test_actual_rest_mcp_cli_and_same_run_source_view(
         async with Client(create_mcp_app()) as client:
             response = await call_calculation(
                 client,
-                spec.mcp_name,
+                spec.name,
                 {
                     **values,
+                    "detail": "audit",
                     "fields": fields,
-                    "strict_fields": True,
-                    "include_snapshot_text": False,
                 },
                 raise_on_error=False,
             )
-            full = await same_run_payload(client, response)
+            full = response.structured_content
             assert full["taiyi"] == expected
 
     asyncio.run(call())

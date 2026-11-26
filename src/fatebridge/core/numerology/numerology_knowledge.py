@@ -8,7 +8,7 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any, NoReturn
 
-from fatebridge.core.heluo.heluo_snapshot import yao_text
+from fatebridge.core.heluo.heluo_texts import yao_text
 from fatebridge.core.knowledge_store import ToolValidationError
 from fatebridge.core.numerology.canping_schedule_basis import (
     APPLIED,

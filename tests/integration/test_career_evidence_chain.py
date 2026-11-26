@@ -106,7 +106,7 @@ def test_boundary_day_keeps_midnight_and_makes_hourly_followup_discoverable() ->
     )
     assert tc["liunian_pillar"] == "丙午"
     assert noon["stem"] + noon["branch"] == "丁未"
-    assert tc["hourly_evidence"]["tool"] == SPECS["timing_analysis"].tool_name
+    assert tc["hourly_evidence"]["tool"] == SPECS["bazi_timing"].name
 
 
 def test_partial_override_reports_effective_pillar_and_marks_auto_age_reference() -> (
@@ -126,23 +126,26 @@ def test_career_projection_preserves_primary_tie_and_scope_across_transports(
 ) -> None:
     spec = SPECS["bazi_career"]
     fields = suggested_fields(spec, view=view)
-    params = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
+    params = dict(detail="audit", fields=fields)
     http, protocol, code, output = surface_calls(
         spec,
         D1,
         params=params,
         options=params,
         flags=[
-            "--no-metadata",
+            "--detail",
+            "audit",
             "--fields",
             *fields,
-            "--strict-fields",
-            "--no-include-snapshot-text",
         ],
         cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
-    assert business(http.json()) == business(protocol.structured_content) == output
+    assert (
+        business(http.json())
+        == business(protocol.structured_content)
+        == business(output)
+    )
     career = output["career_analysis"]
     assert career["evidence_chain"]["topic"]["first_view"]["natal_stars"]
     if "timing_context" in career:
@@ -154,7 +157,7 @@ def test_career_projection_preserves_primary_tie_and_scope_across_transports(
 
 
 def test_western_career_view_keeps_phase_bounds_and_real_transit_evidence() -> None:
-    spec = SPECS["western_timing_analysis"]
+    spec = SPECS["western_timing"]
     fields = suggested_fields(spec, view="career")
     assert "time_lords.firdaria.current_major" in fields
     assert "time_lords.firdaria.current_sub" in fields
@@ -164,7 +167,7 @@ def test_western_career_view_keeps_phase_bounds_and_real_transit_evidence() -> N
 
 
 def test_western_career_actual_evidence_agrees_across_transports(surface_calls) -> None:
-    spec = SPECS["western_timing_analysis"]
+    spec = SPECS["western_timing"]
     fields = suggested_fields(spec, view="career")
     request = {
         **example_input(spec),
@@ -175,30 +178,29 @@ def test_western_career_actual_evidence_agrees_across_transports(surface_calls) 
         "analysis_minute": 0,
     }
     params = dict(
+        detail="audit",
         fields=fields,
-        strict_fields=True,
-        include_snapshot_text=False,
-        response_char_limit=0,
         as_of="2026-10-12T02:00:00Z",
     )
     http, protocol, code, output = surface_calls(
         spec,
         request,
         params=params,
-        options={k: v for k, v in params.items() if k != "as_of"},
+        options=params,
         flags=[
-            "--no-metadata",
+            "--detail",
+            "audit",
             "--fields",
             *fields,
-            "--strict-fields",
-            "--no-include-snapshot-text",
-            "--response-char-limit",
-            "0",
         ],
         cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
-    assert business(http.json()) == business(protocol.structured_content) == output
+    assert (
+        business(http.json())
+        == business(protocol.structured_content)
+        == business(output)
+    )
     firdaria = output["time_lords"]["firdaria"]
     for name in ["current_major", "current_sub"]:
         assert firdaria[name]["start"] < firdaria[name]["end"]
@@ -220,23 +222,26 @@ def test_omitted_target_date_uses_person_timezone_at_frozen_utc_across_transport
         birth_timezone="America/New_York", birth_longitude=-74.0, birth_place="New York"
     )
     fields = ["career_analysis.timing_context"]
-    params = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
+    params = dict(detail="audit", fields=fields)
     http, protocol, code, output = surface_calls(
         spec,
         request,
         params={**params, "as_of": "2026-10-12T02:00:00Z"},
-        options=params,
+        options={**params, "as_of": "2026-10-12T02:00:00Z"},
         flags=[
-            "--no-metadata",
+            "--detail",
+            "audit",
             "--fields",
             *fields,
-            "--strict-fields",
-            "--no-include-snapshot-text",
         ],
         cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
-    assert business(http.json()) == business(protocol.structured_content) == output
+    assert (
+        business(http.json())
+        == business(protocol.structured_content)
+        == business(output)
+    )
     context = output["career_analysis"]["timing_context"]
     assert context["analysis_date"] == "2026-10-11"
     assert context["analysis_datetime"] == "2026-10-11T00:00:00-04:00"
@@ -276,23 +281,26 @@ def test_career_evidence_retains_star_positions_and_formation_status(
 ) -> None:
     spec = SPECS["bazi_career"]
     fields = ["career_analysis"]
-    params = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
+    params = dict(detail="audit", fields=fields)
     http, protocol, code, output = surface_calls(
         spec,
         case_input,
         params={**params, "as_of": "2026-10-12T02:00:00Z"},
-        options=params,
+        options={**params, "as_of": "2026-10-12T02:00:00Z"},
         flags=[
-            "--no-metadata",
+            "--detail",
+            "audit",
             "--fields",
             *fields,
-            "--strict-fields",
-            "--no-include-snapshot-text",
         ],
         cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
-    assert business(http.json()) == business(protocol.structured_content) == output
+    assert (
+        business(http.json())
+        == business(protocol.structured_content)
+        == business(output)
+    )
     career = output["career_analysis"]
     assert {"suggestions", "career_structure", "industry_analysis"}.isdisjoint(career)
     evidence = career["evidence_chain"]
@@ -380,23 +388,26 @@ def test_exact_valid_dual_override_matches_applied_pillars_across_transports(
         "career_analysis.timing_context",
         "career_analysis.evidence_chain.topic.timing.layers",
     ]
-    params = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
+    params = dict(detail="audit", fields=fields)
     http, protocol, code, output = surface_calls(
         spec,
         case_input,
         params=params,
         options=params,
         flags=[
-            "--no-metadata",
+            "--detail",
+            "audit",
             "--fields",
             *fields,
-            "--strict-fields",
-            "--no-include-snapshot-text",
         ],
         cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
-    assert business(http.json()) == business(protocol.structured_content) == output
+    assert (
+        business(http.json())
+        == business(protocol.structured_content)
+        == business(output)
+    )
     tc = output["career_analysis"]["timing_context"]
     assert tc["dayun_pillar"] == "甲子" and tc["liunian_pillar"] == "丙寅"
     assert tc["source"] == "explicit_pillar_overrides"

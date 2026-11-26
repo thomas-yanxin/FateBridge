@@ -16,7 +16,7 @@ from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.core.fengshui.spatial_angles import direction_support
 from fatebridge.core.fengshui.spatial_layout import prepare_spatial_request
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services.fengshui import assess
+from fatebridge.services.fengshui import calculate_fengshui_assessment as _assess
 from tests.support.fengshui_transports import mcp_call
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import call_calculation, rest_client
@@ -25,6 +25,10 @@ from tests.unit_test.fixtures.fengshui_measured import (
     measured_request,
     measured_result,
 )
+
+
+def assess(**kwargs):
+    return _assess(AssessRequest.model_validate(kwargs))
 
 
 def test_analytic_geometry_and_distinct_desktop_frames() -> None:
@@ -398,10 +402,8 @@ def test_new_branch_matches_real_rest_mcp_cli_and_strict_projection(
         "rule_trace",
     ]
     controls = dict(
+        detail="audit",
         fields=fields,
-        strict_fields=True,
-        include_snapshot_text=False,
-        response_char_limit=0,
     )
     rest = rest_client(monkeypatch).post(
         "/api/fengshui/assess", json=request, params=controls
@@ -415,12 +417,10 @@ def test_new_branch_matches_real_rest_mcp_cli_and_strict_projection(
                 "fengshui_assess",
                 "--request-file",
                 str(path),
+                "--detail",
+                "audit",
                 "--fields",
                 *fields,
-                "--strict-fields",
-                "--no-include-snapshot-text",
-                "--response-char-limit",
-                "0",
             ]
         )
         == 0
@@ -450,12 +450,7 @@ def test_nested_projection_retains_typed_new_evidence(
     rest = rest_client(monkeypatch).post(
         "/api/fengshui/assess",
         json=request,
-        params=dict(
-            fields=[field],
-            strict_fields=True,
-            include_snapshot_text=False,
-            response_char_limit=0,
-        ),
+        params=dict(detail="audit", fields=[field]),
     )
     assert rest.status_code == 200, rest.text
     FengshuiOutput.model_validate(rest.json())
@@ -571,16 +566,12 @@ def test_reexpressing_plan_in_rotated_frame_preserves_physical_results() -> None
     assert result["rule_comparisons"] == original["rule_comparisons"]
 
 
-def test_source_ids_resolve_and_snapshot_includes_measured_actions() -> None:
+def test_source_ids_resolve_and_includes_measured_actions() -> None:
     result = assess(**measured_request(search=True, charts=True))
     sources = result["source_catalog"].keys()
     branch = result["layout_analysis"]["workstation_layout_analysis"]
     assert all(set(c["source_ids"]) <= sources for c in branch["rule_comparisons"])
     assert all(set(r["source_ids"]) <= sources for r in branch["readings"])
-    assert (
-        "实测工位" in result["snapshot_text"]
-        and "有限布局搜索" in result["snapshot_text"]
-    )
     assert any(c["actions"] for c in branch["search"]["candidates"])
     assert all(
         a["coordinate_frame"].startswith(("desktop:", "synthetic-office-plan"))
@@ -589,17 +580,7 @@ def test_source_ids_resolve_and_snapshot_includes_measured_actions() -> None:
     )
 
 
-def test_default_budget_pages_reconstruct_same_run_search_without_recomputation(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-    import fatebridge.api as api
-    from fatebridge.application import result_delivery as delivery
-    from tests.support.result_delivery import reconstruct
-
-    store = delivery.ResultStore(tmp_path / "measured-results")
-    monkeypatch.setattr(delivery, "RESULT_STORE", store)
-    monkeypatch.setattr(api, "RESULT_STORE", store)
-
+def test_audit_detail_delivers_same_run_search_without_result_delivery() -> None:
     async def native():
         async with Client(create_mcp_app(families="fengshui")) as client:
             result = await call_calculation(
@@ -607,25 +588,16 @@ def test_default_budget_pages_reconstruct_same_run_search_without_recomputation(
                 "fengshui_assess",
                 {
                     **measured_request(search=True, charts=True),
-                    "include_snapshot_text": False,
+                    "detail": "audit",
                 },
             )
             assert not result.is_error
-            ref = result.structured_content["result_delivery"]
-            manifest = json.loads(
-                (await client.read_resource(ref["manifest_uri"]))[0].text
-            )
-            assert (
-                manifest["run_metadata"]["run_id"]
-                == result.structured_content["run_metadata"]["run_id"]
-            )
-            original = reconstruct(store, ref["result_id"])
-            branch = original["layout_analysis"]["workstation_layout_analysis"]
+            assert "result_delivery" not in result.structured_content
+            branch = result.structured_content["layout_analysis"][
+                "workstation_layout_analysis"
+            ]
             assert branch["search"]["evaluated_count"] == 12
             assert len(branch["search"]["receipts"]) == 12
-            assert (
-                original["run_metadata"]["run_id"] == manifest["run_metadata"]["run_id"]
-            )
 
     asyncio.run(native())
 
@@ -634,7 +606,7 @@ def test_measured_task_cards_are_published_and_choose_actual_fields() -> None:
     from fatebridge.application.examples import evidence_views
     from fatebridge.services.tool_catalog import CATALOG
 
-    spec = next(s for s in CATALOG if s.key == "fengshui_assess")
+    spec = next(s for s in CATALOG if s.name == "fengshui_assess")
     views = evidence_views(spec)
     assert "measured_workstation" in views and "measured_workstation_search" in views
     for view in views.values():

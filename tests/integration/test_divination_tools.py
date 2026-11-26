@@ -10,7 +10,6 @@ from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from fatebridge.core.public_output import public_payload
 from fatebridge.services.divination import (
     calculate_gua_lookup,
-    calculate_gua_meiyi,
     calculate_meihua_analysis,
     calculate_otherbu_analysis,
     calculate_sanshiunited_analysis,
@@ -53,14 +52,14 @@ def _local_golden_projection():
     sixyao_result = calculate_sixyao_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
+        timezone="+08:00",
     )
     suzhan_result = calculate_suzhan_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
         szchart=1,
         szshape=1,
         house_start_mode=2,
@@ -69,9 +68,9 @@ def _local_golden_projection():
     otherbu_result = calculate_otherbu_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
         sign="Aries",
         house=6,
         planet="Sun",
@@ -80,9 +79,9 @@ def _local_golden_projection():
     sanshi_result = calculate_sanshiunited_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
         qimen_options={"layout": "direct"},
         taiyi_options={},
         liureng_yue="申",
@@ -154,64 +153,33 @@ def _local_golden_projection():
 
 
 def test_calculate_gua_lookup_supports_hexagram_and_trigram_queries() -> None:
-    hexagram_result = calculate_gua_lookup(query="111111", lookup_mode="auto")
-    trigram_result = calculate_gua_lookup(query="111", lookup_mode="auto")
+    hexagram_result = calculate_gua_lookup(queries=["111111"], lookup_mode="auto")
+    trigram_result = calculate_gua_lookup(queries=["111"], lookup_mode="auto")
 
-    assert hexagram_result["result"]["lookup_type"] == "hexagram"
-    assert hexagram_result["result"]["name"] == "乾为天"
-    assert hexagram_result["result"]["lines"] == [1] * 6
-    assert hexagram_result["result"]["classical"]["guaci"] == "乾：元亨。利貞。"
-    assert hexagram_result["result"]["classical"]["source_url"]
-    assert "[查询信息]" in hexagram_result["snapshot_text"]
-    assert "[卦象结构]" in hexagram_result["snapshot_text"]
-    assert "[经文]" in hexagram_result["snapshot_text"]
-    assert "[来源]" in hexagram_result["snapshot_text"]
-    assert (
-        hexagram_result["snapshot_export"]["export_text"]
-        == hexagram_result["snapshot_text"]
-    )
+    assert hexagram_result["analysis_type"] == "卦象查询"
+    assert hexagram_result["queries"] == ["111111"]
+    hexagram_entry = hexagram_result["results"]["111111"]
+    assert hexagram_entry["lookup_type"] == "hexagram"
+    assert hexagram_entry["name"] == "乾为天"
+    assert hexagram_entry["lines"] == [1] * 6
+    assert hexagram_entry["classical"]["guaci"] == "乾：元亨。利貞。"
+    assert hexagram_entry["classical"]["source_url"]
 
-    assert trigram_result["result"]["lookup_type"] == "trigram"
-    assert trigram_result["result"]["name"] == "乾"
-    assert trigram_result["result"]["lines"] == [1, 1, 1]
-    assert trigram_result["result"]["nature"] == "天"
+    assert trigram_result["queries"] == ["111"]
+    trigram_entry = trigram_result["results"]["111"]
+    assert trigram_entry["lookup_type"] == "trigram"
+    assert trigram_entry["name"] == "乾"
+    assert trigram_entry["lines"] == [1, 1, 1]
+    assert trigram_entry["nature"] == "天"
 
 
-def test_calculate_gua_lookup_supports_selected_export_sections() -> None:
-    result = calculate_gua_lookup(
-        query="111111",
-        lookup_mode="auto",
-        selected_sections=["查询信息", "经文"],
-    )
+def test_calculate_gua_lookup_returns_batch_results() -> None:
+    result = calculate_gua_lookup(queries=["111111", "111"])
 
-    assert result["snapshot_export"]["selected_sections"] == ["查询信息", "经文"]
-    assert "[查询信息]" in result["snapshot_export"]["export_text"]
-    assert "[经文]" in result["snapshot_export"]["export_text"]
-    assert "[卦象结构]" not in result["snapshot_export"]["export_text"]
-    assert "[来源]" not in result["snapshot_export"]["export_text"]
-
-
-def test_calculate_gua_meiyi_returns_snapshot_export() -> None:
-    result = calculate_gua_meiyi(name=["111111", "111"])
-
+    assert result["queries"] == ["111111", "111"]
     assert result["results"]["111111"]["name"] == "乾为天"
     assert result["results"]["111"]["name"] == "乾"
-    assert "[查询概览]" in result["snapshot_text"]
-    assert "[批量结果]" in result["snapshot_text"]
-    assert result["results"]["111111"]["classical"]["guaci"] in result["snapshot_text"]
-    assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
-
-
-def test_calculate_gua_meiyi_supports_selected_export_sections() -> None:
-    result = calculate_gua_meiyi(
-        name=["111111", "111"],
-        selected_sections=["批量结果"],
-    )
-
-    assert result["snapshot_export"]["selected_sections"] == ["批量结果"]
-    assert "[批量结果]" in result["snapshot_export"]["export_text"]
-    assert "[查询概览]" not in result["snapshot_export"]["export_text"]
-    assert "[来源]" not in result["snapshot_export"]["export_text"]
+    assert result["results"]["111111"]["classical"]["guaci"]
 
 
 def test_calculate_meihua_analysis_returns_expected_hexagram_chain() -> None:
@@ -275,15 +243,13 @@ def test_calculate_tongshefa_analysis_returns_expected_local_structure() -> None
     assert model["oppositeLeft"]["name"] == "雷风恒"
     assert model["oppositeRight"]["name"] == "天风姤"
     assert model["main_relation"] == "思克实"
-    assert "[潜藏]" in result["snapshot_text"]
-    assert "[亲和]" in result["snapshot_text"]
 
 
 def test_calculate_sixyao_analysis_supports_explicit_lines() -> None:
     result = calculate_sixyao_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
+        timezone="+08:00",
         question="合作",
         lines=[
             {"value": 1, "change": False},
@@ -300,8 +266,6 @@ def test_calculate_sixyao_analysis_supports_explicit_lines() -> None:
     assert result["moving_lines"] == [2]
     assert result["current_hexagram"]["name"] == "乾为天"
     assert result["changed_hexagram"]["name"] == "天火同人"
-    assert "第2爻：阳爻（动）" in result["snapshot_text"]
-    assert "问题：合作" in result["snapshot_text"]
 
 
 def test_calculate_sixyao_analysis_time_casts_when_no_hexagram_supplied() -> None:
@@ -310,7 +274,7 @@ def test_calculate_sixyao_analysis_time_casts_when_no_hexagram_supplied() -> Non
     result = calculate_sixyao_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
+        timezone="+08:00",
     )
 
     # 2028-04-06 09:33 +08:00 的时间起卦：本卦地水师(010000)、动6爻、之卦山水蒙(010001)。
@@ -323,15 +287,16 @@ def test_calculate_sixyao_analysis_time_casts_when_no_hexagram_supplied() -> Non
     # 2028-04-06 日干=辛，按"庚辛日起白虎"的规则，初爻六神应为白虎。
     assert result["lines"][0]["god"] == "白虎"
     assert result["lines"][5]["change"] is True
-    assert "第6爻：阴爻（动）" in result["snapshot_text"]
 
 
 def test_calculate_sixyao_time_cast_varies_with_moment() -> None:
     """时间起卦必须随起卦时刻变化，而非恒返回同一卦。"""
     morning = calculate_sixyao_analysis(
-        date="2028-04-06", time="09:33:00", zone="+08:00"
+        date="2028-04-06", time="09:33:00", timezone="+08:00"
     )
-    other = calculate_sixyao_analysis(date="2025-01-01", time="23:30:00", zone="+08:00")
+    other = calculate_sixyao_analysis(
+        date="2025-01-01", time="23:30:00", timezone="+08:00"
+    )
 
     assert (morning["current_code"], morning["moving_lines"]) != (
         other["current_code"],
@@ -346,7 +311,7 @@ def test_calculate_sixyao_explicit_code_is_marked_manual() -> None:
     result = calculate_sixyao_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
+        timezone="+08:00",
         gua_code="111000",
         changed_code="110000",
     )
@@ -363,7 +328,7 @@ def test_calculate_sixyao_coin_casting_from_explicit_tosses() -> None:
     result = calculate_sixyao_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
+        timezone="+08:00",
         coins=[7, 8, 7, 9, 8, 6],
     )
 
@@ -386,10 +351,10 @@ def test_calculate_sixyao_coin_casting_from_explicit_tosses() -> None:
 def test_calculate_sixyao_coin_casting_random_is_seedable() -> None:
     """系统随机摇卦：同一 seed 必出同一卦（可复现），标记 coin/random。"""
     first = calculate_sixyao_analysis(
-        date="2028-04-06", time="09:33:00", zone="+08:00", method="coin", seed=42
+        date="2028-04-06", time="09:33:00", timezone="+08:00", method="coin", seed=42
     )
     second = calculate_sixyao_analysis(
-        date="2028-04-06", time="09:33:00", zone="+08:00", method="coin", seed=42
+        date="2028-04-06", time="09:33:00", timezone="+08:00", method="coin", seed=42
     )
 
     assert first["cast"]["method"] == "coin"
@@ -412,7 +377,7 @@ def test_calculate_sixyao_coin_rejects_invalid_toss() -> None:
     result = calculate_sixyao_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
+        timezone="+08:00",
         coins=[7, 8, 7, 9, 8, 5],
     )
     assert result["error_code"] == "validation_error"
@@ -423,7 +388,7 @@ def test_calculate_sixyao_coin_requires_six_tosses() -> None:
     result = calculate_sixyao_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
+        timezone="+08:00",
         coins=[7, 8, 7],
     )
     assert result["error_code"] == "validation_error"
@@ -435,7 +400,10 @@ def test_build_sixyao_result_raises_on_invalid_coins() -> None:
 
     with pytest.raises(ValueError):
         build_sixyao_result(
-            date="2028-04-06", time="09:33:00", zone="+08:00", coins=[7, 8, 7, 9, 8, 5]
+            date="2028-04-06",
+            time="09:33:00",
+            timezone="+08:00",
+            coins=[7, 8, 7, 9, 8, 5],
         )
 
 
@@ -443,14 +411,14 @@ def test_sixyao_does_not_treat_the_string_zero_as_a_yang_line() -> None:
     result = calculate_sixyao_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
+        timezone="+08:00",
         lines=[{"value": "0", "change": False}] * 6,
     )
     assert result["error_code"] == "validation_error"
     result = calculate_sixyao_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
+        timezone="+08:00",
         lines=[{"value": 0, "change": False}] * 6,
     )
     assert result["current_code"] == "000000"
@@ -461,9 +429,9 @@ def test_calculate_suzhan_analysis_returns_chart_and_snapshot() -> None:
     result = calculate_suzhan_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
     )
 
     assert result["analysis_type"] == "宿占 / 宿盘"
@@ -473,10 +441,6 @@ def test_calculate_suzhan_analysis_returns_chart_and_snapshot() -> None:
     assert len(result["chart"]["houses"]) == 12
     assert any(item["id"] == "Sun" for item in result["chart"]["objects"])
     assert any(item["id"] == "Pars Fortuna" for item in result["chart"]["objects"])
-    assert "[宿盘宫位与二十八宿星曜]" in result["snapshot_text"]
-    assert "宫位：House1" in result["snapshot_text"]
-    assert "星曜：Sun " in result["snapshot_text"]
-    assert "˚" in result["snapshot_text"]
 
 
 def test_suzhan_uses_shared_local_chart_runtime(surface_calls) -> None:
@@ -493,9 +457,9 @@ def test_suzhan_uses_shared_local_chart_runtime(surface_calls) -> None:
     suzhan_result = calculate_suzhan_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
     )
     expected_precision, expected_backend = _expected_offline_engine()
     local_sun = next(
@@ -536,18 +500,18 @@ def test_suzhan_uses_shared_local_chart_runtime(surface_calls) -> None:
     payload = dict(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
     )
     spec = SPECS["suzhan"]
     fields = ["params.su28Method", "chart", "astronomy"]
     response, protocol, code, cli = surface_calls(
         spec,
         payload,
-        params={"fields": fields, "strict_fields": True},
-        options={"fields": fields, "strict_fields": True},
-        flags=("--fields", *fields, "--strict-fields"),
+        params={"detail": "audit", "fields": fields},
+        options={"detail": "audit", "fields": fields},
+        flags=("--detail", "audit", "--fields", *fields),
     )
     assert response.status_code == 200, response.text
     assert code == 0 and not protocol.is_error
@@ -569,9 +533,9 @@ def test_calculate_suzhan_analysis_exposes_runtime_engine_metadata() -> None:
     result = calculate_suzhan_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
     )
     expected_precision, expected_backend = _expected_offline_engine()
 
@@ -583,9 +547,9 @@ def test_calculate_suzhan_analysis_applies_chart_modes_to_offline_output() -> No
     default_result = calculate_suzhan_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
         szchart=0,
         szshape=0,
         house_start_mode=1,
@@ -594,9 +558,9 @@ def test_calculate_suzhan_analysis_applies_chart_modes_to_offline_output() -> No
     adjusted_result = calculate_suzhan_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
         szchart=1,
         szshape=1,
         house_start_mode=2,
@@ -617,7 +581,6 @@ def test_calculate_suzhan_analysis_applies_chart_modes_to_offline_output() -> No
     )
     assert any("su28" in item for item in default_result["chart"]["objects"])
     assert all("su28" not in item for item in adjusted_result["chart"]["objects"])
-    assert default_result["snapshot_text"] != adjusted_result["snapshot_text"]
 
 
 def test_calculate_suzhan_analysis_supports_offline_house_system_and_zodiacal_modes() -> (
@@ -626,22 +589,22 @@ def test_calculate_suzhan_analysis_supports_offline_house_system_and_zodiacal_mo
     tropical_equal_result = calculate_suzhan_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
         szchart=0,
-        hsys=8,
-        zodiacal=0,
+        house_system=8,
+        zodiac_type="Tropic",
     )
     sidereal_whole_result = calculate_suzhan_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
         szchart=0,
-        hsys=0,
-        zodiacal=1,
+        house_system=0,
+        zodiac_type="Sidereal",
     )
 
     tropical_sun = next(
@@ -673,22 +636,22 @@ def test_calculate_suzhan_analysis_supports_extended_offline_house_systems() -> 
     placidus_result = calculate_suzhan_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
         szchart=0,
-        hsys=3,
-        zodiacal=0,
+        house_system=3,
+        zodiac_type="Tropic",
     )
     sripati_result = calculate_suzhan_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
         szchart=0,
-        hsys=7,
-        zodiacal=0,
+        house_system=7,
+        zodiac_type="Tropic",
     )
 
     placidus_sun = next(
@@ -727,28 +690,28 @@ def test_calculate_suzhan_analysis_rejects_unsupported_offline_modes() -> None:
     invalid_hsys_result = calculate_suzhan_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
-        hsys=9,
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
+        house_system=9,
     )
     invalid_zodiac_result = calculate_suzhan_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
-        zodiacal=2,
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
+        zodiac_type="Invalid",
     )
 
     assert invalid_hsys_result == {
-        "error": "核心星盘离线模式暂仅支持 hsys=0..8（整宫制、Alcabitus、Regiomontanus、Placidus、Koch、Vehlow Equal、Polich Page、Sripati、天顶为第10宫宫头的等宫制）。",
+        "error": "House system must be a supported letter, name, or integer code0..8.",
         "error_code": "validation_error",
         "status_code": 400,
         "retryable": False,
     }
     assert invalid_zodiac_result == {
-        "error": "核心星盘离线模式暂仅支持 zodiacal=0(回归黄道) 或 zodiacal=1(恒星黄道/Lahiri)。",
+        "error": "zodiac_type必须为Tropic或Sidereal。",
         "error_code": "validation_error",
         "status_code": 400,
         "retryable": False,
@@ -759,9 +722,9 @@ def test_calculate_otherbu_analysis_supports_traditional_mode() -> None:
     result = calculate_otherbu_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
         tradition=True,
         sign="Aries",
         house=0,
@@ -781,11 +744,7 @@ def test_calculate_otherbu_analysis_supports_traditional_mode() -> None:
     assert dice_sun["sign"] == "Aries"
     assert not any(item["id"] == "Uranus" for item in natal_objects)
     assert result["symbolic_details"]["sign_condition"]["conditions"] == ["exaltation"]
-    assert "星座：Aries" in result["snapshot_text"]
-    assert '问题原文（JSON引用）："合作"' in result["snapshot_text"]
     assert result["question"] == result["input_normalized"]["question"] == "合作"
-    assert "[骰子盘宫位与星体]" in result["snapshot_text"]
-    assert "[天象盘宫位与星体]" in result["snapshot_text"]
 
 
 def test_calculate_otherbu_analysis_supports_offline_house_system_and_zodiacal_modes() -> (
@@ -794,26 +753,26 @@ def test_calculate_otherbu_analysis_supports_offline_house_system_and_zodiacal_m
     tropical_equal_result = calculate_otherbu_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
         sign="Aries",
         house=6,
         planet="Sun",
-        hsys=8,
-        zodiacal=0,
+        house_system=8,
+        zodiac_type="Tropic",
     )
     sidereal_whole_result = calculate_otherbu_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
         sign="Aries",
         house=6,
         planet="Sun",
-        hsys=0,
-        zodiacal=1,
+        house_system=0,
+        zodiac_type="Sidereal",
     )
 
     tropical_sun = next(
@@ -850,9 +809,9 @@ def test_calculate_otherbu_analysis_exposes_runtime_engine_metadata() -> None:
     result = calculate_otherbu_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
         sign="Aries",
         house=6,
         planet="Sun",
@@ -869,26 +828,26 @@ def test_calculate_otherbu_analysis_supports_extended_offline_house_systems() ->
     placidus_result = calculate_otherbu_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
         sign="Aries",
         house=6,
         planet="Sun",
-        hsys=3,
-        zodiacal=0,
+        house_system=3,
+        zodiac_type="Tropic",
     )
     sripati_result = calculate_otherbu_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
         sign="Aries",
         house=6,
         planet="Sun",
-        hsys=7,
-        zodiacal=0,
+        house_system=7,
+        zodiac_type="Tropic",
     )
 
     placidus_sun = next(
@@ -931,10 +890,10 @@ def test_calculate_otherbu_analysis_rejects_unsupported_offline_modes() -> None:
     invalid_hsys_result = calculate_otherbu_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
-        hsys=9,
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
+        house_system=9,
         planet="Sun",
         sign="Aries",
         house=0,
@@ -942,23 +901,23 @@ def test_calculate_otherbu_analysis_rejects_unsupported_offline_modes() -> None:
     invalid_zodiac_result = calculate_otherbu_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
-        zodiacal=2,
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
+        zodiac_type="Invalid",
         planet="Sun",
         sign="Aries",
         house=0,
     )
 
     assert invalid_hsys_result == {
-        "error": "hsys必须为0..8的整数，仅用于附加天象盘",
+        "error": "House system must be a supported letter, name, or integer code0..8.",
         "error_code": "validation_error",
         "status_code": 400,
         "retryable": False,
     }
     assert invalid_zodiac_result == {
-        "error": "zodiacal必须为0或1的整数，仅用于附加天象盘",
+        "error": "zodiac_type必须为Tropic或Sidereal，仅用于附加天象盘",
         "error_code": "validation_error",
         "status_code": 400,
         "retryable": False,
@@ -971,9 +930,9 @@ def test_calculate_otherbu_analysis_keeps_dice_chart_house_geometry_consistent()
     result = calculate_otherbu_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
         sign="Aries",
         house=6,
         planet="Sun",
@@ -995,9 +954,9 @@ def test_calculate_sanshiunited_analysis_returns_local_aggregation() -> None:
     result = calculate_sanshiunited_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
     )
 
     assert result["analysis_type"] == "三式合一"
@@ -1008,17 +967,10 @@ def test_calculate_sanshiunited_analysis_returns_local_aggregation() -> None:
     assert result["liureng"]["patterns"][0]["name"] == "贵人顺行格"
     assert "subresults" in result
     assert "qimen" in result["subresults"]
-    assert "[太乙十六宫]" in result["snapshot_text"]
-    assert "[六壬小局]" in result["snapshot_text"]
-    assert "[八宫详解]" in result["snapshot_text"]
-    assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
-    assert "离九宫" in result["snapshot_export"]["section_titles_detected"]
     assert result["qimen"]["zhifu"]["star"] == "天任"
     assert result["qimen"]["zhifu"]["palace"] == "坤二宫"
     assert result["qimen"]["zhishi"]["door"] == "生门"
     assert result["qimen"]["zhishi"]["palace"] == "艮八宫"
-    assert "值符：天任在坤二宫" in result["snapshot_text"]
-    assert "艮八宫：天盘干：癸" in result["snapshot_text"]
     zhifu_palace = next(
         palace
         for palace in result["qimen"]["palaces"]
@@ -1037,9 +989,9 @@ def test_calculate_sanshiunited_analysis_respects_liureng_overrides() -> None:
     result = calculate_sanshiunited_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
         liureng_yue="申",
         liureng_is_diurnal=False,
     )
@@ -1050,7 +1002,11 @@ def test_calculate_sanshiunited_analysis_respects_liureng_overrides() -> None:
 
 def test_calculate_sanshiunited_qimen_options_preserve_default_taiyi() -> None:
     payload = dict(
-        date="2028-04-06", time="09:33:00", zone="+08:00", lat="31n13", lon="121e28"
+        date="2028-04-06",
+        time="09:33:00",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
     )
     default_result = calculate_sanshiunited_analysis(**payload)
     optioned_result = calculate_sanshiunited_analysis(
@@ -1066,44 +1022,22 @@ def test_calculate_sanshiunited_qimen_options_preserve_default_taiyi() -> None:
     )
 
 
-def test_calculate_sanshiunited_analysis_supports_selected_export_sections() -> None:
-    result = calculate_sanshiunited_analysis(
-        date="2028-04-06",
-        time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
-        selected_sections=["起盘信息", "太乙", "离九宫"],
-    )
-
-    assert result["snapshot_export"]["selected_sections"] == [
-        "起盘信息",
-        "太乙",
-        "离九宫",
-    ]
-    assert "[起盘信息]" in result["snapshot_export"]["export_text"]
-    assert "[太乙]" in result["snapshot_export"]["export_text"]
-    assert "[离九宫]" in result["snapshot_export"]["export_text"]
-    assert "[概览]" not in result["snapshot_export"]["export_text"]
-    assert "[八宫详解]" not in result["snapshot_export"]["export_text"]
-
-
 def test_calculate_sanshiunited_analysis_supports_true_solar_time() -> None:
     # 三式默认已开真太阳时；显式关掉得到钟表时间基线，与开启态对比。
     default_result = calculate_sanshiunited_analysis(
         date="2026-04-04",
         time="23:50:00",
-        zone="+08:00",
-        gps_lat=39.9,
-        gps_lon=73.0,
+        timezone="+08:00",
+        latitude=39.9,
+        longitude=73.0,
         use_true_solar_time=False,
     )
     true_solar_result = calculate_sanshiunited_analysis(
         date="2026-04-04",
         time="23:50:00",
-        zone="+08:00",
-        gps_lat=39.9,
-        gps_lon=73.0,
+        timezone="+08:00",
+        latitude=39.9,
+        longitude=73.0,
         use_true_solar_time=True,
     )
 
@@ -1114,8 +1048,6 @@ def test_calculate_sanshiunited_analysis_supports_true_solar_time() -> None:
         true_solar_result["analysis_context"]["corrected_datetime"]
         != true_solar_result["analysis_context"]["input_datetime"]
     )
-    assert "真太阳时" in true_solar_result["snapshot_text"]
-    assert true_solar_result["snapshot_text"] != default_result["snapshot_text"]
     assert (
         true_solar_result["subresults"]["liureng_gods"]["four_pillars"]["hour"]
         != default_result["subresults"]["liureng_gods"]["four_pillars"]["hour"]
@@ -1258,9 +1190,9 @@ def test_sixyao_moving_lines_honor_supplied_codes() -> None:
     result = build_sixyao_result(
         date="2026/04/23",
         time="12:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
         question="audit",
         gua_code="111000",
         changed_code="110000",

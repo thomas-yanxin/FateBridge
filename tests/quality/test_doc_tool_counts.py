@@ -12,7 +12,6 @@ from pathlib import Path
 import pytest
 
 from fatebridge.api import app
-from fatebridge.application.description import spec_is_cli_safe
 from fatebridge.services.tool_catalog import CATALOG, mcp_specs, rest_specs
 
 REPO_ROOT = Path(__file__).resolve().parents[1].parent
@@ -21,7 +20,7 @@ LIVE_REST = len(rest_specs())
 LIVE_MCP = len(mcp_specs())
 LIVE_FAMILIES = len({spec.family for spec in mcp_specs()})
 LIVE_CATALOG = len(CATALOG)
-LIVE_CLI = sum(spec_is_cli_safe(spec) for spec in CATALOG)
+LIVE_CLI = len(CATALOG)
 
 # (相对路径, 人类可读标签, 抽取数字的正则, 期望的实时计数)
 # 正则用 (\d+) 捕获文档当前声称的数字；期望值取自实时目录。
@@ -78,7 +77,7 @@ for _path in (
             (
                 _path,
                 f"{_path} MCP 业务能力",
-                r"MCP\s*通过四个入口提供\s*\*{0,2}(\d+)\s*项业务能力",
+                r"MCP\s*通过两个入口提供\s*\*{0,2}(\d+)\s*项业务能力",
                 LIVE_MCP,
             ),
         ]
@@ -132,7 +131,7 @@ def test_algorithm_matrix_covers_each_published_tool_once() -> None:
     documented = Counter(
         re.findall(r"^\| `([a-z][a-z0-9_]+)` \|", matrix, re.MULTILINE)
     )
-    expected = Counter(spec.mcp_name for spec in mcp_specs())
+    expected = Counter(spec.name for spec in mcp_specs())
     assert documented == expected, (
         f"算法矩阵缺失 {dict(expected - documented)}；"
         f"额外或重复 {dict(documented - expected)}"
@@ -163,7 +162,7 @@ def test_api_mcp_group_list_covers_each_published_tool_once() -> None:
         if line.startswith("- ")
         for name in re.findall(r"`([a-z][a-z0-9_]+)`", line)
     ]
-    assert Counter(names) == Counter(spec.mcp_name for spec in mcp_specs())
+    assert Counter(names) == Counter(spec.name for spec in mcp_specs())
 
 
 @pytest.mark.parametrize("rel_path", ["README.md", "docs/development-guide.md"])

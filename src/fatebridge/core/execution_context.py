@@ -1,26 +1,19 @@
-"""Per-call clock and correlation options; no process-wide clock mutation."""
+"""Per-call clock options; no process-wide clock mutation."""
 
-from collections.abc import Iterator, Mapping
+from collections.abc import Iterator
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 from datetime import datetime, timezone, tzinfo
-from typing import Any, Literal, Protocol
+from typing import Literal, Protocol
 
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    Field,
-    JsonValue,
-    ValidationError,
-    field_validator,
-)
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from fatebridge.utils.civil_time import UTCCalendar, parse_civil_iso_clock
 from fatebridge.utils.errors import ParameterError
 from fatebridge.utils.timezones import is_unspecified_local_time
 
-DetailLevel = Literal["compact", "standard", "audit"]
+DetailLevel = Literal["compact", "audit"]
 
 
 def _execution_instant(value: str) -> datetime:
@@ -42,19 +35,11 @@ class ExecutionOptions(BaseModel):
         default=None,
         description="Freeze implicit current time: ISO 8601 datetime with timezone",
     )
-    trace_id: str | None = Field(
-        default=None, pattern=r"^[A-Za-z0-9_.:-]{1,128}$", description="Caller trace ID"
-    )
-    parent_run_id: str | None = Field(
-        default=None,
-        pattern=r"^[A-Za-z0-9_.:-]{1,128}$",
-        description="Parent call's run_id; correlation only, no stored execution lookup",
-    )
     detail: DetailLevel = Field(
-        default="standard",
+        default="compact",
         description=(
-            "输出详细级别：compact（精简核心事实）、standard（常规结果与精简来源）、"
-            "audit（完整业务结果、已启用的方法与声明误差预算）。省略时沿用入口默认视图。"
+            "输出详细级别：compact（默认，精简核心事实）或 "
+            "audit（完整业务结果、已启用的方法、环境与误差预算）。"
         ),
     )
 
@@ -132,33 +117,3 @@ def current_datetime(
             [{"path": issue_path, "code": "unresolved_timezone_offset"}],
         )
     return local
-
-
-def correlate_error(
-    payload: dict[str, Any], options: ExecutionOptions
-) -> dict[str, Any]:
-    """Preserve default failure envelopes; echo only validated correlation IDs."""
-    return {
-        **payload,
-        **({"trace_id": options.trace_id} if options.trace_id is not None else {}),
-        **(
-            {"parent_run_id": options.parent_run_id}
-            if options.parent_run_id is not None
-            else {}
-        ),
-    }
-
-
-def safe_correlation(values: Mapping[str, JsonValue]) -> ExecutionOptions:
-    validated: dict[str, str | None] = {}
-    for field_name in ("trace_id", "parent_run_id"):
-        try:
-            controls = ExecutionOptions.model_validate(
-                {field_name: values.get(field_name)}
-            )
-        except ValidationError:
-            continue
-        validated[field_name] = (
-            controls.trace_id if field_name == "trace_id" else controls.parent_run_id
-        )
-    return ExecutionOptions.model_construct(set(validated), **validated)

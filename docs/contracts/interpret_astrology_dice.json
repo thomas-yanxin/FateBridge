@@ -1,6 +1,6 @@
 {
   "call_guidance": {
-    "context": "仅骰面解读省略date/time/zone/经纬度；若请求独立天象背景，完整传入实际资料。tradition/hsys/zodiacal仅作用于天象背景，不改变骰面。天象背景按astronomical_context视图选择fields，分页时读回同run完整投影结果。保留ephemerisReferencePoints中的系统质心、本体中心、近似及未确认参考点，不将质心写成本体中心。",
+    "context": "仅骰面解读省略date/time/timezone/经纬度；若请求独立天象背景，完整传入实际资料。tradition/house_system/zodiac_type仅作用于天象背景，不改变骰面。天象背景按astronomical_context视图选择fields。保留ephemerisReferencePoints中的系统质心、本体中心、近似及未确认参考点，不将质心写成本体中心。",
     "input": "planet/sign/house必须是本次实际骰面；实际第N宫传house=N-1。中文、英文和符号可直接传入；缺项追问，不猜测或抽取替代结果。",
     "interpretation": "以symbolic_details和rule_trace为依据，保留rulesets版本和来源。区分自定位与未给出的其他定位星；喜乐宫是宫号关系，不是星座尊贵或成功概率。diceChart为假设整宫示意，无真实度数、相位或ASC/MC；不得从天象背景补写骰面定位星、互容或应期。",
     "longitude_motion": "天象背景的十个物理天体按实际热带或Lahiri黄道读取chart.params.chart_profile.longitude_motion与chart.chart.objects[].motion。保留native_longitude_speed及修正分项，method_id来自实际求导记录；Moshier完整视位置求导不改变解析轨道，未收敛明确不应用。Lahiri包含所选零点的运动，不能复制热带速度。月亮未采用独立光行时分项不表示完整位置求导未执行；分项与整体状态分别核对。这些速度不能证明精确驻留时刻、原典整例或现实预测。",
@@ -61,9 +61,7 @@
       "rulesets",
       "rule_trace",
       "validation"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,
@@ -79,7 +77,7 @@
           }
         ],
         "default": null,
-        "description": "Optional Gregorian date for a separate sky chart; provide time/zone/coordinates too",
+        "description": "Optional Gregorian date for a separate sky chart; provide time/timezone/coordinates too",
         "title": "Date"
       },
       "fortune_method": {
@@ -92,32 +90,6 @@
         "title": "Fortune Method",
         "type": "string"
       },
-      "gps_lat": {
-        "anyOf": [
-          {
-            "type": "number"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "GPS latitude",
-        "title": "Gps Lat"
-      },
-      "gps_lon": {
-        "anyOf": [
-          {
-            "type": "number"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "GPS longitude",
-        "title": "Gps Lon"
-      },
       "house": {
         "description": "Actual dice house INDEX (0-11): printed house N must be submitted as N-1",
         "maximum": 11,
@@ -125,16 +97,24 @@
         "title": "House",
         "type": "integer"
       },
-      "hsys": {
-        "default": 8,
-        "description": "House system 0..8 for the separate sky chart; does not change the symbolic wheel",
-        "maximum": 8,
-        "minimum": 0,
-        "title": "Hsys",
-        "type": "integer"
-      },
-      "lat": {
+      "house_system": {
         "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "string"
+          }
+        ],
+        "default": "D",
+        "description": "Offline house system selector (0..8, SE letter, or name; default 'D'/8=equal_mc). Explicit values must be integer codes 0..8 or supported offline house letters/names (W, B, R, P, K, V, T, S, D); boolean, floating-point, blank and unsupported values are rejected.",
+        "title": "House System"
+      },
+      "latitude": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
           {
             "type": "string"
           },
@@ -144,10 +124,13 @@
         ],
         "default": null,
         "description": "Latitude text or decimal; no assumed location",
-        "title": "Lat"
+        "title": "Latitude"
       },
-      "lon": {
+      "longitude": {
         "anyOf": [
+          {
+            "type": "number"
+          },
           {
             "type": "string"
           },
@@ -157,7 +140,7 @@
         ],
         "default": null,
         "description": "Longitude text or decimal; no assumed location",
-        "title": "Lon"
+        "title": "Longitude"
       },
       "planet": {
         "description": "Actual face: Sun/Moon/Mercury/Venus/Mars/Jupiter/Saturn/Uranus/Neptune/Pluto/NorthNode/SouthNode; Chinese names and glyphs accepted",
@@ -195,21 +178,7 @@
         "description": "Optional civil time for a separate sky chart",
         "title": "Time"
       },
-      "tradition": {
-        "default": false,
-        "description": "Exclude outer planets only from the separate sky chart; never alter the rolled face",
-        "title": "Tradition",
-        "type": "boolean"
-      },
-      "zodiacal": {
-        "default": 0,
-        "description": "Separate sky chart only: 0=tropical, 1=sidereal(Lahiri); never reinterprets a dice sign",
-        "maximum": 1,
-        "minimum": 0,
-        "title": "Zodiacal",
-        "type": "integer"
-      },
-      "zone": {
+      "timezone": {
         "anyOf": [
           {
             "type": "string"
@@ -220,7 +189,23 @@
         ],
         "default": null,
         "description": "Explicit IANA timezone or UTC offset for the separate sky chart",
-        "title": "Zone"
+        "title": "Timezone"
+      },
+      "tradition": {
+        "default": false,
+        "description": "Exclude outer planets only from the separate sky chart; never alter the rolled face",
+        "title": "Tradition",
+        "type": "boolean"
+      },
+      "zodiac_type": {
+        "default": "Tropic",
+        "description": "Offline zodiac selector: Tropic (0) or Sidereal (1, Lahiri).",
+        "enum": [
+          "Tropic",
+          "Sidereal"
+        ],
+        "title": "Zodiac Type",
+        "type": "string"
       }
     },
     "required": [
@@ -282,11 +267,9 @@
       "dependencies": [
         "date",
         "time",
-        "zone",
-        "lat",
-        "lon",
-        "gps_lat",
-        "gps_lon"
+        "timezone",
+        "latitude",
+        "longitude"
       ],
       "error_sources": [
         "civil_clock",
@@ -317,8 +300,8 @@
       "role": "calculation",
       "selector_fields": [
         "tradition",
-        "hsys",
-        "zodiacal",
+        "house_system",
+        "zodiac_type",
         "fortune_method"
       ],
       "source_refs": [

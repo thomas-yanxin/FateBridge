@@ -455,11 +455,166 @@
       "liureng.ruleset.classical_acceptance_passed",
       "synthesis.time_scopes",
       "synthesis.limitations"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
+    "$defs": {
+      "QimenOptions": {
+        "additionalProperties": false,
+        "description": "Typed Qi Men Dun Jia configuration options.",
+        "properties": {
+          "god_profile": {
+            "default": "yanyi_text",
+            "description": "八神表：yanyi_text（默认卷三正文）或 yanyi_diagrams（卷四圆图）。",
+            "enum": [
+              "yanyi_text",
+              "yanyi_diagrams"
+            ],
+            "title": "God Profile",
+            "type": "string"
+          },
+          "ju_method": {
+            "default": "zhirun",
+            "description": "定局法：zhirun（默认置闰）或 chaibu（拆补）。",
+            "enum": [
+              "zhirun",
+              "chaibu"
+            ],
+            "title": "Ju Method",
+            "type": "string"
+          },
+          "layout": {
+            "default": "direct",
+            "description": "转盘排法：仅支持 direct/rotating；飞盘/镜像/反转未实现。",
+            "enum": [
+              "direct",
+              "rotating"
+            ],
+            "title": "Layout",
+            "type": "string"
+          },
+          "palaceShift": {
+            "default": 0,
+            "description": "九宫平移量；仅允许 0（移动九宫内容不能冒充飞盘排法）。",
+            "maximum": 0,
+            "minimum": 0,
+            "title": "Palaceshift",
+            "type": "integer"
+          },
+          "palace_shift": {
+            "default": 0,
+            "description": "palaceShift 的蛇形命名别名；仅允许 0。",
+            "maximum": 0,
+            "minimum": 0,
+            "title": "Palace Shift",
+            "type": "integer"
+          },
+          "season_profile": {
+            "default": "yanyi_vol1_verse",
+            "description": "九星旺衰表：yanyi_vol1_verse（默认卷一烟波钓叟赋）、yanyi_vol3_table（卷三表）或 yanyi_vol3_prose（卷三正文）。",
+            "enum": [
+              "yanyi_vol1_verse",
+              "yanyi_vol3_table",
+              "yanyi_vol3_prose"
+            ],
+            "title": "Season Profile",
+            "type": "string"
+          }
+        },
+        "title": "QimenOptions",
+        "type": "object"
+      },
+      "TaiyiOptions": {
+        "additionalProperties": false,
+        "description": "Typed Taiyi Shenshu calculation mode and edition-profile options.",
+        "properties": {
+          "calculation_mode": {
+            "default": "year",
+            "description": "year年计附金镜年度十神；month按十二节月；day明确采用金钥匙冬至前甲子积日，不乘十二，所选钟面零时换日、二至实刻换遁，附十精及未决异数；hour按所选时计。月/日/时计均为声明的现代天文适配，非完整古历复原。",
+            "enum": [
+              "year",
+              "month",
+              "day",
+              "hour"
+            ],
+            "title": "Calculation Mode",
+            "type": "string"
+          },
+          "hour_profile": {
+            "anyOf": [
+              {
+                "enum": [
+                  "jinjing_hour_solstice_v1",
+                  "key_hour_winter_jiazi_v1"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "仅hour时计：省略用jinjing_hour_solstice_v1（现代至点置一）；key_hour_winter_jiazi_v1按金钥匙冬至前甲子日连续积时、时支合神和阴阳四门，仍为现代日期/23时子初适配，非古历全书认证。不可按吉凶结果择优。",
+            "title": "Hour Profile"
+          },
+          "month_profile": {
+            "anyOf": [
+              {
+                "enum": [
+                  "jinjing_month_jie_360_v1",
+                  "key_month_tianzheng_jie_v1"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "仅month：省略为jinjing_month_jie_360_v1；key_month_tianzheng_jie_v1采用金钥匙完年乘十二、加天地二正和本月名义序，仍以现代节月为界，非完整古历月界；源文门数冲突保留，不按吉凶择法。",
+            "title": "Month Profile"
+          },
+          "shiji_profile": {
+            "anyOf": [
+              {
+                "enum": [
+                  "jinjing_vol2_rotation_v1",
+                  "jinjing_vol3_table_v1",
+                  "jinjing_vol3_table_literal_v1"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "始击来源。默认 jinjing_vol2_rotation_v1 按《金镜》卷二推演。jinjing_vol3_table_v1 对阴遁37、43、44局采用卷三表列始击并按卷二重算客算。jinjing_vol3_table_literal_v1 对这三局采用卷三表列始击和客算。",
+            "title": "Shiji Profile"
+          },
+          "year_profile": {
+            "anyOf": [
+              {
+                "enum": [
+                  "jinjing_year_lunar_civil_v1",
+                  "jinjing_year_historical_table_v1",
+                  "jinjing_year_qiliang_table_v1"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "仅year：省略或jinjing_year_lunar_civil_v1保留通用现代农历岁首；jinjing_year_historical_table_v1选381—385晋历主表；jinjing_year_qiliang_table_v1选501—505齐梁史历表，保留502年闰四月及未决闰五月／六月候选。两者范围外均拒绝。输入仍用推算公历和明确时区；非全部古历、并立王朝异历或原典岁首裁定，不按吉凶择法。",
+            "title": "Year Profile"
+          }
+        },
+        "title": "TaiyiOptions",
+        "type": "object"
+      }
+    },
     "additionalProperties": false,
     "description": "Request model for sanshiunited.",
     "properties": {
@@ -468,34 +623,11 @@
         "title": "Date",
         "type": "string"
       },
-      "gps_lat": {
+      "latitude": {
         "anyOf": [
           {
             "type": "number"
           },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "GPS latitude",
-        "title": "Gps Lat"
-      },
-      "gps_lon": {
-        "anyOf": [
-          {
-            "type": "number"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "GPS longitude",
-        "title": "Gps Lon"
-      },
-      "lat": {
-        "anyOf": [
           {
             "type": "string"
           },
@@ -505,7 +637,7 @@
         ],
         "default": "31n13",
         "description": "Latitude text or decimal",
-        "title": "Lat"
+        "title": "Latitude"
       },
       "liureng_guiren_profile": {
         "default": "liuren_common_v1",
@@ -543,8 +675,11 @@
         "description": "Optional liureng month-general override",
         "title": "Liureng Yue"
       },
-      "lon": {
+      "longitude": {
         "anyOf": [
+          {
+            "type": "number"
+          },
           {
             "type": "string"
           },
@@ -554,40 +689,22 @@
         ],
         "default": "121e28",
         "description": "Longitude text or decimal",
-        "title": "Lon"
+        "title": "Longitude"
       },
       "qimen_options": {
-        "additionalProperties": true,
-        "description": "奇门：ju_method=zhirun（置闰）/chaibu（拆补）；god_profile=yanyi_text（默认卷三正文）/yanyi_diagrams（卷四圆图）；season_profile=yanyi_vol1_verse（默认卷一赋）/yanyi_vol3_table/yanyi_vol3_prose；仅支持转盘layout=direct和零平移",
-        "title": "Qimen Options",
-        "type": "object"
-      },
-      "selected_sections": {
-        "description": "Optional snapshot section titles for filtered export payload",
-        "items": {
-          "type": "string"
-        },
-        "title": "Selected Sections",
-        "type": "array"
+        "$ref": "#/$defs/QimenOptions",
+        "description": "奇门：ju_method=zhirun（置闰）/chaibu（拆补）；god_profile=yanyi_text（默认卷三正文）/yanyi_diagrams（卷四圆图）；season_profile=yanyi_vol1_verse（默认卷一赋）/yanyi_vol3_table/yanyi_vol3_prose；仅支持转盘layout=direct和零平移"
       },
       "taiyi_options": {
-        "additionalProperties": true,
-        "description": "太乙calculation_mode=year/month/day/hour，默认year；仅year可设year_profile=jinjing_year_historical_table_v1选381—385晋历主表，或jinjing_year_qiliang_table_v1选501—505齐梁史历表并保留502年闰标分歧；范围外拒绝，其他两术古历不因而认证；默认年计仍为通用现代农历。仅month可设month_profile=jinjing_month_jie_360_v1（默认金镜）/key_month_tianzheng_jie_v1（金钥匙天地二正，现代节月适配，门数分歧及三门未知保留）；day为金钥匙冬至前甲子积日、所选钟面零时换日，附十精及异数；仅hour可设hour_profile=jinjing_hour_solstice_v1（默认现代至点置一）或key_hour_winter_jiazi_v1（金钥匙完整积时/时支合神/四门，三门主体未决）。shiji_profile 可选《金镜》卷二推演、卷三表列始击并重算客算、或卷三表列始击与客算。接受 calculation_mode、shiji_profile 及对应计法的 year_profile、month_profile、hour_profile。阴阳遁与布盘方向由实际计法和日期决定。日计古历日期仍未复原，不按吉凶择法。",
-        "title": "Taiyi Options",
-        "type": "object"
+        "$ref": "#/$defs/TaiyiOptions",
+        "description": "太乙calculation_mode=year/month/day/hour，默认year；仅year可设year_profile=jinjing_year_historical_table_v1选381—385晋历主表，或jinjing_year_qiliang_table_v1选501—505齐梁史历表并保留502年闰标分歧；范围外拒绝，其他两术古历不因而认证；默认年计仍为通用现代农历。仅month可设month_profile=jinjing_month_jie_360_v1（默认金镜）/key_month_tianzheng_jie_v1（金钥匙天地二正，现代节月适配，门数分歧及三门未知保留）；day为金钥匙冬至前甲子积日、所选钟面零时换日，附十精及异数；仅hour可设hour_profile=jinjing_hour_solstice_v1（默认现代至点置一）或key_hour_winter_jiazi_v1（金钥匙完整积时/时支合神/四门，三门主体未决）。shiji_profile 可选《金镜》卷二推演、卷三表列始击并重算客算、或卷三表列始击与客算。接受 calculation_mode、shiji_profile 及对应计法的 year_profile、month_profile、hour_profile。阴阳遁与布盘方向由实际计法和日期决定。日计古历日期仍未复原，不按吉凶择法。"
       },
       "time": {
         "description": "Time string, e.g. 09:33:00",
         "title": "Time",
         "type": "string"
       },
-      "use_true_solar_time": {
-        "default": true,
-        "description": "Enable local true solar time correction before sanshi aggregation (default on — 式占 keys off the apparent-solar 时辰)",
-        "title": "Use True Solar Time",
-        "type": "boolean"
-      },
-      "zone": {
+      "timezone": {
         "anyOf": [
           {
             "type": "string"
@@ -598,7 +715,13 @@
         ],
         "default": "+08:00",
         "description": "Timezone spec",
-        "title": "Zone"
+        "title": "Timezone"
+      },
+      "use_true_solar_time": {
+        "default": true,
+        "description": "Enable local true solar time correction before sanshi aggregation (default on — 式占 keys off the apparent-solar 时辰)",
+        "title": "Use True Solar Time",
+        "type": "boolean"
       }
     },
     "required": [

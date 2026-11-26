@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.application.execution import execute_spec
+from fatebridge.application.execution import invoke_validated_service
 from fatebridge.core import ephemeris_runtime as runtime
 from fatebridge.core.astro import native_execution
 from fatebridge.core.astro.birth import build_astro_birth_info
@@ -69,51 +69,49 @@ def selected(directories, monkeypatch):
     runtime.configure_ephemeris_path(previous)
 
 
-SPECS = {s.key: s for s in CATALOG}
+SPECS = {s.name: s for s in CATALOG}
 WESTERN_KEYS = [
-    "astro_chart",
-    "astro_chart13",
-    "astro_hellen",
-    "astro_germany",
-    "astro_relative_chart",
-    "western_timing_analysis",
-    "solarreturn",
-    "lunarreturn",
-    "transit",
-    "solararc",
-    "givenyear",
+    "astrology_chart",
+    "thirteen_sector_chart",
+    "hellenistic_chart",
+    "hamburg_midpoint_chart",
+    "relationship_chart",
+    "western_timing",
+    "solar_return",
+    "lunar_return",
+    "transit_chart",
+    "solar_arc",
+    "chart_for_year",
     "profection",
-    "pd",
-    "pdchart",
-    "zr",
+    "primary_directions",
+    "primary_directions_chart",
+    "zodiacal_releasing",
     "firdaria",
     "decennials",
-    "astro_harmonic",
-    "astro_planetary_ages",
-    "astro_triplicity_rulers",
-    "astro_lunation_phase",
-    "astro_distributions",
-    "astro_balbillus",
-    "astro_keypoints",
-    "astro_yearsystem129",
-    "astro_planetaryarc",
-    "astro_persiandirected",
-    "astro_agepoint",
-    "astro_vedicprog",
-    "astro_jaynesprog",
-    "astro_mundane",
-    "astro_extrareturns",
-    "astro_horary",
-    "astro_election",
+    "harmonic_chart",
+    "planetary_ages",
+    "triplicity_ruler_periods",
+    "lunar_phase_progressions",
+    "bounds_directions",
+    "balbillus_periods",
+    "numeric_aspect_periods",
+    "planetary_periods_129_years",
+    "planetary_arc_directions",
+    "persian_directions",
+    "age_point",
+    "sidereal_progressions",
+    "declination_progressions",
+    "mundane_ingress_chart",
+    "planetary_returns",
+    "horary_chart",
+    "evaluate_election_time",
 ]
 
 
 def payload(key, **updates):
     spec = SPECS[key]
     factory = (
-        REST_POST_CASES[spec.rest_path]
-        if spec.rest_path
-        else MCP_CASES[spec.tool_name][1]
+        REST_POST_CASES[spec.rest_path] if spec.rest_path else MCP_CASES[spec.name][1]
     )
     return {**factory(), **updates}
 
@@ -150,7 +148,7 @@ def test_every_published_western_strict_request_rejects_empty_data(
     key, selected
 ) -> None:
     selected("empty")
-    result = execute_spec(
+    result = invoke_validated_service(
         SPECS[key], request(key, ephemeris_policy="require_data_files")
     )
     assert result["error_code"] == "ephemeris_source_inconsistent"
@@ -165,9 +163,9 @@ def test_every_published_western_full_strict_request_preserves_whole_result(
     key, selected
 ) -> None:
     selected("full")
-    before = execute_spec(SPECS[key], request(key))
+    before = invoke_validated_service(SPECS[key], request(key))
     selected("full")
-    after = execute_spec(
+    after = invoke_validated_service(
         SPECS[key], request(key, ephemeris_policy="require_data_files")
     )
     assert "error" not in before and "error" not in after
@@ -187,30 +185,32 @@ def test_every_published_western_full_strict_request_preserves_whole_result(
 @pytest.mark.parametrize(
     "key",
     [
-        "astro_chart",
-        "astro_hellen",
-        "astro_chart13",
-        "astro_germany",
-        "astro_horary",
-        "astro_election",
+        "astrology_chart",
+        "hellenistic_chart",
+        "thirteen_sector_chart",
+        "hamburg_midpoint_chart",
+        "horary_chart",
+        "evaluate_election_time",
         "profection",
-        "solararc",
+        "solar_arc",
     ],
 )
 def test_partial_data_keeps_original_mixed_dependency_failure(
     key: str, selected
 ) -> None:
     selected("planet_only")
-    value = execute_spec(
+    value = invoke_validated_service(
         SPECS[key], request(key, ephemeris_policy="require_data_files")
     )
     assert value["issues"][0]["code"] == "swiss_dependency_unavailable"
 
 
-@pytest.mark.parametrize("key", ["astro_chart", "astro_chart13", "astro_germany"])
+@pytest.mark.parametrize(
+    "key", ["astrology_chart", "thirteen_sector_chart", "hamburg_midpoint_chart"]
+)
 def test_solar_clock_calls_cannot_escape_strict_policy(key: str, selected) -> None:
     selected("empty")
-    value = execute_spec(
+    value = invoke_validated_service(
         SPECS[key],
         request(key, use_true_solar_time=True, ephemeris_policy="require_data_files"),
     )
@@ -278,9 +278,9 @@ def test_non_native_orbital_fallback_is_rejected_even_after_optional_api_failure
 
     selected("full")
     monkeypatch.setattr(ephemeris, "_swisseph_planet_state", lambda *a, **k: None)
-    result = execute_spec(
-        SPECS["astro_hellen"],
-        request("astro_hellen", ephemeris_policy="require_data_files"),
+    result = invoke_validated_service(
+        SPECS["hellenistic_chart"],
+        request("hellenistic_chart", ephemeris_policy="require_data_files"),
     )
     assert result["issues"][0]["code"] == "required_data_files_fallback"
 
@@ -301,9 +301,9 @@ def test_optional_native_failure_cannot_return_a_successful_strict_chart(
         return native_calc(tjdet, planet, *args, **kwargs)
 
     monkeypatch.setattr(runtime.swe, "calc", broken)
-    value = execute_spec(
-        SPECS["astro_chart"],
-        request("astro_chart", ephemeris_policy="require_data_files"),
+    value = invoke_validated_service(
+        SPECS["astrology_chart"],
+        request("astrology_chart", ephemeris_policy="require_data_files"),
     )
     assert value["issues"][0]["code"] == "required_data_files_unavailable"
     assert value["error_code"] == "ephemeris_source_inconsistent"
@@ -388,21 +388,21 @@ def test_owned_subprocess_inherits_policy_and_returns_explicit_receipt(
 
 
 def test_india_policy_binding_is_retained_and_guolao_is_not_silently_claimed() -> None:
-    indian = request("astro_india", ephemeris_policy="require_data_files")
+    indian = request("vedic_chart", ephemeris_policy="require_data_files")
     assert isinstance(indian, WesternEphemerisRequest)
     assert not indian.uses_western_ephemeris_policy()
     assert (
-        SPECS["astro_india"].bind(indian)[2]["ephemeris_policy"] == "require_data_files"
+        SPECS["vedic_chart"].bind(indian)[2]["ephemeris_policy"] == "require_data_files"
     )
     with pytest.raises(ValueError):
         request(
-            "astro_chart",
+            "astrology_chart",
             chart_variant="guolao_chart",
             ephemeris_policy="require_data_files",
         )
 
 
-@pytest.mark.parametrize("key", ["astro_chart13", "astro_germany"])
+@pytest.mark.parametrize("key", ["thirteen_sector_chart", "hamburg_midpoint_chart"])
 def test_non_civil_clock_and_all_uncertainty_samples_share_strict_request(
     key: str, selected
 ) -> None:
@@ -412,9 +412,9 @@ def test_non_civil_clock_and_all_uncertainty_samples_share_strict_request(
         birth_time_uncertainty_minutes=0.1,
     )
     selected("full")
-    auto = execute_spec(SPECS[key], request(key, **extra))
+    auto = invoke_validated_service(SPECS[key], request(key, **extra))
     selected("full")
-    strict = execute_spec(
+    strict = invoke_validated_service(
         SPECS[key], request(key, **extra, ephemeris_policy="require_data_files")
     )
     receipt = strict.pop("ephemeris_data_policy")
@@ -426,9 +426,9 @@ def test_policy_public_schema_rejects_a_false_accuracy_claim(selected) -> None:
     from fatebridge.application.execution import OutputContractError, validate_output
 
     selected("full")
-    spec = SPECS["astro_harmonic"]
-    result = execute_spec(
-        spec, request("astro_harmonic", ephemeris_policy="require_data_files")
+    spec = SPECS["harmonic_chart"]
+    result = invoke_validated_service(
+        spec, request("harmonic_chart", ephemeris_policy="require_data_files")
     )
     assert "ephemeris_data_policy" in spec.output_model.model_fields
     tampered = copy.deepcopy(result)

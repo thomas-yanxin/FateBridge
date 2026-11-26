@@ -1,7 +1,7 @@
 {
   "date": "2000-01-07",
   "time": "12:00:00",
-  "zone": "Asia/Shanghai",
+  "timezone": "Asia/Shanghai",
   "gua_code": "111111",
   "focus_line": 6,
   "focus_kinship": "父母",

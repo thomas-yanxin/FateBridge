@@ -14,17 +14,35 @@ from fatebridge.core.astro.opaque_solar import opaque_solar_positions
 from fatebridge.core.astro.relationship import build_relative_payload
 from fatebridge.core.astro.sensitivity import enrich_specialty_sensitivity
 from fatebridge.core.astro.solar_arc import enrich_solar_arc
-from fatebridge.core.export_parser import parse_export_content
 from fatebridge.core.guolao.guolao_anchor_days import POLICIES
 from fatebridge.core.guolao.guolao_birth_clock import coherent_guolao_solar_call
 from fatebridge.core.guolao.guolao_timing import enrich_guolao_timing
 from fatebridge.core.jyotish.jyotish_display import normalize_solar_display
 from fatebridge.core.jyotish.jyotish_sources import coherent_india_call
-from fatebridge.services.astrology_snapshot import _build_chart_snapshot
-from fatebridge.services.astrology_snapshot_sections import _chart_calculation_notes
 from fatebridge.services.jyotish import enrich_india_chart
-from fatebridge.services.structured_snapshot import render_structured_snapshot_text
 from fatebridge.utils.errors import calculation_guard
+from fatebridge.utils.house_systems import (
+    normalize_offline_zodiac_code,
+    resolve_offline_house_code,
+)
+
+
+def _chart_calculation_notes(payload: dict[str, Any]) -> list[str]:
+    notes: list[str] = []
+    for field in (
+        "ephemeris_reference_points",
+        "angle_definition",
+        "house_axis_convention",
+        "house_position_projection",
+        "orbital_fallback",
+        "fixed_stars",
+    ):
+        qualification = payload.get("chart_profile", {}).get(field) or {}
+        note = qualification.get("note_zh")
+        if note and note not in notes:
+            notes.append(note)
+    return notes
+
 
 __all__ = [
     "SUPPORTED_CHART_VARIANTS",
@@ -88,8 +106,8 @@ def calculate_core_chart_analysis(
     name: str | None = None,
     birth_place: str | None = None,
     gender: str | None = None,  # accepted for uniform args; unused in chart math
-    hsys: int | None = None,
-    zodiacal: int | None = None,
+    house_system: int | str | None = None,
+    zodiac_type: str | None = None,
     use_true_solar_time: bool = False,
     node_mode: str = "mean",
     ephemeris_policy: str = "auto",
@@ -171,12 +189,16 @@ def calculate_core_chart_analysis(
             name=name,
             birth_place=birth_place,
             gender=gender,
-            hsys=hsys,
-            zodiacal=zodiacal,
+            house_system=house_system,
+            zodiac_type=zodiac_type,
             use_true_solar_time=use_true_solar_time,
             birth_time_uncertainty_minutes=birth_time_uncertainty_minutes,
             analysis_datetime=analysis_datetime,
         )
+    hsys = None if house_system is None else resolve_offline_house_code(house_system)
+    zodiacal = (
+        None if zodiac_type is None else normalize_offline_zodiac_code(zodiac_type)
+    )
 
     if analysis_datetime is not None and chart_variant != "guolao_chart":
         raise ValueError(
@@ -275,7 +297,6 @@ def calculate_core_chart_analysis(
             kind="chart13",
             uncertainty_minutes=birth_time_uncertainty_minutes,
         )
-    result.update(_build_chart_snapshot(result, chart_variant))
     if apparent_model == "opaque_solar":
         result["apparent_model_positions"] = opaque_solar_positions(
             result["chart_profile"]["julian_day_tt"]
@@ -299,8 +320,8 @@ def calculate_germany_chart_analysis(
     name: str | None = None,
     birth_place: str | None = None,
     gender: str | None = None,  # accepted for uniform args; unused in chart math
-    hsys: int | None = None,
-    zodiacal: int | None = None,
+    house_system: int | str | None = None,
+    zodiac_type: str | None = None,
     use_true_solar_time: bool = False,
     birth_time_uncertainty_minutes: float | None = None,
     analysis_datetime: datetime | None = None,
@@ -308,6 +329,10 @@ def calculate_germany_chart_analysis(
     """
     Build the FateBridge midpoint/germany chart payload.
     """
+    hsys = None if house_system is None else resolve_offline_house_code(house_system)
+    zodiacal = (
+        None if zodiac_type is None else normalize_offline_zodiac_code(zodiac_type)
+    )
     birth_info = _build_birth_info(
         {
             "birth_year": birth_year,
@@ -346,19 +371,21 @@ def calculate_relative_chart_analysis(
     inner_payload: dict[str, Any],
     outer_payload: dict[str, Any],
     relative_mode: Any = None,
-    hsys: int = 3,
-    zodiacal: int = 0,
+    house_system: int | str = "P",
+    zodiac_type: str = "Tropic",
     relationship_focus: Any = None,
     davison_variant: str = "uncorrected",
 ) -> dict[str, Any]:
     """
     Build synastry/composite payloads for two parties.
 
-    hsys defaults to Placidus (3), matching both published request forms.
+    house_system defaults to Placidus ('P', code 3), matching both published request forms.
     """
+    hsys = resolve_offline_house_code(house_system)
+    zodiacal = normalize_offline_zodiac_code(zodiac_type)
     inner_birth = _build_birth_info(inner_payload)
     outer_birth = _build_birth_info(outer_payload)
-    payload = build_relative_payload(
+    return build_relative_payload(
         inner_birth=inner_birth,
         outer_birth=outer_birth,
         relative_mode=relative_mode,
@@ -367,24 +394,3 @@ def calculate_relative_chart_analysis(
         relationship_focus=relationship_focus,
         davison_variant=davison_variant,
     )
-    if "error" not in payload:
-        # Allowlist the relationship-facing summary; the raw inner/outer/
-        # composite charts and the directional aspect/midpoint dumps stay in
-        # the structured payload only (they would flood the snapshot).
-        summary_view: dict[str, Any] = {
-            key: payload[key]
-            for key in (
-                "relationship_profile",
-                "synastry_aspects",
-                "summary",
-            )
-            if key in payload
-        }
-        snapshot_text = render_structured_snapshot_text(
-            summary_view, title="关系星盘分析"
-        )
-        payload["snapshot_text"] = snapshot_text
-        payload["snapshot_export"] = parse_export_content(
-            technique="relative", content=snapshot_text
-        )
-    return payload

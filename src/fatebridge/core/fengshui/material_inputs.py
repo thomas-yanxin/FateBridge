@@ -4,7 +4,7 @@ from typing import Literal
 
 from pydantic import Field, StrictBool, field_validator, model_validator
 
-from fatebridge.core.fengshui.numeric_inputs import FengshuiInput as _DeferredModel
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput
 from fatebridge.core.fengshui.workstation_inputs import MaterialApplication
 
 Material = Literal[
@@ -44,7 +44,7 @@ ElementUse = Literal[
 ]
 
 
-class MaterialShapeFact(_DeferredModel):
+class MaterialShapeFact(FengshuiInput):
     fact_id: str = Field(min_length=1, max_length=100)
     object_id: str = Field(min_length=1, max_length=100)
     material: Material | None = None

@@ -4,15 +4,39 @@ import pytest
 
 from fatebridge.application.domain_validators import detect_fengshui_approximate
 from fatebridge.core.fengshui import calendar
+from fatebridge.core.fengshui.models import (
+    AnnualRequest,
+    DirectionsRequest,
+    MingguaRequest,
+    XuankongRequest,
+)
 from fatebridge.services import replay_metadata
 from fatebridge.services.fengshui import (
-    calculate_annual_stars,
-    calculate_directions,
-    calculate_minggua,
-    calculate_xuankong_natal,
+    calculate_annual_stars as _calculate_annual_stars,
+)
+from fatebridge.services.fengshui import calculate_directions as _calculate_directions
+from fatebridge.services.fengshui import calculate_minggua as _calculate_minggua
+from fatebridge.services.fengshui import (
+    calculate_xuankong_natal as _calculate_xuankong_natal,
 )
 from fatebridge.services.run_metadata import attach_run_metadata
 from tests.fixtures.fengshui import payload
+
+
+def calculate_annual_stars(**kwargs):
+    return _calculate_annual_stars(AnnualRequest.model_validate(kwargs))
+
+
+def calculate_directions(**kwargs):
+    return _calculate_directions(DirectionsRequest.model_validate(kwargs))
+
+
+def calculate_minggua(**kwargs):
+    return _calculate_minggua(MingguaRequest.model_validate(kwargs))
+
+
+def calculate_xuankong_natal(**kwargs):
+    return _calculate_xuankong_natal(XuankongRequest.model_validate(kwargs))
 
 
 def test_runtime_receipt_includes_observed_field_arithmetic_version(

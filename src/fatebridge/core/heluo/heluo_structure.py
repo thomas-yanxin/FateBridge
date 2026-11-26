@@ -153,18 +153,3 @@ def body_structure(chart: dict[str, Any]) -> dict[str, Any]:
             "本结构层不改变年纳音关系、元气或化工取体，不独自裁定得体、合理、葉否或现实结果。",
         ],
     }
-
-
-def structure_snapshot(evidence: dict[str, Any]) -> str:
-    lines = ["[卦体结构·渐卦原例取法]"]
-    for row in evidence["phases"]:
-        phase = "先天" if row["phase"] == "xian" else "后天"
-        names = "、".join(r["name"] for r in row["records"])
-        basis = "所核渐卦原例" if row["literal_case_match"] else "所列算子推演"
-        lines.append(
-            f"{phase}·{row['gua']}：{names}；全卦倒序为{row['whole_reversal']['name']}。依据：{basis}。"
-        )
-    lines.append(
-        "八条记录含三爻体与六爻卦，不能当作八个互体合并纳音；完整伏体、得体与葉否未裁定。"
-    )
-    return "\n".join(lines)

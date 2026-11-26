@@ -58,7 +58,7 @@ def test_actual_reference_content_on_three_adapters(
     response, code, cli, mcp = run_three(
         SPECS["knowledge_read"],
         {"domain": "human_design", "category": "lines_v4", "key": key},
-        ["category", "key", "reference_details", "provenance", "snapshot_text"],
+        ["category", "key", "reference_details", "provenance", "rendered_text"],
         rest,
         tmp_path,
         capsys,
@@ -87,16 +87,16 @@ def test_adapters_reject_forged_annotations_even_if_projecting_unrelated_field(
         result["category"] = "lines_v3"
     else:
         pass
-    execute = execution.execute_spec
+    execute = execution.invoke_validated_service
 
     def forged(spec, request):
-        if spec.key == "knowledge_read":
+        if spec.name == "knowledge_read":
             spec = replace(spec, bind=lambda _: (lambda: deepcopy(result), (), {}))
         else:
             pass
         return execute(spec, request)
 
-    monkeypatch.setattr(execution, "execute_spec", forged)
+    monkeypatch.setattr(execution, "invoke_validated_service", forged)
     response, code, _, mcp = run_three(
         SPECS["knowledge_read"],
         {"domain": "human_design", "category": "lines_v4", "key": key},

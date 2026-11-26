@@ -80,7 +80,7 @@ def test_all384_casts_confirmed_neither_only_disables_four_prior_clauses(
                 assert rule_id not in neither["weather"]["pending_rule_ids"]
 
 
-@pytest.mark.parametrize("tool", ["meihua_analysis", "meihua_cast"])
+@pytest.mark.parametrize("tool", ["meihua_time_cast", "meihua_cast"])
 def test_confirmed_neither_and_pending_other_conditions_agree_on_all_surfaces(
     tool: str, surface_calls
 ) -> None:
@@ -108,18 +108,15 @@ def test_confirmed_neither_and_pending_other_conditions_agree_on_all_surfaces(
         spec,
         payload,
         params=[
+            ("detail", "audit"),
             *(("fields", f) for f in fields),
-            ("strict_fields", "true"),
-            ("response_char_limit", "0"),
         ],
-        options={"fields": fields, "strict_fields": True, "response_char_limit": 0},
+        options={"detail": "audit", "fields": fields},
         flags=[
+            "--detail",
+            "audit",
             "--fields",
             *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
             "--weather-context",
             json.dumps(payload["weather_context"]),
         ],

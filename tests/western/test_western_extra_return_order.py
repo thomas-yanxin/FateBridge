@@ -318,7 +318,7 @@ def test_extra_returns_service_keeps_extended_utc_clock_coordinates(
 def test_nearest_return_and_zodiac_agree_across_rest_mcp_cli(
     zodiac: str, expected_day: int, latitude: int, surface_calls
 ) -> None:
-    spec = SPECS["astro_extrareturns"]
+    spec = SPECS["planetary_returns"]
     inputs = dict(
         birth_year=1990,
         birth_month=5,
@@ -334,21 +334,16 @@ def test_nearest_return_and_zodiac_agree_across_rest_mcp_cli(
         zodiac_type=zodiac,
     )
     fields = ["extrareturns.returns", "analysis_context.zodiac_type"]
-    query = [("fields", field) for field in fields] + [
-        ("strict_fields", "true"),
-        ("include_snapshot_text", "false"),
-        ("response_char_limit", 0),
-    ]
+    query = [("fields", field) for field in fields] + [("detail", "audit")]
     http, protocol, code, cli = surface_calls(
         spec,
         inputs,
         params=query,
         options={
             "fields": fields,
-            "strict_fields": True,
-            "include_snapshot_text": False,
+            "detail": "audit",
         },
-        flags=["--fields", *fields],
+        flags=["--fields", *fields, "--detail", "audit"],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error

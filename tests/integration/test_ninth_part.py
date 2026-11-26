@@ -59,10 +59,3 @@ def test_chart_planets_carry_ninth_part() -> None:
     assert planets["Sun"]["ninth_part"] == "Virgo"
     for entry in planets.values():
         assert "ninth_part" in entry
-
-
-def test_snapshot_renders_ninth_part_line() -> None:
-    payload = calculate_core_chart_analysis(
-        chart_variant="hellen_chart", use_true_solar_time=True, **_NATAL
-    )
-    assert "九分部：" in payload["snapshot_text"]

@@ -92,9 +92,9 @@ def test_sanshiunited_qimen_matches_dedicated_qimen_service() -> None:
     aggregate = calculate_sanshiunited_analysis(
         date="2028-04-06",
         time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+        timezone="+08:00",
+        latitude="31n13",
+        longitude="121e28",
     )
 
     assert aggregate["qimen"]["ju_text"] == dedicated["qimen"]["ju_text"]
@@ -231,9 +231,6 @@ def test_ju_method_keeps_printed_conflicts_visible_across_transports(
                 f"qimen.{name}"
                 for name in ("ju_method", "ju_term", "ju_text", "source_disagreements")
             ],
-            "strict_fields": True,
-            "response_char_limit": 0,
-            "include_snapshot_text": False,
         },
         rest_as_of=AS_OF,
     )

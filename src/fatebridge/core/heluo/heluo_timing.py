@@ -14,11 +14,7 @@ from typing import Any
 from fatebridge.core.heluo.heluo import _flip_line, _ying, da_yun
 from fatebridge.core.heluo.heluo_clock import source_clock_evidence
 from fatebridge.core.heluo.heluo_hexagrams import GAN, ZHI, lines_to_gua
-from fatebridge.core.heluo.heluo_snapshot import yao_name, yao_text
-from fatebridge.core.heluo.heluo_texts import (
-    text_reading_notes_snapshot,
-    text_status_snapshot,
-)
+from fatebridge.core.heluo.heluo_texts import yao_text
 from fatebridge.core.zhouyi import classical_hexagram
 
 RULESET_ID = "heluo_xiaoxiang_nlc_sequence_v1"
@@ -97,42 +93,6 @@ def annual_sequence(
         result.append(row)
         current = row["lines"][:]
     return result
-
-
-def selected_timing_snapshot(timing: dict[str, Any]) -> str:
-    """Render only selected, calculated sequences with their actual used line.
-
-    No text branch or outcome is chosen here; a template index never becomes a
-    civil date. The day row's used position can differ from its changed line.
-    """
-    if not timing.get("selected_annual"):
-        return ""
-    texts = ["[指定岁运卦序]"]
-    for key, label, value_key, scope in (
-        ("selected_annual", "年标签", "year_label", "annual"),
-        ("selected_month", "月序", "month_index", "month_ordinal"),
-        ("selected_day", "日定式序", "day_index", "day_template_ordinal"),
-    ):
-        row = timing.get(key)
-        if row:
-            texts.append(
-                f"{label}{row[value_key]}：{row['gua']}，用爻{yao_name(row['lines'], row['pos'])}。"
-            )
-            selected = next(
-                (
-                    entry
-                    for entry in timing.get("selected_texts", [])
-                    if entry["scope"] == scope
-                    and (entry["gua"], entry["pos"]) == (row["gua"], row["pos"])
-                ),
-                None,
-            )
-            if selected and selected.get("heluo_commentary"):
-                text = selected["heluo_commentary"]
-                texts.append(f"所用爻文校勘：{text_status_snapshot(text)}。")
-                texts.extend(text_reading_notes_snapshot(text))
-    texts.append("月序、日定式序尚未桥接实际日期；不据此给出公历或农历应期。")
-    return "\n".join(texts)
 
 
 def monthly_sequence(annual_lines: list[int], annual_pos: int) -> list[dict[str, Any]]:

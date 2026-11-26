@@ -6,20 +6,18 @@ import argparse
 import json
 import re
 from collections.abc import Sequence
-from pathlib import Path
 from types import UnionType
 from typing import Annotated, Literal, NoReturn, get_args, get_origin
 
 from pydantic.fields import FieldInfo
 
-UNION_ORIGINS = (UnionType, get_origin(Annotated[int, "u"] | None))
-
-from fatebridge.application.description import is_model_field, spec_is_cli_safe
-from fatebridge.application.tool_spec import ServiceResult, ToolSpec
-from fatebridge.cli_inputs import profile_field_objects
+from fatebridge.application.description import is_model_field, unwrap_optional
+from fatebridge.application.tool_spec import ServiceResult
 from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.transports.flags import RESPONSE_LIMIT_DESC
+from fatebridge.transports.flags import FIELDS_FLAG_DESC
+
+UNION_ORIGINS = (UnionType, get_origin(Annotated[int, "u"] | None))
 
 BOOL_TRUE_TOKENS = {"true", "1", "yes", "y", "on"}
 BOOL_FALSE_TOKENS = {"false", "0", "no", "n", "off"}
@@ -139,13 +137,22 @@ def _parse_nullable_integer(value: str) -> int | None:
             raise argparse.ArgumentTypeError(f"invalid int value: {value!r}") from error
 
 
+def _is_nested_list(annotation: object) -> bool:
+    if get_origin(annotation) is not list:
+        return False
+    members = get_args(annotation)
+    if not members:
+        return False
+    element = unwrap_optional(_argument_type(members[0]))
+    return is_model_field(element) or get_origin(element) is dict
+
+
 def _add_field_argument(
     parser: argparse.ArgumentParser,
     name: str,
     field: FieldInfo,
     *,
     relax_required: bool = False,
-    json_structures: bool = False,
 ) -> None:
     annotation = _argument_type(field.annotation)
     origin = get_origin(annotation)
@@ -155,8 +162,10 @@ def _add_field_argument(
     flag = "--" + name.replace("_", "-")
     help_text = field.description or ""
 
-    if origin is dict or (
-        json_structures and (is_model_field(field.annotation) or origin is list)
+    if (
+        origin is dict
+        or is_model_field(field.annotation)
+        or _is_nested_list(annotation)
     ):
         parser.add_argument(
             flag,
@@ -220,84 +229,48 @@ def build_parser(
     relaxed = relaxed_required or set()
     parser = _JsonErrorParser(
         prog="fatebridge",
-        description="FateBridge 命理/占星离线计算 CLI（数据驱动自中央工具目录）。",
-    )
-    parser.add_argument(
-        "--no-metadata", action="store_true", help="不附加 run_metadata"
+        description="FateBridge 确定性计算 CLI（由中央工具目录动态生成）。",
     )
     sub = parser.add_subparsers(dest="command", metavar="<tool>")
 
-    listing = sub.add_parser("list", help="以文本列出工具，支持筛选")
+    listing = sub.add_parser("list", help="以分类文本列出工具，支持筛选")
     _add_discovery_flags(listing)
+
     discovery = sub.add_parser(
-        "discover", help="先查看目录摘要，再按工具读取完整契约（JSON）"
+        "discover", help="发现工具目录或读取指定工具的完整调用契约与示例（JSON）"
+    )
+    discovery.add_argument(
+        "tool_pos",
+        nargs="?",
+        metavar="tool",
+        help="可选：精确查询指定工具的调用契约与示例",
     )
     _add_discovery_flags(discovery)
     discovery.add_argument(
-        "--detail", choices=("index", "summary", "full"), default="summary"
-    )
-    describe_parser = sub.add_parser(
-        "describe", help="输出某工具的参数 schema、可用接口与示例（JSON）"
-    )
-    describe_parser.add_argument(
-        "tool", nargs="?", help="工具命令名（见 `fatebridge list`）"
-    )
-    describe_parser.add_argument(
         "--detail",
-        choices=("input", "full"),
-        default="full",
-        help="input 只取输入契约及示例；full 还含输出契约",
-    )
-
-    result_reader = sub.add_parser(
-        "result-read", help="核验存储完整性并分页读取原结果，不重算"
-    )
-    result_reader.add_argument("result_id")
-    result_reader.add_argument("--run-id", help="指定原回执的 run_id。无回执时可省略。")
-    result_reader.add_argument(
-        "--path", help="对象或数组数字索引点路径；省略读取全文分页"
-    )
-    result_reader.add_argument("--offset", type=int, default=0)
-    result_reader.add_argument(
-        "--directory", type=Path, help="可选：原交付文件所在的私有目录；不创建目录"
+        choices=("summary", "full"),
+        default="summary",
+        help="summary 返回摘要（指定 tool 时含输入 schema 与示例）；full 附带完整 output_schema",
     )
 
     doctor = sub.add_parser("doctor", help="检查安装；--mcp 验证独立 stdio 进程")
     doctor.add_argument("--mcp", action="store_true")
     doctor.add_argument("--family", help="检查这些 MCP 分类（CSV）")
 
-    _add_profile_parser(sub)
-
     for spec in CATALOG:
-        name = spec.tool_name
-        is_cli_safe = spec_is_cli_safe(spec)
-        sp = sub.add_parser(
-            name,
-            help=(
-                spec.summary
-                if is_cli_safe
-                else f"{spec.summary}（请用 REST 或扁平命令）"
-            ),
-        )
-        if not is_cli_safe:
-            sp.set_defaults(
-                _spec=spec, _cli_unsupported=True, _hint=_unsupported_hint(spec)
-            )
-            continue
+        sp = sub.add_parser(spec.name, help=spec.summary)
         for fname, field in spec.request_model.model_fields.items():
             _add_field_argument(
                 sp,
                 fname,
                 field,
                 relax_required=fname in relaxed,
-                json_structures=spec.cli_request_file,
             )
-        if spec.cli_request_file:
-            sp.add_argument(
-                "--request-file",
-                metavar="PATH",
-                help="完整住宅请求 JSON 文件；显式字段参数覆盖文件中的同名顶层字段，仍按公开模型校验",
-            )
+        sp.add_argument(
+            "--request-file",
+            metavar="PATH",
+            help="完整 JSON 请求文件；显式字段参数覆盖文件中的同名顶层字段，按公开模型严格校验",
+        )
         _add_transport_flags(sp)
         sp.set_defaults(_spec=spec)
     return parser
@@ -318,97 +291,15 @@ def _add_execution_flags(parser: argparse.ArgumentParser) -> None:
 
 
 def _add_transport_flags(parser: argparse.ArgumentParser) -> None:
-    """Attach execution, output and subject options to each tool command."""
+    """Attach shared execution and field-projection controls to each tool command."""
     _add_execution_flags(parser)
-    _add_output_flags(parser)
-    parser.add_argument(
-        "--subject-file",
-        dest="subject_file",
-        default=None,
-        metavar="PATH",
-        help="从 JSON/YAML 档案读取命主默认值；显式参数优先。",
-    )
-
-
-def _add_output_flags(parser: argparse.ArgumentParser) -> None:
-    # note (precedence): Keep a --no-metadata seen before the subcommand.
-    parser.add_argument(
-        "--no-metadata",
-        action="store_true",
-        default=argparse.SUPPRESS,
-        help="不附加 run_metadata",
-    )
-    parser.add_argument(
-        "--strict-fields",
-        action=_BooleanFlagAction,
-        default=False,
-        help="无效投影路径返回校验失败；默认使用宽松投影并附 projection_warnings",
-    )
     parser.add_argument(
         "--fields",
         nargs="*",
         default=None,
         metavar="KEY",
-        help=(
-            "只输出这些字段（token 预算控制；run_metadata 始终保留）。"
-            "支持顶层 key 或点号子路径，如 bazi_birth.day_master"
-        ),
+        help=FIELDS_FLAG_DESC,
     )
-    parser.add_argument(
-        "--compact",
-        action="store_true",
-        default=False,
-        help="紧凑 JSON 输出（无缩进），便于脚本管道；默认美化缩进。",
-    )
-    parser.add_argument(
-        "--response-char-limit", type=int, default=0, help=RESPONSE_LIMIT_DESC
-    )
-    parser.add_argument(
-        "--include-snapshot-text",
-        dest="include_snapshot_text",
-        action=_BooleanFlagAction,
-        default=None,
-        help=(
-            "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；"
-            "用 --no-include-snapshot-text 关闭可显著省 token。"
-        ),
-    )
-
-
-def _add_profile_parser(sub: argparse._SubParsersAction[_JsonErrorParser]) -> None:
-    parser = sub.add_parser(
-        "profile",
-        help="综合命盘：一次为同一命主排多套盘（默认 八字/紫微/西占）",
-    )
-    _add_execution_flags(parser)
-    _add_output_flags(parser)
-    parser.add_argument(
-        "--systems",
-        default=None,
-        metavar="LIST",
-        help=(
-            "逗号分隔的体系或工具，默认 bazi,ziwei,astro。"
-            "支持别名（八字/紫微/西占/性格/事业/婚姻/健康/桃花）或直接用工具命令名。"
-        ),
-    )
-    # note (profile): Check required fields after merging CLI and subject values.
-    for fname, field in profile_field_objects().items():
-        _add_field_argument(parser, fname, field, relax_required=True)
-    parser.add_argument(
-        "--subject-file",
-        dest="subject_file",
-        default=None,
-        metavar="PATH",
-        help="从 JSON/YAML 档案读取命主信息；命令行参数优先于档案值。",
-    )
-    parser.set_defaults(_profile=True)
-
-
-def _unsupported_hint(spec: ToolSpec) -> str:
-    target = spec.rest_path or (
-        f"MCP 工具 {spec.mcp_name}" if spec.mcp_name else "REST/MCP 接口"
-    )
-    return f"该工具含嵌套结构，CLI 暂不支持；请改用 {target}。"
 
 
 def _add_discovery_flags(parser: argparse.ArgumentParser) -> None:

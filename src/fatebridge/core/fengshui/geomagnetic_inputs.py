@@ -6,10 +6,10 @@ from typing import Literal
 
 from pydantic import ConfigDict, Field, StrictFloat, field_validator, model_validator
 
-from fatebridge.core.fengshui.numeric_inputs import FengshuiInput as _DeferredModel
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput
 
 
-class GeomagneticReference(_DeferredModel):
+class GeomagneticReference(FengshuiInput):
     model_config = ConfigDict(
         json_schema_extra={
             "oneOf": [

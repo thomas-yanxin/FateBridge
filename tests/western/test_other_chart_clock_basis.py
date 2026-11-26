@@ -23,8 +23,8 @@ from fatebridge.core.astro.time_scales import (
     ut1_from_tt,
 )
 from fatebridge.core.requests.astrology import (
-    AstroChartPolyRequest,
     AstroGermanyRequest,
+    AstroGuolaoRequest,
 )
 from fatebridge.services.astrology import (
     calculate_core_chart_analysis,
@@ -255,7 +255,6 @@ def test_solar_clock_provenance_and_instant_reach_native_services_and_directions
             == "local_mean_solar"
         )
     else:
-        assert "1879-05-14T23:00:00（地方平太阳时）" in result["snapshot_text"]
         assert result["time_sensitivity"]["status"] == "not_assessed"
 
 
@@ -359,7 +358,7 @@ def test_historical_solar_arc_uses_exact_mean_clock_at_the_rounded_label(
 @pytest.mark.parametrize(
     "conflict", [{"birth_timezone": "UTC"}, {"use_true_solar_time": True}]
 )
-@pytest.mark.parametrize("model", [AstroGermanyRequest, AstroChartPolyRequest])
+@pytest.mark.parametrize("model", [AstroGermanyRequest])
 def test_conflicting_clock_definitions_are_rejected(conflict, model) -> None:
     data = dict(
         birth_year=1879,
@@ -371,11 +370,9 @@ def test_conflicting_clock_definitions_are_rejected(conflict, model) -> None:
         birth_clock_basis="local_mean_solar",
         **conflict,
     )
-    if model is AstroChartPolyRequest:
-        data["chart_variant"] = "germany"
-    else:
-        pass
-    with pytest.raises(ValidationError, match="Local solar birth clocks"):
+    with pytest.raises(
+        ValidationError, match="Explicit solar birth labels|Local solar birth clocks"
+    ):
         model.model_validate(data)
 
 
@@ -394,8 +391,7 @@ def test_ambiguous_original_clock_basis_is_not_guessed_from_a_label() -> None:
         )
 
 
-@pytest.mark.parametrize("variant", ["chart", "hellen_chart", "guolao_chart"])
-def test_chart_variants_enforce_declared_solar_input_scope(variant: str) -> None:
+def test_guolao_enforces_declared_solar_input_scope() -> None:
     data = dict(
         birth_year=1879,
         birth_month=5,
@@ -404,21 +400,12 @@ def test_chart_variants_enforce_declared_solar_input_scope(variant: str) -> None
         birth_longitude=10,
         birth_latitude=53.55,
         birth_clock_basis="local_mean_solar",
-        chart_variant=variant,
     )
-    if variant == "guolao_chart":
-        # Explicit admission replaces the former unsupported-feature gate;
-        # other variants and invalid simultaneous civil zones still reject.
-        assert AstroChartPolyRequest.model_validate(data).birth_clock_basis == (
-            "local_mean_solar"
-        )
-        with pytest.raises(ValidationError):
-            AstroChartPolyRequest.model_validate({**data, "birth_timezone": "UTC"})
-        return
-    else:
-        pass
-    with pytest.raises(ValidationError, match="Noncivil birth_clock_basis"):
-        AstroChartPolyRequest.model_validate(data)
+    assert AstroGuolaoRequest.model_validate(data).birth_clock_basis == (
+        "local_mean_solar"
+    )
+    with pytest.raises(ValidationError):
+        AstroGuolaoRequest.model_validate({**data, "birth_timezone": "UTC"})
 
 
 @HAS_SWE
@@ -455,8 +442,6 @@ def test_local_solar_clock_cli_flag_does_not_require_a_fake_civil_timezone(
             "local_mean_solar",
             "--fields",
             "base_chart.person_info",
-            "--strict-fields",
-            "--no-include-snapshot-text",
         ]
     )
     output = json.loads(capsys.readouterr().out)

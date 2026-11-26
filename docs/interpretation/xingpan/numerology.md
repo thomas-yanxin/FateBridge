@@ -8,7 +8,7 @@
 | 河洛元堂、纳甲、元气、体卦、得时或岁运算法 | [河洛技法](heluo-methods.md) |
 | 参评本命与首行配运、实际方法、原典与日期映射 | [参评配运](canping-timing.md) |
 
-只读本次需要的分支；已明确的输入继续沿用。返回包含`result_delivery`时读取[同次交付与校验](numerology-delivery.md)：业务已完整显示、只延后运行回执的`compact_reference`也属于同次保留交付，先核验原payload与run，再使用该结果，不重算补证。
+只读本次需要的分支；已明确的输入继续沿用。需要核验完整回执与全部选文时读取[完整结果与核验](numerology-delivery.md)。
 
 用户要求解释文本时，给出本次实际可读的关键词，并用白话说明其字词、传统意象和条件。只列编号、引用原句、报告可读状态或说明限制，都不能代替释义。将本命、首行配运及所查询段分别对应到实际选文；缺文和未决条件继续保留，不能为补齐解释而编字或断定现实经历。
 
@@ -18,9 +18,9 @@
 
 需要额外核对术语、原句或来源位置时，可按需查询`knowledge_catalog(domain="heluo"/"canping")`，再用`knowledge_read`读取其分类和键。`keys_sample`只是明确标识的目录样例；键空间数量与已校勘覆盖数分列。`source_collections`保留完整结构化来源对象；`line_texts`按实际完整卦名与爻位（如`乾為天:1`），`text_cells`按实际部别、编号和栏目（如`水.3330.male`）检索，不猜性别、不跨栏补文。
 
-读取河洛／参评参考时保留`citation`、`provenance`、`reference_only`及`reference_details`；完整正文或完整来源对象首次用`fields=null`并读取同run保留交付，不靠摘要重算补证。参考里的`role_by_profile`、`role_for_profile`与`applied_clause_ids_for_profile`只是政策说明；当前排盘实际采用何法、哪些条款适用，仍由同run的`schedule_basis`及选文回执核对。知识查询没有个人出生输入，不能把其中`actual_start_at=null`说成尚未起运。继承文本、编辑未定字、圈空、本地缺行、暂定编号与未选栏目按实际状态解释；来源目录不授予全书、独立复核或现实预测认证。
+读取河洛／参评参考时保留`citation`、`provenance`、`reference_only`及`reference_details`；完整正文或完整来源对象使用`detail=audit`、`fields=null` 直接取得，不靠摘要重算补证。参考里的`role_by_profile`、`role_for_profile`与`applied_clause_ids_for_profile`只是政策说明；当前排盘实际采用何法、哪些条款适用，仍由同run的`schedule_basis`及选文回执核对。知识查询没有个人出生输入，不能把其中`actual_start_at=null`说成尚未起运。继承文本、编辑未定字、圈空、本地缺行、暂定编号与未选栏目按实际状态解释；来源目录不授予全书、独立复核或现实预测认证。
 
-核验计算或原文时，首次投影保留`input_normalized`及`numerology_evidence.birth_clock`，再加本次实际卦爻／编号和所需选文。把已确认资料与返回的民用时刻、实际计算钟面、UTC瞬间、太阳时政策及所选方法逐项对照；仅复述调用参数不能证明实际取时已核。若字段首轮未请求，同run分页也不能补回被投影排除的字段，明确保留该证据缺口，不用另排一次冒充首次证据。解释原文来源时分别标明本次采用的标题、注文和诗歌是否已核；旧`verdict`仍是继承摘要。没有引用的未核文本不参与论证，不能用“本条已校”笼统覆盖所有层。
+核验计算或原文时，首次投影保留`input_normalized`及`numerology_evidence.birth_clock`，再加本次实际卦爻／编号和所需选文。把已确认资料与返回的民用时刻、实际计算钟面、UTC瞬间、太阳时政策及所选方法逐项对照；仅复述调用参数不能证明实际取时已核。若字段在原响应中被投影排除，明确保留该证据缺口，不用另排一次冒充首次证据。解释原文来源时分别标明本次采用的标题、注文和诗歌是否已核；旧`verdict`仍是继承摘要。没有引用的未核文本不参与论证，不能用“本条已校”笼统覆盖所有层。
 
 说明出生钟面或交运日期时，读取同次`birth_clock.input_representation`：`supplied_text`保留用户所给分量，`calculation_defaults`只记录未提供分量的计算补位。按实际回执说明哪些分量已给、哪些只用零作参考；显示到秒或小数位的日期不提升出生记录的实际精度。`uncertainty_interval=null`表示未取得误差区间，不能据`HH:MM`猜成正负半分钟；明确提供秒数或小数秒同样不认证记录准确度。旧结果无此字段时保留未知，不从归一化的`00`反推用户提供过秒数。
 

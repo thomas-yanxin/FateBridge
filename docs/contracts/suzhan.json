@@ -267,9 +267,7 @@
       "validation",
       "summary",
       "sukuyo.lower_methods"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,
@@ -404,48 +402,30 @@
         "title": "Doubing Su28",
         "type": "boolean"
       },
-      "gps_lat": {
-        "anyOf": [
-          {
-            "type": "number"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "GPS latitude",
-        "title": "Gps Lat"
-      },
-      "gps_lon": {
-        "anyOf": [
-          {
-            "type": "number"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "GPS longitude",
-        "title": "Gps Lon"
-      },
       "house_start_mode": {
         "default": 1,
         "description": "宫位起始模式（透传至宿曜引擎；默认 1）",
         "title": "House Start Mode",
         "type": "integer"
       },
-      "hsys": {
-        "default": 8,
-        "description": "Offline house system selector; standard suzhan supports 0..8 with the same FateBridge local house semantics as core chart Explicit values must be integer codes0..8; boolean, floating-point, blank and out-of-range values are rejected.",
-        "maximum": 8,
-        "minimum": 0,
-        "title": "Hsys",
-        "type": "integer"
-      },
-      "lat": {
+      "house_system": {
         "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "string"
+          }
+        ],
+        "default": "D",
+        "description": "Offline house system selector (0..8, SE letter, or name; default 'D'/8=equal_mc). Explicit values must be integer codes 0..8 or supported offline house letters/names (W, B, R, P, K, V, T, S, D); boolean, floating-point, blank and unsupported values are rejected.",
+        "title": "House System"
+      },
+      "latitude": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
           {
             "type": "string"
           },
@@ -454,8 +434,8 @@
           }
         ],
         "default": null,
-        "description": "星图所需纬度，与经度成对提供。接受文本或十进制度，gps_lat优先且0有效。",
-        "title": "Lat"
+        "description": "星图所需纬度，与经度成对提供。接受文本或十进制度，0有效。",
+        "title": "Latitude"
       },
       "leap_month_policy": {
         "default": "unresolved",
@@ -467,8 +447,11 @@
         "title": "Leap Month Policy",
         "type": "string"
       },
-      "lon": {
+      "longitude": {
         "anyOf": [
+          {
+            "type": "number"
+          },
           {
             "type": "string"
           },
@@ -477,8 +460,8 @@
           }
         ],
         "default": null,
-        "description": "星图所需经度，与纬度成对提供。接受文本或十进制度，gps_lon优先且0有效。",
-        "title": "Lon"
+        "description": "星图所需经度，与纬度成对提供。接受文本或十进制度，0有效。",
+        "title": "Longitude"
       },
       "natal_mansion": {
         "anyOf": [
@@ -533,13 +516,7 @@
         "description": "已确认的当地钟时，用于按宿主时区定位历日。提供钟时和完整经纬度时计算星图。钟时未知时可省略，保留历法日期或半日候选。空字符串无效。",
         "title": "Time"
       },
-      "zodiacal": {
-        "default": 0,
-        "description": "Offline zodiac selector; standard suzhan supports 0=tropical and 1=sidereal(Lahiri-like)",
-        "title": "Zodiacal",
-        "type": "integer"
-      },
-      "zone": {
+      "timezone": {
         "anyOf": [
           {
             "type": "string"
@@ -550,7 +527,17 @@
         ],
         "default": "+08:00",
         "description": "Timezone spec",
-        "title": "Zone"
+        "title": "Timezone"
+      },
+      "zodiac_type": {
+        "default": "Tropic",
+        "description": "Offline zodiac selector: Tropic (0) or Sidereal (1, Lahiri).",
+        "enum": [
+          "Tropic",
+          "Sidereal"
+        ],
+        "title": "Zodiac Type",
+        "type": "string"
       }
     },
     "required": [
@@ -595,6 +582,7 @@
       "quantity_kind": "calendar_and_symbolic_result",
       "role": "calculation",
       "selector_fields": [
+        "house_system",
         "calendar_basis",
         "calendar_profile",
         "leap_month_policy",

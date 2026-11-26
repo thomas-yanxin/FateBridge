@@ -130,7 +130,7 @@ def test_chart13_uses_declared_solar_weekday() -> None:
         birth_clock_basis="local_mean_solar",
         birth_longitude=150.0,
         birth_latitude=40.0,
-        hsys=0,
+        house_system=0,
     )
 
     hours = chart["planetary_hours"]
@@ -165,11 +165,9 @@ def test_solar_weekday_retains_opening_sunrise_in_a_utc_leap_second(
 
 
 @_requires_swe
-def test_snapshot_renders_planetary_hours_section() -> None:
+def test_hellen_chart_computes_planetary_hours() -> None:
     payload = calculate_core_chart_analysis(
         chart_variant="hellen_chart", use_true_solar_time=True, **_NATAL
     )
-    text = payload["snapshot_text"]
-    assert "[行星时]" in text
-    assert "生时主星：" in text
-    assert "当日主星：" in text
+    assert payload["planetary_hours"]["hour_ruler"]
+    assert payload["planetary_hours"]["day_ruler"]

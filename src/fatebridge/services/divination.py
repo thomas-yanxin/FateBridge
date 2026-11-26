@@ -5,7 +5,7 @@ FateBridge divination services.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
 from fatebridge.core.almanac import (
     LUNAR_SUPPORTED_SOLAR_END,
@@ -71,94 +71,9 @@ from fatebridge.core.sukuyo.sukuyo_historical_calendar import (
 from fatebridge.core.sukuyo.sukuyo_padas import palace_reference
 from fatebridge.core.sukuyo.sukuyo_relations import relation_between_su27
 from fatebridge.core.zhouyi import classical_hexagram
-from fatebridge.services.snapshot_builders import (
-    build_snapshot_export as _build_snapshot_export,
-)
-from fatebridge.services.snapshot_builders import (
-    render_snapshot_lines as _render_snapshot_text,
-)
-from fatebridge.services.structured_snapshot import render_structured_snapshot_text
 from fatebridge.utils.errors import ParameterError, calculation_guard
 from fatebridge.utils.formatting import create_pillar_dict
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
-
-
-def _build_gua_lookup_snapshot_text(
-    *,
-    query: str,
-    lookup_mode: str,
-    result: dict[str, Any],
-) -> str:
-    query_lines = [
-        f"查询：{query}",
-        f"模式：{lookup_mode}",
-        f"命中类型：{result.get('lookup_type', '未知')}",
-        f"命中卦名：{result.get('name', '未知')}",
-        f"匹配文本：{result.get('matched_query', query)}",
-        f"卦码：{result.get('code') or result.get('binary_code') or '无'}",
-    ]
-    upper = result.get("upper") or {}
-    lower = result.get("lower") or {}
-    structure_lines = [
-        f"符号：{result.get('symbol', '无')}",
-        f"卦爻：{''.join(str(item) for item in result.get('lines', []) or []) or '无'}",
-    ]
-    if upper:
-        structure_lines.append(
-            f"上卦：{upper.get('name', '无')} / {upper.get('nature', '无')} / "
-            f"{upper.get('element', '无')}"
-        )
-    if lower:
-        structure_lines.append(
-            f"下卦：{lower.get('name', '无')} / {lower.get('nature', '无')} / "
-            f"{lower.get('element', '无')}"
-        )
-
-    sections = [("查询信息", query_lines), ("卦象结构", structure_lines)]
-    classical = result.get("classical")
-    if classical:
-        sections.extend(
-            [
-                (
-                    "经文",
-                    [
-                        f"《周易》卦辞：{classical['guaci']}",
-                        f"《象传》大象：{classical['daxiang']}",
-                        *[
-                            f"{line['label']}：{line['text']}"
-                            for line in classical["yaoci"]
-                        ],
-                    ],
-                ),
-                ("来源", [classical["edition_status"]]),
-            ]
-        )
-    return _render_snapshot_text(sections)
-
-
-def _build_gua_meiyi_snapshot_text(
-    *,
-    queries: list[str],
-    results: dict[str, dict[str, Any]],
-    summary: str,
-) -> str:
-    overview_lines = [
-        f"查询数量：{len(queries)}",
-        f"原始请求：{'、'.join(queries) or '无'}",
-        f"摘要：{summary}",
-    ]
-    result_lines: list[str] = []
-    for query in queries:
-        item = results[query]
-        result_lines.append(f"{query} -> {item['name']}（{item['code']}）")
-        if classical := item.get("classical"):
-            result_lines.append(f"《周易》卦辞：{classical['guaci']}")
-    return _render_snapshot_text(
-        [
-            ("查询概览", overview_lines),
-            ("批量结果", result_lines),
-        ]
-    )
 
 
 @calculation_guard("梅花时卦分析")
@@ -496,73 +411,32 @@ def calculate_meihua_analysis(
     }
 
 
-@calculation_guard("卦义检索")
+@calculation_guard("卦象查询")
 def calculate_gua_lookup(
     *,
-    query: str,
-    lookup_mode: str = "auto",
-    selected_sections: list[str] | None = None,
+    queries: list[str],
+    lookup_mode: Literal["auto", "hexagram", "trigram"] = "auto",
 ) -> dict[str, Any]:
     """
-    卦义检索工具 - 支持六十四卦与八卦的离线义理查询。
+    卦象查询工具 - 支持六十四卦与八卦的批量离线义理查询。
     """
-    result = lookup_gua(query, lookup_mode=lookup_mode)
-    snapshot_text = _build_gua_lookup_snapshot_text(
-        query=query,
-        lookup_mode=lookup_mode,
-        result=result,
-    )
-    snapshot_export = _build_snapshot_export(
-        technique="gua_lookup",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
+    cleaned = [item.strip() for item in (queries or []) if item and item.strip()]
+    if not cleaned:
+        raise ValueError("queries 至少需要提供一个非空卦名或卦码。")
+
+    results = {q: lookup_gua(q, lookup_mode=lookup_mode) for q in cleaned}
+    ordered_names = [f"{results[q]['name']}（{results[q]['code']}）" for q in cleaned]
+    summary = (
+        ordered_names[0]
+        if len(cleaned) == 1
+        else f"共查询{len(cleaned)}项卦象：{'、'.join(ordered_names)}。"
     )
     return {
-        "analysis_type": "卦义检索",
-        "query": query,
+        "analysis_type": "卦象查询",
         "lookup_mode": lookup_mode,
-        "result": result,
-        "summary": f"{result['name']}（{result['code']}）",
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
-    }
-
-
-@calculation_guard("梅易卦义")
-def calculate_gua_meiyi(
-    *,
-    name: list[str],
-    selected_sections: list[str] | None = None,
-) -> dict[str, Any]:
-    """
-    梅易卦义辅助工具 - 批量返回偏梅花易数语境的卦义说明。
-    """
-    queries = [item.strip() for item in (name or []) if item and item.strip()]
-    if not queries:
-        raise ValueError("name 至少需要提供一个卦名或卦码。")
-
-    results = {query: lookup_gua(query) for query in queries}
-    ordered_names = [results[query]["name"] for query in queries]
-
-    summary = f"共查询{len(queries)}项梅易卦义：{'、'.join(ordered_names)}。"
-    snapshot_text = _build_gua_meiyi_snapshot_text(
-        queries=queries,
-        results=results,
-        summary=summary,
-    )
-    snapshot_export = _build_snapshot_export(
-        technique="gua_meiyi",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
-
-    return {
-        "analysis_type": "梅易卦义",
-        "queries": queries,
+        "queries": cleaned,
         "results": results,
         "summary": summary,
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
     }
 
 
@@ -590,12 +464,10 @@ def calculate_canping_analysis(
     *,
     date: str,
     time: str,
-    zone: str | None = None,
+    timezone: str | None = None,
     birth_utc_offset: str | None = None,
-    lat: str | None = None,
-    lon: str | None = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     gender: str | None = None,
     method: str = "gu",
     dayun_method: str = "bazi_appendix_v1",
@@ -606,12 +478,10 @@ def calculate_canping_analysis(
     return build_canping_result(
         date=date,
         time=time,
-        zone=zone,
+        timezone=timezone,
         birth_utc_offset=birth_utc_offset,
-        lat=lat,
-        lon=lon,
-        gps_lat=gps_lat,
-        gps_lon=gps_lon,
+        latitude=latitude,
+        longitude=longitude,
         gender=gender,
         method=method,
         dayun_method=dayun_method,
@@ -625,12 +495,10 @@ def calculate_heluo_analysis(
     *,
     date: str,
     time: str,
-    zone: str | None = None,
+    timezone: str | None = None,
     birth_utc_offset: str | None = None,
-    lat: str | None = None,
-    lon: str | None = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     gender: str | None = None,
     use_true_solar_time: bool = True,
     analysis_year: int | None = None,
@@ -642,12 +510,10 @@ def calculate_heluo_analysis(
     return build_heluo_result(
         date=date,
         time=time,
-        zone=zone,
+        timezone=timezone,
         birth_utc_offset=birth_utc_offset,
-        lat=lat,
-        lon=lon,
-        gps_lat=gps_lat,
-        gps_lon=gps_lon,
+        latitude=latitude,
+        longitude=longitude,
         gender=gender,
         use_true_solar_time=use_true_solar_time,
         analysis_year=analysis_year,
@@ -662,16 +528,14 @@ def calculate_sixyao_analysis(
     *,
     date: str,
     time: str,
-    zone: str | None = None,
-    lat: str | None = None,
-    lon: str | None = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    timezone: str | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     question: str | None = None,
     gua_code: str | None = None,
     changed_code: str | None = None,
     lines: list[dict[str, Any]] | None = None,
-    method: str = "auto",
+    method: Literal["auto", "coin", "time"] = "auto",
     coins: list[int] | None = None,
     seed: int | None = None,
     focus_line: int | None = None,
@@ -679,17 +543,14 @@ def calculate_sixyao_analysis(
     focus_kind: str | None = None,
     timing_days: int = 0,
     event_horizon: str | None = None,
-    render_snapshot: bool = True,
 ) -> dict[str, Any]:
     """六爻 / 易卦分析工具。"""
     return build_sixyao_result(
         date=date,
         time=time,
-        zone=zone,
-        lat=lat,
-        lon=lon,
-        gps_lat=gps_lat,
-        gps_lon=gps_lon,
+        timezone=timezone,
+        latitude=latitude,
+        longitude=longitude,
         question=question,
         gua_code=gua_code,
         changed_code=changed_code,
@@ -702,7 +563,6 @@ def calculate_sixyao_analysis(
         focus_kind=focus_kind,
         timing_days=timing_days,
         event_horizon=event_horizon,
-        render_snapshot=render_snapshot,
     )
 
 
@@ -711,17 +571,15 @@ def calculate_suzhan_analysis(
     *,
     date: str,
     time: str | None = None,
-    zone: str | None = None,
-    lat: str | None = None,
-    lon: str | None = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    timezone: str | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     szchart: int = 0,
     szshape: int = 0,
+    house_system: int | str = "D",
+    zodiac_type: str = "Tropic",
     house_start_mode: int = 1,
     doubing_su28: bool = True,
-    hsys: int = 8,
-    zodiacal: int = 0,
     leap_month_policy: str = "unresolved",
     natal_mansion: str | None = None,
     activity: str | None = None,
@@ -736,17 +594,15 @@ def calculate_suzhan_analysis(
     return build_suzhan_result(
         date=date,
         time=time,
-        zone=zone,
-        lat=lat,
-        lon=lon,
-        gps_lat=gps_lat,
-        gps_lon=gps_lon,
+        timezone=timezone,
+        latitude=latitude,
+        longitude=longitude,
         szchart=szchart,
         szshape=szshape,
         house_start_mode=house_start_mode,
         doubing_su28=doubing_su28,
-        hsys=hsys,
-        zodiacal=zodiacal,
+        house_system=house_system,
+        zodiac_type=zodiac_type,
         leap_month_policy=leap_month_policy,
         natal_mansion=natal_mansion,
         activity=activity,
@@ -889,13 +745,6 @@ def calculate_sukuyo_compatibility(
         )
     if calendar_basis != "chinese_hko_utc08":
         result["calendar_basis"] = calendar_basis
-    snapshot_text = render_structured_snapshot_text(
-        result, title="宿曜双人相性 / T1299三九法"
-    )
-    result["snapshot_text"] = snapshot_text
-    result["snapshot_export"] = _build_snapshot_export(
-        technique="generic", snapshot_text=snapshot_text
-    )
     return result
 
 
@@ -904,36 +753,32 @@ def calculate_otherbu_analysis(
     *,
     date: str | None = None,
     time: str | None = None,
-    zone: str | None = None,
-    lat: str | None = None,
-    lon: str | None = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    timezone: str | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     tradition: bool = False,
     sign: str | None = None,
     house: int | None = None,
     planet: str | None = None,
     question: str | None = None,
-    hsys: int = 8,
-    zodiacal: int = 0,
+    house_system: int | str = "D",
+    zodiac_type: str = "Tropic",
     fortune_method: str = "sect_reversing",
 ) -> dict[str, Any]:
     """西洋游戏 / 占星骰子分析工具。"""
     return build_otherbu_result(
         date=date,
         time=time,
-        zone=zone,
-        lat=lat,
-        lon=lon,
-        gps_lat=gps_lat,
-        gps_lon=gps_lon,
+        timezone=timezone,
+        latitude=latitude,
+        longitude=longitude,
         tradition=tradition,
         sign=sign,
         house=house,
         planet=planet,
         question=question,
-        hsys=hsys,
-        zodiacal=zodiacal,
+        house_system=house_system,
+        zodiac_type=zodiac_type,
         fortune_method=fortune_method,
     )
 
@@ -943,28 +788,23 @@ def calculate_sanshiunited_analysis(
     *,
     date: str,
     time: str,
-    zone: str | None = None,
-    lat: str | None = None,
-    lon: str | None = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    timezone: str | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     qimen_options: dict[str, Any] | None = None,
     taiyi_options: dict[str, Any] | None = None,
     liureng_yue: str | None = None,
     liureng_is_diurnal: bool | None = None,
     liureng_guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
-    selected_sections: list[str] | None = None,
     use_true_solar_time: bool = True,
 ) -> dict[str, Any]:
     """三式合一本地聚合工具。"""
-    result = build_sanshiunited_result(
+    return build_sanshiunited_result(
         date=date,
         time=time,
-        zone=zone,
-        lat=lat,
-        lon=lon,
-        gps_lat=gps_lat,
-        gps_lon=gps_lon,
+        timezone=timezone,
+        latitude=latitude,
+        longitude=longitude,
         qimen_options=qimen_options,
         taiyi_options=taiyi_options,
         liureng_yue=liureng_yue,
@@ -972,11 +812,3 @@ def calculate_sanshiunited_analysis(
         liureng_guiren_profile=liureng_guiren_profile,
         use_true_solar_time=use_true_solar_time,
     )
-    snapshot_text = result.get("snapshot_text")
-    if isinstance(snapshot_text, str) and snapshot_text.strip():
-        result["snapshot_export"] = _build_snapshot_export(
-            technique="sanshiunited",
-            snapshot_text=snapshot_text,
-            selected_sections=selected_sections,
-        )
-    return result

@@ -36,7 +36,7 @@ Hinoo另返`critical_calendar_reference.image_witness_research`时，按其中�
 
 ## 宿占日课与具体事项
 
-`suzhan`的time可省略或给null：沿用已确认日期和输入时区，计算历法、日期候选及事项证据；chart、astronomy保持null，params.birthTimeImputed=false。缺钟时不计算宫位、瞬时天文28宿或角距tithi；经纬度、宫制及盘式选项没有用于历法层。已知钟时须同时提供完整经纬度才能生成星图，GPS分量优先且0°有效；缺项明确报错，不用默认地点、示例或0点换取星图。先核实际公开Schema；旧连接尚要求time时不要补时，改用已更新接口或完成客户端重连。
+`suzhan`的time可省略或给null：沿用已确认日期和输入时区，计算历法、日期候选及事项证据；chart、astronomy保持null，params.birthTimeImputed=false。缺钟时不计算宫位、瞬时天文28宿或角距tithi；经纬度、宫制及盘式选项没有用于历法层。已知钟时须同时提供完整经纬度（`latitude` / `longitude`）才能生成星图，0°有效；缺项明确报错，不用默认地点、示例或0点换取星图。先核实际公开Schema；旧连接尚要求time时不要补时，改用已更新接口或完成客户端重连。
 
 `suzhan`把三类依据分开：`sukuyo`为农历历日，`calendar_day`为黑白月日名与时段条文，`astronomy`为七曜物理天文。默认天文是现代距星视赤经不等宽研究口径，不能称唐代宿界已经复原；显式legacy方法是旧版等分黄道示意。
 
@@ -93,6 +93,6 @@ Hinoo另返`critical_calendar_reference.image_witness_research`时，按其中�
 
 `directional_travel`是下卷行动禁闭法按明列日宿查方向的证言，只有明确 `northbound_journey/eastbound_journey/southbound_journey/westbound_journey` 才适用；不从出生地点、GPS、目的地或角度猜方向，不扩为东北等斜向。四条具名禁向的“纵吉时亦不可行”不能被吉时抵销。壁宿南行在逐宿章与方向章有相反条文，须同时解释；第十摩竭、第一羊、第二牛宫的大正凶／明本吉校记分别保留，不拼成一致判断。宫名及序号只属本段查表，不等上卷足表宫序、本命宫或现代宫位；未识别的互不猜成氐，明本移入的尾不混进大正主文。`directional_travel`的候选行不代入确定事项，未列方向也不表示已获允许。
 
-核对实际历日宿与天文月宿有没有混用、主客方向是否颠倒、候选是否被写成确定、原典冲突与时段条件是否保留。需要回执级引用核验时，首次 `fields=null`、`include_snapshot_text=true`取得完整业务结果；超限经引擎校验读取同run全部分页，不能用摘要重算补齐。`validation.sukuyo.verify_sukuyo_context_claims`检查完整回执及必要的整段结构化上下文；通过仅表示上下文引用完整，自由文本语义仍须独立复核。不能把字段检查通过写成解释忠实度满分。
+核对实际历日宿与天文月宿有没有混用、主客方向是否颠倒、候选是否被写成确定、原典冲突与时段条件是否保留。需要回执级引用核验时，使用 `detail=audit`、`fields=null` 取得完整业务结果，不能用摘要重算补齐。`validation.sukuyo.verify_sukuyo_context_claims` 检查完整回执及必要的整段结构化上下文；通过仅表示上下文引用完整，自由文本语义仍须独立复核。不能把字段检查通过写成解释忠实度满分。
 
 [算法、来源和未决项](../../sukuyo.md)。

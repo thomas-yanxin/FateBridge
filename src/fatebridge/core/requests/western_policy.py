@@ -4,10 +4,10 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
-from fatebridge.core.requests.base import _DeferredModel
+from fatebridge.core.requests.base import FateBridgeBaseRequest
 
 
-class WesternEphemerisRequest(_DeferredModel):
+class WesternEphemerisRequest(FateBridgeBaseRequest):
     ephemeris_policy: Literal["auto", "require_data_files"] = Field(
         default="auto",
         json_schema_extra={"x-fatebridge-western-data-policy": True},

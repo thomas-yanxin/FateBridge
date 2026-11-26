@@ -19,7 +19,7 @@ from fatebridge.core.fengshui.context_inputs import EnvironmentalContext
 from fatebridge.core.fengshui.geomagnetic_inputs import GeomagneticReference
 from fatebridge.core.fengshui.layout_inputs import ElementAdjustment, FormObservation
 from fatebridge.core.fengshui.lingzheng_inputs import FixedLingzhengRequest
-from fatebridge.core.fengshui.numeric_inputs import FengshuiInput as _DeferredModel
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput
 from fatebridge.core.fengshui.spatial_request import WorkstationLayoutInput
 from fatebridge.core.fengshui.surface_inputs import SurfaceConstraints, SurfaceLayout
 from fatebridge.core.fengshui.workstation_inputs import (
@@ -39,7 +39,7 @@ Method = Literal["bazhai", "jinsuo", "annual_stars", "monthly_stars", "xuankong_
 Year = int
 
 
-class TimeInput(_DeferredModel):
+class TimeInput(FengshuiInput):
     timezone_name: str = Field(
         default="Asia/Shanghai", description="IANA 时区或 UTC 偏移；用于对应历法边界"
     )
@@ -139,7 +139,7 @@ class Occupant(MingguaRequest):
     )
 
 
-class House(_DeferredModel):
+class House(FengshuiInput):
     model_config = ConfigDict(
         json_schema_extra={
             "allOf": [
@@ -270,7 +270,7 @@ PLACEMENT_SCHEMA_CONSTRAINTS: dict[str, Any] = {
 }
 
 
-class Placement(_DeferredModel):
+class Placement(FengshuiInput):
     """门床桌灶的已确认方位。至少提供位置或朝向；两者均未知时省略本对象，
     可在 form_observations 中独立提供形态。朝向和对应 facing_role 必须成对。
     """
@@ -334,7 +334,7 @@ class Placement(_DeferredModel):
         return self
 
 
-class BazhaiRequest(_DeferredModel):
+class BazhaiRequest(FengshuiInput):
     house: House | None = Field(
         default=None,
         description="已确认的住宅坐向；未知可省略保留其他可算层，不用桌朝向补宅向",
@@ -385,7 +385,7 @@ class BazhaiRequest(_DeferredModel):
         return self
 
 
-class EnvironmentFeature(_DeferredModel):
+class EnvironmentFeature(FengshuiInput):
     object_id: str = Field(min_length=1, max_length=100)
     direction: Direction = Field(
         description="已确认特征落宫，默认以全宅中心为准；若environmental_context.floors将对象关联楼层，则必须相对该层独立确认中心及对齐后的方位，不由全宅中心自动投射。"
@@ -400,7 +400,7 @@ class EnvironmentFeature(_DeferredModel):
     label: str | None = Field(default=None, max_length=100)
 
 
-class JinsuoRequest(_DeferredModel):
+class JinsuoRequest(FengshuiInput):
     features: list[EnvironmentFeature] = Field(
         default_factory=list,
         max_length=500,
@@ -559,7 +559,7 @@ class HousePeriod(TimeInput):
         return self
 
 
-class ExternalFormObservation(_DeferredModel):
+class ExternalFormObservation(FengshuiInput):
     """Confirmed external forms in house-centred sectors, not indoor backing."""
 
     model_config = ConfigDict(
@@ -585,7 +585,7 @@ class ExternalFormObservation(_DeferredModel):
         return self
 
 
-class XuankongInterpretationRequest(_DeferredModel):
+class XuankongInterpretationRequest(FengshuiInput):
     """An opt-in, limited rule layer; current period never resets natal age."""
 
     model_config = ConfigDict(
@@ -743,7 +743,7 @@ class XuankongInterpretationRequest(_DeferredModel):
         return self
 
 
-class XuankongRequest(_DeferredModel):
+class XuankongRequest(FengshuiInput):
     model_config = ConfigDict(
         json_schema_extra={
             "allOf": [
@@ -812,7 +812,7 @@ class XuankongRequest(_DeferredModel):
         return 0.0
 
 
-class LayoutConstraint(_DeferredModel):
+class LayoutConstraint(FengshuiInput):
     """Action permissions, never evidence of a layout's physical properties."""
 
     object_id: str = Field(min_length=1, max_length=100)
@@ -829,7 +829,7 @@ class LayoutConstraint(_DeferredModel):
         return value
 
 
-class LayoutAlternative(_DeferredModel):
+class LayoutAlternative(FengshuiInput):
     """A user-supplied proposal, independently observed at its new position.
 
     A move within the same compass sector is still a move. Explicit changes
@@ -1722,7 +1722,7 @@ class AssessRequest(BazhaiRequest):
         return self
 
 
-class DirectionsRequest(_DeferredModel):
+class DirectionsRequest(FengshuiInput):
     geomagnetic_reference: GeomagneticReference | None = Field(
         default=None,
         description="可选WMM2025地磁参考；明确地点、WGS84椭球高及日期，仅给换算候选，不自动确认或修改宅盘朝向",

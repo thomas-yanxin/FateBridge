@@ -1,6 +1,6 @@
 # 六壬与金口诀的同次结果取证
 
-只在本次已选六壬或金口诀时读取。先使用工具发布的 `evidence_views.core.fields`，配合 `strict_fields=true`、`include_snapshot_text=false`（视图名不是请求参数）。未裁定的综合条件只限制对应层次，不影响已返回结构的解释。
+只在本次已选六壬或金口诀时读取。先使用工具发布的 `evidence_views.core.fields`（视图名不是请求参数，三端对 `fields` 始终严格校验）。未裁定的综合条件只限制对应层次，不影响已返回结构的解释。
 
 ## 六壬起课与行年
 
@@ -34,4 +34,4 @@
 | 三合、动象与空破 | `combinations`、`motions`、`rows.xun_kong/si_da_kong/month_break` | 支齐虚一不代合化；保留《四库》/京本/早稻田等异文对照 |
 | 四绝、四败与岁日 | `relations.si_jue/si_bai`、`relations.calendar.checks` | 传入 `natal_branch` 时才核大绝，不以占时或行年替代 |
 
-金口诀本课不借大六壬三传定用，`guiren_profile` 仅作用于附带 `liureng` 盘。返回 `result_delivery` 时请读取同一 `run_id` 的完整交付载荷，不重算替代原课。
+金口诀本课不借大六壬三传定用，`guiren_profile` 仅作用于附带 `liureng` 盘。需要完整结果时请用 `detail=audit` 且 `fields=null`，不重算替代原课。

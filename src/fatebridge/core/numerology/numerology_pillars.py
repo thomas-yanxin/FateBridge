@@ -144,15 +144,3 @@ def attach_pillar_links(evidence: dict[str, Any], links: dict[str, Any]) -> None
         }
     )
     evidence["interpretation_constraints"].append(links["constraint"])
-
-
-def pillar_link_snapshot(evidence: dict[str, Any]) -> str:
-    lines = ["[四柱干支衔接·卷七附法]"]
-    for row in evidence["links"]:
-        target = "月柱" if row["target"] == "month" else "时柱"
-        basis = "年柱" if row["basis"] == "year" else "所用日柱"
-        lines.append(
-            f"{basis}{row['basis_pillar']}，{row['source_stem_group']}组从{row['head_pillar']}顺行{row['branch_step']}步；{target}{row['actual_pillar']}，原句式{'匹配' if row['matches'] else '不匹配'}。"
-        )
-    lines.append(evidence["constraint"])
-    return "\n".join(lines)

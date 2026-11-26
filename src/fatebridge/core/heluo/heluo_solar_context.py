@@ -209,24 +209,6 @@ def attach_solar_context(evidence: dict, solar: dict) -> None:
     attach_solar_sources(evidence, POLICY_ID, solar["boundary_context"]["dependencies"])
 
 
-def solar_context_snapshot(context: dict) -> str:
-    lines = ["[所用节气与至点来源]"]
-    labels = {
-        "current_term": "当前节气",
-        "preceding_solstice": "最近至点",
-        "next_four_li": "下一四立",
-    }
-    for row in context["dependencies"]:
-        term = row["record"]
-        lines.append(
-            f"{labels[row['role']]}：{term['name']}，UTC {row['instant_utc']}；来源{term['resolution_provider']}／{term['ephemeris_model']}。"
-        )
-    lines.append(
-        f"按民用时区{context['context_timezone']}的{context['context_local_year']}年上下文读取；相邻年边界不扩展公开模型年份，数值分辨率不等于实际精度认证。"
-    )
-    return "\n".join(lines)
-
-
 QUARTER_HG: dict[str, dict[str, str]] = {
     "震": {"hg": "震", "fh": "巽"},
     "離": {"hg": "離", "fh": "坎"},

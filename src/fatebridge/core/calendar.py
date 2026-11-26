@@ -7,24 +7,24 @@ from datetime import datetime
 from functools import lru_cache
 from typing import Any
 
-from ..utils.civil_time import (
-    NominalClockLabel,
-    ZonedCalendar,
-    gregorian_date_parts,
-    gregorian_ordinal,
-)
-from ..utils.data import (
-    EARTHLY_BRANCHES,
-    HEAVENLY_STEMS,
-    get_hour_branch,
-)
-from .almanac import (
+from fatebridge.core.almanac import (
     DEFAULT_TIMEZONE,
     get_bazi_month_context,
     get_bazi_year,
     get_day_ganzhi,
     get_solar_term_environment_key,
     localize_datetime,
+)
+from fatebridge.utils.civil_time import (
+    NominalClockLabel,
+    ZonedCalendar,
+    gregorian_date_parts,
+    gregorian_ordinal,
+)
+from fatebridge.utils.data import (
+    EARTHLY_BRANCHES,
+    HEAVENLY_STEMS,
+    get_hour_branch,
 )
 
 LATE_ZI_HOUR = 23  # 23:00-23:59 属 late 子时 / 晚子时, 日柱翻至次日

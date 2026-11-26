@@ -100,6 +100,8 @@ def test_installing_or_replacing_data_in_same_directory_invalidates_old_year(
     installed = almanac.get_solar_terms_for_year(2026, "UTC")
     assert (installed[0].moment - before[0].moment).total_seconds() == 3
     file.write_text("9")
+    stat = file.stat()
+    os.utime(file, ns=(stat.st_atime_ns, stat.st_mtime_ns + 1_000_000_000))
     replaced = almanac.get_solar_terms_for_year(2026, "UTC")
     assert (replaced[0].moment - installed[0].moment).total_seconds() == 5
     file.unlink()

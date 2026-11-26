@@ -26,7 +26,7 @@ uv run --locked --extra dev python -m pytest -q
 
 | 范围 | 目录 |
 | --- | --- |
-| 请求校验、执行回执、输出投影、结果交付与 REST/MCP/CLI 合同 | [integration/](integration/) |
+| 请求校验、执行回执、输出投影与 REST/MCP/CLI 合同 | [integration/](integration/) |
 | 架构依赖边界、文档完整性、工具计数、生成合同、CI 与发布校验 | [quality/](quality/) |
 | 八字、时运与双人关系 | [bazi/](bazi/) · [compatibility/](compatibility/) |
 | 星历、节气、时间尺度与太阳模型 | [astronomy/](astronomy/) |
@@ -41,6 +41,6 @@ uv run --locked --extra dev python -m pytest -q
 
 ## 测试约定
 
-- 跨领域共享辅助统一放入 `tests/support/`（如三端调用封装 `support/transports.py`、风水传输封装 `support/fengshui_transports.py`、交付存储夹具 `support/result_delivery.py` 与空星历隔离 `support/ephemeris_context.py`）。
+- 跨领域共享辅助统一放入 `tests/support/`（如三端调用封装 `support/transports.py`、风水传输封装 `support/fengshui_transports.py`、MCP 回执断言 `support/mcp_result_assertions.py` 与空星历隔离 `support/ephemeris_context.py`）。
 - 独立测试夹具放在 `tests/fixtures/`；不得通过运行当前生产计算重新生成测试期望值或放宽断言门槛。
 - 严格嵌套输出模型检查由 `FATEBRIDGE_STRICT_OUTPUT_VALIDATION=1` 控制，详见[开发指南](../docs/development-guide.md#设计与测试约束)。

@@ -6,10 +6,13 @@ from typing import Literal
 
 from pydantic import Field
 
-from fatebridge.core.requests.base import AstroHouseValidatorMixin
+from fatebridge.core.requests.base import (
+    AnalysisDateFields,
+    AstroHouseValidatorMixin,
+    WesternChartSystemFields,
+)
 from fatebridge.core.requests.birth import AstroBirthRequest
 from fatebridge.core.requests.western_policy import WesternEphemerisRequest
-from fatebridge.utils.house_systems import TWELVE_HOUSE_SYSTEM_NOTE
 
 ClassicalPlanet = Literal[
     "Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"
@@ -17,20 +20,12 @@ ClassicalPlanet = Literal[
 
 
 class AstroLifespanRequest(
-    AstroHouseValidatorMixin, AstroBirthRequest, WesternEphemerisRequest
+    AstroHouseValidatorMixin,
+    WesternChartSystemFields,
+    AstroBirthRequest,
+    WesternEphemerisRequest,
 ):
     """Shared base for western *lifespan* techniques cast from a single natal chart."""
-
-    house_system: int | str = Field(
-        default="P",
-        description="House system, any convention: SE letter ('P'=Placidus, "
-        "'R'=Regiomontanus, 'W'=whole sign, 'D'=equal_mc), key ('placidus', "
-        "'equal_mc'), or integer code 0..8 (3=Placidus, 8=equal_mc)."
-        + TWELVE_HOUSE_SYSTEM_NOTE,
-    )
-    zodiac_type: str = Field(
-        default="Tropic", description="Zodiac type, e.g. Tropic or Sidereal"
-    )
 
 
 class AstroHarmonicRequest(AstroLifespanRequest):
@@ -50,19 +45,8 @@ class AstroHarmonicRequest(AstroLifespanRequest):
     )
 
 
-class AstroPlanetaryAgesRequest(AstroLifespanRequest):
+class AstroPlanetaryAgesRequest(AnalysisDateFields, AstroLifespanRequest):
     """Request model for the 行星年龄 (Ptolemy seven ages) tool."""
-
-    analysis_year: int | None = Field(
-        default=None,
-        description="Reference year; with month/day, flags the active age band (omit to list all bands)",
-    )
-    analysis_month: int | None = Field(
-        default=None, ge=1, le=12, description="Reference month (1-12)"
-    )
-    analysis_day: int | None = Field(
-        default=None, ge=1, le=31, description="Reference day (1-31)"
-    )
 
 
 class AstroTriplicityRulersRequest(AstroLifespanRequest):
@@ -159,7 +143,7 @@ class AstroYearSystem129Request(AstroLifespanRequest):
     )
 
 
-class AstroPlanetaryArcRequest(AstroLifespanRequest):
+class AstroPlanetaryArcRequest(AnalysisDateFields, AstroLifespanRequest):
     """Request model for the 行星弧方向 (planetary arc directions) tool."""
 
     arc_source: ClassicalPlanet | Literal["Ascendant", "Medium_Coeli"] = Field(
@@ -171,15 +155,6 @@ class AstroPlanetaryArcRequest(AstroLifespanRequest):
         ge=0,
         le=15,
         description="Aspect orb in degrees for directed-to-natal hits",
-    )
-    analysis_year: int | None = Field(
-        default=None, description="Direction target year (omit for current date)"
-    )
-    analysis_month: int | None = Field(
-        default=None, ge=1, le=12, description="Direction target month (1-12)"
-    )
-    analysis_day: int | None = Field(
-        default=None, ge=1, le=31, description="Direction target day (1-31)"
     )
 
 
@@ -209,7 +184,7 @@ class AstroAgePointRequest(AstroLifespanRequest):
     )
 
 
-class AstroVedicProgRequest(AstroLifespanRequest):
+class AstroVedicProgRequest(AnalysisDateFields, AstroLifespanRequest):
     """Request model for the 恒星推运 (Vedic sidereal secondary progression) tool.
 
     The technique is read sidereally, so the tool always casts Sidereal regardless
@@ -222,29 +197,11 @@ class AstroVedicProgRequest(AstroLifespanRequest):
         le=15,
         description="Aspect orb (degrees) for progressed→natal hits",
     )
-    analysis_year: int | None = Field(
-        default=None, description="Progression target year (omit for current date)"
-    )
-    analysis_month: int | None = Field(
-        default=None, ge=1, le=12, description="Progression target month (1-12)"
-    )
-    analysis_day: int | None = Field(
-        default=None, ge=1, le=31, description="Progression target day (1-31)"
-    )
 
 
-class AstroJaynesProgRequest(AstroLifespanRequest):
+class AstroJaynesProgRequest(AnalysisDateFields, AstroLifespanRequest):
     """Request model for the 赤纬推运 (Jayne declination progression) tool."""
 
     orb: float = Field(
         default=1.0, ge=0, le=5, description="Declination orb (degrees) for parallels"
-    )
-    analysis_year: int | None = Field(
-        default=None, description="Progression target year (omit for current date)"
-    )
-    analysis_month: int | None = Field(
-        default=None, ge=1, le=12, description="Progression target month (1-12)"
-    )
-    analysis_day: int | None = Field(
-        default=None, ge=1, le=31, description="Progression target day (1-31)"
     )

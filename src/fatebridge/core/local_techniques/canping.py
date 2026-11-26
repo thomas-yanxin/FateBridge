@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from decimal import Decimal
-from fractions import Fraction
 from typing import Any
 
 from fatebridge.core.almanac import get_bazi_year
@@ -13,17 +11,12 @@ from fatebridge.core.local_techniques.chart import (
     _build_metaphysics_seed,
     _normalize_date_text,
 )
-from fatebridge.core.numerology.canping import (
-    build_snapshot_text as _canping_snapshot_text,
-)
 from fatebridge.core.numerology.canping import calculate as _canping_calculate
 from fatebridge.core.numerology.canping import liunian_series as _canping_liunian_series
 from fatebridge.core.numerology.canping_schedule_basis import (
     POLICY_ID,
     build_schedule_basis,
-    schedule_basis_snapshot,
 )
-from fatebridge.core.numerology.canping_solar import projection_snapshot
 from fatebridge.core.numerology.canping_timing import (
     APPENDIX,
     CONTINUOUS,
@@ -34,7 +27,6 @@ from fatebridge.core.numerology.numerology_clock_policy import parse_birth_clock
 from fatebridge.core.numerology.numerology_evidence import canping_evidence
 from fatebridge.core.numerology.numerology_inputs import (
     attach_birth_clock,
-    birth_clock_snapshot,
     normalize_numerology_utc_offset,
     numerology_birth_clock,
     numerology_seed_time,
@@ -43,11 +35,11 @@ from fatebridge.core.numerology.numerology_inputs import (
 )
 from fatebridge.core.numerology.numerology_pillars import (
     attach_pillar_links,
-    pillar_link_snapshot,
     verified_computed_pillars,
 )
 from fatebridge.core.numerology.numerology_solar_sources import attach_solar_sources
 from fatebridge.utils.birth_input import normalize_gender
+from fatebridge.utils.coordinates import parse_geo_coordinate
 from fatebridge.utils.formatting import create_pillar_dict
 
 
@@ -62,12 +54,10 @@ def build_canping_result(
     *,
     date: str,
     time: str,
-    zone: str | None = None,
+    timezone: str | None = None,
     birth_utc_offset: str | None = None,
-    lat: str | int | float | Decimal | Fraction | None = None,
-    lon: str | int | float | Decimal | Fraction | None = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     gender: str | None = None,
     method: str = "gu",
     dayun_method: str = APPENDIX,
@@ -87,20 +77,19 @@ def build_canping_result(
             "legacy命宫顺排没有已核实的日期映射，不支持analysis_datetime。"
         )
     normalized_method = _normalize_canping_method(method)
-    longitude, longitude_source = resolve_numerology_longitude(
-        lon, gps_lon, use_true_solar_time
+    parsed_latitude = parse_geo_coordinate(latitude, axis="latitude")
+    parsed_longitude, longitude_source = resolve_numerology_longitude(
+        longitude, use_true_solar_time
     )
     birth_date = _normalize_date_text(date)
     birth_clock = parse_birth_clock(time)
-    timezone_name = resolve_numerology_timezone(zone)
+    timezone_name = resolve_numerology_timezone(timezone)
     input_normalized = {
         "date": birth_date,
         "time": birth_clock.normalized_clock,
-        "zone": timezone_name,
-        "lat": lat,
-        "lon": lon,
-        "gpsLat": gps_lat,
-        "gpsLon": gps_lon,
+        "timezone": timezone_name,
+        "latitude": parsed_latitude,
+        "longitude": parsed_longitude,
         "gender": normalized_gender,
         "method": normalized_method,
         "dayun_method": dayun_method,
@@ -120,9 +109,9 @@ def build_canping_result(
         date_text=birth_date,
         time_text=seed_time,
         timezone_name=timezone_name,
-        lat=lat,
-        lon=longitude,
-        gps_lat=gps_lat,
+        lat=parsed_latitude,
+        lon=parsed_longitude,
+        gps_lat=None,
         gps_lon=None,
         use_true_solar_time=use_true_solar_time,
     )
@@ -183,26 +172,15 @@ def build_canping_result(
             dayun=periods, mingGong=None, qiyunAge=None, dayunPolicy=dayun_method
         )
     result["timing"] = timing
-    snapshot_text = _canping_snapshot_text(result)
-    if dayun_method == LEGACY:
-        snapshot_text += (
-            "\n\n[旧命宫流年年序]\n"
-            f"公历{seed.input_datetime.year}年出生，年柱{year_gz}；"
-            f"流年从立春年标签{series['birth_pillar_year']}起排。"
-            "年龄为标签年差加一；旧配运与年序仍未核实际UTC区间。"
-        )
-    else:
-        snapshot_text += "\n\n" + projection_snapshot(timing["solar_year_context"])
     analysis_context = _build_metaphysics_analysis_context(seed)
-    analysis_context["longitude"] = longitude
+    analysis_context["longitude"] = parsed_longitude
     clock = numerology_birth_clock(
         seed,
-        longitude,
+        parsed_longitude,
         longitude_source,
         birth_utc_offset=confirmed_offset,
         input_clock=birth_clock,
     )
-    snapshot_text += "\n\n" + birth_clock_snapshot(clock)
     basis = build_schedule_basis(dayun_method, timing, clock)
     timing["schedule_basis"] = basis
     # The legacy row carries age labels and text, even though it has no dated
@@ -211,7 +189,6 @@ def build_canping_result(
     timing["first_period"] = (
         deepcopy(result["dayun"][0]) if dayun_method != LEGACY else None
     )
-    snapshot_text += "\n\n" + schedule_basis_snapshot(basis)
     evidence = canping_evidence(result)
     evidence["rule_trace"].append(
         {
@@ -228,7 +205,6 @@ def build_canping_result(
             timing["solar_year_context"]["policy_id"],
             series["year_boundaries"],
         )
-    snapshot_text += "\n\n" + pillar_link_snapshot(pillar_links)
     four_pillars = create_pillar_dict(seed.pillars)
 
     return {
@@ -246,7 +222,6 @@ def build_canping_result(
         "liunian_series": series,
         "canping_timing": timing,
         "numerology_evidence": evidence,
-        "snapshot_text": snapshot_text,
         "summary": (
             f"已生成邵子参评数 / 金锁银匙输出。年纳音：{result['element']}部，"
             f"取法：{'原典日支' if normalized_method == 'gu' else '月支变法'}，"

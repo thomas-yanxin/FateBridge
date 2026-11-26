@@ -61,8 +61,8 @@ def test_relative_chart_attaches_focus_block_subset_of_synastry() -> None:
         ),
         relative_mode="Composite",
         relationship_focus="romance",
-        hsys=0,
-        zodiacal=0,
+        house_system=0,
+        zodiac_type="Tropic",
     )
 
     focus = result["relationship_profile"]["focus"]
@@ -121,8 +121,8 @@ def test_unknown_focus_is_rejected_on_both_request_shapes_and_all_public_transpo
     flat = relationship_payload("Comp", "uncorrected")
     flat["relationship_focus"] = "romnace"
     response = rest.post("/api/astrology/relationship-chart", json=flat)
-    code, cli = call_cli(SPECS["astro_relative_chart"], flat, tmp_path, capsys)
-    mcp = asyncio.run(native(SPECS["astro_relative_chart"], flat))
+    code, cli = call_cli(SPECS["relationship_chart"], flat, tmp_path, capsys)
+    mcp = asyncio.run(native(SPECS["relationship_chart"], flat))
     assert response.status_code == 400 and code != 0 and mcp.is_error
     assert "relationship_focus" in response.json()["error"]
     assert "relationship_focus" in cli["error"]
@@ -143,25 +143,23 @@ def test_valid_focus_aliases_reach_all_public_transports(
         "/api/astrology/relationship-chart",
         json=flat,
         params=[
+            ("detail", "audit"),
             ("fields", fields[0]),
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
         ],
     )
     code, cli = call_cli(
-        SPECS["astro_relative_chart"],
+        SPECS["relationship_chart"],
         flat,
         tmp_path,
         capsys,
-        flags=["--fields", *fields],
+        flags=["--detail", "audit", "--fields", *fields],
     )
     mcp = asyncio.run(
         native(
-            SPECS["astro_relative_chart"],
+            SPECS["relationship_chart"],
             flat,
+            detail="audit",
             fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
         )
     )
     assert response.status_code == 200 and code == 0 and not mcp.is_error

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from typing import Any
 
 from fatebridge.core.astro.astrology_tables import SIGNS
@@ -20,142 +19,80 @@ from fatebridge.core.local_techniques.chart import (
     _normalize_date_text,
     _normalize_time_text,
 )
-from fatebridge.core.local_techniques.snapshot import render_snapshot_text
+from fatebridge.utils.coordinates import parse_geo_coordinate
+from fatebridge.utils.house_systems import InvalidHouseSystemError, house_system_fields
 
 
-def _quote_question(question: str) -> str:
-    # JSON quoting protects ASCII line separators and quotes; Python's section
-    # parser also treats these three Unicode characters as line boundaries.
-    return (
-        json.dumps(question, ensure_ascii=False)
-        .replace("\u0085", "\\u0085")
-        .replace("\u2028", "\\u2028")
-        .replace("\u2029", "\\u2029")
-    )
-
-
-def _motion_snapshot_line(obj: dict[str, Any]) -> str:
-    motion = obj["motion"]
-    labels = {
-        "direct": "瞬时顺行",
-        "retrograde": "瞬时逆行",
-        "zero_instantaneous_rate": "瞬时零日速",
-        "not_computed": "未计算",
-    }
-    speed = motion["longitude_speed"]
-    value = "未提供速度" if speed is None else f"{speed} 度/日"
-    line = f"{obj['id']} / {value} / {labels[motion['direction']]} / {motion['basis']}"
-    if "native_longitude_speed" in motion:
-        line += f"；原生日速 {motion['native_longitude_speed']} 度/日"
-        if "light_time_correction" in motion:
-            line += f"，光行时链式修正 {motion['light_time_correction']} 度/日"
-        if "spatial_aberration_correction" in motion:
-            line += f"，空间光行差修正 {motion['spatial_aberration_correction']} 度/日"
-        if "lunar_source_remainder_correction" in motion:
-            line += f"，月球固定框架源导数余项 {motion['lunar_source_remainder_correction']} 度/日"
-        if "sidereal_origin_wrap_correction" in motion:
-            line += f"，恒星黄道原点整圈差分修正 {motion['sidereal_origin_wrap_correction']} 度/日"
-        if "rotation_correction" in motion:
-            line += f"，黄道旋转导数修正 {motion['rotation_correction']} 度/日"
-        if "analytic_frame_correction" in motion:
-            line += (
-                f"，日期框架解析导数修正 {motion['analytic_frame_correction']} 度/日"
-            )
-        if "position_derivative_correction" in motion:
-            line += (
-                f"，完整视位置导数余项 {motion['position_derivative_correction']} 度/日"
-            )
-    return line
-
-
-def _solar_position_snapshot(policy: dict[str, Any]) -> str:
-    """Render the computed convention receipt without inventing visibility."""
-    domains = {
-        "behind_solar_disc": "太阳盘后方；视位置来自透明太阳质量模型的虚拟延拓",
-        "foreground_of_solar_disc": "太阳盘前方；与盘后延拓分开处理",
-        "outside_solar_disc": "未穿过模型太阳盘",
-        "sun_behind_observer": "太阳位于观测者后方",
-        "solar_limb_ambiguous": "模型太阳边缘，几何分类未决",
-        "target_on_model_sphere_ambiguous": "目标位于模型球面边界，几何分类未决",
-        "target_inside_model_sphere": "目标位于模型太阳内部，几何分类未决",
-    }
-    verified = policy["solar_deflection_model"] == "native_extended_solar_mass"
-    lines = [
-        (
-            "太阳引力偏折采用 Swiss Ephemeris 的有限太阳质量模型。"
-            if verified
-            else "当前原生太阳引力偏折模型未经版本核验。"
-        ),
-        "JPL 数据后端仍由 Swiss Ephemeris 计算视位置；不代表采用 Horizons 的全部视位置约定。",
-    ]
-    for body, geometry in policy["bodies"].items():
-        if geometry["status"] != "computed":
-            text = "几何未计算：" + geometry["reason"]
-        else:
-            text = domains[geometry["unbent_ray_domain"]]
-        lines.append(f"{body}：{text}")
-    lines.extend(
-        [
-            "以上是题问时刻的模型几何，不是可见性、遮掩接触时刻或观测精度证明；不用于改写骰面或定位应期。",
-            f"依据：{policy['source_section']}；原生版本 {policy['native_version']}。",
-        ]
-    )
-    return "\n".join(lines)
+def _resolve_otherbu_chart_options(
+    house_system: int | str, zodiac_type: str
+) -> tuple[int, str, int, str]:
+    if isinstance(house_system, bool):
+        raise ValueError("house_system不能为布尔值，仅用于附加天象盘")
+    try:
+        house_fields = house_system_fields(house_system, default="D")
+    except InvalidHouseSystemError as exc:
+        raise ValueError(str(exc)) from exc
+    hsys = house_fields["house_system_code"]
+    if hsys is None:
+        raise ValueError("house_system仅支持0..8对应宫制，仅用于附加天象盘")
+    if not isinstance(zodiac_type, str):
+        raise ValueError("zodiac_type必须为Tropic或Sidereal，仅用于附加天象盘")
+    token = zodiac_type.strip().casefold()
+    if token in {"tropic", "tropical"}:
+        return hsys, house_fields["house_system"], 0, "Tropic"
+    if token == "sidereal":
+        return hsys, house_fields["house_system"], 1, "Sidereal"
+    raise ValueError("zodiac_type必须为Tropic或Sidereal，仅用于附加天象盘")
 
 
 def build_otherbu_result(
     *,
     date: str | None = None,
     time: str | None = None,
-    zone: str | None = None,
-    lat: str | float | None = None,
-    lon: str | float | None = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    timezone: str | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     tradition: bool = False,
     sign: str | None = None,
     house: int | None = None,
     planet: str | None = None,
     question: str | None = None,
-    hsys: int = 8,
-    zodiacal: int = 0,
+    house_system: int | str = "D",
+    zodiac_type: str = "Tropic",
     fortune_method: str = "sect_reversing",
 ) -> dict[str, Any]:
     normalized_sign = normalize_sign(sign)
     normalized_planet = normalize_planet(planet)
     normalized_house = normalize_house(house)
-    if type(hsys) is not int or hsys not in range(9):
-        raise ValueError("hsys必须为0..8的整数，仅用于附加天象盘")
-    if type(zodiacal) is not int or zodiacal not in {0, 1}:
-        raise ValueError("zodiacal必须为0或1的整数，仅用于附加天象盘")
+    hsys, resolved_house_system, zodiacal, normalized_zodiac_type = (
+        _resolve_otherbu_chart_options(house_system, zodiac_type)
+    )
     if fortune_method not in FORTUNE_METHODS:
         raise ValueError("fortune_method必须为sect_reversing或ptolemy_iii10")
+    parsed_latitude = parse_geo_coordinate(latitude, axis="latitude")
+    parsed_longitude = parse_geo_coordinate(longitude, axis="longitude")
     validate_context(
         date=date,
         time=time,
-        zone=zone,
-        lat=lat,
-        lon=lon,
-        gps_lat=gps_lat,
-        gps_lon=gps_lon,
+        timezone=timezone,
+        latitude=parsed_latitude,
+        longitude=parsed_longitude,
     )
     date_text = _normalize_date_text(date) if date is not None else None
     time_text = _normalize_time_text(time) if time is not None else None
     inputs = {
         "date": date_text,
         "time": time_text,
-        "zone": zone,
-        "lat": lat,
-        "lon": lon,
-        "gpsLat": gps_lat,
-        "gpsLon": gps_lon,
+        "timezone": timezone,
+        "latitude": parsed_latitude,
+        "longitude": parsed_longitude,
         "tradition": tradition,
         "sign": normalized_sign,
         "house": normalized_house,
         "planet": normalized_planet,
         "question": question,
-        "hsys": hsys,
-        "zodiacal": zodiacal,
+        "house_system": resolved_house_system,
+        "zodiac_type": normalized_zodiac_type,
         "fortune_method": fortune_method,
     }
     evidence = build_symbolic_evidence(
@@ -191,11 +128,11 @@ def build_otherbu_result(
         base_chart = _build_local_chart_response(
             date_text=date_text,
             time_text=time_text,
-            timezone_name=zone,
-            lat=lat,
-            lon=lon,
-            gps_lat=gps_lat,
-            gps_lon=gps_lon,
+            timezone_name=timezone,
+            lat=parsed_latitude,
+            lon=parsed_longitude,
+            gps_lat=None,
+            gps_lon=None,
             tradition=tradition,
             hsys=hsys,
             zodiacal=zodiacal,
@@ -206,90 +143,6 @@ def build_otherbu_result(
         )
         base_chart["params"]["chartKind"] = "astronomical_context_only"
         evidence["validation"]["calendar"] = "separate_astronomical_context_computed"
-    snapshot = [
-        (
-            "骰子结果",
-            f"行星：{normalized_planet}\n星座：{normalized_sign}\n宫位：House{normalized_house + 1}\n问题原文（JSON引用）：{_quote_question(question) if question is not None else '未填写'}",
-        ),
-        (
-            "骰子盘宫位与星体",
-            f"符号示意：{normalized_planet} / {normalized_sign} / House{normalized_house + 1}；无精确度数、上升点或天顶。",
-        ),
-        (
-            "依据与边界",
-            "\n".join(
-                f"{r['author']} | {r['version']} | {r.get('source_path') or r['source_kind']}"
-                for r in evidence["rulesets"]
-            ),
-        ),
-    ]
-    if base_chart is not None:
-        params = base_chart["params"]
-        snapshot.append(
-            (
-                "天象盘宫位与星体",
-                f"独立天象背景，不用于改写骰面或推断应期。\n日期：{inputs['date']} {inputs['time']}\n时区：{zone}\n"
-                f"经纬度：{params['birthLongitude']} {params['birthLatitude']}\n宫制：{params['houseSystemResolved']}\n黄道：{params['zodiacMode']}\n"
-                f"福点公式：{params['fortuneDefinition']['method']} / {params['fortuneDefinition']['formula']}\n"
-                f"福点依据：{params['fortuneDefinition'].get('source_url') or params['fortuneDefinition'].get('source_path')}（仅公式范围）\n"
-                + (
-                    params["ephemerisReferencePoints"]["note_zh"] + "\n"
-                    if "ephemerisReferencePoints" in params
-                    else ""
-                )
-                + (
-                    params["chart_profile"]["orbital_fallback"]["note_zh"]
-                    + "\n近似天体："
-                    + "、".join(
-                        params["chart_profile"]["orbital_fallback"][
-                            "approximate_planets"
-                        ]
-                    )
-                    + "\n"
-                    if "orbital_fallback" in params["chart_profile"]
-                    else ""
-                )
-                + (
-                    params["chart_profile"]["angle_definition"]["note_zh"] + "\n"
-                    if "angle_definition" in params["chart_profile"]
-                    else ""
-                )
-                + (
-                    params["chart_profile"]["house_axis_convention"]["note_zh"] + "\n"
-                    if "house_axis_convention" in params["chart_profile"]
-                    else ""
-                )
-                + (
-                    params["housePositionProjection"].get(
-                        "note_zh",
-                        "落宫方法：非单圈顺行宫头，采用原生黄纬0°投影；不是计入星体实际黄纬的空间落宫。",
-                    )
-                    + "\n"
-                    + f"投影依据：{params['housePositionProjection']['source_url']} §16\n"
-                    if "housePositionProjection" in params
-                    else ""
-                )
-                + "\n".join(
-                    f"{obj['id']} / {obj['sign']} / {obj['lon']}° / {obj['house']}"
-                    for obj in base_chart["chart"]["objects"]
-                ),
-            )
-        )
-        if "motionPolicy" in params:
-            snapshot.append(
-                (
-                    "天象瞬时黄经运动",
-                    f"参考系：{params['motionPolicy']['reference_frame']}。"
-                    "只说明该时刻显示黄道下的日速；不改写骰面条件，也不定位留站或应期。\n"
-                    + "\n".join(
-                        _motion_snapshot_line(obj)
-                        for obj in base_chart["chart"]["objects"]
-                    ),
-                )
-            )
-        solar_policy = params["chart_profile"].get("apparent_position_policy")
-        if solar_policy is not None:
-            snapshot.append(("天象视位置约定", _solar_position_snapshot(solar_policy)))
     return {
         "analysis_type": "西洋游戏 / 占星骰子",
         "input_normalized": inputs,
@@ -300,6 +153,5 @@ def build_otherbu_result(
         "chart": base_chart,
         "question": question,
         **evidence,
-        "snapshot_text": render_snapshot_text(snapshot),
         "summary": f"星骰符号：{normalized_planet} / {normalized_sign} / 第{normalized_house + 1}宫。",
     }

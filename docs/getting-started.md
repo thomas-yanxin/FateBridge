@@ -47,15 +47,14 @@ fatebridge bazi_birth_chart --birth-year 1990 --birth-month 5 --birth-day 15 \
   --birth-hour 10 --birth-minute 30 --gender 男 --birth-place 北京 \
   --birth-timezone Asia/Shanghai \
   --fields bazi_birth.day_master.stem bazi_birth.day_master.element \
-    bazi_birth.day_master.polarity --strict-fields --no-include-snapshot-text \
-  --response-char-limit 8192
+    bazi_birth.day_master.polarity
 ```
 
-执行成功时，退出码为 `0`，`bazi_birth.day_master` 返回 `stem=庚`、`element=金`、`polarity=阳`，并附 `run_metadata`。较大的运行证据通过 `result_delivery` 延后交付，按[同次结果读取](agent-guide.md#完整结果交付与同次导出)展开。查看其他工具和输入格式：
+执行成功时，退出码为 `0`，`bazi_birth.day_master` 返回 `stem=庚`、`element=金`、`polarity=阳`，并附 `run_metadata`。三端默认采用 `--detail compact` 返回核心业务字段，需要完整输出与方法依据时传 `--detail audit`（详细约定见[输出控制与结果读取](agent-guide.md#输出控制与结果读取)）。查看其他工具和输入格式：
 
 ```bash
 fatebridge list
-fatebridge describe bazi_birth_chart --detail input
+fatebridge discover bazi_birth_chart
 ```
 
 CLI 不自动读取 `.env`，不需要配置 REST 密钥；如果已有进程环境配置，仍会按实际设置运行。
@@ -98,7 +97,7 @@ curl -X POST http://localhost:8010/api/bazi/birth-chart \
   }'
 ```
 
-开启鉴权时加 `-H "X-API-Key: replace-me"`。响应业务字段在 `bazi_birth`，包含 `four_pillars`、`day_master` 等；此外还有 `person_info`、`snapshot_text`、`snapshot_export` 和 `run_metadata`。独立命盘使用 `/api/bazi/birth-chart`，综合命理 `bazi_overview` 的 REST 路由为 `/api/bazi/overview`，详情见[三端能力边界](api-reference.md#24-三端能力边界)。
+开启鉴权时加 `-H "X-API-Key: replace-me"`。默认 `detail=compact` 返回核心业务字段（例如 `bazi_birth` 下的 `four_pillars`、`day_master`）与精简 `run_metadata`；传入 `?detail=audit` 可获得包含 `person_info` 与完整方法证据的完整响应。独立命盘使用 `/api/bazi/birth-chart`，综合命理 `bazi_overview` 的 REST 路由为 `/api/bazi/overview`，详情见[三端能力边界](api-reference.md#22-三端能力边界)。
 
 中式出生信息默认开启真太阳时，显式 true 时必须提供可解析地点或经度；没有经度且只使用默认值时，按钟表时间计算并附提示。小时必填。八字与时运入口可另传已知 `birth_second`（整数 `0..59`，须同时显式给出分钟），未知秒数省略或传 `null`。
 
@@ -133,7 +132,7 @@ fatebridge-mcp
 
 host 应使用已安装 FateBridge 的虚拟环境解释器绝对路径，可从 `fatebridge doctor --mcp` 的 `executable` 取得。Codex / Claude Desktop / Cursor 配置、Windows 路径、HTTP 运行、远程接入与升级步骤见 [MCP 部署指南](mcp-deployment.md)。
 
-MCP 默认响应预算为 8192 字符，超限时返回 `result_delivery`；需要全文时读取同一次结果。完整 JSON 首次调用不做字段筛选，文件导出方法见[完整结果交付](agent-guide.md#完整结果交付与同次导出)。三端投影、错误和快照规则查 [API 参考](api-reference.md)，出错时查看[故障排除](troubleshooting.md)。
+MCP 仅公开 `discover_tools` 与 `run_calculation` 两个入口（无资源 URI），与 REST、CLI 共用三项输出控制：`detail`（默认 `compact`，可选 `audit`）、`fields`（始终严格校验的点号路径列表）与 `as_of`（冻结当前时钟）。三端发现、投影与错误恢复规则查 [API 参考](api-reference.md)，出错时查看[故障排除](troubleshooting.md)。
 
 ## 下一步
 

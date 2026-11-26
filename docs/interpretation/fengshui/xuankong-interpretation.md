@@ -60,7 +60,7 @@
 
 ## 启用与读取
 
-聚合布局使用 `fengshui_assess`，选择 `xuankong_natal`，启用 `analyze_layout`，在已有 `xuankong` 宅盘请求中显式提供 `interpretation`。咨询摘要在原共享首轮 `fields` 之外追加 `layout_analysis.natal_interpretation`；独立宅盘则读取 `layers.xuankong_natal.interpretation`。新增分支为显式启用，未请求解释时不要在严格投影中选择不存在的分支。完整导出首次 `fields=null`，超过默认预算时从 `result_delivery` 读取同一 run。
+聚合布局使用 `fengshui_assess`，选择 `xuankong_natal`，启用 `analyze_layout`，在已有 `xuankong` 宅盘请求中显式提供 `interpretation`。咨询摘要在原共享首轮 `fields` 之外追加 `layout_analysis.natal_interpretation`；独立宅盘则读取 `layers.xuankong_natal.interpretation`。新增分支为显式启用，未请求解释时不要在严格投影中选择不存在的分支。完整导出使用 `detail=audit` 且 `fields=null`。
 
 完整请求仍须保留用户确认的住宅、历史定运、物件位置与证据。磁北误差导致多个宅盘时逐候选解释，不挑选最有利盘。资料核对见 [历史宅盘](xuankong.md)。示例或默认值不能作为用户资料。
 

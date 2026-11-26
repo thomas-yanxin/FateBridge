@@ -44,7 +44,7 @@ def payload_for(date, base, changed):
     return dict(
         date=date,
         time="12:00:00",
-        zone="Asia/Shanghai",
+        timezone="Asia/Shanghai",
         gua_code=base,
         changed_code=changed,
     )
@@ -112,7 +112,7 @@ def test_pending_source_does_not_override_month_broken_day_controlled_target() -
 def test_pending_support_qualification_matches_real_transports(
     date, base, changed, source, target, bucket, matched, surface_calls
 ) -> None:
-    spec = SPECS["sixyao"]
+    spec = SPECS["liuyao"]
     payload = payload_for(date, base, changed)
     fields = [
         "nongli.dayGanZi",
@@ -123,9 +123,9 @@ def test_pending_support_qualification_matches_real_transports(
     response, protocol, code, cli = surface_calls(
         spec,
         payload,
-        params={"fields": fields, "strict_fields": True},
-        options={"fields": fields, "strict_fields": True},
-        flags=("--fields", *fields, "--strict-fields"),
+        params={"detail": "audit", "fields": fields},
+        options={"detail": "audit", "fields": fields},
+        flags=("--detail", "audit", "--fields", *fields),
     )
     assert response.status_code == 200, response.text
     assert code == 0 and not protocol.is_error
@@ -140,13 +140,13 @@ def test_pending_dark_movement_reaches_void_conditions_on_all_surfaces(
     payload = {**payload_for("2025-02-26", "011010", "111010"), "focus_line": 2}
     prefix = "liuyao_evidence.conditional_analysis"
     fields = [f"{prefix}.classical_assessment.lines", f"{prefix}.void_conditions.focus"]
-    controls = dict(fields=fields, strict_fields=True, response_char_limit=0)
+    controls = dict(detail="audit", fields=fields)
     http, protocol, code, cli = surface_calls(
-        SPECS["sixyao"],
+        SPECS["liuyao"],
         payload,
         params=controls,
         options=controls,
-        flags=("--fields", *fields, "--strict-fields", "--response-char-limit", "0"),
+        flags=("--detail", "audit", "--fields", *fields),
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     body = business(http.json())

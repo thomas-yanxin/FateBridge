@@ -12,7 +12,7 @@
 | 401、400、422、CLI 非零退出 | [鉴权与错误](#rest-鉴权与错误) |
 | 时刻、地点或命盘字段不符 | [出生信息与返回字段](#出生信息与返回字段) |
 | 星历降级或西占后端错误 | [占星与推运](#占星与推运) |
-| 只收到部分结果、引用失效 | [快照与结果交付](#快照导出) |
+| 字段投影报错或结果被裁剪 | [输出分级与字段投影](#输出分级与字段投影) |
 
 ## 先检查当前环境
 
@@ -91,7 +91,7 @@ API_HOST=127.0.0.1 API_PORT=8011 python -m fatebridge.api
 - `422`：请求字段缺失、类型或取值错误、未知字段、无效日期、非法 JSON，以及梅花时卦钟时校验失败。遇到回拨重复钟时，`analysis_utc_offset` 的 `constraints.expected` 列出该时区允许的偏移。
 - `400`：请求进入领域计算后被拒绝，例如显式要求真太阳时却无经度。
 
-先查看 `issues[].path`；若路径指向 `fields` 中的输出路径，修正投影。`fields`、`strict_fields`、`include_snapshot_text`、`as_of` 等 REST 控制项应放在查询参数，放入 JSON 请求体会作为未知字段失败。
+先查看 `issues[].path`；若路径指向 `fields` 中的输出路径，修正投影。`detail`、`fields`、`as_of` 等 REST 控制项应放在查询参数，放入 JSON 请求体会作为未知字段失败。
 
 ### MCP / CLI 返回错误的位置
 
@@ -113,7 +113,7 @@ MCP 已知工具失败返回原生 `isError=true` 与结构化错误包络；Fas
 
 ### 命盘字段层级不同或无时盘报错
 
-独立八字入口 `/api/bazi/birth-chart` 的业务字段位于 `bazi_birth` 下；综合分析使用 `bazi_overview`。出生类模型当前要求小时，不能省略 `birth_hour`。字段投影的点号路径从响应根开始；无效路径默认附 `projection_warnings`，启用 `strict_fields=true` / `--strict-fields` 可明确拒绝。
+独立八字入口 `/api/bazi/birth-chart` 的业务字段位于 `bazi_birth` 下；综合分析使用 `bazi_overview`。出生类模型当前要求小时，不能省略 `birth_hour`。字段投影的点号路径从响应根开始且始终严格校验，无效路径会返回 `unknown_projection_path` 并在 `issues[].constraints.available` 提示当前可用键名。
 
 ## 占星与推运
 
@@ -121,9 +121,9 @@ MCP 已知工具失败返回原生 `isError=true` 与结构化错误包络；Fas
 
 同时检查 `chart_profile.engine_backend`、`engine_precision`、`ephemeris_model` 与 `run_metadata.engine_is_approximate`。运行时可用但缺 `.se1` 时可能使用 Moshier。数据获取与 `SE_EPHE_PATH` 配置见[星历安装](ephemeris.md)。CLI 不自动读取 `.env`，应在启动前设进程环境。
 
-### 显式 `hsys` 覆盖报依赖错误
+### 显式 `house_system` 覆盖报依赖错误
 
-核心/关系盘的 `hsys` 是整数 `0..8`，西占推运的 `house_system` 支持 `P` 等字符串。显式 `hsys=1..8` 缺 `swisseph` 时会报错，需安装或修复运行时，或按需使用 `hsys=0`。
+核心/关系盘与西占推运均使用 `house_system`，支持 SE 字母（如 `W`、`P`、`D`）、名称或整数编码 `0..8`。在核心/关系盘中显式指定非整宫宫制（例如 `1..8` 或 `P`）且缺 `swisseph` 时会报错，需安装或修复运行时，或按需使用整宫 `0` / `W`。
 
 ### 西占推运 `dependency_missing`
 
@@ -133,23 +133,19 @@ MCP 已知工具失败返回原生 `isError=true` 与结构化错误包络；Fas
 
 `relative_mode="synastry"` 映射为 `influence`，比较盘使用 `relative_mode="compare"`。三端均使用 `inner_birth_*` / `outer_birth_*`。
 
-## 快照导出
+## 输出分级与字段投影
 
-### `selected_sections` 没生效或导出为空
+### 只返回精简字段而非完整载荷
 
-先确认模型支持该字段（八字九大专项不支持），再查看 `snapshot_export.section_titles_detected` 与 `missing_selected_sections`。显式非空选择没有命中时导出为空。CLI 用空格分隔多个标题；紫微命盘的导出 section 是 `起盘信息` / `宫位总览`，单个宫名并非 section。
+三端默认使用 `detail=compact`，在未指定 `fields` 时仅返回工具配置的核心业务字段及精简 `run_metadata`。需要完整业务载荷、全部时间线与 `calculation_evidence` 时，请传入 `detail=audit`（REST `?detail=audit`、MCP `detail="audit"`、CLI `--detail audit`）且不传 `fields`（`fields=null`）。详见[输出控制与结果读取](agent-guide.md#输出控制与结果读取)。
 
-### 只返回部分字段或出现 `result_delivery`
+### 字段投影返回 `unknown_projection_path`
 
-MCP 默认预算为 8192 字符，超限时返回 `result_delivery` 指向同一次运行的结果。读取 `manifest_uri` 后，从 `first_page_uri` 跟随 `next_uri` 拼接每页 `text` 再解析完整 JSON；需要完整导出时首次调用应使用 `detail=audit` 和 `fields=null`。详见[完整结果交付](agent-guide.md#完整结果交付与同次导出)。
+`fields` 在三端始终严格校验点号对象路径：先核对错误 `issues[].constraints.available` 列出的可用字段名，或通过 `discover_tools` / `fatebridge discover <tool> --detail full` 查看 `output_schema`。数组字段须选择其所属父键，不能使用数字索引（否则返回 `non_object_projection_path`）。
 
 ### 西占推运采用了出生钟时
 
 推运省略 `analysis_hour` 或 `analysis_minute` 时，分别沿用出生小时或分钟。需要某日某时结果时应显式传入这两项（零点传 `0`）。输入按 `birth_timezone` 解释，`return_timezone` 只转换同一时刻。
-
-### 结果引用过期或首轮没有保留字段
-
-`result_delivery` 是临时交付引用，可能过期或因容量回收失效；未失效时应尽快保存。若首次 `fields` 未选择某字段，分页与文件都不能补回，需明确按需重新调用。
 
 ## 最小复现材料
 

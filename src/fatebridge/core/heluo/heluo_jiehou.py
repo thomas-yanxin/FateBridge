@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from fatebridge.core.heluo.heluo_hexagrams import _gua_tables, gua_lines
-from fatebridge.core.heluo.heluo_snapshot import yao_name
+from fatebridge.core.heluo.heluo_texts import yao_name
 from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.errors import NumerologySourceError
 
@@ -255,14 +255,3 @@ def attach_jiehou_evidence(evidence: dict[str, Any], jiehou: dict[str, Any]) -> 
         )
     )
     evidence["interpretation_constraints"].extend(jiehou["interpretation_constraints"])
-
-
-def jiehou_snapshot(evidence: dict[str, Any]) -> str:
-    term = evidence["selected_term_gua"]
-    literals = "；".join(
-        f"{r['gua']}原印{r['raw_yao']}" for r in evidence["literal_hou_group"]
-    )
-    return (
-        f"[卷一节候背景]\n按本次节气{evidence['upstream_term_label']}查节卦：{term['gua']}，{term['yao']}。\n"
-        f"候卦原列：{literals}。原印与卦形／日序的差异另列，未选实际候卦或裁定化工。"
-    )

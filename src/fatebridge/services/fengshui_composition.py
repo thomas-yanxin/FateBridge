@@ -1,4 +1,4 @@
-"""Assemble residential results and their source and snapshot receipts."""
+"""Assemble residential results and their source receipts."""
 
 from typing import Any
 
@@ -8,11 +8,6 @@ from fatebridge.core.fengshui.directions import rule_data
 from fatebridge.core.fengshui.geomagnetic import geomagnetic_provenance
 from fatebridge.core.fengshui.natal_interpretation import interpretation_provenance
 from fatebridge.core.fengshui.reading import build_natal_reading
-from fatebridge.core.fengshui.snapshot import sections
-from fatebridge.services.snapshot_builders import (
-    build_snapshot_export,
-    render_snapshot_lines,
-)
 
 
 def _collect_sources(result: dict[str, Any]) -> None:
@@ -322,13 +317,6 @@ def compose_fengshui_result(
             environmental_context_missing_inputs=context["missing_inputs"],
         )
     _collect_sources(result)
-    snapshot_sections = sections(result)
-    result["snapshot_text"] = render_snapshot_lines(snapshot_sections)
-    result["snapshot_export"] = build_snapshot_export(
-        technique="fengshui",
-        snapshot_text=result["snapshot_text"],
-        selected_sections=[title for title, _ in snapshot_sections],
-    )
     if include_calculation_reading:
         result["calculation_reading"] = build_natal_reading(result)
     return result

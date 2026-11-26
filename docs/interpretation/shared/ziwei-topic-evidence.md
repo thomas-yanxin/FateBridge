@@ -14,7 +14,7 @@
 
 `birth_context` 是动态接口的出生回执；本命 `ziwei_birth_chart` 的出生回执仍是 `analysis_context/person_info`，不能因两工具资料相似而复制投影路径。
 
-本命首轮使用实际合同发布的 `evidence_views.natal`。`reading_view.palaces` 保留全部本命星曜，`stars[].name/brightness/mutagen` 与完整 `palaces[].stars_detail` 对应；`null_star_fields_omitted` 声明缺少的亮度／四化属性等于完整字段的 `null`，不能补造。`major_stars=[]` 只代表没有十四主星，继续读取同宫 `stars`。`sanfang_sizheng_branches` 按 `sanfang_branch_order` 与同一视图十二宫关联，不在首轮复制四遍星曜。结构问题需要展开时用 `structure` 视图，查规则步骤用 `rules` 视图；用户要完整结果时仍首次 `fields=null`。
+本命首轮使用实际合同发布的 `evidence_views.natal`。`reading_view.palaces` 保留全部本命星曜，`stars[].name/brightness/mutagen` 与完整 `palaces[].stars_detail` 对应；`null_star_fields_omitted` 声明缺少的亮度／四化属性等于完整字段的 `null`，不能补造。`major_stars=[]` 只代表没有十四主星，继续读取同宫 `stars`。`sanfang_sizheng_branches` 按 `sanfang_branch_order` 与同一视图十二宫关联，不在首轮复制四遍星曜。结构问题需要展开时用 `structure` 视图，查规则步骤用 `rules` 视图；用户要完整结果时使用 `detail=audit`、`fields=null`。
 
 ## 四化连接先认星，再认宫
 
@@ -36,7 +36,7 @@
 
 ## 规则配置与结构依据
 
-首轮保留 `ziwei_birth.ruleset` 或 `ziwei_horoscope.ruleset`。默认 `iztro_2_5_8` 是软件兼容口径；`quanshu_v2_excerpt` 1.3.2 选择闰月、壬年四化、亮度表、长生方向、旬空双支、部分年度流曜，并采用邻宫起大限及火铃年支定点读法，余项仍有软件回退，不能称全书认证。与 1.2.0 相比，摘录配置的十二宫大限年龄区间及火铃位置会变化；不能只换版本名继续引用旧值。该闰月条文只覆盖本命安身命；目标流月闰月仍保留软件半月规则。动态层复用所选四化表为软件约定。配置不同要先解释真实差异，不挑更符合叙事的盘。目标时间可显式传 `target_minute/target_timezone`，与出生时区独立；分钟输入不构成分钟级预测。
+首轮保留 `ziwei_birth.ruleset` 或 `ziwei_horoscope.ruleset`。默认 `iztro_2_5_8` 是软件兼容口径；`quanshu_v2_excerpt` 1.3.2 选择闰月、壬年四化、亮度表、长生方向、旬空双支、部分年度流曜，并采用邻宫起大限及火铃年支定点读法，余项仍有软件回退，不能称全书认证。与 1.2.0 相比，摘录配置的十二宫大限年龄区间及火铃位置会变化；不能只换版本名继续引用旧值。该闰月条文只覆盖本命安身命；目标流月闰月仍保留软件半月规则。动态层复用所选四化表为软件约定。配置不同要先解释真实差异，不挑更符合叙事的盘。目标时间可显式传 `analysis_minute/analysis_timezone`，与出生时区独立；分钟输入不构成分钟级预测。
 
 本命 `palaces[].structural_evidence` 提供十四主星名单、是否无主星及本宫／两三合宫／对宫的实际星位。空宫只表示没有十四主星，不等于没有任何星；对宫星没有搬入本宫。三方四正是盘面关系，不自动认证古典成格、吉凶或现实结果。性别未知仍可读本命非运限结构，大限范围留空，不把未知当女命排运。
 
@@ -70,7 +70,7 @@
 
 首轮 `time_input_minute_sensitive=true` 表示两个端点跨了时支或排盘日期。按需读取端点结果，先说明基准再解释实际命盘。午夜附近同为子时也可能跨农历日期或年。诊断只说明给定钟面端点的敏感性，出生记录精度、记录误差、全局天文误差和古典钟制各需自己的证据。
 
-明刊星义专题用 `evidence_views.contextual_symbolism` 先核条件，或 `ming_symbolism` 读取 `ming_textual_properties` 的完整定义与计算连接；较长完整视图需沿同run `result_delivery` 取齐。旧 `symbolic_properties` 仍是固定在线转录，不把它冒充明刊整段原文。明刊保留七杀“將星”、文昌“文魁之宿”、天梁“化陰”，不覆盖旧转录降／首／荫。`occurrences.kind` 区分本命星、实际本命四化与博士循环标记；四化属性的五行不改被化星原属性、五行局或亮度。古天空只连接本系统地空，博士飞廉不连接年支蜚廉；病符、官府本条未写五行时保持空，不从另条官符火补值。未配层的歲君、丧门、吊客、白虎、官符只是本批定义尚未映射，不否定已计算的年度层。
+明刊星义专题用 `evidence_views.contextual_symbolism` 先核条件，或 `ming_symbolism` 读取 `ming_textual_properties` 的完整定义与计算连接；完整输出使用 `detail=audit`、`fields=null` 直接取得。旧 `symbolic_properties` 仍是固定在线转录，不把它冒充明刊整段原文。明刊保留七杀“將星”、文昌“文魁之宿”、天梁“化陰”，不覆盖旧转录降／首／荫。`occurrences.kind` 区分本命星、实际本命四化与博士循环标记；四化属性的五行不改被化星原属性、五行局或亮度。古天空只连接本系统地空，博士飞廉不连接年支蜚廉；病符、官府本条未写五行时保持空，不从另条官符火补值。未配层的歲君、丧门、吊客、白虎、官符只是本批定义尚未映射，不否定已计算的年度层。
 
 核对起紫微日表时，读取本命`rule_trace`中`ziwei_tianfu_placement.outputs.source_comparison`。`matches_source_record`只比较最初选定转录，不能称已校定原图；同处`independent_review`另列更正后的隔离复读。水二局二十一、木三局十一、火六局初六没有唯一直接标签，木三局十二有两处直接宫位；火六局初八有未位直接读法，但寅位仍有疑读候选。`matches_unique_direct_branch=null`是未能形成唯一直接比较，不是不匹配；`unambiguous_after_rereading=false`的疑义不能由当前计算落宫来裁定。146项唯一直接读法也不等于整表150项全过，新复读不是新版本或外部人工专家认证。原转录与首次失败都保留，不据疑字改星位。
 
@@ -80,11 +80,11 @@
 
 明确指定明刊四化表时，在本命、运限和规则查询一致传`sihua_source=naj_ming_v1`；省略沿用基础配置，不因读到异文而偷偷换表。组合`ruleset.version`含`+sihua.naj-ming-v1`，`sihua_source_url`专指四化原页，`classical_source`仍属于基础配置。显式选择后庚干实际为太阳禄、武曲权、天同科、天相忌，壬干为天梁禄、紫微权、天府科、武曲忌；以实际`stars_detail.mutagen`和`mutagen_natal_links`解释，不保留旧天同化忌或再给太阴补科。`compared_assignments_applied=true`仅说明此表被显式采用，不表示整书、时钟、亮度或运限复用获原典认证。文字天相化印仍是传统象义，不新增化印赋值。来源专题可用`sihua_source`视图核对，较长完整结果继续读取同run交付物。
 
-出生钟时处于夏令时重复区间且用户有明确偏移记录时，可传`birth_utc_offset`（两出生工具），运限目标可另传`target_utc_offset`；格式`±HH:MM`或含历史秒数的`±HH:MM:SS`。偏移只核对已解析的命名时区并选定物理瞬间，不应把`birth_timezone`改成固定偏移而丢失当地历史规则。未给仍拒绝歧义，错误偏移或春季不存在钟时仍拒绝。`calendar_basis.civil_clock`列出实际偏移、fold、UTC瞬间及运行时区资料版本；首轮上下文的`civil_instant_utc`与`civil_utc_offset`保留区分。运限分别读出生和目标回执，实际先后按UTC瞬间，不能把回拨后的较小钟面当成出生前。真太阳时标签继续只作排盘标签，不附会成第二个民用瞬间。此选择不认证出生记录、古典时钟政策或既有混合时钟岁序。
+出生钟时处于夏令时重复区间且用户有明确偏移记录时，可传`birth_utc_offset`（两出生工具），运限目标可另传`analysis_utc_offset`；格式`±HH:MM`或含历史秒数的`±HH:MM:SS`。偏移只核对已解析的命名时区并选定物理瞬间，不应把`birth_timezone`改成固定偏移而丢失当地历史规则。未给仍拒绝歧义，错误偏移或春季不存在钟时仍拒绝。`calendar_basis.civil_clock`列出实际偏移、fold、UTC瞬间及运行时区资料版本；首轮上下文的`civil_instant_utc`与`civil_utc_offset`保留区分。运限分别读出生和目标回执，实际先后按UTC瞬间，不能把回拨后的较小钟面当成出生前。真太阳时标签继续只作排盘标签，不附会成第二个民用瞬间。此选择不认证出生记录、古典时钟政策或既有混合时钟岁序。
 
 明刊结构条件专题可用`evidence_views.classical_conditions`读取`ming_structural_conditions.index`。当前五条核对紫府同宫守命及甲干、紫微辅弼同宫、紫府／魁钺／左右夹命。`geometry_match`只报告实际星位几何；`evaluated_necessary_premises_match`只合并本批已经核对的几何、落支和年干前提，不能说原文全部条件已满足。`source_literal_example_matches`仅比较所录两个具体宫位例，旋转或反向的一般双邻宫读法与原例匹配不同。缺少或重复星对象为`null`，不能说无该组合；某个已知必要前提为false则可说明此项不符，不因此推断现实不利。
 
-需要完整条文、原注、未裁定条件和每个实际星对象的`calculation_path`时，首次选`evidence_views.classical_condition_details`的fields，较长结果沿该run的`result_delivery`取齐。完整原始JSON首次`fields=null`。索引视图没有请求records，不能从该索引run回补未投影字段，也不应以分页补充回执的可读性冒充全文已被保存。无杀凑、月份例注及三方替代条件未完成完整裁定，`full_traditional_judgment=null`，`source_outcome_claim_adopted=false`；即使几何符合，也不能据“贵格”“奇格”推成财富、地位、性格或职业事实。
+需要完整条文、原注、未裁定条件和每个实际星对象的`calculation_path`时，首次选`evidence_views.classical_condition_details`的fields，或用`detail=audit`、`fields=null`取得完整原始JSON。索引视图没有请求records，不能以摘要run代替完整记录。无杀凑、月份例注及三方替代条件未完成完整裁定，`full_traditional_judgment=null`，`source_outcome_claim_adopted=false`；即使几何符合，也不能据“贵格”“奇格”推成财富、地位、性格或职业事实。
 
 结构条文1.1.0按两份隔离原图复读把左右夹命小注更正为“九月十一月”；“加吉方论”归紧邻“魁钺命身多折桂”，不再并入魁钺夹命。月份例注未变成通用安星条件。紫微辅弼的财帛小注两份新读不同，`source_annotation=null`表示未裁定唯一转录；通过`annotation_revision.prior_annotation/reader_annotations`分别说明旧读和新分歧，不能把null说成原书无注，也不能擅自给它加财帛或官禄宫判据。`source_revision`给出此次来源版本、两位隔离模型读者及零新增见证／零外部人工专家；它不是整书或版本独立互证。此视图不改安星、四化、命身宫名或其他条件读法，不认证整个章节、原典时钟或现实预测。
 
@@ -105,4 +105,4 @@
 原典比较同时出现`independent_review`与`targeted_rereading`时，两者是分阶段的读法记录。后者是五个输入的同一书影复读；若其`unique_source_confirmation_supported=false`，不得据旧`matches_source_record=true`或R22的唯一直接标签匹配，声称当前已由原文唯一确认。复读的冲突、未确认和旧记录均需按本次实际回执保留，不用安星结果补字；五个目标也不扩成全表或新版本认证。
 
 
-运限问题要求解释起岁、五行局或本命前置链时，首次可选`evidence_views.natal_prerequisites`的fields，读取`ziwei_horoscope.natal_prerequisites`。这是本次运限内部已生成本命的原值与原三个规则步骤，并非独立`ziwei_birth_chart`运行；`separate_birth_run=false`。按实际出生排盘农历月时到命身、年干与命宫干支到纳音元素／局数，说明足够的连接，不能只复述局数。`nominal_age_calendar`的岁序参考年和目标流年干分别属于另外两层，不覆盖此处本命年干。`rule_trace`内的原典比较仍是给定农历条件下的比较，不能据此声称HKO原表已在本run重新核验、甲人语义唯一或原典岁首已证实；纳音元素比较不等于原书纳音名称校勘。来源核对按实际`date_conversion_provenance`区分实施表和印刷参照，未独立打开原表就如实说明，不能补写一次来源核验。完整JSON首次仍`fields=null`，沿同run交付并核验。
+运限问题要求解释起岁、五行局或本命前置链时，首次可选`evidence_views.natal_prerequisites`的fields，读取`ziwei_horoscope.natal_prerequisites`。这是本次运限内部已生成本命的原值与原三个规则步骤，并非独立`ziwei_birth_chart`运行；`separate_birth_run=false`。按实际出生排盘农历月时到命身、年干与命宫干支到纳音元素／局数，说明足够的连接，不能只复述局数。`nominal_age_calendar`的岁序参考年和目标流年干分别属于另外两层，不覆盖此处本命年干。`rule_trace`内的原典比较仍是给定农历条件下的比较，不能据此声称HKO原表已在本run重新核验、甲人语义唯一或原典岁首已证实；纳音元素比较不等于原书纳音名称校勘。来源核对按实际`date_conversion_provenance`区分实施表和印刷参照，未独立打开原表就如实说明，不能补写一次来源核验。完整JSON首次仍`detail=audit`、`fields=null`。

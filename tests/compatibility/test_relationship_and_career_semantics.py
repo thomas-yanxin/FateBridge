@@ -19,9 +19,9 @@ from fatebridge.services.tool_catalog import CATALOG
 from tests.support.transports import call_calculation, rest
 
 SPECS = {
-    spec.key: spec
+    spec.name: spec
     for spec in CATALOG
-    if spec.key in {"two_person_compatibility", "bazi_career"}
+    if spec.name in {"bazi_compatibility", "bazi_career"}
 }
 
 
@@ -29,8 +29,8 @@ async def mcp_call(tool: str, inputs: dict[str, JsonValue]) -> CallToolResult:
     async with Client(create_mcp_app(families=SPECS[tool].family)) as client:
         return await call_calculation(
             client,
-            SPECS[tool].tool_name,
-            {**inputs, "response_char_limit": 0},
+            SPECS[tool].name,
+            inputs,
             raise_on_error=False,
         )
 
@@ -39,7 +39,7 @@ def cli_call(
     tool: str, inputs: dict[str, JsonValue], capsys: pytest.CaptureFixture[str]
 ) -> tuple[int, dict[str, JsonValue]]:
     """Exercise the published flags for flat birth and pair requests."""
-    args = [SPECS[tool].tool_name]
+    args = [SPECS[tool].name, "--detail", "audit"]
     for field, value in inputs.items():
         rendered = str(value).lower() if isinstance(value, bool) else str(value)
         args.extend(["--" + field.replace("_", "-"), rendered])
@@ -58,7 +58,7 @@ def test_relationship_schema_lists_exactly_the_supported_rules() -> None:
         "family",
     }
     assert field["default"] == "general"
-    inputs = example_input(SPECS["two_person_compatibility"])
+    inputs = example_input(SPECS["bazi_compatibility"])
     inputs.pop("relationship_type")
     assert TwoPersonCompatibilityRequest(**inputs).relationship_type == "general"
 
@@ -67,7 +67,7 @@ def test_relationship_schema_lists_exactly_the_supported_rules() -> None:
 def test_invalid_relationship_matches_all_transports(
     rest: TestClient, capsys: pytest.CaptureFixture[str], invalid: str | int | None
 ) -> None:
-    tool = "two_person_compatibility"
+    tool = "bazi_compatibility"
     inputs = {**example_input(SPECS[tool]), "relationship_type": invalid}
     with pytest.raises(ValidationError):
         TwoPersonCompatibilityRequest(**inputs)
@@ -75,7 +75,7 @@ def test_invalid_relationship_matches_all_transports(
         Draft202012Validator(
             TwoPersonCompatibilityRequest.model_json_schema()
         ).validate(inputs)
-    response = rest.post(SPECS[tool].rest_path, json=inputs)
+    response = rest.post(SPECS[tool].rest_path, json=inputs, params={"detail": "audit"})
     protocol = asyncio.run(mcp_call(tool, inputs))
     code, cli = cli_call(tool, inputs, capsys)
     assert response.status_code == 422 and protocol.is_error and code == 1
@@ -95,13 +95,13 @@ def test_invalid_relationship_matches_all_transports(
 def test_relationship_facts_match_across_transports(
     rest: TestClient, capsys: pytest.CaptureFixture[str], kind: str | None
 ) -> None:
-    tool = "two_person_compatibility"
+    tool = "bazi_compatibility"
     inputs = example_input(SPECS[tool])
     if kind is None:
         inputs.pop("relationship_type")
     else:
         inputs["relationship_type"] = kind
-    response = rest.post(SPECS[tool].rest_path, json=inputs)
+    response = rest.post(SPECS[tool].rest_path, json=inputs, params={"detail": "audit"})
     protocol = asyncio.run(mcp_call(tool, inputs))
     code, cli = cli_call(tool, inputs, capsys)
     assert response.status_code == 200 and not protocol.is_error and code == 0
@@ -124,7 +124,7 @@ def test_career_semantics_match_rest_mcp_cli(
         "dayun_pillar": "甲申",
         "liunian_pillar": "丙午",
     }
-    response = rest.post(SPECS[tool].rest_path, json=inputs)
+    response = rest.post(SPECS[tool].rest_path, json=inputs, params={"detail": "audit"})
     protocol = asyncio.run(mcp_call(tool, inputs))
     code, cli = cli_call(tool, inputs, capsys)
     assert response.status_code == 200 and not protocol.is_error and code == 0

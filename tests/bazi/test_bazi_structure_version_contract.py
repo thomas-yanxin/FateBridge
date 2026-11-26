@@ -81,13 +81,11 @@ def test_current_key_alone_never_bypasses_month_reference_semantics(
 def test_current_profile_and_version_conditions_agree_on_three_surfaces(
     rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    spec = SPECS["bazi_birth"]
+    spec = SPECS["bazi_birth_chart"]
     payload = inputs(spec)
     options = {
+        "detail": "audit",
         "fields": ["bazi_birth.structure_profile"],
-        "strict_fields": True,
-        "include_snapshot_text": False,
-        "response_char_limit": 0,
     }
     protocol = asyncio.run(native(spec, payload, **options))
     code, cli = call_cli(
@@ -96,14 +94,10 @@ def test_current_profile_and_version_conditions_agree_on_three_surfaces(
         tmp_path,
         capsys,
         flags=[
+            "--detail",
+            "audit",
             "--fields",
             "bazi_birth.structure_profile",
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
         ],
     )
     http = rest.post(spec.rest_path, json=payload, params={"as_of": AS_OF, **options})
@@ -121,18 +115,20 @@ def test_current_profile_and_version_conditions_agree_on_three_surfaces(
     async def native_schema():
         async with Client(mcp.app) as client:
             tools = await capability_contracts(client, detail="full")
-        return tools[spec.tool_name]["output_schema"]
+        return tools[spec.name]["output_schema"]
 
-    assert cli_run(["describe", spec.tool_name]) == 0
-    cli_schema = json.loads(capsys.readouterr().out)["output_schema"]
+    assert cli_run(["discover", "--tool", spec.name, "--detail", "full"]) == 0
+    cli_schema = json.loads(capsys.readouterr().out)["tools"][0]["output_schema"]
     advertised = {
         tool["tool"]: tool["output_schema"]
-        for tool in rest.get("/api/tools").json()["tools"]
+        for tool in rest.get(
+            "/api/tools", params={"tool": spec.name, "detail": "full"}
+        ).json()["tools"]
     }
     schemas = [
         spec.output_model.model_json_schema(),
         cli_schema,
-        advertised[spec.tool_name],
+        advertised[spec.name],
         asyncio.run(native_schema()),
     ]
     assert all(schema == schemas[0] for schema in schemas)

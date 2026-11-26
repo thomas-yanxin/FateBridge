@@ -124,15 +124,15 @@ def test_metrics_use_route_templates_before_routing_and_for_wrong_method(
         api_module.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
     with TestClient(api_module.app) as client:
-        assert client.get("/api/results/unavailable-result").status_code == 404
-        assert client.post("/api/results/another-result").status_code == 405
+        assert client.get("/api/tools/nonexistent").status_code == 404
+        assert client.get("/api/bazi/birth-chart").status_code == 405
         metric_lines = client.get("/metrics").text.splitlines()
     assert (
-        'fatebridge_http_requests_total{method="GET",path="/api/results/{result_id}",status="404"} 1.0'
+        'fatebridge_http_requests_total{method="GET",path="/unknown",status="404"} 1.0'
         in metric_lines
     )
     assert (
-        'fatebridge_http_requests_total{method="POST",path="/api/results/{result_id}",status="405"} 1.0'
+        'fatebridge_http_requests_total{method="GET",path="/api/bazi/birth-chart",status="405"} 1.0'
         in metric_lines
     )
 
@@ -169,25 +169,19 @@ def test_invalid_http_bodies_use_safe_common_error_envelope(
     assert "sensitive" not in response.text
 
 
-@pytest.mark.parametrize("response_budget", ["private-budget-text", "4096.0", "4095"])
-def test_invalid_http_response_budget_uses_a_safe_issue_code(
-    rest: TestClient, response_budget: str
+@pytest.mark.parametrize("detail", ["private-detail", "standard"])
+def test_invalid_http_detail_uses_safe_validation_error(
+    rest: TestClient, detail: str
 ) -> None:
-    """Malformed and out-of-range budgets share a diagnostic without echoing the query."""
+    """Malformed detail values are rejected cleanly without echoing raw input."""
     response = rest.post(
         "/api/divination/gua",
-        params={"response_char_limit": response_budget},
+        params={"detail": detail},
         json={"query": "乾"},
     )
     assert response.status_code == 422
-    assert response.json()["issues"] == [
-        {
-            "path": "response_char_limit",
-            "code": "invalid_response_limit",
-            "message": "response_char_limit 须为 0 或 4096–65536",
-        }
-    ]
-    assert response_budget not in response.text
+    assert response.json()["error_code"] == "validation_error"
+    assert detail not in response.text
 
 
 @pytest.mark.parametrize("has_explicit_path", [False, True])
@@ -253,7 +247,6 @@ def test_openapi_validation_error_schema_matches_real_http_response(
     error_schema = schema["components"]["schemas"]["ErrorEnvelope"]
     assert set(error_schema["required"]) <= set(response.json())
     assert set(response.json()) <= set(error_schema["properties"])
-    assert {"trace_id", "parent_run_id"} <= set(error_schema["properties"])
     assert response.status_code == 422
     assert ErrorEnvelope.model_validate(response.json()).model_dump(
         exclude_none=True

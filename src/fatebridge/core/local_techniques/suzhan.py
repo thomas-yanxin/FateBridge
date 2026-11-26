@@ -10,172 +10,54 @@ from fatebridge.core.local_techniques.chart import (
     _normalize_date_text,
     _normalize_time_text,
 )
-from fatebridge.core.local_techniques.snapshot import join_lines, render_snapshot_text
 from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence, rulesets
 from fatebridge.core.sukuyo.suzhan_astronomy import (
     METHOD,
     apply_equatorial_mansions,
     build_equatorial_mansions,
 )
+from fatebridge.utils.coordinates import parse_geo_coordinate
+from fatebridge.utils.house_systems import InvalidHouseSystemError, house_system_fields
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 
 
-def _build_suzhan_snapshot_text(
-    input_normalized: dict[str, Any], response: dict[str, Any]
-) -> str:
-    chart = response.get("chart") or {}
-    houses = chart.get("houses") or []
-    objects = chart.get("objects") or []
-    params = response.get("params") or {}
-    longitude = params.get("birthLongitude")
-    latitude = params.get("birthLatitude")
-    if longitude is None:
-        longitude = input_normalized.get("gpsLon")
-    if latitude is None:
-        latitude = input_normalized.get("gpsLat")
-    if longitude is None:
-        longitude = input_normalized.get("lon", "未提供")
-    if latitude is None:
-        latitude = input_normalized.get("lat", "未提供")
-    astronomy = response.get("astronomy") or {}
-    epoch_text = (
-        join_lines(
-            [
-                f"物理时刻参考标签（UTC记法）：{astronomy['utc_datetime']}",
-                "UTC标签与当地输入表示同一时刻；年编号跨界不改写出生输入。",
-                f"TT儒略日：{astronomy['julian_day_tt']}；UT1儒略日：{astronomy['julian_day_ut1']}",
-                "两种时标不可直接互换；历史时标按所声明模型处理，参考标签不认证古代当地钟时。",
-            ]
+def _resolve_suzhan_chart_options(
+    house_system: int | str, zodiac_type: str
+) -> tuple[int, str, int, str]:
+    if isinstance(house_system, bool):
+        raise ValueError("house_system不能为布尔值")
+    try:
+        house_fields = house_system_fields(house_system, default="D")
+    except InvalidHouseSystemError as exc:
+        raise ValueError(str(exc)) from exc
+    hsys = house_fields["house_system_code"]
+    if hsys is None:
+        raise ValueError(
+            f"宿占星图暂仅支持0..8宫制，不支持 {house_fields['house_system']}。"
         )
-        + "\n"
-        if astronomy
-        else ""
-    )
-    validation = response.get("validation") or {}
-    phase = astronomy.get("lunar_phase_reference") or {}
-    phase_text = "现代月日黄经差未计算；此模式未取得所需同次天文坐标。"
-    if phase:
-        tithi = phase["modern_tithi"]
-        phase_text = join_lines(
-            [
-                f"同次TT月日视黄经差：{phase['elongation_degrees']}现代度；"
-                f"现代12度角距tithi第{tithi['index']}段（{tithi['half_zh']}分{tithi['half_tithi_index']}）。",
-                f"半开区间：[{tithi['lower_degrees_inclusive']}°, {tithi['upper_degrees_exclusive']}°)；"
-                "精确180°起现代黑分第一段，原典以月满名白十五的用语另存。",
-                "本段的现代白黑分是瞬时角距命名；历日段白黑月是T1299日号命名，两者分别交付。",
-                "下文历日层所说未计算月相或tithi仅限该历日层；本段已算黄经差与角距分段，"
-                "未算月宿合、日出历日或tithi终止时刻，未判定T1796仪轨条件。",
-                phase["scope"],
-            ]
-        )
-    house_groups = [
-        (
-            f"宫位：{house['id']}",
-            [item for item in objects if item.get("house") == house["id"]],
-        )
-        for house in houses
-    ]
-    unassigned = [item for item in objects if item.get("house") is None]
-    if unassigned:
-        house_groups.append(("参考宫位未定；以下星曜未分配落宫", unassigned))
-    house_lines: list[str] = []
-    for heading, in_house in house_groups:
-        house_lines.append(heading)
-        if not in_house:
-            house_lines.append("星曜：无")
-            house_lines.append("")
-            continue
-        for item in in_house:
-            su28 = str(item.get("su28") or "").strip()
-            # A zodiac-sign degree is not a degree within a 360/28 band.
-            value = (
-                (item["su28_degree"]) if su28 else item.get("signlon", item.get("lon"))
-            )
-            if su28:
-                # Some real RA mansion bands exceed 30 degrees; do not apply
-                # the zodiac-sign modulo.
-                if value is None:
-                    raise ValueError("宿位缺少可显示的宿内度数")
-                degree = int(float(value))
-                minute = int((float(value) - degree) * 60)
-            else:
-                sign_degree = float(value) % 30
-                degree = int(sign_degree)
-                minute = int((sign_degree - degree) * 60)
-            star_text = f"{degree}˚{su28}{minute}分" if su28 else f"{degree}˚{minute}分"
-            house_lines.append(f"星曜：{item.get('id')} {star_text}".strip())
-        house_lines.append("")
-
-    return render_snapshot_text(
-        [
-            (
-                "起盘信息",
-                join_lines(
-                    [
-                        f"日期：{input_normalized['date']} {input_normalized['time']}",
-                        f"时区：{input_normalized['zone']}",
-                        f"经纬度：{longitude} {latitude}",
-                        f"外盘：{input_normalized.get('szchart', 0)}",
-                        f"盘型：{input_normalized.get('szshape', 0)}",
-                        f"宫制：{((response.get('params') or {}).get('houseSystemResolved') or '未提供')}",
-                        ((params.get("angleDefinition") or {}).get("note_zh") or ""),
-                        (
-                            (params.get("housePositionProjection") or {}).get("note_zh")
-                            or ""
-                        ),
-                        params.get("houseGeometryNote") or "",
-                        f"黄道：{((response.get('params') or {}).get('zodiacLabelZh') or (response.get('params') or {}).get('zodiacMode') or 'tropical')}",
-                    ]
-                ),
-            ),
-            (
-                "宿盘宫位与二十八宿星曜",
-                (
-                    "未标注天文宿位。\n"
-                    if not (input_normalized.get("doubingSu28", True))
-                    else "现代距星研究口径：当日视赤经与不等宽宿界。\n"
-                )
-                + epoch_text
-                + (join_lines(house_lines) or "无"),
-            ),
-            (
-                "现代月日黄经差参考",
-                phase_text,
-            ),
-            (
-                "历日二十七宿",
-                (response.get("sukuyo") or {}).get("reading_text")
-                or str(response.get("sukuyo", {})),
-            ),
-            *(
-                [
-                    (
-                        "星图来源与适用范围",
-                        join_lines(validation["chart_source"]["limitations"]),
-                    )
-                ]
-                if "chart_source" in validation
-                else []
-            ),
-        ]
-    )
+    if not isinstance(zodiac_type, str):
+        raise ValueError("zodiac_type必须为Tropic或Sidereal。")
+    token = zodiac_type.strip().casefold()
+    if token in {"tropic", "tropical"}:
+        return hsys, house_fields["house_system"], 0, "Tropic"
+    if token == "sidereal":
+        return hsys, house_fields["house_system"], 1, "Sidereal"
+    raise ValueError("zodiac_type必须为Tropic或Sidereal。")
 
 
 def build_suzhan_result(
     *,
     date: str,
     time: str | None = None,
-    zone: str | None = None,
-    lat: Any = None,
-    lon: Any = None,
-    gps_lat: float | None = None,
-    gps_lon: float | None = None,
+    timezone: str | None = None,
+    latitude: float | str | None = None,
+    longitude: float | str | None = None,
     szchart: int = 0,
     szshape: int = 0,
     house_start_mode: int = 1,
     doubing_su28: bool = True,
-    hsys: int = 8,
-    zodiacal: int = 0,
+    house_system: int | str = "D",
+    zodiac_type: str = "Tropic",
     leap_month_policy: str = "unresolved",
     natal_mansion: str | None = None,
     activity: str | None = None,
@@ -188,15 +70,15 @@ def build_suzhan_result(
 ) -> dict[str, Any]:
     if time is not None and not time.strip():
         raise ValueError("钟时须为已知时间；未知请省略或用null，空字符串不能代替未知。")
-    coordinates_supplied = any(
-        value is not None for value in (lat, lon, gps_lat, gps_lon)
+    hsys, resolved_house_system, zodiacal, normalized_zodiac_type = (
+        _resolve_suzhan_chart_options(house_system, zodiac_type)
     )
+    parsed_latitude = parse_geo_coordinate(latitude, axis="latitude")
+    parsed_longitude = parse_geo_coordinate(longitude, axis="longitude")
+    coordinates_supplied = parsed_latitude is not None or parsed_longitude is not None
     compute_chart = time is not None and (coordinates_supplied or chart_requested)
-    if compute_chart and (
-        (gps_lat is None and (lat is None or not str(lat).strip()))
-        or (gps_lon is None and (lon is None or not str(lon).strip()))
-    ):
-        raise ValueError("计算宿占星图需要完整经纬度，请提供lat/lon或gps_lat/gps_lon。")
+    if compute_chart and (parsed_latitude is None or parsed_longitude is None):
+        raise ValueError("计算宿占星图需要完整经纬度，请提供latitude和longitude。")
     normalized_szchart = 1 if szchart else 0
     normalized_szshape = 1 if szshape else 0
     normalized_house_start_mode = 2 if house_start_mode == 2 else 1
@@ -204,20 +86,21 @@ def build_suzhan_result(
     chart_variant = "guolao_chart" if normalized_szchart else "chart"
     if compute_chart and normalized_szchart and (hsys != 8 or zodiacal != 0):
         raise ValueError("宿占果老盘模式暂仅支持固定离线宫制 / 黄道语义。")
-    input_normalized = {
-        "date": _normalize_date_text(date),
-        "time": _normalize_time_text(time) if time is not None else None,
-        "zone": zone or DEFAULT_BIRTH_TIMEZONE,
-        "lat": lat,
-        "lon": lon,
-        "gpsLat": gps_lat,
-        "gpsLon": gps_lon,
+    date_text = _normalize_date_text(date)
+    time_text = _normalize_time_text(time) if time is not None else None
+    timezone_name = timezone or DEFAULT_BIRTH_TIMEZONE
+    input_normalized: dict[str, Any] = {
+        "date": date_text,
+        "time": time_text,
+        "timezone": timezone_name,
+        "latitude": parsed_latitude,
+        "longitude": parsed_longitude,
         "szchart": normalized_szchart,
         "szshape": normalized_szshape,
         "houseStartMode": normalized_house_start_mode,
         "doubingSu28": include_su28,
-        "hsys": hsys,
-        "zodiacal": zodiacal,
+        "house_system": resolved_house_system,
+        "zodiac_type": normalized_zodiac_type,
         "leap_month_policy": leap_month_policy,
         "natal_mansion": natal_mansion,
         "activity": activity,
@@ -241,9 +124,9 @@ def build_suzhan_result(
             else "钟时未知，已交付历法与候选证据。排星图及天文宿位需确认钟时和经纬度。"
         )
         calendar = calendar_mansion(
-            input_normalized["date"],
-            input_normalized["time"],
-            input_normalized["zone"],
+            date_text,
+            time_text,
+            timezone_name,
             leap_month_policy=leap_month_policy,
             calendar_profile=calendar_profile,
             calendar_day_part=calendar_day_part,
@@ -275,27 +158,6 @@ def build_suzhan_result(
             "su28Method": layer_status,
             "su28AstronomicalAccuracy": "not_computed",
         }
-        snapshot = render_snapshot_text(
-            [
-                (
-                    "起盘信息",
-                    join_lines(
-                        [
-                            f"日期：{input_normalized['date']}",
-                            (
-                                f"钟时：{input_normalized['time']}"
-                                if clock_known
-                                else "钟时：未知，未补造出生时刻。"
-                            ),
-                            f"输入时区：{input_normalized['zone']}",
-                            "经纬度与星图选项未用于本次历法计算。",
-                        ]
-                    ),
-                ),
-                ("历日二十七宿", evidence["reading_text"]),
-                ("天文宿位与宫位", reason),
-            ]
-        )
         return {
             "analysis_type": "宿占 / 宿盘",
             "input_normalized": input_normalized,
@@ -305,17 +167,17 @@ def build_suzhan_result(
             "astronomy": None,
             "rulesets": rulesets(calendar_profile, calendar_basis),
             "validation": validation,
-            "snapshot_text": snapshot,
             "summary": f"历日宿{evidence['day_mansion'] or '以候选为准'}。{reason}",
         }
+    assert time_text is not None
     response = _build_local_chart_response(
-        date_text=input_normalized["date"],
-        time_text=input_normalized["time"],
-        timezone_name=input_normalized["zone"],
-        lat=lat,
-        lon=lon,
-        gps_lat=gps_lat,
-        gps_lon=gps_lon,
+        date_text=date_text,
+        time_text=time_text,
+        timezone_name=timezone_name,
+        lat=parsed_latitude,
+        lon=parsed_longitude,
+        gps_lat=None,
+        gps_lon=None,
         tradition=False,
         chart_variant=chart_variant,
         house_start_mode=normalized_house_start_mode,
@@ -328,21 +190,21 @@ def build_suzhan_result(
             "szshape": normalized_szshape,
             "houseStartMode": normalized_house_start_mode,
             "doubingSu28": include_su28,
-            "hsys": hsys,
-            "zodiacal": zodiacal,
+            "house_system": resolved_house_system,
+            "zodiac_type": normalized_zodiac_type,
         },
     )
     chart = response["chart"]
     astronomy = None
     if include_su28:
         birth, _, _ = _build_birth_info(
-            date_text=input_normalized["date"],
-            time_text=input_normalized["time"],
-            timezone_name=input_normalized["zone"],
-            lat=lat,
-            lon=lon,
-            gps_lat=gps_lat,
-            gps_lon=gps_lon,
+            date_text=date_text,
+            time_text=time_text,
+            timezone_name=timezone_name,
+            lat=parsed_latitude,
+            lon=parsed_longitude,
+            gps_lat=None,
+            gps_lon=None,
         )
         astronomy = build_equatorial_mansions(birth)
         apply_equatorial_mansions(chart, astronomy)
@@ -350,9 +212,9 @@ def build_suzhan_result(
         pass
     response["sukuyo"] = day_evidence(
         calendar_mansion(
-            input_normalized["date"],
-            input_normalized["time"],
-            input_normalized["zone"],
+            date_text,
+            time_text,
+            timezone_name,
             leap_month_policy=leap_month_policy,
             calendar_profile=calendar_profile,
             calendar_day_part=calendar_day_part,
@@ -386,10 +248,6 @@ def build_suzhan_result(
         calculation_layers.update(
             house_geometry="unavailable_selected_reference", planet_positions="computed"
         )
-    snapshot_text = _build_suzhan_snapshot_text(
-        input_normalized,
-        {**response, "astronomy": astronomy, "validation": validation},
-    )
     return {
         "analysis_type": "宿占 / 宿盘",
         "input_normalized": input_normalized,
@@ -402,7 +260,6 @@ def build_suzhan_result(
             **({"chart": response["rulesets"]} if "rulesets" in response else {}),
         },
         "validation": validation,
-        "snapshot_text": snapshot_text,
         "summary": f"历日宿{response['sukuyo']['day_mansion'] or '未定（见历法档案候选）'}；已生成星图。"
         + (
             "天文宿位采用现代距星不等宽研究口径。"

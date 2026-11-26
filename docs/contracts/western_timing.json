@@ -110,13 +110,11 @@
       "transits.current_transit.analysis_datetime",
       "transits.current_transit.orb_limit",
       "transits.current_transit.hits"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,
-    "description": "Request model for western predictive timing analysis.",
+    "description": "Request model for aggregate western predictive timing analysis.",
     "properties": {
       "analysis_day": {
         "anyOf": [
@@ -145,7 +143,7 @@
           }
         ],
         "default": null,
-        "description": "Analysis hour (0-23), in birth_timezone. If omitted, keeps the birth hour for date-only compatibility.",
+        "description": "Analysis hour (0-23)",
         "title": "Analysis Hour"
       },
       "analysis_minute": {
@@ -160,7 +158,7 @@
           }
         ],
         "default": null,
-        "description": "Analysis minute (0-59), in birth_timezone. If omitted, keeps the birth minute for date-only compatibility.",
+        "description": "Analysis minute (0-59)",
         "title": "Analysis Minute"
       },
       "analysis_month": {
@@ -413,7 +411,11 @@
       },
       "zodiac_type": {
         "default": "Tropic",
-        "description": "Zodiac type, e.g. Tropic or Sidereal",
+        "description": "Zodiac type: Tropic or Sidereal",
+        "enum": [
+          "Tropic",
+          "Sidereal"
+        ],
         "title": "Zodiac Type",
         "type": "string"
       }
@@ -453,7 +455,7 @@
         "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
         "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
       ],
-      "method_id": "fatebridge.western_solarreturn.contract_v1",
+      "method_id": "fatebridge.western_solar_return.contract_v1",
       "output_paths": [
         "directions",
         "returns",
@@ -467,9 +469,9 @@
       "role": "calculation",
       "selector_fields": [
         "ephemeris_policy",
-        "firdaria_year_basis",
         "house_system",
-        "pd_method"
+        "pd_method",
+        "firdaria_year_basis"
       ],
       "source_refs": [
         "docs/algorithm-coverage.md"
@@ -504,7 +506,7 @@
         "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
         "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
       ],
-      "method_id": "fatebridge.western_lunarreturn.contract_v1",
+      "method_id": "fatebridge.western_lunar_return.contract_v1",
       "output_paths": [
         "directions",
         "returns",
@@ -518,9 +520,9 @@
       "role": "calculation",
       "selector_fields": [
         "ephemeris_policy",
-        "firdaria_year_basis",
         "house_system",
-        "pd_method"
+        "pd_method",
+        "firdaria_year_basis"
       ],
       "source_refs": [
         "docs/algorithm-coverage.md"
@@ -555,7 +557,7 @@
         "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
         "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
       ],
-      "method_id": "fatebridge.western_transit.contract_v1",
+      "method_id": "fatebridge.western_transit_chart.contract_v1",
       "output_paths": [
         "directions",
         "returns",
@@ -569,9 +571,9 @@
       "role": "calculation",
       "selector_fields": [
         "ephemeris_policy",
-        "firdaria_year_basis",
         "house_system",
-        "pd_method"
+        "pd_method",
+        "firdaria_year_basis"
       ],
       "source_refs": [
         "docs/algorithm-coverage.md"
@@ -606,7 +608,7 @@
         "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
         "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
       ],
-      "method_id": "fatebridge.western_solararc.contract_v1",
+      "method_id": "fatebridge.western_solar_arc.contract_v1",
       "output_paths": [
         "directions",
         "returns",
@@ -620,9 +622,9 @@
       "role": "calculation",
       "selector_fields": [
         "ephemeris_policy",
-        "firdaria_year_basis",
         "house_system",
-        "pd_method"
+        "pd_method",
+        "firdaria_year_basis"
       ],
       "source_refs": [
         "docs/algorithm-coverage.md"
@@ -657,7 +659,7 @@
         "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
         "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
       ],
-      "method_id": "fatebridge.western_givenyear.contract_v1",
+      "method_id": "fatebridge.western_chart_for_year.contract_v1",
       "output_paths": [
         "directions",
         "returns",
@@ -671,9 +673,9 @@
       "role": "calculation",
       "selector_fields": [
         "ephemeris_policy",
-        "firdaria_year_basis",
         "house_system",
-        "pd_method"
+        "pd_method",
+        "firdaria_year_basis"
       ],
       "source_refs": [
         "docs/algorithm-coverage.md"
@@ -722,9 +724,9 @@
       "role": "calculation",
       "selector_fields": [
         "ephemeris_policy",
-        "firdaria_year_basis",
         "house_system",
-        "pd_method"
+        "pd_method",
+        "firdaria_year_basis"
       ],
       "source_refs": [
         "docs/algorithm-coverage.md"
@@ -759,7 +761,7 @@
         "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
         "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
       ],
-      "method_id": "fatebridge.western_pd.contract_v1",
+      "method_id": "fatebridge.western_primary_directions.contract_v1",
       "output_paths": [
         "directions",
         "returns",
@@ -773,9 +775,9 @@
       "role": "calculation",
       "selector_fields": [
         "ephemeris_policy",
-        "firdaria_year_basis",
         "house_system",
-        "pd_method"
+        "pd_method",
+        "firdaria_year_basis"
       ],
       "source_refs": [
         "docs/algorithm-coverage.md"
@@ -810,7 +812,7 @@
         "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
         "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
       ],
-      "method_id": "fatebridge.western_pdchart.contract_v1",
+      "method_id": "fatebridge.western_primary_directions_chart.contract_v1",
       "output_paths": [
         "directions",
         "returns",
@@ -824,9 +826,9 @@
       "role": "calculation",
       "selector_fields": [
         "ephemeris_policy",
-        "firdaria_year_basis",
         "house_system",
-        "pd_method"
+        "pd_method",
+        "firdaria_year_basis"
       ],
       "source_refs": [
         "docs/algorithm-coverage.md"
@@ -861,7 +863,7 @@
         "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
         "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
       ],
-      "method_id": "fatebridge.western_zr.contract_v1",
+      "method_id": "fatebridge.western_zodiacal_releasing.contract_v1",
       "output_paths": [
         "directions",
         "returns",
@@ -875,9 +877,9 @@
       "role": "calculation",
       "selector_fields": [
         "ephemeris_policy",
-        "firdaria_year_basis",
         "house_system",
-        "pd_method"
+        "pd_method",
+        "firdaria_year_basis"
       ],
       "source_refs": [
         "docs/algorithm-coverage.md"
@@ -926,9 +928,9 @@
       "role": "calculation",
       "selector_fields": [
         "ephemeris_policy",
-        "firdaria_year_basis",
         "house_system",
-        "pd_method"
+        "pd_method",
+        "firdaria_year_basis"
       ],
       "source_refs": [
         "docs/algorithm-coverage.md"
@@ -977,9 +979,9 @@
       "role": "calculation",
       "selector_fields": [
         "ephemeris_policy",
-        "firdaria_year_basis",
         "house_system",
-        "pd_method"
+        "pd_method",
+        "firdaria_year_basis"
       ],
       "source_refs": [
         "docs/algorithm-coverage.md"

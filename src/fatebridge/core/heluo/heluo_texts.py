@@ -663,98 +663,6 @@ def _apply_commentary(
         result["commentary_cross_references"] = references
 
 
-def text_reading_notes_snapshot(text: dict[str, Any]) -> list[str]:
-    """Render the supplied record's qualifications without reselecting text."""
-    provenance = text["text_provenance"]
-    notes: list[str] = []
-    for label, key in (
-        ("爻辞", "header_reading_notes"),
-        ("注文", "commentary_reading_notes"),
-    ):
-        notes.extend(f"{label}读文说明：{note}" for note in provenance.get(key, []))
-    for poem in text.get("poem_sections", []):
-        notes.extend(
-            f"第{poem['index']}首诗读文说明：{note}"
-            for note in poem.get("reading_notes", [])
-        )
-    supplement = text.get("poem_review_supplement")
-    if supplement:
-        notes.append("后续五首复核范围：" + supplement["scope_note"])
-        for entry in supplement["entries"]:
-            notes.extend(
-                f"第{entry['poem_index']}首后续复核：{note}"
-                for note in entry["review_notes"]
-            )
-    return notes
-
-
-def poem_text_snapshot(text: dict[str, Any]) -> str:
-    """Label the actual poem layer, retaining all printed poems and doubts."""
-    if text["text_provenance"]["poem_status"] == "source_poems_visually_collated":
-        label = "诗歌（卷三局部目校，按印次全列，未择用）"
-    else:
-        label = "诗歌（继承文本，来源待核）"
-    return f"{label}：{text['shige']}"
-
-
-def text_status_snapshot(text: dict[str, Any]) -> str:
-    provenance = text["text_provenance"]
-    if provenance["commentary_status"] == "source_commentary_visually_collated":
-        pages = "、".join(map(str, provenance["commentary_pdf_pages"]))
-        note = f"注文据影印PDF第{pages}页单次目校，待独立复核"
-        if provenance["poem_status"] == "source_poems_visually_collated":
-            poem_pages = "、".join(map(str, provenance["poem_pdf_pages"]))
-            note += f"；另据卷三PDF第{poem_pages}页单次目校本爻{len(text['poem_sections'])}首诗，按印次全列，未择用；象曰的具体来源未由诗诀底本核定"
-        else:
-            note += "；诗歌未见于这些爻解段落，来源待核"
-        if any(
-            "unresolved" in p.get("review_status", "")
-            for p in text.get("poem_sections", [])
-        ):
-            note += "；诗诀仍有字形未决，暂读与候选见逐首读稿说明"
-        if "unresolved" in provenance.get("commentary_review_status", ""):
-            note += "；本条仍有字形未决，暂读与候选见读稿说明"
-        if "unresolved" in provenance.get("review_status", ""):
-            note += "；爻辞仍有字形未决，暂读与候选见头辞读稿说明"
-        for reference in text.get("commentary_cross_references", []):
-            if reference["source_hexagram"] == "地水師":
-                note += "；师三引升三仅为有条件的单爻变引用，适用未定，不替代后天卦"
-            elif reference["source_hexagram"] == "風天小畜":
-                note += (
-                    "；小畜初引巽初仅为有条件的单爻变引用，适用未定，不替代后天巽四爻"
-                )
-            elif reference["target_line"] is None:
-                quotation = (
-                    f"原注另引“{reference['target_quote']}”、未指定目标爻"
-                    if reference["target_quote"] is not None
-                    else "只印卦名、未指定目标爻"
-                )
-                note += (
-                    f"；{reference['source_hexagram']}第{reference['source_line']}爻在"
-                    f"{reference['source_condition_label']}段的{reference['condition_text']}语境引{reference['target_hexagram']}"
-                    f"，{quotation}；单爻翻转核对相符，适用未定，不替代正式后天卦"
-                )
-            else:
-                condition_context = (
-                    f"的{reference['condition_text']}语境"
-                    if reference.get("condition_text")
-                    and reference["condition_text"]
-                    != reference["source_condition_label"]
-                    else ""
-                )
-                note += (
-                    f"；{reference['source_hexagram']}第{reference['source_line']}爻在"
-                    f"{reference['source_condition_label']}段{condition_context}引{reference['target_hexagram']}"
-                    f"第{reference['target_line']}爻，属有条件的单爻变引用，适用未定，不替代后天卦"
-                )
-        if text.get("commentary_branch_selection", {}).get(
-            "condition_labels_not_separately_printed"
-        ):
-            note += "；本爻未单列不葉者，未印标签不表示不匹配"
-        return note
-    return "摘要注文及诗歌尚未逐字核对，诗歌来源待核"
-
-
 def collated_line(gua: str, pos: int, inherited: dict[str, Any]) -> dict[str, Any]:
     result = deepcopy(inherited)
     entry = next(
@@ -789,3 +697,23 @@ def collated_line(gua: str, pos: int, inherited: dict[str, Any]) -> dict[str, An
     apply_poems(gua, pos, result, provenance)
     result["text_provenance"] = provenance
     return result
+
+
+LINE_POSITION_LABELS = ["初", "二", "三", "四", "五", "上"]
+
+
+def yao_text(gua_name: str, pos: int) -> dict[str, Any] | None:
+    """本卦元堂(动爻)之爻辞。"""
+    g = heluo_hexagrams._tiaowen().get(gua_name)
+    if not g or not g.get("yao", {}).get(str(pos)):
+        return None
+    return collated_line(gua_name, pos, g["yao"][str(pos)])
+
+
+def yao_name(lines: list[int], pos: int) -> str:
+    yang = lines[pos - 1] == 1
+    if pos == 1:
+        return f"初{'九' if yang else '六'}"
+    if pos == 6:
+        return f"上{'九' if yang else '六'}"
+    return f"{'九' if yang else '六'}{LINE_POSITION_LABELS[pos - 1]}"

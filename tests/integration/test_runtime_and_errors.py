@@ -15,7 +15,7 @@ from pydantic import BaseModel
 
 import fatebridge.api as api_module
 import fatebridge.mcp_server as mcp
-from fatebridge.application.execution import execute_tool
+from fatebridge.application.execution import execute_with_receipt
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
 from fatebridge.cli import run as cli_run
 from fatebridge.core import ephemeris_runtime
@@ -116,21 +116,17 @@ def test_calculate_birth_route_executes_service_via_threadpool(
         request: BaseModel,
         *,
         options: ExecutionOptions,
-        fields: list[str] | None,
-        include_snapshot_text: bool | None,
     ) -> ServiceResult:
         calculation_thread_ids.append(get_ident())
-        assert spec.key == "bazi_birth"
+        assert spec.name == "bazi_birth_chart"
         assert isinstance(request, BaziBirthRequest) and request.name == "张三"
-        return execute_tool(
+        return execute_with_receipt(
             spec,
             request,
             options=options,
-            fields=fields,
-            include_snapshot_text=include_snapshot_text,
         )
 
-    monkeypatch.setattr(api_module, "execute_tool", observe_calculation_thread)
+    monkeypatch.setattr(api_module, "execute_with_receipt", observe_calculation_thread)
     request = BaziBirthRequest(
         name="张三",
         gender="男",
@@ -144,14 +140,13 @@ def test_calculate_birth_route_executes_service_via_threadpool(
         birth_place="上海",
     )
 
-    birth_route = rest_handler("bazi_birth")
-    result = asyncio.run(birth_route(request))
+    birth_route = rest_handler("bazi_birth_chart")
+    result = asyncio.run(birth_route(request, detail="audit"))
 
     assert result["analysis_type"] == "八字命盘"
     assert result["run_metadata"]["tool_name"] == "bazi_birth_chart"
     assert result["run_metadata"]["engine"] == "fatebridge-offline"
     assert result["run_metadata"]["run_id"]
-    assert result["run_metadata"]["trace_id"]
     assert result["run_metadata"]["generated_at"]
     (calculation_thread_id,) = calculation_thread_ids
     assert calculation_thread_id != route_thread_id
@@ -240,7 +235,7 @@ def test_repeated_public_requests_succeed() -> None:
     client = TestClient(api_module.app)
 
     for _ in range(2):
-        response = client.post("/api/divination/gua", json={"query": "乾"})
+        response = client.post("/api/divination/gua", json={"queries": ["乾"]})
         assert response.status_code == 200
 
 
@@ -257,7 +252,7 @@ def test_api_key_auth_rejects_missing_key_when_configured(
         ),
     )
     client = TestClient(api_module.app)
-    response = client.post("/api/divination/gua", json={"query": "乾"})
+    response = client.post("/api/divination/gua", json={"queries": ["乾"]})
 
     assert response.status_code == 401
     assert response.headers["WWW-Authenticate"] == "APIKey"
@@ -303,7 +298,7 @@ def test_repeated_authenticated_requests_succeed(
 
     for _ in range(2):
         response = client.post(
-            "/api/divination/gua", json={"query": "乾"}, headers=headers
+            "/api/divination/gua", json={"queries": ["乾"]}, headers=headers
         )
         assert response.status_code == 200
 
@@ -345,7 +340,6 @@ def test_mcp_outer_argument_validation_returns_structured_feedback(
                 {
                     "tool": "bazi_birth_chart",
                     "arguments": "private-mcp-input",
-                    "trace_id": "outer-validation",
                 },
                 raise_on_error=False,
             )
@@ -353,7 +347,6 @@ def test_mcp_outer_argument_validation_returns_structured_feedback(
     result = asyncio.run(call())
     assert result.is_error
     payload = result.structured_content
-    assert payload["trace_id"] == "outer-validation"
     assert payload["error_code"] == "validation_error" and not payload["retryable"]
     (issue,) = payload["issues"]
     assert issue["path"] == "arguments" and issue["code"] == "dict_type"
@@ -366,14 +359,14 @@ class RuntimeApproximationCheck(Protocol):
 
 
 @pytest.mark.parametrize("stage", ["attachment", "validation"])
-def test_metadata_failures_are_internal_and_correlated_in_all_transports(
+def test_metadata_failures_are_internal_and_consistent_in_all_transports(
     rest: TestClient,
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
     caplog: pytest.LogCaptureFixture,
     stage: Literal["attachment", "validation"],
 ) -> None:
-    """Runtime receipt failures must keep correlation and hide exception text."""
+    """Runtime receipt failures must hide exception text on all transports."""
 
     def fail(
         record: ServiceResult,
@@ -390,18 +383,17 @@ def test_metadata_failures_are_internal_and_correlated_in_all_transports(
         monkeypatch.setattr(RunMetadata, "model_validate", fail)
 
     inputs = REST_POST_CASES["/api/bazi/birth-chart"]()
-    controls = {"trace_id": "review-trace", "parent_run_id": "review-parent"}
-    http = rest.post("/api/bazi/birth-chart", json=inputs, params=controls)
+    http = rest.post("/api/bazi/birth-chart", json=inputs)
 
     async def call() -> CallToolResult:
         async with Client(mcp.app) as client:
             return await call_calculation(
-                client, "bazi_birth_chart", {**inputs, **controls}, raise_on_error=False
+                client, "bazi_birth_chart", inputs, raise_on_error=False
             )
 
     protocol = asyncio.run(call())
     args = ["bazi_birth_chart"]
-    for key, value in {**inputs, **controls}.items():
+    for key, value in inputs.items():
         if value is not None:
             args += [
                 "--" + key.replace("_", "-"),
@@ -415,8 +407,6 @@ def test_metadata_failures_are_internal_and_correlated_in_all_transports(
     payloads = [http.json(), protocol.structured_content, cli_output]
     for payload in payloads:
         assert payload["error_code"] == "internal_error"
-        assert payload["trace_id"] == controls["trace_id"]
-        assert payload["parent_run_id"] == controls["parent_run_id"]
         assert "private" not in json.dumps(payload)
     # note (parity): HTTP status and MCP operation labels are transport metadata.
     normalized = [

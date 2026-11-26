@@ -6,12 +6,12 @@ from typing import Literal
 
 from pydantic import Field, model_validator
 
-from fatebridge.core.requests.base import _DeferredModel
+from fatebridge.core.requests.base import FateBridgeBaseRequest
 from fatebridge.core.sukuyo.sukuyo_calendar_basis import SukuyoCalendarBasis
 from fatebridge.utils.birth_input import MAX_PERSON_BIRTH_YEAR, MIN_PERSON_BIRTH_YEAR
 
 
-class TwoPersonCompatibilityRequest(_DeferredModel):
+class TwoPersonCompatibilityRequest(FateBridgeBaseRequest):
     """Request model for two-person compatibility analysis."""
 
     person1_name: str = Field(description="First person name")
@@ -117,7 +117,7 @@ class TwoPersonCompatibilityRequest(_DeferredModel):
     )
 
 
-class SukuyoCompatibilityRequest(_DeferredModel):
+class SukuyoCompatibilityRequest(FateBridgeBaseRequest):
     """T1299望日定宿及三九法；宿主历法另选，经纬度不定宿。"""
 
     calendar_basis: SukuyoCalendarBasis = Field(

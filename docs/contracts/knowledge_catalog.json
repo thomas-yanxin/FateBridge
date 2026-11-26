@@ -1,6 +1,6 @@
 {
   "call_guidance": {
-    "lookup": "分类与键在domains[].categories[]，数组先读所属根；strict fields不能直接填domain或categories。",
+    "lookup": "分类与键在domains[].categories[]，数组先读所属根；fields不能直接填domain或categories。",
     "output_fields": [
       "domains",
       "source",
@@ -18,9 +18,7 @@
     }
   },
   "first_view": {
-    "fields": null,
-    "include_snapshot_text": false,
-    "strict_fields": true
+    "fields": null
   },
   "input": {
     "additionalProperties": false,
@@ -38,14 +36,6 @@
         "default": null,
         "description": "Optional domain filter: astro/bazi/liureng/qimen/heluo/canping/human_design. Heluo/Canping/Human Design expose source-bound partial references; catalogues do not select rules applicable to a person. Human Design retains384line locators; actual coverage reports pending local paraphrases, uncurated meanings and independent acceptance separately. Omit for all domains with separate source provenance.",
         "title": "Domain"
-      },
-      "selected_sections": {
-        "description": "Optional snapshot section titles for filtered export payload",
-        "items": {
-          "type": "string"
-        },
-        "title": "Selected Sections",
-        "type": "array"
       }
     },
     "title": "KnowledgeRegistryRequest",

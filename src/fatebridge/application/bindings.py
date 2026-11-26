@@ -21,7 +21,7 @@ from fatebridge.utils.birth_input import PersonInfo
 
 
 @dataclass(frozen=True)
-class LazyService:
+class ServiceRef:
     """Reference a service module without loading it during discovery."""
 
     module_name: str
@@ -41,12 +41,12 @@ class LazyService:
         return self.resolved(*positional, **keywords)
 
 
-def lazy_service(module: str, name: str) -> LazyService:
-    return LazyService(module, name)
+def service_ref(module: str, name: str) -> ServiceRef:
+    return ServiceRef(module, name)
 
 
-def resolve_service(service: LazyService | ResolvedService) -> ResolvedService:
-    return service.resolved if isinstance(service, LazyService) else service
+def resolve_service(service: ServiceRef | ResolvedService) -> ResolvedService:
+    return service.resolved if isinstance(service, ServiceRef) else service
 
 
 PERSON_FIELDS = frozenset(
@@ -100,8 +100,8 @@ def _build_person(
     return PersonInfo.model_validate(person_arguments)
 
 
-def person_invoke(
-    service: LazyService | ResolvedService, *, also_pass: tuple[str, ...] = ()
+def bind_person(
+    service: ServiceRef | ResolvedService, *, also_pass: tuple[str, ...] = ()
 ) -> Bind:
     """Bind the birth input and forward the remaining validated request fields."""
     forwarded_person_fields = PERSON_FIELDS.difference(also_pass)
@@ -126,8 +126,8 @@ def person_invoke(
     return bind
 
 
-def pair_invoke(
-    service: LazyService | ResolvedService,
+def bind_pair(
+    service: ServiceRef | ResolvedService,
     *,
     relationship_field: str = "relationship_type",
 ) -> Bind:
@@ -161,8 +161,21 @@ class ServiceInputProvider(Protocol):
     def service_inputs(self) -> Mapping[str, ServiceInput]: ...
 
 
-def raw_invoke(
-    service: LazyService | ResolvedService,
+def bind_request(service: ServiceRef | ResolvedService) -> Bind:
+    """Pass the validated request model directly as the single positional argument."""
+
+    def bind(request: BaseModel) -> BoundServiceCall:
+        return BoundServiceCall(
+            resolve_service(service),
+            (request,),
+            {},
+        )
+
+    return bind
+
+
+def bind_kwargs(
+    service: ServiceRef | ResolvedService,
     *,
     fixed: Mapping[str, ServiceInput] | None = None,
 ) -> Bind:

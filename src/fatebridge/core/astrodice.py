@@ -7,8 +7,7 @@ FateBridge owns the synthesis policy, which is not an ancient dice method.
 from __future__ import annotations
 
 import re
-from fractions import Fraction
-from typing import Any, Literal
+from typing import Any
 
 from fatebridge.core.astro.astrology_tables import (
     DOMICILE_RULERS,
@@ -141,43 +140,32 @@ def normalize_house(value: Any) -> int:
     return value
 
 
-def _validate_coordinate_aliases(
-    text: Any, gps: Any, *, axis: Literal["latitude", "longitude"]
-) -> None:
-    first = parse_geo_coordinate(text, axis=axis)
-    second = parse_geo_coordinate(gps, axis=axis)
-    if (text is not None and first is None) or (gps is not None and second is None):
-        raise ValueError("附加天象盘不能使用空白坐标")
-    if first is not None and second is not None:
-        distance = abs(Fraction(first) - Fraction(second))
-        if axis == "longitude":
-            distance = min(distance, 360 - distance)
-        if distance > 1e-9:
-            raise ValueError(
-                f"{axis}文本坐标与GPS坐标不一致；请仅提供一套已核对坐标，不能静默覆盖"
-            )
-
-
 def validate_context(
-    *, date: Any, time: Any, zone: Any, lat: Any, lon: Any, gps_lat: Any, gps_lon: Any
+    *,
+    date: str | None,
+    time: str | None,
+    timezone: str | None,
+    latitude: float | str | None,
+    longitude: float | str | None,
 ) -> None:
     if date is None and time is None:
-        if any(v is not None for v in (zone, lat, lon, gps_lat, gps_lon)):
+        if any(v is not None for v in (timezone, latitude, longitude)):
             raise ValueError(
-                "附加天象盘需要同时提供date/time/zone和经纬度；仅骰面解读请省略这些参数"
+                "附加天象盘需要同时提供date/time/timezone和经纬度；仅骰面解读请省略这些参数"
             )
         return
-    if not all(isinstance(v, str) and v.strip() for v in (date, time, zone)):
-        raise ValueError("附加天象盘需要明确date/time/zone，不能补默认时刻或时区")
-    if (lat is None and gps_lat is None) or (lon is None and gps_lon is None):
+    if not all(isinstance(v, str) and v.strip() for v in (date, time, timezone)):
+        raise ValueError("附加天象盘需要明确date/time/timezone，不能补默认时刻或时区")
+    parsed_lat = parse_geo_coordinate(latitude, axis="latitude")
+    parsed_lon = parse_geo_coordinate(longitude, axis="longitude")
+    if parsed_lat is None or parsed_lon is None:
         raise ValueError("附加天象盘需要明确经纬度，不能补默认地点")
-    _validate_coordinate_aliases(lat, gps_lat, axis="latitude")
-    _validate_coordinate_aliases(lon, gps_lon, axis="longitude")
+    assert isinstance(time, str)
     if (
         re.fullmatch(r"\d{1,2}:\d{1,2}(?::\d{1,2}(?:\.\d{1,6})?)?", time.strip())
         is None
     ):
-        raise ValueError("time须为本地HH:MM[:SS[.微秒]]，时区单独通过zone传入")
+        raise ValueError("time须为本地HH:MM[:SS[.微秒]]，时区单独通过timezone传入")
 
 
 def sign_condition(planet: str, sign: str) -> dict[str, Any]:

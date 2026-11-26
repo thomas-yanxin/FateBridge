@@ -34,25 +34,24 @@ def test_tools_endpoint_counts_match_catalog() -> None:
     assert payload["counts"]["mcp"] == len(mcp_specs())
     assert payload["counts"]["total"] == len(CATALOG)
     assert len(payload["tools"]) == len(CATALOG)
+    assert sum(payload["families"].values()) == len(CATALOG)
 
 
 def test_tools_endpoint_records_are_well_formed() -> None:
     payload = _tools_payload()
-    assert {t["tool"] for t in payload["tools"]} == {s.tool_name for s in CATALOG}
+    assert {t["tool"] for t in payload["tools"]} == {s.name for s in CATALOG}
     for record in payload["tools"]:
         assert record["summary"]
         assert record["family"]
-        assert {"cli", "rest_path", "mcp_name"} <= record["surfaces"].keys()
-        for param in record["parameters"]:
-            assert {"name", "type", "required", "description"} <= param.keys()
+        assert set(record["surfaces"]) == {"cli", "rest", "mcp"}
 
 
 def test_every_tool_declares_the_same_public_name_across_surfaces() -> None:
     for spec in CATALOG:
         surfaces = describe_spec(spec)["surfaces"]
-        assert surfaces["rest_path"]
-        assert surfaces["mcp_name"] == spec.tool_name
-        assert surfaces["cli"]
+        assert surfaces["rest"] == spec.rest_path
+        assert surfaces["mcp"] is spec.expose_mcp
+        assert surfaces["cli"] is True
 
 
 def test_mcp_transport_flags_are_self_describing() -> None:
@@ -64,22 +63,16 @@ def test_mcp_transport_flags_are_self_describing() -> None:
             return tool.input_schema["properties"]
 
     properties = asyncio.run(fetch())
-    assert "compact" not in properties
+    assert set(properties) == {"tool", "arguments", "detail", "fields", "as_of"}
     assert properties["detail"]["default"] == "compact"
-    assert properties["detail"]["enum"] == ["compact", "standard", "audit"]
-    for flag in (
-        "include_snapshot_text",
-        "fields",
-        "strict_fields",
-        "response_char_limit",
-    ):
-        assert properties[flag]["description"]
+    assert properties["detail"]["enum"] == ["compact", "audit"]
+    assert properties["fields"]["description"]
 
 
-def test_reference_discovery_uses_public_names_and_resources(
+def test_reference_discovery_uses_public_names(
     rest: TestClient, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    names = {"export_formats", "export_parse", "knowledge_catalog", "knowledge_read"}
+    names = {"knowledge_catalog", "knowledge_read"}
     records = {}
     for name in sorted(names):
         response = rest.get(
@@ -87,30 +80,43 @@ def test_reference_discovery_uses_public_names_and_resources(
         )
         assert response.status_code == 200, response.text
         (record,) = response.json()["tools"]
-        assert record["tool"] == record["surfaces"]["mcp_name"] == name
+        assert record["tool"] == name
+        assert record["surfaces"]["mcp"] is True
         assert (
             run(["discover", "--tool", name, "--surface", "mcp", "--detail", "summary"])
             == 0
         )
-        assert json.loads(capsys.readouterr().out)["tools"] == [record]
+        cli_record = json.loads(capsys.readouterr().out)["tools"][0]
+        assert {
+            k: v
+            for k, v in cli_record.items()
+            if k not in {"cli_example", "example_note"}
+        } == record
         records[name] = record["surfaces"]
 
-    retired = {"export_registry", "knowledge_registry", "calculate_knowledge_read"}
+    retired = {
+        "export_registry",
+        "export_formats",
+        "export_parse",
+        "knowledge_registry",
+        "calculate_knowledge_read",
+    }
     for name in sorted(retired):
-        assert rest.get("/api/tools", params={"tool": name}).status_code == 422
-        assert run(["discover", "--tool", name]) == 1
-        assert json.loads(capsys.readouterr().out)["issues"] == [
-            {"path": "tool", "code": "unknown_tool"}
-        ]
+        assert rest.get("/api/tools", params={"tool": name}).status_code == 404
+        assert run(["discover", "--tool", name]) == 2
+        issues = json.loads(capsys.readouterr().out)["issues"]
+        assert len(issues) == 1
+        assert issues[0]["path"] == "tool"
+        assert issues[0]["code"] == "unknown_tool"
 
-    async def read_resources() -> None:
-        async with Client(cached_mcp_app(families="export,knowledge")) as client:
+    async def check_mcp_discovery() -> None:
+        async with Client(cached_mcp_app(families="knowledge")) as client:
             assert set(await discover_capabilities(client)) == names
             for name in sorted(names):
-                manifest = json.loads(
-                    (await client.read_resource(f"fatebridge://tools/{name}"))[0].text
+                discovered = await client.call_tool(
+                    "discover_tools", {"tool": name, "detail": "summary"}
                 )
-                (contract,) = manifest["tools"]
+                (contract,) = discovered.structured_content["tools"]
                 assert contract["tool"] == name
                 assert contract["surfaces"] == records[name]
             for name in sorted(retired):
@@ -122,4 +128,4 @@ def test_reference_discovery_uses_public_names_and_resources(
                 assert result.is_error
                 assert result.structured_content["error_code"] == "unknown_tool"
 
-    asyncio.run(read_resources())
+    asyncio.run(check_mcp_discovery())

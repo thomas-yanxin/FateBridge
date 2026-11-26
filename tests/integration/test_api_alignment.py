@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 from fatebridge.application.tool_spec import ServiceResult
 from fatebridge.core.requests.astrology import (
-    AstroChartPolyRequest,
+    AstroNatalChartRequest,
     AstroRelativeFlatRequest,
 )
 from fatebridge.core.requests.compatibility import TwoPersonCompatibilityRequest
@@ -18,7 +18,6 @@ from fatebridge.core.requests.metaphysics import (
     TaiyiAnalysisRequest,
 )
 from fatebridge.core.requests.reference import (
-    ExportRegistryRequest,
     KnowledgeReadRequest,
     KnowledgeRegistryRequest,
 )
@@ -29,7 +28,11 @@ from fatebridge.core.requests.timing import (
     TimingAnalysisRequest,
 )
 from fatebridge.core.requests.western_timing import (
-    WesternTimingModuleRequest,
+    WesternFirdariaRequest,
+    WesternPrimaryDirectionsChartRequest,
+    WesternPrimaryDirectionsRequest,
+    WesternReturnTimingRequest,
+    WesternTimingBaseRequest,
     WesternTimingRequest,
 )
 from fatebridge.services.astrology import (
@@ -43,7 +46,11 @@ from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.services.western_timing import (
     calculate_western_timing_analysis as service_calculate_western_timing_analysis,
 )
-from tests.fixtures.surface_payloads import western_payload
+from tests.fixtures.surface_payloads import (
+    western_base_payload,
+    western_payload,
+    western_pd_payload,
+)
 from tests.fixtures.transports import mcp_payload
 from tests.support.transports import SPECS
 
@@ -82,7 +89,6 @@ def _build_metaphysics_payload() -> ServiceResult:
         "analysis_minute": 30,
         "analysis_timezone": "Asia/Shanghai",
         "analysis_longitude": 121.4737,
-        "selected_sections": ["起盘信息", "九宫方盘"],
         "use_true_solar_time": False,
     }
 
@@ -102,14 +108,12 @@ def _assert_run_metadata(payload: ServiceResult, *, tool_name: str) -> ServiceRe
     assert isinstance(metadata, dict)
     assert set(metadata) >= {
         "run_id",
-        "trace_id",
         "tool_name",
         "generated_at",
         "engine",
         "engine_is_approximate",
     }
     assert isinstance(metadata["run_id"], str) and metadata["run_id"]
-    assert isinstance(metadata["trace_id"], str) and metadata["trace_id"]
     assert metadata["tool_name"] == tool_name
     assert isinstance(metadata["engine"], str) and metadata["engine"]
     assert isinstance(metadata["engine_is_approximate"], bool)
@@ -133,7 +137,6 @@ def _assert_transport_parity(
 
     assert api_metadata["engine"] == mcp_metadata["engine"]
     assert api_metadata["run_id"] != mcp_metadata["run_id"]
-    assert api_metadata["trace_id"] != mcp_metadata["trace_id"]
 
 
 def _relative_request(mode: str = "Composite") -> AstroRelativeFlatRequest:
@@ -154,23 +157,15 @@ def _relative_request(mode: str = "Composite") -> AstroRelativeFlatRequest:
             for key, value in party.items()
             if key != "gender"
         }
-        | {"relative_mode": mode, "hsys": 0, "zodiacal": 0}
+        | {"relative_mode": mode, "house_system": 0, "zodiac_type": "Tropic"}
     )
 
 
 PARITY_CASES = [
     pytest.param(
-        "export_registry",
-        ExportRegistryRequest(technique="qimen"),
-        id="export_registry",
-    ),
-    pytest.param(
-        "knowledge_registry",
-        KnowledgeRegistryRequest(
-            domain="astro",
-            selected_sections=["目录概览", "astro"],
-        ),
-        id="knowledge_registry",
+        "knowledge_catalog",
+        KnowledgeRegistryRequest(domain="astro"),
+        id="knowledge_catalog",
     ),
     pytest.param(
         "knowledge_read",
@@ -178,23 +173,21 @@ PARITY_CASES = [
             domain="qimen",
             category="door",
             key="休门",
-            selected_sections=["知识正文"],
         ),
         id="knowledge_read",
     ),
     pytest.param(
-        "solarreturn",
-        WesternTimingModuleRequest(
-            **western_payload(),
-            selected_sections=["起盘信息", "星盘信息"],
-        ),
-        id="solarreturn",
+        "solar_return",
+        WesternReturnTimingRequest(**western_base_payload()),
+        id="solar_return",
     ),
     pytest.param(
-        "pdchart", WesternTimingModuleRequest(**western_payload()), id="pdchart"
+        "primary_directions_chart",
+        WesternPrimaryDirectionsChartRequest(**western_payload()),
+        id="primary_directions_chart",
     ),
     pytest.param(
-        "two_person_compatibility",
+        "bazi_compatibility",
         TwoPersonCompatibilityRequest(
             person1_name="甲",
             person1_birth_year=1990,
@@ -218,20 +211,18 @@ PARITY_CASES = [
             person2_birth_longitude=116.4074,
             relationship_type="marriage",
         ),
-        id="two_person_compatibility",
+        id="bazi_compatibility",
     ),
     pytest.param(
-        "astro_chart",
-        AstroChartPolyRequest(
+        "astrology_chart",
+        AstroNatalChartRequest(
             **_build_astro_birth_payload("张三", "男", "上海"),
         ),
-        id="chart",
+        id="astrology_chart",
     ),
+    pytest.param("relationship_chart", _relative_request(), id="relationship_chart"),
     pytest.param(
-        "astro_relative_chart", _relative_request(), id="astro_relative_chart"
-    ),
-    pytest.param(
-        "timing_analysis",
+        "bazi_timing",
         TimingAnalysisRequest(
             **_build_birth_payload(name="张三", gender="男", birth_place="上海"),
             analysis_year=2028,
@@ -240,29 +231,27 @@ PARITY_CASES = [
             analysis_hour=21,
             analysis_minute=55,
             analysis_age=38,
-            selected_sections=["查询信息", "综合影响"],
         ),
-        id="timing_analysis",
+        id="bazi_timing",
     ),
     pytest.param(
-        "dayun_analysis",
+        "bazi_luck_cycles",
         DayunAnalysisRequest(
             **_build_birth_payload(name="张三", gender="男", birth_place="上海"),
             analysis_age=38,
-            selected_sections=["查询信息", "大运信息"],
         ),
-        id="dayun_analysis",
+        id="bazi_luck_cycles",
     ),
     pytest.param(
-        "liunian_analysis",
+        "bazi_yearly_timing",
         LiunianAnalysisRequest(
             **_build_birth_payload(name="张三", gender="男", birth_place="上海"),
-            target_year=2028,
+            analysis_year=2028,
         ),
-        id="liunian_analysis",
+        id="bazi_yearly_timing",
     ),
     pytest.param(
-        "liushi_analysis",
+        "bazi_hourly_timing",
         LiushiAnalysisRequest(
             **_build_birth_payload(name="张三", gender="男", birth_place="上海"),
             analysis_year=2028,
@@ -270,9 +259,8 @@ PARITY_CASES = [
             analysis_day=6,
             analysis_hour=21,
             analysis_minute=55,
-            selected_sections=["查询信息", "流时信息"],
         ),
-        id="liushi_analysis",
+        id="bazi_hourly_timing",
     ),
     pytest.param(
         "qimen",
@@ -290,7 +278,6 @@ PARITY_CASES = [
             **{
                 **_build_metaphysics_payload(),
                 "gender": "男",
-                "selected_sections": ["起盘信息", "太乙"],
             }
         ),
         id="taiyi",
@@ -302,7 +289,6 @@ PARITY_CASES = [
                 **_build_metaphysics_payload(),
                 "gender": "男",
                 "di_fen": "酉",
-                "selected_sections": ["起盘信息", "金口诀四位"],
             }
         ),
         id="jinkou",
@@ -311,26 +297,21 @@ PARITY_CASES = [
 
 
 def test_catalog_descriptors_cover_reference_and_timing_families() -> None:
-    assert {item.key for item in CATALOG if item.family == "export"} == {
-        "export_registry",
-        "export_parse",
-    }
-    assert {item.key for item in CATALOG if item.family == "knowledge"} == {
-        "knowledge_registry",
+    assert {item.name for item in CATALOG if item.family == "knowledge"} == {
+        "knowledge_catalog",
         "knowledge_read",
     }
-    assert {item.key for item in CATALOG if item.family == "western_timing_tool"} >= {
-        "solarreturn",
-        "pdchart",
+    assert {item.name for item in CATALOG if item.family == "western_timing"} >= {
+        "western_timing",
+        "solar_return",
+        "primary_directions_chart",
     }
     for descriptor in CATALOG:
-        if descriptor.family in {"export", "knowledge", "western_timing_tool"}:
-            assert descriptor.mcp_name
+        if descriptor.family in {"knowledge", "western_timing"}:
+            assert descriptor.expose_mcp
             assert descriptor.rest_path.startswith("/api/")
             assert descriptor.request_model
             assert descriptor.summary
-        else:
-            pass
 
 
 @pytest.mark.parametrize(("tool_key", "calculation_request"), PARITY_CASES)
@@ -341,34 +322,34 @@ def test_catalog_tools_api_match_fastmcp_output(
     spec = SPECS[tool_key]
     assert spec.rest_path is not None
     response = rest.post(
-        spec.rest_path, json=calculation_request.model_dump(mode="json", by_alias=True)
+        spec.rest_path,
+        json=calculation_request.model_dump(mode="json", by_alias=True),
+        params={"detail": "audit"},
     )
     assert response.status_code == 200, response.text
     api_result = response.json()
     mcp_arguments = calculation_request.model_dump(
         exclude={"qimen_options"} if tool_key == "taiyi" else None
     )
-    mcp_result = mcp_payload(spec.tool_name, **mcp_arguments)
+    mcp_result = mcp_payload(spec.name, **mcp_arguments)
 
-    _assert_transport_parity(api_result, mcp_result, tool_name=spec.tool_name)
-    if tool_key == "two_person_compatibility":
+    _assert_transport_parity(api_result, mcp_result, tool_name=spec.name)
+    if tool_key == "bazi_compatibility":
         assert set(api_result["natal_contexts"]) == {"person1", "person2"}
         assert api_result["cross_chart_relations"]["pairs"]
         assert set(api_result["directional_ten_gods"]) == {
             "person1_to_person2",
             "person2_to_person1",
         }
-    elif tool_key == "astro_relative_chart":
+    elif tool_key == "relationship_chart":
         assert api_result["relationship_profile"]["relative_mode_normalized"] == (
             "composite"
         )
         assert api_result["relationship_profile"]["mode_status"] == "implemented"
-    else:
-        pass
 
 
 def test_relative_chart_api_rejects_invalid_relative_mode(rest: TestClient) -> None:
-    spec = SPECS["astro_relative_chart"]
+    spec = SPECS["relationship_chart"]
     assert spec.rest_path is not None
     response = rest.post(
         spec.rest_path,
@@ -379,35 +360,9 @@ def test_relative_chart_api_rejects_invalid_relative_mode(rest: TestClient) -> N
     assert "relative_mode" in response.json()["error"]
 
 
-def test_selected_sections_only_trim_export_text_not_structured_payload(
-    rest: TestClient,
-) -> None:
-    spec = SPECS["knowledge_read"]
-    assert spec.rest_path is not None
-    response = rest.post(
-        spec.rest_path,
-        json={
-            "domain": "qimen",
-            "category": "door",
-            "key": "休门",
-            "selected_sections": ["知识正文"],
-        },
-    )
-    assert response.status_code == 200, response.text
-    result = response.json()
-
-    assert result["snapshot_export"]["selected_sections"] == ["知识正文"]
-    assert "[知识正文]" in result["snapshot_export"]["export_text"]
-    assert "[查询信息]" not in result["snapshot_export"]["export_text"]
-    assert "[来源]" not in result["snapshot_export"]["export_text"]
-    assert "[查询信息]" in result["snapshot_text"]
-    assert result["rendered_text"]
-    assert result["key"] == "休门"
-
-
 def test_western_timing_catalog_preserves_service_binding() -> None:
     request = WesternTimingRequest(**western_payload())
-    spec = next(spec for spec in CATALOG if spec.key == "western_timing_analysis")
+    spec = next(spec for spec in CATALOG if spec.name == "western_timing")
     service, args, kwargs = spec.bind(request)
     assert service is service_calculate_western_timing_analysis
     assert args == ()
@@ -416,53 +371,48 @@ def test_western_timing_catalog_preserves_service_binding() -> None:
 
 
 def test_western_timing_module_catalog_selects_requested_technique() -> None:
-    modules = (
-        "solarreturn",
-        "lunarreturn",
-        "transit",
-        "solararc",
-        "givenyear",
-        "profection",
-        "pd",
-        "pdchart",
-        "zr",
-        "firdaria",
-        "decennials",
-    )
-    executed = {"solarreturn", "profection"}
-    request = WesternTimingModuleRequest(
-        **western_payload(),
-        selected_sections=["起盘信息"],
-    )
-    specs = {spec.key: spec for spec in CATALOG}
-    for tool_name in modules:
-        service, args, kwargs = specs[tool_name].bind(request)
+    modules = {
+        "solar_return": (WesternReturnTimingRequest, western_base_payload()),
+        "lunar_return": (WesternReturnTimingRequest, western_base_payload()),
+        "transit_chart": (WesternTimingBaseRequest, western_base_payload()),
+        "solar_arc": (WesternTimingBaseRequest, western_base_payload()),
+        "chart_for_year": (WesternTimingBaseRequest, western_base_payload()),
+        "profection": (WesternTimingBaseRequest, western_base_payload()),
+        "primary_directions": (WesternPrimaryDirectionsRequest, western_pd_payload()),
+        "primary_directions_chart": (
+            WesternPrimaryDirectionsChartRequest,
+            western_payload(),
+        ),
+        "zodiacal_releasing": (WesternTimingBaseRequest, western_base_payload()),
+        "firdaria": (WesternFirdariaRequest, western_base_payload()),
+        "decennials": (WesternTimingBaseRequest, western_base_payload()),
+    }
+    executed = {"solar_return", "profection"}
+    for tool_name, (model, raw_payload) in modules.items():
+        request = model(**raw_payload)
+        service, args, kwargs = SPECS[tool_name].bind(request)
         assert args == ()
-        assert kwargs["selected_sections"] == ["起盘信息"]
         assert kwargs["analysis_day"] == 20
         if tool_name in executed:
             result = service(*args, **kwargs)
             assert "error" not in result
             assert result[tool_name]
-            assert result["snapshot_export"]["selected_sections"] == ["起盘信息"]
-        else:
-            pass
 
 
 def test_astro_chart_catalog_preserves_service_binding() -> None:
-    request = AstroChartPolyRequest(
+    request = AstroNatalChartRequest(
         **_build_astro_birth_payload("张三", "男", "上海"),
     )
-    spec = next(spec for spec in CATALOG if spec.key == "astro_chart")
+    spec = next(spec for spec in CATALOG if spec.name == "astrology_chart")
     service, args, kwargs = spec.bind(request)
     assert service is service_calculate_core_chart_analysis
-    assert kwargs["chart_variant"] == "chart"
+    assert kwargs["apparent_model"] == "native"
     assert kwargs["birth_latitude"] == 31.2304
 
 
 def test_astro_relative_catalog_preserves_service_binding() -> None:
     request = _relative_request()
-    spec = SPECS["astro_relative_chart"]
+    spec = SPECS["relationship_chart"]
     service, args, kwargs = spec.bind(request)
     assert service is service_calculate_relative_chart_analysis
     assert kwargs["inner_payload"]["birth_latitude"] == 31.2304

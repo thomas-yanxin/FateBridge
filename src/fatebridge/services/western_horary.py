@@ -13,12 +13,6 @@ from fatebridge.core.astro.iers_ut1 import use_ut1_source
 from fatebridge.core.astro.lilly_orbs import DEFAULT_ORB_PROFILE, full_orbs
 from fatebridge.core.western_clock_origin import event_wall_datetime
 from fatebridge.core.western_event_clock import build_event_subject
-from fatebridge.services.snapshot_builders import (
-    format_snapshot_json,
-)
-from fatebridge.services.snapshot_builders import (
-    render_snapshot_text as _render_snapshot_text,
-)
 from fatebridge.utils.errors import handle_calculation_error
 from fatebridge.utils.house_systems import house_system_fields, normalize_house_system
 
@@ -44,7 +38,6 @@ def calculate_horary(
     question_clock_basis: str = "civil",
     question_hour_origin: str = "midnight",
     ut1_source: str = "swiss_delta_t",
-    render_snapshot: bool = True,
 ) -> dict[str, Any]:
     """按提问时刻核算相位、月亮事件与原典条件的核验状态。"""
     label = "卜卦证据"
@@ -108,7 +101,7 @@ def calculate_horary(
                 "engine": "fatebridge-offline",
             }
             summary = f"卜卦（{payload['category_label']}），所问宫位为第{payload['quesited_house']}宫。"
-            result = {
+            return {
                 "analysis_type": "西占卜卦",
                 "engine": "fatebridge-offline",
                 "analysis_context": context,
@@ -117,41 +110,5 @@ def calculate_horary(
                 "horary": payload,
                 "summary": summary,
             }
-            if render_snapshot:
-                sections = [
-                    ("起盘信息", format_snapshot_json(context)),
-                    (
-                        "历法日期换算",
-                        format_snapshot_json(calendar_conversion),
-                    ),
-                    (
-                        "钟时与物理时刻",
-                        format_snapshot_json(clock_conversion),
-                    ),
-                    (
-                        "主星与原典条件",
-                        format_snapshot_json(
-                            {
-                                "ascendant": payload["ascendant"],
-                                "significators": payload["significators"],
-                                "planets": payload["planets"],
-                                "fortune": payload["fortune"],
-                                "perfection": payload["perfection"],
-                                "rule_profile": payload["rule_profile"],
-                            },
-                        ),
-                    ),
-                    (
-                        "月亮事件与起盘条件",
-                        format_snapshot_json(
-                            {
-                                "moon": payload["moon"],
-                                "radicality": payload["radicality"],
-                            },
-                        ),
-                    ),
-                ]
-                result["snapshot_text"] = _render_snapshot_text(sections)
-            return result
     except Exception as exc:
         return handle_calculation_error(exc, label)

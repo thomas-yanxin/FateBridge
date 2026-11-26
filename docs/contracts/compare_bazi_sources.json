@@ -56,9 +56,7 @@
       "current_calculation.strength_level",
       "source_comparison",
       "summary"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,

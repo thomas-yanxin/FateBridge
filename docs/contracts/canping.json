@@ -2,7 +2,7 @@
   "call_guidance": {
     "birth_clock": "numerology_evidence.birth_clock保存同次民用时刻、UTC瞬间、所选计算钟面、经度来源与是否使用。钟表时未给经度为null；太阳钟面不是新的物理瞬间。可用birth_clock视图读取。",
     "evidence": "按年纳音部、顺逆编号与实际男女或岁运条文解释，缺条和缺字只表示语料缺口。",
-    "known_inputs": "出生时间与性别须明确提供；空白时间不能补零点。时间字段是当地钟时，时区放zone；显式零点有效。真太阳时默认开启，须明确lon或gps_lon；GPS优先，0度有效。缺失不可套上海或0度，不为通过调用自动改为钟表时。",
+    "known_inputs": "出生时间与性别须明确提供；空白时间不能补零点。时间字段是当地钟时，时区放timezone；显式零点有效。真太阳时默认开启，须明确经度longitude，0度有效。缺失不可套上海或0度，不为通过调用自动改为钟表时。",
     "method": "默认gu用真实日支，ming为显式月支变法；二者规则来源与结果分别说明。",
     "pillar_links": "pillar_links视图核numerology_evidence.pillar_links的实际年柱起月干、所用日柱起时干、原句起头与顺行步数。立春前不用公历年干，晚子及太阳钟跨日不用未换日日干替代。干序衔接匹配不证明原典月界、日界、历史钟制或全历法准确；原书个别形式算例含衔接冲突，不能据数算可复现当真实出生盘。",
     "text_selection": "按benming或实际查询当段verses的selectionShun/selectionNi读五行、编号和上男／中女／下共用岁运栏，不能串栏。pair_resolution区分顺逆同号与两号、单向有文；原书允许顺有逆无或逆有顺无，本地缺行不等于原典圈空，也不能断现实灾祸。1123格经首次目校及同一审阅者原图复读确定；水、火、木、金、土各234格全段目读，其中分别10、11、13、11、2格未决；全表1170格均已目读，47格未决不计入已确定数；目读覆盖不等于读法全部确认、原典全书符合或独立复核完成；火2743、2248及木2816、2917、3315、2424编号经原图复查仍有印章遮盖或首位淡损，暂按继承键定位，number_attribution_status=provisional_inherited_key，三栏均保留未定，正文或圈空可辨不代表号文归属已核；number_reading_evidence保留原图编号片段和unresolved状态，body_reading_status仅分列此前字面正文可读／全圈空／局部圈空／编辑疑读，body_evidence_basis说明非本轮新校正文；14格正文可读不增加已确定数，六行十八格整体仍source_reading_uncertain；part_coverage分部列明覆盖，仍待独立复核。 reading_revision保留原图复读前疑读，rereading_witness记录同馆藏IIIF原图区域；additional_rereading_witnesses另存后续各批，水部旧见证不被覆盖；土部三格复读一格确定、两格仍未定；3377女文晝字形不代表词义已定，晝亦可作畫异体。3379原有檠／晝文字保持，拟改撤回，不生成虚假修订或新增确认数；金部15格旧疑读复读4格确定、11格仍未定，保留麴蘖／追遊世；3314时运只明花字且仍带□，不得抄同号女文或计为整格已核，金部末十一条号文归属问题与字形校勘分开；木部四格旧疑读复读三格确定、一格仍未定，保留撫手／玉藍／門帳字面；2519只补明傾而后一字□不补，不将部分改读计为整格已核；火部11格旧疑读复读六格确定、五格仍未定，旧鴛□改蒼鷹、浩雲按原图保留，暗字可辨但末字仍□不升级，不依熟语改文；水部旧40格疑读经复读30格确定、10格仍未决，新增编号格、独立审阅者、命例和历法时刻均为0，不按典故补字。金部末十一行按所选底本原页号文归属取条，继承同号旧文保留，计算编号不重映射；差异原因及继承语料来源未明，不泛称所有版本错排。○为原页圈空，□为编辑未定；不得按典故补字；2869附诗编号与公式不合、适用未明，未作为通用补文。 所选格的witnesses为文明书局本局部对读，主选文仍为textShun/Ni；不得按吉凶择本、串栏或以对读文补主本○/□。different_text只指字符串不同，未自动裁定版本异文或错字；同一审阅者对读不算独立复核，主本1123格校勘数不随对读36格增加。",
@@ -98,9 +98,7 @@
       "canping_timing.profile_id",
       "canping_timing.schedule_basis",
       "numerology_evidence"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,
@@ -149,40 +147,15 @@
         "type": "string"
       },
       "gender": {
-        "description": "需明确男/女：选择男女条文及附子平法配运方向；接受male/female，不默认性别。",
+        "description": "性别 男/女 — 影响起命排运与男女条文。接受 男/女、male/female 等写法；必须明确提供，不默认性别。",
         "title": "Gender",
         "type": "string"
       },
-      "gps_lat": {
+      "latitude": {
         "anyOf": [
           {
             "type": "number"
           },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "GPS latitude",
-        "title": "Gps Lat"
-      },
-      "gps_lon": {
-        "anyOf": [
-          {
-            "maximum": 180,
-            "minimum": -180,
-            "type": "number"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Explicit numeric GPS longitude; preferred over lon; zero is valid",
-        "title": "Gps Lon"
-      },
-      "lat": {
-        "anyOf": [
           {
             "type": "string"
           },
@@ -192,10 +165,13 @@
         ],
         "default": null,
         "description": "Latitude text or decimal (optional)",
-        "title": "Lat"
+        "title": "Latitude"
       },
-      "lon": {
+      "longitude": {
         "anyOf": [
+          {
+            "type": "number"
+          },
           {
             "type": "string"
           },
@@ -205,7 +181,7 @@
         ],
         "default": null,
         "description": "Longitude text or decimal; required when true solar time is on",
-        "title": "Lon"
+        "title": "Longitude"
       },
       "method": {
         "default": "gu",
@@ -218,17 +194,11 @@
         "type": "string"
       },
       "time": {
-        "description": "Known birth local time HH:MM[:SS[.ffffff]], up to six fractional digits; required, blank is not midnight; timezone goes in zone. Supplied components are retained separately from zero calculation defaults. Textual digits do not certify birth-record precision or imply an uncertainty interval.",
+        "description": "Known birth local time HH:MM[:SS[.ffffff]], up to six fractional digits; required, blank is not midnight; timezone goes in timezone. Supplied components are retained separately from zero calculation defaults. Textual digits do not certify birth-record precision or imply an uncertainty interval.",
         "title": "Time",
         "type": "string"
       },
-      "use_true_solar_time": {
-        "default": true,
-        "description": "Apply true solar time correction (needs lon); default on — 数算 derives from the BaZi pillars",
-        "title": "Use True Solar Time",
-        "type": "boolean"
-      },
-      "zone": {
+      "timezone": {
         "anyOf": [
           {
             "type": "string"
@@ -239,7 +209,13 @@
         ],
         "default": "+08:00",
         "description": "IANA zone or UTC offset; omitted/null means fixed +08:00, not historical Asia/Shanghai. Blank/invalid zones and nonexistent clocks are rejected. Repeated clocks require a confirmed birth_utc_offset; the IANA zone remains in use for later boundaries.",
-        "title": "Zone"
+        "title": "Timezone"
+      },
+      "use_true_solar_time": {
+        "default": true,
+        "description": "Apply true solar time correction (needs longitude); default on — 数算 derives from the BaZi pillars",
+        "title": "Use True Solar Time",
+        "type": "boolean"
       }
     },
     "required": [

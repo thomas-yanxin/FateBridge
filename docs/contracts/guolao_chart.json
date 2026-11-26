@@ -63,9 +63,7 @@
       "guolao.bodies",
       "guolao.rulesets",
       "guolao.validation"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,
@@ -87,7 +85,7 @@
       },
       "birth_clock_basis": {
         "default": "civil",
-        "description": "Confirmed basis of the supplied birth label. Civil retains its timezone policy. LMT/LAT use longitude and the shared modeled UT1/TT inverse; omit birth_timezone. LMT uses its recorded label for the nominal hour unless use_true_solar_time=true selects the same natal Sun's apparent hour without changing the epoch. LAT already supplies an apparent label; either flag keeps its nominal input hour and applies no second correction. Do not infer an unknown historical clock basis. When UTC is outside datetime range, second60, or lacks a unique label, Guolao retains native TT/UT1 without a surrogate civil instant. Solar-day numerical ambiguity, unavailable month calendars, source coverage and native ordering ties remain explicit limits; no classical clock calibration or prediction certification.",
+        "description": "Confirmed basis of the supplied birth clock label: civil uses birth_timezone; local_mean_solar (LMT) or local_apparent_solar (LAT) uses longitude and modeled UT1/TT with birth_timezone omitted.",
         "enum": [
           "civil",
           "local_mean_solar",
@@ -122,7 +120,7 @@
           }
         ],
         "default": null,
-        "description": "Birth latitude. Optional for core chart endpoints when FateBridge can infer it from a supported birth_place.",
+        "description": "Birth latitude (optional)",
         "title": "Birth Latitude"
       },
       "birth_longitude": {
@@ -137,7 +135,7 @@
           }
         ],
         "default": null,
-        "description": "Birth longitude. Optional for core chart endpoints when FateBridge can infer it from a supported birth_place.",
+        "description": "Birth longitude (optional)",
         "title": "Birth Longitude"
       },
       "birth_microsecond": {
@@ -178,7 +176,7 @@
       },
       "birth_second": {
         "default": 0,
-        "description": "Recorded birth second, if known. Omitted seconds use the start of the supplied minute; this does not certify exact recording precision. Leap-second labels are not represented.",
+        "description": "Recorded birth second (0..59), if known. Omitted seconds use the start of the supplied minute; this does not certify exact recording precision. Leap-second labels are not represented.",
         "maximum": 59,
         "minimum": 0,
         "title": "Birth Second",
@@ -194,7 +192,7 @@
           }
         ],
         "default": null,
-        "description": "For civil input: IANA name or explicit UTC offset; omit only if birth_place resolves a timezone. Unresolved missing timezones are rejected and are not defaulted to UTC. For explicit LMT/LAT input this field must be omitted: a solar label is not a civil timezone. Converted UTC labels and native TT/UT1 are computation references, not inferred historical zones; no surrogate datetime is created for second60 or out-of-range UTC labels.",
+        "description": "Birth timezone (IANA name or UTC offset). Optional: when omitted, FateBridge may resolve it from a supported birth_place. Western charts and timing reject an unresolved civil timezone; coordinates alone do not establish a zone. Supply UTC explicitly when that is the confirmed recorded basis. Place inference does not certify historical clock accuracy.",
         "title": "Birth Timezone"
       },
       "birth_year": {
@@ -262,20 +260,21 @@
         "description": "Optional Guolao anchor policy. term_instants preserves v7. source_solar_days_winter_exclusive/inclusive require use_true_solar_time=true or an explicit LAT input: use the same Sun/UT1 apparent-solar day, include the whole Major Cold, summer-solstice and Minor Heat days, and exclude/include the winter-solstice day. These explicit v8 hypotheses do not adjudicate historical day boundaries or predictive validity; numerical ambiguity and model changes error without fallback.",
         "title": "Guolao Seasonal Anchor Policy"
       },
-      "hsys": {
+      "house_system": {
         "anyOf": [
           {
-            "maximum": 8,
-            "minimum": 0,
             "type": "integer"
+          },
+          {
+            "type": "string"
           },
           {
             "type": "null"
           }
         ],
         "default": null,
-        "description": "Optional offline house system override; if omitted, FateBridge keeps each chart variant's historical default. Explicit values currently support 0=whole_sign, 1=Alcabitus, 2=Regiomontanus, 3=Placidus, 4=Koch, 5=Vehlow Equal, 6=Polich Page, 7=Sripati, 8=equal_mc Explicit values must be integer codes0..8; boolean, floating-point, blank and out-of-range values are rejected.",
-        "title": "Hsys"
+        "description": "Optional offline house system override; if omitted, FateBridge keeps each chart variant's historical default. Accepts SE letters, keys, or integer codes 0..8 (0=whole_sign, 1=Alcabitus, 2=Regiomontanus, 3=Placidus, 4=Koch, 5=Vehlow Equal, 6=Polich Page, 7=Sripati, 8=equal_mc). Explicit values must be integer codes 0..8 or supported offline house letters/names (W, B, R, P, K, V, T, S, D); boolean, floating-point, blank and unsupported values are rejected.",
+        "title": "House System"
       },
       "name": {
         "anyOf": [
@@ -296,18 +295,22 @@
         "title": "Use True Solar Time",
         "type": "boolean"
       },
-      "zodiacal": {
+      "zodiac_type": {
         "anyOf": [
           {
-            "type": "integer"
+            "enum": [
+              "Tropic",
+              "Sidereal"
+            ],
+            "type": "string"
           },
           {
             "type": "null"
           }
         ],
         "default": null,
-        "description": "Optional offline zodiac override; if omitted, FateBridge keeps each chart variant's historical default. Explicit values currently support 0=tropical and 1=sidereal(Lahiri-like)",
-        "title": "Zodiacal"
+        "description": "Optional offline zodiac override ('Tropic' or 'Sidereal'); if omitted, FateBridge keeps each chart variant's historical default.",
+        "title": "Zodiac Type"
       }
     },
     "required": [
@@ -356,6 +359,7 @@
       "role": "calculation",
       "selector_fields": [
         "ephemeris_policy",
+        "house_system",
         "birth_clock_basis",
         "guolao_month_basis",
         "guolao_seasonal_anchor_policy"
@@ -403,6 +407,7 @@
       "role": "calculation",
       "selector_fields": [
         "ephemeris_policy",
+        "house_system",
         "birth_clock_basis",
         "guolao_month_basis",
         "guolao_seasonal_anchor_policy"

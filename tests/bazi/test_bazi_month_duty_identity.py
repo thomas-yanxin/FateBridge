@@ -115,7 +115,7 @@ def test_returned_source_identity_and_occurrences_cannot_mutate_cache_or_inputs(
 def test_identity_layer_matches_actual_rest_native_mcp_cli_for_all_ten_tools(
     topic, surface_calls
 ) -> None:
-    spec = SPECS["bazi_" + topic]
+    spec = SPECS["bazi_birth_chart" if topic == "birth" else "bazi_" + topic]
     prefix = "bazi_birth" if topic == "birth" else topic + "_analysis"
     chain = prefix + (
         ".structure_profile.evidence_chain" if topic == "birth" else ".evidence_chain"
@@ -136,10 +136,8 @@ def test_identity_layer_matches_actual_rest_native_mcp_cli_for_all_ten_tools(
     }
     opts = dict(
         as_of=AS_OF,
+        detail="audit",
         fields=[path],
-        strict_fields=True,
-        include_snapshot_text=False,
-        response_char_limit=0,
     )
     http, protocol, code, cli = surface_calls(
         spec,
@@ -147,12 +145,8 @@ def test_identity_layer_matches_actual_rest_native_mcp_cli_for_all_ten_tools(
         params=opts,
         options=opts,
         flags=[
-            "--response-char-limit",
-            "0",
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
+            "--detail",
+            "audit",
             "--fields",
             path,
         ],

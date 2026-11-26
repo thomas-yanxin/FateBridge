@@ -160,7 +160,7 @@ rest = _shared_rest
 def test_all_ten_calendar_views_publish_actual_bundled_model_on_three_surfaces(
     topic, preserve_provider, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    spec = SPECS["bazi_" + topic]
+    spec = SPECS["bazi_birth_chart" if topic == "birth" else "bazi_" + topic]
     payload = {**inputs(spec), "use_true_solar_time": False}
     fields = suggested_fields(spec, view="calendar_basis")
     with TemporaryDirectory(prefix="bazi-bundled-view-") as empty:
@@ -168,16 +168,14 @@ def test_all_ten_calendar_views_publish_actual_bundled_model_on_three_surfaces(
         response = rest.post(
             spec.rest_path,
             json=payload,
-            params=[("fields", p) for p in fields]
-            + [("strict_fields", "true"), ("include_snapshot_text", "false")],
+            params=[("detail", "audit")] + [("fields", p) for p in fields],
         )
         protocol = asyncio.run(
             native(
                 spec,
                 payload,
+                detail="audit",
                 fields=fields,
-                strict_fields=True,
-                include_snapshot_text=False,
             )
         )
         code, cli = call_cli(
@@ -186,14 +184,10 @@ def test_all_ten_calendar_views_publish_actual_bundled_model_on_three_surfaces(
             tmp_path,
             capsys,
             flags=[
+                "--detail",
+                "audit",
                 "--fields",
                 *fields,
-                "--strict-fields",
-                "true",
-                "--include-snapshot-text",
-                "false",
-                "--response-char-limit",
-                "0",
             ],
         )
     assert response.status_code == 200 and code == 0 and not protocol.is_error

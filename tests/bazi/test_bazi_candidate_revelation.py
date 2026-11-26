@@ -139,7 +139,7 @@ def test_revelation_gate_is_a_role_rule_for_every_day_stem(
 def test_revelation_precondition_matches_across_three_public_surfaces(
     hour: int, status: str, surface_calls
 ) -> None:
-    spec = SPECS["bazi_birth"]
+    spec = SPECS["bazi_birth_chart"]
     # Fictional fully specified interface controls; source person identity is
     # not inferred from matching four pillars or this selected civil date.
     payload = dict(
@@ -155,10 +155,8 @@ def test_revelation_precondition_matches_across_three_public_surfaces(
     )
     field = "bazi_birth.structure_profile.candidate_selection"
     options = dict(
+        detail="audit",
         fields=[field],
-        strict_fields=True,
-        include_snapshot_text=False,
-        response_char_limit=0,
     )
     response, protocol, code, local = surface_calls(
         spec,
@@ -166,14 +164,10 @@ def test_revelation_precondition_matches_across_three_public_surfaces(
         params=options,
         options=options,
         flags=[
+            "--detail",
+            "audit",
             "--fields",
             field,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
         ],
         cli_first=False,
     )

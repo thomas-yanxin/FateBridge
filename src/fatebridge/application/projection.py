@@ -1,4 +1,4 @@
-"""Shared result field projection and invalid-path reporting."""
+"""Shared strict result field projection and actionable invalid-path reporting."""
 
 from collections.abc import Iterable
 from typing import Literal
@@ -15,58 +15,53 @@ def project_fields(
     result: dict[str, JsonValue],
     fields: Iterable[str] | None,
     *,
-    strict_fields: bool = False,
     validate_against: ServiceResult | None = None,
 ) -> ServiceResult:
-    """Select dotted object paths and keep the run receipt whole.
-
-    A whole parent takes precedence. For shaped child results, callers may
-    validate a path against the original facts before detail and text omission.
-    """
+    """Select dotted object paths strictly and keep the run receipt whole."""
     if fields is None:
         return result
-    fields = list(fields)
-    if not fields:
+    field_list = list(fields)
+    if not field_list:
         return result
     issues = projection_issues(
-        result if validate_against is None else validate_against, fields
+        result if validate_against is None else validate_against, field_list
     )
-    if issues and strict_fields:
-        raise ParameterError("输出字段投影无效", [{**issue} for issue in issues])
+    if issues:
+        raise ParameterError("输出字段投影无效", issues)
+    return _apply_projection(result, field_list)
+
+
+def project_present_fields(
+    result: dict[str, JsonValue],
+    fields: Iterable[str] | None,
+) -> ServiceResult:
+    """Project existing paths for internal compact views without failing on absent variant keys."""
+    if fields is None:
+        return result
+    field_list = [path for path in fields if not projection_issues(result, [path])]
+    if not field_list:
+        return result
+    return _apply_projection(result, field_list)
+
+
+def _apply_projection(result: dict[str, JsonValue], fields: list[str]) -> ServiceResult:
     tree = build_selection_tree(fields)
     tree["run_metadata"] = True
-    projected: dict[str, JsonValue] = {
+    return {
         name: apply_selection(result[name], child)
         for name, child in tree.items()
         if name in result
     }
-    if issues:
-        projected["projection_warnings"] = [{**issue} for issue in issues]
-    return projected
-
-
-def merge_projected_fields(
-    base: dict[str, JsonValue], selected: dict[str, JsonValue]
-) -> dict[str, JsonValue]:
-    """Add explicit facts to an existing view without mutating either projection."""
-    merged = dict(base)
-    for name, value in selected.items():
-        current = merged.get(name)
-        merged[name] = (
-            merge_projected_fields(current, value)
-            if isinstance(current, dict) and isinstance(value, dict)
-            else value
-        )
-    return merged
 
 
 def projection_issues(
     result: dict[str, JsonValue], fields: list[str]
-) -> list[dict[str, str]]:
-    issues: list[dict[str, str]] = []
+) -> list[dict[str, object]]:
+    issues: list[dict[str, object]] = []
     for path in dict.fromkeys(fields):
         parts = path.split(".")
         code = ""
+        constraints: dict[str, object] | None = None
         if any(not part or part.strip() != part for part in parts):
             code = "invalid_projection_path"
         else:
@@ -77,10 +72,14 @@ def projection_issues(
                     break
                 if part not in value:
                     code = "unknown_projection_path"
+                    constraints = {"available": sorted(value.keys())[:30]}
                     break
                 value = value[part]
         if code:
-            issues.append({"path": path, "code": code})
+            issue: dict[str, object] = {"path": path, "code": code}
+            if constraints is not None:
+                issue["constraints"] = constraints
+            issues.append(issue)
     return issues
 
 

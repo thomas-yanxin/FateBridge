@@ -17,6 +17,7 @@ from fatebridge.core.de440_solar import MODEL_ID as DE440_MODEL_ID
 from fatebridge.core.ephemeris_paths import ephemeris_search_directories
 from fatebridge.core.error_budget import declared_error_budget
 from fatebridge.core.execution_context import CallClock, ExecutionOptions
+from fatebridge.core.reproducibility import ReproducibilityPolicy
 from fatebridge.fetch_vsop2013 import MODEL_ID as VSOP2013_MODEL_ID
 
 METADATA_SCHEMA_VERSION = "2.0"
@@ -43,14 +44,13 @@ class ReplayReceipt(TypedDict):
 
 
 class ExecutionReceipt(TypedDict):
-    metadata_schema_version: str
-    package_version: str
-    duration_ms: float
     effective_time: EffectiveTimeReceipt
-    determinism: DeterminismReceipt
-    replay: ReplayReceipt
     warnings: list[str]
-    parent_run_id: NotRequired[str]
+    replay: NotRequired[ReplayReceipt]
+    metadata_schema_version: NotRequired[str]
+    package_version: NotRequired[str]
+    duration_ms: NotRequired[float]
+    determinism: NotRequired[DeterminismReceipt]
     runtime: NotRequired[dict[str, JsonValue]]
     provenance: NotRequired[dict[str, list[str]]]
     calculation_evidence: NotRequired[dict[str, JsonValue]]
@@ -222,7 +222,7 @@ def execution_receipt(
     replay_overrides: dict[str, JsonValue],
     compact_receipt: bool = False,
 ) -> ExecutionReceipt:
-    policy = spec.reproducibility
+    policy = spec.reproducibility or ReproducibilityPolicy()
     as_of = clock.instant.isoformat().replace("+00:00", "Z")
     time_defaults = [
         field
@@ -231,38 +231,41 @@ def execution_receipt(
     ]
     if spec.resolve_time_defaults is not None:
         time_defaults = spec.resolve_time_defaults(result, time_defaults)
+    warnings = (
+        ["current_time_frozen"]
+        if clock.reads and (time_defaults or policy.implicit_current_time)
+        else []
+    ) + (["random_seed_generated"] if generated_seed else [])
     receipt: ExecutionReceipt = {
-        "metadata_schema_version": METADATA_SCHEMA_VERSION,
-        "package_version": __version__,
-        "duration_ms": round(elapsed_ms, 3),
         "effective_time": {"as_of": as_of, "clock_timezones": sorted(clock.reads)},
-        "determinism": {
-            "uses_current_time": bool(clock.reads)
-            and bool(time_defaults or policy.implicit_current_time),
-            "current_time_fields_defaulted": time_defaults if clock.reads else [],
-            "randomness_used": bool(replay_overrides),
-            "seed_generated": generated_seed,
-            "replayable_with_receipt": True,
-            "scope": "business payload in identical implementation/data/runtime; metadata IDs and duration vary",
-        },
-        "replay": {
+        "warnings": warnings,
+    }
+    if replay_overrides:
+        receipt["replay"] = {
             "as_of": as_of,
             "overrides": replay_overrides,
             "requires_original_input": True,
-        },
-        "warnings": (
-            (
-                ["current_time_frozen"]
-                if clock.reads and (time_defaults or policy.implicit_current_time)
-                else []
-            )
-            + (["random_seed_generated"] if generated_seed else [])
-        ),
-    }
-    if options.parent_run_id is not None:
-        receipt["parent_run_id"] = options.parent_run_id
+        }
     if compact_receipt:
         return receipt
+
+    receipt["metadata_schema_version"] = METADATA_SCHEMA_VERSION
+    receipt["package_version"] = __version__
+    receipt["duration_ms"] = round(elapsed_ms, 3)
+    receipt["determinism"] = {
+        "uses_current_time": bool(clock.reads)
+        and bool(time_defaults or policy.implicit_current_time),
+        "current_time_fields_defaulted": time_defaults if clock.reads else [],
+        "randomness_used": bool(replay_overrides),
+        "seed_generated": generated_seed,
+        "replayable_with_receipt": True,
+        "scope": "business payload in identical implementation/data/runtime; metadata IDs and duration vary",
+    }
+    receipt["replay"] = {
+        "as_of": as_of,
+        "overrides": replay_overrides,
+        "requires_original_input": True,
+    }
 
     observed_provenance = provenance_values(
         {key: value for key, value in result.items() if key != "run_metadata"}

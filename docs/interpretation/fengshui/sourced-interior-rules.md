@@ -86,7 +86,7 @@ IR5 与旧工位尖角观察另保留 WOFS／Joey Yap 的作者分歧：后者�
 
 ## 结果、候选与动作边界
 
-只在提交了对应输入时读取 `layout_analysis.interior_analysis` 或 `layout_analysis.material_analysis`；未提交时这些路径可以不存在，不能无条件加进 `strict_fields=true` 的首轮投影。所有风水说明仍保留 `rulesets` 与 `rule_trace`，按具体结果交付本次作者、版本、来源及适用范围。
+只在提交了对应输入时读取 `layout_analysis.interior_analysis` 或 `layout_analysis.material_analysis`；未提交时这些路径可以不存在，不能无条件加进严格校验的 `fields` 投影。所有风水说明仍保留 `rulesets` 与 `rule_trace`，按具体结果交付本次作者、版本、来源及适用范围。
 
 室内关系 findings 的状态分别为 `authored_caution`（已确认关系成立的作者提醒）、`not_present`（已确认不成立）、`needs_confirmation`（显式未知）或 `candidate_only`（照片候选）。具体 `rule_id`、`predicate`、`exceptions` 和 `method_disagreements` 保留适用范围及分歧。新关系动作只会是 `blocked` 或 `conditional_option`，本模块不确认新位置几何／可容纳条件，因此不返回 ready；没有登记的非结构动作则明示 `no_registered_nonstructural_action`，不能为凑建议编搬改方案。
 

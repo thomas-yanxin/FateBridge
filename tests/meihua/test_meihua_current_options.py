@@ -157,7 +157,7 @@ def test_xiangbei_keeps_orientation_and_motion_separate(
         assert clause["full_clause_applies"] is None
 
 
-@pytest.mark.parametrize("key", ["meihua_cast", "meihua_analysis"])
+@pytest.mark.parametrize("key", ["meihua_cast", "meihua_time_cast"])
 def test_xiangbei_projects_and_rejects_contradictions_on_all_transports(
     key: str, surface_calls
 ) -> None:
@@ -185,9 +185,6 @@ def test_xiangbei_projects_and_rejects_contradictions_on_all_transports(
     projection = dict(
         detail="audit",
         fields=["interpretation.motion_context"],
-        strict_fields=True,
-        response_char_limit=0,
-        include_snapshot_text=False,
     )
     http, mcp, code, cli = surface_calls(
         SPECS[key],

@@ -12,7 +12,7 @@ from pydantic import ValidationError
 from fatebridge.cli import run
 from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.output import FengshuiOutput
-from fatebridge.services.fengshui import assess
+from fatebridge.services.fengshui import calculate_fengshui_assessment as _assess
 from tests.fixtures.fengshui import payload
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import call_calculation, rest_client
@@ -21,6 +21,10 @@ from tests.unit_test.fixtures.fengshui_layout import (
     annual_inputs,
     form_inputs,
 )
+
+
+def assess(**kwargs):
+    return _assess(AssessRequest.model_validate(kwargs))
 
 
 @pytest.mark.parametrize("purpose", ["desk", "bed", "stove"])
@@ -386,15 +390,19 @@ def test_supplements_match_real_rest_mcp_cli_and_output_schema(
             return await call_calculation(
                 client,
                 "fengshui_assess",
-                {"response_char_limit": 0, **inputs},
+                {"detail": "audit", **inputs},
                 raise_on_error=False,
             )
 
-    rest = rest_client(monkeypatch).post("/api/fengshui/assess", json=inputs)
+    rest = rest_client(monkeypatch).post(
+        "/api/fengshui/assess", json=inputs, params={"detail": "audit"}
+    )
     protocol = asyncio.run(call())
     path = tmp_path / "layout.json"
     path.write_text(json.dumps(inputs))
-    assert run(["fengshui_assess", "--request-file", str(path)]) == 0
+    assert (
+        run(["fengshui_assess", "--request-file", str(path), "--detail", "audit"]) == 0
+    )
     cli = json.loads(capsys.readouterr().out)
     assert rest.status_code == 200 and not protocol.is_error
     assert (
@@ -414,7 +422,7 @@ def test_form_only_first_view_can_project_on_real_mcp_without_missing_chart_path
     from fatebridge.mcp_server import create_mcp_app
     from fatebridge.services.tool_catalog import CATALOG
 
-    spec = next(s for s in CATALOG if s.key == "fengshui_assess")
+    spec = next(s for s in CATALOG if s.name == "fengshui_assess")
 
     async def call():
         async with Client(create_mcp_app()) as client:
@@ -423,9 +431,8 @@ def test_form_only_first_view_can_project_on_real_mcp_without_missing_chart_path
                 "fengshui_assess",
                 {
                     **form_inputs(),
+                    "detail": "audit",
                     "fields": suggested_fields(spec),
-                    "strict_fields": True,
-                    "include_snapshot_text": False,
                 },
             )
 

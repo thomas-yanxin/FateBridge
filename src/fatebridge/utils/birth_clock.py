@@ -80,28 +80,3 @@ def birth_clock_input_receipt(
             "偏移只按已解析时区的规则校验并选择实际时刻；不认证出生记录、推断时区或未来规则。"
         )
     return receipt
-
-
-def birth_clock_snapshot_lines(receipt: BirthClockReceipt) -> list[str]:
-    """Keep source precision visible alongside the nominal chart."""
-    omitted = receipt.get("omitted_components", [])
-    assumptions = [
-        f"{'分钟' if part == 'minute' else '秒数'}未提供，计算沿用00"
-        for part in omitted
-    ]
-    lines = [
-        f"出生钟时计算参考：{receipt.get('nominal_civil_datetime', '未提供')}",
-        (
-            "；".join(assumptions) + "；未推定记录精度或误差区间。"
-            if assumptions
-            else "已传入分、秒分量；这不认证出生记录的实际精度。"
-        ),
-    ]
-    if "requested_utc_offset" in receipt:
-        ambiguity = "重复钟时" if receipt.get("civil_time_ambiguous") else "唯一钟时"
-        lines.append(
-            f"民用偏移核对：{receipt['civil_utc_offset']}，{ambiguity}，"
-            f"fold={receipt['civil_fold']}；实际UTC：{receipt['civil_instant_utc']}。"
-            "原时区规则用于后续交运；偏移选择不认证出生记录。"
-        )
-    return lines

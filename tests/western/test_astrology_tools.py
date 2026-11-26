@@ -72,19 +72,6 @@ def test_core_chart_variants_expose_variant_specific_fields() -> None:
         item for item in india["planets"] if item["id"] == "Moon"
     )
 
-    assert "[起盘信息]" in chart["snapshot_text"]
-    assert "[宫位宫头]" in chart["snapshot_text"]
-    assert "[星与虚点]" in chart["snapshot_text"]
-    assert "[相位]" in chart["snapshot_text"]
-    assert "[行星]" in chart["snapshot_text"]
-    assert "太阳：" in chart["snapshot_text"]
-    assert "Asc：" in chart["snapshot_text"]
-    assert "人格签名：" not in chart["snapshot_text"]
-    assert "核心人格：" not in chart["snapshot_text"]
-    assert "成长建议：" not in chart["snapshot_text"]
-    assert chart["snapshot_export"]["technique"]["key"] == "astrochart"
-    assert "[起盘信息]" in chart["snapshot_export"]["export_text"]
-    assert "[行星]" in chart["snapshot_export"]["export_text"]
     assert "interpretation" not in chart
     assert "个星体与虚点" in chart["summary"][0]
 
@@ -141,7 +128,6 @@ def test_core_chart_can_infer_coordinates_from_birth_place() -> None:
     else:
         expected_asc_sign = "Leo"
     assert chart["angles"]["ascendant"]["sign"] == expected_asc_sign
-    assert "[起盘信息]" in chart["snapshot_text"]
 
 
 def test_core_chart_infers_coordinates_for_prefecture_city() -> None:
@@ -236,19 +222,19 @@ def test_core_chart_offline_options_preserve_defaults_and_allow_overrides() -> N
     )
     whole_sign_chart = calculate_core_chart_analysis(
         chart_variant="chart",
-        hsys=0,
+        house_system=0,
         **astro_payload(),
     )
     equal_mc_sidereal_chart = calculate_core_chart_analysis(
         chart_variant="chart",
-        hsys=8,
-        zodiacal=1,
+        house_system=8,
+        zodiac_type="Sidereal",
         **astro_payload(),
     )
     india_tropical_placidus = calculate_core_chart_analysis(
         chart_variant="india_chart",
-        hsys=3,
-        zodiacal=0,
+        house_system=3,
+        zodiac_type="Tropic",
         **astro_payload(),
     )
 
@@ -313,8 +299,8 @@ def test_germany_chart_returns_midpoint_payload() -> None:
 def test_germany_chart_respects_core_house_and_zodiac_overrides() -> None:
     result = calculate_germany_chart_analysis(
         **astro_payload(),
-        hsys=0,
-        zodiacal=1,
+        house_system=0,
+        zodiac_type="Sidereal",
     )
 
     assert result["chart_profile"]["house_system"] == "whole_sign"
@@ -324,17 +310,17 @@ def test_germany_chart_respects_core_house_and_zodiac_overrides() -> None:
     assert result["midpoints"]
 
 
-def test_hsys_int_family_defaults_are_consistent() -> None:
+def test_house_system_offline_defaults_are_consistent() -> None:
     # The Western tropical-quadrant charts (natal + relative/synastry) share one
     # default house system so a person's natal chart and its synastry chart agree
-    # on houses. That default is Placidus (3), the de-facto Western convention.
-    # Local suzhan and optional otherbu sky contexts keep equal_mc (8).
+    # on houses. That default is Placidus (P / 3), the de-facto Western convention.
+    # Local suzhan and optional otherbu sky contexts keep equal_mc (D / 8).
     # Dice symbols themselves have no astronomical house-system calculation.
     from fatebridge.core.requests.astrology import AstroRelativeFlatRequest
     from fatebridge.core.requests.divination import OtherBuRequest, SuZhanRequest
 
-    assert SuZhanRequest(date="2000-12-10", time="09:55:00").hsys == 8
-    assert OtherBuRequest(planet="Sun", sign="Aries", house=0).hsys == 8
+    assert SuZhanRequest(date="2000-12-10", time="09:55:00").house_system == "D"
+    assert OtherBuRequest(planet="Sun", sign="Aries", house=0).house_system == "D"
     flat = AstroRelativeFlatRequest(
         inner_birth_year=2000,
         inner_birth_month=12,
@@ -349,7 +335,7 @@ def test_hsys_int_family_defaults_are_consistent() -> None:
         outer_birth_longitude=120.0,
         outer_birth_latitude=30.0,
     )
-    assert flat.hsys == 3
+    assert flat.house_system == "P"
 
 
 def test_relative_chart_returns_canonical_layers_and_metadata() -> None:
@@ -365,8 +351,8 @@ def test_relative_chart_returns_canonical_layers_and_metadata() -> None:
             "birth_minute": 18,
         },
         relative_mode="Composite",
-        hsys=0,
-        zodiacal=1,
+        house_system=0,
+        zodiac_type="Sidereal",
     )
 
     assert result["relationship_profile"]["chart_type"] == "relative"
@@ -417,19 +403,19 @@ def test_relative_derived_layers_inherit_runtime_precision_from_sources() -> Non
         inner_payload=astro_payload(),
         outer_payload=outer_payload,
         relative_mode="Composite",
-        hsys=0,
+        house_system=0,
     )
     timespace_result = calculate_relative_chart_analysis(
         inner_payload=astro_payload(),
         outer_payload=outer_payload,
         relative_mode="TimeSpace",
-        hsys=0,
+        house_system=0,
     )
     marks_result = calculate_relative_chart_analysis(
         inner_payload=astro_payload(),
         outer_payload=outer_payload,
         relative_mode="Marks",
-        hsys=0,
+        house_system=0,
     )
 
     assert (
@@ -588,7 +574,7 @@ def test_relative_influence_timespace_and_marks_modes_expose_distinct_primary_la
             "birth_minute": 18,
         },
         relative_mode="Synastry",
-        hsys=0,
+        house_system=0,
     )
     timespace_result = calculate_relative_chart_analysis(
         inner_payload=astro_payload(),
@@ -602,7 +588,7 @@ def test_relative_influence_timespace_and_marks_modes_expose_distinct_primary_la
             "birth_minute": 18,
         },
         relative_mode="TimeSpace",
-        hsys=0,
+        house_system=0,
     )
     marks_result = calculate_relative_chart_analysis(
         inner_payload=astro_payload(),
@@ -616,7 +602,7 @@ def test_relative_influence_timespace_and_marks_modes_expose_distinct_primary_la
             "birth_minute": 18,
         },
         relative_mode="Marks",
-        hsys=0,
+        house_system=0,
     )
 
     assert (
@@ -672,7 +658,7 @@ def test_relative_hsys_zero_and_eight_drive_supported_offline_house_systems() ->
             "birth_minute": 18,
         },
         relative_mode="TimeSpace",
-        hsys=0,
+        house_system=0,
     )
     equal_result = calculate_relative_chart_analysis(
         inner_payload=astro_payload(),
@@ -686,7 +672,7 @@ def test_relative_hsys_zero_and_eight_drive_supported_offline_house_systems() ->
             "birth_minute": 18,
         },
         relative_mode="TimeSpace",
-        hsys=8,
+        house_system=8,
     )
 
     assert (
@@ -716,7 +702,7 @@ def test_relative_hsys_one_to_seven_are_available_offline() -> None:
         7: "sripati",
     }
 
-    for hsys, expected_house_system in expected_house_systems.items():
+    for house_system, expected_house_system in expected_house_systems.items():
         result = calculate_relative_chart_analysis(
             inner_payload=astro_payload(),
             outer_payload={
@@ -729,7 +715,7 @@ def test_relative_hsys_one_to_seven_are_available_offline() -> None:
                 "birth_minute": 18,
             },
             relative_mode="TimeSpace",
-            hsys=hsys,
+            house_system=house_system,
         )
 
         assert (
@@ -754,11 +740,15 @@ def test_relative_unsupported_hsys_returns_error_payload() -> None:
             "birth_minute": 18,
         },
         relative_mode="TimeSpace",
-        hsys=9,
+        house_system=9,
     )
 
     assert result == {
-        "error": "relative 关系盘离线模式暂仅支持 hsys=0..8（整宫制、Alcabitus、Regiomontanus、Placidus、Koch、Vehlow Equal、Polich Page、Sripati、天顶为第10宫宫头的等宫制）。",
+        "error": (
+            "house_system must be an integer code 0..8 or a supported offline house "
+            "system letter/name (W, B, R, P, K, V, T, S, D); boolean and "
+            "floating-point values are invalid."
+        ),
         "error_code": "validation_error",
         "status_code": 400,
         "retryable": False,
@@ -778,8 +768,8 @@ def test_relative_zodiacal_one_switches_relative_layers_to_sidereal() -> None:
             "birth_minute": 18,
         },
         relative_mode="TimeSpace",
-        hsys=0,
-        zodiacal=0,
+        house_system=0,
+        zodiac_type="Tropic",
     )
     sidereal_result = calculate_relative_chart_analysis(
         inner_payload=astro_payload(),
@@ -793,8 +783,8 @@ def test_relative_zodiacal_one_switches_relative_layers_to_sidereal() -> None:
             "birth_minute": 18,
         },
         relative_mode="TimeSpace",
-        hsys=0,
-        zodiacal=1,
+        house_system=0,
+        zodiac_type="Sidereal",
     )
 
     assert tropical_result["inner_chart"]["chart_profile"]["zodiac"] == "tropical"
@@ -832,12 +822,12 @@ def test_relative_unsupported_zodiacal_returns_error_payload() -> None:
             "birth_minute": 18,
         },
         relative_mode="TimeSpace",
-        hsys=0,
-        zodiacal=2,
+        house_system=0,
+        zodiac_type="Invalid",
     )
 
     assert result == {
-        "error": "relative 关系盘离线模式暂仅支持 zodiacal=0(回归黄道) 或 zodiacal=1(恒星黄道/Lahiri)。",
+        "error": "zodiac_type must be 'Tropic' or 'Sidereal'",
         "error_code": "validation_error",
         "status_code": 400,
         "retryable": False,
@@ -857,8 +847,8 @@ def test_relative_invalid_mode_returns_structured_validation_error() -> None:
             "birth_minute": 18,
         },
         relative_mode="banana",
-        hsys=0,
-        zodiacal=0,
+        house_system=0,
+        zodiac_type="Tropic",
     )
 
     assert result["error_code"] == "validation_error"
@@ -934,7 +924,7 @@ def test_cli_no_true_solar_time_flag_actually_disables_correction() -> None:
     """End-to-end CLI dispatch: ``--no-use-true-solar-time`` must leave the
     birth clock untouched (no longitude/equation-of-time rebasing)."""
     pytest.importorskip("swisseph")
-    from fatebridge.application.execution import execute_spec
+    from fatebridge.application.execution import invoke_validated_service
     from fatebridge.cli import build_parser
 
     parser = build_parser()
@@ -966,7 +956,7 @@ def test_cli_no_true_solar_time_flag_actually_disables_correction() -> None:
             for k, v in vars(args).items()
             if k in set(spec.request_model.model_fields) and v is not None
         }
-        return execute_spec(spec, spec.request_model(**provided))
+        return invoke_validated_service(spec, spec.request_model(**provided))
 
     off = _run(["--no-use-true-solar-time"])
     on = _run(["--use-true-solar-time", "true"])

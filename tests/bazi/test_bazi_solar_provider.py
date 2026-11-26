@@ -46,15 +46,15 @@ rest = _shared_rest
 
 @pytest.mark.parametrize(
     "key",
-    ["bazi_" + topic for topic in TOPICS]
+    ["bazi_birth_chart" if topic == "birth" else "bazi_" + topic for topic in TOPICS]
     + [
-        "timing_analysis",
-        "dayun_analysis",
-        "liunian_analysis",
-        "liuyue_analysis",
-        "liuri_analysis",
-        "liushi_analysis",
-        "jieqi_timeline_analysis",
+        "bazi_timing",
+        "bazi_luck_cycles",
+        "bazi_yearly_timing",
+        "bazi_monthly_timing",
+        "bazi_daily_timing",
+        "bazi_hourly_timing",
+        "solar_term_timeline",
     ],
 )
 def test_missing_native_crossings_are_rejected_on_all_three_surfaces(

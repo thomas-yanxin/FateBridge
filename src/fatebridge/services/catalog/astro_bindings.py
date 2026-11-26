@@ -4,58 +4,38 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from fatebridge.application.bindings import lazy_service, resolve_service
+from fatebridge.application.bindings import resolve_service, service_ref
 from fatebridge.application.tool_spec import BoundServiceCall, ServiceInput
-from fatebridge.core.requests.astrology import AstroChartPolyRequest
+from fatebridge.core.requests.astrology import AstroNatalChartRequest
 
-calculate_core_chart_analysis = lazy_service(
+calculate_core_chart_analysis = service_ref(
     "fatebridge.services.astrology", "calculate_core_chart_analysis"
 )
 
 
-calculate_germany_chart_analysis = lazy_service(
+calculate_germany_chart_analysis = service_ref(
     "fatebridge.services.astrology", "calculate_germany_chart_analysis"
 )
 
 
-calculate_relative_chart_analysis = lazy_service(
+calculate_relative_chart_analysis = service_ref(
     "fatebridge.services.astrology", "calculate_relative_chart_analysis"
 )
 
 
-def _astro_chart_bind(
-    req: BaseModel,
+def bind_astro_natal_chart(
+    request: BaseModel,
 ) -> BoundServiceCall:
-    assert isinstance(req, AstroChartPolyRequest)
-    data = req.service_inputs()
-    variant = data.pop("chart_variant", "chart")
-    apparent_model = data.pop("apparent_model", "native")
-    if variant == "chart":
-        data["apparent_model"] = apparent_model
-    if variant == "germany":
-        for key in (
-            "guolao_month_basis",
-            "guolao_seasonal_anchor_policy",
-            "node_mode",
-            "divisions",
-            "saptavargaja_profile",
-            "drekkana_profile",
-            "cheshta_model",
-            "birth_microsecond",
-        ):
-            data.pop(key, None)
-        return BoundServiceCall(
-            resolve_service(calculate_germany_chart_analysis), (), data
-        )
-    else:
-        return BoundServiceCall(
-            resolve_service(calculate_core_chart_analysis),
-            (),
-            {**data, "chart_variant": variant},
-        )
+    assert isinstance(request, AstroNatalChartRequest)
+    arguments = request.service_inputs()
+    return BoundServiceCall(
+        resolve_service(calculate_core_chart_analysis),
+        (),
+        {**arguments, "chart_variant": "chart"},
+    )
 
 
-def _astro_relative_flat_bind(
+def bind_relationship_chart(
     request: BaseModel,
 ) -> BoundServiceCall:
     arguments: dict[str, ServiceInput] = request.model_dump()
@@ -85,8 +65,8 @@ def _astro_relative_flat_bind(
             "inner_payload": party("inner"),
             "outer_payload": party("outer"),
             "relative_mode": arguments["relative_mode"],
-            "hsys": arguments["hsys"],
-            "zodiacal": arguments["zodiacal"],
+            "house_system": arguments["house_system"],
+            "zodiac_type": arguments["zodiac_type"],
             "relationship_focus": arguments["relationship_focus"],
             "davison_variant": arguments["davison_variant"],
         },

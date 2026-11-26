@@ -2,7 +2,7 @@
 
 [文档中心](README.md) · [贡献流程](../CONTRIBUTING.md) · [架构说明](architecture.md)
 
-FateBridge 使用 Python `src` 布局，通过共享执行层和中央目录统一提供 REST、MCP 与 CLI 能力。改进计算引擎、协议适配或文档参考，应先配置隔离开发环境，再按变更范围选择测试与契约校验。协作与 PR 规范见[贡献指南](../CONTRIBUTING.md)。
+FateBridge 使用 Python `src` 布局，通过共享执行层和中央目录统一提供 REST、MCP 与 CLI 能力。建议按**安装 → 复现 → 修改 → 验证 → 贡献**的闭环开展开发：先配置隔离环境并用最小虚构请求复现现象，再按变更范围修改代码与契约，运行对应测试与静态检查后提交 PR。协作与 PR 规范见[贡献指南](../CONTRIBUTING.md)。
 
 ## 环境准备
 
@@ -60,15 +60,15 @@ uv run --locked --extra dev mypy src/fatebridge/
 ### 新增或修改领域能力
 
 1. 在 `src/fatebridge/core/*` 或 `src/fatebridge/analysis/*` 实现领域计算逻辑。
-2. 在 `src/fatebridge/services/*` 编排业务返回结构与可选双层快照。
+2. 在 `src/fatebridge/services/*` 编排结构化业务返回与方法追溯。
 3. 在 `src/fatebridge/core/requests/` 定义或更新请求模型，在 `src/fatebridge/core/response_models.py` 与 `core/contracts/` 声明输出模型（业务根继承 `ProjectedOutput`，可投影嵌套对象继承 `PartialOutput`）。
-4. 在 `src/fatebridge/services/catalog/` 追加或更新 `ToolSpec`（新领域须接入 `tool_catalog.py`）。复杂 CLI JSON 输入启用 `cli_request_file=True`。
+4. 在 `src/fatebridge/services/catalog/` 追加或更新 `ToolSpec`（新领域须接入 `tool_catalog.py`）。所有 CLI 工具均支持 `--request-file`；复杂嵌套输入可设 `cli_request_file=True` 在 `discover` 示例中优先提示文件传参。
 5. 在 `tests/fixtures/surface_payloads.py` 补充代表请求，并编写领域回归与三端契约测试。
 6. 同步更新 [API 参考](api-reference.md)、[算法覆盖矩阵](algorithm-coverage.md)及相关文档，必要时重新生成按需调用合同。
 
 ### 调整传输层行为
 
-修改 REST 路由绑定或 FastMCP 注册器位于 `src/fatebridge/transports/rest.py` 与 `src/fatebridge/mcp_server.py`，公共字段投影、快照筛选和超预算交付位于 `src/fatebridge/application/response_delivery.py`。修改后运行 [完整接口验证](../tests/integration/test_full_surface_validation.py)、[CLI 集成测试](../tests/integration/test_cli.py) 与 [投影合同测试](../tests/integration/test_output_projection_contracts.py)。
+修改 REST 路由绑定或 FastMCP 注册器位于 `src/fatebridge/transports/rest.py` 与 `src/fatebridge/mcp_server.py`，公共 `detail` 分级（`compact` / `audit`）与严格 `fields` 投影位于 `src/fatebridge/application/response_delivery.py` 与 `src/fatebridge/application/projection.py`。修改后运行 [完整接口验证](../tests/integration/test_full_surface_validation.py)、[CLI 集成测试](../tests/integration/test_cli.py) 与 [投影合同测试](../tests/integration/test_output_projection_contracts.py)。
 
 ## 设计与测试约束
 

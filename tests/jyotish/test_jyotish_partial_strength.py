@@ -45,19 +45,15 @@ def call_surfaces(monkeypatch, capsys, key, payload, fields):
     )
     options = {
         "as_of": AS_OF,
+        "detail": "audit",
         "fields": fields,
-        "strict_fields": True,
-        "include_snapshot_text": False,
-        "response_char_limit": 0,
     }
     response = TestClient(api.app).post(
         spec.rest_path,
         json=payload,
         params=[
             ("as_of", AS_OF),
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
+            ("detail", "audit"),
             *[("fields", f) for f in fields],
         ],
     )
@@ -65,12 +61,12 @@ def call_surfaces(monkeypatch, capsys, key, payload, fields):
     async def protocol():
         async with Client(cached_mcp_app()) as client:
             return await call_calculation(
-                client, spec.tool_name, {**payload, **options}, raise_on_error=False
+                client, spec.name, {**payload, **options}, raise_on_error=False
             )
 
     protocol_result = asyncio.run(protocol())
     native = protocol_result.structured_content
-    args = [spec.tool_name]
+    args = [spec.name]
     for name, value in payload.items():
         args += [
             "--" + name.replace("_", "-"),
@@ -79,10 +75,8 @@ def call_surfaces(monkeypatch, capsys, key, payload, fields):
     args += [
         "--as-of",
         AS_OF,
-        "--strict-fields",
-        "--no-include-snapshot-text",
-        "--response-char-limit",
-        "0",
+        "--detail",
+        "audit",
         "--fields",
         *fields,
     ]
@@ -298,7 +292,7 @@ def test_same_run_consensus_receipt_rejects_forged_angular_operands(
 def test_actual_1977_origin_pair_magnitude_reaches_three_surfaces_without_a_verdict(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    from fatebridge.application.execution import execute_tool
+    from fatebridge.application.execution import execute_with_receipt
     from fatebridge.core.execution_context import ExecutionOptions
 
     payload = dict(
@@ -317,7 +311,7 @@ def test_actual_1977_origin_pair_magnitude_reaches_three_surfaces_without_a_verd
     india_surfaces = call_surfaces(
         monkeypatch,
         capsys,
-        "astro_india",
+        "vedic_chart",
         payload,
         [
             "india.strengths.kala_bala.components.yuddha_bala",
@@ -326,8 +320,8 @@ def test_actual_1977_origin_pair_magnitude_reaches_three_surfaces_without_a_verd
             "india.profile.drekkana_profile",
         ],
     )
-    vimshottari_spec = SPECS["astro_vimshottari"]
-    vimshottari_direct = execute_tool(
+    vimshottari_spec = SPECS["vimshottari_dasha"]
+    vimshottari_direct = execute_with_receipt(
         vimshottari_spec,
         vimshottari_spec.request_model.model_validate(payload),
         options=ExecutionOptions(as_of=AS_OF),
@@ -433,7 +427,7 @@ def test_named_strength_sources_and_partial_facts_on_actual_public_chart(
         "cheshta_model": mean_model,
     }
     result = three_surfaces(
-        SPECS["astro_india"],
+        SPECS["vedic_chart"],
         payload,
         ["india.charts.D1", "india.strengths", "india.rulesets"],
         AS_OF,

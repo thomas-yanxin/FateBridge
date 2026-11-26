@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from fatebridge.application.bindings import LazyService, lazy_service, raw_invoke
+from fatebridge.application.bindings import ServiceRef, bind_kwargs, service_ref
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.requests.western_events import (
     AstroElectionRequest,
@@ -13,89 +13,69 @@ from fatebridge.core.requests.western_events import (
     AstroMundaneRequest,
 )
 
-calculate_election = lazy_service(
+calculate_election = service_ref(
     "fatebridge.services.western_election", "calculate_election"
 )
 
 
-calculate_extrareturns = lazy_service(
+calculate_extrareturns = service_ref(
     "fatebridge.services.western_events", "calculate_extrareturns"
 )
 
 
-calculate_mundane = lazy_service(
+calculate_mundane = service_ref(
     "fatebridge.services.western_events", "calculate_mundane"
 )
 
 
-calculate_horary = lazy_service(
-    "fatebridge.services.western_horary", "calculate_horary"
-)
+calculate_horary = service_ref("fatebridge.services.western_horary", "calculate_horary")
 
 
 def _western_event_spec(
-    name: str, tool_name: str, service: LazyService, model: type[BaseModel], label: str
+    name: str, service: ServiceRef, model: type[BaseModel], label: str
 ) -> ToolSpec:
     """Register a western ephemeris-event technique (ingress chart / planetary return)."""
     return ToolSpec(
-        key=f"astro_{name}",
-        bind=raw_invoke(service),
+        name=name,
+        bind=bind_kwargs(service),
         request_model=model,
         summary=(
-            (
-                "按明确提问时刻起盘，核算月亮出宫前黄经事件、当前相位候选与原典条件缺项。"
-                if name == "horary"
-                else (
-                    "按明确候选时刻起盘，核算原生月亮事件、太阳状态与约定评分因子，未核算项保留未知。"
-                    if name == "election"
-                    else f"生成{label}（求解天文时刻后起盘）。"
-                )
-            )
-            + (
-                "评估给定的非医疗活动候选时刻；不是整段时间自动最优搜索，不提供手术或治疗择时。"
-                if name == "election"
-                else (
-                    "生死寿命、疾病及生育临床判断类别不开放。"
-                    if name == "horary"
-                    else ""
-                )
+            "按明确提问时刻起盘，核算月亮出宫前黄经事件与原典条件；禁生死/疾病/生育判断。"
+            if name == "horary_chart"
+            else (
+                "按明确候选时刻起盘评估非医疗活动条件（非最优区间搜索，不提供医疗择时）。"
+                if name == "evaluate_election_time"
+                else f"生成{label}（求解天文时刻后起盘）。"
             )
         ),
         operation_label_zh=label,
         family="western_event",
         cpu_bound=True,
-        include_snapshot_text=name not in {"horary", "election"},
-        optional_snapshot=True,
-        rest_path="/api/astrology/events/" + tool_name.replace("_", "-"),
-        mcp_name=tool_name,
-        cli_request_file=name == "horary",
+        rest_path="/api/astrology/events/" + name.replace("_", "-"),
+        cli_request_file=name == "horary_chart",
     )
 
 
 SPECS: list[ToolSpec] = [
     _western_event_spec(
-        "mundane",
         "mundane_ingress_chart",
         calculate_mundane,
         AstroMundaneRequest,
         "世俗入宫盘",
     ),
     _western_event_spec(
-        "extrareturns",
         "planetary_returns",
         calculate_extrareturns,
         AstroExtraReturnsRequest,
         "多重回归",
     ),
     _western_event_spec(
-        "horary",
         "horary_chart",
         calculate_horary,
         AstroHoraryRequest,
         "卜卦证据",
     ),
     _western_event_spec(
-        "election",
         "evaluate_election_time",
         calculate_election,
         AstroElectionRequest,

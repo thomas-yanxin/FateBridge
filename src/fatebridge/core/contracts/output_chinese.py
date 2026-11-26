@@ -167,15 +167,20 @@ CHINESE_FIELDS: dict[str, Any] = {
 
 
 CHINESE_TOOL_FIELDS: dict[str, dict[str, Any]] = {
-    "sanshiunited": {"synthesis": SanshiSynthesis},
-    "sixyao": {
+    "sanshi_combined_chart": {"synthesis": SanshiSynthesis},
+    "liuyao": {
         "lines": list[SixyaoLine],
         "moving_lines": list[int],
         "liuyao_evidence": LiuyaoEvidence,
         "classical_text_evidence": ClassicalTextEvidence,
     },
-    "gua_lookup": {"result": GuaLookupResult},
-    "gua_meiyi": {"queries": list[str], "results": dict[str, GuaLookupResult]},
+    "gua_lookup": {
+        "queries": list[str],
+        "results": dict[str, GuaLookupResult],
+        "lookup_mode": str,
+        "summary": str,
+        "analysis_type": str,
+    },
     "canping": {
         "dayun": list[CanpingRow],
         "numerology_evidence": NumerologyEvidence,
@@ -191,5 +196,8 @@ CHINESE_TOOL_FIELDS: dict[str, dict[str, Any]] = {
         "solar_term": HeluoSolarTermEvidence,
     },
     "suzhan": {"chart": LocalChart},
-    "otherbu": {"chart": LocalChartBundle, "diceChart": LocalChartBundle},
+    "interpret_astrology_dice": {
+        "chart": LocalChartBundle,
+        "diceChart": LocalChartBundle,
+    },
 }
