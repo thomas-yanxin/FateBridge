@@ -15,7 +15,7 @@ from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.core.fengshui.spatial_geometry import transform_point
 from fatebridge.core.fengshui.spatial_inputs import PlanPoint, PlanPose, SpatialScene
 from fatebridge.core.fengshui.spatial_scene import evaluate_geometry
-from fatebridge.services.fengshui import assess
+from fatebridge.services.fengshui import assess as _assess
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.fengshui_transports import mcp_call
 from tests.support.mcp_result_assertions import without_transport
@@ -25,6 +25,10 @@ from tests.unit_test.fixtures.fengshui_measured import (
     measured_request,
     measured_result,
 )
+
+
+def assess(**kwargs):
+    return _assess(AssessRequest.model_validate(kwargs))
 
 
 def screen_request():
@@ -83,7 +87,7 @@ def test_chartless_complete_output_requires_present_map_but_allows_empty_layers(
 ):
     request = screen_request()
     result = assess(**request)
-    spec = next(s for s in CATALOG if s.key == "fengshui_assess")
+    spec = next(s for s in CATALOG if s.name == "fengshui_assess")
     assert result["layers"] == {}
     validate_output(spec, result, request=AssessRequest.model_validate(request))
     for changed in ("missing", "null"):
@@ -104,7 +108,7 @@ def test_nonempty_declared_chart_layers_cannot_disappear_in_complete_result(
 ) -> None:
     request = measured_request(charts=True)
     result = assess(**request)
-    spec = next(s for s in CATALOG if s.key == "fengshui_assess")
+    spec = next(s for s in CATALOG if s.name == "fengshui_assess")
     assert result["coverage"]["implemented_layers"]
     result["layers"] = replacement
     with pytest.raises(OutputContractError):
@@ -478,10 +482,8 @@ def test_generated_screen_candidates_recompute_visibility_and_real_transports(
         ]
     )
     controls = dict(
+        detail="audit",
         fields=["layout_analysis.workstation_layout_analysis"],
-        strict_fields=True,
-        include_snapshot_text=False,
-        response_char_limit=0,
     )
     rest = rest_client(monkeypatch).post(
         "/api/fengshui/assess", json=request, params=controls
@@ -496,12 +498,10 @@ def test_generated_screen_candidates_recompute_visibility_and_real_transports(
                 "fengshui_assess",
                 "--request-file",
                 str(path),
+                "--detail",
+                "audit",
                 "--fields",
                 *controls["fields"],
-                "--strict-fields",
-                "--no-include-snapshot-text",
-                "--response-char-limit",
-                "0",
             ]
         )
         == 0

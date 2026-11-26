@@ -139,8 +139,8 @@ def test_reduced_wall_clock_fraction_uses_the_last_time_unit(
 @pytest.mark.parametrize(
     "tool,extra",
     [
-        ("sixyao", {"gua_code": "111111"}),
-        ("sanshiunited", {"use_true_solar_time": False}),
+        ("liuyao", {"gua_code": "111111"}),
+        ("sanshi_combined_chart", {"use_true_solar_time": False}),
     ],
 )
 def test_explicit_instant_requires_defined_target_local_time(
@@ -162,14 +162,14 @@ def test_explicit_instant_requires_defined_target_local_time(
         ]
 
 
-@pytest.mark.parametrize("key", ["sixyao", "sanshiunited"])
+@pytest.mark.parametrize("key", ["liuyao", "sanshi_combined_chart"])
 @pytest.mark.parametrize("clock,expected_clock,day,hour", CASES)
 def test_fractional_offset_and_day_pillars_agree_across_transports(
     key: str, clock, expected_clock, day, hour, surface_calls
 ) -> None:
     spec = SPECS[key]
     payload = {"date": "2026-11-03", "time": clock, "zone": "UTC"}
-    if key == "sixyao":
+    if key == "liuyao":
         payload["gua_code"] = "111111"
         fields = ["nongli.birth", "nongli.dayGanZi", "nongli.time"]
     else:
@@ -185,9 +185,9 @@ def test_fractional_offset_and_day_pillars_agree_across_transports(
     response, protocol, code, cli = surface_calls(
         spec,
         payload,
-        params={"fields": fields, "strict_fields": True},
-        options={"fields": fields, "strict_fields": True},
-        flags=("--fields", *fields, "--strict-fields"),
+        params={"detail": "audit", "fields": fields},
+        options={"detail": "audit", "fields": fields},
+        flags=("--detail", "audit", "--fields", *fields),
     )
     assert response.status_code == 200, response.text
     assert code == 0
@@ -197,7 +197,7 @@ def test_fractional_offset_and_day_pillars_agree_across_transports(
     wall = (
         datetime.fromisoformat(expected_clock).replace(tzinfo=None).isoformat(sep=" ")
     )
-    if key == "sixyao":
+    if key == "liuyao":
         assert expected["nongli"] == {"birth": wall, "dayGanZi": day, "time": hour}
     else:
         assert (

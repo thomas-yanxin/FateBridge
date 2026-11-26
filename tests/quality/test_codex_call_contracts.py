@@ -8,11 +8,9 @@ from fastmcp import Client
 from jsonschema import ValidationError, validate
 
 from fatebridge.application.examples import example_input, suggested_fields
-from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from scripts import build_codex_call_contracts as builder
-from tests.fixtures.mcp_result_delivery import read_full_result
-from tests.support.result_delivery import store
+from tests.fixtures.mcp_receipt import verified_inline_business
 from tests.support.transports import cached_mcp_app, call_calculation
 
 
@@ -94,7 +92,7 @@ def test_published_contract_keeps_required_time_and_solar_flag_constraints(
     published_contracts,
 ) -> None:
     record = next(item for item in published_contracts if item["tool"] == "bazi_career")
-    spec = next(s for s in CATALOG if s.tool_name == record["tool"])
+    spec = next(s for s in CATALOG if s.name == record["tool"])
     params = example_input(spec)
     validate(params, record["input"])
     for invalid in [
@@ -110,26 +108,25 @@ def test_published_contract_keeps_required_time_and_solar_flag_constraints(
 
 @pytest.mark.asyncio
 async def test_published_stage_view_retains_actual_period_boundaries(
-    published_contracts, store
+    published_contracts,
 ) -> None:
     """A on-demand contract must support stage reading without rediscovery."""
     record = next(
         item for item in published_contracts if item["tool"] == "western_timing"
     )
-    spec = next(s for s in CATALOG if s.tool_name == record["tool"])
+    spec = next(s for s in CATALOG if s.name == record["tool"])
     async with Client(cached_mcp_app()) as client:
         result = await call_calculation(
             client,
             record["tool"],
             {
                 **example_input(spec),
+                "detail": "audit",
                 "fields": record["evidence_views"]["stage"]["fields"],
-                "strict_fields": True,
-                "include_snapshot_text": False,
             },
         )
         assert not result.is_error
-        payload = await read_full_result(client, result.structured_content)
+        payload = result.structured_content
         firdaria = payload["time_lords"]["firdaria"]
         for period in (firdaria["current_major"], firdaria["current_sub"]):
             assert period["planet"] and period["start"] < period["end"]
@@ -138,10 +135,10 @@ async def test_published_stage_view_retains_actual_period_boundaries(
 @pytest.mark.asyncio
 @pytest.mark.local_data
 async def test_only_published_inputs_and_views_are_enough_for_real_mcp_calls(
-    published_contracts, store
+    published_contracts,
 ) -> None:
     records = published_contracts
-    specs = {s.tool_name: s for s in CATALOG}
+    specs = {s.name: s for s in CATALOG}
     async with Client(cached_mcp_app()) as client:
         for record in records:
             arguments = example_input(specs[record["tool"]])
@@ -152,13 +149,14 @@ async def test_only_published_inputs_and_views_are_enough_for_real_mcp_calls(
                     "tool": record["tool"],
                     "arguments": arguments,
                     **record["first_view"],
+                    "detail": "audit",
                     "as_of": "2026-10-12T12:00:00+08:00",
                 },
             )
             assert not result.is_error
-            payload = await read_full_result(client, result.structured_content)
+            payload = result.structured_content
             assert (
-                payload["run_metadata"]["tool_name"] == specs[record["tool"]].tool_name
+                payload["run_metadata"]["tool_name"] == specs[record["tool"]].name
             )
             if record["tool"] == "bazi_career":
                 career = payload["career_analysis"]
@@ -220,29 +218,28 @@ async def test_fengshui_first_views_deliver_resolvable_rule_sources() -> None:
     """A successful calculation must also leave enough evidence to cite it."""
     async with Client(cached_mcp_app(families="fengshui")) as client:
         for spec in CATALOG:
-            if spec.family != "fengshui" or not spec.mcp_name:
+            if spec.family != "fengshui" or not spec.expose_mcp:
                 continue
             else:
                 pass
             example = example_input(spec)
             if example is None:
-                assert spec.key == "fengshui_monthly_stars"
+                assert spec.name == "fengshui_monthly_stars"
                 # Explicit confirmed-month fixture, independent of any user.
                 example = {"effective_solar_year": 2026, "solar_month_number": 1}
             else:
                 pass
             result = await call_calculation(
                 client,
-                spec.tool_name,
+                spec.name,
                 {
                     **example,
+                    "detail": "audit",
                     "fields": suggested_fields(spec),
-                    "strict_fields": True,
-                    "include_snapshot_text": False,
                 },
             )
             assert not result.is_error
-            payload = await read_full_result(client, result.structured_content)
+            payload = await verified_inline_business(client, result.structured_content)
             assert payload["rulesets"] and payload["rule_trace"]
             sources = payload["source_catalog"]
             assert sources and all(

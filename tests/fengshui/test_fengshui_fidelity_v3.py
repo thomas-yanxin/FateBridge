@@ -7,10 +7,20 @@ from pathlib import Path
 import pytest
 
 from fatebridge.cli import run
-from fatebridge.services.fengshui import assess, calculate_bazhai
+from fatebridge.core.fengshui.models import AssessRequest, BazhaiRequest
+from fatebridge.services.fengshui import assess as _assess
+from fatebridge.services.fengshui import calculate_bazhai as _calculate_bazhai
 from tests.support.fengshui_transports import mcp_call
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import rest_client
+
+
+def assess(**kwargs):
+    return _assess(AssessRequest.model_validate(kwargs))
+
+
+def calculate_bazhai(**kwargs):
+    return _calculate_bazhai(BazhaiRequest.model_validate(kwargs))
 
 EVIDENCE = (
     "star",
@@ -65,13 +75,6 @@ def test_inverse_matching_direction_keeps_the_countervailing_element_fact() -> N
     ] == ["S10", "S13"]
     assert house["matching_directions"] == ["N", "E", "SE", "S"]
     assert option["current_result_scope"] == house["matches_convention_scope"]
-    line = next(
-        line
-        for line in result["snapshot_text"].splitlines()
-        if "house:house" in line and "备选E" in line
-    )
-    assert "基本星性用途匹配：True" in line
-    assert "宫克星（宫木，星土）" in line and "累计变爻6次，净变2爻" in line
 
 
 @pytest.mark.parametrize("purpose", ["door", "bed", "desk", "stove"])
@@ -134,7 +137,7 @@ def test_each_proposed_direction_reproduces_a_fresh_forward_calculation() -> Non
                 assert {**metadata, **proposed[key]} == finding[key]
 
 
-def test_unconfirmed_personal_candidates_remain_distinct_in_every_snapshot_use() -> (
+def test_unconfirmed_personal_candidates_remain_distinct_in_every_scope() -> (
     None
 ):
     data = request(unknown_convention=True)
@@ -144,32 +147,17 @@ def test_unconfirmed_personal_candidates_remain_distinct_in_every_snapshot_use()
     assert option["resolution"] == "no_confirmed_scope"
     assert option["agreed_matching_directions"] == []
     assert option["current_result"] == "no_confirmed_scope"
-    lines = [
-        line
-        for line in result["snapshot_text"].splitlines()
-        if "occupant:resident" in line
-    ]
-    assert (
-        len(lines) == 12
-    )  # two current findings, two current scopes, eight proposed directions
-    assert all("（未确认候选）" in line for line in lines)
-    assert all("起法male" in line or "起法female" in line for line in lines)
-    male = next(line for line in lines if "起法male" in line and "对象bed" in line)
-    female = next(line for line in lines if "起法female" in line and "对象bed" in line)
-    assert (
-        "天医（土）" in male and "基本星性用途匹配：True" in male and "宫克星" in male
-    )
-    assert (
-        "六煞（水）" in female
-        and "基本星性用途匹配：False" in female
-        and "星生宫" in female
-    )
-    assert "基本星性匹配方位：N、E、SE、S" in next(
-        line for line in lines if "起法male" in line and "当前E" in line
-    )
-    assert "基本星性匹配方位：NE、SW、W、NW" in next(
-        line for line in lines if "起法female" in line and "当前E" in line
-    )
+    assert len(option["scopes"]) == 2
+    assert all(s["candidate_only"] for s in option["scopes"])
+    by_conv = {s["gender_convention"]: s for s in option["scopes"]}
+    assert by_conv["male"]["matches_convention"] is True
+    assert by_conv["male"]["star"]["name"] == "天医"
+    assert by_conv["male"]["palace_star_relationship"]["traditional_label"] == "宫克星"
+    assert by_conv["male"]["matching_directions"] == ["N", "E", "SE", "S"]
+    assert by_conv["female"]["matches_convention"] is False
+    assert by_conv["female"]["star"]["name"] == "六煞"
+    assert by_conv["female"]["palace_star_relationship"]["traditional_label"] == "星生宫"
+    assert by_conv["female"]["matching_directions"] == ["NE", "SW", "W", "NW"]
 
 
 def test_house_and_person_conflict_keeps_per_scope_proof_without_common_direction() -> (
@@ -185,7 +173,6 @@ def test_house_and_person_conflict_keeps_per_scope_proof_without_common_directio
     for scope in option["scopes"]:
         assert not scope["candidate_only"]
         assert scope["palace_star_relationship"]["star_name"] == scope["star"]["name"]
-    assert "已确认作用域之间没有共同匹配方位" in result["snapshot_text"]
 
 
 @pytest.mark.parametrize("variant", ["confirmed", "candidate", "stove_facing"])
@@ -207,11 +194,13 @@ def test_layout_proof_and_readable_candidate_scopes_match_all_transports(
         ]
     else:
         pass
-    http = rest_client(monkeypatch).post("/api/fengshui/assess", json=data)
+    http = rest_client(monkeypatch).post(
+        "/api/fengshui/assess", json=data, params={"detail": "audit"}
+    )
     protocol = asyncio.run(mcp_call("assess", data))
     path = tmp_path / "fidelity.json"
     path.write_text(json.dumps(data))
-    assert run(["fengshui_assess", "--request-file", str(path)]) == 0
+    assert run(["fengshui_assess", "--request-file", str(path), "--detail", "audit"]) == 0
     cli = json.loads(capsys.readouterr().out)
     assert http.status_code == 200 and not protocol.is_error
     assert (
@@ -227,8 +216,6 @@ def test_strict_projection_delivers_complete_inverse_evidence_on_real_mcp() -> N
     data = {
         **request(unknown_convention=True),
         "fields": ["layout_analysis.adjustment_options", "rulesets", "rule_trace"],
-        "strict_fields": True,
-        "include_snapshot_text": False,
     }
     result = asyncio.run(mcp_call("assess", data))
     assert not result.is_error

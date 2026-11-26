@@ -2,9 +2,14 @@
 
 import pytest
 
-from fatebridge.services.fengshui import assess
+from fatebridge.core.fengshui.models import AssessRequest
+from fatebridge.services.fengshui import assess as _assess
 from tests.support.transports import SPECS, business, rest, surface_calls
 from tests.unit_test.fixtures.fengshui_measured import rotation_payload as payload_for
+
+
+def assess(**kwargs):
+    return _assess(AssessRequest.model_validate(kwargs))
 
 
 def attached_request(kind, value, *, unchanged=False):
@@ -140,9 +145,9 @@ def test_unknown_attached_action_is_conditional_on_actual_three_transports(
     response, protocol, code, cli = surface_calls(
         spec,
         payload,
-        params={"fields": fields, "strict_fields": True},
-        options={"fields": fields, "strict_fields": True},
-        flags=("--fields", *fields, "--strict-fields"),
+        params={"detail": "audit", "fields": fields},
+        options={"detail": "audit", "fields": fields},
+        flags=("--detail", "audit", "--fields", *fields),
     )
     assert response.status_code == 200, response.text
     assert code == 0 and not protocol.is_error

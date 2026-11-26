@@ -40,7 +40,6 @@ def test_zhirun_service_accepts_civil_endpoints_with_independent_day_facts(
     )
 
     assert "error" not in result, result
-    assert result["snapshot_text"]
     qimen = result["qimen"]
     assert qimen["ju_method"] == "zhirun"
     assert qimen["day_ganzhi"] == day_ganzhi

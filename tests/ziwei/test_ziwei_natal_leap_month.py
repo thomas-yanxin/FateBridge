@@ -162,10 +162,10 @@ def test_timing_uses_the_natal_choice_and_target_keeps_day_15_split(
         timing = calculate_ziwei_horoscope(
             person,
             natal_leap_month_policy=policy,
-            target_year=2025,
-            target_month=8,
-            target_day=target_day,
-            target_hour=12,
+            analysis_year=2025,
+            analysis_month=8,
+            analysis_day=target_day,
+            analysis_hour=12,
         )["ziwei_horoscope"]
         natal = timing["natal_prerequisites"]
         assert timing["ruleset"]["leap_month_rule"] == policy

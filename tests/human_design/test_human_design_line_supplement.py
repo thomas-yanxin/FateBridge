@@ -35,8 +35,8 @@ def test_gate2_condition_stays_reference_only_and_is_not_a_material_forecast() -
         == "one_explicit_clause_locally_recorded_not_exhaustive"
     )
     assert row["actual_fixing_state"] is row["selected_polarity"] is None
-    assert "永久" in result["snapshot_text"] and "不自动应用" in result["snapshot_text"]
-    assert "逆命题" in result["snapshot_text"]
+    assert "永久" in result["rendered_text"] and "不自动应用" in result["rendered_text"]
+    assert "逆命题" in result["rendered_text"]
     assert result["provenance"]["real_world_efficacy_validated"] is False
 
 

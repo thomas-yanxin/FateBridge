@@ -12,7 +12,7 @@ from pydantic import ValidationError
 from fatebridge.cli import run
 from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.output import FengshuiOutput
-from fatebridge.services.fengshui import assess
+from fatebridge.services.fengshui import assess as _assess
 from tests.fixtures.fengshui import payload
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import call_calculation, capability_contracts, rest_client
@@ -21,6 +21,10 @@ from tests.unit_test.fixtures.fengshui_layout import (
     proposal_request,
     surface_input,
 )
+
+
+def assess(**kwargs):
+    return _assess(AssessRequest.model_validate(kwargs))
 
 
 @pytest.mark.parametrize("scene", [None, "workstation", "home"])
@@ -50,7 +54,6 @@ def test_scene_selection_uses_inputs_and_explicit_choice_wins() -> None:
         automatic["coverage"]["scene_scope"]["selection_policy"]
         == "explicit_methods_override_input_driven_default"
     )
-    assert "全宅审查" in automatic["snapshot_text"]
     assert "jinsuo" not in automatic["layers"]
     assert assess(**{**base, "methods": ["annual_stars"]})["coverage"]["scene_scope"][
         "selected_methods"
@@ -375,15 +378,13 @@ def test_scene_constraints_and_proposals_match_all_transports(
     else:
         pass
     controls = {
+        "detail": "audit",
         "fields": [
             "coverage",
             "layout_analysis.alternatives_analysis",
             "rulesets",
             "rule_trace",
         ],
-        "strict_fields": True,
-        "include_snapshot_text": False,
-        "response_char_limit": 0,
     }
 
     async def call():
@@ -406,10 +407,10 @@ def test_scene_constraints_and_proposals_match_all_transports(
                 "fengshui_assess",
                 "--request-file",
                 str(path),
+                "--detail",
+                "audit",
                 "--fields",
                 *controls["fields"],
-                "--strict-fields",
-                "--no-include-snapshot-text",
             ]
         )
         == 0

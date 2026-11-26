@@ -109,12 +109,10 @@ def test_horary_unknown_category_is_rejected() -> None:
     assert "horary" not in result
 
 
-def test_horary_envelope_has_snapshot_and_moon_block() -> None:
+def test_horary_envelope_has_moon_block() -> None:
     result = calculate_horary(**QUESTION, category="career")
-    assert result["snapshot_text"]
     assert "void_of_course" in result["horary"]["moon"]
     assert result["analysis_context"]["house_system"]
-    assert "[主星与原典条件]" in result["snapshot_text"]
     assert "verdict" not in result["horary"] and "reasoning" not in result["horary"]
 
 
@@ -128,7 +126,7 @@ def test_horary_saturn_station_identity_and_event_order_reach_three_surfaces(
         "horary.perfection.lilly_conditions.event_paths",
     ]
     response, protocol, code, cli = surface_calls(
-        SPECS["astro_horary"],
+        SPECS["horary_chart"],
         {
             "question_year": 2022,
             "question_month": 10,
@@ -141,9 +139,7 @@ def test_horary_saturn_station_identity_and_event_order_reach_three_surfaces(
         },
         projection={
             "fields": fields,
-            "strict_fields": True,
-            "include_snapshot_text": False,
-            "response_char_limit": 0,
+            "detail": "audit",
         },
         rest_as_of=AS_OF,
     )

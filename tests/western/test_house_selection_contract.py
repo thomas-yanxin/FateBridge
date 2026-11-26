@@ -98,8 +98,8 @@ def test_both_request_families_reject_invalid_values_before_dispatch(value) -> N
             with pytest.raises(ValidationError) as caught:
                 spec.request_model.model_validate({**inputs(spec), field: value})
             issue = caught.value.errors(include_input=False)[0]
-            assert issue["loc"] == (field,), spec.key
-            assert issue["type"] == expected, (spec.key, issue)
+            assert issue["loc"] == (field,), spec.name
+            assert issue["type"] == expected, (spec.name, issue)
 
 
 def test_defaults_require_a_missing_override_and_validate_configuration() -> None:
@@ -156,7 +156,7 @@ def test_every_representative_request_and_optional_missing_hsys_remains_valid() 
         spec.request_model.model_validate(inputs(spec))
     from fatebridge.core.requests.astrology import AstroChartRequest
 
-    spec = next(s for s in CATALOG if s.key == "astro_chart")
+    spec = next(s for s in CATALOG if s.name == "astrology_chart")
     assert AstroChartRequest.model_validate({**inputs(spec), "hsys": None}).hsys is None
 
 
@@ -166,11 +166,11 @@ def test_numeric_request_schema_advertises_the_actual_range() -> None:
         shape = next(
             (v for v in field.get("anyOf", []) if v.get("type") == "integer"), field
         )
-        assert shape["minimum"] == 0 and shape["maximum"] == 8, spec.key
+        assert shape["minimum"] == 0 and shape["maximum"] == 8, spec.name
 
 
 def test_existing_strict_integer_domain_does_not_gain_string_coercion() -> None:
-    spec = next(s for s in CODE_SPECS if s.key == "otherbu")
+    spec = next(s for s in CODE_SPECS if s.name == "interpret_astrology_dice")
     with pytest.raises(ValidationError) as caught:
         spec.request_model.model_validate({**inputs(spec), "hsys": "3"})
     assert caught.value.errors()[0]["type"] == "int_type"

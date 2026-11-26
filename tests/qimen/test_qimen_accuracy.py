@@ -231,9 +231,6 @@ def test_ju_method_keeps_printed_conflicts_visible_across_transports(
                 f"qimen.{name}"
                 for name in ("ju_method", "ju_term", "ju_text", "source_disagreements")
             ],
-            "strict_fields": True,
-            "response_char_limit": 0,
-            "include_snapshot_text": False,
         },
         rest_as_of=AS_OF,
     )

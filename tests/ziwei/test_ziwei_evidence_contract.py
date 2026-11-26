@@ -17,7 +17,7 @@ from fatebridge.services.metaphysics import (
 from fatebridge.utils.birth_input import create_person_info
 from tests.support.transports import call_calculation
 
-TARGET = dict(target_year=2027, target_month=6, target_day=15, target_hour=12)
+TARGET = dict(analysis_year=2027, analysis_month=6, analysis_day=15, analysis_hour=12)
 BIRTH = dict(
     birth_year=1992,
     birth_month=8,
@@ -154,19 +154,15 @@ def test_context_scope_and_natal_linkage_match_rest_mcp_cli(
     inputs = {**BIRTH, **TARGET}
     options = dict(
         as_of="2026-10-20T00:45:00+08:00",
+        detail="audit",
         fields=FIELDS,
-        strict_fields=True,
-        include_snapshot_text=False,
-        response_char_limit=0,
     )
     response = TestClient(api.app).post(
         "/api/ziwei/timing",
         json=inputs,
         params=[
             ("as_of", options["as_of"]),
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
+            ("detail", "audit"),
             *[("fields", field) for field in FIELDS],
         ],
     )
@@ -187,10 +183,8 @@ def test_context_scope_and_natal_linkage_match_rest_mcp_cli(
         [
             "--as-of",
             options["as_of"],
-            "--strict-fields",
-            "--no-include-snapshot-text",
-            "--response-char-limit",
-            "0",
+            "--detail",
+            "audit",
             "--fields",
             *FIELDS,
         ]

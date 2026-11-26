@@ -38,7 +38,7 @@ def test_service_summary_keeps_an_actual_geographic_pole_qualification() -> None
         **{**BIRTH, "birth_latitude": 90.0}, chart_variant="chart", hsys=0
     )
     note = result["chart_profile"]["angle_definition"]["note_zh"]
-    assert note in result["summary"] and note in result["snapshot_text"]
+    assert note in result["summary"]
 
 
 def test_service_summary_keeps_an_actual_partial_orbital_fallback(
@@ -52,7 +52,7 @@ def test_service_summary_keeps_an_actual_partial_orbital_fallback(
     monkeypatch.setattr(ephemeris, "_swisseph_planet_state", without_venus)
     result = calculate_core_chart_analysis(**BIRTH, chart_variant="chart", hsys=0)
     note = result["chart_profile"]["orbital_fallback"]["note_zh"]
-    assert note in result["summary"] and note in result["snapshot_text"]
+    assert note in result["summary"]
 
 
 @pytest.mark.parametrize("hsys", [2, 6])

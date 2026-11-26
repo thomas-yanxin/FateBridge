@@ -50,7 +50,7 @@ def test_revised_vocabulary_is_identical_across_rest_native_mcp_and_cli(
 ) -> None:
     spec = SPECS["knowledge_read"]
     payload = {"domain": "bazi", "category": "classical_force_semantics", "key": KEY}
-    options = {"include_snapshot_text": True, "response_char_limit": 0}
+    options = {"detail": "audit"}
     http, mcp, code, cli = surface_calls(
         spec, payload, projection=options, cli_first=False
     )
@@ -61,7 +61,4 @@ def test_revised_vocabulary_is_identical_across_rest_native_mcp_and_cli(
     assert curation["method_id"] == "dtcw1947_body_vocabulary_semantics_v3"
     assert curation["entry_revision"] == 3 and len(result["tips"]) == 8
     assert len(curation["source_relation_binding"]["rows"]) == 20
-    assert "李雨田增补层" in result["snapshot_text"]
-    assert "太旺、旺极、太衰、衰极" in result["snapshot_text"]
-    assert "未知四态不能由工程三档或人物际遇补造" in result["snapshot_text"]
-    assert "dtcw1947_body_vocabulary_semantics_v3 / 3" in result["snapshot_text"]
+    assert "太旺、旺极、太衰、衰极" in result["rendered_text"]

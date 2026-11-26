@@ -62,16 +62,12 @@ def test_untriggered_additional_source_planets_are_visible_but_not_applied(
     assert record["source_polarity_planets"]["exaltation"] == expected
     assert record["actual_fixing_state"] is None
     assert record["editorial_paraphrase"] is None
-    assert "含明文附加星体" in entry["snapshot_text"]
 
 
 def test_gate1_source_ambiguity_and_both_poles_survive_summary() -> None:
     entry = calculate_knowledge_read(domain="human_design", key="1.4")
     row = entry["reference_details"]["record"]
-    assert row["source_reading_notes"] and "重复措辞" in entry["snapshot_text"]
-    assert "上升极性简述" in entry["snapshot_text"]
-    assert "下降极性简述" in entry["snapshot_text"]
-    assert "尚待独立复核" in entry["snapshot_text"]
+    assert row["source_reading_notes"] and "重复措辞" in entry["rendered_text"]
     assert entry["provenance"]["independent_whole_corpus_review_completed"] is False
     assert "不排除另一极性" in row["selection_policy"]
     assert row["fixing_reading_rule_source"]["author"] == "Lynda Bunnell"

@@ -10,7 +10,11 @@ from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.sensitivity import time_sensitivity
 from fatebridge.core.requests.astrology import (
-    AstroChartPolyRequest,
+    AstroChartRequest,
+    AstroGermanyRequest,
+    AstroGuolaoRequest,
+    AstroIndiaRequest,
+    AstroNatalChartRequest,
     AstroSpecialtyRequest,
 )
 from fatebridge.services.astrology import (
@@ -234,28 +238,26 @@ def test_invalid_intervals_rejected_by_public_request_contract(value) -> None:
         )
 
 
-def test_polymorphic_options_are_scoped_without_silently_dropping_uncertainty() -> None:
-    for variant in ("germany", "chart13", "india_chart"):
-        model = AstroChartPolyRequest.model_validate(
+def test_dedicated_chart_options_are_scoped_without_silently_dropping_uncertainty() -> None:
+    for req_model in (AstroGermanyRequest, AstroSpecialtyRequest, AstroIndiaRequest):
+        model = req_model.model_validate(
             {
                 **astro_payload(),
-                "chart_variant": variant,
                 "birth_time_uncertainty_minutes": 5,
             }
         )
         assert model.birth_time_uncertainty_minutes == 5
-    for variant in ("chart", "guolao_chart", "hellen_chart"):
+    for req_model in (AstroNatalChartRequest, AstroGuolaoRequest, AstroChartRequest):
         with pytest.raises(ValidationError):
-            AstroChartPolyRequest.model_validate(
+            req_model.model_validate(
                 {
                     **astro_payload(),
-                    "chart_variant": variant,
                     "birth_time_uncertainty_minutes": 5,
                 }
             )
     with pytest.raises(ValidationError):
-        AstroChartPolyRequest.model_validate(
-            {**astro_payload(), "chart_variant": "germany", "node_mode": "true"}
+        AstroGermanyRequest.model_validate(
+            {**astro_payload(), "node_mode": "true"}
         )
 
 

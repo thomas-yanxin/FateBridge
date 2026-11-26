@@ -135,7 +135,7 @@ def test_local_station_refinement_rejects_changed_native_source(
 
 
 def test_station_cell_root_is_the_same_on_rest_mcp_cli(surface_calls) -> None:
-    spec = SPECS["astro_extrareturns"]
+    spec = SPECS["planetary_returns"]
     inputs = dict(
         birth_year=2001,
         birth_month=1,
@@ -155,16 +155,13 @@ def test_station_cell_root_is_the_same_on_rest_mcp_cli(surface_calls) -> None:
         inputs,
         params=[
             ("fields", fields[0]),
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", 0),
+            ("detail", "audit"),
         ],
         options={
             "fields": fields,
-            "strict_fields": True,
-            "include_snapshot_text": False,
+            "detail": "audit",
         },
-        flags=["--fields", *fields],
+        flags=["--fields", *fields, "--detail", "audit"],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error

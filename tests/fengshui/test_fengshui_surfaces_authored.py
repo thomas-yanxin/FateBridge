@@ -18,7 +18,7 @@ from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.core.fengshui.surface_inputs import SurfaceZone
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services.fengshui import assess
+from fatebridge.services.fengshui import assess as _assess
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.mcp_result_assertions import (
     same_run_projected_response,
@@ -28,6 +28,10 @@ from tests.support.transports import call_calculation, capability_contracts, res
 from tests.unit_test.fixtures.fengshui_layout import (
     surface_input,
 )
+
+
+def assess(**kwargs):
+    return _assess(AssessRequest.model_validate(kwargs))
 
 
 def surface_result(inputs):
@@ -259,7 +263,7 @@ def test_position_and_representation_evidence_are_independent() -> None:
 
 
 def test_shared_frame_guide_covers_exact_schema_regions_and_is_not_mutable() -> None:
-    spec = next(s for s in CATALOG if s.key == "fengshui_assess")
+    spec = next(s for s in CATALOG if s.name == "fengshui_assess")
     guide = call_guidance(spec)
     assert set(guide["zone_legend"]) == set(get_args(SurfaceZone))
     original = guide["zone_legend"]["far_left"]
@@ -371,14 +375,10 @@ def test_authored_surfaces_match_rest_mcp_cli_and_strict_projection(
 ) -> None:
     inputs = surface_input()
     fields = ["layout_analysis.surface_analysis", "rulesets"]
-    controls = {"fields": fields, "strict_fields": True, "include_snapshot_text": False}
+    controls = {"detail": "audit", "fields": fields}
     response = rest_client(monkeypatch).post(
         "/api/fengshui/assess",
-        params={
-            "fields": fields,
-            "strict_fields": "true",
-            "include_snapshot_text": "false",
-        },
+        params={"detail": "audit", "fields": fields},
         json=inputs,
     )
 
@@ -391,7 +391,7 @@ def test_authored_surfaces_match_rest_mcp_cli_and_strict_projection(
             result = await call_calculation(
                 client, "fengshui_assess", {**inputs, **controls}
             )
-            return await same_run_projected_response(client, result)
+            return result.structured_content
 
     protocol = asyncio.run(call())
     path = tmp_path / "surface.json"
@@ -401,10 +401,10 @@ def test_authored_surfaces_match_rest_mcp_cli_and_strict_projection(
             "fengshui_assess",
             "--request-file",
             str(path),
+            "--detail",
+            "audit",
             "--fields",
             *fields,
-            "--strict-fields",
-            "--no-include-snapshot-text",
         ]
     )
     cli = json.loads(capsys.readouterr().out)

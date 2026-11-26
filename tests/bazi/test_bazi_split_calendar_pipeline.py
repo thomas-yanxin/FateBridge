@@ -79,12 +79,12 @@ def check_actual_parts(value):
 rest = _shared_rest
 
 
-@pytest.mark.parametrize("key", ["bazi_birth", "timing_analysis", "dayun_analysis"])
+@pytest.mark.parametrize("name", ["bazi_birth_chart", "bazi_timing", "bazi_luck_cycles"])
 @pytest.mark.parametrize("project", [False, True])
 def test_actual_parts_and_same_business_result_on_rest_mcp_cli(
-    key: str, project: bool, surface_calls
+    name: str, project: bool, surface_calls
 ) -> None:
-    spec = next(s for s in CATALOG if s.key == key)
+    spec = next(s for s in CATALOG if s.name == name)
     payload = {
         **inputs(spec),
         "birth_year": 2001,
@@ -96,27 +96,21 @@ def test_actual_parts_and_same_business_result_on_rest_mcp_cli(
         "birth_timezone": "Asia/Shanghai",
         "use_true_solar_time": False,
     }
-    opts = dict(detail="audit", include_snapshot_text=False, response_char_limit=0)
+    opts = dict(detail="audit")
     flags = [
         "--detail",
         "audit",
         "--as-of",
         AS_OF,
-        "--include-snapshot-text",
-        "false",
-        "--response-char-limit",
-        "0",
     ]
     if project:
         field = (
-            "bazi_birth.calendar_context" if key == "bazi_birth" else "calendar_context"
+            "bazi_birth.calendar_context" if name == "bazi_birth_chart" else "calendar_context"
         )
-        opts.update(fields=[field], strict_fields=True)
+        opts.update(fields=[field])
         flags += [
             "--fields",
             field,
-            "--strict-fields",
-            "true",
         ]
     else:
         pass

@@ -10,7 +10,7 @@ from fastmcp import Client
 from pydantic import ValidationError
 
 from fatebridge.application.description import resolve_spec
-from fatebridge.application.execution import execute_spec
+from fatebridge.application.execution import invoke_validated_service
 from fatebridge.core.consultation_policy import restricted_intent_path
 from fatebridge.core.requests.divination import MeihuaAnalysisRequest
 from fatebridge.core.requests.western_events import (
@@ -195,9 +195,9 @@ def test_restrictions_match_rest_mcp_cli_and_never_reach_services(
     def forbidden_execute(*args, **kwargs):
         pytest.fail("restricted request reached the shared executor")
 
-    monkeypatch.setattr(api, "execute_tool", forbidden_execute)
-    monkeypatch.setattr("fatebridge.mcp_server.execute_tool", forbidden_execute)
-    monkeypatch.setattr(cli, "execute_tool", forbidden_execute)
+    monkeypatch.setattr(api, "execute_with_receipt", forbidden_execute)
+    monkeypatch.setattr("fatebridge.mcp_server.execute_with_receipt", forbidden_execute)
+    monkeypatch.setattr(cli, "execute_with_receipt", forbidden_execute)
     response = TestClient(api.app).post(spec.rest_path, json=inputs)
     args = [tool]
     for key, value in inputs.items():
@@ -224,7 +224,7 @@ def test_health_is_cultural_and_has_no_disease_or_treatment_recommendations() ->
     spec = resolve_spec(CATALOG, "bazi_health")
     assert spec is not None
     request = spec.request_model.model_validate(MCP_CASES["bazi_health"][1]())
-    result = execute_spec(spec, request)["health_analysis"]
+    result = invoke_validated_service(spec, request)["health_analysis"]
     evidence = result["evidence_chain"]
     assert evidence["element_presence"]
     assert evidence["seasonal_reference"]
@@ -265,7 +265,7 @@ def test_parent_child_rules_do_not_recommend_reproduction_or_predict_count() -> 
     request = spec.request_model.model_validate(
         {**MCP_CASES["bazi_children"][1](), "gender": "女"}
     )
-    result = execute_spec(spec, request)["children_analysis"]
+    result = invoke_validated_service(spec, request)["children_analysis"]
     topic = result["evidence_chain"]["topic"]
     assert set(topic["palaces"]) == {"hour"}
     assert set(topic["stars"]) == {"食神", "伤官"}

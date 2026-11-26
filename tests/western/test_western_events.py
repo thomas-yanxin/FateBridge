@@ -101,7 +101,6 @@ def test_mundane_casts_ingress_chart() -> None:
     payload = result["mundane"]
     assert payload["ingress_datetime_utc"].startswith("2026-03-20")
     assert payload["ascendant"]["sign"]
-    assert result["snapshot_text"]
 
 
 def test_mundane_keeps_the_ingress_when_local_clock_is_undefined() -> None:

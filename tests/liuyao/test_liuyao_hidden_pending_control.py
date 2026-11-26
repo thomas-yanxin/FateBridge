@@ -75,7 +75,7 @@ def test_hidden_control_gate_preserves_all_three_blocker_states(
 def test_hidden_control_uncertainty_agrees_across_real_transports(
     date, base, changed, position, hidden, own, possible, surface_calls
 ) -> None:
-    spec = SPECS["sixyao"]
+    spec = SPECS["liuyao"]
     payload = payload_for(date, base, changed)
     fields = [
         "nongli.dayGanZi",
@@ -87,9 +87,9 @@ def test_hidden_control_uncertainty_agrees_across_real_transports(
     response, protocol, code, cli = surface_calls(
         spec,
         payload,
-        params={"fields": fields, "strict_fields": True},
-        options={"fields": fields, "strict_fields": True},
-        flags=("--fields", *fields, "--strict-fields"),
+        params={"detail": "audit", "fields": fields},
+        options={"detail": "audit", "fields": fields},
+        flags=("--detail", "audit", "--fields", *fields),
     )
     assert response.status_code == 200, response.text
     assert code == 0 and not protocol.is_error

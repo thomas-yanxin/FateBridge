@@ -9,13 +9,13 @@ import pytest
 
 @pytest.fixture(scope="session")
 def current_raw_business() -> Callable[[str], dict[str, Any]]:
-    from fatebridge.application.execution import execute_spec, result_is_error
+    from fatebridge.application.execution import invoke_validated_service, result_is_error
     from fatebridge.core.execution_context import call_clock
     from fatebridge.services.tool_catalog import CATALOG
     from tests.fixtures.surface_payloads import MCP_CASES, REST_POST_CASES
     from tests.support.ephemeris_context import empty_ephemeris_path
 
-    specs = {spec.key: spec for spec in CATALOG}
+    specs = {spec.name: spec for spec in CATALOG}
 
     @cache
     def calculate(key: str) -> dict[str, Any]:
@@ -24,11 +24,11 @@ def current_raw_business() -> Callable[[str], dict[str, Any]]:
             factory = (
                 REST_POST_CASES[spec.rest_path]
                 if spec.rest_path
-                else MCP_CASES[spec.tool_name][1]
+                else MCP_CASES[spec.name][1]
             )
             request = spec.request_model.model_validate(factory())
-            result = execute_spec(spec, request)
-            assert not result_is_error(result), (spec.key, result)
+            result = invoke_validated_service(spec, request)
+            assert not result_is_error(result), (spec.name, result)
         return result
 
     return calculate

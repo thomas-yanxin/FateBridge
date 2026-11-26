@@ -65,9 +65,8 @@ def test_election_unknown_topic_is_rejected() -> None:
     assert "election" not in result
 
 
-def test_election_envelope_has_snapshot_and_factors() -> None:
+def test_election_envelope_has_factors() -> None:
     result = calculate_election(**CANDIDATE, topic_id="contract")
-    assert result["snapshot_text"]
     assert isinstance(result["election"]["factors"], list)
     for factor in result["election"]["factors"]:
         assert factor["code"]

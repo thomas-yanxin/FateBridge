@@ -72,19 +72,6 @@ def test_core_chart_variants_expose_variant_specific_fields() -> None:
         item for item in india["planets"] if item["id"] == "Moon"
     )
 
-    assert "[起盘信息]" in chart["snapshot_text"]
-    assert "[宫位宫头]" in chart["snapshot_text"]
-    assert "[星与虚点]" in chart["snapshot_text"]
-    assert "[相位]" in chart["snapshot_text"]
-    assert "[行星]" in chart["snapshot_text"]
-    assert "太阳：" in chart["snapshot_text"]
-    assert "Asc：" in chart["snapshot_text"]
-    assert "人格签名：" not in chart["snapshot_text"]
-    assert "核心人格：" not in chart["snapshot_text"]
-    assert "成长建议：" not in chart["snapshot_text"]
-    assert chart["snapshot_export"]["technique"]["key"] == "astrochart"
-    assert "[起盘信息]" in chart["snapshot_export"]["export_text"]
-    assert "[行星]" in chart["snapshot_export"]["export_text"]
     assert "interpretation" not in chart
     assert "个星体与虚点" in chart["summary"][0]
 
@@ -141,7 +128,6 @@ def test_core_chart_can_infer_coordinates_from_birth_place() -> None:
     else:
         expected_asc_sign = "Leo"
     assert chart["angles"]["ascendant"]["sign"] == expected_asc_sign
-    assert "[起盘信息]" in chart["snapshot_text"]
 
 
 def test_core_chart_infers_coordinates_for_prefecture_city() -> None:

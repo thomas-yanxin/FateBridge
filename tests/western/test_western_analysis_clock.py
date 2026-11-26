@@ -18,13 +18,12 @@ from fatebridge.core.predictive._common import (
     build_predictive_birth_info,
 )
 from fatebridge.core.requests.western_timing import (
-    WesternTimingModuleRequest,
+    WesternTimingBaseRequest,
     WesternTimingRequest,
 )
 from fatebridge.services.catalog.western_timing import SPECS
 from fatebridge.services.western_timing import calculate_western_timing_analysis
 from fatebridge.services.western_timing_tools import calculate_timing_tool
-from tests.fixtures.mcp_result_delivery import read_full_result
 from tests.fixtures.transports import mcp_parameters
 from tests.support.transports import call_calculation
 
@@ -104,7 +103,7 @@ def test_partial_target_date_uses_local_call_clock_and_explicit_minutes() -> Non
     assert target.isoformat() == "2026-02-28T00:07:00+08:00"
 
 
-@pytest.mark.parametrize("model", [WesternTimingRequest, WesternTimingModuleRequest])
+@pytest.mark.parametrize("model", [WesternTimingRequest, WesternTimingBaseRequest])
 @pytest.mark.parametrize(
     "field,value,code",
     [
@@ -120,15 +119,15 @@ def test_target_clock_bounds(model, field: str, value, code: str) -> None:
     assert [(e["loc"], e["type"]) for e in exc.value.errors()] == [((field,), code)]
 
 
-@pytest.mark.parametrize("spec", SPECS, ids=lambda spec: spec.key)
+@pytest.mark.parametrize("spec", SPECS, ids=lambda spec: spec.name)
 def test_every_timing_surface_exposes_the_same_clock_contract(spec) -> None:
     from fatebridge.api import app
 
     rest_schema = app.openapi()["components"]["schemas"][spec.request_model.__name__]
-    mcp_schema = mcp_parameters(spec.tool_name)
+    mcp_schema = mcp_parameters(spec.name)
     args = build_parser().parse_args(
         [
-            spec.tool_name,
+            spec.name,
             "--birth-year",
             "1990",
             "--birth-month",
@@ -172,8 +171,8 @@ def _cli_arguments(tool, payload):
     return args + [
         "--as-of",
         AS_OF,
-        "--no-include-snapshot-text",
-        "--strict-fields",
+        "--detail",
+        "audit",
         "--fields",
         "analysis_context",
         "summary",
@@ -192,8 +191,7 @@ def _all_transports(monkeypatch, capsys, tool, path, payload):
         json=payload,
         params=[
             ("as_of", AS_OF),
-            ("include_snapshot_text", "false"),
-            ("strict_fields", "true"),
+            ("detail", "audit"),
             ("fields", "analysis_context"),
             ("fields", "summary"),
         ],
@@ -207,15 +205,13 @@ def _all_transports(monkeypatch, capsys, tool, path, payload):
                 {
                     **payload,
                     "as_of": AS_OF,
-                    "include_snapshot_text": False,
-                    "strict_fields": True,
+                    "detail": "audit",
                     "fields": ["analysis_context", "summary"],
                 },
                 raise_on_error=False,
             )
             inline = result.structured_content
-            assert inline == result.structured_content
-            return result, await read_full_result(client, inline)
+            return result, inline
 
     protocol, complete = asyncio.run(native_call())
     capsys.readouterr()
@@ -224,13 +220,13 @@ def _all_transports(monkeypatch, capsys, tool, path, payload):
     return response, protocol, exit_code, cli_payload, complete
 
 
-@pytest.mark.parametrize("spec", SPECS, ids=lambda spec: spec.key)
+@pytest.mark.parametrize("spec", SPECS, ids=lambda spec: spec.name)
 def test_exact_clock_reaches_every_timing_engine_through_all_transports(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], spec
 ) -> None:
     payload = {**BIRTH, **DATE, "analysis_hour": 12, "analysis_minute": 7}
     response, protocol, code, cli_payload, complete = _all_transports(
-        monkeypatch, capsys, spec.tool_name, spec.rest_path, payload
+        monkeypatch, capsys, spec.name, spec.rest_path, payload
     )
     assert response.status_code == 200 and not protocol.is_error and code == 0
     outputs = [response.json(), protocol.structured_content, cli_payload]
@@ -248,7 +244,7 @@ def test_exact_clock_reaches_every_timing_engine_through_all_transports(
     assert business[0] == business[1] == business[2]
 
 
-@pytest.mark.parametrize("spec", [SPECS[0], SPECS[3]], ids=lambda spec: spec.key)
+@pytest.mark.parametrize("spec", [SPECS[0], SPECS[3]], ids=lambda spec: spec.name)
 @pytest.mark.parametrize(
     "field,value,code",
     [
@@ -268,7 +264,7 @@ def test_invalid_clock_is_rejected_consistently(
 ) -> None:
     payload = {**BIRTH, **DATE, **{field: value}}
     response, protocol, exit_code, cli_payload, _ = _all_transports(
-        monkeypatch, capsys, spec.tool_name, spec.rest_path, payload
+        monkeypatch, capsys, spec.name, spec.rest_path, payload
     )
     assert response.status_code == 422 and protocol.is_error and exit_code == 1
     for output in [response.json(), protocol.structured_content, cli_payload]:
@@ -278,36 +274,36 @@ def test_invalid_clock_is_rejected_consistently(
 
 def test_exact_clock_changes_computed_transit_and_matches_standalone() -> None:
     kwargs = {**BIRTH, **DATE}
-    legacy = calculate_timing_tool("transit", **kwargs)
+    legacy = calculate_timing_tool("transit_chart", **kwargs)
     noon = calculate_western_timing_analysis(
         **kwargs, analysis_hour=12, analysis_minute=0
     )
     standalone = calculate_timing_tool(
-        "transit", **kwargs, analysis_hour=12, analysis_minute=0
+        "transit_chart", **kwargs, analysis_hour=12, analysis_minute=0
     )
     later = calculate_timing_tool(
-        "transit", **kwargs, analysis_hour=12, analysis_minute=37
+        "transit_chart", **kwargs, analysis_hour=12, analysis_minute=37
     )
     assert noon["analysis_context"]["analysis_datetime"] == "2026-10-14T12:00:00+08:00"
-    assert noon["transits"]["current_transit"] == standalone["transit"]
+    assert noon["transits"]["current_transit"] == standalone["transit_chart"]
     assert noon["natal_reference"]["sun"] == legacy["natal_reference"]["sun"]
     assert (
-        standalone["transit"]["moon"]["absolute_degree"]
-        != legacy["transit"]["moon"]["absolute_degree"]
+        standalone["transit_chart"]["moon"]["absolute_degree"]
+        != legacy["transit_chart"]["moon"]["absolute_degree"]
     )
     assert (
-        later["transit"]["moon"]["absolute_degree"]
-        != standalone["transit"]["moon"]["absolute_degree"]
+        later["transit_chart"]["moon"]["absolute_degree"]
+        != standalone["transit_chart"]["moon"]["absolute_degree"]
     )
     assert (
-        later["transit"]["ascendant"]["absolute_degree"]
-        != standalone["transit"]["ascendant"]["absolute_degree"]
+        later["transit_chart"]["ascendant"]["absolute_degree"]
+        != standalone["transit_chart"]["ascendant"]["absolute_degree"]
     )
 
 
 def test_target_clock_keeps_the_instant_when_return_location_changes() -> None:
     result = calculate_timing_tool(
-        "transit",
+        "transit_chart",
         **BIRTH,
         **DATE,
         analysis_hour=0,
@@ -317,7 +313,7 @@ def test_target_clock_keeps_the_instant_when_return_location_changes() -> None:
         return_timezone="America/New_York",
     )
     target = result["analysis_context"]["analysis_datetime"]
-    transit_target = result["transit"]["analysis_datetime"]
+    transit_target = result["transit_chart"]["analysis_datetime"]
     assert target == "2026-10-14T00:00:00+08:00"
     assert transit_target == "2026-10-13T12:00:00-04:00"
     assert datetime.fromisoformat(target) == datetime.fromisoformat(transit_target)
@@ -378,7 +374,7 @@ def test_transit_accepts_representable_local_clock_in_utc_year_zero(
     return_label: str,
 ) -> None:
     result = calculate_timing_tool(
-        "transit",
+        "transit_chart",
         birth_year=1900,
         birth_month=1,
         birth_day=15,
@@ -397,7 +393,7 @@ def test_transit_accepts_representable_local_clock_in_utc_year_zero(
     )
     assert result["analysis_context"]["analysis_datetime"] == label
     assert result["analysis_context"]["age_years"] == -1899.0373
-    assert result["transit"]["analysis_datetime"] == return_label
-    basis = result["transit"]["calculation_basis"]
+    assert result["transit_chart"]["analysis_datetime"] == return_label
+    basis = result["transit_chart"]["calculation_basis"]
     assert basis["time_scale"] == "pre_1972_swiss_UT1_delta_t"
     assert basis["julian_day_ut1"] == nominal_jd

@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator
 
-from fatebridge.application.description import describe_spec, spec_is_cli_safe
+from fatebridge.application.description import describe_spec
 from fatebridge.cli import run
 from tests.fixtures.fengshui import PAYLOADS, payload
 from tests.support.fengshui_transports import SPECS, mcp_call
@@ -27,11 +27,13 @@ def test_all_residential_tools_match_rest_mcp_cli(
     name,
 ) -> None:
     inputs = payload(name)
-    response = rest_client(monkeypatch).post(SPECS[name].rest_path, json=inputs)
+    response = rest_client(monkeypatch).post(
+        SPECS[name].rest_path, json=inputs, params={"detail": "audit"}
+    )
     protocol = asyncio.run(mcp_call(name, inputs))
     request_file = tmp_path / "住宅.json"
     request_file.write_text(json.dumps(inputs, ensure_ascii=False))
-    code = run([SPECS[name].tool_name, "--request-file", str(request_file)])
+    code = run([SPECS[name].name, "--request-file", str(request_file), "--detail", "audit"])
     cli_body = json.loads(capsys.readouterr().out)
     assert response.status_code == 200, response.text
     assert not protocol.is_error
@@ -45,7 +47,7 @@ def test_all_residential_tools_match_rest_mcp_cli(
     for body in [response.json(), protocol.structured_content, cli_body]:
         Draft202012Validator(schema).validate(body)
         assert body["status"] == "complete"
-        assert body["run_metadata"]["tool_name"] == SPECS[name].tool_name
+        assert body["run_metadata"]["tool_name"] == SPECS[name].name
         if name == "xuankong_natal":
             ruleset = next(
                 ruleset
@@ -127,7 +129,7 @@ def test_invalid_nested_inputs_fail_on_every_surface(
     protocol = asyncio.run(mcp_call(name, inputs))
     path = tmp_path / "request.json"
     path.write_text(json.dumps(inputs))
-    code = run([SPECS[name].tool_name, "--request-file", str(path)])
+    code = run([SPECS[name].name, "--request-file", str(path)])
     body = json.loads(capsys.readouterr().out)
     assert rest.status_code == 422
     assert protocol.is_error
@@ -147,11 +149,13 @@ def test_partial_is_success_not_protocol_error(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], tmp_path: Path
 ) -> None:
     inputs = {"methods": ["bazhai", "jinsuo", "annual_stars"]}
-    rest = rest_client(monkeypatch).post("/api/fengshui/assess", json=inputs)
+    rest = rest_client(monkeypatch).post(
+        "/api/fengshui/assess", json=inputs, params={"detail": "audit"}
+    )
     protocol = asyncio.run(mcp_call("assess", inputs))
     path = tmp_path / "selected-layers.json"
     path.write_text(json.dumps(inputs))
-    code = run(["fengshui_assess", "--request-file", str(path)])
+    code = run(["fengshui_assess", "--request-file", str(path), "--detail", "audit"])
     assert code == 0 and rest.status_code == 200 and not protocol.is_error
     assert json.loads(capsys.readouterr().out)["status"] == "partial"
     assert without_transport(rest.json()) == without_transport(
@@ -172,12 +176,23 @@ def test_natal_boundary_or_missing_input_is_partial_on_all_surfaces(
     else:
         inputs["house"]["facing_degrees"] = angle
     rest = rest_client(monkeypatch).post(
-        "/api/fengshui/xuankong-house-chart", json=inputs
+        "/api/fengshui/xuankong-house-chart", json=inputs, params={"detail": "audit"}
     )
     protocol = asyncio.run(mcp_call("xuankong_natal", inputs))
     path = tmp_path / "natal.json"
     path.write_text(json.dumps(inputs))
-    assert run(["fengshui_xuankong_house_chart", "--request-file", str(path)]) == 0
+    assert (
+        run(
+            [
+                "fengshui_xuankong_house_chart",
+                "--request-file",
+                str(path),
+                "--detail",
+                "audit",
+            ]
+        )
+        == 0
+    )
     cli_body = json.loads(capsys.readouterr().out)
     assert rest.status_code == 200 and not protocol.is_error
     assert (
@@ -207,11 +222,24 @@ def test_precise_near_boundaries_have_one_chart_on_all_surfaces(
 ) -> None:
     inputs = payload("xuankong_natal")
     inputs["house"]["facing_degrees"] = angle
-    rest = rest_client(monkeypatch).post(SPECS["xuankong_natal"].rest_path, json=inputs)
+    rest = rest_client(monkeypatch).post(
+        SPECS["xuankong_natal"].rest_path, json=inputs, params={"detail": "audit"}
+    )
     protocol = asyncio.run(mcp_call("xuankong_natal", inputs))
     path = tmp_path / "precise.json"
     path.write_text(json.dumps(inputs))
-    assert run(["fengshui_xuankong_house_chart", "--request-file", str(path)]) == 0
+    assert (
+        run(
+            [
+                "fengshui_xuankong_house_chart",
+                "--request-file",
+                str(path),
+                "--detail",
+                "audit",
+            ]
+        )
+        == 0
+    )
     body = json.loads(capsys.readouterr().out)
     assert rest.status_code == 200 and not protocol.is_error
     assert (
@@ -232,11 +260,15 @@ def test_complete_four_layers_are_separate_on_all_surfaces(
     inputs["house"] = natal.pop("house")
     inputs["xuankong"] = natal
     inputs["methods"] = ["bazhai", "jinsuo", "annual_stars", "xuankong_natal"]
-    rest = rest_client(monkeypatch).post(SPECS["assess"].rest_path, json=inputs)
+    rest = rest_client(monkeypatch).post(
+        SPECS["assess"].rest_path, json=inputs, params={"detail": "audit"}
+    )
     protocol = asyncio.run(mcp_call("assess", inputs))
     path = tmp_path / "four-layers.json"
     path.write_text(json.dumps(inputs))
-    assert run(["fengshui_assess", "--request-file", str(path)]) == 0
+    assert (
+        run(["fengshui_assess", "--request-file", str(path), "--detail", "audit"]) == 0
+    )
     body = json.loads(capsys.readouterr().out)
     assert rest.status_code == 200 and not protocol.is_error
     assert (
@@ -270,13 +302,9 @@ def test_natal_projection_and_annual_layer_match_all_transports(
     rest = rest_client(monkeypatch).post(
         "/api/fengshui/assess",
         json=inputs,
-        params={"fields": field, "include_snapshot_text": "false"},
+        params={"fields": field, "detail": "audit"},
     )
-    protocol = asyncio.run(
-        mcp_call(
-            "assess", {**inputs, "fields": [field], "include_snapshot_text": False}
-        )
-    )
+    protocol = asyncio.run(mcp_call("assess", {**inputs, "fields": [field]}))
     path = tmp_path / "combined.json"
     path.write_text(json.dumps(inputs))
     assert (
@@ -287,7 +315,8 @@ def test_natal_projection_and_annual_layer_match_all_transports(
                 str(path),
                 "--fields",
                 field,
-                "--no-include-snapshot-text",
+                "--detail",
+                "audit",
             ]
         )
         == 0
@@ -307,7 +336,7 @@ def test_natal_projection_and_annual_layer_match_all_transports(
     )
 
 
-def test_natal_nested_cli_flags_and_recognized_snapshot(
+def test_natal_nested_cli_flags_succeed(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     inputs = payload("xuankong_natal")
@@ -324,12 +353,11 @@ def test_natal_nested_cli_flags_and_recognized_snapshot(
         == 0
     )
     body = json.loads(capsys.readouterr().out)
-    assert not body["snapshot_export"]["unknown_detected_sections"]
-    assert not body["snapshot_export"]["missing_selected_sections"]
-    assert "玄空宅盘" in body["snapshot_export"]["selected_sections"]
+    assert body["status"] == "complete"
+    assert "snapshot_export" not in body
 
 
-def test_projection_and_snapshot_flags_match(
+def test_projection_flags_match(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     field = "layers.annual_stars.palaces.S.annual_star_number"
@@ -337,12 +365,12 @@ def test_projection_and_snapshot_flags_match(
     rest = rest_client(monkeypatch).post(
         "/api/fengshui/annual-stars",
         json=inputs,
-        params={"fields": field, "include_snapshot_text": "false"},
+        params={"fields": field},
     )
     protocol = asyncio.run(
         mcp_call(
             "annual_stars",
-            {**inputs, "fields": [field], "include_snapshot_text": False},
+            {**inputs, "fields": [field], "detail": "compact"},
         )
     )
     code = run(
@@ -352,8 +380,8 @@ def test_projection_and_snapshot_flags_match(
             "2026",
             "--fields",
             field,
-            "--no-include-snapshot-text",
-            "--compact",
+            "--detail",
+            "compact",
         ]
     )
     cli_body = json.loads(capsys.readouterr().out)
@@ -378,28 +406,23 @@ def test_discovery_publishes_nested_inputs_and_outputs_on_three_surfaces(
     records = rest_client(monkeypatch).get("/api/tools").json()["tools"]
     for spec in SPECS.values():
         descriptor = describe_spec(spec)
-        assert spec_is_cli_safe(spec)
         assert descriptor["surfaces"]["cli"] and descriptor["cli_request_file"]
         assert descriptor["input_schema"] and descriptor["output_schema"]
-        assert any(r["tool"] == spec.tool_name for r in records)
+        assert any(r["tool"] == spec.name for r in records)
 
 
-def test_cli_request_file_overrides_subject_and_explicit_flags_override_file(
+def test_cli_explicit_flags_override_request_file(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     path = tmp_path / "request.json"
     path.write_text(
         json.dumps({"effective_birth_year": 1990, "gender_convention": "female"})
     )
-    subject = tmp_path / "subject.json"
-    subject.write_text(json.dumps({"effective_birth_year": 2000}))
     code = run(
         [
             "fengshui_minggua",
             "--request-file",
             str(path),
-            "--subject-file",
-            str(subject),
             "--gender-convention",
             "male",
         ]

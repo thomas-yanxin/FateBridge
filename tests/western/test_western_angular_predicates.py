@@ -26,9 +26,6 @@ from fatebridge.core.classical_western import (
     combustion_state,
 )
 from fatebridge.core.predictive._common import collect_aspect_hits
-from fatebridge.services.astrology_classical_snapshot import (
-    _build_classical_patterns_lines,
-)
 from tests.support.western_angular_reference import (
     ANGLES,
     RADII,
@@ -254,14 +251,6 @@ def test_classical_motion_evidence_and_delivery_keep_exact_and_unknown_distinct(
             == "instantaneous_longitude_phase_v1"
         )
         json.dumps(patterns, allow_nan=False)
-        rendered = _build_classical_patterns_lines({"classical_patterns": patterns})
-        assert {
-            "applying": "入相",
-            "stationary": "相对黄经同速",
-            "unavailable": "速度未知",
-        }[expected] in rendered
-        assert "合相黄纬同侧条件在逐项证据中单列（可为缺项）" in rendered
-        assert "未检验未来成相及完整原典条件" in rendered
 
 
 def test_combustion_and_nodal_thresholds_reject_the_wrap_counterexample() -> None:

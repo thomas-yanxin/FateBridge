@@ -48,7 +48,7 @@ def test_public_boundary_preserves_facts_and_does_not_mutate_internal_evidence()
     assert internal == before
     assert str(actual["facts"][0]["value"]) == "-0.0"
     with pytest.raises(ParameterError):
-        project_fields(actual, ["source.source_sha256"], strict_fields=True)
+        project_fields(actual, ["source.source_sha256"])
 
 
 def test_output_schema_hides_internal_fields_without_weakening_internal_validation() -> (

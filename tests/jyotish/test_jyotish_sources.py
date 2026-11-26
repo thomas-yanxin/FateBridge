@@ -97,7 +97,7 @@ def test_a_single_frame_body_source_is_readable_with_strict_projection(data18) -
 
     result = {"india": build_india(birth(), divisions=[])}
     path = "india.profile.physical_ephemeris_source.by_factor.ecliptic_Sun.model"
-    projected = project_fields(result, [path], strict_fields=True)
+    projected = project_fields(result, [path])
     assert projected["india"]["profile"]["physical_ephemeris_source"]["by_factor"][
         "ecliptic_Sun"
     ] == {"model": "swieph"}

@@ -5,7 +5,8 @@ from pathlib import Path
 
 from pydantic import JsonValue
 
-from fatebridge.services.fengshui import assess
+from fatebridge.core.fengshui.models import AssessRequest
+from fatebridge.services.fengshui import assess as _assess
 
 
 def measured_request(
@@ -41,7 +42,7 @@ def measured_request(
 
 
 def measured_result(request: dict[str, JsonValue]) -> dict[str, JsonValue]:
-    return assess(**request)["layout_analysis"]["workstation_layout_analysis"]
+    return _assess(AssessRequest.model_validate(request))["layout_analysis"]["workstation_layout_analysis"]
 
 
 def body(

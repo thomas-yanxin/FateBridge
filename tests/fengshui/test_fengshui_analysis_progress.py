@@ -14,7 +14,7 @@ from fatebridge.cli import run
 from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services.fengshui import assess
+from fatebridge.services.fengshui import assess as _assess
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import call_calculation, rest_client
 from tests.unit_test.fixtures.fengshui_layout import (
@@ -26,6 +26,10 @@ from tests.unit_test.fixtures.fengshui_layout import (
     relation_candidate,
     surface_input,
 )
+
+
+def assess(**kwargs):
+    return _assess(AssessRequest.model_validate(kwargs))
 
 
 def progress(inputs):
@@ -476,10 +480,8 @@ def test_coverage_projection_preserves_review_and_action_states_on_all_transport
         "unknown": "insufficient_evidence",
     }.get(state, "available")
     controls = {
+        "detail": "audit",
         "fields": ["coverage.analysis_progress", "rulesets", "rule_trace"],
-        "strict_fields": True,
-        "include_snapshot_text": False,
-        "response_char_limit": 0,
     }
 
     async def call():
@@ -500,12 +502,10 @@ def test_coverage_projection_preserves_review_and_action_states_on_all_transport
                 "fengshui_assess",
                 "--request-file",
                 str(path),
+                "--detail",
+                "audit",
                 "--fields",
                 *controls["fields"],
-                "--strict-fields",
-                "--no-include-snapshot-text",
-                "--response-char-limit",
-                "0",
             ]
         )
         == 0

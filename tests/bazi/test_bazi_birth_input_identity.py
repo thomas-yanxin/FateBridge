@@ -16,11 +16,9 @@ from tests.unit_test.fixtures.bazi_birth_clock import (
 
 
 def test_mcp_omitted_and_explicit_zero_minute_have_distinct_input_identity() -> None:
-    spec = next(s for s in SPECS if s.key == "bazi_birth")
+    spec = next(s for s in SPECS if s.name == "bazi_birth_chart")
     payload = omitted_payload(spec)
-    opts = dict(
-        fields=[receipt_path(spec)], strict_fields=True, include_snapshot_text=False
-    )
+    opts = dict(detail="audit", fields=[receipt_path(spec)])
     omitted = asyncio.run(native(spec, payload, **opts)).structured_content
     explicit = asyncio.run(
         native(spec, {**payload, "birth_minute": 0}, **opts)
@@ -37,25 +35,19 @@ rest = _shared_rest
 
 
 @pytest.mark.parametrize(
-    "key", ["analyze_destiny", "bazi_birth", "bazi_career", "dayun_analysis"]
+    "name", ["bazi_overview", "bazi_birth_chart", "bazi_career", "bazi_luck_cycles"]
 )
 def test_original_input_replay_and_identity_agree_across_actual_surfaces(
-    key: str, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    name: str, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    spec = next(s for s in SPECS if s.key == key)
+    spec = next(s for s in SPECS if s.name == name)
     payload = omitted_payload(spec)
-    opts = dict(
-        fields=[receipt_path(spec)], strict_fields=True, include_snapshot_text=False
-    )
+    opts = dict(detail="audit", fields=[receipt_path(spec)])
     flags = [
+        "--detail",
+        "audit",
         "--fields",
         receipt_path(spec),
-        "--strict-fields",
-        "true",
-        "--include-snapshot-text",
-        "false",
-        "--response-char-limit",
-        "0",
     ]
     first = asyncio.run(native(spec, payload, **opts)).structured_content
     replay = first["run_metadata"]["replay"]
@@ -70,7 +62,7 @@ def test_original_input_replay_and_identity_agree_across_actual_surfaces(
         response = rest.post(
             spec.rest_path,
             json=payload,
-            params={"as_of": replay["as_of"], "response_char_limit": 0, **opts},
+            params={"as_of": replay["as_of"], **opts},
         )
         assert response.status_code == 200
         all_values.append(response.json())
@@ -84,11 +76,9 @@ def test_original_input_replay_and_identity_agree_across_actual_surfaces(
 
 
 def test_null_second_and_omitted_second_keep_the_same_unknown_input_identity() -> None:
-    spec = next(s for s in SPECS if s.key == "bazi_birth")
+    spec = next(s for s in SPECS if s.name == "bazi_birth_chart")
     payload = {**omitted_payload(spec), "birth_minute": 0}
-    opts = dict(
-        fields=[receipt_path(spec)], strict_fields=True, include_snapshot_text=False
-    )
+    opts = dict(detail="audit", fields=[receipt_path(spec)])
     a = asyncio.run(native(spec, payload, **opts)).structured_content
     b = asyncio.run(
         native(spec, {**payload, "birth_second": None}, **opts)

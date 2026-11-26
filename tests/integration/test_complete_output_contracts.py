@@ -24,7 +24,7 @@ from tests.support.transports import call_calculation
 
 
 def career_spec() -> ToolSpec:
-    return next(spec for spec in CATALOG if spec.key == "bazi_career")
+    return next(spec for spec in CATALOG if spec.name == "bazi_career")
 
 
 def test_civil_point_distinguishes_omitted_null_and_complete_facts() -> None:
@@ -57,7 +57,7 @@ def test_civil_point_distinguishes_omitted_null_and_complete_facts() -> None:
 
 def test_every_catalog_tool_declares_real_complete_business_roots() -> None:
     for spec in CATALOG:
-        assert spec.required_output_fields, spec.key
+        assert spec.required_output_fields, spec.name
         assert set(spec.required_output_fields) <= set(spec.output_model.model_fields)
         assert not set(spec.required_output_fields) & {
             "run_metadata",
@@ -67,8 +67,8 @@ def test_every_catalog_tool_declares_real_complete_business_roots() -> None:
         assert describe_input_spec(spec)["full_result_required_fields"] == list(
             spec.required_output_fields
         )
-    by_key = {spec.key: spec for spec in CATALOG}
-    for key in ("bazi_career", "astro_chart", "ziwei_birth"):
+    by_key = {spec.name: spec for spec in CATALOG}
+    for key in ("bazi_career", "astrology_chart", "ziwei_birth_chart"):
         spec = by_key[key]
         assert describe_spec(spec)["full_result_required_fields"] == list(
             spec.required_output_fields
@@ -94,15 +94,13 @@ def test_missing_or_null_business_output_is_correlated_internal_error(
     broken = replace(spec, bind=lambda _: (lambda: payload, (), {}))
     request = spec.request_model.model_validate(example_input(spec))
     with pytest.raises(execution.OutputContractError):
-        execution.execute_spec(broken, request)
-    result = execution.execute_tool(
+        execution.invoke_validated_service(broken, request)
+    result = execution.execute_with_receipt(
         broken,
         request,
-        options=ExecutionOptions(trace_id="output-guard", parent_run_id="parent"),
+        options=ExecutionOptions(),
     )
     assert result["error_code"] == "internal_error"
-    assert result["trace_id"] == "output-guard"
-    assert result["parent_run_id"] == "parent"
     assert "run_metadata" not in result
     assert "private" not in json.dumps(result)
 
@@ -116,7 +114,7 @@ def test_error_result_does_not_require_success_business_roots() -> None:
         "retryable": False,
     }
     broken = replace(spec, bind=lambda _: (lambda: failure, (), {}))
-    result = execution.execute_tool(
+    result = execution.execute_with_receipt(
         broken, spec.request_model.model_validate(example_input(spec))
     )
     assert result == failure
@@ -127,7 +125,6 @@ def test_missing_root_and_legal_projection_across_rest_mcp_cli(
 ) -> None:
     spec = career_spec()
     inputs = example_input(spec)
-    controls = {"trace_id": "missing-root", "parent_run_id": "original-run"}
     monkeypatch.setattr(
         api,
         "API_KEY_AUTHENTICATOR",
@@ -140,36 +137,34 @@ def test_missing_root_and_legal_projection_across_rest_mcp_cli(
             return await call_calculation(
                 connection,
                 "bazi_career",
-                {"response_char_limit": 0, **inputs, **arguments},
+                {**inputs, **arguments},
                 raise_on_error=False,
             )
 
     argv = ["bazi_career"]
     for name, value in inputs.items():
         argv += ["--" + name.replace("_", "-"), str(value)]
-    for name, value in controls.items():
-        argv += ["--" + name.replace("_", "-"), value]
 
     # The real service still executes and validates before projection. Omitting
     # its primary business root from the wire output remains legitimate.
-    projected = {**controls, "fields": ["analysis_type"], "strict_fields": True}
+    projected = {"detail": "audit", "fields": ["analysis_type"]}
     http = client.post(spec.rest_path, json=inputs, params=projected)
     native = asyncio.run(protocol(projected))
     assert http.status_code == 200 and not native.is_error
     assert "career_analysis" not in http.json()
     assert "career_analysis" not in native.structured_content
-    assert cli.run(argv + ["--fields", "analysis_type", "--strict-fields"]) == 0
+    assert cli.run(argv + ["--detail", "audit", "--fields", "analysis_type"]) == 0
     assert "career_analysis" not in json.loads(capsys.readouterr().out)
 
-    original = execution.execute_spec
+    original = execution.invoke_validated_service
 
-    def corrupt_service(current: ToolSpec, request: BaseModel) -> ServiceResult:
+    def corrupt_service(current: ToolSpec, request: BaseModel, **kwargs) -> ServiceResult:
         broken = replace(current, bind=lambda _: (lambda: {}, (), {}))
-        return original(broken, request)
+        return original(broken, request, **kwargs)
 
-    monkeypatch.setattr(execution, "execute_spec", corrupt_service)
-    http = client.post(spec.rest_path, json=inputs, params=controls)
-    native = asyncio.run(protocol(controls))
+    monkeypatch.setattr(execution, "invoke_validated_service", corrupt_service)
+    http = client.post(spec.rest_path, json=inputs)
+    native = asyncio.run(protocol({}))
     assert http.status_code == 500 and native.is_error
     assert cli.run(argv) == 1
     outputs = [
@@ -179,8 +174,6 @@ def test_missing_root_and_legal_projection_across_rest_mcp_cli(
     ]
     for result in outputs:
         assert result["error_code"] == "internal_error"
-        assert result["trace_id"] == controls["trace_id"]
-        assert result["parent_run_id"] == controls["parent_run_id"]
 
 
 def test_execution_skips_heavy_self_validation_by_default_and_runs_when_strict(
@@ -213,13 +206,13 @@ def test_execution_skips_heavy_self_validation_by_default_and_runs_when_strict(
     monitored = replace(spec, output_validators=(spy_validator,))
 
     monkeypatch.delenv("FATEBRIDGE_STRICT_OUTPUT_VALIDATION", raising=False)
-    execution.execute_spec(monitored, request)
+    execution.invoke_validated_service(monitored, request)
     assert called_models == 0 and validator_calls == 0
     for bad_payload in ({}, {"career_analysis": None}, {"career_analysis": {}}):
         broken = replace(monitored, bind=lambda _, b=bad_payload: (lambda: b, (), {}))
         with pytest.raises(execution.OutputContractError):
-            execution.execute_spec(broken, request)
+            execution.invoke_validated_service(broken, request)
 
     monkeypatch.setenv("FATEBRIDGE_STRICT_OUTPUT_VALIDATION", "1")
-    execution.execute_spec(monitored, request)
+    execution.invoke_validated_service(monitored, request)
     assert called_models == 1 and validator_calls == 1

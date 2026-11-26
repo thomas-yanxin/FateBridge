@@ -35,14 +35,14 @@ def test_every_mcp_input_preserves_canonical_constraints_and_examples() -> None:
 
     tools = asyncio.run(fetch())
     for spec in CATALOG:
-        if spec.mcp_name is None:
+        if not spec.expose_mcp:
             continue
         else:
             pass
-        published = tools[spec.tool_name]["input_schema"]
+        published = tools[spec.name]["input_schema"]
         canonical = model_schema(spec.request_model)
         Draft202012Validator.check_schema(published)
-        assert published == canonical, spec.key
+        assert published == canonical, spec.name
         example = example_input(spec)
         if example is not None:
             Draft202012Validator(published).validate(example)
@@ -117,29 +117,33 @@ def test_recursive_input_falls_back_to_valid_refs_and_remains_callable() -> None
         return lambda: {"node": request.node.model_dump()}, (), {}
 
     spec = ToolSpec(
-        key="recursive",
+        name="recursive",
         request_model=Request,
         bind=bind,
         summary="Recursive input",
         operation_label_zh="测试",
         family="test",
     )
+    import fatebridge.mcp_server as mcp_server
+
     app = FastMCP("recursive contract", dereference_schemas=False)
     _register_mcp_tools(app, [spec])
 
     async def call():
-        async with Client(app) as client:
-            schema = (await describe_capability(client, spec.tool_name))["input_schema"]
-            Draft202012Validator.check_schema(schema)
-            assert "$defs" in schema  # cycles remain finite valid references
-            good = {"node": {"value": 2, "child": {"value": 1}}}
-            Draft202012Validator(schema).validate(good)
-            result = await call_calculation(client, "recursive", good)
-            assert result.structured_content["node"]["child"]["value"] == 1
-            invalid = await call_calculation(
-                client, "recursive", {"node": {"value": -1}}, raise_on_error=False
-            )
-            assert invalid.is_error
+        with pytest.MonkeyPatch.context() as mp:
+            mp.setattr(mcp_server, "CATALOG", [spec])
+            async with Client(app) as client:
+                schema = (await describe_capability(client, spec.name))["input_schema"]
+                Draft202012Validator.check_schema(schema)
+                assert "$defs" in schema  # cycles remain finite valid references
+                good = {"node": {"value": 2, "child": {"value": 1}}}
+                Draft202012Validator(schema).validate(good)
+                result = await call_calculation(client, "recursive", good)
+                assert result.structured_content["node"]["child"]["value"] == 1
+                invalid = await call_calculation(
+                    client, "recursive", {"node": {"value": -1}}, raise_on_error=False
+                )
+                assert invalid.is_error
 
     asyncio.run(call())
 
@@ -225,7 +229,7 @@ def test_published_mcp_schema_rejects_missing_role_for_every_supported_purpose()
                 valid = await call_calculation(
                     client,
                     "fengshui_assess",
-                    {**complete_pair, "response_char_limit": 0},
+                    complete_pair,
                     raise_on_error=False,
                 )
                 assert not valid.is_error
@@ -258,10 +262,9 @@ def test_form_only_calls_need_no_compass_placeholder_and_invalid_layout_stays_re
                         "evidence": "三项已确认",
                     }
                 ],
-                "include_snapshot_text": False,
             }
             valid = await call_calculation(
-                client, "fengshui_assess", {**forms, "response_char_limit": 0}
+                client, "fengshui_assess", forms
             )
             assert (
                 valid.structured_content["layout_analysis"]["form_analysis"]["status"]
@@ -296,8 +299,6 @@ def test_city_only_career_call_remains_callable_without_explicit_solar_flag() ->
                     "fields": [
                         "career_analysis.evidence_chain.month_command.month_branch"
                     ],
-                    "strict_fields": True,
-                    "include_snapshot_text": False,
                 },
             )
             assert not result.is_error

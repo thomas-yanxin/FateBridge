@@ -19,10 +19,8 @@ async def mcp_payload_async(name, /, **arguments):
     from fatebridge.mcp_server import app
 
     async with Client(app) as client:
-        # This helper verifies full-payload parity. Chat delivery defaults and
-        # lossless paging are exercised separately in test_result_delivery.
         result = await call_calculation(
-            client, name, {"response_char_limit": 0, **arguments}, raise_on_error=False
+            client, name, {"detail": "audit", **arguments}, raise_on_error=False
         )
         assert result.structured_content is not None
         return result.structured_content

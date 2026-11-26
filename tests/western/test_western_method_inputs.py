@@ -8,24 +8,24 @@ from tests.support.transports import inputs as representative_inputs
 from tests.support.transports import rest, surface_calls
 
 METHODS = [
-    ("astro_triplicity_rulers", "division", "halfs", ["thirds", "halves"]),
-    ("astro_distributions", "time_key", "invalid", ["Ptolemy", "Naibod"]),
+    ("triplicity_ruler_periods", "division", "halfs", ["thirds", "halves"]),
+    ("bounds_directions", "time_key", "invalid", ["Ptolemy", "Naibod"]),
     (
-        "astro_balbillus",
+        "balbillus_periods",
         "start_planet",
         "Neptune",
         ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"],
     ),
-    ("astro_balbillus", "mode", "nearset", ["nearest", "forward"]),
-    ("astro_keypoints", "release_mode", "spirit", ["soul", "body"]),
+    ("balbillus_periods", "mode", "nearset", ["nearest", "forward"]),
+    ("numeric_aspect_periods", "release_mode", "spirit", ["soul", "body"]),
     (
-        "astro_yearsystem129",
+        "planetary_periods_129_years",
         "start_planet",
         "Pluto",
         ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"],
     ),
     (
-        "astro_planetaryarc",
+        "planetary_arc_directions",
         "arc_source",
         "Neptune",
         [
@@ -40,8 +40,8 @@ METHODS = [
             "Medium_Coeli",
         ],
     ),
-    ("pd", "pd_time_key", "invalid", ["Ptolemy", "Naibod", "Cardan"]),
-    ("astro_mundane", "ingress_term", "立春", ["春分", "夏至", "秋分", "冬至"]),
+    ("primary_directions", "pd_time_key", "invalid", ["Ptolemy", "Naibod", "Cardan"]),
+    ("mundane_ingress_chart", "ingress_term", "立春", ["春分", "夏至", "秋分", "冬至"]),
 ]
 
 

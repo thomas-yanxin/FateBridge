@@ -6,12 +6,13 @@ import pytest
 from fastmcp import Client, FastMCP
 from pydantic import BaseModel
 
-from fatebridge.application.bindings import raw_invoke
-from fatebridge.application.execution import execute_spec
+from fatebridge.application.bindings import bind_kwargs
+from fatebridge.application.execution import invoke_validated_service
 from fatebridge.application.projection import project_fields
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.mcp_server import _register_mcp_tools
 from fatebridge.services.tool_catalog import CATALOG
+from fatebridge.utils.errors import ParameterError
 
 
 class _Empty(BaseModel):
@@ -26,14 +27,14 @@ def test_request_service_drift_is_not_silently_ignored() -> None:
     def service(value):
         return {"value": value}
 
-    spec = _spec(service, bind=raw_invoke(service))
+    spec = _spec(service, bind=bind_kwargs(service))
     with pytest.raises(TypeError, match="new_option"):
-        execute_spec(spec, Request(value=1))
+        invoke_validated_service(spec, Request(value=1))
 
 
 def _spec(service, **overrides):
     base = dict(
-        key="t",
+        name="t",
         bind=lambda req: (service, (), {}),
         request_model=_Empty,
         summary="",
@@ -61,12 +62,16 @@ def test_project_fields_none_or_empty_is_identity() -> None:
     assert project_fields(payload, []) == payload
 
 
-def test_project_fields_warns_for_unknown_keys_without_changing_selected_data() -> None:
-    payload = {"a": 1, "run_metadata": {}}
-    out = project_fields(payload, ["a", "no_such_key"])
-    assert set(out) == {"a", "run_metadata", "projection_warnings"}
-    assert out["projection_warnings"] == [
-        {"path": "no_such_key", "code": "unknown_projection_path"}
+def test_project_fields_rejects_unknown_keys_with_available_options() -> None:
+    payload = {"a": 1, "b": 2, "run_metadata": {}}
+    with pytest.raises(ParameterError) as exc_info:
+        project_fields(payload, ["a", "no_such_key"])
+    assert exc_info.value.issues == [
+        {
+            "path": "no_such_key",
+            "code": "unknown_projection_path",
+            "constraints": {"available": ["a", "b", "run_metadata"]},
+        }
     ]
 
 
@@ -80,7 +85,7 @@ def _nested_payload():
             "ten_gods": {"big": "blob"},
             "shensha": [1, 2, 3],
         },
-        "snapshot_text": "[起盘信息]...",
+        "summary": "summary-text",
         "run_metadata": {"run_id": "r"},
     }
 
@@ -96,9 +101,9 @@ def test_project_fields_dotted_prunes_into_subtree() -> None:
 
 
 def test_project_fields_mixes_dotted_and_top_level() -> None:
-    out = project_fields(_nested_payload(), ["snapshot_text", "bazi_birth.day_master"])
-    assert set(out) == {"snapshot_text", "bazi_birth", "run_metadata"}
-    assert out["snapshot_text"] == "[起盘信息]..."
+    out = project_fields(_nested_payload(), ["summary", "bazi_birth.day_master"])
+    assert set(out) == {"summary", "bazi_birth", "run_metadata"}
+    assert out["summary"] == "summary-text"
     assert set(out["bazi_birth"]) == {"day_master"}
 
 
@@ -110,18 +115,20 @@ def test_project_fields_whole_parent_overrides_dotted_regardless_of_order() -> N
     assert b["bazi_birth"] == payload["bazi_birth"]
 
 
-def test_project_fields_unknown_subkey_keeps_legacy_shape_and_warns() -> None:
-    out = project_fields(_nested_payload(), ["bazi_birth.no_such_sub"])
-    assert set(out) == {"bazi_birth", "run_metadata", "projection_warnings"}
-    assert out["bazi_birth"] == {}
-    assert out["projection_warnings"][0]["path"] == "bazi_birth.no_such_sub"
+def test_project_fields_unknown_subkey_fails_strictly() -> None:
+    with pytest.raises(ParameterError) as exc_info:
+        project_fields(_nested_payload(), ["bazi_birth.no_such_sub"])
+    issue = exc_info.value.issues[0]
+    assert issue["path"] == "bazi_birth.no_such_sub"
+    assert issue["code"] == "unknown_projection_path"
+    assert "day_master" in issue["constraints"]["available"]
 
 
-def test_project_fields_dotted_into_scalar_keeps_scalar() -> None:
-    out = project_fields(_nested_payload(), ["snapshot_text.foo"])
-    assert out["snapshot_text"] == "[起盘信息]..."
-    assert out["projection_warnings"] == [
-        {"path": "snapshot_text.foo", "code": "non_object_projection_path"}
+def test_project_fields_dotted_into_scalar_fails_strictly() -> None:
+    with pytest.raises(ParameterError) as exc_info:
+        project_fields(_nested_payload(), ["summary.foo"])
+    assert exc_info.value.issues == [
+        {"path": "summary.foo", "code": "non_object_projection_path"}
     ]
 
 
@@ -133,7 +140,7 @@ def _call_mcp(spec, arguments, **options):
         async with Client(server) as client:
             return await client.call_tool(
                 "run_calculation",
-                {"tool": spec.tool_name, "arguments": arguments, **options},
+                {"tool": spec.name, "arguments": arguments, **options},
                 raise_on_error=False,
             )
 
@@ -145,18 +152,17 @@ def test_mcp_threads_fields_to_projection() -> None:
         _spec(lambda: {"selected": 1, "other": 2}),
         {},
         fields=["selected"],
-        strict_fields=True,
     )
     assert not result.is_error
     assert set(result.structured_content) == {"selected", "run_metadata"}
 
 
-def test_execute_spec_preserves_domain_result_and_error() -> None:
+def test_invoke_validated_service_preserves_domain_result_and_error() -> None:
     for payload in (
         {"a": 1},
         {"error": "boom", "error_code": "validation_error", "retryable": False},
     ):
-        assert execute_spec(_spec(lambda: payload), _Empty()) == payload
+        assert invoke_validated_service(_spec(lambda: payload), _Empty()) == payload
 
 
 def test_mcp_preserves_binding_value_error_message() -> None:
@@ -173,7 +179,7 @@ def test_mcp_preserves_binding_value_error_message() -> None:
 
 def test_mcp_invalid_date_renders_error_end_to_end() -> None:
     # Complete civil dates are now rejected by shared request validation.
-    spec = next(spec for spec in CATALOG if spec.key == "bazi_wealth")
+    spec = next(spec for spec in CATALOG if spec.name == "bazi_wealth")
     result = _call_mcp(
         spec,
         dict(
@@ -194,15 +200,15 @@ def test_mcp_arguments_are_separate_from_delivery_controls() -> None:
         fields: list[str]
 
     spec = ToolSpec(
-        key="field_calculation",
-        bind=raw_invoke(lambda fields: {"selection": fields, "other": 2}),
+        name="field_calculation",
+        bind=bind_kwargs(lambda fields: {"selection": fields, "other": 2}),
         request_model=Request,
         summary="",
         operation_label_zh="",
         family="",
     )
     result = _call_mcp(
-        spec, {"fields": ["domain"]}, fields=["selection"], strict_fields=True
+        spec, {"fields": ["domain"]}, fields=["selection"]
     )
     assert not result.is_error
     assert result.structured_content["selection"] == ["domain"]

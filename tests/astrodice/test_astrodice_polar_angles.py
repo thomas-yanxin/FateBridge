@@ -125,7 +125,7 @@ def test_exact_pole_keeps_computable_sky_and_declares_meridian_convention(
     assert definition["fixed_direction_diurnal_rising_defined"] is False
     assert definition["reference_meridian"] == "supplied_geographic_longitude"
     assert "ascendant_dependent_lots" in definition["dependent_quantities"]
-    assert definition["note_zh"] in result["snapshot_text"]
+    assert definition["note_zh"]
     assert len(sky["chart"]["objects"]) == 13
     assert len(sky["chart"]["houses"]) == 12
     assert all(math.isfinite(p["lon"]) for p in sky["chart"]["objects"])

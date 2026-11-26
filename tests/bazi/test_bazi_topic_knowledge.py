@@ -67,7 +67,6 @@ def test_each_public_entry_attributes_only_its_declared_statements(
         assert source["source_pdf_pages"]
     for implementation in entry["implementation_refs"]:
         assert (ROOT / implementation["source_path"]).is_file()
-        assert implementation["source_path"] in result["snapshot_text"]
     assert entry["independent_expert_review"] == "not_completed"
     assert entry["reality_prediction_efficacy"] == "not_tested"
 

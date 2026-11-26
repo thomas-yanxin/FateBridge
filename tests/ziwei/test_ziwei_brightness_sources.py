@@ -24,7 +24,7 @@ BIRTH = dict(
     gender="男",
     use_true_solar_time=False,
 )
-TARGET = dict(target_year=2026, target_month=10, target_day=12, target_hour=10)
+TARGET = dict(analysis_year=2026, analysis_month=10, analysis_day=12, analysis_hour=10)
 
 
 def test_literal_classical_labels_and_unassigned_cells():
