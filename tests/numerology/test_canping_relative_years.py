@@ -32,11 +32,10 @@ def test_explanatory_source_image_identity_is_fixed_separately_from_the_verse() 
     assert REFERENCE["source_pdf"]["pdf_page"] == 64
 
 
-@pytest.mark.parametrize("anchor", [None, 0])
-def test_unknown_century_advances_known_ganzhi_without_inventing_calendar_year(
-    anchor: int | None,
-) -> None:
-    series = liunian_series(**ARGS, birth_year=anchor)
+def test_unknown_century_advances_known_ganzhi_without_inventing_calendar_year() -> (
+    None
+):
+    series = liunian_series(**ARGS, birth_year=None)
     assert len(series["rows"]) == 120
     assert series["birth_pillar_year"] is None
     assert series["year_boundary"] == "relative_ganzhi_year_labels_only"
@@ -47,9 +46,9 @@ def test_unknown_century_advances_known_ganzhi_without_inventing_calendar_year(
     assert all("start_at" not in row and "end_at" not in row for row in series["rows"])
 
 
-@pytest.mark.parametrize("anchor", [0, 1984])
+@pytest.mark.parametrize("anchor", [None, 1984])
 def test_ages_before_explicit_first_period_have_no_number_text_or_substituted_luck_branch(
-    anchor: int,
+    anchor: int | None,
 ) -> None:
     rows = liunian_series(**ARGS, birth_year=anchor, end_age=4)["rows"]
     for row in rows[:2]:
@@ -64,7 +63,7 @@ def test_ages_before_explicit_first_period_have_no_number_text_or_substituted_lu
 def test_unknown_calendar_year_uses_actual_relative_taisui_not_birth_day(
     expected,
 ) -> None:
-    row = liunian_series(**ARGS, birth_year=0)["rows"][expected["age"] - 1]
+    row = liunian_series(**ARGS, birth_year=None)["rows"][expected["age"] - 1]
     assert (row["ganzhi"], row["taisuiBranch"], row["dayunBranch"]) == (
         expected["ganzhi"],
         expected["taisui"],
@@ -78,7 +77,7 @@ def test_unknown_calendar_year_uses_actual_relative_taisui_not_birth_day(
 def test_anchored_and_relative_rows_have_same_calculation_without_an_epoch_guess() -> (
     None
 ):
-    relative = liunian_series(**ARGS, birth_year=0)
+    relative = liunian_series(**ARGS, birth_year=None)
     anchored = liunian_series(**ARGS, birth_year=1984)
     assert all(
         {k: v for k, v in a.items() if k != "year"}
@@ -112,6 +111,8 @@ def test_explicit_relative_extension_beyond_default_horizon_remains_supported() 
         {"qiyun_age": -1},
         {"qiyun_age": True},
         {"birth_year": False},
+        {"birth_year": 0},
+        {"birth_year": -1},
     ],
 )
 def test_invalid_age_ranges_or_boolean_anchors_do_not_silently_produce_a_schedule(
