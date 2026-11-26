@@ -36,8 +36,7 @@
         "taiyi.core_board.jishen",
         "taiyi.core_board.heshen",
         "taiyi.ruleset.id",
-        "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy"
+        "taiyi.ruleset.classical_acceptance_passed"
       ],
       "purpose": "核对实际输入瞬间、明确偏移、fold与命名时区，再读所选计法/钟面；省略偏移时不制造回执，不把民用时刻消歧认证成古历。"
     },
@@ -54,8 +53,7 @@
       "fields": [
         "taiyi.calendar_summary",
         "taiyi.count_source_assessment",
-        "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy"
+        "taiyi.ruleset.classical_acceptance_passed"
       ],
       "purpose": "分辨主客算差异在源位置还是同位置加总；保留原字、所选书影层和当前同盘事实。仅选定卷三四位置/两算，不认证全书或古历。"
     },
@@ -64,8 +62,7 @@
         "taiyi.counter_cycles",
         "taiyi.calendar_summary",
         "taiyi.ruleset.id",
-        "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy"
+        "taiyi.ruleset.classical_acceptance_passed"
       ],
       "purpose": "核同次完整计数、360位、60纪组与72元组及实际局号；余数不代替积数，不反推实际干支或古历起元。"
     },
@@ -73,8 +70,7 @@
       "fields": [
         "taiyi.calendar_summary",
         "taiyi.count_assessment",
-        "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy"
+        "taiyi.ruleset.classical_acceptance_passed"
       ],
       "purpose": "核查主客算的原条缺数、足数推导、杜塞数格、分源和数与太乙/二目各自阴阳配数；保留源差异和未决，不裁成总体胜负。"
     },
@@ -163,8 +159,7 @@
       "fields": [
         "taiyi.calendar_summary",
         "taiyi.elemental_guan_assessment",
-        "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy"
+        "taiyi.ruleset.classical_acceptance_passed"
       ],
       "purpose": "按同盘文昌/始击实际十六神核二目五行生克，与旧空间同宫关分开；保留卷四日计适用和角色语境，原断不裁为整体胜负。"
     },
@@ -180,8 +175,7 @@
         "taiyi.core_board.main_vice_general",
         "taiyi.core_board.guest_general",
         "taiyi.core_board.guest_vice_general",
-        "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy"
+        "taiyi.ruleset.classical_acceptance_passed"
       ],
       "purpose": "分读李法正宫与同方二将夹持几何，保留实际宫位、源路径和未决；间神不并宫，不以未命中否定全部挟闭/四郭。"
     },
@@ -220,8 +214,7 @@
         "taiyi.core_board.kook_number",
         "taiyi.core_board.taiyi_number",
         "taiyi.core_board.suijun",
-        "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy"
+        "taiyi.ruleset.classical_acceptance_passed"
       ],
       "purpose": "先明确year_profile=jinjing_year_historical_table_v1（381—385晋历）或jinjing_year_qiliang_table_v1（501—505齐梁史历，含502闰标分歧）；合参置taiyi_options。仅year可用，保留实际日期、来源及范围，不认证完整古历或其他两术古历。"
     },
@@ -244,8 +237,7 @@
       "fields": [
         "taiyi.calendar_summary",
         "taiyi.opposition_assessment",
-        "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy"
+        "taiyi.ruleset.classical_acceptance_passed"
       ],
       "purpose": "核六主体实际对宫，中五无环向；主方格/对原名并列，保留阳53附带外迫不符。几何事实不代替五将合取或原典名称统一验收。"
     },
@@ -257,8 +249,7 @@
         "taiyi.core_board.shiji",
         "taiyi.shiji_derivation",
         "taiyi.count_source_assessment.summary",
-        "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy"
+        "taiyi.ruleset.classical_acceptance_passed"
       ],
       "purpose": "核本盘计神加和德艮后顺行十六神的逐步天地对应，以实际文昌取始击；步数为间隔，不是主客算。原表差异继续保留，不把推步相符当全书符合。"
     },
@@ -285,10 +276,8 @@
         "taiyi.victory_matrix_assessment.status",
         "taiyi.victory_matrix_assessment.table_applicability_verified",
         "taiyi.victory_matrix_assessment.classical_acceptance_passed",
-        "taiyi.victory_matrix_assessment.real_world_efficacy",
         "taiyi.calendar_summary",
-        "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy"
+        "taiyi.ruleset.classical_acceptance_passed"
       ],
       "purpose": "核同次盘对应胜败钤原栏、几何比较与未决范围；原栏胜败不直接应用于本盘。"
     },
@@ -318,8 +307,7 @@
         "taiyi.core_board.heshen",
         "taiyi.ruleset.id",
         "taiyi.ruleset.version",
-        "taiyi.ruleset.classical_acceptance_passed",
-        "taiyi.ruleset.real_world_efficacy"
+        "taiyi.ruleset.classical_acceptance_passed"
       ],
       "purpose": "先设year，核对输入钟时、校正钟面、实际年计农历及换算来源；兼容明确所选历史历表，不把时间上下文农历替代年计日期。"
     },
