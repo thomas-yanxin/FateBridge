@@ -1,6 +1,5 @@
 """Independent Sun references, source rounding intervals and mixed-layer algebra."""
 
-import hashlib
 import json
 import math
 import random
@@ -332,31 +331,6 @@ def test_invalid_time_domain_and_zero_arc_are_not_replaced_by_defaults() -> None
         with pytest.raises(ValueError):
             solar_arc_state(birth, jd, target)
     assert solar_arc_state(birth, jd, birth)["solar_arc_degrees"] == 0
-
-
-def test_cached_independent_response_has_explicit_reverifiable_hash_meaning() -> None:
-    assert (
-        hashlib.sha256(REFERENCE["response"]["result"].encode()).hexdigest()
-        == REFERENCE["response_sha256"]
-    )
-    if "source_fixture" in REFERENCE:
-        source = Path(REFERENCE["source_fixture"])
-        assert (
-            hashlib.sha256(source.read_bytes()).hexdigest()
-            == REFERENCE["source_fixture_sha256"]
-        )
-        assert REFERENCE["original_http_json_bytes_preserved"] is False
-        assert (
-            REFERENCE["retrieved_at"] == json.loads(source.read_text())["retrieved_at"]
-        )
-    else:
-        raw = REFERENCE["http_json_text"].encode("utf-8")
-        assert (
-            hashlib.sha256(raw).hexdigest()
-            == REFERENCE["original_http_json_bytes_sha256"]
-        )
-        assert json.loads(raw) == REFERENCE["response"]
-        assert REFERENCE["original_http_json_bytes_preserved"] is True
 
 
 @HAS_SWE

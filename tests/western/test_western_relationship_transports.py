@@ -2,11 +2,13 @@
 
 import asyncio
 from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
 from fastapi.testclient import TestClient
 
 from fatebridge.application.examples import evidence_views, suggested_fields
+from scripts.western import audit_western_relationship as relationship_audit
 from tests.fixtures.surface_payloads import J2000_UNRESOLVED_ASC_SITE
 from tests.support.relationship_inputs import relationship_payload
 from tests.support.transports import (
@@ -17,6 +19,67 @@ from tests.support.transports import (
     native,
     rest,
 )
+
+
+@pytest.mark.parametrize(
+    "single_instant,marks_roles",
+    [(True, ("inner", "outer")), (False, ("inner", "outer")), (True, ("inner",))],
+)
+def test_relationship_audit_includes_timespace_chart_with_empty_marks_map(
+    single_instant: bool,
+    marks_roles: tuple[str, ...],
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """TimeSpace audits skipped their chart when the service returned empty Marks."""
+    reference = tmp_path / "equatorial-midpoint.json"
+    reference.write_text(
+        '{"source_url":"equatorial great-circle midpoint", "oracle":"geometry",'
+        '"tolerance_degrees":1e-9,"cases":[{"input_longitudes_latitudes":[0,0,90,0],'
+        '"expected_longitude":45,"expected_latitude":0}]}'
+    )
+    methods = tmp_path / "methods.json"
+    methods.write_text("{}")
+    monkeypatch.setattr(relationship_audit, "REFERENCE", reference)
+    monkeypatch.setattr(relationship_audit, "METHODS", methods)
+    responses = []
+    for variant in ("uncorrected", "corrected", "spherical"):
+        for mode in ("TimeSpace", "Marks"):
+            chart = {
+                "person_info": {},
+                "chart_profile": {
+                    "derivation_policy": {
+                        "positions_from_single_instant": single_instant,
+                        "variant": variant,
+                    }
+                },
+            }
+            responses.append(
+                {
+                    "chart": chart,
+                    "marks_charts": (
+                        {}
+                        if mode == "TimeSpace"
+                        else {role: chart for role in marks_roles}
+                    ),
+                    "relationship_profile": {},
+                }
+            )
+    monkeypatch.setattr(
+        relationship_audit,
+        "calculate_relative_chart_analysis",
+        Mock(side_effect=responses),
+    )
+    monkeypatch.setattr(relationship_audit, "configure_ephemeris_path", Mock())
+    report = relationship_audit.audit()
+    assert report["spherical_midpoints"]["passed"] == 1
+    for case in report["variants_and_marks_recipe"]:
+        assert case["passed"] is (
+            single_instant and (case["mode"] == "TimeSpace" or len(marks_roles) == 2)
+        )
+        assert set(case["charts"]) == (
+            {"pair"} if case["mode"] == "TimeSpace" else set(marks_roles)
+        )
 
 
 def test_marks_requires_only_the_selected_personal_charts(

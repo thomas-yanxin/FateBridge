@@ -10,8 +10,10 @@ import pytest
 from fatebridge.core import ephemeris_runtime as runtime
 from fatebridge.core.predictive import _common, returns
 from fatebridge.core.predictive.transit import build_transit_payload
+from fatebridge.services.western_timing import calculate_western_timing_analysis
 from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.utils.timezones import parse_timezone_name
+from tests.support.ephemeris_context import empty_ephemeris_path
 from tests.support.transports import SPECS, inputs, rest, surface_calls
 
 
@@ -28,15 +30,12 @@ def _birth_info():
 
 
 @pytest.mark.parametrize(
-    "analysis_year,has_firdaria",
-    [(1989, False), (2500, True)],
+    "analysis_year,before_birth",
+    [(1989, True), (2500, False)],
 )
-def test_timing_aggregate_preserves_results_without_an_active_releasing_period(
-    analysis_year: int, has_firdaria: bool
+def test_timing_aggregate_validates_age_and_preserves_far_future_layers(
+    analysis_year: int, before_birth: bool
 ) -> None:
-    from fatebridge.services.western_timing import calculate_western_timing_analysis
-    from tests.support.ephemeris_context import empty_ephemeris_path
-
     with empty_ephemeris_path():
         result = calculate_western_timing_analysis(
             birth_year=1990,
@@ -54,13 +53,16 @@ def test_timing_aggregate_preserves_results_without_an_active_releasing_period(
             analysis_minute=0,
             house_system="W",
         )
-    assert "error" not in result
+    if before_birth:
+        assert result["error_code"] == "validation_error"
+        assert "分析时刻不能早于出生时刻" in result["error"]
+        return
+    else:
+        assert "error" not in result
     assert (
         result["time_lords"]["zodiacal_releasing"]["spirit"]["current_level_1"] is None
     )
-    assert (
-        result["time_lords"]["firdaria"]["current_major"] is not None
-    ) == has_firdaria
+    assert result["time_lords"]["firdaria"]["current_major"] is not None
     assert "Spirit 黄道释放 L1 未知" in result["summary"]
     assert (
         result["natal_reference"]["calculation_basis"]["ephemeris_model"] == "moshier"

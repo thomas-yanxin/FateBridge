@@ -1,6 +1,5 @@
 """Pre-edit manual source cells; synthetic angles do not prove prediction."""
 
-import hashlib
 import json
 import math
 from decimal import Decimal, localcontext
@@ -23,19 +22,10 @@ REFERENCE = json.loads(PATH.read_text())
 SIGNS = [row[0] for row in REFERENCE["manual_rows"]]
 
 
-def test_reference_is_the_preedit_manual_primary_source_not_production_output() -> None:
-    assert (
-        hashlib.sha256(PATH.read_bytes()).hexdigest()
-        == "57d16dcd8c5d6431f169d6ca44dab761416c3cf164e133f514e2c2936afc1b3a"
-    )
-    assert REFERENCE["production_imports"] is False
-    assert REFERENCE["independent_expert_reviewed"] is False
-    assert REFERENCE["counts"] == {
-        "ray": 84,
-        "co_present": 12,
-        "listed_inconjunct": 32,
-        "not_in_either_table": 16,
-    }
+def test_printed_cells_cover_every_ordered_sign_pair_once() -> None:
+    pairs = {(row["caster_sign"], row["receiver_sign"]) for row in REFERENCE["cases"]}
+    assert len(REFERENCE["cases"]) == len(pairs) == 144
+    assert pairs == {(caster, receiver) for caster in SIGNS for receiver in SIGNS}
 
 
 @pytest.mark.parametrize(

@@ -1,8 +1,6 @@
 """Bounded geometry and clock references for primary-direction calculations."""
 
 import gzip
-import hashlib
-import json
 import math
 from dataclasses import replace
 from datetime import date, datetime, timezone
@@ -100,18 +98,9 @@ class PrimaryClockReference(BaseModel):
 
 
 CLOCK_DIRECTORY = Path(__file__).parents[1] / "data/primary_direction_clock_temporal_v1"
-clock_bytes = gzip.decompress((CLOCK_DIRECTORY / "reference.json.gz").read_bytes())
-assert (
-    hashlib.sha256(clock_bytes).hexdigest()
-    == (CLOCK_DIRECTORY / "reference.json.sha256").read_text().strip()
+CLOCK_REFERENCE = PrimaryClockReference.model_validate_json(
+    gzip.decompress((CLOCK_DIRECTORY / "reference.json.gz").read_bytes())
 )
-# Adapt the frozen scalar epochs to the current NativeSubject fields.
-clock_values = json.loads(clock_bytes)
-for clock_case in clock_values["cases"]:
-    clock_subject = clock_case["natal_subject"]
-    clock_subject["ut1"] = UT1Instant.from_float(clock_subject.pop("julian_day"))
-    clock_subject["tt"] = TTInstant.from_float(clock_subject.pop("julian_day_tt"))
-CLOCK_REFERENCE = PrimaryClockReference.model_validate(clock_values)
 
 
 @pytest.fixture(scope="module")

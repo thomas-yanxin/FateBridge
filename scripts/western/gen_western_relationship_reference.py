@@ -6,7 +6,6 @@ degree tolerance is fixed before collecting these samples. No FateBridge
 calculation is imported to manufacture a reference answer.
 """
 
-import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -64,7 +63,6 @@ def main():
         "tolerance_degrees": TOLERANCE_DEGREES,
         "scope": "47 unique spherical geographic midpoint cases; not WGS84, native astrological coordinates, or an original-text interpretation oracle",
         "cases": rows,
-        "generator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     }
     target = ROOT / "tests/fixtures/western-geographiclib-midpoints.json"
     target.write_text(

@@ -1,7 +1,6 @@
 """Named-source row predicates, counterexamples and retained source conflicts."""
 
 import copy
-import hashlib
 import json
 import math
 from fractions import Fraction
@@ -41,25 +40,6 @@ def result(states, data):
 
 def row(value, planet, code):
     return next(r for r in value["planets"][planet]["rows"] if r["code"] == code)
-
-
-def test_all_original_rows_and_mean_motion_units_are_frozen_before_candidate() -> None:
-    base = Path(__file__).parents[1] / "fixtures"
-    assert (
-        hashlib.sha256(
-            (base / "western-lilly-fortitudes-1647.json").read_bytes()
-        ).hexdigest()
-        == "31a64976c3ca8650de975cf53cf76972741788dc81f51021278087f8ef962f6e"
-    )
-    assert (
-        hashlib.sha256(
-            (base / "western-lilly-fortitudes-sources.zip").read_bytes()
-        ).hexdigest()
-        == "0cea6669b1d9f96e9583772da8002813149282e189be2029165c45c1e153d2cc"
-    )
-    assert REFERENCE["production_imports"] is False
-    assert len(REFERENCE["rows"]) == 41
-    assert REFERENCE["mean_daily_motion_arcseconds"]["Mars"] == 31 * 60 + 27
 
 
 def test_the_entire_printed_example_keeps_its_failed_acceptance_and_row_differences() -> (

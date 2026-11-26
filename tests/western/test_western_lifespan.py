@@ -437,12 +437,6 @@ def test_singular_ascendant_blocks_ascendant_dependent_results() -> None:
     assert kp_soul_payload["release_sign_index"] is not None
 
 
-def test_balbillus_source_metadata_has_no_redundant_sha256() -> None:
-    result = calculate_balbillus(**BIRTH)
-    source = result["balbillus"]["reduction_model"]["source"]
-    assert "sha256" not in source
-
-
 @pytest.mark.parametrize(
     "age_limit,expected_count", [(19.0, 1), (math.nextafter(19.0, math.inf), 2)]
 )

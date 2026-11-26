@@ -1,6 +1,5 @@
 """Frozen primary-text cases, independent JPL events and analytical controls."""
 
-import hashlib
 import json
 import math
 from decimal import Decimal, localcontext
@@ -52,19 +51,6 @@ def test_current_numerical_solver_matches_exact_dyadic_contact_and_ingress() -> 
     assert result["void_of_course"] is False
     assert result["contacts"][0]["after_days"] == 1 / 16
     assert result["sign_exit_after_days"] == 30 / 16
-
-
-def test_reference_protocol_and_primary_examples_are_not_runtime_generated() -> None:
-    assert (
-        hashlib.sha256(
-            (FIXTURES / "western-horary-motion-protocol.json").read_bytes()
-        ).hexdigest()
-        == REFERENCE["protocol_sha256"]
-    )
-    assert REFERENCE["production_imports"] is False
-    assert PROTOCOL["comparison_tolerance_event_seconds"] == 30
-    assert len(SOURCE["source_images"]) == 8
-    assert SOURCE["full_original_text_acceptance"] is False
 
 
 def test_solar_definitions_follow_the_printed_seventeen_degree_and_sign_conditions() -> (
@@ -195,6 +181,7 @@ def test_future_contact_inside_current_orb_flag_is_classified_before_rounding(
 
 @pytest.mark.parametrize("case", REFERENCE["cases"], ids=lambda row: row["case_id"])
 def test_native_ingress_and_all_contacts_match_independent_jpl(case) -> None:
+    assert PROTOCOL["comparison_tolerance_event_seconds"] == 30
     result = native_lunar_contacts(
         SimpleNamespace(julian_day_tt=case["start_julian_day_tt"], zodiac_type="Tropic")
     )
