@@ -54,21 +54,23 @@ __all__ = [
 ]
 
 
-def output_model_for(key: str, *, western_data_policy: bool = False) -> type[BaseModel]:
+def output_model_for(
+    tool_name: str, *, western_data_policy: bool = False
+) -> type[BaseModel]:
     """Build each catalog's public schema from explicit root-field contracts."""
-    if key not in TOOL_FIELDS:
-        raise KeyError(f"Missing output contract for tool {key}")
+    if tool_name not in TOOL_FIELDS:
+        raise KeyError(f"Missing output contract for tool {tool_name}")
     fields: dict[str, Any] = {
         "run_metadata": (RunMetadata | None, None),
     }
     if western_data_policy:
         fields["ephemeris_data_policy"] = (WesternDataPolicy | None, None)
     tool_fields = {
-        **CHINESE_TOOL_FIELDS.get(key, {}),
-        **CHART_TOOL_FIELDS.get(key, {}),
-        **REFERENCE_TOOL_FIELDS.get(key, {}),
-        **(ASTRODICE_FIELDS if key == "interpret_astrology_dice" else {}),
-        **(COMPATIBILITY_FIELDS if key == "bazi_compatibility" else {}),
+        **CHINESE_TOOL_FIELDS.get(tool_name, {}),
+        **CHART_TOOL_FIELDS.get(tool_name, {}),
+        **REFERENCE_TOOL_FIELDS.get(tool_name, {}),
+        **(ASTRODICE_FIELDS if tool_name == "interpret_astrology_dice" else {}),
+        **(COMPATIBILITY_FIELDS if tool_name == "bazi_compatibility" else {}),
         **(
             {
                 "input_context": LiteralSourceInputContext,
@@ -76,7 +78,7 @@ def output_model_for(key: str, *, western_data_policy: bool = False) -> type[Bas
                 "source_comparison": SourceAnnotationComparison,
                 "summary": str,
             }
-            if key == "compare_bazi_sources"
+            if tool_name == "compare_bazi_sources"
             else {}
         ),
     }
@@ -96,7 +98,7 @@ def output_model_for(key: str, *, western_data_policy: bool = False) -> type[Bas
         "birth_time_sensitivity": BirthTimeSensitivity,
         **tool_fields,
     }
-    root_fields = dict.fromkeys([*TOOL_FIELDS[key].split(), *tool_fields])
+    root_fields = dict.fromkeys([*TOOL_FIELDS[tool_name].split(), *tool_fields])
     for field in root_fields:
         annotation = overrides.get(field, FIELD_TYPES.get(field, Object))
         metadata: dict[str, JsonValue] = {}
@@ -123,17 +125,17 @@ def output_model_for(key: str, *, western_data_policy: bool = False) -> type[Bas
                 json_schema_extra=metadata or None,
             ),
         )
-    name = "".join(part.title() for part in key.split("_")) + "Output"
+    name = "".join(part.title() for part in tool_name.split("_")) + "Output"
     bases = (
         (ProjectedOutput, RenAnchoredOutput)
-        if key
+        if tool_name
         in {"jinkou", "liuren_chart", "liuren_yearly_timing", "sanshi_combined_chart"}
         else (ProjectedOutput,)
     )
     return create_model(name, __base__=bases, **fields)
 
 
-def required_output_fields_for(key: str) -> tuple[str, ...]:
+def required_output_fields_for(tool_name: str) -> tuple[str, ...]:
     """Non-null roots required before any transport projects the full result.
 
     This separate contract preserves projection-compatible public models. A
@@ -141,7 +143,7 @@ def required_output_fields_for(key: str) -> tuple[str, ...]:
     silently unprotected. Required objects must contain a fact or explicit
     status; empty lists can still be legitimate domain results.
     """
-    return tuple(REQUIRED_OUTPUT_FIELDS[key].split())
+    return tuple(REQUIRED_OUTPUT_FIELDS[tool_name].split())
 
 
 FIELD_TYPES: dict[str, Any] = {
@@ -247,8 +249,7 @@ TOOL_FIELDS = {
     "solar_term_timeline": "analysis_type calendar_context jieqi_timeline personal_info summary target_year_jieqi",
     "solar_terms_for_year": "analysis_type jieqi_year query_context selected_jieqi summary year",
     "lunar_calendar_time": "analysis_context analysis_type birth calendar_context day dayGanZi dayInt four_pillars input_context jiedelta jieqi leap lunar_calendar month monthGanZi monthInt nongli summary timeGanZi yearGanZi yearJieqi",
-    "gua_lookup": "analysis_type lookup_mode query result summary",
-    "gua_meanings": "analysis_type queries results summary",
+    "gua_lookup": "analysis_type lookup_mode queries results summary",
     "meihua_time_cast": "analysis_context analysis_type calendar_context four_pillars interpretation meihua summary",
     "combine_four_gua": "analysis_type input_normalized summary tongshefa",
     "liuyao": "analysis_type calendar_context cast changed_code changed_hexagram classical_text_evidence current_code current_hexagram descriptions hexagram_info input_normalized lines liuyao_evidence moving_lines nongli pattern_flags patterns question summary",
@@ -331,8 +332,7 @@ REQUIRED_OUTPUT_FIELDS = {
     "solar_term_timeline": "jieqi_timeline",
     "solar_terms_for_year": "jieqi_year",
     "lunar_calendar_time": "nongli four_pillars",
-    "gua_lookup": "result",
-    "gua_meanings": "results",
+    "gua_lookup": "results",
     "meihua_time_cast": "meihua",
     "combine_four_gua": "tongshefa",
     "liuyao": "cast current_code current_hexagram",

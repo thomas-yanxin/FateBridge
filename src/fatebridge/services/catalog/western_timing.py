@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from fatebridge.application.bindings import bind_kwargs, service_ref
-from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.application.tool_spec import CompactView, ServiceResult, ToolSpec
 from fatebridge.core.requests.western_timing import (
     WesternFirdariaRequest,
     WesternPrimaryDirectionsChartRequest,
@@ -23,24 +23,59 @@ calculate_timing_tool = service_ref(
 )
 
 
+_DECENNIAL_PERIOD_FIELDS = frozenset(
+    {
+        "key",
+        "level",
+        "planet",
+        "planet_label",
+        "date",
+        "nominal",
+        "start",
+        "end",
+        "active",
+    }
+)
+
+
+def _compact_decennial_period(period: ServiceResult | None) -> ServiceResult | None:
+    if period is None:
+        return None
+    return {
+        key: value for key, value in period.items() if key in _DECENNIAL_PERIOD_FIELDS
+    }
+
+
+def _compact_decennials(result: ServiceResult) -> ServiceResult:
+    decennials = result["decennials"]
+    return {
+        **result,
+        "decennials": {
+            **decennials,
+            "current_level_1": _compact_decennial_period(decennials["current_level_1"]),
+            "current_level_2": _compact_decennial_period(decennials["current_level_2"]),
+            "current_level_3": _compact_decennial_period(decennials["current_level_3"]),
+        },
+    }
+
+
 def _western_module_spec(
     name: str,
     label: str,
     *,
     request_model: type[WesternTimingBaseRequest] = WesternTimingBaseRequest,
+    compact_view: CompactView | None = None,
 ) -> ToolSpec:
     return ToolSpec(
         name=name,
         bind=bind_kwargs(calculate_timing_tool, fixed={"tool_name": name}),
         request_model=request_model,
-        summary=(
-            f"{label}：西占行运的单项技法，读取本命盘+目标时刻只算这一种。"
-            "想一次拿到多项行运的整合结果，改用聚合工具 western_timing。"
-        ),
+        summary=f"{label}：单项西占行运（整合用 western_timing）。",
         operation_label_zh=label,
         family="western_timing",
         cpu_bound=True,
         rest_path="/api/astrology/timing/" + name.replace("_", "-"),
+        compact_view=compact_view,
     )
 
 
@@ -49,10 +84,7 @@ SPECS: list[ToolSpec] = [
         name="western_timing",
         bind=bind_kwargs(calculate_western_timing_analysis),
         request_model=WesternTimingRequest,
-        summary=(
-            "西占预测时运的聚合分析：一次整合多种行运技法（返照/行运/太阳弧/小限/法达等）；"
-            "只要单一技法请用对应的 solar_return、transit_chart 等工具。"
-        ),
+        summary="西占时运聚合分析：整合返照/行运/太阳弧/小限/法达；单项用对应工具。",
         operation_label_zh="西占时运",
         family="western_timing",
         cpu_bound=True,
@@ -82,5 +114,7 @@ SPECS: list[ToolSpec] = [
     _western_module_spec(
         "firdaria", "西占法达星限", request_model=WesternFirdariaRequest
     ),
-    _western_module_spec("decennials", "西占十年星限"),
+    _western_module_spec(
+        "decennials", "西占十年星限", compact_view=_compact_decennials
+    ),
 ]

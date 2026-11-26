@@ -27,7 +27,7 @@ ServiceInput = (
     | Mapping[str, "ServiceInput"]
     | Mapping[int, "ServiceInput"]
 )
-ServicePositionalInput = ServiceInput | PersonInfo
+ServicePositionalInput = ServiceInput | PersonInfo | BaseModel
 
 
 class EvidenceView(TypedDict):
@@ -164,15 +164,13 @@ class ToolSpec:
     required_output_validator: RequiredOutputValidator | None = None
     cli_request_file: bool = False
     execution_hints: ExecutionHints = field(default_factory=ExecutionHints)
-    reproducibility: ReproducibilityPolicy = field(
-        default_factory=ReproducibilityPolicy
-    )
+    reproducibility: ReproducibilityPolicy | None = None
     methods: tuple[MethodContract, ...] = ()
     output_validators: tuple[OutputValidator, ...] = ()
     needs_random_seed: NeedsRandomSeed | None = None
     resolve_time_defaults: TimeDefaultsResolver | None = None
     approximate_record: ApproximationDetector | None = None
-    uses_astronomy_runtime: bool = False
+    uses_astronomy_runtime: bool = True
     execution_wrapper: ExecutionWrapper | None = None
     evidence_views_builder: EvidenceViewsBuilder | None = None
     compact_view: CompactView | None = None

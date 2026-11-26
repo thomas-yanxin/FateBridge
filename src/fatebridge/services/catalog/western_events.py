@@ -40,23 +40,12 @@ def _western_event_spec(
         bind=bind_kwargs(service),
         request_model=model,
         summary=(
-            (
-                "按明确提问时刻起盘，核算月亮出宫前黄经事件、当前相位候选与原典条件缺项。"
-                if name == "horary_chart"
-                else (
-                    "按明确候选时刻起盘，核算原生月亮事件、太阳状态与约定评分因子，未核算项保留未知。"
-                    if name == "evaluate_election_time"
-                    else f"生成{label}（求解天文时刻后起盘）。"
-                )
-            )
-            + (
-                "评估给定的非医疗活动候选时刻；不是整段时间自动最优搜索，不提供手术或治疗择时。"
+            "按明确提问时刻起盘，核算月亮出宫前黄经事件与原典条件；禁生死/疾病/生育判断。"
+            if name == "horary_chart"
+            else (
+                "按明确候选时刻起盘评估非医疗活动条件（非最优区间搜索，不提供医疗择时）。"
                 if name == "evaluate_election_time"
-                else (
-                    "生死寿命、疾病及生育临床判断类别不开放。"
-                    if name == "horary_chart"
-                    else ""
-                )
+                else f"生成{label}（求解天文时刻后起盘）。"
             )
         ),
         operation_label_zh=label,

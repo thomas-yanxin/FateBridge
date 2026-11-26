@@ -40,11 +40,11 @@ def _layer(result: dict[str, Any], ruleset_id: str) -> dict[str, Any]:
     return {**result, "ruleset": provenance(ruleset_id)}
 
 
-def calculate_directions(req: DirectionsRequest) -> dict[str, Any]:
+def calculate_directions(request: DirectionsRequest) -> dict[str, Any]:
     bearing = None
-    if req.bearing_degrees is not None:
-        assert req.north_reference is not None
-        bearing = bearing_context(req.bearing_degrees, req.north_reference)
+    if request.bearing_degrees is not None:
+        assert request.north_reference is not None
+        bearing = bearing_context(request.bearing_degrees, request.north_reference)
     result = {
         "status": "complete",
         "directions": rule_data("directions"),
@@ -52,66 +52,73 @@ def calculate_directions(req: DirectionsRequest) -> dict[str, Any]:
         "bearing": bearing,
         "division_scope": "confirmed_angular_sectors_no_automatic_geometry",
     }
-    if req.geomagnetic_reference is not None:
+    if request.geomagnetic_reference is not None:
         result["geomagnetic_reference"] = geomagnetic_reference(
-            req.geomagnetic_reference, req.bearing_degrees, req.north_reference
+            request.geomagnetic_reference,
+            request.bearing_degrees,
+            request.north_reference,
         )
-    return compose_fengshui_result({"directions": _layer(result, req.ruleset_id)}, [])
-
-
-def calculate_minggua(req: MingguaRequest) -> dict[str, Any]:
     return compose_fengshui_result(
-        {"minggua": _layer(minggua(req), req.ruleset_id)}, []
+        {"directions": _layer(result, request.ruleset_id)}, []
     )
 
 
-def calculate_bazhai(req: BazhaiRequest) -> dict[str, Any]:
-    layer = _layer(bazhai(req), req.ruleset_id)
+def calculate_minggua(request: MingguaRequest) -> dict[str, Any]:
+    return compose_fengshui_result(
+        {"minggua": _layer(minggua(request), request.ruleset_id)}, []
+    )
+
+
+def calculate_bazhai(request: BazhaiRequest) -> dict[str, Any]:
+    layer = _layer(bazhai(request), request.ruleset_id)
     return compose_fengshui_result({"bazhai": layer}, _differences({"bazhai": layer}))
 
 
-def calculate_jinsuo(req: JinsuoRequest) -> dict[str, Any]:
-    return compose_fengshui_result({"jinsuo": _layer(jinsuo(req), req.ruleset_id)}, [])
-
-
-def calculate_annual_stars(req: AnnualRequest) -> dict[str, Any]:
+def calculate_jinsuo(request: JinsuoRequest) -> dict[str, Any]:
     return compose_fengshui_result(
-        {"annual_stars": _layer(annual_stars(req), req.ruleset_id)}, []
+        {"jinsuo": _layer(jinsuo(request), request.ruleset_id)}, []
     )
 
 
-def calculate_monthly_stars(req: MonthlyRequest) -> dict[str, Any]:
-    return compose_fengshui_result({"monthly_stars": monthly_stars(req)}, [])
+def calculate_annual_stars(request: AnnualRequest) -> dict[str, Any]:
+    return compose_fengshui_result(
+        {"annual_stars": _layer(annual_stars(request), request.ruleset_id)}, []
+    )
+
+
+def calculate_monthly_stars(request: MonthlyRequest) -> dict[str, Any]:
+    return compose_fengshui_result({"monthly_stars": monthly_stars(request)}, [])
 
 
 def _natal_layer(
-    req: XuankongRequest, placements: list[Placement] | None = None
+    request: XuankongRequest, placements: list[Placement] | None = None
 ) -> dict[str, Any]:
-    layer = {**xuankong_natal(req), "ruleset": natal_provenance()}
-    if req.interpretation is not None:
+    layer = {**xuankong_natal(request), "ruleset": natal_provenance()}
+    if request.interpretation is not None:
         layer["interpretation"] = analyze_natal_interpretation(
-            req.interpretation, layer, placements or []
+            request.interpretation, layer, placements or []
         )
         validate_author_geometries(
             layer["interpretation"],
             layer,
-            current=req.interpretation.current_period_number,
-            expected_selected=req.interpretation.timeliness_ruleset_id is not None,
+            current=request.interpretation.current_period_number,
+            expected_selected=request.interpretation.timeliness_ruleset_id is not None,
         )
         validate_host_guest(
             layer["interpretation"],
             layer,
-            expected_selected=req.interpretation.host_guest_ruleset_id is not None,
+            expected_selected=request.interpretation.host_guest_ruleset_id is not None,
         )
     return layer
 
 
-def calculate_xuankong_natal(req: XuankongRequest) -> dict[str, Any]:
+def calculate_xuankong_natal(request: XuankongRequest) -> dict[str, Any]:
     return compose_fengshui_result(
-        {"xuankong_natal": _natal_layer(req)},
+        {"xuankong_natal": _natal_layer(request)},
         [],
         include_calculation_reading=bool(
-            req.interpretation and req.interpretation.include_calculation_reading
+            request.interpretation
+            and request.interpretation.include_calculation_reading
         ),
     )
 
@@ -190,80 +197,87 @@ def _differences(layers: dict[str, Any]) -> list[dict[str, Any]]:
     return differences
 
 
-def assess(req: AssessRequest) -> dict[str, Any]:
-    original = req
+def calculate_fengshui_assessment(request: AssessRequest) -> dict[str, Any]:
+    original = request
     geometry = None
-    if req.workstation_layout is not None:
-        req, geometry = prepare_spatial_request(req, req.workstation_layout.scene)
+    if request.workstation_layout is not None:
+        request, geometry = prepare_spatial_request(
+            request, request.workstation_layout.scene
+        )
     layers = {}
-    if "bazhai" in req.selected_methods:
-        layers["bazhai"] = _layer(bazhai(req), req.ruleset_id)
-    if "jinsuo" in req.selected_methods:
+    if "bazhai" in request.selected_methods:
+        layers["bazhai"] = _layer(bazhai(request), request.ruleset_id)
+    if "jinsuo" in request.selected_methods:
         layers["jinsuo"] = _layer(
             jinsuo(
-                JinsuoRequest(features=req.features, ruleset_id=req.jinsuo_ruleset_id)
+                JinsuoRequest(
+                    features=request.features, ruleset_id=request.jinsuo_ruleset_id
+                )
             ),
-            req.jinsuo_ruleset_id,
+            request.jinsuo_ruleset_id,
         )
-    if "annual_stars" in req.selected_methods:
+    if "annual_stars" in request.selected_methods:
         layers["annual_stars"] = _layer(
             annual_stars(
                 AnnualRequest(
-                    effective_year=req.effective_year,
-                    query_at=req.query_at,
-                    timezone_name=req.timezone_name,
-                    ruleset_id=req.annual_ruleset_id,
+                    effective_year=request.effective_year,
+                    query_at=request.query_at,
+                    timezone_name=request.timezone_name,
+                    ruleset_id=request.annual_ruleset_id,
                 )
             ),
-            req.annual_ruleset_id,
+            request.annual_ruleset_id,
         )
-    if "xuankong_natal" in req.selected_methods:
-        if req.xuankong is None:
-            natal = XuankongRequest(house=req.house)
-        elif req.xuankong.house is None and req.house is not None:
+    if "xuankong_natal" in request.selected_methods:
+        if request.xuankong is None:
+            natal = XuankongRequest(house=request.house)
+        elif request.xuankong.house is None and request.house is not None:
             # note (house): Inheriting a house applies Xuankong's magnetic-bearing constraints.
             natal = XuankongRequest(
-                house=req.house,
-                period=req.xuankong.period,
-                ruleset_id=req.xuankong.ruleset_id,
-                interpretation=req.xuankong.interpretation,
-                city_gate=req.xuankong.city_gate,
+                house=request.house,
+                period=request.xuankong.period,
+                ruleset_id=request.xuankong.ruleset_id,
+                interpretation=request.xuankong.interpretation,
+                city_gate=request.xuankong.city_gate,
             )
         else:
-            natal = req.xuankong
-        layers["xuankong_natal"] = _natal_layer(natal, req.placements)
-    if "monthly_stars" in req.selected_methods:
-        monthly = req.monthly or MonthlyRequest(
-            query_at=req.query_at, timezone_name=req.timezone_name
+            natal = request.xuankong
+        layers["xuankong_natal"] = _natal_layer(natal, request.placements)
+    if "monthly_stars" in request.selected_methods:
+        monthly = request.monthly or MonthlyRequest(
+            query_at=request.query_at, timezone_name=request.timezone_name
         )
         layers["monthly_stars"] = monthly_stars(monthly)
-    layers = {name: layers[name] for name in req.selected_methods}
+    layers = {name: layers[name] for name in request.selected_methods}
     layout = (
-        analyze_layout(req, layers)
-        if req.analyze_layout
+        analyze_layout(request, layers)
+        if request.analyze_layout
         # A scene also labels method-reference queries. It does not by itself
         # request a site assessment or create missing physical observations.
-        or (req.scene and (req.selected_methods or req.placements or req.features))
-        or req.layout_constraints
-        or req.layout_alternatives
-        or req.form_observations
-        or req.environmental_context is not None
-        or req.surface_layouts
-        or req.element_adjustments
-        or req.annual_remedy_ruleset_id is not None
-        or req.workstation_layout is not None
+        or (
+            request.scene
+            and (request.selected_methods or request.placements or request.features)
+        )
+        or request.layout_constraints
+        or request.layout_alternatives
+        or request.form_observations
+        or request.environmental_context is not None
+        or request.surface_layouts
+        or request.element_adjustments
+        or request.annual_remedy_ruleset_id is not None
+        or request.workstation_layout is not None
         else None
     )
     if layout is not None and geometry is not None:
         layout = merge_measured_layout(
             original,
-            req,
+            request,
             geometry,
             TypeAdapter(dict[str, JsonValue]).validate_python(layers),
             TypeAdapter(dict[str, JsonValue]).validate_python(layout),
         )
-    if layout is not None and req.layout_alternatives:
-        alternatives = evaluate_alternatives(req, layers)
+    if layout is not None and request.layout_alternatives:
+        alternatives = evaluate_alternatives(request, layers)
         layout["alternatives_analysis"] = alternatives
         registered = {r["ruleset_id"] for r in layout["supplemental_rulesets"]}
         for proposal in alternatives["findings"]:
@@ -311,20 +325,20 @@ def assess(req: AssessRequest) -> dict[str, Any]:
         )
         layout["analysis_progress"] = progress
     scene_scope = None
-    if req.scene is not None:
+    if request.scene is not None:
         scene_scope = {
-            "scene": req.scene,
-            "selected_methods": req.selected_methods,
+            "scene": request.scene,
+            "selected_methods": request.selected_methods,
             "selection_policy": "explicit_methods_override_input_driven_default",
             "scope": "supplied_objects_and_selected_rules_not_whole_property_certification",
             "indoor_forms": (
                 "selected_modern_authored_rules"
-                if req.form_observations
+                if request.form_observations
                 else "not_provided"
             ),
             "geometry": (
                 "measured_planar_scene_with_explicit_chart_binding"
-                if req.workstation_layout
+                if request.workstation_layout
                 else "user_confirmed_house_sectors_no_automatic_floorplan_geometry"
             ),
             "natal_interpretation": (
@@ -343,7 +357,9 @@ def assess(req: AssessRequest) -> dict[str, Any]:
                 "complete_classical_landforms",
             ],
         }
-    policy_selected = req.scene is not None or req.environmental_context is not None
+    policy_selected = (
+        request.scene is not None or request.environmental_context is not None
+    )
     return compose_fengshui_result(
         layers,
         _differences(layers),
@@ -351,8 +367,8 @@ def assess(req: AssessRequest) -> dict[str, Any]:
         scene_scope,
         (
             method_policy(
-                req,
-                explicit_methods=req.methods is not None,
+                request,
+                explicit_methods=request.methods is not None,
                 layer_results=layers,
                 candidate_results=(layout or {})
                 .get("alternatives_analysis", {})
@@ -361,10 +377,10 @@ def assess(req: AssessRequest) -> dict[str, Any]:
             if policy_selected
             else None
         ),
-        method_details(req.selected_methods) if policy_selected else None,
+        method_details(request.selected_methods) if policy_selected else None,
         include_calculation_reading=bool(
-            req.xuankong
-            and req.xuankong.interpretation
-            and req.xuankong.interpretation.include_calculation_reading
+            request.xuankong
+            and request.xuankong.interpretation
+            and request.xuankong.interpretation.include_calculation_reading
         ),
     )

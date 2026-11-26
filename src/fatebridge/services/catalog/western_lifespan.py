@@ -101,11 +101,7 @@ def _western_lifespan_spec(
         name=name,
         bind=bind_kwargs(service),
         request_model=model,
-        summary=summary
-        or (
-            f"{label}：只读单张本命盘的古典「全生命周期」技法（不需目标时刻），"
-            f"输出按年龄/时段划分的人生阶段。"
-        ),
+        summary=summary or f"{label}：古典全生命周期技法（不需目标时刻）。",
         operation_label_zh=label,
         family="western_lifespan",
         cpu_bound=True,
@@ -139,11 +135,7 @@ SPECS: list[ToolSpec] = [
         calculate_lunation_phase,
         AstroLunationPhaseRequest,
         "月相推运",
-        summary=(
-            "月相推运：按出生后实际日月星历搜索八相交点，"
-            "以一名义UTC日对应一象征年龄年，返回出生后至年龄上限内的转换。"
-            "星历与时间钥随结果交付；年龄范围不是寿命估计。"
-        ),
+        summary="月相推运：按出生后实际日月八相交点推演象征年龄阶段（非寿命估计）。",
     ),
     _western_lifespan_spec(
         "bounds_directions",
