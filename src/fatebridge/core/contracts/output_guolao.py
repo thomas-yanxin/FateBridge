@@ -164,7 +164,6 @@ class GuolaoProfile(PartialOutput):
     solar_clock_display: str | None = None
     apparent_solar_clock: GuolaoApparentSolarClock | None = None
     solar_clock_changes_instant: bool | None = None
-    catalogue_sha256: str | None = None
     ephemeris_models: list[str] | None = None
     ephemeris_provenance: GuolaoEphemerisProvenance | None = None
     longitude_motion: GuolaoLongitudeMotionPolicy | None = None
@@ -362,7 +361,6 @@ class GuolaoTargetProfile(PartialOutput):
     ephemeris_models: list[str] | None = None
     ephemeris_provenance: GuolaoEphemerisProvenance | None = None
     longitude_motion: GuolaoLongitudeMotionPolicy | None = None
-    catalogue_sha256: str | None = None
     ayanamsha: float | None = None
     zodiac: str | None = None
     position_basis: str | None = None

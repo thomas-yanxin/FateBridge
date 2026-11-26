@@ -305,7 +305,6 @@ class ZiweiStructuralConditions(PartialOutput):
     scope: str | None = None
     actual_assignments_modified: Literal[False] | None = None
     whole_book_acceptance_passed: Literal[False] | None = None
-    real_world_efficacy: str | None = None
 
 
 class ZiweiPalaceSihuaOccurrence(PartialOutput):
