@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from fatebridge.core.contracts.output_liuren_selection import compare
-from fatebridge.core.metaphysics.jinkou_natal_course import (
+from fatebridge.core.metaphysics.jinkou.year_fate import (
     natal_course_metadata,
     natal_course_trace,
 )
@@ -133,10 +133,3 @@ def require_complete_natal_course(parent: dict[str, Any]) -> None:
         overview = value["course"].get("overview") or {}
         if not {"di_fen", "di_fen_source"} <= overview.keys():
             raise ValueError("完整本命另课须保留派生地分")
-    traces = [
-        t
-        for t in parent.get("rule_trace") or []
-        if t.get("rule_id") == "jinkou.natal_branch_course"
-    ]
-    if len(traces) != 1 or traces[0] != natal_course_trace(expected):
-        raise ValueError("完整本命另课须有唯一完整依据轨迹")

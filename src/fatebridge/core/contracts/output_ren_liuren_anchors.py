@@ -28,10 +28,12 @@ from fatebridge.core.metaphysics.common import (
     stem_element_text,
     xun_head_for_ganzhi,
 )
-from fatebridge.core.metaphysics.liureng import _liureng_month_general_on_hour
-from fatebridge.core.metaphysics.liureng_life_stages import life_stage_cycle
-from fatebridge.core.metaphysics.liureng_trine_seasonal import nominal_seasonal_evidence
-from fatebridge.core.metaphysics.ren_evidence import xun_dun_stems
+from fatebridge.core.metaphysics.liureng.board import _liureng_month_general_on_hour
+from fatebridge.core.metaphysics.liureng.stars import (
+    life_stage_cycle,
+    nominal_seasonal_evidence,
+)
+from fatebridge.core.metaphysics.ren_calendar import xun_dun_stems
 from fatebridge.core.metaphysics.ren_gods import noble_start
 from fatebridge.utils.data import EARTHLY_BRANCHES
 

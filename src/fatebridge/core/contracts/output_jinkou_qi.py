@@ -5,13 +5,46 @@ from __future__ import annotations
 from typing import Any
 
 from fatebridge.core.metaphysics.common import ELEMENT_GENERATES, branch_element_text
-from fatebridge.core.metaphysics.jinkou_qi import (
-    day_qi_facts,
-    month_qi_facts,
-    offset_qi_facts,
-    qi_basis,
-    qi_metadata,
-)
+from fatebridge.utils.data import EARTHLY_BRANCHES
+
+
+def qi_metadata() -> dict[str, Any]:
+    return {"ruleset_id": "jinkou_yuejian_richen_excerpt_v1"}
+
+
+def offset_qi_facts(offset: int) -> dict[str, Any]:
+    label = {0: "建旺", 1: "进气相", 2: "进气相", 6: "月破", 11: "退气"}.get(offset)
+    return {
+        "month_offset": offset,
+        "month_qi_label": label,
+        "month_qi_status": "matched_excerpt" if label else "not_classified_by_excerpt",
+    }
+
+
+def month_qi_facts(month: str, general: str) -> dict[str, Any]:
+    offset = (EARTHLY_BRANCHES.index(general) - EARTHLY_BRANCHES.index(month)) % 12
+    return {
+        "month_building_branch": month,
+        "jiangshen_branch": general,
+        **offset_qi_facts(offset),
+    }
+
+
+def day_qi_facts(day: str, general: str) -> dict[str, Any]:
+    day_el, gen_el = branch_element_text(day), branch_element_text(general)
+    return {
+        "day_branch": day,
+        "day_element": day_el,
+        "jiangshen_element": gen_el,
+        "day_generates_general": ELEMENT_GENERATES[day_el] == gen_el,
+    }
+
+
+def qi_basis(month: str, general: str, day: str) -> str:
+    m = month_qi_facts(month, general)
+    d = day_qi_facts(day, general)
+    return f"月建{month}、将神{general}相距{m['month_offset']}支（{m['month_qi_label'] or '平'}）；日支{day}({d['day_element']}){'生' if d['day_generates_general'] else '未生'}将神({d['jiangshen_element']})。"
+
 
 MONTH_DEPENDENTS = ("month_offset", "month_qi_label", "month_qi_status")
 

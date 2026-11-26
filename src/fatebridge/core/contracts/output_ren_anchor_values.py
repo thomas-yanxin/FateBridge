@@ -65,7 +65,10 @@ def _diurnal(holder: Any, hour: str | None) -> bool | None:
     evidence = _get(holder, "diurnal_evidence")
     if hour is not None:
         _same(evidence, "hour_branch", hour)
-        if _has(evidence, "explicit_choice"):
+        if (
+            _has(evidence, "explicit_choice")
+            and _get(evidence, "method_id") != "sunrise_sunset_solar_elevation_v1"
+        ):
             expected = resolve_diurnal(hour, _get(evidence, "explicit_choice"))
             _same(evidence, "is_diurnal", expected["is_diurnal"])
             _same(evidence, "selection_source", expected["selection_source"])

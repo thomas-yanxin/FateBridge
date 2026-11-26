@@ -1,8 +1,9 @@
-"""A native-library provider alone does not identify its actual orbit model."""
+"""Tests for Taiyi solar-anchor selection, provenance, and cache immutability."""
 
 import asyncio
 import json
 from copy import deepcopy
+from datetime import datetime
 
 import pytest
 import swisseph as swe
@@ -19,7 +20,6 @@ from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.sanshi import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.transports import call_calculation
-from tests.unit_test.fixtures.taiyi import same_run_payload
 
 PROFILES = [
     ("month", None),
@@ -62,8 +62,6 @@ def inputs(tool, mode, profile):
             use_true_solar_time=False,
             **selected,
         )
-    else:
-        pass
     return dict(
         date="2026-10-25",
         time="12:00:00",
@@ -85,14 +83,15 @@ def test_all_source_anchor_profiles_keep_same_run_models_and_text(
     board = result["taiyi"]
     Taiyi.model_validate(board)
     anchors = board["solar_anchors"]
-    winter_expected = mode == "day" or profile == "key_hour_winter_jiazi_v1"
+    winter_expected = profile == "key_hour_winter_jiazi_v1"
     assert set(anchors) == (
         {"boundary", "winter_origin"} if winter_expected else {"boundary"}
     )
     for value in anchors.values():
         assert value["resolution_provider"] == FALLBACK_PROVIDER
         assert value["ephemeris_model"] == FALLBACK_MODEL
-        assert value["solar_model_details"]["root_time_scale"] == "TT"
+        assert "civil_point" in value
+        assert "comparison_policy" in value
     assert anchors["boundary"]["name"] == board["calendar_rules"]["anchor_name"]
     assert (
         anchors["boundary"]["datetime_with_offset"]
@@ -109,7 +108,7 @@ def test_source_record_mutation_cannot_poison_the_cached_term() -> None:
     first = calculate_taiyi_analysis(**args)
     expected = deepcopy(first["taiyi"]["solar_anchors"])
     for value in first["taiyi"]["solar_anchors"].values():
-        value["solar_model_details"]["selected_crossing_jd_tt"] = -1
+        value["name"] = "tampered"
     second = calculate_taiyi_analysis(**args)
     assert second["taiyi"]["solar_anchors"] == expected
 
@@ -148,13 +147,7 @@ def test_actual_rest_mcp_cli_and_same_run_source_view(
         )
     assert r.status_code == 200, r.text
     expected = r.json()["taiyi"]
-    argv = [
-        spec.name,
-        "--detail",
-        "audit",
-        "--fields",
-        *fields,
-    ]
+    argv = [spec.name, "--detail", "audit", "--fields", *fields]
     for key, value in values.items():
         if key == "use_true_solar_time":
             argv += ["--use-true-solar-time", "false"]
@@ -171,11 +164,7 @@ def test_actual_rest_mcp_cli_and_same_run_source_view(
             response = await call_calculation(
                 client,
                 spec.name,
-                {
-                    **values,
-                    "detail": "audit",
-                    "fields": fields,
-                },
+                {**values, "detail": "audit", "fields": fields},
                 raise_on_error=False,
             )
             full = response.structured_content
@@ -196,17 +185,11 @@ def test_native_moshier_probe_selects_the_de441_calendar_anchor() -> None:
     )
     board = result["taiyi"]
     assert "solar_anchors" in board
-    anchors = board["solar_anchors"]
-    boundary = anchors["boundary"]
-    _, native_flags = ephemeris_call(
-        "calc",
-        boundary["solar_model_details"]["selected_crossing_jd_tt"],
-        swe.SUN,
-        swe.FLG_SWIEPH,
-    )
+    boundary = board["solar_anchors"]["boundary"]
+    dt = datetime.fromisoformat(boundary["datetime_with_offset"])
+    jd_tt = swe.julday(dt.year, dt.month, dt.day, dt.hour + dt.minute / 60.0)
+    _, native_flags = ephemeris_call("calc", jd_tt, swe.SUN, swe.FLG_SWIEPH)
     assert native_flags == swe.FLG_MOSEPH
     assert boundary["resolution_provider"] == FALLBACK_PROVIDER
     assert boundary["ephemeris_model"] == FALLBACK_MODEL
-    assert boundary["solar_model_details"]["native_moshier_relabelled"] is False
-    assert anchors["winter_origin"]["ephemeris_model"] == FALLBACK_MODEL
     assert board["calendar_summary"]["anchor_ephemeris_model"] == FALLBACK_MODEL

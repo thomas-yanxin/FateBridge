@@ -21,15 +21,13 @@ from fatebridge.core.metaphysics.common import (
     liuqin_against_day,
     stem_element_text,
 )
-from fatebridge.core.metaphysics.liureng_course_conditions import course_conditions
-from fatebridge.core.metaphysics.liureng_life_stages import life_stage_cycle
-from fatebridge.core.metaphysics.liureng_ordered_patterns import (
-    ordered_transmission_patterns,
-)
-from fatebridge.core.metaphysics.liureng_relation_tables import GOD_ELEMENTS
-from fatebridge.core.metaphysics.liureng_transmission_relations import (
+from fatebridge.core.metaphysics.liureng.stars import GOD_ELEMENTS, life_stage_cycle
+from fatebridge.core.metaphysics.liureng.transmissions import (
     RULE_NAMES,
+    course_conditions,
+    ordered_transmission_patterns,
     phase_relation,
+    transmission_relations,
 )
 
 Phase = Literal["木", "火", "土", "金", "水"]
@@ -136,7 +134,7 @@ class LiurenTransmissionRelations(PartialOutput):
     any_transmission_has_sky_god: StrictBool | None = None
     equivalent_three_empty_adjudicated: None = None
     comprehensive_judgement: None = None
-    complete_classical_conformance: Literal[False] | None = None
+    complete_classical_conformance: StrictBool | None = None
     scope: str | None = None
 
     @model_validator(mode="after")

@@ -10,11 +10,11 @@ from fatebridge.core.metaphysics.common import (
     kongwang_for_ganzhi,
     xun_head_for_ganzhi,
 )
-from fatebridge.core.metaphysics.liureng_emptiness import (
+from fatebridge.core.metaphysics.liureng.stars import (
+    STEM_HOUSES,
     apply_year_fate_emptiness,
     emptiness_evidence,
 )
-from fatebridge.core.metaphysics.liureng_transmissions import STEM_HOUSES
 from fatebridge.utils.data import EARTHLY_BRANCHES
 
 Branch = Literal["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"]
@@ -80,7 +80,7 @@ class LiurenEmptinessEvidence(PartialOutput):
     seasonal_true_half_empty_status: Literal["not_adjudicated"] | None = None
     filling_clashing_status: Literal["role_exceptions_only"] | None = None
     comprehensive_judgement: None = None
-    complete_classical_conformance: Literal[False] | None = None
+    complete_classical_conformance: StrictBool | None = None
     scope: str | None = None
 
     @model_validator(mode="after")

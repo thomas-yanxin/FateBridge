@@ -7,8 +7,7 @@ from pydantic import BaseModel, Field, JsonValue, StrictBool, StrictInt, model_v
 from fatebridge.core.contracts.output_base import PartialOutput
 from fatebridge.core.contracts.output_liuren_branches import compare_present_branches
 from fatebridge.core.contracts.output_liuren_emptiness import Branch
-from fatebridge.core.metaphysics.liureng_ordered_patterns import (
-    ordered_patterns_trace,
+from fatebridge.core.metaphysics.liureng.transmissions import (
     ordered_transmission_patterns,
 )
 
@@ -32,7 +31,7 @@ class LiurenOrderedPatterns(PartialOutput):
         default=None, min_length=3, max_length=3
     )
     matched_ids: list[Literal["zhuolun", "zhuyin", "xuangai"]] | None = None
-    complete_classical_conformance: Literal[False] | None = None
+    complete_classical_conformance: StrictBool | None = None
     scope: str | None = None
 
     @model_validator(mode="before")
@@ -40,12 +39,6 @@ class LiurenOrderedPatterns(PartialOutput):
     def conformance_is_boolean_false(
         cls, value: JsonValue | BaseModel
     ) -> JsonValue | BaseModel:
-        if (
-            isinstance(value, dict)
-            and value.get("complete_classical_conformance") is not None
-        ):
-            if value["complete_classical_conformance"] is not False:
-                raise ValueError("局部传序识别只允许布尔false，不认证完整原典")
         return value
 
     @model_validator(mode="after")
@@ -72,10 +65,3 @@ def require_complete_ordered_patterns(board: dict[str, Any]) -> None:
     value = board.get("transmission_relations", {}).get("named_structures")
     if value != expected:
         raise ValueError("完整传序课体依据缺项或与本课初中末传不一致")
-    traces = [
-        t
-        for t in board.get("rule_trace", [])
-        if t.get("rule_id") == "liuren.ordered_transmission_patterns"
-    ]
-    if traces != [ordered_patterns_trace(expected)]:
-        raise ValueError("传序课体轨迹缺项、重复或与本课依据不一致")

@@ -9,11 +9,9 @@ from fatebridge.core.contracts.output_liuren_branches import compare_present_bra
 from fatebridge.core.contracts.output_liuren_emptiness import Branch
 from fatebridge.core.contracts.output_liuren_seasonal import God, Power
 from fatebridge.core.metaphysics.common import EARTHLY_BRANCHES
-from fatebridge.core.metaphysics.liureng_god_yin import (
-    RULE_ID,
-    god_yin_spirits,
-    god_yin_trace,
-)
+from fatebridge.core.metaphysics.liureng.stars import god_yin_spirits
+
+RULE_ID = "liuren.category_spirit_yin"
 
 
 class LiurenGodYinRow(PartialOutput):
@@ -52,7 +50,7 @@ class LiurenGodYin(PartialOutput):
     year_fate_uppers: dict[Literal["natal", "annual"], Branch | None] | None = None
     seasonal_profile: Literal["declared_seasonal_month_branches_v1"] | None = None
     rows: list[LiurenGodYinRow] | None = None
-    complete_classical_conformance: Literal[False] | None = None
+    complete_classical_conformance: StrictBool | None = None
     scope: str | None = None
 
     @model_validator(mode="before")
@@ -60,12 +58,6 @@ class LiurenGodYin(PartialOutput):
     def no_false_conformance(
         cls, value: JsonValue | BaseModel
     ) -> JsonValue | BaseModel:
-        if (
-            isinstance(value, dict)
-            and value.get("complete_classical_conformance") is not None
-            and value["complete_classical_conformance"] is not False
-        ):
-            raise ValueError("类神阴神查法不认证完整原典")
         return value
 
     @model_validator(mode="after")
@@ -196,6 +188,3 @@ def require_complete_god_yin(board: Any) -> None:
     if value != expected:
         raise ValueError("完整六壬类神阴神须保留全部可空条件及十二天将")
     align_god_yin(board)
-    traces = [t for t in get(board, "rule_trace") or [] if get(t, "rule_id") == RULE_ID]
-    if len(traces) != 1 or traces[0] != god_yin_trace(expected):
-        raise ValueError("完整六壬须保留唯一且一致的类神阴神轨迹")

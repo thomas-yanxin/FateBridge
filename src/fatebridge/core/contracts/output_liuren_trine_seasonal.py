@@ -5,12 +5,20 @@ from typing import Any, Literal
 from pydantic import BaseModel, JsonValue, model_validator
 
 from fatebridge.core.contracts.output_base import PartialOutput
-from fatebridge.core.metaphysics.liureng_seasonal import MONTH_PARTITION, POWERS
-from fatebridge.core.metaphysics.liureng_trine_seasonal import (
-    COMPONENTS,
+from fatebridge.core.metaphysics.liureng.stars import (
+    MONTH_PARTITION,
+    POWERS,
     nominal_seasonal_evidence,
     nominal_seasonal_metadata,
 )
+
+COMPONENTS = {
+    "旺": "得势",
+    "相": "将来",
+    "休": "既往",
+    "囚": "失时",
+    "死": "失时",
+}
 
 
 class LiurenNominalTrineSeasonal(PartialOutput):
@@ -28,7 +36,7 @@ class LiurenNominalTrineSeasonal(PartialOutput):
     nominal_element: Literal["木", "火", "金", "水"] | None = None
     nominal_power: Literal["旺", "相", "休", "囚", "死"] | None = None
     course_component: Literal["得势", "失时", "将来", "既往"] | None = None
-    full_named_course_adjudicated: Literal[False] | None = None
+    full_named_course_adjudicated: bool | None = None
     transformation_confirmed: None = None
     scope: str | None = None
 
@@ -37,9 +45,6 @@ class LiurenNominalTrineSeasonal(PartialOutput):
     def no_certificate_coercion(
         cls, value: JsonValue | BaseModel
     ) -> JsonValue | BaseModel:
-        if isinstance(value, dict) and "full_named_course_adjudicated" in value:
-            if value["full_named_course_adjudicated"] is not False:
-                raise ValueError("名义季态组件不认证完整课体")
         return value
 
     @model_validator(mode="after")

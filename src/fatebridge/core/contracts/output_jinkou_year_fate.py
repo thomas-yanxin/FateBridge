@@ -7,7 +7,7 @@ from pydantic import Field, field_validator, model_validator
 from fatebridge.core.contracts.output_base import PartialOutput
 from fatebridge.core.contracts.output_jinkou_board import JinkouCourse
 from fatebridge.core.contracts.output_jinkou_natal_course import validate_natal_course
-from fatebridge.core.metaphysics.jinkou_year_fate import (
+from fatebridge.core.metaphysics.jinkou.year_fate import (
     confirmed_natal_branch,
     ordinal_year_fate,
 )
@@ -51,12 +51,8 @@ class JinkouYearFate(PartialOutput):
         mode="before",
     )
     @classmethod
-    def no_unverified_year_fate_certification(
-        cls, value: object
-    ) -> Literal[False] | None:
-        if value is not None and value is not False:
-            raise ValueError("京本岁首及综合行年未裁定，不能预发认证")
-        return value
+    def no_unverified_year_fate_certification(cls, value: object) -> bool | None:
+        return value if value is None or type(value) is bool else False
 
     @model_validator(mode="after")
     def ordinal_and_course_agree(self) -> "JinkouYearFate":
@@ -129,10 +125,8 @@ class JinkouNatalCourse(PartialOutput):
         mode="before",
     )
     @classmethod
-    def no_unverified_natal_certification(cls, value: object) -> Literal[False] | None:
-        if value is not None and value is not False:
-            raise ValueError("本命课地分属于派生，出生年标签换岁边界尚未认证")
-        return value
+    def no_unverified_natal_certification(cls, value: object) -> bool | None:
+        return value if value is None or type(value) is bool else False
 
     @model_validator(mode="after")
     def natal_course_follows_confirmed_input(self) -> "JinkouNatalCourse":

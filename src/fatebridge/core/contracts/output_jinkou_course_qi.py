@@ -6,7 +6,11 @@ from typing import Any
 
 from fatebridge.core.contracts.output_jinkou_qi import compare
 from fatebridge.core.contracts.output_jinkou_qi_models import JinkouQiEvidence
-from fatebridge.core.metaphysics.jinkou_qi import qi_metadata
+from fatebridge.core.metaphysics.jinkou.board import build_jinkou_qi
+
+
+def qi_metadata() -> dict[str, Any]:
+    return {"ruleset_id": "jinkou_month_day_qi_v1"}
 
 
 def validate_course_qi(board: dict[str, Any]) -> None:

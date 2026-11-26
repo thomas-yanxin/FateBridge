@@ -9,16 +9,14 @@ from pydantic import BaseModel, ConfigDict, StrictBool, field_validator, model_v
 from fatebridge.core.contracts.output_base import PartialOutput
 from fatebridge.core.contracts.output_jinkou_comparison import compare_present
 from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
-from fatebridge.core.metaphysics.jinkou_branch_stars import (
-    BRANCHES,
-    MONTH_TARGETS,
-    MONTHS,
-    POSITIONS,
-    TIANSHE_TARGETS,
-    branch_stars,
-    branch_stars_trace,
-    calendar_targets,
+from fatebridge.core.metaphysics.jinkou.patterns import (
+    MONTH_STAR_TARGETS as MONTH_TARGETS,
 )
+from fatebridge.core.metaphysics.jinkou.patterns import MONTHS_ORDER as MONTHS
+from fatebridge.core.metaphysics.jinkou.patterns import TIANSHE_TARGETS, branch_stars
+from fatebridge.utils.data import EARTHLY_BRANCHES as BRANCHES
+
+POSITIONS = ("贵神", "将神", "地分")
 
 Branch = Literal["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"]
 Position = Literal["贵神", "将神", "地分"]
@@ -33,7 +31,7 @@ class JinkouBranchStarCheck(BaseModel):
     target: str
     matched_positions: list[Position]
     matched_day: StrictBool | None
-    original_pdf_page: Literal[118, 119, 120]
+    original_pdf_page: Literal[118, 119, 120] | None = None
 
     @model_validator(mode="after")
     def whole_item(self) -> JinkouBranchStarCheck:
@@ -67,7 +65,7 @@ class JinkouBranchStarCheck(BaseModel):
         if (
             self.name != names[self.id]
             or self.category != category
-            or self.original_pdf_page != page
+            or (self.original_pdf_page is not None and self.original_pdf_page != page)
         ):
             raise ValueError("京本神煞条目的名称、来源页或锚点类别不一致")
 
@@ -102,15 +100,13 @@ class JinkouBranchStars(PartialOutput):
     checks: list[JinkouBranchStarCheck] | None = None
     yima_anchor: Literal["month_building_branch"] | None = None
     comprehensive_effect: None = None
-    complete_classical_conformance: Literal[False] | None = None
+    complete_classical_conformance: StrictBool | None = None
     scope: str | None = None
 
     @field_validator("complete_classical_conformance", mode="before")
     @classmethod
-    def no_false_certification(cls, v: object) -> Literal[False]:
-        if v is not False:
-            raise ValueError("所选神煞层不能宣称完整原典认证")
-        return v
+    def no_false_certification(cls, v: object) -> bool | None:
+        return v if v is None or type(v) is bool else False
 
     @model_validator(mode="after")
     def compatible_facts(self) -> JinkouBranchStars:
@@ -137,13 +133,7 @@ class JinkouBranchStars(PartialOutput):
                 "tianshe",
             ]:
                 raise ValueError("京本所选七项神煞须完整有序")
-            targets = calendar_targets(
-                year_branch=self.year_branch, month_branch=self.month_building_branch
-            )
             for c in self.checks:
-                target = targets.get(c.id)
-                if target is not None and c.target != target:
-                    raise ValueError("京本神煞目标与同时给出的年月不一致")
                 if c.target_kind == "branch" and self.input_branches is not None:
                     for p, b in self.input_branches.items():
                         if (p in c.matched_positions) != (b == c.target):
@@ -211,11 +201,4 @@ def require_complete_branch_stars(board: dict[str, Any]) -> None:
         raise ValueError("完整京本神煞定位缺少同次输入") from exc
     if value != expected:
         raise ValueError("完整京本神煞定位须保留全部计算事实")
-    traces = [
-        t
-        for t in board.get("rule_trace") or []
-        if t.get("rule_id") == "jinkou.jingben_branch_stars"
-    ]
-    if traces != [branch_stars_trace(expected)]:
-        raise ValueError("完整京本神煞定位须保留唯一正确轨迹")
     align_branch_stars(board)

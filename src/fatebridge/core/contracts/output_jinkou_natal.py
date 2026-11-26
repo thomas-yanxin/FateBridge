@@ -5,7 +5,7 @@ from typing import Literal
 from pydantic import model_validator
 
 from fatebridge.core.contracts.output_base import PartialOutput
-from fatebridge.core.metaphysics.jinkou_relations import natal_absolute
+from fatebridge.core.metaphysics.jinkou.patterns import natal_absolute
 
 NatalBranch = Literal[
     "子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"

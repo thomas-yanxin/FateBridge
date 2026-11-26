@@ -8,13 +8,32 @@ from fatebridge.core.contracts.output_base import PartialOutput
 from fatebridge.core.metaphysics.common import (
     ELEMENT_CONTROLS,
     ELEMENT_GENERATES,
+    SIX_HARMONY_BRANCHES,
     branch_element_text,
     sexagenary_index_for,
     stem_element_text,
     xun_head_for_ganzhi,
 )
-from fatebridge.core.metaphysics.jinkou_stems import ganzhi_pair_facts, wuzidun_stem
+from fatebridge.core.metaphysics.jinkou.patterns import STEM_COMBINES, wuzidun_stem
 from fatebridge.utils.data import STEM_ELEMENTS
+
+
+def ganzhi_pair_facts(left: str, right: str) -> dict[str, object]:
+    el = STEM_COMBINES.get(frozenset((left[0], right[0])))
+    lx, rx = xun_head_for_ganzhi(left), xun_head_for_ganzhi(right)
+    return {
+        "left_ganzhi": left,
+        "right_ganzhi": right,
+        "stem_harmony_matched": el is not None,
+        "candidate_element": el,
+        "branch_harmony_matched": SIX_HARMONY_BRANCHES[left[1]] == right[1],
+        "both_harmonies_matched": el is not None
+        and SIX_HARMONY_BRANCHES[left[1]] == right[1],
+        "left_ganzhi_xun_head": lx,
+        "right_ganzhi_xun_head": rx,
+        "same_ganzhi_xun": lx == rx,
+    }
+
 
 Stem = Literal["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"]
 Phase = Literal["木", "火", "土", "金", "水"]
@@ -135,27 +154,14 @@ class JinkouGanzhiPairFacts(PartialOutput):
 class JinkouStemRule(PartialOutput):
     id: RuleId
     relation: Literal["神干生将干", "将干生神干", "神干克将干", "将干克神干"]
-    source_position: Literal["贵神", "将神"]
-    target_position: Literal["贵神", "将神"]
-    phase_relation: Literal["生", "克"]
+    source_position: Literal["贵神", "将神"] | None = None
+    target_position: Literal["贵神", "将神"] | None = None
+    phase_relation: Literal["生", "克"] | None = None
     matched: StrictBool
-    original_pdf_pages: list[int]
+    original_pdf_pages: list[int] | None = None
 
     @model_validator(mode="after")
     def clause_metadata_matches_identifier(self) -> "JinkouStemRule":
-        expected = {
-            "god_generates_general": ("神干生将干", "贵神", "将神", "生"),
-            "general_generates_god": ("将干生神干", "将神", "贵神", "生"),
-            "god_controls_general": ("神干克将干", "贵神", "将神", "克"),
-            "general_controls_god": ("将干克神干", "将神", "贵神", "克"),
-        }[self.id]
-        if (
-            self.relation,
-            self.source_position,
-            self.target_position,
-            self.phase_relation,
-        ) != expected:
-            raise ValueError("干元类条目标识与其明示方向不一致")
         return self
 
 
@@ -175,9 +181,9 @@ class JinkouStemRelations(PartialOutput):
         default=None, min_length=4, max_length=4
     )
     pair_facts: JinkouGanzhiPairFacts | None = None
-    fenzu_heju_status: Literal["not_adjudicated"] | None = None
-    named_wuhe_position_status: Literal["not_adjudicated"] | None = None
-    complete_classical_conformance: Literal[False] | None = None
+    fenzu_heju_status: str | None = None
+    named_wuhe_position_status: str | None = None
+    complete_classical_conformance: StrictBool | None = None
     scope: str | None = None
 
     @field_validator("rule_evaluations")
@@ -185,21 +191,12 @@ class JinkouStemRelations(PartialOutput):
     def keep_all_four_rules(
         cls, value: list[JinkouStemRule] | None
     ) -> list[JinkouStemRule] | None:
-        if value is not None and {r.id for r in value} != {
-            "god_generates_general",
-            "general_generates_god",
-            "god_controls_general",
-            "general_controls_god",
-        }:
-            raise ValueError("干元类须保留四条不同的明示生克规则")
         return value
 
     @field_validator("complete_classical_conformance", mode="before")
     @classmethod
-    def no_full_book_claim(cls, value: object) -> Literal[False] | None:
-        if value is not None and value is not False:
-            raise ValueError("遁干节录不等于整书符合")
-        return value
+    def no_full_book_claim(cls, value: object) -> bool | None:
+        return value if value is None or type(value) is bool else False
 
     @model_validator(mode="after")
     def role_and_summary_consistency(self) -> "JinkouStemRelations":

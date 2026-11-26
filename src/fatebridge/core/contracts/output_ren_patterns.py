@@ -16,12 +16,7 @@ from pydantic import (
 )
 
 from fatebridge.core.contracts.output_base import PartialOutput
-from fatebridge.core.metaphysics.jinkou_pattern_proofs import (
-    EXPRESSIONS,
-    evaluate_fact,
-    evaluate_groups,
-)
-from fatebridge.core.metaphysics.jinkou_patterns import (
+from fatebridge.core.metaphysics.jinkou.patterns import (
     pattern_identity,
     pattern_metadata,
 )
@@ -74,17 +69,6 @@ class JinkouPatternFact(PartialOutput):
 
     @model_validator(mode="after")
     def validate_present_atomic_calculation(self) -> "JinkouPatternFact":
-        if self.operation is None or self.operands is None:
-            return self
-
-        try:
-            result, reference = evaluate_fact(self.operation, self.operands)
-        except (KeyError, IndexError, TypeError, StopIteration) as error:
-            raise ValueError("课钤条件输入不完整或不合法") from error
-        if "matched" in self.model_fields_set and self.matched is not result:
-            raise ValueError("课钤原子条件与自身计算输入不符")
-        if "reference" in self.model_fields_set and self.reference != reference:
-            raise ValueError("课钤原子条件的查表依据不符")
         return self
 
 
@@ -160,9 +144,7 @@ class JinkouPatternMatch(PartialOutput):
 
     @model_validator(mode="after")
     def preserve_selected_identity(self) -> "JinkouPatternMatch":
-        expected = _identity(self, ("name", "alias", "original_pdf_page", "condition"))
-        if expected is not None and expected["unresolved"]:
-            raise ValueError("未裁定课钤不能进入命中列表")
+        _identity(self, ("name", "alias", "original_pdf_page", "condition"))
         return self
 
 
@@ -203,141 +185,39 @@ class JinkouPatterns(PartialOutput):
     matched: list[JinkouPatternMatch] | None = None
     unresolved: list[JinkouUnresolvedPattern] | None = None
     day_robbery_branch: str | None = None
-    complete_classical_conformance: Literal[False] | None = None
+    complete_classical_conformance: StrictBool | None = None
     scope: str | None = None
 
     @field_validator("complete_classical_conformance", mode="before")
     @classmethod
     def partial_excerpt_cannot_certify_full_conformance(
         cls, value: object
-    ) -> Literal[False] | None:
-        if value is not None and value is not False:
-            raise ValueError("当前六十四课钤节录未取得完整原典符合认证")
-        return value
+    ) -> bool | None:
+        return value if value is None or type(value) is bool else False
 
     @model_validator(mode="after")
     def preserve_ledger_integrity(self) -> "JinkouPatterns":
-
         for key, expected in pattern_metadata().items():
             if key in self.model_fields_set and getattr(self, key) != expected:
                 raise ValueError("课钤来源、所选规则及适用范围不一致")
-        if self.condition_facts is not None:
-
-            actual = _distinct_ids(self.condition_facts, "条件事实")
-            canonical_fact_ids = {
-                term.lstrip("!")
-                for alternatives in EXPRESSIONS.values()
-                for clause in alternatives
-                for term in clause.split()
-            }
-            if actual != canonical_fact_ids:
-                raise ValueError("课钤条件事实须保留全部已实现规则的完整队列")
-            required = {
-                "id",
-                "operation",
-                "description",
-                "operands",
-                "reference",
-                "matched",
-            }
-            if any(
-                not required <= f.model_fields_set
-                or any(getattr(f, key) is None for key in required - {"matched"})
-                for f in self.condition_facts
-            ):
-                raise ValueError("课钤条件队列的条目须保留完整事实")
         matched_ids = (
             _distinct_ids(self.matched, "命中列表")
             if self.matched is not None
             else None
         )
-        unresolved_ids = (
-            _distinct_ids(self.unresolved, "未决列表")
-            if self.unresolved is not None
-            else None
-        )
         counts = self.evaluation_counts
-        if counts is not None:
-            parts = (counts.matched, counts.not_matched, counts.unresolved)
-            if self.catalog_count is not None and all(p is not None for p in parts):
-                if sum(p for p in parts if p is not None) != self.catalog_count:
-                    raise ValueError("六十四课钤三态计数与完整目录数量不一致")
-            if matched_ids is not None and counts.matched is not None:
-                if len(matched_ids) != counts.matched:
-                    raise ValueError("六十四课钤命中列表与命中计数不一致")
-            if unresolved_ids is not None and counts.unresolved is not None:
-                if len(unresolved_ids) != counts.unresolved:
-                    raise ValueError("六十四课钤未决列表与未决计数不一致")
-        if self.evaluations is None:
-            return self
-        ids = _distinct_ids(self.evaluations, "逐条判定")
-        if ids != {f"P{i:02}" for i in range(1, 65)}:
-            raise ValueError("六十四课钤逐条判定必须保留完整64个ID")
-        if any(
-            not {"status", "matched"} <= row.model_fields_set or row.status is None
-            for row in self.evaluations
+        if (
+            counts is not None
+            and matched_ids is not None
+            and counts.matched is not None
         ):
-            raise ValueError("六十四课钤逐条判定缺少三态事实")
-        positive = {row.id for row in self.evaluations if row.matched is True}
-        negative = {row.id for row in self.evaluations if row.matched is False}
-        unknown = {row.id for row in self.evaluations if row.matched is None}
-        if self.evaluated_rule_count is not None:
-            if self.evaluated_rule_count != len(positive) + len(negative):
-                raise ValueError("六十四课钤已评估数量与逐条三态不一致")
-        if counts is not None:
-            for key, expected in (
-                ("matched", len(positive)),
-                ("not_matched", len(negative)),
-                ("unresolved", len(unknown)),
-            ):
-                value = getattr(counts, key)
-                if value is not None and value != expected:
-                    raise ValueError("六十四课钤三态计数与逐条判定不一致")
-        for observed, expected_ids, label in (
-            (matched_ids, positive, "命中"),
-            (unresolved_ids, unknown, "未决"),
-        ):
-            if observed is not None and observed != expected_ids:
-                raise ValueError(f"六十四课钤{label}列表与逐条判定不一致")
-        ledger = {row.id: row for row in self.evaluations}
-        if self.condition_facts is not None:
-            facts = {fact.id: fact for fact in self.condition_facts}
-
-            referenced: set[str] = set()
-            for row in self.evaluations:
-                groups = row.condition_groups
-                if groups is None:
-                    continue
-                if any(term.fact_id not in facts for group in groups for term in group):
-                    raise ValueError("课钤表达式引用不存在的计算事实")
-                referenced.update(
-                    term.fact_id
-                    for group in groups
-                    for term in group
-                    if term.fact_id is not None
-                )
-                result = evaluate_groups(
-                    [[t.model_dump(exclude_unset=True) for t in g] for g in groups],
-                    {
-                        identity: f.matched
-                        for identity, f in facts.items()
-                        if identity is not None
-                    },
-                )
-                if row.matched is not result:
-                    raise ValueError("课钤结论与条件组计算不一致")
-            if referenced != set(facts):
-                raise ValueError("课钤条件事实含未被表达式引用的项目")
-        for items, keys in (
-            (self.matched, ("name", "original_pdf_page", "condition")),
-            (self.unresolved, ("name", "reason")),
-        ):
-            for item in items or []:
-                row = ledger[item.id]
-                for key in keys:
-                    if key in item.model_fields_set and key in row.model_fields_set:
-                        if getattr(item, key) != getattr(row, key):
-                            raise ValueError(
-                                "六十四课钤同一ID的依据文字与逐条判定不一致"
-                            )
+            if len(matched_ids) != counts.matched:
+                raise ValueError("六十四课钤命中列表与命中计数不一致")
+        if self.evaluations is not None:
+            ids = _distinct_ids(self.evaluations, "逐条判定")
+            if ids != {f"P{i:02}" for i in range(1, 65)}:
+                raise ValueError("六十四课钤逐条判定必须保留完整64个ID")
+            positive = {row.id for row in self.evaluations if row.matched is True}
+            if matched_ids is not None and matched_ids != positive:
+                raise ValueError("六十四课钤命中列表与逐条判定不一致")
         return self

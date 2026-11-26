@@ -80,6 +80,7 @@ class TaiyiCore(PartialOutput):
     kook_number: int | None = None
     kook_year: str | None = None
     main_calculation: str | None = None
+    table_policy: str | None = None
     main_count: Annotated[int | None, FULL_FACT] = None
     main_count_des: list[str] | None = None
     main_general: int | None = None
@@ -235,6 +236,7 @@ class Taiyi(PartialOutput):
     opposition_assessment: TaiyiOppositionAssessment | None = None
     enclosure_assessment: TaiyiEnclosureAssessment | None = None
     ten_jing: TaiyiTenJing | None = None
+    fate_palaces: Object | None = None
     day_source_comparisons: list[TaiyiSourceComparison] | None = None
     gates: TaiyiGates | None = None
     determinate_calculation: TaiyiDeterminate | None = None

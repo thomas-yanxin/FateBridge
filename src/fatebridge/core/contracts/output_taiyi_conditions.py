@@ -61,5 +61,6 @@ class TaiyiConditionAssessment(PartialOutput):
     five_generals: TaiyiFiveGenerals | None = None
     three_gates: TaiyiThreeGates | None = None
     menju_jiangfa: bool | None = None
+    adjudication: str | None = None
     summary: str | None = None
     scope: str | None = None

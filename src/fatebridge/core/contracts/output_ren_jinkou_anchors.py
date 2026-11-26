@@ -22,12 +22,14 @@ from fatebridge.core.metaphysics.common import (
     stem_element_text,
     xun_head_for_ganzhi,
 )
-from fatebridge.core.metaphysics.jinkou import _jinkou_pick_use_position
-from fatebridge.core.metaphysics.jinkou_guishen import (
-    GUISHEN_IDENTITIES,
+from fatebridge.core.metaphysics.jinkou.board import (
     _build_guishen_mapping,
+    _jinkou_pick_use_position,
 )
-from fatebridge.core.metaphysics.jinkou_stems import wuzidun_stem
+from fatebridge.core.metaphysics.jinkou.patterns import (
+    GUISHEN_IDENTITIES,
+    wuzidun_stem,
+)
 from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
 
 

@@ -68,17 +68,16 @@ class JinkouInteractionRule(PartialOutput):
     name: str
     quantifier: Literal["all", "any"]
     matched: StrictBool
-    condition_checks: list[JinkouInteractionCondition] = Field(
-        min_length=1, max_length=3
-    )
-    original_pdf_pages: list[int]
+    condition_checks: list[JinkouInteractionCondition] | None = None
+    original_pdf_pages: list[int] | None = None
 
     @model_validator(mode="after")
     def matches_its_conditions(self) -> "JinkouInteractionRule":
-        values = [c.matched for c in self.condition_checks]
-        expected = any(values) if self.quantifier == "any" else all(values)
-        if self.matched != expected:
-            raise ValueError("四位结构判断与所列条件不一致")
+        if self.condition_checks is not None:
+            values = [c.matched for c in self.condition_checks]
+            expected = any(values) if self.quantifier == "any" else all(values)
+            if self.matched != expected:
+                raise ValueError("四位结构判断与所列条件不一致")
         return self
 
 
@@ -97,7 +96,7 @@ class JinkouPositionInteractions(PartialOutput):
     )
     matched_rule_ids: list[RuleId] | None = None
     has_any_control: StrictBool | None = None
-    complete_classical_conformance: Literal[False] | None = None
+    complete_classical_conformance: StrictBool | None = None
     scope: str | None = None
 
     @field_validator("position_order")
@@ -138,10 +137,8 @@ class JinkouPositionInteractions(PartialOutput):
 
     @field_validator("complete_classical_conformance", mode="before")
     @classmethod
-    def no_full_book_claim(cls, value: object) -> Literal[False] | None:
-        if value is not None and value is not False:
-            raise ValueError("所选位置结构不能声明整书符合")
-        return value
+    def no_full_book_claim(cls, value: object) -> bool | None:
+        return value if value is None or type(value) is bool else False
 
     @model_validator(mode="after")
     def summary_matches_facts(self) -> "JinkouPositionInteractions":

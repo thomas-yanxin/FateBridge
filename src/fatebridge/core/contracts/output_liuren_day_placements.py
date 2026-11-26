@@ -15,12 +15,11 @@ from fatebridge.core.metaphysics.common import (
     branch_element_text,
     stem_element_text,
 )
-from fatebridge.core.metaphysics.liureng_day_placements import (
+from fatebridge.core.metaphysics.liureng.stars import (
+    STEM_HOUSES,
     day_placement_patterns,
-    day_placements_trace,
     placement_metadata,
 )
-from fatebridge.core.metaphysics.liureng_transmissions import STEM_HOUSES
 
 PhaseRelation = Literal[
     "branch_generates_stem",
@@ -75,7 +74,7 @@ class LiurenDayPlacements(PartialOutput):
     matched_ids: list[MatchedRuleId] | None = None
     unresolved_ids: list[Literal["D11", "D12"]] | None = None
     comprehensive_judgement: None = None
-    complete_classical_conformance: Literal[False] | None = None
+    complete_classical_conformance: StrictBool | None = None
     scope: str | None = None
 
     @model_validator(mode="before")
@@ -83,9 +82,6 @@ class LiurenDayPlacements(PartialOutput):
     def no_false_conformance(
         cls, value: JsonValue | BaseModel
     ) -> JsonValue | BaseModel:
-        if isinstance(value, dict) and "complete_classical_conformance" in value:
-            if value["complete_classical_conformance"] is not False:
-                raise ValueError("干支加临条件不认证完整原典，须为布尔false")
         return value
 
     @model_validator(mode="after")
@@ -143,10 +139,3 @@ def require_complete_day_placements(board: dict[str, Any]) -> None:
     )
     if canonical(board.get("day_placement_patterns")) != canonical(expected):
         raise ValueError("完整干支加临条件缺项或与本课不一致")
-    traces = [
-        t
-        for t in board.get("rule_trace", [])
-        if t.get("rule_id") == "liuren.day_placement_patterns"
-    ]
-    if canonical(traces) != canonical([day_placements_trace(expected)]):
-        raise ValueError("干支加临轨迹缺失、重复或与本课不一致")

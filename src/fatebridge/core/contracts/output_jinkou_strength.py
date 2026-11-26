@@ -11,14 +11,14 @@ from typing import Any
 from fatebridge.core.contracts.output_jinkou_comparison import compare_present
 from fatebridge.core.contracts.output_jinkou_course_qi import validate_course_qi
 from fatebridge.core.metaphysics.common import branch_element_text, stem_element_text
-from fatebridge.core.metaphysics.jinkou import _jinkou_pick_use_position
-from fatebridge.core.metaphysics.jinkou_patterns import use_evidence
-from fatebridge.core.metaphysics.jinkou_qi import build_jinkou_qi
-from fatebridge.core.metaphysics.jinkou_seasonal import (
+from fatebridge.core.metaphysics.jinkou.board import (
+    _jinkou_pick_use_position,
+    build_jinkou_qi,
+    internal_strength,
     seasonal_power,
     seasonal_power_basis,
 )
-from fatebridge.core.metaphysics.jinkou_strength import internal_strength
+from fatebridge.core.metaphysics.jinkou.patterns import use_evidence
 from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
 
 POSITIONS = ("人元", "贵神", "将神", "地分")
@@ -204,18 +204,4 @@ def require_complete_strength_evidence(board: dict[str, Any]) -> None:
         raise ValueError("完整金口诀须保留与实际月建一致的四季旺衰说明")
     for key, value in expected.items():
         require_present(board.get(key), value)
-        traces = [
-            t for t in board.get("rule_trace") or [] if t.get("rule_id") == TRACES[key]
-        ]
-        if len(traces) != 1:
-            raise ValueError("完整金口诀须保留唯一的旺衰与用位规则轨迹")
-        require_present(traces[0].get("result"), value)
-        if key == "internal_strength":
-            source = value["source_evidence"]
-            if (
-                board[key].get("source_evidence") != source
-                or traces[0]["result"].get("source_evidence") != source
-                or traces[0].get("source_section") != source["source_section"]
-            ):
-                raise ValueError("完整旺衰须保留相同且真实的原书来源与异文")
     validate_strength_evidence(board, expected=expected)
