@@ -13,7 +13,6 @@ from fatebridge.core.metaphysics.common import MetaphysicsSeed, chinese_numeral
 from fatebridge.core.metaphysics.taiyi_board import assemble_board, calendar_summary
 from fatebridge.core.metaphysics.taiyi_civil_calendar import civil_lunar_evidence
 from fatebridge.core.metaphysics.taiyi_counts import count_labels
-from fatebridge.core.metaphysics.taiyi_evidence import evidence_text as evidence_text
 from fatebridge.core.metaphysics.taiyi_gates import attach_gate_board
 from fatebridge.core.metaphysics.taiyi_geometry import (
     BRANCHES,

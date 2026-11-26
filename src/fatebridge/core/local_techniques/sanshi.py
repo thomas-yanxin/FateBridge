@@ -37,8 +37,8 @@ from fatebridge.core.metaphysics.taiyi_dangshi import (
     noble_source_assessment,
     noble_source_text,
 )
+from fatebridge.core.metaphysics.taiyi_evidence import evidence_text
 from fatebridge.core.metaphysics.taiyi_long_cycles import long_cycle_text
-from fatebridge.core.metaphysics.taiyi_year import evidence_text
 from fatebridge.utils.formatting import create_pillar_dict
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 

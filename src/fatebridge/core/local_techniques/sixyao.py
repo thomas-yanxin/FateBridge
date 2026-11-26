@@ -15,11 +15,6 @@ from fatebridge.core.liuyao.liuyao_casting import (
     cast_lines_from_codes,
     changed_hexagram_code,
     coin_cast,
-)
-from fatebridge.core.liuyao.liuyao_casting import (
-    needs_random_coin_cast as needs_random_coin_cast,
-)
-from fatebridge.core.liuyao.liuyao_casting import (
     normalize_cast_lines,
     random_coin_tosses,
     validate_hexagram_code,

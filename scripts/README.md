@@ -75,7 +75,6 @@ WMM2025精确WGS84参考由[独立多项式生成器](fengshui/build_fengshui_wm
 | --- | --- |
 | 梅花取数、历表、原典和天气规则 | `uv run --locked --extra dev python -m pytest -q tests/meihua`；研究绑定统一用 `python -m scripts.meihua.audit_meihua_weather_study --check trace`；检查项可选 `trace`、`calendar`、`solar` 或 `context-capacity`，原始资料与报告路径另行指定；参考采集保留独立入口 |
 | 六爻来源配置 | `python -m scripts.liuyao.build_profile --check`；可在 `--check` 前选 `role`、`strength` 等配置，专门扫描／勘误仍由对应构建器处理 |
-| 八字未来时钟 | [执行器](bazi/audit_bazi_dayun_future_clocks_shard.py)默认完整单片，分片时明确提供索引与数量；[合并器](bazi/merge_bazi_future_clock_shards.py)校验完整队列、顺序、未知与失败 |
 | 人类图 Profile | [完整队列审计](human_design/audit_human_design_profile_full_coverage.py)，保留19／193例、768计划及缺项 |
 | 参评 DE440 投影资料 | `python -m scripts.numerology.build_canping_projection_profile --kernel <de440.bsp> --profile original --check`；第二份固定队列用 `--profile extended`，两份协议与原始字节分别验证 |
 | AA1996来源构建 | `python -m fatebridge.fetch_aa1996`，见[太阳后端](../docs/solar-backends.md) |
