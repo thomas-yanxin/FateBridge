@@ -14,7 +14,7 @@ from fatebridge.core.almanac import (
 )
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.divination import build_meihua_interpretation, lookup_gua
-from fatebridge.core.heluo.heluo_months import (
+from fatebridge.core.heluo.judgment import (
     DEFAULT_MONTH_ASSIGNMENT,
     MonthAssignmentMethod,
 )
@@ -54,22 +54,17 @@ from fatebridge.core.meihua.topics import (
 )
 from fatebridge.core.metaphysics.ren_gods import DEFAULT_GUIREN_PROFILE, GuirenProfile
 from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
-from fatebridge.core.sukuyo.sukuyo import (
-    calendar_mansion,
+from fatebridge.core.sukuyo.calendar import calendar_mansion, rulesets
+from fatebridge.core.sukuyo.sanjiu import (
+    DistanceRule,
     candidate_relation_analysis,
-    rulesets,
+    relation_between_su27,
 )
 from fatebridge.core.sukuyo.sukuyo_calendar_basis import basis_parameters
-from fatebridge.core.sukuyo.sukuyo_compatibility_text import (
-    candidate_compatibility_reading,
+from fatebridge.core.sukuyo.texts import (
     joint_reconstruction_contract,
+    palace_reference,
 )
-from fatebridge.core.sukuyo.sukuyo_dayan_advance import research_scope, scope_lines
-from fatebridge.core.sukuyo.sukuyo_historical_calendar import (
-    compatibility_reference_notes,
-)
-from fatebridge.core.sukuyo.sukuyo_padas import palace_reference
-from fatebridge.core.sukuyo.sukuyo_relations import relation_between_su27
 from fatebridge.core.zhouyi import classical_hexagram
 from fatebridge.utils.errors import ParameterError, calculation_guard
 from fatebridge.utils.formatting import create_pillar_dict
@@ -597,6 +592,10 @@ def calculate_suzhan_analysis(
     textual_pada: int | None = None,
     calendar_basis: str = "chinese_hko_utc08",
     chart_requested: bool = False,
+    distance_rule: DistanceRule = "symmetric",
+    birth_year: int | None = None,
+    target_year: int | None = None,
+    urgent: bool = False,
 ) -> dict[str, Any]:
     """宿占 / 宿盘分析工具。"""
     return build_suzhan_result(
@@ -620,6 +619,10 @@ def calculate_suzhan_analysis(
         textual_pada=textual_pada,
         calendar_basis=calendar_basis,
         chart_requested=chart_requested,
+        distance_rule=distance_rule,
+        birth_year=birth_year,
+        target_year=target_year,
+        urgent=urgent,
     )
 
 
@@ -641,6 +644,7 @@ def calculate_sukuyo_compatibility(
     person1_textual_pada: int | None = None,
     person2_textual_pada: int | None = None,
     calendar_basis: str = "chinese_hko_utc08",
+    distance_rule: DistanceRule = "symmetric",
 ) -> dict[str, Any]:
     """按显式宿主历法月日定本命宿，依T1299三九法返回双向关系。"""
     contexts = [
@@ -681,52 +685,38 @@ def calculate_sukuyo_compatibility(
 
     calendar_label = basis_parameters(calendar_basis)[3]
     resolved = first is not None and second is not None
-    forward = relation_between_su27(first, second) if resolved else None
-    reverse = relation_between_su27(second, first) if resolved else None
-    candidate_analysis = candidate_relation_analysis(contexts[0], contexts[1])
+    forward = (
+        relation_between_su27(first, second, distance_rule=distance_rule)
+        if resolved
+        else None
+    )
+    reverse = (
+        relation_between_su27(second, first, distance_rule=distance_rule)
+        if resolved
+        else None
+    )
+    candidate_analysis = candidate_relation_analysis(
+        contexts[0], contexts[1], distance_rule=distance_rule
+    )
     if forward is not None and reverse is not None:
+        dist = f"（{forward['distance']}）" if forward.get("distance") else ""
         summary = (
-            f"{person1_name}本命宿{first}，{person2_name}本命宿{second}，配对类别{forward['pair']}。"
-            f"{person1_name}以自身为命数至{person2_name}为{forward['relation']}；"
-            f"反向为{reverse['relation']}。双方须分别解读，类别不是关系成败预测。"
+            f"{person1_name}（{first}）与{person2_name}（{second}）"
+            f"为{forward['pair']}{dist}：正{forward['relation']}、反{reverse['relation']}。"
         )
-        if any(c.get("calendar_candidates") for c in contexts):
-            summary += f"当地日期仍有多个{calendar_label}历日候选，但完整候选均得到同一本命宿；未确定出生时刻或唯一历日。"
+    elif any(c.get("calendar_candidates") for c in contexts):
+        summary = f"所选{calendar_label}历日存在候选，双向关系见candidate_relation_analysis。"
     else:
-        summary = (
-            f"出生当地日期对应多个可能{calendar_label}历日；已交付各日期的历法候选及双向条件关系，未补造出生时刻，也未据候选作确定相性。"
-            if any(c.get("calendar_candidates") for c in contexts)
-            else "所选历法档案的闰月政策、小月半日或规则次序尚未确定；已交付双方农历及已列候选的条件组合，未据候选作确定相性。"
-        )
-    if (
-        not resolved
-        or any(c.get("calendar_candidates") for c in contexts)
-        or candidate_analysis.get("shared_reconstruction_analysis")
-        or calendar_profile == "hinoo_t1299_host27"
-        or any(c.get("printed_edition_reference") for c in contexts)
-    ):
-        if forward is not None and reverse is not None:
-            summary += f"前向含义：{forward['meaning']}反向含义：{reverse['meaning']}"
-        summary += candidate_compatibility_reading(
-            contexts,
-            [person1_name, person2_name],
-            candidate_analysis,
-            [p["palace_reference"] for p in people],
-        )
-    if calendar_basis == "japanese_naoj_historical_utc09":
-        summary += compatibility_reference_notes(contexts, [person1_name, person2_name])
+        summary = "闰月/半日或规则次序未定，候选关系见candidate_relation_analysis。"
 
-    fixed_research_scope = research_scope()
-    # Only the first item is the full-table overview. Later items describe a
-    # selected single month and cannot be attached to two different people.
-    summary += scope_lines(fixed_research_scope, None)[0]
-    unknown_rows = "、".join(
-        str(row) for row in fixed_research_scope["unknown_direction_rows"]
-    )
-    summary += (
-        f"未知行号为{unknown_rows}，作者横杠未补成不进；"
-        "这份全表参考与双方本次历日分别交付，未覆盖任何一方的宿主、配宿或原典半日。"
-    )
+    contract: dict[str, Any] = {
+        "calendar_basis": calendar_basis,
+        "distance_rule": distance_rule,
+    }
+    if candidate_analysis.get("shared_reconstruction_analysis"):
+        contract["joint_reconstruction"] = joint_reconstruction_contract(
+            candidate_analysis
+        )
     result: dict[str, Any] = {
         "analysis_type": "宿曜双人相性 / T1299三九法",
         "status": "computed" if resolved else "partial",
@@ -737,20 +727,10 @@ def calculate_sukuyo_compatibility(
         "person1_to_person2": forward,
         "person2_to_person1": reverse,
         "candidate_relation_analysis": candidate_analysis,
-        "fixed_host_research_scope": fixed_research_scope,
         "rulesets": rulesets(calendar_profile, calendar_basis),
-        "interpretation_contract": {
-            "basis": "仅引用本次calendar档案、完整候选和双向relation；不能把sequence_group解释为近中远距离，也不把原典半日自动当民用12:00。",
-            "pair_labels": "六类配对标签只归类有向结果，不是原典六级吉凶或成功概率。",
-            "palace_reference": "双方宫名仅按历日宿名和显式textual_pada查原典分足表；未定实际出生足位或本命宫，也未据此合成宫位相性或分数。",
-            "research_reference": "fixed_host_research_scope是具名研究全表与固定NAOJ月首方向比较，不是双方本月选行、历日算法或关系预测；未知及不利行完整保留。",
-        },
+        "interpretation_contract": contract,
         "summary": summary,
     }
-    if candidate_analysis.get("shared_reconstruction_analysis"):
-        result["interpretation_contract"]["joint_reconstruction"] = (
-            joint_reconstruction_contract(candidate_analysis)
-        )
     if calendar_basis != "chinese_hko_utc08":
         result["calendar_basis"] = calendar_basis
     return result

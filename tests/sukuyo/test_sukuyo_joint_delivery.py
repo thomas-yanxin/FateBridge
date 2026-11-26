@@ -4,8 +4,9 @@ from copy import deepcopy
 
 import pytest
 
-from fatebridge.core.sukuyo import sukuyo_compatibility_text as delivery
-from fatebridge.core.sukuyo.sukuyo import calendar_mansion, candidate_relation_analysis
+from fatebridge.core.sukuyo import texts as delivery
+from fatebridge.core.sukuyo.calendar import calendar_mansion
+from fatebridge.core.sukuyo.sanjiu import candidate_relation_analysis
 from fatebridge.services.divination import calculate_sukuyo_compatibility
 
 
