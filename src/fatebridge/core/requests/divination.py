@@ -74,6 +74,14 @@ class MeihuaAnalysisRequest(MeihuaInterpretationOptions):
         default=None,
         description="Optional explicit UTC offset, ±HH:MM or ±HH:MM:SS. Verified jointly with analysis_timezone at the supplied local clock; selects a fold without replacing the named calendar zone. Cannot rescue a DST gap or skipped date. Omit to keep rejecting ambiguous clocks. An offset cannot certify an unspecified regional time type; a confirmed fixed offset belongs in analysis_timezone.",
     )
+    analysis_longitude: float | None = Field(
+        default=None,
+        description="Optional longitude in decimal degrees; required when use_true_solar_time is True.",
+    )
+    use_true_solar_time: bool = Field(
+        default=False,
+        description="Apply true solar time correction before resolving the lunar cast hour (default False).",
+    )
     question: str | None = Field(
         default=None, description="Question or topic for the divination context"
     )

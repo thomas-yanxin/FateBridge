@@ -25,32 +25,32 @@ from fatebridge.core.local_techniques.sanshi import build_sanshiunited_result
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from fatebridge.core.local_techniques.suzhan import build_suzhan_result
 from fatebridge.core.local_techniques.tongshefa import build_tongshefa_result
-from fatebridge.core.meihua.meihua import build_meihua_evidence
-from fatebridge.core.meihua.meihua_calendar_precision import calendar_label_precision
-from fatebridge.core.meihua.meihua_clock import resolve_meihua_clock
-from fatebridge.core.meihua.meihua_clock_input import (
+from fatebridge.core.meihua.casting import (
+    MeihuaUnspecifiedClockError,
     apply_clock_input_notice,
     clock_components,
+    resolve_meihua_cast_datetime,
+    resolve_meihua_clock,
 )
-from fatebridge.core.meihua.meihua_clock_resolution import MeihuaUnspecifiedClockError
-from fatebridge.core.meihua.meihua_day_qi import apply_day_qi, civil_day_qi_context
-from fatebridge.core.meihua.meihua_external import apply_external_omens
-from fatebridge.core.meihua.meihua_motion import apply_motion_context
-from fatebridge.core.meihua.meihua_observation import apply_observation_context
-from fatebridge.core.meihua.meihua_qi_branches import (
-    apply_qi_branch_timing_references,
-)
-from fatebridge.core.meihua.meihua_qi_days import apply_qi_day_timing_references
-from fatebridge.core.meihua.meihua_reputation import apply_reputation_supplement
-from fatebridge.core.meihua.meihua_situational import apply_situational_responses
-from fatebridge.core.meihua.meihua_solar_reference import (
+from fatebridge.core.meihua.relations import build_meihua_evidence
+from fatebridge.core.meihua.texts import (
+    calendar_label_precision,
     solar_reference_notice,
     solar_term_date_reference,
 )
-from fatebridge.core.meihua.meihua_stage_emphasis import apply_stage_emphasis
-from fatebridge.core.meihua.meihua_timing import apply_postheaven_count_reference
-from fatebridge.core.meihua.meihua_trigram_symbols import (
+from fatebridge.core.meihua.topics import (
+    apply_day_qi,
+    apply_external_omens,
+    apply_motion_context,
+    apply_observation_context,
+    apply_postheaven_count_reference,
+    apply_qi_branch_timing_references,
+    apply_qi_day_timing_references,
+    apply_reputation_supplement,
+    apply_situational_responses,
+    apply_stage_emphasis,
     apply_trigram_relation_symbols,
+    civil_day_qi_context,
 )
 from fatebridge.core.metaphysics.ren_gods import DEFAULT_GUIREN_PROFILE, GuirenProfile
 from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
@@ -87,6 +87,8 @@ def calculate_meihua_analysis(
     analysis_second: int | None = None,
     analysis_timezone: str | None = None,
     analysis_utc_offset: str | None = None,
+    analysis_longitude: float | None = None,
+    use_true_solar_time: bool = False,
     question: str | None = None,
     interpretation_topic: str = "general",
     weather_context: dict[str, Any] | None = None,
@@ -176,12 +178,18 @@ def calculate_meihua_analysis(
             "issues": [{"path": "analysis_date", "code": "unsupported_calendar_date"}],
         }
 
-    pillars = BaZiCalendar.get_four_pillars(
+    cast_datetime, solar_meta = resolve_meihua_cast_datetime(
         analysis_datetime,
+        timezone_name=timezone_name,
+        longitude=analysis_longitude,
+        use_true_solar_time=use_true_solar_time,
+    )
+    pillars = BaZiCalendar.get_four_pillars(
+        cast_datetime,
         timezone_name=timezone_name,
     )
     calendar_context = build_calendar_context(
-        analysis_datetime,
+        cast_datetime,
         timezone_name=timezone_name,
         pillars=pillars,
     )
@@ -211,9 +219,6 @@ def calculate_meihua_analysis(
     for key in (
         "base_hexagram",
         "changed_hexagram",
-        "mutual_hexagram",
-        "cuo_hexagram",
-        "zong_hexagram",
     ):
         meihua[key]["classical"] = classical_hexagram(meihua[key]["binary_code"])
     meihua.update(
@@ -225,6 +230,9 @@ def calculate_meihua_analysis(
             month_branch=calendar_context["bazi_month_boundary"]["branch"],
         )
     )
+    meihua["calendar_policy"]["true_solar_time_applied"] = solar_meta[
+        "true_solar_time_applied"
+    ]
     meihua["calendar_policy"]["civil_clock_resolution"] = clock_resolution
     meihua["rule_trace"].append(
         {
