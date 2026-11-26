@@ -286,7 +286,6 @@ docs/reviews/
 !/tests/data/local_partial_house_v1/source.json.sha256
 !/tests/data/human_design_interval_flint_v1/README.md
 !/tests/data/human_design_interval_flint_v1/source.json.gz
-!/tests/data/human_design_interval_flint_v1/source.json.sha256
 !/tests/data/human_design_finite_contacts_v1/README.md
 !/tests/data/human_design_finite_contacts_v1/manifest.json
 !/tests/data/human_design_finite_contacts_v1/reference.jsonl.gz

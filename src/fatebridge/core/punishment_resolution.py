@@ -2,6 +2,8 @@
 
 from typing import Any, Mapping, Sequence
 
+from fatebridge.core.source_identity import ZIPING_ZHENQUAN_NLC_SCAN_URL
+
 POLICY = "completed_combination_zi_mao_month_officer_resolution_v4"
 STRENGTH_METHOD = "season_root_revelation_relations_v12"
 CURRENT_STRENGTH_METHODS = frozenset({STRENGTH_METHOD})
@@ -10,7 +12,7 @@ SOURCE = {
     "author": "沈孝瞻",
     "title": "秘本子平真詮·論刑沖會合解法",
     "edition": "国家图书馆藏本，上海世界图书馆发行",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+    "url": ZIPING_ZHENQUAN_NLC_SCAN_URL,
     "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
     "pdf_pages": [23, 24, 25],
     "printed_pages": [14, 15, 16],

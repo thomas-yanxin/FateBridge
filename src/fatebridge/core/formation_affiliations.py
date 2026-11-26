@@ -7,6 +7,10 @@ An affiliate contributes no separate binding, transformation or physical root.
 from itertools import combinations
 from typing import Any, Mapping, Sequence, TypeVar
 
+from fatebridge.core.source_identity import (
+    DITIAN_SUI_CHANWEI_SCAN_URL,
+    ZIPING_ZHENQUAN_NLC_SCAN_URL,
+)
 from fatebridge.utils.data import BRANCH_CONFLICTS, Element
 
 POLICY = "complete_same_target_affiliation_v1"
@@ -15,12 +19,12 @@ SOURCE = {
     "title": "子平真詮·論正官宣參國例；任注滴天髓闡微·方局、母象",
     "references": [
         {
-            "url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+            "url": ZIPING_ZHENQUAN_NLC_SCAN_URL,
             "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
             "pdf_pages": [24, 25, 66],
         },
         {
-            "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+            "url": DITIAN_SUI_CHANWEI_SCAN_URL,
             "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
             "pdf_pages": [140, 141, 144, 145, 146, 424],
         },

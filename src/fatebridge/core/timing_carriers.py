@@ -3,6 +3,7 @@
 from typing import Any, Literal, Mapping, Sequence, TypedDict
 
 from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
+from fatebridge.core.source_identity import DITIAN_SUI_CHANWEI_SCAN_URL
 from fatebridge.utils.data import (
     BRANCH_ELEMENTS,
     BRANCH_HIDDEN_STEMS,
@@ -16,7 +17,7 @@ SOURCE = {
     "source_title": "任注滴天髓闡微·歲運",
     "source_author": "任鐵樵增注，李雨田校訂兼發行",
     "source_edition": "上海大東書局經售，1947年4月初版",
-    "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+    "source_url": DITIAN_SUI_CHANWEI_SCAN_URL,
     "source_pdf_pages": "502–510，盖头截脚举例503，乙酉及丁酉反例506",
 }
 

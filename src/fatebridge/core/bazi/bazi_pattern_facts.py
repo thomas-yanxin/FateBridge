@@ -3,6 +3,7 @@
 from itertools import combinations
 from typing import Literal, Mapping, TypedDict
 
+from fatebridge.core.source_identity import DITIAN_SUI_CHANWEI_SCAN_URL
 from fatebridge.utils.data import (
     BRANCH_CONFLICTS,
     BRANCH_ELEMENTS,
@@ -84,7 +85,7 @@ PILLAR_SOURCES: tuple[PatternSource, ...] = (
         "title": "任注滴天髓闡微·干支總論、順局、歲運",
         "edition": "上海大東書局經售，1947年4月初版",
         "locator": "PDF101、391、503–504；盖头可涉及支中藏干，天覆地载不等于两类单柱生助",
-        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "url": DITIAN_SUI_CHANWEI_SCAN_URL,
     },
 )
 
