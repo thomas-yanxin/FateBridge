@@ -40,13 +40,10 @@ from fatebridge.core.ziwei.ziwei_rulesets import (
     DEFAULT_ZIWEI_PROFILE,
     ZIWEI_NATAL_LEAP_MONTH_LABELS,
     ZIWEI_PALACE_SEQUENCE,
-)
-from fatebridge.core.ziwei.ziwei_rulesets import ZIWEI_SIHUA_RULES as ZIWEI_SIHUA_RULES
-from fatebridge.core.ziwei.ziwei_rulesets import (
+    ZIWEI_SIHUA_RULES,
     ZiweiNatalLeapMonthPolicy,
     effective_lunar_month,
     natal_leap_month_policy_for,
-    ordered_sihua_mapping,
     sihua_rules_for,
     validate_day_divide,
     validate_rule_profile,
@@ -136,7 +133,7 @@ def _apply_sihua_to_palaces(
                     for label in palace["stars"]
                 ]
                 break
-    return ordered_sihua_mapping(sihua)
+    return dict(sihua)
 
 
 def build_ziwei_chart(
@@ -552,7 +549,7 @@ def build_ziwei_rules(
             raise ValueError("紫微四化年干必须为甲乙丙丁戊己庚辛壬癸之一")
         focused = {
             "year_stem": year_stem,
-            "sihua": ordered_sihua_mapping(rules[year_stem]),
+            "sihua": dict(rules[year_stem]),
         }
     return {
         "requested_year_stem": year_stem,

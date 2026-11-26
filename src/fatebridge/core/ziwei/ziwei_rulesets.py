@@ -1,9 +1,4 @@
-"""Versioned Ziwei conventions; a software oracle is not a classical edition.
-
-The excerpt profile selects explicit rules and one named brightness table in
-the pinned transcription. Intra-volume textual conflicts remain unresolved;
-uncovered rules retain the software baseline without a whole-book claim.
-"""
+"""Versioned Ziwei conventions with explicit source selections and differences."""
 
 from __future__ import annotations
 
@@ -210,7 +205,6 @@ def ziwei_ruleset_metadata(
             "运限复用所选四化表为软件约定，原典未验",
             "飞天三杀仅三支集合，逐星位置未分配",
         ],
-        "real_world_efficacy": "not_tested",
     }
     if sihua_source == "naj_ming_v1":
         result["version"] += "+sihua.naj-ming-v1"
@@ -227,30 +221,3 @@ def ziwei_ruleset_metadata(
             for item in result["unresolved"]
         ]
     return result
-
-
-SIHUA_DISPLAY_ORDER = {
-    "化忌": 0,
-    "化权": 1,
-    "化科": 2,
-    "化禄": 3,
-}
-
-
-class OrderedSihuaKey(str):
-    """String subclass that keeps Zi Wei sihua labels in traditional order."""
-
-    def __lt__(self, other: object) -> bool:
-        if not isinstance(other, str):
-            return NotImplemented
-        return (
-            SIHUA_DISPLAY_ORDER.get(str(self), 99),
-            str(self),
-        ) < (
-            SIHUA_DISPLAY_ORDER.get(str(other), 99),
-            str(other),
-        )
-
-
-def ordered_sihua_mapping(sihua: dict[str, str]) -> dict[str, str]:
-    return {OrderedSihuaKey(label): star for label, star in sihua.items()}

@@ -7,7 +7,6 @@ from typing import Any
 from fatebridge.core.local_techniques.snapshot import join_lines
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.ziwei.ziwei_calendar import basis_text, placement_lunar_display
-from fatebridge.core.ziwei.ziwei_rulesets import DEFAULT_ZIWEI_DAY_DIVIDE
 from fatebridge.services.snapshot_builders import render_snapshot_text
 
 
@@ -70,7 +69,7 @@ def build_ziwei_snapshot_text(
                         else []
                     ),
                     f"闰月口径：{ziwei_birth['calendar_rules']['leap_month']}",
-                    f"晚子分日口径：{ziwei_birth['calendar_rules'].get('day_divide', DEFAULT_ZIWEI_DAY_DIVIDE)}（{ziwei_birth['calendar_rules'].get('late_zi', '')}）",
+                    f"晚子分日口径：{ziwei_birth['calendar_rules']['day_divide']}（{ziwei_birth['calendar_rules']['late_zi']}）",
                     f"亮度来源：{ziwei_birth['ruleset']['brightness_rule']}",
                     "旬空显示："
                     + "、".join(
@@ -154,7 +153,7 @@ def build_ziwei_horoscope_snapshot_text(
                         else []
                     ),
                     f"规则配置：{horoscope['ruleset']['id']}；原典符合范围：{horoscope['ruleset']['classical_conformance']}",
-                    f"晚子分日口径：{horoscope['calendar_rules'].get('day_divide', DEFAULT_ZIWEI_DAY_DIVIDE)}（{horoscope['calendar_rules'].get('late_zi', '')}）",
+                    f"晚子分日口径：{horoscope['calendar_rules']['day_divide']}（{horoscope['calendar_rules']['late_zi']}）",
                     *(
                         [
                             "所选四化表：明刊卷三；各可用层按实际天干查同表，运限复用仍为软件约定，未获原典认证"
@@ -189,7 +188,7 @@ def build_ziwei_horoscope_snapshot_text(
                 str(s.get("scope", "运限")),
                 join_lines(
                     [
-                        f"命宫活动索引所临本命宫：{s.get('natal_palace_name', s.get('palace_name', '无'))}（{s.get('palace_ganzhi', '')}）",
+                        f"命宫活动索引所临本命宫：{s['natal_palace_name']}（{s['palace_ganzhi']}）",
                         f"四化天干：{s.get('stem', '')}",
                         f"天干来源：{s.get('stem_origin', '')}",
                         f"四化：{_mutagen_line(s.get('mutagen', {}) or {})}",
