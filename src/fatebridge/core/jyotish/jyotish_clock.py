@@ -8,7 +8,10 @@ from fractions import Fraction
 from typing import Any
 
 from fatebridge.core.astro.birth import AstroBirthInfo, require_resolved_birth_timezone
-from fatebridge.core.astro.birth_clock import resolve_solar_epoch
+from fatebridge.core.astro.birth_clock import (
+    resolve_solar_birth_clock,
+    resolve_solar_epoch,
+)
 from fatebridge.core.astro.physical_epoch import PhysicalEpoch
 from fatebridge.core.astro.sensitivity_grid import (
     RecordedBirthSample,
@@ -127,8 +130,6 @@ def check_clock_sources(
     conversion = birth.clock_conversion
     if conversion is None:
         return None
-    from fatebridge.core.astro.birth_clock import resolve_solar_birth_clock
-
     session = current_source_session()
     assert session is not None
     key = (

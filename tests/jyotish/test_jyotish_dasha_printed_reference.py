@@ -5,7 +5,7 @@ from fractions import Fraction
 
 import pytest
 
-from fatebridge.core.jyotish.jyotish import vimshottari
+from fatebridge.core.jyotish.jyotish_dasha_levels import vimshottari
 
 
 def test_rao_example_50_printed_balance_and_calendar_discrepancy() -> None:

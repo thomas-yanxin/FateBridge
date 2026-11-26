@@ -8,7 +8,8 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish.jyotish import build_india, nakshatra
+from fatebridge.core.jyotish.jyotish import build_india
+from fatebridge.core.jyotish.jyotish_dasha_levels import nakshatra
 from fatebridge.core.jyotish.jyotish_kala import solar_packet, solar_parts
 from fatebridge.core.jyotish.jyotish_panchanga import compute_panchanga
 from tests.support.solar_events import fixed_crossings, solar_event

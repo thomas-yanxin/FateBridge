@@ -12,13 +12,8 @@ import pytest
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish.jyotish import (
-    GRAHAS,
-    build_india,
-    divisional_chart,
-    positions,
-    topic_evidence,
-)
+from fatebridge.core.jyotish.jyotish import build_india, positions
+from fatebridge.core.jyotish.jyotish_charts import GRAHAS, divisional_chart
 from fatebridge.core.jyotish.jyotish_strength import (
     SOURCE,
     SOURCE_ID,
@@ -26,6 +21,7 @@ from fatebridge.core.jyotish.jyotish_strength import (
     physical_state,
     solar_orb_condition,
 )
+from fatebridge.core.jyotish.jyotish_topics import topic_evidence
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 TIME_REFERENCE = json.loads((FIXTURES / "jyotish-time-reference.json").read_text())

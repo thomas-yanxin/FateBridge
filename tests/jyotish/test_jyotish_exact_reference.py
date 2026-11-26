@@ -9,8 +9,8 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.astro.astrology_tables import SIGNS
-from fatebridge.core.jyotish.jyotish import GRAHAS, divisional_chart
 from fatebridge.core.jyotish.jyotish_balas import resolve_directional_strength
+from fatebridge.core.jyotish.jyotish_charts import GRAHAS, divisional_chart
 from fatebridge.core.jyotish.jyotish_kala import nathonnatha
 from fatebridge.core.jyotish.jyotish_mean import mean_longitudes
 from fatebridge.core.jyotish.jyotish_sthana import calculate_sthana, resolve_sthana

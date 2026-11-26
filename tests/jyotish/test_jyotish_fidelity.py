@@ -5,6 +5,7 @@ import copy
 import pytest
 
 from fatebridge.core.astro.birth import build_astro_birth_info
+from fatebridge.core.jyotish import jyotish, jyotish_sensitivity
 from fatebridge.core.jyotish.jyotish import build_india
 from fatebridge.core.jyotish.jyotish_evidence import strength_context
 from fatebridge.services.astrology import calculate_core_chart_analysis
@@ -230,8 +231,6 @@ def test_unselected_model_is_unavailable_without_claiming_birth_data_is_missing(
 def test_star_change_alone_marks_sensitivity_even_if_discrete_strengths_are_fixed(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from fatebridge.core.jyotish import jyotish
-
     birth = build_astro_birth_info(**CUSP)
     original = jyotish.resolve_sthana
     fixed = None
@@ -245,6 +244,7 @@ def test_star_change_alone_marks_sensitivity_even_if_discrete_strengths_are_fixe
         return fixed
 
     monkeypatch.setattr(jyotish, "resolve_sthana", fixed_sthana)
+    monkeypatch.setattr(jyotish_sensitivity, "resolve_sthana", fixed_sthana)
     build_india(birth, divisions=[])
     result = build_india(birth, divisions=[], birth_time_uncertainty_minutes=2)
     sensitivity = result["birth_time_sensitivity"]

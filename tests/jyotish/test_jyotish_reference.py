@@ -7,7 +7,8 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish.jyotish import build_india, vimshottari
+from fatebridge.core.jyotish.jyotish import build_india
+from fatebridge.core.jyotish.jyotish_dasha_levels import vimshottari
 
 REFERENCE = json.loads(
     (Path(__file__).parents[1] / "fixtures/jyotish-reference.json").read_text()

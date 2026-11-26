@@ -24,7 +24,7 @@ claim made by the book. See `criteria.json` for the frozen scope and seeds.
 The old producer failed 251 final-coordinate values and overflowed for16
 valid rational-input/division pairs; all315 failed fields and original data
 are retained outside the repository in
-`/Users/thomas/.codex/artifacts/fatebridge-jyotish-varga-and-role-census-20261112/`.
+the external archive `fatebridge-jyotish-varga-and-role-census-20261112`.
 Ordinary tests read this frozen reference and never regenerate expectations.
 The source, generator, original failures and native-library receipts remain
 in that evidence directory. This does not certify the whole original book,

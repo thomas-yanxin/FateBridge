@@ -93,7 +93,8 @@ Santhanam第26章与27.19现另有未施用来源字段，记录译文／注解�
 | D1 | Rasi、上升、整宫、宫主落宫 | 采用七曜守护星，节点不另赋宫主 |
 | D9 | Navamsa | 每座九分，起座按火白羊、土摩羯、风天秤、水巨蟹，再顺行 |
 | D10 | Dasamsa | 每座十分；奇数星座从自身起，偶数星座从第九座起，再顺行 |
-| D2／D3／D7／D12／D30 | Santhanam 第6章所列分盘 | D2固定传统日月Hora，D30不等长区段只给星座；盘内度数和读法见下方v4说明 |
+| D2／D3／D7／D12／D30 | Santhanam 第6章所列分盘 | D2固定传统日月Hora，D30不等长区段只给星座；盘内度数和读法见[分盘与位置强度](#分盘与位置强度) |
+| D4／D16／D20／D24／D27／D40／D45／D60 | 十六分盘中的其余八盘 | 使用各自星座分配；等分盘度数沿用线性显示约定；八盘FLINT固定参考不授予这些分盘独立数值验收 |
 | Sthana Bala | 五项位置分量、逐盘证据、总量及来源口径比较 | 七曜，60 Virupa为1 Rupa；选定七分盘读法，不等于完整Shadbala |
 | 尊贵与状态 | 星座级标签；D1 的 moolatrikona 度数、Baladi、Uchcha Bala；黄纬、速度、太阳黄经间距 | 度数条件独立；Uchcha Bala 仅一个 0–60 Virupa 分量；按 Santhanam 注释给太阳角距条件；D9/D10 不套物理状态 |
 | 星体关系 | D1 星体对所在星座主星的自然、临时与复合关系 | 采用《Brihat Jataka》1905 版 II.16–18；方向不强制互反，不当作人际信用 |
@@ -103,7 +104,7 @@ Santhanam第26章与27.19现另有未施用来源字段，记录译文／注解�
 
 规则来源为 [P.V.R. Narasimha Rao《Vedic Astrology: An Integrated Approach》](https://www.vedicastrologer.org/articles/vedic_astro_textbook.pdf)，重点为第 2–4、6、10、16 章；天文接口来源为 [Swiss Ephemeris Programmer's Manual](https://www.astro.com/swisseph/swephprg.htm)。采用书中有限规则；有分歧的节点尊贵、节点相位和共主没有纳入本版本。`india.rulesets/rule_trace` 保留来源和规则 ID。
 
-规则、来源和教材冲突的检查见[深度规则测试](../tests/jyotish/test_jyotish_depth.py)。仍未覆盖完整 Shadbala（已实现位置力五分量、方向力与自然力，相位力保留分类分支）、八分法占据读法的唯一裁定与未决削减分支及事件推断、其他作者燃烧规则与真实出没可见性、复杂 Yoga 成格验收、D1/D2/D3/D7/D9/D10/D12/D30 以外分盘、其他 Dasha、出生时校正。`sidereal_progressions` 是已有的恒星二次推运，与本页的 Vimshottari 分开。
+规则、来源和教材冲突的检查见[深度规则测试](../tests/jyotish/test_jyotish_depth.py)。仍未覆盖完整 Shadbala（已实现位置力五分量、方向力与自然力，相位力保留分类分支）、八分法占据读法的唯一裁定与未决削减分支及事件推断、其他作者燃烧规则与真实出没可见性、复杂 Yoga 成格验收、十六分盘（D1、D2、D3、D4、D7、D9、D10、D12、D16、D20、D24、D27、D30、D40、D45、D60）以外分盘、其他 Dasha、出生时校正。`sidereal_progressions` 是已有的恒星二次推运，与本页的 Vimshottari 分开。
 
 ## 接口与独立视图
 

@@ -6,8 +6,9 @@ import pytest
 
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.contracts.output_jyotish import JyotishIndia
-from fatebridge.core.jyotish.jyotish import build_india, topic_evidence
+from fatebridge.core.jyotish.jyotish import build_india
 from fatebridge.core.jyotish.jyotish_aiyar_ashtakavarga import RULE, SOURCE, calculate
+from fatebridge.core.jyotish.jyotish_topics import topic_evidence
 from tests.fixtures.surface_payloads import astro_payload
 from tests.support.reference_data import resolve
 
