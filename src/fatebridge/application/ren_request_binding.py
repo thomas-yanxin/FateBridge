@@ -24,7 +24,7 @@ from fatebridge.core.metaphysics.ren_calendar import (
 )
 from fatebridge.core.metaphysics.ren_diurnal import resolve_diurnal
 from fatebridge.core.requests.divination import SanShiUnitedRequest
-from fatebridge.core.requests.metaphysics import (
+from fatebridge.core.requests.sanshi import (
     JinkouAnalysisRequest,
     LiuRengGodsRequest,
     LiuRengRunyearRequest,

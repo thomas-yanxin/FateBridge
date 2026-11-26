@@ -101,53 +101,5 @@
     "title": "IpipBigFiveRequest",
     "type": "object"
   },
-  "method_contracts": [
-    {
-      "comparison_requirements": [
-        "相同 Goldberg (1992) IPIP 50 题条目键、反向计分公式 (6 - score) 与 8/10 缺失阈值"
-      ],
-      "dependencies": [
-        "validated_request"
-      ],
-      "error_sources": [],
-      "implementation_refs": [
-        "src/fatebridge/core/psychometrics/ipip_big_five.py",
-        "src/fatebridge/services/psychometrics.py"
-      ],
-      "limitations": [
-        "仅确定性算术计分与公有领域条目清单；不输出常模百分位、临床诊断或泛化叙事建议",
-        "仅作答 >= 8/10 题的因子计算折算均值；< 8 题标记为 insufficient_items 且 mean 为 null"
-      ],
-      "method_id": "fatebridge.ipip_big_five_50.contract_v1",
-      "output_paths": [
-        "mode",
-        "scale_id",
-        "domains",
-        "scale_raw_sum",
-        "scale_mean",
-        "items",
-        "provenance"
-      ],
-      "prerequisites": [
-        "action=list_items，或 action=score 且提供合法的 1..5 整数作答（responses 或 ratings）"
-      ],
-      "quantity_kind": "psychometric_scale_score",
-      "role": "calculation",
-      "selector_fields": [
-        "action",
-        "domain",
-        "include_item_breakdown"
-      ],
-      "source_refs": [
-        "docs/algorithm-coverage.md"
-      ],
-      "unit": "likert_1_to_5",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "deterministic_arithmetic_verified"
-      }
-    }
-  ],
   "tool": "ipip_big_five"
 }

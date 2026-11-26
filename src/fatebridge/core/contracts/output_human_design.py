@@ -5,7 +5,8 @@ from typing import Literal
 from pydantic import JsonValue
 
 from fatebridge.core.contracts.output_base import PartialOutput
-from fatebridge.core.response_models import ProjectedOutput, RunMetadata
+from fatebridge.core.contracts.output_projection import ProjectedOutput
+from fatebridge.core.receipt_models import RunMetadata
 
 
 class Activation(PartialOutput):

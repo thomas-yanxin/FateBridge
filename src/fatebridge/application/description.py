@@ -9,12 +9,10 @@ from fatebridge.application.examples import (
     call_guidance,
     compact_fields,
     evidence_views,
-    example_context,
     example_input,
     suggested_fields,
 )
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
-from fatebridge.core.reproducibility import ReproducibilityPolicy
 from fatebridge.core.schema_cache import model_schema
 
 UNION_ORIGINS = (UnionType, get_origin(Annotated[int, "u"] | None))
@@ -68,41 +66,25 @@ def _surfaces(spec: ToolSpec) -> dict[str, bool | str | None]:
     }
 
 
-def describe_spec(spec: ToolSpec) -> ServiceResult:
-    """Describe one tool's full schemas, capabilities and available transports."""
-    return _describe_contract(spec, include_output_schema=True)
+def describe_spec(
+    spec: ToolSpec, *, include_output_schema: bool = False
+) -> ServiceResult:
+    """Describe one tool's schema, capabilities and available transports."""
+    return _describe_contract(spec, include_output_schema=include_output_schema)
 
 
 def _describe_contract(spec: ToolSpec, *, include_output_schema: bool) -> ServiceResult:
     """Build requested contracts without generating schemas that are discarded."""
-    parameters = [
-        {
-            "name": name,
-            "flag": "--" + name.replace("_", "-"),
-            "type": field_type_name(field.annotation),
-            "required": field.is_required(),
-            "default": (
-                None
-                if field.is_required()
-                else field.get_default(call_default_factory=True)
-            ),
-            "description": field.description or "",
-            "nested_model": is_model_field(field.annotation),
-        }
-        for name, field in spec.request_model.model_fields.items()
-    ]
     example = example_input(spec)
     views = evidence_views(spec)
     guidance = call_guidance(spec)
     fields = suggested_fields(spec)
     default_fields = compact_fields(spec)
-    reproducibility = spec.reproducibility or ReproducibilityPolicy()
+    root_fields = list(spec.output_fields)
+    if not root_fields and spec.output_model:
+        root_fields = list(spec.output_model.model_fields)
     record: ServiceResult = {
-        **(
-            {"example_input": example, "example_context": example_context()}
-            if example is not None
-            else {}
-        ),
+        **({"example_input": example} if example is not None else {}),
         **({"evidence_views": views} if views is not None else {}),
         **({"call_guidance": guidance} if guidance is not None else {}),
         "tool": spec.name,
@@ -110,35 +92,14 @@ def _describe_contract(spec: ToolSpec, *, include_output_schema: bool) -> Servic
         "operation_label_zh": spec.operation_label_zh,
         "family": spec.family,
         "annotations": spec.execution_hints.as_annotations(),
-        "reproducibility": reproducibility.as_manifest(),
-        "method_contract_coverage": (
-            "declared_subset" if spec.methods else "not_registered"
-        ),
-        "method_contracts": [method.as_manifest() for method in spec.methods],
-        "method_registration": {
-            "scope": "domain_methods_and_runtime_policy_witnesses",
-            "status": "registered" if spec.methods else "not_registered",
-            "applicability_contract": "input_schema_and_runtime_domain_preconditions",
-            "version_semantics": "contract_v1 is a registration contract; actual algorithm versions are recorded separately",
-        },
         "full_result_required_fields": list(spec.required_output_fields),
-        "full_result_empty_object_policy": "reject_required_roots",
         "execution": {
             "cpu_bound": spec.cpu_bound,
-            "budget_scope": "process_shared_across_transports",
         },
         "surfaces": _surfaces(spec),
-        "parameters": parameters,
         "input_schema": model_schema(spec.request_model),
-        "output_fields": (
-            list(spec.output_model.model_fields) if spec.output_model else []
-        ),
+        "output_fields": root_fields,
         "cli_request_file": spec.cli_request_file,
-        "projection_note": (
-            "默认 detail=compact 返回核心业务字段；需要指定字段时传 fields"
-            "（严格校验路径，支持点号子路径）；需要完整结果时传 detail=audit。"
-            "run_metadata 自动保留；不要猜测字段名。"
-        ),
     }
     if fields is not None:
         record["suggested_fields"] = fields
@@ -158,10 +119,9 @@ def summarize_spec(spec: ToolSpec) -> ServiceResult:
         "label": spec.operation_label_zh,
         "summary": spec.summary,
         "surfaces": _surfaces(spec),
-        "method_ids": [method.method_id for method in spec.methods],
     }
 
 
 def describe_input_spec(spec: ToolSpec) -> ServiceResult:
-    """Call contract with input schema and output root names; output_schema is on detail=full."""
+    """Call contract with input schema and output root names."""
     return _describe_contract(spec, include_output_schema=False)

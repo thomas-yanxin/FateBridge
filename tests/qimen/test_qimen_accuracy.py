@@ -9,7 +9,7 @@ from fatebridge.core.metaphysics import qimen as engine
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.qimen import build_qimen_board, qimen_futou_for_ganzhi
 from fatebridge.services.divination import calculate_sanshiunited_analysis
-from fatebridge.services.metaphysics import calculate_qimen_analysis
+from fatebridge.services.sanshi import calculate_qimen_analysis
 from fatebridge.utils.civil_time import NominalClockLabel
 from tests.support.transports import AS_OF, SPECS, business
 

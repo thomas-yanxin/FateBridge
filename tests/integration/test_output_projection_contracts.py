@@ -146,7 +146,12 @@ def test_all_published_schemas_preserve_object_projection_compatibility(
 ) -> None:
     manifest = {
         spec.name: rest.get(
-            "/api/tools", params={"tool": spec.name, "detail": "full"}
+            "/api/tools",
+            params={
+                "tool": spec.name,
+                "detail": "full",
+                "include_output_schema": True,
+            },
         ).json()["tools"][0]["output_schema"]
         for spec in CATALOG
     }
@@ -163,7 +168,9 @@ def test_all_published_schemas_preserve_object_projection_compatibility(
             return {
                 name: contract["output_schema"]
                 for name, contract in (
-                    await capability_contracts(client, detail="full")
+                    await capability_contracts(
+                        client, detail="full", include_output_schema=True
+                    )
                 ).items()
             }
 
@@ -171,7 +178,19 @@ def test_all_published_schemas_preserve_object_projection_compatibility(
     assert set(published) == {spec.name for spec in CATALOG if spec.expose_mcp}
     for spec in CATALOG:
         central = spec.output_model.model_json_schema()
-        assert run(["discover", "--tool", spec.name, "--detail", "full"]) == 0
+        assert (
+            run(
+                [
+                    "discover",
+                    "--tool",
+                    spec.name,
+                    "--detail",
+                    "full",
+                    "--include-output-schema",
+                ]
+            )
+            == 0
+        )
         cli = json.loads(capsys.readouterr().out)["tools"][0]["output_schema"]
         assert central == cli == manifest[spec.name]
         roots = [(central, central)]

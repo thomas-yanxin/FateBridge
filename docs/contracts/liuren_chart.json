@@ -238,7 +238,7 @@
       },
       "guiren_profile": {
         "default": "liuren_common_v1",
-        "description": "大六壬昼夜贵人表：liuren_common_v1 为既有表；tanyuan_xieji_v1 按探原日夜贵人歌。金口诀仅影响附带六壬盘，本课独立用古本表。",
+        "description": "大六壬昼夜贵人表：liuren_common_v1 为既有表；tanyuan_xieji_v1 按探原日夜贵人歌。",
         "enum": [
           "liuren_common_v1",
           "tanyuan_xieji_v1"
@@ -256,7 +256,7 @@
           }
         ],
         "default": null,
-        "description": "显式昼贵/夜贵：true 昼、false 夜；省略按卯至申昼、酉至寅夜。未自动计算当地星没星出。",
+        "description": "显式昼贵/夜贵：true 昼、false 夜；省略按卯至申昼、酉至寅夜。",
         "title": "Is Diurnal"
       },
       "use_true_solar_time": {
@@ -275,49 +275,5 @@
     "title": "LiuRengGodsRequest",
     "type": "object"
   },
-  "method_contracts": [
-    {
-      "comparison_requirements": [
-        "相同方法合同、实现与数据版本、选项及实际计算层"
-      ],
-      "dependencies": [
-        "validated_request"
-      ],
-      "error_sources": [
-        "civil_clock",
-        "solar_clock",
-        "calendar_model",
-        "rule_adjudication"
-      ],
-      "implementation_refs": [
-        "src/fatebridge/services/metaphysics.py"
-      ],
-      "limitations": [
-        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
-        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
-      ],
-      "method_id": "fatebridge.liuren_course_and_transmissions.contract_v1",
-      "output_paths": [
-        "liureng"
-      ],
-      "prerequisites": [
-        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
-      ],
-      "quantity_kind": "traditional_rule_result",
-      "role": "calculation",
-      "selector_fields": [
-        "guiren_profile"
-      ],
-      "source_refs": [
-        "docs/algorithm-coverage.md"
-      ],
-      "unit": "categorical",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "not_fully_accepted"
-      }
-    }
-  ],
   "tool": "liuren_chart"
 }

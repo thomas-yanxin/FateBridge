@@ -3,16 +3,24 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
+from typing import TypedDict
 
-from fatebridge.core.almanac import build_calendar_context, get_adjacent_solar_terms
+from fatebridge.core.almanac import (
+    build_calendar_context,
+    get_adjacent_solar_terms,
+    localize_datetime,
+)
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
+from fatebridge.core.ziwei.ziwei_time_input import birth_clock_receipt
+from fatebridge.utils.birth_input import PersonInfo
 from fatebridge.utils.civil_clock import resolve_civil_clock
 from fatebridge.utils.civil_time import NominalClockLabel
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 from fatebridge.utils.solar_time import (
     SOLAR_TIME_STRATEGY_APPARENT,
     calculate_solar_time_adjustment,
+    normalize_birth_time,
 )
 from fatebridge.utils.solar_time_provenance import solar_time_receipt
 
@@ -55,6 +63,60 @@ def assemble_metaphysics_seed(
         solar_time_adjustment=solar_time_adjustment,
         birth_time_normalization=birth_time_normalization,
     )
+
+
+class AnalysisClockContext(TypedDict):
+    input_datetime: str
+    corrected_datetime: str
+    timezone: str
+    longitude: float | None
+    time_algorithm: str
+    total_correction_minutes: float
+    current_jieqi: str
+    next_jieqi: str
+    lunar_display: str | None
+
+
+def _build_person_seed(
+    person: PersonInfo, *, birth_utc_offset: str | None = None
+) -> MetaphysicsSeed:
+    # note (birth clock): Zi Wei and BaZi both include the equation of time at hour boundaries.
+    normalized_birth_time = normalize_birth_time(
+        person,
+        solar_time_strategy=SOLAR_TIME_STRATEGY_APPARENT,
+        birth_utc_offset=birth_utc_offset,
+    )
+    civil = localize_datetime(
+        normalized_birth_time.input_datetime, normalized_birth_time.timezone
+    )
+    return assemble_metaphysics_seed(
+        civil=civil,
+        clock=NominalClockLabel.from_local_datetime(
+            normalized_birth_time.corrected_datetime
+        ),
+        timezone_name=normalized_birth_time.timezone,
+        input_offset_visible=normalized_birth_time.input_datetime.utcoffset()
+        is not None,
+        longitude=normalized_birth_time.longitude,
+        applied_true_solar=normalized_birth_time.applied,
+        total_correction_minutes=normalized_birth_time.total_correction_minutes,
+        birth_time_normalization=birth_clock_receipt(person, normalized_birth_time),
+    )
+
+
+def _analysis_context_payload(seed: MetaphysicsSeed) -> AnalysisClockContext:
+    lunar_context = seed.calendar_context.get("lunar_calendar") or {}
+    return {
+        "input_datetime": seed.input_datetime.strftime("%Y-%m-%d %H:%M:%S"),
+        "corrected_datetime": seed.clock.isoformat(sep=" ", timespec="seconds"),
+        "timezone": seed.timezone,
+        "longitude": seed.longitude,
+        "time_algorithm": "真太阳时" if seed.applied_true_solar else "直接时间",
+        "total_correction_minutes": round(seed.total_correction_minutes, 2),
+        "current_jieqi": seed.calendar_context["current_solar_term"]["name"],
+        "next_jieqi": seed.calendar_context["next_solar_term"]["name"],
+        "lunar_display": lunar_context.get("display"),
+    }
 
 
 def build_metaphysics_seed(

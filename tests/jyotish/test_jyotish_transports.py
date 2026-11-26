@@ -144,7 +144,7 @@ def test_vimshottari_all_configurations_across_three_real_surfaces(
         ],
     )
     assert result["vimshottari"]["year_days"] == YEAR_DAYS[basis]
-    assert not result["run_metadata"]["determinism"]["uses_current_time"]
+    assert "current_time_frozen" not in result["run_metadata"]["warnings"]
     assert result["analysis_context"]["analysis_datetime"].endswith("T00:00:00+08:00")
 
 
@@ -354,7 +354,7 @@ def test_as_of_date_anchor_and_declared_current_clock_use() -> None:
     assert (
         result["analysis_context"]["analysis_datetime"] == "2026-10-22T00:00:00+08:00"
     )
-    assert result["run_metadata"]["determinism"]["uses_current_time"]
+    assert "current_time_frozen" in result["run_metadata"]["warnings"]
 
 
 @pytest.mark.parametrize(

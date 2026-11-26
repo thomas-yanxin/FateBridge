@@ -3,7 +3,7 @@
 import pytest
 
 from fatebridge.core.ziwei.ziwei_tables import lookup_star_brightness
-from fatebridge.services.metaphysics import (
+from fatebridge.services.ziwei import (
     calculate_ziwei_birth,
     calculate_ziwei_horoscope,
     calculate_ziwei_rules,

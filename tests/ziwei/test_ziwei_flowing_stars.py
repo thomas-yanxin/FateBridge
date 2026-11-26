@@ -3,7 +3,7 @@
 import pytest
 
 from fatebridge.core.ziwei.ziwei_auxiliary import flowing_horoscope_stars
-from fatebridge.services.metaphysics import calculate_ziwei_horoscope
+from fatebridge.services.ziwei import calculate_ziwei_horoscope
 from fatebridge.utils.birth_input import create_person_info
 
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"

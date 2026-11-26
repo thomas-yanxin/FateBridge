@@ -1,9 +1,12 @@
 """Declarative replay conditions, distinct from MCP environment-effect hints."""
 
-from dataclasses import dataclass
-from typing import Literal, TypedDict
+from __future__ import annotations
 
-from pydantic import BaseModel
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Literal, TypedDict
+
+if TYPE_CHECKING:
+    from pydantic import BaseModel
 
 
 class ReproducibilityManifest(TypedDict):

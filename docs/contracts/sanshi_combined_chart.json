@@ -8,10 +8,10 @@
     "gates": "年/月按预先所选王法核三门；李法四盘及定计目门盘另列比较。默认至点时计的门盘/定计仍未算；明确选key_hour_winter_jiazi_v1可算完整积时、时支合神、定计和阴阳四门，但三门主体未决仍为null。各配置不按结果择优，不借奇门门盘补齐。",
     "god_yin_scope": "类神阴神按实际天将所乘支再查上神，天乙依所选昼夜表互取；与四课第二、四课的阴神称谓分层。年命上神缺项保留未知，季节本空事实不替代有效空亡及日辰德合相生，综合类神可用性仍未裁。金口诀附带六壬盘的本层不替代金口诀四位取用。",
     "historical_dates": "输入日期统一为推算公历；儒略历日期须先明确转换。calendar_rules.historical_date_reference只对选定金钥匙课例返回独立历表日期、原积数及实际积数，逐项核对匹配，不代表完整古历、全盘原典符合或应验。固定现代时区及代表钟面须明示，不能把未知古例时地补造成事实。",
-    "historical_year": "year_profile仅用于year：jinjing_year_historical_table_v1选381—385晋历主表；jinjing_year_qiliang_table_v1选501—505齐梁史历表，保留502闰四月及未决闰五月／六月候选。两者各62个月1831日、范围外拒绝；默认现代农历保持，不自动按日期选配置。historical_year_calendar视图保留同次日期、原儒略历与推算公历、作者版本及未裁定范围；历表不是王氏同元古历或其他两术古历，年栏不裁定逐日改元。",
+    "historical_year": "year_profile仅用于year：jinjing_year_historical_table_v1选381—385晋历主表；jinjing_year_qiliang_table_v1选501—505齐梁史历表，保留502闰四月及未决闰五月／六月候选。两者各62个月1831日、范围外拒绝；默认现代农历保持，不自动按日期选配置。",
     "hour_profiles": "hour_profile仅用于hour；默认jinjing_hour_solstice_v1是现代至点置一。key_hour_winter_jiazi_v1按金钥匙冬至前甲子连续积时，calendar_rules.hour_origin保存同盘日期、完整积时和现代23时子初约定。合参放在taiyi_options。不可把只求太乙宫的甲己捷数代替完整积时，也不宣称古历复原。",
     "interpretation": "三式共用输入与历法，不能当三份独立证据；未定义统一事件规则，不输出综合胜率。",
-    "monthly": "仅month可选month_profile。省略保留金镜六纪节月；key_month_tianzheng_jie_v1按金钥匙完年乘十二、加天地二正与本月名义序，仍按现代节月边界。full积月及1504截数分别返回，不先约360求240门周。KEY直门加定计目，原门段684/184/死4与本盘原例相位695/215/惊5并列，三门主体未裁定。独立历表若显示农历月与节月不符须明示，不按吉凶改选方法。 独立历表的朔月比较是一项假设；source_calendar_basis=not_adjudicated时，不能声称原书已证实采用朔月。",
+    "monthly": "仅month可选month_profile。省略保留金镜六纪节月；key_month_tianzheng_jie_v1按金钥匙完年乘十二、加天地二正与本月名义序，仍按现代节月边界。full积月及1504截数分别返回，不先约360求240门周。KEY直门加定计目，原门段684/184/死4与本盘原例相位695/215/惊5并列，三门主体未裁定。独立历表若显示农历月与节月不符须明示，不按吉凶改选方法。",
     "options": "taiyi_options只接受calculation_mode=year/month/day/hour及对应year_profile/month_profile/hour_profile；阴阳遁和布盘方向由实际计法与日期计算。",
     "paged_first_view": "先核对result_delivery.deferred_fields：若仅run_metadata.runtime延后，业务依据已内联，可据所选字段解读，环境复核再读取同run完整runtime。若业务字段延后，须沿first_page_uri/next_uri读回同run投影载荷并核对原run后解释该字段；不能当作不存在或重算全文替代。",
     "qimen_profiles": "首读保留已选八神、九星旺相、三奇入墓配置的id、书名、来源及异文说明；具体顺序、旺相映射和未采用候选按同次qimen.rule_profiles续读。配置说明不能代替实际宫位事实，未读取不视为不存在。",
@@ -485,29 +485,13 @@
           },
           "layout": {
             "default": "direct",
-            "description": "转盘排法：仅支持 direct/rotating；飞盘/镜像/反转未实现。",
+            "description": "转盘排法：direct/rotating。",
             "enum": [
               "direct",
               "rotating"
             ],
             "title": "Layout",
             "type": "string"
-          },
-          "palaceShift": {
-            "default": 0,
-            "description": "九宫平移量；仅允许 0（移动九宫内容不能冒充飞盘排法）。",
-            "maximum": 0,
-            "minimum": 0,
-            "title": "Palaceshift",
-            "type": "integer"
-          },
-          "palace_shift": {
-            "default": 0,
-            "description": "palaceShift 的蛇形命名别名；仅允许 0。",
-            "maximum": 0,
-            "minimum": 0,
-            "title": "Palace Shift",
-            "type": "integer"
           },
           "season_profile": {
             "default": "yanyi_vol1_verse",
@@ -530,7 +514,7 @@
         "properties": {
           "calculation_mode": {
             "default": "year",
-            "description": "year年计附金镜年度十神；month按十二节月；day明确采用金钥匙冬至前甲子积日，不乘十二，所选钟面零时换日、二至实刻换遁，附十精及未决异数；hour按所选时计。月/日/时计均为声明的现代天文适配，非完整古历复原。",
+            "description": "year年计附金镜年度十神；month按十二节月；day采用金钥匙冬至前甲子积日；hour按所选时计。",
             "enum": [
               "year",
               "month",
@@ -554,7 +538,7 @@
               }
             ],
             "default": null,
-            "description": "仅hour时计：省略用jinjing_hour_solstice_v1（现代至点置一）；key_hour_winter_jiazi_v1按金钥匙冬至前甲子日连续积时、时支合神和阴阳四门，仍为现代日期/23时子初适配，非古历全书认证。不可按吉凶结果择优。",
+            "description": "仅hour时计：省略用jinjing_hour_solstice_v1（至点置一）；key_hour_winter_jiazi_v1按金钥匙冬至前甲子日连续积时、时支合神和阴阳四门。",
             "title": "Hour Profile"
           },
           "month_profile": {
@@ -571,7 +555,7 @@
               }
             ],
             "default": null,
-            "description": "仅month：省略为jinjing_month_jie_360_v1；key_month_tianzheng_jie_v1采用金钥匙完年乘十二、加天地二正和本月名义序，仍以现代节月为界，非完整古历月界；源文门数冲突保留，不按吉凶择法。",
+            "description": "仅month：省略为jinjing_month_jie_360_v1；key_month_tianzheng_jie_v1采用金钥匙完年乘十二、加天地二正和本月名义序。",
             "title": "Month Profile"
           },
           "shiji_profile": {
@@ -607,7 +591,7 @@
               }
             ],
             "default": null,
-            "description": "仅year：省略或jinjing_year_lunar_civil_v1保留通用现代农历岁首；jinjing_year_historical_table_v1选381—385晋历主表；jinjing_year_qiliang_table_v1选501—505齐梁史历表，保留502年闰四月及未决闰五月／六月候选。两者范围外均拒绝。输入仍用推算公历和明确时区；非全部古历、并立王朝异历或原典岁首裁定，不按吉凶择法。",
+            "description": "仅year：省略或jinjing_year_lunar_civil_v1用通用现代农历岁首；jinjing_year_historical_table_v1选381—385晋历主表；jinjing_year_qiliang_table_v1选501—505齐梁史历表。",
             "title": "Year Profile"
           }
         },
@@ -731,195 +715,5 @@
     "title": "SanShiUnitedRequest",
     "type": "object"
   },
-  "method_contracts": [
-    {
-      "comparison_requirements": [
-        "相同方法合同、实现与数据版本、选项及实际计算层"
-      ],
-      "dependencies": [
-        "validated_request"
-      ],
-      "error_sources": [
-        "civil_clock",
-        "solar_clock",
-        "calendar_model",
-        "rule_adjudication"
-      ],
-      "implementation_refs": [
-        "src/fatebridge/services/divination.py"
-      ],
-      "limitations": [
-        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
-        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
-      ],
-      "method_id": "fatebridge.sanshi_correspondence.contract_v1",
-      "output_paths": [
-        "qimen",
-        "taiyi",
-        "liureng",
-        "subresults",
-        "synthesis"
-      ],
-      "prerequisites": [
-        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
-      ],
-      "quantity_kind": "spatial_symbolic_correspondence",
-      "role": "calculation",
-      "selector_fields": [
-        "qimen_options",
-        "liureng_guiren_profile"
-      ],
-      "source_refs": [
-        "docs/algorithm-coverage.md"
-      ],
-      "unit": "categorical",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "not_fully_accepted"
-      }
-    },
-    {
-      "comparison_requirements": [
-        "相同方法合同、实现与数据版本、选项及实际计算层"
-      ],
-      "dependencies": [
-        "validated_request"
-      ],
-      "error_sources": [
-        "civil_clock",
-        "solar_clock",
-        "calendar_model",
-        "rule_adjudication"
-      ],
-      "implementation_refs": [
-        "src/fatebridge/services/metaphysics.py"
-      ],
-      "limitations": [
-        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
-        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
-      ],
-      "method_id": "fatebridge.liuren_course_and_transmissions.contract_v1",
-      "output_paths": [
-        "qimen",
-        "taiyi",
-        "liureng",
-        "subresults",
-        "synthesis"
-      ],
-      "prerequisites": [
-        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
-      ],
-      "quantity_kind": "traditional_rule_result",
-      "role": "calculation",
-      "selector_fields": [
-        "qimen_options",
-        "liureng_guiren_profile"
-      ],
-      "source_refs": [
-        "docs/algorithm-coverage.md"
-      ],
-      "unit": "categorical",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "not_fully_accepted"
-      }
-    },
-    {
-      "comparison_requirements": [
-        "相同方法合同、实现与数据版本、选项及实际计算层"
-      ],
-      "dependencies": [
-        "validated_request"
-      ],
-      "error_sources": [
-        "civil_clock",
-        "solar_clock",
-        "calendar_model",
-        "rule_adjudication"
-      ],
-      "implementation_refs": [
-        "src/fatebridge/services/metaphysics.py"
-      ],
-      "limitations": [
-        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
-        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
-      ],
-      "method_id": "fatebridge.qimen_rotating_board.contract_v1",
-      "output_paths": [
-        "qimen",
-        "taiyi",
-        "liureng",
-        "subresults",
-        "synthesis"
-      ],
-      "prerequisites": [
-        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
-      ],
-      "quantity_kind": "traditional_rule_result",
-      "role": "calculation",
-      "selector_fields": [
-        "qimen_options",
-        "liureng_guiren_profile"
-      ],
-      "source_refs": [
-        "docs/algorithm-coverage.md"
-      ],
-      "unit": "categorical",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "not_fully_accepted"
-      }
-    },
-    {
-      "comparison_requirements": [
-        "相同方法合同、实现与数据版本、选项及实际计算层"
-      ],
-      "dependencies": [
-        "validated_request"
-      ],
-      "error_sources": [
-        "civil_clock",
-        "solar_clock",
-        "calendar_model",
-        "rule_adjudication"
-      ],
-      "implementation_refs": [
-        "src/fatebridge/services/metaphysics.py"
-      ],
-      "limitations": [
-        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
-        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
-      ],
-      "method_id": "fatebridge.taiyi_four_counts.contract_v1",
-      "output_paths": [
-        "qimen",
-        "taiyi",
-        "liureng",
-        "subresults",
-        "synthesis"
-      ],
-      "prerequisites": [
-        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
-      ],
-      "quantity_kind": "integer_and_rule_result",
-      "role": "calculation",
-      "selector_fields": [
-        "qimen_options",
-        "liureng_guiren_profile"
-      ],
-      "source_refs": [
-        "docs/algorithm-coverage.md"
-      ],
-      "unit": "per_field",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "not_fully_accepted"
-      }
-    }
-  ],
   "tool": "sanshi_combined_chart"
 }

@@ -1,12 +1,12 @@
 {
   "call_guidance": {
-    "birth_seconds": "Pass birth_second only from an actually recorded clock or an explicitly identified historical clock conversion. Omission represents the start of the supplied minute, not evidence of exact seconds. Seconds propagate to UTC/TT/UT1, birth-time samples and optional directions; no outcome-driven rectification. Generic astrology_chart admits recorded seconds for germany/chart13/india_chart; use the current published variant schema for its other clock options.",
-    "birth_time_uncertainty": "Pass user-confirmed birth_time_uncertainty_minutes (0..120), then read time_sensitivity. None is unknown, not exact. Samples vary recorded UTC before optional solar correction. Do not use event outcomes to choose a birth time, or report sample frequencies as confidence probabilities.",
-    "clock_basis": "Use birth_clock_basis=civil for a recorded civil zone clock. Only an explicitly identified historical LMT/LAT record may select local_mean_solar/local_apparent_solar, with birth_timezone omitted and use_true_solar_time=false. These are input labels, not extra accuracy switches. Read actual person_info.clock_conversion (Germany under base_chart): input label, modeled physical UTC/UT1/TT, longitude, Sun/EOT where used, source/model and numerical residual. The UTC-named carrier before1960 is historical UT1, not atomic UTC. Never infer an ambiguous OZ basis or choose one by fitting positions/outcomes; a small numerical residual does not certify record precision or measured Earth rotation.",
+    "birth_seconds": "Pass birth_second only from an actually recorded clock or an explicitly identified historical clock conversion. Omission represents the start of the supplied minute, not evidence of exact seconds.",
+    "birth_time_uncertainty": "Pass user-confirmed birth_time_uncertainty_minutes (0..120), then read time_sensitivity. None is unknown, not exact. Samples vary recorded UTC before optional solar correction.",
+    "clock_basis": "Use birth_clock_basis=civil for a recorded civil zone clock. Only an explicitly identified historical LMT/LAT record may select local_mean_solar/local_apparent_solar, with birth_timezone omitted and use_true_solar_time=false.",
     "geometry": "sector13 is an ascendant-relative equal partition, independent of the twelve-house selection; IAU constellations have different boundaries.",
-    "house_roles": "Keep the selected base-chart12-house system separate from native reference-angle extraction, Meridian cusps and the custom13-sector partition. In the current numeric policy hsys1 is Alcabitus (SwissB), never Equal. Read actual chart_profile.house_system/house_system_code/house_system_label_zh; do not label a whole chart from a backend reference-angle call. reference_angle_model.house_code=E with cusp_output_used=false records only ASC/MC/ARMC extraction; samples carry their own model, and Germany solar-arc profile reuses the natal model. meridian_houses.profile.house_code=X identifies the separate RA cusp construction. fatebridge_equal13_v1 is the custom partition, independent of the selected12-house system. Unrecorded roles remain unknown; these labels do not establish original-text or predictive validity.",
-    "physical_ephemeris": "Read chart_profile.physical_ephemeris_source for the actual nominal physical-body models, observed file names, ranges and DE headers; the analytical node is separate. Read time_sensitivity.physical_ephemeris_sources and each sample index for the grid. Nominal and sampled source cohorts are checked together, so a changing model or data edition cannot be interpreted as pure birth-time sensitivity. Source failures are error_code=ephemeris_source_inconsistent with named issues at runtime.ephemeris_data and retryable=false. Repair the runtime data, retain the original interval and repeat; source identities are not accuracy certification or proof of atomic reads. ephemeris_model_scope=physical_bodies excludes the analytical mean node from physical model summaries; read nonphysical_factor_models and the node model swisseph_analytical_mean_node separately. Midpoint native_return_flags can echo the requested model and do not prove a vector-file source. A failed node still affects engine precision. Explicit strict JPL selection also governs the native Hamburg loop and fixed-star Earth observer; a limited kernel subset test does not certify full epoch coverage.",
-    "reference_angle_qualification": "When sector_profile.status=underdetermined_ascendant, no unique ASC-relative13-sector assignment exists: planets.sector13 and profile.anchor_longitude are null, thirteen_sectors is empty. backend_convention_* fields preserve replay values only. A null sector_by_sample is unknown, not a sector or absent condition; preserve every sample and computed_sample_count/unresolved_sample_count. Do not summarize known samples as full-interval stability or a probability. Ill-conditioned but resolved intersections and geographic-pole conventions retain their explicit angle_definition."
+    "house_roles": "Keep the selected base-chart12-house system separate from native reference-angle extraction, Meridian cusps and the custom13-sector partition. In the current numeric policy hsys1 is Alcabitus (SwissB), never Equal.",
+    "physical_ephemeris": "Read chart_profile.physical_ephemeris_source for the actual nominal physical-body models, observed file names, ranges and DE headers; the analytical node is separate.",
+    "reference_angle_qualification": "When sector_profile.status=underdetermined_ascendant, no unique ASC-relative13-sector assignment exists: planets.sector13 and profile.anchor_longitude are null, thirteen_sectors is empty."
   },
   "evidence_views": {
     "aspect_motion": {
@@ -24,12 +24,6 @@
         "person_info"
       ],
       "purpose": "Explicit input civil/LMT/LAT basis and physical-time conversion only. Never infer a historical basis; numerical resolution is not record accuracy or measured EOP."
-    },
-    "data_files": {
-      "fields": [
-        "ephemeris_data_policy"
-      ],
-      "scope": "Available when ephemeris_policy=require_data_files. Read the actual observed physical models, file sources, reference zeros and private-worker reports. Native event-internal reads, fixed-star catalogue formulae and absolute accuracy are not certified. This card does not set the input policy."
     },
     "geometry": {
       "fields": [
@@ -203,17 +197,6 @@
         "title": "Birth Year",
         "type": "integer"
       },
-      "ephemeris_policy": {
-        "default": "auto",
-        "description": "auto retains and reports actual available models. require_data_files rejects analytical/orbital fallback for observed physical coordinates throughout the request, including clocks and samples; checks data contexts and endpoint hashes. Native rise/set query/result epochs are probed, but internal solver reads are not fully observable. Analytical points, fictitious elements, reference zeros and Earth rotation are separate; this is not an astronomical-accuracy or prediction certificate.",
-        "enum": [
-          "auto",
-          "require_data_files"
-        ],
-        "title": "Ephemeris Policy",
-        "type": "string",
-        "x-fatebridge-western-data-policy": true
-      },
       "gender": {
         "anyOf": [
           {
@@ -289,56 +272,5 @@
     "title": "AstroSpecialtyRequest",
     "type": "object"
   },
-  "method_contracts": [
-    {
-      "comparison_requirements": [
-        "相同方法合同、实现与数据版本、选项及实际计算层"
-      ],
-      "dependencies": [
-        "validated_request"
-      ],
-      "error_sources": [
-        "civil_clock",
-        "observer_location",
-        "earth_rotation",
-        "ephemeris_model",
-        "numerical_solver",
-        "display_quantization",
-        "rule_adjudication"
-      ],
-      "implementation_refs": [
-        "src/fatebridge/core/astro/chart.py"
-      ],
-      "limitations": [
-        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
-        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
-      ],
-      "method_id": "fatebridge.western_natal_geometry.contract_v1",
-      "output_paths": [
-        "planets",
-        "chart_profile",
-        "thirteen_sectors"
-      ],
-      "prerequisites": [
-        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
-      ],
-      "quantity_kind": "astronomy_and_rule_result",
-      "role": "calculation",
-      "selector_fields": [
-        "ephemeris_policy",
-        "house_system",
-        "birth_clock_basis"
-      ],
-      "source_refs": [
-        "docs/algorithm-coverage.md"
-      ],
-      "unit": "per_field",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "not_fully_accepted"
-      }
-    }
-  ],
   "tool": "thirteen_sector_chart"
 }

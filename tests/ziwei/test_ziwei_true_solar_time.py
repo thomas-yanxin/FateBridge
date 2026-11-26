@@ -9,7 +9,7 @@
 路径的一致性，不把一致性或秒级显示当成天文精度认证。
 """
 
-from fatebridge.services.metaphysics import calculate_ziwei_birth
+from fatebridge.services.ziwei import calculate_ziwei_birth
 from fatebridge.utils.birth_input import PersonInfo
 from fatebridge.utils.solar_time import (
     SOLAR_TIME_STRATEGY_APPARENT,

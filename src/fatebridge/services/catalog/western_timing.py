@@ -2,16 +2,10 @@
 
 from __future__ import annotations
 
-from fatebridge.application.bindings import bind_kwargs, service_ref
+from fatebridge.application.bindings import bind_kwargs, request_model_ref, service_ref
 from fatebridge.application.tool_spec import CompactView, ServiceResult, ToolSpec
-from fatebridge.core.requests.western_timing import (
-    WesternFirdariaRequest,
-    WesternPrimaryDirectionsChartRequest,
-    WesternPrimaryDirectionsRequest,
-    WesternReturnTimingRequest,
-    WesternTimingBaseRequest,
-    WesternTimingRequest,
-)
+
+_REQ_MODULE = "fatebridge.core.requests.western_timing"
 
 calculate_western_timing_analysis = service_ref(
     "fatebridge.services.western_timing", "calculate_western_timing_analysis"
@@ -63,13 +57,13 @@ def _western_module_spec(
     name: str,
     label: str,
     *,
-    request_model: type[WesternTimingBaseRequest] = WesternTimingBaseRequest,
+    request_model_name: str = "WesternTimingBaseRequest",
     compact_view: CompactView | None = None,
 ) -> ToolSpec:
     return ToolSpec(
         name=name,
         bind=bind_kwargs(calculate_timing_tool, fixed={"tool_name": name}),
-        request_model=request_model,
+        request_model_loader=request_model_ref(_REQ_MODULE, request_model_name),
         summary=f"{label}：单项西占行运（整合用 western_timing）。",
         operation_label_zh=label,
         family="western_timing",
@@ -83,7 +77,7 @@ SPECS: list[ToolSpec] = [
     ToolSpec(
         name="western_timing",
         bind=bind_kwargs(calculate_western_timing_analysis),
-        request_model=WesternTimingRequest,
+        request_model_loader=request_model_ref(_REQ_MODULE, "WesternTimingRequest"),
         summary="西占时运聚合分析：整合返照/行运/太阳弧/小限/法达；单项用对应工具。",
         operation_label_zh="西占时运",
         family="western_timing",
@@ -91,10 +85,10 @@ SPECS: list[ToolSpec] = [
         rest_path="/api/astrology/timing",
     ),
     _western_module_spec(
-        "solar_return", "西占太阳返照", request_model=WesternReturnTimingRequest
+        "solar_return", "西占太阳返照", request_model_name="WesternReturnTimingRequest"
     ),
     _western_module_spec(
-        "lunar_return", "西占月亮返照", request_model=WesternReturnTimingRequest
+        "lunar_return", "西占月亮返照", request_model_name="WesternReturnTimingRequest"
     ),
     _western_module_spec("transit_chart", "西占行运盘"),
     _western_module_spec("solar_arc", "西占太阳弧"),
@@ -103,16 +97,16 @@ SPECS: list[ToolSpec] = [
     _western_module_spec(
         "primary_directions",
         "西占主限",
-        request_model=WesternPrimaryDirectionsRequest,
+        request_model_name="WesternPrimaryDirectionsRequest",
     ),
     _western_module_spec(
         "primary_directions_chart",
         "西占主限法盘",
-        request_model=WesternPrimaryDirectionsChartRequest,
+        request_model_name="WesternPrimaryDirectionsChartRequest",
     ),
     _western_module_spec("zodiacal_releasing", "西占黄道释放"),
     _western_module_spec(
-        "firdaria", "西占法达星限", request_model=WesternFirdariaRequest
+        "firdaria", "西占法达星限", request_model_name="WesternFirdariaRequest"
     ),
     _western_module_spec(
         "decennials", "西占十年星限", compact_view=_compact_decennials

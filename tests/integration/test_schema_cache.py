@@ -156,7 +156,7 @@ def test_input_discovery_does_not_materialize_output_schema() -> None:
     compact = describe_input_spec(spec)
     assert Output.schema_calls == 0
     assert compact["output_fields"] == ["value"]
-    full = describe_spec(spec)
+    full = describe_spec(spec, include_output_schema=True)
     assert Output.schema_calls == 1
     assert {key: compact[key] for key in full if key != "output_schema"} == {
         key: value for key, value in full.items() if key != "output_schema"

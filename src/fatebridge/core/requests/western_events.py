@@ -9,15 +9,15 @@ from pydantic import BaseModel, ConfigDict, Field, StrictBool, model_validator
 from fatebridge.core.requests.base import (
     AnalysisDateFields,
     AstroHouseValidatorMixin,
+    FateBridgeBaseRequest,
     WesternChartSystemFields,
 )
 from fatebridge.core.requests.western_lifespan import AstroLifespanRequest
-from fatebridge.core.requests.western_policy import WesternEphemerisRequest
 from fatebridge.utils.house_systems import TWELVE_HOUSE_SYSTEM_NOTE
 
 
 class AstroMundaneRequest(
-    AstroHouseValidatorMixin, WesternChartSystemFields, WesternEphemerisRequest
+    AstroHouseValidatorMixin, WesternChartSystemFields, FateBridgeBaseRequest
 ):
     """Request model for the 世俗入宫盘 (mundane ingress) tool — cast at a solar ingress, no birth data."""
 
@@ -70,7 +70,7 @@ class LillyRadicalityContext(BaseModel):
 
 
 class WesternEventClockFields(
-    AstroHouseValidatorMixin, WesternChartSystemFields, WesternEphemerisRequest
+    AstroHouseValidatorMixin, WesternChartSystemFields, FateBridgeBaseRequest
 ):
     """Shared location, UT1 earth-rotation, and Regiomontanus defaults for horary/election."""
 

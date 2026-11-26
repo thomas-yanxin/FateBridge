@@ -4,32 +4,17 @@ from __future__ import annotations
 
 from itertools import chain
 
-from fatebridge.application.bindings import bind_kwargs, service_ref
+from fatebridge.application.bindings import bind_kwargs, request_model_ref, service_ref
 from fatebridge.application.domain_validators import validate_astro_chart_variant
 from fatebridge.application.tool_spec import EvidenceViews, ServiceResult, ToolSpec
-from fatebridge.core.astro.reference import (
-    RELATIVE_MODE_EXACT_ALIASES,
-    RELATIVE_MODE_FALLBACK_ALIASES,
-    RELATIVE_MODE_NUMERIC_MAP,
-)
-from fatebridge.core.contracts.output_human_design import HumanDesignOutput
-from fatebridge.core.requests.astrology import (
-    AstroChartRequest,
-    AstroGermanyRequest,
-    AstroGuolaoRequest,
-    AstroIndiaRequest,
-    AstroNatalChartRequest,
-    AstroRelativeFlatRequest,
-    AstroSpecialtyRequest,
-    AstroVimshottariRequest,
-)
-from fatebridge.core.requests.human_design import HumanDesignRequest
 from fatebridge.services.catalog.astro_bindings import (
     bind_astro_natal_chart,
     bind_relationship_chart,
     calculate_core_chart_analysis,
     calculate_germany_chart_analysis,
 )
+
+_ASTRO_REQ = "fatebridge.core.requests.astrology"
 
 RELATIONSHIP_PRIMARY_FIELDS = {
     "directional_synastry": {
@@ -77,6 +62,12 @@ def _relative_evidence_views(
 ) -> EvidenceViews | None:
     if views is None:
         return None
+    from fatebridge.core.astro.reference import (
+        RELATIVE_MODE_EXACT_ALIASES,
+        RELATIVE_MODE_FALLBACK_ALIASES,
+        RELATIVE_MODE_NUMERIC_MAP,
+    )
+
     aliases: dict[str | int, str] = dict(
         chain(
             RELATIVE_MODE_FALLBACK_ALIASES.items(),
@@ -101,16 +92,21 @@ def _chart_spec(
         bind=bind_kwargs(
             calculate_core_chart_analysis, fixed={"chart_variant": variant}
         ),
-        request_model=(
-            AstroIndiaRequest
-            if variant == "india_chart"
-            else (
-                AstroGuolaoRequest
-                if variant == "guolao_chart"
+        request_model_loader=request_model_ref(
+            _ASTRO_REQ,
+            (
+                "AstroIndiaRequest"
+                if variant == "india_chart"
                 else (
-                    AstroSpecialtyRequest if variant == "chart13" else AstroChartRequest
+                    "AstroGuolaoRequest"
+                    if variant == "guolao_chart"
+                    else (
+                        "AstroSpecialtyRequest"
+                        if variant == "chart13"
+                        else "AstroChartRequest"
+                    )
                 )
-            )
+            ),
         ),
         summary=(
             "印占 Lahiri 整宫与分盘，含 PAV/BAV/SAV 计数及生时抽样。"
@@ -135,8 +131,9 @@ SPECS: list[ToolSpec] = [
         bind=bind_kwargs(
             service_ref("fatebridge.services.human_design", "calculate_human_design")
         ),
-        request_model=HumanDesignRequest,
-        output_model=HumanDesignOutput,
+        request_model_loader=request_model_ref(
+            "fatebridge.core.requests.human_design", "HumanDesignRequest"
+        ),
         required_output_fields=(
             "activations",
             "variables",
@@ -168,7 +165,7 @@ SPECS: list[ToolSpec] = [
     ToolSpec(
         name="astrology_chart",
         bind=bind_astro_natal_chart,
-        request_model=AstroNatalChartRequest,
+        request_model_loader=request_model_ref(_ASTRO_REQ, "AstroNatalChartRequest"),
         summary="离线西占本命盘（高精度星历或近似回退）；可选 opaque_solar 偏折层。",
         operation_label_zh="星盘",
         family="astro",
@@ -205,7 +202,7 @@ SPECS: list[ToolSpec] = [
         bind=bind_kwargs(
             service_ref("fatebridge.services.jyotish", "calculate_vimshottari")
         ),
-        request_model=AstroVimshottariRequest,
+        request_model_loader=request_model_ref(_ASTRO_REQ, "AstroVimshottariRequest"),
         summary="印占 Vimshottari 分期：2–6层大运子期、出生剩余运及分盘八分法。",
         operation_label_zh="印占 Vimshottari 分期",
         family="astro",
@@ -215,7 +212,7 @@ SPECS: list[ToolSpec] = [
     ToolSpec(
         name="hamburg_midpoint_chart",
         bind=bind_kwargs(calculate_germany_chart_analysis),
-        request_model=AstroGermanyRequest,
+        request_model_loader=request_model_ref(_ASTRO_REQ, "AstroGermanyRequest"),
         summary="德国中点盘：22因素、253中点轴、90/45度盘及可选真太阳弧。",
         operation_label_zh="德国盘",
         family="astro",
@@ -226,7 +223,7 @@ SPECS: list[ToolSpec] = [
     ToolSpec(
         name="relationship_chart",
         bind=bind_relationship_chart,
-        request_model=AstroRelativeFlatRequest,
+        request_model_loader=request_model_ref(_ASTRO_REQ, "AstroRelativeFlatRequest"),
         summary="关系/合盘：比较、影响、组合盘、Davison 变体及 Marks 个人盘。",
         operation_label_zh="关系星盘分析",
         family="astro",

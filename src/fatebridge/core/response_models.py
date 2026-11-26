@@ -6,38 +6,13 @@ extension fields and existing numeric values survive unchanged. Stable expert
 facts use the same nested contracts in validation and transport discovery.
 """
 
-from typing import Any
+from __future__ import annotations
 
-from pydantic import BaseModel, Field, JsonValue, create_model
+from functools import lru_cache
+from typing import TYPE_CHECKING, Any
 
-from fatebridge.core.contracts.output_astrodice import ASTRODICE_FIELDS
-from fatebridge.core.contracts.output_base import PartialOutput
-from fatebridge.core.contracts.output_bazi import DimensionOutput
-from fatebridge.core.contracts.output_bazi_anchors import TOPICS
-from fatebridge.core.contracts.output_bazi_birth import BaziBirth, DayMaster
-from fatebridge.core.contracts.output_bazi_evidence import EvidenceStructureProfile
-from fatebridge.core.contracts.output_chart_geometry import ChartPlanet
-from fatebridge.core.contracts.output_charts import CHART_FIELDS, CHART_TOOL_FIELDS
-from fatebridge.core.contracts.output_chinese import CHINESE_FIELDS, CHINESE_TOOL_FIELDS
-from fatebridge.core.contracts.output_compatibility import COMPATIBILITY_FIELDS
-from fatebridge.core.contracts.output_jyotish import Vimshottari
-from fatebridge.core.contracts.output_projection import ProjectedOutput
-from fatebridge.core.contracts.output_reference import REFERENCE_TOOL_FIELDS
-from fatebridge.core.contracts.output_ren_anchors import RenAnchoredOutput
-from fatebridge.core.contracts.output_source_annotations import (
-    LiteralSourceInputContext,
-    SourceAnnotationComparison,
-    SourceCurrentCalculation,
-)
-from fatebridge.core.contracts.output_timing import (
-    AnalysisReference,
-    BirthTimeSensitivity,
-    TimingInteractions,
-)
-from fatebridge.core.contracts.output_western import WESTERN_FIELDS
-from fatebridge.core.contracts.output_western_election import Election
-from fatebridge.core.contracts.output_western_policy import WesternDataPolicy
-from fatebridge.core.receipt_models import Object, RunMetadata
+if TYPE_CHECKING:
+    from pydantic import BaseModel, JsonValue
 
 __all__ = [
     "CHART_TOOL_FIELDS",
@@ -49,33 +24,264 @@ __all__ = [
     "ProjectedOutput",
     "REFERENCE_TOOL_FIELDS",
     "RunMetadata",
+    "output_fields_for",
     "output_model_for",
     "required_output_fields_for",
 ]
 
 
-def output_model_for(
-    tool_name: str, *, western_data_policy: bool = False
-) -> type[BaseModel]:
-    """Build each catalog's public schema from explicit root-field contracts."""
+@lru_cache(maxsize=1)
+def _contract_symbols() -> dict[str, Any]:
+    """Import domain output contract modules lazily on first schema/validation demand."""
+    from pydantic import JsonValue
+
+    from fatebridge.core.contracts.output_astrodice import ASTRODICE_FIELDS
+    from fatebridge.core.contracts.output_base import PartialOutput
+    from fatebridge.core.contracts.output_bazi import DimensionOutput
+    from fatebridge.core.contracts.output_bazi_anchors import TOPICS
+    from fatebridge.core.contracts.output_bazi_birth import BaziBirth, DayMaster
+    from fatebridge.core.contracts.output_bazi_evidence import EvidenceStructureProfile
+    from fatebridge.core.contracts.output_chart_geometry import ChartPlanet
+    from fatebridge.core.contracts.output_charts import CHART_FIELDS, CHART_TOOL_FIELDS
+    from fatebridge.core.contracts.output_chinese import (
+        CHINESE_FIELDS,
+        CHINESE_TOOL_FIELDS,
+    )
+    from fatebridge.core.contracts.output_compatibility import COMPATIBILITY_FIELDS
+    from fatebridge.core.contracts.output_jyotish import Vimshottari
+    from fatebridge.core.contracts.output_projection import ProjectedOutput
+    from fatebridge.core.contracts.output_reference import REFERENCE_TOOL_FIELDS
+    from fatebridge.core.contracts.output_ren_anchors import RenAnchoredOutput
+    from fatebridge.core.contracts.output_source_annotations import (
+        LiteralSourceInputContext,
+        SourceAnnotationComparison,
+        SourceCurrentCalculation,
+    )
+    from fatebridge.core.contracts.output_timing import (
+        AnalysisReference,
+        BirthTimeSensitivity,
+        TimingInteractions,
+    )
+    from fatebridge.core.contracts.output_western import WESTERN_FIELDS
+    from fatebridge.core.contracts.output_western_election import Election
+    from fatebridge.core.receipt_models import Object, RunMetadata
+
+    field_types: dict[str, Any] = {
+        "analysis_type": str,
+        "aspects": list[JsonValue],
+        "balance_basis": str,
+        "birth": str,
+        "bundle_version": int,
+        "category": str,
+        "challenges": list[JsonValue],
+        "changed_code": str,
+        "citation": str,
+        "comprehensive_summary": str,
+        "current_code": str,
+        "day": str,
+        "dayGanZi": str,
+        "dayInt": int,
+        "day_palace_branch": str,
+        "dayun": Object | list[JsonValue],
+        "domain": str,
+        "domains": list[JsonValue],
+        "element": str,
+        "element_distribution_basis": str,
+        "engine": str,
+        "favorable_elements": list[JsonValue],
+        "favorable_elements_status": str,
+        "engineering_favorable_elements": list[str],
+        "fixed_stars": list[JsonValue],
+        "house": int,
+        "houses": list[JsonValue],
+        "in_to_out_antiscia": list[JsonValue],
+        "in_to_out_aspects": list[JsonValue],
+        "in_to_out_contra_antiscia": list[JsonValue],
+        "jiedelta": str,
+        "jieqi": str,
+        "jieqi_split_keys": list[JsonValue],
+        "jieqi_timeline": list[JsonValue],
+        "jieqi_year": list[JsonValue],
+        "key": str,
+        "leap": bool,
+        "lines": list[JsonValue],
+        "lookup_mode": str,
+        "midpoint_aspects": list[JsonValue],
+        "midpoints": list[JsonValue],
+        "ming_gong": str,
+        "month": str,
+        "monthGanZi": str,
+        "monthInt": int,
+        "moving_lines": list[JsonValue],
+        "nongli": Object | str,
+        "out_to_in_antiscia": list[JsonValue],
+        "out_to_in_aspects": list[JsonValue],
+        "out_to_in_contra_antiscia": list[JsonValue],
+        "pair": str,
+        "part_name": str,
+        "patterns": Object | list[JsonValue],
+        "planet": str,
+        "planets": list[JsonValue],
+        "queries": list[JsonValue],
+        "query": str,
+        "question": JsonValue | str,
+        "rendered_text": str,
+        "requested_year_stem": str,
+        "selected_jieqi": list[JsonValue],
+        "sign": str,
+        "source": str,
+        "su27_basis": str,
+        "summary": Object | list[JsonValue] | str,
+        "synastry_aspects": list[JsonValue],
+        "target_year_jieqi": list[JsonValue],
+        "techniques": list[JsonValue],
+        "thirteen_sectors": list[JsonValue],
+        "time": str,
+        "timeGanZi": str,
+        "tips": list[JsonValue],
+        "title": str,
+        "year": int | str,
+        "yearGanZi": str,
+        "yearJieqi": str,
+    }
+
+    return {
+        "PartialOutput": PartialOutput,
+        "ProjectedOutput": ProjectedOutput,
+        "Object": Object,
+        "RunMetadata": RunMetadata,
+        "FIELD_TYPES": field_types,
+        "ASTRODICE_FIELDS": ASTRODICE_FIELDS,
+        "DimensionOutput": DimensionOutput,
+        "TOPICS": TOPICS,
+        "BaziBirth": BaziBirth,
+        "DayMaster": DayMaster,
+        "EvidenceStructureProfile": EvidenceStructureProfile,
+        "ChartPlanet": ChartPlanet,
+        "CHART_FIELDS": CHART_FIELDS,
+        "CHART_TOOL_FIELDS": CHART_TOOL_FIELDS,
+        "CHINESE_FIELDS": CHINESE_FIELDS,
+        "CHINESE_TOOL_FIELDS": CHINESE_TOOL_FIELDS,
+        "COMPATIBILITY_FIELDS": COMPATIBILITY_FIELDS,
+        "Vimshottari": Vimshottari,
+        "REFERENCE_TOOL_FIELDS": REFERENCE_TOOL_FIELDS,
+        "RenAnchoredOutput": RenAnchoredOutput,
+        "LiteralSourceInputContext": LiteralSourceInputContext,
+        "SourceAnnotationComparison": SourceAnnotationComparison,
+        "SourceCurrentCalculation": SourceCurrentCalculation,
+        "AnalysisReference": AnalysisReference,
+        "BirthTimeSensitivity": BirthTimeSensitivity,
+        "TimingInteractions": TimingInteractions,
+        "WESTERN_FIELDS": WESTERN_FIELDS,
+        "Election": Election,
+    }
+
+
+_DIRECT_LAZY_EXPORTS: dict[str, tuple[str, str]] = {
+    "PartialOutput": ("fatebridge.core.contracts.output_base", "PartialOutput"),
+    "ProjectedOutput": (
+        "fatebridge.core.contracts.output_projection",
+        "ProjectedOutput",
+    ),
+    "Object": ("fatebridge.core.receipt_models", "Object"),
+    "RunMetadata": ("fatebridge.core.receipt_models", "RunMetadata"),
+}
+
+_LAZY_CONTRACT_EXPORTS = frozenset(
+    {
+        "FIELD_TYPES",
+        "ASTRODICE_FIELDS",
+        "DimensionOutput",
+        "TOPICS",
+        "BaziBirth",
+        "DayMaster",
+        "EvidenceStructureProfile",
+        "ChartPlanet",
+        "CHART_FIELDS",
+        "CHART_TOOL_FIELDS",
+        "CHINESE_FIELDS",
+        "CHINESE_TOOL_FIELDS",
+        "COMPATIBILITY_FIELDS",
+        "Vimshottari",
+        "REFERENCE_TOOL_FIELDS",
+        "RenAnchoredOutput",
+        "LiteralSourceInputContext",
+        "SourceAnnotationComparison",
+        "SourceCurrentCalculation",
+        "AnalysisReference",
+        "BirthTimeSensitivity",
+        "TimingInteractions",
+        "WESTERN_FIELDS",
+        "Election",
+    }
+)
+
+
+def __getattr__(name: str) -> Any:
+    if name in _DIRECT_LAZY_EXPORTS:
+        from importlib import import_module
+
+        module_name, attr_name = _DIRECT_LAZY_EXPORTS[name]
+        return getattr(import_module(module_name), attr_name)
+    if name in _LAZY_CONTRACT_EXPORTS:
+        return _contract_symbols()[name]
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+@lru_cache(maxsize=None)
+def output_model_for(tool_name: str) -> type[BaseModel]:
+    """Build each catalog's public schema lazily from explicit root-field contracts."""
+    from importlib import import_module
+
+    standalone_refs = {
+        "human_design": (
+            "fatebridge.core.contracts.output_human_design",
+            "HumanDesignOutput",
+        ),
+        "meihua_cast": (
+            "fatebridge.core.contracts.output_meihua_cast",
+            "MeihuaCastOutput",
+        ),
+        "ipip_big_five": (
+            "fatebridge.core.psychometrics.ipip_big_five",
+            "IpipBigFiveOutput",
+        ),
+    }
+    if tool_name in standalone_refs:
+        mod_name, attr_name = standalone_refs[tool_name]
+        return getattr(import_module(mod_name), attr_name)
+    if tool_name.startswith("fengshui_"):
+        return getattr(
+            import_module("fatebridge.core.fengshui.output"), "FengshuiOutput"
+        )
+
     if tool_name not in TOOL_FIELDS:
         raise KeyError(f"Missing output contract for tool {tool_name}")
+
+    from pydantic import Field, JsonValue, create_model
+
+    symbols = _contract_symbols()
+    field_types = symbols["FIELD_TYPES"]
     fields: dict[str, Any] = {
-        "run_metadata": (RunMetadata | None, None),
+        "run_metadata": (symbols["RunMetadata"] | None, None),
     }
-    if western_data_policy:
-        fields["ephemeris_data_policy"] = (WesternDataPolicy | None, None)
     tool_fields = {
-        **CHINESE_TOOL_FIELDS.get(tool_name, {}),
-        **CHART_TOOL_FIELDS.get(tool_name, {}),
-        **REFERENCE_TOOL_FIELDS.get(tool_name, {}),
-        **(ASTRODICE_FIELDS if tool_name == "interpret_astrology_dice" else {}),
-        **(COMPATIBILITY_FIELDS if tool_name == "bazi_compatibility" else {}),
+        **symbols["CHINESE_TOOL_FIELDS"].get(tool_name, {}),
+        **symbols["CHART_TOOL_FIELDS"].get(tool_name, {}),
+        **symbols["REFERENCE_TOOL_FIELDS"].get(tool_name, {}),
+        **(
+            symbols["ASTRODICE_FIELDS"]
+            if tool_name == "interpret_astrology_dice"
+            else {}
+        ),
+        **(
+            symbols["COMPATIBILITY_FIELDS"] if tool_name == "bazi_compatibility" else {}
+        ),
         **(
             {
-                "input_context": LiteralSourceInputContext,
-                "current_calculation": SourceCurrentCalculation,
-                "source_comparison": SourceAnnotationComparison,
+                "input_context": symbols["LiteralSourceInputContext"],
+                "current_calculation": symbols["SourceCurrentCalculation"],
+                "source_comparison": symbols["SourceAnnotationComparison"],
                 "summary": str,
             }
             if tool_name == "compare_bazi_sources"
@@ -83,26 +289,31 @@ def output_model_for(
         ),
     }
     overrides = {
-        **CHINESE_FIELDS,
-        **WESTERN_FIELDS,
-        **CHART_FIELDS,
-        **{f"{topic}_analysis": DimensionOutput for topic in TOPICS},
-        "bazi_birth": BaziBirth,
-        "day_master": DayMaster,
-        "structure_profile": EvidenceStructureProfile,
-        "planets": list[ChartPlanet],
-        "election": Election,
-        "vimshottari": Vimshottari,
-        "interaction_analysis": TimingInteractions,
-        "analysis_reference": AnalysisReference,
-        "birth_time_sensitivity": BirthTimeSensitivity,
+        **symbols["CHINESE_FIELDS"],
+        **symbols["WESTERN_FIELDS"],
+        **symbols["CHART_FIELDS"],
+        **{
+            f"{topic}_analysis": symbols["DimensionOutput"]
+            for topic in symbols["TOPICS"]
+        },
+        "bazi_birth": symbols["BaziBirth"],
+        "day_master": symbols["DayMaster"],
+        "structure_profile": symbols["EvidenceStructureProfile"],
+        "planets": list[symbols["ChartPlanet"]],
+        "election": symbols["Election"],
+        "vimshottari": symbols["Vimshottari"],
+        "interaction_analysis": symbols["TimingInteractions"],
+        "analysis_reference": symbols["AnalysisReference"],
+        "birth_time_sensitivity": symbols["BirthTimeSensitivity"],
         **tool_fields,
     }
     root_fields = dict.fromkeys([*TOOL_FIELDS[tool_name].split(), *tool_fields])
-    for field in root_fields:
-        annotation = overrides.get(field, FIELD_TYPES.get(field, Object))
+    for field_name in root_fields:
+        annotation = overrides.get(
+            field_name, field_types.get(field_name, symbols["Object"])
+        )
         metadata: dict[str, JsonValue] = {}
-        if field == "planets":
+        if field_name == "planets":
             metadata.update(
                 {
                     "x-fatebridge-full-result-unique-by": "id",
@@ -117,22 +328,38 @@ def output_model_for(
                     ],
                 }
             )
-        fields[field] = (
+        fields[field_name] = (
             annotation | None,
             Field(
                 default=None,
-                min_length=7 if field == "planets" else None,
+                min_length=7 if field_name == "planets" else None,
                 json_schema_extra=metadata or None,
             ),
         )
     name = "".join(part.title() for part in tool_name.split("_")) + "Output"
+    projected_output = symbols["ProjectedOutput"]
     bases = (
-        (ProjectedOutput, RenAnchoredOutput)
+        (projected_output, symbols["RenAnchoredOutput"])
         if tool_name
         in {"jinkou", "liuren_chart", "liuren_yearly_timing", "sanshi_combined_chart"}
-        else (ProjectedOutput,)
+        else (projected_output,)
     )
     return create_model(name, __base__=bases, **fields)
+
+
+def output_fields_for(tool_name: str) -> list[str] | None:
+    """Return root output field names without importing Pydantic output contracts."""
+    if tool_name in TOOL_FIELDS:
+        extra = EXTRA_TOOL_OUTPUT_FIELDS.get(tool_name, ())
+        return [
+            "run_metadata",
+            *dict.fromkeys([*TOOL_FIELDS[tool_name].split(), *extra]),
+        ]
+    if tool_name in STANDALONE_TOOL_OUTPUT_FIELDS:
+        return list(STANDALONE_TOOL_OUTPUT_FIELDS[tool_name])
+    if tool_name.startswith("fengshui_"):
+        return list(STANDALONE_TOOL_OUTPUT_FIELDS["fengshui"])
+    return None
 
 
 def required_output_fields_for(tool_name: str) -> tuple[str, ...]:
@@ -146,83 +373,97 @@ def required_output_fields_for(tool_name: str) -> tuple[str, ...]:
     return tuple(REQUIRED_OUTPUT_FIELDS[tool_name].split())
 
 
-FIELD_TYPES: dict[str, Any] = {
-    "analysis_type": str,
-    "aspects": list[JsonValue],
-    "balance_basis": str,
-    "birth": str,
-    "bundle_version": int,
-    "category": str,
-    "challenges": list[JsonValue],
-    "changed_code": str,
-    "citation": str,
-    "comprehensive_summary": str,
-    "current_code": str,
-    "day": str,
-    "dayGanZi": str,
-    "dayInt": int,
-    "day_palace_branch": str,
-    "dayun": Object | list[JsonValue],
-    "domain": str,
-    "domains": list[JsonValue],
-    "element": str,
-    "element_distribution_basis": str,
-    "engine": str,
-    "favorable_elements": list[JsonValue],
-    "favorable_elements_status": str,
-    "engineering_favorable_elements": list[str],
-    "fixed_stars": list[JsonValue],
-    "house": int,
-    "houses": list[JsonValue],
-    "in_to_out_antiscia": list[JsonValue],
-    "in_to_out_aspects": list[JsonValue],
-    "in_to_out_contra_antiscia": list[JsonValue],
-    "jiedelta": str,
-    "jieqi": str,
-    "jieqi_split_keys": list[JsonValue],
-    "jieqi_timeline": list[JsonValue],
-    "jieqi_year": list[JsonValue],
-    "key": str,
-    "leap": bool,
-    "lines": list[JsonValue],
-    "lookup_mode": str,
-    "midpoint_aspects": list[JsonValue],
-    "midpoints": list[JsonValue],
-    "ming_gong": str,
-    "month": str,
-    "monthGanZi": str,
-    "monthInt": int,
-    "moving_lines": list[JsonValue],
-    "nongli": Object | str,
-    "out_to_in_antiscia": list[JsonValue],
-    "out_to_in_aspects": list[JsonValue],
-    "out_to_in_contra_antiscia": list[JsonValue],
-    "pair": str,
-    "part_name": str,
-    "patterns": Object | list[JsonValue],
-    "planet": str,
-    "planets": list[JsonValue],
-    "queries": list[JsonValue],
-    "query": str,
-    "question": JsonValue | str,
-    "rendered_text": str,
-    "requested_year_stem": str,
-    "selected_jieqi": list[JsonValue],
-    "sign": str,
-    "source": str,
-    "su27_basis": str,
-    "summary": Object | list[JsonValue] | str,
-    "synastry_aspects": list[JsonValue],
-    "target_year_jieqi": list[JsonValue],
-    "techniques": list[JsonValue],
-    "thirteen_sectors": list[JsonValue],
-    "time": str,
-    "timeGanZi": str,
-    "tips": list[JsonValue],
-    "title": str,
-    "year": int | str,
-    "yearGanZi": str,
-    "yearJieqi": str,
+EXTRA_TOOL_OUTPUT_FIELDS: dict[str, tuple[str, ...]] = {
+    "sanshi_combined_chart": ("synthesis",),
+}
+
+STANDALONE_TOOL_OUTPUT_FIELDS: dict[str, tuple[str, ...]] = {
+    "human_design": (
+        "apparent_model_comparison",
+        "apparent_position_context",
+        "native_execution_context",
+        "run_metadata",
+        "engine",
+        "method_id",
+        "name",
+        "birth_utc",
+        "birth_clock_evidence",
+        "clock_evidence",
+        "design_utc",
+        "design_solver",
+        "time_scales",
+        "calculation_policy",
+        "activations",
+        "variables",
+        "bodygraph",
+        "definition_bridging",
+        "profile",
+        "profile_evidence",
+        "cycle_context",
+        "cycle_summary",
+        "cycle_origin_comparison",
+        "incarnation_cross",
+        "node_convention_comparison",
+        "node_backend_comparison",
+        "ephemeris_backend_comparison",
+        "ephemeris_source_evidence",
+        "ephemeris_source_summary",
+        "time_sensitivity",
+        "rulesets",
+        "source_consistency",
+        "source_summary",
+        "gate_evidence",
+        "historical_polarity_context",
+        "gate_activation_context",
+        "profile_partition_context",
+        "depth_evidence",
+        "rule_trace",
+        "interpretation",
+        "validation",
+    ),
+    "meihua_cast": (
+        "run_metadata",
+        "analysis_type",
+        "input_normalized",
+        "meihua",
+        "interpretation",
+        "summary",
+    ),
+    "ipip_big_five": (
+        "run_metadata",
+        "mode",
+        "scale_id",
+        "status",
+        "domain_filter",
+        "item_count",
+        "items",
+        "answered_count",
+        "missing_count",
+        "total_items",
+        "scale_raw_sum",
+        "scale_mean",
+        "domains",
+        "item_breakdown",
+        "provenance",
+        "summary",
+    ),
+    "fengshui": (
+        "calculation_reading",
+        "method_policy",
+        "method_details",
+        "analysis_type",
+        "engine",
+        "status",
+        "layers",
+        "rulesets",
+        "source_catalog",
+        "coverage",
+        "conflicts",
+        "rule_trace",
+        "summary",
+        "run_metadata",
+        "layout_analysis",
+    ),
 }
 
 

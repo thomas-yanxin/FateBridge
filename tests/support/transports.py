@@ -67,11 +67,18 @@ async def call_calculation(
     )
 
 
-async def describe_capability(client: Client, tool: str, *, detail="summary"):
+async def describe_capability(
+    client: Client,
+    tool: str,
+    *,
+    detail="summary",
+    include_output_schema: bool = False,
+):
     wire_detail = "summary" if detail == "input" else detail
-    result = await client.call_tool(
-        "discover_tools", {"tool": tool, "detail": wire_detail}
-    )
+    args: dict[str, object] = {"tool": tool, "detail": wire_detail}
+    if include_output_schema:
+        args["include_output_schema"] = True
+    result = await client.call_tool("discover_tools", args)
     assert result.structured_content is not None
     return result.structured_content["tools"][0]
 
@@ -82,9 +89,19 @@ async def discover_capabilities(client: Client):
     return [item["tool"] for item in result.structured_content["tools"]]
 
 
-async def capability_contracts(client: Client, *, detail="summary"):
+async def capability_contracts(
+    client: Client,
+    *,
+    detail="summary",
+    include_output_schema: bool = False,
+):
     return {
-        name: await describe_capability(client, name, detail=detail)
+        name: await describe_capability(
+            client,
+            name,
+            detail=detail,
+            include_output_schema=include_output_schema,
+        )
         for name in await discover_capabilities(client)
     }
 

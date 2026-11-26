@@ -12,7 +12,6 @@ from fatebridge.core.requests.base import (
     WesternChartSystemFields,
 )
 from fatebridge.core.requests.birth import AstroBirthRequest
-from fatebridge.core.requests.western_policy import WesternEphemerisRequest
 
 ClassicalPlanet = Literal[
     "Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"
@@ -23,7 +22,6 @@ class AstroLifespanRequest(
     AstroHouseValidatorMixin,
     WesternChartSystemFields,
     AstroBirthRequest,
-    WesternEphemerisRequest,
 ):
     """Shared base for western *lifespan* techniques cast from a single natal chart."""
 

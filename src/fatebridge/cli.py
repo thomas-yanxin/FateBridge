@@ -4,22 +4,28 @@ from __future__ import annotations
 
 import json
 import shlex
+import sys
+from typing import TYPE_CHECKING
 
-from fatebridge.application.discovery import discover_specs, select_specs
-from fatebridge.application.examples import example_input
-from fatebridge.application.execution import execute_with_receipt, result_is_error
-from fatebridge.application.response_delivery import deliver_response
-from fatebridge.application.tool_spec import ServiceResult, ToolSpec
 from fatebridge.cli_arguments import build_parser, emit_error
 from fatebridge.cli_inputs import preload_request
-from fatebridge.core.execution_context import ExecutionOptions
-from fatebridge.diagnostics import diagnose
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.utils.errors import ParameterError, handle_calculation_error
-from fatebridge.utils.formatting import format_json_response
 from fatebridge.utils.runtime import load_runtime_env
 
+if TYPE_CHECKING:
+    from fatebridge.application.tool_spec import ServiceResult, ToolSpec
+
 __all__ = ["build_parser", "main", "run"]
+
+
+def _cli_command_token(argv: list[str] | None) -> str:
+    tokens = sys.argv[1:] if argv is None else argv
+    for token in tokens:
+        if token in {"-h", "--help"}:
+            return "__root__"
+        if not token.startswith("-"):
+            return token
+    return "__root__"
 
 
 def _cli_example(spec: ToolSpec, inputs: ServiceResult) -> str:
@@ -55,6 +61,8 @@ def _print_tools(specs: list[ToolSpec] | None = None) -> None:
 
 
 def _attach_cli_examples(manifest: ServiceResult) -> ServiceResult:
+    from fatebridge.application.examples import example_input
+
     by_name = {spec.name: spec for spec in CATALOG}
     for entry in manifest.get("tools", []):
         if not isinstance(entry, dict):
@@ -87,7 +95,7 @@ def run(argv: list[str] | None = None) -> int:
             2,
         )
     relaxed = set(request_data) if request_data is not None else set()
-    parser = build_parser(relaxed)
+    parser = build_parser(relaxed, command=_cli_command_token(argv))
     try:
         args = parser.parse_args(argv)
     except SystemExit as exc:
@@ -99,6 +107,9 @@ def run(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command in {"list", "discover"}:
+        from fatebridge.application.discovery import discover_specs, select_specs
+        from fatebridge.utils.errors import ParameterError
+
         tool_name = getattr(args, "tool_pos", None) or args.tool
         filters = {
             "family": args.family,
@@ -108,7 +119,12 @@ def run(argv: list[str] | None = None) -> int:
         }
         try:
             if args.command == "discover":
-                catalog = discover_specs(CATALOG, detail=args.detail, **filters)
+                catalog = discover_specs(
+                    CATALOG,
+                    detail=args.detail,
+                    include_output_schema=args.include_output_schema,
+                    **filters,
+                )
                 if tool_name is not None or args.detail == "full":
                     _attach_cli_examples(catalog)
                 print(json.dumps(catalog, ensure_ascii=False, indent=2, default=str))
@@ -120,6 +136,8 @@ def run(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "doctor":
+        from fatebridge.diagnostics import diagnose
+
         result = diagnose(
             mcp=args.mcp,
             family=args.family,
@@ -131,6 +149,12 @@ def run(argv: list[str] | None = None) -> int:
     if spec is None:
         parser.error(f"未知工具: {args.command}")
         return 2
+
+    from fatebridge.application.execution import execute_with_receipt, result_is_error
+    from fatebridge.application.response_delivery import deliver_response
+    from fatebridge.core.execution_context import ExecutionOptions
+    from fatebridge.utils.errors import ParameterError, handle_calculation_error
+    from fatebridge.utils.formatting import format_json_response
 
     field_names = set(spec.request_model.model_fields)
     explicit_fields = {k: v for k, v in vars(args).items() if k in field_names}

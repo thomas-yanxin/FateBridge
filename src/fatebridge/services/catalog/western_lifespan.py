@@ -2,25 +2,15 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel
-
-from fatebridge.application.bindings import ServiceRef, bind_kwargs, service_ref
-from fatebridge.application.tool_spec import ToolSpec
-from fatebridge.core.requests.western_lifespan import (
-    AstroAgePointRequest,
-    AstroBalbillusRequest,
-    AstroDistributionsRequest,
-    AstroHarmonicRequest,
-    AstroJaynesProgRequest,
-    AstroKeypointsRequest,
-    AstroLunationPhaseRequest,
-    AstroPersianDirectedRequest,
-    AstroPlanetaryAgesRequest,
-    AstroPlanetaryArcRequest,
-    AstroTriplicityRulersRequest,
-    AstroVedicProgRequest,
-    AstroYearSystem129Request,
+from fatebridge.application.bindings import (
+    ServiceRef,
+    bind_kwargs,
+    request_model_ref,
+    service_ref,
 )
+from fatebridge.application.tool_spec import ToolSpec
+
+_REQ_MODULE = "fatebridge.core.requests.western_lifespan"
 
 calculate_age_point = service_ref(
     "fatebridge.services.western_lifespan", "calculate_age_point"
@@ -90,7 +80,7 @@ calculate_yearsystem129 = service_ref(
 def _western_lifespan_spec(
     name: str,
     service: ServiceRef,
-    model: type[BaseModel],
+    model_name: str,
     label: str,
     *,
     summary: str | None = None,
@@ -100,7 +90,7 @@ def _western_lifespan_spec(
     return ToolSpec(
         name=name,
         bind=bind_kwargs(service),
-        request_model=model,
+        request_model_loader=request_model_ref(_REQ_MODULE, model_name),
         summary=summary or f"{label}：古典全生命周期技法（不需目标时刻）。",
         operation_label_zh=label,
         family="western_lifespan",
@@ -114,81 +104,81 @@ SPECS: list[ToolSpec] = [
     _western_lifespan_spec(
         "harmonic_chart",
         calculate_harmonic_chart,
-        AstroHarmonicRequest,
+        "AstroHarmonicRequest",
         "调波盘",
         rest_path="/api/astrology/harmonic-chart",
     ),
     _western_lifespan_spec(
         "planetary_ages",
         calculate_planetary_ages,
-        AstroPlanetaryAgesRequest,
+        "AstroPlanetaryAgesRequest",
         "行星年龄",
     ),
     _western_lifespan_spec(
         "triplicity_ruler_periods",
         calculate_triplicity_rulers,
-        AstroTriplicityRulersRequest,
+        "AstroTriplicityRulersRequest",
         "三分主星推运",
     ),
     _western_lifespan_spec(
         "lunar_phase_progressions",
         calculate_lunation_phase,
-        AstroLunationPhaseRequest,
+        "AstroLunationPhaseRequest",
         "月相推运",
         summary="月相推运：按出生后实际日月八相交点推演象征年龄阶段（非寿命估计）。",
     ),
     _western_lifespan_spec(
         "bounds_directions",
         calculate_distributions,
-        AstroDistributionsRequest,
+        "AstroDistributionsRequest",
         "界推运",
     ),
     _western_lifespan_spec(
         "balbillus_periods",
         calculate_balbillus,
-        AstroBalbillusRequest,
+        "AstroBalbillusRequest",
         "Balbillus 129年系统",
     ),
     _western_lifespan_spec(
         "numeric_aspect_periods",
         calculate_keypoints,
-        AstroKeypointsRequest,
+        "AstroKeypointsRequest",
         "数字相位推运",
     ),
     _western_lifespan_spec(
         "planetary_periods_129_years",
         calculate_yearsystem129,
-        AstroYearSystem129Request,
+        "AstroYearSystem129Request",
         "129年系统",
     ),
     _western_lifespan_spec(
         "planetary_arc_directions",
         calculate_planetary_arc,
-        AstroPlanetaryArcRequest,
+        "AstroPlanetaryArcRequest",
         "行星弧方向",
     ),
     _western_lifespan_spec(
         "persian_directions",
         calculate_persian_directed,
-        AstroPersianDirectedRequest,
+        "AstroPersianDirectedRequest",
         "波斯向运",
     ),
     _western_lifespan_spec(
         "age_point",
         calculate_age_point,
-        AstroAgePointRequest,
+        "AstroAgePointRequest",
         "年龄推进点",
     ),
     _western_lifespan_spec(
         "sidereal_progressions",
         calculate_vedicprog,
-        AstroVedicProgRequest,
+        "AstroVedicProgRequest",
         "恒星推运",
     ),
     _western_lifespan_spec(
         "declination_progressions",
         calculate_jaynesprog,
-        AstroJaynesProgRequest,
+        "AstroJaynesProgRequest",
         "赤纬推运",
     ),
 ]

@@ -4,7 +4,7 @@ from datetime import datetime
 
 import pytest
 
-from fatebridge.services.metaphysics import (
+from fatebridge.services.ziwei import (
     calculate_ziwei_birth,
     calculate_ziwei_horoscope,
 )

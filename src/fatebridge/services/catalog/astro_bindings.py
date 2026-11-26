@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel
+from typing import TYPE_CHECKING
 
 from fatebridge.application.bindings import resolve_service, service_ref
 from fatebridge.application.tool_spec import BoundServiceCall, ServiceInput
-from fatebridge.core.requests.astrology import AstroNatalChartRequest
+
+if TYPE_CHECKING:
+    from pydantic import BaseModel
 
 calculate_core_chart_analysis = service_ref(
     "fatebridge.services.astrology", "calculate_core_chart_analysis"
@@ -26,8 +28,10 @@ calculate_relative_chart_analysis = service_ref(
 def bind_astro_natal_chart(
     request: BaseModel,
 ) -> BoundServiceCall:
+    from fatebridge.core.requests.astrology import AstroNatalChartRequest
+
     assert isinstance(request, AstroNatalChartRequest)
-    arguments = request.service_inputs()
+    arguments = request.model_dump()
     return BoundServiceCall(
         resolve_service(calculate_core_chart_analysis),
         (),

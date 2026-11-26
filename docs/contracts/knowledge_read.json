@@ -9,7 +9,7 @@
     },
     "astro_aspect_scope": "按相位角查询术语与来源。对象标签同时使用 category=aspect 和 aspect_degree（或相位 key）。个案相位由命盘或关系盘计算。",
     "health_scope": "传统健康原文可以作为文化出处，不把其中病名、脏腑薄弱或调理语言应用为个人医学结论。",
-    "human_design_line_reference": "domain=human_design, category=lines, key=gate.line (e.g.1.1). All384 source locators remain; consult actual registry coverage for local paraphrases pending independent review, uncurated meanings and independent semantic acceptance. Null meanings are never replaced by profile-line themes. Preserve reference_details, citation and provenance. Select any personal polarity only from the same-run actual fixing_state and donor paths; the lookup never applies a line or predicts an outcome. Preserve1.4source ambiguity,2.3permanent2–14connection condition with unknown applicability, and2.6narrow receptivity in exaltation. Conditions not recorded are not thereby absent.",
+    "human_design_line_reference": "domain=human_design, category=lines, key=gate.line (e.g.1.1). All384 source locators remain; consult actual registry coverage for local paraphrases pending independent review, uncurated meanings and independent semantic acceptance.",
     "lookup": "不确定 category 或 key 时，先读 knowledge_catalog 的 domains[].categories[]。目录根含 domains、source 和 provenance。",
     "missing_and_uncertain": "Do not fill a locally missing or unselected cell, an editorial unknown glyph or a provisional number from another column, number or edition.",
     "scope": "西占和奇门条目按现行计算表给出规则和出处。河洛、参评按目录 category/key 查具名来源，保留各来源实际可读的部分。",
@@ -175,45 +175,5 @@
     "title": "KnowledgeReadRequest",
     "type": "object"
   },
-  "method_contracts": [
-    {
-      "comparison_requirements": [
-        "相同方法合同、实现与数据版本、选项及实际计算层"
-      ],
-      "dependencies": [
-        "validated_request"
-      ],
-      "error_sources": [
-        "rule_adjudication"
-      ],
-      "implementation_refs": [
-        "src/fatebridge/services/knowledge.py"
-      ],
-      "limitations": [
-        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
-        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
-      ],
-      "method_id": "fatebridge.knowledge_source_lookup.contract_v1",
-      "output_paths": [
-        "lines",
-        "provenance"
-      ],
-      "prerequisites": [
-        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
-      ],
-      "quantity_kind": "reference_text",
-      "role": "reference",
-      "selector_fields": [],
-      "source_refs": [
-        "docs/api-reference.md"
-      ],
-      "unit": "categorical",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "not_fully_accepted"
-      }
-    }
-  ],
   "tool": "knowledge_read"
 }

@@ -1,9 +1,10 @@
 """Carry original request presence and check the full clock receipt before projection."""
 
+from __future__ import annotations
+
 from datetime import datetime, timedelta
 from fractions import Fraction
-
-from pydantic import BaseModel, JsonValue
+from typing import TYPE_CHECKING
 
 from fatebridge.application.bindings import ServiceRef, bind_kwargs
 from fatebridge.application.tool_spec import (
@@ -12,19 +13,11 @@ from fatebridge.application.tool_spec import (
     ResolvedService,
     ServiceResult,
 )
-from fatebridge.core.contracts.output_civil_time import CivilPointEvidence
-from fatebridge.core.meihua.meihua_clock_iso import parse_meihua_clock_label
-from fatebridge.core.meihua.meihua_clock_resolution import (
-    resolve_meihua_civil_clock as resolve_civil_clock,
-)
-from fatebridge.core.requests.divination import MeihuaAnalysisRequest
-from fatebridge.utils.civil_clock import (
-    format_utc_offset,
-    utc_instant,
-)
-from fatebridge.utils.civil_time import utc_calendar
-from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
-from fatebridge.utils.timezones import timezone_rules_metadata
+
+if TYPE_CHECKING:
+    from pydantic import BaseModel, JsonValue
+
+    from fatebridge.core.requests.divination import MeihuaAnalysisRequest
 
 COMPONENTS = ("year", "month", "day", "hour", "minute", "second")
 
@@ -42,6 +35,8 @@ def bind_meihua_time(service: ServiceRef | ResolvedService) -> Bind:
     bind_service = bind_kwargs(service)
 
     def bind(request: BaseModel) -> BoundServiceCall:
+        from fatebridge.core.requests.divination import MeihuaAnalysisRequest
+
         assert isinstance(request, MeihuaAnalysisRequest)
         bound_call = BoundServiceCall(*bind_service(request))
         bound_call.keyword_arguments["_clock_supplied_components"] = (
@@ -57,6 +52,19 @@ def require_meihua_clock_binding(
     result: ServiceResult, request: MeihuaAnalysisRequest
 ) -> None:
     """Check request presence independently of the producer's receipt builder."""
+    from datetime import datetime, timedelta
+    from fractions import Fraction
+
+    from fatebridge.core.contracts.output_civil_time import CivilPointEvidence
+    from fatebridge.core.meihua.meihua_clock_iso import parse_meihua_clock_label
+    from fatebridge.core.meihua.meihua_clock_resolution import (
+        resolve_meihua_civil_clock as resolve_civil_clock,
+    )
+    from fatebridge.utils.civil_clock import format_utc_offset, utc_instant
+    from fatebridge.utils.civil_time import utc_calendar
+    from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
+    from fatebridge.utils.timezones import timezone_rules_metadata
+
     supplied = supplied_clock_components(request)
     omitted = [n for n in ["minute", "second"] if n not in supplied]
     clock = result["meihua"]["calendar_policy"]["civil_clock_resolution"]
@@ -122,6 +130,8 @@ def _same_clock_record(actual: JsonValue, expected: JsonValue, path: str) -> Non
 
 
 def _clock_datetime(value: JsonValue, path: str, *, aware: bool) -> datetime:
+    from fatebridge.core.meihua.meihua_clock_iso import parse_meihua_clock_label
+
     if type(value) is not str:
         raise ValueError("梅花时刻须为字符串：" + path)
     parsed = parse_meihua_clock_label(value)
@@ -131,6 +141,8 @@ def _clock_datetime(value: JsonValue, path: str, *, aware: bool) -> datetime:
 
 
 def _local_clock_matches(value: JsonValue, expected: datetime, path: str) -> None:
+    from fatebridge.utils.civil_clock import utc_instant
+
     actual = _clock_datetime(value, path, aware=True)
     if (
         actual.replace(tzinfo=None) != expected.replace(tzinfo=None)
@@ -141,6 +153,8 @@ def _local_clock_matches(value: JsonValue, expected: datetime, path: str) -> Non
 
 
 def _utc_clock_matches(value: JsonValue, expected: datetime, path: str) -> None:
+    from fatebridge.utils.civil_clock import utc_instant
+
     actual = _clock_datetime(value, path, aware=True)
     if actual.utcoffset() != timedelta(0) or utc_instant(actual) != expected:
         raise ValueError("梅花UTC时刻与请求不符：" + path)
@@ -153,6 +167,9 @@ def _elapsed_matches(actual: JsonValue, expected: float, path: str) -> None:
 
 
 def _solar_term_day(record: dict[str, JsonValue], path: str) -> Fraction:
+    from fatebridge.core.contracts.output_civil_time import CivilPointEvidence
+    from fatebridge.utils.civil_time import utc_calendar
+
     if "civil_point" not in record:
         raise ValueError("梅花节气缺少精确民用主点：" + path)
     display = record.get("datetime_utc") or record["datetime_with_offset"]
@@ -170,6 +187,14 @@ def require_meihua_instant_binding(
     result: ServiceResult, request: MeihuaAnalysisRequest
 ) -> None:
     """Verify all retained civil clock consumers against the original request."""
+    from fatebridge.core.meihua.meihua_clock_resolution import (
+        resolve_meihua_civil_clock as resolve_civil_clock,
+    )
+    from fatebridge.utils.civil_clock import format_utc_offset, utc_instant
+    from fatebridge.utils.civil_time import utc_calendar
+    from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
+    from fatebridge.utils.timezones import timezone_rules_metadata
+
     wall = datetime(
         request.analysis_year,
         request.analysis_month,

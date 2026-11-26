@@ -14,21 +14,32 @@ from collections import defaultdict
 from dataclasses import dataclass
 from functools import lru_cache
 
-from fatebridge.utils.place_catalog import (
-    KNOWN_BIRTH_PLACE_ENTRIES as KNOWN_BIRTH_PLACE_ENTRIES,
-)
-from fatebridge.utils.place_catalog import (
-    MAX_PLACE_ALIAS_LENGTH,
-    PLACE_ALIAS_INDEX,
-    PLACE_BY_ID,
-    PLACE_CONTEXT_COMMAS,
-    PLACE_CONTEXT_INDEX,
-)
 from fatebridge.utils.place_catalog import PLACE_SPECIFICITY as PLACE_SPECIFICITY
-from fatebridge.utils.place_catalog import PREFERRED_PLACE_ALIASES, fold_place_text
+from fatebridge.utils.place_catalog import fold_place_text, get_place_catalog
 from fatebridge.utils.place_catalog import (
     normalize_birth_place_text as normalize_birth_place_text,
 )
+
+_CATALOG_EXPORTS = frozenset(
+    {
+        "KNOWN_BIRTH_PLACE_ENTRIES",
+        "MAX_PLACE_ALIAS_LENGTH",
+        "PLACE_ALIAS_INDEX",
+        "PLACE_BY_ID",
+        "PLACE_CONTEXT_COMMAS",
+        "PLACE_CONTEXT_INDEX",
+        "PREFERRED_PLACE_ALIASES",
+    }
+)
+
+
+def __getattr__(name: str) -> object:
+    if name in _CATALOG_EXPORTS:
+        from fatebridge.utils import place_catalog
+
+        return getattr(place_catalog, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
 
 DEFAULT_BIRTH_TIMEZONE = "Asia/Shanghai"
 # UPU United Kingdom addressing guide (11/2011), p. 2: Square and Walk
@@ -189,16 +200,17 @@ def _matches(
         uppercase_code_spans.add((start, start + len(code[0])))
     positions = [i for i, c in enumerate(folded) if c.isalnum()]
     normalized = "".join(folded[i] for i in positions)
+    catalog = get_place_catalog()
     places: list[_Match] = []
     contexts: list[_Match] = []
     for start in range(len(normalized)):
         for end in range(
-            start + 1, min(len(normalized), start + MAX_PLACE_ALIAS_LENGTH) + 1
+            start + 1, min(len(normalized), start + catalog.max_alias_length) + 1
         ):
             alias = normalized[start:end]
             if len(alias) == 1:
                 continue
-            ids, qualifiers = PLACE_ALIAS_INDEX.get(alias), PLACE_CONTEXT_INDEX.get(
+            ids, qualifiers = catalog.alias_index.get(alias), catalog.context_index.get(
                 alias
             )
             if not ids and not qualifiers:
@@ -228,7 +240,7 @@ def _matches(
                 signature = "".join(
                     c for c in folded[raw_start:raw_end] if c.isalnum() or c == ","
                 )
-                qualifiers = PLACE_CONTEXT_COMMAS.get(signature)
+                qualifiers = catalog.context_commas.get(signature)
             contexts.extend(
                 _Match(f"{kind}:{key}", start, end, alias)
                 for kind, key in (qualifiers or ())
@@ -250,7 +262,8 @@ def _matches(
         for m in places
         if not any(
             n.start < m.start < n.end < m.end
-            and PLACE_BY_ID[n.key]["level"] in {"province", "municipality", "city"}
+            and catalog.place_by_id[n.key]["level"]
+            in {"province", "municipality", "city"}
             and n.key not in _ancestors(m.key)
             for n in places
         )
@@ -283,14 +296,14 @@ def _matches(
 
 @lru_cache(maxsize=None)
 def _ancestors(key: str) -> tuple[str, ...]:
-    parent = PLACE_BY_ID[key]["parent"]
+    parent = get_place_catalog().place_by_id[key]["parent"]
     if parent is None:
         return ()
     return (parent, *_ancestors(parent))
 
 
 def _resolve(match: _Match) -> BirthPlaceResolution:
-    entry = PLACE_BY_ID[match.key]
+    entry = get_place_catalog().place_by_id[match.key]
     return BirthPlaceResolution(
         entry["canonical_name"],
         entry["longitude"],
@@ -334,16 +347,18 @@ def _resolve_birth_place_context_cached(birth_place: str) -> BirthPlaceResolutio
             for outer_start, outer_end in qualifier_options
         )
     ]
+    catalog = get_place_catalog()
+    place_by_id = catalog.place_by_id
     scored: list[tuple[tuple[int, int, int], _Match]] = []
     for match in pool:
-        entry = PLACE_BY_ID[match.key]
+        entry = place_by_id[match.key]
         ancestors = _ancestors(match.key)
         if not exact:
             # Reject names crossing an earlier administrative name boundary:
             # 上海安亭 contains 海安, 黑龙江 contains 龙江, 河南开封 contains 南开.
             if any(
                 m.start < match.start < m.end < match.end
-                and PLACE_BY_ID[m.key]["level"] in {"province", "municipality", "city"}
+                and place_by_id[m.key]["level"] in {"province", "municipality", "city"}
                 and m.key not in ancestors
                 for m in matches
             ):
@@ -397,8 +412,8 @@ def _resolve_birth_place_context_cached(birth_place: str) -> BirthPlaceResolutio
                 m
                 for m in matches
                 if not match.overlaps(m)
-                and PLACE_BY_ID[m.key]["level"] in {"province", "municipality", "city"}
-                and PLACE_BY_ID[m.key]["country"] == "CN"
+                and place_by_id[m.key]["level"] in {"province", "municipality", "city"}
+                and place_by_id[m.key]["country"] == "CN"
             ]
             # A longer parent alias can contain a shorter unrelated one. Keep
             # the longest at each position, e.g. 广西 versus 西安 pinyin.
@@ -433,7 +448,7 @@ def _resolve_birth_place_context_cached(birth_place: str) -> BirthPlaceResolutio
         score = (context_score, entry["specificity"], match.end - match.start)
         scored.append((score, match))
     if scored:
-        preferred = PREFERRED_PLACE_ALIASES.get(normalized)
+        preferred = catalog.preferred_aliases.get(normalized)
         context_best = max(s[0] for s, _ in scored)
         preferred_matches = [
             m for s, m in scored if m.key == preferred and s[0] == context_best
@@ -446,7 +461,7 @@ def _resolve_birth_place_context_cached(birth_place: str) -> BirthPlaceResolutio
             canonical = [
                 (score, m)
                 for score, m in scored
-                if normalize_birth_place_text(PLACE_BY_ID[m.key]["canonical_name"])
+                if normalize_birth_place_text(place_by_id[m.key]["canonical_name"])
                 == normalized
             ]
             if canonical:
@@ -454,7 +469,7 @@ def _resolve_birth_place_context_cached(birth_place: str) -> BirthPlaceResolutio
                 cities = [
                     (s, m)
                     for s, m in scored
-                    if PLACE_BY_ID[m.key]["level"]
+                    if place_by_id[m.key]["level"]
                     in {"city", "municipality", "special_region"}
                 ]
                 if cities:
@@ -463,7 +478,7 @@ def _resolve_birth_place_context_cached(birth_place: str) -> BirthPlaceResolutio
         winners = {m.key: m for s, m in scored if s == best}
         # Explicit context always wins over the few stable, established aliases
         # (London means the UK by default, but Canada/London resolves to Ontario).
-        preferred = PREFERRED_PLACE_ALIASES.get(normalized)
+        preferred = catalog.preferred_aliases.get(normalized)
         if preferred in winners:
             return _resolve(winners[preferred])
         if len(winners) == 1:

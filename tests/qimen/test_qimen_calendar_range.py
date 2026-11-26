@@ -2,7 +2,7 @@
 
 import pytest
 
-from fatebridge.services.metaphysics import calculate_qimen_analysis
+from fatebridge.services.sanshi import calculate_qimen_analysis
 
 
 @pytest.mark.parametrize(

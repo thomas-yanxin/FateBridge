@@ -222,7 +222,7 @@ def test_ren_birth_clock_direct_record_and_keyword_cannot_disagree() -> None:
 
 
 def test_ren_direct_known_second_is_used_before_chronology_comparison() -> None:
-    from fatebridge.services.metaphysics import calculate_liureng_runyear
+    from fatebridge.services.sanshi import calculate_liureng_runyear
 
     person = PersonInfo(**{**SHANGHAI, "birth_second": 59}, birth_utc_offset="+08:00")
     result = calculate_liureng_runyear(

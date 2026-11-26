@@ -1,8 +1,8 @@
 {
   "call_guidance": {
-    "calendar_sources": "calendar核时钟与日期，calendar_sources核date_conversion_provenance：lookups逐个连接实际日期、实施provider与印刷参照，implementation_sources保存所用补表原出处。1900参照TAM全年表，最初30日用PMO补表；1901—2100参照HKO，2100年2月9日后使用HKO补表。实施数据不是独立验证，既有历法数值及混合时钟岁序未借来源标记改写。长结果按首次所选fields沿同run分页取齐。 普通日期的实施者是fatebridge_lunardate_adapter_v1，包含上游库表与本系统已登记修正；逐时钟核applied_year_info_correction，按实际农历年取1933/1954/1978等登记，不按公历年份代选。编码是实施证据，不是新的独立历法观测或置信分。",
+    "calendar_sources": "calendar核时钟与日期，calendar_sources核date_conversion_provenance：lookups逐个连接实际日期、实施provider与印刷参照，implementation_sources保存所用补表原出处。1900参照TAM全年表，最初30日用PMO补表；1901—2100参照HKO，2100年2月9日后使用HKO补表。实施数据不是独立验证，既有历法数值及混合时钟岁序未借来源标记改写。长结果按首次所选fields沿同run分页取齐。",
     "civil_offset": "出生钟时在夏令时重复区间且已知实际偏移时，用birth_utc_offset明确选择；与birth_timezone或地点解析的命名时区核对，不用固定偏移替换历史时区。省略仍拒绝歧义，错误偏移或不存在钟时仍拒绝。calendar_basis.civil_clock及analysis_context保留实际UTC瞬间，太阳标签不是新的民用时刻。",
-    "classical_conditions": "原典条件按所需深度首次选fields：classical_conditions只返回索引；需要原注、实际星位及计算路径时首次用classical_condition_details，完整原始JSON首次fields=null。视图名不是请求参数。分页只保留该次已请求字段，索引run不能回补未投影records。geometry_match仅为几何，evaluated_necessary_premises_match只合并已算前提；完整传统判断仍null，不能推成财富、地位或职业结果。详尽视图沿自身同run result_delivery取齐；原文例匹配与一般几何读法分开。",
+    "classical_conditions": "原典条件按所需深度首次选fields：classical_conditions只返回索引；需要原注、实际星位及计算路径时首次用classical_condition_details，完整原始JSON首次fields=null。视图名不是请求参数。分页只保留该次已请求字段，索引run不能回补未投影records。",
     "contextual_symbolism": "先读条件事实：廉贞在官禄与在身宫可同时成立，不用elif排除；身命采用命或身的明示读法，未宣称唯一裁定。官禄主等是原文角色，不是新宫名。七杀遇帝的几何本段未定义，condition_match=null；same_palace/trine等是计算事实，不能自行选几何或把为权写成实际化权。 化禄喜见禄存、化权喜会巨武、化科喜会魁钺也保留未裁定条件，不把引文中的喜会当作当前盘已满足。",
     "cycles": "cycle_sources视图逐宫比较明刊长生和博士。未知性别时只保留两方向不变的起点及对宫标记，其余仍未定；博士飞廉与年支蜚廉分层，大耗和官府按明刊原字。默认长生的阴年顺逆与明文有差异，不据两处恰合认定整套规则相同。",
     "limit_reading": "摘录自1.3.0起首大限从父母或兄弟起，火铃按年支定点读法；默认软件仍命宫起限、火铃顺生时。rule_trace说明本命首宫，运限source_rules视图给明文与实际值，不能把某种读法称为唯一史实或整书认证。",
@@ -11,7 +11,7 @@
     "sihua_source": "sihua_source=rule_profile沿用基础配置；仅在明确指定明刊四化时选naj_ming_v1。三工具同选项，组合版本含+sihua.naj-ming-v1，sihua_source_url专指四化，classical_source仍是基础配置来源。庚日武同相会实际改本命标记及各层按干查表；不因此更改安星、亮度、岁序，也不认证古典运限复用或整书。",
     "source_readings": "rule_trace的source_comparison.matches_source_record只比较初选转录；independent_review另列更正复读、直接宫位及疑读，不能用实算落宫裁定疑字或认证整表。",
     "textual_symbols": "按symbolism视图读取symbolic_properties。原文的化财、化印、遇帝为权不是本命禄权科忌赋值；elements_as_written多项时保持原文，不按软件简表擅选一项。calculation_path连回同次完整本命星位。",
-    "time_input": "首轮回执time_input_status标记实际校时状态；time_input视图给出原校时过程、时区来源和地点精度。默认缺经度降级、省级代表点或仅按经度假设时区均按实际条件说明；不能把没有计算的均时差当0，也不把派生秒数当出生资料秒精度。 minute_sensitivity保留秒0；只在所选民用时分和偏移仍有效时比较59.999999秒端点。缺上端点时两项跨界标志为空；跨时辰或排盘日期时首轮上下文有time_input_minute_sensitive=true。不得替换原命盘、猜实际出生秒数、将端点当两份出生事实，或把样本误差当全局精度界。",
+    "time_input": "首轮回执time_input_status标记实际校时状态；time_input视图给出原校时过程、时区来源和地点精度。默认缺经度降级、省级代表点或仅按经度假设时区均按实际条件说明；不能把没有计算的均时差当0，也不把派生秒数当出生资料秒精度。 minute_sensitivity保留秒0；只在所选民用时分和偏移仍有效时比较59.999999秒端点。缺上端点时两项跨界标志为空；跨时辰或排盘日期时首轮上下文有time_input_minute_sensitive=true。",
     "voids": "摘录配置自1.2.0起按原文旬中空亡列两支；软件配置仍按年干阴阳显示一支。66种星名与67条落点不同，读取star_occurrence_count/distinct_star_count。古天空映射今地空，古本生年解神映射年解；不能同名合并。"
   },
   "evidence_views": {
@@ -447,53 +447,5 @@
     "title": "ZiweiBirthRequest",
     "type": "object"
   },
-  "method_contracts": [
-    {
-      "comparison_requirements": [
-        "相同方法合同、实现与数据版本、选项及实际计算层"
-      ],
-      "dependencies": [
-        "validated_request"
-      ],
-      "error_sources": [
-        "civil_clock",
-        "solar_clock",
-        "calendar_model",
-        "rule_adjudication"
-      ],
-      "implementation_refs": [
-        "src/fatebridge/services/metaphysics.py"
-      ],
-      "limitations": [
-        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
-        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
-      ],
-      "method_id": "fatebridge.ziwei_natal_and_temporal_rules.contract_v1",
-      "output_paths": [
-        "ziwei_birth"
-      ],
-      "prerequisites": [
-        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
-      ],
-      "quantity_kind": "traditional_rule_result",
-      "role": "calculation",
-      "selector_fields": [
-        "rule_profile",
-        "natal_leap_month_policy",
-        "sihua_source",
-        "brightness_source",
-        "day_divide"
-      ],
-      "source_refs": [
-        "docs/algorithm-coverage.md"
-      ],
-      "unit": "categorical",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "not_fully_accepted"
-      }
-    }
-  ],
   "tool": "ziwei_birth_chart"
 }

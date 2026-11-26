@@ -86,8 +86,9 @@ def test_non_metaphysics_psychometric_plugin_runs_end_to_end() -> None:
     assert "calculation_evidence" not in delivered["run_metadata"]
 
     audit = execute_with_receipt(spec, req, options=ExecutionOptions(detail="audit"))
-    assert "ephemeris" not in audit["run_metadata"]["runtime"]
-    assert "solar_term_policy" not in audit["run_metadata"]["runtime"]
+    assert "runtime" not in audit["run_metadata"]
+    assert "duration_ms" in audit["run_metadata"]
+    assert "replay" in audit["run_metadata"]
 
     custom_policy = ReproducibilityPolicy(
         random_seed_field="seed", seed_condition="bootstrap_resampling"

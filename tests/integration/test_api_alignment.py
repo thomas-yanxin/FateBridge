@@ -12,14 +12,14 @@ from fatebridge.core.requests.astrology import (
     AstroRelativeFlatRequest,
 )
 from fatebridge.core.requests.compatibility import TwoPersonCompatibilityRequest
-from fatebridge.core.requests.metaphysics import (
-    JinkouAnalysisRequest,
-    QimenAnalysisRequest,
-    TaiyiAnalysisRequest,
-)
 from fatebridge.core.requests.reference import (
     KnowledgeReadRequest,
     KnowledgeRegistryRequest,
+)
+from fatebridge.core.requests.sanshi import (
+    JinkouAnalysisRequest,
+    QimenAnalysisRequest,
+    TaiyiAnalysisRequest,
 )
 from fatebridge.core.requests.timing import (
     DayunAnalysisRequest,

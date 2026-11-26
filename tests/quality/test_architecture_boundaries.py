@@ -185,7 +185,6 @@ def test_shared_execution_layer_has_no_domain_specific_imports(
         "fatebridge.core.contracts.output_bazi_anchors",
         "fatebridge.core.contracts.output_ren_anchors",
         "fatebridge.core.physical_ephemeris_policy",
-        "fatebridge.core.requests.western_policy",
         "fatebridge.core.astro",
         "fatebridge.core.response_models",
         "fatebridge.application.meihua_clock_binding",

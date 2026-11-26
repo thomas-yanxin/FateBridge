@@ -2,13 +2,12 @@
 
 import pytest
 
-from fatebridge.core.metaphysics.seed import build_analysis_seed
+from fatebridge.core.metaphysics.seed import _build_person_seed, build_analysis_seed
 from fatebridge.core.metaphysics.ziwei import (
     ZIWEI_SIHUA_RULES,
     build_ziwei_chart,
     build_ziwei_horoscope,
 )
-from fatebridge.services.metaphysics import _build_person_seed
 from fatebridge.utils.birth_input import create_person_info
 
 SCOPES = ["大限", "小限", "流年", "流月", "流日", "流时"]

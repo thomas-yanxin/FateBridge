@@ -255,7 +255,7 @@
           }
         ],
         "default": null,
-        "description": "已确认的完整出生年干支，须属六十甲子；供京本六甲旬起行年、本命年支和本命另课。本命另课不要求性别或岁序。不是公历年份，不从占时、年龄反推或代猜岁首。",
+        "description": "已确认的完整出生年干支，须属六十甲子；供京本六甲旬起行年、本命年支和本命另课。",
         "title": "Birth Year Ganzhi"
       },
       "di_fen": {
@@ -282,7 +282,7 @@
           }
         ],
         "default": null,
-        "description": "地分十二地支；不填按时支作软件回退，并非已观测的来人方位。",
+        "description": "地分十二地支；不填按时支作软件回退。",
         "title": "Di Fen"
       },
       "gender": {
@@ -300,7 +300,7 @@
       },
       "guiren_profile": {
         "default": "liuren_common_v1",
-        "description": "大六壬昼夜贵人表：liuren_common_v1 为既有表；tanyuan_xieji_v1 按探原日夜贵人歌。金口诀仅影响附带六壬盘，本课独立用古本表。",
+        "description": "大六壬昼夜贵人表：liuren_common_v1 为既有表；tanyuan_xieji_v1 按探原日夜贵人歌。",
         "enum": [
           "liuren_common_v1",
           "tanyuan_xieji_v1"
@@ -318,7 +318,7 @@
           }
         ],
         "default": null,
-        "description": "显式昼贵/夜贵：true 昼、false 夜；省略按卯至申昼、酉至寅夜。未自动计算当地星没星出。",
+        "description": "显式昼贵/夜贵：true 昼、false 夜；省略按卯至申昼、酉至寅夜。",
         "title": "Is Diurnal"
       },
       "natal_branch": {
@@ -345,7 +345,7 @@
           }
         ],
         "default": null,
-        "description": "问课对象已确认的本命年支，用于京本将命大绝配对及本命另课。另课以本命支作派生地分，保留本次占时，与原地分主课分列。省略且已给birth_year_ganzhi时取其明确年支；两者并给须一致。不由占时、地分或行年推定，不要求补猜出生时刻。",
+        "description": "问课对象已确认的本命年支，用于京本将命大绝配对及本命另课。省略且已给birth_year_ganzhi时取其年支；两者并给须一致。",
         "title": "Natal Branch"
       },
       "use_true_solar_time": {
@@ -366,7 +366,7 @@
           }
         ],
         "default": null,
-        "description": "明确提供的一岁起算行年岁序，非周岁或寿限。与出生年干支及已知男/女齐备才另起行年课；不由生日、占时推算，也未认证原典换岁边界。",
+        "description": "明确提供的一岁起算行年岁序，非周岁。与出生年干支及已知男/女齐备才另起行年课。",
         "title": "Year Fate Age"
       }
     },
@@ -379,49 +379,5 @@
     "title": "JinkouAnalysisRequest",
     "type": "object"
   },
-  "method_contracts": [
-    {
-      "comparison_requirements": [
-        "相同方法合同、实现与数据版本、选项及实际计算层"
-      ],
-      "dependencies": [
-        "validated_request"
-      ],
-      "error_sources": [
-        "civil_clock",
-        "solar_clock",
-        "calendar_model",
-        "rule_adjudication"
-      ],
-      "implementation_refs": [
-        "src/fatebridge/services/metaphysics.py"
-      ],
-      "limitations": [
-        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
-        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
-      ],
-      "method_id": "fatebridge.jinkou_four_positions.contract_v1",
-      "output_paths": [
-        "jinkou"
-      ],
-      "prerequisites": [
-        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
-      ],
-      "quantity_kind": "traditional_rule_result",
-      "role": "calculation",
-      "selector_fields": [
-        "guiren_profile"
-      ],
-      "source_refs": [
-        "docs/algorithm-coverage.md"
-      ],
-      "unit": "categorical",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "not_fully_accepted"
-      }
-    }
-  ],
   "tool": "jinkou"
 }

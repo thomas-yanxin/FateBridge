@@ -3,46 +3,40 @@
 from __future__ import annotations
 
 from dataclasses import replace
-
-from pydantic import BaseModel
+from functools import partial
 
 from fatebridge.application.domain_plugin import DomainPlugin, assemble_catalog
 from fatebridge.application.tool_spec import (
-    EvidenceViews,
-    EvidenceViewsBuilder,
-    RunService,
-    ServiceResult,
+    _UNSET_OUTPUT_MODEL,
+    _UNSET_REQUEST_MODEL,
     ToolSpec,
 )
-from fatebridge.core.physical_ephemeris_policy import data_file_policy
-from fatebridge.core.reproducibility import policy_for
-from fatebridge.core.requests.western_policy import (
-    WesternEphemerisRequest,
-    supports_western_policy_model,
+from fatebridge.core.response_models import (
+    output_fields_for,
+    output_model_for,
+    required_output_fields_for,
 )
-from fatebridge.core.response_models import output_model_for, required_output_fields_for
 from fatebridge.services.catalog.astrology import SPECS as ASTROLOGY_SPECS
 from fatebridge.services.catalog.bazi import SPECS as BAZI_SPECS
 from fatebridge.services.catalog.compatibility import SPECS as COMPATIBILITY_SPECS
 from fatebridge.services.catalog.detail_views import traditional_detail_view
 from fatebridge.services.catalog.divination import SPECS as DIVINATION_SPECS
 from fatebridge.services.catalog.fengshui import SPECS as FENGSHUI_SPECS
-from fatebridge.services.catalog.metaphysics import SPECS as METAPHYSICS_SPECS
 from fatebridge.services.catalog.psychometrics import SPECS as PSYCHOMETRICS_SPECS
 from fatebridge.services.catalog.reference import SPECS as REFERENCE_SPECS
+from fatebridge.services.catalog.sanshi import SPECS as SANSHI_SPECS
 from fatebridge.services.catalog.timing import SPECS as TIMING_SPECS
 from fatebridge.services.catalog.western_events import SPECS as WESTERN_EVENTS_SPECS
 from fatebridge.services.catalog.western_lifespan import SPECS as WESTERN_LIFESPAN_SPECS
 from fatebridge.services.catalog.western_timing import SPECS as WESTERN_TIMING_SPECS
-from fatebridge.services.method_registration import register_methods
-from fatebridge.utils.errors import EphemerisSourceError, handle_calculation_error
+from fatebridge.services.catalog.ziwei import SPECS as ZIWEI_SPECS
 
 PLUGINS: tuple[DomainPlugin, ...] = (
     DomainPlugin("bazi", tuple(BAZI_SPECS)),
     DomainPlugin("compatibility", tuple(COMPATIBILITY_SPECS)),
     DomainPlugin("timing", tuple(TIMING_SPECS)),
     DomainPlugin("divination", tuple(DIVINATION_SPECS)),
-    DomainPlugin("metaphysics", tuple(METAPHYSICS_SPECS)),
+    DomainPlugin("metaphysics", (*ZIWEI_SPECS, *SANSHI_SPECS)),
     DomainPlugin("reference", tuple(REFERENCE_SPECS)),
     DomainPlugin("astrology", tuple(ASTROLOGY_SPECS)),
     DomainPlugin("western_timing", tuple(WESTERN_TIMING_SPECS)),
@@ -53,74 +47,30 @@ PLUGINS: tuple[DomainPlugin, ...] = (
 )
 
 
-def _western_ephemeris_execution_wrapper(
-    spec: ToolSpec,
-    request: BaseModel,
-    run: RunService,
-) -> ServiceResult:
-    mode = (
-        request.ephemeris_policy
-        if isinstance(request, WesternEphemerisRequest)
-        else "auto"
-    )
-    try:
-        with data_file_policy(mode) as policy:
-            result = run()
-        if policy is not None and "error" not in result:
-            return {**result, "ephemeris_data_policy": policy.receipt()}
-        return result
-    except EphemerisSourceError as error:
-        if mode == "auto":
-            raise
-        return handle_calculation_error(error, spec.operation_label_zh)
-
-
-def _with_western_data_files_view(
-    previous: EvidenceViewsBuilder | None,
-) -> EvidenceViewsBuilder:
-    def build(views: EvidenceViews | None) -> EvidenceViews | None:
-        if previous is not None:
-            views = previous(views)
-        views = views or {}
-        views["data_files"] = {
-            "fields": ["ephemeris_data_policy"],
-            "scope": "Available when ephemeris_policy=require_data_files. Read the actual observed physical models, file sources, reference zeros and private-worker reports. Native event-internal reads, fixed-star catalogue formulae and absolute accuracy are not certified. This card does not set the input policy.",
-        }
-        return views
-
-    return build
-
-
 def _enrich_builtin_spec(spec: ToolSpec) -> ToolSpec:
-    western_policy = supports_western_policy_model(spec.request_model)
-    updated = replace(
+    spec_dict = object.__getattribute__(spec, "__dict__")
+    has_explicit_output = (
+        spec_dict.get("output_model", _UNSET_OUTPUT_MODEL) is not _UNSET_OUTPUT_MODEL
+    )
+    has_explicit_request = (
+        spec_dict.get("request_model", _UNSET_REQUEST_MODEL) is not _UNSET_REQUEST_MODEL
+    )
+    return replace(
         spec,
         detail_view=spec.detail_view or traditional_detail_view,
-        output_model=spec.output_model
-        or output_model_for(spec.name, western_data_policy=western_policy),
+        request_model=(
+            spec.request_model if has_explicit_request else _UNSET_REQUEST_MODEL
+        ),
+        output_model=(
+            spec.output_model if has_explicit_output else _UNSET_OUTPUT_MODEL
+        ),
+        output_model_loader=(
+            spec.output_model_loader or partial(output_model_for, spec.name)
+        ),
         required_output_fields=spec.required_output_fields
         or required_output_fields_for(spec.name),
-        execution_wrapper=(
-            spec.execution_wrapper
-            or (_western_ephemeris_execution_wrapper if western_policy else None)
-        ),
-        evidence_views_builder=(
-            _with_western_data_files_view(spec.evidence_views_builder)
-            if western_policy
-            else spec.evidence_views_builder
-        ),
-        reproducibility=(
-            policy_for(
-                spec.request_model,
-                has_time_defaults=spec.resolve_time_defaults is not None,
-            )
-            if spec.reproducibility is None
-            else spec.reproducibility
-        ),
+        output_fields=spec.output_fields or tuple(output_fields_for(spec.name) or ()),
     )
-    if not updated.methods:
-        updated = replace(updated, methods=register_methods(updated))
-    return updated
 
 
 CATALOG: list[ToolSpec] = [

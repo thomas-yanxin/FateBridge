@@ -7,7 +7,7 @@ import pytest
 from fatebridge.core.almanac import localize_datetime
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
-from fatebridge.services.metaphysics import (
+from fatebridge.services.ziwei import (
     calculate_ziwei_birth,
     calculate_ziwei_horoscope,
 )

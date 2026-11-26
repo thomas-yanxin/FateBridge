@@ -57,26 +57,16 @@ def test_bazi_birth_tiered_detail_and_inline_suggested_fields(
     def dump_len(obj):
         return len(json.dumps(obj, ensure_ascii=False, separators=(",", ":")))
 
-    inventory_calls = 0
-    original_inventory = replay_metadata.ephemeris_inventory
-
-    def inventory():
-        nonlocal inventory_calls
-        inventory_calls += 1
-        return original_inventory()
-
-    monkeypatch.setattr(replay_metadata, "ephemeris_inventory", inventory)
     compact = ExecutionOptions(detail="compact", as_of="2026-11-23T04:00:00Z")
     compact_raw = execute_with_receipt(spec, req, options=compact)
-    assert inventory_calls == 0
     assert "runtime" not in compact_raw["run_metadata"]
+    assert "duration_ms" not in compact_raw["run_metadata"]
     assert "snapshot_text" not in compact_raw
     assert "snapshot_export" not in compact_raw
 
     audit_raw = execute_with_receipt(
         spec, req, options=compact.model_copy(update={"detail": "audit"})
     )
-    assert inventory_calls == 1
     assert compact_raw["bazi_birth"] == audit_raw["bazi_birth"]
 
     compact_out = deliver_response(compact_raw, spec=spec, detail="compact")
@@ -87,7 +77,9 @@ def test_bazi_birth_tiered_detail_and_inline_suggested_fields(
     audit_out = deliver_response(audit_raw, spec=spec, detail="audit")
 
     assert "calculation_evidence" not in compact_out["run_metadata"]
-    assert "calculation_evidence" in audit_out["run_metadata"]
+    assert "calculation_evidence" not in audit_out["run_metadata"]
+    assert "duration_ms" in audit_out["run_metadata"]
+    assert "replay" in audit_out["run_metadata"]
     assert dump_len(compact_out) < dump_len(audit_out)
 
     # With suggested_fields, bazi_birth_chart fits cleanly without result_delivery.

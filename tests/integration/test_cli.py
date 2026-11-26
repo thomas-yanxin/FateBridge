@@ -141,11 +141,8 @@ def test_discover_flat_tool_emits_schema_and_example(
     assert info["tool"] == "bazi_wealth"
     assert info["surfaces"]["cli"] is True
     assert info["surfaces"]["rest"] == "/api/bazi/wealth"
-    by = next(p for p in info["parameters"] if p["name"] == "birth_year")
-    assert by["required"] is True
-    assert by["type"] == "int"
-    assert by["flag"] == "--birth-year"
-    assert by["description"]
+    assert info["input_schema"]["properties"]["birth_year"]["type"] == "integer"
+    assert "birth_year" in info["input_schema"]["required"]
     assert info["cli_example"].startswith("fatebridge bazi_wealth")
     assert "--birth-year" in info["cli_example"]
 
@@ -509,7 +506,9 @@ def test_request_file_rejects_unknown_keys_before_calculation(
     def unexpected_calculation(*args, **kwargs):
         pytest.fail("Invalid request keys must fail before any calculation")
 
-    monkeypatch.setattr("fatebridge.cli.execute_with_receipt", unexpected_calculation)
+    monkeypatch.setattr(
+        "fatebridge.application.execution.execute_with_receipt", unexpected_calculation
+    )
     code = run(["bazi_birth_chart", "--request-file", subject_path])
     payload = json.loads(capsys.readouterr().out)
     assert code == 1
@@ -608,13 +607,13 @@ def test_cli_compact_supports_runtime_projection(
                 "--as-of",
                 as_of,
                 "--fields",
-                "run_metadata.runtime",
+                "run_metadata.replay",
             ]
         )
         == 0
     )
-    runtime_payload = json.loads(capsys.readouterr().out)
-    assert runtime_payload["run_metadata"]["runtime"]["package_version"]
+    replay_payload = json.loads(capsys.readouterr().out)
+    assert replay_payload["run_metadata"]["replay"]["as_of"] == "2026-10-12T04:00:00Z"
 
     assert (
         run(

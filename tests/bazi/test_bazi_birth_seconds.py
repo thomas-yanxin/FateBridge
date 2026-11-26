@@ -188,7 +188,7 @@ def test_public_birth_context_and_display_keep_seconds_and_default_receipt() -> 
 
 
 def test_other_systems_do_not_gain_an_accepted_but_ignored_second_parameter() -> None:
-    from fatebridge.core.requests.metaphysics import ZiweiBirthRequest
+    from fatebridge.core.requests.ziwei import ZiweiBirthRequest
 
     assert "birth_second" not in ZiweiBirthRequest.model_fields
     with pytest.raises(ValidationError):

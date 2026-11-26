@@ -2,6 +2,7 @@
 
 import difflib
 from collections import Counter
+from functools import partial
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, ValidationError
@@ -25,6 +26,7 @@ class DiscoveryQuery(BaseModel):
     tool: str | None = None
     surface: ToolSurface | None = None
     detail: Literal["summary", "full"] = "summary"
+    include_output_schema: bool = False
 
 
 def select_mcp_specs(
@@ -107,6 +109,7 @@ def discover_specs(
     tool: str | None = None,
     surface: str | None = None,
     detail: str = "summary",
+    include_output_schema: bool = False,
     allowed_names: set[str] | None = None,
 ) -> ServiceResult:
     try:
@@ -117,6 +120,7 @@ def discover_specs(
                 tool=tool,
                 surface=surface,
                 detail=detail,
+                include_output_schema=include_output_schema,
             )
         )
     except ValidationError as exc:
@@ -147,13 +151,17 @@ def discover_specs(
     )
     selected = select_specs(
         specs,
-        **query.model_dump(exclude={"detail"}),
+        **query.model_dump(exclude={"detail", "include_output_schema"}),
         allowed_names=allowed_names,
     )
-    if query.tool is not None:
-        describe = describe_spec if query.detail == "full" else describe_input_spec
+    if query.detail == "full":
+        describe = partial(
+            describe_spec, include_output_schema=query.include_output_schema
+        )
+    elif query.tool is not None:
+        describe = describe_input_spec
     else:
-        describe = describe_spec if query.detail == "full" else summarize_spec
+        describe = summarize_spec
     tools = [describe(spec) for spec in selected]
     families = dict(sorted(Counter(spec.family for spec in pool).items()))
     return {

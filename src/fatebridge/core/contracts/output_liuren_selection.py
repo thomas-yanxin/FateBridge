@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import Any
 
 from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
-from fatebridge.core.metaphysics.liureng import derive_selection
+from fatebridge.core.metaphysics.liureng_selection import derive_selection
 
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 SELECTION_TRACES = frozenset(

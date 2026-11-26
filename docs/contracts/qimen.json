@@ -78,29 +78,13 @@
           },
           "layout": {
             "default": "direct",
-            "description": "转盘排法：仅支持 direct/rotating；飞盘/镜像/反转未实现。",
+            "description": "转盘排法：direct/rotating。",
             "enum": [
               "direct",
               "rotating"
             ],
             "title": "Layout",
             "type": "string"
-          },
-          "palaceShift": {
-            "default": 0,
-            "description": "九宫平移量；仅允许 0（移动九宫内容不能冒充飞盘排法）。",
-            "maximum": 0,
-            "minimum": 0,
-            "title": "Palaceshift",
-            "type": "integer"
-          },
-          "palace_shift": {
-            "default": 0,
-            "description": "palaceShift 的蛇形命名别名；仅允许 0。",
-            "maximum": 0,
-            "minimum": 0,
-            "title": "Palace Shift",
-            "type": "integer"
           },
           "season_profile": {
             "default": "yanyi_vol1_verse",
@@ -206,7 +190,7 @@
       },
       "qimen_options": {
         "$ref": "#/$defs/QimenOptions",
-        "description": "奇门选项：ju_method=zhirun（默认置闰）/chaibu（拆补）；god_profile=yanyi_text（默认卷三正文）/yanyi_diagrams（卷四圆图）；season_profile=yanyi_vol1_verse（默认卷一赋）/yanyi_vol3_table/yanyi_vol3_prose；仅支持转盘layout=direct、palaceShift=0"
+        "description": "奇门选项：ju_method=zhirun（默认置闰）/chaibu（拆补）；god_profile=yanyi_text（默认卷三正文）/yanyi_diagrams（卷四圆图）；season_profile=yanyi_vol1_verse（默认卷一赋）/yanyi_vol3_table/yanyi_vol3_prose；layout=direct/rotating。"
       },
       "use_true_solar_time": {
         "default": true,
@@ -224,49 +208,5 @@
     "title": "QimenAnalysisRequest",
     "type": "object"
   },
-  "method_contracts": [
-    {
-      "comparison_requirements": [
-        "相同方法合同、实现与数据版本、选项及实际计算层"
-      ],
-      "dependencies": [
-        "validated_request"
-      ],
-      "error_sources": [
-        "civil_clock",
-        "solar_clock",
-        "calendar_model",
-        "rule_adjudication"
-      ],
-      "implementation_refs": [
-        "src/fatebridge/services/metaphysics.py"
-      ],
-      "limitations": [
-        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
-        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
-      ],
-      "method_id": "fatebridge.qimen_rotating_board.contract_v1",
-      "output_paths": [
-        "qimen"
-      ],
-      "prerequisites": [
-        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
-      ],
-      "quantity_kind": "traditional_rule_result",
-      "role": "calculation",
-      "selector_fields": [
-        "qimen_options"
-      ],
-      "source_refs": [
-        "docs/algorithm-coverage.md"
-      ],
-      "unit": "categorical",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "not_fully_accepted"
-      }
-    }
-  ],
   "tool": "qimen"
 }

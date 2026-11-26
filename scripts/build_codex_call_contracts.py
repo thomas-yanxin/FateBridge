@@ -70,7 +70,7 @@ async def call_contracts() -> list[dict[str, object]]:
                     "fields": contract.get("suggested_fields"),
                 },
             }
-            for field in ("call_guidance", "evidence_views", "method_contracts"):
+            for field in ("call_guidance", "evidence_views"):
                 if contract.get(field):
                     record[field] = contract[field]
                 else:

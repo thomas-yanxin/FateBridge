@@ -17,11 +17,11 @@ from pydantic import (
 )
 
 from fatebridge.core.requests.base import (
+    FateBridgeBaseRequest,
     OfflineHouseValidatorMixin,
     OptionalAnalysisClockFields,
 )
 from fatebridge.core.requests.birth import AstroBirthBase
-from fatebridge.core.requests.western_policy import WesternEphemerisRequest
 from fatebridge.utils.house_systems import (
     OFFLINE_HOUSE_CODE_NOTE,
     normalize_offline_zodiac_code,
@@ -82,9 +82,7 @@ def _exact_target_datetime(
 _ExactTargetDatetime = Annotated[AwareDatetime, WrapValidator(_exact_target_datetime)]
 
 
-class AstroChartRequest(
-    OfflineHouseValidatorMixin, AstroBirthBase, WesternEphemerisRequest
-):
+class AstroChartRequest(OfflineHouseValidatorMixin, AstroBirthBase):
     """Request model for offline astrology chart generation."""
 
     gender: str | None = Field(
@@ -158,13 +156,6 @@ class SolarBirthClockFields(AstroChartRequest):
 class AstroGuolaoRequest(SolarBirthClockFields):
     """Explicit target instant for the partial Guolao temporal research layer."""
 
-    def uses_western_ephemeris_policy(self) -> bool:
-        return False
-
-    ephemeris_policy: Literal["auto", "require_data_files"] = Field(
-        default="auto",
-        description="Guolao retains its existing observed source rules; the Western require_data_files request policy is not implemented for this variant.",
-    )
     birth_microsecond: int = Field(
         default=0,
         ge=0,
@@ -186,8 +177,6 @@ class AstroGuolaoRequest(SolarBirthClockFields):
 
     @model_validator(mode="after")
     def _month_limit_requires_target(self) -> "AstroGuolaoRequest":
-        if self.ephemeris_policy != "auto":
-            raise ValueError("Western ephemeris_policy is not implemented for Guolao")
         if self.guolao_month_basis is not None and self.analysis_datetime is None:
             raise ValueError("guolao_month_basis requires analysis_datetime")
         if self.guolao_seasonal_anchor_policy in {
@@ -233,9 +222,6 @@ class AstroGermanyRequest(AstroSpecialtyRequest):
 
 class AstroIndiaRequest(SolarBirthClockFields):
     """Lahiri Parashari subset; legacy zodiac/house overrides remain explicit."""
-
-    def uses_western_ephemeris_policy(self) -> bool:
-        return False
 
     birth_microsecond: int = Field(
         default=0,
@@ -355,11 +341,8 @@ class AstroNatalChartRequest(AstroChartRequest):
         ),
     )
 
-    def uses_western_ephemeris_policy(self) -> bool:
-        return True
 
-
-class AstroRelativeFlatRequest(OfflineHouseValidatorMixin, WesternEphemerisRequest):
+class AstroRelativeFlatRequest(OfflineHouseValidatorMixin, FateBridgeBaseRequest):
     """Flat (non-nested) relative/synastry chart request for tool surfaces."""
 
     davison_variant: Literal["uncorrected", "corrected", "spherical"] = Field(

@@ -351,9 +351,9 @@ def test_rest_mcp_cli_discovery_parity_and_runtime_isolation(
     )
     assert rest_audit.status_code == 200
     audit_meta = rest_audit.json()["run_metadata"]
-    assert "ephemeris" not in audit_meta["runtime"]
-    assert "solar_term_policy" not in audit_meta["runtime"]
-    assert audit_meta["provenance"] == {"method_id": [METHOD_ID]}
+    assert "runtime" not in audit_meta
+    assert "duration_ms" in audit_meta
+    assert audit_meta["tool_name"] == "ipip_big_five"
 
     bad_rest = client.post(
         "/api/psychometrics/ipip-big-five", json={"responses": {"1": 9}}
@@ -375,7 +375,7 @@ def test_rest_mcp_cli_discovery_parity_and_runtime_isolation(
                 mcp_client, "ipip_big_five", detail="full"
             )
             assert contract["family"] == "psychometrics"
-            assert contract["example_context"]["fictional"] is True
+            assert contract["example_input"]
             mcp_list = await call_calculation(
                 mcp_client,
                 "ipip_big_five",

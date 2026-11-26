@@ -192,9 +192,14 @@ async def test_mcp_input_contract_is_small_and_projections_are_callable() -> Non
         full = await client.call_tool(
             "discover_tools", {"tool": "bazi_career", "detail": "full"}
         )
+        full_with_schema = await client.call_tool(
+            "discover_tools",
+            {"tool": "bazi_career", "detail": "full", "include_output_schema": True},
+        )
         record = compact.structured_content["tools"][0]
         assert "output_schema" not in record
-        assert "output_schema" in full.structured_content["tools"][0]
+        assert "output_schema" not in full.structured_content["tools"][0]
+        assert "output_schema" in full_with_schema.structured_content["tools"][0]
         assert "career_analysis" in record["output_fields"]
         result = await call_calculation(
             client,

@@ -2,31 +2,18 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel
-
 from fatebridge.application.bindings import (
     ServiceRef,
     bind_kwargs,
     bind_person,
+    request_model_ref,
     service_ref,
 )
 from fatebridge.application.domain_validators import validate_bazi_anchors
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.reproducibility import ReproducibilityPolicy
-from fatebridge.core.requests.bazi import (
-    BaziBirthRequest,
-    BaziCareerRequest,
-    BaziChildrenRequest,
-    BaziEducationRequest,
-    BaziHealthRequest,
-    BaziMarriageRequest,
-    BaziPersonalityRequest,
-    BaziRelativesRequest,
-    BaziRomanceRequest,
-    BaziSourceCompareRequest,
-    BaziWealthRequest,
-)
-from fatebridge.core.requests.birth import BaziClockRequest
+
+_BAZI_REQ = "fatebridge.core.requests.bazi"
 
 calculate_bazi_birth = service_ref("fatebridge.services.bazi", "calculate_bazi_birth")
 calculate_bazi_source_compare = service_ref(
@@ -79,12 +66,12 @@ calculate_destiny_analysis = service_ref(
 
 
 def _bazi_dimension_spec(
-    name: str, service: ServiceRef, model: type[BaseModel], label: str
+    name: str, service: ServiceRef, model_name: str, label: str
 ) -> ToolSpec:
     return ToolSpec(
         name=f"bazi_{name}",
         bind=bind_person(service),
-        request_model=model,
+        request_model_loader=request_model_ref(_BAZI_REQ, model_name),
         summary=f"{label}取证：四柱星位、传统前提与大运流年触点。",
         operation_label_zh=label,
         family="bazi",
@@ -98,7 +85,9 @@ SPECS: list[ToolSpec] = [
     ToolSpec(
         name="bazi_overview",
         bind=bind_person(calculate_destiny_analysis),
-        request_model=BaziClockRequest,
+        request_model_loader=request_model_ref(
+            "fatebridge.core.requests.birth", "BaziClockRequest"
+        ),
         summary="八字综合命理：命盘、喜用神与格局；仅需四柱十神用 bazi_birth_chart。",
         operation_label_zh="命理分析",
         family="bazi",
@@ -110,7 +99,7 @@ SPECS: list[ToolSpec] = [
     ToolSpec(
         name="bazi_birth_chart",
         bind=bind_person(calculate_bazi_birth),
-        request_model=BaziBirthRequest,
+        request_model_loader=request_model_ref(_BAZI_REQ, "BaziBirthRequest"),
         summary="八字标准命盘：四柱、十神、五行与大运概略；喜用格局用 bazi_overview。",
         operation_label_zh="八字命盘",
         family="bazi",
@@ -119,39 +108,39 @@ SPECS: list[ToolSpec] = [
         output_validators=(validate_bazi_anchors,),
     ),
     _bazi_dimension_spec(
-        "marriage", calculate_bazi_marriage, BaziMarriageRequest, "八字婚姻分析"
+        "marriage", calculate_bazi_marriage, "BaziMarriageRequest", "八字婚姻分析"
     ),
     _bazi_dimension_spec(
-        "career", calculate_bazi_career, BaziCareerRequest, "八字事业分析"
+        "career", calculate_bazi_career, "BaziCareerRequest", "八字事业分析"
     ),
     _bazi_dimension_spec(
-        "wealth", calculate_bazi_wealth, BaziWealthRequest, "八字财运分析"
+        "wealth", calculate_bazi_wealth, "BaziWealthRequest", "八字财运分析"
     ),
     _bazi_dimension_spec(
-        "health", calculate_bazi_health, BaziHealthRequest, "八字健康分析"
+        "health", calculate_bazi_health, "BaziHealthRequest", "八字健康分析"
     ),
     _bazi_dimension_spec(
-        "children", calculate_bazi_children, BaziChildrenRequest, "八字子女分析"
+        "children", calculate_bazi_children, "BaziChildrenRequest", "八字子女分析"
     ),
     _bazi_dimension_spec(
-        "education", calculate_bazi_education, BaziEducationRequest, "八字学业分析"
+        "education", calculate_bazi_education, "BaziEducationRequest", "八字学业分析"
     ),
     _bazi_dimension_spec(
         "personality",
         calculate_bazi_personality,
-        BaziPersonalityRequest,
+        "BaziPersonalityRequest",
         "八字性格分析",
     ),
     _bazi_dimension_spec(
-        "relatives", calculate_bazi_relatives, BaziRelativesRequest, "八字六亲分析"
+        "relatives", calculate_bazi_relatives, "BaziRelativesRequest", "八字六亲分析"
     ),
     _bazi_dimension_spec(
-        "romance", calculate_bazi_romance, BaziRomanceRequest, "八字正缘桃花分析"
+        "romance", calculate_bazi_romance, "BaziRomanceRequest", "八字正缘桃花分析"
     ),
     ToolSpec(
         name="compare_bazi_sources",
         bind=bind_kwargs(calculate_bazi_source_compare),
-        request_model=BaziSourceCompareRequest,
+        request_model_loader=request_model_ref(_BAZI_REQ, "BaziSourceCompareRequest"),
         summary="按字面四柱计算旺衰并核对同柱原典编释，列出差异与未收录；不反推生日。",
         operation_label_zh="原典四柱核对",
         family="bazi",

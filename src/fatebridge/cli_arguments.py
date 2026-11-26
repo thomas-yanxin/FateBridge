@@ -7,15 +7,14 @@ import json
 import re
 from collections.abc import Sequence
 from types import UnionType
-from typing import Annotated, Literal, NoReturn, get_args, get_origin
+from typing import TYPE_CHECKING, Annotated, Literal, NoReturn, get_args, get_origin
 
-from pydantic.fields import FieldInfo
-
-from fatebridge.application.description import is_model_field, unwrap_optional
 from fatebridge.application.tool_spec import ServiceResult
-from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.transports.flags import FIELDS_FLAG_DESC
+
+if TYPE_CHECKING:
+    from pydantic.fields import FieldInfo
 
 UNION_ORIGINS = (UnionType, get_origin(Annotated[int, "u"] | None))
 
@@ -138,6 +137,8 @@ def _parse_nullable_integer(value: str) -> int | None:
 
 
 def _is_nested_list(annotation: object) -> bool:
+    from fatebridge.application.description import is_model_field, unwrap_optional
+
     if get_origin(annotation) is not list:
         return False
     members = get_args(annotation)
@@ -154,6 +155,8 @@ def _add_field_argument(
     *,
     relax_required: bool = False,
 ) -> None:
+    from fatebridge.application.description import is_model_field
+
     annotation = _argument_type(field.annotation)
     origin = get_origin(annotation)
     required = field.is_required() and not relax_required
@@ -225,6 +228,8 @@ def _add_field_argument(
 
 def build_parser(
     relaxed_required: set[str] | None = None,
+    *,
+    command: str | None = None,
 ) -> argparse.ArgumentParser:
     relaxed = relaxed_required or set()
     parser = _JsonErrorParser(
@@ -250,7 +255,13 @@ def build_parser(
         "--detail",
         choices=("summary", "full"),
         default="summary",
-        help="summary 返回摘要（指定 tool 时含输入 schema 与示例）；full 附带完整 output_schema",
+        help="summary 返回摘要（指定 tool 时含输入 schema 与示例）；full 附带 output_fields",
+    )
+    discovery.add_argument(
+        "--include-output-schema",
+        action="store_true",
+        default=False,
+        help="与 --detail full 联用时附带完整 output_schema",
     )
 
     doctor = sub.add_parser("doctor", help="检查安装；--mcp 验证独立 stdio 进程")
@@ -259,6 +270,8 @@ def build_parser(
 
     for spec in CATALOG:
         sp = sub.add_parser(spec.name, help=spec.summary)
+        if command is not None and command != spec.name:
+            continue
         for fname, field in spec.request_model.model_fields.items():
             _add_field_argument(
                 sp,
@@ -277,6 +290,8 @@ def build_parser(
 
 
 def _add_execution_flags(parser: argparse.ArgumentParser) -> None:
+    from fatebridge.core.execution_context import ExecutionOptions
+
     for name, definition in ExecutionOptions.model_fields.items():
         parser.add_argument(
             "--" + name.replace("_", "-"),

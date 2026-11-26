@@ -2,20 +2,20 @@
 
 from __future__ import annotations
 
+from functools import partial
+
+from pydantic import BaseModel
+
 from fatebridge.application.bindings import bind_request, service_ref
 from fatebridge.application.domain_validators import detect_fengshui_approximate
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
-from fatebridge.core.fengshui.models import (
-    AnnualRequest,
-    AssessRequest,
-    BazhaiRequest,
-    DirectionsRequest,
-    JinsuoRequest,
-    MingguaRequest,
-    MonthlyRequest,
-    XuankongRequest,
-)
-from fatebridge.core.fengshui.output import FengshuiOutput
+from fatebridge.core.reproducibility import ReproducibilityPolicy
+
+
+def _load_fengshui_request_model(model_name: str) -> type[BaseModel]:
+    from fatebridge.core.fengshui import models
+
+    return getattr(models, model_name)
 
 
 def _compact_rulesets(result: ServiceResult) -> list[ServiceResult]:
@@ -317,56 +317,56 @@ def _build_fengshui_specs() -> list[ToolSpec]:
             "directions",
             "风水方位",
             "calculate_directions",
-            DirectionsRequest,
+            "DirectionsRequest",
             "后天八卦方位与角区索引；可选 WMM2025 地磁换算候选，不自动套用宅盘。",
         ),
         (
             "minggua",
             "风水命卦",
             "calculate_minggua",
-            MingguaRequest,
+            "MingguaRequest",
             "住户命卦及个人八方关系；布局分析请用 fengshui_assess 的 analyze_layout。",
         ),
         (
             "bazhai",
             "八宅风水",
             "calculate_bazhai",
-            BazhaiRequest,
+            "BazhaiRequest",
             "八宅坐山宅盘、逐人命盘与用途判定；不是完整阳宅三要门主灶结构法",
         ),
         (
             "jinsuo",
             "金锁玉关",
             "calculate_jinsuo",
-            JinsuoRequest,
+            "JinsuoRequest",
             "金锁玉关八宫基础砂水偏好（已确认分类）",
         ),
         (
             "annual_stars",
             "流年飞星",
             "calculate_annual_stars",
-            AnnualRequest,
+            "AnnualRequest",
             "立春换年的年度九宫紫白飞星（非山向宅盘）",
         ),
         (
             "monthly_stars",
             "流月飞星",
             "calculate_monthly_stars",
-            MonthlyRequest,
+            "MonthlyRequest",
             "十二节换月九宫紫白飞星；需 query_at 或已确认 solar 年月，不替代宅盘。",
         ),
         (
             "xuankong_house_chart",
             "玄空宅盘",
             "calculate_xuankong_natal",
-            XuankongRequest,
+            "XuankongRequest",
             "中州派玄空运山向宅盘、定运与兼向替星；支持显式 xuankong_conditioned_v1 解释。",
         ),
         (
             "assess",
             "风水布局评估",
             "calculate_fengshui_assessment",
-            AssessRequest,
+            "AssessRequest",
             "工位、合租与家居风水布局主入口；布局设 analyze_layout=true，只传已确认事实。",
         ),
     ):
@@ -375,13 +375,13 @@ def _build_fengshui_specs() -> list[ToolSpec]:
             ToolSpec(
                 name=tool_name,
                 bind=bind_request(service_ref("fatebridge.services.fengshui", service)),
-                request_model=model,
+                request_model_loader=partial(_load_fengshui_request_model, model),
                 summary=summary,
                 operation_label_zh=label,
                 family="fengshui",
                 rest_path="/api/fengshui/" + public_name.replace("_", "-"),
-                output_model=FengshuiOutput,
                 cli_request_file=True,
+                reproducibility=ReproducibilityPolicy(),
                 approximate_record=detect_fengshui_approximate,
                 compact_view=COMPACT_VIEWS.get(tool_name),
             )

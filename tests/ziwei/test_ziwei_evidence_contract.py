@@ -10,7 +10,7 @@ from fastmcp import Client
 import fatebridge.api as api
 from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services.metaphysics import (
+from fatebridge.services.ziwei import (
     calculate_ziwei_birth,
     calculate_ziwei_horoscope,
 )

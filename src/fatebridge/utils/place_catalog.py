@@ -1,10 +1,14 @@
-"""Load and index the packaged representative place records."""
+"""Load and index the packaged representative place records lazily."""
+
+from __future__ import annotations
 
 import json
 import unicodedata
 from collections import defaultdict
+from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
-from typing import Literal, TypedDict
+from typing import Any, Literal, TypedDict
 
 from typing_extensions import NotRequired
 
@@ -45,6 +49,19 @@ class CountryAliases(TypedDict):
 
 
 class PlaceCatalogAliases(TypedDict):
+    preferred_aliases: dict[str, str]
+
+
+@dataclass(frozen=True)
+class PlaceCatalogData:
+    entries: tuple[PlaceEntry, ...]
+    place_by_id: dict[str, PlaceEntry]
+    countries: dict[str, CountryAliases]
+    manifest: PlaceCatalogAliases
+    alias_index: dict[str, list[str]]
+    context_index: dict[str, list[tuple[str, str]]]
+    context_commas: dict[str, list[tuple[str, str]]]
+    max_alias_length: int
     preferred_aliases: dict[str, str]
 
 
@@ -99,38 +116,71 @@ def _load_entries() -> tuple[PlaceEntry, ...]:
     return tuple(entries)
 
 
-KNOWN_BIRTH_PLACE_ENTRIES = _load_entries()
-PLACE_BY_ID = {r["id"]: r for r in KNOWN_BIRTH_PLACE_ENTRIES}
-COUNTRIES: dict[str, CountryAliases] = json.loads(
-    (CATALOG_DIRECTORY / "countries.json").read_text(encoding="utf-8")
-)
-MANIFEST: PlaceCatalogAliases = json.loads(
-    (CATALOG_DIRECTORY / "manifest.json").read_text(encoding="utf-8")
-)
-PLACE_ALIAS_INDEX: dict[str, list[str]] = defaultdict(list)
-PLACE_CONTEXT_INDEX: dict[str, list[tuple[str, str]]] = defaultdict(list)
-PLACE_CONTEXT_COMMAS: dict[str, list[tuple[str, str]]] = defaultdict(list)
+@lru_cache(maxsize=1)
+def get_place_catalog() -> PlaceCatalogData:
+    """Parse and index packaged place data once on first lookup."""
+    entries = _load_entries()
+    place_by_id = {row["id"]: row for row in entries}
+    countries: dict[str, CountryAliases] = json.loads(
+        (CATALOG_DIRECTORY / "countries.json").read_text(encoding="utf-8")
+    )
+    manifest: PlaceCatalogAliases = json.loads(
+        (CATALOG_DIRECTORY / "manifest.json").read_text(encoding="utf-8")
+    )
+    alias_index: dict[str, list[str]] = defaultdict(list)
+    context_index: dict[str, list[tuple[str, str]]] = defaultdict(list)
+    context_commas: dict[str, list[tuple[str, str]]] = defaultdict(list)
+
+    def index_qualifier(alias: str, jurisdiction: tuple[str, str]) -> None:
+        folded = fold_place_text(alias)
+        context_index["".join(filter(str.isalnum, folded))].append(jurisdiction)
+        if "," in folded:
+            signature = "".join(c for c in folded if c.isalnum() or c == ",")
+            context_commas[signature].append(jurisdiction)
+
+    for entry in entries:
+        for alias in entry["normalized_aliases"]:
+            alias_index[alias].append(entry["id"])
+        for alias in entry.get("admin1_aliases", ()):
+            index_qualifier(alias, ("admin1", entry["id"]))
+    for country, info in countries.items():
+        for alias in info["aliases"]:
+            index_qualifier(alias, ("country", country))
+    max_alias_length = max(map(len, (*alias_index, *context_index)))
+    preferred_aliases: dict[str, str] = {}
+    for preferred_id in manifest["preferred_aliases"].values():
+        if preferred_id in place_by_id:
+            for alias in place_by_id[preferred_id]["normalized_aliases"]:
+                preferred_aliases[alias] = preferred_id
+
+    return PlaceCatalogData(
+        entries=entries,
+        place_by_id=place_by_id,
+        countries=countries,
+        manifest=manifest,
+        alias_index=dict(alias_index),
+        context_index=dict(context_index),
+        context_commas=dict(context_commas),
+        max_alias_length=max_alias_length,
+        preferred_aliases=preferred_aliases,
+    )
 
 
-def _index_qualifier(alias: str, jurisdiction: tuple[str, str]) -> None:
-    folded = fold_place_text(alias)
-    PLACE_CONTEXT_INDEX["".join(filter(str.isalnum, folded))].append(jurisdiction)
-    if "," in folded:
-        signature = "".join(c for c in folded if c.isalnum() or c == ",")
-        PLACE_CONTEXT_COMMAS[signature].append(jurisdiction)
+_EXPORTED_ATTRS = {
+    "KNOWN_BIRTH_PLACE_ENTRIES": "entries",
+    "PLACE_BY_ID": "place_by_id",
+    "COUNTRIES": "countries",
+    "MANIFEST": "manifest",
+    "PLACE_ALIAS_INDEX": "alias_index",
+    "PLACE_CONTEXT_INDEX": "context_index",
+    "PLACE_CONTEXT_COMMAS": "context_commas",
+    "MAX_PLACE_ALIAS_LENGTH": "max_alias_length",
+    "PREFERRED_PLACE_ALIASES": "preferred_aliases",
+}
 
 
-for _entry in KNOWN_BIRTH_PLACE_ENTRIES:
-    for _alias in _entry["normalized_aliases"]:
-        PLACE_ALIAS_INDEX[_alias].append(_entry["id"])
-    for _alias in _entry.get("admin1_aliases", ()):
-        _index_qualifier(_alias, ("admin1", _entry["id"]))
-for _country, _info in COUNTRIES.items():
-    for _alias in _info["aliases"]:
-        _index_qualifier(_alias, ("country", _country))
-MAX_PLACE_ALIAS_LENGTH = max(map(len, (*PLACE_ALIAS_INDEX, *PLACE_CONTEXT_INDEX)))
-PREFERRED_PLACE_ALIASES: dict[str, str] = {}
-for _preferred_id in MANIFEST["preferred_aliases"].values():
-    if _preferred_id in PLACE_BY_ID:
-        for _alias in PLACE_BY_ID[_preferred_id]["normalized_aliases"]:
-            PREFERRED_PLACE_ALIASES[_alias] = _preferred_id
+def __getattr__(name: str) -> Any:
+    field_name = _EXPORTED_ATTRS.get(name)
+    if field_name is not None:
+        return getattr(get_place_catalog(), field_name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

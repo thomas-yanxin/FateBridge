@@ -24,11 +24,11 @@ from fatebridge.core.requests.divination import (
     HeluoRequest,
     SanShiUnitedRequest,
 )
-from fatebridge.core.requests.metaphysics import (
+from fatebridge.core.requests.sanshi import (
     LiuRengGodsRequest,
     QimenAnalysisRequest,
-    ZiweiBirthRequest,
 )
+from fatebridge.core.requests.ziwei import ZiweiBirthRequest
 
 # 所有中式体系：缺省 use_true_solar_time 必须为 True。
 _CHINESE_MODELS = [

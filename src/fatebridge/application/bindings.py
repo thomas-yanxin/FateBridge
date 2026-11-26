@@ -1,13 +1,13 @@
 """Resolve catalog services when binding a validated request."""
 
-from collections.abc import Mapping
+from __future__ import annotations
+
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from functools import cached_property
 from importlib import import_module
 from inspect import signature
-from typing import Protocol, runtime_checkable
-
-from pydantic import BaseModel
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from fatebridge.application.tool_spec import (
     Bind,
@@ -17,7 +17,11 @@ from fatebridge.application.tool_spec import (
     ServicePositionalInput,
     ServiceResult,
 )
-from fatebridge.utils.birth_input import PersonInfo
+
+if TYPE_CHECKING:
+    from pydantic import BaseModel
+
+    from fatebridge.utils.birth_input import PersonInfo
 
 
 @dataclass(frozen=True)
@@ -47,6 +51,15 @@ def service_ref(module: str, name: str) -> ServiceRef:
 
 def resolve_service(service: ServiceRef | ResolvedService) -> ResolvedService:
     return service.resolved if isinstance(service, ServiceRef) else service
+
+
+def request_model_ref(module: str, name: str) -> Callable[[], type[BaseModel]]:
+    """Reference a Pydantic request model without importing it during catalog load."""
+
+    def load() -> type[BaseModel]:
+        return getattr(import_module(module), name)
+
+    return load
 
 
 PERSON_FIELDS = frozenset(
@@ -97,6 +110,8 @@ def _build_person(
         person_arguments["birth_minute"] = birth_minute
     if birth_second is not None:
         person_arguments["birth_second"] = birth_second
+    from fatebridge.utils.birth_input import PersonInfo
+
     return PersonInfo.model_validate(person_arguments)
 
 

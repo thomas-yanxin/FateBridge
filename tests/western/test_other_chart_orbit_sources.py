@@ -18,7 +18,6 @@ from fatebridge.core.astro.sensitivity import (
     time_sensitivity,
 )
 from fatebridge.services.astrology import calculate_germany_chart_analysis
-from fatebridge.services.replay_metadata import ephemeris_inventory
 from tests.fixtures.hamburg_orbits import ROWS, write_orbits
 
 HAS_SWE = pytest.mark.skipif(e.swe is None, reason="Swiss Ephemeris required")
@@ -143,7 +142,6 @@ def test_same_directory_orbit_edits_update_positions_and_receipt_without_cache_r
     source = write_orbits(tmp_path)
     e.configure_ephemeris_path(str(tmp_path))
     before = _native_factors(_birth(), False)
-    inventory_before = ephemeris_inventory()
     stat = source.stat()
     write_orbits(tmp_path, cupido_anomaly="164.7409")
     os.utime(source, ns=(stat.st_atime_ns, stat.st_mtime_ns))
@@ -153,9 +151,6 @@ def test_same_directory_orbit_edits_update_positions_and_receipt_without_cache_r
     assert before_cupido["longitude"] != after_cupido["longitude"]
     assert before["hypothetical_element_source"]["status"] == "external_file"
     assert after["hypothetical_element_source"]["status"] == "external_file"
-    # The inventory lists filenames; source-specific content identity is above.
-    assert inventory_before == ephemeris_inventory()
-    assert "0/seorbel.txt" in ephemeris_inventory()["files"]
 
 
 @HAS_SWE

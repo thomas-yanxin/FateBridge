@@ -64,17 +64,13 @@ def test_example_has_explicit_fixture_context_but_does_not_supply_user_defaults(
     spec = SPECS[key]
     record = describe_input_spec(spec)
     assert record["example_input"]
-    assert record["example_context"] == {
-        "fictional": True,
-        "purpose": "schema_and_transport_demo",
-        "use_as_user_default": False,
-    }
+    assert "example_context" not in record
     validate(record["example_input"], record["input_schema"])
     with pytest.raises(ValueError):
         spec.request_model.model_validate({})
     with pytest.raises(ValueError):
         spec.request_model.model_validate(
-            {**record["example_input"], "example_context": record["example_context"]}
+            {**record["example_input"], "example_context": {"fictional": True}}
         )
 
 
@@ -143,8 +139,7 @@ def test_public_descriptor_drives_each_available_adapter_without_private_input_d
                 record = next(
                     item for item in described["tools"] if item["tool"] == key
                 )
-            assert record["example_context"]["fictional"] is True
-            assert record["example_context"]["use_as_user_default"] is False
+            assert record["example_input"]
             data = record["example_input"]
             fields = record.get("suggested_fields")
             values = []
@@ -185,7 +180,7 @@ def test_public_descriptor_drives_each_available_adapter_without_private_input_d
     assert cli_run(["discover", "--tool", spec.name, "--detail", "full"]) == 0
     description = json.loads(capsys.readouterr().out)["tools"][0]
     assert description["example_input"] == data
-    assert description["example_context"] == record["example_context"]
+    assert "example_context" not in description
     flags = ["--detail", "audit"]
     if fields is not None:
         flags += ["--fields", *fields]

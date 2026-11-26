@@ -2,12 +2,14 @@ import re
 
 import pytest
 
-from fatebridge.services.metaphysics import (
+from fatebridge.services.sanshi import (
     calculate_jinkou_analysis,
     calculate_liureng_gods,
     calculate_liureng_runyear,
     calculate_qimen_analysis,
     calculate_taiyi_analysis,
+)
+from fatebridge.services.ziwei import (
     calculate_ziwei_birth,
     calculate_ziwei_rules,
 )
@@ -151,12 +153,12 @@ def test_liureng_runyear_independent_of_birth_pillars(
     # 大六壬行年以「分析时刻」起课，不依赖出生四柱的构建。
     # 回归测试：曾有一处废弃的 _build_person_seed(person) 调用，会让非法出生数据
     # 误使整个行年分析报错。即便出生四柱构建失败，行年分析也应正常返回。
-    import fatebridge.services.metaphysics as meta
+    import fatebridge.core.metaphysics.seed as seed_mod
 
     def _boom(*args, **kwargs):
         raise ValueError("行年分析不应依赖出生四柱")
 
-    monkeypatch.setattr(meta, "_build_person_seed", _boom)
+    monkeypatch.setattr(seed_mod, "_build_person_seed", _boom)
 
     person = create_person_info(
         birth_year=1994,
@@ -547,7 +549,7 @@ def test_calculate_jinkou_analysis_does_not_borrow_liureng_transmission_rule() -
 
 
 def test_ziwei_horoscope_request_requires_analysis_datetime() -> None:
-    from fatebridge.core.requests.metaphysics import ZiweiHoroscopeRequest
+    from fatebridge.core.requests.ziwei import ZiweiHoroscopeRequest
 
     req = ZiweiHoroscopeRequest(
         gender="男",
@@ -580,7 +582,7 @@ def test_ziwei_horoscope_request_requires_analysis_datetime() -> None:
 
 
 def test_calculate_ziwei_horoscope_returns_six_scopes() -> None:
-    from fatebridge.services.metaphysics import calculate_ziwei_horoscope
+    from fatebridge.services.ziwei import calculate_ziwei_horoscope
 
     person = create_person_info(
         birth_year=1994,

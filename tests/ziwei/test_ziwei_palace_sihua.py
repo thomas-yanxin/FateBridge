@@ -6,7 +6,7 @@ import pytest
 
 from fatebridge.core.contracts.output_ziwei_structure import ZiweiPalaceSihuaRelations
 from fatebridge.core.ziwei.ziwei_flying import palace_sihua_relations
-from fatebridge.services.metaphysics import (
+from fatebridge.services.ziwei import (
     calculate_ziwei_birth,
     calculate_ziwei_horoscope,
 )

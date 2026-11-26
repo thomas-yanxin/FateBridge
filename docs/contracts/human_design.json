@@ -1,10 +1,10 @@
 {
   "call_guidance": {
-    "ephemeris_provenance": "calculation_policy.ephemeris_model_scope=physical_bodies只汇总十个原生物理天体；节点与体系对点在nonphysical_factor_models。平交点ephemeris_model为swisseph_analytical_mean_node，native_return_flag_model与return_flags只是原生返回证据，不证明读取某矢量文件。严格JPL下主盘与交点约定比较仍计算，Moshier后端对照显式reference_disabled_by_strict_jpl_policy、reference_computation_performed=false；该未执行对照不作一致性或精度证据。主计算的缺文件、损坏或越界仍报来源错误。require_swiss_files=true保留仅接收Swiss压缩文件的含义，与显式JPL冲突时报告jpl_swiss_file_requirement_conflict，不自动改用户设置。",
-    "native_context": "核对native_execution_context.mechanism和lifetime；生产调用为fresh_exec_process及one_outer_human_design_operation。auxiliary_files_present是搜索候选的端点身份，不是已读证明。压缩文件诊断记录保留原值；不是完整调用认证或位置精度保证。父进程设置不作为人类图输入；辅助文件变化返回不可自动重试的ephemeris_source_inconsistent。完整释义核验继续要求原run及全部计算见证。 提供cycle_reference_datetime时，请求时刻次序校验也使用独立短进程；完整盘计算会再次按TT校验。原生辅助文件变化保持来源错误，不能通过改出生参数绕过。",
+    "ephemeris_provenance": "calculation_policy.ephemeris_model_scope=physical_bodies只汇总十个原生物理天体；节点与体系对点在nonphysical_factor_models。平交点ephemeris_model为swisseph_analytical_mean_node，native_return_flag_model与return_flags只是原生返回证据，不证明读取某矢量文件。",
+    "native_context": "核对native_execution_context.mechanism和lifetime；生产调用为fresh_exec_process及one_outer_human_design_operation。auxiliary_files_present是搜索候选的端点身份，不是已读证明。压缩文件诊断记录保留原值；不是完整调用认证或位置精度保证。父进程设置不作为人类图输入；辅助文件变化返回不可自动重试的ephemeris_source_inconsistent。",
     "node_policy": "默认true是显式约定，自动比较mean；node_backend_comparison另查同一TT的节点后端差异，不把同后端吻合当独立认证。未认证与原版软件完全一致。",
     "reading_boundary": "Color/Tone/Base是数值细分，不是医学、饮食处方或现实事件概率；交叉名称为2001版原典事实索引，完整线义尚未认证。 primary_diagrams卡仅在16/9｜63/64或9/16｜64/63且为左角度时返回已核看的2008图示旁证；公开转录本未经校对、母本未认证，不是课程16/6列项的勘误，也不把图所在5/1段落扩成其他角色线义。",
-    "source_files": "先核对ephemeris_source_summary是否identity_incomplete及未识别上下文数；该层记录本命、设计根、范围与后端对照观察到的文件身份。身份变化为不可自动重试的ephemeris_source_inconsistent，先修复运行数据，保留原出生与范围输入。完整contexts从同次结果取回；解析平交点不依赖文件，真交点SWIEPH回显位也不证明月球文件可识别。身份／次数均非位置精度、完整原子读取集合或原生执行认证；周期搜索另读cycle_context.source_evidence。",
+    "source_files": "先核对ephemeris_source_summary是否identity_incomplete及未识别上下文数；该层记录本命、设计根、范围与后端对照观察到的文件身份。身份变化为不可自动重试的ephemeris_source_inconsistent，先修复运行数据，保留原出生与范围输入。完整contexts从同次结果取回；解析平交点不依赖文件，真交点SWIEPH回显位也不证明月球文件可识别。",
     "time_policy": "必须提供出生小时、分钟、时区；未知生时不能套默认；人类图使用民用出生瞬间，不作真太阳时重定时。 完整输出的clock_evidence保留实际时标转换、四步DeltaT迭代与UTC显示见证；当前完整释义验收要求这些见证，并纯回放主盘、整盘后端对照、全部实际生时样本及周期标签。见证不认证原生执行、实测UT1或物理精度；旧回执保留当时版本，不补造转换记录。"
   },
   "evidence_views": {
@@ -567,155 +567,5 @@
     "title": "HumanDesignRequest",
     "type": "object"
   },
-  "method_contracts": [
-    {
-      "comparison_requirements": [
-        "相同方法合同、实现与数据版本、选项及实际计算层"
-      ],
-      "dependencies": [
-        "validated_request"
-      ],
-      "error_sources": [
-        "civil_clock",
-        "earth_rotation",
-        "ephemeris_model",
-        "numerical_solver",
-        "display_quantization",
-        "rule_adjudication"
-      ],
-      "implementation_refs": [
-        "src/fatebridge/core/human_design/human_design.py"
-      ],
-      "limitations": [
-        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
-        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
-      ],
-      "method_id": "fatebridge.human_design_solar_arc_and_mechanics.contract_v1",
-      "output_paths": [
-        "activations",
-        "variables",
-        "bodygraph",
-        "profile",
-        "design_solver",
-        "rulesets",
-        "rule_trace",
-        "source_consistency",
-        "gate_evidence",
-        "historical_polarity_context",
-        "gate_activation_context",
-        "profile_partition_context",
-        "apparent_position_context",
-        "depth_evidence",
-        "definition_bridging",
-        "incarnation_cross",
-        "cycle_context",
-        "cycle_summary",
-        "interpretation",
-        "validation"
-      ],
-      "prerequisites": [
-        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
-      ],
-      "quantity_kind": "astronomy_and_rule_result",
-      "role": "calculation",
-      "selector_fields": [
-        "node_mode"
-      ],
-      "source_refs": [
-        "docs/human-design.md"
-      ],
-      "unit": "per_field",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "not_fully_accepted"
-      }
-    },
-    {
-      "comparison_requirements": [
-        "同TT、同重心状态来源、相同有限源偏折/光行差/真黄道约定"
-      ],
-      "dependencies": [
-        "time_scales.personality.jd_tt",
-        "time_scales.design.jd_tt"
-      ],
-      "error_sources": [
-        "ephemeris_model",
-        "numerical_solver",
-        "display_quantization",
-        "rule_adjudication"
-      ],
-      "implementation_refs": [
-        "src/fatebridge/core/human_design/human_design_point_mass.py"
-      ],
-      "limitations": [
-        "不改变原生激活；固定TT位置与候选自有设计根分别比较；太阳盘内为数学延拓",
-        "固定队列误差不是全域物理误差界；未认证原版软件来源优先级"
-      ],
-      "method_id": "swiss_barycentric_sun_monopole_iau2006_v1",
-      "output_paths": [
-        "apparent_model_comparison"
-      ],
-      "prerequisites": [
-        "compare_apparent_models=true；pyerfa与实际重心星历文件可用"
-      ],
-      "quantity_kind": "astronomy_model_comparison",
-      "role": "calculation",
-      "selector_fields": [
-        "compare_apparent_models"
-      ],
-      "source_refs": [
-        "docs/human-design.md"
-      ],
-      "unit": "degrees",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "not_fully_accepted"
-      }
-    },
-    {
-      "comparison_requirements": [
-        "同TT、同重心状态来源、相同有限源偏折/光行差/真黄道约定"
-      ],
-      "dependencies": [
-        "time_scales.personality.jd_tt"
-      ],
-      "error_sources": [
-        "ephemeris_model",
-        "numerical_solver",
-        "display_quantization",
-        "rule_adjudication"
-      ],
-      "implementation_refs": [
-        "src/fatebridge/core/human_design/human_design_point_mass.py"
-      ],
-      "limitations": [
-        "88度根仅使用同一候选坐标模型的太阳；数值相邻端点不是物理时刻误差界",
-        "不替换原生设计根；数值队列通过不认证原版软件模型或现实效度"
-      ],
-      "method_id": "human_design_point_mass_design_root_v1",
-      "output_paths": [
-        "apparent_model_comparison.candidate_design_root"
-      ],
-      "prerequisites": [
-        "compare_apparent_models=true；pyerfa与实际重心星历文件可用"
-      ],
-      "quantity_kind": "event_time",
-      "role": "calculation",
-      "selector_fields": [
-        "compare_apparent_models"
-      ],
-      "source_refs": [
-        "docs/human-design.md"
-      ],
-      "unit": "per_field",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "not_fully_accepted"
-      }
-    }
-  ],
   "tool": "human_design"
 }

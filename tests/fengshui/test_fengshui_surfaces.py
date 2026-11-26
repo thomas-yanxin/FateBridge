@@ -407,7 +407,7 @@ def test_discovery_publishes_nested_inputs_and_outputs_on_three_surfaces(
 ) -> None:
     records = rest_client(monkeypatch).get("/api/tools").json()["tools"]
     for spec in SPECS.values():
-        descriptor = describe_spec(spec)
+        descriptor = describe_spec(spec, include_output_schema=True)
         assert descriptor["surfaces"]["cli"] and descriptor["cli_request_file"]
         assert descriptor["input_schema"] and descriptor["output_schema"]
         assert any(r["tool"] == spec.name for r in records)

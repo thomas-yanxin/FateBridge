@@ -1,14 +1,14 @@
 {
   "call_guidance": {
-    "calendar_input": "Date labels use the explicit question_calendar/candidate_calendar, default proleptic Gregorian. Read calendar_conversion and analysis_context.input_calendar/input_date before explaining normalized datetimes. Julian dates use CE Jan1 years; do not infer regional reforms, March25 years or historical LMT/LAT. With explicit noon hour origin, retain raw calendar labels and read clock_conversion.hour_origin_conversion for the final canonical wall date; validate range after nominal day carry.",
+    "calendar_input": "Date labels use the explicit question_calendar/candidate_calendar, default proleptic Gregorian. Read calendar_conversion and analysis_context.input_calendar/input_date before explaining normalized datetimes.",
     "candidate_inputs": "Use the recorded candidate instant, timezone and coordinates; this is not an interval-wide optimum search.",
-    "clock_input": "Use explicit candidate_clock_basis only from confirmed clock evidence: civil / local_mean_solar / local_apparent_solar. Solar bases must omit/null timezone_name; civil omission preserves the legacy +08:00 default, not evidence of a known zone. Read clock_conversion with calendar_conversion: first normalize date labels, then resolve the declared clock to TT/UT1. Geocentric LAT is not a topocentric sundial reconstruction. Before1960 UTC-named carriers denote UT1 model labels. Never infer an original clock from ASC fit or outcome; numerical residual is not record accuracy.",
-    "clock_seconds": "Use candidate_second only for confirmed whole-second labels0..59; omitted defaults to0. Do not invent unknown seconds. calendar_conversion.input_clock and clock_conversion.hour_origin_conversion.input_clock preserve the second through date/noon normalization; input_granularity=second describes supported labels, not historical accuracy. Fractional seconds and directly supplied second60 are unsupported; solar inversion can still return a separately identified UTC leap-second label without truncation.",
+    "clock_input": "Use explicit candidate_clock_basis only from confirmed clock evidence: civil / local_mean_solar / local_apparent_solar.",
+    "clock_seconds": "Use candidate_second only for confirmed whole-second labels0..59; omitted defaults to0. Do not invent unknown seconds.",
     "evidence_boundary": "读取 moon、axes、factors 与 unresolved_factors；婚嫁指定 Ramesey 时读取 marriage_significators 的原典条件。",
-    "hour_origin": "Use candidate_hour_origin=noon only for confirmed noon-based clock-hour labels such as Lilly1647 pp30-31 ephemeris tables. Default midnight preserves modern labels. Noon0=same-date12:00; noon12..23=next-date00:00..11:00. Read clock_conversion.hour_origin_conversion, raw calendar date/clock, and canonical candidate_datetime together. Calendar-normalized_local_datetime is a raw hour label and can be null for an unrepresentable intermediate date rescued by the carry; final wall time is separate. This is not physical elapsed duration, a timezone/EOT/JD offset, a house-table coordinate, a regional reform or proof of LMT/LAT. Do not infer the author's convention from a fitted chart. Apply declared hour origin before civil zone/DST validation or solar-clock inversion.",
+    "hour_origin": "Use candidate_hour_origin=noon only for confirmed noon-based clock-hour labels such as Lilly1647 pp30-31 ephemeris tables. Default midnight preserves modern labels. Noon0=same-date12:00; noon12..23=next-date00:00..11:00.",
     "interpretation_boundary": "以用户明确的活动需求、备选窗口和传统方法逐条件解读。",
     "physical_epoch": "太阳时反解的有效时刻可能落在UTC闰秒。converted_utc可含23:59:60；按clock_conversion.utc_representation区分标签与datetime可表示性，计算使用原生TT/UT1。不能把不能解析datetime说成计算失败，也不能将秒60截断、平滑或移到次日；数值标签精度不代表实测钟时精度。",
-    "ut1_source": "ut1_source默认swiss_delta_t；显式iers_c04使用固定IERS20 C04最终每日合成值，仅覆盖1962-01-01 00:00至2026-09-19 00:00 UTC，需要UT1的时刻超范围拒绝；地心TT黄经事件试算不需要UT1。连续TT上先去除62项zonal模型，对UT1-TAI作四点Lagrange插值，再恢复zonal并加入声明的日内模型；不要重复叠加回执中的zonal项。clock_conversion.ut1_reference及calculation_basis.earth_rotation.ut1_reference是时标回执，其polar_motion_applied与celestial_pole_offsets_applied为false不代表几何未消费EOP；managed宫位／地平的实际极移及有来源资格的CPO看earth_rotation.terrestrial_orientation，1984年前CPO仍未资格。形式标准差和求解残差不是瞬时物理误差界，不认证完整EOP、史料钟时精度或预测效力；无外推、预测值或静默模型回退。"
+    "ut1_source": "ut1_source默认swiss_delta_t；显式iers_c04使用固定IERS20 C04最终每日合成值，仅覆盖1962-01-01 00:00至2026-09-19 00:00 UTC，需要UT1的时刻超范围拒绝；地心TT黄经事件试算不需要UT1。连续TT上先去除62项zonal模型，对UT1-TAI作四点Lagrange插值，再恢复zonal并加入声明的日内模型；不要重复叠加回执中的zonal项。"
   },
   "evidence_views": {
     "calculation_conditions": {
@@ -50,12 +50,6 @@
         "election.calculation_basis.julian_day_ut1"
       ],
       "purpose": "核对已确认的整秒钟面、民用／地方平太阳／地心视太阳时、历法与正午进位及同一物理TT/UT1；省略秒沿用0不代表记录精度，不拟合未知原书钟时。"
-    },
-    "data_files": {
-      "fields": [
-        "ephemeris_data_policy"
-      ],
-      "scope": "Available when ephemeris_policy=require_data_files. Read the actual observed physical models, file sources, reference zeros and private-worker reports. Native event-internal reads, fixed-star catalogue formulae and absolute accuracy are not certified. This card does not set the input policy."
     },
     "hour_origin": {
       "fields": [
@@ -183,17 +177,6 @@
         "title": "Candidate Year",
         "type": "integer"
       },
-      "ephemeris_policy": {
-        "default": "auto",
-        "description": "auto retains and reports actual available models. require_data_files rejects analytical/orbital fallback for observed physical coordinates throughout the request, including clocks and samples; checks data contexts and endpoint hashes. Native rise/set query/result epochs are probed, but internal solver reads are not fully observable. Analytical points, fictitious elements, reference zeros and Earth rotation are separate; this is not an astronomical-accuracy or prediction certificate.",
-        "enum": [
-          "auto",
-          "require_data_files"
-        ],
-        "title": "Ephemeris Policy",
-        "type": "string",
-        "x-fatebridge-western-data-policy": true
-      },
       "house_system": {
         "anyOf": [
           {
@@ -297,54 +280,5 @@
     "title": "AstroElectionRequest",
     "type": "object"
   },
-  "method_contracts": [
-    {
-      "comparison_requirements": [
-        "相同方法合同、实现与数据版本、选项及实际计算层"
-      ],
-      "dependencies": [
-        "validated_request"
-      ],
-      "error_sources": [
-        "civil_clock",
-        "observer_location",
-        "earth_rotation",
-        "ephemeris_model",
-        "numerical_solver",
-        "display_quantization",
-        "rule_adjudication"
-      ],
-      "implementation_refs": [
-        "src/fatebridge/services/western_events.py"
-      ],
-      "limitations": [
-        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
-        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
-      ],
-      "method_id": "fatebridge.western_evaluate_election_time.contract_v1",
-      "output_paths": [
-        "election"
-      ],
-      "prerequisites": [
-        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
-      ],
-      "quantity_kind": "astronomy_and_rule_result",
-      "role": "calculation",
-      "selector_fields": [
-        "ephemeris_policy",
-        "house_system",
-        "candidate_clock_basis"
-      ],
-      "source_refs": [
-        "docs/algorithm-coverage.md"
-      ],
-      "unit": "per_field",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "not_fully_accepted"
-      }
-    }
-  ],
   "tool": "evaluate_election_time"
 }

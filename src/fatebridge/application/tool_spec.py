@@ -2,32 +2,39 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
-from decimal import Decimal
-from typing import Any, NamedTuple, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Any, Literal, NamedTuple, Protocol, runtime_checkable
 
-from pydantic import BaseModel
 from typing_extensions import NotRequired, TypedDict
 
-from fatebridge.core.execution_context import DetailLevel
-from fatebridge.core.method_contracts import MethodContract
-from fatebridge.core.reproducibility import ReproducibilityPolicy
-from fatebridge.utils.birth_input import PersonInfo
+if TYPE_CHECKING:
+    from decimal import Decimal
+
+    from pydantic import BaseModel
+
+    from fatebridge.core.reproducibility import ReproducibilityPolicy
+    from fatebridge.utils.birth_input import PersonInfo
+
+DetailLevel = Literal["compact", "audit"]
 
 ServiceResult = dict[str, Any]
-ServiceInput = (
-    str
-    | int
-    | float
-    | bool
-    | Decimal
-    | None
-    | Sequence["ServiceInput"]
-    | Mapping[str, "ServiceInput"]
-    | Mapping[int, "ServiceInput"]
-)
-ServicePositionalInput = ServiceInput | PersonInfo | BaseModel
+if TYPE_CHECKING:
+    ServiceInput = (
+        str
+        | int
+        | float
+        | bool
+        | Decimal
+        | None
+        | Sequence["ServiceInput"]
+        | Mapping[str, "ServiceInput"]
+        | Mapping[int, "ServiceInput"]
+    )
+    ServicePositionalInput = ServiceInput | PersonInfo | BaseModel
+else:
+    ServiceInput = Any
+    ServicePositionalInput = Any
 
 
 class EvidenceView(TypedDict):
@@ -145,27 +152,37 @@ class ExecutionHints:
         }
 
 
+_UNSET_OUTPUT_MODEL: Any = object()
+_UNSET_REQUEST_MODEL: Any = object()
+
+
 @dataclass(frozen=True)
 class ToolSpec:
     """Single source of truth for one FateBridge tool across all surfaces."""
 
     name: str
     bind: Bind
-    request_model: type[BaseModel]
     summary: str
     operation_label_zh: str
     family: str
+    request_model: type[BaseModel] = _UNSET_REQUEST_MODEL
+    request_model_loader: Callable[[], type[BaseModel]] | None = field(
+        default=None, repr=False, compare=False
+    )
     rest_path: str | None = None
     expose_mcp: bool = True
     cpu_bound: bool = False
-    output_model: type[BaseModel] | None = None
+    output_model: type[BaseModel] | None = _UNSET_OUTPUT_MODEL
+    output_model_loader: Callable[[], type[BaseModel] | None] | None = field(
+        default=None, repr=False, compare=False
+    )
     # note (output validation): Complete service results must include these roots before projection.
     required_output_fields: tuple[str, ...] = ()
+    output_fields: tuple[str, ...] = ()
     required_output_validator: RequiredOutputValidator | None = None
     cli_request_file: bool = False
     execution_hints: ExecutionHints = field(default_factory=ExecutionHints)
     reproducibility: ReproducibilityPolicy | None = None
-    methods: tuple[MethodContract, ...] = ()
     output_validators: tuple[OutputValidator, ...] = ()
     needs_random_seed: NeedsRandomSeed | None = None
     resolve_time_defaults: TimeDefaultsResolver | None = None
@@ -175,3 +192,26 @@ class ToolSpec:
     evidence_views_builder: EvidenceViewsBuilder | None = None
     compact_view: CompactView | None = None
     detail_view: DetailView | None = None
+
+    def __getattribute__(self, name: str) -> Any:
+        if name == "output_model":
+            attrs = object.__getattribute__(self, "__dict__")
+            value = attrs.get("output_model", _UNSET_OUTPUT_MODEL)
+            if value is _UNSET_OUTPUT_MODEL:
+                loader = attrs.get("output_model_loader")
+                if loader is None:
+                    return None
+                value = loader()
+                object.__setattr__(self, "output_model", value)
+            return value
+        if name == "request_model":
+            attrs = object.__getattribute__(self, "__dict__")
+            value = attrs.get("request_model", _UNSET_REQUEST_MODEL)
+            if value is _UNSET_REQUEST_MODEL:
+                loader = attrs.get("request_model_loader")
+                if loader is None:
+                    raise AttributeError("ToolSpec missing request_model")
+                value = loader()
+                object.__setattr__(self, "request_model", value)
+            return value
+        return object.__getattribute__(self, name)

@@ -106,7 +106,7 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
         description=(
             "按 family、关键词 q 或精确 tool 发现当前公开的计算能力与调用契约。"
             "无参数调用返回全部分类计数与工具摘要；指定 tool 返回输入参数 schema、示例与推荐字段；"
-            "detail=full 额外附带完整 output_schema。"
+            "detail=full 返回 output_fields，需完整 output_schema 时传 include_output_schema=True。"
         ),
         annotations=meta_annotations,
         tags={"meta"},
@@ -116,6 +116,7 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
         q: str | None = None,
         tool: str | None = None,
         detail: Literal["summary", "full"] = "summary",
+        include_output_schema: bool = False,
     ) -> ToolResult:
         try:
             manifest = discover_specs(
@@ -125,6 +126,7 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
                 tool=tool,
                 surface="mcp",
                 detail=detail,
+                include_output_schema=include_output_schema,
                 allowed_names=allowed_tools,
             )
             return protocol_result(manifest, failed=False)

@@ -358,6 +358,7 @@ async def list_tools(
     tool: str | None = None,
     surface: ToolSurface | None = None,
     detail: Literal["summary", "full"] = "summary",
+    include_output_schema: bool = False,
 ) -> ServiceResult:
     try:
         return discover_specs(
@@ -367,6 +368,7 @@ async def list_tools(
             tool=tool,
             surface=surface,
             detail=detail,
+            include_output_schema=include_output_schema,
         )
     except ParameterError as exception:
         raise HTTPException(

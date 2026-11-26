@@ -1,8 +1,13 @@
 """Optional detail views for the catalog's traditional calculation results."""
 
-from pydantic import JsonValue
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from fatebridge.application.tool_spec import DetailLevel, ServiceResult
+
+if TYPE_CHECKING:
+    from pydantic import JsonValue
 
 COMPACT_FIELDS = {
     ("", "solar_model_details"),

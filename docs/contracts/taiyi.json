@@ -11,9 +11,9 @@
     "evidence": "按本次taiyi.calendar_rules确认岁首，再读取core_board、rule_trace、patterns、ruleset；未命中空间关系不能推成吉凶，原典分歧不隐去。",
     "gates": "年/月按预先所选王法核三门；李法四盘及定计目门盘另列比较。默认至点时计的门盘/定计仍未算；明确选key_hour_winter_jiazi_v1可算完整积时、时支合神、定计和阴阳四门，但三门主体未决仍为null。各配置不按结果择优，不借奇门门盘补齐。",
     "historical_dates": "输入日期统一为推算公历；儒略历日期须先明确转换。calendar_rules.historical_date_reference只对选定金钥匙课例返回独立历表日期、原积数及实际积数，逐项核对匹配，不代表完整古历、全盘原典符合或应验。固定现代时区及代表钟面须明示，不能把未知古例时地补造成事实。",
-    "historical_year": "year_profile仅用于year：jinjing_year_historical_table_v1选381—385晋历主表；jinjing_year_qiliang_table_v1选501—505齐梁史历表，保留502闰四月及未决闰五月／六月候选。两者各62个月1831日、范围外拒绝；默认现代农历保持，不自动按日期选配置。historical_year_calendar视图保留同次日期、原儒略历与推算公历、作者版本及未裁定范围；历表不是王氏同元古历或其他两术古历，年栏不裁定逐日改元。",
+    "historical_year": "year_profile仅用于year：jinjing_year_historical_table_v1选381—385晋历主表；jinjing_year_qiliang_table_v1选501—505齐梁史历表，保留502闰四月及未决闰五月／六月候选。两者各62个月1831日、范围外拒绝；默认现代农历保持，不自动按日期选配置。",
     "hour_profiles": "hour_profile仅用于hour；默认jinjing_hour_solstice_v1是现代至点置一。key_hour_winter_jiazi_v1按金钥匙冬至前甲子连续积时，calendar_rules.hour_origin保存同盘日期、完整积时和现代23时子初约定。合参放在taiyi_options。不可把只求太乙宫的甲己捷数代替完整积时，也不宣称古历复原。",
-    "monthly": "仅month可选month_profile。省略保留金镜六纪节月；key_month_tianzheng_jie_v1按金钥匙完年乘十二、加天地二正与本月名义序，仍按现代节月边界。full积月及1504截数分别返回，不先约360求240门周。KEY直门加定计目，原门段684/184/死4与本盘原例相位695/215/惊5并列，三门主体未裁定。独立历表若显示农历月与节月不符须明示，不按吉凶改选方法。 独立历表的朔月比较是一项假设；source_calendar_basis=not_adjudicated时，不能声称原书已证实采用朔月。",
+    "monthly": "仅month可选month_profile。省略保留金镜六纪节月；key_month_tianzheng_jie_v1按金钥匙完年乘十二、加天地二正与本月名义序，仍按现代节月边界。full积月及1504截数分别返回，不先约360求240门周。KEY直门加定计目，原门段684/184/死4与本盘原例相位695/215/惊5并列，三门主体未裁定。独立历表若显示农历月与节月不符须明示，不按吉凶改选方法。",
     "paged_first_view": "先核对result_delivery.deferred_fields：若仅run_metadata.runtime延后，业务依据已内联，可据所选字段解读，环境复核再读取同run完整runtime。若业务字段延后，须沿first_page_uri/next_uri读回同run投影载荷并核对原run后解释该字段；不能当作不存在或重算全文替代。",
     "scope": "calculation_mode支持year/month/day/hour，默认year。月计按所选节月起元，日计按金钥匙冬至前甲子积日，时计按所选至点或完整积时配置；核对实际calendar_rules及配置，现代天文与钟面适配不等于完整古历复原。玄命未实现。",
     "year_calendar": "年计核对year_calendar视图（合参taiyi_year_calendar）：civil_lunar_calendar保留输入钟表日期实际换算的年月日及本次来源；historical_calendar保留明确所选历史历表。analysis_context.lunar_display仅为校正钟面上下文，真太阳时跨日时不能替代年计日期。未单列conversion_source不补造逐日权威认证；岁首工程约定与原典裁定仍分开。"
@@ -429,7 +429,7 @@
       },
       "calculation_mode": {
         "default": "year",
-        "description": "year年计附金镜年度十神；month按十二节月；day明确采用金钥匙冬至前甲子积日，不乘十二，所选钟面零时换日、二至实刻换遁，附十精及未决异数；hour按所选时计。月/日/时计均为声明的现代天文适配，非完整古历复原。",
+        "description": "year年计附金镜年度十神；month按十二节月；day采用金钥匙冬至前甲子积日；hour按所选时计。",
         "enum": [
           "year",
           "month",
@@ -466,7 +466,7 @@
           }
         ],
         "default": null,
-        "description": "仅hour时计：省略用jinjing_hour_solstice_v1（现代至点置一）；key_hour_winter_jiazi_v1按金钥匙冬至前甲子日连续积时、时支合神和阴阳四门，仍为现代日期/23时子初适配，非古历全书认证。不可按吉凶结果择优。",
+        "description": "仅hour时计：省略用jinjing_hour_solstice_v1（至点置一）；key_hour_winter_jiazi_v1按金钥匙冬至前甲子日连续积时、时支合神和阴阳四门。",
         "title": "Hour Profile"
       },
       "month_profile": {
@@ -483,7 +483,7 @@
           }
         ],
         "default": null,
-        "description": "仅month：省略为jinjing_month_jie_360_v1；key_month_tianzheng_jie_v1采用金钥匙完年乘十二、加天地二正和本月名义序，仍以现代节月为界，非完整古历月界；源文门数冲突保留，不按吉凶择法。",
+        "description": "仅month：省略为jinjing_month_jie_360_v1；key_month_tianzheng_jie_v1采用金钥匙完年乘十二、加天地二正和本月名义序。",
         "title": "Month Profile"
       },
       "shiji_profile": {
@@ -506,7 +506,7 @@
       },
       "use_true_solar_time": {
         "default": false,
-        "description": "年计农历岁首按输入钟表日期；月计按真实节气瞬间。日/时计为true时用经度及均时差的本地真太阳钟，为false时按时区钟表标签计数。日计所选钟面零时换日，时计23时子初，不能混用。",
+        "description": "年计农历岁首按输入钟表日期；月计按真实节气瞬间；日/时计为true时用真太阳钟，为false时按时区钟表计数。",
         "title": "Use True Solar Time",
         "type": "boolean"
       },
@@ -525,7 +525,7 @@
           }
         ],
         "default": null,
-        "description": "仅year：省略或jinjing_year_lunar_civil_v1保留通用现代农历岁首；jinjing_year_historical_table_v1选381—385晋历主表；jinjing_year_qiliang_table_v1选501—505齐梁史历表，保留502年闰四月及未决闰五月／六月候选。两者范围外均拒绝。输入仍用推算公历和明确时区；非全部古历、并立王朝异历或原典岁首裁定，不按吉凶择法。",
+        "description": "仅year：省略或jinjing_year_lunar_civil_v1用通用现代农历岁首；jinjing_year_historical_table_v1选381—385晋历主表；jinjing_year_qiliang_table_v1选501—505齐梁史历表。",
         "title": "Year Profile"
       }
     },
@@ -538,53 +538,5 @@
     "title": "TaiyiAnalysisRequest",
     "type": "object"
   },
-  "method_contracts": [
-    {
-      "comparison_requirements": [
-        "相同方法合同、实现与数据版本、选项及实际计算层"
-      ],
-      "dependencies": [
-        "validated_request"
-      ],
-      "error_sources": [
-        "civil_clock",
-        "solar_clock",
-        "calendar_model",
-        "rule_adjudication"
-      ],
-      "implementation_refs": [
-        "src/fatebridge/services/metaphysics.py"
-      ],
-      "limitations": [
-        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
-        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
-      ],
-      "method_id": "fatebridge.taiyi_four_counts.contract_v1",
-      "output_paths": [
-        "taiyi"
-      ],
-      "prerequisites": [
-        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
-      ],
-      "quantity_kind": "integer_and_rule_result",
-      "role": "calculation",
-      "selector_fields": [
-        "calculation_mode",
-        "hour_profile",
-        "month_profile",
-        "year_profile",
-        "shiji_profile"
-      ],
-      "source_refs": [
-        "docs/algorithm-coverage.md"
-      ],
-      "unit": "per_field",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "not_fully_accepted"
-      }
-    }
-  ],
   "tool": "taiyi"
 }

@@ -16,7 +16,7 @@ from fatebridge.core.contracts.output_chinese import Taiyi
 from fatebridge.core.ephemeris_runtime import ephemeris_call
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.divination import calculate_sanshiunited_analysis
-from fatebridge.services.metaphysics import calculate_taiyi_analysis
+from fatebridge.services.sanshi import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.transports import call_calculation
 from tests.unit_test.fixtures.taiyi import same_run_payload

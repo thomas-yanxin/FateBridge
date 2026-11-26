@@ -301,7 +301,9 @@ async def test_all_published_schemas_keep_valid_shared_references() -> None:
         discovered = set(await discover_capabilities(client))
         assert discovered == set(by_name)
         for name in representatives:
-            published = await describe_capability(client, name, detail="full")
+            published = await describe_capability(
+                client, name, detail="full", include_output_schema=True
+            )
             assert_local_schema_defs(published["input_schema"])
             published_output_schema = published["output_schema"]
             assert isinstance(published_output_schema, dict), name

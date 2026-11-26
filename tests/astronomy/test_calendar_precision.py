@@ -7,14 +7,13 @@ import pytest
 from fatebridge.core.almanac import get_solar_terms_for_year, localize_datetime
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.local_techniques.chart import _build_metaphysics_seed
-from fatebridge.core.metaphysics.seed import build_analysis_seed
+from fatebridge.core.metaphysics.seed import _build_person_seed, build_analysis_seed
 from fatebridge.core.timing import TimingAnalysis
 from fatebridge.services.bazi import _resolve_analysis_date, calculate_bazi_birth
 from fatebridge.services.birth_context import (
     build_birth_computation_context as _build_birth_computation_context,
 )
 from fatebridge.services.calendar_tools import calculate_nongli_time
-from fatebridge.services.metaphysics import _build_person_seed
 from fatebridge.services.timing import calculate_dayun_analysis
 from fatebridge.utils.birth_input import create_person_info
 from fatebridge.utils.timezones import parse_timezone_name

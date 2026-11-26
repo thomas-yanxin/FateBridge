@@ -1,22 +1,22 @@
 {
   "call_guidance": {
     "birth_choice": "birth_date、birth_at、effective_birth_year最多传一个，不能同时传日期和时刻",
-    "environmental_context": "environmental_context提供独立环境/家庭/楼层事实，不传八字紫微喜忌；首轮fields追加layout_analysis.environmental_context。orientation分别确认direction_confirmed、north_reference、floorplan_alignment_confirmed、center_confirmed；未确认落宫不能同时传位置/砂水/外局分宫，仍可原始盘与独立形态。household_members按辈分/本家庭排行，household_composition_confirmed确认成员范围，配偶排行须显式声明。objects定义厨卫/绿化/器物而不改名为门床桌灶；floors保存实际使用人/对象，院落level=1，floor_influences区分本层与共同作用；异层适宜须成对依据。无注册规则的厨卫/材质器形保持未覆盖，拱门/开放厨房仅低优先提醒。 household_scope=symbolic_reference仅解释卦名/对宫，不追罗盘、不绑定实地方区；此选择不免除同时请求的楼层方位要求。家庭索引仅飞星/金锁适用，非八宅命卦。subject_ids仅正向使用事实；负向排除需有关楼层/院落usage_confirmed=true并配usage_evidence，且名单覆盖其对象显式使用人。",
+    "environmental_context": "environmental_context提供独立环境/家庭/楼层事实，不传八字紫微喜忌；首轮fields追加layout_analysis.environmental_context。orientation分别确认direction_confirmed、north_reference、floorplan_alignment_confirmed、center_confirmed；未确认落宫不能同时传位置/砂水/外局分宫，仍可原始盘与独立形态。",
     "feasibility": "feasible_zones只含用户逐区明确确认能容纳对象并保持视野的区域，不从照片空白、物件属性确认或允许移动扩展；其余省略",
-    "interior_relations": "明确非罗盘关系用environmental_context.interior_relations：relation_id/source_object_id/target_object_id/kind/present/observation_basis/evidence；present必须显式true、false或null，照片true/false均候选，不由相邻/可见推直接相对。objects.role独立确认主门、厕门、镜、梁管、厕墙、尖角源，床桌灶可继承明确purpose；床柱角仅pillar_corner，不外推普通家具角。仅相关输入时fields追加layout_analysis.interior_analysis。Joey/CYFS/WOFS各作者版本独立，镜照床保留BTB异议；各动作绑定实际对象与操作权限，允许仍须新位置和物理可行确认，不作现实健康财富预测。",
-    "interpretation": "先解释已有依据，再给条件式建议；照片候选不升级事实，但不等待全部complete或动作ready才解释。analysis_progress.interpretation_status区分available/conditional/scope_only/insufficient_evidence；follow_up.conclusion_candidates只择会改变当前所问结论的缺项追问，execution_only仅用于落实动作。未实现或无规则直接说明，不反复索取资料；计算定宫与宅运校验保留，边界简述一次。",
+    "interior_relations": "明确非罗盘关系用environmental_context.interior_relations：relation_id/source_object_id/target_object_id/kind/present/observation_basis/evidence；present必须显式true、false或null，照片true/false均候选，不由相邻/可见推直接相对。",
+    "interpretation": "先解释已有依据，再给条件式建议；照片候选不升级事实，但不等待全部complete或动作ready才解释。analysis_progress.interpretation_status区分available/conditional/scope_only/insufficient_evidence；follow_up.conclusion_candidates只择会改变当前所问结论的缺项追问，execution_only仅用于落实动作。",
     "item_fields": "object_id,label,representation,observation_basis,evidence必填；zone与zone_observation_basis成对可选，属性确认与位置确认分别保存；只确认左右不能补近远，照片位置为image_observed",
-    "layout_planning": "家具动作放layout_constraints；候选放layout_alternatives，声明changes并独立提供新位置placement/form_observation，许可和physically_feasible各自确认。候选fields追加layout_analysis.alternatives_analysis；ready表示可执行门槛，不表示各方法均有利或现实效力。 候选features仅提供同一候选对象在新位置独立确认的金锁砂水方向/分类/依据；与新placement落宫一致。旧对象已有features而候选缺少新features时保持待确认，其他固定环境可保留。读取候选environment_adjustments及rule_comparisons，不复用旧目标砂水。 候选environmental_context不得改变非目标固定对象的楼层/坐标系；省略固定砂水仍保留原floor元数据。逐规则比较包含所选飞星原始参考，comparison_scope不表示完整组合吉凶；layer_statuses列候选真实计算状态。 镜等环境物件可仅给候选environmental_context的相关双对象interior_relations，不伪造门床桌灶placement。原关系任一端移动都重核同kind及两端，静态端已知楼层保留；改变空间归属必须changes含location。材质/器形/颜色/存活状态及代表物用途不能借搬转改写，照片或未知可独立确认。",
-    "material_application": "material_facts.application显式选afsi_application_conditions_v1；有明确element_use才核相应水体清洁/流动、金属暴露/定性尺度或植物健康，各条件用value/observation_basis/evidence独立证据。target_request_id可引用本轮element_adjustments.request_id，只有实际算出的introduced_element才可绑定；资格、条件、目标绑定、实际位置、剂量和效力分开，不因条件确认返回ready。摆位候选须重核已有application的条件和目标，不能换目标或漏旧属性。",
-    "material_facts": "材料器形用environmental_context.material_facts：fact_id/object_id/material?/shape?/colour?/plant_alive?/observation_basis/evidence；至少一属性，未知用unknown，属性按独立证据粒度保存。element_use只明确询问wood_remedy等代表物资格，不是个人喜用或房屋所需元素。AFSI材料/颜色与FSI器形参考分开；processed_wood不作AFSI木材料，明确绿色可另列颜色替代；镜面/尖角还核实际几何。仅相关输入时fields追加layout_analysis.material_analysis；资格不认证摆位或可执行动作。",
-    "method_reference": "纯方法/职业家具参考可用scene=home作通用家居参考查询标签，analyze_layout=false，按问题显式methods并投影method_details；年度对照仅加实际effective_year或确认的query_at。无真实环境事实时省略environmental_context，不提交空对象或仅household_scope。scene不生成房屋/房间/观察/摆位结论；household_scope=symbolic_reference只用于已给household_members的家庭象意，不等于通用reference_only。",
-    "natal_delivery": "询问玄空宅盘时确认已选 xuankong_natal（可用 methods 显式选中）。通用 first_view 用于已执行布局分析；宅盘首读用 evidence_views.natal_candidates 取历史定运、朝向、全部候选、待补事实和来源。缺磁向用 house.facing_degrees 或 xuankong.house.facing_degrees 配同一 house 的 north_reference=magnetic。逐候选按 candidate_id 关联证据；需要格局及原典数字对照时首轮用 natal_patterns。若传 xuankong.city_gate，追加 layers.xuankong_natal.city_gate_analysis，独立核对其参考运、状态和缺项。",
-    "natal_interpretation": "玄空有限解释需 xuankong.interpretation 显式启用 xuankong_conditioned_v1；当前评价运 current_period_number 与 period_evidence 成对，不改历史宅运。external_forms 按全宅中心八宫独立确认外部山形/水形，未知省略，照片保留候选，不复用金锁砂水或室内靠背；床/门取用结合顶层 placements.location_direction，桌/灶未覆盖。fields 追加 layout_analysis.natal_interpretation；仅有限五行与当令形势条件，不是完整81组合吉凶或可立即搬动建议。",
+    "layout_planning": "家具动作放layout_constraints；候选放layout_alternatives，声明changes并独立提供新位置placement/form_observation，许可和physically_feasible各自确认。候选fields追加layout_analysis.alternatives_analysis；ready表示可执行门槛，不表示各方法均有利或现实效力。",
+    "material_application": "material_facts.application显式选afsi_application_conditions_v1；有明确element_use才核相应水体清洁/流动、金属暴露/定性尺度或植物健康，各条件用value/observation_basis/evidence独立证据。",
+    "material_facts": "材料器形用environmental_context.material_facts：fact_id/object_id/material?/shape?/colour?/plant_alive?/observation_basis/evidence；至少一属性，未知用unknown，属性按独立证据粒度保存。element_use只明确询问wood_remedy等代表物资格，不是个人喜用或房屋所需元素。",
+    "method_reference": "纯方法/职业家具参考可用scene=home作通用家居参考查询标签，analyze_layout=false，按问题显式methods并投影method_details；年度对照仅加实际effective_year或确认的query_at。无真实环境事实时省略environmental_context，不提交空对象或仅household_scope。",
+    "natal_delivery": "询问玄空宅盘时确认已选 xuankong_natal（可用 methods 显式选中）。通用 first_view 用于已执行布局分析；宅盘首读用 evidence_views.natal_candidates 取历史定运、朝向、全部候选、待补事实和来源。缺磁向用 house.facing_degrees 或 xuankong.house.facing_degrees 配同一 house 的 north_reference=magnetic。",
+    "natal_interpretation": "玄空有限解释需 xuankong.interpretation 显式启用 xuankong_conditioned_v1；当前评价运 current_period_number 与 period_evidence 成对，不改历史宅运。external_forms 按全宅中心八宫独立确认外部山形/水形，未知省略，照片保留候选，不复用金锁砂水或室内靠背；床/门取用结合顶层 placements.location_direction，桌/灶未覆盖。",
     "natal_projection": "同次需要的视图在首轮合并 fields；result_delivery 只保留当次所选字段，分页沿同一 run 读回。兼容原始路径 layers.xuankong_natal.chart 只有唯一候选才有值；完整导出首次 fields=null。",
-    "scene_selection": "工位scene=workstation，合租scene=shared_rental，家居scene=home；自动按事实展开飞星、金锁、八宅，局部前两法优先，显式methods优先。不为优先级补年份或宅运；年盘不替代历史宅盘。独立形态/桌面/context不要求生辰或罗盘。无场景无作者无context保留原三法默认。场景首轮fields按需追加method_policy；细节参考按需读method_details。 method_policy.priority_review_status/missing与已选计算状态独立；available_engine_layers仅现状已完整计算层，候选读priority_review_by_scope.candidates及available_candidate_engine_layers，不以候选代替现状。priority_missing_inputs为可选审查索引，不是待传参数或必追问清单。",
+    "scene_selection": "工位scene=workstation，合租scene=shared_rental，家居scene=home；自动按事实展开飞星、金锁、八宅，局部前两法优先，显式methods优先。不为优先级补年份或宅运；年盘不替代历史宅盘。独立形态/桌面/context不要求生辰或罗盘。无场景无作者无context保留原三法默认。场景首轮fields按需追加method_policy；细节参考按需读method_details。",
     "surface_frame": "以坐着使用的桌沿为近沿near，远离坐者的桌沿为far；这是桌面坐标，不是房间前后或罗盘方向",
-    "workstation_measured": "有实际尺寸的人工标注用workstation_layout.scene；+y图纸前方、桌面+x右/+y远沿，米制尺寸/高度/眼高/头顶高分别明确。compass独立提供北基准、角误差、参考中心和chart_binding_confirmed，sector_anchor明确坐者或桌中心；不自动立极。照片/坐标误差保持候选，清单不完整时未列观察仍未知。search提供完整有限位置/角度域，复用layout_constraints搬转许可；实测同一对象不重复提交placements/form_observations/features或旧关系。fields按需追加layout_analysis.workstation_layout_analysis；保留全部search.receipts、拒绝与未显示前沿数量，不把ready或Pareto集合解释为风水总分。BTB与wofs_desktop_compass_v1须逐个明确另选；植物身份、状态及几何分别核对，向星不等于坐向或桌面水体需求。 搜索域可用positions或grid二选一；grid明确原点和步长，默认从房间/桌面生成中心候选。竖直屏幕可在items[].screen实测，检查整面透视遮挡，required_visible明确是否硬约束，不推断眩光。算法完工审查读取research_completion_status/research_coverage；请求complete不代表完整81或24山已完成。",
-    "workstation_review": "工位工作/学习用途用 environmental_context.workstation_review.activities，逐项显式选 workstation_activity_authored_v1 并给实际活动/证据；按 placements.location_direction 读取各候选宅盘向星，位置与朝向分开，不要求外部有水或桌上放水。评价运可用该review.evaluation_period独立确认，不以日期/宅运代替。入口隔挡用 entry_barriers 显式 afsi_entry_barrier_v1，分别登记实际入口/桌/隔挡、两端直线与隔挡介入观察及 operation；执行许可和通行/视野/操作/容纳独立。fields追加layout_analysis.workstation_analysis，rulesets/rule_trace保留。WOFS桌面只作reference_only，不开启固定吉位。",
+    "workstation_measured": "有实际尺寸的人工标注用workstation_layout.scene；+y图纸前方、桌面+x右/+y远沿，米制尺寸/高度/眼高/头顶高分别明确。compass独立提供北基准、角误差、参考中心和chart_binding_confirmed，sector_anchor明确坐者或桌中心；不自动立极。照片/坐标误差保持候选，清单不完整时未列观察仍未知。",
+    "workstation_review": "工位工作/学习用途用 environmental_context.workstation_review.activities，逐项显式选 workstation_activity_authored_v1 并给实际活动/证据；按 placements.location_direction 读取各候选宅盘向星，位置与朝向分开，不要求外部有水或桌上放水。评价运可用该review.evaluation_period独立确认，不以日期/宅运代替。",
     "zone_legend": {
       "far_center": "远中/远沿中",
       "far_left": "左后/远沿左",
@@ -6276,209 +6276,5 @@
     "title": "AssessRequest",
     "type": "object"
   },
-  "method_contracts": [
-    {
-      "comparison_requirements": [
-        "相同方法合同、实现与数据版本、选项及实际计算层"
-      ],
-      "dependencies": [
-        "validated_request"
-      ],
-      "error_sources": [
-        "civil_clock",
-        "calendar_model",
-        "north_reference",
-        "rule_adjudication"
-      ],
-      "implementation_refs": [
-        "src/fatebridge/services/fengshui.py"
-      ],
-      "limitations": [
-        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
-        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
-      ],
-      "method_id": "fatebridge.fengshui_minggua_bazhai.contract_v1",
-      "output_paths": [
-        "status",
-        "rulesets",
-        "coverage",
-        "rule_trace"
-      ],
-      "prerequisites": [
-        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
-      ],
-      "quantity_kind": "traditional_rule_result",
-      "role": "calculation",
-      "selector_fields": [
-        "ruleset_id",
-        "form_ruleset_id",
-        "element_ruleset_id",
-        "annual_remedy_ruleset_id",
-        "methods",
-        "jinsuo_ruleset_id",
-        "annual_ruleset_id"
-      ],
-      "source_refs": [
-        "docs/fengshui.md"
-      ],
-      "unit": "categorical",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "not_fully_accepted"
-      }
-    },
-    {
-      "comparison_requirements": [
-        "相同方法合同、实现与数据版本、选项及实际计算层"
-      ],
-      "dependencies": [
-        "validated_request"
-      ],
-      "error_sources": [
-        "north_reference",
-        "rule_adjudication"
-      ],
-      "implementation_refs": [
-        "src/fatebridge/services/fengshui.py"
-      ],
-      "limitations": [
-        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
-        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
-      ],
-      "method_id": "fatebridge.fengshui_jinsuo.contract_v1",
-      "output_paths": [
-        "status",
-        "rulesets",
-        "coverage",
-        "rule_trace"
-      ],
-      "prerequisites": [
-        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
-      ],
-      "quantity_kind": "traditional_rule_result",
-      "role": "calculation",
-      "selector_fields": [
-        "ruleset_id",
-        "form_ruleset_id",
-        "element_ruleset_id",
-        "annual_remedy_ruleset_id",
-        "methods",
-        "jinsuo_ruleset_id",
-        "annual_ruleset_id"
-      ],
-      "source_refs": [
-        "docs/fengshui.md"
-      ],
-      "unit": "categorical",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "not_fully_accepted"
-      }
-    },
-    {
-      "comparison_requirements": [
-        "相同方法合同、实现与数据版本、选项及实际计算层"
-      ],
-      "dependencies": [
-        "validated_request"
-      ],
-      "error_sources": [
-        "civil_clock",
-        "calendar_model",
-        "north_reference",
-        "rule_adjudication"
-      ],
-      "implementation_refs": [
-        "src/fatebridge/services/fengshui.py"
-      ],
-      "limitations": [
-        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
-        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
-      ],
-      "method_id": "fatebridge.fengshui_annual_monthly_stars.contract_v1",
-      "output_paths": [
-        "status",
-        "rulesets",
-        "coverage",
-        "rule_trace"
-      ],
-      "prerequisites": [
-        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
-      ],
-      "quantity_kind": "traditional_rule_result",
-      "role": "calculation",
-      "selector_fields": [
-        "ruleset_id",
-        "form_ruleset_id",
-        "element_ruleset_id",
-        "annual_remedy_ruleset_id",
-        "methods",
-        "jinsuo_ruleset_id",
-        "annual_ruleset_id"
-      ],
-      "source_refs": [
-        "docs/fengshui.md"
-      ],
-      "unit": "categorical",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "not_fully_accepted"
-      }
-    },
-    {
-      "comparison_requirements": [
-        "相同方法合同、实现与数据版本、选项及实际计算层"
-      ],
-      "dependencies": [
-        "validated_request"
-      ],
-      "error_sources": [
-        "civil_clock",
-        "calendar_model",
-        "north_reference",
-        "rule_adjudication"
-      ],
-      "implementation_refs": [
-        "src/fatebridge/services/fengshui.py"
-      ],
-      "limitations": [
-        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
-        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
-      ],
-      "method_id": "fatebridge.fengshui_xuankong_natal.contract_v1",
-      "output_paths": [
-        "status",
-        "rulesets",
-        "coverage",
-        "rule_trace"
-      ],
-      "prerequisites": [
-        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
-      ],
-      "quantity_kind": "traditional_rule_result",
-      "role": "calculation",
-      "selector_fields": [
-        "ruleset_id",
-        "form_ruleset_id",
-        "element_ruleset_id",
-        "annual_remedy_ruleset_id",
-        "methods",
-        "jinsuo_ruleset_id",
-        "annual_ruleset_id"
-      ],
-      "source_refs": [
-        "docs/fengshui.md"
-      ],
-      "unit": "categorical",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "not_fully_accepted"
-      }
-    }
-  ],
   "tool": "fengshui_assess"
 }

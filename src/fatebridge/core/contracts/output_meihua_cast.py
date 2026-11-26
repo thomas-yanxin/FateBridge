@@ -3,7 +3,8 @@
 from pydantic import JsonValue
 
 from fatebridge.core.contracts.output_chinese_calendar import Meihua
-from fatebridge.core.response_models import ProjectedOutput, RunMetadata
+from fatebridge.core.contracts.output_projection import ProjectedOutput
+from fatebridge.core.receipt_models import RunMetadata
 
 
 class MeihuaCastOutput(ProjectedOutput):

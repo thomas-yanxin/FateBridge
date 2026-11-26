@@ -293,7 +293,7 @@
           }
         ],
         "default": null,
-        "description": "出生民用时区；显式值优先，否则按唯一解析的birth_place补全。已给但无法解析的地名、或只有经度时须明确时区；地理信息全缺时沿用Asia/Shanghai并标记默认假设。出生与分析瞬间均转换到该时区计算农历虚岁，不移动分析课盘。",
+        "description": "出生民用时区；显式值优先，否则按唯一解析的birth_place补全。出生与分析瞬间均转换到该时区计算农历虚岁，不移动分析课盘。",
         "title": "Birth Timezone"
       },
       "birth_utc_offset": {
@@ -306,7 +306,7 @@
           }
         ],
         "default": null,
-        "description": "出生民用钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与显式或出生地补全后的出生时区核对并选择重复时刻，不替换命名时区。省略时拒绝歧义或不存在的出生钟时。仅用于出生民用时刻与农历年，不移动分析起课时刻。",
+        "description": "出生民用钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与出生时区核对并选择重复时刻，不替换命名时区。",
         "title": "Birth Utc Offset"
       },
       "birth_year": {
@@ -331,7 +331,7 @@
       },
       "guiren_profile": {
         "default": "liuren_common_v1",
-        "description": "大六壬昼夜贵人表；tanyuan_xieji_v1 仅采用探原贵人表，不代表全书取传配置。",
+        "description": "大六壬昼夜贵人表：liuren_common_v1 或 tanyuan_xieji_v1。",
         "enum": [
           "liuren_common_v1",
           "tanyuan_xieji_v1"
@@ -385,50 +385,5 @@
     "title": "LiuRengRunyearRequest",
     "type": "object"
   },
-  "method_contracts": [
-    {
-      "comparison_requirements": [
-        "相同方法合同、实现与数据版本、选项及实际计算层"
-      ],
-      "dependencies": [
-        "validated_request"
-      ],
-      "error_sources": [
-        "civil_clock",
-        "solar_clock",
-        "calendar_model",
-        "rule_adjudication"
-      ],
-      "implementation_refs": [
-        "src/fatebridge/services/metaphysics.py"
-      ],
-      "limitations": [
-        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
-        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
-      ],
-      "method_id": "fatebridge.liuren_course_and_transmissions.contract_v1",
-      "output_paths": [
-        "liureng",
-        "runyear"
-      ],
-      "prerequisites": [
-        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
-      ],
-      "quantity_kind": "traditional_rule_result",
-      "role": "calculation",
-      "selector_fields": [
-        "guiren_profile"
-      ],
-      "source_refs": [
-        "docs/algorithm-coverage.md"
-      ],
-      "unit": "categorical",
-      "validation_scope": {
-        "numerical": "method_specific_reference_required",
-        "real_world_validity": "not_established",
-        "source_conformity": "not_fully_accepted"
-      }
-    }
-  ],
   "tool": "liuren_yearly_timing"
 }

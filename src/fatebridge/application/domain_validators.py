@@ -2,41 +2,16 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel
+from typing import TYPE_CHECKING
 
-from fatebridge.application.human_design_knowledge_binding import (
-    require_human_design_reference_binding,
-)
-from fatebridge.application.meihua_clock_binding import require_meihua_clock_binding
-from fatebridge.application.numerology_knowledge_binding import (
-    require_reference_binding,
-)
-from fatebridge.application.ren_request_binding import require_request_binding
 from fatebridge.application.tool_spec import (
     OutputContractError,
     ServiceResult,
     ToolSpec,
 )
-from fatebridge.core.contracts.output_bazi_anchors import require_complete_bazi_anchors
-from fatebridge.core.contracts.output_ren_anchors import require_complete_ren_anchors
-from fatebridge.core.numerology.canping_schedule_validation import (
-    require_schedule_binding,
-)
-from fatebridge.core.numerology.numerology_clock_input import (
-    require_clock_input_binding as require_numerology_clock_input_binding,
-)
-from fatebridge.core.requests.divination import (
-    CanpingRequest,
-    HeluoRequest,
-    MeihuaAnalysisRequest,
-    SuZhanRequest,
-)
-from fatebridge.core.requests.reference import (
-    KnowledgeReadRequest,
-    KnowledgeRegistryRequest,
-)
-from fatebridge.core.sukuyo.suzhan_clock_input import require_clock_input_binding
-from fatebridge.utils.errors import EphemerisSourceError
+
+if TYPE_CHECKING:
+    from pydantic import BaseModel
 
 _EXPECTED_CHART_TYPES = {
     "astrology_chart": "chart",
@@ -54,6 +29,10 @@ def validate_bazi_anchors(
     request: BaseModel | None,
     _validated: BaseModel | None,
 ) -> None:
+    from fatebridge.core.contracts.output_bazi_anchors import (
+        require_complete_bazi_anchors,
+    )
+
     try:
         require_complete_bazi_anchors(spec.name, result)
     except ValueError as exc:
@@ -66,11 +45,18 @@ def validate_ren_output(
     request: BaseModel | None,
     _validated: BaseModel | None,
 ) -> None:
+    from fatebridge.application.ren_request_binding import require_request_binding
+    from fatebridge.core.contracts.output_ren_anchors import (
+        require_complete_ren_anchors,
+    )
+
     try:
         require_complete_ren_anchors(spec.name, result)
     except ValueError as exc:
         raise OutputContractError("完整六壬金口诀输出缺少计算依据") from exc
     if request is not None:
+        from fatebridge.utils.errors import EphemerisSourceError
+
         try:
             require_request_binding(spec.name, result, request)
         except EphemerisSourceError:
@@ -85,6 +71,9 @@ def validate_suzhan_clock(
     request: BaseModel | None,
     _validated: BaseModel | None,
 ) -> None:
+    from fatebridge.core.requests.divination import SuZhanRequest
+    from fatebridge.core.sukuyo.suzhan_clock_input import require_clock_input_binding
+
     assert request is None or isinstance(request, SuZhanRequest)
     try:
         require_clock_input_binding(result, request=request)
@@ -100,6 +89,8 @@ def validate_meihua_clock(
 ) -> None:
     if request is None:
         return
+    from fatebridge.application.meihua_clock_binding import require_meihua_clock_binding
+    from fatebridge.core.requests.divination import MeihuaAnalysisRequest
 
     assert isinstance(request, MeihuaAnalysisRequest)
     try:
@@ -114,6 +105,11 @@ def validate_numerology_clock(
     request: BaseModel | None,
     _validated: BaseModel | None,
 ) -> None:
+    from fatebridge.core.numerology.numerology_clock_input import (
+        require_clock_input_binding as require_numerology_clock_input_binding,
+    )
+    from fatebridge.core.requests.divination import CanpingRequest, HeluoRequest
+
     assert request is None or isinstance(request, (CanpingRequest, HeluoRequest))
     require_numerology_clock_input_binding(
         result, requested_time=request.time if request is not None else None
@@ -126,6 +122,10 @@ def validate_canping_schedule(
     _request: BaseModel | None,
     validated: BaseModel | None,
 ) -> None:
+    from fatebridge.core.numerology.canping_schedule_validation import (
+        require_schedule_binding,
+    )
+
     parsed = (
         (
             getattr(validated, "canping_timing"),
@@ -146,8 +146,18 @@ def validate_knowledge_bindings(
 ) -> None:
     if request is None or spec.name not in {"knowledge_read", "knowledge_catalog"}:
         return
-    else:
-        assert isinstance(request, (KnowledgeReadRequest, KnowledgeRegistryRequest))
+    from fatebridge.application.human_design_knowledge_binding import (
+        require_human_design_reference_binding,
+    )
+    from fatebridge.application.numerology_knowledge_binding import (
+        require_reference_binding,
+    )
+    from fatebridge.core.requests.reference import (
+        KnowledgeReadRequest,
+        KnowledgeRegistryRequest,
+    )
+
+    assert isinstance(request, (KnowledgeReadRequest, KnowledgeRegistryRequest))
     require_human_design_reference_binding(result, request)
     require_reference_binding(result, request)
 

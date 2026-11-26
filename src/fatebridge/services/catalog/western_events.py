@@ -2,16 +2,15 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel
-
-from fatebridge.application.bindings import ServiceRef, bind_kwargs, service_ref
-from fatebridge.application.tool_spec import ToolSpec
-from fatebridge.core.requests.western_events import (
-    AstroElectionRequest,
-    AstroExtraReturnsRequest,
-    AstroHoraryRequest,
-    AstroMundaneRequest,
+from fatebridge.application.bindings import (
+    ServiceRef,
+    bind_kwargs,
+    request_model_ref,
+    service_ref,
 )
+from fatebridge.application.tool_spec import ToolSpec
+
+_REQ_MODULE = "fatebridge.core.requests.western_events"
 
 calculate_election = service_ref(
     "fatebridge.services.western_election", "calculate_election"
@@ -32,13 +31,13 @@ calculate_horary = service_ref("fatebridge.services.western_horary", "calculate_
 
 
 def _western_event_spec(
-    name: str, service: ServiceRef, model: type[BaseModel], label: str
+    name: str, service: ServiceRef, model_name: str, label: str
 ) -> ToolSpec:
     """Register a western ephemeris-event technique (ingress chart / planetary return)."""
     return ToolSpec(
         name=name,
         bind=bind_kwargs(service),
-        request_model=model,
+        request_model_loader=request_model_ref(_REQ_MODULE, model_name),
         summary=(
             "按明确提问时刻起盘，核算月亮出宫前黄经事件与原典条件；禁生死/疾病/生育判断。"
             if name == "horary_chart"
@@ -60,25 +59,25 @@ SPECS: list[ToolSpec] = [
     _western_event_spec(
         "mundane_ingress_chart",
         calculate_mundane,
-        AstroMundaneRequest,
+        "AstroMundaneRequest",
         "世俗入宫盘",
     ),
     _western_event_spec(
         "planetary_returns",
         calculate_extrareturns,
-        AstroExtraReturnsRequest,
+        "AstroExtraReturnsRequest",
         "多重回归",
     ),
     _western_event_spec(
         "horary_chart",
         calculate_horary,
-        AstroHoraryRequest,
+        "AstroHoraryRequest",
         "卜卦证据",
     ),
     _western_event_spec(
         "evaluate_election_time",
         calculate_election,
-        AstroElectionRequest,
+        "AstroElectionRequest",
         "择日",
     ),
 ]

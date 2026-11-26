@@ -12,7 +12,6 @@ from fatebridge.core.requests.base import (
     WesternChartSystemFields,
 )
 from fatebridge.core.requests.birth import AstroBirthRequest
-from fatebridge.core.requests.western_policy import WesternEphemerisRequest
 
 
 class WesternTimingBaseRequest(
@@ -20,7 +19,6 @@ class WesternTimingBaseRequest(
     OptionalAnalysisClockFields,
     WesternChartSystemFields,
     AstroBirthRequest,
-    WesternEphemerisRequest,
 ):
     """Shared base request model for western predictive timing techniques."""
 

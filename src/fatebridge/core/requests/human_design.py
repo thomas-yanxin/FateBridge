@@ -4,10 +4,6 @@ from typing import Literal
 
 from pydantic import Field, model_validator
 
-from fatebridge.core.human_design.human_design_birth_clock import resolve_birth_clock
-from fatebridge.core.human_design.human_design_cycle_input import (
-    validate_cycle_reference,
-)
 from fatebridge.core.requests.base import FateBridgeBaseRequest
 
 
@@ -58,6 +54,10 @@ class HumanDesignRequest(FateBridgeBaseRequest):
 
     @model_validator(mode="after")
     def _validate_clock(self) -> "HumanDesignRequest":
+        from fatebridge.core.human_design.human_design_birth_clock import (
+            resolve_birth_clock,
+        )
+
         resolve_birth_clock(
             birth_year=self.birth_year,
             birth_month=self.birth_month,
@@ -68,6 +68,10 @@ class HumanDesignRequest(FateBridgeBaseRequest):
             birth_timezone=self.birth_timezone,
         )
         if self.cycle_reference_datetime is not None:
+            from fatebridge.core.human_design.human_design_cycle_input import (
+                validate_cycle_reference,
+            )
+
             validate_cycle_reference(
                 **self.model_dump(
                     include={

@@ -234,9 +234,7 @@ def test_exact_clock_reaches_every_timing_engine_through_all_transports(
         context = output["analysis_context"]
         assert context["analysis_datetime"] == "2026-10-14T12:07:00+08:00"
         assert context["birth_datetime"] == "1990-05-15T10:30:00+09:00"
-        assert (
-            output["run_metadata"]["determinism"]["current_time_fields_defaulted"] == []
-        )
+        assert "current_time_frozen" not in output["run_metadata"]["warnings"]
     business = [
         {k: v for k, v in output.items() if k != "run_metadata"}
         for output in [response.json(), complete, cli_payload]
