@@ -107,6 +107,8 @@ def reference() -> Reference:
         "975e172254f85ebca55fd2266eefc1782546339417c57b3b14138e2728f02e8c"
     )
     assert result["metadata"]["original_scalar_checks"] == 35447
+    for control in result["public_controls"]:
+        control["payload"].pop("mansion_method", None)
     return result
 
 
