@@ -3,7 +3,6 @@
 from itertools import pairwise
 from typing import Any, Mapping, Sequence
 
-from fatebridge.core.stem_order_review import stem_order_review_snapshot_line
 from fatebridge.utils.data import STEM_ELEMENTS, Element
 
 ORDER = ("year", "month", "day", "hour")
@@ -99,27 +98,3 @@ def evaluate_stem_effects(
         "energies": energies,
         "scope": "每个非日干原字预算1；唯一邻合且不含日干者合绊，预算作用于未舍入能量。不计算局部成化或日主化气格。",
     }
-
-
-def stem_energy_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
-    """Explain only supplied applied energy; do not calculate another chart."""
-    receipt = assessment.get("stem_energy_accounting")
-    if not receipt or not receipt.get("ledger"):
-        return []
-    names = {"year": "年干", "month": "月干", "hour": "时干"}
-    details = [
-        f"{names[r['pillar']]}{r['physical_stem']}：预算{r['available_budget']:g}"
-        f"×根激活{r['activation']:.6f}×季相{r['seasonal_factor']:g}"
-        f"＝{r['energy']:.6f}"
-        for r in receipt["ledger"]
-    ]
-    lines = [
-        "天干计力（工程量）："
-        + "；".join(details)
-        + "。计算用未取整值，以上仅作展示。",
-        "本次五合采用既有合绊政策，未据此认定局部成化或日主化气格。",
-    ]
-    line = stem_order_review_snapshot_line(receipt.get("source_order_review") or {})
-    if line:
-        lines.append(line)
-    return lines

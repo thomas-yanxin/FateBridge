@@ -366,7 +366,7 @@ def _horary_ephemeris_source_identity(
             if (
                 basis.get("julian_day_ut1") is not None
                 or earth_rotation_model
-                or hasattr(subject, "first_house")
+                or getattr(subject, "first_house", None) is not None
             )
             else None
         ),

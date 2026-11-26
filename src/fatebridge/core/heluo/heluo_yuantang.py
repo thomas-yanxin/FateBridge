@@ -102,39 +102,3 @@ def source_profile() -> dict[str, Any]:
         "source_pdf_pages": list(range(26, 33)),
         "review_status": "single_visual_collation; independent_second_review_pending",
     }
-
-
-def derivation_snapshot(evidence: dict[str, Any]) -> str:
-    half = evidence["half_year"]
-    layout = evidence["placement"]
-    if half["value"] is None:
-        half_text = "至点半年未定；两个半年所得元堂和后天卦相同，保留可唯一计算结果"
-    else:
-        half_text = (
-            "阳令（冬至至夏至）" if half["value"] else "阴令（夏至至冬至）"
-        ) + f"；来源{half['basis']}"
-    pages = "、".join(map(str, layout["source_pdf_pages"]))
-    direction = (
-        "；纯卦自上而下"
-        if layout["pure_direction"] == "descending"
-        else "；纯卦自下而上" if layout["pure_direction"] == "ascending" else ""
-    )
-    comparison = "；".join(
-        f"{'阳' if c['yang_ling'] else '阴'}令：元堂{c['xian_yuan']}爻→{c['hou_name']}{c['hou_yuan']}爻"
-        for c in half["counterfactuals"]
-    )
-    move = (
-        "交换上下卦"
-        if evidence["houtian_transform"]["swap_trigrams"]
-        else "三至尊变而不易，上下卦不交换"
-    )
-    return "\n".join(
-        [
-            "[元堂起例与阴阳令]",
-            f"{evidence['gender']}命；" + half_text + "。",
-            f"{layout['hour_zhi']}时属于{'子至巳阳' if layout['hour_half']=='yang' else '午至亥阴'}时组第{layout['hour_index']}位{direction}；依次爻位{layout['slot_positions']}，实际取{layout['selected_pos']}爻（PDF第{pages}页）。",
-            f"所取元堂爻先变，随后{move}；后天元堂{evidence['houtian_transform']['resulting_yuan']}爻。",
-            "半年反事实比较（非两个实际出生时刻）：" + comparison + "。",
-            "元堂定位不等于完整得体或葉否；图式单次目校，待独立复核。",
-        ]
-    )

@@ -7,9 +7,8 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Callable
 
+from fatebridge.core.ephemeris_runtime import lock_ephemeris_configuration
 from fatebridge.utils.errors import EphemerisSourceError
-
-from .ephemeris_runtime import lock_ephemeris_configuration
 
 POLICY_ID = (
     "same_epoch_moshier_preflight_then_requested_swiss_before_fixed_source_bisection_v1"

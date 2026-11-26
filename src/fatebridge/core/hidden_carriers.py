@@ -134,25 +134,3 @@ def build_natal_hidden_carriers(
         "source": deepcopy(SOURCE),
         "scope": SCOPE,
     }
-
-
-def hidden_carrier_snapshot_lines(receipt: Mapping[str, Any]) -> list[str]:
-    """Render the supplied natal table, without calculating another chart."""
-    labels = {"year": "年柱", "month": "月柱", "day": "日柱", "hour": "时柱"}
-    lines = []
-    for row in receipt.get("pillars") or []:
-        covered = [
-            t for t in row["targets"] if t["covering_candidate_if_target_desired"]
-        ]
-        if covered:
-            names = "、".join(
-                t["hidden_stem"] + "（" + t["ten_god"] + "）" for t in covered
-            )
-            lines.append(
-                f"{labels[row['position']]}{row['pillar']}：干克本柱藏干{names}；仅在这些藏干为所喜时列盖头候选。"
-            )
-    if lines:
-        lines.append(
-            "藏干目标与支本气分别列示；生克关系未裁定真实喜忌、作用程度、救应或根损。"
-        )
-    return lines

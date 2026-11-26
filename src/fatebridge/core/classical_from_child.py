@@ -153,19 +153,3 @@ def build_from_child_reference(
         "source": deepcopy(SOURCE),
         "scope": "原注区分成象、从象、伤官；任注另说明从儿不同于从财官。此处只形式化可观察的进入条件及条件喜忌；两柱出现为工程筛选约定，不是古籍力量常数，不证明完整成格或现实预测。未因比劫透出或日主有根排除，也未将藏印官杀抹去。",
     }
-
-
-def from_child_snapshot_lines(profile: Mapping[str, Any]) -> list[str]:
-    """Explain the supplied receipt; do not recalculate or select a structure."""
-    ref = profile.get("from_child_reference") or {}
-    if not ref.get("ordinary_fuyi_requires_review"):
-        return []
-    directions = ref["conditional_direction"]["if_route_is_formed"]
-    return [
-        "任注顺局从儿路径：月柱食伤、食伤分布与财星的可观察条件已见，成气、承接与救应仍待裁定；从儿不以普通身强弱为必要条件。",
-        "若从儿成立，条件方向为食伤、财（"
-        + "、".join(directions["useful_elements"])
-        + "）；印、官杀（"
-        + "、".join(directions["avoid_elements"])
-        + "）为条件忌。当前普通扶抑列条件参考，未授予全局喜忌。",
-    ]

@@ -374,13 +374,3 @@ def boundary_context(
         "leap_table_expires_at": leap_table()["expires_at"],
         "scope": "Complete original horizon, actual Lichun receipts and same-run selection. Future UTC/leap seconds and IANA rules remain conditional; event coverage is not classical or real-world prediction certification.",
     }
-
-
-def projection_snapshot(context: dict[str, Any]) -> str:
-    return (
-        "[参平年序·实际立春来源]\n"
-        f"出生民用年{context['origin_civil_year']}，干支年标签{context['origin_bazi_year']}；"
-        f"保留{context['horizon_years']}年序及{context['boundary_count']}个边界。\n"
-        f"实际模型：{'、'.join(context['observed_models'])}。派生立春许可不扩大公开模型年份；"
-        "未来UTC与时区仍按所列条件，120年范围不是寿命估计。"
-    )

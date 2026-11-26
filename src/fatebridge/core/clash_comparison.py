@@ -58,39 +58,3 @@ def build_clash_comparison(
         "classical_effective_force": "not_adjudicated",
         "scope": SCOPE,
     }
-
-
-def clash_comparison_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
-    """Format supplied decisions; missing comparison remains missing."""
-    receipt = assessment.get("clash_comparison")
-    if not receipt or not receipt.get("events"):
-        return []
-    labels = {"year": "年支", "month": "月支", "day": "日支", "hour": "时支"}
-    lines = []
-    for row in receipt["events"]:
-        seats = "与".join(
-            labels[p] + b for p, b in zip(row["positions"], row["branches"])
-        )
-        if row["calculation_branch"] == "combination_resolution":
-            lines.append(f"六冲工程依据：{seats}本次按合解冲分支处理，未比较冲力。")
-        elif row["calculation_branch"] == "ordered_generation_path_resolution":
-            middle = "、".join(labels[p] for p in row["intermediary_positions"])
-            lines.append(
-                f"六冲来源依据：{seats}经{middle}进入完整有序杀印身通关分支，未扣根或比较预算输赢。"
-            )
-        elif row["calculation_branch"] == "storage_movement":
-            lines.append(f"六冲工程依据：{seats}本次按四墓土冲动分支处理，未比较冲力。")
-        else:
-            powers = "、".join(
-                f"{p['element']}初始藏干预算{p['raw_budget']:.6f}"
-                for p in row["powers"]
-            )
-            factors = "、".join(
-                f"{labels[p]}{m:g}"
-                for p, m in (row["applied_root_retention"] or {}).items()
-            )
-            lines.append(f"六冲工程依据：{seats}，{powers}；本次保留系数{factors}。")
-    lines.append(
-        "初始预算比较未含盖头、间接生扶、距离权重或寒暖；工程保留不等于原典有效根力与拔根裁定。"
-    )
-    return lines

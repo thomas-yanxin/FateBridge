@@ -151,30 +151,3 @@ def annotate_positions(
         "source_issues": deepcopy([i for i in data["order_issues"] if i["gua"] == gua]),
         "source_scope": "Actual positions checked against eight pure-table bases; individual composite-entry collation only where source.basis=hexagram_entry. List order in unresolved entries is not silently identified with line order.",
     }
-
-
-def najia_snapshot(assessments: list[dict[str, Any]]) -> str:
-    lines = ["[年命纳甲与来源]"]
-    for row in assessments:
-        phase = "先天" if row["phase"] == "xian" else "后天"
-        if not row["matches"]:
-            lines.append(
-                f"{phase}·{row['gua']}：出生年{row['year_ganzhi']}未命中本阶段六爻正纳／借用。"
-            )
-        for match in row["matches"]:
-            entry = row["lines"][match["pos"] - 1]
-            source = entry["source"]
-            basis = (
-                "卦条目所列"
-                if source["basis"] == "hexagram_entry"
-                else "按纯卦内外位推演"
-            )
-            kind = "正纳" if match["kind"] == "direct" else "借用"
-            lines.append(
-                f"{phase}·{row['gua']}：出生年{row['year_ganzhi']}命中计算第{match['pos']}爻{kind}；{basis}，依据{source['source_hexagram']}，PDF第{source['source_pdf_page']}页。"
-            )
-        if row.get("source_issues"):
-            lines.append(
-                f"{phase}·{row['gua']}：两印本原文列举末两支顺序与计算爻序不同，成员相同；列举是否按爻位仍未决，不据此换位或称该卦逐爻已核。"
-            )
-    return "\n".join(lines)

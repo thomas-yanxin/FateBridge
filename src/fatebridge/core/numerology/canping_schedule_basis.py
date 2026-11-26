@@ -42,14 +42,6 @@ SUMMARIES = MappingProxyType(
         ),
     }
 )
-ROLE_LABELS = MappingProxyType(
-    {
-        "applied_rule": "本次采用的原句",
-        "supplementary_ziping_background": "另书子平背景",
-        "source_context": "来源语境",
-        "comparison_not_applied": "对照而未采用",
-    }
-)
 
 
 def clause_role(profile: str, clause: dict[str, Any]) -> str:
@@ -214,19 +206,3 @@ def build_schedule_basis(profile: str, timing: dict, clock: dict) -> dict[str, A
         ),
         "summary": SUMMARIES[profile],
     }
-
-
-def schedule_basis_snapshot(basis: dict) -> str:
-    lines = ["[配运原典与日期映射]", basis["summary"]]
-    context = basis.get("reading_context")
-    if context is not None:
-        lines.append(context["date_mapping_statement"])
-        for citation in context["source_citations"]:
-            source = basis["sources"][citation["source_id"]]
-            pages = "、".join(map(str, citation["pdf_pages"]))
-            roles = "、".join(ROLE_LABELS[role] for role in citation["roles"])
-            lines.append(
-                f"出处：《{source['title']}》；{source['edition']}；"
-                f"PDF第{pages}页；本次角色：{roles}。书影：{source['url']}"
-            )
-    return "\n".join(lines)

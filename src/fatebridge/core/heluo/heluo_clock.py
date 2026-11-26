@@ -266,29 +266,3 @@ def attach_clock_evidence(
         )
     )
     evidence["interpretation_constraints"].extend(profile["constraints"])
-
-
-def source_clock_snapshot(profile: dict[str, Any]) -> str:
-    branches = "".join(profile["extra_branches_in_printed_order"])
-    lengths = {row["branch"]: row["length_ke"] for row in profile["branch_lengths"]}
-    long_ke = lengths[profile["extra_branches_in_printed_order"][0]]
-    ordinary = profile["base_ke"] // 12
-    literal = profile["daily_extra_literal"]
-    required = profile["equal_shi_projection"][
-        "fen_per_ke_required_for_numeric_closure"
-    ]
-    ratio = (
-        str(required["numerator"])
-        if required["denominator"] == 1
-        else f"{required['numerator']}/{required['denominator']}"
-    )
-    shift = profile["branch_shift_projection"]
-    source_days = shift["total_source_days"]
-    days = f"{source_days['numerator']}/{source_days['denominator']}"
-    if source_days["denominator"] == 1:
-        days = str(source_days["numerator"])
-    return (
-        f"[卷一百刻原式]\n{branches}各{long_ke}刻，其余各{ordinary}刻，合{profile['day_ke']}刻。每日添{literal['ke']}刻{literal['fen']}分的分制仍未核定。\n"
-        f"以支初为相对原点，六日进一支的{shift['year_blocks']}块推演合{days}源日；日内添分和实际节月仍未接通。\n"
-        f"原式未换成本次出生钟面或实际日卦日期；等时推算中的每刻{ratio}分不作原典默认值。"
-    )

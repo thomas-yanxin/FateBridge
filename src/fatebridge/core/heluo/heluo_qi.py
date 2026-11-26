@@ -2,20 +2,9 @@
 
 from typing import Any
 
-from fatebridge.core.heluo.heluo_opposition import (
-    opposition_evidence,
-    opposition_snapshot,
-)
+from fatebridge.core.heluo.heluo_opposition import opposition_evidence
 
 RULESET_ID = "heluo_wenming_phase_qi_v1"
-LABELS = {
-    "yuan_tian": "天元气",
-    "yuan_di": "地元气",
-    "fan_yuan_tian": "反天元气候选",
-    "fan_yuan_di": "反地元气候选",
-    "huagong": "化工",
-    "fanhua": "反化工",
-}
 
 
 def phase_qi_evidence(
@@ -113,30 +102,3 @@ def phase_qi_evidence(
             "未按气虚、制化、轻重及元堂等条件完成综合葉否；不得自动选定条文分支。",
         ],
     }
-
-
-def phase_qi_snapshot(evidence: dict[str, Any]) -> str:
-    lines = ["[先后天·元气化工分列]"]
-    body_labels = {
-        "lower": "下体",
-        "upper": "上体",
-        "lower_nuclear": "下互",
-        "upper_nuclear": "上互",
-    }
-    for row in evidence["phases"]:
-        phase = "先天" if row["phase"] == "xian" else "后天"
-        bodies = {b["body_id"]: b for b in row["bodies"]}
-        clauses = []
-        for kind, match in row["matches"].items():
-            ids = match["direct_body_ids"] + match["nuclear_body_ids"]
-            detail = "、".join(
-                f"{body_labels[bodies[i]['kind']]}{bodies[i]['trigram']}" for i in ids
-            )
-            status = (
-                detail if ids else "无" if match["present"] is False else "候选未定"
-            )
-            clauses.append(f"{LABELS[kind]}{''.join(match['trigrams'])}：{status}")
-        lines.append(f"{phase}·{row['gua']}：" + "；".join(clauses))
-    lines.append("各项为实际卦体命中；先后天分开，综合葉否未定。")
-    lines.extend(["", opposition_snapshot(evidence["yuanqi_opposition"])])
-    return "\n".join(lines)
