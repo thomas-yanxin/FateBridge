@@ -155,9 +155,7 @@ async def test_only_published_inputs_and_views_are_enough_for_real_mcp_calls(
             )
             assert not result.is_error
             payload = result.structured_content
-            assert (
-                payload["run_metadata"]["tool_name"] == specs[record["tool"]].name
-            )
+            assert payload["run_metadata"]["tool_name"] == specs[record["tool"]].name
             if record["tool"] == "bazi_career":
                 career = payload["career_analysis"]
                 first_view = career["evidence_chain"]["topic"]["first_view"]

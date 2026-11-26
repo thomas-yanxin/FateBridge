@@ -71,9 +71,7 @@
       "time_sensitivity.status",
       "time_sensitivity.uncertainty_minutes",
       "person_info"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,

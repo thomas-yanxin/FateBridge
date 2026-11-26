@@ -455,9 +455,7 @@
       "liureng.ruleset.classical_acceptance_passed",
       "synthesis.time_scopes",
       "synthesis.limitations"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,
@@ -561,14 +559,6 @@
         "description": "奇门：ju_method=zhirun（置闰）/chaibu（拆补）；god_profile=yanyi_text（默认卷三正文）/yanyi_diagrams（卷四圆图）；season_profile=yanyi_vol1_verse（默认卷一赋）/yanyi_vol3_table/yanyi_vol3_prose；仅支持转盘layout=direct和零平移",
         "title": "Qimen Options",
         "type": "object"
-      },
-      "selected_sections": {
-        "description": "Optional snapshot section titles for filtered export payload",
-        "items": {
-          "type": "string"
-        },
-        "title": "Selected Sections",
-        "type": "array"
       },
       "taiyi_options": {
         "additionalProperties": true,

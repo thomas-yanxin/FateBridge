@@ -171,7 +171,7 @@ SPECS: list[ToolSpec] = [
         request_model=AstroNatalChartRequest,
         summary=(
             "离线西占本命盘（优先本地高精度星历，缺失时回退近似模型）；"
-            "可选 apparent_model=\"opaque_solar\" 附加真太阳偏折位置层。"
+            '可选 apparent_model="opaque_solar" 附加真太阳偏折位置层。'
         ),
         operation_label_zh="星盘",
         family="astro",

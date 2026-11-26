@@ -9,7 +9,10 @@ import pytest
 
 @pytest.fixture(scope="session")
 def current_raw_business() -> Callable[[str], dict[str, Any]]:
-    from fatebridge.application.execution import invoke_validated_service, result_is_error
+    from fatebridge.application.execution import (
+        invoke_validated_service,
+        result_is_error,
+    )
     from fatebridge.core.execution_context import call_clock
     from fatebridge.services.tool_catalog import CATALOG
     from tests.fixtures.surface_payloads import MCP_CASES, REST_POST_CASES

@@ -22,6 +22,7 @@ def assess(**kwargs):
 def calculate_bazhai(**kwargs):
     return _calculate_bazhai(BazhaiRequest.model_validate(kwargs))
 
+
 EVIDENCE = (
     "star",
     "expected_polarity",
@@ -137,9 +138,7 @@ def test_each_proposed_direction_reproduces_a_fresh_forward_calculation() -> Non
                 assert {**metadata, **proposed[key]} == finding[key]
 
 
-def test_unconfirmed_personal_candidates_remain_distinct_in_every_scope() -> (
-    None
-):
+def test_unconfirmed_personal_candidates_remain_distinct_in_every_scope() -> None:
     data = request(unknown_convention=True)
     data.pop("house")
     result = assess(**data)
@@ -156,7 +155,9 @@ def test_unconfirmed_personal_candidates_remain_distinct_in_every_scope() -> (
     assert by_conv["male"]["matching_directions"] == ["N", "E", "SE", "S"]
     assert by_conv["female"]["matches_convention"] is False
     assert by_conv["female"]["star"]["name"] == "六煞"
-    assert by_conv["female"]["palace_star_relationship"]["traditional_label"] == "星生宫"
+    assert (
+        by_conv["female"]["palace_star_relationship"]["traditional_label"] == "星生宫"
+    )
     assert by_conv["female"]["matching_directions"] == ["NE", "SW", "W", "NW"]
 
 
@@ -200,7 +201,9 @@ def test_layout_proof_and_readable_candidate_scopes_match_all_transports(
     protocol = asyncio.run(mcp_call("assess", data))
     path = tmp_path / "fidelity.json"
     path.write_text(json.dumps(data))
-    assert run(["fengshui_assess", "--request-file", str(path), "--detail", "audit"]) == 0
+    assert (
+        run(["fengshui_assess", "--request-file", str(path), "--detail", "audit"]) == 0
+    )
     cli = json.loads(capsys.readouterr().out)
     assert http.status_code == 200 and not protocol.is_error
     assert (

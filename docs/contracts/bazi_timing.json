@@ -117,9 +117,7 @@
       "analysis_calendar.analysis_date_context.next_solar_term.name",
       "analysis_calendar.analysis_date_context.next_solar_term.datetime_with_offset",
       "analysis_calendar.analysis_date_context.bazi_month_boundary.branch"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,
@@ -357,14 +355,6 @@
         "default": "未提供",
         "description": "姓名（可选，仅用于结果快照中的标识，不参与计算）",
         "title": "Name"
-      },
-      "selected_sections": {
-        "description": "Optional snapshot section titles for filtered export payload",
-        "items": {
-          "type": "string"
-        },
-        "title": "Selected Sections",
-        "type": "array"
       },
       "use_true_solar_time": {
         "default": true,

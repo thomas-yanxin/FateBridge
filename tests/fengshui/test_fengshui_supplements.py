@@ -400,7 +400,9 @@ def test_supplements_match_real_rest_mcp_cli_and_output_schema(
     protocol = asyncio.run(call())
     path = tmp_path / "layout.json"
     path.write_text(json.dumps(inputs))
-    assert run(["fengshui_assess", "--request-file", str(path), "--detail", "audit"]) == 0
+    assert (
+        run(["fengshui_assess", "--request-file", str(path), "--detail", "audit"]) == 0
+    )
     cli = json.loads(capsys.readouterr().out)
     assert rest.status_code == 200 and not protocol.is_error
     assert (

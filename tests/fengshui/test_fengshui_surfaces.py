@@ -33,7 +33,9 @@ def test_all_residential_tools_match_rest_mcp_cli(
     protocol = asyncio.run(mcp_call(name, inputs))
     request_file = tmp_path / "住宅.json"
     request_file.write_text(json.dumps(inputs, ensure_ascii=False))
-    code = run([SPECS[name].name, "--request-file", str(request_file), "--detail", "audit"])
+    code = run(
+        [SPECS[name].name, "--request-file", str(request_file), "--detail", "audit"]
+    )
     cli_body = json.loads(capsys.readouterr().out)
     assert response.status_code == 200, response.text
     assert not protocol.is_error

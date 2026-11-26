@@ -11,7 +11,10 @@ from fastmcp import Client
 
 import fatebridge.api as api
 from fatebridge.application.description import describe_spec
-from fatebridge.application.execution import execute_with_receipt, invoke_validated_service
+from fatebridge.application.execution import (
+    execute_with_receipt,
+    invoke_validated_service,
+)
 from fatebridge.cli import run
 from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.core.jyotish.jyotish_dasha_levels import YEAR_DAYS

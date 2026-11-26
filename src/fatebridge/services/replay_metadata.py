@@ -231,9 +231,7 @@ def execution_receipt(
     if spec.resolve_time_defaults is not None:
         time_defaults = spec.resolve_time_defaults(result, time_defaults)
     warnings = (
-        [
-            "current_time_frozen"
-        ]
+        ["current_time_frozen"]
         if clock.reads and (time_defaults or policy.implicit_current_time)
         else []
     ) + (["random_seed_generated"] if generated_seed else [])

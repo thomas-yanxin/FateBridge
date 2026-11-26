@@ -42,7 +42,9 @@ def measured_request(
 
 
 def measured_result(request: dict[str, JsonValue]) -> dict[str, JsonValue]:
-    return _assess(AssessRequest.model_validate(request))["layout_analysis"]["workstation_layout_analysis"]
+    return _assess(AssessRequest.model_validate(request))["layout_analysis"][
+        "workstation_layout_analysis"
+    ]
 
 
 def body(

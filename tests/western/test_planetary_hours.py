@@ -169,5 +169,5 @@ def test_hellen_chart_computes_planetary_hours() -> None:
     payload = calculate_core_chart_analysis(
         chart_variant="hellen_chart", use_true_solar_time=True, **_NATAL
     )
-    assert payload["planetary_hours"]["birth_hour_lord"]
-    assert payload["planetary_hours"]["day_lord"]
+    assert payload["planetary_hours"]["hour_ruler"]
+    assert payload["planetary_hours"]["day_ruler"]

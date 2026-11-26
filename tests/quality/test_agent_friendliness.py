@@ -14,8 +14,8 @@ import fatebridge.api as api
 from fatebridge import cli
 from fatebridge.application.description import describe_spec
 from fatebridge.application.examples import example_input
-from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.transports import cached_mcp_app
@@ -60,7 +60,9 @@ async def test_stranger_agent_mcp_loop_and_error_recovery() -> None:
         # 3. Step 2: q= search narrows to relevant tools.
         searched = await client.call_tool("discover_tools", {"q": "法达"})
         assert not searched.is_error
-        assert "firdaria" in {item["tool"] for item in searched.structured_content["tools"]}
+        assert "firdaria" in {
+            item["tool"] for item in searched.structured_content["tools"]
+        }
 
         # 4. Step 3: discover_tools(tool=...) pulls the single-tool full contract.
         contract_res = await client.call_tool("discover_tools", {"tool": "firdaria"})
@@ -74,7 +76,11 @@ async def test_stranger_agent_mcp_loop_and_error_recovery() -> None:
         # 5. Step 4: run_calculation defaults to detail="compact" and succeeds inline.
         calc_res = await client.call_tool(
             "run_calculation",
-            {"tool": "firdaria", "arguments": example, "as_of": "2026-10-12T12:00:00+08:00"},
+            {
+                "tool": "firdaria",
+                "arguments": example,
+                "as_of": "2026-10-12T12:00:00+08:00",
+            },
         )
         assert not calc_res.is_error
         payload = calc_res.structured_content
@@ -90,7 +96,10 @@ async def test_stranger_agent_mcp_loop_and_error_recovery() -> None:
         )
         assert bad_tool.is_error
         assert bad_tool.structured_content["error_code"] == "unknown_tool"
-        assert "firdaria" in bad_tool.structured_content["issues"][0]["constraints"]["suggestions"]
+        assert (
+            "firdaria"
+            in bad_tool.structured_content["issues"][0]["constraints"]["suggestions"]
+        )
 
         # 7. Error recovery on misspelled fields -> constraints.available.
         bad_fields = await client.call_tool(
@@ -109,7 +118,9 @@ async def test_stranger_agent_mcp_loop_and_error_recovery() -> None:
         assert "firdaria" in issue["constraints"]["available"]
 
 
-@pytest.mark.parametrize("tool_name", ["firdaria", "bazi_birth_chart", "fengshui_directions"])
+@pytest.mark.parametrize(
+    "tool_name", ["firdaria", "bazi_birth_chart", "fengshui_directions"]
+)
 def test_three_surface_parity_on_default_compact(
     tool_name: str,
     monkeypatch: pytest.MonkeyPatch,
@@ -150,7 +161,11 @@ def test_three_surface_parity_on_default_compact(
     cli_body = json.loads(capsys.readouterr().out)
     assert code == 0
 
-    assert _business(rest_res.json()) == _business(mcp_res.structured_content) == _business(cli_body)
+    assert (
+        _business(rest_res.json())
+        == _business(mcp_res.structured_content)
+        == _business(cli_body)
+    )
 
 
 def test_catalog_hygiene_across_all_tools() -> None:

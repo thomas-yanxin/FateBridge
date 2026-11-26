@@ -338,9 +338,7 @@
       "taiyi.extra_palace_marks",
       "taiyi.ruleset",
       "taiyi.long_cycle_summary"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,
@@ -487,14 +485,6 @@
         "default": null,
         "description": "仅month：省略为jinjing_month_jie_360_v1；key_month_tianzheng_jie_v1采用金钥匙完年乘十二、加天地二正和本月名义序，仍以现代节月为界，非完整古历月界；源文门数冲突保留，不按吉凶择法。",
         "title": "Month Profile"
-      },
-      "selected_sections": {
-        "description": "Optional snapshot section titles for filtered export payload",
-        "items": {
-          "type": "string"
-        },
-        "title": "Selected Sections",
-        "type": "array"
       },
       "shiji_profile": {
         "anyOf": [

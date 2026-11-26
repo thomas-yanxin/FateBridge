@@ -134,9 +134,7 @@
       "liureng.calendar_policy",
       "liureng.ruleset",
       "liureng.rule_trace"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,
@@ -260,14 +258,6 @@
         "default": null,
         "description": "显式昼贵/夜贵：true 昼、false 夜；省略按卯至申昼、酉至寅夜。未自动计算当地星没星出。",
         "title": "Is Diurnal"
-      },
-      "selected_sections": {
-        "description": "Optional snapshot section titles for filtered export payload",
-        "items": {
-          "type": "string"
-        },
-        "title": "Selected Sections",
-        "type": "array"
       },
       "use_true_solar_time": {
         "default": true,

@@ -413,7 +413,9 @@ def test_rest_mcp_cli_discovery_parity_and_runtime_isolation(
 
     mcp_list_body, mcp_score_body = asyncio.run(run_mcp())
 
-    assert cli_run(["ipip_big_five", "--action", "list_items", "--detail", "audit"]) == 0
+    assert (
+        cli_run(["ipip_big_five", "--action", "list_items", "--detail", "audit"]) == 0
+    )
     cli_list_body = json.loads(capsys.readouterr().out)
     assert (
         cli_run(
@@ -430,7 +432,10 @@ def test_rest_mcp_cli_discovery_parity_and_runtime_isolation(
     )
     cli_score_body = json.loads(capsys.readouterr().out)
 
-    assert cli_run(["ipip_big_five", "--ratings", *(["3"] * 50), "--detail", "compact"]) == 0
+    assert (
+        cli_run(["ipip_big_five", "--ratings", *(["3"] * 50), "--detail", "compact"])
+        == 0
+    )
     cli_ratings_body = json.loads(capsys.readouterr().out)
     assert cli_ratings_body["scale_raw_sum"] == 150
     assert cli_ratings_body["scale_mean"] == 3.0

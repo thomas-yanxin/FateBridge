@@ -12,10 +12,12 @@ from fastmcp import Client
 from fatebridge.cli import run
 from fatebridge.core.analytic_solar import MODEL_ID
 from fatebridge.core.fengshui import monthly_time
-from fatebridge.core.fengshui.monthly import monthly_position_reading
 from fatebridge.core.fengshui.models import MonthlyRequest
+from fatebridge.core.fengshui.monthly import monthly_position_reading
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services.fengshui import calculate_monthly_stars as _calculate_monthly_stars
+from fatebridge.services.fengshui import (
+    calculate_monthly_stars as _calculate_monthly_stars,
+)
 from tests.support.fengshui_clock import seconds_from_boundary
 from tests.support.fengshui_transports import SPECS
 from tests.support.mcp_result_assertions import (

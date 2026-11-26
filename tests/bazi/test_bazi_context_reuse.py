@@ -224,7 +224,7 @@ async def test_heavy_api_routes_honor_shared_concurrency_limit(
     )
 
     results = await asyncio.gather(
-        *(rest_handler("bazi_timing")(request) for _ in range(5))
+        *(rest_handler("bazi_timing")(request, detail="audit") for _ in range(5))
     )
 
     assert max_in_flight <= 2

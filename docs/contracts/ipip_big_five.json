@@ -1,8 +1,6 @@
 {
   "first_view": {
-    "fields": null,
-    "include_snapshot_text": false,
-    "strict_fields": true
+    "fields": null
   },
   "input": {
     "additionalProperties": false,

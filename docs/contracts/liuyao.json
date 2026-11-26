@@ -53,9 +53,7 @@
       "liuyao_evidence",
       "classical_text_evidence",
       "summary"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "$defs": {

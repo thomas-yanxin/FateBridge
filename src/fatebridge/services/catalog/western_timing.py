@@ -79,6 +79,8 @@ SPECS: list[ToolSpec] = [
         request_model=WesternPrimaryDirectionsChartRequest,
     ),
     _western_module_spec("zodiacal_releasing", "西占黄道释放"),
-    _western_module_spec("firdaria", "西占法达星限", request_model=WesternFirdariaRequest),
+    _western_module_spec(
+        "firdaria", "西占法达星限", request_model=WesternFirdariaRequest
+    ),
     _western_module_spec("decennials", "西占十年星限"),
 ]

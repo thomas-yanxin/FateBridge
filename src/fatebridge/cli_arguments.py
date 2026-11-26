@@ -162,7 +162,11 @@ def _add_field_argument(
     flag = "--" + name.replace("_", "-")
     help_text = field.description or ""
 
-    if origin is dict or is_model_field(field.annotation) or _is_nested_list(annotation):
+    if (
+        origin is dict
+        or is_model_field(field.annotation)
+        or _is_nested_list(annotation)
+    ):
         parser.add_argument(
             flag,
             dest=name,

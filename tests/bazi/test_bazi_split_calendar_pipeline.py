@@ -79,7 +79,9 @@ def check_actual_parts(value):
 rest = _shared_rest
 
 
-@pytest.mark.parametrize("name", ["bazi_birth_chart", "bazi_timing", "bazi_luck_cycles"])
+@pytest.mark.parametrize(
+    "name", ["bazi_birth_chart", "bazi_timing", "bazi_luck_cycles"]
+)
 @pytest.mark.parametrize("project", [False, True])
 def test_actual_parts_and_same_business_result_on_rest_mcp_cli(
     name: str, project: bool, surface_calls
@@ -105,7 +107,9 @@ def test_actual_parts_and_same_business_result_on_rest_mcp_cli(
     ]
     if project:
         field = (
-            "bazi_birth.calendar_context" if name == "bazi_birth_chart" else "calendar_context"
+            "bazi_birth.calendar_context"
+            if name == "bazi_birth_chart"
+            else "calendar_context"
         )
         opts.update(fields=[field])
         flags += [

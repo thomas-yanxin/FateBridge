@@ -21,6 +21,7 @@ from tests.support.transports import call_calculation, rest_client
 def assess(**kwargs):
     return _assess(AssessRequest.model_validate(kwargs))
 
+
 RESIDENTS = [
     {"subject_id": "a", "effective_birth_year": 1990, "gender_convention": "male"},
     {"subject_id": "b", "effective_birth_year": 2000, "gender_convention": "male"},

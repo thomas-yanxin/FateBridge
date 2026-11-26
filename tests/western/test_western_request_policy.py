@@ -111,9 +111,7 @@ WESTERN_KEYS = [
 def payload(key, **updates):
     spec = SPECS[key]
     factory = (
-        REST_POST_CASES[spec.rest_path]
-        if spec.rest_path
-        else MCP_CASES[spec.name][1]
+        REST_POST_CASES[spec.rest_path] if spec.rest_path else MCP_CASES[spec.name][1]
     )
     return {**factory(), **updates}
 

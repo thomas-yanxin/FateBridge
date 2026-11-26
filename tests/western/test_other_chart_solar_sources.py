@@ -302,9 +302,7 @@ def test_nonfinite_sun_epoch_is_rejected(jd) -> None:
             batch.sun(jd)
 
 
-@pytest.mark.parametrize(
-    "name", ["hamburg_midpoint_chart", "astrology_chart"]
-)
+@pytest.mark.parametrize("name", ["hamburg_midpoint_chart"])
 def test_progressed_boundary_error_and_same_complete_grid_across_surfaces(
     files, monkeypatch: pytest.MonkeyPatch, name: str, surface_calls
 ) -> None:
@@ -312,7 +310,11 @@ def test_progressed_boundary_error_and_same_complete_grid_across_surfaces(
     payload = edge_input(directory)
     monkeypatch.setenv("SE_EPHE_PATH", str(directory))
     spec = next(s for s in CATALOG if s.name == name)
-    path = "midpoint_analysis.solar_arc_analysis" if name == "hamburg_midpoint_chart" else "angles"
+    path = (
+        "midpoint_analysis.solar_arc_analysis"
+        if name == "hamburg_midpoint_chart"
+        else "angles"
+    )
     options = dict(
         fields=[path],
         detail="audit",

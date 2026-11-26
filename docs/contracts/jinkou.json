@@ -156,9 +156,7 @@
       "jinkou.rule_trace",
       "jinkou.natal_course.status",
       "jinkou.natal_course.natal_branch"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,
@@ -349,14 +347,6 @@
         "default": null,
         "description": "问课对象已确认的本命年支，用于京本将命大绝配对及本命另课。另课以本命支作派生地分，保留本次占时，与原地分主课分列。省略且已给birth_year_ganzhi时取其明确年支；两者并给须一致。不由占时、地分或行年推定，不要求补猜出生时刻。",
         "title": "Natal Branch"
-      },
-      "selected_sections": {
-        "description": "Optional snapshot section titles for filtered export payload",
-        "items": {
-          "type": "string"
-        },
-        "title": "Selected Sections",
-        "type": "array"
       },
       "use_true_solar_time": {
         "default": true,

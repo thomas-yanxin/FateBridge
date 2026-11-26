@@ -920,7 +920,7 @@ def test_cli_no_true_solar_time_flag_actually_disables_correction() -> None:
     """End-to-end CLI dispatch: ``--no-use-true-solar-time`` must leave the
     birth clock untouched (no longitude/equation-of-time rebasing)."""
     pytest.importorskip("swisseph")
-    from fatebridge.application.execution import execute_spec
+    from fatebridge.application.execution import invoke_validated_service
     from fatebridge.cli import build_parser
 
     parser = build_parser()
@@ -952,7 +952,7 @@ def test_cli_no_true_solar_time_flag_actually_disables_correction() -> None:
             for k, v in vars(args).items()
             if k in set(spec.request_model.model_fields) and v is not None
         }
-        return execute_spec(spec, spec.request_model(**provided))
+        return invoke_validated_service(spec, spec.request_model(**provided))
 
     off = _run(["--no-use-true-solar-time"])
     on = _run(["--use-true-solar-time", "true"])

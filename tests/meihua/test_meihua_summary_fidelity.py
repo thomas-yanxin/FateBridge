@@ -49,4 +49,6 @@ async def test_topic_projection_preserves_an_empty_casting_array() -> None:
             raise_on_error=False,
         )
         assert bad.is_error
-        assert bad.structured_content["issues"][0]["code"] == "non_object_projection_path"
+        assert (
+            bad.structured_content["issues"][0]["code"] == "non_object_projection_path"
+        )

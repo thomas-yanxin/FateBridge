@@ -90,7 +90,12 @@ def test_new_year_eve_chart_and_flows_share_the_placement_date(
     assert age["birth_lunar_date"] == age["target_lunar_date"] == CNY_EVE
     assert horoscope["nominal_age"] == age["nominal_age"] == 1
 
-    new_year = {**EVE_TARGET, "analysis_day": 10, "analysis_hour": 0, "analysis_minute": 0}
+    new_year = {
+        **EVE_TARGET,
+        "analysis_day": 10,
+        "analysis_hour": 0,
+        "analysis_minute": 0,
+    }
     after = calculate_ziwei_horoscope(person, **new_year, day_divide=policy)[
         "ziwei_horoscope"
     ]

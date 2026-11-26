@@ -103,8 +103,8 @@ def render_files(records: list[dict[str, object]]) -> dict[str, str]:
         [
             "",
             "`input` 描述 `run_calculation.arguments`。工具名和控制参数（`detail`、`fields`、`as_of`）放在 `run_calculation` 的外层。",
-            "首次摘要使用 `detail=\"compact\"` 并省略 `fields`。需要指定业务字段时，可按问题选择 `first_view.fields` 或 `evidence_views` 中的字段（默认严格投影）。",
-            "完整输出使用 `detail=\"audit\"` 并省略 `fields`。",
+            '首次摘要使用 `detail="compact"` 并省略 `fields`。需要指定业务字段时，可按问题选择 `first_view.fields` 或 `evidence_views` 中的字段（默认严格投影）。',
+            '完整输出使用 `detail="audit"` 并省略 `fields`。',
             "输入日期使用公历；不猜生时、不套示例；出生与分析时刻、时区及太阳时策略以各工具合同为准。",
         ]
     )

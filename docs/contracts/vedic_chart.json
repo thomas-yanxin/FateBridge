@@ -227,9 +227,7 @@
       "india.strengths.shadbala_assessment",
       "india.strengths.kala_bala",
       "india.strengths.cheshta_bala"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,

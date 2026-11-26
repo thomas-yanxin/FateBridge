@@ -1,8 +1,6 @@
 {
   "first_view": {
-    "fields": null,
-    "include_snapshot_text": false,
-    "strict_fields": true
+    "fields": null
   },
   "input": {
     "additionalProperties": false,
@@ -18,14 +16,6 @@
         "description": "Trigram or hexagram name (source short name or common full name, simplified/traditional forms), or a 3/6-bit code from bottom to top. In auto mode the eight pure trigram names select trigrams; use hexagram for their six-line identities.",
         "title": "Query",
         "type": "string"
-      },
-      "selected_sections": {
-        "description": "Optional snapshot section titles for filtered export payload",
-        "items": {
-          "type": "string"
-        },
-        "title": "Selected Sections",
-        "type": "array"
       }
     },
     "required": [

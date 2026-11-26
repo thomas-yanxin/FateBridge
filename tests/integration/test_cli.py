@@ -556,7 +556,17 @@ def test_request_file_rejects_tool_options_not_in_selected_contract(
             "message": "Extra inputs are not permitted",
         }
     ]
-    code = run(["astrology_chart", "--request-file", subject_path, "--birth-latitude", "30.0", "--detail", "audit"])
+    code = run(
+        [
+            "astrology_chart",
+            "--request-file",
+            subject_path,
+            "--birth-latitude",
+            "30.0",
+            "--detail",
+            "audit",
+        ]
+    )
     payload = json.loads(capsys.readouterr().out)
     assert code == 0
     assert payload["chart_profile"]["house_system_code"] == 8

@@ -242,7 +242,9 @@ def test_correct_progression_frames_reach_rest_mcp_cli(
     tool: str, surface_calls
 ) -> None:
     spec = SPECS[tool]
-    key = "vedic_progression" if tool == "sidereal_progressions" else "jaynes_declination"
+    key = (
+        "vedic_progression" if tool == "sidereal_progressions" else "jaynes_declination"
+    )
     fields = ["natal_reference", key, "analysis_context.zodiac_type"]
     query = [("fields", field) for field in fields] + [("detail", "audit")]
     http, protocol, code, cli = surface_calls(

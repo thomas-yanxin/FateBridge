@@ -20,7 +20,9 @@ from fatebridge.core.fengshui.reading import build_natal_reading
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.fengshui import (
     calculate_annual_stars as _calculate_annual_stars,
-    calculate_minggua as _calculate_minggua,
+)
+from fatebridge.services.fengshui import calculate_minggua as _calculate_minggua
+from fatebridge.services.fengshui import (
     calculate_xuankong_natal as _calculate_xuankong_natal,
 )
 from tests.support.fengshui_clock import seconds_from_boundary

@@ -11,6 +11,8 @@ from fatebridge.services.fengshui import assess as _assess
 
 def assess(**kwargs):
     return _assess(AssessRequest.model_validate(kwargs))
+
+
 from tests.unit_test.fixtures.fengshui_layout import candidate_features as inputs
 from tests.unit_test.fixtures.fengshui_layout import environment_feature as feature
 from tests.unit_test.fixtures.fengshui_layout import observation, orientation

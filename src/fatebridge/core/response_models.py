@@ -126,7 +126,8 @@ def output_model_for(key: str, *, western_data_policy: bool = False) -> type[Bas
     name = "".join(part.title() for part in key.split("_")) + "Output"
     bases = (
         (ProjectedOutput, RenAnchoredOutput)
-        if key in {"jinkou", "liuren_chart", "liuren_yearly_timing", "sanshi_combined_chart"}
+        if key
+        in {"jinkou", "liuren_chart", "liuren_yearly_timing", "sanshi_combined_chart"}
         else (ProjectedOutput,)
     )
     return create_model(name, __base__=bases, **fields)

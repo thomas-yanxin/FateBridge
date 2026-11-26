@@ -238,7 +238,9 @@ def test_invalid_intervals_rejected_by_public_request_contract(value) -> None:
         )
 
 
-def test_dedicated_chart_options_are_scoped_without_silently_dropping_uncertainty() -> None:
+def test_dedicated_chart_options_are_scoped_without_silently_dropping_uncertainty() -> (
+    None
+):
     for req_model in (AstroGermanyRequest, AstroSpecialtyRequest, AstroIndiaRequest):
         model = req_model.model_validate(
             {
@@ -256,9 +258,7 @@ def test_dedicated_chart_options_are_scoped_without_silently_dropping_uncertaint
                 }
             )
     with pytest.raises(ValidationError):
-        AstroGermanyRequest.model_validate(
-            {**astro_payload(), "node_mode": "true"}
-        )
+        AstroGermanyRequest.model_validate({**astro_payload(), "node_mode": "true"})
 
 
 def test_explicit_interval_is_unavailable_if_swiss_is_missing(

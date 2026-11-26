@@ -192,7 +192,9 @@ def test_minute_grid_uses_each_derived_instant_offset_across_clock_rollback(
     ]
 
 
-@pytest.mark.parametrize("key", ["ziwei_birth_chart", "ziwei_timing", "liuren_yearly_timing"])
+@pytest.mark.parametrize(
+    "key", ["ziwei_birth_chart", "ziwei_timing", "liuren_yearly_timing"]
+)
 def test_existing_public_offset_consumers_keep_their_explicit_keyword(key: str) -> None:
     spec = next(s for s in CATALOG if s.name == key)
     values = {**inputs(spec), **SHANGHAI, "birth_utc_offset": "+09:00"}

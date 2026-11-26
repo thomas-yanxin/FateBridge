@@ -121,9 +121,7 @@ def inputs(spec):
     from tests.fixtures.surface_payloads import MCP_CASES, REST_POST_CASES
 
     factory = (
-        REST_POST_CASES[spec.rest_path]
-        if spec.rest_path
-        else MCP_CASES[spec.name][1]
+        REST_POST_CASES[spec.rest_path] if spec.rest_path else MCP_CASES[spec.name][1]
     )
     return spec.request_model.model_validate(factory()).model_dump(exclude_unset=True)
 

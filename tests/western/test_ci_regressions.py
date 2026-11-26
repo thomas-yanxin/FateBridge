@@ -339,7 +339,11 @@ def test_persian_hit_limit_keeps_the_first_actual_age_with_equal_display_labels(
             "balbillus",
             {"mode": "forward", "max_age_years": 30},
         ),
-        ("zodiacal_releasing", "zodiacal_releasing", {"analysis_year": 2030, "analysis_month": 1, "analysis_day": 1}),
+        (
+            "zodiacal_releasing",
+            "zodiacal_releasing",
+            {"analysis_year": 2030, "analysis_month": 1, "analysis_day": 1},
+        ),
         (
             "zodiacal_releasing",
             "zodiacal_releasing",

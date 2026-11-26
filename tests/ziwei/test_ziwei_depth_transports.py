@@ -43,7 +43,12 @@ TARGET = dict(
 @pytest.mark.parametrize(
     "tool_name,payload_key,inputs,fields",
     [
-        ("ziwei_birth_chart", "ziwei_birth", BIRTH, ["analysis_context", "ziwei_birth"]),
+        (
+            "ziwei_birth_chart",
+            "ziwei_birth",
+            BIRTH,
+            ["analysis_context", "ziwei_birth"],
+        ),
         (
             "ziwei_timing",
             "ziwei_horoscope",
@@ -163,8 +168,12 @@ def test_profiles_and_evidence_match_all_public_surfaces(
             == "ming_palace_branch"
         )
         assert result["ziwei_birth"]["calendar_cycles"]["status"] == "computed"
-        assert all(p["changsheng12"] and p["boshi12"] for p in result["ziwei_birth"]["palaces"])
-        assert result["ziwei_birth"]["palaces"][0]["structural_evidence"]["sanfang_sizheng"]
+        assert all(
+            p["changsheng12"] and p["boshi12"] for p in result["ziwei_birth"]["palaces"]
+        )
+        assert result["ziwei_birth"]["palaces"][0]["structural_evidence"][
+            "sanfang_sizheng"
+        ]
     else:
         assert result["focused_rules"]["sihua"]["化科"] == (
             "左辅" if profile == "iztro_2_5_8" else "天府"

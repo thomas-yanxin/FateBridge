@@ -38,17 +38,13 @@ def project_present_fields(
     """Project existing paths for internal compact views without failing on absent variant keys."""
     if fields is None:
         return result
-    field_list = [
-        path for path in fields if not projection_issues(result, [path])
-    ]
+    field_list = [path for path in fields if not projection_issues(result, [path])]
     if not field_list:
         return result
     return _apply_projection(result, field_list)
 
 
-def _apply_projection(
-    result: dict[str, JsonValue], fields: list[str]
-) -> ServiceResult:
+def _apply_projection(result: dict[str, JsonValue], fields: list[str]) -> ServiceResult:
     tree = build_selection_tree(fields)
     tree["run_metadata"] = True
     return {

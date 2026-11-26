@@ -246,9 +246,7 @@
       "midpoint_analysis.time_sensitivity.uncertainty_minutes",
       "midpoint_analysis.unique_two_factor_pair_count",
       "base_chart.person_info"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,

@@ -13,8 +13,10 @@ from fatebridge.core.fengshui.models import (
 from fatebridge.services import replay_metadata
 from fatebridge.services.fengshui import (
     calculate_annual_stars as _calculate_annual_stars,
-    calculate_directions as _calculate_directions,
-    calculate_minggua as _calculate_minggua,
+)
+from fatebridge.services.fengshui import calculate_directions as _calculate_directions
+from fatebridge.services.fengshui import calculate_minggua as _calculate_minggua
+from fatebridge.services.fengshui import (
     calculate_xuankong_natal as _calculate_xuankong_natal,
 )
 from fatebridge.services.run_metadata import attach_run_metadata

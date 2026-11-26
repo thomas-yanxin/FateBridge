@@ -138,7 +138,9 @@ def test_public_descriptor_drives_each_available_adapter_without_private_input_d
                 record = await describe_capability(client, spec.name)
             else:
                 described = rest.get("/api/tools", params={"detail": "full"}).json()
-                record = next(item for item in described["tools"] if item["tool"] == key)
+                record = next(
+                    item for item in described["tools"] if item["tool"] == key
+                )
             assert record["example_context"]["fictional"] is True
             assert record["example_context"]["use_as_user_default"] is False
             data = record["example_input"]
@@ -154,7 +156,15 @@ def test_public_descriptor_drives_each_available_adapter_without_private_input_d
                     **({"fields": fields} if fields is not None else {}),
                 }
                 result = await call_calculation(
-                    client, spec.name, {**data, "as_of": AS_OF, "detail": "audit", **({"fields": fields} if fields is not None else {})}, raise_on_error=False
+                    client,
+                    spec.name,
+                    {
+                        **data,
+                        "as_of": AS_OF,
+                        "detail": "audit",
+                        **({"fields": fields} if fields is not None else {}),
+                    },
+                    raise_on_error=False,
                 )
                 assert not result.is_error, params
                 values.append(("mcp", result.structured_content))

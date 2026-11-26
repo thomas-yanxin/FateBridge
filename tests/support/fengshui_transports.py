@@ -6,11 +6,7 @@ import fatebridge.mcp_server as mcp
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.transports import call_calculation
 
-SPECS = {
-    s.name.removeprefix("fengshui_"): s
-    for s in CATALOG
-    if s.family == "fengshui"
-}
+SPECS = {s.name.removeprefix("fengshui_"): s for s in CATALOG if s.family == "fengshui"}
 # Support xuankong_natal alias used by existing fixture helpers.
 if "xuankong_house_chart" in SPECS:
     SPECS["xuankong_natal"] = SPECS["xuankong_house_chart"]

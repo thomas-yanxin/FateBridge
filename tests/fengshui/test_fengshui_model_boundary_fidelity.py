@@ -22,7 +22,9 @@ from fatebridge.core.fengshui.models import AnnualRequest, HousePeriod, MingguaR
 from fatebridge.core.fengshui.monthly_time import solar_month_context
 from fatebridge.core.fengshui.xuankong import period_context
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services.fengshui import calculate_annual_stars as _calculate_annual_stars
+from fatebridge.services.fengshui import (
+    calculate_annual_stars as _calculate_annual_stars,
+)
 from fatebridge.services.fengshui import calculate_minggua as _calculate_minggua
 from tests.fixtures.fengshui import payload
 from tests.support.fengshui_clock import seconds_from_boundary
@@ -164,7 +166,12 @@ def test_actual_model_reading_names_its_solver_without_claiming_seconds(
 ) -> None:
     result = calculate_annual_stars(effective_year=2024, timezone_name="UTC")
     layer = result["layers"]["annual_stars"]
-    assert layer["time_context"]["timing"]["start_resolution"]["solar_model_details"]["model_id"] == "fatebridge_analytic_solar_v1"
+    assert (
+        layer["time_context"]["timing"]["start_resolution"]["solar_model_details"][
+            "model_id"
+        ]
+        == "fatebridge_analytic_solar_v1"
+    )
 
 
 def test_confirmed_minggua_year_does_not_invent_a_solver_observation(
@@ -235,7 +242,10 @@ def test_model_reason_and_reading_match_rest_real_mcp_cli(
     protocol = asyncio.run(call())
     request = tmp_path / "request.json"
     request.write_text(json.dumps(inputs))
-    assert run([SPECS[name].name, "--request-file", str(request), "--detail", "audit"]) == 0
+    assert (
+        run([SPECS[name].name, "--request-file", str(request), "--detail", "audit"])
+        == 0
+    )
     cli = json.loads(capsys.readouterr().out)
     assert response.status_code == 200 and not protocol.is_error
     body = response.json()

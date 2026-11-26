@@ -155,7 +155,11 @@ def test_actual_rest_mcp_cli_keep_both_editions(
             "use_true_solar_time": False,
         }
     fields = ["taiyi.core_board", "taiyi.count_source_assessment"]
-    target_name = "taiyi" if key == "taiyi" else ("sanshi_combined_chart" if key == "sanshiunited" else key)
+    target_name = (
+        "taiyi"
+        if key == "taiyi"
+        else ("sanshi_combined_chart" if key == "sanshiunited" else key)
+    )
     spec = next(s for s in CATALOG if s.name == target_name)
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(

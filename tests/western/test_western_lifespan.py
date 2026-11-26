@@ -317,9 +317,9 @@ def test_planetary_arc_with_sun_source_equals_solar_arc() -> None:
     """planetaryarc(arc_source=Sun) must reproduce FateBridge's own solar arc."""
     common = dict(analysis_year=2025, analysis_month=4, analysis_day=6)
     pa = calculate_planetary_arc(**BIRTH, arc_source="Sun", **common)
-    sa = calculate_timing_tool("solararc", **BIRTH, **common)
+    sa = calculate_timing_tool("solar_arc", **BIRTH, **common)
     assert (
-        abs(pa["planetary_arc"]["arc_degrees"] - sa["solararc"]["arc_degrees"]) < 1e-6
+        abs(pa["planetary_arc"]["arc_degrees"] - sa["solar_arc"]["arc_degrees"]) < 1e-6
     )
 
 

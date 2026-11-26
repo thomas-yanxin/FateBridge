@@ -5,6 +5,7 @@ from fractions import Fraction
 
 import pytest
 
+from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.spatial_geometry import (
     ray_xy,
     rectangle_xy,
@@ -18,7 +19,6 @@ from fatebridge.core.fengshui.spatial_inputs import (
     PlanRectangle,
     PlanSegment,
 )
-from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.services.fengshui import assess as _assess
 from tests.support.transports import SPECS, business, rest, surface_calls
 from tests.unit_test.fixtures.fengshui_measured import rotation_payload as payload_for

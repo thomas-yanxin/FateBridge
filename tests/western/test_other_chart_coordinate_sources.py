@@ -248,7 +248,6 @@ def test_explicit_base_fallback_does_not_discard_native_midpoint_layer(
     [
         "thirteen_sector_chart",
         "hamburg_midpoint_chart",
-        "astrology_chart",
     ],
 )
 def test_nominal_source_and_metadata_across_three_surfaces(

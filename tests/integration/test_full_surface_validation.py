@@ -119,7 +119,10 @@ def test_renamed_tool_accepts_only_the_public_name_on_all_surfaces(
                         endpoint, params, raise_on_error=False
                     )
                     assert rejected.is_error
-                    assert rejected.structured_content["issues"][0]["code"] == "unknown_tool"
+                    assert (
+                        rejected.structured_content["issues"][0]["code"]
+                        == "unknown_tool"
+                    )
                 result = await call_calculation(native, new_name, args)
                 assert result.structured_content is not None
                 results.append(result.structured_content)

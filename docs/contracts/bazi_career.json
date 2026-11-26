@@ -256,9 +256,7 @@
     "fields": [
       "career_analysis.evidence_chain.topic.first_view",
       "career_analysis.timing_context"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,

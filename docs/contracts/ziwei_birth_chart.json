@@ -246,9 +246,7 @@
       "ziwei_birth.calendar_cycles.status",
       "ziwei_birth.calendar_cycles.changsheng_rule",
       "ziwei_birth.calendar_cycles.boshi_rule"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "additionalProperties": false,
@@ -422,14 +420,6 @@
         ],
         "title": "Rule Profile",
         "type": "string"
-      },
-      "selected_sections": {
-        "description": "Optional snapshot section titles for filtered export payload",
-        "items": {
-          "type": "string"
-        },
-        "title": "Selected Sections",
-        "type": "array"
       },
       "sihua_source": {
         "default": "rule_profile",

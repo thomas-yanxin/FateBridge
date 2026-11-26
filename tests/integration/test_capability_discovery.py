@@ -87,7 +87,9 @@ def test_reference_discovery_uses_public_names(
         )
         cli_record = json.loads(capsys.readouterr().out)["tools"][0]
         assert {
-            k: v for k, v in cli_record.items() if k not in {"cli_example", "example_note"}
+            k: v
+            for k, v in cli_record.items()
+            if k not in {"cli_example", "example_note"}
         } == record
         records[name] = record["surfaces"]
 

@@ -220,9 +220,7 @@ PARITY_CASES = [
         ),
         id="astrology_chart",
     ),
-    pytest.param(
-        "relationship_chart", _relative_request(), id="relationship_chart"
-    ),
+    pytest.param("relationship_chart", _relative_request(), id="relationship_chart"),
     pytest.param(
         "bazi_timing",
         TimingAnalysisRequest(

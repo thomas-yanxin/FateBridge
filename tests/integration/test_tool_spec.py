@@ -207,9 +207,7 @@ def test_mcp_arguments_are_separate_from_delivery_controls() -> None:
         operation_label_zh="",
         family="",
     )
-    result = _call_mcp(
-        spec, {"fields": ["domain"]}, fields=["selection"]
-    )
+    result = _call_mcp(spec, {"fields": ["domain"]}, fields=["selection"])
     assert not result.is_error
     assert result.structured_content["selection"] == ["domain"]
     assert "other" not in result.structured_content

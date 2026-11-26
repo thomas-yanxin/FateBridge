@@ -497,7 +497,10 @@ def test_extended_layout_matches_rest_mcp_cli(
     mcp = asyncio.run(call())
     request = tmp_path / "layout.json"
     request.write_text(json.dumps(inputs))
-    assert run(["fengshui_assess", "--request-file", str(request), "--detail", "audit"]) == 0
+    assert (
+        run(["fengshui_assess", "--request-file", str(request), "--detail", "audit"])
+        == 0
+    )
     cli = json.loads(capsys.readouterr().out)
     assert rest.status_code == 200 and not mcp.is_error
     assert (

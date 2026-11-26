@@ -28,9 +28,7 @@ calculate_mundane = service_ref(
 )
 
 
-calculate_horary = service_ref(
-    "fatebridge.services.western_horary", "calculate_horary"
-)
+calculate_horary = service_ref("fatebridge.services.western_horary", "calculate_horary")
 
 
 def _western_event_spec(

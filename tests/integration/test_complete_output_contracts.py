@@ -158,7 +158,9 @@ def test_missing_root_and_legal_projection_across_rest_mcp_cli(
 
     original = execution.invoke_validated_service
 
-    def corrupt_service(current: ToolSpec, request: BaseModel, **kwargs) -> ServiceResult:
+    def corrupt_service(
+        current: ToolSpec, request: BaseModel, **kwargs
+    ) -> ServiceResult:
         broken = replace(current, bind=lambda _: (lambda: {}, (), {}))
         return original(broken, request, **kwargs)
 

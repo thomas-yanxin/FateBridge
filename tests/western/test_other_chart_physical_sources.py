@@ -257,7 +257,6 @@ def test_nominal_and_sampled_models_must_also_agree(
     [
         "hamburg_midpoint_chart",
         "thirteen_sector_chart",
-        "astrology_chart",
     ],
 )
 def test_partial_data_error_and_complete_interval_across_three_surfaces(

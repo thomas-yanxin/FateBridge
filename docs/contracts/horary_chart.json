@@ -232,9 +232,7 @@
       "horary.significators.quesited",
       "horary.moon.void_of_course",
       "horary.perfection.status"
-    ],
-    "include_snapshot_text": false,
-    "strict_fields": true
+    ]
   },
   "input": {
     "$defs": {
@@ -608,7 +606,7 @@
         "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
         "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
       ],
-      "method_id": "fatebridge.western_horary.contract_v1",
+      "method_id": "fatebridge.western_horary_chart.contract_v1",
       "output_paths": [
         "horary"
       ],

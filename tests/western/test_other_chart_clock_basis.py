@@ -440,8 +440,6 @@ def test_local_solar_clock_cli_flag_does_not_require_a_fake_civil_timezone(
             "local_mean_solar",
             "--fields",
             "base_chart.person_info",
-            "--strict-fields",
-            "--no-include-snapshot-text",
         ]
     )
     output = json.loads(capsys.readouterr().out)

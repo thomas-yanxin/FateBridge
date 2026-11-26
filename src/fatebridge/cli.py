@@ -133,9 +133,7 @@ def run(argv: list[str] | None = None) -> int:
         return 2
 
     field_names = set(spec.request_model.model_fields)
-    explicit_fields = {
-        k: v for k, v in vars(args).items() if k in field_names
-    }
+    explicit_fields = {k: v for k, v in vars(args).items() if k in field_names}
     provided = (
         {**request_data, **explicit_fields}
         if request_data is not None

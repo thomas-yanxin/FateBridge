@@ -39,6 +39,7 @@ def _chart_calculation_notes(payload: dict[str, Any]) -> list[str]:
             notes.append(note)
     return notes
 
+
 __all__ = [
     "SUPPORTED_CHART_VARIANTS",
     "calculate_core_chart_analysis",

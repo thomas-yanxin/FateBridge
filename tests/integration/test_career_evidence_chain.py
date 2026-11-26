@@ -141,7 +141,11 @@ def test_career_projection_preserves_primary_tie_and_scope_across_transports(
         cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
-    assert business(http.json()) == business(protocol.structured_content) == business(output)
+    assert (
+        business(http.json())
+        == business(protocol.structured_content)
+        == business(output)
+    )
     career = output["career_analysis"]
     assert career["evidence_chain"]["topic"]["first_view"]["natal_stars"]
     if "timing_context" in career:
@@ -192,7 +196,11 @@ def test_western_career_actual_evidence_agrees_across_transports(surface_calls) 
         cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
-    assert business(http.json()) == business(protocol.structured_content) == business(output)
+    assert (
+        business(http.json())
+        == business(protocol.structured_content)
+        == business(output)
+    )
     firdaria = output["time_lords"]["firdaria"]
     for name in ["current_major", "current_sub"]:
         assert firdaria[name]["start"] < firdaria[name]["end"]
@@ -229,7 +237,11 @@ def test_omitted_target_date_uses_person_timezone_at_frozen_utc_across_transport
         cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
-    assert business(http.json()) == business(protocol.structured_content) == business(output)
+    assert (
+        business(http.json())
+        == business(protocol.structured_content)
+        == business(output)
+    )
     context = output["career_analysis"]["timing_context"]
     assert context["analysis_date"] == "2026-10-11"
     assert context["analysis_datetime"] == "2026-10-11T00:00:00-04:00"
@@ -284,7 +296,11 @@ def test_career_evidence_retains_star_positions_and_formation_status(
         cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
-    assert business(http.json()) == business(protocol.structured_content) == business(output)
+    assert (
+        business(http.json())
+        == business(protocol.structured_content)
+        == business(output)
+    )
     career = output["career_analysis"]
     assert {"suggestions", "career_structure", "industry_analysis"}.isdisjoint(career)
     evidence = career["evidence_chain"]
@@ -387,7 +403,11 @@ def test_exact_valid_dual_override_matches_applied_pillars_across_transports(
         cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
-    assert business(http.json()) == business(protocol.structured_content) == business(output)
+    assert (
+        business(http.json())
+        == business(protocol.structured_content)
+        == business(output)
+    )
     tc = output["career_analysis"]["timing_context"]
     assert tc["dayun_pillar"] == "甲子" and tc["liunian_pillar"] == "丙寅"
     assert tc["source"] == "explicit_pillar_overrides"

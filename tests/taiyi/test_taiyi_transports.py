@@ -67,7 +67,11 @@ def test_published_first_views_preserve_evidence_under_default_limits(
     hour_profile: str | None,
     month_profile: str | None,
 ) -> None:
-    target_name = "taiyi" if key == "taiyi" else ("sanshi_combined_chart" if key == "sanshiunited" else key)
+    target_name = (
+        "taiyi"
+        if key == "taiyi"
+        else ("sanshi_combined_chart" if key == "sanshiunited" else key)
+    )
     spec = next(s for s in CATALOG if s.name == target_name)
     inputs = example_input(spec)
     assert inputs is not None
