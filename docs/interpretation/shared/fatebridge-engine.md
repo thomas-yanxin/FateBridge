@@ -18,7 +18,7 @@
 
 已连接 FateBridge MCP 时，按所选工具的实际定义直接调用，不为用户咨询先运行安装诊断、搜索仓库或项目历史。当前聊天已确认的资料足够时直接计算；只有用户要求沿用历史资料才核对历史。以下 CLI 是无连接时的本地后备及可复核示例，不需要启动 REST 服务。
 
-已加载的调用合同包含完整参数且工具公开时，不重复发现；其他工具按名称一次取得实际 inputSchema 与描述，再调用。工具描述的首轮 `fields` 来自共享字段配置；部分工具还发布按用户任务选择的 `evidence_views`（CLI `describe <tool>`、REST 工具详情也可读取）。先选任务卡，再把其中 `fields` 复制到真实请求；卡名和 `view` 不是请求参数，不发送 `evidence_views/view/task`。关系盘按规范模式选卡，西占时运按 stage／annual／short_term 选卡；事业岗位／年度安排按 direction／target_year 选卡，西占事业补证可合并 career 卡，确保并列十神、判断范围和目标时间依据进入首次字段；细节卡与主任务字段合并去重，不用细节卡取代主层。默认视图是安全后备，不表示每次需要解释全部分支。首轮设 `strict_fields=true`、`include_snapshot_text=false`，详细追问才展开更多字段。没有首轮预设时，依据实际输出合同选字段，不猜路径。下面的出生数据都是示例，不能当作用户资料。
+MCP 公开 `discover_capabilities`、`describe_capability`、`run_calculation` 与 `read_result`。已知能力和业务参数时，用 `run_calculation(tool=能力名, arguments=业务输入)`；默认 `detail=compact` 返回核心字段。完整 JSON、全部时间线或文件首次用 `detail=audit`、`fields=null`，再读同 run 的交付结果。需要参数时按名称用 `describe_capability`，不把能力名当独立的 MCP 协议工具调用。已取得完整参数且能力公开时，不重复发现。工具描述的首轮 `fields` 来自共享字段配置；部分工具还发布按用户任务选择的 `evidence_views`（CLI `describe <tool>`、REST 工具详情也可读取）。先选任务卡，再把其中 `fields` 复制到真实请求；卡名和 `view` 不是请求参数，不发送 `evidence_views/view/task`。关系盘按规范模式选卡，西占时运按 stage／annual／short_term 选卡；事业岗位／年度安排按 direction／target_year 选卡，西占事业补证可合并 career 卡，确保并列十神、判断范围和目标时间依据进入首次字段；细节卡与主任务字段合并去重，不用细节卡取代主层。默认视图是安全后备，不表示每次需要解释全部分支。首轮设 `strict_fields=true`、`include_snapshot_text=false`，详细追问才展开更多字段。没有首轮预设时，依据实际输出合同选字段，不猜路径。下面的出生数据都是示例，不能当作用户资料。
 
 接收调用或资源结果时，先核对实际返回形状：可能是 JSON 字符串、文本 `content` 或 `structuredContent`，不能固定假设存在 `contents[0]` 或 `structuredContent.run_metadata`。有截断标记的 JSON 片段不能解析成完整合同；改读所选工具的实际定义或更小的资源，勿反复解析同一片段。字段选择先用已核对的顶层业务字段，需要细节再展开，不为首轮遍历整个 `$defs`。
 
@@ -160,7 +160,7 @@ python3 -m fatebridge.cli --no-metadata bazi_birth_chart <出生参数> \
 --use-true-solar-time       # 开启真太阳时校正（推荐）
 ```
 
-- 性别影响大运顺逆，具体必填性按工具模型；`bazi_luck_cycles` 要求 `gender` 与 `analysis_age`。
+- 性别影响大运顺逆，具体必填性按工具模型；`bazi_luck_cycles` 要求 `gender`，默认按目标瞬间选运，`analysis_age` 仅作显式年龄参考，不能与 `analysis_*` 日期组合。
 - 对实际 Schema 必填小时的计算，缺小时只阻止该次计算；先简短核对，用户已说不知道或无法提供时停止同项追问。可以解释已有结果、传统概念或已给的现实选项；确有不依赖缺项的工具时再选择适用路线。不能省略或擅自填 0 当作无时盘。只有「上午」等时段不能复用某个精确时刻的命盘；用户明确选择假设时刻比较后分别标明假设，保留时段内不稳定结论。
 - 用户用日常语言提供历法、日期、时间范围和城市即可，由助手按合同转译参数。这些 `birth_*` 接口使用公历；历法确有歧义时才核对，农历先转换。出生时区依出生地与历史日期解析并核对实际回执，不要求用户自己提供 IANA 名称，也不能直接套当前聊天时区。真太阳时默认开启，通常省略开关沿用引擎默认；显式 `true` 表示必须完成校正，缺地点／经度时可能报错，不能机械抄入默认值。仅按用户明确要求关闭；未知经度可省略，以返回精度限制说明，不能猜经度。
 - 出生地用于地点与太阳时解析，给到城市并保留返回精度；支持的城市交给引擎解析，不要求用户自行查经纬度。所选接口确需显式坐标且不能可靠解析时再说明补充方式，不能把示例坐标当事实。中式工具不能套入西占 `birth_latitude` 参数。
@@ -169,7 +169,7 @@ python3 -m fatebridge.cli --no-metadata bazi_birth_chart <出生参数> \
 
 ```
 --analysis-year 2026 --analysis-month 6 --analysis-day 18   # 想看哪天的运
---analysis-age 35                                            # bazi_luck_cycles 按虚岁定位大运
+--analysis-age 35                                            # bazi_luck_cycles 的独立年龄参考，不与分析日期组合
 --target-year 2026                                           # bazi_yearly_timing 指定流年
 ```
 

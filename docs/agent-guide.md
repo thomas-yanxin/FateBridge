@@ -57,7 +57,7 @@ curl 'http://localhost:8010/api/tools?tool=bazi_birth_chart&detail=full'
 
 ```json
 {
-  "counts": {"rest": 91, "mcp": 92, "total": 93},
+  "counts": {"rest": 93, "mcp": 93, "total": 93},
   "tools": [
     {
       "tool": "bazi_wealth",

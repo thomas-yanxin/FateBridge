@@ -53,7 +53,7 @@ uv run --locked --extra dev python -m scripts.astronomy.audit_solar_model_refere
 
 新增脚本放入所属领域，先检查现有入口能否扩展；通用开发命令才留在顶层。领域之间用完整包路径导入，领域命令优先使用 `python -m scripts.<领域>.<模块>`；明确支持的直接文件入口另行验证。不要给移动后的脚本另留一份兼容包装。
 
-独立参考生成器即使不被生产代码导入，也可能承担来源复现职责。退役前检查测试、CI、文档、其他脚本及原始来源记录；保存仍有价值的参考、失败与取得方法。原始资料在 `tests/data/`、`tests/fixtures/` 或外部固定档案中维护，不混入脚本目录。完整规则见[仓库维护](../docs/repository-maintenance.md)。
+独立参考生成器即使不被生产代码导入，也可能承担来源复现职责。退役前检查测试、CI、文档、其他脚本及原始来源记录；保存仍有价值的参考、失败与取得方法。原始资料在 `tests/data/`、`tests/fixtures/` 或外部固定档案中维护，不混入脚本目录。完整规则见[仓库维护](../docs/development-guide.md#仓库维护)。
 
 太阳TT固定参考使用 [astronomy/build_solar_term_reference.py](astronomy/build_solar_term_reference.py) 生成自带生成源码的独立资料包，读取与固定身份校验由 [astronomy/solar_term_reference.py](astronomy/solar_term_reference.py) 维护。复现环境、内核和范围见[资料说明](../tests/data/solar_tt_de440_v1/README.md)；日常回归使用 `tests/astronomy/test_solar_term_reference.py`。接受外部矩阵的TT诊断保留模块入口 `uv run --locked --extra dev python -m scripts.ren.audit_ren_model_tt --help`，分别报告现行参考来源、旧侧件缺口和原刊载分钟失败。
 
