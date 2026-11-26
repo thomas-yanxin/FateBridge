@@ -1,0 +1,67 @@
+"""Consolidated Jin Kou Jue package."""
+
+from fatebridge.core.metaphysics.jinkou.board import (
+    GUISHEN_IDENTITIES,
+    _build_guishen_mapping,
+    _jinkou_pick_use_position,
+    build_jinkou_board,
+    build_jinkou_qi,
+    build_stem_relations,
+    internal_strength,
+    seasonal_power,
+    seasonal_power_basis,
+)
+from fatebridge.core.metaphysics.jinkou.patterns import (
+    branch_breaks,
+    branch_stars,
+    definition_evidence,
+    pattern_identity,
+    pattern_metadata,
+    patterns_from_symbols,
+    position_interactions,
+    structural_patterns,
+    structural_relations,
+    trine_evidence,
+    use_evidence,
+    wuzidun_stem,
+)
+from fatebridge.core.metaphysics.jinkou.year_fate import (
+    build_jinkou_year_fate,
+    build_natal_course,
+    confirmed_natal_branch,
+    natal_course_metadata,
+    natal_course_trace,
+    ordinal_year_fate,
+)
+from fatebridge.core.metaphysics.ren_calendar import compute_month_general
+
+__all__ = [
+    "GUISHEN_IDENTITIES",
+    "_build_guishen_mapping",
+    "_jinkou_pick_use_position",
+    "branch_breaks",
+    "branch_stars",
+    "build_jinkou_board",
+    "build_jinkou_qi",
+    "build_jinkou_year_fate",
+    "build_natal_course",
+    "build_stem_relations",
+    "compute_month_general",
+    "confirmed_natal_branch",
+    "definition_evidence",
+    "internal_strength",
+    "natal_course_metadata",
+    "natal_course_trace",
+    "ordinal_year_fate",
+    "pattern_identity",
+    "pattern_metadata",
+    "patterns_from_symbols",
+    "position_interactions",
+    "seasonal_power",
+    "seasonal_power_basis",
+    "structural_patterns",
+    "structural_relations",
+    "trine_evidence",
+    "use_evidence",
+    "wuzidun_stem",
+]

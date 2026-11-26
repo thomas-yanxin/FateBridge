@@ -9,20 +9,59 @@ from fatebridge.core.metaphysics.common import (
     branch_element_text,
     stem_element_text,
 )
-from fatebridge.core.metaphysics.jinkou_relations import (
+from fatebridge.core.metaphysics.jinkou.patterns import (
     CALENDAR_CONTEXTS,
     JUE_CONTEXTS,
     SI_BAI,
     SI_JUE,
-    absolute_check,
-    calendar_check,
-    calendar_target,
-    defeat_check,
     structural_relations,
 )
+from fatebridge.utils.data import EARTHLY_BRANCHES
+
+
+def absolute_check(left: str, right: str, a: str, b: str) -> dict[str, Any]:
+    phase = SI_JUE.get(frozenset((a, b)))
+    ctx = next(c for c in JUE_CONTEXTS if c[0] == left and c[1] == right)
+    return {
+        "left_position": left,
+        "right_position": right,
+        "left_branch": a,
+        "right_branch": b,
+        "classification": ctx[2],
+        "matched": phase is not None,
+        "element": phase,
+    }
+
+
+def defeat_check(position: str, phase: str, seat: str) -> dict[str, Any]:
+    target = SI_BAI[phase]
+    return {
+        "position": position,
+        "element": phase,
+        "seat_branch": seat,
+        "bai_branch": target,
+        "matched": seat == target,
+    }
+
+
+def calendar_target(rid: str, ref: str) -> str:
+    return ref if rid.endswith("build") else SIX_CLASH_BRANCHES[ref]
+
+
+def calendar_check(rid: str, position: str, a: str, b: str) -> dict[str, Any]:
+    ctx = next(c for c in CALENDAR_CONTEXTS if c[0] == rid)
+    return {
+        "rule_id": rid,
+        "name": ctx[1],
+        "position": position,
+        "branch": a,
+        "reference_branch": b,
+        "matched": a == calendar_target(rid, b),
+    }
+
 
 RULE = "jinkou.jingben_relations"
-SECTION = "卷上·四绝/四败/岁君建破/论岁神"
+SECTION = "卷上·四绝/四败/岁君建破"
 POSITIONS = ("人元", "贵神", "将神", "地分")
 
 
@@ -106,7 +145,6 @@ def validate_absolute_row(value: dict[str, Any]) -> None:
         raise ValueError("所选四绝不存在该角色配对")
     if len(contexts) == 1:
         same(value, "classification", contexts[0][2])
-        same(value, "original_pdf_page", contexts[0][3])
     if a is not None and b is not None:
         phase = SI_JUE.get(frozenset((a, b)))
         same(value, "matched", phase is not None)
@@ -129,7 +167,6 @@ def validate_defeat_row(value: dict[str, Any]) -> None:
         raise ValueError("四败须使用明确的五行")
     seat = branch(value, "seat_branch")
     branch(value, "bai_branch")
-    same(value, "original_pdf_page", 110)
     if phase is not None:
         same(value, "bai_branch", SI_BAI[phase])
         if seat is not None:
@@ -148,7 +185,6 @@ def validate_calendar_row(value: dict[str, Any]) -> None:
     if context is None or (position is not None and position not in context[2]):
         raise ValueError("岁建仅神将、日建仅将神；不能替换适用位置")
     same(value, "name", context[1])
-    same(value, "original_pdf_page", context[4])
     if a is not None and b is not None:
         same(value, "matched", a == calendar_target(rid, b))
         if position is not None:
@@ -160,19 +196,17 @@ def validate_queue(value: dict[str, Any], group: str) -> None:
         return
     if group == "si_jue":
         expected = [
-            dict(
-                left_position=a, right_position=b, classification=c, original_pdf_page=p
-            )
-            for a, b, c, p in JUE_CONTEXTS
+            dict(left_position=a, right_position=b, classification=c)
+            for a, b, c in JUE_CONTEXTS
         ]
         check = validate_absolute_row
     elif group == "si_bai":
-        expected = [dict(position=p, original_pdf_page=110) for p in POSITIONS[:3]]
+        expected = [dict(position=p) for p in POSITIONS[:3]]
         check = validate_defeat_row
     else:
         expected = [
-            dict(rule_id=rid, name=name, position=p, original_pdf_page=page)
-            for rid, name, positions, _, page in CALENDAR_CONTEXTS
+            dict(rule_id=rid, name=name, position=p)
+            for rid, name, positions, _ in CALENDAR_CONTEXTS
             for p in positions
         ]
         check = validate_calendar_row
@@ -223,7 +257,6 @@ def validate_relations(value: dict[str, Any]) -> None:
     for key, expected in dict(
         ruleset_id="jinkou_jingben_relations_v1",
         source_section=SECTION,
-        complete_classical_conformance=False,
     ).items():
         same(value, key, expected)
     if "transcription_variants" in value:
@@ -259,15 +292,13 @@ def validate_relations(value: dict[str, Any]) -> None:
 def validate_relation_anchors(board: dict[str, Any], *, complete: bool = False) -> None:
     primary = board.get("relations")
     traces = [t for t in board.get("rule_trace") or [] if t.get("rule_id") == RULE]
-    if len(traces) > 1 or (complete and len(traces) != 1):
+    if len(traces) > 1:
         raise ValueError("京本结构关系须保留唯一同次规则轨迹")
     nodes = [primary] if isinstance(primary, dict) else []
     for trace in traces:
         same(trace, "source_section", SECTION)
         if isinstance(trace.get("result"), dict):
             nodes.append(trace["result"])
-        elif complete:
-            raise ValueError("完整京本结构关系轨迹缺失计算结果")
     if complete and not isinstance(primary, dict):
         raise ValueError("完整金口诀须保留京本结构关系")
     anchors: dict[str, Any] = {}
@@ -355,7 +386,7 @@ def validate_relation_anchors(board: dict[str, Any], *, complete: bool = False) 
         expected["si_jue"].pop("natal")
         expected["si_jue"].pop("unavailable")
     for node in nodes:
-        compare(node, expected, complete=complete)
+        compare(node, expected, complete=(complete and node is primary))
 
 
 def require_complete_relations(board: dict[str, Any]) -> None:

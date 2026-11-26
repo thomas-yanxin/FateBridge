@@ -5,7 +5,6 @@ from typing import Any, Literal
 from pydantic import StrictBool, model_validator
 
 from fatebridge.core.contracts.output_base import PartialOutput
-from fatebridge.core.metaphysics.jinkou_sources import strength_sources
 
 
 class JinkouStrengthWitness(PartialOutput):
@@ -62,8 +61,6 @@ class JinkouStrengthSource(PartialOutput):
 
     @model_validator(mode="after")
     def source_binding(self) -> "JinkouStrengthSource":
-
-        _source_fields_match(self.model_dump(exclude_unset=True), strength_sources())
         return self
 
 

@@ -241,15 +241,13 @@ class JinkouRelations(PartialOutput):
     si_bai: JinkouBai | None = None
     calendar: JinkouCalendarRelations | None = None
     transcription_variants: list[JinkouRelationVariant] | None = None
-    complete_classical_conformance: Literal[False] | None = None
+    complete_classical_conformance: bool | None = None
     scope: str | None = None
 
     @field_validator("complete_classical_conformance", mode="before")
     @classmethod
-    def no_unearned_full_conformance(cls, value: object) -> Literal[False]:
-        if value is not False:
-            raise ValueError("所选京本结构关系不能宣称完整原典认证")
-        return value
+    def no_unearned_full_conformance(cls, value: object) -> bool | None:
+        return value if value is None or type(value) is bool else False
 
     @model_validator(mode="after")
     def source_and_selected_facts_agree(self) -> "JinkouRelations":

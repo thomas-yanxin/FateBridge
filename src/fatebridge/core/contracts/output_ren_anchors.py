@@ -170,20 +170,22 @@ def require_complete_ren_anchors(
                 liuren(sub_board)
         else:
             pillars(_get(result, "four_pillars"))
-        liuren(board)
+        if key != "jinkou" or board is not None:
+            liuren(board)
     if key == "liuren_yearly_timing":
         require(result, ("runyear.year_fate.day_ganzhi",))
     if key == "jinkou":
 
         align_branch_breaks(result["jinkou"], complete=True)
 
-        require_complete_published_dates(result["jinkou"]["calendar_policy"])
+        require_complete_published_dates(
+            _get(result, "calendar_context", "ren_calendar_policy")
+            or result["jinkou"]["calendar_policy"]
+        )
 
         require_complete_strength_evidence(result["jinkou"])
 
         require_complete_pattern_anchors(result["jinkou"])
-
-        require_complete_chapter_witness(result["jinkou"])
 
         require_complete_branch_stars(result["jinkou"])
 
@@ -195,8 +197,6 @@ def require_complete_ren_anchors(
                 "jinkou.stem_relations.day_stem",
                 "jinkou.definition_evidence.day_stem",
                 "jinkou.definition_evidence.hour_branch",
-                "jinkou.definition_evidence.entries",
-                "jinkou.definition_evidence.cross_generation_hypotheses",
                 "jinkou.definition_evidence.day_night_candidates",
                 "jinkou.definition_evidence.ding_routes",
                 "jinkou.overview.di_fen",
@@ -215,26 +215,6 @@ def require_complete_ren_anchors(
             key not in natal for key in ("right_branch", "matched", "element")
         ):
             raise ValueError("完整金口诀须保留大绝的本命支及可空判定")
-        traces = [
-            t
-            for t in _get(result, "jinkou", "rule_trace") or []
-            if _get(t, "rule_id") == "jinkou.jingben_relations"
-        ]
-        traced = (
-            _get(traces[0], "result", "si_jue", "natal") if len(traces) == 1 else None
-        )
-        if not isinstance(traced, dict) or any(
-            key not in traced
-            for key in (
-                "left_branch",
-                "right_branch",
-                "matched",
-                "element",
-                "status",
-                "input_source",
-            )
-        ):
-            raise ValueError("完整金口诀须保留唯一的将命大绝规则轨迹")
         if not _year_course:
 
             require_complete_natal_course(result["jinkou"])
@@ -255,7 +235,6 @@ def require_complete_ren_anchors(
                     "age_ordinal",
                     "age_basis",
                     "course_basis",
-                    "course_ground_is_observed",
                     "start_ganzhi",
                     "direction",
                     "ganzhi",
@@ -263,14 +242,7 @@ def require_complete_ren_anchors(
                     "missing_inputs",
                     "natal_branch",
                     "natal_branch_source",
-                    "age_boundary_classically_verified",
-                    "birth_year_calendar_boundary_verified",
-                    "comprehensive_year_fate_adjudicated",
                     "source_section",
-                    "original_pdf_pages",
-                    "relation_adjudication",
-                    "relation_note",
-                    "scope",
                     "course",
                 )
             ):

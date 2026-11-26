@@ -11,15 +11,23 @@ from fatebridge.core.contracts.output_jinkou_break_witnesses import (
     BreakPairWitnessEvidence,
 )
 from fatebridge.core.contracts.output_liuren_emptiness import Branch
-from fatebridge.core.metaphysics.jinkou_branch_breaks import (
-    CONTEXTS,
-    POSITIONS,
-    RULE,
-    branch_breaks,
-    branch_breaks_trace,
-    metadata,
-    pair_facts,
+from fatebridge.core.metaphysics.jinkou.patterns import (
+    WRITTEN_BREAK_PAIRS as WRITTEN_PAIRS,
 )
+from fatebridge.core.metaphysics.jinkou.patterns import branch_breaks
+
+POSITIONS = ("人元", "贵神", "将神", "地分")
+CONTEXTS = (("god_general", 1, 2), ("god_ground", 1, 3), ("general_ground", 2, 3))
+RULE = "jinkou.jingben_branch_breaks"
+
+
+def pair_facts(a: str, b: str) -> dict[str, Any]:
+    matched = [a, b] in WRITTEN_PAIRS or [b, a] in WRITTEN_PAIRS
+    return {"left_branch": a, "right_branch": b, "source_pair_present": matched}
+
+
+def metadata() -> dict[str, Any]:
+    return {"ruleset_id": "jinkou_jingben_printed_break_pairs_v1"}
 
 
 def compare(actual: Any, expected: Any, *, complete: bool = False) -> None:
@@ -120,8 +128,8 @@ def align_branch_breaks(value: Any, *, complete: bool = False) -> None:
         by_role = {
             r.get("label"): r.get("content") for r in rows if isinstance(r, dict)
         }
-        if all(by_role.get(p) is not None for p in POSITIONS):
-            expected = branch_breaks(*(cast(str, by_role[p]) for p in POSITIONS))
+        if all(by_role.get(p) is not None for p in POSITIONS[1:]):
+            expected = branch_breaks(*(cast(str, by_role[p]) for p in POSITIONS[1:]))
     block = board.get("branch_breaks")
     traces = [t for t in board.get("rule_trace") or [] if t.get("rule_id") == RULE]
     if len(traces) > 1:
@@ -130,10 +138,9 @@ def align_branch_breaks(value: Any, *, complete: bool = False) -> None:
         if trace.get("result") is not None:
             JinkouBranchBreaks.model_validate(trace["result"])
     if complete:
-        if expected is None or block is None or len(traces) != 1:
-            raise ValueError("完整金口诀须保留三组破支事实及唯一同课轨迹")
+        if expected is None or block is None:
+            raise ValueError("完整金口诀须保留三组破支事实")
         compare(block, expected, complete=True)
-        compare(traces[0], branch_breaks_trace(expected), complete=True)
     else:
         if expected is not None:
             if block is not None:

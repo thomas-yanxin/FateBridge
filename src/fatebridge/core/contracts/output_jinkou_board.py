@@ -40,7 +40,7 @@ from fatebridge.core.contracts.output_liuren_board import (
     RenRuleTrace,
 )
 from fatebridge.core.contracts.output_ren_patterns import JinkouPatterns
-from fatebridge.core.metaphysics.jinkou_definitions import definition_evidence
+from fatebridge.core.metaphysics.jinkou.patterns import definition_evidence
 
 
 class JinkouCourse(PartialOutput):

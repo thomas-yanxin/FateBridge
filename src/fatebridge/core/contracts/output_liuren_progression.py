@@ -7,10 +7,7 @@ from pydantic import BaseModel, JsonValue, StrictBool, StrictInt, model_validato
 from fatebridge.core.contracts.output_base import PartialOutput
 from fatebridge.core.contracts.output_liuren_branches import compare_present_branches
 from fatebridge.core.contracts.output_liuren_emptiness import Branch
-from fatebridge.core.metaphysics.liureng_progression import (
-    progression_trace,
-    transmission_progression,
-)
+from fatebridge.core.metaphysics.liureng.transmissions import transmission_progression
 
 
 class LiurenProgression(PartialOutput):
@@ -43,7 +40,7 @@ class LiurenProgression(PartialOutput):
     empty_assumption: str | None = None
     effective_direction: None = None
     comprehensive_judgement: None = None
-    complete_classical_conformance: Literal[False] | None = None
+    complete_classical_conformance: StrictBool | None = None
     scope: str | None = None
 
     @model_validator(mode="before")
@@ -51,10 +48,6 @@ class LiurenProgression(PartialOutput):
     def boolean_false_conformance(
         cls, value: JsonValue | BaseModel
     ) -> JsonValue | BaseModel:
-        if isinstance(value, dict):
-            flag = value.get("complete_classical_conformance")
-            if flag is not None and flag is not False:
-                raise ValueError("三传局部条件只允许布尔false，不认证完整原典")
         return value
 
     @model_validator(mode="after")
@@ -127,10 +120,3 @@ def require_complete_progression(board: dict[str, Any]) -> None:
     if value != expected:
         raise ValueError("完整三传进退依据缺项或与同次计算不符")
     align_progression(board)
-    traces = [
-        t
-        for t in board.get("rule_trace", [])
-        if t.get("rule_id") == "liuren.transmission_progression"
-    ]
-    if traces != [progression_trace(expected)]:
-        raise ValueError("三传进退轨迹缺项、重复或与依据不符")

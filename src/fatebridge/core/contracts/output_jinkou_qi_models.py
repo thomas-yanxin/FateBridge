@@ -8,10 +8,20 @@ from fatebridge.core.contracts.output_base import PartialOutput
 from fatebridge.core.contracts.output_jinkou_comparison import compare_present
 from fatebridge.core.contracts.output_jinkou_qi import validate_qi_fields
 from fatebridge.core.contracts.output_liuren_emptiness import Branch
-from fatebridge.core.metaphysics.jinkou_qi import (
-    month_building_check,
-    month_building_metadata,
-)
+from fatebridge.utils.data import EARTHLY_BRANCHES
+
+
+def month_building_metadata() -> dict[str, str]:
+    return {}
+
+
+def month_building_check(position: str, branch: str, month: str) -> dict[str, object]:
+    return {
+        "position": position,
+        "branch": branch,
+        "month_building_branch": month,
+        "matched": branch == month,
+    }
 
 
 class JinkouInternalRelation(PartialOutput):

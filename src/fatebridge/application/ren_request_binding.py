@@ -16,8 +16,10 @@ from fatebridge.core.local_techniques.chart import (
     _resolve_coordinates,
     parse_local_datetime,
 )
-from fatebridge.core.metaphysics.jinkou_year_fate import confirmed_natal_branch
-from fatebridge.core.metaphysics.liureng import _liureng_month_general_for_term
+from fatebridge.core.metaphysics.jinkou.year_fate import confirmed_natal_branch
+from fatebridge.core.metaphysics.ren_calendar import (
+    month_general_for_term as _liureng_month_general_for_term,
+)
 from fatebridge.core.metaphysics.ren_calendar import (
     resolve_runyear_birth_clock,
     resolve_runyear_birth_zone,
@@ -133,10 +135,7 @@ def require_request_binding(
         if (
             request.use_true_solar_time
             and longitude is None
-            and (
-                key == "liuren_yearly_timing"
-                or "use_true_solar_time" in request.model_fields_set
-            )
+            and "use_true_solar_time" in request.model_fields_set
         ):
             raise ValueError("显式真太阳时请求需要经度")
         applied_solar = request.use_true_solar_time and longitude is not None
@@ -177,25 +176,27 @@ def require_request_binding(
             ),
         )
     board = _get(result, "liureng")
-    _mapping(board, policy, "calendar_policy.")
-    _same(board, "meta.guiren_profile", profile)
     hour = ren_result["four_pillars"]["hour"]["branch"]
     diurnal = resolve_diurnal(hour, explicit)
-    _mapping(board, diurnal, "meta.diurnal_evidence.")
-    _gender(board, "meta.questioner_gender", gender)
     current_term = calendar["current_solar_term"]["name"]
     general = override or _liureng_month_general_for_term(current_term)
-    _same(board, "month_general.branch", general)
-    _same(
-        board,
-        "meta.month_general_basis",
-        "explicit_override" if override is not None else "中气换将",
-    )
+    if board is not MISSING:
+        _mapping(board, policy, "calendar_policy.")
+        _same(board, "meta.guiren_profile", profile)
+        _mapping(board, diurnal, "meta.diurnal_evidence.")
+        _gender(board, "meta.questioner_gender", gender)
+        _same(board, "month_general.branch", general)
+        _same(
+            board,
+            "meta.month_general_basis",
+            "explicit_override" if override is not None else "中气换将",
+        )
 
     if key == "jinkou":
         assert isinstance(request, JinkouAnalysisRequest)
         jinkou = _get(result, "jinkou")
         _mapping(jinkou, policy, "calendar_policy.")
+        _same(jinkou, "overview.month_general.branch", general)
         _same(jinkou, "overview.di_fen", request.di_fen or hour)
         _same(
             jinkou,

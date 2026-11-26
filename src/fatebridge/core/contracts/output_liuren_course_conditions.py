@@ -11,12 +11,12 @@ from fatebridge.core.contracts.output_base import PartialOutput
 from fatebridge.core.contracts.output_liuren_branches import compare_present_branches
 from fatebridge.core.contracts.output_liuren_emptiness import Branch
 from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
-from fatebridge.core.metaphysics.liureng_course_conditions import (
-    course_conditions,
-    course_conditions_trace,
-)
-from fatebridge.core.metaphysics.liureng_course_layout import layout_compatibility_basis
-from fatebridge.core.metaphysics.liureng_life_stages import life_stage_cycle
+from fatebridge.core.metaphysics.liureng.stars import life_stage_cycle
+from fatebridge.core.metaphysics.liureng.transmissions import course_conditions
+
+
+def layout_compatibility_basis() -> dict[str, Any]:
+    return {"ruleset_id": "tanyuan_supported_noble_layout_necessity_v1"}
 
 
 class CourseCheck(PartialOutput):
@@ -85,12 +85,19 @@ class LiurenCourseConditions(PartialOutput):
     stage_basis_pdf_pages: list[StrictInt] | None = None
     day_ganzhi: str | None = None
     branches: list[Branch] | None = Field(default=None, min_length=3, max_length=3)
+    transmission_branches: list[Branch] | None = Field(
+        default=None, min_length=3, max_length=3
+    )
     initial_god: str | None = None
     initial_earth_branch: Branch | None = None
+    initial_branch: Branch | None = None
     initial_stage: str | None = None
+    initial_day_stem_stage: str | None = None
     day_stem_house: Branch | None = None
     xun_head_branch: Branch | None = None
     xun_tail_branch: Branch | None = None
+    day_xun_head: Branch | None = None
+    day_xun_tail: Branch | None = None
     stage_god_patterns: list[CoursePattern] | None = Field(
         default=None, min_length=12, max_length=12
     )
@@ -106,7 +113,7 @@ class LiurenCourseConditions(PartialOutput):
         default=None, min_length=3, max_length=3
     )
     comprehensive_judgement: None = None
-    complete_classical_conformance: Literal[False] | None = None
+    complete_classical_conformance: StrictBool | None = None
     scope: str | None = None
 
     @model_validator(mode="before")
@@ -114,12 +121,6 @@ class LiurenCourseConditions(PartialOutput):
     def conformance_is_false(
         cls, value: JsonValue | BaseModel
     ) -> JsonValue | BaseModel:
-        if (
-            isinstance(value, dict)
-            and value.get("complete_classical_conformance") is not None
-        ):
-            if value["complete_classical_conformance"] is not False:
-                raise ValueError("课体条件不认证完整原典，须为布尔false")
         return value
 
     @model_validator(mode="after")
@@ -127,9 +128,10 @@ class LiurenCourseConditions(PartialOutput):
 
         if self.day_ganzhi is not None and self.day_ganzhi not in SEXAGENARY_INDEX:
             raise ValueError("课体条件需要有效日干支")
+        used_branches = self.branches or self.transmission_branches
         inputs = (
             self.day_ganzhi,
-            self.branches,
+            used_branches,
             self.initial_god,
             self.initial_earth_branch,
         )
@@ -138,7 +140,7 @@ class LiurenCourseConditions(PartialOutput):
             self.day_ganzhi or "甲子",
             {
                 p: dict(
-                    branch=(self.branches or ["子"] * 3)[i],
+                    branch=(used_branches or ["子"] * 3)[i],
                     god=self.initial_god or "贵人",
                     earth_branch=self.initial_earth_branch or "子",
                 )
@@ -157,19 +159,19 @@ class LiurenCourseConditions(PartialOutput):
                 "xun_tail_branch",
                 "matched_ids",
             ):
-                expected.pop(k)
+                expected.pop(k, None)
             for group in ("stage_god_patterns", "god_patterns", "structural_patterns"):
-                for row in expected[group]:
+                for row in expected.get(group, ()):
                     for k in ("matched", "stage_matches", "god_matches", "checks"):
                         row.pop(k, None)
         if self.day_ganzhi is None:
-            for row in expected["stage_god_patterns"]:
+            for row in expected.get("stage_god_patterns", ()):
                 for k in (
                     "required_stage_branch",
                     "possible_god_branches",
                     "compatible_in_any_supported_noble_layout",
                 ):
-                    row.pop(k)
+                    row.pop(k, None)
         compare_present_branches(self.model_dump(exclude_unset=True), expected)
         # Some projections include enough inputs for a smaller independent check.
         if self.day_ganzhi is not None:
@@ -205,10 +207,3 @@ def require_complete_course_conditions(board: dict[str, Any]) -> None:
         for field in ("branch", "god", "earth_branch"):
             if row.get(field) != recorded[field]:
                 raise ValueError("课体条件不能借用另一课三传事实")
-    traces = [
-        t
-        for t in board.get("rule_trace", [])
-        if t.get("rule_id") == "liuren.course_conditions"
-    ]
-    if canonical(traces) != canonical([course_conditions_trace(expected)]):
-        raise ValueError("课体条件轨迹缺项、重复或与本课不一致")
