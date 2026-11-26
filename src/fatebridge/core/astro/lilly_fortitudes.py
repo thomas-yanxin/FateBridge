@@ -519,7 +519,6 @@ def evaluate_fortitudes(
                 if r["status"] == "satisfied"
             ],
             "row_count": len(rows),
-            "conditional_reading_zh": f"{planet}按本次采用的 Lilly 条件表计分，助力{positive}分、减损{negative}分，另有{len(unknown)}行条件待定。",
         }
         bodies[planet] = {**summary, "rows": rows}
         summaries[planet] = summary

@@ -12,19 +12,16 @@ from fatebridge.core.astro import runtime
 from fatebridge.core.astro.angle_definitions import (
     native_ecliptic_horizon_angle_definition,
 )
+from fatebridge.core.astro.ephemeris import (
+    _resolve_swe_body_id,
+    _swisseph_planet_state,
+    fast_swe_call,
+)
 from fatebridge.core.astro.geometry import normalize_angle
 from fatebridge.core.astro.house_axes import canonical_house_geometry
-from fatebridge.core.astro.longitude_motion import (
-    LunarAdjustment,
-    corrected_longitude_motion,
-)
-from fatebridge.core.astro.lunar_source_window import (
-    coherent_lunar_native_state,
-)
 from fatebridge.core.astro.native_coordinates import require_spherical_coordinates
 from fatebridge.core.astro.native_motion import require_longitude_speed
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
-from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.astro.ut1_epoch import UT1Instant
 
@@ -34,16 +31,16 @@ def native_lahiri_positions(
     *,
     julian_day_ut1: float,
     julian_day_tt: float | TTInstant | None,
-    lunar_adjustments: dict[str, LunarAdjustment] | None = None,
+    lunar_adjustments: dict[str, Any] | None = None,
     motion_metadata: dict[str, Any] | None = None,
     source_trace: PhysicalEphemerisTrace | None = None,
+    node_mode: str = "mean",
 ) -> dict[str, dict[str, float]]:
     """Native zodiac coordinates/speeds; physical states remain for horizon."""
+    del lunar_adjustments, motion_metadata
     if runtime.swe is None:
         raise ValueError("原生Lahiri黄道转换需要Swiss Ephemeris")
     operation = "calc" if julian_day_tt is not None else "calc_ut"
-    # Native states and their motion/source-window corrections share this
-    # actual SDK epoch, rather than a frame evaluated at an unrounded point.
     instant = (
         TTInstant.from_value(julian_day_tt).as_float()
         if julian_day_tt is not None
@@ -54,10 +51,41 @@ def native_lahiri_positions(
     with runtime.preserve_ephemeris_path():
         runtime.swe.set_sid_mode(runtime.swe.SIDM_LAHIRI, 0, 0)
         for planet in planets:
-            coordinates, flags = runtime.ephemeris_call(
+            if planet == "South Node":
+                north = result.get("North Node")
+                if north is None:
+                    n_id = _resolve_swe_body_id("North Node", node_mode=node_mode)
+                    assert n_id is not None
+                    coords, flags = fast_swe_call(
+                        operation,
+                        instant,
+                        n_id,
+                        runtime.swe.FLG_SWIEPH
+                        | runtime.swe.FLG_SPEED
+                        | runtime.swe.FLG_SIDEREAL,
+                    )
+                    spd = require_longitude_speed(coords, flags, runtime.swe.FLG_SPEED)
+                    lon, lat, _ = require_spherical_coordinates(
+                        coords, flags, native=runtime.swe, sidereal=True
+                    )
+                    north = {
+                        "longitude": normalize_angle(lon),
+                        "latitude": lat,
+                        "longitude_speed": spd,
+                    }
+                result[planet] = {
+                    "longitude": normalize_angle(north["longitude"] + 180.0),
+                    "latitude": -float(north["latitude"]),
+                    "longitude_speed": float(north["longitude_speed"]),
+                }
+                continue
+            body_id = _resolve_swe_body_id(planet, node_mode=node_mode)
+            if body_id is None:
+                continue
+            coordinates, flags = fast_swe_call(
                 operation,
                 instant,
-                PLANET_SWISSEPH_IDS[planet],
+                body_id,
                 runtime.swe.FLG_SWIEPH
                 | runtime.swe.FLG_SPEED
                 | runtime.swe.FLG_SIDEREAL,
@@ -73,62 +101,6 @@ def native_lahiri_positions(
                 "latitude": latitude,
                 "longitude_speed": longitude_speed,
             }
-            motion_tt = (
-                instant
-                if julian_day_tt is not None
-                else julian_day_ut1
-                + float(
-                    runtime.ephemeris_call(
-                        "deltat_ex",
-                        julian_day_ut1,
-                        flags
-                        & (
-                            runtime.swe.FLG_SWIEPH
-                            | runtime.swe.FLG_MOSEPH
-                            | runtime.swe.FLG_JPLEPH
-                        ),
-                    )
-                )
-            )
-            if planet == "Moon":
-                model = runtime.ephemeris_model_from_retflag(flags)
-                coordinates, flags, policy = coherent_lunar_native_state(
-                    operation,
-                    instant,
-                    runtime.swe.FLG_SWIEPH
-                    | runtime.swe.FLG_SPEED
-                    | runtime.swe.FLG_SIDEREAL,
-                    motion_tt,
-                    model,
-                    trace,
-                    initial=coordinates,
-                    initial_flags=flags,
-                )
-                speed = require_longitude_speed(
-                    coordinates, flags, runtime.swe.FLG_SPEED
-                )
-                lon, lat, _ = require_spherical_coordinates(
-                    coordinates, flags, native=runtime.swe, sidereal=True
-                )
-                result[planet].update(
-                    longitude=normalize_angle(lon), latitude=lat, longitude_speed=speed
-                )
-                if motion_metadata is not None:
-                    motion_metadata.setdefault("lunar_source_windows", {})[
-                        "lahiri"
-                    ] = policy
-            result[planet].update(
-                corrected_longitude_motion(
-                    planet,
-                    motion_tt,
-                    coordinates,
-                    runtime.ephemeris_model_from_retflag(flags),
-                    sidereal=True,
-                    context=motion_metadata,
-                    source_trace=trace,
-                    lunar_adjustment=(lunar_adjustments or {}).get(planet),
-                )
-            )
         if source_trace is None:
             trace.finish()
     return result

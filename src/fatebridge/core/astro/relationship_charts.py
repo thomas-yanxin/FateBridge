@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
+import math
 from typing import Any, Literal
 
+from fatebridge.core.astro import runtime
 from fatebridge.core.astro.angle_definitions import is_ascendant_resolved
 from fatebridge.core.astro.aspects import _build_aspects
 from fatebridge.core.astro.astrology_tables import SIGN_LABELS_ZH
 from fatebridge.core.astro.birth import AstroBirthInfo
 from fatebridge.core.astro.chart import build_core_chart_payload
-from fatebridge.core.astro.geometry import _sign_name
+from fatebridge.core.astro.ephemeris import fast_swe_call
+from fatebridge.core.astro.geometry import _sign_name, normalize_angle
 from fatebridge.core.astro.layout import (
     _house_cusp_values_from_payload,
     _midpoint_house_cusps,
@@ -43,6 +46,8 @@ def _composite_chart(
     *,
     house_system: str,
     zodiacal_info: dict[str, Any],
+    composite_house_method: str = "midpoint",
+    midpoint_latitude: float | None = None,
 ) -> dict[str, Any]:
     engine_profile = _derive_engine_profile(
         inner_chart.get("chart_profile", {}),
@@ -76,23 +81,75 @@ def _composite_chart(
     are_houses_resolved = (
         are_both_ascendants_resolved or not are_houses_ascendant_dependent
     ) and (are_both_ascendants_resolved or midheaven is not None)
-    house_cusps = (
-        []
-        if not are_houses_resolved or house_system == "whole_sign"
-        else _midpoint_house_cusps(
+    house_cusps: list[float] = []
+    if (
+        composite_house_method == "mc_latitude"
+        and midheaven is not None
+        and midpoint_latitude is not None
+        and runtime.swe is not None
+        and abs(midpoint_latitude) < 90.0
+    ):
+        eps_rad = math.radians(23.43929)
+        mc_rad = math.radians(midheaven)
+        armc = (
+            math.degrees(
+                math.atan2(math.sin(mc_rad) * math.cos(eps_rad), math.cos(mc_rad))
+            )
+            % 360.0
+        )
+        code_map = {
+            "whole_sign": b"W",
+            "alcabitus": b"B",
+            "regiomontanus": b"R",
+            "placidus": b"P",
+            "koch": b"K",
+            "vehlow_equal": b"V",
+            "polich_page": b"T",
+            "sripati": b"S",
+            "equal_mc": b"D",
+            "equal": b"E",
+        }
+        h_code = code_map.get(house_system, b"P")
+        try:
+            cusps_raw, ascmc_raw = fast_swe_call(
+                "houses_armc", armc, midpoint_latitude, math.degrees(eps_rad), h_code
+            )
+            ascendant = normalize_angle(float(ascmc_raw[0]))
+            house_cusps = (
+                []
+                if house_system == "whole_sign"
+                else [normalize_angle(float(c)) for c in cusps_raw[:12]]
+            )
+            are_houses_resolved = True
+            are_both_ascendants_resolved = True
+        except Exception:
+            house_cusps = []
+    if not house_cusps and are_houses_resolved and house_system != "whole_sign":
+        house_cusps = _midpoint_house_cusps(
             _house_cusp_values_from_payload(inner_chart),
             _house_cusp_values_from_payload(outer_chart),
         )
-    )
     planet_asc_anchor = ascendant if ascendant is not None else 0.0
+    sun_comp_lon: float | None = None
+    if "Sun" in inner_planets and "Sun" in outer_planets:
+        sun_comp_lon = unique_midpoint(
+            inner_planets["Sun"]["longitude"],
+            outer_planets["Sun"]["longitude"],
+        )
     composite_planets: list[dict[str, Any]] = []
     for planet in PLANET_SEQUENCE:
         if planet not in inner_planets or planet not in outer_planets:
             continue
-        longitude = unique_midpoint(
-            inner_planets[planet]["longitude"],
-            outer_planets[planet]["longitude"],
-        )
+        lon_a = inner_planets[planet]["longitude"]
+        lon_b = outer_planets[planet]["longitude"]
+        antipodal = abs((lon_b - lon_a) % 360.0 - 180.0) < 1e-9
+        longitude = unique_midpoint(lon_a, lon_b)
+        flipped_elongation = False
+        if planet in ("Mercury", "Venus") and sun_comp_lon is not None:
+            sep = abs(math.remainder(longitude - sun_comp_lon, 360.0))
+            if sep > 90.0:
+                longitude = normalize_angle(longitude + 180.0)
+                flipped_elongation = True
         record = _build_planet_record(
             planet,
             longitude,
@@ -101,9 +158,12 @@ def _composite_chart(
             planet_asc_anchor,
             house_system if are_houses_resolved else "whole_sign",
             house_cusps=house_cusps or None,
+            houses_resolved=are_houses_resolved,
         )
-        if not are_houses_resolved:
-            record["house"] = None
+        if antipodal:
+            record["antipodal_midpoint"] = True
+        if flipped_elongation:
+            record["flipped_for_sun_elongation"] = True
         composite_planets.append(record)
     aspect_evidence = _build_aspects(composite_planets, include_evidence=True)
     aspects = [
@@ -220,6 +280,7 @@ def _build_relative_base_chart(
     *,
     house_system_info: dict[str, Any],
     zodiacal_info: dict[str, Any],
+    high_latitude_fallback: str = "error",
 ) -> dict[str, Any]:
     base_chart = build_core_chart_payload(
         birth_info,
@@ -227,6 +288,7 @@ def _build_relative_base_chart(
         hsys=house_system_info["value"],
         zodiacal=zodiacal_info["value"],
         include_planetary_hours=False,
+        high_latitude_fallback=high_latitude_fallback,
     )
     # note (recast): A derived event uses the same native zodiac, houses, and time basis as a natal chart.
     return {

@@ -22,6 +22,11 @@ class WesternTimingBaseRequest(
 ):
     """Shared base request model for western predictive timing techniques."""
 
+    high_latitude_fallback: Literal["error", "porphyry", "whole_sign"] = Field(
+        default="error",
+        description="Fallback when quadrant houses fail at high latitudes: error (default), porphyry, or whole_sign.",
+    )
+
 
 class WesternReturnTimingRequest(WesternTimingBaseRequest):
     """Request model for solar and lunar return timing techniques."""
@@ -62,17 +67,27 @@ class WesternPrimaryDirectionsRequest(WesternTimingBaseRequest):
     """Request model for primary directions timing."""
 
     pd_method: Literal[
-        "astroapp_alchabitius", "equatorial", "fatebridge_mundane_semiarc"
+        "placidus",
+        "regiomontanus",
+        "campanus",
+        "alcabitius",
+        "equatorial",
+        "astroapp_alchabitius",
+        "fatebridge_mundane_semiarc",
     ] = Field(
-        default="astroapp_alchabitius",
+        default="placidus",
         description=(
-            "Primary direction method identifier, e.g. astroapp_alchabitius, "
-            "equatorial, or fatebridge_mundane_semiarc"
+            "Primary direction method: placidus (default), regiomontanus, campanus, "
+            "alcabitius, or equatorial (oblique ascension for Asc, RAMC for MC)."
         ),
     )
-    pd_time_key: Literal["Ptolemy", "Naibod", "Cardan"] = Field(
+    pd_time_key: Literal["Ptolemy", "Naibod", "Cardan", "Solar_Arc", "Van_Dam"] = Field(
         default="Ptolemy",
-        description="Primary direction time key: Ptolemy, Naibod or Cardan",
+        description="Primary direction time key: Ptolemy, Naibod, Cardan, Solar_Arc, or Van_Dam.",
+    )
+    pd_direction_mode: Literal["zodiacal", "mundane"] = Field(
+        default="zodiacal",
+        description="Primary direction mode: 'zodiacal' (ecliptic aspect points) or 'mundane' (in mundo).",
     )
     pd_type: int = Field(
         default=0,

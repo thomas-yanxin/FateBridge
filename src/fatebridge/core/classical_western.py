@@ -366,8 +366,17 @@ def ecliptic_out_of_bounds(longitude: float, latitude: float, obliquity: float) 
     ERFA NUMAT's ecliptic/equatorial rotation gives the unit ray's z below.
     Compare it directly with sin(epsilon), avoiding an asin/degree round trip
     that can put even an in-plane ray outside its own bound. Supplied degree
-    inputs are retained at 96 digits; no body-name shortcut or deadband.
+    inputs are retained at 96 digits near the cone boundary; no deadband.
     """
+    lam_r = math.radians(longitude)
+    beta_r = math.radians(latitude)
+    eps_r = math.radians(obliquity)
+    sin_eps_f = math.sin(eps_r)
+    z_f = math.sin(beta_r) * math.cos(eps_r) + math.cos(beta_r) * sin_eps_f * math.sin(
+        lam_r
+    )
+    if abs(abs(z_f) - abs(sin_eps_f)) > 1e-11:
+        return abs(z_f) > abs(sin_eps_f)
     ctx = mp.clone()
     ctx.dps = 96
     lam, beta, eps = (

@@ -59,7 +59,6 @@ def _build_western_timing_natal_reference(
     natal_subject: NativeSubject,
 ) -> dict[str, Any]:
     natal_reference = extract_reference_points(natal_subject)
-    natal_reference["calculation_basis"] = natal_subject.calculation_basis
     sect = determine_sect(natal_subject)
     natal_reference["sect"] = {"key": sect, "label": sect_label(sect)}
     if is_ascendant_resolved(natal_subject):
@@ -67,7 +66,7 @@ def _build_western_timing_natal_reference(
     else:
         natal_reference["lots"] = {
             lot_key: _unresolved_lot_payload(lot_key)
-            for lot_key in ("lot_of_fortune", "lot_of_spirit")
+            for lot_key in ("lot_of_fortune", "lot_of_spirit", "lot_of_eros")
         }
     return natal_reference
 
@@ -103,6 +102,7 @@ def _build_primary_direction_pair(
     pd_type: int,
     pd_aspects: list[int] | None,
     show_pd_bounds: bool,
+    pd_direction_mode: str = "zodiacal",
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     directions = build_primary_direction_analysis(
         birth_info,
@@ -112,6 +112,7 @@ def _build_primary_direction_pair(
         pd_time_key=pd_time_key,
         pd_type=pd_type,
         pd_aspects=pd_aspects,
+        direction_mode=pd_direction_mode,
     )
     primary_directions_payload = directions.payload
     primary_direction_chart_payload = build_primary_direction_chart_payload(
@@ -263,16 +264,19 @@ def build_western_timing_module_payload(
     return_timezone: str | None = None,
     house_system: str = "P",
     zodiac_type: str = "Tropic",
-    pd_method: str = "astroapp_alchabitius",
+    pd_method: str = "placidus",
     pd_time_key: str = "Ptolemy",
     pd_type: int = 0,
     pd_aspects: list[int] | None = None,
     show_pd_bounds: bool = True,
+    high_latitude_fallback: str = "error",
+    pd_direction_mode: str = "zodiacal",
 ) -> dict[str, Any]:
     natal_subject = build_natal_subject(
         birth_info,
         house_system=house_system,
         zodiac_type=zodiac_type,
+        high_latitude_fallback=high_latitude_fallback,
     )
     natal_reference = _build_western_timing_natal_reference(natal_subject)
     return_location = _resolve_western_timing_return_location(
@@ -362,6 +366,7 @@ def build_western_timing_module_payload(
             pd_time_key=pd_time_key,
             pd_type=pd_type,
             pd_aspects=pd_aspects,
+            direction_mode=pd_direction_mode,
         )
         result["directions"] = {"primary_directions": primary_directions_payload}
         result["summary"] = _build_western_timing_module_summary(
@@ -381,6 +386,7 @@ def build_western_timing_module_payload(
             pd_type=pd_type,
             pd_aspects=pd_aspects,
             show_pd_bounds=show_pd_bounds,
+            pd_direction_mode=pd_direction_mode,
         )
         result["directions"] = {
             "primary_direction_chart": primary_direction_chart_payload
@@ -462,17 +468,6 @@ def build_western_timing_module_payload(
         return result
 
     if technique == "decennials":
-        # Period allocation uses sect and natal longitude order. Keep chart
-        # provenance without embedding the per-planet derivative sampling trace.
-        basis = natal_subject.calculation_basis
-        natal_reference["calculation_basis"] = {
-            **basis,
-            "longitude_motion": {
-                key: value
-                for key, value in basis["longitude_motion"].items()
-                if key != "complete_position_derivatives"
-            },
-        }
         decennials_payload = build_decennials_payload(
             birth_info,
             natal_subject,
@@ -500,16 +495,19 @@ def build_western_timing_payload(
     return_timezone: str | None = None,
     house_system: str = "P",
     zodiac_type: str = "Tropic",
-    pd_method: str = "astroapp_alchabitius",
+    pd_method: str = "placidus",
     pd_time_key: str = "Ptolemy",
     pd_type: int = 0,
     pd_aspects: list[int] | None = None,
     show_pd_bounds: bool = True,
+    high_latitude_fallback: str = "error",
+    pd_direction_mode: str = "zodiacal",
 ) -> dict[str, Any]:
     natal_subject = build_natal_subject(
         birth_info,
         house_system=house_system,
         zodiac_type=zodiac_type,
+        high_latitude_fallback=high_latitude_fallback,
     )
     natal_reference = _build_western_timing_natal_reference(natal_subject)
     return_location = _resolve_western_timing_return_location(
@@ -549,6 +547,7 @@ def build_western_timing_payload(
             pd_type=pd_type,
             pd_aspects=pd_aspects,
             show_pd_bounds=show_pd_bounds,
+            pd_direction_mode=pd_direction_mode,
         )
     )
     profection_payload = build_annual_profection_payload(

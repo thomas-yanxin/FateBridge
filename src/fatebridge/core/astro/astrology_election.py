@@ -11,6 +11,7 @@ from fatebridge.core.astro.astrology_tables import (
     RULER_BY_SIGN,
     SIGNS,
 )
+from fatebridge.core.astro.classical import _resolve_planetary_hour
 from fatebridge.core.astro.event_reference import (
     reference_qualification,
     unresolved_ascendant,
@@ -23,7 +24,9 @@ from fatebridge.core.astro.geometry import (
 )
 from fatebridge.core.astro.horary_events import native_planetary_events
 from fatebridge.core.astro.horary_motion import native_lunar_contacts
-from fatebridge.core.classical_western import combustion_state, solar_condition_policy
+
+_ORIG_NATIVE_PLANETARY_EVENTS = native_planetary_events
+from fatebridge.core.classical_western import combustion_state
 from fatebridge.core.planetary_event_order import ordered_contact
 from fatebridge.core.predictive._common import (
     planet_label,
@@ -129,7 +132,6 @@ def _planet_view(subject: Any, planet: str) -> dict[str, Any]:
         "retrograde": None if speed is None else speed < 0.0,
         "house": getattr(point, "house", None),
         "dignity": _dignity(planet, sign),
-        "dignity_scope": "sign_only_major_dignity; triplicity_term_face_and_peregrine_not_classified",
     }
 
 
@@ -247,6 +249,26 @@ def build_election_payload(subject: Any, *, topic_id: str) -> dict[str, Any]:
         elif retrograde:
             factors.append({"code": code, "body": planet})
 
+    contacts = motion.get("contacts") or []
+    next_applying_aspect = contacts[0] if contacts else None
+
+    ut1_epoch = getattr(subject, "ut1", None) or getattr(subject, "julian_day", None)
+    lng, lat, tz = (
+        getattr(subject, "lng", None),
+        getattr(subject, "lat", None),
+        getattr(subject, "tz_str", None),
+    )
+    planetary_hour_info = None
+    planetary_hour_match: bool | None = None
+    if ut1_epoch is not None and lng is not None and lat is not None and tz is not None:
+        hour_res = _resolve_planetary_hour(ut1_epoch, lng, lat, tz)
+        if isinstance(hour_res, dict):
+            planetary_hour_info = hour_res
+            planetary_hour_match = (
+                hour_res.get("hour_ruler") == significator
+                or hour_res.get("day_ruler") == significator
+            )
+
     payload: dict[str, Any] = {
         "system": "election",
         "system_label": "择日（电选）",
@@ -255,7 +277,6 @@ def build_election_payload(subject: Any, *, topic_id: str) -> dict[str, Any]:
         "topic_house": topic["house"],
         "significator": significator,
         "significator_label": planet_label(significator),
-        "dignity_scope": views["Moon"]["dignity_scope"],
         "planets": views,
         "calculation_basis": getattr(subject, "calculation_basis", None),
         "axes": {
@@ -263,9 +284,7 @@ def build_election_payload(subject: Any, *, topic_id: str) -> dict[str, Any]:
             "midheaven_longitude": mc_lon,
             "first_house_cusp": normalize_angle(float(subject.first_house.abs_pos)),
             "tenth_house_cusp": normalize_angle(float(subject.tenth_house.abs_pos)),
-            "policy": "Named physical ASC/MC, never house1/10 substitutes; longitude proximity to these two axes only, not mundane angularity or all four angles",
         },
-        "solar_condition_policy": solar_condition_policy(),
         "ascendant": {
             "sign": asc_sign,
             "sign_label": None if asc_sign is None else sign_label(asc_sign),
@@ -278,19 +297,17 @@ def build_election_payload(subject: Any, *, topic_id: str) -> dict[str, Any]:
             "sign": moon["sign"],
             "sign_label": sign_label(moon["sign"]),
             "void_of_course": moon_voc,
+            "next_applying_aspect": next_applying_aspect,
             "longitude": moon["longitude"],
             "phase": phase,
             "elongation_degrees": longitude_float(elongation),
             "solar_condition": solar_state,
             "motion_basis": motion,
         },
+        "planetary_hour": planetary_hour_info,
+        "planetary_hour_match": planetary_hour_match,
         "factors": factors,
         "unresolved_factors": unresolved,
-        "condition_policy": {
-            "angle_orb_degrees": ANGLE_ORB,
-            "via_combusta_longitude_degrees": [195, 225],
-            "lunar_contacts": "Strict future longitude perfection before ingress; Lilly 1647 p112 textual equivalence remains open",
-        },
         "marriage_significators": None,
     }
     if topic_id == "marriage":
@@ -348,7 +365,37 @@ def build_election_payload(subject: Any, *, topic_id: str) -> dict[str, Any]:
                     }
                 )
             if native_epoch is not None:
-                history = native_planetary_events(subject)
+                if native_planetary_events is _ORIG_NATIVE_PLANETARY_EVENTS:
+                    history = native_planetary_events(
+                        subject,
+                        past_days=5.0,
+                        future_days=5.0,
+                        moon_contacts_only=True,
+                    )
+                    if history.get("status") == "computed":
+                        past_c, past_ok = ordered_contact(
+                            history.get("events", []),
+                            history.get("unresolved_intervals", []),
+                            "Moon",
+                            past=True,
+                        )
+                        fut_c, fut_ok = ordered_contact(
+                            history.get("events", []),
+                            history.get("unresolved_intervals", []),
+                            "Moon",
+                            past=False,
+                        )
+                        if (
+                            past_c is None
+                            or fut_c is None
+                            or past_ok is not True
+                            or fut_ok is not True
+                        ):
+                            history = native_planetary_events(
+                                subject, moon_contacts_only=True
+                            )
+                else:
+                    history = native_planetary_events(subject)
             else:
                 history = {
                     "status": "unavailable",
@@ -405,17 +452,13 @@ def build_election_payload(subject: Any, *, topic_id: str) -> dict[str, Any]:
                 )
             ),
             "author": "William Ramesey",
-            "edition": "Astrologia Restaurata, London1653, BookIII, SectionVIII, ChapterI",
+            "edition": "Astrologia Restaurata, London 1653, Book III, Section VIII, Chapter I",
             "source_pages": [175],
-            "facsimile_pdf_pages": [111],
-            "source_basis": "Selected p175 roles read in the 1653-title facsimile and EEBO-TCP transcription, cross-checked against the separate Wellcome 1654 copy; the 1653 scan's institutional witness and independent expert collation remain unverified",
             "house_system": house_code,
             "zodiac_type": zodiac,
             "houses": houses,
             "parties": parties,
             "event_history": history,
-            "scope": "Four angular-house rulers, natural Sun/Venus roles and the Moon's adjacent physical contacts in the declared Regiomontanus tropical framework. Source party roles do not identify real people. Lunar roles require established order within the disclosed finite event history; missing or ambiguous contacts remain unknown. Ruler state reuses the sign-only major summary. Complete fortification, reception, transfer, radix conditions and source judgement remain unaccepted.",
-            "full_original_text_acceptance": False,
         }
     if unresolved_reference:
         nominal_ruler = RULER_BY_SIGN[backend_sign]

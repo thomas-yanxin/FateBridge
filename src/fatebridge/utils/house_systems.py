@@ -9,10 +9,10 @@ INVALID_HOUSE_SYSTEM_MESSAGE = (
     "House system must be a supported letter, name, or integer code0..8."
 )
 INVALID_HOUSE_CODE_MESSAGE = (
-    "house_system must be an integer code 0..8 or a supported offline house system letter/name (W, B, R, P, K, V, T, S, D); "
+    "house_system must be an integer code 0..8 or a supported offline house system letter/name (W, B, R, P, K, V, T, S, D, E); "
     "boolean and floating-point values are invalid."
 )
-OFFLINE_HOUSE_CODE_NOTE = " Explicit values must be integer codes 0..8 or supported offline house letters/names (W, B, R, P, K, V, T, S, D); boolean, floating-point, blank and unsupported values are rejected."
+OFFLINE_HOUSE_CODE_NOTE = " Explicit values must be integer codes 0..8 or supported offline house letters/names (W, B, R, P, K, V, T, S, D, E); boolean, floating-point, blank and unsupported values are rejected."
 GAUQUELIN_UNSUPPORTED_MESSAGE = "Gauquelin (G) uses 36 clockwise sectors and is unavailable in the twelve-house interface."
 GAUQUELIN_IDENTIFIERS = frozenset(
     {
@@ -302,14 +302,21 @@ def normalize_house_system(house_system: object, default: str = "P") -> str:
     )
 
 
+_OFFLINE_EXTRA_LETTER_CODES: dict[str, int] = {
+    "A": 9,
+}
+
+
 def resolve_offline_house_code(value: object) -> int:
-    """Resolve an offline house selector (0..8 or supported letter/name) to code 0..8."""
+    """Resolve an offline house selector (0..8 or supported letter/name, incl. E/A Equal) to code."""
     try:
         letter = _resolve_house_identifier(value)
     except UnsupportedGauquelinError:
         raise
     except InvalidHouseSystemError:
         raise InvalidHouseCodeError(INVALID_HOUSE_CODE_MESSAGE) from None
+    if letter in _OFFLINE_EXTRA_LETTER_CODES:
+        return _OFFLINE_EXTRA_LETTER_CODES[letter]
     code = HOUSE_SYSTEM_LETTER_INFO.get(letter, (None, "", ""))[0]
     if code is None:
         raise InvalidHouseCodeError(INVALID_HOUSE_CODE_MESSAGE)

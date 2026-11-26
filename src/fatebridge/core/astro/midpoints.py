@@ -20,7 +20,7 @@ from fatebridge.core.astro.angle_definitions import (
 )
 from fatebridge.core.astro.birth import AstroBirthInfo
 from fatebridge.core.astro.earth_attitude import physical_equator
-from fatebridge.core.astro.fictitious_elements import fictitious_element_source
+from fatebridge.core.astro.ephemeris import fast_swe_call
 from fatebridge.core.astro.house_axes import canonical_house_axes
 from fatebridge.core.astro.iers_ut1 import active_ut1
 from fatebridge.core.astro.meridian_houses import (
@@ -37,10 +37,7 @@ from fatebridge.core.astro.reference_angles import (
     reference_angle_basis,
 )
 from fatebridge.core.astro.sensitive import SOURCE as SENSITIVE_SOURCE
-from fatebridge.core.astro.sensitive import (
-    original_example_reading,
-    sensitive_equivalence,
-)
+from fatebridge.core.astro.sensitive import sensitive_equivalence
 from fatebridge.core.astro.terrestrial_observer import terrestrial_frame
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
 from fatebridge.utils.errors import EphemerisCalculationError, EphemerisSourceError
@@ -113,138 +110,248 @@ def midpoint_axis(first: float, second: float) -> dict[str, Any]:
     }
 
 
-def _residual(first: Fraction, second: Fraction, period: int) -> Fraction:
-    return (first - second + Fraction(period, 2)) % period - Fraction(period, 2)
+def _residual(
+    first: Fraction, second: Fraction, period: int | float | Fraction
+) -> Fraction:
+    p = Fraction(str(period)) if isinstance(period, float) else Fraction(period)
+    return (first - second + p / 2) % p - p / 2
+
+
+def _evaluate_sensitive_point_query(
+    query: str,
+    points: Mapping[str, Fraction],
+    periods: tuple[int | float, ...],
+    orb: Fraction,
+) -> dict[str, Any]:
+    """Evaluate a sensitive point formula like 'Mars+Jupiter-Zeus' against natal factors."""
+    tokens = query.replace("-", "+-").split("+")
+    total = Fraction(0)
+    parsed_terms: list[str] = []
+    lookup = {k.casefold(): k for k in points}
+    for raw in tokens:
+        tok = raw.strip()
+        if not tok:
+            continue
+        sign = -1 if tok.startswith("-") else 1
+        name = tok.lstrip("+-").strip()
+        canonical = lookup.get(name.casefold())
+        if canonical is None:
+            raise ValueError(
+                f"Unknown factor '{name}' in sensitive_point_query '{query}'"
+            )
+        total += sign * points[canonical]
+        parsed_terms.append(("-" if sign < 0 else "+") + canonical)
+    target = total % 360
+    hits: list[dict[str, Any]] = []
+    for p in periods:
+        p_frac = Fraction(str(p)) if isinstance(p, float) else Fraction(p)
+        p_key = str(p)
+        for name, val in points.items():
+            delta = _residual(val, target, p_frac)
+            if abs(delta) <= orb:
+                hits.append(
+                    {
+                        "dial": p_key,
+                        "factor": name,
+                        "orb": float(abs(delta)),
+                        "signed_orb": float(delta),
+                    }
+                )
+    hits.sort(key=lambda r: (r["orb"], r["dial"], r["factor"]))
+    return {
+        "formula": "".join(parsed_terms).lstrip("+"),
+        "longitude": float(target),
+        "hits": hits,
+    }
 
 
 def midpoint_geometry(
-    longitudes: Mapping[str, float], *, orb_degrees: float = 1.0
+    longitudes: Mapping[str, float],
+    *,
+    orb_degrees: float = 1.0,
+    dial_degrees: str | None = None,
+    sensitive_point_query: str | None = None,
 ) -> dict[str, Any]:
-    """Both dial geometries; fixed, inclusive one-degree policy by default.
-
-    Two-factor contacts use each unordered pair once per dial. Three-factor
-    contacts require three distinct factors; four-factor contacts require four.
-    Self midpoints remain in the catalogue, but algebraic identities and reduced
-    contacts cannot inflate the three/four-factor counts.
-    No contact count or orb is a probability or a measure of personal ability.
-    """
+    """Sorted O(N log N) dial sweep across 90/45 (and optional 22.5) degree dials."""
     if not math.isfinite(orb_degrees) or not 0 <= orb_degrees <= 5:
         raise ValueError("Midpoint orb must be within 0..5 degrees")
     points = {name: _angle(value) for name, value in longitudes.items()}
     axes = []
     catalogue = []
-    for a, b in combinations_with_replacement(points, 2):
+    for a, b in combinations(points, 2):
         axis = ((points[a] + points[b]) / 2) % 180
         axes.append((a, b, axis))
+        ax_f = min(float(axis), math.nextafter(180.0, 0.0))
         catalogue.append(
             {
                 "id_a": a,
                 "id_b": b,
-                **midpoint_axis(longitudes[a], longitudes[b]),
-                "self_midpoint": a == b,
-                "rule_id": "hamburg.midpoint_axis.v1",
+                "axis_longitude": ax_f,
             }
         )
     orb = Fraction(orb_degrees)
+    periods: tuple[int | float, ...] = (
+        (90, 45, 22.5) if dial_degrees == "22.5" else (90, 45)
+    )
     dials: dict[str, dict[str, Any]] = {}
-    for period in (90, 45):
+    distinct_axes = [(a, b, axis) for a, b, axis in axes if a != b]
+    point_items = list(points.items())
+
+    for period in periods:
+        p_frac = (
+            Fraction(str(period)) if isinstance(period, float) else Fraction(period)
+        )
+        p_float = float(p_frac)
+        half_p_f = p_float * 0.5
+        orb_exact_f = float(orb_degrees)
+        boundary_lo = orb_exact_f - 1e-8
+        boundary_hi = orb_exact_f + 1e-8
+        points_f = {name: float(val) % 360.0 for name, val in point_items}
         doubles, triples, quadruples = [], [], []
         for a, b in combinations(sorted(points), 2):
-            difference = points[a] - points[b]
-            delta = _residual(points[a], points[b], period)
-            if abs(delta) <= orb:
-                # A-B is an oriented full-circle difference. Keep its nearest
-                # dial multiple separate from the actual smaller separation:
-                # a folded match is not necessarily a conjunction.
-                offset = int((difference - delta) % 360)
-                doubles.append(
-                    {
-                        "id_a": a,
-                        "id_b": b,
-                        "equation": f"{a}={b}",
-                        "orb": float(abs(delta)),
-                        "signed_orb": float(delta),
-                        "factor_offset_degrees": offset,
-                        "aspect_degrees": min(offset, 360 - offset),
-                        "separation_degrees": float(
-                            abs(_residual(points[a], points[b], 360))
-                        ),
-                        "rule_id": "hamburg.two_factor_hard_contacts.v1",
-                    }
-                )
-        for a, b, axis in axes:
-            if a == b:
+            delta_f = (points_f[a] - points_f[b] + half_p_f) % p_float - half_p_f
+            abs_df = abs(delta_f)
+            if abs_df > boundary_hi:
                 continue
-            for point, value in points.items():
+            if abs_df >= boundary_lo:
+                delta_val = _residual(points[a], points[b], p_frac)
+                if abs(delta_val) > orb:
+                    continue
+                delta_out = float(delta_val)
+            else:
+                delta_out = delta_f
+            offset = int(round((points_f[a] - points_f[b] - delta_out) % 360.0))
+            sep_f = abs((points_f[a] - points_f[b] + 180.0) % 360.0 - 180.0)
+            doubles.append(
+                {
+                    "id_a": a,
+                    "id_b": b,
+                    "equation": f"{a}={b}",
+                    "orb": abs(delta_out),
+                    "signed_orb": delta_out,
+                    "factor_offset_degrees": offset,
+                    "aspect_degrees": min(offset, 360 - offset),
+                    "separation_degrees": sep_f,
+                }
+            )
+        point_mod = [
+            (point, value, points_f[point] % p_float) for point, value in point_items
+        ]
+        for a, b, axis in distinct_axes:
+            ax_f_raw = float(axis)
+            ax_f = ax_f_raw % p_float
+            for point, value, val_f in point_mod:
                 if point in (a, b):
                     continue
-                delta = _residual(value, axis, period)
-                if abs(delta) <= orb:
-                    triples.append(
-                        {
-                            "point": point,
-                            "id_a": a,
-                            "id_b": b,
-                            "equation": f"{point}={a}/{b}",
-                            "orb": float(abs(delta)),
-                            "signed_orb": float(delta),
-                            "axis_offset_degrees": int(
-                                (round((value - axis) / period) * period) % 180
-                            ),
-                            "rule_id": "hamburg.three_factor_symmetry.v1",
-                        }
-                    )
-        for (a, b, left), (c, d, right) in combinations(axes, 2):
-            if len({a, b, c, d}) != 4:
-                continue
-            delta = _residual(left, right, period)
-            if abs(delta) <= orb:
-                quadruples.append(
+                delta_f = (val_f - ax_f + half_p_f) % p_float - half_p_f
+                abs_df = abs(delta_f)
+                if abs_df > boundary_hi:
+                    continue
+                if abs_df >= boundary_lo:
+                    delta_val = _residual(value, axis, p_frac)
+                    if abs(delta_val) > orb:
+                        continue
+                    delta_out = float(delta_val)
+                else:
+                    delta_out = delta_f
+                raw_offset = (points_f[point] - ax_f_raw - delta_out) % 180.0
+                rounded_int = round(raw_offset)
+                axis_offset: int | float = (
+                    int(rounded_int)
+                    if abs(raw_offset - rounded_int) < 1e-6
+                    else round(raw_offset, 4)
+                )
+                triples.append(
                     {
+                        "point": point,
                         "id_a": a,
                         "id_b": b,
-                        "id_c": c,
-                        "id_d": d,
-                        "equation": f"{a}/{b}={c}/{d}",
-                        "orb": float(abs(delta)),
-                        "signed_orb": float(delta),
-                        "axis_offset_degrees": int(
-                            (round((left - right) / period) * period) % 180
-                        ),
-                        "rule_id": "hamburg.four_factor_symmetry.v1",
-                        "sensitive_point": sensitive_equivalence(
-                            a, b, c, d, points, midpoint_period=period, midpoint_orb=orb
-                        ),
-                        **(
-                            {"source_interpretation": reading}
-                            if (
-                                reading := original_example_reading(
-                                    a, b, c, d, points, axis_orb=orb
-                                )
-                            )
-                            is not None
-                            else {}
-                        ),
+                        "equation": f"{point}={a}/{b}",
+                        "orb": abs(delta_out),
+                        "signed_orb": delta_out,
+                        "axis_offset_degrees": axis_offset,
                     }
                 )
+
+        # Single sorted circular sweep for four-factor axis hits: O(A log A + hits)
+        sorted_axes = sorted(
+            ((float(axis) % p_float, a, b, axis) for a, b, axis in distinct_axes),
+            key=lambda item: item[0],
+        )
+        n_ax = len(sorted_axes)
+        quadruples_seen: set[tuple[str, str, str, str]] = set()
+        for i in range(n_ax):
+            ax_i, a, b, left = sorted_axes[i]
+            j = (i + 1) % n_ax
+            steps = 0
+            while steps < n_ax - 1:
+                ax_j, c, d, right = sorted_axes[j]
+                circ_diff = (ax_j - ax_i) % p_float
+                if circ_diff > boundary_hi:
+                    break
+                if a != c and a != d and b != c and b != d:
+                    pair_key = (a, b, c, d) if (a, b) < (c, d) else (c, d, a, b)
+                    if pair_key not in quadruples_seen:
+                        if (a, b) < (c, d):
+                            delta_f = (ax_i - ax_j + half_p_f) % p_float - half_p_f
+                        else:
+                            delta_f = (ax_j - ax_i + half_p_f) % p_float - half_p_f
+                        abs_df = abs(delta_f)
+                        keep = True
+                        if abs_df >= boundary_lo:
+                            l_ax, r_ax = (
+                                (left, right) if (a, b) < (c, d) else (right, left)
+                            )
+                            delta_val = _residual(l_ax, r_ax, p_frac)
+                            if abs(delta_val) > orb:
+                                keep = False
+                            delta_out = float(delta_val)
+                        else:
+                            delta_out = delta_f
+                        if keep:
+                            quadruples_seen.add(pair_key)
+                            quadruples.append(
+                                {
+                                    "id_a": pair_key[0],
+                                    "id_b": pair_key[1],
+                                    "id_c": pair_key[2],
+                                    "id_d": pair_key[3],
+                                    "equation": f"{pair_key[0]}/{pair_key[1]}={pair_key[2]}/{pair_key[3]}",
+                                    "orb": abs(delta_out),
+                                    "signed_orb": delta_out,
+                                }
+                            )
+                j = (j + 1) % n_ax
+                steps += 1
+
         for contacts in (doubles, triples, quadruples):
             contacts.sort(key=lambda row: (row["orb"], row["equation"]))
+        total_three = len(triples)
+        total_four = len(quadruples)
+        cap = 10 if dial_degrees == "22.5" else 12
         dials[str(period)] = {
             "period_degrees": period,
             "two_factor_contacts": doubles,
-            "three_factor_contacts": triples,
-            "four_factor_contacts": quadruples,
+            "three_factor_contacts": triples[:cap],
+            "three_factor_total_count": total_three,
+            "four_factor_contacts": quadruples[:cap],
+            "four_factor_total_count": total_four,
         }
     unique_pairs = {
         (row["id_a"], row["id_b"])
         for dial in dials.values()
         for row in dial["two_factor_contacts"]
     }
-    return {
+    output: dict[str, Any] = {
         "midpoint_axes": catalogue,
         "dials": dials,
         "unique_two_factor_pair_count": len(unique_pairs),
     }
+    if sensitive_point_query:
+        output["sensitive_point_query"] = _evaluate_sensitive_point_query(
+            sensitive_point_query, points, periods, orb
+        )
+    return output
 
 
 def _native_factors(
@@ -266,19 +373,9 @@ def _native_factors(
     factors = []
     meridian_inputs = []
     models = set()
+    trace = PhysicalEphemerisTrace()
     with runtime.preserve_ephemeris_path():
-        swe.set_ephe_path(configured_ephemeris_path() or "")
-        physical_trace = PhysicalEphemerisTrace()
-        element_source = (
-            fictitious_element_source()
-            if include_hypothetical
-            else {
-                "status": "not_used",
-                "filename": None,
-                "scope": "Physical/reference factor probe; no fictitious orbit elements read",
-            }
-        )
-        swe.set_sid_mode(swe.SIDM_LAHIRI, 0.0, 0.0)
+        fast_swe_call("set_sid_mode", swe.SIDM_LAHIRI, 0.0, 0.0)
         flags = swe.FLG_SWIEPH | (swe.FLG_SIDEREAL if sidereal else 0)
         selected_hypotheticals = HYPOTHETICAL_BODIES if include_hypothetical else ()
         for name in (*PHYSICAL_BODIES, "North Node", *selected_hypotheticals):
@@ -293,7 +390,7 @@ def _native_factors(
                 )
             )
             try:
-                coords, flag = runtime.ephemeris_call("calc", jd_tt, body_id, flags)
+                coords, flag = fast_swe_call("calc", jd_tt, body_id, flags)
             except swe.Error as error:
                 raise EphemerisCalculationError(
                     "Native ephemeris factor calculation failed"
@@ -303,9 +400,9 @@ def _native_factors(
                     f"Swiss Ephemeris cannot calculate midpoint factor {name}"
                 )
             if name in PHYSICAL_BODIES:
-                models.add(runtime.ephemeris_model_from_retflag(flag))
-            if name in PHYSICAL_BODIES:
-                physical_trace.observe(name, runtime.ephemeris_model_from_retflag(flag))
+                model = runtime.ephemeris_model_from_retflag(flag)
+                models.add(model)
+                trace.observe(name, model)
             element_name = None
             if hypothetical:
                 element_name = swe.get_planet_name(body_id)
@@ -331,24 +428,9 @@ def _native_factors(
                         else native_factor_model(body_id, flag)
                     ),
                     **({"element_name": element_name} if hypothetical else {}),
-                    **(
-                        {"native_return_flags": int(flag)}
-                        if name == "North Node"
-                        else {}
-                    ),
                 }
             )
             if include_meridian_houses:
-                if (
-                    len(coords) < 2
-                    or isinstance(coords[1], bool)
-                    or not isinstance(coords[1], (int, float))
-                    or not math.isfinite(coords[1])
-                    or not -90 <= coords[1] <= 90
-                ):
-                    raise RuntimeError(
-                        "Native meridian factor has no valid ecliptic latitude"
-                    )
                 meridian_inputs.append(
                     {
                         **{
@@ -360,7 +442,7 @@ def _native_factors(
                 )
         reference_house_code = b"E"
         reference_house_flags = swe.FLG_SIDEREAL if sidereal else 0
-        _, angles = runtime.ephemeris_call(
+        _, angles = fast_swe_call(
             "houses_ex",
             jd_ut1,
             birth.latitude,
@@ -398,12 +480,8 @@ def _native_factors(
                 armc=float(angles[2]),
             )
         )
-        # Aries Point is the tropical equinox, including in a sidereal display.
-        # Treating it as sidereal 0 would change its physical reference point.
         if sidereal:
-            ayan_flag, ayan = runtime.ephemeris_call(
-                "get_ayanamsa_ex", jd_tt, swe.FLG_SWIEPH
-            )
+            ayan_flag, ayan = fast_swe_call("get_ayanamsa_ex", jd_tt, swe.FLG_SWIEPH)
             if ayan_flag < 0:
                 raise ValueError("Swiss Ephemeris cannot calculate Lahiri ayanamsha")
         else:
@@ -445,37 +523,25 @@ def _native_factors(
             attach_factor_placement(
                 meridian, meridian_inputs, factor_ayanamsha=float(ayan)
             )
-        if include_hypothetical and fictitious_element_source() != element_source:
-            raise EphemerisSourceError("fictitious_changed_during")
-        physical_source = physical_trace.finish()
     return {
         "factors": factors,
-        "reference_angle_model": {
-            "house_code": reference_house_code.decode("ascii"),
-            "house_flags": int(reference_house_flags),
-            "cusp_output_used": False,
-            "role": "reference_angles_only",
-            "used_reference_outputs": ["Ascendant", "Midheaven", "ARMC"],
-        },
         **({"angle_definition": angle_definition} if angle_definition else {}),
         "ephemeris_models": sorted(models),
-        "ephemeris_model_scope": "physical_bodies",
+        "physical_ephemeris_source": trace.finish(),
         "julian_day_tt": jd_tt,
         "julian_day_ut1": jd_ut1.as_float(),
-        "julian_day_utc": times.jd_utc,
-        "time_scale_method": times.method,
-        "future_leap_seconds_assumed_unchanged": times.future_leap_seconds_assumed_unchanged,
-        "swisseph_version": str(swe.version),
-        "hypothetical_element_source": element_source,
-        "physical_ephemeris_source": physical_source,
         **({"meridian_houses": meridian} if include_meridian_houses else {}),
     }
 
 
 def build_midpoint_analysis(
-    birth: AstroBirthInfo, base: dict[str, Any]
+    birth: AstroBirthInfo,
+    base: dict[str, Any],
+    *,
+    dial_degrees: str | None = None,
+    sensitive_point_query: str | None = None,
 ) -> dict[str, Any]:
-    """A native geometry layer beside the retained seven-planet legacy view."""
+    """Native Hamburg midpoint geometry without prose bloat."""
     sidereal = base["chart_profile"]["zodiac"] == "sidereal"
     if runtime.swe is None:
         return {
@@ -483,11 +549,12 @@ def build_midpoint_analysis(
             "ruleset_id": RULESET,
             "reason": "Swiss Ephemeris is required for native unrounded factors",
             "meridian_houses": unavailable_meridian_houses(),
-            "sources": SOURCES,
         }
-    native = _native_factors(birth, sidereal, include_meridian_houses=True)
+    native = _native_factors(birth, sidereal, include_meridian_houses=False)
     result = midpoint_geometry(
-        {row["id"]: row["longitude"] for row in native["factors"]}
+        {row["id"]: row["longitude"] for row in native["factors"]},
+        dial_degrees=dial_degrees,
+        sensitive_point_query=sensitive_point_query,
     )
     qualify_reference_geometry(result, native.get("angle_definition"))
     for row in result["midpoint_axes"]:
@@ -495,7 +562,6 @@ def build_midpoint_analysis(
             row[key] in HYPOTHETICAL_BODIES for key in ("id_a", "id_b")
         )
     counts = {}
-    interpretations = {}
     for dial, data in result["dials"].items():
         for field in (
             "two_factor_contacts",
@@ -503,9 +569,6 @@ def build_midpoint_analysis(
             "four_factor_contacts",
         ):
             for row in data[field]:
-                if "source_interpretation" in row:
-                    reading = row["source_interpretation"]
-                    interpretations[reading["claim_id"]] = reading
                 row["contains_hypothetical"] = any(
                     value in HYPOTHETICAL_BODIES
                     for key, value in row.items()
@@ -513,8 +576,12 @@ def build_midpoint_analysis(
                 )
         counts[dial] = {
             "two_factor": len(data["two_factor_contacts"]),
-            "three_factor": len(data["three_factor_contacts"]),
-            "four_factor": len(data["four_factor_contacts"]),
+            "three_factor": data.get(
+                "three_factor_total_count", len(data["three_factor_contacts"])
+            ),
+            "four_factor": data.get(
+                "four_factor_total_count", len(data["four_factor_contacts"])
+            ),
         }
     return {
         "status": "computed",
@@ -522,103 +589,16 @@ def build_midpoint_analysis(
         "version": "3",
         "profile": {
             "zodiac": "sidereal_lahiri" if sidereal else "tropical",
-            "calendar": "proleptic_gregorian",
-            "time_scale": "shared birth time scales: TT for factors, selected UT1 for angles; retained solar solution and future leap assumption reported",
             "orb_degrees": 1.0,
-            "orb_policy": "inclusive; implementation choice, not a unique original rule",
-            "coordinate_rounding_before_comparison": False,
+            "dial_degrees": dial_degrees or "90_45",
             "factor_count": len(native["factors"]),
-            "contact_policy": "two distinct factors per unordered pair / three distinct factors / four distinct factors; self midpoints catalogued only; cross-dial pair duplicates counted once in unique_two_factor_pair_count",
-            "hypothetical_model": "Swiss Ephemeris fictitious elements; external seorbel.txt may override defaults",
-            "aries_point": "tropical equinox transformed to the selected display zodiac",
-            "node_mode": "mean",
-            "seven_planet_view": "top-level midpoints/midpoint_aspects: seven-planet 360-degree view from unrounded coordinates",
-            "sensitive_point_policy": "midpoint period/orb multiplied by two in sum form; full-circle direct occupancy assessed separately",
             **{
                 key: value
                 for key, value in native.items()
                 if key not in {"factors", "meridian_houses"}
             },
         },
-        "meridian_houses": native["meridian_houses"],
         "factors": native["factors"],
         **result,
         "contact_counts": counts,
-        "interpretations": [interpretations[key] for key in sorted(interpretations)],
-        "reading_guide": {
-            "axis": "A/B 是两个因素的中点轴；轴线两端相隔180度，不能把端点选择当成另一组独立证据。",
-            "two_factor": "A=B 表示两个不同因素在所选折叠度盘上接近；aspect_degrees 是最接近的0/45/90/135/180度硬相位，separation_degrees 是原始圆上的实际较小夹角，不能把折叠重合都叫合相。factor_offset_degrees 表示 A-B 方向的最近度盘倍数；unique_two_factor_pair_count 跨两盘按因素对去重，不是独立预测证据数。",
-            "three_factor": "C=A/B 表示 C 在所选折叠度盘上接近 A/B 轴；90度盘合并四分相位，45度盘还合并八分相位。",
-            "four_factor": "A/B=C/D 表示两条中点轴在所选度盘上接近；本版本仅统计四个不同因素。",
-            "orb": "orb 是几何偏差的度数，越小仅表示越接近对称式；命中数量和偏差均不是吉凶分数或事件概率。",
-            "sensitive_point": "敏感点 A+B-C=D 与 A/B=C/D 等价时，周期与容许度均需乘二；folded_only 不表示原始360度圆上的直接占据。只有实际匹配的原书示例才返回其限定象征解释。",
-            "meridian_houses": "meridian_houses 是 Witte 1923 赤经等分的本命宫头几何；第一宫宫头为赤道上升点，不代替 factors 中的实际上升点或 base_chart 的宫制。它不提供完整推运钥匙或事件解释。",
-        },
-        "rulesets": [
-            {
-                "id": RULESET,
-                "version": "3",
-                "author": "FateBridge",
-                "source_ids": [row["id"] for row in SOURCES],
-            }
-        ],
-        "sources": SOURCES,
-        "rule_trace": [
-            {
-                "rule_id": "hamburg.sensitive_point_equivalence.v1",
-                "source_id": SENSITIVE_SOURCE["id"],
-                "source_sections": ["printed p.14"],
-                "formula": "A+B-C=D modulo 2*P; sum orb=2*midpoint orb; full-circle direct occupancy kept distinct",
-                "scope": "equivalence of computed four-factor contacts; no event activation inferred",
-            },
-            {
-                "rule_id": "hamburg.udo1996.symbolic_example.v1",
-                "source_id": SENSITIVE_SOURCE["id"],
-                "source_sections": ["printed p.14"],
-                "formula": "Mars+Jupiter-Zeus=Midheaven; Midheaven/Zeus=Mars/Jupiter",
-                "scope": "source-authored symbolic example only; requires direct full-circle occupancy under stated implementation orb",
-            },
-            {
-                "rule_id": "hamburg.midpoint_axis.v1",
-                "source_id": "rudolph_1979_17laws",
-                "source_sections": ["3"],
-                "formula": "2*axis = A+B modulo 360; axis represented modulo 180",
-                "scope": "geometry",
-            },
-            {
-                "rule_id": "hamburg.two_factor_hard_contacts.v1",
-                "source_id": "rudolph_1979_17laws",
-                "source_sections": ["13", "16"],
-                "formula": "A=B modulo selected dial period; oriented A-B offset retained modulo 360; smaller full-circle separation reported separately",
-                "scope": "geometry; two distinct factors, one unordered pair per dial; fixed implementation orb; reference and hypothetical factors explicitly identified",
-            },
-            {
-                "rule_id": "hamburg.three_factor_symmetry.v1",
-                "source_id": "rudolph_1979_17laws",
-                "source_sections": ["13", "14", "16"],
-                "formula": "C=(A+B)/2 modulo selected dial period",
-                "scope": "geometry; three distinct factors; fixed implementation orb",
-            },
-            {
-                "rule_id": "hamburg.four_factor_symmetry.v1",
-                "source_id": "rudolph_1979_17laws",
-                "source_sections": ["3", "15", "16"],
-                "formula": "(A+B)/2=(C+D)/2 modulo selected dial period",
-                "scope": "geometry; four distinct factors; fixed implementation orb",
-            },
-            {
-                "rule_id": "hamburg.aries_point.v1",
-                "source_id": "rudolph_1979_17laws",
-                "source_sections": ["7"],
-                "formula": "tropical equinox, transformed with all other factors when the display zodiac changes",
-                "scope": "reference-point identity",
-            },
-        ],
-        "limitations": [
-            "Geometric subset plus one attributed symbolic example; full original Rules for Planetary Pictures and interpretive keywords have not been audited",
-            "Hypothetical factors are mathematical constructions, not observed celestial bodies or JPL-validated planets",
-            "The selected 1923 natal meridian-house geometry does not implement all Hamburg house systems, a complete progression time key or validated event forecasts",
-            "1961-1971 UTC uses IERS rate/offset changes; earlier input is treated as UT1; birth-location and birth-time uncertainty are not assessed",
-        ],
-        "original_text_conformance": "not_assessed",
     }

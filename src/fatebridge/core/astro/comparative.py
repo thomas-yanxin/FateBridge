@@ -245,14 +245,6 @@ def build_comparative_geometry(
         "birth_time_sensitivity": sensitivity,
         "sources": [SOURCE],
         "original_text_conformance": "not_assessed",
-        "limitations": [
-            "Selected geometric reconstruction, not the complete original text, Earth-house assignment or original event/mortality claims",
-            "All modern native factors reuse the same algebra; the printed source table contains only12 factors and does not interpret every modern hypothetical factor",
-            "Rotations and mirrors are symbolic coordinates, not new physical sky observations; repeated points, frames and samples are not independent evidence",
-            "An assigned anchor identity is fixed by definition and does not resolve the physical anchor or an unresolved frame orientation",
-            "Four printed transformed rows remain uncoordinated under the declared nearest-arcminute rounding assumption; no printed value or input was fitted",
-            "Unknown birth-time error is not zero; sampled spans do not establish continuous stability or real-world probabilities",
-        ],
     }
     if layer["status"] != "computed":
         result["reason"] = layer.get("reason", "Native factors are unavailable")

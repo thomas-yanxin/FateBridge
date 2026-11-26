@@ -6,14 +6,14 @@ import math
 from datetime import datetime
 from typing import Any
 
-from fatebridge.core.astro.ephemeris import _swisseph_planet_state
+from fatebridge.core.astro import runtime
+from fatebridge.core.astro.ephemeris import _swisseph_planet_state, fast_swe_call
 from fatebridge.core.astro.geometry import native_lahiri_ayanamsha
 from fatebridge.core.astro.physical_epoch import PhysicalEpoch
 from fatebridge.core.astro.time_scales import ephemeris_time
-from fatebridge.core.ephemeris_runtime import (
-    preserve_ephemeris_path,
-    swe,
-)
+from fatebridge.core.ephemeris_runtime import ephemeris_call as _ORIG_EPHEMERIS_CALL
+from fatebridge.core.ephemeris_runtime import preserve_ephemeris_path, swe
+from fatebridge.core.jpl_ephemeris import configured_jpl_file
 from fatebridge.core.predictive._common import build_subject, point_to_dict
 from fatebridge.core.predictive.native_chart import NativeSubject
 from fatebridge.utils.civil_time import utc_calendar
@@ -22,16 +22,25 @@ from fatebridge.utils.civil_time import utc_calendar
 def _longitude_tt(
     body_id: int, julian_day_tt: float, *, sidereal: bool = False
 ) -> float:
-    # The solver validates Sun/Moon once. Use the same coordinate owner and
-    # native flags as natal/final charts: a one-ULP mismatch can skip a cycle.
-    state = _swisseph_planet_state(
-        "Sun" if body_id == swe.SUN else "Moon",
-        julian_day_tt=julian_day_tt,
-        correct_motion=False,
-    )
-    if state is None:
-        raise ValueError("Return search ephemeris failed")
-    longitude = state[0]["longitude"]
+    if (
+        runtime.ephemeris_call is _ORIG_EPHEMERIS_CALL
+        and configured_jpl_file() is None
+        and swe is not None
+    ):
+        coords, flag = fast_swe_call("calc", julian_day_tt, body_id, swe.FLG_SWIEPH)
+        if flag < 0:
+            raise ValueError("Return search ephemeris failed")
+        longitude = float(coords[0]) % 360.0
+    else:
+        state = _swisseph_planet_state(
+            "Sun" if body_id == swe.SUN else "Moon",
+            julian_day_tt=julian_day_tt,
+            correct_motion=False,
+            include_declination=False,
+        )
+        if state is None:
+            raise ValueError("Return search ephemeris failed")
+        longitude = state[0]["longitude"]
     if sidereal:
         longitude -= native_lahiri_ayanamsha(julian_day_tt=julian_day_tt)
     return longitude % 360

@@ -292,36 +292,16 @@ def evaluate_lilly_conditions(
                     collector=third,
                 )
     mutual = principal["mutual"]
-    reading = (
-        "依第112页互纳规则，当前双向接纳提供成事支持；这是该条传统规则的条件性解读，不是全书判断或现实结果认证。"
-        if mutual is True
-        else (
-            "当前未形成第112页所定义的双向接纳；这不排除其他原典路径。"
-            if mutual is False
-            else "当前资料不能核定第112页的双向接纳；同一星体不能构成双向关系，未知昼夜也不套默认值。"
-        )
-    )
     event_paths = evaluate_event_paths(
         event_history or {}, querent, quesited, sect, states, phase
     )
     return {
         "rule_id": RULESET,
         "chart_sect": sect,
-        "coordinate_scope": (
-            "tropical_selected_edition"
-            if zodiac_type in {"Tropic", "Tropical"}
-            else (
-                "sidereal_extension_not_original_edition_acceptance"
-                if zodiac_type == "Sidereal"
-                else "unknown_or_unsupported_zodiac"
-            )
-        ),
         "principal_reception": principal,
         "p112_mutual_reception": {
             "premise_satisfied": mutual,
             "source_pages": [112],
-            "conditional_reading_zh": reading,
-            "full_judgement_accepted": False,
         },
         "routes": routes,
         "event_paths": event_paths,
@@ -329,6 +309,4 @@ def evaluate_lilly_conditions(
             states, querent, quesited, event_history or {}, event_paths, phase
         ),
         "same_body_not_bilateral": querent == quesited,
-        "full_original_text_acceptance": False,
-        "scope": "Selected pp104-105 and112 table/reception facts at question epoch; p125-126 conditions evaluated individually. Unknown event histories are not satisfied gates or a yes/no judgement",
     }

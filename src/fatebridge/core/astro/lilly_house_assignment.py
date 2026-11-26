@@ -120,10 +120,6 @@ def assign_cusp_virtue(
         assigned_p115_house_points=house_condition(assigned, house_system, zodiac_type)[
             "p115_house_points"
         ],
-        conditional_reading_zh=(
-            f"几何落第{occupied_house}宫；按第33页最近宫头五度政策，效力归第{assigned}宫。"
-            "这不改写原生坐标、主掌宫位或宫头，也不等于完整原典居宫判断。"
-        ),
     )
     return result
 

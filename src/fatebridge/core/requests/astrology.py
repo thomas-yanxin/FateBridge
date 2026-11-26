@@ -214,6 +214,18 @@ class AstroSpecialtyRequest(SolarBirthClockFields):
 class AstroGermanyRequest(AstroSpecialtyRequest):
     """Optional target instant enables the explicit true-solar-arc layer."""
 
+    high_latitude_fallback: Literal["error", "porphyry", "whole_sign"] = Field(
+        default="error",
+        description="Fallback when quadrant houses fail at |lat| >= 66.5°: error (default), porphyry, or whole_sign.",
+    )
+    dial_degrees: Literal["90", "45", "22.5"] = Field(
+        default="90",
+        description="Primary dial modulus to summarize in compact output (90, 45, or 22.5).",
+    )
+    sensitive_point_query: str | None = Field(
+        default=None,
+        description="Optional sensitive point formula 'A+B-C' (e.g. 'Mars+Jupiter-Zeus') to evaluate against all chart factors.",
+    )
     analysis_datetime: _ExactTargetDatetime | None = Field(
         default=None,
         description="Optional ISO target instant with timezone offset for true-solar-arc biwheel geometry and the explicitly named Witte-1924 ecliptic day-meridian equation. Uses a 365.25-day Julian symbolic year key, within 0..150 key years after effective birth. Omit for natal only. Symbolic directions/meridians are not physical target positions or event-success probabilities.",
@@ -329,6 +341,24 @@ class AstroVimshottariRequest(OptionalAnalysisClockFields, AstroIndiaRequest):
 class AstroNatalChartRequest(AstroChartRequest):
     """Natal astrology chart request with optional apparent-solar position layer."""
 
+    node_mode: Literal["mean", "true"] = Field(
+        default="mean",
+        description="Lunar node mode: 'mean' (default) or 'true' (osculating true node).",
+    )
+    high_latitude_fallback: Literal["error", "porphyry", "whole_sign"] = Field(
+        default="error",
+        description="Fallback when quadrant houses fail at high latitudes (|lat| >= 66.5°): error (default), porphyry, or whole_sign.",
+    )
+    include_minor_aspects: bool = Field(
+        default=False,
+        description="Include minor aspects (30° semisextile, 45° semisquare, 72° quintile, 135° sesquiquadrate, 150° quincunx).",
+    )
+    extra_bodies: list[
+        Literal["Chiron", "Lilith", "Ceres", "Pallas", "Juno", "Vesta", "True Node"]
+    ] = Field(
+        default_factory=list,
+        description="Optional additional bodies/points to compute alongside the 11 standard chart points.",
+    )
     apparent_model: Literal["native", "opaque_solar"] = Field(
         default="native",
         description=(
@@ -422,4 +452,12 @@ class AstroRelativeFlatRequest(OfflineHouseValidatorMixin, FateBridgeBaseRequest
             "adds a focus block + intent-filtered synastry aspects. Default/unset "
             "is general (no filtering)."
         ),
+    )
+    composite_house_method: Literal["cusp_midpoints", "mc_latitude"] = Field(
+        default="cusp_midpoints",
+        description="Composite house cusp method: 'cusp_midpoints' (default short-arc cusp midpoints) or 'mc_latitude' (Composite MC + mean latitude derived houses).",
+    )
+    high_latitude_fallback: Literal["error", "porphyry", "whole_sign"] = Field(
+        default="error",
+        description="Fallback when quadrant houses fail at high latitudes: error (default), porphyry, or whole_sign.",
     )

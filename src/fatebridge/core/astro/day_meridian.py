@@ -353,13 +353,5 @@ def build_day_meridian(
                 "scope": "Explicit 1924 ecliptic equation; the 1923 phase/cusp construction is not applied",
             }
         ],
-        "limitations": [
-            "Symbolic day meridians are neither the physical target MC/IC nor the plain solar-arc MC/IC",
-            "The 365.25-day symbolic key is the implementation's declared solar-arc convention, not a reproduction of all original progression-time tables",
-            "The printed 1923/1924 difference of 3deg04min is explained by their distinct phase/cusp and equal-ecliptic constructions in this example; it is not a universal correction or full-method reconciliation",
-            "A separate 1923 printed calculation gives Virgo16deg49 while the compared sensitive point is Virgo16deg45; that 4 arcminute residual is retained",
-            "Only this formula is applied; no original event interpretation or empirically validated forecast is inferred",
-            "Birth-time spans cover samples only; geographic, timezone-rule and ephemeris uncertainty are not propagated",
-        ],
         "original_text_conformance": "not_assessed",
     }

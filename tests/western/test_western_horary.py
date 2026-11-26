@@ -100,7 +100,8 @@ def test_horary_querent_is_ascendant_ruler_and_quesited_house_matches_topic() ->
     asc_sign = payload["ascendant"]["sign"]
     assert payload["significators"]["querent"]["planet"] == RULER_BY_SIGN[asc_sign]
     assert payload["quesited_house"] == HOUSE_BY_CATEGORY["marriage"] == 7
-    assert payload["perfection"]["status"] == "source_conditions_incomplete"
+    assert payload["perfection"]["status"] == "perfected_direct"
+    assert payload["perfection"]["perfected"] is True
 
 
 def test_horary_unknown_category_is_rejected() -> None:

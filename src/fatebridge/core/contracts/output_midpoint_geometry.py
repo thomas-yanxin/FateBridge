@@ -116,7 +116,7 @@ class SymmetryContact(ReferenceAngleGeometry):
     equation: str | None = None
     orb: float | None = None
     signed_orb: float | None = None
-    axis_offset_degrees: int | None = None
+    axis_offset_degrees: int | float | None = None
     rule_id: str | None = None
     contains_hypothetical: bool | None = None
     sensitive_point: SensitivePoint | None = None
@@ -137,7 +137,7 @@ class TwoFactorContact(ReferenceAngleGeometry):
 
 
 class MidpointDial(PartialOutput):
-    period_degrees: int | None = None
+    period_degrees: int | float | None = None
     two_factor_contacts: list[TwoFactorContact] | None = None
     three_factor_contacts: list[SymmetryContact] | None = None
     four_factor_contacts: list[SymmetryContact] | None = None

@@ -15,6 +15,7 @@ from fatebridge.core.astro.geometry import (
 from fatebridge.core.astro.reference import (
     ASPECTS,
     DEFAULT_PLANET_ORBS,
+    MINOR_ASPECTS,
     TRADITIONAL_PLANET_IDS,
 )
 from fatebridge.core.astro.relationship_geometry import midpoint_candidates_fraction
@@ -45,6 +46,7 @@ def _build_aspects(
     orb: float = 6.0,
     *,
     include_evidence: bool = False,
+    include_minor_aspects: bool = False,
 ) -> list[dict[str, Any]]:
     _checked_orb(orb)
     items = list(planets)
@@ -57,6 +59,7 @@ def _build_aspects(
                 orb=orb,
                 planet_a_id=first["id"],
                 planet_b_id=second["id"],
+                include_minor_aspects=include_minor_aspects,
             )
             if matched is None:
                 continue
@@ -86,17 +89,24 @@ def _match_cross_aspect_fraction(
     orb: float = 4.0,
     planet_a_id: str | None = None,
     planet_b_id: str | None = None,
+    *,
+    include_minor_aspects: bool = False,
 ) -> AspectMatch | None:
     _checked_orb(orb)
     difference = angular_separation_fraction(longitude_a, longitude_b)
     matched: AspectMatch | None = None
-    for aspect_name, exact_angle in ASPECTS:
+    candidates = ASPECTS + MINOR_ASPECTS if include_minor_aspects else ASPECTS
+    minor_names = {name for name, _ in MINOR_ASPECTS}
+    for aspect_name, exact_angle in candidates:
         current_orb = abs(difference - Fraction(exact_angle))
-        dynamic_max_orb = orb
-        if planet_a_id and planet_b_id:
-            dynamic_max_orb = _get_dynamic_orb(
-                planet_a_id, planet_b_id, aspect_name, default_orb=orb
-            )
+        if aspect_name in minor_names:
+            dynamic_max_orb = min(orb, 2.0)
+        else:
+            dynamic_max_orb = orb
+            if planet_a_id and planet_b_id:
+                dynamic_max_orb = _get_dynamic_orb(
+                    planet_a_id, planet_b_id, aspect_name, default_orb=orb
+                )
 
         if current_orb <= Fraction(dynamic_max_orb) and (
             matched is None or current_orb < matched[1]

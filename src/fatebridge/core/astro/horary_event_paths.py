@@ -53,10 +53,8 @@ def evaluate_event_paths(
         "paths": [],
         "refranation_patterns": [],
         "prohibition_patterns": [],
-        "full_original_text_acceptance": False,
-        "reception_epoch_policy": "Guest longitude at the named physical event, radical/question-chart sect held fixed; reception at question instant remains separate. Historical source timing interpretation is not independently certified.",
+        "frustration_patterns": [],
         "source_pages": [110, 111, 125, 126],
-        "scope": "Actual roots under the disclosed finite scan. Missing events outside its window, full prohibition variants, houses, accidental strengths and complete judgement remain open.",
     }
     if (
         history.get("status") != "computed"
@@ -254,9 +252,26 @@ def evaluate_event_paths(
                                     "first_contact": a,
                                     "second_contact": b,
                                     "source_pages": [110, 111],
-                                    "scope": "Selected p111 prograde overtaking pattern: same body/ray type reaches applicant then recipient before their conjunction. Other prohibition variants remain unverified.",
                                 }
                             )
+        if future is not None:
+            for c_evt in intervention:
+                if event_involves(c_evt, recipient) and not event_involves(
+                    c_evt, applicant
+                ):
+                    if c_evt["root_bracket_tt"][1] < future["root_bracket_tt"][0]:
+                        third_body = next(b for b in c_evt["bodies"] if b != recipient)
+                        result["frustration_patterns"].append(
+                            {
+                                "applicant": applicant,
+                                "recipient": recipient,
+                                "intervening_planet": third_body,
+                                "intervening_contact": c_evt,
+                                "principal_contact": future,
+                                "source_pages": [111, 112],
+                            }
+                        )
+                        break
     add(
         "direct",
         [querent, quesited],

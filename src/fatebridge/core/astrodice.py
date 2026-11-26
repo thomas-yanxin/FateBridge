@@ -359,51 +359,37 @@ def build_symbolic_evidence(planet: str, sign: str, house: int) -> dict[str, Any
             "id": "duvendack_2013_faces",
             "author": "Rev Bill Duvendack",
             "version": "2013",
-            "source_kind": "author_primary_explanation",
-            "scope": "十二种骰面与星体/星座/宫位组合；不采用作者另述的出生盘扩展法。",
         },
         {
             "id": SIGN_RULESET,
             "author": "Claudius Ptolemy; tr. J. M. Ashmand",
             "version": "Tetrabiblos, 1822, Book I, chapters XX and XXII",
-            "source_kind": "primary_text_translation",
-            "scope": "七曜入庙、擢升与落陷；失势定义另有来源，不归给本章；不声称原典含星骰法。",
         },
         {
             "id": EDITORIAL_RULESET,
             "author": "FateBridge contributors",
             "version": METHOD_ID,
             "source_path": "docs/astrodice.md",
-            "source_kind": "product_convention",
-            "scope": "元素、模式、宫位组与假设整宫轮。",
         },
         {
             "id": HOUSE_RULESET,
             "author": "William Lilly",
-            "version": "Christian Astrology, 1647, pp.51-56; Skyscript transcription",
-            "source_kind": "primary_text_transcription",
-            "scope": "七曜喜乐宫关系；不将原文的临床、生死或灾祸判断用于咨询，不以喜乐判定事件吉凶。",
+            "version": "Christian Astrology, 1647, pp.51-56",
         },
         {
             "id": TRIPLICITY_RULESET,
             "author": "Claudius Ptolemy; tr. F. E. Robbins",
             "version": "Tetrabiblos, Loeb Classical Library, 1940, I.18",
-            "source_kind": "primary_text_translation",
-            "scope": "分别保留三角总体分派与昼夜首要/明确共管角色；水象为火星与昼金星/夜月亮共管；不混入Dorotheus第三主星或从天象选定骰面昼夜。",
         },
         {
             "id": DETRIMENT_RULESET,
             "author": "Deborah Houlding",
-            "version": "Understanding Planetary Dignity and Debility, part 2; undated",
-            "source_kind": "author_primary_explanation",
-            "scope": "仅采用作者对失势为守护星座对宫的明确说明；不当作托勒密XX章原文或采用文中其他尊贵表。",
+            "version": "Understanding Planetary Dignity and Debility, part 2",
         },
         {
             "id": PLANET_SECT_RULESET,
             "author": "Claudius Ptolemy; tr. F. E. Robbins",
             "version": "Tetrabiblos, Loeb Classical Library, 1940, I.7",
-            "source_kind": "primary_text_translation",
-            "scope": "七曜昼夜分派；水星保留晨星昼曜与昏星夜曜两条件。星体分派不等于实际盘的昼夜；不由骰面宫号或附加天象补条件。",
         },
     ]
     trace = [
@@ -412,7 +398,6 @@ def build_symbolic_evidence(planet: str, sign: str, house: int) -> dict[str, Any
             "ruleset_id": rulesets[0]["id"],
             "inputs": {"planet": planet, "sign": sign, "house": house},
             "result": {"house_number": house_number},
-            "scope": "user_supplied_symbols",
         },
         {
             "rule_id": "sign_relationships",
@@ -420,7 +405,6 @@ def build_symbolic_evidence(planet: str, sign: str, house: int) -> dict[str, Any
             "supporting_ruleset_ids": [SIGN_RULESET, DETRIMENT_RULESET],
             "inputs": {"planet": planet, "sign": sign},
             "result": condition,
-            "scope": "sign_only",
         },
         {
             "rule_id": "symbolic_whole_sign_ring",
@@ -432,7 +416,6 @@ def build_symbolic_evidence(planet: str, sign: str, house: int) -> dict[str, Any
                     "houses_ruled_by_rolled_planet"
                 ],
             },
-            "scope": "hypothetical_wheel_not_observed_sky",
         },
         {
             "rule_id": "symbolic_traits",
@@ -443,28 +426,24 @@ def build_symbolic_evidence(planet: str, sign: str, house: int) -> dict[str, Any
                 "modality": details["modality"],
                 "house_group": details["house_group"],
             },
-            "scope": "symbolic_classification",
         },
         {
             "rule_id": "planetary_house_joy",
             "ruleset_id": HOUSE_RULESET,
             "inputs": {"planet": planet, "house": house},
             "result": details["house_condition"],
-            "scope": "symbolic_house_only",
         },
         {
             "rule_id": "conditional_triplicity",
             "ruleset_id": TRIPLICITY_RULESET,
             "inputs": {"planet": planet, "sign": sign},
             "result": details["triplicity_condition"],
-            "scope": "overall_triangle_assignment_and_both_conditional_roles_without_selecting_a_sect",
         },
         {
             "rule_id": "natural_planet_sect",
             "ruleset_id": PLANET_SECT_RULESET,
             "inputs": {"planet": planet},
             "result": details["planet_sect_condition"],
-            "scope": "natural_assignment_and_conditional_mercury_roles_without_chart_sect",
         },
     ]
     return {
@@ -474,6 +453,5 @@ def build_symbolic_evidence(planet: str, sign: str, house: int) -> dict[str, Any
         "rule_trace": trace,
         "validation": {
             "calendar": "not_applicable_to_symbolic_roll",
-            "classical": "specified_sign_joy_triangle_and_natural_planet_sect_subsets_only",
         },
     }

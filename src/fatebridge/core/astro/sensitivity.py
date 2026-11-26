@@ -229,11 +229,6 @@ def time_sensitivity(
         "hypothetical_element_source": element_source,
         "factor_spans": spans,
         "samples": samples,
-        "limitations": [
-            "Samples do not prove behavior between grid points; narrow changes can be missed",
-            "Coordinate, timezone-rule and ephemeris uncertainty are not propagated",
-            "No rectification, confidence probability or real-world outcome inference",
-        ],
     }
 
 
@@ -264,9 +259,6 @@ def enrich_specialty_sensitivity(
         if "meridian_houses" in layer:
             attach_meridian_sensitivity(layer["meridian_houses"], sensitivity)
         if sensitivity["status"] != "sampled":
-            layer["comparative_geometry"] = build_comparative_geometry(
-                layer, sensitivity
-            )
             return None
         if (
             sensitivity["hypothetical_element_source"]

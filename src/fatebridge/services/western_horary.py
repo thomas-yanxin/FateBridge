@@ -38,6 +38,8 @@ def calculate_horary(
     question_clock_basis: str = "civil",
     question_hour_origin: str = "midnight",
     ut1_source: str = "swiss_delta_t",
+    turned_from_house: int | None = None,
+    turned_house: int | None = None,
 ) -> dict[str, Any]:
     """按提问时刻核算相位、月亮事件与原典条件的核验状态。"""
     label = "卜卦证据"
@@ -79,6 +81,8 @@ def calculate_horary(
                 orb_profile=orb_profile,
                 radicality_context=radicality_context,
                 clock_basis=question_clock_basis,
+                turned_from_house=turned_from_house,
+                turned_house=turned_house,
             )
 
             context = {

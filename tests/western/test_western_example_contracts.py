@@ -55,6 +55,27 @@ KEYS = [
 ]
 SPECS = {s.name: s for s in CATALOG}
 AS_OF = "2026-10-12T12:00:00+08:00"
+# Pruned prose/policy paths still referenced by shared data/agent_examples.json until Wave 3 refreshes it.
+_PRUNED_SUGGESTED_FIELDS = frozenset(
+    {
+        "summary",
+        "midpoint_analysis.reading_guide",
+        "midpoint_analysis.limitations",
+        "midpoint_analysis.original_text_conformance",
+        "midpoint_analysis.interpretations",
+        "midpoint_analysis.time_sensitivity.status",
+        "midpoint_analysis.time_sensitivity.uncertainty_minutes",
+        "election.solar_condition_policy",
+        "election.condition_policy",
+    }
+)
+
+
+def _active_suggested_fields(record: dict) -> list[str] | None:
+    fields = record.get("suggested_fields")
+    if fields is None:
+        return None
+    return [f for f in fields if f not in _PRUNED_SUGGESTED_FIELDS]
 
 
 @pytest.mark.parametrize("key", KEYS)
@@ -141,7 +162,7 @@ def test_public_descriptor_drives_each_available_adapter_without_private_input_d
                 )
             assert record["example_input"]
             data = record["example_input"]
-            fields = record.get("suggested_fields")
+            fields = _active_suggested_fields(record)
             values = []
             if spec.expose_mcp:
                 validate(data, record["input_schema"])
@@ -169,7 +190,7 @@ def test_public_descriptor_drives_each_available_adapter_without_private_input_d
 
     record, values = asyncio.run(public_call())
     data = record["example_input"]
-    fields = record.get("suggested_fields")
+    fields = _active_suggested_fields(record)
     if spec.rest_path:
         params: dict[str, object] = {"as_of": AS_OF, "detail": "audit"}
         if fields is not None:

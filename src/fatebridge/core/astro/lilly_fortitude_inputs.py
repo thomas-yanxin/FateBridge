@@ -7,15 +7,18 @@ from fractions import Fraction
 from typing import Any
 
 from fatebridge.core.astro import runtime
-from fatebridge.core.astro.ephemeris import _swisseph_planet_state
+from fatebridge.core.astro.ephemeris import _swisseph_planet_state, fast_swe_call
 from fatebridge.core.astro.geometry import native_lahiri_ayanamsha
 from fatebridge.core.astro.lilly_fortitudes import ORDER
 from fatebridge.core.astro.physical_sources import (
     PhysicalEphemerisTrace,
     assert_physical_configuration,
 )
+from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
+from fatebridge.core.ephemeris_runtime import ephemeris_call as _ORIG_EPHEMERIS_CALL
 from fatebridge.core.fixed_stars import apparent_positions
+from fatebridge.core.jpl_ephemeris import configured_jpl_file
 from fatebridge.utils.errors import EphemerisSourceError
 
 
@@ -59,6 +62,9 @@ def collect_fortitude_inputs(subject: Any) -> dict[str, Any]:
     models: dict[str, str] = {}
     basis = getattr(subject, "calculation_basis", None) or {}
     expected = (basis.get("physical_ephemeris_source") or {}).get("factors") or {}
+    use_fast = (
+        runtime.ephemeris_call is _ORIG_EPHEMERIS_CALL and configured_jpl_file() is None
+    )
     offsets = (0.0, 0.25, 0.5, 0.75, 1.0)
     for planet in ORDER:
         points = []
@@ -66,17 +72,31 @@ def collect_fortitude_inputs(subject: Any) -> dict[str, Any]:
         coordinate_allowance: float | None = None
         for offset in offsets:
             epoch = at + offset
-            sampled = _swisseph_planet_state(
-                planet,
-                julian_day_tt=epoch,
-                source_trace=trace,
-                motion_metadata=contexts.setdefault(epoch, {}),
-                correct_motion=False,
-            )
-            assert_physical_configuration(selected)
-            if sampled is None:
-                break
-            state, model = sampled
+            if use_fast and offset > 0.0:
+                coords, flag = fast_swe_call(
+                    "calc",
+                    epoch,
+                    PLANET_SWISSEPH_IDS[planet],
+                    runtime.swe.FLG_SWIEPH | runtime.swe.FLG_SPEED,
+                )
+                assert_physical_configuration(selected)
+                if flag < 0:
+                    break
+                model = runtime.ephemeris_model_from_retflag(flag)
+                state = {"longitude": float(coords[0]) % 360.0}
+            else:
+                sampled = _swisseph_planet_state(
+                    planet,
+                    julian_day_tt=epoch,
+                    source_trace=trace,
+                    motion_metadata=contexts.setdefault(epoch, {}),
+                    correct_motion=False,
+                    include_declination=False,
+                )
+                assert_physical_configuration(selected)
+                if sampled is None:
+                    break
+                state, model = sampled
             expected_model = (expected.get(planet) or {}).get("model")
             if expected_model is not None and model != expected_model:
                 raise EphemerisSourceError("model_changed")

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
 from typing import Any
 
 from fatebridge.core.astro.astrology_election import (
@@ -34,6 +35,7 @@ def calculate_election(
     candidate_clock_basis: str = "civil",
     candidate_hour_origin: str = "midnight",
     ut1_source: str = "swiss_delta_t",
+    search_window_hours: int = 0,
 ) -> dict[str, Any]:
     """评估某候选时刻对某类用事（结婚/开业/签约等非医疗活动）是否吉利。"""
     label = "择日"
@@ -69,6 +71,52 @@ def calculate_election(
                 hour_origin_conversion=hour_origin_conversion,
             )
             payload = build_election_payload(subject, topic_id=topic_id)
+            if search_window_hours > 0:
+                windows: list[dict[str, Any]] = []
+                for h_off in range(
+                    0, search_window_hours + 1, max(1, search_window_hours // 24)
+                ):
+                    cand_dt = candidate_local + timedelta(hours=h_off)
+                    c_subj, _ = build_event_subject(
+                        name=name or "择日候选",
+                        local_datetime=cand_dt,
+                        longitude=longitude,
+                        latitude=latitude,
+                        timezone_name=timezone_name,
+                        clock_basis=candidate_clock_basis,
+                        house_system=house_system,
+                        zodiac_type=zodiac_type,
+                    )
+                    c_eval = build_election_payload(c_subj, topic_id=topic_id)
+                    c_codes = {f["code"] for f in c_eval.get("factors", [])}
+                    score = 0
+                    if c_eval["moon"]["void_of_course"] is False:
+                        score += 3
+                    if c_eval.get("planetary_hour_match"):
+                        score += 2
+                    if any(c.startswith("benefic_on_angle_") for c in c_codes):
+                        score += 2
+                    if any(c.startswith("malefic_on_angle_") for c in c_codes):
+                        score -= 3
+                    if "moon_combust" in c_codes or "moon_via_combusta" in c_codes:
+                        score -= 2
+                    if (
+                        "mercury_retrograde" in c_codes
+                        or "significator_retrograde" in c_codes
+                    ):
+                        score -= 1
+                    windows.append(
+                        {
+                            "datetime": cand_dt.isoformat(),
+                            "offset_hours": h_off,
+                            "score": score,
+                            "moon_void_of_course": c_eval["moon"]["void_of_course"],
+                            "planetary_hour_match": c_eval.get("planetary_hour_match"),
+                            "factor_codes": sorted(c_codes),
+                        }
+                    )
+                windows.sort(key=lambda w: (-w["score"], w["offset_hours"]))
+                payload["candidate_windows"] = windows[:5]
 
             context = {
                 "tool": label,

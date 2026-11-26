@@ -502,8 +502,8 @@ def test_derived_calculations_reach_all_three_transports(
         basis = calculation["calculation_basis"]
         assert basis["year_days"] == 360.0
         assert basis["interval_time_basis"] == "elapsed_utc_days"
-        assert basis["published_levels"] == [1, 2, 3]
-        assert not basis["whole_procedure_certified"]
+        assert basis["published_levels"] == [1, 2, 3, 4]
+        assert "whole_procedure_certified" not in basis
         for track in (calculation["fortune"], calculation["spirit"]):
             for period in track["level_3_timeline"]:
                 assert period["duration_unit"] == "days"

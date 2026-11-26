@@ -12,10 +12,7 @@ from fatebridge.core.astro.angle_definitions import (
 )
 from fatebridge.core.astro.geometry import normalize_angle
 from fatebridge.core.astro.house_axes import canonical_house_axes
-from fatebridge.core.astro.longitude_motion import corrected_longitude_motion
-from fatebridge.core.astro.lunar_source_window import (
-    coherent_lunar_native_state,
-)
+from fatebridge.core.astro.iers_ut1 import active_ut1
 from fatebridge.core.astro.native_coordinates import require_spherical_coordinates
 from fatebridge.core.astro.native_motion import require_longitude_speed
 from fatebridge.core.astro.orbits import (
@@ -32,15 +29,40 @@ from fatebridge.core.astro.profiles import (
     physical_ephemeris_summary,
 )
 from fatebridge.core.astro.reference import (
+    EXTRA_BODY_SWISSEPH_IDS,
+    NODE_BODIES,
     PLANET_SEQUENCE,
     PLANET_SWISSEPH_IDS,
     TRADITIONAL_PLANETS,
 )
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.astro.ut1_epoch import UT1Instant
-from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
+from fatebridge.core.ephemeris_runtime import (
+    EPHEMERIS_LOCK,
+    _ensure_thread_ephemeris_path,
+    configured_ephemeris_path,
+)
+from fatebridge.core.ephemeris_runtime import ephemeris_call as _ORIG_EPHEMERIS_CALL
 from fatebridge.core.jpl_ephemeris import configured_jpl_file
 from fatebridge.utils.errors import EphemerisSourceError
+
+
+def fast_swe_call(operation: str, *args: Any, **kwargs: Any) -> Any:
+    """Invoke Swiss Ephemeris directly under EPHEMERIS_LOCK unless mocked, IERS UT1, or JPL."""
+    if (
+        runtime.ephemeris_call is _ORIG_EPHEMERIS_CALL
+        and configured_jpl_file() is None
+        and active_ut1.get() is None
+        and runtime.swe is not None
+    ):
+        with EPHEMERIS_LOCK:
+            _ensure_thread_ephemeris_path()
+            clean_args = tuple(
+                arg.as_float() if hasattr(arg, "as_float") else arg for arg in args
+            )
+            clean_kwargs = {k: v for k, v in kwargs.items() if not k.startswith("_")}
+            return getattr(runtime.swe, operation)(*clean_args, **clean_kwargs)
+    return runtime.ephemeris_call(operation, *args, **kwargs)
 
 
 def _swisseph_angles(
@@ -94,10 +116,37 @@ def _swisseph_angles(
     return result
 
 
-def _planet_set(chart_variant: str) -> list[str]:
-    if chart_variant in {"hellen_chart", "guolao_chart"}:
-        return list(TRADITIONAL_PLANETS)
-    return list(PLANET_SEQUENCE)
+def _planet_set(
+    chart_variant: str, extra_bodies: tuple[str, ...] | list[str] = ()
+) -> list[str]:
+    base = (
+        list(TRADITIONAL_PLANETS)
+        if chart_variant in {"hellen_chart", "guolao_chart"}
+        else list(PLANET_SEQUENCE)
+    )
+    if extra_bodies:
+        seen = set(base)
+        for body in extra_bodies:
+            if body not in seen and (
+                body in PLANET_SWISSEPH_IDS
+                or body in EXTRA_BODY_SWISSEPH_IDS
+                or body == "South Node"
+            ):
+                base.append(body)
+                seen.add(body)
+    return base
+
+
+def _resolve_swe_body_id(planet: str, *, node_mode: str = "mean") -> int | None:
+    if runtime.swe is None:
+        return None
+    if planet == "North Node":
+        return runtime.swe.TRUE_NODE if node_mode == "true" else runtime.swe.MEAN_NODE
+    if planet in PLANET_SWISSEPH_IDS:
+        return PLANET_SWISSEPH_IDS[planet]
+    if planet in EXTRA_BODY_SWISSEPH_IDS:
+        return EXTRA_BODY_SWISSEPH_IDS[planet]
+    return None
 
 
 def _swisseph_planet_state(
@@ -109,16 +158,35 @@ def _swisseph_planet_state(
     motion_metadata: dict[str, Any] | None = None,
     correct_motion: bool = True,
     include_declination: bool = True,
+    node_mode: str = "mean",
 ) -> tuple[dict[str, float], str] | None:
-    """One coherent physical state, with optional shared batch file tracing.
+    """One coherent physical state, with optional shared batch file tracing."""
+    del motion_metadata, correct_motion  # Instantaneous FLG_SPEED is used directly.
+    if runtime.swe is None:
+        return None
+    if planet == "South Node":
+        north = _swisseph_planet_state(
+            "North Node",
+            julian_day,
+            julian_day_tt=julian_day_tt,
+            source_trace=source_trace,
+            include_declination=include_declination,
+            node_mode=node_mode,
+        )
+        if north is None:
+            return None
+        north_state, model = north
+        south_state: dict[str, float] = {
+            "longitude": normalize_angle(north_state["longitude"] + 180.0),
+            "latitude": -float(north_state["latitude"]),
+            "longitude_speed": float(north_state["longitude_speed"]),
+        }
+        if "declination" in north_state:
+            south_state["declination"] = -float(north_state["declination"])
+        return south_state, model
 
-    Explicit TT needs no Earth-rotation epoch. The default includes
-    declination and its source observations; ecliptic-only callers can omit
-    that query. An unavailable requested equatorial position leaves
-    declination unknown. A changed source is a consistency error, never an
-    orbital approximation trigger.
-    """
-    if runtime.swe is None or planet not in PLANET_SWISSEPH_IDS:
+    body_id = _resolve_swe_body_id(planet, node_mode=node_mode)
+    if body_id is None:
         return None
     operation = "calc" if julian_day_tt is not None else "calc_ut"
     epoch = (
@@ -129,133 +197,60 @@ def _swisseph_planet_state(
     if epoch is None or not math.isfinite(epoch):
         raise ValueError("A finite TT or UT1 Julian day is required")
     trace = source_trace if source_trace is not None else PhysicalEphemerisTrace()
-    physical = planet not in {"North Node", "South Node"}
-    with runtime.preserve_ephemeris_path():
-        selected = configured_ephemeris_path()
-        # Set the calling thread's C configuration even when a third-party
-        # direct API call bypassed the managed runtime signature.
-        runtime.swe.set_ephe_path(selected or "")
+    physical = planet not in NODE_BODIES and planet != "True Node"
+    selected = configured_ephemeris_path()
+    try:
+        coordinates, flag = fast_swe_call(
+            operation,
+            epoch,
+            body_id,
+            runtime.swe.FLG_SWIEPH | runtime.swe.FLG_SPEED,
+        )
+    except EphemerisSourceError:
+        raise
+    except runtime.native_ephemeris_errors() as error:
+        runtime._log_swe_runtime_failure(operation, error)
+        return None
+    assert_physical_configuration(selected)
+    if flag < 0:
+        runtime._log_swe_runtime_failure(operation, RuntimeError(f"retflag={flag}"))
+        return None
+    model = runtime.ephemeris_model_from_retflag(flag)
+    longitude_speed = require_longitude_speed(coordinates, flag, runtime.swe.FLG_SPEED)
+    longitude, latitude, _ = require_spherical_coordinates(
+        coordinates, flag, native=runtime.swe
+    )
+    if physical:
+        trace.observe(planet, model)
+    state: dict[str, float] = {
+        "longitude": normalize_angle(longitude),
+        "latitude": latitude,
+        "longitude_speed": longitude_speed,
+    }
+    if include_declination:
         try:
-            coordinates, flag = runtime.ephemeris_call(
+            equatorial, eq_flag = fast_swe_call(
                 operation,
                 epoch,
-                PLANET_SWISSEPH_IDS[planet],
-                runtime.swe.FLG_SWIEPH | runtime.swe.FLG_SPEED,
+                body_id,
+                runtime.swe.FLG_SWIEPH | runtime.swe.FLG_EQUATORIAL,
             )
         except EphemerisSourceError:
             raise
         except runtime.native_ephemeris_errors() as error:
-            runtime._log_swe_runtime_failure(operation, error)
-            return None
-        assert_physical_configuration(selected)
-        if flag < 0:
-            runtime._log_swe_runtime_failure(operation, RuntimeError(f"retflag={flag}"))
-            return None
-        model = runtime.ephemeris_model_from_retflag(flag)
-        longitude_speed = require_longitude_speed(
-            coordinates, flag, runtime.swe.FLG_SPEED
-        )
-        longitude, latitude, _ = require_spherical_coordinates(
-            coordinates, flag, native=runtime.swe
-        )
-        if physical:
-            trace.observe(planet, model)
-        state = {
-            "longitude": normalize_angle(longitude),
-            "latitude": latitude,
-            "longitude_speed": longitude_speed,
-        }
-        motion_tt = (
-            epoch
-            if operation == "calc"
-            else epoch
-            + float(
-                runtime.ephemeris_call(
-                    "deltat_ex",
-                    epoch,
-                    flag
-                    & (
-                        runtime.swe.FLG_SWIEPH
-                        | runtime.swe.FLG_MOSEPH
-                        | runtime.swe.FLG_JPLEPH
-                    ),
+            runtime._log_swe_runtime_failure(operation + "(equatorial)", error)
+        else:
+            if eq_flag >= 0:
+                if physical:
+                    trace.observe(planet, runtime.ephemeris_model_from_retflag(eq_flag))
+                _, declination, _ = require_spherical_coordinates(
+                    equatorial, eq_flag, native=runtime.swe, equatorial=True
                 )
-            )
-        )
-        if planet == "Moon":
-            coordinates, flag, policy = coherent_lunar_native_state(
-                operation,
-                epoch,
-                runtime.swe.FLG_SWIEPH | runtime.swe.FLG_SPEED,
-                motion_tt,
-                model,
-                trace,
-                initial=coordinates,
-                initial_flags=flag,
-            )
-            speed = require_longitude_speed(coordinates, flag, runtime.swe.FLG_SPEED)
-            lon, lat, _ = require_spherical_coordinates(
-                coordinates, flag, native=runtime.swe
-            )
-            state.update(
-                longitude=normalize_angle(lon), latitude=lat, longitude_speed=speed
-            )
-            trace.observe(planet, model)
-            if motion_metadata is not None:
-                motion_metadata.setdefault("lunar_source_windows", {})[
-                    "tropical"
-                ] = policy
-        if correct_motion:
-            state.update(
-                corrected_longitude_motion(
-                    planet,
-                    motion_tt,
-                    coordinates,
-                    model,
-                    source_trace=trace,
-                    context=motion_metadata,
-                )
-            )
-        if include_declination:
-            try:
-                if planet == "Moon":
-                    equatorial, eq_flag, eq_policy = coherent_lunar_native_state(
-                        operation,
-                        epoch,
-                        runtime.swe.FLG_SWIEPH | runtime.swe.FLG_EQUATORIAL,
-                        motion_tt,
-                        model,
-                        trace,
-                    )
-                    if motion_metadata is not None:
-                        motion_metadata.setdefault("lunar_source_windows", {})[
-                            "equatorial"
-                        ] = eq_policy
-                else:
-                    equatorial, eq_flag = runtime.ephemeris_call(
-                        operation,
-                        epoch,
-                        PLANET_SWISSEPH_IDS[planet],
-                        runtime.swe.FLG_SWIEPH | runtime.swe.FLG_EQUATORIAL,
-                    )
-            except EphemerisSourceError:
-                raise
-            except runtime.native_ephemeris_errors() as error:
-                runtime._log_swe_runtime_failure(operation + "(equatorial)", error)
-            else:
-                if eq_flag >= 0:
-                    if runtime.ephemeris_model_from_retflag(eq_flag) != model:
-                        raise EphemerisSourceError("coordinate_model_changed")
-                    if physical:
-                        trace.observe(planet, model)
-                    _, declination, _ = require_spherical_coordinates(
-                        equatorial, eq_flag, native=runtime.swe, equatorial=True
-                    )
-                    state["declination"] = declination
-        assert_physical_configuration(selected)
-        if source_trace is None:
-            trace.finish()
-        return state, native_factor_model(PLANET_SWISSEPH_IDS[planet], flag)
+                state["declination"] = declination
+    assert_physical_configuration(selected)
+    if source_trace is None:
+        trace.finish()
+    return state, native_factor_model(body_id, flag)
 
 
 @dataclass(frozen=True)
@@ -275,13 +270,16 @@ def _build_planet_states(
     julian_day_tt: float | TTInstant | None = None,
     source_trace: PhysicalEphemerisTrace | None = None,
     motion_metadata: dict[str, Any] | None = None,
+    node_mode: str = "mean",
+    extra_bodies: tuple[str, ...] | list[str] = (),
+    include_declination: bool = True,
 ) -> PlanetStateBatch:
     """Build one batch; a caller-supplied trace keeps its outer endpoint owner."""
     if configured_jpl_file() is not None and runtime.swe is None:
         raise ModuleNotFoundError(
             "Swiss Ephemeris is required for explicitly selected JPL mode"
         )
-    planet_names = _planet_set(chart_variant)
+    planet_names = _planet_set(chart_variant, extra_bodies=extra_bodies)
     ephemeris_states: dict[str, dict[str, float]] = {}
     models: dict[str, str] = {}
     native_count = 0
@@ -296,22 +294,30 @@ def _build_planet_states(
                 julian_day_tt=julian_day_tt,
                 source_trace=trace,
                 motion_metadata=motion_metadata,
+                include_declination=include_declination,
+                node_mode=node_mode,
             )
             if result is not None:
                 state, model = result
                 ephemeris_states[planet] = state
                 models[planet] = model
                 native_count += 1
-            else:
-                # Keep successful native bodies and the requested TT. The
-                # fallback has its own coherent Earth/Sun/frame calculation.
+            elif planet not in EXTRA_BODY_SWISSEPH_IDS:
                 if fallback is None:
                     fallback = ApproximateEphemeris(julian_day, julian_day_tt)
-                ephemeris_states[planet] = fallback.state(planet)
-                models[planet] = (
-                    MEAN_NODE_MODEL if planet == "North Node" else ORBITAL_MODEL
-                )
-                if planet not in {"North Node", "South Node"}:
+                if planet == "South Node":
+                    north = fallback.state("North Node")
+                    ephemeris_states[planet] = {
+                        "longitude": normalize_angle(north["longitude"] + 180.0),
+                        "latitude": -float(north["latitude"]),
+                        "longitude_speed": float(north["longitude_speed"]),
+                    }
+                    models[planet] = MEAN_NODE_MODEL
+                else:
+                    ephemeris_states[planet] = fallback.state(planet)
+                    models[planet] = (
+                        MEAN_NODE_MODEL if planet == "North Node" else ORBITAL_MODEL
+                    )
                     trace.observe(planet, models[planet])
             assert_physical_configuration(selected)
         if source_trace is None:

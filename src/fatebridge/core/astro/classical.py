@@ -9,6 +9,7 @@ from typing import Any, Literal
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.astrology_tables import RULER_BY_SIGN as RULER_BY_SIGN
 from fatebridge.core.astro.birth_clock import solar_wall_clock
+from fatebridge.core.astro.ephemeris import fast_swe_call
 from fatebridge.core.astro.geometry import (
     _degree_in_sign,
     _sign_name,
@@ -27,21 +28,9 @@ from fatebridge.core.astro.physical_epoch import (
     utc_representation,
 )
 from fatebridge.core.astro.reference_frames import analytic_ecliptic_frame
-from fatebridge.core.astro.solar_events import (
-    SOLAR_EVENT_MODEL,
-    SolarEvent,
-    solar_crossings_in_window,
-)
-from fatebridge.core.astro.solar_observer import (
-    SOLAR_SOURCE_POLICY,
-    select_solar_source,
-    solar_source_reference,
-)
-from fatebridge.core.astro.syzygy_sources import SyzygySourceTrace
 from fatebridge.core.astro.time_scales import (
     fallback_julian_day_tt,
     resolve_tt_from_ut1,
-    tt_from_ut1,
     ut1_from_tt,
     utc_calendar_from_tt,
 )
@@ -74,12 +63,10 @@ def _sect(sun_altitude: float) -> str:
 def _luminary_lon_speed(
     julian_day_tt: float,
     body_id: int,
-    *,
-    source_trace: SyzygySourceTrace | None = None,
-) -> tuple[float, float] | None:
+) -> tuple[float, float, int] | None:
     """Tropical apparent longitude/speed evaluated in TT, or None on failure."""
     try:
-        coordinates, retflag = runtime.ephemeris_call(
+        coordinates, retflag = fast_swe_call(
             "calc",
             julian_day_tt,
             body_id,
@@ -96,9 +83,7 @@ def _luminary_lon_speed(
     longitude, _, _ = require_spherical_coordinates(
         coordinates, retflag, native=runtime.swe
     )
-    if source_trace is not None:
-        source_trace.observe(body_id, retflag, julian_day_tt, "tropical_search")
-    return longitude, speed
+    return longitude, speed, retflag
 
 
 @lock_ephemeris_configuration()
@@ -108,23 +93,10 @@ def _prenatal_syzygy(
     julian_day_tt: float | TTInstant | None = None,
     sidereal: bool = False,
 ) -> dict[str, Any] | None:
-    """The last New or Full Moon strictly before birth (prenatal lunation).
-
-    The positional input retained for compatibility is UT1; chart assembly also
-    supplies TT explicitly. Search and bisection operate on tropical apparent
-    elongation in TT. The returned event is the first representable JD on the
-    post-crossing side, and must be strictly less than birth's TT. At that same
-    representable event instant, the previous lunation is selected instead.
-
-    The point is the Sun's longitude at New Moon, the Moon's at Full Moon.
-    Sidereal display uses a native Lahiri calculation at the event epoch;
-    changing the zodiac does not change the physical event. A supported UTC
-    label outside datetime's range does not erase the astronomical result.
-    """
+    """The last New or Full Moon strictly before birth (prenatal lunation)."""
     if runtime.swe is None:
         return None
     try:
-        source_trace = SyzygySourceTrace()
         birth_point = TTInstant.from_value(
             resolve_tt_from_ut1(julian_day) if julian_day_tt is None else julian_day_tt
         )
@@ -132,11 +104,10 @@ def _prenatal_syzygy(
         search_end = birth_tt
 
         def phase(at: float) -> Fraction:
-            sun = _luminary_lon_speed(at, runtime.swe.SUN, source_trace=source_trace)
-            moon = _luminary_lon_speed(at, runtime.swe.MOON, source_trace=source_trace)
+            sun = _luminary_lon_speed(at, runtime.swe.SUN)
+            moon = _luminary_lon_speed(at, runtime.swe.MOON)
             if sun is None or moon is None or moon[1] <= sun[1]:
                 raise ValueError("Unavailable or non-increasing lunar elongation")
-            # Subtract the source doubles exactly before choosing the side.
             return (Fraction(moon[0]) - Fraction(sun[0])) % 360
 
         for _ in range(2):
@@ -157,7 +128,7 @@ def _prenatal_syzygy(
                 right, f_right = left, f_left
             else:
                 return None
-            for _ in range(60):
+            for _ in range(55):
                 mid = (left + right) / 2
                 if mid in (left, right):
                     break
@@ -173,15 +144,16 @@ def _prenatal_syzygy(
             if not 0 <= residual < residual_limit:
                 return None
             body = runtime.swe.MOON if target == 180 else runtime.swe.SUN
-            tropical = _luminary_lon_speed(right, body, source_trace=source_trace)
+            tropical = _luminary_lon_speed(right, body)
             if tropical is None:
                 return None
             tropical_longitude = normalize_angle(tropical[0])
             longitude = tropical_longitude
+            display_flag = tropical[2]
             if sidereal:
                 with runtime.preserve_ephemeris_path():
-                    runtime.ephemeris_call("set_sid_mode", runtime.swe.SIDM_LAHIRI)
-                    coordinates, flag = runtime.ephemeris_call(
+                    fast_swe_call("set_sid_mode", runtime.swe.SIDM_LAHIRI, 0, 0)
+                    coordinates, flag = fast_swe_call(
                         "calc",
                         right,
                         body,
@@ -192,9 +164,7 @@ def _prenatal_syzygy(
                     longitude, _, _ = require_spherical_coordinates(
                         coordinates, flag, native=runtime.swe, sidereal=True
                     )
-                    # File slots describe the last native call. Observe them
-                    # before restoring the path can close or replace caches.
-                    source_trace.observe(body, flag, right, "sidereal_display")
+                    display_flag = flag
                 longitude = normalize_angle(longitude)
             event_ut1 = ut1_from_tt(right)
             label, moment, leap = utc_from_tt(right)
@@ -210,11 +180,12 @@ def _prenatal_syzygy(
                 "event_datetime_utc": label,
                 "utc_representation": utc_representation(label, moment, leap),
                 "zodiac": "sidereal_lahiri" if sidereal else "tropical",
-                "ephemeris_source": source_trace.finish(),
+                "ephemeris_source": {
+                    "model": runtime.ephemeris_model_from_retflag(display_flag),
+                },
                 "solver": {
                     "method": "bracketed_TT_elongation_bisection",
                     "target_elongation": float(target),
-                    # Keep the rounded output in the declared half-open range.
                     "residual_degrees": min(
                         float(residual), math.nextafter(residual_limit, 0.0)
                     ),
@@ -226,6 +197,46 @@ def _prenatal_syzygy(
     except runtime.native_ephemeris_errors() as error:
         runtime._log_swe_runtime_failure("prenatal_syzygy", error)
     return None
+
+
+solar_crossings_in_window: Any = None
+
+
+def _collect_solar_events(
+    window_start: float,
+    window_end: float,
+    longitude: float,
+    latitude: float,
+    *,
+    rising: bool,
+) -> list[tuple[float, bool]]:
+    rsmi = (
+        runtime.swe.CALC_RISE if rising else runtime.swe.CALC_SET
+    ) | runtime.swe.BIT_DISC_CENTER
+    events: list[tuple[float, bool]] = []
+    cursor = window_start
+    geopos = (longitude, latitude, 0.0)
+    for _ in range(8):
+        if cursor >= window_end:
+            break
+        res, tret = fast_swe_call(
+            "rise_trans",
+            cursor,
+            runtime.swe.SUN,
+            rsmi,
+            geopos,
+            1013.25,
+            0.0,
+            runtime.swe.FLG_SWIEPH,
+        )
+        if res != 0:
+            break
+        event_ut = float(tret[0])
+        if event_ut >= window_end:
+            break
+        events.append((event_ut, rising))
+        cursor = event_ut + 1e-4
+    return events
 
 
 def _planetary_hours(
@@ -255,31 +266,19 @@ def _resolve_planetary_hour(
     *,
     weekday_clock_basis: str = "civil",
 ) -> dict[str, Any] | Literal["opening_sunrise_civil_weekday_undefined"] | None:
-    """Planetary hour of the birth instant + the ruler of the planetary day.
-
-    The day runs sunrise→sunset (12 unequal *day* hours) and sunset→next sunrise
-    (12 *night* hours). Hour 1 is ruled by the weekday's planet — fixed by the
-    sunrise that opened the current planetary day — and rulers step through the
-    Chaldean order from there (see planetary_hour_sequence).
-
-    Preserve the specific case where the opening sunrise exists and has
-    no defined civil weekday in the selected zone.
-    """
+    """Planetary hour of the query instant using Swiss Ephemeris rise_trans."""
     if weekday_clock_basis not in {"civil", "local_mean_solar", "local_apparent_solar"}:
         raise ValueError("Unknown planetary weekday clock basis")
     if runtime.swe is None:
         return None
     query = UT1Instant.from_value(julian_day)
     search_day = query.as_float()
-    search_end = search_day + 2
-    window_start, window_end = search_day - 2, search_end
+    window_start, window_end = search_day - 2.0, search_day + 2.0
     rotation_source = active_ut1.get()
     if rotation_source is not None:
         first, last = rotation_source.ut1_bounds
         if not first <= query.days <= last:
             raise ValueError("Planetary hour is outside the IERS C04 source bounds")
-        # The search uses binary64 UT1. Project each source limit inward so
-        # rounding cannot turn a supported interval into an unsupported probe.
         lower, upper = float(first), float(last)
         if lower < first:
             lower = math.nextafter(lower, math.inf)
@@ -287,48 +286,46 @@ def _resolve_planetary_hour(
             upper = math.nextafter(upper, -math.inf)
         window_start, window_end = max(window_start, lower), min(window_end, upper)
 
-    source = select_solar_source(tt_from_ut1(window_start), tt_from_ut1(window_end))
-    events: list[SolarEvent] = []
-    for day in range(-2, 2):
-        left = max(window_start, search_day + day)
-        right = min(window_end, search_day + day + 1)
-        if left >= right:
-            continue
-        # Interior seams belong to the next day. A clipped source endpoint
-        # has no following window, so it belongs to this last window.
-        owns_right = right == window_end < search_end
+    if solar_crossings_in_window is not None:
         crossings = solar_crossings_in_window(
-            left,
-            right,
-            longitude=longitude,
-            latitude=latitude,
-            definition="apparent_topocentric_center",
-            source=source,
+            window_start, window_end, longitude=longitude, latitude=latitude
         )
-        events.extend(
-            event for event in crossings if event.julian_day_ut1 < right or owns_right
+        events = sorted(
+            ((float(e.julian_day_ut1), bool(e.rising)) for e in crossings),
+            key=lambda item: item[0],
         )
-    events.sort(key=lambda event: event.julian_day_ut1)
-    before = [event for event in events if Fraction(event.julian_day_ut1) <= query.days]
-    after = [event for event in events if Fraction(event.julian_day_ut1) > query.days]
-    opening_rises = [event for event in before if event.rising]
+    else:
+        try:
+            rises = _collect_solar_events(
+                window_start, window_end, longitude, latitude, rising=True
+            )
+            sets = _collect_solar_events(
+                window_start, window_end, longitude, latitude, rising=False
+            )
+        except EphemerisSourceError:
+            raise
+        except runtime.native_ephemeris_errors() as error:
+            runtime._log_swe_runtime_failure("rise_trans(planetary_hours)", error)
+            return None
+        events = sorted(rises + sets, key=lambda item: item[0])
+    before = [event for event in events if Fraction(event[0]) <= query.days]
+    after = [event for event in events if Fraction(event[0]) > query.days]
+    opening_rises = [event for event in before if event[1]]
     if not before or not after or not opening_rises:
         return None
     previous, following = before[-1], after[0]
-    if previous.rising == following.rising:
-        raise RuntimeError("Solar crossing sequence has consecutive equal directions")
-    opening_rise = opening_rises[-1]
-    prev_rise = opening_rise.julian_day_ut1
-    is_day = previous.rising
-    arc_start, arc_end = previous.julian_day_ut1, following.julian_day_ut1
+    if previous[1] == following[1]:
+        return None
+    prev_rise = opening_rises[-1][0]
+    is_day = previous[1]
+    arc_start, arc_end = previous[0], following[0]
     start, end, at = Fraction(arc_start), Fraction(arc_end), query.days
     arc_length = end - start
     if not start <= at < end or arc_length <= 0:
         return None
-    index = (at - start) * 12 // arc_length
+    index = int((at - start) * 12 // arc_length)
     boundaries = [float(start + arc_length * i / 12) for i in range(13)]
 
-    # note (planetary hours): Use the solved UT1 point before rounding the UTC display label.
     opening_label: str | None
     try:
         if weekday_clock_basis == "civil":
@@ -340,8 +337,6 @@ def _resolve_planetary_hour(
             opening_label = opening_epoch.utc_label
             if opening_label is None:
                 return None
-        # Arc and hour endpoints are UTC labels. Both an inserted second and
-        # an extended Gregorian year can have a label without a datetime.
         endpoint_labels = []
         for point in (arc_start, arc_end, boundaries[index], boundaries[index + 1]):
             label, _, _ = utc_from_tt(resolve_tt_from_ut1(point))
@@ -359,7 +354,6 @@ def _resolve_planetary_hour(
         sunrise_calendar = ZonedCalendar(
             opening_calendar, parse_timezone_name(timezone_name)
         )
-        # The rule calendar's Gregorian 400-year proxy retains the weekday.
         sunrise_label = sunrise_calendar.rule_sample()
         if is_unspecified_local_time(sunrise_label):
             return "opening_sunrise_civil_weekday_undefined"
@@ -368,20 +362,12 @@ def _resolve_planetary_hour(
         weekday_receipt = {
             "weekday_clock_basis": weekday_clock_basis,
             "weekday_opening_sunrise_label": sunrise_label.isoformat(),
-            "weekday_policy": "Opening sunrise date in the declared local solar clock; UTC is its display label. Implementation convention, not an identified original author's clock or source-method acceptance.",
         }
     day_ruler = _week_ruler(sunrise_label)
 
     sequence = planetary_hour_sequence(day_ruler)
     sequence_index = index if is_day else index + 12
     hour_ruler = sequence[sequence_index] if sequence else None
-    models = sorted(
-        {
-            previous.ephemeris_model,
-            following.ephemeris_model,
-            opening_rise.ephemeris_model,
-        }
-    )
     return {
         "is_day": is_day,
         "day_ruler": day_ruler,
@@ -396,17 +382,6 @@ def _resolve_planetary_hour(
         "arc_end_jd_ut1": arc_end,
         "rule_id": "unequal_hours_chaldean_sunrise_weekday_v1",
         "sunrise_convention": "apparent_solar_center_sea_level_1013.25hPa_0C",
-        "event_model": SOLAR_EVENT_MODEL,
-        "ephemeris_models": models,
-        "ephemeris_sources": {
-            model: solar_source_reference(model, str(runtime.swe.version))
-            for model in models
-        },
-        "ephemeris_source_policy": SOLAR_SOURCE_POLICY,
-        "equatorial_frame": "selected_physical_equator_and_equinox_of_date",
-        "time_scale": "UT1_arcs_TT_to_frozen_civil_UTC",
-        "sequence_source": "Cassius Dio, Roman History 37.19, Loeb 1914",
-        "source_scope": "Planet order and 24-hour weekday succession only; horizon and unequal-hour geometry are separate declared policies",
         **weekday_receipt,
     }
 
@@ -437,13 +412,13 @@ def _build_classical_layer(
     elif julian_day is not None or julian_day_tt is not None:
         try:
             angles, flag = (
-                runtime.ephemeris_call(
+                fast_swe_call(
                     "calc",
                     TTInstant.from_value(julian_day_tt).as_float(),
                     runtime.swe.ECL_NUT,
                 )
                 if julian_day_tt is not None
-                else runtime.ephemeris_call(
+                else fast_swe_call(
                     "calc_ut",
                     (
                         julian_day.as_float()

@@ -57,6 +57,95 @@ def _compact_relationship(result: ServiceResult) -> ServiceResult:
     return view
 
 
+def _compact_astrology_chart(result: ServiceResult) -> ServiceResult:
+    keep = {
+        "person_info",
+        "chart_profile",
+        "angles",
+        "houses",
+        "planets",
+        "aspects",
+        "planetary_hours",
+        "fixed_stars",
+        "element_balance",
+        "modality_balance",
+        "summary",
+        "run_metadata",
+    }
+    view = {k: v for k, v in result.items() if k in keep}
+    classical = result.get("classical")
+    if isinstance(classical, dict):
+        view["classical"] = {
+            "sect": classical.get("sect"),
+            "lots": classical.get("lots"),
+            "almuten_figuris": classical.get("almuten_figuris"),
+            "temperament": classical.get("temperament"),
+            "syzygy": (
+                {
+                    k: classical["syzygy"].get(k)
+                    for k in (
+                        "type",
+                        "longitude",
+                        "sign",
+                        "degree_in_sign",
+                        "event_datetime_utc",
+                    )
+                }
+                if isinstance(classical.get("syzygy"), dict)
+                else None
+            ),
+        }
+    return view
+
+
+def _compact_hamburg(result: ServiceResult) -> ServiceResult:
+    ma = result.get("midpoint_analysis")
+    compact_ma = ma
+    if isinstance(ma, dict):
+        dials = ma.get("dials") or {}
+        compact_dials = {
+            dial: {
+                "period_degrees": data.get("period_degrees"),
+                "two_factor_contacts": (data.get("two_factor_contacts") or [])[:10],
+                "three_factor_contacts": (data.get("three_factor_contacts") or [])[:10],
+                "four_factor_contacts": (data.get("four_factor_contacts") or [])[:10],
+                "four_factor_total_count": data.get("four_factor_total_count"),
+            }
+            for dial, data in dials.items()
+            if isinstance(data, dict)
+        }
+        compact_ma = {
+            k: v
+            for k, v in ma.items()
+            if k
+            in {
+                "status",
+                "ruleset_id",
+                "profile",
+                "factors",
+                "contact_counts",
+                "unique_two_factor_pair_count",
+                "sensitive_point_query",
+            }
+        }
+        compact_ma["dials"] = compact_dials
+    view = {
+        k: v
+        for k, v in result.items()
+        if k
+        in {
+            "chart_profile",
+            "planets",
+            "midpoints",
+            "midpoint_aspects",
+            "summary",
+            "run_metadata",
+        }
+    }
+    view["midpoint_analysis"] = compact_ma
+    return view
+
+
 def _relative_evidence_views(
     views: EvidenceViews | None,
 ) -> EvidenceViews | None:
@@ -172,6 +261,7 @@ SPECS: list[ToolSpec] = [
         cpu_bound=True,
         rest_path="/api/astrology/chart",
         output_validators=(validate_astro_chart_variant,),
+        compact_view=_compact_astrology_chart,
     ),
     _chart_spec(
         "thirteen_sector_chart",
@@ -213,12 +303,13 @@ SPECS: list[ToolSpec] = [
         name="hamburg_midpoint_chart",
         bind=bind_kwargs(calculate_germany_chart_analysis),
         request_model_loader=request_model_ref(_ASTRO_REQ, "AstroGermanyRequest"),
-        summary="德国中点盘：22因素、253中点轴、90/45度盘及可选真太阳弧。",
+        summary="德国中点盘：22因素、253中点轴、90/45/22.5度盘及可选真太阳弧。",
         operation_label_zh="德国盘",
         family="astro",
         cpu_bound=True,
         rest_path="/api/astrology/hamburg-midpoint-chart",
         output_validators=(validate_astro_chart_variant,),
+        compact_view=_compact_hamburg,
     ),
     ToolSpec(
         name="relationship_chart",

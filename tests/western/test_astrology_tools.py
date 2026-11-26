@@ -746,7 +746,7 @@ def test_relative_unsupported_hsys_returns_error_payload() -> None:
     assert result == {
         "error": (
             "house_system must be an integer code 0..8 or a supported offline house "
-            "system letter/name (W, B, R, P, K, V, T, S, D); boolean and "
+            "system letter/name (W, B, R, P, K, V, T, S, D, E); boolean and "
             "floating-point values are invalid."
         ),
         "error_code": "validation_error",

@@ -5,11 +5,15 @@ from __future__ import annotations
 import math
 import re
 from collections.abc import Iterator, Mapping, Sequence
+from contextlib import nullcontext
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from fractions import Fraction
 from pathlib import Path
 
+from fatebridge.core.astro import runtime
+from fatebridge.core.astro.ephemeris import fast_swe_call
+from fatebridge.core.astro.iers_ut1 import active_ut1
 from fatebridge.core.astro.physical_epoch import utc_from_tt
 from fatebridge.core.astro.profiles import (
     ANALYTICAL_MEAN_NODE_MODEL,
@@ -19,12 +23,17 @@ from fatebridge.core.astro.profiles import (
 from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.ephemeris_runtime import (
-    ephemeris_call,
+    EPHEMERIS_LOCK,
+    _ensure_thread_ephemeris_path,
+)
+from fatebridge.core.ephemeris_runtime import ephemeris_call as _ORIG_EPHEMERIS_CALL
+from fatebridge.core.ephemeris_runtime import (
     lock_ephemeris_configuration,
     native_ephemeris_errors,
     swe,
 )
-from fatebridge.utils.civil_time import UTCCalendar, ZonedCalendar
+from fatebridge.core.jpl_ephemeris import configured_jpl_file
+from fatebridge.utils.civil_time import UTCCalendar, ZonedCalendar, utc_calendar
 from fatebridge.utils.errors import EphemerisSourceError
 
 # Cardinal solar ingresses → (target tropical longitude, anchor month/day used to
@@ -46,13 +55,16 @@ CARDINAL_INGRESS_LABELS: dict[str, str] = {
 # Inner planets (Mercury/Venus) orbit the Sun and return geocentrically once per
 # ~365.25 days (with retrograde loops resolved via station splitting).
 RETURN_BODIES: dict[str, dict[str, object]] = {
+    "Pluto": {"planet_id": 9, "period_days": 90560.0, "label": "冥王星返照"},
+    "Neptune": {"planet_id": 8, "period_days": 60195.0, "label": "海王星返照"},
+    "Uranus": {"planet_id": 7, "period_days": 30688.5, "label": "天王星返照"},
+    "Chiron": {"planet_id": 15, "period_days": 18530.0, "label": "凯龙星返照"},
     "Saturn": {"planet_id": 6, "period_days": 10759.22, "label": "土星返照"},
+    "North Node": {"planet_id": 10, "period_days": 6798.38, "label": "月交点返照"},
     "Jupiter": {"planet_id": 5, "period_days": 4332.59, "label": "木星返照"},
     "Mars": {"planet_id": 4, "period_days": 686.98, "label": "火星返照"},
     "Venus": {"planet_id": 3, "period_days": 365.25, "label": "金星返照"},
     "Mercury": {"planet_id": 2, "period_days": 365.25, "label": "水星返照"},
-    "North Node": {"planet_id": 10, "period_days": 6798.38, "label": "月交点返照"},
-    "Chiron": {"planet_id": 15, "period_days": 18530.0, "label": "凯龙星返照"},
 }
 
 
@@ -264,61 +276,67 @@ def _is_asteroid_body(planet_id: int) -> bool:
 
 
 def _planet_motion(
-    jd: float, planet_id: int, *, sidereal: bool = False
+    jd: float, planet_id: int, *, sidereal: bool = False, collect_files: bool = False
 ) -> MotionSample:
     if not math.isfinite(jd):
         raise ValueError("Julian day TT must be finite")
-    with lock_ephemeris_configuration():
-        _require_swe()
-        flags = swe.FLG_SWIEPH | swe.FLG_SPEED
-        if sidereal:
-            ephemeris_call("set_sid_mode", swe.SIDM_LAHIRI, 0.0, 0.0)
-            flags |= swe.FLG_SIDEREAL
-        try:
-            result, returned = ephemeris_call("calc", jd, planet_id, flags)
-        except native_ephemeris_errors() as exc:
-            raw_message = str(exc)
-            missing_match = re.search(r"'([^']+\.se1)'", raw_message)
-            if missing_match is not None:
-                raise EphemerisUnavailableError(
-                    f"Ephemeris data file '{missing_match.group(1)}' unavailable for body {planet_id}"
-                ) from exc
-            safe_message = raw_message.split(" in PATH ")[0]
+    _require_swe()
+    flags = swe.FLG_SWIEPH | swe.FLG_SPEED
+    if sidereal:
+        fast_swe_call("set_sid_mode", swe.SIDM_LAHIRI, 0.0, 0.0)
+        flags |= swe.FLG_SIDEREAL
+    try:
+        result, returned = fast_swe_call("calc", jd, planet_id, flags)
+    except native_ephemeris_errors() as exc:
+        raw_message = str(exc)
+        missing_match = re.search(r"'([^']+\.se1)'", raw_message)
+        if missing_match is not None:
             raise EphemerisUnavailableError(
-                f"Swiss Ephemeris failed for body {planet_id}: {safe_message}"
+                f"Ephemeris data file '{missing_match.group(1)}' unavailable for body {planet_id}"
             ) from exc
-        disallowed = (
-            swe.FLG_TRUEPOS
-            | swe.FLG_NOABERR
-            | swe.FLG_NOGDEFL
-            | swe.FLG_BARYCTR
-            | swe.FLG_HELCTR
-            | getattr(swe, "FLG_CENTER_BODY", 1048576)
+        safe_message = raw_message.split(" in PATH ")[0]
+        raise EphemerisUnavailableError(
+            f"Swiss Ephemeris failed for body {planet_id}: {safe_message}"
+        ) from exc
+    disallowed = (
+        swe.FLG_TRUEPOS
+        | swe.FLG_NOABERR
+        | swe.FLG_NOGDEFL
+        | swe.FLG_BARYCTR
+        | swe.FLG_HELCTR
+        | getattr(swe, "FLG_CENTER_BODY", 1048576)
+    )
+    if (
+        returned < 0
+        or not (returned & swe.FLG_SPEED)
+        or bool(returned & swe.FLG_SIDEREAL) != sidereal
+        or bool(returned & disallowed)
+        or not all(math.isfinite(result[index]) for index in (0, 3))
+    ):
+        raise EphemerisUnavailableError(
+            f"Astronomical event ephemeris returned unexpected coordinate flags ({returned}) for body {planet_id}"
         )
-        if (
-            returned < 0
-            or not (returned & swe.FLG_SPEED)
-            or bool(returned & swe.FLG_SIDEREAL) != sidereal
-            or bool(returned & disallowed)
-            or not all(math.isfinite(result[index]) for index in (0, 3))
-        ):
-            raise EphemerisUnavailableError(
-                f"Astronomical event ephemeris returned unexpected coordinate flags ({returned}) for body {planet_id}"
-            )
-        contexts: list[tuple[str, float, float, int]] = []
-        if planet_id != swe.MEAN_NODE and (
-            returned & (swe.FLG_SWIEPH | swe.FLG_JPLEPH)
-        ):
-            if returned & swe.FLG_JPLEPH:
-                slots: tuple[int, ...] = (
-                    (0, 2) if _is_asteroid_body(planet_id) else (0,)
-                )
-            else:
-                slots = (0, 1, 2) if _is_asteroid_body(planet_id) else (0, 1)
-            for slot in slots:
-                filename, start, end, edition = swe.get_current_file_data(slot)
-                contexts.append((str(filename), float(start), float(end), int(edition)))
-    return float(result[0] % 360.0), float(result[3]), int(returned), tuple(contexts)
+    contexts: tuple[tuple[str, float, float, int], ...] = ()
+    if (
+        collect_files
+        and planet_id != swe.MEAN_NODE
+        and (returned & (swe.FLG_SWIEPH | swe.FLG_JPLEPH))
+    ):
+        slots: tuple[int, ...]
+        if returned & swe.FLG_JPLEPH:
+            slots = (0, 2) if _is_asteroid_body(planet_id) else (0,)
+        else:
+            slots = (0, 1, 2) if _is_asteroid_body(planet_id) else (0, 1)
+        items: list[tuple[str, float, float, int]] = []
+        for slot in slots:
+            filename, start, end, edition = swe.get_current_file_data(slot)
+            items.append((str(filename), float(start), float(end), int(edition)))
+        contexts = tuple(items)
+    return float(result[0] % 360.0), float(result[3]), int(returned), contexts
+
+
+_ORIG_PLANET_MOTION = _planet_motion
+_NULL_LOCK = nullcontext()
 
 
 def _wrapped_diff(longitude: float, target: float) -> float:
@@ -341,181 +359,354 @@ def _longitude_crossings(
     if not math.isfinite(step_days) or step_days <= 0:
         raise ValueError("Longitude-crossing scan step must be finite and positive")
     cursor, limit = (end_jd, start_jd) if reverse else (start_jd, end_jd)
-    sample = _planet_motion(cursor, planet_id, sidereal=sidereal)
-    if expected_source is not None and _motion_source(sample) != expected_source:
-        raise EphemerisSourceError("model_changed")
-    last_point: TTInstant | None = None
-    while cursor != limit:
-        following = (
-            max(cursor - step_days, limit)
-            if reverse
-            else min(cursor + step_days, limit)
+    fast_direct = (
+        _planet_motion is _ORIG_PLANET_MOTION
+        and runtime.ephemeris_call is _ORIG_EPHEMERIS_CALL
+        and configured_jpl_file() is None
+        and active_ut1.get() is None
+        and runtime.swe is not None
+    )
+    swe_mod = runtime.swe
+    flags = (
+        (
+            (swe_mod.FLG_SWIEPH | swe_mod.FLG_SPEED)
+            | (swe_mod.FLG_SIDEREAL if sidereal else 0)
         )
-        if following == cursor:
-            raise ValueError("Longitude-crossing scan step does not advance TT")
-        next_sample = _planet_motion(following, planet_id, sidereal=sidereal)
+        if swe_mod is not None
+        else 0
+    )
+
+    def _file_contexts_for_ret(ret: int) -> FileContext:
         if (
-            expected_source is not None
-            and _motion_source(next_sample) != expected_source
+            swe_mod is None
+            or planet_id == swe_mod.MEAN_NODE
+            or not (ret & (swe_mod.FLG_SWIEPH | swe_mod.FLG_JPLEPH))
         ):
-            raise EphemerisSourceError("model_changed")
-        if reverse:
-            previous_jd, previous, jd, current = following, next_sample, cursor, sample
+            return ()
+        slots: tuple[int, ...]
+        if ret & swe_mod.FLG_JPLEPH:
+            slots = (0, 2) if _is_asteroid_body(planet_id) else (0,)
         else:
-            previous_jd, previous, jd, current = cursor, sample, following, next_sample
+            slots = (0, 1, 2) if _is_asteroid_body(planet_id) else (0, 1)
+        return tuple(
+            (str(fn), float(st), float(en), int(ed))
+            for fn, st, en, ed in (swe_mod.get_current_file_data(s) for s in slots)
+        )
 
-        def same_source(at: float) -> MotionSample:
-            value = _planet_motion(at, planet_id, sidereal=sidereal)
-            if value[2:] != current[2:]:
+    def _motion_fast(at_jd: float, *, with_files: bool = False) -> MotionSample:
+        if fast_direct:
+            res, ret = swe_mod.calc(at_jd, planet_id, flags)
+            if ret < 0:
+                return _planet_motion(
+                    at_jd, planet_id, sidereal=sidereal, collect_files=with_files
+                )
+            contexts = _file_contexts_for_ret(int(ret)) if with_files else ()
+            return float(res[0] % 360.0), float(res[3]), int(ret), contexts
+        return _planet_motion(
+            at_jd, planet_id, sidereal=sidereal, collect_files=with_files
+        )
+
+    def same_source_lon(at: float, ref_sample: MotionSample) -> float:
+        if fast_direct:
+            res, ret = swe_mod.calc(at, planet_id, flags)
+            if ret < 0:
+                value = _planet_motion(
+                    at, planet_id, sidereal=sidereal, collect_files=False
+                )
+                if value[2:] != ref_sample[2:]:
+                    raise EphemerisSourceError("model_changed")
+                return value[0]
+            if int(ret) != ref_sample[2]:
                 raise EphemerisSourceError("model_changed")
-            return value
+            return float(res[0] % 360.0)
+        value = _planet_motion(at, planet_id, sidereal=sidereal, collect_files=False)
+        if value[2:] != ref_sample[2:]:
+            raise EphemerisSourceError("model_changed")
+        return value[0]
 
-        knots = [(previous_jd, previous[0])]
-        if previous[1] * current[1] < 0 or (
-            (previous[1] == 0.0) != (current[1] == 0.0)
-        ):
-            if previous[2:] != current[2:]:
-                raise EphemerisSourceError("model_changed")
-            if previous[1] == 0.0:
-                turn = previous_jd
-            elif current[1] == 0.0:
-                turn = jd
-            else:
-                low, high = previous_jd, jd
-                for _ in range(64):
-                    mid = (low + high) / 2
-                    if mid in (low, high):
-                        break
-                    sample = same_source(mid)
-                    if sample[1] == 0:
-                        low = high = mid
-                        break
-                    if (sample[1] < 0) == (previous[1] < 0):
-                        low = mid
-                    else:
-                        high = mid
-                turn = (low + high) / 2
-            split_jds: set[float] = set()
-            if previous_jd < turn < jd:
-                split_jds.add(turn)
-            # Native speed only identifies a candidate cell. A grazing target
-            # can be reached at a different, even single, representable TT point.
-            a, b = previous_jd, jd
-            direction = 1 if previous[1] > 0.0 or current[1] < 0.0 else -1
-            turn_lon = same_source(turn)[0]
+    def same_source(at: float, ref_sample: MotionSample) -> MotionSample:
+        value = _motion_fast(at)
+        if value[2:] != ref_sample[2:]:
+            raise EphemerisSourceError("model_changed")
+        return value
 
-            def altitude(at: float) -> tuple[int, float]:
-                longitude = same_source(at)[0]
-                delta = longitude - turn_lon
-                # Rank the wrap and the original longitude separately to keep
-                # fine differences that subtraction or addition would round away.
-                wrap = int(delta < -180) - int(delta > 180)
-                return direction * wrap, direction * longitude
-
-            turn_score = (0, direction * turn_lon)
-            c = b - GOLDEN_RATIO_RECIPROCAL * (b - a)
-            d = a + GOLDEN_RATIO_RECIPROCAL * (b - a)
-            fc, fd = altitude(c), altitude(d)
-            best = max((turn_score, turn), (fc, c), (fd, d))
-            for _ in range(96):
-                if b - a <= 4 * math.ulp(max(abs(a), abs(b))) or c >= d:
-                    break
-                if fc < fd:
-                    a, c, fc = c, d, fd
-                    d = a + GOLDEN_RATIO_RECIPROCAL * (b - a)
-                    fd = altitude(d)
+    swe_calc = swe_mod.calc if swe_mod is not None else None
+    lock_ctx = EPHEMERIS_LOCK if fast_direct else _NULL_LOCK
+    with lock_ctx:
+        if fast_direct:
+            _ensure_thread_ephemeris_path()
+            if sidereal:
+                swe_mod.set_sid_mode(swe_mod.SIDM_LAHIRI, 0.0, 0.0)
+        sample = _motion_fast(cursor, with_files=bool(expected_source))
+        expected_ret = expected_source[0] if expected_source is not None else None
+        if expected_source is not None and _motion_source(sample) != expected_source:
+            raise EphemerisSourceError("model_changed")
+        if fast_direct:
+            sample = (sample[0], sample[1], sample[2], ())
+        sample_diff = math.remainder(sample[0] - target_longitude, 360.0)
+        last_point: TTInstant | None = None
+        while cursor != limit:
+            following = (
+                max(cursor - step_days, limit)
+                if reverse
+                else min(cursor + step_days, limit)
+            )
+            if following == cursor:
+                raise ValueError("Longitude-crossing scan step does not advance TT")
+            if fast_direct:
+                res, ret = swe_calc(following, planet_id, flags)
+                if ret < 0:
+                    next_sample = _planet_motion(
+                        following, planet_id, sidereal=sidereal, collect_files=False
+                    )
                 else:
-                    b, d, fd = d, c, fc
-                    c = b - GOLDEN_RATIO_RECIPROCAL * (b - a)
-                    fc = altitude(c)
-                best = max(best, (fc, c), (fd, d))
-            # Recheck the final bracket on the same binary64 axis as the native
-            # position call. A bracket this narrow contains only a few samples.
-            for _ in range(8):
-                if a > b:
-                    break
-                best = max(best, (altitude(a), a))
-                a = math.nextafter(a, math.inf)
-            extremum_score, extremum = best
-            if extremum_score > turn_score and previous_jd < extremum < jd:
-                split_jds.add(extremum)
-            for split_jd in sorted(split_jds):
-                knots.append((split_jd, same_source(split_jd)[0]))
-        knots.append((jd, current[0]))
-        cells = list(zip(knots, knots[1:]))
-        if reverse:
-            cells.reverse()
-        for (left_jd, left_longitude), (right_jd, right_longitude) in cells:
-            left_diff = _wrapped_diff(left_longitude, target_longitude)
-            right_diff = _wrapped_diff(right_longitude, target_longitude)
+                    next_sample = (
+                        float(res[0] % 360.0),
+                        float(res[3]),
+                        int(ret),
+                        (),
+                    )
+            else:
+                next_sample = _motion_fast(following)
+            if expected_ret is not None and next_sample[2] != expected_ret:
+                raise EphemerisSourceError("model_changed")
             if (
-                left_diff <= 0.0 <= right_diff or right_diff <= 0.0 <= left_diff
-            ) and abs(right_diff - left_diff) < 90.0:
+                expected_source is not None
+                and not fast_direct
+                and _motion_source(next_sample) != expected_source
+            ):
+                raise EphemerisSourceError("model_changed")
+            next_diff = math.remainder(next_sample[0] - target_longitude, 360.0)
+            if reverse:
+                previous_jd, previous, p_diff, jd, current, c_diff = (
+                    following,
+                    next_sample,
+                    next_diff,
+                    cursor,
+                    sample,
+                    sample_diff,
+                )
+            else:
+                previous_jd, previous, p_diff, jd, current, c_diff = (
+                    cursor,
+                    sample,
+                    sample_diff,
+                    following,
+                    next_sample,
+                    next_diff,
+                )
+            has_station_near = min(abs(p_diff), abs(c_diff)) <= 8.0 and (
+                previous[1] * current[1] < 0.0
+                or ((previous[1] == 0.0) != (current[1] == 0.0))
+            )
+            has_direct_cross = (
+                p_diff <= 0.0 <= c_diff or c_diff <= 0.0 <= p_diff
+            ) and abs(c_diff - p_diff) < 90.0
+            if not has_station_near and not has_direct_cross:
+                cursor, sample, sample_diff = following, next_sample, next_diff
+                continue
+
+            knots = [(previous_jd, previous[0])]
+            if has_station_near:
                 if previous[2:] != current[2:]:
                     raise EphemerisSourceError("model_changed")
-                source_id = _body_source_identity(
-                    planet_id, current[2], current[3], sidereal=sidereal
-                )
-                low, high = left_jd, right_jd
-                low_negative = left_diff < 0.0 if left_diff != 0 else right_diff > 0
-                if left_diff == 0:
-                    high = low
-                elif right_diff == 0:
-                    low = high
-                for _ in range(64):
-                    mid = (low + high) / 2.0
-                    if mid in (low, high):
+                if previous[1] == 0.0:
+                    turn = previous_jd
+                elif current[1] == 0.0:
+                    turn = jd
+                else:
+                    low, high = previous_jd, jd
+                    for _ in range(64):
+                        mid = (low + high) / 2
+                        if mid in (low, high):
+                            break
+                        mid_sample_speed = same_source(mid, current)[1]
+                        if mid_sample_speed == 0:
+                            low = high = mid
+                            break
+                        if (mid_sample_speed < 0) == (previous[1] < 0):
+                            low = mid
+                        else:
+                            high = mid
+                    turn = (low + high) / 2
+                split_jds: set[float] = set()
+                if previous_jd < turn < jd:
+                    split_jds.add(turn)
+                a, b = previous_jd, jd
+                direction = 1 if previous[1] > 0.0 or current[1] < 0.0 else -1
+                turn_lon = same_source_lon(turn, current)
+
+                def altitude(at: float) -> tuple[int, float]:
+                    longitude = same_source_lon(at, current)
+                    delta = longitude - turn_lon
+                    wrap = int(delta < -180) - int(delta > 180)
+                    return direction * wrap, direction * longitude
+
+                turn_score = (0, direction * turn_lon)
+                c = b - GOLDEN_RATIO_RECIPROCAL * (b - a)
+                d = a + GOLDEN_RATIO_RECIPROCAL * (b - a)
+                fc, fd = altitude(c), altitude(d)
+                best = max((turn_score, turn), (fc, c), (fd, d))
+                for _ in range(96):
+                    if b - a <= 4 * math.ulp(max(abs(a), abs(b))) or c >= d:
                         break
-                    mid_negative = (
-                        _wrapped_diff(
-                            same_source(mid)[0],
+                    if fc < fd:
+                        a, c, fc = c, d, fd
+                        d = a + GOLDEN_RATIO_RECIPROCAL * (b - a)
+                        fd = altitude(d)
+                    else:
+                        b, d, fd = d, c, fc
+                        c = b - GOLDEN_RATIO_RECIPROCAL * (b - a)
+                        fc = altitude(c)
+                    best = max(best, (fc, c), (fd, d))
+                for _ in range(8):
+                    if a > b:
+                        break
+                    best = max(best, (altitude(a), a))
+                    a = math.nextafter(a, math.inf)
+                extremum_score, extremum = best
+                if extremum_score > turn_score and previous_jd < extremum < jd:
+                    split_jds.add(extremum)
+                for split_jd in sorted(split_jds):
+                    knots.append((split_jd, same_source_lon(split_jd, current)))
+            knots.append((jd, current[0]))
+            cells = list(zip(knots, knots[1:]))
+            if reverse:
+                cells.reverse()
+            for (left_jd, left_longitude), (right_jd, right_longitude) in cells:
+                left_diff = _wrapped_diff(left_longitude, target_longitude)
+                right_diff = _wrapped_diff(right_longitude, target_longitude)
+                if (
+                    left_diff <= 0.0 <= right_diff or right_diff <= 0.0 <= left_diff
+                ) and abs(right_diff - left_diff) < 90.0:
+                    if previous[2] != current[2]:
+                        raise EphemerisSourceError("model_changed")
+                    if fast_direct:
+                        mid_res, mid_ret = swe_mod.calc(
+                            (left_jd + right_jd) / 2.0, planet_id, flags
+                        )
+                        contexts: FileContext = ()
+                        if planet_id != swe_mod.MEAN_NODE and (
+                            mid_ret & (swe_mod.FLG_SWIEPH | swe_mod.FLG_JPLEPH)
+                        ):
+                            slots = (
+                                ((0, 2) if _is_asteroid_body(planet_id) else (0,))
+                                if (mid_ret & swe_mod.FLG_JPLEPH)
+                                else (
+                                    (0, 1, 2)
+                                    if _is_asteroid_body(planet_id)
+                                    else (0, 1)
+                                )
+                            )
+                            contexts = tuple(
+                                (str(fn), float(st), float(en), int(ed))
+                                for fn, st, en, ed in (
+                                    swe_mod.get_current_file_data(s) for s in slots
+                                )
+                            )
+                        source_id = _body_source_identity(
+                            planet_id, int(mid_ret), contexts, sidereal=sidereal
+                        )
+                    else:
+                        final_sample = _planet_motion(
+                            (left_jd + right_jd) / 2.0,
+                            planet_id,
+                            sidereal=sidereal,
+                            collect_files=True,
+                        )
+                        source_id = _body_source_identity(
+                            planet_id,
+                            final_sample[2],
+                            final_sample[3],
+                            sidereal=sidereal,
+                        )
+                    low, high = left_jd, right_jd
+                    d_low = left_diff
+                    d_high = right_diff
+                    low_negative = left_diff < 0.0 if left_diff != 0 else right_diff > 0
+                    if left_diff == 0:
+                        high = low
+                    elif right_diff == 0:
+                        low = high
+                    d_low_s, d_high_s = d_low, d_high
+                    last_side = 0
+                    for _ in range(56):
+                        mid = (low + high) / 2.0
+                        if mid in (low, high):
+                            break
+                        cand = mid
+                        if _ % 4 != 3:
+                            denom = d_high_s - d_low_s
+                            if denom != 0.0 and math.isfinite(denom):
+                                sec = low - d_low_s * (high - low) / denom
+                                if low < sec < high:
+                                    cand = sec
+                        mid_diff = _wrapped_diff(
+                            same_source_lon(cand, current),
                             target_longitude,
                         )
-                        < 0.0
-                    )
-                    if mid_negative == low_negative:
-                        low = mid
+                        if mid_diff == 0.0:
+                            low = high = cand
+                            break
+                        if (mid_diff < 0.0) == low_negative:
+                            low, d_low, d_low_s = cand, mid_diff, mid_diff
+                            if last_side == -1:
+                                d_high_s *= 0.5
+                            last_side = -1
+                        else:
+                            high, d_high, d_high_s = cand, mid_diff, mid_diff
+                            if last_side == 1:
+                                d_low_s *= 0.5
+                            last_side = 1
+                    point = TTInstant.from_float(high)
+                    if point == last_point:
+                        continue
+                    label, moment, leap = utc_from_tt(point, legacy_pre_utc=True)
+                    original_display = label, moment, leap
+                    for _ in range(8):
+                        if moment is not None:
+                            if fast_direct and moment.year >= 2017:
+                                recovered = float(
+                                    Fraction(utc_calendar(moment).julian_day_exact())
+                                    + Fraction(69184, 86400000)
+                                )
+                            else:
+                                recovered = _julian_day(moment)
+                        elif label is not None and not leap:
+                            recovered = _julian_day(
+                                ZonedCalendar.from_isoformat(label).utc
+                            )
+                        else:
+                            break
+                        value = _wrapped_diff(
+                            same_source_lon(recovered, current), target_longitude
+                        )
+                        if value >= 0.0 if low_negative else value <= 0.0:
+                            break
+                        following = math.nextafter(high, math.inf)
+                        following_diff = _wrapped_diff(
+                            same_source_lon(following, current), target_longitude
+                        )
+                        if (
+                            following_diff < 0.0
+                            if low_negative
+                            else following_diff > 0.0
+                        ):
+                            label, moment, leap = original_display
+                            break
+                        high = following
+                        label, moment, leap = utc_from_tt(
+                            TTInstant.from_float(high), legacy_pre_utc=True
+                        )
                     else:
-                        high = mid
-                point = TTInstant.from_float(high)
-                if point == last_point:
-                    continue
-                label, moment, leap = utc_from_tt(point, legacy_pre_utc=True)
-                original_display = label, moment, leap
-                # A civil display can round to the preceding TT sample. Keep
-                # root selection on native TT even when adjusting the label.
-                for _ in range(8):
-                    if moment is not None:
-                        recovered = _julian_day(moment)
-                    elif label is not None and not leap:
-                        recovered = _julian_day(ZonedCalendar.from_isoformat(label).utc)
-                    else:
-                        break
-                    value = _wrapped_diff(same_source(recovered)[0], target_longitude)
-                    if value >= 0.0 if low_negative else value <= 0.0:
-                        break
-                    following = math.nextafter(high, math.inf)
-                    following_diff = _wrapped_diff(
-                        same_source(following)[0], target_longitude
+                        raise EphemerisUnavailableError(
+                            "Civil crossing instant could not preserve its crossing side"
+                        )
+                    last_point = point
+                    yield LongitudeCrossing(
+                        point, moment, label, leap, source_identity=source_id
                     )
-                    if following_diff < 0.0 if low_negative else following_diff > 0.0:
-                        # A tangent or a sub-label-width pair can have no civil
-                        # representation on the crossed side.
-                        label, moment, leap = original_display
-                        break
-                    high = following
-                    label, moment, leap = utc_from_tt(
-                        TTInstant.from_float(high), legacy_pre_utc=True
-                    )
-                else:
-                    raise EphemerisUnavailableError(
-                        "Civil crossing instant could not preserve its crossing side"
-                    )
-                last_point = point
-                yield LongitudeCrossing(
-                    point, moment, label, leap, source_identity=source_id
-                )
-        cursor, sample = following, next_sample
+            cursor, sample, sample_diff = following, next_sample, next_diff
 
 
 def resolve_longitude_crossing(
@@ -619,36 +810,56 @@ def resolve_planet_returns(
     future: int = 1,
     sidereal: bool = False,
     natal_motion: MotionSample | None = None,
+    not_before_utc: datetime | UTCCalendar | None = None,
+    not_before_tt: float | None = None,
+    reference_tt: float | None = None,
 ) -> ResolvedPlanetReturns:
     """Return the requested nearest past/future crossings in a bounded scan.
 
-    One mean-period seed can choose a remote revolution while skipping a closer
-    retrograde recrossing. Scan one contiguous window instead, retaining each
-    observed event before selecting either side of the reference. The daily
-    scan is a finite numerical search, not an interval-wide completeness proof
-    for unresolved grazing contacts near a station.
+    When not_before_utc or not_before_tt is provided (typically the birth instant),
+    past returns never extend prior to birth + 1 minute.
     """
     _require_swe()
     if not math.isfinite(period_days) or period_days <= 0.0:
         raise ValueError("period_days must be finite and positive")
     if past < 0 or future < 0:
         raise ValueError("past and future return counts must be non-negative")
-    reference_jd = _julian_day(reference_utc)
+    reference_jd = (
+        reference_tt if reference_tt is not None else _julian_day(reference_utc)
+    )
     reference = Fraction(reference_jd)
+    min_past_jd: float | None = (
+        not_before_tt
+        if not_before_tt is not None
+        else (_julian_day(not_before_utc) if not_before_utc is not None else None)
+    )
     expected_source = (
         _motion_source(
             natal_motion
             if natal_motion is not None
-            else _planet_motion(reference_jd, planet_id, sidereal=sidereal)
+            else _planet_motion(
+                reference_jd, planet_id, sidereal=sidereal, collect_files=True
+            )
         )
         if past or future
         else None
     )
-    step_days = (
-        min(0.5, period_days / 360.0)
-        if period_days <= 400.0
-        else min(1.0, period_days / 360.0)
-    )
+    if period_days <= 100.0:
+        step_days = min(1.0, max(1e-3, period_days / 4.0))
+    elif period_days <= 1000.0:
+        step_days = 5.0
+    elif period_days <= 5000.0:
+        step_days = 50.0
+    elif period_days <= 12000.0:
+        step_days = 100.0
+    elif period_days <= 25000.0:
+        step_days = 150.0
+    elif period_days <= 40000.0:
+        step_days = 280.0
+    elif period_days <= 70000.0:
+        step_days = 360.0
+    else:
+        step_days = 560.0
     selected: list[tuple[LongitudeCrossing, ...]] = []
     observed_identity: dict[str, object] | None = None
     for direction, count in ((-1, past), (1, future)):
@@ -657,6 +868,12 @@ def resolve_planet_returns(
             limit = reference_jd + direction * (
                 period_days * (1.25 * count + 0.5) + 15.0
             )
+            if direction < 0 and min_past_jd is not None:
+                floor_jd = min_past_jd + 1.0 / 1440.0
+                if reference_jd <= floor_jd:
+                    selected.append(())
+                    continue
+                limit = max(limit, floor_jd)
             for crossing in _longitude_crossings(
                 planet_id,
                 natal_longitude,
@@ -668,6 +885,12 @@ def resolve_planet_returns(
                 reverse=direction < 0,
             ):
                 if direction > 0 and crossing.tt.days == reference:
+                    continue
+                if (
+                    direction < 0
+                    and min_past_jd is not None
+                    and crossing.tt.days <= Fraction(min_past_jd) + Fraction(1, 1440)
+                ):
                     continue
                 if observed_identity is None:
                     observed_identity = crossing.source_identity
@@ -687,12 +910,9 @@ def find_planet_returns(
     past: int = 1,
     future: int = 1,
     sidereal: bool = False,
+    not_before_utc: datetime | UTCCalendar | None = None,
 ) -> list[datetime]:
-    """Civil displays of native TT-selected past and future returns.
-
-    Rounded labels can lie on the opposite side of the reference within one
-    native TT rounding cell. They do not select or certify a physical root.
-    """
+    """Civil displays of native TT-selected past and future returns."""
     resolved = resolve_planet_returns(
         planet_id,
         natal_longitude,
@@ -701,6 +921,7 @@ def find_planet_returns(
         past=past,
         future=future,
         sidereal=sidereal,
+        not_before_utc=not_before_utc,
     )
     return [at.require_utc_datetime() for at in (*resolved.past, *resolved.future)]
 

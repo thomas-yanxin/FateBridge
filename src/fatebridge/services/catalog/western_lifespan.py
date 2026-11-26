@@ -8,7 +8,12 @@ from fatebridge.application.bindings import (
     request_model_ref,
     service_ref,
 )
-from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.application.tool_spec import ServiceResult, ToolSpec
+
+
+def _compact_lifespan(result: ServiceResult) -> ServiceResult:
+    return {k: v for k, v in result.items() if k != "natal_reference"}
+
 
 _REQ_MODULE = "fatebridge.core.requests.western_lifespan"
 
@@ -96,6 +101,7 @@ def _western_lifespan_spec(
         family="western_lifespan",
         cpu_bound=True,
         rest_path=rest_path or "/api/astrology/timing/" + name.replace("_", "-"),
+        compact_view=_compact_lifespan,
     )
 
 

@@ -65,7 +65,8 @@ def test_timing_aggregate_validates_age_and_preserves_far_future_layers(
     assert result["time_lords"]["firdaria"]["current_major"] is not None
     assert "Spirit 黄道释放 L1 未知" in result["summary"]
     assert (
-        result["natal_reference"]["calculation_basis"]["ephemeris_model"] == "moshier"
+        result["returns"]["solar_return"]["calculation_basis"]["ephemeris_model"]
+        == "moshier"
     )
     assert result["returns"]["solar_return"]["solver"]["event_not_after_analysis"]
     assert result["returns"]["lunar_return"]["solver"]["event_not_after_analysis"]

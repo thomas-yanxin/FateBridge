@@ -53,12 +53,7 @@ def qualify_reference_geometry(
     def qualify_reading(row: dict[str, Any]) -> None:
         qualify(row, list(row.get("factor_longitudes", {})))
         if row.get("physical_reference_geometry_resolved") is False:
-            row.setdefault("backend_reading_zh", row["reading_zh"])
             row["source_application_status"] = "underdetermined_reference_geometry"
-            row["reading_zh"] = (
-                "这条原文解释依赖未解析的物理参考；当前仅有后端约定下的形式条件，"
-                "不能据此判定该主题适用。"
-            )
 
     for row in geometry.get("midpoint_axes", []):
         qualify(row, [row["id_a"], row["id_b"]])

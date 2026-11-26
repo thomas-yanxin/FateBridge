@@ -103,10 +103,6 @@ def _prepare_chart(
         birth_info, house_system=house_system, zodiac_type=zodiac_type
     )
     natal_reference = extract_reference_points(subject)
-    if "angle_definition" in subject.calculation_basis:
-        natal_reference["calculation_basis"] = {
-            "angle_definition": subject.calculation_basis["angle_definition"],
-        }
     sect = determine_sect(subject)
     return birth_info, subject, natal_reference, sect
 
