@@ -15,7 +15,6 @@ uv run --locked --extra dev python scripts/run_ci_checks.py
 | 任务 | 入口 |
 | --- | --- |
 | 文档链接、代码块和 JSON 语法 | [check_docs.py](check_docs.py) |
-| 细粒度算法清单的计数、入口和源码引用 | [check_algorithm_inventory.py](check_algorithm_inventory.py)，只检查索引一致性，不认证算法覆盖或精度 |
 | 连续星历系数的无损存储 | [astronomy/build_coefficient_archives.py](astronomy/build_coefficient_archives.py)，从五份原始DE440提取暂存件及连续DE441源构建两个运行时档案；`--check`核对分发数据，使用方法见[星历说明](../docs/ephemeris.md) |
 | 按需调用合同 | [build_codex_call_contracts.py](build_codex_call_contracts.py)；生成后用 `--check` 核对 |
 | 自包含 CI 集合 | [run_ci_checks.py](run_ci_checks.py)，分片插件为 [ci_sharding.py](ci_sharding.py) |

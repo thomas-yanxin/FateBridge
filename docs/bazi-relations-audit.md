@@ -1,6 +1,6 @@
 # 八字离散规则与关系层核对
 
-[旺衰与喜用范围](bazi-assessment.md) · [细粒度清单](algorithm-inventory.md)
+[旺衰与喜用范围](bazi-assessment.md) · [源码职责](architecture.md#分层职责)
 
 本页记录2026-11-11起的分层核对。离散查表、字面配对、整局成化、格局力量及现实预测是不同验收对象；下表相符不能代替后几层验收。
 

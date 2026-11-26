@@ -59,7 +59,7 @@ CLI 可直接运行；REST 默认端口为 `8010`；MCP 默认通过 stdio 由�
 | 需要查什么 | 入口 |
 | --- | --- |
 | 工具、参数、端点和错误 | [API 参考](api-reference.md) · [按需调用合同](contracts/README.md) |
-| 实现覆盖、依赖与近似路径 | [算法覆盖矩阵](algorithm-coverage.md) · [细粒度源码索引](algorithm-inventory.md) · [当前算法状态](algorithm-status.md) |
+| 实现覆盖、依赖与近似路径 | [算法覆盖矩阵](algorithm-coverage.md) · [当前算法状态](algorithm-status.md) |
 | 模块职责、数据流与共享历法依赖 | [架构说明](architecture.md) |
 | 太阳、近太阳位置及月球日速的固定队列 | [分项精度验收](precision-acceptance.md) |
 | 方法登记、误差预算、证据图与固定总体验收 | [计算证据合同](computation-evidence.md) |
