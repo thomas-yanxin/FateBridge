@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import ctypes
-import json
 import math
 import os
 import platform
@@ -15,11 +14,19 @@ from pathlib import Path
 from threading import RLock
 from typing import Any
 
+from fatebridge.core.native_solar_loader import (
+    file_signature,
+    is_finite_number,
+    load_validated_manifest_and_library,
+    verify_loaded_image,
+)
 from fatebridge.fetch_aa1996 import MODEL_ID, source_profile
 from fatebridge.utils.errors import EphemerisSourceError
 
 MANIFEST_ENV = "FATEBRIDGE_AA1996_MANIFEST"
 LOCK = RLock()
+
+_finite = is_finite_number
 
 
 @lru_cache(maxsize=1)
@@ -28,60 +35,11 @@ def _profile() -> dict[str, Any]:
 
 
 def _signature(path: Path) -> tuple[int, ...]:
-    try:
-        stat = path.stat()
-        if not path.is_file():
-            raise OSError("not a file")
-        return (
-            stat.st_dev,
-            stat.st_ino,
-            stat.st_size,
-            stat.st_mtime_ns,
-            stat.st_ctime_ns,
-        )
-    except OSError as error:
-        raise EphemerisSourceError("solar_aa1996_unavailable") from error
-
-
-def _pairs(items: list[tuple[str, Any]]) -> dict[str, Any]:
-    result: dict[str, Any] = {}
-    for key, value in items:
-        if key in result:
-            raise ValueError("Duplicate model manifest field")
-        result[key] = value
-    return result
-
-
-def _finite(value: Any) -> bool:
-    try:
-        return type(value) in (int, float) and math.isfinite(value)
-    except OverflowError:
-        return False
-
-
-class _ImageInfo(ctypes.Structure):
-    _fields_ = [
-        ("filename", ctypes.c_char_p),
-        ("base", ctypes.c_void_p),
-        ("symbol", ctypes.c_char_p),
-        ("address", ctypes.c_void_p),
-    ]
+    return file_signature(path, "solar_aa1996_unavailable")
 
 
 def _loaded_image(function: Any, expected_path: Path) -> None:
-    """Observe the image containing the actual calculation entry address."""
-    lookup = ctypes.CDLL(None).dladdr
-    lookup.argtypes = [ctypes.c_void_p, ctypes.POINTER(_ImageInfo)]
-    lookup.restype = ctypes.c_int
-    info = _ImageInfo()
-    if (
-        not lookup(ctypes.cast(function, ctypes.c_void_p), ctypes.byref(info))
-        or not info.filename
-    ):
-        raise ValueError("Actual calculation image could not be resolved")
-    mapped = Path(os.fsdecode(info.filename)).resolve()
-    if mapped != expected_path.resolve():
-        raise ValueError("Calculation entry was resolved from another image")
+    verify_loaded_image(function, expected_path, "AA1996")
 
 
 class _Source:
@@ -90,41 +48,21 @@ class _Source:
         self._temporary: tempfile.TemporaryDirectory[str] | None = None
         try:
             self.profile = _profile()
-            raw = path.read_bytes()
-            manifest = json.loads(raw, object_pairs_hook=_pairs)
-            if not isinstance(manifest, dict):
-                raise ValueError("Model manifest must be an object")
-            expected = dict(
+            (
+                self.binary_path,
+                self.binary_signature,
+                self._temporary,
+                loaded,
+                self.library,
+            ) = load_validated_manifest_and_library(
+                path,
                 model_id=MODEL_ID,
                 version=self.profile["version"],
-                abi_version=1,
-                system=platform.system(),
-                machine=platform.machine(),
+                label="AA1996",
+                temp_prefix="fatebridge-aa1996-loaded-",
+                unavailable_reason="solar_aa1996_unavailable",
+                cdll_loader=ctypes.CDLL,
             )
-            if platform.system() not in {"Darwin", "Linux"} or any(
-                type(manifest.get(k)) is not type(value) or manifest.get(k) != value
-                for k, value in expected.items()
-            ):
-                raise ValueError(
-                    "Manifest does not describe the loaded model/profile/platform"
-                )
-            name = manifest["binary"]
-            if not isinstance(name, str) or not name or Path(name).name != name:
-                raise ValueError("Model binary must be a sibling filename")
-            binary = (path.parent / name).resolve()
-            if binary.parent != path.parent:
-                raise ValueError("Model binary must remain in its manifest directory")
-            self.binary_path = binary
-            self.binary_signature = _signature(binary)
-            data = binary.read_bytes()
-            # A unique private copy avoids dlopen returning an old image for a
-            # replaced configured filename.
-            self._temporary = tempfile.TemporaryDirectory(
-                prefix="fatebridge-aa1996-loaded-"
-            )
-            loaded = Path(self._temporary.name) / name
-            loaded.write_bytes(data)
-            self.library = ctypes.CDLL(str(loaded))
             function = getattr(self.library, "fatebridge_aa1996_model_id")
             function.argtypes = []
             function.restype = ctypes.c_char_p
@@ -150,6 +88,7 @@ class _Source:
                 raise ValueError("Actual native core version differs")
             self.library.swe_set_ephe_path.argtypes = [ctypes.c_char_p]
             self.library.swe_set_ephe_path.restype = None
+            assert self._temporary is not None
             self.library.swe_set_ephe_path(self._temporary.name.encode())
             self.check_unchanged(check_environment=False)
         except Exception as error:

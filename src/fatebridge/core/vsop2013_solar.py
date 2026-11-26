@@ -8,7 +8,6 @@ no Python ERFA/JPL dependency and never silently changes orbital providers.
 from __future__ import annotations
 
 import ctypes
-import json
 import math
 import os
 import platform
@@ -19,67 +18,27 @@ from pathlib import Path
 from threading import RLock
 from typing import Any
 
+from fatebridge.core.native_solar_loader import (
+    file_signature,
+    is_finite_number,
+    load_validated_manifest_and_library,
+    verify_loaded_image,
+)
 from fatebridge.fetch_vsop2013 import MODEL_ID, source_profile
 from fatebridge.utils.errors import EphemerisSourceError
 
 MANIFEST_ENV = "FATEBRIDGE_VSOP2013_MANIFEST"
 LOCK = RLock()
 
-
-def _finite(value: Any) -> bool:
-    try:
-        return type(value) in (int, float) and math.isfinite(value)
-    except OverflowError:
-        return False
-
-
-def _pairs(items: list[tuple[str, Any]]) -> dict[str, Any]:
-    result: dict[str, Any] = {}
-    for key, value in items:
-        if key in result:
-            raise ValueError("Duplicate VSOP2013 manifest field")
-        result[key] = value
-    return result
+_finite = is_finite_number
 
 
 def _signature(path: Path) -> tuple[int, ...]:
-    try:
-        stat = path.stat()
-        if not path.is_file():
-            raise OSError("not a file")
-        return (
-            stat.st_dev,
-            stat.st_ino,
-            stat.st_size,
-            stat.st_mtime_ns,
-            stat.st_ctime_ns,
-        )
-    except OSError as error:
-        raise EphemerisSourceError("solar_vsop2013_unavailable") from error
-
-
-class _ImageInfo(ctypes.Structure):
-    _fields_ = [
-        ("filename", ctypes.c_char_p),
-        ("base", ctypes.c_void_p),
-        ("symbol", ctypes.c_char_p),
-        ("address", ctypes.c_void_p),
-    ]
+    return file_signature(path, "solar_vsop2013_unavailable")
 
 
 def _loaded_image(function: Any, expected: Path) -> None:
-    lookup = ctypes.CDLL(None).dladdr
-    lookup.argtypes = [ctypes.c_void_p, ctypes.POINTER(_ImageInfo)]
-    lookup.restype = ctypes.c_int
-    info = _ImageInfo()
-    if (
-        not lookup(ctypes.cast(function, ctypes.c_void_p), ctypes.byref(info))
-        or not info.filename
-    ):
-        raise ValueError("Actual VSOP2013 coordinate entry could not be observed")
-    actual = Path(os.fsdecode(info.filename)).resolve()
-    if actual != expected.resolve():
-        raise ValueError("Actual VSOP2013 calculation image differs")
+    verify_loaded_image(function, expected, "VSOP2013")
 
 
 class _Source:
@@ -91,40 +50,21 @@ class _Source:
             raise EphemerisSourceError("solar_vsop2013_invalid") from profile_error
         self._temporary: tempfile.TemporaryDirectory[str] | None = None
         try:
-            raw = path.read_bytes()
-            manifest = json.loads(raw, object_pairs_hook=_pairs)
-            if not isinstance(manifest, dict):
-                raise ValueError("VSOP2013 manifest must be an object")
-            expected = dict(
+            (
+                self.binary_path,
+                self.binary_signature,
+                self._temporary,
+                loaded,
+                self.library,
+            ) = load_validated_manifest_and_library(
+                path,
                 model_id=MODEL_ID,
                 version=self.profile["version"],
-                abi_version=1,
-                system=platform.system(),
-                machine=platform.machine(),
+                label="VSOP2013",
+                temp_prefix="fatebridge-vsop2013-loaded-",
+                unavailable_reason="solar_vsop2013_unavailable",
+                cdll_loader=ctypes.CDLL,
             )
-            if platform.system() not in {"Darwin", "Linux"} or any(
-                type(manifest.get(key)) is not type(value) or manifest.get(key) != value
-                for key, value in expected.items()
-            ):
-                raise ValueError(
-                    "VSOP2013 manifest does not match profile/ABI/platform"
-                )
-            name = manifest["binary"]
-            if not isinstance(name, str) or not name or Path(name).name != name:
-                raise ValueError("VSOP2013 binary must be a sibling filename")
-            binary = (path.parent / name).resolve()
-            if binary.parent != path.parent:
-                raise ValueError("VSOP2013 binary escaped its manifest directory")
-            self.binary_path = binary
-            self.binary_signature = _signature(binary)
-            data = binary.read_bytes()
-            # dlopen must not silently return an old image for a replaced name.
-            self._temporary = tempfile.TemporaryDirectory(
-                prefix="fatebridge-vsop2013-loaded-"
-            )
-            loaded = Path(self._temporary.name) / name
-            loaded.write_bytes(data)
-            self.library = ctypes.CDLL(str(loaded))
             function = getattr(self.library, "fatebridge_vsop2013_model_id")
             function.argtypes = []
             function.restype = ctypes.c_char_p

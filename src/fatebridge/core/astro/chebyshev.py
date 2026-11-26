@@ -111,6 +111,31 @@ class ChebyshevKinematics(NamedTuple):
         return self.in_units(derivative_scale, divisor).rounded()
 
 
+def chebyshev_eval_float(
+    coefficients: Sequence[float],
+    x: float,
+    *,
+    need_derivative: bool = True,
+) -> tuple[float, float]:
+    """Fast IEEE-754 float64 Clenshaw evaluation (value, first_derivative)."""
+    if not coefficients or not -1.0 <= x <= 1.0:
+        raise EphemerisSourceError("jpl_kinematics_invalid")
+    tx = 2.0 * x
+    b1 = b2 = 0.0
+    if not need_derivative:
+        for coefficient in reversed(coefficients[1:]):
+            b0 = coefficient + tx * b1 - b2
+            b2, b1 = b1, b0
+        return coefficients[0] + x * b1 - b2, 0.0
+    d1 = d2 = 0.0
+    for coefficient in reversed(coefficients[1:]):
+        b0 = coefficient + tx * b1 - b2
+        d0 = 2.0 * b1 + tx * d1 - d2
+        b2, b1 = b1, b0
+        d2, d1 = d1, d0
+    return coefficients[0] + x * b1 - b2, b1 + x * d1 - d2
+
+
 def chebyshev_kinematics(
     coefficients: Sequence[float],
     x: float | Fraction,

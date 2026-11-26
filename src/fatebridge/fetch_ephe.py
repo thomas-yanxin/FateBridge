@@ -35,6 +35,7 @@ from fatebridge.core.ephemeris_paths import (
     ephemeris_search_directories,
     ephemeris_search_path_fits,
 )
+from fatebridge.core.ephemeris_runtime import bump_ephemeris_generation
 
 # note (mirror): This URL serves raw files where the astro.com front serves HTML.
 BASE_URL = load_ephemeris_manifest()["base_url"]
@@ -100,6 +101,7 @@ def fetch_one(
                 f"{name}: destination changed during download; left unchanged"
             )
         pending.replace(target)
+        bump_ephemeris_generation()
     finally:
         pending.unlink(missing_ok=True)
     return target

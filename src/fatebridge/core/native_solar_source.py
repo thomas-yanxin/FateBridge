@@ -20,27 +20,19 @@ SWISS_SOLAR_CONTEXT_TT_INTERVAL = (
 
 
 def swiss_solar_context_required(jd_tt: float) -> bool:
-    """Register fixed-source refinement by its actual TT, including guard years.
-
-    This is the application's source-pinning interval, not the full native
-    Sun range or a physical-accuracy claim. Request and neighbor-context year
-    labels cannot move a consumed root into this interval.
-    """
+    """Return whether jd_tt lies inside the Swiss source-pinning interval."""
     start, end = SWISS_SOLAR_CONTEXT_TT_INTERVAL
     return start <= jd_tt < end
 
 
-def _signature(path: Path) -> tuple[int, ...]:
-    stat = path.stat()
-    return stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns
-
-
-def native_solar_file_context(native: Any) -> dict[str, Any] | None:
-    """Observed slots, not a complete atomic read set or an accuracy proof."""
+def native_solar_file_context(
+    native: Any,
+) -> tuple[tuple[str, float, float, int], ...] | None:
+    """Lightweight Swiss file-slot context without per-call Path.stat()."""
     getter = getattr(native, "get_current_file_data", None)
     if not callable(getter):
         return None
-    windows = []
+    windows: list[tuple[str, float, float, int]] = []
     for slot in (0, 1):
         filename, start, end, edition = getter(slot)
         if (
@@ -49,30 +41,8 @@ def native_solar_file_context(native: Any) -> dict[str, Any] | None:
             or start >= end
         ):
             return None
-        path = Path(filename).absolute()
-        try:
-            signature = _signature(path)
-        except OSError as exc:
-            raise EphemerisSourceError("solar_native_context_unavailable") from exc
-        windows.append(
-            dict(
-                slot=slot,
-                filename=path.name,
-                bytes=signature[2],
-                start_jd_tt=float(start),
-                end_jd_tt=float(end),
-                de_number=int(edition),
-            )
-        )
-    return dict(
-        policy_id=POLICY_ID,
-        selection_method="same_TT_Moshier_then_requested_Swiss",
-        file_windows=windows,
-        physical_target_epoch_shifted=False,
-        preflight_state_returned_as_target=False,
-        physical_accuracy_certified=False,
-        scope="Observed final-refinement Sun file contexts; not atomic reads, complete dependency sets or independent physical accuracy",
-    )
+        windows.append((Path(filename).name, float(start), float(end), int(edition)))
+    return tuple(windows)
 
 
 def prime_swiss_solar_context(
@@ -81,16 +51,8 @@ def prime_swiss_solar_context(
     native: Any,
     invoke: Callable[..., Any],
     capture_context: bool = True,
-) -> tuple[Any, dict[str, Any] | None]:
-    """Select the requested Swiss source at this same TT point via public APIs.
-
-    Swiss closes computed states/files when its requested ephemeris changes.
-    The built-in preflight's coordinate is discarded. No set_ephe_path,
-    set_tid_acc, set_delta_t_userdef or private C state is changed here.
-    Call only in the registered modern/guard TT interval, where the
-    built-in Sun is available. Strict JPL and actual Moshier stay on their
-    own paths. The caller checks the final returned model.
-    """
+) -> tuple[Any, tuple[tuple[str, float, float, int], ...] | None]:
+    """Select the requested Swiss source at this same TT point via public APIs."""
     if not swiss_solar_context_required(jd_tt):
         raise EphemerisSourceError("solar_native_context_unavailable")
     with lock_ephemeris_configuration():

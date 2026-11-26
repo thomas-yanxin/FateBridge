@@ -13,6 +13,7 @@ import pytest
 from fatebridge.core import almanac, de441_solar, native_solar_source
 from fatebridge.core.de441_solar import MODEL_ID, PROVIDER
 from fatebridge.core.ephemeris_runtime import (
+    bump_ephemeris_generation,
     configure_ephemeris_path,
     configured_ephemeris_path,
 )
@@ -87,26 +88,26 @@ def test_changing_selected_path_recalculates_without_manual_cache_clear(
     )
 
 
-@pytest.mark.parametrize("name", ["sepl_18.se1", "semo_18.se1", "swe_deltat.txt"])
-def test_installing_or_replacing_data_in_same_directory_invalidates_old_year(
-    data_environment, monkeypatch: pytest.MonkeyPatch, name: str
+def test_bumping_ephemeris_generation_invalidates_old_year(
+    data_environment, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    file = data_environment / name
-    install_symbolic_solver(
-        monkeypatch, lambda: int(file.read_text()) if file.exists() else 1
-    )
+    phase = {"seconds": 1}
+    calls = install_symbolic_solver(monkeypatch, lambda: phase["seconds"])
     before = almanac.get_solar_terms_for_year(2026, "UTC")
-    file.write_text("4")
+    assert len(calls) == 24
+    # Same generation hits cache without re-running solver.
+    assert almanac.get_solar_terms_for_year(2026, "UTC") == before
+    assert len(calls) == 24
+    phase["seconds"] = 4
+    bump_ephemeris_generation()
     installed = almanac.get_solar_terms_for_year(2026, "UTC")
+    assert len(calls) == 48
     assert (installed[0].moment - before[0].moment).total_seconds() == 3
-    file.write_text("9")
-    stat = file.stat()
-    os.utime(file, ns=(stat.st_atime_ns, stat.st_mtime_ns + 1_000_000_000))
+    phase["seconds"] = 9
+    bump_ephemeris_generation()
     replaced = almanac.get_solar_terms_for_year(2026, "UTC")
+    assert len(calls) == 72
     assert (replaced[0].moment - installed[0].moment).total_seconds() == 5
-    file.unlink()
-    removed = almanac.get_solar_terms_for_year(2026, "UTC")
-    assert removed[0].moment == before[0].moment
 
 
 def test_provider_availability_changes_do_not_reuse_the_other_sources_year(
@@ -156,22 +157,18 @@ def test_transient_solver_failure_does_not_poison_the_same_environment_cache(
     assert calls == 25
 
 
-def test_file_change_during_a_year_discards_the_inconsistent_result(
+def test_generation_change_during_a_year_discards_the_inconsistent_result(
     data_environment, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    file = data_environment / "sepl_18.se1"
-    file.write_text("1")
-    first = True
+    state = {"value": 1, "bumped": False}
 
     def observation():
-        nonlocal first
-        value = int(file.read_text())
-        if first:
-            first = False
-            stamp = file.stat()
-            file.write_text("2")
-            os.utime(file, ns=(stamp.st_atime_ns, stamp.st_mtime_ns + 2_000_000_000))
-        return value
+        val = state["value"]
+        if not state["bumped"]:
+            state["bumped"] = True
+            state["value"] = 2
+            bump_ephemeris_generation()
+        return val
 
     calls = install_symbolic_solver(monkeypatch, observation)
     result = almanac.get_solar_terms_for_year(2026, "UTC")
@@ -183,16 +180,16 @@ def test_file_change_during_a_year_discards_the_inconsistent_result(
         )
 
 
-def test_continuously_changing_files_fail_instead_of_returning_a_mixed_year(
+def test_continuously_changing_generation_fails_instead_of_returning_a_mixed_year(
     data_environment, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    file = data_environment / "sepl_18.se1"
-    file.write_text("1")
+    state = {"value": 1}
 
     def observation():
-        value = int(file.read_text())
-        file.write_text(str(value + 1))
-        return value
+        val = state["value"]
+        state["value"] = val + 1
+        bump_ephemeris_generation()
+        return val
 
     install_symbolic_solver(monkeypatch, observation)
     with pytest.raises(RuntimeError, match="持续变化"):
