@@ -256,7 +256,6 @@ docs/reviews/
 !/tests/data/bazi_pattern_facts_v1/reference.json.gz
 !/tests/data/bazi_pattern_facts_v1/reference.json.sha256
 !/tests/data/bazi_pattern_facts_v1/source-rules.json
-!/tests/data/bazi_pattern_facts_v1/legacy-clock.json
 !/tests/data/bazi_pillar_facts_v1/README.md
 !/tests/data/bazi_pillar_facts_v1/reference.json
 !/tests/data/bazi_pillar_facts_v1/reference.json.sha256

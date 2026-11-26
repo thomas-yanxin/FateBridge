@@ -883,10 +883,6 @@ def calculate_sukuyo_compatibility(
             "palace_reference": "双方宫名仅按历日宿名和显式textual_pada查原典分足表；未定实际出生足位或本命宫，也未据此合成宫位相性或分数。",
             "research_reference": "fixed_host_research_scope是具名研究全表与固定NAOJ月首方向比较，不是双方本月选行、历日算法或关系预测；未知及不利行完整保留。",
         },
-        "validation": {
-            "real_world_prediction": "not_established",
-            "authority_certified": False,
-        },
         "summary": summary,
     }
     if candidate_analysis.get("shared_reconstruction_analysis"):

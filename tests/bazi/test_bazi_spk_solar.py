@@ -238,6 +238,7 @@ def test_all_ten_bazi_calendar_views_return_actual_spk_on_three_protocols(
     key = "bazi_birth" if topic == "birth" else topic + "_analysis"
     fields = [key + ".calendar_context"]
     opts = dict(
+        detail="audit",
         fields=fields,
         strict_fields=True,
         include_snapshot_text=False,

@@ -934,7 +934,6 @@ from tests.unit_test.fixtures.sukuyo_transports import (
                 "person1_to_person2",
                 "person2_to_person1",
                 "rulesets",
-                "validation",
             ],
         ),
         (
