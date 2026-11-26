@@ -159,7 +159,7 @@ def test_calendar_evidence_is_typed_and_equal_in_rest_native_mcp_cli(
     inputs = {
         **BIRTH,
         "rule_profile": profile,
-        **(TARGET if path == "horoscope" else {}),
+        **(TARGET if key == "ziwei_horoscope" else {}),
     }
     options = dict(
         as_of="2026-10-22T12:00:00+08:00",
@@ -212,7 +212,7 @@ def test_calendar_evidence_is_typed_and_equal_in_rest_native_mcp_cli(
     ]
     assert bodies[0] == bodies[1] == bodies[2]
     b = bodies[0][key]["calendar_basis"]
-    if path == "horoscope":
+    if key == "ziwei_horoscope":
         assert b["target"]["placement_clock"] == "civil"
         assert (
             b["nominal_age_rule"]
