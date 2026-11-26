@@ -1,6 +1,6 @@
 # 人类图算法、独立参考与验证范围
 
-[计算与调用](human-design.md) · [细算法清单](algorithm-inventory.md) · [算法状态](algorithm-status.md)
+[计算与调用](human-design.md) · [源码职责](architecture.md#分层职责) · [算法状态](algorithm-status.md)
 
 本文维护当前算法所有者、独立参考及已知差异。调用参数、默认口径、原典覆盖和来源分歧见[人类图计算说明](human-design.md)；函数归属见细算法清单。
 
