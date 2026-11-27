@@ -198,7 +198,7 @@ def _resolve_schema_property(schema: dict[str, object], name: str) -> dict[str, 
 
 def test_catalog_hygiene_across_all_tools() -> None:
     """Single canonical identity, valid examples, lean labels, and no cross-technique leakage."""
-    assert len(CATALOG) == 90
+    assert len(CATALOG) == 91
     assert len({spec.family for spec in CATALOG}) == 12
     assert set(ExecutionOptions.model_fields) == {"as_of", "detail"}
 

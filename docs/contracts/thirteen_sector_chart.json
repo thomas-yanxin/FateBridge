@@ -1,7 +1,7 @@
 {
   "call_guidance": {
     "birth_seconds": "Pass birth_second only from an actually recorded clock or an explicitly identified historical clock conversion. Omission represents the start of the supplied minute, not evidence of exact seconds.",
-    "birth_time_uncertainty": "Pass user-confirmed birth_time_uncertainty_minutes (0..120), then read time_sensitivity. None is unknown, not exact. Samples vary recorded UTC before optional solar correction.",
+    "birth_time_uncertainty": "Pass user-confirmed birth_time_uncertainty_minutes (0..120), then read birth_time_sensitivity. None is unknown, not exact. Samples vary recorded UTC before optional solar correction.",
     "clock_basis": "Use birth_clock_basis=civil for a recorded civil zone clock. Only an explicitly identified historical LMT/LAT record may select local_mean_solar/local_apparent_solar, with birth_timezone omitted and use_true_solar_time=false.",
     "geometry": "sector13 is an ascendant-relative equal partition, independent of the twelve-house selection; IAU constellations have different boundaries.",
     "house_roles": "Keep the selected base-chart12-house system separate from native reference-angle extraction, Meridian cusps and the custom13-sector partition. In the current numeric policy hsys1 is Alcabitus (SwissB), never Equal.",
@@ -31,8 +31,8 @@
         "sector_profile",
         "planets",
         "thirteen_sectors",
-        "time_sensitivity.status",
-        "time_sensitivity.uncertainty_minutes",
+        "birth_time_sensitivity.status",
+        "birth_time_sensitivity.uncertainty_minutes",
         "person_info"
       ],
       "purpose": "Custom 13 equal sectors; not astronomical constellation membership"
@@ -50,7 +50,7 @@
     },
     "time_sensitivity": {
       "fields": [
-        "time_sensitivity",
+        "birth_time_sensitivity",
         "person_info"
       ],
       "purpose": "Recomputed user-confirmed birth-time interval on a TT grid with at most 30 SI seconds between samples. Missing interval is unknown. Sampled stability is neither a continuous interval proof nor a probability; inspect nominal interpretations/partitions separately."
@@ -62,8 +62,8 @@
       "sector_profile",
       "planets",
       "thirteen_sectors",
-      "time_sensitivity.status",
-      "time_sensitivity.uncertainty_minutes",
+      "birth_time_sensitivity.status",
+      "birth_time_sensitivity.uncertainty_minutes",
       "person_info"
     ]
   },

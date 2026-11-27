@@ -2,7 +2,7 @@
 
 [文档中心](README.md) · [核心概念](concepts.md) · [API 参考](api-reference.md)
 
-本页按中央目录 `src/fatebridge/services/tool_catalog.py` 列出 FateBridge 的 12 个 family 与 90 项计算能力，说明实现状态、依赖条件与适用边界。输入字段与参数详情见 [API 参考](api-reference.md)，结果解读指引见[方法参考](interpretation/README.md)。
+本页按中央目录 `src/fatebridge/services/tool_catalog.py` 列出 FateBridge 的 12 个 family 与 91 项计算能力，说明实现状态、依赖条件与适用边界。输入字段与参数详情见 [API 参考](api-reference.md)，结果解读指引见[方法参考](interpretation/README.md)。
 
 状态分类：
 
@@ -11,7 +11,7 @@
 - `Partial` / `Limited`：已实现明确子集，存在未覆盖或未裁定的规则范围。
 - `Excluded`：当前仓库不提供该能力。
 
-> 工具来自中央目录 `src/fatebridge/services/tool_catalog.py`。REST 公开 **90 个工具**（含 `/api/batch` 批处理入口），MCP 通过三个入口提供 **90 项业务能力**，分为 **12 个 family**。目录共有 90 条记录，CLI 可执行 90 条。
+> 工具来自中央目录 `src/fatebridge/services/tool_catalog.py`。REST 公开 **91 个工具**（含 `/api/batch` 批处理入口），MCP 通过三个入口提供 **91 项业务能力**，分为 **12 个 family**。目录共有 91 条记录，CLI 可执行 91 条。
 
 ## 怎样核对一次结果
 
@@ -22,7 +22,7 @@
 | 数值与时间精度 | `chart_profile.ephemeris_model`、`time_adjustment` 与 `engine_is_approximate` | 依赖库可导入不代表已加载外部 `.se1` 星历文件 |
 | 可追溯性 | 原输入、`run_metadata`、版本、来源与环境 | 重放需保留原输入、`as_of` 与环境设置 |
 
-## 1. 总览：12 个 family / 90 个工具
+## 1. 总览：12 个 family / 91 个工具
 
 | family | 工具数 | 主题 | 总体状态 |
 | --- | --- | --- | --- |
@@ -35,7 +35,7 @@
 | `western_timing` | 12 | 西占推运总览与 11 项独立推运技法（返照/行运/主限/法达等） | Implemented（依赖 backend） |
 | `western_event` | 4 | 事件占星（世俗/卜卦/择日/多重回归） | Implemented（依赖 backend） |
 | `western_lifespan` | 13 | 传统阶段与周期技法（不用于寿命推断） | Implemented（依赖 backend） |
-| `knowledge` | 2 | 内置知识库目录与读取 | Implemented |
+| `knowledge` | 3 | 内置知识库目录、条目读取与离线地名解析 | Implemented |
 | `fengshui` | 8 | 公共方位与地磁、命卦、八宅三要、金锁 24 山、四层紫白、玄空宅盘、多层合参 | Implemented（明确版本） |
 | `psychometrics` | 1 | Goldberg (1992) IPIP 50 题大五人格因子标记量表 | Implemented |
 | 仓库内前端 | — | 内置 Web UI | Excluded |
@@ -177,6 +177,7 @@
 | --- | --- | --- |
 | `knowledge_catalog` | 列出内置知识域与分类（`astro`、`bazi`、`liureng`、`qimen` 等） | Implemented |
 | `knowledge_read` | 读取单条内置知识条目 | Implemented |
+| `place_lookup` | 离线地名表解析出生地名、别名与经纬度/时区候选 | Implemented |
 
 ### 2.11 `fengshui` —— 家居风水（Implemented）
 

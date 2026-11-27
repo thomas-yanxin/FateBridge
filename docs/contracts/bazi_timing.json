@@ -80,6 +80,9 @@
       "dayun.end_at",
       "dayun.selection_basis",
       "liunian.pillar",
+      "liunian.year",
+      "liunian.year_boundary_policy",
+      "liunian.year_boundary_basis",
       "liuyue.pillar",
       "liuri.pillar",
       "liushi.pillar",
@@ -338,6 +341,12 @@
         "description": "性别（可选但建议提供：影响大运顺逆排布与部分六亲判断）。接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法。",
         "title": "Gender"
       },
+      "include_timelines": {
+        "default": false,
+        "description": "是否同时返回分析年的二十四节气网格、十二节流月时间轴与节气节点时间轴。",
+        "title": "Include Timelines",
+        "type": "boolean"
+      },
       "name": {
         "anyOf": [
           {
@@ -356,6 +365,16 @@
         "description": "Rebase the birth clock onto true solar time (longitude + equation of time). Default on in the current software policy; this option does not certify a classical text's clock rule. Set false for the raw civil clock.",
         "title": "Use True Solar Time",
         "type": "boolean"
+      },
+      "year_boundary_policy": {
+        "default": "lichun",
+        "description": "年柱换年口径：lichun（默认，立春换年；提供月份/日期时按立春精确时刻判断，仅传analysis_year时视为该太阳年）或 gregorian（按公历整数年份）。",
+        "enum": [
+          "lichun",
+          "gregorian"
+        ],
+        "title": "Year Boundary Policy",
+        "type": "string"
       },
       "zi_hour_policy": {
         "default": "day_rollover_at_23",

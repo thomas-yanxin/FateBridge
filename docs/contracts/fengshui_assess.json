@@ -950,7 +950,9 @@
               {
                 "enum": [
                   "male",
-                  "female"
+                  "female",
+                  "男",
+                  "女"
                 ],
                 "type": "string"
               },
@@ -959,7 +961,7 @@
               }
             ],
             "default": null,
-            "description": "传统男女起算法；未知时返回两个候选",
+            "description": "传统男女起算法（male/female 或 男/女）；未知时返回两个候选",
             "title": "Gender"
           },
           "ruleset_id": {

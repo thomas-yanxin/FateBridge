@@ -301,6 +301,7 @@ def test_catalog_descriptors_cover_reference_and_timing_families() -> None:
     assert {item.name for item in CATALOG if item.family == "knowledge"} == {
         "knowledge_catalog",
         "knowledge_read",
+        "place_lookup",
     }
     assert {item.name for item in CATALOG if item.family == "western_timing"} >= {
         "western_timing",

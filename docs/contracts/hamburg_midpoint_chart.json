@@ -1,7 +1,7 @@
 {
   "call_guidance": {
     "birth_seconds": "Pass birth_second only from an actually recorded clock or an explicitly identified historical clock conversion. Omission represents the start of the supplied minute, not evidence of exact seconds.",
-    "birth_time_uncertainty": "Pass user-confirmed birth_time_uncertainty_minutes (0..120), then read time_sensitivity. None is unknown, not exact. Samples vary recorded UTC before optional solar correction.",
+    "birth_time_uncertainty": "Pass user-confirmed birth_time_uncertainty_minutes (0..120), then read birth_time_sensitivity. None is unknown, not exact. Samples vary recorded UTC before optional solar correction.",
     "clock_basis": "Use birth_clock_basis=civil for a recorded civil zone clock. Only an explicitly identified historical LMT/LAT record may select local_mean_solar/local_apparent_solar, with birth_timezone omitted and use_true_solar_time=false.",
     "comparative_geometry": "Witte1924 comparative_geometry reconstructs five stated anchor rotations and the four-point mirror system from the same native factors. Coordinates are symbolic; use the actual Aries Point for tropical axes in a sidereal display.",
     "daily_meridian": "The selected Witte 1924 p.15 equation is solar_arc_analysis.daily_meridian: IC.day=IC.natal+solar_arc-Sun.natal.tropical+Sun.target.tropical, MC.day=IC.day+180.",
@@ -92,7 +92,7 @@
     },
     "meridian_houses": {
       "fields": [
-        "midpoint_analysis.time_sensitivity",
+        "midpoint_analysis.birth_time_sensitivity",
         "base_chart.chart_profile",
         "base_chart.person_info"
       ],
@@ -127,8 +127,8 @@
         "midpoint_analysis.status",
         "midpoint_analysis.profile",
         "midpoint_analysis.contact_counts",
-        "midpoint_analysis.time_sensitivity.status",
-        "midpoint_analysis.time_sensitivity.uncertainty_minutes",
+        "midpoint_analysis.birth_time_sensitivity.status",
+        "midpoint_analysis.birth_time_sensitivity.uncertainty_minutes",
         "midpoint_analysis.unique_two_factor_pair_count",
         "base_chart.person_info"
       ],
@@ -165,14 +165,14 @@
       "fields": [
         "midpoint_analysis.profile",
         "midpoint_analysis.factors",
-        "midpoint_analysis.time_sensitivity",
+        "midpoint_analysis.birth_time_sensitivity",
         "base_chart.person_info"
       ],
       "purpose": "Only matched source-attributed symbolic readings; claim_id deduplicates the same reading across dials. An empty list does not mean all traditional interpretations were tested. Distinguish unresolved physical MC from formal backend conditions and unavailable arcs. Read resolved/unresolved condition counts; unknown applicability is not absence. Only ASC degeneracy does not restrict a resolved MC."
     },
     "time_sensitivity": {
       "fields": [
-        "midpoint_analysis.time_sensitivity",
+        "midpoint_analysis.birth_time_sensitivity",
         "base_chart.person_info"
       ],
       "purpose": "Recomputed user-confirmed birth-time interval on a TT grid with at most 30 SI seconds between samples. Missing interval is unknown. Sampled stability is neither a continuous interval proof nor a probability; inspect nominal interpretations/partitions separately. Distinguish unresolved physical MC from formal backend conditions and unavailable arcs. Read resolved/unresolved condition counts; unknown applicability is not absence. Only ASC degeneracy does not restrict a resolved MC."
@@ -195,8 +195,8 @@
       "midpoint_analysis.status",
       "midpoint_analysis.profile",
       "midpoint_analysis.contact_counts",
-      "midpoint_analysis.time_sensitivity.status",
-      "midpoint_analysis.time_sensitivity.uncertainty_minutes",
+      "midpoint_analysis.birth_time_sensitivity.status",
+      "midpoint_analysis.birth_time_sensitivity.uncertainty_minutes",
       "midpoint_analysis.unique_two_factor_pair_count",
       "base_chart.person_info"
     ]

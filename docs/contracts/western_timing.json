@@ -198,18 +198,34 @@
         "type": "integer"
       },
       "birth_latitude": {
-        "description": "Birth latitude",
-        "maximum": 90,
-        "minimum": -90,
-        "title": "Birth Latitude",
-        "type": "number"
+        "anyOf": [
+          {
+            "maximum": 90,
+            "minimum": -90,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth latitude (optional when birth_place is given)",
+        "title": "Birth Latitude"
       },
       "birth_longitude": {
-        "description": "Birth longitude",
-        "maximum": 180,
-        "minimum": -180,
-        "title": "Birth Longitude",
-        "type": "number"
+        "anyOf": [
+          {
+            "maximum": 180,
+            "minimum": -180,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth longitude (optional when birth_place is given)",
+        "title": "Birth Longitude"
       },
       "birth_minute": {
         "default": 0,
@@ -235,9 +251,24 @@
             "type": "null"
           }
         ],
-        "default": "未提供",
-        "description": "Birth place",
+        "default": null,
+        "description": "Birth place (optional; when coordinates/timezone are omitted, resolved lazily via supported city catalog)",
         "title": "Birth Place"
+      },
+      "birth_second": {
+        "anyOf": [
+          {
+            "maximum": 59,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "出生秒数（0-59，可选，用于跨工具参数对称）。",
+        "title": "Birth Second"
       },
       "birth_timezone": {
         "anyOf": [
@@ -251,6 +282,19 @@
         "default": null,
         "description": "Birth timezone (IANA name or UTC offset). Optional: when omitted, FateBridge may resolve it from a supported birth_place. Western charts and timing reject an unresolved civil timezone; coordinates alone do not establish a zone. Supply UTC explicitly when that is the confirmed recorded basis. Place inference does not certify historical clock accuracy.",
         "title": "Birth Timezone"
+      },
+      "birth_utc_offset": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "已确认的出生民用UTC偏移（±HH:MM或±HH:MM:SS，可选，用于跨工具参数对称）。",
+        "title": "Birth Utc Offset"
       },
       "birth_year": {
         "description": "Birth year, e.g., 1990",
@@ -278,6 +322,19 @@
         ],
         "title": "Firdaria Year Basis",
         "type": "string"
+      },
+      "gender": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "性别（可选，用于批量/跨工具参数对称；西方推运计算不使用性别）。",
+        "title": "Gender"
       },
       "high_latitude_fallback": {
         "default": "error",
@@ -471,9 +528,7 @@
       "birth_year",
       "birth_month",
       "birth_day",
-      "birth_hour",
-      "birth_longitude",
-      "birth_latitude"
+      "birth_hour"
     ],
     "title": "WesternTimingRequest",
     "type": "object"

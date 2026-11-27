@@ -565,17 +565,17 @@
         "description": "Latitude text or decimal",
         "title": "Latitude"
       },
-      "liureng_guiren_profile": {
+      "liuren_guiren_profile": {
         "default": "liuren_common_v1",
         "description": "六壬贵人本位：liuren_common_v1（默认通行表）或tanyuan_xieji_v1（探原协纪表）。与金镜明钞／四库当时法的本位逐版对照，不自动择优；昼夜边界、四维寄支及完整合参断法另待验收。",
         "enum": [
           "liuren_common_v1",
           "tanyuan_xieji_v1"
         ],
-        "title": "Liureng Guiren Profile",
+        "title": "Liuren Guiren Profile",
         "type": "string"
       },
-      "liureng_is_diurnal": {
+      "liuren_is_diurnal": {
         "anyOf": [
           {
             "type": "boolean"
@@ -585,10 +585,10 @@
           }
         ],
         "default": null,
-        "description": "Optional liureng day/night override",
-        "title": "Liureng Is Diurnal"
+        "description": "Optional liuren day/night override",
+        "title": "Liuren Is Diurnal"
       },
-      "liureng_yue": {
+      "liuren_yue": {
         "anyOf": [
           {
             "type": "string"
@@ -598,8 +598,8 @@
           }
         ],
         "default": null,
-        "description": "Optional liureng month-general override",
-        "title": "Liureng Yue"
+        "description": "Optional liuren month-general override",
+        "title": "Liuren Yue"
       },
       "longitude": {
         "anyOf": [

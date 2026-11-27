@@ -4,7 +4,7 @@
 
 本文列出 FateBridge 的 REST 路由、FastMCP 工具面、共享请求族与响应约定。安装步骤见[快速入门](getting-started.md)，端到端调用代码、错误恢复全表与 Agent 闭环见[接入指南](agent-guide.md)。
 
-OpenAPI 发布 90 个业务 REST 路由，另有 `/api/batch`（多主体多工具无状态批处理）、`/health`、`/ready`、`/metrics` 四个共享端点。目录共有 90 条记录，CLI 可执行 90 条目录命令，MCP 通过三个入口（`discover_tools`、`run_calculation`、`run_batch`）提供 90 项业务能力。字段约束以当前服务的 `/openapi.json`、MCP `discover_tools(tool=...)` 或 CLI `fatebridge discover <tool>` 为准。
+OpenAPI 发布 91 个业务 REST 路由，另有 `/api/batch`（多主体多工具无状态批处理）、`/health`、`/ready`、`/metrics` 四个共享端点。目录共有 91 条记录，CLI 可执行 91 条目录命令，MCP 通过三个入口（`discover_tools`、`run_calculation`、`run_batch`）提供 91 项业务能力。字段约束以当前服务的 `/openapi.json`、MCP `discover_tools(tool=...)` 或 CLI `fatebridge discover <tool>` 为准。
 
 ## 阅读导航
 
@@ -45,14 +45,14 @@ OpenAPI 发布 90 个业务 REST 路由，另有 `/api/batch`（多主体多工�
 
 ### 2.2 三端能力边界
 
-目录共有 90 条记录。REST 和 MCP 默认公开全量，CLI 可执行 90 条目录命令（另有 `list`、`discover` 与 `doctor`）。三端共用规范工具名（`spec.name`）和业务输入合同，部分主要命名映射如下：
+目录共有 91 条记录。REST 和 MCP 默认公开全量，CLI 可执行 91 条目录命令（另有 `list`、`discover` 与 `doctor`）。三端共用规范工具名（`spec.name`）和业务输入合同，部分主要命名映射如下：
 
 | 能力 | REST | MCP / CLI | 差异说明 |
 | --- | --- | --- | --- |
 | 独立八字命盘 | `/api/bazi/birth-chart` | `bazi_birth_chart` | 业务数据位于 `bazi_birth` |
 | 综合命理分析 | `/api/bazi/overview` | `bazi_overview` | 提供出生盘、喜用与格局事实 |
 | 关系盘 | `/api/astrology/relationship-chart` | `relationship_chart` | 三端统一使用 `inner_birth_*` / `outer_birth_*` |
-| 家居风水 | `/api/fengshui/*` | `fengshui_*` | 八个工具同名；全部 90 个 CLI 命令均支持 `--request-file` 传入 JSON |
+| 家居风水 | `/api/fengshui/*` | `fengshui_*` | 八个工具同名；全部 91 个 CLI 命令均支持 `--request-file` 传入 JSON |
 
 ### 2.3 输出控制与字段投影
 
@@ -155,6 +155,7 @@ REST 使用 `GET /api/tools`（查询参数 `detail=summary|full`、`family`、`
 | `POST` | `/api/divination/gua` | 批量查询八卦/六十四卦结构与《周易》经文（`queries` / `lookup_mode`） |
 | `POST` | `/api/knowledge/catalog` | 内置知识目录 |
 | `POST` | `/api/knowledge/read` | 内置知识条目读取 |
+| `POST` | `/api/places/lookup` | 离线地名表解析与经纬度/时区候选 |
 
 ### 4.4 占卜与本地技法
 
@@ -312,7 +313,7 @@ uv run --extra dev python -m fatebridge.mcp_server
 
 ### 6.2 MCP 工具分组
 
-全部 90 项业务能力由 `discover_tools`、`run_calculation` 与 `run_batch` 三个协议工具暴露（不暴露 MCP 资源），按 `family` 分组如下：
+全部 91 项业务能力由 `discover_tools`、`run_calculation` 与 `run_batch` 三个协议工具暴露（不暴露 MCP 资源），按 `family` 分组如下：
 
 #### 基础命理（family `bazi`）
 
@@ -376,6 +377,7 @@ uv run --extra dev python -m fatebridge.mcp_server
 
 - `knowledge_catalog`
 - `knowledge_read`
+- `place_lookup`
 
 #### 核心占星盘（family `astro`）
 

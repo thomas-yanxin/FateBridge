@@ -143,7 +143,7 @@
         "design_solver",
         "activations",
         "variables",
-        "time_sensitivity"
+        "birth_time_sensitivity"
       ],
       "purpose": "连续TT、最终相邻浮点太阳根见证、端点日地细分与实际星历口径；数值收敛不表示物理精度认证。实际设计根端点另读root_endpoints，分别保留13项激活、整盘结构与四箭头差异；不把端点一致当连续稳定，也不拼接候选盘。"
     },
@@ -207,14 +207,14 @@
         "birth_utc",
         "calculation_policy.node_mode",
         "calculation_policy.ephemeris_model",
-        "time_sensitivity.status"
+        "birth_time_sensitivity.status"
       ],
       "purpose": "联合比较桥接门集、线固定与四箭头；需明确birth_time_uncertainty_minutes才做区间采样，0返回未评估。完整快照及局部字段路径读取同次结果，不以方案数量或有限网格认证稳定性；另列已观测多依赖过渡细查及未分开区间，不把有限细查认证为连续穷尽"
     },
     "variables": {
       "fields": [
         "variables",
-        "time_sensitivity"
+        "birth_time_sensitivity"
       ],
       "purpose": "人格与设计日地/交点四组Tone的左右箭头、同次引用和实际变体；不作健康、饮食或学习能力评估"
     }

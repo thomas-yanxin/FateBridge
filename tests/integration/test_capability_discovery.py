@@ -72,7 +72,7 @@ def test_mcp_transport_flags_are_self_describing() -> None:
 def test_reference_discovery_uses_public_names(
     rest: TestClient, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    names = {"knowledge_catalog", "knowledge_read"}
+    names = {"knowledge_catalog", "knowledge_read", "place_lookup"}
     records = {}
     for name in sorted(names):
         response = rest.get(
