@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import almanac, de441_solar, native_solar_source
+from fatebridge.core import almanac, analytic_solar, de441_solar, native_solar_source
 from fatebridge.core.de441_solar import MODEL_ID, PROVIDER
 from fatebridge.core.ephemeris_runtime import (
     bump_ephemeris_generation,
@@ -117,9 +117,11 @@ def test_provider_availability_changes_do_not_reuse_the_other_sources_year(
     library = almanac.swe
     monkeypatch.setattr(almanac, "swe", None)
     before = almanac.get_solar_terms_for_year(2026, "UTC")
-    assert {t.resolution_provider for t in before} == {PROVIDER}
-    assert {t.ephemeris_model for t in before} == {MODEL_ID}
-    assert all(t.ephemeris_library_version is None for t in before)
+    assert {t.resolution_provider for t in before} == {"fatebridge_analytic"}
+    assert {t.ephemeris_model for t in before} == {analytic_solar.MODEL_ID}
+    assert {t.ephemeris_library_version for t in before} == {
+        "fatebridge.analytic_solar/1.0.0"
+    }
     monkeypatch.setattr(almanac, "swe", library)
     install_symbolic_solver(monkeypatch, lambda: 7)
     after = almanac.get_solar_terms_for_year(2026, "UTC")
@@ -237,13 +239,33 @@ def test_solver_records_the_returned_model_rather_than_the_requested_one(
     resolved_datetime = resolved.as_datetime()
     assert resolved_datetime is not None
     assert abs((resolved_datetime - civil).total_seconds()) < 0.0002
-    if actual_model == "moshier":
-        assert provenance["ephemeris_model"] == de441_solar.MODEL_ID
-        assert provenance["resolution_provider"] == de441_solar.PROVIDER
-        assert provenance["ephemeris_retflags"] == ()
-    else:
-        assert provenance["ephemeris_model"] == actual_model
-        assert provenance["ephemeris_retflags"] == (returned_flag,)
+    assert provenance["ephemeris_model"] == actual_model
+    assert provenance["ephemeris_retflags"] == (returned_flag,)
+
+
+def test_explicit_de441_dir_routes_moshier_probe_to_de441_solar(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    civil = datetime(2020, 3, 20, 3, 50, tzinfo=timezone.utc)
+    tt = (
+        2451544.5
+        + ((civil - datetime(2000, 1, 1, tzinfo=timezone.utc)).total_seconds() + 69.184)
+        / 86400
+    )
+
+    def sun(operation, at, body, flags):
+        assert operation == "calc" and flags in (2, 4)
+        return ((at - tt) % 360, 0, 1, 0, 0, 0), 4
+
+    monkeypatch.setenv("FATEBRIDGE_DE441_DIR", str(tmp_path))
+    monkeypatch.setattr(almanac, "ephemeris_call", sun)
+    monkeypatch.setattr(de441_solar, "solar_longitude", lambda at: (at - tt) % 360)
+    provenance = {}
+    resolved = almanac._solar_term_utc_via_swe(2020, 0, civil, provenance)
+    assert resolved is not None
+    assert provenance["ephemeris_model"] == MODEL_ID
+    assert provenance["resolution_provider"] == PROVIDER
+    assert provenance["ephemeris_retflags"] == ()
 
 
 @pytest.mark.parametrize(
@@ -336,6 +358,4 @@ def test_solver_does_not_require_an_unavailable_unused_search_prefix(
         < 0.0002
     )
     assert all(at >= root - 10 for at in sampled)
-    assert provenance["ephemeris_model"] == (
-        de441_solar.MODEL_ID if actual_model == "moshier" else "swieph"
-    )
+    assert provenance["ephemeris_model"] == actual_model

@@ -123,15 +123,20 @@ def test_all_original_native_events_select_the_first_post_crossing_point(
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
+    monkeypatch.delenv("FATEBRIDGE_DE441_DIR", raising=False)
     terms = almanac.get_solar_terms_for_year(year, "UTC")
     assert len(terms) == 24
     for term, target in zip(terms, almanac.SOLAR_TERM_LONGITUDES, strict=True):
         point = ephemeris_time(term.moment).jd_tt
         before = math.nextafter(point, -math.inf)
-        assert term.resolution_provider == de441_solar.PROVIDER
-        assert term.ephemeris_model == de441_solar.MODEL_ID
-        left = de441_solar.solar_longitude(before)
-        right = de441_solar.solar_longitude(point)
+        assert term.resolution_provider == "swisseph"
+        assert term.ephemeris_model == "moshier"
+        left = (
+            almanac.ephemeris_call("calc", before, swe.SUN, swe.FLG_SWIEPH)[0][0] % 360
+        )
+        right = (
+            almanac.ephemeris_call("calc", point, swe.SUN, swe.FLG_SWIEPH)[0][0] % 360
+        )
         assert math.remainder(left - target, 360) < 0, term.name
         assert math.remainder(right - target, 360) >= 0, term.name
         assert term.tt_instant is not None and term.tt_instant.days == point

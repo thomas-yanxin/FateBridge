@@ -36,11 +36,7 @@ repos:
         entry: uv run --extra dev check-added-large-files --maxkb=10240 --enforce-all --
         language: system
         # Existing bundled ephemerides exceed the limit by design.
-        exclude: >-
-          (?x)^src/fatebridge/data/astronomy/(?:
-            de440-solar-record-atlas-v1\.bin\.gz|
-            de441-planetary-0001-9999-v4-part-(?:0[0-9]|1[0-3])\.bin\.gz
-          )$
+        exclude: ^src/fatebridge/data/astronomy/de440-solar-record-atlas-v1\.bin\.gz$
       - id: trailing-whitespace
         name: Trim trailing whitespace in source and configuration
         entry: uv run --extra dev trailing-whitespace-fixer --

@@ -18,13 +18,18 @@ import fatebridge.mcp_server as mcp
 from fatebridge.application.execution import execute_with_receipt
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
 from fatebridge.cli import run as cli_run
-from fatebridge.core import ephemeris_runtime
+from fatebridge.core import almanac, ephemeris_runtime
+from fatebridge.core.astro.orbits import ApproximateEphemeris
 from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.core.predictive import _common as predictive_runtime
 from fatebridge.core.receipt_models import RunMetadata
 from fatebridge.core.requests.bazi import BaziBirthRequest
 from fatebridge.services import run_metadata
-from fatebridge.utils.errors import error_response_payload, handle_calculation_error
+from fatebridge.utils.errors import (
+    EphemerisSourceError,
+    error_response_payload,
+    handle_calculation_error,
+)
 from fatebridge.utils.formatting import format_json_response
 from fatebridge.utils.runtime import load_runtime_env, parse_allowed_origins
 from tests.fixtures.surface_payloads import REST_POST_CASES, astro_payload
@@ -199,6 +204,26 @@ def test_ready_requires_available_offline_ephemeris(
     assert response.status_code == 503
     assert response.json()["status"] == "not_ready"
     assert response.json()["checks"]["offline_astrology"]["ok"] is False
+
+
+def test_explicit_missing_de441_dir_raises_de441_archive_missing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("FATEBRIDGE_DE441_DIR", str(tmp_path))
+    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
+    monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
+    monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
+    almanac.get_solar_terms_for_year.cache_clear()
+    try:
+        with pytest.raises(EphemerisSourceError) as solar_err:
+            almanac.get_solar_terms_for_year(2026, "UTC")
+        assert solar_err.value.reason == "de441_archive_missing"
+
+        with pytest.raises(EphemerisSourceError) as orbit_err:
+            ApproximateEphemeris(2451545.0, 2451545.0).state("Pluto")
+        assert orbit_err.value.reason == "de441_archive_missing"
+    finally:
+        almanac.get_solar_terms_for_year.cache_clear()
 
 
 def test_metrics_endpoint_exposes_request_counters() -> None:

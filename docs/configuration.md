@@ -35,7 +35,7 @@ cp -n .env.example .env
 | --- | --- | --- |
 | `SE_EPHE_PATH` | 未设置 | 自定义 Swiss `.se1` 或 JPL 内核搜索目录；优先级高于代码内置路径，整串须小于 242 编码字节 |
 | `FATEBRIDGE_JPL_FILE` | 未设置 | 显式启用的严格 DE441 内核短文件名（如 `linux_m13000p17000.441`），须位于 `SE_EPHE_PATH` 内 |
-| `FATEBRIDGE_DE441_DIR` | 未设置 | DE441 连续行星系数分片目录的绝对路径；源码检出默认读取项目数据目录，wheel 安装按[星历说明](ephemeris.md)配置 |
+| `FATEBRIDGE_DE441_DIR` | 未设置 | 可选 DE441 连续行星系数分片目录的绝对路径；未设置且缺失分片时自动使用内置 Moshier／`analytic_solar`／`astronomy-engine` 零体积降级，显式设置但缺少分片时报错 `de441_archive_missing`（详见[星历说明](ephemeris.md)） |
 | `FATEBRIDGE_SOLAR_TERM_MODEL` | `auto` | 太阳交节模型；`auto` 在 1700–2300 年默认使用随包 DE440（`FATEBRIDGE_JPL_FILE` 优先），可选 `native`、`swiss`、`analytic`、`spk`、`de440`、`aa1996`、`vsop2013` |
 | `FATEBRIDGE_SOLAR_SPK_FILE` | 未设置 | 仅 `FATEBRIDGE_SOLAR_TERM_MODEL=spk` 时读取的外部 SPK 文件路径（需安装 `jpl` 可选依赖） |
 | `FATEBRIDGE_VSOP2013_MANIFEST` | 未设置 | 仅 `FATEBRIDGE_SOLAR_TERM_MODEL=vsop2013` 时读取的本地构建 `manifest.json` 路径（1700–2300 年） |

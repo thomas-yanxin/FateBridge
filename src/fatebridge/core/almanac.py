@@ -35,7 +35,7 @@ from fatebridge.core import (
     spk_solar,
     vsop2013_solar,
 )
-from fatebridge.core.astro import time_scales
+from fatebridge.core.astro import de441_source, time_scales
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.divination import derive_meihua_hexagram
 from fatebridge.core.ephemeris_runtime import (
@@ -495,6 +495,7 @@ def is_calculated_solar_term(term: SolarTerm) -> bool:
     return (
         term.resolution_provider == "fatebridge_analytic"
         and term.ephemeris_model == analytic_solar.MODEL_ID
+        and not term.ephemeris_retflags
     )
 
 
@@ -653,14 +654,29 @@ def _solar_term_utc_via_swe(
         if model in {"unavailable", "moshier"}:
             if require_swiss:
                 raise EphemerisSourceError("solar_swiss_files_required")
-
-            longitude = de441_solar.solar_longitude(jd)
-            model = de441_solar.MODEL_ID
+            if (
+                de441_source.coefficient_files_available()
+                or de441_source.de441_dir_explicitly_configured()
+            ):
+                longitude = de441_solar.solar_longitude(jd)
+                model = de441_solar.MODEL_ID
+            elif native_result is not None and model == "moshier":
+                longitude = float(result[0] % 360.0)
+                model = "moshier"
+            elif (
+                solar_model_policy.VALIDATED_SOFTWARE_YEARS[0]
+                <= year
+                <= solar_model_policy.VALIDATED_SOFTWARE_YEARS[1]
+            ):
+                longitude = analytic_solar.solar_longitude(jd)
+                model = analytic_solar.MODEL_ID
+            else:
+                raise EphemerisSourceError("solar_native_unavailable")
         else:
             longitude = float(result[0] % 360.0)
         if refining:
             models.add(model)
-            if native_result is not None and model in {"swieph", "jpl"}:
+            if native_result is not None and model in {"swieph", "jpl", "moshier"}:
                 retflags.add(flags)
             if len(models) != 1:
                 raise RuntimeError("Solar crossing mixed different ephemeris models")
@@ -772,6 +788,14 @@ def _solar_term_utc_via_swe(
                     {
                         "resolution_provider": de441_solar.PROVIDER,
                         "ephemeris_library_version": None,
+                        "ephemeris_retflags": (),
+                    }
+                )
+            elif models == {analytic_solar.MODEL_ID}:
+                provenance.update(
+                    {
+                        "resolution_provider": "fatebridge_analytic",
+                        "ephemeris_library_version": "fatebridge.analytic_solar/1.0.0",
                         "ephemeris_retflags": (),
                     }
                 )

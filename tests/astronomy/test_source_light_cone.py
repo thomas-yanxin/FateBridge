@@ -6,6 +6,7 @@ from fractions import Fraction
 
 import pytest
 
+from fatebridge.core.astro.de441_source import coefficient_files_available
 from fatebridge.core.astro.light_cone import LIGHT_SPEED_AU_DAY, solve_light_cone
 from fatebridge.utils.errors import EphemerisSourceError
 
@@ -99,6 +100,11 @@ def test_unbracketed_source_still_fails_after_the_original_twenty_steps() -> Non
     assert len(calls) == 20
 
 
+@pytest.mark.local_data
+@pytest.mark.skipif(
+    not coefficient_files_available(),
+    reason="requires optional DE441 coefficient chunks",
+)
 @pytest.mark.parametrize("offset", [-0.02, -0.01, 0.0, 0.01, 0.02])
 def test_real_j2000_source_refines_its_fine_clock_bracket(offset) -> None:
     from fatebridge.core.astro.analytic_observer import AnalyticObserver

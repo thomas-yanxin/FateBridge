@@ -28,8 +28,8 @@ PROFILES = [
     ("hour", None),
     ("hour", "key_hour_winter_jiazi_v1"),
 ]
-FALLBACK_PROVIDER = "jpl_de441"
-FALLBACK_MODEL = "fatebridge_de441_solar_v1"
+FALLBACK_PROVIDER = "swisseph"
+FALLBACK_MODEL = "moshier"
 
 
 @pytest.fixture(autouse=True)
@@ -37,6 +37,7 @@ def controlled_de441_fallback(monkeypatch, tmp_path):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
+    monkeypatch.delenv("FATEBRIDGE_DE441_DIR", raising=False)
 
 
 def options(mode, profile):

@@ -9,6 +9,7 @@ from fatebridge.core.aa1996_solar import MODEL_ID as AA1996_MODEL_ID
 from fatebridge.core.aa1996_solar import cache_key as aa1996_cache_key
 from fatebridge.core.aa1996_solar import source_receipt as aa1996_source_receipt
 from fatebridge.core.analytic_solar import MODEL_ID
+from fatebridge.core.astro import de441_source
 from fatebridge.core.de440_solar import EXTENDED_MODEL_ID
 from fatebridge.core.de440_solar import MODEL_ID as DE440_MODEL_ID
 from fatebridge.core.de440_solar import cache_key as de440_cache_key
@@ -87,6 +88,14 @@ def solar_context_input_years(year: int) -> tuple[int, int]:
     return VALIDATED_SOFTWARE_YEARS
 
 
+def _de441_fallback_cache_token() -> tuple[Any, ...]:
+    if de441_source.coefficient_files_available():
+        return (*CACHE_IDENTITY, os.getenv("FATEBRIDGE_DE441_DIR") or "bundled")
+    if de441_source.de441_dir_explicitly_configured():
+        return (*CACHE_IDENTITY, "explicit_missing", os.getenv("FATEBRIDGE_DE441_DIR"))
+    return ("moshier_or_analytic", MODEL_ID)
+
+
 def solar_model_cache_key(*, year: int | None = None) -> tuple[Any, ...]:
     # Keys bind immutable packaged source identities or configured native data.
     # The selected calculation verifies the bytes it uses.
@@ -108,7 +117,7 @@ def solar_model_cache_key(*, year: int | None = None) -> tuple[Any, ...]:
             return mode, "native_swiss_runtime"
         if configured_jpl_file() is not None:
             return mode, "native_strict_jpl"
-        return mode, "native_swiss_runtime", *CACHE_IDENTITY
+        return mode, "native_swiss_runtime", *_de441_fallback_cache_token()
     if mode == "auto" and configured_jpl_file() is not None:
         return mode, "native_strict_jpl"
     if (
@@ -123,7 +132,7 @@ def solar_model_cache_key(*, year: int | None = None) -> tuple[Any, ...]:
     if year is not None and mode in {"auto", "de440"} and not de440_selected(year):
         # Use the native source policy outside the packaged year grid.
         # Explicit de440 has already rejected an out-of-range year above.
-        return mode, "native_outside_packaged_years", *CACHE_IDENTITY
+        return mode, "native_outside_packaged_years", *_de441_fallback_cache_token()
     if mode == "vsop2013":
         if (
             year is not None

@@ -116,13 +116,14 @@ def test_real_file_to_bundled_source_switch_keeps_matching_pillars_and_windows(
         )
     else:
         pass
-    # Keep the original minute, now before both selected roots, and a fixed
-    # microsecond between them. These are consistency controls, not accuracy oracles.
+    # Keep the first instant before both roots and the second between Moshier
+    # (17:36:59.5 UTC) and SWIEPH (>17:37:00 UTC) so switching models without
+    # clearing caches must move the boundary.
     with TemporaryDirectory(prefix="bazi-model-switch-") as empty:
         for path, model, boundary_branch, boundary_start in [
-            (folder, "swieph", "丑", "小寒"),
-            (empty, "fatebridge_de441_solar_v1", "子", "大雪"),
-            (folder, "swieph", "丑", "小寒"),
+            (folder, "swieph", "子", "大雪"),
+            (empty, "moshier", "丑", "小寒"),
+            (folder, "swieph", "子", "大雪"),
         ]:
             select_provider(path)  # Intentionally no cache clearing here.
             term = next(
@@ -132,9 +133,9 @@ def test_real_file_to_bundled_source_switch_keeps_matching_pillars_and_windows(
             )
             assert term.ephemeris_model == model
             for birth, branch, start in [
-                (datetime(1904, 1, 6, 17, 37), "子", "大雪"),
+                (datetime(1904, 1, 6, 17, 36, 59), "子", "大雪"),
                 (
-                    datetime(1904, 1, 6, 17, 37, 1, 212232),
+                    datetime(1904, 1, 6, 17, 37, 0),
                     boundary_branch,
                     boundary_start,
                 ),
@@ -202,7 +203,7 @@ def test_all_ten_calendar_views_publish_actual_bundled_model_on_three_surfaces(
             context["bazi_month_boundary"]["start_term"],
             context["bazi_month_boundary"]["next_term"],
         ]:
-            assert term["resolution_provider"] == "jpl_de441"
-            assert term["ephemeris_model"] == "fatebridge_de441_solar_v1"
+            assert term["resolution_provider"] == "swisseph"
+            assert term["ephemeris_model"] == "moshier"
         assert result["run_metadata"]["engine_is_approximate"] is True
         assert "approximate_engine" in result["run_metadata"]["warnings"]

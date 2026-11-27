@@ -74,7 +74,7 @@ curl http://localhost:8011/health
 | `dependency_missing` | HTTP 503 | 缺少 `swisseph` 等运行时依赖（如西占推运、事件与生命周期工具或显式非整宫宫制），不回退近似轨道 |
 | `ephemeris_calculation_failed` | HTTP 503 | 原生星历计算异常；核对运行时环境、`SE_EPHE_PATH` 与输入有效范围 |
 | `ephemeris_source_inconsistent` | HTTP 503 | 太阳交节模型与 `FATEBRIDGE_JPL_FILE` 冲突、SPK/VSOP2013/AA1996 清单或字节不一致、或计算期间文件发生变化（`retryable=false`） |
-| `de441_archive_missing` | HTTP 503 | 缺少 DE441 连续行星系数分片；设置 `FATEBRIDGE_DE441_DIR` 指向对应版本分片目录后重启（`retryable=false`） |
+| `de441_archive_missing` | HTTP 503 | 显式设置了 `FATEBRIDGE_DE441_DIR`（或直接调用 DE441 系数接口）但目录下缺少 DE441 连续行星系数分片；补齐对应分片或取消 `FATEBRIDGE_DE441_DIR` 改用内置降级后重启（`retryable=false`） |
 | `fengshui_calculation_inconsistent` / `numerology_source_inconsistent` / `jyotish_calculation_inconsistent` | HTTP 503 | 领域内部计算或来源校验矛盾，不能靠改用户输入绕过，需保留输入与版本反馈维护者（`retryable=false`） |
 | `timeout` / `internal_error` | HTTP 504 / 500 | 服务端超时或未预期内部异常（`retryable=true`，可原参数有限重试并附诊断上下文） |
 | `usage_error` | CLI exit 2 | CLI 未知 flag、参数语法或 `--request-file` 读取错误（MCP 客户端注意 `raise_on_error=False` 读取结构化 `issues`） |

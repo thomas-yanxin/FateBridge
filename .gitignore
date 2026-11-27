@@ -40,6 +40,10 @@ uv.lock
 # fetch them per-checkout via `python -m fatebridge.fetch_ephe`.
 ephe/
 
+# Optional DE441 planetary coefficient chunks (~600 MB; excluded from Git and wheels).
+# Point FATEBRIDGE_DE441_DIR to an archive directory when using DE441 fallback explicitly.
+src/fatebridge/data/astronomy/de441-planetary-*-part-*.bin.gz
+
 # IDE
 .vscode/
 .idea/

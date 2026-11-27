@@ -88,6 +88,11 @@ def _parameters() -> Parameters:
     return result
 
 
+def de441_dir_explicitly_configured() -> bool:
+    """Return True when the caller explicitly configured FATEBRIDGE_DE441_DIR."""
+    return bool(os.getenv("FATEBRIDGE_DE441_DIR"))
+
+
 def coefficient_files_available() -> bool:
     """Check whether every coefficient chunk is present before loading any."""
     archive_dir = os.getenv("FATEBRIDGE_DE441_DIR")

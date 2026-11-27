@@ -52,7 +52,7 @@ export FATEBRIDGE_JPL_FILE=linux_m13000p17000.441
 
 ### `FATEBRIDGE_DE441_DIR` 系数分片
 
-Python 分发包（wheel / sdist）默认不包含约 600 MiB 的 `de441-planetary-*-part-*.bin.gz` 连续行星系数分片；源码检出直接读取 `src/fatebridge/data/astronomy/`。使用 wheel 或 sdist 且需要离线连续冥王星／DE441 系数时，需从对应版本源码归档提取分片并将 `FATEBRIDGE_DE441_DIR` 设为该目录的绝对路径；缺少所需分片时引擎返回不可自动重试的 `de441_archive_missing`。
+Git 仓库与 Python 分发包（wheel / sdist）均不包含约 600 MiB 的 `de441-planetary-*-part-*.bin.gz` 连续行星系数分片。默认未设置 `FATEBRIDGE_DE441_DIR` 且缺少外部 `.se1` 时，`native` 太阳交节与近似行星轨道会自动采用零体积内置降级路径（`pyswisseph` 内置 Moshier / `analytic_solar` / `astronomy-engine`）。若已单独下载分片归档并需要启用 DE441 连续行星／太阳系质心系数，请将 `FATEBRIDGE_DE441_DIR` 设为该目录的绝对路径；显式设置了 `FATEBRIDGE_DE441_DIR` 但目录下缺少所需分片时，引擎返回不可自动重试的 `de441_archive_missing`。
 
 ### `FATEBRIDGE_SOLAR_TERM_MODEL` 太阳交节模型
 

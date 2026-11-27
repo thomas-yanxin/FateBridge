@@ -15,7 +15,6 @@ from datetime import datetime
 import pytest
 
 from fatebridge.core.almanac import get_solar_terms_for_year
-from fatebridge.core.de441_solar import MODEL_ID, PROVIDER
 from fatebridge.core.ephemeris_runtime import preserve_ephemeris_path
 
 
@@ -25,10 +24,11 @@ def moshier_terms(tmp_path_factory):
         patch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
         patch.setenv("SE_EPHE_PATH", str(tmp_path_factory.mktemp("native-ephe")))
         patch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
+        patch.delenv("FATEBRIDGE_DE441_DIR", raising=False)
         terms = get_solar_terms_for_year(2026, "Asia/Hong_Kong")
         assert len(terms) == 24
-        assert {term.ephemeris_model for term in terms} == {MODEL_ID}
-        assert {term.resolution_provider for term in terms} == {PROVIDER}
+        assert {term.ephemeris_model for term in terms} == {"moshier"}
+        assert {term.resolution_provider for term in terms} == {"swisseph"}
         yield {term.name: term for term in terms}
 
 
