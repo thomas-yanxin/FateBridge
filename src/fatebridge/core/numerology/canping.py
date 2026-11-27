@@ -73,7 +73,6 @@ CYCLE_SET = frozenset(GANS[i % 10] + BRANCHES[i % 12] for i in range(60))
 DATA_ROOT = Path(__file__).resolve().parents[2] / "data/canping"
 INHERITED_PATH = DATA_ROOT / "canpingTiaowen.json"
 COLLATION_PATH = DATA_ROOT / "text-collation-v1.json"
-WITNESSES_PATH = DATA_ROOT / "text-witnesses-v1.json"
 KINDS = {"male": "upper_male", "female": "middle_female", "luck": "lower_shared_luck"}
 
 
@@ -84,7 +83,7 @@ class LegacyLuckStep(TypedDict):
     ageEnd: int
 
 
-@lru_cache(maxsize=3)
+@lru_cache(maxsize=2)
 def _loaded(path: Path) -> dict[str, Any]:
     try:
         data = json.loads(path.read_bytes())
@@ -200,78 +199,11 @@ def _collation() -> dict[str, Any]:
 
 
 @lru_cache(maxsize=1)
-def _witness_corpus() -> dict[str, Any]:
-    try:
-        data = _loaded(WITNESSES_PATH)
-        keys = [(e["element"], e["number"], e["kind"]) for e in data["entries"]]
-        unmatched = data.get("unmatched_observations", [])
-        if not isinstance(unmatched, list):
-            raise ValueError("参评未匹配原页观察须逐格登记。")
-        unmatched_keys = [(e["element"], e["number"], e["kind"]) for e in unmatched]
-        if len(unmatched_keys) != len(set(unmatched_keys)) or set(keys) & set(
-            unmatched_keys
-        ):
-            raise ValueError("参评未匹配观察不可重复或冒充已绑定对读格。")
-        for e in data["entries"] + unmatched:
-            if (
-                e["element"] not in {"水", "火", "木", "金", "土"}
-                or type(e["number"]) is not int
-                or e["kind"] not in KINDS
-                or not isinstance(e["text"], str)
-                or not e["pdf_pages"]
-                or any(type(p) is not int or p < 1 for p in e["pdf_pages"])
-                or e["body_pdf_page"] not in e["pdf_pages"]
-            ):
-                raise ValueError("参评对读须对应明确五行、编号、栏目与原页。")
-            notes = e.get("reading_uncertainties")
-            if ("□" in e["text"] and not notes) or (
-                notes
-                and (
-                    not isinstance(notes, list)
-                    or any(not isinstance(n, str) or not n for n in notes)
-                )
-            ):
-                raise ValueError("参评对读编辑方框须明确标为疑读。")
-            occurrence = e.get("source_occurrence_id")
-            header_page = e.get("header_pdf_page")
-            if (occurrence is not None or header_page is not None) and (
-                not isinstance(occurrence, str)
-                or not occurrence
-                or type(header_page) is not int
-                or header_page not in e["pdf_pages"]
-            ):
-                raise ValueError("参评原页条目身份须绑定实际编号所在页。")
-        grouped: dict[tuple[str, int, str], list[dict[str, Any]]] = {}
-        for key, entry in zip(keys, data["entries"]):
-            grouped.setdefault(key, []).append(entry)
-        for entries in grouped.values():
-            if len(entries) > 1:
-                occurrences = [e.get("source_occurrence_id") for e in entries]
-                if any(not isinstance(o, str) or not o for o in occurrences) or len(
-                    occurrences
-                ) != len(set(occurrences)):
-                    raise ValueError("参评对读格重复；同号原页须有不同的条目身份。")
-        if any(
-            e.get("matching_status")
-            != "unmatched_observation_not_assigned_to_a_computed_key"
-            or e.get("header_pdf_page") not in e["pdf_pages"]
-            or not isinstance(e.get("reason"), str)
-            or not e["reason"]
-            for e in unmatched
-        ):
-            raise ValueError("参评未匹配观察须保留实际编号、原页及未绑定原因。")
-        return data
-    except (OSError, KeyError, TypeError, ValueError) as exc:
-        raise NumerologySourceError("invalid_canping_witness_collation") from exc
-
-
-@lru_cache(maxsize=1)
 def _collation_index() -> tuple[
     dict[tuple[str, int], dict[str, Any]],
     dict[tuple[str, int], dict[str, Any]],
     dict[tuple[str, int], dict[str, Any]],
     dict[int, dict[str, Any]],
-    dict[tuple[str, int, str], list[dict[str, Any]]],
 ]:
     source = _collation()
     entries_by_key: dict[tuple[str, int], dict[str, Any]] = {}
@@ -287,86 +219,12 @@ def _collation_index() -> tuple[
     }
     unapplied_by_num = {n["printed_number"]: n for n in source["unapplied_notes"]}
 
-    witness_data = _witness_corpus()
-    witnesses_by_key: dict[tuple[str, int, str], list[dict[str, Any]]] = {}
-    for entry in witness_data["entries"]:
-        witnesses_by_key.setdefault(
-            (entry["element"], entry["number"], entry["kind"]), []
-        ).append(entry)
-    for entries in witnesses_by_key.values():
-        entries.sort(
-            key=lambda e: (
-                e.get("header_pdf_page", e["pdf_pages"][0]),
-                e["body_pdf_page"],
-                e.get("source_occurrence_id", ""),
-            )
-        )
     return (
         entries_by_key,
         retired_by_key,
         headers_by_key,
         unapplied_by_num,
-        witnesses_by_key,
     )
-
-
-def _comparisons(
-    element: str, number: int, kind: str, text: str, state: str, inherited_text: str
-) -> list[dict[str, Any]]:
-    witness_data = _witness_corpus()
-    _, _, _, _, witnesses_by_key = _collation_index()
-    entries = witnesses_by_key.get((element, number, kind), [])
-    if not entries:
-        return []
-    result = []
-    for entry in entries:
-        primary_uncertain = state == "source_reading_uncertain"
-        witness_uncertain = bool(entry.get("reading_uncertainties"))
-        relation = (
-            "both_readings_uncertain"
-            if primary_uncertain and witness_uncertain
-            else (
-                "selected_reading_uncertain"
-                if primary_uncertain
-                else (
-                    "witness_reading_uncertain"
-                    if witness_uncertain
-                    else "same_text" if text == entry["text"] else "different_text"
-                )
-            )
-        )
-        status = (
-            "source_reading_uncertain"
-            if witness_uncertain
-            else (
-                "source_printed_blank"
-                if not text_available(entry["text"])
-                else (
-                    "source_printed_partial_blank"
-                    if any(c in entry["text"] for c in "○〇")
-                    else "source_cell_visually_collated"
-                )
-            )
-        )
-        result.append(
-            {
-                **entry,
-                "source_corpus_id": witness_data["corpus_id"],
-                "text_status": status,
-                "relation": relation,
-                "replaces_selected_text": False,
-                "inherited_reading_matches": inherited_text == entry["text"],
-                **(
-                    {
-                        "number_occurrence_count": len(entries),
-                        "number_occurrence_ambiguous": True,
-                    }
-                    if len(entries) > 1
-                    else {}
-                ),
-            }
-        )
-    return result
 
 
 def lookup_record(
@@ -391,7 +249,6 @@ def lookup_record(
         retired_by_key,
         headers_by_key,
         unapplied_by_num,
-        _,
     ) = _collation_index()
     inherited_parts = _loaded(INHERITED_PATH)["parts"][element]
     row = inherited_parts.get(str(number))
@@ -491,16 +348,6 @@ def lookup_record(
                 k: note[k]
                 for k in ("printed_number", "pdf_page", "status", "applied_to_lookup")
             }
-        comparisons = _comparisons(
-            element,
-            number,
-            kind,
-            text,
-            selection["cell_status"],
-            (row or {}).get(kind, ""),
-        )
-        if comparisons:
-            selection["witnesses"] = comparisons
     if not include_witnesses:
         compact_sel: dict[str, Any] = {
             "kind": kind,

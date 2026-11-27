@@ -425,9 +425,6 @@ def _build_weather_one(
             "matched_rule_ids": [row["rule_id"] for row in matched],
             "pending_rule_ids": pending,
             "single_forecast": None,
-            "research_validation": deepcopy(
-                load_meihua_json("weather-research-validation-v1.json")
-            ),
         },
         "evidence_scope": {"classical_coverage": "selected_weather_clauses_only"},
         "comprehensive_judgement": summary,

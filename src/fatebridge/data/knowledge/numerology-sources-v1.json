@@ -95,12 +95,6 @@
       "source_kind": "existing_partial_source_record"
     },
     {
-      "domain": "canping",
-      "key": "text_witnesses",
-      "source_path": "canping/text-witnesses-v1.json",
-      "source_kind": "existing_partial_source_record"
-    },
-    {
       "domain": "heluo",
       "key": "pillar_links",
       "source_path": "numerology/pillar-links-v1.json",

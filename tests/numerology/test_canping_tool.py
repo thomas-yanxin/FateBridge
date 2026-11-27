@@ -5,9 +5,11 @@ from __future__ import annotations
 from fatebridge.core.numerology.canping import (
     calculate,
     compute_number,
+    lookup_record,
     nayin_element,
 )
 from fatebridge.services.divination import calculate_canping_analysis
+from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.utils.data import get_nayin
 
 # horosa NAYIN_PAIRS (canpingLocal.js:18-29): (ganzhi_a, ganzhi_b, element).
@@ -104,6 +106,7 @@ def test_canping_fixed_pillars_keep_numbers_columns_and_readings() -> None:
     )
     assert natal["verses"]["selectionNi"]["column"] == "upper_male"
     assert natal["verses"]["selectionNi"]["source_pdf_page"] == 103
+    assert "witnesses" not in natal["verses"]["selectionNi"]
     luck = result["dayun"]
     # National Archives of Japan, 305-0271, volume 6. The Earth luck cells
     # are identified by their number and PDF page. Three forward rows are absent locally.
@@ -183,3 +186,12 @@ def test_canping_gu_method_uses_day_branch() -> None:
     # 古法日宫支 = 八字日支; 明法用月支反向 (寅→亥), so the two diverge.
     assert gu["dayPalaceBranch"] == "巳"
     assert ming["dayPalaceBranch"] == "亥"
+
+
+def test_canping_lookup_and_knowledge_read_omit_witnesses() -> None:
+    record = lookup_record("水", 2231, "male")
+    assert record["text"] == "月在清波底，維舟向柳邊。"
+    assert "witnesses" not in record["selection"]
+    knowledge = calculate_knowledge_read(domain="canping", key="水.2231.male")
+    assert knowledge["key"] == "水.2231.male"
+    assert "月在清波底" in knowledge["rendered_text"]
