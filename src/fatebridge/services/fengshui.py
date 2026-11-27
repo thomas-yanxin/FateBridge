@@ -1,23 +1,14 @@
-"""Feng Shui services: clean multi-layer structural calculation and source composition."""
+"""Feng Shui services: clean multi-layer structural calculation and composition."""
 
 from __future__ import annotations
 
 from itertools import combinations
 from typing import Any
 
-from pydantic import JsonValue
-
 from fatebridge.core.fengshui.assess import analyze_layout
 from fatebridge.core.fengshui.bazhai import bazhai, minggua
-from fatebridge.core.fengshui.directions import (
-    bearing_context,
-    provenance,
-    raw_rule_data,
-)
-from fatebridge.core.fengshui.geomagnetic import (
-    geomagnetic_provenance,
-    geomagnetic_reference,
-)
+from fatebridge.core.fengshui.directions import bearing_context, raw_rule_data
+from fatebridge.core.fengshui.geomagnetic import geomagnetic_reference
 from fatebridge.core.fengshui.jinsuo import jinsuo
 from fatebridge.core.fengshui.models import (
     AnnualRequest,
@@ -30,97 +21,12 @@ from fatebridge.core.fengshui.models import (
     Placement,
     XuankongRequest,
 )
-from fatebridge.core.fengshui.xuankong import (
-    analyze_natal_interpretation,
-    interpretation_provenance,
-    natal_provenance,
-    xuankong_natal,
-)
+from fatebridge.core.fengshui.xuankong import analyze_natal_interpretation, xuankong_natal
 from fatebridge.core.fengshui.zibai import (
     annual_stars,
     build_palace_overlay,
     monthly_stars,
 )
-
-_BIBLIOGRAPHY_FIELDS = (
-    "title",
-    "url",
-    "kind",
-    "author",
-    "author_identity_url",
-    "edition",
-    "isbn",
-)
-_CITATION_FIELDS = (
-    "source_version",
-    "published",
-    "retrieved_at",
-    "locator",
-    "pages",
-    "scope",
-    "evidence_excerpt",
-    "boundary",
-    "source_disagreements",
-    "verification_note",
-)
-
-
-def _layer(result: dict[str, Any], ruleset_id: str) -> dict[str, Any]:
-    return {**result, "ruleset": provenance(ruleset_id)}
-
-
-def _collect_sources(result: dict[str, Any]) -> None:
-    """Register bibliographic facts once in source_catalog and keep per-ruleset citations."""
-    catalog: dict[str, dict[str, JsonValue]] = {}
-    registered_sources = {
-        record["ruleset_id"]: record.get("sources") for record in result["rulesets"]
-    }
-
-    def visit(value: Any, *, registry_record: bool = False) -> Any:
-        if isinstance(value, list):
-            return [visit(row) for row in value]
-        if not isinstance(value, dict):
-            return value
-        shaped = {name: visit(child) for name, child in value.items()}
-        if "ruleset_id" in value and "sources" in value:
-            sources = value["sources"]
-            ruleset_id = value["ruleset_id"]
-            assert isinstance(sources, list) and isinstance(ruleset_id, str)
-            shaped.pop("sources")
-            if not registry_record and sources == registered_sources.get(ruleset_id):
-                return shaped
-            citations: dict[str, JsonValue] = {}
-            for source in sources:
-                assert isinstance(source, dict)
-                source_id = source["source_id"]
-                assert isinstance(source_id, str)
-                catalog.setdefault(source_id, {}).update(
-                    {key: source[key] for key in _BIBLIOGRAPHY_FIELDS if key in source}
-                )
-                citations[source_id] = {
-                    key: source[key] for key in _CITATION_FIELDS if key in source
-                }
-            if citations:
-                shaped["source_citations"] = citations
-        return shaped
-
-    result["rulesets"] = [
-        visit(record, registry_record=True) for record in result["rulesets"]
-    ]
-    for name in list(result):
-        if name != "rulesets":
-            result[name] = visit(result[name])
-    result["source_catalog"] = catalog
-
-
-def _trace_entry(method: str, record: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "method": method,
-        "ruleset_id": record["ruleset_id"],
-        "version": record["version"],
-        "source_ids": record["source_ids"],
-        "scope": record["scope"],
-    }
 
 
 def compose_fengshui_result(
@@ -133,11 +39,6 @@ def compose_fengshui_result(
     status = "partial" if missing else "complete"
     summary = "；".join(f"{name}: {layer['status']}" for name, layer in layers.items())
     natal_selected = "xuankong_natal" in layers
-
-    rulesets = [layer["ruleset"] for layer in layers.values()]
-    rule_trace = [
-        _trace_entry(name, layer["ruleset"]) for name, layer in layers.items()
-    ]
 
     coverage: dict[str, Any] = {
         "implemented_layers": list(layers),
@@ -169,10 +70,8 @@ def compose_fengshui_result(
         ),
         "status": status,
         "layers": layers,
-        "rulesets": rulesets,
         "coverage": coverage,
         "conflicts": conflicts,
-        "rule_trace": rule_trace,
         "summary": summary,
     }
     if palace_overlay is not None:
@@ -192,19 +91,6 @@ def compose_fengshui_result(
 
     interpretation = layers.get("xuankong_natal", {}).get("interpretation")
     if interpretation is not None:
-        interp_prov = interpretation_provenance()
-        rulesets.append(interp_prov)
-        rule_trace.append(_trace_entry("xuankong_interpretation", interp_prov))
-        for key, trace_name in (
-            ("timeliness_ruleset", "wang_timeliness"),
-            ("host_guest_analysis", "host_guest"),
-            ("fixed_lingzheng_analysis", "fixed_lingzheng"),
-        ):
-            sub = interpretation.get(key)
-            if sub is not None:
-                rec = sub if key == "timeliness_ruleset" else sub["ruleset"]
-                rulesets.append(rec)
-                rule_trace.append(_trace_entry(trace_name, rec))
         coverage["natal_interpretation_status"] = interpretation["status"]
         coverage["requested_analysis_status"] = (
             "partial"
@@ -216,9 +102,6 @@ def compose_fengshui_result(
     city_gate = layers.get("xuankong_natal", {}).get("city_gate_analysis")
     if city_gate is not None:
         result["summary"] += f"；city_gate: {city_gate['status']}"
-        rec = city_gate["ruleset"]
-        rulesets.append(rec)
-        rule_trace.append(_trace_entry("city_gate", rec))
         coverage["city_gate_status"] = city_gate["status"]
         coverage["requested_analysis_status"] = (
             "partial"
@@ -227,13 +110,6 @@ def compose_fengshui_result(
             else "complete"
         )
 
-    geomagnetic = layers.get("directions", {}).get("geomagnetic_reference")
-    if geomagnetic is not None:
-        rec = geomagnetic_provenance(geomagnetic["selected_model_id"])
-        rulesets.append(rec)
-        rule_trace.append(_trace_entry("geomagnetic", rec))
-
-    _collect_sources(result)
     return result
 
 
@@ -254,32 +130,24 @@ def calculate_directions(request: DirectionsRequest) -> dict[str, Any]:
             request.bearing_degrees,
             request.north_reference,
         )
-    return compose_fengshui_result(
-        {"directions": _layer(result, request.ruleset_id)}, []
-    )
+    return compose_fengshui_result({"directions": result}, [])
 
 
 def calculate_minggua(request: MingguaRequest) -> dict[str, Any]:
-    return compose_fengshui_result(
-        {"minggua": _layer(minggua(request), request.ruleset_id)}, []
-    )
+    return compose_fengshui_result({"minggua": minggua(request)}, [])
 
 
 def calculate_bazhai(request: BazhaiRequest) -> dict[str, Any]:
-    layer = _layer(bazhai(request), request.ruleset_id)
+    layer = bazhai(request)
     return compose_fengshui_result({"bazhai": layer}, _differences({"bazhai": layer}))
 
 
 def calculate_jinsuo(request: JinsuoRequest) -> dict[str, Any]:
-    return compose_fengshui_result(
-        {"jinsuo": _layer(jinsuo(request), request.ruleset_id)}, []
-    )
+    return compose_fengshui_result({"jinsuo": jinsuo(request)}, [])
 
 
 def calculate_annual_stars(request: AnnualRequest) -> dict[str, Any]:
-    return compose_fengshui_result(
-        {"annual_stars": _layer(annual_stars(request), request.ruleset_id)}, []
-    )
+    return compose_fengshui_result({"annual_stars": annual_stars(request)}, [])
 
 
 def calculate_monthly_stars(request: MonthlyRequest) -> dict[str, Any]:
@@ -289,7 +157,7 @@ def calculate_monthly_stars(request: MonthlyRequest) -> dict[str, Any]:
 def _natal_layer(
     request: XuankongRequest, placements: list[Placement] | None = None
 ) -> dict[str, Any]:
-    layer = {**xuankong_natal(request), "ruleset": natal_provenance()}
+    layer = xuankong_natal(request)
     if request.interpretation is not None:
         layer["interpretation"] = analyze_natal_interpretation(
             request.interpretation, layer, placements or []
@@ -346,29 +214,23 @@ def _differences(layers: dict[str, Any]) -> list[dict[str, Any]]:
 def calculate_fengshui_assessment(request: AssessRequest) -> dict[str, Any]:
     layers: dict[str, Any] = {}
     if "bazhai" in request.selected_methods:
-        layers["bazhai"] = _layer(bazhai(request), request.ruleset_id)
+        layers["bazhai"] = bazhai(request)
     if "jinsuo" in request.selected_methods:
-        layers["jinsuo"] = _layer(
-            jinsuo(
-                JinsuoRequest(
-                    features=request.features, ruleset_id=request.jinsuo_ruleset_id
-                )
-            ),
-            request.jinsuo_ruleset_id,
+        layers["jinsuo"] = jinsuo(
+            JinsuoRequest(
+                features=request.features, ruleset_id=request.jinsuo_ruleset_id
+            )
         )
     if "annual_stars" in request.selected_methods:
-        layers["annual_stars"] = _layer(
-            annual_stars(
-                AnnualRequest(
-                    effective_year=request.effective_year,
-                    query_at=(
-                        None if request.effective_year is not None else request.query_at
-                    ),
-                    timezone_name=request.timezone_name,
-                    ruleset_id=request.annual_ruleset_id,
-                )
-            ),
-            request.annual_ruleset_id,
+        layers["annual_stars"] = annual_stars(
+            AnnualRequest(
+                effective_year=request.effective_year,
+                query_at=(
+                    None if request.effective_year is not None else request.query_at
+                ),
+                timezone_name=request.timezone_name,
+                ruleset_id=request.annual_ruleset_id,
+            )
         )
     if "xuankong_natal" in request.selected_methods:
         if request.xuankong is None:

@@ -39,7 +39,7 @@ def profile(tmp_path, monkeypatch):
 
 
 def test_profile_covers_actual_supported_house_period_extrema() -> None:
-    schema = HousePeriod.model_json_schema()["properties"]["effective_event_year"]
+    schema = HousePeriod.model_json_schema()["properties"]["event_year"]
     integer = next(row for row in schema["anyOf"] if row["type"] == "integer")
     minimum, maximum = integer["minimum"], integer["maximum"]
     assert 1864 + (minimum - 1864) // 20 * 20 == install.FENGSHUI_FIRST_BOUNDARY_YEAR

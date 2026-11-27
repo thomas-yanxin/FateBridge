@@ -57,12 +57,12 @@ def test_used_calendar_fallback_reaches_outer_receipt_even_away_from_boundary(
     if kind == "annual":
         result = calculate_annual_stars(effective_year=2026)
     elif kind == "birth_date":
-        result = calculate_minggua(birth_date="2000-07-01", gender_convention="male")
+        result = calculate_minggua(birth_date="2000-07-01", gender="male")
     else:
         request = payload("xuankong_natal")
         request["period"] = {
             "basis": "construction_completion",
-            "effective_event_year": 2004,
+            "event_year": 2004,
             "evidence": "fixture only",
         }
         result = calculate_xuankong_natal(**request)
@@ -85,7 +85,7 @@ def test_no_false_degradation_from_unused_solver_or_statistical_uncertainty(
     monkeypatch.setattr(
         calendar, "lichun_resolution", lambda *a: pytest.fail("unused solver called")
     )
-    result = calculate_minggua(effective_birth_year=2000, gender_convention="male")
+    result = calculate_minggua(birth_year=2000, gender="male")
     assert (
         attach_run_metadata(
             result,

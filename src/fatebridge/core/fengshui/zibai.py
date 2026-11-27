@@ -83,22 +83,6 @@ def _monthly_bundle() -> dict[str, Any]:
     return cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
-def monthly_provenance() -> dict[str, Any]:
-    data = _monthly_bundle()
-    ruleset = data["ruleset"]
-    sources = data["sources"]
-    return {
-        "ruleset_id": ruleset["ruleset_id"],
-        "version": ruleset["version"],
-        "method": ruleset["method"],
-        "source_ids": list(ruleset["source_ids"]),
-        "scope": ruleset["scope"],
-        "conventions": list(ruleset["conventions"]),
-        "bundle_version": data["bundle_version"],
-        "sources": [{"source_id": k, **sources[k]} for k in ruleset["source_ids"]],
-    }
-
-
 def _fly_palaces(center: int, star_key: str, number_key: str) -> dict[str, Any]:
     directions = raw_rule_data("directions")
     stars = raw_rule_data("annual_stars")
@@ -244,7 +228,6 @@ def monthly_stars(req: MonthlyRequest) -> dict[str, Any]:
         "status": "complete" if complete else "partial",
         "time_context": time,
         "palaces": {},
-        "ruleset": monthly_provenance(),
         "missing_inputs": (
             [
                 (

@@ -246,7 +246,7 @@ def test_natal_interpretation_timeliness_host_guest_and_lingzheng() -> None:
         natal,
         [Placement(object_id="bed", purpose="bed", location_direction="N")],
     )
-    assert interp["timeliness_ruleset"]["ruleset_id"] == "wang_zhongzhou_timeliness_v1"
+    assert interp["timeliness_ruleset_id"] == "wang_zhongzhou_timeliness_v1"
     assert interp["host_guest_analysis"]["status"] == "computed_relations"
     assert interp["fixed_lingzheng_analysis"]["candidates"][0]["zheng_direction"] == "S"
     assert interp["fixed_lingzheng_analysis"]["candidates"][0]["ling_direction"] == "N"

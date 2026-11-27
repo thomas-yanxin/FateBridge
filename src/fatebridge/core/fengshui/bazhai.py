@@ -14,6 +14,7 @@ from fatebridge.core.fengshui.calendar import (
 from fatebridge.core.fengshui.directions import (
     raw_rule_data,
     sitting_from_facing,
+    sitting_from_mountain,
     sitting_support,
     wrap9,
 )
@@ -199,7 +200,7 @@ def yangzhai_sanyao(
 
 def minggua(req: MingguaRequest, subject_id: str = "occupant") -> dict[str, Any]:
     time = year_context(
-        req.effective_birth_year,
+        req.birth_year,
         req.birth_at,
         req.timezone_name,
         req.year_boundary,
@@ -207,13 +208,13 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> dict[str, Any]
     )
     year = time["effective_year"]
     missing = []
-    required_year_input = "birth_at_or_effective_birth_year"
+    required_year_input = "birth_at_or_birth_year"
     if time.get("effective_year_status") == "requires_confirmation":
         year = None
         required_year_input = (
-            "confirmed_effective_birth_year_due_to_undefined_local_clock"
+            "confirmed_birth_year_due_to_undefined_local_clock"
             if req.year_boundary == "january_1"
-            else "confirmed_effective_birth_year_due_to_boundary_precision"
+            else "confirmed_birth_year_due_to_boundary_precision"
         )
     if req.birth_date is not None:
         day = req.birth_date
@@ -259,26 +260,20 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> dict[str, Any]
                 }
         if unresolved_boundary_date:
             time["effective_year_status"] = "requires_confirmation"
-            required_year_input = (
-                "confirmed_effective_birth_year_due_to_undefined_local_clock"
-            )
+            required_year_input = "confirmed_birth_year_due_to_undefined_local_clock"
         elif uncertain_boundary:
-            required_year_input = (
-                "confirmed_effective_birth_year_due_to_boundary_precision"
-            )
+            required_year_input = "confirmed_birth_year_due_to_boundary_precision"
         else:
             required_year_input = "birth_at_on_year_boundary"
     if year is None:
         missing.append(f"occupants.{subject_id}.{required_year_input}")
-    if req.gender_convention is None:
-        missing.append(f"occupants.{subject_id}.gender_convention")
+    if req.gender is None:
+        missing.append(f"occupants.{subject_id}.gender")
 
     candidates: list[dict[str, Any]] = []
     if year is not None:
         directions = raw_rule_data("directions")
-        for convention in (
-            [req.gender_convention] if req.gender_convention else ["male", "female"]
-        ):
+        for convention in [req.gender] if req.gender else ["male", "female"]:
             raw = wrap9(
                 1 - (year - 1864) if convention == "male" else 5 + (year - 1864)
             )
@@ -290,7 +285,7 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> dict[str, Any]
             )
             candidates.append(
                 {
-                    "gender_convention": convention,
+                    "gender": convention,
                     "raw_number": raw,
                     "palace_number": number,
                     "substitution": raw == 5,
@@ -377,6 +372,10 @@ def bazhai(req: BazhaiRequest) -> dict[str, Any]:
             else:
                 sitting = bearing["trigram"]
                 data["sitting_bearing"] = bearing
+        elif data.get("facing_mountain") is not None:
+            bearing = sitting_from_mountain(data["facing_mountain"])
+            sitting = bearing["trigram"]
+            data["sitting_bearing"] = bearing
         if sitting is not None and not house_candidates:
             house = {
                 **data,
@@ -386,7 +385,7 @@ def bazhai(req: BazhaiRequest) -> dict[str, Any]:
     if house is None and not house_candidates:
         missing.append("house.sitting_trigram_or_confirmed_facing")
 
-    occupants = [minggua(o, o.subject_id) for o in req.occupants]
+    occupants = [minggua(o, o.subject_id or "occupant") for o in req.occupants]
     for o in occupants:
         missing.extend(o["missing_inputs"])
     if not occupants:
@@ -394,6 +393,7 @@ def bazhai(req: BazhaiRequest) -> dict[str, Any]:
 
     findings = []
     for placement in req.placements:
+        assert placement.object_id is not None
         if placement.location_direction is None:
             missing.append(f"placements.{placement.object_id}.location_direction")
         bases = []
@@ -421,7 +421,7 @@ def bazhai(req: BazhaiRequest) -> dict[str, Any]:
                             o["subject_id"],
                             "occupant",
                             c["sectors"],
-                            c["gender_convention"],
+                            c["gender"],
                             {},
                             o["status"] == "partial",
                         )
@@ -436,11 +436,7 @@ def bazhai(req: BazhaiRequest) -> dict[str, Any]:
                 finding: dict[str, Any] = {
                     "subject_id": subject_id,
                     "subject_kind": basis,
-                    **(
-                        {"gender_convention": convention}
-                        if convention is not None
-                        else {}
-                    ),
+                    **({"gender": convention} if convention is not None else {}),
                     **cand_ctx,
                     "object_id": placement.object_id,
                     "purpose": placement.purpose,

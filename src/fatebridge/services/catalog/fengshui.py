@@ -19,28 +19,12 @@ def _load_fengshui_model(model_name: str) -> type[BaseModel]:
     return model
 
 
-def _compact_rulesets(result: ServiceResult) -> list[ServiceResult]:
-    fields = {"ruleset_id", "version", "method", "source_ids"}
-    return [
-        {key: value for key, value in ruleset.items() if key in fields}
-        for ruleset in result["rulesets"]
-    ]
-
-
-def _compact_sources(result: ServiceResult) -> ServiceResult:
-    return {
-        source_id: {"title": source["title"]}
-        for source_id, source in result.get("source_catalog", {}).items()
-        if "title" in source
-    }
-
-
 def _compact_directions(result: ServiceResult) -> ServiceResult:
     layer = result["layers"]["directions"]
     compact_layer = {
         key: value
         for key, value in layer.items()
-        if key not in {"ruleset", "directions"}
+        if key != "directions"
     }
     compact_layer["directions"] = {
         d: {
@@ -52,45 +36,49 @@ def _compact_directions(result: ServiceResult) -> ServiceResult:
     }
     return {
         **result,
-        "rulesets": _compact_rulesets(result),
-        "source_catalog": _compact_sources(result),
         "layers": {"directions": compact_layer},
     }
 
 
 def _compact_bazhai_chart(chart: ServiceResult) -> ServiceResult:
-    return {
-        **{
-            key: value
-            for key, value in chart.items()
-            if key not in {"bearing_support", "sectors", "sitting_bearing"}
-        },
-        "sectors": {
-            direction: f"{palace['star']['name']}({palace['star']['polarity'][0]})"
-            for direction, palace in chart["sectors"].items()
-        },
+    keep = {
+        "sitting_trigram",
+        "facing_degrees",
+        "facing_mountain",
+        "candidate_id",
+        "candidate_only",
+        "gender",
+        "palace_number",
+        "trigram",
+        "group",
     }
+    out: ServiceResult = {
+        key: value
+        for key, value in chart.items()
+        if key in keep and value is not None
+    }
+    out["sectors"] = {
+        direction: palace["star"]["name"]
+        for direction, palace in chart["sectors"].items()
+    }
+    return out
 
 
 def _compact_personal_chart(person: ServiceResult) -> ServiceResult:
-    return {
+    out: ServiceResult = {
         "status": person["status"],
         "subject_id": person["subject_id"],
         "effective_year": person["time_context"].get("effective_year"),
         "candidates": [_compact_bazhai_chart(chart) for chart in person["candidates"]],
-        **(
-            {"missing_inputs": person["missing_inputs"]}
-            if person["missing_inputs"]
-            else {}
-        ),
     }
+    if person.get("missing_inputs"):
+        out["missing_inputs"] = person["missing_inputs"]
+    return out
 
 
 def _compact_minggua(result: ServiceResult) -> ServiceResult:
     return {
         **result,
-        "rulesets": _compact_rulesets(result),
-        "source_catalog": _compact_sources(result),
         "layers": {"minggua": _compact_personal_chart(result["layers"]["minggua"])},
     }
 
@@ -98,15 +86,11 @@ def _compact_minggua(result: ServiceResult) -> ServiceResult:
 def _compact_bazhai(result: ServiceResult) -> ServiceResult:
     layer = result["layers"]["bazhai"]
     house = layer["house"]
-    compact_layer = {
-        key: value
-        for key, value in layer.items()
-        if key not in {"ruleset", "yangzhai_sanyao", "missing_inputs"}
-    }
-    compact_layer.update(
-        house=_compact_bazhai_chart(house) if house is not None else None,
-        occupants=[_compact_personal_chart(person) for person in layer["occupants"]],
-        placement_findings=[
+    compact_layer: ServiceResult = {
+        "status": layer["status"],
+        "house": _compact_bazhai_chart(house) if house is not None else None,
+        "occupants": [_compact_personal_chart(person) for person in layer["occupants"]],
+        "placement_findings": [
             {
                 "target": f"{f['subject_id']}.{f['object_id']}.{f['aspect']}",
                 "direction": f["direction"],
@@ -115,7 +99,7 @@ def _compact_bazhai(result: ServiceResult) -> ServiceResult:
             }
             for f in layer["placement_findings"]
         ],
-    )
+    }
     if layer.get("missing_inputs"):
         compact_layer["missing_inputs"] = layer["missing_inputs"]
     if "yangzhai_sanyao" in layer:
@@ -134,27 +118,41 @@ def _compact_bazhai(result: ServiceResult) -> ServiceResult:
         ]
     return {
         **result,
-        "rulesets": _compact_rulesets(result),
-        "source_catalog": _compact_sources(result),
         "layers": {"bazhai": compact_layer},
     }
 
 
+def _compact_feature_finding(f: ServiceResult) -> ServiceResult:
+    out: ServiceResult = {
+        "object_id": f["object_id"],
+        "direction": f["direction"],
+        "classification": f["classification"],
+        "preferred": f["preferred_classification"],
+        "finding": f["finding"],
+    }
+    if f.get("mountain") is not None:
+        out["mountain"] = f["mountain"]
+    if "target_classification" in f and f["target_classification"] is not None:
+        out["target"] = f["target_classification"]
+    return out
+
+
 def _compact_jinsuo(result: ServiceResult) -> ServiceResult:
     layer = result["layers"]["jinsuo"]
-    compact_layer = {
+    compact_layer: ServiceResult = {
         "status": layer["status"],
         "preferences": {
             d: info["preferred_classification"]
             for d, info in layer["preferences"].items()
         },
-        "feature_findings": layer["feature_findings"],
-        "missing_inputs": layer["missing_inputs"],
+        "feature_findings": [
+            _compact_feature_finding(f) for f in layer["feature_findings"]
+        ],
     }
+    if layer.get("missing_inputs"):
+        compact_layer["missing_inputs"] = layer["missing_inputs"]
     return {
         **result,
-        "rulesets": _compact_rulesets(result),
-        "source_catalog": _compact_sources(result),
         "layers": {"jinsuo": compact_layer},
     }
 
@@ -164,8 +162,18 @@ def _compact_zibai(layer_name: str, result: ServiceResult) -> ServiceResult:
     compact_layer = {
         key: value
         for key, value in layer.items()
-        if key not in {"ruleset", "time_context", "daily_stars", "hourly_stars"}
+        if key
+        not in {
+            "time_context",
+            "daily_stars",
+            "hourly_stars",
+            "flight_path",
+            "annual_afflictions",
+            "missing_inputs",
+        }
     }
+    if layer.get("missing_inputs"):
+        compact_layer["missing_inputs"] = layer["missing_inputs"]
     if "palaces" in compact_layer:
         star_num_key = (
             "annual_star_number"
@@ -174,8 +182,18 @@ def _compact_zibai(layer_name: str, result: ServiceResult) -> ServiceResult:
         )
         star_key = "annual_star" if layer_name == "annual_stars" else "monthly_star"
         compact_layer["palaces"] = {
-            d: {star_num_key: p[star_num_key], star_key: p[star_key]}
+            d: f"{p[star_num_key]}{p[star_key]['name'][2:]}/{p[star_key]['element']}"
             for d, p in compact_layer["palaces"].items()
+        }
+    if "annual_afflictions" in layer:
+        aff = layer["annual_afflictions"]
+        compact_layer["annual_afflictions"] = {
+            "year_branch": aff["year_branch"],
+            "taisui": aff["taisui"]["direction"],
+            "suipo": aff["suipo"]["direction"],
+            "sansha": aff["sansha"]["direction"],
+            "wuhuang": aff["wuhuang"]["direction"],
+            "erhei": aff["erhei"]["direction"],
         }
     if "daily_stars" in layer:
         ds = layer["daily_stars"]
@@ -193,8 +211,6 @@ def _compact_zibai(layer_name: str, result: ServiceResult) -> ServiceResult:
         }
     return {
         **result,
-        "rulesets": _compact_rulesets(result),
-        "source_catalog": _compact_sources(result),
         "layers": {layer_name: compact_layer},
     }
 
@@ -210,23 +226,6 @@ def _compact_xuankong(result: ServiceResult) -> ServiceResult:
         "resolution_status",
         "candidate_effective_event_years",
         "candidate_period_numbers",
-    }
-    chart_fields = {
-        "candidate_id",
-        "period_number",
-        "facing",
-        "sitting",
-        "chart_mode",
-        "mode_reason",
-        "facing_subband",
-        "adjacent_mountain",
-        "kongwang",
-    }
-    palace_fields = {
-        "period_star_number",
-        "mountain_star_number",
-        "facing_star_number",
-        "palace_number",
     }
 
     def chart_view(chart: ServiceResult) -> ServiceResult:
@@ -312,8 +311,6 @@ def _compact_xuankong(result: ServiceResult) -> ServiceResult:
         }
     return {
         **result,
-        "rulesets": _compact_rulesets(result),
-        "source_catalog": _compact_sources(result),
         "layers": {"xuankong_natal": natal},
     }
 
@@ -323,36 +320,41 @@ def _compact_assessment(result: ServiceResult) -> ServiceResult:
     compact_layers = {}
     for name, layer in result["layers"].items():
         if name == "bazhai":
-            compact_layers[name] = _compact_bazhai(
-                {"layers": {"bazhai": layer}, "rulesets": []}
-            )["layers"]["bazhai"]
+            bz = _compact_bazhai({"layers": {"bazhai": layer}})["layers"]["bazhai"]
+            if layout is not None:
+                bz.pop("placement_findings", None)
+            compact_layers[name] = bz
         elif name == "jinsuo":
-            compact_layers[name] = _compact_jinsuo(
-                {"layers": {"jinsuo": layer}, "rulesets": []}
-            )["layers"]["jinsuo"]
+            js = _compact_jinsuo({"layers": {"jinsuo": layer}})["layers"]["jinsuo"]
+            if layout is not None:
+                js.pop("feature_findings", None)
+            compact_layers[name] = js
         elif name in {"annual_stars", "monthly_stars"}:
-            compact_layers[name] = _compact_zibai(
-                name, {"layers": {name: layer}, "rulesets": []}
-            )["layers"][name]
+            zb = _compact_zibai(name, {"layers": {name: layer}})["layers"][name]
+            if "palace_overlay" in result:
+                zb.pop("palaces", None)
+            compact_layers[name] = zb
         elif name == "xuankong_natal":
             compact_layers[name] = _compact_xuankong(
-                {"layers": {"xuankong_natal": layer}, "rulesets": []}
+                {"layers": {"xuankong_natal": layer}}
             )["layers"]["xuankong_natal"]
         else:
-            compact_layers[name] = {k: v for k, v in layer.items() if k != "ruleset"}
+            compact_layers[name] = dict(layer)
     out: ServiceResult = {
-        **result,
+        "status": result["status"],
         "layers": compact_layers,
-        "rulesets": _compact_rulesets(result),
-        "source_catalog": _compact_sources(result),
     }
+    if "palace_overlay" in result:
+        out["palace_overlay"] = result["palace_overlay"]
     if layout is not None:
         out["layout_analysis"] = {
             "status": layout["status"],
             "calculation_scope": layout["calculation_scope"],
             "placement_findings": [
                 {
-                    k: (v["name"] if k == "star" and isinstance(v, dict) else v)
+                    ("ok" if k == "matches_convention" else k): (
+                        v["name"] if k == "star" and isinstance(v, dict) else v
+                    )
                     for k, v in f.items()
                     if k
                     in {
@@ -369,7 +371,12 @@ def _compact_assessment(result: ServiceResult) -> ServiceResult:
                 for f in layout["placement_findings"]
             ],
             **(
-                {"environment_adjustments": layout["environment_adjustments"]}
+                {
+                    "environment_adjustments": [
+                        _compact_feature_finding(e)
+                        for e in layout["environment_adjustments"]
+                    ]
+                }
                 if layout["environment_adjustments"]
                 else {}
             ),
@@ -379,7 +386,9 @@ def _compact_assessment(result: ServiceResult) -> ServiceResult:
                 else {}
             ),
         }
-    out.pop("conflicts", None)
+    out["coverage"] = result["coverage"]
+    if "run_metadata" in result:
+        out["run_metadata"] = result["run_metadata"]
     return out
 
 

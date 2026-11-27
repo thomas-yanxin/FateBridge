@@ -64,7 +64,7 @@ def analyze_layout(req: AssessRequest, layers: dict[str, Any]) -> dict[str, Any]
                 (
                     person["subject_id"],
                     "occupant",
-                    cand["gender_convention"],
+                    cand["gender"],
                     person["status"] != "complete",
                     cand["sectors"],
                     {},
@@ -118,7 +118,7 @@ def analyze_layout(req: AssessRequest, layers: dict[str, Any]) -> dict[str, Any]
                     "method": "bazhai",
                     "subject_id": subject,
                     "subject_kind": kind,
-                    "gender_convention": convention,
+                    "gender": convention,
                     **cand_ctx,
                     "candidate_only": cand_only,
                     "aspect": aspect,
@@ -131,7 +131,7 @@ def analyze_layout(req: AssessRequest, layers: dict[str, Any]) -> dict[str, Any]
                     {
                         "subject_id": subject,
                         "subject_kind": kind,
-                        "gender_convention": convention,
+                        "gender": convention,
                         "candidate_only": cand_only,
                         "matches_convention": app["matches_convention"],
                         "matching_directions": matching,

@@ -4,7 +4,7 @@ from copy import deepcopy
 
 PAYLOADS = {
     "directions": {"bearing_degrees": 360, "north_reference": "magnetic"},
-    "minggua": {"effective_birth_year": 1990, "gender_convention": "female"},
+    "minggua": {"birth_year": 1990, "gender": "female"},
     "bazhai": {
         "house": {
             "object_id": "home",
@@ -14,13 +14,13 @@ PAYLOADS = {
         "occupants": [
             {
                 "subject_id": "a",
-                "effective_birth_year": 1990,
-                "gender_convention": "male",
+                "birth_year": 1990,
+                "gender": "male",
             },
             {
                 "subject_id": "b",
-                "effective_birth_year": 1990,
-                "gender_convention": "female",
+                "birth_year": 1990,
+                "gender": "female",
             },
         ],
         "placements": [
@@ -70,7 +70,7 @@ PAYLOADS = {
         },
         "period": {
             "basis": "construction_completion",
-            "effective_event_year": 2004,
+            "event_year": 2004,
             "evidence": "示例：立春后竣工，按竣工事件定运",
         },
     },

@@ -20,10 +20,22 @@ from fatebridge.core.fengshui.calendar import (
 from fatebridge.core.fengshui.models import (
     AnnualRequest,
     AssessRequest,
+    BazhaiRequest,
+    CityGateRequest,
+    EnvironmentFeature,
+    GeomagneticReference,
+    House,
+    HousePeriod,
+    JinsuoRequest,
     MingguaRequest,
     MonthlyRequest,
+    Placement,
+    XuankongRequest,
 )
-from fatebridge.services.fengshui import calculate_fengshui_assessment
+from fatebridge.services.fengshui import (
+    calculate_fengshui_assessment,
+    calculate_xuankong_natal,
+)
 
 
 @pytest.mark.parametrize(
@@ -38,13 +50,15 @@ from fatebridge.services.fengshui import calculate_fengshui_assessment
         ("AnnualRequest", "query_at"),
         ("AssessRequest", "effective_year"),
         ("AssessRequest", "query_at"),
+        ("AssessRequest", "built_year"),
+        ("AssessRequest", "period_number"),
         ("DirectionsRequest", "bearing_degrees"),
         ("House", "facing_degrees"),
         ("House", "bearing_uncertainty_degrees"),
         ("HousePeriod", "period_number"),
-        ("HousePeriod", "effective_event_year"),
+        ("HousePeriod", "event_year"),
         ("MingguaRequest", "birth_date"),
-        ("MingguaRequest", "effective_birth_year"),
+        ("MingguaRequest", "birth_year"),
         ("MingguaRequest", "birth_at"),
         ("MonthlyRequest", "query_at"),
         ("MonthlyRequest", "effective_solar_year"),
@@ -127,8 +141,8 @@ def test_assess_allows_effective_year_and_query_at_together_and_4_layer_overlay(
             "occupants": [
                 {
                     "subject_id": "a",
-                    "effective_birth_year": 1990,
-                    "gender_convention": "male",
+                    "birth_year": 1990,
+                    "gender": "male",
                 }
             ],
             "placements": [
@@ -155,3 +169,105 @@ def test_assess_allows_effective_year_and_query_at_together_and_4_layer_overlay(
     }
     assert "layout_analysis" in out
     assert "annual_remedies" not in out["layout_analysis"]
+
+
+def test_ergonomic_defaults_auto_ids_and_propagation() -> None:
+    # Finite float accepts integer 0 and defaults height_km_wgs84=0.0, evidence=None
+    geo = GeomagneticReference(latitude=0, longitude=0, decimal_year=2026)
+    assert geo.height_km_wgs84 == 0.0 and geo.evidence is None
+
+    # House defaults north_reference='magnetic' and supports facing_mountain when facing_degrees omitted
+    h_deg = House(facing_degrees=180)
+    assert h_deg.north_reference == "magnetic"
+    assert House(facing_degrees=180, north_reference="true").north_reference == "true"
+    h_mtn = House(facing_mountain="午")
+    assert h_mtn.facing_mountain == "午"
+    with pytest.raises(ValidationError):
+        House(facing_degrees=180, facing_mountain="午")
+    with pytest.raises(ValidationError):
+        House(facing_mountain="午", sitting_trigram="离")
+
+    # Placement auto-assigns object_id in BazhaiRequest and auto-populates facing_role
+    p = Placement(purpose="bed", facing_direction="E")
+    assert p.facing_role == "headboard"
+    with pytest.raises(ValidationError):
+        Placement(purpose="bed", facing_direction="E", facing_role="fire_mouth")
+    with pytest.raises(ValidationError):
+        Placement(purpose="bed", location_direction="N", facing_role="headboard")
+
+    bz = BazhaiRequest.model_validate(
+        {
+            "house": {"facing_mountain": "午"},
+            "occupants": [{"birth_year": 1990, "gender": "male"}],
+            "placements": [{"purpose": "bed", "location_direction": "N", "facing_direction": "E"}],
+        }
+    )
+    assert bz.occupants[0].subject_id == "occupant_1"
+    assert bz.placements[0].object_id == "placement_1"
+
+    # EnvironmentFeature defaults and JinsuoRequest auto-IDs
+    js = JinsuoRequest.model_validate(
+        {"features": [{"direction": "N", "classification": "sand"}]}
+    )
+    assert js.features[0].object_id == "feature_1"
+    assert js.features[0].classification_basis == "user_confirmed"
+    assert js.features[0].evidence is None
+
+    # HousePeriod defaults
+    hp1 = HousePeriod(period_number=8)
+    assert hp1.basis == "expert_confirmed" and hp1.evidence is None
+    hp2 = HousePeriod(event_year=2004)
+    assert hp2.basis == "construction_completion"
+    hp3 = HousePeriod(basis="confirmed_major_renovation", event_year=2024)
+    assert hp3.qualifies_for_period_reset is True
+
+    # XuankongRequest & AssessRequest propagation + auto-methods + analyze_layout
+    xk = XuankongRequest.model_validate(
+        {
+            "house": {"facing_degrees": 180},
+            "period": {"period_number": 8},
+            "current_period_number": 9,
+            "city_gate": {},
+            "interpretation": {
+                "external_forms": [{"direction": "S", "water_present": True}]
+            },
+        }
+    )
+    assert xk.city_gate is not None and xk.city_gate.reference_period_number == 9
+    assert (
+        xk.interpretation is not None
+        and xk.interpretation.current_period_number == 9
+        and xk.interpretation.external_forms[0].observation_basis == "user_confirmed"
+    )
+    xk_out = calculate_xuankong_natal(xk)
+    assert xk_out["layers"]["xuankong_natal"]["city_gate_analysis"]["status"] == "complete"
+
+    assess = AssessRequest.model_validate(
+        {
+            "house": {"facing_degrees": 255},
+            "built_year": 2004,
+            "query_at": "2026-04-06T12:00:00+08:00",
+            "placements": [{"purpose": "desk", "location_direction": "N"}],
+            "xuankong": {
+                "city_gate": {},
+                "interpretation": {},
+            },
+        }
+    )
+    assert assess.analyze_layout is True
+    assert set(assess.selected_methods) == {
+        "xuankong_natal",
+        "annual_stars",
+        "monthly_stars",
+        "bazhai",
+    }
+    assert assess.xuankong is not None
+    assert assess.xuankong.period is not None and assess.xuankong.period.event_year == 2004
+    assert assess.xuankong.city_gate is not None
+    assert assess.xuankong.city_gate.reference_period_number == 9
+    assert assess.xuankong.interpretation is not None
+    assert assess.xuankong.interpretation.current_period_number == 9
+    assessed = calculate_fengshui_assessment(assess)
+    assert assessed["status"] == "partial"
+    assert "layout_analysis" in assessed
+    assert "palace_overlay" in assessed

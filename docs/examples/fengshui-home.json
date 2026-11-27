@@ -1,19 +1,17 @@
 {
   "house": {
-    "object_id": "home",
-    "facing_degrees": 255,
-    "north_reference": "magnetic"
+    "facing_degrees": 255
   },
   "occupants": [
     {
       "subject_id": "a",
-      "effective_birth_year": 1990,
-      "gender_convention": "male"
+      "birth_year": 1990,
+      "gender": "male"
     },
     {
       "subject_id": "b",
-      "effective_birth_year": 1990,
-      "gender_convention": "female"
+      "birth_year": 1990,
+      "gender": "female"
     }
   ],
   "placements": [
@@ -22,7 +20,6 @@
       "purpose": "stove",
       "location_direction": "NE",
       "facing_direction": "S",
-      "facing_role": "fire_mouth",
       "subject_id": "a"
     },
     {
@@ -30,38 +27,19 @@
       "purpose": "bed",
       "location_direction": "N",
       "facing_direction": "E",
-      "facing_role": "headboard",
       "subject_id": "a"
     }
   ],
   "features": [
     {
-      "object_id": "pond",
       "direction": "S",
-      "classification": "water",
-      "classification_basis": "user_confirmed",
-      "evidence": "确认南方水体"
+      "classification": "water"
     },
     {
-      "object_id": "hill",
       "direction": "N",
-      "classification": "sand",
-      "classification_basis": "measured",
-      "evidence": "北方高于宅基的实体，已测量确认"
+      "classification": "sand"
     }
   ],
   "effective_year": 2026,
-  "methods": [
-    "bazhai",
-    "jinsuo",
-    "annual_stars",
-    "xuankong_natal"
-  ],
-  "xuankong": {
-    "period": {
-      "basis": "construction_completion",
-      "effective_event_year": 2004,
-      "evidence": "示例：立春后竣工，按竣工事件定运"
-    }
-  }
+  "built_year": 2004
 }
