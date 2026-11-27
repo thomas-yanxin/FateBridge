@@ -50,7 +50,7 @@ from fatebridge.transports.http_runtime import (
     RuntimeMetrics,
     build_readiness_payload,
 )
-from fatebridge.transports.rest import register_rest
+from fatebridge.transports.rest import register_batch_route, register_rest
 from fatebridge.utils.errors import (
     ErrorEnvelope,
     ParameterError,
@@ -330,7 +330,9 @@ async def metrics_endpoint() -> PlainTextResponse:
     )
 
 
-register_rest(app, rest_specs(), execute_service=_execute_service)
+exposed_rest_specs = rest_specs()
+register_rest(app, exposed_rest_specs, execute_service=_execute_service)
+register_batch_route(app, exposed_rest_specs)
 
 # note (Pydantic): Build deferred body adapters while FastAPI's field-alias warning is filtered.
 with warnings.catch_warnings():
