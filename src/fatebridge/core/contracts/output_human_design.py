@@ -178,7 +178,7 @@ class HumanDesignOutput(ProjectedOutput):
     line_fixings: list[HDLineFixing] | None = None
     cycle_context: dict[str, JsonValue] | None = None
     cycle_summary: dict[str, JsonValue] | None = None
-    time_sensitivity: dict[str, JsonValue] | None = None
+    birth_time_sensitivity: dict[str, JsonValue] | None = None
     transit_overlay: dict[str, JsonValue] | None = None
     composite: dict[str, JsonValue] | None = None
     summary: str | None = None

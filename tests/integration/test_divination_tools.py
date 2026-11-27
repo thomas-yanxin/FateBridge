@@ -84,8 +84,8 @@ def _local_golden_projection():
         longitude="121e28",
         qimen_options={"layout": "direct"},
         taiyi_options={},
-        liureng_yue="申",
-        liureng_is_diurnal=False,
+        liuren_yue="申",
+        liuren_is_diurnal=False,
     )
     otherbu_sun = next(
         item
@@ -985,15 +985,15 @@ def test_calculate_sanshiunited_analysis_returns_local_aggregation() -> None:
     assert zhishi_palace["door"] == result["qimen"]["zhishi"]["door"]
 
 
-def test_calculate_sanshiunited_analysis_respects_liureng_overrides() -> None:
+def test_calculate_sanshiunited_analysis_respects_liuren_overrides() -> None:
     result = calculate_sanshiunited_analysis(
         date="2028-04-06",
         time="09:33:00",
         timezone="+08:00",
         latitude="31n13",
         longitude="121e28",
-        liureng_yue="申",
-        liureng_is_diurnal=False,
+        liuren_yue="申",
+        liuren_is_diurnal=False,
     )
 
     assert result["liuren"]["month_general"]["branch"] == "申"

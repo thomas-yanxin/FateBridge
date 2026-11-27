@@ -11,6 +11,7 @@ from fatebridge.analysis.timing_element_shares import (
     ElementShareCountingBasis,
     TimingElementEffects,
 )
+from fatebridge.core.bazi.policies import YearBoundaryPolicy
 from fatebridge.core.bazi.timing import TimingAnalysis, analyze_timing_interactions
 from fatebridge.services.birth_context import BirthComputationContext
 
@@ -57,6 +58,7 @@ def build_current_timing_state(
     analysis_date: datetime,
     analysis_age: int | None = None,
     include_interactions: bool = True,
+    year_boundary_policy: YearBoundaryPolicy = "lichun",
 ) -> dict[str, Any]:
     """Build current Dayun/小运, 流年, 流月, 流日, 流时 and full interactions."""
     timezone_name = birth_context.normalized_birth_time.timezone
@@ -99,6 +101,7 @@ def build_current_timing_state(
         original_element_counts=birth_context.original_element_counts,
         moment=analysis_date,
         timezone_name=timezone_name,
+        year_boundary_policy=year_boundary_policy,
     )
     liuyue_analysis = TimingEffectsAnalysis.analyze_liuyue_effects(
         birth_context.birth_pillars,

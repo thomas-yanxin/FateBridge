@@ -77,9 +77,9 @@ def build_sanshiunited_result(
     longitude: float | str | None = None,
     qimen_options: dict[str, Any] | None = None,
     taiyi_options: dict[str, Any] | None = None,
-    liureng_yue: str | None = None,
-    liureng_is_diurnal: bool | None = None,
-    liureng_guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
+    liuren_yue: str | None = None,
+    liuren_is_diurnal: bool | None = None,
+    liuren_guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
     use_true_solar_time: bool = False,
     corner_lodging: CornerLodging = "both",
 ) -> dict[str, Any]:
@@ -96,9 +96,9 @@ def build_sanshiunited_result(
         "longitude": parsed_longitude,
         "qimen_options": qimen_options or {},
         "taiyi_options": taiyi_options or {},
-        "liureng_yue": liureng_yue,
-        "liureng_is_diurnal": liureng_is_diurnal,
-        "liureng_guiren_profile": liureng_guiren_profile,
+        "liuren_yue": liuren_yue,
+        "liuren_is_diurnal": liuren_is_diurnal,
+        "liuren_guiren_profile": liuren_guiren_profile,
         "use_true_solar_time": bool(use_true_solar_time),
         "corner_lodging": corner_lodging,
     }
@@ -112,7 +112,7 @@ def build_sanshiunited_result(
         gps_lon=None,
         use_true_solar_time=bool(use_true_solar_time),
     )
-    ren_policy = require_ren_calendar(base_seed, month_general_override=liureng_yue)
+    ren_policy = require_ren_calendar(base_seed, month_general_override=liuren_yue)
     ren_seed = replace(
         base_seed,
         calendar_context={
@@ -126,9 +126,9 @@ def build_sanshiunited_result(
     liureng = build_liureng_board(
         ren_seed,
         gender="未知",
-        month_general_override=liureng_yue,
-        is_diurnal_override=liureng_is_diurnal,
-        guiren_profile=liureng_guiren_profile,
+        month_general_override=liuren_yue,
+        is_diurnal_override=liuren_is_diurnal,
+        guiren_profile=liuren_guiren_profile,
     )
 
     correspondences = palace_correspondences(

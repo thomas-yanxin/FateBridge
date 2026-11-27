@@ -9,6 +9,7 @@ from fatebridge.application.bindings import (
     service_ref,
 )
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
+from fatebridge.core.reproducibility import ReproducibilityPolicy
 
 _ZIWEI_REQ = "fatebridge.core.requests.ziwei"
 
@@ -214,6 +215,15 @@ SPECS: list[ToolSpec] = [
         family="metaphysics",
         cpu_bound=True,
         rest_path="/api/ziwei/timing",
+        reproducibility=ReproducibilityPolicy(
+            current_time_fields=(
+                "analysis_year",
+                "analysis_month",
+                "analysis_day",
+                "analysis_hour",
+                "analysis_minute",
+            )
+        ),
         compact_view=_compact_ziwei_horoscope,
     ),
     ToolSpec(

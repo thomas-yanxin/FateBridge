@@ -7,10 +7,10 @@ from typing import Any
 from fatebridge.analysis.timing_effects import TimingEffectsAnalysis
 from fatebridge.core.almanac import (
     build_calendar_context,
-    current_local_datetime,
     get_jieqi_year_grid,
 )
 from fatebridge.core.bazi.calendar import ChangshengSchool, DutyProfile, ZiHourPolicy
+from fatebridge.core.bazi.policies import YearBoundaryPolicy
 from fatebridge.services.birth_context import build_birth_computation_context
 from fatebridge.services.timing_clock import (
     AnalysisClockReference,
@@ -32,6 +32,7 @@ from fatebridge.services.timing_state import (
 )
 from fatebridge.services.timing_uncertainty import analyze_birth_time_range
 from fatebridge.utils.birth_input import PersonInfo, normalize_gender
+from fatebridge.utils.data import get_shishen
 from fatebridge.utils.errors import calculation_guard
 from fatebridge.utils.formatting import create_pillar_dict, format_clock_datetime
 
@@ -57,6 +58,7 @@ def calculate_comprehensive_timing(
     analysis_minute: int | None = None,
     birth_time_uncertainty_minutes: int | None = None,
     *,
+    year_boundary_policy: YearBoundaryPolicy = "lichun",
     zi_hour_policy: ZiHourPolicy = "day_rollover_at_23",
     changsheng_school: ChangshengSchool = "fire_earth_same_palace",
     duty_profile: DutyProfile = "sanming",
@@ -91,6 +93,7 @@ def calculate_comprehensive_timing(
         birth_context,
         analysis_date=analysis_date,
         analysis_age=analysis_age,
+        year_boundary_policy=year_boundary_policy,
     )
     current_age = timing_result["current_age"]
 
@@ -223,6 +226,21 @@ def calculate_comprehensive_timing(
         timing_result["combined_effects"]
     )
     result["interaction_analysis"] = timing_result["interaction_analysis"]
+    dayun_summary = result["dayun"].get("current_dayun") or (
+        result["dayun"].get("xiaoyun", {}).get("pillar")
+        if result["dayun"].get("status") == "before_dayun"
+        else None
+    )
+    result["summary"] = {
+        "analysis_datetime": result["person_info"]["analysis_datetime"],
+        "current_age": current_age,
+        "dayun": dayun_summary,
+        "liunian": result["liunian"]["pillar"],
+        "liuyue": result["liuyue"]["pillar"],
+        "liuri": result["liuri"]["pillar"],
+        "liushi": result["liushi"]["pillar"],
+        "overall_effect": result["combined_effects"].get("overall_effect"),
+    }
     if birth_time_uncertainty_minutes is not None:
         result["birth_time_sensitivity"] = analyze_birth_time_range(
             person,
@@ -361,6 +379,23 @@ def calculate_dayun_analysis(
         }
 
     result["timing_context"] = dayun_result["timing_context"]
+    timeline = dayun_result["timing_context"].get("timeline")
+    if isinstance(timeline, dict) and isinstance(timeline.get("periods"), list):
+        day_stem = birth_context.birth_pillars["day"][0]
+        result["dayun_timeline"] = [
+            {
+                "period": period["period"],
+                "pillar": period["pillar"],
+                "stem": period["stem"],
+                "branch": period["branch"],
+                "stem_ten_god": get_shishen(day_stem, period["stem"]),
+                "nayin": period["nayin"],
+                "age_range": period["age_range"],
+                "start_at": period.get("start_at"),
+                "end_at": period.get("end_at"),
+            }
+            for period in timeline["periods"]
+        ]
     if birth_time_uncertainty_minutes is not None:
         result["birth_time_sensitivity"] = analyze_birth_time_range(
             person,
@@ -389,11 +424,12 @@ def calculate_jieqi_timeline_analysis(
     )
     normalized_birth_time = birth_context.normalized_birth_time
     birth_date = normalized_birth_time.corrected_datetime
-    target_year = (
-        analysis_year
-        if analysis_year is not None
-        else current_local_datetime(normalized_birth_time.timezone).year
+    resolution = resolve_analysis_moment(
+        "jieqi_timeline",
+        normalized_birth_time.timezone,
+        analysis_year=analysis_year,
     )
+    target_year = resolution.moment.year
     jieqi_timeline = enrich_jieqi_timeline(birth_context, target_year=target_year)
     target_year_jieqi = get_jieqi_year_grid(target_year, normalized_birth_time.timezone)
     return {
@@ -413,4 +449,5 @@ def calculate_jieqi_timeline_analysis(
         "calendar_context": birth_context.birth_calendar_context,
         "target_year_jieqi": target_year_jieqi,
         "jieqi_timeline": jieqi_timeline,
+        "analysis_context": resolution.reference,
     }

@@ -14,6 +14,7 @@ from fatebridge.core.astro.solar_rebase import (
 )
 from fatebridge.core.astro.time_scales import EphemerisTime, ephemeris_time
 from fatebridge.utils.civil_time import UTCCalendar, utc_calendar
+from fatebridge.utils.errors import ParameterError
 from fatebridge.utils.places import resolve_birth_place_context
 from fatebridge.utils.solar_time import (
     SOLAR_TIME_STRATEGY_APPARENT,
@@ -284,3 +285,39 @@ def build_astro_birth_info(
         recorded_datetime=recorded_datetime,
         timezone_source=timezone_source,
     )
+
+
+def resolve_astro_birth_request_inputs(payload: dict[str, Any]) -> dict[str, Any]:
+    """Lazily resolve birth_place into coordinates/timezone and drop cross-family padding fields."""
+    resolved = dict(payload)
+    for unused_field in ("gender", "birth_second", "birth_utc_offset"):
+        resolved.pop(unused_field, None)
+    birth_place = resolved.get("birth_place")
+    longitude = resolved.get("birth_longitude")
+    latitude = resolved.get("birth_latitude")
+    timezone_name = resolved.get("birth_timezone")
+    if (longitude is None or latitude is None or not timezone_name) and birth_place:
+        place_context = resolve_birth_place_context(birth_place)
+        if longitude is None:
+            longitude = place_context.longitude
+            resolved["birth_longitude"] = longitude
+        if latitude is None:
+            latitude = place_context.latitude
+            resolved["birth_latitude"] = latitude
+        if not timezone_name:
+            timezone_name = place_context.timezone
+            resolved["birth_timezone"] = timezone_name
+    if longitude is None or latitude is None:
+        msg = "核心星盘需要 birth_longitude / birth_latitude，或提供 FateBridge 支持的 birth_place 以自动补全坐标。"
+        missing_path = "birth_longitude" if longitude is None else "birth_latitude"
+        raise ParameterError(
+            msg,
+            [{"path": missing_path, "code": "missing_coordinates", "message": msg}],
+        )
+    if not timezone_name:
+        msg = "未知出生时区不能默认为UTC；请提供明确 birth_timezone（IANA名称或UTC偏移），或可唯一识别时区的 birth_place。坐标不能代替民用时区。"
+        raise ParameterError(
+            msg,
+            [{"path": "birth_timezone", "code": "missing_timezone", "message": msg}],
+        )
+    return resolved

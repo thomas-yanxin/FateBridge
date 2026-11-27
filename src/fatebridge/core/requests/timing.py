@@ -5,8 +5,14 @@ from __future__ import annotations
 from pydantic import Field, model_validator
 from pydantic_core import PydanticCustomError
 
+from fatebridge.core.bazi.policies import YearBoundaryPolicy
 from fatebridge.core.requests.base import OptionalAnalysisClockFields
 from fatebridge.core.requests.birth import BaziClockRequest
+
+_YEAR_BOUNDARY_DESCRIPTION = (
+    "年柱换年口径：lichun（默认，立春换年；提供月份/日期时按立春精确时刻判断，"
+    "仅传analysis_year时视为该太阳年）或 gregorian（按公历整数年份）。"
+)
 
 
 class TimingAnalysisRequest(OptionalAnalysisClockFields, BaziClockRequest):
@@ -24,6 +30,13 @@ class TimingAnalysisRequest(OptionalAnalysisClockFields, BaziClockRequest):
         ge=0,
         le=120,
         description="仅传用户确认的名义出生参考正负UTC经过分钟范围；保留分钟网格，并补充计算节令、钟面、大运名义月进位与当前分析日附近未来跳时逆像探针。未认证全部连续交运状态或极值。None表示未提供范围，不表示精确生时。",
+    )
+    year_boundary_policy: YearBoundaryPolicy = Field(
+        default="lichun", description=_YEAR_BOUNDARY_DESCRIPTION
+    )
+    include_timelines: bool = Field(
+        default=False,
+        description="是否同时返回分析年的二十四节气网格、十二节流月时间轴与节气节点时间轴。",
     )
 
 
@@ -72,10 +85,41 @@ class DayunAnalysisRequest(OptionalAnalysisClockFields, BaziClockRequest):
         return self
 
 
-class LiunianAnalysisRequest(BaziClockRequest):
+class LiunianAnalysisRequest(OptionalAnalysisClockFields, BaziClockRequest):
     """Request model for liunian analysis."""
 
-    analysis_year: int = Field(description="Target analysis year")
+    analysis_year: int | None = Field(
+        default=None,
+        description=(
+            "目标分析年份；省略全部analysis_*日期分量时取本次as_of或执行开始时刻。"
+            "仅传analysis_year且year_boundary_policy=lichun时，按该太阳年计算流年；"
+            "同时传入analysis_month等细分日期时，按该时刻在立春前后的实际归属年。"
+        ),
+    )
+    end_year: int | None = Field(
+        default=None,
+        description="可选结束年份；传入时返回从起始年到end_year的多年流年时间轴（含首尾最多20年）。",
+    )
+    year_boundary_policy: YearBoundaryPolicy = Field(
+        default="lichun", description=_YEAR_BOUNDARY_DESCRIPTION
+    )
+
+    @model_validator(mode="after")
+    def validate_year_range(self) -> LiunianAnalysisRequest:
+        if self.end_year is not None and self.analysis_year is not None:
+            if self.end_year < self.analysis_year:
+                raise PydanticCustomError(
+                    "invalid_year_range",
+                    "end_year不能小于analysis_year",
+                    {"path": "end_year"},
+                )
+            if self.end_year - self.analysis_year + 1 > 20:
+                raise PydanticCustomError(
+                    "year_range_too_large",
+                    "年份扫描范围最多20年（end_year - analysis_year + 1 <= 20）",
+                    {"path": "end_year"},
+                )
+        return self
 
 
 class LiuriAnalysisRequest(OptionalAnalysisClockFields, BaziClockRequest):
@@ -84,6 +128,12 @@ class LiuriAnalysisRequest(OptionalAnalysisClockFields, BaziClockRequest):
     analysis_year: int | None = Field(
         default=None,
         description="日期全部省略时按本次as_of或执行开始时刻的完整当地瞬间取流日，保留晚子时规则；显式部分日期缺年月日取当前值、缺时分取0。 显式日期的不存在或重复钟时须用有效钟时或明确UTC偏移消歧。",
+    )
+    scan_days: int | None = Field(
+        default=None,
+        ge=1,
+        le=31,
+        description="可选连续扫描天数（1–31）；传入时返回从分析日起的逐日流日时间轴。",
     )
 
 
@@ -108,4 +158,13 @@ class LiuyueAnalysisRequest(OptionalAnalysisClockFields, BaziClockRequest):
     analysis_year: int | None = Field(
         default=None,
         description="日期全部省略时按本次as_of或执行开始时刻的完整当地瞬间取节令月；显式部分日期缺年/月取当前年/月，缺日取15、缺时分取0。 显式日期的不存在或重复钟时须用有效钟时或明确UTC偏移消歧。",
+    )
+    year_boundary_policy: YearBoundaryPolicy = Field(
+        default="lichun", description=_YEAR_BOUNDARY_DESCRIPTION
+    )
+    scan_months: int | None = Field(
+        default=None,
+        ge=1,
+        le=24,
+        description="可选连续扫描节令月数（1–24）；传入时按十二节顺序返回连续流月时间轴。",
     )

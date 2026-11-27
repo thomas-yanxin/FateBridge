@@ -38,6 +38,7 @@ from fatebridge.core.bazi.calendar import (
     ZiHourPolicy,
     resolve_bazi_effective_date,
 )
+from fatebridge.core.bazi.policies import YearBoundaryPolicy
 from fatebridge.core.bazi.relations import (
     BRANCH_BREAKS,
     BRANCH_HIDDEN_COMBINATIONS,
@@ -455,6 +456,34 @@ def _calculate_liuri_cached(
     }
 
 
+def _format_solar_term_timestamp(term: SolarTerm) -> str:
+    return (
+        term.calendar.isoformat()
+        if term.has_defined_local_clock
+        else term.calendar.utc.isoformat()
+    )
+
+
+def _solar_year_window(
+    solar_year: int, timezone_name: str = DEFAULT_TIMEZONE
+) -> dict[str, str]:
+    start_terms = {
+        term.name: term for term in get_solar_terms_for_year(solar_year, timezone_name)
+    }
+    end_terms = {
+        term.name: term
+        for term in get_solar_terms_for_year(solar_year + 1, timezone_name)
+    }
+    start_lichun = start_terms["立春"]
+    end_lichun = end_terms["立春"]
+    require_calculated_solar_term(start_lichun)
+    require_calculated_solar_term(end_lichun)
+    return {
+        "start_lichun": _format_solar_term_timestamp(start_lichun),
+        "end_lichun": _format_solar_term_timestamp(end_lichun),
+    }
+
+
 def _copy_timing_info(info: dict[str, Any]) -> dict[str, Any]:
     return deepcopy(info)
 
@@ -576,25 +605,42 @@ class TimingAnalysis:
         *,
         moment: datetime | None = None,
         timezone_name: str = DEFAULT_TIMEZONE,
+        year_boundary_policy: YearBoundaryPolicy = "lichun",
+        include_solar_window: bool | None = None,
     ) -> dict[str, Any]:
-        if moment is not None:
+        if year_boundary_policy == "gregorian":
+            resolved_year = (
+                localize_datetime(moment, timezone_name).year
+                if moment is not None
+                else target_year
+            )
+            boundary_basis = "gregorian_year_integer"
+        elif moment is not None:
             resolved_year = get_bazi_year(moment, timezone_name)
             boundary_basis = "lichun_exact_moment"
         else:
             resolved_year = target_year
-            boundary_basis = "gregorian_year_integer"
+            boundary_basis = "lichun_solar_year"
 
         liunian_stem, liunian_branch = BaZiCalendar.calculate_year_pillar(resolved_year)
         stem_element, _ = STEM_ELEMENTS[liunian_stem]
-        return {
+        payload: dict[str, Any] = {
             "year": resolved_year,
             "stem": liunian_stem,
             "branch": liunian_branch,
             "pillar": f"{liunian_stem}{liunian_branch}",
             "element": stem_element.value,
             "nayin": get_nayin(liunian_stem, liunian_branch),
+            "year_boundary_policy": year_boundary_policy,
             "year_boundary_basis": boundary_basis,
         }
+        if include_solar_window is True or (
+            include_solar_window is None and moment is not None
+        ):
+            payload["solar_year_window"] = _solar_year_window(
+                resolved_year, timezone_name
+            )
+        return payload
 
     @staticmethod
     def calculate_liuyue(

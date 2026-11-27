@@ -43,8 +43,8 @@ class SubjectProfile(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     name: str | None = Field(default=None, description="姓名或对象标签")
-    gender: Literal["male", "female"] | None = Field(
-        default=None, description="性别：male 或 female"
+    gender: Literal["male", "female", "男", "女"] | None = Field(
+        default=None, description="性别：male/female 或 男/女"
     )
     birth_year: int | None = Field(default=None, description="出生公历年")
     birth_month: int | None = Field(

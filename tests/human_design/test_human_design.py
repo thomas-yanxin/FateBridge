@@ -133,7 +133,7 @@ def test_composite_transit_cycles_and_sensitivity() -> None:
             "birth_timezone": "Asia/Shanghai",
         },
     )
-    assert res["time_sensitivity"]["sample_count"] == 21
+    assert res["birth_time_sensitivity"]["sample_count"] == 21
     assert res["cycle_summary"]["status"] in {"computed_finite_search", "partial"}
     saturn = next(b for b in res["cycle_summary"]["bodies"] if b["body"] == "Saturn")
     assert (

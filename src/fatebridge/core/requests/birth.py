@@ -151,7 +151,57 @@ class AstroBirthBase(BirthClockBase):
 
 
 class AstroBirthRequest(AstroBirthBase):
-    """Base birth request model requiring explicit coordinates for Western endpoints."""
+    """Base birth request model accepting coordinates or a supported birth_place."""
 
-    birth_longitude: float = Field(ge=-180, le=180, description="Birth longitude")
-    birth_latitude: float = Field(ge=-90, le=90, description="Birth latitude")
+    gender: str | None = Field(
+        default=None,
+        description="性别（可选，用于批量/跨工具参数对称；西方推运计算不使用性别）。",
+    )
+    birth_second: int | None = Field(
+        default=None,
+        ge=0,
+        le=59,
+        description="出生秒数（0-59，可选，用于跨工具参数对称）。",
+    )
+    birth_utc_offset: str | None = Field(
+        default=None,
+        description="已确认的出生民用UTC偏移（±HH:MM或±HH:MM:SS，可选，用于跨工具参数对称）。",
+    )
+    birth_place: str | None = Field(
+        default=None,
+        description="Birth place (optional; when coordinates/timezone are omitted, resolved lazily via supported city catalog)",
+    )
+    birth_longitude: float | None = Field(
+        default=None,
+        ge=-180,
+        le=180,
+        description="Birth longitude (optional when birth_place is given)",
+    )
+    birth_latitude: float | None = Field(
+        default=None,
+        ge=-90,
+        le=90,
+        description="Birth latitude (optional when birth_place is given)",
+    )
+
+    @model_validator(mode="after")
+    def _require_coordinates_or_place(self) -> AstroBirthRequest:
+        if self.birth_longitude is None or self.birth_latitude is None:
+            place = (self.birth_place or "").strip()
+            if not place or place == "未提供":
+                missing_path = (
+                    "birth_longitude"
+                    if self.birth_longitude is None
+                    else "birth_latitude"
+                )
+                raise PydanticCustomError(
+                    "missing_coordinates",
+                    "需要 birth_longitude / birth_latitude，或提供 FateBridge 支持的 birth_place 以补全坐标",
+                    {"path": missing_path},
+                )
+        return self
+
+    def service_inputs(self) -> dict[str, object]:
+        from fatebridge.core.astro.birth import resolve_astro_birth_request_inputs
+
+        return resolve_astro_birth_request_inputs(self.model_dump())

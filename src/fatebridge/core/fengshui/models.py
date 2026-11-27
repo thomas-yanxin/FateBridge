@@ -368,13 +368,23 @@ class MingguaRequest(TimeInput):
         default=None, ge=1800, le=2199, description="已确认换年后的有效生年"
     )
     birth_at: datetime | None = Field(default=None, description="含时区的 ISO 出生时刻")
-    gender: Literal["male", "female"] | None = Field(
-        default=None, description="传统男女起算法；未知时返回两个候选"
+    gender: Literal["male", "female", "男", "女"] | None = Field(
+        default=None,
+        description="传统男女起算法（male/female 或 男/女）；未知时返回两个候选",
     )
     year_boundary: Literal["lichun", "january_1"] = Field(
         default="lichun", description="命卦换年约定"
     )
     ruleset_id: BazhaiRuleset = "bazhai_sitting_v1"
+
+    @field_validator("gender", mode="before")
+    @classmethod
+    def _normalize_minggua_gender(cls, value: object) -> object:
+        if value == "男":
+            return "male"
+        if value == "女":
+            return "female"
+        return value
 
     @model_validator(mode="after")
     def validate_birth(self) -> "MingguaRequest":

@@ -548,7 +548,7 @@ def test_calculate_jinkou_analysis_does_not_borrow_liureng_transmission_rule() -
     )
 
 
-def test_ziwei_horoscope_request_requires_analysis_datetime() -> None:
+def test_ziwei_horoscope_request_allows_optional_analysis_datetime() -> None:
     from fatebridge.core.requests.ziwei import ZiweiHoroscopeRequest
 
     req = ZiweiHoroscopeRequest(
@@ -568,17 +568,25 @@ def test_ziwei_horoscope_request_requires_analysis_datetime() -> None:
     assert payload["analysis_day"] == 19
     assert payload["analysis_hour"] == 14
 
-    import pytest as _pytest
-    from pydantic import ValidationError
+    partial_req = ZiweiHoroscopeRequest(
+        gender="男",
+        birth_year=1994,
+        birth_month=8,
+        birth_day=23,
+        birth_hour=14,
+        analysis_year=2026,
+    )
+    assert partial_req.analysis_year == 2026
+    assert partial_req.analysis_month is None
 
-    with _pytest.raises(ValidationError):
-        ZiweiHoroscopeRequest(  # missing analysis_* → invalid
-            gender="男",
-            birth_year=1994,
-            birth_month=8,
-            birth_day=23,
-            birth_hour=14,
-        )
+    omitted_req = ZiweiHoroscopeRequest(
+        gender="男",
+        birth_year=1994,
+        birth_month=8,
+        birth_day=23,
+        birth_hour=14,
+    )
+    assert omitted_req.analysis_year is None
 
 
 def test_calculate_ziwei_horoscope_returns_six_scopes() -> None:

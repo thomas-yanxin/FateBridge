@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from fatebridge.application.bindings import (
     bind_kwargs,
     bind_person,
@@ -52,6 +54,66 @@ TERM_VIEW = {
 }
 
 
+def _compact_term(term: dict) -> dict:
+    return {key: value for key, value in term.items() if key in TERM_VIEW}
+
+
+def _compact_solar_term_window(window: dict) -> dict:
+    return {
+        **window,
+        **(
+            {"start_term": _compact_term(window["start_term"])}
+            if isinstance(window.get("start_term"), dict)
+            else {}
+        ),
+        **(
+            {"next_term": _compact_term(window["next_term"])}
+            if isinstance(window.get("next_term"), dict)
+            else {}
+        ),
+    }
+
+
+def _compact_jieqi_nodes(nodes: list[dict]) -> list[dict]:
+    return [
+        {
+            "order": node["order"],
+            "jieqi": _compact_term(node["jieqi"]),
+            **(
+                {
+                    "analysis_anchor": node["analysis_anchor"],
+                    "liuyue": {"pillar": node["liuyue"]["pillar"]},
+                    "liuri": {"pillar": node["liuri"]["pillar"]},
+                    "overall_effect": node["overall_effect"],
+                }
+                if "analysis_anchor" in node
+                else {"analysis_anchor_status": node["analysis_anchor_status"]}
+            ),
+        }
+        for node in nodes
+    ]
+
+
+def _compact_liuyue_timeline_nodes(nodes: list[dict]) -> list[dict]:
+    compact_nodes: list[dict] = []
+    for node in nodes:
+        entry = {
+            "order": node["order"],
+            "gregorian_window": node["gregorian_window"],
+            "start_term": _compact_term(node["start_term"]),
+            "next_term": _compact_term(node["next_term"]),
+        }
+        if "analysis_anchor" in node:
+            entry["analysis_anchor"] = node["analysis_anchor"]
+            entry["liuyue"] = {"pillar": node["liuyue"]["pillar"]}
+            if "overall_effect" in node:
+                entry["overall_effect"] = node["overall_effect"]
+        elif "analysis_anchor_status" in node:
+            entry["analysis_anchor_status"] = node["analysis_anchor_status"]
+        compact_nodes.append(entry)
+    return compact_nodes
+
+
 def _compact_jieqi_year(result: ServiceResult) -> ServiceResult:
     field = (
         "selected_jieqi"
@@ -64,37 +126,14 @@ def _compact_jieqi_year(result: ServiceResult) -> ServiceResult:
             for key, value in result.items()
             if key not in {"jieqi_year", "selected_jieqi"}
         },
-        field: [
-            {key: value for key, value in term.items() if key in TERM_VIEW}
-            for term in result[field]
-        ],
+        field: [_compact_term(term) for term in result[field]],
     }
 
 
 def _compact_jieqi_timeline(result: ServiceResult) -> ServiceResult:
     return {
         **result,
-        "jieqi_timeline": [
-            {
-                "order": node["order"],
-                "jieqi": {
-                    key: value
-                    for key, value in node["jieqi"].items()
-                    if key in TERM_VIEW
-                },
-                **(
-                    {
-                        "analysis_anchor": node["analysis_anchor"],
-                        "liuyue": {"pillar": node["liuyue"]["pillar"]},
-                        "liuri": {"pillar": node["liuri"]["pillar"]},
-                        "overall_effect": node["overall_effect"],
-                    }
-                    if "analysis_anchor" in node
-                    else {"analysis_anchor_status": node["analysis_anchor_status"]}
-                ),
-            }
-            for node in result["jieqi_timeline"]
-        ],
+        "jieqi_timeline": _compact_jieqi_nodes(result["jieqi_timeline"]),
     }
 
 
@@ -105,8 +144,34 @@ def _compact_bazi_timing(result: ServiceResult) -> ServiceResult:
         if isinstance(dayun, dict)
         else dayun
     )
+    analysis_calendar = result.get("analysis_calendar")
+    compact_calendar: Any
+    if isinstance(analysis_calendar, dict) and any(
+        k in analysis_calendar
+        for k in ("analysis_year_jieqi", "liuyue_timeline", "jieqi_timeline")
+    ):
+        trimmed_calendar = dict(analysis_calendar)
+        if isinstance(trimmed_calendar.get("analysis_year_jieqi"), list):
+            trimmed_calendar["analysis_year_jieqi"] = [
+                _compact_term(term) for term in trimmed_calendar["analysis_year_jieqi"]
+            ]
+        if isinstance(trimmed_calendar.get("liuyue_timeline"), list):
+            trimmed_calendar["liuyue_timeline"] = _compact_liuyue_timeline_nodes(
+                trimmed_calendar["liuyue_timeline"]
+            )
+        if isinstance(trimmed_calendar.get("jieqi_timeline"), list):
+            trimmed_calendar["jieqi_timeline"] = _compact_jieqi_nodes(
+                trimmed_calendar["jieqi_timeline"]
+            )
+        compact_calendar = trimmed_calendar
+    else:
+        compact_calendar = analysis_calendar
     return {
-        k: (compact_dayun if k == "dayun" else v)
+        k: (
+            compact_dayun
+            if k == "dayun"
+            else compact_calendar if k == "analysis_calendar" else v
+        )
         for k, v in result.items()
         if k not in {"calendar_context"}
     }
@@ -118,6 +183,41 @@ def _compact_timing_period(result: ServiceResult) -> ServiceResult:
         for k, v in result.items()
         if k not in {"calendar_context", "timing_context"}
     }
+
+
+def _compact_liuyue(result: ServiceResult) -> ServiceResult:
+    base = _compact_timing_period(result)
+    liuyue = base.get("liuyue")
+    if isinstance(liuyue, dict) and isinstance(liuyue.get("solar_term_window"), dict):
+        base = {
+            **base,
+            "liuyue": {
+                **liuyue,
+                "solar_term_window": _compact_solar_term_window(
+                    liuyue["solar_term_window"]
+                ),
+            },
+        }
+    timeline = base.get("monthly_timeline")
+    if isinstance(timeline, list):
+        base = {
+            **base,
+            "monthly_timeline": [
+                (
+                    {
+                        **entry,
+                        "solar_term_window": _compact_solar_term_window(
+                            entry["solar_term_window"]
+                        ),
+                    }
+                    if isinstance(entry, dict)
+                    and isinstance(entry.get("solar_term_window"), dict)
+                    else entry
+                )
+                for entry in timeline
+            ],
+        }
+    return base
 
 
 SPECS: list[ToolSpec] = [
@@ -154,6 +254,7 @@ SPECS: list[ToolSpec] = [
         family="timing",
         rest_path="/api/bazi/timing/yearly",
         compact_view=_compact_timing_period,
+        resolve_time_defaults=resolve_bazi_analysis_time_defaults,
         cpu_bound=True,
     ),
     ToolSpec(
@@ -165,7 +266,7 @@ SPECS: list[ToolSpec] = [
         family="timing",
         rest_path="/api/bazi/timing/monthly",
         cpu_bound=True,
-        compact_view=_compact_timing_period,
+        compact_view=_compact_liuyue,
         resolve_time_defaults=resolve_bazi_analysis_time_defaults,
     ),
     ToolSpec(
