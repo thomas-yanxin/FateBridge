@@ -518,6 +518,15 @@ def test_request_file_rejects_unknown_keys_before_calculation(
             "path": "birth_huor",
             "code": "extra_forbidden",
             "message": "Extra inputs are not permitted",
+            "constraints": {
+                "suggestions": [
+                    "birth_hour",
+                    "birth_year",
+                    "birth_month",
+                    "birth_second",
+                    "birth_minute",
+                ]
+            },
         }
     ]
 
@@ -674,3 +683,95 @@ def test_cli_compact_supports_runtime_projection(
     assert err["issues"][0]["path"] == "bazi_birth.missing"
     assert err["issues"][0]["code"] == "unknown_projection_path"
     assert err["issues"][0]["constraints"]["available"]
+
+
+def test_batch_self_description_and_discover_batch(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    from fatebridge.application.batch import MAX_BATCH_CALLS, BatchRequest
+
+    assert run(["batch", "--schema"]) == 0
+    schema_payload = json.loads(capsys.readouterr().out)
+    assert schema_payload["tool"] == "batch"
+    assert schema_payload["surface"] == ["cli", "rest", "mcp"]
+    assert schema_payload["rest_path"] == "/api/batch"
+    assert schema_payload["mcp_tool"] == "run_batch"
+    assert schema_payload["limits"] == {"max_calls": MAX_BATCH_CALLS}
+    assert schema_payload["cli_example"] == "fatebridge batch --request-file batch.json"
+    assert "calls" in schema_payload["input_schema"]["properties"]
+    BatchRequest.model_validate(schema_payload["example_input"])
+
+    assert run(["batch", "--example"]) == 0
+    example_payload = json.loads(capsys.readouterr().out)
+    assert example_payload == schema_payload["example_input"]
+
+    assert run(["discover", "batch"]) == 0
+    discover_payload = json.loads(capsys.readouterr().out)
+    assert discover_payload == schema_payload
+
+    assert run(["batch"]) == 2
+    usage_payload = json.loads(capsys.readouterr().out)
+    assert usage_payload["error_code"] == "usage_error"
+
+
+def test_cli_list_includes_batch_footer_and_preload_stdin(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    import io
+
+    from fatebridge.cli_inputs import preload_request
+
+    assert run(["list"]) == 0
+    list_out = capsys.readouterr().out
+    assert "batch" in list_out
+    assert "--schema" in list_out
+
+    monkeypatch.setattr(
+        "sys.stdin",
+        io.StringIO(
+            json.dumps(
+                {
+                    "birth_year": 1990,
+                    "birth_month": 5,
+                    "birth_day": 15,
+                    "birth_hour": 10,
+                    "gender": "male",
+                }
+            )
+        ),
+    )
+    loaded = preload_request(["bazi_birth_chart", "--request-file", "-"])
+    assert loaded is not None and loaded["birth_year"] == 1990
+
+
+def test_discover_bazi_timing_examples_include_analysis_date_fields(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    for tool_name, expected_flags in (
+        ("bazi_monthly_timing", ("--analysis-year", "--analysis-month")),
+        (
+            "bazi_daily_timing",
+            ("--analysis-year", "--analysis-month", "--analysis-day"),
+        ),
+        (
+            "bazi_hourly_timing",
+            (
+                "--analysis-year",
+                "--analysis-month",
+                "--analysis-day",
+                "--analysis-hour",
+            ),
+        ),
+        ("solar_term_timeline", ("--analysis-year",)),
+        ("bazi_luck_cycles", ("--analysis-year",)),
+    ):
+        assert run(["discover", tool_name]) == 0
+        payload = json.loads(capsys.readouterr().out)
+        (info,) = payload["tools"]
+        assert "analysis_year" in info["example_input"]
+        for flag in expected_flags:
+            assert flag in info["cli_example"], (tool_name, flag)
+    assert run(["discover", "bazi_monthly_timing"]) == 0
+    monthly_info = json.loads(capsys.readouterr().out)["tools"][0]
+    assert "analysis_month" in monthly_info["example_input"]

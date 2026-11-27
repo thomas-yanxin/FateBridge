@@ -1,5 +1,6 @@
 """Shared strict result field projection and actionable invalid-path reporting."""
 
+import difflib
 from collections.abc import Iterable
 from typing import Literal
 
@@ -72,7 +73,11 @@ def projection_issues(
                     break
                 if part not in value:
                     code = "unknown_projection_path"
-                    constraints = {"available": sorted(value.keys())[:30]}
+                    keys = sorted(value.keys())
+                    constraints = {"available": keys[:30]}
+                    suggestions = difflib.get_close_matches(part, keys, n=5, cutoff=0.6)
+                    if suggestions:
+                        constraints["suggestions"] = suggestions
                     break
                 value = value[part]
         if code:

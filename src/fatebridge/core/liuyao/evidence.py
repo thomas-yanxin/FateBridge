@@ -32,6 +32,7 @@ from fatebridge.core.liuyao.strength import (
 )
 from fatebridge.utils.civil_intervals import METHOD_ID, local_interval_preimages
 from fatebridge.utils.civil_time import NominalClockLabel, UTCCalendar, ZonedCalendar
+from fatebridge.utils.errors import ParameterError
 from fatebridge.utils.timezones import is_unspecified_local_time
 
 KINSHIPS = ("父母", "兄弟", "子孙", "妻财", "官鬼")
@@ -105,20 +106,61 @@ def resolve_focus(
     if focus_line is not None and (
         type(focus_line) is not int or not 1 <= focus_line <= 6
     ):
-        raise ValueError("focus_line 必须是1至6的整数")
+        raise ParameterError(
+            "focus_line 必须是1至6的整数",
+            [
+                {
+                    "path": "focus_line",
+                    "code": "invalid_focus_line",
+                    "constraints": {"ge": 1, "le": 6},
+                }
+            ],
+        )
     if focus_kind is not None and focus_kind not in FOCUS_KINDS:
-        raise ValueError("focus_kind 必须为visible、changed、hidden、month或day")
+        raise ParameterError(
+            "focus_kind 必须为visible、changed、hidden、month或day",
+            [
+                {
+                    "path": "focus_kind",
+                    "code": "invalid_focus_kind",
+                    "constraints": {"allowed": list(FOCUS_KINDS)},
+                }
+            ],
+        )
     if focus_kinship is not None and focus_kinship not in KINSHIPS:
-        raise ValueError("focus_kinship 必须为父母、兄弟、子孙、妻财或官鬼")
+        raise ParameterError(
+            "focus_kinship 必须为父母、兄弟、子孙、妻财或官鬼",
+            [
+                {
+                    "path": "focus_kinship",
+                    "code": "invalid_focus_kinship",
+                    "constraints": {"allowed": list(KINSHIPS)},
+                }
+            ],
+        )
     if focus_kind in ("day", "month") and focus_line is not None:
-        raise ValueError("日月取用不能同时指定爻位")
+        raise ParameterError(
+            "日月取用不能同时指定爻位",
+            [{"path": "focus_line", "code": "conflicting_focus_line"}],
+        )
     if (
         focus_line is None
         and focus_kinship is None
         and focus_kind not in ("day", "month")
     ):
         if focus_kind is not None:
-            raise ValueError("指定爻类取用还须提供focus_line或focus_kinship")
+            raise ParameterError(
+                "指定爻类取用还须提供focus_line或focus_kinship",
+                [
+                    {
+                        "path": "focus_kind",
+                        "code": "missing_focus_target",
+                        "constraints": {
+                            "required_with": ["focus_line", "focus_kinship"]
+                        },
+                    }
+                ],
+            )
         return {
             "status": "not_requested",
             "selected": None,
@@ -163,8 +205,18 @@ def resolve_focus(
         location = focus_kind or "visible"
         matching = [r for r in pool[location] if r["position"] == focus_line]
         if len(matching) != 1:
-            raise ValueError(
-                "所选爻位不存在该类用爻；静爻不能作为变爻，未列伏神不能凭空取用"
+            available_positions = sorted(
+                r["position"] for r in pool[location] if r.get("position") is not None
+            )
+            raise ParameterError(
+                "所选爻位不存在该类用爻；静爻不能作为变爻，未列伏神不能凭空取用",
+                [
+                    {
+                        "path": "focus_line",
+                        "code": "focus_line_not_available",
+                        "constraints": {"available": available_positions},
+                    }
+                ],
             )
         selected = matching[0]
         status = (
@@ -177,7 +229,16 @@ def resolve_focus(
         status = "unresolved"
     if selected is not None:
         if focus_kinship is not None and selected["liuqin"] != focus_kinship:
-            raise ValueError("所选用爻的六亲与focus_kinship不一致")
+            raise ParameterError(
+                "所选用爻的六亲与focus_kinship不一致",
+                [
+                    {
+                        "path": "focus_kinship",
+                        "code": "focus_kinship_mismatch",
+                        "constraints": {"expected": selected["liuqin"]},
+                    }
+                ],
+            )
         focus_kinship = selected["liuqin"]
     matching_visible = [r for r in visible if r["liuqin"] == focus_kinship]
     matching_changed = [r for r in changed if r["liuqin"] == focus_kinship]

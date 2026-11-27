@@ -5,6 +5,7 @@ import logging
 import os
 import time
 import warnings
+from collections.abc import Collection
 from copy import deepcopy
 from typing import Literal
 
@@ -229,7 +230,13 @@ async def _request_validation_error_envelope(
             issues.append(normalized_issue)
         else:
             issues.append(issue)
-    result = validation_issues_result(issues)
+    allowed_fields: Collection[str] | None = None
+    route = _request.scope.get("route")
+    if isinstance(route, APIRoute) and route.dependant.body_params:
+        body_type = route.dependant.body_params[0].field_info.annotation
+        if isinstance(body_type, type) and issubclass(body_type, BaseModel):
+            allowed_fields = body_type.model_fields.keys()
+    result = validation_issues_result(issues, allowed_fields=allowed_fields)
     return JSONResponse(
         status_code=result["status_code"],
         content=_build_error_detail(result),

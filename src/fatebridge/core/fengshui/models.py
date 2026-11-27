@@ -294,14 +294,30 @@ class GeomagneticReference(FengshuiInput):
     @model_validator(mode="after")
     def validate_time_and_model(self) -> "GeomagneticReference":
         if (self.model_date is None) == (self.decimal_year is None):
-            raise ValueError("model_date和decimal_year须且只能提供一项")
+            raise PydanticCustomError(
+                "invalid_geomagnetic_epoch",
+                "model_date和decimal_year须且只能提供一项",
+                {"path": "model_date"},
+            )
         year = self.year_value()
         if self.model_id == "wmm2025_v1" and not (2025.0 <= year <= 2030.0):
-            raise ValueError(
-                "wmm2025_v1 仅支持 [2025.0, 2030.0]；历史年份请用 auto 或 igrf14_v1"
+            raise PydanticCustomError(
+                "geomagnetic_model_out_of_range",
+                "wmm2025_v1 仅支持 [2025.0, 2030.0]；历史年份请用 auto 或 igrf14_v1",
+                {"path": "model_id"},
             )
         if not (1900.0 <= year <= 2030.0):
-            raise ValueError("地磁模型仅支持 1900.0–2030.0")
+            raise PydanticCustomError(
+                "geomagnetic_year_out_of_range",
+                "地磁模型仅支持 1900.0–2030.0",
+                {
+                    "path": (
+                        "decimal_year"
+                        if self.decimal_year is not None
+                        else "model_date"
+                    )
+                },
+            )
         return self
 
     def year_value(self) -> float:
@@ -336,7 +352,11 @@ class DirectionsRequest(FengshuiInput):
     @model_validator(mode="after")
     def validate_reference(self) -> "DirectionsRequest":
         if self.bearing_degrees is not None and self.north_reference is None:
-            raise ValueError("角度输入必须明确 north_reference")
+            raise PydanticCustomError(
+                "missing_north_reference",
+                "角度输入必须明确 north_reference",
+                {"path": "north_reference", "required_with": ["bearing_degrees"]},
+            )
         return self
 
 
@@ -364,14 +384,30 @@ class MingguaRequest(TimeInput):
             )
             > 1
         ):
-            raise ValueError("birth_year、birth_at、birth_date 只能提供一项")
+            raise PydanticCustomError(
+                "conflicting_birth_fields",
+                "birth_year、birth_at、birth_date 只能提供一项",
+                {"path": "birth_year" if self.birth_year is not None else "birth_date"},
+            )
         if self.birth_date is not None and not 1801 <= self.birth_date.year <= 2199:
-            raise ValueError("birth_date 支持 1801–2199 年")
+            raise PydanticCustomError(
+                "birth_date_out_of_range",
+                "birth_date 支持 1801–2199 年",
+                {"path": "birth_date"},
+            )
         if self.birth_at is not None:
             if self.birth_at.tzinfo is None or self.birth_at.utcoffset() is None:
-                raise ValueError("birth_at 必须包含时区")
+                raise PydanticCustomError(
+                    "naive_birth_at",
+                    "birth_at 必须包含时区",
+                    {"path": "birth_at"},
+                )
             if not 1801 <= self.birth_at.year <= 2199:
-                raise ValueError("birth_at 支持 1801–2199 年")
+                raise PydanticCustomError(
+                    "birth_at_out_of_range",
+                    "birth_at 支持 1801–2199 年",
+                    {"path": "birth_at"},
+                )
         return self
 
 
@@ -413,9 +449,20 @@ class House(FengshuiInput):
     @model_validator(mode="after")
     def bearing_reference(self) -> "House":
         if self.facing_degrees is not None and self.facing_mountain is not None:
-            raise ValueError("facing_degrees 与 facing_mountain 不能同时提供")
+            raise PydanticCustomError(
+                "conflicting_facing_fields",
+                "facing_degrees 与 facing_mountain 不能同时提供",
+                {"path": "facing_mountain"},
+            )
         if self.bearing_uncertainty_degrees is not None and self.facing_degrees is None:
-            raise ValueError("宅向误差半径须同时提供 facing_degrees")
+            raise PydanticCustomError(
+                "missing_facing_degrees",
+                "宅向误差半径须同时提供 facing_degrees",
+                {
+                    "path": "bearing_uncertainty_degrees",
+                    "required_with": ["facing_degrees"],
+                },
+            )
         if self.facing_degrees is not None and self.north_reference is None:
             self.north_reference = "magnetic"
         self.check_sitting_trigram(self.bearing_uncertainty_degrees or 0.0)
@@ -428,11 +475,19 @@ class House(FengshuiInput):
                 self.facing_degrees, radius, self.north_reference
             )
             if self.sitting_trigram not in {c["sitting_trigram"] for c in supported}:
-                raise ValueError("宅向推导的坐山与 sitting_trigram 不一致")
+                raise PydanticCustomError(
+                    "sitting_trigram_mismatch",
+                    "宅向推导的坐山与 sitting_trigram 不一致",
+                    {"path": "sitting_trigram"},
+                )
         if self.facing_mountain is not None and self.sitting_trigram is not None:
             derived = sitting_from_mountain(self.facing_mountain)["trigram"]
             if self.sitting_trigram != derived:
-                raise ValueError("facing_mountain 推导的坐山与 sitting_trigram 不一致")
+                raise PydanticCustomError(
+                    "sitting_trigram_mismatch",
+                    "facing_mountain 推导的坐山与 sitting_trigram 不一致",
+                    {"path": "sitting_trigram", "expected": derived},
+                )
 
 
 PLACEMENT_FACING_ROLES = {
@@ -500,15 +555,31 @@ class Placement(FengshuiInput):
     @model_validator(mode="after")
     def facing_semantics(self) -> "Placement":
         if self.subject_id is not None and self.subject_ids is not None:
-            raise ValueError("subject_id 和 subject_ids 只能提供一项")
+            raise PydanticCustomError(
+                "conflicting_subject_fields",
+                "subject_id 和 subject_ids 只能提供一项",
+                {"path": "subject_ids"},
+            )
         if self.subject_ids is not None and len(set(self.subject_ids)) != len(
             self.subject_ids
         ):
-            raise ValueError("对象共用住户 subject_ids 必须唯一")
+            raise PydanticCustomError(
+                "duplicate_subject_ids",
+                "对象共用住户 subject_ids 必须唯一",
+                {"path": "subject_ids"},
+            )
         if self.location_direction is None and self.facing_direction is None:
-            raise ValueError("布局对象至少提供位置或朝向")
+            raise PydanticCustomError(
+                "missing_placement_direction",
+                "布局对象至少提供位置或朝向",
+                {"path": "location_direction"},
+            )
         if self.facing_direction is None and self.facing_role is not None:
-            raise ValueError("无 facing_direction 时不得单独提供 facing_role")
+            raise PydanticCustomError(
+                "missing_facing_direction",
+                "无 facing_direction 时不得单独提供 facing_role",
+                {"path": "facing_role", "required_with": ["facing_direction"]},
+            )
         expected_role = PLACEMENT_FACING_ROLES[self.purpose]
         if self.facing_direction is not None and self.facing_role is None:
             self.facing_role = cast(
@@ -516,7 +587,11 @@ class Placement(FengshuiInput):
                 expected_role,
             )
         if self.facing_role is not None and self.facing_role != expected_role:
-            raise ValueError("facing_role 与 purpose 不匹配")
+            raise PydanticCustomError(
+                "facing_role_mismatch",
+                "facing_role 与 purpose 不匹配",
+                {"path": "facing_role", "expected": expected_role},
+            )
         return self
 
 
@@ -559,12 +634,30 @@ class BazhaiRequest(FengshuiInput):
 
         ids = [cast(str, o.subject_id) for o in self.occupants]
         objects = [cast(str, p.object_id) for p in self.placements]
-        if len(set(ids)) != len(ids) or len(set(objects)) != len(objects):
-            raise ValueError("住户及布局对象 ID 必须分别唯一")
+        if len(set(ids)) != len(ids):
+            raise PydanticCustomError(
+                "duplicate_object_ids",
+                "住户及布局对象 ID 必须分别唯一",
+                {"path": "occupants"},
+            )
+        if len(set(objects)) != len(objects):
+            raise PydanticCustomError(
+                "duplicate_object_ids",
+                "住户及布局对象 ID 必须分别唯一",
+                {"path": "placements"},
+            )
         if self.house is not None and self.house.object_id in ids:
-            raise ValueError("住宅 ID 不得与住户 ID 重复")
+            raise PydanticCustomError(
+                "duplicate_object_ids",
+                "住宅 ID 不得与住户 ID 重复",
+                {"path": "occupants"},
+            )
         if self.house is not None and self.house.object_id in objects:
-            raise ValueError("布局对象 ID 不得与住宅 ID 重复")
+            raise PydanticCustomError(
+                "duplicate_object_ids",
+                "布局对象 ID 不得与住宅 ID 重复",
+                {"path": "placements"},
+            )
         known_subjects = set(ids)
         if any(
             ref not in known_subjects
@@ -575,7 +668,11 @@ class BazhaiRequest(FengshuiInput):
                 else [p.subject_id] if p.subject_id is not None else []
             )
         ):
-            raise ValueError("布局对象引用了未提供的住户")
+            raise PydanticCustomError(
+                "unknown_subject_reference",
+                "布局对象引用了未提供的住户",
+                {"path": "placements", "available": sorted(known_subjects)},
+            )
         return self
 
 
@@ -593,12 +690,23 @@ class EnvironmentFeature(FengshuiInput):
     @model_validator(mode="after")
     def resolve_sector_and_mountain(self) -> "EnvironmentFeature":
         if self.direction is None and self.mountain is None:
-            raise ValueError("环境特征须提供 direction 或 mountain")
+            raise PydanticCustomError(
+                "missing_feature_direction",
+                "环境特征须提供 direction 或 mountain",
+                {"path": "direction"},
+            )
         if self.mountain is not None:
             m_dir = MOUNTAIN_BY_NAME[self.mountain]["direction"]
             if self.direction is not None and self.direction != m_dir:
-                raise ValueError(
-                    f"mountain {self.mountain} 属 {m_dir} 宫，与 direction={self.direction} 冲突"
+                raise PydanticCustomError(
+                    "direction_mountain_mismatch",
+                    "mountain {mountain} 属 {expected} 宫，与 direction={actual} 冲突",
+                    {
+                        "path": "direction",
+                        "mountain": self.mountain,
+                        "expected": m_dir,
+                        "actual": self.direction,
+                    },
                 )
             self.direction = cast(Direction, m_dir)
         return self
@@ -620,7 +728,11 @@ class JinsuoRequest(FengshuiInput):
         _assign_feature_ids(self.features)
         ids = [cast(str, f.object_id) for f in self.features]
         if len(set(ids)) != len(ids):
-            raise ValueError("环境特征 object_id 必须唯一")
+            raise PydanticCustomError(
+                "duplicate_feature_ids",
+                "环境特征 object_id 必须唯一",
+                {"path": "features"},
+            )
         return self
 
 
@@ -632,12 +744,24 @@ class AnnualRequest(TimeInput):
     @model_validator(mode="after")
     def validate_query(self) -> "AnnualRequest":
         if self.effective_year is not None and self.query_at is not None:
-            raise ValueError("effective_year 与 query_at 不能同时提供")
+            raise PydanticCustomError(
+                "conflicting_year_query",
+                "effective_year 与 query_at 不能同时提供",
+                {"path": "query_at"},
+            )
         if self.query_at is not None:
             if self.query_at.tzinfo is None or self.query_at.utcoffset() is None:
-                raise ValueError("query_at 必须包含时区")
+                raise PydanticCustomError(
+                    "naive_query_at",
+                    "query_at 必须包含时区",
+                    {"path": "query_at"},
+                )
             if not 1801 <= self.query_at.year <= 2199:
-                raise ValueError("query_at 支持 1801–2199 年")
+                raise PydanticCustomError(
+                    "query_at_out_of_range",
+                    "query_at 支持 1801–2199 年",
+                    {"path": "query_at"},
+                )
         return self
 
 
@@ -655,14 +779,40 @@ class MonthlyRequest(TimeInput):
     @model_validator(mode="after")
     def selected_month_clock(self) -> "MonthlyRequest":
         if (self.effective_solar_year is None) != (self.solar_month_number is None):
-            raise ValueError("effective_solar_year与solar_month_number必须成对")
+            missing = (
+                "effective_solar_year"
+                if self.effective_solar_year is None
+                else "solar_month_number"
+            )
+            present = (
+                "solar_month_number"
+                if self.effective_solar_year is None
+                else "effective_solar_year"
+            )
+            raise PydanticCustomError(
+                "incomplete_solar_month",
+                "effective_solar_year与solar_month_number必须成对",
+                {"path": missing, "required_with": [present]},
+            )
         if self.query_at is not None:
             if self.effective_solar_year is not None:
-                raise ValueError("query_at与已确认有效年/节月不能同时提供")
+                raise PydanticCustomError(
+                    "conflicting_month_query",
+                    "query_at与已确认有效年/节月不能同时提供",
+                    {"path": "query_at"},
+                )
             if self.query_at.tzinfo is None or self.query_at.utcoffset() is None:
-                raise ValueError("query_at必须包含时区")
+                raise PydanticCustomError(
+                    "naive_query_at",
+                    "query_at必须包含时区",
+                    {"path": "query_at"},
+                )
             if not 1801 <= self.query_at.year <= 2199:
-                raise ValueError("query_at支持1801–2199年")
+                raise PydanticCustomError(
+                    "query_at_out_of_range",
+                    "query_at支持1801–2199年",
+                    {"path": "query_at"},
+                )
         return self
 
 
@@ -693,7 +843,11 @@ class HousePeriod(TimeInput):
             )
             != 1
         ):
-            raise ValueError("定运需且仅需 period_number、event_year、event_at 之一")
+            raise PydanticCustomError(
+                "invalid_period_selection",
+                "定运需且仅需 period_number、event_year、event_at 之一",
+                {"path": "period_number"},
+            )
         if self.basis is None:
             self.basis = (
                 "expert_confirmed"
@@ -703,14 +857,26 @@ class HousePeriod(TimeInput):
         if self.event_at is not None:
             AnnualRequest(query_at=self.event_at, timezone_name=self.timezone_name)
         if self.basis == "expert_confirmed" and self.period_number is None:
-            raise ValueError("expert_confirmed 必须显式确认 period_number")
+            raise PydanticCustomError(
+                "missing_period_number",
+                "expert_confirmed 必须显式确认 period_number",
+                {"path": "period_number"},
+            )
         if self.basis == "confirmed_major_renovation":
             if self.qualifies_for_period_reset is None:
                 self.qualifies_for_period_reset = True
             elif self.qualifies_for_period_reset is not True:
-                raise ValueError("大修换运须明确 qualifies_for_period_reset=true")
+                raise PydanticCustomError(
+                    "invalid_period_reset",
+                    "大修换运须明确 qualifies_for_period_reset=true",
+                    {"path": "qualifies_for_period_reset", "expected": True},
+                )
         elif self.qualifies_for_period_reset is not None:
-            raise ValueError("qualifies_for_period_reset 仅用于已确认的大修换运")
+            raise PydanticCustomError(
+                "unexpected_period_reset",
+                "qualifies_for_period_reset 仅用于已确认的大修换运",
+                {"path": "qualifies_for_period_reset"},
+            )
         return self
 
 
@@ -740,7 +906,11 @@ class CityGateObservation(FengshuiInput):
             "water_reflects_towards_site",
         )
         if not any(getattr(self, k) is not None for k in fields):
-            raise ValueError("城门观察须至少提供一项明确形势事实")
+            raise PydanticCustomError(
+                "empty_city_gate_observation",
+                "城门观察须至少提供一项明确形势事实",
+                {"path": "water_present"},
+            )
         if self.water_present is False and any(
             getattr(self, k) is True
             for k in (
@@ -749,12 +919,20 @@ class CityGateObservation(FengshuiInput):
                 "water_reflects_towards_site",
             )
         ):
-            raise ValueError("无水与明确水口/三叉水/水光事实不得冲突")
+            raise PydanticCustomError(
+                "conflicting_water_observation",
+                "无水与明确水口/三叉水/水光事实不得冲突",
+                {"path": "water_present"},
+            )
         if (
             self.sole_opening_with_water is True
             and self.multiple_openings_present is True
         ):
-            raise ValueError("唯一缺口与多个缺口不得同时为真")
+            raise PydanticCustomError(
+                "conflicting_opening_observation",
+                "唯一缺口与多个缺口不得同时为真",
+                {"path": "sole_opening_with_water"},
+            )
         return self
 
 
@@ -770,7 +948,11 @@ class CityGateRequest(FengshuiInput):
     def unique_mountains(self) -> "CityGateRequest":
         values = [o.mountain for o in self.observations]
         if len(values) != len(set(values)):
-            raise ValueError("同一城门山位不可重复")
+            raise PydanticCustomError(
+                "duplicate_city_gate_mountains",
+                "同一城门山位不可重复",
+                {"path": "observations"},
+            )
         return self
 
 
@@ -796,7 +978,11 @@ class LingzhengObservation(FengshuiInput):
                 "river_water_present",
             )
         ):
-            raise ValueError("零正形势须至少有一项明确存在或不存在的事实")
+            raise PydanticCustomError(
+                "empty_lingzheng_observation",
+                "零正形势须至少有一项明确存在或不存在的事实",
+                {"path": "high_solid_terrain_present"},
+            )
         return self
 
 
@@ -811,9 +997,17 @@ class FixedLingzhengRequest(FengshuiInput):
     @model_validator(mode="after")
     def explicit_half_and_unique_directions(self) -> "FixedLingzhengRequest":
         if self.five_period_half is None and self.half_evidence is not None:
-            raise ValueError("未指定五运分段时不得单独提供 half_evidence")
+            raise PydanticCustomError(
+                "missing_five_period_half",
+                "未指定五运分段时不得单独提供 half_evidence",
+                {"path": "half_evidence", "required_with": ["five_period_half"]},
+            )
         if len({o.direction for o in self.observations}) != len(self.observations):
-            raise ValueError("零正外局同一方向不可重复")
+            raise PydanticCustomError(
+                "duplicate_lingzheng_directions",
+                "零正外局同一方向不可重复",
+                {"path": "observations"},
+            )
         return self
 
 
@@ -831,7 +1025,11 @@ class ExternalFormObservation(FengshuiInput):
     @model_validator(mode="after")
     def explicit_observation(self) -> "ExternalFormObservation":
         if self.mountain_present is None and self.water_present is None:
-            raise ValueError("外局须至少明确山形或水形的一项观察")
+            raise PydanticCustomError(
+                "empty_external_form_observation",
+                "外局须至少明确山形或水形的一项观察",
+                {"path": "mountain_present"},
+            )
         return self
 
 
@@ -856,19 +1054,29 @@ class XuankongInterpretationRequest(FengshuiInput):
                 and self.current_period_number is not None
                 and self.current_period_number != 5
             ):
-                raise ValueError("零正五运分段仅可用于明确评价五运")
+                raise PydanticCustomError(
+                    "invalid_five_period_half",
+                    "零正五运分段仅可用于明确评价五运",
+                    {"path": "fixed_lingzheng"},
+                )
             old_water = {o.direction: o.water_present for o in self.external_forms}
             for obs in self.fixed_lingzheng.observations:
                 if (
                     obs.river_water_present is True
                     and old_water.get(obs.direction) is False
                 ):
-                    raise ValueError(
-                        "同一全宅方向的有水事实不能在飞星与固定零正观察中冲突"
+                    raise PydanticCustomError(
+                        "conflicting_water_observation",
+                        "同一全宅方向的有水事实不能在飞星与固定零正观察中冲突",
+                        {"path": "fixed_lingzheng"},
                     )
         directions = [o.direction for o in self.external_forms]
         if len(set(directions)) != len(directions):
-            raise ValueError("同一全宅外局方向不能重复")
+            raise PydanticCustomError(
+                "duplicate_external_form_directions",
+                "同一全宅外局方向不能重复",
+                {"path": "external_forms"},
+            )
         return self
 
 
@@ -889,7 +1097,11 @@ class XuankongRequest(FengshuiInput):
             and self.house.bearing_uncertainty_degrees is not None
         ):
             if self.house.bearing_uncertainty_degrees > 7.5:
-                raise ValueError("本玄空版本的宅向误差半径最多支持7.5度")
+                raise PydanticCustomError(
+                    "bearing_uncertainty_too_large",
+                    "本玄空版本的宅向误差半径最多支持7.5度",
+                    {"path": "house.bearing_uncertainty_degrees", "le": 7.5},
+                )
         if self.house is not None:
             self.house.check_sitting_trigram(self.effective_bearing_uncertainty)
         if self.house is not None and (
@@ -902,15 +1114,21 @@ class XuankongRequest(FengshuiInput):
                 and self.house.north_reference == "true"
             )
         ):
-            raise ValueError("本玄空版本使用磁北宅向；真北需先完成磁偏角校正")
+            raise PydanticCustomError(
+                "invalid_north_reference",
+                "本玄空版本使用磁北宅向；真北需先完成磁偏角校正",
+                {"path": "house.north_reference", "expected": "magnetic"},
+            )
         if (
             self.current_period_number is not None
             and self.interpretation is not None
             and self.interpretation.current_period_number is not None
             and self.current_period_number != self.interpretation.current_period_number
         ):
-            raise ValueError(
-                "current_period_number 与 interpretation.current_period_number 不一致"
+            raise PydanticCustomError(
+                "conflicting_period_number",
+                "current_period_number 与 interpretation.current_period_number 不一致",
+                {"path": "current_period_number"},
             )
         if self.current_period_number is not None:
             if (
@@ -930,7 +1148,11 @@ class XuankongRequest(FengshuiInput):
             and self.interpretation.current_period_number is not None
             and self.interpretation.current_period_number != 5
         ):
-            raise ValueError("零正五运分段仅可用于明确评价五运")
+            raise PydanticCustomError(
+                "invalid_five_period_half",
+                "零正五运分段仅可用于明确评价五运",
+                {"path": "interpretation.fixed_lingzheng"},
+            )
         return self
 
     @property
@@ -1038,18 +1260,38 @@ class AssessRequest(BazhaiRequest):
         if self.analyze_layout is None:
             self.analyze_layout = bool(self.placements)
         if self.built_year is not None and self.period_number is not None:
-            raise ValueError("built_year 与 period_number 不能同时提供")
+            raise PydanticCustomError(
+                "conflicting_period_fields",
+                "built_year 与 period_number 不能同时提供",
+                {"path": "period_number"},
+            )
         if not self.selected_methods:
-            raise ValueError("至少选择一层计算")
+            raise PydanticCustomError(
+                "missing_methods",
+                "至少选择一层计算",
+                {"path": "methods"},
+            )
         if len(set(self.selected_methods)) != len(self.selected_methods):
-            raise ValueError("methods 不得重复")
+            raise PydanticCustomError(
+                "duplicate_methods",
+                "methods 不得重复",
+                {"path": "methods"},
+            )
         _assign_feature_ids(self.features)
         JinsuoRequest(features=self.features, ruleset_id=self.jinsuo_ruleset_id)
         flat_period: HousePeriod | None = None
         if self.built_year is not None or self.period_number is not None:
             if self.xuankong is not None and self.xuankong.period is not None:
-                raise ValueError(
-                    "顶层 built_year/period_number 不能与 xuankong.period 同时提供"
+                raise PydanticCustomError(
+                    "conflicting_period_fields",
+                    "顶层 built_year/period_number 不能与 xuankong.period 同时提供",
+                    {
+                        "path": (
+                            "built_year"
+                            if self.built_year is not None
+                            else "period_number"
+                        )
+                    },
                 )
             flat_period = HousePeriod(
                 event_year=self.built_year,
@@ -1059,14 +1301,20 @@ class AssessRequest(BazhaiRequest):
         if (
             self.xuankong is not None or flat_period is not None
         ) and "xuankong_natal" not in self.selected_methods:
-            raise ValueError(
-                "提供 xuankong/built_year/period_number 时须在 methods 中选择 xuankong_natal"
+            raise PydanticCustomError(
+                "missing_xuankong_method",
+                "提供 xuankong/built_year/period_number 时须在 methods 中选择 xuankong_natal",
+                {"path": "methods"},
             )
         if "xuankong_natal" in self.selected_methods:
             natal = self.xuankong or XuankongRequest()
             if self.house is not None and natal.house is not None:
                 if self.house.model_dump() != natal.house.model_dump():
-                    raise ValueError("合参顶层 house 与 xuankong.house 必须一致")
+                    raise PydanticCustomError(
+                        "conflicting_house",
+                        "合参顶层 house 与 xuankong.house 必须一致",
+                        {"path": "xuankong.house"},
+                    )
             inferred_period = self._inferred_current_period()
             current_period = natal.current_period_number
             if current_period is None and inferred_period is not None:

@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import difflib
 import logging
-from collections.abc import Sequence
+from collections.abc import Collection, Sequence
 from functools import wraps
 from traceback import walk_tb
 from typing import Any, Callable, ParamSpec
@@ -309,14 +310,23 @@ class ParameterError(ValueError):
         }
 
 
-def validation_error_result(error: ValidationError) -> dict[str, Any]:
+def validation_error_result(
+    error: ValidationError,
+    *,
+    allowed_fields: Collection[str] | None = None,
+) -> dict[str, Any]:
     """Return validator feedback to the caller without attaching the input body."""
     return validation_issues_result(
-        error.errors(include_input=False, include_url=False)
+        error.errors(include_input=False, include_url=False),
+        allowed_fields=allowed_fields,
     )
 
 
-def validation_issues_result(entries: Sequence[ErrorDetails]) -> dict[str, Any]:
+def validation_issues_result(
+    entries: Sequence[ErrorDetails],
+    *,
+    allowed_fields: Collection[str] | None = None,
+) -> dict[str, Any]:
     # note (Pydantic): Keep typed native source faults carried in ctx.error.
     if not any(item["type"] == "consultation_restricted" for item in entries):
         for item in entries:
@@ -354,9 +364,23 @@ def validation_issues_result(entries: Sequence[ErrorDetails]) -> dict[str, Any]:
                 "expected",
                 "pattern",
                 "required_with",
+                "allowed",
+                "suggestions",
+                "available",
             )
             if key in context
         }
+        if (
+            code == "extra_forbidden"
+            and allowed_fields
+            and len(loc) == 1
+            and "suggestions" not in constraints
+        ):
+            suggestions = difflib.get_close_matches(
+                str(loc[0]), sorted(allowed_fields), n=5, cutoff=0.6
+            )
+            if suggestions:
+                constraints["suggestions"] = suggestions
         if field := context.get("path"):
             path = f"{path}.{field}" if path else field
         issue_message = item["msg"]
@@ -397,10 +421,15 @@ def validation_issues_result(entries: Sequence[ErrorDetails]) -> dict[str, Any]:
     }
 
 
-def handle_calculation_error(error: Exception, operation: str) -> dict[str, Any]:
+def handle_calculation_error(
+    error: Exception,
+    operation: str,
+    *,
+    allowed_fields: Collection[str] | None = None,
+) -> dict[str, Any]:
     """Return caller diagnostics and log only exception identity and stack locations."""
     if isinstance(error, ValidationError):
-        return validation_error_result(error)
+        return validation_error_result(error, allowed_fields=allowed_fields)
     if isinstance(error, ParameterError):
         return error.as_result()
     if isinstance(error, DomainSourceError):

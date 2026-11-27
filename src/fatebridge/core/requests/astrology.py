@@ -15,6 +15,7 @@ from pydantic import (
     WrapValidator,
     model_validator,
 )
+from pydantic_core import PydanticCustomError
 
 from fatebridge.core.requests.base import (
     FateBridgeBaseRequest,
@@ -137,7 +138,11 @@ class SolarBirthClockFields(AstroChartRequest):
     @model_validator(mode="after")
     def _validate_solar_birth_timezone(self) -> "SolarBirthClockFields":
         if self.birth_clock_basis != "civil" and self.birth_timezone is not None:
-            raise ValueError("Explicit solar birth labels must omit birth_timezone")
+            raise PydanticCustomError(
+                "conflicting_solar_birth_timezone",
+                "Explicit solar birth labels must omit birth_timezone",
+                {"path": "birth_timezone"},
+            )
         return self
 
 
@@ -155,8 +160,10 @@ class AstroSpecialtyRequest(SolarBirthClockFields):
     @model_validator(mode="after")
     def _solar_birth_clock_scope(self) -> "AstroSpecialtyRequest":
         if self.birth_clock_basis != "civil" and self.use_true_solar_time:
-            raise ValueError(
-                "Local solar birth clocks require birth_timezone omitted and use_true_solar_time=false"
+            raise PydanticCustomError(
+                "conflicting_solar_birth_clock",
+                "Local solar birth clocks require birth_timezone omitted and use_true_solar_time=false",
+                {"path": "use_true_solar_time"},
             )
         return self
 

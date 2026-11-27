@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Literal
 
 from pydantic import Field, model_validator
+from pydantic_core import PydanticCustomError
 
 from fatebridge.core.bazi.calendar import ZiHourPolicy
 from fatebridge.core.requests.base import FateBridgeBaseRequest
@@ -194,9 +195,17 @@ class SukuyoCompatibilityRequest(FateBridgeBaseRequest):
 
     @model_validator(mode="after")
     def day_part_requires_hinoo(self) -> "SukuyoCompatibilityRequest":
-        if self.calendar_profile != "hinoo_t1299_host27" and any(
-            p is not None
-            for p in (self.person1_calendar_day_part, self.person2_calendar_day_part)
-        ):
-            raise ValueError("原典日序半日只适用于明确选择的Hinoo研究档案")
+        if self.calendar_profile != "hinoo_t1299_host27":
+            if self.person1_calendar_day_part is not None:
+                raise PydanticCustomError(
+                    "invalid_calendar_day_part",
+                    "原典日序半日只适用于明确选择的Hinoo研究档案",
+                    {"path": "person1_calendar_day_part"},
+                )
+            if self.person2_calendar_day_part is not None:
+                raise PydanticCustomError(
+                    "invalid_calendar_day_part",
+                    "原典日序半日只适用于明确选择的Hinoo研究档案",
+                    {"path": "person2_calendar_day_part"},
+                )
         return self

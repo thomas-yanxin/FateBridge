@@ -177,3 +177,47 @@ def discover_specs(
         "detail": query.detail,
         "tools": tools,
     }
+
+
+def describe_batch_interface() -> ServiceResult:
+    """Return the shared self-description contract for batch execution across CLI, REST, and MCP."""
+    from fatebridge.application.batch import MAX_BATCH_CALLS, BatchRequest
+
+    example_input: dict[str, Any] = {
+        "subjects": {
+            "demo": {
+                "name": "演示甲",
+                "gender": "male",
+                "birth_date": "1990-05-15",
+                "birth_time": "10:30:00",
+                "birth_place": "北京",
+                "timezone": "Asia/Shanghai",
+            }
+        },
+        "calls": [
+            {
+                "id": "bazi_chart",
+                "tool": "bazi_birth_chart",
+                "subject": "demo",
+                "fields": ["bazi_birth.day_master"],
+            },
+            {
+                "id": "minggua",
+                "tool": "fengshui_minggua",
+                "subject": "demo",
+            },
+        ],
+        "detail": "compact",
+    }
+    BatchRequest.model_validate(example_input)
+    return {
+        "tool": "batch",
+        "summary": "在单次无状态调用中对一个或多个对象（subjects）批量执行多个计算工具（calls），共享冻结时刻 as_of 并按调用隔离错误。",
+        "surface": ["cli", "rest", "mcp"],
+        "rest_path": "/api/batch",
+        "mcp_tool": "run_batch",
+        "limits": {"max_calls": MAX_BATCH_CALLS},
+        "input_schema": BatchRequest.model_json_schema(),
+        "example_input": example_input,
+        "cli_example": "fatebridge batch --request-file batch.json",
+    }

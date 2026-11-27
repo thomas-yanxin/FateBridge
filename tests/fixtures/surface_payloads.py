@@ -315,6 +315,10 @@ REST_POST_CASES = {
         "object_a": "Sun",
         "object_b": "Jupiter",
     },
+    "/api/places/lookup": lambda: {
+        "query": "北京",
+        "limit": 5,
+    },
     "/api/divination/meihua/time-cast": lambda: {
         "analysis_year": 2028,
         "analysis_month": 4,
@@ -638,6 +642,10 @@ MCP_CASES = {
             "object_a": "Sun",
             "object_b": "Jupiter",
         },
+    ),
+    "place_lookup": (
+        "place_lookup",
+        lambda: {"query": "北京", "limit": 5},
     ),
     "solar_terms_for_year": (
         "solar_terms_for_year",

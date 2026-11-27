@@ -3,6 +3,7 @@
 from typing import Annotated, Literal
 
 from pydantic import Field, StrictBool, StrictInt, model_validator
+from pydantic_core import PydanticCustomError
 
 from fatebridge.core.meihua.relations import ensure_observation_method_context
 from fatebridge.core.requests.base import FateBridgeBaseRequest
@@ -93,11 +94,17 @@ class ObservedCategories(FateBridgeBaseRequest):
     @model_validator(mode="after")
     def confirmed_single_subject(self) -> "ObservedCategories":
         if not self.single_subject_confirmed:
-            raise ValueError(
-                "所选端法类别入口须已确认单一对象；群物或未知不可默认一个对象"
+            raise PydanticCustomError(
+                "single_subject_not_confirmed",
+                "所选端法类别入口须已确认单一对象；群物或未知不可默认一个对象",
+                {"path": "single_subject_confirmed"},
             )
         if not self.subject_description.strip():
-            raise ValueError("物象描述不能用空白替代未知事实")
+            raise PydanticCustomError(
+                "blank_subject_description",
+                "物象描述不能用空白替代未知事实",
+                {"path": "subject_description"},
+            )
         return self
 
 
@@ -112,7 +119,11 @@ class ZhangChi(FateBridgeBaseRequest):
     @model_validator(mode="after")
     def nonzero(self) -> "ZhangChi":
         if self.zhang == self.chi == 0:
-            raise ValueError("丈尺占的丈数和尺数不能同时为零；寸数不参与取卦")
+            raise PydanticCustomError(
+                "zero_length_cast",
+                "丈尺占的丈数和尺数不能同时为零；寸数不参与取卦",
+                {"path": "zhang"},
+            )
         return self
 
 
@@ -128,7 +139,11 @@ class ChiCun(FateBridgeBaseRequest):
     @model_validator(mode="after")
     def nonzero(self) -> "ChiCun":
         if self.chi == self.cun == 0:
-            raise ValueError("尺寸占的尺数和寸数不能同时为零；分数不参与取卦")
+            raise PydanticCustomError(
+                "zero_length_cast",
+                "尺寸占的尺数和寸数不能同时为零；分数不参与取卦",
+                {"path": "chi"},
+            )
         return self
 
 
@@ -149,9 +164,17 @@ class MeihuaToneReference(FateBridgeBaseRequest):
 
     @model_validator(mode="after")
     def nonblank_reference(self) -> "MeihuaToneReference":
-        if not self.system_name.strip() or not self.source.strip():
-            raise ValueError(
-                "四声依据的音系及来源不能只含空白；未确认时留空整个tone_reference"
+        if not self.system_name.strip():
+            raise PydanticCustomError(
+                "blank_tone_reference",
+                "四声依据的音系及来源不能只含空白；未确认时留空整个tone_reference",
+                {"path": "system_name"},
+            )
+        if not self.source.strip():
+            raise PydanticCustomError(
+                "blank_tone_reference",
+                "四声依据的音系及来源不能只含空白；未确认时留空整个tone_reference",
+                {"path": "source"},
             )
         return self
 
@@ -177,7 +200,11 @@ class TextTones(FateBridgeBaseRequest):
     @model_validator(mode="after")
     def matching_characters(self) -> "TextTones":
         if self.text is not None and len(self.text) != len(self.tones):
-            raise ValueError("原字与四声类别须逐字对应；不自动猜音或删标点")
+            raise PydanticCustomError(
+                "mismatched_text_length",
+                "原字与四声类别须逐字对应；不自动猜音或删标点",
+                {"path": "text", "expected": len(self.tones)},
+            )
         return self
 
 
@@ -193,7 +220,11 @@ class TextStrokes(FateBridgeBaseRequest):
     @model_validator(mode="after")
     def matching_characters(self) -> "TextStrokes":
         if self.text is not None and len(self.text) != len(self.strokes):
-            raise ValueError("原字与所报笔画须逐字对应")
+            raise PydanticCustomError(
+                "mismatched_text_length",
+                "原字与所报笔画须逐字对应",
+                {"path": "text", "expected": len(self.strokes)},
+            )
         return self
 
 
@@ -210,7 +241,14 @@ class SingleCharacter(FateBridgeBaseRequest):
     @model_validator(mode="after")
     def complete_partition(self) -> "SingleCharacter":
         if self.left_strokes + self.right_strokes != self.total_strokes:
-            raise ValueError("所报左右阴阳画须完整分配全字笔画，不猜或重复计画")
+            raise PydanticCustomError(
+                "stroke_partition_mismatch",
+                "所报左右阴阳画须完整分配全字笔画，不猜或重复计画",
+                {
+                    "path": "total_strokes",
+                    "expected": self.left_strokes + self.right_strokes,
+                },
+            )
         return self
 
 
@@ -236,8 +274,10 @@ class TextCount(FateBridgeBaseRequest):
             self.text_basis == "fixed_transcription_2690596"
             and self.character_count > 100
         ):
-            raise ValueError(
-                "固定转录工作范围至100；影印百餘字须显式选择nlc1925_selected_span，且其精确上限未裁定"
+            raise PydanticCustomError(
+                "character_count_exceeds_basis",
+                "固定转录工作范围至100；影印百餘字须显式选择nlc1925_selected_span，且其精确上限未裁定",
+                {"path": "character_count", "le": 100},
             )
         return self
 
@@ -351,9 +391,17 @@ class MeihuaExternalObservation(FateBridgeBaseRequest):
     @model_validator(mode="after")
     def validate_observation(self) -> "MeihuaExternalObservation":
         if not self.label.strip():
-            raise ValueError("外应资料须有已报描述，不能用空白代替未知事实")
+            raise PydanticCustomError(
+                "blank_observation_label",
+                "外应资料须有已报描述，不能用空白代替未知事实",
+                {"path": "label"},
+            )
         if self.orientation is not None and self.motion == "stationary":
-            raise ValueError("同一时刻静止的外物不能同时声明趋近或离开")
+            raise PydanticCustomError(
+                "conflicting_motion_orientation",
+                "同一时刻静止的外物不能同时声明趋近或离开",
+                {"path": "orientation"},
+            )
         return self
 
 
@@ -379,7 +427,11 @@ class MeihuaObservationContext(FateBridgeBaseRequest):
     @model_validator(mode="after")
     def nonblank_label(self) -> "MeihuaObservationContext":
         if not self.label.strip():
-            raise ValueError("闻见语境须有已报说明，不能用空白代替未知")
+            raise PydanticCustomError(
+                "blank_observation_label",
+                "闻见语境须有已报说明，不能用空白代替未知",
+                {"path": "label"},
+            )
         return self
 
 
@@ -401,7 +453,11 @@ class MeihuaReputationContext(FateBridgeBaseRequest):
     @model_validator(mode="after")
     def nonblank_label(self) -> "MeihuaReputationContext":
         if not self.label.strip():
-            raise ValueError("求名情境须有已报说明，不能用空白代替未知事实")
+            raise PydanticCustomError(
+                "blank_reputation_label",
+                "求名情境须有已报说明，不能用空白代替未知事实",
+                {"path": "label"},
+            )
         return self
 
 
@@ -462,12 +518,18 @@ class MeihuaInterpretationOptions(FateBridgeBaseRequest):
             self.reputation_context is not None
             and self.interpretation_topic != "reputation"
         ):
-            raise ValueError(
-                "reputation_context须与interpretation_topic=reputation一起提供"
+            raise PydanticCustomError(
+                "invalid_topic_context",
+                "reputation_context须与interpretation_topic=reputation一起提供",
+                {"path": "reputation_context"},
             )
         if self.response_context is not None:
             if self.interpretation_topic == "weather":
-                raise ValueError("所选十应体用现场条件仅用于人事分支，不能套用天时占")
+                raise PydanticCustomError(
+                    "invalid_topic_context",
+                    "所选十应体用现场条件仅用于人事分支，不能套用天时占",
+                    {"path": "response_context"},
+                )
             self.response_context.validate_quiet_context(
                 self.observation_context.model_dump(mode="json")
                 if self.observation_context is not None
@@ -475,28 +537,50 @@ class MeihuaInterpretationOptions(FateBridgeBaseRequest):
             )
         if self.observation_context is not None:
             if self.interpretation_topic == "weather":
-                raise ValueError("所选静占体用语境仅用于人事分支，不能套用天时占")
+                raise PydanticCustomError(
+                    "invalid_topic_context",
+                    "所选静占体用语境仅用于人事分支，不能套用天时占",
+                    {"path": "observation_context"},
+                )
             if self.external_observations is not None and all(
                 getattr(self.observation_context, key) is True
                 for key in ("quiet_room", "nothing_heard", "nothing_seen")
             ):
-                raise ValueError("同次静室且无所闻见的声明不能同时附带已报外应资料")
+                raise PydanticCustomError(
+                    "conflicting_quiet_observation",
+                    "同次静室且无所闻见的声明不能同时附带已报外应资料",
+                    {"path": "external_observations"},
+                )
         if (
             self.observer_activity is not None
             and self.interpretation_topic == "weather"
         ):
-            raise ValueError("observer_activity仅用于所选人事动静条款，不能套用天时占")
+            raise PydanticCustomError(
+                "invalid_topic_context",
+                "observer_activity仅用于所选人事动静条款，不能套用天时占",
+                {"path": "observer_activity"},
+            )
         if self.matter_scenario is not None and self.interpretation_topic == "weather":
-            raise ValueError(
-                "matter_scenario仅为人事原文情境声明，不能用于不分体用的天时占"
+            raise PydanticCustomError(
+                "invalid_topic_context",
+                "matter_scenario仅为人事原文情境声明，不能用于不分体用的天时占",
+                {"path": "matter_scenario"},
             )
         if self.weather_context is not None and self.interpretation_topic != "weather":
-            raise ValueError("weather_context须与interpretation_topic=weather一起提供")
+            raise PydanticCustomError(
+                "invalid_topic_context",
+                "weather_context须与interpretation_topic=weather一起提供",
+                {"path": "weather_context"},
+            )
         if (
             self.external_observations is not None
             and self.interpretation_topic == "weather"
         ):
-            raise ValueError("所选外应体用资格仅用于人事分支，不能套用天时占")
+            raise PydanticCustomError(
+                "invalid_topic_context",
+                "所选外应体用资格仅用于人事分支，不能套用天时占",
+                {"path": "external_observations"},
+            )
         return self
 
 
@@ -519,7 +603,11 @@ class MeihuaCastRequest(MeihuaInterpretationOptions):
     @model_validator(mode="after")
     def observation_matches_casting(self) -> "MeihuaCastRequest":
         if self.day_qi_context is not None and self.interpretation_topic == "weather":
-            raise ValueError("所选日气体用条款仅用于人事分支，不能套用天时占")
+            raise PydanticCustomError(
+                "invalid_topic_context",
+                "所选日气体用条款仅用于人事分支，不能套用天时占",
+                {"path": "day_qi_context"},
+            )
         if self.observation_context is not None:
 
             ensure_observation_method_context(

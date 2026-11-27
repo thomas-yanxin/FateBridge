@@ -264,3 +264,80 @@ def test_liuyao_retires_conditional_analysis_and_event_horizon() -> None:
     )
     assert "event_horizon" not in res["analysis_context"]
     assert retired_evidence_fields.isdisjoint(res["liuyao_evidence"])
+
+
+def test_liuyao_focus_errors_expose_exact_paths_and_constraints() -> None:
+    from pydantic import ValidationError
+
+    from fatebridge.core.liuyao.evidence import resolve_focus
+    from fatebridge.core.requests.divination import SixYaoRequest
+    from fatebridge.utils.errors import ParameterError, validation_error_result
+
+    base = {"date": "2024-05-20", "time": "14:30:00", "timezone": "Asia/Shanghai"}
+    cases = [
+        ({**base, "lines": [{"value": 1}]}, "lines", "invalid_lines_count"),
+        (
+            {**base, "focus_kind": "day", "focus_line": 2},
+            "focus_line",
+            "conflicting_focus_line",
+        ),
+        ({**base, "focus_kind": "visible"}, "focus_kind", "missing_focus_target"),
+        ({**base, "timing_days": 5}, "timing_days", "missing_focus_for_timing"),
+    ]
+    for payload, expected_path, expected_code in cases:
+        with pytest.raises(ValidationError) as exc_info:
+            SixYaoRequest.model_validate(payload)
+        envelope = validation_error_result(exc_info.value)
+        assert envelope["issues"][0]["path"] == expected_path
+        assert envelope["issues"][0]["code"] == expected_code
+
+    # calculate_sixyao_analysis returns the ParameterError envelope from resolve_focus
+    static_changed = calculate_sixyao_analysis(
+        date="2024-05-20",
+        time="14:30",
+        timezone="Asia/Shanghai",
+        gua_code="100000",
+        changed_code="100100",
+        focus_kind="changed",
+        focus_line=1,
+    )
+    assert static_changed["error_code"] == "validation_error"
+    assert static_changed["issues"] == [
+        {
+            "path": "focus_line",
+            "code": "focus_line_not_available",
+            "constraints": {"available": [4]},
+        }
+    ]
+
+    mismatch = calculate_sixyao_analysis(
+        date="2024-05-20",
+        time="14:30",
+        timezone="Asia/Shanghai",
+        gua_code="100000",
+        changed_code="100100",
+        focus_line=1,
+        focus_kinship="官鬼",
+    )
+    assert mismatch["error_code"] == "validation_error"
+    assert mismatch["issues"] == [
+        {
+            "path": "focus_kinship",
+            "code": "focus_kinship_mismatch",
+            "constraints": {"expected": "妻财"},
+        }
+    ]
+
+    with pytest.raises(ParameterError) as bad_kind:
+        resolve_focus(
+            focus_line=None,
+            focus_kinship=None,
+            lines=[],
+            hidden=[],
+            palace="坤",
+            month="巳",
+            day="甲子",
+            focus_kind="bogus",
+        )
+    assert bad_kind.value.issues[0]["path"] == "focus_kind"
+    assert "visible" in bad_kind.value.issues[0]["constraints"]["allowed"]

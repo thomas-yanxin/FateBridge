@@ -181,7 +181,11 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
         except Exception as exc:
             # note (mcp): The shared error boundary logs unexpected failures without exposing request values.
             return _render_protocol_error(
-                handle_calculation_error(exc, spec.operation_label_zh),
+                handle_calculation_error(
+                    exc,
+                    spec.operation_label_zh,
+                    allowed_fields=spec.request_model.model_fields.keys(),
+                ),
                 spec.operation_label_zh,
             )
 
@@ -233,7 +237,9 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
             return protocol_result(payload, failed=False)
         except Exception as exc:
             return _render_protocol_error(
-                handle_calculation_error(exc, "run_batch"),
+                handle_calculation_error(
+                    exc, "run_batch", allowed_fields=BatchRequest.model_fields.keys()
+                ),
                 "run_batch",
             )
 

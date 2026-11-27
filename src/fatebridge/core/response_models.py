@@ -305,6 +305,16 @@ def output_model_for(tool_name: str) -> type[BaseModel]:
             }
             else {}
         ),
+        **(
+            {
+                "status": str,
+                "resolved": symbols["Object"],
+                "candidates": list[JsonValue],
+                "summary": str,
+            }
+            if tool_name == "place_lookup"
+            else {}
+        ),
     }
     overrides = {
         **symbols["CHINESE_FIELDS"],
@@ -503,6 +513,7 @@ TOOL_FIELDS = {
     "jinkou": "analysis_context analysis_type calendar_context four_pillars jinkou",
     "knowledge_catalog": "bundle_version domains provenance source",
     "knowledge_read": "bundle_version category citation domain key lines provenance query_normalized reference_only reference_details rendered_text source tips title",
+    "place_lookup": "query status resolved candidates summary",
     "astrology_chart": "angles apparent_model_positions aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars houses modality_balance person_info planetary_hours planets summary",
     "thirteen_sector_chart": "angles aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars houses modality_balance person_info planetary_hours planets summary thirteen_sectors sector_profile time_sensitivity",
     "hellenistic_chart": "angles aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars hellenistic houses modality_balance person_info planetary_hours planets summary",
@@ -586,6 +597,7 @@ REQUIRED_OUTPUT_FIELDS = {
     "jinkou": "jinkou",
     "knowledge_catalog": "domains provenance",
     "knowledge_read": "lines provenance",
+    "place_lookup": "query status candidates summary",
     "astrology_chart": "planets chart_profile",
     "thirteen_sector_chart": "planets chart_profile thirteen_sectors",
     "hellenistic_chart": "planets chart_profile hellenistic",

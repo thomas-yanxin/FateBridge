@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, model_validator
+from pydantic_core import PydanticCustomError
 
 from fatebridge.core.requests.base import (
     AnalysisDateFields,
@@ -178,7 +179,11 @@ class AstroHoraryRequest(WesternEventClockFields):
     @model_validator(mode="after")
     def _exclusive_question_clock(self) -> "AstroHoraryRequest":
         if self.question_clock_basis != "civil" and self.timezone_name is not None:
-            raise ValueError("Solar question clock must omit timezone_name")
+            raise PydanticCustomError(
+                "conflicting_solar_clock_timezone",
+                "Solar question clock must omit timezone_name",
+                {"path": "timezone_name"},
+            )
         return self
 
 
@@ -249,5 +254,9 @@ class AstroElectionRequest(WesternEventClockFields):
     @model_validator(mode="after")
     def _exclusive_candidate_clock(self) -> "AstroElectionRequest":
         if self.candidate_clock_basis != "civil" and self.timezone_name is not None:
-            raise ValueError("Solar candidate clock must omit timezone_name")
+            raise PydanticCustomError(
+                "conflicting_solar_clock_timezone",
+                "Solar candidate clock must omit timezone_name",
+                {"path": "timezone_name"},
+            )
         return self

@@ -2,9 +2,37 @@
 
 from __future__ import annotations
 
-from pydantic import Field
+from pydantic import Field, field_validator
+from pydantic_core import PydanticCustomError
 
 from fatebridge.core.requests.base import FateBridgeBaseRequest
+
+
+class PlaceLookupRequest(FateBridgeBaseRequest):
+    """Request model for offline place coordinate and timezone lookup."""
+
+    query: str = Field(
+        min_length=1,
+        max_length=200,
+        description="地名或行政区划查询字符串，支持省/市/县/区及常见海外城市中英文名",
+    )
+    limit: int = Field(
+        default=5,
+        ge=1,
+        le=20,
+        description="最多返回的候选地名条数（1-20，默认 5）",
+    )
+
+    @field_validator("query")
+    @classmethod
+    def _nonblank_query(cls, value: str) -> str:
+        stripped = value.strip()
+        if not stripped:
+            raise PydanticCustomError(
+                "blank_query",
+                "query 不能为空白字符串",
+            )
+        return stripped
 
 
 class KnowledgeRegistryRequest(FateBridgeBaseRequest):

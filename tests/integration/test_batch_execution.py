@@ -552,3 +552,35 @@ def test_batch_boundary_errors_across_surfaces(
     assert cli.run(["batch", "--request-file", str(tmp_path / "missing.json")]) == 2
     usage_err = json.loads(capsys.readouterr().out)
     assert usage_err["error_code"] == "usage_error"
+
+
+def test_batch_field_level_validation_and_call_suggestions() -> None:
+    with pytest.raises(ValidationError) as subj_err:
+        SubjectProfile.model_validate({"birth_date": "1990-02-30"})
+    assert subj_err.value.errors()[0]["ctx"]["path"] == "birth_date"
+
+    with pytest.raises(ValidationError) as call_err:
+        BatchCall.model_validate(
+            {"tool": "bazi_birth_chart", "subject": "a", "subjects": ["a"]}
+        )
+    assert call_err.value.errors()[0]["ctx"]["path"] == "subjects"
+
+    bad_arg_req = BatchRequest.model_validate(
+        {
+            "subjects": {"alice": ALICE_PROFILE},
+            "calls": [
+                {
+                    "id": "typo",
+                    "tool": "bazi_birth_chart",
+                    "subject": "alice",
+                    "arguments": {"birth_huor": 10},
+                }
+            ],
+        }
+    )
+    res = execute_batch(SPECS, bad_arg_req)
+    assert res["status"] == "error"
+    issue = res["results"][0]["error"]["issues"][0]
+    assert issue["code"] == "extra_forbidden"
+    assert issue["path"] == "birth_huor"
+    assert "birth_hour" in issue["constraints"]["suggestions"]
