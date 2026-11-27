@@ -9,7 +9,7 @@ from fatebridge.core.astro.reference import (
     CORE_CHART_DEFAULT_HOUSE_LABELS_ZH,
     CORE_CHART_DEFAULT_HOUSE_SYSTEMS,
     CORE_CHART_DEFAULT_ZODIACAL,
-    NODE_BODIES,
+    NON_PHYSICAL_BODIES,
     RELATIVE_HOUSE_SYSTEM_SPECS,
     RELATIVE_ZODIACAL_LABELS_ZH,
 )
@@ -22,22 +22,29 @@ from fatebridge.utils.house_systems import (
 )
 
 ANALYTICAL_MEAN_NODE_MODEL = "swisseph_analytical_mean_node"
+ANALYTICAL_MEAN_APOGEE_MODEL = "swisseph_analytical_mean_apogee"
 
 
 def native_factor_model(body_id: int, returned_flags: int) -> str:
-    """Mean-node flags echo the request, not a loaded vector ephemeris.
+    """Mean-node and mean-apogee flags echo the request, not a loaded vector ephemeris.
 
-    Swiss 2.10.03 sweph.c delegates this point to swi_mean_node() in
-    swemmoon.c. Frame/nutation handling is separate from its mean elements.
+    Swiss 2.10.03 sweph.c delegates these points to swi_mean_node() and
+    swi_mean_apog() in swemmoon.c. Frame/nutation handling is separate from
+    their mean elements.
     """
-    if runtime.swe is not None and body_id == runtime.swe.MEAN_NODE:
-        return ANALYTICAL_MEAN_NODE_MODEL
+    if runtime.swe is not None:
+        if body_id == runtime.swe.MEAN_NODE:
+            return ANALYTICAL_MEAN_NODE_MODEL
+        if body_id == getattr(runtime.swe, "MEAN_APOG", 12):
+            return ANALYTICAL_MEAN_APOGEE_MODEL
     return runtime.ephemeris_model_from_retflag(returned_flags)
 
 
 def physical_ephemeris_summary(models: Mapping[str, str]) -> str:
     """Summarize physical bodies, keeping reference points and quality apart."""
-    physical = {model for name, model in models.items() if name not in NODE_BODIES}
+    physical = {
+        model for name, model in models.items() if name not in NON_PHYSICAL_BODIES
+    }
     if not physical:
         return "none"
     if len(physical) == 1:

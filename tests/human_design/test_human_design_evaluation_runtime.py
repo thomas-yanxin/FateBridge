@@ -28,17 +28,19 @@ def test_unique_actual_running_app_beats_incompatible_PATH_without_reading_argum
     desktop, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     seen = []
+    posix_desktop = desktop.as_posix()
 
     def ps(args, **kwargs):
         seen.append((args, kwargs))
         return SimpleNamespace(
-            returncode=0, stdout=f"COMMAND\n{desktop}\n{desktop}\n/bin/shell\n"
+            returncode=0,
+            stdout=f"COMMAND\n{posix_desktop}\n{posix_desktop}\n/bin/shell\n",
         )
 
     monkeypatch.setattr(d.subprocess, "run", ps)
     result = d.resolve_codex_cli()
     assert result == {
-        "path": str(desktop),
+        "path": posix_desktop,
         "source": "running_desktop",
         "path_cli": "/old/PATH/codex",
     }
@@ -52,19 +54,16 @@ def test_unique_actual_running_app_beats_incompatible_PATH_without_reading_argum
 def test_uncertain_desktop_discovery_keeps_explicit_PATH_fallback(
     desktop, monkeypatch: pytest.MonkeyPatch, tmp_path: Path, fault: str
 ) -> None:
-    text = str(desktop)
+    text = desktop.as_posix()
     if fault == "ambiguous":
         other = tmp_path / "Other.app/Contents/MacOS/codex"
         other.parent.mkdir(parents=True)
         other.write_text("x")
         other.chmod(0o755)
-        text += "\n" + str(other)
-    else:
-        pass
+        text += "\n" + other.as_posix()
     if fault == "non_executable":
         desktop.chmod(0o644)
-    else:
-        pass
+        monkeypatch.setattr(d.os, "access", lambda *_args, **_kwargs: False)
 
     def ps(*args, **kwargs):
         if fault == "timeout":

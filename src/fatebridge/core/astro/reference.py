@@ -102,6 +102,9 @@ PLANET_SEQUENCE = [*PHYSICAL_BODIES, "North Node"]
 # 月亮交点（虚点）。元素 / 模式平衡按行星本体统计，不计交点。
 NODE_BODIES = frozenset({"North Node", "South Node"})
 
+# 非物理星体 / 瑞士星历解析虚点（不依赖 .se1 物理星历文件，不计入物理星历来源追踪）。
+NON_PHYSICAL_BODIES = NODE_BODIES | frozenset({"True Node", "Lilith"})
+
 
 # 元素 / 模式平衡的统计口径说明（随盘面输出，供解读时标明基准）。
 BALANCE_BASIS = "行星本体计入；月亮交点（虚点）不计入元素/模式统计"

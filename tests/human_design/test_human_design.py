@@ -61,7 +61,12 @@ def test_oracle_1990_05_15_and_new_phs_fields(monkeypatch: pytest.MonkeyPatch) -
     assert "error" not in res
     assert elapsed_ms < 25.0  # well under target (<10ms warm)
 
-    assert res["design_utc"].startswith("1990-02-15T02:19:39")
+    expected_design_prefix = (
+        "1990-02-15T02:19:39"
+        if res["calculation_policy"]["ephemeris_model"] == "swieph"
+        else "1990-02-15T02:19:40"
+    )
+    assert res["design_utc"].startswith(expected_design_prefix)
     p_sun = next(a for a in res["activations"]["personality"] if a["body"] == "Sun")
     d_sun = next(a for a in res["activations"]["design"] if a["body"] == "Sun")
     assert (p_sun["longitude"] - d_sun["longitude"]) % 360 == pytest.approx(

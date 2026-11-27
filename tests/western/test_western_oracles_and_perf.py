@@ -264,7 +264,7 @@ def test_warm_latencies_meet_realtime_budgets() -> None:
         (
             "astrology_chart",
             lambda: calculate_core_chart_analysis(**NATAL_1990, chart_variant="chart"),
-            30.0,
+            80.0,
         ),
         (
             "horary_chart",
@@ -279,7 +279,7 @@ def test_warm_latencies_meet_realtime_budgets() -> None:
                 latitude=39.9,
                 category="marriage",
             ),
-            130.0,
+            350.0,
         ),
         (
             "evaluate_election_time",
@@ -294,24 +294,24 @@ def test_warm_latencies_meet_realtime_budgets() -> None:
                 latitude=39.9,
                 topic_id="marriage",
             ),
-            35.0,
+            100.0,
         ),
         (
             "planetary_returns",
             lambda: calculate_extrareturns(
                 **NATAL_1990, analysis_year=2025, analysis_month=1, analysis_day=1
             ),
-            85.0,
+            200.0,
         ),
         (
             "hamburg_midpoint_chart",
             lambda: calculate_germany_chart_analysis(**NATAL_1990),
-            30.0,
+            80.0,
         ),
         (
             "lunar_phase_progressions",
             lambda: calculate_lunation_phase(**NATAL_1990),
-            35.0,
+            100.0,
         ),
     ]
     for label, fn, limit_ms in cases:

@@ -30,7 +30,7 @@ from fatebridge.core.astro.profiles import (
 )
 from fatebridge.core.astro.reference import (
     EXTRA_BODY_SWISSEPH_IDS,
-    NODE_BODIES,
+    NON_PHYSICAL_BODIES,
     PLANET_SEQUENCE,
     PLANET_SWISSEPH_IDS,
     TRADITIONAL_PLANETS,
@@ -199,7 +199,7 @@ def _swisseph_planet_state(
     if epoch is None or not math.isfinite(epoch):
         raise ValueError("A finite TT or UT1 Julian day is required")
     trace = source_trace if source_trace is not None else PhysicalEphemerisTrace()
-    physical = planet not in NODE_BODIES and planet != "True Node"
+    physical = planet not in NON_PHYSICAL_BODIES
     selected = configured_ephemeris_path()
     try:
         coordinates, flag = fast_swe_call(
