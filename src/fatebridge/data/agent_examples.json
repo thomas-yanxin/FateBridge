@@ -695,13 +695,16 @@
     "bazi_luck_cycles": [
       "person_info",
       "dayun",
+      "dayun_timeline",
       "element_effects",
       "analysis_context"
     ],
     "bazi_yearly_timing": [
       "person_info",
       "liunian",
-      "element_effects"
+      "element_effects",
+      "analysis_context",
+      "yearly_timeline"
     ],
     "bazi_monthly_timing": [
       "person_info",
@@ -710,17 +713,20 @@
       "liuyue.branch",
       "liuyue.element",
       "liuyue.nayin",
+      "liuyue.solar_term_window",
       "detailed_analysis",
       "element_effects",
       "combined_effects",
       "liunian",
-      "analysis_context"
+      "analysis_context",
+      "monthly_timeline"
     ],
     "bazi_daily_timing": [
       "person_info",
       "liuri",
       "element_effects",
-      "analysis_context"
+      "analysis_context",
+      "daily_timeline"
     ],
     "bazi_hourly_timing": [
       "person_info",
@@ -850,8 +856,8 @@
       "angles",
       "sector_profile",
       "thirteen_sectors",
-      "time_sensitivity.status",
-      "time_sensitivity.uncertainty_minutes",
+      "birth_time_sensitivity.status",
+      "birth_time_sensitivity.uncertainty_minutes",
       "person_info"
     ],
     "hellenistic_chart": [
@@ -1356,6 +1362,8 @@
       "analysis_calendar.analysis_date_context.next_solar_term.name",
       "analysis_calendar.analysis_date_context.next_solar_term.datetime_with_offset",
       "analysis_calendar.analysis_date_context.bazi_month_boundary.branch",
+      "analysis_calendar.liuyue_timeline",
+      "analysis_calendar.jieqi_timeline",
       "dayun.child_limit"
     ],
     "ziwei_birth_chart": [
@@ -1518,8 +1526,8 @@
       "midpoint_analysis.status",
       "midpoint_analysis.profile",
       "midpoint_analysis.contact_counts",
-      "midpoint_analysis.time_sensitivity.status",
-      "midpoint_analysis.time_sensitivity.uncertainty_minutes",
+      "midpoint_analysis.birth_time_sensitivity.status",
+      "midpoint_analysis.birth_time_sensitivity.uncertainty_minutes",
       "midpoint_analysis.unique_two_factor_pair_count",
       "base_chart.person_info"
     ],
@@ -1964,8 +1972,8 @@
       "midpoint_analysis.status",
       "midpoint_analysis.profile",
       "midpoint_analysis.contact_counts",
-      "midpoint_analysis.time_sensitivity.status",
-      "midpoint_analysis.time_sensitivity.uncertainty_minutes",
+      "midpoint_analysis.birth_time_sensitivity.status",
+      "midpoint_analysis.birth_time_sensitivity.uncertainty_minutes",
       "midpoint_analysis.unique_two_factor_pair_count",
       "base_chart.person_info"
     ],
@@ -1974,8 +1982,8 @@
       "sector_profile",
       "planets",
       "thirteen_sectors",
-      "time_sensitivity.status",
-      "time_sensitivity.uncertainty_minutes",
+      "birth_time_sensitivity.status",
+      "birth_time_sensitivity.uncertainty_minutes",
       "person_info"
     ],
     "guolao_chart": [
@@ -2382,7 +2390,7 @@
     },
     "hamburg_midpoint_chart": {
       "native_layer": "midpoint_analysis uses unrounded 22-factor geometry and a shared UTC/TT/UT1 policy. Sensitive-point equations double the midpoint period and orb; folded-only occupancy does not activate the direct source example.",
-      "birth_time_uncertainty": "Pass user-confirmed birth_time_uncertainty_minutes (0..120), then read time_sensitivity. None is unknown, not exact. Samples vary recorded UTC before optional solar correction.",
+      "birth_time_uncertainty": "Pass user-confirmed birth_time_uncertainty_minutes (0..120), then read birth_time_sensitivity. None is unknown, not exact. Samples vary recorded UTC before optional solar correction.",
       "solar_arc": "Only pass analysis_datetime when the user specifies a target instant with explicit timezone offset. The true solar arc uses actual tropical Sun displacement, including in the fixed natal Lahiri display.",
       "daily_meridian": "The selected Witte 1924 p.15 equation is solar_arc_analysis.daily_meridian: IC.day=IC.natal+solar_arc-Sun.natal.tropical+Sun.target.tropical, MC.day=IC.day+180.",
       "fictitious_elements": "Read profile.hypothetical_element_source: library_builtin or first readable external seorbel.txt with source details and search-path index. Nonempty SE_EPHE_PATH takes precedence in Swiss.",
@@ -2416,7 +2424,7 @@
     },
     "thirteen_sector_chart": {
       "geometry": "sector13 is an ascendant-relative equal partition, independent of the twelve-house selection; IAU constellations have different boundaries.",
-      "birth_time_uncertainty": "Pass user-confirmed birth_time_uncertainty_minutes (0..120), then read time_sensitivity. None is unknown, not exact. Samples vary recorded UTC before optional solar correction.",
+      "birth_time_uncertainty": "Pass user-confirmed birth_time_uncertainty_minutes (0..120), then read birth_time_sensitivity. None is unknown, not exact. Samples vary recorded UTC before optional solar correction.",
       "birth_seconds": "Pass birth_second only from an actually recorded clock or an explicitly identified historical clock conversion. Omission represents the start of the supplied minute, not evidence of exact seconds.",
       "clock_basis": "Use birth_clock_basis=civil for a recorded civil zone clock. Only an explicitly identified historical LMT/LAT record may select local_mean_solar/local_apparent_solar, with birth_timezone omitted and use_true_solar_time=false.",
       "physical_ephemeris": "Read chart_profile.physical_ephemeris_source for the actual nominal physical-body models, observed file names, ranges and DE headers; the analytical node is separate.",
@@ -4126,8 +4134,8 @@
           "midpoint_analysis.status",
           "midpoint_analysis.profile",
           "midpoint_analysis.contact_counts",
-          "midpoint_analysis.time_sensitivity.status",
-          "midpoint_analysis.time_sensitivity.uncertainty_minutes",
+          "midpoint_analysis.birth_time_sensitivity.status",
+          "midpoint_analysis.birth_time_sensitivity.uncertainty_minutes",
           "midpoint_analysis.unique_two_factor_pair_count",
           "base_chart.person_info"
         ],
@@ -4157,14 +4165,14 @@
         "fields": [
           "midpoint_analysis.profile",
           "midpoint_analysis.factors",
-          "midpoint_analysis.time_sensitivity",
+          "midpoint_analysis.birth_time_sensitivity",
           "base_chart.person_info"
         ],
         "purpose": "Only matched source-attributed symbolic readings; claim_id deduplicates the same reading across dials. An empty list does not mean all traditional interpretations were tested. Distinguish unresolved physical MC from formal backend conditions and unavailable arcs. Read resolved/unresolved condition counts; unknown applicability is not absence. Only ASC degeneracy does not restrict a resolved MC."
       },
       "time_sensitivity": {
         "fields": [
-          "midpoint_analysis.time_sensitivity",
+          "midpoint_analysis.birth_time_sensitivity",
           "base_chart.person_info"
         ],
         "purpose": "Recomputed user-confirmed birth-time interval on a TT grid with at most 30 SI seconds between samples. Missing interval is unknown. Sampled stability is neither a continuous interval proof nor a probability; inspect nominal interpretations/partitions separately. Distinguish unresolved physical MC from formal backend conditions and unavailable arcs. Read resolved/unresolved condition counts; unknown applicability is not absence. Only ASC degeneracy does not restrict a resolved MC."
@@ -4215,7 +4223,7 @@
       "meridian_houses": {
         "when": "用户指定汉堡／Witte 1923 本命子午宫表，或追问赤经等分与实际ASC的区别",
         "fields": [
-          "midpoint_analysis.time_sensitivity",
+          "midpoint_analysis.birth_time_sensitivity",
           "base_chart.chart_profile",
           "base_chart.person_info"
         ],
@@ -4284,15 +4292,15 @@
           "sector_profile",
           "planets",
           "thirteen_sectors",
-          "time_sensitivity.status",
-          "time_sensitivity.uncertainty_minutes",
+          "birth_time_sensitivity.status",
+          "birth_time_sensitivity.uncertainty_minutes",
           "person_info"
         ],
         "purpose": "Custom 13 equal sectors; not astronomical constellation membership"
       },
       "time_sensitivity": {
         "fields": [
-          "time_sensitivity",
+          "birth_time_sensitivity",
           "person_info"
         ],
         "purpose": "Recomputed user-confirmed birth-time interval on a TT grid with at most 30 SI seconds between samples. Missing interval is unknown. Sampled stability is neither a continuous interval proof nor a probability; inspect nominal interpretations/partitions separately."
@@ -5255,7 +5263,7 @@
           "birth_utc",
           "calculation_policy.node_mode",
           "calculation_policy.ephemeris_model",
-          "time_sensitivity.status"
+          "birth_time_sensitivity.status"
         ],
         "purpose": "联合比较桥接门集、线固定与四箭头；需明确birth_time_uncertainty_minutes才做区间采样，0返回未评估。完整快照及局部字段路径读取同次结果，不以方案数量或有限网格认证稳定性；另列已观测多依赖过渡细查及未分开区间，不把有限细查认证为连续穷尽"
       },
@@ -5321,7 +5329,7 @@
           "design_solver",
           "activations",
           "variables",
-          "time_sensitivity"
+          "birth_time_sensitivity"
         ],
         "purpose": "连续TT、最终相邻浮点太阳根见证、端点日地细分与实际星历口径；数值收敛不表示物理精度认证。实际设计根端点另读root_endpoints，分别保留13项激活、整盘结构与四箭头差异；不把端点一致当连续稳定，也不拼接候选盘。"
       },
@@ -5337,7 +5345,7 @@
       "variables": {
         "fields": [
           "variables",
-          "time_sensitivity"
+          "birth_time_sensitivity"
         ],
         "purpose": "人格与设计日地/交点四组Tone的左右箭头、同次引用和实际变体；不作健康、饮食或学习能力评估"
       },

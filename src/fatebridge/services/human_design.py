@@ -235,7 +235,7 @@ def calculate_human_design(
         "depth_evidence": depth,
         "cycle_context": cycles,
         "cycle_summary": cycle_summary(cycles, chart["profile"]),
-        "time_sensitivity": sensitivity,
+        "birth_time_sensitivity": sensitivity,
         "calculation_policy": {
             "calendar": "proleptic_gregorian",
             "birth_local": clock.local_label,

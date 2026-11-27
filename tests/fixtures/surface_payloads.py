@@ -381,8 +381,8 @@ REST_POST_CASES = {
         **_local_base(),
         "qimen_options": {"layout": "direct"},
         "taiyi_options": {},
-        "liureng_yue": "申",
-        "liureng_is_diurnal": False,
+        "liuren_yue": "申",
+        "liuren_is_diurnal": False,
     },
     "/api/ziwei/birth-chart": lambda: {
         **_birth_payload(name="张三", gender="男"),
@@ -755,8 +755,8 @@ MCP_CASES = {
             "longitude": 121.4,
             "qimen_options": {"layout": "direct"},
             "taiyi_options": {},
-            "liureng_yue": "申",
-            "liureng_is_diurnal": False,
+            "liuren_yue": "申",
+            "liuren_is_diurnal": False,
         },
     ),
     "ziwei_birth_chart": (

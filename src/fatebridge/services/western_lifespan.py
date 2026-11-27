@@ -387,6 +387,20 @@ def calculate_balbillus(
         mode=mode,
         max_age_years=max_age_years,
     )
+    payload = {
+        **payload,
+        "periods": [
+            {
+                **{k: v for k, v in period.items() if k != "sub_periods"},
+                **(
+                    {"subperiods": period["sub_periods"]}
+                    if "sub_periods" in period
+                    else {}
+                ),
+            }
+            for period in payload.get("periods", [])
+        ],
+    }
     summary = (
         f"Balbillus 129 年系统（{payload['mode_label']}）：自"
         f"{payload['start_planet_label']}起，{max_age_years} 岁内"

@@ -47,7 +47,7 @@ class MidpointAnalysis(PartialOutput):
     contact_counts: dict[str, DialCounts] | None = None
     unique_two_factor_pair_count: int | None = None
     interpretations: list[SourceInterpretation] | None = None
-    time_sensitivity: SpecialtyTimeSensitivity | None = None
+    birth_time_sensitivity: SpecialtyTimeSensitivity | None = None
     solar_arc_analysis: SolarArcAnalysis | None = None
     meridian_houses: MeridianHouseAnalysis | None = None
     comparative_geometry: ComparativeGeometry | None = None

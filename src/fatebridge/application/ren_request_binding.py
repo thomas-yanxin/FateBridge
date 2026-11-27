@@ -99,9 +99,9 @@ def require_request_binding(
             "longitude": request.longitude,
             "qimen_options": serialized_options["qimen_options"] or {},
             "taiyi_options": serialized_options["taiyi_options"] or {},
-            "liureng_yue": request.liureng_yue,
-            "liureng_is_diurnal": request.liureng_is_diurnal,
-            "liureng_guiren_profile": request.liureng_guiren_profile,
+            "liuren_yue": request.liuren_yue,
+            "liuren_is_diurnal": request.liuren_is_diurnal,
+            "liuren_guiren_profile": request.liuren_guiren_profile,
             "use_true_solar_time": request.use_true_solar_time,
             "corner_lodging": request.corner_lodging,
         }
@@ -115,9 +115,9 @@ def require_request_binding(
         )
         applied_solar = request.use_true_solar_time
         ren_result = result
-        profile = request.liureng_guiren_profile
-        explicit = request.liureng_is_diurnal
-        override = request.liureng_yue
+        profile = request.liuren_guiren_profile
+        explicit = request.liuren_is_diurnal
+        override = request.liuren_yue
         gender = "未知"
         offset = None
         diurnal_mode: Literal["clock", "sunrise_sunset"] = "clock"

@@ -211,6 +211,8 @@ def calculate_core_chart_analysis(
             kind="chart13",
             uncertainty_minutes=birth_time_uncertainty_minutes,
         )
+        if "time_sensitivity" in result:
+            result["birth_time_sensitivity"] = result.pop("time_sensitivity")
     if apparent_model == "opaque_solar":
         result["apparent_model_positions"] = opaque_solar_positions(
             result["chart_profile"]["julian_day_tt"]
@@ -285,6 +287,9 @@ def calculate_germany_chart_analysis(
         uncertainty_minutes=birth_time_uncertainty_minutes,
     )
     enrich_solar_arc(result, birth_info, analysis_datetime, sample_times=sample_times)
+    layer = result.get("midpoint_analysis")
+    if isinstance(layer, dict) and "time_sensitivity" in layer:
+        layer["birth_time_sensitivity"] = layer.pop("time_sensitivity")
     return result
 
 

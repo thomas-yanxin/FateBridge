@@ -64,6 +64,8 @@ def resolve_analysis_moment(
     """Preserve the implicit instant or validate the explicitly supplied local wall label."""
     inherited = {
         "timing_analysis": DATE_FIELDS[:2],
+        "liunian_analysis": DATE_FIELDS[:1],
+        "jieqi_timeline": DATE_FIELDS[:1],
         "liuyue_analysis": DATE_FIELDS[:2],
         "liuri_analysis": DATE_FIELDS[:3],
         "liushi_analysis": DATE_FIELDS[:4],

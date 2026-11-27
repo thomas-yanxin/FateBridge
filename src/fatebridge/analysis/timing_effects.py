@@ -15,6 +15,7 @@ from fatebridge.core.almanac import (
     localize_datetime,
 )
 from fatebridge.core.bazi.calendar import ZiHourPolicy
+from fatebridge.core.bazi.policies import YearBoundaryPolicy
 from fatebridge.core.bazi.relations import collect_target_branch_relations
 from fatebridge.core.bazi.shensha import timing_shensha
 from fatebridge.core.bazi.timing import (
@@ -208,12 +209,16 @@ class TimingEffectsAnalysis:
         *,
         moment: datetime | None = None,
         timezone_name: str | None = None,
+        year_boundary_policy: YearBoundaryPolicy = "lichun",
     ) -> dict[str, Any]:
-        liunian_kwargs: dict[str, Any] = {}
+        liunian_kwargs: dict[str, Any] = {
+            "year_boundary_policy": year_boundary_policy,
+            "include_solar_window": True,
+        }
+        if timezone_name is not None:
+            liunian_kwargs["timezone_name"] = timezone_name
         if moment is not None:
             liunian_kwargs["moment"] = moment
-            if timezone_name is not None:
-                liunian_kwargs["timezone_name"] = timezone_name
         liunian_info = TimingAnalysis.calculate_liunian(target_year, **liunian_kwargs)
         day_stem = birth_pillars["day"][0]
         liunian_info["stem_ten_god"] = get_shishen(day_stem, liunian_info["stem"])
@@ -372,6 +377,7 @@ class TimingEffectsAnalysis:
         liuyue_info: dict[str, Any] | None = None,
         liunian_analysis: dict[str, Any] | None = None,
         original_element_counts: dict[Element, float] | None = None,
+        year_boundary_policy: YearBoundaryPolicy = "lichun",
     ) -> dict[str, Any]:
         liuyue_analysis = TimingEffectsAnalysis.analyze_liuyue_effects(
             birth_pillars,
@@ -396,6 +402,7 @@ class TimingEffectsAnalysis:
                     moment=target_date
                     or datetime(target_year, target_month, target_day),
                     timezone_name=timezone_name,
+                    year_boundary_policy=year_boundary_policy,
                 )
             result["liunian_analysis"] = liunian_analysis
             liuyue_b = liuyue_analysis["liuyue_info"]["branch"]

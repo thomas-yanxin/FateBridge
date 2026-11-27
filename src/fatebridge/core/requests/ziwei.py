@@ -79,15 +79,24 @@ class ZiweiBirthRequest(ZiweiSharedOptions):
 class ZiweiHoroscopeRequest(ZiweiSharedOptions):
     """Request model for 紫微斗数 horoscope (运限) at an analysis date-time."""
 
-    analysis_year: int = Field(description="Analysis year, e.g., 2026")
-    analysis_month: int = Field(ge=1, le=12, description="Analysis month (1-12)")
-    analysis_day: int = Field(ge=1, le=31, description="Analysis day (1-31)")
-    analysis_hour: int = Field(ge=0, le=23, description="Analysis hour (0-23)")
-    analysis_minute: int = Field(
-        default=0,
+    analysis_year: int | None = Field(
+        default=None,
+        description="分析公历年（可选）；省略全部分析时间分量时按本次as_of或执行开始时刻，部分省略时缺失的年/月/日取当前值，时/分默认0。",
+    )
+    analysis_month: int | None = Field(
+        default=None, ge=1, le=12, description="Analysis month (1-12, optional)"
+    )
+    analysis_day: int | None = Field(
+        default=None, ge=1, le=31, description="Analysis day (1-31, optional)"
+    )
+    analysis_hour: int | None = Field(
+        default=None, ge=0, le=23, description="Analysis hour (0-23, optional)"
+    )
+    analysis_minute: int | None = Field(
+        default=None,
         ge=0,
         le=59,
-        description="Analysis minute (0-59)",
+        description="Analysis minute (0-59, optional)",
     )
     analysis_timezone: str = Field(
         default="Asia/Shanghai",

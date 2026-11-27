@@ -772,9 +772,9 @@ def calculate_sanshiunited_analysis(
     longitude: float | str | None = None,
     qimen_options: dict[str, Any] | None = None,
     taiyi_options: dict[str, Any] | None = None,
-    liureng_yue: str | None = None,
-    liureng_is_diurnal: bool | None = None,
-    liureng_guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
+    liuren_yue: str | None = None,
+    liuren_is_diurnal: bool | None = None,
+    liuren_guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
     use_true_solar_time: bool = True,
     corner_lodging: Literal[
         "unassessed", "first_branch", "second_branch", "both"
@@ -789,9 +789,9 @@ def calculate_sanshiunited_analysis(
         longitude=longitude,
         qimen_options=qimen_options,
         taiyi_options=taiyi_options,
-        liureng_yue=liureng_yue,
-        liureng_is_diurnal=liureng_is_diurnal,
-        liureng_guiren_profile=liureng_guiren_profile,
+        liuren_yue=liuren_yue,
+        liuren_is_diurnal=liuren_is_diurnal,
+        liuren_guiren_profile=liuren_guiren_profile,
         use_true_solar_time=use_true_solar_time,
         corner_lodging=corner_lodging,
     )

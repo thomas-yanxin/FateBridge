@@ -102,7 +102,7 @@ CHART_FIELDS: dict[str, Any] = {
     "thirteen_sectors": list[ThirteenSector],
     "sector_profile": SectorProfile,
     "midpoint_analysis": MidpointAnalysis,
-    "time_sensitivity": SpecialtyTimeSensitivity,
+    "birth_time_sensitivity": SpecialtyTimeSensitivity,
     "midpoints": list[Midpoint],
     "midpoint_aspects": list[MidpointAspect],
     "element_balance": dict[str, float],
@@ -146,6 +146,13 @@ CHART_TOOL_FIELDS: dict[str, dict[str, Any]] = {
         "person_info": ChartPerson,
         "apparent_model_positions": OpaqueSolarPositions,
     },
-    "thirteen_sector_chart": {"person_info": ChartPerson},
+    "thirteen_sector_chart": {
+        "person_info": ChartPerson,
+        "birth_time_sensitivity": SpecialtyTimeSensitivity,
+    },
+    "hellenistic_chart": {"person_info": ChartPerson},
+    "guolao_chart": {"person_info": ChartPerson},
+    "vedic_chart": {"person_info": ChartPerson},
+    "vimshottari_dasha": {"person_info": ChartPerson},
     "relationship_chart": {"chart": Chart},
 }

@@ -121,7 +121,7 @@ class AgePeriod(PartialOutput):
 
 
 class BalbillusPeriod(AgePeriod):
-    sub_periods: list[AgePeriod] | None = None
+    subperiods: list[AgePeriod] | None = None
 
 
 class Balbillus(SystemOutput):
