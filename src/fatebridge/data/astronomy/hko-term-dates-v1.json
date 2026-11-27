@@ -4,7 +4,7 @@
   "independent_new_observations": 0,
   "publisher": "Hong Kong Observatory",
   "schema_version": "hko_published_term_dates_v1",
-  "scope": "Reuses previously exposed HKO annual dates. Historical publication conventions and future near-midnight uncertainty are retained. Date equality never certifies the crossing instant, a full calendar, or predictive efficacy.",
+  "scope": "Reuses previously exposed HKO annual dates. Historical publication conventions and future near-midnight uncertainty are retained. Date equality never certifies the crossing instant or a full calendar.",
   "source_event_count": 4800,
   "source_url": "https://www.hko.gov.hk/tc/gts/time/conversion.htm",
   "start_year": 1901,

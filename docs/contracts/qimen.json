@@ -22,7 +22,7 @@
         "qimen.assessment",
         "qimen.engine"
       ],
-      "when": "读相关宫位与方位；局号不能代替九宫；不把盘面当现实结果保证"
+      "when": "读相关宫位与方位；局号不能代替九宫"
     },
     "stem_candidates": {
       "fields": [

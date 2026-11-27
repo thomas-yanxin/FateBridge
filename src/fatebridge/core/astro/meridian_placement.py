@@ -23,7 +23,7 @@ SOURCE = {
         "p.58: RA relation",
         "p.59: cusp comparison",
     ],
-    "scope": "Named natal equatorial house geometry only; no source claims about harm, lifespan, keywords or event efficacy adopted",
+    "scope": "Named natal equatorial house geometry only; no source claims about harm, lifespan, or keywords adopted",
 }
 
 

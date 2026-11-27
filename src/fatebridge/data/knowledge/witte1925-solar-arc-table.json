@@ -728,7 +728,6 @@
     "subday_or_leap_day_policy_resolved": false,
     "source_rounding_policy_fully_specified": false,
     "table_epoch_or_unrounded_solar_model_known": false,
-    "full_original_method_accepted": false,
-    "empirical_outcomes": 0
+    "full_original_method_accepted": false
   }
 }

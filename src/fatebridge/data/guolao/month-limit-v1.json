@@ -41,7 +41,6 @@
   "acceptance": {
     "ordinal_cycle": true,
     "modern_calendar_mapping": false,
-    "complete_temporal_system": false,
-    "real_world_predictive_validity": false
+    "complete_temporal_system": false
   }
 }

@@ -80,7 +80,6 @@ class SukuyoClockDoctrine(PartialOutput):
     comparative_time_systems: SukuyoComparativeTimeReference | None = None
     physical_clock_mapping_status: str | None = None
     western_24_hora_applied: bool | None = None
-    source_claim_is_empirical_validation: bool | None = None
     scope: str | None = None
 
 

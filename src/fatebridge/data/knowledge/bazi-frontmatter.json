@@ -53,7 +53,7 @@
                 3,
                 4
               ],
-              "support_scope": "本节编者层的概念、组合前提和适用限制；不是任氏正文、原韵文、数值常数或现实效度证明。"
+              "support_scope": "本节编者层的概念、组合前提和适用限制；不是任氏正文、原韵文或数值常数。"
             }
           ],
           "source_binding": {
@@ -61,7 +61,6 @@
           },
           "numerical_strength_rules_adopted": false,
           "independent_expert_review": "not_completed",
-          "reality_prediction_efficacy": "not_tested",
           "original26_disagreement_gate_closed": false,
           "citation": "FateBridge限域编释及源表编录，非逐字引文；李雨田增补《初学捷径》，收入《任注滴天髓阐微》；CADAL07005210数字扫描叶51；单读者校读，未完成独立专家审定；https://commons.wikimedia.org/wiki/File:CADAL07005210_滴天髓闡微.djvu",
           "implementation_refs": [
@@ -88,7 +87,7 @@
           "李雨田增补《初学捷径》的看命三法并列得时、得势、得地，明说日主、用神、忌神都要如此观察，还讨论日主与用神、忌神之间的配合；并非只检查日主是否当令。",
           "该段以生于禄旺之月、当令气盛说明得时；以生于休囚之月而党多援众说明得势；以生于非旺之月而坐下通根、支乘生旺说明得地。三个条件应各自保留，不把失时直接写成无势、无根。",
           "日主失时不能代替其他对象的状态判断，某一藏干出现也不能自动证明它在相应关系中有效。若计算只返回部分证据，解释应说到实际返回的层次，不补造未裁定的得势、得地结论。",
-          "本段没有给党多、援众或根地有效性制定数值阈值。这些来源条件不等于已经校准的概率或现实结果保证，也不据此倒填未知出生资料。"
+          "本段没有给党多、援众或根地有效性制定数值阈值，也不据此倒填未知出生资料。"
         ],
         "curation": {
           "method_id": "dtcw1947_li_frontmatter_source_scope_v1",
@@ -123,7 +122,7 @@
                 1,
                 2
               ],
-              "support_scope": "本节编者层的概念、组合前提和适用限制；不是任氏正文、原韵文、数值常数或现实效度证明。"
+              "support_scope": "本节编者层的概念、组合前提和适用限制；不是任氏正文、原韵文或数值常数。"
             }
           ],
           "source_binding": {
@@ -131,7 +130,6 @@
           },
           "numerical_strength_rules_adopted": false,
           "independent_expert_review": "not_completed",
-          "reality_prediction_efficacy": "not_tested",
           "original26_disagreement_gate_closed": false,
           "citation": "FateBridge限域编释及源表编录，非逐字引文；李雨田增补《初学捷径》，收入《任注滴天髓阐微》；CADAL07005210数字扫描叶52；单读者校读，未完成独立专家审定；https://commons.wikimedia.org/wiki/File:CADAL07005210_滴天髓闡微.djvu"
         }
@@ -199,7 +197,7 @@
                 6,
                 7
               ],
-              "support_scope": "本节编者层的概念、组合前提和适用限制；不是任氏正文、原韵文、数值常数或现实效度证明。"
+              "support_scope": "本节编者层的概念、组合前提和适用限制；不是任氏正文、原韵文或数值常数。"
             }
           ],
           "source_binding": {
@@ -207,7 +205,6 @@
           },
           "numerical_strength_rules_adopted": false,
           "independent_expert_review": "not_completed",
-          "reality_prediction_efficacy": "not_tested",
           "original26_disagreement_gate_closed": false,
           "citation": "FateBridge限域编释及源表编录，非逐字引文；李雨田增补《初学捷径》，收入《任注滴天髓阐微》；CADAL07005210数字扫描叶52、53、54、56；单读者校读，未完成独立专家审定；https://commons.wikimedia.org/wiki/File:CADAL07005210_滴天髓闡微.djvu",
           "separate_Ren_passage": {

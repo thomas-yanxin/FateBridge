@@ -462,4 +462,4 @@ uv run --extra dev python -m fatebridge.mcp_server
 
 ## 咨询范围与禁区校验
 
-生死寿命、灾祸断言、临床诊断治疗与医疗择时不提供。卜卦 `category` 不接受 `death`、`health`、`pregnancy`，择时 `topic_id` 不接受 `surgery`；明确命中禁区的请求在计算前返回非重试错误 `consultation_restricted`。健康专项仅提供盘内传统文化分类，子女专项仅提供命主视角的星宫关系而不做数量或生育时间预测，普通星盘亦已排除死亡点。详见[硬边界](interpretation/shared/safety-boundaries.md)。
+生死寿命、灾祸断言、临床诊断治疗与医疗择时不提供。卜卦 `category` 不接受 `death`、`health`、`pregnancy`，择时 `topic_id` 不接受 `surgery`；明确命中禁区的请求在计算前返回非重试错误 `consultation_restricted`。健康专项仅提供盘内传统文化分类，普通星盘亦已排除死亡点。详见[硬边界](interpretation/shared/safety-boundaries.md)。

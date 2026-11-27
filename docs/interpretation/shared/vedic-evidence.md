@@ -23,7 +23,7 @@
 ## 力量、时间口径与来源
 
 - **Sthana / 方向 / 相位与时间力**：可通过 `strength` 视图读取 `india.strengths.sthana_bala`、`drik_bala`、`kala_bala`、`yuddha_bala` 及 `cheshta_model`（显式可选 `simon1994_j2000`）。七分盘与三分盘口径分别由 `saptavargaja_profile`（Santhanam / Raman）与 `drekkana_profile` 控制，未裁定分项（如 `shadbala_assessment.total_virupa=null`）保留空值不自加总。
-- **Vimshottari 达沙**：次运从原始完整主运分配，区分恒星年、365.2425 日固定年与 360 日 savana 年；`timeline_scope` 的 120 年规则周期不作寿命估计。生时区间敏感性通过 `stage_variants` 按网格样点读取。
+- **Vimshottari 达沙**：次运从原始完整主运分配，区分恒星年、365.2425 日固定年与 360 日 savana 年；`timeline_scope` 为 120 年规则周期。生时区间敏感性通过 `stage_variants` 按网格样点读取。
 - **时制与星历回执**：支持 `civil`、`local_mean_solar` 与 `local_apparent_solar` 钟制，历史星历与时标政策记录在 `india.profile.time_scale_context`、`earth_rotation` 与 `physical_ephemeris_source`；启用 `ephemeris_policy=require_data_files` 可拒绝低精度回退。
 
 交付时保留 `india.profile`、`rulesets` 与 `rule_trace` 中的版本和传统来源（如 P.V.R. Narasimha Rao《Vedic Astrology: An Integrated Approach》、Santhanam 译注 BPHS 与 Brihat Jataka）。

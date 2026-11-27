@@ -105,7 +105,7 @@ def _scope(counts: dict[str, Any]) -> str:
         f"{counts['local_editorial_paraphrases']}条为本地简短转述，{counts['meanings_pending']}条爻义待整理，"
         f"独立完整语义验收{counts['independently_accepted_line_meanings']}条。"
         "须核对同run实际gate/line、fixing_state及触发依据，不以角色通用线主题代替具体爻义。"
-        "来源条件未穷尽核对，未记录不表示无条件。出版母本与完整384线未认证，现实效力未检验。"
+        "来源条件未穷尽核对，未记录不表示无条件。出版母本与完整384线未认证。"
     )
 
 
@@ -269,7 +269,6 @@ def _load_consolidated_catalogue(
             "personal_applicability_assessed": False,
             "whole_books_collated": False,
             "independent_whole_corpus_review_completed": False,
-            "real_world_efficacy_validated": False,
             "scope": _scope(coverage),
             "source_records": source_records,
         }

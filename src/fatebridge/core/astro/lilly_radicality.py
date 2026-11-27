@@ -310,7 +310,7 @@ def evaluate_radicality(
     put(
         "R01",
         affinity["supported_under_declared_policy"],
-        "时主与上升主的同主、所选三分及本性对应分别核对；此对应是具名原典的一个前提，不是整盘可判断性或现实效力证明。",
+        "时主与上升主的同主、所选三分及本性对应分别核对；此对应是具名原典的一个前提，不代替整盘判断。",
         affinity,
     )
     put(
@@ -394,7 +394,7 @@ def evaluate_radicality(
     put(
         "C07",
         None if selected_saturn_house is None else selected_saturn_house == 1,
-        "土星第一宫条款保留尤其逆行的强调；按声明的宫头效力政策核对，不由此确认现实结果。",
+        "土星第一宫条款保留尤其逆行的强调；按声明的宫头效力政策核对。",
         saturn_house_facts,
     )
     put(

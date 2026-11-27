@@ -10282,7 +10282,7 @@
       "annotation_status": "explicitly_unknown_body_strength",
       "annotation_basis": null,
       "retained_anchor": "烈之極矣無土以順其性",
-      "retained_context": "午月午时木从火势，金无根、水无源，激火猛烈；人物的好勇与祸事叙述全部不作标签或现实效度。局中火烈不是自动的普通旺衰三档。",
+      "retained_context": "午月午时木从火势，金无根、水无源，激火猛烈；人物的好勇与祸事叙述全部不作标签。局中火烈不是自动的普通旺衰三档。",
       "source_reference": {
         "title": "任注滴天髓闡微·性情",
         "edition": "任鐵樵增注，李雨田校訂兼發行，上海大東書局經售1947年4月初版",
@@ -11770,7 +11770,7 @@
   "strength_constraint_count": 3,
   "editorial_annotation_count": 149,
   "method_id": "registered_literal_source_annotations_v1",
-  "scope": "当前已校读来源记录；未知和集合约束保持，计算不由来源标签改写。原典条件与现实预测均未全面验收。",
+  "scope": "当前已校读来源记录；未知和集合约束保持，计算不由来源标签改写。原典条件未全面验收。",
   "local_comparison_claims": [
     {
       "group": "prior_dizhi",

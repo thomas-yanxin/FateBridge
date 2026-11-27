@@ -178,6 +178,5 @@
     "No next/nearest-day search, dates, scores, horizon tuning, future observation window or real outcome"
   ],
   "legacy_numeric_and_other_full_spans_recollated_this_round": false,
-  "full_original_conformance": false,
-  "predictive_efficacy": false
+  "full_original_conformance": false
 }

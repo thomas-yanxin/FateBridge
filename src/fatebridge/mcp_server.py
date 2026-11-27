@@ -42,7 +42,7 @@ MCP_INSTRUCTIONS = (
     "FateBridge 提供本地确定性计算，公开 discover_tools 与 run_calculation 两个入口。"
     "计算前排除生死寿命、灾祸断言、临床诊断治疗和医疗择时。"
     "只用已确认资料，不猜生时、不套默认或示例；必要缺项简短追问，未知后继续已有可答部分。"
-    "区分计算事实、传统解释与现实建议；分数不是成功概率。"
+    "区分计算事实、传统解释与现实建议。"
     "已知工具定义时直接调用 run_calculation；未知工具或参数时调用 discover_tools(q=...) 或 discover_tools(tool=...)。"
     "run_calculation 默认 detail=compact 返回核心业务字段；需要指定子字段传 fields（严格校验路径，错误时附可用字段）；需要完整输出与方法依据传 detail=audit。"
     "isError=true 时按 error_code 和 issues[].path / constraints 修正参数后重调，仅 retryable=true 才按原参数重试。"

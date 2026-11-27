@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "domain": "bazi",
-  "description": "八字术语资料：十神、格局候选与成败条件、身印语义及健康范围分层整理；内容修订与原典出处核对分别记录，未审旧分类不构成原典或现实效力认证。",
+  "description": "八字术语资料：十神、格局候选与成败条件、身印语义及健康范围分层整理；内容修订与原典出处核对分别记录。",
   "categories": {
     "ten_gods": {
       "比肩": {
@@ -30,7 +30,7 @@
               "title": "秘本子平真诠",
               "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
-              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖全部流派。",
               "source_pdf_pages": [
                 22,
                 28,
@@ -71,7 +71,7 @@
               "title": "秘本子平真诠",
               "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
-              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖全部流派。",
               "source_pdf_pages": [
                 22,
                 28,
@@ -112,7 +112,7 @@
               "title": "秘本子平真诠",
               "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
-              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖全部流派。",
               "source_pdf_pages": [
                 28,
                 76,
@@ -153,7 +153,7 @@
               "title": "秘本子平真诠",
               "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
-              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖全部流派。",
               "source_pdf_pages": [
                 28,
                 82,
@@ -195,7 +195,7 @@
               "title": "秘本子平真诠",
               "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
-              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖全部流派。",
               "source_pdf_pages": [
                 22,
                 28,
@@ -237,7 +237,7 @@
               "title": "秘本子平真诠",
               "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
-              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖全部流派。",
               "source_pdf_pages": [
                 22,
                 28,
@@ -279,7 +279,7 @@
               "title": "秘本子平真诠",
               "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
-              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖全部流派。",
               "source_pdf_pages": [
                 28,
                 30,
@@ -300,7 +300,7 @@
           "七杀代表克日主同阴阳的天干。",
           "七杀亦称偏官。制杀、化杀、生印、去留与合的路径须分别检查，不能由见杀或杀多直接断吉凶。",
           "所选原典的食神制杀及合杀留官都有力量、位置和根气前提；相合不自动等于合去或已经救应。",
-          "约束与压力可作传统议题线索，具体危险、能力、道德与现实结果不是七杀定义的一部分。"
+          "约束与压力可作传统议题线索，具体现实危险、能力与道德评价不是七杀定义的一部分。"
         ],
         "curation": {
           "method_id": "bazi_ten_gods_scoped_v1",
@@ -320,7 +320,7 @@
               "title": "秘本子平真诠",
               "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
-              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖全部流派。",
               "source_pdf_pages": [
                 28,
                 30,
@@ -362,7 +362,7 @@
               "title": "秘本子平真诠",
               "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
-              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖全部流派。",
               "source_pdf_pages": [
                 22,
                 28,
@@ -405,7 +405,7 @@
               "title": "秘本子平真诠",
               "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
-              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖全部流派。",
               "source_pdf_pages": [
                 28,
                 72,
@@ -436,8 +436,8 @@
         "tips": [
           "所选《秘本子平真诠》论星辰无关格局，强调月令四柱配合；该章没有本工具的文昌十干表，不能把神煞命中当作格局成败。",
           "本工具学业模块只按日干查四柱地支：甲巳、乙午、丙戊申、丁己酉、庚亥、辛子、壬寅、癸卯。wenchang_branch与hit_pillars分别返回目标支和全部命中柱位，不同时按年干另算。",
-          "该十干表的原始版本及异文仍待校勘；此处明确其当前程序依据，不把表与原典已核条件或现实效力混为一谈。",
-          "文昌是查表标签，不测量聪明、文采或学习能力；本学业模块也不由大运流年文昌计算考试成功概率。"
+          "该十干表的原始版本及异文仍待校勘；此处明确其当前程序依据。",
+          "文昌是查表标签，对应十干查表与学业专题字段。"
         ],
         "curation": {
           "entry_revision": 1,
@@ -462,7 +462,7 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
-              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
+              "scope": "专题的透藏星位、关系条件与输出范围。"
             }
           ],
           "source_tip_indices": [
@@ -479,7 +479,6 @@
           ],
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
-          "reality_prediction_efficacy": "not_tested",
           "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF49,50,51；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；文昌表或女命对应仍待扫描本校勘。"
         }
       },
@@ -930,7 +929,7 @@
           "保留旧查询键，先核对所选阳刃规则的五阳干及实际月支资格；“甲日卯月”描述月刃，不是日坐羊刃。",
           "原典刃用官杀仍须核对根、制伏、合杀或合官是否使其失去作用、财印相随及伤食的具体角色；刃杀共现不认证驾杀成格。",
           "实际输出应先核对monthly_structure.use_resolution或evidence_chain.month_command.use_resolution的全部适用见证，再读透藏、根气、位置和制化前提；structure_god/selected_god只是单锚参考，会支十神类不自动指明正偏，见证并存不认证成格或喜忌。",
-          "阳刃或七杀不构成人身危险、权威、军警医疗职业或创业成败结论。"
+          "阳刃或七杀属八字结构与格局术语，非具体职业或危险结论。"
         ],
         "curation": {
           "method_id": "bazi_structure_conditions_v1",
@@ -1076,9 +1075,9 @@
             "6": "implementation_scope_not_empirical_measurement",
             "7": "editorial_source_layer_and_review_limits"
           },
-          "validation_status": "selected_textual_correspondences_not_medical_personality_or_efficacy_validation",
+          "validation_status": "selected_textual_correspondences",
           "review_status": "single_developer_digital_text_reading_scan_and_external_review_pending",
-          "known_overlap": "All5cards share the same four digitaltext captures and already exposed性情unit; no new charts or independent efficacy observations.",
+          "known_overlap": "All 5 cards share the same four digital text captures and already exposed 性情 unit.",
           "source_attribution_rule": "按tip索引区分原文、程序与现代编辑；礼制祭先、医籍在藏和命理象义不得互相充作来源。",
           "citation": "FateBridge限域编释，非逐字引文；任鐵樵增注，李雨田校訂《任注滴天髓闡微·性情》上海大東書局，1947年4月初版 https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；古籍原文，成书与传承不作单一作者认定《禮記/月令》维基文库数字转录，固定修订11117084；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E7%A6%AE%E8%A8%98%2F%E6%9C%88%E4%BB%A4&oldid=11117084；蕭吉《五行大義/1》维基文库数字转录，固定修订2361277；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E4%BA%94%E8%A1%8C%E5%A4%A7%E7%BE%A9%2F1&oldid=2361277；古籍原文，成书与传承不作单一作者认定《黃帝內經/素問第二卷》维基文库数字转录，固定修订2627947；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E7%B4%A0%E5%95%8F%E7%AC%AC%E4%BA%8C%E5%8D%B7&oldid=2627947；古籍原文，成书与传承不作单一作者认定《黃帝內經/靈樞第一卷》维基文库数字转录，固定修订2099201；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E9%9D%88%E6%A8%9E%E7%AC%AC%E4%B8%80%E5%8D%B7&oldid=2099201。任注性情PDF426–427；数字转录未完成书影独立校勘，原典分类与现代编辑另列，不代表人格、医疗或预测效度。",
           "curated_on": "2026-10-22"
@@ -1191,9 +1190,9 @@
             "6": "implementation_scope_not_empirical_measurement",
             "7": "editorial_source_layer_and_review_limits"
           },
-          "validation_status": "selected_textual_correspondences_not_medical_personality_or_efficacy_validation",
+          "validation_status": "selected_textual_correspondences",
           "review_status": "single_developer_digital_text_reading_scan_and_external_review_pending",
-          "known_overlap": "All5cards share the same four digitaltext captures and already exposed性情unit; no new charts or independent efficacy observations.",
+          "known_overlap": "All 5 cards share the same four digital text captures and already exposed 性情 unit.",
           "source_attribution_rule": "按tip索引区分原文、程序与现代编辑；礼制祭先、医籍在藏和命理象义不得互相充作来源。",
           "citation": "FateBridge限域编释，非逐字引文；任鐵樵增注，李雨田校訂《任注滴天髓闡微·性情》上海大東書局，1947年4月初版 https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；古籍原文，成书与传承不作单一作者认定《禮記/月令》维基文库数字转录，固定修订11117084；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E7%A6%AE%E8%A8%98%2F%E6%9C%88%E4%BB%A4&oldid=11117084；蕭吉《五行大義/1》维基文库数字转录，固定修订2361277；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E4%BA%94%E8%A1%8C%E5%A4%A7%E7%BE%A9%2F1&oldid=2361277；古籍原文，成书与传承不作单一作者认定《黃帝內經/素問第二卷》维基文库数字转录，固定修订2627947；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E7%B4%A0%E5%95%8F%E7%AC%AC%E4%BA%8C%E5%8D%B7&oldid=2627947；古籍原文，成书与传承不作单一作者认定《黃帝內經/靈樞第一卷》维基文库数字转录，固定修订2099201；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E9%9D%88%E6%A8%9E%E7%AC%AC%E4%B8%80%E5%8D%B7&oldid=2099201。任注性情PDF426–427；数字转录未完成书影独立校勘，原典分类与现代编辑另列，不代表人格、医疗或预测效度。",
           "curated_on": "2026-10-22"
@@ -1306,9 +1305,9 @@
             "6": "implementation_scope_not_empirical_measurement",
             "7": "editorial_source_layer_and_review_limits"
           },
-          "validation_status": "selected_textual_correspondences_not_medical_personality_or_efficacy_validation",
+          "validation_status": "selected_textual_correspondences",
           "review_status": "single_developer_digital_text_reading_scan_and_external_review_pending",
-          "known_overlap": "All5cards share the same four digitaltext captures and already exposed性情unit; no new charts or independent efficacy observations.",
+          "known_overlap": "All 5 cards share the same four digital text captures and already exposed 性情 unit.",
           "source_attribution_rule": "按tip索引区分原文、程序与现代编辑；礼制祭先、医籍在藏和命理象义不得互相充作来源。",
           "citation": "FateBridge限域编释，非逐字引文；任鐵樵增注，李雨田校訂《任注滴天髓闡微·性情》上海大東書局，1947年4月初版 https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；古籍原文，成书与传承不作单一作者认定《禮記/月令》维基文库数字转录，固定修订11117084；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E7%A6%AE%E8%A8%98%2F%E6%9C%88%E4%BB%A4&oldid=11117084；蕭吉《五行大義/1》维基文库数字转录，固定修订2361277；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E4%BA%94%E8%A1%8C%E5%A4%A7%E7%BE%A9%2F1&oldid=2361277；古籍原文，成书与传承不作单一作者认定《黃帝內經/素問第二卷》维基文库数字转录，固定修订2627947；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E7%B4%A0%E5%95%8F%E7%AC%AC%E4%BA%8C%E5%8D%B7&oldid=2627947；古籍原文，成书与传承不作单一作者认定《黃帝內經/靈樞第一卷》维基文库数字转录，固定修订2099201；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E9%9D%88%E6%A8%9E%E7%AC%AC%E4%B8%80%E5%8D%B7&oldid=2099201。任注性情PDF426–427；数字转录未完成书影独立校勘，原典分类与现代编辑另列，不代表人格、医疗或预测效度。",
           "curated_on": "2026-10-22"
@@ -1421,9 +1420,9 @@
             "6": "implementation_scope_not_empirical_measurement",
             "7": "editorial_source_layer_and_review_limits"
           },
-          "validation_status": "selected_textual_correspondences_not_medical_personality_or_efficacy_validation",
+          "validation_status": "selected_textual_correspondences",
           "review_status": "single_developer_digital_text_reading_scan_and_external_review_pending",
-          "known_overlap": "All5cards share the same four digitaltext captures and already exposed性情unit; no new charts or independent efficacy observations.",
+          "known_overlap": "All 5 cards share the same four digital text captures and already exposed 性情 unit.",
           "source_attribution_rule": "按tip索引区分原文、程序与现代编辑；礼制祭先、医籍在藏和命理象义不得互相充作来源。",
           "citation": "FateBridge限域编释，非逐字引文；任鐵樵增注，李雨田校訂《任注滴天髓闡微·性情》上海大東書局，1947年4月初版 https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；古籍原文，成书与传承不作单一作者认定《禮記/月令》维基文库数字转录，固定修订11117084；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E7%A6%AE%E8%A8%98%2F%E6%9C%88%E4%BB%A4&oldid=11117084；蕭吉《五行大義/1》维基文库数字转录，固定修订2361277；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E4%BA%94%E8%A1%8C%E5%A4%A7%E7%BE%A9%2F1&oldid=2361277；古籍原文，成书与传承不作单一作者认定《黃帝內經/素問第二卷》维基文库数字转录，固定修订2627947；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E7%B4%A0%E5%95%8F%E7%AC%AC%E4%BA%8C%E5%8D%B7&oldid=2627947；古籍原文，成书与传承不作单一作者认定《黃帝內經/靈樞第一卷》维基文库数字转录，固定修订2099201；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E9%9D%88%E6%A8%9E%E7%AC%AC%E4%B8%80%E5%8D%B7&oldid=2099201。任注性情PDF426–427；数字转录未完成书影独立校勘，原典分类与现代编辑另列，不代表人格、医疗或预测效度。",
           "curated_on": "2026-10-22"
@@ -1536,9 +1535,9 @@
             "6": "implementation_scope_not_empirical_measurement",
             "7": "editorial_source_layer_and_review_limits"
           },
-          "validation_status": "selected_textual_correspondences_not_medical_personality_or_efficacy_validation",
+          "validation_status": "selected_textual_correspondences",
           "review_status": "single_developer_digital_text_reading_scan_and_external_review_pending",
-          "known_overlap": "All5cards share the same four digitaltext captures and already exposed性情unit; no new charts or independent efficacy observations.",
+          "known_overlap": "All 5 cards share the same four digital text captures and already exposed 性情 unit.",
           "source_attribution_rule": "按tip索引区分原文、程序与现代编辑；礼制祭先、医籍在藏和命理象义不得互相充作来源。",
           "citation": "FateBridge限域编释，非逐字引文；任鐵樵增注，李雨田校訂《任注滴天髓闡微·性情》上海大東書局，1947年4月初版 https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；古籍原文，成书与传承不作单一作者认定《禮記/月令》维基文库数字转录，固定修订11117084；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E7%A6%AE%E8%A8%98%2F%E6%9C%88%E4%BB%A4&oldid=11117084；蕭吉《五行大義/1》维基文库数字转录，固定修订2361277；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E4%BA%94%E8%A1%8C%E5%A4%A7%E7%BE%A9%2F1&oldid=2361277；古籍原文，成书与传承不作单一作者认定《黃帝內經/素問第二卷》维基文库数字转录，固定修订2627947；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E7%B4%A0%E5%95%8F%E7%AC%AC%E4%BA%8C%E5%8D%B7&oldid=2627947；古籍原文，成书与传承不作单一作者认定《黃帝內經/靈樞第一卷》维基文库数字转录，固定修订2099201；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E9%9D%88%E6%A8%9E%E7%AC%AC%E4%B8%80%E5%8D%B7&oldid=2099201。任注性情PDF426–427；数字转录未完成书影独立校勘，原典分类与现代编辑另列，不代表人格、医疗或预测效度。",
           "curated_on": "2026-10-22"
@@ -1628,7 +1627,7 @@
               "supporting_tip_indexes": [
                 0
               ],
-              "support_scope": "仅支持tip[0]的文化配属背景。木—肝的传统配属：正文同段列入通于肝、其类草木，木精为王冰注语。不为tip[1]的软件专题字段背书；tip[2]是本软件的交付边界，古籍不构成临床验证或现实效度证据，也不证明旧Xingque资料由此摘录。"
+              "support_scope": "仅支持tip[0]的文化配属背景。木—肝的传统配属：正文同段列入通于肝、其类草木，木精为王冰注语。不为tip[1]的软件专题字段背书；tip[2]是临床边界，古籍不构成临床验证，也不证明旧Xingque资料由此摘录。"
             },
             {
               "author": "古籍原文不认定单一作者；唐王冰注，宋林亿等校正",
@@ -1640,7 +1639,7 @@
               "supporting_tip_indexes": [
                 0
               ],
-              "support_scope": "仅支持tip[0]的文化配属背景。火—心的传统配属：正文同段列心与其类火；不把注语与正文混作单一作者。不为tip[1]的软件专题字段背书；tip[2]是本软件的交付边界，古籍不构成临床验证或现实效度证据，也不证明旧Xingque资料由此摘录。"
+              "support_scope": "仅支持tip[0]的文化配属背景。火—心的传统配属：正文同段列心与其类火；不把注语与正文混作单一作者。不为tip[1]的软件专题字段背书；tip[2]是临床边界，古籍不构成临床验证，也不证明旧Xingque资料由此摘录。"
             },
             {
               "author": "古籍原文不认定单一作者；唐王冰注，宋林亿等校正",
@@ -1652,7 +1651,7 @@
               "supporting_tip_indexes": [
                 0
               ],
-              "support_scope": "仅支持tip[0]的文化配属背景。土—脾、金—肺的传统配属：正文分别列脾与其类土、肺与其类金。不为tip[1]的软件专题字段背书；tip[2]是本软件的交付边界，古籍不构成临床验证或现实效度证据，也不证明旧Xingque资料由此摘录。"
+              "support_scope": "仅支持tip[0]的文化配属背景。土—脾、金—肺的传统配属：正文分别列脾与其类土、肺与其类金。不为tip[1]的软件专题字段背书；tip[2]是临床边界，古籍不构成临床验证，也不证明旧Xingque资料由此摘录。"
             },
             {
               "author": "古籍原文不认定单一作者；唐王冰注，宋林亿等校正",
@@ -1664,7 +1663,7 @@
               "supporting_tip_indexes": [
                 0
               ],
-              "support_scope": "仅支持tip[0]的文化配属背景。水—肾的传统配属：正文同段列肾与其类水。不为tip[1]的软件专题字段背书；tip[2]是本软件的交付边界，古籍不构成临床验证或现实效度证据，也不证明旧Xingque资料由此摘录。"
+              "support_scope": "仅支持tip[0]的文化配属背景。水—肾的传统配属：正文同段列肾与其类水。不为tip[1]的软件专题字段背书；tip[2]是临床边界，古籍不构成临床验证，也不证明旧Xingque资料由此摘录。"
             }
           ],
           "implementation_refs": [
@@ -1675,7 +1674,7 @@
           ],
           "legacy_correspondence_status": "selected_sources_identified_legacy_origin_unverified",
           "citation": "FateBridge文化词义编释，非逐字引文；王冰注、林亿等校正《重廣補注黃帝內經素問》四部丛刊影明翻北宋本，卷一〈金匮真言论〉扫描54–57，只取五行—五藏配属；旧Xingque包历史出处未定。",
-          "definition_basis": "tip[0]为所选五行—五藏原文的限域编释；“五行藏象”为本卡整理总称，非已核同名原文，六府及完整藏象体系不在此四页的接受范围。新选具名来源不证明旧Xingque包的历史出处；独立专家、全书及现实效度尚未接受。",
+          "definition_basis": "tip[0]为所选五行—五藏原文的限域编释；“五行藏象”为本卡整理总称，非已核同名原文，六府及完整藏象体系不在此四页的接受范围。新选具名来源不证明旧Xingque包的历史出处；独立专家与全书校勘尚未完成。",
           "tip_attribution": {
             "0": "selected_classical_cultural_correspondence_only; cross-passage synthesis where explicitly stated",
             "1": "implementation_scope_only; core/bazi/bazi_evidence.py; not supported by medical classics",
@@ -1709,7 +1708,7 @@
               "supporting_tip_indexes": [
                 0
               ],
-              "support_scope": "仅支持tip[0]的文化配属背景。木—肝的传统配属：正文同段列入通于肝、其类草木，木精为王冰注语。不为tip[1]的软件专题字段背书；tip[2]是本软件的交付边界，古籍不构成临床验证或现实效度证据，也不证明旧Xingque资料由此摘录。"
+              "support_scope": "仅支持tip[0]的文化配属背景。木—肝的传统配属：正文同段列入通于肝、其类草木，木精为王冰注语。不为tip[1]的软件专题字段背书；tip[2]是临床边界，古籍不构成临床验证，也不证明旧Xingque资料由此摘录。"
             },
             {
               "author": "古籍原文不认定单一作者；宋史崧音释",
@@ -1721,7 +1720,7 @@
               "supporting_tip_indexes": [
                 0
               ],
-              "support_scope": "仅支持tip[0]的肝合胆的传统藏府相合关系；与《素问》五行—五藏段连接属于本卡显式跨段整理，不是单句原文。不是软件权重、医疗或现实效度依据，也不证明旧Xingque资料的历史来源。"
+              "support_scope": "仅支持tip[0]的肝合胆的传统藏府相合关系；与《素问》五行—五藏段连接属于本卡显式跨段整理，不是单句原文。不是软件权重或医疗依据，也不证明旧Xingque资料的历史来源。"
             }
           ],
           "implementation_refs": [
@@ -1732,7 +1731,7 @@
           ],
           "legacy_correspondence_status": "selected_sources_identified_legacy_origin_unverified",
           "citation": "FateBridge文化词义编释，非逐字引文；王冰注、林亿等校正《重廣補注黃帝內經素問》四部丛刊影明翻北宋本，卷一〈金匮真言论〉扫描54的木—肝，另与《灵枢经》四库本卷一〈本输〉固定数字转录640546的肝合胆跨段整理；灵枢原叶未核，旧Xingque包历史出处未定。",
-          "definition_basis": "tip[0]显式连接《素问》木—肝与《灵枢》肝—胆；这是跨段术语整理，未获得一句“木主肝胆”的直接原叶引文。新选具名来源不证明旧Xingque包的历史出处；独立专家、全书及现实效度尚未接受。",
+          "definition_basis": "tip[0]显式连接《素问》木—肝与《灵枢》肝—胆；这是跨段术语整理，未获得一句“木主肝胆”的直接原叶引文。新选具名来源不证明旧Xingque包的历史出处；独立专家与全书校勘尚未完成。",
           "tip_attribution": {
             "0": "selected_classical_cultural_correspondence_only; cross-passage synthesis where explicitly stated",
             "1": "implementation_scope_only; core/bazi/bazi_evidence.py; not supported by medical classics",
@@ -1766,7 +1765,7 @@
               "supporting_tip_indexes": [
                 0
               ],
-              "support_scope": "仅支持tip[0]的文化配属背景。火—心的传统配属：正文同段列心与其类火；不把注语与正文混作单一作者。不为tip[1]的软件专题字段背书；tip[2]是本软件的交付边界，古籍不构成临床验证或现实效度证据，也不证明旧Xingque资料由此摘录。"
+              "support_scope": "仅支持tip[0]的文化配属背景。火—心的传统配属：正文同段列心与其类火；不把注语与正文混作单一作者。不为tip[1]的软件专题字段背书；tip[2]是临床边界，古籍不构成临床验证，也不证明旧Xingque资料由此摘录。"
             }
           ],
           "implementation_refs": [
@@ -1777,7 +1776,7 @@
           ],
           "legacy_correspondence_status": "selected_sources_identified_legacy_origin_unverified",
           "citation": "FateBridge文化词义编释，非逐字引文；王冰注、林亿等校正《重廣補注黃帝內經素問》四部丛刊影明翻北宋本，卷一〈金匮真言论〉扫描55，只取火—心配属；旧Xingque包历史出处未定。",
-          "definition_basis": "tip[0]按所选原文的同段传统配属解释“主”，不把它改写为生理控制关系。新选具名来源不证明旧Xingque包的历史出处；独立专家、全书及现实效度尚未接受。",
+          "definition_basis": "tip[0]按所选原文的同段传统配属解释“主”，不把它改写为生理控制关系。新选具名来源不证明旧Xingque包的历史出处；独立专家与全书校勘尚未完成。",
           "tip_attribution": {
             "0": "selected_classical_cultural_correspondence_only; cross-passage synthesis where explicitly stated",
             "1": "implementation_scope_only; core/bazi/bazi_evidence.py; not supported by medical classics",
@@ -1811,7 +1810,7 @@
               "supporting_tip_indexes": [
                 0
               ],
-              "support_scope": "仅支持tip[0]的文化配属背景。土—脾、金—肺的传统配属：正文分别列脾与其类土、肺与其类金。不为tip[1]的软件专题字段背书；tip[2]是本软件的交付边界，古籍不构成临床验证或现实效度证据，也不证明旧Xingque资料由此摘录。"
+              "support_scope": "仅支持tip[0]的文化配属背景。土—脾、金—肺的传统配属：正文分别列脾与其类土、肺与其类金。不为tip[1]的软件专题字段背书；tip[2]是临床边界，古籍不构成临床验证，也不证明旧Xingque资料由此摘录。"
             },
             {
               "author": "古籍原文不认定单一作者；宋史崧音释",
@@ -1823,7 +1822,7 @@
               "supporting_tip_indexes": [
                 0
               ],
-              "support_scope": "仅支持tip[0]的脾合胃的传统藏府相合关系；与《素问》五行—五藏段连接属于本卡显式跨段整理，不是单句原文。不是软件权重、医疗或现实效度依据，也不证明旧Xingque资料的历史来源。"
+              "support_scope": "仅支持tip[0]的脾合胃的传统藏府相合关系；与《素问》五行—五藏段连接属于本卡显式跨段整理，不是单句原文。不是软件权重或医疗依据，也不证明旧Xingque资料的历史来源。"
             }
           ],
           "implementation_refs": [
@@ -1834,7 +1833,7 @@
           ],
           "legacy_correspondence_status": "selected_sources_identified_legacy_origin_unverified",
           "citation": "FateBridge文化词义编释，非逐字引文；王冰注、林亿等校正《重廣補注黃帝內經素問》四部丛刊影明翻北宋本，卷一〈金匮真言论〉扫描56的土—脾，另与《灵枢经》四库本卷一〈本输〉固定数字转录640546的脾合胃跨段整理；灵枢原叶未核，旧Xingque包历史出处未定。",
-          "definition_basis": "tip[0]显式连接《素问》土—脾与《灵枢》脾—胃；这是跨段术语整理，非一句“土主脾胃”的逐字引文。新选具名来源不证明旧Xingque包的历史出处；独立专家、全书及现实效度尚未接受。",
+          "definition_basis": "tip[0]显式连接《素问》土—脾与《灵枢》脾—胃；这是跨段术语整理，非一句“土主脾胃”的逐字引文。新选具名来源不证明旧Xingque包的历史出处；独立专家与全书校勘尚未完成。",
           "tip_attribution": {
             "0": "selected_classical_cultural_correspondence_only; cross-passage synthesis where explicitly stated",
             "1": "implementation_scope_only; core/bazi/bazi_evidence.py; not supported by medical classics",
@@ -1868,7 +1867,7 @@
               "supporting_tip_indexes": [
                 0
               ],
-              "support_scope": "仅支持tip[0]的文化配属背景。土—脾、金—肺的传统配属：正文分别列脾与其类土、肺与其类金。不为tip[1]的软件专题字段背书；tip[2]是本软件的交付边界，古籍不构成临床验证或现实效度证据，也不证明旧Xingque资料由此摘录。"
+              "support_scope": "仅支持tip[0]的文化配属背景。土—脾、金—肺的传统配属：正文分别列脾与其类土、肺与其类金。不为tip[1]的软件专题字段背书；tip[2]是临床边界，古籍不构成临床验证，也不证明旧Xingque资料由此摘录。"
             }
           ],
           "implementation_refs": [
@@ -1879,7 +1878,7 @@
           ],
           "legacy_correspondence_status": "selected_sources_identified_legacy_origin_unverified",
           "citation": "FateBridge文化词义编释，非逐字引文；王冰注、林亿等校正《重廣補注黃帝內經素問》四部丛刊影明翻北宋本，卷一〈金匮真言论〉扫描56，只取金—肺配属；旧Xingque包历史出处未定。",
-          "definition_basis": "tip[0]只解释所选原文金—肺的文化配属，不接受由命盘权重到现代人体系统的扩展。新选具名来源不证明旧Xingque包的历史出处；独立专家、全书及现实效度尚未接受。",
+          "definition_basis": "tip[0]只解释所选原文金—肺的文化配属，不接受由命盘权重到现代人体系统的扩展。新选具名来源不证明旧Xingque包的历史出处；独立专家与全书校勘尚未完成。",
           "tip_attribution": {
             "0": "selected_classical_cultural_correspondence_only; cross-passage synthesis where explicitly stated",
             "1": "implementation_scope_only; core/bazi/bazi_evidence.py; not supported by medical classics",
@@ -1913,7 +1912,7 @@
               "supporting_tip_indexes": [
                 0
               ],
-              "support_scope": "仅支持tip[0]的文化配属背景。水—肾的传统配属：正文同段列肾与其类水。不为tip[1]的软件专题字段背书；tip[2]是本软件的交付边界，古籍不构成临床验证或现实效度证据，也不证明旧Xingque资料由此摘录。"
+              "support_scope": "仅支持tip[0]的文化配属背景。水—肾的传统配属：正文同段列肾与其类水。不为tip[1]的软件专题字段背书；tip[2]是临床边界，古籍不构成临床验证，也不证明旧Xingque资料由此摘录。"
             }
           ],
           "implementation_refs": [
@@ -1924,7 +1923,7 @@
           ],
           "legacy_correspondence_status": "selected_sources_identified_legacy_origin_unverified",
           "citation": "FateBridge文化词义编释，非逐字引文；王冰注、林亿等校正《重廣補注黃帝內經素問》四部丛刊影明翻北宋本，卷一〈金匮真言论〉扫描57，只取水—肾配属；旧Xingque包历史出处未定。",
-          "definition_basis": "tip[0]只解释所选原文水—肾的文化配属，不由盘内有无或偏多少推断实际生理状态。新选具名来源不证明旧Xingque包的历史出处；独立专家、全书及现实效度尚未接受。",
+          "definition_basis": "tip[0]只解释所选原文水—肾的文化配属，不由盘内有无或偏多少推断实际生理状态。新选具名来源不证明旧Xingque包的历史出处；独立专家与全书校勘尚未完成。",
           "tip_attribution": {
             "0": "selected_classical_cultural_correspondence_only; cross-passage synthesis where explicitly stated",
             "1": "implementation_scope_only; core/bazi/bazi_evidence.py; not supported by medical classics",
@@ -2041,7 +2040,7 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
-              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
+              "scope": "专题的透藏星位、关系条件与输出范围。"
             }
           ],
           "source_tip_indices": [
@@ -2058,7 +2057,6 @@
           ],
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
-          "reality_prediction_efficacy": "not_tested",
           "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,54,55；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；文昌表或女命对应仍待扫描本校勘。"
         }
       },
@@ -2092,7 +2090,7 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
-              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
+              "scope": "专题的透藏星位、关系条件与输出范围。"
             }
           ],
           "source_tip_indices": [
@@ -2107,8 +2105,7 @@
           "source_pending_tip_indices": [],
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
-          "reality_prediction_efficacy": "not_tested",
-          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,54,55；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,54,55；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家复核。"
         }
       },
       "时柱十神看子女": {
@@ -2141,7 +2138,7 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
-              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
+              "scope": "专题的透藏星位、关系条件与输出范围。"
             }
           ],
           "source_tip_indices": [
@@ -2156,8 +2153,7 @@
           "source_pending_tip_indices": [],
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
-          "reality_prediction_efficacy": "not_tested",
-          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,54,55；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,54,55；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家复核。"
         }
       },
       "生育时机": {
@@ -2190,7 +2186,7 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
-              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
+              "scope": "专题的透藏星位、关系条件与输出范围。"
             }
           ],
           "source_tip_indices": [
@@ -2205,8 +2201,7 @@
           "source_pending_tip_indices": [],
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
-          "reality_prediction_efficacy": "not_tested",
-          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,54,55；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,54,55；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家复核。"
         }
       }
     },
@@ -2243,7 +2238,7 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
-              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
+              "scope": "专题的透藏星位、关系条件与输出范围。"
             }
           ],
           "source_tip_indices": [
@@ -2258,8 +2253,7 @@
           "source_pending_tip_indices": [],
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
-          "reality_prediction_efficacy": "not_tested",
-          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF28,72,73,74,75；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF28,72,73,74,75；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家复核。"
         }
       },
       "官印相生": {
@@ -2293,7 +2287,7 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
-              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
+              "scope": "专题的透藏星位、关系条件与输出范围。"
             }
           ],
           "source_tip_indices": [
@@ -2308,8 +2302,7 @@
           "source_pending_tip_indices": [],
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
-          "reality_prediction_efficacy": "not_tested",
-          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF28,72,73,75；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF28,72,73,75；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家复核。"
         }
       },
       "食伤主才华": {
@@ -2348,7 +2341,7 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
-              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
+              "scope": "专题的透藏星位、关系条件与输出范围。"
             }
           ],
           "source_tip_indices": [
@@ -2363,8 +2356,7 @@
           "source_pending_tip_indices": [],
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
-          "reality_prediction_efficacy": "not_tested",
-          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF28,73,76,77,78,82,83,84,85；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF28,73,76,77,78,82,83,84,85；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家复核。"
         }
       },
       "文昌贵人": {
@@ -2372,8 +2364,8 @@
         "tips": [
           "所选《秘本子平真诠》论星辰无关格局，强调月令四柱配合；该章没有本工具的文昌十干表，不能把神煞命中当作格局成败。",
           "本工具学业模块只按日干查四柱地支：甲巳、乙午、丙戊申、丁己酉、庚亥、辛子、壬寅、癸卯。wenchang_branch与hit_pillars分别返回目标支和全部命中柱位，不同时按年干另算。",
-          "该十干表的原始版本及异文仍待校勘；此处明确其当前程序依据，不把表与原典已核条件或现实效力混为一谈。",
-          "文昌是查表标签，不测量聪明、文采或学习能力；本学业模块也不由大运流年文昌计算考试成功概率。"
+          "该十干表的原始版本及异文仍待校勘；此处明确其当前程序依据。",
+          "文昌是查表标签，对应十干查表与学业专题字段。"
         ],
         "curation": {
           "entry_revision": 1,
@@ -2398,7 +2390,7 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
-              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
+              "scope": "专题的透藏星位、关系条件与输出范围。"
             }
           ],
           "source_tip_indices": [
@@ -2415,7 +2407,6 @@
           ],
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
-          "reality_prediction_efficacy": "not_tested",
           "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF49,50,51；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；文昌表或女命对应仍待扫描本校勘。"
         }
       },
@@ -2451,7 +2442,7 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
-              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
+              "scope": "专题的透藏星位、关系条件与输出范围。"
             }
           ],
           "source_tip_indices": [
@@ -2466,8 +2457,7 @@
           "source_pending_tip_indices": [],
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
-          "reality_prediction_efficacy": "not_tested",
-          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF28,30,73,74,75；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF28,30,73,74,75；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家复核。"
         }
       },
       "伤官见官": {
@@ -2503,7 +2493,7 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
-              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
+              "scope": "专题的透藏星位、关系条件与输出范围。"
             }
           ],
           "source_tip_indices": [
@@ -2518,8 +2508,7 @@
           "source_pending_tip_indices": [],
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
-          "reality_prediction_efficacy": "not_tested",
-          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF28,30,82,83,84,85；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF28,30,82,83,84,85；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家复核。"
         }
       }
     },
@@ -2578,7 +2567,7 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
-              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
+              "scope": "专题的透藏星位、关系条件与输出范围。"
             }
           ],
           "source_tip_indices": [
@@ -2595,7 +2584,6 @@
           ],
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
-          "reality_prediction_efficacy": "not_tested",
           "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,53；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；文昌表或女命对应仍待扫描本校勘。"
         }
       },
@@ -2630,7 +2618,7 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
-              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
+              "scope": "专题的透藏星位、关系条件与输出范围。"
             }
           ],
           "source_tip_indices": [
@@ -2645,8 +2633,7 @@
           "source_pending_tip_indices": [],
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
-          "reality_prediction_efficacy": "not_tested",
-          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,53,54,55；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,53,54,55；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家复核。"
         }
       },
       "比劫论手足": {
@@ -2678,7 +2665,7 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
-              "scope": "专题的透藏星位、关系条件与输出范围；程序散列不证明原典或现实预测有效。"
+              "scope": "专题的透藏星位、关系条件与输出范围。"
             }
           ],
           "source_tip_indices": [
@@ -2693,8 +2680,7 @@
           "source_pending_tip_indices": [],
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
-          "reality_prediction_efficacy": "not_tested",
-          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,53；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,53；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家复核。"
         }
       }
     },
@@ -2743,7 +2729,7 @@
               "title": "秘本子平真诠",
               "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
-              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖全部流派。",
               "source_pdf_pages": [
                 73,
                 74
@@ -2773,7 +2759,7 @@
               "title": "秘本子平真诠",
               "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
-              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖全部流派。",
               "source_pdf_pages": [
                 73,
                 74
@@ -2803,7 +2789,7 @@
               "title": "秘本子平真诠",
               "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
-              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖全部流派。",
               "source_pdf_pages": [
                 73,
                 74
@@ -2834,7 +2820,7 @@
               "title": "任注滴天髓闡微",
               "edition": "上海大東書局，1947年4月初版",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
-              "support_scope": "所列本版原典语义与条件的编辑编释；非逐字引文，不覆盖所有版本、整部规则或现实效力。",
+              "support_scope": "所列本版原典语义与条件的编辑编释；非逐字引文，不覆盖所有版本或整部规则。",
               "source_pdf_pages": [
                 118
               ]
@@ -2851,7 +2837,7 @@
           "review_status": "selected_classical_semantics_not_full_acceptance",
           "validation_status": "text_semantics_not_model_force_adjudication",
           "known_overlap": "bazi_clash_season_v1/v2 complete chapters; not new independent observations",
-          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局1947年4月初版；PDF118；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，未完成独立专家、全局力量或现实效力验收。",
+          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局1947年4月初版；PDF118；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，未完成独立专家或全局力量验收。",
           "curated_on": "2026-10-22"
         }
       },
@@ -2861,7 +2847,7 @@
           "所选原典先辨全局何者旺、何者衰，再论冲的作用，并要求察大势与喜忌；不能只按支名相冲就裁定根已拔或事件吉凶。",
           "正文例如午旺提纲且四柱无金、卯旺提纲且四柱有火无土，均有并列前提；午月本身不能代替午旺及其余条件。原文还有寅、巳等分支，不能合成一条季相乘数规则。",
           "月令、根气、透干、生扶及制化要一起核对。引擎当前的预算和数值因子是工程策略，不能充当原典定量或自动裁定这些条件。",
-          "冲去一方的局部根、日主全局旺衰和现实事件是不同判断；条文编释不新增独立命例或现实预测通过率。"
+          "冲去一方的局部根与日主全局旺衰是不同判断。"
         ],
         "curation": {
           "method_id": "dtcw1947_force_terms_v1",
@@ -2873,7 +2859,7 @@
               "title": "任注滴天髓闡微",
               "edition": "上海大東書局，1947年4月初版",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
-              "support_scope": "所列本版原典语义与条件的编辑编释；非逐字引文，不覆盖所有版本、整部规则或现实效力。",
+              "support_scope": "所列本版原典语义与条件的编辑编释；非逐字引文，不覆盖所有版本或整部规则。",
               "source_pdf_pages": [
                 78,
                 79,
@@ -2893,7 +2879,7 @@
           "review_status": "selected_classical_semantics_not_full_acceptance",
           "validation_status": "text_semantics_not_model_force_adjudication",
           "known_overlap": "bazi_clash_season_v1/v2 complete chapters; not new independent observations",
-          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局1947年4月初版；PDF78,79,89,90；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，未完成独立专家、全局力量或现实效力验收。",
+          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局1947年4月初版；PDF78,79,89,90；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，未完成独立专家或全局力量验收。",
           "curated_on": "2026-10-22"
         }
       },
@@ -2903,7 +2889,7 @@
           "所选底本在甲寅、戊辰、丙寅、丙申例论时柱比肩盖头使申金冲木无力；另一壬申、甲辰、丙寅、丙申例则论两申冲寅、甲木根拔及壬水泄金生木。两例不能只凭相同支名或一个金木总量合并解释。",
           "丙子、己亥、乙酉、壬午与己亥、丙子、乙丑、壬午两表除了酉丑，年、月两柱位置也不同。正文分别论丙火在年与在月、隔己土及壬水相近，不能把它误当只改一个日支的对照。",
           "盖头和生克距离只是所选命式的条件；不能据一个局部例子给所有命盘固定减根，或宣称已经完成全局力量算法。解释必须对应同次原始柱位、透藏及实际计算。",
-          "这些条目与已经公开的整章对照有来源重合，属于同一开发者的编释；不作为新的独立专家验收或现实结果标签。"
+          "这些条目与已经公开的整章对照有来源重合，属于同一开发者的编释；不作为新的独立专家验收。"
         ],
         "curation": {
           "method_id": "dtcw1947_force_terms_v1",
@@ -2915,7 +2901,7 @@
               "title": "任注滴天髓闡微",
               "edition": "上海大東書局，1947年4月初版",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
-              "support_scope": "所列本版原典语义与条件的编辑编释；非逐字引文，不覆盖所有版本、整部规则或现实效力。",
+              "support_scope": "所列本版原典语义与条件的编辑编释；非逐字引文，不覆盖所有版本或整部规则。",
               "source_pdf_pages": [
                 106,
                 107,
@@ -2935,7 +2921,7 @@
           "review_status": "selected_classical_semantics_not_full_acceptance",
           "validation_status": "text_semantics_not_model_force_adjudication",
           "known_overlap": "bazi_clash_season_v1/v2 complete chapters; not new independent observations",
-          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局1947年4月初版；PDF106,107,108,109；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，未完成独立专家、全局力量或现实效力验收。",
+          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局1947年4月初版；PDF106,107,108,109；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，未完成独立专家或全局力量验收。",
           "curated_on": "2026-10-22"
         }
       },
@@ -2945,7 +2931,7 @@
           "所选《燥湿》把主气、局气与水火相成并看，分别讨论夏木、冬金及原局燥湿；不是只按某五行字数取最多或最少。",
           "任注在夏木情境区分丑辰湿土的培扶与未戌燥土的助火，也以两个寒金命式分别论湿土与燥土；不能据此给所有土都设同一生扶效果。",
           "当前旺衰预算仍使用声明的季相、根预算与合冲参数，没有裁定本章完整生发与承载条件；寒暖或季相标签不能代替这层判断。",
-          "这里讨论命理原典的作用条件，不是人体寒热、气候测量或现实结果证据。"
+          "这里讨论命理原典的作用条件，不是人体寒热或气候测量。"
         ],
         "curation": {
           "method_id": "dtcw_conditional_generation_visibility_manyfew_v6",
@@ -2967,7 +2953,7 @@
               "title": "任注滴天髓闡微",
               "edition": "李雨田校訂兼發行，上海大東書局經售，1947年4月初版",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
-              "support_scope": "指定章页的生发、根与隐显众寡语境；编释非逐字引文，不认证通用力量算法、全书符合或现实效力。",
+              "support_scope": "指定章页的生发、根与隐显众寡语境；编释非逐字引文，不认证通用力量算法或全书符合。",
               "source_pdf_pages": [
                 260,
                 261,
@@ -2979,14 +2965,14 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/strength.py",
-              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
+              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量。"
             }
           ],
           "validation_status": "text_semantics_not_model_force_adjudication",
           "review_status": "single_developer_source_reading_external_review_pending",
-          "known_overlap": "These source observations and cards share the same three-chapter collection; not new independent observations or empirical efficacy samples.",
+          "known_overlap": "These source observations and cards share the same three-chapter collection.",
           "source_attribution_rule": "原典条件与程序范围、编辑边界分开；出处不为程序系数背书。",
-          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF260,261,262,263；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量或现实预测。",
+          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF260,261,262,263；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量。",
           "curated_on": "2026-10-22"
         }
       },
@@ -3024,7 +3010,7 @@
               "title": "任注滴天髓闡微",
               "edition": "李雨田校訂兼發行，上海大東書局經售，1947年4月初版",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
-              "support_scope": "指定章页的生发、根与隐显众寡语境；编释非逐字引文，不认证通用力量算法、全书符合或现实效力。",
+              "support_scope": "指定章页的生发、根与隐显众寡语境；编释非逐字引文，不认证通用力量算法或全书符合。",
               "source_pdf_pages": [
                 261,
                 263,
@@ -3040,7 +3026,7 @@
                 209,
                 210
               ],
-              "support_scope": "仅支持本条新增的相邻两造实际合化结论及正文仍通根而无滋助的差别；不为任意根气判级、全局力量、程序系数或现实效力背书。",
+              "support_scope": "仅支持本条新增的相邻两造实际合化结论及正文仍通根而无滋助的差别；不为任意根气判级、全局力量或程序系数背书。",
               "tip_indexes": [
                 4,
                 5
@@ -3050,22 +3036,22 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/utils/data.py",
-              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
+              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量。"
             },
             {
               "source_path": "src/fatebridge/core/classical_force.py",
-              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
+              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量。"
             },
             {
               "source_path": "src/fatebridge/core/classical_passage.py",
-              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
+              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量。"
             }
           ],
           "validation_status": "text_semantics_not_model_force_adjudication",
           "review_status": "single_developer_source_reading_external_review_pending",
-          "known_overlap": "These source observations and cards share the same three-chapter collection; not new independent observations or empirical efficacy samples. GS12 and GS13 were exposed before this post-comparison correction; no new independent observations.",
+          "known_overlap": "These source observations and cards share the same three-chapter collection. GS12 and GS13 were exposed before this post-comparison correction.",
           "source_attribution_rule": "原典条件与程序范围、编辑边界分开；出处不为程序系数背书。",
-          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF261,263,267；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量或现实预测。 本条修订2另核PDF209–210相邻两造最终结论，先前假设与最后判断分开；已暴露校勘，不增加独立样本。",
+          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF261,263,267；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量。 本条修订2另核PDF209–210相邻两造最终结论，先前假设与最后判断分开；已暴露校勘，不增加独立样本。",
           "curated_on": "2026-10-22",
           "revision_history": [
             {
@@ -3103,7 +3089,7 @@
               "title": "任注滴天髓闡微",
               "edition": "李雨田校訂兼發行，上海大東書局經售，1947年4月初版",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
-              "support_scope": "指定章页的生发、根与隐显众寡语境；编释非逐字引文，不认证通用力量算法、全书符合或现实效力。",
+              "support_scope": "指定章页的生发、根与隐显众寡语境；编释非逐字引文，不认证通用力量算法或全书符合。",
               "source_pdf_pages": [
                 263,
                 264,
@@ -3114,14 +3100,14 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/classical_candidate_selection.py",
-              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
+              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量。"
             }
           ],
           "validation_status": "text_semantics_not_model_force_adjudication",
           "review_status": "single_developer_source_reading_external_review_pending",
-          "known_overlap": "These source observations and cards share the same three-chapter collection; not new independent observations or empirical efficacy samples.",
+          "known_overlap": "These source observations and cards share the same three-chapter collection.",
           "source_attribution_rule": "原典条件与程序范围、编辑边界分开；出处不为程序系数背书。",
-          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF263,264,265；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量或现实预测。",
+          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF263,264,265；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量。",
           "curated_on": "2026-10-22"
         }
       },
@@ -3153,7 +3139,7 @@
               "title": "任注滴天髓闡微",
               "edition": "李雨田校訂兼發行，上海大東書局經售，1947年4月初版",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
-              "support_scope": "指定章页的生发、根与隐显众寡语境；编释非逐字引文，不认证通用力量算法、全书符合或现实效力。",
+              "support_scope": "指定章页的生发、根与隐显众寡语境；编释非逐字引文，不认证通用力量算法或全书符合。",
               "source_pdf_pages": [
                 265,
                 266,
@@ -3165,18 +3151,18 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/bazi/bazi_evidence.py",
-              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
+              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量。"
             },
             {
               "source_path": "src/fatebridge/core/strength.py",
-              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
+              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量。"
             }
           ],
           "validation_status": "text_semantics_not_model_force_adjudication",
           "review_status": "single_developer_source_reading_external_review_pending",
-          "known_overlap": "These source observations and cards share the same three-chapter collection; not new independent observations or empirical efficacy samples.",
+          "known_overlap": "These source observations and cards share the same three-chapter collection.",
           "source_attribution_rule": "原典条件与程序范围、编辑边界分开；出处不为程序系数背书。",
-          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF265,266,267,268；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量或现实预测。",
+          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF265,266,267,268；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量。",
           "curated_on": "2026-10-22"
         }
       },
@@ -3187,7 +3173,7 @@
           "熊忠丞学鹏的丁巳、壬子、辛巳、丁酉例，原注说丁火用于敌寒解冻，非用丁火，用神必在酉金；同时列酉时扶身、巳酉拱等条件。不能只凭冬金喜火便把火写成该例用神。",
           "本条限定该版任注与两例完整上下文；不把任注用神名义强行换成其他书的月令用神定义，也不据两个例子推出所有冬金必用土金。",
           "当前程序的调候参考、扶抑候选、月令路径与原典有效力量是不同层。实际取用尚未裁定时，只能按同次结果说明参考条件，不把暖局之火升级成已经选定的用神。",
-          "本条与完整性情35造共用来源，不增加独立命例、现实预测成绩或外部专家验收；寒暖在这里是原典术语，不是人体温度或医学诊断。"
+          "本条与完整性情35造共用来源，不增加独立命例或外部专家验收；寒暖在这里是原典术语，不是人体温度或医学诊断。"
         ],
         "curation": {
           "method_id": "dtcw1947_xingqing_semantics_v1",
@@ -3210,7 +3196,7 @@
               "title": "任注滴天髓闡微",
               "edition": "李雨田校訂兼發行，上海大東書局經售，1947年4月初版",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
-              "support_scope": "完整性情章中的主体、暖局、用神与位置条件；编释不冒作已算有效力量或全书、现实效度认证。",
+              "support_scope": "完整性情章中的主体、暖局、用神与位置条件；编释不冒作已算有效力量或全书认证。",
               "source_pdf_pages": [
                 450,
                 451
@@ -3220,14 +3206,14 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/strength.py",
-              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
+              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量。"
             }
           ],
           "validation_status": "text_semantics_not_model_force_adjudication",
           "review_status": "single_developer_source_reading_external_review_pending",
           "known_overlap": "These3cards share the same complete35case性情 collection and its first failed adoption experiment. Not3new cohorts or independent external reviews.",
           "source_attribution_rule": "原典条件与程序范围、编辑边界分开；出处不为程序系数背书。",
-          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF450,451；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量或现实预测。",
+          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF450,451；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量。",
           "curated_on": "2026-10-22"
         }
       },
@@ -3238,7 +3224,7 @@
           "戊子、戊午、丙辰、戊戌例先说午提刃强当令，随后论子冲辰泄、三戊窃日主精华并说弱可知。刃强与日主弱可并述，不能只截刃强两字改判日主强。",
           "庚午、乙酉、庚午、壬午例虽生仲秋，原注仍因三午官星制酉刃、五行无土论弱；得令、坐禄、有印字等单因都不能代替全局力量裁定。",
           "当前工程强弱档、印比合计、根预算和原典旺衰不是同一测量。未给明确三档的源例保留未知；这些文字条件不能反过来冒称本系统已经算出全部原典判断。",
-          "人物品德、官位、家产或灾祸叙事不作原典力量标签，也不作现实预测验证。此条是同一开发者的限域编释，独立复核仍待完成。",
+          "人物品德、官位、家产或灾祸叙事不作原典力量标签。此条是同一开发者的限域编释，独立复核仍待完成。",
           "《初学捷径》“衰旺强弱之别”是李雨田增补层：当令而无劫印生扶仍可作衰，失令而劫印重也可作旺；该页末列旺宜克、强宜泄、衰宜扶、弱宜抑。四词与附带条件须按本页语境保存，不能把末句直接套到当前程序的强／中和／弱三档，更不把它冒称任氏原话。",
           "任氏《衰旺》反对只以得时便旺、失令便衰，举春木虽强而金重可危、秋木虽弱而根深亦强，并区分禄旺根、墓库与余气根，提出干多不如根重。得令、同类数量、根位与实际受生要分别核对，不能凭一个时令词或长生名目认证日主三档。",
           "任氏另分太旺、旺极、太衰、衰极。按本段逐项保留的四态取用关系为：木：太旺似金宜火炼，旺极似火宜水克，太衰似水宜金生，衰极似土宜火生；火：太旺似水宜土止，旺极似土宜木克，太衰似木宜水生，衰极似金宜土生；土：太旺似木宜金克，旺极似金宜火炼，太衰似火宜木生，衰极似水宜金生；金：太旺似火宜水济，旺极似水宜土止，太衰似土宜火生，衰极似木宜水生；水：太旺似土宜木克，旺极似木宜金克，太衰似金宜土生，衰极似火宜木生。“所似”是该段有条件的取用比拟，不改字面五行，也未给出可直接套用的四态数值界限；未知四态不能由工程三档或人物际遇补造。"
@@ -3267,7 +3253,7 @@
               "title": "任注滴天髓闡微",
               "edition": "李雨田校訂兼發行，上海大東書局經售，1947年4月初版",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
-              "support_scope": "完整性情章中的主体、暖局、用神与位置条件；编释不冒作已算有效力量或全书、现实效度认证。",
+              "support_scope": "完整性情章中的主体、暖局、用神与位置条件；编释不冒作已算有效力量或全书认证。",
               "source_pdf_pages": [
                 428,
                 432,
@@ -3304,14 +3290,14 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/strength.py",
-              "support_scope": "只说明所引用当前程序的工程三档、根预算与未裁定范围；不为李氏四词、任氏四态提供数值认证，也不证明现实结果。"
+              "support_scope": "只说明所引用当前程序的工程三档、根预算与未裁定范围；不为李氏四词、任氏四态提供数值认证。"
             }
           ],
           "validation_status": "text_semantics_not_model_force_adjudication",
           "review_status": "single_developer_source_reading_external_review_pending",
           "known_overlap": "首版与暖局与用神、根位与有效接引共用完整35造性情资料及首次失败采用实验；本修订增加PDF50、175—178理论来源，不添加新命例、独立样本或外部复核。",
           "source_attribution_rule": "首版性情条件保留；新增李氏初学增补与任氏曰衰旺分列，工程三档和编辑边界另列；原典所似和用词不为程序系数背书。",
-          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF428,432,433,440,441,448；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量或现实预测。 修订2另核：李雨田增補《初學捷徑·衰旺強弱之別》，PDF50；任鐵樵增注（任氏曰）《任注滴天髓闡微·衰旺》，PDF175,176,177,178；同版同源；两种声部和两组名目分开，不认证完整四态算法或现实效度。 修订3依据同版PDF177—178的20项关系表纠正木旺极、太衰、衰极三处摘要对应；全表逐项呈现，不认证数值分类器或独立复核。",
+          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF428,432,433,440,441,448；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量。 修订2另核：李雨田增補《初學捷徑·衰旺強弱之別》，PDF50；任鐵樵增注（任氏曰）《任注滴天髓闡微·衰旺》，PDF175,176,177,178；同版同源；两种声部和两组名目分开，不认证完整四态算法。 修订3依据同版PDF177—178的20项关系表纠正木旺极、太衰、衰极三处摘要对应；全表逐项呈现，不认证数值分类器或独立复核。",
           "curated_on": "2026-10-25",
           "source_relation_binding": {
             "method_id": "dtcw1947_four_state_source_rows_v1",
@@ -3569,7 +3555,7 @@
               "title": "任注滴天髓闡微",
               "edition": "李雨田校訂兼發行，上海大東書局經售，1947年4月初版",
               "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
-              "support_scope": "完整性情章中的主体、暖局、用神与位置条件；编释不冒作已算有效力量或全书、现实效度认证。",
+              "support_scope": "完整性情章中的主体、暖局、用神与位置条件；编释不冒作已算有效力量或全书认证。",
               "source_pdf_pages": [
                 445,
                 447,
@@ -3580,14 +3566,14 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/strength.py",
-              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
+              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量。"
             }
           ],
           "validation_status": "text_semantics_not_model_force_adjudication",
           "review_status": "single_developer_source_reading_external_review_pending",
           "known_overlap": "These3cards share the same complete35case性情 collection and its first failed adoption experiment. Not3new cohorts or independent external reviews.",
           "source_attribution_rule": "原典条件与程序范围、编辑边界分开；出处不为程序系数背书。",
-          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF445,447,448；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量或现实预测。",
+          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF445,447,448；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量。",
           "curated_on": "2026-10-22"
         }
       },
@@ -3601,7 +3587,7 @@
           "现行工程模型按目录位置分配三藏干的4/7、2/7、1/7，再结合柱位与既定作用规则。巳的当前目录为丙、庚、戊，因此庚与戊的份额分别为2/7、1/7。这是未校准工程预算，不是上述章节给出的力量系数，也不是司令天数。",
           "交换目录中庚、戊会改变工程预算的归属；要核对同次账本和受影响条件，不能只因某批命例更符合标签就换序或改权重。本轮没有采用另一种排列。",
           "解释身印、根气或通关时，分别读取原局成员、同次剩余预算、所选原典条件和未裁定字段；工程数值大小不能补成原典身印轻重，候选路径也不能补成有效接引。",
-          "本条为所选完整章节的同开发者书影校读与实现说明，未完成独立专家或新增条件的真实模型解释验收。旧反例与首次失败保留；可复现、出处对应和现实预测效度分别验证。",
+          "本条为所选完整章节的同开发者书影校读与实现说明，未完成独立专家或新增条件的真实模型解释验收。旧反例与首次失败保留；可复现与出处对应分别验证。",
           "酉月始文，雍正刊本与四库本均列庚七日、辛二十三日，合三十日。续表有异文。雍正刊本卷二扫描31列辛二十日、庚七日、丁三日，合三十日。四库本原PDF70列辛二十日、庚七日、丁五日，合三十二日。各按底本保留，不校齐日数。现行引擎未采用这两版司令日历，实体藏干和力量预算另据各自规则。"
         ],
         "curation": {
@@ -3696,8 +3682,6 @@
           "validation_status": "selected_chapter_reading_and_implementation_definition_only",
           "review_status": "same_developer_visual_collation_external_review_pending",
           "independent_expert_review": "not_completed",
-          "actual_model_acceptance_for_new_conditions": "not_tested",
-          "real_world_predictive_validity": "not_tested",
           "calculation_effect": "none",
           "coefficient_adoption": "unchanged_uncalibrated_policy",
           "citation": "明·萬民英《三命通會》卷二·論人元司事，CADAL06066038，原PDF66–73及74上下文。酉月异文另校日本国立公文书馆藏清雍正刊本，305-0295，卷二子件4919180，IIIF扫描30–31。工程分配另据FateBridge当前实现。"

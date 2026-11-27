@@ -1,6 +1,6 @@
 # 时运技法按问题选择
 
-本参考用于阶段细问、用户点名技法或要求生命周期结构时；普通主题先按[共享时间选择](../shared/timing-selection.md)，不默认全栈。工具是否公开、参数与返回以当前 Schema 为准。下面的年龄范围是计算范围，不是寿命估计；遇到寿命、生死、灾祸和临床请求先停止该推算。
+本参考用于阶段细问、用户点名技法或要求生命周期结构时；普通主题先按[共享时间选择](../shared/timing-selection.md)，不默认全栈。工具是否公开、参数与返回以当前 Schema 为准；遇到寿命、生死、灾祸和临床请求先停止该推算。
 
 ## 聚合与单技法
 
@@ -15,7 +15,7 @@
 | 用户指定某年盘或太阳弧 | `chart_for_year` → `givenyear`；`solar_arc` → `solararc` | 按实际 `year_start/year_end` 或 `arc_degrees`、返回点位和 hits 分开解释；目标日与钟时按合同。不把符号弧度当观测天空，不重跑聚合已有层 |
 | 明确主限、某主限接触或图 | `primary_directions` → `pd`；`primary_directions_chart` → `pdchart` | 核对所选根实际返回的 `method/time_key/pd_type/coordinate_system`；`pd` 读 `current_window/timeline`，`pdchart` 读 `hits` 与自身图盘点位，不能交叉照搬子路径。事件年龄／时间保留其时间钥及 backend 精度，不把方法标签、当前弧度或单条精确时间写成事件预言 |
 | 要按福点／精神点比较分期 | `zodiacal_releasing` → `zr.fortune/spirit` | 各轨 `current_level_1..4`、`level_1_timeline..level_4_timeline`、`lot/base_point/peak_signs` 保留所属轨和层级。先按问题选择轨，不将“高峰／解结”标签等同成功或灾祸；已保留轨直接读，不重复算另一套凑一致 |
-| 点名十年星限或需另一种分期机制 | `decennials` → `decennials.current_level_1/2/3/timeline` | 核对 `base_order/resolved_start_planet` 与各段 start/end；这套机制与法达独立，只有新增问题需要才加，不累加为预测置信度 |
+| 点名十年星限或需另一种分期机制 | `decennials` → `decennials.current_level_1/2/3/timeline` | 核对 `base_order/resolved_start_planet` 与各段 start/end；这套机制与法达独立，只有新增问题需要才加 |
 
 ## 生命周期任务卡
 
@@ -24,16 +24,16 @@
 | 用户任务／选择条件 | 工具、额外输入与实际读取 | 新增信息与边界 |
 | --- | --- | --- |
 | 想看粗粒度传统人生阶段 | `planetary_ages`：可选 `analysis_year/month/day` 标当前段；读 `planetary_ages.bands/active_planet/current_age_years`、各段 natal_condition | 七分期年龄带与主星条件；不是个体事件时间表。追问当前段时复用已返回 bands，不重新生成整表 |
-| 点名三分主星、比较三阶段 | `triplicity_ruler_periods`：`division/lifespan`；读 `triplicity_rulers.sect/sect_light/element/stages/lifespan_years` | 昼夜光体所据三分主星及阶段年龄、角色与本命条件。`lifespan` 仅人为划分参数，绝不答能活多久；默认75年也不是命定寿命。三阶段相同长度来自口径，不当个案验证 |
+| 点名三分主星、比较三阶段 | `triplicity_ruler_periods`：`division/lifespan`；读 `triplicity_rulers.sect/sect_light/element/stages/lifespan_years` | 昼夜光体所据三分主星及阶段年龄、角色与本命条件。`lifespan` 仅人为划分参数（默认 75 年）。三阶段相同长度来自口径，不当个案验证 |
 | 想看月相周期的阶段转换 | `lunar_phase_progressions`：`max_age_years`；读 `lunation_phase.method_id/natal_phase/progression_options/phase_ingresses`，核对 `physical_ephemeris_source/solver/age_basis` | 当前模型搜索出生后实际日月星历的八相交点，以一名义 UTC 日对应一象征年龄年，保留原始交点及年龄显示精度；推运星历日期不是现实事件发生日期。同表覆盖范围内追问直接复用 |
 | 点名界推运／分配法 | `bounds_directions`：`time_key/max_age_years`；读 `distributions.direction_model/rate_deg_per_year/periods`、段内 participants | 目前为黄道上升按时间钥经过埃及界的分段及星体接触年龄；不是赤道／地方半弧主限的替代。时间钥不改来挑好答案；已保留段可继续解释其分配星与参与星 |
 | 点名调波或某阶共振 | `harmonic_chart`：`harmonic/orb`；读 `harmonic_chart.harmonic/positions/resonant_conjunctions` | 本命黄经乘阶数得到的配置及合相。调波是结构转换，本身不返回人生阶段，不因默认9阶就编九年周期；追问相同阶数复用，改变阶数才新增计算 |
-| 点名 Balbillus 分期 | `balbillus_periods`：`start_planet/mode/max_age_years`；读 `balbillus.mode/start_planet/zodiacal_order/periods` 及 sub_periods | 读取本版本起星、距离模式和大小段年龄，不与另一种129系统混同。表的上限是取数范围，不是寿命；先说明新增机制，普通年运无需默认加入 |
-| 点名数字相位／120年关键点 | `numeric_aspect_periods`：`release_mode/max_age_years`；读 `keypoints.release_mode/positions/activations` | 月亮或上升释放模式的数字位置、周期激活与年龄；这是该模型的结构条目，不能把“关键点”命名当现实重大事件保证，不能自行换 soul/body 找吻合 |
+| 点名 Balbillus 分期 | `balbillus_periods`：`start_planet/mode/max_age_years`；读 `balbillus.mode/start_planet/zodiacal_order/periods` 及 sub_periods | 读取本版本起星、距离模式和大小段年龄，不与另一种129系统混同。表的上限是取数范围；先说明新增机制，普通年运无需默认加入 |
+| 点名数字相位／120年关键点 | `numeric_aspect_periods`：`release_mode/max_age_years`；读 `keypoints.release_mode/positions/activations` | 月亮或上升释放模式的数字位置、周期激活与年龄；这是该模型的结构条目，不能自行换 soul/body 找吻合 |
 | 点名129年小年轮值 | `planetary_periods_129_years`：`start_planet/max_age_years`；读 `yearsystem129.sequence_model/start_planet/total_cycle_years/periods` | 本实现是本命黄经排序的轮值，`sequence_model` 明示不是原后端逐值核验；129年是模型周期。与 Balbillus 独立，不能只因名字相似合并结论 |
 | 想看指定日期的某行星弧 | `planetary_arc_directions`：`arc_source/orb/analysis_year/month/day`；读 `analysis_context.analysis_datetime`、`planetary_arc.arc_source/arc_degrees/positions/hits` | 所选源星的二次推运弧施于整盘，再对本命取相位；不同源星不等于太阳弧。同日期追问读保留 hits，改日期才需补目标计算 |
 | 点名波斯向运 | `persian_directions`：`max_age_years`；读 `persian_directed.rate_deg_per_year/hits/hit_count` | 符号1°／年的推移，对本命星体与宫头命中，当前最多保留按年龄排序前120条；未出现不证明没有后段命中。返回 date 是该符号模型日期，不是事情发生日；不补小行星／中点／阿拉伯点的未覆盖命中 |
-| 点名 Huber 年龄点 | `age_point`：`max_age_years`；读 `age_point.years_per_house/cycle_years/points/contacts` 与 `analysis_context` | 实际强制 Koch 宫、每宫6年、72年一周；继承的 house_system 不改变本方法。年龄点接触是符号进程，不把72年当寿命，也不由宫位推疾病 |
+| 点名 Huber 年龄点 | `age_point`：`max_age_years`；读 `age_point.years_per_house/cycle_years/points/contacts` 与 `analysis_context` | 实际强制 Koch 宫、每宫6年、72年一周；继承的 house_system 不改变本方法。年龄点接触是符号进程，不由宫位推疾病 |
 | 点名恒星黄道二次推运 | `sidereal_progressions`：`orb/analysis_year/month/day`；读 `analysis_context.analysis_datetime/ayanamsha`、`vedic_progression.progressed_datetime/calculation_options/zodiac/positions/hits` | 本命参照与推运位置均来自共享原生 Lahiri 恒星黄道；`analysis_context.zodiac_type` 是 `Sidereal`，分支 `zodiac` 是 `sidereal`。实际推运时刻及固定年键随结果返回。不是完整吠陀达沙或分盘。按实际点位与命中解释，不能因工具名就称已覆盖印度全部时间技法 |
 | 点名赤纬推运／平行相 | `declination_progressions`：`orb/analysis_year/month/day`；读 `analysis_context.analysis_datetime`、`jaynes_declination.parallels` | 逐条读 natal/progressed、赤纬、kind、orb；这与黄经合相不同。空表只限制此容许度内的赤纬命中，不否定其他阶段依据 |
 
@@ -41,7 +41,7 @@
 
 选择前说清这层能回答什么、新增什么；没有新增价值就沿用现有阶段。交付实际边界及相关主星／点位的两三项事实，再给与用户已知安排有关的一项建议。不同机制保留分歧，不按命中次数投票，不展开未问的整个人生。
 
-年龄表中的段界、主星、接触与峰段都是传统计算结构，不作事件、成败或健康结局。具体某年问题仍需对应年层，不能从粗分期编月份。返回只精确到年龄时保持年龄精度，不能自行手算精确日期。
+年龄表中的段界、主星、接触与峰段都是传统计算结构。具体某年问题仍需对应年层，不能从粗分期编月份。返回只精确到年龄时保持年龄精度，不能自行手算精确日期。
 
 同出生资料、同参数和已覆盖范围的追问，直接复用原结果中已读取的字段；用户只要解释不重算。完整时间线或审计依据使用 `detail=audit` 且 `fields=null`。改日期、阶数、时间钥等确需新增计算时，说明改变了哪项输入。
 

@@ -49,6 +49,5 @@
     "External omens and uncollected trigrams remain outside scope"
   ],
   "source_character_reading": "assistant selected-span visual reading; not independent human expert review",
-  "independent_human_expert_review": false,
-  "predictive_efficacy_established": false
+  "independent_human_expert_review": false
 }

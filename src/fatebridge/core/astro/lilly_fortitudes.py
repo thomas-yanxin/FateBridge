@@ -566,5 +566,4 @@ def evaluate_fortitudes(
         ],
         "full_original_text_acceptance": False,
         "full_judgement_accepted": False,
-        "real_world_prediction_established": False,
     }

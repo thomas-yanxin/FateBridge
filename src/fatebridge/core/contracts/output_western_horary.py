@@ -175,7 +175,6 @@ class HoraryRadicality(PartialOutput):
     conditional_reading_zh: str | None = None
     full_original_text_acceptance: bool | None = None
     full_judgement_accepted: bool | None = None
-    real_world_prediction_established: bool | None = None
     safe_to_judge_scope: str | None = None
     safe_to_judge: bool | None = None
     strictures: list[HoraryStricture] | None = None
@@ -281,7 +280,6 @@ class LillyFortitudes(PartialOutput):
     source_conflicts: list[str] | None = None
     full_original_text_acceptance: bool | None = None
     full_judgement_accepted: bool | None = None
-    real_world_prediction_established: bool | None = None
 
 
 class LillyFortuneFormula(PartialOutput):
@@ -312,7 +310,6 @@ class LillyFortune(LillyFortitudeSummary):
     interpretation_policies: list[str] | None = None
     full_original_text_acceptance: bool | None = None
     full_judgement_accepted: bool | None = None
-    real_world_prediction_established: bool | None = None
 
 
 class HoraryRuleProfile(PartialOutput):

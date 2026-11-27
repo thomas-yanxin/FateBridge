@@ -131,7 +131,7 @@ SPECS: list[ToolSpec] = [
         calculate_lunation_phase,
         "AstroLunationPhaseRequest",
         "月相推运",
-        summary="月相推运：按出生后实际日月八相交点推演象征年龄阶段（非寿命估计）。",
+        summary="月相推运：按出生后实际日月八相交点推演象征年龄阶段。",
     ),
     _western_lifespan_spec(
         "bounds_directions",

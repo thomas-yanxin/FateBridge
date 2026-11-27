@@ -23,9 +23,9 @@
 ## 历史钟制与 Lilly 卜卦 / 择日
 
 - **历史历法与钟面**：儒略历输入传 `question_calendar=julian` / `candidate_calendar=julian`；地方平/视太阳时通过 `question_clock_basis` / `candidate_clock_basis` 声明并省略时区；正午起算小时标签传 `question_hour_origin=noon` / `candidate_hour_origin=noon`。对应字段卡为 `calendar_input`、`clock_input` 与 `hour_origin`。
-- **Lilly 1647 卜卦规则**：按 `lilly_radicality` 读取判断前 12 条款与 `radicality_context`；按 `lilly_sign_rays` 读取有向左右相；按 `lilly_orbs_houses` 读取两列容许度（`orb_profile`）与居宫条件；按 `lilly_fortitudes` 与 `lilly_fortune` 读取第 115 页尊贵弱项及福点计分。子条件成立仍保留各自条款范围，不扩展为全盘成败断言。
+- **Lilly 1647 卜卦规则**：按 `lilly_radicality` 读取判断前 12 条款与 `radicality_context`；按 `lilly_sign_rays` 读取有向左右相；按 `lilly_orbs_houses` 读取两列容许度（`orb_profile`）与居宫条件；按 `lilly_fortitudes` 与 `lilly_fortune` 读取第 115 页尊贵弱项及福点计分。子条件成立仍保留各自条款范围。
 
 ## 关系盘方向与汉堡中点
 
 - **关系盘深读**（`relationship_detail`）：区分 `in_to_out_aspects` 与 `out_to_in_aspects` 方向、一方星体对另一方中点（`in_to_out_midpoint` / `out_to_in_midpoint`）及映点/反映点（`antiscia`/`contra_antiscia`）；Marks 盘读取 `marks_charts.inner/outer`。
-- **汉堡中点与太阳弧**：支持 `meridian_houses`（Witte 1923 赤经子午宫）、`meridian_placement`、`progression_key`（365.25 日钥匙）、`daily_meridian`（Witte 1924 日推运）、`comparative_geometry`（镜点锚框）、`witte1925_table` 与太阳弧交叉组合（`mixed_pairs` / `mixed_pair_sensitivity`）。存在生时不确定范围时按实际样点变化解释，不将频次当成事件发生率。
+- **汉堡中点与太阳弧**：支持 `meridian_houses`（Witte 1923 赤经子午宫）、`meridian_placement`、`progression_key`（365.25 日钥匙）、`daily_meridian`（Witte 1924 日推运）、`comparative_geometry`（镜点锚框）、`witte1925_table` 与太阳弧交叉组合（`mixed_pairs` / `mixed_pair_sensitivity`）。存在生时不确定范围时按实际样点变化解释。

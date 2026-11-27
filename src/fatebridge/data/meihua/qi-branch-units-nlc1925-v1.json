@@ -281,6 +281,5 @@
     "No stem predicate is inferred from 五金, 午火, 土 or an element-strength label",
     "All numeric/month-transition/element/season phrases, dates, physical horizons and full source synthesis remain unadjudicated"
   ],
-  "full_original_conformance": false,
-  "predictive_efficacy_established": false
+  "full_original_conformance": false
 }

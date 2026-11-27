@@ -708,7 +708,7 @@ def read_knowledge_entry(
                     "citation", f"FateBridge knowledge · {domain}/{category}/{key}"
                 )
                 if curation is not None
-                else f"FateBridge旧资料待逐条核对 · {domain}/{category}/{key}；未据此认证指定原典或现实效力。"
+                else f"FateBridge旧资料待逐条核对 · {domain}/{category}/{key}。"
             ),
         }
 

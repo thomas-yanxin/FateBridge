@@ -1,7 +1,7 @@
 {
   "call_guidance": {
     "delivery": "主层超预算时从 result_delivery 读取同一 run；投影后不能恢复首次未选字段。完整JSON首次 fields=null。",
-    "marks": "Marks主层为marks_chart_pair，分别读marks_charts.inner/outer；chart仅为内方别名。每盘是本人与双方Davison资料再次计算Davison，沿实际davison_variant；不使用已撤除的组合／时空盘混合算法，不把个人象征盘当双方本命、真实心意或关系成功率。",
+    "marks": "Marks主层为marks_chart_pair，分别读marks_charts.inner/outer；chart仅为内方别名。每盘是本人与双方Davison资料再次计算Davison，沿实际davison_variant；不使用已撤除的组合／时空盘混合算法，不把个人象征盘当双方共同盘。",
     "mode_aliases": "Comp→compare；Composite→composite；Synastry→influence；TimeSpace→timespace；Marks→marks；数值0..4依次对应这五种规范模式。",
     "views": "首次按已选 relative_mode 取 evidence_views 对应 fields；suggested_fields 是未选专用视图时的安全联合，不要求每次读取全部分支。核对实际 relationship_profile.relative_mode_normalized/primary_layer。"
   },

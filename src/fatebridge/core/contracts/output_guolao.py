@@ -316,7 +316,6 @@ class GuolaoRuleTrace(PartialOutput):
 
 class GuolaoValidation(PartialOutput):
     classical_acceptance_passed: bool | None = None
-    real_world_prediction_status: str | None = None
     full_marks_established: bool | None = None
     limitations: list[str] | None = None
 

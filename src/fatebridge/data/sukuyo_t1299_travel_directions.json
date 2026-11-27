@@ -21,7 +21,7 @@
       "source_excerpts": [
         "日屬軫宿，不得向北路行縱吉時亦不可行。"
       ],
-      "meaning": "下卷行动禁闭法按本段明列日宿，将向北出行列为禁行条（原文不得）；不扩大成其他方向或现实结局保证。夹注称纵吉时亦不可行，不能用吉时抵销此项原典限制。",
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向北出行列为禁行条（原文不得）；不扩大成其他方向。夹注称纵吉时亦不可行，不能用吉时抵销此项原典限制。",
       "direction": "north",
       "applicability": "activity_detail_required",
       "activity_detail_any_of": [
@@ -52,7 +52,7 @@
       "source_excerpts": [
         "日屬女宿，不得向東行縱吉時亦不可行。"
       ],
-      "meaning": "下卷行动禁闭法按本段明列日宿，将向东出行列为禁行条（原文不得）；不扩大成其他方向或现实结局保证。夹注称纵吉时亦不可行，不能用吉时抵销此项原典限制。",
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向东出行列为禁行条（原文不得）；不扩大成其他方向。夹注称纵吉时亦不可行，不能用吉时抵销此项原典限制。",
       "direction": "east",
       "applicability": "activity_detail_required",
       "activity_detail_any_of": [
@@ -91,7 +91,7 @@
       "source_excerpts": [
         "日屬鬼宿，不得向西行縱吉時亦不可行。"
       ],
-      "meaning": "下卷行动禁闭法按本段明列日宿，将向西出行列为禁行条（原文不得）；不扩大成其他方向或现实结局保证。夹注称纵吉时亦不可行，不能用吉时抵销此项原典限制。",
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向西出行列为禁行条（原文不得）；不扩大成其他方向。夹注称纵吉时亦不可行，不能用吉时抵销此项原典限制。",
       "direction": "west",
       "applicability": "activity_detail_required",
       "activity_detail_any_of": [
@@ -122,7 +122,7 @@
       "source_excerpts": [
         "日屬婁宿，不得向南行縱吉時亦不可行。"
       ],
-      "meaning": "下卷行动禁闭法按本段明列日宿，将向南出行列为禁行条（原文不得）；不扩大成其他方向或现实结局保证。夹注称纵吉时亦不可行，不能用吉时抵销此项原典限制。",
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向南出行列为禁行条（原文不得）；不扩大成其他方向。夹注称纵吉时亦不可行，不能用吉时抵销此项原典限制。",
       "direction": "south",
       "applicability": "activity_detail_required",
       "activity_detail_any_of": [
@@ -163,7 +163,7 @@
         "第七秤宮取角、亢日",
         "第十一瓶宮取危、室日，已上東行大吉"
       ],
-      "meaning": "下卷行动禁闭法按本段明列日宿，将向东出行列为宜条；不扩大成其他方向或现实结局保证。",
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向东出行列为宜条；不扩大成其他方向。",
       "direction": "east",
       "applicability": "activity_detail_required",
       "activity_detail_any_of": [
@@ -210,7 +210,7 @@
       "source_excerpts": [
         "第十一瓶宮取危、室日，已上東行大吉"
       ],
-      "meaning": "下卷行动禁闭法按本段明列日宿，将向东出行列为宜条；不扩大成其他方向或现实结局保证。",
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向东出行列为宜条；不扩大成其他方向。",
       "direction": "east",
       "applicability": "activity_detail_required",
       "activity_detail_any_of": [
@@ -251,7 +251,7 @@
         "第五獅子宮取星、張日",
         "第九弓宮取尾、箕、斗日，已上西行大吉"
       ],
-      "meaning": "下卷行动禁闭法按本段明列日宿，将向西出行列为宜条；不扩大成其他方向或现实结局保证。",
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向西出行列为宜条；不扩大成其他方向。",
       "direction": "west",
       "applicability": "activity_detail_required",
       "activity_detail_any_of": [
@@ -306,7 +306,7 @@
       "source_excerpts": [
         "第九弓宮取尾、箕、斗日，已上西行大吉"
       ],
-      "meaning": "下卷行动禁闭法按本段明列日宿，将向西出行列为宜条；不扩大成其他方向或现实结局保证。",
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向西出行列为宜条；不扩大成其他方向。",
       "direction": "west",
       "applicability": "activity_detail_required",
       "activity_detail_any_of": [
@@ -354,7 +354,7 @@
         "第八蝎宮取互、房、心日",
         "第十二魚宮取壁、奎日，已上向南行大吉"
       ],
-      "meaning": "下卷行动禁闭法按本段明列日宿，将向南出行列为宜条；不扩大成其他方向或现实结局保证。",
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向南出行列为宜条；不扩大成其他方向。",
       "direction": "south",
       "applicability": "activity_detail_required",
       "activity_detail_any_of": [
@@ -424,7 +424,7 @@
       "source_excerpts": [
         "第十二魚宮取壁、奎日，已上向南行大吉"
       ],
-      "meaning": "下卷行动禁闭法按本段明列日宿，将向南出行列为宜条；不扩大成其他方向或现实结局保证。",
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向南出行列为宜条；不扩大成其他方向。",
       "direction": "south",
       "applicability": "activity_detail_required",
       "activity_detail_any_of": [
@@ -479,7 +479,7 @@
         "第六女宮取翼、軫日",
         "第四蟹宮取鬼、柳，日已上向南行大吉"
       ],
-      "meaning": "下卷行动禁闭法按本段明列日宿，将向南出行列为宜条；不扩大成其他方向或现实结局保证。",
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向南出行列为宜条；不扩大成其他方向。",
       "direction": "south",
       "applicability": "activity_detail_required",
       "activity_detail_any_of": [
@@ -533,7 +533,7 @@
       "source_excerpts": [
         "第四蟹宮取鬼、柳，日已上向南行大吉"
       ],
-      "meaning": "下卷行动禁闭法按本段明列日宿，将向南出行列为宜条；不扩大成其他方向或现实结局保证。",
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向南出行列为宜条；不扩大成其他方向。",
       "direction": "south",
       "applicability": "activity_detail_required",
       "activity_detail_any_of": [
@@ -587,7 +587,7 @@
       "source_excerpts": [
         "第三男女宮至參、井日，東行大吉"
       ],
-      "meaning": "下卷行动禁闭法按本段明列日宿，将向东出行列为宜条；不扩大成其他方向或现实结局保证。",
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向东出行列为宜条；不扩大成其他方向。",
       "direction": "east",
       "applicability": "activity_detail_required",
       "activity_detail_any_of": [
@@ -627,7 +627,7 @@
       "source_excerpts": [
         "第十摩竭宮至女、虛日，南行大凶"
       ],
-      "meaning": "下卷行动禁闭法按本段明列日宿，将向南出行列为慎用条；不扩大成其他方向或现实结局保证。此处大正主文作凶，明本校记作吉；当前按大正列慎用，未合并为一致判断。",
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向南出行列为慎用条；不扩大成其他方向。此处大正主文作凶，明本校记作吉；当前按大正列慎用，未合并为一致判断。",
       "direction": "south",
       "applicability": "activity_detail_required",
       "activity_detail_any_of": [
@@ -668,7 +668,7 @@
       "source_excerpts": [
         "第一羊宮至婁、胃、昴日，西行大凶"
       ],
-      "meaning": "下卷行动禁闭法按本段明列日宿，将向西出行列为慎用条；不扩大成其他方向或现实结局保证。此处大正主文作凶，明本校记作吉；当前按大正列慎用，未合并为一致判断。",
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向西出行列为慎用条；不扩大成其他方向。此处大正主文作凶，明本校记作吉；当前按大正列慎用，未合并为一致判断。",
       "direction": "west",
       "applicability": "activity_detail_required",
       "activity_detail_any_of": [
@@ -708,7 +708,7 @@
       "source_excerpts": [
         "第二牛宮至畢、觜日，北行大凶"
       ],
-      "meaning": "下卷行动禁闭法按本段明列日宿，将向北出行列为慎用条；不扩大成其他方向或现实结局保证。此处大正主文作凶，明本校记作吉；当前按大正列慎用，未合并为一致判断。",
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向北出行列为慎用条；不扩大成其他方向。此处大正主文作凶，明本校记作吉；当前按大正列慎用，未合并为一致判断。",
       "direction": "north",
       "applicability": "activity_detail_required",
       "activity_detail_any_of": [
@@ -742,5 +742,5 @@
       "applied_to_activity": false
     }
   ],
-  "scope": "按本章明列日宿及用户明确出行方向查条文；宫名和序号仅为本段字面标签，与上卷师子起序足表和现代黄道宫、House分别保留。方向不从出生地点、GPS、目的地或角度猜测；未建立东北等扇区或角宽，不补齐未列方向。未核定平明日界，不给现实必然结局。"
+  "scope": "按本章明列日宿及用户明确出行方向查条文；宫名和序号仅为本段字面标签，与上卷师子起序足表和现代黄道宫、House分别保留。方向不从出生地点、GPS、目的地或角度猜测；未建立东北等扇区或角宽，不补齐未列方向。"
 }

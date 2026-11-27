@@ -27,7 +27,7 @@
     "scope": "sukuyo宿主默认chinese_hko_utc08；可明确选择japanese_hutime_1002_1_utc09的HuTime逐日参考，1872-02-09至2031-01-22、固定UTC+09。与出生时区、calendar_profile和天文模型分别保留，不称唐历、完整天保历或历史地方时已复原。",
     "shogonji_daily_annotations": "若返回manuscript_daily_annotations，逐分支解释本日是原始旁注所在日还是作者建议移置日；两条らうさく原在六月21／八月5，作者建议20／3，位移分别−1／−2。假名原读、狼藉汉字候选、作者意见与本次计算分开；不能当作T1299羅刹观测或统一换日误差。暦林問答集1811目录印本61章狼藉、62章羅刹分列；64章三宝仪式限制与支干吉前提属于该书，未替换T1299。",
     "shogonji_month_headers": "若返回manuscript_month_header，须解释该月首的原读、规范化候选、疑字／错位／未见朱注及非初一限制。荘厳寺37个月首来自1992研究作者转写，27条清晰、2条带限定、8处所选栏未见注；1092仅为月长合计，不能算逐日宿曜校勘或现实样本。1346／1347七月张注与Hinoo前半星不同，但朱注无半日钟时，不能判定规则胜负；1346闰九月两重建同氐，没有裁决次序的区分力。1345正文五行为纳音，非七曜。不能用渡边敏夫正文概表补缺注或据同名宿认证古代日界。",
-    "six_palaces": "six_palace_reference按已确认natal_mansion本身计一，交付命/事/意/聚/同/克六个本命相对位置；未给本命则status=natal_mansion_required。不得由日宿、星期、六类相性或十二宫足表补出本命，也不得把这些位置直接当已判定七曜凌犯、六害期间或现实灾祸；读取seven_luminary_transits_evaluated和三九参断evaluated。",
+    "six_palaces": "six_palace_reference按已确认natal_mansion本身计一，交付命/事/意/聚/同/克六个本命相对位置；未给本命则status=natal_mansion_required。不得由日宿、星期、六类相性或十二宫足表补出本命，也不得把这些位置直接当已判定七曜凌犯或六害期间；读取seven_luminary_transits_evaluated和三九参断evaluated。",
     "source_capture": "来源文件在内部校验；公开结果保留书目、版本与位置。Hinoo的active_primary_evidence指向downloaded_primary_edition，交付SAT响应来源、选定原段及五条校记。旧cached_primary_excerpt是历史记录，摘录不等于完整响应或抄本；旧末句句号与下载原文闭引号的差异明示。SAT原/甲本不合成唯一正文；完整HTML不等于字图全部取得、影印或独立学术校勘，半日钟时与规则次序仍未定。",
     "special_days": "special_day_labels仍采用上卷大正主表；special_day_evidence分别交付上下卷大正和所载明本校记表，明本仅作同底本重建，不代入主表或确定事项。冒/底未归并胃/氐；下卷标签完整性为false时不能把未匹配当无此特殊日。religious_learning才匹配甘露学道/经法，不泛化为一般学习或考试。下卷月与宿合仅作历日宿名查文献，physical_lunar_conjunction_evaluated=false时不能称已观察到物理月亮合宿。",
     "taibai_direction_reference": "taibai_direction_reference按实际入月日查T1299下卷太白八方／地下／天上表，使用calendar.lunar_day，不能以公历日、tithi、桧尾补配宿序或实测金星替代。明本校记删去初十／二十／三十天上行，缺文不等于无太白或已获行动允许；其他行正南等措辞按原字保留。",
@@ -114,8 +114,8 @@
         "validation",
         "summary"
       ],
-      "purpose": "完整衣事上下文。口诀和上卷预测式原句为单独文献见证，不作为新的现实预测或加权评分；源注与缺项完整保留。",
-      "when": "按明确衣事动作核对专章、跨卷条文、明本未识别字及半日候选；未宣称现实病灾。"
+      "purpose": "完整衣事上下文。口诀和上卷原句为单独文献见证；源注与缺项完整保留。",
+      "when": "按明确衣事动作核对专章、跨卷条文、明本未识别字及半日候选。"
     },
     "diagram": {
       "fields": [

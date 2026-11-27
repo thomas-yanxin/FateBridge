@@ -423,7 +423,7 @@ class MeihuaInterpretationOptions(FateBridgeBaseRequest):
         "dining",
     ] = Field(
         default="general",
-        description="Explicit branch: general; weather (no body/use); planning/reputation/wealth/transaction (文明书局本原四章初始体用条款，wealth另列求财成分)；travel/meeting为同本出行/谒见章，travel另核旺气及辅助生体偏好，多字及舟陆角色范围未裁定；lost_property为失物章五种初始关系及明示变用经卦读法的方位类象，物不失不否认已报遗失，位置与寻获未核实。traveler为行人章，返归句保留原体参照，在外补充明示以初用为受生受克对象，四个其他内卦角色逐一列出；初用月令衰与受克须同时成立，未知不猜，多字门槛及完整角色范围未裁定，不生成行踪、灾祸、返归核实或日期。reputation另列求名补充句及原文時序/方道，reputation_context声明原文在任与求职任条件，未知不猜，巽方道東/同本地理及转录東南等差异未裁定。household/dwelling分别为家宅/屋舍章，沿用实际原体与初用。家宅比利/转录比和未裁定，五行相同不自动套家宅安稳句；屋舍保留冷退/衰退异文。家宅生体转引人事章只核所列四内卦实际角色，未作完整跨章合参、住宅安全鉴定、选房或迁居许可。marriage为婚姻章五种初始关系，并分别核原体所占之家、初用所婚之家的已报节月旺气条件；原文未定与缺月令保持未知。补充生体/体生只列实际关系成分，或字不合并成必然同现；后段比利/转录比和未裁定，不自动套彼此相就句。八卦相貌品行仅作历史文本记录，不指派现实人物特征、两家财富、意愿或婚姻成败。dining为飲食章五种初始关系，并另列内卦坎酒、兑食及體用類的坤艮制坎、离制兑；这些句不要求多字门槛，不因制约者受制或季令衰自动抵消，完整内外合参未裁定。影印生身/转录生体及兑坎组合未裁定，不把酒食象当实际供应、菜单、席上人物、饮酒或饮食医疗建议。版本异文另列。Question keywords never switch branches; historical clauses are not hazard verdicts, travel instructions, validated outcomes or event dates",
+        description="Explicit branch: general; weather (no body/use); planning/reputation/wealth/transaction (文明书局本原四章初始体用条款，wealth另列求财成分)；travel/meeting为同本出行/谒见章，travel另核旺气及辅助生体偏好，多字及舟陆角色范围未裁定；lost_property为失物章五种初始关系及明示变用经卦读法的方位类象。traveler为行人章，返归句保留原体参照，在外补充明示以初用为受生受克对象，四个其他内卦角色逐一列出；初用月令衰与受克须同时成立，未知不猜，多字门槛及完整角色范围未裁定。reputation另列求名补充句及原文時序/方道，reputation_context声明原文在任与求职任条件，未知不猜，巽方道東/同本地理及转录東南等差异未裁定。household/dwelling分别为家宅/屋舍章，沿用实际原体与初用。家宅比利/转录比和未裁定，五行相同不自动套家宅安稳句；屋舍保留冷退/衰退异文。家宅生体转引人事章只核所列四内卦实际角色，未作完整跨章合参。marriage为婚姻章五种初始关系，并分别核原体所占之家、初用所婚之家的已报节月旺气条件；原文未定与缺月令保持未知。补充生体/体生只列实际关系成分，或字不合并成必然同现；后段比利/转录比和未裁定，不自动套彼此相就句；八卦相貌品行按原文条文保留。dining为飲食章五种初始关系，并另列内卦坎酒、兑食及體用類的坤艮制坎、离制兑；这些句不要求多字门槛，不因制约者受制或季令衰自动抵消，完整内外合参未裁定；影印生身/转录生体及兑坎组合未裁定，版本异文另列。Question keywords never switch branches.",
     )
     weather_context: MeihuaWeatherContext | None = Field(
         default=None,
@@ -431,29 +431,29 @@ class MeihuaInterpretationOptions(FateBridgeBaseRequest):
     )
     reputation_context: MeihuaReputationContext | None = Field(
         default=None,
-        description="Optional caller-confirmed 在任 and 職任之處 declarations, only with interpretation_topic=reputation. Unknown omit/null; no keyword inference, permission, event date, validated outcome or probability",
+        description="Optional caller-confirmed 在任 and 職任之處 declarations, only with interpretation_topic=reputation. Unknown omit/null; no keyword inference.",
     )
     observation_context: MeihuaObservationContext | None = Field(
         default=None,
-        description="Optional same-cast/observer quiet-room and hearing/vision declarations for human branches. Missing is uncollected, not confirmed absent. Selected NLC1925静占 conditions only; no full year-month-day strength synthesis, mental-state inference, casting eligibility or validated forecast. Never changes old study denominators",
+        description="Optional same-cast/observer quiet-room and hearing/vision declarations for human branches. Missing is uncollected, not confirmed absent. Selected NLC1925静占 conditions only; no full year-month-day strength synthesis. Never changes old study denominators",
     )
     response_context: MeihuaResponseContext | None = Field(
         default=None,
-        description="Optional caller-reported same-cast 方應/天時應/地理應/人事應 for human matters. No scene, direction or weather inferred; retain multiple trigram candidates and source variants. Not a casting method, future weather forecast, combined ten-response verdict, probability or event date",
+        description="Optional caller-reported same-cast 方應/天時應/地理應/人事應 for human matters. No scene, direction or weather inferred; retain multiple trigram candidates and source variants. Not a casting method or combined ten-response verdict.",
     )
     observer_activity: Literal["seated", "walking", "standing"] | None = Field(
         default=None,
-        description="Optional caller-confirmed observer activity corresponding to selected NLC1925 我坐/我行/我立. Omit if unknown; no inference from question, vehicle motion, external movement or mental stillness. Selected relative wording only, no measured delay, omen valence, or date. Human-matter branches only",
+        description="Optional caller-confirmed observer activity corresponding to selected NLC1925 我坐/我行/我立. Omit if unknown; no inference from question or external movement. Selected relative wording only. Human-matter branches only",
     )
     matter_scenario: Literal["favorable_matter", "unfavorable_matter"] | None = Field(
         default=None,
-        description="Caller-confirmed subject category for the selected 占卦訣: 原文问吉事 or 原文问不吉之事. Not a desired answer, question sentiment, topic classification or prediction of an actual outcome. Omit when unknown. Human-matter branches only; declaration is not independently verified",
+        description="Caller-confirmed subject category for the selected 占卦訣: 原文问吉事 or 原文问不吉之事. Not a desired answer, question sentiment, or topic classification. Omit when unknown. Human-matter branches only",
     )
     external_observations: list[MeihuaExternalObservation] | None = Field(
         default=None,
         min_length=1,
         max_length=12,
-        description="Optional caller-reported manifestations for general/planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler/household/dwelling/marriage/dining; NLC1925 selected material-versus-appearance qualifications plus explicit gold_silver_treasure/weapon original-body symbolic cases. Traveler observations keep the original-body reference and are not automatically rebased to initial use. Not every metal object is treasure or every sharp tool a weapon. Omit if unknown; no default observations, unique trigram assignment, physical/hazard/clinical verdict or event date.12 is a software guard, not a classical limit",
+        description="Optional caller-reported manifestations for general/planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler/household/dwelling/marriage/dining; NLC1925 selected material-versus-appearance qualifications plus explicit gold_silver_treasure/weapon original-body symbolic cases. Traveler observations keep the original-body reference and are not automatically rebased to initial use. Omit if unknown; max 12 items.",
     )
 
     @model_validator(mode="after")

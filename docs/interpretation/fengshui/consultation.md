@@ -2,7 +2,7 @@
 
 [基础规则与来源](rule-sources.md) · [中州派玄空](xuankong.md) · [家居风水参考](../../fengshui.md) · [硬边界](../shared/safety-boundaries.md) · [咨询核心](../shared/consultation-core.md) · [示例索引](../../examples/README.md)
 
-本指南定义 FateBridge `fengshui` 家族 8 个工具的现场资料采集口径、边界护栏与分层输出读法。所有计算由引擎完成，引擎仅产出确定性结构化事实，不生成化解处方、摆件疗效或全宅吉凶总分。
+本指南定义 FateBridge `fengshui` 家族 8 个工具的现场资料采集口径、边界护栏与分层输出读法。所有计算由引擎完成，引擎仅产出确定性结构化事实。
 
 开始前先核对[硬边界](../shared/safety-boundaries.md)与[咨询核心](../shared/consultation-core.md)：不涉及生死寿命、灾祸断言、临床诊断治疗或医疗择时；未知出生时刻或宅向不猜、不套示例默认值；只解释当前聊天已确认的资料。
 
@@ -69,7 +69,7 @@
   - `placement_findings`：逐对象按已选层列出评估结果——八宅分别评估 `aspect="location"` 与 `aspect="facing"`（对照传统用途星性偏好 `matches_convention`）；年星、月星与玄空本命盘仅评估已确认的 `location_direction`（`aspect="location"`），朝向不能代替落宫位置。
   - `adjustment_options`：针对八宅计算各已确认/候选作用域的 `matching_directions`，并仅对**已确认作用域**求交集得到 `agreed_matching_directions`。
   - `environment_adjustments`：透传金锁 `feature_findings` 与 `target_classification`。
-  - `element_relationships`：按各层实际落宫星五行给出 `same_element`、`generating_element`、`draining_element`、`controlling_element`、`controlled_element`，仅用于结构说明，不生成物品、颜色或风水处方。
+  - `element_relationships`：按各层实际落宫星五行给出 `same_element`、`generating_element`、`draining_element`、`controlling_element`、`controlled_element`，仅用于结构说明。
 
 ### 4.3 默认视图与必须交付的来源字段
 
@@ -79,4 +79,4 @@
 
 1. **规则与版本**：`rulesets[]` 中的 `ruleset_id`、`version`、`method`、`scope` 与 `conventions`（以及 `rule_trace` 对应的方法映射）。
 2. **典籍与作者来源**：`source_catalog[source_id]` 中的 `title`、`author`、`edition`、`isbn`、`url`、`kind`，以及 `rulesets[].source_citations[source_id]` 中的 `locator`、`pages`、`source_version`、`scope`、`boundary` 与 `source_disagreements`。
-3. **版本限度声明**：网络转录或特定作者资料仅代表该登记版本在 `scope` 内的依据，不能外推为整部古籍校勘定本或全门派统一结论，更不构成现实预测效力保证。
+3. **版本限度声明**：网络转录或特定作者资料仅代表该登记版本在 `scope` 内的依据，不能外推为整部古籍校勘定本或全门派统一结论。

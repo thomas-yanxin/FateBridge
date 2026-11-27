@@ -5,9 +5,9 @@
     "known_inputs": "出生时间与性别须明确提供；空白时间不能补零点。时间字段是当地钟时，时区放timezone；显式零点有效。真太阳时默认开启，须明确经度longitude，0度有效。缺失不可套上海或0度，不为通过调用自动改为钟表时。",
     "method": "默认gu用真实日支，ming为显式月支变法；二者规则来源与结果分别说明。",
     "pillar_links": "pillar_links视图核numerology_evidence.pillar_links的实际年柱起月干、所用日柱起时干、原句起头与顺行步数。立春前不用公历年干，晚子及太阳钟跨日不用未换日日干替代。干序衔接匹配不证明原典月界、日界、历史钟制或全历法准确；原书个别形式算例含衔接冲突，不能据数算可复现当真实出生盘。",
-    "text_selection": "按benming或实际查询当段verses的selectionShun/selectionNi读五行、编号和上男／中女／下共用岁运栏，不能串栏。pair_resolution区分顺逆同号与两号、单向有文；原书允许顺有逆无或逆有顺无，本地缺行不等于原典圈空，也不能断现实灾祸。",
+    "text_selection": "按benming或实际查询当段verses的selectionShun/selectionNi读五行、编号和上男／中女／下共用岁运栏，不能串栏。pair_resolution区分顺逆同号与两号、单向有文；原书允许顺有逆无或逆有顺无，本地缺行不等于原典圈空。",
     "timing": "dayun_method默认bazi_appendix_v1为卷七整数借除，continuous为现代连续折算，legacy为未核旧命宫排法。配运先读timing_policy视图：schedule_basis逐原句标applied_rule／对照，区分所选附法、另书十年背景和现代落点约定；first_row为同次实际首行，旧法保留年龄标签和取文；first_period仅为已映射日期首运摘要，旧法为null，两者均非查询当段。",
-    "validation": "本命起数有限核对通过不代表起运大运体系或现实预测已经验证。"
+    "validation": "本命起数有限核对通过不代表起运大运体系已全部核对。"
   },
   "evidence_views": {
     "birth_clock": {

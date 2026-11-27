@@ -329,5 +329,4 @@ def evaluate_fortune(
         ],
         "full_original_text_acceptance": False,
         "full_judgement_accepted": False,
-        "real_world_prediction_established": False,
     }

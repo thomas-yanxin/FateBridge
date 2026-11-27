@@ -52,7 +52,7 @@
                 "凡論人命年月日時排成四柱遁月從年則以年為本遁時從日則以日為主",
                 "所以遁月從年遁時從日"
               ],
-              "support_scope": "仅支持年月日时排成四柱、遁月从年及遁时从日的选段释义；不支持旁文的寿命、亲属遭遇、贵贱或现实预测。数字转录未完成影印校勘及独立专家审阅。"
+              "support_scope": "仅支持年月日时排成四柱、遁月从年及遁时从日的选段释义；数字转录未完成影印校勘及独立专家审阅。"
             }
           ],
           "implementation_refs": [
@@ -63,7 +63,7 @@
                 "calculate_month_pillar_by_branch",
                 "_get_four_pillars_cached"
               ],
-              "support_scope": "所列文件和函数定位当前确定性实现；不认证外部依赖精度、全部流派或现实预测。"
+              "support_scope": "所列文件和函数定位当前确定性实现；不认证外部依赖精度或全部流派。"
             },
             {
               "source_path": "src/fatebridge/core/almanac.py",
@@ -72,14 +72,13 @@
                 "get_bazi_month_context",
                 "get_bazi_month_boundaries"
               ],
-              "support_scope": "所列文件和函数定位当前确定性实现；不认证外部依赖精度、全部流派或现实预测。"
+              "support_scope": "所列文件和函数定位当前确定性实现；不认证外部依赖精度或全部流派。"
             }
           ],
           "independent_expert_review": "not_completed",
           "scan_collation": "not_completed",
           "new_independent_chart_cases": 0,
-          "reality_prediction_efficacy": "not_tested",
-          "citation": "FateBridge术语整理，非逐字引文；萬民英《三命通會》四庫全書本数字转录，卷二〈論年月日時／論遁月時〉，維基文庫固定修订761691；https://zh.wikisource.org/w/index.php?title=%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83%20%28%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC%29/%E5%8D%B702&oldid=761691；原典选段与当前程序历法口径分别归属，未作影印、独立专家或现实效度认证。"
+          "citation": "FateBridge术语整理，非逐字引文；萬民英《三命通會》四庫全書本数字转录，卷二〈論年月日時／論遁月時〉，維基文庫固定修订761691；https://zh.wikisource.org/w/index.php?title=%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83%20%28%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC%29/%E5%8D%B702&oldid=761691；原典选段与当前程序历法口径分别归属，未作影印或独立专家认证。"
         }
       },
       "年柱": {
@@ -130,7 +129,7 @@
                 "凡論人命年月日時排成四柱遁月從年則以年為本遁時從日則以日為主",
                 "所以遁月從年遁時從日"
               ],
-              "support_scope": "仅支持年月日时排成四柱、遁月从年及遁时从日的选段释义；不支持旁文的寿命、亲属遭遇、贵贱或现实预测。数字转录未完成影印校勘及独立专家审阅。"
+              "support_scope": "仅支持年月日时排成四柱、遁月从年及遁时从日的选段释义；数字转录未完成影印校勘及独立专家审阅。"
             }
           ],
           "implementation_refs": [
@@ -141,7 +140,7 @@
                 "calculate_month_pillar_by_branch",
                 "_get_four_pillars_cached"
               ],
-              "support_scope": "所列文件和函数定位当前确定性实现；不认证外部依赖精度、全部流派或现实预测。"
+              "support_scope": "所列文件和函数定位当前确定性实现；不认证外部依赖精度或全部流派。"
             },
             {
               "source_path": "src/fatebridge/core/almanac.py",
@@ -150,14 +149,13 @@
                 "get_bazi_month_context",
                 "get_bazi_month_boundaries"
               ],
-              "support_scope": "所列文件和函数定位当前确定性实现；不认证外部依赖精度、全部流派或现实预测。"
+              "support_scope": "所列文件和函数定位当前确定性实现；不认证外部依赖精度或全部流派。"
             }
           ],
           "independent_expert_review": "not_completed",
           "scan_collation": "not_completed",
           "new_independent_chart_cases": 0,
-          "reality_prediction_efficacy": "not_tested",
-          "citation": "FateBridge术语整理，非逐字引文；萬民英《三命通會》四庫全書本数字转录，卷二〈論年月日時／論遁月時〉，維基文庫固定修订761691；https://zh.wikisource.org/w/index.php?title=%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83%20%28%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC%29/%E5%8D%B702&oldid=761691；原典选段与当前程序历法口径分别归属，未作影印、独立专家或现实效度认证。"
+          "citation": "FateBridge术语整理，非逐字引文；萬民英《三命通會》四庫全書本数字转录，卷二〈論年月日時／論遁月時〉，維基文庫固定修订761691；https://zh.wikisource.org/w/index.php?title=%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83%20%28%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC%29/%E5%8D%B702&oldid=761691；原典选段与当前程序历法口径分别归属，未作影印或独立专家认证。"
         }
       },
       "月柱": {
@@ -167,7 +165,7 @@
           "《三命通会》〈论遁月时〉叙述遁月从年及起月取法；本词条仅释该取法背景，不据数字转录校定所有歌诀字形。",
           "FateBridge 以十二个“节”作为节月换界，不是二十四节气的每一项都换月；也不把公历月份号或农历月序（含闰月）直接当作月支。",
           "月支确定后，程序结合八字年干和寅月起干的关系推出月干；具体交节时刻交引擎比较，不从日期或固定整点补造。",
-          "月柱、月令分析所用月支与节后人元司令不是同一字段。单凭月柱不能完成格局成败、身强弱或现实结果裁定。"
+          "月柱、月令分析所用月支与节后人元司令不是同一字段。单凭月柱不能完成格局成败或身强弱裁定。"
         ],
         "curation": {
           "method_id": "bazi_foundations_scoped_v1",
@@ -208,7 +206,7 @@
                 "凡論人命年月日時排成四柱遁月從年則以年為本遁時從日則以日為主",
                 "所以遁月從年遁時從日"
               ],
-              "support_scope": "仅支持年月日时排成四柱、遁月从年及遁时从日的选段释义；不支持旁文的寿命、亲属遭遇、贵贱或现实预测。数字转录未完成影印校勘及独立专家审阅。"
+              "support_scope": "仅支持年月日时排成四柱、遁月从年及遁时从日的选段释义；数字转录未完成影印校勘及独立专家审阅。"
             }
           ],
           "implementation_refs": [
@@ -219,7 +217,7 @@
                 "calculate_month_pillar_by_branch",
                 "_get_four_pillars_cached"
               ],
-              "support_scope": "所列文件和函数定位当前确定性实现；不认证外部依赖精度、全部流派或现实预测。"
+              "support_scope": "所列文件和函数定位当前确定性实现；不认证外部依赖精度或全部流派。"
             },
             {
               "source_path": "src/fatebridge/core/almanac.py",
@@ -228,14 +226,13 @@
                 "get_bazi_month_context",
                 "get_bazi_month_boundaries"
               ],
-              "support_scope": "所列文件和函数定位当前确定性实现；不认证外部依赖精度、全部流派或现实预测。"
+              "support_scope": "所列文件和函数定位当前确定性实现；不认证外部依赖精度或全部流派。"
             }
           ],
           "independent_expert_review": "not_completed",
           "scan_collation": "not_completed",
           "new_independent_chart_cases": 0,
-          "reality_prediction_efficacy": "not_tested",
-          "citation": "FateBridge术语整理，非逐字引文；萬民英《三命通會》四庫全書本数字转录，卷二〈論年月日時／論遁月時〉，維基文庫固定修订761691；https://zh.wikisource.org/w/index.php?title=%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83%20%28%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC%29/%E5%8D%B702&oldid=761691；原典选段与当前程序历法口径分别归属，未作影印、独立专家或现实效度认证。"
+          "citation": "FateBridge术语整理，非逐字引文；萬民英《三命通會》四庫全書本数字转录，卷二〈論年月日時／論遁月時〉，維基文庫固定修订761691；https://zh.wikisource.org/w/index.php?title=%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83%20%28%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC%29/%E5%8D%B702&oldid=761691；原典选段与当前程序历法口径分别归属，未作影印或独立专家认证。"
         }
       }
     }

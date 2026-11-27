@@ -195,7 +195,6 @@ class SukuyoClothingReference(PartialOutput):
     verse_and_literal_forecasts_applied_to_aggregate: bool | None = None
     independent_ming_edition_collated: bool | None = None
     historical_clock_mapping_evaluated: bool | None = None
-    real_world_event_prediction_evaluated: bool | None = None
     source_url: str | None = None
     locator: str | None = None
     unmapped_clothing_predicates: list[dict[str, OpenJsonValue]] | None = None

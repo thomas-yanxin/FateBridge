@@ -169,6 +169,5 @@
   },
   "single_forecast": null,
   "event_datetime": null,
-  "success_probability": null,
-  "predictive_efficacy_established": false
+  "success_probability": null
 }

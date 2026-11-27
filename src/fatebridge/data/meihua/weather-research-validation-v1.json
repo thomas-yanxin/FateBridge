@@ -17,7 +17,6 @@
   "prospective_case_count": 0,
   "scope": "本条旧版研究组合与additional_profile_audits的1.5.0研究分别保留；不能认证当前1.7.0新增朝暮时段及后续条款，也不能跨政策、年份或时间窗合并命中率。",
   "result": "该组合未胜过固定基线；不以这批数据调参后宣称独立通过。",
-  "current_ruleset_efficacy_established": false,
   "authority_certified": false,
   "official_observation_source": "https://data.weather.gov.hk/weatherAPI/cis/csvfile/HKO/ALL/daily_HKO_RF_ALL.csv",
   "report": "docs/validation/meihua-weather-2025-pilot-v1.json",
@@ -82,7 +81,6 @@
         "observed_accuracy": null,
         "supplied_cohort_seal_authenticated": false,
         "scope": "Conditional on this complete fixed forecast vector, binary complete outcomes, zero abstention credit and the specified full-cohort endpoint. Other models, inputs, targets or decision costs are not evaluated.",
-        "predictive_efficacy_established": false,
         "authority_certified": false
       },
       "source_study_id": "meihua-weather1.7.0-scope-policy-v3-HKO",
@@ -227,7 +225,6 @@
     "result": "Both fixed scenarios failed full-cohort constant baselines in every cohort. Every issued categorical label was dry; same-date always-dry matches all their correct counts. No winning scenario selected.",
     "prospective_case_count": 0,
     "actual_model_runs": 0,
-    "current_ruleset_efficacy_established": false,
     "authority_certified": false,
     "scope": "Single HKO station, fixed1.7.0 source and v3 bridge only. Does not prove failure or success of all methods, dates, locations or original-text interpretations. Noon cohort never matched explicit朝暮 rules, so it cannot validate those rules in reality. Earlier2024/2025 reports and future frozen ledger are preserved.",
     "report": "docs/validation/meihua-weather-scope-study-v3.json"
@@ -362,7 +359,6 @@
     "report": "docs/validation/meihua-weather-reference-baselines-v1.json",
     "actual_model_runs": 0,
     "new_prospective_observations": 0,
-    "real_world_predictive_efficacy_established": false,
     "authority_certified": false
   }
 }

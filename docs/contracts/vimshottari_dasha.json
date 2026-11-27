@@ -11,7 +11,7 @@
     "periods": "Moon-nakshatra，主运/次运从完整原始主运起算；UTC日历标签按每天86400名义秒的datetime口径，不表示连续原子时历时。三种年长口径明确区分，读取elapsed_time_convention。",
     "physical_clock": "出生资料为民用钟时，use_true_solar_time默认false。v11起true只另报太阳钟标签，不改变记录钟时所指的物理时刻、盘面、达沙或模型出生年代窗口。读india.profile.clock_context；solar_wall_datetime无时区，不当另一出生时间，不当分析日期。不能把已知LAT/LMT记录直接当民用资料后开此开关。",
     "reading_fidelity": "reading_basis保留名义生时、未评估与抽样候选；不把未给误差当精确。星宿/宿足候选与分盘候选共用同一物理 TT 网格，计数不是概率。主题力量calculation_context直接携带同run分支数值、约束与字段路径；computed_consensus/conditional_results/unavailable/partially_computed分开，null不一概为0或用户资料不足。不能只选高分支、自动全盘否定或宣称已完成独立文本盲审。",
-    "scope": "120年是规则周期，不是寿命估计；读当前ruler的本命上下文，不能将边界写成事件必发生。",
+    "scope": "120年是规则周期；读当前ruler的本命上下文。",
     "solar_component_scope": "Kala太阳依赖分开：日主/时主读连续日出对，三分力读当前相邻昼夜端点；partial_solar_brackets只限制对应分量。读取solar_context及同run constraints，不因缺其他日落抹去已有结果，也不补假日出。网格状态计数不是概率。",
     "solar_event_scope": "日出／日落支撑窗口逐项检索同一UT1日界内的连续事件；不假定每天仅一个同类事件。solar_events.enumeration的1秒仅是检索防重复步长，不是出生记录或实测精度。",
     "solar_uncertainty": "仅传用户确认的误差；太阳钟输入先换算原钟面区间两端，保留端点TT与UT1，再取间距至多30 SI秒的TT网格。保留clock_interval原始标签、转换端点、非对称offset及全部候选；覆盖计数非概率，不当连续区间证明。require_data_files同样检查LAT求解和端点换算的每次太阳坐标，不用最后一次成功掩盖中途降级。",

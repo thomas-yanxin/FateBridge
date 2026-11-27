@@ -148,11 +148,9 @@
   "scope": {
     "new_dated_instrument_measurements": 0,
     "full_source_collation_accepted": false,
-    "source_report_equated_to_empirically_verified_time_standard": false,
     "modern_clock_boundary_applied": false,
     "hinoo_half_mapping_established": false,
     "leap_short_month_priority_established": false,
-    "runtime_host_or_mansion_override": false,
-    "real_world_efficacy_established": false
+    "runtime_host_or_mansion_override": false
   }
 }

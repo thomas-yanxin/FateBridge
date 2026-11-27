@@ -130,7 +130,6 @@
   "applied_to_runtime_day_boundary": false,
   "applied_to_hinoo_half": false,
   "leap_short_month_priority_established": false,
-  "source_claim_is_real_world_outcome_validation": false,
   "nominal_24h_equivalents_are_current_civil_times": false,
   "scope": "Exact selected-research clock arithmetic and full selected Table 3 comparison. Not a reconstructed ancient civil clock, T1299 daybreak, new calendar basis, complete original collation, Hinoo precedence rule or empirical prediction validation.",
   "record_groups": [

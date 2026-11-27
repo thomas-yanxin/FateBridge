@@ -26,7 +26,7 @@
 
 ## 专题解释与新增价值
 
-事业方向可读实际本命官禄、命身相关星曜配置；目标年度则说明大限背景、该年标记关联哪些已确认本命对象。来源查询可使用 `knowledge_catalog/knowledge_read` 或已核验作者文本，记录作者、版本、章节／页码及适用范围。排盘与外部软件一致，只核验所选口径下的计算；它不是星性、现代职业类比或现实预测有效性的出处。
+事业方向可读实际本命官禄、命身相关星曜配置；目标年度则说明大限背景、该年标记关联哪些已确认本命对象。来源查询可使用 `knowledge_catalog/knowledge_read` 或已核验作者文本，记录作者、版本、章节／页码及适用范围。排盘与外部软件一致，只核验所选口径下的计算；它不是星性或现代职业类比的出处。
 
 用户明确要求原典版本与页码的审查中，在线转录的卷／章节定位不能冒充书影页码；未核到所选版本和页码的解释只列作未验参考，不作为已验收的传统主证。也不能从单星象意补出未查证的“运限四化连接本命宫后如何断事”组合规则。此时仍交付计算连接、已核实的其他依据和独立现实建议，不靠增加调用填补来源缺口。
 
@@ -38,8 +38,8 @@
 
 ### 基础配置与本命结构
 
-- **规则版本与差异**：首轮保留 `ziwei_birth.ruleset` 或 `ziwei_horoscope.ruleset`。默认 `iztro_2_5_8` 是软件兼容口径；`quanshu_v2_excerpt` 1.3.2 选择闰月、壬年四化、亮度表、长生方向、旬空双支、部分年度流曜，并采用邻宫起大限及火铃年支定点读法，余项仍有软件回退，不能称全书认证。与 1.2.0 相比，摘录配置的十二宫大限年龄区间及火铃位置会变化，不能只换版本名继续引用旧值。该闰月条文只覆盖本命安身命；目标流月闰月仍保留软件半月规则。动态层复用所选四化表为软件约定；配置不同先解释真实差异，不挑更符合叙事的盘。目标时间可传 `analysis_minute/analysis_timezone`，与出生时区独立，分钟输入不构成分钟级预测。
-- **三方四正与空宫**：本命 `palaces[].structural_evidence` 提供十四主星名单、是否无主星及本宫／两三合宫／对宫的实际星位。空宫只表示没有十四主星，不等于没有任何星；对宫星没有搬入本宫。三方四正是盘面关系，不自动认证古典成格、吉凶或现实结果。性别未知仍可读本命非运限结构，大限范围留空，不把未知当女命排运。
+- **规则版本与差异**：首轮保留 `ziwei_birth.ruleset` 或 `ziwei_horoscope.ruleset`。默认 `iztro_2_5_8` 是软件兼容口径；`quanshu_v2_excerpt` 1.3.2 选择闰月、壬年四化、亮度表、长生方向、旬空双支、部分年度流曜，并采用邻宫起大限及火铃年支定点读法，余项仍有软件回退，不能称全书认证。与 1.2.0 相比，摘录配置的十二宫大限年龄区间及火铃位置会变化，不能只换版本名继续引用旧值。该闰月条文只覆盖本命安身命；目标流月闰月仍保留软件半月规则。动态层复用所选四化表为软件约定；配置不同先解释真实差异，不挑更符合叙事的盘。目标时间可传 `analysis_minute/analysis_timezone`，与出生时区独立。
+- **三方四正与空宫**：本命 `palaces[].structural_evidence` 提供十四主星名单、是否无主星及本宫／两三合宫／对宫的实际星位。空宫只表示没有十四主星，不等于没有任何星；对宫星没有搬入本宫。三方四正是盘面关系，不自动认证古典成格或吉凶。性别未知仍可读本命非运限结构，大限范围留空，不把未知当女命排运。
 - **命身主与长生博士**：本命新增 `chart_masters` 与 `calendar_cycles`，命主按命宫支、身主按生年支，不要把命主／身主当成命宫／身宫所在主星。十二长生和博士十二神分层读取，未知性别留空，循环名称不作临床或寿命判断。所选亮度表与同卷散文有分歧；身主转录火玲、明刊火鈴仍不足以裁定单取哪颗，保留显式软件约定，不按咨询叙事挑选规则。
 - **旬空与流曜条数**：摘录配置自 1.2.0 起的旬空显示两支，因此 `reading_view` 是 66 种星名、67 条星曜落点；软件配置为 66 条，不把条数当新增星种。`voids` 视图的 `source_name_mapping` 说明古天空对应今地空、原文本生年解神对应年解，不能拿软件另列的同名星替代。摘录配置的流年 `flowing_stars` 返回禄羊陀及天德、月德、丧门、吊客、白虎、官府共九项（软件配置仍为三项），结合 `scope_palace_name/natal_palace_name/system_id` 读取，不搬移本命星。流年月德按目标年支，年度官府不等于博士官府；`annual_three_sha` 逐名位置为空时不依顺序配宫或从博士同名标记补齐。
 - **原文星义与 `symbolism`**：读取 `symbolism` 视图的 `symbolic_properties.records` 连接引句、原字五行与实际本命星位；化财、化印、化善、遇帝为权等文字不是禄权科忌赋值，以 `natal_mutagen` 为实际本命四化，天同水金、七杀火金、贪狼水木保持 `elements_as_written`。16 条属性不是全书象意或全部组合断语。明刊星义专题用 `contextual_symbolism` 先核条件或 `ming_symbolism` 读 `ming_textual_properties`（完整输出用 `detail=audit`、`fields=null`）；明刊保留七杀“將星”、文昌“文魁之宿”、天梁“化陰”，`occurrences.kind` 区分本命星、实际本命四化与博士循环标记，四化属性五行不改被化星原属性、五行局或亮度。古天空只连接本系统地空，博士飞廉不连接年支蜚廉；病符、官府未写五行时保持空，未配层的歲君、丧门等不否定已算年度层。廉贞“在官禄”按实际本命官禄宫、“在身命”按命或身明示读法；七杀“遇帝”几何未定，`condition_match` 为 `null` 不自选范围，化禄喜见禄存等三条同样保留未裁定条件，不把寿、病、孤等字当寿命或临床判断。
@@ -61,4 +61,4 @@
 
 - **历法来源与日期对照（`calendar` / `calendar_sources`）**：`calendar_basis` 区分 `placement_lunar_date`（当前排盘农历）、`civil_date_lunar_date`（输入钟表日期查表）与 `reference_lunar_date`（转固定 UTC+08 后查表），跨日时保留三者区分。展开 `calendar_sources` 读 `calendar_basis.date_conversion_provenance`：1900 年印刷参照为 TAM 全年表（最初 30 日实施用 PMO 补表），1901—2100 参照 HKO（2100-02-09 以后用 HKO 补表），实施由 `fatebridge_lunardate_adapter_v1` 完成，`applied_year_info_correction` 逐时钟记录实际农历年登记修正（如 1934 年一月仍可能用 1933 年修正）。
 - **校时精度与重复钟时（`time_input`）**：本命读 `calendar_basis.time_input`，运限读 `calendar_basis.birth.time_input`。区分 `solar_unavailable`、`civil_clock_selected`、`timezone_assumed` 与 `province_longitude`；未应用校正时分量为 `null` 不代表均时差或夏令时为零。`minute_sensitivity` 以秒 0 对照 `59.999999` 秒端点，`endpoint_seconds=[0]` 时上端点缺失；`time_input_minute_sensitive=true` 表示端点跨时支或排盘日期，先说明基准再解释。夏令时重复钟时若有明确记录可传 `birth_utc_offset` / `analysis_utc_offset`（`±HH:MM[:SS]`）在已解析命名时区中选定物理瞬间，实际先后按 `calendar_basis.civil_clock` 的 UTC 瞬间比较。
-- **岁序时钟**：`ziwei_timing` 默认 `nominal_age_basis=birth_civil_timezone`，把出生与目标实际瞬间均转到出生民用时区查农历年，正月初一 00:00 换岁；先读 `nominal_age_calendar` 两端年份与参考时区。本命安星及年干仍取出生排盘钟，流年／月／日／时仍取目标钟；春节前后分别得到实际岁序（不靠把 0 岁钳成 1 岁），`boundary_source_evidence` 不认证整书或现实预测有效。
+- **岁序时钟**：`ziwei_timing` 默认 `nominal_age_basis=birth_civil_timezone`，把出生与目标实际瞬间均转到出生民用时区查农历年，正月初一 00:00 换岁；先读 `nominal_age_calendar` 两端年份与参考时区。本命安星及年干仍取出生排盘钟，流年／月／日／时仍取目标钟；春节前后分别得到实际岁序（不靠把 0 岁钳成 1 岁），`boundary_source_evidence` 不认证整书。

@@ -87,6 +87,5 @@
     "lying/running numeric multiplier"
   ],
   "nominal_count_is_actual_duration": false,
-  "full_original_conformance": false,
-  "prediction_validated": false
+  "full_original_conformance": false
 }

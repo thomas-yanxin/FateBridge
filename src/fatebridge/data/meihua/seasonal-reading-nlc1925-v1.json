@@ -74,8 +74,7 @@
     "原文未定 and missing month are unknown, not neutral or weak",
     "Body and supporter strength preferences are independent desiderata, not a requirement that both elements be 旺 simultaneously",
     "Internal controls may constrain support or attack; retain them, no recursive cancellation",
-    "No all-chapter, actual model or real-world prediction acceptance"
+    "No all-chapter or actual model acceptance"
   ],
-  "independent_human_expert_review": false,
-  "predictive_efficacy_established": false
+  "independent_human_expert_review": false
 }

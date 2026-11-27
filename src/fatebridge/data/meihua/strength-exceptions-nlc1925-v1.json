@@ -82,6 +82,5 @@
     "No actual safety, clinical, mortality, litigation or event-date judgement",
     "No absence of external support inferred from missing reported observations"
   ],
-  "independent_human_expert_review": false,
-  "predictive_efficacy_established": false
+  "independent_human_expert_review": false
 }

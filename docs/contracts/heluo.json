@@ -14,7 +14,7 @@
     "source_clock": "岁运year_context绑定实际cycleYear与出生年柱，不能拿公历出生年或另一干支年替代。source_clock列卷一百刻式：寅申巳亥各九刻，其余八刻。时支循环原点及一刻七分的分制未由所核段确立；等长时辰假设推得18分一刻只是数式相合条件，不能选它凑原典符合。physical_clock_applied与calendar_mapping_complete均false；不可把源刻序换成当前出生钟面、实际日卦日期或预测应期。",
     "text_collation": "乾坤屯蒙需讼师比小畜履六十条注文单次目校，commentary_sections按原文分段但applicability=null；旧文另存inherited_detail。不能借judge.xie选葉否或把歲運段用作本命断语；龍妾、掌無權、正即、無舊、女人為女人等本印本文字保留，初读撤回不计作继承错录。",
     "timing": "heluo_timing按影印页规则给出流年、月卦与日卦定式；analysis_year为年标签，month_index/day_index为原典序号，不能当公历年月日或精确应期；不指定年时不自动取当前年。",
-    "validation": "原典部分核验、语料未全量校勘、现实预测未验证；周易参照不替代河洛注文。",
+    "validation": "原典部分核验、语料未全量校勘；周易参照不替代河洛注文。",
     "yuantang": "用yuantang视图核对chart.yuantang_derivation的实际性别、时组、逐位序列、至点半年和换卦。counterfactuals仅比较阴阳令敏感性，实际选择以half_year.value为准；不能据反事实改算出生盘。half_year.value或heLi为null时不补成阴令或异类。公开日期工具按出生绝对瞬间确定半年，不用整个子月或午月猜。"
   },
   "evidence_views": {
@@ -166,7 +166,7 @@
         "numerology_evidence.rulesets",
         "numerology_evidence.rule_trace"
       ],
-      "purpose": "核对实际元堂配时、阴阳令来源、两半年的敏感性及后天换卦；反事实不是两个出生盘或现实预测。"
+      "purpose": "核对实际元堂配时、阴阳令来源、两半年的敏感性及后天换卦；反事实不是两个出生盘。"
     }
   },
   "first_view": {

@@ -87,5 +87,5 @@
   "leap_short_month_priority_established": false,
   "full_futen_calendar_reconstructed": false,
   "independent_historical_observations_added": 0,
-  "scope": "Exact arithmetic for the study's two explicit 1240 clock interpretations. Retains printed values and residuals. Does not choose a historical calendar, modern timezone, T1299 dawn, Hinoo half, leap/short-month precedence or real-world forecast."
+  "scope": "Exact arithmetic for the study's two explicit 1240 clock interpretations. Retains printed values and residuals. Does not choose a historical calendar, modern timezone, T1299 dawn, Hinoo half, or leap/short-month precedence."
 }

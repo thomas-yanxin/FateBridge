@@ -56,7 +56,7 @@
 | `bazi_career` | 事业类型、行业、创业倾向与贵人方位 | Implemented |
 | `bazi_wealth` | 正偏财、财库、求财方式方位与风险特征 | Implemented |
 | `bazi_health` | 盘内五行权重、寒暖分类与传统文化对应（不做医疗诊断） | Implemented |
-| `bazi_children` | 命主视角的子女星／宫传统对应（不推数量或生育时间） | Implemented |
+| `bazi_children` | 命主视角的子女星／宫传统对应 | Implemented |
 | `bazi_education` | 印星／食伤／官星、文昌与学业结构 | Implemented，限定规则 |
 | `bazi_personality` | 日主心性、五行与十神结构特征 | Implemented |
 | `bazi_relatives` | 父母、兄弟姐妹星与六亲宫位 | Implemented |

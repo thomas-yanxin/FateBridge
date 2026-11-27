@@ -134,7 +134,7 @@
         "birth_utc",
         "variables.personality_colors"
       ],
-      "purpose": "按人格日地/交点的实际Color及一致对点读取官方Motivation/View类别名、来源定位和本盘局部依据；同箭头编码不保证Color类别相同。出生盘不测量现实心理、转移或分心状态，不将类别当完整PHS、384线原典或现实预测验收。完整比较和时间样本读取同一run。"
+      "purpose": "按人格日地/交点的实际Color及一致对点读取官方Motivation/View类别名、来源定位和本盘局部依据；同箭头编码不保证Color类别相同。完整比较和时间样本读取同一run。"
     },
     "precision": {
       "fields": [

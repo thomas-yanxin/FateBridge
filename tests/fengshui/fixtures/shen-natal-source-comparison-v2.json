@@ -7,7 +7,7 @@
       "SLC1",
       "SRC1"
     ],
-    "scope": "逐候选比较固定整理本216下卦正文四字段和216下卦图、216起星图星数；起星正文、星名与兼向选盘条件未验证，不认证整本、历法或现实效度"
+    "scope": "逐候选比较固定整理本216下卦正文四字段和216下卦图、216起星图星数；起星正文、星名与兼向选盘条件未验证，不认证整本或历法"
   },
   "source": {
     "source_id": "SLC1",
@@ -17,7 +17,7 @@
     "kind": "hash_fixed_modern_arranged_edition_not_authenticated_early_print",
     "url": "https://www.vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4%2F%E6%B2%88%E6%B0%8F%E7%8E%84%E7%A9%BA%E5%AD%A6.pdf",
     "isbn": "978-7-5117-0801-4",
-    "scope": "仅比较本版216条下卦正文种子顺逆与216张盘图星数；不认证原书全本、替卦、历法或现实效度"
+    "scope": "仅比较本版216条下卦正文种子顺逆与216张盘图星数；不认证原书全本、替卦或历法"
   },
   "source_freezes": {
     "source_only_before_engine_comparison": true

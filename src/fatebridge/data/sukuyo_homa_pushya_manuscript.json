@@ -148,7 +148,6 @@
     "birth_date_or_mansion_overridden": false,
     "ancient_clock_mapping_established": false,
     "hinoo_half_mapping_established": false,
-    "leap_short_month_priority_established": false,
-    "real_world_efficacy_established": false
+    "leap_short_month_priority_established": false
   }
 }

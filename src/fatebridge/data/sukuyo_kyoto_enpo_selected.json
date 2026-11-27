@@ -496,7 +496,6 @@
     "modern_clock_mapping_established": false,
     "hinoo_half_mapping_established": false,
     "leap_short_month_priority_established": false,
-    "applied_to_primary_or_activities": false,
-    "source_efficacy_claim_is_empirical_evidence": false
+    "applied_to_primary_or_activities": false
   }
 }

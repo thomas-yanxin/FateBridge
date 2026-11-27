@@ -67,7 +67,7 @@
       "source_id": "nlc_1925",
       "section": "出行占第十二",
       "quote": "用尅體出則有禍",
-      "reading": "所选本取不利的传统象义；原文禍字仅为历史用语记录，不是现实灾祸断言",
+      "reading": "所选本取不利的传统象义；原文禍字为传统文献用语",
       "semantic_tags": [
         "source_conditional_symbol_not_verified_outcome"
       ],
@@ -352,6 +352,5 @@
     "體宜乘旺 and諸卦宜生體 are preferences, not conditions that cancel all other clauses or require all4roles to generate the body",
     "Source quote about禍 is historical wording only, never an actual hazard verdict; no probability, event date or route instruction"
   ],
-  "independent_human_expert_review": false,
-  "predictive_efficacy_established": false
+  "independent_human_expert_review": false
 }

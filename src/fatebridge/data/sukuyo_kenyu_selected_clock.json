@@ -378,8 +378,7 @@
   "t1299_unique_intraday_interpretation_established": false,
   "hinoo_half_mapping_established": false,
   "leap_short_month_priority_established": false,
-  "source_claim_is_empirical_validation": false,
-  "scope": "具名后出印本的条件性支时查表；不从民用钟时选择支、上下刻或古代直日。保留T1299本层未定和其他见证，不覆盖宿主历法、补配候选、事项或现实结局。",
+  "scope": "具名后出印本的条件性支时查表；不从民用钟时选择支、上下刻或古代直日。保留T1299本层未定和其他见证，不覆盖宿主历法、补配候选或事项。",
   "frame18_closing_variants": {
     "accepted_full_literal": null,
     "reader1": "已上依一日二宿三曜四時具出吉凶用不之釋畢",

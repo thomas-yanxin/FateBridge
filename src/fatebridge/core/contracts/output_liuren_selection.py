@@ -1,7 +1,7 @@
 """Bind nine-method evidence to the returned day and complete rotating sky.
 
 This reuses the domain derivation. It proves output consistency, not an
-independent classical oracle, astronomical accuracy, or predictive efficacy.
+independent classical oracle or astronomical accuracy.
 """
 
 from __future__ import annotations

@@ -887,8 +887,7 @@
     "intradaily_luminary_order": null,
     "physical_clock_mapping_status": "not_established",
     "western_24_hora_applied": false,
-    "scope": "仅交付所选原段的日夜各八时及平明起曜。段内未逐时列曜神顺序，不以日曜序列或西方24行星时补写；酉戌保留原字，未映射为现代固定钟时。",
-    "source_claim_is_empirical_validation": false
+    "scope": "仅交付所选原段的日夜各八时及平明起曜。段内未逐时列曜神顺序，不以日曜序列或西方24行星时补写；酉戌保留原字，未映射为现代固定钟时。"
   },
   "verse_abbreviation_resolution": {
     "id": "t1299_white_one_night_abbreviation_v1",

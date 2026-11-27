@@ -162,7 +162,7 @@
       "quote": "如無生體之卦事必不吉矣",
       "required_scenario": "unfavorable_matter",
       "structural_condition": "no_generation",
-      "reading": "按调用方所报问不吉之事情境，所列内卦无生体时，原句作事必不吉；只为所选传统条件断语，非灾祸、临床或现实结果判定",
+      "reading": "按调用方所报问不吉之事情境，所列内卦无生体时，原句作事必不吉；属所选传统条件断语，非临床或灾祸判定",
       "section": "占卦訣",
       "kind": "conditional_scenario_structure",
       "pdf_indices": [
@@ -175,7 +175,6 @@
   ],
   "scope": "Selected ordinal emphasis and inner-role clause conditions under caller-declared source scenario; no context inference, net outcome or event date",
   "independent_human_expert_review": false,
-  "predictive_efficacy_established": false,
   "source_locator_supplement": {
     "recorded_at": "2026-10-22T12:56:24.285326+00:00",
     "original_source_reading_bytes_unchanged": true,
@@ -218,7 +217,7 @@
         "quote": "如無生體之卦事必不吉矣",
         "required_scenario": "unfavorable_matter",
         "structural_condition": "no_generation",
-        "reading": "按调用方所报问不吉之事情境，所列内卦无生体时，原句作事必不吉；只为所选传统条件断语，非灾祸、临床或现实结果判定"
+        "reading": "按调用方所报问不吉之事情境，所列内卦无生体时，原句作事必不吉；属所选传统条件断语，非临床或灾祸判定"
       }
     ],
     "unresolved": [

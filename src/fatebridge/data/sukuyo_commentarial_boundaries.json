@@ -110,7 +110,6 @@
         "day": 13
       }
     ],
-    "claim_is_empirical_validation": false,
     "quoted_mansion_literal": "補灑",
     "normalized_mansion": "鬼",
     "normalization_basis": "T1788 p0312a01-02 explicitly identifies 布灑 as 鬼星; T2216 p0055c17-25 gives the connected name and date discussion. Literal spelling remains separate."
@@ -157,7 +156,6 @@
     "historical_observation_count_added": 0,
     "clock_convention_applied_to_runtime": false,
     "hinoo_half_mapping_established": false,
-    "leap_short_month_priority_established": false,
-    "real_world_efficacy_established": false
+    "leap_short_month_priority_established": false
   }
 }

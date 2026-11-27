@@ -12,13 +12,13 @@
     "method": "casting.method为必填判别字段；所需字段只属于该方法，不混入别法参数。时间法另用meihua_time_cast。",
     "motion_context": "observer_activity只接已确认占者当时seated坐/walking行/standing立，未知不补；external_observations逐条motion可为moving/stationary，未知省略，不从水土类别、label、问句、车辆运动或内卦角色推断。读interpretation.motion_context或motion字段卡。内卦体互静、用变动是符号角色；与外物运动、占者活动分列，各候选保留自身原体及外应资格路径。",
     "observed_categories": "observed_categories为独立文明书局所选端法入口，只接已确认subject_category老人elder_person/少年young_person/牛cow/鸡chicken/槁木dry_wood及非空subject_description，single_subject_confirmed必须明确true；群物、未知类别、只知普通树木或未确认枯木不补成单一物象。",
-    "obstruction_days": "interpretation.stage_emphasis.obstruction_timing按本候选原体列克体阻节日数。须调用方明确matter_scenario=favorable_matter且实际内卦同时有生体、克体才激活；乾1兑2为原句明例，其余六卦为类推。重复角色不累加，多卦日数不选总和/最大/最小；未给起算日及计日边界，不生成完成日期，不把日数当成功概率。",
+    "obstruction_days": "interpretation.stage_emphasis.obstruction_timing按本候选原体列克体阻节日数。须调用方明确matter_scenario=favorable_matter且实际内卦同时有生体、克体才激活；乾1兑2为原句明例，其余六卦为类推。重复角色不累加，多卦日数不选总和/最大/最小；未给起算日及计日边界，不生成完成日期。",
     "omen_reversal": "Explicitly reported external_observations manifestation gold_silver_treasure/weapon uses NLC1925內外論 original-body symbol qualifications.",
     "postheaven_timing": "端法名义应期数见motion_context.postheaven_count_reference：仅observed_trigrams/observed_categories且占者observer_activity明确时，原上下卦先天序数加原时支数一次，以除六前总数按行1/2、坐2、立1作精确比例。奇数取半保留分数，不取动爻余数，不推定主体活动、时间单位、起算时刻、天数、日期或现实观测窗口。已有卦的起法未知，数起卦和年月日时起卦不借用此式。",
     "qi_branch_timing": "求名/求财的topic_reading.qi_branch_timing_reference按原章句实际生体/克体角色分列年、月、日、时的明列支标签；各取数候选读自身topic_clause同名子层。年/时只用原seed，年支不以立春年或子初翌日重算。节月支与名义农历月序对应支分列，后者只是固定月序映射，闰月及完整时序含义未唯一裁定；23时日界备选不改原年支。坤辰戌丑未只另属月，未申见于四单位，月的明列支为辰戌丑未申，其他单位为未申。",
     "qi_day_timing": "求名/求财且day_qi已知时，topic_reading.qi_day_timing_reference按原章句实际生体/克体角色核时序明列日支，求名另保留无克体条件未全核时的原体参照；不得用原体或变用替代指定角色。坤辰戌丑未月是月限定，日支原子只取未申年月日時中的未/申；这是明列标签相符，不是五行旺衰或全时序条件。其他数字、季节、五行干支条文未解析，原子不符不等于全条件否定；在任及完整内外无克体前提另列。",
-    "quiet_context": "observation_context只接同次起卦与占者已报label及quiet_room/nothing_heard/nothing_seen三项严格布尔，未知省略或null；未采集不等于确认无所闻见。读quiet字段卡。全真仅核对所选文明书局《静占》的不论外卦条件，不代表完整年月日衰旺合参、心境、起占资格或现实预测有效。静室不推占者坐/行/立；问题文字和本卦动爻不补闻见事实。",
-    "reputation_supplement": "reputation另读chapter_qualifications的5条补充句、八卦時序及方道原文；reputation_context只接收已确认的原文在任与職任之處条件，不从已就业、考试、问句或label推定。未知省略/null，布尔须明确。初始五条不变，各候选沿用自身原体及四个辅助角色，生体和克体分别列自身时序、受制与旺衰；内卦无克体不等于已确认完整内外无克体。在任条件满足也不输出处分、灾祸或现实结局。",
+    "quiet_context": "observation_context只接同次起卦与占者已报label及quiet_room/nothing_heard/nothing_seen三项严格布尔，未知省略或null；未采集不等于确认无所闻见。读quiet字段卡。全真仅核对所选文明书局《静占》的不论外卦条件，不代表完整年月日衰旺合参。静室不推占者坐/行/立；问题文字和本卦动爻不补闻见事实。",
+    "reputation_supplement": "reputation另读chapter_qualifications的5条补充句、八卦時序及方道原文；reputation_context只接收已确认的原文在任与職任之處条件，不从已就业、考试、问句或label推定。未知省略/null，布尔须明确。初始五条不变，各候选沿用自身原体及四个辅助角色，生体和克体分别列自身时序、受制与旺衰；内卦无克体不等于已确认完整内外无克体。",
     "situational_responses": "Only when caller reports response_context for the same casting episode, use situational field card. Map querent occupied compass side, present weather, setting and human source categories against each candidate own original body.",
     "sources": "字形与传统平上去入由已确认资料给出；不能用现代普通话声调或规范字笔画替换。端法上下卦已确认，采用乾一兑二等先天卦序取数。",
     "stage_emphasis": "读取interpretation.stage_emphasis或stage_emphasis字段卡。matter_scenario只接调用方已确认的原文所问事项类别：favorable_matter问吉事、unfavorable_matter问不吉之事，不是愿望、情绪、系统预测或已发生结果；未知不补，不由题篇、关键词或关系推断，天气拒绝此参数。scenario_declaration保留原值、caller_declared_unverified及原输入路径。",
@@ -27,10 +27,10 @@
     "text_tones": "1.5.0四声法保留seed.text_tone_basis及两处证据范围。1/2/3/4指所报平上去入，不是现代拼音调号；历史音系不唯一，所选原例动静取去声，不被另一韵书归上声静默改写。tone_reference可声明system_name/source/reading_scope，encoding仅ping_shang_qu_ru；缺项未知，声明仍未独立核验。",
     "topic_chapters": "显式选planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler/household/dwelling并使用topic字段卡。原四章20条与新增出行/谒见10条分别保留规则集；travel另列原体旺气及各辅助生体偏好，多字阈值及舟陆等句的角色范围未裁定，不补方位或出行指令。",
     "traveler_frame": "traveler按行人章初始五条及补充六句，返归仍以原体为参照，在外另以初用为受作用者。chapter_qualifications.initial_use_frame逐列原体、体互、用互、变用对初用的实际有向关系；体生用可为初用受生，用生体不能改写成用受生。初用月令衰且实际受克须同成立，原文未定与缺月令保持未知，内卦未见不证明完整内外没有。震多艮多门槛与范围未裁定；坎兑句只标明初用经卦读法。保留影印盈旺/转录在外之情況、紛爭之應/紛爭差异。",
-    "trigram_relation_symbols": "按trigram_symbols字段卡核对所选16条史料象义：仅实际用生体或用克体的角色匹配对应卦名，不能以同五行替代卦名。所有或字为备选，不自动识别姓名、性别、身份、实际方位或事件；受制与未知旺衰保留，各取爻候选用自己的原体。所选巽克体作南方，固定转录作东南，不据八卦常识换字；不是现实灾祸、临床、应期或预测效力判断。",
+    "trigram_relation_symbols": "按trigram_symbols字段卡核对所选16条史料象义：仅实际用生体或用克体的角色匹配对应卦名，不能以同五行替代卦名。所有或字为备选，不自动识别姓名、性别、身份或方位；受制与未知旺衰保留，各取爻候选用自己的原体。所选巽克体作南方，固定转录作东南，不据八卦常识换字。",
     "unknowns": "没有season_month_branch时不算季令；不补当前日期或时辰。existing模式保留原卦码与动爻，不重起。",
     "wealth_supplement": "interpretation_topic=wealth 时读取 interpretation.wealth_components。文明书局卷二求財占补充句逐项核对初用、体互、用互、变用和原体的关系，各候选使用自己的卦、体气和直接制约。source_groups 给出原句与关系成分。all_named_components_present 表示该句所列成分是否齐备，两组可同时齐备。及字的组合含义待裁定，timing_reference 保留原文卦气措辞。",
-    "weather": "天时占显式选interpretation_topic=weather并复制weather字段卡到fields。按selected_readings的effective_status/controlled_tags/conditional_tags解释，不能只读raw status=matched。controls保留阈值和五/六位置及合计/单卦范围分歧，不投票。旧1.0.0研究组合128/209未胜过同日始终无雨134/209；不冒称当前组件已做现实预测验收。",
+    "weather": "天时占显式选interpretation_topic=weather并复制weather字段卡到fields。按selected_readings的effective_status/controlled_tags/conditional_tags解释，不能只读raw status=matched。controls保留阈值和五/六位置及合计/单卦范围分歧，不投票。",
     "weather_dayparts": "1.7.0离在艮上暮雨朝晴仅匹配同一本/互/变重卦上离下艮；两项原文时段保留time_scope=morning/evening，不能当成同窗自相矛盾。读取time_scope_comparison：未定时段不等于全天，与朝暮的关系仍待核定；不自动交集、排序或合为唯一预报。朝暮不补日期、钟时或日出日落，已知analysis_datetime也不自动定位应验日。离互艮宫仍未裁定。每个取爻候选都有自己的时段比较；旧1.5.0现实检验及1.6.0语义准备不能认证本轮。",
     "weather_prior_context": "prior_condition可用neither_prolonged表达久雨与久晴两个前期条件均已确认不成立；null或省略仍未知，不为消除pending_context而填neither。它只使四项前期条件条款not_met，不补季节、多字阈值或唯一预报。一天无雨不证明久晴，缺测或间歇天气也不自动证明两者均不成立；公开月度回顾资料不证明起卦当时已可得。旧1.7.0负面现实检验保持不变，新增事实状态不是预测提升或原文久字阈值已裁定的证明。",
     "weather_reference_baselines": "weather.research_validation.reference_baseline_supplement单列现代参考方法，不是梅花预测或卦象概率。起卦前一日中午不能使用尚未结束的当日总雨量，持续性改用最近完整民用日即目标日前2日；月度基线固定1991—2020，10958日并与官方12个月常年雨日数按公布精度核对相符。全273日条件性历史参考持续性183、月度190，旧梅花正确贡献29；同49日参考各31、旧标签29。",
@@ -239,7 +239,7 @@
       "when": "仅在已提供response_context时读取；未知现场资料省略，常规reading保留原输出；不用于天时预测分支"
     },
     "stage_emphasis": {
-      "description": "所报原文问事情境、内卦紧次及迟速／生克条件；整句条件适用不等于净作用或现实结局",
+      "description": "所报原文问事情境、内卦紧次及迟速／生克条件",
       "fields": [
         "input_normalized",
         "meihua.seed",
@@ -249,7 +249,7 @@
       ]
     },
     "stage_emphasis_audit": {
-      "description": "所报原文问事情境、内卦紧次及迟速／生克条件；整句条件适用不等于净作用或现实结局",
+      "description": "所报原文问事情境、内卦紧次及迟速／生克条件",
       "fields": [
         "input_normalized",
         "meihua",
@@ -1648,12 +1648,12 @@
           }
         ],
         "default": null,
-        "description": "Optional caller-reported manifestations for general/planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler/household/dwelling/marriage/dining; NLC1925 selected material-versus-appearance qualifications plus explicit gold_silver_treasure/weapon original-body symbolic cases. Traveler observations keep the original-body reference and are not automatically rebased to initial use. Not every metal object is treasure or every sharp tool a weapon. Omit if unknown; no default observations, unique trigram assignment, physical/hazard/clinical verdict or event date.12 is a software guard, not a classical limit",
+        "description": "Optional caller-reported manifestations for general/planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler/household/dwelling/marriage/dining; NLC1925 selected material-versus-appearance qualifications plus explicit gold_silver_treasure/weapon original-body symbolic cases. Traveler observations keep the original-body reference and are not automatically rebased to initial use. Omit if unknown; max 12 items.",
         "title": "External Observations"
       },
       "interpretation_topic": {
         "default": "general",
-        "description": "Explicit branch: general; weather (no body/use); planning/reputation/wealth/transaction (文明书局本原四章初始体用条款，wealth另列求财成分)；travel/meeting为同本出行/谒见章，travel另核旺气及辅助生体偏好，多字及舟陆角色范围未裁定；lost_property为失物章五种初始关系及明示变用经卦读法的方位类象，物不失不否认已报遗失，位置与寻获未核实。traveler为行人章，返归句保留原体参照，在外补充明示以初用为受生受克对象，四个其他内卦角色逐一列出；初用月令衰与受克须同时成立，未知不猜，多字门槛及完整角色范围未裁定，不生成行踪、灾祸、返归核实或日期。reputation另列求名补充句及原文時序/方道，reputation_context声明原文在任与求职任条件，未知不猜，巽方道東/同本地理及转录東南等差异未裁定。household/dwelling分别为家宅/屋舍章，沿用实际原体与初用。家宅比利/转录比和未裁定，五行相同不自动套家宅安稳句；屋舍保留冷退/衰退异文。家宅生体转引人事章只核所列四内卦实际角色，未作完整跨章合参、住宅安全鉴定、选房或迁居许可。marriage为婚姻章五种初始关系，并分别核原体所占之家、初用所婚之家的已报节月旺气条件；原文未定与缺月令保持未知。补充生体/体生只列实际关系成分，或字不合并成必然同现；后段比利/转录比和未裁定，不自动套彼此相就句。八卦相貌品行仅作历史文本记录，不指派现实人物特征、两家财富、意愿或婚姻成败。dining为飲食章五种初始关系，并另列内卦坎酒、兑食及體用類的坤艮制坎、离制兑；这些句不要求多字门槛，不因制约者受制或季令衰自动抵消，完整内外合参未裁定。影印生身/转录生体及兑坎组合未裁定，不把酒食象当实际供应、菜单、席上人物、饮酒或饮食医疗建议。版本异文另列。Question keywords never switch branches; historical clauses are not hazard verdicts, travel instructions, validated outcomes or event dates",
+        "description": "Explicit branch: general; weather (no body/use); planning/reputation/wealth/transaction (文明书局本原四章初始体用条款，wealth另列求财成分)；travel/meeting为同本出行/谒见章，travel另核旺气及辅助生体偏好，多字及舟陆角色范围未裁定；lost_property为失物章五种初始关系及明示变用经卦读法的方位类象。traveler为行人章，返归句保留原体参照，在外补充明示以初用为受生受克对象，四个其他内卦角色逐一列出；初用月令衰与受克须同时成立，未知不猜，多字门槛及完整角色范围未裁定。reputation另列求名补充句及原文時序/方道，reputation_context声明原文在任与求职任条件，未知不猜，巽方道東/同本地理及转录東南等差异未裁定。household/dwelling分别为家宅/屋舍章，沿用实际原体与初用。家宅比利/转录比和未裁定，五行相同不自动套家宅安稳句；屋舍保留冷退/衰退异文。家宅生体转引人事章只核所列四内卦实际角色，未作完整跨章合参。marriage为婚姻章五种初始关系，并分别核原体所占之家、初用所婚之家的已报节月旺气条件；原文未定与缺月令保持未知。补充生体/体生只列实际关系成分，或字不合并成必然同现；后段比利/转录比和未裁定，不自动套彼此相就句；八卦相貌品行按原文条文保留。dining为飲食章五种初始关系，并另列内卦坎酒、兑食及體用類的坤艮制坎、离制兑；这些句不要求多字门槛，不因制约者受制或季令衰自动抵消，完整内外合参未裁定；影印生身/转录生体及兑坎组合未裁定，版本异文另列。Question keywords never switch branches.",
         "enum": [
           "general",
           "weather",
@@ -1687,7 +1687,7 @@
           }
         ],
         "default": null,
-        "description": "Caller-confirmed subject category for the selected 占卦訣: 原文问吉事 or 原文问不吉之事. Not a desired answer, question sentiment, topic classification or prediction of an actual outcome. Omit when unknown. Human-matter branches only; declaration is not independently verified",
+        "description": "Caller-confirmed subject category for the selected 占卦訣: 原文问吉事 or 原文问不吉之事. Not a desired answer, question sentiment, or topic classification. Omit when unknown. Human-matter branches only",
         "title": "Matter Scenario"
       },
       "observation_context": {
@@ -1700,7 +1700,7 @@
           }
         ],
         "default": null,
-        "description": "Optional same-cast/observer quiet-room and hearing/vision declarations for human branches. Missing is uncollected, not confirmed absent. Selected NLC1925静占 conditions only; no full year-month-day strength synthesis, mental-state inference, casting eligibility or validated forecast. Never changes old study denominators"
+        "description": "Optional same-cast/observer quiet-room and hearing/vision declarations for human branches. Missing is uncollected, not confirmed absent. Selected NLC1925静占 conditions only; no full year-month-day strength synthesis. Never changes old study denominators"
       },
       "observer_activity": {
         "anyOf": [
@@ -1717,7 +1717,7 @@
           }
         ],
         "default": null,
-        "description": "Optional caller-confirmed observer activity corresponding to selected NLC1925 我坐/我行/我立. Omit if unknown; no inference from question, vehicle motion, external movement or mental stillness. Selected relative wording only, no measured delay, omen valence, or date. Human-matter branches only",
+        "description": "Optional caller-confirmed observer activity corresponding to selected NLC1925 我坐/我行/我立. Omit if unknown; no inference from question or external movement. Selected relative wording only. Human-matter branches only",
         "title": "Observer Activity"
       },
       "question": {
@@ -1743,7 +1743,7 @@
           }
         ],
         "default": null,
-        "description": "Optional caller-confirmed 在任 and 職任之處 declarations, only with interpretation_topic=reputation. Unknown omit/null; no keyword inference, permission, event date, validated outcome or probability"
+        "description": "Optional caller-confirmed 在任 and 職任之處 declarations, only with interpretation_topic=reputation. Unknown omit/null; no keyword inference."
       },
       "response_context": {
         "anyOf": [
@@ -1755,7 +1755,7 @@
           }
         ],
         "default": null,
-        "description": "Optional caller-reported same-cast 方應/天時應/地理應/人事應 for human matters. No scene, direction or weather inferred; retain multiple trigram candidates and source variants. Not a casting method, future weather forecast, combined ten-response verdict, probability or event date"
+        "description": "Optional caller-reported same-cast 方應/天時應/地理應/人事應 for human matters. No scene, direction or weather inferred; retain multiple trigram candidates and source variants. Not a casting method or combined ten-response verdict."
       },
       "season_month_branch": {
         "anyOf": [

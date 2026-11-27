@@ -132,7 +132,6 @@
     "nested_quoted_originals_independently_acquired": false,
     "new_independent_historical_observations": 0,
     "historical_clock_mapping_established": false,
-    "leap_short_month_priority_established": false,
-    "real_world_efficacy_established": false
+    "leap_short_month_priority_established": false
   }
 }

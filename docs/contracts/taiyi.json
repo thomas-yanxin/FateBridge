@@ -5,7 +5,6 @@
     "conditions": "五将/门具问题读取conditions视图（合参taiyi_conditions）；全部阻断按同次patterns路径解释。年/月计以实际门盘合取；时计三门未评估/null不能改成满足。即使两层满足也不推出实际成败。",
     "count_sources": "核count_source_assessment时分开当前二目/算数、所选原表字面、书影校读和源位置重算。三者不互相覆盖；两算相符不认证目位或全盘相符，原表差异仍未裁定。适用于年/月/日/时计循环核心。",
     "daily": "calculation_mode=day明确选金钥匙冬至前甲子积日；合参置taiyi_options。按所选钟面零时换日，不乘十二；同日甲子纳入是现代约定，不能套用时计720时相位不变。日计专用daily_calendar/daily_essences视图需先设day，保留十精未知、正文与课式异数，全年十神不当作十精。 天时按十二支通则计算，有年度第10数亥及金镜/统宗补证；日44例坤与实际酉并列为差异，不能将源文坤写成实际计算值。太乙数只给局序，四宫语义仍未知。",
-    "efficacy": "现实预测效力未检验；数值不是概率，独立转录案例也不证明现实效力。",
     "elemental_relations": "读取elemental_guan_assessment以核二目纳音所选十六神五行片段。天目/地目按原文语境与文昌主、始击客对应，不套六十甲子日柱纳音；空间关和五将合取不由本项覆盖。",
     "enclosures": "提挟读取enclosures（合参taiyi_enclosures）：李法太乙与一将夹正宫、同方大小二将短弧夹太乙或对方目将分层。间神按原位读取，不并八门扇区，几何命中不认证完整挟闭。pattern_paths指向同盘各自记录；二将完整记录在enclosure_assessment.two_general_enclosure.patterns，旧全局patterns保持；完整挟闭、四郭固杜未评估，未命中不代替不存在，不套用现实胜负断语。",
     "evidence": "按本次taiyi.calendar_rules确认岁首，再读取core_board、rule_trace、patterns、ruleset；未命中空间关系不能推成吉凶，原典分歧不隐去。",

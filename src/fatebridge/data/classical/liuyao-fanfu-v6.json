@@ -58,5 +58,5 @@
       "action": "Recognize this source example; do not invent a complete eight-trigram or 32-complement Fan table from it"
     }
   ],
-  "scope": "Classical structure only: original active-line branch changes, separate inner/outer chart-branch comparisons, and explicitly printed body examples. Chart branches at static positions are comparison data, not transformed-line actors. No outcome or efficacy verdict."
+  "scope": "Classical structure only: original active-line branch changes, separate inner/outer chart-branch comparisons, and explicitly printed body examples. Chart branches at static positions are comparison data, not transformed-line actors."
 }

@@ -84,7 +84,6 @@ class KnowledgeProvenance(PartialOutput):
     personal_applicability_assessed: ReferenceFalse | None = None
     whole_books_collated: ReferenceFalse | None = None
     independent_whole_corpus_review_completed: ReferenceFalse | None = None
-    real_world_efficacy_validated: ReferenceFalse | None = None
     scope: str | None = None
 
 

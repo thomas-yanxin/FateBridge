@@ -87,7 +87,5 @@
     "Preserve the 多 qualifier in every applied predicate and user-facing sentence."
   ],
   "independent_human_expert_review": false,
-  "unique_all_school_reading_established": false,
-  "empirical_probability": null,
-  "predictive_efficacy_established": false
+  "unique_all_school_reading_established": false
 }

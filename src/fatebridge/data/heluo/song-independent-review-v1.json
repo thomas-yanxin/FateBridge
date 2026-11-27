@@ -15,7 +15,6 @@
   "external_expert_review": false,
   "whole_corpus_independent_review": false,
   "automatic_applicability_selection": false,
-  "real_world_efficacy_validated": false,
   "entries": [
     {
       "hexagram": "天水訟",
@@ -146,7 +145,7 @@
       "first_difference_count": 1,
       "unresolved_readings": [],
       "review_notes": [
-        "R89首稿有錫不須憚；看到候选后依像素改判懽。此为曝光后改判，不能记录为曝光前一致；困字与曝光前首稿一致。懽为当前所录字，仍不据诗自动选择个人适用或现实结果。"
+        "R89首稿有錫不須憚；看到候选后依像素改判懽。此为曝光后改判，不能记录为曝光前一致；困字与曝光前首稿一致。懽为当前所录字，不据诗自动选择个人适用。"
       ]
     }
   ]

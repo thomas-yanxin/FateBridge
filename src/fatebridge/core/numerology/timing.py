@@ -392,7 +392,7 @@ def resolve_annual_series(
 ) -> ResolvedAnnualSeries:
     """Resolve explicit Lichun intervals across the requested horizon."""
     if type(horizon) is not int or not 1 <= horizon <= 120:
-        raise ValueError("年序范围须为1至120；不是寿命估计。")
+        raise ValueError("年序范围须为1至120。")
     birth_year = get_bazi_year(birth, zone)
     birth_label = ZonedCalendar.from_datetime(birth)
     birth_point = CivilPoint(birth_label.utc.julian_day_exact())

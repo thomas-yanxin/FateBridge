@@ -756,6 +756,5 @@
   "calendar_mapping_status": "not_adopted",
   "selected_duty_stem": null,
   "effective_command_status": "not_adjudicated",
-  "calculation_effect": "none",
-  "real_world_predictive_validity": "not_tested"
+  "calculation_effect": "none"
 }

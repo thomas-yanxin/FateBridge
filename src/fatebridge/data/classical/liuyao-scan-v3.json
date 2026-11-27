@@ -16,7 +16,7 @@
     "license": "public_domain_scan",
     "method": "Selected rendered pages visually read before changing rules; OCR was used only as an unsuccessful locator, never as an oracle."
   },
-  "scope": "Only the listed passages are visually collated; not the full book or every edition. No real-world efficacy claim.",
+  "scope": "Only the listed passages are visually collated; not the full book or every edition.",
   "collations": [
     {
       "id": "ji-advance-correction",

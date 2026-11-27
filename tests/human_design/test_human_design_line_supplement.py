@@ -24,7 +24,6 @@ def test_gate2_condition_stays_reference_only() -> None:
     assert condition["automatic_application"] is False
     assert row["actual_fixing_state"] is row["selected_polarity"] is None
     assert "永久" in result["rendered_text"] and "不自动应用" in result["rendered_text"]
-    assert result["provenance"]["real_world_efficacy_validated"] is False
 
 
 def test_context_annotations_attached_on_exact_five_keys() -> None:

@@ -11,6 +11,5 @@
   "raw_text_policy": "Preserve the original corpus and raw verse without normalization; offsets use Python Unicode code points, zero based and end exclusive.",
   "unresolved_policy": "Keep raw text, mark unresolved_markup and set display_text to null; never issue a partially rendered quotation as resolved.",
   "scope": "Meihua verse display only; this template reading is not a collated ancient edition or a rule for choosing a prediction.",
-  "critical_edition_adjudicated": false,
-  "predictive_efficacy_established": false
+  "critical_edition_adjudicated": false
 }

@@ -27,7 +27,7 @@ POLICY_ID = "numerology_source_reference_v1"
 SCOPE = (
     "此处提供具名来源与已存局部读稿，不选择个人适用条款。"
     "本次实际取法、栏目及条款角色仍须核对同run计算回执；"
-    "继承文本、疑读与待核关系保留，不能据目录授予全书或现实预测认证。"
+    "继承文本、疑读与待核关系保留，不据目录授予全书认证。"
 )
 
 
@@ -160,7 +160,6 @@ def _provenance(
         "personal_applicability_assessed": False,
         "whole_books_collated": False,
         "independent_whole_corpus_review_completed": False,
-        "real_world_efficacy_validated": False,
         "scope": SCOPE,
     }
 

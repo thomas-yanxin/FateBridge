@@ -2,7 +2,7 @@
 
 [文档中心](README.md) · [API 参考](api-reference.md) · [可运行示例](examples/README.md) · [现场咨询指南](interpretation/fengshui/consultation.md) · [基础规则与来源](interpretation/fengshui/rule-sources.md) · [玄空参考](interpretation/fengshui/xuankong.md)
 
-FateBridge 的 `fengshui` family 提供 8 个确定性、带规则与来源追溯的风水计算工具，覆盖后天方位与地磁换算、命卦、八宅与阳宅三要、金锁玉关砂水、年/月/日/时紫白、中州派玄空宅盘以及多层合参评估。引擎只产出结构化计算事实与条件匹配状态，不生成摆件处方、颜色建议或吉凶断言。
+FateBridge 的 `fengshui` family 提供 8 个确定性、带规则与来源追溯的风水计算工具，覆盖后天方位与地磁换算、命卦、八宅与阳宅三要、金锁玉关砂水、年/月/日/时紫白、中州派玄空宅盘以及多层合参评估。引擎只产出结构化计算事实与条件匹配状态。
 
 ## 8 个工具速查
 

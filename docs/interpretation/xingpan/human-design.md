@@ -10,13 +10,13 @@
 
 从 `bodygraph.channels` 与 `definition.components` 说明类型和定义：两端激活才构成通道，两侧激活合并计算。`generator` 的 `manifesting_generator` 是子型，马达至喉可经间接路径。`undefined` 仍可能有激活门，`completely_open` 才表示该中心没有激活门；不能解释为能力或人格缺陷。
 
-权威优先读实际 `bodygraph.authority`，不靠已激活门或个人喜好另判。`environment_no_inner_authority` 和 `lunar_no_inner_authority` 没有内在权威；不能称为头脑内在权威。`profile` 前数是人格太阳线，后数是设计太阳线。轮回交叉按原典返回四门、角度和名称；名称可能保留原拼写，不将英文名称扩成命运或职业断语。
+权威优先读实际 `bodygraph.authority`，不靠已激活门或个人喜好另判。`environment_no_inner_authority` 和 `lunar_no_inner_authority` 没有内在权威；不能称为头脑内在权威。`profile` 前数是人格太阳线，后数是设计太阳线。轮回交叉按原典返回四门、角度和名称；名称可能保留原拼写。
 
 `gate_evidence` 给出原典的中心、门所属回路标签、通道端点及 PDF 页码；门回路标签与通道分类不是同一个字段。`source_consistency` 保留2001版29门1/2线的印刷分界与等分公式分歧；不能声称全本原典已通过。
 
 问回路时读取`circuitry`卡，按`bodygraph.circuitry`中实际完整通道解释赋能／分享／支持主题；数量不等于主导人格或能力强弱。整合四通道是10–20、10–57、20–34、34–57；同四门中的10–34属Centering，20–57属Knowing，不把六条都算Integration。`source_consistency.channel_classifications`区分6条官方直接说明与30条两端门标签推断，不将后者说成独立原页认证。
 
-`node_convention_comparison` 展示真／平交点约定造成的差异，不以哪个“更像本人”挑口径。`time_sensitivity` 对已确认的生时范围使用10秒连续TT网格，并细查检测到的速度变号候选；读取`classification_variants`与`activation_variants`的实际见证。`continuous_interval_certified=false`，未观察到变化只能说检查样本未变，不能说整个区间确定稳定。盘面解释仍针对名义时刻，不能扩展为全区间共同结论；不可跨不同见证时刻拼接单门、通道或角色，逐层数值集合也不能自行作笛卡尔组合。Color/Tone/Base 是黄经细分；不得据此诊断身心、制定饮食处方或断现实事件。`depth` 卡提供原典384线极性星体目录及本盘26位置的实际同门／谐振门触发。月交点不作为供给固定的星体，但四个节点位置可以接受固定；逐项读取 `depth_evidence.line_fixings` 的 `fixing_state`、`fixing_planets` 和 `recipient_kind`，不能写成节点自身未评估。尚未实现 PHS、完整384线解读、合盘和流运，不套其他体系补足。
+`node_convention_comparison` 展示真／平交点约定造成的差异，不以哪个“更像本人”挑口径。`time_sensitivity` 对已确认的生时范围使用10秒连续TT网格，并细查检测到的速度变号候选；读取`classification_variants`与`activation_variants`的实际见证。`continuous_interval_certified=false`，未观察到变化只能说检查样本未变，不能说整个区间确定稳定。盘面解释仍针对名义时刻，不能扩展为全区间共同结论；不可跨不同见证时刻拼接单门、通道或角色，逐层数值集合也不能自行作笛卡尔组合。Color/Tone/Base 是黄经细分；不得据此诊断身心或制定饮食处方。`depth` 卡提供原典384线极性星体目录及本盘26位置的实际同门／谐振门触发。月交点不作为供给固定的星体，但四个节点位置可以接受固定；逐项读取 `depth_evidence.line_fixings` 的 `fixing_state`、`fixing_planets` 和 `recipient_kind`，不能写成节点自身未评估。尚未实现 PHS、完整384线解读、合盘和流运，不套其他体系补足。
 
 `node_backend_comparison`另列同一TT的节点后端差异和只替换节点后的结构变化。`same_backend_not_independent`的零差值不能认证精度；平交点也不能因换旗标就当作两个独立模型。Moshier真交点可能改变门线或Tone/Base；实际后端差值及发布者约70角秒的近似最大差异都不是每盘误差上界。122个独立DE440/ERFA时刻对照不能扩为全时域或官方交点约定认证。1800年初出生的设计时刻可能在1799年，只有18段文件不足以保证两侧均为Swiss。
 
@@ -50,11 +50,11 @@
 
 `additional_poles`卡保留2001正文另列的11.4金星、25.4木星及本盘实际采用它们的依据；原exaltation_planet字段只对应印刷符号。附加星体仍须实际出现在同门或谐振门，不能无条件补造触发，交点不施加固定。两项正文事实不等于384线全文验收，也不改变25.4的非双极性类别。
 
-需要具体爻义参考时，可调用`knowledge_read(domain="human_design", category="lines", key="门.线")`；先用同run实际激活定位，不从角色数字推算具体门线。目录保留全部384线的来源块与极性星体，当前1.1至2.6共12条有本地简短转述，仍待独立复核，完整独立线义验收0条；其余372条的`editorial_paraphrase=null`表示尚未整理，不能补造。参照`depth_evidence.line_fixings`实际`fixing_state`说明被强调的极性，不声称另一极性永不发生；juxtaposition并列两极，unfixed只列原文已有可能，不能仅凭知识条目选定。`source_polarity_planets`包含11.4金星和25.4木星的附加事实，列出星体不等于本盘触发。1.4原文重复措辞的疑点须随解释保留，不称作已勘误。2.3须保留原文服务回报的永久2–14通道条件，结合同run实际固定状态与永久通道证据再讨论，不能改成无条件结果或自动推断逆命题；知识查询的条件适用性为null。2.6上升段也有视野狭窄的含义，不一概美化。其他条目的条件未记录表示未评估，不表示无条件。覆盖数以当前目录coverage为准。知识条目本身不评估个人适用性，亦不认证完整384线、原典母本或现实效力。
+需要具体爻义参考时，可调用`knowledge_read(domain="human_design", category="lines", key="门.线")`；先用同run实际激活定位，不从角色数字推算具体门线。目录保留全部384线的来源块与极性星体，当前1.1至2.6共12条有本地简短转述，仍待独立复核，完整独立线义验收0条；其余372条的`editorial_paraphrase=null`表示尚未整理，不能补造。参照`depth_evidence.line_fixings`实际`fixing_state`说明被强调的极性，不声称另一极性永不发生；juxtaposition并列两极，unfixed只列原文已有可能，不能仅凭知识条目选定。`source_polarity_planets`包含11.4金星和25.4木星的附加事实，列出星体不等于本盘触发。1.4原文重复措辞的疑点须随解释保留，不称作已勘误。2.3须保留原文服务回报的永久2–14通道条件，结合同run实际固定状态与永久通道证据再讨论，不能改成无条件结果或自动推断逆命题；知识查询的条件适用性为null。2.6上升段也有视野狭窄的含义，不一概美化。其他条目的条件未记录表示未评估，不表示无条件。覆盖数以当前目录coverage为准。知识条目本身不评估个人适用性，亦不认证完整384线或原典母本。
 
 ## 人格 Color
 
-`personality_colors`卡按人格日地的Color读取Motivation类别，按人格交点的Color读取View类别；检查实际Color、人格路径与对点一致性。缺失或冲突不补类别。英文类别是官方教学来源的体系术语，不据其字面判定现实动机或能力；出生盘的转移、分心、是否对齐均未评估。交点口径的四箭头即使相同，Color类别仍可能不同，按同一口径的完整联合见证分别说明。联合投影v2保留人格Color，过渡四元状态的Tone与Color属同一个源依赖，对点不算额外证据。该有限类别功能不代表完整PHS或384线线义已验收。
+`personality_colors`卡按人格日地的Color读取Motivation类别，按人格交点的Color读取View类别；检查实际Color、人格路径与对点一致性。缺失或冲突不补类别。英文类别是官方教学来源的体系术语；出生盘的转移、分心、是否对齐均未评估。交点口径的四箭头即使相同，Color类别仍可能不同，按同一口径的完整联合见证分别说明。联合投影v2保留人格Color，过渡四元状态的Tone与Color属同一个源依赖，对点不算额外证据。该有限类别功能不代表完整PHS或384线线义已验收。
 
 ## 额外数值根候选
 

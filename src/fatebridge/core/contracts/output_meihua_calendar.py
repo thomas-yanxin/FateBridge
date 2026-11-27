@@ -55,7 +55,6 @@ class MeihuaCalendarPrecision(PartialOutput):
     date_label_revision_may_change_month_day_and_cast: bool | None = None
     absence_of_named_event_certifies_exactness: bool | None = None
     exact_astronomical_accuracy_established: bool | None = None
-    predictive_efficacy_established: bool | None = None
 
 
 class MeihuaSolarDateEvent(PartialOutput):
@@ -97,4 +96,3 @@ class MeihuaSolarDateReference(PartialOutput):
     alternate_event_time_inferred: bool | None = None
     published_date_match_certifies_exactness: bool | None = None
     exact_astronomical_accuracy_established: bool | None = None
-    predictive_efficacy_established: bool | None = None

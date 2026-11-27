@@ -312,8 +312,7 @@
       "明和元年",
       "嘉永二年"
     ],
-    "verified": false,
-    "independent_real_world_samples_added": 0
+    "verified": false
   },
   "comparison_t1299": {
     "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/master/T/T21/T21n1299.xml",
@@ -333,5 +332,5 @@
     }
   ],
   "reading_status": "two_existing_model_roles_agree_on_23_literal_table_rows_not_human_independent_collation",
-  "scope": "具名印本23行月朔曜条件表与入纸条件说明；普通宿主民用月首仅作明示条件查表，未列条件不等于确定无陵逼；古代日界、闰月继承的朔曜、整套轮图、传承及现实效力尚未建立。"
+  "scope": "具名印本23行月朔曜条件表与入纸条件说明；普通宿主民用月首仅作明示条件查表，未列条件不等于确定无陵逼；古代日界、闰月继承的朔曜、整套轮图及传承尚未完全建立。"
 }

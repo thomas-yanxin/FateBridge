@@ -26,7 +26,7 @@
 - `A/B=C/D` 的折叠关系不自动表示 `A+B-C=D` 在完整 360°圆上直接占据。核对 `sensitive_point.occupancy/direct_orb`；`folded_only` 不能说成直接合相。中点式转和差式的周期与容许度都加倍，不能混用角偏差。
 - 当前原文含义只覆盖 Udo Rudolph《ABC für Planetenbilder》1996 首版、出版社摘页**印刷页 14／PDF 第 6 页**的 `MA+JU-ZE=MC` 示例。实际 `interpretations` 命中后，才可归因为关于个人目标与行动成效的象征讨论；保留 `source_id/source_section/basis_expression/direct_orb_degrees/maximum_orb_degrees`。
 - `interpretations=[]` 只表示当前没有生成这条限定解释；参考未定时不能把空列表当作已知未命中。它不表示整部书没有其他解释，也不能补写未核对的关键字。相同 `claim_id` 在不同度盘或零弧图重复出现只算同一坐标依据，不增加证据权重。
-- 几何条文另据 Ludwig Rudolph《17 Gesetze für Planetenbilder》，《Hamburger Hefte》1979/2、第 74 期、第 1 页，第 3、7、13–16 条。几何条文核对不证明文章的现实作用主张，更不等于整部原书已验收。
+- 几何条文另据 Ludwig Rudolph《17 Gesetze für Planetenbilder》，《Hamburger Hefte》1979/2、第 74 期、第 1 页，第 3、7、13–16 条。几何条文核对不等于整部原书已验收。
 
 ## 生时误差会改变哪些判断
 
@@ -64,13 +64,13 @@
 
 先解释实际返回且与所问有关的两三项关系，再把来源的限定象征含义联系到现实中可观察的目标、行动和成效标准。未命中原文解释时仍可解释实际几何关系和计算范围，不能为了给出断语另造关键词或事件。
 
-作者、规则版本及来源回显在 `profile/rulesets/sources/rule_trace`。完整原书符合度为 `not_assessed`，现实预测效果为 `not_tested`；这两项状态不能被测试数量、多个度盘一致或出版物署名替代。
+作者、规则版本及来源回显在 `profile/rulesets/sources/rule_trace`。完整原书符合度为 `not_assessed`，不能被测试数量、多个度盘一致或出版物署名替代。
 
-原生物理因素的数据版本与假设轨道分开读取：`profile.physical_ephemeris_source` 保留实际模型、文件名称及文件头 DE 版本；生时样点的 `physical_source_index` 对应 `physical_ephemeris_sources`。来源无法识别时保持该限制；模型／同名文件内容／DE 版本切换会使纯生时比较报错，需要补齐所声明区间的数据，不能删去失败样点。文件上下文不证明精度或原子读取。NASA 与 Swiss 可能共用 DE441，不能将交叉检查称作两套独立动力学或现实预测证据。
+原生物理因素的数据版本与假设轨道分开读取：`profile.physical_ephemeris_source` 保留实际模型、文件名称及文件头 DE 版本；生时样点的 `physical_source_index` 对应 `physical_ephemeris_sources`。来源无法识别时保持该限制；模型／同名文件内容／DE 版本切换会使纯生时比较报错，需要补齐所声明区间的数据，不能删去失败样点。文件上下文不证明精度或原子读取。NASA 与 Swiss 可能共用 DE441，不能将交叉检查称作两套独立动力学证据。
 
 基础盘另读 `base_chart.chart_profile.physical_ephemeris_source`。黄道经纬度、赤纬和恒星黄道复算共用受管理的配置会话；明确的基础盘轨道近似与原生中点层可能不同，按各层实际来源解释，保留有效部分。13 等分盘的对应来源在 `chart_profile.physical_ephemeris_source`，不是中点字段；它的生时比较还核对本命与样点来源，不能把数据切换当作生时效应。
 
-`ephemeris_model_scope=physical_bodies` 下，模型汇总只含物理天体；平交点的 `swisseph_analytical_mean_node` 与基础盘 `nonphysical_factor_models` 另读。中点交点 `native_return_flags` 可回显请求位，不能据此断言读取 Swiss／JPL 矢量文件，或把全 Moshier 物理盘说成混合模型。交点近似仍影响计算质量，不能因物理模型标签一致而隐瞒。显式严格 JPL 选项也用于原生德国因素及恒星观测者，来源错误按实际原因交付；96 日系数子集测试不认证完整年代或现实效果。
+`ephemeris_model_scope=physical_bodies` 下，模型汇总只含物理天体；平交点的 `swisseph_analytical_mean_node` 与基础盘 `nonphysical_factor_models` 另读。中点交点 `native_return_flags` 可回显请求位，不能据此断言读取 Swiss／JPL 矢量文件，或把全 Moshier 物理盘说成混合模型。交点近似仍影响计算质量，不能因物理模型标签一致而隐瞒。显式严格 JPL 选项也用于原生德国因素及恒星观测者，来源错误按实际原因交付；96 日系数子集测试不认证完整年代。
 
 `ephemeris_source_inconsistent` 的 `issues` 指向 `runtime.ephemeris_data`，是来源配置／变更问题；保留其具名原因，不误述为出生资料错误或缺少 Python 包。`retryable=false` 时不原样反复调用；先补齐区间数据、重新加载后再重做相同输入，不变更用户已确认的误差区间。
 

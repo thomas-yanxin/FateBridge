@@ -474,7 +474,6 @@ def build_chart(
         "rule_trace": trace,
         "validation": {
             "classical_acceptance_passed": False,
-            "real_world_prediction_status": "not_tested",
             "full_marks_established": False,
             "limitations": [],
         },

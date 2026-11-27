@@ -19,7 +19,7 @@
 ## 主客事实、条件与合参
 
 - **字段视图**：按 `evidence_views` 复制 `fields`（三端始终严格校验路径）。年计核心用 `year_core`，深读可选 `taiyi_depth`、`counter_cycles`、`shiji_derivation`、`count_sources`、`conditions`、`gates`、`victory_matrix`、`long_cycle_summary` 与 `noble_sources`；年／月八门与定计用 `gates`、`gate_comparison`、`determinate` 分源深读，始击读 `shiji_derivation`，原表读 `count_sources`。
-- **主客、始击与数格**：`core_board` 与 `shiji_derivation` 给出天盘计神起法与主客算数，中五星标在 `core_board`／`center_marks`；无天、无地、无人等属传统数格分类，不直接作现实吉凶断言。`patterns` 与 `enclosure_assessment` 列出掩、击、迫、囚、关、格、对与正宫提挟条件；`three_gates`、`menju_jiangfa` 与 `victory_matrix` 按三值条件合取与钤表栏位保留未决项。
+- **主客、始击与数格**：`core_board` 与 `shiji_derivation` 给出天盘计神起法与主客算数，中五星标在 `core_board`／`center_marks`；无天、无地、无人等属传统数格分类。`patterns` 与 `enclosure_assessment` 列出掩、击、迫、囚、关、格、对与正宫提挟条件；`three_gates`、`menju_jiangfa` 与 `victory_matrix` 按三值条件合取与钤表栏位保留未决项。
 - **三式合参（`sanshi_combined_chart`）**：先读 `synthesis.time_scopes` 分清太乙计法与奇门／六壬时刻。`palace_correspondences` 按方位联接五将与奇门星门神及六壬地盘支位（中五不寄坤，四维寄支在 `sector_candidates` 保留候选），`noble_source_assessment` 区分通行与探原协纪贵人表。
 
 解读时先结合本次计算事实说明传统含义，再提供现实中可核对的条件，保留 `rulesets` 版本来源与 `partial`／未知边界；需要完整结果与依据时传 `detail=audit` 且 `fields=null`，不凭 `detail=compact` 默认裁剪作否定，也不重算替代。

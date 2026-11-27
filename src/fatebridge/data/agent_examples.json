@@ -2206,7 +2206,7 @@
       "transmission_progression_scope": "探原PDF110–111三传连茹／间断：sequence_direction只指支序；raw_branch_empty_conditional_*仅在支神本空适用假设下释读，不把坐空或天将天空替代本空。effective_direction和comprehensive_judgement仍未裁定，不从进退字样推成败、概率或应期。",
       "published_term_dates_scope": "逐项读取实际solar_term_dependencies中的published_date_reference：按固定UTC+08对照香港天文台1901—2100逐日表，日期相符只表示同一天，不认证交气秒数或全部历法。date_mismatch保留两日期，不能称官方一致或移动交界凑表；outside_published_range是无资料，不能说相符或不符。与分析时区、真太阳钟、历史时间约定及未来闰秒假设分列，金口诀仍按同次四位解释。",
       "seasonal_evidence_scope": "探原季节五态用本次月建支，不用月将支。当前季月整月配置分别计算支神、天将固有五行和地盘五态，日干五态不替代它们。真空／半空只列支神本空与季节状态的条件，天空天将及坐空不替换本空；季末十八日异法、扶助冲剋及角色例外后的有效真半未裁，不把原文效力折扣说成成功率。金口诀本课与附带六壬分开，不能借本层代替金口诀日下五态或综合取用。",
-      "branch_stars_scope": "京本PDF118–120所选七项神煞只给历法目标与三位本支事实。驿马条用月建支，天赦比完整日干支；不以名称或条件推出现实结局，不借六壬日马、月将或贵神落宫替代。",
+      "branch_stars_scope": "京本PDF118–120所选七项神煞只给历法目标与三位本支事实。驿马条用月建支，天赦比完整日干支；不借六壬日马、月将或贵神落宫替代。",
       "god_yin_scope": "类神阴神按实际天将所乘支再查上神，天乙依所选昼夜表互取；与四课第二、四课的阴神称谓分层。年命上神缺项保留未知，季节本空事实不替代有效空亡及日辰德合相生，综合类神可用性仍未裁。金口诀附带六壬盘的本层不替代金口诀四位取用。",
       "natal_course_scope": "jinkou.natal_course以已确认本命支另起完整四位课；未给本命支及明确出生年干支则course=null。它不是出生时刻命盘，不需要猜生时、性别或岁序；本命支作派生地分，主课原地分保留，日干、占时、月将、昼夜选择不改。不因重复提问自动换将或换日，也不宣称原典全书或预测有效。"
     },
@@ -2222,7 +2222,7 @@
       "month_affinity": "judge.deTime仅卦属月匹配；64卦总论目校含63项明确属月，无妄本月仍未确认。judge.month_affinity区分离散月份、跨年区间、季节、及时和失时；month_label_match仅月号，附加条件未决时即使月号未中也保持match=null。十三条原句的natal_najia_clause分别列月号和同一先／后天阶段出生年干支的正纳／借用位置；不可借另一阶段或deSheng合并布尔替代。及字连接范围与解卦例外未决，两项事实均不裁成整条吉凶。",
       "seasonal_numbers": "judge.seasonal_numbers分别给出正数比较、至弱太过、十一数式及六个时令窗口。重叠全部保留；numeric_band_match只判断绝对数段，得中为null未量化，不能把25/30或不在窗口推成综合吉凶。",
       "timing": "heluo_timing按影印页规则给出流年、月卦与日卦定式；analysis_year为年标签，month_index/day_index为原典序号，不能当公历年月日或精确应期；不指定年时不自动取当前年。",
-      "validation": "原典部分核验、语料未全量校勘、现实预测未验证；周易参照不替代河洛注文。",
+      "validation": "原典部分核验、语料未全量校勘；周易参照不替代河洛注文。",
       "text_collation": "乾坤屯蒙需讼师比小畜履六十条注文单次目校，commentary_sections按原文分段但applicability=null；旧文另存inherited_detail。不能借judge.xie选葉否或把歲運段用作本命断语；龍妾、掌無權、正即、無舊、女人為女人等本印本文字保留，初读撤回不计作继承错录。",
       "yuantang": "用yuantang视图核对chart.yuantang_derivation的实际性别、时组、逐位序列、至点半年和换卦。counterfactuals仅比较阴阳令敏感性，实际选择以half_year.value为准；不能据反事实改算出生盘。half_year.value或heLi为null时不补成阴令或异类。公开日期工具按出生绝对瞬间确定半年，不用整个子月或午月猜。",
       "pillar_links": "pillar_links视图核numerology_evidence.pillar_links的实际年柱起月干、所用日柱起时干、原句起头与顺行步数。立春前不用公历年干，晚子及太阳钟跨日不用未换日日干替代。干序衔接匹配不证明原典月界、日界、历史钟制或全历法准确；原书个别形式算例含衔接冲突，不能据数算可复现当真实出生盘。",
@@ -2234,14 +2234,13 @@
       "birth_clock": "numerology_evidence.birth_clock保存同次民用时刻、UTC瞬间、所选计算钟面、经度来源与是否使用。钟表时未给经度为null；太阳钟面不是新的物理瞬间。可用birth_clock视图读取。",
       "timing": "dayun_method默认bazi_appendix_v1为卷七整数借除，continuous为现代连续折算，legacy为未核旧命宫排法。配运先读timing_policy视图：schedule_basis逐原句标applied_rule／对照，区分所选附法、另书十年背景和现代落点约定；first_row为同次实际首行，旧法保留年龄标签和取文；first_period仅为已映射日期首运摘要，旧法为null，两者均非查询当段。",
       "evidence": "按年纳音部、顺逆编号与实际男女或岁运条文解释，缺条和缺字只表示语料缺口。",
-      "validation": "本命起数有限核对通过不代表起运大运体系或现实预测已经验证。",
-      "text_selection": "按benming或实际查询当段verses的selectionShun/selectionNi读五行、编号和上男／中女／下共用岁运栏，不能串栏。pair_resolution区分顺逆同号与两号、单向有文；原书允许顺有逆无或逆有顺无，本地缺行不等于原典圈空，也不能断现实灾祸。",
+      "validation": "本命起数有限核对通过不代表起运大运体系已全部核对。",
+      "text_selection": "按benming或实际查询当段verses的selectionShun/selectionNi读五行、编号和上男／中女／下共用岁运栏，不能串栏。pair_resolution区分顺逆同号与两号、单向有文；原书允许顺有逆无或逆有顺无，本地缺行不等于原典圈空。",
       "pillar_links": "pillar_links视图核numerology_evidence.pillar_links的实际年柱起月干、所用日柱起时干、原句起头与顺行步数。立春前不用公历年干，晚子及太阳钟跨日不用未换日日干替代。干序衔接匹配不证明原典月界、日界、历史钟制或全历法准确；原书个别形式算例含衔接冲突，不能据数算可复现当真实出生盘。"
     },
     "taiyi": {
       "scope": "calculation_mode支持year/month/day/hour，默认year。月计按所选节月起元，日计按金钥匙冬至前甲子积日，时计按所选至点或完整积时配置；核对实际calendar_rules及配置，现代天文与钟面适配不等于完整古历复原。玄命未实现。",
       "evidence": "按本次taiyi.calendar_rules确认岁首，再读取core_board、rule_trace、patterns、ruleset；未命中空间关系不能推成吉凶，原典分歧不隐去。",
-      "efficacy": "现实预测效力未检验；数值不是概率，独立转录案例也不证明现实效力。",
       "annual_cycles": "年计long_cycles分别用卷五积年：三基285011、五福/大游13331、小游/四神等3361，均锚724年；直符原表与正文不一致时同时展示，不用八将积数或现代地区替换原典分野。",
       "conditions": "五将/门具问题读取conditions视图（合参taiyi_conditions）；全部阻断按同次patterns路径解释。年/月计以实际门盘合取；时计三门未评估/null不能改成满足。即使两层满足也不推出实际成败。",
       "gates": "年/月按预先所选王法核三门；李法四盘及定计目门盘另列比较。默认至点时计的门盘/定计仍未算；明确选key_hour_winter_jiazi_v1可算完整积时、时支合神、定计和阴阳四门，但三门主体未决仍为null。各配置不按结果择优，不借奇门门盘补齐。",
@@ -2281,7 +2280,7 @@
     "interpret_astrology_dice": {
       "input": "planet/sign/house必须是本次实际骰面；实际第N宫传house=N-1。中文、英文和符号可直接传入；缺项追问，不猜测或抽取替代结果。",
       "context": "仅骰面解读省略date/time/timezone/经纬度；若请求独立天象背景，完整传入实际资料。tradition/house_system/zodiac_type仅作用于天象背景，不改变骰面。天象背景按astronomical_context视图选择fields。保留ephemerisReferencePoints中的系统质心、本体中心、近似及未确认参考点，不将质心写成本体中心。",
-      "interpretation": "以symbolic_details和rule_trace为依据，保留rulesets版本和来源。区分自定位与未给出的其他定位星；喜乐宫是宫号关系，不是星座尊贵或成功概率。diceChart为假设整宫示意，无真实度数、相位或ASC/MC；不得从天象背景补写骰面定位星、互容或应期。",
+      "interpretation": "以symbolic_details和rule_trace为依据，保留rulesets版本和来源。区分自定位与未给出的其他定位星；喜乐宫是宫号关系，不是星座尊贵。diceChart为假设整宫示意，无真实度数、相位或ASC/MC；不得从天象背景补写骰面定位星、互容或应期。",
       "validation": "星座条件按所引原典核对七曜，外行星和交点保留各自的条件状态。",
       "longitude_motion": "天象背景的十个物理天体按实际热带或Lahiri黄道读取chart.params.chart_profile.longitude_motion与chart.chart.objects[].motion。保留native_longitude_speed及修正分项，method_id来自实际求导记录；Moshier完整视位置求导不改变解析轨道，未收敛明确不应用。Lahiri包含所选零点的运动，不能复制热带速度。"
     },
@@ -2302,7 +2301,7 @@
       "feasibility": "feasible_zones只含用户逐区明确确认能容纳对象并保持视野的区域，不从照片空白、物件属性确认或允许移动扩展；其余省略",
       "birth_choice": "birth_date、birth_at、effective_birth_year最多传一个，不能同时传日期和时刻",
       "scene_selection": "工位scene=workstation，合租scene=shared_rental，家居scene=home；自动按事实展开飞星、金锁、八宅，局部前两法优先，显式methods优先。不为优先级补年份或宅运；年盘不替代历史宅盘。独立形态/桌面/context不要求生辰或罗盘。无场景无作者无context保留原三法默认。场景首轮fields按需追加method_policy；细节参考按需读method_details。",
-      "layout_planning": "家具动作放layout_constraints；候选放layout_alternatives，声明changes并独立提供新位置placement/form_observation，许可和physically_feasible各自确认。候选fields追加layout_analysis.alternatives_analysis；ready表示可执行门槛，不表示各方法均有利或现实效力。",
+      "layout_planning": "家具动作放layout_constraints；候选放layout_alternatives，声明changes并独立提供新位置placement/form_observation，许可和physically_feasible各自确认。候选fields追加layout_analysis.alternatives_analysis；ready表示可执行门槛，不表示各方法均有利。",
       "natal_interpretation": "玄空有限解释需 xuankong.interpretation 显式启用 xuankong_conditioned_v1；当前评价运 current_period_number 与 period_evidence 成对，不改历史宅运。external_forms 按全宅中心八宫独立确认外部山形/水形，未知省略，照片保留候选，不复用金锁砂水或室内靠背；床/门取用结合顶层 placements.location_direction，桌/灶未覆盖。",
       "environmental_context": "environmental_context提供独立环境/家庭/楼层事实，不传八字紫微喜忌；首轮fields追加layout_analysis.environmental_context。orientation分别确认direction_confirmed、north_reference、floorplan_alignment_confirmed、center_confirmed；未确认落宫不能同时传位置/砂水/外局分宫，仍可原始盘与独立形态。",
       "interior_relations": "明确非罗盘关系用environmental_context.interior_relations：relation_id/source_object_id/target_object_id/kind/present/observation_basis/evidence；present必须显式true、false或null，照片true/false均候选，不由相邻/可见推直接相对。",
@@ -2341,7 +2340,7 @@
     "firdaria": {
       "scope": "普通人生阶段问题的正常候选，窄查只用本工具，不默认运行全部西占时运。",
       "field_root": "单项读 firdaria.current_major/current_sub；聚合读 time_lords.firdaria.current_major/current_sub，不复制前缀。",
-      "time": "保留实际主运／分运起止、夜盘顺序和年长口径；阶段切换不等于现实事件日期。"
+      "time": "保留实际主运／分运起止、夜盘顺序和年长口径。"
     },
     "bazi_health": {
       "scope": "仅盘内文化分类与传统对应，不是中医体质辨识、辨证或医学评估。",
@@ -2352,7 +2351,7 @@
       "views": "首次按已选 relative_mode 取 evidence_views 对应 fields；suggested_fields 是未选专用视图时的安全联合，不要求每次读取全部分支。核对实际 relationship_profile.relative_mode_normalized/primary_layer。",
       "mode_aliases": "Comp→compare；Composite→composite；Synastry→influence；TimeSpace→timespace；Marks→marks；数值0..4依次对应这五种规范模式。",
       "delivery": "主层超预算时从 result_delivery 读取同一 run；投影后不能恢复首次未选字段。完整JSON首次 fields=null。",
-      "marks": "Marks主层为marks_chart_pair，分别读marks_charts.inner/outer；chart仅为内方别名。每盘是本人与双方Davison资料再次计算Davison，沿实际davison_variant；不使用已撤除的组合／时空盘混合算法，不把个人象征盘当双方本命、真实心意或关系成功率。"
+      "marks": "Marks主层为marks_chart_pair，分别读marks_charts.inner/outer；chart仅为内方别名。每盘是本人与双方Davison资料再次计算Davison，沿实际davison_variant；不使用已撤除的组合／时空盘混合算法，不把个人象征盘当双方共同盘。"
     },
     "bazi_career": {
       "evidence": "首轮按问题选 direction 或 target_year。按实际星位、透藏和时运触点取证。",
@@ -2388,11 +2387,11 @@
       "scope": "读取india内独立Parashari规则；顶层西占字段仅为历史兼容参考，不能冒充印占。",
       "physical_conditions": "D1 physical_state含度数区间、Baladi、0–60 Virupa Uchcha Bala分量、运动及Santhanam注释的太阳角距条件；核对combustion的source_layer、顺逆行、阈值和未裁定边界，不当作真实可见性或现实失能；D9/D10不套物理状态。dispositor_relationship为有方向的星体关系。",
       "time_scales": "profile.time_scale_context区分TT、模型UT1及冻结IERS闰秒假设；过期表后的future_leap_seconds_assumed_unchanged不能解释为已知未来时间精度。",
-      "ephemeris": "ephemeris_policy=auto回显实际逐星后端；require_data_files拒绝七个物理天体的分析模型降级，包括生时抽样。后端来源不证明预测有效。 ephemeris_model_scope=physical_bodies只汇总七个物理天体及其实际赤道/所选运动帧；Rahu/Ketu见nonphysical_factor_models，平交点为swisseph_analytical_mean_node。",
+      "ephemeris": "ephemeris_policy=auto回显实际逐星后端；require_data_files拒绝七个物理天体的分析模型降级，包括生时抽样。 ephemeris_model_scope=physical_bodies只汇总七个物理天体及其实际赤道/所选运动帧；Rahu/Ketu见nonphysical_factor_models，平交点为swisseph_analytical_mean_node。",
       "configuration": "Lahiri sidereal + whole_sign 才计算本核心。显式旧式黄道/宫制覆盖返回configuration_not_supported，不另猜分盘。",
       "sensitivity": "None不是精确生时；只传用户确认的正负范围。",
       "full_export": "完整结果fields=null，从同run的result_delivery取回。",
-      "strength": "Sthana五分量用Virupa，60=1Rupa；saptavargaja_profile仅切换七分盘系数与moolatrikona作用域。默认Santhanam27逐字七盘读法；Raman30不改其余四分量，特别Drekkana第二/三段分组仍为Santhanam。需读profile，不用总量认证吉凶、能力或成功概率。",
+      "strength": "Sthana五分量用Virupa，60=1Rupa；saptavargaja_profile仅切换七分盘系数与moolatrikona作用域。默认Santhanam27逐字七盘读法；Raman30不改其余四分量，特别Drekkana第二/三段分组仍为Santhanam。需读profile。",
       "divisions": "可选2,3,7,9,10,12,30，D1始终计算。D30不等长区段仅给星座及整宫，无唯一盘内度数；任何分盘不套物理状态。",
       "additional_balas": "Dig用实际上升/天顶角点，不用整宫起点；自然力为固定系数。Drik按Raman113-120方向差、附加特殊值、正负四分之一，未经裁定的水星性质保留scenarios，summary=null不当零；特殊附加值可超过60，不擅自截断。读source_id、nature_context、source_disagreements及shadbala_assessment；Kala/Cheshta须各自核对条件与模型状态，不拼完整六力总量。",
       "temporal_balas": "Kala与Cheshta均为出生时刻的本命分量，不是analysis_year/as_of的时运。Natha按视太阳过中天，Hora按日出后等长平均小时，不套西占不等时小时；日主日出换日，岁/月主为360/30日传统口径。月亮第八日窗口与盈亏读法、水星性质保留scenarios；星战金额按Raman76-77固定系数及本次前置力量条件计算，读取yuddha_bala.evidence/upstream_profile。",
@@ -2409,7 +2408,7 @@
     "vimshottari_dasha": {
       "clock": "公历。analysis_year给定时缺月/日各取1；完全未给日期按as_of的出生时区日期，未给钟时取00:00。出生与分析时刻的DST歧义需明确UTC偏移。",
       "periods": "Moon-nakshatra，主运/次运从完整原始主运起算；UTC日历标签按每天86400名义秒的datetime口径，不表示连续原子时历时。三种年长口径明确区分，读取elapsed_time_convention。",
-      "scope": "120年是规则周期，不是寿命估计；读当前ruler的本命上下文，不能将边界写成事件必发生。",
+      "scope": "120年是规则周期；读当前ruler的本命上下文。",
       "full_export": "完整JSON或时间线导出首次fields=null，保留默认预算，从同run result_delivery取回。",
       "strength": "主次运星可结合india.strengths.sthana_bala及其profile阅读位置分量；不把位置强度直接写成事件概率。",
       "additional_balas": "Dig用实际上升/天顶角点，不用整宫起点；自然力为固定系数。Drik按Raman113-120方向差、附加特殊值、正负四分之一，未经裁定的水星性质保留scenarios，summary=null不当零；特殊附加值可超过60，不擅自截断。读source_id、nature_context、source_disagreements及shadbala_assessment；Kala/Cheshta须各自核对条件与模型状态，不拼完整六力总量。",
@@ -2464,7 +2463,7 @@
         "purpose": "核对实际太阳弧年长钥匙及其与Witte1923推运常数原刊的关系。只在给定analysis_datetime时读取该层。",
         "source_boundary": "实际使用1个TT星历日/365.25个UTC日历日的FateBridge符号约定；不是该原刊常数法的完整实现。",
         "reading": "读取profile.key_policy/year_days/key_years/progressed_julian_day_tt与key_source_comparison。原刊八项时角运算有两项不一致，残差单位为时角时间秒；它们不属于当前命盘，不能加到用户钟时或黄经。民用夜间日期与正午起算天文日标签尚未独立裁定，不从事件反推。",
-        "limits": "精确算术与真实接口一致性不证明原典整体、真实模型解释或现实预测已验收。"
+        "limits": "精确算术与真实接口一致性不代表原典整体已验收。"
       },
       "witte1925_table": {
         "purpose": "核对Witte1925原刊完整太阳弧表、数值插值和原载分步算例，不将其冒充当前盘的太阳弧。",
@@ -2543,7 +2542,7 @@
       "personal_day_witnesses": "有本命宿时读取personal_day.source_day_evidence，分别引用上卷、下卷和又一说；未说明距离不能套远行条文，personal_departure是启程，long_distance_traveler_entering_residence是远行人入宅，不限定回自己家，互不代推。荣日启请法要用monastic_dharma_request，须明确出家人身份和请教行为；religious_learning不反向推出身份。",
       "actor_purpose_social_scope": "forming_friendship是明确结交交友，不限首次相识，social_gathering是聚会，不互相推断。personal_departure本人启程不证明private_journey因私；下卷日曜远行另须royal_or_official_traveler与long_distance_journey同时明确，出差或使节任务不证明身份，上卷不同范围继续保留。",
       "calendar_reference": "读取calendar_reference的日期来源类别、版本与支持范围及资料差异。2015起是出版方参考推算，不能说成已核对逐年神宫原刊；固定UTC+09不是历史日本地方时。旧月度候选仍拒绝接入，新后端来自完整逐日事实；文档到2033与LOD到2031的差异继续保留，范围外不能换中国历补齐。",
-      "six_palaces": "six_palace_reference按已确认natal_mansion本身计一，交付命/事/意/聚/同/克六个本命相对位置；未给本命则status=natal_mansion_required。不得由日宿、星期、六类相性或十二宫足表补出本命，也不得把这些位置直接当已判定七曜凌犯、六害期间或现实灾祸；读取seven_luminary_transits_evaluated和三九参断evaluated。",
+      "six_palaces": "six_palace_reference按已确认natal_mansion本身计一，交付命/事/意/聚/同/克六个本命相对位置；未给本命则status=natal_mansion_required。不得由日宿、星期、六类相性或十二宫足表补出本命，也不得把这些位置直接当已判定七曜凌犯或六害期间；读取seven_luminary_transits_evaluated和三九参断evaluated。",
       "historical_reference": "显式calendar_basis=japanese_naoj_historical_utc09使用NAOJ冻结月首参考，前推公历0001-01-01至1872-12-31、固定UTC+09；不因地点或古代出生年自动选择。阴历年0只作来源上下文，非公元0年输入。453阴历年及以前为儀鳳暦平朔回推；454起亦为具历史校正的参考，不能称当时颁历、观测或地方钟时已证明。",
       "historical_source_variants": "NAOJ与HuTime1001.1完整月首对照保留210个分歧日期；calendar_reference.cross_source_comparison的control_fields未代入主结果，二者部分共用文献来源。即使配宿相同也须保留月/日/闰标志不同，不能称全历史历法一致。1872年旧历十二月只存两天；1873-01-01不延续旧历，不自动切现代日本参考。",
       "lower_date_boundary": "固定时差的公元1年边界以完整区间代数保留0000-12-31来源分支及UTC端点；这是天文年编号的计算标签，不能说成已支持公元0年出生或历史UTC实测。读取epoch秒及范围外分支，未知钟时不补造。",
@@ -2563,8 +2562,8 @@
       "casting": "只支持年月日時取数；输入公历钟时，按指定时区查中国农历。不得把八字立春年柱代替农历年支。",
       "conventions": "春节换年、民用午夜换日、闰月沿用本月数、节月季令是明示约定；不是原文唯一裁定。",
       "reading": "用、体互、用互、变用均相对原体分析；经文按实际卦码与动爻引用。is_active=false为其他爻单动的假设参考。",
-      "limits": "季令只列所选规则的旺衰，不据此生造现实概率、外应或精确应期；现实效力未验证。",
-      "weather": "天时占显式选interpretation_topic=weather并复制weather字段卡到fields。按selected_readings的effective_status/controlled_tags/conditional_tags解释，不能只读raw status=matched。controls保留阈值和五/六位置及合计/单卦范围分歧，不投票。旧1.0.0研究组合128/209未胜过同日始终无雨134/209；不冒称当前组件已做现实预测验收。",
+      "limits": "季令只列所选规则的旺衰，不据此生造外应或精确应期。",
+      "weather": "天时占显式选interpretation_topic=weather并复制weather字段卡到fields。按selected_readings的effective_status/controlled_tags/conditional_tags解释，不能只读raw status=matched。controls保留阈值和五/六位置及合计/单卦范围分歧，不投票。",
       "weather_text": "selected_readings.source_witnesses保留影印选段与所引固定转录的文字差异。四时多雨不改成保证有雨；未辨清的字形或主语不凭熟悉文本补齐。震多春夏须核实际季节，巽多四时与兑多亦阴均须明示阈值和五/六位置资格；兑阴不是无雨标签。目读由助手完成，非独立专家或全章认证。",
       "weather_research": "research_validation的旧1.0.0/2025结果与additional_profile_audits的1.5.0/2024结果分别读取，不能跨政策和年份合并。后者16/29、337弃权，与同日恒无雨16/29相同；主终点按全366日正确贡献16计，对比恒无雨214，未通过。全队列正确贡献不是命中率；实际前瞻观测仍0。",
       "weather_seasonal": "1.6.0新增秋金晴、冬坎雪、春土雨按固定卷二转录1441921；乾兑或坤艮任一见于实际本互变即可，不要求两者同现或多字阈值。仅用已确认weather_context.season，未知不从公历月份猜。所选文明书局冬句未见坎之水，春句坤兌与转录坤艮不同；逐条保留textual_status/source_witnesses，不默改底本，也不将土雨象随坎雨一并取消。旧现实检验不认证1.6.0。",
@@ -2582,13 +2581,13 @@
       "external_manifestations": "external_observations接收已报manifestation类别及label描述，可选填motion=moving或stationary。未知不猜，不按问题文字或未查看场景自动分类。适用于全部人事题篇（general/planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler/household/dwelling/marriage/dining）。",
       "stage_emphasis": "读取interpretation.stage_emphasis或stage_emphasis字段卡。matter_scenario只接调用方已确认的原文所问事项类别：favorable_matter问吉事、unfavorable_matter问不吉之事，不是愿望、情绪、系统预测或已发生结果；未知不补，不由题篇、关键词或关系推断，天气拒绝此参数。scenario_declaration保留原值、caller_declared_unverified及原输入路径。",
       "motion_context": "observer_activity只接已确认占者当时seated坐/walking行/standing立，未知不补；external_observations逐条motion可为moving/stationary，未知省略，不从水土类别、label、问句、车辆运动或内卦角色推断。读interpretation.motion_context或motion字段卡。内卦体互静、用变动是符号角色；与外物运动、占者活动分列，各候选保留自身原体及外应资格路径。",
-      "quiet_context": "observation_context只接同次起卦与占者已报label及quiet_room/nothing_heard/nothing_seen三项严格布尔，未知省略或null；未采集不等于确认无所闻见。读quiet字段卡。全真仅核对所选文明书局《静占》的不论外卦条件，不代表完整年月日衰旺合参、心境、起占资格或现实预测有效。静室不推占者坐/行/立；问题文字和本卦动爻不补闻见事实。",
+      "quiet_context": "observation_context只接同次起卦与占者已报label及quiet_room/nothing_heard/nothing_seen三项严格布尔，未知省略或null；未采集不等于确认无所闻见。读quiet字段卡。全真仅核对所选文明书局《静占》的不论外卦条件，不代表完整年月日衰旺合参。静室不推占者坐/行/立；问题文字和本卦动爻不补闻见事实。",
       "day_qi": "Read interpretation.day_qi for selected NLC1925 day-branch element and month/day strength.",
       "situational_responses": "Only when caller reports response_context for the same casting episode, use situational field card. Map querent occupied compass side, present weather, setting and human source categories against each candidate own original body.",
       "omen_reversal": "Explicitly reported external_observations manifestation gold_silver_treasure/weapon uses NLC1925內外論 original-body symbol qualifications.",
-      "obstruction_days": "interpretation.stage_emphasis.obstruction_timing按本候选原体列克体阻节日数。须调用方明确matter_scenario=favorable_matter且实际内卦同时有生体、克体才激活；乾1兑2为原句明例，其余六卦为类推。重复角色不累加，多卦日数不选总和/最大/最小；未给起算日及计日边界，不生成完成日期，不把日数当成功概率。",
-      "trigram_relation_symbols": "按trigram_symbols字段卡核对所选16条史料象义：仅实际用生体或用克体的角色匹配对应卦名，不能以同五行替代卦名。所有或字为备选，不自动识别姓名、性别、身份、实际方位或事件；受制与未知旺衰保留，各取爻候选用自己的原体。所选巽克体作南方，固定转录作东南，不据八卦常识换字；不是现实灾祸、临床、应期或预测效力判断。",
-      "reputation_supplement": "reputation另读chapter_qualifications的5条补充句、八卦時序及方道原文；reputation_context只接收已确认的原文在任与職任之處条件，不从已就业、考试、问句或label推定。未知省略/null，布尔须明确。初始五条不变，各候选沿用自身原体及四个辅助角色，生体和克体分别列自身时序、受制与旺衰；内卦无克体不等于已确认完整内外无克体。在任条件满足也不输出处分、灾祸或现实结局。",
+      "obstruction_days": "interpretation.stage_emphasis.obstruction_timing按本候选原体列克体阻节日数。须调用方明确matter_scenario=favorable_matter且实际内卦同时有生体、克体才激活；乾1兑2为原句明例，其余六卦为类推。重复角色不累加，多卦日数不选总和/最大/最小；未给起算日及计日边界，不生成完成日期。",
+      "trigram_relation_symbols": "按trigram_symbols字段卡核对所选16条史料象义：仅实际用生体或用克体的角色匹配对应卦名，不能以同五行替代卦名。所有或字为备选，不自动识别姓名、性别、身份或方位；受制与未知旺衰保留，各取爻候选用自己的原体。所选巽克体作南方，固定转录作东南，不据八卦常识换字。",
+      "reputation_supplement": "reputation另读chapter_qualifications的5条补充句、八卦時序及方道原文；reputation_context只接收已确认的原文在任与職任之處条件，不从已就业、考试、问句或label推定。未知省略/null，布尔须明确。初始五条不变，各候选沿用自身原体及四个辅助角色，生体和克体分别列自身时序、受制与旺衰；内卦无克体不等于已确认完整内外无克体。",
       "traveler_frame": "traveler按行人章初始五条及补充六句，返归仍以原体为参照，在外另以初用为受作用者。chapter_qualifications.initial_use_frame逐列原体、体互、用互、变用对初用的实际有向关系；体生用可为初用受生，用生体不能改写成用受生。初用月令衰且实际受克须同成立，原文未定与缺月令保持未知，内卦未见不证明完整内外没有。震多艮多门槛与范围未裁定；坎兑句只标明初用经卦读法。保留影印盈旺/转录在外之情況、紛爭之應/紛爭差异。",
       "postheaven_timing": "端法名义应期数见motion_context.postheaven_count_reference：仅observed_trigrams/observed_categories且占者observer_activity明确时，原上下卦先天序数加原时支数一次，以除六前总数按行1/2、坐2、立1作精确比例。奇数取半保留分数，不取动爻余数，不推定主体活动、时间单位、起算时刻、天数、日期或现实观测窗口。已有卦的起法未知，数起卦和年月日时起卦不借用此式。",
       "qi_day_timing": "求名/求财且day_qi已知时，topic_reading.qi_day_timing_reference按原章句实际生体/克体角色核时序明列日支，求名另保留无克体条件未全核时的原体参照；不得用原体或变用替代指定角色。坤辰戌丑未月是月限定，日支原子只取未申年月日時中的未/申；这是明列标签相符，不是五行旺衰或全时序条件。其他数字、季节、五行干支条文未解析，原子不符不等于全条件否定；在任及完整内外无克体前提另列。",
@@ -2624,7 +2623,7 @@
       "sources": "字形与传统平上去入由已确认资料给出；不能用现代普通话声调或规范字笔画替换。端法上下卦已确认，采用乾一兑二等先天卦序取数。",
       "unknowns": "没有season_month_branch时不算季令；不补当前日期或时辰。existing模式保留原卦码与动爻，不重起。",
       "conventions": "丈尺不加时且不用寸，尺寸加时而不用分；字占按具体例不暗加时。物数以实际数量取上卦、时支数取下卦，取爻保留原时支数且只加一次。物数与两段声音超八取爻有约定边界，保留line_sum_basis和counting_variants中各自的本变互、体用及stage_relations，不把默认口径当唯一原典答案。",
-      "weather": "天时占显式选interpretation_topic=weather并复制weather字段卡到fields。按selected_readings的effective_status/controlled_tags/conditional_tags解释，不能只读raw status=matched。controls保留阈值和五/六位置及合计/单卦范围分歧，不投票。旧1.0.0研究组合128/209未胜过同日始终无雨134/209；不冒称当前组件已做现实预测验收。",
+      "weather": "天时占显式选interpretation_topic=weather并复制weather字段卡到fields。按selected_readings的effective_status/controlled_tags/conditional_tags解释，不能只读raw status=matched。controls保留阈值和五/六位置及合计/单卦范围分歧，不投票。",
       "candidate_readings": "一般分支的interpretation.casting_readings按每个取爻候选分别给出生克、同一已报节月下的季令及实际动爻经文，fact_prefix指向自身counting_variants；纯乾坤按各自变卦取互。不可把所选口径的体气或爻辞套给另一候选。casting_comparison仅比较所列计算事实，不合成现实成败。",
       "weather_text": "selected_readings.source_witnesses保留影印选段与所引固定转录的文字差异。四时多雨不改成保证有雨；未辨清的字形或主语不凭熟悉文本补齐。震多春夏须核实际季节，巽多四时与兑多亦阴均须明示阈值和五/六位置资格；兑阴不是无雨标签。目读由助手完成，非独立专家或全章认证。",
       "weather_research": "research_validation的旧1.0.0/2025结果与additional_profile_audits的1.5.0/2024结果分别读取，不能跨政策和年份合并。后者16/29、337弃权，与同日恒无雨16/29相同；主终点按全366日正确贡献16计，对比恒无雨214，未通过。全队列正确贡献不是命中率；实际前瞻观测仍0。",
@@ -2644,13 +2643,13 @@
       "stage_emphasis": "读取interpretation.stage_emphasis或stage_emphasis字段卡。matter_scenario只接调用方已确认的原文所问事项类别：favorable_matter问吉事、unfavorable_matter问不吉之事，不是愿望、情绪、系统预测或已发生结果；未知不补，不由题篇、关键词或关系推断，天气拒绝此参数。scenario_declaration保留原值、caller_declared_unverified及原输入路径。",
       "motion_context": "observer_activity只接已确认占者当时seated坐/walking行/standing立，未知不补；external_observations逐条motion可为moving/stationary，未知省略，不从水土类别、label、问句、车辆运动或内卦角色推断。读interpretation.motion_context或motion字段卡。内卦体互静、用变动是符号角色；与外物运动、占者活动分列，各候选保留自身原体及外应资格路径。",
       "observed_categories": "observed_categories为独立文明书局所选端法入口，只接已确认subject_category老人elder_person/少年young_person/牛cow/鸡chicken/槁木dry_wood及非空subject_description，single_subject_confirmed必须明确true；群物、未知类别、只知普通树木或未确认枯木不补成单一物象。",
-      "quiet_context": "observation_context只接同次起卦与占者已报label及quiet_room/nothing_heard/nothing_seen三项严格布尔，未知省略或null；未采集不等于确认无所闻见。读quiet字段卡。全真仅核对所选文明书局《静占》的不论外卦条件，不代表完整年月日衰旺合参、心境、起占资格或现实预测有效。静室不推占者坐/行/立；问题文字和本卦动爻不补闻见事实。",
+      "quiet_context": "observation_context只接同次起卦与占者已报label及quiet_room/nothing_heard/nothing_seen三项严格布尔，未知省略或null；未采集不等于确认无所闻见。读quiet字段卡。全真仅核对所选文明书局《静占》的不论外卦条件，不代表完整年月日衰旺合参。静室不推占者坐/行/立；问题文字和本卦动爻不补闻见事实。",
       "day_qi": "Read interpretation.day_qi for selected NLC1925 day-branch element and month/day strength.",
       "situational_responses": "Only when caller reports response_context for the same casting episode, use situational field card. Map querent occupied compass side, present weather, setting and human source categories against each candidate own original body.",
       "omen_reversal": "Explicitly reported external_observations manifestation gold_silver_treasure/weapon uses NLC1925內外論 original-body symbol qualifications.",
-      "obstruction_days": "interpretation.stage_emphasis.obstruction_timing按本候选原体列克体阻节日数。须调用方明确matter_scenario=favorable_matter且实际内卦同时有生体、克体才激活；乾1兑2为原句明例，其余六卦为类推。重复角色不累加，多卦日数不选总和/最大/最小；未给起算日及计日边界，不生成完成日期，不把日数当成功概率。",
-      "trigram_relation_symbols": "按trigram_symbols字段卡核对所选16条史料象义：仅实际用生体或用克体的角色匹配对应卦名，不能以同五行替代卦名。所有或字为备选，不自动识别姓名、性别、身份、实际方位或事件；受制与未知旺衰保留，各取爻候选用自己的原体。所选巽克体作南方，固定转录作东南，不据八卦常识换字；不是现实灾祸、临床、应期或预测效力判断。",
-      "reputation_supplement": "reputation另读chapter_qualifications的5条补充句、八卦時序及方道原文；reputation_context只接收已确认的原文在任与職任之處条件，不从已就业、考试、问句或label推定。未知省略/null，布尔须明确。初始五条不变，各候选沿用自身原体及四个辅助角色，生体和克体分别列自身时序、受制与旺衰；内卦无克体不等于已确认完整内外无克体。在任条件满足也不输出处分、灾祸或现实结局。",
+      "obstruction_days": "interpretation.stage_emphasis.obstruction_timing按本候选原体列克体阻节日数。须调用方明确matter_scenario=favorable_matter且实际内卦同时有生体、克体才激活；乾1兑2为原句明例，其余六卦为类推。重复角色不累加，多卦日数不选总和/最大/最小；未给起算日及计日边界，不生成完成日期。",
+      "trigram_relation_symbols": "按trigram_symbols字段卡核对所选16条史料象义：仅实际用生体或用克体的角色匹配对应卦名，不能以同五行替代卦名。所有或字为备选，不自动识别姓名、性别、身份或方位；受制与未知旺衰保留，各取爻候选用自己的原体。所选巽克体作南方，固定转录作东南，不据八卦常识换字。",
+      "reputation_supplement": "reputation另读chapter_qualifications的5条补充句、八卦時序及方道原文；reputation_context只接收已确认的原文在任与職任之處条件，不从已就业、考试、问句或label推定。未知省略/null，布尔须明确。初始五条不变，各候选沿用自身原体及四个辅助角色，生体和克体分别列自身时序、受制与旺衰；内卦无克体不等于已确认完整内外无克体。",
       "traveler_frame": "traveler按行人章初始五条及补充六句，返归仍以原体为参照，在外另以初用为受作用者。chapter_qualifications.initial_use_frame逐列原体、体互、用互、变用对初用的实际有向关系；体生用可为初用受生，用生体不能改写成用受生。初用月令衰且实际受克须同成立，原文未定与缺月令保持未知，内卦未见不证明完整内外没有。震多艮多门槛与范围未裁定；坎兑句只标明初用经卦读法。保留影印盈旺/转录在外之情況、紛爭之應/紛爭差异。",
       "postheaven_timing": "端法名义应期数见motion_context.postheaven_count_reference：仅observed_trigrams/observed_categories且占者observer_activity明确时，原上下卦先天序数加原时支数一次，以除六前总数按行1/2、坐2、立1作精确比例。奇数取半保留分数，不取动爻余数，不推定主体活动、时间单位、起算时刻、天数、日期或现实观测窗口。已有卦的起法未知，数起卦和年月日时起卦不借用此式。",
       "qi_day_timing": "求名/求财且day_qi已知时，topic_reading.qi_day_timing_reference按原章句实际生体/克体角色核时序明列日支，求名另保留无克体条件未全核时的原体参照；不得用原体或变用替代指定角色。坤辰戌丑未月是月限定，日支原子只取未申年月日時中的未/申；这是明列标签相符，不是五行旺衰或全时序条件。其他数字、季节、五行干支条文未解析，原子不符不等于全条件否定；在任及完整内外无克体前提另列。",
@@ -2884,7 +2883,7 @@
         ]
       },
       "yuantang": {
-        "purpose": "核对实际元堂配时、阴阳令来源、两半年的敏感性及后天换卦；反事实不是两个出生盘或现实预测。",
+        "purpose": "核对实际元堂配时、阴阳令来源、两半年的敏感性及后天换卦；反事实不是两个出生盘。",
         "fields": [
           "four_pillars",
           "chart.gender",
@@ -3711,7 +3710,7 @@
     },
     "qimen": {
       "directional": {
-        "when": "读相关宫位与方位；局号不能代替九宫；不把盘面当现实结果保证",
+        "when": "读相关宫位与方位；局号不能代替九宫",
         "fields": [
           "analysis_context",
           "four_pillars",
@@ -3871,7 +3870,7 @@
         ]
       },
       "ptolemy": {
-        "when": "指定 Ptolemy／Robbins 1940 原典子集，核对章节、实际计算关系及 III.10 昼夜同式福点；不扩展为全文或现实效力认证",
+        "when": "指定 Ptolemy／Robbins 1940 原典子集，核对章节、实际计算关系及 III.10 昼夜同式福点；不扩展为全文认证",
         "fields": [
           "person_info",
           "chart_profile",
@@ -4702,7 +4701,7 @@
         ]
       },
       "clothing": {
-        "when": "按明确衣事动作核对专章、跨卷条文、明本未识别字及半日候选；未宣称现实病灾。",
+        "when": "按明确衣事动作核对专章、跨卷条文、明本未识别字及半日候选。",
         "fields": [
           "sukuyo.calendar",
           "sukuyo.day_mansion",
@@ -4724,7 +4723,7 @@
           "validation",
           "summary"
         ],
-        "purpose": "完整衣事上下文。口诀和上卷预测式原句为单独文献见证，不作为新的现实预测或加权评分；源注与缺项完整保留。"
+        "purpose": "完整衣事上下文。口诀和上卷原句为单独文献见证；源注与缺项完整保留。"
       },
       "calendar_date_only": {
         "when": "钟时未知时读取完整历法、日期／宿候选和事项证据；核对天文与宫位的未计算状态。",
@@ -4919,7 +4918,7 @@
         ]
       },
       "stage_emphasis": {
-        "description": "所报原文问事情境、内卦紧次及迟速／生克条件；整句条件适用不等于净作用或现实结局",
+        "description": "所报原文问事情境、内卦紧次及迟速／生克条件",
         "fields": [
           "analysis_context",
           "meihua.seed",
@@ -4928,7 +4927,7 @@
         ]
       },
       "stage_emphasis_audit": {
-        "description": "所报原文问事情境、内卦紧次及迟速／生克条件；整句条件适用不等于净作用或现实结局",
+        "description": "所报原文问事情境、内卦紧次及迟速／生克条件",
         "fields": [
           "analysis_context",
           "meihua",
@@ -5051,7 +5050,7 @@
     },
     "liuren_chart": {
       "core": {
-        "purpose": "四课三传、旬遁空亡、探原十干十二运、贵人方向与来源；各规则口径分列，不能据此认证现实预测。",
+        "purpose": "四课三传、旬遁空亡、探原十干十二运、贵人方向与来源；各规则口径分列。",
         "fields": [
           "analysis_context",
           "four_pillars",
@@ -5306,7 +5305,7 @@
         ]
       },
       "natal_absolute": {
-        "purpose": "已确认本命支与本次将神的京本大绝配对；省略本命支时保留未知，不从占时或行年替代，不据结构断言现实结局。",
+        "purpose": "已确认本命支与本次将神的京本大绝配对；省略本命支时保留未知，不从占时或行年替代。",
         "fields": [
           "four_pillars",
           "jinkou.rows",
@@ -5564,7 +5563,7 @@
           "birth_utc",
           "variables.personality_colors"
         ],
-        "purpose": "按人格日地/交点的实际Color及一致对点读取官方Motivation/View类别名、来源定位和本盘局部依据；同箭头编码不保证Color类别相同。出生盘不测量现实心理、转移或分心状态，不将类别当完整PHS、384线原典或现实预测验收。完整比较和时间样本读取同一run。"
+        "purpose": "按人格日地/交点的实际Color及一致对点读取官方Motivation/View类别名、来源定位和本盘局部依据；同箭头编码不保证Color类别相同。完整比较和时间样本读取同一run。"
       },
       "gate_context": {
         "fields": [
@@ -5625,7 +5624,7 @@
         ]
       },
       "rules": {
-        "purpose": "核查历法约定、原文配置与安星步骤；不是全书或现实预测认证。",
+        "purpose": "核查历法约定、原文配置与安星步骤；不扩展为全书认证。",
         "fields": [
           "analysis_context",
           "ziwei_birth.ruleset",
@@ -6055,7 +6054,7 @@
         ]
       },
       "stage_emphasis": {
-        "description": "所报原文问事情境、内卦紧次及迟速／生克条件；整句条件适用不等于净作用或现实结局",
+        "description": "所报原文问事情境、内卦紧次及迟速／生克条件",
         "fields": [
           "input_normalized",
           "meihua.seed",
@@ -6065,7 +6064,7 @@
         ]
       },
       "stage_emphasis_audit": {
-        "description": "所报原文问事情境、内卦紧次及迟速／生克条件；整句条件适用不等于净作用或现实结局",
+        "description": "所报原文问事情境、内卦紧次及迟速／生克条件",
         "fields": [
           "input_normalized",
           "meihua",
@@ -6601,7 +6600,7 @@
         ]
       },
       "ut1_input": {
-        "purpose": "核对明确选择的模型或IERS20 C04 UT1来源、固定覆盖期、源文件名称与版本、插值区间与未应用修正；盘面与地平计算仍要求覆盖内UT1；地心TT黄经事件不外推UT1即可跨边界搜索，未取得瞬时观测误差或现实预测证据。",
+        "purpose": "核对明确选择的模型或IERS20 C04 UT1来源、固定覆盖期、源文件名称与版本、插值区间与未应用修正；盘面与地平计算仍要求覆盖内UT1；地心TT黄经事件不外推UT1即可跨边界搜索，未取得瞬时观测误差。",
         "fields": [
           "analysis_context",
           "clock_conversion",
@@ -6688,7 +6687,7 @@
         ]
       },
       "ut1_input": {
-        "purpose": "核对明确选择的模型或IERS20 C04 UT1来源、固定覆盖期、源文件名称与版本、插值区间与未应用修正；盘面与地平计算仍要求覆盖内UT1；地心TT黄经事件不外推UT1即可跨边界搜索，未取得瞬时观测误差或现实预测证据。",
+        "purpose": "核对明确选择的模型或IERS20 C04 UT1来源、固定覆盖期、源文件名称与版本、插值区间与未应用修正；盘面与地平计算仍要求覆盖内UT1；地心TT黄经事件不外推UT1即可跨边界搜索，未取得瞬时观测误差。",
         "fields": [
           "analysis_context",
           "clock_conversion",
@@ -6799,7 +6798,7 @@
           "reference_only",
           "reference_details"
         ],
-        "scope": "Only domain=human_design: complete384line locator/polarity index; actual registry coverage separates pending local paraphrases, uncurated meanings and independent semantic acceptance. Preserve source conditions and unknown personal applicability. Source facts are not personal fixing states. Keep same-run calculation evidence separate; no complete original-source, publisher-master or real-world efficacy certificate."
+        "scope": "Only domain=human_design: complete384line locator/polarity index; actual registry coverage separates pending local paraphrases, uncurated meanings and independent semantic acceptance. Preserve source conditions and unknown personal applicability. Source facts are not personal fixing states. Keep same-run calculation evidence separate; no complete original-source or publisher-master certificate."
       },
       "numerology_reference": {
         "fields": [

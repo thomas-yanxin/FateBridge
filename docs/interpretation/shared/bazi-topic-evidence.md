@@ -17,7 +17,7 @@
 - 转述 `career_type/traits/suitable_roles` 等规则类比时须忠于实际字段值，与用户现实职责分开。
 - 路径从对应 `<dim>_analysis` 根读取（标准命盘在 `bazi_birth`），不跨工具混用前缀；数组选择所属整个字段后再读取条目。
 - 未知出生时刻不能猜测或填默认 `0`/`12` 时；同一目标范围与精度内复用 `timing_context`，交节当日需小时精度时按[共享时间选择](timing-selection.md)补齐所需时间层。
-- 涉及生死、疾病、临床诊断、医疗择时与生育结局时遵守[硬边界](safety-boundaries.md)。
+- 涉及生死、疾病、临床诊断与医疗择时时遵守[硬边界](safety-boundaries.md)。
 
 ## 格局、扶抑与调候分别取证
 

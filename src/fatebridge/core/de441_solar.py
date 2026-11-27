@@ -46,5 +46,5 @@ def model_details() -> dict[str, object]:
         "native_moshier_relabelled": False,
         "reference_values_used_at_runtime": False,
         "accuracy_certified": False,
-        "scope": "Named bounded DE441 representation and shared optical reduction, not stock Swiss Moshier or a runtime load of the original JPL file. Finite comparisons do not certify all epochs, civil UTC or predictive efficacy.",
+        "scope": "Named bounded DE441 representation and shared optical reduction, not stock Swiss Moshier or a runtime load of the original JPL file. Finite comparisons do not certify all epochs or civil UTC.",
     }
