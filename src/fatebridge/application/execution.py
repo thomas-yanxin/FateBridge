@@ -101,7 +101,11 @@ def execute_with_receipt(
                 replay_overrides[seed_field] = seed
             result = invoke_validated_service(spec, request)
         except Exception as exc:
-            return handle_calculation_error(exc, spec.operation_label_zh)
+            return handle_calculation_error(
+                exc,
+                spec.operation_label_zh,
+                allowed_fields=spec.request_model.model_fields.keys(),
+            )
         elapsed_ms = (perf_counter() - started) * 1000
         if result_is_error(result):
             return result

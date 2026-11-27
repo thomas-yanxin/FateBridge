@@ -161,6 +161,10 @@
       "category": "wealth",
       "key": "财库"
     },
+    "place_lookup": {
+      "query": "北京",
+      "limit": 5
+    },
     "ipip_big_five": {
       "action": "list_items"
     },
@@ -558,11 +562,83 @@
       "latitude": 39.9042,
       "topic_id": "general"
     },
-    "bazi_luck_cycles": "demo",
-    "bazi_monthly_timing": "demo",
-    "bazi_daily_timing": "demo",
-    "bazi_hourly_timing": "demo",
-    "solar_term_timeline": "demo",
+    "bazi_luck_cycles": {
+      "name": "演示甲",
+      "gender": "男",
+      "birth_year": 1990,
+      "birth_month": 5,
+      "birth_day": 15,
+      "birth_hour": 10,
+      "birth_minute": 30,
+      "birth_timezone": "Asia/Shanghai",
+      "birth_place": "北京",
+      "birth_longitude": 116.4074,
+      "birth_latitude": 39.9042,
+      "analysis_year": 2026
+    },
+    "bazi_monthly_timing": {
+      "name": "演示甲",
+      "gender": "男",
+      "birth_year": 1990,
+      "birth_month": 5,
+      "birth_day": 15,
+      "birth_hour": 10,
+      "birth_minute": 30,
+      "birth_timezone": "Asia/Shanghai",
+      "birth_place": "北京",
+      "birth_longitude": 116.4074,
+      "birth_latitude": 39.9042,
+      "analysis_year": 2026,
+      "analysis_month": 10
+    },
+    "bazi_daily_timing": {
+      "name": "演示甲",
+      "gender": "男",
+      "birth_year": 1990,
+      "birth_month": 5,
+      "birth_day": 15,
+      "birth_hour": 10,
+      "birth_minute": 30,
+      "birth_timezone": "Asia/Shanghai",
+      "birth_place": "北京",
+      "birth_longitude": 116.4074,
+      "birth_latitude": 39.9042,
+      "analysis_year": 2026,
+      "analysis_month": 10,
+      "analysis_day": 12
+    },
+    "bazi_hourly_timing": {
+      "name": "演示甲",
+      "gender": "男",
+      "birth_year": 1990,
+      "birth_month": 5,
+      "birth_day": 15,
+      "birth_hour": 10,
+      "birth_minute": 30,
+      "birth_timezone": "Asia/Shanghai",
+      "birth_place": "北京",
+      "birth_longitude": 116.4074,
+      "birth_latitude": 39.9042,
+      "analysis_year": 2026,
+      "analysis_month": 10,
+      "analysis_day": 12,
+      "analysis_hour": 14,
+      "analysis_minute": 0
+    },
+    "solar_term_timeline": {
+      "name": "演示甲",
+      "gender": "男",
+      "birth_year": 1990,
+      "birth_month": 5,
+      "birth_day": 15,
+      "birth_hour": 10,
+      "birth_minute": 30,
+      "birth_timezone": "Asia/Shanghai",
+      "birth_place": "北京",
+      "birth_longitude": 116.4074,
+      "birth_latitude": 39.9042,
+      "analysis_year": 2026
+    },
     "solar_terms_for_year": {
       "year": 2026
     },
@@ -584,6 +660,13 @@
     }
   },
   "compact_fields": {
+    "place_lookup": [
+      "query",
+      "status",
+      "resolved",
+      "candidates",
+      "summary"
+    ],
     "fengshui_minggua": [
       "status",
       "layers.minggua",

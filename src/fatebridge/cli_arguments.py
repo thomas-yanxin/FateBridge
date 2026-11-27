@@ -270,13 +270,26 @@ def build_parser(
 
     batch = sub.add_parser(
         "batch",
-        help="从 JSON 请求文件（或标准输入 -）批量执行多对象多工具计算",
+        help="从 JSON 请求文件（或标准输入 -）批量执行多对象多工具计算；支持 --schema / --example",
     )
     batch.add_argument(
         "--request-file",
-        required=True,
+        required=False,
+        default=None,
         metavar="PATH|-",
         help="批量计算 JSON 请求文件路径，或传 - 从标准输入读取",
+    )
+    batch.add_argument(
+        "--schema",
+        action="store_true",
+        default=False,
+        help="输出 batch 接口契约、限制与 BatchRequest JSON Schema",
+    )
+    batch.add_argument(
+        "--example",
+        action="store_true",
+        default=False,
+        help="输出可配合 --request-file 使用的批量计算示例 JSON",
     )
 
     for spec in CATALOG:

@@ -11,6 +11,7 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+from pydantic_core import PydanticCustomError
 
 from fatebridge.core.heluo.judgment import (
     DEFAULT_MONTH_ASSIGNMENT,
@@ -215,22 +216,44 @@ class SixYaoRequest(LocalLocationFields):
     @model_validator(mode="after")
     def complete_lines(self) -> "SixYaoRequest":
         if self.lines and len(self.lines) != 6:
-            raise ValueError("六爻 lines 必须恰为 6 条，按初爻至上爻排列")
+            raise PydanticCustomError(
+                "invalid_lines_count",
+                "六爻 lines 必须恰为 6 条，按初爻至上爻排列",
+                {"path": "lines", "expected": 6},
+            )
         if self.focus_kind in ("month", "day") and self.focus_line is not None:
-            raise ValueError("日月取用不能同时指定爻位")
+            raise PydanticCustomError(
+                "conflicting_focus_line",
+                "日月取用不能同时指定爻位",
+                {"path": "focus_line"},
+            )
         if (
             self.focus_kind in ("visible", "changed", "hidden")
             and self.focus_line is None
             and self.focus_kinship is None
         ):
-            raise ValueError("指定爻类取用还须提供focus_line或focus_kinship")
+            raise PydanticCustomError(
+                "missing_focus_target",
+                "指定爻类取用还须提供focus_line或focus_kinship",
+                {
+                    "path": "focus_kind",
+                    "required_with": ["focus_line", "focus_kinship"],
+                },
+            )
         if (
             self.timing_days
             and self.focus_line is None
             and self.focus_kinship is None
             and self.focus_kind is None
         ):
-            raise ValueError("展开日级候选需要先明确focus_line或focus_kinship")
+            raise PydanticCustomError(
+                "missing_focus_for_timing",
+                "展开日级候选需要先明确focus_line或focus_kinship",
+                {
+                    "path": "timing_days",
+                    "required_with": ["focus_line", "focus_kinship"],
+                },
+            )
         return self
 
 
@@ -360,7 +383,11 @@ class SuZhanRequest(_LocalChartSystemFields):
             self.calendar_day_part is not None
             and self.calendar_profile != "hinoo_t1299_host27"
         ):
-            raise ValueError("原典日序半日只适用于明确选择的Hinoo研究档案")
+            raise PydanticCustomError(
+                "invalid_calendar_day_part",
+                "原典日序半日只适用于明确选择的Hinoo研究档案",
+                {"path": "calendar_day_part"},
+            )
         validate_activity_details(self.activity, self.activity_details)
         return self
 
@@ -460,7 +487,11 @@ class CanpingRequest(NumerologyBirthRequest):
             self.dayun_method == "legacy_minggong_v1"
             and self.analysis_datetime is not None
         ):
-            raise ValueError("legacy方法没有已核实的日期映射，不能查询精确时刻。")
+            raise PydanticCustomError(
+                "unsupported_analysis_datetime",
+                "legacy方法没有已核实的日期映射，不能查询精确时刻。",
+                {"path": "analysis_datetime"},
+            )
         return self
 
 
@@ -494,9 +525,17 @@ class HeluoRequest(NumerologyBirthRequest):
     @model_validator(mode="after")
     def require_timing_parent(self) -> "HeluoRequest":
         if self.month_index is not None and self.analysis_year is None:
-            raise ValueError("month_index需要analysis_year年标签。")
+            raise PydanticCustomError(
+                "missing_analysis_year",
+                "month_index需要analysis_year年标签。",
+                {"path": "month_index", "required_with": ["analysis_year"]},
+            )
         if self.day_index is not None and self.month_index is None:
-            raise ValueError("day_index需要month_index月序号。")
+            raise PydanticCustomError(
+                "missing_month_index",
+                "day_index需要month_index月序号。",
+                {"path": "day_index", "required_with": ["month_index"]},
+            )
         return self
 
 

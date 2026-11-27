@@ -15,6 +15,10 @@ calculate_knowledge_registry = service_ref(
     "fatebridge.services.knowledge", "calculate_knowledge_registry"
 )
 
+calculate_place_lookup = service_ref(
+    "fatebridge.services.places", "calculate_place_lookup"
+)
+
 
 def compact_knowledge_catalog(result: ServiceResult) -> ServiceResult:
     """Return a concise (<5 KB) domain/category index without duplicate provenance trees."""
@@ -80,5 +84,17 @@ SPECS: list[ToolSpec] = [
         uses_astronomy_runtime=False,
         output_validators=(validate_knowledge_bindings,),
         compact_view=compact_knowledge_read,
+    ),
+    ToolSpec(
+        name="place_lookup",
+        bind=bind_kwargs(calculate_place_lookup),
+        request_model_loader=request_model_ref(
+            "fatebridge.core.requests.reference", "PlaceLookupRequest"
+        ),
+        summary="查询内置地名坐标、时区与行政层级，同名地名返回消歧候选。",
+        operation_label_zh="地名坐标查询",
+        family="knowledge",
+        rest_path="/api/places/lookup",
+        uses_astronomy_runtime=False,
     ),
 ]

@@ -48,7 +48,9 @@ def _cli_example(spec: ToolSpec, inputs: ServiceResult) -> str:
     return shlex.join(parts)
 
 
-def _print_tools(specs: list[ToolSpec] | None = None) -> None:
+def _print_tools(
+    specs: list[ToolSpec] | None = None, *, include_footer: bool = True
+) -> None:
     selected = CATALOG if specs is None else specs
     grouped: dict[str, list[ToolSpec]] = {}
     for spec in selected:
@@ -58,6 +60,15 @@ def _print_tools(specs: list[ToolSpec] | None = None) -> None:
         lines.append(f"\n[{family}] ({len(items)})")
         for spec in items:
             lines.append(f"  {spec.name:<30} {spec.operation_label_zh}")
+    if include_footer:
+        lines.append("\n[commands] 辅助与批量命令")
+        lines.append(
+            "  batch                          多对象多工具批量计算（--schema / --example / --request-file PATH|-）"
+        )
+        lines.append(
+            "  discover [tool]                查看工具契约与示例（支持 discover batch）"
+        )
+        lines.append("  doctor                         检查安装、依赖与 MCP 连通性")
     print("\n".join(lines))
 
 
@@ -127,8 +138,32 @@ def run(argv: list[str] | None = None) -> int:
 
     if args.command == "batch":
         from fatebridge.application.batch import BatchRequest, execute_batch
+        from fatebridge.application.discovery import describe_batch_interface
         from fatebridge.utils.errors import handle_calculation_error
         from fatebridge.utils.formatting import format_json_response
+
+        if args.schema:
+            print(json.dumps(describe_batch_interface(), ensure_ascii=False, indent=2))
+            return 0
+        if args.example:
+            print(
+                json.dumps(
+                    describe_batch_interface()["example_input"],
+                    ensure_ascii=False,
+                    indent=2,
+                )
+            )
+            return 0
+        if not args.request_file:
+            return emit_error(
+                {
+                    "error": "batch 需要提供 --request-file PATH|-、--schema 或 --example",
+                    "error_code": "usage_error",
+                    "status_code": 400,
+                    "retryable": False,
+                },
+                2,
+            )
 
         try:
             batch_data = _load_batch_payload(args.request_file)
@@ -152,13 +187,24 @@ def run(argv: list[str] | None = None) -> int:
         except (
             Exception
         ) as exc:  # noqa: BLE001 - translate failures at the CLI boundary
-            return emit_error(handle_calculation_error(exc, "batch"), 1)
+            return emit_error(
+                handle_calculation_error(
+                    exc,
+                    "batch",
+                    allowed_fields=BatchRequest.model_fields.keys(),
+                ),
+                1,
+            )
 
         print(format_json_response(payload, compact=False))
         return 0
 
     if args.command in {"list", "discover"}:
-        from fatebridge.application.discovery import discover_specs, select_specs
+        from fatebridge.application.discovery import (
+            describe_batch_interface,
+            discover_specs,
+            select_specs,
+        )
         from fatebridge.utils.errors import ParameterError
 
         tool_name = getattr(args, "tool_pos", None) or args.tool
@@ -170,6 +216,21 @@ def run(argv: list[str] | None = None) -> int:
         }
         try:
             if args.command == "discover":
+                if (
+                    tool_name == "batch"
+                    and args.family is None
+                    and args.q is None
+                    and args.surface is None
+                ):
+                    print(
+                        json.dumps(
+                            describe_batch_interface(),
+                            ensure_ascii=False,
+                            indent=2,
+                            default=str,
+                        )
+                    )
+                    return 0
                 catalog = discover_specs(
                     CATALOG,
                     detail=args.detail,
@@ -181,7 +242,7 @@ def run(argv: list[str] | None = None) -> int:
                 print(json.dumps(catalog, ensure_ascii=False, indent=2, default=str))
             else:
                 selected = select_specs(CATALOG, **filters)
-                _print_tools(selected)
+                _print_tools(selected, include_footer=not any(filters.values()))
         except ParameterError as exc:
             return emit_error(exc.as_result(), 2 if exc.status_code == 404 else 1)
         return 0
@@ -228,7 +289,11 @@ def run(argv: list[str] | None = None) -> int:
         )
     except Exception as exc:  # noqa: BLE001 - translate failures at the CLI boundary
         return emit_error(
-            handle_calculation_error(exc, spec.operation_label_zh),
+            handle_calculation_error(
+                exc,
+                spec.operation_label_zh,
+                allowed_fields=spec.request_model.model_fields.keys(),
+            ),
             1,
         )
 

@@ -445,3 +445,47 @@ def test_metadata_failures_are_internal_and_consistent_in_all_transports(
     assert normalized[0] == normalized[1] == normalized[2]
     assert "private-server-error" not in caplog.text
     assert "ValueError" in caplog.text and ".fail:" in caplog.text
+
+
+def test_extra_forbidden_suggestions_and_projection_suggestions_across_transports(
+    rest: TestClient, capsys: pytest.CaptureFixture[str], tmp_path: Path
+) -> None:
+    from fatebridge.application.projection import project_fields
+    from fatebridge.utils.errors import ParameterError
+
+    bad_payload = {
+        **REST_POST_CASES["/api/bazi/birth-chart"](),
+        "birth_huor": 10,
+    }
+    http = rest.post("/api/bazi/birth-chart", json=bad_payload)
+    assert http.status_code == 422
+
+    async def call_mcp() -> CallToolResult:
+        async with Client(mcp.app) as client:
+            return await call_calculation(
+                client, "bazi_birth_chart", bad_payload, raise_on_error=False
+            )
+
+    mcp_res = asyncio.run(call_mcp())
+    assert mcp_res.is_error
+
+    req_file = tmp_path / "bad.json"
+    req_file.write_text(json.dumps(bad_payload), encoding="utf-8")
+    capsys.readouterr()
+    code = cli_run(["bazi_birth_chart", "--request-file", str(req_file)])
+    assert code == 1
+    cli_res = json.loads(capsys.readouterr().out)
+
+    for body in (http.json(), mcp_res.structured_content, cli_res):
+        issue = body["issues"][0]
+        assert issue["path"] == "birth_huor"
+        assert issue["code"] == "extra_forbidden"
+        assert "birth_hour" in issue["constraints"]["suggestions"]
+
+    with pytest.raises(ParameterError) as proj_err:
+        project_fields(
+            {"bazi_birth": {"day_master": 1}, "summary": "x"}, ["bazi_birth.day_mastr"]
+        )
+    proj_issue = proj_err.value.issues[0]
+    assert proj_issue["code"] == "unknown_projection_path"
+    assert proj_issue["constraints"]["suggestions"] == ["day_master"]

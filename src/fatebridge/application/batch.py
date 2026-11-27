@@ -19,6 +19,7 @@ from pydantic import (
     model_validator,
 )
 from pydantic.fields import FieldInfo
+from pydantic_core import PydanticCustomError
 
 from fatebridge.application.execution import execute_with_receipt, result_is_error
 from fatebridge.application.response_delivery import deliver_response
@@ -90,21 +91,37 @@ class SubjectProfile(BaseModel):
     def _parse_and_validate_birth_clock(self) -> SubjectProfile:
         if self.birth_date is not None:
             if not _DATE_RE.fullmatch(self.birth_date):
-                raise ValueError("birth_date 须为 YYYY-MM-DD 格式")
+                raise PydanticCustomError(
+                    "invalid_birth_date_format",
+                    "birth_date 须为 YYYY-MM-DD 格式",
+                    {"path": "birth_date"},
+                )
             try:
                 parsed_date = date.fromisoformat(self.birth_date)
             except ValueError as exc:
-                raise ValueError("birth_date 不是有效的公历日期") from exc
+                raise PydanticCustomError(
+                    "invalid_calendar_date",
+                    "birth_date 不是有效的公历日期",
+                    {"path": "birth_date"},
+                ) from exc
             if self.birth_year is None:
                 self.birth_year = parsed_date.year
                 if self.birth_month is None:
                     self.birth_month = parsed_date.month
                 elif self.birth_month != parsed_date.month:
-                    raise ValueError("birth_date 与 birth_month 不一致")
+                    raise PydanticCustomError(
+                        "conflicting_birth_date",
+                        "birth_date 与 birth_month 不一致",
+                        {"path": "birth_date"},
+                    )
                 if self.birth_day is None:
                     self.birth_day = parsed_date.day
                 elif self.birth_day != parsed_date.day:
-                    raise ValueError("birth_date 与 birth_day 不一致")
+                    raise PydanticCustomError(
+                        "conflicting_birth_date",
+                        "birth_date 与 birth_day 不一致",
+                        {"path": "birth_date"},
+                    )
             else:
                 if (
                     self.birth_year != parsed_date.year
@@ -116,8 +133,10 @@ class SubjectProfile(BaseModel):
                         self.birth_day is not None and self.birth_day != parsed_date.day
                     )
                 ):
-                    raise ValueError(
-                        "birth_date 与 birth_year/birth_month/birth_day 不一致"
+                    raise PydanticCustomError(
+                        "conflicting_birth_date",
+                        "birth_date 与 birth_year/birth_month/birth_day 不一致",
+                        {"path": "birth_date"},
                     )
         elif (
             self.birth_year is not None
@@ -128,30 +147,50 @@ class SubjectProfile(BaseModel):
             try:
                 date(self.birth_year, self.birth_month, self.birth_day)
             except ValueError as exc:
-                raise ValueError("出生年月日不是有效的公历日期") from exc
+                raise PydanticCustomError(
+                    "invalid_calendar_date",
+                    "出生年月日不是有效的公历日期",
+                    {"path": "birth_date"},
+                ) from exc
 
         if self.birth_time is not None:
             match = _TIME_RE.fullmatch(self.birth_time)
             if match is None:
-                raise ValueError("birth_time 须为 HH:MM 或 HH:MM:SS 格式")
+                raise PydanticCustomError(
+                    "invalid_birth_time_format",
+                    "birth_time 须为 HH:MM 或 HH:MM:SS 格式",
+                    {"path": "birth_time"},
+                )
             hour = int(match.group(1))
             minute = int(match.group(2))
             second = int(match.group(3)) if match.group(3) is not None else None
             if not (0 <= hour <= 23 and 0 <= minute <= 59) or (
                 second is not None and not 0 <= second <= 59
             ):
-                raise ValueError("birth_time 超出有效时分秒范围")
+                raise PydanticCustomError(
+                    "invalid_birth_time",
+                    "birth_time 超出有效时分秒范围",
+                    {"path": "birth_time"},
+                )
             if self.birth_hour is None:
                 self.birth_hour = hour
                 if self.birth_minute is None:
                     self.birth_minute = minute
                 elif self.birth_minute != minute:
-                    raise ValueError("birth_time 与 birth_minute 不一致")
+                    raise PydanticCustomError(
+                        "conflicting_birth_time",
+                        "birth_time 与 birth_minute 不一致",
+                        {"path": "birth_time"},
+                    )
                 if second is not None:
                     if self.birth_second is None:
                         self.birth_second = second
                     elif self.birth_second != second:
-                        raise ValueError("birth_time 与 birth_second 不一致")
+                        raise PydanticCustomError(
+                            "conflicting_birth_time",
+                            "birth_time 与 birth_second 不一致",
+                            {"path": "birth_time"},
+                        )
             else:
                 if (
                     self.birth_hour != hour
@@ -162,8 +201,10 @@ class SubjectProfile(BaseModel):
                         and self.birth_second != second
                     )
                 ):
-                    raise ValueError(
-                        "birth_time 与 birth_hour/birth_minute/birth_second 不一致"
+                    raise PydanticCustomError(
+                        "conflicting_birth_time",
+                        "birth_time 与 birth_hour/birth_minute/birth_second 不一致",
+                        {"path": "birth_time"},
                     )
 
         return self
@@ -198,7 +239,11 @@ class BatchCall(BaseModel):
     @model_validator(mode="after")
     def _reject_both_subject_forms(self) -> BatchCall:
         if self.subject is not None and self.subjects is not None:
-            raise ValueError("subject 与 subjects 不能同时指定")
+            raise PydanticCustomError(
+                "conflicting_subject_fields",
+                "subject 与 subjects 不能同时指定",
+                {"path": "subjects"},
+            )
         return self
 
 
@@ -695,7 +740,11 @@ def execute_batch(
             )
         except Exception as exc:  # noqa: BLE001 - isolate per-call failures
             failed += 1
-            failure = handle_calculation_error(exc, spec.operation_label_zh)
+            failure = handle_calculation_error(
+                exc,
+                spec.operation_label_zh,
+                allowed_fields=spec.request_model.model_fields.keys(),
+            )
             results.append(
                 {
                     "id": call.id,
