@@ -18,7 +18,6 @@ from pydantic import (
     ConfigDict,
     Field,
     StrictBool,
-    StrictFloat,
     StrictInt,
     ValidationInfo,
     field_validator,
@@ -26,7 +25,12 @@ from pydantic import (
 )
 from pydantic_core import PydanticCustomError
 
-from fatebridge.core.fengshui.directions import MOUNTAIN_BY_NAME, sitting_support
+from fatebridge.core.fengshui.calendar import year_context
+from fatebridge.core.fengshui.directions import (
+    MOUNTAIN_BY_NAME,
+    sitting_from_mountain,
+    sitting_support,
+)
 from fatebridge.core.requests.base import FateBridgeBaseRequest
 from fatebridge.core.response_models import (
     Object,
@@ -261,10 +265,10 @@ class GeomagneticReference(FengshuiInput):
         default="auto",
         description="地磁模型：auto（2025-2030用WMM2025，1900-2025用IGRF-14）、wmm2025_v1 或 igrf14_v1",
     )
-    latitude: StrictFloat = Field(ge=-90, le=90, allow_inf_nan=False)
-    longitude: StrictFloat = Field(ge=-180, le=180, allow_inf_nan=False)
-    height_km_wgs84: StrictFloat = Field(
-        ge=-1, le=850, allow_inf_nan=False, description="WGS84椭球高(km)"
+    latitude: float = Field(ge=-90, le=90, allow_inf_nan=False)
+    longitude: float = Field(ge=-180, le=180, allow_inf_nan=False)
+    height_km_wgs84: float = Field(
+        default=0.0, ge=-1, le=850, allow_inf_nan=False, description="WGS84椭球高(km)"
     )
     model_date: date | None = Field(
         default=None,
@@ -272,10 +276,12 @@ class GeomagneticReference(FengshuiInput):
         le=date(2030, 1, 1),
         description="UTC参考日期(YYYY-MM-DD)；与decimal_year二选一",
     )
-    decimal_year: StrictFloat | None = Field(
+    decimal_year: float | None = Field(
         default=None, ge=1900, le=2030, allow_inf_nan=False
     )
-    evidence: str = Field(min_length=1, pattern=r"\S", description="地点与参考日期来源")
+    evidence: str | None = Field(
+        default=None, min_length=1, pattern=r"\S", description="地点与参考日期来源"
+    )
 
     @field_validator("model_date", mode="before")
     @classmethod
@@ -341,11 +347,11 @@ class MingguaRequest(TimeInput):
     birth_date: date | None = Field(
         default=None, description="公历出生日期；与有效生年/出生时刻三选一"
     )
-    effective_birth_year: Year | None = Field(
+    birth_year: Year | None = Field(
         default=None, ge=1800, le=2199, description="已确认换年后的有效生年"
     )
     birth_at: datetime | None = Field(default=None, description="含时区的 ISO 出生时刻")
-    gender_convention: Literal["male", "female"] | None = Field(
+    gender: Literal["male", "female"] | None = Field(
         default=None, description="传统男女起算法；未知时返回两个候选"
     )
     year_boundary: Literal["lichun", "january_1"] = Field(
@@ -358,11 +364,11 @@ class MingguaRequest(TimeInput):
         if (
             sum(
                 v is not None
-                for v in (self.effective_birth_year, self.birth_at, self.birth_date)
+                for v in (self.birth_year, self.birth_at, self.birth_date)
             )
             > 1
         ):
-            raise ValueError("effective_birth_year、birth_at、birth_date 只能提供一项")
+            raise ValueError("birth_year、birth_at、birth_date 只能提供一项")
         if self.birth_date is not None and not 1801 <= self.birth_date.year <= 2199:
             raise ValueError("birth_date 支持 1801–2199 年")
         if self.birth_at is not None:
@@ -374,7 +380,9 @@ class MingguaRequest(TimeInput):
 
 
 class Occupant(MingguaRequest):
-    subject_id: str = Field(min_length=1, max_length=100, description="住户稳定标识")
+    subject_id: str | None = Field(
+        default=None, min_length=1, max_length=100, description="住户稳定标识"
+    )
 
 
 class House(FengshuiInput):
@@ -389,28 +397,31 @@ class House(FengshuiInput):
         allow_inf_nan=False,
         description="宅向角度，0°北顺时针",
     )
+    facing_mountain: Mountain | None = Field(
+        default=None, description="已确认住宅朝向二十四山（未提供 facing_degrees 时可选）"
+    )
     bearing_uncertainty_degrees: float | None = Field(
         default=None,
         ge=0,
         le=180,
-        strict=True,
         allow_inf_nan=False,
         description="宅向测量误差半径（度）",
     )
     north_reference: NorthReference | None = Field(
-        default=None, description="参考北：magnetic 或 true"
+        default=None, description="参考北：magnetic 或 true；提供角度时默认 magnetic"
     )
     orientation_basis: Basis = "user_confirmed"
     division_method: Literal["confirmed_angular_sectors"] = "confirmed_angular_sectors"
 
     @model_validator(mode="after")
     def bearing_reference(self) -> "House":
+        if self.facing_degrees is not None and self.facing_mountain is not None:
+            raise ValueError("facing_degrees 与 facing_mountain 不能同时提供")
         if self.bearing_uncertainty_degrees is not None and self.facing_degrees is None:
             raise ValueError("宅向误差半径须同时提供 facing_degrees")
         if self.facing_degrees is not None and self.north_reference is None:
-            raise ValueError("角度输入必须明确 north_reference")
-        if self.bearing_uncertainty_degrees is not None:
-            self.check_sitting_trigram(self.bearing_uncertainty_degrees)
+            self.north_reference = "magnetic"
+        self.check_sitting_trigram(self.bearing_uncertainty_degrees or 0.0)
         return self
 
     def check_sitting_trigram(self, radius: float) -> None:
@@ -421,6 +432,10 @@ class House(FengshuiInput):
             )
             if self.sitting_trigram not in {c["sitting_trigram"] for c in supported}:
                 raise ValueError("宅向推导的坐山与 sitting_trigram 不一致")
+        if self.facing_mountain is not None and self.sitting_trigram is not None:
+            derived = sitting_from_mountain(self.facing_mountain)["trigram"]
+            if self.sitting_trigram != derived:
+                raise ValueError("facing_mountain 推导的坐山与 sitting_trigram 不一致")
 
 
 PLACEMENT_FACING_ROLES = {
@@ -441,17 +456,10 @@ PLACEMENT_SCHEMA_CONSTRAINTS: dict[str, Any] = {
         {
             "anyOf": [
                 {
-                    "properties": {
-                        f: {"type": "null"} for f in ("facing_direction", "facing_role")
-                    }
+                    "required": ["facing_direction"],
+                    "properties": {"facing_direction": {"type": "string"}},
                 },
-                {
-                    "required": ["facing_direction", "facing_role"],
-                    "properties": {
-                        f: {"type": "string"}
-                        for f in ("facing_direction", "facing_role")
-                    },
-                },
+                {"properties": {"facing_role": {"type": "null"}}},
             ]
         },
         *[
@@ -472,11 +480,11 @@ PLACEMENT_SCHEMA_CONSTRAINTS: dict[str, Any] = {
 
 
 class Placement(FengshuiInput):
-    """门床桌灶已确认方位。至少提供位置或朝向；朝向和对应 facing_role 须成对。"""
+    """门床桌灶已确认方位。至少提供位置或朝向；提供朝向时可省略 facing_role 自动匹配。"""
 
     model_config = ConfigDict(json_schema_extra=PLACEMENT_SCHEMA_CONSTRAINTS)
 
-    object_id: str = Field(min_length=1, max_length=100)
+    object_id: str | None = Field(default=None, min_length=1, max_length=100)
     purpose: Literal["door", "bed", "desk", "stove"]
     location_direction: Direction | None = Field(default=None, description="已确认落宫")
     facing_direction: Direction | None = Field(default=None, description="已确认朝向")
@@ -502,14 +510,26 @@ class Placement(FengshuiInput):
             raise ValueError("对象共用住户 subject_ids 必须唯一")
         if self.location_direction is None and self.facing_direction is None:
             raise ValueError("布局对象至少提供位置或朝向")
-        if (self.facing_direction is None) != (self.facing_role is None):
-            raise ValueError("facing_direction 和 facing_role 必须一起提供")
-        if (
-            self.facing_role is not None
-            and self.facing_role != PLACEMENT_FACING_ROLES[self.purpose]
-        ):
+        if self.facing_direction is None and self.facing_role is not None:
+            raise ValueError("无 facing_direction 时不得单独提供 facing_role")
+        expected_role = PLACEMENT_FACING_ROLES[self.purpose]
+        if self.facing_direction is not None and self.facing_role is None:
+            self.facing_role = cast(
+                Literal["door_facing", "headboard", "desk_facing", "fire_mouth"],
+                expected_role,
+            )
+        if self.facing_role is not None and self.facing_role != expected_role:
             raise ValueError("facing_role 与 purpose 不匹配")
         return self
+
+
+def _next_auto_id(prefix: str, used: set[str]) -> str:
+    idx = 1
+    while f"{prefix}_{idx}" in used:
+        idx += 1
+    candidate = f"{prefix}_{idx}"
+    used.add(candidate)
+    return candidate
 
 
 class BazhaiRequest(FengshuiInput):
@@ -524,8 +544,22 @@ class BazhaiRequest(FengshuiInput):
             self.house.check_sitting_trigram(
                 self.house.bearing_uncertainty_degrees or 0
             )
-        ids = [o.subject_id for o in self.occupants]
-        objects = [p.object_id for p in self.placements]
+        used_subjects = {o.subject_id for o in self.occupants if o.subject_id is not None}
+        if self.house is not None:
+            used_subjects.add(self.house.object_id)
+        for o in self.occupants:
+            if o.subject_id is None:
+                o.subject_id = _next_auto_id("occupant", used_subjects)
+
+        used_objects = {p.object_id for p in self.placements if p.object_id is not None}
+        if self.house is not None:
+            used_objects.add(self.house.object_id)
+        for p in self.placements:
+            if p.object_id is None:
+                p.object_id = _next_auto_id("placement", used_objects)
+
+        ids = [cast(str, o.subject_id) for o in self.occupants]
+        objects = [cast(str, p.object_id) for p in self.placements]
         if len(set(ids)) != len(ids) or len(set(objects)) != len(objects):
             raise ValueError("住户及布局对象 ID 必须分别唯一")
         if self.house is not None and self.house.object_id in ids:
@@ -547,12 +581,14 @@ class BazhaiRequest(FengshuiInput):
 
 
 class EnvironmentFeature(FengshuiInput):
-    object_id: str = Field(min_length=1, max_length=100)
+    object_id: str | None = Field(default=None, min_length=1, max_length=100)
     direction: Direction | None = Field(default=None, description="已确认八宫方位")
     mountain: Mountain | None = Field(default=None, description="已确认二十四山位")
     classification: Literal["sand", "water", "mixed", "unknown"]
-    classification_basis: Basis
-    evidence: str = Field(min_length=1, max_length=1000)
+    classification_basis: Basis = "user_confirmed"
+    evidence: str | None = Field(
+        default=None, min_length=1, max_length=1000, pattern=r"\S"
+    )
     label: str | None = Field(default=None, max_length=100)
 
     @model_validator(mode="after")
@@ -569,13 +605,21 @@ class EnvironmentFeature(FengshuiInput):
         return self
 
 
+def _assign_feature_ids(features: list[EnvironmentFeature]) -> None:
+    used = {f.object_id for f in features if f.object_id is not None}
+    for f in features:
+        if f.object_id is None:
+            f.object_id = _next_auto_id("feature", used)
+
+
 class JinsuoRequest(FengshuiInput):
     features: list[EnvironmentFeature] = Field(default_factory=list, max_length=500)
     ruleset_id: JinsuoRuleset = "jinsuo_basic_fixed_v1"
 
     @model_validator(mode="after")
     def unique_features(self) -> "JinsuoRequest":
-        ids = [f.object_id for f in self.features]
+        _assign_feature_ids(self.features)
+        ids = [cast(str, f.object_id) for f in self.features]
         if len(set(ids)) != len(ids):
             raise ValueError("环境特征 object_id 必须唯一")
         return self
@@ -624,15 +668,20 @@ class MonthlyRequest(TimeInput):
 
 
 class HousePeriod(TimeInput):
-    basis: Literal[
-        "construction_completion",
-        "first_occupancy",
-        "confirmed_major_renovation",
-        "expert_confirmed",
-    ]
-    evidence: str = Field(min_length=1, max_length=2000)
+    basis: (
+        Literal[
+            "construction_completion",
+            "first_occupancy",
+            "confirmed_major_renovation",
+            "expert_confirmed",
+        ]
+        | None
+    ) = None
+    evidence: str | None = Field(
+        default=None, min_length=1, max_length=2000, pattern=r"\S"
+    )
     period_number: int | None = Field(default=None, ge=1, le=9)
-    effective_event_year: int | None = Field(default=None, ge=1800, le=2199)
+    event_year: int | None = Field(default=None, ge=1800, le=2199)
     event_at: datetime | None = None
     qualifies_for_period_reset: bool | None = None
 
@@ -641,21 +690,27 @@ class HousePeriod(TimeInput):
         if (
             sum(
                 x is not None
-                for x in (self.period_number, self.effective_event_year, self.event_at)
+                for x in (self.period_number, self.event_year, self.event_at)
             )
             != 1
         ):
             raise ValueError(
-                "定运需且仅需 period_number、effective_event_year、event_at 之一"
+                "定运需且仅需 period_number、event_year、event_at 之一"
             )
-        if not self.evidence.strip():
-            raise ValueError("定运 evidence 不得为空白")
+        if self.basis is None:
+            self.basis = (
+                "expert_confirmed"
+                if self.period_number is not None
+                else "construction_completion"
+            )
         if self.event_at is not None:
             AnnualRequest(query_at=self.event_at, timezone_name=self.timezone_name)
         if self.basis == "expert_confirmed" and self.period_number is None:
             raise ValueError("expert_confirmed 必须显式确认 period_number")
         if self.basis == "confirmed_major_renovation":
-            if self.qualifies_for_period_reset is not True:
+            if self.qualifies_for_period_reset is None:
+                self.qualifies_for_period_reset = True
+            elif self.qualifies_for_period_reset is not True:
                 raise ValueError("大修换运须明确 qualifies_for_period_reset=true")
         elif self.qualifies_for_period_reset is not None:
             raise ValueError("qualifies_for_period_reset 仅用于已确认的大修换运")
@@ -664,8 +719,12 @@ class HousePeriod(TimeInput):
 
 class CityGateObservation(FengshuiInput):
     mountain: Mountain
-    observation_basis: Literal["measured", "user_confirmed", "image_observed"]
-    evidence: str = Field(min_length=1, max_length=2000, pattern=r"\S")
+    observation_basis: Literal["measured", "user_confirmed", "image_observed"] = (
+        "user_confirmed"
+    )
+    evidence: str | None = Field(
+        default=None, min_length=1, max_length=2000, pattern=r"\S"
+    )
     water_present: StrictBool | None = None
     multiple_openings_present: StrictBool | None = None
     encircling_form_present: StrictBool | None = None
@@ -704,8 +763,10 @@ class CityGateObservation(FengshuiInput):
 
 class CityGateRequest(FengshuiInput):
     ruleset_id: Literal["shen_city_gate_v1"] = "shen_city_gate_v1"
-    reference_period_number: StrictInt = Field(ge=1, le=9)
-    period_evidence: str = Field(min_length=1, max_length=2000, pattern=r"\S")
+    reference_period_number: StrictInt | None = Field(default=None, ge=1, le=9)
+    period_evidence: str | None = Field(
+        default=None, min_length=1, max_length=2000, pattern=r"\S"
+    )
     observations: list[CityGateObservation] = Field(default_factory=list, max_length=24)
 
     @model_validator(mode="after")
@@ -721,8 +782,12 @@ class LingzhengObservation(FengshuiInput):
     high_solid_terrain_present: StrictBool | None = None
     low_lying_terrain_present: StrictBool | None = None
     river_water_present: StrictBool | None = None
-    observation_basis: Literal["measured", "user_confirmed", "image_observed"]
-    evidence: str = Field(min_length=1, max_length=1000, pattern=r"\S")
+    observation_basis: Literal["measured", "user_confirmed", "image_observed"] = (
+        "user_confirmed"
+    )
+    evidence: str | None = Field(
+        default=None, min_length=1, max_length=1000, pattern=r"\S"
+    )
 
     @model_validator(mode="after")
     def observed_facts(self) -> "LingzhengObservation":
@@ -748,8 +813,8 @@ class FixedLingzhengRequest(FengshuiInput):
 
     @model_validator(mode="after")
     def explicit_half_and_unique_directions(self) -> "FixedLingzhengRequest":
-        if (self.five_period_half is None) != (self.half_evidence is None):
-            raise ValueError("五运分段与half_evidence必须一起提供")
+        if self.five_period_half is None and self.half_evidence is not None:
+            raise ValueError("未指定五运分段时不得单独提供 half_evidence")
         if len({o.direction for o in self.observations}) != len(self.observations):
             raise ValueError("零正外局同一方向不可重复")
         return self
@@ -759,15 +824,17 @@ class ExternalFormObservation(FengshuiInput):
     direction: Direction
     mountain_present: StrictBool | None = None
     water_present: StrictBool | None = None
-    observation_basis: Literal["measured", "user_confirmed", "image_observed"]
-    evidence: str = Field(min_length=1, max_length=1000, pattern=r"\S")
+    observation_basis: Literal["measured", "user_confirmed", "image_observed"] = (
+        "user_confirmed"
+    )
+    evidence: str | None = Field(
+        default=None, min_length=1, max_length=1000, pattern=r"\S"
+    )
 
     @model_validator(mode="after")
     def explicit_observation(self) -> "ExternalFormObservation":
         if self.mountain_present is None and self.water_present is None:
             raise ValueError("外局须至少明确山形或水形的一项观察")
-        if not self.evidence.strip():
-            raise ValueError("外局 evidence 不得为空白")
         return self
 
 
@@ -789,6 +856,7 @@ class XuankongInterpretationRequest(FengshuiInput):
         if self.fixed_lingzheng is not None:
             if (
                 self.fixed_lingzheng.five_period_half is not None
+                and self.current_period_number is not None
                 and self.current_period_number != 5
             ):
                 raise ValueError("零正五运分段仅可用于明确评价五运")
@@ -801,10 +869,6 @@ class XuankongInterpretationRequest(FengshuiInput):
                     raise ValueError(
                         "同一全宅方向的有水事实不能在飞星与固定零正观察中冲突"
                     )
-        if (self.current_period_number is None) != (self.period_evidence is None):
-            raise ValueError("current_period_number 与 period_evidence 必须一起提供")
-        if self.period_evidence is not None and not self.period_evidence.strip():
-            raise ValueError("period_evidence 不得为空白")
         directions = [o.direction for o in self.external_forms]
         if len(set(directions)) != len(directions):
             raise ValueError("同一全宅外局方向不能重复")
@@ -831,10 +895,15 @@ class XuankongRequest(FengshuiInput):
                 raise ValueError("本玄空版本的宅向误差半径最多支持7.5度")
         if self.house is not None:
             self.house.check_sitting_trigram(self.effective_bearing_uncertainty)
-        if (
-            self.house is not None
-            and self.house.facing_degrees is not None
-            and self.house.north_reference != "magnetic"
+        if self.house is not None and (
+            (
+                self.house.facing_degrees is not None
+                and self.house.north_reference != "magnetic"
+            )
+            or (
+                self.house.facing_mountain is not None
+                and self.house.north_reference == "true"
+            )
         ):
             raise ValueError("本玄空版本使用磁北宅向；真北需先完成磁偏角校正")
         if (
@@ -846,6 +915,25 @@ class XuankongRequest(FengshuiInput):
             raise ValueError(
                 "current_period_number 与 interpretation.current_period_number 不一致"
             )
+        if self.current_period_number is not None:
+            if (
+                self.interpretation is not None
+                and self.interpretation.current_period_number is None
+            ):
+                self.interpretation.current_period_number = self.current_period_number
+            if (
+                self.city_gate is not None
+                and self.city_gate.reference_period_number is None
+            ):
+                self.city_gate.reference_period_number = self.current_period_number
+        if (
+            self.interpretation is not None
+            and self.interpretation.fixed_lingzheng is not None
+            and self.interpretation.fixed_lingzheng.five_period_half is not None
+            and self.interpretation.current_period_number is not None
+            and self.interpretation.current_period_number != 5
+        ):
+            raise ValueError("零正五运分段仅可用于明确评价五运")
         return self
 
     @property
@@ -861,8 +949,8 @@ class XuankongRequest(FengshuiInput):
 class AssessRequest(BazhaiRequest):
     """Multi-layer assessment decoupled from AnnualRequest mutual exclusion."""
 
-    analyze_layout: bool = Field(
-        default=False, description="是否计算跨层布局落宫与四层叠盘"
+    analyze_layout: bool | None = Field(
+        default=None, description="是否计算跨层布局落宫与四层叠盘；默认有 placements 时自动启用"
     )
     features: list[EnvironmentFeature] = Field(default_factory=list, max_length=500)
     effective_year: Year | None = Field(
@@ -875,6 +963,18 @@ class AssessRequest(BazhaiRequest):
         default=None, description="含时区查询时刻，用于月/日/时紫白及默认年星"
     )
     timezone_name: str = Field(default="Asia/Shanghai")
+    built_year: Year | None = Field(
+        default=None,
+        ge=1800,
+        le=2199,
+        description="住宅建成或换运有效年份（扁平简写，等效于 xuankong.period.event_year）",
+    )
+    period_number: int | None = Field(
+        default=None,
+        ge=1,
+        le=9,
+        description="住宅元运 1–9（扁平简写，等效于 xuankong.period.period_number）",
+    )
     methods: list[Method] | None = None
     jinsuo_ruleset_id: JinsuoRuleset = "jinsuo_basic_fixed_v1"
     annual_ruleset_id: AnnualRuleset = "annual_zibai_lichun_v1"
@@ -904,11 +1004,15 @@ class AssessRequest(BazhaiRequest):
         if self.methods is not None:
             return self.methods
         selected: list[Method] = []
-        if self.xuankong is not None:
+        if (
+            self.xuankong is not None
+            or self.built_year is not None
+            or self.period_number is not None
+        ):
             selected.append("xuankong_natal")
         if self.effective_year is not None or self.query_at is not None:
             selected.append("annual_stars")
-        if self.monthly is not None:
+        if self.monthly is not None or self.query_at is not None:
             selected.append("monthly_stars")
         if self.features:
             selected.append("jinsuo")
@@ -916,43 +1020,80 @@ class AssessRequest(BazhaiRequest):
             selected.append("bazhai")
         return selected
 
+    def _inferred_current_period(self) -> int | None:
+        eval_year = self.effective_year
+        if eval_year is None and self.query_at is not None:
+            eval_year = year_context(
+                None, self.query_at, self.timezone_name, resolve_interval=False
+            ).get("effective_year")
+        if eval_year is None:
+            return None
+        return ((eval_year - 1864) // 20) % 9 + 1
+
     @model_validator(mode="after")
     def validate_layers(self) -> "AssessRequest":
+        if self.analyze_layout is None:
+            self.analyze_layout = bool(self.placements)
+        if self.built_year is not None and self.period_number is not None:
+            raise ValueError("built_year 与 period_number 不能同时提供")
         if not self.selected_methods:
             raise ValueError("至少选择一层计算")
         if len(set(self.selected_methods)) != len(self.selected_methods):
             raise ValueError("methods 不得重复")
+        _assign_feature_ids(self.features)
         JinsuoRequest(features=self.features, ruleset_id=self.jinsuo_ruleset_id)
-        if self.xuankong is not None and "xuankong_natal" not in self.selected_methods:
-            raise ValueError("提供 xuankong 时须在 methods 中选择 xuankong_natal")
+        flat_period: HousePeriod | None = None
+        if self.built_year is not None or self.period_number is not None:
+            if self.xuankong is not None and self.xuankong.period is not None:
+                raise ValueError("顶层 built_year/period_number 不能与 xuankong.period 同时提供")
+            flat_period = HousePeriod(
+                event_year=self.built_year,
+                period_number=self.period_number,
+                timezone_name=self.timezone_name,
+            )
+        if (
+            self.xuankong is not None or flat_period is not None
+        ) and "xuankong_natal" not in self.selected_methods:
+            raise ValueError("提供 xuankong/built_year/period_number 时须在 methods 中选择 xuankong_natal")
         if "xuankong_natal" in self.selected_methods:
             natal = self.xuankong or XuankongRequest()
             if self.house is not None and natal.house is not None:
                 if self.house.model_dump() != natal.house.model_dump():
                     raise ValueError("合参顶层 house 与 xuankong.house 必须一致")
-            XuankongRequest.model_validate(
-                {**natal.model_dump(), "house": natal.house or self.house}
+            inferred_period = self._inferred_current_period()
+            current_period = natal.current_period_number
+            if current_period is None and inferred_period is not None:
+                if (
+                    natal.interpretation is None
+                    or natal.interpretation.current_period_number is None
+                ):
+                    current_period = inferred_period
+            city_gate_data = (
+                natal.city_gate.model_dump() if natal.city_gate is not None else None
             )
+            if (
+                city_gate_data is not None
+                and city_gate_data["reference_period_number"] is None
+                and (current_period or inferred_period) is not None
+            ):
+                city_gate_data["reference_period_number"] = (
+                    current_period or inferred_period
+                )
+            resolved_natal = XuankongRequest.model_validate(
+                {
+                    **natal.model_dump(),
+                    "house": natal.house or self.house,
+                    "period": natal.period or flat_period,
+                    "current_period_number": current_period,
+                    "city_gate": city_gate_data,
+                }
+            )
+            if self.xuankong is not None or flat_period is not None:
+                self.xuankong = resolved_natal
         return self
 
 
 # --- Compact Per-Tool Projection-Compatible Output Models (<6 KB schemas) ---
-
-
-class RuleSource(PartialOutput):
-    title: str | None = None
-    url: str | None = None
-    kind: str | None = None
-    author: str | None = None
-
-
-class Ruleset(PartialOutput):
-    ruleset_id: str | None = None
-    version: str | None = None
-    method: str | None = None
-    source_ids: list[str] | None = None
-    source_citations: dict[str, Object] | None = None
-    scope: str | None = None
 
 
 class Coverage(PartialOutput):
@@ -967,11 +1108,8 @@ class BaseFengshuiOutput(ProjectedOutput):
     engine: str | None = None
     status: Literal["complete", "partial"] | None = None
     layers: dict[str, Object] | None = None
-    rulesets: list[Ruleset] | None = None
-    source_catalog: dict[str, RuleSource] | None = None
     coverage: Coverage | None = None
     conflicts: list[Object] | None = None
-    rule_trace: list[Object] | None = None
     summary: str | None = None
     run_metadata: RunMetadata | None = None
 

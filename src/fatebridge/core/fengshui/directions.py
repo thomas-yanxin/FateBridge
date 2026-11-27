@@ -210,20 +210,21 @@ def rule_data(key: str) -> Any:
     return val
 
 
-def provenance(ruleset_id: str) -> dict[str, Any]:
-    """Build compact ruleset provenance with resolved source records."""
-    bundle = _bundle()
-    rule = bundle["rulesets"][ruleset_id]
-    sources = bundle["sources"]
+def sitting_from_mountain(mountain: str) -> dict[str, Any]:
+    directions = _bundle()["directions"]
+    mountains = _bundle()["mountains"]
+    idx = mountains.index(mountain)
+    facing_info = MOUNTAIN_BY_NAME[mountain]
+    sitting_name = mountains[(idx + 12) % 24]
+    sitting_info = MOUNTAIN_BY_NAME[sitting_name]
+    s_dir = sitting_info["direction"]
     return {
-        "ruleset_id": ruleset_id,
-        "version": rule["version"],
-        "method": rule["method"],
-        "source_ids": list(rule["source_ids"]),
-        "scope": rule["scope"],
-        "conventions": list(rule["conventions"]),
-        "bundle_version": bundle["bundle_version"],
-        "sources": [{"source_id": s, **sources[s]} for s in rule["source_ids"]],
+        "facing_mountain": mountain,
+        "facing_direction": facing_info["direction"],
+        "facing_trigram": directions[facing_info["direction"]]["trigram"],
+        "mountain": sitting_name,
+        "direction": s_dir,
+        "trigram": directions[s_dir]["trigram"],
     }
 
 

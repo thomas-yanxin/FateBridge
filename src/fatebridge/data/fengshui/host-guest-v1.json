@@ -16,44 +16,6 @@
     "source_angle_applicability_verified": false,
     "whole_book_conformity_established": false
   },
-  "sources": [
-    {
-      "source_id": "HGT1",
-      "title": "沈氏玄空学所收地理精纂·生克吉凶篇",
-      "author": "该篇未署作者；地理精纂题江阴杜振逵藏，藏者不作作者",
-      "locator": "PDF901为篇题；PDF909–910为主客出入定义、盘层关系与旁六宫范围",
-      "scope": "只取主客、出入名词和盘层；不合并吉凶、疾病或现实应验断语",
-      "url": "https://www.vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4%2F%E6%B2%88%E6%B0%8F%E7%8E%84%E7%A9%BA%E5%AD%A6.pdf",
-      "edition": "中央编译出版社2011整理/2016重印本 ISBN978-7-5117-0801-4"
-    },
-    {
-      "source_id": "HGT2",
-      "title": "沈氏玄空学卷四·王则先谨按",
-      "author": "王则先",
-      "locator": "PDF452–453",
-      "scope": "论山山主、论向向主；保留其他比较对象与克出吉凶争论",
-      "url": "https://www.vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4%2F%E6%B2%88%E6%B0%8F%E7%8E%84%E7%A9%BA%E5%AD%A6.pdf",
-      "edition": "中央编译出版社2011整理/2016重印本 ISBN978-7-5117-0801-4"
-    },
-    {
-      "source_id": "HGT3",
-      "title": "沈氏玄空学卷四·九宫挨星掌诀",
-      "author": "江志伊录；本卷所列掌诀",
-      "locator": "PDF283",
-      "scope": "九星卦位和二十四山组；南上图位不认证现场北向",
-      "url": "https://www.vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4%2F%E6%B2%88%E6%B0%8F%E7%8E%84%E7%A9%BA%E5%AD%A6.pdf",
-      "edition": "中央编译出版社2011整理/2016重印本 ISBN978-7-5117-0801-4"
-    },
-    {
-      "source_id": "HGT4",
-      "title": "沈氏玄空学所收紫白诀上篇",
-      "author": "原诀作者未确，原注录姚廷銮本；不署为沈竹礽自著",
-      "locator": "PDF859–860",
-      "scope": "仅九星五行对应，不套用该篇八宅、层间与五子运的其他规则",
-      "url": "https://www.vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4%2F%E6%B2%88%E6%B0%8F%E7%8E%84%E7%A9%BA%E5%AD%A6.pdf",
-      "edition": "中央编译出版社2011整理/2016重印本 ISBN978-7-5117-0801-4"
-    }
-  ],
   "star_elements": {
     "1": "水",
     "2": "土",

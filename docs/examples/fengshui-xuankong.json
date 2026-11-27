@@ -1,12 +1,8 @@
 {
   "house": {
-    "object_id": "home",
-    "facing_degrees": 255,
-    "north_reference": "magnetic"
+    "facing_degrees": 255
   },
   "period": {
-    "basis": "construction_completion",
-    "effective_event_year": 2004,
-    "evidence": "示例：立春后竣工，按竣工事件定运"
+    "event_year": 2004
   }
 }

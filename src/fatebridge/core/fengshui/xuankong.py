@@ -125,71 +125,6 @@ def validate_replacement_catalog(bundle: dict[str, Any]) -> None:
         raise ValueError("完整替星表须与十三改数山位及十一同数山位一致")
 
 
-def _build_provenance(
-    ruleset: dict[str, Any],
-    sources_map: dict[str, Any],
-    extra: dict[str, Any] | None = None,
-) -> dict[str, Any]:
-    src_ids = list(ruleset["source_ids"])
-    res = {
-        "ruleset_id": ruleset["ruleset_id"],
-        "version": ruleset["version"],
-        "method": ruleset["method"],
-        "source_ids": src_ids,
-        "scope": ruleset["scope"],
-        "conventions": list(ruleset["conventions"]),
-        "sources": [{"source_id": s, **sources_map[s]} for s in src_ids],
-    }
-    if extra:
-        res.update(extra)
-    return res
-
-
-def natal_provenance() -> dict[str, Any]:
-    b = _bundle()
-    r = b["ruleset"]
-    return {
-        "ruleset_id": r["ruleset_id"],
-        "version": r["version"],
-        "method": r["method"],
-        "source_ids": list(r["source_ids"]),
-        "scope": r["scope"],
-        "bundle_version": b["bundle_version"],
-        "sources": [{"source_id": s, **b["sources"][s]} for s in r["source_ids"]],
-    }
-
-
-def city_gate_provenance() -> dict[str, Any]:
-    b = _city_gate_bundle()
-    return _build_provenance(b["ruleset"], b["sources"])
-
-
-def interpretation_provenance() -> dict[str, Any]:
-    b = _interp_bundle()
-    return _build_provenance(
-        b["ruleset"], b["sources"], {"bundle_version": b["bundle_version"]}
-    )
-
-
-def lingzheng_provenance() -> dict[str, Any]:
-    b = _lingzheng_bundle()
-    return _build_provenance(b["ruleset"], b["sources"])
-
-
-def timeliness_provenance() -> dict[str, Any]:
-    b = _timeliness_bundle()
-    r = b["ruleset"]
-    return {
-        "ruleset_id": r["ruleset_id"],
-        "version": r["version"],
-        "method": r["method"],
-        "source_ids": list(r["source_ids"]),
-        "scope": r["scope"],
-        "conventions": list(r["conventions"]),
-        "sources": [dict(b["source"])],
-    }
-
-
 def _compact_resolution(res: dict[str, Any]) -> dict[str, Any]:
     return {k: v for k, v in res.items() if k not in {"civil_point", "time_basis"}}
 
@@ -228,7 +163,7 @@ def period_context(period: HousePeriod) -> dict[str, Any]:
             "valid_until": None,
         }
     time = year_context(
-        period.effective_event_year, period.event_at, period.timezone_name
+        period.event_year, period.event_at, period.timezone_name
     )
     year_uncertain = time.get("effective_year_status") == "requires_confirmation"
     years = (
@@ -727,7 +662,23 @@ def analyze_city_gate(
     orientations: list[dict[str, Any]],
     registry: dict[str, Any],
 ) -> dict[str, Any]:
+    _city_gate_bundle()
     period = config.reference_period_number
+    if period is None:
+        return {
+            "status": "partial",
+            "calculation_status": "partial",
+            "reference_period_context": {
+                "number": None,
+                "evidence": config.period_evidence,
+            },
+            "candidates": [],
+            "missing_inputs": ["city_gate.reference_period_number"],
+            "unmatched_observations": [
+                {"mountain": o.mountain, "evidence": o.evidence}
+                for o in config.observations
+            ],
+        }
     path = raw_rule_data("flight_path")
     directions = raw_rule_data("directions")
     ring = list(directions)
@@ -823,7 +774,6 @@ def analyze_city_gate(
             "number": period,
             "evidence": config.period_evidence,
         },
-        "ruleset": city_gate_provenance(),
         "candidates": candidates,
         "missing_inputs": list(dict.fromkeys(missing)),
         "unmatched_observations": [
@@ -1014,7 +964,6 @@ def _analyze_fixed_lingzheng(
         )
     return {
         "status": "partial" if missing else "complete",
-        "ruleset": lingzheng_provenance(),
         "reference_period_number": current,
         "candidates": results,
         "missing_inputs": list(dict.fromkeys(missing)),
@@ -1096,17 +1045,7 @@ def _analyze_host_guest(natal: dict[str, Any]) -> dict[str, Any]:
                 "axes": axes,
             }
         )
-    ruleset = data["ruleset"]
     return {
-        "ruleset": {
-            "ruleset_id": ruleset["ruleset_id"],
-            "version": ruleset["version"],
-            "method": ruleset["method"],
-            "source_ids": list(ruleset["source_ids"]),
-            "scope": ruleset["scope"],
-            "conventions": list(ruleset.get("conventions", [])),
-            "sources": [{"kind": "primary_facsimile", **s} for s in data["sources"]],
-        },
         "status": "computed_relations" if charts else "no_computed_chart",
         "candidates": candidates,
     }
@@ -1284,7 +1223,7 @@ def analyze_natal_interpretation(
     host_guest = _analyze_host_guest(natal) if config.host_guest_ruleset_id else None
 
     result: dict[str, Any] = {
-        **({"timeliness_ruleset": timeliness_provenance()} if author_profile else {}),
+        **({"timeliness_ruleset_id": config.timeliness_ruleset_id} if author_profile else {}),
         **({"fixed_lingzheng_analysis": fixed} if fixed is not None else {}),
         **({"host_guest_analysis": host_guest} if host_guest is not None else {}),
         "status": "partial" if missing or not charts else "complete",
@@ -1318,24 +1257,27 @@ def xuankong_natal(req: XuankongRequest) -> dict[str, Any]:
         if house is not None and house.facing_degrees is not None
         else None
     )
+    orientation_ctx: dict[str, Any] = {
+        "facing_degrees": (
+            house.facing_degrees % 360
+            if house and house.facing_degrees is not None
+            else None
+        ),
+        "north_reference": house.north_reference if house else None,
+        "uncertainty_degrees": req.effective_bearing_uncertainty,
+        "confirmed_sitting_trigram": house.sitting_trigram if house else None,
+        "facing_subband": band["facing_subband"] if band else None,
+        "adjacent_mountain": band["adjacent_mountain"] if band else None,
+        "kongwang": band["kongwang"] if band else None,
+        "kongwang_seam_degrees": band["kongwang_seam_degrees"] if band else None,
+    }
+    if house is not None and house.facing_mountain is not None:
+        orientation_ctx["facing_mountain"] = house.facing_mountain
     result: dict[str, Any] = {
         "status": "partial",
         "subject_id": house.object_id if house is not None else "house",
         "period_context": period,
-        "orientation_context": {
-            "facing_degrees": (
-                house.facing_degrees % 360
-                if house and house.facing_degrees is not None
-                else None
-            ),
-            "north_reference": house.north_reference if house else None,
-            "uncertainty_degrees": req.effective_bearing_uncertainty,
-            "confirmed_sitting_trigram": house.sitting_trigram if house else None,
-            "facing_subband": band["facing_subband"] if band else None,
-            "adjacent_mountain": band["adjacent_mountain"] if band else None,
-            "kongwang": band["kongwang"] if band else None,
-            "kongwang_seam_degrees": band["kongwang_seam_degrees"] if band else None,
-        },
+        "orientation_context": orientation_ctx,
         "chart": None,
         "candidates": [],
         "missing_inputs": missing,
@@ -1364,10 +1306,41 @@ def xuankong_natal(req: XuankongRequest) -> dict[str, Any]:
                         "bearing_regions": [],
                     }
                 orientations[index]["bearing_regions"].append(region)
+        elif house is not None and house.facing_mountain is not None:
+            mountains = _bundle()["mountains"]
+            m_idx = [m["name"] for m in mountains].index(house.facing_mountain)
+            facing, sitting = mountains[m_idx], mountains[(m_idx + 12) % 24]
+            orientations[m_idx] = {
+                "orientation_candidate_id": f"city-gate-facing:{facing['name']}",
+                "facing": facing,
+                "sitting": sitting,
+                "bearing_regions": [],
+            }
         result["city_gate_analysis"] = analyze_city_gate(
             req.city_gate, list(orientations.values()), _bundle()
         )
     if missing:
+        if (
+            house is not None
+            and house.facing_degrees is None
+            and house.facing_mountain is not None
+            and period is not None
+            and period["resolution_status"] == "resolved"
+        ):
+            mountains = _bundle()["mountains"]
+            m_idx = [m["name"] for m in mountains].index(house.facing_mountain)
+            result["candidates"] = [
+                _chart(
+                    period["number"],
+                    (m_idx, "lower", "facing_mountain_lower_candidate"),
+                    current_period=eval_period,
+                ),
+                _chart(
+                    period["number"],
+                    (m_idx, "replacement", "facing_mountain_replacement_candidate"),
+                    current_period=eval_period,
+                ),
+            ]
         return result
 
     assert house is not None and house.facing_degrees is not None and period is not None

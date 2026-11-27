@@ -26,7 +26,6 @@ from fatebridge.core.geomagnetic_field import (
 
 class _GeomagneticData(TypedDict):
     ruleset: dict[str, JsonValue]
-    sources: dict[str, dict[str, JsonValue]]
     model_header: list[JsonValue]
     degree: int
     coefficients: list[list[JsonValue]]
@@ -34,21 +33,17 @@ class _GeomagneticData(TypedDict):
 
 @lru_cache(maxsize=1)
 def _wmm_bundle() -> tuple[
-    dict[str, JsonValue],
-    dict[str, dict[str, JsonValue]],
     list[JsonValue],
     tuple[WmmCoefficient, ...],
 ]:
     path = Path(__file__).parents[2] / "data/fengshui/geomagnetic-wmm2025-v1.json"
     data = TypeAdapter(_GeomagneticData).validate_json(path.read_bytes())
     coeffs = tuple(cast(WmmCoefficient, tuple(row)) for row in data["coefficients"])
-    return data["ruleset"], data["sources"], data["model_header"], coeffs
+    return data["model_header"], coeffs
 
 
 @lru_cache(maxsize=1)
 def _igrf_bundle() -> tuple[
-    dict[str, JsonValue],
-    dict[str, dict[str, JsonValue]],
     list[JsonValue],
     tuple[IgrfCoefficient, ...],
 ]:
@@ -65,7 +60,7 @@ def _igrf_bundle() -> tuple[
         )
         for row in data["coefficients"]
     )
-    return data["ruleset"], data["sources"], data["model_header"], coeffs
+    return data["model_header"], coeffs
 
 
 def _select_model(model_id: str, year: float) -> Literal["wmm2025_v1", "igrf14_v1"]:
@@ -74,24 +69,6 @@ def _select_model(model_id: str, year: float) -> Literal["wmm2025_v1", "igrf14_v
     if model_id == "igrf14_v1":
         return "igrf14_v1"
     return "wmm2025_v1" if 2025.0 <= year < 2030.0 else "igrf14_v1"
-
-
-def geomagnetic_provenance(
-    model_id: Literal["wmm2025_v1", "igrf14_v1"] = "wmm2025_v1",
-) -> dict[str, JsonValue]:
-    ruleset, sources, _, _ = (
-        _wmm_bundle() if model_id == "wmm2025_v1" else _igrf_bundle()
-    )
-    src_ids = cast(list[str], ruleset["source_ids"])
-    return {
-        "ruleset_id": ruleset["ruleset_id"],
-        "version": ruleset["version"],
-        "method": ruleset["method"],
-        "source_ids": list(src_ids),
-        "scope": ruleset["scope"],
-        "conventions": list(cast(list[str], ruleset["conventions"])),
-        "sources": [{"source_id": k, **sources[k]} for k in src_ids],
-    }
 
 
 def field_zone(horizontal_nt: float) -> str:
@@ -110,7 +87,7 @@ def geomagnetic_reference(
     year = req.year_value()
     chosen = _select_model(req.model_id, year)
     if chosen == "wmm2025_v1":
-        ruleset, _, header, coeffs = _wmm_bundle()
+        header, coeffs = _wmm_bundle()
         value = wmm2025_field(
             req.latitude, req.longitude, req.height_km_wgs84, year, coeffs
         )
@@ -127,7 +104,7 @@ def geomagnetic_reference(
             },
         }
     else:
-        ruleset, _, header, coeffs_igrf = _igrf_bundle()
+        header, coeffs_igrf = _igrf_bundle()
         value = igrf14_field(
             req.latitude, req.longitude, req.height_km_wgs84, year, coeffs_igrf
         )
@@ -188,12 +165,6 @@ def geomagnetic_reference(
     return {
         "calculation_status": "complete",
         "selected_model_id": chosen,
-        "ruleset": {
-            "ruleset_id": ruleset["ruleset_id"],
-            "version": ruleset["version"],
-            "method": ruleset["method"],
-            "source_ids": list(cast(list[str], ruleset["source_ids"])),
-        },
         "input": {
             **req.model_dump(mode="json"),
             "effective_decimal_year": year,
@@ -210,7 +181,6 @@ def geomagnetic_reference(
             "declination_degrees": (
                 math.hypot(0.26, 5417 / value.h) if value.h > 0 else None
             ),
-            "source_ids": ["GM2"] if chosen == "wmm2025_v1" else ["IGRF1"],
         },
         "conversion": conversion,
     }

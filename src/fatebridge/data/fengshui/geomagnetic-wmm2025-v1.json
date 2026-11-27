@@ -11,51 +11,7 @@
       "GM6",
       "GM7"
     ],
-    "scope": "WMM2025 main field/heading; no site/effect validation",
-    "conventions": [
-      "WGS84 ellipsoid km; east-positive D; T=M+D modulo360",
-      "Explicit time in[2025,2030); original bearing/house retained",
-      "Surface one-sigma model error is not a site error bound",
-      "Exact WGS84 inverse flattening;50-digit potential-gradient evaluation; unchanged official-table and original-C gates retained separately"
-    ]
-  },
-  "sources": {
-    "GM1": {
-      "title": "NOAA/BGS WMM2025 coefficients",
-      "url": "https://www.ncei.noaa.gov/sites/default/files/2024-12/WMM2025COF.zip",
-      "kind": "official_model_coefficients",
-      "scope": "Degree/order12; epoch2025.0"
-    },
-    "GM2": {
-      "title": "NOAA WMM accuracy and limitations",
-      "url": "https://www.ncei.noaa.gov/products/world-magnetic-model/accuracy-limitations-error-model",
-      "kind": "official_model_limitations",
-      "scope": "Surface one-sigma errors and heading zones"
-    },
-    "GM3": {
-      "title": "NOAA WMM2025 test values",
-      "url": "https://www.ncei.noaa.gov/sites/default/files/2025-02/WMM2025_TEST_VALUES.txt",
-      "kind": "independent_official_numeric_reference",
-      "scope": "12 main-field vectors; excludes rates/grid variation"
-    },
-    "GM5": {
-      "title": "NOAA current WMM2025 C release",
-      "url": "https://www.ngdc.noaa.gov/geomag/WMM/data/WMM2025/wmm2025_Linux.zip",
-      "kind": "official_reference_implementation",
-      "scope": "Unmodified C; ellipsoid heights;100 inputs"
-    },
-    "GM6": {
-      "title": "NOAA/BGS WMM2025 technical report",
-      "url": "https://doi.org/10.25923/prbc-s316",
-      "kind": "official_model_definition",
-      "scope": "Equations3,5,7-12,17,19; report reciprocal WGS84 flattening; printed formula differences recorded separately"
-    },
-    "GM7": {
-      "title": "NIST DLMF associated Legendre recurrence and Rodrigues formulas",
-      "url": "https://dlmf.nist.gov/14.10.E3",
-      "kind": "mathematical_reference",
-      "scope": "Schmidt normalization of degree recurrence; analytic latitude derivative and positive-order P/cos factorization"
-    }
+    "scope": "WMM2025 main field/heading; no site/effect validation"
   },
   "model_header": [
     2025.0,

@@ -210,18 +210,18 @@ def test_bazhai_all_64_cells_and_minggua_and_sanyao() -> None:
             assert computed[direction]["star"]["name"] == expected_star
 
     # MingGua 1990-05-15 male -> 坎1 East; female -> 艮8 West; raw 5 substitution
-    m1990 = minggua(MingguaRequest(birth_date="1990-05-15", gender_convention="male"))
+    m1990 = minggua(MingguaRequest(birth_date="1990-05-15", gender="male"))
     assert m1990["candidates"][0]["trigram"] == "坎"
     assert m1990["candidates"][0]["palace_number"] == 1
     assert m1990["candidates"][0]["group"] == "east"
 
     m_five_male = minggua(
-        MingguaRequest(effective_birth_year=1995, gender_convention="male")
+        MingguaRequest(birth_year=1995, gender="male")
     )
     assert m_five_male["candidates"][0]["substitution"] is True
     assert m_five_male["candidates"][0]["trigram"] == "坤"
     m_five_female = minggua(
-        MingguaRequest(effective_birth_year=1999, gender_convention="female")
+        MingguaRequest(birth_year=1999, gender="female")
     )
     assert m_five_female["candidates"][0]["substitution"] is True
     assert m_five_female["candidates"][0]["trigram"] == "艮"
@@ -250,27 +250,26 @@ def test_bazhai_all_64_cells_and_minggua_and_sanyao() -> None:
             {
                 "house": {
                     "facing_degrees": 135.0,
-                    "north_reference": "magnetic",
-                },  # sitting 乾
+                },  # sitting 乾, defaults north_reference="magnetic"
                 "occupants": [
                     {
-                        "subject_id": "a",
-                        "effective_birth_year": 1990,
-                        "gender_convention": "male",
+                        "birth_year": 1990,
+                        "gender": "male",
                     }
                 ],
                 "placements": [
                     {
-                        "object_id": "door",
                         "purpose": "door",
                         "location_direction": "NE",
                     },
-                    {"object_id": "bed", "purpose": "bed", "location_direction": "SW"},
+                    {"purpose": "bed", "location_direction": "SW"},
                 ],
             }
         )
     )
+    assert full["house"]["north_reference"] == "magnetic"
     assert full["house"]["sitting_trigram"] == "乾"
+    assert full["occupants"][0]["subject_id"] == "occupant_1"
     assert full["yangzhai_sanyao"]["east_west_coherence"] == "west_four_coherent"
 
 

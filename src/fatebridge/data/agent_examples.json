@@ -213,8 +213,8 @@
       "outer_use_true_solar_time": false
     },
     "fengshui_minggua": {
-      "effective_birth_year": 1990,
-      "gender_convention": "female"
+      "birth_year": 1990,
+      "gender": "female"
     },
     "fengshui_bazhai": {
       "house": {
@@ -225,13 +225,13 @@
       "occupants": [
         {
           "subject_id": "a",
-          "effective_birth_year": 1990,
-          "gender_convention": "male"
+          "birth_year": 1990,
+          "gender": "male"
         },
         {
           "subject_id": "b",
-          "effective_birth_year": 1990,
-          "gender_convention": "female"
+          "birth_year": 1990,
+          "gender": "female"
         }
       ],
       "placements": [
@@ -282,8 +282,8 @@
       },
       "period": {
         "basis": "construction_completion",
-        "effective_event_year": 2004,
-        "evidence": "示例：立春后竣工，按竣工事件定运"
+        "evidence": "示例：立春后竣工，按竣工事件定运",
+        "event_year": 2004
       }
     },
     "fengshui_assess": {
@@ -295,13 +295,13 @@
       "occupants": [
         {
           "subject_id": "a",
-          "effective_birth_year": 1990,
-          "gender_convention": "male"
+          "birth_year": 1990,
+          "gender": "male"
         },
         {
           "subject_id": "b",
-          "effective_birth_year": 1990,
-          "gender_convention": "female"
+          "birth_year": 1990,
+          "gender": "female"
         }
       ],
       "placements": [
@@ -587,23 +587,17 @@
     "fengshui_minggua": [
       "status",
       "layers.minggua",
-      "rulesets",
-      "source_catalog",
-      "rule_trace"
+      "coverage"
     ],
     "fengshui_bazhai": [
       "status",
       "layers.bazhai",
-      "rulesets",
-      "source_catalog",
-      "rule_trace"
+      "coverage"
     ],
     "fengshui_xuankong_house_chart": [
       "status",
       "layers.xuankong_natal",
-      "rulesets",
-      "source_catalog",
-      "rule_trace"
+      "coverage"
     ],
     "solar_terms_for_year": [
       "query_context",
@@ -1126,8 +1120,6 @@
       "layers.annual_stars.palaces",
       "layers.annual_stars.current_period",
       "layers.annual_stars.missing_inputs",
-      "rulesets",
-      "rule_trace",
       "coverage"
     ],
     "fengshui_monthly_stars": [
@@ -1138,8 +1130,6 @@
       "layers.monthly_stars.center_star_number",
       "layers.monthly_stars.palaces",
       "layers.monthly_stars.missing_inputs",
-      "rulesets",
-      "rule_trace",
       "coverage"
     ],
     "liuyao": [
@@ -1464,10 +1454,7 @@
     "fengshui_directions": [
       "status",
       "layers.directions",
-      "coverage",
-      "rulesets",
-      "source_catalog",
-      "rule_trace"
+      "coverage"
     ],
     "knowledge_read": [
       "title",
@@ -1482,21 +1469,14 @@
     "fengshui_jinsuo": [
       "status",
       "layers.jinsuo",
-      "coverage",
-      "rulesets",
-      "source_catalog",
-      "rule_trace"
+      "coverage"
     ],
     "fengshui_assess": [
       "status",
-      "layout_analysis.status",
-      "layout_analysis.calculation_scope",
-      "layout_analysis.placement_findings",
-      "layout_analysis.missing_inputs",
-      "coverage",
-      "rule_trace",
-      "rulesets",
-      "source_catalog"
+      "layers",
+      "palace_overlay",
+      "layout_analysis",
+      "coverage"
     ],
     "western_timing": [
       "analysis_context",
@@ -1841,10 +1821,7 @@
     "fengshui_directions": [
       "status",
       "layers.directions",
-      "coverage",
-      "rulesets",
-      "source_catalog",
-      "rule_trace"
+      "coverage"
     ],
     "knowledge_read": [
       "title",
@@ -1879,34 +1856,22 @@
       "layers.minggua.candidates",
       "layers.minggua.time_context",
       "layers.minggua.missing_inputs",
-      "coverage",
-      "rulesets",
-      "source_catalog",
-      "rule_trace"
+      "coverage"
     ],
     "fengshui_bazhai": [
       "status",
       "layers.bazhai",
-      "coverage",
-      "rulesets",
-      "source_catalog",
-      "rule_trace"
+      "coverage"
     ],
     "fengshui_jinsuo": [
       "status",
       "layers.jinsuo",
-      "coverage",
-      "rulesets",
-      "source_catalog",
-      "rule_trace"
+      "coverage"
     ],
     "fengshui_annual_stars": [
       "status",
       "layers.annual_stars",
-      "coverage",
-      "rulesets",
-      "source_catalog",
-      "rule_trace"
+      "coverage"
     ],
     "fengshui_xuankong_house_chart": [
       "status",
@@ -1915,21 +1880,14 @@
       "layers.xuankong_natal.orientation_context",
       "layers.xuankong_natal.candidates",
       "layers.xuankong_natal.missing_inputs",
-      "coverage",
-      "rulesets",
-      "source_catalog",
-      "rule_trace"
+      "coverage"
     ],
     "fengshui_assess": [
       "status",
-      "layout_analysis.status",
-      "layout_analysis.calculation_scope",
-      "layout_analysis.placement_findings",
-      "layout_analysis.missing_inputs",
-      "coverage",
-      "rule_trace",
-      "rulesets",
-      "source_catalog"
+      "layers",
+      "palace_overlay",
+      "layout_analysis",
+      "coverage"
     ],
     "western_timing": [
       "analysis_context",
@@ -2196,7 +2154,7 @@
   },
   "call_guidance": {
     "fengshui_xuankong_house_chart": {
-      "natal_delivery": "普通宅盘用 evidence_views.natal_candidates，先读 period_context、orientation_context、全部 candidates 和 missing_inputs，并保留 rulesets/rule_trace。缺定运或定向资料时交付已知事实与本次待补项；缺磁向用 house.facing_degrees 配 north_reference=magnetic。边界向逐候选说明，按 candidate_id 关联盘式及依据。",
+      "natal_delivery": "普通宅盘用 evidence_views.natal_candidates，先读 period_context、orientation_context、全部 candidates 和 missing_inputs。缺定运或定向资料时交付已知事实与本次待补项；缺磁向用 house.facing_degrees（默认 magnetic）。边界向逐候选说明，按 candidate_id 关联盘式。",
       "natal_details": "格局读每个 candidates[].structure；需要原典数字对照时首轮用 natal_patterns，保留各候选的比对范围与未裁定项。启用 interpretation 后可读 natal_interpretation；当前评价运与历史宅运独立。若 include_calculation_reading=true（启用解释时默认），追加 calculation_reading。",
       "natal_projection": "同次需要的视图在首轮合并 fields；result_delivery 只保留当次所选字段，分页沿同一 run 读回。兼容原始路径 layers.xuankong_natal.chart 只有唯一候选才有值；完整导出首次 fields=null。",
       "conditioned_scope": "独立于年星；interpretation 显式启用 xuankong_conditioned_v1 有限解释，current_period_number 与 period_evidence 成对，外局分宫独立确认山形/水形，不复用金锁或室内靠背。"
@@ -2299,7 +2257,7 @@
       },
       "item_fields": "object_id,label,representation,observation_basis,evidence必填；zone与zone_observation_basis成对可选，属性确认与位置确认分别保存；只确认左右不能补近远，照片位置为image_observed",
       "feasibility": "feasible_zones只含用户逐区明确确认能容纳对象并保持视野的区域，不从照片空白、物件属性确认或允许移动扩展；其余省略",
-      "birth_choice": "birth_date、birth_at、effective_birth_year最多传一个，不能同时传日期和时刻",
+      "birth_choice": "birth_date、birth_at、birth_year最多传一个，不能同时传日期和时刻",
       "scene_selection": "工位scene=workstation，合租scene=shared_rental，家居scene=home；自动按事实展开飞星、金锁、八宅，局部前两法优先，显式methods优先。不为优先级补年份或宅运；年盘不替代历史宅盘。独立形态/桌面/context不要求生辰或罗盘。无场景无作者无context保留原三法默认。场景首轮fields按需追加method_policy；细节参考按需读method_details。",
       "layout_planning": "家具动作放layout_constraints；候选放layout_alternatives，声明changes并独立提供新位置placement/form_observation，许可和physically_feasible各自确认。候选fields追加layout_analysis.alternatives_analysis；ready表示可执行门槛，不表示各方法均有利。",
       "natal_interpretation": "玄空有限解释需 xuankong.interpretation 显式启用 xuankong_conditioned_v1；当前评价运 current_period_number 与 period_evidence 成对，不改历史宅运。external_forms 按全宅中心八宫独立确认外部山形/水形，未知省略，照片保留候选，不复用金锁砂水或室内靠背；床/门取用结合顶层 placements.location_direction，桌/灶未覆盖。",
@@ -2746,9 +2704,7 @@
           "layers.xuankong_natal.period_context",
           "layers.xuankong_natal.orientation_context",
           "layers.xuankong_natal.candidates",
-          "layers.xuankong_natal.missing_inputs",
-          "rulesets",
-          "rule_trace"
+          "layers.xuankong_natal.missing_inputs"
         ],
         "scope": "普通宅盘首读。保留实际定运、定向、全部已算候选及待补输入。边界向逐候选交付；唯一候选可交付单盘。无已算盘时保留已确认的事实和缺项。"
       },
@@ -2759,16 +2715,16 @@
           "layers.xuankong_natal.period_context",
           "layers.xuankong_natal.orientation_context",
           "layers.xuankong_natal.candidates",
-          "layers.xuankong_natal.missing_inputs",
-          "rulesets",
-          "rule_trace"
+          "layers.xuankong_natal.missing_inputs"
         ],
         "scope": "用 candidate_id 关联每盘 structure 与原典数字对照。保留格局适用条件、差异及未裁定范围。缺定运或定向时对照可为 not_computed。"
       },
       "natal_interpretation": {
         "fields": [
-          "rulesets",
-          "rule_trace"
+          "status",
+          "layers.xuankong_natal.status",
+          "layers.xuankong_natal.interpretation",
+          "layers.xuankong_natal.missing_inputs"
         ],
         "scope": "仅在传入 interpretation 时使用。逐候选读五行、当令及外局条件，保留未知、待确认与规则未覆盖的解释。"
       }
@@ -6824,9 +6780,7 @@
           "layers.xuankong_natal.period_context",
           "layers.xuankong_natal.orientation_context",
           "layers.xuankong_natal.candidates",
-          "layers.xuankong_natal.missing_inputs",
-          "rulesets",
-          "rule_trace"
+          "layers.xuankong_natal.missing_inputs"
         ],
         "purpose": "玄空宅盘候选星盘与定运朝向依据"
       },
@@ -6838,9 +6792,7 @@
           "layers.xuankong_natal.orientation_context",
           "layers.xuankong_natal.chart",
           "layers.xuankong_natal.candidates",
-          "layers.xuankong_natal.missing_inputs",
-          "rulesets",
-          "rule_trace"
+          "layers.xuankong_natal.missing_inputs"
         ],
         "purpose": "玄空宅盘格局与挨星盘面"
       }
