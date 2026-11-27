@@ -87,6 +87,8 @@ def _build_calendar_payload(
     sequence: list[tuple[str, int]],
     sect: str,
     analysis_datetime: datetime,
+    *,
+    include_full_timelines: bool = True,
 ) -> dict[str, Any]:
     validate_calendar_firdaria_inputs(birth_info, analysis_datetime)
     birth = birth_info.local_datetime
@@ -102,18 +104,27 @@ def _build_calendar_payload(
     start, start_utc = birth, clock.utc
 
     for planet, years in cycle(sequence):
-        if start_utc > horizon:
+        if start_utc > horizon or (
+            start_utc > target and (not include_full_timelines or len(timeline) >= 12)
+        ):
             break
         end_age = age + years
         if birth.year + end_age > datetime.max.year:
             # Earlier preview periods and the current period are already complete.
-            if start_utc > target and len(timeline) >= 12:
+            if start_utc > target and (
+                not include_full_timelines or len(timeline) >= 12
+            ):
                 break
             raise ValueError(
                 "Civil calendar label is outside Python datetime's year range"
             )
         end = _calendar_anniversary(birth, end_age)
         end_utc = utc_calendar(end)
+        current = start_utc <= target < end_utc
+        in_preview = include_full_timelines and len(timeline) < 12
+        if not (current or in_preview):
+            start, start_utc, age = end, end_utc, end_age
+            continue
         major = {
             **_calendar_period(start, end, planet),
             "years": years,
@@ -138,18 +149,21 @@ def _build_calendar_payload(
                 major["subperiods"].append(sub)
                 if boundaries[k] <= target < boundaries[k + 1]:
                     current_sub = sub
-        if start_utc <= target < end_utc:
+        if current:
             current_major = major
-        timeline.append(major)
+        if in_preview:
+            timeline.append(major)
         start, start_utc, age = end, end_utc, end_age
 
-    return {
+    payload: dict[str, Any] = {
         "sect": sect,
         "sect_label": sect_label(sect),
         "current_major": current_major,
         "current_sub": current_sub,
-        "timeline": timeline[:12],
     }
+    if include_full_timelines:
+        payload["timeline"] = timeline
+    return payload
 
 
 def build_firdaria_payload(
@@ -159,6 +173,7 @@ def build_firdaria_payload(
     analysis_datetime: datetime,
     firdaria_night_order: str = "nodes_at_end",
     firdaria_year_basis: str = "fixed_365_2425",
+    include_full_timelines: bool = True,
 ) -> dict[str, Any]:
     return build_firdaria_for_sect(
         birth_info,
@@ -166,6 +181,7 @@ def build_firdaria_payload(
         analysis_datetime=analysis_datetime,
         firdaria_night_order=firdaria_night_order,
         firdaria_year_basis=firdaria_year_basis,
+        include_full_timelines=include_full_timelines,
     )
 
 
@@ -176,6 +192,7 @@ def build_firdaria_for_sect(
     analysis_datetime: datetime,
     firdaria_night_order: str = "nodes_at_end",
     firdaria_year_basis: str = "fixed_365_2425",
+    include_full_timelines: bool = True,
 ) -> dict[str, Any]:
     """Calendar arithmetic with an explicit sect; no surrogate natal houses."""
     if sect not in {"day", "night"}:
@@ -194,10 +211,20 @@ def build_firdaria_for_sect(
         )
     )
     if firdaria_year_basis == "calendar_anniversary":
-        result = _build_calendar_payload(birth_info, sequence, sect, analysis_datetime)
+        result = _build_calendar_payload(
+            birth_info,
+            sequence,
+            sect,
+            analysis_datetime,
+            include_full_timelines=include_full_timelines,
+        )
     else:
         result = _build_fixed_year_payload(
-            birth_info, sequence, sect, analysis_datetime
+            birth_info,
+            sequence,
+            sect,
+            analysis_datetime,
+            include_full_timelines=include_full_timelines,
         )
     result["calculation_options"] = {
         "night_order": firdaria_night_order,
@@ -213,6 +240,8 @@ def _build_fixed_year_payload(
     sequence: list[tuple[str, int]],
     sect: str,
     analysis_datetime: datetime,
+    *,
+    include_full_timelines: bool = True,
 ) -> dict[str, Any]:
     """Fixed nominal days on UTC elapsed time, displayed in the birth timezone."""
     display_zone = ZonedCalendar.from_datetime(birth_info.local_datetime).zone
@@ -231,13 +260,15 @@ def _build_fixed_year_payload(
     current_sub = None
 
     for planet, years in cycle(sequence):
-        if cursor > horizon or (len(timeline) == 12 and cursor > target):
+        if cursor > horizon or (
+            cursor > target and (not include_full_timelines or len(timeline) == 12)
+        ):
             break
         start = cursor
         duration = timedelta(days=years * TROPICAL_YEAR_DAYS)
         cursor = start.shifted(duration)
         current = start <= target < cursor
-        in_preview = len(timeline) < 12
+        in_preview = include_full_timelines and len(timeline) < 12
         if not (current or in_preview):
             continue
 
@@ -272,10 +303,12 @@ def _build_fixed_year_payload(
         if in_preview:
             timeline.append(main_period)
 
-    return {
+    payload: dict[str, Any] = {
         "sect": sect,
         "sect_label": sect_label(sect),
         "current_major": current_major,
         "current_sub": current_sub,
-        "timeline": timeline,
     }
+    if include_full_timelines:
+        payload["timeline"] = timeline
+    return payload

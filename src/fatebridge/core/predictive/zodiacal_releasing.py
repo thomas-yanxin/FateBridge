@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from datetime import datetime, timedelta, tzinfo
 from typing import Any
 
@@ -254,6 +255,7 @@ def build_zodiacal_releasing_for_lot(
     display_timezone: tzinfo,
     start_sign: str,
     fortune_sign: str,
+    include_full_timelines: bool = True,
 ) -> dict[str, Any]:
     level_one_timeline = build_releasing_level_preview(
         start_sign=start_sign,
@@ -318,7 +320,7 @@ def build_zodiacal_releasing_for_lot(
             None,
         )
 
-    return {
+    track: dict[str, Any] = {
         "base_point": LOT_POINT_NAMES[lot_key],
         "base_point_label": LOT_LABELS[lot_key],
         "lot": lot_payload,
@@ -339,19 +341,21 @@ def build_zodiacal_releasing_for_lot(
         "current_level_4": clean_releasing_period(
             current_level_4, display_timezone=display_timezone
         ),
-        "level_1_timeline": clean_releasing_timeline(
-            level_one_timeline, display_timezone=display_timezone
-        ),
-        "level_2_timeline": clean_releasing_timeline(
-            level_two_timeline, display_timezone=display_timezone
-        ),
-        "level_3_timeline": clean_releasing_timeline(
-            level_three_timeline, display_timezone=display_timezone
-        ),
-        "level_4_timeline": clean_releasing_timeline(
-            level_four_timeline, display_timezone=display_timezone
-        ),
     }
+    if include_full_timelines:
+        track["level_1_timeline"] = clean_releasing_timeline(
+            level_one_timeline, display_timezone=display_timezone
+        )
+        track["level_2_timeline"] = clean_releasing_timeline(
+            level_two_timeline, display_timezone=display_timezone
+        )
+        track["level_3_timeline"] = clean_releasing_timeline(
+            level_three_timeline, display_timezone=display_timezone
+        )
+        track["level_4_timeline"] = clean_releasing_timeline(
+            level_four_timeline, display_timezone=display_timezone
+        )
+    return track
 
 
 def _unresolved_lot_payload(lot_key: str) -> dict[str, Any]:
@@ -371,8 +375,10 @@ def _unresolved_lot_payload(lot_key: str) -> dict[str, Any]:
     }
 
 
-def _unresolved_releasing_track(lot_key: str) -> dict[str, Any]:
-    return {
+def _unresolved_releasing_track(
+    lot_key: str, *, include_full_timelines: bool = True
+) -> dict[str, Any]:
+    track: dict[str, Any] = {
         "status": "underdetermined_ascendant",
         "ascendant_resolved": False,
         "unavailable_reason": "lot_requires_resolved_ascendant",
@@ -388,11 +394,13 @@ def _unresolved_releasing_track(lot_key: str) -> dict[str, Any]:
         "current_level_2": None,
         "current_level_3": None,
         "current_level_4": None,
-        "level_1_timeline": [],
-        "level_2_timeline": [],
-        "level_3_timeline": [],
-        "level_4_timeline": [],
     }
+    if include_full_timelines:
+        track["level_1_timeline"] = []
+        track["level_2_timeline"] = []
+        track["level_3_timeline"] = []
+        track["level_4_timeline"] = []
+    return track
 
 
 def _zr_calculation_basis(fortune_sign: str | None) -> dict[str, Any]:
@@ -416,6 +424,8 @@ def build_zodiacal_releasing_payload(
     natal_subject: NativeSubject,
     *,
     analysis_datetime: datetime,
+    natal_lots: Mapping[str, dict[str, Any]] | None = None,
+    include_full_timelines: bool = True,
 ) -> dict[str, Any]:
     if not is_ascendant_resolved(natal_subject):
         basis = _zr_calculation_basis(None)
@@ -425,15 +435,25 @@ def build_zodiacal_releasing_payload(
             "ascendant_resolved": False,
             "unavailable_reason": "lot_of_fortune_and_lot_of_spirit_require_resolved_ascendant",
             "calculation_basis": basis,
-            "spirit": _unresolved_releasing_track("lot_of_spirit"),
-            "fortune": _unresolved_releasing_track("lot_of_fortune"),
-            "eros": _unresolved_releasing_track("lot_of_eros"),
+            "spirit": _unresolved_releasing_track(
+                "lot_of_spirit", include_full_timelines=include_full_timelines
+            ),
+            "fortune": _unresolved_releasing_track(
+                "lot_of_fortune", include_full_timelines=include_full_timelines
+            ),
+            "eros": _unresolved_releasing_track(
+                "lot_of_eros", include_full_timelines=include_full_timelines
+            ),
         }
 
     birth_utc = birth_info.utc_calendar
     analysis_utc = utc_calendar(analysis_datetime)
     display_timezone = parse_timezone_name(birth_info.timezone)
-    lots = build_lot_payloads(natal_subject)
+    lots = (
+        {key: dict(value) for key, value in natal_lots.items()}
+        if natal_lots is not None
+        else build_lot_payloads(natal_subject)
+    )
     fortune_sign = lots["lot_of_fortune"]["sign"]
     spirit_start_sign = lots["lot_of_spirit"]["sign"]
     if spirit_start_sign == fortune_sign:
@@ -449,6 +469,7 @@ def build_zodiacal_releasing_payload(
             display_timezone=display_timezone,
             start_sign=spirit_start_sign,
             fortune_sign=fortune_sign,
+            include_full_timelines=include_full_timelines,
         ),
         "fortune": build_zodiacal_releasing_for_lot(
             "lot_of_fortune",
@@ -458,6 +479,7 @@ def build_zodiacal_releasing_payload(
             display_timezone=display_timezone,
             start_sign=fortune_sign,
             fortune_sign=fortune_sign,
+            include_full_timelines=include_full_timelines,
         ),
         "eros": build_zodiacal_releasing_for_lot(
             "lot_of_eros",
@@ -467,5 +489,6 @@ def build_zodiacal_releasing_payload(
             display_timezone=display_timezone,
             start_sign=eros_start_sign,
             fortune_sign=fortune_sign,
+            include_full_timelines=include_full_timelines,
         ),
     }

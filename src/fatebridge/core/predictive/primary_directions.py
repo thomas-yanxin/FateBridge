@@ -19,7 +19,7 @@ from fatebridge.core.astro.geometry import (
     normalize_angle,
 )
 from fatebridge.core.astro.reference import TRADITIONAL_PLANETS
-from fatebridge.core.astro.reference_frames import rotate_spherical
+from fatebridge.core.astro.reference_frames import Matrix, rotate_spherical
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.astro.ut1_epoch import UT1Instant
 from fatebridge.core.ephemeris_runtime import swe
@@ -166,6 +166,7 @@ class PrimaryDirectionEquatorialContext:
     obliquity: float
     longitude_origin: float
     armc: float
+    native_to_house: Matrix | None = None
 
     @property
     def julian_day(self) -> float:
@@ -186,6 +187,7 @@ def build_primary_direction_equatorial_context(
         attitude.reduction.house_obliquity,
         attitude.reduction.house_longitude_origin,
         float(armc),
+        attitude.reduction.native_to_house,
     )
 
 
@@ -218,9 +220,13 @@ def point_equatorial_position(
         )
         if retflag < 0:
             raise ValueError("Primary direction equatorial ephemeris failed")
-        attitude = earth_attitude(swe, context.ut1, julian_day_tt=context.tt)
+        native_to_house = context.native_to_house
+        if native_to_house is None:
+            native_to_house = earth_attitude(
+                swe, context.ut1, julian_day_tt=context.tt
+            ).reduction.native_to_house
         return rotate_spherical(
-            attitude.reduction.native_to_house,
+            native_to_house,
             float(equatorial[0]),
             float(equatorial[1]),
         )
@@ -604,6 +610,8 @@ def _extract_all_natal_points(
     birth_info: AstroBirthInfo,
     natal_subject: Any,
     context: PrimaryDirectionEquatorialContext | None,
+    *,
+    natal_lots: Mapping[str, dict[str, Any]] | None = None,
 ) -> tuple[dict[str, float], dict[str, float], dict[str, tuple[float, float]]]:
     """Return (ecliptic_longitudes, ecliptic_latitudes, ra_dec_pairs) for all PD points."""
     longitudes = extract_reference_longitudes(natal_subject)
@@ -613,7 +621,11 @@ def _extract_all_natal_points(
         pt = getattr(natal_subject, attr, None)
         latitudes[name] = float(getattr(pt, "latitude", 0.0) or 0.0)
     if is_ascendant_resolved(natal_subject):
-        lots = build_lot_payloads(natal_subject)
+        lots = (
+            dict(natal_lots)
+            if natal_lots is not None
+            else build_lot_payloads(natal_subject)
+        )
         for lot_key, payload in lots.items():
             p_name = LOT_POINT_NAMES[lot_key]
             longitudes[p_name] = float(
@@ -667,6 +679,9 @@ class _PrimaryDirectionEvent:
 class PrimaryDirectionAnalysis:
     payload: dict[str, Any]
     current_arc: float
+    context: PrimaryDirectionEquatorialContext | None = None
+    equatorial: Mapping[str, tuple[float, float]] | None = None
+    natal_lots: Mapping[str, dict[str, Any]] | None = None
 
 
 def build_primary_directions_payload(
@@ -681,6 +696,8 @@ def build_primary_directions_payload(
     max_age_years: float = PRIMARY_DIRECTION_MAX_AGE_YEARS,
     current_window_size: int = 12,
     direction_mode: str = "zodiacal",
+    natal_lots: Mapping[str, dict[str, Any]] | None = None,
+    include_full_timelines: bool = True,
 ) -> dict[str, Any]:
     return build_primary_direction_analysis(
         birth_info,
@@ -693,6 +710,8 @@ def build_primary_directions_payload(
         max_age_years=max_age_years,
         current_window_size=current_window_size,
         direction_mode=direction_mode,
+        natal_lots=natal_lots,
+        include_full_timelines=include_full_timelines,
     ).payload
 
 
@@ -708,6 +727,8 @@ def build_primary_direction_analysis(
     max_age_years: float = PRIMARY_DIRECTION_MAX_AGE_YEARS,
     current_window_size: int = 12,
     direction_mode: str = "zodiacal",
+    natal_lots: Mapping[str, dict[str, Any]] | None = None,
+    include_full_timelines: bool = True,
 ) -> PrimaryDirectionAnalysis:
     coordinate_system, coordinate_label = primary_direction_coordinate_meta(pd_method)
     approximation, approximation_label = primary_direction_approximation_meta(pd_method)
@@ -732,8 +753,17 @@ def build_primary_direction_analysis(
     sign_mult = -1.0 if pd_type == 1 else 1.0
     current_arc = (current_age * time_key_rate or 0.0) * sign_mult
 
+    resolved_natal_lots = (
+        dict(natal_lots)
+        if natal_lots is not None
+        else (
+            build_lot_payloads(natal_subject)
+            if is_ascendant_resolved(natal_subject)
+            else {}
+        )
+    )
     longitudes, latitudes, equatorial = _extract_all_natal_points(
-        birth_info, natal_subject, context
+        birth_info, natal_subject, context, natal_lots=resolved_natal_lots
     )
     offset = getattr(natal_subject, "calculation_basis", {}).get(
         "ayanamsha_degrees", 0.0
@@ -954,7 +984,27 @@ def build_primary_direction_analysis(
                     )
 
     events.sort(key=lambda item: item.chronological_key)
-    timeline = [e.payload for e in events]
+    full_timeline = [e.payload for e in events]
+    total_timeline_count = len(full_timeline)
+    if include_full_timelines:
+        timeline = full_timeline
+    else:
+        nearby = [
+            item
+            for item in full_timeline
+            if abs(item["relative_years_from_current"]) <= 5.0
+        ]
+        if len(nearby) > 25:
+            closest_indices = sorted(
+                range(len(nearby)),
+                key=lambda idx: (
+                    nearby[idx]["distance_from_current_years"],
+                    nearby[idx]["event_age_years"],
+                    idx,
+                ),
+            )[:25]
+            nearby = [nearby[idx] for idx in sorted(closest_indices)]
+        timeline = nearby
     current_window = [
         e.payload
         for e in sorted(events, key=lambda item: item.proximity_key)[
@@ -1016,7 +1066,16 @@ def build_primary_direction_analysis(
         "timeline": timeline,
         "skipped_circumpolar_count": len(skipped_circumpolar),
     }
-    return PrimaryDirectionAnalysis(payload=payload, current_arc=float(current_arc))
+    if not include_full_timelines:
+        payload["timeline_truncated"] = len(timeline) < total_timeline_count
+        payload["total_timeline_count"] = total_timeline_count
+    return PrimaryDirectionAnalysis(
+        payload=payload,
+        current_arc=float(current_arc),
+        context=context,
+        equatorial=equatorial,
+        natal_lots=resolved_natal_lots,
+    )
 
 
 def build_primary_direction_chart_payload(
@@ -1041,15 +1100,32 @@ def build_primary_direction_chart_payload(
     current_arc_degrees: Angle,
     current_hits: list[dict[str, Any]],
     show_pd_bounds: bool,
+    natal_lots: Mapping[str, dict[str, Any]] | None = None,
+    context: PrimaryDirectionEquatorialContext | None = None,
+    equatorial: Mapping[str, tuple[float, float]] | None = None,
+    embedded_in_western_timing: bool = False,
+    include_shared_primary_directions: bool = False,
 ) -> dict[str, Any]:
     natal_points = extract_reference_points(natal_subject)
-    natal_lots = build_lot_payloads(natal_subject)
+    resolved_natal_lots = (
+        dict(natal_lots)
+        if natal_lots is not None
+        else (
+            build_lot_payloads(natal_subject)
+            if is_ascendant_resolved(natal_subject)
+            else {}
+        )
+    )
     arc_float = float(current_arc_degrees)
     asc_sign = normalize_sign_name(natal_subject.ascendant.sign)
-    context = (
-        build_primary_direction_equatorial_context(birth_info)
-        if swe is not None
-        else None
+    resolved_context = (
+        context
+        if context is not None
+        else (
+            build_primary_direction_equatorial_context(birth_info)
+            if swe is not None
+            else None
+        )
     )
     offset = getattr(natal_subject, "calculation_basis", {}).get(
         "ayanamsha_degrees", 0.0
@@ -1057,13 +1133,18 @@ def build_primary_direction_chart_payload(
 
     directed_points: dict[str, dict[str, Any]] = {}
     for pt_name in extract_reference_longitudes(natal_subject):
-        if context is not None and swe is not None:
-            ra, dec = point_equatorial_position(pt_name, natal_subject, context=context)
+        if resolved_context is not None and swe is not None:
+            if equatorial is not None and pt_name in equatorial:
+                ra, dec = equatorial[pt_name]
+            else:
+                ra, dec = point_equatorial_position(
+                    pt_name, natal_subject, context=resolved_context
+                )
             lon, _ = project_equatorial_to_ecliptic(
                 ra + arc_float,
                 dec,
-                obliquity=context.obliquity,
-                longitude_origin=context.longitude_origin,
+                obliquity=resolved_context.obliquity,
+                longitude_origin=resolved_context.longitude_origin,
                 zodiac_offset=offset,
             )
         else:
@@ -1073,25 +1154,29 @@ def build_primary_direction_chart_payload(
         directed_points[pt_name] = longitude_to_point_dict(pt_name, lon)
 
     directed_lots: dict[str, dict[str, Any]] = {}
-    for lot_key, lot_data in natal_lots.items():
+    for lot_key, lot_data in resolved_natal_lots.items():
         base_lon = float(lot_data.get("longitude", lot_data["absolute_degree"]))
-        if context is not None and swe is not None:
-            ra, dec = project_absolute_degree_to_equatorial(
-                base_lon + offset,
-                obliquity=context.obliquity,
-                longitude_origin=context.longitude_origin,
-            )
+        lot_point_name = LOT_POINT_NAMES[lot_key]
+        if resolved_context is not None and swe is not None:
+            if equatorial is not None and lot_point_name in equatorial:
+                ra, dec = equatorial[lot_point_name]
+            else:
+                ra, dec = project_absolute_degree_to_equatorial(
+                    base_lon + offset,
+                    obliquity=resolved_context.obliquity,
+                    longitude_origin=resolved_context.longitude_origin,
+                )
             lon, _ = project_equatorial_to_ecliptic(
                 ra + arc_float,
                 dec,
-                obliquity=context.obliquity,
-                longitude_origin=context.longitude_origin,
+                obliquity=resolved_context.obliquity,
+                longitude_origin=resolved_context.longitude_origin,
                 zodiac_offset=offset,
             )
         else:
             lon = normalize_angle(base_lon + arc_float)
         directed_lots[lot_key] = {
-            **longitude_to_point_dict(LOT_POINT_NAMES[lot_key], lon),
+            **longitude_to_point_dict(lot_point_name, lon),
             "lot": lot_key,
             "lot_label": LOT_LABELS[lot_key],
         }
@@ -1141,7 +1226,7 @@ def build_primary_direction_chart_payload(
             for lk, l in directed_lots.items()
         }
 
-    return {
+    payload: dict[str, Any] = {
         "analysis_datetime": analysis_datetime.isoformat(),
         "method": pd_method,
         "method_label": primary_direction_method_label(pd_method),
@@ -1159,12 +1244,6 @@ def build_primary_direction_chart_payload(
         "approximation_label": approximation_label,
         "coordinate_precision": coordinate_precision,
         "coordinate_backend": coordinate_backend,
-        "coordinate_diagnostics": coordinate_diagnostics,
-        "natal_coordinate_points": coordinate_points,
-        "natal_coordinate_lots": coordinate_lots,
-        "directed_coordinate_points": current_coordinate_points,
-        "directed_coordinate_lots": current_coordinate_lots,
-        "coordinate_hits": current_hits[:8],
         "exact_hits": [
             item for item in current_hits[:8] if item.get("timing_phase") == "exact"
         ],
@@ -1177,3 +1256,23 @@ def build_primary_direction_chart_payload(
         "hits": current_hits[:8],
         "asc_sign": asc_sign,
     }
+    if not embedded_in_western_timing:
+        payload.update(
+            {
+                "coordinate_diagnostics": coordinate_diagnostics,
+                "natal_coordinate_points": coordinate_points,
+                "natal_coordinate_lots": coordinate_lots,
+                "directed_coordinate_points": current_coordinate_points,
+                "directed_coordinate_lots": current_coordinate_lots,
+                "coordinate_hits": current_hits[:8],
+            }
+        )
+    elif not include_shared_primary_directions:
+        payload.update(
+            {
+                "coordinate_diagnostics": coordinate_diagnostics,
+                "directed_coordinate_points": current_coordinate_points,
+                "directed_coordinate_lots": current_coordinate_lots,
+            }
+        )
+    return payload

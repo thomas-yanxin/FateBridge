@@ -594,7 +594,7 @@ REQUIRED_OUTPUT_FIELDS = {
     "vimshottari_dasha": "analysis_context person_info vimshottari summary",
     "hamburg_midpoint_chart": "base_chart midpoints chart_profile",
     "relationship_chart": "relationship_profile",
-    "western_timing": "directions returns time_lords transits",
+    "western_timing": "analysis_context natal_reference summary",
     "solar_return": "solar_return",
     "lunar_return": "lunar_return",
     "transit_chart": "transit_chart",

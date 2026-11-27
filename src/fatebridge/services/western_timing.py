@@ -51,6 +51,8 @@ def calculate_western_timing_analysis(
     show_pd_bounds: bool = True,
     high_latitude_fallback: str = "error",
     pd_direction_mode: str = "zodiacal",
+    techniques: list[str] | None = None,
+    include_full_timelines: bool = False,
 ) -> dict[str, Any]:
     """
     Build a western astrology predictive package with returns, progressions,
@@ -77,7 +79,9 @@ def calculate_western_timing_analysis(
         analysis_hour=analysis_hour,
         analysis_minute=analysis_minute,
     )
-    if firdaria_year_basis == "calendar_anniversary":
+    if (
+        techniques is None or "firdaria" in techniques
+    ) and firdaria_year_basis == "calendar_anniversary":
         validate_calendar_firdaria_inputs(birth_info, analysis_datetime)
     return build_western_timing_payload(
         birth_info,
@@ -96,6 +100,8 @@ def calculate_western_timing_analysis(
         show_pd_bounds=show_pd_bounds,
         high_latitude_fallback=high_latitude_fallback,
         pd_direction_mode=pd_direction_mode,
+        techniques=techniques,
+        include_full_timelines=include_full_timelines,
     )
 
 
@@ -132,6 +138,7 @@ def calculate_western_timing_module_analysis(
     show_pd_bounds: bool = True,
     high_latitude_fallback: str = "error",
     pd_direction_mode: str = "zodiacal",
+    scan_days: int | None = None,
 ) -> dict[str, Any]:
     """Build a single western timing technique payload for standalone tools."""
     house_system = normalize_house_system(house_system)
@@ -175,4 +182,5 @@ def calculate_western_timing_module_analysis(
         show_pd_bounds=show_pd_bounds,
         high_latitude_fallback=high_latitude_fallback,
         pd_direction_mode=pd_direction_mode,
+        scan_days=scan_days,
     )

@@ -283,7 +283,10 @@ def test_exact_clock_changes_computed_transit_and_matches_standalone() -> None:
         "transit_chart", **kwargs, analysis_hour=12, analysis_minute=37
     )
     assert noon["analysis_context"]["analysis_datetime"] == "2026-10-14T12:00:00+08:00"
-    assert noon["transits"]["current_transit"] == standalone["transit_chart"]
+    assert "natal_reference" not in noon["transits"]["current_transit"]
+    assert noon["transits"]["current_transit"] == {
+        k: v for k, v in standalone["transit_chart"].items() if k != "natal_reference"
+    }
     assert noon["natal_reference"]["sun"] == legacy["natal_reference"]["sun"]
     assert (
         standalone["transit_chart"]["moon"]["absolute_degree"]
