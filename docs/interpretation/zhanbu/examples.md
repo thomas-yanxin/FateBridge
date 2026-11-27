@@ -1,4 +1,4 @@
-## 可复核示例
+# 占式可复核示例
 
 CLI 示例使用已安装并激活的仓库虚拟环境，准备方法见[引擎调用](../shared/fatebridge-engine.md#怎么调引擎)。
 
@@ -26,4 +26,4 @@ python3 -m fatebridge.cli horary_chart --category career \
   --longitude 116.40 --latitude 39.90 --timezone-name Asia/Shanghai --fields summary
 ```
 
-生辰参评、河洛本命卦等已有能力按[数术方法参考](../README.md)核对，不用出生条文替代本次问事卦。
+生辰参评、河洛本命卦等已有能力按[河洛与邵子参评取证](../xingpan/numerology.md)核对，不用出生条文替代本次问事卦。

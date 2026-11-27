@@ -1,6 +1,6 @@
 # 印占的计算事实与传统解释
 
-适用于用户指定印度／吠陀占星、Jyotish、D9／D10 或 Vimshottari，或主题咨询确有新增价值的印占视角。先守[硬边界](safety-boundaries.md)及[本轮范围](consultation-routing.md)。
+适用于用户指定印度／吠陀占星、Jyotish、D9／D10 或 Vimshottari，或主题咨询确有新增价值的印占视角。先守[硬边界](safety-boundaries.md)及[咨询核心](consultation-core.md#任务路由与多视角)。
 
 ## 选择与资料
 

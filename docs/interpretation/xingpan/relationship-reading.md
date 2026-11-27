@@ -1,4 +1,4 @@
-## 关系盘的读法
+# 关系盘的读法
 
 首次调用前按工具公开的 `evidence_views` 选择与盘型同名的字段卡，复制其 `fields`，不要把卡名当成请求参数。默认联合视图保留安全主层，但已知模式时优先用对应卡，不能用通用摘要或跨盘相位替代指定主盘。计算后核对 `relationship_profile.relative_mode_normalized/primary_layer`，实际映射如下：
 
