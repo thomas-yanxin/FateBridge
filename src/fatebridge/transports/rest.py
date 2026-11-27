@@ -5,15 +5,16 @@ import logging
 from typing import Annotated, Protocol
 
 from fastapi import FastAPI, HTTPException, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, JsonValue
 from starlette.concurrency import run_in_threadpool
 
+from fatebridge.application.batch import BatchRequest, execute_batch
 from fatebridge.application.execution import result_is_error
 from fatebridge.application.response_delivery import deliver_response
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
 from fatebridge.core.execution_context import DetailLevel, ExecutionOptions
 from fatebridge.transports.flags import FIELDS_FLAG_DESC
-from fatebridge.utils.errors import ErrorEnvelope, handle_calculation_error
+from fatebridge.utils.errors import ErrorEnvelope, ParameterError, handle_calculation_error
 
 logger = logging.getLogger(__name__)
 
@@ -140,3 +141,38 @@ def register_rest_route(
             },
         },
     )
+
+
+def register_batch_route(app: FastAPI, specs: list[ToolSpec]) -> None:
+    """Mount POST /api/batch for stateless multi-subject, multi-tool execution."""
+    specs_by_name = {spec.name: spec for spec in specs}
+
+    @app.post(
+        "/api/batch",
+        name="rest_batch",
+        operation_id="run_batch",
+        summary="Run batch calculations",
+        description=(
+            "Stateless multi-subject, multi-tool batch execution. "
+            "Maps shared subjects and defaults to each tool's contract, "
+            "executes calls under one frozen as_of clock, and isolates per-call errors."
+        ),
+        responses={
+            status_code: {"model": ErrorEnvelope}
+            for status_code in (400, 401, 422, 500, 503, 504)
+        },
+    )
+    async def batch_route(request: BatchRequest) -> dict[str, JsonValue]:
+        try:
+            return await run_in_threadpool(execute_batch, specs_by_name, request)
+        except ParameterError as exc:
+            raise HTTPException(
+                status_code=exc.status_code,
+                detail=exc.as_result(),
+            ) from None
+        except Exception as error:
+            failure = handle_calculation_error(error, "batch")
+            raise HTTPException(
+                status_code=failure["status_code"],
+                detail=failure,
+            ) from None

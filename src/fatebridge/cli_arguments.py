@@ -268,6 +268,17 @@ def build_parser(
     doctor.add_argument("--mcp", action="store_true")
     doctor.add_argument("--family", help="检查这些 MCP 分类（CSV）")
 
+    batch = sub.add_parser(
+        "batch",
+        help="从 JSON 请求文件（或标准输入 -）批量执行多对象多工具计算",
+    )
+    batch.add_argument(
+        "--request-file",
+        required=True,
+        metavar="PATH|-",
+        help="批量计算 JSON 请求文件路径，或传 - 从标准输入读取",
+    )
+
     for spec in CATALOG:
         sp = sub.add_parser(spec.name, help=spec.summary)
         if command is not None and command != spec.name:

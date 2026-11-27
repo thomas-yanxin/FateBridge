@@ -17,6 +17,12 @@ from mcp.types import CallToolRequestParams, ToolAnnotations
 from pydantic import Field, ValidationError
 
 from fatebridge import __version__ as APP_VERSION
+from fatebridge.application.batch import (
+    BatchCall,
+    BatchRequest,
+    SubjectProfile,
+    execute_batch,
+)
 from fatebridge.application.discovery import discover_specs, select_mcp_specs
 from fatebridge.application.execution import execute_with_receipt, result_is_error
 from fatebridge.application.response_delivery import deliver_response
@@ -39,12 +45,13 @@ app: FastMCP
 
 
 MCP_INSTRUCTIONS = (
-    "FateBridge 提供本地确定性计算，公开 discover_tools 与 run_calculation 两个入口。"
+    "FateBridge 提供本地确定性计算，公开 discover_tools、run_calculation 与 run_batch 三个入口。"
     "计算前排除生死寿命、灾祸断言、临床诊断治疗和医疗择时。"
     "只用已确认资料，不猜生时、不套默认或示例；必要缺项简短追问，未知后继续已有可答部分。"
     "区分计算事实、传统解释与现实建议。"
     "已知工具定义时直接调用 run_calculation；未知工具或参数时调用 discover_tools(q=...) 或 discover_tools(tool=...)。"
-    "run_calculation 默认 detail=compact 返回核心业务字段；需要指定子字段传 fields（严格校验路径，错误时附可用字段）；需要完整输出与方法依据传 detail=audit。"
+    "同一对象跨多体系计算或多人合盘时优先调用 run_batch，通过 subjects、defaults 与 calls 一次性执行并共享同一冻结时刻 as_of，避免重复出生与地点参数。"
+    "run_calculation 与 run_batch 默认 detail=compact 返回核心业务字段；需要指定子字段传 fields（严格校验路径，错误时附可用字段）；需要完整输出与方法依据传 detail=audit。"
     "isError=true 时按 error_code 和 issues[].path / constraints 修正参数后重调，仅 retryable=true 才按原参数重试。"
 )
 
@@ -178,6 +185,56 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
                 spec.operation_label_zh,
             )
 
+    @server.tool(
+        name="run_batch",
+        description=(
+            "在单次无状态调用中对一个或多个对象（subjects）批量执行多个计算工具（calls），"
+            "自动按各工具契约映射出生/位置/性别字段，合并共享 defaults 与单条 arguments，"
+            "并共享同一冻结时刻 as_of。支持单条 detail/fields 覆盖与 stop_on_error。"
+        ),
+        annotations=meta_annotations,
+        tags={"meta"},
+    )
+    def run_batch(
+        calls: Annotated[
+            list[BatchCall],
+            Field(
+                min_length=1,
+                max_length=32,
+                description="要顺序执行的计算调用列表（1-32 条）",
+            ),
+        ],
+        subjects: Annotated[
+            dict[str, SubjectProfile] | None,
+            Field(description="共享对象档案字典，键名供 call.subject / call.subjects 引用"),
+        ] = None,
+        defaults: Annotated[
+            dict[str, object] | None,
+            Field(description="跨工具共享默认参数，按目标工具输入字段自动过滤"),
+        ] = None,
+        detail: DetailLevel = "compact",
+        as_of: str | None = None,
+        stop_on_error: bool = False,
+    ) -> ToolResult:
+        try:
+            batch_request = BatchRequest.model_validate(
+                {
+                    "subjects": subjects or {},
+                    "defaults": defaults or {},
+                    "calls": calls,
+                    "detail": detail,
+                    "as_of": as_of,
+                    "stop_on_error": stop_on_error,
+                }
+            )
+            payload = execute_batch(exposed_by_name, batch_request)
+            return protocol_result(payload, failed=False)
+        except Exception as exc:
+            return _render_protocol_error(
+                handle_calculation_error(exc, "run_batch"),
+                "run_batch",
+            )
+
 
 @cache
 def _configure_runtime() -> None:
@@ -190,7 +247,7 @@ def _configure_runtime() -> None:
 
 
 def create_mcp_app(families: str | None = None) -> FastMCP:
-    """Expose the two public tools for the selected calculation families."""
+    """Expose the three public meta tools for the selected calculation families."""
     _configure_runtime()
     exposed = select_mcp_specs(CATALOG, family=families)
     if not exposed:

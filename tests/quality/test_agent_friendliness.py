@@ -45,9 +45,13 @@ def _business(payload: dict[str, object]) -> dict[str, object]:
 async def test_stranger_agent_mcp_loop_and_error_recovery() -> None:
     """An agent starting cold can discover, search, call compactly, and recover from typos."""
     async with Client(cached_mcp_app()) as client:
-        # 1. Surface exposes only discover_tools + run_calculation and 0 resources.
+        # 1. Surface exposes discover_tools + run_calculation + run_batch and 0 resources.
         tools = await client.list_tools()
-        assert {tool.name for tool in tools} == {"discover_tools", "run_calculation"}
+        assert {tool.name for tool in tools} == {
+            "discover_tools",
+            "run_calculation",
+            "run_batch",
+        }
         resources = await client.list_resources()
         templates = await client.list_resource_templates()
         assert resources == []
@@ -253,7 +257,7 @@ def test_catalog_hygiene_across_all_tools() -> None:
     for field_name in ("qimen_options", "taiyi_options"):
         assert _resolve_schema_property(sanshi_schema, field_name).get("properties")
 
-    # Confirm default MCP app exposes only 2 tools and 0 resources.
+    # Confirm default MCP app exposes 3 meta tools and 0 resources.
     app_mcp = create_mcp_app()
     assert app_mcp is not None
 

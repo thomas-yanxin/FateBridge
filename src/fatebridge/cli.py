@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import shlex
 import sys
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from fatebridge.cli_arguments import build_parser, emit_error
@@ -79,23 +80,41 @@ def _attach_cli_examples(manifest: ServiceResult) -> ServiceResult:
     return manifest
 
 
+def _load_batch_payload(request_file: str) -> dict[str, object]:
+    try:
+        raw_text = (
+            sys.stdin.read()
+            if request_file == "-"
+            else Path(request_file).expanduser().read_text(encoding="utf-8")
+        )
+        data = json.loads(raw_text)
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError("request-file 必须为可读的合法 JSON 文件或标准输入") from exc
+    if not isinstance(data, dict):
+        raise ValueError("request-file 顶层必须是 JSON 对象")
+    return data
+
+
 def run(argv: list[str] | None = None) -> int:
     """Load runtime configuration and dispatch the requested CLI command."""
     load_runtime_env()
-    try:
-        request_data = preload_request(argv)
-    except ValueError as error:
-        return emit_error(
-            {
-                "error": str(error),
-                "error_code": "usage_error",
-                "status_code": 400,
-                "retryable": False,
-            },
-            2,
-        )
+    command = _cli_command_token(argv)
+    request_data: dict[str, object] | None = None
+    if command != "batch":
+        try:
+            request_data = preload_request(argv)
+        except ValueError as error:
+            return emit_error(
+                {
+                    "error": str(error),
+                    "error_code": "usage_error",
+                    "status_code": 400,
+                    "retryable": False,
+                },
+                2,
+            )
     relaxed = set(request_data) if request_data is not None else set()
-    parser = build_parser(relaxed, command=_cli_command_token(argv))
+    parser = build_parser(relaxed, command=command)
     try:
         args = parser.parse_args(argv)
     except SystemExit as exc:
@@ -104,6 +123,36 @@ def run(argv: list[str] | None = None) -> int:
 
     if not args.command:
         _print_tools()
+        return 0
+
+    if args.command == "batch":
+        from fatebridge.application.batch import BatchRequest, execute_batch
+        from fatebridge.utils.errors import handle_calculation_error
+        from fatebridge.utils.formatting import format_json_response
+
+        try:
+            batch_data = _load_batch_payload(args.request_file)
+        except ValueError as error:
+            return emit_error(
+                {
+                    "error": str(error),
+                    "error_code": "usage_error",
+                    "status_code": 400,
+                    "retryable": False,
+                },
+                2,
+            )
+
+        try:
+            batch_request = BatchRequest.model_validate(batch_data)
+            payload = execute_batch(
+                {spec.name: spec for spec in CATALOG},
+                batch_request,
+            )
+        except Exception as exc:  # noqa: BLE001 - translate failures at the CLI boundary
+            return emit_error(handle_calculation_error(exc, "batch"), 1)
+
+        print(format_json_response(payload, compact=False))
         return 0
 
     if args.command in {"list", "discover"}:
