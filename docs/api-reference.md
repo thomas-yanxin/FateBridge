@@ -4,7 +4,7 @@
 
 本文列出 FateBridge 的 REST 路由、FastMCP 工具面、共享请求族与响应约定。安装步骤见[快速入门](getting-started.md)，端到端调用代码、错误恢复全表与 Agent 闭环见[接入指南](agent-guide.md)。
 
-OpenAPI 发布 90 个业务 REST 路由，另有 `/health`、`/ready`、`/metrics` 三个运维端点。目录共有 90 条记录，CLI 可执行 90 条目录命令，MCP 通过两个入口提供 90 项业务能力。字段约束以当前服务的 `/openapi.json`、MCP `discover_tools(tool=...)` 或 CLI `fatebridge discover <tool>` 为准。
+OpenAPI 发布 90 个业务 REST 路由，另有 `/api/batch`（多主体多工具无状态批处理）、`/health`、`/ready`、`/metrics` 四个共享端点。目录共有 90 条记录，CLI 可执行 90 条目录命令，MCP 通过三个入口（`discover_tools`、`run_calculation`、`run_batch`）提供 90 项业务能力。字段约束以当前服务的 `/openapi.json`、MCP `discover_tools(tool=...)` 或 CLI `fatebridge discover <tool>` 为准。
 
 ## 阅读导航
 
@@ -251,6 +251,7 @@ REST 使用 `GET /api/tools`（查询参数 `detail=summary|full`、`family`、`
 | `GET` | `/ready` | 服务就绪与可选西占运行时检查（`checks`） |
 | `GET` | `/metrics` | Prometheus 文本指标 |
 | `GET` | `/api/tools` | 机读能力发现清单（支持 `detail`/`family`/`q`/`tool`/`surface`/`include_output_schema`） |
+| `POST` | `/api/batch` | 多主体多工具无状态批处理（共享 `subjects` 与 `defaults`，一次请求串联多工具） |
 
 ### 4.11 家居风水（family `fengshui`）
 
@@ -311,7 +312,7 @@ uv run --extra dev python -m fatebridge.mcp_server
 
 ### 6.2 MCP 工具分组
 
-全部 90 项业务能力由 `discover_tools` 与 `run_calculation` 两个协议工具暴露（不暴露 MCP 资源），按 `family` 分组如下：
+全部 90 项业务能力由 `discover_tools`、`run_calculation` 与 `run_batch` 三个协议工具暴露（不暴露 MCP 资源），按 `family` 分组如下：
 
 #### 基础命理（family `bazi`）
 

@@ -33,8 +33,8 @@ FateBridge 是面向 Agent 的泛心理领域统一计算引擎，目标是在�
 
 - 使用当前聊天已确认资料。独立咨询不查仓库、历史或记忆；明确要求沿用历史资料时再核对。
 - 计算前检查[硬边界](docs/interpretation/shared/safety-boundaries.md)：不提供生死寿命、灾祸断言、临床诊断治疗或医疗择时。未知出生时刻不能猜，也不套默认值或示例；必要缺项简短追问，明确不知道后停止追问同项，交付已有可答部分。
-- MCP 已连接且定义清楚时直接调用。只在工具或参数不清楚时按名称取得完整定义（`discover_tools(tool=...)`，仅在需要完整输出 Schema 时传 `detail="full"` 与 `include_output_schema=True`）；本地无连接时可用 CLI（`fatebridge discover <tool>`，需要完整输出 Schema 时加 `--detail full --include-output-schema`）。工具发现不是每轮必经步骤。
+- MCP 已连接且定义清楚时直接调用。只在工具或参数不清楚时按名称取得完整定义（`discover_tools(tool=...)`，仅在需要完整输出 Schema 时传 `detail="full"` 与 `include_output_schema=True`）；本地无连接时可用 CLI（`fatebridge discover <tool>`，需要完整输出 Schema 时加 `--detail full --include-output-schema`）。多工具或多主体共享出生/背景资料时优先用 `run_batch`（REST `POST /api/batch`，CLI `fatebridge batch --request-file ...`）一次串联执行。工具发现不是每轮必经步骤。
 - 离线核对常用合同见[按需合同索引](docs/contracts/README.md)，只读所选工具文件。以当前连接的实际 Schema 和公开范围为准，不因文件存在而调用隐藏工具。
-- 摘要首轮用 `detail=compact`，`run_calculation`、REST 与 CLI 默认均采用此级别。需要指定证据或更细字段时，按已发布 `evidence_views` 选择 `fields`（三端始终严格校验路径，无效路径报错并附 `constraints.available`）。需要完整 JSON、全部时间线或方法依据时传 `detail=audit`、`fields=null`。
+- 摘要首轮用 `detail=compact`，`run_calculation`、`run_batch`、REST 与 CLI 默认均采用此级别。需要指定证据或更细字段时，按已发布 `evidence_views` 选择 `fields`（三端始终严格校验路径，无效路径报错并附 `constraints.available`）。需要完整 JSON、全部时间线或完整数值详情时传 `detail=audit`、`fields=null`。
 - 核对 `isError`、实际时区与时间粒度；按错误字段修正，仅 `retryable=true` 才重试。更正事实重建受影响输入；解释未变结果无需重算，需要固定默认时钟或复现时传入 `as_of`。
 - 风水工具的输入口径与图层结构见[家居风水参考](docs/fengshui.md)与[现场资料与口径](docs/interpretation/fengshui/consultation.md)。

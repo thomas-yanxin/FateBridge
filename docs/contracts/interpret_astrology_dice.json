@@ -13,7 +13,7 @@
         "planet",
         "sign",
         "house",
-        "input_normalized",
+        "analysis_context",
         "chart",
         "validation"
       ],
@@ -25,7 +25,7 @@
         "planet",
         "sign",
         "house",
-        "input_normalized",
+        "analysis_context",
         "validation"
       ],
       "purpose": "完整提供实际时空输入后核对独立天象的瞬时黄经日速、显示黄道参考系、实际文件来源与缺失状态；原生速度缺失不得解释为顺行，零日速不定位留站，不能改写骰面条件。"
@@ -37,8 +37,6 @@
         "sign",
         "house",
         "symbolic_details",
-        "rulesets",
-        "rule_trace",
         "validation"
       ],
       "purpose": "忠实解读用户已有的三骰结果，不默认抽骰或附加天象。"
@@ -51,8 +49,6 @@
       "sign",
       "house",
       "symbolic_details",
-      "rulesets",
-      "rule_trace",
       "validation"
     ]
   },

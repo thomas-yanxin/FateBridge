@@ -133,7 +133,9 @@ def test_correct_bound_sequence_reaches_rest_mcp_cli(
     assert business(values[0]) == business(values[1]) == business(values[2])
     for value in values:
         aries = [
-            row for row in value["bounds_directions"]["periods"] if row["sign"] == "Aries"
+            row
+            for row in value["bounds_directions"]["periods"]
+            if row["sign"] == "Aries"
         ]
         assert [row["distributor"] for row in aries] == [
             "Jupiter",

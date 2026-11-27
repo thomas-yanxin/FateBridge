@@ -21,7 +21,10 @@ from fatebridge.core.fengshui.models import (
     Placement,
     XuankongRequest,
 )
-from fatebridge.core.fengshui.xuankong import analyze_natal_interpretation, xuankong_natal
+from fatebridge.core.fengshui.xuankong import (
+    analyze_natal_interpretation,
+    xuankong_natal,
+)
 from fatebridge.core.fengshui.zibai import (
     annual_stars,
     build_palace_overlay,

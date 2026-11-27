@@ -51,7 +51,7 @@ def test_every_mcp_input_preserves_canonical_constraints_and_examples() -> None:
     assess = dereference_refs(tools["fengshui_assess"]["input_schema"])["properties"]
     placement = assess["placements"]["items"]
     assert placement["type"] == "object" and "$ref" not in placement
-    assert set(placement["required"]) == {"object_id", "purpose"}
+    assert set(placement["required"]) == {"purpose"}
     assert "至少提供位置或朝向" in placement["description"]
     assert placement["allOf"]  # Cross-field rules survive nested MCP publication.
 
@@ -163,7 +163,7 @@ def test_placement_schema_and_runtime_preserve_cross_field_contract(
     for location, facing, role in product(
         [omitted, None, "NE"], [omitted, None, "W"], roles
     ):
-        inputs = {"object_id": "object", "purpose": purpose}
+        inputs = {"purpose": purpose}
         for field, value in [
             ("location_direction", location),
             ("facing_direction", facing),
@@ -176,23 +176,21 @@ def test_placement_schema_and_runtime_preserve_cross_field_contract(
         has_location = location is not omitted and location is not None
         has_facing = facing is not omitted and facing is not None
         has_role = role is not omitted and role is not None
-        expected = (
-            (has_location or has_facing)
-            and has_facing == has_role
-            and (not has_role or role == expected_role)
+        expected = (has_location or has_facing) and (
+            not has_role or (has_facing and role == expected_role)
         )
         assert validator.is_valid(inputs) is expected, inputs
         try:
-            Placement.model_validate(inputs)
+            validated = Placement.model_validate(inputs)
             accepted = True
+            if has_facing:
+                assert validated.facing_role == expected_role
         except ValidationError:
             accepted = False
         assert accepted is expected, inputs
 
 
-def test_published_mcp_schema_rejects_missing_role_for_every_supported_purpose() -> (
-    None
-):
+def test_published_mcp_schema_auto_populates_and_rejects_mismatched_role() -> None:
     async def call():
         async with Client(cached_mcp_app(families="fengshui")) as client:
             tool = await describe_capability(client, "fengshui_assess")
@@ -203,40 +201,40 @@ def test_published_mcp_schema_rejects_missing_role_for_every_supported_purpose()
                 ("desk", "desk_facing"),
                 ("stove", "fire_mouth"),
             ]:
-                placement = {
-                    "object_id": purpose,
+                # Omitting facing_role and object_id is valid and auto-populated.
+                auto_placement = {
                     "purpose": purpose,
                     "facing_direction": "E",
                 }
-                inputs = {
+                auto_inputs = {
                     "methods": ["bazhai"],
                     "analyze_layout": True,
-                    "placements": [placement],
+                    "placements": [auto_placement],
                 }
-                assert not validator.is_valid(inputs)
-                invalid = await call_calculation(
-                    client, "fengshui_assess", inputs, raise_on_error=False
-                )
-                assert invalid.is_error
-                complete_pair = {
-                    **inputs,
-                    "placements": [{**placement, "facing_role": role}],
-                }
-                assert validator.is_valid(complete_pair)
-                valid = await call_calculation(
+                assert validator.is_valid(auto_inputs)
+                auto_valid = await call_calculation(
                     client,
                     "fengshui_assess",
-                    complete_pair,
+                    auto_inputs,
                     raise_on_error=False,
                 )
-                assert not valid.is_error
+                assert not auto_valid.is_error
                 assert (
-                    valid.structured_content["layout_analysis"]["status"] == "partial"
+                    auto_valid.structured_content["layout_analysis"]["status"]
+                    == "partial"
                 )
-                assert (
-                    valid.structured_content["layout_analysis"]["placement_findings"]
-                    == []
+
+                # Supplying a mismatched facing_role for purpose is rejected.
+                wrong_role = "headboard" if role != "headboard" else "door_facing"
+                bad_inputs = {
+                    **auto_inputs,
+                    "placements": [{**auto_placement, "facing_role": wrong_role}],
+                }
+                assert not validator.is_valid(bad_inputs)
+                invalid = await call_calculation(
+                    client, "fengshui_assess", bad_inputs, raise_on_error=False
                 )
+                assert invalid.is_error
 
     asyncio.run(call())
 

@@ -8,7 +8,7 @@ import types
 from collections.abc import Mapping
 from copy import deepcopy
 from datetime import date, datetime, timezone
-from typing import Annotated, Literal, get_args, get_origin
+from typing import Annotated, Literal, cast, get_args, get_origin
 
 from pydantic import (
     BaseModel,
@@ -113,11 +113,12 @@ class SubjectProfile(BaseModel):
                         and self.birth_month != parsed_date.month
                     )
                     or (
-                        self.birth_day is not None
-                        and self.birth_day != parsed_date.day
+                        self.birth_day is not None and self.birth_day != parsed_date.day
                     )
                 ):
-                    raise ValueError("birth_date 与 birth_year/birth_month/birth_day 不一致")
+                    raise ValueError(
+                        "birth_date 与 birth_year/birth_month/birth_day 不一致"
+                    )
         elif (
             self.birth_year is not None
             and self.birth_month is not None
@@ -161,7 +162,9 @@ class SubjectProfile(BaseModel):
                         and self.birth_second != second
                     )
                 ):
-                    raise ValueError("birth_time 与 birth_hour/birth_minute/birth_second 不一致")
+                    raise ValueError(
+                        "birth_time 与 birth_hour/birth_minute/birth_second 不一致"
+                    )
 
         return self
 
@@ -336,7 +339,11 @@ def _map_subject_with_prefix(
     require_name: bool,
 ) -> dict[str, object]:
     mapped: dict[str, object] = {}
-    name_value = profile.name if profile.name is not None else (subject_key if require_name else None)
+    name_value = (
+        profile.name
+        if profile.name is not None
+        else (subject_key if require_name else None)
+    )
     candidate_values: dict[str, object | None] = {
         f"{prefix}name": name_value,
         f"{prefix}gender": profile.gender,
@@ -406,9 +413,7 @@ def _map_multi_subjects(
     target_fields: Mapping[str, FieldInfo],
 ) -> dict[str, object]:
     if "occupants" in target_fields:
-        occupant_model = _unwrap_list_item_model(
-            target_fields["occupants"].annotation
-        )
+        occupant_model = _unwrap_list_item_model(target_fields["occupants"].annotation)
         occupant_fields = (
             occupant_model.model_fields if occupant_model is not None else {}
         )
@@ -432,7 +437,10 @@ def _map_multi_subjects(
                     {
                         "path": "subjects",
                         "code": "invalid_subject_count",
-                        "constraints": {"expected_count": 2, "actual_count": len(subject_keys)},
+                        "constraints": {
+                            "expected_count": 2,
+                            "actual_count": len(subject_keys),
+                        },
                     }
                 ],
             )
@@ -462,7 +470,10 @@ def _map_multi_subjects(
                     {
                         "path": "subjects",
                         "code": "invalid_subject_count",
-                        "constraints": {"expected_count": 2, "actual_count": len(subject_keys)},
+                        "constraints": {
+                            "expected_count": 2,
+                            "actual_count": len(subject_keys),
+                        },
                     }
                 ],
             )
@@ -515,7 +526,9 @@ def resolve_call_arguments(
                         }
                     ],
                 )
-        resolved.update(_map_multi_subjects(spec, call.subjects, subjects, model_fields))
+        resolved.update(
+            _map_multi_subjects(spec, call.subjects, subjects, model_fields)
+        )
     elif call.subject is not None:
         if call.subject not in subjects:
             raise ParameterError(
@@ -577,22 +590,25 @@ def _validate_subject_references(request: BatchRequest) -> None:
         raise ParameterError("批量请求包含未知的 subject 引用", issues)
 
 
-def _unknown_tool_error(tool_name: str, allowed_tools: set[str]) -> dict[str, object]:
+def _unknown_tool_error(tool_name: str, allowed_tools: set[str]) -> JsonValue:
     suggestions = difflib.get_close_matches(
         tool_name, sorted(allowed_tools), n=5, cutoff=0.4
     )
     issue: dict[str, object] = {"path": "tool", "code": "unknown_tool"}
     if suggestions:
         issue["constraints"] = {"suggestions": suggestions}
-    return error_response_payload(
-        {
-            "error": f"未知工具: {tool_name}",
-            "error_code": "unknown_tool",
-            "status_code": 404,
-            "retryable": False,
-            "issues": [issue],
-        },
-        tool_name,
+    return cast(
+        JsonValue,
+        error_response_payload(
+            {
+                "error": f"未知工具: {tool_name}",
+                "error_code": "unknown_tool",
+                "status_code": 404,
+                "retryable": False,
+                "issues": [issue],
+            },
+            tool_name,
+        ),
     )
 
 
@@ -608,11 +624,14 @@ def execute_batch(
         else datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     )
     allowed_tools = set(specs_by_name)
-    results: list[dict[str, JsonValue]] = []
+    results: list[JsonValue] = []
+    succeeded = 0
+    failed = 0
 
     for call in request.calls:
         spec = specs_by_name.get(call.tool)
         if spec is None:
+            failed += 1
             results.append(
                 {
                     "id": call.id,
@@ -643,13 +662,15 @@ def execute_batch(
                 options=options,
             )
             if result_is_error(raw_result):
+                failed += 1
                 results.append(
                     {
                         "id": call.id,
                         "tool": call.tool,
                         "ok": False,
-                        "error": error_response_payload(
-                            raw_result, spec.operation_label_zh
+                        "error": cast(
+                            JsonValue,
+                            error_response_payload(raw_result, spec.operation_label_zh),
                         ),
                     }
                 )
@@ -663,6 +684,7 @@ def execute_batch(
                 fields=call.fields,
                 detail=options.detail,
             )
+            succeeded += 1
             results.append(
                 {
                     "id": call.id,
@@ -672,20 +694,22 @@ def execute_batch(
                 }
             )
         except Exception as exc:  # noqa: BLE001 - isolate per-call failures
+            failed += 1
             failure = handle_calculation_error(exc, spec.operation_label_zh)
             results.append(
                 {
                     "id": call.id,
                     "tool": call.tool,
                     "ok": False,
-                    "error": error_response_payload(failure, spec.operation_label_zh),
+                    "error": cast(
+                        JsonValue,
+                        error_response_payload(failure, spec.operation_label_zh),
+                    ),
                 }
             )
             if request.stop_on_error:
                 break
 
-    succeeded = sum(1 for item in results if item["ok"])
-    failed = len(results) - succeeded
     status: Literal["ok", "partial_error", "error"]
     if failed == 0:
         status = "ok"

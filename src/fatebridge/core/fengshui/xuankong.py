@@ -162,9 +162,7 @@ def period_context(period: HousePeriod) -> dict[str, Any]:
             "valid_from": None,
             "valid_until": None,
         }
-    time = year_context(
-        period.event_year, period.event_at, period.timezone_name
-    )
+    time = year_context(period.event_year, period.event_at, period.timezone_name)
     year_uncertain = time.get("effective_year_status") == "requires_confirmation"
     years = (
         time["candidate_effective_years"]
@@ -571,7 +569,7 @@ def _chart(
         "kongwang": band["kongwang"] if band else None,
         "kongwang_seam_degrees": band["kongwang_seam_degrees"] if band else None,
         "palaces": palaces,
-        "trace": {"mountain": mountain, "facing": water},
+        "flight_details": {"mountain": mountain, "facing": water},
         "structure": natal_structure(
             {
                 "period_number": period,
@@ -1223,7 +1221,11 @@ def analyze_natal_interpretation(
     host_guest = _analyze_host_guest(natal) if config.host_guest_ruleset_id else None
 
     result: dict[str, Any] = {
-        **({"timeliness_ruleset_id": config.timeliness_ruleset_id} if author_profile else {}),
+        **(
+            {"timeliness_ruleset_id": config.timeliness_ruleset_id}
+            if author_profile
+            else {}
+        ),
         **({"fixed_lingzheng_analysis": fixed} if fixed is not None else {}),
         **({"host_guest_analysis": host_guest} if host_guest is not None else {}),
         "status": "partial" if missing or not charts else "complete",

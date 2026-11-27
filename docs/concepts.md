@@ -27,7 +27,7 @@ FateBridge 把确定性计算、传统依据说明与自然语言对话拆开处
 | 工具（Tool） | 单项确定性计算的输入输出契约 | 已知计算目标，核对 Schema 后直接调用 |
 | 分类（`family`） | 中央目录的 12 个能力分类 | 缩小发现范围，或用 `FATEBRIDGE_MCP_FAMILIES` 裁剪 MCP 公开范围 |
 
-MCP 仅公开 `discover_tools` 与 `run_calculation` 两个入口（无 MCP 资源）；三端能力边界与路径映射见[三端能力边界](api-reference.md#22-三端能力边界)，全量能力见[算法覆盖矩阵](algorithm-coverage.md)。
+MCP 公开 `discover_tools`、`run_calculation` 与 `run_batch` 三个入口（无 MCP 资源）；三端能力边界与路径映射见[三端能力边界](api-reference.md#22-三端能力边界)，全量能力见[算法覆盖矩阵](algorithm-coverage.md)。
 
 ## 输入与时间口径
 
@@ -62,7 +62,6 @@ MCP 仅公开 `discover_tools` 与 `run_calculation` 两个入口（无 MCP 资�
 | 已实际算出的图层 | `coverage.implemented_layers` | 仅列真实完成计算并写入 `layers` 的方法层 |
 | 当前缺失或未请求项 | `coverage.missing_inputs`、`coverage.not_requested_layers`（及 `unavailable_layers`） | 未请求或因缺输入未算不等于否定判断 |
 | 流派或规则分歧 | `conflicts` | 各方法结论并列保留，不平均或合并成单一总分 |
-| 规则版本与追溯依据 | `rulesets`、`rule_trace`（及 `source_catalog`） | 交付来源时保留实际返回的规则 ID、版本与引用编号 |
 | 叠盘与空间布局评估 | `palace_overlay`、`layout_analysis` | 仅在请求对应计算时产出，输出结构事实而非化煞处方 |
 
 未知的现场事实不得按否定事实处理，也不能把条件候选升级为已确认现状。风水八工具的完整结构说明见[家居风水参考](fengshui.md)。

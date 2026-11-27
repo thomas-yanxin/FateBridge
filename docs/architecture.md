@@ -11,7 +11,7 @@ flowchart TD
     Catalog["services/tool_catalog.py<br/>CATALOG / ToolSpec"] --> Registrar["transports/rest.py<br/>register_rest"]
     Catalog --> CLI["cli.py<br/>list / discover / doctor + 目录命令"]
     Registrar --> REST["api.py / FastAPI"]
-    Catalog --> MCP["mcp_server.py / FastMCP<br/>discover_tools + run_calculation"]
+    Catalog --> MCP["mcp_server.py / FastMCP<br/>discover_tools + run_calculation + run_batch"]
     REST --> Execution["application/execution.py<br/>共享执行、输出校验、receipt"]
     MCP --> Execution
     CLI --> Execution
@@ -27,7 +27,7 @@ flowchart TD
 
 `services/catalog/` 按领域声明 `ToolSpec`，`services/tool_catalog.py` 将其有序装配为唯一的中央目录 `CATALOG`；请求模型位于 `core/requests/`，响应根模型与嵌套契约位于 `core/response_models.py` 及 `core/contracts/`。
 
-目录共有 90 条记录。OpenAPI 发布 90 个业务 REST 路由，FastAPI 另提供 `/api/tools`、`/health`、`/ready` 与 `/metrics`。MCP 通过两个入口提供 90 项业务能力。CLI 可执行 90 条目录命令，并提供 `list`、`discover` 与 `doctor`。各端入口映射见[三端能力边界](api-reference.md#22-三端能力边界)。
+目录共有 90 条记录。OpenAPI 发布 90 个业务 REST 路由，FastAPI 另提供 `/api/tools`、`/api/batch`、`/health`、`/ready` 与 `/metrics`。MCP 通过三个入口提供 90 项业务能力。CLI 可执行 90 条目录命令，并提供 `list`、`discover`、`batch` 与 `doctor`。各端入口映射见[三端能力边界](api-reference.md#22-三端能力边界)。
 
 ## 分层职责
 

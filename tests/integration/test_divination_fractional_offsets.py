@@ -204,7 +204,9 @@ def test_fractional_offset_and_day_pillars_agree_across_transports(
             "time": hour,
         }
     else:
-        assert expected["liuren"]["calendar_policy"]["corrected_clock"] == expected_clock
+        assert (
+            expected["liuren"]["calendar_policy"]["corrected_clock"] == expected_clock
+        )
         for tool in ("qimen", "taiyi", "liuren"):
             pillars = expected["subresults"][tool]["four_pillars"]
             assert pillars["day"] == {"stem": day[0], "branch": day[1]}

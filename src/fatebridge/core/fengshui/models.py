@@ -363,8 +363,7 @@ class MingguaRequest(TimeInput):
     def validate_birth(self) -> "MingguaRequest":
         if (
             sum(
-                v is not None
-                for v in (self.birth_year, self.birth_at, self.birth_date)
+                v is not None for v in (self.birth_year, self.birth_at, self.birth_date)
             )
             > 1
         ):
@@ -398,7 +397,8 @@ class House(FengshuiInput):
         description="宅向角度，0°北顺时针",
     )
     facing_mountain: Mountain | None = Field(
-        default=None, description="已确认住宅朝向二十四山（未提供 facing_degrees 时可选）"
+        default=None,
+        description="已确认住宅朝向二十四山（未提供 facing_degrees 时可选）",
     )
     bearing_uncertainty_degrees: float | None = Field(
         default=None,
@@ -544,7 +544,9 @@ class BazhaiRequest(FengshuiInput):
             self.house.check_sitting_trigram(
                 self.house.bearing_uncertainty_degrees or 0
             )
-        used_subjects = {o.subject_id for o in self.occupants if o.subject_id is not None}
+        used_subjects = {
+            o.subject_id for o in self.occupants if o.subject_id is not None
+        }
         if self.house is not None:
             used_subjects.add(self.house.object_id)
         for o in self.occupants:
@@ -694,9 +696,7 @@ class HousePeriod(TimeInput):
             )
             != 1
         ):
-            raise ValueError(
-                "定运需且仅需 period_number、event_year、event_at 之一"
-            )
+            raise ValueError("定运需且仅需 period_number、event_year、event_at 之一")
         if self.basis is None:
             self.basis = (
                 "expert_confirmed"
@@ -950,7 +950,8 @@ class AssessRequest(BazhaiRequest):
     """Multi-layer assessment decoupled from AnnualRequest mutual exclusion."""
 
     analyze_layout: bool | None = Field(
-        default=None, description="是否计算跨层布局落宫与四层叠盘；默认有 placements 时自动启用"
+        default=None,
+        description="是否计算跨层布局落宫与四层叠盘；默认有 placements 时自动启用",
     )
     features: list[EnvironmentFeature] = Field(default_factory=list, max_length=500)
     effective_year: Year | None = Field(
@@ -1045,7 +1046,9 @@ class AssessRequest(BazhaiRequest):
         flat_period: HousePeriod | None = None
         if self.built_year is not None or self.period_number is not None:
             if self.xuankong is not None and self.xuankong.period is not None:
-                raise ValueError("顶层 built_year/period_number 不能与 xuankong.period 同时提供")
+                raise ValueError(
+                    "顶层 built_year/period_number 不能与 xuankong.period 同时提供"
+                )
             flat_period = HousePeriod(
                 event_year=self.built_year,
                 period_number=self.period_number,
@@ -1054,7 +1057,9 @@ class AssessRequest(BazhaiRequest):
         if (
             self.xuankong is not None or flat_period is not None
         ) and "xuankong_natal" not in self.selected_methods:
-            raise ValueError("提供 xuankong/built_year/period_number 时须在 methods 中选择 xuankong_natal")
+            raise ValueError(
+                "提供 xuankong/built_year/period_number 时须在 methods 中选择 xuankong_natal"
+            )
         if "xuankong_natal" in self.selected_methods:
             natal = self.xuankong or XuankongRequest()
             if self.house is not None and natal.house is not None:

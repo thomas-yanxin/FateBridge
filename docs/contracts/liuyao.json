@@ -2,7 +2,7 @@
   "evidence_views": {
     "line_reading": {
       "fields": [
-        "input_normalized",
+        "analysis_context",
         "nongli",
         "current_hexagram",
         "changed_hexagram",
@@ -10,7 +10,6 @@
         "lines",
         "hexagram_info",
         "liuyao_evidence",
-        "classical_text_evidence",
         "summary"
       ],
       "when": "读取逐爻纳支、世应、原典动爻及月令动静条件；focus_line/focus_kinship为明确取用前提，日级候选不等于事件应期"
@@ -24,18 +23,15 @@
     "void_conditions_overview": {
       "fields": [
         "current_hexagram",
-        "input_normalized.event_horizon",
-        "lines",
-        "liuyao_evidence.calendar_conventions.month_branch",
-        "liuyao_evidence.calendar_conventions.day_ganzhi",
-        "liuyao_evidence.calendar_conventions.xunkong"
+        "analysis_context.event_horizon",
+        "lines"
       ],
       "when": "无明确用爻时，查六条明爻和实际伏神的原旬旬空与空／不空条件，核对原文疑义及使用范围。保留问事近远、总旺衰未决的条件，不代选用爻。超出响应预算时，按 result_delivery 读取同一 run 的证据。"
     }
   },
   "first_view": {
     "fields": [
-      "input_normalized",
+      "analysis_context",
       "nongli",
       "current_hexagram",
       "changed_hexagram",
@@ -43,7 +39,6 @@
       "lines",
       "hexagram_info",
       "liuyao_evidence",
-      "classical_text_evidence",
       "summary"
     ]
   },

@@ -7,7 +7,7 @@
 
 - **释义与原典引用**：解释文本时给出实际可读关键词并用白话说明字词、传统意象与条件；缺文和未决条件保留，不编字。核对方法与原典依据时按同次 `schedule_basis` 区分实际采用规则、语境对照规则与现代日期约定，每条引文交代书目、版本／唯一书影身份与页码；来源目录不授予全书认证。
 - **知识查询**：需查术语或原句时按需调用 `knowledge_catalog(domain="heluo"/"canping")` 与 `knowledge_read`（`line_texts` 如 `乾為天:1`、`text_cells` 如 `水.3330.male`），保留 `citation`、`provenance`、`reference_only` 与 `reference_details`；当前盘实际采用何法仍由同 run 的 `schedule_basis` 核对，知识查询中的 `actual_start_at=null` 不代表尚未起运。
-- **出生钟面与性别**：首次核验保留 `input_normalized`、`numerology_evidence.birth_clock` 及实际卦爻／编号与所需选文。读取 `birth_clock.input_representation` 的 `supplied_text` 与 `calculation_defaults`，`uncertainty_interval=null` 不从 `HH:MM` 猜正负半分钟；显示到秒也不提升出生记录精度。两工具均须明确已知性别，不可补男命；读 `text_provenance` 分别核对爻辞、注文与诗歌，`yaoci_collation` 单次目校仍待独立复核。
+- **出生钟面与性别**：首次核验保留 `analysis_context`、`numerology_evidence.birth_clock` 及实际卦爻／编号与所需选文。读取 `birth_clock.input_representation` 的 `supplied_text` 与 `calculation_defaults`，`uncertainty_interval=null` 不从 `HH:MM` 猜正负半分钟；显示到秒也不提升出生记录精度。两工具均须明确已知性别，不可补男命；读 `text_provenance` 分别核对爻辞、注文与诗歌，`yaoci_collation` 单次目校仍待独立复核。
 
 ## 共用日期与钟时
 
@@ -45,7 +45,7 @@
 完整回执与全部选文首次即用 `detail=audit` 且 `fields=null`；仅核验时钟与核心字段时按 `fields` 精确投影：
 
 ```bash
-python3 -m fatebridge.cli heluo --date 1990-05-15 --time 10:30 --longitude 116.40 --gender 男 --fields input_normalized numerology_evidence.birth_clock
+python3 -m fatebridge.cli heluo --date 1990-05-15 --time 10:30 --longitude 116.40 --gender 男 --fields analysis_context numerology_evidence.birth_clock
 ```
 
 无可用本地环境且非连接咨询时，保留核验缺口并交付已有可答部分，不猜解释器位置、不为咨询安装依赖。调用规范见[引擎调用](../shared/fatebridge-engine.md#怎么调引擎)。

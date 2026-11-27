@@ -14,7 +14,11 @@ from fatebridge.application.response_delivery import deliver_response
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
 from fatebridge.core.execution_context import DetailLevel, ExecutionOptions
 from fatebridge.transports.flags import FIELDS_FLAG_DESC
-from fatebridge.utils.errors import ErrorEnvelope, ParameterError, handle_calculation_error
+from fatebridge.utils.errors import (
+    ErrorEnvelope,
+    ParameterError,
+    handle_calculation_error,
+)
 
 logger = logging.getLogger(__name__)
 

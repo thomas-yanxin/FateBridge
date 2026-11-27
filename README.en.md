@@ -33,7 +33,7 @@ FateBridge provides local Chinese metaphysics, astrology, and psychometrics calc
 | Feng Shui | WMM2025/IGRF-14 geomagnetic, Eight Mansions & Yangzhai Sanyao, Jinsuo sand/water, annual/monthly/daily/hourly Zi Bai, Zhongzhou Xuan Kong charts & 4-layer layout | [Home assessment](docs/fengshui.md) · [Consultation guide](docs/interpretation/fengshui/consultation.md) |
 | Psychometrics | IPIP 50-item Big Five factor markers (Goldberg 1992 public domain) | [Coverage](docs/algorithm-coverage.md#212-psychometrics--心理测量量表implemented) |
 
-The current source exposes **90 business REST routes**. Two MCP tools (`discover_tools` and `run_calculation`) provide access to **90 capabilities** across **12 families**. The central catalog contains 90 entries, with 90 available through the CLI. All three interfaces share canonical tool names (`spec.name`), request fields, and domain calculations; see [interface boundaries](docs/api-reference.md#22-三端能力边界) and the [algorithm coverage matrix](docs/algorithm-coverage.md).
+The current source exposes **90 business REST routes** (plus `POST /api/batch` for multi-subject/multi-tool batching). Three MCP tools (`discover_tools`, `run_calculation`, and `run_batch`) provide access to **90 capabilities** across **12 families**. The central catalog contains 90 entries, with 90 available through the CLI. All three interfaces share canonical tool names (`spec.name`), request fields, and domain calculations; see [interface boundaries](docs/api-reference.md#22-三端能力边界) and the [algorithm coverage matrix](docs/algorithm-coverage.md).
 
 ## Quick start
 

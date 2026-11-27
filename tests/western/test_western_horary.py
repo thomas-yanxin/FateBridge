@@ -114,7 +114,10 @@ def test_horary_envelope_has_moon_block() -> None:
     result = calculate_horary(**QUESTION, category="career")
     assert "void_of_course" in result["horary_chart"]["moon"]
     assert result["analysis_context"]["house_system"]
-    assert "verdict" not in result["horary_chart"] and "reasoning" not in result["horary_chart"]
+    assert (
+        "verdict" not in result["horary_chart"]
+        and "reasoning" not in result["horary_chart"]
+    )
 
 
 def test_horary_saturn_station_identity_and_event_order_reach_three_surfaces(

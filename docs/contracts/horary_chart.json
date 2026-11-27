@@ -14,10 +14,10 @@
         "analysis_context",
         "calendar_conversion",
         "clock_conversion.hour_origin_conversion",
-        "horary.calculation_basis.calendar",
-        "horary.calculation_basis.time_scale",
-        "horary.calculation_basis.julian_day_tt",
-        "horary.calculation_basis.julian_day_ut1"
+        "horary_chart.calculation_basis.calendar",
+        "horary_chart.calculation_basis.time_scale",
+        "horary_chart.calculation_basis.julian_day_tt",
+        "horary_chart.calculation_basis.julian_day_ut1"
       ],
       "purpose": "核对显式儒略历／延伸格里历日期、转换后的本地钟时与实际TT/UT1；不推断地区改历、旧式年份或历史钟时，不把日期换算当原图复现。"
     },
@@ -26,22 +26,22 @@
         "analysis_context",
         "calendar_conversion",
         "clock_conversion",
-        "horary.calculation_basis.time_scale",
-        "horary.calculation_basis.julian_day_tt",
-        "horary.calculation_basis.julian_day_ut1"
+        "horary_chart.calculation_basis.time_scale",
+        "horary_chart.calculation_basis.julian_day_tt",
+        "horary_chart.calculation_basis.julian_day_ut1"
       ],
       "purpose": "核对已确认的整秒钟面、民用／地方平太阳／地心视太阳时、历法与正午进位及同一物理TT/UT1；省略秒沿用0不代表记录精度，不拟合未知原书钟时。"
     },
     "event_paths": {
       "fields": [
         "analysis_context",
-        "horary.calculation_basis",
-        "horary.rule_profile",
-        "horary.planets",
-        "horary.significators",
-        "horary.perfection.event_history",
-        "horary.perfection.lilly_conditions.event_paths",
-        "horary.perfection.status"
+        "horary_chart.calculation_basis",
+        "horary_chart.rule_profile",
+        "horary_chart.planets",
+        "horary_chart.significators",
+        "horary_chart.perfection.event_history",
+        "horary_chart.perfection.lilly_conditions.event_paths",
+        "horary_chart.perfection.status"
       ],
       "purpose": "Read actual seven-planet TT roots in the explicit ±30-day scan, distinct principal/principal and carrier/source prior contacts, all intervening carrier contacts, event-epoch receptions with numerical boundary uncertainty, and selected Lilly p111 prohibition/refranation patterns. Product radius and radical sect policies, unknown conditions, finite horizon, frame-specific station timing and incomplete whole-method acceptance remain explicit. A satisfied sequence subset is not a full judgement or outcome proof.",
       "when": "核对主星、传光星与聚光星的实际历史／未来事件顺序、停滞折返及不同事件历元的接纳。"
@@ -54,23 +54,23 @@
         "clock_conversion.hour_origin_conversion",
         "clock_conversion.input_wall_datetime",
         "clock_conversion.converted_utc",
-        "horary.calculation_basis.julian_day_tt",
-        "horary.calculation_basis.julian_day_ut1"
+        "horary_chart.calculation_basis.julian_day_tt",
+        "horary_chart.calculation_basis.julian_day_ut1"
       ],
       "purpose": "核对已确认的午夜／正午起算小时标签：原历法日期、原小时与进位后的标准钟面分别读取，再看实际TT／UT1；不推断原图口径，不当作时区修正或实际持续时长。"
     },
     "lilly_fortitudes": {
       "fields": [
         "analysis_context",
-        "horary.fortitudes.method_id",
-        "horary.fortitudes.summary",
-        "horary.fortitudes.physical_inputs.status",
-        "horary.fortitudes.physical_inputs.daily_motion_policy",
-        "horary.fortitudes.physical_inputs.star_position_policy",
-        "horary.fortitudes.source_method_scope",
-        "horary.fortitudes.source_conflicts",
-        "horary.fortitudes.full_original_text_acceptance",
-        "horary.fortitudes.full_judgement_accepted"
+        "horary_chart.fortitudes.method_id",
+        "horary_chart.fortitudes.summary",
+        "horary_chart.fortitudes.physical_inputs.status",
+        "horary_chart.fortitudes.physical_inputs.daily_motion_policy",
+        "horary_chart.fortitudes.physical_inputs.star_position_policy",
+        "horary_chart.fortitudes.source_method_scope",
+        "horary_chart.fortitudes.source_conflicts",
+        "horary_chart.fortitudes.full_original_text_acceptance",
+        "horary_chart.fortitudes.full_judgement_accepted"
       ],
       "purpose": "Read all41-row summary including inapplicable and unknown conditions. Daily displacement differs from instantaneous direction; dated stellar astrometry differs from printed1647 coordinates. Literal row sums do not reproduce every original worked total. Expand fortitudes.planets.<Planet>.rows for exact predicates; unknown rows are not zero, and points are not success probabilities or a complete judgement.",
       "when": "逐行核对Lilly1647第115页本质／偶然尊贵表的已算条件、24小时运动与未知项。"
@@ -78,19 +78,19 @@
     "lilly_fortune": {
       "fields": [
         "analysis_context",
-        "horary.fortune.method_id",
-        "horary.fortune.longitude",
-        "horary.fortune.formula",
-        "horary.fortune.house_assignment",
-        "horary.fortune.status",
-        "horary.fortune.known_fortitudes",
-        "horary.fortune.known_debilities",
-        "horary.fortune.literal_table_balance",
-        "horary.fortune.unknown_rows",
-        "horary.fortune.applied_conditions",
-        "horary.fortune.interpretation_policies",
-        "horary.fortune.source_method_scope",
-        "horary.fortune.full_original_text_acceptance"
+        "horary_chart.fortune.method_id",
+        "horary_chart.fortune.longitude",
+        "horary_chart.fortune.formula",
+        "horary_chart.fortune.house_assignment",
+        "horary_chart.fortune.status",
+        "horary_chart.fortune.known_fortitudes",
+        "horary_chart.fortune.known_debilities",
+        "horary_chart.fortune.literal_table_balance",
+        "horary_chart.fortune.unknown_rows",
+        "horary_chart.fortune.applied_conditions",
+        "horary_chart.fortune.interpretation_policies",
+        "horary_chart.fortune.source_method_scope",
+        "horary_chart.fortune.full_original_text_acceptance"
       ],
       "purpose": "Lilly pp143-144 uses physical ASC+Moon-Sun day and night. Keep geometric occupancy, nearest-cusp virtue and significator roles separate. The28 p145 rows include neutral Aries and Fortune-specific sixth/eighth-house weights. Exact planetary rays and p179 stellar range transfer are disclosed conventions. P180 beyond-five-degree assignment and row discrepancies remain failed controls; unknowns never equal zero; no wealth amount, success probability or complete judgement follows.",
       "when": "核对Lilly1647福点昼夜同式、宫头五度效力归属和第145页独立强弱表。"
@@ -98,13 +98,13 @@
     "lilly_orbs_houses": {
       "fields": [
         "analysis_context",
-        "horary.rule_profile",
-        "horary.planets",
-        "horary.significators",
-        "horary.perfection.lilly_conditions.p126_127_dwelling",
-        "horary.perfection.lilly_conditions.event_paths",
-        "horary.perfection.status",
-        "horary.moon"
+        "horary_chart.rule_profile",
+        "horary_chart.planets",
+        "horary_chart.significators",
+        "horary_chart.perfection.lilly_conditions.p126_127_dwelling",
+        "horary_chart.perfection.lilly_conditions.event_paths",
+        "horary_chart.perfection.status",
+        "horary_chart.moon"
       ],
       "purpose": "Read selected p107 full-orb column and declared equality convention; house is the significator role, occupied_house is actual chart occupancy. P48 rank assumes otherwise equal dignity; p115 house points are a separate partial row. P126-127 dwelling requires lunar transfer; finite ordered Moon contacts and current rays are necessary subconditions, not complete transfer, full judgement or reality proof. Preserve missing histories, collisions and numerical ambiguity.",
       "when": "核对Lilly1647第107页两列容许度、第48／115页宫位事实，以及第126–127页不可仅凭居宫断成的条件。"
@@ -112,14 +112,14 @@
     "lilly_radicality": {
       "fields": [
         "analysis_context",
-        "horary.radicality.method_id",
-        "horary.radicality.hour_inputs",
-        "horary.radicality.hour_affinity",
-        "horary.radicality.reported_context",
-        "horary.radicality.ascendant_degree_gate",
-        "horary.radicality.clauses",
-        "horary.radicality.unknown_clauses",
-        "horary.radicality.safe_to_judge"
+        "horary_chart.radicality.method_id",
+        "horary_chart.radicality.hour_inputs",
+        "horary_chart.radicality.hour_affinity",
+        "horary_chart.radicality.reported_context",
+        "horary_chart.radicality.ascendant_degree_gate",
+        "horary_chart.radicality.clauses",
+        "horary_chart.radicality.unknown_clauses",
+        "horary_chart.radicality.safe_to_judge"
       ],
       "purpose": "Read all12 clauses in the pp121-123 manual inventory, actual unequal-hour geometry, selected p104 triplicity and own-nature affinity, prerequisites, exceptions and attributed variants. The Moon late-degree cutoff is unspecified; no27degree threshold or p115 weighted balance0 is invented. Optional context is caller-reported only: a known question timestamp is not a certain timed event, and no age/appearance/strength is inferred. safe_to_judge remains null for the uncertified full method, not false/true reality prediction. Compute the supplied instant without changing it to clear a caution.",
       "when": "核对Lilly1647起盘审慎条件、时主对应、原文例外与未知定义，避免仅凭上升度数认定整盘可判断。"
@@ -127,12 +127,12 @@
     "lilly_reception_conditions": {
       "fields": [
         "analysis_context",
-        "horary.calculation_basis",
-        "horary.rule_profile",
-        "horary.planets",
-        "horary.significators",
-        "horary.perfection.status",
-        "horary.perfection.lilly_conditions"
+        "horary_chart.calculation_basis",
+        "horary_chart.rule_profile",
+        "horary_chart.planets",
+        "horary_chart.significators",
+        "horary_chart.perfection.status",
+        "horary_chart.perfection.lilly_conditions"
       ],
       "purpose": "Selected Lilly1647 seven-planet dignity/reception table and p125-126 route conditions, including actual finite event sequences in event_paths. Preserve receiver/guest direction, radical chart sect, event epochs, explicit numerical boundary ambiguity and selected p107 orb column, literal occupied-house facts and incomplete full house/epoch interpretation. Sidereal is an extension, not original-edition acceptance.",
       "when": "核对Lilly1647指定版本的本质尊贵、谁接纳谁、互纳与第125–126页路径的逐项条件；同时读取七曜原始状态与未核验项。"
@@ -140,9 +140,9 @@
     "lilly_sign_rays": {
       "fields": [
         "analysis_context",
-        "horary.calculation_basis",
-        "horary.rule_profile",
-        "horary.significators"
+        "horary_chart.calculation_basis",
+        "horary_chart.rule_profile",
+        "horary_chart.significators"
       ],
       "purpose": "Caster-to-receiver direction from Lilly1647 pp108-109, separate from reception host/guest and Hellenistic overcoming. Preserve the32printed ordered inconjunct pairs and16pairs absent from both tables. Same-sign co-presence does not establish bodily conjunction. Compare the sign table to the selected degree/orb candidate without replacing it, adding strength points or certifying event perfection. Sidereal is an extension.",
       "when": "核对Lilly1647第108–109页由求问者主星向所问主星发出的左相／右相、冲相、同星座和原表不相照关系，并与实际度数相位候选分别核对。"
@@ -150,13 +150,13 @@
     "motion_conditions": {
       "fields": [
         "analysis_context",
-        "horary.calculation_basis",
-        "horary.rule_profile",
-        "horary.significators",
-        "horary.planets",
-        "horary.moon",
-        "horary.radicality",
-        "horary.perfection"
+        "horary_chart.calculation_basis",
+        "horary_chart.rule_profile",
+        "horary_chart.significators",
+        "horary_chart.planets",
+        "horary_chart.moon",
+        "horary_chart.radicality",
+        "horary_chart.perfection"
       ],
       "purpose": "Read actual lunar before-ingress and finite seven-planet TT event histories, nominal geometry, selected Lilly receptions and event-path conditions separately. Physical roots and named source predicates do not establish a complete source-method judgement; native failure and unsearched times remain unknown.",
       "when": "用户按明确提问时刻询问卜卦相位与传统条件；先读实际月亮事件、各路径的具名条件与待核范围。"
@@ -166,33 +166,33 @@
       "fields": [
         "analysis_context",
         "clock_conversion",
-        "horary.calculation_basis.julian_day_tt",
-        "horary.calculation_basis.julian_day_ut1"
+        "horary_chart.calculation_basis.julian_day_tt",
+        "horary_chart.calculation_basis.julian_day_ut1"
       ]
     },
     "reference_points": {
       "fields": [
         "analysis_context",
-        "horary.calculation_basis",
-        "horary.perfection.event_history.status",
-        "horary.perfection.event_history.unavailable_reason",
-        "horary.perfection.event_history.unavailable_code",
-        "horary.perfection.event_history.failed_sample",
-        "horary.perfection.event_history.completeness_scope",
-        "horary.perfection.event_history.ephemeris_reference_points",
-        "horary.perfection.event_history.question_states",
-        "horary.moon.motion_basis.status",
-        "horary.perfection.status",
-        "horary.perfection.lilly_conditions.event_paths.status",
-        "horary.rule_profile"
+        "horary_chart.calculation_basis",
+        "horary_chart.perfection.event_history.status",
+        "horary_chart.perfection.event_history.unavailable_reason",
+        "horary_chart.perfection.event_history.unavailable_code",
+        "horary_chart.perfection.event_history.failed_sample",
+        "horary_chart.perfection.event_history.completeness_scope",
+        "horary_chart.perfection.event_history.ephemeris_reference_points",
+        "horary_chart.perfection.event_history.question_states",
+        "horary_chart.moon.motion_basis.status",
+        "horary_chart.perfection.status",
+        "horary_chart.perfection.lilly_conditions.event_paths.status",
+        "horary_chart.rule_profile"
       ],
       "purpose": "Read declared body/system centers and actual physical model summary separately from analytical nodes; inspect native speed and applied source-derived/display-frame corrections. Root brackets are numerical resolution. Matched-reference-point validation is not body-center accuracy, full original method or reality prediction certification. Unavailable event histories remain explicit; empty events do not establish absence.",
       "when": "核对星历采用本体中心还是行星系统质心、物理后端与交点模型、以及成相／停滞所用日速来源。"
     },
     "solar_position_model": {
       "fields": [
-        "horary.calculation_basis.ephemeris_model",
-        "horary.calculation_basis.julian_day_tt"
+        "horary_chart.calculation_basis.ephemeris_model",
+        "horary_chart.calculation_basis.julian_day_tt"
       ],
       "purpose": "Read nominal-epoch finite unbent-ray geometry and the inspected native solar mass model. A background solar-disc position is a virtual continuous extension; foreground transits differ. Unknown geometry remains unknown. This is not an optical occultation, limb-contact, detectability or physical-error certificate. Never replace native positions with a no-deflection diagnostic to pass a reference comparison.",
       "when": "核对近太阳位置的原生偏折模型、太阳后方的虚拟模型视位置与太阳前方的凌日几何。"
@@ -201,8 +201,8 @@
       "fields": [
         "analysis_context",
         "clock_conversion",
-        "horary.calculation_basis.julian_day_tt",
-        "horary.calculation_basis.julian_day_ut1"
+        "horary_chart.calculation_basis.julian_day_tt",
+        "horary_chart.calculation_basis.julian_day_ut1"
       ],
       "purpose": "核对明确选择的模型或IERS20 C04 UT1来源、固定覆盖期、源文件名称与版本、插值区间与未应用修正；盘面与地平计算仍要求覆盖内UT1；地心TT黄经事件不外推UT1即可跨边界搜索，未取得瞬时观测误差。"
     }
@@ -210,12 +210,12 @@
   "first_view": {
     "fields": [
       "analysis_context",
-      "horary.ascendant",
-      "horary.quesited_house",
-      "horary.significators.querent",
-      "horary.significators.quesited",
-      "horary.moon.void_of_course",
-      "horary.perfection.status"
+      "horary_chart.ascendant",
+      "horary_chart.quesited_house",
+      "horary_chart.significators.querent",
+      "horary_chart.significators.quesited",
+      "horary_chart.moon.void_of_course",
+      "horary_chart.perfection.status"
     ]
   },
   "input": {

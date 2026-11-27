@@ -188,12 +188,12 @@ async def test_only_published_inputs_and_views_are_enough_for_real_mcp_calls(
                     }
                 assert payload["cross_chart_relations"]["pairs"]
             elif record["tool"] == "horary_chart":
-                horary = payload["horary"]
+                horary = payload["horary_chart"]
                 assert horary["perfection"]["status"] == "same_ruler"
                 assert horary["significators"]["querent"]["planet"]
                 assert horary["significators"]["quesited"]["planet"]
             elif record["tool"] == "bazi_timing":
-                assert payload["personal_info"]["analysis_datetime"] == (
+                assert payload["person_info"]["analysis_datetime"] == (
                     "2026-10-12 00:00"
                 )
                 calendar = payload["analysis_calendar"]["analysis_date_context"]
@@ -218,8 +218,8 @@ async def test_only_published_inputs_and_views_are_enough_for_real_mcp_calls(
 
 
 @pytest.mark.asyncio
-async def test_fengshui_first_views_deliver_resolvable_rule_sources() -> None:
-    """A successful calculation must also leave enough evidence to cite it."""
+async def test_fengshui_first_views_deliver_core_layers_without_audit_bloat() -> None:
+    """A successful calculation delivers layers and coverage without ruleset/trace bloat."""
     async with Client(cached_mcp_app(families="fengshui")) as client:
         for spec in CATALOG:
             if spec.family != "fengshui" or not spec.expose_mcp:
@@ -244,18 +244,7 @@ async def test_fengshui_first_views_deliver_resolvable_rule_sources() -> None:
             )
             assert not result.is_error
             payload = await verified_inline_business(client, result.structured_content)
-            assert payload["rulesets"] and payload["rule_trace"]
-            sources = payload["source_catalog"]
-            assert sources and all(
-                source["title"] and source["url"] for source in sources.values()
-            )
-            ruleset_ids = set()
-            for ruleset in payload["rulesets"]:
-                assert ruleset["version"]
-                ruleset_ids.add(ruleset["ruleset_id"])
-                assert set(ruleset["source_ids"]) <= sources.keys()
-                assert ruleset["source_citations"].keys() == set(ruleset["source_ids"])
-                assert "sources" not in ruleset
-            for trace in payload["rule_trace"]:
-                assert trace["ruleset_id"] in ruleset_ids
-                assert set(trace["source_ids"]) <= sources.keys()
+            assert payload["status"] in {"complete", "partial"}
+            assert payload["coverage"]
+            for forbidden in ("rulesets", "rule_trace", "source_catalog"):
+                assert forbidden not in payload

@@ -5,50 +5,50 @@
   "evidence_views": {
     "analysis_clock": {
       "fields": [
-        "analysis_reference"
+        "analysis_context"
       ],
       "when": "核对同次完整分析瞬间、UTC偏移/fold及分析日期的补齐来源；不把默认月初、月中或整点当成当前。"
     },
     "birth_time_sensitivity": {
       "fields": [
-        "personal_info.analysis_datetime",
+        "person_info.analysis_datetime",
         "calendar_context.birth_time_input",
-        "dayun_analysis"
+        "dayun"
       ],
       "when": "用户确认名义出生参考的正负UTC经过分钟范围时，传birth_time_uncertainty_minutes并读取完整候选与事件未决层；无分钟样本的事件候选不能忽略，计数不是概率，None不是精确生时"
     },
     "carriers": {
       "fields": [
-        "personal_info.analysis_datetime"
+        "person_info.analysis_datetime"
       ],
       "when": "核对大运至流时的同柱干支生克、本柱真实藏根及原局外援；喜支才核盖头、喜干才核截脚压力，不据候选裁定喜忌、合化、救应或吉凶。"
     },
     "carriers_detail": {
       "fields": [
-        "personal_info.analysis_datetime"
+        "person_info.analysis_datetime"
       ],
       "when": "逐项核对本柱藏根和原局外援及原典来源；完整明细若分页，读取同一run，不另算补齐。"
     },
     "dayun_timeline": {
       "fields": [
-        "personal_info.analysis_datetime",
-        "dayun_analysis"
+        "person_info.analysis_datetime",
+        "dayun"
       ],
       "when": "查看交运边界与十二步大运时间轴；analysis_age仅作显式年龄参考，默认按目标时刻选运"
     },
     "interactions": {
       "fields": [
-        "personal_info.analysis_datetime",
-        "dayun_analysis",
-        "liunian_analysis",
-        "liuyue_analysis",
+        "person_info.analysis_datetime",
+        "dayun",
+        "liunian",
+        "liuyue",
         "interaction_analysis"
       ],
       "when": "核对原局、大运至流时之间的结构关系；关系成立不代表合化或吉凶，按所问时间层筛选"
     },
     "root_effects": {
       "fields": [
-        "personal_info.analysis_datetime",
+        "person_info.analysis_datetime",
         "interaction_analysis.nodes",
         "interaction_analysis.relations"
       ],
@@ -56,7 +56,7 @@
     },
     "roots": {
       "fields": [
-        "personal_info.analysis_datetime",
+        "person_info.analysis_datetime",
         "interaction_analysis.nodes",
         "interaction_analysis.relations"
       ],
@@ -64,7 +64,7 @@
     },
     "stem_roots": {
       "fields": [
-        "personal_info.analysis_datetime",
+        "person_info.analysis_datetime",
         "interaction_analysis.nodes",
         "interaction_analysis.relations"
       ],
@@ -73,16 +73,16 @@
   },
   "first_view": {
     "fields": [
-      "personal_info.analysis_datetime",
-      "birth_pillars",
-      "dayun_analysis.current_dayun",
-      "dayun_analysis.start_at",
-      "dayun_analysis.end_at",
-      "dayun_analysis.selection_basis",
-      "liunian_analysis.pillar",
-      "liuyue_analysis.pillar",
-      "liuri_analysis.pillar",
-      "liushi_analysis.pillar",
+      "person_info.analysis_datetime",
+      "four_pillars",
+      "dayun.current_dayun",
+      "dayun.start_at",
+      "dayun.end_at",
+      "dayun.selection_basis",
+      "liunian.pillar",
+      "liuyue.pillar",
+      "liuri.pillar",
+      "liushi.pillar",
       "analysis_calendar.analysis_date_context.timezone",
       "analysis_calendar.analysis_date_context.current_solar_term.name",
       "analysis_calendar.analysis_date_context.current_solar_term.datetime_with_offset",

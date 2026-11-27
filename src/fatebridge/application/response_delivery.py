@@ -81,8 +81,6 @@ def deliver_response(
                     if name in COMPACT_RUN_METADATA_FIELDS
                 },
             }
-    if spec is None or not spec.name.startswith("fengshui_"):
-        stripped = _strip_audit_bloat(payload)
-        assert isinstance(stripped, dict)
-        return stripped
-    return payload
+    stripped = _strip_audit_bloat(payload)
+    assert isinstance(stripped, dict)
+    return stripped

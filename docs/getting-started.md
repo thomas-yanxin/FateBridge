@@ -107,7 +107,7 @@ curl -X POST http://localhost:8010/api/astrology/chart \
 
 ## 验证 MCP 入口
 
-MCP 默认通过 stdio 由 AI 客户端拉起子进程，仅暴露 `discover_tools` 与 `run_calculation` 两个工具（0 个 MCP 资源）。在客户端注册前，先验证独立 stdio 探测：
+MCP 默认通过 stdio 由 AI 客户端拉起子进程，暴露 `discover_tools`、`run_calculation` 与 `run_batch` 三个工具（0 个 MCP 资源）。在客户端注册前，先验证独立 stdio 探测：
 
 ```bash
 fatebridge doctor --mcp

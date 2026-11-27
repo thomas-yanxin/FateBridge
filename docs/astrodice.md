@@ -14,14 +14,14 @@
 uv run --extra dev fatebridge interpret_astrology_dice \
   --planet Mercury --sign Virgo --house 6 \
   --question '虚构示例：合作沟通中应核对什么？' \
-  --fields method_id planet sign house symbolic_details rulesets rule_trace validation
+  --fields method_id planet sign house symbolic_details validation
 ```
 
 REST 请求示例（字段投影参数放在 URL query）：
 
 ```bash
 curl -sS -X POST \
-  'http://localhost:8010/api/divination/astrology-dice/interpret?fields=method_id&fields=planet&fields=sign&fields=house&fields=symbolic_details&fields=rulesets&fields=rule_trace&fields=validation' \
+  'http://localhost:8010/api/divination/astrology-dice/interpret?fields=method_id&fields=planet&fields=sign&fields=house&fields=symbolic_details&fields=validation' \
   -H 'Content-Type: application/json' \
   -d '{"planet":"Mercury","sign":"Virgo","house":6}'
 ```
@@ -38,7 +38,7 @@ curl -sS -X POST \
 | 七曜昼夜分派 | 同译本，I.7 | 太阳/木/土为昼曜，月/金/火为夜曜，水星按晨星/昏星保留条件 |
 | 七曜喜乐宫 | William Lilly，《Christian Astrology》，1647，pp.51–56 | 水1、月3、金5、火6、日9、木11、土12（按 `symbolic_details.house_condition` 返回） |
 
-超出七曜范围的三王星与南北交点在星座尊贵、喜乐宫与自然昼夜条件中保留 `null`，不按否定处理。`rulesets` 与 `rule_trace` 随结果返回作者、版本、来源路径与命中依据；可用 `evidence_views` 中的 `astronomical_context` 或 `astronomical_motion` 字段清单展开附加天象详情。
+超出七曜范围的三王星与南北交点在星座尊贵、喜乐宫与自然昼夜条件中保留 `null`，不按否定处理。可用 `evidence_views` 中的 `astronomical_context` 或 `astronomical_motion` 字段清单展开附加天象详情。
 
 ## 附加天象边界
 

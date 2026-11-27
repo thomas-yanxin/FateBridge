@@ -31,8 +31,7 @@
         "jinkou.branch_breaks",
         "jinkou.stem_relations",
         "jinkou.combinations",
-        "jinkou.ruleset",
-        "jinkou.rule_trace"
+        "jinkou.ruleset"
       ],
       "purpose": "四位、旺衰、阴阳取用、动象、三合齐缺、原文破支配对与空破条件及来源；破局效力、合化与实际应期未裁定，保留地分回退和原典疑文。"
     },
@@ -112,8 +111,7 @@
         "jinkou.overview",
         "jinkou.rows",
         "jinkou.year_fate",
-        "jinkou.ruleset",
-        "jinkou.rule_trace"
+        "jinkou.ruleset"
       ],
       "purpose": "按明确出生年干支与一岁起算岁序核对京本行年及另课；性别未知或资料不足保留未算，喜用条文疑义未裁。"
     }
@@ -135,7 +133,6 @@
       "jinkou.relations",
       "jinkou.calendar_policy",
       "jinkou.ruleset",
-      "jinkou.rule_trace",
       "jinkou.natal_course.status",
       "jinkou.natal_course.natal_branch"
     ]

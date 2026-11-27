@@ -316,7 +316,10 @@ def test_multi_subject_compatibility_and_fengshui_pairing() -> None:
 
     by_id = {item["id"]: item["result"] for item in payload["results"]}
     assert "cross_chart_relations" in by_id["bazi_pair"]
-    assert by_id["astro_pair"]["relationship_profile"]["relative_mode_normalized"] == "composite"
+    assert (
+        by_id["astro_pair"]["relationship_profile"]["relative_mode_normalized"]
+        == "composite"
+    )
     assert by_id["sukuyo_pair"]["person1"]["name"] == "Alice"
     assert by_id["sukuyo_pair"]["person2"]["name"] == "Bob"
     assert "bazhai" in by_id["bazhai"]["layers"]
@@ -370,8 +373,13 @@ def test_batch_partial_error_all_error_and_stop_on_error() -> None:
     assert partial["failed"] == 2
     assert len(partial["results"]) == 4
     assert partial["results"][1]["error"]["error_code"] == "unknown_tool"
-    assert "bazi_birth_chart" in partial["results"][1]["error"]["issues"][0]["constraints"]["suggestions"]
-    assert partial["results"][2]["error"]["issues"][0]["code"] == "unknown_projection_path"
+    assert (
+        "bazi_birth_chart"
+        in partial["results"][1]["error"]["issues"][0]["constraints"]["suggestions"]
+    )
+    assert (
+        partial["results"][2]["error"]["issues"][0]["code"] == "unknown_projection_path"
+    )
 
     # stop_on_error=True stops at first failure
     stop_req = BatchRequest.model_validate(
@@ -469,7 +477,9 @@ def test_three_surface_batch_parity_mcp_rest_cli(
 
     # 3. CLI batch --request-file <path>
     req_file = tmp_path / "batch.json"
-    req_file.write_text(json.dumps(request_payload, ensure_ascii=False), encoding="utf-8")
+    req_file.write_text(
+        json.dumps(request_payload, ensure_ascii=False), encoding="utf-8"
+    )
     capsys.readouterr()
     code = cli.run(["batch", "--request-file", str(req_file)])
     assert code == 0
@@ -489,7 +499,12 @@ def test_three_surface_batch_parity_mcp_rest_cli(
         == _strip_run_metadata(cli_body)
         == _strip_run_metadata(cli_stdin_body)
     )
-    assert rest_body["as_of"] == mcp_body["as_of"] == cli_body["as_of"] == "2026-10-12T04:00:00Z"
+    assert (
+        rest_body["as_of"]
+        == mcp_body["as_of"]
+        == cli_body["as_of"]
+        == "2026-10-12T04:00:00Z"
+    )
 
 
 def test_batch_boundary_errors_across_surfaces(

@@ -24,38 +24,36 @@
   "evidence_views": {
     "divisions": {
       "fields": [
-        "india.charts",
-        "india.bhava_chalit",
-        "india.arudha_padas",
-        "india.upagrahas"
+        "vedic_chart.charts",
+        "vedic_chart.bhava_chalit",
+        "vedic_chart.arudha_padas",
+        "vedic_chart.upagrahas"
       ],
       "purpose": "分盘、Bhava Chalit 与 Arudha/Upagraha"
     },
     "natal": {
       "fields": [
         "summary",
-        "india.profile",
-        "india.panchanga",
-        "india.charts.D1",
-        "india.nakshatras",
-        "india.bhava_chalit",
-        "india.strengths.shadbala_assessment",
-        "india.strengths.bhava_bala",
-        "india.ashtakavarga",
-        "india.yogas",
-        "india.chara_karakas",
-        "india.arudha_padas",
-        "india.upagrahas",
-        "india.rulesets"
+        "vedic_chart.profile",
+        "vedic_chart.panchanga",
+        "vedic_chart.charts.D1",
+        "vedic_chart.nakshatras",
+        "vedic_chart.bhava_chalit",
+        "vedic_chart.strengths.shadbala_assessment",
+        "vedic_chart.strengths.bhava_bala",
+        "vedic_chart.ashtakavarga",
+        "vedic_chart.yogas",
+        "vedic_chart.chara_karakas",
+        "vedic_chart.arudha_padas",
+        "vedic_chart.upagrahas"
       ],
       "purpose": "印占全盘（含D1/分盘、Shadbala、Bhava Bala、Yoga、Arudha与八分表）"
     },
     "strength": {
       "fields": [
-        "india.strengths",
-        "india.ashtakavarga",
-        "india.yogas",
-        "india.rulesets"
+        "vedic_chart.strengths",
+        "vedic_chart.ashtakavarga",
+        "vedic_chart.yogas"
       ],
       "purpose": "六力(Shadbala)、宫力(Bhava Bala)与八分表明细"
     }
@@ -63,19 +61,18 @@
   "first_view": {
     "fields": [
       "summary",
-      "india.profile",
-      "india.panchanga",
-      "india.charts.D1",
-      "india.nakshatras",
-      "india.bhava_chalit",
-      "india.strengths.shadbala_assessment",
-      "india.strengths.bhava_bala",
-      "india.ashtakavarga",
-      "india.yogas",
-      "india.chara_karakas",
-      "india.arudha_padas",
-      "india.upagrahas",
-      "india.rulesets"
+      "vedic_chart.profile",
+      "vedic_chart.panchanga",
+      "vedic_chart.charts.D1",
+      "vedic_chart.nakshatras",
+      "vedic_chart.bhava_chalit",
+      "vedic_chart.strengths.shadbala_assessment",
+      "vedic_chart.strengths.bhava_bala",
+      "vedic_chart.ashtakavarga",
+      "vedic_chart.yogas",
+      "vedic_chart.chara_karakas",
+      "vedic_chart.arudha_padas",
+      "vedic_chart.upagrahas"
     ]
   },
   "input": {

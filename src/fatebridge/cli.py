@@ -149,7 +149,9 @@ def run(argv: list[str] | None = None) -> int:
                 {spec.name: spec for spec in CATALOG},
                 batch_request,
             )
-        except Exception as exc:  # noqa: BLE001 - translate failures at the CLI boundary
+        except (
+            Exception
+        ) as exc:  # noqa: BLE001 - translate failures at the CLI boundary
             return emit_error(handle_calculation_error(exc, "batch"), 1)
 
         print(format_json_response(payload, compact=False))

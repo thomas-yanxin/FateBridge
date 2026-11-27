@@ -10,7 +10,7 @@
 
 已连接 FateBridge MCP 时直接按公开工具定义调用，不先跑安装诊断或翻仓库历史；CLI 是无连接时的本地后备与可复核示例。三端控制面与通道细节见[接入指南](../../agent-guide.md#按通道接入)和[API 参考](../../api-reference.md#22-三端能力边界)。
 
-- **发现与调用**：MCP 仅公开 `discover_tools` 与 `run_calculation`（0 资源 URI）。查参先用 `discover_tools(tool=能力名)`；`detail="full"` 须带 `tool`/`family`/`q` 过滤，且 **`output_schema` 仅在显式传 `include_output_schema=True`（REST `?include_output_schema=true`，CLI `--include-output-schema`）时返回**。已取得合同不重复发现。
+- **发现与调用**：MCP 公开 `discover_tools`、`run_calculation` 与 `run_batch`（0 资源 URI）。查参先用 `discover_tools(tool=能力名)`；`detail="full"` 须带 `tool`/`family`/`q` 过滤，且 **`output_schema` 仅在显式传 `include_output_schema=True`（REST `?include_output_schema=true`，CLI `--include-output-schema`）时返回**。多工具或多对象共享同一人物资料时优先使用 `run_batch`（REST `POST /api/batch`、CLI `fatebridge batch --request-file ...`）。已取得合同不重复发现。
 - **任务视图与严格投影**：部分工具发布按任务组织的 `evidence_views`（`discover` 可读）。先选卡再把其中的 `fields` 复制到请求；卡名与 `view` 不是请求参数。三端对 `fields` 始终严格校验点号对象路径（数组整体取字段，不传数字索引、不传逗号分隔），无效路径返回 `unknown_projection_path` 并在 `constraints.available` 列出可用键名。控制面细节见[输出控制与结果读取](../../agent-guide.md#输出控制与结果读取)。
 - **本地环境与后备**：本地仓库先用 `uv sync --extra dev` 准备 `.venv`（macOS/Linux `source .venv/bin/activate`，Windows `.\.venv\Scripts\Activate.ps1`），步骤见[快速入门](../../getting-started.md#安装)。以下 `python3` 指激活环境中的解释器；`fatebridge <tool>` 与 `python3 -m fatebridge.cli <tool>` 等价。
 - **常用 CLI 开关**：`--detail {compact,audit}`、`--fields KEY [KEY ...]`、`--as-of AS_OF`（冻结默认当前时钟以便复现）、`--request-file PATH`（全工具支持从 JSON 文件加载输入，显式参数覆盖顶层同名字段），以及 `fatebridge list` / `fatebridge discover [tool]`。
@@ -41,7 +41,7 @@
 
 ## 常用工具速查
 
-当前 REST 公开 90 个工具，MCP 通过两个入口提供 90 项业务能力，目录共有 90 条记录，CLI 可执行 90 条。完整清单见[算法覆盖](../../algorithm-coverage.md)。
+当前 REST 公开 90 个工具（另提供 `/api/batch` 批处理入口），MCP 通过三个入口提供 90 项业务能力，目录共有 90 条记录，CLI 可执行 90 条。完整清单见[算法覆盖](../../algorithm-coverage.md)。
 
 - **八字本命与九大专项**：综合画像一次调 `bazi_overview`（已含四柱、喜用与格局，不再重调 `bazi_birth_chart`）；仅需原始四柱才用 `bazi_birth_chart`。九大专项（`bazi_marriage`、`bazi_romance`、`bazi_career`、`bazi_wealth`、`bazi_health`、`bazi_children`、`bazi_education`、`bazi_personality`、`bazi_relatives`）接受 `analysis_year/month/day`，自动推算大运/流年并写入 `<dim>_analysis.timing_context`。
 - **双人配合**：`bazi_compatibility` 输出根字段为 `relationship_type`、`person_info`、`natal_contexts`、`element_relationship`、`nayin_comparison`、`day_pillar_synergy`、`element_complementarity`、`cross_shensha`、`cross_chart_relations`、`directional_ten_gods`（无综合分或内置建议文案，须结合双方关系解读）。`sukuyo_compatibility` 按固定口径定 27 宿并区分双向（`person1_to_person2` 与 `person2_to_person1`），详见[宿曜与宿占取证](sukuyo-evidence.md)。
@@ -62,7 +62,7 @@
 | `fengshui_annual_stars` | `layers.annual_stars` | 立春换年；固定宫数与临宫年星分开，不把年盘当完整玄空山向盘 |
 | `fengshui_monthly_stars` | `layers.monthly_stars` | 立春换年、十二节月起星（可选日/时紫白）；独立于年盘与宅盘 |
 | `fengshui_xuankong_house_chart` | `layers.xuankong_natal` | 磁北宅向与历史定运事件；中州派运山向与兼向替星，角度不明保留候选 |
-| `fengshui_assess` | `layers` 叠加 + `palace_overlay` / `layout_analysis` | 住宅评估总入口；须保留 `rulesets`、`rule_trace`、`coverage` 与逐人差异 |
+| `fengshui_assess` | `layers` 叠加 + `palace_overlay` / `layout_analysis` | 住宅评估总入口；须保留 `coverage` 与逐人差异 |
 
 > [!NOTE]
 > 金锁玉关已实现 8 宫与 24 山砂水极性计算；当前 `coverage.unavailable_layers` 仅指金锁形态元运与自动户型几何。禁止把三层结果合成为总分，也不由户主命卦覆盖其他住户。
@@ -93,7 +93,7 @@ python3 -m fatebridge.cli astrology_chart \
   --name Mia --birth-year 1995 --birth-month 6 --birth-day 1 --birth-hour 8 --birth-minute 20 \
   --birth-latitude 31.23 --birth-longitude 121.47 --birth-place 上海
 
-python3 -m fatebridge.cli fengshui_minggua --effective-birth-year 1990 --gender-convention female
+python3 -m fatebridge.cli fengshui_minggua --birth-year 1990 --gender female
 python3 -m fatebridge.cli fengshui_annual_stars --effective-year 2026
 python3 -m fatebridge.cli fengshui_monthly_stars --effective-solar-year 2026 --solar-month-number 3
 fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json --detail compact

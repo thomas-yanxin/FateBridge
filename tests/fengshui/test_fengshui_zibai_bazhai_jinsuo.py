@@ -215,14 +215,10 @@ def test_bazhai_all_64_cells_and_minggua_and_sanyao() -> None:
     assert m1990["candidates"][0]["palace_number"] == 1
     assert m1990["candidates"][0]["group"] == "east"
 
-    m_five_male = minggua(
-        MingguaRequest(birth_year=1995, gender="male")
-    )
+    m_five_male = minggua(MingguaRequest(birth_year=1995, gender="male"))
     assert m_five_male["candidates"][0]["substitution"] is True
     assert m_five_male["candidates"][0]["trigram"] == "坤"
-    m_five_female = minggua(
-        MingguaRequest(birth_year=1999, gender="female")
-    )
+    m_five_female = minggua(MingguaRequest(birth_year=1999, gender="female"))
     assert m_five_female["candidates"][0]["substitution"] is True
     assert m_five_female["candidates"][0]["trigram"] == "艮"
 

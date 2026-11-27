@@ -178,7 +178,9 @@ def test_zodiacal_releasing_l4_eros_and_chiron_return_bounds() -> None:
         analysis_day=1,
     )
     assert "error" not in ret
-    chiron = next(r for r in ret["planetary_returns"]["returns"] if r["body"] == "Chiron")
+    chiron = next(
+        r for r in ret["planetary_returns"]["returns"] if r["body"] == "Chiron"
+    )
     if chiron.get("status") != "unavailable":
         assert chiron["most_recent_return"] is None
         assert chiron["next_return"] is not None

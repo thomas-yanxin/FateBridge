@@ -94,13 +94,13 @@ def test_ti_gua_five_yellow_does_not_replace_oracle() -> None:
     assert chart["facing_subband"] == "jianxiang_replacement"
     assert chart["adjacent_mountain"] == "庚"
     # Sitting 卯(E) seed=5 borrows P7 heaven 酉(yin), flies 5 reverse without replacement
-    m_trace = chart["trace"]["mountain"]
+    m_trace = chart["flight_details"]["mountain"]
     assert m_trace["seed_star_number"] == 5
     assert m_trace["five_yellow_kept_without_replacement"] is True
     assert m_trace["center_star_number"] == 5
     assert m_trace["flight"] == "reverse"
     # Facing base[W]=9 -> 酉(9, yin reverse)
-    f_trace = chart["trace"]["facing"]
+    f_trace = chart["flight_details"]["facing"]
     assert f_trace["seed_star_number"] == 9
     assert f_trace["center_star_number"] == 9
     assert f_trace["flight"] == "reverse"

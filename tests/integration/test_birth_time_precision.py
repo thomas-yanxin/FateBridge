@@ -259,10 +259,7 @@ def test_calculate_comprehensive_timing_supports_age_override() -> None:
     assert result["person_info"]["current_age"] == 42
     assert result["person_info"]["analysis_date"] == "2028-04-06"
     assert result["person_info"]["analysis_datetime"] == "2028-04-06 21:55"
-    assert (
-        result["dayun"]["current_dayun"]
-        == dayun_result["dayun"]["current_dayun"]
-    )
+    assert result["dayun"]["current_dayun"] == dayun_result["dayun"]["current_dayun"]
 
 
 def test_calculate_comprehensive_timing_supports_analysis_day_boundaries() -> None:
@@ -311,14 +308,8 @@ def test_calculate_comprehensive_timing_supports_analysis_day_boundaries() -> No
     )
     assert timing_result["liuyue"]["pillar"] == "丙辰"
     assert timing_result["liuri"]["pillar"] == "辛酉"
-    assert (
-        timing_result["liuyue"]["pillar"]
-        == liuyue_result["liuyue"]["pillar"]
-    )
-    assert (
-        timing_result["liuri"]["pillar"]
-        == liuri_result["liuri"]["pillar"]
-    )
+    assert timing_result["liuyue"]["pillar"] == liuyue_result["liuyue"]["pillar"]
+    assert timing_result["liuri"]["pillar"] == liuri_result["liuri"]["pillar"]
 
 
 def test_time_precision_changes_liuyue_across_qingming_boundary() -> None:
@@ -421,9 +412,7 @@ def test_time_precision_aligns_liuri_and_timing_with_jieqi_anchor() -> None:
         == "清明"
     )
     assert timing_result["person_info"]["analysis_datetime"] == "2028-04-04 21:55"
-    assert (
-        timing_result["liuyue"]["pillar"] == qingming_node["liuyue"]["pillar"]
-    )
+    assert timing_result["liuyue"]["pillar"] == qingming_node["liuyue"]["pillar"]
     assert timing_result["liuri"]["pillar"] == qingming_node["liuri"]["pillar"]
     assert (
         timing_result["analysis_calendar"]["analysis_date_context"][
@@ -622,10 +611,7 @@ def test_liuyue_timeline_anchor_is_minute_safe_and_replayable() -> None:
 
     assert qingming_month["analysis_anchor"] == "2028-04-04 14:04:00"
     assert liuyue_result["liuyue"]["pillar"] == qingming_month["liuyue"]["pillar"]
-    assert (
-        liuyue_result["liuyue"]["solar_term_window"]["start_term"]["name"]
-        == "清明"
-    )
+    assert liuyue_result["liuyue"]["solar_term_window"]["start_term"]["name"] == "清明"
 
 
 def test_jieqi_timeline_anchor_is_minute_safe_and_replayable() -> None:
@@ -733,30 +719,12 @@ def test_comprehensive_timing_matches_specialized_timing_tools() -> None:
         timing_result["dayun"]["current_dayun"]
         == dayun_result["dayun"]["current_dayun"]
     )
-    assert (
-        timing_result["dayun"]["start_age"]
-        == dayun_result["dayun"]["start_age"]
-    )
-    assert (
-        timing_result["dayun"]["dayun_age"]
-        == dayun_result["dayun"]["dayun_age"]
-    )
-    assert (
-        timing_result["liunian"]["pillar"]
-        == liunian_result["liunian"]["pillar"]
-    )
-    assert (
-        timing_result["liuyue"]["pillar"]
-        == liuyue_result["liuyue"]["pillar"]
-    )
-    assert (
-        timing_result["liuri"]["pillar"]
-        == liuri_result["liuri"]["pillar"]
-    )
-    assert (
-        timing_result["liushi"]["pillar"]
-        == liushi_result["liushi"]["pillar"]
-    )
+    assert timing_result["dayun"]["start_age"] == dayun_result["dayun"]["start_age"]
+    assert timing_result["dayun"]["dayun_age"] == dayun_result["dayun"]["dayun_age"]
+    assert timing_result["liunian"]["pillar"] == liunian_result["liunian"]["pillar"]
+    assert timing_result["liuyue"]["pillar"] == liuyue_result["liuyue"]["pillar"]
+    assert timing_result["liuri"]["pillar"] == liuri_result["liuri"]["pillar"]
+    assert timing_result["liushi"]["pillar"] == liushi_result["liushi"]["pillar"]
 
 
 def _offset_hours(tzinfo) -> float:

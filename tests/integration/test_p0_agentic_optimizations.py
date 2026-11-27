@@ -95,7 +95,7 @@ def test_bazi_birth_tiered_detail_and_inline_suggested_fields(
     assert dump_len(mcp_view) <= 8192
 
 
-def test_mcp_exposes_two_tools_and_zero_resources() -> None:
+def test_mcp_exposes_three_tools_and_zero_resources() -> None:
     app = create_mcp_app()
     by_name = {spec.name: spec for spec in CATALOG}
 
@@ -103,7 +103,7 @@ def test_mcp_exposes_two_tools_and_zero_resources() -> None:
         async with Client(app) as client:
             tools = await client.list_tools()
             names = {t.name for t in tools}
-            assert names == {"discover_tools", "run_calculation"}
+            assert names == {"discover_tools", "run_calculation", "run_batch"}
             assert all(tool.output_schema is None for tool in tools)
             assert await client.list_resources() == []
             assert await client.list_resource_templates() == []
@@ -120,7 +120,7 @@ def test_mcp_exposes_two_tools_and_zero_resources() -> None:
                 )
                 for t in tools
             )
-            assert wire_size < 5_000
+            assert wire_size < 6_500
 
             found = await client.call_tool("discover_tools", {"family": "bazi"})
             assert not found.is_error
@@ -172,10 +172,9 @@ def test_mcp_exposes_two_tools_and_zero_resources() -> None:
                 elif name == "fengshui_assess":
                     findings = business["layout_analysis"]["placement_findings"]
                     assert {item["object_id"] for item in findings} == {"stove", "bed"}
-                    assert business["rule_trace"]
-                    assert all(
-                        ruleset["source_ids"] for ruleset in business["rulesets"]
-                    )
+                    assert "layers" in business and "palace_overlay" in business
+                    assert "rule_trace" not in business
+                    assert "rulesets" not in business
                 else:
                     assert len(business["lines"]) == 6
                     assert business["run_metadata"]["replay"]["overrides"]["seed"] == 42

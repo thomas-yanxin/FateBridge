@@ -144,8 +144,7 @@
       "fields": [
         "analysis_context",
         "ziwei_birth.ruleset",
-        "ziwei_birth.calendar_rules",
-        "ziwei_birth.rule_trace"
+        "ziwei_birth.calendar_rules"
       ],
       "purpose": "核查历法约定、原文配置与安星步骤；不扩展为全书认证。"
     },

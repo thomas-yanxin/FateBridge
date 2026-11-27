@@ -59,7 +59,7 @@ def facing_only() -> dict[str, JsonValue]:
         "methods": ["bazhai"],
         "analyze_layout": True,
         "occupants": [
-            {"subject_id": "a", "birth_date": "2000-12-10", "gender_convention": "male"}
+            {"subject_id": "a", "birth_date": "2000-12-10", "gender": "male"}
         ],
         "placements": [
             {
@@ -150,8 +150,8 @@ def proposal_request(
         "occupants": [
             {
                 "subject_id": "user",
-                "effective_birth_year": 1990,
-                "gender_convention": "male",
+                "birth_year": 1990,
+                "gender": "male",
             }
         ],
         "placements": [current],

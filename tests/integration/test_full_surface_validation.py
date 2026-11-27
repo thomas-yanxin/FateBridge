@@ -73,6 +73,8 @@ def test_rest_case_map_covers_all_business_routes() -> None:
         and not route.path.startswith("/openapi")
         and not route.path.startswith("/docs")
         and not route.path.startswith("/redoc")
+        and route.path
+        != "/api/batch"  # meta batch runner tested in test_batch_execution.py
     }
     expected_paths = set(REST_GET_CASES) | set(REST_POST_CASES)
 

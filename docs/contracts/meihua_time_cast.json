@@ -43,14 +43,11 @@
         "calendar_context.lunar_calendar",
         "meihua.ruleset",
         "meihua.calendar_policy",
-        "meihua.rule_trace",
         "meihua.stage_relations",
         "meihua.seasonal_strength",
-        "meihua.evidence_scope",
         "interpretation.topic_reading",
         "interpretation.classical_text_reference",
         "interpretation.traditional_stage_readings",
-        "interpretation.evidence_scope",
         "interpretation.external_omens"
       ],
       "purpose": "核对原文修订、历法约定与实际取数过程；不另起卦"
@@ -69,7 +66,6 @@
         "analysis_context",
         "meihua.seed",
         "meihua.calendar_policy",
-        "meihua.rule_trace",
         "calendar_context.bazi_month_boundary",
         "meihua.seasonal_strength",
         "summary"
@@ -95,9 +91,7 @@
         "meihua.seed",
         "meihua.body_trigram",
         "meihua.stage_relations",
-        "meihua.evidence_scope",
         "interpretation.external_omens",
-        "interpretation.evidence_scope",
         "summary"
       ],
       "purpose": "核对已报外应的形色／实物资格、原体及各取数候选；保留符号关系和所选原文的不同作用类别",
@@ -211,10 +205,8 @@
         "meihua.calendar_policy",
         "meihua.stage_relations",
         "meihua.seasonal_strength",
-        "meihua.evidence_scope",
         "interpretation.topic_reading",
         "interpretation.classical_text_reference",
-        "interpretation.evidence_scope",
         "summary",
         "interpretation.external_omens"
       ],
@@ -234,7 +226,6 @@
         "meihua.seed",
         "meihua.calendar_policy.solar_term_date_reference",
         "calendar_context.bazi_month_boundary",
-        "interpretation.evidence_scope",
         "summary"
       ],
       "purpose": "核对实际交节时刻与固定UTC+08公布日期，包含月令起终锚点；保留差异与未比较项",
@@ -281,10 +272,8 @@
         "meihua.calendar_policy",
         "meihua.stage_relations",
         "meihua.seasonal_strength",
-        "meihua.evidence_scope",
         "interpretation.casting_readings",
         "interpretation.casting_comparison",
-        "interpretation.evidence_scope",
         "summary",
         "interpretation.external_omens",
         "interpretation.day_qi"
@@ -299,7 +288,6 @@
         "interpretation.topic_reading",
         "interpretation.casting_readings",
         "interpretation.casting_comparison",
-        "interpretation.evidence_scope",
         "summary",
         "interpretation.external_omens",
         "interpretation.day_qi"
@@ -336,8 +324,6 @@
         "meihua.seed",
         "meihua.calendar_policy.label_precision",
         "meihua.calendar_policy.solar_term_date_reference",
-        "meihua.evidence_scope",
-        "interpretation.evidence_scope",
         "summary"
       ],
       "purpose": "先读实际命中条文、制约资格、五/六位置计数差异及旧研究负结果；不以体用判晴雨，不把raw matched当成未受制天气断言",
@@ -347,8 +333,7 @@
       "fields": [
         "analysis_context",
         "meihua",
-        "interpretation.weather",
-        "interpretation.evidence_scope"
+        "interpretation.weather"
       ],
       "purpose": "完整天气规则、计数、条件轨迹与来源；用于核对缺项和跨章制化候选",
       "when": "interpretation_topic=weather且需要审计细节时；沿用同run结果"

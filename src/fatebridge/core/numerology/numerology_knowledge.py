@@ -437,9 +437,7 @@ def read_reference(
             )
         tips.append(SCOPE)
         meta = snapshots["text_collation"][1]
-        citation = (
-            f"{meta['source_title']}；PDF页{selection.get('source_pdf_page', '未定位')}。"
-        )
+        citation = f"{meta['source_title']}；PDF页{selection.get('source_pdf_page', '未定位')}。"
     elif domain == "canping" and category in {"schedule_clauses", "schedule_profiles"}:
 
         data = source_readings()

@@ -11,14 +11,14 @@
 - `Partial` / `Limited`：已实现明确子集，存在未覆盖或未裁定的规则范围。
 - `Excluded`：当前仓库不提供该能力。
 
-> 工具来自中央目录 `src/fatebridge/services/tool_catalog.py`。REST 公开 **90 个工具**，MCP 通过两个入口提供 **90 项业务能力**，分为 **12 个 family**。目录共有 90 条记录，CLI 可执行 90 条。
+> 工具来自中央目录 `src/fatebridge/services/tool_catalog.py`。REST 公开 **90 个工具**（含 `/api/batch` 批处理入口），MCP 通过三个入口提供 **90 项业务能力**，分为 **12 个 family**。目录共有 90 条记录，CLI 可执行 90 条。
 
 ## 怎样核对一次结果
 
 | 核对项 | 看什么 | 说明 |
 | --- | --- | --- |
 | 接口成功 | HTTP 状态、MCP `isError`、CLI 退出码与错误包络 | 接口成功不代表请求的所有分层都完整无缺项 |
-| 计算与规则覆盖 | 实际 `status`、`coverage`、缺失项及 `rulesets` | `partial` 只限制对应层，未计算项不视作否定 |
+| 计算与规则覆盖 | 实际 `status`、`coverage` 与缺失项 | `partial` 只限制对应层，未计算项不视作否定 |
 | 数值与时间精度 | `chart_profile.ephemeris_model`、`time_adjustment` 与 `engine_is_approximate` | 依赖库可导入不代表已加载外部 `.se1` 星历文件 |
 | 可追溯性 | 原输入、`run_metadata`、版本、来源与环境 | 重放需保留原输入、`as_of` 与环境设置 |
 

@@ -2,7 +2,7 @@
 
 [文档中心](README.md) · [快速入门](getting-started.md) · [API 参考](api-reference.md) · [算法覆盖矩阵](algorithm-coverage.md)
 
-应用与 Agent 宿主集成 FateBridge 遵循四步闭环：**1. 发现 → 2. 调用 → 3. 读取 → 4. 恢复**。REST（`fatebridge-api`，默认 `:8010`）、FastMCP（`fatebridge-mcp`）与 CLI（`fatebridge <tool>`）共用同一中央目录与执行管道：目录共有 90 条记录，REST 公开 90 个工具，CLI 可执行 90 条目录命令，MCP 通过两个入口提供 90 项业务能力，完整清单见[算法覆盖矩阵](algorithm-coverage.md)。
+应用与 Agent 宿主集成 FateBridge 遵循四步闭环：**1. 发现 → 2. 调用 → 3. 读取 → 4. 恢复**。REST（`fatebridge-api`，默认 `:8010`）、FastMCP（`fatebridge-mcp`）与 CLI（`fatebridge <tool>`）共用同一中央目录与执行管道：目录共有 90 条记录，REST 公开 90 个工具，CLI 可执行 90 条目录命令，MCP 通过三个入口提供 90 项业务能力，完整清单见[算法覆盖矩阵](algorithm-coverage.md)。
 
 | 环节 | 核心动作 | 跳转 |
 | --- | --- | --- |
@@ -42,7 +42,7 @@ fatebridge discover --tool bazi_birth_chart --detail full --include-output-schem
 fatebridge doctor
 ```
 
-MCP 仅暴露 `discover_tools` 与 `run_calculation` 两个工具（无资源 URI）；可通过 `FATEBRIDGE_MCP_FAMILIES` 限制公开的 family，配置见 [MCP 部署指南](mcp-deployment.md)。
+MCP 暴露 `discover_tools`、`run_calculation` 与 `run_batch` 三个工具（无资源 URI）；多主体或多工具串联可通过 `run_batch`（REST `POST /api/batch`、CLI `fatebridge batch --request-file ...`）共享 `subjects` 与 `defaults`。可通过 `FATEBRIDGE_MCP_FAMILIES` 限制公开的 family，配置见 [MCP 部署指南](mcp-deployment.md)。
 
 ## 2. 调用：三端控制面与按通道接入
 
@@ -205,7 +205,7 @@ MCP 失败返回原生 `isError=true`（使用 FastMCP Python Client 读取 `str
 
 ## 家居风水接入
 
-8 个 `fengshui_*` 工具共用统一响应结构，CLI 对嵌套请求优先使用 `--request-file`。主入口 `fengshui_assess` 在 `layers` 下分层返回八宅、金锁、年星、月星（含日/时紫白）与中州玄空宅盘；同时计算住宅或年/月/日/时紫白时返回九宫 `palace_overlay`，传入 `analyze_layout=true` 时生成 `layout_analysis`；`coverage` 明确声明已算层与缺失项（`partial` 仅限制对应层，不会合并成单一吉凶分数），`rulesets` 与 `rule_trace` 保留规则版本与出处。完整工具速查、坐标系与请求示例见[家居风水参考](fengshui.md)及[现场咨询指南](interpretation/fengshui/consultation.md)。
+8 个 `fengshui_*` 工具共用统一响应结构，CLI 对嵌套请求优先使用 `--request-file`。主入口 `fengshui_assess` 在 `layers` 下分层返回八宅、金锁、年星、月星（含日/时紫白）与中州玄空宅盘；同时计算住宅或年/月/日/时紫白时返回九宫 `palace_overlay`，传入 `placements`（或 `analyze_layout=true`）时生成 `layout_analysis`；`coverage` 明确声明已算层与缺失项（`partial` 仅限制对应层，不会合并成单一吉凶分数）。完整工具速查、坐标系与请求示例见[家居风水参考](fengshui.md)及[现场咨询指南](interpretation/fengshui/consultation.md)。
 
 ## 相关文档
 

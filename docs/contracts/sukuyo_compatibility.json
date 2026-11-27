@@ -24,8 +24,7 @@
         "su27_basis",
         "status",
         "person1",
-        "person2",
-        "rulesets"
+        "person2"
       ],
       "purpose": "核对双方公历转农历、闰月和本命宿口径"
     },
@@ -38,8 +37,6 @@
         "person1_to_person2",
         "person2_to_person1",
         "pair",
-        "interpretation_contract",
-        "rulesets",
         "summary"
       ],
       "purpose": "未知时刻的当地日期完整映射、各中国历日候选及双向条件关系"
@@ -51,9 +48,7 @@
         "person2",
         "person1_to_person2",
         "person2_to_person1",
-        "pair",
-        "interpretation_contract",
-        "rulesets"
+        "pair"
       ],
       "purpose": "双方按历日宿名查原典分足表，足序未给保留全部候选，不影响三九双向关系"
     },
@@ -66,9 +61,7 @@
         "person1_to_person2",
         "person2_to_person1",
         "pair",
-        "candidate_relation_analysis",
-        "interpretation_contract",
-        "rulesets"
+        "candidate_relation_analysis"
       ],
       "purpose": "核对双方望宿、半日及候选条件关系，不能将候选提升为主结果"
     },
@@ -82,8 +75,6 @@
         "person2_to_person1",
         "pair",
         "candidate_relation_analysis",
-        "rulesets",
-        "interpretation_contract",
         "summary"
       ],
       "purpose": "原典三九双向关系与解释约束"
@@ -99,8 +90,6 @@
       "person2_to_person1",
       "pair",
       "candidate_relation_analysis",
-      "rulesets",
-      "interpretation_contract",
       "summary"
     ]
   },

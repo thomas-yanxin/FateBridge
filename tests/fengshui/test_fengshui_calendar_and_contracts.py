@@ -199,7 +199,9 @@ def test_ergonomic_defaults_auto_ids_and_propagation() -> None:
         {
             "house": {"facing_mountain": "午"},
             "occupants": [{"birth_year": 1990, "gender": "male"}],
-            "placements": [{"purpose": "bed", "location_direction": "N", "facing_direction": "E"}],
+            "placements": [
+                {"purpose": "bed", "location_direction": "N", "facing_direction": "E"}
+            ],
         }
     )
     assert bz.occupants[0].subject_id == "occupant_1"
@@ -240,7 +242,9 @@ def test_ergonomic_defaults_auto_ids_and_propagation() -> None:
         and xk.interpretation.external_forms[0].observation_basis == "user_confirmed"
     )
     xk_out = calculate_xuankong_natal(xk)
-    assert xk_out["layers"]["xuankong_natal"]["city_gate_analysis"]["status"] == "complete"
+    assert (
+        xk_out["layers"]["xuankong_natal"]["city_gate_analysis"]["status"] == "complete"
+    )
 
     assess = AssessRequest.model_validate(
         {
@@ -262,7 +266,9 @@ def test_ergonomic_defaults_auto_ids_and_propagation() -> None:
         "bazhai",
     }
     assert assess.xuankong is not None
-    assert assess.xuankong.period is not None and assess.xuankong.period.event_year == 2004
+    assert (
+        assess.xuankong.period is not None and assess.xuankong.period.event_year == 2004
+    )
     assert assess.xuankong.city_gate is not None
     assert assess.xuankong.city_gate.reference_period_number == 9
     assert assess.xuankong.interpretation is not None

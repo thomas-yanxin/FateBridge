@@ -133,12 +133,10 @@ def test_output_models_top_level_keys_are_snake_case() -> None:
     assert not bad, f"Non-snake_case top-level output_model keys: {bad}"
 
 
-def test_non_fengshui_output_models_exclude_removed_keys() -> None:
-    """No removed bloat or inconsistent key appears in any non-fengshui output_model."""
+def test_all_output_models_exclude_removed_keys() -> None:
+    """No removed bloat or inconsistent key appears in any tool output_model."""
     violations: dict[str, list[str]] = {}
     for spec in CATALOG:
-        if spec.name.startswith("fengshui"):
-            continue
         model = output_model_for(spec.name)
         schema = model.model_json_schema()
         hits = sorted(set(_walk_schema_keys(schema, schema.get("$defs", {}))))
@@ -146,21 +144,27 @@ def test_non_fengshui_output_models_exclude_removed_keys() -> None:
             hits.append("birth")
         if spec.name == "liuyao":
             ev_schema = model.model_fields["liuyao_evidence"].annotation
-            if hasattr(ev_schema, "model_fields") and "sources" in ev_schema.model_fields:
+            if (
+                hasattr(ev_schema, "model_fields")
+                and "sources" in ev_schema.model_fields
+            ):
                 hits.append("liuyao_evidence.sources")
         if hits:
             violations[spec.name] = hits
-    assert not violations, f"Forbidden keys remain in output_model schemas: {violations}"
+    assert (
+        not violations
+    ), f"Forbidden keys remain in output_model schemas: {violations}"
 
 
-def test_non_fengshui_runtime_audit_responses_exclude_removed_keys() -> None:
-    """Every non-fengshui tool's audit runtime response excludes removed bloat/renamed keys."""
+def test_all_runtime_audit_responses_exclude_removed_keys() -> None:
+    """Every tool's audit runtime response excludes removed bloat/renamed keys."""
     options = ExecutionOptions(detail="audit", as_of="2026-10-12T12:00:00+08:00")
     violations: dict[str, list[str]] = {}
     for spec in CATALOG:
-        if spec.name.startswith("fengshui"):
-            continue
-        request = spec.request_model.model_validate(example_input(spec))
+        payload = example_input(spec)
+        if payload is None and spec.name == "fengshui_monthly_stars":
+            payload = {"effective_solar_year": 2026, "solar_month_number": 1}
+        request = spec.request_model.model_validate(payload)
         raw = execute_with_receipt(spec, request, options=options)
         delivered = deliver_response(raw, spec=spec, detail="audit")
         hits = sorted(set(_walk_runtime_keys(delivered)))

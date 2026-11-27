@@ -7,7 +7,7 @@
   "evidence_views": {
     "branch_candidates": {
       "fields": [
-        "input_context"
+        "analysis_context"
       ],
       "label": "合会候选与同次筛选回执",
       "purpose": "保留现有v8目录中的完整局、字面六合及含旺支半合候选，包括被冲、占位或邻接条件筛掉的图形。候选、筛选与实际事件分别解释，不据候选认定合化、通关或旺衰；未提供或未知方法保留未知。视图字段复制到fields，视图名不是请求参数。"
@@ -15,7 +15,7 @@
     "energy_sources": {
       "fields": [
         "four_pillars",
-        "input_context",
+        "analysis_context",
         "current_calculation.strength_level"
       ],
       "label": "同次身印等五类能量来源",
@@ -34,7 +34,7 @@
     "source_strength": {
       "fields": [
         "four_pillars",
-        "input_context",
+        "analysis_context",
         "current_calculation.strength_level",
         "source_comparison"
       ],
@@ -45,7 +45,7 @@
   "first_view": {
     "fields": [
       "four_pillars",
-      "input_context",
+      "analysis_context",
       "current_calculation.strength_level",
       "source_comparison"
     ]

@@ -12,7 +12,6 @@
   "evidence_views": {
     "birth_clock": {
       "fields": [
-        "input_normalized",
         "analysis_context",
         "four_pillars",
         "numerology_evidence.birth_clock"
@@ -23,14 +22,13 @@
       "fields": [
         "canping_timing.solar_year_context",
         "canping_timing.selected",
-        "liunian_series.solar_context",
-        "numerology_evidence.rule_trace"
+        "liunian_series.solar_context"
       ],
       "purpose": "核对完整年序的实际立春、所选查询两端及未来钟面条件；派生事件许可不扩大公开模型年份，不解释为寿命或预测认证。"
     },
     "natal": {
       "fields": [
-        "input_normalized",
+        "analysis_context",
         "four_pillars",
         "element",
         "benming",
@@ -52,27 +50,24 @@
       "fields": [
         "four_pillars",
         "numerology_evidence.pillar_links",
-        "numerology_evidence.birth_clock",
-        "numerology_evidence.rule_trace",
-        "numerology_evidence.rulesets"
+        "numerology_evidence.birth_clock"
       ],
       "purpose": "核对实际四柱的起月起时原句、基准干与顺行支序；保留历法边界验收范围。"
     },
     "text_selection": {
       "fields": [
-        "input_normalized",
+        "analysis_context",
         "numerology_evidence.birth_clock",
         "element",
         "benming",
         "canping_timing.selected",
-        "numerology_evidence.selected_texts",
-        "numerology_evidence.rule_trace"
+        "numerology_evidence.selected_texts"
       ],
       "purpose": "核对本命及已查询岁运的实际编号、栏目、缺行／圈空、同号及局部校勘来源。 同时保留本次归一输入与实际计算钟面，供核验所用资料。"
     },
     "timing_policy": {
       "fields": [
-        "input_normalized",
+        "analysis_context",
         "four_pillars",
         "element",
         "benming",
@@ -86,7 +81,7 @@
   },
   "first_view": {
     "fields": [
-      "input_normalized",
+      "analysis_context",
       "four_pillars",
       "element",
       "benming",

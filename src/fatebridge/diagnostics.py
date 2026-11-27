@@ -157,7 +157,7 @@ async def _probe_stdio(env: dict[str, str]) -> StdioProbeResult:
                     names = {tool.name for tool in tools}
                     if not catalog.get("tools"):
                         raise RuntimeError("MCP discover_tools returned no tools")
-                    expected = {"discover_tools", "run_calculation"}
+                    expected = {"discover_tools", "run_calculation", "run_batch"}
                     if names != expected:
                         raise RuntimeError("MCP catalog and tools/list disagree")
                     output: StdioProbeResult = {
@@ -228,7 +228,7 @@ def diagnose(
         "executable": sys.executable,
         "package_path": str(Path(__file__).parent),
         "dependencies": dependencies,
-        "mcp_tool_count": 2 if selected else 0,
+        "mcp_tool_count": 3 if selected else 0,
         "mcp_capability_count": len(selected),
         "codex": {
             "cli": codex_cli,

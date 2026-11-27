@@ -41,13 +41,11 @@
   "evidence_views": {
     "audit": {
       "fields": [
-        "input_normalized",
+        "analysis_context",
         "meihua.ruleset",
         "meihua.seed",
-        "meihua.rule_trace",
         "meihua.stage_relations",
         "meihua.calendar_policy",
-        "meihua.evidence_scope",
         "meihua.counting_variants",
         "interpretation.topic_reading",
         "interpretation.casting_readings",
@@ -68,7 +66,7 @@
     },
     "day_qi": {
       "fields": [
-        "input_normalized",
+        "analysis_context",
         "meihua.seed",
         "meihua.body_trigram",
         "meihua.use_trigram",
@@ -85,10 +83,8 @@
         "meihua.seed",
         "meihua.body_trigram",
         "meihua.stage_relations",
-        "meihua.evidence_scope",
         "interpretation.external_omens",
         "interpretation.casting_readings",
-        "interpretation.evidence_scope",
         "summary"
       ],
       "purpose": "核对已报外应的形色／实物资格、原体及各取数候选；保留符号关系和所选原文的不同作用类别",
@@ -96,7 +92,7 @@
     },
     "external_symbol": {
       "fields": [
-        "input_normalized",
+        "analysis_context",
         "meihua",
         "interpretation.external_omens",
         "interpretation.casting_readings",
@@ -145,7 +141,7 @@
     "motion": {
       "description": "占者坐行立、实际外应动静与内卦符号角色分列；缺吉凶判断的条件保持待定，无日期或结局；端法且占者活动明确时另核除六前名义比例数及未知时间单位",
       "fields": [
-        "input_normalized",
+        "analysis_context",
         "meihua.body_trigram",
         "interpretation.motion_context",
         "interpretation.external_omens",
@@ -156,24 +152,22 @@
     "observation_source": {
       "description": "核对已报端法类别、单一对象、八方参照、原例查表及实际起卦；不把来方改为相反行进方向",
       "fields": [
-        "input_normalized.casting",
+        "analysis_context.casting",
         "meihua.seed",
         "meihua.ruleset",
-        "meihua.rule_trace",
         "meihua.base_hexagram",
         "meihua.changed_hexagram",
         "meihua.mutual_hexagram",
         "meihua.body_trigram",
         "meihua.use_trigram",
         "meihua.stage_relations",
-        "interpretation.evidence_scope",
         "summary"
       ]
     },
     "obstruction_days": {
       "description": "生克并见时的条件化原文计日；明例与类推、实际角色、制约与候选分别保留，非净延迟或现实日期",
       "fields": [
-        "input_normalized",
+        "analysis_context",
         "meihua.body_trigram",
         "meihua.stage_relations",
         "meihua.counting_variants",
@@ -190,7 +184,7 @@
     },
     "quiet": {
       "fields": [
-        "input_normalized",
+        "analysis_context",
         "meihua.seed",
         "meihua.body_trigram",
         "meihua.use_trigram",
@@ -207,7 +201,7 @@
     },
     "reading": {
       "fields": [
-        "input_normalized",
+        "analysis_context",
         "meihua.method",
         "meihua.seed",
         "meihua.counting_variants",
@@ -218,10 +212,8 @@
         "meihua.changed_hexagram",
         "meihua.stage_relations",
         "meihua.seasonal_strength",
-        "meihua.evidence_scope",
         "interpretation.topic_reading",
         "interpretation.classical_text_reference",
-        "interpretation.evidence_scope",
         "summary",
         "interpretation.casting_readings",
         "interpretation.casting_comparison",
@@ -241,7 +233,7 @@
     "stage_emphasis": {
       "description": "所报原文问事情境、内卦紧次及迟速／生克条件",
       "fields": [
-        "input_normalized",
+        "analysis_context",
         "meihua.seed",
         "meihua.body_trigram",
         "interpretation.casting_readings",
@@ -251,7 +243,7 @@
     "stage_emphasis_audit": {
       "description": "所报原文问事情境、内卦紧次及迟速／生克条件",
       "fields": [
-        "input_normalized",
+        "analysis_context",
         "meihua",
         "interpretation.casting_readings",
         "summary"
@@ -275,13 +267,10 @@
     },
     "text_count": {
       "fields": [
-        "input_normalized.casting",
+        "analysis_context.casting",
         "meihua.seed",
         "meihua.ruleset",
-        "meihua.rule_trace",
-        "meihua.evidence_scope",
         "meihua.counting_variants",
-        "interpretation.evidence_scope",
         "interpretation.casting_readings",
         "interpretation.casting_comparison",
         "summary"
@@ -291,12 +280,9 @@
     },
     "text_tones": {
       "fields": [
-        "input_normalized.casting",
+        "analysis_context.casting",
         "meihua.seed",
         "meihua.ruleset",
-        "meihua.rule_trace",
-        "meihua.evidence_scope",
-        "interpretation.evidence_scope",
         "interpretation.traditional_judgement",
         "summary"
       ],
@@ -305,17 +291,15 @@
     },
     "topic": {
       "fields": [
-        "input_normalized",
+        "analysis_context",
         "interpretation.topic_reading",
         "meihua.seed",
         "meihua.base_hexagram.name",
         "meihua.calendar_policy",
         "meihua.stage_relations",
         "meihua.seasonal_strength",
-        "meihua.evidence_scope",
         "interpretation.casting_readings",
         "interpretation.casting_comparison",
-        "interpretation.evidence_scope",
         "summary",
         "interpretation.external_omens",
         "interpretation.day_qi"
@@ -325,12 +309,11 @@
     },
     "topic_audit": {
       "fields": [
-        "input_normalized",
+        "analysis_context",
         "meihua",
         "interpretation.topic_reading",
         "interpretation.casting_readings",
         "interpretation.casting_comparison",
-        "interpretation.evidence_scope",
         "summary",
         "interpretation.external_omens",
         "interpretation.day_qi"
@@ -363,11 +346,9 @@
     },
     "weather": {
       "fields": [
-        "input_normalized",
+        "analysis_context",
         "meihua.counting_variants",
         "meihua.seed",
-        "meihua.evidence_scope",
-        "interpretation.evidence_scope",
         "summary"
       ],
       "purpose": "先读实际命中条文、制约资格、五/六位置计数差异及旧研究负结果；不以体用判晴雨，不把raw matched当成未受制天气断言",
@@ -375,10 +356,9 @@
     },
     "weather_audit": {
       "fields": [
-        "input_normalized",
+        "analysis_context",
         "meihua",
-        "interpretation.weather",
-        "interpretation.evidence_scope"
+        "interpretation.weather"
       ],
       "purpose": "完整天气规则、计数、条件轨迹与来源；用于核对缺项和跨章制化候选",
       "when": "interpretation_topic=weather且需要审计细节时；沿用同run结果"

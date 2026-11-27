@@ -20,7 +20,7 @@ import fatebridge.mcp_server as mcp
 from fatebridge.application.projection import project_fields
 from fatebridge.application.tool_spec import ServiceResult
 from fatebridge.cli import run
-from fatebridge.core.fengshui.models import Ruleset
+from fatebridge.core.fengshui.models import Coverage
 from fatebridge.core.response_models import (
     CHART_TOOL_FIELDS,
     CHINESE_TOOL_FIELDS,
@@ -211,7 +211,7 @@ def test_all_published_schemas_preserve_object_projection_compatibility(
 
 
 @pytest.mark.parametrize("name", list(PAYLOADS))
-def test_each_ruleset_field_projects_on_native_mcp_rest_and_cli(
+def test_each_coverage_and_layer_field_projects_on_native_mcp_rest_and_cli(
     name: str,
     rest: TestClient,
     tmp_path: Path,
@@ -237,18 +237,21 @@ def test_each_ruleset_field_projects_on_native_mcp_rest_and_cli(
     cases = []
     body = full.json()
     for layer, data in body["layers"].items():
-        for field, value in data["ruleset"].items():
+        if isinstance(data, dict) and "status" in data:
             cases.append(
                 (
-                    "layers." + layer + ".ruleset." + field,
-                    {"layers": {layer: {"ruleset": {field: value}}}},
+                    f"layers.{layer}.status",
+                    {"layers": {layer: {"status": data["status"]}}},
                 )
             )
-    source_id, source = next(iter(body["source_catalog"].items()))
     cases.append(
         (
-            f"source_catalog.{source_id}.title",
-            {"source_catalog": {source_id: {"title": source["title"]}}},
+            "coverage.implemented_layers",
+            {
+                "coverage": {
+                    "implemented_layers": body["coverage"]["implemented_layers"]
+                }
+            },
         )
     )
 
@@ -310,23 +313,23 @@ def test_each_ruleset_field_projects_on_native_mcp_rest_and_cli(
 
 
 @pytest.mark.parametrize(
-    "value", [{"version": 1}, {"source_ids": "S1"}, {"source_citations": []}]
+    "value", [{"implemented_layers": "bazhai"}, {"missing_inputs": [123]}]
 )
-def test_partial_ruleset_still_rejects_wrong_present_types(value: JsonValue) -> None:
+def test_partial_coverage_still_rejects_wrong_present_types(value: JsonValue) -> None:
     with pytest.raises(ValidationError):
-        Ruleset.model_validate(value)
+        Coverage.model_validate(value)
     with pytest.raises(SchemaError):
-        Draft202012Validator(Ruleset.model_json_schema()).validate(value)
+        Draft202012Validator(Coverage.model_json_schema()).validate(value)
 
 
 @pytest.mark.parametrize(
     "field,issue",
     [
-        ("layers.directions.ruleset.source_ids.0", "non_object_projection_path"),
-        ("layers.directions.ruleset.versoin", "unknown_projection_path"),
+        ("coverage.implemented_layers.0", "non_object_projection_path"),
+        ("layers.directions.statuz", "unknown_projection_path"),
     ],
 )
-def test_ruleset_invalid_paths_keep_same_diagnostics_on_all_surfaces(
+def test_fengshui_invalid_paths_keep_same_diagnostics_on_all_surfaces(
     field: str,
     issue: str,
     rest: TestClient,
@@ -371,4 +374,4 @@ def test_ruleset_invalid_paths_keep_same_diagnostics_on_all_surfaces(
         assert recorded["path"] == field
         assert recorded["code"] == issue
         if issue == "unknown_projection_path":
-            assert "version" in recorded["constraints"]["available"]
+            assert "status" in recorded["constraints"]["available"]

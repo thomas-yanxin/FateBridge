@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from fnmatch import fnmatch
 import json
+from fnmatch import fnmatch
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -50,7 +50,9 @@ def test_every_packaged_data_file_is_referenced_by_source() -> None:
         ):
             unreferenced.append(rel)
 
-    assert not unreferenced, f"Unreferenced files in src/fatebridge/data/: {unreferenced}"
+    assert (
+        not unreferenced
+    ), f"Unreferenced files in src/fatebridge/data/: {unreferenced}"
 
 
 def test_purged_audit_and_witness_files_stay_absent() -> None:

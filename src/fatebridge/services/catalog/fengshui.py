@@ -21,11 +21,7 @@ def _load_fengshui_model(model_name: str) -> type[BaseModel]:
 
 def _compact_directions(result: ServiceResult) -> ServiceResult:
     layer = result["layers"]["directions"]
-    compact_layer = {
-        key: value
-        for key, value in layer.items()
-        if key != "directions"
-    }
+    compact_layer = {key: value for key, value in layer.items() if key != "directions"}
     compact_layer["directions"] = {
         d: {
             "trigram": info["trigram"],
@@ -53,9 +49,7 @@ def _compact_bazhai_chart(chart: ServiceResult) -> ServiceResult:
         "group",
     }
     out: ServiceResult = {
-        key: value
-        for key, value in chart.items()
-        if key in keep and value is not None
+        key: value for key, value in chart.items() if key in keep and value is not None
     }
     out["sectors"] = {
         direction: palace["star"]["name"]

@@ -54,7 +54,7 @@ class TongSheFaComparison(TypedDict):
 
 class TongSheFaResult(TypedDict):
     analysis_type: str
-    input_normalized: dict[str, str]
+    analysis_context: dict[str, str]
     tongshefa: TongSheFaComparison
     summary: str
 

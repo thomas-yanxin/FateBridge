@@ -99,7 +99,9 @@ def test_extra_returns_service_uses_native_lahiri_for_natal_and_events() -> None
     )
     assert "error" not in result, result
     row = next(
-        row for row in result["planetary_returns"]["returns"] if row["body"] == "Jupiter"
+        row
+        for row in result["planetary_returns"]["returns"]
+        if row["body"] == "Jupiter"
     )
     target = native_longitude(swe.JUPITER, BIRTH, True)
     assert row["natal_longitude"]["absolute_degree"] == pytest.approx(target, abs=1e-10)

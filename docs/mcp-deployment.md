@@ -12,7 +12,7 @@
 | 支持 URL 的客户端、远程机器 | Streamable HTTP | 你或服务管理器 | `http://127.0.0.1:8011/mcp`，远程可通过 SSH 隧道 |
 | 普通应用 HTTP 调用 | REST，见[快速入门](getting-started.md) | 你或服务管理器 | `http://127.0.0.1:8010/api/...` |
 
-`fatebridge-mcp` 运行 stdio，HTTP 部署加载 `app`。两种入口使用同一套两工具接口（`discover_tools` 与 `run_calculation`），不暴露 MCP 资源。REST 独立运行。
+`fatebridge-mcp` 运行 stdio，HTTP 部署加载 `app`。两种入口使用同一套三工具接口（`discover_tools`、`run_calculation` 与 `run_batch`），不暴露 MCP 资源。REST 独立运行。
 
 ## 安装与本地验证
 
@@ -141,7 +141,7 @@ uv run --extra dev fatebridge bazi_birth_chart `
 
 ## 工具筛选与运行环境
 
-默认两个工具（`discover_tools` 与 `run_calculation`）覆盖全部公开能力。在客户端的 `env` 中设置 `FATEBRIDGE_MCP_FAMILIES` 可限制能力范围，例如 `"bazi,knowledge"` 或 `"fengshui"`。多个 family 取并集，空值保留全量，错误分类阻止启动。以下命令可验证独立进程：
+默认三个工具（`discover_tools`、`run_calculation` 与 `run_batch`）覆盖全部公开能力。在客户端的 `env` 中设置 `FATEBRIDGE_MCP_FAMILIES` 可限制能力范围，例如 `"bazi,knowledge"` 或 `"fengshui"`。多个 family 取并集，空值保留全量，错误分类阻止启动。以下命令可验证独立进程：
 
 ```bash
 uv run --extra dev fatebridge doctor --mcp --family fengshui

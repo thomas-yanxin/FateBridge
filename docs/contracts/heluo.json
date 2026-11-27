@@ -20,7 +20,6 @@
   "evidence_views": {
     "birth_clock": {
       "fields": [
-        "input_normalized",
         "analysis_context",
         "four_pillars",
         "numerology_evidence.birth_clock"
@@ -30,8 +29,7 @@
     "body_relations": {
       "fields": [
         "four_pillars",
-        "judge.deTi",
-        "numerology_evidence.rulesets"
+        "judge.deTi"
       ],
       "purpose": "核对年纳音、实际上下及互体的有向五行关系、无元气前提；完整得体仍未决。"
     },
@@ -39,27 +37,21 @@
       "fields": [
         "chart.xian",
         "chart.hou",
-        "judge.body_structure",
-        "numerology_evidence.rule_trace",
-        "numerology_evidence.rulesets"
+        "judge.body_structure"
       ],
       "purpose": "核对渐卦原例的混合爻数结构、原爻位映射及逐阶段推演来源，避免把八条结构误当八个互体。"
     },
     "clock_basis": {
       "description": "岁运年上下文与卷一百刻／寄时原式；计数可核对，物理钟面与日期桥接仍未完成。",
       "fields": [
-        "heluo_timing.year_context",
-        "numerology_evidence.rule_trace",
-        "numerology_evidence.rulesets"
+        "heluo_timing.year_context"
       ]
     },
     "jiehou": {
       "description": "已算节气标签的四正节卦、原候卦组和未解决的六日重建差异，不自动选实际候卦或化工。",
       "fields": [
         "jiehou_evidence",
-        "solar_term",
-        "numerology_evidence.rulesets",
-        "numerology_evidence.rule_trace"
+        "solar_term"
       ]
     },
     "line_conditions": {
@@ -67,17 +59,14 @@
         "chart.xian",
         "chart.hou",
         "judge.line_conditions",
-        "judge.yuanTang",
-        "numerology_evidence.rule_trace",
-        "numerology_evidence.rulesets"
+        "judge.yuanTang"
       ],
       "purpose": "按实际先后天元堂核二五位、众宗及主本阴元堂阳应爻有援式，保留同阶段应位和阴阳事实；不把通用相应、偶数爻位或未中原句合成十体总评。"
     },
     "month_affinity": {
       "fields": [
         "judge.deTime",
-        "judge.month_affinity",
-        "numerology_evidence.rulesets"
+        "judge.month_affinity"
       ],
       "purpose": "区分卦属本月与原文另述跨月窗口，核对原页、边界月和完整判断尚未完成的范围。"
     },
@@ -91,7 +80,7 @@
     },
     "natal": {
       "fields": [
-        "input_normalized",
+        "analysis_context",
         "four_pillars",
         "chart",
         "solar_term",
@@ -104,8 +93,7 @@
       "fields": [
         "chart.tian",
         "chart.di",
-        "judge.seasonal_numbers",
-        "numerology_evidence.rulesets"
+        "judge.seasonal_numbers"
       ],
       "purpose": "核对原典十一数式、六个时令窗口及重叠；绝对数段与时令条件分开读取，不据此裁定综合葉否。"
     },
@@ -126,9 +114,7 @@
       "fields": [
         "four_pillars",
         "numerology_evidence.pillar_links",
-        "numerology_evidence.birth_clock",
-        "numerology_evidence.rule_trace",
-        "numerology_evidence.rulesets"
+        "numerology_evidence.birth_clock"
       ],
       "purpose": "核对实际四柱的起月起时原句、基准干与顺行支序；保留历法边界验收范围。"
     },
@@ -138,18 +124,16 @@
         "chart.xian",
         "chart.hou",
         "judge.qi_phases",
-        "solar_term",
-        "numerology_evidence.rule_trace"
+        "solar_term"
       ]
     },
     "selected_texts": {
       "fields": [
-        "input_normalized",
+        "analysis_context",
         "numerology_evidence.birth_clock",
         "chart.xian",
         "chart.hou",
-        "numerology_evidence.selected_texts",
-        "numerology_evidence.rule_trace"
+        "numerology_evidence.selected_texts"
       ],
       "purpose": "读取本次实际先后天元堂的底本注文、条件段落、异文与独立来源状态；不自动裁定葉否。 同时保留本次归一输入与实际计算钟面，供核验所用资料。 卷三诗诀另列底本、爻组与首数；象曰不借诗诀认证，多首诗按原次序全列。"
     },
@@ -162,16 +146,14 @@
         "chart.yangLing",
         "chart.yangLingBasis",
         "chart.yuantang_derivation",
-        "judge.yuanTang",
-        "numerology_evidence.rulesets",
-        "numerology_evidence.rule_trace"
+        "judge.yuanTang"
       ],
       "purpose": "核对实际元堂配时、阴阳令来源、两半年的敏感性及后天换卦；反事实不是两个出生盘。"
     }
   },
   "first_view": {
     "fields": [
-      "input_normalized",
+      "analysis_context",
       "four_pillars",
       "chart",
       "solar_term",

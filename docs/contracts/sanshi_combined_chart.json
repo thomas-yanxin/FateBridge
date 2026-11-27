@@ -69,16 +69,16 @@
     "liuren_cross_harmony": {
       "fields": [
         "four_pillars",
-        "liureng.cross_harmony",
-        "liureng.ruleset"
+        "liuren.cross_harmony",
+        "liuren.ruleset"
       ],
       "purpose": "核对干上神与日支、支上神与日干寄宫的两边六合，以及五个干支同宫日的排除条件；按所选原文列实际支位和来源。"
     },
     "liuren_day_placement_patterns": {
       "fields": [
         "four_pillars",
-        "liureng.day_placement_patterns",
-        "liureng.ruleset"
+        "liuren.day_placement_patterns",
+        "liuren.ruleset"
       ],
       "purpose": "探原干加支／支加干的十条生克比和条件，按日干本五行与日支计算；归合、求合缺加临时排除，加临成立但合式未裁时仍未知。附带六壬盘不替代金口诀本课规则，不据课名推断他人意图或现实成败。"
     },
@@ -97,10 +97,10 @@
     "noble_sources": {
       "fields": [
         "analysis_context",
-        "subresults.liureng_gods.four_pillars.day",
-        "liureng.meta",
-        "liureng.month_general",
-        "liureng.ruleset",
+        "subresults.liuren.four_pillars.day",
+        "liuren.meta",
+        "liuren.month_general",
+        "liuren.ruleset",
         "synthesis.noble_source_assessment",
         "synthesis.time_scopes"
       ],
@@ -117,11 +117,11 @@
         "qimen.rule_profiles.god.title",
         "qimen.rule_profiles.season.id",
         "qimen.rule_profiles.season.title",
-        "liureng.ruleset.id",
-        "liureng.ruleset.version",
-        "liureng.ruleset.source_title",
-        "liureng.ruleset.classical_conformance",
-        "liureng.ruleset.classical_acceptance_passed"
+        "liuren.ruleset.id",
+        "liuren.ruleset.version",
+        "liuren.ruleset.source_title",
+        "liuren.ruleset.classical_conformance",
+        "liuren.ruleset.classical_acceptance_passed"
       ],
       "purpose": "查五将同方位的奇门星门神；六壬四正直接对应，四维并列同方位两支实际神将且不选寄支，中五不寄宫。"
     },
@@ -141,14 +141,14 @@
         "qimen.rule_profiles.god.title",
         "qimen.rule_profiles.season.id",
         "qimen.rule_profiles.season.title",
-        "liureng.month_general",
-        "liureng.three_transmissions",
-        "liureng.patterns",
-        "liureng.ruleset.id",
-        "liureng.ruleset.version",
-        "liureng.ruleset.source_title",
-        "liureng.ruleset.classical_conformance",
-        "liureng.ruleset.classical_acceptance_passed",
+        "liuren.month_general",
+        "liuren.three_transmissions",
+        "liuren.patterns",
+        "liuren.ruleset.id",
+        "liuren.ruleset.version",
+        "liuren.ruleset.source_title",
+        "liuren.ruleset.classical_conformance",
+        "liuren.ruleset.classical_acceptance_passed",
         "synthesis.noble_source_assessment",
         "synthesis.time_scopes"
       ],
@@ -194,7 +194,6 @@
         "analysis_context",
         "taiyi.core_board",
         "taiyi.calendar_rules",
-        "taiyi.rule_trace",
         "taiyi.patterns",
         "taiyi.ruleset",
         "synthesis.time_scopes"
@@ -335,14 +334,14 @@
       "qimen.rule_profiles.god.title",
       "qimen.rule_profiles.season.id",
       "qimen.rule_profiles.season.title",
-      "liureng.month_general",
-      "liureng.three_transmissions",
-      "liureng.patterns",
-      "liureng.ruleset.id",
-      "liureng.ruleset.version",
-      "liureng.ruleset.source_title",
-      "liureng.ruleset.classical_conformance",
-      "liureng.ruleset.classical_acceptance_passed",
+      "liuren.month_general",
+      "liuren.three_transmissions",
+      "liuren.patterns",
+      "liuren.ruleset.id",
+      "liuren.ruleset.version",
+      "liuren.ruleset.source_title",
+      "liuren.ruleset.classical_conformance",
+      "liuren.ruleset.classical_acceptance_passed",
       "synthesis.time_scopes"
     ]
   },

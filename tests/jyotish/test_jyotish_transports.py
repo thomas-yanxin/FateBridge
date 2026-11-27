@@ -136,7 +136,12 @@ def test_extended_vargas_and_complete_shadbala_across_real_surfaces(
         capsys,
         "vedic_chart",
         {**astro_payload(), "divisions": [2, 3, 7, 9, 10, 12, 30]},
-        ["vedic_chart.charts", "vedic_chart.strengths", "vedic_chart.profile", "vedic_chart.yogas"],
+        [
+            "vedic_chart.charts",
+            "vedic_chart.strengths",
+            "vedic_chart.profile",
+            "vedic_chart.yogas",
+        ],
     )
     india = result["vedic_chart"]
     assert set(india["charts"]) == {"D1", "D2", "D3", "D7", "D9", "D10", "D12", "D30"}

@@ -25,8 +25,6 @@
       "fields": [
         "guolao.life_palace",
         "guolao.palaces",
-        "guolao.rulesets",
-        "guolao.rule_trace",
         "guolao.god_positions",
         "guolao.validation"
       ],
@@ -36,7 +34,6 @@
       "fields": [
         "guolao.bodies",
         "guolao.moira_patterns",
-        "guolao.rule_trace",
         "guolao.validation"
       ],
       "purpose": "核对政余格局的具名条件、参与星体和计算证据"
@@ -46,8 +43,6 @@
         "guolao.timing",
         "guolao.life_palace",
         "guolao.palaces",
-        "guolao.rulesets",
-        "guolao.rule_trace",
         "guolao.validation"
       ],
       "purpose": "显式analysis_datetime的小限逆数及当时十一曜研究位置；未给目标则not_requested，不据此生成完整流年或现实事件概率"
@@ -59,7 +54,6 @@
       "guolao.life_palace",
       "guolao.conditions",
       "guolao.bodies",
-      "guolao.rulesets",
       "guolao.validation"
     ]
   },

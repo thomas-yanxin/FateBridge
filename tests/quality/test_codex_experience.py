@@ -521,5 +521,5 @@ def test_timing_first_view_keeps_current_basis_without_year_grids(
     assert context["timezone"] == "Asia/Shanghai"
     assert context["current_solar_term"] and context["next_solar_term"]
     assert context["bazi_month_boundary"]
-    assert result["dayun_analysis"] and result["liunian_analysis"]
+    assert result["dayun"] and result["liunian"]
     assert len(json.dumps(result, ensure_ascii=False).encode()) < 10000

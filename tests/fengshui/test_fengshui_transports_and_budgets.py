@@ -139,9 +139,17 @@ def test_latency_and_payload_and_schema_budgets() -> None:
         )
         assert out_schema_kb < 6.0, f"{spec.name} out schema {out_schema_kb:.1f}KB"
         assert compact_kb < 4.0, f"{spec.name} compact {compact_kb:.1f}KB"
-        for removed_key in ("rulesets", "source_catalog", "rule_trace", "source_citations", "conventions"):
+        for removed_key in (
+            "rulesets",
+            "source_catalog",
+            "rule_trace",
+            "source_citations",
+            "conventions",
+        ):
             assert removed_key not in audit, f"{spec.name} audit leaked {removed_key}"
-            assert removed_key not in compact, f"{spec.name} compact leaked {removed_key}"
+            assert (
+                removed_key not in compact
+            ), f"{spec.name} compact leaked {removed_key}"
         for layer in audit["layers"].values():
             assert "ruleset" not in layer
         for layer in compact["layers"].values():
@@ -155,7 +163,14 @@ def test_latency_and_payload_and_schema_budgets() -> None:
                 "coverage",
                 "run_metadata",
             }
-            assert set(compact) >= {"status", "layers", "palace_overlay", "layout_analysis", "coverage", "run_metadata"}
+            assert set(compact) >= {
+                "status",
+                "layers",
+                "palace_overlay",
+                "layout_analysis",
+                "coverage",
+                "run_metadata",
+            }
         if spec.name in STANDALONE_TOOLS:
             audit_kb = len(json.dumps(audit, ensure_ascii=False).encode()) / 1024
             assert audit_kb < 20.0, f"{spec.name} audit {audit_kb:.1f}KB"

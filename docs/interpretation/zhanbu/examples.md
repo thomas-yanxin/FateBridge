@@ -19,7 +19,7 @@ python3 -m fatebridge.cli combine_four_gua \
 
 python3 -m fatebridge.cli liuyao --question "这个项目试点有什么需要留意" \
   --date 2026-06-18 --time 15:00:00 --seed 20260618 \
-  --fields input_normalized nongli current_hexagram changed_hexagram moving_lines lines hexagram_info
+  --fields analysis_context nongli current_hexagram changed_hexagram moving_lines lines hexagram_info
 
 python3 -m fatebridge.cli horary_chart --category career \
   --question-year 2026 --question-month 6 --question-day 18 --question-hour 15 \

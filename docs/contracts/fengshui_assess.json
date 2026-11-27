@@ -1,6 +1,6 @@
 {
   "call_guidance": {
-    "birth_choice": "birth_date、birth_at、effective_birth_year最多传一个，不能同时传日期和时刻",
+    "birth_choice": "birth_date、birth_at、birth_year最多传一个，不能同时传日期和时刻",
     "environmental_context": "environmental_context提供独立环境/家庭/楼层事实，不传八字紫微喜忌；首轮fields追加layout_analysis.environmental_context。orientation分别确认direction_confirmed、north_reference、floorplan_alignment_confirmed、center_confirmed；未确认落宫不能同时传位置/砂水/外局分宫，仍可原始盘与独立形态。",
     "feasibility": "feasible_zones只含用户逐区明确确认能容纳对象并保持视野的区域，不从照片空白、物件属性确认或允许移动扩展；其余省略",
     "interior_relations": "明确非罗盘关系用environmental_context.interior_relations：relation_id/source_object_id/target_object_id/kind/present/observation_basis/evidence；present必须显式true、false或null，照片true/false均候选，不由相邻/可见推直接相对。",
@@ -37,9 +37,7 @@
         "layers.xuankong_natal.period_context",
         "layers.xuankong_natal.orientation_context",
         "layers.xuankong_natal.candidates",
-        "layers.xuankong_natal.missing_inputs",
-        "rulesets",
-        "rule_trace"
+        "layers.xuankong_natal.missing_inputs"
       ],
       "purpose": "玄空宅盘候选星盘与定运朝向依据"
     },
@@ -51,9 +49,7 @@
         "layers.xuankong_natal.orientation_context",
         "layers.xuankong_natal.chart",
         "layers.xuankong_natal.candidates",
-        "layers.xuankong_natal.missing_inputs",
-        "rulesets",
-        "rule_trace"
+        "layers.xuankong_natal.missing_inputs"
       ],
       "purpose": "玄空宅盘格局与挨星盘面"
     }
@@ -61,14 +57,10 @@
   "first_view": {
     "fields": [
       "status",
-      "layout_analysis.status",
-      "layout_analysis.calculation_scope",
-      "layout_analysis.placement_findings",
-      "layout_analysis.missing_inputs",
-      "coverage",
-      "rule_trace",
-      "rulesets",
-      "source_catalog"
+      "layers",
+      "palace_overlay",
+      "layout_analysis",
+      "coverage"
     ]
   },
   "input": {
@@ -89,11 +81,19 @@
             "title": "Encircling Form Present"
           },
           "evidence": {
-            "maxLength": 2000,
-            "minLength": 1,
-            "pattern": "\\S",
-            "title": "Evidence",
-            "type": "string"
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "minLength": 1,
+                "pattern": "\\S",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Evidence"
           },
           "mountain": {
             "enum": [
@@ -138,6 +138,7 @@
             "title": "Multiple Openings Present"
           },
           "observation_basis": {
+            "default": "user_confirmed",
             "enum": [
               "measured",
               "user_confirmed",
@@ -196,9 +197,7 @@
           }
         },
         "required": [
-          "mountain",
-          "observation_basis",
-          "evidence"
+          "mountain"
         ],
         "title": "CityGateObservation",
         "type": "object"
@@ -215,17 +214,33 @@
             "type": "array"
           },
           "period_evidence": {
-            "maxLength": 2000,
-            "minLength": 1,
-            "pattern": "\\S",
-            "title": "Period Evidence",
-            "type": "string"
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "minLength": 1,
+                "pattern": "\\S",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Period Evidence"
           },
           "reference_period_number": {
-            "maximum": 9,
-            "minimum": 1,
-            "title": "Reference Period Number",
-            "type": "integer"
+            "anyOf": [
+              {
+                "maximum": 9,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reference Period Number"
           },
           "ruleset_id": {
             "const": "shen_city_gate_v1",
@@ -234,10 +249,6 @@
             "type": "string"
           }
         },
-        "required": [
-          "reference_period_number",
-          "period_evidence"
-        ],
         "title": "CityGateRequest",
         "type": "object"
       },
@@ -255,6 +266,7 @@
             "type": "string"
           },
           "classification_basis": {
+            "default": "user_confirmed",
             "enum": [
               "measured",
               "user_confirmed"
@@ -286,10 +298,19 @@
             "title": "Direction"
           },
           "evidence": {
-            "maxLength": 1000,
-            "minLength": 1,
-            "title": "Evidence",
-            "type": "string"
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "minLength": 1,
+                "pattern": "\\S",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Evidence"
           },
           "label": {
             "anyOf": [
@@ -344,17 +365,22 @@
             "title": "Mountain"
           },
           "object_id": {
-            "maxLength": 100,
-            "minLength": 1,
-            "title": "Object Id",
-            "type": "string"
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Object Id"
           }
         },
         "required": [
-          "object_id",
-          "classification",
-          "classification_basis",
-          "evidence"
+          "classification"
         ],
         "title": "EnvironmentFeature",
         "type": "object"
@@ -377,11 +403,19 @@
             "type": "string"
           },
           "evidence": {
-            "maxLength": 1000,
-            "minLength": 1,
-            "pattern": "\\S",
-            "title": "Evidence",
-            "type": "string"
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "minLength": 1,
+                "pattern": "\\S",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Evidence"
           },
           "mountain_present": {
             "anyOf": [
@@ -396,6 +430,7 @@
             "title": "Mountain Present"
           },
           "observation_basis": {
+            "default": "user_confirmed",
             "enum": [
               "measured",
               "user_confirmed",
@@ -418,9 +453,7 @@
           }
         },
         "required": [
-          "direction",
-          "observation_basis",
-          "evidence"
+          "direction"
         ],
         "title": "ExternalFormObservation",
         "type": "object"
@@ -516,6 +549,45 @@
             "description": "宅向角度，0°北顺时针",
             "title": "Facing Degrees"
           },
+          "facing_mountain": {
+            "anyOf": [
+              {
+                "enum": [
+                  "子",
+                  "癸",
+                  "丑",
+                  "艮",
+                  "寅",
+                  "甲",
+                  "卯",
+                  "乙",
+                  "辰",
+                  "巽",
+                  "巳",
+                  "丙",
+                  "午",
+                  "丁",
+                  "未",
+                  "坤",
+                  "申",
+                  "庚",
+                  "酉",
+                  "辛",
+                  "戌",
+                  "乾",
+                  "亥",
+                  "壬"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "已确认住宅朝向二十四山（未提供 facing_degrees 时可选）",
+            "title": "Facing Mountain"
+          },
           "north_reference": {
             "anyOf": [
               {
@@ -530,7 +602,7 @@
               }
             ],
             "default": null,
-            "description": "参考北：magnetic 或 true",
+            "description": "参考北：magnetic 或 true；提供角度时默认 magnetic",
             "title": "North Reference"
           },
           "object_id": {
@@ -580,28 +652,22 @@
         "additionalProperties": false,
         "properties": {
           "basis": {
-            "enum": [
-              "construction_completion",
-              "first_occupancy",
-              "confirmed_major_renovation",
-              "expert_confirmed"
-            ],
-            "title": "Basis",
-            "type": "string"
-          },
-          "effective_event_year": {
             "anyOf": [
               {
-                "maximum": 2199,
-                "minimum": 1800,
-                "type": "integer"
+                "enum": [
+                  "construction_completion",
+                  "first_occupancy",
+                  "confirmed_major_renovation",
+                  "expert_confirmed"
+                ],
+                "type": "string"
               },
               {
                 "type": "null"
               }
             ],
             "default": null,
-            "title": "Effective Event Year"
+            "title": "Basis"
           },
           "event_at": {
             "anyOf": [
@@ -616,11 +682,34 @@
             "default": null,
             "title": "Event At"
           },
+          "event_year": {
+            "anyOf": [
+              {
+                "maximum": 2199,
+                "minimum": 1800,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Event Year"
+          },
           "evidence": {
-            "maxLength": 2000,
-            "minLength": 1,
-            "title": "Evidence",
-            "type": "string"
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "minLength": 1,
+                "pattern": "\\S",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Evidence"
           },
           "period_number": {
             "anyOf": [
@@ -655,10 +744,6 @@
             "type": "string"
           }
         },
-        "required": [
-          "basis",
-          "evidence"
-        ],
         "title": "HousePeriod",
         "type": "object"
       },
@@ -680,11 +765,19 @@
             "type": "string"
           },
           "evidence": {
-            "maxLength": 1000,
-            "minLength": 1,
-            "pattern": "\\S",
-            "title": "Evidence",
-            "type": "string"
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "minLength": 1,
+                "pattern": "\\S",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Evidence"
           },
           "high_solid_terrain_present": {
             "anyOf": [
@@ -711,6 +804,7 @@
             "title": "Low Lying Terrain Present"
           },
           "observation_basis": {
+            "default": "user_confirmed",
             "enum": [
               "measured",
               "user_confirmed",
@@ -733,9 +827,7 @@
           }
         },
         "required": [
-          "direction",
-          "observation_basis",
-          "evidence"
+          "direction"
         ],
         "title": "LingzhengObservation",
         "type": "object"
@@ -838,7 +930,7 @@
             "description": "公历出生日期；与有效生年/出生时刻三选一",
             "title": "Birth Date"
           },
-          "effective_birth_year": {
+          "birth_year": {
             "anyOf": [
               {
                 "maximum": 2199,
@@ -851,9 +943,9 @@
             ],
             "default": null,
             "description": "已确认换年后的有效生年",
-            "title": "Effective Birth Year"
+            "title": "Birth Year"
           },
-          "gender_convention": {
+          "gender": {
             "anyOf": [
               {
                 "enum": [
@@ -868,7 +960,7 @@
             ],
             "default": null,
             "description": "传统男女起算法；未知时返回两个候选",
-            "title": "Gender Convention"
+            "title": "Gender"
           },
           "ruleset_id": {
             "const": "bazhai_sitting_v1",
@@ -877,11 +969,19 @@
             "type": "string"
           },
           "subject_id": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
             "description": "住户稳定标识",
-            "maxLength": 100,
-            "minLength": 1,
-            "title": "Subject Id",
-            "type": "string"
+            "title": "Subject Id"
           },
           "timezone_name": {
             "default": "Asia/Shanghai",
@@ -900,9 +1000,6 @@
             "type": "string"
           }
         },
-        "required": [
-          "subject_id"
-        ],
         "title": "Occupant",
         "type": "object"
       },
@@ -938,26 +1035,19 @@
               {
                 "properties": {
                   "facing_direction": {
-                    "type": "null"
-                  },
-                  "facing_role": {
-                    "type": "null"
-                  }
-                }
-              },
-              {
-                "properties": {
-                  "facing_direction": {
-                    "type": "string"
-                  },
-                  "facing_role": {
                     "type": "string"
                   }
                 },
                 "required": [
-                  "facing_direction",
-                  "facing_role"
+                  "facing_direction"
                 ]
+              },
+              {
+                "properties": {
+                  "facing_role": {
+                    "type": "null"
+                  }
+                }
               }
             ]
           },
@@ -1056,7 +1146,7 @@
             ]
           }
         ],
-        "description": "门床桌灶已确认方位。至少提供位置或朝向；朝向和对应 facing_role 须成对。",
+        "description": "门床桌灶已确认方位。至少提供位置或朝向；提供朝向时可省略 facing_role 自动匹配。",
         "properties": {
           "facing_direction": {
             "anyOf": [
@@ -1123,10 +1213,18 @@
             "title": "Location Direction"
           },
           "object_id": {
-            "maxLength": 100,
-            "minLength": 1,
-            "title": "Object Id",
-            "type": "string"
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Object Id"
           },
           "observation_basis": {
             "default": "user_confirmed",
@@ -1178,7 +1276,6 @@
           }
         },
         "required": [
-          "object_id",
           "purpose"
         ],
         "title": "Placement",
@@ -1348,16 +1445,38 @@
     "description": "Multi-layer assessment decoupled from AnnualRequest mutual exclusion.",
     "properties": {
       "analyze_layout": {
-        "default": false,
-        "description": "是否计算跨层布局落宫与四层叠盘",
-        "title": "Analyze Layout",
-        "type": "boolean"
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "是否计算跨层布局落宫与四层叠盘；默认有 placements 时自动启用",
+        "title": "Analyze Layout"
       },
       "annual_ruleset_id": {
         "const": "annual_zibai_lichun_v1",
         "default": "annual_zibai_lichun_v1",
         "title": "Annual Ruleset Id",
         "type": "string"
+      },
+      "built_year": {
+        "anyOf": [
+          {
+            "maximum": 2199,
+            "minimum": 1800,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "住宅建成或换运有效年份（扁平简写，等效于 xuankong.period.event_year）",
+        "title": "Built Year"
       },
       "effective_year": {
         "anyOf": [
@@ -1439,6 +1558,21 @@
         "maxItems": 50,
         "title": "Occupants",
         "type": "array"
+      },
+      "period_number": {
+        "anyOf": [
+          {
+            "maximum": 9,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "住宅元运 1–9（扁平简写，等效于 xuankong.period.period_number）",
+        "title": "Period Number"
       },
       "placements": {
         "items": {

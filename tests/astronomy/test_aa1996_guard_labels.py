@@ -60,7 +60,7 @@ def test_date_only_guard_names_source_without_inventing_a_birth_hour(
 ) -> None:
     monkeypatch.setattr(bazhai, "lichun_resolution", lambda *a: resolution())
     request = MingguaRequest(
-        birth_date=date(2024, 2, 3), timezone_name="UTC", gender_convention="male"
+        birth_date=date(2024, 2, 3), timezone_name="UTC", gender="male"
     )
     result = bazhai.minggua(request)
     time = result["time_context"]

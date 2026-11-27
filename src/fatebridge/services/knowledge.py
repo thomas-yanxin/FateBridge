@@ -101,11 +101,7 @@ def _cached_registry(lookup_domain: str | None) -> dict[str, Any]:
                 _slim_catalog_domain(domain_record)
                 for domain_record in (
                     *base_registry["domains"],
-                    *(
-                        record
-                        for provider in added
-                        for record in provider["domains"]
-                    ),
+                    *(record for provider in added for record in provider["domains"]),
                 )
             ],
             "provenance": {

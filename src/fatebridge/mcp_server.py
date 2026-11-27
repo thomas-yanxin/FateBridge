@@ -206,7 +206,9 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
         ],
         subjects: Annotated[
             dict[str, SubjectProfile] | None,
-            Field(description="共享对象档案字典，键名供 call.subject / call.subjects 引用"),
+            Field(
+                description="共享对象档案字典，键名供 call.subject / call.subjects 引用"
+            ),
         ] = None,
         defaults: Annotated[
             dict[str, object] | None,

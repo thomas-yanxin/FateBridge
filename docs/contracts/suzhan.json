@@ -47,7 +47,6 @@
         "sukuyo.lower_mansion_day",
         "sukuyo.conjunction_doctrine",
         "sukuyo.activity_assessment",
-        "rulesets",
         "validation",
         "summary",
         "sukuyo.lower_methods",
@@ -64,7 +63,6 @@
       "fields": [
         "astronomy",
         "params",
-        "rulesets",
         "validation"
       ],
       "when": "核对当日视赤经、不等宽宿界与现代距星来源，不能用于农历本命宿。"
@@ -72,7 +70,6 @@
     "calendar": {
       "fields": [
         "sukuyo",
-        "rulesets",
         "validation",
         "summary",
         "sukuyo.taibai_direction_reference"
@@ -81,12 +78,11 @@
     },
     "calendar_date_only": {
       "fields": [
-        "input_normalized",
+        "analysis_context",
         "params",
         "sukuyo",
         "chart",
         "astronomy",
-        "rulesets",
         "validation",
         "summary"
       ],
@@ -98,7 +94,6 @@
         "sukuyo.day_mansion",
         "sukuyo.conjunction_doctrine",
         "sukuyo.palace_reference",
-        "rulesets",
         "sukuyo.calendar_day",
         "sukuyo.weekday",
         "sukuyo.nature",
@@ -110,7 +105,7 @@
         "sukuyo.lower_methods",
         "sukuyo.directional_travel",
         "sukuyo.special_day_evidence",
-        "input_normalized",
+        "analysis_context",
         "validation",
         "summary"
       ],
@@ -120,8 +115,7 @@
     "diagram": {
       "fields": [
         "chart",
-        "params",
-        "rulesets"
+        "params"
       ],
       "purpose": "核对宿盘及所选天文宿位方法；现代研究宿界与legacy等分示意分开标注"
     },
@@ -132,8 +126,7 @@
         "sukuyo.lower_mansion_day",
         "sukuyo.conjunction_doctrine",
         "sukuyo.activity_assessment",
-        "input_normalized",
-        "rulesets",
+        "analysis_context",
         "sukuyo.lower_methods",
         "sukuyo.directional_travel"
       ],
@@ -146,8 +139,7 @@
         "sukuyo.weekday",
         "sukuyo.lower_methods",
         "sukuyo.activity_assessment",
-        "input_normalized",
-        "rulesets",
+        "analysis_context",
         "validation",
         "sukuyo.special_day_evidence"
       ],
@@ -158,8 +150,7 @@
         "sukuyo.calendar",
         "sukuyo.day_mansion",
         "sukuyo.palace_reference",
-        "input_normalized",
-        "rulesets",
+        "analysis_context",
         "validation"
       ],
       "purpose": "原典分足108格查表、跨宫候选及文献主曜；不能据历日宿补出生足位"
@@ -169,7 +160,7 @@
         "sukuyo.calendar",
         "sukuyo.personal_day",
         "sukuyo.activity_assessment",
-        "input_normalized"
+        "analysis_context"
       ],
       "purpose": "本命三九日的卷别、启程与入宅范围；条件未定不代入。"
     },
@@ -177,8 +168,7 @@
       "fields": [
         "sukuyo.calendar",
         "sukuyo.day_mansion",
-        "input_normalized",
-        "rulesets",
+        "analysis_context",
         "validation"
       ],
       "purpose": "核对望宿两法及可选桧尾补配、半日和规则次序候选"
@@ -188,7 +178,7 @@
         "sukuyo.six_palace_reference",
         "sukuyo.personal_day",
         "sukuyo.calendar",
-        "input_normalized"
+        "analysis_context"
       ],
       "purpose": "核对T1299六个本命相对位置及原文例题；运行犯宿未计算，不生成当日吉凶"
     },
@@ -196,8 +186,7 @@
       "fields": [
         "sukuyo.calendar.profile_calculation",
         "sukuyo.calendar.candidate_su27s",
-        "rulesets.calendar",
-        "input_normalized"
+        "analysis_context"
       ],
       "purpose": "核对望宿表捕获来源、缺日分支及Hinoo直接下载原段、校记与历史缓存差异"
     },
@@ -209,7 +198,7 @@
         "sukuyo.special_day_labels",
         "sukuyo.special_day_evidence",
         "sukuyo.activity_assessment",
-        "input_normalized"
+        "analysis_context"
       ],
       "purpose": "核对上下卷大正特殊日、明本校记及未识别宿字；不将合宿原文变成物理观测"
     },
@@ -217,7 +206,7 @@
       "fields": [
         "sukuyo.calendar",
         "sukuyo.calendar_day",
-        "input_normalized"
+        "analysis_context"
       ],
       "purpose": "核对原典一夜省文、十一夜释义及有效时段证言；不是已定现代钟时"
     },
@@ -227,7 +216,7 @@
         "sukuyo.day_mansion",
         "sukuyo.directional_travel",
         "sukuyo.activity_assessment",
-        "input_normalized"
+        "analysis_context"
       ],
       "purpose": "核对明确方向条件、吉时不能解除的原注、版本相反校记与逐宿章冲突；不计算地理角度或本命宫"
     }
@@ -235,7 +224,6 @@
   "first_view": {
     "fields": [
       "sukuyo",
-      "rulesets",
       "validation",
       "summary",
       "sukuyo.lower_methods"
