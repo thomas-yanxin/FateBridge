@@ -38,7 +38,7 @@ def _compact_relationship(result: ServiceResult) -> ServiceResult:
 
     def positions(chart: ServiceResult) -> ServiceResult:
         return {
-            **chart,
+            **{k: v for k, v in chart.items() if k not in {"houses", "aspects"}},
             "planets": [
                 {key: value for key, value in planet.items() if key in planet_fields}
                 for planet in chart["planets"]
@@ -62,23 +62,43 @@ def _compact_astrology_chart(result: ServiceResult) -> ServiceResult:
         "person_info",
         "chart_profile",
         "angles",
-        "houses",
-        "planets",
-        "aspects",
-        "planetary_hours",
-        "fixed_stars",
         "element_balance",
         "modality_balance",
         "summary",
         "run_metadata",
     }
     view = {k: v for k, v in result.items() if k in keep}
+    planet_fields = {
+        "id",
+        "name",
+        "sign",
+        "sign_zh",
+        "degree",
+        "longitude",
+        "house",
+        "retrograde",
+    }
+    if isinstance(result.get("planets"), list):
+        view["planets"] = [
+            {k: v for k, v in p.items() if k in planet_fields}
+            for p in result["planets"]
+            if isinstance(p, dict)
+        ]
+    if isinstance(result.get("aspects"), list):
+        view["aspects"] = result["aspects"][:16]
     classical = result.get("classical")
     if isinstance(classical, dict):
         view["classical"] = {
             "sect": classical.get("sect"),
-            "lots": classical.get("lots"),
-            "almuten_figuris": classical.get("almuten_figuris"),
+            "almuten_figuris": (
+                {
+                    k: classical["almuten_figuris"].get(k)
+                    for k in ("winner", "winners", "total_scores")
+                    if k in classical["almuten_figuris"]
+                }
+                if isinstance(classical.get("almuten_figuris"), dict)
+                else classical.get("almuten_figuris")
+            ),
             "temperament": classical.get("temperament"),
             "syzygy": (
                 {
@@ -106,9 +126,9 @@ def _compact_hamburg(result: ServiceResult) -> ServiceResult:
         compact_dials = {
             dial: {
                 "period_degrees": data.get("period_degrees"),
-                "two_factor_contacts": (data.get("two_factor_contacts") or [])[:10],
-                "three_factor_contacts": (data.get("three_factor_contacts") or [])[:10],
-                "four_factor_contacts": (data.get("four_factor_contacts") or [])[:10],
+                "two_factor_contacts": (data.get("two_factor_contacts") or [])[:3],
+                "three_factor_contacts": (data.get("three_factor_contacts") or [])[:3],
+                "four_factor_contacts": (data.get("four_factor_contacts") or [])[:3],
                 "four_factor_total_count": data.get("four_factor_total_count"),
             }
             for dial, data in dials.items()
@@ -122,7 +142,6 @@ def _compact_hamburg(result: ServiceResult) -> ServiceResult:
                 "status",
                 "ruleset_id",
                 "profile",
-                "factors",
                 "contact_counts",
                 "unique_two_factor_pair_count",
                 "sensitive_point_query",
@@ -135,9 +154,6 @@ def _compact_hamburg(result: ServiceResult) -> ServiceResult:
         if k
         in {
             "chart_profile",
-            "planets",
-            "midpoints",
-            "midpoint_aspects",
             "summary",
             "run_metadata",
         }

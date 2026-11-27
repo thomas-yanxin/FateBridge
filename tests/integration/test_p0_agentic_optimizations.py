@@ -131,7 +131,7 @@ def test_mcp_exposes_three_tools_and_zero_resources() -> None:
                 "discover_tools", {"tool": "bazi_birth_chart", "detail": "summary"}
             )
             assert not described.is_error
-            assert "suggested_fields" in described.structured_content["tools"][0]
+            assert "suggested_fields" in described.structured_content
 
             ran = await client.call_tool(
                 "run_calculation",

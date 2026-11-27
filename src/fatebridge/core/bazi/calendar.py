@@ -410,11 +410,12 @@ def life_stages_for_pillars(
     *,
     school: ChangshengSchool = "fire_earth_same_palace",
 ) -> dict[str, str]:
-    """Return day-master 十二长生 across year/month/day/hour branches."""
+    """Return day-master 十二长生 across available pillar branches."""
     day_stem = pillars["day"][0]
     return {
         pos: twelve_life_stage(day_stem, pillars[pos][1], school=school)
         for pos in ("year", "month", "day", "hour")
+        if pos in pillars
     }
 
 
@@ -448,11 +449,10 @@ def _build_origin_payload(
 def build_three_origins(
     pillars: dict[str, tuple[str, str]],
 ) -> dict[str, dict[str, Any]]:
-    """Compute 胎元, 命宫, 身宫."""
+    """Compute 胎元, and (when hour pillar is present) 命宫, 身宫."""
     year_stem = pillars["year"][0]
     month_stem, month_branch = pillars["month"]
     day_stem = pillars["day"][0]
-    hour_branch = pillars["hour"][1]
 
     taiyuan = _build_origin_payload(
         label_key="taiyuan",
@@ -460,6 +460,10 @@ def build_three_origins(
         branch=EARTHLY_BRANCHES[(EARTHLY_BRANCHES.index(month_branch) + 3) % 12],
         day_stem=day_stem,
     )
+    if "hour" not in pillars:
+        return {"taiyuan": taiyuan}
+
+    hour_branch = pillars["hour"][1]
 
     month_order = _MONTH_BRANCH_SEQUENCE.index(month_branch) + 1
     ming_hour_order = _MONTH_BRANCH_SEQUENCE.index(hour_branch) + 1

@@ -24,6 +24,7 @@ from fatebridge.core.almanac import (
     localize_datetime,
     lunar_supported_range_message,
 )
+from fatebridge.core.batch_cache import batch_cached, metaphysics_seed_key
 from fatebridge.core.ephemeris_runtime import swe
 from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX, MetaphysicsSeed
 from fatebridge.core.metaphysics.ren_calendar import compute_month_general
@@ -921,6 +922,36 @@ def build_fate_board(
     return board
 
 
+def _taiyi_board_cache_key(
+    seed: MetaphysicsSeed,
+    gender: str,
+    *,
+    calculation_mode: str = "year",
+    hour_profile: str | None = None,
+    month_profile: str | None = None,
+    year_profile: str | None = None,
+    day_profile: str | None = None,
+    shiji_profile: str | None = None,
+    table_policy: TaiyiTablePolicy = DEFAULT_TABLE_POLICY,
+) -> tuple[object, ...]:
+    return (
+        metaphysics_seed_key(seed),
+        gender,
+        calculation_mode,
+        hour_profile,
+        month_profile,
+        year_profile,
+        day_profile,
+        shiji_profile,
+        table_policy,
+    )
+
+
+@batch_cached(
+    "taiyi.build_taiyi_board",
+    _taiyi_board_cache_key,
+    copy_result=True,
+)
 def build_taiyi_board(
     seed: MetaphysicsSeed,
     gender: str,

@@ -200,6 +200,19 @@
         "title": "Analysis Month",
         "type": "integer"
       },
+      "analysis_place": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "起局/起课地点名称（支持离线地名库自动补全 analysis_longitude / analysis_latitude / analysis_timezone）",
+        "title": "Analysis Place"
+      },
       "analysis_second": {
         "default": 0,
         "description": "Analysis second (0-59)",
@@ -238,6 +251,30 @@
         "description": "Analysis year, e.g., 2026",
         "title": "Analysis Year",
         "type": "integer"
+      },
+      "birth_date": {
+        "anyOf": [
+          {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "问课对象公历出生日期（YYYY-MM-DD），自动换算出生年干支、本命年支与行年岁序",
+        "title": "Birth Date"
+      },
+      "birth_year_boundary": {
+        "default": "lunar_new_year",
+        "description": "换年口径：lunar_new_year（正月初一，默认）或 lichun（立春）；跨界时报告分歧",
+        "enum": [
+          "lunar_new_year",
+          "lichun"
+        ],
+        "title": "Birth Year Boundary",
+        "type": "string"
       },
       "birth_year_ganzhi": {
         "anyOf": [

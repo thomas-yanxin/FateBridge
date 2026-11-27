@@ -59,9 +59,22 @@ def _compact_bazi_birth(result: ServiceResult) -> ServiceResult:
         k: v
         for k, v in birth.items()
         if k
-        not in {"calendar_context", "analysis_calendar_context", "patterns", "shensha"}
+        not in {
+            "calendar_context",
+            "analysis_calendar_context",
+            "patterns",
+            "shensha",
+            "three_origins_shensha",
+            "taixi_shensha",
+        }
     }
-    return {"analysis_type": result.get("analysis_type"), "bazi_birth": compact_birth}
+    out: ServiceResult = {
+        "analysis_type": result.get("analysis_type"),
+        "bazi_birth": compact_birth,
+    }
+    if "coverage" in result:
+        out["coverage"] = result["coverage"]
+    return out
 
 
 def _compact_bazi_dimension(result: ServiceResult) -> ServiceResult:
@@ -95,9 +108,7 @@ SPECS: list[ToolSpec] = [
     ToolSpec(
         name="bazi_overview",
         bind=bind_person(calculate_bazi_overview),
-        request_model_loader=request_model_ref(
-            "fatebridge.core.requests.birth", "BaziClockRequest"
-        ),
+        request_model_loader=request_model_ref(_BAZI_REQ, "BaziOverviewRequest"),
         summary="八字综合命理：命盘、格局、调候、喜用神与司令分野；完整盘式用 bazi_birth_chart。",
         operation_label_zh="命理分析",
         family="bazi",

@@ -133,12 +133,9 @@ def test_public_descriptor_drives_each_available_adapter_without_private_input_d
             if spec.expose_mcp:
                 record = await describe_capability(client, spec.name)
             else:
-                described = rest.get(
+                record = rest.get(
                     "/api/tools", params={"tool": spec.name, "detail": "full"}
                 ).json()
-                record = next(
-                    item for item in described["tools"] if item["tool"] == key
-                )
             assert record["example_input"]
             data = record["example_input"]
             fields = record.get("suggested_fields")
@@ -178,7 +175,7 @@ def test_public_descriptor_drives_each_available_adapter_without_private_input_d
         assert response.status_code == 200
         values.append(("rest", response.json()))
     assert cli_run(["discover", "--tool", spec.name, "--detail", "full"]) == 0
-    description = json.loads(capsys.readouterr().out)["tools"][0]
+    description = json.loads(capsys.readouterr().out)
     assert description["example_input"] == data
     assert "example_context" not in description
     flags = ["--detail", "audit"]

@@ -60,3 +60,4 @@ class BaziBirth(PartialOutput):
     calendar_context: CalendarContext | None = None
     analysis_calendar_context: CalendarContext | None = None
     timing_overview: dict[str, OpenJsonValue] | None = None
+    coverage: dict[str, OpenJsonValue] | None = None

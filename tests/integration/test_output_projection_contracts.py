@@ -152,7 +152,7 @@ def test_all_published_schemas_preserve_object_projection_compatibility(
                 "detail": "full",
                 "include_output_schema": True,
             },
-        ).json()["tools"][0]["output_schema"]
+        ).json()["output_schema"]
         for spec in CATALOG
     }
     openapi = rest.get("/openapi.json").json()
@@ -191,7 +191,7 @@ def test_all_published_schemas_preserve_object_projection_compatibility(
             )
             == 0
         )
-        cli = json.loads(capsys.readouterr().out)["tools"][0]["output_schema"]
+        cli = json.loads(capsys.readouterr().out)["output_schema"]
         assert central == cli == manifest[spec.name]
         roots = [(central, central)]
         if spec.expose_mcp:

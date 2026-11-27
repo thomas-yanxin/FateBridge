@@ -1,9 +1,11 @@
 """Schema and compact capability descriptions derived from ToolSpec."""
 
 from types import UnionType
-from typing import Annotated, get_args, get_origin
+from typing import Annotated, Any, Literal, get_args, get_origin
 
 from pydantic import BaseModel
+from pydantic.fields import FieldInfo
+from pydantic_core import PydanticUndefined
 
 from fatebridge.application.examples import (
     call_guidance,
@@ -125,3 +127,48 @@ def summarize_spec(spec: ToolSpec) -> ServiceResult:
 def describe_input_spec(spec: ToolSpec) -> ServiceResult:
     """Call contract with input schema and output root names."""
     return _describe_contract(spec, include_output_schema=False)
+
+
+def _brief_field_descriptor(field_info: FieldInfo) -> dict[str, Any]:
+    """Return compact type, requirement, default, and enum metadata for one input field."""
+    entry: dict[str, Any] = {
+        "type": field_type_name(field_info.annotation),
+        "required": field_info.is_required(),
+    }
+    base = unwrap_optional(field_info.annotation)
+    if get_origin(base) is Literal:
+        entry["enum"] = list(get_args(base))
+    if not field_info.is_required() and field_info.default is not PydanticUndefined:
+        default_val = field_info.default
+        if isinstance(default_val, (str, int, float, bool)) or default_val is None:
+            entry["default"] = default_val
+    return entry
+
+
+def describe_brief_spec(spec: ToolSpec) -> ServiceResult:
+    """Minimal call contract: required fields, flat field types/enums, example, and views."""
+    example = example_input(spec)
+    views = evidence_views(spec)
+    default_fields = compact_fields(spec)
+    model_fields = spec.request_model.model_fields
+    required_fields = [
+        name for name, field in model_fields.items() if field.is_required()
+    ]
+    fields_map = {
+        name: _brief_field_descriptor(field) for name, field in model_fields.items()
+    }
+    record: ServiceResult = {
+        "tool": spec.name,
+        "family": spec.family,
+        "summary": spec.summary,
+        "surfaces": _surfaces(spec),
+        "required_fields": required_fields,
+        "fields": fields_map,
+    }
+    if example is not None:
+        record["example_input"] = example
+    if default_fields is not None:
+        record["compact_fields"] = default_fields
+    if views is not None:
+        record["evidence_views"] = sorted(views)
+    return record

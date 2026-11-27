@@ -183,6 +183,19 @@
         "title": "Method",
         "type": "string"
       },
+      "place": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "地点名称（支持离线地名库自动补全 longitude / latitude / timezone）",
+        "title": "Place"
+      },
       "time": {
         "description": "Known birth local time HH:MM[:SS[.ffffff]], up to six fractional digits; required, blank is not midnight; timezone goes in timezone. Supplied components are retained separately from zero calculation defaults. Textual digits do not certify birth-record precision or imply an uncertainty interval.",
         "title": "Time",

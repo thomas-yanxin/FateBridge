@@ -422,12 +422,41 @@ def _antiscia_contacts(
     return hits
 
 
+def _direct_ingress_and_intervening_info(
+    lilly_conditions: dict[str, Any],
+) -> tuple[bool | None, int, bool]:
+    """Inspect event_paths for direct contact sign-ingress order, intervening hits, and sequence verification."""
+    event_paths = lilly_conditions.get("event_paths") or {}
+    direct_path = next(
+        (p for p in (event_paths.get("paths") or []) if p.get("mode") == "direct"),
+        None,
+    )
+    if not isinstance(direct_path, dict):
+        return None, 0, True
+    future = direct_path.get("future_contact")
+    transitions = direct_path.get("transitions") or []
+    intervening = direct_path.get("intervening_contacts") or []
+    seq_unverified = direct_path.get("sequence_conditions_satisfied") is not True
+    if not isinstance(future, dict) or not future.get("root_bracket_tt"):
+        return None, len(intervening), seq_unverified
+    future_start = future["root_bracket_tt"][0]
+    ingress_before = any(
+        t.get("kind") == "ingress"
+        and isinstance(t.get("root_bracket_tt"), list)
+        and len(t["root_bracket_tt"]) >= 2
+        and t["root_bracket_tt"][1] < future_start
+        for t in transitions
+        if isinstance(t, dict)
+    )
+    return (not ingress_before), len(intervening), seq_unverified
+
+
 def _summarize_perfection(
     querent_planet: str,
     quesited_planet: str,
     lilly_conditions: dict[str, Any],
     moon_voc: dict[str, Any],
-) -> tuple[bool, str, list[str], list[str]]:
+) -> dict[str, Any]:
     event_paths = lilly_conditions.get("event_paths") or {}
     paths = event_paths.get("paths") or []
     refranations = event_paths.get("refranation_patterns") or []
@@ -441,6 +470,39 @@ def _summarize_perfection(
         obstructions.append("refranation")
     if frustrations:
         obstructions.append("frustration")
+
+    before_ingress, intervening_count, seq_unverified = (
+        _direct_ingress_and_intervening_info(lilly_conditions)
+    )
+
+    event_path_summary: list[dict[str, Any]] = []
+    for ep in event_paths.get("paths") or []:
+        if not isinstance(ep, dict):
+            continue
+        fc = ep.get("future_contact")
+        compact_fc = (
+            {
+                "bodies": fc.get("bodies"),
+                "aspect": fc.get("aspect"),
+                "julian_day_tt": fc.get("julian_day_tt"),
+                "datetime_utc": fc.get("datetime_utc"),
+            }
+            if isinstance(fc, dict)
+            else None
+        )
+        event_path_summary.append(
+            {
+                "mode": ep.get("mode"),
+                "actors": ep.get("actors"),
+                "status": ep.get("status"),
+                "sequence_conditions_satisfied": ep.get(
+                    "sequence_conditions_satisfied"
+                ),
+                "future_contact": compact_fc,
+                "transitions_count": len(ep.get("transitions") or []),
+                "intervening_contacts_count": len(ep.get("intervening_contacts") or []),
+            }
+        )
 
     active_routes: list[str] = []
     for row in paths:
@@ -459,19 +521,71 @@ def _summarize_perfection(
             if ok and row.get("collection_contacts"):
                 active_routes.append("collection")
 
-    if active_routes:
-        return True, f"perfected_{active_routes[0]}", active_routes, obstructions
+    base = {
+        "before_ingress": before_ingress,
+        "intervening_contacts_count": intervening_count,
+        "sequence_conditions_unverified": seq_unverified,
+        "principal_reception": lilly_conditions.get("principal_reception"),
+        "event_path_summary": event_path_summary,
+    }
+
     if obstructions:
-        return False, f"obstructed_{obstructions[0]}", [], obstructions
+        return {
+            **base,
+            "perfected": False,
+            "status": f"obstructed_{obstructions[0]}",
+            "perfection_routes": [],
+            "obstructions": obstructions,
+        }
+    if active_routes:
+        primary = active_routes[0]
+        if primary == "direct":
+            if before_ingress is False:
+                return {
+                    **base,
+                    "perfected": False,
+                    "status": "post_ingress_contact_unverified",
+                    "perfection_routes": active_routes,
+                    "obstructions": obstructions,
+                }
+            if intervening_count > 0:
+                return {
+                    **base,
+                    "perfected": False,
+                    "status": "direct_contact_with_intervening_unverified",
+                    "perfection_routes": active_routes,
+                    "obstructions": obstructions,
+                }
+            return {
+                **base,
+                "perfected": True,
+                "status": "perfected_direct_before_ingress",
+                "perfection_routes": active_routes,
+                "obstructions": obstructions,
+            }
+        return {
+            **base,
+            "perfected": True,
+            "status": f"perfected_{primary}",
+            "perfection_routes": active_routes,
+            "obstructions": obstructions,
+        }
     if querent_planet == quesited_planet:
         voc = moon_voc.get("void_of_course")
-        return (
-            voc is False,
-            "same_ruler",
-            ["co_significator_moon"] if voc is False else [],
-            [],
-        )
-    return False, "no_perfection", [], []
+        return {
+            **base,
+            "perfected": voc is False,
+            "status": "same_ruler",
+            "perfection_routes": ["co_significator_moon"] if voc is False else [],
+            "obstructions": [],
+        }
+    return {
+        **base,
+        "perfected": False,
+        "status": "no_perfection",
+        "perfection_routes": [],
+        "obstructions": [],
+    }
 
 
 def build_horary_payload(
@@ -483,6 +597,7 @@ def build_horary_payload(
     clock_basis: str = "civil",
     turned_from_house: int | None = None,
     turned_house: int | None = None,
+    include_inactive_fortitude_rows: bool = True,
 ) -> dict[str, Any]:
     """Build horary chart facts, lunar motion, radicality, fortitudes, and perfection."""
     if category not in HOUSE_BY_CATEGORY:
@@ -506,6 +621,7 @@ def build_horary_payload(
         collect_fortitude_inputs(subject),
         house_system=getattr(subject, "houses_system_identifier", None),
         zodiac_type=getattr(subject, "zodiac_type", None),
+        include_inactive_rows=include_inactive_fortitude_rows,
     )
     moon_state = states["Moon"]
 
@@ -561,16 +677,12 @@ def build_horary_payload(
         zodiac_type=getattr(subject, "zodiac_type", None),
         event_history=event_history,
     )
-    perfected, perfection_status, perfection_routes, obstructions = (
-        _summarize_perfection(
-            querent_planet, quesited_planet, lilly_conditions, moon_voc
-        )
+    perfection_summary = _summarize_perfection(
+        querent_planet, quesited_planet, lilly_conditions, moon_voc
     )
+    perfection_status = perfection_summary["status"]
     perfection = {
-        "perfected": perfected,
-        "status": perfection_status,
-        "perfection_routes": perfection_routes,
-        "obstructions": obstructions,
+        **perfection_summary,
         "event_history": event_history,
         "lilly_conditions": lilly_conditions,
     }

@@ -76,11 +76,10 @@ async def test_stranger_agent_mcp_loop_and_error_recovery() -> None:
             item["tool"] for item in searched.structured_content["tools"]
         }
 
-        # 4. Step 3: discover_tools(tool=...) pulls the single-tool full contract.
+        # 4. Step 3: discover_tools(tool=...) pulls the unwrapped single-tool contract.
         contract_res = await client.call_tool("discover_tools", {"tool": "firdaria"})
         assert not contract_res.is_error
-        assert contract_res.structured_content["matched_count"] == 1
-        contract = contract_res.structured_content["tools"][0]
+        contract = contract_res.structured_content
         assert contract["tool"] == "firdaria"
         example = contract["example_input"]
         validate(example, contract["input_schema"])

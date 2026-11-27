@@ -37,12 +37,28 @@ def birth_clock_input_receipt(
     person: PersonInfo, normalized: NormalizedBirthTime
 ) -> BirthClockReceipt:
     """Declare old nominal defaults without inventing a recording interval."""
-    supplied = ["year", "month", "day", "hour"]
-    if "birth_minute" in person.model_fields_set:
-        supplied.append("minute")
-    if person.birth_second is not None:
-        supplied.append("second")
-    omitted = [part for part in ("minute", "second") if part not in supplied]
+    unknown_hour = bool(getattr(person, "birth_time_unknown", False))
+    if unknown_hour:
+        supplied = ["year", "month", "day"]
+        omitted = ["hour", "minute", "second"]
+        calc_defaults = {"hour": 12, "minute": 0, "second": 0}
+        scope_text = (
+            "出生时辰明确未知；仅以当地正午12:00:00作年柱/月柱节气历表及日柱参照点，"
+            "不排时柱亦不推定实际出生时段。"
+        )
+    else:
+        supplied = ["year", "month", "day", "hour"]
+        if "birth_minute" in person.model_fields_set:
+            supplied.append("minute")
+        if person.birth_second is not None:
+            supplied.append("second")
+        omitted = [part for part in ("minute", "second") if part not in supplied]
+        calc_defaults = {part: 0 for part in omitted}
+        scope_text = (
+            "只声明输入分量及兼容计算参考；省略分量按既有00值计算，不表示实际出生"
+            "在整时或整分。显式秒数也不认证记录准确度。未从分量省略推定舍入方式、"
+            "误差区间或分量之间的稳定性；另行提供的时间范围核对保持其声明的采样范围。"
+        )
     civil = normalized.input_datetime
     zone = parse_timezone_name(normalized.timezone)
     civil = (
@@ -52,17 +68,13 @@ def birth_clock_input_receipt(
         "method_id": "birth_clock_components_v1",
         "supplied_components": supplied,
         "omitted_components": omitted,
-        "calculation_defaults": {part: 0 for part in omitted},
+        "calculation_defaults": calc_defaults,
         "nominal_civil_datetime": civil.isoformat(),
         "corrected_clock_datetime": normalized.corrected_datetime.isoformat(),
         "timezone": normalized.timezone,
         "uncertainty_interval": None,
         "observed_precision_certified": False,
-        "scope": (
-            "只声明输入分量及兼容计算参考；省略分量按既有00值计算，不表示实际出生"
-            "在整时或整分。显式秒数也不认证记录准确度。未从分量省略推定舍入方式、"
-            "误差区间或分量之间的稳定性；另行提供的时间范围核对保持其声明的采样范围。"
-        ),
+        "scope": scope_text,
     }
     if person.birth_utc_offset is not None:
         offset = civil.utcoffset()

@@ -13,6 +13,76 @@ from fatebridge.application.tool_spec import CompactView, ServiceResult, ToolSpe
 _REQ_MODULE = "fatebridge.core.requests.western_events"
 
 
+def _compact_horary_actor(actor: object) -> object:
+    if not isinstance(actor, dict):
+        return actor
+    ha = actor.get("house_assignment")
+    hc = actor.get("house_condition")
+    ec = actor.get("essential_condition")
+    out: ServiceResult = {
+        k: v
+        for k, v in actor.items()
+        if k
+        in {
+            "house",
+            "planet",
+            "planet_label",
+            "sign",
+            "sign_label",
+            "degree",
+            "longitude",
+            "speed",
+            "retrograde",
+            "occupied_house",
+            "dignities",
+        }
+    }
+    if isinstance(ha, dict):
+        out["assigned_house"] = ha.get("assigned_house")
+    if isinstance(hc, dict):
+        out["house_class"] = hc.get("house_class")
+    if isinstance(ec, dict):
+        out["essential_condition"] = {
+            k: v
+            for k, v in ec.items()
+            if k in {"dignities", "debilities", "peregrine", "lords"}
+        }
+    return out
+
+
+def _compact_reception(rec: object) -> object:
+    if not isinstance(rec, dict):
+        return rec
+    dirs = rec.get("directions")
+    compact_dirs = (
+        [
+            {
+                k: v
+                for k, v in d.items()
+                if k
+                in {
+                    "receiver",
+                    "guest",
+                    "guest_sign",
+                    "dignities",
+                    "unknown_dignities",
+                    "receives",
+                }
+            }
+            for d in dirs
+            if isinstance(d, dict)
+        ]
+        if isinstance(dirs, list)
+        else dirs
+    )
+    return {
+        "status": rec.get("status"),
+        "mutual": rec.get("mutual"),
+        "mutual_same_kind": rec.get("mutual_same_kind"),
+        "directions": compact_dirs,
+    }
+
+
 def _compact_horary(result: ServiceResult) -> ServiceResult:
     horary = result.get("horary_chart")
     if not isinstance(horary, dict):
@@ -21,23 +91,9 @@ def _compact_horary(result: ServiceResult) -> ServiceResult:
     rad = horary.get("radicality") or {}
     fort = horary.get("fortitudes") or {}
     perf = horary.get("perfection") or {}
-    fort_planets = fort.get("planets") or {}
-    fort_summary = {
-        p: {
-            k: v
-            for k, v in data.items()
-            if k
-            in {
-                "net_score",
-                "essential_score",
-                "accidental_score",
-                "total_fortitude",
-                "total_debility",
-            }
-        }
-        for p, data in fort_planets.items()
-        if isinstance(data, dict)
-    }
+    sigs = horary.get("significators") or {}
+    fortune = horary.get("fortune") or {}
+    hour_aff = rad.get("hour_affinity") or {}
     compact_horary = {
         "system": horary.get("system"),
         "category": horary.get("category"),
@@ -45,9 +101,17 @@ def _compact_horary(result: ServiceResult) -> ServiceResult:
         "turned_from_house": horary.get("turned_from_house"),
         "turned_house": horary.get("turned_house"),
         "ascendant": horary.get("ascendant"),
-        "significators": horary.get("significators"),
+        "significators": {
+            "querent": _compact_horary_actor(sigs.get("querent")),
+            "quesited": _compact_horary_actor(sigs.get("quesited")),
+            "moon_co_significator": _compact_horary_actor(
+                sigs.get("moon_co_significator")
+            ),
+            "directed_sign_relationship": sigs.get("directed_sign_relationship"),
+        },
         "moon": {
             "sign": moon.get("sign"),
+            "sign_label": moon.get("sign_label"),
             "speed": moon.get("speed"),
             "void_of_course": moon.get("void_of_course"),
             "degrees_left_in_sign": moon.get("degrees_left_in_sign"),
@@ -56,22 +120,99 @@ def _compact_horary(result: ServiceResult) -> ServiceResult:
         "radicality": {
             "safe_to_judge": rad.get("safe_to_judge"),
             "status": rad.get("status"),
-            "hour_affinity": rad.get("hour_affinity"),
-            "strictures": rad.get("strictures"),
+            "hour_affinity": (
+                {
+                    k: hour_aff.get(k)
+                    for k in (
+                        "hour_ruler",
+                        "ascendant_lord",
+                        "same_ruler",
+                        "ascendant_triplicity",
+                        "same_own_nature",
+                        "supported_under_declared_policy",
+                    )
+                }
+                if isinstance(hour_aff, dict)
+                else hour_aff
+            ),
+            "strictures": [
+                {
+                    k: v
+                    for k, v in s.items()
+                    if k in {"code", "status", "exception_satisfied", "detail"}
+                }
+                for s in (rad.get("strictures") or [])
+                if isinstance(s, dict)
+            ],
             "ascendant_degree_gate": rad.get("ascendant_degree_gate"),
+            "unknown_clauses": rad.get("unknown_clauses"),
         },
         "fortitudes": {
-            "summary": fort_summary,
-            "balance": fort.get("balance"),
+            "summary": {
+                p: {
+                    "status": data.get("status"),
+                    "known_fortitudes": data.get("known_fortitudes"),
+                    "known_debilities": data.get("known_debilities"),
+                    "known_balance": data.get("known_balance"),
+                    "literal_table_balance": data.get("literal_table_balance"),
+                    "unknown_rows": data.get("unknown_rows"),
+                    **(
+                        {
+                            "applied_codes": [
+                                f"{r['code']}({r['contribution']:+d})"
+                                for r in (data.get("applied_conditions") or [])
+                                if isinstance(r, dict)
+                            ]
+                        }
+                        if isinstance(data.get("applied_conditions"), list)
+                        else {}
+                    ),
+                }
+                for p, data in (fort.get("summary") or {}).items()
+                if isinstance(data, dict)
+            },
         },
-        "fortune": horary.get("fortune"),
-        "chart_almuten": horary.get("chart_almuten"),
+        "fortune": (
+            {
+                k: v
+                for k, v in fortune.items()
+                if k
+                in {
+                    "sign",
+                    "degree_in_sign",
+                    "longitude",
+                    "solar_state",
+                    "bound_lord",
+                    "known_fortitudes",
+                    "known_debilities",
+                    "known_balance",
+                }
+            }
+            if isinstance(fortune, dict)
+            else fortune
+        ),
+        "chart_almuten": (
+            {
+                k: v
+                for k, v in (horary.get("chart_almuten") or {}).items()
+                if k in {"winner", "winners", "total_scores", "scores"}
+            }
+            if isinstance(horary.get("chart_almuten"), dict)
+            else horary.get("chart_almuten")
+        ),
         "antiscia_contacts": horary.get("antiscia_contacts"),
         "perfection": {
             "perfected": perf.get("perfected"),
             "status": perf.get("status"),
+            "before_ingress": perf.get("before_ingress"),
+            "intervening_contacts_count": perf.get("intervening_contacts_count"),
+            "sequence_conditions_unverified": perf.get(
+                "sequence_conditions_unverified"
+            ),
             "perfection_routes": perf.get("perfection_routes"),
             "obstructions": perf.get("obstructions"),
+            "principal_reception": _compact_reception(perf.get("principal_reception")),
+            "event_path_summary": perf.get("event_path_summary"),
         },
     }
     return {

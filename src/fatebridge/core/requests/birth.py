@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import MAXYEAR, MINYEAR
 from typing import Annotated, Literal
 
-from pydantic import Field, model_validator
+from pydantic import BaseModel, Field, model_validator
 from pydantic_core import PydanticCustomError
 
 from fatebridge.core.bazi.policies import (
@@ -121,6 +121,45 @@ class BaziClockRequest(FateBridgeRequest):
                 "birth_second_requires_minute",
                 "birth_second需要显式提供birth_minute；不能替未知分钟填0",
                 {"path": "birth_minute", "required_with": "birth_second"},
+            )
+        return self
+
+
+OPTIONAL_UNKNOWN_BIRTH_HOUR_FIELD = Field(
+    default=None,
+    ge=0,
+    le=23,
+    description="Birth hour (0-23); omit only when birth_time_unknown=True",
+)
+
+
+class OptionalUnknownBirthHourMixin(BaseModel):
+    """Allow omitting birth_hour strictly when birth_time_unknown=True."""
+
+    birth_hour: int | None
+    birth_time_unknown: bool = Field(
+        default=False,
+        description="明确声明出生时辰未知；仅在为 true 时允许省略 birth_hour，按三柱/日级口径推算并标注边界提示",
+    )
+
+    @model_validator(mode="after")
+    def _validate_unknown_birth_hour(self) -> OptionalUnknownBirthHourMixin:
+        if self.birth_time_unknown:
+            if (
+                self.birth_hour is not None
+                or "birth_minute" in self.model_fields_set
+                or getattr(self, "birth_second", None) is not None
+            ):
+                raise PydanticCustomError(
+                    "conflicting_unknown_birth_time",
+                    "birth_time_unknown=True 时不能同时提供 birth_hour / birth_minute / birth_second",
+                    {"path": "birth_hour"},
+                )
+        elif self.birth_hour is None:
+            raise PydanticCustomError(
+                "missing_birth_hour",
+                "缺少出生时辰 birth_hour；如确实未知请显式设置 birth_time_unknown=True",
+                {"path": "birth_hour"},
             )
         return self
 

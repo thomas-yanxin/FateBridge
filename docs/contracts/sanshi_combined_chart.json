@@ -321,6 +321,7 @@
   "first_view": {
     "fields": [
       "analysis_context",
+      "four_pillars",
       "taiyi.calendar_summary",
       "taiyi.core_board",
       "taiyi.pattern_summary",
@@ -328,6 +329,7 @@
       "qimen.ju_text",
       "qimen.zhifu",
       "qimen.zhishi",
+      "qimen.patterns",
       "qimen.stem_context.day",
       "qimen.stem_context.hour",
       "qimen.rule_profiles.god.id",
@@ -342,7 +344,8 @@
       "liuren.ruleset.source_title",
       "liuren.ruleset.classical_conformance",
       "liuren.ruleset.classical_acceptance_passed",
-      "synthesis.time_scopes"
+      "synthesis.time_scopes",
+      "synthesis.facts"
     ]
   },
   "input": {
@@ -616,6 +619,19 @@
         "default": "121e28",
         "description": "Longitude text or decimal",
         "title": "Longitude"
+      },
+      "place": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "地点名称（支持离线地名库自动补全 longitude / latitude / timezone）",
+        "title": "Place"
       },
       "qimen_options": {
         "$ref": "#/$defs/QimenOptions",

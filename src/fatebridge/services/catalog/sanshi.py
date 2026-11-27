@@ -30,17 +30,66 @@ calculate_taiyi_analysis = service_ref(
 )
 
 
+_COMPACT_QIMEN_KEYS = frozenset(
+    {
+        "ju_text",
+        "dun_type",
+        "ju_number",
+        "yuan",
+        "fu_tou",
+        "ju_method",
+        "ju_term",
+        "day_ganzhi",
+        "time_ganzhi",
+        "xun_head",
+        "kongwang",
+        "day_xun_head",
+        "day_kongwang",
+        "zhifu",
+        "zhishi",
+        "horse_star",
+        "void_palaces",
+        "structure",
+        "patterns",
+        "stem_context",
+        "source_disagreements",
+        "rule_profiles",
+        "assessment",
+        "engine",
+    }
+)
+_OMIT_PALACE_COMPACT_KEYS = frozenset(
+    {
+        "door_hexagram",
+        "content_palace",
+        "content_trigram",
+        "heaven_origin_trigram",
+        "god_sequence_index",
+    }
+)
+
+
 def _compact_qimen(result: ServiceResult) -> ServiceResult:
     board = result["qimen"]
+    compact_board: ServiceResult = {
+        key: value for key, value in board.items() if key in _COMPACT_QIMEN_KEYS
+    }
+    compact_board["palaces"] = [
+        {
+            key: value
+            for key, value in palace.items()
+            if key not in _OMIT_PALACE_COMPACT_KEYS
+        }
+        for palace in board["palaces"]
+    ]
     return {
-        **result,
-        "qimen": {
-            **board,
-            "palaces": [
-                {key: value for key, value in palace.items() if key != "evidence"}
-                for palace in board["palaces"]
-            ],
-        },
+        "analysis_type": result.get("analysis_type"),
+        "analysis_context": result.get("analysis_context"),
+        "four_pillars": result.get("four_pillars"),
+        "qimen": compact_board,
+        **(
+            {"run_metadata": result["run_metadata"]} if "run_metadata" in result else {}
+        ),
     }
 
 

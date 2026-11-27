@@ -452,19 +452,20 @@ def _pillar_hits(target_pillar: str, pillar_map: dict[str, str]) -> list[str]:
 
 
 def _compute_kongwang_details(pillars: Pillars) -> dict[str, Any]:
+    active_order = tuple(pos for pos in ORDER if pos in pillars)
     by_pillar = {
         pos: list(kongwang_for_ganzhi(f"{pillars[pos][0]}{pillars[pos][1]}"))
-        for pos in ORDER
+        for pos in active_order
     }
     year_kw = set(by_pillar["year"])
     day_kw = set(by_pillar["day"])
-    year_kw_positions = [pos for pos in ORDER if pillars[pos][1] in year_kw]
-    day_kw_positions = [pos for pos in ORDER if pillars[pos][1] in day_kw]
+    year_kw_positions = [pos for pos in active_order if pillars[pos][1] in year_kw]
+    day_kw_positions = [pos for pos in active_order if pillars[pos][1] in day_kw]
 
     day_stem = pillars["day"][0]
-    hour_branch = pillars["hour"][1]
+    hour_tuple = pillars.get("hour")
     jielu_targets = JIE_LU_KONGWANG_TARGETS[day_stem]
-    jielu_hit = hour_branch in jielu_targets
+    jielu_hit = (hour_tuple[1] in jielu_targets) if hour_tuple is not None else False
 
     # 四大空亡: 甲子/甲午旬缺水(海/水空), 甲寅/甲申旬缺金(金空)
     day_kw_pair = tuple(by_pillar["day"])
@@ -497,7 +498,9 @@ def _evaluate_star_rules(
     month_branch = pillars["month"][1]
     day_stem, day_branch = pillars["day"]
     day_pillar = f"{day_stem}{day_branch}"
-    hour_pillar = f"{pillars['hour'][0]}{pillars['hour'][1]}"
+    hour_pillar = (
+        f"{pillars['hour'][0]}{pillars['hour'][1]}" if "hour" in pillars else None
+    )
 
     tian_yi_table = TIAN_YI_TABLES[tian_yi_school]
     rows: list[dict[str, Any]] = []
@@ -748,7 +751,9 @@ def _evaluate_star_rules(
         # 截路空亡 (day_stem -> hour_branch)
         jielu_targets = JIE_LU_KONGWANG_TARGETS[day_stem]
         jielu_hits = (
-            [f"时柱{hour_pillar}"] if pillars["hour"][1] in jielu_targets else []
+            [f"时柱{hour_pillar}"]
+            if hour_pillar is not None and pillars["hour"][1] in jielu_targets
+            else []
         )
         rows.append(
             {
@@ -771,9 +776,10 @@ def build_shensha_profile(
     tian_yi_school: Literal["standard", "alt_yang_yin"] = "standard",
 ) -> dict[str, Any]:
     """Compute complete natal 神煞 strictly separated from 三垣/胎息."""
-    natal_stems = {p: pillars[p][0] for p in ORDER}
-    natal_branches = {p: pillars[p][1] for p in ORDER}
-    natal_pillars = {p: f"{pillars[p][0]}{pillars[p][1]}" for p in ORDER}
+    active_order = tuple(p for p in ORDER if p in pillars)
+    natal_stems = {p: pillars[p][0] for p in active_order}
+    natal_branches = {p: pillars[p][1] for p in active_order}
+    natal_pillars = {p: f"{pillars[p][0]}{pillars[p][1]}" for p in active_order}
 
     natal_rows = _evaluate_star_rules(
         pillars=pillars,
@@ -789,7 +795,7 @@ def build_shensha_profile(
             "label": f"{PILLAR_LABELS[p]}纳音",
             "value": get_nayin(pillars[p][0], pillars[p][1]),
         }
-        for p in ORDER
+        for p in active_order
     ]
 
     entries: list[dict[str, str]] = [
@@ -797,7 +803,11 @@ def build_shensha_profile(
         {"label": "年柱空亡", "value": "".join(kongwang["year_kongwang"])},
         {"label": "月柱空亡", "value": "".join(kongwang["by_pillar"]["month"])},
         {"label": "日柱空亡", "value": "".join(kongwang["day_kongwang"])},
-        {"label": "时柱空亡", "value": "".join(kongwang["by_pillar"]["hour"])},
+        *(
+            [{"label": "时柱空亡", "value": "".join(kongwang["by_pillar"]["hour"])}]
+            if "hour" in kongwang["by_pillar"]
+            else []
+        ),
         *[{"label": row["label"], "value": row["value"]} for row in natal_rows],
     ]
 
@@ -889,7 +899,7 @@ def timing_shensha(
     # 冲空: timing branch clashes with a natal kongwang branch that actually sits in natal chart
     clash_branch = EARTHLY_BRANCHES[(EARTHLY_BRANCHES.index(layer_branch) + 6) % 12]
     if clash_branch in day_kw and any(
-        natal_pillars[p][1] == clash_branch for p in ORDER
+        natal_pillars[p][1] == clash_branch for p in ORDER if p in natal_pillars
     ):
         stars.append({"name": "冲空(日柱空亡)", "anchor": "日柱"})
 

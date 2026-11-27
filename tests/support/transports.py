@@ -80,7 +80,7 @@ async def describe_capability(
         args["include_output_schema"] = True
     result = await client.call_tool("discover_tools", args)
     assert result.structured_content is not None
-    return result.structured_content["tools"][0]
+    return result.structured_content
 
 
 async def discover_capabilities(client: Client):

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, Literal
 
 from pydantic import BaseModel
@@ -19,6 +19,7 @@ from fatebridge.core.local_techniques.chart import (
 from fatebridge.core.metaphysics.jinkou.year_fate import confirmed_natal_branch
 from fatebridge.core.metaphysics.ren_calendar import (
     SIGN_TO_MONTH_GENERAL,
+    derive_birth_year_fate_from_date,
 )
 from fatebridge.core.metaphysics.ren_calendar import (
     month_general_for_term as _liureng_month_general_for_term,
@@ -250,6 +251,18 @@ def require_request_binding(
         birth_ganzhi = request.birth_year_ganzhi
         natal_branch = request.natal_branch
         age = request.year_fate_age
+        if request.birth_date is not None:
+            derivation = derive_birth_year_fate_from_date(
+                request.birth_date,
+                date(
+                    request.analysis_year, request.analysis_month, request.analysis_day
+                ),
+                boundary=request.birth_year_boundary,
+                timezone_name=request.analysis_timezone or DEFAULT_BIRTH_TIMEZONE,
+            )
+            birth_ganzhi = birth_ganzhi or derivation["birth_year_ganzhi"]
+            if age is None:
+                age = derivation["year_fate_age"]
         natal = dict(
             birth_year_ganzhi=birth_ganzhi,
             natal_branch=confirmed_natal_branch(birth_ganzhi, natal_branch, age),
@@ -282,14 +295,19 @@ def require_request_binding(
         zone, zone_source = resolve_runyear_birth_zone(
             person.birth_timezone, person.birth_place, person.birth_longitude
         )
+        unknown_hour = bool(getattr(person, "birth_time_unknown", False))
         birth, birth_clock = resolve_runyear_birth_clock(
             datetime(
                 person.birth_year,
                 person.birth_month,
                 person.birth_day,
-                person.birth_hour,
-                person.birth_minute,
-                person.birth_second or 0,
+                (
+                    12
+                    if unknown_hour
+                    else (person.birth_hour if person.birth_hour is not None else 0)
+                ),
+                0 if unknown_hour else person.birth_minute,
+                0 if unknown_hour else (person.birth_second or 0),
             ),
             zone,
             request.birth_utc_offset,

@@ -478,8 +478,8 @@ STANDALONE_TOOL_OUTPUT_FIELDS: dict[str, tuple[str, ...]] = {
 
 TOOL_FIELDS = {
     "compare_bazi_sources": "analysis_context analysis_type current_calculation four_pillars source_comparison",
-    "bazi_overview": "calendar_context day_master element_distribution element_distribution_basis element_seasonal_phase favorable_elements four_pillars patterns person_info structure_profile ten_gods",
-    "bazi_birth_chart": "analysis_type bazi_birth",
+    "bazi_overview": "calendar_context coverage day_master element_distribution element_distribution_basis element_seasonal_phase favorable_elements four_pillars patterns person_info structure_profile ten_gods",
+    "bazi_birth_chart": "analysis_type bazi_birth coverage",
     "bazi_marriage": "analysis_type marriage_analysis",
     "bazi_career": "analysis_type career_analysis",
     "bazi_wealth": "analysis_type wealth_analysis",
@@ -490,7 +490,7 @@ TOOL_FIELDS = {
     "bazi_relatives": "analysis_type relatives_analysis",
     "bazi_romance": "analysis_type romance_analysis",
     "bazi_compatibility": "relationship_type person_info natal_contexts element_relationship nayin_comparison day_pillar_synergy element_complementarity cross_shensha cross_chart_relations directional_ten_gods",
-    "bazi_timing": "analysis_calendar analysis_context analysis_type birth_time_sensitivity calendar_context combined_effects dayun four_pillars interaction_analysis liunian liuri liushi liuyue person_info summary",
+    "bazi_timing": "analysis_calendar analysis_context analysis_type birth_time_sensitivity calendar_context combined_effects coverage dayun four_pillars interaction_analysis liunian liuri liushi liuyue person_info summary",
     "bazi_luck_cycles": "analysis_context analysis_type birth_time_sensitivity calendar_context dayun dayun_timeline element_effects person_info summary timing_context",
     "bazi_yearly_timing": "analysis_context analysis_type calendar_context element_effects liunian person_info summary target_year_jieqi yearly_timeline",
     "bazi_monthly_timing": "analysis_calendar analysis_context analysis_type calendar_context combined_effects detailed_analysis element_effects liunian liuyue monthly_timeline person_info summary target_year_jieqi",
@@ -513,7 +513,7 @@ TOOL_FIELDS = {
     "ziwei_timing": "analysis_context analysis_type birth_context person_info ziwei_horoscope",
     "ziwei_rules": "analysis_type engine focused_rules requested_year_stem rule_catalogue",
     "liuren_chart": "analysis_context analysis_type calendar_context four_pillars liuren",
-    "liuren_yearly_timing": "analysis_context analysis_type calendar_context four_pillars liuren runyear",
+    "liuren_yearly_timing": "analysis_context analysis_type calendar_context coverage four_pillars liuren runyear",
     "qimen": "analysis_context analysis_type calendar_context four_pillars qimen",
     "taiyi": "analysis_context analysis_type calendar_context four_pillars taiyi",
     "jinkou": "analysis_context analysis_type calendar_context four_pillars jinkou",

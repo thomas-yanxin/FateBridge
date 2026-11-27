@@ -105,6 +105,14 @@ class TimingEffectsAnalysis:
             dayun_age = analysis_age - start_age
 
         if before_start:
+            if "hour" not in birth_pillars:
+                return {
+                    "status": "before_dayun_hour_unknown",
+                    "child_limit": timeline["child_limit"],
+                    "first_dayun": sequence[0],
+                    "timing_context": context,
+                    "message": "起运前小运依赖出生时柱；出生时辰未知故略去小运推算。",
+                }
             nominal_age = max(1, int(analysis_age) + 1)
             xiaoyun = calculate_xiaoyun_pillar(
                 birth_pillars["hour"], gender, start_info["year_stem"], nominal_age

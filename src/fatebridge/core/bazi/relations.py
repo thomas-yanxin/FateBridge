@@ -273,7 +273,8 @@ def group_relations(pillars: Pillars) -> list[dict[str, Any]]:
 
 def check_harmony_patterns(pillars: Pillars) -> dict[str, Any]:
     """Structured natal harmony facts (三合/半合/拱合/三会/六合/暗合)."""
-    branches = [pillars[pos][1] for pos in ORDER]
+    active_order = tuple(pos for pos in ORDER if pos in pillars)
+    branches = [pillars[pos][1] for pos in active_order]
     branch_set = set(branches)
     three_harmony: list[dict[str, Any]] = []
     half_harmony: list[dict[str, Any]] = []
@@ -316,13 +317,14 @@ def check_harmony_patterns(pillars: Pillars) -> dict[str, Any]:
             "positions": [p1, p2],
             "detail": BRANCH_HIDDEN_COMBINATIONS[frozenset((b1, b2))],
         }
-        for p1, p2 in combinations(ORDER, 2)
+        for p1, p2 in combinations(active_order, 2)
         for b1, b2 in ((pillars[p1][1], pillars[p2][1]),)
         if b1 != b2 and frozenset((b1, b2)) in BRANCH_HIDDEN_COMBINATIONS
     ]
     return {
         "branch_positions": {
-            b: [p for p in ORDER if pillars[p][1] == b] for b in dict.fromkeys(branches)
+            b: [p for p in active_order if pillars[p][1] == b]
+            for b in dict.fromkeys(branches)
         },
         "three_harmony": three_harmony,
         "half_harmony": half_harmony,
@@ -337,7 +339,8 @@ def check_harmony_patterns(pillars: Pillars) -> dict[str, Any]:
 
 def check_clash_patterns(pillars: Pillars) -> dict[str, Any]:
     """Structured natal clash/harm/break/punishment facts."""
-    branches = [pillars[pos][1] for pos in ORDER]
+    active_order = tuple(pos for pos in ORDER if pos in pillars)
+    branches = [pillars[pos][1] for pos in active_order]
     branch_set = set(branches)
     names = (("无恩之刑", "恃势之刑"), ("恃势之刑", "无恩之刑"), ("无礼之刑",))
     punishments: list[dict[str, Any]] = []
@@ -381,7 +384,8 @@ def check_clash_patterns(pillars: Pillars) -> dict[str, Any]:
 
     return {
         "branch_positions": {
-            b: [p for p in ORDER if pillars[p][1] == b] for b in dict.fromkeys(branches)
+            b: [p for p in active_order if pillars[p][1] == b]
+            for b in dict.fromkeys(branches)
         },
         "six_clash": [
             list(pair) for pair in BRANCH_CLASH_PAIRS if set(pair) <= branch_set
@@ -398,10 +402,11 @@ def check_clash_patterns(pillars: Pillars) -> dict[str, Any]:
 
 def check_stem_patterns(pillars: Pillars) -> dict[str, Any]:
     """Check stem 5-combinations, 4-clashes, and adjacent pairings."""
-    stems = {pos: pillars[pos][0] for pos in ORDER}
+    active_order = tuple(pos for pos in ORDER if pos in pillars)
+    stems = {pos: pillars[pos][0] for pos in active_order}
     combinations_found = []
     clashes_found = []
-    for p1, p2 in combinations(ORDER, 2):
+    for p1, p2 in combinations(active_order, 2):
         s1, s2 = stems[p1], stems[p2]
         key = frozenset((s1, s2))
         if key in _STEM_COMBINATION_ELEMENT:
@@ -429,8 +434,9 @@ def check_stem_patterns(pillars: Pillars) -> dict[str, Any]:
 
 def check_pillar_patterns(pillars: Pillars) -> dict[str, Any]:
     """Per-pillar stem vs principal/hidden branch element relations."""
+    active_order = tuple(pos for pos in ORDER if pos in pillars)
     rows = []
-    for pos in ORDER:
+    for pos in active_order:
         stem, branch = pillars[pos]
         elem = STEM_ELEMENTS[stem][0]
         principal = BRANCH_ELEMENTS[branch][0]
@@ -457,9 +463,10 @@ def check_pillar_patterns(pillars: Pillars) -> dict[str, Any]:
 
 
 def check_pillar_pair_patterns(pillars: Pillars) -> dict[str, Any]:
-    """Check all six pillar pairs for identity, clash, and stem relation."""
+    """Check all pillar pairs for identity, clash, and stem relation."""
+    active_order = tuple(pos for pos in ORDER if pos in pillars)
     pairs = []
-    for left, right in combinations(ORDER, 2):
+    for left, right in combinations(active_order, 2):
         s1, b1 = pillars[left]
         s2, b2 = pillars[right]
         pairs.append(
@@ -479,9 +486,10 @@ def check_pillar_pair_patterns(pillars: Pillars) -> dict[str, Any]:
 
 def check_hidden_patterns(pillars: Pillars) -> dict[str, Any]:
     """Check concealed stem combinations, arch combinations, and 拱禄拱贵."""
-    branches = [pillars[name][1] for name in ORDER]
+    active_order = tuple(pos for pos in ORDER if pos in pillars)
+    branches = [pillars[name][1] for name in active_order]
     hidden_stem_combinations = []
-    for left, right in combinations(ORDER, 2):
+    for left, right in combinations(active_order, 2):
         a, b = pillars[left][1], pillars[right][1]
         stem_pairs = []
         for ra, sa in enumerate(BRANCH_HIDDEN_STEMS[a]):
@@ -515,20 +523,21 @@ def check_hidden_patterns(pillars: Pillars) -> dict[str, Any]:
 
     arch_lu_gui = []
     day_s, day_b = pillars["day"]
-    hour_s, hour_b = pillars["hour"]
-    if day_s == hour_s and (day_s, day_b, hour_b) in _ARCH_LU_GUI_TABLE:
-        kind, arched = _ARCH_LU_GUI_TABLE[(day_s, day_b, hour_b)]
-        filled = [p for p in ORDER if pillars[p][1] == arched]
-        arch_lu_gui.append(
-            {
-                "kind": kind,
-                "day_pillar": day_s + day_b,
-                "hour_pillar": hour_s + hour_b,
-                "arched": arched,
-                "target_present_at": filled,
-                "status": "excluded_by_filled_target" if filled else "present",
-            }
-        )
+    if "hour" in pillars:
+        hour_s, hour_b = pillars["hour"]
+        if day_s == hour_s and (day_s, day_b, hour_b) in _ARCH_LU_GUI_TABLE:
+            kind, arched = _ARCH_LU_GUI_TABLE[(day_s, day_b, hour_b)]
+            filled = [p for p in active_order if pillars[p][1] == arched]
+            arch_lu_gui.append(
+                {
+                    "kind": kind,
+                    "day_pillar": day_s + day_b,
+                    "hour_pillar": hour_s + hour_b,
+                    "arched": arched,
+                    "target_present_at": filled,
+                    "status": "excluded_by_filled_target" if filled else "present",
+                }
+            )
 
     return {
         "hidden_stem_combinations": hidden_stem_combinations,
@@ -547,8 +556,9 @@ def collect_target_branch_relations(
 ) -> list[dict[str, Any]]:
     """Full branch + stem relation scan between one timing branch/pillar and natal 4 pillars."""
     relations: list[dict[str, Any]] = []
-    natal_branches = {natal_pillars[p][1] for p in ORDER}
-    for pillar_name in ORDER:
+    active_order = tuple(p for p in ORDER if p in natal_pillars)
+    natal_branches = {natal_pillars[p][1] for p in active_order}
+    for pillar_name in active_order:
         p_stem, p_branch = natal_pillars[pillar_name]
         if BRANCH_CONFLICTS.get(target_branch) == p_branch:
             relations.append(
@@ -667,7 +677,7 @@ def collect_target_branch_relations(
                     "group": triple_group,
                     "bureau": bureau,
                     "with_pillars": [
-                        p for p in ORDER if natal_pillars[p][1] in triple_group
+                        p for p in active_order if natal_pillars[p][1] in triple_group
                     ],
                 }
             )
@@ -678,7 +688,7 @@ def collect_target_branch_relations(
                     "group": triple_group,
                     "bureau": bureau,
                     "with_pillars": [
-                        p for p in ORDER if natal_pillars[p][1] in triple_group
+                        p for p in active_order if natal_pillars[p][1] in triple_group
                     ],
                 }
             )
@@ -691,7 +701,7 @@ def collect_target_branch_relations(
                     "group": seasonal_group,
                     "bureau": bureau,
                     "with_pillars": [
-                        p for p in ORDER if natal_pillars[p][1] in seasonal_group
+                        p for p in active_order if natal_pillars[p][1] in seasonal_group
                     ],
                 }
             )

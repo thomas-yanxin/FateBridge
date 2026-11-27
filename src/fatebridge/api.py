@@ -39,7 +39,11 @@ load_runtime_env()
 
 from fatebridge import __version__ as APP_VERSION
 from fatebridge.application.compute_limits import heavy_calculation_budget
-from fatebridge.application.discovery import ToolSurface, discover_specs
+from fatebridge.application.discovery import (
+    DiscoveryDetail,
+    ToolSurface,
+    discover_specs,
+)
 from fatebridge.application.execution import execute_with_receipt, result_is_error
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
 from fatebridge.core.execution_context import ExecutionOptions
@@ -231,12 +235,16 @@ async def _request_validation_error_envelope(
         else:
             issues.append(issue)
     allowed_fields: Collection[str] | None = None
+    root_model: type[BaseModel] | None = None
     route = _request.scope.get("route")
     if isinstance(route, APIRoute) and route.dependant.body_params:
         body_type = route.dependant.body_params[0].field_info.annotation
         if isinstance(body_type, type) and issubclass(body_type, BaseModel):
             allowed_fields = body_type.model_fields.keys()
-    result = validation_issues_result(issues, allowed_fields=allowed_fields)
+            root_model = body_type
+    result = validation_issues_result(
+        issues, allowed_fields=allowed_fields, root_model=root_model
+    )
     return JSONResponse(
         status_code=result["status_code"],
         content=_build_error_detail(result),
@@ -365,8 +373,9 @@ async def list_tools(
     family: str | None = None,
     q: str | None = None,
     tool: str | None = None,
+    tools: str | None = None,
     surface: ToolSurface | None = None,
-    detail: Literal["summary", "full"] = "summary",
+    detail: DiscoveryDetail = "summary",
     include_output_schema: bool = False,
 ) -> ServiceResult:
     try:
@@ -375,6 +384,7 @@ async def list_tools(
             family=family,
             q=q,
             tool=tool,
+            tools=tools,
             surface=surface,
             detail=detail,
             include_output_schema=include_output_schema,

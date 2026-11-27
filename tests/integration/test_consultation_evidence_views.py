@@ -294,7 +294,7 @@ async def test_views_are_discoverable_on_demand_and_aliases_are_not_guessed() ->
             discovered = await client.call_tool(
                 "discover_tools", {"tool": spec.name, "detail": "summary"}
             )
-            assert discovered.structured_content["tools"][0]["evidence_views"] == (
+            assert discovered.structured_content["evidence_views"] == (
                 json.loads(json.dumps(views))
             )
             assert describe_spec(spec)["evidence_views"] == views

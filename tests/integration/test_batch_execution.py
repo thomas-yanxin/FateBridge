@@ -584,3 +584,202 @@ def test_batch_field_level_validation_and_call_suggestions() -> None:
     assert issue["code"] == "extra_forbidden"
     assert issue["path"] == "birth_huor"
     assert "birth_hour" in issue["constraints"]["suggestions"]
+    assert "birth_hour" in issue["constraints"]["allowed_fields"]
+
+
+def test_batch_analysis_context_place_and_nested_extra_diagnostics(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    batch_payload = {
+        "context": {
+            "analysis_datetime": "2026-04-06T09:30:00+08:00",
+            "place": "杭州西湖区",
+        },
+        "calls": [
+            {"id": "qm", "tool": "qimen"},
+            {"id": "lr", "tool": "liuren_chart"},
+            {"id": "jk", "tool": "jinkou"},
+            {"id": "mh", "tool": "meihua_time_cast"},
+            {"id": "hr", "tool": "horary_chart"},
+            {"id": "ss", "tool": "sanshi_combined_chart"},
+        ],
+    }
+    res = execute_batch(SPECS, BatchRequest.model_validate(batch_payload))
+    assert res["status"] == "ok", res
+    assert res["succeeded"] == 6
+
+    example = cli.run(["batch", "--example"])
+    assert example == 0
+    ex_json = json.loads(capsys.readouterr().out)
+    assert "context" in ex_json
+    assert "defaults" in ex_json
+    assert "as_of" in ex_json
+    assert any("arguments" in c for c in ex_json["calls"])
+
+    # Nested extra_forbidden returns allowed_fields & synonym suggestions on REST/MCP/CLI
+    bad_nested_payload = {
+        "context": {"analysis_datetime": "2026-04-06T09:30:00+08:00"},
+        "calls": [
+            {"tool": "qimen", "params": {"qimen_options": {"ju_method": "zhirun"}}}
+        ],
+    }
+    api._reset_runtime_state_for_tests()
+    monkeypatch.setattr(
+        api,
+        "API_KEY_AUTHENTICATOR",
+        api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
+    )
+    rest_err = TestClient(api.app).post("/api/batch", json=bad_nested_payload)
+    assert rest_err.status_code == 422
+    rest_issue = rest_err.json()["issues"][0]
+    assert rest_issue["code"] == "extra_forbidden"
+    assert rest_issue["constraints"]["suggestions"][0] == "arguments"
+    assert "arguments" in rest_issue["constraints"]["allowed_fields"]
+
+    bad_file = tmp_path / "bad_nested.json"
+    bad_file.write_text(json.dumps(bad_nested_payload), encoding="utf-8")
+    assert cli.run(["batch", "--request-file", str(bad_file)]) == 1
+    cli_issue = json.loads(capsys.readouterr().out)["issues"][0]
+    assert "arguments" in cli_issue["constraints"]["allowed_fields"]
+    assert cli_issue["constraints"]["suggestions"][0] == "arguments"
+
+
+def test_single_tool_offline_place_resolution() -> None:
+    from fatebridge.core.requests.divination import (
+        MeihuaAnalysisRequest,
+        SanShiUnitedRequest,
+    )
+    from fatebridge.core.requests.sanshi import (
+        JinkouAnalysisRequest,
+        LiuRengGodsRequest,
+        QimenAnalysisRequest,
+    )
+    from fatebridge.core.requests.western_events import (
+        AstroHoraryRequest,
+        AstroMundaneRequest,
+    )
+
+    qm = QimenAnalysisRequest(
+        analysis_year=2026,
+        analysis_month=4,
+        analysis_day=6,
+        analysis_hour=9,
+        analysis_place="杭州西湖区",
+    )
+    assert qm.analysis_longitude is not None and 120.0 < qm.analysis_longitude < 120.3
+    assert qm.analysis_timezone == "Asia/Shanghai"
+    assert "analysis_place" not in qm.service_inputs()
+
+    lr = LiuRengGodsRequest(
+        analysis_year=2026,
+        analysis_month=4,
+        analysis_day=6,
+        analysis_hour=9,
+        analysis_place="杭州西湖区",
+    )
+    assert lr.analysis_latitude is not None and 30.1 < lr.analysis_latitude < 30.4
+
+    jk = JinkouAnalysisRequest(
+        analysis_year=2026,
+        analysis_month=4,
+        analysis_day=6,
+        analysis_hour=9,
+        analysis_place="杭州西湖区",
+    )
+    assert jk.analysis_longitude is not None
+
+    mh = MeihuaAnalysisRequest(
+        analysis_year=2026,
+        analysis_month=4,
+        analysis_day=6,
+        analysis_hour=9,
+        analysis_place="杭州西湖区",
+    )
+    assert mh.analysis_longitude is not None and mh.analysis_timezone == "Asia/Shanghai"
+    assert "analysis_place" not in mh.service_inputs()
+
+    ss = SanShiUnitedRequest(date="2026-04-06", time="09:30:00", place="杭州西湖区")
+    assert ss.longitude is not None and float(ss.longitude) < 120.3
+    assert ss.timezone == "Asia/Shanghai"
+    assert "place" not in ss.service_inputs()
+
+    hr = AstroHoraryRequest(
+        question_year=2026,
+        question_month=4,
+        question_day=6,
+        question_hour=9,
+        place="杭州西湖区",
+    )
+    assert hr.longitude is not None and hr.latitude is not None
+    assert hr.timezone_name == "Asia/Shanghai"
+    assert "place" not in hr.service_inputs()
+
+    # Solar clock must NOT populate timezone_name even when place is supplied
+    hr_solar = AstroHoraryRequest(
+        question_year=2026,
+        question_month=4,
+        question_day=6,
+        question_hour=9,
+        question_clock_basis="local_mean_solar",
+        place="杭州西湖区",
+    )
+    assert hr_solar.longitude is not None and hr_solar.timezone_name is None
+
+    mn = AstroMundaneRequest(year=2026, place="杭州西湖区")
+    assert mn.longitude is not None and mn.timezone_name == "Asia/Shanghai"
+    assert "place" not in mn.service_inputs()
+
+
+def test_batch_memoizes_shared_primitives_without_cross_batch_leakage(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import fatebridge.core.metaphysics.seed as seed_mod
+    import fatebridge.core.qimen.ju as qimen_ju
+
+    seed_calls = 0
+    orig_build_seed = seed_mod.build_metaphysics_seed
+
+    def tracked_seed(*args, **kwargs):
+        nonlocal seed_calls
+        seed_calls += 1
+        return orig_build_seed(*args, **kwargs)
+
+    monkeypatch.setattr(seed_mod, "build_metaphysics_seed", tracked_seed)
+
+    qimen_calls = 0
+    orig_assemble_qimen = qimen_ju.build_qimen_board
+
+    def tracked_qimen(*args, **kwargs):
+        nonlocal qimen_calls
+        qimen_calls += 1
+        return orig_assemble_qimen(*args, **kwargs)
+
+    monkeypatch.setattr(qimen_ju, "build_qimen_board", tracked_qimen)
+
+    batch_req = BatchRequest.model_validate(
+        {
+            "context": {
+                "analysis_datetime": "2026-04-06T09:30:00+08:00",
+                "place": "杭州西湖区",
+            },
+            "calls": [
+                {"id": "qm", "tool": "qimen"},
+                {"id": "lr", "tool": "liuren_chart"},
+                {"id": "jk", "tool": "jinkou"},
+                {"id": "ss", "tool": "sanshi_combined_chart"},
+                {"id": "qm_dup", "tool": "qimen"},
+            ],
+            "as_of": "2026-04-06T09:30:00+08:00",
+        }
+    )
+    res1 = execute_batch(SPECS, batch_req)
+    assert res1["status"] == "ok" and res1["succeeded"] == 5
+    # qimen/liuren_chart/jinkou share one build_analysis_seed call, and qm_dup hits raw cache
+    assert seed_calls <= 2, f"Expected memoized seed builds <= 2, got {seed_calls}"
+    assert qimen_calls <= 2, f"Expected memoized qimen builds <= 2, got {qimen_calls}"
+
+    # Second independent batch must NOT reuse stale cache entries across scopes
+    prev_seed_calls = seed_calls
+    res2 = execute_batch(SPECS, batch_req)
+    assert res2["status"] == "ok"
+    assert seed_calls > prev_seed_calls

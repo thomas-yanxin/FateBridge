@@ -242,13 +242,22 @@ def normalize_birth_time(
     field_prefix: str = "",
 ) -> NormalizedBirthTime:
     """Normalize birth time and optionally apply true solar time correction."""
+    unknown_hour = bool(getattr(person, "birth_time_unknown", False))
     input_datetime = create_birth_datetime(
         person.birth_year,
         person.birth_month,
         person.birth_day,
-        person.birth_hour,
-        person.birth_minute,
-        person.birth_second if person.birth_second is not None else 0,
+        (
+            12
+            if unknown_hour
+            else (person.birth_hour if person.birth_hour is not None else 0)
+        ),
+        0 if unknown_hour else person.birth_minute,
+        (
+            0
+            if unknown_hour
+            else (person.birth_second if person.birth_second is not None else 0)
+        ),
     )
 
     inferred_place = resolve_birth_place_context(person.birth_place)
@@ -292,7 +301,7 @@ def normalize_birth_time(
     if birth_utc_offset is not None or person.birth_utc_offset is not None:
         input_datetime = resolved_clock
 
-    if not person.use_true_solar_time:
+    if unknown_hour or not person.use_true_solar_time:
         return NormalizedBirthTime(
             input_datetime=input_datetime,
             corrected_datetime=input_datetime,

@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import json
 import re
+import sqlite3
 import unicodedata
 from collections import defaultdict
+from collections.abc import Sequence
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -74,6 +76,7 @@ PLACE_SPECIFICITY = {
     "county": 4,
 }
 CATALOG_DIRECTORY = Path(__file__).resolve().parents[1] / "data" / "places"
+SQLITE_INDEX_FILENAME = "places.sqlite"
 
 
 _ASCII_NON_ALNUM_TABLE = str.maketrans(
@@ -108,13 +111,13 @@ def normalize_birth_place_text(text: str) -> str:
     return "".join(c for c in folded if c.isalnum())
 
 
-def _load_entries() -> tuple[PlaceEntry, ...]:
+def _load_entries(directory: Path = CATALOG_DIRECTORY) -> tuple[PlaceEntry, ...]:
     entries: list[PlaceEntry] = []
     norm = normalize_birth_place_text
     specificity_by_level = PLACE_SPECIFICITY
     for filename in ("china.json", "world.json"):
         catalog_rows: list[PlaceSourceEntry] = json.loads(
-            (CATALOG_DIRECTORY / filename).read_bytes()
+            (directory / filename).read_bytes()
         )
         for source_entry in catalog_rows:
             seen_aliases = {
@@ -133,16 +136,17 @@ def _load_entries() -> tuple[PlaceEntry, ...]:
     return tuple(entries)
 
 
-@lru_cache(maxsize=1)
-def get_place_catalog() -> PlaceCatalogData:
-    """Parse and index packaged place data once on first lookup."""
-    entries = _load_entries()
+def build_place_catalog_from_directory(
+    directory: Path = CATALOG_DIRECTORY,
+) -> PlaceCatalogData:
+    """Parse and index place JSON files from a directory."""
+    entries = _load_entries(directory)
     place_by_id = {row["id"]: row for row in entries}
     countries: dict[str, CountryAliases] = json.loads(
-        (CATALOG_DIRECTORY / "countries.json").read_bytes()
+        (directory / "countries.json").read_bytes()
     )
     manifest: PlaceCatalogAliases = json.loads(
-        (CATALOG_DIRECTORY / "manifest.json").read_bytes()
+        (directory / "manifest.json").read_bytes()
     )
     alias_index: dict[str, list[str]] = defaultdict(list)
     context_index: dict[str, list[tuple[str, str]]] = defaultdict(list)
@@ -188,6 +192,157 @@ def get_place_catalog() -> PlaceCatalogData:
         max_alias_length=max_alias_length,
         preferred_aliases=preferred_aliases,
     )
+
+
+@lru_cache(maxsize=1)
+def get_place_catalog() -> PlaceCatalogData:
+    """Parse and index packaged place data once on first full-catalog demand."""
+    return build_place_catalog_from_directory(CATALOG_DIRECTORY)
+
+
+_SQLITE_BATCH_CHUNK = 500
+
+
+class SqlitePlaceIndex:
+    """Fast read-only point/batch lookup backed by precompiled places.sqlite."""
+
+    def __init__(self, db_path: Path) -> None:
+        self._conn = sqlite3.connect(
+            f"file:{db_path}?mode=ro&immutable=1",
+            uri=True,
+            check_same_thread=False,
+        )
+        row = self._conn.execute(
+            "SELECT value FROM meta WHERE key = 'max_alias_length'"
+        ).fetchone()
+        self.max_alias_length: int = int(row[0]) if row is not None else 64
+        self._place_cache: dict[str, PlaceEntry] = {}
+        self._country_cache: dict[str, CountryAliases | None] = {}
+
+    def lookup_aliases(self, candidates: Sequence[str]) -> dict[str, list[str]]:
+        unique = [c for c in dict.fromkeys(candidates) if c]
+        if not unique:
+            return {}
+        out: dict[str, list[str]] = {}
+        for i in range(0, len(unique), _SQLITE_BATCH_CHUNK):
+            chunk = unique[i : i + _SQLITE_BATCH_CHUNK]
+            placeholders = ",".join("?" for _ in chunk)
+            rows = self._conn.execute(
+                f"SELECT alias, place_id FROM alias_index WHERE alias IN ({placeholders})",
+                chunk,
+            ).fetchall()
+            for alias, place_id in rows:
+                out.setdefault(alias, []).append(place_id)
+        return out
+
+    def lookup_contexts(
+        self, candidates: Sequence[str]
+    ) -> dict[str, list[tuple[str, str]]]:
+        unique = [c for c in dict.fromkeys(candidates) if c]
+        if not unique:
+            return {}
+        out: dict[str, list[tuple[str, str]]] = {}
+        for i in range(0, len(unique), _SQLITE_BATCH_CHUNK):
+            chunk = unique[i : i + _SQLITE_BATCH_CHUNK]
+            placeholders = ",".join("?" for _ in chunk)
+            rows = self._conn.execute(
+                f"SELECT alias, kind, key FROM context_index WHERE alias IN ({placeholders})",
+                chunk,
+            ).fetchall()
+            for alias, kind, key in rows:
+                out.setdefault(alias, []).append((kind, key))
+        return out
+
+    def lookup_context_commas(
+        self, signatures: Sequence[str]
+    ) -> dict[str, list[tuple[str, str]]]:
+        unique = [s for s in dict.fromkeys(signatures) if s]
+        if not unique:
+            return {}
+        out: dict[str, list[tuple[str, str]]] = {}
+        for i in range(0, len(unique), _SQLITE_BATCH_CHUNK):
+            chunk = unique[i : i + _SQLITE_BATCH_CHUNK]
+            placeholders = ",".join("?" for _ in chunk)
+            rows = self._conn.execute(
+                f"SELECT signature, kind, key FROM context_commas WHERE signature IN ({placeholders})",
+                chunk,
+            ).fetchall()
+            for sig, kind, key in rows:
+                out.setdefault(sig, []).append((kind, key))
+        return out
+
+    def get_places(self, place_ids: Sequence[str]) -> dict[str, PlaceEntry]:
+        result: dict[str, PlaceEntry] = {}
+        missing: list[str] = []
+        for pid in dict.fromkeys(place_ids):
+            if pid in self._place_cache:
+                result[pid] = self._place_cache[pid]
+            else:
+                missing.append(pid)
+        for i in range(0, len(missing), _SQLITE_BATCH_CHUNK):
+            chunk = missing[i : i + _SQLITE_BATCH_CHUNK]
+            placeholders = ",".join("?" for _ in chunk)
+            rows = self._conn.execute(
+                f"SELECT id, payload_json FROM places WHERE id IN ({placeholders})",
+                chunk,
+            ).fetchall()
+            for pid, payload_json in rows:
+                entry = cast(PlaceEntry, json.loads(payload_json))
+                entry["normalized_aliases"] = tuple(entry["normalized_aliases"])
+                self._place_cache[pid] = entry
+                result[pid] = entry
+        return result
+
+    def get_place(self, place_id: str) -> PlaceEntry | None:
+        cached = self._place_cache.get(place_id)
+        if cached is not None:
+            return cached
+        row = self._conn.execute(
+            "SELECT payload_json FROM places WHERE id = ?", (place_id,)
+        ).fetchone()
+        if row is None:
+            return None
+        entry = cast(PlaceEntry, json.loads(row[0]))
+        entry["normalized_aliases"] = tuple(entry["normalized_aliases"])
+        self._place_cache[place_id] = entry
+        return entry
+
+    def get_preferred(self, normalized_alias: str) -> str | None:
+        row = self._conn.execute(
+            "SELECT place_id FROM preferred_aliases WHERE alias = ?",
+            (normalized_alias,),
+        ).fetchone()
+        return str(row[0]) if row is not None else None
+
+    def get_country(self, code: str) -> CountryAliases | None:
+        if code in self._country_cache:
+            return self._country_cache[code]
+        row = self._conn.execute(
+            "SELECT name, continent, aliases_json FROM countries WHERE code = ?",
+            (code,),
+        ).fetchone()
+        if row is None:
+            self._country_cache[code] = None
+            return None
+        info: CountryAliases = {
+            "name": str(row[0]),
+            "continent": str(row[1]),
+            "aliases": list(json.loads(row[2])),
+        }
+        self._country_cache[code] = info
+        return info
+
+
+@lru_cache(maxsize=1)
+def get_place_index() -> SqlitePlaceIndex:
+    """Return the precompiled read-only SQLite place index."""
+    db_path = CATALOG_DIRECTORY / SQLITE_INDEX_FILENAME
+    if not db_path.is_file():
+        raise FileNotFoundError(
+            f"Precompiled place index missing: {db_path}. "
+            "Run scripts/build_place_index.py to generate it."
+        )
+    return SqlitePlaceIndex(db_path)
 
 
 _EXPORTED_ATTRS = {

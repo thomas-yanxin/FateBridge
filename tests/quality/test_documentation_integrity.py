@@ -228,3 +228,20 @@ def test_maintained_docs_contain_no_retired_api_symbols() -> None:
             if symbol in text:
                 hits.append(f"{rel}: {symbol}")
     assert not hits, "Found retired symbols in maintained docs:\n" + "\n".join(hits)
+
+
+def test_interpretation_schema_paths_valid_and_rejects_stale_qimen_evidence(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    assert check_docs.check_interpretation_schema_paths() == []
+    monkeypatch.setattr(check_docs, "ROOT", tmp_path)
+    qimen_doc = tmp_path / "docs/interpretation/zhanbu/qimen-evidence.md"
+    qimen_doc.parent.mkdir(parents=True, exist_ok=True)
+    qimen_doc.write_text(
+        "# 奇门盘面证据\n\n宫内读取 `evidence.door_palace_relation` 与 `qualification.door_palace_evidence`。\n",
+        encoding="utf-8",
+    )
+    assert check_docs.main([]) == 1
+    out = capsys.readouterr().out
+    assert "evidence.door_palace_relation" in out
+    assert "qualification.door_palace_evidence" in out

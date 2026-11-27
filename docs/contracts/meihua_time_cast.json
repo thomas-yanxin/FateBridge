@@ -360,10 +360,13 @@
       "meihua.body_trigram.name",
       "meihua.use_trigram.name",
       "meihua.body_use_relation",
+      "meihua.body_use_summary",
+      "meihua.seasonal_strength",
       "meihua.stage_relations",
       "meihua.ruleset.id",
       "meihua.ruleset.version",
       "interpretation.interpretation_topic",
+      "interpretation.topic_reading",
       "interpretation.classical_text_reference",
       "summary"
     ]
@@ -796,6 +799,19 @@
         "minimum": 1,
         "title": "Analysis Month",
         "type": "integer"
+      },
+      "analysis_place": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "起卦地点名称（支持离线地名库自动补全 analysis_longitude / analysis_timezone）",
+        "title": "Analysis Place"
       },
       "analysis_second": {
         "anyOf": [

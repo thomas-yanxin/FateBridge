@@ -10,11 +10,13 @@ from types import UnionType
 from typing import TYPE_CHECKING, Annotated, Literal, NoReturn, get_args, get_origin
 
 from fatebridge.application.tool_spec import ServiceResult
-from fatebridge.services.tool_catalog import CATALOG
+from fatebridge.services.tool_catalog import all_catalog, get_spec
 from fatebridge.transports.flags import FIELDS_FLAG_DESC
 
 if TYPE_CHECKING:
     from pydantic.fields import FieldInfo
+
+    from fatebridge.application.tool_spec import ToolSpec
 
 UNION_ORIGINS = (UnionType, get_origin(Annotated[int, "u"] | None))
 
@@ -242,20 +244,24 @@ def build_parser(
     _add_discovery_flags(listing)
 
     discovery = sub.add_parser(
-        "discover", help="发现工具目录或读取指定工具的完整调用契约与示例（JSON）"
+        "discover", help="发现工具目录或读取指定工具的调用契约与示例（JSON）"
     )
     discovery.add_argument(
         "tool_pos",
-        nargs="?",
+        nargs="*",
         metavar="tool",
-        help="可选：精确查询指定工具的调用契约与示例",
+        help="可选：精确查询一个或多个工具的调用契约与示例（支持 batch）",
     )
     _add_discovery_flags(discovery)
     discovery.add_argument(
+        "--tools",
+        help="精确选择多个工具，可用逗号分隔",
+    )
+    discovery.add_argument(
         "--detail",
-        choices=("summary", "full"),
+        choices=("brief", "summary", "full"),
         default="summary",
-        help="summary 返回摘要（指定 tool 时含输入 schema 与示例）；full 附带 output_fields",
+        help="brief 返回必填与字段类型极简契约；summary 返回摘要或单工具输入 schema；full 附带 output_fields",
     )
     discovery.add_argument(
         "--include-output-schema",
@@ -292,9 +298,16 @@ def build_parser(
         help="输出可配合 --request-file 使用的批量计算示例 JSON",
     )
 
-    for spec in CATALOG:
-        if command is not None and command != "__root__" and command != spec.name:
-            continue
+    target_specs: list[ToolSpec]
+    if command is None or command == "__root__":
+        target_specs = all_catalog()
+    elif command in {"list", "discover", "doctor", "batch"}:
+        target_specs = []
+    else:
+        matched_spec = get_spec(command)
+        target_specs = [matched_spec] if matched_spec is not None else []
+
+    for spec in target_specs:
         sp = sub.add_parser(spec.name, help=spec.summary)
         if command is not None and command != spec.name:
             continue

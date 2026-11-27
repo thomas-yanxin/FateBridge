@@ -112,10 +112,11 @@ def _compact_bazhai(result: ServiceResult) -> ServiceResult:
         compact_layer["house_candidates"] = [
             _compact_bazhai_chart(chart) for chart in layer["house_candidates"]
         ]
-    return {
-        **result,
-        "layers": {"bazhai": compact_layer},
-    }
+    out: ServiceResult = {"layers": {"bazhai": compact_layer}}
+    for key in ("status", "coverage", "run_metadata"):
+        if key in result:
+            out[key] = result[key]
+    return out
 
 
 def _compact_feature_finding(f: ServiceResult) -> ServiceResult:

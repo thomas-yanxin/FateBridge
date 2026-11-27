@@ -69,17 +69,27 @@ def _compact_primary_directions(result: ServiceResult) -> ServiceResult:
             "pd_type",
             "direction_mode",
             "pd_direction_mode",
+            "coordinate_system",
+            "coordinate_precision",
+            "approximation",
             "current_age_years",
             "current_arc_degrees",
             "current_window",
-            "past_window",
-            "future_window",
             "exact_window",
             "skipped_circumpolar_count",
         }
     }
-    compact_pd["timeline_preview"] = (pd.get("timeline") or [])[:15]
-    return {**result, "primary_directions": compact_pd}
+    if isinstance(pd.get("current_window"), list):
+        compact_pd["current_window"] = pd["current_window"][:5]
+    if isinstance(pd.get("past_window"), list):
+        compact_pd["past_window"] = pd["past_window"][:3]
+    if isinstance(pd.get("future_window"), list):
+        compact_pd["future_window"] = pd["future_window"][:3]
+    return {
+        k: (compact_pd if k == "primary_directions" else v)
+        for k, v in result.items()
+        if k != "natal_reference"
+    }
 
 
 def _compact_zr(result: ServiceResult) -> ServiceResult:
@@ -107,7 +117,11 @@ def _compact_zr(result: ServiceResult) -> ServiceResult:
                 "status",
             }
         }
-    return {**result, "zodiacal_releasing": compact_zr}
+    return {
+        k: (compact_zr if k == "zodiacal_releasing" else v)
+        for k, v in result.items()
+        if k != "natal_reference"
+    }
 
 
 _COMPACT_CALCULATION_BASIS_FIELDS = frozenset(
@@ -122,14 +136,12 @@ _COMPACT_CALCULATION_BASIS_FIELDS = frozenset(
 
 def _compact_return_chart(chart: ServiceResult) -> ServiceResult:
     compact = {
-        k: v
+        k: (v[:2] if k == "hits" and isinstance(v, list) else v)
         for k, v in chart.items()
         if k
         in {
             "return_datetime",
             "return_datetime_utc",
-            "sun",
-            "moon",
             "ascendant",
             "medium_coeli",
             "solver",
@@ -139,9 +151,30 @@ def _compact_return_chart(chart: ServiceResult) -> ServiceResult:
     cb = chart.get("calculation_basis")
     if isinstance(cb, dict):
         compact["calculation_basis"] = {
-            k: v for k, v in cb.items() if k in _COMPACT_CALCULATION_BASIS_FIELDS
+            k: v for k, v in cb.items() if k in {"engine_backend", "ephemeris_model"}
         }
     return compact
+
+
+def _compact_zr_level(level: object) -> object:
+    if not isinstance(level, dict):
+        return level
+    return {
+        k: v
+        for k, v in level.items()
+        if k
+        in {
+            "sign",
+            "sign_zh",
+            "ruler",
+            "start",
+            "end",
+            "start_age",
+            "end_age",
+            "is_lb",
+            "is_peak",
+        }
+    }
 
 
 def _compact_western_timing(result: ServiceResult) -> ServiceResult:
@@ -150,13 +183,6 @@ def _compact_western_timing(result: ServiceResult) -> ServiceResult:
         for k, v in result.items()
         if k in {"analysis_type", "analysis_context", "summary", "run_metadata"}
     }
-    natal_ref = result.get("natal_reference")
-    if isinstance(natal_ref, dict):
-        compact["natal_reference"] = {
-            k: v
-            for k, v in natal_ref.items()
-            if k in {"sect", "sun", "moon", "ascendant", "medium_coeli"}
-        }
     returns = result.get("returns")
     if isinstance(returns, dict):
         compact["returns"] = {
@@ -169,14 +195,12 @@ def _compact_western_timing(result: ServiceResult) -> ServiceResult:
         if isinstance(ct, dict):
             compact["transits"] = {
                 "current_transit": {
-                    k: (v[:12] if k == "hits" and isinstance(v, list) else v)
+                    k: (v[:5] if k == "hits" and isinstance(v, list) else v)
                     for k, v in ct.items()
                     if k
                     in {
                         "analysis_datetime",
                         "orb_limit",
-                        "exact_orb_limit",
-                        "house_emphasis",
                         "hits",
                         "exact_hits",
                     }
@@ -190,30 +214,63 @@ def _compact_western_timing(result: ServiceResult) -> ServiceResult:
         if "secondary_progression" in directions:
             sp = directions["secondary_progression"]
             compact_dirs["secondary_progression"] = (
-                {k: v for k, v in sp.items() if k != "calculation_basis"}
+                {
+                    k: (v[:3] if k == "hits" and isinstance(v, list) else v)
+                    for k, v in sp.items()
+                    if k in {"status", "progressed_datetime", "hits"}
+                }
                 if isinstance(sp, dict)
                 else sp
             )
         if "solar_arc" in directions:
-            compact_dirs["solar_arc"] = directions["solar_arc"]
+            sa = directions["solar_arc"]
+            compact_dirs["solar_arc"] = (
+                {
+                    k: (v[:3] if k == "hits" and isinstance(v, list) else v)
+                    for k, v in sa.items()
+                    if k in {"status", "arc_degrees", "hits"}
+                }
+                if isinstance(sa, dict)
+                else sa
+            )
         if "given_year" in directions:
             gy = directions["given_year"]
             compact_dirs["given_year"] = (
-                {k: v for k, v in gy.items() if k != "monthly_profections"}
+                {
+                    k: v
+                    for k, v in gy.items()
+                    if k in {"target_year", "age", "profection_sign", "profection_lord"}
+                }
                 if isinstance(gy, dict)
                 else gy
             )
         if "primary_directions" in directions:
-            compact_dirs["primary_directions"] = _compact_primary_directions(
-                {"primary_directions": directions["primary_directions"]}
-            )["primary_directions"]
-            if isinstance(compact_dirs["primary_directions"], dict):
-                compact_dirs["primary_directions"].pop("timeline_preview", None)
+            pd = directions["primary_directions"]
+            compact_dirs["primary_directions"] = (
+                {
+                    k: v
+                    for k, v in pd.items()
+                    if k
+                    in {
+                        "method",
+                        "time_key",
+                        "direction_mode",
+                        "current_age_years",
+                        "current_arc_degrees",
+                    }
+                }
+                if isinstance(pd, dict)
+                else pd
+            )
         if "primary_direction_chart" in directions:
             pdc = directions["primary_direction_chart"]
             compact_dirs["primary_direction_chart"] = (
                 {
-                    k: v
+                    k: (
+                        v[:3]
+                        if k in {"exact_hits", "sign_changes"} and isinstance(v, list)
+                        else v
+                    )
                     for k, v in pdc.items()
                     if k
                     in {
@@ -221,10 +278,7 @@ def _compact_western_timing(result: ServiceResult) -> ServiceResult:
                         "time_key",
                         "direction_mode",
                         "current_arc_degrees",
-                        "directed_ascendant",
-                        "directed_medium_coeli",
                         "exact_hits",
-                        "sign_changes",
                     }
                 }
                 if isinstance(pdc, dict)
@@ -239,20 +293,50 @@ def _compact_western_timing(result: ServiceResult) -> ServiceResult:
         if "firdaria" in time_lords:
             fird = time_lords["firdaria"]
             compact_tl["firdaria"] = (
-                {k: v for k, v in fird.items() if k != "timeline"}
+                {
+                    k: v
+                    for k, v in fird.items()
+                    if k in {"sect", "current_major", "current_sub"}
+                }
                 if isinstance(fird, dict)
                 else fird
             )
         if "decennials" in time_lords:
-            compact_tl["decennials"] = _compact_decennials(
-                {"decennials": time_lords["decennials"]}
-            )["decennials"]
-            if isinstance(compact_tl["decennials"], dict):
-                compact_tl["decennials"].pop("timeline", None)
+            dec = _compact_decennials({"decennials": time_lords["decennials"]})[
+                "decennials"
+            ]
+            if isinstance(dec, dict):
+                compact_tl["decennials"] = {
+                    k: v
+                    for k, v in dec.items()
+                    if k
+                    in {
+                        "resolved_start_planet",
+                        "current_level_1",
+                        "current_level_2",
+                        "current_level_3",
+                    }
+                }
         if "zodiacal_releasing" in time_lords:
-            compact_tl["zodiacal_releasing"] = _compact_zr(
-                {"zodiacal_releasing": time_lords["zodiacal_releasing"]}
-            )["zodiacal_releasing"]
+            zr = time_lords["zodiacal_releasing"]
+            if isinstance(zr, dict):
+                compact_tl["zodiacal_releasing"] = {
+                    track: {
+                        "lot": zr[track].get("lot"),
+                        "release_start_sign": zr[track].get("release_start_sign"),
+                        "current_level_1": _compact_zr_level(
+                            zr[track].get("current_level_1")
+                        ),
+                        "current_level_2": _compact_zr_level(
+                            zr[track].get("current_level_2")
+                        ),
+                        "current_level_3": _compact_zr_level(
+                            zr[track].get("current_level_3")
+                        ),
+                    }
+                    for track in ("spirit", "fortune")
+                    if isinstance(zr.get(track), dict)
+                }
         compact["time_lords"] = compact_tl
     return compact
 

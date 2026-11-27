@@ -135,9 +135,9 @@ def test_discover_flat_tool_emits_schema_and_example(
 ) -> None:
     code = run(["discover", "bazi_wealth"])
     out = capsys.readouterr().out
-    payload = json.loads(out)
+    info = json.loads(out)
     assert code == 0
-    (info,) = payload["tools"]
+    assert "tools" not in info
     assert info["tool"] == "bazi_wealth"
     assert info["surfaces"]["cli"] is True
     assert info["surfaces"]["rest"] == "/api/bazi/wealth"
@@ -152,13 +152,61 @@ def test_discover_relationship_tool_lists_shared_surface(
 ) -> None:
     code = run(["discover", "relationship_chart"])
     out = capsys.readouterr().out
-    payload = json.loads(out)
+    info = json.loads(out)
     assert code == 0
-    (info,) = payload["tools"]
     assert info["tool"] == "relationship_chart"
     assert info["surfaces"]["rest"] == "/api/astrology/relationship-chart"
     assert info["surfaces"]["cli"] is True
     assert info["cli_example"].startswith("fatebridge relationship_chart")
+
+
+def test_discover_multi_tool_brief_mode_and_lazy_catalog_parity(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    import subprocess
+    import sys
+
+    from fatebridge.services.tool_catalog import _TOOL_MODULE_BY_NAME
+
+    assert set(_TOOL_MODULE_BY_NAME) == {spec.name for spec in CATALOG}
+
+    assert (
+        run(["discover", "qimen", "liuren_chart", "jinkou", "--detail", "brief"]) == 0
+    )
+    brief_payload = json.loads(capsys.readouterr().out)
+    assert brief_payload["detail"] == "brief"
+    assert brief_payload["matched_count"] == 3
+    assert [t["tool"] for t in brief_payload["tools"]] == [
+        "qimen",
+        "liuren_chart",
+        "jinkou",
+    ]
+    assert "required_fields" in brief_payload["tools"][0]
+    assert "fields" in brief_payload["tools"][0]
+    assert "input_schema" not in brief_payload["tools"][0]
+
+    assert run(["discover", "--tools", "qimen,liuren_chart", "--detail", "brief"]) == 0
+    csv_payload = json.loads(capsys.readouterr().out)
+    assert csv_payload["matched_count"] == 2
+
+    proc = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "fatebridge",
+            "discover",
+            "qimen",
+            "liuren_chart",
+            "jinkou",
+            "--detail",
+            "brief",
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    mod_payload = json.loads(proc.stdout)
+    assert mod_payload["matched_count"] == 3
 
 
 def test_discover_unknown_tool_returns_nonzero(
@@ -513,22 +561,19 @@ def test_request_file_rejects_unknown_keys_before_calculation(
     payload = json.loads(capsys.readouterr().out)
     assert code == 1
     assert payload["error_code"] == "validation_error"
-    assert payload["issues"] == [
-        {
-            "path": "birth_huor",
-            "code": "extra_forbidden",
-            "message": "Extra inputs are not permitted",
-            "constraints": {
-                "suggestions": [
-                    "birth_hour",
-                    "birth_year",
-                    "birth_month",
-                    "birth_second",
-                    "birth_minute",
-                ]
-            },
-        }
+    assert len(payload["issues"]) == 1
+    issue = payload["issues"][0]
+    assert issue["path"] == "birth_huor"
+    assert issue["code"] == "extra_forbidden"
+    assert issue["message"] == "Extra inputs are not permitted"
+    assert issue["constraints"]["suggestions"] == [
+        "birth_hour",
+        "birth_year",
+        "birth_month",
+        "birth_second",
+        "birth_minute",
     ]
+    assert "birth_hour" in issue["constraints"]["allowed_fields"]
 
 
 @pytest.mark.parametrize(
@@ -557,13 +602,13 @@ def test_request_file_rejects_tool_options_not_in_selected_contract(
     code = run(["bazi_birth_chart", "--request-file", subject_path])
     payload = json.loads(capsys.readouterr().out)
     assert code == 1
-    assert payload["issues"] == [
-        {
-            "path": "house_system",
-            "code": "extra_forbidden",
-            "message": "Extra inputs are not permitted",
-        }
-    ]
+    assert len(payload["issues"]) == 1
+    issue = payload["issues"][0]
+    assert issue["path"] == "house_system"
+    assert issue["code"] == "extra_forbidden"
+    assert issue["message"] == "Extra inputs are not permitted"
+    assert "birth_hour" in issue["constraints"]["allowed_fields"]
+    assert "house_system" not in issue["constraints"]["allowed_fields"]
     code = run(
         [
             "astrology_chart",
@@ -767,11 +812,10 @@ def test_discover_bazi_timing_examples_include_analysis_date_fields(
         ("bazi_luck_cycles", ("--analysis-year",)),
     ):
         assert run(["discover", tool_name]) == 0
-        payload = json.loads(capsys.readouterr().out)
-        (info,) = payload["tools"]
+        info = json.loads(capsys.readouterr().out)
         assert "analysis_year" in info["example_input"]
         for flag in expected_flags:
             assert flag in info["cli_example"], (tool_name, flag)
     assert run(["discover", "bazi_monthly_timing"]) == 0
-    monthly_info = json.loads(capsys.readouterr().out)["tools"][0]
+    monthly_info = json.loads(capsys.readouterr().out)
     assert "analysis_month" in monthly_info["example_input"]

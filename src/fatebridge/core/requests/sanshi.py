@@ -10,7 +10,11 @@ from fatebridge.core.requests.base import (
     FateBridgeBaseRequest,
     RequiredAnalysisClockFields,
 )
-from fatebridge.core.requests.birth import FateBridgeRequest
+from fatebridge.core.requests.birth import (
+    OPTIONAL_UNKNOWN_BIRTH_HOUR_FIELD,
+    FateBridgeRequest,
+    OptionalUnknownBirthHourMixin,
+)
 
 ShehaiMethod = Literal["depth_first", "meng_zhong_first"]
 MonthGeneralMode = Literal["solar_term", "true_solar_longitude"]
@@ -155,10 +159,23 @@ class LiuRengGodsRequest(RequiredAnalysisClockFields, FateBridgeBaseRequest):
         default=True,
         description="Enable true solar time correction (default on — 式占 keys off the apparent-solar 时辰)",
     )
+    birth_date: str | None = Field(
+        default=None,
+        pattern=r"^\d{4}-\d{2}-\d{2}$",
+        description="问课对象公历出生日期（YYYY-MM-DD），自动换算出生年干支、本命年支与行年岁序",
+    )
+    birth_year_boundary: Literal["lunar_new_year", "lichun"] = Field(
+        default="lunar_new_year",
+        description="换年口径：lunar_new_year（正月初一，默认）或 lichun（立春）；跨界时报告分歧",
+    )
 
 
-class LiuRengRunyearRequest(RequiredAnalysisClockFields, FateBridgeRequest):
+class LiuRengRunyearRequest(
+    OptionalUnknownBirthHourMixin, RequiredAnalysisClockFields, FateBridgeRequest
+):
     """Request model for Liu Ren runyear analysis."""
+
+    birth_hour: int | None = OPTIONAL_UNKNOWN_BIRTH_HOUR_FIELD  # type: ignore[assignment]
 
     birth_timezone: str | None = Field(
         default=None,
@@ -296,6 +313,15 @@ class JinkouAnalysisRequest(RequiredAnalysisClockFields, FateBridgeBaseRequest):
         ge=1,
         le=150,
         description="明确提供的一岁起算行年岁序，非周岁。与出生年干支及已知男/女齐备才另起行年课。",
+    )
+    birth_date: str | None = Field(
+        default=None,
+        pattern=r"^\d{4}-\d{2}-\d{2}$",
+        description="问课对象公历出生日期（YYYY-MM-DD），自动换算出生年干支、本命年支与行年岁序",
+    )
+    birth_year_boundary: Literal["lunar_new_year", "lichun"] = Field(
+        default="lunar_new_year",
+        description="换年口径：lunar_new_year（正月初一，默认）或 lichun（立春）；跨界时报告分歧",
     )
 
     @model_validator(mode="after")

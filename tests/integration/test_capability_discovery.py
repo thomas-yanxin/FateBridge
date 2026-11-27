@@ -79,14 +79,14 @@ def test_reference_discovery_uses_public_names(
             "/api/tools", params={"tool": name, "surface": "mcp", "detail": "summary"}
         )
         assert response.status_code == 200, response.text
-        (record,) = response.json()["tools"]
+        record = response.json()
         assert record["tool"] == name
         assert record["surfaces"]["mcp"] is True
         assert (
             run(["discover", "--tool", name, "--surface", "mcp", "--detail", "summary"])
             == 0
         )
-        cli_record = json.loads(capsys.readouterr().out)["tools"][0]
+        cli_record = json.loads(capsys.readouterr().out)
         assert {
             k: v
             for k, v in cli_record.items()
@@ -116,7 +116,7 @@ def test_reference_discovery_uses_public_names(
                 discovered = await client.call_tool(
                     "discover_tools", {"tool": name, "detail": "summary"}
                 )
-                (contract,) = discovered.structured_content["tools"]
+                contract = discovered.structured_content
                 assert contract["tool"] == name
                 assert contract["surfaces"] == records[name]
             for name in sorted(retired):

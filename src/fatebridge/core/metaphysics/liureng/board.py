@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, TypedDict
 
 from fatebridge.core.almanac import localize_datetime
+from fatebridge.core.batch_cache import batch_cached, metaphysics_seed_key
 from fatebridge.core.metaphysics.common import (
     ELEMENT_CONTROLS,
     ELEMENT_GENERATES,
@@ -267,6 +268,40 @@ def derive_selection(
     }
 
 
+def _liureng_board_cache_key(
+    seed: MetaphysicsSeed,
+    gender: str = "未知",
+    month_general_override: str | None = None,
+    is_diurnal_override: bool | None = None,
+    guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
+    *,
+    shehai_method: ShehaiMethod = "depth_first",
+    harm_include_terminal: bool = False,
+    diurnal_mode: DiurnalMode = "clock",
+    month_general_mode: MonthGeneralMode = "solar_term",
+    latitude: float | None = None,
+    longitude: float | None = None,
+) -> tuple[object, ...]:
+    return (
+        metaphysics_seed_key(seed),
+        gender,
+        month_general_override,
+        is_diurnal_override,
+        guiren_profile,
+        shehai_method,
+        harm_include_terminal,
+        diurnal_mode,
+        month_general_mode,
+        latitude,
+        longitude,
+    )
+
+
+@batch_cached(
+    "liuren.build_liureng_board",
+    _liureng_board_cache_key,
+    copy_result=True,
+)
 def build_liureng_board(
     seed: MetaphysicsSeed,
     gender: str = "未知",

@@ -7,7 +7,11 @@ from pydantic_core import PydanticCustomError
 
 from fatebridge.core.bazi.policies import YearBoundaryPolicy
 from fatebridge.core.requests.base import OptionalAnalysisClockFields
-from fatebridge.core.requests.birth import BaziClockRequest
+from fatebridge.core.requests.birth import (
+    OPTIONAL_UNKNOWN_BIRTH_HOUR_FIELD,
+    BaziClockRequest,
+    OptionalUnknownBirthHourMixin,
+)
 
 _YEAR_BOUNDARY_DESCRIPTION = (
     "年柱换年口径：lichun（默认，立春换年；提供月份/日期时按立春精确时刻判断，"
@@ -15,8 +19,12 @@ _YEAR_BOUNDARY_DESCRIPTION = (
 )
 
 
-class TimingAnalysisRequest(OptionalAnalysisClockFields, BaziClockRequest):
+class TimingAnalysisRequest(
+    OptionalUnknownBirthHourMixin, OptionalAnalysisClockFields, BaziClockRequest
+):
     """Request model for comprehensive timing analysis."""
+
+    birth_hour: int | None = OPTIONAL_UNKNOWN_BIRTH_HOUR_FIELD  # type: ignore[assignment]
 
     analysis_year: int | None = Field(
         default=None,

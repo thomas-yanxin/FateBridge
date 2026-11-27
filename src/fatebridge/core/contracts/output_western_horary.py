@@ -69,6 +69,14 @@ class LillyConditions(PartialOutput):
 
 
 class HoraryPerfection(PartialOutput):
+    perfected: bool | None = None
+    before_ingress: bool | None = None
+    intervening_contacts_count: int | None = None
+    sequence_conditions_unverified: bool | None = None
+    perfection_routes: list[str] | None = None
+    obstructions: list[str] | None = None
+    principal_reception: LillyPairReception | None = None
+    event_path_summary: list[dict[str, OpenJsonValue]] | None = None
     lilly_conditions: LillyConditions | None = None
     event_history: PlanetaryEventHistory | None = None
     status: str | None = None
@@ -261,6 +269,7 @@ class LillyFortitudeSummary(PartialOutput):
 
 class LillyFortitudePlanet(LillyFortitudeSummary):
     rows: list[LillyFortitudeRow] | None = None
+    inactive_row_codes: list[str] | None = None
 
 
 class LillyFortitudes(PartialOutput):
@@ -269,6 +278,8 @@ class LillyFortitudes(PartialOutput):
     source_edition: str | None = None
     source_pages: list[int] | None = None
     row_count_per_planet: int | None = None
+    include_inactive_rows: bool | None = None
+    row_catalog: dict[str, dict[str, OpenJsonValue]] | None = None
     planets: dict[str, LillyFortitudePlanet] | None = None
     summary: dict[str, LillyFortitudeSummary] | None = None
     physical_inputs: LillyFortitudeInputs | None = None

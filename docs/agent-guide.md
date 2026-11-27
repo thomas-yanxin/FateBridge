@@ -23,8 +23,9 @@
 | 已确定工具名，缺输入契约或视图 | REST `GET /api/tools?tool=...`、CLI `fatebridge discover <tool>` 或 MCP `discover_tools(tool=...)` |
 | 需要完整输出 Schema | 传入 `detail=full` 并配合 `tool`、`family` 或 `q` 过滤，且显式设置 `include_output_schema=True` |
 
-- `detail="summary"`（默认）：未传 `tool` 时返回全局 `counts`、`families` 与工具摘要；指定 `tool` 时直接返回单个工具的 `input_schema`、`output_fields`、`example_input`、`evidence_views`、`suggested_fields` 与 `compact_fields`。
-- `detail="full"`：返回完整契约（包括 `output_fields` 等），**必须**配合 `tool`、`family` 或 `q` 之一过滤（否则返回 `validation_error` / `filter_required_for_full_detail`）。**`output_schema` 默认不返回**，仅当显式传入 `include_output_schema=True`（REST `?include_output_schema=true`，CLI `--include-output-schema`）时才会附带。
+- `detail="brief"`：仅返回必填字段、`field_types`、一两行 `usage_hint` 与 `evidence_views` 名称列表，适合批量预检多个工具。
+- `detail="summary"`（默认）：未传 `tool`/`tools` 时返回全局 `counts`、`families` 与工具摘要；指定单个 `tool` 时直接解包返回该工具的 `input_schema`、`output_fields`、`example_input`、`evidence_views`、`suggested_fields` 与 `compact_fields`；指定多个 `tools` 时返回精简列表。
+- `detail="full"`：返回完整契约（包括 `output_fields` 等），**必须**配合 `tool`、`tools`、`family` 或 `q` 之一过滤（否则返回 `validation_error` / `filter_required_for_full_detail`）。**`output_schema` 默认不返回**，仅当显式传入 `include_output_schema=True`（REST `?include_output_schema=true`，CLI `--include-output-schema`）时才会附带。
 - 拼写错误时返回 `unknown_tool`（404）并在 `issues[].constraints.suggestions` 给出候选名称。
 
 ```bash
@@ -32,17 +33,19 @@
 curl 'http://localhost:8010/api/tools'
 curl 'http://localhost:8010/api/tools?detail=summary&family=bazi'
 curl 'http://localhost:8010/api/tools?tool=bazi_birth_chart'
+curl 'http://localhost:8010/api/tools?tools=qimen,liuren_chart,jinkou&detail=brief'
 curl 'http://localhost:8010/api/tools?tool=bazi_birth_chart&detail=full&include_output_schema=true'
 
-# CLI 能力发现与环境自检
+# CLI 能力发现与环境自检（同样支持 python -m fatebridge ...）
 fatebridge list
 fatebridge discover --family bazi
+fatebridge discover qimen liuren_chart jinkou --detail brief
 fatebridge discover bazi_birth_chart
 fatebridge discover --tool bazi_birth_chart --detail full --include-output-schema
 fatebridge doctor
 ```
 
-MCP 暴露 `discover_tools`、`run_calculation` 与 `run_batch` 三个工具（无资源 URI）；多主体或多工具串联可通过 `run_batch`（REST `POST /api/batch`、CLI `fatebridge batch --request-file ...`）共享 `subjects` 与 `defaults`。可通过 `FATEBRIDGE_MCP_FAMILIES` 限制公开的 family，配置见 [MCP 部署指南](mcp-deployment.md)。
+MCP 暴露 `discover_tools`、`run_calculation` 与 `run_batch` 三个工具（无资源 URI）；多主体或多工具串联可通过 `run_batch`（REST `POST /api/batch`、CLI `fatebridge batch --request-file ...`）共享 `subjects`、`context`（问事/分析时刻 `analysis_datetime`、`place`、`timezone`、`longitude`、`latitude`）与 `defaults`，并在同批请求内自动复用共享计算结果（所有 `extra_forbidden` 校验失败统一返回 `constraints.allowed_fields` 与近义字段建议）。可通过 `FATEBRIDGE_MCP_FAMILIES` 限制公开的 family，配置见 [MCP 部署指南](mcp-deployment.md)。
 
 ## 2. 调用：三端控制面与按通道接入
 
@@ -50,7 +53,7 @@ REST、MCP 与 CLI 共用三项正交控制参数：
 
 | 控制项 | REST（URL 查询参数） | MCP（`run_calculation` 参数） | CLI（子命令选项） | 默认值与行为 |
 | --- | --- | --- | --- | --- |
-| `detail` | `?detail=compact\|audit` | `detail="compact"\|"audit"` | `--detail compact\|audit` | 默认 `compact`；`audit` 返回完整载荷与计时重放元数据 |
+| `detail` | `?detail=compact\|audit` | `detail="compact"\|"audit"` | `--detail compact\|audit` | 默认 `compact`（保留影响结论的核心证据与限定条件，如奇门 `patterns`/`coexisting_conflicts`/`hour_void_scope`、卜卦 `perfection.status`/`radicality`/`moon`/`principal_reception`）；`audit` 返回完整载荷与计时重放元数据 |
 | `fields` | `?fields=a&fields=b.c` | `fields=["a", "b.c"]` | `--fields a b.c` | 严格校验点号对象路径；`run_metadata` 始终保留 |
 | `as_of` | `?as_of=2026-06-01T12:00:00+08:00` | `as_of="2026-06-01T12:00:00+08:00"` | `--as-of 2026-06-01T12:00:00+08:00` | 带时区 ISO 8601 时刻，冻结隐式当前时钟以便复现 |
 
@@ -58,10 +61,10 @@ REST、MCP 与 CLI 共用三项正交控制参数：
 
 命理与占星工具共用基础出生字段（各家族详情见 [API 参考 §3](api-reference.md#3-共享请求族)）：
 
-- `birth_year` / `birth_month` / `birth_day` / `birth_hour`：必填（公历）；不猜未知出生时刻。
+- `birth_year` / `birth_month` / `birth_day` / `birth_hour`：必填（公历）；不猜未知出生时刻。当用户确认未知出生时辰时，八字与 `liuren_yearly_timing` 支持显式传入 `birth_time_unknown=true`（不传 `birth_hour`），按三柱模式计算并在 `coverage` 声明边界与缺失项；`jinkou` 与 `liuren_chart` 可直接传入 `birth_date` 自动换算年命并附立春/春节边界提示。
 - `birth_minute`：可选，默认 `0`；八字与时运另支持 `birth_second`（`0..59`）与 `birth_utc_offset`（消歧夏令时重复钟时）。
 - `gender`：八字专项可选建议传入，`bazi_luck_cycles` 等必填，支持 `男`/`女`、`male`/`female`。
-- `birth_place` / `birth_timezone` / `birth_longitude` / `birth_latitude`：支持内置静态地名解析（参见[离线城市目录](place-catalog.md)）；高精度星盘建议显式传经纬度与 IANA 时区。
+- `birth_place` / `birth_timezone` / `birth_longitude` / `birth_latitude`：支持内置离线 SQLite 地名索引秒级解析（参见[离线城市目录](place-catalog.md)）；奇门、六壬、金口诀、梅花与西占事件盘同时支持 `analysis_place` / `place` 离线解析，批处理可在顶层 `context` 统一提供问事时刻与地点。高精度星盘建议显式传经纬度与 IANA 时区。
 - `use_true_solar_time`：中式出生模型默认 `true`（无经度回退钟表时间并附提示，显式 `true` 无经度报错）；核心星盘默认 `false`。校正详情见 `person_info.time_adjustment`。
 
 ### 按通道接入

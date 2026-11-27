@@ -161,6 +161,19 @@
         "title": "Analysis Month",
         "type": "integer"
       },
+      "analysis_place": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "起局/起课地点名称（支持离线地名库自动补全 analysis_longitude / analysis_latitude / analysis_timezone）",
+        "title": "Analysis Place"
+      },
       "analysis_second": {
         "default": 0,
         "description": "Analysis second (0-59)",

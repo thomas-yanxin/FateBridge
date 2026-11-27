@@ -244,6 +244,44 @@ class RequiredAnalysisClockFields(BaseModel):
     analysis_longitude: float | None = Field(
         default=None, ge=-180, le=180, description="Analysis longitude"
     )
+    analysis_place: str | None = Field(
+        default=None,
+        description="起局/起课地点名称（支持离线地名库自动补全 analysis_longitude / analysis_latitude / analysis_timezone）",
+    )
+
+    @model_validator(mode="after")
+    def _resolve_analysis_place(self) -> "RequiredAnalysisClockFields":
+        place_text = (self.analysis_place or "").strip()
+        if not place_text or place_text == "未提供":
+            return self
+        need_lon = (
+            self.analysis_longitude is None
+            or "analysis_longitude" not in self.model_fields_set
+        )
+        has_lat = hasattr(self, "analysis_latitude")
+        need_lat = has_lat and (
+            getattr(self, "analysis_latitude") is None
+            or "analysis_latitude" not in self.model_fields_set
+        )
+        need_tz = (
+            self.analysis_timezone is None
+            or "analysis_timezone" not in self.model_fields_set
+        )
+        if not (need_lon or need_lat or need_tz):
+            return self
+        from fatebridge.utils.places import resolve_place_location
+
+        resolved = resolve_place_location(place_text, place_field="analysis_place")
+        if need_lon:
+            self.analysis_longitude = resolved.longitude
+        if need_lat:
+            setattr(self, "analysis_latitude", resolved.latitude)
+        if need_tz and resolved.timezone is not None:
+            self.analysis_timezone = resolved.timezone
+        return self
+
+    def service_inputs(self) -> dict[str, object]:
+        return self.model_dump(exclude={"analysis_place"})
 
 
 class WesternChartSystemFields(BaseModel):

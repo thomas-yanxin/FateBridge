@@ -976,6 +976,8 @@ def analyze_timing_interactions(
     """Full structural interaction matrix across natal + active timing pillars."""
     nodes: list[dict[str, str]] = []
     for name in _ORDER:
+        if name not in natal:
+            continue
         stem, branch = natal[name]
         nodes.append(
             {

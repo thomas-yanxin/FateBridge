@@ -193,11 +193,19 @@
         "type": "integer"
       },
       "birth_hour": {
-        "description": "Birth hour (0-23)",
-        "maximum": 23,
-        "minimum": 0,
-        "title": "Birth Hour",
-        "type": "integer"
+        "anyOf": [
+          {
+            "maximum": 23,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth hour (0-23); omit only when birth_time_unknown=True",
+        "title": "Birth Hour"
       },
       "birth_longitude": {
         "anyOf": [
@@ -271,6 +279,12 @@
         "default": null,
         "description": "仅传用户确认的名义出生参考正负UTC经过分钟范围；保留分钟网格，并补充计算节令、钟面、大运名义月进位与当前分析日附近未来跳时逆像探针。未认证全部连续交运状态或极值。None表示未提供范围，不表示精确生时。",
         "title": "Birth Time Uncertainty Minutes"
+      },
+      "birth_time_unknown": {
+        "default": false,
+        "description": "明确声明出生时辰未知；仅在为 true 时允许省略 birth_hour，按三柱/日级口径推算并标注边界提示",
+        "title": "Birth Time Unknown",
+        "type": "boolean"
       },
       "birth_timezone": {
         "anyOf": [
@@ -391,8 +405,7 @@
     "required": [
       "birth_year",
       "birth_month",
-      "birth_day",
-      "birth_hour"
+      "birth_day"
     ],
     "title": "TimingAnalysisRequest",
     "type": "object"

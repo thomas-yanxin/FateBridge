@@ -138,6 +138,7 @@ class JinkouNatalCourse(PartialOutput):
 class Jinkou(JinkouCourse):
     year_fate: JinkouYearFate | None = None
     natal_course: JinkouNatalCourse | None = None
+    birth_year_derivation: dict[str, Any] | None = None
 
     @model_validator(mode="after")
     def natal_course_keeps_analysis_facts(self) -> "Jinkou":

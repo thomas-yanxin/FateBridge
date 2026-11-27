@@ -704,6 +704,8 @@
       "liuren.four_lessons",
       "liuren.three_transmissions",
       "liuren.classification",
+      "liuren.patterns",
+      "liuren.overview",
       "liuren.kongwang",
       "liuren.xun_head",
       "liuren.guiren_order",
@@ -715,11 +717,13 @@
       "liuren.ruleset.id",
       "liuren.ruleset.version",
       "liuren.ruleset.source_title",
-      "liuren.ruleset.classical_conformance"
+      "liuren.ruleset.classical_conformance",
+      "liuren.birth_year_derivation"
     ],
     "liuren_yearly_timing": [
       "analysis_context",
       "four_pillars",
+      "coverage",
       "runyear",
       "liuren.month_general",
       "liuren.four_lessons",
@@ -760,7 +764,8 @@
       "jinkou.natal_course.missing_inputs",
       "jinkou.year_fate.status",
       "jinkou.year_fate.ganzhi",
-      "jinkou.year_fate.missing_inputs"
+      "jinkou.year_fate.missing_inputs",
+      "jinkou.birth_year_derivation"
     ],
     "bazi_compatibility": [
       "relationship_type",
@@ -1368,6 +1373,7 @@
     ],
     "sanshi_combined_chart": [
       "analysis_context",
+      "four_pillars",
       "taiyi.calendar_summary",
       "taiyi.core_board",
       "taiyi.pattern_summary",
@@ -1375,6 +1381,7 @@
       "qimen.ju_text",
       "qimen.zhifu",
       "qimen.zhishi",
+      "qimen.patterns",
       "qimen.stem_context.day",
       "qimen.stem_context.hour",
       "qimen.rule_profiles.god.id",
@@ -1389,7 +1396,8 @@
       "liuren.ruleset.source_title",
       "liuren.ruleset.classical_conformance",
       "liuren.ruleset.classical_acceptance_passed",
-      "synthesis.time_scopes"
+      "synthesis.time_scopes",
+      "synthesis.facts"
     ],
     "bazi_overview": [
       "four_pillars",
@@ -1512,10 +1520,13 @@
       "meihua.body_trigram.name",
       "meihua.use_trigram.name",
       "meihua.body_use_relation",
+      "meihua.body_use_summary",
+      "meihua.seasonal_strength",
       "meihua.stage_relations",
       "meihua.ruleset.id",
       "meihua.ruleset.version",
       "interpretation.interpretation_topic",
+      "interpretation.topic_reading",
       "interpretation.classical_text_reference",
       "summary"
     ],
@@ -1678,6 +1689,7 @@
     ],
     "sanshi_combined_chart": [
       "analysis_context",
+      "four_pillars",
       "taiyi.calendar_summary",
       "taiyi.core_board",
       "taiyi.pattern_summary",
@@ -1685,6 +1697,7 @@
       "qimen.ju_text",
       "qimen.zhifu",
       "qimen.zhishi",
+      "qimen.patterns",
       "qimen.stem_context.day",
       "qimen.stem_context.hour",
       "qimen.rule_profiles.god.id",
@@ -1699,7 +1712,8 @@
       "liuren.ruleset.source_title",
       "liuren.ruleset.classical_conformance",
       "liuren.ruleset.classical_acceptance_passed",
-      "synthesis.time_scopes"
+      "synthesis.time_scopes",
+      "synthesis.facts"
     ],
     "interpret_astrology_dice": [
       "method_id",
@@ -1850,10 +1864,13 @@
       "meihua.body_trigram.name",
       "meihua.use_trigram.name",
       "meihua.body_use_relation",
+      "meihua.body_use_summary",
+      "meihua.seasonal_strength",
       "meihua.stage_relations",
       "meihua.ruleset.id",
       "meihua.ruleset.version",
       "interpretation.interpretation_topic",
+      "interpretation.topic_reading",
       "interpretation.classical_text_reference",
       "summary"
     ],

@@ -62,7 +62,7 @@ async def call_contracts() -> list[dict[str, object]]:
             result = await client.call_tool("discover_tools", {"tool": spec.name})
             payload = result.structured_content
             assert payload is not None
-            contract = payload["tools"][0]
+            contract = payload
             record: dict[str, object] = {
                 "tool": spec.name,
                 "input": contract["input_schema"],

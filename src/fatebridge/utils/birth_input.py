@@ -58,7 +58,13 @@ class PersonInfo(BaseModel):
     )
     birth_month: int = Field(ge=1, le=12, description="出生月份 1-12")
     birth_day: int = Field(ge=1, le=31, description="出生日期 1-31")
-    birth_hour: int = Field(ge=0, le=23, description="出生时辰 0-23")
+    birth_hour: int | None = Field(
+        default=None, ge=0, le=23, description="出生时辰 0-23"
+    )
+    birth_time_unknown: bool = Field(
+        default=False,
+        description="明确声明出生时辰未知；仅在为 true 时允许省略 birth_hour",
+    )
     birth_minute: int = Field(default=0, ge=0, le=59, description="出生分钟 0-59")
     birth_second: int | None = Field(
         default=None,
@@ -107,11 +113,27 @@ class PersonInfo(BaseModel):
 
     @model_validator(mode="after")
     def seconds_require_minute(self) -> "PersonInfo":
-        if (
-            self.birth_second is not None
-            and "birth_minute" not in self.model_fields_set
-        ):
-            raise ValueError("birth_second需要显式提供birth_minute；不能替未知分钟填0")
+        if self.birth_time_unknown:
+            if (
+                self.birth_hour is not None
+                or "birth_minute" in self.model_fields_set
+                or self.birth_second is not None
+            ):
+                raise ValueError(
+                    "birth_time_unknown=True 时不能同时提供 birth_hour/birth_minute/birth_second"
+                )
+        else:
+            if self.birth_hour is None:
+                raise ValueError(
+                    "缺少出生时辰 birth_hour；如确实未知请显式设置 birth_time_unknown=True"
+                )
+            if (
+                self.birth_second is not None
+                and "birth_minute" not in self.model_fields_set
+            ):
+                raise ValueError(
+                    "birth_second需要显式提供birth_minute；不能替未知分钟填0"
+                )
         return self
 
 
@@ -119,11 +141,12 @@ def create_person_info(
     birth_year: int,
     birth_month: int,
     birth_day: int,
-    birth_hour: int,
+    birth_hour: int | None = None,
     name: str | None = "未提供",
     gender: str | None = "未知",
     birth_place: str | None = "未提供",
     *,
+    birth_time_unknown: bool = False,
     birth_minute: int | None = None,
     birth_second: int | None = None,
     birth_timezone: str | None = None,
@@ -163,6 +186,7 @@ def create_person_info(
         birth_month=birth_month,
         birth_day=birth_day,
         birth_hour=birth_hour,
+        birth_time_unknown=birth_time_unknown,
         gender=gender,
         birth_place=birth_place,
         birth_timezone=birth_timezone,

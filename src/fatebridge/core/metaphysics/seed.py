@@ -10,6 +10,7 @@ from fatebridge.core.almanac import (
     get_adjacent_solar_terms,
     localize_datetime,
 )
+from fatebridge.core.batch_cache import batch_cached, freeze_cache_value
 from fatebridge.core.bazi.calendar import BaZiCalendar
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.ziwei.calendar import birth_clock_receipt
@@ -163,6 +164,11 @@ def build_metaphysics_seed(
     )
 
 
+@batch_cached(
+    "metaphysics.build_analysis_seed",
+    lambda **kwargs: freeze_cache_value(kwargs),
+    copy_result=True,
+)
 def build_analysis_seed(
     *,
     analysis_year: int,

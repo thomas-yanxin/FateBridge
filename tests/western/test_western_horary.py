@@ -100,8 +100,14 @@ def test_horary_querent_is_ascendant_ruler_and_quesited_house_matches_topic() ->
     asc_sign = payload["ascendant"]["sign"]
     assert payload["significators"]["querent"]["planet"] == RULER_BY_SIGN[asc_sign]
     assert payload["quesited_house"] == HOUSE_BY_CATEGORY["marriage"] == 7
-    assert payload["perfection"]["status"] == "perfected_direct"
-    assert payload["perfection"]["perfected"] is True
+    # QUESTION has Mars & Venus changing signs before direct contact and 19 intervening hits.
+    assert payload["perfection"]["status"] == "post_ingress_contact_unverified"
+    assert payload["perfection"]["perfected"] is False
+    assert payload["perfection"]["before_ingress"] is False
+    assert payload["perfection"]["intervening_contacts_count"] == 19
+    assert payload["perfection"]["sequence_conditions_unverified"] is True
+    assert payload["fortitudes"]["row_catalog"]
+    assert payload["fortitudes"]["include_inactive_rows"] is False
 
 
 def test_horary_unknown_category_is_rejected() -> None:

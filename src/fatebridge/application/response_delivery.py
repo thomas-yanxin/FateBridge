@@ -18,13 +18,26 @@ _BLOAT_KEYS = frozenset(
 
 def _strip_audit_bloat(value: JsonValue) -> JsonValue:
     if isinstance(value, dict):
-        return {
-            key: _strip_audit_bloat(item)
-            for key, item in value.items()
-            if key not in _BLOAT_KEYS
-        }
+        changed = False
+        cleaned: dict[str, JsonValue] = {}
+        for key, item in value.items():
+            if key in _BLOAT_KEYS:
+                changed = True
+                continue
+            next_item = _strip_audit_bloat(item)
+            if next_item is not item:
+                changed = True
+            cleaned[key] = next_item
+        return cleaned if changed else value
     if isinstance(value, list):
-        return [_strip_audit_bloat(item) for item in value]
+        changed = False
+        items: list[JsonValue] = []
+        for item in value:
+            next_item = _strip_audit_bloat(item)
+            if next_item is not item:
+                changed = True
+            items.append(next_item)
+        return items if changed else value
     return value
 
 
@@ -62,17 +75,17 @@ def deliver_response(
             payload = spec.compact_view(payload)
             if metadata is not None and "run_metadata" not in payload:
                 payload = {**payload, "run_metadata": metadata}
-        default_fields = compact_fields(spec)
-        if default_fields:
-            payload = project_present_fields(payload, default_fields)
+        else:
+            default_fields = compact_fields(spec)
+            if default_fields:
+                payload = project_present_fields(payload, default_fields)
 
     if detail == "compact":
         requested = {part for path in fields or () for part in path.split(".")}
         if spec is not None and spec.detail_view is not None:
             payload = spec.detail_view(payload, detail, requested)
         metadata = payload.get("run_metadata")
-        if "run_metadata" not in requested and metadata:
-            assert isinstance(metadata, dict)
+        if "run_metadata" not in requested and isinstance(metadata, dict) and metadata:
             payload = {
                 **payload,
                 "run_metadata": {

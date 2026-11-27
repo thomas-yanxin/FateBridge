@@ -69,6 +69,7 @@ PERSON_FIELDS = frozenset(
         "birth_month",
         "birth_day",
         "birth_hour",
+        "birth_time_unknown",
         "name",
         "gender",
         "birth_place",
@@ -96,6 +97,7 @@ def _build_person(
         "birth_month": data.get(f"{prefix}birth_month"),
         "birth_day": data.get(f"{prefix}birth_day"),
         "birth_hour": data.get(f"{prefix}birth_hour"),
+        "birth_time_unknown": bool(data.get(f"{prefix}birth_time_unknown", False)),
         "gender": data.get(f"{prefix}gender", "未知"),
         "birth_place": data.get(f"{prefix}birth_place", "未提供"),
         "birth_timezone": data.get(f"{prefix}birth_timezone"),
@@ -126,7 +128,11 @@ def bind_person(
     forwarded_person_fields = PERSON_FIELDS.difference(also_pass)
 
     def bind(request: BaseModel) -> BoundServiceCall:
-        arguments: dict[str, ServiceInput] = request.model_dump()
+        arguments: dict[str, ServiceInput] = (
+            dict(request.service_inputs())
+            if isinstance(request, ServiceInputProvider)
+            else request.model_dump()
+        )
         person = _build_person(
             arguments,
             true_solar_explicit="use_true_solar_time" in request.model_fields_set,
@@ -153,7 +159,11 @@ def bind_pair(
     """Bind each person with independent clock presence."""
 
     def bind(request: BaseModel) -> BoundServiceCall:
-        arguments: dict[str, ServiceInput] = request.model_dump()
+        arguments: dict[str, ServiceInput] = (
+            dict(request.service_inputs())
+            if isinstance(request, ServiceInputProvider)
+            else request.model_dump()
+        )
         supplied_fields = request.model_fields_set
         person1 = _build_person(
             arguments,

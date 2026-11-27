@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import difflib
 import logging
-from collections.abc import Collection, Sequence
+import types
+from collections.abc import Collection, Mapping, Sequence
 from functools import wraps
 from traceback import walk_tb
-from typing import Any, Callable, ParamSpec
+from typing import Annotated, Any, Callable, ParamSpec, Union, get_args, get_origin
 
 from pydantic import BaseModel, ValidationError
 from pydantic_core import ErrorDetails, PydanticCustomError
@@ -310,15 +311,101 @@ class ParameterError(ValueError):
         }
 
 
+_EXTRA_FIELD_SYNONYMS: dict[str, tuple[str, ...]] = {
+    "params": ("arguments", "defaults", "context"),
+    "input": ("arguments", "context", "subjects"),
+    "payload": ("arguments", "context", "calls"),
+    "args": ("arguments",),
+    "kwargs": ("arguments",),
+    "birth_place_name": ("birth_place",),
+    "place_name": ("place", "analysis_place", "birth_place"),
+    "tz": ("timezone", "analysis_timezone", "birth_timezone", "timezone_name"),
+    "lon": ("longitude", "analysis_longitude", "birth_longitude"),
+    "lng": ("longitude", "analysis_longitude", "birth_longitude"),
+    "lat": ("latitude", "analysis_latitude", "birth_latitude"),
+}
+
+
+def _expand_cursor_types(annotation: object) -> list[object]:
+    """Expand Annotated and Union wrappers into concrete candidate types."""
+    origin = get_origin(annotation)
+    if origin is Annotated:
+        return _expand_cursor_types(get_args(annotation)[0])
+    if origin in (Union, types.UnionType):
+        expanded: list[object] = []
+        for arg in get_args(annotation):
+            if arg is not type(None):
+                expanded.extend(_expand_cursor_types(arg))
+        return expanded
+    return [annotation]
+
+
+def _resolve_model_fields_at_loc(
+    root_model: type[BaseModel] | None,
+    loc: tuple[str | int, ...],
+) -> set[str] | None:
+    """Walk Pydantic error location path to recover allowed fields of the failing container model."""
+    if root_model is None:
+        return None
+    cursor_types: list[object] = [root_model]
+    for part in loc[:-1]:
+        next_types: list[object] = []
+        expanded_cursor: list[object] = []
+        for candidate in cursor_types:
+            expanded_cursor.extend(_expand_cursor_types(candidate))
+        for candidate in expanded_cursor:
+            if isinstance(part, int):
+                origin = get_origin(candidate)
+                if origin in (list, Sequence, set, frozenset):
+                    args = get_args(candidate)
+                    if args:
+                        next_types.append(args[0])
+                elif origin is tuple:
+                    args = get_args(candidate)
+                    if len(args) == 2 and args[1] is Ellipsis:
+                        next_types.append(args[0])
+                    elif 0 <= part < len(args):
+                        next_types.append(args[part])
+                continue
+            part_str = str(part)
+            if isinstance(candidate, type) and issubclass(candidate, BaseModel):
+                field_info = candidate.model_fields.get(part_str)
+                if field_info is None:
+                    for candidate_field in candidate.model_fields.values():
+                        if candidate_field.alias == part_str:
+                            field_info = candidate_field
+                            break
+                if field_info is not None and field_info.annotation is not None:
+                    next_types.append(field_info.annotation)
+                continue
+            origin = get_origin(candidate)
+            if origin in (dict, Mapping):
+                args = get_args(candidate)
+                if len(args) == 2:
+                    next_types.append(args[1])
+        if not next_types:
+            return None
+        cursor_types = next_types
+
+    fields: set[str] = set()
+    for candidate in cursor_types:
+        for concrete in _expand_cursor_types(candidate):
+            if isinstance(concrete, type) and issubclass(concrete, BaseModel):
+                fields.update(concrete.model_fields.keys())
+    return fields or None
+
+
 def validation_error_result(
     error: ValidationError,
     *,
     allowed_fields: Collection[str] | None = None,
+    root_model: type[BaseModel] | None = None,
 ) -> dict[str, Any]:
     """Return validator feedback to the caller without attaching the input body."""
     return validation_issues_result(
         error.errors(include_input=False, include_url=False),
         allowed_fields=allowed_fields,
+        root_model=root_model,
     )
 
 
@@ -326,6 +413,7 @@ def validation_issues_result(
     entries: Sequence[ErrorDetails],
     *,
     allowed_fields: Collection[str] | None = None,
+    root_model: type[BaseModel] | None = None,
 ) -> dict[str, Any]:
     # note (Pydantic): Keep typed native source faults carried in ctx.error.
     if not any(item["type"] == "consultation_restricted" for item in entries):
@@ -370,17 +458,28 @@ def validation_issues_result(
             )
             if key in context
         }
-        if (
-            code == "extra_forbidden"
-            and allowed_fields
-            and len(loc) == 1
-            and "suggestions" not in constraints
-        ):
-            suggestions = difflib.get_close_matches(
-                str(loc[0]), sorted(allowed_fields), n=5, cutoff=0.6
-            )
-            if suggestions:
-                constraints["suggestions"] = suggestions
+        if code == "extra_forbidden" and loc:
+            target_fields = _resolve_model_fields_at_loc(root_model, tuple(loc))
+            if target_fields is None and allowed_fields and len(loc) == 1:
+                target_fields = set(allowed_fields)
+            if target_fields:
+                sorted_fields = sorted(target_fields)
+                constraints["allowed_fields"] = sorted_fields
+                if "suggestions" not in constraints:
+                    unknown_name = str(loc[-1])
+                    synonym_hits = [
+                        candidate
+                        for candidate in _EXTRA_FIELD_SYNONYMS.get(
+                            unknown_name.lower(), ()
+                        )
+                        if candidate in target_fields
+                    ]
+                    fuzzy_hits = difflib.get_close_matches(
+                        unknown_name, sorted_fields, n=5, cutoff=0.5
+                    )
+                    suggestions = list(dict.fromkeys([*synonym_hits, *fuzzy_hits]))[:5]
+                    if suggestions:
+                        constraints["suggestions"] = suggestions
         if field := context.get("path"):
             path = f"{path}.{field}" if path else field
         issue_message = item["msg"]
@@ -426,10 +525,13 @@ def handle_calculation_error(
     operation: str,
     *,
     allowed_fields: Collection[str] | None = None,
+    root_model: type[BaseModel] | None = None,
 ) -> dict[str, Any]:
     """Return caller diagnostics and log only exception identity and stack locations."""
     if isinstance(error, ValidationError):
-        return validation_error_result(error, allowed_fields=allowed_fields)
+        return validation_error_result(
+            error, allowed_fields=allowed_fields, root_model=root_model
+        )
     if isinstance(error, ParameterError):
         return error.as_result()
     if isinstance(error, DomainSourceError):

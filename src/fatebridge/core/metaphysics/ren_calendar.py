@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from functools import lru_cache
 from typing import Any, Literal
 
@@ -12,10 +12,12 @@ from fatebridge.core.almanac import (
     SolarTerm,
     get_adjacent_solar_terms,
     get_bazi_month_boundaries,
+    get_lunar_context,
     get_solar_terms_for_year,
     is_calculated_solar_term,
 )
 from fatebridge.core.astro import time_scales, utc_policy
+from fatebridge.core.bazi.calendar import BaZiCalendar, get_bazi_year
 from fatebridge.core.ephemeris_runtime import ephemeris_call
 from fatebridge.core.metaphysics.common import (
     SEXAGENARY_CYCLE,
@@ -27,7 +29,7 @@ from fatebridge.core.metaphysics.hko_term_dates import published_date_reference
 from fatebridge.core.solar_term_runtime import loaded_clock_profile_key
 from fatebridge.utils.civil_clock import format_utc_offset, resolve_civil_clock
 from fatebridge.utils.civil_time import NominalClockLabel, UTCCalendar, utc_calendar
-from fatebridge.utils.errors import EphemerisSourceError
+from fatebridge.utils.errors import EphemerisSourceError, ParameterError
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE, resolve_birth_place_context
 from fatebridge.utils.timezones import timezone_rules_metadata
 
@@ -464,3 +466,93 @@ def liuren_annotation_note(day_ganzhi: str, gan_upper: str) -> dict[str, Any] | 
         "kind": kind,
         "explanation": explanation,
     }
+
+
+def _year_ganzhi_for_nominal_year(year: int) -> tuple[str, str]:
+    ganzhi = SEXAGENARY_CYCLE[(year - 1984) % 60]
+    return ganzhi, ganzhi[1]
+
+
+def derive_birth_year_fate_from_date(
+    birth_date: str,
+    analysis_date: date,
+    *,
+    boundary: Literal["lunar_new_year", "lichun"] = "lunar_new_year",
+    timezone_name: str = DEFAULT_BIRTH_TIMEZONE,
+) -> dict[str, Any]:
+    """Derive birth year ganzhi, natal branch, and nominal age with CNY-vs-Lichun check."""
+    try:
+        birth_d = date.fromisoformat(birth_date)
+    except ValueError as exc:
+        raise ParameterError(
+            f"无效的 birth_date: {birth_date}",
+            [{"path": "birth_date", "code": "invalid_birth_date"}],
+        ) from exc
+    if birth_d > analysis_date:
+        raise ParameterError(
+            "birth_date 不能晚于起课日期",
+            [{"path": "birth_date", "code": "birth_after_analysis"}],
+        )
+
+    birth_noon = datetime(birth_d.year, birth_d.month, birth_d.day, 12, 0, 0)
+    analysis_noon = datetime(
+        analysis_date.year, analysis_date.month, analysis_date.day, 12, 0, 0
+    )
+
+    birth_lunar = get_lunar_context(birth_noon, timezone_name=timezone_name)
+    analysis_lunar = get_lunar_context(analysis_noon, timezone_name=timezone_name)
+    raw_birth_lunar_year = (
+        birth_lunar.get("year") if isinstance(birth_lunar, dict) else None
+    )
+    if not isinstance(raw_birth_lunar_year, int):
+        raise ParameterError(
+            "birth_date 超出农历支持区间（1900-01-01 至 2100-12-31）",
+            [{"path": "birth_date", "code": "unsupported_calendar_date"}],
+        )
+    raw_analysis_lunar_year = (
+        analysis_lunar.get("year") if isinstance(analysis_lunar, dict) else None
+    )
+    if not isinstance(raw_analysis_lunar_year, int):
+        raise ParameterError(
+            "起课日期超出农历支持区间（1900-01-01 至 2100-12-31）",
+            [{"path": "analysis_year", "code": "unsupported_calendar_date"}],
+        )
+
+    lny_birth_year = raw_birth_lunar_year
+    lny_analysis_year = raw_analysis_lunar_year
+    lny_ganzhi, lny_branch = _year_ganzhi_for_nominal_year(lny_birth_year)
+    lny_age = lny_analysis_year - lny_birth_year + 1
+
+    lc_birth_year = get_bazi_year(birth_noon, timezone_name)
+    lc_analysis_year = get_bazi_year(analysis_noon, timezone_name)
+    lc_ganzhi, lc_branch = _year_ganzhi_for_nominal_year(lc_birth_year)
+    lc_age = lc_analysis_year - lc_birth_year + 1
+
+    lny_record = {
+        "boundary": "lunar_new_year",
+        "birth_year": lny_birth_year,
+        "birth_year_ganzhi": lny_ganzhi,
+        "natal_branch": lny_branch,
+        "year_fate_age": lny_age,
+    }
+    lc_record = {
+        "boundary": "lichun",
+        "birth_year": lc_birth_year,
+        "birth_year_ganzhi": lc_ganzhi,
+        "natal_branch": lc_branch,
+        "year_fate_age": lc_age,
+    }
+    primary = lny_record if boundary == "lunar_new_year" else lc_record
+    alternate = lc_record if boundary == "lunar_new_year" else lny_record
+    disagreement = lny_ganzhi != lc_ganzhi or lny_age != lc_age
+    payload: dict[str, Any] = {
+        "birth_date": birth_d.isoformat(),
+        "boundary": boundary,
+        "birth_year_ganzhi": primary["birth_year_ganzhi"],
+        "natal_branch": primary["natal_branch"],
+        "year_fate_age": primary["year_fate_age"],
+        "boundary_disagreement": disagreement,
+    }
+    if disagreement:
+        payload["alternate_boundary"] = alternate
+    return payload

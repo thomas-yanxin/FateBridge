@@ -24,6 +24,7 @@ from pydantic_core import PydanticCustomError
 from fatebridge.application.execution import execute_with_receipt, result_is_error
 from fatebridge.application.response_delivery import deliver_response
 from fatebridge.application.tool_spec import DetailLevel, ToolSpec
+from fatebridge.core.batch_cache import batch_cache_scope
 from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.utils.errors import (
     ParameterError,
@@ -34,7 +35,214 @@ from fatebridge.utils.errors import (
 MAX_BATCH_CALLS = 32
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _TIME_RE = re.compile(r"^(\d{2}):(\d{2})(?::(\d{2}))?$")
+_DATETIME_RE = re.compile(
+    r"^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?(Z|[+-]\d{2}:\d{2}(?::\d{2})?)?$"
+)
+_SOLAR_CLOCK_BASES = frozenset({"local_mean_solar", "local_apparent_solar"})
 _UNION_ORIGINS = (types.UnionType, get_origin(Annotated[int, "u"] | None))
+
+
+class AnalysisContext(BaseModel):
+    """Shared analysis clock and location context."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    analysis_datetime: str | None = Field(
+        default=None, description="YYYY-MM-DDTHH:MM[:SS][±HH:MM]"
+    )
+    date: str | None = None
+    time: str | None = None
+    year: int | None = None
+    month: int | None = Field(default=None, ge=1, le=12)
+    day: int | None = Field(default=None, ge=1, le=31)
+    hour: int | None = Field(default=None, ge=0, le=23)
+    minute: int | None = Field(default=None, ge=0, le=59)
+    second: int | None = Field(default=None, ge=0, le=59)
+    place: str | None = Field(default=None, description="分析地点")
+    timezone: str | None = None
+    utc_offset: str | None = None
+    longitude: float | None = Field(default=None, ge=-180, le=180)
+    latitude: float | None = Field(default=None, ge=-90, le=90)
+    use_true_solar_time: bool | None = None
+
+    @model_validator(mode="after")
+    def _normalize_clock_and_place(self) -> AnalysisContext:
+        if self.analysis_datetime is not None:
+            dt_match = _DATETIME_RE.fullmatch(self.analysis_datetime.strip())
+            if dt_match is None:
+                raise PydanticCustomError(
+                    "invalid_analysis_datetime",
+                    "analysis_datetime 须为 YYYY-MM-DDTHH:MM[:SS][±HH:MM] 格式",
+                    {"path": "analysis_datetime"},
+                )
+            y_s, m_s, d_s, h_s, mi_s, s_s, offset_s = dt_match.groups()
+            date_str = f"{y_s}-{m_s}-{d_s}"
+            time_str = f"{h_s}:{mi_s}:{s_s}" if s_s is not None else f"{h_s}:{mi_s}"
+            try:
+                date.fromisoformat(date_str)
+            except ValueError as exc:
+                raise PydanticCustomError(
+                    "invalid_calendar_date",
+                    "analysis_datetime 不是有效的公历日期",
+                    {"path": "analysis_datetime"},
+                ) from exc
+            hour_i, min_i = int(h_s), int(mi_s)
+            sec_i = int(s_s) if s_s is not None else None
+            if not (0 <= hour_i <= 23 and 0 <= min_i <= 59) or (
+                sec_i is not None and not 0 <= sec_i <= 59
+            ):
+                raise PydanticCustomError(
+                    "invalid_analysis_time",
+                    "analysis_datetime 超出有效时分秒范围",
+                    {"path": "analysis_datetime"},
+                )
+            if self.date is None:
+                self.date = date_str
+            elif self.date != date_str:
+                raise PydanticCustomError(
+                    "conflicting_analysis_datetime",
+                    "analysis_datetime 与 date 不一致",
+                    {"path": "analysis_datetime"},
+                )
+            if self.time is None:
+                self.time = time_str
+            elif self.time != time_str:
+                raise PydanticCustomError(
+                    "conflicting_analysis_datetime",
+                    "analysis_datetime 与 time 不一致",
+                    {"path": "analysis_datetime"},
+                )
+            if offset_s is not None:
+                norm_offset = "+00:00" if offset_s == "Z" else offset_s
+                if self.utc_offset is None:
+                    self.utc_offset = norm_offset
+                elif self.utc_offset != norm_offset:
+                    raise PydanticCustomError(
+                        "conflicting_analysis_offset",
+                        "analysis_datetime 偏移与 utc_offset 不一致",
+                        {"path": "utc_offset"},
+                    )
+                if self.timezone is None:
+                    self.timezone = norm_offset
+
+        if self.date is not None:
+            if not _DATE_RE.fullmatch(self.date):
+                raise PydanticCustomError(
+                    "invalid_analysis_date_format",
+                    "context.date 须为 YYYY-MM-DD 格式",
+                    {"path": "date"},
+                )
+            try:
+                parsed_date = date.fromisoformat(self.date)
+            except ValueError as exc:
+                raise PydanticCustomError(
+                    "invalid_calendar_date",
+                    "context.date 不是有效的公历日期",
+                    {"path": "date"},
+                ) from exc
+            if self.year is None:
+                self.year = parsed_date.year
+            elif self.year != parsed_date.year:
+                raise PydanticCustomError(
+                    "conflicting_analysis_date",
+                    "context.date 与 year 不一致",
+                    {"path": "date"},
+                )
+            if self.month is None:
+                self.month = parsed_date.month
+            elif self.month != parsed_date.month:
+                raise PydanticCustomError(
+                    "conflicting_analysis_date",
+                    "context.date 与 month 不一致",
+                    {"path": "date"},
+                )
+            if self.day is None:
+                self.day = parsed_date.day
+            elif self.day != parsed_date.day:
+                raise PydanticCustomError(
+                    "conflicting_analysis_date",
+                    "context.date 与 day 不一致",
+                    {"path": "date"},
+                )
+        elif (
+            self.year is not None
+            and self.month is not None
+            and self.day is not None
+            and 1 <= self.year <= 9999
+        ):
+            try:
+                date(self.year, self.month, self.day)
+            except ValueError as exc:
+                raise PydanticCustomError(
+                    "invalid_calendar_date",
+                    "context 年月日不是有效的公历日期",
+                    {"path": "date"},
+                ) from exc
+
+        if self.time is not None:
+            t_match = _TIME_RE.fullmatch(self.time)
+            if t_match is None:
+                raise PydanticCustomError(
+                    "invalid_analysis_time_format",
+                    "context.time 须为 HH:MM 或 HH:MM:SS 格式",
+                    {"path": "time"},
+                )
+            hour_i = int(t_match.group(1))
+            min_i = int(t_match.group(2))
+            sec_i = int(t_match.group(3)) if t_match.group(3) is not None else None
+            if not (0 <= hour_i <= 23 and 0 <= min_i <= 59) or (
+                sec_i is not None and not 0 <= sec_i <= 59
+            ):
+                raise PydanticCustomError(
+                    "invalid_analysis_time",
+                    "context.time 超出有效时分秒范围",
+                    {"path": "time"},
+                )
+            if self.hour is None:
+                self.hour = hour_i
+            elif self.hour != hour_i:
+                raise PydanticCustomError(
+                    "conflicting_analysis_time",
+                    "context.time 与 hour 不一致",
+                    {"path": "time"},
+                )
+            if self.minute is None:
+                self.minute = min_i
+            elif self.minute != min_i:
+                raise PydanticCustomError(
+                    "conflicting_analysis_time",
+                    "context.time 与 minute 不一致",
+                    {"path": "time"},
+                )
+            if sec_i is not None:
+                if self.second is None:
+                    self.second = sec_i
+                elif self.second != sec_i:
+                    raise PydanticCustomError(
+                        "conflicting_analysis_time",
+                        "context.time 与 second 不一致",
+                        {"path": "time"},
+                    )
+
+        place_text = (self.place or "").strip()
+        if (
+            place_text
+            and place_text != "未提供"
+            and (
+                self.longitude is None or self.latitude is None or self.timezone is None
+            )
+        ):
+            from fatebridge.utils.places import resolve_place_location
+
+            resolved = resolve_place_location(place_text, place_field="place")
+            if self.longitude is None:
+                self.longitude = resolved.longitude
+            if self.latitude is None:
+                self.latitude = resolved.latitude
+            if self.timezone is None and resolved.timezone is not None:
+                self.timezone = resolved.timezone
+
+        return self
 
 
 class SubjectProfile(BaseModel):
@@ -42,50 +250,23 @@ class SubjectProfile(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    name: str | None = Field(default=None, description="姓名或对象标签")
-    gender: Literal["male", "female", "男", "女"] | None = Field(
-        default=None, description="性别：male/female 或 男/女"
-    )
-    birth_year: int | None = Field(default=None, description="出生公历年")
-    birth_month: int | None = Field(
-        default=None, ge=1, le=12, description="出生公历月（1-12）"
-    )
-    birth_day: int | None = Field(
-        default=None, ge=1, le=31, description="出生公历日（1-31）"
-    )
-    birth_hour: int | None = Field(
-        default=None, ge=0, le=23, description="出生时（0-23）"
-    )
-    birth_minute: int | None = Field(
-        default=None, ge=0, le=59, description="出生分（0-59）"
-    )
-    birth_second: int | None = Field(
-        default=None, ge=0, le=59, description="出生秒（0-59）"
-    )
-    birth_date: str | None = Field(
-        default=None,
-        description="出生公历日期（YYYY-MM-DD）；省略 birth_year 时自动解析为年月日",
-    )
-    birth_time: str | None = Field(
-        default=None,
-        description="出生当地钟时（HH:MM 或 HH:MM:SS）；省略 birth_hour 时自动解析为时分秒",
-    )
-    birth_place: str | None = Field(default=None, description="出生地点")
-    birth_longitude: float | None = Field(
-        default=None, ge=-180, le=180, description="出生经度（度）"
-    )
-    birth_latitude: float | None = Field(
-        default=None, ge=-90, le=90, description="出生纬度（度）"
-    )
-    birth_utc_offset: str | None = Field(
-        default=None, description="已确认的出生民用 UTC 偏移（如 +08:00）"
-    )
-    timezone: str | None = Field(
-        default=None, description="出生或分析时区（IANA 名称或 UTC 偏移）"
-    )
-    use_true_solar_time: bool | None = Field(
-        default=None, description="是否启用真太阳时校正"
-    )
+    name: str | None = None
+    gender: Literal["male", "female", "男", "女"] | None = None
+    birth_year: int | None = None
+    birth_month: int | None = Field(default=None, ge=1, le=12)
+    birth_day: int | None = Field(default=None, ge=1, le=31)
+    birth_hour: int | None = Field(default=None, ge=0, le=23)
+    birth_minute: int | None = Field(default=None, ge=0, le=59)
+    birth_second: int | None = Field(default=None, ge=0, le=59)
+    birth_date: str | None = Field(default=None, description="YYYY-MM-DD")
+    birth_time: str | None = Field(default=None, description="HH:MM[:SS]")
+    birth_place: str | None = None
+    birth_longitude: float | None = Field(default=None, ge=-180, le=180)
+    birth_latitude: float | None = Field(default=None, ge=-90, le=90)
+    birth_utc_offset: str | None = None
+    timezone: str | None = None
+    birth_time_unknown: bool | None = Field(default=None, description="未知时辰")
+    use_true_solar_time: bool | None = None
 
     @model_validator(mode="after")
     def _parse_and_validate_birth_clock(self) -> SubjectProfile:
@@ -215,26 +396,15 @@ class BatchCall(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    id: str | None = Field(default=None, description="可选调用标识，原样回传到结果项")
-    tool: str = Field(min_length=1, description="要调用的公开工具名")
-    subject: str | None = Field(
-        default=None, description="单对象工具引用的 subject 键名"
-    )
+    id: str | None = None
+    tool: str = Field(min_length=1, description="工具名")
+    subject: str | None = Field(default=None, description="单对象键")
     subjects: list[str] | None = Field(
-        default=None,
-        min_length=1,
-        description="多对象或合盘工具引用的 subject 键名列表",
+        default=None, min_length=1, description="多对象键"
     )
-    arguments: dict[str, object] = Field(
-        default_factory=dict,
-        description="显式工具参数，优先级高于 subject(s) 与 defaults",
-    )
-    detail: DetailLevel | None = Field(
-        default=None, description="覆盖批量默认 detail（compact 或 audit）"
-    )
-    fields: list[str] | None = Field(
-        default=None, description="仅返回选定的业务字段或点号子路径"
-    )
+    arguments: dict[str, object] = Field(default_factory=dict, description="工具参数")
+    detail: DetailLevel | None = None
+    fields: list[str] | None = None
 
     @model_validator(mode="after")
     def _reject_both_subject_forms(self) -> BatchCall:
@@ -254,6 +424,10 @@ class BatchRequest(BaseModel):
 
     subjects: dict[str, SubjectProfile] = Field(
         default_factory=dict, description="共享对象档案字典，供 calls 引用"
+    )
+    context: AnalysisContext | None = Field(
+        default=None,
+        description="跨工具共享的问事/分析时刻与地点上下文，按目标工具契约自动映射",
     )
     defaults: dict[str, object] = Field(
         default_factory=dict,
@@ -398,6 +572,8 @@ def _map_subject_with_prefix(
         f"{prefix}birth_hour": profile.birth_hour,
         f"{prefix}birth_minute": profile.birth_minute,
         f"{prefix}birth_second": profile.birth_second,
+        f"{prefix}birth_date": _subject_date_string(profile),
+        f"{prefix}birth_time_unknown": profile.birth_time_unknown,
         f"{prefix}birth_place": profile.birth_place,
         f"{prefix}birth_longitude": profile.birth_longitude,
         f"{prefix}birth_latitude": profile.birth_latitude,
@@ -429,6 +605,7 @@ def _map_single_subject(
             "name": profile.name,
             "date": date_text,
             "time": time_text,
+            "place": profile.birth_place,
             "timezone": profile.timezone,
             "longitude": profile.birth_longitude,
             "latitude": profile.birth_latitude,
@@ -544,18 +721,121 @@ def _map_multi_subjects(
     )
 
 
+def _context_date_string(context: AnalysisContext) -> str | None:
+    if context.date is not None:
+        return context.date
+    if (
+        context.year is not None
+        and context.month is not None
+        and context.day is not None
+    ):
+        return f"{context.year:04d}-{context.month:02d}-{context.day:02d}"
+    return None
+
+
+def _context_time_string(context: AnalysisContext) -> str | None:
+    if context.time is not None:
+        return context.time
+    if context.hour is not None:
+        minute = context.minute if context.minute is not None else 0
+        if context.second is not None:
+            return f"{context.hour:02d}:{minute:02d}:{context.second:02d}"
+        return f"{context.hour:02d}:{minute:02d}"
+    return None
+
+
+def _map_analysis_context(
+    context: AnalysisContext,
+    target_fields: Mapping[str, FieldInfo],
+    *,
+    is_birth_date_mapped: bool,
+    explicit_args: Mapping[str, object],
+    defaults: Mapping[str, object],
+) -> dict[str, object]:
+    """Map shared AnalysisContext clock and location fields to a tool's contract."""
+    mapped: dict[str, object] = {}
+    candidate_values: dict[str, object | None] = {
+        "analysis_year": context.year,
+        "analysis_month": context.month,
+        "analysis_day": context.day,
+        "analysis_hour": context.hour,
+        "analysis_minute": context.minute,
+        "analysis_second": context.second,
+        "analysis_place": context.place,
+        "analysis_timezone": context.timezone,
+        "analysis_utc_offset": context.utc_offset,
+        "analysis_longitude": context.longitude,
+        "analysis_latitude": context.latitude,
+        "question_year": context.year,
+        "question_month": context.month,
+        "question_day": context.day,
+        "question_hour": context.hour,
+        "question_minute": context.minute,
+        "question_second": context.second,
+        "candidate_year": context.year,
+        "candidate_month": context.month,
+        "candidate_day": context.day,
+        "candidate_hour": context.hour,
+        "candidate_minute": context.minute,
+        "candidate_second": context.second,
+    }
+    if not is_birth_date_mapped:
+        candidate_values.update(
+            {
+                "date": _context_date_string(context),
+                "time": _context_time_string(context),
+                "place": context.place,
+                "timezone": context.timezone,
+                "longitude": context.longitude,
+                "latitude": context.latitude,
+                "use_true_solar_time": context.use_true_solar_time,
+            }
+        )
+        clock_basis = (
+            explicit_args.get("question_clock_basis")
+            or explicit_args.get("candidate_clock_basis")
+            or defaults.get("question_clock_basis")
+            or defaults.get("candidate_clock_basis")
+        )
+        if not (isinstance(clock_basis, str) and clock_basis in _SOLAR_CLOCK_BASES):
+            candidate_values["timezone_name"] = context.timezone
+
+    for key, value in candidate_values.items():
+        if key in target_fields and value is not None:
+            mapped[key] = value
+    return mapped
+
+
 def resolve_call_arguments(
     spec: ToolSpec,
     call: BatchCall,
     *,
     subjects: Mapping[str, SubjectProfile],
     defaults: Mapping[str, object],
+    context: AnalysisContext | None = None,
 ) -> dict[str, object]:
-    """Resolve tool arguments with precedence defaults < subject(s) < call.arguments."""
+    """Resolve tool arguments with precedence defaults < context < subject(s) < call.arguments."""
     model_fields = spec.request_model.model_fields
     resolved: dict[str, object] = {
         key: deepcopy(value) for key, value in defaults.items() if key in model_fields
     }
+
+    if context is not None:
+        is_birth_date_mapped = (
+            (call.subject is not None or call.subjects is not None)
+            and "date" in model_fields
+            and "birth_year" not in model_fields
+            and "analysis_year" not in model_fields
+        )
+        resolved.update(
+            _map_analysis_context(
+                context,
+                model_fields,
+                is_birth_date_mapped=is_birth_date_mapped,
+                explicit_args=call.arguments,
+                defaults=defaults,
+            )
+        )
 
     available = sorted(subjects)
     if call.subjects is not None:
@@ -672,42 +952,100 @@ def execute_batch(
     results: list[JsonValue] = []
     succeeded = 0
     failed = 0
+    raw_call_cache: dict[tuple[str, str, str, str], dict[str, JsonValue]] = {}
 
-    for call in request.calls:
-        spec = specs_by_name.get(call.tool)
-        if spec is None:
-            failed += 1
-            results.append(
-                {
-                    "id": call.id,
-                    "tool": call.tool,
-                    "ok": False,
-                    "error": _unknown_tool_error(call.tool, allowed_tools),
-                }
-            )
-            if request.stop_on_error:
-                break
-            continue
-
-        try:
-            call_detail = call.detail if call.detail is not None else request.detail
-            options = ExecutionOptions.model_validate(
-                {"as_of": shared_as_of, "detail": call_detail}
-            )
-            resolved_args = resolve_call_arguments(
-                spec,
-                call,
-                subjects=request.subjects,
-                defaults=request.defaults,
-            )
-            tool_request = spec.request_model.model_validate(resolved_args)
-            raw_result = execute_with_receipt(
-                spec,
-                tool_request,
-                options=options,
-            )
-            if result_is_error(raw_result):
+    with batch_cache_scope():
+        for call in request.calls:
+            spec = specs_by_name.get(call.tool)
+            if spec is None:
                 failed += 1
+                results.append(
+                    {
+                        "id": call.id,
+                        "tool": call.tool,
+                        "ok": False,
+                        "error": _unknown_tool_error(call.tool, allowed_tools),
+                    }
+                )
+                if request.stop_on_error:
+                    break
+                continue
+
+            try:
+                call_detail = call.detail if call.detail is not None else request.detail
+                options = ExecutionOptions.model_validate(
+                    {"as_of": shared_as_of, "detail": call_detail}
+                )
+                resolved_args = resolve_call_arguments(
+                    spec,
+                    call,
+                    subjects=request.subjects,
+                    defaults=request.defaults,
+                    context=request.context,
+                )
+                tool_request = spec.request_model.model_validate(resolved_args)
+                is_cacheable = (
+                    "seed" not in spec.request_model.model_fields
+                    or "seed" in tool_request.model_fields_set
+                )
+                cache_key = (
+                    spec.name,
+                    tool_request.model_dump_json(),
+                    options.detail,
+                    shared_as_of,
+                )
+                if is_cacheable and cache_key in raw_call_cache:
+                    raw_result = deepcopy(raw_call_cache[cache_key])
+                else:
+                    raw_result = execute_with_receipt(
+                        spec,
+                        tool_request,
+                        options=options,
+                    )
+                    if is_cacheable and not result_is_error(raw_result):
+                        raw_call_cache[cache_key] = deepcopy(raw_result)
+                if result_is_error(raw_result):
+                    failed += 1
+                    results.append(
+                        {
+                            "id": call.id,
+                            "tool": call.tool,
+                            "ok": False,
+                            "error": cast(
+                                JsonValue,
+                                error_response_payload(
+                                    raw_result, spec.operation_label_zh
+                                ),
+                            ),
+                        }
+                    )
+                    if request.stop_on_error:
+                        break
+                    continue
+
+                delivered = deliver_response(
+                    raw_result,
+                    spec=spec,
+                    fields=call.fields,
+                    detail=options.detail,
+                )
+                succeeded += 1
+                results.append(
+                    {
+                        "id": call.id,
+                        "tool": call.tool,
+                        "ok": True,
+                        "result": delivered,
+                    }
+                )
+            except Exception as exc:  # noqa: BLE001 - isolate per-call failures
+                failed += 1
+                failure = handle_calculation_error(
+                    exc,
+                    spec.operation_label_zh,
+                    allowed_fields=spec.request_model.model_fields.keys(),
+                    root_model=spec.request_model,
+                )
                 results.append(
                     {
                         "id": call.id,
@@ -715,49 +1053,12 @@ def execute_batch(
                         "ok": False,
                         "error": cast(
                             JsonValue,
-                            error_response_payload(raw_result, spec.operation_label_zh),
+                            error_response_payload(failure, spec.operation_label_zh),
                         ),
                     }
                 )
                 if request.stop_on_error:
                     break
-                continue
-
-            delivered = deliver_response(
-                raw_result,
-                spec=spec,
-                fields=call.fields,
-                detail=options.detail,
-            )
-            succeeded += 1
-            results.append(
-                {
-                    "id": call.id,
-                    "tool": call.tool,
-                    "ok": True,
-                    "result": delivered,
-                }
-            )
-        except Exception as exc:  # noqa: BLE001 - isolate per-call failures
-            failed += 1
-            failure = handle_calculation_error(
-                exc,
-                spec.operation_label_zh,
-                allowed_fields=spec.request_model.model_fields.keys(),
-            )
-            results.append(
-                {
-                    "id": call.id,
-                    "tool": call.tool,
-                    "ok": False,
-                    "error": cast(
-                        JsonValue,
-                        error_response_payload(failure, spec.operation_label_zh),
-                    ),
-                }
-            )
-            if request.stop_on_error:
-                break
 
     status: Literal["ok", "partial_error", "error"]
     if failed == 0:

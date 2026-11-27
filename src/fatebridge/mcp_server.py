@@ -18,12 +18,17 @@ from pydantic import Field, ValidationError
 
 from fatebridge import __version__ as APP_VERSION
 from fatebridge.application.batch import (
+    AnalysisContext,
     BatchCall,
     BatchRequest,
     SubjectProfile,
     execute_batch,
 )
-from fatebridge.application.discovery import discover_specs, select_mcp_specs
+from fatebridge.application.discovery import (
+    DiscoveryDetail,
+    discover_specs,
+    select_mcp_specs,
+)
 from fatebridge.application.execution import execute_with_receipt, result_is_error
 from fatebridge.application.response_delivery import deliver_response
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
@@ -50,7 +55,7 @@ MCP_INSTRUCTIONS = (
     "只用已确认资料，不猜生时、不套默认或示例；必要缺项简短追问，未知后继续已有可答部分。"
     "区分计算事实、传统解释与现实建议。"
     "已知工具定义时直接调用 run_calculation；未知工具或参数时调用 discover_tools(q=...) 或 discover_tools(tool=...)。"
-    "同一对象跨多体系计算或多人合盘时优先调用 run_batch，通过 subjects、defaults 与 calls 一次性执行并共享同一冻结时刻 as_of，避免重复出生与地点参数。"
+    "同一对象跨多体系计算或多人合盘时优先调用 run_batch，通过 subjects、context（共享问事/分析时刻与地点）、defaults 与 calls 一次性执行并共享同一冻结时刻 as_of，避免重复出生与地点参数。"
     "run_calculation 与 run_batch 默认 detail=compact 返回核心业务字段；需要指定子字段传 fields（严格校验路径，错误时附可用字段）；需要完整输出与方法依据传 detail=audit。"
     "isError=true 时按 error_code 和 issues[].path / constraints 修正参数后重调，仅 retryable=true 才按原参数重试。"
 )
@@ -93,8 +98,10 @@ class _ToolValidationFeedback(Middleware):
             cause = exc if isinstance(exc, ValidationError) else exc.__cause__
             if not isinstance(cause, ValidationError):
                 raise
+            root_model = BatchRequest if context.message.name == "run_batch" else None
             return _render_protocol_error(
-                validation_error_result(cause), context.message.name
+                validation_error_result(cause, root_model=root_model),
+                context.message.name,
             )
 
 
@@ -111,9 +118,8 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
     @server.tool(
         name="discover_tools",
         description=(
-            "按 family、关键词 q 或精确 tool 发现当前公开的计算能力与调用契约。"
-            "无参数调用返回全部分类计数与工具摘要；指定 tool 返回输入参数 schema、示例与推荐字段；"
-            "detail=full 返回 output_fields，需完整 output_schema 时传 include_output_schema=True。"
+            "按 family/q/tool/tools 发现计算能力与契约。无参返回摘要；单 tool 直接返回契约；"
+            "detail=brief|summary|full，full 加 include_output_schema=True 含输出 schema。"
         ),
         annotations=meta_annotations,
         tags={"meta"},
@@ -122,7 +128,8 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
         family: str | None = None,
         q: str | None = None,
         tool: str | None = None,
-        detail: Literal["summary", "full"] = "summary",
+        tools: str | list[str] | None = None,
+        detail: DiscoveryDetail = "summary",
         include_output_schema: bool = False,
     ) -> ToolResult:
         try:
@@ -131,6 +138,7 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
                 family=family,
                 q=q,
                 tool=tool,
+                tools=tools,
                 surface="mcp",
                 detail=detail,
                 include_output_schema=include_output_schema,
@@ -185,6 +193,7 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
                     exc,
                     spec.operation_label_zh,
                     allowed_fields=spec.request_model.model_fields.keys(),
+                    root_model=spec.request_model,
                 ),
                 spec.operation_label_zh,
             )
@@ -192,9 +201,8 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
     @server.tool(
         name="run_batch",
         description=(
-            "在单次无状态调用中对一个或多个对象（subjects）批量执行多个计算工具（calls），"
-            "自动按各工具契约映射出生/位置/性别字段，合并共享 defaults 与单条 arguments，"
-            "并共享同一冻结时刻 as_of。支持单条 detail/fields 覆盖与 stop_on_error。"
+            "单次无状态批量执行（1-32 calls），自动映射 subjects、context、defaults 与 arguments，"
+            "共享 as_of。支持单条 detail/fields 覆盖与 stop_on_error。"
         ),
         annotations=meta_annotations,
         tags={"meta"},
@@ -205,18 +213,20 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
             Field(
                 min_length=1,
                 max_length=32,
-                description="要顺序执行的计算调用列表（1-32 条）",
+                description="计算调用列表",
             ),
         ],
         subjects: Annotated[
             dict[str, SubjectProfile] | None,
-            Field(
-                description="共享对象档案字典，键名供 call.subject / call.subjects 引用"
-            ),
+            Field(description="共享对象档案字典"),
+        ] = None,
+        context: Annotated[
+            AnalysisContext | None,
+            Field(description="共享分析时刻与地点上下文"),
         ] = None,
         defaults: Annotated[
             dict[str, object] | None,
-            Field(description="跨工具共享默认参数，按目标工具输入字段自动过滤"),
+            Field(description="共享默认参数"),
         ] = None,
         detail: DetailLevel = "compact",
         as_of: str | None = None,
@@ -226,6 +236,7 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
             batch_request = BatchRequest.model_validate(
                 {
                     "subjects": subjects or {},
+                    "context": context,
                     "defaults": defaults or {},
                     "calls": calls,
                     "detail": detail,
@@ -238,7 +249,10 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
         except Exception as exc:
             return _render_protocol_error(
                 handle_calculation_error(
-                    exc, "run_batch", allowed_fields=BatchRequest.model_fields.keys()
+                    exc,
+                    "run_batch",
+                    allowed_fields=BatchRequest.model_fields.keys(),
+                    root_model=BatchRequest,
                 ),
                 "run_batch",
             )

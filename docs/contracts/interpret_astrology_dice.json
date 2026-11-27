@@ -131,6 +131,19 @@
         "description": "Longitude text or decimal; no assumed location",
         "title": "Longitude"
       },
+      "place": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "地点名称（支持离线地名库自动补全 longitude / latitude / timezone）",
+        "title": "Place"
+      },
       "planet": {
         "description": "Actual face: Sun/Moon/Mercury/Venus/Mars/Jupiter/Saturn/Uranus/Neptune/Pluto/NorthNode/SouthNode; Chinese names and glyphs accepted",
         "title": "Planet",

@@ -7,11 +7,6 @@ from fatebridge.core.contracts.output_base import PartialOutput
 Object = dict[str, JsonValue]
 
 
-class QimenPalaceEvidence(PartialOutput):
-    status: str | None = None
-    note: str | None = None
-
-
 class QimenRuleset(PartialOutput):
     id: str | None = None
     version: str | None = None
@@ -46,6 +41,7 @@ class QimenPattern(PartialOutput):
     name: str | None = None
     palace: str | None = None
     facts: Object | None = None
+    coexisting_conflicts: list[str] | None = None
 
 
 class QimenStructure(PartialOutput):

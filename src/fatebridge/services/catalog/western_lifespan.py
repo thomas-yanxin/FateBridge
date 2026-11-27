@@ -12,7 +12,26 @@ from fatebridge.application.tool_spec import ServiceResult, ToolSpec
 
 
 def _compact_lifespan(result: ServiceResult) -> ServiceResult:
-    return {k: v for k, v in result.items() if k != "natal_reference"}
+    trimmed: ServiceResult = {}
+    for k, v in result.items():
+        if k == "natal_reference":
+            continue
+        if isinstance(v, dict):
+            sub: ServiceResult = {}
+            for sk, sv in v.items():
+                if sk == "physical_ephemeris_source":
+                    continue
+                if sk in {"activations", "points"} and isinstance(sv, list):
+                    sub[sk] = sv[:10]
+                    sub[f"{sk}_total_count"] = len(sv)
+                elif sk in {"hits", "phase_ingresses"} and isinstance(sv, list):
+                    sub[sk] = sv[:12]
+                else:
+                    sub[sk] = sv
+            trimmed[k] = sub
+        else:
+            trimmed[k] = v
+    return trimmed
 
 
 _REQ_MODULE = "fatebridge.core.requests.western_lifespan"

@@ -64,10 +64,12 @@ OpenAPI 发布 91 个业务 REST 路由，另有 `/api/batch`（多主体多工�
 
 ### 2.5 渐进发现与按需 Schema
 
-REST 使用 `GET /api/tools`（查询参数 `detail=summary|full`、`family`、`q`、`tool`、`surface`、`include_output_schema=false|true`），CLI 使用 `list` / `discover [tool]`（支持 `--detail`、`--include-output-schema`），MCP 使用 `discover_tools`。
+REST 使用 `GET /api/tools`（查询参数 `detail=brief|summary|full`、`family`、`q`、`tool`、`tools`、`surface`、`include_output_schema=false|true`），CLI 使用 `list` / `discover [tool ...]`（支持 `--tools`、`--detail brief|summary|full`、`--include-output-schema`，也可直接通过 `python -m fatebridge` 调用），MCP 使用 `discover_tools`。
 
-- `detail=summary`（默认）：未传 `tool` 时返回全局 `counts`、`families` 与工具摘要；指定 `tool` 时返回完整 `input_schema`、`output_fields`、`example_input`、`evidence_views`、`suggested_fields` 与 `compact_fields`。
-- `detail=full`：返回完整契约，必须配合 `tool`、`family` 或 `q` 过滤（否则返回 `filter_required_for_full_detail`）；**`output_schema` 默认不返回，仅当显式传入 `include_output_schema=true`（MCP `include_output_schema=True`，CLI `--include-output-schema`）时才会附带**。
+- `detail=brief`：仅返回必填字段、`field_types`、一两行 `usage_hint` 与 `evidence_views` 名称列表，体积最小，适合多工具批量预检（例如 `fatebridge discover qimen liuren_chart jinkou --detail brief`）。
+- `detail=summary`（默认）：未传 `tool`/`tools` 时返回全局 `counts`、`families` 与工具摘要；指定单个 `tool` 时直接解包返回该工具的 `input_schema`、`output_fields`、`example_input`、`evidence_views`、`suggested_fields` 与 `compact_fields`（不再多套一层目录列表）；指定多个 `tools` 时返回精简匹配列表。
+- `detail=full`：返回完整契约，必须配合 `tool`、`tools`、`family` 或 `q` 过滤（否则返回 `filter_required_for_full_detail`）；**`output_schema` 默认不返回，仅当显式传入 `include_output_schema=true`（MCP `include_output_schema=True`，CLI `--include-output-schema`）时才会附带**。
+- 所有 `extra_forbidden` 校验错误（包括 `BatchRequest`、`BatchCall`、`SubjectProfile`、`AnalysisContext` 与单工具参数）统一返回 `issues[].constraints.allowed_fields` 与近义 `suggestions`。
 
 ### 2.6 确定性与复现元数据
 
@@ -80,15 +82,16 @@ REST 使用 `GET /api/tools`（查询参数 `detail=summary|full`、`family`、`
 | 字段 | 类型 | 必需 | 说明 |
 | --- | --- | --- | --- |
 | `name` / `gender` | string | 否 | 默认 `未提供` / `未知`；`bazi_luck_cycles` 等须传有效性别 |
-| `birth_year` / `birth_month` / `birth_day` / `birth_hour` | int | 是 | 出生年月日时（公历） |
+| `birth_year` / `birth_month` / `birth_day` / `birth_hour` | int | 是（`birth_hour` 在 `birth_time_unknown=true` 时可省略） | 出生年月日时（公历） |
+| `birth_time_unknown` | bool | 否 | 默认 `false`；八字与 `liuren_yearly_timing` 支持显式置 `true`，按三柱模式计算（`four_pillars.hour=null` 并附 `coverage`） |
 | `birth_minute` | int | 否 | 默认 `0` |
 | `birth_second` | int / null | 否 | 八字与时运入口支持已确认整秒 `0..59`（需同时显式给出分钟） |
 | `birth_utc_offset` | string / null | 否 | 已确认民用偏移 `±HH:MM[:SS]`，用于消歧重复钟时 |
-| `birth_place` / `birth_timezone` | string | 否 | 内置地点解析或 IANA 时区 |
+| `birth_place` / `birth_timezone` | string | 否 | 内置离线 SQLite 索引解析或 IANA 时区；奇门/六壬/金口/梅花/西占事件盘同时支持 `analysis_place` / `place` 离线解析 |
 | `birth_longitude` | float | 否 | `-180..180` |
 | `use_true_solar_time` | bool | 否 | 中式出生家族默认 `true`（无经度回退钟表时间；显式 `true` 无经度报错） |
 
-九大专项追加 `analysis_year/month/day`、`dayun_pillar` 与 `liunian_pillar`。
+九大专项追加 `analysis_year/month/day`、`dayun_pillar` 与 `liunian_pillar`；`jinkou` 与 `liuren_chart` 支持直接传入 `birth_date`（`YYYY-MM-DD`）与 `birth_year_boundary`（`lunar_new_year` | `lichun`），自动推算并校准年命与立春/春节边界差异。
 
 ### 3.2 核心占星与印度/果老请求家族
 
@@ -252,7 +255,7 @@ REST 使用 `GET /api/tools`（查询参数 `detail=summary|full`、`family`、`
 | `GET` | `/ready` | 服务就绪与可选西占运行时检查（`checks`） |
 | `GET` | `/metrics` | Prometheus 文本指标 |
 | `GET` | `/api/tools` | 机读能力发现清单（支持 `detail`/`family`/`q`/`tool`/`surface`/`include_output_schema`） |
-| `POST` | `/api/batch` | 多主体多工具无状态批处理（共享 `subjects` 与 `defaults`，一次请求串联多工具） |
+| `POST` | `/api/batch` | 多主体多工具无状态批处理（支持 `subjects`、`context`、`defaults`、`arguments` 与 `as_of`，批内共享缓存一次串联多工具） |
 
 ### 4.11 家居风水（family `fengshui`）
 

@@ -101,16 +101,26 @@ def require_complete_bazi_anchors(key: str, result: dict[str, Any]) -> None:
         )
         _keys(
             r["person_info"],
-            "name gender birth_datetime normalized_birth_datetime birth_timezone zi_hour_policy",
+            "name gender birth_datetime birth_timezone zi_hour_policy",
         )
-        pillars = _keys(r["four_pillars"], "year month day hour")
-        for name in POSITIONS:
+        three_pillar = (r.get("coverage") or {}).get(
+            "mode"
+        ) == "three_pillars_hour_unknown"
+        expected_positions = ("year", "month", "day") if three_pillar else POSITIONS
+        pillars = _keys(
+            r["four_pillars"],
+            "year month day hour",
+            nullable={"hour"} if three_pillar else None,
+        )
+        for name in expected_positions:
             _keys(pillars[name], "stem branch")
+        if three_pillar and pillars.get("hour") is not None:
+            raise ValueError("时辰未知三柱模式不得伪造时柱")
         dm = _keys(
             r["day_master"],
             "stem element polarity strength classical_adjudication",
         )
-        _keys(r["ten_gods"], "year month day hour")
+        _keys(r["ten_gods"], " ".join(expected_positions))
         profile = _keys(
             r["structure_profile"],
             "assessment_status dominant_structure useful_elements avoid_elements seasonal_climate classical_adjudication",

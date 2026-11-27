@@ -392,19 +392,41 @@
         "description": "House system, any convention (SE letter / key / integer code 0..8); Regiomontanus (R, code 2) is traditional for horary and elections. Explicit values must be supported letters/names or integer codes0..8; unknown, blank, boolean and floating-point selections are rejected without substitution. Gauquelin (G) has36 clockwise sectors and is unavailable here.",
         "title": "House System"
       },
+      "include_inactive_fortitude_rows": {
+        "default": false,
+        "description": "Whether audit output expands all 0-contribution inactive fortitude rows per planet (default false keeps row_catalog + active/unknown rows + inactive_row_codes).",
+        "title": "Include Inactive Fortitude Rows",
+        "type": "boolean"
+      },
       "latitude": {
-        "description": "Latitude where the chart is cast",
-        "maximum": 90,
-        "minimum": -90,
-        "title": "Latitude",
-        "type": "number"
+        "anyOf": [
+          {
+            "maximum": 90,
+            "minimum": -90,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Latitude where the chart is cast (optional when place is given)",
+        "title": "Latitude"
       },
       "longitude": {
-        "description": "Longitude where the chart is cast",
-        "maximum": 180,
-        "minimum": -180,
-        "title": "Longitude",
-        "type": "number"
+        "anyOf": [
+          {
+            "maximum": 180,
+            "minimum": -180,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Longitude where the chart is cast (optional when place is given)",
+        "title": "Longitude"
       },
       "name": {
         "anyOf": [
@@ -428,6 +450,19 @@
         ],
         "title": "Orb Profile",
         "type": "string"
+      },
+      "place": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "起盘地点名称（支持离线地名库自动补全 longitude / latitude 及民用时钟下的 timezone_name）",
+        "title": "Place"
       },
       "question_calendar": {
         "default": "proleptic_gregorian",
@@ -579,8 +614,6 @@
       }
     },
     "required": [
-      "longitude",
-      "latitude",
       "question_year",
       "question_month",
       "question_day",

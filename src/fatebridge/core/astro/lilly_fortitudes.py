@@ -153,6 +153,7 @@ def evaluate_fortitudes(
     *,
     house_system: str | None,
     zodiac_type: str | None,
+    include_inactive_rows: bool = True,
 ) -> dict[str, Any]:
     """Evaluate every printed row; unknown required facts never contribute zero."""
     if not set(states) <= PLANETS:
@@ -461,46 +462,65 @@ def evaluate_fortitudes(
                 list(STELLAR_ORB_SOURCE_PAGES[star]),
             )
         rows: list[dict[str, Any]] = []
+        inactive_row_codes: list[str] = []
+        satisfied_count = 0
+        unknown_codes: list[str] = []
+        positive = 0
+        negative = 0
         for code, group, points, condition in ROW_SPECS:
             holds, applicable, facts, pages = evaluations[code]
-            rows.append(
-                {
+            status = (
+                "not_applicable"
+                if not applicable
+                else (
+                    "unknown"
+                    if holds is None
+                    else "satisfied" if holds else "not_satisfied"
+                )
+            )
+            contribution = (
+                0
+                if not applicable or holds is False
+                else points if holds is True else None
+            )
+            if status == "unknown":
+                unknown_codes.append(code)
+            elif status == "satisfied":
+                satisfied_count += 1
+                if contribution is not None:
+                    if contribution > 0:
+                        positive += contribution
+                    elif contribution < 0:
+                        negative += -contribution
+            if include_inactive_rows or status in {"satisfied", "unknown"}:
+                row_entry: dict[str, Any] = {
                     "code": code,
-                    "group": group,
-                    "condition": condition,
-                    "label_zh": ROW_LABELS_ZH[code],
-                    "points": points,
                     "applicable": applicable,
                     "satisfied": holds if applicable else None,
-                    "contribution": (
-                        0
-                        if not applicable or holds is False
-                        else points if holds is True else None
-                    ),
-                    "status": (
-                        "not_applicable"
-                        if not applicable
-                        else (
-                            "unknown"
-                            if holds is None
-                            else "satisfied" if holds else "not_satisfied"
-                        )
-                    ),
+                    "contribution": contribution,
+                    "status": status,
                     "inputs": facts,
                     "source_pages": pages,
                 }
-            )
-        unknown = [r["code"] for r in rows if r["status"] == "unknown"]
-        positive = sum(
-            r["contribution"]
-            for r in rows
-            if r["contribution"] is not None and r["contribution"] > 0
-        )
-        negative = -sum(
-            r["contribution"]
-            for r in rows
-            if r["contribution"] is not None and r["contribution"] < 0
-        )
+                if include_inactive_rows:
+                    row_entry["group"] = group
+                    row_entry["condition"] = condition
+                    row_entry["label_zh"] = ROW_LABELS_ZH[code]
+                    row_entry["points"] = points
+                rows.append(row_entry)
+            else:
+                inactive_row_codes.append(code)
+        unknown = unknown_codes
+        applied_conditions = [
+            {
+                "code": code,
+                "label_zh": ROW_LABELS_ZH[code],
+                "contribution": points,
+                "source_pages": evaluations[code][3],
+            }
+            for code, _group, points, _condition in ROW_SPECS
+            if evaluations[code][1] and evaluations[code][0] is True
+        ]
         summary = {
             "status": "partial" if unknown else "computed_under_declared_policy",
             "known_fortitudes": positive,
@@ -508,20 +528,23 @@ def evaluate_fortitudes(
             "known_balance": positive - negative,
             "literal_table_balance": None if unknown else positive - negative,
             "unknown_rows": unknown,
-            "applied_conditions": [
-                {
-                    "code": r["code"],
-                    "label_zh": r["label_zh"],
-                    "contribution": r["contribution"],
-                    "source_pages": r["source_pages"],
-                }
-                for r in rows
-                if r["status"] == "satisfied"
-            ],
-            "row_count": len(rows),
+            "applied_conditions": applied_conditions,
+            "row_count": len(ROW_SPECS),
         }
-        bodies[planet] = {**summary, "rows": rows}
+        body_payload: dict[str, Any] = {**summary, "rows": rows}
+        if not include_inactive_rows:
+            body_payload["inactive_row_codes"] = inactive_row_codes
+        bodies[planet] = body_payload
         summaries[planet] = summary
+    row_catalog = {
+        code: {
+            "group": group,
+            "condition": condition,
+            "label_zh": ROW_LABELS_ZH[code],
+            "points": points,
+        }
+        for code, group, points, condition in ROW_SPECS
+    }
     return {
         "method_id": RULESET,
         "source_edition": "William Lilly Christian Astrology London1647",
@@ -545,6 +568,8 @@ def evaluate_fortitudes(
             181,
         ],
         "row_count_per_planet": len(ROW_SPECS),
+        "include_inactive_rows": include_inactive_rows,
+        "row_catalog": row_catalog,
         "planets": bodies,
         "summary": summaries,
         "physical_inputs": physical_inputs,

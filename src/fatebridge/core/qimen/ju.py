@@ -4,6 +4,11 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
+from fatebridge.core.batch_cache import (
+    batch_cached,
+    freeze_cache_value,
+    metaphysics_seed_key,
+)
 from fatebridge.core.divination import build_hexagram
 from fatebridge.core.metaphysics.common import (
     MetaphysicsSeed,
@@ -141,6 +146,14 @@ def build_qimen_board(
     return enrich_qimen_evidence(board, seed=seed, leader=leaders)
 
 
+@batch_cached(
+    "qimen.build_qimen_with_options",
+    lambda seed, options=None: (
+        metaphysics_seed_key(seed),
+        freeze_cache_value(dict(options or {})),
+    ),
+    copy_result=True,
+)
 def build_qimen_with_options(
     seed: MetaphysicsSeed, options: dict[str, Any] | None
 ) -> dict[str, Any]:

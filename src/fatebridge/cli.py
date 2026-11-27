@@ -10,7 +10,12 @@ from typing import TYPE_CHECKING
 
 from fatebridge.cli_arguments import build_parser, emit_error
 from fatebridge.cli_inputs import preload_request
-from fatebridge.services.tool_catalog import CATALOG
+from fatebridge.services.tool_catalog import (
+    all_catalog,
+    get_spec,
+    get_specs,
+    known_tool_names,
+)
 from fatebridge.utils.runtime import load_runtime_env
 
 if TYPE_CHECKING:
@@ -51,7 +56,7 @@ def _cli_example(spec: ToolSpec, inputs: ServiceResult) -> str:
 def _print_tools(
     specs: list[ToolSpec] | None = None, *, include_footer: bool = True
 ) -> None:
-    selected = CATALOG if specs is None else specs
+    selected = all_catalog() if specs is None else specs
     grouped: dict[str, list[ToolSpec]] = {}
     for spec in selected:
         grouped.setdefault(spec.family, []).append(spec)
@@ -66,28 +71,42 @@ def _print_tools(
             "  batch                          多对象多工具批量计算（--schema / --example / --request-file PATH|-）"
         )
         lines.append(
-            "  discover [tool]                查看工具契约与示例（支持 discover batch）"
+            "  discover [tool ...]            查看工具契约与示例（支持多工具、--detail brief 与 batch）"
         )
         lines.append("  doctor                         检查安装、依赖与 MCP 连通性")
     print("\n".join(lines))
 
 
-def _attach_cli_examples(manifest: ServiceResult) -> ServiceResult:
+def _attach_cli_examples(
+    manifest: ServiceResult,
+    *,
+    specs_by_name: dict[str, ToolSpec] | None = None,
+) -> ServiceResult:
     from fatebridge.application.examples import example_input
 
-    by_name = {spec.name: spec for spec in CATALOG}
-    for entry in manifest.get("tools", []):
-        if not isinstance(entry, dict):
-            continue
-        spec = by_name.get(entry.get("tool", ""))
+    def _annotate_entry(entry: dict[str, object], by_name: dict[str, ToolSpec]) -> None:
+        tool_id = entry.get("tool")
+        if not isinstance(tool_id, str):
+            return
+        spec = by_name.get(tool_id) or get_spec(tool_id)
         if spec is None:
-            continue
+            return
         example = entry.get("example_input") or example_input(spec)
         if isinstance(example, dict):
             entry["cli_example"] = _cli_example(spec, example)
             entry["example_note"] = "虚构演示资料；使用时替换为已确认的用户输入。"
         elif "input_schema" in entry:
             entry["cli_example"] = f"fatebridge {spec.name} --request-file request.json"
+
+    by_name = specs_by_name if specs_by_name is not None else {}
+    if "tools" in manifest:
+        if not by_name:
+            by_name = {spec.name: spec for spec in all_catalog()}
+        for entry in manifest.get("tools", []):
+            if isinstance(entry, dict):
+                _annotate_entry(entry, by_name)
+    elif isinstance(manifest.get("tool"), str):
+        _annotate_entry(manifest, by_name)
     return manifest
 
 
@@ -180,8 +199,15 @@ def run(argv: list[str] | None = None) -> int:
 
         try:
             batch_request = BatchRequest.model_validate(batch_data)
+            known = set(known_tool_names())
+            requested_names = [call.tool for call in batch_request.calls]
+            batch_specs = (
+                get_specs(requested_names)
+                if all(name in known for name in requested_names)
+                else all_catalog()
+            )
             payload = execute_batch(
-                {spec.name: spec for spec in CATALOG},
+                {spec.name: spec for spec in batch_specs},
                 batch_request,
             )
         except (
@@ -192,6 +218,7 @@ def run(argv: list[str] | None = None) -> int:
                     exc,
                     "batch",
                     allowed_fields=BatchRequest.model_fields.keys(),
+                    root_model=BatchRequest,
                 ),
                 1,
             )
@@ -207,7 +234,25 @@ def run(argv: list[str] | None = None) -> int:
         )
         from fatebridge.utils.errors import ParameterError
 
-        tool_name = getattr(args, "tool_pos", None) or args.tool
+        pos_tools: list[str] = (
+            list(getattr(args, "tool_pos", None) or [])
+            if args.command == "discover"
+            else []
+        )
+        flag_tool: str | None = args.tool
+        flag_tools: str | None = (
+            getattr(args, "tools", None) if args.command == "discover" else None
+        )
+        if pos_tools and (flag_tool is not None or flag_tools is not None):
+            return emit_error(
+                ParameterError(
+                    "位置工具参数不能与 --tool / --tools 同时指定",
+                    [{"path": "tools", "code": "conflicting_tool_filters"}],
+                ).as_result(),
+                1,
+            )
+        tool_name = pos_tools[0] if len(pos_tools) == 1 else flag_tool
+        tools_csv = ",".join(pos_tools) if len(pos_tools) > 1 else flag_tools
         filters = {
             "family": args.family,
             "q": args.q,
@@ -218,6 +263,7 @@ def run(argv: list[str] | None = None) -> int:
             if args.command == "discover":
                 if (
                     tool_name == "batch"
+                    and tools_csv is None
                     and args.family is None
                     and args.q is None
                     and args.surface is None
@@ -231,17 +277,42 @@ def run(argv: list[str] | None = None) -> int:
                         )
                     )
                     return 0
+                requested_exact: list[str] = []
+                if tool_name is not None:
+                    requested_exact = [tool_name]
+                elif tools_csv is not None:
+                    requested_exact = [
+                        part.strip() for part in tools_csv.split(",") if part.strip()
+                    ]
+                known = set(known_tool_names())
+                if (
+                    requested_exact
+                    and args.family is None
+                    and args.q is None
+                    and all(name in known for name in requested_exact)
+                ):
+                    source_specs = get_specs(requested_exact)
+                else:
+                    source_specs = all_catalog()
                 catalog = discover_specs(
-                    CATALOG,
+                    source_specs,
+                    tools=tools_csv,
                     detail=args.detail,
                     include_output_schema=args.include_output_schema,
                     **filters,
                 )
-                if tool_name is not None or args.detail == "full":
-                    _attach_cli_examples(catalog)
+                if (
+                    tool_name is not None
+                    or tools_csv is not None
+                    or args.detail == "full"
+                ):
+                    _attach_cli_examples(
+                        catalog,
+                        specs_by_name={spec.name: spec for spec in source_specs},
+                    )
                 print(json.dumps(catalog, ensure_ascii=False, indent=2, default=str))
             else:
-                selected = select_specs(CATALOG, **filters)
+                selected = select_specs(all_catalog(), **filters)
                 _print_tools(selected, include_footer=not any(filters.values()))
         except ParameterError as exc:
             return emit_error(exc.as_result(), 2 if exc.status_code == 404 else 1)
@@ -293,6 +364,7 @@ def run(argv: list[str] | None = None) -> int:
                 exc,
                 spec.operation_label_zh,
                 allowed_fields=spec.request_model.model_fields.keys(),
+                root_model=spec.request_model,
             ),
             1,
         )

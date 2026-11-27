@@ -1,32 +1,18 @@
 # 奇门盘面证据
 
-只对本次已读结果解释，沿用同一次 run。默认规则是时家转盘、中五寄坤二；`ju_method=zhirun` 是置闰，`chaibu` 是另列的拆补约定。`calendar_policy.astronomical_term` 是实际民用时刻的节气，`ju_term` 是定局用气，置闰时两者可以不同。规则与来源见 `rulesets`，解释链在 `rule_trace`；不能把在线转录的部分规则验收称为整部原典认证。
+只对本次已读结果解释，沿用同一次 run。默认规则是时家转盘、中五寄坤二（`lodging_policy="kun2"`，`ju_method="zhirun"` 为置闰，`chaibu` 为另列的拆补约定）。`ju_term` 为定局用气，与 `calendar_policy.corrected_datetime` / 实际节气在置闰时可以不同；`rule_profiles.god`、`rule_profiles.season`、`rule_profiles.lodging` 标明实际采用口径，不得跨口径混读，也不将局部规则校对称为整部原典认证。
 
-来源以所选规则或宫级证据的实际章节为准。当前 `rulesets.volume_sources` 固定各卷修订，`source_revision_scope` 说明绑定范围；全览地址是转入各卷的导航。八神正文、圆图名称与旺衰来自不同章节，不因共用书名就省略所选卷次，也不为旧run补写未返回的逐卷核对结果。
-
-本地结构化格局引用核验器的 `trusted_payload` 用于传入从可信执行端另行保存的完整原结果；`original_payload_compared` 说明本次是否实际逐值比较。未传原件时，仅核对所给结构与同run引用，不能把核验状态解释为结果来源已认证；传原件也不认证自由文本语义。
-
-- `xun_head/kongwang` 为时旬；`day_xun_head/day_kongwang` 为日旬。不能混用空亡范围，也不能把双支宫中一支空亡说成全宫空。
-- 真太阳时读取整条 `calendar_policy.solar_time_adjustment`：经度差＋均时差－夏令时＝总修正；`civil_input_instant_utc` 是原实际时刻，`apparent_solar_label` 只是日时取用标签，不据标签再次移动交节时刻。均时差方法按种子计算时保留的记录读取；`UTC_as_UT1` 未使用实测DUT1，不能称亚秒认证。距最近时辰／23点换日的秒数是标签几何距离，不是测量精度、误差界或确定性。独立JPL核对有近边界一例在5秒容差下不能认证日时归属，不能因名义结果相同就称已精确验证。`not_applied` 不补写均时差；`missing_seed_adjustment_provenance` 不能从总修正量推断算法。整条结构化引用可用 `verify_qimen_solar_time_quotes` 核对，但不证明自由文本解释忠实。
-- `zhifu.star` 保留天禽的身份。某宫 `star=天芮` 且 `hosted_stars=[天禽]`，可以承载天禽值符；不是字段矛盾。`heaven_stems`、`earth_stems` 同时保留主干和寄干，不能只读单数干而丢掉寄宫格局。
-- 中宫的独立门、神、转动星与天盘干为 `null`。天禽与中干在天芮所在宫读取，不补造“中门”或第二个值符神。
-- 门宫关系读取 `rule_profiles.door_palace_relation` 与宫级同名证据，命中门迫时还读整条 `qualification.door_palace_evidence`。`door_pressure/verse_door_pressure` 固定按歌诀门克宫；正文另外将门克宫称吉迫、宫克门称凶迫、门生宫称和、宫生门称义。歌诀门迫为否不等于正文没有凶迫；吉迫不是吉利。同五行在本段未另命名，不补成该段原文“比和”。`printed_example` 只在所列11个门宫组合上保留原文分类；景门临兑被本段列“吉门被迫”仍附“不吉”，不推广为景门恒吉。
-- 宫内 `evidence` 直接给出门迫、宫克门、时旬空支及九星旺衰。首轮一起读 `rule_profiles`，以实际 `season_profile` 为准：默认 `yanyi_vol1_verse` 采用卷一赋，同五行为相、星生月为旺；卷三表 `yanyi_vol3_table` 将这两项对调；卷三正文 `yanyi_vol3_prose` 还将月生星列休、星克月列死。三种都保留各自章节，不能混成一套口诀，也不按结果挑吉利口径。旺衰用实际月支的五行，不用定局借用之气代替月令。
-- `god_profile=yanyi_text` 默认按卷三正文用白虎、玄武；`yanyi_diagrams` 按已核卷四圆图用勾陈、朱雀。`god_sequence_index` 只是从移动值符星宫起阳顺阴逆的序位，不证明名称同义，也不能套用六壬十二天将。`evidence.god_interpretation` 保留所读神义及附加条件；勾陈、朱雀目前只据图排名称，未移植白虎、玄武正文解释。螣蛇、白虎、玄武的“得奇门会合则不忌”条件尚未自动判定，不能只凭神名直断吉凶。
-- 三奇得使、天遁等组合须一起读取 `qualification`，明确条件已观察到或未满足、同宫冲突及 `source_disagreements`。乙辛得使不能覆盖青龙逃走；天遁结构不能掩盖门迫；玉女守门按值使到地盘丁判断。原典例局与规则不一致时，同时交代原文与实际盘面，不改盘迎合原文。
-- 三奇入墓另核 `rule_profiles.wonder_tomb` 及宫内 `evidence.wonder_tomb`。正式匹配固定按卷二王璋明确列举乙坤、丙乾、丁艮，主干和寄干均参与。同段首句可字面读作乙丙丁临乾六戌宫，但该释读与优先关系未解决；`unadopted_literal_candidate_matched_stems` 只是候选，`candidate_adopted=false`。候选在乾宫命中乙或丁，不自动补成正式入墓；本宫两种读法恰同也不证明全书已统一。整条入墓格的 `qualification.tomb_evidence` 保留上述限定，组合格另给证据路径；不能按哪种更吉、更符合想要的结论而换法。它与字面时干支入墓是不同层。
-- 飞鸟跌穴、青龙返首、天乙伏宫格、天乙飞宫格须读取 `qualification.identity_binding`。这里的甲／直符按本时旬首所遁六仪及原宫、移动宫取用，不统一换成戊，也不借日旬代替。寄干在复数数组中同样参与。飞鸟跌穴可与荧入太白同时匹配；须一并解释同宫冲突，不能以格名直接判吉。当前独立原例是所列甲子旬算例，其他五旬是按已声明规则推算，不能把1080盘内部遍历称为1080个原典例局。大格、小格按庚癸、庚壬干对读取，小格的别称伏格不等于伏吟或伏宫。
-- 六仪击刑读取 `rule_profiles.six_instrument_punishment`、宫级同名证据及整条 `qualification.punishment_evidence/punishment_instrument_identity`。当前暂定保留广义六仪落所刑宫的原有匹配：甲子戊卯震、甲戌己未坤、甲申庚寅艮、甲午辛午离、甲辰壬辰巽、甲寅癸巳巽，主干和寄干均核。每个仪自身所属六甲与本时旬首分别列出；不要把甲辰仪壬误说成本时甲子仪戊。原文“六甲直符”未明写仅本旬，另列的 `current_zhifu_matched` 是尚未采纳的本时直符窄读候选；同段阳一局甲己日卯时原例能区分两法。`source_scope_adjudicated=false`，不能称广义已认证，也不能据窄读候选删除广义匹配。不得按哪个更吉或更符合结果选取法；不能与庚加己的刑格混名。
-- 首轮一起读取盘级 `source_disagreements`。卷四十八局1080时数表目前有2处直使宫数差异，卷二另有1处门名、1处阳五壬申天盘庚宫位差异；六仪击刑另有未裁定的范围解释，区别例及两种计算在规则口径和宫级证据中保留；命中对应时局时，摘要和快照均保留原文、计算值及来源。另一古籍引文支持坤二，不消除所选《演义》离九文字，也不解决日甲取法。卷四原始5宫是寄宫前数值，不能把它与显示的坤二直接判为矛盾。1078行观察符合不等于全盘各层或整部原典已经通过。
-- 首轮一起读取 `stem_context`。非甲日干按字面直取，庚加日干为伏干／日格、日干加庚为飞干；别称不算两份证据。日甲的 `status=unresolved_jia_identity` 只列日甲本身藏仪与时旬藏仪两套候选计算，`adopted_candidate=null`，即使某个候选符合一例也不采纳，不能把未正式输出日格说成没有相关结构。时格独立核时干；其原文别称伏吟格不等于整盘星伏吟或门伏吟，仍以 `structure` 对应字段为准。
-- 三诈读取 `rule_profiles.three_deceptions`、各宫 `evidence.three_deceptions` 和整条正式格局。2.11.0按现行时家转盘天盘乙丙丁（含寄奇）、开休生门、对应太阴／九地／六合完整同宫命名真诈／重诈／休诈；不是任意得二就补出正式名称。`verse_exactly_two_components_present` 仅是歌诀太阴三要素的盘面观察，不能扩到任意神；歌诀得二亦吉与正文门合太阴无奇不利的解释优先未决。`prose_partial_case` 保留缺项类别，不据缺项自动判吉凶。丁休太阴同时见人遁与真诈时，`overlapping_evidence_group` 表示共享事实，不算独立印证，也不把所有真诈等同人遁。保留 `coexisting_rule_names` 及门迫、入墓等已有证据，完整三诈名称不覆盖限制；没有综合认证为全盘吉。诈是古籍格名，不作为医疗效果判断；五假未由这个规则判断。
-- `structure` 分开给出星伏吟／反吟与门伏吟／反吟，另列五不遇。`patterns` 是命中的条件；逐项核对 `facts` 与宫位。未匹配、未实现、未读到是三种不同情况。
-- 五假读取 `rule_profiles.five_jia`、宫级 `evidence.five_jia` 和整条正式格局。2.12.0明确采用天盘干（含寄干）、实际门与所选八神：天假是景门合乙丙丁临九天，地／神／鬼假分别是杜／伤／死门合丁己癸临九地。丁己癸不是三奇，不用本时干或地盘干替代。杜门合丁己癸临六合／太阴是原文另列的未命名旁例，不能套地假名称。人假原句写惊门合六合下临九天；同一八神层不能放两个神，但这不证明人假不存在。另段己为六合只支持未采纳候选，保留 `human_jia.adopted_match=null`，不能改字作六壬、自动把六合当己，或因候选未中就断定没有人假。四类完整名称不覆盖同宫门迫、入墓等证据；古代语境不作为临床或丧葬择时判断。
-- 时干支入墓读取 `structure.hour_branch_tomb` 与整条 `stem_context.hour_branch_tomb`。当前只核卷二正文六组字面时柱：丙戌、壬辰、丁丑、癸未、戊戌、己丑。己丑是正文补列，不因歌诀只列五组而删去。跟随实际采用的时柱；真太阳时跨时辰后可能与输入钟表时不同。这里不能借甲的藏仪替代字面时干，甲辰藏壬不等于壬辰；也没有判断天盘时干落墓宫。它是时间条件，没有伪造落宫或塞进宫位格局。未命中本表只能说未命中所选六组，不等于所有入墓法都不存在。原文禁忌不构成医疗后果判断。
-- 岁格与月朔格分别读取 `stem_context.year/lunar_month_start`。岁干只在立春年与农历年候选一致且非甲时直取；两种年界不同会保留候选，不输出正式岁格，不能解释为不存在。月朔干取本农历月初一的日干，不取八字月柱天干；核 `anchor_date/calendar_year/lunar_month/is_leap_month`，闰月取自己的初一。该月历按输入时区的民用日期读取现代离线历表，不因23点子初换日或真太阳时跨日提前换月，也不是计算真实合朔时刻。岁干、月朔干为甲时仍只列藏仪候选，不自动采纳。超出农历支持范围不猜锚点。岁格／月朔格与其他格局可能共用同一庚加干事实，`shared_evidence_group` 相同不算多份独立证据。
-- 专问伏干、飞干、岁格或月朔格时可读 `stem_candidates` 视图。`candidate_outcomes` 中各候选都命中、都未命中或有分歧，分别对应 `true`、`false`、`null`；再看共同宫位及所有候选命中宫位。只说「在所列口径下」；候选比较不选正式取法，也不替代 `patterns`。
-- 人假宫级 `evidence.five_jia.human_jia.printed_clause_match` 为 `false` 表示该宫没有条文要求的惊门；为 `null` 表示虽见惊门，六合身份与层次仍待裁。己干候选是否命中不改变这条边界。
-- `door_hexagram/fushi_hexagram` 是软件派生卦，未认证为该原典规则；不能借它提高结论置信度。
-- `fly/fei/mirror/reverse` 与非零 `palaceShift` 不支持，必须按错误纠正，不能改个名字继续输出所谓飞盘。
-
-交付先说相关宫实际组合及其传统提示，再给用户可核实的条件。用 `assessment.interpretation_status` 确认本次解读范围，将吉凶用语限定在对应条款和盘面条件内。
+- **旬空与双支宫范围**：`xun_head` / `kongwang` 为时旬，`day_xun_head` / `day_kongwang` 为日旬；盘级 `void_palaces` 列出落空宫名，各宫顶层 `branches`、`hour_void_branches`、`day_void_branches` 及 `hour_void_scope` / `day_void_scope`（`"none"` | `"partial_branch"` | `"full_palace"`）直接标明单支空还是全宫空，禁止把双支宫的 `partial_branch` 说成全宫空，也不得混用时旬与日旬。
+- **马星与真太阳时**：盘级 `horse_star` 与各宫 `is_horse_palace` 标出驿马所在宫。`calendar_policy`（含 `civil_datetime`、`corrected_datetime`、`hour_clock`、`day_boundary`、`solar_term_provider`）在 `detail="audit"` 下保留完整钟表与节气换算边界，不得自行按民用表时重算干支。
+- **寄宫与天禽**：`zhifu.star` 保留天禽身份；当坤二等宫 `star="天芮"` 且 `hosted_stars` 含 `"天禽"` 时属正常寄宫，`heaven_stems` 与 `earth_stems` 同时保留主干与寄干（`hidden_stem` 为原宫寄干），解读格局时须同时核对主干与寄干。中宫在转盘下 `door`、`star`、`god`、`heaven_stem` 为 `null`，天禽与中干在所寄之宫读取。
+- **宫级平铺证据（全部直接位于 `palaces[i]` 顶层，不额外嵌套子对象）**：
+  - `palaces[i].door_palace_relation` 与 `palaces[i].door_pressure`：给出门宫生克及按歌诀门克宫判定的门迫标记；`door_pressure=false` 时仍需核对 `door_palace_relation`（宫克门等），`door_pressure=true` 不得美化为吉。
+  - `palaces[i].star_season_state`：按 `rule_profiles.season`（默认 `yanyi_vol1_verse`，可选 `yanyi_vol3_table` / `yanyi_vol3_prose`）与实际月支计算九星旺相休囚死，不同口径不得混用。
+  - `palaces[i].wonder_tombs` 与 `palaces[i].punishments`：分别给出该宫命中的天盘三奇入墓干与六仪击刑干（主干与寄干均核）。
+  - `palaces[i].god` 与 `palaces[i].god_sequence_index`：`rule_profiles.god` 默认按卷三正文排布，不得套用六壬十二天将；未自动判定的神煞合奇门解忌条件不得臆断化解。
+- **格局与同宫冲突（`patterns[]`）**：每条格局包含 `rule_id`、`name`、`palace`、`facts` 与可选 `coexisting_conflicts`。吉格若携带 `coexisting_conflicts`（如同宫门迫、三奇入墓、六仪击刑、青龙逃走、太白入荧、时旬空/半空），须并列说明冲突约束，禁止用“三奇得使”“天遁”等吉格名称覆盖同宫凶格或空亡。
+- **日时干支与盘级结构**：
+  - `stem_context.day`（`ganzhi`、`literal_stem`、`xun_head`）与 `stem_context.hour`（`ganzhi`、`literal_stem`、`effective_stem`、`xun_head`）列出日干与时干的字面与遁甲取值；甲干借直符六仪取用，不可自行替成戊干或日旬。
+  - `structure` 分开给出 `hour_branch_tomb`、`stars_fuyin`、`stars_fanyin`、`doors_fuyin`、`doors_fanyin`、`stems_fuyin`、`stems_fanyin`、`five_not_meet`、`tian_xian_time`，不得把时格与星/门/干伏吟混为一谈。
+- **源典分歧与边界**：盘级 `source_disagreements` 列出命中时局的古籍异文或口径分歧；`fushi_hexagram`（与宫级 `door_hexagram`）为派生参考卦；非转盘与非零 `palaceShift`（`options_applied`）不作支持。
+- **交付要求**：结合 `assessment.calculation_scope` 与 `assessment.classical_conformance` 确认本次计算范围，先述相关宫 `palaces[i]` 实际组合、`patterns[].coexisting_conflicts` 与 `hour_void_scope` / `day_void_scope`，再给可核实条件，将吉凶限定在对应盘面事实内。

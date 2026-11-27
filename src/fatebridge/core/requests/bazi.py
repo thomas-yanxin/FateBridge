@@ -6,7 +6,11 @@ from pydantic import Field
 
 from fatebridge.core.metaphysics.common import SEXAGENARY_CYCLE
 from fatebridge.core.requests.base import AnalysisDateFields, FateBridgeBaseRequest
-from fatebridge.core.requests.birth import BaziClockRequest
+from fatebridge.core.requests.birth import (
+    OPTIONAL_UNKNOWN_BIRTH_HOUR_FIELD,
+    BaziClockRequest,
+    OptionalUnknownBirthHourMixin,
+)
 
 PILLAR_PATTERN = "^(?:" + "|".join(SEXAGENARY_CYCLE) + ")$"
 LITERAL_PILLAR_PATTERN = "^[甲乙丙丁戊己庚辛壬癸][子丑寅卯辰巳午未申酉戌亥]$"
@@ -67,8 +71,18 @@ class BaziDimensionRequest(AnalysisDateFields, BaziClockRequest):
     )
 
 
-class BaziBirthRequest(AnalysisDateFields, BaziClockRequest):
+class BaziOverviewRequest(OptionalUnknownBirthHourMixin, BaziClockRequest):
+    """Request model for BaZi overview (supports explicit birth_time_unknown=True 3-pillar mode)."""
+
+    birth_hour: int | None = OPTIONAL_UNKNOWN_BIRTH_HOUR_FIELD  # type: ignore[assignment]
+
+
+class BaziBirthRequest(
+    OptionalUnknownBirthHourMixin, AnalysisDateFields, BaziClockRequest
+):
     """Request model for standalone BaZi birth output."""
+
+    birth_hour: int | None = OPTIONAL_UNKNOWN_BIRTH_HOUR_FIELD  # type: ignore[assignment]
 
 
 class BaziMarriageRequest(BaziDimensionRequest):

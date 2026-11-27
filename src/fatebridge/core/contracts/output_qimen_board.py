@@ -9,7 +9,6 @@ from fatebridge.core.contracts.output_chinese_calendar import Object
 from fatebridge.core.contracts.output_qimen import (
     QimenAssessment,
     QimenCalendarPolicy,
-    QimenPalaceEvidence,
     QimenPattern,
     QimenRuleset,
     QimenRuleTrace,
@@ -32,7 +31,6 @@ class QimenPalace(PartialOutput):
     earth_stems: list[str] | None = None
     hidden_stem: str | None = None
     hosted_stars: list[str] | None = None
-    evidence: QimenPalaceEvidence | None = None
     name: str | None = None
     content_palace: str | None = None
     content_trigram: str | None = None
@@ -44,8 +42,11 @@ class QimenPalace(PartialOutput):
     star_season_state: str | None = None
     wonder_tombs: list[str] | None = None
     punishments: list[str] | None = None
+    branches: list[str] | None = None
     hour_void_branches: list[str] | None = None
     day_void_branches: list[str] | None = None
+    hour_void_scope: str | None = None
+    day_void_scope: str | None = None
     is_horse_palace: bool | None = None
     earth_stem: str | None = None
     heaven_stem: str | None = None
@@ -91,6 +92,7 @@ class Qimen(PartialOutput):
     calendar_policy: Annotated[QimenCalendarPolicy | None, FULL_FACT] = None
     structure: QimenStructure | None = None
     patterns: list[QimenPattern] | None = None
+    stem_context: Object | None = None
     assessment: QimenAssessment | None = None
     source_disagreements: list[dict[str, JsonValue]] | None = None
     engine: str | None = None

@@ -6,9 +6,11 @@ import argparse
 import json
 import os
 import re
+import types
 from dataclasses import dataclass, field
 from html.parser import HTMLParser
 from pathlib import Path
+from typing import Annotated, Any, Union, get_args, get_origin
 from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -120,6 +122,159 @@ def inspect_markdown(text: str) -> Document:
     return document
 
 
+_QIMEN_STALE_ROOTS = frozenset({"evidence", "qualification", "rulesets", "rule_trace"})
+_INDEX_SUFFIX_RE = re.compile(r"\[(?:[a-zA-Z_*]|\d*)\]$")
+_INLINE_CODE_RE = re.compile(r"`([^`\n]+)`")
+
+
+def _extract_inline_code_tokens(text: str) -> list[tuple[int, str]]:
+    """Extract (line_number, inline_code_text) outside fenced code blocks."""
+    tokens: list[tuple[int, str]] = []
+    fence = ""
+    for number, line in enumerate(text.splitlines(), 1):
+        marker = FENCE.match(line)
+        if fence:
+            if (
+                marker
+                and marker[1][0] == fence[0]
+                and len(marker[1]) >= len(fence)
+                and not marker[2].strip()
+            ):
+                fence = ""
+            continue
+        if marker:
+            fence = marker[1]
+            continue
+        for match in _INLINE_CODE_RE.finditer(line):
+            tokens.append((number, match[1].strip()))
+    return tokens
+
+
+def _unwrap_model_or_open(annotation: Any) -> tuple[type[Any] | None, bool]:
+    """Return (BaseModel subclass if concrete, is_open_container) from a type annotation."""
+    from pydantic import BaseModel
+
+    if annotation is None or annotation is type(None):
+        return None, False
+    origin = get_origin(annotation)
+    if origin is Annotated:
+        return _unwrap_model_or_open(get_args(annotation)[0])
+    if origin in (Union, types.UnionType):
+        models: list[type[Any]] = []
+        open_container = False
+        for arg in get_args(annotation):
+            if arg is type(None):
+                continue
+            sub_model, sub_open = _unwrap_model_or_open(arg)
+            if sub_model is not None:
+                models.append(sub_model)
+            if sub_open:
+                open_container = True
+        if len(models) == 1 and not open_container:
+            return models[0], False
+        return (models[0] if len(models) == 1 else None), open_container or len(
+            models
+        ) > 1
+    if origin in (list, tuple, set, frozenset):
+        args = get_args(annotation)
+        return _unwrap_model_or_open(args[0]) if args else (None, True)
+    if origin is dict:
+        return None, True
+    if isinstance(annotation, type) and issubclass(annotation, BaseModel):
+        return annotation, False
+    if annotation is dict:
+        return None, True
+    return None, False
+
+
+def _validate_model_path(model_cls: type[Any], segments: list[str]) -> str | None:
+    """Validate dotted segments against Pydantic BaseModel fields; return error detail or None."""
+    current: type[Any] | None = model_cls
+    for idx, raw_seg in enumerate(segments):
+        seg = _INDEX_SUFFIX_RE.sub("", raw_seg)
+        if not seg or not seg.isidentifier():
+            return None
+        if current is None:
+            return None
+        fields = current.model_fields
+        if seg not in fields:
+            prefix = ".".join(segments[:idx]) if idx else current.__name__
+            return f"unknown schema field `{seg}` under `{prefix}`"
+        next_model, is_open = _unwrap_model_or_open(fields[seg].annotation)
+        if idx == len(segments) - 1:
+            return None
+        if next_model is not None:
+            current = next_model
+        elif is_open:
+            return None
+        else:
+            return f"field `{seg}` has no child schema attributes for `{'.'.join(segments[idx + 1:])}`"
+    return None
+
+
+def check_interpretation_schema_paths(root: Path = ROOT) -> list[str]:
+    """Validate documented JSON schema paths in docs/interpretation against live models."""
+    interp_dir = root / "docs" / "interpretation"
+    if not interp_dir.is_dir():
+        return []
+    from fatebridge.core.contracts.output_qimen_board import Qimen, QimenPalace
+    from fatebridge.core.response_models import output_model_for
+
+    qimen_output = output_model_for("qimen")
+    unambiguous_roots = {
+        "liuyao_evidence": output_model_for("liuyao"),
+        "bazi_birth": output_model_for("bazi_birth_chart"),
+        "runyear": output_model_for("liuren_yearly_timing"),
+        "jinkou": output_model_for("jinkou"),
+    }
+    errors: list[str] = []
+    for md_path in sorted(interp_dir.rglob("*.md")):
+        rel = md_path.relative_to(root).as_posix()
+        is_qimen_doc = rel == "docs/interpretation/zhanbu/qimen-evidence.md"
+        tokens = _extract_inline_code_tokens(md_path.read_text(encoding="utf-8"))
+        for line_no, token in tokens:
+            if (
+                "." not in token
+                or any(
+                    ch in token
+                    for ch in (" ", "=", "(", ")", "/", "<", ">", "{", "}", "*", ":")
+                )
+                or token.startswith(".")
+                or token.endswith(".")
+            ):
+                continue
+            segments = token.split(".")
+            first = _INDEX_SUFFIX_RE.sub("", segments[0])
+            if not first.isidentifier():
+                continue
+            if is_qimen_doc:
+                if first in _QIMEN_STALE_ROOTS:
+                    errors.append(
+                        f"{rel}:{line_no}: retired/nonexistent qimen schema path `{token}`"
+                    )
+                    continue
+                if first == "qimen":
+                    msg = _validate_model_path(qimen_output, segments)
+                    if msg:
+                        errors.append(f"{rel}:{line_no}: {msg} (`{token}`)")
+                    continue
+                if first in {"palaces", "palace"}:
+                    msg = _validate_model_path(QimenPalace, segments[1:])
+                    if msg:
+                        errors.append(f"{rel}:{line_no}: {msg} (`{token}`)")
+                    continue
+                if first in Qimen.model_fields:
+                    msg = _validate_model_path(Qimen, segments)
+                    if msg:
+                        errors.append(f"{rel}:{line_no}: {msg} (`{token}`)")
+                    continue
+            if first in unambiguous_roots:
+                msg = _validate_model_path(unambiguous_roots[first], segments)
+                if msg:
+                    errors.append(f"{rel}:{line_no}: {msg} (`{token}`)")
+    return errors
+
+
 def markdown_paths() -> list[Path]:
     """Return sorted maintained Markdown files checked by the documentation linter."""
     paths = set(ROOT.glob("*.md"))
@@ -178,10 +333,11 @@ def main(argv: list[str] | None = None) -> int:
             json.loads(path.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, UnicodeDecodeError) as error:
             errors.append(f"{path.relative_to(ROOT)}: invalid JSON: {error}")
+    blocks = sum(document.json_blocks for document in documents.values())
+    errors.extend(check_interpretation_schema_paths(ROOT))
     if errors:
         print("\n".join(errors))
         return 1
-    blocks = sum(document.json_blocks for document in documents.values())
     print(
         f"OK: {len(documents)} Markdown files, {checked_links} local links, "
         f"{blocks} JSON blocks, {len(json_paths)} JSON example files"

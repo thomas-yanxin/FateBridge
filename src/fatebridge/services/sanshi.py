@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from datetime import datetime
-from typing import Any
+from datetime import date, datetime
+from typing import Any, Literal
 
 from fatebridge.core.almanac import get_lunar_context, localize_datetime
 from fatebridge.core.metaphysics.jinkou import (
@@ -23,6 +23,7 @@ from fatebridge.core.metaphysics.liureng import (
 )
 from fatebridge.core.metaphysics.ren_calendar import (
     MonthGeneralMode,
+    derive_birth_year_fate_from_date,
     require_ren_calendar,
     resolve_runyear_birth_clock,
     resolve_runyear_birth_zone,
@@ -42,11 +43,13 @@ from fatebridge.core.metaphysics.taiyi import (
     civil_clock_resolution,
 )
 from fatebridge.core.qimen import build_qimen_with_options
+from fatebridge.services.birth_context import build_unknown_hour_coverage
 from fatebridge.utils.birth_input import PersonInfo
 from fatebridge.utils.civil_clock import format_utc_offset
 from fatebridge.utils.civil_time import utc_calendar, utc_ordering_key
 from fatebridge.utils.errors import calculation_guard
 from fatebridge.utils.formatting import create_pillar_dict
+from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 
 
 @calculation_guard("大六壬起课")
@@ -71,7 +74,17 @@ def calculate_liureng_gods(
     shehai_method: ShehaiMethod = "depth_first",
     harm_include_terminal: bool = False,
     guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
+    birth_date: str | None = None,
+    birth_year_boundary: Literal["lunar_new_year", "lichun"] = "lunar_new_year",
 ) -> dict[str, Any]:
+    derivation: dict[str, Any] | None = None
+    if birth_date is not None:
+        derivation = derive_birth_year_fate_from_date(
+            birth_date,
+            date(analysis_year, analysis_month, analysis_day),
+            boundary=birth_year_boundary,
+            timezone_name=analysis_timezone or DEFAULT_BIRTH_TIMEZONE,
+        )
     seed = build_analysis_seed(
         analysis_year=analysis_year,
         analysis_month=analysis_month,
@@ -101,6 +114,8 @@ def calculate_liureng_gods(
         month_general_mode=month_general_mode,
         latitude=analysis_latitude,
     )
+    if derivation is not None:
+        liureng["birth_year_derivation"] = derivation
     liureng["engine"] = "fatebridge-offline"
     return {
         "analysis_type": "大六壬起课",
@@ -153,14 +168,19 @@ def calculate_liureng_runyear(
     birth_zone, birth_zone_source = resolve_runyear_birth_zone(
         person.birth_timezone, person.birth_place, person.birth_longitude
     )
+    unknown_hour = bool(getattr(person, "birth_time_unknown", False))
     birth_moment, birth_clock = resolve_runyear_birth_clock(
         datetime(
             person.birth_year,
             person.birth_month,
             person.birth_day,
-            person.birth_hour,
-            person.birth_minute,
-            person.birth_second or 0,
+            (
+                12
+                if unknown_hour
+                else (person.birth_hour if person.birth_hour is not None else 0)
+            ),
+            0 if unknown_hour else person.birth_minute,
+            0 if unknown_hour else (person.birth_second or 0),
         ),
         birth_zone,
         birth_utc_offset,
@@ -217,7 +237,7 @@ def calculate_liureng_runyear(
         natal=runyear["year_fate"]["natal"]["earth_branch"],
         annual=runyear["year_fate"]["annual"]["earth_branch"],
     )
-    return {
+    payload: dict[str, Any] = {
         "analysis_type": "大六壬行年",
         "analysis_context": _analysis_context_payload(seed),
         "four_pillars": create_pillar_dict(seed.pillars),
@@ -225,6 +245,14 @@ def calculate_liureng_runyear(
         "runyear": runyear,
         "liuren": liureng,
     }
+    if unknown_hour:
+        payload["coverage"] = build_unknown_hour_coverage(
+            birth_moment.date(),
+            birth_zone,
+            mode="date_only_hour_unknown",
+            omitted_components=["birth_hour"],
+        )
+    return payload
 
 
 @calculation_guard("奇门遁甲")
@@ -364,8 +392,30 @@ def calculate_jinkou_analysis(
     diurnal_mode: DiurnalMode = "clock",
     month_general_mode: MonthGeneralMode = "solar_term",
     guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
+    birth_date: str | None = None,
+    birth_year_boundary: Literal["lunar_new_year", "lichun"] = "lunar_new_year",
 ) -> dict[str, Any]:
     del guiren_profile
+    derivation: dict[str, Any] | None = None
+    if birth_date is not None:
+        derivation = derive_birth_year_fate_from_date(
+            birth_date,
+            date(analysis_year, analysis_month, analysis_day),
+            boundary=birth_year_boundary,
+            timezone_name=analysis_timezone or DEFAULT_BIRTH_TIMEZONE,
+        )
+        if (
+            birth_year_ganzhi is not None
+            and birth_year_ganzhi != derivation["birth_year_ganzhi"]
+        ):
+            raise ValueError("birth_year_ganzhi 与按 birth_date 换算的出生年干支冲突")
+        if natal_branch is not None and natal_branch != derivation["natal_branch"]:
+            raise ValueError("natal_branch 与按 birth_date 换算的本命年支冲突")
+        if year_fate_age is not None and year_fate_age != derivation["year_fate_age"]:
+            raise ValueError("year_fate_age 与按 birth_date 换算的行年岁序冲突")
+        birth_year_ganzhi = birth_year_ganzhi or derivation["birth_year_ganzhi"]
+        if year_fate_age is None:
+            year_fate_age = derivation["year_fate_age"]
     natal = confirmed_natal_branch(birth_year_ganzhi, natal_branch, year_fate_age)
     seed = build_analysis_seed(
         analysis_year=analysis_year,
@@ -424,6 +474,8 @@ def calculate_jinkou_analysis(
         month_general_mode=month_general_mode,
         latitude=analysis_latitude,
     )
+    if derivation is not None:
+        jinkou["birth_year_derivation"] = derivation
     jinkou["engine"] = "fatebridge-offline"
     return {
         "analysis_type": "金口诀",

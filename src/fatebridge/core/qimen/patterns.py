@@ -226,6 +226,53 @@ FIVE_JIA = (
 
 GOOD_DOORS = frozenset({"开门", "休门", "生门"})
 
+AUSPICIOUS_PATTERN_IDS = frozenset(
+    {
+        "wonders_de_shi",
+        "flying_bird_enters_cave",
+        "dragon_returns_head",
+        "heaven_dun",
+        "earth_dun",
+        "cloud_dun",
+        "dragon_dun",
+        "human_dun",
+        "spirit_dun",
+        "ghost_dun",
+        "wind_dun",
+        "tiger_dun",
+        "true_deception",
+        "heavy_deception",
+        "rest_deception",
+        "heaven_jia",
+        "earth_jia",
+        "spirit_jia",
+        "ghost_jia",
+        "jade_maiden_gate",
+    }
+)
+
+CONFLICTING_PATTERN_IDS = frozenset(
+    {
+        "door_pressure",
+        "wonder_tomb",
+        "six_instrument_punishment",
+        "big_grid",
+        "small_grid",
+        "punishment_grid",
+        "azure_dragon_flee",
+        "white_tiger_rampant",
+        "vermilion_bird_river",
+        "tengshe_coiling",
+        "taibai_enters_ying",
+        "ying_enters_taibai",
+        "hidden_palace",
+        "flying_palace",
+        "hidden_day_stem",
+        "flying_day_stem",
+        "hour_stem_block",
+    }
+)
+
 GOD_ROLES = {
     "值符": "天乙之神",
     "螣蛇": "虚诈之神",
@@ -384,15 +431,26 @@ def enrich_qimen_evidence(
         trigram = palace["trigram"]
         palace["direction"] = DIRECTIONS[trigram]
         palace["element"] = PALACE_ELEMENTS[trigram]
-        branches = PALACE_BRANCHES[trigram]
+        branches = list(PALACE_BRANCHES[trigram])
         h_void = [b for b in branches if b in hour_void_chars]
         d_void = [b for b in branches if b in day_void_chars]
         if h_void:
             hour_void_palaces.append(palace["name"])
         if d_void:
             day_void_palaces.append(palace["name"])
+        palace["branches"] = branches
         palace["hour_void_branches"] = h_void
         palace["day_void_branches"] = d_void
+        palace["hour_void_scope"] = (
+            "none"
+            if not h_void
+            else ("full_palace" if len(h_void) == len(branches) else "partial_branch")
+        )
+        palace["day_void_scope"] = (
+            "none"
+            if not d_void
+            else ("full_palace" if len(d_void) == len(branches) else "partial_branch")
+        )
         palace["is_horse_palace"] = trigram == horse["trigram"]
 
         if trigram == "中" and board.get("layout") != "fei":
@@ -525,6 +583,26 @@ def enrich_qimen_evidence(
                 },
             }
         )
+
+    # Annotate auspicious patterns with same-palace conflicts or hour-void constraints
+    conflicts_by_palace: dict[str, list[str]] = {}
+    for pat in patterns:
+        if pat["rule_id"] in CONFLICTING_PATTERN_IDS:
+            conflicts_by_palace.setdefault(pat["palace"], [])
+            if pat["name"] not in conflicts_by_palace[pat["palace"]]:
+                conflicts_by_palace[pat["palace"]].append(pat["name"])
+    for palace in board["palaces"]:
+        if palace.get("hour_void_scope") == "full_palace":
+            label = f"时旬空({''.join(palace['hour_void_branches'])})"
+            conflicts_by_palace.setdefault(palace["name"], []).append(label)
+        elif palace.get("hour_void_scope") == "partial_branch":
+            label = f"时旬半空({''.join(palace['hour_void_branches'])})"
+            conflicts_by_palace.setdefault(palace["name"], []).append(label)
+    for pat in patterns:
+        if pat["rule_id"] in AUSPICIOUS_PATTERN_IDS:
+            conflicts = conflicts_by_palace.get(pat["palace"])
+            if conflicts:
+                pat["coexisting_conflicts"] = list(conflicts)
 
     board["patterns"] = patterns
     board["stem_context"] = {

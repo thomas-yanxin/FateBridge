@@ -202,9 +202,12 @@ def seasonal_climate_god(
     elements = list(dict.fromkeys(STEM_ELEMENTS[s][0].value for s in stems))
     observed: list[dict[str, Any]] = []
     if pillars is not None:
+        active_order = tuple(p for p in ORDER if p in pillars)
         for s in stems:
-            visible = [p for p in ORDER if pillars[p][0] == s]
-            hidden = [p for p in ORDER if s in BRANCH_HIDDEN_STEMS[pillars[p][1]]]
+            visible = [p for p in active_order if pillars[p][0] == s]
+            hidden = [
+                p for p in active_order if s in BRANCH_HIDDEN_STEMS[pillars[p][1]]
+            ]
             observed.append(
                 {
                     "stem": s,
@@ -321,13 +324,16 @@ def evaluate_strength_policy(
     effective: dict[Element, float] = {e: 0.0 for e in Element}
     hidden_ledger: list[dict[str, Any]] = []
     clashed_branches: set[str] = set()
-    branches = [pillars[p][1] for p in ORDER]
+    active_order = tuple(p for p in ORDER if p in pillars)
+    branches = [pillars[p][1] for p in active_order]
     for b1, b2 in BRANCH_CLASH_PAIRS:
         if b1 in branches and b2 in branches:
             clashed_branches.update((b1, b2))
 
     # Visible stems (non-day stems contribute; day stem is the target being weighed)
     for pos in ("year", "month", "hour"):
+        if pos not in pillars:
+            continue
         stem = pillars[pos][0]
         elem = STEM_ELEMENTS[stem][0]
         factor = (
@@ -336,7 +342,7 @@ def evaluate_strength_policy(
         effective[elem] += policy.reveal_multiplier * factor
 
     # Branch hidden stems with month weighting + clash attenuation
-    for pos in ORDER:
+    for pos in active_order:
         branch = pillars[pos][1]
         weight_base = policy.branch_budget * (
             policy.month_multiplier if pos == "month" else 1.0
@@ -395,7 +401,7 @@ def evaluate_strength_policy(
     # Root checks for structural confirmation
     vigorous_roots = [
         pos
-        for pos in ORDER
+        for pos in active_order
         if twelve_life_stage(day_stem, pillars[pos][1]) in {"长生", "临官", "帝旺"}
         and any(
             STEM_ELEMENTS[h][0] == day_elem
@@ -483,8 +489,11 @@ def _adjudicate_special_structure(
     month_branch = pillars["month"][1]
     month_elem = BRANCH_ELEMENTS[month_branch][0]
 
+    active_order = tuple(p for p in ORDER if p in pillars)
     # 1. 化气格: day stem combines with adjacent month or hour stem, month supports transformed element, day lacks strong root
     for adj in ("month", "hour"):
+        if adj not in pillars:
+            continue
         other = pillars[adj][0]
         for a, b, target_elem_val in STEM_COMBINATIONS:
             if {day_stem, other} == {a, b}:
@@ -494,18 +503,17 @@ def _adjudicate_special_structure(
                     or GENERATION_CYCLE[month_elem] == target_elem
                 )
                 jealous = (
-                    sum(1 for p in ("year", "month", "hour") if pillars[p][0] == other)
-                    > 1
-                    or sum(
+                    sum(
                         1
-                        for p in ("year", "month", "day", "hour")
-                        if pillars[p][0] == day_stem
+                        for p in ("year", "month", "hour")
+                        if p in pillars and pillars[p][0] == other
                     )
                     > 1
+                    or sum(1 for p in active_order if pillars[p][0] == day_stem) > 1
                 )
                 day_roots = [
                     p
-                    for p in ORDER
+                    for p in active_order
                     if any(
                         STEM_ELEMENTS[h][0] == day_elem
                         for h in BRANCH_HIDDEN_STEMS[pillars[p][1]]
@@ -564,7 +572,7 @@ def _adjudicate_special_structure(
 
     # 3. 从格: rootless or very weak day master (support_share <= 0.18, no vigorous roots)
     has_same_stem_root = any(
-        day_stem in BRANCH_HIDDEN_STEMS[pillars[p][1]] for p in ORDER
+        day_stem in BRANCH_HIDDEN_STEMS[pillars[p][1]] for p in active_order
     )
     if (
         support_share <= 0.18
@@ -647,10 +655,12 @@ def _adjudicate_month_pattern(
     """Adjudicate 正格 / 杂气透干取格 / 建禄格 / 月刃格 and 成败救应."""
     day_stem = pillars["day"][0]
     day_elem = STEM_ELEMENTS[day_stem][0]
+    active_order = tuple(p for p in ORDER if p in pillars)
+    non_day_order = tuple(p for p in ("year", "month", "hour") if p in pillars)
     roles = _element_by_role(day_elem)
     month_branch = pillars["month"][1]
     hidden = BRANCH_HIDDEN_STEMS[month_branch]
-    visible_stems = {pillars[p][0] for p in ("year", "month", "hour")}
+    visible_stems = {pillars[p][0] for p in non_day_order}
 
     if month_branch == LU_SEATS[day_stem]:
         pattern_god = "比肩"
@@ -698,18 +708,16 @@ def _adjudicate_month_pattern(
     key = key_map.get(label, "month_pattern")
 
     # 成败救应 check
-    all_gods = {
-        get_ten_god(day_stem, pillars[p][0]).value for p in ("year", "month", "hour")
-    } | {
+    all_gods = {get_ten_god(day_stem, pillars[p][0]).value for p in non_day_order} | {
         get_ten_god(day_stem, h).value
-        for p in ORDER
+        for p in active_order
         for h in BRANCH_HIDDEN_STEMS[pillars[p][1]]
     }
-    visible_gods = {
-        get_ten_god(day_stem, pillars[p][0]).value for p in ("year", "month", "hour")
-    }
+    visible_gods = {get_ten_god(day_stem, pillars[p][0]).value for p in non_day_order}
     month_clashed = any(
-        BRANCH_CONFLICTS[month_branch] == pillars[p][1] for p in ("year", "day", "hour")
+        BRANCH_CONFLICTS[month_branch] == pillars[p][1]
+        for p in ("year", "day", "hour")
+        if p in pillars
     )
 
     obstructions: list[str] = []
@@ -973,6 +981,7 @@ def analyze_elements_and_structure(
     life_stages = {
         pos: twelve_life_stage(day_stem, pillars[pos][1], school=changsheng_school)
         for pos in ORDER
+        if pos in pillars
     }
 
     day_master = {

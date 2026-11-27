@@ -11,7 +11,10 @@ from fatebridge.core.almanac import (
 )
 from fatebridge.core.bazi.calendar import ChangshengSchool, DutyProfile, ZiHourPolicy
 from fatebridge.core.bazi.policies import YearBoundaryPolicy
-from fatebridge.services.birth_context import build_birth_computation_context
+from fatebridge.services.birth_context import (
+    build_birth_computation_context,
+    build_unknown_hour_coverage,
+)
 from fatebridge.services.timing_clock import (
     AnalysisClockReference,
     age_only_reference,
@@ -111,15 +114,25 @@ def calculate_comprehensive_timing(
             birth_context, target_year=analysis_date.year
         )
 
+    unknown_hour = bool(getattr(person, "birth_time_unknown", False))
     result: dict[str, Any] = {
         "analysis_type": "综合时运分析",
         "person_info": {
             "name": person.name,
-            "birth_datetime": format_clock_datetime(
-                input_birth_datetime, include_seconds=person.birth_second is not None
+            "birth_datetime": (
+                f"{input_birth_datetime:%Y-%m-%d} (时辰未知)"
+                if unknown_hour
+                else format_clock_datetime(
+                    input_birth_datetime,
+                    include_seconds=person.birth_second is not None,
+                )
             ),
-            "normalized_birth_datetime": format_clock_datetime(
-                birth_date, include_seconds=person.birth_second is not None
+            "normalized_birth_datetime": (
+                None
+                if unknown_hour
+                else format_clock_datetime(
+                    birth_date, include_seconds=person.birth_second is not None
+                )
             ),
             "gender": normalize_gender(person.gender),
             "analysis_date": analysis_date.strftime("%Y-%m-%d"),
@@ -132,6 +145,17 @@ def calculate_comprehensive_timing(
         "calendar_context": birth_context.birth_calendar_context,
         "analysis_calendar": analysis_calendar,
     }
+    if unknown_hour:
+        result["coverage"] = build_unknown_hour_coverage(
+            input_birth_datetime.date(),
+            normalized_birth_time.timezone,
+            mode="three_pillars_hour_unknown",
+            omitted_components=[
+                "hour_pillar",
+                "xiaoyun",
+                "dayun_exact_onset_hour",
+            ],
+        )
 
     dayun_analysis = timing_result["dayun_analysis"]
     if "dayun_info" in dayun_analysis:

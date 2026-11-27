@@ -441,6 +441,8 @@ def solve_planetary_events(
                     p_lons[k + sub] = (l0 + dl * frac) % 360.0
                     p_spds[k + sub] = s0 + (s1 - s0) * frac
 
+    _CONTACT_RAY_SECTORS = frozenset({0, 2, 3, 4, 6, 8, 9, 10})
+
     def _has_ray_hit(
         vx: float, vy: float, rays: tuple[int, ...], pad: float = 1e-6
     ) -> bool:
@@ -448,15 +450,13 @@ def solve_planetary_events(
         if abs(step_f) >= 45.0 or vx == vy:
             return True
         low_f, high_f = (vx, vx + step_f) if step_f >= 0.0 else (vx + step_f, vx)
-        t_min = int(math.floor(low_f / 360.0)) - 1
-        t_max = int(math.floor(high_f / 360.0)) + 1
-        for turn in range(t_min, t_max + 1):
-            base = turn * 360
-            for ray in rays:
-                tgt_f = base + ray
-                if low_f - pad <= tgt_f <= high_f + pad:
-                    return True
-        return False
+        k_start = math.ceil((low_f - pad) / 30.0)
+        k_end = math.floor((high_f + pad) / 30.0)
+        if k_start > k_end:
+            return False
+        if rays is ingress_rays:
+            return True
+        return any((k % 12) in _CONTACT_RAY_SECTORS for k in range(k_start, k_end + 1))
 
     def _might_turn(va: float, vb: float) -> bool:
         min_v = min(abs(va), abs(vb))
@@ -467,21 +467,22 @@ def solve_planetary_events(
             stride = 1 if planet == "Moon" else slow_stride
             lons_p = grid_lon[planet]
             spds_p = grid_spd[planet]
+
+            def rate(t: float, p: str = planet) -> float:
+                return sample(p, t)["speed"]
+
+            def longitude(t: float, p: str = planet) -> float:
+                return fast_lon_lookup(p, t)
+
             for idx in range(0, n_steps, stride):
                 idx_end = min(n_steps, idx + stride)
-                a_t, b_t = step_times[idx], step_times[idx_end]
                 va_s, vb_s = spds_p[idx], spds_p[idx_end]
                 need_turn = _might_turn(va_s, vb_s)
                 if not need_turn and not _has_ray_hit(
                     lons_p[idx], lons_p[idx_end], ingress_rays
                 ):
                     continue
-
-                def rate(t: float, p: str = planet) -> float:
-                    return sample(p, t)["speed"]
-
-                def longitude(t: float, p: str = planet) -> float:
-                    return fast_lon_lookup(p, t)
+                a_t, b_t = step_times[idx], step_times[idx_end]
 
                 turns = extrema(a_t, b_t, rate) if need_turn else []
                 for bracket in turns:
@@ -510,8 +511,21 @@ def solve_planetary_events(
         if moon_contacts_only and not has_moon:
             continue
         stride = 1 if has_moon else slow_stride
+        pad_c = 1.0 if has_moon else 1e-6
         lons_p, lons_q = grid_lon[first], grid_lon[second]
         spds_p, spds_q = grid_spd[first], grid_spd[second]
+
+        def relative_longitude(t: float, p: str = first, q: str = second) -> Fraction:
+            return (
+                Fraction(fast_lon_lookup(p, t)) - Fraction(fast_lon_lookup(q, t))
+            ) % 360
+
+        def relative_longitude_f(t: float, p: str = first, q: str = second) -> float:
+            return (fast_lon_lookup(p, t) - fast_lon_lookup(q, t)) % 360.0
+
+        def relative_rate(t: float, p: str = first, q: str = second) -> float:
+            return sample(p, t)["speed"] - sample(q, t)["speed"]
+
         for idx in range(0, n_steps, stride):
             idx_end = min(n_steps, idx + stride)
             va_r = spds_p[idx] - spds_q[idx]
@@ -519,26 +533,9 @@ def solve_planetary_events(
             need_turn = _might_turn(va_r, vb_r)
             vx_r = (lons_p[idx] - lons_q[idx]) % 360.0
             vy_r = (lons_p[idx_end] - lons_q[idx_end]) % 360.0
-            if not need_turn and not _has_ray_hit(
-                vx_r, vy_r, contact_rays, pad=1.0 if has_moon else 1e-6
-            ):
+            if not need_turn and not _has_ray_hit(vx_r, vy_r, contact_rays, pad=pad_c):
                 continue
             a_t, b_t = step_times[idx], step_times[idx_end]
-
-            def relative_longitude(
-                t: float, p: str = first, q: str = second
-            ) -> Fraction:
-                return (
-                    Fraction(fast_lon_lookup(p, t)) - Fraction(fast_lon_lookup(q, t))
-                ) % 360
-
-            def relative_longitude_f(
-                t: float, p: str = first, q: str = second
-            ) -> float:
-                return (fast_lon_lookup(p, t) - fast_lon_lookup(q, t)) % 360.0
-
-            def relative_rate(t: float, p: str = first, q: str = second) -> float:
-                return sample(p, t)["speed"] - sample(q, t)["speed"]
 
             crossings(
                 a_t,

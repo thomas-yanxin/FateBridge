@@ -271,6 +271,7 @@ class Liuren(PartialOutput):
     ruleset: RenRuleset | None = None
     classification: LiurenClassification | None = None
     calendar_policy: RenCalendarPolicy | None = None
+    birth_year_derivation: dict[str, OpenJsonValue] | None = None
 
     @model_validator(mode="after")
     def selection_follows_present_board(self, info: ValidationInfo) -> "Liuren":

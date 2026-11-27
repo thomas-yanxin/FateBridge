@@ -100,6 +100,7 @@ def register_rest_route(
                 error,
                 spec.operation_label_zh,
                 allowed_fields=spec.request_model.model_fields.keys(),
+                root_model=spec.request_model,
             )
             raise HTTPException(
                 status_code=failure["status_code"], detail=failure
@@ -180,7 +181,10 @@ def register_batch_route(app: FastAPI, specs: list[ToolSpec]) -> None:
             ) from None
         except Exception as error:
             failure = handle_calculation_error(
-                error, "batch", allowed_fields=BatchRequest.model_fields.keys()
+                error,
+                "batch",
+                allowed_fields=BatchRequest.model_fields.keys(),
+                root_model=BatchRequest,
             )
             raise HTTPException(
                 status_code=failure["status_code"],

@@ -280,10 +280,24 @@ def calculate_bazi_birth(
     )
     return {
         "analysis_type": "八字命盘",
+        **(
+            {"coverage": base_analysis["coverage"]}
+            if "coverage" in base_analysis
+            else {}
+        ),
         "bazi_birth": {
             "engine": "fatebridge-offline",
-            "time_algorithm": "真太阳时" if normalized.applied else "直接时间",
+            "time_algorithm": (
+                "三柱模式(时辰未知)"
+                if getattr(person, "birth_time_unknown", False)
+                else ("真太阳时" if normalized.applied else "直接时间")
+            ),
             "analysis_date": analysis_date.strftime("%Y-%m-%d"),
+            **(
+                {"coverage": base_analysis["coverage"]}
+                if "coverage" in base_analysis
+                else {}
+            ),
             "person_info": base_analysis["person_info"],
             "four_pillars": base_analysis["four_pillars"],
             "three_origins": three_origins,

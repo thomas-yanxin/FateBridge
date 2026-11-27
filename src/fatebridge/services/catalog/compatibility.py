@@ -20,9 +20,21 @@ def _compact_compatibility(result: ServiceResult) -> ServiceResult:
         if isinstance(natal, dict)
         else natal
     )
-    return {
-        k: (compact_natal if k == "natal_contexts" else v) for k, v in result.items()
-    }
+    ccr = result.get("cross_chart_relations")
+    compact_ccr = (
+        {k: v for k, v in ccr.items() if k in {"pairs", "groups"}}
+        if isinstance(ccr, dict)
+        else ccr
+    )
+    out: ServiceResult = {}
+    for k, v in result.items():
+        if k == "natal_contexts":
+            out[k] = compact_natal
+        elif k == "cross_chart_relations":
+            out[k] = compact_ccr
+        elif k != "directional_ten_gods":
+            out[k] = v
+    return out
 
 
 SPECS: list[ToolSpec] = [

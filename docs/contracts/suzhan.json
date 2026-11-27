@@ -447,6 +447,19 @@
         "description": "已核定的农历二十七宿本命宿（不含牛）；提供则计算本命六宫宿位置及命宿到历日宿的三九关系；七曜运行犯宿另未计算，不从黄经星图提取本命宿",
         "title": "Natal Mansion"
       },
+      "place": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "地点名称（支持离线地名库自动补全 longitude / latitude / timezone）",
+        "title": "Place"
+      },
       "szchart": {
         "default": 0,
         "description": "宿占盘模式开关（透传至宿曜引擎；默认 0）",

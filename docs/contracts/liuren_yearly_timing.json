@@ -200,6 +200,19 @@
         "title": "Analysis Month",
         "type": "integer"
       },
+      "analysis_place": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "起局/起课地点名称（支持离线地名库自动补全 analysis_longitude / analysis_latitude / analysis_timezone）",
+        "title": "Analysis Place"
+      },
       "analysis_second": {
         "default": 0,
         "description": "Analysis second (0-59)",
@@ -247,11 +260,19 @@
         "type": "integer"
       },
       "birth_hour": {
-        "description": "Birth hour (0-23)",
-        "maximum": 23,
-        "minimum": 0,
-        "title": "Birth Hour",
-        "type": "integer"
+        "anyOf": [
+          {
+            "maximum": 23,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth hour (0-23); omit only when birth_time_unknown=True",
+        "title": "Birth Hour"
       },
       "birth_longitude": {
         "anyOf": [
@@ -295,6 +316,12 @@
         "default": "未提供",
         "description": "Birth place (optional)",
         "title": "Birth Place"
+      },
+      "birth_time_unknown": {
+        "default": false,
+        "description": "明确声明出生时辰未知；仅在为 true 时允许省略 birth_hour，按三柱/日级口径推算并标注边界提示",
+        "title": "Birth Time Unknown",
+        "type": "boolean"
       },
       "birth_timezone": {
         "anyOf": [
@@ -425,7 +452,6 @@
       "birth_year",
       "birth_month",
       "birth_day",
-      "birth_hour",
       "analysis_year",
       "analysis_month",
       "analysis_day",

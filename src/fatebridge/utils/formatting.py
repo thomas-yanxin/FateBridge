@@ -1,6 +1,7 @@
 """Shared response text, pillar representation and JSON formatting."""
 
 import json
+from collections.abc import Mapping
 from datetime import datetime
 
 from pydantic import JsonValue
@@ -46,14 +47,15 @@ def format_clock_datetime(
 
 
 def create_pillar_dict(
-    pillars: dict[str, tuple[str, str]],
-) -> dict[str, dict[str, str]]:
-    """Name the stem and branch of each of the four pillars."""
+    pillars: Mapping[str, tuple[str, str] | None],
+) -> dict[str, dict[str, str] | None]:
+    """Name the stem and branch of each pillar (hour may be None in 3-pillar mode)."""
+    hour = pillars.get("hour")
     return {
-        "year": {"stem": pillars["year"][0], "branch": pillars["year"][1]},
-        "month": {"stem": pillars["month"][0], "branch": pillars["month"][1]},
-        "day": {"stem": pillars["day"][0], "branch": pillars["day"][1]},
-        "hour": {"stem": pillars["hour"][0], "branch": pillars["hour"][1]},
+        "year": {"stem": pillars["year"][0], "branch": pillars["year"][1]},  # type: ignore[index]
+        "month": {"stem": pillars["month"][0], "branch": pillars["month"][1]},  # type: ignore[index]
+        "day": {"stem": pillars["day"][0], "branch": pillars["day"][1]},  # type: ignore[index]
+        "hour": ({"stem": hour[0], "branch": hour[1]} if hour is not None else None),
     }
 
 

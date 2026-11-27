@@ -186,18 +186,34 @@
         "title": "House System"
       },
       "latitude": {
-        "description": "Latitude where the chart is cast",
-        "maximum": 90,
-        "minimum": -90,
-        "title": "Latitude",
-        "type": "number"
+        "anyOf": [
+          {
+            "maximum": 90,
+            "minimum": -90,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Latitude where the chart is cast (optional when place is given)",
+        "title": "Latitude"
       },
       "longitude": {
-        "description": "Longitude where the chart is cast",
-        "maximum": 180,
-        "minimum": -180,
-        "title": "Longitude",
-        "type": "number"
+        "anyOf": [
+          {
+            "maximum": 180,
+            "minimum": -180,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Longitude where the chart is cast (optional when place is given)",
+        "title": "Longitude"
       },
       "name": {
         "anyOf": [
@@ -211,6 +227,19 @@
         "default": null,
         "description": "Optional chart name",
         "title": "Name"
+      },
+      "place": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "起盘地点名称（支持离线地名库自动补全 longitude / latitude 及民用时钟下的 timezone_name）",
+        "title": "Place"
       },
       "search_window_hours": {
         "default": 0,
@@ -273,8 +302,6 @@
       }
     },
     "required": [
-      "longitude",
-      "latitude",
       "candidate_year",
       "candidate_month",
       "candidate_day",

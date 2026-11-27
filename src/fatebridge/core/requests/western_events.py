@@ -28,15 +28,56 @@ class AstroMundaneRequest(
         default="春分",
         description="Cardinal ingress: 春分 (spring equinox) / 夏至 / 秋分 / 冬至",
     )
-    longitude: float = Field(
+    longitude: float | None = Field(
+        default=None,
         ge=-180,
         le=180,
-        description="Observation longitude (e.g. capital / place of interest)",
+        description="Observation longitude (e.g. capital / place of interest; optional when place is given)",
     )
-    latitude: float = Field(ge=-90, le=90, description="Observation latitude")
+    latitude: float | None = Field(
+        default=None,
+        ge=-90,
+        le=90,
+        description="Observation latitude (optional when place is given)",
+    )
+    place: str | None = Field(
+        default=None,
+        description="起盘地点名称（支持离线地名库自动补全 longitude / latitude / timezone_name）",
+    )
     timezone_name: str = Field(
         default="+08:00", description="Observation timezone (IANA name or UTC offset)"
     )
+
+    @model_validator(mode="after")
+    def _resolve_mundane_place(self) -> "AstroMundaneRequest":
+        place_text = (self.place or "").strip()
+        if place_text and place_text != "未提供":
+            need_lon = (
+                self.longitude is None or "longitude" not in self.model_fields_set
+            )
+            need_lat = self.latitude is None or "latitude" not in self.model_fields_set
+            need_tz = "timezone_name" not in self.model_fields_set
+            if need_lon or need_lat or need_tz:
+                from fatebridge.utils.places import resolve_place_location
+
+                resolved = resolve_place_location(place_text, place_field="place")
+                if need_lon:
+                    self.longitude = resolved.longitude
+                if need_lat:
+                    self.latitude = resolved.latitude
+                if need_tz and resolved.timezone is not None:
+                    self.timezone_name = resolved.timezone
+        if self.longitude is None or self.latitude is None:
+            missing_path = "longitude" if self.longitude is None else "latitude"
+            raise PydanticCustomError(
+                "missing_coordinates",
+                "需要 longitude / latitude，或提供 FateBridge 支持的 place 以补全坐标",
+                {"path": missing_path},
+            )
+        return self
+
+    def service_inputs(self) -> dict[str, object]:
+        return self.model_dump(exclude={"place"})
 
 
 class AstroExtraReturnsRequest(AnalysisDateFields, AstroLifespanRequest):
@@ -84,11 +125,21 @@ class WesternEventClockFields(
         default=None,
         description="Civil timezone (IANA or UTC offset). Omitted/null with civil preserves legacy +08:00; supply the known zone explicitly. Solar clock bases must omit/null this field to prevent double correction.",
     )
-    longitude: float = Field(
-        ge=-180, le=180, description="Longitude where the chart is cast"
+    longitude: float | None = Field(
+        default=None,
+        ge=-180,
+        le=180,
+        description="Longitude where the chart is cast (optional when place is given)",
     )
-    latitude: float = Field(
-        ge=-90, le=90, description="Latitude where the chart is cast"
+    latitude: float | None = Field(
+        default=None,
+        ge=-90,
+        le=90,
+        description="Latitude where the chart is cast (optional when place is given)",
+    )
+    place: str | None = Field(
+        default=None,
+        description="起盘地点名称（支持离线地名库自动补全 longitude / latitude 及民用时钟下的 timezone_name）",
     )
     house_system: int | str = Field(
         default="R",
@@ -96,6 +147,45 @@ class WesternEventClockFields(
         "code 0..8); Regiomontanus (R, code 2) is traditional for horary and elections."
         + TWELVE_HOUSE_SYSTEM_NOTE,
     )
+
+    @model_validator(mode="after")
+    def _resolve_event_place(self) -> "WesternEventClockFields":
+        place_text = (self.place or "").strip()
+        if place_text and place_text != "未提供":
+            clock_basis = getattr(
+                self,
+                "question_clock_basis",
+                getattr(self, "candidate_clock_basis", "civil"),
+            )
+            need_lon = (
+                self.longitude is None or "longitude" not in self.model_fields_set
+            )
+            need_lat = self.latitude is None or "latitude" not in self.model_fields_set
+            need_tz = clock_basis == "civil" and (
+                self.timezone_name is None
+                or "timezone_name" not in self.model_fields_set
+            )
+            if need_lon or need_lat or need_tz:
+                from fatebridge.utils.places import resolve_place_location
+
+                resolved = resolve_place_location(place_text, place_field="place")
+                if need_lon:
+                    self.longitude = resolved.longitude
+                if need_lat:
+                    self.latitude = resolved.latitude
+                if need_tz and resolved.timezone is not None:
+                    self.timezone_name = resolved.timezone
+        if self.longitude is None or self.latitude is None:
+            missing_path = "longitude" if self.longitude is None else "latitude"
+            raise PydanticCustomError(
+                "missing_coordinates",
+                "需要 longitude / latitude，或提供 FateBridge 支持的 place 以补全坐标",
+                {"path": missing_path},
+            )
+        return self
+
+    def service_inputs(self) -> dict[str, object]:
+        return self.model_dump(exclude={"place"})
 
 
 class AstroHoraryRequest(WesternEventClockFields):
@@ -174,6 +264,10 @@ class AstroHoraryRequest(WesternEventClockFields):
         ge=1,
         le=12,
         description="Optional derived house offset (1-12) counted from turned_from_house (or quesited_house), e.g. 5th from 7th = 11th radical house.",
+    )
+    include_inactive_fortitude_rows: bool = Field(
+        default=False,
+        description="Whether audit output expands all 0-contribution inactive fortitude rows per planet (default false keeps row_catalog + active/unknown rows + inactive_row_codes).",
     )
 
     @model_validator(mode="after")

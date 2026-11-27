@@ -132,24 +132,27 @@ def _compact_jieqi_year(result: ServiceResult) -> ServiceResult:
 
 def _compact_jieqi_timeline(result: ServiceResult) -> ServiceResult:
     return {
-        **result,
-        "jieqi_timeline": _compact_jieqi_nodes(result["jieqi_timeline"]),
+        k: (_compact_jieqi_nodes(v) if k == "jieqi_timeline" else v)
+        for k, v in result.items()
+        if k not in {"calendar_context", "target_year_jieqi"}
     }
 
 
 def _compact_bazi_timing(result: ServiceResult) -> ServiceResult:
     dayun = result.get("dayun")
     compact_dayun = (
-        {k: v for k, v in dayun.items() if k != "timing_context"}
+        {
+            k: v
+            for k, v in dayun.items()
+            if k
+            not in {"timing_context", "element_effects", "natal_relations", "shensha"}
+        }
         if isinstance(dayun, dict)
         else dayun
     )
     analysis_calendar = result.get("analysis_calendar")
     compact_calendar: Any
-    if isinstance(analysis_calendar, dict) and any(
-        k in analysis_calendar
-        for k in ("analysis_year_jieqi", "liuyue_timeline", "jieqi_timeline")
-    ):
+    if isinstance(analysis_calendar, dict):
         trimmed_calendar = dict(analysis_calendar)
         if isinstance(trimmed_calendar.get("analysis_year_jieqi"), list):
             trimmed_calendar["analysis_year_jieqi"] = [
@@ -166,15 +169,23 @@ def _compact_bazi_timing(result: ServiceResult) -> ServiceResult:
         compact_calendar = trimmed_calendar
     else:
         compact_calendar = analysis_calendar
-    return {
-        k: (
-            compact_dayun
-            if k == "dayun"
-            else compact_calendar if k == "analysis_calendar" else v
-        )
-        for k, v in result.items()
-        if k not in {"calendar_context"}
-    }
+    out: ServiceResult = {}
+    for k, v in result.items():
+        if k in {"calendar_context", "interaction_analysis", "combined_effects"}:
+            continue
+        if k == "dayun":
+            out[k] = compact_dayun
+        elif k == "analysis_calendar":
+            out[k] = compact_calendar
+        elif k in {"liuyue", "liuri", "liushi", "liunian"} and isinstance(v, dict):
+            out[k] = {
+                sk: sv
+                for sk, sv in v.items()
+                if sk not in {"detailed_analysis", "element_effects"}
+            }
+        else:
+            out[k] = v
+    return out
 
 
 def _compact_timing_period(result: ServiceResult) -> ServiceResult:

@@ -10,7 +10,10 @@ from fatebridge.core.bazi.relations import (
     check_pillar_patterns,
     check_stem_patterns,
 )
-from fatebridge.services.birth_context import BirthComputationContext
+from fatebridge.services.birth_context import (
+    BirthComputationContext,
+    build_unknown_hour_coverage,
+)
 from fatebridge.utils.formatting import (
     create_pillar_dict,
     format_birth_datetime_display,
@@ -29,20 +32,31 @@ def build_destiny_payload(context: BirthComputationContext) -> dict[str, Any]:
 
     ea = context.element_analysis
     structure_profile = ea["structure_profile"]
+    unknown_hour = bool(getattr(person, "birth_time_unknown", False))
+    birth_display = (
+        f"{birth_datetime.year:04d}年{birth_datetime.month:02d}月{birth_datetime.day:02d}日 (时辰未知)"
+        if unknown_hour
+        else format_birth_datetime_display(
+            birth_datetime,
+            include_minutes=include_minutes,
+            include_seconds=person.birth_second is not None,
+        )
+    )
+    normalized_display = (
+        None
+        if unknown_hour
+        else format_birth_datetime_display(
+            corrected,
+            include_minutes=True,
+            include_seconds=person.birth_second is not None,
+        )
+    )
 
-    return {
+    payload: dict[str, Any] = {
         "person_info": {
             "name": person.name or "未提供",
-            "birth_datetime": format_birth_datetime_display(
-                birth_datetime,
-                include_minutes=include_minutes,
-                include_seconds=person.birth_second is not None,
-            ),
-            "normalized_birth_datetime": format_birth_datetime_display(
-                corrected,
-                include_minutes=True,
-                include_seconds=person.birth_second is not None,
-            ),
+            "birth_datetime": birth_display,
+            "normalized_birth_datetime": normalized_display,
             "gender": person.gender or "未知",
             "birth_place": person.birth_place or "未提供",
             "birth_timezone": normalized.timezone,
@@ -72,3 +86,18 @@ def build_destiny_payload(context: BirthComputationContext) -> dict[str, Any]:
         },
         "calendar_context": context.birth_calendar_context,
     }
+    if unknown_hour:
+        payload["coverage"] = build_unknown_hour_coverage(
+            birth_datetime.date(),
+            normalized.timezone,
+            mode="three_pillars_hour_unknown",
+            omitted_components=[
+                "hour_pillar",
+                "hour_ten_gods",
+                "hour_shensha",
+                "minggong",
+                "shengong",
+                "dayun_exact_onset_hour",
+            ],
+        )
+    return payload

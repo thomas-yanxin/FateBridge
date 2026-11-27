@@ -56,10 +56,10 @@ def test_public_name_resolves_across_discover_and_cli(
     tool = "hellenistic_chart"
     code, result, _ = invoke(capsys, "discover", tool)
     assert code == 0
-    record = result["tools"][0]
+    record = result
     assert record["tool"] == tool
     assert "output_schema" not in record
-    assert discover_specs(CATALOG, tool=tool)["tools"][0]["tool"] == tool
+    assert discover_specs(CATALOG, tool=tool)["tool"] == tool
     parser = cli.build_parser()
     flags = shlex.split(record["cli_example"])[2:]
     assert parser.parse_args([tool, *flags])._spec.name == tool
@@ -143,7 +143,7 @@ def test_doctor_checks_active_dependency_markers_and_skips_unselected_extras(
 async def test_mcp_discover_respects_exposed_family() -> None:
     async with Client(cached_mcp_app(families="astro")) as client:
         listed = await client.call_tool("discover_tools", {"tool": "hellenistic_chart"})
-        assert listed.structured_content["tools"][0]["tool"] == "hellenistic_chart"
+        assert listed.structured_content["tool"] == "hellenistic_chart"
         for old in ("astro_hellen_chart", "astro_hellen"):
             missing = await client.call_tool(
                 "discover_tools", {"tool": old}, raise_on_error=False
@@ -196,10 +196,10 @@ async def test_mcp_input_contract_is_small_and_projections_are_callable() -> Non
             "discover_tools",
             {"tool": "bazi_career", "detail": "full", "include_output_schema": True},
         )
-        record = compact.structured_content["tools"][0]
+        record = compact.structured_content
         assert "output_schema" not in record
-        assert "output_schema" not in full.structured_content["tools"][0]
-        assert "output_schema" in full_with_schema.structured_content["tools"][0]
+        assert "output_schema" not in full.structured_content
+        assert "output_schema" in full_with_schema.structured_content
         assert "career_analysis" in record["output_fields"]
         result = await call_calculation(
             client,
@@ -444,7 +444,7 @@ async def test_published_input_contract_delivers_strict_fields_from_one_run() ->
         contract = await client.call_tool(
             "discover_tools", {"tool": tool, "detail": "full"}
         )
-        fields = contract.structured_content["tools"][0]["suggested_fields"]
+        fields = contract.structured_content["suggested_fields"]
         spec = next(s for s in CATALOG if s.name == tool)
         result = await call_calculation(
             client,
