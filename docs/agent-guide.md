@@ -200,7 +200,7 @@ MCP 失败返回原生 `isError=true`（使用 FastMCP Python Client 读取 `str
 
 1. **发现**：工具定义清楚时直接调用；存在缺口时调用 `discover_tools` / `GET /api/tools` / `fatebridge discover`，按 `family` 或 `q` 检索后取目标工具的 `input_schema`、`evidence_views` 与 `suggested_fields`。咨询规范见[方法参考](interpretation/README.md)、[时间选择](interpretation/shared/timing-selection.md)与[硬边界](interpretation/shared/safety-boundaries.md)。
 2. **调用**：仅收集所选方法必需的资料，未知生时禁止猜测或套用默认/示例。默认 `detail="compact"`，需特定证据按 `evidence_views` 传 `fields`，需完整结构与依据传 `detail="audit"` 且 `fields=null`。
-3. **解读**：将确定性计算事实、传统典籍来源与现实建议分开说明，保留 `rulesets`、`rule_trace`、`engine_is_approximate` 与 `partial` 范围限制。
+3. **读取**：按需读取业务字段与 `status`、`coverage`、`run_metadata` 等结构化结果（`partial` 仅表示对应层缺少部分输入）。
 4. **恢复**：遇到 `isError=true`、HTTP 4xx/5xx 或 CLI 非零退出码时，依 `error_code`、`issues[].path` 与 `constraints` 精确修正；仅 `retryable=true` 才按原参数重试。
 
 ## 家居风水接入

@@ -37,5 +37,4 @@ FateBridge 是面向 Agent 的泛心理领域统一计算引擎，目标是在�
 - 离线核对常用合同见[按需合同索引](docs/contracts/README.md)，只读所选工具文件。以当前连接的实际 Schema 和公开范围为准，不因文件存在而调用隐藏工具。
 - 摘要首轮用 `detail=compact`，`run_calculation`、REST 与 CLI 默认均采用此级别。需要指定证据或更细字段时，按已发布 `evidence_views` 选择 `fields`（三端始终严格校验路径，无效路径报错并附 `constraints.available`）。需要完整 JSON、全部时间线或方法依据时传 `detail=audit`、`fields=null`。
 - 核对 `isError`、实际时区与时间粒度；按错误字段修正，仅 `retryable=true` 才重试。更正事实重建受影响输入；解释未变结果无需重算，需要固定默认时钟或复现时传入 `as_of`。
-- 先回答问题，给实际返回依据的传统含义和现实建议，将计算事实、传统解释与现实建议分开说明。`partial` 只限制对应层，不能把未读取当否定或用限制代替解读。
-- 风水按实际计算层核对[现场资料与来源](docs/interpretation/fengshui/consultation.md)：按实际计算层核对位置、朝向、砂水与宅盘，保留 `status`、`coverage`、`rulesets` 与 `rule_trace`，`partial` 只限制对应层。详细规则见[家居风水参考](docs/fengshui.md)与实际工具合同。
+- 风水工具的输入口径与图层结构见[家居风水参考](docs/fengshui.md)与[现场资料与口径](docs/interpretation/fengshui/consultation.md)。

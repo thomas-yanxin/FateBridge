@@ -71,12 +71,6 @@
   - `environment_adjustments`：透传金锁 `feature_findings` 与 `target_classification`。
   - `element_relationships`：按各层实际落宫星五行给出 `same_element`、`generating_element`、`draining_element`、`controlling_element`、`controlled_element`，仅用于结构说明。
 
-### 4.3 默认视图与必须交付的来源字段
+### 4.3 默认视图与审计字段
 
-按[输出控制与结果读取](../../agent-guide.md#输出控制与结果读取)，单层工具默认 `evidence_views` 投影为 `status layers rulesets coverage rule_trace`，`fengshui_assess` 默认投影为 `status rulesets coverage rule_trace`；且 `detail=compact` 会将 `rulesets` 裁剪为 `{ruleset_id, version, method, source_ids}`、将 `source_catalog` 裁剪为 `{source_id: {title}}`。
-
-向用户正式解释或交付依据时，若需完整作者、版本、链接与典籍页码定位，必须使用 `detail=audit` 且 `fields=null`（或按需投影 `source_catalog`、`rulesets`、`rule_trace`），并如实交代：
-
-1. **规则与版本**：`rulesets[]` 中的 `ruleset_id`、`version`、`method`、`scope` 与 `conventions`（以及 `rule_trace` 对应的方法映射）。
-2. **典籍与作者来源**：`source_catalog[source_id]` 中的 `title`、`author`、`edition`、`isbn`、`url`、`kind`，以及 `rulesets[].source_citations[source_id]` 中的 `locator`、`pages`、`source_version`、`scope`、`boundary` 与 `source_disagreements`。
-3. **版本限度声明**：网络转录或特定作者资料仅代表该登记版本在 `scope` 内的依据，不能外推为整部古籍校勘定本或全门派统一结论。
+按[输出控制与结果读取](../../agent-guide.md#输出控制与结果读取)，单层工具默认 `evidence_views` 投影为 `status layers rulesets coverage rule_trace`，`fengshui_assess` 默认投影为 `status rulesets coverage rule_trace`；且 `detail=compact` 会将 `rulesets` 裁剪为 `{ruleset_id, version, method, source_ids}`、将 `source_catalog` 裁剪为 `{source_id: {title}}`。需要完整的规则集元数据、书目详情或页码定位时，可传 `detail=audit` 且 `fields=null`（或按需投影 `source_catalog`、`rulesets`、`rule_trace`）。
