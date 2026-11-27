@@ -3,13 +3,15 @@
 from __future__ import annotations
 
 from functools import partial
-
-from pydantic import BaseModel
+from typing import TYPE_CHECKING
 
 from fatebridge.application.bindings import bind_request, service_ref
 from fatebridge.application.domain_validators import detect_fengshui_approximate
 from fatebridge.application.tool_spec import CompactView, ServiceResult, ToolSpec
 from fatebridge.core.reproducibility import ReproducibilityPolicy
+
+if TYPE_CHECKING:
+    from pydantic import BaseModel
 
 
 def _load_fengshui_model(model_name: str) -> type[BaseModel]:

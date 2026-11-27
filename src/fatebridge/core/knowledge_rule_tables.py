@@ -10,16 +10,6 @@ from fatebridge.core.astro.astrology_tables import (
     SIGN_LABELS_ZH,
 )
 from fatebridge.core.astro.lilly_houses import house_condition
-from fatebridge.core.classical_western import LOTS
-from fatebridge.core.qimen import (
-    DOOR_ELEMENTS,
-    GOD_PROFILES,
-    PRINTED_EXAMPLES,
-    QIMEN_DOOR_TO_TRIGRAM,
-    QIMEN_FUHEAD_HEAVEN_STEM,
-    STAR_ELEMENTS,
-    god_evidence,
-)
 
 
 class KnowledgeCard(TypedDict, total=False):
@@ -30,6 +20,8 @@ class KnowledgeCard(TypedDict, total=False):
 
 
 def astro_rule_cards(labels: dict[str, str]) -> dict[str, dict[str, KnowledgeCard]]:
+    from fatebridge.core.classical_western import LOTS
+
     planets: dict[str, KnowledgeCard] = {}
     for planet, signs in DOMICILE_RULERS.items():
         planets[planet] = {
@@ -128,6 +120,16 @@ def astro_rule_cards(labels: dict[str, str]) -> dict[str, dict[str, KnowledgeCar
 
 
 def qimen_rule_cards() -> dict[str, dict[str, KnowledgeCard]]:
+    from fatebridge.core.qimen import (
+        DOOR_ELEMENTS,
+        GOD_PROFILES,
+        PRINTED_EXAMPLES,
+        QIMEN_DOOR_TO_TRIGRAM,
+        QIMEN_FUHEAD_HEAVEN_STEM,
+        STAR_ELEMENTS,
+        god_evidence,
+    )
+
     doors: dict[str, KnowledgeCard] = {}
     for door, element in DOOR_ELEMENTS.items():
         doors[door] = {

@@ -6,16 +6,17 @@ from typing import Literal
 
 from pydantic import Field, StrictInt, model_validator
 
-from fatebridge.core.metaphysics.liureng import ShehaiMethod
-from fatebridge.core.metaphysics.ren_calendar import MonthGeneralMode
-from fatebridge.core.metaphysics.ren_diurnal import DiurnalMode
-from fatebridge.core.metaphysics.taiyi import TaiyiDayProfile, TaiyiTablePolicy
 from fatebridge.core.requests.base import (
     FateBridgeBaseRequest,
     RequiredAnalysisClockFields,
 )
 from fatebridge.core.requests.birth import FateBridgeRequest
 
+ShehaiMethod = Literal["depth_first", "meng_zhong_first"]
+MonthGeneralMode = Literal["solar_term", "true_solar_longitude"]
+DiurnalMode = Literal["clock", "sunrise_sunset"]
+TaiyiDayProfile = Literal["jinjing_day_v1", "key_day_winter_jiazi_v1"]
+TaiyiTablePolicy = Literal["computed", "printed_table"]
 GuirenProfile = Literal["liuren_common_v1", "tanyuan_xieji_v1"]
 DEFAULT_GUIREN_PROFILE: GuirenProfile = "liuren_common_v1"
 TaiyiHourProfile = Literal["jinjing_hour_solstice_v1", "key_hour_winter_jiazi_v1"]

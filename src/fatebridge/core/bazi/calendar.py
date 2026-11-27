@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from functools import lru_cache
-from typing import Any, Literal
+from typing import Any
 
 from fatebridge.core.almanac import (
     DEFAULT_TIMEZONE,
@@ -14,6 +14,10 @@ from fatebridge.core.almanac import (
     get_solar_term_environment_key,
     localize_datetime,
 )
+from fatebridge.core.bazi.policies import ChangshengSchool as ChangshengSchool
+from fatebridge.core.bazi.policies import DutyProfile as DutyProfile
+from fatebridge.core.bazi.policies import YearBoundaryPolicy as YearBoundaryPolicy
+from fatebridge.core.bazi.policies import ZiHourPolicy as ZiHourPolicy
 from fatebridge.utils.civil_time import (
     NominalClockLabel,
     ZonedCalendar,
@@ -33,29 +37,18 @@ from fatebridge.utils.data import (
 
 LATE_ZI_HOUR = 23  # 23:00-23:59 属晚子时 / 夜子时
 
-ZiHourPolicy = Literal[
-    "day_rollover_at_23",
-    "night_zi_same_day_next_hour_stem",
-    "night_zi_same_day_same_hour_stem",
-]
 ZI_HOUR_POLICIES: tuple[ZiHourPolicy, ...] = (
     "day_rollover_at_23",
     "night_zi_same_day_next_hour_stem",
     "night_zi_same_day_same_hour_stem",
 )
 
-ChangshengSchool = Literal[
-    "fire_earth_same_palace",
-    "water_earth_same_palace",
-    "five_element_same_stage",
-]
 CHANGSHENG_SCHOOLS: tuple[ChangshengSchool, ...] = (
     "fire_earth_same_palace",
     "water_earth_same_palace",
     "five_element_same_stage",
 )
 
-DutyProfile = Literal["sanming", "yuanhai", "6tail", "ditian"]
 DUTY_PROFILES: tuple[DutyProfile, ...] = ("sanming", "yuanhai", "6tail", "ditian")
 
 TWELVE_STAGES: tuple[str, ...] = (

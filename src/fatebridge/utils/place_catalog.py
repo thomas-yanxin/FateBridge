@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import json
+import re
 import unicodedata
 from collections import defaultdict
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Literal, TypedDict
+from typing import Any, Literal, TypedDict, cast
 
 from typing_extensions import NotRequired
 
@@ -75,7 +76,17 @@ PLACE_SPECIFICITY = {
 CATALOG_DIRECTORY = Path(__file__).resolve().parents[1] / "data" / "places"
 
 
+_ASCII_NON_ALNUM_TABLE = str.maketrans(
+    "", "", "".join(chr(i) for i in range(128) if not chr(i).isalnum())
+)
+_PURE_CJK_RE = re.compile(r"^[\u4e00-\u9fff]+$")
+
+
 def fold_place_text(text: str) -> str:
+    if text.isascii():
+        return text.lower()
+    if _PURE_CJK_RE.match(text):
+        return text
     return "".join(
         c
         for c in unicodedata.normalize(
@@ -87,32 +98,38 @@ def fold_place_text(text: str) -> str:
 
 def normalize_birth_place_text(text: str) -> str:
     """Fold case/Latin accents and punctuation without dropping other scripts."""
-    return "".join(filter(str.isalnum, fold_place_text(text)))
+    if text.isascii():
+        return text.lower().translate(_ASCII_NON_ALNUM_TABLE)
+    if _PURE_CJK_RE.match(text):
+        return text
+    folded = fold_place_text(text)
+    if folded.isascii():
+        return folded.translate(_ASCII_NON_ALNUM_TABLE)
+    return "".join(c for c in folded if c.isalnum())
 
 
 def _load_entries() -> tuple[PlaceEntry, ...]:
     entries: list[PlaceEntry] = []
+    norm = normalize_birth_place_text
+    specificity_by_level = PLACE_SPECIFICITY
     for filename in ("china.json", "world.json"):
         catalog_rows: list[PlaceSourceEntry] = json.loads(
-            (CATALOG_DIRECTORY / filename).read_text(encoding="utf-8")
+            (CATALOG_DIRECTORY / filename).read_bytes()
         )
         for source_entry in catalog_rows:
-            normalized_aliases = tuple(
-                sorted(
-                    {
-                        normalized_alias
-                        for alias in source_entry["aliases"]
-                        if (normalized_alias := normalize_birth_place_text(alias))
-                    }
-                )
+            seen_aliases = {
+                normalized_alias
+                for alias in source_entry["aliases"]
+                if (normalized_alias := norm(alias))
+            }
+            entry = cast(PlaceEntry, source_entry)
+            entry["normalized_aliases"] = (
+                tuple(sorted(seen_aliases))
+                if len(seen_aliases) > 1
+                else tuple(seen_aliases)
             )
-            entries.append(
-                {
-                    **source_entry,
-                    "normalized_aliases": normalized_aliases,
-                    "specificity": PLACE_SPECIFICITY[source_entry["level"]],
-                }
-            )
+            entry["specificity"] = specificity_by_level[source_entry["level"]]
+            entries.append(entry)
     return tuple(entries)
 
 
@@ -122,10 +139,10 @@ def get_place_catalog() -> PlaceCatalogData:
     entries = _load_entries()
     place_by_id = {row["id"]: row for row in entries}
     countries: dict[str, CountryAliases] = json.loads(
-        (CATALOG_DIRECTORY / "countries.json").read_text(encoding="utf-8")
+        (CATALOG_DIRECTORY / "countries.json").read_bytes()
     )
     manifest: PlaceCatalogAliases = json.loads(
-        (CATALOG_DIRECTORY / "manifest.json").read_text(encoding="utf-8")
+        (CATALOG_DIRECTORY / "manifest.json").read_bytes()
     )
     alias_index: dict[str, list[str]] = defaultdict(list)
     context_index: dict[str, list[tuple[str, str]]] = defaultdict(list)
@@ -133,7 +150,14 @@ def get_place_catalog() -> PlaceCatalogData:
 
     def index_qualifier(alias: str, jurisdiction: tuple[str, str]) -> None:
         folded = fold_place_text(alias)
-        context_index["".join(filter(str.isalnum, folded))].append(jurisdiction)
+        if folded.isascii():
+            context_index[folded.translate(_ASCII_NON_ALNUM_TABLE)].append(jurisdiction)
+        elif _PURE_CJK_RE.match(folded):
+            context_index[folded].append(jurisdiction)
+        else:
+            context_index["".join(c for c in folded if c.isalnum())].append(
+                jurisdiction
+            )
         if "," in folded:
             signature = "".join(c for c in folded if c.isalnum() or c == ",")
             context_commas[signature].append(jurisdiction)

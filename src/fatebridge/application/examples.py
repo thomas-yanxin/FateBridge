@@ -1,10 +1,12 @@
 """Read fictional starter inputs and evidence views for public discovery."""
 
+import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
+from typing import cast
 
-from pydantic import JsonValue, TypeAdapter
+from pydantic import JsonValue
 from typing_extensions import NotRequired, TypedDict
 
 from fatebridge.application.tool_spec import EvidenceViews, ToolSpec
@@ -20,10 +22,18 @@ class AgentExamples(TypedDict):
     call_guidance: NotRequired[dict[str, dict[str, JsonValue]]]
 
 
+def validate_agent_examples() -> AgentExamples:
+    """Validate packaged examples against the AgentExamples TypedDict schema."""
+    from pydantic import TypeAdapter
+
+    path = Path(__file__).resolve().parents[1] / "data/agent_examples.json"
+    return TypeAdapter(AgentExamples).validate_json(path.read_bytes())
+
+
 @lru_cache(maxsize=1)
 def _examples() -> AgentExamples:
     path = Path(__file__).resolve().parents[1] / "data/agent_examples.json"
-    return TypeAdapter(AgentExamples).validate_json(path.read_bytes())
+    return cast(AgentExamples, json.loads(path.read_bytes()))
 
 
 def example_input(spec: ToolSpec) -> dict[str, JsonValue] | None:

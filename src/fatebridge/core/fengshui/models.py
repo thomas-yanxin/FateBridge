@@ -12,7 +12,6 @@ from fractions import Fraction
 from numbers import Integral, Real
 from typing import Annotated, Any, Literal, cast, get_args, get_origin
 
-from dateutil.tz import datetime_exists
 from pydantic import (
     BeforeValidator,
     ConfigDict,
@@ -25,7 +24,6 @@ from pydantic import (
 )
 from pydantic_core import PydanticCustomError
 
-from fatebridge.core.fengshui.calendar import year_context
 from fatebridge.core.fengshui.directions import (
     MOUNTAIN_BY_NAME,
     sitting_from_mountain,
@@ -249,12 +247,11 @@ class TimeInput(FengshuiInput):
     @field_validator("birth_at", "query_at", "event_at", check_fields=False)
     @classmethod
     def existing_aware_clock(cls, value: datetime | None) -> datetime | None:
-        if (
-            value is not None
-            and value.utcoffset() is not None
-            and not datetime_exists(value)
-        ):
-            raise ValueError("nonexistent local time：该地区时区不存在此钟时")
+        if value is not None and value.utcoffset() is not None:
+            from dateutil.tz import datetime_exists
+
+            if not datetime_exists(value):
+                raise ValueError("nonexistent local time：该地区时区不存在此钟时")
         return value
 
 
@@ -992,8 +989,11 @@ class AssessRequest(BazhaiRequest):
     @classmethod
     def valid_query_clock(cls, value: datetime | None) -> datetime | None:
         if value is not None:
-            if value.utcoffset() is not None and not datetime_exists(value):
-                raise ValueError("nonexistent local time：该地区时区不存在此钟时")
+            if value.utcoffset() is not None:
+                from dateutil.tz import datetime_exists
+
+                if not datetime_exists(value):
+                    raise ValueError("nonexistent local time：该地区时区不存在此钟时")
             if value.tzinfo is None or value.utcoffset() is None:
                 raise ValueError("query_at 必须包含时区")
             if not 1801 <= value.year <= 2199:
@@ -1024,6 +1024,8 @@ class AssessRequest(BazhaiRequest):
     def _inferred_current_period(self) -> int | None:
         eval_year = self.effective_year
         if eval_year is None and self.query_at is not None:
+            from fatebridge.core.fengshui.calendar import year_context
+
             eval_year = year_context(
                 None, self.query_at, self.timezone_name, resolve_interval=False
             ).get("effective_year")

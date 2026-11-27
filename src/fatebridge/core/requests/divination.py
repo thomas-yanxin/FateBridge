@@ -12,22 +12,6 @@ from pydantic import (
     model_validator,
 )
 
-from fatebridge.core.heluo.judgment import (
-    DEFAULT_MONTH_ASSIGNMENT,
-    MonthAssignmentMethod,
-)
-from fatebridge.core.numerology.numerology_clock_input import (
-    preserve_birth_clock_text,
-)
-from fatebridge.core.numerology.numerology_inputs import (
-    BIRTH_OFFSET_DESCRIPTION,
-    NUMEROLOGY_DATE_DESCRIPTION,
-    NUMEROLOGY_DEFAULT_TIMEZONE,
-    NUMEROLOGY_TIME_DESCRIPTION,
-    normalize_numerology_utc_offset,
-    resolve_numerology_longitude,
-    resolve_numerology_timezone,
-)
 from fatebridge.core.requests.base import (
     FateBridgeBaseRequest,
     OfflineHouseValidatorMixin,
@@ -44,6 +28,27 @@ from fatebridge.core.sukuyo.texts import (
 from fatebridge.utils.birth_input import normalize_gender
 from fatebridge.utils.civil_time import UTCCalendar, parse_civil_iso_clock
 from fatebridge.utils.house_systems import OFFLINE_HOUSE_CODE_NOTE
+
+MonthAssignmentMethod = Literal["intro_preferred_v1", "volume_one_table_v1"]
+DEFAULT_MONTH_ASSIGNMENT: MonthAssignmentMethod = "intro_preferred_v1"
+NUMEROLOGY_DEFAULT_TIMEZONE = "+08:00"
+BIRTH_OFFSET_DESCRIPTION = (
+    "Optional confirmed birth UTC offset ±HH:MM[:SS]. With an IANA zone, verifies "
+    "or selects the occurrence of a repeated birth clock while retaining regional "
+    "rules for later boundaries. Never infer an unknown offset; cannot make a "
+    "nonexistent local time valid or replace birth-record precision."
+)
+NUMEROLOGY_DATE_DESCRIPTION = (
+    "Birth date YYYY-MM-DD in the proleptic Gregorian calendar, including before "
+    "1582; no automatic Julian/Gregorian cutover or historical lunar/era conversion. "
+    "Historical source dates require a separately evidenced conversion."
+)
+NUMEROLOGY_TIME_DESCRIPTION = (
+    "Known birth local time HH:MM[:SS[.ffffff]], up to six fractional digits; "
+    "required, blank is not midnight; timezone goes in timezone. Supplied components "
+    "are retained separately from zero calculation defaults. Textual digits "
+    "do not certify birth-record precision or imply an uncertainty interval."
+)
 
 
 class MeihuaAnalysisRequest(MeihuaInterpretationOptions):
@@ -409,20 +414,36 @@ class NumerologyBirthRequest(LocalLocationFields):
     @field_validator("time", mode="before")
     @classmethod
     def explicit_numerology_clock(cls, value: object) -> str:
+        from fatebridge.core.numerology.numerology_clock_input import (
+            preserve_birth_clock_text,
+        )
+
         return preserve_birth_clock_text(value)
 
     @field_validator("birth_utc_offset", mode="before")
     @classmethod
     def confirmed_birth_offset(cls, value: object) -> str | None:
+        from fatebridge.core.numerology.numerology_inputs import (
+            normalize_numerology_utc_offset,
+        )
+
         return normalize_numerology_utc_offset(value)
 
     @field_validator("timezone", mode="before")
     @classmethod
     def explicit_numerology_timezone(cls, value: object) -> str:
+        from fatebridge.core.numerology.numerology_inputs import (
+            resolve_numerology_timezone,
+        )
+
         return resolve_numerology_timezone(value)
 
     @model_validator(mode="after")
     def require_numerology_longitude(self) -> "NumerologyBirthRequest":
+        from fatebridge.core.numerology.numerology_inputs import (
+            resolve_numerology_longitude,
+        )
+
         resolve_numerology_longitude(self.longitude, self.use_true_solar_time)
         return self
 

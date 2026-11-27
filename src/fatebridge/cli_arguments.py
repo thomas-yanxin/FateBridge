@@ -280,6 +280,8 @@ def build_parser(
     )
 
     for spec in CATALOG:
+        if command is not None and command != "__root__" and command != spec.name:
+            continue
         sp = sub.add_parser(spec.name, help=spec.summary)
         if command is not None and command != spec.name:
             continue

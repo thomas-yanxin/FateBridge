@@ -8,7 +8,7 @@ from typing import Annotated, Literal
 from pydantic import Field, model_validator
 from pydantic_core import PydanticCustomError
 
-from fatebridge.core.bazi.calendar import (
+from fatebridge.core.bazi.policies import (
     ChangshengSchool,
     DutyProfile,
     ZiHourPolicy,
