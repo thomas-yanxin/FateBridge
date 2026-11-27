@@ -167,10 +167,6 @@ class SixYaoRequest(LocalLocationFields):
         le=60,
         description="按已明确的用爻列未来0至60个干支日的条件候选；0不展开，不是事件发生保证",
     )
-    event_horizon: Literal["near", "long_term"] | None = Field(
-        default=None,
-        description="调用方已明确问近事near或久远long_term时传入；用于原典进退条件，未给保持待定，不从timing_days推断",
-    )
     gua_code: str | None = Field(
         default=None,
         pattern=r"^[01]{6}$",

@@ -7,6 +7,7 @@ from typing import Literal
 from pydantic import ConfigDict
 
 from fatebridge.core.contracts.output_base import OpenJsonValue, PartialOutput
+from fatebridge.core.contracts.output_bazi_evidence import DominantStructure
 from fatebridge.core.contracts.output_chinese_calendar import (
     CalendarContext,
     FourPillars,
@@ -43,6 +44,15 @@ class DimensionTimingContext(PartialOutput):
     overridden: TimingOverrides | None = None
 
 
+class TopicMarker(PartialOutput):
+    name: str | None = None
+    anchor: str | None = None
+    target_branch: str | None = None
+    direction: str | None = None
+    natal_positions: list[str] | None = None
+    timing_layers: list[str] | None = None
+
+
 class TopicFacts(PartialOutput):
     topic: str | None = None
     four_pillars: FourPillars | None = None
@@ -50,11 +60,12 @@ class TopicFacts(PartialOutput):
     favorable_elements: list[str] | None = None
     avoid_elements: list[str] | None = None
     dominant_structure: str | None = None
+    structure_detail: DominantStructure | None = None
     seasonal_climate: dict[str, OpenJsonValue] | None = None
     element_distribution: dict[str, float] | None = None
     element_seasonal_phase: dict[str, str] | None = None
     natal_stars: list[dict[str, OpenJsonValue]] | None = None
-    markers: list[dict[str, OpenJsonValue]] | None = None
+    markers: list[TopicMarker] | None = None
     palace_relations: dict[str, list[dict[str, OpenJsonValue]]] | None = None
     natal_groups: list[dict[str, OpenJsonValue]] | None = None
     timing_layers: list[dict[str, OpenJsonValue]] | None = None

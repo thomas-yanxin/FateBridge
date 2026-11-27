@@ -228,3 +228,39 @@ def test_liuyao_audit_payload_budget_and_transports(surface_calls) -> None:
     )
     assert http.status_code == 200 and code == 0 and not mcp.is_error
     assert business(http.json()) == business(cli) == business(mcp.structured_content)
+
+
+def test_liuyao_retires_conditional_analysis_and_event_horizon() -> None:
+    from pydantic import ValidationError
+
+    from fatebridge.core.contracts.output_divination import LiuyaoEvidence
+    from fatebridge.core.requests.divination import SixYaoRequest
+
+    retired_evidence_fields = {
+        "conditional_analysis",
+        "source_kind",
+        "conformance_scope",
+        "source_revisions",
+        "textual_corrections",
+        "pattern_detection_scope",
+        "pending_judgments",
+    }
+    assert retired_evidence_fields.isdisjoint(LiuyaoEvidence.model_fields)
+    assert "event_horizon" not in SixYaoRequest.model_fields
+
+    with pytest.raises(ValidationError):
+        SixYaoRequest(
+            date="2024-05-20",
+            time="14:30:00",
+            event_horizon="near",
+        )
+
+    res = calculate_sixyao_analysis(
+        date="2024-05-20",
+        time="14:30:00",
+        timezone="Asia/Shanghai",
+        gua_code="100000",
+        changed_code="100100",
+    )
+    assert "event_horizon" not in res["analysis_context"]
+    assert retired_evidence_fields.isdisjoint(res["liuyao_evidence"])

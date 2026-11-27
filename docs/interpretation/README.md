@@ -16,7 +16,6 @@
 
 - [八字专题细问的证据读取](shared/bazi-topic-evidence.md)
 - [紫微本命与动态结果的证据读取](shared/ziwei-topic-evidence.md)
-- [时运技法按问题选择](shiyun/techniques.md)
 - [时运可复核示例](shiyun/examples.md)
 - [缘分与合婚可复核示例](yuanfen/examples.md)
 
@@ -24,6 +23,7 @@
 
 - [西占在生活主题中的证据读取](shared/western-topic-evidence.md)
 - [西占深层证据按问题读取](shared/western-deep-evidence.md)
+- [西占单技法与生命周期按问题选择](xingpan/western-timing-techniques.md)
 - [印占的计算事实与传统解释](shared/vedic-evidence.md)
 - [果老研究盘取证](xingpan/guolao-evidence.md)
 - [汉堡中点与德国盘取证](xingpan/hamburg-evidence.md)
@@ -38,7 +38,7 @@
 
 ### 占式与三式
 
-- [六爻：来源资格与目标承受分别说明](zhanbu/liuyao-source-target.md)
+- [六爻：纳甲结构与《增删卜易》取证](zhanbu/liuyao-source-target.md)
 - [奇门盘面证据](zhanbu/qimen-evidence.md)
 - [六壬与金口诀的同次结果取证](zhanbu/ren-evidence.md)
 - [太乙与三式：按本次实际依据解释](zhanbu/taiyi-sanshi.md)

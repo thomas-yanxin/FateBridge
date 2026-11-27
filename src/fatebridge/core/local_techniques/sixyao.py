@@ -115,11 +115,8 @@ def build_sixyao_result(
     focus_kinship: str | None = None,
     focus_kind: str | None = None,
     timing_days: int = 0,
-    event_horizon: str | None = None,
 ) -> dict[str, Any]:
     """Build deterministic Liuyao Najia, Gua Shen, Shen Sha, and structural evidence."""
-    if event_horizon not in (None, "near", "long_term"):
-        raise ValueError("event_horizon 必须是 near、long_term 或省略。")
     method = (method or "auto").strip().lower()
     if method not in {"auto", "coin", "time"}:
         raise ValueError("method 必须是 auto、coin 或 time。")
@@ -234,7 +231,6 @@ def build_sixyao_result(
         "focus_kinship": focus_kinship,
         "focus_kind": focus_kind,
         "timing_days": timing_days,
-        "event_horizon": event_horizon,
     }
     current_payload = _hexagram_desc_payload(current_code)
     changed_payload = _hexagram_desc_payload(changed_hexagram_binary_code)
@@ -306,7 +302,6 @@ def build_sixyao_result(
         focus_kinship=focus_kinship,
         focus_kind=focus_kind,
         timing_days=timing_days,
-        event_horizon=event_horizon,
     )
 
     month_context = context["calendar_context"]["bazi_month_boundary"]

@@ -1,10 +1,6 @@
 """Projection-compatible facts for attributed Yi texts and Liu Yao evidence."""
 
 from fatebridge.core.contracts.output_base import OpenJsonValue, PartialOutput
-from fatebridge.core.contracts.output_liuyao_conditions import (
-    DivinationSource,
-    LiuyaoConditions,
-)
 from fatebridge.core.contracts.output_liuyao_fanfu import FanfuEvidence
 
 
@@ -158,11 +154,8 @@ class DivinationTrace(PartialOutput):
 class LiuyaoEvidence(PartialOutput):
     ruleset_id: str | None = None
     ruleset_version: str | None = None
-    source_kind: str | None = None
-    conformance_scope: str | None = None
     month_model_comparison: MonthModelComparison | None = None
     lines: list[LineEvidence] | None = None
-    conditional_analysis: LiuyaoConditions | None = None
     fanfu: FanfuEvidence | None = None
     hidden_spirits: list[HiddenSpirit] | None = None
     hidden_policy: str | None = None
@@ -171,7 +164,3 @@ class LiuyaoEvidence(PartialOutput):
     moving_focus_guidance: MovingFocusGuidance | None = None
     focus: dict[str, OpenJsonValue] | None = None
     timing_candidates: dict[str, OpenJsonValue] | None = None
-    source_revisions: dict[str, DivinationSource] | None = None
-    textual_corrections: list[str] | None = None
-    pattern_detection_scope: str | None = None
-    pending_judgments: list[str] | None = None

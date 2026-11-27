@@ -1,23 +1,23 @@
-# 六爻：来源资格与目标承受分别说明
+# 六爻：纳甲结构与《增删卜易》取证
 
-解释某爻“当前可用”时，先说明问题涉及的局部条件，再说明尚未裁定的范围。来源受扶、来源可向外生扶、目标能承受、具体作用匹配、整体效力是不同问题；同一爻可以同时有已核事实和未决事实。
+六爻计算采用版本化结构层 `zengshan_structural_v2`（`liuyao_evidence.ruleset_id`），返回确定性的逐爻月令旺衰、日辰生克冲合、暗动／日破、进退神、伏神、三合局、反吟伏吟与日级条件窗口；不直接下吉凶断言或把日级条件写成事件发生保证。
 
-从同次 `liuyao_evidence.conditional_analysis` 读取以下对象，不另算一卦补字段：
+从同次返回读取以下对象，不另算一卦补字段：
 
 | 问题 | 同次依据 | 交付要求 |
 | --- | --- | --- |
-| 本爻是否有已核生扶与另有反制 | `classical_assessment` 的相应主体与 `strength` | 有扶、反制及未知分别说明，不以“总体未决”替代已核内容 |
-| 这个来源是否具备向外生扶资格 | `generation_conditions.sources` 的本位置 `condition_match/status` | 匹配时说明本项资格已核；不匹配时说明实际阻碍；未知不能写成无作用。资格匹配本身不创造原本不存在的生向 |
-| 用爻作为受方能否承受 | `generation_conditions.focus.target_reception_condition/target_status` | 与来源资格分别说明；这不是用爻自身向外生扶的判定 |
-| 某条生扶能否在所列条件下受益 | `generation_conditions.generations` 的对应来源、目标及 `benefit_now` | 只说实际存在的方向，不把某源可用扩成所有目标都已受益 |
-| 本位变化有什么作用 | `back_generation_conditions` 及本爻 `outgoing_obstructions`、对应克制条件 | 回头生的原门槛与当前资格分别读。回头克存在时，连同向外生扶是否受阻一起说明；不能只说该克仍在，然后跳到全局未决 |
+| 卦象基本盘面与世应动静 | `lines`、`moving_lines`、`hexagram_info`（含 `shi_line`、`ying_line`、`gua_shen`）、`patterns`、`pattern_flags` | 区分本卦（`current_hexagram`）与变卦（`changed_hexagram`）；六冲/六合/伏吟/反吟按实际 `patterns` 与 `pattern_flags` 说明 |
+| 逐爻月令旺衰、日建冲合、旬空与进退 | `liuyao_evidence.lines[]` | 按爻位读取 `month_strength`、`day_growth_stage`、`is_xunkong`、`is_month_broken`、`is_void_clashed`、`is_dark_moving`、`is_day_broken`、`day_clash_status`、`shensha` 与 `transformation`（`back_relation`、`advance`、`retreat`） |
+| 动静多寡取象重点 | `liuyao_evidence.moving_focus_guidance` | 读取 `mode`、`moving_count`、`primary_focus_positions` 与 `rule`，说明静卦、独动或重动时的主要观察位置 |
+| 已指定用神及其生克角色 | `liuyao_evidence.focus` | 仅当请求传入 `focus_line`、`focus_kinship` 或 `focus_kind` 时解析；读取 `status`、`selected`、`candidates` 与 `roles`（用神/元神/忌神/仇神/同类）。未传参数时 `status="not_requested"`，不代用户自定用神 |
+| 伏神与飞神关系 | `liuyao_evidence.hidden_spirits[]` 与 `hidden_policy` | 伏神严格按本卦缺失六亲取本宫纯卦同位；`present_in_changed` / `changed_positions` 仅标注变爻是否出现该六亲，不掩盖本卦伏神。读 `flying_to_hidden_relation` 与 `calendar_relations` |
+| 三合局成局状态 | `liuyao_evidence.three_harmony[]` | 区分 `complete_in_lines`、`complete_with_calendar` 与 `pending_one_branch`，列明 `line_members`、`calendar_members` 与 `missing_branches` |
+| 反吟与伏吟结构明细 | `liuyao_evidence.fanfu` | 读 `regions`（`inner` / `outer` 纳支关系）、`moving_line_relations` 与 `explicit_body_example` |
+| 未来干支日条件候选 | `liuyao_evidence.timing_candidates` | 仅当 `timing_days > 0` 且已明确可用焦点时生成 `windows[]`（`effective_date`、`day_ganzhi`、`start_at`、`end_at`、`matched_rules`、`requires_month_reassessment`）。条件窗口只表示干支触发规则，不是事件发生日期保证 |
 
-`month_break_conditions` 保留原月破和同支值日的本项限定。原始月令分类不删除，限定后月令反制不匹配也不排除独立动克、暗动、回头克、旬空或合绊。实际变支、飞神、伏神分别用自己的支值；不借另一主体值日。所列静克静分支是限定条款，不外推成一切静爻永远不能伤临日之爻。
+## 按视图读取与交付边界
 
-细问用爻空亡时可读 `void_conditions` 视图。日建生扶若同时返回原始 `matched` 与 `qualified_matched`，以资格字段判断该生扶能否用于本条，保留其三支条件出处。资格为 `false` 表示该条生扶不能计入，`null` 表示待审；两者都不单独证明用爻永久空亡。
-
-`generation_conditions.focus.source_condition_match/source_status/source_condition_path` 与同一位置的生源记录相连，可和原有 `target_reception_condition/target_status` 一起读取。`source_explanation/target_explanation` 分别转述这两项实际资格；摘要会明确写出已核向外生扶受阻，不能再省略成只有“另有克制、全局待审”。该焦点对象仅适用已明确的可见本爻；变爻、伏神或日月主体返回空时，转读其对应条件，不借原爻焦点代替。
-
-需要完整条件证据时，在首次调用使用 `detail=audit` 且 `fields=null`，不重算另取全文。调用方法见[引擎调用](../shared/fatebridge-engine.md#怎么调引擎)。
-
-交付用日常语言说清这些已读事实。字段检查是取证方法，不要求把整份Schema贴给用户；总效力未裁定继续保留。
+- 需要常规逐爻读取时用 `evidence_views["liuyao"]["line_reading"]`；已明确用神和日级窗口时用 `focus_and_timing`；细查伏神、三合、反吟伏吟与神煞时用 `structural_relations`。
+- 首次需要完整结构证据时使用 `detail=audit` 且 `fields=null`，不重算另取全文。调用方法见[引擎调用](../shared/fatebridge-engine.md#怎么调引擎)。
+- 月令节气交界存在模型差异时，核对可选字段 `liuyao_evidence.month_model_comparison`，保留未比较探针说明。
+- 交付时用日常语言说清已核结构事实与未决条件（如多现未决、月破、旬空、跨月需重估 `requires_month_reassessment`），不把结构条目贴满全文或替引擎补出总吉凶分数。

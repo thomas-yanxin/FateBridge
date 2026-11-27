@@ -544,7 +544,6 @@ def calculate_sixyao_analysis(
     focus_kinship: str | None = None,
     focus_kind: str | None = None,
     timing_days: int = 0,
-    event_horizon: str | None = None,
 ) -> dict[str, Any]:
     """六爻 / 易卦分析工具。"""
     return build_sixyao_result(
@@ -564,7 +563,6 @@ def calculate_sixyao_analysis(
         focus_kinship=focus_kinship,
         focus_kind=focus_kind,
         timing_days=timing_days,
-        event_horizon=event_horizon,
     )
 
 
