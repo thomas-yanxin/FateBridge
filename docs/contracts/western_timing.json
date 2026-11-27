@@ -303,6 +303,12 @@
         "description": "House system, any convention: SE letter ('P'=Placidus, 'R'=Regiomontanus, 'W'=whole sign, 'D'=equal_mc), key ('placidus', 'equal_mc'), or integer code 0..8 (3=Placidus, 8=equal_mc). Explicit values must be supported letters/names or integer codes0..8; unknown, blank, boolean and floating-point selections are rejected without substitution. Gauquelin (G) has36 clockwise sectors and is unavailable here.",
         "title": "House System"
       },
+      "include_full_timelines": {
+        "default": false,
+        "description": "Whether to include full multi-decade timelines; default False returns active states and bounded nearby windows.",
+        "title": "Include Full Timelines",
+        "type": "boolean"
+      },
       "name": {
         "anyOf": [
           {
@@ -418,6 +424,37 @@
         "description": "Whether to expose the bounds overlay preference for the primary direction chart",
         "title": "Show Pd Bounds",
         "type": "boolean"
+      },
+      "techniques": {
+        "anyOf": [
+          {
+            "items": {
+              "enum": [
+                "firdaria",
+                "profection",
+                "solar_return",
+                "lunar_return",
+                "transit",
+                "given_year",
+                "secondary_progression",
+                "solar_arc",
+                "primary_directions",
+                "primary_direction_chart",
+                "decennials",
+                "zodiacal_releasing"
+              ],
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional subset of western timing techniques to compute; when omitted, computes all techniques.",
+        "title": "Techniques"
       },
       "zodiac_type": {
         "default": "Tropic",

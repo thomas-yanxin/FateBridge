@@ -9,6 +9,7 @@ from fatebridge.core.astro.angle_definitions import is_ascendant_resolved
 from fatebridge.core.astro.astrology_tables import RULER_BY_SIGN, SIGNS
 from fatebridge.core.astro.birth import AstroBirthInfo
 from fatebridge.core.predictive._common import (
+    TIMING_POINT_NAMES,
     build_subject,
     collect_aspect_hits,
     extract_reference_longitudes,
@@ -22,6 +23,8 @@ from fatebridge.core.predictive._common import (
 from fatebridge.core.predictive.native_chart import NativeSubject
 from fatebridge.utils.civil_time import ZonedCalendar, utc_calendar
 from fatebridge.utils.timezones import format_local_time_or_utc, parse_timezone_name
+
+_TIMING_POINT_NAME_SET = frozenset(TIMING_POINT_NAMES)
 
 
 def monthly_profection_segment(
@@ -173,26 +176,37 @@ def build_given_year_payload(
     return_timezone: str,
     house_system: str = "P",
     zodiac_type: str = "Tropic",
+    analysis_subject: NativeSubject | None = None,
+    transit_hits: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    anniversary = resolve_last_birthday(
-        birth_info,
-        analysis_datetime=analysis_datetime,
-    )
-    analysis_local = anniversary.analysis_datetime
-    last_birthday = anniversary.start
-    year_end = resolve_local_birthday_anniversary(
-        birth_info.local_datetime,
-        anniversary.nominal_year + 1,
-        tzinfo=last_birthday.tzinfo,
-        clock_policy="compatible",
-    )
     zone = parse_timezone_name(return_timezone)
-    analysis_local = ZonedCalendar(
-        utc_calendar(analysis_local), zone
-    ).require_datetime()
-    last_birthday = ZonedCalendar(utc_calendar(last_birthday), zone).require_datetime()
-    year_end = ZonedCalendar(utc_calendar(year_end), zone).require_datetime()
-    given_year_subject = build_subject(
+    year_start_iso = annual_profection.get("year_start")
+    year_end_iso = annual_profection.get("year_end")
+    if isinstance(year_start_iso, str) and isinstance(year_end_iso, str):
+        analysis_utc = utc_calendar(analysis_datetime)
+        if analysis_utc < birth_info.utc_calendar:
+            raise ValueError("分析时刻不能早于出生时刻。")
+        last_birthday_utc = ZonedCalendar.from_isoformat(year_start_iso).utc
+        year_end_utc = ZonedCalendar.from_isoformat(year_end_iso).utc
+    else:
+        anniversary = resolve_last_birthday(
+            birth_info,
+            analysis_datetime=analysis_datetime,
+        )
+        analysis_utc = utc_calendar(anniversary.analysis_datetime)
+        last_birthday_utc = utc_calendar(anniversary.start)
+        year_end_utc = utc_calendar(
+            resolve_local_birthday_anniversary(
+                birth_info.local_datetime,
+                anniversary.nominal_year + 1,
+                tzinfo=anniversary.start.tzinfo,
+                clock_policy="compatible",
+            )
+        )
+    analysis_local = ZonedCalendar(analysis_utc, zone).require_datetime()
+    last_birthday = ZonedCalendar(last_birthday_utc, zone).require_datetime()
+    year_end = ZonedCalendar(year_end_utc, zone).require_datetime()
+    given_year_subject = analysis_subject or build_subject(
         name=f"{birth_info.name}-given-year",
         local_datetime=analysis_local,
         longitude=return_longitude,
@@ -214,13 +228,21 @@ def build_given_year_payload(
         year_end=year_end,
         analysis_datetime=analysis_local,
     )
-    source_longitudes = extract_reference_longitudes(given_year_subject)
-    target_longitudes = extract_reference_longitudes(natal_subject)
-    hits = collect_aspect_hits(
-        source_longitudes=source_longitudes,
-        target_longitudes=target_longitudes,
-        orb_limit=1.5,
-    )
+    if transit_hits is not None:
+        hits = [
+            hit
+            for hit in transit_hits
+            if hit["source"] in _TIMING_POINT_NAME_SET
+            and hit["target"] in _TIMING_POINT_NAME_SET
+        ]
+    else:
+        source_longitudes = extract_reference_longitudes(given_year_subject)
+        target_longitudes = extract_reference_longitudes(natal_subject)
+        hits = collect_aspect_hits(
+            source_longitudes=source_longitudes,
+            target_longitudes=target_longitudes,
+            orb_limit=1.5,
+        )
     reference = extract_reference_points(given_year_subject)
     payload: dict[str, Any] = {
         "analysis_datetime": format_local_time_or_utc(analysis_local),

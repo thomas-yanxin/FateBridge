@@ -13,6 +13,21 @@ from fatebridge.core.requests.base import (
 )
 from fatebridge.core.requests.birth import AstroBirthRequest
 
+WesternTimingTechnique = Literal[
+    "firdaria",
+    "profection",
+    "solar_return",
+    "lunar_return",
+    "transit",
+    "given_year",
+    "secondary_progression",
+    "solar_arc",
+    "primary_directions",
+    "primary_direction_chart",
+    "decennials",
+    "zodiacal_releasing",
+]
+
 
 class WesternTimingBaseRequest(
     AstroHouseValidatorMixin,
@@ -110,9 +125,39 @@ class WesternPrimaryDirectionsChartRequest(WesternPrimaryDirectionsRequest):
     )
 
 
+class WesternTransitRequest(WesternTimingBaseRequest):
+    """Request model for transit chart and optional multi-day transit scanning."""
+
+    scan_days: int | None = Field(
+        default=None,
+        ge=1,
+        le=90,
+        description=(
+            "Optional number of daily steps (1..90) to scan transits forward "
+            "from analysis_datetime."
+        ),
+    )
+
+
 class WesternTimingRequest(
     WesternReturnTimingRequest,
     WesternFirdariaRequest,
     WesternPrimaryDirectionsChartRequest,
 ):
     """Request model for aggregate western predictive timing analysis."""
+
+    techniques: list[WesternTimingTechnique] | None = Field(
+        default=None,
+        min_length=1,
+        description=(
+            "Optional subset of western timing techniques to compute; "
+            "when omitted, computes all techniques."
+        ),
+    )
+    include_full_timelines: bool = Field(
+        default=False,
+        description=(
+            "Whether to include full multi-decade timelines; default False returns "
+            "active states and bounded nearby windows."
+        ),
+    )

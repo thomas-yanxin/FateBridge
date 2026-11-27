@@ -58,7 +58,7 @@ class DecennialExactOffset(TypedDict):
     denominator: int
 
 
-class DecennialPeriod(TypedDict):
+class _DecennialPeriodRequired(TypedDict):
     key: str
     level: int
     planet: str
@@ -72,6 +72,9 @@ class DecennialPeriod(TypedDict):
     end_offset_minutes: int
     start_offset_exact_minutes: DecennialExactOffset
     end_offset_exact_minutes: DecennialExactOffset
+
+
+class DecennialPeriod(_DecennialPeriodRequired, total=False):
     sublevel: list[DecennialPeriod]
 
 
@@ -86,15 +89,18 @@ class DecennialCalculationOptions(TypedDict):
     timezone: str
 
 
-class DecennialsPayload(TypedDict):
+class _DecennialsPayloadRequired(TypedDict):
     resolved_start_planet: str
     resolved_start_planet_label: str
     base_order: list[str]
     current_level_1: DecennialPeriod | None
     current_level_2: DecennialPeriod | None
     current_level_3: DecennialPeriod | None
-    timeline: list[DecennialPeriod]
     calculation_options: DecennialCalculationOptions
+
+
+class DecennialsPayload(_DecennialsPayloadRequired, total=False):
+    timeline: list[DecennialPeriod]
 
 
 def _rotate_items(items: list[str], start_value: str) -> list[str]:
@@ -198,6 +204,8 @@ class _DecennialInterval:
         display_zone: tzinfo,
         analysis_utc: UTCCalendar,
         calendar_scale: Fraction,
+        *,
+        include_sublevel: bool = True,
     ) -> DecennialPeriod:
         # Round the absolute rational offset once to the civil microsecond grid.
         # Local civil labels never participate in the elapsed-time arithmetic.
@@ -215,7 +223,7 @@ class _DecennialInterval:
         end = ZonedCalendar(end_utc, display_zone).require_datetime()
         display_start = round(self.start_minutes)
         display_end = round(self.end_minutes)
-        return {
+        result: DecennialPeriod = {
             "key": self.key,
             "level": self.level,
             "planet": self.planet,
@@ -238,8 +246,10 @@ class _DecennialInterval:
                 "numerator": self.end_minutes.numerator,
                 "denominator": self.end_minutes.denominator,
             },
-            "sublevel": [],
         }
+        if include_sublevel:
+            result["sublevel"] = []
+        return result
 
 
 def build_decennials_payload(
@@ -251,6 +261,7 @@ def build_decennials_payload(
     order_type: str = DECENNIAL_ORDER_ZODIACAL,
     day_method: str = DECENNIAL_DAY_METHOD_VALENS,
     calendar_type: str = DECENNIAL_CALENDAR_TRADITIONAL,
+    include_full_timelines: bool = True,
 ) -> DecennialsPayload:
     """Build the seven-period preview and the current path, not a discarded tree.
 
@@ -300,10 +311,14 @@ def build_decennials_payload(
         )
         for index in indices
     ]
-    timeline = [
-        interval.payload(birth_utc, display_zone, analysis_utc, calendar_scale)
-        for interval in intervals[:7]
-    ]
+    timeline = (
+        [
+            interval.payload(birth_utc, display_zone, analysis_utc, calendar_scale)
+            for interval in intervals[:7]
+        ]
+        if include_full_timelines
+        else []
+    )
     current: list[DecennialPeriod | None] = [None, None, None]
     active = next(
         (interval for interval in intervals if interval.key == f"l1_{current_index}"),
@@ -312,29 +327,32 @@ def build_decennials_payload(
     for index in range(3):
         if active is None:
             break
-        node = active.payload(birth_utc, display_zone, analysis_utc, calendar_scale)
+        node = active.payload(
+            birth_utc,
+            display_zone,
+            analysis_utc,
+            calendar_scale,
+            include_sublevel=include_full_timelines,
+        )
         children = active.children(base_order)
-        node["sublevel"] = [
+        sublevel = [
             child.payload(birth_utc, display_zone, analysis_utc, calendar_scale)
             for child in children
         ]
+        if include_full_timelines:
+            node["sublevel"] = sublevel
         current[index] = node
         active = next(
-            (
-                child
-                for child, output in zip(children, node["sublevel"])
-                if output["active"]
-            ),
+            (child for child, output in zip(children, sublevel) if output["active"]),
             None,
         )
-    return {
+    result: DecennialsPayload = {
         "resolved_start_planet": start_planet,
         "resolved_start_planet_label": planet_label(start_planet),
         "base_order": base_order,
         "current_level_1": current[0],
         "current_level_2": current[1],
         "current_level_3": current[2],
-        "timeline": timeline,
         "calculation_options": {
             "start_mode": start_mode,
             "order_type": order_type,
@@ -346,3 +364,6 @@ def build_decennials_payload(
             "timezone": birth_info.timezone,
         },
     }
+    if include_full_timelines:
+        result["timeline"] = timeline
+    return result

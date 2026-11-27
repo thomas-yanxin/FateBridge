@@ -110,6 +110,153 @@ def _compact_zr(result: ServiceResult) -> ServiceResult:
     return {**result, "zodiacal_releasing": compact_zr}
 
 
+_COMPACT_CALCULATION_BASIS_FIELDS = frozenset(
+    {
+        "engine_backend",
+        "ephemeris_model",
+        "time_scale",
+        "future_leap_seconds_assumed_unchanged",
+    }
+)
+
+
+def _compact_return_chart(chart: ServiceResult) -> ServiceResult:
+    compact = {
+        k: v
+        for k, v in chart.items()
+        if k
+        in {
+            "return_datetime",
+            "return_datetime_utc",
+            "sun",
+            "moon",
+            "ascendant",
+            "medium_coeli",
+            "solver",
+            "hits",
+        }
+    }
+    cb = chart.get("calculation_basis")
+    if isinstance(cb, dict):
+        compact["calculation_basis"] = {
+            k: v for k, v in cb.items() if k in _COMPACT_CALCULATION_BASIS_FIELDS
+        }
+    return compact
+
+
+def _compact_western_timing(result: ServiceResult) -> ServiceResult:
+    compact: ServiceResult = {
+        k: v
+        for k, v in result.items()
+        if k in {"analysis_type", "analysis_context", "summary", "run_metadata"}
+    }
+    natal_ref = result.get("natal_reference")
+    if isinstance(natal_ref, dict):
+        compact["natal_reference"] = {
+            k: v
+            for k, v in natal_ref.items()
+            if k in {"sect", "sun", "moon", "ascendant", "medium_coeli"}
+        }
+    returns = result.get("returns")
+    if isinstance(returns, dict):
+        compact["returns"] = {
+            k: (_compact_return_chart(v) if isinstance(v, dict) else v)
+            for k, v in returns.items()
+        }
+    transits = result.get("transits")
+    if isinstance(transits, dict):
+        ct = transits.get("current_transit")
+        if isinstance(ct, dict):
+            compact["transits"] = {
+                "current_transit": {
+                    k: (v[:12] if k == "hits" and isinstance(v, list) else v)
+                    for k, v in ct.items()
+                    if k
+                    in {
+                        "analysis_datetime",
+                        "orb_limit",
+                        "exact_orb_limit",
+                        "house_emphasis",
+                        "hits",
+                        "exact_hits",
+                    }
+                }
+            }
+        else:
+            compact["transits"] = transits
+    directions = result.get("directions")
+    if isinstance(directions, dict):
+        compact_dirs: ServiceResult = {}
+        if "secondary_progression" in directions:
+            sp = directions["secondary_progression"]
+            compact_dirs["secondary_progression"] = (
+                {k: v for k, v in sp.items() if k != "calculation_basis"}
+                if isinstance(sp, dict)
+                else sp
+            )
+        if "solar_arc" in directions:
+            compact_dirs["solar_arc"] = directions["solar_arc"]
+        if "given_year" in directions:
+            gy = directions["given_year"]
+            compact_dirs["given_year"] = (
+                {k: v for k, v in gy.items() if k != "monthly_profections"}
+                if isinstance(gy, dict)
+                else gy
+            )
+        if "primary_directions" in directions:
+            compact_dirs["primary_directions"] = _compact_primary_directions(
+                {"primary_directions": directions["primary_directions"]}
+            )["primary_directions"]
+            if isinstance(compact_dirs["primary_directions"], dict):
+                compact_dirs["primary_directions"].pop("timeline_preview", None)
+        if "primary_direction_chart" in directions:
+            pdc = directions["primary_direction_chart"]
+            compact_dirs["primary_direction_chart"] = (
+                {
+                    k: v
+                    for k, v in pdc.items()
+                    if k
+                    in {
+                        "method",
+                        "time_key",
+                        "direction_mode",
+                        "current_arc_degrees",
+                        "directed_ascendant",
+                        "directed_medium_coeli",
+                        "exact_hits",
+                        "sign_changes",
+                    }
+                }
+                if isinstance(pdc, dict)
+                else pdc
+            )
+        compact["directions"] = compact_dirs
+    time_lords = result.get("time_lords")
+    if isinstance(time_lords, dict):
+        compact_tl: ServiceResult = {}
+        if "annual_profection" in time_lords:
+            compact_tl["annual_profection"] = time_lords["annual_profection"]
+        if "firdaria" in time_lords:
+            fird = time_lords["firdaria"]
+            compact_tl["firdaria"] = (
+                {k: v for k, v in fird.items() if k != "timeline"}
+                if isinstance(fird, dict)
+                else fird
+            )
+        if "decennials" in time_lords:
+            compact_tl["decennials"] = _compact_decennials(
+                {"decennials": time_lords["decennials"]}
+            )["decennials"]
+            if isinstance(compact_tl["decennials"], dict):
+                compact_tl["decennials"].pop("timeline", None)
+        if "zodiacal_releasing" in time_lords:
+            compact_tl["zodiacal_releasing"] = _compact_zr(
+                {"zodiacal_releasing": time_lords["zodiacal_releasing"]}
+            )["zodiacal_releasing"]
+        compact["time_lords"] = compact_tl
+    return compact
+
+
 def _western_module_spec(
     name: str,
     label: str,
@@ -140,6 +287,7 @@ SPECS: list[ToolSpec] = [
         family="western_timing",
         cpu_bound=True,
         rest_path="/api/astrology/timing",
+        compact_view=_compact_western_timing,
     ),
     _western_module_spec(
         "solar_return", "西占太阳返照", request_model_name="WesternReturnTimingRequest"
@@ -147,7 +295,9 @@ SPECS: list[ToolSpec] = [
     _western_module_spec(
         "lunar_return", "西占月亮返照", request_model_name="WesternReturnTimingRequest"
     ),
-    _western_module_spec("transit_chart", "西占行运盘"),
+    _western_module_spec(
+        "transit_chart", "西占行运盘", request_model_name="WesternTransitRequest"
+    ),
     _western_module_spec("solar_arc", "西占太阳弧"),
     _western_module_spec("chart_for_year", "西占指定年盘"),
     _western_module_spec("profection", "西占年小限"),

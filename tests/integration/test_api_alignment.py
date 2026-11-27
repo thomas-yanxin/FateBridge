@@ -34,6 +34,7 @@ from fatebridge.core.requests.western_timing import (
     WesternReturnTimingRequest,
     WesternTimingBaseRequest,
     WesternTimingRequest,
+    WesternTransitRequest,
 )
 from fatebridge.services.astrology import (
     calculate_core_chart_analysis as service_calculate_core_chart_analysis,
@@ -374,7 +375,7 @@ def test_western_timing_module_catalog_selects_requested_technique() -> None:
     modules = {
         "solar_return": (WesternReturnTimingRequest, western_base_payload()),
         "lunar_return": (WesternReturnTimingRequest, western_base_payload()),
-        "transit_chart": (WesternTimingBaseRequest, western_base_payload()),
+        "transit_chart": (WesternTransitRequest, western_base_payload()),
         "solar_arc": (WesternTimingBaseRequest, western_base_payload()),
         "chart_for_year": (WesternTimingBaseRequest, western_base_payload()),
         "profection": (WesternTimingBaseRequest, western_base_payload()),

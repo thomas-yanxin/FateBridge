@@ -739,7 +739,7 @@ def calculate_jaynesprog(
 ) -> dict[str, Any]:
     """生成赤纬推运盘（二次推运后看赤纬平行/反平行）。"""
     label = "赤纬推运"
-    birth_info, _natal_subject, natal_reference, sect = _prepare_chart(
+    birth_info, natal_subject, natal_reference, sect = _prepare_chart(
         house_system=house_system, zodiac_type=zodiac_type, **birth_kwargs
     )
     analysis_datetime = build_analysis_datetime(
@@ -752,9 +752,17 @@ def calculate_jaynesprog(
     progressed_utc, clock_options = calculate_secondary_progression_clock(
         birth_info, analysis_datetime=analysis_datetime
     )
+    natal_declinations = {
+        body: float(point.declination)
+        for body in DECLINATION_BODIES
+        if (point := natal_subject.points.get(body.lower())) is not None
+        and point.declination is not None
+    }
+    if len(natal_declinations) < len(DECLINATION_BODIES):
+        natal_declinations = _body_declinations(birth_info.utc_calendar)
     payload = build_jaynes_declination_payload(
         _body_declinations(progressed_utc),
-        _body_declinations(birth_info.utc_calendar),
+        natal_declinations,
         orb=orb,
     )
     payload["progressed_datetime"] = progressed_utc.isoformat()
