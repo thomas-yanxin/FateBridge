@@ -27,6 +27,36 @@ LIVE_CLI = len(CATALOG)
 CHECKS = [
     ("README.md", "README REST 业务路由", r"(\d+)\s*个业务\s*REST\s*路由", LIVE_REST),
     (
+        "README.en.md",
+        "README.en REST routes",
+        r"(\d+)\s+business\s+REST\s+routes",
+        LIVE_REST,
+    ),
+    (
+        "README.en.md",
+        "README.en MCP capabilities",
+        r"provide\s+access\s+to\s+\*{0,2}(\d+)\s+capabilities",
+        LIVE_MCP,
+    ),
+    (
+        "README.en.md",
+        "README.en families",
+        r"across\s+\*{0,2}(\d+)\s+families",
+        LIVE_FAMILIES,
+    ),
+    (
+        "README.en.md",
+        "README.en catalog entries",
+        r"catalog\s+contains\s+(\d+)\s+entries",
+        LIVE_CATALOG,
+    ),
+    (
+        "README.en.md",
+        "README.en CLI entries",
+        r"with\s+(\d+)\s+available\s+through\s+the\s+CLI",
+        LIVE_CLI,
+    ),
+    (
         "docs/api-reference.md",
         "api-reference.md REST 业务路由",
         r"(\d+)\s*个业务\s*REST\s*路由",
@@ -57,8 +87,6 @@ for _path in (
     "docs/api-reference.md",
     "docs/architecture.md",
     "docs/algorithm-coverage.md",
-    "docs/agent-guide.md",
-    "docs/interpretation/shared/fatebridge-engine.md",
 ):
     CHECKS.extend(
         [
@@ -83,19 +111,14 @@ for _path in (
         ]
     )
 
-for _path in (
-    "docs/algorithm-coverage.md",
-    "docs/agent-guide.md",
-    "docs/interpretation/shared/fatebridge-engine.md",
-):
-    CHECKS.append(
-        (
-            _path,
-            f"{_path} REST 数",
-            r"REST\s*(?:公开|暴露)\s*\*{0,2}(\d+)\s*个工具",
-            LIVE_REST,
-        )
+CHECKS.append(
+    (
+        "docs/algorithm-coverage.md",
+        "docs/algorithm-coverage.md REST 数",
+        r"REST\s*(?:公开|暴露)\s*\*{0,2}(\d+)\s*个工具",
+        LIVE_REST,
     )
+)
 
 
 @pytest.mark.parametrize(

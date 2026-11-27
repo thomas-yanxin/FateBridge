@@ -44,7 +44,7 @@ MCP 仅公开 `discover_tools` 与 `run_calculation` 两个入口（无 MCP 资�
 | 内容 | 用途 | 阅读时注意 |
 | --- | --- | --- |
 | 结构化业务字段 | 本次实际计算值、规则命中与分层证据 | 根键随工具变化，以输出合同或 `discover` 为准 |
-| `run_metadata` | 工具名、版本、有效时间、近似标志与重放信息 | 始终保留；`compact` 保留精简回执，`audit` 附加 `calculation_evidence` 与 `runtime` |
+| `run_metadata` | 工具名、版本、有效时间、近似标志与重放信息 | 始终保留；`compact` 保留精简回执，`audit` 附加 `duration_ms` 与完整 `replay` |
 
 三端支持通过 `fields` 按点号对象路径严格投影，无效路径立即返回 `validation_error`（`issues[].code="unknown_projection_path"`）并在 `issues[].constraints.available` 提示当前可用键名；数组字段须选取所属父键后在客户端处理。
 

@@ -36,7 +36,7 @@
 | `ziwei_birth_chart` | `ziwei_birth.ming_gong/shen_gong/palaces/sihua` | 核对出生处理加 `person_info`, `analysis_context` |
 | `ziwei_timing` | `analysis_context`, `birth_context`, `ziwei_horoscope.interpretation_scope/nominal_age/calendar_rules/scopes` | `scopes` 整体取回，详见[紫微专题取证](ziwei-topic-evidence.md) |
 | `astrology_chart` | `angles`, `chart_profile`, `planets`, `aspect_evidence`, `classical`, `person_info` | 深入读[西占主题参考](western-topic-evidence.md) |
-| `relationship_chart` | `relationship_profile`, `inner_chart`, `outer_chart`, `synastry_aspects`, `chart`, `compatibility` | 按盘型选同名 `evidence_views`，见[关系盘读法](../xingpan/relationship-reading.md) |
+| `relationship_chart` | `relationship_profile`, `summary`, `synastry_aspects`, `in_to_out_aspects`, `out_to_in_aspects`, `chart`, `inner`, `outer`, `marks_charts` | 按盘型选同名 `evidence_views`，见[关系盘读法](../xingpan/relationship-reading.md) |
 | `sukuyo_compatibility` | `person1/2.natal_su27`, `person1_to_person2`, `person2_to_person1` | 有方向性；候选项与异文保留，见[宿曜取证](sukuyo-evidence.md) |
 
 ## 常用工具速查

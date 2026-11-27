@@ -1,9 +1,11 @@
 """Exercise documentation checks with broken and valid authoring examples."""
 
+import json
 from pathlib import Path
 
 import pytest
 
+from fatebridge.services.tool_catalog import CATALOG
 from scripts import check_docs
 
 
@@ -172,3 +174,57 @@ def test_missing_html_and_reference_assets_fail(
     monkeypatch.setattr(check_docs, "ROOT", tmp_path)
     (tmp_path / "README.md").write_text(text, encoding="utf-8")
     assert check_docs.main([]) == 1
+
+
+EXAMPLE_TOOL_MAP = {
+    "examples/demo-subject.json": "astrology_chart",
+    "docs/examples/fengshui-home.json": "fengshui_assess",
+    "docs/examples/fengshui-xuankong.json": "fengshui_xuankong_house_chart",
+    "docs/examples/liuyao-conditional-demo.json": "liuyao",
+}
+
+RETIRED_DOC_SYMBOLS = (
+    "discover_capabilities",
+    "describe_capability",
+    "read_result",
+    "detail=standard",
+    'detail="standard"',
+    "selected_sections",
+    "snapshot_export",
+    "result_delivery",
+    "projection_warnings",
+    "desktop_bagua_btb_v1",
+    "user_expert_policy_v1",
+    "workstation_layout",
+    "surface_layouts",
+    "environmental_context",
+    "analysis_progress",
+    "unsupported_queries",
+)
+
+
+def test_example_json_files_validate_against_live_request_models() -> None:
+    """Every published JSON example maps to a live tool and validates cleanly."""
+    root = check_docs.ROOT
+    discovered = {
+        path.relative_to(root).as_posix()
+        for folder in (root / "examples", root / "docs" / "examples")
+        for path in folder.rglob("*.json")
+    }
+    assert discovered == set(EXAMPLE_TOOL_MAP)
+    specs = {spec.name: spec for spec in CATALOG}
+    for rel_path, tool_name in sorted(EXAMPLE_TOOL_MAP.items()):
+        payload = json.loads((root / rel_path).read_text(encoding="utf-8"))
+        specs[tool_name].request_model.model_validate(payload)
+
+
+def test_maintained_docs_contain_no_retired_api_symbols() -> None:
+    """Maintained Markdown pages must not reintroduce retired APIs or fields."""
+    hits: list[str] = []
+    for path in check_docs.markdown_paths():
+        text = path.read_text(encoding="utf-8")
+        rel = path.relative_to(check_docs.ROOT)
+        for symbol in RETIRED_DOC_SYMBOLS:
+            if symbol in text:
+                hits.append(f"{rel}: {symbol}")
+    assert not hits, "Found retired symbols in maintained docs:\n" + "\n".join(hits)
