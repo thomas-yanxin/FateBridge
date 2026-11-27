@@ -1,4 +1,4 @@
-"""Regression and contract tests for WS3 temporal symmetry, range scanning, parameter symmetry, and output hygiene."""
+"""Regression and contract tests for temporal symmetry, range scanning, parameter symmetry, and output hygiene."""
 
 from __future__ import annotations
 
@@ -18,10 +18,8 @@ from fatebridge.core.requests.birth import AstroBirthRequest
 from fatebridge.core.requests.timing import LiunianAnalysisRequest
 from fatebridge.core.response_models import output_model_for
 from fatebridge.services.tool_catalog import CATALOG
-from tests.support.transports import rest as _shared_rest
 
 SPECS = {spec.name: spec for spec in CATALOG}
-rest = _shared_rest
 
 BIRTH_ARGS = {
     "name": "测试甲",

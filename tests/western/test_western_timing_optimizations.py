@@ -247,8 +247,6 @@ def test_shared_analysis_subject_and_earth_attitude_and_firdaria_calendar(
         return orig_ea(*args, **kwargs)
 
     monkeypatch.setattr(pd, "earth_attitude", counted_ea)
-    bi = wt.build_natal_subject
-    del bi
     from datetime import datetime
 
     from fatebridge.core.predictive._common import build_predictive_birth_info
