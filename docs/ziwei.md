@@ -1,8 +1,8 @@
 # 紫微斗数参考
 
-[文档中心](README.md) · [API 参考](api-reference.md) · [结果解读参考](interpretation/shared/ziwei-topic-evidence.md)
+[文档中心](README.md) · [API 参考](api-reference.md) · [算法覆盖](algorithm-coverage.md) · [结果解读参考](interpretation/shared/ziwei-topic-evidence.md)
 
-紫微斗数公开入口为 `ziwei_birth_chart`、`ziwei_timing` 与 `ziwei_rules`，完整输入与字段视图见[按需调用合同](contracts/README.md)。
+紫微斗数公开入口为 `ziwei_birth_chart`、`ziwei_timing` 与 `ziwei_rules`，完整输入与字段视图见[按需调用合同](contracts/README.md)（[ziwei_birth_chart](contracts/ziwei_birth_chart.json) · [ziwei_timing](contracts/ziwei_timing.json) · [ziwei_rules](contracts/ziwei_rules.json)）。
 
 ## 流派、三盘与四化
 
@@ -16,8 +16,8 @@
 
 - `day_divide` 支持 `current`（晚子 23:00–23:59 算当日）与 `forward`（晚子算次日早子，农历日序、流日/流时天干及虚岁换岁同步翻日）。
 - `year_divide` 支持 `normal`（正月初一换年，默认）与 `exact`（立春换年）。
-- `horoscope_divide` 支持 `normal`（农历月建，默认）与 `exact`（节气月建）；`natal_leap_month_policy` 统一覆盖本命与目标流月闰月规则。
-- `age_divide` 支持 `normal`（农历新年换岁）与 `birthday`（农历生日换岁）。
+- `horoscope_divide` 支持 `normal`（农历月建，默认）与 `exact`（节气月建）；`natal_leap_month_policy` 统一覆盖本命与目标流月闰月规则（`split_at_day_15` / `all_current_month` / `all_next_month`）。
+- `age_divide` 支持 `normal`（农历新年换岁）与 `birthday`（农历生日换岁）；`birth_utc_offset` / `analysis_utc_offset` 可在夏令时重复钟时下消歧。
 
 ## 大限、童限、斗君与批量运限
 

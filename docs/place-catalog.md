@@ -1,6 +1,6 @@
 # 离线城市与行政区坐标 / Offline place catalog
 
-[文档中心](README.md) · [API 参考](api-reference.md)
+[文档中心](README.md) · [API 参考](api-reference.md) · [算法覆盖](algorithm-coverage.md)
 
 FateBridge 的 REST、MCP、CLI 共用 `utils/places.py`，不需要在线地理编码服务或 API Key。`birth_place` 可补全经度、纬度和 IANA 民用时区；显式提供的 `birth_longitude`、`birth_latitude`、`birth_timezone` 各自优先。
 
@@ -57,7 +57,7 @@ uv run --extra dev fatebridge astrology_chart \
 离线回归测试命令（核对静态目录解析、坐标与边界）：
 
 ```bash
-uv run --extra dev pytest -q tests/integration/test_place_catalog.py tests/integration/test_birth_place_resolution.py
+uv run --extra dev pytest -q tests/integration/test_birth_place_resolution.py
 ```
 
 ## English note

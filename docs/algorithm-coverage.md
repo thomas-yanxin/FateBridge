@@ -36,7 +36,7 @@
 | `western_event` | 4 | 事件占星（世俗/卜卦/择日/多重回归） | Implemented（依赖 backend） |
 | `western_lifespan` | 13 | 传统阶段与周期技法（不用于寿命推断） | Implemented（依赖 backend） |
 | `knowledge` | 2 | 内置知识库目录与读取 | Implemented |
-| `fengshui` | 8 | 公共方位、命卦、八宅、砂水、年／月紫白、玄空宅盘、分层合参 | Implemented（明确版本） |
+| `fengshui` | 8 | 公共方位与地磁、命卦、八宅三要、金锁 24 山、四层紫白、玄空宅盘、多层合参 | Implemented（明确版本） |
 | `psychometrics` | 1 | Goldberg (1992) IPIP 50 题大五人格因子标记量表 | Implemented |
 | 仓库内前端 | — | 内置 Web UI | Excluded |
 | 存储 / 账户 | — | 持久化数据库、历史记录、用户体系 | Excluded |
@@ -45,7 +45,7 @@
 
 ### 2.1 `bazi` —— 八字与命理分析（Implemented）
 
-底层由 `fatebridge.core.bazi.calendar`、`elements`、`rules` 与 `fatebridge.services.bazi` 提供；九大专项维度默认按出生资料与分析日期内部推算大运和流年，也可用 `dayun_pillar` / `liunian_pillar` 覆盖。支持通过已知 `birth_second` 与 `birth_utc_offset` 传递精确秒数并消歧重复民用钟时。
+底层由 `fatebridge.core.bazi.calendar`、`strength`、`relations` 与 `fatebridge.services.bazi` 提供；九大专项维度默认按出生资料与分析日期内部推算大运和流年，也可用 `dayun_pillar` / `liunian_pillar` 覆盖。支持通过已知 `birth_second` 与 `birth_utc_offset` 传递精确秒数并消歧重复民用钟时。
 
 | 工具 | 说明 | 状态 |
 | --- | --- | --- |
@@ -184,14 +184,14 @@
 
 | 工具 | 范围 | 状态 |
 | --- | --- | --- |
-| `fengshui_directions` | 后天方位／洛书宫数、八方与 24 山角区索引 | Implemented |
-| `fengshui_minggua` | 1864 锚点命卦、原始五数寄宫、个人八方关系 | Implemented |
-| `fengshui_bazhai` | 坐山宅盘、逐人命盘、位置／朝向用途分开 | Implemented |
-| `fengshui_jinsuo` | 金锁玉关八宫固定砂水偏好、已确认特征逐项判定 | Implemented（限定来源） |
-| `fengshui_annual_stars` | 年度紫白九宫、立春区间与当前元运 | Implemented |
-| `fengshui_monthly_stars` | 十二节月紫白、跨年有效年、九宫中性位置与固定释义 | Implemented |
-| `fengshui_xuankong_house_chart` | 中州派历史定运、24 山／三元龙、五黄、下卦与兼向替星 | Implemented |
-| `fengshui_assess` | 多层布局关联、室内形态观察、条件式元素/年度方案与分歧 | Implemented（限定版本） |
+| `fengshui_directions` | 后天八卦／洛书宫数、八方与 24 山兼向/空亡细分，及 WMM2025/IGRF-14 地磁换算候选 | Implemented |
+| `fengshui_minggua` | 1864 锚点命卦、原始五数寄宫与个人八方游年关系 | Implemented |
+| `fengshui_bazhai` | 坐山宅盘、逐人命盘、门床桌灶位置/朝向检验及阳宅三要（门/主/灶） | Implemented |
+| `fengshui_jinsuo` | 金锁玉关八宫（1234 砂 / 6789 水）与 24 山砂水偏好逐项核对 | Implemented（限定来源） |
+| `fengshui_annual_stars` | 立春换年年度紫白九宫、二十年元运及太岁/岁破/三煞/五黄/二黑 | Implemented |
+| `fengshui_monthly_stars` | 十二节换月中性月紫白，以及传入 `query_at` 时的日紫白与时紫白 | Implemented |
+| `fengshui_xuankong_house_chart` | 中州派定运、下卦与 13 山替星、古典格局、正副城门与条件式解读 | Implemented |
+| `fengshui_assess` | 八宅/金锁/玄空/年/月/日/时紫白四层叠盘（`palace_overlay`）与跨层布局分析 | Implemented（限定版本） |
 
 ### 2.12 `psychometrics` —— 心理测量量表（Implemented）
 

@@ -1,6 +1,8 @@
 # FateBridge API 参考
 
-本文列出 FateBridge 的 REST 路由、FastMCP 工具、CLI 约定、共享请求族与响应字段。首次安装请看[快速入门](getting-started.md)，客户端集成代码与分页交付示例见[接入指南](agent-guide.md)，各能力范围见[算法覆盖矩阵](algorithm-coverage.md)。
+[文档中心](README.md) · [接入指南](agent-guide.md) · [算法覆盖矩阵](algorithm-coverage.md) · [可运行示例](examples/README.md)
+
+本文列出 FateBridge 的 REST 路由、FastMCP 工具面、共享请求族与响应约定。安装步骤见[快速入门](getting-started.md)，端到端调用代码、错误恢复全表与 Agent 闭环见[接入指南](agent-guide.md)。
 
 OpenAPI 发布 90 个业务 REST 路由，另有 `/health`、`/ready`、`/metrics` 三个运维端点。目录共有 90 条记录，CLI 可执行 90 条目录命令，MCP 通过两个入口提供 90 项业务能力。字段约束以当前服务的 `/openapi.json`、MCP `discover_tools(tool=...)` 或 CLI `fatebridge discover <tool>` 为准。
 
@@ -8,56 +10,38 @@ OpenAPI 发布 90 个业务 REST 路由，另有 `/health`、`/ready`、`/metric
 
 | 要查什么 | 章节 |
 | --- | --- |
-| 接口命名、错误、输出控制与复现 | [公共约定](#2-公共约定) |
+| 接口命名、错误包络、发现与输出控制 | [公共约定](#2-公共约定) |
 | 咨询禁区与范围校验 | [咨询范围与禁区校验](#咨询范围与禁区校验) |
 | 输入字段与默认值 | [共享请求族](#3-共享请求族) |
 | REST 路由与风水入口 | [REST 端点家族](#4-rest-端点家族) |
 | 可复制 HTTP 调用 | [REST 调用示例](#5-rest-调用示例) |
 | MCP 公开工具列表与差异 | [FastMCP 工具面](#6-fastmcp-工具面) |
-| 常见字段与排错 | [常见响应字段](#7-常见响应字段) · [调试建议](#8-调试建议) |
+| 常见响应字段与调试 | [常见响应字段](#7-常见响应字段) · [调试建议](#8-调试建议) |
 
 ## 1. 基础信息
 
-### REST
-
-- 基础地址：`http://localhost:8010`（Swagger UI `/docs`，ReDoc `/redoc`，OpenAPI Schema `/openapi.json`，能力发现 `/api/tools`）。
-- 请求格式：`Content-Type: application/json`。业务输入放在 JSON 请求体；通用控制项（`detail`、`fields`、`as_of`）放在 URL 查询参数，多个 `fields` 重复传参。
-
-### FastMCP
-
-- 启动命令：`python -m fatebridge.mcp_server`（默认 stdio，HTTP 部署见 [MCP 部署指南](mcp-deployment.md)）。
-- 返回格式：原生 `structuredContent` JSON 对象；工具失败时返回 `isError=true`，`content` 附带简短错误消息。
+- **REST**：默认地址 `http://localhost:8010`（Swagger UI `/docs`、ReDoc `/redoc`、OpenAPI `/openapi.json`、能力发现 `/api/tools`）。业务参数放入 JSON 请求体，控制项（`detail`、`fields`、`as_of`）放入 URL 查询参数（多个 `fields` 重复传参）。
+- **FastMCP**：通过 `python -m fatebridge.mcp_server` 启动（默认 stdio，HTTP 部署见 [MCP 部署指南](mcp-deployment.md)）；返回原生 `structuredContent` JSON 对象，失败时设置 `isError=true`。
 
 ## 2. 公共约定
 
 ### 2.1 鉴权与错误格式
 
-`FATEBRIDGE_API_KEYS` 为空时 REST 不鉴权；非空时发送 `X-API-Key: <secret>`（请求头名可用 `API_KEY_HEADER_NAME` 修改）。`/health`、`/ready`、`/metrics`、`/docs`、`/redoc`、`/openapi.json` 及 `OPTIONS` 免检，其余业务和发现接口均受保护。MCP 与 CLI 不使用 REST API Key。
+`FATEBRIDGE_API_KEYS` 为空时 REST 不鉴权；非空时需发送 `X-API-Key: <secret>`（请求头名可通过 `API_KEY_HEADER_NAME` 修改）。`/health`、`/ready`、`/metrics`、`/docs`、`/redoc`、`/openapi.json` 及 `OPTIONS` 免检，其余接口均受保护；MCP 与 CLI 不使用 REST API Key。
 
-已知工具的模型校验与业务错误共享扁平错误包络（`error`、`error_code`、`retryable`、`issues`）：
+模型校验与业务错误共享统一错误包络（`error`、`error_code`、`retryable`、`issues`；完整错误码对照表见[接入指南 § 错误恢复与复现](agent-guide.md#错误恢复与复现)）：
 
-```json
-{
-  "error": "请求参数无效",
-  "error_code": "validation_error",
-  "retryable": false,
-  "issues": [
-    {"path": "birth_month", "code": "less_than_equal",
-     "message": "Input should be less than or equal to 12", "constraints": {"le": 12}}
-  ]
-}
-```
-
-请按 `error_code` 分支处理：
-
-- `validation_error`（400 / 422）：字段缺失、格式或取值非法、未知字段、无效日期，或领域输入拒绝；出生年月日无效时 `issues[].path` 指向 `birth_date`（关系盘为 `inner.birth_date` / `outer.birth_date`），正午起算无效钟面返回 `invalid_clock_origin_datetime`。
-- `authentication_required`（401）：缺少或无效 API Key。
-- `consultation_restricted`（400 / 422）：命中咨询禁区（生死、灾祸、临床诊断或医疗择时），`retryable=false`。
-- `dependency_missing` / `ephemeris_calculation_failed`（503）：运行依赖或 Swiss Ephemeris 计算失败。
-- `fengshui_calculation_inconsistent` / `numerology_source_inconsistent`（503）：玄空或数算内部状态不一致，`retryable=false`。
-- `timeout`（504）与 `internal_error`（500）。
-
-CLI 成功退出 `0`，计算或校验失败退出 `1`，参数语法或未知 flag 错误退出 `2`。
+| `error_code` | HTTP / CLI | 说明 |
+| --- | --- | --- |
+| `validation_error` | 400 / 422 · `1` | 字段缺失、取值非法、未知字段、无效日期（如 `birth_date`、`invalid_clock_origin_datetime`）或无效 `fields` 路径（`unknown_projection_path`） |
+| `unknown_tool` | 404 · `1` / `2` | 工具名不存在，在 `issues[].constraints.suggestions` 返回相近候选 |
+| `authentication_required` | 401 · — | 缺少或携带无效 API Key |
+| `consultation_restricted` | 422 · `1` | 命中禁区（生死、灾祸、临床诊断或医疗择时），`retryable=false` |
+| `dependency_missing` / `ephemeris_calculation_failed` | 503 · `1` | 缺少运行时依赖或 Swiss Ephemeris 计算失败 |
+| `ephemeris_source_inconsistent` | 503 · `1` | 星历/时区/参考数据文件或配置在运行时不一致，`retryable=false` |
+| `fengshui_calculation_inconsistent` / `numerology_source_inconsistent` / `jyotish_calculation_inconsistent` | 503 · `1` | 玄空/月紫白、河洛参评或印占 Drik Bala 内部数据一致性校验失败，`retryable=false` |
+| `timeout` / `internal_error` | 504 / 500 · `1` | 请求处理超时或服务端未预期异常 |
+| `usage_error` | — · `2` | 仅 CLI：未知 flag、参数语法或 `--request-file` 读取错误 |
 
 ### 2.2 三端能力边界
 
@@ -72,27 +56,22 @@ CLI 成功退出 `0`，计算或校验失败退出 `1`，参数语法或未知 f
 
 ### 2.3 输出控制与字段投影
 
-| 选项 | REST（查询参数） | MCP（`run_calculation`） | CLI（工具名后） |
-| --- | --- | --- | --- |
-| 结果级别 | `?detail=compact`（默认 `compact`，可选 `audit`） | `detail="compact"`（默认，可选 `"audit"`） | `--detail compact`（默认，可选 `audit`） |
-| 字段投影 | `?fields=bazi_birth.day_master&fields=person_info` | `fields=["bazi_birth.day_master", "person_info"]` | `--fields bazi_birth.day_master person_info` |
-| 冻结时钟 | `?as_of=2026-06-01T12:00:00+08:00` | `as_of="2026-06-01T12:00:00+08:00"` | `--as-of 2026-06-01T12:00:00+08:00` |
-
-`compact`（三端默认）在省略 `fields` 时返回领域精简核心字段及精简 `run_metadata`；`audit` 返回完整业务载荷、全部时间线及 `run_metadata.calculation_evidence` 与误差预算信息。
-
-`fields` 在三端始终严格校验点号对象路径：无效路径返回 `validation_error`（`issues[].code="unknown_projection_path"`、`retryable=false`），并在 `issues[].constraints.available` 列出可用键名；`run_metadata` 始终保留。`ToolSpec.required_output_fields` 声明完整结果必需业务根，启用 `FATEBRIDGE_STRICT_OUTPUT_VALIDATION=1` 后校验完整嵌套输出模型。
+三端统一支持 `detail`（默认 `compact`，可选 `audit`）、`fields`（严格点号路径投影，`run_metadata` 始终保留）与 `as_of`（带时区 ISO 8601 冻结时钟）。无效 `fields` 路径返回 `validation_error`（`unknown_projection_path`）并在 `issues[].constraints.available` 给出可用字段；`ToolSpec.required_output_fields` 声明完整结果必需业务根，启用 `FATEBRIDGE_STRICT_OUTPUT_VALIDATION=1` 后触发完整嵌套模型核验。详细用法与代码示例见[接入指南 § 输出控制与结果读取](agent-guide.md#输出控制与结果读取)。
 
 ### 2.4 精度与依赖
 
 核心占星盘优先使用本地 `swisseph`，缺失时回退内置近似轨道；西占推运、事件与生命周期工具依赖 `swisseph` 后端，缺失时返回 `dependency_missing`。`swisseph` 可导入不等于已加载 `.se1` 数据文件，请核对 `chart_profile.ephemeris_model` 与 `run_metadata.engine_is_approximate`，配置方式见[星历数据安装](ephemeris.md)。
 
-### 2.5 渐进发现与执行提示
+### 2.5 渐进发现与按需 Schema
 
-REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surface=...`，CLI 使用 `list` / `discover [tool]`，MCP 使用 `discover_tools`。发现响应始终包含全局 `counts` 与各分类 `families` 计数，每条工具摘要的 `surfaces` 采用 `{"cli": true, "rest": "<path>|null", "mcp": <bool>}`；`detail=summary`（默认）在未指定 `tool` 时返回摘要，指定 `tool` 时返回完整输入 Schema、参数与 `evidence_views`，`detail=full` 额外返回 `output_schema`（须配合 `tool`、`family` 或 `q` 过滤，否则返回 `filter_required_for_full_detail`）。工具名不存在时返回 `unknown_tool`（404）并在 `issues[].constraints.suggestions` 列出候选名称。
+REST 使用 `GET /api/tools`（查询参数 `detail=summary|full`、`family`、`q`、`tool`、`surface`、`include_output_schema=false|true`），CLI 使用 `list` / `discover [tool]`（支持 `--detail`、`--include-output-schema`），MCP 使用 `discover_tools`。
+
+- `detail=summary`（默认）：未传 `tool` 时返回全局 `counts`、`families` 与工具摘要；指定 `tool` 时返回完整 `input_schema`、`output_fields`、`example_input`、`evidence_views`、`suggested_fields` 与 `compact_fields`。
+- `detail=full`：返回完整契约，必须配合 `tool`、`family` 或 `q` 过滤（否则返回 `filter_required_for_full_detail`）；**`output_schema` 默认不返回，仅当显式传入 `include_output_schema=true`（MCP `include_output_schema=True`，CLI `--include-output-schema`）时才会附带**。
 
 ### 2.6 确定性与复现元数据
 
-三端支持 `as_of`（ISO 8601 带时区时刻，公历 1–9999 年）。`run_metadata`（2.0）包含 `run_id`、`tool_name`、`generated_at`、`engine`、`engine_is_approximate`、`effective_time`、`determinism`、`replay` 与 `warnings`（`detail=audit` 额外包含 `runtime`、`provenance`、`calculation_evidence` 等）；随机起卦保留 `replay.overrides.seed`。将 `replay.overrides` 与 `replay.as_of` 传回同一工具可在相同环境中复现同一计算结果。
+三端支持 `as_of`（ISO 8601 带时区时刻）。`run_metadata` 包含 `run_id`、`tool_name`、`generated_at`、`engine`、`engine_is_approximate`、`effective_time` 与 `warnings`；`detail=audit` 另附 `duration_ms` 与 `replay`（含 `as_of`、`overrides`、`requires_original_input`），随机起卦在 `compact` 下也会附带 `replay.overrides.seed`。将 `replay.overrides` 与 `replay.as_of` 传回同一工具可在相同环境中复现同一计算结果。
 
 ## 3. 共享请求族
 
@@ -167,7 +146,7 @@ REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surfac
 | `POST` | `/api/bazi/timing/hourly` | 流时分析 |
 | `POST` | `/api/calendar/solar-term-timeline` | 全年节气节点时间轴 |
 
-### 4.3 Calendar / knowledge helper
+### 4.3 历法与知识检索
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
@@ -177,7 +156,7 @@ REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surfac
 | `POST` | `/api/knowledge/catalog` | 内置知识目录 |
 | `POST` | `/api/knowledge/read` | 内置知识条目读取 |
 
-### 4.4 Divination 与本地技法
+### 4.4 占卜与本地技法
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
@@ -188,7 +167,7 @@ REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surfac
 | `POST` | `/api/divination/canping` | 邵子参评数 / 金锁银匙 |
 | `POST` | `/api/divination/heluo` | 河洛理数 |
 | `POST` | `/api/divination/suzhan` | 二十七宿占 |
-| `POST` | `/api/divination/astrology-dice/interpret` | [占星骰](astrodice.md)：planet/sign/house 必填（house=`0..11`） |
+| `POST` | `/api/divination/astrology-dice/interpret` | [占星骰](astrodice.md)：`planet`/`sign`/`house` 必填（`house=0..11`） |
 | `POST` | `/api/divination/sanshi` | 三式合一 |
 
 ### 4.5 中国术数独立盘
@@ -271,20 +250,20 @@ REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surfac
 | `GET` | `/health` | 存活检查，返回 `{"status":"healthy"}` |
 | `GET` | `/ready` | 服务就绪与可选西占运行时检查（`checks`） |
 | `GET` | `/metrics` | Prometheus 文本指标 |
-| `GET` | `/api/tools` | 机读能力发现清单（支持 `detail`/`family`/`q`/`tool`/`surface`） |
+| `GET` | `/api/tools` | 机读能力发现清单（支持 `detail`/`family`/`q`/`tool`/`surface`/`include_output_schema`） |
 
 ### 4.11 家居风水（family `fengshui`）
 
 | REST POST | MCP / CLI | 说明 |
 | --- | --- | --- |
-| `/api/fengshui/directions` | `fengshui_directions` | 后天八卦与八方／24山角区索引 |
+| `/api/fengshui/directions` | `fengshui_directions` | 后天八卦与八方／24 山角区索引及地磁换算候选 |
 | `/api/fengshui/minggua` | `fengshui_minggua` | 个人命卦与八方关系 |
-| `/api/fengshui/bazhai` | `fengshui_bazhai` | 坐山宅盘与逐人命盘 |
-| `/api/fengshui/jinsuo` | `fengshui_jinsuo` | 金锁玉关八宫固定砂水偏好 |
-| `/api/fengshui/annual-stars` | `fengshui_annual_stars` | 立春换年九宫年星与元运 |
-| `/api/fengshui/monthly-stars` | `fengshui_monthly_stars` | 十二节换月中性月紫白 |
-| `/api/fengshui/xuankong-house-chart` | `fengshui_xuankong_house_chart` | 中州派玄空运山向宅盘与替星 |
-| `/api/fengshui/assess` | `fengshui_assess` | 分层宅盘、室内布局与条件式方案评估 |
+| `/api/fengshui/bazhai` | `fengshui_bazhai` | 坐山宅盘、逐人命盘、位置/朝向校验与阳宅三要 |
+| `/api/fengshui/jinsuo` | `fengshui_jinsuo` | 金锁玉关八宫与 24 山砂水偏好 |
+| `/api/fengshui/annual-stars` | `fengshui_annual_stars` | 立春换年九宫年星、元运与岁煞 |
+| `/api/fengshui/monthly-stars` | `fengshui_monthly_stars` | 十二节换月紫白及日/时紫白 |
+| `/api/fengshui/xuankong-house-chart` | `fengshui_xuankong_house_chart` | 中州派玄空运山向宅盘、替星、城门与条件解读 |
+| `/api/fengshui/assess` | `fengshui_assess` | 多层合参主入口（四层叠盘与跨层布局分析） |
 
 三端可复制请求与状态字段语义见[家居风水参考](fengshui.md)。
 
@@ -296,9 +275,8 @@ REST 使用 `GET /api/tools?detail=summary|full&family=...&q=...&tool=...&surfac
 
 ## 5. REST 调用示例
 
-### 5.1 核心占星盘
-
 ```bash
+# 核心占星盘
 curl -X POST http://localhost:8010/api/astrology/chart \
   -H "Content-Type: application/json" \
   -d '{
@@ -308,11 +286,8 @@ curl -X POST http://localhost:8010/api/astrology/chart \
     "birth_timezone": "Asia/Shanghai",
     "birth_longitude": 121.4667, "birth_latitude": 31.2167, "birth_place": "上海"
   }'
-```
 
-### 5.2 独立西占技法
-
-```bash
+# 太阳返照
 curl -X POST http://localhost:8010/api/astrology/timing/solar-return \
   -H "Content-Type: application/json" \
   -d '{
@@ -370,7 +345,7 @@ uv run --extra dev python -m fatebridge.mcp_server
 - `solar_terms_for_year`
 - `lunar_calendar_time`
 
-#### Divination 与本地技法（family `divination`）
+#### 占卜与本地技法（family `divination`）
 
 - `gua_lookup`
 - `meihua_time_cast`
@@ -396,7 +371,7 @@ uv run --extra dev python -m fatebridge.mcp_server
 - `taiyi`
 - `jinkou`
 
-#### knowledge helper（family `knowledge`）
+#### 知识库（family `knowledge`）
 
 - `knowledge_catalog`
 - `knowledge_read`
@@ -483,9 +458,7 @@ uv run --extra dev python -m fatebridge.mcp_server
 
 ## 8. 调试建议
 
-- **字段投影报错**：核对错误 `issues[].constraints.available` 提示的可用路径，或用 `discover_tools` / `fatebridge discover <tool> --detail full` 查看 `output_schema`。
-- **占星精度下降**：同时核对 `chart_profile.engine_precision`、`engine_backend`、`ephemeris_model` 与 `run_metadata.engine_is_approximate`。
-- **西占推运报错**：检查当前进程解释器是否具备 `swisseph` 运行时依赖；更多排错见[故障排除](troubleshooting.md)。
+投影报错（`unknown_projection_path`）、星历精度降级或 `dependency_missing` 的完整排查步骤见[故障排除](troubleshooting.md)，或通过 `discover_tools(tool=..., detail="full", include_output_schema=True)` 查看完整输出结构。
 
 ## 咨询范围与禁区校验
 

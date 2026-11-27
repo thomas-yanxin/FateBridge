@@ -80,14 +80,13 @@ uv run --extra dev mypy src/fatebridge/
 
 ### 文档写作
 
-- 文档按读者任务分工：README 介绍定位与安装，快速入门完成首次运行，部署/配置/排错提供操作步骤，API/覆盖矩阵维护准确契约，领域与方法参考说明输入及来源。
-- 散文段落使用单行（不在句中换行），保持简洁清晰；并列字段用表格，顺序操作用列表。
-- 同一约定只在一个主文档中维护，其余文档通过链接引用；机器调用合同（`docs/contracts/`）从代码自动生成，不得手改。
-- 删除页面或标题前先搜索全库引用，确保无断链或失效锚点，且不引入过程日志、临时散列或免责声明。
+- **Diátaxis 分工**：[文档中心](README.md)按四象限组织——教程（[快速入门](getting-started.md)）完成首次运行，操作指南（[接入指南](agent-guide.md)、部署与排错）提供端到端任务步骤，技术参考（[API 参考](api-reference.md)、[算法覆盖矩阵](algorithm-coverage.md)、各领域参考与 `docs/contracts/`）维护准确契约，原理与解读（[核心概念](concepts.md)及 `docs/interpretation/`）说明边界与出处。
+- **单一信源**：同一协议约定、参数表或规则只在一个主文档中维护，其余文档通过 Markdown 链接引用，避免重复拷贝产生漂移；`docs/contracts/` 由脚本自动生成，严禁手改。
+- **可运行示例与格式**：散文段落保持单行不折行；并列字段用表格，顺序操作用列表；示例 JSON（`examples/`、`docs/examples/`）须能通过对应 `request_model.model_validate`，文档中的 CLI/REST 示例须与当前公开参数及 `fields` 路径一致。删除文件或标题前须全局搜索引用，确保零断链。
 
 ### 验证命令
 
-修改文档后运行以下检查，确保零断链、计数准确且生成合同无漂移：
+修改文档、示例或工具契约后运行以下检查，确保零断链、计数准确、示例可执行且生成合同无漂移：
 
 ```bash
 uv run --extra dev python scripts/check_docs.py
@@ -98,7 +97,7 @@ uv run --extra dev python scripts/build_codex_call_contracts.py --check
 git diff --check
 ```
 
-`scripts/check_docs.py` 校验根目录文档、`docs/`（不含临时评审目录）以及脚本与测试索引中的本地链接、标题锚点、代码围栏、JSON 代码块和示例 JSON 文件。`test_doc_tool_counts.py` 核对核心文档与实时中央目录的工具、路由、family 数量及所有公开路线覆盖。`test_interpretation_examples.py` 提取并实际执行 `docs/interpretation/` 中的 CLI 示例。当工具参数或 `evidence_views` 变化时，先运行 `uv run --extra dev python scripts/build_codex_call_contracts.py` 更新 `docs/contracts/`，再以 `--check` 复核。
+`scripts/check_docs.py` 校验根目录文档、`docs/`（不含临时评审目录）以及脚本与测试索引中的本地链接、标题锚点、代码围栏、JSON 代码块和示例 JSON 文件。`test_doc_tool_counts.py` 核对核心文档与实时中央目录的工具、路由、family 数量及全部公开路由覆盖。`test_interpretation_examples.py` 提取并实际执行 `docs/interpretation/` 中的 CLI 示例。当工具参数或 `evidence_views` 变化时，先运行 `uv run --extra dev python scripts/build_codex_call_contracts.py` 更新 `docs/contracts/`，再以 `--check` 复核。
 
 ## 仓库维护与打包发布
 

@@ -1,6 +1,6 @@
 # 占星骰参考
 
-[文档中心](README.md) · [API 参考](api-reference.md)
+[文档中心](README.md) · [API 参考](api-reference.md) · [算法覆盖](algorithm-coverage.md) · [调用合同](contracts/interpret_astrology_dice.json)
 
 `interpret_astrology_dice` 对用户已投出的三枚占星骰（星体、星座、宫位）进行符号条件与来源依据解读（规则版本 `astrodice_symbolic_v7`），并在提供完整时空坐标时可选附带独立天象背景。工具不代替抽骰，也不接收塔罗牌阵。
 

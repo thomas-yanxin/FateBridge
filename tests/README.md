@@ -34,10 +34,10 @@ uv run --extra dev python -m pytest -q
 | 人类图、印度占星 | [human_design/](human_design/) · [jyotish/](jyotish/) |
 | 果老、紫微、宿曜 | [guolao/](guolao/) · [ziwei/](ziwei/) · [sukuyo/](sukuyo/) |
 | 梅花、六爻、河洛与参评 | [meihua/](meihua/) · [liuyao/](liuyao/) · [numerology/](numerology/) |
-| 六壬、金口诀、奇门与太乙 | [qimen/](qimen/) · [taiyi/](taiyi/) |
+| 六壬、金口诀、奇门与太乙 | [liuren/](liuren/) · [jinkou/](jinkou/) · [qimen/](qimen/) · [taiyi/](taiyi/) |
 | 家居风水、地磁、玄空与布局 | [fengshui/](fengshui/) |
 | 心理测量量表 | [psychometrics/](psychometrics/) |
-| 共享协议调用、时间冻结、星历上下文与夹具 | [support/](support/) · [fixtures/](fixtures/) |
+| 共享协议调用、时间冻结、星历上下文与夹具 | [support/](support/) · [fixtures/](fixtures/) · [unit_test/](unit_test/) |
 
 ## 测试约定
 

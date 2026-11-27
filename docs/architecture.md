@@ -20,7 +20,7 @@ flowchart TD
     Services --> Analysis["analysis/*<br/>专项与复合分析"]
     Services --> Core["core/*<br/>领域计算与输出契约"]
     Services --> Utils["utils/*<br/>输入归一化、地点、时区、错误"]
-    Core --> Ephe["ephemeris_runtime.py<br/>Swiss Ephemeris 路径与共享锁"]
+    Core --> Ephe["core/ephemeris_runtime.py<br/>Swiss Ephemeris 路径与共享锁"]
     Core --> Data["data/*<br/>知识及规则 JSON"]
     Analysis --> Core
 ```
@@ -34,13 +34,13 @@ flowchart TD
 | 层 | 主要路径 | 职责 |
 | --- | --- | --- |
 | 工具声明 | `services/catalog/`、`services/tool_catalog.py`、`application/domain_plugin.py`、`application/tool_spec.py` | 领域插件装配与协议无关的工具描述 |
-| 应用编排 | `application/bindings.py`、`execution.py`、`projection.py`、`response_delivery.py` | 请求绑定、统一执行、输出校验、分级视图与严格字段投影 |
-| 能力发现 | `application/description.py`、`discovery.py` | 三端共用的工具摘要与 Schema 筛选 |
-| 协议传输 | `transports/rest.py`、`transports/flags.py`、`api.py`、`mcp_server.py`、`cli.py` | REST 路由注册、FastMCP 两工具协议与 CLI 参数生成 |
-| 请求与响应模型 | `core/requests/`、`core/response_models.py`、`core/contracts/` | Pydantic 输入校验、输出根契约与 `PartialOutput` 嵌套模型 |
-| 服务与分析 | `services/*.py`、`analysis/*.py` | 领域编排、时运复合分析与 `run_metadata` |
-| 核心计算与数据 | `core/*.py`、`core/{bazi,ziwei,fengshui,guolao,jyotish,human_design,qimen,liuyao,meihua,heluo,numerology,sukuyo}/`、`core/{astro,predictive,metaphysics}/`、`data/*` | 各体系独立领域计算、知识条目、规则表与内置数据 |
-| 公共基础 | `utils/*`、`core/ephemeris_runtime.py`、`core/execution_context.py` | 出生时间/地点/时区、星历共享锁、调用时钟与统一错误 |
+| 应用编排 | `application/bindings.py`、`application/execution.py`、`application/projection.py`、`application/response_delivery.py` | 请求绑定、统一执行、输出校验、分级视图与严格字段投影 |
+| 能力发现 | `application/description.py`、`application/discovery.py` | 三端共用的工具摘要与按需 Schema 筛选 |
+| 协议传输 | `transports/rest.py`、`transports/flags.py`、`transports/http_runtime.py`、`api.py`、`mcp_server.py`、`mcp_transport.py`、`cli.py`、`cli_arguments.py`、`cli_inputs.py` | REST 路由注册、FastMCP 两工具协议与 CLI 参数解析 |
+| 请求与响应模型 | `core/requests/`、`core/response_models.py`、`core/contracts/`、`core/receipt_models.py` | Pydantic 输入校验、输出根契约、`PartialOutput` 嵌套模型与执行回执模型 |
+| 服务与分析 | `services/*.py`、`analysis/*.py` | 领域编排、时运复合分析与 `run_metadata` / `replay` 构造 |
+| 核心计算与数据 | `core/*.py`、`core/{bazi,ziwei,fengshui,guolao,jyotish,human_design,qimen,liuyao,meihua,heluo,numerology,sukuyo,local_techniques,psychometrics}/`、`core/{astro,predictive,metaphysics}/`、`data/*` | 各体系独立领域计算、知识条目、规则表与内置数据 |
+| 公共基础 | `utils/*`、`core/ephemeris_runtime.py`、`core/execution_context.py`、`core/reproducibility.py` | 出生时间/地点/时区、星历共享锁、调用时钟、可复现策略与统一错误 |
 | 测试与工具 | `tests/`、`scripts/` | 领域回归、三端契约检查与文档/合同生成校验 |
 
 ## 典型请求流
@@ -71,18 +71,17 @@ sequenceDiagram
     R-->>C: JSON 响应
 ```
 
-所有传输层均通过 `application/execution.py` 调用领域服务，重计算由 `application/compute_limits.py` 按 `FATEBRIDGE_HEAVY_CALC_MAX_CONCURRENCY` 进行进程内信号量限流。请求成功返回后，共享交付管线依次执行：业务输出合同校验 -> 附加 `run_metadata` -> 若传入 `fields` 则按点号路径严格投影（`projection.py`，无效路径报错并附可用字段），否则在 `detail=compact`（默认）时裁剪为核心业务字段与精简 `run_metadata`，`detail=audit` 返回完整业务载荷与方法依据。
+所有传输层均通过 `application/execution.py` 调用领域服务，重计算由 `application/compute_limits.py` 按 `FATEBRIDGE_HEAVY_CALC_MAX_CONCURRENCY` 进行进程内信号量限流。请求成功返回后，共享交付管线依次执行：业务输出合同校验 -> 附加 `run_metadata` -> 若传入 `fields` 则按点号路径严格投影（`application/projection.py`，无效路径报错并附可用字段），否则在 `detail=compact`（默认）时裁剪为核心业务字段与精简 `run_metadata`，`detail=audit` 返回完整业务载荷与执行回执。
 
 ### 合同缓存
 
-`core/schema_cache.py` 按模型类与必需根声明缓存公开 JSON Schema（每类最多 256 条），动态重建模型后可通过 `clear_contract_caches()` 清理缓存。服务本身不持久化历史运行或分页结果存储。
+`core/schema_cache.py` 按模型类与必需根声明缓存公开 JSON Schema（每类最多 256 条），动态重建模型后可通过 `clear_contract_caches()` 清理缓存。服务本身不持久化历史运行数据。
 
 ## 关键实现约束
 
 - **时间与地点归一化**：出生输入构造集中在 `utils/birth_input.py`，真太阳时在 `utils/solar_time.py`，时区在 `utils/timezones.py`，离线地名解析在 `utils/places.py`。中式模型默认开启真太阳时，核心星盘默认关闭，适配层须保留该语义。
 - **星历共享状态**：Swiss Ephemeris 存在共享 C 目录状态，所有目录切换与调用通过 `core/ephemeris_runtime.py` 与 `core/ephemeris_paths.py` 的可重入锁协调。核心占星盘缺省数据时可走内置近似路径，西占推运缺运行时则直接报 `dependency_missing`。
-- **执行回执与重放**：`run_metadata`（格式版本 2.0）保存有效时钟、`determinism` 与 `replay.overrides`；随机起卦保留当次 `seed`。重放需保留原始输入与环境配置，服务不持久化历史运行数据库。
-- **方法登记**：`core/method_contracts.py` 与 `services/method_registration.py` 维护各工具对应的唯一 `method_id`、依赖声明与来源范围；`detail=audit` 时通过 `run_metadata.calculation_evidence` 输出方法与误差边界说明。
+- **执行回执与重放**：`core/receipt_models.py` 定义的 `run_metadata`（由 `services/run_metadata.py` 与 `services/replay_metadata.py` 生成）保存有效时钟、`warnings` 与重放信息（`detail=audit` 含 `duration_ms` 与完整 `replay`，随机起卦保留当次 `seed`）。重放需保留原始输入与环境配置，服务不持久化历史运行数据库。
 
 ## 内聚与依赖边界
 
@@ -90,11 +89,11 @@ sequenceDiagram
 
 | 关注点 | 模块与维护规则 |
 | --- | --- |
-| 出生公共计算 | `services/birth_context.py` 与 `birth_payload.py` 复用出生归一化与公共命盘构造 |
-| 八字与时运 | `core/bazi/{calendar,timing,elements,rules,pillars,relations,shensha}.py` 实现历法、时运与命盘计算；`services/{bazi,timing,timing_clock,calendar_tools}.py` 编排服务与 `core.execution_context` 执行时钟 |
+| 出生公共计算 | `services/birth_context.py` 与 `services/birth_payload.py` 复用出生归一化与公共命盘构造 |
+| 八字与时运 | `core/bazi/{calendar,compatibility,relations,shensha,sources,strength,timing}.py` 实现历法、时运与命盘计算；`services/{bazi,timing,timing_clock,calendar_tools}.py` 编排服务与 `core/execution_context.py` 执行时钟 |
 | 星盘与子技法 | `core/astro/`、`core/predictive/`、`core/{jyotish,guolao,human_design}/` 按领域目录组织；`services/{astrology,jyotish,guolao,human_design}.py` 分别提供对应独立入口，共享星座与尊贵表位于 `core/astro/astrology_tables.py` |
 | 术数与占卜 | `core/{ziwei,qimen,liuyao,meihua,heluo,numerology,sukuyo,metaphysics}/` 保持各自独立计算与规则表；`services/{ziwei,sanshi,divination}.py` 编排交付 |
-| 家居风水 | `core/fengshui/` 按八宅、砂水、年/月星、玄空与布局分层实现，`services/fengshui.py` 编排多层合并与 `cli_request_file` 支持，详见[家居风水参考](fengshui.md) |
+| 家居风水 | `core/fengshui/` 按八宅、砂水、年/月/日/时紫白、玄空与布局分层实现，`services/fengshui.py` 编排多层合并与 `cli_request_file` 支持，详见[家居风水参考](fengshui.md) |
 
 ## 运行配置与边界
 
@@ -102,4 +101,4 @@ REST 默认监听 `0.0.0.0:8010`，支持可选 API Key 鉴权与 CORS（见[运
 
 ## 扩展与验证
 
-新增工具通常按 `core` / `analysis` -> `services` -> `core/requests` / `core/response_models` -> `services/catalog`（追加 `ToolSpec`）顺序实现，并在 `tests/fixtures/surface_payloads.py` 补充代表请求后运行三端契约与领域回归测试。详细验证命令与文档生成规则见[开发指南](development-guide.md)。
+新增工具通常按 `core` / `analysis` -> `services` -> `core/requests` / `core/response_models.py` -> `services/catalog`（追加 `ToolSpec`）顺序实现，并在 `tests/fixtures/surface_payloads.py` 补充代表请求后运行三端契约与领域回归测试。详细验证命令与文档生成规则见[开发指南](development-guide.md)。
