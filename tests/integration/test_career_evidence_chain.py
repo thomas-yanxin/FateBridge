@@ -368,3 +368,38 @@ def test_exact_valid_dual_override_matches_applied_pillars_across_transports(
         "dayun": "甲子",
         "liunian": "丙寅",
     }
+
+
+def test_career_markers_and_structure_detail_returned_with_directions(
+    surface_calls,
+) -> None:
+    spec = SPECS["bazi_career"]
+    fields = suggested_fields(spec, view="markers")
+    params = dict(detail="audit", fields=fields)
+    http, protocol, code, output = surface_calls(
+        spec,
+        D1,
+        params=params,
+        options=params,
+        flags=["--detail", "audit", "--fields", *fields],
+        cli_first=False,
+    )
+    assert http.status_code == 200 and not protocol.is_error and code == 0
+    assert (
+        business(http.json())
+        == business(protocol.structured_content)
+        == business(output)
+    )
+    markers = output["career_analysis"]["topic_facts"]["markers"]
+    assert markers
+    names = {m["name"] for m in markers}
+    assert {"天乙贵人", "禄神", "驿马", "将星", "国印贵人", "文昌"} <= names
+    tianyi = [m for m in markers if m["name"] == "天乙贵人"]
+    assert tianyi and all(m.get("direction") for m in tianyi)
+
+    full = calculate_bazi_career(
+        person(), analysis_year=2027, analysis_month=6, analysis_day=15
+    )["career_analysis"]["topic_facts"]
+    detail = full["structure_detail"]
+    assert detail["label"] == full["dominant_structure"] == "正官格"
+    assert {"formation_status", "obstructions", "rescues", "reason"} <= detail.keys()

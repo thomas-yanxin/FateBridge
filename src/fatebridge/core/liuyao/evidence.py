@@ -378,11 +378,8 @@ def build_liuyao_evidence(
     focus_kinship: str | None = None,
     focus_kind: str | None = None,
     timing_days: int = 0,
-    event_horizon: str | None = None,
 ) -> dict[str, Any]:
     """Build compact, deterministic Liuyao structural evidence (<25 KB audit)."""
-    if event_horizon not in (None, "near", "long_term"):
-        raise ValueError("event_horizon 必须是 near、long_term 或省略。")
     void = xunkong(day_ganzhi)
     day = day_ganzhi[1]
     moving_elements = {ELEMENTS[line["branch"]] for line in lines if line.get("change")}

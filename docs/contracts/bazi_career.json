@@ -1,7 +1,7 @@
 {
   "call_guidance": {
-    "depth": "evidence_chain按星位、根气与条件取证；structure_checks只审有限前提，formation_status=not_adjudicated不能解释成已成格。topic.timing使用实际生效柱，不是全年扫描；未知性别保留传统选星分支。",
-    "evidence": "首轮按问题选 direction 或 target_year。按实际星位、透藏和时运触点取证。",
+    "depth": "通过 career_analysis.topic_facts 读取 four_pillars、day_master、favorable_elements/avoid_elements、dominant_structure、structure_detail（含 formation_status、obstructions、rescues）、seasonal_climate、markers 及 timing_layers 运年触点；career_analysis.timing_context 使用实际生效柱，不是全年扫描；未知性别保留日干与流年，不补造大运。",
+    "evidence": "首轮按问题选 target_year、depth 或 markers（或默认全取 topic_facts 与 timing_context）。按 topic_facts.natal_stars 透藏星位、dominant_structure、structure_detail 与 markers 取证。",
     "interpretation": "结合已知工作经历、职责和目标解释；需要传统定义时查询 knowledge_catalog 和 knowledge_read。行业映射和实践建议由 Agent 结合语境提出。",
     "target_clock": "日期级专项固定出生时区的本地零点，timing_context回显analysis_datetime、timezone和boundary_status；交节当日涉及钟时时，用 bazi_timing 核对实际目标时刻。"
   },
@@ -12,29 +12,44 @@
       ],
       "when": "复核同次出生历法、节气来源与实际星历模型；提供者状态不等于天文精度或原典认证。"
     },
-    "carriers": {
-      "fields": [
-        "career_analysis.timing_context.analysis_datetime"
-      ],
-      "when": "同一目标日期核对大运与流年的本柱承载和原局外援，喜干与喜支分别读条件；未知性别时不补造大运，不以承载条件判断吉凶或合化。"
-    },
     "depth": {
       "fields": [
-        "career_analysis.timing_context"
+        "career_analysis.timing_context",
+        "career_analysis.topic_facts.four_pillars",
+        "career_analysis.topic_facts.day_master",
+        "career_analysis.topic_facts.dominant_structure",
+        "career_analysis.topic_facts.structure_detail",
+        "career_analysis.topic_facts.seasonal_climate",
+        "career_analysis.topic_facts.favorable_elements",
+        "career_analysis.topic_facts.avoid_elements",
+        "career_analysis.topic_facts.natal_stars",
+        "career_analysis.topic_facts.markers",
+        "career_analysis.topic_facts.palace_relations",
+        "career_analysis.topic_facts.natal_groups",
+        "career_analysis.topic_facts.timing_layers"
       ],
-      "when": "核对星位、根气、格局前提与目标日期大运流年触点；保留不满足和未裁定条件。"
+      "when": "核对星位、格局成败救应、调候喜用与目标日期大运流年触点；保留不满足和破格条件。"
     },
-    "hidden_carriers_timing": {
+    "markers": {
       "fields": [
-        "career_analysis.timing_context.analysis_datetime"
+        "career_analysis.topic_facts.four_pillars",
+        "career_analysis.topic_facts.markers",
+        "career_analysis.timing_context.dayun_pillar",
+        "career_analysis.timing_context.liunian_pillar"
       ],
-      "when": "在同一目标时点逐项核对运年柱的真实藏干生克；与公共hidden_target_reference合读来源、方法和效力边界，不能从盖头候选推成全支或实际根损。"
+      "when": "查看事业神煞标记（天乙贵人方位、禄神、驿马、将星、国印贵人、文昌）及在四柱与运年中的落位。"
     },
     "target_year": {
       "fields": [
-        "career_analysis.timing_context"
+        "career_analysis.timing_context",
+        "career_analysis.topic_facts.four_pillars",
+        "career_analysis.topic_facts.day_master",
+        "career_analysis.topic_facts.dominant_structure",
+        "career_analysis.topic_facts.favorable_elements",
+        "career_analysis.topic_facts.natal_stars",
+        "career_analysis.topic_facts.timing_layers"
       ],
-      "when": "询问指定年份或日期时读取对应大运、流年及命盘触点。"
+      "when": "询问指定年份或日期时读取对应大运、流年、命盘星位及流年大运触点。"
     }
   },
   "first_view": {

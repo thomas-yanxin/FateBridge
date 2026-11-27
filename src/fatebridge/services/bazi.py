@@ -29,9 +29,14 @@ from fatebridge.core.bazi.relations import (
 from fatebridge.core.bazi.shensha import (
     GU_CHEN_TARGETS,
     GUA_SU_TARGETS,
+    GUO_YIN_TARGETS,
     HONG_LUAN_TARGETS,
+    JIANG_XING_TARGETS,
+    LU_SHEN_TARGETS,
     PEACH_BLOSSOM_TARGETS,
     TIAN_XI_TARGETS,
+    TIAN_YI_TABLES,
+    TRAVEL_HORSE_TARGETS,
     WEN_CHANG_TARGETS,
     build_shensha_profile,
 )
@@ -61,6 +66,28 @@ from fatebridge.utils.errors import (
 from fatebridge.utils.formatting import create_pillar_dict
 
 _ORDER = ("year", "month", "day", "hour")
+
+BRANCH_COMPASS_DIRECTIONS: dict[str, str] = {
+    "子": "正北",
+    "丑": "东北偏北",
+    "寅": "东北偏东",
+    "卯": "正东",
+    "辰": "东南偏东",
+    "巳": "东南偏南",
+    "午": "正南",
+    "未": "西南偏南",
+    "申": "西南偏西",
+    "酉": "正西",
+    "戌": "西北偏西",
+    "亥": "西北偏北",
+}
+
+
+def _group_branch_target(
+    branch: str, mappings: tuple[tuple[tuple[str, ...], str], ...]
+) -> str:
+    return next(target for grp, target in mappings if branch in grp)
+
 
 _TOPICS: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
     "career": (
@@ -417,6 +444,20 @@ def _build_lean_topic_facts(
     }
 
     marker_targets: list[tuple[str, str, str]] = []
+    if topic == "career":
+        for target in TIAN_YI_TABLES["standard"][day_stem]:
+            marker_targets.append(("天乙贵人", "day_stem", target))
+        marker_targets.append(("禄神", "day_stem", LU_SHEN_TARGETS[day_stem]))
+        for pos in ("year", "day"):
+            b = pillars[pos][1]
+            marker_targets.append(
+                ("驿马", f"{pos}_branch", _group_branch_target(b, TRAVEL_HORSE_TARGETS))
+            )
+            marker_targets.append(
+                ("将星", f"{pos}_branch", _group_branch_target(b, JIANG_XING_TARGETS))
+            )
+        marker_targets.append(("国印贵人", "day_stem", GUO_YIN_TARGETS[day_stem]))
+        marker_targets.append(("文昌", "day_stem", WEN_CHANG_TARGETS[day_stem]))
     if topic == "education":
         marker_targets.append(("文昌", "day_stem", WEN_CHANG_TARGETS[day_stem]))
     if topic in ("marriage", "romance"):
@@ -429,7 +470,7 @@ def _build_lean_topic_facts(
         )
         for pos in ("year", "day"):
             b = pillars[pos][1]
-            t = next(target for grp, target in PEACH_BLOSSOM_TARGETS if b in grp)
+            t = _group_branch_target(b, PEACH_BLOSSOM_TARGETS)
             marker_targets.append(("咸池", f"{pos}_branch", t))
     if topic == "marriage":
         yb = pillars["year"][1]
@@ -445,6 +486,11 @@ def _build_lean_topic_facts(
             "name": name,
             "anchor": anchor,
             "target_branch": target,
+            **(
+                {"direction": BRANCH_COMPASS_DIRECTIONS[target]}
+                if name == "天乙贵人"
+                else {}
+            ),
             "natal_positions": [p for p in _ORDER if pillars[p][1] == target],
             "timing_layers": [
                 layer for layer, (_, b) in temporal.items() if b == target
@@ -513,6 +559,7 @@ def _build_lean_topic_facts(
         "favorable_elements": ea["favorable_elements"],
         "avoid_elements": ea["avoid_elements"],
         "dominant_structure": ea["structure_profile"]["dominant_structure"]["label"],
+        "structure_detail": ea["structure_profile"]["dominant_structure"],
         "seasonal_climate": ea["structure_profile"]["seasonal_climate"],
         "element_distribution": ea["element_distribution"],
         "element_seasonal_phase": ea["element_seasonal_phase"],

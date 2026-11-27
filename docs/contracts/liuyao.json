@@ -1,5 +1,19 @@
 {
   "evidence_views": {
+    "focus_and_timing": {
+      "fields": [
+        "analysis_context",
+        "nongli",
+        "moving_lines",
+        "hexagram_info",
+        "liuyao_evidence.focus",
+        "liuyao_evidence.lines",
+        "liuyao_evidence.moving_focus_guidance",
+        "liuyao_evidence.timing_candidates",
+        "summary"
+      ],
+      "when": "已指定 focus_line/focus_kinship/focus_kind 及可选 timing_days 时，核对用神取用、生克角色（roles）、动静焦点引导与日级条件窗口；日级条件窗口不是事件发生保证"
+    },
     "line_reading": {
       "fields": [
         "analysis_context",
@@ -12,21 +26,25 @@
         "liuyao_evidence",
         "summary"
       ],
-      "when": "读取逐爻纳支、世应、原典动爻及月令动静条件；focus_line/focus_kinship为明确取用前提，日级候选不等于事件应期"
+      "when": "读取逐爻纳支、世应、六亲六神与 zengshan_structural_v2 结构证据；focus_line/focus_kinship 为明确取用前提，日级候选不等于事件应期"
     },
-    "void_conditions": {
+    "structural_relations": {
       "fields": [
-        "current_hexagram"
+        "analysis_context",
+        "nongli",
+        "lines",
+        "hexagram_info.gua_shen",
+        "patterns",
+        "pattern_flags",
+        "liuyao_evidence.lines",
+        "liuyao_evidence.hidden_spirits",
+        "liuyao_evidence.hidden_policy",
+        "liuyao_evidence.three_harmony",
+        "liuyao_evidence.fanfu",
+        "liuyao_evidence.shensha",
+        "summary"
       ],
-      "when": "查所选用爻原旬空、空亡条件及寅日生扶资格；未选用爻则保留空焦点，不代选"
-    },
-    "void_conditions_overview": {
-      "fields": [
-        "current_hexagram",
-        "analysis_context.event_horizon",
-        "lines"
-      ],
-      "when": "无明确用爻时，查六条明爻和实际伏神的原旬旬空与空／不空条件，核对原文疑义及使用范围。保留问事近远、总旺衰未决的条件，不代选用爻。超出响应预算时，按 result_delivery 读取同一 run 的证据。"
+      "when": "细查伏神、三合局、反吟伏吟与六冲六合格局及神煞时使用；伏神按本卦缺失六亲取本宫纯卦同位，不因变爻掩盖"
     }
   },
   "first_view": {
@@ -136,23 +154,6 @@
         "description": "Date string, e.g. 2028-04-06",
         "title": "Date",
         "type": "string"
-      },
-      "event_horizon": {
-        "anyOf": [
-          {
-            "enum": [
-              "near",
-              "long_term"
-            ],
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "调用方已明确问近事near或久远long_term时传入；用于原典进退条件，未给保持待定，不从timing_days推断",
-        "title": "Event Horizon"
       },
       "focus_kind": {
         "anyOf": [

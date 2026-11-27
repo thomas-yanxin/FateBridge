@@ -53,8 +53,8 @@
 | `bazi_birth_chart` | 离线八字命盘（四柱、三元、十神、五行、神煞与大运流年概略） | Implemented |
 | `compare_bazi_sources` | 已明确的字面四柱与登记原典编释逐项核对，不反推生日 | Implemented |
 | `bazi_marriage` | 配偶星／宫与传统婚姻象意 | Implemented，限定规则 |
-| `bazi_career` | 事业类型、行业、创业倾向与贵人方位 | Implemented |
-| `bazi_wealth` | 正偏财、财库、求财方式方位与风险特征 | Implemented |
+| `bazi_career` | 官杀、印、食伤、财星透藏星位，格局成败救应、调候喜用、神煞标记（天乙贵人方位、禄神、驿马、将星、国印贵人、文昌）及运年触点（现代行业与职业方向映射由消费方 Agent 推导） | Implemented |
+| `bazi_wealth` | 正偏财、食伤、比劫星位，五行强弱、格局结构、喜用五行及运年触点（求财方式与风险解读由消费方 Agent 推导） | Implemented |
 | `bazi_health` | 盘内五行权重、寒暖分类与传统文化对应（不做医疗诊断） | Implemented |
 | `bazi_children` | 命主视角的子女星／宫传统对应 | Implemented |
 | `bazi_education` | 印星／食伤／官星、文昌与学业结构 | Implemented，限定规则 |
