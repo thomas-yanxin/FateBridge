@@ -89,14 +89,14 @@ def test_published_first_views_preserve_evidence_and_adjudications(
             "qimen.rule_profiles.god.title",
             "qimen.rule_profiles.season.id",
             "qimen.rule_profiles.season.title",
-            "liureng.month_general",
-            "liureng.three_transmissions",
-            "liureng.patterns",
-            "liureng.ruleset.id",
-            "liureng.ruleset.version",
-            "liureng.ruleset.source_title",
-            "liureng.ruleset.classical_conformance",
-            "liureng.ruleset.classical_acceptance_passed",
+            "liuren.month_general",
+            "liuren.three_transmissions",
+            "liuren.patterns",
+            "liuren.ruleset.id",
+            "liuren.ruleset.version",
+            "liuren.ruleset.source_title",
+            "liuren.ruleset.classical_conformance",
+            "liuren.ruleset.classical_acceptance_passed",
             "synthesis.time_scopes",
         ]
         if key == "sanshiunited" and view is None
@@ -148,8 +148,8 @@ def test_published_first_views_preserve_evidence_and_adjudications(
         else:
             assert cycles["status"] == "not_computed_for_selected_mode"
     if key == "sanshiunited" and view is None:
-        assert body["liureng"]["ruleset"]
-        assert body["liureng"]["three_transmissions"]
+        assert body["liuren"]["ruleset"]
+        assert body["liuren"]["three_transmissions"]
 
 
 @pytest.mark.parametrize(

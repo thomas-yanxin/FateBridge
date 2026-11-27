@@ -453,25 +453,6 @@ def build_chart(
             "functional_palace_basis": "source_reverse_twelve_palaces_from_hour_count_life_branch",
         },
         "mansion_boundaries": raw["boundaries"],
-        "rulesets": [
-            {
-                "id": RULESET,
-                "edition_id": EDITION,
-                "title": "新编评注通玄先生张果星宗大全，陆位辑校，卷一至二",
-                "verified_subset": "安命/命度/身宫/逆布十二宫/十干化曜/33神煞/恩用难仇/小限/洞微大限",
-            },
-            {
-                "id": "yuanshi_054_shoushi_1281",
-                "title": "元史历志·授时历二十八宿古度",
-                "verified_subset": "365.2575古度闭合宿表",
-            },
-            {
-                "id": "swiss_ephemeris_astronomy",
-                "title": "Swiss Ephemeris Programmer's Manual",
-                "verified_subset": "天文计算接口与时间尺度",
-            },
-        ],
-        "rule_trace": trace,
         "validation": {
             "classical_acceptance_passed": False,
             "full_marks_established": False,

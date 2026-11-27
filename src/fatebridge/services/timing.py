@@ -110,7 +110,7 @@ def calculate_comprehensive_timing(
 
     result: dict[str, Any] = {
         "analysis_type": "综合时运分析",
-        "personal_info": {
+        "person_info": {
             "name": person.name,
             "birth_datetime": format_clock_datetime(
                 input_birth_datetime, include_seconds=person.birth_second is not None
@@ -125,7 +125,7 @@ def calculate_comprehensive_timing(
             "zi_hour_policy": zi_hour_policy,
             "time_adjustment": normalized_birth_time.as_dict(),
         },
-        "birth_pillars": create_pillar_dict(birth_context.birth_pillars),
+        "four_pillars": create_pillar_dict(birth_context.birth_pillars),
         "calendar_context": birth_context.birth_calendar_context,
         "analysis_calendar": analysis_calendar,
     }
@@ -157,9 +157,9 @@ def calculate_comprehensive_timing(
                 dayun_analysis["element_effects"]
             ),
         }
-        result["dayun_analysis"] = dayun_section
+        result["dayun"] = dayun_section
     elif dayun_analysis.get("status") == "before_dayun":
-        result["dayun_analysis"] = {
+        result["dayun"] = {
             "status": "before_dayun",
             "current_dayun": None,
             "child_limit": dayun_analysis["child_limit"],
@@ -171,16 +171,16 @@ def calculate_comprehensive_timing(
             ),
         }
     else:
-        result["dayun_analysis"] = {
+        result["dayun"] = {
             "status": dayun_analysis.get("status"),
             "current_dayun": None,
             "message": dayun_analysis.get("message", "大运信息不可用"),
         }
-    result["dayun_analysis"]["timing_context"] = dayun_analysis["timing_context"]
+    result["dayun"]["timing_context"] = dayun_analysis["timing_context"]
 
     liunian_analysis = timing_result["liunian_analysis"]
     liunian_info = liunian_analysis["liunian_info"]
-    result["liunian_analysis"] = {
+    result["liunian"] = {
         **liunian_info,
         "element_effects": serialize_element_effects(
             liunian_analysis["element_effects"]
@@ -189,7 +189,7 @@ def calculate_comprehensive_timing(
 
     liuyue_analysis = timing_result["liuyue_analysis"]
     liuyue_info = liuyue_analysis["liuyue_info"]
-    result["liuyue_analysis"] = {
+    result["liuyue"] = {
         "pillar": liuyue_info["pillar"],
         "stem": liuyue_info["stem"],
         "branch": liuyue_info["branch"],
@@ -199,7 +199,7 @@ def calculate_comprehensive_timing(
 
     liuri_analysis = timing_result["liuri_analysis"]
     liuri_info = liuri_analysis["liuri_info"]
-    result["liuri_analysis"] = {
+    result["liuri"] = {
         "pillar": liuri_info["pillar"],
         "stem": liuri_info["stem"],
         "branch": liuri_info["branch"],
@@ -210,7 +210,7 @@ def calculate_comprehensive_timing(
 
     liushi_analysis = timing_result["liushi_analysis"]
     liushi_info = liushi_analysis["liushi_info"]
-    result["liushi_analysis"] = {
+    result["liushi"] = {
         "pillar": liushi_info["pillar"],
         "stem": liushi_info["stem"],
         "branch": liushi_info["branch"],
@@ -230,7 +230,7 @@ def calculate_comprehensive_timing(
             analysis_moment=analysis_date if analysis_age is None else None,
             analysis_age=analysis_age,
         )
-    result["analysis_reference"] = resolution.reference
+    result["analysis_context"] = resolution.reference
     return result
 
 
@@ -298,7 +298,7 @@ def calculate_dayun_analysis(
 
     result: dict[str, Any] = {
         "analysis_type": "大运专项分析",
-        "personal_info": {
+        "person_info": {
             "name": person.name,
             "gender": person.gender,
             "analysis_age": analysis_age,
@@ -317,7 +317,7 @@ def calculate_dayun_analysis(
     if "dayun_info" in dayun_result:
         dayun_info = dayun_result["dayun_info"]
         age_info = dayun_result["age_info"]
-        result["dayun_info"] = {
+        result["dayun"] = {
             "status": "active",
             "current_dayun": dayun_info["pillar"],
             "stem": dayun_info["stem"],
@@ -341,7 +341,7 @@ def calculate_dayun_analysis(
             dayun_result["element_effects"]
         )
     elif dayun_result.get("status") == "before_dayun":
-        result["dayun_info"] = {
+        result["dayun"] = {
             "status": "before_dayun",
             "current_dayun": None,
             "child_limit": dayun_result["child_limit"],
@@ -354,7 +354,7 @@ def calculate_dayun_analysis(
             dayun_result["element_effects"]
         )
     else:
-        result["dayun_info"] = {
+        result["dayun"] = {
             "status": dayun_result.get("status"),
             "current_dayun": None,
             "message": dayun_result.get("message", "大运信息不可用"),
@@ -368,7 +368,7 @@ def calculate_dayun_analysis(
             analysis_moment=analysis_moment,
             analysis_age=analysis_age if analysis_moment is None else None,
         )
-    result["analysis_reference"] = analysis_reference
+    result["analysis_context"] = analysis_reference
     return result
 
 
@@ -398,7 +398,7 @@ def calculate_jieqi_timeline_analysis(
     target_year_jieqi = get_jieqi_year_grid(target_year, normalized_birth_time.timezone)
     return {
         "analysis_type": "节气节点时间轴分析",
-        "personal_info": {
+        "person_info": {
             "name": person.name,
             "target_year": target_year,
             "birth_datetime": format_clock_datetime(

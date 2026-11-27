@@ -559,7 +559,6 @@ def _build_local_chart_response(
         },
     }
     if chart_variant == "guolao_chart":
-        response["rulesets"] = core_payload["guolao"]["rulesets"]
         response["validation"] = core_payload["guolao"]["validation"]
     return response
 

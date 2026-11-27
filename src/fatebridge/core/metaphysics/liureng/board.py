@@ -450,35 +450,6 @@ def build_liureng_board(
             }
         )
 
-    # Keep only compact decision traces (no verbatim duplication of top-level blocks).
-    compact_trace = rule_trace + [
-        {
-            "rule_id": "liuren.guiren_start",
-            "source_section": (
-                "日贵人歌 / 夜贵人歌"
-                if guiren_profile == "tanyuan_xieji_v1"
-                else "六壬通行贵人表"
-            ),
-            "result": {
-                "profile": guiren_profile,
-                "is_diurnal": is_day,
-                "start_branch": guiren_start,
-                "earth_branch": guiren_earth,
-                "direction": "逆" if guiren_reverse else "顺",
-            },
-        },
-        {
-            "rule_id": "liuren.transmissions.result",
-            "source_section": "九宗门",
-            "result": {
-                "style": style,
-                "detail": style_detail,
-                "branches": transmission_branches,
-                "source_lesson": selected_lesson_index,
-            },
-        },
-    ]
-
     raw_policy = seed.calendar_context.get("ren_calendar_policy")
     board_policy = (
         dict(raw_policy) if raw_policy is not None else symbolic_calendar_policy()
@@ -498,7 +469,6 @@ def build_liureng_board(
         "board_order": "天盘顺布",
         "guiren_order": "逆" if guiren_reverse else "顺",
         "ruleset": ruleset_metadata("liureng", guiren_profile=guiren_profile),
-        "rule_trace": compact_trace,
         "kongwang": kongwang,
         "xun_head": xun_head,
         "month_building_element": branch_element_text(month_branch),
@@ -548,6 +518,7 @@ def build_liureng_board(
                 initial_lesson.get("upper_lower_relation") if initial_lesson else None
             ),
             "guiren_earth_branch": guiren_earth,
+            "guiren_start_branch": guiren_start,
             "diurnal_basis": (
                 "explicit_override"
                 if is_diurnal_override is not None

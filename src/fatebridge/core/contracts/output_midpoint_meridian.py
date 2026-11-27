@@ -123,6 +123,5 @@ class DayMeridianAnalysis(PartialOutput):
     birth_time_sensitivity: DayMeridianSensitivity | None = None
     sources: list[GeometrySource] | None = None
     source_comparison: DayMeridianSourceComparison | None = None
-    rule_trace: list[GeometryRuleTrace] | None = None
     limitations: list[str] | None = None
     original_text_conformance: str | None = None

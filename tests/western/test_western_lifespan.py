@@ -334,12 +334,12 @@ def test_services_return_envelope_with_snapshot_and_no_error() -> None:
             {"analysis_year": 2025, "analysis_month": 6, "analysis_day": 3},
             "planetary_ages",
         ),
-        (calculate_triplicity_rulers, {}, "triplicity_rulers"),
-        (calculate_lunation_phase, {}, "lunation_phase"),
-        (calculate_distributions, {}, "distributions"),
+        (calculate_triplicity_rulers, {}, "triplicity_ruler_periods"),
+        (calculate_lunation_phase, {}, "lunar_phase_progressions"),
+        (calculate_distributions, {}, "bounds_directions"),
         (calculate_balbillus, {}, "balbillus"),
-        (calculate_keypoints, {}, "keypoints"),
-        (calculate_yearsystem129, {}, "yearsystem129"),
+        (calculate_keypoints, {}, "numeric_aspect_periods"),
+        (calculate_yearsystem129, {}, "planetary_periods_129_years"),
         (calculate_planetary_arc, {}, "planetary_arc"),
     ]
     for fn, extra, key in cases:
@@ -394,7 +394,7 @@ def test_singular_ascendant_blocks_ascendant_dependent_results() -> None:
         **J2000_UNRESOLVED_ASC_SITE,
     )
     distributions = calculate_distributions(**singular_birth, house_system="W")
-    dist_payload = distributions["distributions"]
+    dist_payload = distributions["bounds_directions"]
     assert "calculation_basis" not in distributions["natal_reference"]
     assert dist_payload["status"] == "underdetermined_ascendant"
     assert dist_payload["ascendant_resolved"] is False
@@ -413,7 +413,7 @@ def test_singular_ascendant_blocks_ascendant_dependent_results() -> None:
     body_kp = calculate_keypoints(
         **singular_birth, house_system="W", release_mode="body"
     )
-    kp_body_payload = body_kp["keypoints"]
+    kp_body_payload = body_kp["numeric_aspect_periods"]
     assert kp_body_payload["status"] == "underdetermined_ascendant"
     assert kp_body_payload["ascendant_resolved"] is False
     assert kp_body_payload["release_sign_index"] is None
@@ -424,7 +424,7 @@ def test_singular_ascendant_blocks_ascendant_dependent_results() -> None:
     soul_kp = calculate_keypoints(
         **singular_birth, house_system="W", release_mode="soul"
     )
-    kp_soul_payload = soul_kp["keypoints"]
+    kp_soul_payload = soul_kp["numeric_aspect_periods"]
     assert "status" not in kp_soul_payload
     assert len(kp_soul_payload["positions"]) == 7
     assert len(kp_soul_payload["activations"]) > 0
@@ -441,7 +441,7 @@ def test_small_year_preview_is_half_open_on_all_surfaces(
         SPECS["planetary_periods_129_years"],
         {**BIRTH, "max_age_years": age_limit, "start_planet": "Sun"},
         projection={
-            "fields": ["yearsystem129"],
+            "fields": ["planetary_periods_129_years"],
             "detail": "audit",
         },
         rest_as_of=AS_OF,
@@ -450,7 +450,7 @@ def test_small_year_preview_is_half_open_on_all_surfaces(
     assert code == 0 and not protocol.is_error
     result = response.json()
     assert business(result) == business(protocol.structured_content) == business(cli)
-    periods = result["yearsystem129"]["periods"]
+    periods = result["planetary_periods_129_years"]["periods"]
     assert len(periods) == expected_count
     assert periods[0]["planet"] == "Sun"
     assert periods[0]["duration_years"] == 19

@@ -52,8 +52,6 @@ class MidpointAnalysis(PartialOutput):
     meridian_houses: MeridianHouseAnalysis | None = None
     comparative_geometry: ComparativeGeometry | None = None
     reading_guide: dict[str, str] | None = None
-    rulesets: list[GeometryRuleset] | None = None
-    rule_trace: list[GeometryRuleTrace] | None = None
     sources: list[GeometrySource] | None = None
     limitations: list[str] | None = None
     original_text_conformance: str | None = None

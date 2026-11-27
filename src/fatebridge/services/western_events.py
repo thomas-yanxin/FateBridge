@@ -110,7 +110,7 @@ def calculate_mundane(
             "analysis_type": "西占世俗入宫盘",
             "engine": calculation_basis["engine_backend"],
             "analysis_context": context,
-            "mundane": payload,
+            "mundane_ingress_chart": payload,
             "summary": summary,
         }
     except Exception as exc:
@@ -319,7 +319,7 @@ def calculate_extrareturns(
             "analysis_type": "西占多重回归",
             "engine": "fatebridge-offline",
             "analysis_context": context,
-            "extrareturns": payload,
+            "planetary_returns": payload,
             "summary": summary,
         }
     except Exception as exc:

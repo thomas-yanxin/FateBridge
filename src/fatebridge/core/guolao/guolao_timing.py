@@ -173,26 +173,6 @@ def enrich_guolao_timing(
         },
         "limitations": [],
     }
-    g["rule_trace"].append(
-        {
-            "rule_id": "source_small_limit_reverse_count",
-            "source_id": guolao.EDITION,
-            "locator": small_limit["locator"],
-            "inputs": {
-                "life_branch": life["branch"],
-                "birth_year_branch": birth_gods["year_branch"],
-                "target_year_branch": year_branch,
-                "analysis_datetime": target_calendar.isoformat(),
-            },
-            "outputs": {
-                "small_limit_branch": branch,
-                "natal_functional_palace": palace["palace"],
-                "palace_lord": palace["lord"],
-                "dongwei_current": dongwei.get("current_period"),
-            },
-            "placement_classical_acceptance": False,
-        }
-    )
 
     if month_basis == "jie_month":
         birth_sun_lon = next(b["longitude"] for b in g["bodies"] if b["id"] == "Sun")

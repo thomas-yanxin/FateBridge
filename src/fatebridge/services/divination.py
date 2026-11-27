@@ -261,17 +261,6 @@ def calculate_meihua_analysis(
         "true_solar_time_applied"
     ]
     meihua["calendar_policy"]["civil_clock_resolution"] = clock_resolution
-    meihua["rule_trace"].append(
-        {
-            "rule_id": "civil_clock_resolution",
-            "operation": "Verify offset against the supplied timezone, preserve the resolved instant and fold for both calendar consumers; use local civil date/hour for the cast",
-            "inputs": {
-                "timezone": timezone_name,
-                "utc_offset": analysis_utc_offset,
-            },
-            "result": clock_resolution,
-        }
-    )
     label_precision = calendar_label_precision(analysis_datetime.date())
     meihua["calendar_policy"]["label_precision"] = label_precision
     solar_reference = solar_term_date_reference(calendar_context)
@@ -281,29 +270,6 @@ def calculate_meihua_analysis(
         meihua,
         interpretation_topic=interpretation_topic,
         weather_context=weather_context,
-    )
-    if interpretation_topic == "weather":
-        meihua["evidence_scope"][
-            "interpretation_basis"
-        ] = "weather_rules_without_body_use"
-        meihua["evidence_scope"]["implemented"].append("selected_weather_clauses")
-    elif interpretation_topic != "general":
-        meihua["evidence_scope"][
-            "interpretation_basis"
-        ] = "selected_nlc1925_topic_initial_body_use_clause"
-        meihua["evidence_scope"]["implemented"].append("selected_topic_clauses")
-        if interpretation_topic == "wealth":
-            meihua["evidence_scope"]["implemented"].append("selected_wealth_components")
-        if interpretation_topic == "lost_property":
-            meihua["evidence_scope"]["implemented"].append(
-                "selected_lost_property_changed_use_location_symbols"
-            )
-
-    interpretation["evidence_scope"].update(
-        calendar_label_precision_path="meihua.calendar_policy.label_precision",
-        calendar_label_precision_status=label_precision["status"],
-        solar_term_date_reference_path="meihua.calendar_policy.solar_term_date_reference",
-        solar_term_date_reference_status=solar_reference["status"],
     )
     if label_precision["matched_events"]:
         interpretation["comprehensive_judgement"] += (
@@ -744,14 +710,6 @@ def calculate_sukuyo_compatibility(
     else:
         summary = "闰月/半日或规则次序未定，候选关系见candidate_relation_analysis。"
 
-    contract: dict[str, Any] = {
-        "calendar_basis": calendar_basis,
-        "distance_rule": distance_rule,
-    }
-    if candidate_analysis.get("shared_reconstruction_analysis"):
-        contract["joint_reconstruction"] = joint_reconstruction_contract(
-            candidate_analysis
-        )
     result: dict[str, Any] = {
         "analysis_type": "宿曜双人相性 / T1299三九法",
         "status": "computed" if resolved else "partial",
@@ -762,8 +720,6 @@ def calculate_sukuyo_compatibility(
         "person1_to_person2": forward,
         "person2_to_person1": reverse,
         "candidate_relation_analysis": candidate_analysis,
-        "rulesets": rulesets(calendar_profile, calendar_basis),
-        "interpretation_contract": contract,
         "summary": summary,
     }
     if calendar_basis != "chinese_hko_utc08":

@@ -36,7 +36,7 @@ class PalaceCorrespondence(PartialOutput):
     trigram: str | None = None
     direction: str | None = None
     qimen: CorrespondenceQimen | None = None
-    liureng: CorrespondenceLiuren | None = None
+    liuren: CorrespondenceLiuren | None = None
 
 
 class CorrespondenceRuleset(PartialOutput):

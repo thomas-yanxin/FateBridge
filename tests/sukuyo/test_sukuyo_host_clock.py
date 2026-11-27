@@ -97,7 +97,7 @@ def test_historical_half_candidates_and_directed_relations_across_three_surfaces
 ) -> None:
     if tool_name == "suzhan":
         payload = {"date": "0806-09-20", "timezone": "+09:00"}
-        fields = ["sukuyo.calendar", "rulesets", "validation"]
+        fields = ["sukuyo.calendar", "validation"]
     else:
         payload = {
             "person1_date": "0806-09-21" if reverse else "0806-09-20",
@@ -112,7 +112,6 @@ def test_historical_half_candidates_and_directed_relations_across_three_surfaces
             "person1_to_person2",
             "person2_to_person1",
             "candidate_relation_analysis",
-            "rulesets",
         ]
     payload.update(calendar_basis=BASIS, calendar_profile="hinoo_t1299_host27")
     spec = SPECS[tool_name]

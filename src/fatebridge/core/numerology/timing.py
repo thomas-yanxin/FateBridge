@@ -139,7 +139,6 @@ def build_reading_context(
         "date_mapping_statement": date_mapping_statement(
             profile, future_clock_policy, timezone_spec
         ),
-        "source_citations": reading_source_citations(profile),
     }
 
 

@@ -59,6 +59,6 @@ def test_zhirun_service_accepts_civil_endpoints_with_independent_day_facts(
         for palace in palaces
     )
     assert qimen["zhifu"] and qimen["zhishi"]
-    assert qimen["rulesets"] and qimen["rule_trace"]
+    assert "rulesets" not in qimen and "rule_trace" not in qimen
     assert qimen["calendar_policy"]["day_boundary"] == "23:00"
     assert qimen["calendar_policy"]["hour_clock"] == "civil"

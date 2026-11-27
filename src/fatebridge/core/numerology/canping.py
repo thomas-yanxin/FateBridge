@@ -715,63 +715,25 @@ def liunian_series(
 
 def canping_evidence(calculation: dict[str, Any]) -> dict[str, Any]:
     """Build compact factual evidence for Canping without collation/prose bloat."""
-    method = calculation["method"]
-    collation = _collation()
     timing = calculation.get("timing")
     selected = timing.get("selected") if timing else None
-    rulesets: list[dict[str, Any]] = [
-        {
-            "ruleset_id": (
-                "jinsuo_day_branch_v1" if method == "gu" else "canping_month_variant_v1"
-            ),
-            "version": "1.0.0",
-            "source_title": "河洛理數（史應選校訂本）",
-            "source_status": "collated_subset",
-        },
-        {
-            "ruleset_id": collation["corpus_id"],
-            "version": collation["version"],
-            "source_title": collation["source_title"],
-            "source_status": collation["review_status"],
-        },
-    ]
     selected_texts: list[dict[str, Any]] = []
-    rule_trace: list[dict[str, Any]] = [
-        {
-            "rule_id": "jinsuo_benming",
-            "source_section": "卷六·金鎖銀匙",
-            "facts": {
-                "method": method,
-                "day_palace_branch": calculation["dayPalaceBranch"],
-                "nayin_element": calculation["element"],
-                "kind": calculation["kindMain"],
-                "numShun": calculation["benming"]["numShun"],
-                "numNi": calculation["benming"]["numNi"],
-            },
-        }
-    ]
-    if timing and timing["profile_id"] != "legacy_minggong_v1":
-        rulesets.append(
+    if (
+        timing
+        and timing["profile_id"] != "legacy_minggong_v1"
+        and selected
+        and selected.get("status") == "active"
+    ):
+        selected_texts.append(
             {
-                "ruleset_id": timing["ruleset_id"],
-                "version": timing["ruleset_version"],
-                "source_title": timing["source_title"],
-                "source_status": timing["source_status"],
+                "phase": "liunian_segment",
+                "at": selected["at"],
+                "ganzhi": selected["ganzhi"],
+                "dayun_pillar": selected["dayun_pillar"],
+                "kind": "luck",
+                "verses": selected["verses"],
             }
         )
-        if selected and selected.get("status") == "active":
-            selected_texts.append(
-                {
-                    "phase": "liunian_segment",
-                    "at": selected["at"],
-                    "ganzhi": selected["ganzhi"],
-                    "dayun_pillar": selected["dayun_pillar"],
-                    "kind": "luck",
-                    "verses": selected["verses"],
-                }
-            )
     return {
-        "rulesets": rulesets,
         "selected_texts": selected_texts,
-        "rule_trace": rule_trace,
     }

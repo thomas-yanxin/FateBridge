@@ -55,7 +55,7 @@ TERM_VIEW = {
 def _compact_jieqi_year(result: ServiceResult) -> ServiceResult:
     field = (
         "selected_jieqi"
-        if result["query_context"]["requested_jieqis"]
+        if result["analysis_context"]["requested_jieqis"]
         else "jieqi_year"
     )
     return {
@@ -99,14 +99,14 @@ def _compact_jieqi_timeline(result: ServiceResult) -> ServiceResult:
 
 
 def _compact_bazi_timing(result: ServiceResult) -> ServiceResult:
-    dayun = result.get("dayun_analysis")
+    dayun = result.get("dayun")
     compact_dayun = (
         {k: v for k, v in dayun.items() if k != "timing_context"}
         if isinstance(dayun, dict)
         else dayun
     )
     return {
-        k: (compact_dayun if k == "dayun_analysis" else v)
+        k: (compact_dayun if k == "dayun" else v)
         for k, v in result.items()
         if k not in {"calendar_context"}
     }

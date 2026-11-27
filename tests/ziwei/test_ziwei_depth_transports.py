@@ -152,7 +152,7 @@ def test_profiles_and_evidence_match_all_public_surfaces(
         assert link["scope_palace_name"] == "夫妻宫"
     elif payload_key == "ziwei_birth":
         birth = result["ziwei_birth"]
-        assert birth["rule_trace"]
+        assert "rule_trace" not in birth
         assert birth["laiyin_gong"]["ganzhi"][0] == birth["year_stem"]
         assert birth["zidou_branch"]
         assert len(birth["flying_sihua"]["matrix"]) == 12

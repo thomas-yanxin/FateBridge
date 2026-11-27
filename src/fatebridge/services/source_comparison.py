@@ -30,7 +30,7 @@ def calculate_bazi_source_compare(
     return {
         "analysis_type": "原典字面四柱与当前模型核对",
         "four_pillars": create_pillar_dict(pillars),
-        "input_context": {
+        "analysis_context": {
             **input_consistency(values),
             "input_kind": "literal_four_pillars",
             "birth_datetime_reconstructed": False,

@@ -35,39 +35,94 @@ def _validation_error_payload(error: ToolValidationError) -> dict[str, JsonValue
     }
 
 
+_CATALOG_PROVENANCE_KEYS = (
+    "source_domain",
+    "domain",
+    "bundle_version",
+    "reference_policy_id",
+    "source_catalogue_version",
+    "reference_only",
+    "personal_applicability_assessed",
+    "whole_books_collated",
+    "independent_whole_corpus_review_completed",
+)
+
+
+def _slim_catalog_provenance(provenance: dict[str, Any] | None) -> dict[str, Any]:
+    data = provenance or {}
+    slim: dict[str, Any] = {
+        key: data[key] for key in _CATALOG_PROVENANCE_KEYS if key in data
+    }
+    slim.setdefault("reference_only", True)
+    slim.setdefault("personal_applicability_assessed", False)
+    return slim
+
+
+def _slim_catalog_domain(domain_record: dict[str, Any]) -> dict[str, Any]:
+    categories = []
+    for cat in domain_record.get("categories", []):
+        entry: dict[str, Any] = {
+            "name": cat["name"],
+            "count": cat["count"],
+        }
+        if "keys" in cat:
+            entry["keys"] = list(cat["keys"][:2])
+        elif "keys_sample" in cat:
+            entry["keys_sample"] = list(cat["keys_sample"][:2])
+        if cat.get("key_format"):
+            entry["key_format"] = cat["key_format"]
+        if "supports" in cat:
+            entry["supports"] = list(cat["supports"])
+        categories.append(entry)
+    slim_domain: dict[str, Any] = {
+        "domain": domain_record["domain"],
+        "source": domain_record["source"],
+        "categories": categories,
+    }
+    if domain_record.get("bundle_version") is not None:
+        slim_domain["bundle_version"] = domain_record["bundle_version"]
+    return slim_domain
+
+
 @lru_cache(maxsize=16)
 def _cached_registry(lookup_domain: str | None) -> dict[str, Any]:
     if lookup_domain == human_design_knowledge.DOMAIN:
-        return human_design_knowledge.build_registry()
-    if lookup_domain in DOMAINS:
-        return build_registry(lookup_domain)
-    if lookup_domain is None or lookup_domain == "":
+        raw = human_design_knowledge.build_registry()
+    elif lookup_domain in DOMAINS:
+        raw = build_registry(lookup_domain)
+    elif lookup_domain is None or lookup_domain == "":
         base_registry = build_knowledge_registry(domain=lookup_domain)
         added = [build_registry(name) for name in DOMAINS]
         added.append(human_design_knowledge.build_registry())
         return {
-            **base_registry,
             "source": "fatebridge_mixed_knowledge",
             "bundle_version": None,
             "domains": [
-                *base_registry["domains"],
-                *(
-                    domain_record
-                    for provider in added
-                    for domain_record in provider["domains"]
-                ),
+                _slim_catalog_domain(domain_record)
+                for domain_record in (
+                    *base_registry["domains"],
+                    *(
+                        record
+                        for provider in added
+                        for record in provider["domains"]
+                    ),
+                )
             ],
             "provenance": {
                 "source_domain": "fatebridge_mixed_knowledge",
-                "components": [
-                    base_registry["provenance"],
-                    *(provider["provenance"] for provider in added),
-                ],
-                "added_reference_source": SOURCE,
-                "added_reference_scope": SCOPE,
+                "reference_only": True,
+                "personal_applicability_assessed": False,
+                "whole_books_collated": False,
+                "independent_whole_corpus_review_completed": False,
             },
         }
-    return build_knowledge_registry(domain=lookup_domain)
+    else:
+        raw = build_knowledge_registry(domain=lookup_domain)
+    return {
+        **raw,
+        "domains": [_slim_catalog_domain(d) for d in raw.get("domains", [])],
+        "provenance": _slim_catalog_provenance(raw.get("provenance")),
+    }
 
 
 def calculate_knowledge_registry(

@@ -165,8 +165,11 @@ def build_heluo_result(
     judgment["seasonal_numbers"]["seasonal_windows"] = [
         w for w in judgment["seasonal_numbers"]["seasonal_windows"] if w.get("active")
     ]
-    analysis_context = _build_metaphysics_analysis_context(seed)
-    analysis_context["longitude"] = parsed_longitude
+    analysis_context = {
+        **input_normalized,
+        **_build_metaphysics_analysis_context(seed),
+        "longitude": parsed_longitude,
+    }
     clock = numerology_birth_clock(
         seed,
         parsed_longitude,
@@ -201,7 +204,6 @@ def build_heluo_result(
 
     return {
         "analysis_type": "河洛理数",
-        "input_normalized": input_normalized,
         "analysis_context": analysis_context,
         "four_pillars": create_pillar_dict(seed.pillars),
         "chart": chart,

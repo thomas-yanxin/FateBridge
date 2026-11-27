@@ -98,7 +98,7 @@ CHART_FIELDS: dict[str, Any] = {
     "classical_patterns": ClassicalPatterns,
     "hellenistic": Hellenistic,
     "guolao": Guolao,
-    "india": India,
+    "vedic_chart": India,
     "thirteen_sectors": list[ThirteenSector],
     "sector_profile": SectorProfile,
     "midpoint_analysis": MidpointAnalysis,

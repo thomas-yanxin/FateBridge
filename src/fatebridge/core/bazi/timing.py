@@ -1076,5 +1076,4 @@ def analyze_timing_interactions(
         "nodes": nodes,
         "ten_god_context": ten_god_context,
         "relations": events,
-        "rule_trace": sorted({e["rule_id"] for e in events}),
     }

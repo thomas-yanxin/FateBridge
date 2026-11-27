@@ -189,10 +189,8 @@ def test_native_pattern_trace_and_classical_features(
         "仇",
         "同",
     }
-    trace = next(t for t in g["rule_trace"] if t["rule_id"] == m.PATTERN_MODEL_ID)
-    assert [p["name"] for p in trace["outputs"]["matched_patterns"]] == [
-        p["name"] for p in g["moira_patterns"]
-    ]
+    assert "rule_trace" not in g
+    assert "rulesets" not in g
     assert all(
         p["evidence"]["granularity"] == "palace_index" for p in g["moira_patterns"]
     )

@@ -141,7 +141,7 @@ SPECS: list[ToolSpec] = [
         ),
         required_output_fields=(
             "analysis_type",
-            "input_normalized",
+            "analysis_context",
             "meihua",
             "interpretation",
             "summary",

@@ -134,7 +134,7 @@ def test_service_uses_state_specific_contract_and_resolved_support() -> None:
         person1_calendar_day_part="second_half",
         person2_calendar_day_part="second_half",
     )
-    assert "not_needed" in result["interpretation_contract"]["joint_reconstruction"]
+    assert "rulesets" not in result and "interpretation_contract" not in result
     supports = result["candidate_relation_analysis"]["shared_reconstruction_analysis"][
         "resolved_support"
     ]

@@ -145,11 +145,11 @@ def build_otherbu_result(
         evidence["validation"]["calendar"] = "separate_astronomical_context_computed"
     return {
         "analysis_type": "西洋游戏 / 占星骰子",
-        "input_normalized": inputs,
+        "analysis_context": inputs,
         "planet": normalized_planet,
         "sign": normalized_sign,
         "house": normalized_house,
-        "diceChart": dice_chart,
+        "dice_chart": dice_chart,
         "chart": base_chart,
         "question": question,
         **evidence,

@@ -405,6 +405,7 @@ def symbolic_calendar_policy() -> dict[str, Any]:
 def ruleset_metadata(
     technique: str, *, guiren_profile: str = "liuren_common_v1"
 ) -> dict[str, Any]:
+    del guiren_profile
     jinkou = technique == "jinkou"
     if jinkou:
         return {
@@ -422,9 +423,6 @@ def ruleset_metadata(
         ),
         "classical_conformance": "implemented",
         "classical_acceptance_passed": True,
-        "conventions": {
-            "guiren_profile": guiren_profile,
-        },
     }
 
 

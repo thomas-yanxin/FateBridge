@@ -77,7 +77,7 @@ def test_supplied_facts_survive_the_current_options_boundary(
     topic = "reputation" if field == "reputation_context" else "general"
     output = result(kind, interpretation_topic=topic, **{field: value})
     assert "error" not in output
-    facts = output["input_normalized" if kind == "cast" else "analysis_context"]
+    facts = output["analysis_context"]
     if field == "external_observations":
         rows = output["interpretation"]["external_omens"]["observations"]
         assert len(rows) == len(value)

@@ -225,12 +225,12 @@ def test_calculate_comprehensive_timing_uses_corrected_birth_time() -> None:
         person, analysis_year=2020, analysis_month=1
     )
 
-    assert result["personal_info"]["birth_datetime"] == "2020-01-01 00:30"
-    assert result["personal_info"]["normalized_birth_datetime"] == "2019-12-31 22:17"
-    assert result["personal_info"]["time_adjustment"]["applied"] is True
-    assert result["personal_info"]["time_adjustment"]["resolved_place"] == "乌鲁木齐"
-    assert result["personal_info"]["time_adjustment"]["resolution_level"] == "city"
-    assert result["birth_pillars"]["hour"]["branch"] == "亥"
+    assert result["person_info"]["birth_datetime"] == "2020-01-01 00:30"
+    assert result["person_info"]["normalized_birth_datetime"] == "2019-12-31 22:17"
+    assert result["person_info"]["time_adjustment"]["applied"] is True
+    assert result["person_info"]["time_adjustment"]["resolved_place"] == "乌鲁木齐"
+    assert result["person_info"]["time_adjustment"]["resolution_level"] == "city"
+    assert result["four_pillars"]["hour"]["branch"] == "亥"
 
 
 def test_calculate_comprehensive_timing_supports_age_override() -> None:
@@ -256,12 +256,12 @@ def test_calculate_comprehensive_timing_supports_age_override() -> None:
     )
     dayun_result = calculate_dayun_analysis(person, 42)
 
-    assert result["personal_info"]["current_age"] == 42
-    assert result["personal_info"]["analysis_date"] == "2028-04-06"
-    assert result["personal_info"]["analysis_datetime"] == "2028-04-06 21:55"
+    assert result["person_info"]["current_age"] == 42
+    assert result["person_info"]["analysis_date"] == "2028-04-06"
+    assert result["person_info"]["analysis_datetime"] == "2028-04-06 21:55"
     assert (
-        result["dayun_analysis"]["current_dayun"]
-        == dayun_result["dayun_info"]["current_dayun"]
+        result["dayun"]["current_dayun"]
+        == dayun_result["dayun"]["current_dayun"]
     )
 
 
@@ -296,7 +296,7 @@ def test_calculate_comprehensive_timing_supports_analysis_day_boundaries() -> No
         analysis_day=6,
     )
 
-    assert timing_result["personal_info"]["analysis_date"] == "2028-04-06"
+    assert timing_result["person_info"]["analysis_date"] == "2028-04-06"
     assert (
         timing_result["analysis_calendar"]["analysis_date_context"][
             "current_solar_term"
@@ -309,15 +309,15 @@ def test_calculate_comprehensive_timing_supports_analysis_day_boundaries() -> No
         ]
         == "谷雨"
     )
-    assert timing_result["liuyue_analysis"]["pillar"] == "丙辰"
-    assert timing_result["liuri_analysis"]["pillar"] == "辛酉"
+    assert timing_result["liuyue"]["pillar"] == "丙辰"
+    assert timing_result["liuri"]["pillar"] == "辛酉"
     assert (
-        timing_result["liuyue_analysis"]["pillar"]
-        == liuyue_result["liuyue_info"]["pillar"]
+        timing_result["liuyue"]["pillar"]
+        == liuyue_result["liuyue"]["pillar"]
     )
     assert (
-        timing_result["liuri_analysis"]["pillar"]
-        == liuri_result["liuri_info"]["pillar"]
+        timing_result["liuri"]["pillar"]
+        == liuri_result["liuri"]["pillar"]
     )
 
 
@@ -355,14 +355,14 @@ def test_time_precision_changes_liuyue_across_qingming_boundary() -> None:
         analysis_minute=55,
     )
 
-    assert before_result["liuyue_info"]["pillar"] == "乙卯"
+    assert before_result["liuyue"]["pillar"] == "乙卯"
     assert (
         before_result["analysis_calendar"]["analysis_date_context"][
             "current_solar_term"
         ]["name"]
         == "春分"
     )
-    assert boundary_result["liuyue_info"]["pillar"] == qingming_node["liuyue"]["pillar"]
+    assert boundary_result["liuyue"]["pillar"] == qingming_node["liuyue"]["pillar"]
     assert (
         boundary_result["analysis_calendar"]["analysis_date_context"][
             "current_solar_term"
@@ -413,18 +413,18 @@ def test_time_precision_aligns_liuri_and_timing_with_jieqi_anchor() -> None:
         analysis_minute=55,
     )
 
-    assert liuri_result["liuri_info"]["pillar"] == qingming_node["liuri"]["pillar"]
+    assert liuri_result["liuri"]["pillar"] == qingming_node["liuri"]["pillar"]
     assert (
         liuri_result["analysis_calendar"]["analysis_date_context"][
             "current_solar_term"
         ]["name"]
         == "清明"
     )
-    assert timing_result["personal_info"]["analysis_datetime"] == "2028-04-04 21:55"
+    assert timing_result["person_info"]["analysis_datetime"] == "2028-04-04 21:55"
     assert (
-        timing_result["liuyue_analysis"]["pillar"] == qingming_node["liuyue"]["pillar"]
+        timing_result["liuyue"]["pillar"] == qingming_node["liuyue"]["pillar"]
     )
-    assert timing_result["liuri_analysis"]["pillar"] == qingming_node["liuri"]["pillar"]
+    assert timing_result["liuri"]["pillar"] == qingming_node["liuri"]["pillar"]
     assert (
         timing_result["analysis_calendar"]["analysis_date_context"][
             "current_solar_term"
@@ -447,7 +447,7 @@ def test_calculate_dayun_analysis_returns_current_dayun() -> None:
 
     result = calculate_dayun_analysis(person, 38)
 
-    assert "current_dayun" in result["dayun_info"]
+    assert "current_dayun" in result["dayun"]
 
 
 def test_calculate_liuri_analysis_returns_expected_pillar() -> None:
@@ -466,7 +466,7 @@ def test_calculate_liuri_analysis_returns_expected_pillar() -> None:
         person, analysis_year=2028, analysis_month=4, analysis_day=1
     )
 
-    assert result["liuri_info"]["pillar"] == "丙辰"
+    assert result["liuri"]["pillar"] == "丙辰"
     assert (
         result["analysis_calendar"]["analysis_date_context"]["current_solar_term"][
             "name"
@@ -501,8 +501,8 @@ def test_calculate_liushi_analysis_returns_expected_pillar() -> None:
         timezone_name="Asia/Shanghai",
     )
 
-    assert result["liushi_info"]["pillar"] == expected_liushi["pillar"]
-    assert result["liushi_info"]["hour"] == 21
+    assert result["liushi"]["pillar"] == expected_liushi["pillar"]
+    assert result["liushi"]["hour"] == 21
     assert (
         result["analysis_calendar"]["analysis_date_context"]["current_solar_term"][
             "name"
@@ -528,7 +528,7 @@ def test_calculate_liunian_analysis_returns_expected_pillar() -> None:
         2028,
     )
 
-    assert result["liunian_info"]["pillar"] == "戊申"
+    assert result["liunian"]["pillar"] == "戊申"
 
 
 def test_calculate_liuyue_analysis_returns_expected_pillar() -> None:
@@ -547,8 +547,8 @@ def test_calculate_liuyue_analysis_returns_expected_pillar() -> None:
         person, analysis_year=2028, analysis_month=4, analysis_day=1
     )
 
-    assert result["liuyue_info"]["pillar"] == "乙卯"
-    assert result["liuyue_info"]["solar_term_window"]["start_term"]["name"] == "惊蛰"
+    assert result["liuyue"]["pillar"] == "乙卯"
+    assert result["liuyue"]["solar_term_window"]["start_term"]["name"] == "惊蛰"
     assert (
         result["analysis_calendar"]["analysis_date_context"]["current_solar_term"][
             "name"
@@ -559,7 +559,7 @@ def test_calculate_liuyue_analysis_returns_expected_pillar() -> None:
         result["analysis_calendar"]["analysis_date_context"]["next_solar_term"]["name"]
         == "清明"
     )
-    assert result["liunian_info"]["pillar"] == "戊申"
+    assert result["liunian"]["pillar"] == "戊申"
 
 
 def test_calculate_jieqi_timeline_analysis_returns_qingming_node() -> None:
@@ -621,9 +621,9 @@ def test_liuyue_timeline_anchor_is_minute_safe_and_replayable() -> None:
     )
 
     assert qingming_month["analysis_anchor"] == "2028-04-04 14:04:00"
-    assert liuyue_result["liuyue_info"]["pillar"] == qingming_month["liuyue"]["pillar"]
+    assert liuyue_result["liuyue"]["pillar"] == qingming_month["liuyue"]["pillar"]
     assert (
-        liuyue_result["liuyue_info"]["solar_term_window"]["start_term"]["name"]
+        liuyue_result["liuyue"]["solar_term_window"]["start_term"]["name"]
         == "清明"
     )
 
@@ -681,10 +681,10 @@ def test_jieqi_timeline_anchor_is_minute_safe_and_replayable() -> None:
             analysis_minute=anchor.minute,
         )
 
-        assert liuyue_result["liuyue_info"]["pillar"] == item["liuyue"]["pillar"]
-        assert liuri_result["liuri_info"]["pillar"] == item["liuri"]["pillar"]
-        assert timing_result["liuyue_analysis"]["pillar"] == item["liuyue"]["pillar"]
-        assert timing_result["liuri_analysis"]["pillar"] == item["liuri"]["pillar"]
+        assert liuyue_result["liuyue"]["pillar"] == item["liuyue"]["pillar"]
+        assert liuri_result["liuri"]["pillar"] == item["liuri"]["pillar"]
+        assert timing_result["liuyue"]["pillar"] == item["liuyue"]["pillar"]
+        assert timing_result["liuri"]["pillar"] == item["liuri"]["pillar"]
 
 
 def test_comprehensive_timing_matches_specialized_timing_tools() -> None:
@@ -730,32 +730,32 @@ def test_comprehensive_timing_matches_specialized_timing_tools() -> None:
     )
 
     assert (
-        timing_result["dayun_analysis"]["current_dayun"]
-        == dayun_result["dayun_info"]["current_dayun"]
+        timing_result["dayun"]["current_dayun"]
+        == dayun_result["dayun"]["current_dayun"]
     )
     assert (
-        timing_result["dayun_analysis"]["start_age"]
-        == dayun_result["dayun_info"]["start_age"]
+        timing_result["dayun"]["start_age"]
+        == dayun_result["dayun"]["start_age"]
     )
     assert (
-        timing_result["dayun_analysis"]["dayun_age"]
-        == dayun_result["dayun_info"]["dayun_age"]
+        timing_result["dayun"]["dayun_age"]
+        == dayun_result["dayun"]["dayun_age"]
     )
     assert (
-        timing_result["liunian_analysis"]["pillar"]
-        == liunian_result["liunian_info"]["pillar"]
+        timing_result["liunian"]["pillar"]
+        == liunian_result["liunian"]["pillar"]
     )
     assert (
-        timing_result["liuyue_analysis"]["pillar"]
-        == liuyue_result["liuyue_info"]["pillar"]
+        timing_result["liuyue"]["pillar"]
+        == liuyue_result["liuyue"]["pillar"]
     )
     assert (
-        timing_result["liuri_analysis"]["pillar"]
-        == liuri_result["liuri_info"]["pillar"]
+        timing_result["liuri"]["pillar"]
+        == liuri_result["liuri"]["pillar"]
     )
     assert (
-        timing_result["liushi_analysis"]["pillar"]
-        == liushi_result["liushi_info"]["pillar"]
+        timing_result["liushi"]["pillar"]
+        == liushi_result["liushi"]["pillar"]
     )
 
 

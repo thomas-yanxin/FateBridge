@@ -560,23 +560,6 @@ def build_jinkou_board(
         "branch_stars": stars,
         "branch_breaks": breaks,
         "ruleset": ruleset_metadata("jinkou"),
-        "rule_trace": [
-            {
-                "rule_id": "jinkou.four_positions",
-                "source_section": "入式歌解 / 贵神起例 / 五子元遁",
-                "result": {r["label"]: r["content"] for r in rows},
-            },
-            {
-                "rule_id": "jinkou.polarity_use",
-                "source_section": "阴阳次第五用",
-                "result": {"pattern": pattern, "position": use_position},
-            },
-            {
-                "rule_id": "jinkou.jingben_relations",
-                "source_section": relations["source_section"],
-                "result": {"si_jue": {"natal": relations["si_jue"]["natal"]}},
-            },
-        ],
         "shensha": [
             {"label": "旬空", "value": empty},
             {"label": "四大空亡", "value": overview["si_da_kong"]},

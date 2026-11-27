@@ -60,7 +60,6 @@ class TimingInteractions(PartialOutput):
     nodes: list[TimingNode] | None = None
     ten_god_context: list[dict[str, OpenJsonValue]] | None = None
     relations: list[TimingRelation] | None = None
-    rule_trace: list[str] | None = None
 
 
 class PillarsCandidate(PartialOutput):

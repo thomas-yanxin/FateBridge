@@ -392,65 +392,9 @@ def build_symbolic_evidence(planet: str, sign: str, house: int) -> dict[str, Any
             "version": "Tetrabiblos, Loeb Classical Library, 1940, I.7",
         },
     ]
-    trace = [
-        {
-            "rule_id": "three_faces",
-            "ruleset_id": rulesets[0]["id"],
-            "inputs": {"planet": planet, "sign": sign, "house": house},
-            "result": {"house_number": house_number},
-        },
-        {
-            "rule_id": "sign_relationships",
-            "ruleset_id": EDITORIAL_RULESET,
-            "supporting_ruleset_ids": [SIGN_RULESET, DETRIMENT_RULESET],
-            "inputs": {"planet": planet, "sign": sign},
-            "result": condition,
-        },
-        {
-            "rule_id": "symbolic_whole_sign_ring",
-            "ruleset_id": rulesets[2]["id"],
-            "inputs": {"sign": sign, "house": house},
-            "result": {
-                "first_sign": SIGNS[start],
-                "houses_ruled_by_rolled_planet": details[
-                    "houses_ruled_by_rolled_planet"
-                ],
-            },
-        },
-        {
-            "rule_id": "symbolic_traits",
-            "ruleset_id": rulesets[2]["id"],
-            "inputs": {"planet": planet, "sign": sign, "house": house},
-            "result": {
-                "element": details["element"],
-                "modality": details["modality"],
-                "house_group": details["house_group"],
-            },
-        },
-        {
-            "rule_id": "planetary_house_joy",
-            "ruleset_id": HOUSE_RULESET,
-            "inputs": {"planet": planet, "house": house},
-            "result": details["house_condition"],
-        },
-        {
-            "rule_id": "conditional_triplicity",
-            "ruleset_id": TRIPLICITY_RULESET,
-            "inputs": {"planet": planet, "sign": sign},
-            "result": details["triplicity_condition"],
-        },
-        {
-            "rule_id": "natural_planet_sect",
-            "ruleset_id": PLANET_SECT_RULESET,
-            "inputs": {"planet": planet},
-            "result": details["planet_sect_condition"],
-        },
-    ]
     return {
         "method_id": METHOD_ID,
         "symbolic_details": details,
-        "rulesets": rulesets,
-        "rule_trace": trace,
         "validation": {
             "calendar": "not_applicable_to_symbolic_roll",
         },

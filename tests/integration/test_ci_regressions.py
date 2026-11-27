@@ -434,7 +434,7 @@ def test_empty_and_invalid_trigrams_fail_on_all_transports(rest, surface_calls) 
 def test_explicit_trigrams_build_expected_tongshefa_chart(rest, surface_calls) -> None:
     payload = {"taiyin": "巽", "taiyang": "坤", "shaoyang": "震", "shaoyin": "震"}
     result = build_tongshefa_result(**payload)
-    assert result["input_normalized"] == payload
+    assert result["analysis_context"] == payload
     assert result["tongshefa"]["baseLeft"]["name"] == "风雷益"
     assert result["tongshefa"]["baseRight"]["name"] == "地雷复"
     response, protocol, code, local = surface_calls(SPECS["combine_four_gua"], payload)

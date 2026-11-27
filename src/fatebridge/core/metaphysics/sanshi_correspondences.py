@@ -57,7 +57,7 @@ def liuren_at_taiyi_palace(
         if len(matches) != 1:
             raise ValueError("三式对应要求唯一的六壬实际地盘支位")
         index, row = matches[0]
-        return {"source_path": f"liureng.twelve_board.{index}", **row}
+        return {"source_path": f"liuren.twelve_board.{index}", **row}
 
     if palace in "子卯午酉":
         return {"status": "direct_branch_match", **actual_row(palace)}
@@ -137,7 +137,7 @@ def palace_correspondences(
                 "trigram": trigram,
                 "direction": direction,
                 "qimen": qrow,
-                "liureng": lrow,
+                "liuren": lrow,
             }
         )
     return {

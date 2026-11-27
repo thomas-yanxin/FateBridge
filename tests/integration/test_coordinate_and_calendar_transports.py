@@ -95,12 +95,12 @@ def test_zero_gps_coordinates_drive_the_actual_chart_on_every_transport(
     for output in outputs:
         assert (
             output["params"]["birthLatitude"]
-            == output["input_normalized"]["latitude"]
+            == output["analysis_context"]["latitude"]
             == 0
         )
         assert (
             output["params"]["birthLongitude"]
-            == output["input_normalized"]["longitude"]
+            == output["analysis_context"]["longitude"]
             == 0
         )
     assert outputs[0]["chart"] == outputs[1]["chart"] == outputs[2]["chart"]
@@ -276,10 +276,10 @@ def test_lunar_calendar_separates_civil_season_and_solar_day_across_surfaces(
         projection={
             "detail": "audit",
             "fields": [
-                "yearGanZi",
-                "monthGanZi",
-                "monthInt",
-                "dayInt",
+                "year_ganzhi",
+                "month_ganzhi",
+                "month_int",
+                "day_int",
                 "analysis_context.corrected_datetime",
             ],
         },
@@ -291,8 +291,8 @@ def test_lunar_calendar_separates_civil_season_and_solar_day_across_surfaces(
         == canonical_json(protocol.structured_content)
         == canonical_json(cli)
     )
-    assert (cli["yearGanZi"], cli["monthGanZi"]) == (year_pillar, month_pillar)
-    assert (cli["monthInt"], cli["dayInt"]) == lunar_day
+    assert (cli["year_ganzhi"], cli["month_ganzhi"]) == (year_pillar, month_pillar)
+    assert (cli["month_int"], cli["day_int"]) == lunar_day
     assert cli["analysis_context"]["corrected_datetime"] < f"{date} {clock}"
 
 
@@ -342,7 +342,7 @@ def test_unknown_gender_still_delivers_hourly_facts_on_every_transport(
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     for output in outputs:
-        hour = output["liushi_info"]
+        hour = output["liushi"]
         assert hour["branch"] == "午"
         assert hour["pillar"] == hour["stem"] + hour["branch"]
         assert output["analysis_calendar"]["analysis_date_context"]
@@ -369,7 +369,7 @@ def test_removed_rollover_switch_is_rejected_on_every_transport(
         (
             "lunar_calendar_time",
             {"date": "2028-04-01", "time": "09:00:00"},
-            "timeGanZi",
+            "time_ganzhi",
             {"year", "time"},
         ),
         ("gua_lookup", {"queries": ["111", "000"]}, "results", {"111", "000"}),

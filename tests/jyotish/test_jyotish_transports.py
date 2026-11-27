@@ -91,9 +91,9 @@ def test_1960_sofa_time_context_across_three_real_surfaces(
             "birth_minute": 34,
             "birth_timezone": "UTC",
         },
-        ["india.profile"],
+        ["vedic_chart.profile"],
     )
-    profile = result["india"]["profile"]
+    profile = result["vedic_chart"]["profile"]
     assert profile["julian_day_utc"] is not None
     assert profile["time_scale_context"]["method"].startswith("SOFA_1960")
 
@@ -136,9 +136,9 @@ def test_extended_vargas_and_complete_shadbala_across_real_surfaces(
         capsys,
         "vedic_chart",
         {**astro_payload(), "divisions": [2, 3, 7, 9, 10, 12, 30]},
-        ["india.charts", "india.strengths", "india.profile", "india.yogas"],
+        ["vedic_chart.charts", "vedic_chart.strengths", "vedic_chart.profile", "vedic_chart.yogas"],
     )
-    india = result["india"]
+    india = result["vedic_chart"]
     assert set(india["charts"]) == {"D1", "D2", "D3", "D7", "D9", "D10", "D12", "D30"}
     assert india["strengths"]["shadbala_assessment"]["status"] == "complete"
     assert india["strengths"]["shadbala_assessment"]["total_virupa"]["Sun"] > 0

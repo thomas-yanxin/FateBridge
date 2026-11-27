@@ -189,10 +189,6 @@ def build_topic_interpretation(cast: dict[str, Any], topic: str) -> dict[str, An
             "moving_yaoci_rendering": render_yaoci_text(verse["text"]),
         },
         **alternatives,
-        "evidence_scope": {
-            "traditional_rules": "interpretation.topic_reading",
-            "selected_source_edition": "nlc_1925",
-        },
         "comprehensive_judgement": summary,
     }
 
@@ -421,12 +417,10 @@ def _build_weather_one(
             "context": confirmed,
             "trigram_counts": {name: counts[name] for name in "乾兑离震巽坎艮坤"},
             "controls": controls,
-            "rule_trace": traces,
             "matched_rule_ids": [row["rule_id"] for row in matched],
             "pending_rule_ids": pending,
             "single_forecast": None,
         },
-        "evidence_scope": {"classical_coverage": "selected_weather_clauses_only"},
         "comprehensive_judgement": summary,
     }
 
@@ -518,9 +512,6 @@ def apply_external_omens(
             interpretation_prefix=f"interpretation.casting_readings.{index}",
         )
     interpretation["comprehensive_judgement"] += selected["summary"]
-    interpretation["evidence_scope"][
-        "external_omens"
-    ] = "caller_reported_selected_manifestation_pairs"
 
 
 def _motion_reading(
@@ -601,7 +592,7 @@ def apply_motion_context(
     interpretation: dict[str, Any],
     *,
     observer_activity: str | None = None,
-    observer_fact_path: str = "input_normalized.observer_activity",
+    observer_fact_path: str = "analysis_context.observer_activity",
 ) -> None:
     """Attach compact motion/orientation context only when activity or omens are supplied."""
     interpretation["motion_context"] = None
@@ -761,7 +752,7 @@ def apply_reputation_supplement(
     interpretation: dict[str, Any],
     *,
     context: dict[str, Any] | None = None,
-    context_fact_path: str = "input_normalized.reputation_context",
+    context_fact_path: str = "analysis_context.reputation_context",
 ) -> None:
     """Attach compact reputation timing/direction lookup when topic is reputation."""
     interpretation["reputation_supplement"] = None
@@ -782,7 +773,7 @@ def apply_stage_emphasis(
     interpretation: dict[str, Any],
     *,
     matter_scenario: str | None = None,
-    scenario_fact_path: str = "input_normalized.matter_scenario",
+    scenario_fact_path: str = "analysis_context.matter_scenario",
 ) -> None:
     """Attach compact scenario tag only when matter_scenario is declared."""
     if matter_scenario is None or interpretation["interpretation_topic"] == "weather":

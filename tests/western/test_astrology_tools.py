@@ -63,9 +63,9 @@ def test_core_chart_variants_expose_variant_specific_fields() -> None:
     assert guolao["guolao"]["lunar_mansion_system"] == "modern_research_anchors_v1"
     assert len(guolao["guolao"]["planetary_mansions"]) >= 7
 
-    assert india["india"]["ayanamsa"] == "lahiri"
-    assert india["india"]["ayanamsha"] > 0
-    assert india["india"]["moon_nakshatra"]
+    assert india["vedic_chart"]["ayanamsa"] == "lahiri"
+    assert india["vedic_chart"]["ayanamsha"] > 0
+    assert india["vedic_chart"]["moon_nakshatra"]
 
     assert "interpretation" not in chart
     assert "个星体与虚点" in chart["summary"][0]

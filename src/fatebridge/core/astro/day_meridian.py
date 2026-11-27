@@ -344,14 +344,5 @@ def build_day_meridian(
         "birth_time_sensitivity": sensitivity,
         "sources": [SOURCE, SOURCE_1923],
         "source_comparison": source_method_comparison(),
-        "rule_trace": [
-            {
-                "rule_id": RULESET,
-                "source_id": SOURCE["id"],
-                "source_sections": ["p.15"],
-                "formula": "IC.day = IC.natal + solar_arc - Sun.natal + Sun.target (ecliptic longitudes)",
-                "scope": "Explicit 1924 ecliptic equation; the 1923 phase/cusp construction is not applied",
-            }
-        ],
         "original_text_conformance": "not_assessed",
     }

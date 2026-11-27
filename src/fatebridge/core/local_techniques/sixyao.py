@@ -60,18 +60,18 @@ def _build_context(
     )
     lunar = calendar_context.get("lunar_calendar") or {}
     nongli = {
-        "birth": calendar_context["solar_datetime"],
+        "solar_datetime": calendar_context["solar_datetime"],
         "nongli": lunar.get("display"),
-        "yearJieqi": f"{pillars['year'][0]}{pillars['year'][1]}",
+        "year_jieqi": f"{pillars['year'][0]}{pillars['year'][1]}",
         "year": f"{pillars['year'][0]}{pillars['year'][1]}",
-        "yearGanZi": f"{pillars['year'][0]}{pillars['year'][1]}",
-        "monthGanZi": f"{pillars['month'][0]}{pillars['month'][1]}",
-        "dayGanZi": f"{pillars['day'][0]}{pillars['day'][1]}",
+        "year_ganzhi": f"{pillars['year'][0]}{pillars['year'][1]}",
+        "month_ganzhi": f"{pillars['month'][0]}{pillars['month'][1]}",
+        "day_ganzhi": f"{pillars['day'][0]}{pillars['day'][1]}",
         "time": f"{pillars['hour'][0]}{pillars['hour'][1]}",
         "jieqi": calendar_context["current_solar_term"]["name"],
         "jiedelta": calendar_context["solar_term_delta"]["description"],
-        "monthInt": lunar.get("month"),
-        "dayInt": lunar.get("day"),
+        "month_int": lunar.get("month"),
+        "day_int": lunar.get("day"),
         "month": lunar.get("month_cn"),
         "day": lunar.get("day_cn"),
         "leap": lunar.get("is_leap_month"),
@@ -243,7 +243,7 @@ def build_sixyao_result(
         changed_hexagram_binary_code: changed_payload,
     }
 
-    day_ganzhi = context.get("nongli", {}).get("dayGanZi") or ""
+    day_ganzhi = context.get("nongli", {}).get("day_ganzhi") or ""
     day_gan = day_ganzhi[0] if len(day_ganzhi) >= 1 else ""
     day_branch = day_ganzhi[1] if len(day_ganzhi) >= 2 else ""
     hexagram_info, enrichment = build_sixyao_enrichment(
@@ -319,7 +319,7 @@ def build_sixyao_result(
         ),
     )
     if comparison is not None:
-        evidence["calendar_conventions"]["month_model_comparison"] = comparison
+        evidence["month_model_comparison"] = comparison
 
     _, changed_chart = build_sixyao_enrichment(
         changed_hexagram_binary_code, changed_hexagram_binary_code, day_gan or None
@@ -330,18 +330,7 @@ def build_sixyao_result(
         base_branches=[r["branch"] for r in normalized_lines],
         changed_chart_branches=[r["branch"] for r in changed_chart],
     )
-    text_evidence = moving_text_evidence(current_code, changed_hexagram_binary_code)
-    evidence["rule_trace"].append(
-        {
-            "rule_id": "actual_moving_classical_text",
-            "fact_path": "classical_text_evidence",
-            "inputs": {
-                "current_code": current_code,
-                "changed_code": changed_hexagram_binary_code,
-            },
-            "sources": [SOURCES["fanfu"]],
-        }
-    )
+    moving_text_evidence(current_code, changed_hexagram_binary_code)
 
     moving_lines = [
         index + 1 for index, line in enumerate(normalized_lines) if line.get("change")
@@ -385,11 +374,10 @@ def build_sixyao_result(
         }
     return {
         "analysis_type": "六爻 / 易卦",
-        "input_normalized": input_normalized,
+        "analysis_context": input_normalized,
         "nongli": context["nongli"],
         "calendar_context": context["calendar_context"],
         "liuyao_evidence": evidence,
-        "classical_text_evidence": text_evidence,
         "current_code": current_code,
         "changed_code": changed_hexagram_binary_code,
         "cast": cast_info,

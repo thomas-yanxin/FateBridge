@@ -160,7 +160,7 @@ class LiuyaoEvidence(PartialOutput):
     ruleset_version: str | None = None
     source_kind: str | None = None
     conformance_scope: str | None = None
-    calendar_conventions: DivinationCalendarConventions | None = None
+    month_model_comparison: MonthModelComparison | None = None
     lines: list[LineEvidence] | None = None
     conditional_analysis: LiuyaoConditions | None = None
     fanfu: FanfuEvidence | None = None
@@ -171,8 +171,6 @@ class LiuyaoEvidence(PartialOutput):
     moving_focus_guidance: MovingFocusGuidance | None = None
     focus: dict[str, OpenJsonValue] | None = None
     timing_candidates: dict[str, OpenJsonValue] | None = None
-    rule_trace: list[DivinationTrace] | None = None
-    sources: list[str] | None = None
     source_revisions: dict[str, DivinationSource] | None = None
     textual_corrections: list[str] | None = None
     pattern_detection_scope: str | None = None

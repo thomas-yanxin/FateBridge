@@ -256,7 +256,6 @@ class Taiyi(PartialOutput):
     calendar_rules: TaiyiCalendarRules | None = None
     calendar_summary: TaiyiCalendarRules | None = None
     pattern_summary: Object | None = None
-    rule_trace: TaiyiRuleTrace | None = None
     patterns: list[TaiyiPattern] | None = None
     interpretation_scope: Object | None = None
     rotation: str | None = None

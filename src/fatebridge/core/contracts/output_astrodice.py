@@ -249,7 +249,5 @@ ASTRODICE_FIELDS = {
     "chart": DiceSkyChart,
     "method_id": str,
     "symbolic_details": DiceDetails,
-    "rulesets": list[DiceRuleset],
-    "rule_trace": list[DiceRuleTrace],
     "validation": DiceValidation,
 }

@@ -204,16 +204,4 @@ def build_india(
         "arudha_padas": arudhas,
         "upagrahas": upagrahas,
         "birth_time_sensitivity": sensitivity,
-        "rulesets": [
-            {
-                "id": "pvr_2000",
-                "title": "P.V.R. Narasimha Rao, Vedic Astrology: An Integrated Approach",
-            },
-            {
-                "id": "bphs_santhanam",
-                "title": "Brihat Parasara Hora Sastra (R. Santhanam)",
-            },
-            {"id": "raman_balas", "title": "B.V. Raman, Graha and Bhava Balas"},
-            {"id": "swiss_ephemeris", "title": "Swiss Ephemeris Sidereal Calculations"},
-        ],
     }

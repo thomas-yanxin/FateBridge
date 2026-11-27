@@ -8,7 +8,7 @@ from fatebridge.core.requests.divination import SuZhanRequest
 def require_clock_input_binding(
     result: dict[str, Any], *, request: object = None
 ) -> None:
-    inputs = result.get("input_normalized")
+    inputs = result.get("analysis_context")
     if not isinstance(inputs, dict) or "time" not in inputs:
         raise ValueError("缺少钟时输入事实")
     clock_known = inputs["time"] is not None

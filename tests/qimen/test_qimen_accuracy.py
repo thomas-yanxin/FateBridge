@@ -343,4 +343,4 @@ def test_sanshi_corner_lodging_modes() -> None:
             corner_lodging=mode,
         )
         entries = res["synthesis"]["palace_correspondences"]["entries"]
-        assert any(e["liureng"]["status"] == expected_prefix for e in entries)
+        assert any(e["liuren"]["status"] == expected_prefix for e in entries)

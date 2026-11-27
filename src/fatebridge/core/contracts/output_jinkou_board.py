@@ -62,7 +62,6 @@ class JinkouCourse(PartialOutput):
     branch_breaks: JinkouBranchBreaks | None = None
     calendar_policy: RenCalendarPolicy | None = None
     ruleset: RenRuleset | None = None
-    rule_trace: list[RenRuleTrace] | None = None
 
     @model_validator(mode="after")
     def breaks_follow_this_course(self) -> "JinkouCourse":
@@ -104,21 +103,6 @@ class JinkouCourse(PartialOutput):
             else None
         )
         nodes = [primary] if primary is not None else []
-        for trace in self.rule_trace or []:
-            if trace.rule_id != "jinkou.jingben_relations" or trace.result is None:
-                continue
-            block = trace.result.get("si_jue")
-            if not isinstance(block, dict) or "natal" not in block:
-                continue
-            traced = JinkouJue.model_validate(block).natal
-            if traced is None:
-                raise ValueError("将命大绝规则轨迹不可伪造为空")
-            nodes.append(traced)
-            if primary is not None:
-                a = primary.model_dump(exclude_unset=True)
-                b = traced.model_dump(exclude_unset=True)
-                if any(a[k] != b[k] for k in a.keys() & b.keys()):
-                    raise ValueError("将命大绝正文与同次规则轨迹不一致")
         row = next((r for r in self.rows or [] if r.label == "将神"), None)
         if row is not None and row.content is not None:
             for natal in nodes:

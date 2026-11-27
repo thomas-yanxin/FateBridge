@@ -268,7 +268,7 @@ SPECS: list[ToolSpec] = [
         request_model_loader=request_model_ref(
             "fatebridge.core.requests.jyotish", "VedicChartRequest"
         ),
-        required_output_fields=("india",),
+        required_output_fields=("vedic_chart",),
         summary="印占整宫与十六分盘，含 Shadbala、Bhava Bala、Yoga、Arudha 与 Ashtakavarga。",
         operation_label_zh="印度盘",
         family="astro",

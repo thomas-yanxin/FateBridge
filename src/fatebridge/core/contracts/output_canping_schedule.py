@@ -76,7 +76,6 @@ class CanpingReadingContext(PartialOutput):
     future_clock_policy: _ClockPolicy | None = None
     timezone_spec: str | None = None
     date_mapping_statement: str | None = None
-    source_citations: list[CanpingReadingCitation] | None = None
 
     @model_validator(mode="after")
     def coherent_reading_context(self) -> "CanpingReadingContext":
@@ -94,20 +93,6 @@ class CanpingReadingContext(PartialOutput):
                 )
                 if self.date_mapping_statement != expected:
                     raise ValueError("阅读日期条件与所选方法及钟制不符。")
-            if self.source_citations is not None:
-                expected_by_source = {
-                    c["source_id"]: c for c in reading_source_citations(self.profile_id)
-                }
-                for c in self.source_citations:
-                    if c.source_id is not None and c.roles is not None:
-                        if c.roles != expected_by_source[c.source_id]["roles"]:
-                            raise ValueError("阅读引文角色与所选方法不符。")
-        if self.source_citations is not None:
-            ids = [
-                c.source_id for c in self.source_citations if c.source_id is not None
-            ]
-            if len(ids) != len(set(ids)):
-                raise ValueError("阅读引文不能重复来源。")
         return self
 
 

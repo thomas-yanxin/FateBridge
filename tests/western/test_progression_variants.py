@@ -75,7 +75,7 @@ def test_vedicprog_end_to_end_is_sidereal() -> None:
     )
     assert result.get("error") is None, result
     assert result["analysis_context"]["zodiac_type"] == "Sidereal"
-    assert result["vedic_progression"]["zodiac"] == "sidereal"
+    assert result["sidereal_progressions"]["zodiac"] == "sidereal"
 
 
 def test_declination_parallel_and_contraparallel() -> None:
@@ -139,8 +139,8 @@ def test_jaynesprog_end_to_end() -> None:
         birth_latitude=32.54,
     )
     assert result.get("error") is None, result
-    parallels = result["jaynes_declination"]["parallels"]
-    orb = result["jaynes_declination"]["orb"]
+    parallels = result["declination_progressions"]["parallels"]
+    orb = result["declination_progressions"]["orb"]
     for p in parallels:
         if p["kind"] == "parallel":
             assert abs(p["progressed_declination"] - p["natal_declination"]) <= orb

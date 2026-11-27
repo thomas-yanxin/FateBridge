@@ -155,7 +155,7 @@ _BIRTH_1998 = dict(
 def test_end_to_end_runs_and_is_bounded() -> None:
     result = calculate_persian_directed(max_age_years=90.0, **_BIRTH_1998)
     assert result.get("error") is None, result
-    hits = result["persian_directed"]["hits"]
+    hits = result["persian_directions"]["hits"]
     assert hits, "expected at least one 波斯向运 hit"
     assert all(0 < h["age"] <= 90.0 for h in hits)
     assert all(
@@ -182,5 +182,5 @@ def test_end_to_end_runs_and_is_bounded() -> None:
 
 def test_hits_are_sorted_by_age() -> None:
     result = calculate_persian_directed(**_BIRTH_1998)
-    ages = [h["age"] for h in result["persian_directed"]["hits"]]
+    ages = [h["age"] for h in result["persian_directions"]["hits"]]
     assert ages == sorted(ages)

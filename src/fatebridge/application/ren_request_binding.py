@@ -105,7 +105,7 @@ def require_request_binding(
             "use_true_solar_time": request.use_true_solar_time,
             "corner_lodging": request.corner_lodging,
         }
-        _same(result, "input_normalized", normalized)
+        _mapping(result, normalized, "analysis_context.")
         civil = parse_local_datetime(date_text, time_text, zone, validate_wall=True)
         latitude: float | None
         longitude: float | None
@@ -124,7 +124,7 @@ def require_request_binding(
         month_general_mode = "solar_term"
         _same(
             result,
-            "subresults.liureng_gods.four_pillars",
+            "subresults.liuren.four_pillars",
             _get(result, "four_pillars"),
         )
     else:
@@ -183,7 +183,7 @@ def require_request_binding(
         month_general_override=override,
     )
     if key == "sanshi_combined_chart":
-        board = _get(result, "liureng")
+        board = _get(result, "liuren")
         _mapping(board, policy, "calendar_policy.")
         current_term = _get(board, "meta.current_term")
     else:
@@ -202,7 +202,7 @@ def require_request_binding(
                     instant_utc=policy["civil_instant_utc"],
                 ),
             )
-        board = _get(result, "liureng")
+        board = _get(result, "liuren")
         current_term = calendar["current_solar_term"]["name"]
     hour = ren_result["four_pillars"]["hour"]["branch"]
     diurnal = resolve_diurnal(

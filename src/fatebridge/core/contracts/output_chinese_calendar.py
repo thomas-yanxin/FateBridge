@@ -203,10 +203,8 @@ class Meihua(PartialOutput):
     version: str | None = None
     ruleset: MeihuaRuleset | None = None
     calendar_policy: MeihuaCalendarPolicy | None = None
-    rule_trace: list[MeihuaTraceStep] | None = None
     stage_relations: list[MeihuaStageRelation] | None = None
     seasonal_strength: MeihuaSeasonalStrength | None = None
-    evidence_scope: MeihuaEvidenceScope | None = None
     ruleset_id: str | None = None
     year_boundary: str | None = None
     leap_month_rule: str | None = None

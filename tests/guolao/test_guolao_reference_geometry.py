@@ -63,7 +63,6 @@ def test_real_polar_placidus_error_retains_core_and_independent_angles(
         "god_positions",
         "moira_patterns",
         "mansion_boundaries",
-        "rule_trace",
     ]:
         assert g[key] == reference["guolao"][key]
     assert result["angles"] == reference["angles"]

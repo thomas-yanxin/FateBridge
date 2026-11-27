@@ -171,12 +171,11 @@ def build_suzhan_result(
         }
         return {
             "analysis_type": "宿占 / 宿盘",
-            "input_normalized": input_normalized,
+            "analysis_context": input_normalized,
             "params": params,
             "chart": None,
             "sukuyo": evidence,
             "astronomy": None,
-            "rulesets": rulesets(calendar_profile, calendar_basis),
             "validation": validation,
             "summary": f"历日宿{evidence['day_mansion'] or '以候选为准'}。{reason}",
         }
@@ -265,15 +264,11 @@ def build_suzhan_result(
         )
     return {
         "analysis_type": "宿占 / 宿盘",
-        "input_normalized": input_normalized,
+        "analysis_context": input_normalized,
         "params": response["params"],
         "chart": chart,
         "sukuyo": response["sukuyo"],
         "astronomy": astronomy,
-        "rulesets": {
-            **rulesets(calendar_profile, calendar_basis),
-            **({"chart": response["rulesets"]} if "rulesets" in response else {}),
-        },
         "validation": validation,
         "summary": f"历日宿{response['sukuyo']['day_mansion'] or '未定（见历法档案候选）'}；已生成星图。"
         + (

@@ -105,7 +105,7 @@ class SanshiSubresult(PartialOutput):
     analysis_type: str | None = None
     calendar_context: CalendarContext | None = None
     four_pillars: FourPillars | None = None
-    liureng: Liuren | None = None
+    liuren: Liuren | None = None
 
 
 class QimenSubresult(SanshiSubresult):
@@ -117,6 +117,6 @@ class TaiyiSubresult(SanshiSubresult):
 
 
 class SanshiSubresults(PartialOutput):
-    liureng_gods: SanshiSubresult | None = None
+    liuren: SanshiSubresult | None = None
     qimen: QimenSubresult | None = None
     taiyi: TaiyiSubresult | None = None

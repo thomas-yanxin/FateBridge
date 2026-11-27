@@ -107,7 +107,7 @@ def calculate_liureng_gods(
         "analysis_context": _analysis_context_payload(seed),
         "four_pillars": create_pillar_dict(seed.pillars),
         "calendar_context": seed.calendar_context,
-        "liureng": liureng,
+        "liuren": liureng,
     }
 
 
@@ -223,7 +223,7 @@ def calculate_liureng_runyear(
         "four_pillars": create_pillar_dict(seed.pillars),
         "calendar_context": seed.calendar_context,
         "runyear": runyear,
-        "liureng": liureng,
+        "liuren": liureng,
     }
 
 
@@ -270,19 +270,6 @@ def calculate_qimen_analysis(
             "instant_utc": utc_calendar(seed.input_datetime).isoformat(),
         }
         qimen["calendar_policy"]["civil_clock_resolution"] = resolution
-        qimen["rule_trace"].append(
-            {
-                "rule_id": "civil_clock_resolution",
-                "source": "declared UTC offset checked against timezone rules",
-                "section": "民用时刻消歧，非原典规则",
-                "inputs": {
-                    "timezone": seed.timezone,
-                    "utc_offset": analysis_utc_offset,
-                },
-                "outputs": dict(resolution),
-                "evidence_paths": ["qimen.calendar_policy.civil_clock_resolution"],
-            }
-        )
     return {
         "analysis_type": "奇门遁甲",
         "analysis_context": _analysis_context_payload(seed),
@@ -437,14 +424,6 @@ def calculate_jinkou_analysis(
         month_general_mode=month_general_mode,
         latitude=analysis_latitude,
     )
-    jinkou["rule_trace"].append(
-        {
-            "rule_id": "jinkou.birth_xun_year_fate",
-            "source_section": jinkou["year_fate"]["source_section"],
-            "result": {k: v for k, v in jinkou["year_fate"].items() if k != "course"},
-        }
-    )
-    jinkou["rule_trace"].append(natal_course_trace(jinkou["natal_course"]))
     jinkou["engine"] = "fatebridge-offline"
     return {
         "analysis_type": "金口诀",

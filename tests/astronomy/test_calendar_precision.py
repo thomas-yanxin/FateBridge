@@ -109,8 +109,8 @@ def test_beijing_lichun_birth_and_metaphysics_paths_keep_civil_year_month() -> N
         longitude=116.4074,
         time_alg=0,
     )
-    assert nongli["yearGanZi"] == "甲辰"
-    assert nongli["monthGanZi"] == "丙寅"
+    assert nongli["year_ganzhi"] == "甲辰"
+    assert nongli["month_ganzhi"] == "丙寅"
     assert nongli["jieqi"] == "立春"
 
 
@@ -131,8 +131,8 @@ def test_dayun_boundaries_use_civil_instant_after_solar_correction() -> None:
     person = _person(moment)
     expected = TimingAnalysis.calculate_dayun_start_details(moment, "男")
     result = calculate_dayun_analysis(person, analysis_age=12)
-    assert result["dayun_info"]["start_age_precise"] == expected["start_age_precise"]
-    assert result["dayun_info"]["direction"] == "顺行"
+    assert result["dayun"]["start_age_precise"] == expected["start_age_precise"]
+    assert result["dayun"]["direction"] == "顺行"
 
 
 @pytest.mark.parametrize(

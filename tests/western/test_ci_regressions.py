@@ -328,7 +328,7 @@ def test_persian_hit_limit_keeps_the_first_actual_age_with_equal_display_labels(
     [
         ("harmonic_chart", "harmonic_chart", {"harmonic": 7}),
         ("age_point", "age_point", {"max_age_years": 72}),
-        ("persian_directions", "persian_directed", {"max_age_years": 90}),
+        ("persian_directions", "persian_directions", {"max_age_years": 90}),
         (
             "balbillus_periods",
             "balbillus",

@@ -455,50 +455,9 @@ def build_liuyao_evidence(
         month=month_branch,
         day=day,
     )
-    trace = [
-        {
-            "rule_id": "palace_shiying_nazhi_kinship_six_gods",
-            "fact_path": "lines",
-            "inputs": {
-                "current_code": current_code,
-                "changed_code": changed_code,
-                "day_ganzhi": day_ganzhi,
-            },
-            "sources": [SOURCES["najia"]],
-        },
-        {
-            "rule_id": "day_month_branch_and_dark_moving",
-            "fact_path": "liuyao_evidence.lines",
-            "inputs": {
-                "month_branch": month_branch,
-                "day_ganzhi": day_ganzhi,
-                "xunkong": void,
-            },
-            "sources": [SOURCES["relations"], SOURCES["stages"]],
-        },
-        {
-            "rule_id": "base_only_missing_kinship_hidden_spirits",
-            "fact_path": "liuyao_evidence.hidden_spirits",
-            "inputs": {
-                "current_code": current_code,
-                "visible_kinships": sorted({line["liuqin"] for line in lines}),
-            },
-            "sources": [SOURCES["hidden"]],
-        },
-    ]
-
     result: dict[str, Any] = {
         "ruleset_id": "zengshan_structural_v2",
         "ruleset_version": "2.0.0",
-        "calendar_conventions": {
-            "cast_at": moment.isoformat(),
-            "year_boundary": "立春",
-            "month_boundary": "十二节交接瞬间",
-            "day_boundary": "当地时钟23:00换干支日",
-            "month_branch": month_branch,
-            "day_ganzhi": day_ganzhi,
-            "xunkong": void,
-        },
         "lines": rows,
         "hidden_spirits": hidden,
         "hidden_policy": "仅按本卦缺失六亲取本宫纯卦同位伏神；变爻是否现该六亲另行标注，不掩盖本卦伏神。",
@@ -506,8 +465,6 @@ def build_liuyao_evidence(
         "three_harmony": three_harmony,
         "moving_focus_guidance": moving_focus_guidance or {},
         "focus": focus,
-        "rule_trace": trace,
-        "sources": list(dict.fromkeys(SOURCES.values())),
     }
     if timing_days:
         selected = focus.get("selected")

@@ -285,23 +285,9 @@ def build_meihua_evidence(
         "version": profile["version"],
         "ruleset": profile,
         "calendar_policy": policy,
-        "rule_trace": trace,
         "stage_relations": stages,
         "seasonal_strength": meihua_seasonal_strength(meihua, month_branch),
         "party_counts": party_counts,
-        "evidence_scope": {
-            "classical_coverage": "partial",
-            "implemented": [
-                "time_seed",
-                "remainders",
-                "mutual",
-                "body_use",
-                "stages",
-                "mutual_roles",
-                "season",
-                "party_counts",
-            ],
-        },
     }
 
 

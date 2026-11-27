@@ -33,7 +33,6 @@ def untimed():
         "layer",
         "clock_request",
         "missing_calendar",
-        "missing_rulesets",
     ],
 )
 def test_rejects_invalid_date_only_layer_before_projection(untimed, fault: str) -> None:

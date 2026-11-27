@@ -240,12 +240,6 @@ def numerology_birth_clock(
 
 def attach_birth_clock(evidence: dict, clock: dict) -> None:
     evidence["birth_clock"] = clock
-    evidence["rule_trace"].append(
-        {
-            "rule_id": CLOCK_POLICY_ID,
-            "facts": clock,
-        }
-    )
 
 
 @lru_cache(maxsize=1)
@@ -328,12 +322,3 @@ def verified_computed_pillars(pillars: dict[str, str]) -> dict[str, Any]:
 
 def attach_pillar_links(evidence: dict[str, Any], links: dict[str, Any]) -> None:
     evidence["pillar_links"] = links
-    evidence["rulesets"].append(
-        {
-            "ruleset_id": links["ruleset_id"],
-            "version": links["version"],
-            "source_title": links["source_title"],
-            "authorship_status": links["authorship_status"],
-            "source_status": links["review_status"],
-        }
-    )
