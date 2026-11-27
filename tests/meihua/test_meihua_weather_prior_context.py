@@ -135,7 +135,4 @@ def test_confirmed_neither_and_pending_other_conditions_agree_on_all_surfaces(
             if r["rule_id"] in PRIOR_RULES
         )
         assert weather["single_forecast"] is None
-        study = weather["research_validation"]["current_profile_study"]
-        assert study["primary"]["correct"] == 29
-        assert study["primary"]["all_dates_always_dry_correct"] == 158
-        assert study["primary"]["primary_full_cohort_gate_met"] is False
+        assert "research_validation" not in weather

@@ -340,7 +340,7 @@ def read_reference(
             "commentary_collation",
             "poem_collation",
         ],
-        "text_cells": ["canpingTiaowen", "text_collation", "text_witnesses"],
+        "text_cells": ["canpingTiaowen", "text_collation"],
         "schedule_clauses": ["schedule_basis"],
         "schedule_profiles": ["schedule_basis"],
     }
@@ -435,19 +435,11 @@ def read_reference(
             tips.append(
                 f"旧转录号已退役，所核新号为{selection['corrected_number']}；不据此改写实际计算所得编号。"
             )
-        witnesses = selection.get("witnesses", [])
-        if any(w.get("number_occurrence_ambiguous") for w in witnesses):
-            tips.append(
-                "同一文明書局本同号有多处正文，按原页并列；号文归属未裁定，不据第一条替换主选文。"
-            )
-            for witness in witnesses:
-                pages = "、".join(str(p) for p in witness["pdf_pages"])
-                tips.append(
-                    f"文明書局本对读（单次目读，PDF第{pages}页）：{witness['text']}；未替换主选文。"
-                )
         tips.append(SCOPE)
         meta = snapshots["text_collation"][1]
-        citation = f"{meta['source_title']}；PDF页{selection.get('source_pdf_page', '未定位')}；另本对读身份另列，不替主本认证。"
+        citation = (
+            f"{meta['source_title']}；PDF页{selection.get('source_pdf_page', '未定位')}。"
+        )
     elif domain == "canping" and category in {"schedule_clauses", "schedule_profiles"}:
 
         data = source_readings()
