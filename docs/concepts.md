@@ -1,64 +1,72 @@
 # 核心概念与结果阅读
 
-FateBridge 把计算、传统解释依据与模型对话拆开处理。本文介绍接入时需要理解的分工、工具与分类、时间口径，以及如何读取和保存同一次结果。初次体验请先看[快速入门](getting-started.md)，具体参数见 [API 参考](api-reference.md)。
+FateBridge 把确定性计算、传统依据说明与自然语言对话拆开处理。本文说明三层分工、三端同源调用载体、时间口径，以及如何按分级与覆盖状态正确解读结果。首次安装请先看[快速入门](getting-started.md)，完整接入与字段规范见[开发者 / Agent 接入指南](agent-guide.md)和 [API 参考](api-reference.md)。
 
 ## 计算、解读与对话的分工
 
 | 组成 | 负责什么 | 使用方式 |
 | --- | --- | --- |
-| FateBridge 计算引擎 | 按输入执行排盘、历法和规则计算，返回结构化结果及相应运行回执 | 本地运行，通过 MCP、REST 或 CLI 调用 |
-| 方法参考 | 说明结果读取、传统来源与适用范围 | `docs/interpretation/` 按需查阅 |
-| 接入应用、Agent 客户端与模型 | 提供界面与对话，理解问题、调用计算并表达结果 | 由使用者或应用开发者选择和配置 |
+| FateBridge 计算引擎 | 按输入执行排盘、历法和规则计算，返回结构化结果与运行回执 | 本地运行，通过 MCP、REST 或 CLI 调用 |
+| 方法参考 | 说明结果读取口径、经典/现代来源与适用范围 | `docs/interpretation/` 按需查阅 |
+| 接入应用、Agent 客户端与模型 | 提供交互界面与对话，理解问题、调用工具并组织表达 | 由使用者或应用开发者选择和配置 |
 
-计算服务本身无需 LLM API Key；对话模型的配置取决于所选客户端。结果读取与来源说明见[方法参考](interpretation/README.md)。
+计算服务本身无需 LLM API Key；对话能力取决于接入客户端所选模型。结果解读边界与参考总览见[方法参考](interpretation/README.md)。
 
-## 工具与入口
+## 工具与三端载体
 
-用户提出的是问题，接口接收的是工具请求。REST、MCP 和 CLI 通过不同入口调用共享领域服务，但名称、请求形态与公开范围可能不同；即使工具同名，也不能把一端的请求原样发到另一端。
+用户提出的是自然语言问题，引擎接收的是结构化工具请求。REST、MCP 和 CLI 共享同一中央目录的规范工具名（`spec.name`）和业务输入字段（`spec.request_model`），仅传输载体与外层控制参数形态不同：
 
-| 名称 | 含义 | 何时使用 |
+| 通道 | 工具寻址与业务输入载体 | 外层控制参数（`detail` / `fields` / `as_of`） |
 | --- | --- | --- |
-| 工具 | 具体计算或查询的输入与输出合同 | 已知道要算什么，读取其 Schema 后调用 |
-| family | 工具目录的能力分类 | 从较大的目录缩小发现范围 |
+| REST（HTTP） | `POST /api/...` 路径 + JSON 请求体 | URL 查询参数（如 `?detail=compact&fields=a&fields=b`） |
+| MCP（FastMCP） | `run_calculation(tool="<spec.name>", arguments={...})` | 同级工具参数（`detail`、`fields`、`as_of`） |
+| CLI（`fatebridge`） | 子命令 `<spec.name>` + `--flag` 或 `--request-file PATH` | 子命令选项（`--detail`、`--fields`、`--as-of`） |
 
-按实际方法、资料和时间范围选择工具；`FATEBRIDGE_MCP_FAMILIES` 可限制 MCP 连接公开的工具，修改后重启连接。选工具看[工具覆盖](algorithm-coverage.md)，核对结果读取与来源看[方法参考](interpretation/README.md)，核对名称映射看[三端能力边界](api-reference.md#22-三端能力边界)。
+| 概念 | 含义 | 何时使用 |
+| --- | --- | --- |
+| 工具（Tool） | 单项确定性计算的输入输出契约 | 已知计算目标，核对 Schema 后直接调用 |
+| 分类（`family`） | 中央目录的 12 个能力分类 | 缩小发现范围，或用 `FATEBRIDGE_MCP_FAMILIES` 裁剪 MCP 公开范围 |
+
+MCP 仅公开 `discover_tools` 与 `run_calculation` 两个入口（无 MCP 资源）；三端能力边界与路径映射见[三端能力边界](api-reference.md#22-三端能力边界)，全量能力见[算法覆盖矩阵](algorithm-coverage.md)。
 
 ## 输入与时间口径
 
-同一份请求里，出生时间、分析时间与“现在”并不是同一个时钟：
+同一份请求中，出生时间、分析时间与“现在”属于不同时钟，不能混用：
 
-- `birth_*` 描述出生事实。接口使用公历，农历须先转换；不以默认小时补出未知出生时刻。
-- `analysis_*` 或提问时间字段指定本次计算目标，具体名称取决于工具。
-- `as_of` 冻结未显式指定的当前时钟，帮助复现；它不能替代出生时刻，也不能覆盖工具要求显式提供的目标钟时。
+- `birth_*` 描述出生事实，接口统一采用公历，农历须先转换；未知出生小时不得用默认值或示例值补齐。
+- `analysis_*` 或查询时刻（如 `query_at`、`date`/`time`）指定本次分析目标，字段名以具体工具 Schema 为准。
+- `as_of` 冻结未显式指定的当前时钟以便复现；它不能替代出生时刻，也不能覆盖工具要求显式给出的目标钟时。
 
-出生时区取决于地点和历史日期。中式工具与西占的真太阳时默认策略不同，需核对实际工具合同与返回的时间校正。传统周期也有各自边界（节气年／月、公历范围、生日年、返照周期和法达分期），时间层的选择与比较见[共享时间选择](interpretation/shared/timing-selection.md)。
+出生时区取决于地点与历史日期；中式命理与西占本命盘对真太阳时的默认策略不同，需以实际工具合同和返回的 `time_adjustment` 为准。传统周期边界（节气年/月、生日年、返照周期等）的比较口径见[共享时间选择](interpretation/shared/timing-selection.md)。
 
 ## 一次结果包含什么
 
 | 内容 | 用途 | 阅读时注意 |
 | --- | --- | --- |
-| 结构化业务字段 | 本次实际计算值、规则命中及解释依据 | 字段根随工具变化，以实际输出合同为准 |
-| `run_metadata` | 工具、版本、有效时间、输入和结果摘要等回执 | 始终保留；`detail=compact` 仅保留核心回执字段，`detail=audit` 附完整方法与误差证据 |
+| 结构化业务字段 | 本次实际计算值、规则命中与分层证据 | 根键随工具变化，以输出合同或 `discover` 为准 |
+| `run_metadata` | 工具名、版本、有效时间、近似标志与重放信息 | 始终保留；`compact` 保留精简回执，`audit` 附加 `calculation_evidence` 与 `runtime` |
 
-`fields` 从输出根按点号路径选择字段，三端始终严格校验路径（无效路径返回 `validation_error` 并附 `constraints.available`）。投影沿对象路径读取，数组应选择其所属字段后在客户端处理。REST 的公共控制选项（`detail`、`fields`、`as_of`）使用查询参数；MCP 使用工具参数；CLI 的多个 `--fields` 路径以空格分隔。
+三端支持通过 `fields` 按点号对象路径严格投影，无效路径立即返回 `validation_error`（`issues[].code="unknown_projection_path"`）并在 `issues[].constraints.available` 提示当前可用键名；数组字段须选取所属父键后在客户端处理。
 
 ## 摘要与完整输出
 
-三端默认使用 `detail=compact`，按工具预设返回精简核心业务字段。想进一步收窄到特定证据时，传入 `fields` 指定所需点号路径；想读取全部业务字段、完整时间线与方法取证数据时，使用 `detail=audit` 且不传 `fields`（REST/MCP `fields=null`，CLI 省略 `--fields`）。完整控制面与错误恢复约定见[Agent 接入指南](agent-guide.md)。
+三端默认采用 `detail=compact`，按工具预设返回精简核心业务字段。若只需要指定分支证据，在 `compact` 下配合 `fields` 精确投影；若需要完整业务载荷、全部时间线与方法取证数据，则传入 `detail=audit` 且不传 `fields`（REST/MCP 传 `fields=null`，CLI 省略 `--fields`）。完整控制约定见[输出控制与结果读取](agent-guide.md#输出控制与结果读取)。
 
 ## 状态与覆盖分开阅读
 
-请求成功不意味着所有问题都有了答案；以风水分层结果为例，需区分已完成的层、当前可解释范围与动作可行性：
+请求返回成功不等于所有方法层或现场事实都已完整覆盖。以家居风水分层结果（`fengshui_assess` 等）为例，应将整体状态、已覆盖层、缺失输入与规则冲突分开核对：
 
-| 需要确认什么 | 阅读依据 | 不能据此推出什么 |
+| 需要确认什么 | 读取字段 | 阅读边界 |
 | --- | --- | --- |
-| 哪些计算已完成 | 各层 `status`、`coverage` 和缺失输入 | 已选层完成不等于所有方法完成 |
-| 现在能解释什么 | `analysis_progress.interpretation_status` 与实际事实、规则 | 有条件依据不能升级为已确认现场事实 |
-| 候选动作能否落实 | 许可、物理可行性及相应行动状态 | 动作状态不影响原始盘面事实 |
-| 哪些内容没有支持 | `unsupported_queries`、限制和未覆盖项目 | 未读取、未计算与已确认否定不同 |
+| 整体与各层完成度 | `status`（`complete` / `partial`） | `partial` 只限制未完成层，不影响已完成层的有效判断 |
+| 已实际算出的图层 | `coverage.implemented_layers` | 仅列真实完成计算并写入 `layers` 的方法层 |
+| 当前缺失或未请求项 | `coverage.missing_inputs`、`coverage.not_requested_layers`（及 `unavailable_layers`） | 未请求或因缺输入未算不等于否定判断 |
+| 流派或规则分歧 | `conflicts` | 各方法结论并列保留，不平均或合并成单一总分 |
+| 规则版本与追溯依据 | `rulesets`、`rule_trace`（及 `source_catalog`） | 交付来源时保留实际返回的规则 ID、版本与引用编号 |
+| 叠盘与空间布局评估 | `palace_overlay`、`layout_analysis` | 仅在请求对应计算时产出，输出结构事实而非化煞处方 |
 
-`partial` 只限制对应层，其他已有依据仍可解释；未知事实也不能按否定事实处理。风水各字段的作用域与状态细则见[家居风水](fengshui.md)。
+未知的现场事实不得按否定事实处理，也不能把条件候选升级为已确认现状。风水八工具的完整结构说明见[家居风水参考](fengshui.md)。
 
 ## 计算事实与解释
 
-读结果时需区分三层：按输入和规则算出了什么计算事实、所选传统来源如何理解它、结合现实条件可以讨论什么安排。三者应清楚区分，不把建议冒充引擎原结论。星历精度需核对实际 `chart_profile.ephemeris_model` 与 `run_metadata.engine_is_approximate`，详见[算法覆盖矩阵](algorithm-coverage.md)；咨询的禁止范围见[硬边界](interpretation/shared/safety-boundaries.md)。
+读取与转述结果时应保持三层分离：引擎实际产出的计算事实、所选传统来源对这些事实的解释口径，以及结合用户现实情况的可核对建议。星历精度需核对实际 `chart_profile.ephemeris_model` 与 `run_metadata.engine_is_approximate`（详见[星历数据](ephemeris.md)），咨询禁区见[硬边界](interpretation/shared/safety-boundaries.md)。

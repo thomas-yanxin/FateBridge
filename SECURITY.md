@@ -1,57 +1,42 @@
 # Security Policy
 
-Use this policy to report vulnerabilities privately and understand which security controls FateBridge provides. For installation and configuration, see [Getting started](docs/getting-started.md); ordinary defects belong in [GitHub Issues](https://github.com/thomas-yanxin/FateBridge/issues).
+Use this policy to report vulnerabilities privately and understand FateBridge's built-in security boundaries. For installation and configuration, see [Getting started](docs/getting-started.md); ordinary bugs belong in [GitHub Issues](https://github.com/thomas-yanxin/FateBridge/issues).
 
 On this page: [Supported Versions](#supported-versions) · [Reporting a Vulnerability](#reporting-a-vulnerability) · [Scope Notes](#scope-notes) · [Personal Data](#personal-data)
 
 ## Supported Versions
 
-FateBridge is pre-1.0. Security fixes target the latest released version. The latest release documented here is `0.1.1`; the [Unreleased section](CHANGELOG.md#unreleased) describes development changes. Check the installed version and the documentation at its Git tag when reporting a vulnerability.
+FateBridge is pre-1.0, and security fixes target the latest release (`0.1.1`). Pending development changes appear in [CHANGELOG](CHANGELOG.md#unreleased); check your installed version and corresponding Git tag before reporting.
 
 | Version | Supported |
-| ------- | --------- |
-| 0.1.1   | Yes       |
+| --- | --- |
+| `0.1.1` | Yes |
 | Earlier or unpublished development versions | Upgrade to the current release |
-
-If a problem affects an older version, include that version in your report and check whether you can reproduce it on the current release when practical.
 
 ## Reporting a Vulnerability
 
-Please do not open a public issue containing vulnerability details or sensitive reproduction material.
+Do not open public issues with vulnerability details or sensitive reproduction inputs. Report privately through GitHub [Security Advisories](https://github.com/thomas-yanxin/FateBridge/security/advisories/new), or email **yx20001210@163.com** with:
 
-Report privately via GitHub's [Report a vulnerability](https://github.com/thomas-yanxin/FateBridge/security/advisories/new) (Security → Advisories), or email **yx20001210@163.com** with:
+- Issue description, impact, and required access.
+- Fictional or redacted reproduction steps, affected version/commit, OS, and configuration.
+- Whether the issue reproduces on the latest release.
 
-- a description of the issue, its impact and any required access,
-- steps to reproduce using fictional or redacted data,
-- the affected version or commit, operating system and relevant configuration,
-- whether you have observed the issue on the current release.
-
-If GitHub private reporting is unavailable, use the email address above. Never send API secrets or real birth records as part of a reproduction.
-
-You can expect an initial acknowledgement within 7 days. Once a fix is released, we will credit reporters who wish to be named.
+Expect an initial acknowledgement within 7 days. Reporters who wish to be credited are acknowledged once a fix is released.
 
 ## Scope Notes
 
-FateBridge is an open-source toolkit for running Chinese metaphysics and astrology calculations in your own environment. Applications and AI clients provide the user interface and model conversations. Its access controls depend on the interface used:
+FateBridge provides local calculation interfaces; host applications supply user interfaces, model conversations, and perimeter controls. Built-in access boundaries depend on the transport:
 
 | Interface | Built-in boundary | Deployment responsibility |
 | --- | --- | --- |
-| REST | Optional shared API keys | Configure keys and a gateway for TLS, request limits and network access |
-| MCP | stdio process launched by the host | Restrict process access and provide authentication if exposing a network transport |
-| CLI | Local process | Restrict host access, input files and output files |
+| REST | Optional shared API keys (`FATEBRIDGE_API_KEYS`) | Configure keys and terminate TLS, rate limits, and network access at a gateway |
+| MCP | Host-managed stdio process (`0` MCP resources) | Restrict host process access and add transport authentication if exposed over HTTP |
+| CLI | Local process | Restrict host access, input files, and output logs |
 
-REST API key authentication uses `FATEBRIDGE_API_KEYS` and `API_KEY_HEADER_NAME` (default `X-API-Key`). An empty key configuration disables authentication; malformed nonempty entries stop startup. Shared keys do not provide accounts, roles or per-tool authorization.
-
-`/health`, `/ready`, `/metrics`, `/docs`, `/redoc`, `/openapi.json` and `OPTIONS` are exempt from API key checks. `/api/tools` and calculation endpoints are protected when keys are configured. Shared keys do not establish per-user ownership or access isolation; restrict operational endpoints and isolate services when callers require separate access boundaries.
-
-REST binds to `0.0.0.0:8010` by default. For local use set `API_HOST=127.0.0.1`. CORS controls browser origins and does not authenticate callers. Heavy-calculation concurrency controls the amount of simultaneous work in a process and does not provide a request rate limit.
-
-FastMCP (`fatebridge-mcp`) uses stdio by default. REST API key settings do not apply to MCP or CLI. If a host changes the MCP transport to expose a network endpoint, it must provide transport authentication.
-
-The Python distribution does not bundle Swiss Ephemeris `.se1` data. The optional `uv run python -m fatebridge.fetch_ephe` command downloads data separately from a source checkout. Project code, third-party dependencies and downloaded data have separate license declarations; see [LICENSE](LICENSE) and [NOTICE](NOTICE).
+- **REST authentication and bind scope:** `FATEBRIDGE_API_KEYS` and `API_KEY_HEADER_NAME` (default `X-API-Key`) protect `/api/tools` and calculation endpoints; empty configuration disables auth, and malformed nonempty entries fail startup. `/health`, `/ready`, `/metrics`, `/docs`, `/redoc`, `/openapi.json`, and `OPTIONS` are exempt. Shared keys do not provide per-user roles or isolation. REST binds to `0.0.0.0:8010` by default (use `API_HOST=127.0.0.1` for local-only access). `ALLOWED_ORIGINS` restricts browser CORS origins and does not authenticate callers; `FATEBRIDGE_HEAVY_CALC_MAX_CONCURRENCY` bounds process-local heavy work and is not a request rate limit.
+- **MCP and CLI:** `fatebridge-mcp` runs over stdio by default and does not read REST API keys. If you expose FastMCP over Streamable HTTP, keep it on loopback behind SSH or add gateway authentication and TLS.
+- **External data and licensing:** Swiss Ephemeris `.se1` files and optional solar/DE441 archives are not bundled in the wheel; see [ephemeris setup](docs/ephemeris.md), [LICENSE](LICENSE), and [NOTICE](NOTICE).
 
 ## Personal Data
 
-Birth information may appear in responses, client histories and calculation logs. FateBridge does not persist a historical run database on disk; all calculation results are returned directly in the response payload.
-
-Treat exported JSON and logs as potentially sensitive. Use fictional examples in Issues and PRs, redact diagnostics before sharing them, and apply your deployment's log-retention and access policies. The [Agent guide](docs/agent-guide.md#输出控制与结果读取) explains how output detail levels and strict field projection work.
+Birth inputs may appear in responses, client chat histories, and host logs. FateBridge does not persist a calculation database on disk and returns results directly in each response payload. Always use fictional inputs in Issues and PRs, redact diagnostics before sharing, and use `detail=compact` or targeted `fields` when minimizing payload exposure (see [output controls](docs/agent-guide.md#输出控制与结果读取)).

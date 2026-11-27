@@ -280,7 +280,7 @@ WantedBy=multi-user.target
 
 ## 升级、回退与停用
 
-升级前记录 doctor 的版本、包路径、当前 Git 提交和客户端配置，保存仍需要的结果交付文件。
+升级前记录 `fatebridge doctor` 返回的版本、包路径、当前 Git 提交和客户端配置，并备份本地环境变量文件。
 
 - PyPI 独立工具：执行 `uv tool upgrade fatebridge`；如需回退到已发布版本，使用 `uv tool install --force fatebridge==<version>`。
 - 源码：确认 `git status` 并保留本地修改，执行 `git pull --ff-only` 与 `uv sync --extra dev`。

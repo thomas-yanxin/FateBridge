@@ -30,10 +30,10 @@ FateBridge 为 AI 应用提供本地术数、占星与心理测量计算，通�
 | 中国术数与易占 | 紫微、奇门、大六壬（720课）、金口诀、太乙、梅花、六爻、河洛与参评 | [紫微斗数](docs/ziwei.md) · [算法覆盖](docs/algorithm-coverage.md) |
 | 占星 | 西占本命/关系/推运（主限/黄道释放/多重回归）/卜卦；印占、果老、宿曜与七曜 | [宿曜](docs/sukuyo.md) · [占星骰](docs/astrodice.md) · [算法覆盖](docs/algorithm-coverage.md) |
 | 人类图 | 太阳 88° 双时刻、门线、通道、类型与权威 | [人类图参考](docs/human-design.md) |
-| 风水空间 | 八宅、金锁玉关砂水、紫白年/月星、中州玄空宅盘、IGRF-14 地磁与布局评估 | [家居风水](docs/fengshui.md) · [现场咨询指南](docs/interpretation/fengshui/consultation.md) |
+| 风水空间 | WMM2025/IGRF-14 地磁、八宅与阳宅三要、金锁砂水、年/月/日/时紫白、中州玄空宅盘与四层布局 | [家居风水](docs/fengshui.md) · [现场咨询指南](docs/interpretation/fengshui/consultation.md) |
 | 心理测量 | IPIP 50 题大五人格因子标记量表（Goldberg 1992 公有领域） | [覆盖矩阵](docs/algorithm-coverage.md#212-psychometrics--心理测量量表implemented) |
 
-当前源码提供 **90 个业务 REST 路由**。MCP 通过两个入口提供 **90 项业务能力**，覆盖 **12 个 family**。目录共有 90 条记录，CLI 可执行 90 条。三端共用公开工具名、请求字段与领域计算，见[接口边界](docs/api-reference.md#22-三端能力边界)和[算法覆盖矩阵](docs/algorithm-coverage.md)。
+当前源码提供 **90 个业务 REST 路由**。MCP 通过两个入口提供 **90 项业务能力**，覆盖 **12 个 family**。目录共有 90 条记录，CLI 可执行 90 条。三端共用规范工具名（`spec.name`）、请求字段与领域计算，见[接口边界](docs/api-reference.md#22-三端能力边界)和[算法覆盖矩阵](docs/algorithm-coverage.md)。
 
 ## 快速开始
 
