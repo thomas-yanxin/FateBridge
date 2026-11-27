@@ -390,7 +390,6 @@ def cyclic_core(
         "guest_general": guest_general,
         "main_vice_general": main_general * 3 % 10,
         "guest_vice_general": guest_general * 3 % 10,
-        "count_trace": {"main": home_trace, "guest": guest_trace},
     }
 
 
@@ -796,7 +795,6 @@ def determinate_calculation(board: dict[str, Any], mode: str) -> dict[str, Any]:
         "count": trace["count"],
         "general": general,
         "vice_general": vice,
-        "trace": trace,
         "rotation": {
             "ruler_branch": ruler,
             "hegod": hegod,
@@ -1450,18 +1448,12 @@ def noble_source_assessment(
     guiren_order = liureng.get("guiren_order")
     if type(is_day) is not bool or not isinstance(guiren_order, str):
         return {**base, "reason": "缺少同盘贵人昼夜与起位信息"}
-    # First god in guiren_order or noble start from rule_trace / board
-    start = None
-    for row in liureng.get("twelve_board") or []:
-        if row.get("god") == "贵人":
-            start = row.get("sky_branch")
-            break
-    for trace in liureng.get("rule_trace") or []:
-        if isinstance(trace, dict) and trace.get("rule_id") == "liuren.guiren_start":
-            res = trace.get("result") or {}
-            if res.get("start_branch"):
-                start = res["start_branch"]
-            break
+    start = meta.get("guiren_start_branch")
+    if start not in tuple(BRANCHES):
+        for row in liureng.get("twelve_board") or []:
+            if row.get("god") == "贵人":
+                start = row.get("sky_branch")
+                break
     if start not in tuple(BRANCHES):
         return {**base, "reason": "未能定位贵人起位"}
     comparisons = []
@@ -1546,7 +1538,6 @@ def assemble_board(
             for palace in DISPLAY_ORDER
         ],
         "center_marks": {"palace": "中", "markers": sorted(marks["中"])},
-        "rule_trace": core["count_trace"],
         "patterns": patterns,
         "condition_assessment": {
             "ruleset": {

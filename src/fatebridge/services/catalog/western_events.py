@@ -14,7 +14,7 @@ _REQ_MODULE = "fatebridge.core.requests.western_events"
 
 
 def _compact_horary(result: ServiceResult) -> ServiceResult:
-    horary = result.get("horary")
+    horary = result.get("horary_chart")
     if not isinstance(horary, dict):
         return result
     moon = horary.get("moon") or {}
@@ -77,7 +77,7 @@ def _compact_horary(result: ServiceResult) -> ServiceResult:
     return {
         "analysis_type": result.get("analysis_type"),
         "analysis_context": result.get("analysis_context"),
-        "horary": compact_horary,
+        "horary_chart": compact_horary,
         "summary": result.get("summary"),
         **(
             {"run_metadata": result["run_metadata"]} if "run_metadata" in result else {}

@@ -84,11 +84,11 @@ def test_vedic_natal_reference_and_progressed_positions_share_native_lahiri() ->
     result = calculate_vedicprog(**BIRTH_INPUTS, zodiac_type="Tropic")
     assert "error" not in result, result
     assert (
-        datetime.fromisoformat(result["vedic_progression"]["progressed_datetime"])
+        datetime.fromisoformat(result["sidereal_progressions"]["progressed_datetime"])
         == PROGRESSED
     )
     assert (
-        result["vedic_progression"]["calculation_options"]["year_basis"]
+        result["sidereal_progressions"]["calculation_options"]["year_basis"]
         == "fixed_365_24219_nominal_days"
     )
     for body, planet in (
@@ -101,7 +101,7 @@ def test_vedic_natal_reference_and_progressed_positions_share_native_lahiri() ->
         assert result["natal_reference"][body]["absolute_degree"] == pytest.approx(
             expected_natal, abs=1e-8
         )
-        assert result["vedic_progression"]["positions"][body][
+        assert result["sidereal_progressions"]["positions"][body][
             "absolute_degree"
         ] == pytest.approx(expected_progressed, abs=1e-8)
     assert result["analysis_context"]["zodiac_type"] == "Sidereal"
@@ -147,7 +147,7 @@ def test_vedic_progression_from_extended_utc_analysis_clock(
         analysis_day=day,
     )
     assert "error" not in result, result
-    assert result["vedic_progression"]["progressed_datetime"] == expected
+    assert result["sidereal_progressions"]["progressed_datetime"] == expected
 
 
 @pytest.mark.parametrize(
@@ -190,13 +190,13 @@ def test_progressions_from_birth_at_utc_year_zero(
     assert "error" not in vedic, vedic
     assert "error" not in jayne, jayne
     assert (
-        vedic["vedic_progression"]["progressed_datetime"]
+        vedic["sidereal_progressions"]["progressed_datetime"]
         == "0001-02-05T13:57:07.245885+14:00"
     )
-    assert vedic["vedic_progression"]["positions"]["moon"][
+    assert vedic["sidereal_progressions"]["positions"]["moon"][
         "absolute_degree"
     ] == pytest.approx(expected_moon, rel=0, abs=1e-9)
-    declination = jayne["jaynes_declination"]
+    declination = jayne["declination_progressions"]
     assert declination["progressed_datetime"] == "0001-02-04T23:57:07.245885+00:00"
     closest = declination["parallels"][0]
     assert (closest["progressed"], closest["natal"], closest["kind"]) == (
@@ -234,7 +234,7 @@ def test_vedic_native_offset_failure_never_succeeds_with_linear_approximation(
     monkeypatch.setattr(geometry.runtime, "ephemeris_call", unavailable)
     result = calculate_vedicprog(**BIRTH_INPUTS)
     assert result.get("error"), result
-    assert "vedic_progression" not in result
+    assert "sidereal_progressions" not in result
 
 
 @pytest.mark.parametrize("tool", ["sidereal_progressions", "declination_progressions"])
@@ -242,9 +242,7 @@ def test_correct_progression_frames_reach_rest_mcp_cli(
     tool: str, surface_calls
 ) -> None:
     spec = SPECS[tool]
-    key = (
-        "vedic_progression" if tool == "sidereal_progressions" else "jaynes_declination"
-    )
+    key = tool
     fields = ["natal_reference", key, "analysis_context.zodiac_type"]
     query = [("fields", field) for field in fields] + [("detail", "audit")]
     http, protocol, code, cli = surface_calls(
@@ -265,7 +263,7 @@ def test_correct_progression_frames_reach_rest_mcp_cli(
         assert datetime.fromisoformat(result[key]["progressed_datetime"]) == PROGRESSED
         assert result[key]["calculation_options"]["year_key_numerator"] == 36524219
         assert result[key]["calculation_options"]["year_key_denominator"] == 100000
-        if key == "vedic_progression":
+        if key == "sidereal_progressions":
             expected = native_coordinates(swe.MOON, BIRTH, sidereal=True)[0]
             assert result["natal_reference"]["moon"][
                 "absolute_degree"

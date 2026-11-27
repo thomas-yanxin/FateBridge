@@ -67,11 +67,11 @@ class RenAnchoredOutput(PartialOutput):
     def shared_ren_calculation_anchors(self, info: ValidationInfo) -> RenAnchoredOutput:
         complete = bool(info.context and info.context.get("full_result"))
         pillars = _get(self, "four_pillars")
-        board = _get(self, "liureng")
-        sub = _get(self, "subresults", "liureng_gods")
+        board = _get(self, "liuren")
+        sub = _get(self, "subresults", "liuren")
         if sub is not None:
             subpillars = _get(sub, "four_pillars")
-            _liuren(_get(sub, "liureng"), subpillars, complete=complete)
+            _liuren(_get(sub, "liuren"), subpillars, complete=complete)
             if pillars is None:
                 pillars = subpillars
         _liuren(board, pillars, _get(self, "runyear"), complete=complete)
@@ -161,11 +161,11 @@ def require_complete_ren_anchors(
         validate_selection(obj, complete=True)
 
     if not _year_course:
-        board = _get(result, "liureng")
+        board = _get(result, "liuren")
         if key == "sanshi_combined_chart":
-            sub = _get(result, "subresults", "liureng_gods")
+            sub = _get(result, "subresults", "liuren")
             pillars(_get(sub, "four_pillars"))
-            sub_board = _get(sub, "liureng")
+            sub_board = _get(sub, "liuren")
             if sub_board is not None and sub_board is not board:
                 liuren(sub_board)
         else:

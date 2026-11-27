@@ -178,7 +178,7 @@ def test_zodiacal_releasing_l4_eros_and_chiron_return_bounds() -> None:
         analysis_day=1,
     )
     assert "error" not in ret
-    chiron = next(r for r in ret["extrareturns"]["returns"] if r["body"] == "Chiron")
+    chiron = next(r for r in ret["planetary_returns"]["returns"] if r["body"] == "Chiron")
     if chiron.get("status") != "unavailable":
         assert chiron["most_recent_return"] is None
         assert chiron["next_return"] is not None
@@ -198,7 +198,7 @@ def test_horary_election_hamburg_and_relationship_features_and_no_prose_bloat() 
         turned_from_house=5,
     )
     assert "error" not in horary
-    h = horary["horary"]
+    h = horary["horary_chart"]
     assert h["quesited_house"] == 11
     assert h["perfection"]["status"] != "source_conditions_incomplete"
     assert not (_walk_keys(horary) & PROSE_KEYS)

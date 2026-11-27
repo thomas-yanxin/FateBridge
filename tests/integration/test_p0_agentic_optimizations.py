@@ -181,9 +181,9 @@ def test_mcp_exposes_two_tools_and_zero_resources() -> None:
                     assert business["run_metadata"]["replay"]["overrides"]["seed"] == 42
                     assert len(business["current_code"]) == 6
                     assert business["current_hexagram"]["name"]
-                    assert business["classical_text_evidence"]["base_guaci"]
+                    assert "classical_text_evidence" not in business
                     evidence = business["liuyao_evidence"]
-                    assert evidence["calendar_conventions"]["day_ganzhi"]
-                    assert evidence["sources"]
+                    assert "calendar_conventions" not in evidence
+                    assert "sources" not in evidence
 
     asyncio.run(check())

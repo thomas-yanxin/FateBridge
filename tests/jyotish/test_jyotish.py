@@ -182,7 +182,7 @@ def test_pyjhora_bphs_delhi_oracle_and_new_vedic_features() -> None:
         elapsed_ms < 50.0
     )  # comfortably <20 ms after warmup; strict budget <50ms in test process
 
-    india = res["india"]
+    india = res["vedic_chart"]
     assert 23.72 < india["ayanamsha"] < 23.73
     d1 = india["charts"]["D1"]
     assert 151.8 < d1["ascendant"]["longitude"] < 152.1
@@ -234,7 +234,7 @@ def test_five_ayanamsas_and_all_dasha_systems() -> None:
             birth_latitude=28.6139,
             ayanamsa=ay,
         )
-        shifts[ay] = r["india"]["ayanamsha"]
+        shifts[ay] = r["vedic_chart"]["ayanamsha"]
     assert len(set(round(v, 4) for v in shifts.values())) == 5
 
     t0 = time.perf_counter()

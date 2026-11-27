@@ -213,7 +213,6 @@ class SukuyoDay(PartialOutput):
     weekday: dict[str, OpenJsonValue] | None = None
     special_day_labels: list[str] | None = None
     special_day_evidence: SukuyoSpecialDays | None = None
-    rule_trace: list[dict[str, OpenJsonValue]] | None = None
     personal_day: SukuyoPersonalDay | None = None
     six_palace_reference: SukuyoSixPalaceReference | None = None
     taibai_direction_reference: SukuyoTaibaiReference | None = None
@@ -265,7 +264,6 @@ class SukuyoRelation(PartialOutput):
     offset: int | None = None
     sequence_group: int | None = None
     traditional_assessment: str | None = None
-    rule_trace: list[dict[str, OpenJsonValue]] | None = None
 
 
 class SukuyoJointPersonSupport(PartialOutput):

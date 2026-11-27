@@ -171,14 +171,14 @@ def test_fractional_offset_and_day_pillars_agree_across_transports(
     payload = {"date": "2026-11-03", "time": clock, "timezone": "UTC"}
     if key == "liuyao":
         payload["gua_code"] = "111111"
-        fields = ["nongli.birth", "nongli.dayGanZi", "nongli.time"]
+        fields = ["nongli.solar_datetime", "nongli.day_ganzhi", "nongli.time"]
     else:
         payload["use_true_solar_time"] = False
         fields = [
-            "liureng.calendar_policy.corrected_clock",
+            "liuren.calendar_policy.corrected_clock",
             *[
                 f"subresults.{tool}.four_pillars.{pillar}"
-                for tool in ("qimen", "taiyi", "liureng_gods")
+                for tool in ("qimen", "taiyi", "liuren")
                 for pillar in ("day", "hour")
             ],
         ]
@@ -198,12 +198,14 @@ def test_fractional_offset_and_day_pillars_agree_across_transports(
         datetime.fromisoformat(expected_clock).replace(tzinfo=None).isoformat(sep=" ")
     )
     if key == "liuyao":
-        assert expected["nongli"] == {"birth": wall, "dayGanZi": day, "time": hour}
+        assert expected["nongli"] == {
+            "solar_datetime": wall,
+            "day_ganzhi": day,
+            "time": hour,
+        }
     else:
-        assert (
-            expected["liureng"]["calendar_policy"]["corrected_clock"] == expected_clock
-        )
-        for tool in ("qimen", "taiyi", "liureng_gods"):
+        assert expected["liuren"]["calendar_policy"]["corrected_clock"] == expected_clock
+        for tool in ("qimen", "taiyi", "liuren"):
             pillars = expected["subresults"][tool]["four_pillars"]
             assert pillars["day"] == {"stem": day[0], "branch": day[1]}
             assert pillars["hour"] == {"stem": hour[0], "branch": hour[1]}

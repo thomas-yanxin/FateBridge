@@ -1510,26 +1510,6 @@ def heluo_evidence(
     """Build compact non-duplicated evidence metadata for Heluo."""
     del four_pillars
     return {
-        "rulesets": [
-            {
-                "ruleset_id": YUANTANG_RULESET_ID,
-                "version": "1.0.0",
-                "source_title": "河洛理數（上海文明書局印行本）卷一",
-                "source_status": "single_visual_review",
-            },
-            {
-                "ruleset_id": MONTH_RULESET_ID,
-                "version": "3.0.0",
-                "source_title": "河洛理數（上海文明書局印行本）卷一・卦月",
-                "source_status": "single_visual_review",
-            },
-            {
-                "ruleset_id": JIEHOU_RULESET_ID,
-                "version": "1.0.0",
-                "source_title": "河洛理數（上海文明書局印行本）卷一定節候卦說",
-                "source_status": "single_visual_review",
-            },
-        ],
         "selected_texts": [
             {
                 "phase": phase,
@@ -1539,28 +1519,12 @@ def heluo_evidence(
             }
             for phase in ("xian", "hou")
         ],
-        "rule_trace": [],
     }
 
 
 def attach_solar_context(evidence: dict[str, Any], solar: dict[str, Any]) -> None:
-    del solar
-    evidence["rulesets"].append(
-        {
-            "ruleset_id": SOLAR_POLICY_ID,
-            "version": "1.0.0",
-            "source_title": "现代节气黄经交点上下文及河洛至点／四立取用",
-            "source_status": "actual_consumed_boundary_provenance",
-        }
-    )
+    del evidence, solar
 
 
 def attach_jiehou_evidence(evidence: dict[str, Any], jiehou: dict[str, Any]) -> None:
-    evidence["rulesets"].append(
-        {
-            "ruleset_id": jiehou["ruleset_id"],
-            "version": jiehou.get("version", "1.0.0"),
-            "source_title": "河洛理數（上海文明書局印行本）卷一定節候卦說",
-            "source_status": "single_visual_review",
-        }
-    )
+    del evidence, jiehou

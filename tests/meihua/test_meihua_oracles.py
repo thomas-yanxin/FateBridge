@@ -102,7 +102,7 @@ def test_meihua_time_cast_2024_05_20_14_30_oracle() -> None:
         "internal_countercontrol",
     ):
         assert removed not in interp
-    assert "no_universal_relation_verdict" not in interp["evidence_scope"]
+    assert "evidence_scope" not in interp
     for stage in meihua["stage_relations"]:
         assert "meaning" not in stage
         assert stage["traditional_tendency"] in {"比和", "泄出", "克出", "生入", "克入"}

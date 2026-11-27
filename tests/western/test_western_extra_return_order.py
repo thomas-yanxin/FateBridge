@@ -99,7 +99,7 @@ def test_extra_returns_service_uses_native_lahiri_for_natal_and_events() -> None
     )
     assert "error" not in result, result
     row = next(
-        row for row in result["extrareturns"]["returns"] if row["body"] == "Jupiter"
+        row for row in result["planetary_returns"]["returns"] if row["body"] == "Jupiter"
     )
     target = native_longitude(swe.JUPITER, BIRTH, True)
     assert row["natal_longitude"]["absolute_degree"] == pytest.approx(target, abs=1e-10)
@@ -273,7 +273,7 @@ def test_extra_returns_service_preserves_selected_side_and_original_display(
         analysis_day=25,
     )
     assert "error" not in result
-    for row in result["extrareturns"]["returns"]:
+    for row in result["planetary_returns"]["returns"]:
         assert row["most_recent_return"]["datetime_utc"] == displayed_past.isoformat()
         assert row["next_return"]["datetime_utc"] == displayed_future.isoformat()
 
@@ -310,7 +310,7 @@ def test_extra_returns_service_keeps_extended_utc_clock_coordinates(
         analysis_day=1,
     )
     assert "error" not in result
-    body_count = len(result["extrareturns"]["returns"])
+    body_count = len(result["planetary_returns"]["returns"])
     assert body_count == 10
     assert (
         birth_labels == reference_labels == ["0000-12-31T23:59:00+00:00"] * body_count
@@ -337,7 +337,7 @@ def test_nearest_return_and_zodiac_agree_across_rest_mcp_cli(
         analysis_day=12,
         zodiac_type=zodiac,
     )
-    fields = ["extrareturns.returns", "analysis_context.zodiac_type"]
+    fields = ["planetary_returns.returns", "analysis_context.zodiac_type"]
     query = [("fields", field) for field in fields] + [("detail", "audit")]
     http, protocol, code, cli = surface_calls(
         spec,
@@ -356,7 +356,9 @@ def test_nearest_return_and_zodiac_agree_across_rest_mcp_cli(
     for output in outputs:
         assert output["analysis_context"]["zodiac_type"] == zodiac
         row = next(
-            row for row in output["extrareturns"]["returns"] if row["body"] == "Jupiter"
+            row
+            for row in output["planetary_returns"]["returns"]
+            if row["body"] == "Jupiter"
         )
         target = native_longitude(swe.JUPITER, BIRTH, zodiac == "Sidereal")
         assert row["natal_longitude"]["absolute_degree"] == pytest.approx(
@@ -428,7 +430,7 @@ def test_extra_returns_preserve_the_root_when_utc_has_no_datetime(
             house_system="W",
         )
     assert "error" not in result, result
-    returns = result["extrareturns"]["returns"]
+    returns = result["planetary_returns"]["returns"]
     assert {row["body"] for row in returns} == {
         "Saturn",
         "Jupiter",

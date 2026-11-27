@@ -88,8 +88,6 @@ class Qimen(PartialOutput):
     horse_star: dict[str, str] | None = None
     void_palaces: dict[str, list[str]] | None = None
     hidden_stems_palace_map: dict[str, str] | None = None
-    rulesets: Annotated[list[QimenRuleset] | None, FULL_FACT] = None
-    rule_trace: Annotated[list[QimenRuleTrace] | None, FULL_FACT] = None
     calendar_policy: Annotated[QimenCalendarPolicy | None, FULL_FACT] = None
     structure: QimenStructure | None = None
     patterns: list[QimenPattern] | None = None

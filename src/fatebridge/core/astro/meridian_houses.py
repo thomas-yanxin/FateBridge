@@ -159,15 +159,6 @@ def native_meridian_houses(
             "sample_reference": "midpoint_analysis.time_sensitivity.samples",
         },
         "sources": [SOURCE, SWISS_SOURCE],
-        "rule_trace": [
-            {
-                "rule_id": RULESET,
-                "source_id": SOURCE["id"],
-                "source_sections": ["p.34"],
-                "formula": "RA(cusp h)=ARMC+(h-10)*30deg modulo360; intersect each RA meridian with the ecliptic",
-                "scope": "natal cusps only; actual Ascendant and existing midpoint factors retained",
-            }
-        ],
         "original_text_conformance": "not_assessed",
     }
 

@@ -171,7 +171,7 @@ def build_tongshefa_result(
     }
     return {
         "analysis_type": "统摄法分析",
-        "input_normalized": selected,
+        "analysis_context": selected,
         "tongshefa": model,
         "summary": (
             f"已运行本地统摄法算法。本卦：左{base_left['name']}，右{base_right['name']}。"

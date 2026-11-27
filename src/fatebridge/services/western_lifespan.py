@@ -276,7 +276,7 @@ def calculate_triplicity_rulers(
     )
     return _envelope(
         analysis_type="西占三分主星推运",
-        tool_name="triplicity_rulers",
+        tool_name="triplicity_ruler_periods",
         context=context,
         natal_reference=natal_reference,
         payload=payload,
@@ -314,7 +314,7 @@ def calculate_lunation_phase(
     )
     return _envelope(
         analysis_type="西占月相推运",
-        tool_name="lunation_phase",
+        tool_name="lunar_phase_progressions",
         context=context,
         natal_reference=natal_reference,
         payload=payload,
@@ -358,7 +358,7 @@ def calculate_distributions(
     )
     return _envelope(
         analysis_type="西占界推运",
-        tool_name="distributions",
+        tool_name="bounds_directions",
         context=context,
         natal_reference=natal_reference,
         payload=payload,
@@ -445,7 +445,7 @@ def calculate_keypoints(
     )
     return _envelope(
         analysis_type="西占数字相位推运",
-        tool_name="keypoints",
+        tool_name="numeric_aspect_periods",
         context=context,
         natal_reference=natal_reference,
         payload=payload,
@@ -484,7 +484,7 @@ def calculate_yearsystem129(
     )
     return _envelope(
         analysis_type="西占129年系统",
-        tool_name="yearsystem129",
+        tool_name="planetary_periods_129_years",
         context=context,
         natal_reference=natal_reference,
         payload=payload,
@@ -592,7 +592,7 @@ def calculate_persian_directed(
     context["max_age_years"] = max_age_years
     return _envelope(
         analysis_type="西占波斯向运",
-        tool_name="persian_directed",
+        tool_name="persian_directions",
         context=context,
         natal_reference=natal_reference,
         payload=payload,
@@ -707,7 +707,7 @@ def calculate_vedicprog(
     context["age_years"] = round(age_years, 4)
     return _envelope(
         analysis_type="西占恒星推运",
-        tool_name="vedic_progression",
+        tool_name="sidereal_progressions",
         context=context,
         natal_reference=natal_reference,
         payload=payload,
@@ -774,7 +774,7 @@ def calculate_jaynesprog(
     context["age_years"] = round(age_years, 4)
     return _envelope(
         analysis_type="西占赤纬推运",
-        tool_name="jaynes_declination",
+        tool_name="declination_progressions",
         context=context,
         natal_reference=natal_reference,
         payload=payload,

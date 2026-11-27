@@ -40,7 +40,6 @@ class SolarArcAnalysis(PartialOutput):
     daily_meridian: DayMeridianAnalysis | None = None
     original_table_1925: Witte1925SourceTable | None = None
     sources: list[GeometrySource] | None = None
-    rule_trace: list[GeometryRuleTrace] | None = None
     limitations: list[str] | None = None
     original_text_conformance: str | None = None
 
@@ -140,7 +139,6 @@ class MeridianHouseAnalysis(PartialOutput):
     factor_placement: MeridianFactorPlacement | None = None
     birth_time_sensitivity: MeridianHouseSensitivity | None = None
     sources: list[GeometrySource] | None = None
-    rule_trace: list[GeometryRuleTrace] | None = None
     limitations: list[str] | None = None
     original_text_conformance: str | None = None
 

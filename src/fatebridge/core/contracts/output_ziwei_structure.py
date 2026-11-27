@@ -151,7 +151,6 @@ class ZiweiBirth(PartialOutput):
     calendar_basis: Annotated[ZiweiCalendarBasis | None, FULL_FACT] = None
     calendar_rules: Annotated[ZiweiCalendarRules | None, FULL_FACT] = None
     ruleset: Annotated[ZiweiRuleset | None, FULL_FACT] = None
-    rule_trace: Annotated[list[ZiweiRuleTrace] | None, FULL_FACT] = None
     reading_view: ZiweiReadingView | None = None
     named_patterns: ZiweiNamedPatternEvidence | None = None
     flying_sihua: ZiweiFlyingSihua | None = None

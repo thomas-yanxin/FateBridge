@@ -93,16 +93,6 @@ def require_meihua_clock_binding(
         != clock
     ):
         raise ValueError("梅花钟时输入记录与时间轨迹不符")
-    scope = result["interpretation"]["evidence_scope"]["clock_input"]
-    if (
-        scope["path"]
-        != "meihua.calendar_policy.civil_clock_resolution.input_components"
-        or scope["status"] != receipt["status"]
-        or scope["calendar_basis"] != "nominal_reference_only"
-        or scope["calendar_stability"] != "not_assessed"
-        or scope["observed_precision_certified"] is not False
-    ):
-        raise ValueError("梅花解释的钟时依据与输入记录不符")
     require_meihua_instant_binding(result, request)
 
 
@@ -277,16 +267,10 @@ def require_meihua_instant_binding(
         "analysis_context.civil_instant_utc",
     )
     for cast in [result["meihua"], calendar_context["lunar_calendar"]["meihua"]]:
-        traces = [
-            r for r in cast["rule_trace"] if r["rule_id"] == "civil_clock_resolution"
-        ]
-        if len(traces) != 1:
-            raise ValueError("梅花钟时轨迹缺失或重复")
-        _same_clock_record(traces[0]["result"], clock, "rule_trace.result")
         _same_clock_record(
-            traces[0]["inputs"],
-            {"timezone": zone, "utc_offset": offset},
-            "rule_trace.inputs",
+            cast["calendar_policy"]["civil_clock_resolution"],
+            clock,
+            "calendar_policy.civil_clock_resolution",
         )
     month = calendar_context["bazi_month_boundary"]
     _local_clock_matches(

@@ -89,7 +89,7 @@ def _local_golden_projection():
     )
     otherbu_sun = next(
         item
-        for item in otherbu_result["diceChart"]["chart"]["objects"]
+        for item in otherbu_result["dice_chart"]["chart"]["objects"]
         if item["id"] == "Sun"
     )
 
@@ -122,7 +122,7 @@ def _local_golden_projection():
             "planet": otherbu_result["planet"],
             "sign": otherbu_result["sign"],
             "house": otherbu_result["house"],
-            "diceHouse1Longitude": otherbu_result["diceChart"]["params"][
+            "diceHouse1Longitude": otherbu_result["dice_chart"]["params"][
                 "diceHouse1Longitude"
             ],
             "sun": otherbu_sun,
@@ -144,9 +144,9 @@ def _local_golden_projection():
                 "big_pattern": sanshi_result["taiyi"].get("big_pattern"),
                 "small_pattern": sanshi_result["taiyi"].get("small_pattern"),
             },
-            "liureng": {
-                "month_general": sanshi_result["liureng"]["month_general"],
-                "is_diurnal": sanshi_result["liureng"]["meta"]["is_diurnal"],
+            "liuren": {
+                "month_general": sanshi_result["liuren"]["month_general"],
+                "is_diurnal": sanshi_result["liuren"]["meta"]["is_diurnal"],
             },
         },
     }
@@ -734,7 +734,7 @@ def test_calculate_otherbu_analysis_supports_traditional_mode() -> None:
 
     natal_objects = result["chart"]["chart"]["objects"]
     dice_sun = next(
-        item for item in result["diceChart"]["chart"]["objects"] if item["id"] == "Sun"
+        item for item in result["dice_chart"]["chart"]["objects"] if item["id"] == "Sun"
     )
 
     assert result["analysis_type"] == "西洋游戏 / 占星骰子"
@@ -744,7 +744,7 @@ def test_calculate_otherbu_analysis_supports_traditional_mode() -> None:
     assert dice_sun["sign"] == "Aries"
     assert not any(item["id"] == "Uranus" for item in natal_objects)
     assert result["symbolic_details"]["sign_condition"]["conditions"] == ["exaltation"]
-    assert result["question"] == result["input_normalized"]["question"] == "合作"
+    assert result["question"] == result["analysis_context"]["question"] == "合作"
 
 
 def test_calculate_otherbu_analysis_supports_offline_house_system_and_zodiacal_modes() -> (
@@ -820,8 +820,8 @@ def test_calculate_otherbu_analysis_exposes_runtime_engine_metadata() -> None:
 
     assert result["chart"]["params"]["enginePrecision"] == expected_precision
     assert result["chart"]["params"]["engineBackend"] == expected_backend
-    assert result["diceChart"]["params"]["enginePrecision"] == "sign_and_house_only"
-    assert result["diceChart"]["params"]["engineBackend"] == "symbolic_rules"
+    assert result["dice_chart"]["params"]["enginePrecision"] == "sign_and_house_only"
+    assert result["dice_chart"]["params"]["engineBackend"] == "symbolic_rules"
 
 
 def test_calculate_otherbu_analysis_supports_extended_offline_house_systems() -> None:
@@ -939,9 +939,9 @@ def test_calculate_otherbu_analysis_keeps_dice_chart_house_geometry_consistent()
     )
 
     dice_sun = next(
-        item for item in result["diceChart"]["chart"]["objects"] if item["id"] == "Sun"
+        item for item in result["dice_chart"]["chart"]["objects"] if item["id"] == "Sun"
     )
-    symbolic_house = result["diceChart"]["chart"]["houses"][6]
+    symbolic_house = result["dice_chart"]["chart"]["houses"][6]
 
     assert dice_sun["house"] == "House7"
     assert symbolic_house["sign"] == dice_sun["sign"] == "Aries"
@@ -964,7 +964,7 @@ def test_calculate_sanshiunited_analysis_returns_local_aggregation() -> None:
     assert result["qimen"]["ju_number"] == 6
     assert result["taiyi"]["core_board"]["main_calculation"] == "陽遁五十七局"
     # 贵人乘午，实际落地盘丑，应按地盘位置顺布。
-    assert result["liureng"]["patterns"][0]["name"] == "贵人顺行格"
+    assert result["liuren"]["patterns"][0]["name"] == "贵人顺行格"
     assert "subresults" in result
     assert "qimen" in result["subresults"]
     assert result["qimen"]["zhifu"]["star"] == "天任"
@@ -996,8 +996,8 @@ def test_calculate_sanshiunited_analysis_respects_liureng_overrides() -> None:
         liureng_is_diurnal=False,
     )
 
-    assert result["liureng"]["month_general"]["branch"] == "申"
-    assert result["liureng"]["meta"]["is_diurnal"] is False
+    assert result["liuren"]["month_general"]["branch"] == "申"
+    assert result["liuren"]["meta"]["is_diurnal"] is False
 
 
 def test_calculate_sanshiunited_qimen_options_preserve_default_taiyi() -> None:
@@ -1049,8 +1049,8 @@ def test_calculate_sanshiunited_analysis_supports_true_solar_time() -> None:
         != true_solar_result["analysis_context"]["input_datetime"]
     )
     assert (
-        true_solar_result["subresults"]["liureng_gods"]["four_pillars"]["hour"]
-        != default_result["subresults"]["liureng_gods"]["four_pillars"]["hour"]
+        true_solar_result["subresults"]["liuren"]["four_pillars"]["hour"]
+        != default_result["subresults"]["liuren"]["four_pillars"]["hour"]
     )
 
 
@@ -1121,7 +1121,7 @@ def test_local_offline_golden_samples_match_current_contract() -> None:
                 "big_pattern": None,
                 "small_pattern": None,
             },
-            "liureng": {
+            "liuren": {
                 "month_general": {"branch": "申", "name": "传送"},
                 "is_diurnal": False,
             },

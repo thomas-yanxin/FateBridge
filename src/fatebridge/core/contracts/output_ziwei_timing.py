@@ -133,7 +133,6 @@ class ZiweiHoroscopeNatalPrerequisites(PartialOutput):
     ming_gong: ZiweiPosition | None = None
     shen_gong: ZiweiPosition | None = None
     wuxing_ju: WuxingJu | None = None
-    rule_trace: list[ZiweiRuleTrace] | None = None
 
 
 class ZiweiHoroscope(PartialOutput):

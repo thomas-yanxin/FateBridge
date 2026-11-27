@@ -480,8 +480,6 @@ class GuolaoResearch(PartialOutput):
     conditions: GuolaoConditions | None = None
     profile: GuolaoProfile | None = None
     mansion_boundaries: list[GuolaoBoundary] | None = None
-    rulesets: list[GuolaoRuleset] | None = None
-    rule_trace: list[GuolaoRuleTrace] | None = None
     validation: GuolaoValidation | None = None
     god_positions: GuolaoGodPositions | None = None
     purple_model_audit: GuolaoPurpleModelAudit | None = None

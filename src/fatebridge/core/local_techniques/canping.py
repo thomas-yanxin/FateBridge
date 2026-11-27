@@ -164,8 +164,11 @@ def build_canping_result(
             dayun=periods, mingGong=None, qiyunAge=None, dayunPolicy=dayun_method
         )
     result["timing"] = timing
-    analysis_context = _build_metaphysics_analysis_context(seed)
-    analysis_context["longitude"] = parsed_longitude
+    analysis_context = {
+        **input_normalized,
+        **_build_metaphysics_analysis_context(seed),
+        "longitude": parsed_longitude,
+    }
     clock = numerology_birth_clock(
         seed,
         parsed_longitude,
@@ -179,20 +182,12 @@ def build_canping_result(
         timing["first_row"] = dict(result["dayun"][0])
         timing["first_period"] = None
     evidence = canping_evidence(result)
-    evidence["rule_trace"].append(
-        {
-            "rule_id": POLICY_ID,
-            "source_section": "卷七附法、子平十年背景与日期映射",
-            "fact_path": "canping_timing.schedule_basis",
-        }
-    )
     attach_birth_clock(evidence, clock)
     attach_pillar_links(evidence, pillar_links)
     four_pillars = create_pillar_dict(seed.pillars)
 
     return {
         "analysis_type": "邵子参评数 / 金锁银匙",
-        "input_normalized": input_normalized,
         "analysis_context": analysis_context,
         "four_pillars": four_pillars,
         "element": result["element"],

@@ -96,11 +96,6 @@ def calculate_meihua_cast(
             },
         )
     )
-    cast["evidence_scope"]["implemented"][0] = cast["seed"]["casting_method"]
-    if season_month_branch is None:
-        cast["evidence_scope"]["implemented"].remove("season")
-        cast["evidence_scope"]["missing_context"] = ["season_month_branch"]
-
     interpretation = build_meihua_interpretation(
         cast,
         interpretation_topic=interpretation_topic,
@@ -109,15 +104,12 @@ def calculate_meihua_cast(
     if interpretation_topic == "weather":
         interpretation["casting_readings"] = None
         interpretation["casting_comparison"] = None
-        cast["evidence_scope"]["implemented"].append("selected_weather_clauses")
     elif interpretation_topic == "general":
         interpretation.update(build_general_casting_readings(cast, season_month_branch))
         if interpretation["casting_readings"]:
             interpretation["comprehensive_judgement"] = general_casting_summary(
                 interpretation["casting_readings"]
             )
-    else:
-        cast["evidence_scope"]["implemented"].append("selected_topic_clauses")
 
     if cast["seed"].get("count_boundary_status") == "convention_changes_result":
         interpretation["status"] = "conditional_on_declared_convention"
@@ -142,13 +134,13 @@ def calculate_meihua_cast(
         cast,
         interpretation,
         observer_activity=options.observer_activity,
-        observer_fact_path="input_normalized.observer_activity",
+        observer_fact_path="analysis_context.observer_activity",
     )
     apply_observation_context(
         cast,
         interpretation,
         normalized_observation,
-        context_fact_path="input_normalized.observation_context",
+        context_fact_path="analysis_context.observation_context",
     )
     apply_day_qi(
         cast,
@@ -158,7 +150,7 @@ def calculate_meihua_cast(
             if normalized_day_qi is not None
             else None
         ),
-        declared_fact_path="input_normalized.day_qi_context.day_branch",
+        declared_fact_path="analysis_context.day_qi_context.day_branch",
     )
     normalized_response = (
         options.response_context.model_dump(mode="json")
@@ -169,7 +161,7 @@ def calculate_meihua_cast(
         cast,
         interpretation,
         normalized_response,
-        context_fact_path="input_normalized.response_context",
+        context_fact_path="analysis_context.response_context",
     )
     normalized_reputation = (
         options.reputation_context.model_dump(mode="json", exclude_none=True)
@@ -180,17 +172,17 @@ def calculate_meihua_cast(
         cast,
         interpretation,
         context=normalized_reputation,
-        context_fact_path="input_normalized.reputation_context",
+        context_fact_path="analysis_context.reputation_context",
     )
     if options.matter_scenario is not None and interpretation_topic != "weather":
         interpretation["stage_emphasis"] = {
             "matter_scenario": options.matter_scenario,
-            "scenario_fact_path": "input_normalized.matter_scenario",
+            "scenario_fact_path": "analysis_context.matter_scenario",
         }
 
     return {
         "analysis_type": "梅花显式起卦",
-        "input_normalized": {
+        "analysis_context": {
             **(
                 {"reputation_context": normalized_reputation}
                 if reputation_context is not None

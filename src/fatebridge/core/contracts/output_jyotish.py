@@ -412,8 +412,6 @@ class JyotishIndia(PartialOutput):
     upagrahas: Object | None = None
     topic_evidence: dict[str, Object] | None = None
     birth_time_sensitivity: Object | None = None
-    rulesets: list[Object] | None = None
-    rule_trace: list[Object] | None = None
     coverage: dict[str, list[str]] | None = None
     interpretation_scope: str | None = None
 

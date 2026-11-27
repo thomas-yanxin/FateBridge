@@ -149,7 +149,7 @@ def test_station_cell_root_is_the_same_on_rest_mcp_cli(surface_calls) -> None:
         analysis_month=1,
         analysis_day=27,
     )
-    fields = ["extrareturns.returns"]
+    fields = ["planetary_returns.returns"]
     http, protocol, code, cli = surface_calls(
         spec,
         inputs,
@@ -169,7 +169,9 @@ def test_station_cell_root_is_the_same_on_rest_mcp_cli(surface_calls) -> None:
     assert business(values[0]) == business(values[1]) == business(values[2])
     for value in values:
         row = next(
-            row for row in value["extrareturns"]["returns"] if row["body"] == "Jupiter"
+            row
+            for row in value["planetary_returns"]["returns"]
+            if row["body"] == "Jupiter"
         )
         recent = datetime.fromisoformat(row["most_recent_return"]["datetime_utc"])
         assert abs((recent - INDEPENDENT_RECENT).total_seconds()) <= 30

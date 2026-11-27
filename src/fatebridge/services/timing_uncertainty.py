@@ -176,7 +176,7 @@ def analyze_birth_time_range(
             ends.setdefault(period_key, []).append(
                 datetime.fromisoformat(period["end_at"]).astimezone(timezone.utc)
             )
-        info = result.get("dayun_info", {})
+        info = result.get("dayun", {})
         state: DayunStatus = result.get("status", "active")
         current_key = (direction, state, info.get("period"), info.get("pillar"))
         current.setdefault(
@@ -258,7 +258,7 @@ def analyze_birth_time_range(
     ]
     affected = []
     if len(candidates) > 1:
-        affected.append("birth_pillars")
+        affected.append("four_pillars")
     if len(directions) > 1:
         affected.append("dayun_direction")
     if len(current) > 1:

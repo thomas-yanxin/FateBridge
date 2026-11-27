@@ -133,11 +133,10 @@ def test_exact_pole_keeps_computable_sky_and_declares_meridian_convention(
     plain = build_otherbu_result(**FACES)
     for key in [
         "symbolic_details",
-        "rule_trace",
-        "rulesets",
-        "diceChart",
+        "dice_chart",
     ]:
         assert result[key] == plain[key]
+    assert "rule_trace" not in result and "rulesets" not in result
 
 
 @pytest.mark.parametrize("latitude", [-90, 90])

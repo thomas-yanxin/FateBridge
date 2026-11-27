@@ -139,24 +139,26 @@ def build_sanshiunited_result(
         liureng,
         taiyi_mode=taiyi["calendar_summary"]["calculation_mode"],
     )
-    analysis_context = _build_metaphysics_analysis_context(base_seed)
+    analysis_context = {
+        **input_normalized,
+        **_build_metaphysics_analysis_context(base_seed),
+    }
     four_pillars = create_pillar_dict(base_seed.pillars)
 
     # Compact subresults without 41 KB calendar_context / analysis_context 3x duplication.
     subresults = {
         "qimen": {"analysis_type": "奇门遁甲", "four_pillars": four_pillars},
         "taiyi": {"analysis_type": "太乙神数", "four_pillars": four_pillars},
-        "liureng_gods": {"analysis_type": "大六壬起课", "four_pillars": four_pillars},
+        "liuren": {"analysis_type": "大六壬起课", "four_pillars": four_pillars},
     }
 
     return {
         "analysis_type": "三式合一",
         "analysis_context": analysis_context,
         "four_pillars": four_pillars,
-        "input_normalized": input_normalized,
         "qimen": qimen,
         "taiyi": taiyi,
-        "liureng": liureng,
+        "liuren": liureng,
         "subresults": subresults,
         "synthesis": {
             "method": "sanshi_correspondence_v2",
@@ -164,7 +166,7 @@ def build_sanshiunited_result(
             "time_scopes": {
                 "taiyi": taiyi["ruleset"]["time_granularity"],
                 "qimen": "casting_time",
-                "liureng": "casting_time",
+                "liuren": "casting_time",
             },
             "common_input": {
                 "date": input_normalized["date"],
@@ -183,8 +185,8 @@ def build_sanshiunited_result(
                     "value": qimen["ju_text"],
                 },
                 {
-                    "technique": "liureng",
-                    "field": "liureng.patterns",
+                    "technique": "liuren",
+                    "field": "liuren.patterns",
                     "value": liureng.get("patterns", []),
                 },
             ],

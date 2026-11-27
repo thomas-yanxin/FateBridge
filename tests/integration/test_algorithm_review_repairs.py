@@ -233,4 +233,4 @@ def test_missing_required_timing_layer_fails_on_every_transport(
     local = json.loads(capsys.readouterr().out)
     assert http.status_code == 503 and protocol.is_error
     for result in [http.json(), protocol.structured_content, local]:
-        assert "error" in result and "liushi_info" not in result
+        assert "error" in result and "liushi" not in result

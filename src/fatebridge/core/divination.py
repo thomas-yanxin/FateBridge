@@ -382,9 +382,6 @@ def build_meihua_interpretation(
             "moving_yaoci_rendering": moving_line_oracle["classical_yaoci_rendering"],
             "selection_policy": "actual_moving_line_reference_only",
         },
-        "evidence_scope": {
-            "traditional_rules": "meihua.ruleset",
-        },
         "comprehensive_judgement": comprehensive,
     }
 

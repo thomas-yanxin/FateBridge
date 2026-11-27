@@ -111,7 +111,7 @@ def calculate_horary(
                 "analysis_context": context,
                 "calendar_conversion": calendar_conversion,
                 "clock_conversion": clock_conversion,
-                "horary": payload,
+                "horary_chart": payload,
                 "summary": summary,
             }
     except Exception as exc:

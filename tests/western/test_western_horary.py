@@ -96,7 +96,7 @@ def test_house_by_category_covers_allowed_consultation_topics() -> None:
 def test_horary_querent_is_ascendant_ruler_and_quesited_house_matches_topic() -> None:
     result = calculate_horary(**QUESTION, category="marriage")
     assert "error" not in result, result
-    payload = result["horary"]
+    payload = result["horary_chart"]
     asc_sign = payload["ascendant"]["sign"]
     assert payload["significators"]["querent"]["planet"] == RULER_BY_SIGN[asc_sign]
     assert payload["quesited_house"] == HOUSE_BY_CATEGORY["marriage"] == 7
@@ -107,14 +107,14 @@ def test_horary_querent_is_ascendant_ruler_and_quesited_house_matches_topic() ->
 def test_horary_unknown_category_is_rejected() -> None:
     result = calculate_horary(**QUESTION, category="not_a_topic")
     assert result["error_code"] == "validation_error"
-    assert "horary" not in result
+    assert "horary_chart" not in result
 
 
 def test_horary_envelope_has_moon_block() -> None:
     result = calculate_horary(**QUESTION, category="career")
-    assert "void_of_course" in result["horary"]["moon"]
+    assert "void_of_course" in result["horary_chart"]["moon"]
     assert result["analysis_context"]["house_system"]
-    assert "verdict" not in result["horary"] and "reasoning" not in result["horary"]
+    assert "verdict" not in result["horary_chart"] and "reasoning" not in result["horary_chart"]
 
 
 def test_horary_saturn_station_identity_and_event_order_reach_three_surfaces(
@@ -123,8 +123,8 @@ def test_horary_saturn_station_identity_and_event_order_reach_three_surfaces(
     # JPL Horizons target 6 (system barycenter), IAU2006/2000A true ecliptic.
     reference_tt = 2459875.672683134
     fields = [
-        "horary.perfection.event_history",
-        "horary.perfection.lilly_conditions.event_paths",
+        "horary_chart.perfection.event_history",
+        "horary_chart.perfection.lilly_conditions.event_paths",
     ]
     response, protocol, code, cli = surface_calls(
         SPECS["horary_chart"],
@@ -148,7 +148,7 @@ def test_horary_saturn_station_identity_and_event_order_reach_three_surfaces(
     assert not protocol.is_error and code == 0
     result = response.json()
     assert business(result) == business(protocol.structured_content) == business(cli)
-    perfection = result["horary"]["perfection"]
+    perfection = result["horary_chart"]["perfection"]
     history = perfection["event_history"]
     assert history["status"] == "computed"
     assert "Saturn" in history["ephemeris_reference_points"]["system_barycenters"]

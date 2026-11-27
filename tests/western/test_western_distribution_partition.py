@@ -115,7 +115,7 @@ def test_correct_bound_sequence_reaches_rest_mcp_cli(
         time_key=time_key,
         max_age_years=90,
     )
-    fields = ["distributions", "natal_reference.ascendant.absolute_degree"]
+    fields = ["bounds_directions", "natal_reference.ascendant.absolute_degree"]
     query = [("fields", field) for field in fields] + [("detail", "audit")]
     http, protocol, code, cli = surface_calls(
         spec,
@@ -133,7 +133,7 @@ def test_correct_bound_sequence_reaches_rest_mcp_cli(
     assert business(values[0]) == business(values[1]) == business(values[2])
     for value in values:
         aries = [
-            row for row in value["distributions"]["periods"] if row["sign"] == "Aries"
+            row for row in value["bounds_directions"]["periods"] if row["sign"] == "Aries"
         ]
         assert [row["distributor"] for row in aries] == [
             "Jupiter",
@@ -142,7 +142,7 @@ def test_correct_bound_sequence_reaches_rest_mcp_cli(
             "Mars",
             "Saturn",
         ]
-        rate = value["distributions"]["rate_deg_per_year"]
+        rate = value["bounds_directions"]["rate_deg_per_year"]
         assert aries[3]["start_age_years"] == round(
             (20 - value["natal_reference"]["ascendant"]["absolute_degree"]) / rate, 3
         )

@@ -255,9 +255,9 @@ def test_child_limit_countdown_and_pre_dayun_xiaoyun() -> None:
         analysis_day=15,
         analysis_hour=12,
     )
-    assert timing_res["dayun_analysis"]["status"] == "before_dayun"
-    assert timing_res["dayun_analysis"]["xiaoyun"]["pillar"] == "己巳"
-    assert timing_res["dayun_analysis"]["child_limit"]["start_day_ganzhi"] == "丙午"
+    assert timing_res["dayun"]["status"] == "before_dayun"
+    assert timing_res["dayun"]["xiaoyun"]["pillar"] == "己巳"
+    assert timing_res["dayun"]["child_limit"]["start_day_ganzhi"] == "丙午"
 
 
 def test_active_structure_strength_diaohou_and_month_duty() -> None:

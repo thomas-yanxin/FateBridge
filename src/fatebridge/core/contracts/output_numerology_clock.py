@@ -350,7 +350,6 @@ class NumerologyPillarLinks(PartialOutput):
 
 
 class NumerologyEvidence(PartialOutput):
-    rulesets: list[NumerologyRuleset] | None = None
     corpus_status: str | None = None
     najia_collation: HeluoNajiaCollation | None = None
     yaoci_collation: dict[str, JsonValue] | None = None
@@ -360,6 +359,5 @@ class NumerologyEvidence(PartialOutput):
     interpretation_constraints: list[str] | None = None
     unresolved_rules: list[str] | None = None
     selected_texts: list[dict[str, JsonValue]] | None = None
-    rule_trace: list[NumerologyRuleTrace] | None = None
     birth_clock: NumerologyBirthClock | None = None
     pillar_links: NumerologyPillarLinks | None = None

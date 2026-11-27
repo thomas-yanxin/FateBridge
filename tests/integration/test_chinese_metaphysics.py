@@ -106,13 +106,13 @@ def test_calculate_liureng_gods_returns_core_sections() -> None:
     )
 
     assert result["analysis_type"] == "大六壬起课"
-    assert result["liureng"]["engine"] == "fatebridge-offline"
-    assert result["liureng"]["month_general"]["branch"] == "戌"
-    assert result["liureng"]["month_general"]["branch"]
-    assert len(result["liureng"]["four_lessons"]) == 4
-    assert result["liureng"]["three_transmissions"]["initial"]["branch"]
-    assert result["liureng"]["overview"]
-    assert "空" in result["liureng"]["kongwang"]
+    assert result["liuren"]["engine"] == "fatebridge-offline"
+    assert result["liuren"]["month_general"]["branch"] == "戌"
+    assert result["liuren"]["month_general"]["branch"]
+    assert len(result["liuren"]["four_lessons"]) == 4
+    assert result["liuren"]["three_transmissions"]["initial"]["branch"]
+    assert result["liuren"]["overview"]
+    assert "空" in result["liuren"]["kongwang"]
 
 
 def test_calculate_liureng_runyear_uses_birth_context() -> None:
@@ -140,11 +140,11 @@ def test_calculate_liureng_runyear_uses_birth_context() -> None:
     )
 
     assert result["analysis_type"] == "大六壬行年"
-    assert result["liureng"]["engine"] == "fatebridge-offline"
+    assert result["liuren"]["engine"] == "fatebridge-offline"
     assert result["runyear"]["engine"] == "fatebridge-offline"
     assert result["runyear"]["age"] > 0
     assert len(result["runyear"]["ganzhi"]) == 2
-    assert result["liureng"]["three_transmissions"]["initial"]["branch"]
+    assert result["liuren"]["three_transmissions"]["initial"]["branch"]
 
 
 def test_liureng_runyear_independent_of_birth_pillars(
@@ -199,10 +199,10 @@ def test_calculate_liureng_gods_distinguishes_liuhe_style() -> None:
         analysis_longitude=121.4667,
         gender="男",
     )
-    first = result["liureng"]["four_lessons"][0]
+    first = result["liuren"]["four_lessons"][0]
     assert first["relations"]["with_lower_branch"] == "六合"
     assert first["style_hint"] == "六合"
-    assert result["liureng"]["board_style"] == "涉害"
+    assert result["liuren"]["board_style"] == "涉害"
 
 
 def test_calculate_liureng_gods_uses_zeike_transmission_rule() -> None:
@@ -217,8 +217,8 @@ def test_calculate_liureng_gods_uses_zeike_transmission_rule() -> None:
         analysis_longitude=121.4667,
         gender="男",
     )
-    transmissions = result["liureng"]["three_transmissions"]
-    assert result["liureng"]["board_style"] == "涉害"
+    transmissions = result["liuren"]["three_transmissions"]
+    assert result["liuren"]["board_style"] == "涉害"
     assert [transmissions[k]["branch"] for k in ("initial", "middle", "final")] == [
         "未",
         "子",
@@ -240,8 +240,8 @@ def test_calculate_liureng_gods_uses_fanyin_transmission_rule() -> None:
         gender="男",
     )
 
-    transmissions = result["liureng"]["three_transmissions"]
-    assert result["liureng"]["board_style"] == "返吟"
+    transmissions = result["liuren"]["three_transmissions"]
+    assert result["liuren"]["board_style"] == "返吟"
     assert transmissions["method"] == "返吟贼克"
     # 阴日 (乙)：初=支上 (亥的上神=sky[亥]=巳)；中=初之冲=亥；末=sky[中]=巳。
     assert transmissions["initial"]["branch"] == "巳"
@@ -262,8 +262,8 @@ def test_calculate_liureng_gods_uses_fuyin_transmission_rule() -> None:
         analysis_longitude=121.4737,
         gender="男",
     )
-    transmissions = result["liureng"]["three_transmissions"]
-    assert result["liureng"]["board_style"] == "伏吟"
+    transmissions = result["liuren"]["three_transmissions"]
+    assert result["liuren"]["board_style"] == "伏吟"
     assert transmissions["method"] == "伏吟循刑"
     assert [transmissions[k]["branch"] for k in ("initial", "middle", "final")] == [
         "辰",
@@ -286,9 +286,9 @@ def test_calculate_liureng_gods_prefers_zeike_over_yaoke() -> None:
         gender="男",
     )
 
-    assert result["liureng"]["board_style"] == "重审"
-    assert result["liureng"]["board_style_detail"] == "重审"
-    assert result["liureng"]["meta"]["selected_lesson_index"] == 4
+    assert result["liuren"]["board_style"] == "重审"
+    assert result["liuren"]["board_style_detail"] == "重审"
+    assert result["liuren"]["meta"]["selected_lesson_index"] == 4
 
 
 def test_calculate_liureng_gods_bazhuan_day_still_prefers_direct_clash() -> None:
@@ -303,8 +303,8 @@ def test_calculate_liureng_gods_bazhuan_day_still_prefers_direct_clash() -> None
         analysis_longitude=121.4737,
         gender="男",
     )
-    assert result["liureng"]["board_style_detail"] == "元首"
-    assert result["liureng"]["meta"]["selected_lesson_relation"] == "上克下"
+    assert result["liuren"]["board_style_detail"] == "元首"
+    assert result["liuren"]["meta"]["selected_lesson_relation"] == "上克下"
 
 
 def test_calculate_liureng_gods_remote_clash_precedes_bieze() -> None:
@@ -317,10 +317,10 @@ def test_calculate_liureng_gods_remote_clash_precedes_bieze() -> None:
         analysis_longitude=121.4737,
         gender="男",
     )
-    assert result["liureng"]["board_style"] == "遥克"
-    assert result["liureng"]["board_style_detail"] == "弹射"
+    assert result["liuren"]["board_style"] == "遥克"
+    assert result["liuren"]["board_style_detail"] == "弹射"
     assert [
-        result["liureng"]["three_transmissions"][k]["branch"]
+        result["liuren"]["three_transmissions"][k]["branch"]
         for k in ("initial", "middle", "final")
     ] == ["申", "辰", "子"]
 
@@ -339,9 +339,9 @@ def test_calculate_liureng_gods_marks_zhongshen_detail() -> None:
         gender="男",
     )
 
-    assert result["liureng"]["board_style_detail"] == "重审"
-    assert result["liureng"]["meta"]["selected_lesson_relation"] == "下贼上"
-    assert any(pattern["name"] == "重审课" for pattern in result["liureng"]["patterns"])
+    assert result["liuren"]["board_style_detail"] == "重审"
+    assert result["liuren"]["meta"]["selected_lesson_relation"] == "下贼上"
+    assert any(pattern["name"] == "重审课" for pattern in result["liuren"]["patterns"])
 
 
 def test_calculate_liureng_gods_first_lesson_uses_stem_element() -> None:
@@ -356,9 +356,9 @@ def test_calculate_liureng_gods_first_lesson_uses_stem_element() -> None:
         gender="男",
     )
 
-    assert result["liureng"]["board_style_detail"] == "重审"
-    assert result["liureng"]["meta"]["selected_lesson_relation"] == "下贼上"
-    assert any(pattern["name"] == "重审课" for pattern in result["liureng"]["patterns"])
+    assert result["liuren"]["board_style_detail"] == "重审"
+    assert result["liuren"]["meta"]["selected_lesson_relation"] == "下贼上"
+    assert any(pattern["name"] == "重审课" for pattern in result["liuren"]["patterns"])
 
 
 def test_calculate_qimen_analysis_returns_nine_palaces() -> None:
@@ -505,7 +505,7 @@ def test_calculate_jinkou_analysis_returns_four_positions() -> None:
     )
 
     assert result["analysis_type"] == "金口诀"
-    assert "liureng" not in result
+    assert "liuren" not in result and "liureng" not in result
     assert result["jinkou"]["engine"] == "fatebridge-offline"
     assert result["jinkou"]["overview"]["di_fen"] == "酉"
     assert result["jinkou"]["overview"]["month_general"]["branch"] == "戌"
@@ -539,7 +539,7 @@ def test_calculate_jinkou_analysis_does_not_borrow_liureng_transmission_rule() -
         di_fen="巳",
     )
 
-    assert "liureng" not in result
+    assert "liuren" not in result and "liureng" not in result
     assert result["jinkou"]["overview"]["board_style_detail"] == "三阴一阳"
     # 丙子日巳时巳位：癸 / 天空戌 / 大吉丑 / 巳，唯一阳位是贵神。
     assert result["jinkou"]["overview"]["use_position"] == "贵神"

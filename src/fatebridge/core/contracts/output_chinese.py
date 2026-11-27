@@ -31,7 +31,6 @@ from fatebridge.core.contracts.output_chinese_calendar import (
     SolarTerm,
 )
 from fatebridge.core.contracts.output_divination import (
-    ClassicalTextEvidence,
     LiuyaoEvidence,
 )
 from fatebridge.core.contracts.output_heluo_jiehou import HeluoJiehouEvidence
@@ -131,7 +130,7 @@ CHINESE_FIELDS: dict[str, Any] = {
     "ziwei_horoscope": ZiweiHoroscope,
     "focused_rules": ZiweiFocusedRules,
     "rule_catalogue": ZiweiRuleCatalogue,
-    "liureng": Liuren,
+    "liuren": Liuren,
     "runyear": Runyear,
     "qimen": Qimen,
     "taiyi": Taiyi,
@@ -154,7 +153,6 @@ CHINESE_TOOL_FIELDS: dict[str, dict[str, Any]] = {
         "lines": list[SixyaoLine],
         "moving_lines": list[int],
         "liuyao_evidence": LiuyaoEvidence,
-        "classical_text_evidence": ClassicalTextEvidence,
     },
     "gua_lookup": {
         "queries": list[str],
@@ -180,6 +178,6 @@ CHINESE_TOOL_FIELDS: dict[str, dict[str, Any]] = {
     "suzhan": {"chart": LocalChart},
     "interpret_astrology_dice": {
         "chart": LocalChartBundle,
-        "diceChart": LocalChartBundle,
+        "dice_chart": LocalChartBundle,
     },
 }

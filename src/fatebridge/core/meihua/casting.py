@@ -319,15 +319,8 @@ def clock_input_receipt(
 def apply_clock_input_notice(
     interpretation: dict[str, Any], clock: CivilClockEvidence
 ) -> None:
-    """Attach clock_input binding path to interpretation.evidence_scope."""
+    """Attach clock_input binding notice when optional clock components are omitted."""
     receipt = clock["input_components"]
-    interpretation["evidence_scope"]["clock_input"] = {
-        "path": "meihua.calendar_policy.civil_clock_resolution.input_components",
-        "status": receipt["status"],
-        "calendar_basis": "nominal_reference_only",
-        "observed_precision_certified": False,
-        "calendar_stability": "not_assessed",
-    }
     if receipt["omitted_components"]:
         for key in ("comprehensive_judgement", "traditional_judgement"):
             if interpretation.get(key):

@@ -137,7 +137,6 @@ class RenRuleset(PartialOutput):
     source_kind: str | None = None
     classical_conformance: str | None = None
     classical_acceptance_passed: bool | None = None
-    conventions: dict[str, str] | None = None
     unresolved: list[str] | None = None
 
 
@@ -270,7 +269,6 @@ class Liuren(PartialOutput):
     xun_head: str | None = None
     guiren_order: str | None = None
     ruleset: RenRuleset | None = None
-    rule_trace: list[RenRuleTrace] | None = None
     classification: LiurenClassification | None = None
     calendar_policy: RenCalendarPolicy | None = None
 

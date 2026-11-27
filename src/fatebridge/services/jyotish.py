@@ -34,7 +34,7 @@ from fatebridge.utils.timezones import (
 
 def compact_vedic_chart(result: dict[str, Any]) -> dict[str, Any]:
     """Return a clean <10 KB structured compact view of a Vedic chart."""
-    india = result.get("india", result)
+    india = result.get("vedic_chart", result)
     charts_compact = {}
     for name, ch in india.get("charts", {}).items():
         charts_compact[name] = {
@@ -227,7 +227,7 @@ def calculate_vedic_chart(
             "birth_latitude": birth.latitude,
             "birth_place": birth.birth_place,
         },
-        "india": india,
+        "vedic_chart": india,
         "summary": (
             f"印占本命（{ayanamsa}）：上升{asc['sign_zh']}，月宿{india['moon_nakshatra']}；已计算{', '.join(india['charts'])}。"
         ),

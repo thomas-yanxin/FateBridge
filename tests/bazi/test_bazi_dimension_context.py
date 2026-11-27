@@ -29,7 +29,7 @@ def test_dayun_analysis_exposes_precise_start_age_and_direction() -> None:
         use_true_solar_time=True,
     )
     result = calculate_dayun_analysis(person, analysis_age=30)
-    info = result["dayun_info"]
+    info = result["dayun"]
     assert info["start_age"] == 8
     assert info["start_age_precise"] is not None
     # 7 < precise < 8 for this chart (roughly 7.25). Use a loose window to stay

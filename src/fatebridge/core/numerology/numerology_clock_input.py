@@ -56,17 +56,10 @@ def require_clock_input_binding(
             raise ValueError("Clock provenance differs from request")
         if any(type(v) is not int for v in receipt["calculation_defaults"].values()):
             raise ValueError("Defaults must be integer reference components")
-        if result["input_normalized"]["time"] != expected["normalized_clock"]:
+        if result["analysis_context"]["time"] != expected["normalized_clock"]:
             raise ValueError("Normalized calculation clock differs from input")
         civil = datetime.fromisoformat(clock["civil_datetime"])
         if civil.time() != time.fromisoformat(expected["normalized_clock"]):
             raise ValueError("Civil clock differs from supplied calculation reference")
-        traces = [
-            r["facts"]
-            for r in evidence["rule_trace"]
-            if r.get("rule_id") == CLOCK_POLICY_ID
-        ]
-        if len(traces) != 1 or traces[0] != clock:
-            raise ValueError("Clock trace differs from output")
     except (KeyError, TypeError, ValueError, AttributeError) as exc:
         raise NumerologySourceError("runtime_numerology_clock_input_conflict") from exc

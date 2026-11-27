@@ -6,6 +6,28 @@ from fatebridge.application.examples import compact_fields
 from fatebridge.application.projection import project_fields, project_present_fields
 from fatebridge.application.tool_spec import DetailLevel, ToolSpec
 
+_BLOAT_KEYS = frozenset(
+    {
+        "rule_trace",
+        "source_citations",
+        "source_catalog",
+        "conventions",
+    }
+)
+
+
+def _strip_audit_bloat(value: JsonValue) -> JsonValue:
+    if isinstance(value, dict):
+        return {
+            key: _strip_audit_bloat(item)
+            for key, item in value.items()
+            if key not in _BLOAT_KEYS
+        }
+    if isinstance(value, list):
+        return [_strip_audit_bloat(item) for item in value]
+    return value
+
+
 COMPACT_RUN_METADATA_FIELDS = frozenset(
     {
         "run_id",
@@ -59,4 +81,8 @@ def deliver_response(
                     if name in COMPACT_RUN_METADATA_FIELDS
                 },
             }
+    if spec is None or not spec.name.startswith("fengshui_"):
+        stripped = _strip_audit_bloat(payload)
+        assert isinstance(stripped, dict)
+        return stripped
     return payload

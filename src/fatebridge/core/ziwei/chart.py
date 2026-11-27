@@ -371,60 +371,6 @@ def build_ziwei_chart(
             year_branch=year_branch,
             school=resolved_school,
         ),
-        "rule_trace": [
-            {
-                "rule_id": "lunar_month_for_placement",
-                "source": leap_policy,
-                "inputs": {
-                    "month": state.lunar_month,
-                    "day": lunar_day,
-                    "is_leap_month": state.is_leap_month,
-                },
-                "outputs": {"effective_month": lunar_month},
-            },
-            {
-                "rule_id": "ming_shen_month_hour",
-                "source": f"astro_type={resolved_astro}",
-                "inputs": {"effective_month": lunar_month, "hour_branch": hour_branch},
-                "outputs": {"ming_branch": ming_branch, "shen_branch": shen_branch},
-            },
-            {
-                "rule_id": "wuhu_dun_nayin_ju",
-                "source": "五虎遁与命宫纳音",
-                "inputs": {
-                    "lunar_year": state.lunar_year,
-                    "year_stem": year_stem,
-                    "ming_ganzhi": ming_palace["ganzhi"],
-                },
-                "outputs": {
-                    "nayin": wuxing_ju["nayin"],
-                    "ju_number": wuxing_ju["number"],
-                },
-            },
-            {
-                "rule_id": "ziwei_tianfu_placement",
-                "source": "五行局生日安紫微天府",
-                "inputs": {"lunar_day": lunar_day, "ju_number": start_age},
-                "outputs": {
-                    "ziwei_branch": star_placement.ziwei_branch,
-                    "tianfu_branch": star_placement.tianfu_branch,
-                },
-            },
-            {
-                "rule_id": "daxian_direction",
-                "source": resolved_profile,
-                "inputs": {"year_stem": year_stem, "gender": canonical_gender},
-                "outputs": {
-                    "direction": daxian_direction_label,
-                    "initial_palace_name": (
-                        next(p["name"] for p in palaces if p["daxian_period"] == 1)
-                        if is_gender_known
-                        else None
-                    ),
-                    "first_age_given_bureau": start_age,
-                },
-            },
-        ],
         "year_stem": year_stem,
         "lunar_date": {
             "year": state.lunar_year,

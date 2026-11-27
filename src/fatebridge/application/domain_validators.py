@@ -179,7 +179,7 @@ def validate_astro_chart_variant(
 def resolve_bazi_analysis_time_defaults(
     result: ServiceResult, current: list[str]
 ) -> list[str]:
-    reference = result.get("analysis_reference")
+    reference = result.get("analysis_context")
     if isinstance(reference, dict):
         return list(reference["defaulted_from_clock"])
     return current

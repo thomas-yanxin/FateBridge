@@ -128,7 +128,6 @@ class TaiyiDeterminate(PartialOutput):
     count: int | None = None
     general: int | None = None
     vice_general: int | None = None
-    trace: TaiyiDeterminateTrace | None = None
     rotation: TaiyiDeterminateRotation | None = None
     source: str | None = None
     scope: str | None = None

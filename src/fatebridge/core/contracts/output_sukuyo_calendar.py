@@ -242,7 +242,6 @@ class SukuyoCalendar(PartialOutput):
     leap_month_policy: str | None = None
     source_table_variant: SukuyoMonthTableVariant | None = None
     printed_edition_reference: dict[str, OpenJsonValue] | None = None
-    rule_trace: list[dict[str, OpenJsonValue]] | None = None
     date_support: SukuyoDateSupport | None = None
     calendar_candidates: list[dict[str, OpenJsonValue]] | None = None
     out_of_range_calendar_dates: list[str] | None = None

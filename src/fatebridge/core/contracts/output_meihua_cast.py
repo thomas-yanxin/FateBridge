@@ -10,7 +10,7 @@ from fatebridge.core.receipt_models import RunMetadata
 class MeihuaCastOutput(ProjectedOutput):
     run_metadata: RunMetadata | None = None
     analysis_type: str | None = None
-    input_normalized: dict[str, JsonValue] | None = None
+    analysis_context: dict[str, JsonValue] | None = None
     meihua: Meihua | None = None
     interpretation: dict[str, JsonValue] | None = None
     summary: str | None = None

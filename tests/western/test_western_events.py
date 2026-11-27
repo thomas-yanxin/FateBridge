@@ -98,7 +98,7 @@ def test_mundane_casts_ingress_chart() -> None:
         timezone_name="Asia/Shanghai",
     )
     assert "error" not in result, result
-    payload = result["mundane"]
+    payload = result["mundane_ingress_chart"]
     assert payload["ingress_datetime_utc"].startswith("2026-03-20")
     assert payload["ascendant"]["sign"]
 
@@ -110,7 +110,10 @@ def test_mundane_keeps_the_ingress_when_local_clock_is_undefined() -> None:
     local = calculate_mundane(**inputs, timezone_name="Antarctica/Vostok")
     utc = calculate_mundane(**inputs, timezone_name="UTC")
     assert local["analysis_context"]["ingress_datetime_local"] is None
-    assert local["mundane"] == {**utc["mundane"], "ingress_datetime_local": None}
+    assert local["mundane_ingress_chart"] == {
+        **utc["mundane_ingress_chart"],
+        "ingress_datetime_local": None,
+    }
     assert "UTC（当地钟时未定义）" in local["summary"]
 
 
@@ -141,7 +144,7 @@ def test_mundane_cast_consumes_the_solved_source_tt(
     assert "error" not in result
     assert len(epochs) == 1
     assert epochs[0].time.tt == resolved.tt
-    assert result["mundane"]["ingress_datetime_utc"] == (
+    assert result["mundane_ingress_chart"]["ingress_datetime_utc"] == (
         resolved.utc_datetime.isoformat()
     )
 
@@ -156,7 +159,7 @@ def test_mundane_delivers_one_utc_label_for_the_solved_epoch() -> None:
         house_system="W",
     )
     assert "error" not in result, result
-    mundane = result["mundane"]
+    mundane = result["mundane_ingress_chart"]
     context = result["analysis_context"]
     utc_label = mundane["calculation_basis"]["utc_representation"]["utc_label"]
     assert context["ingress_datetime_utc"] == utc_label
@@ -171,7 +174,7 @@ def test_extrareturns_reports_recent_and_next_for_each_body() -> None:
         **BIRTH, analysis_year=2025, analysis_month=1, analysis_day=1
     )
     assert "error" not in result, result
-    returns = result["extrareturns"]["returns"]
+    returns = result["planetary_returns"]["returns"]
     bodies = {item["body"] for item in returns}
     assert bodies == {
         "Saturn",
@@ -220,7 +223,9 @@ def test_extrareturns_preserves_utc_when_local_time_is_undefined() -> None:
         analysis_day=30,
     )
     jupiter = next(
-        item for item in result["extrareturns"]["returns"] if item["body"] == "Jupiter"
+        item
+        for item in result["planetary_returns"]["returns"]
+        if item["body"] == "Jupiter"
     )
     assert jupiter["next_return"]["datetime_local"] is None
     assert jupiter["next_return"]["datetime_utc"].startswith("1994-06-27T")
@@ -243,12 +248,12 @@ def test_cardinal_ingress_cast_is_on_the_entered_side_of_each_sign_boundary() ->
             timezone_name="Asia/Shanghai",
         )
         assert "error" not in result
-        sun = result["mundane"]["points"]["sun"]
+        sun = result["mundane_ingress_chart"]["points"]["sun"]
         assert sun["sign"] == sign
         assert 0 <= (sun["longitude"] - target) % 360 < 1e-6
         assert 0 <= sun["absolute_degree"] < 360
         assert 0 <= sun["degree"] < 30
         assert (
-            result["mundane"]["calculation_basis"]["julian_day_tt"]
-            > result["mundane"]["calculation_basis"]["julian_day_ut1"]
+            result["mundane_ingress_chart"]["calculation_basis"]["julian_day_tt"]
+            > result["mundane_ingress_chart"]["calculation_basis"]["julian_day_ut1"]
         )

@@ -551,16 +551,6 @@ def enrich_qimen_evidence(
         },
         "lodging": {"id": board.get("lodging_policy", "kun2")},
     }
-    board["rulesets"] = [
-        {
-            "id": RULESET_ID,
-            "version": "3.0.0",
-            "title": "时家奇门（转盘/飞盘、置闰/拆补/茅山、寄宫可选）",
-            "classical_author": "明·程道生等",
-            "classical_conformance": "implemented",
-            "ju_method": board["ju_method"],
-        }
-    ]
     board["calendar_policy"] = {
         "timezone": seed.timezone,
         "timezone_rules": timezone_rules_metadata(seed.timezone),
@@ -574,37 +564,6 @@ def enrich_qimen_evidence(
             "resolution_provider", "unknown"
         ),
     }
-    board["rule_trace"] = [
-        {
-            "rule_id": "ju_resolution",
-            "inputs": {
-                "day_ganzhi": board["day_ganzhi"],
-                "ju_method": board["ju_method"],
-            },
-            "outputs": {
-                "ju_term": board["ju_term"],
-                "dun_type": board["dun_type"],
-                "ju_number": board["ju_number"],
-                "yuan": board["yuan"],
-            },
-        },
-        {
-            "rule_id": "leaders",
-            "inputs": {"time_ganzhi": board["time_ganzhi"], "layout": board["layout"]},
-            "outputs": {
-                "zhifu_star": board["zhifu"]["star"],
-                "zhifu_palace": board["zhifu"]["palace"],
-                "zhishi_door": board["zhishi"]["door"],
-                "zhishi_palace": board["zhishi"]["palace"],
-                "horse_star": horse,
-            },
-        },
-        {
-            "rule_id": "structure",
-            "inputs": {"month_branch": month_branch, "kongwang": board["kongwang"]},
-            "outputs": board["structure"],
-        },
-    ]
     board["assessment"] = {
         "calculation_scope": f"time_qimen_{board['layout']}_{board['ju_method']}",
         "classical_conformance": "implemented",

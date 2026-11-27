@@ -46,7 +46,7 @@ def calculate_liunian_analysis(
 
     return {
         "analysis_type": "流年专项分析",
-        "personal_info": {
+        "person_info": {
             "name": person.name,
             "target_year": analysis_year,
             "birth_datetime": format_clock_datetime(
@@ -59,7 +59,7 @@ def calculate_liunian_analysis(
             "time_adjustment": normalized_birth_time.as_dict(),
         },
         "calendar_context": birth_context.birth_calendar_context,
-        "liunian_info": liunian_info,
+        "liunian": liunian_info,
         "element_effects": serialize_element_effects(element_effects),
     }
 
@@ -141,7 +141,7 @@ def calculate_liuyue_analysis(
 
     return {
         "analysis_type": "流月专项分析",
-        "personal_info": {
+        "person_info": {
             "name": person.name,
             "analysis_date": analysis_date.strftime("%Y-%m-%d"),
             "analysis_datetime": analysis_date.strftime("%Y-%m-%d %H:%M"),
@@ -156,7 +156,7 @@ def calculate_liuyue_analysis(
         },
         "calendar_context": birth_context.birth_calendar_context,
         "analysis_calendar": {"analysis_date_context": analysis_calendar_context},
-        "liuyue_info": {
+        "liuyue": {
             "pillar": liuyue_info["pillar"],
             "stem": liuyue_info["stem"],
             "branch": liuyue_info["branch"],
@@ -171,9 +171,9 @@ def calculate_liuyue_analysis(
             "shensha": detailed_analysis["shensha"],
         },
         "element_effects": serialize_element_effects(element_effects),
-        "combination_effects": liuyue_result.get("combination_effects", {}),
-        "liunian_info": liunian_info,
-        "analysis_reference": resolution.reference,
+        "combined_effects": liuyue_result.get("combination_effects", {}),
+        "liunian": liunian_info,
+        "analysis_context": resolution.reference,
     }
 
 
@@ -226,7 +226,7 @@ def calculate_liuri_analysis(
 
     return {
         "analysis_type": "流日专项分析",
-        "personal_info": {
+        "person_info": {
             "name": person.name,
             "birth_datetime": format_clock_datetime(
                 normalized_birth_time.input_datetime,
@@ -241,7 +241,7 @@ def calculate_liuri_analysis(
         },
         "calendar_context": birth_context.birth_calendar_context,
         "analysis_calendar": {"analysis_date_context": analysis_calendar_context},
-        "liuri_info": {
+        "liuri": {
             "pillar": liuri_info["pillar"],
             "stem": liuri_info["stem"],
             "branch": liuri_info["branch"],
@@ -258,7 +258,7 @@ def calculate_liuri_analysis(
             "shensha": detailed["shensha"],
         },
         "element_effects": serialize_element_effects(liuri_result["element_effects"]),
-        "analysis_reference": resolution.reference,
+        "analysis_context": resolution.reference,
     }
 
 
@@ -311,7 +311,7 @@ def calculate_liushi_analysis(
 
     return {
         "analysis_type": "流时专项分析",
-        "personal_info": {
+        "person_info": {
             "name": person.name,
             "birth_datetime": format_clock_datetime(
                 normalized_birth_time.input_datetime,
@@ -325,7 +325,7 @@ def calculate_liushi_analysis(
         },
         "calendar_context": birth_context.birth_calendar_context,
         "analysis_calendar": {"analysis_date_context": analysis_calendar_context},
-        "liushi_info": {
+        "liushi": {
             "pillar": liushi_info["pillar"],
             "stem": liushi_info["stem"],
             "branch": liushi_info["branch"],
@@ -341,5 +341,5 @@ def calculate_liushi_analysis(
             "shensha": detailed_analysis["shensha"],
         },
         "element_effects": serialize_element_effects(liushi_result["element_effects"]),
-        "analysis_reference": resolution.reference,
+        "analysis_context": resolution.reference,
     }

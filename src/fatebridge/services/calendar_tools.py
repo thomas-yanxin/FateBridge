@@ -47,7 +47,7 @@ def calculate_jieqi_year(
     )
     result: dict[str, Any] = {
         "analysis_type": "全年节气盘",
-        "query_context": {
+        "analysis_context": {
             "year": normalized_year,
             "timezone": timezone_name,
             "latitude": parsed_latitude,
@@ -148,7 +148,7 @@ def calculate_nongli_time(
 
     result: dict[str, Any] = {
         "analysis_type": "农历换算",
-        "input_context": {
+        "analysis_context": {
             "date": date,
             "time": time,
             "timezone": timezone_name,
@@ -157,28 +157,33 @@ def calculate_nongli_time(
             "gender": gender,
             "time_alg": time_alg,
             "ad": ad,
-        },
-        "analysis_context": {
             "input_datetime": input_datetime.isoformat(sep=" "),
             "corrected_datetime": clock.isoformat(sep=" "),
             "effective_datetime": clock.isoformat(sep=" "),
             "time_algorithm": time_algorithm_label,
-            "longitude": effective_longitude,
             "total_correction_minutes": round(total_correction_minutes, 2),
         },
-        "birth": calendar_context["solar_datetime"],
+        "person_info": {
+            "gender": gender,
+            "birth_datetime": input_datetime.isoformat(sep=" "),
+            "normalized_birth_datetime": clock.isoformat(sep=" "),
+            "birth_timezone": timezone_name,
+            "birth_longitude": effective_longitude,
+            "birth_latitude": parsed_latitude,
+            "time_algorithm": time_algorithm_label,
+        },
         "nongli": nongli_display,
-        "yearGanZi": year_ganzhi,
-        "yearJieqi": lunar_calendar.get("year_jieqi_ganzhi", year_ganzhi),
-        "monthGanZi": lunar_calendar.get("month_ganzhi", month_ganzhi),
-        "dayGanZi": lunar_calendar.get("day_ganzhi", day_ganzhi),
-        "timeGanZi": lunar_calendar.get("time_ganzhi", time_ganzhi),
+        "year_ganzhi": year_ganzhi,
+        "year_jieqi": lunar_calendar.get("year_jieqi_ganzhi", year_ganzhi),
+        "month_ganzhi": lunar_calendar.get("month_ganzhi", month_ganzhi),
+        "day_ganzhi": lunar_calendar.get("day_ganzhi", day_ganzhi),
+        "time_ganzhi": lunar_calendar.get("time_ganzhi", time_ganzhi),
         "jieqi": lunar_calendar.get("jieqi"),
         "jiedelta": lunar_calendar.get("jiedelta"),
         "month": lunar_calendar.get("month_cn"),
         "day": lunar_calendar.get("day_cn"),
-        "monthInt": lunar_calendar.get("month"),
-        "dayInt": lunar_calendar.get("day"),
+        "month_int": lunar_calendar.get("month"),
+        "day_int": lunar_calendar.get("day"),
         "leap": lunar_calendar.get("is_leap_month", False),
         "calendar_context": calendar_context,
         "lunar_calendar": lunar_calendar,

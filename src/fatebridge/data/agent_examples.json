@@ -606,60 +606,60 @@
       "rule_trace"
     ],
     "solar_terms_for_year": [
-      "query_context",
+      "analysis_context",
       "jieqi_year",
       "selected_jieqi",
       "summary",
       "warnings"
     ],
     "solar_term_timeline": [
-      "personal_info.name",
-      "personal_info.target_year",
-      "personal_info.birth_datetime",
-      "personal_info.normalized_birth_datetime",
+      "person_info.name",
+      "person_info.target_year",
+      "person_info.birth_datetime",
+      "person_info.normalized_birth_datetime",
       "calendar_context.timezone",
       "jieqi_timeline"
     ],
     "liuren_chart": [
       "analysis_context",
       "four_pillars",
-      "liureng.month_general",
-      "liureng.four_lessons",
-      "liureng.three_transmissions",
-      "liureng.classification",
-      "liureng.kongwang",
-      "liureng.xun_head",
-      "liureng.guiren_order",
-      "liureng.meta.guiren_profile",
-      "liureng.meta.is_diurnal",
-      "liureng.meta.diurnal_basis",
-      "liureng.calendar_policy.mode",
-      "liureng.calendar_policy.precision_status",
-      "liureng.ruleset.id",
-      "liureng.ruleset.version",
-      "liureng.ruleset.source_title",
-      "liureng.ruleset.classical_conformance"
+      "liuren.month_general",
+      "liuren.four_lessons",
+      "liuren.three_transmissions",
+      "liuren.classification",
+      "liuren.kongwang",
+      "liuren.xun_head",
+      "liuren.guiren_order",
+      "liuren.meta.guiren_profile",
+      "liuren.meta.is_diurnal",
+      "liuren.meta.diurnal_basis",
+      "liuren.calendar_policy.mode",
+      "liuren.calendar_policy.precision_status",
+      "liuren.ruleset.id",
+      "liuren.ruleset.version",
+      "liuren.ruleset.source_title",
+      "liuren.ruleset.classical_conformance"
     ],
     "liuren_yearly_timing": [
       "analysis_context",
       "four_pillars",
       "runyear",
-      "liureng.month_general",
-      "liureng.four_lessons",
-      "liureng.three_transmissions",
-      "liureng.classification",
-      "liureng.kongwang",
-      "liureng.xun_head",
-      "liureng.guiren_order",
-      "liureng.meta.guiren_profile",
-      "liureng.meta.is_diurnal",
-      "liureng.meta.diurnal_basis",
-      "liureng.calendar_policy.mode",
-      "liureng.calendar_policy.precision_status",
-      "liureng.ruleset.id",
-      "liureng.ruleset.version",
-      "liureng.ruleset.source_title",
-      "liureng.ruleset.classical_conformance"
+      "liuren.month_general",
+      "liuren.four_lessons",
+      "liuren.three_transmissions",
+      "liuren.classification",
+      "liuren.kongwang",
+      "liuren.xun_head",
+      "liuren.guiren_order",
+      "liuren.meta.guiren_profile",
+      "liuren.meta.is_diurnal",
+      "liuren.meta.diurnal_basis",
+      "liuren.calendar_policy.mode",
+      "liuren.calendar_policy.precision_status",
+      "liuren.ruleset.id",
+      "liuren.ruleset.version",
+      "liuren.ruleset.source_title",
+      "liuren.ruleset.classical_conformance"
     ],
     "jinkou": [
       "analysis_context",
@@ -699,58 +699,56 @@
       "cross_shensha"
     ],
     "bazi_luck_cycles": [
-      "personal_info",
-      "dayun_info",
+      "person_info",
+      "dayun",
       "element_effects",
-      "analysis_reference"
+      "analysis_context"
     ],
     "bazi_yearly_timing": [
-      "personal_info",
-      "liunian_info",
+      "person_info",
+      "liunian",
       "element_effects"
     ],
     "bazi_monthly_timing": [
-      "personal_info",
-      "liuyue_info.pillar",
-      "liuyue_info.stem",
-      "liuyue_info.branch",
-      "liuyue_info.element",
-      "liuyue_info.nayin",
+      "person_info",
+      "liuyue.pillar",
+      "liuyue.stem",
+      "liuyue.branch",
+      "liuyue.element",
+      "liuyue.nayin",
       "detailed_analysis",
       "element_effects",
-      "combination_effects",
-      "liunian_info",
-      "analysis_reference"
+      "combined_effects",
+      "liunian",
+      "analysis_context"
     ],
     "bazi_daily_timing": [
-      "personal_info",
-      "liuri_info",
+      "person_info",
+      "liuri",
       "element_effects",
-      "analysis_reference"
+      "analysis_context"
     ],
     "bazi_hourly_timing": [
-      "personal_info",
-      "liushi_info",
+      "person_info",
+      "liushi",
       "detailed_analysis",
       "element_effects",
-      "analysis_reference"
+      "analysis_context"
     ],
     "lunar_calendar_time": [
-      "input_context",
       "analysis_context",
-      "birth",
+      "person_info",
       "nongli",
       "four_pillars",
-      "yearJieqi",
+      "year_jieqi",
       "jieqi",
       "jiedelta",
-      "monthInt",
-      "dayInt",
+      "month_int",
+      "day_int",
       "leap",
       "summary"
     ],
     "canping": [
-      "input_normalized",
       "analysis_context",
       "four_pillars",
       "element",
@@ -758,12 +756,10 @@
       "canping_timing.profile_id",
       "canping_timing.start_at",
       "canping_timing.selected",
-      "numerology_evidence.rulesets",
       "numerology_evidence.selected_texts",
       "summary"
     ],
     "heluo": [
-      "input_normalized",
       "analysis_context",
       "four_pillars",
       "chart",
@@ -780,7 +776,7 @@
       "summary"
     ],
     "suzhan": [
-      "input_normalized",
+      "analysis_context",
       "sukuyo.personal_day",
       "sukuyo.day_mansion",
       "sukuyo.weekday",
@@ -800,17 +796,13 @@
       "person1_to_person2",
       "person2_to_person1",
       "pair",
-      "candidate_relation_analysis",
-      "rulesets.calendar",
-      "rulesets.relations",
-      "interpretation_contract"
+      "candidate_relation_analysis"
     ],
     "interpret_astrology_dice": [
       "method_id",
       "planet",
       "sign",
       "house",
-      "rulesets",
       "validation",
       "symbolic_details.sign_condition",
       "symbolic_details.house_condition",
@@ -819,7 +811,7 @@
       "summary"
     ],
     "meihua_cast": [
-      "input_normalized",
+      "analysis_context",
       "meihua.method",
       "meihua.seed",
       "meihua.counting_variants",
@@ -835,7 +827,6 @@
       "meihua.ruleset.version",
       "meihua.calendar_policy",
       "interpretation.classical_text_reference",
-      "interpretation.evidence_scope",
       "interpretation.interpretation_topic",
       "interpretation.topic_reading.clause_id",
       "interpretation.topic_reading.reading",
@@ -887,7 +878,6 @@
       "guolao.conditions",
       "guolao.moon_mansion",
       "guolao.planetary_mansions",
-      "guolao.rulesets",
       "guolao.validation",
       "guolao.body_palace",
       "guolao.hua_yao.by_transformation",
@@ -896,19 +886,19 @@
     ],
     "vedic_chart": [
       "person_info",
-      "india.ayanamsa",
-      "india.ayanamsha",
-      "india.moon_nakshatra",
-      "india.rising_nakshatra",
-      "india.panchanga",
-      "india.charts.D1",
-      "india.bhava_chalit.shifted_planets",
-      "india.strengths.shadbala_assessment.total_rupa",
-      "india.strengths.shadbala_assessment.is_strong",
-      "india.yogas.yogas",
-      "india.chara_karakas",
-      "india.arudha_padas",
-      "india.upagrahas",
+      "vedic_chart.ayanamsa",
+      "vedic_chart.ayanamsha",
+      "vedic_chart.moon_nakshatra",
+      "vedic_chart.rising_nakshatra",
+      "vedic_chart.panchanga",
+      "vedic_chart.charts.D1",
+      "vedic_chart.bhava_chalit.shifted_planets",
+      "vedic_chart.strengths.shadbala_assessment.total_rupa",
+      "vedic_chart.strengths.shadbala_assessment.is_strong",
+      "vedic_chart.yogas.yogas",
+      "vedic_chart.chara_karakas",
+      "vedic_chart.arudha_padas",
+      "vedic_chart.upagrahas",
       "summary"
     ],
     "vimshottari_dasha": [
@@ -1034,14 +1024,14 @@
     ],
     "lunar_phase_progressions": [
       "analysis_context",
-      "lunation_phase.system",
-      "lunation_phase.natal_elongation_degree",
-      "lunation_phase.natal_phase",
-      "lunation_phase.natal_phase_label",
-      "lunation_phase.progression_options",
-      "lunation_phase.max_age_years",
-      "lunation_phase.age_basis",
-      "lunation_phase.solver",
+      "lunar_phase_progressions.system",
+      "lunar_phase_progressions.natal_elongation_degree",
+      "lunar_phase_progressions.natal_phase",
+      "lunar_phase_progressions.natal_phase_label",
+      "lunar_phase_progressions.progression_options",
+      "lunar_phase_progressions.max_age_years",
+      "lunar_phase_progressions.age_basis",
+      "lunar_phase_progressions.solver",
       "summary"
     ],
     "balbillus_periods": [
@@ -1056,18 +1046,18 @@
     ],
     "numeric_aspect_periods": [
       "analysis_context",
-      "keypoints.system",
-      "keypoints.release_mode",
-      "keypoints.release_sign_index",
-      "keypoints.positions",
+      "numeric_aspect_periods.system",
+      "numeric_aspect_periods.release_mode",
+      "numeric_aspect_periods.release_sign_index",
+      "numeric_aspect_periods.positions",
       "summary"
     ],
     "persian_directions": [
       "analysis_context",
-      "persian_directed.system",
-      "persian_directed.rate_deg_per_year",
-      "persian_directed.max_age_years",
-      "persian_directed.hit_count",
+      "persian_directions.system",
+      "persian_directions.rate_deg_per_year",
+      "persian_directions.max_age_years",
+      "persian_directions.hit_count",
       "summary"
     ],
     "age_point": [
@@ -1081,24 +1071,24 @@
     ],
     "mundane_ingress_chart": [
       "analysis_context",
-      "mundane.system",
-      "mundane.ingress_term",
-      "mundane.ingress_datetime_utc",
-      "mundane.ingress_datetime_local",
-      "mundane.ascendant",
-      "mundane.medium_coeli",
-      "mundane.points",
-      "mundane.calculation_basis.ephemeris_model",
+      "mundane_ingress_chart.system",
+      "mundane_ingress_chart.ingress_term",
+      "mundane_ingress_chart.ingress_datetime_utc",
+      "mundane_ingress_chart.ingress_datetime_local",
+      "mundane_ingress_chart.ascendant",
+      "mundane_ingress_chart.medium_coeli",
+      "mundane_ingress_chart.points",
+      "mundane_ingress_chart.calculation_basis.ephemeris_model",
       "summary"
     ],
     "horary_chart": [
       "analysis_context",
-      "horary.calculation_basis.ephemeris_model",
-      "horary.ascendant",
-      "horary.quesited_house",
-      "horary.significators.querent",
-      "horary.significators.quesited",
-      "horary.perfection.status",
+      "horary_chart.calculation_basis.ephemeris_model",
+      "horary_chart.ascendant",
+      "horary_chart.quesited_house",
+      "horary_chart.significators.querent",
+      "horary_chart.significators.quesited",
+      "horary_chart.perfection.status",
       "summary"
     ],
     "evaluate_election_time": [
@@ -1143,7 +1133,7 @@
       "coverage"
     ],
     "liuyao": [
-      "input_normalized",
+      "analysis_context",
       "nongli",
       "current_code",
       "changed_code",
@@ -1156,9 +1146,6 @@
       "hexagram_info",
       "liuyao_evidence.ruleset_id",
       "liuyao_evidence.ruleset_version",
-      "liuyao_evidence.calendar_conventions",
-      "liuyao_evidence.sources",
-      "classical_text_evidence",
       "summary",
       "hexagram_info.gua_shen",
       "liuyao_evidence.moving_focus_guidance",
@@ -1172,7 +1159,7 @@
     ],
     "combine_four_gua": [
       "analysis_type",
-      "input_normalized",
+      "analysis_context",
       "tongshefa",
       "summary"
     ],
@@ -1200,29 +1187,29 @@
     ],
     "triplicity_ruler_periods": [
       "analysis_context",
-      "triplicity_rulers.system",
-      "triplicity_rulers.division",
-      "triplicity_rulers.element",
-      "triplicity_rulers.sect",
-      "triplicity_rulers.stages",
+      "triplicity_ruler_periods.system",
+      "triplicity_ruler_periods.division",
+      "triplicity_ruler_periods.element",
+      "triplicity_ruler_periods.sect",
+      "triplicity_ruler_periods.stages",
       "summary"
     ],
     "bounds_directions": [
       "analysis_context",
-      "distributions.system",
-      "distributions.direction_model",
-      "distributions.time_key",
-      "distributions.max_age_years",
-      "distributions.periods",
+      "bounds_directions.system",
+      "bounds_directions.direction_model",
+      "bounds_directions.time_key",
+      "bounds_directions.max_age_years",
+      "bounds_directions.periods",
       "summary"
     ],
     "planetary_periods_129_years": [
       "analysis_context",
-      "yearsystem129.system",
-      "yearsystem129.start_planet",
-      "yearsystem129.max_age_years",
-      "yearsystem129.total_cycle_years",
-      "yearsystem129.periods",
+      "planetary_periods_129_years.system",
+      "planetary_periods_129_years.start_planet",
+      "planetary_periods_129_years.max_age_years",
+      "planetary_periods_129_years.total_cycle_years",
+      "planetary_periods_129_years.periods",
       "summary"
     ],
     "planetary_arc_directions": [
@@ -1236,23 +1223,23 @@
     ],
     "sidereal_progressions": [
       "analysis_context",
-      "vedic_progression.system",
-      "vedic_progression.progressed_datetime",
-      "vedic_progression.zodiac",
-      "vedic_progression.hits",
+      "sidereal_progressions.system",
+      "sidereal_progressions.progressed_datetime",
+      "sidereal_progressions.zodiac",
+      "sidereal_progressions.hits",
       "summary"
     ],
     "declination_progressions": [
       "analysis_context",
-      "jaynes_declination.system",
-      "jaynes_declination.progressed_datetime",
-      "jaynes_declination.orb",
-      "jaynes_declination.parallels",
+      "declination_progressions.system",
+      "declination_progressions.progressed_datetime",
+      "declination_progressions.orb",
+      "declination_progressions.parallels",
       "summary"
     ],
     "planetary_returns": [
       "analysis_context",
-      "extrareturns",
+      "planetary_returns",
       "summary"
     ],
     "ipip_big_five": [
@@ -1290,7 +1277,6 @@
       "analysis_context",
       "taiyi.core_board",
       "taiyi.calendar_summary",
-      "taiyi.rule_trace",
       "taiyi.pattern_summary",
       "taiyi.palace_marks",
       "taiyi.center_marks",
@@ -1313,14 +1299,14 @@
       "qimen.rule_profiles.god.title",
       "qimen.rule_profiles.season.id",
       "qimen.rule_profiles.season.title",
-      "liureng.month_general",
-      "liureng.three_transmissions",
-      "liureng.patterns",
-      "liureng.ruleset.id",
-      "liureng.ruleset.version",
-      "liureng.ruleset.source_title",
-      "liureng.ruleset.classical_conformance",
-      "liureng.ruleset.classical_acceptance_passed",
+      "liuren.month_general",
+      "liuren.three_transmissions",
+      "liuren.patterns",
+      "liuren.ruleset.id",
+      "liuren.ruleset.version",
+      "liuren.ruleset.source_title",
+      "liuren.ruleset.classical_conformance",
+      "liuren.ruleset.classical_acceptance_passed",
       "synthesis.time_scopes"
     ],
     "bazi_overview": [
@@ -1364,23 +1350,23 @@
       "career_analysis.timing_context"
     ],
     "bazi_timing": [
-      "personal_info.analysis_datetime",
-      "birth_pillars",
-      "dayun_analysis.current_dayun",
-      "dayun_analysis.start_at",
-      "dayun_analysis.end_at",
-      "dayun_analysis.selection_basis",
-      "liunian_analysis.pillar",
-      "liuyue_analysis.pillar",
-      "liuri_analysis.pillar",
-      "liushi_analysis.pillar",
+      "person_info.analysis_datetime",
+      "four_pillars",
+      "dayun.current_dayun",
+      "dayun.start_at",
+      "dayun.end_at",
+      "dayun.selection_basis",
+      "liunian.pillar",
+      "liuyue.pillar",
+      "liuri.pillar",
+      "liushi.pillar",
       "analysis_calendar.analysis_date_context.timezone",
       "analysis_calendar.analysis_date_context.current_solar_term.name",
       "analysis_calendar.analysis_date_context.current_solar_term.datetime_with_offset",
       "analysis_calendar.analysis_date_context.next_solar_term.name",
       "analysis_calendar.analysis_date_context.next_solar_term.datetime_with_offset",
       "analysis_calendar.analysis_date_context.bazi_month_boundary.branch",
-      "dayun_analysis.child_limit"
+      "dayun.child_limit"
     ],
     "ziwei_birth_chart": [
       "analysis_context",
@@ -1579,14 +1565,14 @@
     ],
     "compare_bazi_sources": [
       "four_pillars",
-      "input_context",
+      "analysis_context",
       "current_calculation.strength_level",
       "source_comparison"
     ]
   },
   "suggested_fields": {
     "heluo": [
-      "input_normalized",
+      "analysis_context",
       "four_pillars",
       "chart",
       "solar_term",
@@ -1594,7 +1580,7 @@
       "numerology_evidence"
     ],
     "canping": [
-      "input_normalized",
+      "analysis_context",
       "four_pillars",
       "element",
       "benming",
@@ -1606,7 +1592,6 @@
       "analysis_context",
       "taiyi.core_board",
       "taiyi.calendar_summary",
-      "taiyi.rule_trace",
       "taiyi.pattern_summary",
       "taiyi.palace_marks",
       "taiyi.center_marks",
@@ -1629,14 +1614,14 @@
       "qimen.rule_profiles.god.title",
       "qimen.rule_profiles.season.id",
       "qimen.rule_profiles.season.title",
-      "liureng.month_general",
-      "liureng.three_transmissions",
-      "liureng.patterns",
-      "liureng.ruleset.id",
-      "liureng.ruleset.version",
-      "liureng.ruleset.source_title",
-      "liureng.ruleset.classical_conformance",
-      "liureng.ruleset.classical_acceptance_passed",
+      "liuren.month_general",
+      "liuren.three_transmissions",
+      "liuren.patterns",
+      "liuren.ruleset.id",
+      "liuren.ruleset.version",
+      "liuren.ruleset.source_title",
+      "liuren.ruleset.classical_conformance",
+      "liuren.ruleset.classical_acceptance_passed",
       "synthesis.time_scopes"
     ],
     "interpret_astrology_dice": [
@@ -1645,8 +1630,6 @@
       "sign",
       "house",
       "symbolic_details",
-      "rulesets",
-      "rule_trace",
       "validation"
     ],
     "bazi_overview": [
@@ -1684,16 +1667,16 @@
       "career_analysis.calendar_context"
     ],
     "bazi_timing": [
-      "personal_info.analysis_datetime",
-      "birth_pillars",
-      "dayun_analysis.current_dayun",
-      "dayun_analysis.start_at",
-      "dayun_analysis.end_at",
-      "dayun_analysis.selection_basis",
-      "liunian_analysis.pillar",
-      "liuyue_analysis.pillar",
-      "liuri_analysis.pillar",
-      "liushi_analysis.pillar",
+      "person_info.analysis_datetime",
+      "four_pillars",
+      "dayun.current_dayun",
+      "dayun.start_at",
+      "dayun.end_at",
+      "dayun.selection_basis",
+      "liunian.pillar",
+      "liuyue.pillar",
+      "liuri.pillar",
+      "liushi.pillar",
       "analysis_calendar.analysis_date_context.timezone",
       "analysis_calendar.analysis_date_context.current_solar_term.name",
       "analysis_calendar.analysis_date_context.current_solar_term.datetime_with_offset",
@@ -1795,7 +1778,7 @@
       "summary"
     ],
     "liuyao": [
-      "input_normalized",
+      "analysis_context",
       "nongli",
       "current_hexagram",
       "changed_hexagram",
@@ -1803,7 +1786,6 @@
       "lines",
       "hexagram_info",
       "liuyao_evidence",
-      "classical_text_evidence",
       "summary"
     ],
     "decennials": [
@@ -1995,19 +1977,18 @@
     ],
     "vedic_chart": [
       "summary",
-      "india.profile",
-      "india.panchanga",
-      "india.charts.D1",
-      "india.nakshatras",
-      "india.bhava_chalit",
-      "india.strengths.shadbala_assessment",
-      "india.strengths.bhava_bala",
-      "india.ashtakavarga",
-      "india.yogas",
-      "india.chara_karakas",
-      "india.arudha_padas",
-      "india.upagrahas",
-      "india.rulesets"
+      "vedic_chart.profile",
+      "vedic_chart.panchanga",
+      "vedic_chart.charts.D1",
+      "vedic_chart.nakshatras",
+      "vedic_chart.bhava_chalit",
+      "vedic_chart.strengths.shadbala_assessment",
+      "vedic_chart.strengths.bhava_bala",
+      "vedic_chart.ashtakavarga",
+      "vedic_chart.yogas",
+      "vedic_chart.chara_karakas",
+      "vedic_chart.arudha_padas",
+      "vedic_chart.upagrahas"
     ],
     "vimshottari_dasha": [
       "analysis_context",
@@ -2044,7 +2025,6 @@
       "guolao.life_palace",
       "guolao.conditions",
       "guolao.bodies",
-      "guolao.rulesets",
       "guolao.validation"
     ],
     "sukuyo_compatibility": [
@@ -2056,13 +2036,10 @@
       "person2_to_person1",
       "pair",
       "candidate_relation_analysis",
-      "rulesets",
-      "interpretation_contract",
       "summary"
     ],
     "suzhan": [
       "sukuyo",
-      "rulesets",
       "validation",
       "summary",
       "sukuyo.lower_methods"
@@ -2070,38 +2047,36 @@
     "liuren_chart": [
       "analysis_context",
       "four_pillars",
-      "liureng.month_general",
-      "liureng.four_lessons",
-      "liureng.three_transmissions",
-      "liureng.life_stages",
-      "liureng.auxiliary_stars",
-      "liureng.month_building_element",
-      "liureng.guiren_order",
-      "liureng.classification",
-      "liureng.meta",
-      "liureng.kongwang",
-      "liureng.xun_head",
-      "liureng.calendar_policy",
-      "liureng.ruleset",
-      "liureng.rule_trace"
+      "liuren.month_general",
+      "liuren.four_lessons",
+      "liuren.three_transmissions",
+      "liuren.life_stages",
+      "liuren.auxiliary_stars",
+      "liuren.month_building_element",
+      "liuren.guiren_order",
+      "liuren.classification",
+      "liuren.meta",
+      "liuren.kongwang",
+      "liuren.xun_head",
+      "liuren.calendar_policy",
+      "liuren.ruleset"
     ],
     "liuren_yearly_timing": [
       "analysis_context",
       "four_pillars",
-      "liureng.month_general",
-      "liureng.four_lessons",
-      "liureng.three_transmissions",
-      "liureng.life_stages",
-      "liureng.auxiliary_stars",
-      "liureng.month_building_element",
-      "liureng.guiren_order",
-      "liureng.classification",
-      "liureng.meta",
-      "liureng.kongwang",
-      "liureng.xun_head",
-      "liureng.calendar_policy",
-      "liureng.ruleset",
-      "liureng.rule_trace",
+      "liuren.month_general",
+      "liuren.four_lessons",
+      "liuren.three_transmissions",
+      "liuren.life_stages",
+      "liuren.auxiliary_stars",
+      "liuren.month_building_element",
+      "liuren.guiren_order",
+      "liuren.classification",
+      "liuren.meta",
+      "liuren.kongwang",
+      "liuren.xun_head",
+      "liuren.calendar_policy",
+      "liuren.ruleset",
       "runyear"
     ],
     "jinkou": [
@@ -2120,7 +2095,6 @@
       "jinkou.relations",
       "jinkou.calendar_policy",
       "jinkou.ruleset",
-      "jinkou.rule_trace",
       "jinkou.natal_course.status",
       "jinkou.natal_course.natal_branch"
     ],
@@ -2168,12 +2142,12 @@
     ],
     "horary_chart": [
       "analysis_context",
-      "horary.ascendant",
-      "horary.quesited_house",
-      "horary.significators.querent",
-      "horary.significators.quesited",
-      "horary.moon.void_of_course",
-      "horary.perfection.status"
+      "horary_chart.ascendant",
+      "horary_chart.quesited_house",
+      "horary_chart.significators.querent",
+      "horary_chart.significators.quesited",
+      "horary_chart.moon.void_of_course",
+      "horary_chart.perfection.status"
     ],
     "evaluate_election_time": [
       "analysis_context",
@@ -2189,7 +2163,7 @@
     ],
     "compare_bazi_sources": [
       "four_pillars",
-      "input_context",
+      "analysis_context",
       "current_calculation.strength_level",
       "source_comparison"
     ]
@@ -2780,15 +2754,12 @@
           "chart.xian",
           "chart.hou",
           "judge.line_conditions",
-          "judge.yuanTang",
-          "numerology_evidence.rule_trace",
-          "numerology_evidence.rulesets"
+          "judge.yuanTang"
         ]
       },
       "birth_clock": {
         "purpose": "核对实际民用／太阳钟面、经度来源及是否使用，不补默认出生地点。",
         "fields": [
-          "input_normalized",
           "analysis_context",
           "four_pillars",
           "numerology_evidence.birth_clock"
@@ -2800,16 +2771,14 @@
           "chart.xian",
           "chart.hou",
           "judge.qi_phases",
-          "solar_term",
-          "numerology_evidence.rule_trace"
+          "solar_term"
         ]
       },
       "body_relations": {
         "purpose": "核对年纳音、实际上下及互体的有向五行关系、无元气前提；完整得体仍未决。",
         "fields": [
           "four_pillars",
-          "judge.deTi",
-          "numerology_evidence.rulesets"
+          "judge.deTi"
         ]
       },
       "body_structure": {
@@ -2817,9 +2786,7 @@
         "fields": [
           "chart.xian",
           "chart.hou",
-          "judge.body_structure",
-          "numerology_evidence.rule_trace",
-          "numerology_evidence.rulesets"
+          "judge.body_structure"
         ]
       },
       "najia": {
@@ -2834,8 +2801,7 @@
         "purpose": "区分卦属本月与原文另述跨月窗口，核对原页、边界月和完整判断尚未完成的范围。",
         "fields": [
           "judge.deTime",
-          "judge.month_affinity",
-          "numerology_evidence.rulesets"
+          "judge.month_affinity"
         ]
       },
       "number_conditions": {
@@ -2843,14 +2809,13 @@
         "fields": [
           "chart.tian",
           "chart.di",
-          "judge.seasonal_numbers",
-          "numerology_evidence.rulesets"
+          "judge.seasonal_numbers"
         ]
       },
       "natal": {
         "purpose": "先后天卦、元堂、实际条文及计算和原典限制。",
         "fields": [
-          "input_normalized",
+          "analysis_context",
           "four_pillars",
           "chart",
           "solar_term",
@@ -2874,12 +2839,11 @@
       "selected_texts": {
         "purpose": "读取本次实际先后天元堂的底本注文、条件段落、异文与独立来源状态；不自动裁定葉否。 同时保留本次归一输入与实际计算钟面，供核验所用资料。 卷三诗诀另列底本、爻组与首数；象曰不借诗诀认证，多首诗按原次序全列。",
         "fields": [
-          "input_normalized",
+          "analysis_context",
           "numerology_evidence.birth_clock",
           "chart.xian",
           "chart.hou",
-          "numerology_evidence.selected_texts",
-          "numerology_evidence.rule_trace"
+          "numerology_evidence.selected_texts"
         ]
       },
       "yuantang": {
@@ -2892,9 +2856,7 @@
           "chart.yangLing",
           "chart.yangLingBasis",
           "chart.yuantang_derivation",
-          "judge.yuanTang",
-          "numerology_evidence.rulesets",
-          "numerology_evidence.rule_trace"
+          "judge.yuanTang"
         ]
       },
       "pillar_links": {
@@ -2902,26 +2864,20 @@
         "fields": [
           "four_pillars",
           "numerology_evidence.pillar_links",
-          "numerology_evidence.birth_clock",
-          "numerology_evidence.rule_trace",
-          "numerology_evidence.rulesets"
+          "numerology_evidence.birth_clock"
         ]
       },
       "clock_basis": {
         "description": "岁运年上下文与卷一百刻／寄时原式；计数可核对，物理钟面与日期桥接仍未完成。",
         "fields": [
-          "heluo_timing.year_context",
-          "numerology_evidence.rule_trace",
-          "numerology_evidence.rulesets"
+          "heluo_timing.year_context"
         ]
       },
       "jiehou": {
         "description": "已算节气标签的四正节卦、原候卦组和未解决的六日重建差异，不自动选实际候卦或化工。",
         "fields": [
           "jiehou_evidence",
-          "solar_term",
-          "numerology_evidence.rulesets",
-          "numerology_evidence.rule_trace"
+          "solar_term"
         ]
       }
     },
@@ -2929,7 +2885,6 @@
       "birth_clock": {
         "purpose": "核对实际民用／太阳钟面、经度来源及是否使用，不补默认出生地点。",
         "fields": [
-          "input_normalized",
           "analysis_context",
           "four_pillars",
           "numerology_evidence.birth_clock"
@@ -2938,7 +2893,7 @@
       "natal": {
         "purpose": "本命取数、实际条文和流派来源。",
         "fields": [
-          "input_normalized",
+          "analysis_context",
           "four_pillars",
           "element",
           "benming",
@@ -2958,13 +2913,12 @@
       "text_selection": {
         "purpose": "核对本命及已查询岁运的实际编号、栏目、缺行／圈空、同号及局部校勘来源。 同时保留本次归一输入与实际计算钟面，供核验所用资料。",
         "fields": [
-          "input_normalized",
+          "analysis_context",
           "numerology_evidence.birth_clock",
           "element",
           "benming",
           "canping_timing.selected",
-          "numerology_evidence.selected_texts",
-          "numerology_evidence.rule_trace"
+          "numerology_evidence.selected_texts"
         ]
       },
       "pillar_links": {
@@ -2972,9 +2926,7 @@
         "fields": [
           "four_pillars",
           "numerology_evidence.pillar_links",
-          "numerology_evidence.birth_clock",
-          "numerology_evidence.rule_trace",
-          "numerology_evidence.rulesets"
+          "numerology_evidence.birth_clock"
         ]
       },
       "calendar_boundaries": {
@@ -2982,14 +2934,13 @@
         "fields": [
           "canping_timing.solar_year_context",
           "canping_timing.selected",
-          "liunian_series.solar_context",
-          "numerology_evidence.rule_trace"
+          "liunian_series.solar_context"
         ]
       },
       "timing_policy": {
         "purpose": "首轮配运取证：同次出生钟面、实际方法、具名原句／现代日期映射、首运及所查询段；全运或121个立春按需另取。first_row保留同次dayun[0]的编号／栏目与条文；旧命宫法first_period仍为null，首行只有年龄标签，不补日期。",
         "fields": [
-          "input_normalized",
+          "analysis_context",
           "four_pillars",
           "element",
           "benming",
@@ -3016,7 +2967,6 @@
           "analysis_context",
           "taiyi.core_board",
           "taiyi.calendar_summary",
-          "taiyi.rule_trace",
           "taiyi.pattern_summary",
           "taiyi.palace_marks",
           "taiyi.center_marks",
@@ -3257,14 +3207,14 @@
           "qimen.rule_profiles.god.title",
           "qimen.rule_profiles.season.id",
           "qimen.rule_profiles.season.title",
-          "liureng.month_general",
-          "liureng.three_transmissions",
-          "liureng.patterns",
-          "liureng.ruleset.id",
-          "liureng.ruleset.version",
-          "liureng.ruleset.source_title",
-          "liureng.ruleset.classical_conformance",
-          "liureng.ruleset.classical_acceptance_passed",
+          "liuren.month_general",
+          "liuren.three_transmissions",
+          "liuren.patterns",
+          "liuren.ruleset.id",
+          "liuren.ruleset.version",
+          "liuren.ruleset.source_title",
+          "liuren.ruleset.classical_conformance",
+          "liuren.ruleset.classical_acceptance_passed",
           "synthesis.noble_source_assessment",
           "synthesis.time_scopes"
         ]
@@ -3275,7 +3225,6 @@
           "analysis_context",
           "taiyi.core_board",
           "taiyi.calendar_rules",
-          "taiyi.rule_trace",
           "taiyi.patterns",
           "taiyi.ruleset",
           "synthesis.time_scopes"
@@ -3285,10 +3234,10 @@
         "purpose": "核对本次实际六壬贵人配置、起贵本位与金镜明钞／四库当时法的同干朝暮读数；本位相符不认证朝暮边界、四维寄支或完整合参断法。",
         "fields": [
           "analysis_context",
-          "subresults.liureng_gods.four_pillars.day",
-          "liureng.meta",
-          "liureng.month_general",
-          "liureng.ruleset",
+          "subresults.liuren.four_pillars.day",
+          "liuren.meta",
+          "liuren.month_general",
+          "liuren.ruleset",
           "synthesis.noble_source_assessment",
           "synthesis.time_scopes"
         ]
@@ -3305,11 +3254,11 @@
           "qimen.rule_profiles.god.title",
           "qimen.rule_profiles.season.id",
           "qimen.rule_profiles.season.title",
-          "liureng.ruleset.id",
-          "liureng.ruleset.version",
-          "liureng.ruleset.source_title",
-          "liureng.ruleset.classical_conformance",
-          "liureng.ruleset.classical_acceptance_passed"
+          "liuren.ruleset.id",
+          "liuren.ruleset.version",
+          "liuren.ruleset.source_title",
+          "liuren.ruleset.classical_conformance",
+          "liuren.ruleset.classical_acceptance_passed"
         ]
       },
       "annual_cycles": {
@@ -3515,16 +3464,16 @@
         "purpose": "探原干加支／支加干的十条生克比和条件，按日干本五行与日支计算；归合、求合缺加临时排除，加临成立但合式未裁时仍未知。附带六壬盘不替代金口诀本课规则，不据课名推断他人意图或现实成败。",
         "fields": [
           "four_pillars",
-          "liureng.day_placement_patterns",
-          "liureng.ruleset"
+          "liuren.day_placement_patterns",
+          "liuren.ruleset"
         ]
       },
       "liuren_cross_harmony": {
         "purpose": "核对干上神与日支、支上神与日干寄宫的两边六合，以及五个干支同宫日的排除条件；按所选原文列实际支位和来源。",
         "fields": [
           "four_pillars",
-          "liureng.cross_harmony",
-          "liureng.ruleset"
+          "liuren.cross_harmony",
+          "liuren.ruleset"
         ]
       }
     },
@@ -3537,8 +3486,6 @@
           "sign",
           "house",
           "symbolic_details",
-          "rulesets",
-          "rule_trace",
           "validation"
         ]
       },
@@ -3549,7 +3496,7 @@
           "planet",
           "sign",
           "house",
-          "input_normalized",
+          "analysis_context",
           "chart",
           "validation"
         ]
@@ -3561,7 +3508,7 @@
           "planet",
           "sign",
           "house",
-          "input_normalized",
+          "analysis_context",
           "validation"
         ]
       }
@@ -3570,50 +3517,50 @@
       "birth_time_sensitivity": {
         "when": "用户确认名义出生参考的正负UTC经过分钟范围时，传birth_time_uncertainty_minutes并读取完整候选与事件未决层；无分钟样本的事件候选不能忽略，计数不是概率，None不是精确生时",
         "fields": [
-          "personal_info.analysis_datetime",
+          "person_info.analysis_datetime",
           "calendar_context.birth_time_input",
-          "dayun_analysis"
+          "dayun"
         ]
       },
       "interactions": {
         "when": "核对原局、大运至流时之间的结构关系；关系成立不代表合化或吉凶，按所问时间层筛选",
         "fields": [
-          "personal_info.analysis_datetime",
-          "dayun_analysis",
-          "liunian_analysis",
-          "liuyue_analysis",
+          "person_info.analysis_datetime",
+          "dayun",
+          "liunian",
+          "liuyue",
           "interaction_analysis"
         ]
       },
       "dayun_timeline": {
         "when": "查看交运边界与十二步大运时间轴；analysis_age仅作显式年龄参考，默认按目标时刻选运",
         "fields": [
-          "personal_info.analysis_datetime",
-          "dayun_analysis"
+          "person_info.analysis_datetime",
+          "dayun"
         ]
       },
       "carriers": {
         "when": "核对大运至流时的同柱干支生克、本柱真实藏根及原局外援；喜支才核盖头、喜干才核截脚压力，不据候选裁定喜忌、合化、救应或吉凶。",
         "fields": [
-          "personal_info.analysis_datetime"
+          "person_info.analysis_datetime"
         ]
       },
       "carriers_detail": {
         "when": "逐项核对本柱藏根和原局外援及原典来源；完整明细若分页，读取同一run，不另算补齐。",
         "fields": [
-          "personal_info.analysis_datetime"
+          "person_info.analysis_datetime"
         ]
       },
       "analysis_clock": {
         "fields": [
-          "analysis_reference"
+          "analysis_context"
         ],
         "when": "核对同次完整分析瞬间、UTC偏移/fold及分析日期的补齐来源；不把默认月初、月中或整点当成当前。"
       },
       "roots": {
         "when": "核对日主在时运支的原典根类、真实藏干及同次冲合刑触点；月令仍属原局，阴长生参考不补根，未见根不直接判弱，关系触点不等于有效损益。",
         "fields": [
-          "personal_info.analysis_datetime",
+          "person_info.analysis_datetime",
           "interaction_analysis.nodes",
           "interaction_analysis.relations"
         ]
@@ -3621,7 +3568,7 @@
       "stem_roots": {
         "when": "核对运干在四个原局支的根类及关系触点；共享根位不能重复相加为预算，不据原局根存在宣称已算行运后旺衰。",
         "fields": [
-          "personal_info.analysis_datetime",
+          "person_info.analysis_datetime",
           "interaction_analysis.nodes",
           "interaction_analysis.relations"
         ]
@@ -3629,7 +3576,7 @@
       "root_effects": {
         "when": "核对时间支冲刑及唯一大运干五合对原局既有预算的限定投影、来源、同次参数与阻塞关系；其它时间粒度的干合未定量，残存原局数值档不能解释为完整行运后旺衰。",
         "fields": [
-          "personal_info.analysis_datetime",
+          "person_info.analysis_datetime",
           "interaction_analysis.nodes",
           "interaction_analysis.relations"
         ]
@@ -3725,7 +3672,6 @@
           "qimen.calendar_policy",
           "qimen.stem_context",
           "qimen.rule_profiles",
-          "qimen.rulesets",
           "qimen.structure",
           "qimen.patterns",
           "qimen.source_disagreements",
@@ -3746,7 +3692,7 @@
       "line_reading": {
         "when": "读取逐爻纳支、世应、原典动爻及月令动静条件；focus_line/focus_kinship为明确取用前提，日级候选不等于事件应期",
         "fields": [
-          "input_normalized",
+          "analysis_context",
           "nongli",
           "current_hexagram",
           "changed_hexagram",
@@ -3754,7 +3700,6 @@
           "lines",
           "hexagram_info",
           "liuyao_evidence",
-          "classical_text_evidence",
           "summary"
         ]
       },
@@ -3768,11 +3713,8 @@
         "when": "无明确用爻时，查六条明爻和实际伏神的原旬旬空与空／不空条件，核对原文疑义及使用范围。保留问事近远、总旺衰未决的条件，不代选用爻。超出响应预算时，按 result_delivery 读取同一 run 的证据。",
         "fields": [
           "current_hexagram",
-          "input_normalized.event_horizon",
-          "lines",
-          "liuyao_evidence.calendar_conventions.month_branch",
-          "liuyao_evidence.calendar_conventions.day_ganzhi",
-          "liuyao_evidence.calendar_conventions.xunkong"
+          "analysis_context.event_horizon",
+          "lines"
         ]
       }
     },
@@ -3954,37 +3896,35 @@
       "natal": {
         "fields": [
           "summary",
-          "india.profile",
-          "india.panchanga",
-          "india.charts.D1",
-          "india.nakshatras",
-          "india.bhava_chalit",
-          "india.strengths.shadbala_assessment",
-          "india.strengths.bhava_bala",
-          "india.ashtakavarga",
-          "india.yogas",
-          "india.chara_karakas",
-          "india.arudha_padas",
-          "india.upagrahas",
-          "india.rulesets"
+          "vedic_chart.profile",
+          "vedic_chart.panchanga",
+          "vedic_chart.charts.D1",
+          "vedic_chart.nakshatras",
+          "vedic_chart.bhava_chalit",
+          "vedic_chart.strengths.shadbala_assessment",
+          "vedic_chart.strengths.bhava_bala",
+          "vedic_chart.ashtakavarga",
+          "vedic_chart.yogas",
+          "vedic_chart.chara_karakas",
+          "vedic_chart.arudha_padas",
+          "vedic_chart.upagrahas"
         ],
         "purpose": "印占全盘（含D1/分盘、Shadbala、Bhava Bala、Yoga、Arudha与八分表）"
       },
       "strength": {
         "fields": [
-          "india.strengths",
-          "india.ashtakavarga",
-          "india.yogas",
-          "india.rulesets"
+          "vedic_chart.strengths",
+          "vedic_chart.ashtakavarga",
+          "vedic_chart.yogas"
         ],
         "purpose": "六力(Shadbala)、宫力(Bhava Bala)与八分表明细"
       },
       "divisions": {
         "fields": [
-          "india.charts",
-          "india.bhava_chalit",
-          "india.arudha_padas",
-          "india.upagrahas"
+          "vedic_chart.charts",
+          "vedic_chart.bhava_chalit",
+          "vedic_chart.arudha_padas",
+          "vedic_chart.upagrahas"
         ],
         "purpose": "分盘、Bhava Chalit 与 Arudha/Upagraha"
       }
@@ -4444,8 +4384,6 @@
         "fields": [
           "guolao.life_palace",
           "guolao.palaces",
-          "guolao.rulesets",
-          "guolao.rule_trace",
           "guolao.god_positions",
           "guolao.validation"
         ],
@@ -4455,7 +4393,6 @@
         "fields": [
           "guolao.bodies",
           "guolao.moira_patterns",
-          "guolao.rule_trace",
           "guolao.validation"
         ],
         "purpose": "核对政余格局的具名条件、参与星体和计算证据"
@@ -4465,8 +4402,6 @@
           "guolao.timing",
           "guolao.life_palace",
           "guolao.palaces",
-          "guolao.rulesets",
-          "guolao.rule_trace",
           "guolao.validation"
         ],
         "purpose": "显式analysis_datetime的小限逆数及当时十一曜研究位置；未给目标则not_requested，不据此生成完整流年或现实事件概率"
@@ -4479,8 +4414,7 @@
           "su27_basis",
           "status",
           "person1",
-          "person2",
-          "rulesets"
+          "person2"
         ]
       },
       "relationship": {
@@ -4494,8 +4428,6 @@
           "person2_to_person1",
           "pair",
           "candidate_relation_analysis",
-          "rulesets",
-          "interpretation_contract",
           "summary"
         ]
       },
@@ -4509,9 +4441,7 @@
           "person1_to_person2",
           "person2_to_person1",
           "pair",
-          "candidate_relation_analysis",
-          "interpretation_contract",
-          "rulesets"
+          "candidate_relation_analysis"
         ]
       },
       "padas": {
@@ -4522,9 +4452,7 @@
           "person2",
           "person1_to_person2",
           "person2_to_person1",
-          "pair",
-          "interpretation_contract",
-          "rulesets"
+          "pair"
         ]
       },
       "date_uncertainty": {
@@ -4537,8 +4465,6 @@
           "person1_to_person2",
           "person2_to_person1",
           "pair",
-          "interpretation_contract",
-          "rulesets",
           "summary"
         ]
       }
@@ -4548,7 +4474,6 @@
         "purpose": "宿占历日宿、七曜与上卷宿性",
         "fields": [
           "sukuyo",
-          "rulesets",
           "validation",
           "summary",
           "sukuyo.taibai_direction_reference"
@@ -4558,8 +4483,7 @@
         "purpose": "核对宿盘及所选天文宿位方法；现代研究宿界与legacy等分示意分开标注",
         "fields": [
           "chart",
-          "params",
-          "rulesets"
+          "params"
         ]
       },
       "astronomy": {
@@ -4567,7 +4491,6 @@
         "fields": [
           "astronomy",
           "params",
-          "rulesets",
           "validation"
         ]
       },
@@ -4582,7 +4505,6 @@
           "sukuyo.lower_mansion_day",
           "sukuyo.conjunction_doctrine",
           "sukuyo.activity_assessment",
-          "rulesets",
           "validation",
           "summary",
           "sukuyo.lower_methods",
@@ -4599,8 +4521,7 @@
         "fields": [
           "sukuyo.calendar",
           "sukuyo.day_mansion",
-          "input_normalized",
-          "rulesets",
+          "analysis_context",
           "validation"
         ]
       },
@@ -4612,8 +4533,7 @@
           "sukuyo.lower_mansion_day",
           "sukuyo.conjunction_doctrine",
           "sukuyo.activity_assessment",
-          "input_normalized",
-          "rulesets",
+          "analysis_context",
           "sukuyo.lower_methods",
           "sukuyo.directional_travel"
         ]
@@ -4624,8 +4544,7 @@
           "sukuyo.calendar",
           "sukuyo.day_mansion",
           "sukuyo.palace_reference",
-          "input_normalized",
-          "rulesets",
+          "analysis_context",
           "validation"
         ]
       },
@@ -4637,8 +4556,7 @@
           "sukuyo.weekday",
           "sukuyo.lower_methods",
           "sukuyo.activity_assessment",
-          "input_normalized",
-          "rulesets",
+          "analysis_context",
           "validation",
           "sukuyo.special_day_evidence"
         ]
@@ -4648,7 +4566,7 @@
         "fields": [
           "sukuyo.calendar",
           "sukuyo.calendar_day",
-          "input_normalized"
+          "analysis_context"
         ]
       },
       "travel_directions": {
@@ -4658,7 +4576,7 @@
           "sukuyo.day_mansion",
           "sukuyo.directional_travel",
           "sukuyo.activity_assessment",
-          "input_normalized"
+          "analysis_context"
         ]
       },
       "special_days": {
@@ -4670,7 +4588,7 @@
           "sukuyo.special_day_labels",
           "sukuyo.special_day_evidence",
           "sukuyo.activity_assessment",
-          "input_normalized"
+          "analysis_context"
         ]
       },
       "source_capture": {
@@ -4678,8 +4596,7 @@
         "fields": [
           "sukuyo.calendar.profile_calculation",
           "sukuyo.calendar.candidate_su27s",
-          "rulesets.calendar",
-          "input_normalized"
+          "analysis_context"
         ]
       },
       "personal_day_witnesses": {
@@ -4687,7 +4604,7 @@
           "sukuyo.calendar",
           "sukuyo.personal_day",
           "sukuyo.activity_assessment",
-          "input_normalized"
+          "analysis_context"
         ],
         "purpose": "本命三九日的卷别、启程与入宅范围；条件未定不代入。"
       },
@@ -4697,7 +4614,7 @@
           "sukuyo.six_palace_reference",
           "sukuyo.personal_day",
           "sukuyo.calendar",
-          "input_normalized"
+          "analysis_context"
         ]
       },
       "clothing": {
@@ -4707,7 +4624,6 @@
           "sukuyo.day_mansion",
           "sukuyo.conjunction_doctrine",
           "sukuyo.palace_reference",
-          "rulesets",
           "sukuyo.calendar_day",
           "sukuyo.weekday",
           "sukuyo.nature",
@@ -4719,7 +4635,7 @@
           "sukuyo.lower_methods",
           "sukuyo.directional_travel",
           "sukuyo.special_day_evidence",
-          "input_normalized",
+          "analysis_context",
           "validation",
           "summary"
         ],
@@ -4728,12 +4644,11 @@
       "calendar_date_only": {
         "when": "钟时未知时读取完整历法、日期／宿候选和事项证据；核对天文与宫位的未计算状态。",
         "fields": [
-          "input_normalized",
+          "analysis_context",
           "params",
           "sukuyo",
           "chart",
           "astronomy",
-          "rulesets",
           "validation",
           "summary"
         ]
@@ -4755,10 +4670,8 @@
           "meihua.calendar_policy",
           "meihua.stage_relations",
           "meihua.seasonal_strength",
-          "meihua.evidence_scope",
           "interpretation.topic_reading",
           "interpretation.classical_text_reference",
-          "interpretation.evidence_scope",
           "summary",
           "interpretation.external_omens"
         ]
@@ -4770,14 +4683,11 @@
           "calendar_context.lunar_calendar",
           "meihua.ruleset",
           "meihua.calendar_policy",
-          "meihua.rule_trace",
           "meihua.stage_relations",
           "meihua.seasonal_strength",
-          "meihua.evidence_scope",
           "interpretation.topic_reading",
           "interpretation.classical_text_reference",
           "interpretation.traditional_stage_readings",
-          "interpretation.evidence_scope",
           "interpretation.external_omens"
         ]
       },
@@ -4789,7 +4699,6 @@
           "meihua.seed",
           "meihua.calendar_policy.solar_term_date_reference",
           "calendar_context.bazi_month_boundary",
-          "interpretation.evidence_scope",
           "summary"
         ]
       },
@@ -4801,8 +4710,6 @@
           "meihua.seed",
           "meihua.calendar_policy.label_precision",
           "meihua.calendar_policy.solar_term_date_reference",
-          "meihua.evidence_scope",
-          "interpretation.evidence_scope",
           "summary"
         ]
       },
@@ -4812,8 +4719,7 @@
         "fields": [
           "analysis_context",
           "meihua",
-          "interpretation.weather",
-          "interpretation.evidence_scope"
+          "interpretation.weather"
         ]
       },
       "topic": {
@@ -4827,10 +4733,8 @@
           "meihua.calendar_policy",
           "meihua.stage_relations",
           "meihua.seasonal_strength",
-          "meihua.evidence_scope",
           "interpretation.casting_readings",
           "interpretation.casting_comparison",
-          "interpretation.evidence_scope",
           "summary",
           "interpretation.external_omens",
           "interpretation.day_qi"
@@ -4845,7 +4749,6 @@
           "interpretation.topic_reading",
           "interpretation.casting_readings",
           "interpretation.casting_comparison",
-          "interpretation.evidence_scope",
           "summary",
           "interpretation.external_omens",
           "interpretation.day_qi"
@@ -4884,7 +4787,6 @@
           "analysis_context",
           "meihua.seed",
           "meihua.calendar_policy",
-          "meihua.rule_trace",
           "calendar_context.bazi_month_boundary",
           "meihua.seasonal_strength",
           "summary"
@@ -4911,9 +4813,7 @@
           "meihua.seed",
           "meihua.body_trigram",
           "meihua.stage_relations",
-          "meihua.evidence_scope",
           "interpretation.external_omens",
-          "interpretation.evidence_scope",
           "summary"
         ]
       },
@@ -5054,61 +4954,60 @@
         "fields": [
           "analysis_context",
           "four_pillars",
-          "liureng.month_general",
-          "liureng.four_lessons",
-          "liureng.three_transmissions",
-          "liureng.life_stages",
-          "liureng.auxiliary_stars",
-          "liureng.month_building_element",
-          "liureng.guiren_order",
-          "liureng.classification",
-          "liureng.meta",
-          "liureng.kongwang",
-          "liureng.xun_head",
-          "liureng.ruleset",
-          "liureng.rule_trace"
+          "liuren.month_general",
+          "liuren.four_lessons",
+          "liuren.three_transmissions",
+          "liuren.life_stages",
+          "liuren.auxiliary_stars",
+          "liuren.month_building_element",
+          "liuren.guiren_order",
+          "liuren.classification",
+          "liuren.meta",
+          "liuren.kongwang",
+          "liuren.xun_head",
+          "liuren.ruleset"
         ]
       },
       "transmission_relations": {
         "purpose": "三传内外战、支神与天将五行、初末生墓、递克与朝日朝枝、三合名义局体；不改本支六亲或裁定综合吉凶、合化和应期。",
         "fields": [
           "four_pillars",
-          "liureng.four_lessons",
-          "liureng.three_transmissions",
-          "liureng.transmission_relations",
-          "liureng.ruleset"
+          "liuren.four_lessons",
+          "liuren.three_transmissions",
+          "liuren.transmission_relations",
+          "liuren.ruleset"
         ]
       },
       "emptiness_evidence": {
         "purpose": "探原论空亡的天盘本空、地盘落底空、日干寄宫地盘例外与太岁月建月将的本支填实；此入口没有年命输入。综合有效空亡及其他填实冲实尚未裁定。",
         "fields": [
           "four_pillars",
-          "liureng.month_general",
-          "liureng.twelve_board",
-          "liureng.three_transmissions",
-          "liureng.emptiness_evidence",
-          "liureng.ruleset"
+          "liuren.month_general",
+          "liuren.twelve_board",
+          "liuren.three_transmissions",
+          "liuren.emptiness_evidence",
+          "liuren.ruleset"
         ]
       },
       "branch_relations": {
         "purpose": "探原支位的六合、六冲、六害、六破与双向刑并列；寅亥破合、巳申刑合不取消其他关系，首课寄宫支不替代日干五行，不据合独断成局。",
         "fields": [
           "four_pillars",
-          "liureng.month_general",
-          "liureng.four_lessons",
-          "liureng.three_transmissions",
-          "liureng.branch_relations",
-          "liureng.ruleset"
+          "liuren.month_general",
+          "liuren.four_lessons",
+          "liuren.three_transmissions",
+          "liuren.branch_relations",
+          "liuren.ruleset"
         ]
       },
       "transmission_progression": {
         "purpose": "探原PDF110–111三传连茹／间断：sequence_direction只指支序；raw_branch_empty_conditional_*仅在支神本空适用假设下释读，不把坐空或天将天空替代本空。effective_direction和comprehensive_judgement仍未裁定，不从进退字样推成败、概率或应期。",
         "fields": [
           "four_pillars",
-          "liureng.three_transmissions",
-          "liureng.transmission_progression",
-          "liureng.emptiness_evidence",
-          "liureng.ruleset"
+          "liuren.three_transmissions",
+          "liuren.transmission_progression",
+          "liuren.emptiness_evidence",
+          "liuren.ruleset"
         ]
       },
       "published_term_dates": {
@@ -5116,46 +5015,46 @@
         "fields": [
           "analysis_context",
           "four_pillars",
-          "liureng.calendar_policy"
+          "liuren.calendar_policy"
         ]
       },
       "seasonal_evidence": {
         "purpose": "探原季节五态用本次月建支，不用月将支。当前季月整月配置分别计算支神、天将固有五行和地盘五态，日干五态不替代它们。真空／半空只列支神本空与季节状态的条件，天空天将及坐空不替换本空；季末十八日异法、扶助冲剋及角色例外后的有效真半未裁，不把原文效力折扣说成成功率。金口诀本课与附带六壬分开，不能借本层代替金口诀日下五态或综合取用。",
         "fields": [
           "four_pillars",
-          "liureng.month_general",
-          "liureng.three_transmissions",
-          "liureng.seasonal_evidence",
-          "liureng.emptiness_evidence",
-          "liureng.ruleset"
+          "liuren.month_general",
+          "liuren.three_transmissions",
+          "liuren.seasonal_evidence",
+          "liuren.emptiness_evidence",
+          "liuren.ruleset"
         ]
       },
       "god_yin": {
         "purpose": "探原类神之阴：十一天将取实际所乘支上神，天乙依当前昼夜表互取；课传及已知年命上神定位，缺年命保留未知，综合可用性未裁。",
         "fields": [
           "four_pillars",
-          "liureng.twelve_board",
-          "liureng.four_lessons",
-          "liureng.three_transmissions",
-          "liureng.god_yin",
-          "liureng.meta",
-          "liureng.ruleset"
+          "liuren.twelve_board",
+          "liuren.four_lessons",
+          "liuren.three_transmissions",
+          "liuren.god_yin",
+          "liuren.meta",
+          "liuren.ruleset"
         ]
       },
       "day_placement_patterns": {
         "purpose": "探原干加支／支加干的十条生克比和条件，按日干本五行与日支计算；归合、求合缺加临时排除，加临成立但合式未裁时仍未知。附带六壬盘不替代金口诀本课规则，不据课名推断他人意图或现实成败。",
         "fields": [
           "four_pillars",
-          "liureng.day_placement_patterns",
-          "liureng.ruleset"
+          "liuren.day_placement_patterns",
+          "liuren.ruleset"
         ]
       },
       "cross_harmony": {
         "purpose": "核对干上神与日支、支上神与日干寄宫的两边六合，以及五个干支同宫日的排除条件；按所选原文列实际支位和来源。",
         "fields": [
           "four_pillars",
-          "liureng.cross_harmony",
-          "liureng.ruleset"
+          "liuren.cross_harmony",
+          "liuren.ruleset"
         ]
       }
     },
@@ -5165,19 +5064,18 @@
         "fields": [
           "analysis_context",
           "four_pillars",
-          "liureng.month_general",
-          "liureng.four_lessons",
-          "liureng.three_transmissions",
-          "liureng.life_stages",
-          "liureng.auxiliary_stars",
-          "liureng.month_building_element",
-          "liureng.guiren_order",
-          "liureng.classification",
-          "liureng.meta",
-          "liureng.kongwang",
-          "liureng.xun_head",
-          "liureng.ruleset",
-          "liureng.rule_trace",
+          "liuren.month_general",
+          "liuren.four_lessons",
+          "liuren.three_transmissions",
+          "liuren.life_stages",
+          "liuren.auxiliary_stars",
+          "liuren.month_building_element",
+          "liuren.guiren_order",
+          "liuren.classification",
+          "liuren.meta",
+          "liuren.kongwang",
+          "liuren.xun_head",
+          "liuren.ruleset",
           "runyear"
         ]
       },
@@ -5185,42 +5083,42 @@
         "purpose": "三传内外战、支神与天将五行、初末生墓、递克与朝日朝枝、三合名义局体；不改本支六亲或裁定综合吉凶、合化和应期。",
         "fields": [
           "four_pillars",
-          "liureng.four_lessons",
-          "liureng.three_transmissions",
-          "liureng.transmission_relations",
-          "liureng.ruleset"
+          "liuren.four_lessons",
+          "liuren.three_transmissions",
+          "liuren.transmission_relations",
+          "liuren.ruleset"
         ]
       },
       "emptiness_evidence": {
         "purpose": "探原论空亡的天盘本空、地盘落底空、日干寄宫及同课本命行年填实；本命、行年均书地盘，上神本空另读。综合有效空亡及其他填实冲实尚未裁定。",
         "fields": [
           "four_pillars",
-          "liureng.month_general",
-          "liureng.twelve_board",
-          "liureng.three_transmissions",
-          "liureng.emptiness_evidence",
-          "liureng.ruleset"
+          "liuren.month_general",
+          "liuren.twelve_board",
+          "liuren.three_transmissions",
+          "liuren.emptiness_evidence",
+          "liuren.ruleset"
         ]
       },
       "branch_relations": {
         "purpose": "探原支位的六合、六冲、六害、六破与双向刑并列；寅亥破合、巳申刑合不取消其他关系，首课寄宫支不替代日干五行，不据合独断成局。",
         "fields": [
           "four_pillars",
-          "liureng.month_general",
-          "liureng.four_lessons",
-          "liureng.three_transmissions",
-          "liureng.branch_relations",
-          "liureng.ruleset"
+          "liuren.month_general",
+          "liuren.four_lessons",
+          "liuren.three_transmissions",
+          "liuren.branch_relations",
+          "liuren.ruleset"
         ]
       },
       "transmission_progression": {
         "purpose": "探原PDF110–111三传连茹／间断：sequence_direction只指支序；raw_branch_empty_conditional_*仅在支神本空适用假设下释读，不把坐空或天将天空替代本空。effective_direction和comprehensive_judgement仍未裁定，不从进退字样推成败、概率或应期。",
         "fields": [
           "four_pillars",
-          "liureng.three_transmissions",
-          "liureng.transmission_progression",
-          "liureng.emptiness_evidence",
-          "liureng.ruleset"
+          "liuren.three_transmissions",
+          "liuren.transmission_progression",
+          "liuren.emptiness_evidence",
+          "liuren.ruleset"
         ]
       },
       "published_term_dates": {
@@ -5228,30 +5126,30 @@
         "fields": [
           "analysis_context",
           "four_pillars",
-          "liureng.calendar_policy"
+          "liuren.calendar_policy"
         ]
       },
       "seasonal_evidence": {
         "purpose": "探原季节五态用本次月建支，不用月将支。当前季月整月配置分别计算支神、天将固有五行和地盘五态，日干五态不替代它们。真空／半空只列支神本空与季节状态的条件，天空天将及坐空不替换本空；季末十八日异法、扶助冲剋及角色例外后的有效真半未裁，不把原文效力折扣说成成功率。金口诀本课与附带六壬分开，不能借本层代替金口诀日下五态或综合取用。",
         "fields": [
           "four_pillars",
-          "liureng.month_general",
-          "liureng.three_transmissions",
-          "liureng.seasonal_evidence",
-          "liureng.emptiness_evidence",
-          "liureng.ruleset"
+          "liuren.month_general",
+          "liuren.three_transmissions",
+          "liuren.seasonal_evidence",
+          "liuren.emptiness_evidence",
+          "liuren.ruleset"
         ]
       },
       "god_yin": {
         "purpose": "探原类神之阴：十一天将取实际所乘支上神，天乙依当前昼夜表互取；课传及已知年命上神定位，缺年命保留未知，综合可用性未裁。",
         "fields": [
           "four_pillars",
-          "liureng.twelve_board",
-          "liureng.four_lessons",
-          "liureng.three_transmissions",
-          "liureng.god_yin",
-          "liureng.meta",
-          "liureng.ruleset",
+          "liuren.twelve_board",
+          "liuren.four_lessons",
+          "liuren.three_transmissions",
+          "liuren.god_yin",
+          "liuren.meta",
+          "liuren.ruleset",
           "runyear.year_fate"
         ]
       },
@@ -5259,16 +5157,16 @@
         "purpose": "探原干加支／支加干的十条生克比和条件，按日干本五行与日支计算；归合、求合缺加临时排除，加临成立但合式未裁时仍未知。附带六壬盘不替代金口诀本课规则，不据课名推断他人意图或现实成败。",
         "fields": [
           "four_pillars",
-          "liureng.day_placement_patterns",
-          "liureng.ruleset"
+          "liuren.day_placement_patterns",
+          "liuren.ruleset"
         ]
       },
       "cross_harmony": {
         "purpose": "核对干上神与日支、支上神与日干寄宫的两边六合，以及五个干支同宫日的排除条件；按所选原文列实际支位和来源。",
         "fields": [
           "four_pillars",
-          "liureng.cross_harmony",
-          "liureng.ruleset"
+          "liuren.cross_harmony",
+          "liuren.ruleset"
         ]
       }
     },
@@ -5287,8 +5185,7 @@
           "jinkou.branch_breaks",
           "jinkou.stem_relations",
           "jinkou.combinations",
-          "jinkou.ruleset",
-          "jinkou.rule_trace"
+          "jinkou.ruleset"
         ]
       },
       "definition_witnesses": {
@@ -5354,8 +5251,7 @@
           "jinkou.overview",
           "jinkou.rows",
           "jinkou.year_fate",
-          "jinkou.ruleset",
-          "jinkou.rule_trace"
+          "jinkou.ruleset"
         ],
         "purpose": "按明确出生年干支与一岁起算岁序核对京本行年及另课；性别未知或资料不足保留未算，喜用条文疑义未裁。"
       },
@@ -5628,8 +5524,7 @@
         "fields": [
           "analysis_context",
           "ziwei_birth.ruleset",
-          "ziwei_birth.calendar_rules",
-          "ziwei_birth.rule_trace"
+          "ziwei_birth.calendar_rules"
         ]
       },
       "editions": {
@@ -5873,7 +5768,7 @@
       "reading": {
         "purpose": "按实际原始资料起卦或解释已有卦，不补钟时、字音和笔画",
         "fields": [
-          "input_normalized",
+          "analysis_context",
           "meihua.method",
           "meihua.seed",
           "meihua.counting_variants",
@@ -5884,10 +5779,8 @@
           "meihua.changed_hexagram",
           "meihua.stage_relations",
           "meihua.seasonal_strength",
-          "meihua.evidence_scope",
           "interpretation.topic_reading",
           "interpretation.classical_text_reference",
-          "interpretation.evidence_scope",
           "summary",
           "interpretation.casting_readings",
           "interpretation.casting_comparison",
@@ -5897,13 +5790,11 @@
       "audit": {
         "purpose": "核对所用原法、软件约定、原始数及取爻计数分歧",
         "fields": [
-          "input_normalized",
+          "analysis_context",
           "meihua.ruleset",
           "meihua.seed",
-          "meihua.rule_trace",
           "meihua.stage_relations",
           "meihua.calendar_policy",
-          "meihua.evidence_scope",
           "meihua.counting_variants",
           "interpretation.topic_reading",
           "interpretation.casting_readings",
@@ -5915,11 +5806,9 @@
         "purpose": "先读实际命中条文、制约资格、五/六位置计数差异及旧研究负结果；不以体用判晴雨，不把raw matched当成未受制天气断言",
         "when": "interpretation_topic=weather时选择；需要的weather_context由已确认事实提供",
         "fields": [
-          "input_normalized",
+          "analysis_context",
           "meihua.counting_variants",
           "meihua.seed",
-          "meihua.evidence_scope",
-          "interpretation.evidence_scope",
           "summary"
         ]
       },
@@ -5927,27 +5816,24 @@
         "purpose": "完整天气规则、计数、条件轨迹与来源；用于核对缺项和跨章制化候选",
         "when": "interpretation_topic=weather且需要审计细节时；沿用同run结果",
         "fields": [
-          "input_normalized",
+          "analysis_context",
           "meihua",
-          "interpretation.weather",
-          "interpretation.evidence_scope"
+          "interpretation.weather"
         ]
       },
       "topic": {
         "purpose": "核对所选文明书局本八章的初始体用条款及出行偏好、失物方位类象、行人初用参照、异文与各实际取数候选；不以通用吉凶取代章句",
         "when": "interpretation_topic为planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler之一",
         "fields": [
-          "input_normalized",
+          "analysis_context",
           "interpretation.topic_reading",
           "meihua.seed",
           "meihua.base_hexagram.name",
           "meihua.calendar_policy",
           "meihua.stage_relations",
           "meihua.seasonal_strength",
-          "meihua.evidence_scope",
           "interpretation.casting_readings",
           "interpretation.casting_comparison",
-          "interpretation.evidence_scope",
           "summary",
           "interpretation.external_omens",
           "interpretation.day_qi"
@@ -5957,12 +5843,11 @@
         "purpose": "完整所选题篇条款、异文及实际候选的原体用/互变/季令与爻辞参照",
         "when": "八个显式题篇分支需要完整审计；沿用同run结果",
         "fields": [
-          "input_normalized",
+          "analysis_context",
           "meihua",
           "interpretation.topic_reading",
           "interpretation.casting_readings",
           "interpretation.casting_comparison",
-          "interpretation.evidence_scope",
           "summary",
           "interpretation.external_omens",
           "interpretation.day_qi"
@@ -5999,13 +5884,10 @@
         "purpose": "核对字数依据、软件扩展范围、计数候选与各自实际读法",
         "when": "casting.method=text_count，尤其超过100或两种取爻不同；不自动用此法替换声数或笔画",
         "fields": [
-          "input_normalized.casting",
+          "analysis_context.casting",
           "meihua.seed",
           "meihua.ruleset",
-          "meihua.rule_trace",
-          "meihua.evidence_scope",
           "meihua.counting_variants",
-          "interpretation.evidence_scope",
           "interpretation.casting_readings",
           "interpretation.casting_comparison",
           "summary"
@@ -6015,12 +5897,9 @@
         "purpose": "核对逐字四声、声明的音系与来源、实际原例类别比较和条件性解释",
         "when": "casting.method=text_tones；不得以现代拼音调号或未核定古音自动填数",
         "fields": [
-          "input_normalized.casting",
+          "analysis_context.casting",
           "meihua.seed",
           "meihua.ruleset",
-          "meihua.rule_trace",
-          "meihua.evidence_scope",
-          "interpretation.evidence_scope",
           "interpretation.traditional_judgement",
           "summary"
         ]
@@ -6046,17 +5925,15 @@
           "meihua.seed",
           "meihua.body_trigram",
           "meihua.stage_relations",
-          "meihua.evidence_scope",
           "interpretation.external_omens",
           "interpretation.casting_readings",
-          "interpretation.evidence_scope",
           "summary"
         ]
       },
       "stage_emphasis": {
         "description": "所报原文问事情境、内卦紧次及迟速／生克条件",
         "fields": [
-          "input_normalized",
+          "analysis_context",
           "meihua.seed",
           "meihua.body_trigram",
           "interpretation.casting_readings",
@@ -6066,7 +5943,7 @@
       "stage_emphasis_audit": {
         "description": "所报原文问事情境、内卦紧次及迟速／生克条件",
         "fields": [
-          "input_normalized",
+          "analysis_context",
           "meihua",
           "interpretation.casting_readings",
           "summary"
@@ -6075,7 +5952,7 @@
       "motion": {
         "description": "占者坐行立、实际外应动静与内卦符号角色分列；缺吉凶判断的条件保持待定，无日期或结局；端法且占者活动明确时另核除六前名义比例数及未知时间单位",
         "fields": [
-          "input_normalized",
+          "analysis_context",
           "meihua.body_trigram",
           "interpretation.motion_context",
           "interpretation.external_omens",
@@ -6086,17 +5963,15 @@
       "observation_source": {
         "description": "核对已报端法类别、单一对象、八方参照、原例查表及实际起卦；不把来方改为相反行进方向",
         "fields": [
-          "input_normalized.casting",
+          "analysis_context.casting",
           "meihua.seed",
           "meihua.ruleset",
-          "meihua.rule_trace",
           "meihua.base_hexagram",
           "meihua.changed_hexagram",
           "meihua.mutual_hexagram",
           "meihua.body_trigram",
           "meihua.use_trigram",
           "meihua.stage_relations",
-          "interpretation.evidence_scope",
           "summary"
         ]
       },
@@ -6104,7 +5979,7 @@
         "purpose": "静占已报条件与未知状态、内卦资料范围；不把未采集解释为无外应",
         "when": "人事分支需要区别未采集与当次静室无所闻见声明时；不套天时占",
         "fields": [
-          "input_normalized",
+          "analysis_context",
           "meihua.seed",
           "meihua.body_trigram",
           "meihua.use_trigram",
@@ -6121,7 +5996,7 @@
         "purpose": "Selected day-qi, own-body and month/day qualifications; no full synthesis or reality claim",
         "when": "Selected day-qi, own-body and month/day qualifications; no full synthesis or reality claim",
         "fields": [
-          "input_normalized",
+          "analysis_context",
           "meihua.seed",
           "meihua.body_trigram",
           "meihua.use_trigram",
@@ -6144,7 +6019,7 @@
         "purpose": "所报金银世宝、兵刃的原体限定与实物资格分列；不把不凶改成吉或安全",
         "when": "只有已报明确类别才选新manifestation，未知省略；旧金属或锐器不自动升级为新类别",
         "fields": [
-          "input_normalized",
+          "analysis_context",
           "meihua",
           "interpretation.external_omens",
           "interpretation.casting_readings",
@@ -6154,7 +6029,7 @@
       "obstruction_days": {
         "description": "生克并见时的条件化原文计日；明例与类推、实际角色、制约与候选分别保留，非净延迟或现实日期",
         "fields": [
-          "input_normalized",
+          "analysis_context",
           "meihua.body_trigram",
           "meihua.stage_relations",
           "meihua.counting_variants",
@@ -6415,9 +6290,9 @@
         "when": "核对Lilly1647第108–109页由求问者主星向所问主星发出的左相／右相、冲相、同星座和原表不相照关系，并与实际度数相位候选分别核对。",
         "fields": [
           "analysis_context",
-          "horary.calculation_basis",
-          "horary.rule_profile",
-          "horary.significators"
+          "horary_chart.calculation_basis",
+          "horary_chart.rule_profile",
+          "horary_chart.significators"
         ],
         "purpose": "Caster-to-receiver direction from Lilly1647 pp108-109, separate from reception host/guest and Hellenistic overcoming. Preserve the32printed ordered inconjunct pairs and16pairs absent from both tables. Same-sign co-presence does not establish bodily conjunction. Compare the sign table to the selected degree/orb candidate without replacing it, adding strength points or certifying event perfection. Sidereal is an extension."
       },
@@ -6425,13 +6300,13 @@
         "when": "用户按明确提问时刻询问卜卦相位与传统条件；先读实际月亮事件、各路径的具名条件与待核范围。",
         "fields": [
           "analysis_context",
-          "horary.calculation_basis",
-          "horary.rule_profile",
-          "horary.significators",
-          "horary.planets",
-          "horary.moon",
-          "horary.radicality",
-          "horary.perfection"
+          "horary_chart.calculation_basis",
+          "horary_chart.rule_profile",
+          "horary_chart.significators",
+          "horary_chart.planets",
+          "horary_chart.moon",
+          "horary_chart.radicality",
+          "horary_chart.perfection"
         ],
         "purpose": "Read actual lunar before-ingress and finite seven-planet TT event histories, nominal geometry, selected Lilly receptions and event-path conditions separately. Physical roots and named source predicates do not establish a complete source-method judgement; native failure and unsearched times remain unknown."
       },
@@ -6439,12 +6314,12 @@
         "when": "核对Lilly1647指定版本的本质尊贵、谁接纳谁、互纳与第125–126页路径的逐项条件；同时读取七曜原始状态与未核验项。",
         "fields": [
           "analysis_context",
-          "horary.calculation_basis",
-          "horary.rule_profile",
-          "horary.planets",
-          "horary.significators",
-          "horary.perfection.status",
-          "horary.perfection.lilly_conditions"
+          "horary_chart.calculation_basis",
+          "horary_chart.rule_profile",
+          "horary_chart.planets",
+          "horary_chart.significators",
+          "horary_chart.perfection.status",
+          "horary_chart.perfection.lilly_conditions"
         ],
         "purpose": "Selected Lilly1647 seven-planet dignity/reception table and p125-126 route conditions, including actual finite event sequences in event_paths. Preserve receiver/guest direction, radical chart sect, event epochs, explicit numerical boundary ambiguity and selected p107 orb column, literal occupied-house facts and incomplete full house/epoch interpretation. Sidereal is an extension, not original-edition acceptance."
       },
@@ -6452,13 +6327,13 @@
         "when": "核对Lilly1647第107页两列容许度、第48／115页宫位事实，以及第126–127页不可仅凭居宫断成的条件。",
         "fields": [
           "analysis_context",
-          "horary.rule_profile",
-          "horary.planets",
-          "horary.significators",
-          "horary.perfection.lilly_conditions.p126_127_dwelling",
-          "horary.perfection.lilly_conditions.event_paths",
-          "horary.perfection.status",
-          "horary.moon"
+          "horary_chart.rule_profile",
+          "horary_chart.planets",
+          "horary_chart.significators",
+          "horary_chart.perfection.lilly_conditions.p126_127_dwelling",
+          "horary_chart.perfection.lilly_conditions.event_paths",
+          "horary_chart.perfection.status",
+          "horary_chart.moon"
         ],
         "purpose": "Read selected p107 full-orb column and declared equality convention; house is the significator role, occupied_house is actual chart occupancy. P48 rank assumes otherwise equal dignity; p115 house points are a separate partial row. P126-127 dwelling requires lunar transfer; finite ordered Moon contacts and current rays are necessary subconditions, not complete transfer, full judgement or reality proof. Preserve missing histories, collisions and numerical ambiguity."
       },
@@ -6466,13 +6341,13 @@
         "when": "核对主星、传光星与聚光星的实际历史／未来事件顺序、停滞折返及不同事件历元的接纳。",
         "fields": [
           "analysis_context",
-          "horary.calculation_basis",
-          "horary.rule_profile",
-          "horary.planets",
-          "horary.significators",
-          "horary.perfection.event_history",
-          "horary.perfection.lilly_conditions.event_paths",
-          "horary.perfection.status"
+          "horary_chart.calculation_basis",
+          "horary_chart.rule_profile",
+          "horary_chart.planets",
+          "horary_chart.significators",
+          "horary_chart.perfection.event_history",
+          "horary_chart.perfection.lilly_conditions.event_paths",
+          "horary_chart.perfection.status"
         ],
         "purpose": "Read actual seven-planet TT roots in the explicit ±30-day scan, distinct principal/principal and carrier/source prior contacts, all intervening carrier contacts, event-epoch receptions with numerical boundary uncertainty, and selected Lilly p111 prohibition/refranation patterns. Product radius and radical sect policies, unknown conditions, finite horizon, frame-specific station timing and incomplete whole-method acceptance remain explicit. A satisfied sequence subset is not a full judgement or outcome proof."
       },
@@ -6480,26 +6355,26 @@
         "when": "核对星历采用本体中心还是行星系统质心、物理后端与交点模型、以及成相／停滞所用日速来源。",
         "fields": [
           "analysis_context",
-          "horary.calculation_basis",
-          "horary.perfection.event_history.status",
-          "horary.perfection.event_history.unavailable_reason",
-          "horary.perfection.event_history.unavailable_code",
-          "horary.perfection.event_history.failed_sample",
-          "horary.perfection.event_history.completeness_scope",
-          "horary.perfection.event_history.ephemeris_reference_points",
-          "horary.perfection.event_history.question_states",
-          "horary.moon.motion_basis.status",
-          "horary.perfection.status",
-          "horary.perfection.lilly_conditions.event_paths.status",
-          "horary.rule_profile"
+          "horary_chart.calculation_basis",
+          "horary_chart.perfection.event_history.status",
+          "horary_chart.perfection.event_history.unavailable_reason",
+          "horary_chart.perfection.event_history.unavailable_code",
+          "horary_chart.perfection.event_history.failed_sample",
+          "horary_chart.perfection.event_history.completeness_scope",
+          "horary_chart.perfection.event_history.ephemeris_reference_points",
+          "horary_chart.perfection.event_history.question_states",
+          "horary_chart.moon.motion_basis.status",
+          "horary_chart.perfection.status",
+          "horary_chart.perfection.lilly_conditions.event_paths.status",
+          "horary_chart.rule_profile"
         ],
         "purpose": "Read declared body/system centers and actual physical model summary separately from analytical nodes; inspect native speed and applied source-derived/display-frame corrections. Root brackets are numerical resolution. Matched-reference-point validation is not body-center accuracy, full original method or reality prediction certification. Unavailable event histories remain explicit; empty events do not establish absence."
       },
       "solar_position_model": {
         "when": "核对近太阳位置的原生偏折模型、太阳后方的虚拟模型视位置与太阳前方的凌日几何。",
         "fields": [
-          "horary.calculation_basis.ephemeris_model",
-          "horary.calculation_basis.julian_day_tt"
+          "horary_chart.calculation_basis.ephemeris_model",
+          "horary_chart.calculation_basis.julian_day_tt"
         ],
         "purpose": "Read nominal-epoch finite unbent-ray geometry and the inspected native solar mass model. A background solar-disc position is a virtual continuous extension; foreground transits differ. Unknown geometry remains unknown. This is not an optical occultation, limb-contact, detectability or physical-error certificate. Never replace native positions with a no-deflection diagnostic to pass a reference comparison."
       },
@@ -6507,15 +6382,15 @@
         "when": "逐行核对Lilly1647第115页本质／偶然尊贵表的已算条件、24小时运动与未知项。",
         "fields": [
           "analysis_context",
-          "horary.fortitudes.method_id",
-          "horary.fortitudes.summary",
-          "horary.fortitudes.physical_inputs.status",
-          "horary.fortitudes.physical_inputs.daily_motion_policy",
-          "horary.fortitudes.physical_inputs.star_position_policy",
-          "horary.fortitudes.source_method_scope",
-          "horary.fortitudes.source_conflicts",
-          "horary.fortitudes.full_original_text_acceptance",
-          "horary.fortitudes.full_judgement_accepted"
+          "horary_chart.fortitudes.method_id",
+          "horary_chart.fortitudes.summary",
+          "horary_chart.fortitudes.physical_inputs.status",
+          "horary_chart.fortitudes.physical_inputs.daily_motion_policy",
+          "horary_chart.fortitudes.physical_inputs.star_position_policy",
+          "horary_chart.fortitudes.source_method_scope",
+          "horary_chart.fortitudes.source_conflicts",
+          "horary_chart.fortitudes.full_original_text_acceptance",
+          "horary_chart.fortitudes.full_judgement_accepted"
         ],
         "purpose": "Read all41-row summary including inapplicable and unknown conditions. Daily displacement differs from instantaneous direction; dated stellar astrometry differs from printed1647 coordinates. Literal row sums do not reproduce every original worked total. Expand fortitudes.planets.<Planet>.rows for exact predicates; unknown rows are not zero, and points are not success probabilities or a complete judgement."
       },
@@ -6523,19 +6398,19 @@
         "when": "核对Lilly1647福点昼夜同式、宫头五度效力归属和第145页独立强弱表。",
         "fields": [
           "analysis_context",
-          "horary.fortune.method_id",
-          "horary.fortune.longitude",
-          "horary.fortune.formula",
-          "horary.fortune.house_assignment",
-          "horary.fortune.status",
-          "horary.fortune.known_fortitudes",
-          "horary.fortune.known_debilities",
-          "horary.fortune.literal_table_balance",
-          "horary.fortune.unknown_rows",
-          "horary.fortune.applied_conditions",
-          "horary.fortune.interpretation_policies",
-          "horary.fortune.source_method_scope",
-          "horary.fortune.full_original_text_acceptance"
+          "horary_chart.fortune.method_id",
+          "horary_chart.fortune.longitude",
+          "horary_chart.fortune.formula",
+          "horary_chart.fortune.house_assignment",
+          "horary_chart.fortune.status",
+          "horary_chart.fortune.known_fortitudes",
+          "horary_chart.fortune.known_debilities",
+          "horary_chart.fortune.literal_table_balance",
+          "horary_chart.fortune.unknown_rows",
+          "horary_chart.fortune.applied_conditions",
+          "horary_chart.fortune.interpretation_policies",
+          "horary_chart.fortune.source_method_scope",
+          "horary_chart.fortune.full_original_text_acceptance"
         ],
         "purpose": "Lilly pp143-144 uses physical ASC+Moon-Sun day and night. Keep geometric occupancy, nearest-cusp virtue and significator roles separate. The28 p145 rows include neutral Aries and Fortune-specific sixth/eighth-house weights. Exact planetary rays and p179 stellar range transfer are disclosed conventions. P180 beyond-five-degree assignment and row discrepancies remain failed controls; unknowns never equal zero; no wealth amount, success probability or complete judgement follows."
       },
@@ -6543,14 +6418,14 @@
         "when": "核对Lilly1647起盘审慎条件、时主对应、原文例外与未知定义，避免仅凭上升度数认定整盘可判断。",
         "fields": [
           "analysis_context",
-          "horary.radicality.method_id",
-          "horary.radicality.hour_inputs",
-          "horary.radicality.hour_affinity",
-          "horary.radicality.reported_context",
-          "horary.radicality.ascendant_degree_gate",
-          "horary.radicality.clauses",
-          "horary.radicality.unknown_clauses",
-          "horary.radicality.safe_to_judge"
+          "horary_chart.radicality.method_id",
+          "horary_chart.radicality.hour_inputs",
+          "horary_chart.radicality.hour_affinity",
+          "horary_chart.radicality.reported_context",
+          "horary_chart.radicality.ascendant_degree_gate",
+          "horary_chart.radicality.clauses",
+          "horary_chart.radicality.unknown_clauses",
+          "horary_chart.radicality.safe_to_judge"
         ],
         "purpose": "Read all12 clauses in the pp121-123 manual inventory, actual unequal-hour geometry, selected p104 triplicity and own-nature affinity, prerequisites, exceptions and attributed variants. The Moon late-degree cutoff is unspecified; no27degree threshold or p115 weighted balance0 is invented. Optional context is caller-reported only: a known question timestamp is not a certain timed event, and no age/appearance/strength is inferred. safe_to_judge remains null for the uncertified full method, not false/true reality prediction. Compute the supplied instant without changing it to clear a caution."
       },
@@ -6560,10 +6435,10 @@
           "analysis_context",
           "calendar_conversion",
           "clock_conversion.hour_origin_conversion",
-          "horary.calculation_basis.calendar",
-          "horary.calculation_basis.time_scale",
-          "horary.calculation_basis.julian_day_tt",
-          "horary.calculation_basis.julian_day_ut1"
+          "horary_chart.calculation_basis.calendar",
+          "horary_chart.calculation_basis.time_scale",
+          "horary_chart.calculation_basis.julian_day_tt",
+          "horary_chart.calculation_basis.julian_day_ut1"
         ]
       },
       "clock_input": {
@@ -6572,9 +6447,9 @@
           "analysis_context",
           "calendar_conversion",
           "clock_conversion",
-          "horary.calculation_basis.time_scale",
-          "horary.calculation_basis.julian_day_tt",
-          "horary.calculation_basis.julian_day_ut1"
+          "horary_chart.calculation_basis.time_scale",
+          "horary_chart.calculation_basis.julian_day_tt",
+          "horary_chart.calculation_basis.julian_day_ut1"
         ]
       },
       "hour_origin": {
@@ -6586,8 +6461,8 @@
           "clock_conversion.hour_origin_conversion",
           "clock_conversion.input_wall_datetime",
           "clock_conversion.converted_utc",
-          "horary.calculation_basis.julian_day_tt",
-          "horary.calculation_basis.julian_day_ut1"
+          "horary_chart.calculation_basis.julian_day_tt",
+          "horary_chart.calculation_basis.julian_day_ut1"
         ]
       },
       "physical_epoch": {
@@ -6595,8 +6470,8 @@
         "fields": [
           "analysis_context",
           "clock_conversion",
-          "horary.calculation_basis.julian_day_tt",
-          "horary.calculation_basis.julian_day_ut1"
+          "horary_chart.calculation_basis.julian_day_tt",
+          "horary_chart.calculation_basis.julian_day_ut1"
         ]
       },
       "ut1_input": {
@@ -6604,8 +6479,8 @@
         "fields": [
           "analysis_context",
           "clock_conversion",
-          "horary.calculation_basis.julian_day_tt",
-          "horary.calculation_basis.julian_day_ut1"
+          "horary_chart.calculation_basis.julian_day_tt",
+          "horary_chart.calculation_basis.julian_day_ut1"
         ]
       }
     },
@@ -6699,15 +6574,15 @@
     "bazi_luck_cycles": {
       "birth_time_sensitivity": {
         "fields": [
-          "analysis_reference",
+          "analysis_context",
           "calendar_context.birth_time_input",
-          "dayun_info"
+          "dayun"
         ],
         "when": "用户已确认出生参考的正负UTC经过分钟范围；读取全部分钟及事件候选、原始分量省略事实与未决层。事件探针不是观测频率，包络未认证连续极值。"
       },
       "analysis_clock": {
         "fields": [
-          "analysis_reference"
+          "analysis_context"
         ],
         "when": "核对同次完整分析瞬间、UTC偏移/fold及分析日期的补齐来源；不把默认月初、月中或整点当成当前。"
       }
@@ -6715,7 +6590,7 @@
     "bazi_monthly_timing": {
       "analysis_clock": {
         "fields": [
-          "analysis_reference"
+          "analysis_context"
         ],
         "when": "核对同次完整分析瞬间、UTC偏移/fold及分析日期的补齐来源；不把默认月初、月中或整点当成当前。"
       }
@@ -6723,7 +6598,7 @@
     "bazi_daily_timing": {
       "analysis_clock": {
         "fields": [
-          "analysis_reference"
+          "analysis_context"
         ],
         "when": "核对同次完整分析瞬间、UTC偏移/fold及分析日期的补齐来源；不把默认月初、月中或整点当成当前。"
       }
@@ -6731,7 +6606,7 @@
     "bazi_hourly_timing": {
       "analysis_clock": {
         "fields": [
-          "analysis_reference"
+          "analysis_context"
         ],
         "when": "核对同次完整分析瞬间、UTC偏移/fold及分析日期的补齐来源；不把默认月初、月中或整点当成当前。"
       }
@@ -6740,7 +6615,7 @@
       "energy_sources": {
         "fields": [
           "four_pillars",
-          "input_context",
+          "analysis_context",
           "current_calculation.strength_level"
         ],
         "label": "同次身印等五类能量来源",
@@ -6748,7 +6623,7 @@
       },
       "branch_candidates": {
         "fields": [
-          "input_context"
+          "analysis_context"
         ],
         "label": "合会候选与同次筛选回执",
         "purpose": "保留现有v8目录中的完整局、字面六合及含旺支半合候选，包括被冲、占位或邻接条件筛掉的图形。候选、筛选与实际事件分别解释，不据候选认定合化、通关或旺衰；未提供或未知方法保留未知。视图字段复制到fields，视图名不是请求参数。"
@@ -6757,7 +6632,7 @@
         "label": "字面四柱与强弱编释核对",
         "fields": [
           "four_pillars",
-          "input_context",
+          "analysis_context",
           "current_calculation.strength_level",
           "source_comparison"
         ],

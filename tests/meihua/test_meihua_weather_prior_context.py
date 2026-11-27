@@ -19,10 +19,6 @@ PRIOR_RULES = {
 }
 
 
-def rows(output):
-    return {r["rule_id"]: r for r in output["weather"]["rule_trace"]}
-
-
 def test_confirmed_neither_is_accepted_but_never_supplied_by_default() -> None:
     assert MeihuaWeatherContext().prior_condition is None
     assert MeihuaWeatherContext(prior_condition=None).prior_condition is None
@@ -58,26 +54,18 @@ def test_all384_casts_confirmed_neither_only_disables_four_prior_clauses(
                 cast,
                 {"many_min_count": threshold, "prior_condition": "neither_prolonged"},
             )
-            before, after = rows(unknown), rows(neither)
-            assert len(after) == 40
-            assert neither["weather"]["context"]["season"] is None
-            assert neither["weather"]["single_forecast"] is None
-            for rule_id in after:
-                if rule_id not in PRIOR_RULES:
-                    assert after[rule_id] == before[rule_id]
-                    continue
-                else:
-                    pass
-                assert after[rule_id]["status"] == "not_met"
-                prior = next(
-                    c
-                    for c in after[rule_id]["conditions"]
-                    if c["condition"] == "prior_condition"
-                )
-                assert prior["actual"] == "neither_prolonged" and prior["met"] is False
-                assert after[rule_id]["effective_status"] == "not_met"
-                assert rule_id not in neither["weather"]["matched_rule_ids"]
-                assert rule_id not in neither["weather"]["pending_rule_ids"]
+            before_weather = unknown["weather"]
+            after_weather = neither["weather"]
+            assert after_weather["context"]["season"] is None
+            assert after_weather["single_forecast"] is None
+            assert set(after_weather["matched_rule_ids"]).isdisjoint(PRIOR_RULES)
+            assert set(after_weather["pending_rule_ids"]).isdisjoint(PRIOR_RULES)
+            assert [
+                r for r in after_weather["matched_rule_ids"] if r not in PRIOR_RULES
+            ] == [r for r in before_weather["matched_rule_ids"] if r not in PRIOR_RULES]
+            assert [
+                r for r in after_weather["pending_rule_ids"] if r not in PRIOR_RULES
+            ] == [r for r in before_weather["pending_rule_ids"] if r not in PRIOR_RULES]
 
 
 @pytest.mark.parametrize("tool", ["meihua_time_cast", "meihua_cast"])
@@ -103,7 +91,7 @@ def test_confirmed_neither_and_pending_other_conditions_agree_on_all_surfaces(
             analysis_hour=6,
             analysis_timezone="Asia/Hong_Kong",
         )
-    fields = ["interpretation.weather", "interpretation.evidence_scope", "summary"]
+    fields = ["interpretation.weather", "summary"]
     response, protocol, code, local = surface_calls(
         spec,
         payload,
@@ -129,11 +117,9 @@ def test_confirmed_neither_and_pending_other_conditions_agree_on_all_surfaces(
         assert weather["context"]["prior_condition"] == "neither_prolonged"
         assert weather["context"]["season"] is None
         assert weather["context"]["many_min_count"] is None
-        assert all(
-            r["status"] == "not_met"
-            for r in weather["rule_trace"]
-            if r["rule_id"] in PRIOR_RULES
-        )
+        assert "rule_trace" not in weather
+        assert set(weather["matched_rule_ids"]).isdisjoint(PRIOR_RULES)
+        assert set(weather["pending_rule_ids"]).isdisjoint(PRIOR_RULES)
         assert weather["single_forecast"] is None
         study = weather["research_validation"]["current_profile_study"]
         assert study["primary"]["correct"] == 29
