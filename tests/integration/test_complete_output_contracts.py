@@ -147,13 +147,13 @@ def test_missing_root_and_legal_projection_across_rest_mcp_cli(
 
     # The real service still executes and validates before projection. Omitting
     # its primary business root from the wire output remains legitimate.
-    projected = {"detail": "audit", "fields": ["analysis_type"]}
+    projected = {"fields": ["analysis_type"]}
     http = client.post(spec.rest_path, json=inputs, params=projected)
     native = asyncio.run(protocol(projected))
     assert http.status_code == 200 and not native.is_error
     assert "career_analysis" not in http.json()
     assert "career_analysis" not in native.structured_content
-    assert cli.run(argv + ["--detail", "audit", "--fields", "analysis_type"]) == 0
+    assert cli.run(argv + ["--fields", "analysis_type"]) == 0
     assert "career_analysis" not in json.loads(capsys.readouterr().out)
 
     original = execution.invoke_validated_service

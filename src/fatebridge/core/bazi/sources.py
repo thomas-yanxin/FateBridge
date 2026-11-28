@@ -11,7 +11,6 @@ from typing import Any, Mapping
 from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
 
 ORDER = ("year", "month", "day", "hour")
-GRADES = {"强", "中和", "弱"}
 
 
 @lru_cache(maxsize=1)

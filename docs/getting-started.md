@@ -47,7 +47,7 @@ fatebridge bazi_birth_chart \
     bazi_birth.day_master.polarity
 ```
 
-退出码为 `0` 即成功，输出包含日主（`庚 / 金 / 阳`）与精简 `run_metadata`。三端默认采用 `detail=compact` 返回核心业务字段；需要完整结果与方法依据时传 `--detail audit`（省略 `--fields`）。发现其他工具和请求定义：
+退出码为 `0` 即成功，输出包含日主（`庚 / 金 / 阳`）与 `run_metadata`。三端默认返回核心层（被省略的可选重型路径记入 `run_metadata.omitted_fields`）；需要无损完整结果与方法依据时传 `--include "*"`（或按需传路径/`evidence_views` 名称，且不与 `--fields` 并用）。发现其他工具和请求定义：
 
 ```bash
 fatebridge list
@@ -123,4 +123,4 @@ fatebridge doctor --mcp
 
 - 接入应用、工具发现、严格 `fields` 投影与错误恢复：[开发者 / Agent 接入指南](agent-guide.md)
 - 按业务场景运行风水、六爻与星盘示例：[可运行请求示例](examples/README.md) · [家居风水参考](fengshui.md)
-- 查看全部 90 项能力清单与问题排查：[算法覆盖矩阵](algorithm-coverage.md) · [故障排除](troubleshooting.md)
+- 查看全部 91 项能力清单与问题排查：[算法覆盖矩阵](algorithm-coverage.md) · [故障排除](troubleshooting.md)

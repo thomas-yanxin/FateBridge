@@ -5,15 +5,13 @@ from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 from datetime import datetime, timezone, tzinfo
-from typing import Literal, Protocol
+from typing import Protocol
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from fatebridge.utils.civil_time import UTCCalendar, parse_civil_iso_clock
 from fatebridge.utils.errors import ParameterError
 from fatebridge.utils.timezones import is_unspecified_local_time
-
-DetailLevel = Literal["compact", "audit"]
 
 
 def _execution_instant(value: str) -> datetime:
@@ -34,13 +32,6 @@ class ExecutionOptions(BaseModel):
     as_of: str | None = Field(
         default=None,
         description="Freeze implicit current time: ISO 8601 datetime with timezone",
-    )
-    detail: DetailLevel = Field(
-        default="compact",
-        description=(
-            "输出详细级别：compact（默认，精简核心事实）或 "
-            "audit（完整业务结果、已启用的方法、环境与误差预算）。"
-        ),
     )
 
     @field_validator("as_of")

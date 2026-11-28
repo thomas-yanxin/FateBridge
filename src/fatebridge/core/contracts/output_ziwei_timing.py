@@ -14,7 +14,6 @@ from fatebridge.core.contracts.output_ziwei_palaces import (
     ZiweiFlowingStar,
     ZiweiPosition,
     ZiweiRuleset,
-    ZiweiRuleTrace,
     ZiweiYearBranchCycles,
 )
 from fatebridge.core.contracts.output_ziwei_structure import (

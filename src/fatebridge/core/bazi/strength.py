@@ -20,19 +20,15 @@ from fatebridge.core.bazi.relations import (
 )
 from fatebridge.utils.data import (
     BRANCH_CLASH_PAIRS,
-    BRANCH_COMBINATION_ELEMENT,
-    BRANCH_COMBINATIONS,
     BRANCH_CONFLICTS,
     BRANCH_ELEMENTS,
     BRANCH_HIDDEN_STEMS,
     BRANCH_SEASONAL_COMBINATIONS,
-    BRANCH_TRIPLE_COMBINATIONS,
     BRANCH_TRIPLE_ELEMENTS,
     DESTRUCTION_CYCLE,
     GENERATION_CYCLE,
     STEM_COMBINATIONS,
     STEM_ELEMENTS,
-    TRIPLE_COMBINATION_PEAK,
     Element,
     get_shishen,
     get_ten_god,
@@ -243,9 +239,6 @@ PHASE_FACTORS: dict[str, float] = {
     "囚": 0.70,
     "死": 0.50,
 }
-
-STORAGE_EARTH = {"木": "未", "火": "戌", "金": "丑", "水": "辰"}
-RESIDUAL_EARTH = {"木": "辰", "火": "未", "金": "戌", "水": "丑"}
 
 
 @dataclass(frozen=True)

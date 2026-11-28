@@ -78,17 +78,17 @@ def test_non_metaphysics_psychometric_plugin_runs_end_to_end() -> None:
         neuroticism=2,
     )
     raw = execute_with_receipt(spec, req)
-    delivered = deliver_response(raw, spec=spec, detail="compact")
+    delivered = deliver_response(raw, spec=spec)
     assert delivered["traits"]["openness"] == 100.0
     assert delivered["dominant_trait"] == "openness"
     assert delivered["assessment"] == raw["assessment"]
     assert delivered["run_metadata"]["tool_name"] == "psych_big_five"
     assert "calculation_evidence" not in delivered["run_metadata"]
 
-    audit = execute_with_receipt(spec, req, options=ExecutionOptions(detail="audit"))
-    assert "runtime" not in audit["run_metadata"]
-    assert "duration_ms" in audit["run_metadata"]
-    assert "replay" in audit["run_metadata"]
+    receipt = execute_with_receipt(spec, req, options=ExecutionOptions())
+    assert "runtime" not in receipt["run_metadata"]
+    assert "duration_ms" in receipt["run_metadata"]
+    assert "replay" in receipt["run_metadata"]
 
     custom_policy = ReproducibilityPolicy(
         random_seed_field="seed", seed_condition="bootstrap_resampling"
@@ -115,7 +115,6 @@ def test_non_metaphysics_psychometric_plugin_runs_end_to_end() -> None:
                         "extraversion": 3,
                         "agreeableness": 4,
                         "neuroticism": 2,
-                        "detail": "compact",
                     },
                 )
                 assert not res.is_error

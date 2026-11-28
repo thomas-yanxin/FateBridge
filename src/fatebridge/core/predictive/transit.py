@@ -30,6 +30,7 @@ def build_transit_analysis(
     house_system: str = "P",
     zodiac_type: str = "Tropic",
     orb_limit: float = 1.5,
+    max_hits: int | None = None,
     transit_subject: NativeSubject | None = None,
     include_natal_reference: bool = True,
     scan_days: int | None = None,
@@ -72,7 +73,11 @@ def build_transit_analysis(
         )
     ]
     exact_orb_limit = min(orb_limit, 0.3)
-    exact_hits = [hit for hit in hits if hit["orb"] <= exact_orb_limit][:12]
+    all_exact_hits = [hit for hit in hits if hit["orb"] <= exact_orb_limit]
+    selected_hits = hits[:max_hits] if max_hits is not None else hits
+    selected_exact_hits = (
+        all_exact_hits[:max_hits] if max_hits is not None else all_exact_hits
+    )
     payload: dict[str, Any] = {
         "calculation_basis": subject.calculation_basis,
         "analysis_datetime": format_local_time_or_utc(analysis_local),
@@ -91,8 +96,10 @@ def build_transit_analysis(
         "medium_coeli": transit_reference["medium_coeli"],
         "transit_reference": transit_reference,
         "house_emphasis": house_emphasis,
-        "hits": hits[:24],
-        "exact_hits": exact_hits,
+        "hits": selected_hits,
+        "hits_total_count": len(hits),
+        "exact_hits": selected_exact_hits,
+        "exact_hits_total_count": len(all_exact_hits),
     }
     if include_natal_reference:
         payload["natal_reference"] = extract_named_points(
@@ -125,17 +132,29 @@ def build_transit_analysis(
                     target_longitudes=target_longitudes,
                     orb_limit=tight_orb_limit,
                 )
+            step_exact_hits = [
+                hit for hit in step_hits if hit["orb"] <= exact_orb_limit
+            ]
+            step_tight_hits = [
+                hit for hit in step_hits if hit["orb"] <= tight_orb_limit
+            ]
             transit_timeline.append(
                 {
                     "day_offset": day_offset,
                     "date": step_zoned.isoformat().split("T", 1)[0],
                     "analysis_datetime": format_local_time_or_utc(step_local),
-                    "exact_hits": [
-                        hit for hit in step_hits if hit["orb"] <= exact_orb_limit
-                    ][:12],
-                    "tight_hits": [
-                        hit for hit in step_hits if hit["orb"] <= tight_orb_limit
-                    ][:12],
+                    "exact_hits": (
+                        step_exact_hits[:max_hits]
+                        if max_hits is not None
+                        else step_exact_hits
+                    ),
+                    "exact_hits_total_count": len(step_exact_hits),
+                    "tight_hits": (
+                        step_tight_hits[:max_hits]
+                        if max_hits is not None
+                        else step_tight_hits
+                    ),
+                    "tight_hits_total_count": len(step_tight_hits),
                 }
             )
         payload["scan_days"] = scan_days
@@ -155,6 +174,7 @@ def build_transit_payload(
     house_system: str = "P",
     zodiac_type: str = "Tropic",
     orb_limit: float = 1.5,
+    max_hits: int | None = None,
     transit_subject: NativeSubject | None = None,
     include_natal_reference: bool = True,
     scan_days: int | None = None,
@@ -170,6 +190,7 @@ def build_transit_payload(
         house_system=house_system,
         zodiac_type=zodiac_type,
         orb_limit=orb_limit,
+        max_hits=max_hits,
         transit_subject=transit_subject,
         include_natal_reference=include_natal_reference,
         scan_days=scan_days,

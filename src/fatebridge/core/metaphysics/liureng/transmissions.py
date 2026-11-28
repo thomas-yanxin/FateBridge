@@ -174,7 +174,6 @@ def select_transmissions(
     *,
     shehai_method: ShehaiMethod = "depth_first",
     harm_include_terminal: bool = False,
-    trace: list[dict[str, Any]] | None = None,
 ) -> tuple[str, str, str, list[str], int | None]:
     """Return styles, derivation, three gods, and the actual source lesson."""
     if shehai_method not in ("depth_first", "meng_zhong_first"):
@@ -212,42 +211,15 @@ def select_transmissions(
             for lesson in cands
         ]
         depths = [(lesson, walk["harm_count"]) for lesson, walk in zip(cands, walks)]
-        if trace is not None:
-            trace.append(
-                {
-                    "rule_id": "liuren.harm_depth",
-                    "source_section": "涉害法",
-                    "result": {str(l["index"]): value for l, value in depths},
-                }
-            )
         deepest = max(value for _, value in depths)
         matched = [l for l, value in depths if value == deepest]
         return matched, ("涉害" if len(matched) == 1 else None)
 
     def choose(candidates: list[dict[str, Any]]) -> tuple[dict[str, Any], str]:
         candidates = _unique(candidates)
-        if trace is not None:
-            trace.append(
-                {
-                    "rule_id": "liuren.direct_or_remote_candidates",
-                    "source_section": "贼克 / 比用 / 遥克",
-                    "result": {
-                        "lessons": [l["index"] for l in candidates],
-                        "uppers": [l["upper_branch"] for l in candidates],
-                    },
-                }
-            )
         if len(candidates) == 1:
             return candidates[0], "贼克"
         preferred = [l for l in candidates if same_polarity(l)]
-        if trace is not None:
-            trace.append(
-                {
-                    "rule_id": "liuren.polarity",
-                    "source_section": "比用法",
-                    "result": {"preferred_lessons": [l["index"] for l in preferred]},
-                }
-            )
         if len(preferred) == 1:
             return preferred[0], "比用"
         candidates = preferred or candidates
@@ -274,18 +246,6 @@ def select_transmissions(
         else:
             order = lessons[:2] + lessons[2:] if yang else lessons[2:] + lessons[:2]
             selected = next(l for l in order if l in candidates)
-        if trace is not None:
-            trace.append(
-                {
-                    "rule_id": "liuren.harm_tie",
-                    "source_section": "涉害法·复等（缀瑕）",
-                    "result": {
-                        "remaining_lessons": [l["index"] for l in candidates],
-                        "selected_lesson": selected["index"],
-                        "day_polarity": "阳" if yang else "阴",
-                    },
-                }
-            )
         return selected, "复等"
 
     thieves = _unique([l for l in lessons if l["upper_lower_relation"] == "下贼上"])

@@ -1,4 +1,4 @@
-"""Shared Human Design service orchestration and compact projection."""
+"""Shared Human Design service orchestration."""
 
 from __future__ import annotations
 
@@ -25,109 +25,6 @@ from fatebridge.core.human_design.time import (
     resolve_birth_clock,
 )
 from fatebridge.utils.errors import calculation_guard
-
-
-def compact_human_design(result: dict[str, Any]) -> dict[str, Any]:
-    """Return a clean <6 KB structured compact view of a Human Design chart."""
-    bg = result["bodygraph"]
-    vars_data = result["variables"]
-    compact_vars = {
-        "code": vars_data.get("code"),
-        "arrows": [
-            {
-                "component": a["component"],
-                "tone": a["tone"],
-                "orientation": a["orientation"],
-                "letter": a["letter"],
-            }
-            for a in vars_data.get("arrows", [])
-        ],
-        "phs_determination": vars_data.get("phs_determination"),
-        "environment": vars_data.get("environment"),
-        "motivation": (
-            {
-                "color": vars_data["motivation"].get("color"),
-                "source_term": vars_data["motivation"].get("source_term"),
-                "transference": vars_data["motivation"].get("transference"),
-            }
-            if vars_data.get("motivation")
-            else None
-        ),
-        "view": (
-            {
-                "color": vars_data["view"].get("color"),
-                "source_term": vars_data["view"].get("source_term"),
-                "distraction": vars_data["view"].get("distraction"),
-            }
-            if vars_data.get("view")
-            else None
-        ),
-        "cognition": vars_data.get("cognition"),
-        "sense": vars_data.get("sense"),
-    }
-    compact_activations = {
-        side: [
-            {
-                "body": a["body"],
-                "lon": round(a["longitude"], 4),
-                "gate": a["gate"],
-                "line": a["line"],
-                "color": a["color"],
-                "tone": a["tone"],
-                "base": a["base"],
-            }
-            for a in items
-        ]
-        for side, items in result["activations"].items()
-    }
-    fixings = [
-        {
-            "side": r["side"],
-            "body": r["body"],
-            "gate": r["gate"],
-            "line": r["line"],
-            "fixing_state": r["fixing_state"],
-        }
-        for r in result.get("depth_evidence", {}).get("line_fixings", [])
-        if r["fixing_state"] not in {"unfixed", "not_applicable_no_planet_polarity"}
-    ]
-    out: dict[str, Any] = {
-        "engine": result["engine"],
-        "name": result.get("name"),
-        "birth_utc": result["birth_utc"],
-        "design_utc": result["design_utc"],
-        "profile": result["profile"],
-        "incarnation_cross": {
-            "name": result["incarnation_cross"]["name"],
-            "angle": result["incarnation_cross"]["angle"],
-            "gates": result["incarnation_cross"]["gates"],
-        },
-        "bodygraph": {
-            "type": bg["type"],
-            "subtype": bg["subtype"],
-            "authority": bg["authority"],
-            "strategy": bg["strategy"],
-            "definition": bg["definition"],
-            "centers": {c: info["status"] for c, info in bg["centers"].items()},
-            "channels": [
-                {"id": c["id"], "circuit": c["circuit"]} for c in bg["channels"]
-            ],
-            "circuitry": bg["circuitry"]["group_channel_counts"],
-            "activated_gates": bg["activated_gates"],
-            "hanging_gates": bg["hanging_gates"],
-        },
-        "activations": compact_activations,
-        "variables": compact_vars,
-        "line_fixings": fixings,
-        "summary": result.get("summary"),
-    }
-    if result.get("cycle_summary", {}).get("status") not in (None, "not_requested"):
-        out["cycle_summary"] = result["cycle_summary"]
-    if "transit_overlay" in result:
-        out["transit_overlay"] = result["transit_overlay"]
-    if "composite" in result:
-        out["composite"] = result["composite"]
-    return out
 
 
 def _single_chart(

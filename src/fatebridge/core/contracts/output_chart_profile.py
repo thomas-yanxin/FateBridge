@@ -42,6 +42,8 @@ class ChartProfile(PartialOutput):
     house_overlay_policy: str | None = None
     derivation_policy: RelationshipDerivation | None = None
     aspect_policy: ChartAspectPolicy | None = None
+    aspects_total_count: int | None = None
+    aspects_returned_count: int | None = None
     house_position_projection: HousePositionProjection | None = None
     coordinate_precision: str | None = None
     midpoint_coordinate_source: str | None = None

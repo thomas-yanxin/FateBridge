@@ -42,19 +42,12 @@ from fatebridge.core.bazi.policies import YearBoundaryPolicy
 from fatebridge.core.bazi.relations import (
     BRANCH_BREAKS,
     BRANCH_HIDDEN_COMBINATIONS,
-    classify_triple_members,
     collect_target_branch_relations,
 )
 from fatebridge.core.bazi.shensha import timing_shensha
 from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
 from fatebridge.utils.birth_input import normalize_gender
-from fatebridge.utils.civil_time import (
-    ZonedCalendar,
-)
-from fatebridge.utils.civil_time import (
-    datetime_fromisoformat_preserving_offset as parse_iso_datetime,
-)
-from fatebridge.utils.civil_time import utc_calendar, utc_ordering_key
+from fatebridge.utils.civil_time import ZonedCalendar, utc_calendar
 from fatebridge.utils.data import (
     BRANCH_COMBINATIONS,
     BRANCH_CONFLICTS,
@@ -70,7 +63,6 @@ from fatebridge.utils.data import (
     STEM_COMBINATIONS,
     STEM_ELEMENTS,
     TRIPLE_COMBINATION_PEAK,
-    Element,
     get_nayin,
     get_shishen,
 )
@@ -759,13 +751,15 @@ class TimingAnalysis:
                 item["analysis_anchor_status"] = "no_replayable_local_minute_in_window"
             else:
                 item["analysis_anchor"] = anchor.strftime("%Y-%m-%d %H:%M:%S")
-                item["liuyue"] = TimingAnalysis.calculate_liuyue(
+                liuyue = TimingAnalysis.calculate_liuyue(
                     anchor.year,
                     anchor.month,
                     anchor.day,
                     timezone_name=timezone_name,
                     target_date=anchor,
                 )
+                liuyue.pop("solar_term_window", None)
+                item["liuyue"] = liuyue
             timeline.append(item)
         return timeline
 
@@ -824,16 +818,26 @@ class TimingAnalysis:
                 item["analysis_anchor_status"] = "no_replayable_local_minute_in_window"
             else:
                 item["analysis_anchor"] = anchor.strftime("%Y-%m-%d %H:%M:%S")
-                item["liuyue"] = TimingAnalysis.calculate_liuyue(
+                liuyue = TimingAnalysis.calculate_liuyue(
                     anchor.year,
                     anchor.month,
                     anchor.day,
                     timezone_name=timezone_name,
                     target_date=anchor,
                 )
-                item["liuri"] = TimingAnalysis.calculate_liuri(
+                liuri = TimingAnalysis.calculate_liuri(
                     anchor, timezone_name=timezone_name
                 )
+                item["liuyue"] = {
+                    "pillar": liuyue["pillar"],
+                    "stem": liuyue["stem"],
+                    "branch": liuyue["branch"],
+                }
+                item["liuri"] = {
+                    "pillar": liuri["pillar"],
+                    "stem": liuri["stem"],
+                    "branch": liuri["branch"],
+                }
             timeline.append(item)
         return timeline
 

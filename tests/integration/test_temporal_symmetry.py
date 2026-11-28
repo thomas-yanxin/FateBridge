@@ -39,7 +39,7 @@ def _call_tool(
     tool_name: str,
     arguments: dict[str, object],
     *,
-    detail: str = "audit",
+    include: list[str] | None = None,
     as_of: str = "2026-10-12T12:00:00+08:00",
 ) -> dict[str, object]:
     spec = SPECS[tool_name]
@@ -47,9 +47,9 @@ def _call_tool(
     raw = execute_with_receipt(
         spec,
         request,
-        options=ExecutionOptions(detail=detail, as_of=as_of),
+        options=ExecutionOptions(as_of=as_of),
     )
-    return deliver_response(raw, spec=spec, detail=detail)
+    return deliver_response(raw, spec=spec, include=include)
 
 
 @pytest.mark.parametrize(
@@ -125,8 +125,8 @@ def test_solar_term_timeline_emits_analysis_context() -> None:
     assert result["analysis_context"]["timezone"] == "Asia/Shanghai"
 
 
-def test_bazi_timing_include_timelines_compact_and_summary() -> None:
-    compact = _call_tool(
+def test_bazi_timing_include_timelines_default_and_summary() -> None:
+    default_out = _call_tool(
         "bazi_timing",
         {
             **BIRTH_ARGS,
@@ -134,36 +134,40 @@ def test_bazi_timing_include_timelines_compact_and_summary() -> None:
             "analysis_month": 10,
             "include_timelines": True,
         },
-        detail="compact",
     )
-    cal = compact["analysis_calendar"]
+    cal = default_out["analysis_calendar"]
     assert len(cal["liuyue_timeline"]) == 12
     assert len(cal["jieqi_timeline"]) == 24
+    solar_term_default_keys = {
+        "name",
+        "resolution_provider",
+        "ephemeris_model",
+        "timezone",
+        "datetime",
+        "datetime_utc",
+        "date_key",
+        "day_ganzhi",
+        "datetime_with_offset",
+        "utc_offset_seconds",
+        "fold",
+    }
     first_month = cal["liuyue_timeline"][0]
-    assert set(first_month["start_term"]) <= {
-        "name",
-        "datetime_with_offset",
-        "datetime_utc",
-        "day_ganzhi",
-        "ephemeris_model",
-    }
+    assert set(first_month["start_term"]) <= solar_term_default_keys
+    assert "civil_point" not in first_month["start_term"]
+    assert "comparison_policy" not in first_month["start_term"]
     first_jieqi = cal["jieqi_timeline"][0]
-    assert set(first_jieqi["jieqi"]) <= {
-        "name",
-        "datetime_with_offset",
-        "datetime_utc",
-        "day_ganzhi",
-        "ephemeris_model",
-    }
+    assert set(first_jieqi["jieqi"]) <= solar_term_default_keys
+    assert "civil_point" not in first_jieqi["jieqi"]
+    assert "comparison_policy" not in first_jieqi["jieqi"]
 
-    audit = _call_tool(
+    full_out = _call_tool(
         "bazi_timing",
         {**BIRTH_ARGS, "analysis_year": 2026, "analysis_month": 10},
-        detail="audit",
+        include=["*"],
     )
-    assert isinstance(audit["summary"], dict)
-    assert audit["summary"]["liunian"] == audit["liunian"]["pillar"]
-    assert audit["summary"]["liuyue"] == audit["liuyue"]["pillar"]
+    assert isinstance(full_out["summary"], dict)
+    assert full_out["summary"]["liunian"] == full_out["liunian"]["pillar"]
+    assert full_out["summary"]["liuyue"] == full_out["liuyue"]["pillar"]
 
 
 def test_bazi_range_scans_yearly_monthly_daily_and_dayun_timeline(
@@ -198,7 +202,6 @@ def test_bazi_range_scans_yearly_monthly_daily_and_dayun_timeline(
     yearly = _call_tool(
         "bazi_yearly_timing",
         {**BIRTH_ARGS, "analysis_year": 2026, "end_year": 2030},
-        detail="compact",
     )
     assert context_calls == 1
     assert [row["year"] for row in yearly["yearly_timeline"]] == [
@@ -212,18 +215,27 @@ def test_bazi_range_scans_yearly_monthly_daily_and_dayun_timeline(
     monthly = _call_tool(
         "bazi_monthly_timing",
         {**BIRTH_ARGS, "analysis_year": 2026, "analysis_month": 2, "scan_months": 3},
-        detail="compact",
     )
     assert context_calls == 2
     assert [row["branch"] for row in monthly["monthly_timeline"]] == ["寅", "卯", "辰"]
     assert "solar_term_window" in monthly["liuyue"]
     assert set(monthly["liuyue"]["solar_term_window"]["start_term"]) <= {
         "name",
-        "datetime_with_offset",
-        "datetime_utc",
-        "day_ganzhi",
+        "resolution_provider",
         "ephemeris_model",
+        "timezone",
+        "datetime",
+        "datetime_utc",
+        "date_key",
+        "day_ganzhi",
+        "datetime_with_offset",
+        "utc_offset_seconds",
+        "fold",
     }
+    assert "civil_point" not in monthly["liuyue"]["solar_term_window"]["start_term"]
+    assert (
+        "comparison_policy" not in monthly["liuyue"]["solar_term_window"]["start_term"]
+    )
 
     daily = _call_tool(
         "bazi_daily_timing",
@@ -234,7 +246,6 @@ def test_bazi_range_scans_yearly_monthly_daily_and_dayun_timeline(
             "analysis_day": 12,
             "scan_days": 5,
         },
-        detail="compact",
     )
     assert context_calls == 3
     assert [row["date"] for row in daily["daily_timeline"]] == [
@@ -248,7 +259,6 @@ def test_bazi_range_scans_yearly_monthly_daily_and_dayun_timeline(
     luck = _call_tool(
         "bazi_luck_cycles",
         {**BIRTH_ARGS, "analysis_year": 2026},
-        detail="compact",
     )
     assert len(luck["dayun_timeline"]) == 12
     assert luck["dayun_timeline"][0]["period"] == 1
@@ -327,6 +337,7 @@ def test_astro_birth_request_place_and_gender_symmetry_without_eager_catalog() -
             "analysis_month": 10,
             "analysis_day": 12,
         },
+        include=["*"],
     )
     assert "error" not in western, western
     assert western["natal_reference"]["ascendant"]
@@ -362,6 +373,7 @@ def test_cross_tool_output_hygiene_contracts() -> None:
             "birth_minute": 30,
             "birth_place": "北京",
         },
+        include=["*"],
     )
     first_period = balbillus["balbillus"]["periods"][0]
     assert "subperiods" in first_period

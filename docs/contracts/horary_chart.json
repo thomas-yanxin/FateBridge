@@ -4,10 +4,35 @@
     "clock_input": "Use explicit question_clock_basis only from confirmed clock evidence: civil / local_mean_solar / local_apparent_solar.",
     "clock_seconds": "Use question_second only for confirmed whole-second labels0..59; omitted defaults to0. Do not invent unknown seconds.",
     "hour_origin": "Use question_hour_origin=noon only for confirmed noon-based clock-hour labels such as Lilly1647 pp30-31 ephemeris tables. Default midnight preserves modern labels. Noon0=same-date12:00; noon12..23=next-date00:00..11:00.",
-    "interpretation_boundary": "Read the native events, Lilly conditions, and missing conditions in horary.perfection with the actual moon.motion_basis and rule_profile. Treat instantaneous aspects and same-ruler geometry as candidate facts.",
+    "interpretation_boundary": "Read the native events, Lilly conditions, and missing conditions in horary_chart.perfection with the actual horary_chart.moon.motion_basis and horary_chart.rule_profile. Treat instantaneous aspects and same-ruler geometry as candidate facts.",
     "physical_epoch": "太阳时反解的有效时刻可能落在UTC闰秒。converted_utc可含23:59:60；按clock_conversion.utc_representation区分标签与datetime可表示性，计算使用原生TT/UT1。不能把不能解析datetime说成计算失败，也不能将秒60截断、平滑或移到次日；数值标签精度不代表实测钟时精度。",
     "ut1_source": "ut1_source默认swiss_delta_t；显式iers_c04使用固定IERS20 C04最终每日合成值，仅覆盖1962-01-01 00:00至2026-09-19 00:00 UTC，需要UT1的时刻超范围拒绝；地心TT黄经事件试算不需要UT1。连续TT上先去除62项zonal模型，对UT1-TAI作四点Lagrange插值，再恢复zonal并加入声明的日内模型；不要重复叠加回执中的zonal项。"
   },
+  "default_omit": [
+    "calendar_conversion",
+    "clock_conversion",
+    "analysis_context.radicality_context",
+    "horary_chart.calculation_basis",
+    "horary_chart.ephemeris_source_identity",
+    "horary_chart.rule_profile",
+    "horary_chart.planets",
+    "horary_chart.significators.querent.house_assignment",
+    "horary_chart.significators.querent.house_condition",
+    "horary_chart.significators.querent.essential_condition",
+    "horary_chart.significators.quesited.house_assignment",
+    "horary_chart.significators.quesited.house_condition",
+    "horary_chart.significators.quesited.essential_condition",
+    "horary_chart.significators.moon_co_significator",
+    "horary_chart.fortitudes",
+    "horary_chart.fortune",
+    "horary_chart.chart_almuten",
+    "horary_chart.radicality.clauses",
+    "horary_chart.radicality.hour_inputs",
+    "horary_chart.radicality.reported_context",
+    "horary_chart.moon.motion_basis",
+    "horary_chart.perfection.event_history",
+    "horary_chart.perfection.lilly_conditions"
+  ],
   "evidence_views": {
     "calendar_input": {
       "fields": [
@@ -92,7 +117,7 @@
         "horary_chart.fortune.source_method_scope",
         "horary_chart.fortune.full_original_text_acceptance"
       ],
-      "purpose": "Lilly pp143-144 uses physical ASC+Moon-Sun day and night. Keep geometric occupancy, nearest-cusp virtue and significator roles separate. The28 p145 rows include neutral Aries and Fortune-specific sixth/eighth-house weights. Exact planetary rays and p179 stellar range transfer are disclosed conventions. P180 beyond-five-degree assignment and row discrepancies remain failed controls; unknowns never equal zero; no wealth amount, success probability or complete judgement follows.",
+      "purpose": "Lilly pp143-144 uses physical ASC+Moon-Sun day and night. Keep geometric occupancy, nearest-cusp virtue and significator roles separate. The28 p145 rows include neutral Aries and Fortune-specific sixth/eighth-house weights. Exact planetary rays and p179 stellar range transfer are disclosed policies. P180 beyond-five-degree assignment and row discrepancies remain failed controls; unknowns never equal zero; no wealth amount, success probability or complete judgement follows.",
       "when": "核对Lilly1647福点昼夜同式、宫头五度效力归属和第145页独立强弱表。"
     },
     "lilly_orbs_houses": {

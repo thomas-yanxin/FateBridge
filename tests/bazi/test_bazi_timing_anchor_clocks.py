@@ -160,9 +160,6 @@ def test_actual_provider_lidong_replays_new_month_on_rest_native_mcp_and_cli(
     response, protocol, code, local = surface_calls(
         spec,
         args,
-        flags=["--detail", "audit"],
-        options={"detail": "audit"},
-        params={"detail": "audit"},
         cli_first=False,
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error

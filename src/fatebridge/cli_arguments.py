@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Annotated, Literal, NoReturn, get_args, get_or
 
 from fatebridge.application.tool_spec import ServiceResult
 from fatebridge.services.tool_catalog import all_catalog, get_spec
-from fatebridge.transports.flags import FIELDS_FLAG_DESC
+from fatebridge.transports.flags import FIELDS_FLAG_DESC, INCLUDE_FLAG_DESC
 
 if TYPE_CHECKING:
     from pydantic.fields import FieldInfo
@@ -345,8 +345,15 @@ def _add_execution_flags(parser: argparse.ArgumentParser) -> None:
 
 
 def _add_transport_flags(parser: argparse.ArgumentParser) -> None:
-    """Attach shared execution and field-projection controls to each tool command."""
+    """Attach shared execution and delivery projection controls to each tool command."""
     _add_execution_flags(parser)
+    parser.add_argument(
+        "--include",
+        nargs="*",
+        default=None,
+        metavar="KEY",
+        help=INCLUDE_FLAG_DESC,
+    )
     parser.add_argument(
         "--fields",
         nargs="*",

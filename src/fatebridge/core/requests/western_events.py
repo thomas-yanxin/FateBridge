@@ -342,7 +342,18 @@ class AstroElectionRequest(WesternEventClockFields):
         default=0,
         ge=0,
         le=168,
-        description="Optional candidate window scanner duration (hours, 0..168). When > 0, scans 1-hour steps forward from candidate datetime for top non-VOC, benefic-supported windows.",
+        description=(
+            "Optional candidate window scanner duration (hours, 0..168). When > 0, "
+            "scans forward in steps of max(1, search_window_hours // 24) hours from "
+            "candidate datetime (0..search_window_hours inclusive) for top non-VOC, "
+            "benefic-supported windows."
+        ),
+    )
+    max_candidate_windows: int | None = Field(
+        default=5,
+        ge=1,
+        le=169,
+        description="Maximum candidate windows returned when search_window_hours > 0 (default 5; null returns all scanned windows).",
     )
 
     @model_validator(mode="after")

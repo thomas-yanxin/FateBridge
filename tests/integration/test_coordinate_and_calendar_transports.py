@@ -26,7 +26,7 @@ from tests.support.transports import (
 __all__ = ["rest", "surface_calls"]
 
 
-def invoke(tool, inputs, monkeypatch, capsys, *, detail="audit"):
+def invoke(tool, inputs, monkeypatch, capsys, *, include=("*",)):
     spec = resolve_spec(CATALOG, tool)
     assert spec is not None
     monkeypatch.setattr(
@@ -34,10 +34,10 @@ def invoke(tool, inputs, monkeypatch, capsys, *, detail="audit"):
         "API_KEY_AUTHENTICATOR",
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
-    response = TestClient(api.app).post(
-        spec.rest_path, json=inputs, params={"detail": detail}
-    )
-    args = [tool, "--detail", detail]
+    include_list = list(include) if include is not None else None
+    params = {"include": include_list} if include_list is not None else None
+    response = TestClient(api.app).post(spec.rest_path, json=inputs, params=params)
+    args = [tool, *(["--include", *include_list] if include_list is not None else ())]
     for key, value in inputs.items():
         if value is None:
             # CLI optional flags represent JSON null by omission.
@@ -60,10 +60,15 @@ def invoke(tool, inputs, monkeypatch, capsys, *, detail="audit"):
 
     async def call():
         async with Client(mcp_app) as client:
+            mcp_args = (
+                {**inputs, "include": include_list}
+                if include_list is not None
+                else inputs
+            )
             return await call_calculation(
                 client,
                 tool,
-                {**inputs, "detail": detail},
+                mcp_args,
                 raise_on_error=False,
             )
 
@@ -274,7 +279,6 @@ def test_lunar_calendar_separates_civil_season_and_solar_day_across_surfaces(
             "time_alg": 0,
         },
         projection={
-            "detail": "audit",
             "fields": [
                 "year_ganzhi",
                 "month_ganzhi",
@@ -308,7 +312,7 @@ def test_nongli_uses_selected_fold_for_seasonal_elapsed_time(surface_calls) -> N
         response, protocol, code, cli = surface_calls(
             SPECS["lunar_calendar_time"],
             {**inputs, "analysis_utc_offset": offset},
-            projection={"detail": "audit"},
+            projection={"include": ["*"]},
         )
         assert response.status_code == 200 and code == 0 and not protocol.is_error
         http = response.json()
@@ -389,11 +393,10 @@ def test_canonical_helper_results_agree_without_duplicate_fields(
     assert outputs[0][canonical] == outputs[1][canonical] == outputs[2][canonical]
 
 
-def test_compact_solar_term_year_preserves_requested_filter(surface_calls) -> None:
+def test_default_solar_term_year_preserves_requested_filter(surface_calls) -> None:
     response, protocol, code, cli = surface_calls(
         SPECS["solar_terms_for_year"],
         {"year": 2028, "jieqis": ["春分", "未知节气", "冬至"]},
-        projection={"detail": "compact"},
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     http = response.json()
@@ -419,7 +422,7 @@ def test_birth_strength_uses_one_assessment_on_every_transport(
         },
         monkeypatch,
         capsys,
-        detail="audit",
+        include=["*"],
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     births = [output["bazi_birth"] for output in outputs]

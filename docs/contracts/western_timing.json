@@ -1,10 +1,24 @@
 {
   "call_guidance": {
-    "complete_export": "用户要求完整JSON、全部时间线或完整文件时，首次fields=null，保留默认响应预算，再读取result_delivery；first_view仅用于摘要咨询，不能先投影摘要再补算全文。",
-    "delivery": "MCP默认8192字符，完整结果超限返回result_delivery。用其manifest_uri按所需字段或分页读取同一run；完整JSON重组并核对原run，不重新计算，不解析截断片段。",
-    "evidence": "首次按问题选择evidence_views.stage/annual/short_term/career的fields；事业兼阶段与目标时段用career，结合本命职业配置筛选相关hits。默认与其他视图不强制展开全部方法；fields=null仍表示全量。",
+    "complete_export": "用户要求完整JSON、全部时间线或完整输出时，使用 include=[\"*\"]（并省略 fields）；first_view 与 evidence_views 仅用于按需摘要或专题投影。",
+    "evidence": "首次按问题选择evidence_views.stage/annual/short_term/career的fields或include；事业兼阶段与目标时段用career，结合本命职业配置筛选相关hits。默认与其他视图不强制展开全部方法；include=[\"*\"] 表示全量。",
     "target_clock": "analysis_hour/minute 是目标钟时，按 birth_timezone；显式0有效。省略分别沿用出生小时/分钟，仅兼容日期级调用。return_timezone转换同一时刻。"
   },
+  "default_omit": [
+    "natal_reference",
+    "returns.solar_return.calculation_basis",
+    "returns.lunar_return",
+    "transits.current_transit.calculation_basis",
+    "transits.current_transit.transit_reference",
+    "transits.current_transit.location",
+    "directions.given_year",
+    "directions.secondary_progression",
+    "directions.solar_arc",
+    "directions.primary_directions",
+    "directions.primary_direction_chart",
+    "time_lords.zodiacal_releasing",
+    "time_lords.decennials"
+  ],
   "evidence_views": {
     "annual": {
       "fields": [
@@ -366,6 +380,21 @@
         "title": "Include Full Timelines",
         "type": "boolean"
       },
+      "max_hits": {
+        "anyOf": [
+          {
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional cap on returned aspect hits (default None returns all hits within orb_limit).",
+        "title": "Max Hits"
+      },
       "name": {
         "anyOf": [
           {
@@ -378,6 +407,14 @@
         "default": "未提供",
         "description": "Name (optional)",
         "title": "Name"
+      },
+      "orb_limit": {
+        "default": 1.5,
+        "description": "Maximum aspect orb in degrees (0..15, default 1.5).",
+        "maximum": 15.0,
+        "minimum": 0.0,
+        "title": "Orb Limit",
+        "type": "number"
       },
       "pd_aspects": {
         "description": "Primary direction aspects in degrees",
@@ -397,6 +434,14 @@
         "title": "Pd Direction Mode",
         "type": "string"
       },
+      "pd_max_age_years": {
+        "default": 100.0,
+        "description": "Upper age bound (years) for primary directions timeline.",
+        "exclusiveMinimum": 0.0,
+        "maximum": 150.0,
+        "title": "Pd Max Age Years",
+        "type": "number"
+      },
       "pd_method": {
         "default": "placidus",
         "description": "Primary direction method: placidus (default), regiomontanus, campanus, alcabitius, or equatorial (oblique ascension for Asc, RAMC for MC).",
@@ -412,6 +457,14 @@
         "title": "Pd Method",
         "type": "string"
       },
+      "pd_nearby_years": {
+        "default": 5.0,
+        "description": "Year radius around current age when include_full_timelines is false.",
+        "exclusiveMinimum": 0.0,
+        "maximum": 100.0,
+        "title": "Pd Nearby Years",
+        "type": "number"
+      },
       "pd_time_key": {
         "default": "Ptolemy",
         "description": "Primary direction time key: Ptolemy, Naibod, Cardan, Solar_Arc, or Van_Dam.",
@@ -425,12 +478,28 @@
         "title": "Pd Time Key",
         "type": "string"
       },
+      "pd_timeline_limit": {
+        "default": 25,
+        "description": "Maximum nearby timeline entries when include_full_timelines is false.",
+        "maximum": 500,
+        "minimum": 1,
+        "title": "Pd Timeline Limit",
+        "type": "integer"
+      },
       "pd_type": {
         "default": 0,
         "description": "Primary direction mode: 0 for direct, 1 for converse",
         "maximum": 1,
         "minimum": 0,
         "title": "Pd Type",
+        "type": "integer"
+      },
+      "pd_window_size": {
+        "default": 6,
+        "description": "Maximum events in primary directions current/exact windows.",
+        "maximum": 50,
+        "minimum": 1,
+        "title": "Pd Window Size",
         "type": "integer"
       },
       "return_latitude": {

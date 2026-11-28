@@ -53,7 +53,7 @@ def test_boundary_years_retain_bazi_and_explicit_lunar_sources(
         "analysis_day": day,
     }
     response = rest.post(
-        SPECS["bazi_birth_chart"].rest_path, json=args, params={"detail": "audit"}
+        SPECS["bazi_birth_chart"].rest_path, json=args, params={"include": ["*"]}
     )
     assert response.status_code == 200
     bazi = response.json()["bazi_birth"]

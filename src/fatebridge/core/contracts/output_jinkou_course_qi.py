@@ -4,34 +4,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from fatebridge.core.contracts.output_jinkou_qi import compare
 from fatebridge.core.contracts.output_jinkou_qi_models import JinkouQiEvidence
-from fatebridge.core.metaphysics.jinkou.board import build_jinkou_qi
-
-
-def qi_metadata() -> dict[str, Any]:
-    return {"ruleset_id": "jinkou_month_day_qi_v1"}
 
 
 def validate_course_qi(board: dict[str, Any]) -> None:
-    # Runtime import avoids a schema import cycle. The child validator calls only
-    # validate_qi_fields, so trace-only views do not recurse through the course.
-
     block = board.get("qi_evidence")
     if isinstance(block, dict):
         JinkouQiEvidence.model_validate(block)
-    traces = [
-        t
-        for t in board.get("rule_trace") or []
-        if t.get("rule_id") == "jinkou.month_day_qi"
-    ]
-    if len(traces) > 1:
-        raise ValueError("月建日辰得气轨迹不可重复")
-    for trace in traces:
-        metadata = qi_metadata()
-        compare(trace, {"source_section": metadata["source_section"]})
-        result = trace.get("result")
-        if isinstance(result, dict):
-            JinkouQiEvidence.model_validate(result)
-            if isinstance(block, dict):
-                compare(result, block)

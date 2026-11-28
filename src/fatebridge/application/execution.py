@@ -115,11 +115,9 @@ def execute_with_receipt(
                 request,
                 result,
                 clock=clock,
-                options=controls,
                 elapsed_ms=elapsed_ms,
                 generated_seed=seed_was_generated,
                 replay_overrides=replay_overrides,
-                compact_receipt=controls.detail == "compact",
             )
             base_metadata = run_metadata.build_run_metadata(
                 result,

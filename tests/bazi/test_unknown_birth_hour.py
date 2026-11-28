@@ -62,7 +62,7 @@ def test_unknown_birth_hour_three_pillars_bazi_and_liuren_runyear() -> None:
             ]
         )
     }
-    opts = ExecutionOptions(detail="compact", as_of="2026-04-06T09:30:00+08:00")
+    opts = ExecutionOptions(as_of="2026-04-06T09:30:00+08:00")
     base = {
         "name": "案例对象",
         "gender": "male",
@@ -78,7 +78,6 @@ def test_unknown_birth_hour_three_pillars_bazi_and_liuren_runyear() -> None:
             specs["bazi_overview"], BaziOverviewRequest(**base), options=opts
         ),
         spec=specs["bazi_overview"],
-        detail="compact",
     )
     assert overview["four_pillars"]["hour"] is None
     assert set(overview["ten_gods"]) == {"year", "month", "day"}
@@ -92,7 +91,6 @@ def test_unknown_birth_hour_three_pillars_bazi_and_liuren_runyear() -> None:
             specs["bazi_birth_chart"], BaziBirthRequest(**base), options=opts
         ),
         spec=specs["bazi_birth_chart"],
-        detail="compact",
     )
     assert birth_chart["bazi_birth"]["four_pillars"]["hour"] is None
     assert set(birth_chart["bazi_birth"]["three_origins"]) == {"taiyuan"}
@@ -108,7 +106,6 @@ def test_unknown_birth_hour_three_pillars_bazi_and_liuren_runyear() -> None:
             options=opts,
         ),
         spec=specs["bazi_timing"],
-        detail="compact",
     )
     assert timing["four_pillars"]["hour"] is None
     assert timing["coverage"]["mode"] == "three_pillars_hour_unknown"
@@ -128,7 +125,6 @@ def test_unknown_birth_hour_three_pillars_bazi_and_liuren_runyear() -> None:
             options=opts,
         ),
         spec=specs["liuren_yearly_timing"],
-        detail="compact",
     )
     assert runyear["runyear"]["birth_lunar_year"] == 2003
     assert runyear["coverage"]["mode"] == "date_only_hour_unknown"
@@ -144,9 +140,7 @@ def test_unknown_birth_hour_lichun_solar_term_boundary_warning() -> None:
         birth_time_unknown=True,
         birth_place="杭州西湖区",
     )
-    res = execute_with_receipt(
-        specs["bazi_overview"], req, options=ExecutionOptions(detail="compact")
-    )
+    res = execute_with_receipt(specs["bazi_overview"], req, options=ExecutionOptions())
     warnings = res["coverage"]["boundary_warnings"]
     assert any("立春" in w for w in warnings), warnings
 
@@ -191,7 +185,6 @@ def test_batch_unknown_birth_hour_end_to_end() -> None:
                 {"id": "lr", "tool": "liuren_chart", "subject": "client"},
             ],
             "as_of": "2026-04-06T09:30:00+08:00",
-            "detail": "compact",
         }
     )
     res = execute_batch(specs, req)

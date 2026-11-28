@@ -6,8 +6,30 @@
     "geometry": "sector13 is an ascendant-relative equal partition, independent of the twelve-house selection; IAU constellations have different boundaries.",
     "house_roles": "Keep the selected base-chart12-house system separate from native reference-angle extraction, Meridian cusps and the custom13-sector partition. In the current numeric policy hsys1 is Alcabitus (SwissB), never Equal.",
     "physical_ephemeris": "Read chart_profile.physical_ephemeris_source for the actual nominal physical-body models, observed file names, ranges and DE headers; the analytical node is separate.",
-    "reference_angle_qualification": "When sector_profile.status=underdetermined_ascendant, no unique ASC-relative13-sector assignment exists: planets.sector13 and profile.anchor_longitude are null, thirteen_sectors is empty."
+    "reference_angle_qualification": "When sector_profile.status=underdetermined_ascendant, no unique ASC-relative13-sector assignment exists: planets.sector13 and sector_profile.anchor_longitude are null, thirteen_sectors is empty."
   },
+  "default_omit": [
+    "houses",
+    "aspects",
+    "aspect_evidence",
+    "classical",
+    "classical_patterns",
+    "planetary_hours",
+    "fixed_stars",
+    "element_balance",
+    "modality_balance",
+    "balance_basis",
+    "chart_profile.aspect_policy",
+    "chart_profile.physical_ephemeris_source",
+    "planets.*.dignity",
+    "planets.*.sector13_evidence",
+    "birth_time_sensitivity.factor_spans",
+    "birth_time_sensitivity.sector_assignments",
+    "birth_time_sensitivity.clock_policy",
+    "birth_time_sensitivity.scope",
+    "birth_time_sensitivity.samples",
+    "birth_time_sensitivity.physical_ephemeris_sources"
+  ],
   "evidence_views": {
     "aspect_motion": {
       "fields": [

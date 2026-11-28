@@ -244,16 +244,15 @@ def test_correct_progression_frames_reach_rest_mcp_cli(
     spec = SPECS[tool]
     key = tool
     fields = ["natal_reference", key, "analysis_context.zodiac_type"]
-    query = [("fields", field) for field in fields] + [("detail", "audit")]
+    query = [("fields", field) for field in fields]
     http, protocol, code, cli = surface_calls(
         spec,
         BIRTH_INPUTS,
         params=query,
         options={
-            "detail": "audit",
             "fields": fields,
         },
-        flags=["--detail", "audit", "--fields", *fields],
+        flags=["--fields", *fields],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error
@@ -293,7 +292,6 @@ def test_planetary_arc_uses_independent_secondary_clock_on_all_surfaces(
         {**BIRTH_INPUTS, "arc_source": arc_source},
         projection={
             "fields": ["natal_reference.sun", "planetary_arc"],
-            "detail": "audit",
         },
     )
     assert response.status_code == 200, response.text

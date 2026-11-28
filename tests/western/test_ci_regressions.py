@@ -193,9 +193,9 @@ def test_leap_birth_year_and_active_month_agree_on_all_transports(
     response, protocol, code, local = surface_calls(
         spec,
         payload,
-        params=[("detail", "audit")] + [("fields", field) for field in fields],
-        options={"detail": "audit", "fields": fields},
-        flags=["--detail", "audit", "--fields", *fields],
+        params=[("fields", field) for field in fields],
+        options={"fields": fields},
+        flags=["--fields", *fields],
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
@@ -411,16 +411,13 @@ def test_derived_calculations_reach_all_three_transports(
         **options,
     }
     fields = [field]
-    query = [("detail", "audit"), ("fields", field)]
+    query = [("fields", field)]
     http, protocol, code, cli = surface_calls(
         spec,
         inputs,
         params=query,
-        options={
-            "detail": "audit",
-            "fields": fields,
-        },
-        flags=["--detail", "audit", "--fields", *fields],
+        options={"fields": fields},
+        flags=["--fields", *fields],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error

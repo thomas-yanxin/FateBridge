@@ -694,7 +694,9 @@ def build_primary_directions_payload(
     pd_type: int = 0,
     pd_aspects: list[int] | None = None,
     max_age_years: float = PRIMARY_DIRECTION_MAX_AGE_YEARS,
-    current_window_size: int = 12,
+    current_window_size: int = 6,
+    nearby_years: float = 5.0,
+    timeline_limit: int = 25,
     direction_mode: str = "zodiacal",
     natal_lots: Mapping[str, dict[str, Any]] | None = None,
     include_full_timelines: bool = True,
@@ -709,6 +711,8 @@ def build_primary_directions_payload(
         pd_aspects=pd_aspects,
         max_age_years=max_age_years,
         current_window_size=current_window_size,
+        nearby_years=nearby_years,
+        timeline_limit=timeline_limit,
         direction_mode=direction_mode,
         natal_lots=natal_lots,
         include_full_timelines=include_full_timelines,
@@ -725,7 +729,9 @@ def build_primary_direction_analysis(
     pd_type: int = 0,
     pd_aspects: list[int] | None = None,
     max_age_years: float = PRIMARY_DIRECTION_MAX_AGE_YEARS,
-    current_window_size: int = 12,
+    current_window_size: int = 6,
+    nearby_years: float = 5.0,
+    timeline_limit: int = 25,
     direction_mode: str = "zodiacal",
     natal_lots: Mapping[str, dict[str, Any]] | None = None,
     include_full_timelines: bool = True,
@@ -992,9 +998,9 @@ def build_primary_direction_analysis(
         nearby = [
             item
             for item in full_timeline
-            if abs(item["relative_years_from_current"]) <= 5.0
+            if abs(item["relative_years_from_current"]) <= nearby_years
         ]
-        if len(nearby) > 25:
+        if len(nearby) > timeline_limit:
             closest_indices = sorted(
                 range(len(nearby)),
                 key=lambda idx: (
@@ -1002,34 +1008,29 @@ def build_primary_direction_analysis(
                     nearby[idx]["event_age_years"],
                     idx,
                 ),
-            )[:25]
+            )[:timeline_limit]
             nearby = [nearby[idx] for idx in sorted(closest_indices)]
         timeline = nearby
-    current_window = [
-        e.payload
-        for e in sorted(events, key=lambda item: item.proximity_key)[
-            :current_window_size
-        ]
-    ]
+    all_proximity = sorted(events, key=lambda item: item.proximity_key)
+    current_window = [e.payload for e in all_proximity[:current_window_size]]
+    current_window_total_count = len(all_proximity)
     phase_size = max(3, current_window_size // 2)
-    past_window = [
-        e.payload
-        for e in sorted(
-            (e for e in events if e.payload["timing_phase"] == "past"),
-            key=lambda item: item.chronological_key[0],
-            reverse=True,
-        )[:phase_size]
-    ]
-    future_window = [
-        e.payload for e in events if e.payload["timing_phase"] in ("future", "exact")
-    ][:phase_size]
-    exact_window = [
-        e.payload
-        for e in sorted(
-            (e for e in events if e.payload["timing_phase"] == "exact"),
-            key=lambda item: item.proximity_key,
-        )[:current_window_size]
-    ]
+    all_past = sorted(
+        (e for e in events if e.payload["timing_phase"] == "past"),
+        key=lambda item: item.chronological_key[0],
+        reverse=True,
+    )
+    past_window = [e.payload for e in all_past[:phase_size]]
+    past_window_total_count = len(all_past)
+    all_future = [e for e in events if e.payload["timing_phase"] in ("future", "exact")]
+    future_window = [e.payload for e in all_future[:phase_size]]
+    future_window_total_count = len(all_future)
+    all_exact = sorted(
+        (e for e in events if e.payload["timing_phase"] == "exact"),
+        key=lambda item: item.proximity_key,
+    )
+    exact_window = [e.payload for e in all_exact[:current_window_size]]
+    exact_window_total_count = len(all_exact)
 
     payload = {
         "method": pd_method,
@@ -1060,15 +1061,19 @@ def build_primary_direction_analysis(
         "current_arc_degrees": float(current_arc),
         "current_arc_absolute_degrees": abs(float(current_arc)),
         "current_window": current_window,
+        "current_window_total_count": current_window_total_count,
         "past_window": past_window,
+        "past_window_total_count": past_window_total_count,
         "future_window": future_window,
+        "future_window_total_count": future_window_total_count,
         "exact_window": exact_window,
+        "exact_window_total_count": exact_window_total_count,
         "timeline": timeline,
+        "total_timeline_count": total_timeline_count,
         "skipped_circumpolar_count": len(skipped_circumpolar),
     }
     if not include_full_timelines:
         payload["timeline_truncated"] = len(timeline) < total_timeline_count
-        payload["total_timeline_count"] = total_timeline_count
     return PrimaryDirectionAnalysis(
         payload=payload,
         current_arc=float(current_arc),
@@ -1100,6 +1105,9 @@ def build_primary_direction_chart_payload(
     current_arc_degrees: Angle,
     current_hits: list[dict[str, Any]],
     show_pd_bounds: bool,
+    exact_hits: list[dict[str, Any]] | None = None,
+    hits_total_count: int | None = None,
+    exact_hits_total_count: int | None = None,
     natal_lots: Mapping[str, dict[str, Any]] | None = None,
     context: PrimaryDirectionEquatorialContext | None = None,
     equatorial: Mapping[str, tuple[float, float]] | None = None,
@@ -1226,6 +1234,12 @@ def build_primary_direction_chart_payload(
             for lk, l in directed_lots.items()
         }
 
+    resolved_exact_hits = (
+        list(exact_hits)
+        if exact_hits is not None
+        else [item for item in current_hits if item.get("timing_phase") == "exact"]
+    )
+    resolved_hits = list(current_hits)
     payload: dict[str, Any] = {
         "analysis_datetime": analysis_datetime.isoformat(),
         "method": pd_method,
@@ -1244,16 +1258,22 @@ def build_primary_direction_chart_payload(
         "approximation_label": approximation_label,
         "coordinate_precision": coordinate_precision,
         "coordinate_backend": coordinate_backend,
-        "exact_hits": [
-            item for item in current_hits[:8] if item.get("timing_phase") == "exact"
-        ],
+        "exact_hits": resolved_exact_hits,
+        "exact_hits_total_count": (
+            exact_hits_total_count
+            if exact_hits_total_count is not None
+            else len(resolved_exact_hits)
+        ),
         "bounds_overlay": bounds_overlay,
         "directed_points": directed_points,
         "directed_lots": directed_lots,
         "sign_changes": sign_changes,
         "directed_ascendant": directed_points.get("Ascendant"),
         "directed_medium_coeli": directed_points.get("Medium_Coeli"),
-        "hits": current_hits[:8],
+        "hits": resolved_hits,
+        "hits_total_count": (
+            hits_total_count if hits_total_count is not None else len(resolved_hits)
+        ),
         "asc_sign": asc_sign,
     }
     if not embedded_in_western_timing:
@@ -1264,7 +1284,7 @@ def build_primary_direction_chart_payload(
                 "natal_coordinate_lots": coordinate_lots,
                 "directed_coordinate_points": current_coordinate_points,
                 "directed_coordinate_lots": current_coordinate_lots,
-                "coordinate_hits": current_hits[:8],
+                "coordinate_hits": resolved_hits,
             }
         )
     elif not include_shared_primary_directions:

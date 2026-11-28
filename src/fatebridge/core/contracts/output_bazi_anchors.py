@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from fatebridge.utils.data import TenGod
-
 TOPICS = (
     "career",
     "wealth",

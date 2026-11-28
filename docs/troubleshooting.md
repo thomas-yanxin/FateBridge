@@ -68,7 +68,7 @@ curl http://localhost:8011/health
 | --- | --- | --- |
 | `authentication_required` | HTTP 401 | 配置了 `FATEBRIDGE_API_KEYS` 但请求缺少或错传密钥头；`agent:secret` 配置只发送 `secret` 不含前缀，`/api/tools` 同样受保护 |
 | `unknown_tool` | HTTP 404 / CLI 2 | 工具名拼错或被 `FATEBRIDGE_MCP_FAMILIES` 排除；从 `issues[].constraints.suggestions` 选择正确工具名 |
-| `validation_error` | HTTP 422 / 400 | 缺必填字段、类型/取值越界、非法 JSON、重复钟时缺 `birth_utc_offset`（看 `constraints.expected`）、无经度显式要求真太阳时，或将 `detail`/`fields`/`as_of` 误放入 REST JSON 体（应放 URL 查询参数） |
+| `validation_error` | HTTP 422 / 400 | 缺必填字段、类型/取值越界、非法 JSON、重复钟时缺 `birth_utc_offset`（看 `constraints.expected`）、无经度显式要求真太阳时，同时传入 `include` 与 `fields`、传入已移除的 `detail` 参数，或将 `include`/`fields`/`as_of` 误放入 REST JSON 体（应放 URL 查询参数） |
 | `filter_required_for_full_detail` | HTTP 422 | 调用 `discover_tools` / `/api/tools` / `fatebridge discover` 时传了 `detail=full` 但未提供 `tool`、`family` 或 `q` 过滤 |
 | `consultation_restricted` | HTTP 422 | 命中生死寿命、灾祸断言、临床诊断或医疗择时红线（不可重试） |
 | `dependency_missing` | HTTP 503 | 缺少 `swisseph` 等运行时依赖（如西占推运、事件与生命周期工具或显式非整宫宫制），不回退近似轨道 |
@@ -93,9 +93,9 @@ curl http://localhost:8011/health
 
 ## 输出分级与字段投影
 
-### 返回精简载荷而非完整结果
+### 默认省略次级重型块而非完整结果
 
-三端默认 `detail=compact` 仅返回核心业务字段与精简 `run_metadata`。需要完整业务载荷、全部时间线与方法取证数据时，传 `detail=audit` 且不传 `fields`（REST `?detail=audit`、MCP `detail="audit", fields=None`、CLI `--detail audit`）。
+三端默认返回核心业务字段，并通过 `run_metadata.omitted_fields` 列出实际省略的可选重型路径。需要按需展开指定路径或 `evidence_views` 名称时传 `include`，需要无损完整业务载荷与全部时间线时传 `include=["*"]`（REST `?include=*`、MCP `include=["*"]`、CLI `--include "*"`；不可与 `fields` 同时传入）。
 
 ### 投影报 `unknown_projection_path` 或 `non_object_projection_path`
 

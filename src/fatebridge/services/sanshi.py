@@ -11,7 +11,6 @@ from fatebridge.core.metaphysics.jinkou import (
     build_jinkou_year_fate,
     build_natal_course,
     confirmed_natal_branch,
-    natal_course_trace,
 )
 from fatebridge.core.metaphysics.liureng import (
     ShehaiMethod,

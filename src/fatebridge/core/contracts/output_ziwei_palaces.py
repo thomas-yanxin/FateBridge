@@ -6,7 +6,6 @@ from pydantic import Field
 
 from fatebridge.core.contracts.output_base import (
     FULL_FACT,
-    OpenJsonValue,
     PartialOutput,
 )
 from fatebridge.core.contracts.output_chinese_calendar import BranchName
@@ -62,13 +61,6 @@ class ZiweiRuleset(PartialOutput):
     brightness_rule: str | None = None
     brightness_table: ZiweiBrightnessTableReceipt | None = None
     overrides: list[str] | None = None
-
-
-class ZiweiRuleTrace(PartialOutput):
-    rule_id: str | None = None
-    source: str | None = None
-    inputs: dict[str, OpenJsonValue] | None = None
-    outputs: dict[str, OpenJsonValue] | None = None
 
 
 class ZiweiYearCyclePosition(PartialOutput):

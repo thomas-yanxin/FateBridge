@@ -49,8 +49,6 @@ def test_cli_runs_bazi_dimension(capsys: pytest.CaptureFixture[str]) -> None:
             "male",
             "--dayun-pillar",
             "壬戌",
-            "--detail",
-            "audit",
         ]
     )
     out = capsys.readouterr().out
@@ -337,7 +335,7 @@ def test_ipip_ratings_preserve_an_unanswered_interior_slot(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     """A null rating leaves item 2 unanswered and keeps the next rating on item 3."""
-    command = ["ipip_big_five", "--detail", "audit", "--as-of", "2026-10-12T02:00:00Z"]
+    command = ["ipip_big_five", "--include", "*", "--as-of", "2026-10-12T02:00:00Z"]
     assert run([*command, "--responses", '{"1":5,"3":4}']) == 0
     expected = json.loads(capsys.readouterr().out)
     expected.pop("run_metadata", None)
@@ -437,7 +435,7 @@ def test_request_file_supplies_required_and_optional_fields(
             }
         ),
     )
-    code = run(["bazi_birth_chart", "--request-file", subject, "--detail", "audit"])
+    code = run(["bazi_birth_chart", "--request-file", subject, "--include", "*"])
     payload = json.loads(capsys.readouterr().out)
     assert code == 0
     chart = payload["bazi_birth"]
@@ -489,7 +487,7 @@ def test_request_file_reused_across_tools(
             }
         ),
     )
-    code = run(["ziwei_birth_chart", "--request-file", subject, "--detail", "audit"])
+    code = run(["ziwei_birth_chart", "--request-file", subject, "--include", "*"])
     payload = json.loads(capsys.readouterr().out)
     assert code == 0
     # This CLI-surface test only proves the request-file drives ziwei; the exact
@@ -616,8 +614,8 @@ def test_request_file_rejects_tool_options_not_in_selected_contract(
             subject_path,
             "--birth-latitude",
             "30.0",
-            "--detail",
-            "audit",
+            "--include",
+            "*",
         ]
     )
     payload = json.loads(capsys.readouterr().out)
@@ -625,7 +623,7 @@ def test_request_file_rejects_tool_options_not_in_selected_contract(
     assert payload["chart_profile"]["house_system_code"] == 8
 
 
-def test_cli_compact_supports_runtime_projection(
+def test_cli_default_supports_runtime_projection(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     subject = _full_subject(tmp_path)
@@ -637,8 +635,6 @@ def test_cli_compact_supports_runtime_projection(
                 "bazi_birth_chart",
                 "--request-file",
                 subject,
-                "--detail",
-                "compact",
                 "--as-of",
                 as_of,
             ]
@@ -649,6 +645,8 @@ def test_cli_compact_supports_runtime_projection(
     standalone = json.loads(standalone_raw)
     assert "snapshot_text" not in standalone
     assert "runtime" not in standalone["run_metadata"]
+    assert "duration_ms" in standalone["run_metadata"]
+    assert standalone["run_metadata"]["replay"]["as_of"] == "2026-10-12T04:00:00Z"
 
     assert (
         run(
@@ -656,8 +654,6 @@ def test_cli_compact_supports_runtime_projection(
                 "bazi_birth_chart",
                 "--request-file",
                 subject,
-                "--detail",
-                "audit",
                 "--as-of",
                 as_of,
                 "--fields",
@@ -675,8 +671,6 @@ def test_cli_compact_supports_runtime_projection(
                 "bazi_birth_chart",
                 "--request-file",
                 subject,
-                "--detail",
-                "compact",
                 "--as-of",
                 as_of,
                 "--fields",
@@ -694,8 +688,6 @@ def test_cli_compact_supports_runtime_projection(
                 "bazi_birth_chart",
                 "--request-file",
                 subject,
-                "--detail",
-                "compact",
                 "--as-of",
                 as_of,
                 "--fields",
@@ -715,8 +707,6 @@ def test_cli_compact_supports_runtime_projection(
                 "bazi_birth_chart",
                 "--request-file",
                 subject,
-                "--detail",
-                "compact",
                 "--fields",
                 "bazi_birth.missing",
             ]

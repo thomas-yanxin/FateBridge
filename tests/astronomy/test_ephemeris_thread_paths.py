@@ -151,17 +151,17 @@ def test_real_human_design_adapters_keep_actual_swiss_flags_after_thread_polluti
             response = rest.post(
                 spec.rest_path,
                 json=payload,
-                params={"as_of": AS_OF, "detail": "audit"},
+                params={"as_of": AS_OF, "include": "*"},
             )
             assert response.status_code == 200
             body = response.json()
         elif surface == "mcp":
-            response = asyncio.run(native(spec, payload, detail="audit"))
+            response = asyncio.run(native(spec, payload, include=["*"]))
             assert not response.is_error
             body = response.structured_content
         else:
             code, body = call_cli(
-                spec, payload, tmp_path, capsys, flags=["--detail", "audit"]
+                spec, payload, tmp_path, capsys, flags=["--include", "*"]
             )
             assert code == 0
         spec.output_model.model_validate(body)

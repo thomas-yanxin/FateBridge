@@ -39,7 +39,6 @@ from fatebridge.core.astro.reference_angles import (
 from fatebridge.core.astro.sensitive import SOURCE as SENSITIVE_SOURCE
 from fatebridge.core.astro.sensitive import sensitive_equivalence
 from fatebridge.core.astro.terrestrial_observer import terrestrial_frame
-from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
 from fatebridge.utils.errors import EphemerisCalculationError, EphemerisSourceError
 
 RULESET = "hamburg_midpoint_geometry_v3"
@@ -171,6 +170,7 @@ def midpoint_geometry(
     orb_degrees: float = 1.0,
     dial_degrees: str | None = None,
     sensitive_point_query: str | None = None,
+    max_higher_factor_contacts: int | None = None,
 ) -> dict[str, Any]:
     """Sorted O(N log N) dial sweep across 90/45 (and optional 22.5) degree dials."""
     if not math.isfinite(orb_degrees) or not 0 <= orb_degrees <= 5:
@@ -328,13 +328,24 @@ def midpoint_geometry(
             contacts.sort(key=lambda row: (row["orb"], row["equation"]))
         total_three = len(triples)
         total_four = len(quadruples)
-        cap = 10 if dial_degrees == "22.5" else 12
+        returned_three = (
+            triples[:max_higher_factor_contacts]
+            if max_higher_factor_contacts is not None
+            else triples
+        )
+        returned_four = (
+            quadruples[:max_higher_factor_contacts]
+            if max_higher_factor_contacts is not None
+            else quadruples
+        )
         dials[str(period)] = {
             "period_degrees": period,
             "two_factor_contacts": doubles,
-            "three_factor_contacts": triples[:cap],
+            "three_factor_contacts": returned_three,
+            "three_factor_returned_count": len(returned_three),
             "three_factor_total_count": total_three,
-            "four_factor_contacts": quadruples[:cap],
+            "four_factor_contacts": returned_four,
+            "four_factor_returned_count": len(returned_four),
             "four_factor_total_count": total_four,
         }
     unique_pairs = {
@@ -540,6 +551,7 @@ def build_midpoint_analysis(
     *,
     dial_degrees: str | None = None,
     sensitive_point_query: str | None = None,
+    max_higher_factor_contacts: int | None = 12,
 ) -> dict[str, Any]:
     """Native Hamburg midpoint geometry without prose bloat."""
     sidereal = base["chart_profile"]["zodiac"] == "sidereal"
@@ -555,6 +567,7 @@ def build_midpoint_analysis(
         {row["id"]: row["longitude"] for row in native["factors"]},
         dial_degrees=dial_degrees,
         sensitive_point_query=sensitive_point_query,
+        max_higher_factor_contacts=max_higher_factor_contacts,
     )
     qualify_reference_geometry(result, native.get("angle_definition"))
     for row in result["midpoint_axes"]:

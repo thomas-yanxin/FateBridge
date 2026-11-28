@@ -340,16 +340,13 @@ def test_nearest_return_and_zodiac_agree_across_rest_mcp_cli(
         zodiac_type=zodiac,
     )
     fields = ["planetary_returns.returns", "analysis_context.zodiac_type"]
-    query = [("fields", field) for field in fields] + [("detail", "audit")]
+    query = [("fields", field) for field in fields]
     http, protocol, code, cli = surface_calls(
         spec,
         inputs,
         params=query,
-        options={
-            "fields": fields,
-            "detail": "audit",
-        },
-        flags=["--fields", *fields, "--detail", "audit"],
+        options={"fields": fields},
+        flags=["--fields", *fields],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error

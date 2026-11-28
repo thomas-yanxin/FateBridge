@@ -12,7 +12,7 @@ import logging
 import math
 from bisect import bisect_right
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from fractions import Fraction
 from functools import lru_cache
 from importlib.resources import files

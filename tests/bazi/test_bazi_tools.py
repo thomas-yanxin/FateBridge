@@ -55,8 +55,8 @@ def test_fastmcp_bazi_birth_omits_deleted_snapshot_fields() -> None:
         analysis_year=2028,
         analysis_month=4,
         analysis_day=1,
-        detail="audit",
     )
 
+    assert "bazi_birth" in payload
     assert "snapshot_text" not in payload
     assert "snapshot_export" not in payload

@@ -200,7 +200,6 @@ def test_partial_reference_geometry_across_native_mcp_rest_cli_and_projection(
     options = {
         "as_of": "2026-10-22T12:00:00+08:00",
         "fields": fields,
-        "detail": "audit",
     }
     client = TestClient(api.app)
     response = client.post(
@@ -208,7 +207,6 @@ def test_partial_reference_geometry_across_native_mcp_rest_cli_and_projection(
         json=payload,
         params=[
             ("as_of", options["as_of"]),
-            ("detail", "audit"),
             *[("fields", f) for f in fields],
         ],
     )
@@ -227,8 +225,6 @@ def test_partial_reference_geometry_across_native_mcp_rest_cli_and_projection(
     args += [
         "--as-of",
         options["as_of"],
-        "--detail",
-        "audit",
         "--fields",
         *fields,
     ]

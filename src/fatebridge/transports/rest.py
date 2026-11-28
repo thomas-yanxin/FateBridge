@@ -2,18 +2,21 @@
 
 import inspect
 import logging
-from typing import Annotated, Protocol
+from typing import Annotated, Protocol, cast
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from pydantic import BaseModel, JsonValue
 from starlette.concurrency import run_in_threadpool
 
 from fatebridge.application.batch import BatchRequest, execute_batch
 from fatebridge.application.execution import result_is_error
-from fatebridge.application.response_delivery import deliver_response
+from fatebridge.application.response_delivery import (
+    deliver_response,
+    validate_delivery_controls,
+)
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
-from fatebridge.core.execution_context import DetailLevel, ExecutionOptions
-from fatebridge.transports.flags import FIELDS_FLAG_DESC
+from fatebridge.core.execution_context import ExecutionOptions
+from fatebridge.transports.flags import FIELDS_FLAG_DESC, INCLUDE_FLAG_DESC
 from fatebridge.utils.errors import (
     ErrorEnvelope,
     ParameterError,
@@ -23,9 +26,25 @@ from fatebridge.utils.errors import (
 logger = logging.getLogger(__name__)
 
 REST_RESERVED_FIELDS = {
+    "include",
     "fields",
     *ExecutionOptions.model_fields,
 }
+
+
+def _reject_removed_detail_query(
+    http_request: Request, *, allowed_fields: list[str] | None = None
+) -> None:
+    if "detail" not in http_request.query_params:
+        return
+    issue: dict[str, object] = {
+        "path": "detail",
+        "code": "extra_forbidden",
+        "message": "计算接口已移除 detail 参数，请改用 include 或 fields",
+    }
+    if allowed_fields is not None:
+        issue["constraints"] = {"allowed_fields": allowed_fields}
+    raise ParameterError("请求参数无效", [issue])
 
 
 class RestCalculationExecutor(Protocol):
@@ -70,16 +89,21 @@ def register_rest_route(
     async def calculation_route(
         request: BaseModel,
         *,
+        include: Annotated[
+            list[str] | None, Query(description=INCLUDE_FLAG_DESC)
+        ] = None,
         fields: Annotated[list[str] | None, Query(description=FIELDS_FLAG_DESC)] = None,
         as_of: str | None = None,
-        detail: DetailLevel = "compact",
+        http_request: Request = cast(Request, None),
     ) -> ServiceResult:
         try:
+            if http_request is not None:
+                _reject_removed_detail_query(
+                    http_request, allowed_fields=["include", "fields", "as_of"]
+                )
             logger.info(f"Processing {spec.name} request")
-            options = ExecutionOptions(
-                as_of=as_of,
-                detail=detail,
-            )
+            validate_delivery_controls(include, fields)
+            options = ExecutionOptions(as_of=as_of)
             result = await execute_service(
                 spec,
                 request,
@@ -89,8 +113,8 @@ def register_rest_route(
                 deliver_response,
                 result,
                 spec=spec,
+                include=include,
                 fields=fields,
-                detail=options.detail,
                 failed=result_is_error(result),
             )
         except HTTPException:
@@ -171,8 +195,12 @@ def register_batch_route(app: FastAPI, specs: list[ToolSpec]) -> None:
             for status_code in (400, 401, 422, 500, 503, 504)
         },
     )
-    async def batch_route(request: BatchRequest) -> dict[str, JsonValue]:
+    async def batch_route(
+        request: BatchRequest, *, http_request: Request = cast(Request, None)
+    ) -> dict[str, JsonValue]:
         try:
+            if http_request is not None:
+                _reject_removed_detail_query(http_request, allowed_fields=[])
             return await run_in_threadpool(execute_batch, specs_by_name, request)
         except ParameterError as exc:
             raise HTTPException(

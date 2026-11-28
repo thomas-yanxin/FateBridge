@@ -1,25 +1,21 @@
 {
   "call_guidance": {
-    "additional_balas": "Dig用实际上升/天顶角点，不用整宫起点；自然力为固定系数。Drik按Raman113-120方向差、附加特殊值、正负四分之一，未经裁定的水星性质保留scenarios，summary=null不当零；特殊附加值可超过60，不擅自截断。读source_id、nature_context、source_disagreements及shadbala_assessment；Kala/Cheshta须各自核对条件与模型状态，不拼完整六力总量。",
-    "birth_grid": "给定生时误差时读取完整物理间距至多30 SI秒的网格stage_variants及其同生时natal_ruler_contexts；按sample_segments网格序号关联，不能拼名义盘或不同样本。requested/evaluated/omitted针对全网格，旧samples仅端点中心子集并有endpoint_subset计数。相邻变化夹区非精确边界，计数非概率；顶层natal_ruler_context仅名义盘。",
-    "cheshta_model": "明确要求五星运动力或深度力量时，可选择simon1994_j2000：Simon1994完整平均黄经、独立几何J2000真位置、原有角度公式。模型仅在1900-2050出生TT窗口承认；analysis_year不改变本命窗口。默认unadjudicated及窗口外保留五星缺失。不是原书1900表校勘、完整六力或预测验证。",
-    "clock": "公历。analysis_year给定时缺月/日各取1；完全未给日期按as_of的出生时区日期，未给钟时取00:00。出生与分析时刻的DST歧义需明确UTC偏移。",
-    "ephemeris_provenance": "ephemeris_model_scope=physical_bodies只汇总七个物理天体及其实际赤道/所选运动帧；Rahu/Ketu见nonphysical_factor_models，平交点为swisseph_analytical_mean_node。native_node_return_flags回显的请求位不证明交点读取了物理矢量文件。",
-    "full_export": "完整JSON或时间线导出首次fields=null，保留默认预算，从同run result_delivery取回。",
-    "historical_clock": "v12支持已明确的birth_clock_basis=civil/local_mean_solar/local_apparent_solar；日期为公历，不猜原始钟制。LMT/LAT省略birth_timezone且use_true_solar_time=false，按已确认地点取经度；birth_second/microsecond仅保留已知或转换数值精度，不证明原记录准确。",
-    "lunar_nature": "Raman53第八日窗口与117-118盈亏表述并不相同。nature_context.moon_readings保留差异；边界及有分歧角距保留两种传统分类，不把旧版单一盈亏标签当作者唯一结论。",
-    "periods": "Moon-nakshatra，主运/次运从完整原始主运起算；UTC日历标签按每天86400名义秒的datetime口径，不表示连续原子时历时。三种年长口径明确区分，读取elapsed_time_convention。",
-    "physical_clock": "出生资料为民用钟时，use_true_solar_time默认false。v11起true只另报太阳钟标签，不改变记录钟时所指的物理时刻、盘面、达沙或模型出生年代窗口。读india.profile.clock_context；solar_wall_datetime无时区，不当另一出生时间，不当分析日期。不能把已知LAT/LMT记录直接当民用资料后开此开关。",
-    "reading_fidelity": "reading_basis保留名义生时、未评估与抽样候选；不把未给误差当精确。星宿/宿足候选与分盘候选共用同一物理 TT 网格，计数不是概率。主题力量calculation_context直接携带同run分支数值、约束与字段路径；computed_consensus/conditional_results/unavailable/partially_computed分开，null不一概为0或用户资料不足。不能只选高分支、自动全盘否定或宣称已完成独立文本盲审。",
-    "scope": "120年是规则周期；读当前ruler的本命上下文。",
-    "solar_component_scope": "Kala太阳依赖分开：日主/时主读连续日出对，三分力读当前相邻昼夜端点；partial_solar_brackets只限制对应分量。读取solar_context及同run constraints，不因缺其他日落抹去已有结果，也不补假日出。网格状态计数不是概率。",
-    "solar_event_scope": "日出／日落支撑窗口逐项检索同一UT1日界内的连续事件；不假定每天仅一个同类事件。solar_events.enumeration的1秒仅是检索防重复步长，不是出生记录或实测精度。",
-    "solar_uncertainty": "仅传用户确认的误差；太阳钟输入先换算原钟面区间两端，保留端点TT与UT1，再取间距至多30 SI秒的TT网格。保留clock_interval原始标签、转换端点、非对称offset及全部候选；覆盖计数非概率，不当连续区间证明。require_data_files同样检查LAT求解和端点换算的每次太阳坐标，不用最后一次成功掩盖中途降级。",
-    "sthana_sources": "Saptavargaja与Drekkana独立选源；默认Drekkana为santhanam_27_6。Raman36详细条文与例12取15，摘要105取60冲突仍保留在source_reading_conflicts；比较读法不挑最高值，也不认证完整单一原典六力。",
-    "strength": "主次运星可结合india.strengths.sthana_bala及其profile阅读位置分量；不把位置强度直接写成事件概率。",
-    "target_timezone": "analysis_timezone独立指定目标民用时区；不改变出生换算。省略时民用出生沿用其解析时区，LMT/LAT出生明确默认UTC。用户目标地时区可由已确认城市整理，不把原太阳钟当目标民用时区；读analysis_context.timezone_basis，DST歧义用明确UTC偏移。",
-    "temporal_balas": "Kala与Cheshta均为出生时刻的本命分量，不是analysis_year/as_of的时运。Natha按视太阳过中天，Hora按日出后等长平均小时，不套西占不等时小时；日主日出换日，岁/月主为360/30日传统口径。月亮第八日窗口与盈亏读法、水星性质保留scenarios；星战金额按Raman76-77固定系数及本次前置力量条件计算，读取yuddha_bala.evidence/upstream_profile。"
+    "additional_systems": "可选include_yogini、include_ashtottari与include_chara（此时使用node_mode=mean|true）分别输出yogini、ashtottari与chara。",
+    "birth_sensitivity": "vimshottari.birth_time_sensitivity（DashaGrid）输出status、nakshatra_options与sample_count。",
+    "clock": "公历。analysis_year给定时缺月/日各取1，缺时/分取0；analysis_year省略时按as_of（或当前）在analysis_timezone下的当地瞬间计算，详见analysis_context（analysis_datetime、timezone、ayanamsa）。",
+    "full_export": "完整JSON或时间线导出使用 include=[\"*\"]（默认省略次级细节路径见 run_metadata.omitted_fields），或使用evidence_views（stage、timeline）。",
+    "periods": "基于Moon宿度，次运从完整原始主运按比例起算；year_basis支持julian_365_25（默认）、sidereal_365_25636、tropical_365_2425与savana_360（见vimshottari.year_days），dasha_depth支持2..6层。vimshottari.timeline_scope为120年规则周期。",
+    "strength": "本命力量与时标细节可另调用vedic_chart工具读取vedic_chart.strengths.sthana_bala与vedic_chart.profile.time_scale_context，不把位置强度直接写成事件概率。"
   },
+  "default_omit": [
+    "vimshottari.timeline.*.antardashas",
+    "vimshottari.subdivisions.siblings_by_level",
+    "vimshottari.birth_time_sensitivity",
+    "vimshottari.rule_ids",
+    "yogini.timeline",
+    "ashtottari.timeline",
+    "chara.timeline"
+  ],
   "evidence_views": {
     "stage": {
       "fields": [

@@ -121,7 +121,6 @@ async def test_published_stage_view_retains_actual_period_boundaries(
             record["tool"],
             {
                 **example_input(spec),
-                "detail": "audit",
                 "fields": record["evidence_views"]["stage"]["fields"],
             },
         )
@@ -149,7 +148,6 @@ async def test_only_published_inputs_and_views_are_enough_for_real_mcp_calls(
                     "tool": record["tool"],
                     "arguments": arguments,
                     **record["first_view"],
-                    "detail": "audit",
                     "as_of": "2026-10-12T12:00:00+08:00",
                 },
             )
@@ -238,7 +236,6 @@ async def test_fengshui_first_views_deliver_core_layers_without_audit_bloat() ->
                 spec.name,
                 {
                     **example,
-                    "detail": "audit",
                     "fields": suggested_fields(spec),
                 },
             )

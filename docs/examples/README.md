@@ -15,16 +15,16 @@
 
 ## 运行示例
 
-按[快速入门](../getting-started.md)安装后，在仓库根目录执行 CLI（所有 90 个目录命令均支持 `--request-file`）：
+按[快速入门](../getting-started.md)安装后，在仓库根目录执行 CLI（所有 91 个目录命令均支持 `--request-file`）：
 
 ```bash
 uv run --extra dev fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json \
-  --fields status layers palace_overlay layout_analysis coverage --detail compact
-uv run --extra dev fatebridge fengshui_xuankong_house_chart --request-file docs/examples/fengshui-xuankong.json --detail compact
-uv run --extra dev fatebridge astrology_chart --request-file examples/demo-subject.json --detail compact
-uv run --extra dev fatebridge liuyao --request-file docs/examples/liuyao-conditional-demo.json --detail compact
+  --fields status layers palace_overlay layout_analysis coverage
+uv run --extra dev fatebridge fengshui_xuankong_house_chart --request-file docs/examples/fengshui-xuankong.json
+uv run --extra dev fatebridge astrology_chart --request-file examples/demo-subject.json
+uv run --extra dev fatebridge liuyao --request-file docs/examples/liuyao-conditional-demo.json
 ```
 
-REST 可通过 `--data-binary @docs/examples/fengshui-home.json` 发送到对应 `POST` 路由（例如 `http://localhost:8010/api/fengshui/assess?detail=compact`）；MCP 直接将 JSON 文件解析为 `run_calculation` 的 `arguments` 对象参数。命令行参数详情可通过 `fatebridge discover <tool>` 查看。
+REST 可通过 `--data-binary @docs/examples/fengshui-home.json` 发送到对应 `POST` 路由（例如 `http://localhost:8010/api/fengshui/assess`）；MCP 直接将 JSON 文件解析为 `run_calculation` 的 `arguments` 对象参数。命令行参数详情可通过 `fatebridge discover <tool>` 查看。
 
-核对响应时先检查协议状态与顶层错误包络，再查看各层 `status` 与 `coverage`；`partial` 表示对应层范围受限但已有部分事实可解释。需要完整输出载荷时请省略 `--fields` 并传入 `detail=audit`，参见[输出控制与结果读取](../agent-guide.md#输出控制与结果读取)。
+核对响应时先检查协议状态与顶层错误包络，再查看各层 `status`、`coverage` 与 `run_metadata.omitted_fields`；`partial` 表示对应层范围受限但已有部分事实可解释。需要无损完整输出载荷时请省略 `--fields` 并传入 `include=["*"]`（CLI `--include "*"`），参见[输出控制与结果读取](../agent-guide.md#输出控制与结果读取)。

@@ -18,6 +18,6 @@
 ## 按视图读取与交付边界
 
 - 需要常规逐爻读取时用 `evidence_views["liuyao"]["line_reading"]`；已明确用神和日级窗口时用 `focus_and_timing`；细查伏神、三合、反吟伏吟与神煞时用 `structural_relations`。
-- 首次需要完整结构证据时使用 `detail=audit` 且 `fields=null`，不重算另取全文。调用方法见[引擎调用](../shared/fatebridge-engine.md#怎么调引擎)。
+- 首次需要完整结构证据时使用 `include=["*"]`（省略 `fields`），不重算另取全文。调用方法见[引擎调用](../shared/fatebridge-engine.md#怎么调引擎)。
 - 月令节气交界存在模型差异时，核对可选字段 `liuyao_evidence.month_model_comparison`，保留未比较探针说明。
 - 交付时用日常语言说清已核结构事实与未决条件（如多现未决、月破、旬空、跨月需重估 `requires_month_reassessment`），不把结构条目贴满全文或替引擎补出总吉凶分数。

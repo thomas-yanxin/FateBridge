@@ -1,12 +1,25 @@
 {
   "call_guidance": {
-    "ephemeris_provenance": "calculation_policy.ephemeris_model_scope=physical_bodies只汇总十个原生物理天体；节点与体系对点在nonphysical_factor_models。平交点ephemeris_model为swisseph_analytical_mean_node，native_return_flag_model与return_flags只是原生返回证据，不证明读取某矢量文件。",
-    "native_context": "核对native_execution_context.mechanism和lifetime；生产调用为fresh_exec_process及one_outer_human_design_operation。auxiliary_files_present是搜索候选的端点身份，不是已读证明。压缩文件诊断记录保留原值；不是完整调用认证或位置精度保证。父进程设置不作为人类图输入；辅助文件变化返回不可自动重试的ephemeris_source_inconsistent。",
-    "node_policy": "默认true是显式约定，自动比较mean；node_backend_comparison另查同一TT的节点后端差异，不把同后端吻合当独立认证。未认证与原版软件完全一致。",
-    "reading_boundary": "Color/Tone/Base是数值细分，不是医学、饮食处方或现实事件概率；交叉名称为2001版原典事实索引，完整线义尚未认证。 primary_diagrams卡仅在16/9｜63/64或9/16｜64/63且为左角度时返回已核看的2008图示旁证；公开转录本未经校对、母本未认证，不是课程16/6列项的勘误，也不把图所在5/1段落扩成其他角色线义。",
-    "source_files": "先核对ephemeris_source_summary是否identity_incomplete及未识别上下文数；该层记录本命、设计根、范围与后端对照观察到的文件身份。身份变化为不可自动重试的ephemeris_source_inconsistent，先修复运行数据，保留原出生与范围输入。完整contexts从同次结果取回；解析平交点不依赖文件，真交点SWIEPH回显位也不证明月球文件可识别。",
-    "time_policy": "必须提供出生小时、分钟、时区；未知生时不能套默认；人类图使用民用出生瞬间，不作真太阳时重定时。 完整输出的clock_evidence保留实际时标转换、四步DeltaT迭代与UTC显示见证；当前完整释义验收要求这些见证，并纯回放主盘、整盘后端对照、全部实际生时样本及周期标签。见证不认证原生执行、实测UT1或物理精度；旧回执保留当时版本，不补造转换记录。"
+    "cycles_and_sensitivity": "传入birth_time_uncertainty_minutes（1..60）时读取birth_time_sensitivity（30秒TT网格、changed_structure_fields、activation_variants）；传入cycle_reference_datetime时读取cycle_context与cycle_summary（bodies[*].reference_relation与contacts[*]）。完整导出使用 include=[\"*\"]。",
+    "ephemeris_policy": "读取calculation_policy（ephemeris_model、ephemeris_version、require_swiss_files、node_mode、gate_41_start_degrees）与activations.personality[*]/activations.design[*]下的ephemeris_model（及交点native_return_flag_model）；require_swiss_files=true拒绝非Swiss星历回退。解析平交点不证明读取物理矢量文件。",
+    "node_policy": "默认node_mode=\"true\"，可显式设为\"mean\"；activations中各星体保留ephemeris_model、return_flags与native_return_flag_model。同后端吻合不作独立认证，未认证与原版软件完全一致。",
+    "reading_boundary": "Color/Tone/Base是数值细分（activations），不是医学、饮食处方或现实事件概率；incarnation_cross给出2001版原典 gates/angle/name/source_pdf_page_one_based，完整线义尚未认证。depth_evidence.line_fixings给出各位置fixing_state、recipient_kind与fixing_planets。",
+    "time_policy": "必须提供出生小时、分钟、时区；未知生时不能套默认；人类图使用民用出生瞬间，不作真太阳时重定时。birth_utc、design_utc、design_solver（target_solar_arc_degrees、residual_degrees、bracket_width_seconds、method、utc_is_leap_second、utc_label_status）与time_scales记录实际TT求根与时间尺度（闰秒时另有birth_clock_evidence）；旧回执保留当时版本，不补造转换记录。"
   },
+  "default_omit": [
+    "activations",
+    "depth_evidence.line_fixings",
+    "time_scales",
+    "design_solver",
+    "definition_bridging",
+    "birth_time_sensitivity.activation_variants",
+    "cycle_context",
+    "transit_overlay.transit_activations",
+    "composite.composite_bodygraph",
+    "bodygraph.gate_sources",
+    "bodygraph.circuitry.circuits",
+    "variables.personality_colors"
+  ],
   "evidence_views": {
     "additional_poles": {
       "fields": [
@@ -43,7 +56,7 @@
       "fields": [
         "birth_utc"
       ],
-      "purpose": "出生名义时刻正负范围内实际求值数、激活与联合结构变化及未分开区间；完整采样原始黄经、速度、旗标和见证从同次result_delivery读取。0表示未评估；有限采样不是连续稳定性或出生钟认证，次数不是概率。"
+      "purpose": "出生名义时刻正负范围内实际求值数、激活与联合结构变化及未分开区间；完整采样原始黄经、速度、旗标和见证可通过 include=[\"*\"] 或对应字段路径读取。0表示未评估；有限采样不是连续稳定性或出生钟认证，次数不是概率。"
     },
     "circuitry": {
       "fields": [
@@ -67,7 +80,7 @@
         "cycle_summary",
         "calculation_policy.ephemeris_model"
       ],
-      "purpose": "明确cycle_reference_datetime才计算首轮周期交会；保留逆行多次接触、有限搜索和缺失凯龙星数据，不按生日分期。参考输入最多6位小数秒，超限拒绝；reference_ordering以源定义连续TT核对不早于出生，微秒输入顺序不认证微秒天文精度。摘要保留文件来源和DE版本，完整逐点来源索引与TT求根见证读同一run的cycle_context。交会与已观测驻点细化到函数零值或相邻TT，保留精确残差和驻点速度区间；量化可能掩盖极近峰值，完整解析交会数量仍未认证。文件身份及数值收敛不认证物理时刻精度。"
+      "purpose": "明确cycle_reference_datetime才计算首轮周期交会；保留逆行多次接触、有限搜索和缺失凯龙星数据，不按生日分期。参考输入最多6位小数秒，超限拒绝；以连续TT核对参考时刻不早于出生（结果见cycle_summary.bodies[*].reference_relation），微秒输入顺序不认证微秒天文精度。摘要保留文件来源和DE版本，完整逐点来源索引与TT求根见证读同一run的cycle_context。交会与已观测驻点细化到函数零值或相邻TT，保留精确残差和驻点速度区间；量化可能掩盖极近峰值，完整解析交会数量仍未认证。文件身份及数值收敛不认证物理时刻精度。"
     },
     "definition": {
       "fields": [
@@ -106,7 +119,7 @@
       "fields": [
         "birth_utc"
       ],
-      "purpose": "区分名义盘已激活、定义中心内active与未定义中心内dormant；保留悬挂门的公开宽窄用词。逐门通道与人格/设计来源读同run的gate_activation_context.nominal.gates；各后端和生时联合见证读witnesses，不把名义状态拼到另一TT。"
+      "purpose": "区分名义盘已激活门（bodygraph.activated_gates）、已定义／未定义中心门（bodygraph.centers）与悬挂门（bodygraph.hanging_gates）；逐门人格／设计来源读同run的bodygraph.gate_sources与bodygraph.channels，具体行星激活见activations.personality[*]/activations.design[*]，生时变化见birth_time_sensitivity，不把名义状态拼到另一TT。"
     },
     "grounding": {
       "fields": [
@@ -127,7 +140,7 @@
       "fields": [
         "birth_utc"
       ],
-      "purpose": "同一外层人类图操作的独立原生进程边界、辅助文件候选身份与压缩文件端点诊断。父进程DeltaT、潮汐加速度和旧表缓存不参与当前计算；当前配置文件仍有效。仅为声明与端点检查，不认证原生执行、原子读取、物理精度或预测。完整诊断过长时读取同次result_delivery。"
+      "purpose": "同一外层人类图操作的独立原生进程边界、辅助文件候选身份与压缩文件端点诊断。父进程DeltaT、潮汐加速度和旧表缓存不参与当前计算；当前配置文件仍有效。仅为声明与端点检查，不认证原生执行、原子读取、物理精度或预测。完整诊断可通过 include=[\"*\"] 或对应字段路径读取。"
     },
     "personality_colors": {
       "fields": [
@@ -175,14 +188,14 @@
         "design_utc",
         "design_solver.bracket_width_seconds"
       ],
-      "purpose": "实际设计数值根的1或2个TT端点、13激活与完整解释依赖摘要；求根和实际太阳统一坐标旗标并逐位绑定。主盘在已观测正到负括区及精确零点中按绝对精确残差、较早TT选根；local_root_family_summary另列全部多接触候选的实际整盘。初始括区、完整邻点、最终端点与候选见同一run的design_solver.numerical_precision；不拼接候选，不将有限最优性、候选异同当作全域最优、物理误差界或连续稳定认证。"
+      "purpose": "实际设计数值根的TT端点与求解精度（design_solver中的target_solar_arc_degrees、residual_degrees、bracket_width_seconds、method、iterations、birth_jd_tt、design_jd_tt）及对应的birth_utc/design_utc；完整13项激活、通道结构与生时网格敏感性见同一run的activations.personality[*]/activations.design[*]、bodygraph与birth_time_sensitivity。主盘按连续TT括区与相邻浮点零点选根；不拼接不同TT样本，不将数值收敛当作物理误差界或连续稳定认证。"
     },
     "source_files": {
       "fields": [
         "birth_utc",
         "calculation_policy.ephemeris_model"
       ],
-      "purpose": "本命／设计根／范围及后端对照的实际原生位置文件上下文与前后身份检查；保留文件来源、DE号、返回旗标模型、作用、TT包络与实际求值次数，解析平交点和内置Moshier单列。文件身份不是位置精度或原子读取认证，周期搜索另有来源证据；完整卡过长读取同次result_delivery。"
+      "purpose": "本命／设计根／范围及后端对照的实际原生位置文件上下文与前后身份检查；保留文件来源、DE号、返回旗标模型、作用、TT包络与实际求值次数，解析平交点和内置Moshier单列。文件身份不是位置精度或原子读取认证，周期搜索另有来源证据；完整卡可通过 include=[\"*\"] 或对应字段路径读取。"
     },
     "structure": {
       "fields": [

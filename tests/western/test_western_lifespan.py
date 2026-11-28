@@ -442,7 +442,6 @@ def test_small_year_preview_is_half_open_on_all_surfaces(
         {**BIRTH, "max_age_years": age_limit, "start_planet": "Sun"},
         projection={
             "fields": ["planetary_periods_129_years"],
-            "detail": "audit",
         },
         rest_as_of=AS_OF,
     )

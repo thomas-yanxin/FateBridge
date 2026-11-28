@@ -1,7 +1,38 @@
 {
   "call_guidance": {
-    "clock_defaults": "分析日期全省略时用 as_of/执行开始的完整当地瞬间；实际时刻与补齐来源见 analysis_reference。"
+    "clock_defaults": "分析日期全省略时用 as_of/执行开始的完整当地瞬间；实际时刻与补齐来源见 analysis_context。"
   },
+  "default_omit": [
+    "calendar_context",
+    "interaction_analysis",
+    "combined_effects",
+    "dayun.timing_context",
+    "dayun.element_effects",
+    "dayun.natal_relations",
+    "dayun.shensha",
+    "liunian.element_effects",
+    "liuyue.detailed_analysis",
+    "liuri.detailed_analysis",
+    "liushi.detailed_analysis",
+    "analysis_calendar.analysis_date_context.current_solar_term.civil_point",
+    "analysis_calendar.analysis_date_context.current_solar_term.comparison_policy",
+    "analysis_calendar.analysis_date_context.next_solar_term.civil_point",
+    "analysis_calendar.analysis_date_context.next_solar_term.comparison_policy",
+    "analysis_calendar.analysis_date_context.bazi_month_boundary.start_term.civil_point",
+    "analysis_calendar.analysis_date_context.bazi_month_boundary.start_term.comparison_policy",
+    "analysis_calendar.analysis_date_context.bazi_month_boundary.next_term.civil_point",
+    "analysis_calendar.analysis_date_context.bazi_month_boundary.next_term.comparison_policy",
+    "analysis_calendar.analysis_date_context.lunar_calendar.previous_jieqi",
+    "analysis_calendar.analysis_date_context.lunar_calendar.next_jieqi",
+    "analysis_calendar.analysis_year_jieqi.*.civil_point",
+    "analysis_calendar.analysis_year_jieqi.*.comparison_policy",
+    "analysis_calendar.liuyue_timeline.*.start_term.civil_point",
+    "analysis_calendar.liuyue_timeline.*.start_term.comparison_policy",
+    "analysis_calendar.liuyue_timeline.*.next_term.civil_point",
+    "analysis_calendar.liuyue_timeline.*.next_term.comparison_policy",
+    "analysis_calendar.jieqi_timeline.*.jieqi.civil_point",
+    "analysis_calendar.jieqi_timeline.*.jieqi.comparison_policy"
+  ],
   "evidence_views": {
     "analysis_clock": {
       "fields": [

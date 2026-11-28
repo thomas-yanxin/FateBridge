@@ -232,7 +232,6 @@ def test_ju_method_keeps_printed_conflicts_visible_across_transports(
             "qimen_options": {"ju_method": method},
         },
         projection={
-            "detail": "audit",
             "fields": [
                 f"qimen.{name}"
                 for name in ("ju_method", "ju_term", "ju_text", "source_disagreements")

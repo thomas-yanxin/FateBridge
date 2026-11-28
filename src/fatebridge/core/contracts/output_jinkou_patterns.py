@@ -1,16 +1,10 @@
-"""Bind the complete pattern ledger and trace to their course's raw symbols."""
+"""Bind the complete pattern ledger to its course's raw symbols."""
 
 from __future__ import annotations
 
 from typing import Any
 
-from fatebridge.core.contracts.output_ren_patterns import JinkouPatterns
-from fatebridge.core.metaphysics.jinkou.patterns import (
-    pattern_metadata,
-    patterns_from_symbols,
-)
-
-RULE_ID = "jinkou.structural_patterns"
+from fatebridge.core.metaphysics.jinkou.patterns import patterns_from_symbols
 
 
 def expected_patterns(board: dict[str, Any]) -> dict[str, Any] | None:
@@ -64,26 +58,11 @@ def compare_present(actual: Any, expected: Any) -> None:
 
 
 def validate_pattern_anchors(board: dict[str, Any]) -> None:
-    traces = [t for t in board.get("rule_trace") or [] if t.get("rule_id") == RULE_ID]
-    if len(traces) > 1:
-        raise ValueError("同课六十四课钤规则轨迹不可重复")
-    metadata = pattern_metadata()
-
-    for trace in traces:
-        if trace.get("result") is not None:
-            JinkouPatterns.model_validate(trace["result"])
-        if "source_section" in trace:
-            compare_present(trace["source_section"], metadata["source_section"])
     expected = expected_patterns(board)
     if expected is None:
         return
     if "patterns" in board:
         compare_present(board["patterns"], expected)
-    for trace in traces:
-        if "result" in trace:
-            compare_present(trace["result"], expected)
-        if "source_section" in trace:
-            compare_present(trace["source_section"], expected["source_section"])
 
 
 def require_complete(actual: Any, expected: Any) -> None:

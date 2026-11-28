@@ -176,16 +176,24 @@ def mixed_pair_geometry(
             dial["arc_dependent_contacts"],
             dial["arc_invariant_contacts"],
         )
+        total_dependent = len(dependent)
+        total_invariant = len(invariant)
         counts[key] = {
-            "arc_dependent_relation_groups": len(dependent),
-            "arc_invariant_relation_groups": len(invariant),
-            "represented_layer_assignments": 4 * (len(dependent) + len(invariant)),
+            "arc_dependent_relation_groups": total_dependent,
+            "arc_invariant_relation_groups": total_invariant,
+            "represented_layer_assignments": 4 * (total_dependent + total_invariant),
         }
         if max_contacts_per_field is not None:
             dependent.sort(key=lambda r: (r["orb"], r["equation"]))
             invariant.sort(key=lambda r: (r["orb"], r["equation"]))
-            dial["arc_dependent_contacts"] = dependent[:max_contacts_per_field]
-            dial["arc_invariant_contacts"] = invariant[:max_contacts_per_field]
+            dependent = dependent[:max_contacts_per_field]
+            invariant = invariant[:max_contacts_per_field]
+            dial["arc_dependent_contacts"] = dependent
+            dial["arc_invariant_contacts"] = invariant
+        dial["arc_dependent_returned_count"] = len(dependent)
+        dial["arc_dependent_total_count"] = total_dependent
+        dial["arc_invariant_returned_count"] = len(invariant)
+        dial["arc_invariant_total_count"] = total_invariant
     return {
         "status": "computed",
         "ruleset_id": RULESET,

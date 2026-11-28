@@ -439,7 +439,11 @@ def _build_liureng_house_entry(
     }
 
 
-def build_knowledge_registry(domain: str | None = None) -> dict[str, Any]:
+def build_knowledge_registry(
+    domain: str | None = None,
+    *,
+    keys_sample_limit: int | None = 4,
+) -> dict[str, Any]:
     bundles = load_knowledge_bundles()
     index = load_knowledge_index()
     domains = [domain] if domain else sorted(bundles)
@@ -453,28 +457,53 @@ def build_knowledge_registry(domain: str | None = None) -> dict[str, Any]:
                 details={"domain": name},
             )
         if name != "liureng":
-            categories = [
-                {
-                    "name": category,
-                    "count": len(entries),
-                    "keys": sorted(entries)[:20],
-                    "supports": ["read"],
-                }
-                for category, entries in bundle.get("categories", {}).items()
-            ]
+            categories = []
+            for category, entries in bundle.get("categories", {}).items():
+                ordered = sorted(entries)
+                sample = (
+                    ordered
+                    if keys_sample_limit is None
+                    else ordered[:keys_sample_limit]
+                )
+                categories.append(
+                    {
+                        "name": category,
+                        "count": len(ordered),
+                        "keys_sample": sample,
+                        "keys_complete": len(sample) == len(ordered),
+                        "supports": ["read"],
+                        "reference_only": True,
+                    }
+                )
         else:
+            shen_keys = sorted(bundle.get("shen_entries", {}))
+            shen_sample = (
+                shen_keys
+                if keys_sample_limit is None
+                else shen_keys[:keys_sample_limit]
+            )
+            house_keys = sorted(bundle.get("jiang_info", {}))
+            house_sample = (
+                house_keys
+                if keys_sample_limit is None
+                else house_keys[:keys_sample_limit]
+            )
             categories = [
                 {
                     "name": "shen",
-                    "count": len(bundle.get("shen_entries", {})),
-                    "keys": sorted(bundle.get("shen_entries", {})),
+                    "count": len(shen_keys),
+                    "keys_sample": shen_sample,
+                    "keys_complete": len(shen_sample) == len(shen_keys),
                     "supports": ["read"],
+                    "reference_only": True,
                 },
                 {
                     "name": "house",
-                    "count": len(bundle.get("jiang_info", {})),
-                    "keys": sorted(bundle.get("jiang_info", {})),
+                    "count": len(house_keys),
+                    "keys_sample": house_sample,
+                    "keys_complete": len(house_sample) == len(house_keys),
                     "supports": ["read", "jiang_name+tian_branch+di_branch"],
+                    "reference_only": True,
                 },
             ]
         result_domains.append(

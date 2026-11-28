@@ -4,7 +4,7 @@
 
 ## 六壬起课与行年
 
-核对 `analysis_context` 的输入时刻、校正时刻与 `four_pillars`，月将看 `liureng.month_general` 与 `meta.month_general_basis`（中气换将）。用户给出秒数时保留 `analysis_second`。`calendar_policy` 说明子初换日（23:00）与交气模型来源（如 `swisseph`、`jpl_de440` 或解析模型），503 `dependency_missing` 表示缺可靠天文交气而非参数错误。`published_date_reference` 对照香港天文台 1901–2100 逐日表，仅说明刊载日期一致与否。
+核对 `analysis_context` 的输入时刻、校正时刻与 `four_pillars`，月将看 `liuren.month_general` 与 `meta.month_general_basis`（中气换将）。用户给出秒数时保留 `analysis_second`。`calendar_policy` 说明子初换日（23:00）与交气模型来源（如 `swisseph`、`jpl_de440` 或解析模型），503 `dependency_missing` 表示缺可靠天文交气而非参数错误。`published_date_reference` 对照香港天文台 1901–2100 逐日表，仅说明刊载日期一致与否。
 
 `meta.guiren_profile` 区分通用贵人表 `liuren_common_v1` 与《探原》贵人歌 `tanyuan_xieji_v1`；`meta.diurnal_evidence` 标明昼夜是显式选择还是按时支约定。
 
@@ -34,4 +34,4 @@
 | 三合、动象与空破 | `combinations`、`motions`、`rows.xun_kong/si_da_kong/month_break` | 支齐虚一不代合化；保留《四库》/京本/早稻田等异文对照 |
 | 四绝、四败与岁日 | `relations.si_jue/si_bai`、`relations.calendar.checks` | 传入 `natal_branch` 时才核大绝，不以占时或行年替代 |
 
-金口诀本课不借大六壬三传定用，`guiren_profile` 仅作用于附带 `liureng` 盘。需要完整结果时请用 `detail=audit` 且 `fields=null`，不重算替代原课。
+金口诀本课不借大六壬三传定用，`guiren_profile` 仅作用于附带 `liuren` 盘。需要无损完整结果时请用 `include=["*"]`（省略 `fields`），不重算替代原课。

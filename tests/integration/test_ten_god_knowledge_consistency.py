@@ -82,7 +82,7 @@ def test_corrected_definitions_reach_rest_mcp_and_cli(
 ) -> None:
     assert get_ten_god(day, other).value == expected
     inputs = {"domain": "bazi", "category": "ten_gods", "key": expected}
-    controls = {"detail": "audit"}
+    controls = {"include": ["*"]}
 
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
@@ -91,7 +91,9 @@ def test_corrected_definitions_reach_rest_mcp_and_cli(
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
     with TestClient(api.app) as client:
-        response = client.post("/api/knowledge/read", json=inputs, params=controls)
+        response = client.post(
+            "/api/knowledge/read", json=inputs, params={"include": "*"}
+        )
     assert response.status_code == 200, response.text
 
     async def call():
@@ -112,8 +114,8 @@ def test_corrected_definitions_reach_rest_mcp_and_cli(
                 "ten_gods",
                 "--key",
                 expected,
-                "--detail",
-                "audit",
+                "--include",
+                "*",
             ]
         )
         == 0

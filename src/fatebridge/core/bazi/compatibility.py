@@ -7,7 +7,6 @@ from typing import Any, Mapping
 from fatebridge.core.bazi.relations import (
     BRANCH_BREAKS,
     BRANCH_HIDDEN_COMBINATIONS,
-    classify_triple_members,
     group_relations,
     pair_relations,
 )
@@ -22,8 +21,8 @@ from fatebridge.core.bazi.shensha import (
 from fatebridge.core.metaphysics.common import kongwang_for_ganzhi
 from fatebridge.utils.data import (
     BRANCH_COMBINATIONS,
+    BRANCH_CONFLICTS,
     BRANCH_HIDDEN_STEMS,
-    BRANCH_TRIPLE_COMBINATIONS,
     DESTRUCTION_CYCLE,
     GENERATION_CYCLE,
     STEM_COMBINATIONS,
@@ -32,7 +31,6 @@ from fatebridge.utils.data import (
     get_nayin,
     get_ten_god,
 )
-from fatebridge.utils.elements import get_element_relationship
 
 Pillars = Mapping[str, tuple[str, str]]
 ORDER = ("year", "month", "day", "hour")
@@ -136,16 +134,6 @@ def analyze_day_pillar_synergy(first: Pillars, second: Pillars) -> dict[str, Any
     stem_comb = frozenset((s1, s2)) in _STEM_COMB_SET
     branch_comb = BRANCH_COMBINATIONS.get(b1) == b2
     yuanyang = stem_comb and branch_comb
-    tianke_dichong = (
-        (
-            DESTRUCTION_CYCLE[STEM_ELEMENTS[s1][0]] == STEM_ELEMENTS[s2][0]
-            or DESTRUCTION_CYCLE[STEM_ELEMENTS[s2][0]] == STEM_ELEMENTS[s1][0]
-        )
-        and STEM_ELEMENTS[s1][1] == STEM_ELEMENTS[s2][1]
-        and any(b2 == c for c in (b1,)) is False
-    )
-    from fatebridge.utils.data import BRANCH_CONFLICTS
-
     branch_clash = BRANCH_CONFLICTS.get(b1) == b2
     return {
         "person1_day_pillar": s1 + b1,

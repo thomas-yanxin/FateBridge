@@ -511,6 +511,7 @@ def calculate_planetary_arc(
     *,
     arc_source: str = "Moon",
     orb: float = 1.0,
+    max_hits: int | None = None,
     analysis_year: int | None = None,
     analysis_month: int | None = None,
     analysis_day: int | None = None,
@@ -541,6 +542,7 @@ def calculate_planetary_arc(
         extract_reference_longitudes(progression["subject"]),
         arc_source=arc_source,
         orb=orb,
+        max_hits=max_hits,
     )
     payload["progressed_datetime"] = progression["progressed_datetime"]
     payload["progression_options"] = progression["calculation_options"]
@@ -572,6 +574,7 @@ def calculate_planetary_arc(
 def calculate_persian_directed(
     *,
     max_age_years: float = 90.0,
+    limit: int | None = 120,
     house_system: str = "P",
     zodiac_type: str = "Tropic",
     **birth_kwargs: Any,
@@ -591,6 +594,7 @@ def calculate_persian_directed(
         house_cusps,
         birth_datetime=birth_info.local_datetime,
         max_age_years=max_age_years,
+        limit=limit,
     )
     summary = (
         f"波斯向运：7 政向运星每年 +1° 推动，"
@@ -671,6 +675,7 @@ def calculate_vedicprog(
     analysis_month: int | None = None,
     analysis_day: int | None = None,
     orb: float = 1.5,
+    max_hits: int | None = None,
     house_system: str = "P",
     zodiac_type: str = "Tropic",
     **birth_kwargs: Any,
@@ -702,6 +707,7 @@ def calculate_vedicprog(
         extract_reference_longitudes(progression["subject"]),
         extract_reference_longitudes(natal_subject),
         orb=orb,
+        max_hits=max_hits,
     )
     payload["progressed_datetime"] = progression["progressed_datetime"]
     payload["calculation_options"] = progression["calculation_options"]

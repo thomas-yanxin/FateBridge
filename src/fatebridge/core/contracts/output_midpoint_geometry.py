@@ -140,14 +140,11 @@ class MidpointDial(PartialOutput):
     period_degrees: int | float | None = None
     two_factor_contacts: list[TwoFactorContact] | None = None
     three_factor_contacts: list[SymmetryContact] | None = None
+    three_factor_returned_count: int | None = None
+    three_factor_total_count: int | None = None
     four_factor_contacts: list[SymmetryContact] | None = None
-
-
-class FictitiousElementSource(PartialOutput):
-    filename: str | None = None
-    status: str | None = None
-    search_path_index: int | None = None
-    scope: str | None = None
+    four_factor_returned_count: int | None = None
+    four_factor_total_count: int | None = None
 
 
 class PhysicalEphemerisFile(PartialOutput):
@@ -238,23 +235,7 @@ class MidpointProfile(PartialOutput):
     time_scale_method: str | None = None
     future_leap_seconds_assumed_unchanged: bool | None = None
     swisseph_version: str | None = None
-    hypothetical_element_source: FictitiousElementSource | None = None
     physical_ephemeris_source: PhysicalEphemerisSource | None = None
-
-
-class GeometryRuleset(PartialOutput):
-    id: str | None = None
-    version: str | None = None
-    author: str | None = None
-    source_ids: list[str] | None = None
-
-
-class GeometryRuleTrace(PartialOutput):
-    rule_id: str | None = None
-    source_id: str | None = None
-    source_sections: list[str] | None = None
-    formula: str | None = None
-    scope: str | None = None
 
 
 class DialCounts(PartialOutput):

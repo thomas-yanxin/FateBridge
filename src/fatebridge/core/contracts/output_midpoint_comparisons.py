@@ -8,7 +8,6 @@ from fatebridge.core.contracts.output_midpoint_directions import (
 )
 from fatebridge.core.contracts.output_midpoint_geometry import (
     FactorSpan,
-    GeometryRuleTrace,
     GeometrySource,
     MeridianFactorPosition,
     SourceInterpretation,

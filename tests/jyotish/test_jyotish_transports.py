@@ -35,13 +35,12 @@ def call_surfaces(monkeypatch, capsys, key, payload, fields):
         "API_KEY_AUTHENTICATOR",
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
-    options = {"as_of": AS_OF, "detail": "audit", "fields": fields}
+    options = {"as_of": AS_OF, "fields": fields}
     response = TestClient(api.app).post(
         spec.rest_path,
         json=payload,
         params=[
             ("as_of", AS_OF),
-            ("detail", "audit"),
             *[("fields", f) for f in fields],
         ],
     )
@@ -60,7 +59,7 @@ def call_surfaces(monkeypatch, capsys, key, payload, fields):
             "--" + name.replace("_", "-"),
             *([str(x) for x in value] if isinstance(value, list) else [str(value)]),
         ]
-    args += ["--as-of", AS_OF, "--detail", "audit", "--fields", *fields]
+    args += ["--as-of", AS_OF, "--fields", *fields]
     capsys.readouterr()
     code = run(args)
     cli = json.loads(capsys.readouterr().out)
@@ -218,7 +217,7 @@ def test_as_of_date_anchor_and_audit_timeline(monkeypatch: pytest.MonkeyPatch) -
     result = execute_with_receipt(
         spec,
         request,
-        options=ExecutionOptions(as_of="2026-10-21T20:00:00Z", detail="audit"),
+        options=ExecutionOptions(as_of="2026-10-21T20:00:00Z"),
     )
     assert (
         result["analysis_context"]["analysis_datetime"] == "2026-10-22T00:00:00+08:00"

@@ -15,6 +15,10 @@
     "scope": "西占和奇门条目按现行计算表给出规则和出处。河洛、参评按目录 category/key 查具名来源，保留各来源实际可读的部分。",
     "source_fidelity": "Keep citation and provenance; for Heluo/canping also read reference_only and reference_details. A reference profile role is not the actual applied role of a person: bind personal interpretation to the same-run calculation result."
   },
+  "default_omit": [
+    "provenance",
+    "reference_details"
+  ],
   "evidence_views": {
     "human_design_line_reference": {
       "fields": [
@@ -29,7 +33,8 @@
         "reference_only",
         "reference_details"
       ],
-      "scope": "Only domain=human_design: complete384line locator/polarity index; actual registry coverage separates pending local paraphrases, uncurated meanings and independent semantic acceptance. Preserve source conditions and unknown personal applicability. Source facts are not personal fixing states. Keep same-run calculation evidence separate; no complete original-source or publisher-master certificate."
+      "scope": "Only domain=human_design: complete384line locator/polarity index; actual registry coverage separates pending local paraphrases, uncurated meanings and independent semantic acceptance. Preserve source conditions and unknown personal applicability. Source facts are not personal fixing states. Keep same-run calculation evidence separate; no complete original-source or publisher-master certificate.",
+      "when": "仅当 domain=\"human_design\" 时"
     },
     "numerology_reference": {
       "fields": [
@@ -44,7 +49,8 @@
         "reference_only",
         "reference_details"
       ],
-      "scope": "For domain=heluo/canping only. Preserve original source identity, actual column and part-specific review status. Reference roles do not select personal applicability or dated periods. Full source objects remain in reference_details.record; use fields=null for a complete export and read the same retained delivery."
+      "scope": "For domain=heluo/canping only. Preserve original source identity, actual column and part-specific review status. Reference roles do not select personal applicability or dated periods. Full source objects remain in reference_details.record; pass include=[\"*\"] or include=[\"reference_details\"] for a complete export.",
+      "when": "仅当 domain=\"heluo\" 或 domain=\"canping\" 时"
     }
   },
   "first_view": {

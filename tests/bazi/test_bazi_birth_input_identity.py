@@ -18,7 +18,7 @@ from tests.unit_test.fixtures.bazi_birth_clock import (
 def test_mcp_omitted_and_explicit_zero_minute_have_distinct_input_identity() -> None:
     spec = next(s for s in SPECS if s.name == "bazi_birth_chart")
     payload = omitted_payload(spec)
-    opts = dict(detail="audit", fields=[receipt_path(spec)])
+    opts = dict(fields=[receipt_path(spec)])
     omitted = asyncio.run(native(spec, payload, **opts)).structured_content
     explicit = asyncio.run(
         native(spec, {**payload, "birth_minute": 0}, **opts)
@@ -42,10 +42,8 @@ def test_original_input_replay_and_identity_agree_across_actual_surfaces(
 ) -> None:
     spec = next(s for s in SPECS if s.name == name)
     payload = omitted_payload(spec)
-    opts = dict(detail="audit", fields=[receipt_path(spec)])
+    opts = dict(fields=[receipt_path(spec)])
     flags = [
-        "--detail",
-        "audit",
         "--fields",
         receipt_path(spec),
     ]
@@ -78,7 +76,7 @@ def test_original_input_replay_and_identity_agree_across_actual_surfaces(
 def test_null_second_and_omitted_second_keep_the_same_unknown_input_identity() -> None:
     spec = next(s for s in SPECS if s.name == "bazi_birth_chart")
     payload = {**omitted_payload(spec), "birth_minute": 0}
-    opts = dict(detail="audit", fields=[receipt_path(spec)])
+    opts = dict(fields=[receipt_path(spec)])
     a = asyncio.run(native(spec, payload, **opts)).structured_content
     b = asyncio.run(
         native(spec, {**payload, "birth_second": None}, **opts)

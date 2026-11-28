@@ -39,4 +39,4 @@ FateBridge provides local calculation interfaces; host applications supply user 
 
 ## Personal Data
 
-Birth inputs may appear in responses, client chat histories, and host logs. FateBridge does not persist a calculation database on disk and returns results directly in each response payload. Always use fictional inputs in Issues and PRs, redact diagnostics before sharing, and use `detail=compact` or targeted `fields` when minimizing payload exposure (see [output controls](docs/agent-guide.md#输出控制与结果读取)).
+Birth inputs may appear in responses, client chat histories, and host logs. FateBridge does not persist a calculation database on disk and returns results directly in each response payload. Always use fictional inputs in Issues and PRs, redact diagnostics before sharing, and use the default core output or targeted `fields` when minimizing payload exposure (see [output controls](docs/agent-guide.md#输出控制与结果读取)).

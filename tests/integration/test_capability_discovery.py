@@ -57,16 +57,20 @@ def test_every_tool_declares_the_same_public_name_across_surfaces() -> None:
 def test_mcp_transport_flags_are_self_describing() -> None:
     async def fetch():
         async with Client(create_mcp_app()) as client:
-            tool = next(
-                t for t in await client.list_tools() if t.name == "run_calculation"
+            tools = {t.name: t for t in await client.list_tools()}
+            return (
+                tools["run_calculation"].input_schema["properties"],
+                tools["run_batch"].input_schema,
             )
-            return tool.input_schema["properties"]
 
-    properties = asyncio.run(fetch())
-    assert set(properties) == {"tool", "arguments", "detail", "fields", "as_of"}
-    assert properties["detail"]["default"] == "compact"
-    assert properties["detail"]["enum"] == ["compact", "audit"]
+    properties, batch_schema = asyncio.run(fetch())
+    assert set(properties) == {"tool", "arguments", "include", "fields", "as_of"}
+    assert properties["include"]["description"]
     assert properties["fields"]["description"]
+    assert "detail" not in batch_schema["properties"]
+    batch_call_props = batch_schema["$defs"]["BatchCall"]["properties"]
+    assert {"include", "fields"} <= set(batch_call_props)
+    assert "detail" not in batch_call_props
 
 
 def test_reference_discovery_uses_public_names(

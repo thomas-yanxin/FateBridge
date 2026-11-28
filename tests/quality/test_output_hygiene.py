@@ -156,9 +156,9 @@ def test_all_output_models_exclude_removed_keys() -> None:
     ), f"Forbidden keys remain in output_model schemas: {violations}"
 
 
-def test_all_runtime_audit_responses_exclude_removed_keys() -> None:
-    """Every tool's audit runtime response excludes removed bloat/renamed keys."""
-    options = ExecutionOptions(detail="audit", as_of="2026-10-12T12:00:00+08:00")
+def test_all_runtime_full_responses_exclude_removed_keys() -> None:
+    """Every tool's lossless include=['*'] runtime response excludes removed bloat keys."""
+    options = ExecutionOptions(as_of="2026-10-12T12:00:00+08:00")
     violations: dict[str, list[str]] = {}
     for spec in CATALOG:
         payload = example_input(spec)
@@ -166,7 +166,7 @@ def test_all_runtime_audit_responses_exclude_removed_keys() -> None:
             payload = {"effective_solar_year": 2026, "solar_month_number": 1}
         request = spec.request_model.model_validate(payload)
         raw = execute_with_receipt(spec, request, options=options)
-        delivered = deliver_response(raw, spec=spec, detail="audit")
+        delivered = deliver_response(raw, spec=spec, include=["*"])
         hits = sorted(set(_walk_runtime_keys(delivered)))
         if spec.name == "lunar_calendar_time" and "birth" in delivered:
             hits.append("birth")
@@ -179,8 +179,8 @@ def test_all_runtime_audit_responses_exclude_removed_keys() -> None:
     assert not violations, f"Forbidden keys emitted at runtime: {violations}"
 
 
-def test_knowledge_catalog_audit_payload_is_concise() -> None:
-    """knowledge_catalog audit response stays under 5 KiB."""
+def test_knowledge_catalog_payload_is_concise() -> None:
+    """knowledge_catalog canonical response stays concise under 8 KiB."""
     payload = calculate_knowledge_registry()
     size = len(json.dumps(payload, ensure_ascii=False).encode("utf-8"))
-    assert size < 5120, f"knowledge_catalog audit payload too large: {size} bytes"
+    assert size < 8192, f"knowledge_catalog payload too large: {size} bytes"

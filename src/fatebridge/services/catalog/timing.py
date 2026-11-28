@@ -1,8 +1,8 @@
-"""Timing tool declarations and domain compact views."""
+"""Timing tool declarations."""
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING
 
 from fatebridge.application.bindings import (
     bind_kwargs,
@@ -11,8 +11,15 @@ from fatebridge.application.bindings import (
     service_ref,
 )
 from fatebridge.application.domain_validators import resolve_bazi_analysis_time_defaults
-from fatebridge.application.tool_spec import ServiceResult, ToolSpec
+from fatebridge.application.tool_spec import (
+    OutputContractError,
+    ServiceResult,
+    ToolSpec,
+)
 from fatebridge.core.reproducibility import ReproducibilityPolicy
+
+if TYPE_CHECKING:
+    from pydantic import BaseModel
 
 _TIMING_REQ = "fatebridge.core.requests.timing"
 _CAL_REQ = "fatebridge.core.requests.calendar"
@@ -45,191 +52,47 @@ calculate_nongli_time = service_ref(
     "fatebridge.services.calendar_tools", "calculate_nongli_time"
 )
 
-TERM_VIEW = {
-    "name",
-    "datetime_with_offset",
-    "datetime_utc",
-    "day_ganzhi",
-    "ephemeris_model",
-}
 
-
-def _compact_term(term: dict) -> dict:
-    return {key: value for key, value in term.items() if key in TERM_VIEW}
-
-
-def _compact_solar_term_window(window: dict) -> dict:
-    return {
-        **window,
-        **(
-            {"start_term": _compact_term(window["start_term"])}
-            if isinstance(window.get("start_term"), dict)
-            else {}
-        ),
-        **(
-            {"next_term": _compact_term(window["next_term"])}
-            if isinstance(window.get("next_term"), dict)
-            else {}
-        ),
-    }
-
-
-def _compact_jieqi_nodes(nodes: list[dict]) -> list[dict]:
-    return [
-        {
-            "order": node["order"],
-            "jieqi": _compact_term(node["jieqi"]),
-            **(
-                {
-                    "analysis_anchor": node["analysis_anchor"],
-                    "liuyue": {"pillar": node["liuyue"]["pillar"]},
-                    "liuri": {"pillar": node["liuri"]["pillar"]},
-                    "overall_effect": node["overall_effect"],
-                }
-                if "analysis_anchor" in node
-                else {"analysis_anchor_status": node["analysis_anchor_status"]}
-            ),
-        }
-        for node in nodes
-    ]
-
-
-def _compact_liuyue_timeline_nodes(nodes: list[dict]) -> list[dict]:
-    compact_nodes: list[dict] = []
-    for node in nodes:
-        entry = {
-            "order": node["order"],
-            "gregorian_window": node["gregorian_window"],
-            "start_term": _compact_term(node["start_term"]),
-            "next_term": _compact_term(node["next_term"]),
-        }
-        if "analysis_anchor" in node:
-            entry["analysis_anchor"] = node["analysis_anchor"]
-            entry["liuyue"] = {"pillar": node["liuyue"]["pillar"]}
-            if "overall_effect" in node:
-                entry["overall_effect"] = node["overall_effect"]
-        elif "analysis_anchor_status" in node:
-            entry["analysis_anchor_status"] = node["analysis_anchor_status"]
-        compact_nodes.append(entry)
-    return compact_nodes
-
-
-def _compact_jieqi_year(result: ServiceResult) -> ServiceResult:
-    field = (
-        "selected_jieqi"
-        if result["analysis_context"]["requested_jieqis"]
-        else "jieqi_year"
+def _validate_jieqi_year_output(
+    _spec: ToolSpec,
+    result: ServiceResult,
+    request: BaseModel | None,
+) -> None:
+    analysis_context = result.get("analysis_context")
+    requested_jieqis = (
+        getattr(request, "jieqis", None)
+        if request is not None
+        else (
+            analysis_context.get("requested_jieqis")
+            if isinstance(analysis_context, dict)
+            else None
+        )
     )
-    return {
-        **{
-            key: value
-            for key, value in result.items()
-            if key not in {"jieqi_year", "selected_jieqi"}
-        },
-        field: [_compact_term(term) for term in result[field]],
-    }
+    if requested_jieqis:
+        if "jieqi_year" in result:
+            raise OutputContractError("筛选节气请求不得重复输出全量 jieqi_year")
+        if not isinstance(result.get("selected_jieqi"), list):
+            raise OutputContractError("筛选节气输出缺少 selected_jieqi 列表")
+        return
+    if "selected_jieqi" in result:
+        raise OutputContractError("未筛选节气请求不得重复输出 selected_jieqi")
+    jieqi_year = result.get("jieqi_year")
+    if not isinstance(jieqi_year, list) or not jieqi_year:
+        raise OutputContractError("全年节气输出缺少 jieqi_year 列表")
 
 
-def _compact_jieqi_timeline(result: ServiceResult) -> ServiceResult:
-    return {
-        k: (_compact_jieqi_nodes(v) if k == "jieqi_timeline" else v)
-        for k, v in result.items()
-        if k not in {"calendar_context", "target_year_jieqi"}
-    }
-
-
-def _compact_bazi_timing(result: ServiceResult) -> ServiceResult:
-    dayun = result.get("dayun")
-    compact_dayun = (
-        {
-            k: v
-            for k, v in dayun.items()
-            if k
-            not in {"timing_context", "element_effects", "natal_relations", "shensha"}
-        }
-        if isinstance(dayun, dict)
-        else dayun
-    )
-    analysis_calendar = result.get("analysis_calendar")
-    compact_calendar: Any
-    if isinstance(analysis_calendar, dict):
-        trimmed_calendar = dict(analysis_calendar)
-        if isinstance(trimmed_calendar.get("analysis_year_jieqi"), list):
-            trimmed_calendar["analysis_year_jieqi"] = [
-                _compact_term(term) for term in trimmed_calendar["analysis_year_jieqi"]
-            ]
-        if isinstance(trimmed_calendar.get("liuyue_timeline"), list):
-            trimmed_calendar["liuyue_timeline"] = _compact_liuyue_timeline_nodes(
-                trimmed_calendar["liuyue_timeline"]
-            )
-        if isinstance(trimmed_calendar.get("jieqi_timeline"), list):
-            trimmed_calendar["jieqi_timeline"] = _compact_jieqi_nodes(
-                trimmed_calendar["jieqi_timeline"]
-            )
-        compact_calendar = trimmed_calendar
-    else:
-        compact_calendar = analysis_calendar
-    out: ServiceResult = {}
-    for k, v in result.items():
-        if k in {"calendar_context", "interaction_analysis", "combined_effects"}:
-            continue
-        if k == "dayun":
-            out[k] = compact_dayun
-        elif k == "analysis_calendar":
-            out[k] = compact_calendar
-        elif k in {"liuyue", "liuri", "liushi", "liunian"} and isinstance(v, dict):
-            out[k] = {
-                sk: sv
-                for sk, sv in v.items()
-                if sk not in {"detailed_analysis", "element_effects"}
-            }
-        else:
-            out[k] = v
-    return out
-
-
-def _compact_timing_period(result: ServiceResult) -> ServiceResult:
-    return {
-        k: v
-        for k, v in result.items()
-        if k not in {"calendar_context", "timing_context"}
-    }
-
-
-def _compact_liuyue(result: ServiceResult) -> ServiceResult:
-    base = _compact_timing_period(result)
-    liuyue = base.get("liuyue")
-    if isinstance(liuyue, dict) and isinstance(liuyue.get("solar_term_window"), dict):
-        base = {
-            **base,
-            "liuyue": {
-                **liuyue,
-                "solar_term_window": _compact_solar_term_window(
-                    liuyue["solar_term_window"]
-                ),
-            },
-        }
-    timeline = base.get("monthly_timeline")
-    if isinstance(timeline, list):
-        base = {
-            **base,
-            "monthly_timeline": [
-                (
-                    {
-                        **entry,
-                        "solar_term_window": _compact_solar_term_window(
-                            entry["solar_term_window"]
-                        ),
-                    }
-                    if isinstance(entry, dict)
-                    and isinstance(entry.get("solar_term_window"), dict)
-                    else entry
-                )
-                for entry in timeline
-            ],
-        }
-    return base
-
+_ANALYSIS_DATE_CONTEXT_OMIT: tuple[str, ...] = (
+    "analysis_calendar.analysis_date_context.current_solar_term.civil_point",
+    "analysis_calendar.analysis_date_context.current_solar_term.comparison_policy",
+    "analysis_calendar.analysis_date_context.next_solar_term.civil_point",
+    "analysis_calendar.analysis_date_context.next_solar_term.comparison_policy",
+    "analysis_calendar.analysis_date_context.bazi_month_boundary.start_term.civil_point",
+    "analysis_calendar.analysis_date_context.bazi_month_boundary.start_term.comparison_policy",
+    "analysis_calendar.analysis_date_context.bazi_month_boundary.next_term.civil_point",
+    "analysis_calendar.analysis_date_context.bazi_month_boundary.next_term.comparison_policy",
+    "analysis_calendar.analysis_date_context.lunar_calendar.previous_jieqi",
+    "analysis_calendar.analysis_date_context.lunar_calendar.next_jieqi",
+)
 
 SPECS: list[ToolSpec] = [
     ToolSpec(
@@ -241,8 +104,29 @@ SPECS: list[ToolSpec] = [
         family="timing",
         rest_path="/api/bazi/timing",
         cpu_bound=True,
-        compact_view=_compact_bazi_timing,
         resolve_time_defaults=resolve_bazi_analysis_time_defaults,
+        default_omit=(
+            "calendar_context",
+            "interaction_analysis",
+            "combined_effects",
+            "dayun.timing_context",
+            "dayun.element_effects",
+            "dayun.natal_relations",
+            "dayun.shensha",
+            "liunian.element_effects",
+            "liuyue.detailed_analysis",
+            "liuri.detailed_analysis",
+            "liushi.detailed_analysis",
+            *_ANALYSIS_DATE_CONTEXT_OMIT,
+            "analysis_calendar.analysis_year_jieqi.*.civil_point",
+            "analysis_calendar.analysis_year_jieqi.*.comparison_policy",
+            "analysis_calendar.liuyue_timeline.*.start_term.civil_point",
+            "analysis_calendar.liuyue_timeline.*.start_term.comparison_policy",
+            "analysis_calendar.liuyue_timeline.*.next_term.civil_point",
+            "analysis_calendar.liuyue_timeline.*.next_term.comparison_policy",
+            "analysis_calendar.jieqi_timeline.*.jieqi.civil_point",
+            "analysis_calendar.jieqi_timeline.*.jieqi.comparison_policy",
+        ),
     ),
     ToolSpec(
         name="bazi_luck_cycles",
@@ -253,8 +137,8 @@ SPECS: list[ToolSpec] = [
         family="timing",
         rest_path="/api/bazi/timing/luck-cycles",
         cpu_bound=True,
-        compact_view=_compact_timing_period,
         resolve_time_defaults=resolve_bazi_analysis_time_defaults,
+        default_omit=("calendar_context", "timing_context"),
     ),
     ToolSpec(
         name="bazi_yearly_timing",
@@ -264,9 +148,9 @@ SPECS: list[ToolSpec] = [
         operation_label_zh="流年分析",
         family="timing",
         rest_path="/api/bazi/timing/yearly",
-        compact_view=_compact_timing_period,
         resolve_time_defaults=resolve_bazi_analysis_time_defaults,
         cpu_bound=True,
+        default_omit=("calendar_context",),
     ),
     ToolSpec(
         name="bazi_monthly_timing",
@@ -277,8 +161,19 @@ SPECS: list[ToolSpec] = [
         family="timing",
         rest_path="/api/bazi/timing/monthly",
         cpu_bound=True,
-        compact_view=_compact_liuyue,
         resolve_time_defaults=resolve_bazi_analysis_time_defaults,
+        default_omit=(
+            "calendar_context",
+            *_ANALYSIS_DATE_CONTEXT_OMIT,
+            "liuyue.solar_term_window.start_term.civil_point",
+            "liuyue.solar_term_window.start_term.comparison_policy",
+            "liuyue.solar_term_window.next_term.civil_point",
+            "liuyue.solar_term_window.next_term.comparison_policy",
+            "monthly_timeline.*.solar_term_window.start_term.civil_point",
+            "monthly_timeline.*.solar_term_window.start_term.comparison_policy",
+            "monthly_timeline.*.solar_term_window.next_term.civil_point",
+            "monthly_timeline.*.solar_term_window.next_term.comparison_policy",
+        ),
     ),
     ToolSpec(
         name="bazi_daily_timing",
@@ -289,8 +184,11 @@ SPECS: list[ToolSpec] = [
         family="timing",
         rest_path="/api/bazi/timing/daily",
         cpu_bound=True,
-        compact_view=_compact_timing_period,
         resolve_time_defaults=resolve_bazi_analysis_time_defaults,
+        default_omit=(
+            "calendar_context",
+            *_ANALYSIS_DATE_CONTEXT_OMIT,
+        ),
     ),
     ToolSpec(
         name="bazi_hourly_timing",
@@ -301,8 +199,11 @@ SPECS: list[ToolSpec] = [
         family="timing",
         rest_path="/api/bazi/timing/hourly",
         cpu_bound=True,
-        compact_view=_compact_timing_period,
         resolve_time_defaults=resolve_bazi_analysis_time_defaults,
+        default_omit=(
+            "calendar_context",
+            *_ANALYSIS_DATE_CONTEXT_OMIT,
+        ),
     ),
     ToolSpec(
         name="solar_term_timeline",
@@ -313,18 +214,41 @@ SPECS: list[ToolSpec] = [
         family="timing",
         rest_path="/api/calendar/solar-term-timeline",
         reproducibility=ReproducibilityPolicy(current_time_fields=("analysis_year",)),
-        compact_view=_compact_jieqi_timeline,
         cpu_bound=True,
+        default_omit=(
+            "calendar_context",
+            "target_year_jieqi",
+            "person_info.time_adjustment",
+            "analysis_context.scope",
+            "jieqi_timeline.*.jieqi.civil_point",
+            "jieqi_timeline.*.jieqi.comparison_policy",
+            "jieqi_timeline.*.jieqi.resolution_provider",
+            "jieqi_timeline.*.jieqi.timezone",
+            "jieqi_timeline.*.jieqi.datetime",
+            "jieqi_timeline.*.jieqi.date_key",
+            "jieqi_timeline.*.jieqi.utc_offset_seconds",
+            "jieqi_timeline.*.jieqi.fold",
+            "jieqi_timeline.*.liuyue.stem",
+            "jieqi_timeline.*.liuri.stem",
+            "jieqi_timeline.*.liuri.branch",
+        ),
     ),
     ToolSpec(
         name="solar_terms_for_year",
         bind=bind_kwargs(calculate_jieqi_year),
         request_model_loader=request_model_ref(_CAL_REQ, "JieqiYearRequest"),
+        required_output_fields=("analysis_context", "year"),
+        required_output_validator=_validate_jieqi_year_output,
         summary="指定年份节气时刻表。",
         operation_label_zh="节气年表",
         family="timing",
         rest_path="/api/calendar/solar-terms",
-        compact_view=_compact_jieqi_year,
+        default_omit=(
+            "jieqi_year.*.civil_point",
+            "jieqi_year.*.comparison_policy",
+            "selected_jieqi.*.civil_point",
+            "selected_jieqi.*.comparison_policy",
+        ),
     ),
     ToolSpec(
         name="lunar_calendar_time",
@@ -334,5 +258,6 @@ SPECS: list[ToolSpec] = [
         operation_label_zh="农历时间",
         family="timing",
         rest_path="/api/calendar/lunar-time",
+        default_omit=("calendar_context", "lunar_calendar.meihua"),
     ),
 ]

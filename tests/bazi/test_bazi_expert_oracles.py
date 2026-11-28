@@ -436,7 +436,6 @@ def test_compact_payload_bloat_and_warm_latency_budgets() -> None:
         return deliver_response(
             execute_with_receipt(spec, req),
             spec=spec,
-            detail="compact",
         )
 
     gc.collect()

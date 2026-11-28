@@ -6,7 +6,7 @@ from itertools import chain
 
 from fatebridge.application.bindings import bind_kwargs, request_model_ref, service_ref
 from fatebridge.application.domain_validators import validate_astro_chart_variant
-from fatebridge.application.tool_spec import EvidenceViews, ServiceResult, ToolSpec
+from fatebridge.application.tool_spec import EvidenceViews, ToolSpec
 from fatebridge.services.catalog.astro_bindings import (
     bind_astro_natal_chart,
     bind_relationship_chart,
@@ -15,151 +15,6 @@ from fatebridge.services.catalog.astro_bindings import (
 )
 
 _ASTRO_REQ = "fatebridge.core.requests.astrology"
-
-RELATIONSHIP_PRIMARY_FIELDS = {
-    "directional_synastry": {
-        "synastry_aspects",
-        "in_to_out_aspects",
-        "out_to_in_aspects",
-    },
-    "composite_chart": {"chart"},
-    "influence_chart_pair": {"inner", "outer"},
-    "timespace_chart": {"chart"},
-    "marks_chart_pair": {"marks_charts"},
-}
-
-
-def _compact_relationship(result: ServiceResult) -> ServiceResult:
-    primary_layer = result["relationship_profile"]["primary_layer"]
-    fields = {"relationship_profile", "summary", "run_metadata"}
-    fields.update(RELATIONSHIP_PRIMARY_FIELDS[primary_layer])
-    view = {key: value for key, value in result.items() if key in fields}
-    planet_fields = {"id", "longitude", "latitude", "sign", "sign_zh", "house"}
-
-    def positions(chart: ServiceResult) -> ServiceResult:
-        return {
-            **{k: v for k, v in chart.items() if k not in {"houses", "aspects"}},
-            "planets": [
-                {key: value for key, value in planet.items() if key in planet_fields}
-                for planet in chart["planets"]
-            ],
-        }
-
-    if primary_layer == "marks_chart_pair":
-        view["marks_charts"] = {
-            role: positions(chart) for role, chart in view["marks_charts"].items()
-        }
-    elif primary_layer == "influence_chart_pair":
-        for role in ("inner", "outer"):
-            view[role] = {**view[role], "chart": positions(view[role]["chart"])}
-    elif "chart" in view:
-        view["chart"] = positions(view["chart"])
-    return view
-
-
-def _compact_astrology_chart(result: ServiceResult) -> ServiceResult:
-    keep = {
-        "person_info",
-        "chart_profile",
-        "angles",
-        "element_balance",
-        "modality_balance",
-        "summary",
-        "run_metadata",
-    }
-    view = {k: v for k, v in result.items() if k in keep}
-    planet_fields = {
-        "id",
-        "name",
-        "sign",
-        "sign_zh",
-        "degree",
-        "longitude",
-        "house",
-        "retrograde",
-    }
-    if isinstance(result.get("planets"), list):
-        view["planets"] = [
-            {k: v for k, v in p.items() if k in planet_fields}
-            for p in result["planets"]
-            if isinstance(p, dict)
-        ]
-    if isinstance(result.get("aspects"), list):
-        view["aspects"] = result["aspects"][:16]
-    classical = result.get("classical")
-    if isinstance(classical, dict):
-        view["classical"] = {
-            "sect": classical.get("sect"),
-            "almuten_figuris": (
-                {
-                    k: classical["almuten_figuris"].get(k)
-                    for k in ("winner", "winners", "total_scores")
-                    if k in classical["almuten_figuris"]
-                }
-                if isinstance(classical.get("almuten_figuris"), dict)
-                else classical.get("almuten_figuris")
-            ),
-            "temperament": classical.get("temperament"),
-            "syzygy": (
-                {
-                    k: classical["syzygy"].get(k)
-                    for k in (
-                        "type",
-                        "longitude",
-                        "sign",
-                        "degree_in_sign",
-                        "event_datetime_utc",
-                    )
-                }
-                if isinstance(classical.get("syzygy"), dict)
-                else None
-            ),
-        }
-    return view
-
-
-def _compact_hamburg(result: ServiceResult) -> ServiceResult:
-    ma = result.get("midpoint_analysis")
-    compact_ma = ma
-    if isinstance(ma, dict):
-        dials = ma.get("dials") or {}
-        compact_dials = {
-            dial: {
-                "period_degrees": data.get("period_degrees"),
-                "two_factor_contacts": (data.get("two_factor_contacts") or [])[:3],
-                "three_factor_contacts": (data.get("three_factor_contacts") or [])[:3],
-                "four_factor_contacts": (data.get("four_factor_contacts") or [])[:3],
-                "four_factor_total_count": data.get("four_factor_total_count"),
-            }
-            for dial, data in dials.items()
-            if isinstance(data, dict)
-        }
-        compact_ma = {
-            k: v
-            for k, v in ma.items()
-            if k
-            in {
-                "status",
-                "ruleset_id",
-                "profile",
-                "contact_counts",
-                "unique_two_factor_pair_count",
-                "sensitive_point_query",
-            }
-        }
-        compact_ma["dials"] = compact_dials
-    view = {
-        k: v
-        for k, v in result.items()
-        if k
-        in {
-            "chart_profile",
-            "summary",
-            "run_metadata",
-        }
-    }
-    view["midpoint_analysis"] = compact_ma
-    return view
 
 
 def _relative_evidence_views(
@@ -191,6 +46,8 @@ def _chart_spec(
     rest_path: str,
     variant: str,
     label: str,
+    *,
+    default_omit: tuple[str, ...] = (),
 ) -> ToolSpec:
     return ToolSpec(
         name=name,
@@ -206,6 +63,7 @@ def _chart_spec(
         family="astro",
         cpu_bound=True,
         rest_path=rest_path,
+        default_omit=default_omit,
         output_validators=(validate_astro_chart_variant,),
     )
 
@@ -231,8 +89,19 @@ SPECS: list[ToolSpec] = [
         family="astro",
         cpu_bound=True,
         rest_path="/api/human-design/chart",
-        compact_view=service_ref(
-            "fatebridge.services.human_design", "compact_human_design"
+        default_omit=(
+            "activations",
+            "depth_evidence.line_fixings",
+            "time_scales",
+            "design_solver",
+            "definition_bridging",
+            "birth_time_sensitivity.activation_variants",
+            "cycle_context",
+            "transit_overlay.transit_activations",
+            "composite.composite_bodygraph",
+            "bodygraph.gate_sources",
+            "bodygraph.circuitry.circuits",
+            "variables.personality_colors",
         ),
     ),
     ToolSpec(
@@ -244,20 +113,72 @@ SPECS: list[ToolSpec] = [
         family="astro",
         cpu_bound=True,
         rest_path="/api/astrology/chart",
+        default_omit=(
+            "houses",
+            "aspect_evidence",
+            "classical",
+            "classical_patterns",
+            "planetary_hours",
+            "fixed_stars",
+            "balance_basis",
+            "chart_profile.aspect_policy",
+            "planets.*.dignity",
+            "apparent_model_positions",
+            "context_geometry",
+        ),
         output_validators=(validate_astro_chart_variant,),
-        compact_view=_compact_astrology_chart,
     ),
     _chart_spec(
         "thirteen_sector_chart",
         "/api/astrology/thirteen-sector-chart",
         "chart13",
         "13等分扇区盘",
+        default_omit=(
+            "houses",
+            "aspects",
+            "aspect_evidence",
+            "classical",
+            "classical_patterns",
+            "planetary_hours",
+            "fixed_stars",
+            "element_balance",
+            "modality_balance",
+            "balance_basis",
+            "chart_profile.aspect_policy",
+            "chart_profile.physical_ephemeris_source",
+            "planets.*.dignity",
+            "planets.*.sector13_evidence",
+            "birth_time_sensitivity.factor_spans",
+            "birth_time_sensitivity.sector_assignments",
+            "birth_time_sensitivity.clock_policy",
+            "birth_time_sensitivity.scope",
+            "birth_time_sensitivity.samples",
+            "birth_time_sensitivity.physical_ephemeris_sources",
+        ),
     ),
     _chart_spec(
         "hellenistic_chart",
         "/api/astrology/hellenistic-chart",
         "hellen_chart",
         "希腊盘",
+        default_omit=(
+            "aspect_evidence",
+            "classical_patterns",
+            "planetary_hours",
+            "fixed_stars",
+            "balance_basis",
+            "chart_profile.aspect_policy",
+            "planets.*.dignity.scope",
+            "classical.ptolemy",
+            "classical.planets",
+            "classical.dispositors",
+            "classical.topic_almutens",
+            "classical.solar_condition_policy",
+            "classical.orientality_policy",
+            "classical.syzygy",
+            "classical.almuten_figuris.method",
+            "classical.almuten_figuris.points",
+        ),
     ),
     ToolSpec(
         name="guolao_chart",
@@ -273,8 +194,54 @@ SPECS: list[ToolSpec] = [
         family="astro",
         cpu_bound=True,
         rest_path="/api/astrology/guolao-chart",
+        default_omit=(
+            "planets",
+            "houses",
+            "angles",
+            "chart_profile",
+            "guolao.planetary_mansions",
+            "guolao.mansion_boundaries",
+            "guolao.profile",
+            "guolao.si_yu_sign_index",
+            "guolao.god_sign_index",
+            "guolao.validation",
+            "guolao.palaces",
+            "guolao.dongwei_daxian.periods",
+            "guolao.god_positions.branches",
+            "guolao.god_positions.aliases",
+            "guolao.god_positions.source_id",
+            "guolao.god_positions.locator",
+            "guolao.bodies.*.latitude",
+            "guolao.bodies.*.longitude_speed",
+            "guolao.bodies.*.right_ascension",
+            "guolao.bodies.*.declination",
+            "guolao.bodies.*.mansion.right_ascension",
+            "guolao.bodies.*.mansion.longitude",
+            "guolao.bodies.*.mansion.coordinate",
+            "guolao.bodies.*.mansion.degree_in_mansion",
+            "guolao.bodies.*.mansion.mansion_width",
+            "guolao.bodies.*.mansion.boundary_distance",
+            "guolao.bodies.*.mansion.determinative_star",
+            "guolao.bodies.*.mansion.coordinate_unit",
+            "guolao.bodies.*.mansion.placement_basis",
+            "guolao.life_palace.mansion",
+            "guolao.life_palace.birth_clock",
+            "guolao.life_palace.clock_basis",
+            "guolao.life_palace.method",
+            "guolao.life_palace.sun_palace_basis",
+            "guolao.life_palace.seasonal_anchor_policy",
+            "guolao.body_palace.mansion",
+            "guolao.body_palace.basis",
+            "guolao.timing.transit_bodies",
+            "guolao.timing.mansion_boundaries",
+            "guolao.timing.profile",
+            "guolao.timing.dongwei_daxian.periods",
+            "guolao.timing.small_limit.source_id",
+            "guolao.timing.small_limit.locator",
+            "guolao.timing.small_limit.method",
+            "guolao.timing.small_limit.year_boundary_basis",
+        ),
         output_validators=(validate_astro_chart_variant,),
-        compact_view=service_ref("fatebridge.services.guolao", "compact_guolao_chart"),
     ),
     ToolSpec(
         name="vedic_chart",
@@ -290,7 +257,41 @@ SPECS: list[ToolSpec] = [
         family="astro",
         cpu_bound=True,
         rest_path="/api/astrology/vedic-chart",
-        compact_view=service_ref("fatebridge.services.jyotish", "compact_vedic_chart"),
+        default_omit=(
+            "vedic_chart.profile",
+            "vedic_chart.charts.D2",
+            "vedic_chart.charts.D3",
+            "vedic_chart.charts.D4",
+            "vedic_chart.charts.D7",
+            "vedic_chart.charts.D9",
+            "vedic_chart.charts.D10",
+            "vedic_chart.charts.D12",
+            "vedic_chart.charts.D16",
+            "vedic_chart.charts.D20",
+            "vedic_chart.charts.D24",
+            "vedic_chart.charts.D27",
+            "vedic_chart.charts.D30",
+            "vedic_chart.charts.D40",
+            "vedic_chart.charts.D45",
+            "vedic_chart.charts.D60",
+            "vedic_chart.charts.D1.graha_aspects",
+            "vedic_chart.charts.D1.houses",
+            "vedic_chart.charts.D1.planets.*.dispositor_relationship",
+            "vedic_chart.charts.D1.planets.*.physical_state",
+            "vedic_chart.ashtakavarga",
+            "vedic_chart.strengths.sthana_bala",
+            "vedic_chart.strengths.dig_bala",
+            "vedic_chart.strengths.naisargika_bala",
+            "vedic_chart.strengths.drik_bala",
+            "vedic_chart.strengths.kala_bala",
+            "vedic_chart.strengths.cheshta_bala",
+            "vedic_chart.strengths.bhava_bala",
+            "vedic_chart.strengths.shadbala_assessment.ishta_kashta",
+            "vedic_chart.bhava_chalit.bhavas",
+            "vedic_chart.bhava_chalit.placements",
+            "vedic_chart.nakshatras",
+            "vedic_chart.birth_time_sensitivity",
+        ),
     ),
     ToolSpec(
         name="vimshottari_dasha",
@@ -311,7 +312,15 @@ SPECS: list[ToolSpec] = [
         family="astro",
         cpu_bound=True,
         rest_path="/api/astrology/vimshottari-dasha",
-        compact_view=service_ref("fatebridge.services.jyotish", "compact_vimshottari"),
+        default_omit=(
+            "vimshottari.timeline.*.antardashas",
+            "vimshottari.subdivisions.siblings_by_level",
+            "vimshottari.birth_time_sensitivity",
+            "vimshottari.rule_ids",
+            "yogini.timeline",
+            "ashtottari.timeline",
+            "chara.timeline",
+        ),
     ),
     ToolSpec(
         name="hamburg_midpoint_chart",
@@ -322,8 +331,35 @@ SPECS: list[ToolSpec] = [
         family="astro",
         cpu_bound=True,
         rest_path="/api/astrology/hamburg-midpoint-chart",
+        default_omit=(
+            "base_chart.chart_profile",
+            "base_chart.angles",
+            "base_chart.houses",
+            "base_chart.planets",
+            "base_chart.summary",
+            "planets",
+            "midpoints",
+            "midpoint_aspects",
+            "midpoint_analysis.factors",
+            "midpoint_analysis.midpoint_axes",
+            "midpoint_analysis.profile.physical_ephemeris_source",
+            "midpoint_analysis.dials",
+            "midpoint_analysis.birth_time_sensitivity.factor_spans",
+            "midpoint_analysis.birth_time_sensitivity.source_pattern",
+            "midpoint_analysis.birth_time_sensitivity.samples",
+            "midpoint_analysis.birth_time_sensitivity.physical_ephemeris_sources",
+            "midpoint_analysis.comparative_geometry",
+            "midpoint_analysis.solar_arc_analysis.directed_factors",
+            "midpoint_analysis.solar_arc_analysis.dials",
+            "midpoint_analysis.solar_arc_analysis.original_table_1925",
+            "midpoint_analysis.solar_arc_analysis.profile.key_source_comparison",
+            "midpoint_analysis.solar_arc_analysis.profile.sun_ephemeris_source",
+            "midpoint_analysis.solar_arc_analysis.birth_time_sensitivity.samples",
+            "midpoint_analysis.solar_arc_analysis.birth_time_sensitivity.source_pattern",
+            "midpoint_analysis.solar_arc_analysis.daily_meridian",
+            "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry",
+        ),
         output_validators=(validate_astro_chart_variant,),
-        compact_view=_compact_hamburg,
     ),
     ToolSpec(
         name="relationship_chart",
@@ -334,7 +370,36 @@ SPECS: list[ToolSpec] = [
         family="astro",
         cpu_bound=True,
         rest_path="/api/astrology/relationship-chart",
+        default_omit=(
+            "inner_chart",
+            "outer_chart",
+            "inner",
+            "outer",
+            "in_to_out_midpoint",
+            "out_to_in_midpoint",
+            "in_to_out_antiscia",
+            "out_to_in_antiscia",
+            "in_to_out_contra_antiscia",
+            "out_to_in_contra_antiscia",
+            "composite_to_inner_aspects",
+            "composite_to_outer_aspects",
+            "chart.aspect_evidence",
+            "chart.houses",
+            "chart.aspects",
+            "chart.planets.*.dignity",
+            "chart.balance_basis",
+            "chart.chart_profile.derivation_policy",
+            "chart.chart_profile.aspect_policy",
+            "chart.chart_profile.physical_ephemeris_source",
+            "marks_charts.*.aspect_evidence",
+            "marks_charts.*.houses",
+            "marks_charts.*.aspects",
+            "marks_charts.*.planets.*.dignity",
+            "marks_charts.*.balance_basis",
+            "marks_charts.*.chart_profile.derivation_policy",
+            "marks_charts.*.chart_profile.aspect_policy",
+            "marks_charts.*.chart_profile.physical_ephemeris_source",
+        ),
         evidence_views_builder=_relative_evidence_views,
-        compact_view=_compact_relationship,
     ),
 ]

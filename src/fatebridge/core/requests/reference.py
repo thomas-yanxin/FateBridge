@@ -42,6 +42,12 @@ class KnowledgeRegistryRequest(FateBridgeBaseRequest):
         default=None,
         description="Optional domain filter: astro/bazi/liureng/qimen/heluo/canping/human_design. Heluo/Canping/Human Design expose source-bound partial references; catalogues do not select rules applicable to a person. Human Design retains384line locators; actual coverage reports pending local paraphrases, uncurated meanings and independent acceptance separately. Omit for all domains with separate source provenance.",
     )
+    keys_sample_limit: int | None = Field(
+        default=4,
+        ge=1,
+        le=5000,
+        description="每个分类返回的键值样例数量上限（1-5000，默认 4；设为 null 返回全部键）",
+    )
 
 
 class KnowledgeReadRequest(FateBridgeBaseRequest):

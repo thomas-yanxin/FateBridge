@@ -82,6 +82,7 @@ class LunationPhase(SystemOutput):
     natal_phase: str | None = None
     natal_phase_label: str | None = None
     phase_ingresses: list[PhaseIngress] | None = None
+    phase_ingress_count: int | None = None
 
 
 class DistributionParticipant(PartialOutput):
@@ -166,6 +167,7 @@ class Keypoints(SystemOutput):
     release_sign_index: int | None = None
     positions: list[KeypointPosition] | None = None
     activations: list[KeypointActivation] | None = None
+    activation_count: int | None = None
 
 
 class PlanetaryArc(SystemOutput):
@@ -177,6 +179,7 @@ class PlanetaryArc(SystemOutput):
     orb: float | None = None
     positions: dict[str, WesternPoint] | None = None
     hits: list[AspectHit] | None = None
+    hits_total_count: int | None = None
 
 
 class PersianHit(PartialOutput):
@@ -190,6 +193,7 @@ class PersianHit(PartialOutput):
 
 class PersianDirected(SystemOutput):
     hit_count: int | None = None
+    hits_total_count: int | None = None
     max_age_years: float | None = None
     rate_deg_per_year: float | None = None
     hits: list[PersianHit] | None = None
@@ -218,6 +222,7 @@ class AgePoint(SystemOutput):
     max_age_years: float | None = None
     years_per_house: float | None = None
     points: list[AgePointPosition] | None = None
+    point_count: int | None = None
     contacts: list[AgePointContact] | None = None
 
 
@@ -228,6 +233,7 @@ class VedicProgression(SystemOutput):
     zodiac: str | None = None
     positions: dict[str, WesternPoint] | None = None
     hits: list[AspectHit] | None = None
+    hits_total_count: int | None = None
 
 
 class DeclinationParallel(PartialOutput):

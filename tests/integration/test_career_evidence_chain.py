@@ -83,15 +83,13 @@ def test_career_projection_preserves_primary_tie_and_scope_across_transports(
 ) -> None:
     spec = SPECS["bazi_career"]
     fields = suggested_fields(spec, view=view)
-    params = dict(detail="audit", fields=fields)
+    params = dict(fields=fields)
     http, protocol, code, output = surface_calls(
         spec,
         D1,
         params=params,
         options=params,
         flags=[
-            "--detail",
-            "audit",
             "--fields",
             *fields,
         ],
@@ -134,7 +132,6 @@ def test_western_career_actual_evidence_agrees_across_transports(surface_calls) 
         "analysis_minute": 0,
     }
     params = dict(
-        detail="audit",
         fields=fields,
         as_of="2026-10-12T02:00:00Z",
     )
@@ -144,8 +141,6 @@ def test_western_career_actual_evidence_agrees_across_transports(surface_calls) 
         params=params,
         options=params,
         flags=[
-            "--detail",
-            "audit",
             "--fields",
             *fields,
         ],
@@ -178,15 +173,13 @@ def test_omitted_target_date_uses_person_timezone_at_frozen_utc_across_transport
         birth_timezone="America/New_York", birth_longitude=-74.0, birth_place="New York"
     )
     fields = ["career_analysis.timing_context"]
-    params = dict(detail="audit", fields=fields)
+    params = dict(fields=fields)
     http, protocol, code, output = surface_calls(
         spec,
         request,
         params={**params, "as_of": "2026-10-12T02:00:00Z"},
         options={**params, "as_of": "2026-10-12T02:00:00Z"},
         flags=[
-            "--detail",
-            "audit",
             "--fields",
             *fields,
         ],
@@ -237,15 +230,13 @@ def test_career_evidence_retains_star_positions_and_formation_status(
 ) -> None:
     spec = SPECS["bazi_career"]
     fields = ["career_analysis"]
-    params = dict(detail="audit", fields=fields)
+    params = dict(fields=fields)
     http, protocol, code, output = surface_calls(
         spec,
         case_input,
         params={**params, "as_of": "2026-10-12T02:00:00Z"},
         options={**params, "as_of": "2026-10-12T02:00:00Z"},
         flags=[
-            "--detail",
-            "audit",
             "--fields",
             *fields,
         ],
@@ -340,15 +331,13 @@ def test_exact_valid_dual_override_matches_applied_pillars_across_transports(
         "career_analysis.timing_context",
         "career_analysis.topic_facts.timing_layers",
     ]
-    params = dict(detail="audit", fields=fields)
+    params = dict(fields=fields)
     http, protocol, code, output = surface_calls(
         spec,
         case_input,
         params=params,
         options=params,
         flags=[
-            "--detail",
-            "audit",
             "--fields",
             *fields,
         ],
@@ -375,13 +364,13 @@ def test_career_markers_and_structure_detail_returned_with_directions(
 ) -> None:
     spec = SPECS["bazi_career"]
     fields = suggested_fields(spec, view="markers")
-    params = dict(detail="audit", fields=fields)
+    params = dict(fields=fields)
     http, protocol, code, output = surface_calls(
         spec,
         D1,
         params=params,
         options=params,
-        flags=["--detail", "audit", "--fields", *fields],
+        flags=["--fields", *fields],
         cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0

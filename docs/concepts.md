@@ -16,11 +16,11 @@ FateBridge 把确定性计算、传统依据说明与自然语言对话拆开处
 
 用户提出的是自然语言问题，引擎接收的是结构化工具请求。REST、MCP 和 CLI 共享同一中央目录的规范工具名（`spec.name`）和业务输入字段（`spec.request_model`），仅传输载体与外层控制参数形态不同：
 
-| 通道 | 工具寻址与业务输入载体 | 外层控制参数（`detail` / `fields` / `as_of`） |
+| 通道 | 工具寻址与业务输入载体 | 外层控制参数（`include` / `fields` / `as_of`） |
 | --- | --- | --- |
-| REST（HTTP） | `POST /api/...` 路径 + JSON 请求体 | URL 查询参数（如 `?detail=compact&fields=a&fields=b`） |
-| MCP（FastMCP） | `run_calculation(tool="<spec.name>", arguments={...})` | 同级工具参数（`detail`、`fields`、`as_of`） |
-| CLI（`fatebridge`） | 子命令 `<spec.name>` + `--flag` 或 `--request-file PATH` | 子命令选项（`--detail`、`--fields`、`--as-of`） |
+| REST（HTTP） | `POST /api/...` 路径 + JSON 请求体 | URL 查询参数（如 `?include=view&fields=a&fields=b`） |
+| MCP（FastMCP） | `run_calculation(tool="<spec.name>", arguments={...})` | 同级工具参数（`include`、`fields`、`as_of`） |
+| CLI（`fatebridge`） | 子命令 `<spec.name>` + `--flag` 或 `--request-file PATH` | 子命令选项（`--include`、`--fields`、`--as-of`） |
 
 | 概念 | 含义 | 何时使用 |
 | --- | --- | --- |
@@ -44,13 +44,13 @@ MCP 公开 `discover_tools`、`run_calculation` 与 `run_batch` 三个入口（�
 | 内容 | 用途 | 阅读时注意 |
 | --- | --- | --- |
 | 结构化业务字段 | 本次实际计算值、规则命中与分层证据 | 根键随工具变化，以输出合同或 `discover` 为准 |
-| `run_metadata` | 工具名、版本、有效时间、近似标志与重放信息 | 始终保留；`compact` 保留精简回执，`audit` 附加 `duration_ms` 与完整 `replay` |
+| `run_metadata` | 工具名、版本、有效时间、`duration_ms`、`replay` 与 `omitted_fields` | 始终保留；默认省略真实存在的可选重型块时在 `omitted_fields` 列出 |
 
 三端支持通过 `fields` 按点号对象路径严格投影，无效路径立即返回 `validation_error`（`issues[].code="unknown_projection_path"`）并在 `issues[].constraints.available` 提示当前可用键名；数组字段须选取所属父键后在客户端处理。
 
 ## 摘要与完整输出
 
-三端默认采用 `detail=compact`，按工具预设返回精简核心业务字段。若只需要指定分支证据，在 `compact` 下配合 `fields` 精确投影；若需要完整业务载荷、全部时间线与方法取证数据，则传入 `detail=audit` 且不传 `fields`（REST/MCP 传 `fields=null`，CLI 省略 `--fields`）。完整控制约定见[输出控制与结果读取](agent-guide.md#输出控制与结果读取)。
+三端默认返回核心层（仅对配置了 `default_omit` 的工具省略可选重型次级块，并在 `run_metadata.omitted_fields` 列出）。若需要按需追加被省略路径或专题视图，传入 `include`（支持点号路径或 `evidence_views` 名称）；若只需要指定分支证据，传入 `fields` 精确投影（与 `include` 互斥）；若需要无损完整业务载荷与全部时间线，则传入 `include=["*"]`（REST `?include=*`、CLI `--include "*"`）。完整控制约定见[输出控制与结果读取](agent-guide.md#输出控制与结果读取)。
 
 ## 状态与覆盖分开阅读
 

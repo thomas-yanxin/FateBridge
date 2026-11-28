@@ -149,7 +149,6 @@ def test_horary_saturn_station_identity_and_event_order_reach_three_surfaces(
         },
         projection={
             "fields": fields,
-            "detail": "audit",
         },
         rest_as_of=AS_OF,
     )

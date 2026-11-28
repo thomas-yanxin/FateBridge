@@ -20,7 +20,7 @@ OpenAPI 发布 91 个业务 REST 路由，另有 `/api/batch`（多主体多工�
 
 ## 1. 基础信息
 
-- **REST**：默认地址 `http://localhost:8010`（Swagger UI `/docs`、ReDoc `/redoc`、OpenAPI `/openapi.json`、能力发现 `/api/tools`）。业务参数放入 JSON 请求体，控制项（`detail`、`fields`、`as_of`）放入 URL 查询参数（多个 `fields` 重复传参）。
+- **REST**：默认地址 `http://localhost:8010`（Swagger UI `/docs`、ReDoc `/redoc`、OpenAPI `/openapi.json`、能力发现 `/api/tools`）。业务参数放入 JSON 请求体，控制项（`include`、`fields`、`as_of`）放入 URL 查询参数（多个 `include` 或 `fields` 重复传参）。
 - **FastMCP**：通过 `python -m fatebridge.mcp_server` 启动（默认 stdio，HTTP 部署见 [MCP 部署指南](mcp-deployment.md)）；返回原生 `structuredContent` JSON 对象，失败时设置 `isError=true`。
 
 ## 2. 公共约定
@@ -56,7 +56,7 @@ OpenAPI 发布 91 个业务 REST 路由，另有 `/api/batch`（多主体多工�
 
 ### 2.3 输出控制与字段投影
 
-三端统一支持 `detail`（默认 `compact`，可选 `audit`）、`fields`（严格点号路径投影，`run_metadata` 始终保留）与 `as_of`（带时区 ISO 8601 冻结时钟）。无效 `fields` 路径返回 `validation_error`（`unknown_projection_path`）并在 `issues[].constraints.available` 给出可用字段；`ToolSpec.required_output_fields` 声明完整结果必需业务根，启用 `FATEBRIDGE_STRICT_OUTPUT_VALIDATION=1` 后触发完整嵌套模型核验。详细用法与代码示例见[接入指南 § 输出控制与结果读取](agent-guide.md#输出控制与结果读取)。
+三端统一支持 `include`（在核心层基础上增量追加指定点号路径、`evidence_views` 名称或 `["*"]` 无损全量）、`fields`（严格点号路径替换投影，`run_metadata` 始终保留）与 `as_of`（带时区 ISO 8601 冻结时钟）。`include` 与 `fields` 互斥，同时传入返回 `validation_error`；无效 `include` / `fields` 路径或视图名返回 `validation_error`（`unknown_projection_path` 等）并在 `issues[].constraints.available` 与 `suggestions` 给出可用字段；`ToolSpec.required_output_fields` 声明完整结果必需业务根，启用 `FATEBRIDGE_STRICT_OUTPUT_VALIDATION=1` 后触发完整嵌套模型核验。详细用法与代码示例见[接入指南 § 输出控制与结果读取](agent-guide.md#输出控制与结果读取)。
 
 ### 2.4 精度与依赖
 
@@ -67,13 +67,13 @@ OpenAPI 发布 91 个业务 REST 路由，另有 `/api/batch`（多主体多工�
 REST 使用 `GET /api/tools`（查询参数 `detail=brief|summary|full`、`family`、`q`、`tool`、`tools`、`surface`、`include_output_schema=false|true`），CLI 使用 `list` / `discover [tool ...]`（支持 `--tools`、`--detail brief|summary|full`、`--include-output-schema`，也可直接通过 `python -m fatebridge` 调用），MCP 使用 `discover_tools`。
 
 - `detail=brief`：仅返回必填字段、`field_types`、一两行 `usage_hint` 与 `evidence_views` 名称列表，体积最小，适合多工具批量预检（例如 `fatebridge discover qimen liuren_chart jinkou --detail brief`）。
-- `detail=summary`（默认）：未传 `tool`/`tools` 时返回全局 `counts`、`families` 与工具摘要；指定单个 `tool` 时直接解包返回该工具的 `input_schema`、`output_fields`、`example_input`、`evidence_views`、`suggested_fields` 与 `compact_fields`（不再多套一层目录列表）；指定多个 `tools` 时返回精简匹配列表。
+- `detail=summary`（默认）：未传 `tool`/`tools` 时返回全局 `counts`、`families` 与工具摘要；指定单个 `tool` 时直接解包返回该工具的 `input_schema`、`output_fields`、`example_input`、`evidence_views`、`suggested_fields` 与 `default_omit`（不再多套一层目录列表）；指定多个 `tools` 时返回精简匹配列表。
 - `detail=full`：返回完整契约，必须配合 `tool`、`tools`、`family` 或 `q` 过滤（否则返回 `filter_required_for_full_detail`）；**`output_schema` 默认不返回，仅当显式传入 `include_output_schema=true`（MCP `include_output_schema=True`，CLI `--include-output-schema`）时才会附带**。
 - 所有 `extra_forbidden` 校验错误（包括 `BatchRequest`、`BatchCall`、`SubjectProfile`、`AnalysisContext` 与单工具参数）统一返回 `issues[].constraints.allowed_fields` 与近义 `suggestions`。
 
 ### 2.6 确定性与复现元数据
 
-三端支持 `as_of`（ISO 8601 带时区时刻）。`run_metadata` 包含 `run_id`、`tool_name`、`generated_at`、`engine`、`engine_is_approximate`、`effective_time` 与 `warnings`；`detail=audit` 另附 `duration_ms` 与 `replay`（含 `as_of`、`overrides`、`requires_original_input`），随机起卦在 `compact` 下也会附带 `replay.overrides.seed`。将 `replay.overrides` 与 `replay.as_of` 传回同一工具可在相同环境中复现同一计算结果。
+三端支持 `as_of`（ISO 8601 带时区时刻）。`run_metadata` 统一包含 `run_id`、`tool_name`、`generated_at`、`engine`、`engine_is_approximate`、`effective_time`、`duration_ms`、`replay`（含 `as_of`、`overrides`、`requires_original_input`）与 `warnings`；默认或局部 `include` 响应实际省略 `default_omit` 中真实存在的可选重型块时另附 `omitted_fields`（`include=["*"]` 或无省略时不输出）。将 `replay.overrides` 与 `replay.as_of` 传回同一工具可在相同环境中复现同一计算结果。
 
 ## 3. 共享请求族
 

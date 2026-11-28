@@ -73,12 +73,6 @@ _ARCH_LU_GUI_TABLE: dict[tuple[str, str, str], tuple[str, str]] = {
     ("辛", "丑", "卯"): ("拱贵", "寅"),
 }
 
-# 旺神双见拱会 / 半三会 (同方位两支)
-_DIRECTIONAL_ARCH_PAIRS: dict[frozenset[str], tuple[str, str, str]] = {
-    frozenset((group[0], group[2])): (group, bureau, group[1])
-    for group, bureau in BRANCH_SEASONAL_COMBINATIONS.items()
-}
-
 
 def classify_triple_members(
     group: str, branches: set[str] | list[str]

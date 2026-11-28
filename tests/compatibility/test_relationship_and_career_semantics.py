@@ -36,10 +36,14 @@ async def mcp_call(tool: str, inputs: dict[str, JsonValue]) -> CallToolResult:
 
 
 def cli_call(
-    tool: str, inputs: dict[str, JsonValue], capsys: pytest.CaptureFixture[str]
+    tool: str,
+    inputs: dict[str, JsonValue],
+    capsys: pytest.CaptureFixture[str],
+    *,
+    extra_flags: list[str] | None = None,
 ) -> tuple[int, dict[str, JsonValue]]:
     """Exercise the published flags for flat birth and pair requests."""
-    args = [SPECS[tool].name, "--detail", "audit"]
+    args = [SPECS[tool].name, *(extra_flags or ())]
     for field, value in inputs.items():
         rendered = str(value).lower() if isinstance(value, bool) else str(value)
         args.extend(["--" + field.replace("_", "-"), rendered])
@@ -75,7 +79,7 @@ def test_invalid_relationship_matches_all_transports(
         Draft202012Validator(
             TwoPersonCompatibilityRequest.model_json_schema()
         ).validate(inputs)
-    response = rest.post(SPECS[tool].rest_path, json=inputs, params={"detail": "audit"})
+    response = rest.post(SPECS[tool].rest_path, json=inputs)
     protocol = asyncio.run(mcp_call(tool, inputs))
     code, cli = cli_call(tool, inputs, capsys)
     assert response.status_code == 422 and protocol.is_error and code == 1
@@ -101,9 +105,9 @@ def test_relationship_facts_match_across_transports(
         inputs.pop("relationship_type")
     else:
         inputs["relationship_type"] = kind
-    response = rest.post(SPECS[tool].rest_path, json=inputs, params={"detail": "audit"})
+    response = rest.post(SPECS[tool].rest_path, json=inputs, params={"include": ["*"]})
     protocol = asyncio.run(mcp_call(tool, inputs))
-    code, cli = cli_call(tool, inputs, capsys)
+    code, cli = cli_call(tool, inputs, capsys, extra_flags=["--include", "*"])
     assert response.status_code == 200 and not protocol.is_error and code == 0
     bodies = [response.json(), protocol.structured_content, cli]
     for body in bodies:
@@ -132,9 +136,9 @@ def test_career_semantics_match_rest_mcp_cli(
         "dayun_pillar": "甲申",
         "liunian_pillar": "丙午",
     }
-    response = rest.post(SPECS[tool].rest_path, json=inputs, params={"detail": "audit"})
+    response = rest.post(SPECS[tool].rest_path, json=inputs, params={"include": ["*"]})
     protocol = asyncio.run(mcp_call(tool, inputs))
-    code, cli = cli_call(tool, inputs, capsys)
+    code, cli = cli_call(tool, inputs, capsys, extra_flags=["--include", "*"])
     assert response.status_code == 200 and not protocol.is_error and code == 0
     career = [
         body["career_analysis"]

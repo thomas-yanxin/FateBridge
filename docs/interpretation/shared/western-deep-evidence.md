@@ -6,7 +6,7 @@
 
 - **宫头与极区分支**：`house_position_projection` 与 `house_axis_convention` 保留实际投影、极点约定与正反宫序；高纬或极区 `angle_definition.geometric_ascendant_resolved=false` 时，依赖 ASC 的宫头、福点与 13 扇区落区保留为空，仅解释独立 MC 与星体位置。`house_system=6`（或 `T`）为 Topocentric，`Gauquelin`（`G`）当前会明确报错而不静默回退其他宫制。
 - **昼夜与时间尺度**：昼夜由太阳中心真实地平高度判定；普通西占保留民用钟时默认（`use_true_solar_time=false`）。`ephemeris_policy=require_data_files` 可拒绝星历降级；卜卦与择日可选 `ut1_source=iers_c04`（覆盖 1962-01-01 至 2026-09-19 UTC）或默认 `swiss_delta_t`，并在 `converted_utc` 中保留 UTC 闰秒（`23:59:60`）而不截断。
-- **近太阳与视位置**：可通过 `solar_position_model` 视图查看 `apparent_position_policy`（`foreground_of_solar_disc` / `behind_solar_disc`），或查看 `longitude_motion.complete_position_derivatives`。
+- **近太阳与视位置**：可通过 `horary_chart` 的 `solar_position_model` 视图或 `interpret_astrology_dice` 的 `chart.params.chart_profile.apparent_position_policy` 查看太阳视位置政策与求导/星历背景；天象背景运动分项见 `chart.chart.objects[].motion`（含 `native_longitude_speed` 及相关修正项）。
 
 ## 本命古典细问（`evidence_views`）
 

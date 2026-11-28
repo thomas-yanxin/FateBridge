@@ -579,6 +579,7 @@ def build_lunation_phase_payload(
             "window_membership": "strictly_after_birth_through_exact_nominal_age_cap",
         },
         "phase_ingresses": timeline,
+        "phase_ingress_count": len(timeline),
     }
 
 
@@ -924,6 +925,7 @@ def build_keypoints_payload(
             "release_sign_index": None,
             "positions": [],
             "activations": [],
+            "activation_count": 0,
         }
     if release_longitude is None:
         return {
@@ -936,6 +938,7 @@ def build_keypoints_payload(
             "release_sign_index": None,
             "positions": [],
             "activations": [],
+            "activation_count": 0,
         }
 
     release_sign = int(_wrap360(float(release_longitude)) // 30)
@@ -991,6 +994,7 @@ def build_keypoints_payload(
         "release_sign_index": release_sign,
         "positions": positions,
         "activations": activations,
+        "activation_count": len(activations),
     }
 
 
@@ -1066,6 +1070,7 @@ def build_planetary_arc_payload(
     *,
     arc_source: str,
     orb: float = 1.0,
+    max_hits: int | None = None,
 ) -> dict[str, Any]:
     """
     Direct the whole natal chart by a single arc: the secondary-progressed motion
@@ -1088,6 +1093,8 @@ def build_planetary_arc_payload(
         target_longitudes=natal_longitudes,
         orb_limit=orb,
     )
+    hits_total_count = len(hits)
+    selected_hits = hits[:max_hits] if max_hits is not None else hits
     positions = {
         name.lower(): longitude_to_point_dict(name, longitude_float(degree))
         for name, degree in directed_points.items()
@@ -1100,7 +1107,8 @@ def build_planetary_arc_payload(
         "arc_degrees": round(float(arc_degrees), 4),
         "orb": orb,
         "positions": positions,
-        "hits": hits[:12],
+        "hits": selected_hits,
+        "hits_total_count": hits_total_count,
     }
 
 
@@ -1121,7 +1129,7 @@ def build_persian_directed_payload(
     *,
     birth_datetime: Any = None,
     max_age_years: float = 90.0,
-    limit: int = 120,
+    limit: int | None = 120,
 ) -> dict[str, Any]:
     """
     波斯向运 / Persian Directed (symbolic 1°/year).
@@ -1178,13 +1186,14 @@ def build_persian_directed_payload(
                         )
                     )
     hits.sort(key=lambda hit: hit[0])
-    selected = [row for _, row in hits[:limit]]
+    selected = [row for _, row in (hits[:limit] if limit is not None else hits)]
     return {
         "system": "persian_directed",
         "system_label": "波斯向运",
         "rate_deg_per_year": PERSIAN_RATE_DEG_PER_YEAR,
         "max_age_years": max_age_years,
         "hit_count": len(selected),
+        "hits_total_count": len(hits),
         "hits": selected,
     }
 
@@ -1299,6 +1308,7 @@ def build_age_point_payload(
             for age, body, longitude in contacts
         ],
         "points": points,
+        "point_count": len(points),
     }
 
 
@@ -1310,6 +1320,7 @@ def build_vedic_progression_payload(
     natal_longitudes: dict[str, float],
     *,
     orb: float = 1.5,
+    max_hits: int | None = None,
 ) -> dict[str, Any]:
     """
     恒星推运 / Vedic sidereal secondary progression.
@@ -1332,13 +1343,16 @@ def build_vedic_progression_payload(
         target_longitudes=natal_longitudes,
         orb_limit=orb,
     )
+    hits_total_count = len(hits)
+    selected_hits = hits[:max_hits] if max_hits is not None else hits
     return {
         "system": "vedic_progression",
         "system_label": "恒星推运",
         "zodiac": "sidereal",
         "orb": orb,
         "positions": positions,
-        "hits": hits[:12],
+        "hits": selected_hits,
+        "hits_total_count": hits_total_count,
     }
 
 

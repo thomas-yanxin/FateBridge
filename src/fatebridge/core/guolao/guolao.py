@@ -171,7 +171,6 @@ def build_chart(
     mansions: list[dict[str, Any]] = []
     signs: dict[str, int] = {}
     bodies: list[dict[str, Any]] = []
-    trace: list[dict[str, Any]] = []
 
     for name, state in list(raw["states"].items()) + list(raw["extra"].items()):
         body = body_placement(
@@ -337,50 +336,6 @@ def build_chart(
         pattern["basis"] = (
             "moira_compatibility_with_source_hour_count_and_research_placements"
         )
-
-    trace.extend(
-        [
-            {
-                "rule_id": "source_life_palace_hour_count",
-                "source_id": EDITION,
-                "locator": "卷一·安命、十二宫例",
-                "inputs": {
-                    "sun_palace_branch": sun_branch,
-                    "birth_hour_branch": hour_branch,
-                    "counting_anchor_branch": anchor,
-                    "life_degree_method": life_degree_method,
-                },
-                "outputs": {
-                    "life_branch": life_branch,
-                    "life_longitude": life["longitude"],
-                    "life_mansion": life_mansion["su28"],
-                    "body_branch": body_palace["branch"],
-                },
-                "placement_classical_acceptance": False,
-            },
-            {
-                "rule_id": moira.PATTERN_MODEL_ID,
-                "source_id": "moira_software_conditions",
-                "inputs": {
-                    "life_sign_idx": life_idx,
-                    "is_day": is_day,
-                    "season": current_season,
-                },
-                "outputs": {
-                    "matched_patterns": [
-                        {
-                            "name": p["name"],
-                            "rule_id": p["rule_id"],
-                            "source": p["source"],
-                            "evidence": p["evidence"],
-                        }
-                        for p in patterns
-                    ],
-                },
-                "placement_classical_acceptance": False,
-            },
-        ]
-    )
 
     god_positions = {
         "year_stem": year_stem,

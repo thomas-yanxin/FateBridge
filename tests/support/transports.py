@@ -50,18 +50,20 @@ async def call_calculation(
     *,
     raise_on_error: bool = True,
 ) -> CallToolResult:
-    controls = {"as_of", "detail", "fields"}
+    controls = {"as_of", "include", "fields"}
     arguments = {}
     request: dict[str, object] = {
         "tool": tool,
         "arguments": arguments,
-        "detail": "audit",
     }
     for name, value in (values or {}).items():
         if name in controls:
-            request[name] = value
+            if value is not None or name == "as_of":
+                request[name] = value
         else:
             arguments[name] = value
+    if request.get("include") is None and request.get("fields") is None:
+        request["include"] = ["*"]
     return await client.call_tool(
         "run_calculation", request, raise_on_error=raise_on_error
     )
@@ -149,10 +151,14 @@ def call_cli(spec, payload, tmp_path, capsys, flags=()):
     request_file = tmp_path / "request.json"
     request_file.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     extra_flags = list(flags)
-    if "--detail" not in extra_flags and not any(
-        f.startswith("--detail=") for f in extra_flags
-    ):
-        extra_flags.extend(["--detail", "audit"])
+    has_delivery = any(
+        f in {"--include", "--fields"}
+        or f.startswith("--include=")
+        or f.startswith("--fields=")
+        for f in extra_flags
+    )
+    if not has_delivery:
+        extra_flags.extend(["--include", "*"])
     capsys.readouterr()
     code = cli_run(
         [
@@ -185,19 +191,19 @@ def run_three(spec, payload, fields, rest, tmp_path, capsys):
     response = rest.post(
         spec.rest_path,
         json=payload,
-        params=[("fields", f) for f in fields] + [("detail", "audit")],
+        params=[("fields", f) for f in fields],
     )
     code, cli = call_cli(
         spec,
         payload,
         tmp_path,
         capsys,
-        flags=["--fields", *fields, "--detail", "audit"],
+        flags=["--fields", *fields],
     )
     mcp = asyncio.run(
         native(
             spec,
-            {**payload, "fields": fields, "detail": "audit"},
+            {**payload, "fields": fields},
         )
     )
     return response, code, cli, mcp
@@ -209,9 +215,9 @@ def business(payload):
 
 def projected_outputs(spec, payload, fields, rest, tmp_path, capsys):
     """Call the same strict projection on REST, CLI and native MCP."""
-    options = dict(fields=fields, detail="audit")
-    params = [("fields", f) for f in fields] + [("detail", "audit")]
-    flags = ["--fields", *fields, "--detail", "audit"]
+    options = dict(fields=fields)
+    params = [("fields", f) for f in fields]
+    flags = ["--fields", *fields]
     response = rest.post(
         spec.rest_path,
         json=payload,
@@ -259,7 +265,7 @@ def surface_calls(rest, tmp_path, capsys):
             flags = []
             for name, value in projection.items():
                 flags.append("--" + name.replace("_", "-"))
-                if name == "fields":
+                if name in {"fields", "include"}:
                     flags.extend(value)
                 else:
                     flags.append(
@@ -268,11 +274,17 @@ def surface_calls(rest, tmp_path, capsys):
         else:
             pass
         if params is None:
-            params = {"detail": "audit"}
-        elif isinstance(params, dict) and "detail" not in params:
-            params = {**params, "detail": "audit"}
-        elif isinstance(params, list) and not any(k == "detail" for k, _ in params):
-            params = [*params, ("detail", "audit")]
+            params = {"include": "*"}
+        elif (
+            isinstance(params, dict)
+            and "include" not in params
+            and "fields" not in params
+        ):
+            params = {**params, "include": "*"}
+        elif isinstance(params, list) and not any(
+            k in {"include", "fields"} for k, _ in params
+        ):
+            params = [*params, ("include", "*")]
         http = rest.post(
             spec.rest_path,
             json=payload,
@@ -303,7 +315,6 @@ def three_surfaces(spec, payload, fields, as_of, tmp_path, monkeypatch, capsys):
         json=payload,
         params=[
             ("as_of", as_of),
-            ("detail", "audit"),
             *[("fields", f) for f in fields],
         ],
     )
@@ -317,7 +328,6 @@ def three_surfaces(spec, payload, fields, as_of, tmp_path, monkeypatch, capsys):
                     **payload,
                     "as_of": as_of,
                     "fields": fields,
-                    "detail": "audit",
                 },
                 raise_on_error=False,
             )
@@ -333,8 +343,6 @@ def three_surfaces(spec, payload, fields, as_of, tmp_path, monkeypatch, capsys):
             str(request),
             "--as-of",
             as_of,
-            "--detail",
-            "audit",
             "--fields",
             *fields,
         ]

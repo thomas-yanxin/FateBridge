@@ -156,7 +156,7 @@ def native_meridian_houses(
             "status": "not_assessed",
             "uncertainty_minutes": None,
             "continuous_interval_proven": False,
-            "sample_reference": "midpoint_analysis.time_sensitivity.samples",
+            "sample_reference": "midpoint_analysis.birth_time_sensitivity.samples",
         },
         "sources": [SOURCE, SWISS_SOURCE],
         "original_text_conformance": "not_assessed",
@@ -171,7 +171,7 @@ def attach_meridian_sensitivity(
         "status": sensitivity["status"],
         "uncertainty_minutes": sensitivity["uncertainty_minutes"],
         "continuous_interval_proven": False,
-        "sample_reference": "midpoint_analysis.time_sensitivity.samples",
+        "sample_reference": "midpoint_analysis.birth_time_sensitivity.samples",
     }
     if sensitivity["status"] == "sampled":
         samples = sensitivity["samples"]

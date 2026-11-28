@@ -30,7 +30,6 @@ from fatebridge.core.metaphysics.jinkou.year_fate import (
     build_natal_course,
     confirmed_natal_branch,
     natal_course_metadata,
-    natal_course_trace,
     ordinal_year_fate,
 )
 from fatebridge.core.metaphysics.ren_calendar import compute_month_general
@@ -51,7 +50,6 @@ __all__ = [
     "definition_evidence",
     "internal_strength",
     "natal_course_metadata",
-    "natal_course_trace",
     "ordinal_year_fate",
     "pattern_identity",
     "pattern_metadata",

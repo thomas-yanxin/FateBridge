@@ -5,10 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from fatebridge.core.contracts.output_liuren_selection import compare
-from fatebridge.core.metaphysics.jinkou.year_fate import (
-    natal_course_metadata,
-    natal_course_trace,
-)
+from fatebridge.core.metaphysics.jinkou.year_fate import natal_course_metadata
 
 
 def shared_compare(a: Any, b: Any) -> None:
@@ -109,16 +106,6 @@ def validate_natal_course(parent: dict[str, Any]) -> None:
                 )
         if "calendar_policy" in parent and "calendar_policy" in child:
             shared_compare(parent["calendar_policy"], child["calendar_policy"])
-    traces = [
-        t
-        for t in parent.get("rule_trace") or []
-        if t.get("rule_id") == "jinkou.natal_branch_course"
-    ]
-    if len(traces) > 1:
-        raise ValueError("本命另课推导轨迹不能重复")
-    if expected is not None:
-        for trace in traces:
-            compare(trace, natal_course_trace(expected))
 
 
 def require_complete_natal_course(parent: dict[str, Any]) -> None:

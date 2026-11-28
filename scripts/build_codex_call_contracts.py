@@ -70,7 +70,7 @@ async def call_contracts() -> list[dict[str, object]]:
                     "fields": contract.get("suggested_fields"),
                 },
             }
-            for field in ("call_guidance", "evidence_views"):
+            for field in ("call_guidance", "evidence_views", "default_omit"):
                 if contract.get(field):
                     record[field] = contract[field]
                 else:
@@ -102,9 +102,9 @@ def render_files(records: list[dict[str, object]]) -> dict[str, str]:
     lines.extend(
         [
             "",
-            "`input` 描述 `run_calculation.arguments`。工具名和控制参数（`detail`、`fields`、`as_of`）放在 `run_calculation` 的外层。",
-            '首次摘要使用 `detail="compact"` 并省略 `fields`。需要指定业务字段时，可按问题选择 `first_view.fields` 或 `evidence_views` 中的字段（默认严格投影）。',
-            '完整输出使用 `detail="audit"` 并省略 `fields`。',
+            "`input` 描述 `run_calculation.arguments`。工具名和控制参数（`include`、`fields`、`as_of`）放在 `run_calculation` 的外层；`include` 与 `fields` 互斥。",
+            '默认不传 `include` 与 `fields` 即返回核心层，并在 `run_metadata.omitted_fields` 列出实际省略的可选重型路径（对应合同中的 `default_omit`）。需要按需展开省略块时传 `include`（支持路径、`evidence_views` 名称或 `["*"]`）；需要严格只取指定子字段时按 `first_view.fields` 或 `evidence_views` 传入 `fields`。',
+            '无损全量输出使用 `include=["*"]` 并省略 `fields`。',
             "输入日期使用公历；不猜生时、不套示例；出生与分析时刻、时区及太阳时策略以各工具合同为准。",
         ]
     )

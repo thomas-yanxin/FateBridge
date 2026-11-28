@@ -90,21 +90,6 @@ class TaiyiGates(PartialOutput):
     dingmu_comparison_source: str | None = None
 
 
-class TaiyiDeterminateStep(PartialOutput):
-    palace: str | None = None
-    value: int | None = None
-    kind: str | None = None
-
-
-class TaiyiDeterminateTrace(PartialOutput):
-    count: int | None = None
-    path: list[TaiyiDeterminateStep] | None = None
-    terminal_palace: str | None = None
-    terminal_excluded: bool | None = None
-    counting_rule: str | None = None
-    source: str | None = None
-
-
 class TaiyiDeterminateRotation(PartialOutput):
     ruler_branch: str | None = None
     hegod: str | None = None

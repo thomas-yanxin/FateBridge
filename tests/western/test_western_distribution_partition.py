@@ -116,16 +116,13 @@ def test_correct_bound_sequence_reaches_rest_mcp_cli(
         max_age_years=90,
     )
     fields = ["bounds_directions", "natal_reference.ascendant.absolute_degree"]
-    query = [("fields", field) for field in fields] + [("detail", "audit")]
+    query = [("fields", field) for field in fields]
     http, protocol, code, cli = surface_calls(
         spec,
         inputs,
         params=query,
-        options={
-            "fields": fields,
-            "detail": "audit",
-        },
-        flags=["--fields", *fields, "--detail", "audit"],
+        options={"fields": fields},
+        flags=["--fields", *fields],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error

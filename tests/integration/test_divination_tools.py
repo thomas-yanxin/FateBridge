@@ -509,9 +509,9 @@ def test_suzhan_uses_shared_local_chart_runtime(surface_calls) -> None:
     response, protocol, code, cli = surface_calls(
         spec,
         payload,
-        params={"detail": "audit", "fields": fields},
-        options={"detail": "audit", "fields": fields},
-        flags=("--detail", "audit", "--fields", *fields),
+        params={"fields": fields},
+        options={"fields": fields},
+        flags=("--fields", *fields),
     )
     assert response.status_code == 200, response.text
     assert code == 0 and not protocol.is_error

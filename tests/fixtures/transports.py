@@ -18,10 +18,13 @@ def rest_handler(key):
 async def mcp_payload_async(name, /, **arguments):
     from fatebridge.mcp_server import app
 
+    call_args = (
+        {"include": ["*"], **arguments}
+        if "include" not in arguments and "fields" not in arguments
+        else arguments
+    )
     async with Client(app) as client:
-        result = await call_calculation(
-            client, name, {"detail": "audit", **arguments}, raise_on_error=False
-        )
+        result = await call_calculation(client, name, call_args, raise_on_error=False)
         assert result.structured_content is not None
         return result.structured_content
 

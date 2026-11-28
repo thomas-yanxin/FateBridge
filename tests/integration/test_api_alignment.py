@@ -326,7 +326,7 @@ def test_catalog_tools_api_match_fastmcp_output(
     response = rest.post(
         spec.rest_path,
         json=calculation_request.model_dump(mode="json", by_alias=True),
-        params={"detail": "audit"},
+        params={"include": "*"},
     )
     assert response.status_code == 200, response.text
     api_result = response.json()

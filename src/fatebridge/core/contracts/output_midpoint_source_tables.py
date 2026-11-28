@@ -102,7 +102,11 @@ class MixedPairContact(ReferenceAngleGeometry):
 class MixedPairDial(PartialOutput):
     period_degrees: int | None = None
     arc_dependent_contacts: list[MixedPairContact] | None = None
+    arc_dependent_returned_count: int | None = None
+    arc_dependent_total_count: int | None = None
     arc_invariant_contacts: list[MixedPairContact] | None = None
+    arc_invariant_returned_count: int | None = None
+    arc_invariant_total_count: int | None = None
 
 
 class MixedPairProfile(PartialOutput):

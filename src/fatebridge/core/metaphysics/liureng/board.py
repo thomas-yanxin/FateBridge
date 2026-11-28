@@ -220,7 +220,6 @@ def derive_selection(
             }
         )
 
-    rule_trace: list[dict[str, Any]] = []
     (
         style,
         style_detail,
@@ -234,7 +233,6 @@ def derive_selection(
         four_lessons,
         shehai_method=shehai_method,
         harm_include_terminal=harm_include_terminal,
-        trace=rule_trace,
     )
     classification = classify_transmission_pattern(
         day_ganzhi=day_ganzhi,
@@ -264,7 +262,6 @@ def derive_selection(
         "selected_lesson_relation": (
             initial_lesson.get("upper_lower_relation") if initial_lesson else None
         ),
-        "rule_trace": rule_trace,
     }
 
 
@@ -371,7 +368,6 @@ def build_liureng_board(
     transmission_method = selection["transmission_method"]
     transmission_branches = selection["branches"]
     selected_lesson_index = selection["selected_lesson_index"]
-    rule_trace = selection["rule_trace"]
     classification = selection["classification"]
     initial_lesson = next(
         (row for row in four_lessons if row["index"] == selected_lesson_index), None

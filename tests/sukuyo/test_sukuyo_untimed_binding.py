@@ -17,7 +17,7 @@ def untimed():
     request = SuZhanRequest(
         date="2024-08-04", timezone="+08:00", calendar_profile="hinoo_t1299_host27"
     )
-    return request, build_suzhan_result(**request.model_dump())
+    return request, build_suzhan_result(**request.model_dump(exclude={"place"}))
 
 
 @pytest.mark.parametrize(
@@ -66,7 +66,7 @@ def test_correct_unknown_layers_validate_and_known_clock_still_requires_chart(
     request = request.model_copy(
         update={"time": "09:00:00", "latitude": "31n13", "longitude": "121e28"}
     )
-    known = build_suzhan_result(**request.model_dump())
+    known = build_suzhan_result(**request.model_dump(exclude={"place"}))
     validate_output(SPEC, known, request=request)
     known["chart"] = None
     with pytest.raises(OutputContractError):
@@ -79,7 +79,7 @@ def timed(untimed):
     request = request.model_copy(
         update={"time": "09:00:00", "latitude": "31n13", "longitude": "121e28"}
     )
-    return request, build_suzhan_result(**request.model_dump())
+    return request, build_suzhan_result(**request.model_dump(exclude={"place"}))
 
 
 @pytest.mark.parametrize(

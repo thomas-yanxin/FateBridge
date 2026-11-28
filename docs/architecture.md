@@ -66,12 +66,12 @@ sequenceDiagram
     S-->>E: 结构化业务结果
     E->>E: 输出校验与 run_metadata
     E-->>R: 完整结果
-    R->>D: detail 分级与严格 fields 投影
+    R->>D: default_omit 裁剪 / include 展开 / fields 投影
     D-->>R: 交付响应
     R-->>C: JSON 响应
 ```
 
-所有传输层均通过 `application/execution.py` 调用领域服务，重计算由 `application/compute_limits.py` 按 `FATEBRIDGE_HEAVY_CALC_MAX_CONCURRENCY` 进行进程内信号量限流。请求成功返回后，共享交付管线依次执行：业务输出合同校验 -> 附加 `run_metadata` -> 若传入 `fields` 则按点号路径严格投影（`application/projection.py`，无效路径报错并附可用字段），否则在 `detail=compact`（默认）时裁剪为核心业务字段与精简 `run_metadata`，`detail=audit` 返回完整业务载荷与执行回执。
+所有传输层均通过 `application/execution.py` 调用领域服务，重计算由 `application/compute_limits.py` 按 `FATEBRIDGE_HEAVY_CALC_MAX_CONCURRENCY` 进行进程内信号量限流。请求成功返回后，共享交付管线依次执行：业务输出合同校验 -> 附加 `run_metadata` -> 若传入 `fields` 则按点号路径严格投影（`application/projection.py`，无效路径报错并附可用字段）；若传入 `include=["*"]` 则无损返回完整载荷；否则按 `ToolSpec.default_omit`（并结合 `include` 指定的路径或 `evidence_views` 名称）同构省略真实存在的可选重型次级块，并在 `run_metadata.omitted_fields` 记录实际被省略的路径。
 
 ### 合同缓存
 
@@ -81,7 +81,7 @@ sequenceDiagram
 
 - **时间与地点归一化**：出生输入构造集中在 `utils/birth_input.py`，真太阳时在 `utils/solar_time.py`，时区在 `utils/timezones.py`，离线地名解析在 `utils/places.py`。中式模型默认开启真太阳时，核心星盘默认关闭，适配层须保留该语义。
 - **星历共享状态**：Swiss Ephemeris 存在共享 C 目录状态，所有目录切换与调用通过 `core/ephemeris_runtime.py` 与 `core/ephemeris_paths.py` 的可重入锁协调。核心占星盘缺省数据时可走内置近似路径，西占推运缺运行时则直接报 `dependency_missing`。
-- **执行回执与重放**：`core/receipt_models.py` 定义的 `run_metadata`（由 `services/run_metadata.py` 与 `services/replay_metadata.py` 生成）保存有效时钟、`warnings` 与重放信息（`detail=audit` 含 `duration_ms` 与完整 `replay`，随机起卦保留当次 `seed`）。重放需保留原始输入与环境配置，服务不持久化历史运行数据库。
+- **执行回执与重放**：`core/receipt_models.py` 定义的 `run_metadata`（由 `services/run_metadata.py` 与 `services/replay_metadata.py` 生成）保存有效时钟、`duration_ms`、`warnings`、完整 `replay` 信息以及实际被省略的路径 `omitted_fields`（随机起卦保留当次 `seed`）。重放需保留原始输入与环境配置，服务不持久化历史运行数据库。
 
 ## 内聚与依赖边界
 

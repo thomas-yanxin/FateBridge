@@ -139,7 +139,7 @@ def test_western_timing_selective_techniques_and_validate_output(
     raw = execute_with_receipt(
         spec,
         req,
-        options=ExecutionOptions(detail="audit", as_of="2026-10-14T12:00:00+08:00"),
+        options=ExecutionOptions(as_of="2026-10-14T12:00:00+08:00"),
     )
     assert "error" not in raw, raw
     assert set(raw.keys()) == {
@@ -155,17 +155,25 @@ def test_western_timing_selective_techniques_and_validate_output(
     assert list(raw["transits"].keys()) == ["current_transit"]
 
 
-def test_western_timing_compact_view_under_budget() -> None:
+def test_western_timing_default_delivery_budget_and_isomorphism() -> None:
     spec = next(s for s in CATALOG if s.name == "western_timing")
     req = spec.request_model.model_validate(DEMO)
     raw = execute_with_receipt(
         spec,
         req,
-        options=ExecutionOptions(detail="compact", as_of="2026-10-14T12:00:00+08:00"),
+        options=ExecutionOptions(as_of="2026-10-14T12:00:00+08:00"),
     )
-    delivered = deliver_response(raw, spec=spec, detail="compact")
+    delivered = deliver_response(raw, spec=spec)
+    full = deliver_response(raw, spec=spec, include=["*"])
     size = len(json.dumps(delivered, ensure_ascii=False).encode("utf-8"))
     assert size <= 10240
+    assert delivered["run_metadata"]["omitted_fields"] == list(spec.default_omit)
+    assert "omitted_fields" not in full["run_metadata"]
+    assert delivered["analysis_context"] == full["analysis_context"]
+    assert delivered["time_lords"]["firdaria"] == full["time_lords"]["firdaria"]
+    for view_name in ("stage", "annual", "short_term", "career"):
+        view_out = deliver_response(raw, spec=spec, include=[view_name])
+        assert view_out["summary"] == full["summary"]
 
 
 def test_western_timing_rejects_empty_or_invalid_techniques() -> None:
@@ -347,9 +355,6 @@ def test_transit_scan_rest_mcp_cli_parity(surface_calls) -> None:
     http, protocol, code, cli = surface_calls(
         spec,
         payload,
-        params=[("detail", "audit")],
-        options={"detail": "audit"},
-        flags=["--detail", "audit"],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error

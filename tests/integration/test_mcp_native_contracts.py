@@ -101,7 +101,6 @@ async def test_real_mcp_pair_keeps_each_person_explicitness_separate() -> None:
                     "person1_use_true_solar_time": False,
                     "person1_birth_longitude": 100.0,
                     "person2_birth_longitude": 100.0,
-                    "detail": "audit",
                     "fields": [
                         f"natal_contexts.person{person_number}.calendar_context.birth_time_input"
                         for person_number in (1, 2)

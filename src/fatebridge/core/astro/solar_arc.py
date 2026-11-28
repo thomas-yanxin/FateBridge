@@ -123,6 +123,7 @@ def biwheel_geometry(
     arc_degrees: float | Fraction,
     *,
     orb_degrees: float = 1.0,
+    max_higher_factor_contacts: int | None = None,
 ) -> dict[str, Any]:
     """Two/three/four labelled factor references, with full untruncated hit lists.
 
@@ -314,12 +315,24 @@ def biwheel_geometry(
         three.sort(key=lambda r: (r["orb"], r["equation"]))
         four.sort(key=lambda r: (r["orb"], r["equation"]))
         zero_count = sum(row["zero_arc_identity"] for row in (*two, *three, *four))
+        returned_three = (
+            three[:max_higher_factor_contacts]
+            if max_higher_factor_contacts is not None
+            else three
+        )
+        returned_four = (
+            four[:max_higher_factor_contacts]
+            if max_higher_factor_contacts is not None
+            else four
+        )
         dials[str(period)] = {
             "period_degrees": period,
             "two_factor_contacts": two,
-            "three_factor_contacts": three[:5],
+            "three_factor_contacts": returned_three,
+            "three_factor_returned_count": len(returned_three),
             "three_factor_total_count": len(three),
-            "four_factor_contacts": four[:5],
+            "four_factor_contacts": returned_four,
+            "four_factor_returned_count": len(returned_four),
             "four_factor_total_count": len(four),
         }
         counts[str(period)] = {
@@ -345,6 +358,8 @@ def enrich_solar_arc(
     analysis_datetime: datetime | None,
     *,
     sample_times: SpecialtySampleTimes | None = None,
+    max_higher_factor_contacts: int | None = 12,
+    max_mixed_pair_contacts: int | None = 2,
 ) -> None:
     if analysis_datetime is None:
         return
@@ -657,9 +672,16 @@ def enrich_solar_arc(
             }
             for f in layer["factors"]
         ],
-        **biwheel_geometry(values, arc),
+        **biwheel_geometry(
+            values,
+            arc,
+            max_higher_factor_contacts=max_higher_factor_contacts,
+        ),
         "mixed_pair_geometry": mixed_pair_geometry(
-            values, arc, hypothetical_ids=HYPOTHETICAL_BODIES, max_contacts_per_field=2
+            values,
+            arc,
+            hypothetical_ids=HYPOTHETICAL_BODIES,
+            max_contacts_per_field=max_mixed_pair_contacts,
         ),
         "interpretations": interpretations,
         "birth_time_sensitivity": sensitivity,

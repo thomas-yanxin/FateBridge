@@ -9,6 +9,14 @@
     "timing": "dayun_method默认bazi_appendix_v1为卷七整数借除，continuous为现代连续折算，legacy为未核旧命宫排法。配运先读timing_policy视图：schedule_basis逐原句标applied_rule／对照，区分所选附法、另书十年背景和现代落点约定；first_row为同次实际首行，旧法保留年龄标签和取文；first_period仅为已映射日期首运摘要，旧法为null，两者均非查询当段。",
     "validation": "本命起数有限核对通过不代表起运大运体系已全部核对。"
   },
+  "default_omit": [
+    "dayun",
+    "liunian_series",
+    "numerology_evidence.birth_clock",
+    "numerology_evidence.pillar_links",
+    "canping_timing.schedule_basis",
+    "canping_timing.solar_year_context"
+  ],
   "evidence_views": {
     "birth_clock": {
       "fields": [

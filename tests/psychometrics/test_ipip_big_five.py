@@ -329,7 +329,7 @@ def test_rest_mcp_cli_discovery_parity_and_runtime_isolation(
     }
     rest_list = client.post(
         "/api/psychometrics/ipip-big-five",
-        params={"detail": "audit"},
+        params={"include": "*"},
         json={"action": "list_items"},
     )
     assert rest_list.status_code == 200
@@ -339,7 +339,7 @@ def test_rest_mcp_cli_discovery_parity_and_runtime_isolation(
 
     rest_score = client.post(
         "/api/psychometrics/ipip-big-five",
-        params={"detail": "audit"},
+        params={"include": "*"},
         json=score_payload,
     )
     assert rest_score.status_code == 200
@@ -354,16 +354,17 @@ def test_rest_mcp_cli_discovery_parity_and_runtime_isolation(
         rest_score_body
     )
 
-    rest_audit = client.post(
+    rest_full = client.post(
         "/api/psychometrics/ipip-big-five",
-        params={"detail": "audit"},
+        params={"include": "*"},
         json=score_payload,
     )
-    assert rest_audit.status_code == 200
-    audit_meta = rest_audit.json()["run_metadata"]
-    assert "runtime" not in audit_meta
-    assert "duration_ms" in audit_meta
-    assert audit_meta["tool_name"] == "ipip_big_five"
+    assert rest_full.status_code == 200
+    full_meta = rest_full.json()["run_metadata"]
+    assert "runtime" not in full_meta
+    assert "duration_ms" in full_meta
+    assert "omitted_fields" not in full_meta
+    assert full_meta["tool_name"] == "ipip_big_five"
 
     bad_rest = client.post(
         "/api/psychometrics/ipip-big-five", json={"responses": {"1": 9}}
@@ -389,26 +390,34 @@ def test_rest_mcp_cli_discovery_parity_and_runtime_isolation(
             mcp_list = await call_calculation(
                 mcp_client,
                 "ipip_big_five",
-                {**contract["example_input"], "detail": "audit"},
+                {**contract["example_input"], "include": ["*"]},
             )
             assert not mcp_list.is_error
             assert "result_delivery" not in mcp_list.structured_content
             assert mcp_list.structured_content["item_count"] == 50
-            mcp_list_compact = await call_calculation(
-                mcp_client,
-                "ipip_big_five",
-                {"action": "list_items", "detail": "compact"},
+            mcp_list_default = await mcp_client.call_tool(
+                "run_calculation",
+                {"tool": "ipip_big_five", "arguments": {"action": "list_items"}},
             )
-            assert not mcp_list_compact.is_error
-            assert "result_delivery" not in mcp_list_compact.structured_content
-            assert len(mcp_list_compact.structured_content["items"]) == 50
-            mcp_score_compact = await call_calculation(
-                mcp_client, "ipip_big_five", {**score_payload, "detail": "compact"}
+            assert not mcp_list_default.is_error
+            assert "result_delivery" not in mcp_list_default.structured_content
+            assert "provenance" not in mcp_list_default.structured_content
+            assert mcp_list_default.structured_content["run_metadata"][
+                "omitted_fields"
+            ] == ["provenance"]
+            assert len(mcp_list_default.structured_content["items"]) == 50
+            mcp_score_default = await mcp_client.call_tool(
+                "run_calculation",
+                {"tool": "ipip_big_five", "arguments": score_payload},
             )
-            assert not mcp_score_compact.is_error
-            assert "result_delivery" not in mcp_score_compact.structured_content
+            assert not mcp_score_default.is_error
+            assert "result_delivery" not in mcp_score_default.structured_content
+            assert "provenance" not in mcp_score_default.structured_content
+            assert mcp_score_default.structured_content["run_metadata"][
+                "omitted_fields"
+            ] == ["provenance"]
             mcp_score = await call_calculation(
-                mcp_client, "ipip_big_five", {**score_payload, "detail": "audit"}
+                mcp_client, "ipip_big_five", {**score_payload, "include": ["*"]}
             )
             assert not mcp_score.is_error
             assert "result_delivery" not in mcp_score.structured_content
@@ -423,9 +432,7 @@ def test_rest_mcp_cli_discovery_parity_and_runtime_isolation(
 
     mcp_list_body, mcp_score_body = asyncio.run(run_mcp())
 
-    assert (
-        cli_run(["ipip_big_five", "--action", "list_items", "--detail", "audit"]) == 0
-    )
+    assert cli_run(["ipip_big_five", "--action", "list_items", "--include", "*"]) == 0
     cli_list_body = json.loads(capsys.readouterr().out)
     assert (
         cli_run(
@@ -434,20 +441,18 @@ def test_rest_mcp_cli_discovery_parity_and_runtime_isolation(
                 "--responses",
                 json.dumps(score_payload["responses"]),
                 "--include-item-breakdown",
-                "--detail",
-                "audit",
+                "--include",
+                "*",
             ]
         )
         == 0
     )
     cli_score_body = json.loads(capsys.readouterr().out)
 
-    assert (
-        cli_run(["ipip_big_five", "--ratings", *(["3"] * 50), "--detail", "compact"])
-        == 0
-    )
+    assert cli_run(["ipip_big_five", "--ratings", *(["3"] * 50)]) == 0
     cli_ratings_body = json.loads(capsys.readouterr().out)
     assert "provenance" not in cli_ratings_body
+    assert cli_ratings_body["run_metadata"]["omitted_fields"] == ["provenance"]
     assert "scale_raw_sum" not in cli_ratings_body
     assert cli_ratings_body["domains"]["extraversion"]["mean"] == 3.0
 

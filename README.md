@@ -74,7 +74,7 @@ fatebridge bazi_birth_chart \
     bazi_birth.day_master.polarity
 ```
 
-成功时退出码为 `0`，返回日主 `庚 / 金 / 阳` 与 `run_metadata`。默认 `--detail compact` 返回核心业务字段；需要完整输出与方法依据时传 `--detail audit`。查询其他工具及其请求格式：
+成功时退出码为 `0`，返回日主 `庚 / 金 / 阳` 与 `run_metadata`。默认返回核心层并在 `run_metadata.omitted_fields` 列出实际省略的可选重型路径；需要无损完整输出时传 `--include "*"`（或按需传入路径/`evidence_views` 名称）。查询其他工具及其请求格式：
 
 ```bash
 fatebridge discover --family bazi
@@ -97,7 +97,7 @@ REST 本机启动命令为 `API_HOST=127.0.0.1 fatebridge-api`。默认端口 `8
 ## 读取与核对结果
 
 - **输入与时间**：使用已确认资料，明确时区、地点和分析时刻。未知出生小时不能用默认值或示例补齐；不同方法采用的时钟以实际返回为准。
-- **摘要与全文**：三端默认使用 `detail=compact` 返回核心业务字段；需要指定子字段时传 `fields`（严格校验路径）；需要完整结果、全部时间线与方法依据时传 `detail=audit`（`fields=null`）。操作步骤见[输出控制与结果读取](docs/agent-guide.md#输出控制与结果读取)。
+- **摘要与全文**：三端默认返回核心层（被省略的可选重型路径记入 `run_metadata.omitted_fields`）；需要按需展开时传 `include`（路径、`evidence_views` 名称或 `include=["*"]` 无损全量），需要严格只取指定子字段时传 `fields`（两者互斥，严格校验路径）。操作步骤见[输出控制与结果读取](docs/agent-guide.md#输出控制与结果读取)。
 - **星历与精度**：安装 Python 库不保证读取了外部数据文件。核对实际模型、来源和近似标志；下载与验证见[星历数据](docs/ephemeris.md)。
 - **依据与限制**：软件回归、原典对照与运行依赖分别报告；`partial` 只限制对应层。共同术语见[核心概念](docs/concepts.md)。
 

@@ -10,6 +10,7 @@ from fastmcp import Client
 import fatebridge.api as api
 from fatebridge.application.examples import example_input, suggested_fields
 from fatebridge.cli import run
+from fatebridge.core.response_models import output_model_for
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.mcp_receipt import verified_inline_business
@@ -78,7 +79,6 @@ def test_profiles_and_evidence_match_all_public_surfaces(
     inputs = {**inputs, "rule_profile": profile}
     options = dict(
         as_of="2026-10-22T12:00:00+08:00",
-        detail="audit",
         fields=fields,
     )
     rest = TestClient(api.app).post(
@@ -86,7 +86,6 @@ def test_profiles_and_evidence_match_all_public_surfaces(
         json=inputs,
         params=[
             ("as_of", options["as_of"]),
-            ("detail", "audit"),
             *[("fields", f) for f in fields],
         ],
     )
@@ -105,8 +104,6 @@ def test_profiles_and_evidence_match_all_public_surfaces(
         [
             "--as-of",
             options["as_of"],
-            "--detail",
-            "audit",
             "--fields",
             *fields,
         ]
@@ -152,7 +149,6 @@ def test_profiles_and_evidence_match_all_public_surfaces(
         assert link["scope_palace_name"] == "夫妻宫"
     elif payload_key == "ziwei_birth":
         birth = result["ziwei_birth"]
-        assert "rule_trace" not in birth
         assert birth["laiyin_gong"]["ganzhi"][0] == birth["year_stem"]
         assert birth["zidou_branch"]
         assert len(birth["flying_sihua"]["matrix"]) == 12
@@ -165,7 +161,22 @@ def test_profiles_and_evidence_match_all_public_surfaces(
         )
 
 
-def test_compact_horoscope_and_birth_include_essential_fields_under_6kb(
+def _assert_subset(subset: object, superset: object) -> None:
+    if isinstance(subset, dict):
+        assert isinstance(superset, dict)
+        for key, value in subset.items():
+            assert key in superset
+            _assert_subset(value, superset[key])
+    elif isinstance(subset, list):
+        assert isinstance(superset, list)
+        assert len(subset) == len(superset)
+        for sub_item, super_item in zip(subset, superset, strict=True):
+            _assert_subset(sub_item, super_item)
+    else:
+        assert subset == superset
+
+
+def test_default_horoscope_and_birth_include_essential_fields_within_budget(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     api._reset_runtime_state_for_tests()
@@ -175,30 +186,94 @@ def test_compact_horoscope_and_birth_include_essential_fields_under_6kb(
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
     client = TestClient(api.app)
+    by_name = {entry.name: entry for entry in CATALOG}
 
-    birth_resp = client.post(
-        "/api/ziwei/birth-chart", json=BIRTH, params=[("detail", "compact")]
-    )
+    birth_resp = client.post("/api/ziwei/birth-chart", json=BIRTH)
     assert birth_resp.status_code == 200
-    assert len(birth_resp.content) < 6144
-    birth_body = birth_resp.json()["ziwei_birth"]
+    assert len(birth_resp.content) <= 10240
+    birth_json = birth_resp.json()
+    assert birth_json["run_metadata"]["omitted_fields"] == list(
+        by_name["ziwei_birth_chart"].default_omit
+    )
+    birth_body = birth_json["ziwei_birth"]
     assert len(birth_body["reading_view"]["palaces"]) == 12
     assert birth_body["sihua"]
 
-    timing_resp = client.post(
-        "/api/ziwei/timing", json={**BIRTH, **TARGET}, params=[("detail", "compact")]
+    birth_full = client.post(
+        "/api/ziwei/birth-chart", json=BIRTH, params=[("include", "*")]
     )
+    assert birth_full.status_code == 200
+    assert "omitted_fields" not in birth_full.json()["run_metadata"]
+    _assert_subset(
+        {k: v for k, v in birth_json.items() if k != "run_metadata"},
+        {k: v for k, v in birth_full.json().items() if k != "run_metadata"},
+    )
+
+    timing_resp = client.post("/api/ziwei/timing", json={**BIRTH, **TARGET})
     assert timing_resp.status_code == 200
-    assert len(timing_resp.content) < 6144
-    timing_body = timing_resp.json()["ziwei_horoscope"]
+    assert len(timing_resp.content) <= 10240
+    timing_json = timing_resp.json()
+    assert (
+        "ziwei_horoscope.scopes.*.flowing_stars"
+        in timing_json["run_metadata"]["omitted_fields"]
+    )
+    timing_body = timing_json["ziwei_horoscope"]
     for scope in timing_body["scopes"]:
         if scope.get("status") not in {"not_started", "unavailable"}:
-            # Bug 1.3 fix: natal_palace_name & palace_ganzhi must survive compact mode!
             assert scope["natal_palace_name"]
             assert scope["palace_ganzhi"]
             assert scope["mutagen_natal_links"]
+
+    timing_full = client.post(
+        "/api/ziwei/timing", json={**BIRTH, **TARGET}, params=[("include", "*")]
+    )
+    assert timing_full.status_code == 200
+    assert "omitted_fields" not in timing_full.json()["run_metadata"]
+    _assert_subset(
+        {k: v for k, v in timing_json.items() if k != "run_metadata"},
+        {k: v for k, v in timing_full.json().items() if k != "run_metadata"},
+    )
+
+    timing_stars = client.post(
+        "/api/ziwei/timing",
+        json={**BIRTH, **TARGET},
+        params=[("include", "ziwei_horoscope.scopes.*.flowing_stars")],
+    )
+    assert timing_stars.status_code == 200
+    assert len(timing_stars.content) <= 10240
+    stars_json = timing_stars.json()
+    assert (
+        "ziwei_horoscope.scopes.*.flowing_stars"
+        not in stars_json["run_metadata"]["omitted_fields"]
+    )
+    for scope in stars_json["ziwei_horoscope"]["scopes"]:
+        if scope.get("status") not in {"not_started", "unavailable"}:
             if scope["scope"] != "小限":
                 assert scope["flowing_stars"]
+
+    output_model_for("ziwei_birth_chart").model_validate(birth_json)
+    output_model_for("ziwei_birth_chart").model_validate(birth_full.json())
+    output_model_for("ziwei_timing").model_validate(timing_json)
+    output_model_for("ziwei_timing").model_validate(timing_full.json())
+
+    rules_resp = client.post("/api/ziwei/rules", json={"year_stem": "壬"})
+    assert rules_resp.status_code == 200
+    assert len(rules_resp.content) <= 10240
+    rules_json = rules_resp.json()
+    assert rules_json["run_metadata"]["omitted_fields"] == [
+        "rule_catalogue.named_patterns"
+    ]
+    rules_full = client.post(
+        "/api/ziwei/rules", json={"year_stem": "壬"}, params=[("include", "*")]
+    )
+    assert rules_full.status_code == 200
+    assert "omitted_fields" not in rules_full.json()["run_metadata"]
+    _assert_subset(
+        {k: v for k, v in rules_json.items() if k != "run_metadata"},
+        {k: v for k, v in rules_full.json().items() if k != "run_metadata"},
+    )
+    output_model_for("ziwei_rules").model_validate(rules_json)
+    output_model_for("ziwei_rules").model_validate(rules_full.json())
 
 
 @pytest.mark.parametrize(
@@ -255,7 +330,6 @@ def test_unknown_gender_only_withholds_direction_dependent_mcp_scopes() -> None:
                     **BIRTH,
                     **TARGET,
                     "gender": "未知",
-                    "detail": "audit",
                     "fields": ["ziwei_horoscope.scopes"],
                 },
             )
@@ -292,7 +366,6 @@ def test_published_natal_reading_fits_default_mcp_budget_without_losing_stars(
                     **example_input(spec),
                     "rule_profile": profile,
                     "as_of": "2026-10-15T12:00:00+08:00",
-                    "detail": "audit",
                     "fields": suggested_fields(spec),
                 },
             )

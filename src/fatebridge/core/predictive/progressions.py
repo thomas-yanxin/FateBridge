@@ -73,6 +73,8 @@ def build_secondary_progression_payload(
     analysis_datetime: datetime,
     house_system: str = "P",
     zodiac_type: str = "Tropic",
+    orb_limit: float = 1.5,
+    max_hits: int | None = None,
 ) -> dict[str, Any]:
     progressed_utc, clock_options = calculate_secondary_progression_clock(
         birth_info, analysis_datetime=analysis_datetime
@@ -92,8 +94,10 @@ def build_secondary_progression_payload(
     hits = collect_aspect_hits(
         source_longitudes=extract_reference_longitudes(progressed_subject),
         target_longitudes=extract_reference_longitudes(natal_subject),
-        orb_limit=1.5,
+        orb_limit=orb_limit,
     )
+    hits_total_count = len(hits)
+    selected_hits = hits[:max_hits] if max_hits is not None else hits
     calculation_options: ProgressionCalculationOptions = {
         **clock_options,
         "house_method": "quotidian_at_progressed_UTC",
@@ -109,6 +113,7 @@ def build_secondary_progression_payload(
             "Medium_Coeli",
             progressed_subject.medium_coeli,
         ),
-        "hits": hits[:8],
+        "hits": selected_hits,
+        "hits_total_count": hits_total_count,
         "subject": progressed_subject,
     }

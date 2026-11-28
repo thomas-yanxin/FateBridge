@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from functools import lru_cache
 from typing import Any
 
@@ -65,14 +66,20 @@ def _slim_catalog_domain(domain_record: dict[str, Any]) -> dict[str, Any]:
             "name": cat["name"],
             "count": cat["count"],
         }
-        if "keys" in cat:
-            entry["keys"] = list(cat["keys"][:2])
-        elif "keys_sample" in cat:
-            entry["keys_sample"] = list(cat["keys_sample"][:2])
+        if "keys_sample" in cat:
+            entry["keys_sample"] = list(cat["keys_sample"])
+        elif "keys" in cat:
+            entry["keys"] = list(cat["keys"])
+        if "keys_complete" in cat:
+            entry["keys_complete"] = bool(cat["keys_complete"])
         if cat.get("key_format"):
             entry["key_format"] = cat["key_format"]
         if "supports" in cat:
             entry["supports"] = list(cat["supports"])
+        if "reference_only" in cat:
+            entry["reference_only"] = bool(cat["reference_only"])
+        if "coverage" in cat:
+            entry["coverage"] = dict(cat["coverage"])
         categories.append(entry)
     slim_domain: dict[str, Any] = {
         "domain": domain_record["domain"],
@@ -84,16 +91,26 @@ def _slim_catalog_domain(domain_record: dict[str, Any]) -> dict[str, Any]:
     return slim_domain
 
 
-@lru_cache(maxsize=16)
-def _cached_registry(lookup_domain: str | None) -> dict[str, Any]:
+@lru_cache(maxsize=32)
+def _cached_registry(
+    lookup_domain: str | None,
+    keys_sample_limit: int | None,
+) -> dict[str, Any]:
     if lookup_domain == human_design_knowledge.DOMAIN:
-        raw = human_design_knowledge.build_registry()
+        raw = human_design_knowledge.build_registry(keys_sample_limit=keys_sample_limit)
     elif lookup_domain in DOMAINS:
-        raw = build_registry(lookup_domain)
+        raw = build_registry(lookup_domain, keys_sample_limit=keys_sample_limit)
     elif lookup_domain is None or lookup_domain == "":
-        base_registry = build_knowledge_registry(domain=lookup_domain)
-        added = [build_registry(name) for name in DOMAINS]
-        added.append(human_design_knowledge.build_registry())
+        base_registry = build_knowledge_registry(
+            domain=lookup_domain, keys_sample_limit=keys_sample_limit
+        )
+        added = [
+            build_registry(name, keys_sample_limit=keys_sample_limit)
+            for name in DOMAINS
+        ]
+        added.append(
+            human_design_knowledge.build_registry(keys_sample_limit=keys_sample_limit)
+        )
         return {
             "source": "fatebridge_mixed_knowledge",
             "bundle_version": None,
@@ -113,7 +130,9 @@ def _cached_registry(lookup_domain: str | None) -> dict[str, Any]:
             },
         }
     else:
-        raw = build_knowledge_registry(domain=lookup_domain)
+        raw = build_knowledge_registry(
+            domain=lookup_domain, keys_sample_limit=keys_sample_limit
+        )
     return {
         **raw,
         "domains": [_slim_catalog_domain(d) for d in raw.get("domains", [])],
@@ -124,11 +143,18 @@ def _cached_registry(lookup_domain: str | None) -> dict[str, Any]:
 def calculate_knowledge_registry(
     *,
     domain: str | None = None,
+    keys_sample_limit: int | None = 4,
 ) -> dict[str, Any]:
     """List bundled knowledge domains and their available categories."""
     try:
         lookup_domain = domain.strip() if domain is not None else None
-        return _cached_registry(lookup_domain)
+        if keys_sample_limit is not None and keys_sample_limit < 1:
+            raise ToolValidationError(
+                "keys_sample_limit 必须为正整数或 None",
+                code="knowledge.invalid_keys_sample_limit",
+                details={"keys_sample_limit": keys_sample_limit},
+            )
+        return deepcopy(_cached_registry(lookup_domain, keys_sample_limit))
     except ToolValidationError as exc:
         return _validation_error_payload(exc)
     except Exception as exc:

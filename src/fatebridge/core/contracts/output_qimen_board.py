@@ -11,7 +11,6 @@ from fatebridge.core.contracts.output_qimen import (
     QimenCalendarPolicy,
     QimenPattern,
     QimenRuleset,
-    QimenRuleTrace,
     QimenStructure,
 )
 

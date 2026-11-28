@@ -30,12 +30,6 @@ class QimenCalendarPolicy(PartialOutput):
     solar_term_provider: str | None = None
 
 
-class QimenRuleTrace(PartialOutput):
-    rule_id: str | None = None
-    inputs: Object | None = None
-    outputs: Object | None = None
-
-
 class QimenPattern(PartialOutput):
     rule_id: str | None = None
     name: str | None = None

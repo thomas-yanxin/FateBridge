@@ -136,7 +136,7 @@ def test_renamed_tool_accepts_only_the_public_name_on_all_surfaces(
     err = json.loads(capsys.readouterr().out)
     assert err["error_code"] == "validation_error"
     assert err["issues"][0]["code"] == "unknown_tool"
-    assert run([new_name, "--queries", "111111", "--detail", "audit"]) == 0
+    assert run([new_name, "--queries", "111111", "--include", "*"]) == 0
     results = [
         http.json(),
         json.loads(capsys.readouterr().out),
@@ -365,7 +365,6 @@ def test_reference_helpers_share_strict_projection_and_clock(
         spec,
         arguments,
         projection={
-            "detail": "audit",
             "fields": [field],
         },
         rest_as_of=AS_OF,

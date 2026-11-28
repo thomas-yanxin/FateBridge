@@ -20,6 +20,8 @@ def build_solar_arc_payload(
     natal_subject: NativeSubject,
     progressed_subject: NativeSubject,
     *,
+    orb_limit: float = 1.5,
+    max_hits: int | None = None,
     progression_options: ProgressionCalculationOptions | None = None,
 ) -> dict[str, Any]:
     natal_longitudes = extract_reference_longitudes(natal_subject)
@@ -31,8 +33,10 @@ def build_solar_arc_payload(
     hits = collect_aspect_hits(
         source_longitudes=directed_points,
         target_longitudes=natal_longitudes,
-        orb_limit=1.5,
+        orb_limit=orb_limit,
     )
+    hits_total_count = len(hits)
+    selected_hits = hits[:max_hits] if max_hits is not None else hits
     calculation_options: dict[str, object] = {
         "arc_method": "true_progressed_Sun_ecliptic_longitude",
         "angle_method": "rigid_natal_longitude_rotation",
@@ -57,5 +61,6 @@ def build_solar_arc_payload(
             "Medium_Coeli",
             longitude_float(directed_points["Medium_Coeli"]),
         ),
-        "hits": hits[:8],
+        "hits": selected_hits,
+        "hits_total_count": hits_total_count,
     }

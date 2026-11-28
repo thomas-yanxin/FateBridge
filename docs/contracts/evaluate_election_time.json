@@ -10,6 +10,14 @@
     "physical_epoch": "太阳时反解的有效时刻可能落在UTC闰秒。converted_utc可含23:59:60；按clock_conversion.utc_representation区分标签与datetime可表示性，计算使用原生TT/UT1。不能把不能解析datetime说成计算失败，也不能将秒60截断、平滑或移到次日；数值标签精度不代表实测钟时精度。",
     "ut1_source": "ut1_source默认swiss_delta_t；显式iers_c04使用固定IERS20 C04最终每日合成值，仅覆盖1962-01-01 00:00至2026-09-19 00:00 UTC，需要UT1的时刻超范围拒绝；地心TT黄经事件试算不需要UT1。连续TT上先去除62项zonal模型，对UT1-TAI作四点Lagrange插值，再恢复zonal并加入声明的日内模型；不要重复叠加回执中的zonal项。"
   },
+  "default_omit": [
+    "calendar_conversion",
+    "clock_conversion",
+    "election.calculation_basis.physical_ephemeris_source",
+    "election.planets",
+    "election.moon.motion_basis",
+    "election.marriage_significators"
+  ],
   "evidence_views": {
     "calculation_conditions": {
       "fields": [
@@ -215,6 +223,21 @@
         "description": "Longitude where the chart is cast (optional when place is given)",
         "title": "Longitude"
       },
+      "max_candidate_windows": {
+        "anyOf": [
+          {
+            "maximum": 169,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": 5,
+        "description": "Maximum candidate windows returned when search_window_hours > 0 (default 5; null returns all scanned windows).",
+        "title": "Max Candidate Windows"
+      },
       "name": {
         "anyOf": [
           {
@@ -243,7 +266,7 @@
       },
       "search_window_hours": {
         "default": 0,
-        "description": "Optional candidate window scanner duration (hours, 0..168). When > 0, scans 1-hour steps forward from candidate datetime for top non-VOC, benefic-supported windows.",
+        "description": "Optional candidate window scanner duration (hours, 0..168). When > 0, scans forward in steps of max(1, search_window_hours // 24) hours from candidate datetime (0..search_window_hours inclusive) for top non-VOC, benefic-supported windows.",
         "maximum": 168,
         "minimum": 0,
         "title": "Search Window Hours",

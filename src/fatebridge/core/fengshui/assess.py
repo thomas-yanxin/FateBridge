@@ -38,10 +38,6 @@ def analyze_layout(req: AssessRequest, layers: dict[str, Any]) -> dict[str, Any]
     annual_table = raw_rule_data("annual_stars")
     directions_list = list(raw_rule_data("directions"))
 
-    findings_by_object: dict[str, list[dict[str, Any]]] = {}
-    for f in bazhai_layer.get("placement_findings", []):
-        findings_by_object.setdefault(f["object_id"], []).append(f)
-
     charts: list[tuple[str, str, str | None, bool, dict[str, Any], dict[str, Any]]] = []
     if bazhai_layer.get("house_candidates"):
         for cand in bazhai_layer["house_candidates"]:

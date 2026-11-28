@@ -1,21 +1,36 @@
 {
   "call_guidance": {
-    "calendar_sources": "calendar核时钟与日期，calendar_sources核date_conversion_provenance：lookups逐个连接实际日期、实施provider与印刷参照，implementation_sources保存所用补表原出处。1900参照TAM全年表，最初30日用PMO补表；1901—2100参照HKO，2100年2月9日后使用HKO补表。实施数据不是独立验证，既有历法数值及混合时钟岁序未借来源标记改写。长结果按首次所选fields沿同run分页取齐。",
+    "calendar_sources": "calendar与calendar_sources视图读取ziwei_horoscope.calendar_basis（含method_id、placement_lunar_date、civil_date_lunar_date、reference_lunar_date、day_boundary、time_input与civil_clock）及calendar_rules；实施数据不是独立验证，不改写既有历法数值或岁序。",
     "childhood": "childhood视图单列明文一至六岁童限及实际本命星曜。岁序仍按已披露软件规则；后续岁序未唯一解释时留空，不把本命mutagen当童限四化，也不拿童限证明起大限前替代关系。",
-    "civil_offset": "birth_utc_offset与analysis_utc_offset分别核对出生和目标命名时区，并选择重复钟时；先后按UTC瞬间比较。偏移选择与nominal_age_basis分别记录，不能把太阳标签当成另一实际瞬间。",
-    "flowing_stars": "用flowing_stars视图读取已起大限、流年、流月、流日、流时的魁钺昌曲禄羊陀马鸾喜；流年另有年解，摘录配置另列天德、月德、丧门、吊客、白虎、官府。小限和未起或不可定大限省略流曜字段。flowing_star_basis给本层定位所用干支，流月用有效农历月柱，斗君落宫另见scopes.branch。位置公式按iztro 2.5.8同干支核对，历法或起限口径不同时需分别比较。用scope、system_id、rule_id和两种宫名区分同名星。",
-    "identity": "analysis_context是目标时刻，birth_context是出生回执；scopes.palace_name/natal_palace_name表示运限命宫所临本命宫。其他本层功能宫读取palace_map.scope_palace_name；mutagen_natal_links分别标记natal_palace_name与scope_palace_name，不混淆为同一功能宫。仅功能名旋宫，未包含全部流曜、飞宫体系或事件结论。",
-    "limit_subperiods": "明刊运限分段首次按需展开limit_subperiods或limit_subperiod_details的fields；视图名不是参数。大限上/下五年依既有虚岁与实际所临十岁区间，不能用年龄末位取余。它不认证原典岁首或星曜应验几何；natal_star_groups只给原文分类与实际本命星对象，南北斗双属仍无唯一分段，小限半年起止未定，不补公历7月1日或农历七月。原文为福邻句未计算，不能只筛吉星；不变更四化、星位或给出事件断言。",
-    "natal_prerequisites": "问起岁、五行局或本命前置推导时，按natal_prerequisites视图首次请求相应fields；完整JSON仍fields=null。natal_prerequisites直接携带本次运限内部已算本命的lunar_date/year_stem/hour_branch/ming_gong/shen_gong/wuxing_ju及三个原rule_trace，separate_birth_run=false，不是另一次ziwei_birth_chart回执。",
+    "civil_offset": "birth_utc_offset与analysis_utc_offset分别核对出生和目标命名时区，并选择重复钟时；先后按UTC瞬间比较。偏移选择与nominal_age_calendar分别记录，不能把太阳标签当成另一实际瞬间。",
+    "flowing_stars": "用flowing_stars视图读取已起大限、流年、流月、流日、流时的魁钺昌曲禄羊陀马鸾喜；流年另有年解，摘录配置另列天德、月德、丧门、吊客、白虎、官府。小限和未起或不可定大限省略流曜字段。flowing_star_basis给本层定位所用干支，流月用有效农历月柱，斗君落宫另见doujun_branch。位置公式按iztro 2.5.8同干支核对，历法或起限口径不同时需分别比较。用scope、system_id、rule_id和两种宫名区分同名星。",
+    "identity": "analysis_context是目标时刻，birth_context是出生回执；scopes[*].natal_palace_name表示运限命宫所临本命宫。其他本层功能宫读取scopes[*].palace_map（dict[str, str]，映射 <scope_palace_name> -> \"<branch>:<natal_palace_name>\"）；mutagen_natal_links分别标记natal_palace_name与scope_palace_name，不混淆为同一功能宫。仅功能名旋宫，未包含全部流曜、飞宫体系或事件结论。",
+    "limit_subperiods": "limit_subperiods或limit_subperiod_details视图首次按需展开ziwei_horoscope.scopes、childhood_limit与nominal_age_calendar；视图名不是参数。大限区间与起岁依既有虚岁与实际所临十岁区间，未到起岁保持status=not_started，不变更四化、星位或给出事件断言。",
+    "natal_prerequisites": "问起岁、五行局或本命前置推导时，按natal_prerequisites视图首次请求相应fields或include；完整JSON使用 include=[\"*\"]。ziwei_horoscope.natal_prerequisites直接携带本次运限内部已算本命的origin=same_calculation_internal_natal_chart、lunar_date/year_stem/hour_branch/ming_gong/shen_gong/wuxing_ju，不是另一次本命回执。",
     "nominal_age_basis": "岁序采用birth_civil_timezone：两端实际瞬间均换算到出生民用时区，再以该区民用日期查农历年，正月初一00:00换岁。nominal_age_calendar给出两端计岁钟。target_civil_lunar_year另指目标原民用时区日期的农历年。day_divide统一作用于出生安星和目标流年/月/日/时：current晚子留当日，forward晚子算次日早子。两种分日均沿出生民用时区计岁。原典岁首未认证。",
     "pre_decade": "大限status=not_started表示按所选五行局起岁尚未开始；宫位、宫干、四化为null，palace_map及mutagen_natal_links为空。六层索引保留但该层未计算，不把童限或其本命星曜当大限／童限四化。其他五层照实际结果解释；岁首仍未获原典认证。",
-    "projection": "普通摘要首次用detail=compact并省略fields，返回六层摘要；完整导出首次用detail=audit、fields=null，超限时用原result_id和run_id调用read_result并按next_offset读齐。",
-    "rules": "本命和运限使用同一rule_profile/version。iztro_2_5_8 1.1.2保留已起限的软件规则；quanshu_v2_excerpt 1.3.2选择闰月、四化、亮度、长生、旬空双支、部分流年星，并采用邻宫起大限和火铃年支定点读法。source_rules视图核对实际差异，岁首、小限年龄基准、闰月斗君和后续流月日时未据此认证；动态四化复用选表仍是软件约定。",
+    "projection": "默认不传 include/fields 即返回六层摘要，省略各层 palace_map 与 mutagen_natal_links（见 run_metadata.omitted_fields）；需要完整输出时传入 include=[\"*\"]，或通过 include/fields 按需展开所需路径。",
+    "rules": "本命和运限使用同一rule_profile；iztro_2_5_8保留命宫起限软件规则，quanshu_v2_excerpt选择闰月、四化、亮度、长生、旬空双支、部分流年星，并采用邻宫起大限和火铃年支定点读法。source_rules视图读取ziwei_horoscope.ruleset与calendar_rules；动态四化复用选表仍是软件约定。",
     "scopes": "专题需要完整宫位映射和四化连接时，用fields=[\"ziwei_horoscope.scopes\"]整体投影，取得六层后按scope取所需项。摘要调用省略每层palace_map及mutagen_natal_links；同次分页仅能补读已选结果。投影路径不使用层名或数字索引。",
-    "sihua_source": "sihua_source=rule_profile沿用基础配置；仅在明确指定明刊四化时选naj_ming_v1。三工具同选项，组合版本含+sihua.naj-ming-v1，sihua_source_url专指四化，classical_source仍是基础配置来源。庚日武同相会实际改本命标记及各层按干查表；不因此更改安星、亮度、岁序，也不认证古典运限复用或整书。",
+    "sihua_source": "sihua_source=rule_profile沿用基础配置；仅在明确指定明刊四化时选naj_ming_v1。三工具同选项，ruleset.sihua_source与ruleset.sihua_rule标记实际选用口径。庚日武同相会实际改本命标记及各层按干查表；不因此更改安星、亮度、岁序，也不认证古典运限复用或整书。",
     "target_clock": "analysis_minute默认0，analysis_timezone默认Asia/Shanghai，与出生时区独立；目标时刻采用钟表时间。分钟输入不证明分钟级预测。",
-    "time_input": "首轮回执time_input_status标记实际校时状态；time_input视图给出原校时过程、时区来源和地点精度。默认缺经度降级、省级代表点或仅按经度假设时区均按实际条件说明；不能把没有计算的均时差当0，也不把派生秒数当出生资料秒精度。 minute_sensitivity保留秒0；只在所选民用时分和偏移仍有效时比较59.999999秒端点。缺上端点时两项跨界标志为空；跨时辰或排盘日期时首轮上下文有time_input_minute_sensitive=true。"
+    "time_input": "time_input视图读取ziwei_horoscope.calendar_basis.{birth,target}.time_input、civil_datetime与civil_clock，给出原校时过程、时区来源和地点精度。默认缺经度降级、省级代表点或仅按经度假设时区均按实际条件说明；不能把没有计算的均时差当0，也不把派生秒数当出生资料秒精度。"
   },
+  "default_omit": [
+    "person_info",
+    "ziwei_horoscope.annual_cycles",
+    "ziwei_horoscope.natal_prerequisites",
+    "ziwei_horoscope.nominal_age_calendar",
+    "ziwei_horoscope.calendar_basis",
+    "ziwei_horoscope.interpretation_scope",
+    "ziwei_horoscope.calendar_rules",
+    "ziwei_horoscope.scopes.*.scope_palace_role",
+    "ziwei_horoscope.scopes.*.branch_index",
+    "ziwei_horoscope.scopes.*.stem_origin",
+    "ziwei_horoscope.scopes.*.palace_map",
+    "ziwei_horoscope.scopes.*.flowing_star_basis",
+    "ziwei_horoscope.scopes.*.flowing_stars"
+  ],
   "evidence_views": {
     "age_calendar": {
       "fields": [

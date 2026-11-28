@@ -170,30 +170,37 @@ def _category(
     *,
     key_format: str,
     coverage: dict[str, Any] | None = None,
+    keys_sample_limit: int | None = 4,
 ) -> dict[str, Any]:
     ordered = sorted(keys)
-    result = dict(
+    sample = ordered if keys_sample_limit is None else ordered[:keys_sample_limit]
+    keys_complete = len(sample) == len(ordered)
+    result: dict[str, Any] = dict(
         name=name,
-        count=len(keys),
-        keys_sample=ordered[:20],
-        keys_complete=len(keys) <= 20,
+        count=len(ordered),
+        keys_sample=sample,
+        keys_complete=keys_complete,
         supports=["read"],
         key_format=key_format,
         reference_only=True,
     )
-    if len(keys) <= 20:
-        result["keys"] = ordered
     if coverage is not None:
         result["coverage"] = coverage
     return result
 
 
-def _categories(domain: str, snapshots: dict) -> list[dict]:
+def _categories(
+    domain: str,
+    snapshots: dict,
+    *,
+    keys_sample_limit: int | None = 4,
+) -> list[dict]:
     result = [
         _category(
             "source_collections",
             list(snapshots),
             key_format="所列来源键；返回完整结构化来源对象",
+            keys_sample_limit=keys_sample_limit,
         )
     ]
     if domain == "heluo":
@@ -223,6 +230,7 @@ def _categories(domain: str, snapshots: dict) -> list[dict]:
                     total_line_keyspace=len(keys),
                     scope="键空间包含待核的继承文本，不是已校勘覆盖数；各部分状态分别返回。",
                 ),
+                keys_sample_limit=keys_sample_limit,
             )
         )
     else:
@@ -248,23 +256,30 @@ def _categories(domain: str, snapshots: dict) -> list[dict]:
                         total_cells=data["total_cells"],
                         scope="已列样例不等于所有键；本地缺行、圈空、未选栏目与疑读分列。",
                     ),
+                    keys_sample_limit=keys_sample_limit,
                 ),
                 _category(
                     "schedule_clauses",
                     [c["id"] for c in snapshots["schedule_basis"][0]["clauses"]],
                     key_format="原句ID",
+                    keys_sample_limit=keys_sample_limit,
                 ),
                 _category(
                     "schedule_profiles",
                     ["bazi_appendix_v1", "bazi_continuous_v1", "legacy_minggong_v1"],
                     key_format="配运政策ID；仅返回参考角色，不生成交运日期",
+                    keys_sample_limit=keys_sample_limit,
                 ),
             ]
         )
     return result
 
 
-def build_registry(domain: str) -> dict[str, Any]:
+def build_registry(
+    domain: str,
+    *,
+    keys_sample_limit: int | None = 4,
+) -> dict[str, Any]:
     if domain not in DOMAINS:
         raise ToolValidationError(
             "Unknown numerology knowledge domain",
@@ -283,7 +298,9 @@ def build_registry(domain: str) -> dict[str, Any]:
                 "source": SOURCE,
                 "bundle_version": None,
                 "provenance": deepcopy(provenance),
-                "categories": _categories(domain, snapshots),
+                "categories": _categories(
+                    domain, snapshots, keys_sample_limit=keys_sample_limit
+                ),
             }
         ],
     }

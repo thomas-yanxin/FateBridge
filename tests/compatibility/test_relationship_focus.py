@@ -143,7 +143,6 @@ def test_valid_focus_aliases_reach_all_public_transports(
         "/api/astrology/relationship-chart",
         json=flat,
         params=[
-            ("detail", "audit"),
             ("fields", fields[0]),
         ],
     )
@@ -152,13 +151,12 @@ def test_valid_focus_aliases_reach_all_public_transports(
         flat,
         tmp_path,
         capsys,
-        flags=["--detail", "audit", "--fields", *fields],
+        flags=["--fields", *fields],
     )
     mcp = asyncio.run(
         native(
             SPECS["relationship_chart"],
             flat,
-            detail="audit",
             fields=fields,
         )
     )

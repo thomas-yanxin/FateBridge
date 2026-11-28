@@ -1,7 +1,10 @@
 {
   "call_guidance": {
-    "sihua_source": "sihua_source=rule_profile沿用基础配置；仅在明确指定明刊四化时选naj_ming_v1。三工具同选项，组合版本含+sihua.naj-ming-v1，sihua_source_url专指四化，classical_source仍是基础配置来源。庚日武同相会实际改本命标记及各层按干查表；不因此更改安星、亮度、岁序，也不认证古典运限复用或整书。"
+    "sihua_source": "sihua_source=rule_profile沿用基础配置；仅在明确指定明刊四化时选naj_ming_v1。三工具同选项，rule_catalogue.ruleset的sihua_source与sihua_rule记录实际选用口径，sihua_by_year_stem给出各年干四化表。庚日武同相会实际改本命标记及各层按干查表；不因此更改安星、亮度、岁序，也不认证古典运限复用或整书。"
   },
+  "default_omit": [
+    "rule_catalogue.named_patterns"
+  ],
   "evidence_views": {
     "named_patterns": {
       "fields": [

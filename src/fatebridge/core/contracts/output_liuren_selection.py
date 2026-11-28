@@ -12,17 +12,6 @@ from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
 from fatebridge.core.metaphysics.liureng.board import derive_selection
 
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
-SELECTION_TRACES = frozenset(
-    {
-        "liuren.direct_or_remote_candidates",
-        "liuren.polarity",
-        "liuren.harm_paths",
-        "liuren.harm_depth",
-        "liuren.harm_tie",
-        "liuren.named_subtypes",
-        "liuren.transmissions.result",
-    }
-)
 
 
 def compare(actual: Any, expected: Any) -> None:
@@ -95,28 +84,6 @@ def expected_selection(
     )
 
 
-def trace_expectations(selection: dict[str, Any]) -> list[dict[str, Any]]:
-    classification = selection["classification"]
-    traces: list[dict[str, Any]] = selection["rule_trace"]
-    return traces + [
-        dict(
-            rule_id="liuren.named_subtypes",
-            source_section=classification["source_section"],
-            result=classification,
-        ),
-        dict(
-            rule_id="liuren.transmissions.result",
-            source_section="九宗门",
-            result=dict(
-                style=selection["board_style"],
-                detail=selection["board_style_detail"],
-                branches=selection["branches"],
-                source_lesson=selection["selected_lesson_index"],
-            ),
-        ),
-    ]
-
-
 def validate_selection(
     board: dict[str, Any], day: str | None = None, *, complete: bool = False
 ) -> None:
@@ -161,12 +128,6 @@ def validate_selection(
                     else ({} if isinstance(row, dict) else row)
                 )
         compare(present, wanted_transmissions)
-    actual = [
-        t for t in board.get("rule_trace") or [] if t.get("rule_id") in SELECTION_TRACES
-    ]
-    ids = [t["rule_id"] for t in actual]
-    if len(ids) != len(set(ids)):
-        raise ValueError("九宗门轨迹重复或不属于本次取传分支")
 
 
 def require_shape(actual: Any, expected: Any) -> None:

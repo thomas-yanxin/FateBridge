@@ -173,16 +173,6 @@ def align_branch_stars(board: dict[str, Any]) -> None:
         inputs = value.get("input_branches") or {}
         if p in inputs and "content" in row and inputs[p] != row["content"]:
             raise ValueError("京本神煞须使用同课贵神、将神、地分本支")
-    traces = [
-        t
-        for t in board.get("rule_trace") or []
-        if t.get("rule_id") == "jinkou.jingben_branch_stars"
-    ]
-    if len(traces) > 1:
-        raise ValueError("京本神煞定位轨迹不可重复")
-    for trace in traces:
-        if trace.get("rule_id") == "jinkou.jingben_branch_stars" and "result" in trace:
-            compare_present(trace["result"], value)
 
 
 def require_complete_branch_stars(board: dict[str, Any]) -> None:

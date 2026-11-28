@@ -28,3 +28,4 @@ class RunMetadata(PartialOutput):
     effective_time: EffectiveTime | None = None
     replay: ReplayControls | None = None
     warnings: list[str] | None = None
+    omitted_fields: list[str] | None = None

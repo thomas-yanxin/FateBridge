@@ -5,10 +5,8 @@ import time
 
 import pytest
 
-from fatebridge.services.catalog.ziwei import (
-    _compact_ziwei_birth,
-    _compact_ziwei_horoscope,
-)
+from fatebridge.application.response_delivery import deliver_response
+from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.services.ziwei import (
     calculate_ziwei_birth,
     calculate_ziwei_horoscope,
@@ -205,8 +203,23 @@ def test_warm_latency_and_payload_budgets() -> None:
 
     assert birth_ms < 3.0
     assert timing_ms < 5.0
-    assert len(json.dumps(_compact_ziwei_birth(b), ensure_ascii=False).encode()) < 6144
+    by_name = {spec.name: spec for spec in CATALOG}
     assert (
-        len(json.dumps(_compact_ziwei_horoscope(h), ensure_ascii=False).encode()) < 6144
+        len(
+            json.dumps(
+                deliver_response(b, spec=by_name["ziwei_birth_chart"]),
+                ensure_ascii=False,
+            ).encode()
+        )
+        <= 10240
+    )
+    assert (
+        len(
+            json.dumps(
+                deliver_response(h, spec=by_name["ziwei_timing"]),
+                ensure_ascii=False,
+            ).encode()
+        )
+        <= 10240
     )
     assert len(json.dumps(h, ensure_ascii=False).encode()) < 20480

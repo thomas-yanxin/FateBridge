@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from fatebridge.core.requests.base import (
     AstroHouseValidatorMixin,
@@ -78,8 +78,8 @@ class WesternFirdariaRequest(WesternTimingBaseRequest):
     )
 
 
-class WesternPrimaryDirectionsRequest(WesternTimingBaseRequest):
-    """Request model for primary directions timing."""
+class WesternPrimaryDirectionsBaseRequest(WesternTimingBaseRequest):
+    """Shared base request model for primary directions and primary directions chart."""
 
     pd_method: Literal[
         "placidus",
@@ -114,9 +114,52 @@ class WesternPrimaryDirectionsRequest(WesternTimingBaseRequest):
         default_factory=lambda: [0, 60, 90, 120, 180],
         description="Primary direction aspects in degrees",
     )
+    pd_max_age_years: float = Field(
+        default=100.0,
+        gt=0.0,
+        le=150.0,
+        description="Upper age bound (years) for primary directions timeline.",
+    )
+    pd_window_size: int = Field(
+        default=6,
+        ge=1,
+        le=50,
+        description="Maximum events in primary directions current/exact windows.",
+    )
 
 
-class WesternPrimaryDirectionsChartRequest(WesternPrimaryDirectionsRequest):
+class WesternPrimaryDirectionsTimelineFields(BaseModel):
+    """Timeline scope controls shared where primary directions timeline is emitted."""
+
+    pd_nearby_years: float = Field(
+        default=5.0,
+        gt=0.0,
+        le=100.0,
+        description="Year radius around current age when include_full_timelines is false.",
+    )
+    pd_timeline_limit: int = Field(
+        default=25,
+        ge=1,
+        le=500,
+        description="Maximum nearby timeline entries when include_full_timelines is false.",
+    )
+    include_full_timelines: bool = Field(
+        default=False,
+        description=(
+            "Whether to include full multi-decade timelines; default False returns "
+            "active states and bounded nearby windows."
+        ),
+    )
+
+
+class WesternPrimaryDirectionsRequest(
+    WesternPrimaryDirectionsTimelineFields,
+    WesternPrimaryDirectionsBaseRequest,
+):
+    """Request model for primary directions timing."""
+
+
+class WesternPrimaryDirectionsChartRequest(WesternPrimaryDirectionsBaseRequest):
     """Request model for primary directions chart."""
 
     show_pd_bounds: bool = Field(
@@ -125,7 +168,28 @@ class WesternPrimaryDirectionsChartRequest(WesternPrimaryDirectionsRequest):
     )
 
 
-class WesternTransitRequest(WesternTimingBaseRequest):
+class WesternAspectHitsFields(BaseModel):
+    """Shared aspect-orb and optional hit-count cap fields."""
+
+    orb_limit: float = Field(
+        default=1.5,
+        ge=0.0,
+        le=15.0,
+        description="Maximum aspect orb in degrees (0..15, default 1.5).",
+    )
+    max_hits: int | None = Field(
+        default=None,
+        ge=1,
+        le=200,
+        description="Optional cap on returned aspect hits (default None returns all hits within orb_limit).",
+    )
+
+
+class WesternAspectTimingRequest(WesternAspectHitsFields, WesternTimingBaseRequest):
+    """Request model for standalone aspect-hit timing tools (solar_arc, chart_for_year)."""
+
+
+class WesternTransitRequest(WesternAspectHitsFields, WesternTimingBaseRequest):
     """Request model for transit chart and optional multi-day transit scanning."""
 
     scan_days: int | None = Field(
@@ -143,6 +207,8 @@ class WesternTimingRequest(
     WesternReturnTimingRequest,
     WesternFirdariaRequest,
     WesternPrimaryDirectionsChartRequest,
+    WesternPrimaryDirectionsTimelineFields,
+    WesternAspectHitsFields,
 ):
     """Request model for aggregate western predictive timing analysis."""
 
@@ -152,12 +218,5 @@ class WesternTimingRequest(
         description=(
             "Optional subset of western timing techniques to compute; "
             "when omitted, computes all techniques."
-        ),
-    )
-    include_full_timelines: bool = Field(
-        default=False,
-        description=(
-            "Whether to include full multi-decade timelines; default False returns "
-            "active states and bounded nearby windows."
         ),
     )

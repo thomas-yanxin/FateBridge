@@ -12,7 +12,6 @@ from fatebridge.core.numerology.timing import (
     clause_role,
     clock_policy_for_rules,
     date_mapping_statement,
-    reading_source_citations,
     source_readings,
 )
 
@@ -29,46 +28,11 @@ _ClockPolicy = Literal[
     "explicit_fixed_offset_assumption; no_regional_future_rules",
     "pinned_regional_rules; subject_to_future_legislation",
 ]
-_ClauseRole = Literal[
-    "applied_rule",
-    "supplementary_ziping_background",
-    "source_context",
-    "comparison_not_applied",
-]
 
 
 class CanpingScheduleSource(PartialOutput):
     title: str | None = None
     edition: str | None = None
-
-
-class CanpingReadingCitation(PartialOutput):
-    source_id: Literal["heluo_najda", "sanming_nlc"] | None = None
-    pdf_pages: list[int] | None = None
-    roles: list[_ClauseRole] | None = None
-
-    @model_validator(mode="after")
-    def coherent_citation(self) -> "CanpingReadingCitation":
-        if self.source_id is None:
-            return self
-
-        data = source_readings()
-        pages = sorted(
-            {c["pdf_page"] for c in data["clauses"] if c["source_id"] == self.source_id}
-        )
-        if self.pdf_pages is not None and self.pdf_pages != pages:
-            raise ValueError("阅读引文的PDF页码不能跨书替换。")
-        possible_roles = [
-            next(
-                c["roles"]
-                for c in reading_source_citations(p)
-                if c["source_id"] == self.source_id
-            )
-            for p in APPLIED
-        ]
-        if self.roles is not None and self.roles not in possible_roles:
-            raise ValueError("阅读引文角色未登记。")
-        return self
 
 
 class CanpingReadingContext(PartialOutput):

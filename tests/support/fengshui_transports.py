@@ -15,10 +15,15 @@ _PUBLIC_NAMES = {key: spec.name for key, spec in SPECS.items()}
 
 
 async def mcp_call(name, inputs):
+    call_inputs = (
+        {"include": ["*"], **inputs}
+        if "include" not in inputs and "fields" not in inputs
+        else inputs
+    )
     async with Client(mcp.app) as client:
         return await call_calculation(
             client,
             _PUBLIC_NAMES.get(name, "fengshui_" + name),
-            {"detail": "audit", **inputs},
+            call_inputs,
             raise_on_error=False,
         )

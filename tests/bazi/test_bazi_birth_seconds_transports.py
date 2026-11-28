@@ -26,13 +26,14 @@ def test_seconds_and_component_receipt_on_every_actual_surface(
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     payload = {**inputs(spec), **BASE, "birth_minute": 20, "birth_second": 59}
-    opts: dict[str, object] = {"detail": "audit"}
-    flags = ["--detail", "audit"]
+    opts: dict[str, object] = {}
+    flags: list[str] = []
     if project:
         opts["fields"] = [receipt_path(spec)]
         flags += ["--fields", receipt_path(spec)]
     else:
-        pass
+        opts["include"] = ["*"]
+        flags += ["--include", "*"]
     result = asyncio.run(native(spec, payload, **opts))
     code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
     assert not result.is_error and code == 0

@@ -8,31 +8,7 @@ from fatebridge.application.bindings import (
     request_model_ref,
     service_ref,
 )
-from fatebridge.application.tool_spec import ServiceResult, ToolSpec
-
-
-def _compact_lifespan(result: ServiceResult) -> ServiceResult:
-    trimmed: ServiceResult = {}
-    for k, v in result.items():
-        if k == "natal_reference":
-            continue
-        if isinstance(v, dict):
-            sub: ServiceResult = {}
-            for sk, sv in v.items():
-                if sk == "physical_ephemeris_source":
-                    continue
-                if sk in {"activations", "points"} and isinstance(sv, list):
-                    sub[sk] = sv[:10]
-                    sub[f"{sk}_total_count"] = len(sv)
-                elif sk in {"hits", "phase_ingresses"} and isinstance(sv, list):
-                    sub[sk] = sv[:12]
-                else:
-                    sub[sk] = sv
-            trimmed[k] = sub
-        else:
-            trimmed[k] = v
-    return trimmed
-
+from fatebridge.application.tool_spec import ToolSpec
 
 _REQ_MODULE = "fatebridge.core.requests.western_lifespan"
 
@@ -109,6 +85,7 @@ def _western_lifespan_spec(
     *,
     summary: str | None = None,
     rest_path: str | None = None,
+    default_omit: tuple[str, ...] = (),
 ) -> ToolSpec:
     """Register a single-natal-chart western lifespan technique tool."""
     return ToolSpec(
@@ -120,7 +97,7 @@ def _western_lifespan_spec(
         family="western_lifespan",
         cpu_bound=True,
         rest_path=rest_path or "/api/astrology/timing/" + name.replace("_", "-"),
-        compact_view=_compact_lifespan,
+        default_omit=default_omit,
     )
 
 
@@ -132,18 +109,21 @@ SPECS: list[ToolSpec] = [
         "AstroHarmonicRequest",
         "调波盘",
         rest_path="/api/astrology/harmonic-chart",
+        default_omit=("natal_reference",),
     ),
     _western_lifespan_spec(
         "planetary_ages",
         calculate_planetary_ages,
         "AstroPlanetaryAgesRequest",
         "行星年龄",
+        default_omit=("natal_reference",),
     ),
     _western_lifespan_spec(
         "triplicity_ruler_periods",
         calculate_triplicity_rulers,
         "AstroTriplicityRulersRequest",
         "三分主星推运",
+        default_omit=("natal_reference",),
     ),
     _western_lifespan_spec(
         "lunar_phase_progressions",
@@ -151,59 +131,77 @@ SPECS: list[ToolSpec] = [
         "AstroLunationPhaseRequest",
         "月相推运",
         summary="月相推运：按出生后实际日月八相交点推演象征年龄阶段。",
+        default_omit=(
+            "natal_reference",
+            "lunar_phase_progressions.physical_ephemeris_source",
+            "lunar_phase_progressions.phase_ingresses",
+        ),
     ),
     _western_lifespan_spec(
         "bounds_directions",
         calculate_distributions,
         "AstroDistributionsRequest",
         "界推运",
+        default_omit=("natal_reference",),
     ),
     _western_lifespan_spec(
         "balbillus_periods",
         calculate_balbillus,
         "AstroBalbillusRequest",
         "Balbillus 129年系统",
+        default_omit=(
+            "natal_reference",
+            "balbillus.reduction_model",
+            "balbillus.periods.*.subperiods",
+        ),
     ),
     _western_lifespan_spec(
         "numeric_aspect_periods",
         calculate_keypoints,
         "AstroKeypointsRequest",
         "数字相位推运",
+        default_omit=("natal_reference", "numeric_aspect_periods.activations"),
     ),
     _western_lifespan_spec(
         "planetary_periods_129_years",
         calculate_yearsystem129,
         "AstroYearSystem129Request",
         "129年系统",
+        default_omit=("natal_reference",),
     ),
     _western_lifespan_spec(
         "planetary_arc_directions",
         calculate_planetary_arc,
         "AstroPlanetaryArcRequest",
         "行星弧方向",
+        default_omit=("natal_reference",),
     ),
     _western_lifespan_spec(
         "persian_directions",
         calculate_persian_directed,
         "AstroPersianDirectedRequest",
         "波斯向运",
+        default_omit=("natal_reference", "persian_directions.hits"),
     ),
     _western_lifespan_spec(
         "age_point",
         calculate_age_point,
         "AstroAgePointRequest",
         "年龄推进点",
+        default_omit=("natal_reference", "age_point.points"),
     ),
     _western_lifespan_spec(
         "sidereal_progressions",
         calculate_vedicprog,
         "AstroVedicProgRequest",
         "恒星推运",
+        default_omit=("natal_reference",),
     ),
     _western_lifespan_spec(
         "declination_progressions",
         calculate_jaynesprog,
         "AstroJaynesProgRequest",
         "赤纬推运",
+        default_omit=("natal_reference",),
     ),
 ]

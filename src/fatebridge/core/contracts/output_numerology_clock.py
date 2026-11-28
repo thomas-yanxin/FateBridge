@@ -40,13 +40,6 @@ class NumerologyValidation(PartialOutput):
     prediction: str | None = None
 
 
-class NumerologyRuleTrace(PartialOutput):
-    rule_id: str | None = None
-    source_section: str | None = None
-    fact_path: str | None = None
-    facts: dict[str, JsonValue] | None = None
-
-
 class NumerologyCalendarPolicy(PartialOutput):
     input_calendar: Literal["proleptic_gregorian"] | None = None
     automatic_reform_cutover: Literal[False] | None = None

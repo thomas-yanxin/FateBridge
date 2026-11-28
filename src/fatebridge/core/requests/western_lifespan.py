@@ -154,6 +154,12 @@ class AstroPlanetaryArcRequest(AnalysisDateFields, AstroLifespanRequest):
         le=15,
         description="Aspect orb in degrees for directed-to-natal hits",
     )
+    max_hits: int | None = Field(
+        default=None,
+        ge=1,
+        le=500,
+        description="Optional cap on returned aspect hits (default None returns all hits within orb).",
+    )
 
 
 class AstroPersianDirectedRequest(AstroLifespanRequest):
@@ -164,6 +170,12 @@ class AstroPersianDirectedRequest(AstroLifespanRequest):
         gt=0,
         le=200,
         description="Upper age bound (years) for the symbolic 1°/year hit list",
+    )
+    limit: int | None = Field(
+        default=120,
+        ge=1,
+        le=2000,
+        description="Maximum hits returned in chronological order (default 120; null returns all hits up to max_age_years).",
     )
 
 
@@ -194,6 +206,12 @@ class AstroVedicProgRequest(AnalysisDateFields, AstroLifespanRequest):
         ge=0,
         le=15,
         description="Aspect orb (degrees) for progressed→natal hits",
+    )
+    max_hits: int | None = Field(
+        default=None,
+        ge=1,
+        le=500,
+        description="Optional cap on returned aspect hits (default None returns all hits within orb).",
     )
 
 

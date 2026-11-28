@@ -37,7 +37,6 @@ from fatebridge.core.contracts.output_jinkou_strength import validate_strength_e
 from fatebridge.core.contracts.output_liuren_board import (
     RenCalendarPolicy,
     RenRuleset,
-    RenRuleTrace,
 )
 from fatebridge.core.contracts.output_ren_patterns import JinkouPatterns
 from fatebridge.core.metaphysics.jinkou.patterns import definition_evidence

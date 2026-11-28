@@ -125,7 +125,7 @@ def validate_replacement_catalog(bundle: dict[str, Any]) -> None:
         raise ValueError("完整替星表须与十三改数山位及十一同数山位一致")
 
 
-def _compact_resolution(res: dict[str, Any]) -> dict[str, Any]:
+def _period_timing_entry(res: dict[str, Any]) -> dict[str, Any]:
     return {k: v for k, v in res.items() if k not in {"civil_point", "time_basis"}}
 
 
@@ -140,8 +140,8 @@ def _period_interval(index: int, timezone_name: str) -> dict[str, Any]:
         "valid_from": first["moment"],
         "valid_until": last["moment"],
         "timing": {
-            "start": _compact_resolution(first),
-            "end": _compact_resolution(last),
+            "start": _period_timing_entry(first),
+            "end": _period_timing_entry(last),
         },
     }
 

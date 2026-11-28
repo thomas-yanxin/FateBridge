@@ -175,7 +175,6 @@ class HumanDesignOutput(ProjectedOutput):
     profile: str | None = None
     incarnation_cross: IncarnationCross | None = None
     depth_evidence: HDDepthEvidence | None = None
-    line_fixings: list[HDLineFixing] | None = None
     cycle_context: dict[str, JsonValue] | None = None
     cycle_summary: dict[str, JsonValue] | None = None
     birth_time_sensitivity: dict[str, JsonValue] | None = None

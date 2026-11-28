@@ -155,13 +155,11 @@ def test_station_cell_root_is_the_same_on_rest_mcp_cli(surface_calls) -> None:
         inputs,
         params=[
             ("fields", fields[0]),
-            ("detail", "audit"),
         ],
         options={
             "fields": fields,
-            "detail": "audit",
         },
-        flags=["--fields", *fields, "--detail", "audit"],
+        flags=["--fields", *fields],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error

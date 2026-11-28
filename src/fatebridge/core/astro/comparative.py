@@ -361,7 +361,7 @@ def build_comparative_geometry(
                 "angle_definition": sample.get("angle_definition"),
                 "frame_summary": calculated["frame_summary"],
                 "point_systems": _systems(calculated),
-                "native_sample_reference": f"midpoint_analysis.time_sensitivity.samples[{index}]",
+                "native_sample_reference": f"midpoint_analysis.birth_time_sensitivity.samples[{index}]",
             }
         )
     point_spans: dict[str, dict[str, _PointSpan]] = {}

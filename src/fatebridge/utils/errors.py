@@ -253,9 +253,6 @@ class EphemerisSourceError(DomainSourceError, ValueError):
         "physical_configuration_changed": "Ephemeris configuration changed during physical chart calculation",
         "coordinate_model_changed": "Physical ephemeris model differs between ecliptic and equatorial coordinates",
         "nominal_source_mismatch": "Physical ephemeris source differs between the nominal chart and recalculated same-epoch factors",
-        "fictitious_changed_during": "Fictitious orbit source changed during factor calculation",
-        "fictitious_changed_across": "Fictitious orbit source changed across birth-time samples",
-        "fictitious_nominal_mismatch": "Fictitious orbit source differs between nominal chart and birth-time samples",
         "fictitious_identity": "Fictitious element slot does not identify the requested Hamburg factor; cannot label an unrelated orbit as a Hamburg factor",
     }
 

@@ -5,6 +5,9 @@
     "interpretation": "结合已知工作经历、职责和目标解释；需要传统定义时查询 knowledge_catalog 和 knowledge_read。行业映射和实践建议由 Agent 结合语境提出。",
     "target_clock": "日期级专项固定出生时区的本地零点，timing_context回显analysis_datetime、timezone和boundary_status；交节当日涉及钟时时，用 bazi_timing 核对实际目标时刻。"
   },
+  "default_omit": [
+    "career_analysis.calendar_context"
+  ],
   "evidence_views": {
     "calendar_basis": {
       "fields": [

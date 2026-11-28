@@ -2,10 +2,15 @@
   "call_guidance": {
     "context": "仅骰面解读省略date/time/timezone/经纬度；若请求独立天象背景，完整传入实际资料。tradition/house_system/zodiac_type仅作用于天象背景，不改变骰面。天象背景按astronomical_context视图选择fields。保留ephemerisReferencePoints中的系统质心、本体中心、近似及未确认参考点，不将质心写成本体中心。",
     "input": "planet/sign/house必须是本次实际骰面；实际第N宫传house=N-1。中文、英文和符号可直接传入；缺项追问，不猜测或抽取替代结果。",
-    "interpretation": "以symbolic_details和rule_trace为依据，保留rulesets版本和来源。区分自定位与未给出的其他定位星；喜乐宫是宫号关系，不是星座尊贵。diceChart为假设整宫示意，无真实度数、相位或ASC/MC；不得从天象背景补写骰面定位星、互容或应期。",
-    "longitude_motion": "天象背景的十个物理天体按实际热带或Lahiri黄道读取chart.params.chart_profile.longitude_motion与chart.chart.objects[].motion。保留native_longitude_speed及修正分项，method_id来自实际求导记录；Moshier完整视位置求导不改变解析轨道，未收敛明确不应用。Lahiri包含所选零点的运动，不能复制热带速度。",
+    "interpretation": "以symbolic_details和chart为依据，保留method_id与来源说明。区分自定位与未给出的其他定位星；喜乐宫是宫号关系，不是星座尊贵。diceChart为假设整宫示意，无真实度数、相位或ASC/MC；不得从天象背景补写骰面定位星、互容或应期。",
+    "longitude_motion": "天象背景的十个物理天体按实际热带或Lahiri黄道读取chart.params.chart_profile.apparent_position_policy与chart.chart.objects[].motion。保留motion内的longitude_speed、direction、reference_frame、basis、source_model及（若有）native_longitude_speed、method_id与修正分项；Moshier完整视位置求导不改变解析轨道，未收敛明确不应用。Lahiri包含所选零点的运动，不能复制热带速度。",
     "validation": "星座条件按所引原典核对七曜，外行星和交点保留各自的条件状态。"
   },
+  "default_omit": [
+    "chart",
+    "dice_chart",
+    "symbolic_details.symbolic_house_ring"
+  ],
   "evidence_views": {
     "astronomical_context": {
       "fields": [

@@ -146,7 +146,7 @@ def test_calculate_birth_route_executes_service_via_threadpool(
     )
 
     birth_route = rest_handler("bazi_birth_chart")
-    result = asyncio.run(birth_route(request, detail="audit"))
+    result = asyncio.run(birth_route(request))
 
     assert result["analysis_type"] == "八字命盘"
     assert result["run_metadata"]["tool_name"] == "bazi_birth_chart"

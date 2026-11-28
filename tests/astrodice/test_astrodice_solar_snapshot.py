@@ -41,7 +41,7 @@ def test_native_extension_is_explained_without_rewriting_the_dice(
     response = rest.post(
         SPEC.rest_path,
         json=inputs,
-        params={"detail": "audit", "fields": fields},
+        params={"fields": fields},
     )
     assert response.status_code == 200, response.text
 
@@ -52,7 +52,6 @@ def test_native_extension_is_explained_without_rewriting_the_dice(
                 "interpret_astrology_dice",
                 {
                     **inputs,
-                    "detail": "audit",
                     "fields": fields,
                 },
             )
@@ -63,7 +62,7 @@ def test_native_extension_is_explained_without_rewriting_the_dice(
     flags = ["interpret_astrology_dice"]
     for key, value in inputs.items():
         flags.extend(["--" + key.replace("_", "-"), str(value)])
-    assert run([*flags, "--fields", *fields, "--detail", "audit"]) == 0
+    assert run([*flags, "--fields", *fields]) == 0
     cli = json.loads(capsys.readouterr().out)
     values = [response.json(), mcp, cli]
     for result in values:

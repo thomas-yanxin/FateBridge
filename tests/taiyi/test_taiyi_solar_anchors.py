@@ -144,11 +144,11 @@ def test_actual_rest_mcp_cli_and_same_run_source_view(
         r = client.post(
             spec.rest_path,
             json=values,
-            params=[("detail", "audit")] + [("fields", f) for f in fields],
+            params=[("fields", f) for f in fields],
         )
     assert r.status_code == 200, r.text
     expected = r.json()["taiyi"]
-    argv = [spec.name, "--detail", "audit", "--fields", *fields]
+    argv = [spec.name, "--fields", *fields]
     for key, value in values.items():
         if key == "use_true_solar_time":
             argv += ["--use-true-solar-time", "false"]
@@ -165,7 +165,7 @@ def test_actual_rest_mcp_cli_and_same_run_source_view(
             response = await call_calculation(
                 client,
                 spec.name,
-                {**values, "detail": "audit", "fields": fields},
+                {**values, "fields": fields},
                 raise_on_error=False,
             )
             full = response.structured_content

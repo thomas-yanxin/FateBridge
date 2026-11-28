@@ -218,13 +218,13 @@ def test_liuyao_audit_payload_budget_and_transports(surface_calls) -> None:
         "liuyao_evidence.shensha",
         "liuyao_evidence.moving_focus_guidance",
     ]
-    controls = {"detail": "audit", "fields": fields}
+    controls = {"fields": fields}
     http, mcp, code, cli = surface_calls(
         SPECS["liuyao"],
         payload,
         params=controls,
         options=controls,
-        flags=("--detail", "audit", "--fields", *fields),
+        flags=("--fields", *fields),
     )
     assert http.status_code == 200 and code == 0 and not mcp.is_error
     assert business(http.json()) == business(cli) == business(mcp.structured_content)

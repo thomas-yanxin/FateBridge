@@ -176,6 +176,8 @@ def build_given_year_payload(
     return_timezone: str,
     house_system: str = "P",
     zodiac_type: str = "Tropic",
+    orb_limit: float = 1.5,
+    max_hits: int | None = None,
     analysis_subject: NativeSubject | None = None,
     transit_hits: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
@@ -241,8 +243,10 @@ def build_given_year_payload(
         hits = collect_aspect_hits(
             source_longitudes=source_longitudes,
             target_longitudes=target_longitudes,
-            orb_limit=1.5,
+            orb_limit=orb_limit,
         )
+    hits_total_count = len(hits)
+    selected_hits = hits[:max_hits] if max_hits is not None else hits
     reference = extract_reference_points(given_year_subject)
     payload: dict[str, Any] = {
         "analysis_datetime": format_local_time_or_utc(analysis_local),
@@ -254,7 +258,8 @@ def build_given_year_payload(
         "medium_coeli": reference["medium_coeli"],
         "annual_profection": annual_profection,
         "monthly_profections": monthly_profections,
-        "hits": hits[:8],
+        "hits": selected_hits,
+        "hits_total_count": hits_total_count,
         "location": {
             "longitude": return_longitude,
             "latitude": return_latitude,

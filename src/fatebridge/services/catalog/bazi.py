@@ -1,4 +1,4 @@
-"""Bazi tool declarations and domain compact views."""
+"""Bazi tool declarations."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from fatebridge.application.bindings import (
     service_ref,
 )
 from fatebridge.application.domain_validators import validate_bazi_anchors
-from fatebridge.application.tool_spec import ServiceResult, ToolSpec
+from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.reproducibility import ReproducibilityPolicy
 
 _BAZI_REQ = "fatebridge.core.requests.bazi"
@@ -45,48 +45,6 @@ calculate_bazi_overview = service_ref(
 )
 
 
-def _compact_bazi_overview(result: ServiceResult) -> ServiceResult:
-    return {
-        k: v for k, v in result.items() if k not in {"calendar_context", "patterns"}
-    }
-
-
-def _compact_bazi_birth(result: ServiceResult) -> ServiceResult:
-    birth = result.get("bazi_birth")
-    if not isinstance(birth, dict):
-        return result
-    compact_birth = {
-        k: v
-        for k, v in birth.items()
-        if k
-        not in {
-            "calendar_context",
-            "analysis_calendar_context",
-            "patterns",
-            "shensha",
-            "three_origins_shensha",
-            "taixi_shensha",
-        }
-    }
-    out: ServiceResult = {
-        "analysis_type": result.get("analysis_type"),
-        "bazi_birth": compact_birth,
-    }
-    if "coverage" in result:
-        out["coverage"] = result["coverage"]
-    return out
-
-
-def _compact_bazi_dimension(result: ServiceResult) -> ServiceResult:
-    cleaned: ServiceResult = {}
-    for key, val in result.items():
-        if key.endswith("_analysis") and isinstance(val, dict):
-            cleaned[key] = {k: v for k, v in val.items() if k != "calendar_context"}
-        else:
-            cleaned[key] = val
-    return cleaned
-
-
 def _bazi_dimension_spec(
     name: str, service: ServiceRef, model_name: str, label: str
 ) -> ToolSpec:
@@ -99,8 +57,8 @@ def _bazi_dimension_spec(
         family="bazi",
         rest_path=f"/api/bazi/{name}",
         cpu_bound=True,
-        compact_view=_compact_bazi_dimension,
         output_validators=(validate_bazi_anchors,),
+        default_omit=(f"{name}_analysis.calendar_context",),
     )
 
 
@@ -114,9 +72,9 @@ SPECS: list[ToolSpec] = [
         family="bazi",
         rest_path="/api/bazi/overview",
         cpu_bound=True,
-        compact_view=_compact_bazi_overview,
         reproducibility=ReproducibilityPolicy(implicit_current_time=True),
         output_validators=(validate_bazi_anchors,),
+        default_omit=("calendar_context", "patterns"),
     ),
     ToolSpec(
         name="bazi_birth_chart",
@@ -127,8 +85,15 @@ SPECS: list[ToolSpec] = [
         family="bazi",
         rest_path="/api/bazi/birth-chart",
         cpu_bound=True,
-        compact_view=_compact_bazi_birth,
         output_validators=(validate_bazi_anchors,),
+        default_omit=(
+            "bazi_birth.calendar_context",
+            "bazi_birth.analysis_calendar_context",
+            "bazi_birth.patterns",
+            "bazi_birth.shensha",
+            "bazi_birth.three_origins_shensha",
+            "bazi_birth.shensha_triggered",
+        ),
     ),
     _bazi_dimension_spec(
         "marriage", calculate_bazi_marriage, "BaziMarriageRequest", "八字婚姻分析"
@@ -169,5 +134,6 @@ SPECS: list[ToolSpec] = [
         family="bazi",
         rest_path="/api/bazi/compare-sources",
         cpu_bound=True,
+        default_omit=(),
     ),
 ]

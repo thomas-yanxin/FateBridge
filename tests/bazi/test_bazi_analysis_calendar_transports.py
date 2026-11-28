@@ -58,7 +58,6 @@ def test_natal_and_analysis_calendars_own_their_pillars_on_three_protocols(
     ]
     controls = {
         "as_of": as_of,
-        "detail": "audit",
         "fields": fields,
     }
     http, protocol, code, cli = surface_calls(

@@ -93,23 +93,6 @@ def source_readings() -> dict[str, Any]:
     return deepcopy(_schedule_collation())
 
 
-def reading_source_citations(profile: str) -> list[dict[str, Any]]:
-    if profile not in APPLIED:
-        raise ValueError("未登记的参评配运方法。")
-    data = _schedule_collation()
-    result = []
-    for source_id in data["sources"]:
-        clauses = [c for c in data["clauses"] if c["source_id"] == source_id]
-        result.append(
-            {
-                "source_id": source_id,
-                "pdf_pages": sorted({c["pdf_page"] for c in clauses}),
-                "roles": list(dict.fromkeys(clause_role(profile, c) for c in clauses)),
-            }
-        )
-    return result
-
-
 def date_mapping_statement(
     profile: str, future_clock_policy: str | None, timezone_spec: str | None
 ) -> str:

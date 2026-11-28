@@ -43,7 +43,11 @@ class DirectionDial(PartialOutput):
     period_degrees: int | None = None
     two_factor_contacts: list[DirectionContact] | None = None
     three_factor_contacts: list[DirectionContact] | None = None
+    three_factor_returned_count: int | None = None
+    three_factor_total_count: int | None = None
     four_factor_contacts: list[DirectionContact] | None = None
+    four_factor_returned_count: int | None = None
+    four_factor_total_count: int | None = None
 
 
 class SunObservation(PartialOutput):

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+from dataclasses import replace
 
 import pytest
 from fastmcp import Client
@@ -14,9 +15,7 @@ from fatebridge.application.execution import execute_with_receipt
 from fatebridge.application.response_delivery import deliver_response
 from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services import replay_metadata
 from fatebridge.services.tool_catalog import CATALOG
-from tests.support.transports import call_calculation
 
 
 def test_knowledge_catalog_runs_once_without_redundant_reexecution(
@@ -34,15 +33,13 @@ def test_knowledge_catalog_runs_once_without_redundant_reexecution(
     monkeypatch.setattr(kn, "build_knowledge_registry", spy)
     spec = next(s for s in CATALOG if s.name == "knowledge_catalog")
     request = spec.request_model()
-    compact_options = ExecutionOptions(detail="compact")
-    result = execute_with_receipt(spec, request, options=compact_options)
+    options = ExecutionOptions()
+    result = execute_with_receipt(spec, request, options=options)
     assert calls == 1 and "domains" in result
     assert "snapshot_text" not in result and "snapshot_export" not in result
 
 
-def test_bazi_birth_tiered_detail_and_inline_suggested_fields(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+def test_bazi_birth_default_omit_and_inline_suggested_fields() -> None:
     spec = next(s for s in CATALOG if s.name == "bazi_birth_chart")
     req = spec.request_model(
         birth_year=1990,
@@ -58,37 +55,36 @@ def test_bazi_birth_tiered_detail_and_inline_suggested_fields(
     def dump_len(obj):
         return len(json.dumps(obj, ensure_ascii=False, separators=(",", ":")))
 
-    compact = ExecutionOptions(detail="compact", as_of="2026-11-23T04:00:00Z")
-    compact_raw = execute_with_receipt(spec, req, options=compact)
-    assert "runtime" not in compact_raw["run_metadata"]
-    assert "duration_ms" not in compact_raw["run_metadata"]
-    assert "snapshot_text" not in compact_raw
-    assert "snapshot_export" not in compact_raw
+    options = ExecutionOptions(as_of="2026-11-23T04:00:00Z")
+    raw = execute_with_receipt(spec, req, options=options)
+    assert "runtime" not in raw["run_metadata"]
+    assert "duration_ms" in raw["run_metadata"]
+    assert "replay" in raw["run_metadata"]
+    assert "snapshot_text" not in raw
+    assert "snapshot_export" not in raw
 
-    audit_raw = execute_with_receipt(
-        spec, req, options=compact.model_copy(update={"detail": "audit"})
+    omitted_spec = replace(
+        spec,
+        default_omit=("bazi_birth.calendar_context", "bazi_birth.shensha"),
     )
-    assert compact_raw["bazi_birth"] == audit_raw["bazi_birth"]
+    default_out = deliver_response(raw, spec=omitted_spec)
+    assert deliver_response(raw, spec=omitted_spec, fields=[]) == default_out
+    full_out = deliver_response(raw, spec=omitted_spec, include=["*"])
 
-    compact_out = deliver_response(compact_raw, spec=spec, detail="compact")
-    assert (
-        deliver_response(compact_raw, spec=spec, detail="compact", fields=[])
-        == compact_out
-    )
-    audit_out = deliver_response(audit_raw, spec=spec, detail="audit")
-
-    assert "calculation_evidence" not in compact_out["run_metadata"]
-    assert "calculation_evidence" not in audit_out["run_metadata"]
-    assert "duration_ms" in audit_out["run_metadata"]
-    assert "replay" in audit_out["run_metadata"]
-    assert dump_len(compact_out) < dump_len(audit_out)
+    assert "calculation_evidence" not in default_out["run_metadata"]
+    assert "calculation_evidence" not in full_out["run_metadata"]
+    assert default_out["run_metadata"]["omitted_fields"] == [
+        "bazi_birth.calendar_context",
+        "bazi_birth.shensha",
+    ]
+    assert "omitted_fields" not in full_out["run_metadata"]
+    assert dump_len(default_out) < dump_len(full_out)
 
     # With suggested_fields, bazi_birth_chart fits cleanly without result_delivery.
     mcp_view = deliver_response(
-        audit_raw,
+        raw,
         spec=spec,
         fields=suggested_fields(spec),
-        detail="compact",
     )
     assert "result_delivery" not in mcp_view
     assert "bazi_birth" in mcp_view
@@ -148,7 +144,6 @@ def test_mcp_exposes_three_tools_and_zero_resources() -> None:
                         "birth_timezone": "Asia/Shanghai",
                     },
                     "fields": ["bazi_birth.four_pillars", "bazi_birth.day_master"],
-                    "detail": "compact",
                 },
             )
             assert not ran.is_error
@@ -173,7 +168,6 @@ def test_mcp_exposes_three_tools_and_zero_resources() -> None:
                     findings = business["layout_analysis"]["placement_findings"]
                     assert {item["object_id"] for item in findings} == {"stove", "bed"}
                     assert "layers" in business and "palace_overlay" in business
-                    assert "rule_trace" not in business
                     assert "rulesets" not in business
                 else:
                     assert len(business["lines"]) == 6

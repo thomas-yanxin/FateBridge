@@ -296,14 +296,20 @@ def _catalogue() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     return _load_consolidated_catalogue(stamps)
 
 
-def build_registry() -> dict[str, Any]:
+def build_registry(*, keys_sample_limit: int | None = 4) -> dict[str, Any]:
     """Return the single consolidated Human Design `lines` category without deepcopy."""
     data, coverage, provenance = _catalogue()
+    rows = data["rows"]
+    sample = (
+        [r["key"] for r in rows]
+        if keys_sample_limit is None
+        else [r["key"] for r in rows[:keys_sample_limit]]
+    )
     category = {
         "name": "lines",
-        "count": len(data["rows"]),
-        "keys_sample": [r["key"] for r in data["rows"][:12]],
-        "keys_complete": False,
+        "count": len(rows),
+        "keys_sample": sample,
+        "keys_complete": len(sample) == len(rows),
         "key_format": "gate.line；门1..64，线1..6；例如1.1",
         "supports": ["key"],
         "reference_only": True,

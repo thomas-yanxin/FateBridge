@@ -183,7 +183,6 @@ def test_xiangbei_projects_and_rejects_contradictions_on_all_transports(
         "orientation": "departing",
     }
     projection = dict(
-        detail="audit",
         fields=["interpretation.motion_context"],
     )
     http, mcp, code, cli = surface_calls(

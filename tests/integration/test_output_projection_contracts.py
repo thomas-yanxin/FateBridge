@@ -231,7 +231,7 @@ def test_each_coverage_and_layer_field_projects_on_native_mcp_rest_and_cli(
         inputs["xuankong"] = natal
         inputs["methods"] = ["bazhai", "jinsuo", "annual_stars", "xuankong_natal"]
     full = rest.post(
-        spec.rest_path, json=inputs, params={"as_of": AS_OF, "detail": "audit"}
+        spec.rest_path, json=inputs, params={"as_of": AS_OF, "include": "*"}
     )
     assert full.status_code == 200, full.text
     cases = []
@@ -270,7 +270,6 @@ def test_each_coverage_and_layer_field_projects_on_native_mcp_rest_and_cli(
                             **inputs,
                             "as_of": AS_OF,
                             "fields": [field],
-                            "detail": "audit",
                         },
                         raise_on_error=False,
                     )
@@ -287,7 +286,6 @@ def test_each_coverage_and_layer_field_projects_on_native_mcp_rest_and_cli(
             params={
                 "as_of": AS_OF,
                 "fields": field,
-                "detail": "audit",
             },
         )
         code = run(
@@ -299,8 +297,6 @@ def test_each_coverage_and_layer_field_projects_on_native_mcp_rest_and_cli(
                 AS_OF,
                 "--fields",
                 field,
-                "--detail",
-                "audit",
             ]
         )
         cli = json.loads(capsys.readouterr().out)

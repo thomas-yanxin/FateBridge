@@ -122,7 +122,7 @@ def test_single_failure_preserves_every_other_native_longitude(
         "dice_chart",
     ]:
         assert partial[key] == complete[key]
-    assert "rulesets" not in partial and "rule_trace" not in partial
+    assert "rulesets" not in partial
 
 
 @pytest.mark.parametrize("zodiac_type", ["Tropic", "Sidereal"])

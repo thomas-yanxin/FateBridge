@@ -1,4 +1,4 @@
-"""Agent-friendliness contracts: stranger-agent MCP loop, 3-surface compact parity, and catalog hygiene."""
+"""Agent-friendliness contracts: stranger-agent MCP loop, 3-surface default delivery parity, and catalog hygiene."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ import fatebridge.api as api
 from fatebridge import cli
 from fatebridge.application.description import describe_spec, summarize_spec
 from fatebridge.application.discovery import discover_specs
-from fatebridge.application.examples import _examples, example_input
+from fatebridge.application.examples import example_input
 from fatebridge.application.execution import execute_with_receipt
 from fatebridge.application.response_delivery import deliver_response
 from fatebridge.application.tool_spec import ToolSpec
@@ -43,7 +43,7 @@ def _business(payload: dict[str, object]) -> dict[str, object]:
 
 @pytest.mark.asyncio
 async def test_stranger_agent_mcp_loop_and_error_recovery() -> None:
-    """An agent starting cold can discover, search, call compactly, and recover from typos."""
+    """An agent starting cold can discover, search, call with default delivery, and recover from typos."""
     async with Client(cached_mcp_app()) as client:
         # 1. Surface exposes discover_tools + run_calculation + run_batch and 0 resources.
         tools = await client.list_tools()
@@ -57,7 +57,7 @@ async def test_stranger_agent_mcp_loop_and_error_recovery() -> None:
         assert resources == []
         assert templates == []
 
-        # 2. Step 1: discover_tools() returns family counts and compact tool summaries.
+        # 2. Step 1: discover_tools() returns family counts and summary tool records.
         overview = await client.call_tool("discover_tools", {})
         assert not overview.is_error
         body = overview.structured_content
@@ -84,7 +84,7 @@ async def test_stranger_agent_mcp_loop_and_error_recovery() -> None:
         example = contract["example_input"]
         validate(example, contract["input_schema"])
 
-        # 5. Step 4: run_calculation defaults to detail="compact" and succeeds inline.
+        # 5. Step 4: run_calculation uses default delivery and succeeds inline.
         calc_res = await client.call_tool(
             "run_calculation",
             {
@@ -132,12 +132,12 @@ async def test_stranger_agent_mcp_loop_and_error_recovery() -> None:
 @pytest.mark.parametrize(
     "tool_name", ["firdaria", "bazi_birth_chart", "fengshui_directions"]
 )
-def test_three_surface_parity_on_default_compact(
+def test_three_surface_parity_on_default_delivery(
     tool_name: str,
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """Default detail=compact produces identical business payload across REST, MCP, CLI."""
+    """Default delivery produces identical business payload across REST, MCP, CLI."""
     spec = next(s for s in CATALOG if s.name == tool_name)
     example = example_input(spec)
     assert example is not None
@@ -199,7 +199,7 @@ def test_catalog_hygiene_across_all_tools() -> None:
     """Single canonical identity, valid examples, lean labels, and no cross-technique leakage."""
     assert len(CATALOG) == 91
     assert len({spec.family for spec in CATALOG}) == 12
-    assert set(ExecutionOptions.model_fields) == {"as_of", "detail"}
+    assert set(ExecutionOptions.model_fields) == {"as_of"}
 
     for removed in ("key", "mcp_name", "tool_name"):
         assert not hasattr(ToolSpec, removed)
@@ -272,17 +272,15 @@ def test_discovery_summary_budget_and_full_detail_filter_guard() -> None:
     assert exc_info.value.issues[0]["code"] == "filter_required_for_full_detail"
 
 
-def test_every_tool_declares_compact_fields_within_budget() -> None:
-    """Every tool declares explicit compact_fields and delivers <= 10 KiB in compact mode."""
-    compact_map = _examples().get("compact_fields", {})
-    options = ExecutionOptions(detail="compact", as_of="2026-10-12T12:00:00+08:00")
+def test_every_tool_delivers_default_within_budget() -> None:
+    """Every tool delivers a compact isomorphic default payload <= 10 KiB."""
+    options = ExecutionOptions(as_of="2026-10-12T12:00:00+08:00")
     for spec in CATALOG:
-        assert spec.name in compact_map and compact_map[spec.name], spec.name
         request = spec.request_model.model_validate(example_input(spec))
         raw = execute_with_receipt(spec, request, options=options)
-        delivered = deliver_response(raw, spec=spec, detail="compact")
+        delivered = deliver_response(raw, spec=spec)
         size = len(json.dumps(delivered, ensure_ascii=False).encode("utf-8"))
-        assert size <= 10240, f"{spec.name} compact output too large: {size} bytes"
+        assert size <= 10240, f"{spec.name} default output too large: {size} bytes"
 
 
 def test_package_imports_are_absolute_and_export_presets_is_deleted() -> None:

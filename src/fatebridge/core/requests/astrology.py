@@ -177,7 +177,7 @@ class AstroGermanyRequest(AstroSpecialtyRequest):
     )
     dial_degrees: Literal["90", "45", "22.5"] = Field(
         default="90",
-        description="Primary dial modulus to summarize in compact output (90, 45, or 22.5).",
+        description="Dial modulus scope: '90' or '45' computes 90° and 45° dials; '22.5' additionally computes the 22.5° dial.",
     )
     sensitive_point_query: str | None = Field(
         default=None,
@@ -186,6 +186,18 @@ class AstroGermanyRequest(AstroSpecialtyRequest):
     analysis_datetime: _ExactTargetDatetime | None = Field(
         default=None,
         description="Optional ISO target instant with timezone offset for true-solar-arc biwheel geometry and the explicitly named Witte-1924 ecliptic day-meridian equation. Uses a 365.25-day Julian symbolic year key, within 0..150 key years after effective birth. Omit for natal only. Symbolic directions/meridians are not physical target positions or event-success probabilities.",
+    )
+    max_higher_factor_contacts: int | None = Field(
+        default=12,
+        ge=1,
+        le=500,
+        description="Maximum three-factor and four-factor contacts returned per dial, sorted by tightest orb; null returns all contacts within orb.",
+    )
+    max_mixed_pair_contacts: int | None = Field(
+        default=2,
+        ge=1,
+        le=200,
+        description="Maximum arc-dependent and arc-invariant mixed-pair relation groups returned per dial when analysis_datetime is set; null returns all groups within orb.",
     )
 
 
@@ -203,6 +215,12 @@ class AstroNatalChartRequest(AstroChartRequest):
     include_minor_aspects: bool = Field(
         default=False,
         description="Include minor aspects (30° semisextile, 45° semisquare, 72° quintile, 135° sesquiquadrate, 150° quincunx).",
+    )
+    max_aspects: int | None = Field(
+        default=None,
+        ge=1,
+        le=200,
+        description="Optional cap on returned aspects sorted by tightest orb; null returns all aspects within the selected orb/body filters.",
     )
     extra_bodies: list[
         Literal["Chiron", "Lilith", "Ceres", "Pallas", "Juno", "Vesta", "True Node"]

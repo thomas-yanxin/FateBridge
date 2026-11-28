@@ -78,7 +78,6 @@ def time_sensitivity(
     offsets = times.label_offsets
     samples: list[dict[str, Any]] = []
     models = set()
-    element_source = None
     physical_cohort = PhysicalSourceCohort()
     try:
         for offset, sample in zip(offsets, times.samples):
@@ -89,11 +88,6 @@ def time_sensitivity(
                 include_meridian_houses=include_hypothetical,
                 epoch=sample.effective,
             )
-            native_source = native.get("hypothetical_element_source")
-            if element_source is None:
-                element_source = native_source
-            elif native_source != element_source:
-                raise EphemerisSourceError("fictitious_changed_across")
             models.update(native["ephemeris_models"])
             physical_source_index = physical_cohort.add(
                 native["physical_ephemeris_source"]
@@ -237,7 +231,6 @@ def time_sensitivity(
             "hamburg_native" if include_hypothetical else "physical_reference"
         ),
         "factor_count": len(nominal),
-        "hypothetical_element_source": element_source,
         "factor_spans": spans,
         "samples": samples,
     }
@@ -271,10 +264,6 @@ def enrich_specialty_sensitivity(
             attach_meridian_sensitivity(layer["meridian_houses"], sensitivity)
         if sensitivity["status"] != "sampled":
             return None
-        if sensitivity.get("hypothetical_element_source") != layer["profile"].get(
-            "hypothetical_element_source"
-        ):
-            raise EphemerisSourceError("fictitious_nominal_mismatch")
         nominal_cohort = PhysicalSourceCohort()
         nominal_cohort.add(layer["profile"]["physical_ephemeris_source"])
         for source in sensitivity["physical_ephemeris_sources"]:

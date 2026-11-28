@@ -5,7 +5,6 @@ from pydantic import Field
 from fatebridge.core.contracts.output_base import OpenJsonValue, PartialOutput
 from fatebridge.core.contracts.output_midpoint_geometry import (
     FactorSpan,
-    FictitiousElementSource,
     MeridianFactorPosition,
     PhysicalEphemerisSource,
     ReferenceAngleModel,
@@ -155,7 +154,6 @@ class SpecialtyTimeSensitivity(PartialOutput):
     physical_ephemeris_models_consistent: bool | None = None
     factor_scope: str | None = None
     factor_count: int | None = None
-    hypothetical_element_source: FictitiousElementSource | None = None
     factor_spans: dict[str, FactorSpan] | None = None
     samples: list[TimeSample] | None = None
     limitations: list[str] | None = None

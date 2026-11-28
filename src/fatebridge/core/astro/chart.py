@@ -98,6 +98,7 @@ def build_core_chart_payload(
     node_mode: str = "mean",
     high_latitude_fallback: str = "error",
     include_minor_aspects: bool = False,
+    max_aspects: int | None = None,
     extra_bodies: tuple[str, ...] | list[str] = (),
 ) -> dict[str, Any]:
     """Keep one physical chart on one managed ephemeris configuration."""
@@ -122,6 +123,7 @@ def build_core_chart_payload(
             node_mode=node_mode,
             high_latitude_fallback=high_latitude_fallback,
             include_minor_aspects=include_minor_aspects,
+            max_aspects=max_aspects,
             extra_bodies=extra_bodies,
         )
         assert_physical_configuration(selected)
@@ -146,6 +148,7 @@ def _build_core_chart_payload(
     node_mode: str = "mean",
     high_latitude_fallback: str = "error",
     include_minor_aspects: bool = False,
+    max_aspects: int | None = None,
     extra_bodies: tuple[str, ...] | list[str] = (),
 ) -> dict[str, Any]:
     if guolao_seasonal_anchor_policy is not None and chart_variant != "guolao_chart":
@@ -362,7 +365,7 @@ def _build_core_chart_payload(
         for planet in planet_names
         if planet in planet_states
     ]
-    aspect_evidence = (
+    all_aspect_evidence = (
         _build_aspects(
             planets,
             include_evidence=True,
@@ -371,10 +374,17 @@ def _build_core_chart_payload(
         if include_aspects
         else []
     )
-    aspects = [
+    aspects_total_count = len(all_aspect_evidence)
+    aspect_evidence = (
+        all_aspect_evidence[:max_aspects]
+        if max_aspects is not None
+        else all_aspect_evidence
+    )
+    all_aspects = [
         {key: item[key] for key in ("planet_a", "planet_b", "aspect", "orb")}
-        for item in aspect_evidence
+        for item in all_aspect_evidence
     ]
+    aspects = all_aspects[:max_aspects] if max_aspects is not None else all_aspects
     house_list = (
         _build_houses(
             reference_ascendant,
@@ -469,6 +479,14 @@ def _build_core_chart_payload(
                 "exact_angles": dict(ASPECTS),
                 "include_minor_aspects": include_minor_aspects,
             },
+            **(
+                {
+                    "aspects_total_count": aspects_total_count,
+                    "aspects_returned_count": len(aspects),
+                }
+                if include_aspects
+                else {}
+            ),
         },
         "angles": {
             "ascendant": ascendant_angle,
@@ -504,7 +522,7 @@ def _build_core_chart_payload(
         ),
         "classical_patterns": (
             _build_classical_patterns(
-                planets, aspects, interpretation_states, chart_sect=chart_sect
+                planets, all_aspects, interpretation_states, chart_sect=chart_sect
             )
             if include_classical and include_aspects
             else []
@@ -734,6 +752,7 @@ def build_midpoint_payload(
     high_latitude_fallback: str = "error",
     dial_degrees: str | None = None,
     sensitive_point_query: str | None = None,
+    max_higher_factor_contacts: int | None = 12,
 ) -> dict[str, Any]:
     base_chart = build_core_chart_payload(
         birth_info,
@@ -765,6 +784,7 @@ def build_midpoint_payload(
         base_chart,
         dial_degrees=dial_degrees,
         sensitive_point_query=sensitive_point_query,
+        max_higher_factor_contacts=max_higher_factor_contacts,
     )
     if midpoint_analysis["status"] == "computed":
         raw_factors = midpoint_analysis["factors"]

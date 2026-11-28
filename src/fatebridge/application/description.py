@@ -9,7 +9,6 @@ from pydantic_core import PydanticUndefined
 
 from fatebridge.application.examples import (
     call_guidance,
-    compact_fields,
     evidence_views,
     example_input,
     suggested_fields,
@@ -81,7 +80,6 @@ def _describe_contract(spec: ToolSpec, *, include_output_schema: bool) -> Servic
     views = evidence_views(spec)
     guidance = call_guidance(spec)
     fields = suggested_fields(spec)
-    default_fields = compact_fields(spec)
     root_fields = list(spec.output_fields)
     if not root_fields and spec.output_model:
         root_fields = list(spec.output_model.model_fields)
@@ -105,8 +103,8 @@ def _describe_contract(spec: ToolSpec, *, include_output_schema: bool) -> Servic
     }
     if fields is not None:
         record["suggested_fields"] = fields
-    if default_fields is not None:
-        record["compact_fields"] = default_fields
+    if spec.default_omit:
+        record["default_omit"] = list(spec.default_omit)
     if include_output_schema:
         record["output_schema"] = (
             model_schema(spec.output_model) if spec.output_model else None
@@ -149,7 +147,6 @@ def describe_brief_spec(spec: ToolSpec) -> ServiceResult:
     """Minimal call contract: required fields, flat field types/enums, example, and views."""
     example = example_input(spec)
     views = evidence_views(spec)
-    default_fields = compact_fields(spec)
     model_fields = spec.request_model.model_fields
     required_fields = [
         name for name, field in model_fields.items() if field.is_required()
@@ -167,8 +164,8 @@ def describe_brief_spec(spec: ToolSpec) -> ServiceResult:
     }
     if example is not None:
         record["example_input"] = example
-    if default_fields is not None:
-        record["compact_fields"] = default_fields
+    if spec.default_omit:
+        record["default_omit"] = list(spec.default_omit)
     if views is not None:
         record["evidence_views"] = sorted(views)
     return record

@@ -74,7 +74,7 @@ fatebridge bazi_birth_chart \
     bazi_birth.day_master.polarity
 ```
 
-On success, the command exits with `0` and returns the day master `庚 / 金 / 阳` (Geng / Metal / Yang) plus `run_metadata`. `--detail compact` is the default across all interfaces; pass `--detail audit` for complete payloads and method evidence. Discover other tools and their inputs with:
+On success, the command exits with `0` and returns the day master `庚 / 金 / 阳` (Geng / Metal / Yang) plus `run_metadata`. The default response returns the core canonical layer and records any omitted heavy paths in `run_metadata.omitted_fields`; pass `--include "*"` for the lossless full output (or specific paths / `evidence_views` names). Discover other tools and their inputs with:
 
 ```bash
 fatebridge discover --family bazi
@@ -97,7 +97,7 @@ Start REST locally with `API_HOST=127.0.0.1 fatebridge-api`. The default port is
 ## Read and verify results
 
 - **Inputs and time:** use confirmed information, including time zone, location, and analysis time. Do not fill an unknown birth hour with a default or example. Read the actual time convention returned by each method.
-- **Summary and full output:** `detail=compact` is the default on all three surfaces; project task-specific `fields` (strictly validated) for targeted views, or pass `detail=audit` with `fields=null` for complete JSON and method evidence. See [output controls and result reading](docs/agent-guide.md#输出控制与结果读取).
+- **Summary and full output:** all three surfaces return the core canonical layer by default (listing omitted optional heavy paths in `run_metadata.omitted_fields`); pass `include` (dotted paths, `evidence_views` names, or `["*"]` for lossless full output) to expand incrementally, or pass strictly validated `fields` for targeted projection (`include` and `fields` are mutually exclusive). See [output controls and result reading](docs/agent-guide.md#输出控制与结果读取).
 - **Ephemeris and precision:** an installed Python library does not establish that external data files were used. Check the actual model, source, and approximation flag. See [ephemeris setup](docs/ephemeris.md).
 - **Evidence and limits:** software regression, classical sources, and runtime dependencies are reported separately. A `partial` status limits its own layer. See [core concepts](docs/concepts.md).
 

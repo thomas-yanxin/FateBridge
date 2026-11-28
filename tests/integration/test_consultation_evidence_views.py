@@ -318,7 +318,6 @@ async def test_task_evidence_agrees_across_rest_mcp_and_cli(
         mcp = await original_payload(client, result)
     query = [("fields", f) for f in fields] + [
         ("as_of", as_of),
-        ("detail", "audit"),
     ]
     with TestClient(app) as client:
         response = client.post(spec.rest_path, json=example_input(spec), params=query)
@@ -331,8 +330,6 @@ async def test_task_evidence_agrees_across_rest_mcp_and_cli(
             as_of,
             "--fields",
             *fields,
-            "--detail",
-            "audit",
         ]
     )
     output = json.loads(capsys.readouterr().out)
@@ -345,14 +342,14 @@ async def test_task_evidence_agrees_across_rest_mcp_and_cli(
 
 
 @pytest.mark.asyncio
-async def test_audit_detail_keeps_full_result_despite_compact_views() -> None:
+async def test_include_wildcard_keeps_full_result() -> None:
     async with Client(create_mcp_app()) as client:
         result = await call_view(
             client,
             "relationship_chart",
             relative_mode="Composite",
             fields=None,
-            detail="audit",
+            include=["*"],
         )
         assert "result_delivery" not in result.structured_content
         payload = await original_payload(client, result)

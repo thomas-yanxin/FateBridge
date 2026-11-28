@@ -169,13 +169,12 @@ def test_all_ten_calendar_views_publish_actual_bundled_model_on_three_surfaces(
         response = rest.post(
             spec.rest_path,
             json=payload,
-            params=[("detail", "audit")] + [("fields", p) for p in fields],
+            params=[("fields", p) for p in fields],
         )
         protocol = asyncio.run(
             native(
                 spec,
                 payload,
-                detail="audit",
                 fields=fields,
             )
         )
@@ -185,8 +184,6 @@ def test_all_ten_calendar_views_publish_actual_bundled_model_on_three_surfaces(
             tmp_path,
             capsys,
             flags=[
-                "--detail",
-                "audit",
                 "--fields",
                 *fields,
             ],

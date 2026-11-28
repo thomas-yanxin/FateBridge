@@ -16,7 +16,7 @@ REFERENCES_ROOT = Path(__file__).resolve().parents[2] / "docs/interpretation"
 
 # note (cli): These global flags are accepted independently of the tool request model.
 GLOBAL_CLI_FLAGS = {
-    "--detail",
+    "--include",
     "--fields",
     "--as-of",
     "--request-file",

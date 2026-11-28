@@ -53,7 +53,6 @@ def test_new_year_eve_chart_and_flows_share_the_placement_date(
     assert chart["lunar_date"] == lunar
     assert chart["year_stem"] == year_stem
     assert chart["hour_branch"] == "子"
-    assert "rule_trace" not in chart
     for receipt in clocks["birth"], clocks["target"]:
         assert receipt["day_divide"] == policy
         assert receipt["placement_clock"] == "civil"

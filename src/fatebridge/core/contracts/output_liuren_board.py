@@ -61,7 +61,7 @@ class LiurenLesson(PartialOutput):
     relation: str | None = None
     relations: dict[str, str] | None = Field(
         default=None,
-        description="兼容优先标签仅列同支、合、冲、害；平不表示无刑破。并存支位条件见liureng.branch_relations。",
+        description="兼容优先标签仅列同支、合、冲、害；平不表示无刑破。并存支位条件见liuren.branch_relations。",
     )
     style_basis: str | None = None
     style_hint: str | None = None
@@ -138,13 +138,6 @@ class RenRuleset(PartialOutput):
     classical_conformance: str | None = None
     classical_acceptance_passed: bool | None = None
     unresolved: list[str] | None = None
-
-
-class RenRuleTrace(PartialOutput):
-    rule_id: str | None = None
-    source_section: str | None = None
-    source_url: str | None = None
-    result: Object | None = None
 
 
 class LiurenSourceNote(PartialOutput):

@@ -4,7 +4,6 @@ from fatebridge.core.contracts.output_base import OpenJsonValue, PartialOutput
 from fatebridge.core.contracts.output_midpoint_directions import SunEphemerisBatch
 from fatebridge.core.contracts.output_midpoint_geometry import (
     FactorSpan,
-    GeometryRuleTrace,
     GeometrySource,
     ReferenceAngleGeometry,
 )

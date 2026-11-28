@@ -307,7 +307,6 @@ def describe_batch_interface() -> ServiceResult:
             },
         ],
         "as_of": "2026-04-06T09:30:00+08:00",
-        "detail": "compact",
     }
     BatchRequest.model_validate(example_input)
     return {

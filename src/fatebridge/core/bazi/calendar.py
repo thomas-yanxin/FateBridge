@@ -105,10 +105,8 @@ _CHANGSHENG_TABLES: dict[str, dict[str, tuple[str, int]]] = {
     },
 }
 
-CHANGSHENG_START = _CHANGSHENG_TABLES["fire_earth_same_palace"]
 LU_SEATS = dict(zip("甲乙丙丁戊己庚辛壬癸", "寅卯巳午巳午申酉亥子"))
 YANG_BLADE_SEATS = dict(zip("甲丙戊庚壬", "卯午午酉子"))
-STAGE_PROFILE_ID = "ten_stem_yang_forward_yin_reverse_fire_earth_v1"
 
 # 人元司令分野 (30-day nominal schedules per month branch)
 MONTH_DUTY_SCHEDULES: dict[str, dict[str, tuple[tuple[str, int], ...]]] = {

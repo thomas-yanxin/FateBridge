@@ -11,8 +11,7 @@ class GuolaoMansion(PartialOutput):
     degree_lord: str | None = None
     right_ascension: float | None = None
     longitude: float | None = None
-    du_in_mansion: float | None = None
-    mansion_du_width: float | None = None
+    coordinate: float | None = None
     degree_in_mansion: float | None = None
     mansion_width: float | None = None
     boundary_distance: float | None = None
@@ -302,16 +301,6 @@ class GuolaoRuleset(PartialOutput):
     title: str | None = None
     source_url: str | None = None
     verified_subset: str | None = None
-
-
-class GuolaoRuleTrace(PartialOutput):
-    rule_id: str | None = None
-    source_id: str | None = None
-    locator: str | None = None
-    subject: str | None = None
-    inputs: dict[str, OpenJsonValue] | None = None
-    outputs: dict[str, OpenJsonValue] | None = None
-    placement_classical_acceptance: bool | None = None
 
 
 class GuolaoValidation(PartialOutput):

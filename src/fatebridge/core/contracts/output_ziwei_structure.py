@@ -6,7 +6,6 @@ from pydantic import Field
 
 from fatebridge.core.contracts.output_base import (
     FULL_FACT,
-    OpenJsonValue,
     PartialOutput,
 )
 from fatebridge.core.contracts.output_chinese_calendar import LunarDate
@@ -16,7 +15,6 @@ from fatebridge.core.contracts.output_ziwei_palaces import (
     ZiweiCycleRules,
     ZiweiPosition,
     ZiweiRuleset,
-    ZiweiRuleTrace,
     ZiweiStar,
     ZiweiStructuralEvidence,
 )

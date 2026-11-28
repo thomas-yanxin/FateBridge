@@ -106,6 +106,7 @@ def calculate_core_chart_analysis(
     node_mode: str = "mean",
     high_latitude_fallback: str = "error",
     include_minor_aspects: bool = False,
+    max_aspects: int | None = None,
     extra_bodies: list[str] | tuple[str, ...] = (),
     birth_time_uncertainty_minutes: float | None = None,
     analysis_datetime: datetime | None = None,
@@ -197,6 +198,7 @@ def calculate_core_chart_analysis(
         node_mode=node_mode,
         high_latitude_fallback=high_latitude_fallback,
         include_minor_aspects=include_minor_aspects,
+        max_aspects=max_aspects,
         extra_bodies=extra_bodies,
     )
     result["summary"] = [
@@ -244,6 +246,8 @@ def calculate_germany_chart_analysis(
     high_latitude_fallback: str = "error",
     dial_degrees: str | None = None,
     sensitive_point_query: str | None = None,
+    max_higher_factor_contacts: int | None = 12,
+    max_mixed_pair_contacts: int | None = 2,
 ) -> dict[str, Any]:
     """
     Build the FateBridge midpoint/germany chart payload.
@@ -279,6 +283,7 @@ def calculate_germany_chart_analysis(
         high_latitude_fallback=high_latitude_fallback,
         dial_degrees=dial_degrees,
         sensitive_point_query=sensitive_point_query,
+        max_higher_factor_contacts=max_higher_factor_contacts,
     )
     sample_times = enrich_specialty_sensitivity(
         result,
@@ -286,7 +291,14 @@ def calculate_germany_chart_analysis(
         kind="germany",
         uncertainty_minutes=birth_time_uncertainty_minutes,
     )
-    enrich_solar_arc(result, birth_info, analysis_datetime, sample_times=sample_times)
+    enrich_solar_arc(
+        result,
+        birth_info,
+        analysis_datetime,
+        sample_times=sample_times,
+        max_higher_factor_contacts=max_higher_factor_contacts,
+        max_mixed_pair_contacts=max_mixed_pair_contacts,
+    )
     layer = result.get("midpoint_analysis")
     if isinstance(layer, dict) and "time_sensitivity" in layer:
         layer["birth_time_sensitivity"] = layer.pop("time_sensitivity")

@@ -1,4 +1,17 @@
 {
+  "default_omit": [
+    "calendar_context",
+    "qimen.calendar_policy",
+    "qimen.assessment",
+    "qimen.fushi_hexagram",
+    "qimen.hidden_stems_palace_map",
+    "qimen.ju_decision",
+    "qimen.palaces.*.door_hexagram",
+    "qimen.palaces.*.content_palace",
+    "qimen.palaces.*.content_trigram",
+    "qimen.palaces.*.heaven_origin_trigram",
+    "qimen.palaces.*.god_sequence_index"
+  ],
   "evidence_views": {
     "directional": {
       "fields": [

@@ -141,26 +141,6 @@ class DiceDetails(PartialOutput):
     houses_ruled_by_rolled_planet: list[int] | None = None
 
 
-class DiceRuleset(PartialOutput):
-    id: str | None = None
-    author: str | None = None
-    version: str | None = None
-    source_url: str | None = None
-    source_path: str | None = None
-    additional_urls: list[str] | None = None
-    source_kind: str | None = None
-    scope: str | None = None
-
-
-class DiceRuleTrace(PartialOutput):
-    rule_id: str | None = None
-    ruleset_id: str | None = None
-    supporting_ruleset_ids: list[str] | None = None
-    inputs: dict[str, JsonValue] | None = None
-    result: dict[str, JsonValue] | None = None
-    scope: str | None = None
-
-
 class DiceValidation(PartialOutput):
     calendar: str | None = None
     classical: str | None = None

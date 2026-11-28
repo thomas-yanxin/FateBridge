@@ -60,7 +60,6 @@ def calendar_check(rid: str, position: str, a: str, b: str) -> dict[str, Any]:
     }
 
 
-RULE = "jinkou.jingben_relations"
 SECTION = "卷上·四绝/四败/岁君建破"
 POSITIONS = ("人元", "贵神", "将神", "地分")
 
@@ -291,14 +290,7 @@ def validate_relations(value: dict[str, Any]) -> None:
 
 def validate_relation_anchors(board: dict[str, Any], *, complete: bool = False) -> None:
     primary = board.get("relations")
-    traces = [t for t in board.get("rule_trace") or [] if t.get("rule_id") == RULE]
-    if len(traces) > 1:
-        raise ValueError("京本结构关系须保留唯一同次规则轨迹")
     nodes = [primary] if isinstance(primary, dict) else []
-    for trace in traces:
-        same(trace, "source_section", SECTION)
-        if isinstance(trace.get("result"), dict):
-            nodes.append(trace["result"])
     if complete and not isinstance(primary, dict):
         raise ValueError("完整金口诀须保留京本结构关系")
     anchors: dict[str, Any] = {}

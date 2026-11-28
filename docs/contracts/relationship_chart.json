@@ -1,10 +1,40 @@
 {
   "call_guidance": {
-    "delivery": "主层超预算时从 result_delivery 读取同一 run；投影后不能恢复首次未选字段。完整JSON首次 fields=null。",
+    "delivery": "按需通过 include 或 fields 展开或投影所需分支（默认省略部分次级比对路径见 run_metadata.omitted_fields）；完整JSON使用 include=[\"*\"]。",
     "marks": "Marks主层为marks_chart_pair，分别读marks_charts.inner/outer；chart仅为内方别名。每盘是本人与双方Davison资料再次计算Davison，沿实际davison_variant；不使用已撤除的组合／时空盘混合算法，不把个人象征盘当双方共同盘。",
     "mode_aliases": "Comp→compare；Composite→composite；Synastry→influence；TimeSpace→timespace；Marks→marks；数值0..4依次对应这五种规范模式。",
     "views": "首次按已选 relative_mode 取 evidence_views 对应 fields；suggested_fields 是未选专用视图时的安全联合，不要求每次读取全部分支。核对实际 relationship_profile.relative_mode_normalized/primary_layer。"
   },
+  "default_omit": [
+    "inner_chart",
+    "outer_chart",
+    "inner",
+    "outer",
+    "in_to_out_midpoint",
+    "out_to_in_midpoint",
+    "in_to_out_antiscia",
+    "out_to_in_antiscia",
+    "in_to_out_contra_antiscia",
+    "out_to_in_contra_antiscia",
+    "composite_to_inner_aspects",
+    "composite_to_outer_aspects",
+    "chart.aspect_evidence",
+    "chart.houses",
+    "chart.aspects",
+    "chart.planets.*.dignity",
+    "chart.balance_basis",
+    "chart.chart_profile.derivation_policy",
+    "chart.chart_profile.aspect_policy",
+    "chart.chart_profile.physical_ephemeris_source",
+    "marks_charts.*.aspect_evidence",
+    "marks_charts.*.houses",
+    "marks_charts.*.aspects",
+    "marks_charts.*.planets.*.dignity",
+    "marks_charts.*.balance_basis",
+    "marks_charts.*.chart_profile.derivation_policy",
+    "marks_charts.*.chart_profile.aspect_policy",
+    "marks_charts.*.chart_profile.physical_ephemeris_source"
+  ],
   "evidence_views": {
     "compare": {
       "aliases": [

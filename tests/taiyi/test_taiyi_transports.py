@@ -110,7 +110,6 @@ def test_published_first_views_preserve_evidence_and_adjudications(
                 spec.name,
                 {
                     **inputs,
-                    "detail": "audit",
                     "fields": selected_fields,
                 },
                 raise_on_error=False,
@@ -222,15 +221,13 @@ def test_taiyi_evidence_across_real_transports(
     )
     options = {
         "as_of": "2026-10-22T12:00:00+08:00",
-        "detail": "audit",
         "fields": fields,
     }
     route = "/api/taiyi" if key == "taiyi" else "/api/divination/sanshi"
     response = TestClient(api.app).post(
         route,
         json=payload,
-        params=[("as_of", options["as_of"]), ("detail", "audit")]
-        + [("fields", f) for f in fields],
+        params=[("as_of", options["as_of"])] + [("fields", f) for f in fields],
     )
     assert response.status_code == 200, response.text
 
@@ -254,7 +251,7 @@ def test_taiyi_evidence_across_real_transports(
             "--" + name.replace("_", "-"),
             json.dumps(value) if isinstance(value, dict) else str(value),
         ]
-    args += ["--as-of", options["as_of"], "--detail", "audit", "--fields", *fields]
+    args += ["--as-of", options["as_of"], "--fields", *fields]
     capsys.readouterr()
     status = run(args)
     cli = json.loads(capsys.readouterr().out)

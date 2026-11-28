@@ -537,7 +537,6 @@ def build_jinkou_board(
     if runyear:
         overview["runyear"] = runyear
 
-    # Never duplicate full solar_term_dependencies or top-level board blocks inside rule_trace.
     raw_policy = seed.calendar_context.get("ren_calendar_policy")
     calendar_policy = compact_calendar_policy(raw_policy)
     if _is_child_course and "solar_term_dependencies" in calendar_policy:

@@ -18,7 +18,6 @@ from fatebridge.core.metaphysics.jinkou.patterns import branch_breaks
 
 POSITIONS = ("人元", "贵神", "将神", "地分")
 CONTEXTS = (("god_general", 1, 2), ("god_ground", 1, 3), ("general_ground", 2, 3))
-RULE = "jinkou.jingben_branch_breaks"
 
 
 def pair_facts(a: str, b: str) -> dict[str, Any]:
@@ -131,21 +130,9 @@ def align_branch_breaks(value: Any, *, complete: bool = False) -> None:
         if all(by_role.get(p) is not None for p in POSITIONS[1:]):
             expected = branch_breaks(*(cast(str, by_role[p]) for p in POSITIONS[1:]))
     block = board.get("branch_breaks")
-    traces = [t for t in board.get("rule_trace") or [] if t.get("rule_id") == RULE]
-    if len(traces) > 1:
-        raise ValueError("破支事实的规则轨迹不可重复")
-    for trace in traces:
-        if trace.get("result") is not None:
-            JinkouBranchBreaks.model_validate(trace["result"])
     if complete:
         if expected is None or block is None:
             raise ValueError("完整金口诀须保留三组破支事实")
         compare(block, expected, complete=True)
-    else:
-        if expected is not None:
-            if block is not None:
-                compare(block, expected)
-            if traces and "result" in traces[0]:
-                compare(traces[0]["result"], expected)
-        if block is not None and traces and "result" in traces[0]:
-            compare(traces[0]["result"], block)
+    elif expected is not None and block is not None:
+        compare(block, expected)

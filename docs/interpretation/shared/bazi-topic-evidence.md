@@ -21,7 +21,7 @@
 
 ## 格局、扶抑与调候分别取证
 
-综合命盘读取 `structure_profile`，专题读取 `<topic>_analysis.topic_facts`，标准命盘读取 `bazi_birth.structure_profile` 与 `bazi_birth.intra_month_duty`。`depth` / `audit` 视图或未投影的完整结果保留 `dominant_structure`、`structure_detail`、`seasonal_climate`、`markers`、`palace_relations`、`natal_groups` 与 `timing_layers`。
+综合命盘读取 `structure_profile`，专题读取 `<topic>_analysis.topic_facts`，标准命盘读取 `bazi_birth.structure_profile` 与 `bazi_birth.intra_month_duty`。`depth` 视图或未投影的完整结果（`include=["*"]`）保留 `dominant_structure`、`structure_detail`、`seasonal_climate`、`markers`、`palace_relations`、`natal_groups` 与 `timing_layers`。
 
 - **月令格局 vs 扶抑 vs 调候**：`topic_facts.dominant_structure` 给出主格局名称，`topic_facts.structure_detail`（综合/标准命盘为 `structure_profile.dominant_structure`）给出 `key`、`category`、`selection_rule`、`month_stem`、`month_ten_god`、`formation_status`、`obstructions`、`rescues`、`useful_elements`、`avoid_elements` 与 `reason`；`day_master.strength`（综合命盘另有 `day_master.classical_adjudication`）区分扶抑强弱；`seasonal_climate` 给出调候用神与透藏观测。
 - **人元司令与交气**：`bazi_birth.intra_month_duty`（及综合命盘 `intra_month_duty`）保留月令司令来源与透藏状态；`calendar_context` 中节气 `datetime_with_offset` 保留偏移与 `fold`，起运年龄在 `bazi_timing` / `bazi_luck_cycles` 中区分 `start_age_precise` 与整数 `start_age`。

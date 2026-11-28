@@ -95,14 +95,9 @@ def test_confirmed_neither_and_pending_other_conditions_agree_on_all_surfaces(
     response, protocol, code, local = surface_calls(
         spec,
         payload,
-        params=[
-            ("detail", "audit"),
-            *(("fields", f) for f in fields),
-        ],
-        options={"detail": "audit", "fields": fields},
+        params=[("fields", f) for f in fields],
+        options={"fields": fields},
         flags=[
-            "--detail",
-            "audit",
             "--fields",
             *fields,
             "--weather-context",
@@ -117,7 +112,6 @@ def test_confirmed_neither_and_pending_other_conditions_agree_on_all_surfaces(
         assert weather["context"]["prior_condition"] == "neither_prolonged"
         assert weather["context"]["season"] is None
         assert weather["context"]["many_min_count"] is None
-        assert "rule_trace" not in weather
         assert set(weather["matched_rule_ids"]).isdisjoint(PRIOR_RULES)
         assert set(weather["pending_rule_ids"]).isdisjoint(PRIOR_RULES)
         assert weather["single_forecast"] is None

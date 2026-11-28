@@ -224,7 +224,7 @@ def test_single_subject_fanout_and_shared_as_of() -> None:
                     "id": "ziwei",
                     "tool": "ziwei_birth_chart",
                     "subject": "alice",
-                    "detail": "audit",
+                    "include": ["*"],
                 },
                 {"id": "astro", "tool": "astrology_chart", "subject": "alice"},
                 {"id": "vedic", "tool": "vedic_chart", "subject": "alice"},
@@ -303,7 +303,7 @@ def test_multi_subject_compatibility_and_fengshui_pairing() -> None:
                     "tool": "fengshui_assess",
                     "subjects": ["alice", "bob"],
                     "arguments": {"house": {"sitting_trigram": "坎"}},
-                    "detail": "audit",
+                    "include": ["*"],
                 },
             ],
         }
@@ -426,7 +426,6 @@ def test_three_surface_batch_parity_mcp_rest_cli(
             "relationship_type": "general",
         },
         "as_of": "2026-10-12T12:00:00+08:00",
-        "detail": "compact",
         "calls": [
             {
                 "id": "alice_bazi",
@@ -438,7 +437,7 @@ def test_three_surface_batch_parity_mcp_rest_cli(
                 "id": "alice_astro",
                 "tool": "astrology_chart",
                 "subject": "alice",
-                "detail": "audit",
+                "include": ["*"],
             },
             {
                 "id": "pair_bazi",

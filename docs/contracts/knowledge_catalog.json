@@ -7,6 +7,9 @@
       "provenance"
     ]
   },
+  "default_omit": [
+    "provenance"
+  ],
   "evidence_views": {
     "sources": {
       "fields": [
@@ -36,6 +39,21 @@
         "default": null,
         "description": "Optional domain filter: astro/bazi/liureng/qimen/heluo/canping/human_design. Heluo/Canping/Human Design expose source-bound partial references; catalogues do not select rules applicable to a person. Human Design retains384line locators; actual coverage reports pending local paraphrases, uncurated meanings and independent acceptance separately. Omit for all domains with separate source provenance.",
         "title": "Domain"
+      },
+      "keys_sample_limit": {
+        "anyOf": [
+          {
+            "maximum": 5000,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": 4,
+        "description": "每个分类返回的键值样例数量上限（1-5000，默认 4；设为 null 返回全部键）",
+        "title": "Keys Sample Limit"
       }
     },
     "title": "KnowledgeRegistryRequest",

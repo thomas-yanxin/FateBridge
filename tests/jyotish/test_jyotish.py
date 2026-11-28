@@ -5,10 +5,13 @@ from __future__ import annotations
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor
+from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 
 import pytest
 
+from fatebridge.application.execution import execute_with_receipt
+from fatebridge.application.response_delivery import deliver_response
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.jyotish.ashtakavarga import (
@@ -42,9 +45,8 @@ from fatebridge.core.jyotish.yogas import (
 from fatebridge.services.jyotish import (
     calculate_vedic_chart,
     calculate_vimshottari,
-    compact_vedic_chart,
-    compact_vimshottari,
 )
+from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.surface_payloads import astro_payload
 
 UTC = timezone.utc
@@ -215,9 +217,39 @@ def test_pyjhora_bphs_delhi_oracle_and_new_vedic_features() -> None:
     assert india["upagrahas"]["gulika"] is not None
     assert "yogas" in india["yogas"]
 
-    # Compact size check (<10 KB)
-    compact = compact_vedic_chart(res)
-    assert len(json.dumps(compact, ensure_ascii=False).encode("utf-8")) < 10240
+    # Default delivery size check (<=10 KiB) & lossless include=["*"]
+    vedic_spec = next(s for s in CATALOG if s.name == "vedic_chart")
+    vedic_raw = execute_with_receipt(
+        vedic_spec,
+        vedic_spec.request_model.model_validate(
+            {
+                "birth_year": 1990,
+                "birth_month": 5,
+                "birth_day": 15,
+                "birth_hour": 14,
+                "birth_minute": 30,
+                "birth_timezone": "+05:30",
+                "birth_longitude": 77.2090,
+                "birth_latitude": 28.6139,
+                "ayanamsa": "lahiri",
+                "node_mode": "mean",
+            }
+        ),
+    )
+    vedic_default = deliver_response(deepcopy(vedic_raw), spec=vedic_spec)
+    assert len(json.dumps(vedic_default, ensure_ascii=False).encode("utf-8")) <= 10240
+    assert "vedic_chart.ashtakavarga" in vedic_default["run_metadata"]["omitted_fields"]
+    assert (
+        deliver_response(deepcopy(vedic_raw), spec=vedic_spec, include=["*"])
+        == vedic_raw
+    )
+    vedic_strength = deliver_response(
+        deepcopy(vedic_raw), spec=vedic_spec, include=["strength"]
+    )
+    assert (
+        vedic_strength["vedic_chart"]["strengths"]
+        == vedic_raw["vedic_chart"]["strengths"]
+    )
 
 
 def test_five_ayanamsas_and_all_dasha_systems() -> None:
@@ -264,13 +296,47 @@ def test_five_ayanamsas_and_all_dasha_systems() -> None:
     assert "yogini" in dasha_res and len(dasha_res["yogini"]["timeline"]) == 8
     assert "ashtottari" in dasha_res and len(dasha_res["ashtottari"]["timeline"]) == 8
     assert "chara" in dasha_res and len(dasha_res["chara"]["timeline"]) == 12
+    dasha_spec = next(s for s in CATALOG if s.name == "vimshottari_dasha")
+    dasha_raw = execute_with_receipt(
+        dasha_spec,
+        dasha_spec.request_model.model_validate(
+            {
+                "birth_year": 1990,
+                "birth_month": 5,
+                "birth_day": 15,
+                "birth_hour": 14,
+                "birth_minute": 30,
+                "birth_timezone": "+05:30",
+                "birth_longitude": 77.209,
+                "birth_latitude": 28.6139,
+                "analysis_year": 2026,
+                "analysis_month": 5,
+                "analysis_day": 15,
+                "year_basis": "julian_365_25",
+                "dasha_depth": 4,
+                "include_yogini": True,
+                "include_ashtottari": True,
+                "include_chara": True,
+            }
+        ),
+    )
+    dasha_default = deliver_response(deepcopy(dasha_raw), spec=dasha_spec)
+    assert len(json.dumps(dasha_default, ensure_ascii=False).encode("utf-8")) <= 10240
     assert (
-        len(
-            json.dumps(compact_vimshottari(dasha_res), ensure_ascii=False).encode(
-                "utf-8"
-            )
-        )
-        < 5120
+        "vimshottari.timeline.*.antardashas"
+        in dasha_default["run_metadata"]["omitted_fields"]
+    )
+    assert "yogini.timeline" in dasha_default["run_metadata"]["omitted_fields"]
+    assert (
+        deliver_response(deepcopy(dasha_raw), spec=dasha_spec, include=["*"])
+        == dasha_raw
+    )
+    dasha_timeline = deliver_response(
+        deepcopy(dasha_raw), spec=dasha_spec, include=["timeline"]
+    )
+    assert (
+        dasha_timeline["vimshottari"]["timeline"]
+        == dasha_raw["vimshottari"]["timeline"]
     )
 
 

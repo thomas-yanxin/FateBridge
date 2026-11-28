@@ -169,19 +169,49 @@ def test_invalid_http_bodies_use_safe_common_error_envelope(
     assert "sensitive" not in response.text
 
 
-@pytest.mark.parametrize("detail", ["private-detail", "standard"])
+@pytest.mark.parametrize("detail", ["private-detail", "standard", "compact", "audit"])
 def test_invalid_http_detail_uses_safe_validation_error(
     rest: TestClient, detail: str
 ) -> None:
-    """Malformed detail values are rejected cleanly without echoing raw input."""
+    """Removed detail query param is rejected with 422 without echoing raw input."""
     response = rest.post(
         "/api/divination/gua",
         params={"detail": detail},
-        json={"query": "乾"},
+        json={"queries": ["乾"]},
     )
     assert response.status_code == 422
-    assert response.json()["error_code"] == "validation_error"
+    body = response.json()
+    assert body["error_code"] == "validation_error"
+    assert body["issues"][0]["path"] == "detail"
+    assert body["issues"][0]["code"] == "extra_forbidden"
+    assert body["issues"][0]["constraints"] == {
+        "allowed_fields": ["include", "fields", "as_of"]
+    }
     assert detail not in response.text
+
+    batch_response = rest.post(
+        "/api/batch",
+        params={"detail": detail},
+        json={
+            "calls": [
+                {"id": "c1", "tool": "gua_lookup", "arguments": {"queries": ["乾"]}}
+            ]
+        },
+    )
+    assert batch_response.status_code == 422
+    assert batch_response.json()["error_code"] == "validation_error"
+    assert detail not in batch_response.text
+
+    openapi = rest.get("/openapi.json").json()
+    calc_params = {
+        param["name"]
+        for param in openapi["paths"]["/api/divination/gua"]["post"].get(
+            "parameters", []
+        )
+    }
+    assert calc_params == {"include", "fields", "as_of"}
+    tools_resp = rest.get("/api/tools", params={"detail": "brief"})
+    assert tools_resp.status_code == 200
 
 
 @pytest.mark.parametrize("has_explicit_path", [False, True])

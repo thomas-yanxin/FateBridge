@@ -3,14 +3,15 @@
 import json
 import subprocess
 import time
+from copy import deepcopy
 
 import pytest
 
+from fatebridge.application.execution import execute_with_receipt
+from fatebridge.application.response_delivery import deliver_response
 from fatebridge.core.human_design import depth, mechanics
-from fatebridge.services.human_design import (
-    calculate_human_design,
-    compact_human_design,
-)
+from fatebridge.services.human_design import calculate_human_design
+from fatebridge.services.tool_catalog import CATALOG
 
 
 def test_rave_mandala_exact_boundaries() -> None:
@@ -108,9 +109,31 @@ def test_oracle_1990_05_15_and_new_phs_fields(monkeypatch: pytest.MonkeyPatch) -
     assert "interpretation" not in res
     assert all("reading" not in row for row in res["depth_evidence"]["line_fixings"])
 
-    compact = compact_human_design(res)
-    compact_bytes = len(json.dumps(compact, ensure_ascii=False).encode("utf-8"))
-    assert compact_bytes < 6144
+    hd_spec = next(s for s in CATALOG if s.name == "human_design")
+    hd_raw = execute_with_receipt(
+        hd_spec,
+        hd_spec.request_model.model_validate(
+            {
+                "birth_year": 1990,
+                "birth_month": 5,
+                "birth_day": 15,
+                "birth_hour": 14,
+                "birth_minute": 30,
+                "birth_timezone": "Asia/Shanghai",
+                "node_mode": "true",
+            }
+        ),
+    )
+    hd_default = deliver_response(deepcopy(hd_raw), spec=hd_spec)
+    default_bytes = len(json.dumps(hd_default, ensure_ascii=False).encode("utf-8"))
+    assert default_bytes <= 10240
+    assert "activations" in hd_default["run_metadata"]["omitted_fields"]
+    assert "depth_evidence.line_fixings" in hd_default["run_metadata"]["omitted_fields"]
+    assert deliver_response(deepcopy(hd_raw), spec=hd_spec, include=["*"]) == hd_raw
+    hd_auth = deliver_response(deepcopy(hd_raw), spec=hd_spec, include=["authority"])
+    assert hd_auth["bodygraph"]["centers"] == hd_raw["bodygraph"]["centers"]
+    hd_profile = deliver_response(deepcopy(hd_raw), spec=hd_spec, include=["profile"])
+    assert hd_profile["profile"] == hd_raw["profile"]
 
 
 def test_composite_transit_cycles_and_sensitivity() -> None:
@@ -141,3 +164,34 @@ def test_composite_transit_cycles_and_sensitivity() -> None:
     )
     assert "newly_activated_channels" in res["transit_overlay"]
     assert "electromagnetic" in res["composite"]["connection_channels"]
+
+    hd_spec = next(s for s in CATALOG if s.name == "human_design")
+    heavy_raw = execute_with_receipt(
+        hd_spec,
+        hd_spec.request_model.model_validate(
+            {
+                "birth_year": 1990,
+                "birth_month": 5,
+                "birth_day": 15,
+                "birth_hour": 14,
+                "birth_minute": 30,
+                "birth_timezone": "Asia/Shanghai",
+                "birth_time_uncertainty_minutes": 5,
+                "cycle_reference_datetime": "2020-01-01T00:00:00Z",
+                "transit_datetime": "2026-06-01T00:00:00Z",
+                "partner": {
+                    "birth_year": 1992,
+                    "birth_month": 8,
+                    "birth_day": 20,
+                    "birth_hour": 9,
+                    "birth_minute": 15,
+                    "birth_timezone": "Asia/Shanghai",
+                },
+            }
+        ),
+    )
+    heavy_default = deliver_response(deepcopy(heavy_raw), spec=hd_spec)
+    assert len(json.dumps(heavy_default, ensure_ascii=False).encode("utf-8")) <= 10240
+    assert (
+        deliver_response(deepcopy(heavy_raw), spec=hd_spec, include=["*"]) == heavy_raw
+    )

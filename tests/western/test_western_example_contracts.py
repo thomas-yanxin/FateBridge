@@ -145,7 +145,6 @@ def test_public_descriptor_drives_each_available_adapter_without_private_input_d
                 params = {
                     "tool": spec.name,
                     "arguments": data,
-                    "detail": "audit",
                     "as_of": AS_OF,
                     **({"fields": fields} if fields is not None else {}),
                 }
@@ -155,7 +154,6 @@ def test_public_descriptor_drives_each_available_adapter_without_private_input_d
                     {
                         **data,
                         "as_of": AS_OF,
-                        "detail": "audit",
                         **({"fields": fields} if fields is not None else {}),
                     },
                     raise_on_error=False,
@@ -168,7 +166,7 @@ def test_public_descriptor_drives_each_available_adapter_without_private_input_d
     data = record["example_input"]
     fields = record.get("suggested_fields")
     if spec.rest_path:
-        params: dict[str, object] = {"as_of": AS_OF, "detail": "audit"}
+        params: dict[str, object] = {"as_of": AS_OF}
         if fields is not None:
             params["fields"] = fields
         response = rest.post(spec.rest_path, json=data, params=params)
@@ -178,7 +176,7 @@ def test_public_descriptor_drives_each_available_adapter_without_private_input_d
     description = json.loads(capsys.readouterr().out)
     assert description["example_input"] == data
     assert "example_context" not in description
-    flags = ["--detail", "audit"]
+    flags: list[str] = []
     if fields is not None:
         flags += ["--fields", *fields]
     subject = tmp_path / "published-example.json"

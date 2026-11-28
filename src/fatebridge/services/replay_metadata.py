@@ -3,10 +3,9 @@
 from typing import TypedDict
 
 from pydantic import BaseModel, JsonValue
-from typing_extensions import NotRequired
 
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
-from fatebridge.core.execution_context import CallClock, ExecutionOptions
+from fatebridge.core.execution_context import CallClock
 from fatebridge.core.reproducibility import policy_for
 
 
@@ -24,8 +23,8 @@ class ReplayReceipt(TypedDict):
 class ExecutionReceipt(TypedDict):
     effective_time: EffectiveTimeReceipt
     warnings: list[str]
-    replay: NotRequired[ReplayReceipt]
-    duration_ms: NotRequired[float]
+    replay: ReplayReceipt
+    duration_ms: float
 
 
 def execution_receipt(
@@ -34,11 +33,9 @@ def execution_receipt(
     result: ServiceResult,
     *,
     clock: CallClock,
-    options: ExecutionOptions,
     elapsed_ms: float,
     generated_seed: bool,
     replay_overrides: dict[str, JsonValue],
-    compact_receipt: bool = False,
 ) -> ExecutionReceipt:
     policy = spec.reproducibility or policy_for(
         spec.request_model,
@@ -57,23 +54,13 @@ def execution_receipt(
         if clock.reads and (time_defaults or policy.implicit_current_time)
         else []
     ) + (["random_seed_generated"] if generated_seed else [])
-    receipt: ExecutionReceipt = {
+    return {
         "effective_time": {"as_of": as_of, "clock_timezones": sorted(clock.reads)},
         "warnings": warnings,
-    }
-    if replay_overrides:
-        receipt["replay"] = {
+        "duration_ms": round(elapsed_ms, 3),
+        "replay": {
             "as_of": as_of,
             "overrides": replay_overrides,
             "requires_original_input": True,
-        }
-    if compact_receipt:
-        return receipt
-
-    receipt["duration_ms"] = round(elapsed_ms, 3)
-    receipt["replay"] = {
-        "as_of": as_of,
-        "overrides": replay_overrides,
-        "requires_original_input": True,
+        },
     }
-    return receipt

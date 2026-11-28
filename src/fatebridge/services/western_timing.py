@@ -51,6 +51,12 @@ def calculate_western_timing_analysis(
     show_pd_bounds: bool = True,
     high_latitude_fallback: str = "error",
     pd_direction_mode: str = "zodiacal",
+    pd_max_age_years: float = 100.0,
+    pd_window_size: int = 6,
+    pd_nearby_years: float = 5.0,
+    pd_timeline_limit: int = 25,
+    orb_limit: float = 1.5,
+    max_hits: int | None = None,
     techniques: list[str] | None = None,
     include_full_timelines: bool = False,
 ) -> dict[str, Any]:
@@ -100,6 +106,12 @@ def calculate_western_timing_analysis(
         show_pd_bounds=show_pd_bounds,
         high_latitude_fallback=high_latitude_fallback,
         pd_direction_mode=pd_direction_mode,
+        pd_max_age_years=pd_max_age_years,
+        pd_window_size=pd_window_size,
+        pd_nearby_years=pd_nearby_years,
+        pd_timeline_limit=pd_timeline_limit,
+        orb_limit=orb_limit,
+        max_hits=max_hits,
         techniques=techniques,
         include_full_timelines=include_full_timelines,
     )
@@ -138,7 +150,14 @@ def calculate_western_timing_module_analysis(
     show_pd_bounds: bool = True,
     high_latitude_fallback: str = "error",
     pd_direction_mode: str = "zodiacal",
+    pd_max_age_years: float = 100.0,
+    pd_window_size: int = 6,
+    pd_nearby_years: float = 5.0,
+    pd_timeline_limit: int = 25,
+    orb_limit: float = 1.5,
+    max_hits: int | None = None,
     scan_days: int | None = None,
+    include_full_timelines: bool = False,
 ) -> dict[str, Any]:
     """Build a single western timing technique payload for standalone tools."""
     house_system = normalize_house_system(house_system)
@@ -182,5 +201,12 @@ def calculate_western_timing_module_analysis(
         show_pd_bounds=show_pd_bounds,
         high_latitude_fallback=high_latitude_fallback,
         pd_direction_mode=pd_direction_mode,
+        pd_max_age_years=pd_max_age_years,
+        pd_window_size=pd_window_size,
+        pd_nearby_years=pd_nearby_years,
+        pd_timeline_limit=pd_timeline_limit,
+        orb_limit=orb_limit,
+        max_hits=max_hits,
         scan_days=scan_days,
+        include_full_timelines=include_full_timelines,
     )

@@ -2,13 +2,13 @@
 
 [文档中心](README.md) · [快速入门](getting-started.md) · [API 参考](api-reference.md) · [算法覆盖矩阵](algorithm-coverage.md)
 
-应用与 Agent 宿主集成 FateBridge 遵循四步闭环：**1. 发现 → 2. 调用 → 3. 读取 → 4. 恢复**。REST（`fatebridge-api`，默认 `:8010`）、FastMCP（`fatebridge-mcp`）与 CLI（`fatebridge <tool>`）共用同一中央目录与执行管道：目录共有 90 条记录，REST 公开 90 个工具，CLI 可执行 90 条目录命令，MCP 通过三个入口提供 90 项业务能力，完整清单见[算法覆盖矩阵](algorithm-coverage.md)。
+应用与 Agent 宿主集成 FateBridge 遵循四步闭环：**1. 发现 → 2. 调用 → 3. 读取 → 4. 恢复**。REST（`fatebridge-api`，默认 `:8010`）、FastMCP（`fatebridge-mcp`）与 CLI（`fatebridge <tool>`）共用同一中央目录与执行管道：目录共有 91 条记录，REST 公开 91 个工具，CLI 可执行 91 条目录命令，MCP 通过三个入口提供 91 项业务能力，完整清单见[算法覆盖矩阵](algorithm-coverage.md)。
 
 | 环节 | 核心动作 | 跳转 |
 | --- | --- | --- |
 | 1. 发现 | 动态查询 `family`、`q`、`tool` 与按需 `output_schema` | [发现：自助发现，不硬编码工具列表](#1-发现自助发现不硬编码工具列表) |
 | 2. 调用 | 选择通道并准备出生资料、控制项与业务参数 | [调用：三端控制面与按通道接入](#2-调用三端控制面与按通道接入) · [按通道接入](#按通道接入) |
-| 3. 读取 | 使用 `detail=compact\|audit` 与严格 `fields` 路径投影 | [输出控制与结果读取](#输出控制与结果读取) |
+| 3. 读取 | 使用 `include` 增量展开与严格 `fields` 路径投影 | [输出控制与结果读取](#输出控制与结果读取) |
 | 4. 恢复 | 按 `error_code`、`issues[]` 与 `run_metadata` 修正或复现 | [错误恢复与复现](#错误恢复与复现) |
 | 领域接入 | 遵循咨询流程或集成 8 个家居风水工具 | [Agent 接入闭环](#agent-接入闭环) · [家居风水接入](#家居风水接入) |
 
@@ -24,7 +24,7 @@
 | 需要完整输出 Schema | 传入 `detail=full` 并配合 `tool`、`family` 或 `q` 过滤，且显式设置 `include_output_schema=True` |
 
 - `detail="brief"`：仅返回必填字段、`field_types`、一两行 `usage_hint` 与 `evidence_views` 名称列表，适合批量预检多个工具。
-- `detail="summary"`（默认）：未传 `tool`/`tools` 时返回全局 `counts`、`families` 与工具摘要；指定单个 `tool` 时直接解包返回该工具的 `input_schema`、`output_fields`、`example_input`、`evidence_views`、`suggested_fields` 与 `compact_fields`；指定多个 `tools` 时返回精简列表。
+- `detail="summary"`（默认）：未传 `tool`/`tools` 时返回全局 `counts`、`families` 与工具摘要；指定单个 `tool` 时直接解包返回该工具的 `input_schema`、`output_fields`、`example_input`、`evidence_views`、`suggested_fields` 与 `default_omit`；指定多个 `tools` 时返回精简列表。
 - `detail="full"`：返回完整契约（包括 `output_fields` 等），**必须**配合 `tool`、`tools`、`family` 或 `q` 之一过滤（否则返回 `validation_error` / `filter_required_for_full_detail`）。**`output_schema` 默认不返回**，仅当显式传入 `include_output_schema=True`（REST `?include_output_schema=true`，CLI `--include-output-schema`）时才会附带。
 - 拼写错误时返回 `unknown_tool`（404）并在 `issues[].constraints.suggestions` 给出候选名称。
 
@@ -53,8 +53,8 @@ REST、MCP 与 CLI 共用三项正交控制参数：
 
 | 控制项 | REST（URL 查询参数） | MCP（`run_calculation` 参数） | CLI（子命令选项） | 默认值与行为 |
 | --- | --- | --- | --- | --- |
-| `detail` | `?detail=compact\|audit` | `detail="compact"\|"audit"` | `--detail compact\|audit` | 默认 `compact`（保留影响结论的核心证据与限定条件，如奇门 `patterns`/`coexisting_conflicts`/`hour_void_scope`、卜卦 `perfection.status`/`radicality`/`moon`/`principal_reception`）；`audit` 返回完整载荷与计时重放元数据 |
-| `fields` | `?fields=a&fields=b.c` | `fields=["a", "b.c"]` | `--fields a b.c` | 严格校验点号对象路径；`run_metadata` 始终保留 |
+| `include` | `?include=view&include=a.b` 或 `?include=*` | `include=["view", "a.b"]` 或 `include=["*"]` | `--include view a.b` 或 `--include "*"` | 默认省略 `default_omit` 中的重型次级块（见 `run_metadata.omitted_fields`）；`include` 按需增量展开点号路径、`evidence_views` 名称或 `["*"]` 无损全量（与 `fields` 互斥） |
+| `fields` | `?fields=a&fields=b.c` | `fields=["a", "b.c"]` | `--fields a b.c` | 严格校验点号对象路径替换投影；`run_metadata` 始终保留（与 `include` 互斥） |
 | `as_of` | `?as_of=2026-06-01T12:00:00+08:00` | `as_of="2026-06-01T12:00:00+08:00"` | `--as-of 2026-06-01T12:00:00+08:00` | 带时区 ISO 8601 时刻，冻结隐式当前时钟以便复现 |
 
 ### 出生信息收集要点
@@ -124,31 +124,31 @@ console.log(data.wealth_analysis);
 
 #### FastMCP（Agent Host）
 
-客户端安装、Windows 配置与 HTTP 部署见 [MCP 部署指南](mcp-deployment.md)。调用时统一使用 `run_calculation(tool=..., arguments={...}, detail="compact"|"audit", fields=[...], as_of=...)`，结果与错误均通过 `structuredContent` 返回，客户端须检查 `isError`。
+客户端安装、Windows 配置与 HTTP 部署见 [MCP 部署指南](mcp-deployment.md)。调用时统一使用 `run_calculation(tool=..., arguments={...}, include=[...], fields=[...], as_of=...)`（`include` 与 `fields` 互斥），结果与错误均通过 `structuredContent` 返回，客户端须检查 `isError`。
 
 #### CLI（脚本 / 自动化）
 
 ```bash
 fatebridge ziwei_birth_chart --birth-year 1990 --birth-month 6 --birth-day 15 --birth-hour 10 --gender male
 fatebridge knowledge_read --domain bazi --category romance --key 桃花咸池
-fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json --detail compact
+fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json
 ```
 
-全部目录命令均支持 `--request-file PATH` 读取 JSON 请求文件（命令行显式参数覆盖文件中的同名顶层字段），以及 `--detail`、`--fields` 与 `--as-of`。
+全部目录命令均支持 `--request-file PATH` 读取 JSON 请求文件（命令行显式参数覆盖文件中的同名顶层字段），以及 `--include`、`--fields` 与 `--as-of`。
 
 ## 输出控制与结果读取
 
-### 两级详细度：`compact` 与 `audit`
+### 默认核心层与增量展开：`default_omit` 与 `include`
 
-- `detail="compact"`（默认）：未指定 `fields` 时按工具配置的 `compact_view` / `compact_fields` 返回精简核心字段；`run_metadata` 包含 `run_id`、`tool_name`、`generated_at`、`engine`、`engine_is_approximate`、`effective_time`、`warnings`（仅当生成随机种子等覆盖项时附带 `replay`）。
-- `detail="audit"`：保留完整业务载荷（全部时间线、逐项证据与方法依据），并在 `run_metadata` 中附带 `duration_ms` 与完整 `replay` 对象。需要完整 JSON 时传入 `detail="audit"` 且不传 `fields`（MCP `fields=null`）。
+- 默认（不传 `include` 与 `fields`）：返回完整核心层业务字段；仅对配置了 `default_omit` 的工具省略真实存在的可选重型次级块，并将实际被省略的路径列表记录在 `run_metadata.omitted_fields`（无省略时不输出）。
+- `include` 增量展开：在核心层基础上按需追加指定点号路径、`evidence_views` 名称，或传入 `include=["*"]` 获取无损全量载荷（此时 `omitted_fields` 不输出）。`include` 与 `fields` 互斥，同时传入返回 `validation_error`；无效路径或视图名返回 `validation_error` 并附带 `constraints.available` 与 `suggestions`。
 
 ### 严格字段投影：`fields`
 
-- 路径从输出根开始，支持多层点号路径（如 `bazi_birth.day_master`）。
+- 路径从输出根开始，支持多层点号路径（如 `bazi_birth.day_master`），针对完整规范结果执行严格投影。
 - 不支持数组数字索引（传入数字索引返回 `validation_error` / `non_object_projection_path`），请先投影所属列表字段后在调用方处理。
 - 始终严格校验路径：无效路径返回 `validation_error`（`issues[].code="unknown_projection_path"`、`retryable=false`），并在 `issues[].constraints.available` 列出当前层级的可用字段名。
-- `run_metadata` 始终保留；若未显式请求 `run_metadata` 且使用 `detail="compact"`，则保留精简版 `run_metadata`。
+- `run_metadata` 始终保留（使用 `fields` 投影时不输出 `omitted_fields`）。
 
 ```bash
 fatebridge bazi_birth_chart --birth-year 1990 --birth-month 6 --birth-day 15 \
@@ -197,12 +197,12 @@ MCP 失败返回原生 `isError=true`（使用 FastMCP Python Client 读取 `str
 
 ### `run_metadata` 与结果复现
 
-成功响应均附带 `run_metadata`，包含 `run_id`、`tool_name`、`generated_at`、`engine`、`engine_is_approximate`、`effective_time` 与 `warnings`（`detail="audit"` 另附 `duration_ms` 与 `replay`；随机起卦即使在 `compact` 下也会返回 `replay.overrides.seed`）。将 `replay.overrides` 合并至原始请求并传入 `replay.as_of`（REST `?as_of=` / MCP `as_of` / CLI `--as-of`），即可在相同运行环境中复现同一计算结果。服务不持久化历史运行记录。
+成功响应均附带 `run_metadata`，始终包含 `run_id`、`tool_name`、`generated_at`、`engine`、`engine_is_approximate`、`effective_time`、`duration_ms`、`replay` 与 `warnings`；仅当默认或局部 `include` 响应实际省略了 `default_omit` 中真实存在的可选重型路径时，附带 `omitted_fields`（随机起卦同时在 `replay.overrides.seed` 保留当次种子）。将 `replay.overrides` 合并至原始请求并传入 `replay.as_of`（REST `?as_of=` / MCP `as_of` / CLI `--as-of`），即可在相同运行环境中复现同一计算结果。服务不持久化历史运行记录。
 
 ## Agent 接入闭环
 
-1. **发现**：工具定义清楚时直接调用；存在缺口时调用 `discover_tools` / `GET /api/tools` / `fatebridge discover`，按 `family` 或 `q` 检索后取目标工具的 `input_schema`、`evidence_views` 与 `suggested_fields`。咨询规范见[方法参考](interpretation/README.md)、[时间选择](interpretation/shared/timing-selection.md)与[硬边界](interpretation/shared/safety-boundaries.md)。
-2. **调用**：仅收集所选方法必需的资料，未知生时禁止猜测或套用默认/示例。默认 `detail="compact"`，需特定证据按 `evidence_views` 传 `fields`，需完整结构与依据传 `detail="audit"` 且 `fields=null`。
+1. **发现**：工具定义清楚时直接调用；存在缺口时调用 `discover_tools` / `GET /api/tools` / `fatebridge discover`，按 `family` 或 `q` 检索后取目标工具的 `input_schema`、`evidence_views`、`suggested_fields` 与 `default_omit`。咨询规范见[方法参考](interpretation/README.md)、[时间选择](interpretation/shared/timing-selection.md)与[硬边界](interpretation/shared/safety-boundaries.md)。
+2. **调用**：仅收集所选方法必需的资料，未知生时禁止猜测或套用默认/示例。默认返回核心层（省略项记入 `run_metadata.omitted_fields`），需按需展开证据传入 `include`（路径或 `evidence_views` 名称），需严格只取子字段传入 `fields`，需无损全量结构与依据传入 `include=["*"]`。
 3. **读取**：按需读取业务字段与 `status`、`coverage`、`run_metadata` 等结构化结果（`partial` 仅表示对应层缺少部分输入）。
 4. **恢复**：遇到 `isError=true`、HTTP 4xx/5xx 或 CLI 非零退出码时，依 `error_code`、`issues[].path` 与 `constraints` 精确修正；仅 `retryable=true` 才按原参数重试。
 
@@ -212,7 +212,7 @@ MCP 失败返回原生 `isError=true`（使用 FastMCP Python Client 读取 `str
 
 ## 相关文档
 
-- [api-reference.md](api-reference.md)：全部 90 条 REST 路由、FastMCP 工具、共享请求族与响应字段
-- [algorithm-coverage.md](algorithm-coverage.md)：12 个 family 与 90 项计算能力覆盖及精度边界
+- [api-reference.md](api-reference.md)：全部 91 条 REST 路由、FastMCP 工具、共享请求族与响应字段
+- [algorithm-coverage.md](algorithm-coverage.md)：12 个 family 与 91 项计算能力覆盖及精度边界
 - [fengshui.md](fengshui.md)：家居风水 8 工具速查、坐标系与可运行示例
 - [troubleshooting.md](troubleshooting.md)：环境、依赖、投影与错误排错

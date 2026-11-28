@@ -210,11 +210,3 @@ def build_jinkou_year_fate(
         result["course"]["engine"] = "fatebridge-offline"
         result["course"]["overview"]["di_fen_source"] = "annual_branch_derived_course"
     return result
-
-
-def natal_course_trace(value: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "rule_id": "jinkou.natal_branch_course",
-        "source_section": "卷上·次客法·本命另课",
-        "result": {k: v for k, v in value.items() if k != "course"},
-    }

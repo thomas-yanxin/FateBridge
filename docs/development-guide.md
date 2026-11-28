@@ -68,7 +68,7 @@ uv run --extra dev mypy src/fatebridge/
 
 ### 调整传输层行为
 
-修改 REST 路由绑定或 FastMCP 注册器位于 `src/fatebridge/transports/rest.py` 与 `src/fatebridge/mcp_server.py`，公共 `detail` 分级（`compact` / `audit`）与严格 `fields` 投影位于 `src/fatebridge/application/response_delivery.py` 与 `src/fatebridge/application/projection.py`。修改后运行 [完整接口验证](../tests/integration/test_full_surface_validation.py)、[CLI 集成测试](../tests/integration/test_cli.py) 与 [投影合同测试](../tests/integration/test_output_projection_contracts.py)。
+修改 REST 路由绑定或 FastMCP 注册器位于 `src/fatebridge/transports/rest.py` 与 `src/fatebridge/mcp_server.py`，公共 `default_omit` / `include` 增量展开与严格 `fields` 投影位于 `src/fatebridge/application/response_delivery.py` 与 `src/fatebridge/application/projection.py`。修改后运行 [完整接口验证](../tests/integration/test_full_surface_validation.py)、[CLI 集成测试](../tests/integration/test_cli.py) 与 [投影合同测试](../tests/integration/test_output_projection_contracts.py)。
 
 ## 设计与测试约束
 

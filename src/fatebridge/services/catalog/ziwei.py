@@ -8,7 +8,7 @@ from fatebridge.application.bindings import (
     request_model_ref,
     service_ref,
 )
-from fatebridge.application.tool_spec import ServiceResult, ToolSpec
+from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.reproducibility import ReproducibilityPolicy
 
 _ZIWEI_REQ = "fatebridge.core.requests.ziwei"
@@ -23,176 +23,6 @@ calculate_ziwei_rules = service_ref(
     "fatebridge.services.ziwei", "calculate_ziwei_rules"
 )
 
-_COMPACT_RULESET_KEYS = (
-    "id",
-    "school",
-    "astro_type",
-    "day_divide",
-    "year_divide",
-    "horoscope_divide",
-    "age_divide",
-    "leap_month_rule",
-    "sihua_rule",
-    "brightness_rule",
-)
-
-
-def _slim_ruleset(ruleset: dict) -> dict:
-    return {k: ruleset[k] for k in _COMPACT_RULESET_KEYS if k in ruleset}
-
-
-def _compact_ziwei_birth(result: ServiceResult) -> ServiceResult:
-    birth = result["ziwei_birth"]
-    compact_birth: dict = {
-        "engine": birth["engine"],
-        "ruleset": {
-            k: birth["ruleset"][k]
-            for k in (
-                "id",
-                "school",
-                "astro_type",
-                "day_divide",
-                "leap_month_rule",
-                "sihua_rule",
-            )
-            if k in birth["ruleset"]
-        },
-        "calendar_rules": {
-            "effective_birth_month": birth["calendar_rules"]["effective_birth_month"],
-            "day_divide": birth["calendar_rules"]["day_divide"],
-        },
-        "ming_gong": birth["ming_gong"],
-        "shen_gong": birth["shen_gong"],
-        "laiyin_gong": birth["laiyin_gong"],
-        "zidou_branch": birth["zidou_branch"],
-        "wuxing_ju": {
-            "label": birth["wuxing_ju"]["label"],
-            "number": birth["wuxing_ju"]["number"],
-        },
-        "sihua": birth["sihua"],
-        "chart_masters": {
-            "life": birth["chart_masters"]["life"]["star"],
-            "body": birth["chart_masters"]["body"]["star"],
-        },
-        "calendar_cycles": {
-            k: birth["calendar_cycles"][k]
-            for k in ("status", "changsheng_rule", "boshi_rule")
-            if k in birth.get("calendar_cycles", {})
-        },
-        "reading_view": birth["reading_view"],
-    }
-    patterns = birth.get("named_patterns")
-    if isinstance(patterns, dict):
-        compact_birth["named_patterns"] = {
-            "matched_count": patterns.get("matched_count"),
-            "matched": [row["name"] for row in patterns.get("matched", [])],
-        }
-    return {
-        "analysis_type": result["analysis_type"],
-        "analysis_context": {
-            "corrected_datetime": result["analysis_context"]["corrected_datetime"],
-            "lunar_display": result["analysis_context"].get("lunar_display"),
-            "timezone": result["analysis_context"]["timezone"],
-        },
-        "ziwei_birth": compact_birth,
-    }
-
-
-def _compact_ziwei_horoscope(result: ServiceResult) -> ServiceResult:
-    horoscope = result["ziwei_horoscope"]
-    scope_fields = {
-        "scope",
-        "status",
-        "unavailable_reason",
-        "first_age",
-        "natal_palace_name",
-        "branch",
-        "stem",
-        "palace_ganzhi",
-        "mutagen",
-    }
-    compact_scopes = []
-    for scope in horoscope["scopes"]:
-        entry = {k: v for k, v in scope.items() if k in scope_fields}
-        links = scope.get("mutagen_natal_links")
-        if links:
-            entry["mutagen_natal_links"] = [
-                f"{l['transformation']}:{l['star']}@{l.get('natal_palace_name') or '?'}({l.get('scope_palace_name') or '?'})"
-                for l in links
-            ]
-        stars = scope.get("flowing_stars")
-        if stars:
-            entry["flowing_stars"] = (
-                stars
-                if isinstance(stars, dict)
-                else {
-                    s["star"]: f"{s['branch']}({s['scope_palace_name']})" for s in stars
-                }
-            )
-        if "annual_three_sha" in scope:
-            entry["annual_three_sha"] = scope["annual_three_sha"]["branches"]
-        compact_scopes.append(entry)
-
-    compact_horoscope: dict = {
-        "engine": horoscope["engine"],
-        "school": horoscope["school"],
-        "astro_type": horoscope["astro_type"],
-        "nominal_age": horoscope["nominal_age"],
-        "doujun_branch": horoscope["doujun_branch"],
-        "ruleset": _slim_ruleset(horoscope["ruleset"]),
-    }
-    childhood = horoscope.get("childhood_limit")
-    if isinstance(childhood, dict):
-        if childhood.get("status") == "active":
-            compact_horoscope["childhood_limit"] = {
-                k: childhood[k]
-                for k in (
-                    "status",
-                    "nominal_age",
-                    "natal_palace_name",
-                    "branch",
-                    "palace_ganzhi",
-                    "stem",
-                    "mutagen",
-                )
-                if k in childhood
-            }
-        else:
-            compact_horoscope["childhood_limit"] = {
-                "status": childhood.get("status"),
-                "first_daxian_age": childhood.get("first_daxian_age"),
-            }
-    compact_horoscope["scopes"] = compact_scopes
-    for list_key in ("decadal_list", "yearly_list", "monthly_list"):
-        if list_key in horoscope:
-            compact_horoscope[list_key] = horoscope[list_key]
-
-    return {
-        "analysis_type": result["analysis_type"],
-        "birth_context": {
-            "corrected_datetime": result["birth_context"]["corrected_datetime"],
-            "lunar_display": result["birth_context"].get("lunar_display"),
-            "timezone": result["birth_context"]["timezone"],
-        },
-        "analysis_context": {
-            "analysis_datetime": result["analysis_context"]["analysis_datetime"],
-            "lunar_display": result["analysis_context"].get("lunar_display"),
-            "timezone": result["analysis_context"]["timezone"],
-        },
-        "ziwei_horoscope": compact_horoscope,
-    }
-
-
-def _compact_ziwei_rules(result: ServiceResult) -> ServiceResult:
-    return {
-        **result,
-        "rule_catalogue": {
-            key: value
-            for key, value in result["rule_catalogue"].items()
-            if key != "named_patterns"
-        },
-    }
-
 
 SPECS: list[ToolSpec] = [
     ToolSpec(
@@ -204,7 +34,14 @@ SPECS: list[ToolSpec] = [
         family="metaphysics",
         cpu_bound=True,
         rest_path="/api/ziwei/birth-chart",
-        compact_view=_compact_ziwei_birth,
+        default_omit=(
+            "person_info",
+            "ziwei_birth.palaces",
+            "ziwei_birth.flying_sihua",
+            "ziwei_birth.void_systems",
+            "ziwei_birth.calendar_basis",
+            "ziwei_birth.calendar_cycles.year_branch_cycles",
+        ),
     ),
     ToolSpec(
         name="ziwei_timing",
@@ -215,6 +52,21 @@ SPECS: list[ToolSpec] = [
         family="metaphysics",
         cpu_bound=True,
         rest_path="/api/ziwei/timing",
+        default_omit=(
+            "person_info",
+            "ziwei_horoscope.annual_cycles",
+            "ziwei_horoscope.natal_prerequisites",
+            "ziwei_horoscope.nominal_age_calendar",
+            "ziwei_horoscope.calendar_basis",
+            "ziwei_horoscope.interpretation_scope",
+            "ziwei_horoscope.calendar_rules",
+            "ziwei_horoscope.scopes.*.scope_palace_role",
+            "ziwei_horoscope.scopes.*.branch_index",
+            "ziwei_horoscope.scopes.*.stem_origin",
+            "ziwei_horoscope.scopes.*.palace_map",
+            "ziwei_horoscope.scopes.*.flowing_star_basis",
+            "ziwei_horoscope.scopes.*.flowing_stars",
+        ),
         reproducibility=ReproducibilityPolicy(
             current_time_fields=(
                 "analysis_year",
@@ -224,7 +76,6 @@ SPECS: list[ToolSpec] = [
                 "analysis_minute",
             )
         ),
-        compact_view=_compact_ziwei_horoscope,
     ),
     ToolSpec(
         name="ziwei_rules",
@@ -234,6 +85,6 @@ SPECS: list[ToolSpec] = [
         operation_label_zh="紫微规则",
         family="metaphysics",
         rest_path="/api/ziwei/rules",
-        compact_view=_compact_ziwei_rules,
+        default_omit=("rule_catalogue.named_patterns",),
     ),
 ]

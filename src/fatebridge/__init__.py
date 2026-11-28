@@ -18,7 +18,7 @@ def discover(
     family: str | None = None,
     q: str | None = None,
     tool: str | None = None,
-    detail: Literal["summary", "full"] = "summary",
+    detail: Literal["brief", "summary", "full"] = "summary",
     include_output_schema: bool = False,
 ) -> dict[str, Any]:
     """Discover tools, counts, input schemas, and field contracts."""
@@ -45,7 +45,7 @@ def run(
     tool: str,
     arguments: dict[str, Any] | None = None,
     *,
-    detail: Literal["compact", "audit"] = "compact",
+    include: list[str] | None = None,
     fields: list[str] | None = None,
     as_of: str | None = None,
     **kwargs: Any,
@@ -54,7 +54,10 @@ def run(
     import difflib
 
     from fatebridge.application.execution import execute_with_receipt, result_is_error
-    from fatebridge.application.response_delivery import deliver_response
+    from fatebridge.application.response_delivery import (
+        deliver_response,
+        validate_delivery_controls,
+    )
     from fatebridge.core.execution_context import ExecutionOptions
     from fatebridge.services.tool_catalog import CATALOG
     from fatebridge.utils.errors import ParameterError, handle_calculation_error
@@ -70,7 +73,8 @@ def run(
             issue["constraints"] = {"suggestions": suggestions}
         raise ParameterError(f"未知工具: {tool}", [issue], status_code=404)
 
-    options = ExecutionOptions.model_validate({"as_of": as_of, "detail": detail})
+    validate_delivery_controls(include, fields)
+    options = ExecutionOptions.model_validate({"as_of": as_of})
     try:
         request = spec.request_model.model_validate(merged)
         result = execute_with_receipt(spec, request, options=options)
@@ -78,4 +82,4 @@ def run(
         return handle_calculation_error(exc, spec.operation_label_zh)
     if result_is_error(result):
         return result
-    return deliver_response(result, spec=spec, fields=fields, detail=options.detail)
+    return deliver_response(result, spec=spec, include=include, fields=fields)

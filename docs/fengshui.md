@@ -19,16 +19,16 @@ FateBridge 的 `fengshui` family 提供 8 个确定性风水计算工具，覆�
 
 ## 统一响应结构
 
-8 个工具共用同一顶层结构（`AssessOutput` / `BaseFengshuiOutput`），默认 `detail=compact` 返回精简视图（`< 4 KB`），需要完整宫位、时间边界或岁煞明细时传入 `detail=audit`：
+8 个工具共用同一顶层结构（`FengshuiOutput`），默认响应保持核心字段精简（`default_omit` 省略次级明细并记入 `run_metadata.omitted_fields`），需要完整宫位、调整建议或元素关系明细时传入 `include=["*"]`（或指定路径）：
 
 | 顶层字段 | 含义与读取约定 |
 | --- | --- |
 | `status` | `"complete"` 或 `"partial"`；任一已请求层存在 `missing_inputs` 即为 `"partial"`，仅限制对应层或未定分支，不否定其余已算层 |
 | `layers` | 按请求方法挂载各层计算结果（`directions`、`minggua`、`bazhai`、`jinsuo`、`annual_stars`、`monthly_stars`、`xuankong_natal`） |
 | `palace_overlay` | 仅 `fengshui_assess` 包含宅盘或年/月/日/时紫白任一层时生成，按 `C` 与八方叠加 `natal_period_star`、`natal_mountain_star`、`natal_facing_star`、`annual_star`、`monthly_star`、`daily_star`、`hourly_star` |
-| `layout_analysis` | `fengshui_assess` 传入 `analyze_layout=true`（或未显式关闭且包含 `placements`）时生成，完整包含 `status`、`calculation_scope`、`placement_findings`、`adjustment_options`、`environment_adjustments`、`element_relationships`、`missing_inputs`（默认 `detail=compact` 省略 `adjustment_options` 与 `element_relationships`，需传 `detail=audit` 或显式 `fields` 读取） |
+| `layout_analysis` | `fengshui_assess` 传入 `analyze_layout=true`（或未显式关闭且包含 `placements`）时生成，完整包含 `status`、`calculation_scope`、`placement_findings`、`adjustment_options`、`environment_adjustments`、`element_relationships`、`missing_inputs`（默认响应通过 `default_omit` 省略 `layout_analysis.adjustment_options` 与 `layout_analysis.element_relationships`，需传 `include=["*"]`、`include` 对应路径或显式 `fields` 读取） |
 | `coverage` | 报告 `implemented_layers`、`missing_inputs`、`unavailable_layers`、`not_requested_layers`；启用布局、城门或玄空解读时附带 `requested_analysis_status` 等子状态 |
-| `conflicts` | `fengshui_bazhai` 与 `fengshui_assess` 返回坐山与命卦、或住户之间的同方位吉凶极性差异（`detail=compact` 下的 `fengshui_assess` 默认省略，传 `detail=audit` 或 `--fields conflicts` 读取） |
+| `conflicts` | `fengshui_bazhai` 与 `fengshui_assess` 返回坐山与命卦、或住户之间的同方位吉凶极性差异（`fengshui_assess` 默认通过 `default_omit` 省略 `conflicts`，传 `include=["conflicts"]`、`include=["*"]` 或 `--fields conflicts` 读取） |
 
 ## 关键规则与坐标系约定
 
@@ -46,7 +46,7 @@ FateBridge 的 `fengshui` family 提供 8 个确定性风水计算工具，覆�
 
 ### 紫白四层与中州派玄空
 
-- **紫白年/月/日/时四层**：年紫白按 `1 - (year - 1864)` 模 9 入中顺飞，并在 `detail=audit` 下返回 `annual_afflictions`（太岁、岁破、三煞、五黄、二黑）；月紫白按年支三组（子午卯酉起 8、辰戌丑未起 5、寅申巳亥起 2）逐节月逆推入中顺飞。传入 `query_at` 且 `include_daily_hourly=true`（默认）时，同步按《紫白诀》冬至/雨水/谷雨（阳遁顺行 1/7/4）与夏至/处暑/霜降（阴遁逆行 9/3/6）六段计算日紫白，并按日支三组结合阴阳遁计算时紫白；在 `fengshui_assess` 中传入 `query_at` 会自动启用 `monthly_stars` 与 `annual_stars`。
+- **紫白年/月/日/时四层**：年紫白按 `1 - (year - 1864)` 模 9 入中顺飞，并在 `layers.annual_stars` 中返回 `annual_afflictions`（太岁、岁破、三煞、五黄、二黑）；月紫白按年支三组（子午卯酉起 8、辰戌丑未起 5、寅申巳亥起 2）逐节月逆推入中顺飞。传入 `query_at` 且 `include_daily_hourly=true`（默认）时，同步按《紫白诀》冬至/雨水/谷雨（阳遁顺行 1/7/4）与夏至/处暑/霜降（阴遁逆行 9/3/6）六段计算日紫白，并按日支三组结合阴阳遁计算时紫白；在 `fengshui_assess` 中传入 `query_at` 会自动启用 `monthly_stars` 与 `annual_stars`。
 - **中州玄空与条件解读**：`xuankong_zhongzhou_v1` 要求磁北宅向（`north_reference="magnetic"`，提供 `facing_degrees` 时默认磁北，误差半径 `bearing_uncertainty_degrees ≤ 7.5`）与定运输入（`period_number` 默认 `basis="expert_confirmed"`；`event_year` / `event_at` 默认 `basis="construction_completion"`；`confirmed_major_renovation` 默认 `qualifies_for_period_reset=true`）。在 `fengshui_assess` 中可直接传扁平 `built_year` 或 `period_number` 自动创建 `xuankong` 并启用 `xuankong_natal`。每山正中 `9°`（`|Δ| < 4.5°`）或两侧 `3°` 同宫同阴阳用下卦（`lower`），跨宫或异阴阳用 13 山替星（`replacement`）；五黄借宅运同元龙阴阳飞布而不替。宅盘附带到山到向/上山下水/双星分布、令星入囚、父母三般卦、连珠三般卦、离/坎七星打劫及反吟伏吟数式；可选启用 `city_gate`（`shen_city_gate_v1` 正/副城门与水形）及 `interpretation`（`xuankong_conditioned_v1`、`wang_zhongzhou_timeliness_v1`、`shen_fixed_lingzheng_v1`、`shen_2011_host_guest_v1`），并可从 `XuankongRequest.current_period_number` 或 `AssessRequest.effective_year`/`query_at` 自动传递评价运。
 
 ## 可运行请求示例
@@ -57,20 +57,18 @@ FateBridge 的 `fengshui` family 提供 8 个确定性风水计算工具，覆�
 uv run --extra dev fatebridge fengshui_directions \
   --bearing-degrees 180 \
   --north-reference magnetic \
-  --geomagnetic-reference '{"latitude":39.9042,"longitude":116.4074,"model_date":"2026-06-01"}' \
-  --detail compact
+  --geomagnetic-reference '{"latitude":39.9042,"longitude":116.4074,"model_date":"2026-06-01"}'
 ```
 
 ### 示例 2：十二节月紫白与同日时紫白（CLI & REST）
 
 ```bash
 uv run --extra dev fatebridge fengshui_monthly_stars \
-  --query-at 2026-04-06T10:30:00+08:00 \
-  --detail compact
+  --query-at 2026-04-06T10:30:00+08:00
 ```
 
 ```bash
-curl -sS -X POST 'http://localhost:8010/api/fengshui/monthly-stars?detail=compact' \
+curl -sS -X POST 'http://localhost:8010/api/fengshui/monthly-stars' \
   -H 'Content-Type: application/json' \
   -d '{"query_at":"2026-04-06T10:30:00+08:00","timezone_name":"Asia/Shanghai","include_daily_hourly":true}'
 ```
@@ -79,10 +77,8 @@ curl -sS -X POST 'http://localhost:8010/api/fengshui/monthly-stars?detail=compac
 
 ```bash
 uv run --extra dev fatebridge fengshui_xuankong_house_chart \
-  --request-file docs/examples/fengshui-xuankong.json \
-  --detail compact
+  --request-file docs/examples/fengshui-xuankong.json
 
 uv run --extra dev fatebridge fengshui_assess \
-  --request-file docs/examples/fengshui-home.json \
-  --detail compact
+  --request-file docs/examples/fengshui-home.json
 ```

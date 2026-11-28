@@ -16,7 +16,6 @@ class AgentExamples(TypedDict):
     note: str
     subjects: dict[str, dict[str, JsonValue]]
     tools: dict[str, str | dict[str, JsonValue]]
-    compact_fields: dict[str, list[str]]
     suggested_fields: NotRequired[dict[str, list[str]]]
     evidence_views: NotRequired[dict[str, EvidenceViews]]
     call_guidance: NotRequired[dict[str, dict[str, JsonValue]]]
@@ -72,11 +71,6 @@ def suggested_fields(spec: ToolSpec, *, view: str | None = None) -> list[str] | 
     else:
         fields = _examples().get("suggested_fields", {}).get(spec.name)
         return list(fields) if fields is not None else None
-
-
-def compact_fields(spec: ToolSpec) -> list[str] | None:
-    fields = _examples()["compact_fields"].get(spec.name)
-    return list(fields) if fields is not None else suggested_fields(spec)
 
 
 def evidence_views(spec: ToolSpec) -> EvidenceViews | None:

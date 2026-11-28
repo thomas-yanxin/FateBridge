@@ -80,7 +80,7 @@ def test_relationship_cli_retains_directional_evidence(
     example = cli._cli_example(
         spec, {**example_input(spec), "relationship_type": "marriage"}
     )
-    code, result, _ = invoke(capsys, *shlex.split(example)[1:], "--detail", "audit")
+    code, result, _ = invoke(capsys, *shlex.split(example)[1:], "--include", "*")
     assert code == 0
     assert result["relationship_type"] == "marriage"
     assert result["cross_chart_relations"]["pairs"]
@@ -206,7 +206,6 @@ async def test_mcp_input_contract_is_small_and_projections_are_callable() -> Non
             record["tool"],
             {
                 **record["example_input"],
-                "detail": "audit",
                 "fields": ["career_analysis.topic_facts"],
             },
         )
@@ -237,7 +236,6 @@ async def test_consultation_first_views_keep_interpretable_evidence_across_surfa
             {
                 **inputs,
                 "as_of": as_of,
-                "detail": "audit",
                 "fields": fields,
             },
         )
@@ -278,7 +276,6 @@ async def test_consultation_first_views_keep_interpretable_evidence_across_surfa
     mcp_business = {k: v for k, v in payload.items() if k != "run_metadata"}
     query = [("fields", field) for field in fields] + [
         ("as_of", as_of),
-        ("detail", "audit"),
     ]
     if spec.rest_path is not None:
         with TestClient(app) as rest:
@@ -295,8 +292,6 @@ async def test_consultation_first_views_keep_interpretable_evidence_across_surfa
         *command,
         "--as-of",
         as_of,
-        "--detail",
-        "audit",
         "--fields",
         *fields,
     )
@@ -428,8 +423,6 @@ def test_published_starter_projection_is_runnable(
             *command,
             "--as-of",
             "2026-10-12T04:00:00Z",
-            "--detail",
-            "audit",
             "--fields",
             *suggested_fields(spec),
         )
@@ -451,7 +444,6 @@ async def test_published_input_contract_delivers_strict_fields_from_one_run() ->
             tool,
             {
                 **example_input(spec),
-                "detail": "audit",
                 "fields": fields,
             },
         )
@@ -471,7 +463,7 @@ def test_relationship_example_and_default_do_not_assume_marriage(
     inputs.pop("relationship_type")
     assert spec.request_model.model_validate(inputs).relationship_type == "general"
     code, result, _ = invoke(
-        capsys, *shlex.split(cli._cli_example(spec, inputs))[1:], "--detail", "audit"
+        capsys, *shlex.split(cli._cli_example(spec, inputs))[1:], "--include", "*"
     )
     assert code == 0 and result["relationship_type"] == "general"
 
@@ -486,7 +478,6 @@ async def test_explicit_pillar_context_can_be_projected_without_a_retry() -> Non
             spec.name,
             {
                 **inputs,
-                "detail": "audit",
                 "fields": [
                     *suggested_fields(spec),
                 ],
@@ -507,8 +498,6 @@ def test_timing_first_view_keeps_current_basis_without_year_grids(
     code, result, _ = invoke(
         capsys,
         *shlex.split(cli._cli_example(spec, example_input(spec)))[1:],
-        "--detail",
-        "audit",
         "--fields",
         *suggested_fields(spec),
         "--as-of",

@@ -8,8 +8,6 @@ from fatebridge.core.contracts.output_midpoint_comparisons import (
 )
 from fatebridge.core.contracts.output_midpoint_geometry import (
     DialCounts,
-    GeometryRuleset,
-    GeometryRuleTrace,
     GeometrySource,
     MidpointAxis,
     MidpointDial,

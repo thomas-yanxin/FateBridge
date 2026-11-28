@@ -3,6 +3,12 @@
     "evidence": "先读双方四柱与跨盘触点。按需增加 cross_chart_relations.directional_punishments 和 directional_ten_gods。natal_matches 记录哪方原局已具备同一组关系。",
     "interpretation": "按两人的实际关系与问题解释，分别引用双方对应星位。"
   },
+  "default_omit": [
+    "natal_contexts.*.calendar_context",
+    "natal_contexts.*.day_master",
+    "cross_chart_relations.directional_punishments",
+    "directional_ten_gods"
+  ],
   "first_view": {
     "fields": [
       "relationship_type",

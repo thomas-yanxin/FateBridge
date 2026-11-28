@@ -19,7 +19,6 @@ from fatebridge.core.response_models import (
     output_model_for,
     required_output_fields_for,
 )
-from fatebridge.services.catalog.detail_views import traditional_detail_view
 
 if TYPE_CHECKING:
     PLUGINS: tuple[DomainPlugin, ...]
@@ -133,7 +132,6 @@ def _enrich_builtin_spec(spec: ToolSpec) -> ToolSpec:
     )
     return replace(
         spec,
-        detail_view=spec.detail_view or traditional_detail_view,
         request_model=(
             spec.request_model if has_explicit_request else _UNSET_REQUEST_MODEL
         ),

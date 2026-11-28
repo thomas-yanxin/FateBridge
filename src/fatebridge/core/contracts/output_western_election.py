@@ -99,6 +99,15 @@ class ElectionMarriageSignificators(PartialOutput):
     full_original_text_acceptance: bool | None = None
 
 
+class ElectionCandidateWindow(PartialOutput):
+    datetime: str | None = None
+    offset_hours: int | None = None
+    score: int | None = None
+    moon_void_of_course: bool | None = None
+    planetary_hour_match: bool | None = None
+    factor_codes: list[str] | None = None
+
+
 class Election(PartialOutput):
     reference_geometry: dict[str, OpenJsonValue] | None = None
     backend_convention: dict[str, OpenJsonValue] | None = None
@@ -120,3 +129,5 @@ class Election(PartialOutput):
     topic_label: str | None = None
     topic_house: int | None = None
     factors: list[ElectionFactor] | None = None
+    candidate_windows: list[ElectionCandidateWindow] | None = None
+    candidate_windows_total_count: int | None = None

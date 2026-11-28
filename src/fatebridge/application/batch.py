@@ -22,8 +22,11 @@ from pydantic.fields import FieldInfo
 from pydantic_core import PydanticCustomError
 
 from fatebridge.application.execution import execute_with_receipt, result_is_error
-from fatebridge.application.response_delivery import deliver_response
-from fatebridge.application.tool_spec import DetailLevel, ToolSpec
+from fatebridge.application.response_delivery import (
+    deliver_response,
+    validate_delivery_controls,
+)
+from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.batch_cache import batch_cache_scope
 from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.utils.errors import (
@@ -403,17 +406,18 @@ class BatchCall(BaseModel):
         default=None, min_length=1, description="多对象键"
     )
     arguments: dict[str, object] = Field(default_factory=dict, description="工具参数")
-    detail: DetailLevel | None = None
+    include: list[str] | None = None
     fields: list[str] | None = None
 
     @model_validator(mode="after")
-    def _reject_both_subject_forms(self) -> BatchCall:
+    def _reject_conflicting_controls(self) -> BatchCall:
         if self.subject is not None and self.subjects is not None:
             raise PydanticCustomError(
                 "conflicting_subject_fields",
                 "subject 与 subjects 不能同时指定",
                 {"path": "subjects"},
             )
+        validate_delivery_controls(self.include, self.fields)
         return self
 
 
@@ -437,9 +441,6 @@ class BatchRequest(BaseModel):
         min_length=1,
         max_length=MAX_BATCH_CALLS,
         description="要顺序执行的计算调用列表（1-32 条）",
-    )
-    detail: DetailLevel = Field(
-        default="compact", description="批量默认输出详细级别：compact 或 audit"
     )
     as_of: str | None = Field(
         default=None,
@@ -952,7 +953,7 @@ def execute_batch(
     results: list[JsonValue] = []
     succeeded = 0
     failed = 0
-    raw_call_cache: dict[tuple[str, str, str, str], dict[str, JsonValue]] = {}
+    raw_call_cache: dict[tuple[str, str, str], dict[str, JsonValue]] = {}
 
     with batch_cache_scope():
         for call in request.calls:
@@ -972,10 +973,7 @@ def execute_batch(
                 continue
 
             try:
-                call_detail = call.detail if call.detail is not None else request.detail
-                options = ExecutionOptions.model_validate(
-                    {"as_of": shared_as_of, "detail": call_detail}
-                )
+                options = ExecutionOptions.model_validate({"as_of": shared_as_of})
                 resolved_args = resolve_call_arguments(
                     spec,
                     call,
@@ -991,7 +989,6 @@ def execute_batch(
                 cache_key = (
                     spec.name,
                     tool_request.model_dump_json(),
-                    options.detail,
                     shared_as_of,
                 )
                 if is_cacheable and cache_key in raw_call_cache:
@@ -1026,8 +1023,8 @@ def execute_batch(
                 delivered = deliver_response(
                     raw_result,
                     spec=spec,
+                    include=call.include,
                     fields=call.fields,
-                    detail=options.detail,
                 )
                 succeeded += 1
                 results.append(

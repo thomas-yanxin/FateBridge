@@ -171,8 +171,6 @@ def _cli_arguments(tool, payload):
     return args + [
         "--as-of",
         AS_OF,
-        "--detail",
-        "audit",
         "--fields",
         "analysis_context",
         "summary",
@@ -191,7 +189,6 @@ def _all_transports(monkeypatch, capsys, tool, path, payload):
         json=payload,
         params=[
             ("as_of", AS_OF),
-            ("detail", "audit"),
             ("fields", "analysis_context"),
             ("fields", "summary"),
         ],
@@ -205,7 +202,6 @@ def _all_transports(monkeypatch, capsys, tool, path, payload):
                 {
                     **payload,
                     "as_of": AS_OF,
-                    "detail": "audit",
                     "fields": ["analysis_context", "summary"],
                 },
                 raise_on_error=False,

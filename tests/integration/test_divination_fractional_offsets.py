@@ -185,9 +185,9 @@ def test_fractional_offset_and_day_pillars_agree_across_transports(
     response, protocol, code, cli = surface_calls(
         spec,
         payload,
-        params={"detail": "audit", "fields": fields},
-        options={"detail": "audit", "fields": fields},
-        flags=("--detail", "audit", "--fields", *fields),
+        params={"fields": fields},
+        options={"fields": fields},
+        flags=("--fields", *fields),
     )
     assert response.status_code == 200, response.text
     assert code == 0

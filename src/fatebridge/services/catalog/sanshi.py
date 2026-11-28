@@ -9,7 +9,7 @@ from fatebridge.application.bindings import (
     service_ref,
 )
 from fatebridge.application.domain_validators import validate_ren_output
-from fatebridge.application.tool_spec import ServiceResult, ToolSpec
+from fatebridge.application.tool_spec import ToolSpec
 
 _SANSHI_REQ = "fatebridge.core.requests.sanshi"
 
@@ -29,68 +29,23 @@ calculate_taiyi_analysis = service_ref(
     "fatebridge.services.sanshi", "calculate_taiyi_analysis"
 )
 
-
-_COMPACT_QIMEN_KEYS = frozenset(
-    {
-        "ju_text",
-        "dun_type",
-        "ju_number",
-        "yuan",
-        "fu_tou",
-        "ju_method",
-        "ju_term",
-        "day_ganzhi",
-        "time_ganzhi",
-        "xun_head",
-        "kongwang",
-        "day_xun_head",
-        "day_kongwang",
-        "zhifu",
-        "zhishi",
-        "horse_star",
-        "void_palaces",
-        "structure",
-        "patterns",
-        "stem_context",
-        "source_disagreements",
-        "rule_profiles",
-        "assessment",
-        "engine",
-    }
+_LIUREN_DEFAULT_OMIT = (
+    "calendar_context",
+    "liuren.twelve_board",
+    "liuren.life_stages",
+    "liuren.auxiliary_stars",
+    "liuren.month_building_element",
+    "liuren.transmission_relations",
+    "liuren.branch_relations",
+    "liuren.emptiness_evidence",
+    "liuren.god_yin",
+    "liuren.seasonal_evidence",
+    "liuren.day_placement_patterns",
+    "liuren.cross_harmony",
+    "liuren.transmission_progression",
+    "liuren.calendar_policy.solar_term_dependencies",
+    "liuren.meta.diurnal_evidence",
 )
-_OMIT_PALACE_COMPACT_KEYS = frozenset(
-    {
-        "door_hexagram",
-        "content_palace",
-        "content_trigram",
-        "heaven_origin_trigram",
-        "god_sequence_index",
-    }
-)
-
-
-def _compact_qimen(result: ServiceResult) -> ServiceResult:
-    board = result["qimen"]
-    compact_board: ServiceResult = {
-        key: value for key, value in board.items() if key in _COMPACT_QIMEN_KEYS
-    }
-    compact_board["palaces"] = [
-        {
-            key: value
-            for key, value in palace.items()
-            if key not in _OMIT_PALACE_COMPACT_KEYS
-        }
-        for palace in board["palaces"]
-    ]
-    return {
-        "analysis_type": result.get("analysis_type"),
-        "analysis_context": result.get("analysis_context"),
-        "four_pillars": result.get("four_pillars"),
-        "qimen": compact_board,
-        **(
-            {"run_metadata": result["run_metadata"]} if "run_metadata" in result else {}
-        ),
-    }
 
 
 SPECS: list[ToolSpec] = [
@@ -103,6 +58,7 @@ SPECS: list[ToolSpec] = [
         family="metaphysics",
         cpu_bound=True,
         rest_path="/api/liuren/chart",
+        default_omit=_LIUREN_DEFAULT_OMIT,
         output_validators=(validate_ren_output,),
     ),
     ToolSpec(
@@ -117,6 +73,7 @@ SPECS: list[ToolSpec] = [
         family="metaphysics",
         cpu_bound=True,
         rest_path="/api/liuren/timing/yearly",
+        default_omit=_LIUREN_DEFAULT_OMIT,
         output_validators=(validate_ren_output,),
     ),
     ToolSpec(
@@ -128,7 +85,19 @@ SPECS: list[ToolSpec] = [
         family="metaphysics",
         cpu_bound=True,
         rest_path="/api/qimen",
-        compact_view=_compact_qimen,
+        default_omit=(
+            "calendar_context",
+            "qimen.calendar_policy",
+            "qimen.assessment",
+            "qimen.fushi_hexagram",
+            "qimen.hidden_stems_palace_map",
+            "qimen.ju_decision",
+            "qimen.palaces.*.door_hexagram",
+            "qimen.palaces.*.content_palace",
+            "qimen.palaces.*.content_trigram",
+            "qimen.palaces.*.heaven_origin_trigram",
+            "qimen.palaces.*.god_sequence_index",
+        ),
     ),
     ToolSpec(
         name="taiyi",
@@ -139,6 +108,20 @@ SPECS: list[ToolSpec] = [
         family="metaphysics",
         cpu_bound=True,
         rest_path="/api/taiyi",
+        default_omit=(
+            "calendar_context",
+            "taiyi.calendar_rules",
+            "taiyi.gates",
+            "taiyi.long_cycles",
+            "taiyi.condition_assessment",
+            "taiyi.patterns",
+            "taiyi.counter_cycles",
+            "taiyi.shiji_derivation",
+            "taiyi.determinate_calculation",
+            "taiyi.solar_anchors",
+            "taiyi.solar_anchor_scope",
+            "taiyi.interpretation_scope",
+        ),
     ),
     ToolSpec(
         name="jinkou",
@@ -149,6 +132,22 @@ SPECS: list[ToolSpec] = [
         family="metaphysics",
         cpu_bound=True,
         rest_path="/api/jinkou",
+        default_omit=(
+            "calendar_context",
+            "jinkou.qi_evidence",
+            "jinkou.position_interactions",
+            "jinkou.branch_breaks",
+            "jinkou.stem_relations",
+            "jinkou.definition_evidence",
+            "jinkou.combinations",
+            "jinkou.relations",
+            "jinkou.branch_stars",
+            "jinkou.patterns.evaluations",
+            "jinkou.internal_strength.relations",
+            "jinkou.overview.power_basis",
+            "jinkou.natal_course.course",
+            "jinkou.year_fate.course",
+        ),
         output_validators=(validate_ren_output,),
     ),
 ]

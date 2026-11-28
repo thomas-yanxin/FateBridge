@@ -25,13 +25,14 @@ def test_comprehensive_default_source_matches_its_actual_mcp_and_cli_surfaces(
     spec = SPECS["bazi_overview"]
     assert spec.rest_path == "/api/bazi/overview"
     payload = {**inputs(spec), "use_true_solar_time": False}
-    opts = dict(detail="audit")
-    flags = ["--detail", "audit"]
+    opts: dict[str, object] = {}
+    flags: list[str] = []
     if project:
         opts.update(fields=["calendar_context"])
         flags += ["--fields", "calendar_context"]
     else:
-        pass
+        opts.update(include=["*"])
+        flags += ["--include", "*"]
     mcp = asyncio.run(native(spec, payload, **opts))
     code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
     assert not mcp.is_error and code == 0

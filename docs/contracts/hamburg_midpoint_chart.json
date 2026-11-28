@@ -5,7 +5,7 @@
     "clock_basis": "Use birth_clock_basis=civil for a recorded civil zone clock. Only an explicitly identified historical LMT/LAT record may select local_mean_solar/local_apparent_solar, with birth_timezone omitted and use_true_solar_time=false.",
     "comparative_geometry": "Witte1924 comparative_geometry reconstructs five stated anchor rotations and the four-point mirror system from the same native factors. Coordinates are symbolic; use the actual Aries Point for tropical axes in a sidereal display.",
     "daily_meridian": "The selected Witte 1924 p.15 equation is solar_arc_analysis.daily_meridian: IC.day=IC.natal+solar_arc-Sun.natal.tropical+Sun.target.tropical, MC.day=IC.day+180.",
-    "fictitious_elements": "Read profile.hypothetical_element_source: library_builtin or first readable external seorbel.txt with source details and search-path index. Nonempty SE_EPHE_PATH takes precedence in Swiss.",
+    "fictitious_elements": "Hypothetical factors in midpoint_analysis.factors[*] emit kind=\"hypothetical\", model=\"swisseph_fictitious_elements\", and element_name; do not infer hypothetical orbit provenance from physical-body Moshier/Swiss flags.",
     "house_roles": "Keep the selected base-chart12-house system separate from native reference-angle extraction, Meridian cusps and the custom13-sector partition. In the current numeric policy hsys1 is Alcabitus (SwissB), never Equal.",
     "meridian_houses": "The selected Witte 1923 p.34 natal construction (Swiss X) spaces cusp right ascensions by 30 degrees. Cusp 1 is the equatorial ascendant. Read the physical Ascendant and Midheaven in factors and the selected base houses in base_chart.",
     "meridian_placement": {
@@ -33,6 +33,34 @@
       "scope": "该字段computed_for_current_chart=false，只属于原表与历史例。已有真实出生与目标资料才调用德国盘读取此视图；纯原文问题据原刊解释，不编造出生或目标时刻。完整原典、闰日/亚日与跨年末列规则仍未验收。"
     }
   },
+  "default_omit": [
+    "base_chart.chart_profile",
+    "base_chart.angles",
+    "base_chart.houses",
+    "base_chart.planets",
+    "base_chart.summary",
+    "planets",
+    "midpoints",
+    "midpoint_aspects",
+    "midpoint_analysis.factors",
+    "midpoint_analysis.midpoint_axes",
+    "midpoint_analysis.profile.physical_ephemeris_source",
+    "midpoint_analysis.dials",
+    "midpoint_analysis.birth_time_sensitivity.factor_spans",
+    "midpoint_analysis.birth_time_sensitivity.source_pattern",
+    "midpoint_analysis.birth_time_sensitivity.samples",
+    "midpoint_analysis.birth_time_sensitivity.physical_ephemeris_sources",
+    "midpoint_analysis.comparative_geometry",
+    "midpoint_analysis.solar_arc_analysis.directed_factors",
+    "midpoint_analysis.solar_arc_analysis.dials",
+    "midpoint_analysis.solar_arc_analysis.original_table_1925",
+    "midpoint_analysis.solar_arc_analysis.profile.key_source_comparison",
+    "midpoint_analysis.solar_arc_analysis.profile.sun_ephemeris_source",
+    "midpoint_analysis.solar_arc_analysis.birth_time_sensitivity.samples",
+    "midpoint_analysis.solar_arc_analysis.birth_time_sensitivity.source_pattern",
+    "midpoint_analysis.solar_arc_analysis.daily_meridian",
+    "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry"
+  ],
   "evidence_views": {
     "aspect_motion": {
       "fields": [
@@ -59,8 +87,8 @@
         "midpoint_analysis.comparative_geometry.birth_time_sensitivity.summary",
         "midpoint_analysis.comparative_geometry.sources"
       ],
-      "purpose": "Selected symbolic ecliptic rotations and four-point reflection systems. Use actual native Aries Point for tropical cardinal references in either display zodiac. Assigned anchor identity does not resolve a physical ASC/MC. Append required frame paths or the whole midpoint_analysis.comparative_geometry.birth_time_sensitivity.samples array in the first call; field projection cannot descend through an array when exact coordinates are needed; full JSON requires fields=null initially and same-run result delivery. Preserve unknown references and original source discrepancies; no Earth-house or event interpretation.",
-      "when": "用户点名Witte1924比较盘、太阳／子午线／上升等换基或四点镜像几何；仅用已确认的本命资料，不要求新增目标日期。"
+      "purpose": "Selected symbolic ecliptic rotations and four-point reflection systems. Use actual native Aries Point for tropical cardinal references in either display zodiac. Assigned anchor identity does not resolve a physical ASC/MC. Append required frame paths or the whole midpoint_analysis.comparative_geometry.birth_time_sensitivity.samples array via include or fields; field projection cannot descend through an array when exact coordinates are needed; for lossless full JSON, pass include=[\"*\"]. Preserve unknown references and original source discrepancies; no Earth-house or event interpretation.",
+      "when": "用户点名Witte1924比较盘、太阳／子午线／上升等换基或四点镜像几何，且需同时传入 birth_time_uncertainty_minutes（未传生时误差范围时不生成该层；仅用已确认的本命资料，不要求新增目标日期）。"
     },
     "contact_evidence": {
       "fields": [
@@ -120,7 +148,7 @@
         "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.sources"
       ],
       "purpose": "Mixed-pair method, grouped relation counts and invariant-vs-dependent scope; counts are not timing accuracy. Request the same-run dials separately only when the actual equations are needed.",
-      "when": "用户明确指定德国盘太阳弧目标时刻；通用入口须chart_variant=germany。analysis_datetime未给出时不计算。"
+      "when": "用户明确指定德国盘太阳弧目标时刻；analysis_datetime未给出时不计算。"
     },
     "overview": {
       "fields": [
@@ -138,7 +166,8 @@
       "fields": [
         "midpoint_analysis.solar_arc_analysis.profile"
       ],
-      "purpose": "实际年长钥匙、原刊时角算术及未采纳状态"
+      "purpose": "实际年长钥匙、原刊时角算术及未采纳状态",
+      "when": "需要带时区的 analysis_datetime 进行太阳弧推算时"
     },
     "solar_arc": {
       "fields": [
@@ -187,7 +216,8 @@
         "midpoint_analysis.solar_arc_analysis.original_table_1925.full_original_method_accepted",
         "midpoint_analysis.solar_arc_analysis.profile.key_policy"
       ],
-      "purpose": "Witte1925原表、未定格与分步插值算例"
+      "purpose": "Witte1925原表、未定格与分步插值算例",
+      "when": "需要带时区的 analysis_datetime 查看 Witte 1925 表格时"
     }
   },
   "first_view": {
@@ -347,7 +377,7 @@
       },
       "dial_degrees": {
         "default": "90",
-        "description": "Primary dial modulus to summarize in compact output (90, 45, or 22.5).",
+        "description": "Dial modulus scope: '90' or '45' computes 90° and 45° dials; '22.5' additionally computes the 22.5° dial.",
         "enum": [
           "90",
           "45",
@@ -395,6 +425,36 @@
         "default": null,
         "description": "Optional offline house system override; if omitted, FateBridge keeps each chart variant's historical default. Accepts SE letters, keys, or integer codes 0..8 (0=whole_sign, 1=Alcabitus, 2=Regiomontanus, 3=Placidus, 4=Koch, 5=Vehlow Equal, 6=Polich Page, 7=Sripati, 8=equal_mc). Explicit values must be integer codes 0..8 or supported offline house letters/names (W, B, R, P, K, V, T, S, D, E); boolean, floating-point, blank and unsupported values are rejected.",
         "title": "House System"
+      },
+      "max_higher_factor_contacts": {
+        "anyOf": [
+          {
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": 12,
+        "description": "Maximum three-factor and four-factor contacts returned per dial, sorted by tightest orb; null returns all contacts within orb.",
+        "title": "Max Higher Factor Contacts"
+      },
+      "max_mixed_pair_contacts": {
+        "anyOf": [
+          {
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": 2,
+        "description": "Maximum arc-dependent and arc-invariant mixed-pair relation groups returned per dial when analysis_datetime is set; null returns all groups within orb.",
+        "title": "Max Mixed Pair Contacts"
       },
       "name": {
         "anyOf": [

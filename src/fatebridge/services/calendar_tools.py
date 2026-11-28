@@ -55,8 +55,11 @@ def calculate_jieqi_year(
             "requested_jieqis": requested_terms,
         },
         "year": normalized_year,
-        "jieqi_year": annual_grid,
-        "selected_jieqi": selected_terms,
+        **(
+            {"selected_jieqi": selected_terms}
+            if requested_terms
+            else {"jieqi_year": annual_grid}
+        ),
         "summary": summary,
     }
     if missing_terms:

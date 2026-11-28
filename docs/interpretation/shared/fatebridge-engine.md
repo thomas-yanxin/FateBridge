@@ -2,7 +2,7 @@
 
 本页是 Agent 调用 FateBridge 引擎、读取结构化字段与处理错误的速查手册。咨询边界与范围见[硬边界](safety-boundaries.md)与[咨询核心](consultation-core.md)，时间层选择见[时间选择](timing-selection.md)，核心概念见[核心概念](../../concepts.md)。
 
-**铁律**：全部排盘、干支、十神、运限、神煞、星历坐标、卦局与风水位次都交给 FateBridge 引擎计算，AI 不手算。普通摘要沿用默认 `detail=compact` 或按工具发布的 `evidence_views` 传入 `fields`；需要完整 JSON、全部时间线或计算依据时，首次即传 `detail=audit`、`fields=null`（CLI 省略 `--fields`）。
+**铁律**：全部排盘、干支、十神、运限、神煞、星历坐标、卦局与风水位次都交给 FateBridge 引擎计算，AI 不手算。普通摘要沿用默认核心层（被省略的可选重型路径记入 `run_metadata.omitted_fields`）或按工具发布的 `evidence_views` 传入 `fields` / `include`；需要无损完整 JSON 或全部时间线时，首次即传 `include=["*"]`（省略 `fields`）。
 
 [调用与错误](#怎么调引擎) · [参数与首轮字段](#共用参数与输出读取) · [常用工具](#常用工具速查) · [家居风水](#家居风水基础计算) · [调用样例](#典型调用样例) · [跨体系原则](#跨体系与复用原则)
 
@@ -13,7 +13,7 @@
 - **发现与调用**：MCP 公开 `discover_tools`、`run_calculation` 与 `run_batch`（0 资源 URI）。查参先用 `discover_tools(tool=能力名)`；`detail="full"` 须带 `tool`/`family`/`q` 过滤，且 **`output_schema` 仅在显式传 `include_output_schema=True`（REST `?include_output_schema=true`，CLI `--include-output-schema`）时返回**。多工具或多对象共享同一人物资料时优先使用 `run_batch`（REST `POST /api/batch`、CLI `fatebridge batch --request-file ...`）。已取得合同不重复发现。
 - **任务视图与严格投影**：部分工具发布按任务组织的 `evidence_views`（`discover` 可读）。先选卡再把其中的 `fields` 复制到请求；卡名与 `view` 不是请求参数。三端对 `fields` 始终严格校验点号对象路径（数组整体取字段，不传数字索引、不传逗号分隔），无效路径返回 `unknown_projection_path` 并在 `constraints.available` 列出可用键名。控制面细节见[输出控制与结果读取](../../agent-guide.md#输出控制与结果读取)。
 - **本地环境与后备**：本地仓库先用 `uv sync --extra dev` 准备 `.venv`（macOS/Linux `source .venv/bin/activate`，Windows `.\.venv\Scripts\Activate.ps1`），步骤见[快速入门](../../getting-started.md#安装)。以下 `python3` 指激活环境中的解释器；`fatebridge <tool>` 与 `python3 -m fatebridge.cli <tool>` 等价。
-- **常用 CLI 开关**：`--detail {compact,audit}`、`--fields KEY [KEY ...]`、`--as-of AS_OF`（冻结默认当前时钟以便复现）、`--request-file PATH`（全工具支持从 JSON 文件加载输入，显式参数覆盖顶层同名字段），以及 `fatebridge list` / `fatebridge discover [tool]`。
+- **常用 CLI 开关**：`--include INCLUDE [INCLUDE ...]`（按需展开路径、`evidence_views` 名称或 `"*"`）、`--fields KEY [KEY ...]`（与 `--include` 互斥）、`--as-of AS_OF`（冻结默认当前时钟以便复现）、`--request-file PATH`（全工具支持从 JSON 文件加载输入，显式参数覆盖顶层同名字段），以及 `fatebridge list` / `fatebridge discover [tool]`。
 - **错误处理**：CLI 成功与失败均输出 stdout JSON；以 exit code ≠ 0 判错，先查 `isError`、`error_code`（如 `usage_error`、`unknown_tool`、`validation_error`、`dependency_missing`、`timeout`）与 `constraints` 再修正，**仅 `retryable=true` 才重试**。完整错误表见[错误恢复与复现](../../agent-guide.md#错误恢复与复现)及[故障排除](../../troubleshooting.md)。
 
 ## 共用参数与输出读取
@@ -29,7 +29,7 @@
 
 | 工具 | 常用输出根 / 首轮字段 | 说明 |
 | --- | --- | --- |
-| `bazi_overview` | `four_pillars`, `day_master`, `ten_gods`, `structure_profile`, `element_distribution`, `element_distribution_basis`, `person_info` | 综合画像直接读根字段；格局另看 `structure_profile` 喜忌与调候 |
+| `bazi_overview` | `four_pillars`, `day_master`, `ten_gods`, `structure_profile`, `element_distribution`, `favorable_elements`, `favorable_elements_status`, `avoid_elements`, `person_info` | 综合画像直接读根字段；格局另看 `structure_profile` 喜忌与调候 |
 | `bazi_birth_chart` | `bazi_birth.four_pillars`, `bazi_birth.day_master` | 带 `bazi_birth.` 前缀，不与 `bazi_overview` 混用 |
 | `bazi_<dim>`（九专项） | `<dim>_analysis.topic_facts`, `<dim>_analysis.timing_context` | 自动带大运流年触点；详细取证见[八字专题取证](bazi-topic-evidence.md) |
 | `bazi_compatibility` | `natal_contexts`, `cross_chart_relations`, `directional_ten_gods`, `element_complementarity`, `day_pillar_synergy` | 无综合分或内置建议文案；另含 `element_relationship`, `nayin_comparison`, `cross_shensha` |
@@ -41,12 +41,12 @@
 
 ## 常用工具速查
 
-当前 REST 公开 90 个工具（另提供 `/api/batch` 批处理入口），MCP 通过三个入口提供 90 项业务能力，目录共有 90 条记录，CLI 可执行 90 条。完整清单见[算法覆盖](../../algorithm-coverage.md)。
+当前 REST 公开 91 个工具（另提供 `/api/batch` 批处理入口），MCP 通过三个入口提供 91 项业务能力，目录共有 91 条记录，CLI 可执行 91 条。完整清单见[算法覆盖](../../algorithm-coverage.md)。
 
 - **八字本命与九大专项**：综合画像一次调 `bazi_overview`（已含四柱、喜用与格局，不再重调 `bazi_birth_chart`）；仅需原始四柱才用 `bazi_birth_chart`。九大专项（`bazi_marriage`、`bazi_romance`、`bazi_career`、`bazi_wealth`、`bazi_health`、`bazi_children`、`bazi_education`、`bazi_personality`、`bazi_relatives`）接受 `analysis_year/month/day`，自动推算大运/流年并写入 `<dim>_analysis.timing_context`。
 - **双人配合**：`bazi_compatibility` 输出根字段为 `relationship_type`、`person_info`、`natal_contexts`、`element_relationship`、`nayin_comparison`、`day_pillar_synergy`、`element_complementarity`、`cross_shensha`、`cross_chart_relations`、`directional_ten_gods`（无综合分或内置建议文案，须结合双方关系解读）。`sukuyo_compatibility` 按固定口径定 27 宿并区分双向（`person1_to_person2` 与 `person2_to_person1`），详见[宿曜与宿占取证](sukuyo-evidence.md)。
 - **时运推命与西占推运**：全景优先用聚合 `bazi_timing` / `western_timing`，只在盯单一层级或单技法时调用颗粒工具（`bazi_luck_cycles/yearly/monthly/daily/hourly_timing`、`solar_term_timeline`、`solar_terms_for_year`、`lunar_calendar_time`；`solar_return`、`lunar_return`、`transit_chart`、`solar_arc`、`chart_for_year`、`profection`、`primary_directions`/`primary_directions_chart`、`zodiacal_releasing`、`firdaria`、`decennials` 等），不把年度信号细化为几月或吉日。事件盘与生命周期技法（`mundane_ingress_chart`、`planetary_returns`、`horary_chart`、`evaluate_election_time`、`harmonic_chart`、`planetary_ages` 等）按需先 `discover` 核对输入。
-- **占卜与三式**：`meihua_time_cast`（必填起卦年月日时）、`liuyao`（手摇 `--coins` 或 `--gua-code`，对象列表 `lines` 用 REST/MCP）、`combine_four_gua`（固定组合非随机起卦）、`gua_lookup`、`qimen`、`taiyi`（年/月/日/时计见[太乙与三式](../zhanbu/taiyi-sanshi.md)）、`jinkou`、`liuren_chart`、`liuren_yearly_timing`、`suzhan`（区分历日 27 宿与物理天文 28 宿，不把 `conflicted` 挑边合成或将 `not_computed` 写成已验吉）、`interpret_astrology_dice`（只解读用户已给骰面，不代抽）、`sanshi_combined_chart`。
+- **占卜与三式**：`meihua_time_cast`（必填起卦年月日时）、`liuyao`（手摇 `--coins` 或 `--gua-code`，对象列表 `lines` 用 REST/MCP）、`combine_four_gua`（固定组合非随机起卦）、`gua_lookup`、`qimen`、`taiyi`（年/月/日/时计见[太乙与三式](../zhanbu/taiyi-sanshi.md)）、`jinkou`、`liuren_chart`、`liuren_yearly_timing`、`suzhan`（区分历日 27 宿与物理天文 28 宿，不将相反条文挑边合成或将 `not_computed` 写成已验吉）、`interpret_astrology_dice`（只解读用户已给骰面，不代抽）、`sanshi_combined_chart`。
 - **紫微、占星与知识**：紫微有 `ziwei_birth_chart`、`ziwei_timing`、`ziwei_rules`；占星出生盘有 `astrology_chart`、`thirteen_sector_chart`、`hellenistic_chart`、`guolao_chart`、`vedic_chart`、`hamburg_midpoint_chart`、`relationship_chart`。术语与原典释义用 `knowledge_catalog` 与 `knowledge_read`（`--domain --category --key`，`domains[].categories[]` 先查目录，不拿通用相位词条冒充专属星体对规则）。
 
 ## 家居风水基础计算
@@ -69,7 +69,7 @@
 
 ## 典型调用样例
 
-以下资料与日期均属虚构示例；需完整输出与审计依据时传 `--detail audit` 并省略 `--fields`。
+以下资料与日期均属虚构示例；需无损完整输出时传 `--include "*"` 并省略 `--fields`。
 
 ```bash
 python3 -m fatebridge.cli bazi_birth_chart \
@@ -96,7 +96,7 @@ python3 -m fatebridge.cli astrology_chart \
 python3 -m fatebridge.cli fengshui_minggua --birth-year 1990 --gender female
 python3 -m fatebridge.cli fengshui_annual_stars --effective-year 2026
 python3 -m fatebridge.cli fengshui_monthly_stars --effective-solar-year 2026 --solar-month-number 3
-fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json --detail compact
+fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json
 ```
 
 ## 跨体系与复用原则

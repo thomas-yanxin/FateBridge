@@ -132,25 +132,6 @@ class MonthModelComparison(PartialOutput):
     scope: str | None = None
 
 
-class DivinationCalendarConventions(PartialOutput):
-    month_model_comparison: MonthModelComparison | None = None
-    cast_at: str | None = None
-    year_boundary: str | None = None
-    month_boundary: str | None = None
-    day_boundary: str | None = None
-    clock: str | None = None
-    month_branch: str | None = None
-    day_ganzhi: str | None = None
-    xunkong: list[str] | None = None
-
-
-class DivinationTrace(PartialOutput):
-    rule_id: str | None = None
-    fact_path: str | None = None
-    inputs: dict[str, OpenJsonValue] | None = None
-    sources: list[str] | None = None
-
-
 class LiuyaoEvidence(PartialOutput):
     ruleset_id: str | None = None
     ruleset_version: str | None = None

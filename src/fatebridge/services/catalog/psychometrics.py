@@ -38,10 +38,6 @@ def _validate_ipip_output(
     raise OutputContractError(f"IPIP-50 输出 mode 非法：{mode}")
 
 
-def _compact_ipip_big_five(result: ServiceResult) -> ServiceResult:
-    return {key: value for key, value in result.items() if key != "provenance"}
-
-
 SPECS: list[ToolSpec] = [
     ToolSpec(
         name="ipip_big_five",
@@ -56,6 +52,6 @@ SPECS: list[ToolSpec] = [
         family="psychometrics",
         rest_path="/api/psychometrics/ipip-big-five",
         uses_astronomy_runtime=False,
-        compact_view=_compact_ipip_big_five,
+        default_omit=("provenance",),
     )
 ]

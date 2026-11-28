@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Literal, NamedTuple, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Any, NamedTuple, Protocol, runtime_checkable
 
 from typing_extensions import NotRequired, TypedDict
 
@@ -15,8 +15,6 @@ if TYPE_CHECKING:
 
     from fatebridge.core.reproducibility import ReproducibilityPolicy
     from fatebridge.utils.birth_input import PersonInfo
-
-DetailLevel = Literal["compact", "audit"]
 
 ServiceResult = dict[str, Any]
 if TYPE_CHECKING:
@@ -122,16 +120,6 @@ class ApproximationDetector(Protocol):
     def __call__(self, result: ServiceResult, /) -> bool: ...
 
 
-class CompactView(Protocol):
-    def __call__(self, result: ServiceResult, /) -> ServiceResult: ...
-
-
-class DetailView(Protocol):
-    def __call__(
-        self, result: ServiceResult, detail: DetailLevel, requested_fields: set[str], /
-    ) -> ServiceResult: ...
-
-
 class OutputContractError(RuntimeError):
     """A service bug, never a user-input error."""
 
@@ -190,8 +178,7 @@ class ToolSpec:
     uses_astronomy_runtime: bool = True
     execution_wrapper: ExecutionWrapper | None = None
     evidence_views_builder: EvidenceViewsBuilder | None = None
-    compact_view: CompactView | None = None
-    detail_view: DetailView | None = None
+    default_omit: tuple[str, ...] = ()
 
     def __getattribute__(self, name: str) -> Any:
         if name == "output_model":

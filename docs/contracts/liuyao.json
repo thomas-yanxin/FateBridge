@@ -1,4 +1,16 @@
 {
+  "default_omit": [
+    "calendar_context",
+    "descriptions",
+    "current_hexagram.classical",
+    "changed_hexagram.classical",
+    "liuyao_evidence.lines",
+    "liuyao_evidence.fanfu",
+    "liuyao_evidence.hidden_spirits",
+    "liuyao_evidence.three_harmony",
+    "liuyao_evidence.month_model_comparison",
+    "liuyao_evidence.timing_candidates"
+  ],
   "evidence_views": {
     "focus_and_timing": {
       "fields": [

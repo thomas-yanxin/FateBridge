@@ -7,7 +7,7 @@ import difflib
 import logging
 import os
 from functools import cache
-from typing import Annotated, Literal
+from typing import Annotated
 
 from fastmcp import FastMCP
 from fastmcp.exceptions import ValidationError as MCPValidationError
@@ -30,12 +30,15 @@ from fatebridge.application.discovery import (
     select_mcp_specs,
 )
 from fatebridge.application.execution import execute_with_receipt, result_is_error
-from fatebridge.application.response_delivery import deliver_response
+from fatebridge.application.response_delivery import (
+    deliver_response,
+    validate_delivery_controls,
+)
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
-from fatebridge.core.execution_context import DetailLevel, ExecutionOptions
+from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.mcp_transport import protocol_result
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.transports.flags import FIELDS_FLAG_DESC
+from fatebridge.transports.flags import FIELDS_FLAG_DESC, INCLUDE_FLAG_DESC
 from fatebridge.utils.errors import (
     ParameterError,
     error_response_payload,
@@ -56,7 +59,7 @@ MCP_INSTRUCTIONS = (
     "区分计算事实、传统解释与现实建议。"
     "已知工具定义时直接调用 run_calculation；未知工具或参数时调用 discover_tools(q=...) 或 discover_tools(tool=...)。"
     "同一对象跨多体系计算或多人合盘时优先调用 run_batch，通过 subjects、context（共享问事/分析时刻与地点）、defaults 与 calls 一次性执行并共享同一冻结时刻 as_of，避免重复出生与地点参数。"
-    "run_calculation 与 run_batch 默认 detail=compact 返回核心业务字段；需要指定子字段传 fields（严格校验路径，错误时附可用字段）；需要完整输出与方法依据传 detail=audit。"
+    "run_calculation 与 run_batch 默认返回核心业务字段，省略项见 run_metadata.omitted_fields；可用 include 追加路径、evidence_views 名称或 ['*'] 获取无损全量，或用 fields 仅返回指定路径（include 与 fields 互斥，无效路径报错并附可用字段）。"
     "isError=true 时按 error_code 和 issues[].path / constraints 修正参数后重调，仅 retryable=true 才按原参数重试。"
 )
 
@@ -152,7 +155,7 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
         name="run_calculation",
         description=(
             "按工具名与参数执行确定性计算。"
-            "支持 detail（compact 默认精简事实 / audit 完整结果与取证）、fields（严格字段投影）与 as_of（冻结当前时刻）。"
+            "支持 include（追加路径/视图名/'*'）、fields（严格投影，与 include 互斥）与 as_of（冻结时刻）。"
         ),
         annotations=meta_annotations,
         tags={"meta"},
@@ -160,7 +163,9 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
     def run_calculation(
         tool: str,
         arguments: dict[str, object] | None = None,
-        detail: DetailLevel = "compact",
+        include: Annotated[
+            list[str] | None, Field(description=INCLUDE_FLAG_DESC)
+        ] = None,
         fields: Annotated[list[str] | None, Field(description=FIELDS_FLAG_DESC)] = None,
         as_of: str | None = None,
     ) -> ToolResult:
@@ -168,9 +173,8 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
         if spec is None:
             return _unknown_tool_result(tool, "run_calculation", allowed_tools)
         try:
-            options = ExecutionOptions.model_validate(
-                {"as_of": as_of, "detail": detail}
-            )
+            validate_delivery_controls(include, fields)
+            options = ExecutionOptions.model_validate({"as_of": as_of})
             request = spec.request_model.model_validate(arguments or {})
             result = execute_with_receipt(
                 spec,
@@ -182,8 +186,8 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
             payload = deliver_response(
                 result,
                 spec=spec,
+                include=include,
                 fields=fields,
-                detail=options.detail,
             )
             return protocol_result(payload, failed=False)
         except Exception as exc:
@@ -202,7 +206,7 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
         name="run_batch",
         description=(
             "单次无状态批量执行（1-32 calls），自动映射 subjects、context、defaults 与 arguments，"
-            "共享 as_of。支持单条 detail/fields 覆盖与 stop_on_error。"
+            "共享 as_of。支持单条 include/fields 与 stop_on_error。"
         ),
         annotations=meta_annotations,
         tags={"meta"},
@@ -228,7 +232,6 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
             dict[str, object] | None,
             Field(description="共享默认参数"),
         ] = None,
-        detail: DetailLevel = "compact",
         as_of: str | None = None,
         stop_on_error: bool = False,
     ) -> ToolResult:
@@ -239,7 +242,6 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
                     "context": context,
                     "defaults": defaults or {},
                     "calls": calls,
-                    "detail": detail,
                     "as_of": as_of,
                     "stop_on_error": stop_on_error,
                 }

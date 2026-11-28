@@ -124,7 +124,7 @@ def mixed_pair_sensitivity(
                 ),
                 "reason_code": reason_code,
                 "unresolved_reference_names": sorted(unresolved),
-                "native_sample_reference": f"midpoint_analysis.time_sensitivity.samples[{i}]",
+                "native_sample_reference": f"midpoint_analysis.birth_time_sensitivity.samples[{i}]",
                 "solar_sample_reference": f"midpoint_analysis.solar_arc_analysis.birth_time_sensitivity.samples[{i}]",
             }
         )

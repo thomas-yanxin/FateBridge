@@ -36,6 +36,7 @@ def calculate_election(
     candidate_hour_origin: str = "midnight",
     ut1_source: str = "swiss_delta_t",
     search_window_hours: int = 0,
+    max_candidate_windows: int | None = 5,
 ) -> dict[str, Any]:
     """评估某候选时刻对某类用事（结婚/开业/签约等非医疗活动）是否吉利。"""
     label = "择日"
@@ -116,7 +117,12 @@ def calculate_election(
                         }
                     )
                 windows.sort(key=lambda w: (-w["score"], w["offset_hours"]))
-                payload["candidate_windows"] = windows[:5]
+                payload["candidate_windows_total_count"] = len(windows)
+                payload["candidate_windows"] = (
+                    windows[:max_candidate_windows]
+                    if max_candidate_windows is not None
+                    else windows
+                )
 
             context = {
                 "tool": label,

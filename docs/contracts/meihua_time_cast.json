@@ -1,66 +1,43 @@
 {
   "call_guidance": {
     "calendar_precision": "读取meihua.calendar_policy.label_precision：官方列出2057-09-28、2089-09-04、2097-08-07朔日可能相差一日。matched_events是明示软件复核窗口，不是官方物理置信区间；保留已公布标签，不猜偏移方向、概率或替代卦。历表月日如修订须复算；未列事件不等于全时区或天文精度认证。不能删除这些日期使验收满分。",
+    "calendar_rules": "春节换年、民用午夜换日、闰月沿用本月数、节月季令是明示约定；不是原文唯一裁定。",
     "casting": "只支持年月日時取数；输入公历钟时，按指定时区查中国农历。不得把八字立春年柱代替农历年支。",
     "civil_clock": "analysis_utc_offset可与analysis_timezone联合核对，格式±HH:MM或±HH:MM:SS；保留命名地区时区，不换成固定偏移。未给偏移仍拒绝重复钟时，不存在的钟时、整日跳过和错误偏移不能救回。读analysis_context.civil_utc_offset/civil_instant_utc及meihua.calendar_policy.civil_clock_resolution，核对fold、UTC和实际pytz/IANA版本。",
-    "conventions": "春节换年、民用午夜换日、闰月沿用本月数、节月季令是明示约定；不是原文唯一裁定。",
-    "current_weather_study": "1.7.0实际范围检验另读weather.research_validation.current_profile_study。固定2026年1—9月主队列273日，明示起卦节月季节时49个无雨标签、29正确、224弃权；全队列正确贡献29，对比恒无雨158，未通过。2024/2025和季节未知敏感性情形分别保留，不能挑较好比例拼接或代替主队列；2008份情形记录对应1004个目标日期，不是2008独立观测。",
     "day_qi": "Read interpretation.day_qi for selected NLC1925 day-branch element and month/day strength.",
     "external_manifestations": "external_observations接收已报manifestation类别及label描述，可选填motion=moving或stationary。未知不猜，不按问题文字或未查看场景自动分类。适用于全部人事题篇（general/planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler/household/dwelling/marriage/dining）。",
-    "first_response": "普通卦务首轮复制evidence_views.general.fields（同suggested_fields），明确选择interpretation_topic=weather时用weather卡，明确选择人事题篇时用topic卡。按实际选定的分支取证，问题文字不切换分支。需要完整JSON时首次fields=null。",
-    "household_chapters": "显式household为家宅章、dwelling为屋舍章，均读topic/topic_audit已发布父字段。以本候选原体为主、初用为家宅或屋舍；不是风水空间评估、房屋检查或选房迁居许可。家宅影印比利与固定转录比和未裁定，source_relation_condition=null，五行相同不能自动套家宅安稳；屋舍體生用保留冷退/转录衰退，不改原字。家宅生体转引人事章按所列四内卦实际生体角色留路径；未见仅限该范围，不当完整内外无生。",
-    "internal_control": "人事分支读取interpretation.internal_countercontrol：原体加初用、体互、用互、变用共五个分析角色，不是五次独立观测。用生体之卦受其他卦克则生助受限，用克体之卦受制仅取稍解其凶；原关系保留。control_edges给直接制约及制约者自身所受克，qualifications保留其对原体的关系；离火制兑金也可能同时泄木体，不能递归抵消、计票、加权、合成成败。季令弱或未知不自动关掉制约。每个计数候选自带本卦事实路径；weather分支为null。",
+    "first_response": "普通卦务首轮复制evidence_views.general.fields（同suggested_fields），明确选择interpretation_topic=weather时用weather卡，明确选择人事题篇时用topic卡。按实际选定的分支取证，问题文字不切换分支。需要完整JSON时使用 include=[\"*\"]。",
+    "household_chapters": "显式household为家宅章、dwelling为屋舍章，均读topic/topic_details已发布字段与interpretation.topic_reading。以本候选原体为主、初用为家宅或屋舍；不是风水空间评估、房屋检查或选房迁居许可。",
+    "internal_control": "读取 meihua.stage_relations 与 interpretation.traditional_stage_readings（或 internal_control 字段卡）：原体加初用、体互、用互、变用共五个分析角色，分别给出本卦与互变各卦对原体的五行生克关系与 fact_path，不递归抵消、计票、加权或合成成败。",
     "limits": "季令只列所选规则的旺衰，不据此生造外应或精确应期。",
     "motion_context": "observer_activity只接已确认占者当时seated坐/walking行/standing立，未知不补；external_observations逐条motion可为moving/stationary，未知省略，不从水土类别、label、问句、车辆运动或内卦角色推断。读interpretation.motion_context或motion字段卡。内卦体互静、用变动是符号角色；与外物运动、占者活动分列，各候选保留自身原体及外应资格路径。",
-    "obstruction_days": "interpretation.stage_emphasis.obstruction_timing按本候选原体列克体阻节日数。须调用方明确matter_scenario=favorable_matter且实际内卦同时有生体、克体才激活；乾1兑2为原句明例，其余六卦为类推。重复角色不累加，多卦日数不选总和/最大/最小；未给起算日及计日边界，不生成完成日期。",
     "omen_reversal": "Explicitly reported external_observations manifestation gold_silver_treasure/weapon uses NLC1925內外論 original-body symbol qualifications.",
-    "postheaven_timing": "端法名义应期数见motion_context.postheaven_count_reference：仅observed_trigrams/observed_categories且占者observer_activity明确时，原上下卦先天序数加原时支数一次，以除六前总数按行1/2、坐2、立1作精确比例。奇数取半保留分数，不取动爻余数，不推定主体活动、时间单位、起算时刻、天数、日期或现实观测窗口。已有卦的起法未知，数起卦和年月日时起卦不借用此式。",
-    "qi_branch_timing": "求名/求财的topic_reading.qi_branch_timing_reference按原章句实际生体/克体角色分列年、月、日、时的明列支标签；各取数候选读自身topic_clause同名子层。年/时只用原seed，年支不以立春年或子初翌日重算。节月支与名义农历月序对应支分列，后者只是固定月序映射，闰月及完整时序含义未唯一裁定；23时日界备选不改原年支。坤辰戌丑未只另属月，未申见于四单位，月的明列支为辰戌丑未申，其他单位为未申。",
-    "qi_day_timing": "求名/求财且day_qi已知时，topic_reading.qi_day_timing_reference按原章句实际生体/克体角色核时序明列日支，求名另保留无克体条件未全核时的原体参照；不得用原体或变用替代指定角色。坤辰戌丑未月是月限定，日支原子只取未申年月日時中的未/申；这是明列标签相符，不是五行旺衰或全时序条件。其他数字、季节、五行干支条文未解析，原子不符不等于全条件否定；在任及完整内外无克体前提另列。",
     "quiet_context": "observation_context只接同次起卦与占者已报label及quiet_room/nothing_heard/nothing_seen三项严格布尔，未知省略或null；未采集不等于确认无所闻见。读quiet字段卡。全真仅核对所选文明书局《静占》的不论外卦条件，不代表完整年月日衰旺合参。静室不推占者坐/行/立；问题文字和本卦动爻不补闻见事实。",
     "reading": "用、体互、用互、变用均相对原体分析；经文按实际卦码与动爻引用。is_active=false为其他爻单动的假设参考。",
-    "reputation_supplement": "reputation另读chapter_qualifications的5条补充句、八卦時序及方道原文；reputation_context只接收已确认的原文在任与職任之處条件，不从已就业、考试、问句或label推定。未知省略/null，布尔须明确。初始五条不变，各候选沿用自身原体及四个辅助角色，生体和克体分别列自身时序、受制与旺衰；内卦无克体不等于已确认完整内外无克体。",
+    "reputation_supplement": "reputation另读interpretation.reputation_supplement（time_class、fangdao_class及reported_context）；reputation_context只接收已确认的原文在任与職任之處条件，不从已就业、考试、问句或label推定。未知省略/null，布尔须明确。",
     "situational_responses": "Only when caller reports response_context for the same casting episode, use situational field card. Map querent occupied compass side, present weather, setting and human source categories against each candidate own original body.",
-    "solar_date_reference": "读取meihua.calendar_policy.solar_term_date_reference：四条selected_record_paths分别指当前／下一节气和月令起终锚点；按固定UTC+08比较官方日标签，保留实际时刻、模型、source和fact_path。date_disagreement_count按同年同名事件去重，不能把重复记录当独立验证；publisher_named_event_count是固定说明点名，日期相同不认证精度。",
-    "stage_emphasis": "读取interpretation.stage_emphasis或stage_emphasis字段卡。matter_scenario只接调用方已确认的原文所问事项类别：favorable_matter问吉事、unfavorable_matter问不吉之事，不是愿望、情绪、系统预测或已发生结果；未知不补，不由题篇、关键词或关系推断，天气拒绝此参数。scenario_declaration保留原值、caller_declared_unverified及原输入路径。",
-    "strength_reading": "人事分支的interpretation.seasonal_qualification按文明书局卷二衰旺论分列三条联合条件：体旺逢生、体衰逢克、体衰有生。preferences分列体宜旺、生体宜旺、克体宜衰，不要求体和生体之卦同时旺，不累加成分数或必要门槛。原文未定及缺节月保持pending_strength/unknown_strength，不写中性或衰。",
+    "solar_date_reference": "读取meihua.calendar_policy.solar_term_date_reference：对当前／下一节气和月令起终共4个锚点（compared_record_count）按固定UTC+08比较官方日标签，events保留不一致事件及实际时刻、模型、source和fact_path。date_disagreement_count按同年同名事件去重，不能把重复记录当独立验证；publisher_named_event_count是固定说明点名，日期相同不认证精度。",
+    "stage_emphasis": "读取interpretation.stage_emphasis或stage_emphasis字段卡。matter_scenario只接调用方已确认的原文所问事项类别：favorable_matter问吉事、unfavorable_matter问不吉之事，不是愿望、情绪、系统预测或已发生结果；未知不补，不由题篇、关键词或关系推断，天气拒绝此参数。interpretation.stage_emphasis仅在提供matter_scenario且非weather时返回，保留matter_scenario与scenario_fact_path原输入路径。",
+    "strength_reading": "读取 meihua.seasonal_strength（或 strength 字段卡）：按节月地支列出原体及初用、体互、用互、变用的季令旺衰（旺/衰/原文未定）与 fact_path；缺节月时 seasonal_strength 为 null，不写中性或自填旺衰，也不累加成分数。",
     "topic_chapters": "显式选planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler/household/dwelling并使用topic字段卡。原四章20条与新增出行/谒见10条分别保留规则集；travel另列原体旺气及各辅助生体偏好，多字阈值及舟陆等句的角色范围未裁定，不补方位或出行指令。",
-    "traveler_frame": "traveler按行人章初始五条及补充六句，返归仍以原体为参照，在外另以初用为受作用者。chapter_qualifications.initial_use_frame逐列原体、体互、用互、变用对初用的实际有向关系；体生用可为初用受生，用生体不能改写成用受生。初用月令衰且实际受克须同成立，原文未定与缺月令保持未知，内卦未见不证明完整内外没有。震多艮多门槛与范围未裁定；坎兑句只标明初用经卦读法。保留影印盈旺/转录在外之情況、紛爭之應/紛爭差异。",
-    "trigram_relation_symbols": "按trigram_symbols字段卡核对所选16条史料象义：仅实际用生体或用克体的角色匹配对应卦名，不能以同五行替代卦名。所有或字为备选，不自动识别姓名、性别、身份或方位；受制与未知旺衰保留，各取爻候选用自己的原体。所选巽克体作南方，固定转录作东南，不据八卦常识换字。",
-    "wealth_supplement": "interpretation_topic=wealth 时读取 interpretation.wealth_components。文明书局卷二求財占补充句逐项核对初用、体互、用互、变用和原体的关系，各候选使用自己的卦、体气和直接制约。source_groups 给出原句与关系成分。all_named_components_present 表示该句所列成分是否齐备，两组可同时齐备。及字的组合含义待裁定，timing_reference 保留原文卦气措辞。",
-    "weather": "天时占显式选interpretation_topic=weather并复制weather字段卡到fields。按selected_readings的effective_status/controlled_tags/conditional_tags解释，不能只读raw status=matched。controls保留阈值和五/六位置及合计/单卦范围分歧，不投票。",
-    "weather_dayparts": "1.7.0离在艮上暮雨朝晴仅匹配同一本/互/变重卦上离下艮；两项原文时段保留time_scope=morning/evening，不能当成同窗自相矛盾。读取time_scope_comparison：未定时段不等于全天，与朝暮的关系仍待核定；不自动交集、排序或合为唯一预报。朝暮不补日期、钟时或日出日落，已知analysis_datetime也不自动定位应验日。离互艮宫仍未裁定。每个取爻候选都有自己的时段比较；旧1.5.0现实检验及1.6.0语义准备不能认证本轮。",
-    "weather_prior_context": "prior_condition可用neither_prolonged表达久雨与久晴两个前期条件均已确认不成立；null或省略仍未知，不为消除pending_context而填neither。它只使四项前期条件条款not_met，不补季节、多字阈值或唯一预报。一天无雨不证明久晴，缺测或间歇天气也不自动证明两者均不成立；公开月度回顾资料不证明起卦当时已可得。旧1.7.0负面现实检验保持不变，新增事实状态不是预测提升或原文久字阈值已裁定的证明。",
-    "weather_reference_baselines": "weather.research_validation.reference_baseline_supplement单列现代参考方法，不是梅花预测或卦象概率。起卦前一日中午不能使用尚未结束的当日总雨量，持续性改用最近完整民用日即目标日前2日；月度基线固定1991—2020，10958日并与官方12个月常年雨日数按公布精度核对相符。全273日条件性历史参考持续性183、月度190，旧梅花正确贡献29；同49日参考各31、旧标签29。",
-    "weather_research": "research_validation的旧1.0.0/2025结果与additional_profile_audits的1.5.0/2024结果分别读取，不能跨政策和年份合并。后者16/29、337弃权，与同日恒无雨16/29相同；主终点按全366日正确贡献16计，对比恒无雨214，未通过。全队列正确贡献不是命中率；实际前瞻观测仍0。",
-    "weather_seasonal": "1.6.0新增秋金晴、冬坎雪、春土雨按固定卷二转录1441921；乾兑或坤艮任一见于实际本互变即可，不要求两者同现或多字阈值。仅用已确认weather_context.season，未知不从公历月份猜。所选文明书局冬句未见坎之水，春句坤兌与转录坤艮不同；逐条保留textual_status/source_witnesses，不默改底本，也不将土雨象随坎雨一并取消。旧现实检验不认证1.6.0。",
-    "weather_text": "selected_readings.source_witnesses保留影印选段与所引固定转录的文字差异。四时多雨不改成保证有雨；未辨清的字形或主语不凭熟悉文本补齐。震多春夏须核实际季节，巽多四时与兑多亦阴均须明示阈值和五/六位置资格；兑阴不是无雨标签。目读由助手完成，非独立专家或全章认证。"
+    "wealth_supplement": "interpretation_topic=wealth 时读取 interpretation.topic_reading（求財占第十的 body、use、relation、clause_id、quote、reading），并结合 interpretation.traditional_stage_readings 与 meihua.stage_relations/seasonal_strength 解读。",
+    "weather": "天时占显式选interpretation_topic=weather，按需传weather字段卡或include=[\"interpretation.weather\"]。读取interpretation.weather的ruleset_id、version、context、trigram_counts、controls（rule_id/status/affected_targets）、matched_rule_ids、pending_rule_ids，以及同级字段interpretation.comprehensive_judgement；不以体用生克判断天气，single_forecast恒为null。",
+    "weather_prior_context": "prior_condition可用neither_prolonged表达久雨与久晴两个前期条件均已确认不成立；null或省略仍未知，不为消除pending_context而填neither。它只使四项前期条件条款not_met，不补季节、多字阈值或唯一预报。一天无雨不证明久晴，缺测或间歇天气也不自动证明两者均不成立；公开月度回顾资料不证明起卦当时已可得。",
+    "weather_seasonal": "秋冬春季节条文仅用已确认weather_context.season（未知不从公历月份猜），并在interpretation.weather.context与matched_rule_ids/pending_rule_ids核对实际匹配与待定状态。"
   },
+  "default_omit": [
+    "calendar_context",
+    "meihua.base_hexagram.classical",
+    "meihua.changed_hexagram.classical",
+    "meihua.calendar_policy.solar_term_date_reference",
+    "meihua.calendar_policy.civil_clock_resolution",
+    "meihua.calendar_policy.label_precision.matched_events",
+    "interpretation.line_oracles",
+    "interpretation.traditional_stage_readings",
+    "interpretation.traditional_judgement",
+    "interpretation.moving_line_oracle"
+  ],
   "evidence_views": {
-    "audit": {
-      "fields": [
-        "analysis_context",
-        "calendar_context.lunar_calendar",
-        "meihua.ruleset",
-        "meihua.calendar_policy",
-        "meihua.stage_relations",
-        "meihua.seasonal_strength",
-        "interpretation.topic_reading",
-        "interpretation.classical_text_reference",
-        "interpretation.traditional_stage_readings",
-        "interpretation.external_omens"
-      ],
-      "purpose": "核对原文修订、历法约定与实际取数过程；不另起卦"
-    },
-    "chapter_qualitative_motion": {
-      "fields": [
-        "meihua.body_trigram",
-        "meihua.use_trigram",
-        "interpretation.topic_reading.chapter_qualifications.qualitative_motion",
-        "summary"
-      ],
-      "scope": "Requires interpretation_topic=travel or traveler. A declared NLC1925 grammatical reading selects the candidate's initial body for travel and initial use for traveler. Preserve 多 as an unquantified qualifier; distinguish it from inner-role motion and field observations. Existing occurrence-count readings remain unresolved. No probability, route, location, safety or return-time certificate."
-    },
     "civil_clock": {
       "fields": [
         "analysis_context",
@@ -150,7 +127,7 @@
       ]
     },
     "motion": {
-      "description": "占者坐行立、实际外应动静与内卦符号角色分列；缺吉凶判断的条件保持待定，无日期或结局；端法且占者活动明确时另核除六前名义比例数及未知时间单位",
+      "description": "占者坐行立、实际外应动静与内卦符号角色分列；缺吉凶判断的条件保持待定，无日期或结局",
       "fields": [
         "analysis_context",
         "meihua.body_trigram",
@@ -212,6 +189,21 @@
       ],
       "purpose": "读同一次时间梅花的卦变、原体下初中终生克与季令，区分原文和现代建议"
     },
+    "rules_and_calendar": {
+      "fields": [
+        "analysis_context",
+        "calendar_context.lunar_calendar",
+        "meihua.ruleset",
+        "meihua.calendar_policy",
+        "meihua.stage_relations",
+        "meihua.seasonal_strength",
+        "interpretation.topic_reading",
+        "interpretation.classical_text_reference",
+        "interpretation.traditional_stage_readings",
+        "interpretation.external_omens"
+      ],
+      "purpose": "核对原文修订、历法约定与实际取数过程；不另起卦"
+    },
     "situational": {
       "fields": [
         "meihua",
@@ -240,7 +232,7 @@
         "summary"
       ]
     },
-    "stage_emphasis_audit": {
+    "stage_emphasis_details": {
       "description": "所报原文问事情境、内卦紧次及迟速／生克条件",
       "fields": [
         "analysis_context",
@@ -255,7 +247,7 @@
         "summary"
       ]
     },
-    "strength_audit": {
+    "strength_details": {
       "fields": [
         "meihua",
         "interpretation.topic_reading",
@@ -281,7 +273,7 @@
       "purpose": "核对所选文明书局本八章的初始体用条款及出行偏好、失物方位类象、行人初用参照、异文与各实际取数候选；不以通用吉凶取代章句",
       "when": "interpretation_topic为planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler之一"
     },
-    "topic_audit": {
+    "topic_details": {
       "fields": [
         "analysis_context",
         "meihua",
@@ -293,16 +285,15 @@
         "interpretation.day_qi"
       ],
       "purpose": "完整所选题篇条款、异文及实际候选的原体用/互变/季令与爻辞参照",
-      "when": "八个显式题篇分支需要完整审计；沿用同run结果"
+      "when": "显式题篇分支需要完整细节时；沿用同run参数或 include"
     },
     "trigram_symbols": {
       "fields": [
         "meihua.stage_relations",
-        "meihua.seasonal_strength",
-        "interpretation.casting_readings"
+        "meihua.seasonal_strength"
       ],
-      "purpose": "按本次原体与初用、体互、用互、变用的实际生体或克体关系，读取文明书局本16组八卦专属象义。各计数候选分列，保留受制和旺衰；或字为史料备选，不能推定现实人物、姓氏、方位、灾祸、诊疗、应期或已验证结果。所选巽克体南方等异文不以常识改字。",
-      "when": "比较相同五行却不同卦名的具体传统象义，或核对体用总诀原句与本次角色；天时分支为null"
+      "purpose": "核对本次原体与初用、体互、用互、变用的卦名、五行生克关系及季令旺衰，保留各角色 fact_path；不能推定现实人物、姓氏、方位、灾祸、诊疗或应期。",
+      "when": "比较体用及互变各卦名、五行生克关系与季令旺衰时（含默认 general 与各人事分支；天时分支 seasonal_strength 按季节参数核对）"
     },
     "wealth": {
       "fields": [
@@ -329,14 +320,14 @@
       "purpose": "先读实际命中条文、制约资格、五/六位置计数差异及旧研究负结果；不以体用判晴雨，不把raw matched当成未受制天气断言",
       "when": "interpretation_topic=weather时选择；需要的weather_context由已确认事实提供"
     },
-    "weather_audit": {
+    "weather_details": {
       "fields": [
         "analysis_context",
         "meihua",
         "interpretation.weather"
       ],
       "purpose": "完整天气规则、计数、条件轨迹与来源；用于核对缺项和跨章制化候选",
-      "when": "interpretation_topic=weather且需要审计细节时；沿用同run结果"
+      "when": "interpretation_topic=weather且需要完整细节时；沿用同run参数或 include"
     }
   },
   "first_view": {

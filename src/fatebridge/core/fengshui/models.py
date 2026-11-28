@@ -1,4 +1,4 @@
-"""Consolidated Feng Shui Pydantic request and compact per-tool response models."""
+"""Consolidated Feng Shui Pydantic request and per-tool response models."""
 
 from __future__ import annotations
 
@@ -1358,7 +1358,7 @@ class AssessRequest(BazhaiRequest):
         return self
 
 
-# --- Compact Per-Tool Projection-Compatible Output Models (<6 KB schemas) ---
+# --- Per-Tool Projection-Compatible Output Models (<6 KB schemas) ---
 
 
 class Coverage(PartialOutput):

@@ -154,7 +154,6 @@ class TaiyiCalendarRules(PartialOutput):
     target_clock: str | None = None
     double_hour_start: str | None = None
     initial_interval: str | None = None
-    modern_conventions: str | None = None
     dst_policy: str | None = None
     counter_rule_source: str | None = None
     counter_formula: str | None = None
@@ -170,28 +169,6 @@ class TaiyiCalendarRules(PartialOutput):
     timezone: str | None = None
     solar_correction_affects_year: bool | None = None
     pillars_role: str | None = None
-
-
-class TaiyiCountStep(PartialOutput):
-    palace: str | None = None
-    value: int | None = None
-    kind: str | None = None
-
-
-class TaiyiCountTrace(PartialOutput):
-    count: int | None = None
-    path: list[TaiyiCountStep] | None = None
-    terminal_palace: str | None = None
-    terminal_excluded: bool | None = None
-    counting_rule: str | None = None
-    source: str | None = None
-    selected_count: int | None = None
-    selected_count_basis: str | None = None
-
-
-class TaiyiRuleTrace(PartialOutput):
-    main: TaiyiCountTrace | None = None
-    guest: TaiyiCountTrace | None = None
 
 
 class TaiyiEvidenceFact(PartialOutput):

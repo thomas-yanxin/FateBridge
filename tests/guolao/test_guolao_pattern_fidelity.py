@@ -8,8 +8,11 @@ from datetime import datetime
 
 import pytest
 
+from fatebridge.application.execution import execute_with_receipt
+from fatebridge.application.response_delivery import deliver_response
 from fatebridge.core.guolao import moira as m
-from fatebridge.services.guolao import calculate_guolao_chart, compact_guolao_chart
+from fatebridge.services.guolao import calculate_guolao_chart
+from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.surface_payloads import astro_payload
 
 ALONE = dict(zip(m.MOIRA_PLANET_ORDER, range(11)))
@@ -251,5 +254,28 @@ def test_guolao_moira_oracle_and_shoushi_and_compact() -> None:
         == "shoushi_du_365_2575"
     )
 
-    compact = compact_guolao_chart(result)
-    assert len(json.dumps(compact, ensure_ascii=False).encode("utf-8")) < 6144
+    spec = next(s for s in CATALOG if s.name == "guolao_chart")
+    req = spec.request_model.model_validate(
+        {
+            "birth_year": 1990,
+            "birth_month": 5,
+            "birth_day": 15,
+            "birth_hour": 14,
+            "birth_minute": 30,
+            "birth_timezone": "Asia/Shanghai",
+            "birth_longitude": 116.4,
+            "birth_latitude": 39.9,
+            "use_true_solar_time": False,
+            "analysis_datetime": "2026-06-01T12:00:00+08:00",
+            "month_basis": "jie_month",
+        }
+    )
+    raw = execute_with_receipt(spec, req)
+    default_out = deliver_response(deepcopy(raw), spec=spec)
+    assert len(json.dumps(default_out, ensure_ascii=False).encode("utf-8")) <= 10240
+    omitted = default_out["run_metadata"]["omitted_fields"]
+    assert "guolao.planetary_mansions" in omitted
+    assert "guolao.timing.transit_bodies" in omitted
+    assert deliver_response(deepcopy(raw), spec=spec, include=["*"]) == raw
+    patterns_view = deliver_response(deepcopy(raw), spec=spec, include=["patterns"])
+    assert patterns_view["guolao"]["moira_patterns"] == raw["guolao"]["moira_patterns"]

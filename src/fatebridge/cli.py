@@ -334,7 +334,10 @@ def run(argv: list[str] | None = None) -> int:
         return 2
 
     from fatebridge.application.execution import execute_with_receipt, result_is_error
-    from fatebridge.application.response_delivery import deliver_response
+    from fatebridge.application.response_delivery import (
+        deliver_response,
+        validate_delivery_controls,
+    )
     from fatebridge.core.execution_context import ExecutionOptions
     from fatebridge.utils.errors import ParameterError, handle_calculation_error
     from fatebridge.utils.formatting import format_json_response
@@ -348,6 +351,7 @@ def run(argv: list[str] | None = None) -> int:
     )
 
     try:
+        validate_delivery_controls(args.include, args.fields)
         controls = {
             name: getattr(args, name, None) for name in ExecutionOptions.model_fields
         }
@@ -375,8 +379,8 @@ def run(argv: list[str] | None = None) -> int:
         result = deliver_response(
             result,
             spec=spec,
+            include=args.include,
             fields=args.fields,
-            detail=options.detail,
             failed=is_error,
         )
     except ParameterError as exc:

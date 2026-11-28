@@ -26,7 +26,6 @@ def test_mcp_preserves_omitted_minute_on_every_actual_bazi_and_timing_entry(
         native(
             spec,
             payload,
-            detail="audit",
             fields=[receipt_path(spec)],
         )
     )
@@ -59,12 +58,10 @@ def test_component_presence_agrees_on_actual_rest_mcp_and_cli(
     spec = next(s for s in SPECS if s.name == key)
     payload = {**omitted_payload(spec), **components}
     flags = [
-        "--detail",
-        "audit",
         "--fields",
         receipt_path(spec),
     ]
-    opts = dict(detail="audit", fields=[receipt_path(spec)])
+    opts = dict(fields=[receipt_path(spec)])
     result = asyncio.run(native(spec, payload, **opts))
     code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
     assert not result.is_error and code == 0

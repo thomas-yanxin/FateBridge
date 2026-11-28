@@ -103,3 +103,52 @@ def test_knowledge_mcp_tools_return_structured_payloads() -> None:
     assert knowledge_registry_result["domains"][0]["domain"] == "astro"
     assert knowledge_read_result["key"] == "休门"
     assert "休门属水，本宫为坎" in knowledge_read_result["rendered_text"]
+
+
+def test_knowledge_catalog_keys_sample_limit_and_default_omit_isomorphism() -> None:
+    import fatebridge
+
+    default_cat = fatebridge.run("knowledge_catalog", {})
+    full_cat = fatebridge.run("knowledge_catalog", {}, include=["*"])
+    assert "provenance" not in default_cat
+    assert "provenance" in full_cat
+    assert default_cat["run_metadata"]["omitted_fields"] == ["provenance"]
+    assert "omitted_fields" not in full_cat["run_metadata"]
+    assert {k: v for k, v in default_cat.items() if k != "run_metadata"} == {
+        k: v for k, v in full_cat.items() if k not in {"run_metadata", "provenance"}
+    }
+
+    small = fatebridge.run("knowledge_catalog", {"keys_sample_limit": 2})
+    large = fatebridge.run("knowledge_catalog", {"keys_sample_limit": 10})
+    for dom_s, dom_l in zip(small["domains"], large["domains"], strict=True):
+        for cat_s, cat_l in zip(dom_s["categories"], dom_l["categories"], strict=True):
+            assert len(cat_s["keys_sample"]) <= 2
+            assert len(cat_l["keys_sample"]) <= 10
+            assert cat_s["keys_complete"] is (
+                len(cat_s["keys_sample"]) == cat_s["count"]
+            )
+            assert cat_l["keys_complete"] is (
+                len(cat_l["keys_sample"]) == cat_l["count"]
+            )
+            if cat_s["count"] >= 10:
+                assert len(cat_s["keys_sample"]) < len(cat_l["keys_sample"])
+
+    default_read = fatebridge.run(
+        "knowledge_read",
+        {"domain": "human_design", "category": "lines", "key": "1.1"},
+    )
+    full_read = fatebridge.run(
+        "knowledge_read",
+        {"domain": "human_design", "category": "lines", "key": "1.1"},
+        include=["*"],
+    )
+    assert "provenance" not in default_read and "reference_details" not in default_read
+    assert default_read["run_metadata"]["omitted_fields"] == [
+        "provenance",
+        "reference_details",
+    ]
+    assert "provenance" in full_read and "reference_details" in full_read
+    assert "omitted_fields" not in full_read["run_metadata"]
+
+    default_place = fatebridge.run("place_lookup", {"query": "朝阳", "limit": 5})
+    assert "omitted_fields" not in default_place["run_metadata"]

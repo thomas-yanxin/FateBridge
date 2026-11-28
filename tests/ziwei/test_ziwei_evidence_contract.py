@@ -152,7 +152,6 @@ def test_context_scope_and_natal_linkage_match_rest_mcp_cli(
     inputs = {**BIRTH, **TARGET}
     options = dict(
         as_of="2026-10-20T00:45:00+08:00",
-        detail="audit",
         fields=FIELDS,
     )
     response = TestClient(api.app).post(
@@ -160,7 +159,6 @@ def test_context_scope_and_natal_linkage_match_rest_mcp_cli(
         json=inputs,
         params=[
             ("as_of", options["as_of"]),
-            ("detail", "audit"),
             *[("fields", field) for field in FIELDS],
         ],
     )
@@ -181,8 +179,6 @@ def test_context_scope_and_natal_linkage_match_rest_mcp_cli(
         [
             "--as-of",
             options["as_of"],
-            "--detail",
-            "audit",
             "--fields",
             *FIELDS,
         ]

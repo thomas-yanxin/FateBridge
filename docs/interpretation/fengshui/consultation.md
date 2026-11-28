@@ -8,7 +8,7 @@
 
 ## 1. 八个真实工具的输入与缺项处理
 
-按用户实际问题、指定方法与已确认资料选择工具，不预设固定主题的调用组合。八个工具均支持 `detail=compact`（默认）与 `detail=audit`（配合 `fields=null` 取完整载荷、全部时间线与完整来源引文），各工具实时参数以当前连接的 Schema 为准。
+按用户实际问题、指定方法与已确认资料选择工具，不预设固定主题的调用组合。八个工具均支持默认核心层（通过 `default_omit` 省略次级块并记入 `run_metadata.omitted_fields`）、`include`（按需追加路径或 `include=["*"]` 无损全量）与严格 `fields` 投影，各工具实时参数以当前连接的 Schema 为准。
 
 | 工具名称 | 核心输入与口径 | 必填与互斥规则 | 缺项与 `partial` 处理 |
 | --- | --- | --- | --- |
@@ -57,10 +57,10 @@
 
 ### 4.1 顶层结构与 `status` / `coverage` / `conflicts`
 
-所有 8 个工具共用同一响应信封（`layers`、`rulesets`、`source_catalog`、`coverage`、`conflicts`、`rule_trace`、`summary`），`fengshui_assess` 额外可包含 `palace_overlay` 与 `layout_analysis`：
+所有 8 个工具共用同一响应信封（`layers`、`coverage`、`conflicts`、`palace_overlay`、`layout_analysis`、`summary`、`run_metadata`）：
 
 - **`status` 与 `coverage`**：`status="partial"` 仅表示部分图层或请求项缺少必要输入（详见 `coverage.missing_inputs` 与各层 `missing_inputs`），**不代表**已完整计算的图层失效。合参结果须同时检查 `coverage.implemented_layers`、`not_requested_layers`、`unavailable_layers`（如当前未涵盖的 `jinsuo_forms_and_periods`、`automatic_floorplan_geometry`），以及 `requested_analysis_status`、`natal_interpretation_status` 与 `city_gate_status`。
-- **`conflicts`（多主体八宅差异）**：`fengshui_bazhai` 与 `fengshui_assess` 在存在多个已完成（`status="complete"`）的宅盘与住户命盘时，自动比对八方星性极性并列出 `house_person_scope_difference` 与 `personal_direction_difference`（注：`fengshui_assess` 的 `detail=compact` 视图会裁剪 `conflicts`，读取完整差异需使用 `detail=audit` 且 `fields=null`）。绝不能将宅卦、命卦、年星、月星或金锁偏好折算为单一总分或多数票。
+- **`conflicts`（多主体八宅差异）**：`fengshui_bazhai` 与 `fengshui_assess` 在存在多个已完成（`status="complete"`）的宅盘与住户命盘时，自动比对八方星性极性并列出 `house_person_scope_difference` 与 `personal_direction_difference`（注：`fengshui_assess` 默认通过 `default_omit` 省略 `conflicts`，读取差异需传入 `include=["conflicts"]`、`include=["*"]` 或显式 `fields`）。绝不能将宅卦、命卦、年星、月星或金锁偏好折算为单一总分或多数票。
 
 ### 4.2 四层 `palace_overlay` 与 `layout_analysis` 读法
 
@@ -71,6 +71,6 @@
   - `environment_adjustments`：透传金锁 `feature_findings` 与 `target_classification`。
   - `element_relationships`：按各层实际落宫星五行给出 `same_element`、`generating_element`、`draining_element`、`controlling_element`、`controlled_element`，仅用于结构说明。
 
-### 4.3 默认视图与审计字段
+### 4.3 默认视图与按需展开
 
-按[输出控制与结果读取](../../agent-guide.md#输出控制与结果读取)，单层工具默认 `evidence_views` 投影为 `status layers rulesets coverage rule_trace`，`fengshui_assess` 默认投影为 `status rulesets coverage rule_trace`；且 `detail=compact` 会将 `rulesets` 裁剪为 `{ruleset_id, version, method, source_ids}`、将 `source_catalog` 裁剪为 `{source_id: {title}}`。需要完整的规则集元数据、书目详情或页码定位时，可传 `detail=audit` 且 `fields=null`（或按需投影 `source_catalog`、`rulesets`、`rule_trace`）。
+按[输出控制与结果读取](../../agent-guide.md#输出控制与结果读取)，8 个工具的默认响应与 `include=["*"]` 保持严格同构：仅当声明了 `default_omit` 的路径存在时省略（如 `fengshui_assess` 默认省略 `conflicts`、`layout_analysis.adjustment_options`、`layout_analysis.element_relationships`，并将实际省略路径记入 `run_metadata.omitted_fields`）。需要展开被省略路径或获取完整数据时，可传 `include=["*"]` 或对应点号路径/`evidence_views` 名称（或用 `fields` 严格投影所需字段）。

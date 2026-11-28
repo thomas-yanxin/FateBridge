@@ -73,6 +73,16 @@ class SolarArcCalculationOptions(PartialOutput):
     progression: ProgressionCalculationOptions | None = None
 
 
+class TransitTimelineStep(PartialOutput):
+    day_offset: int | None = None
+    date: str | None = None
+    analysis_datetime: str | None = None
+    exact_hits: list[AspectHit] | None = None
+    exact_hits_total_count: int | None = None
+    tight_hits: list[AspectHit] | None = None
+    tight_hits_total_count: int | None = None
+
+
 class TimingChart(PartialOutput):
     calculation_basis: WesternCalculationBasis | None = None
     calculation_options: (
@@ -89,13 +99,18 @@ class TimingChart(PartialOutput):
     sun: WesternPoint | None = None
     moon: WesternPoint | None = None
     hits: list[AspectHit] | None = None
+    hits_total_count: int | None = None
     exact_hits: list[AspectHit] | None = None
+    exact_hits_total_count: int | None = None
     location: Location | None = None
     natal_reference: dict[str, WesternPoint] | None = None
     transit_reference: dict[str, WesternPoint] | None = None
     house_emphasis: list[HouseEmphasis] | None = None
     orb_limit: float | None = None
     exact_orb_limit: float | None = None
+    scan_days: int | None = None
+    tight_orb_limit: float | None = None
+    transit_timeline: list[TransitTimelineStep] | None = None
     annual_profection: Profection | None = None
     monthly_profections: list[MonthlyProfection] | None = None
     year_start: str | None = None

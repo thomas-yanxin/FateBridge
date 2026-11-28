@@ -132,6 +132,10 @@ def _build_primary_direction_pair(
     pd_aspects: list[int] | None,
     show_pd_bounds: bool,
     pd_direction_mode: str = "zodiacal",
+    pd_max_age_years: float = 100.0,
+    pd_window_size: int = 6,
+    pd_nearby_years: float = 5.0,
+    pd_timeline_limit: int = 25,
     natal_lots: Mapping[str, dict[str, Any]] | None = None,
     include_full_timelines: bool = True,
     embedded_in_western_timing: bool = False,
@@ -146,6 +150,10 @@ def _build_primary_direction_pair(
         pd_time_key=pd_time_key,
         pd_type=pd_type,
         pd_aspects=pd_aspects,
+        max_age_years=pd_max_age_years,
+        current_window_size=pd_window_size,
+        nearby_years=pd_nearby_years,
+        timeline_limit=pd_timeline_limit,
         direction_mode=pd_direction_mode,
         natal_lots=natal_lots,
         include_full_timelines=include_full_timelines,
@@ -176,6 +184,9 @@ def _build_primary_direction_pair(
         current_arc_degrees=directions.current_arc,
         current_hits=primary_directions_payload["current_window"],
         show_pd_bounds=show_pd_bounds,
+        exact_hits=primary_directions_payload["exact_window"],
+        hits_total_count=primary_directions_payload["current_window_total_count"],
+        exact_hits_total_count=primary_directions_payload["exact_window_total_count"],
         natal_lots=directions.natal_lots,
         context=directions.context,
         equatorial=directions.equatorial,
@@ -216,7 +227,14 @@ def _build_western_timing_module_summary(
             )
         timeline = payload.get("transit_timeline")
         if isinstance(timeline, list):
-            exact_count = sum(len(step.get("exact_hits") or ()) for step in timeline)
+            exact_count = sum(
+                int(
+                    step.get("exact_hits_total_count")
+                    if step.get("exact_hits_total_count") is not None
+                    else len(step.get("exact_hits") or ())
+                )
+                for step in timeline
+            )
             summary += f"，扫描 {len(timeline)} 天共 {exact_count} 次精确命中"
         return summary + "。"
 
@@ -318,7 +336,14 @@ def build_western_timing_module_payload(
     show_pd_bounds: bool = True,
     high_latitude_fallback: str = "error",
     pd_direction_mode: str = "zodiacal",
+    pd_max_age_years: float = 100.0,
+    pd_window_size: int = 6,
+    pd_nearby_years: float = 5.0,
+    pd_timeline_limit: int = 25,
+    orb_limit: float = 1.5,
+    max_hits: int | None = None,
     scan_days: int | None = None,
+    include_full_timelines: bool = False,
 ) -> dict[str, Any]:
     natal_subject = build_natal_subject(
         birth_info,
@@ -382,6 +407,8 @@ def build_western_timing_module_payload(
             transit_timezone=return_location["timezone"],
             house_system=house_system,
             zodiac_type=zodiac_type,
+            orb_limit=orb_limit,
+            max_hits=max_hits,
             scan_days=scan_days,
             high_latitude_fallback=high_latitude_fallback,
         )
@@ -400,10 +427,14 @@ def build_western_timing_module_payload(
             analysis_datetime=analysis_datetime,
             house_system=house_system,
             zodiac_type=zodiac_type,
+            orb_limit=orb_limit,
+            max_hits=max_hits,
         )
         solar_arc_payload = build_solar_arc_payload(
             natal_subject,
             progression_payload["subject"],
+            orb_limit=orb_limit,
+            max_hits=max_hits,
             progression_options=progression_payload["calculation_options"],
         )
         result["directions"] = {"solar_arc": solar_arc_payload}
@@ -423,8 +454,13 @@ def build_western_timing_module_payload(
             pd_time_key=pd_time_key,
             pd_type=pd_type,
             pd_aspects=pd_aspects,
+            max_age_years=pd_max_age_years,
+            current_window_size=pd_window_size,
+            nearby_years=pd_nearby_years,
+            timeline_limit=pd_timeline_limit,
             direction_mode=pd_direction_mode,
             natal_lots=natal_lots,
+            include_full_timelines=include_full_timelines,
         )
         result["directions"] = {"primary_directions": primary_directions_payload}
         result["summary"] = _build_western_timing_module_summary(
@@ -445,6 +481,10 @@ def build_western_timing_module_payload(
             pd_aspects=pd_aspects,
             show_pd_bounds=show_pd_bounds,
             pd_direction_mode=pd_direction_mode,
+            pd_max_age_years=pd_max_age_years,
+            pd_window_size=pd_window_size,
+            pd_nearby_years=pd_nearby_years,
+            pd_timeline_limit=pd_timeline_limit,
             natal_lots=natal_lots,
             embedded_in_western_timing=False,
         )
@@ -489,6 +529,8 @@ def build_western_timing_module_payload(
             return_timezone=return_location["timezone"],
             house_system=house_system,
             zodiac_type=zodiac_type,
+            orb_limit=orb_limit,
+            max_hits=max_hits,
         )
         result["directions"] = {"given_year": given_year_payload}
         result["summary"] = _build_western_timing_module_summary(
@@ -704,6 +746,12 @@ def build_western_timing_payload(
     show_pd_bounds: bool = True,
     high_latitude_fallback: str = "error",
     pd_direction_mode: str = "zodiacal",
+    pd_max_age_years: float = 100.0,
+    pd_window_size: int = 6,
+    pd_nearby_years: float = 5.0,
+    pd_timeline_limit: int = 25,
+    orb_limit: float = 1.5,
+    max_hits: int | None = None,
     techniques: Sequence[str] | None = None,
     include_full_timelines: bool = False,
 ) -> dict[str, Any]:
@@ -783,6 +831,8 @@ def build_western_timing_payload(
             transit_timezone=return_location["timezone"],
             house_system=house_system,
             zodiac_type=zodiac_type,
+            orb_limit=orb_limit,
+            max_hits=max_hits,
             transit_subject=analysis_subject,
             include_natal_reference=False,
             high_latitude_fallback=high_latitude_fallback,
@@ -797,6 +847,8 @@ def build_western_timing_payload(
             analysis_datetime=analysis_datetime,
             house_system=house_system,
             zodiac_type=zodiac_type,
+            orb_limit=orb_limit,
+            max_hits=max_hits,
         )
         progressed_subject = progression_payload.pop("subject")
         if "secondary_progression" in selected:
@@ -805,6 +857,8 @@ def build_western_timing_payload(
             solar_arc_payload = build_solar_arc_payload(
                 natal_subject,
                 progressed_subject,
+                orb_limit=orb_limit,
+                max_hits=max_hits,
                 progression_options=progression_payload["calculation_options"],
             )
             directions_section["solar_arc"] = solar_arc_payload
@@ -822,6 +876,10 @@ def build_western_timing_payload(
             pd_aspects=pd_aspects,
             show_pd_bounds=show_pd_bounds,
             pd_direction_mode=pd_direction_mode,
+            pd_max_age_years=pd_max_age_years,
+            pd_window_size=pd_window_size,
+            pd_nearby_years=pd_nearby_years,
+            pd_timeline_limit=pd_timeline_limit,
             natal_lots=natal_lots,
             include_full_timelines=include_full_timelines,
             embedded_in_western_timing=True,
@@ -855,6 +913,8 @@ def build_western_timing_payload(
             return_timezone=return_location["timezone"],
             house_system=house_system,
             zodiac_type=zodiac_type,
+            orb_limit=orb_limit,
+            max_hits=max_hits,
             analysis_subject=analysis_subject,
             transit_hits=all_transit_hits,
         )

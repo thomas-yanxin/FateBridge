@@ -22,11 +22,7 @@ from fatebridge.core.metaphysics.jinkou.patterns import use_evidence
 from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
 
 POSITIONS = ("人元", "贵神", "将神", "地分")
-TRACES = {
-    "internal_strength": "jinkou.internal_strength",
-    "use_evidence": "jinkou.use_conditions",
-    "qi_evidence": "jinkou.month_day_qi",
-}
+EXPECTED_EVIDENCE_KEYS = frozenset({"internal_strength", "use_evidence", "qi_evidence"})
 ROW_FIELDS = (
     "label",
     "content",
@@ -153,14 +149,6 @@ def validate_strength_evidence(
     for key, value in expected.items():
         if key in board:
             compare_present(board[key], value, key)
-    for key, rule_id in TRACES.items():
-        traces = [
-            t for t in board.get("rule_trace") or [] if t.get("rule_id") == rule_id
-        ]
-        if len(traces) > 1:
-            raise ValueError("金口诀同一旺衰或取用规则轨迹不可重复")
-        if key in expected and traces and "result" in traces[0]:
-            compare_present(traces[0]["result"], expected[key], key)
 
 
 def require_present(actual: Any, expected: Any) -> None:
@@ -196,7 +184,7 @@ def require_complete_strength_evidence(board: dict[str, Any]) -> None:
         ):
             raise ValueError("完整金口诀须保留四位旺衰的输入依据")
     expected = expected_facts(board)
-    if set(expected) != set(TRACES):
+    if set(expected) != EXPECTED_EVIDENCE_KEYS:
         raise ValueError("完整金口诀须保留月建日辰与阴阳用位依据")
     basis = seasonal_power_basis(expected["qi_evidence"]["month_building_branch"])
     overview = board.get("overview")

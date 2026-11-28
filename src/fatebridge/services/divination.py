@@ -56,7 +56,7 @@ from fatebridge.core.meihua.topics import (
 from fatebridge.core.metaphysics.ren_gods import DEFAULT_GUIREN_PROFILE, GuirenProfile
 from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
 from fatebridge.core.sukuyo.calendar import _basis_parameters as basis_parameters
-from fatebridge.core.sukuyo.calendar import calendar_mansion, rulesets
+from fatebridge.core.sukuyo.calendar import calendar_mansion
 from fatebridge.core.sukuyo.sanjiu import (
     DistanceRule,
     candidate_relation_analysis,
