@@ -7,11 +7,12 @@ not replace the selected true-Sun solar arc with a table approximation.
 
 from __future__ import annotations
 
-import json
 import math
 from fractions import Fraction
 from pathlib import Path
-from typing import Any, cast
+from typing import Literal, TypedDict
+
+from pydantic import TypeAdapter
 
 RECORD = (
     Path(__file__).resolve().parents[2]
@@ -20,19 +21,167 @@ RECORD = (
 RULESET = "witte1925_table_numeric_interpolation_v1"
 
 
-def load_table() -> dict[str, Any]:
-    raw = RECORD.read_bytes()
-    return cast(dict[str, Any], json.loads(raw))
+class WitteSource(TypedDict):
+    id: str
+    author: str
+    title: str
+    publication: str
+    url: str
 
 
-def normalized_rows(record: dict[str, Any]) -> list[dict[str, Any]]:
+class WitteRawRow(TypedDict):
+    row: int
+    printed_date: str
+    common_year_day_offset: int
+    raw_age_cells: list[str]
+    raw_until_january_zero_arcminutes: int
+
+
+class WitteNormalizedRow(WitteRawRow):
+    normalized_arcminutes: list[int | None]
+    unresolved_age_columns: list[int]
+
+
+class WitteUnresolvedMarker(TypedDict):
+    row: int
+    age_years: int
+    raw_cell: str
+    scope: str
+
+
+class WitteDateInterpolation(TypedDict):
+    first_row: int
+    last_row: int
+    fraction_parts: list[int]
+    printed_subtracted_arcminutes: int
+    printed_result_degrees_minutes: list[int]
+
+
+class WitteWorkedExample(TypedDict):
+    birth_date_label: str
+    target_date_label: str
+    clock_or_timezone_given: bool
+    until_january_zero_arcminutes: int
+    full_years: int
+    full_year_arc_degrees_minutes: list[int]
+    partial_year_months: int
+    partial_year_printed_arcminutes: int
+    partial_year_printed_operations: str
+    fifty_year_date_interpolation: WitteDateInterpolation
+    sixty_year_date_interpolation: WitteDateInterpolation
+    inter_year_difference_arcminutes: int
+    four_year_printed_reduction_arcminutes: int
+    printed_total_degrees_minutes: list[int]
+
+
+class WitteTableLimits(TypedDict):
+    missing_degree_adopted: bool
+    final_extension_sign_resolved: bool
+    subday_or_leap_day_policy_resolved: bool
+    source_rounding_policy_fully_specified: bool
+    table_epoch_or_unrounded_solar_model_known: bool
+    full_original_method_accepted: bool
+
+
+class WitteTableRecord(TypedDict):
+    schema_version: int
+    source: WitteSource
+    scope: str
+    transcription: str
+    age_columns_years: list[int]
+    rows: list[WitteRawRow]
+    unresolved_degree_marker: list[WitteUnresolvedMarker]
+    printed_worked_example: WitteWorkedExample
+    limits: WitteTableLimits
+
+
+class WitteCorner(TypedDict):
+    row: int
+    age_years: int
+    raw_cell: str
+    arcminutes: int | None
+    weight_fraction: list[int]
+
+
+class WitteInterpolateResult(TypedDict):
+    status: Literal["underdetermined", "computed"]
+    ruleset_id: str
+    day_offset_fraction: list[int]
+    age_years_fraction: list[int]
+    corners: list[WitteCorner]
+    arcminutes: float | None
+    arcminutes_fraction: list[int] | None
+    full_original_method_accepted: bool
+    scope: str
+
+
+class WitteSourceSummary(TypedDict):
+    id: str
+    author: str
+    title: str
+    sections: list[str]
+    scope: str
+
+
+class WitteCoverage(TypedDict):
+    date_rows: int
+    raw_age_cells: int
+    resolved_age_cells: int
+    unresolved_age_cells: int
+    last_column_cells: int
+    all_printed_raw_cells_retained: bool
+    all_degrees_resolved: bool
+
+
+class WitteWorkedExampleAnalysis(TypedDict):
+    birth_date_label: str
+    target_date_label: str
+    clock_or_timezone_given: bool
+    printed_components_arcminutes: list[int]
+    literal_components_sum_arcminutes: int
+    printed_total_arcminutes: int
+    literal_arithmetic_matches_print: bool
+    exact_bilinear_base: WitteInterpolateResult
+    exact_fifty_year_arcminutes: float
+    exact_sixty_year_arcminutes: float
+    exact_last_column_arcminutes: float
+    hypothetical_unrounded_partial_year_arcminutes: float
+    hypothetical_unrounded_total_arcminutes: float
+    hypothetical_total_fraction: list[int]
+    printed_minus_hypothetical_total_arcminutes: float
+    hypothetical_unrounded_policy_adopted_as_original: bool
+    source_rounding_policy_fully_specified: bool
+
+
+class WitteTableAnalysis(TypedDict):
+    status: str
+    ruleset_id: str
+    author: str
+    version: str
+    computed_for_current_chart: bool
+    source: WitteSourceSummary
+    coverage: WitteCoverage
+    age_columns_years: list[int]
+    rows: list[WitteNormalizedRow]
+    worked_example: WitteWorkedExampleAnalysis
+    full_original_method_accepted: bool
+
+
+_WITTE_RECORD_ADAPTER = TypeAdapter(WitteTableRecord)
+
+
+def load_table() -> WitteTableRecord:
+    return _WITTE_RECORD_ADAPTER.validate_json(RECORD.read_bytes())
+
+
+def normalized_rows(record: WitteTableRecord) -> list[WitteNormalizedRow]:
     """Carry legible explicit degrees; an unclear marker invalidates that carry."""
     ages = record["age_columns_years"]
     unclear = {(r["row"], r["age_years"]) for r in record["unresolved_degree_marker"]}
     degrees: list[int | None] = [None] * len(ages)
-    result = []
+    result: list[WitteNormalizedRow] = []
     for row in record["rows"]:
-        values = []
+        values: list[int | None] = []
         for index, (age, raw) in enumerate(
             zip(ages, row["raw_age_cells"], strict=True)
         ):
@@ -48,7 +197,13 @@ def normalized_rows(record: dict[str, Any]) -> list[dict[str, Any]]:
             values.append(None if degree is None else degree * 60 + minute)
         result.append(
             {
-                **row,
+                "row": row["row"],
+                "printed_date": row["printed_date"],
+                "common_year_day_offset": row["common_year_day_offset"],
+                "raw_age_cells": row["raw_age_cells"],
+                "raw_until_january_zero_arcminutes": row[
+                    "raw_until_january_zero_arcminutes"
+                ],
                 "normalized_arcminutes": values,
                 "unresolved_age_columns": [
                     age for age, value in zip(ages, values) if value is None
@@ -67,10 +222,10 @@ def _coordinate(value: int | float | Fraction) -> Fraction:
 
 
 def interpolate(
-    record: dict[str, Any],
+    record: WitteTableRecord,
     day_offset: int | float | Fraction,
     age_years: int | float | Fraction,
-) -> dict[str, Any]:
+) -> WitteInterpolateResult:
     """Interpolate numeric axes only; preserve positive-weight unknown corners.
 
     day_offset0 is printed January1; offset370 is the following January6.
@@ -89,7 +244,7 @@ def interpolate(
     col0 = min(int((age - ages[0]) // 10), len(ages) - 2)
     date_weight = (day - rows[row0]["common_year_day_offset"]) / 10
     age_weight = (age - ages[col0]) / 10
-    corners = []
+    corners: list[WitteCorner] = []
     total = Fraction(0)
     unresolved = False
     for r, rw in ((row0, 1 - date_weight), (row0 + 1, date_weight)):
@@ -126,13 +281,14 @@ def interpolate(
     }
 
 
-def _fraction(probe: dict[str, Any]) -> Fraction:
-    if probe["status"] != "computed":
+def _fraction(probe: WitteInterpolateResult) -> Fraction:
+    frac = probe["arcminutes_fraction"]
+    if probe["status"] != "computed" or frac is None:
         raise RuntimeError("Printed worked example has unresolved source corners")
-    return Fraction(*probe["arcminutes_fraction"])
+    return Fraction(frac[0], frac[1])
 
 
-def source_table_analysis() -> dict[str, Any]:
+def source_table_analysis() -> WitteTableAnalysis:
     """Retain every raw cell and replay the author's staged worked example."""
     record = load_table()
     rows = normalized_rows(record)

@@ -13,8 +13,8 @@ from fatebridge.core.bazi.timing import TimingAnalysis
 from fatebridge.core.requests.bazi import BaziBirthRequest
 from fatebridge.utils.birth_input import PersonInfo, create_person_info
 from fatebridge.utils.solar_time import normalize_birth_time
+from tests.fixtures.bazi_birth_clock import BASE, SPECS
 from tests.support.transports import inputs, rest, surface_calls
-from tests.unit_test.fixtures.bazi_birth_clock import BASE, SPECS
 
 
 @pytest.mark.parametrize("spec", SPECS, ids=lambda s: s.name)

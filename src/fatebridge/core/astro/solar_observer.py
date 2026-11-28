@@ -13,7 +13,7 @@ from datetime import date
 from enum import Enum
 from fractions import Fraction
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, TypedDict
 
 import erfa
 
@@ -28,11 +28,19 @@ from fatebridge.core.astro.light_cone import LIGHT_SPEED_AU_DAY, solve_light_con
 from fatebridge.core.astro.tdb import geocentric_tdb_state
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.jpl_ephemeris import configured_jpl_file
-from fatebridge.core.solar_source_types import SolarSourceReference
 
 SOLAR_SOURCE_POLICY = "fatebridge.solar_horizon_source_selection.v2"
 DE440_START_TT = date(1700, 1, 1).toordinal() + 1721424.5
 DE440_END_TT = date(2301, 1, 1).toordinal() + 1721424.5
+
+
+class SolarSourceReference(TypedDict):
+    author: str
+    source_version: str | None
+    calculation_library: str
+    time_argument: str
+    coefficient_representation: str
+    coefficient_profile: str | None
 
 
 @dataclass(frozen=True)

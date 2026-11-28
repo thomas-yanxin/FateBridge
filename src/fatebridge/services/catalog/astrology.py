@@ -5,8 +5,7 @@ from __future__ import annotations
 from itertools import chain
 
 from fatebridge.application.bindings import bind_kwargs, request_model_ref, service_ref
-from fatebridge.application.domain_validators import validate_astro_chart_variant
-from fatebridge.application.tool_spec import EvidenceViews, ToolSpec
+from fatebridge.application.tool_spec import BatchInputPolicy, EvidenceViews, ToolSpec
 from fatebridge.services.catalog.astro_bindings import (
     bind_astro_natal_chart,
     bind_relationship_chart,
@@ -47,6 +46,7 @@ def _chart_spec(
     variant: str,
     label: str,
     *,
+    required_output_fields: tuple[str, ...],
     default_omit: tuple[str, ...] = (),
 ) -> ToolSpec:
     return ToolSpec(
@@ -58,13 +58,14 @@ def _chart_spec(
             _ASTRO_REQ,
             "AstroSpecialtyRequest" if variant == "chart13" else "AstroChartRequest",
         ),
+        required_output_fields=required_output_fields,
         summary=f"离线{label}（高精度星历或近似回退）。",
         operation_label_zh=label,
         family="astro",
         cpu_bound=True,
         rest_path=rest_path,
         default_omit=default_omit,
-        output_validators=(validate_astro_chart_variant,),
+        batch_policy=BatchInputPolicy(subject_mode="birth_fields"),
     )
 
 
@@ -103,11 +104,13 @@ SPECS: list[ToolSpec] = [
             "bodygraph.circuitry.circuits",
             "variables.personality_colors",
         ),
+        batch_policy=BatchInputPolicy(subject_mode="birth_fields"),
     ),
     ToolSpec(
         name="astrology_chart",
         bind=bind_astro_natal_chart,
         request_model_loader=request_model_ref(_ASTRO_REQ, "AstroNatalChartRequest"),
+        required_output_fields=("planets", "chart_profile"),
         summary="离线西占本命盘（高精度星历或近似回退）；可选 opaque_solar 偏折层。",
         operation_label_zh="星盘",
         family="astro",
@@ -126,13 +129,14 @@ SPECS: list[ToolSpec] = [
             "apparent_model_positions",
             "context_geometry",
         ),
-        output_validators=(validate_astro_chart_variant,),
+        batch_policy=BatchInputPolicy(subject_mode="birth_fields"),
     ),
     _chart_spec(
         "thirteen_sector_chart",
         "/api/astrology/thirteen-sector-chart",
         "chart13",
         "13等分扇区盘",
+        required_output_fields=("planets", "chart_profile", "thirteen_sectors"),
         default_omit=(
             "houses",
             "aspects",
@@ -161,6 +165,7 @@ SPECS: list[ToolSpec] = [
         "/api/astrology/hellenistic-chart",
         "hellen_chart",
         "希腊盘",
+        required_output_fields=("planets", "chart_profile", "hellenistic"),
         default_omit=(
             "aspect_evidence",
             "classical_patterns",
@@ -241,7 +246,7 @@ SPECS: list[ToolSpec] = [
             "guolao.timing.small_limit.method",
             "guolao.timing.small_limit.year_boundary_basis",
         ),
-        output_validators=(validate_astro_chart_variant,),
+        batch_policy=BatchInputPolicy(subject_mode="birth_fields"),
     ),
     ToolSpec(
         name="vedic_chart",
@@ -292,6 +297,7 @@ SPECS: list[ToolSpec] = [
             "vedic_chart.nakshatras",
             "vedic_chart.birth_time_sensitivity",
         ),
+        batch_policy=BatchInputPolicy(subject_mode="birth_fields"),
     ),
     ToolSpec(
         name="vimshottari_dasha",
@@ -321,11 +327,13 @@ SPECS: list[ToolSpec] = [
             "ashtottari.timeline",
             "chara.timeline",
         ),
+        batch_policy=BatchInputPolicy(subject_mode="birth_fields"),
     ),
     ToolSpec(
         name="hamburg_midpoint_chart",
         bind=bind_kwargs(calculate_germany_chart_analysis),
         request_model_loader=request_model_ref(_ASTRO_REQ, "AstroGermanyRequest"),
+        required_output_fields=("base_chart", "midpoints", "chart_profile"),
         summary="德国中点盘：22因素、253中点轴、90/45/22.5度盘及可选真太阳弧。",
         operation_label_zh="德国盘",
         family="astro",
@@ -359,12 +367,13 @@ SPECS: list[ToolSpec] = [
             "midpoint_analysis.solar_arc_analysis.daily_meridian",
             "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry",
         ),
-        output_validators=(validate_astro_chart_variant,),
+        batch_policy=BatchInputPolicy(subject_mode="birth_fields"),
     ),
     ToolSpec(
         name="relationship_chart",
         bind=bind_relationship_chart,
         request_model_loader=request_model_ref(_ASTRO_REQ, "AstroRelativeFlatRequest"),
+        required_output_fields=("relationship_profile",),
         summary="关系/合盘：比较、影响、组合盘、Davison 变体及 Marks 个人盘。",
         operation_label_zh="关系星盘分析",
         family="astro",
@@ -401,5 +410,10 @@ SPECS: list[ToolSpec] = [
             "marks_charts.*.chart_profile.physical_ephemeris_source",
         ),
         evidence_views_builder=_relative_evidence_views,
+        batch_policy=BatchInputPolicy(
+            subject_mode="pair",
+            pair_prefixes=("inner_", "outer_"),
+            pair_style="birth_fields",
+        ),
     ),
 ]

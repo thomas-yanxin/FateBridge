@@ -14,6 +14,7 @@ from fastapi.testclient import TestClient
 from fastmcp import Client
 from jsonschema import validate
 
+import fatebridge
 import fatebridge.api as api
 from fatebridge import cli
 from fatebridge.application.description import describe_spec, summarize_spec
@@ -52,10 +53,23 @@ async def test_stranger_agent_mcp_loop_and_error_recovery() -> None:
             "run_calculation",
             "run_batch",
         }
+        assert all(tool.output_schema is None for tool in tools)
+        wire_size = sum(
+            len(tool.description or "")
+            + len(
+                json.dumps(tool.input_schema, ensure_ascii=False, separators=(",", ":"))
+            )
+            for tool in tools
+        )
+        assert wire_size < 6_500
         resources = await client.list_resources()
         templates = await client.list_resource_templates()
         assert resources == []
         assert templates == []
+        direct_call = await client.call_tool(
+            "bazi_birth_chart", {}, raise_on_error=False
+        )
+        assert direct_call.is_error
 
         # 2. Step 1: discover_tools() returns family counts and summary tool records.
         overview = await client.call_tool("discover_tools", {})
@@ -170,11 +184,46 @@ def test_three_surface_parity_on_default_delivery(
     cli_body = json.loads(capsys.readouterr().out)
     assert code == 0
 
+    sdk_body = fatebridge.run(spec.name, example, as_of=as_of)
+
     assert (
-        _business(rest_res.json())
+        _business(sdk_body)
+        == _business(rest_res.json())
         == _business(mcp_res.structured_content)
         == _business(cli_body)
     )
+
+
+def test_python_sdk_discover_error_constraints_and_batch_parity() -> None:
+    """Python SDK exposes discover(tools, surface), ParameterError diagnostics, and batch."""
+    selected = fatebridge.discover(
+        tools=["bazi_birth_chart", "firdaria"], surface="cli"
+    )
+    assert selected["matched_count"] == 2
+    assert {row["tool"] for row in selected["tools"]} == {
+        "bazi_birth_chart",
+        "firdaria",
+    }
+    assert all("cli" in row["surfaces"] for row in selected["tools"])
+
+    spec = next(s for s in CATALOG if s.name == "firdaria")
+    example = example_input(spec)
+    assert example is not None
+    err_payload = fatebridge.run("firdaria", {**example, "birth_place_name": "北京"})
+    assert err_payload["error_code"] == "validation_error"
+    assert err_payload["status_code"] == 422
+    issue = err_payload["issues"][0]
+    assert issue["code"] == "extra_forbidden"
+    assert "birth_year" in issue["constraints"]["allowed_fields"]
+    assert "birth_place" in issue["constraints"]["suggestions"]
+
+    batch_res = fatebridge.batch(
+        [{"id": "c1", "tool": "firdaria", "arguments": example}],
+        as_of="2026-10-12T12:00:00+08:00",
+    )
+    assert batch_res["status"] == "ok"
+    assert batch_res["succeeded"] == 1
+    assert batch_res["results"][0]["ok"] is True
 
 
 FORBIDDEN_LEGACY_PARAMS = frozenset(
@@ -214,6 +263,14 @@ def test_catalog_hygiene_across_all_tools() -> None:
         assert spec.name not in names
         names.add(spec.name)
         assert len(spec.operation_label_zh) <= 24, (spec.name, spec.operation_label_zh)
+        assert (
+            spec.required_output_fields
+        ), f"{spec.name} missing required_output_fields"
+        out_fields = set(spec.output_model.model_fields)
+        assert set(spec.required_output_fields) <= out_fields, (
+            spec.name,
+            set(spec.required_output_fields) - out_fields,
+        )
 
         ex = example_input(spec)
         assert ex is not None, f"{spec.name} missing example_input"
@@ -226,7 +283,6 @@ def test_catalog_hygiene_across_all_tools() -> None:
         )
 
         req_props = set(spec.request_model.model_json_schema().get("properties", {}))
-        out_fields = set(spec.output_model.model_fields)
         desc = describe_spec(spec)
         summary_desc = summarize_spec(spec)
         assert set(desc["surfaces"]) == ALLOWED_SURFACES_KEYS, (
@@ -259,6 +315,37 @@ def test_catalog_hygiene_across_all_tools() -> None:
     # Confirm default MCP app exposes 3 meta tools and 0 resources.
     app_mcp = create_mcp_app()
     assert app_mcp is not None
+
+    # Confirm spec.family matches each of the 13 catalog modules.
+    expected_family_by_module = {
+        "astrology": "astro",
+        "bazi": "bazi",
+        "compatibility": "compatibility",
+        "divination": "divination",
+        "fengshui": "fengshui",
+        "psychometrics": "psychometrics",
+        "reference": "knowledge",
+        "sanshi": "metaphysics",
+        "timing": "timing",
+        "western_events": "western_event",
+        "western_lifespan": "western_lifespan",
+        "western_timing": "western_timing",
+        "ziwei": "metaphysics",
+    }
+    catalog_total = 0
+    for mod_name, expected_family in expected_family_by_module.items():
+        mod = importlib.import_module(f"fatebridge.services.catalog.{mod_name}")
+        module_specs = getattr(mod, "SPECS")
+        assert module_specs, mod_name
+        catalog_total += len(module_specs)
+        for spec in module_specs:
+            assert spec.family == expected_family, (
+                mod_name,
+                spec.name,
+                spec.family,
+                expected_family,
+            )
+    assert catalog_total == len(CATALOG)
 
 
 def test_discovery_summary_budget_and_full_detail_filter_guard() -> None:

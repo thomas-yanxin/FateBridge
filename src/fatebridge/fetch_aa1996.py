@@ -11,21 +11,9 @@ import subprocess
 import tarfile
 import urllib.request
 import zipfile
-from importlib.resources import files
 from pathlib import Path
-from typing import Any
 
-MODEL_ID = "fatebridge_moshier_aa1996_solar_v1"
-
-
-def source_profile() -> dict[str, Any]:
-    raw = (
-        files("fatebridge").joinpath("data/astronomy/aa1996-solar-v1.json").read_bytes()
-    )
-    profile: dict[str, Any] = json.loads(raw)
-    if profile.get("model_id") != MODEL_ID or profile.get("abi_version") != 1:
-        raise ValueError("Invalid AA1996 source profile")
-    return profile
+from fatebridge.core.aa1996_solar import MODEL_ID, source_profile
 
 
 def _archive(source: dict[str, str], supplied: Path | None, target: Path) -> Path:

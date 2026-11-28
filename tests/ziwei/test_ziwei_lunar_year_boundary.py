@@ -15,7 +15,7 @@ from dataclasses import replace
 import pytest
 
 from fatebridge.core.metaphysics.seed import build_analysis_seed
-from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
+from fatebridge.core.ziwei.chart import build_ziwei_chart
 
 # (year, month, day, hour, gender) -> 期望 (五行局, 命宫干支, 命宫大限)
 # 四个 case 均出生在立春之后、正月初一之前（或正月初一之后、立春之前）的年界窗口。

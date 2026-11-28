@@ -1,4 +1,4 @@
-"""太阳弧度推运法（Solar Arc Directions）。"""
+"""Standard Western Predictive Solar Arc Directions (distinct from core/astro/solar_arc.py)."""
 
 from __future__ import annotations
 

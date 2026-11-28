@@ -1,10 +1,9 @@
 """Progressive catalog discovery shared by REST, CLI and MCP."""
 
-import difflib
 from collections import Counter
 from collections.abc import Callable
 from functools import partial
-from typing import Any, Literal
+from typing import Literal
 
 from pydantic import (
     BaseModel,
@@ -22,8 +21,13 @@ from fatebridge.application.description import (
     resolve_spec,
     summarize_spec,
 )
+from fatebridge.application.examples import batch_example_input
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
-from fatebridge.utils.errors import ParameterError, validation_error_result
+from fatebridge.utils.errors import (
+    ParameterError,
+    unknown_tool_error,
+    validation_error_result,
+)
 
 ToolSurface = Literal["rest", "mcp", "cli"]
 DiscoveryDetail = Literal["brief", "summary", "full"]
@@ -38,6 +42,13 @@ class DiscoveryQuery(BaseModel):
     surface: ToolSurface | None = None
     detail: DiscoveryDetail = "summary"
     include_output_schema: bool = False
+
+    @field_validator("q", mode="before")
+    @classmethod
+    def _normalize_q(cls, value: object) -> object:
+        if isinstance(value, str):
+            return value.strip() or None
+        return value
 
     @field_validator("tools", mode="before")
     @classmethod
@@ -119,12 +130,7 @@ def select_specs(
     if tool is not None:
         resolved = resolve_spec(selected, tool)
         if resolved is None:
-            candidates = sorted(spec.name for spec in selected)
-            suggestions = difflib.get_close_matches(tool, candidates, n=5, cutoff=0.4)
-            issue: dict[str, object] = {"path": "tool", "code": "unknown_tool"}
-            if suggestions:
-                issue["constraints"] = {"suggestions": suggestions}
-            raise ParameterError(f"未知工具: {tool}", [issue], status_code=404)
+            raise unknown_tool_error(tool, (spec.name for spec in selected))
         selected = [resolved]
     elif tools is not None:
         by_name = {spec.name: spec for spec in selected}
@@ -134,32 +140,27 @@ def select_specs(
         for name in tools:
             resolved = by_name.get(name)
             if resolved is None:
-                suggestions = difflib.get_close_matches(
-                    name, candidates, n=5, cutoff=0.4
-                )
-                issue = {"path": "tools", "code": "unknown_tool"}
-                if suggestions:
-                    issue["constraints"] = {"suggestions": suggestions}
-                raise ParameterError(f"未知工具: {name}", [issue], status_code=404)
+                raise unknown_tool_error(name, candidates, path="tools")
             if name not in seen:
                 ordered.append(resolved)
                 seen.add(name)
         selected = ordered
     if q:
         needle = q.strip().casefold()
-        selected = [
-            spec
-            for spec in selected
-            if needle
-            in " ".join(
-                (
-                    spec.name,
-                    spec.summary,
-                    spec.operation_label_zh,
-                    spec.family,
-                )
-            ).casefold()
-        ]
+        if needle:
+            selected = [
+                spec
+                for spec in selected
+                if needle
+                in " ".join(
+                    (
+                        spec.name,
+                        spec.summary,
+                        spec.operation_label_zh,
+                        spec.family,
+                    )
+                ).casefold()
+            ]
     return selected
 
 
@@ -219,7 +220,7 @@ def discover_specs(
         **query.model_dump(exclude={"detail", "include_output_schema"}),
         allowed_names=allowed_names,
     )
-    describe: Callable[[ToolSpec], dict[str, Any]]
+    describe: Callable[[ToolSpec], ServiceResult]
     if query.detail == "full":
         describe = partial(
             describe_spec, include_output_schema=query.include_output_schema
@@ -268,46 +269,7 @@ def describe_batch_interface() -> ServiceResult:
     """Return the shared self-description contract for batch execution across CLI, REST, and MCP."""
     from fatebridge.application.batch import MAX_BATCH_CALLS, BatchRequest
 
-    example_input: dict[str, Any] = {
-        "subjects": {
-            "demo": {
-                "name": "演示甲",
-                "gender": "male",
-                "birth_date": "1990-05-15",
-                "birth_time": "10:30:00",
-                "birth_place": "北京",
-                "timezone": "Asia/Shanghai",
-            }
-        },
-        "context": {
-            "analysis_datetime": "2026-04-06T09:30:00+08:00",
-            "place": "杭州西湖区",
-        },
-        "defaults": {
-            "use_true_solar_time": True,
-        },
-        "calls": [
-            {
-                "id": "bazi_chart",
-                "tool": "bazi_birth_chart",
-                "subject": "demo",
-                "fields": ["bazi_birth.day_master"],
-            },
-            {
-                "id": "qimen_now",
-                "tool": "qimen",
-                "arguments": {
-                    "qimen_options": {"ju_method": "zhirun"},
-                },
-            },
-            {
-                "id": "minggua",
-                "tool": "fengshui_minggua",
-                "subject": "demo",
-            },
-        ],
-        "as_of": "2026-04-06T09:30:00+08:00",
-    }
+    example_input = batch_example_input()
     BatchRequest.model_validate(example_input)
     return {
         "tool": "batch",

@@ -8,7 +8,6 @@ date-frame conversion are separate from the native Swiss solar backend.
 from __future__ import annotations
 
 import math
-import os
 import weakref
 from fractions import Fraction
 from functools import lru_cache
@@ -22,6 +21,14 @@ from fatebridge.core.analytic_solar import (
     aberration,
     apparent_ecliptic,
 )
+from fatebridge.core.native_solar_loader import (
+    bisect_forward_crossing,
+    file_signature,
+    is_finite_number,
+    select_env_backed_source,
+    validate_crossing_inputs,
+    validate_forward_bracket,
+)
 from fatebridge.utils.errors import EphemerisSourceError
 
 MODEL_ID = "fatebridge_jpl_spk_solar_v1"
@@ -31,19 +38,7 @@ LOCK = RLock()
 
 
 def _signature(path: Path) -> tuple[int, ...]:
-    try:
-        stat = path.stat()
-        if not path.is_file():
-            raise OSError("not a file")
-        return (
-            stat.st_dev,
-            stat.st_ino,
-            stat.st_size,
-            stat.st_mtime_ns,
-            stat.st_ctime_ns,
-        )
-    except OSError as error:
-        raise EphemerisSourceError("solar_spk_unavailable") from error
+    return file_signature(path, "solar_spk_unavailable")
 
 
 class _KernelSun:
@@ -163,11 +158,7 @@ def _load(path: Path, signature: tuple[int, ...]) -> _KernelSun:
 
 
 def _selected() -> _KernelSun:
-    value = os.environ.get(FILE_ENV, "").strip()
-    if not value:
-        raise EphemerisSourceError("solar_spk_unavailable")
-    path = Path(value).expanduser().resolve()
-    return _load(path, _signature(path))
+    return select_env_backed_source(FILE_ENV, _load, "solar_spk_unavailable")
 
 
 def cache_key() -> tuple[Any, ...]:
@@ -183,9 +174,7 @@ def source_receipt() -> dict[str, Any]:
 
 def solar_longitudes_tt(jd_tts: list[float]) -> dict[str, Any]:
     """Observe one loaded SPK source at finite TT points, under one lock."""
-    if not all(
-        type(value) in (int, float) and math.isfinite(value) for value in jd_tts
-    ):
+    if not all(is_finite_number(value) for value in jd_tts):
         raise ValueError("SPK observations require finite numeric TT points")
     with LOCK:
         source = _selected()
@@ -205,8 +194,13 @@ def longitude_crossing_tt(
     *,
     expected_source_key: tuple[Any, ...] | None = None,
 ) -> dict[str, Any]:
-    if not all(math.isfinite(x) for x in (target, low, high)) or low >= high:
-        raise ValueError("SPK crossing requires a finite increasing TT bracket")
+    validate_crossing_inputs(
+        target,
+        low,
+        high,
+        message="SPK crossing requires a finite increasing TT bracket",
+        reject_bool=False,
+    )
     with LOCK:
         source = _selected()
 
@@ -217,18 +211,13 @@ def longitude_crossing_tt(
         def residual(epoch: float) -> float:
             return math.remainder(source.longitude(epoch) - target, 360)
 
-        if not residual(low) < 0 <= residual(high):
-            raise ValueError("SPK TT bracket does not contain a forward crossing")
-        iterations = 0
-        for _ in range(40):
-            middle = (low + high) / 2
-            if middle == low or middle == high:
-                break
-            if residual(middle) < 0:
-                low = middle
-            else:
-                high = middle
-            iterations += 1
+        validate_forward_bracket(
+            residual(low),
+            residual(high),
+            message="SPK TT bracket does not contain a forward crossing",
+            max_span=None,
+        )
+        low, high, iterations = bisect_forward_crossing(residual, low, high, 40)
         source.check_unchanged()
         return {
             "jd_tt": (low + high) / 2,

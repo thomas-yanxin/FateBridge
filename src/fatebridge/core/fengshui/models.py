@@ -10,9 +10,10 @@ from datetime import date, datetime
 from decimal import Decimal
 from fractions import Fraction
 from numbers import Integral, Real
-from typing import Annotated, Any, Literal, cast, get_args, get_origin
+from typing import Annotated, Any, Literal, get_args, get_origin
 
 from pydantic import (
+    BaseModel,
     BeforeValidator,
     ConfigDict,
     Field,
@@ -24,18 +25,14 @@ from pydantic import (
 )
 from pydantic_core import PydanticCustomError
 
+from fatebridge.core.consultation_policy import POLICY_ID, restricted_intent_path
+from fatebridge.core.contracts.base import PartialOutput, ProjectedOutput
 from fatebridge.core.fengshui.directions import (
     MOUNTAIN_BY_NAME,
     sitting_from_mountain,
     sitting_support,
 )
-from fatebridge.core.requests.base import FateBridgeBaseRequest
-from fatebridge.core.response_models import (
-    Object,
-    PartialOutput,
-    ProjectedOutput,
-    RunMetadata,
-)
+from fatebridge.core.receipt_models import Object, RunMetadata
 from fatebridge.utils.timezones import parse_timezone_name
 
 Direction = Literal["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
@@ -211,8 +208,23 @@ class _NumericGuard:
         return _normalize(self.annotation, value)
 
 
-class FengshuiInput(FateBridgeBaseRequest):
-    """Attach strict numeric/calendar guards to nested and flattened fields."""
+class FengshuiInput(BaseModel):
+    """Attach strict numeric/calendar guards and consultation policy to Feng Shui inputs."""
+
+    model_config = ConfigDict(defer_build=True, extra="forbid")
+
+    @model_validator(mode="before")
+    @classmethod
+    def _validate_consultation_scope(cls, data: object) -> object:
+        if isinstance(data, dict):
+            path = restricted_intent_path(data)
+            if path:
+                raise PydanticCustomError(
+                    "consultation_restricted",
+                    "此请求超出允许的咨询范围",
+                    {"policy": POLICY_ID, "path": path},
+                )
+        return data
 
     @classmethod
     def __pydantic_init_subclass__(cls, **kwargs: Any) -> None:
@@ -500,7 +512,8 @@ class House(FengshuiInput):
                 )
 
 
-PLACEMENT_FACING_ROLES = {
+FacingRole = Literal["door_facing", "headboard", "desk_facing", "fire_mouth"]
+PLACEMENT_FACING_ROLES: dict[str, FacingRole] = {
     "door": "door_facing",
     "bed": "headboard",
     "desk": "desk_facing",
@@ -592,10 +605,7 @@ class Placement(FengshuiInput):
             )
         expected_role = PLACEMENT_FACING_ROLES[self.purpose]
         if self.facing_direction is not None and self.facing_role is None:
-            self.facing_role = cast(
-                Literal["door_facing", "headboard", "desk_facing", "fire_mouth"],
-                expected_role,
-            )
+            self.facing_role = expected_role
         if self.facing_role is not None and self.facing_role != expected_role:
             raise PydanticCustomError(
                 "facing_role_mismatch",
@@ -631,19 +641,24 @@ class BazhaiRequest(FengshuiInput):
         }
         if self.house is not None:
             used_subjects.add(self.house.object_id)
+        ids: list[str] = []
         for o in self.occupants:
-            if o.subject_id is None:
-                o.subject_id = _next_auto_id("occupant", used_subjects)
+            sid = o.subject_id
+            if sid is None:
+                sid = _next_auto_id("occupant", used_subjects)
+                o.subject_id = sid
+            ids.append(sid)
 
         used_objects = {p.object_id for p in self.placements if p.object_id is not None}
         if self.house is not None:
             used_objects.add(self.house.object_id)
+        objects: list[str] = []
         for p in self.placements:
-            if p.object_id is None:
-                p.object_id = _next_auto_id("placement", used_objects)
-
-        ids = [cast(str, o.subject_id) for o in self.occupants]
-        objects = [cast(str, p.object_id) for p in self.placements]
+            oid = p.object_id
+            if oid is None:
+                oid = _next_auto_id("placement", used_objects)
+                p.object_id = oid
+            objects.append(oid)
         if len(set(ids)) != len(ids):
             raise PydanticCustomError(
                 "duplicate_object_ids",
@@ -718,15 +733,20 @@ class EnvironmentFeature(FengshuiInput):
                         "actual": self.direction,
                     },
                 )
-            self.direction = cast(Direction, m_dir)
+            self.direction = m_dir
         return self
 
 
-def _assign_feature_ids(features: list[EnvironmentFeature]) -> None:
+def _assign_feature_ids(features: list[EnvironmentFeature]) -> list[str]:
     used = {f.object_id for f in features if f.object_id is not None}
+    ids: list[str] = []
     for f in features:
-        if f.object_id is None:
-            f.object_id = _next_auto_id("feature", used)
+        oid = f.object_id
+        if oid is None:
+            oid = _next_auto_id("feature", used)
+            f.object_id = oid
+        ids.append(oid)
+    return ids
 
 
 class JinsuoRequest(FengshuiInput):
@@ -735,8 +755,7 @@ class JinsuoRequest(FengshuiInput):
 
     @model_validator(mode="after")
     def unique_features(self) -> "JinsuoRequest":
-        _assign_feature_ids(self.features)
-        ids = [cast(str, f.object_id) for f in self.features]
+        ids = _assign_feature_ids(self.features)
         if len(set(ids)) != len(ids):
             raise PydanticCustomError(
                 "duplicate_feature_ids",

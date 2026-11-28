@@ -26,13 +26,13 @@ from fatebridge.core.astro.horary_events import native_planetary_events
 from fatebridge.core.astro.horary_motion import native_lunar_contacts
 
 _ORIG_NATIVE_PLANETARY_EVENTS = native_planetary_events
-from fatebridge.core.classical_western import combustion_state
-from fatebridge.core.planetary_event_order import ordered_contact
-from fatebridge.core.predictive._common import (
+from fatebridge.core.astro.western_points import (
     planet_label,
     point_absolute_position,
     sign_label,
 )
+from fatebridge.core.classical_western import combustion_state
+from fatebridge.core.planetary_event_order import ordered_contact
 
 BENEFICS = ("Venus", "Jupiter")
 MALEFICS = ("Mars", "Saturn")

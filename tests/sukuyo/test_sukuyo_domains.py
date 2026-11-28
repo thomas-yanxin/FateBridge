@@ -7,7 +7,6 @@ import time
 
 import pytest
 
-from fatebridge.core.local_techniques.suzhan import build_suzhan_result
 from fatebridge.core.sukuyo.calendar import (
     calendar_mansion,
     day_evidence,
@@ -19,6 +18,7 @@ from fatebridge.core.sukuyo.sanjiu import (
     kuyou_for_age,
     relation_between_su27,
 )
+from fatebridge.core.sukuyo.suzhan import build_suzhan_result
 from fatebridge.services.divination import calculate_sukuyo_compatibility
 
 
@@ -124,3 +124,118 @@ def test_sukuyo_latency_and_audit_payload_budget() -> None:
     sz2 = len(json.dumps(compat, ensure_ascii=False))
     assert ms2 < 15.0, f"Compat took {ms2:.2f}ms >= 15ms"
     assert sz2 < 20 * 1024, f"Compat audit payload {sz2}B >= 20KB"
+
+
+def test_unknown_dates_explain_all_four_directed_relationship_rows() -> None:
+    from fatebridge.services.divination import calculate_sukuyo_compatibility
+
+    result = calculate_sukuyo_compatibility(
+        person1_name="甲",
+        person1_date="1346-07-17",
+        person1_zone="+08:00",
+        person2_name="乙",
+        person2_date="1346-08-29",
+        person2_zone="+08:00",
+        calendar_basis="japanese_naoj_historical_utc09",
+    )
+    assert result["pair"] is None
+    rows = result["candidate_relation_analysis"]["rows"]
+    assert {(r["person1_su27"], r["person2_su27"]) for r in rows} == {
+        ("奎", "房"),
+        ("奎", "心"),
+        ("娄", "房"),
+        ("娄", "心"),
+    }
+    assert all(not r["applied_to_primary"] for r in rows)
+
+
+def test_unresolved_leap_candidate_and_declared_half_matrix() -> None:
+    from fatebridge.services.divination import calculate_sukuyo_compatibility
+
+    unresolved = calculate_sukuyo_compatibility(
+        person1_date="2025-07-25",
+        person1_zone="+08:00",
+        person2_date="2025-03-04",
+        person2_zone="+08:00",
+    )
+    assert not unresolved["candidate_relation_analysis"][
+        "candidate_set_complete_within_profile"
+    ]
+    assert unresolved["pair"] is None
+
+    declared = calculate_sukuyo_compatibility(
+        person1_date="1341-05-24",
+        person1_zone="+09:00",
+        person2_date="1349-07-24",
+        person2_zone="+09:00",
+        calendar_basis="japanese_naoj_historical_utc09",
+        calendar_profile="hinoo_t1299_host27",
+        person1_calendar_day_part="first_half",
+        person2_calendar_day_part="first_half",
+    )
+    assert declared["pair"] is None
+    assert set(declared["person1"]["calendar"]["candidate_su27s"]) == {"参", "毕"}
+    assert set(declared["person2"]["calendar"]["candidate_su27s"]) == {"星", "鬼"}
+    analysis = declared["candidate_relation_analysis"]
+    assert len(analysis["rows"]) == 2
+    assert len(analysis["unconstrained_rows"]) == 4
+    assert analysis["shared_reconstruction_analysis"]["unsupported_row_count"] == 2
+
+
+@pytest.mark.parametrize("civil", ["1346-08-30", "1346-08-29"])
+def test_heart_source_restriction_is_retained_beside_general_favorable_day(
+    civil: str,
+) -> None:
+    from fatebridge.core.sukuyo.calendar import calendar_mansion, day_evidence
+
+    c = calendar_mansion(
+        civil,
+        time_text="23:30:00" if civil.endswith("29") else "12:00:00",
+        zone="+08:00" if civil.endswith("29") else "+09:00",
+        calendar_basis="japanese_naoj_historical_utc09",
+    )
+    d = day_evidence(c)
+    assert d["day_mansion"] == "心" and d["activity_assessment"] is None
+    assert "reading_text" not in d
+    assert any(
+        item["assessment"] == "favorable"
+        for item in d["calendar_day"]["classifications"]
+    )
+
+
+@pytest.mark.parametrize("part", [None, "first_half"])
+def test_unresolved_mansion_retains_candidate_list_and_palace(
+    part: str | None,
+) -> None:
+    from fatebridge.core.sukuyo.calendar import calendar_mansion, day_evidence
+
+    c = calendar_mansion(
+        "1341-05-24",
+        time_text="12:00:00",
+        zone="+09:00",
+        calendar_basis="japanese_naoj_historical_utc09",
+        calendar_profile="hinoo_t1299_host27",
+        calendar_day_part=part,
+    )
+    d = day_evidence(c)
+    assert d["day_mansion"] is None and set(c["candidate_su27s"]) == {"参", "毕"}
+    assert "reading_text" not in d
+    assert d["palace_reference"]["mansion_candidates"] == ["参", "毕"]
+
+
+def test_pair_structured_data_preserves_date_candidates_and_resolved_palace() -> None:
+    from fatebridge.services.divination import calculate_sukuyo_compatibility
+
+    r = calculate_sukuyo_compatibility(
+        person1_name="甲",
+        person1_date="1346-07-17",
+        person1_zone="+08:00",
+        person2_name="乙",
+        person2_date="1346-08-29",
+        person2_zone="+08:00",
+        calendar_basis="japanese_naoj_historical_utc09",
+    )
+    assert r["person2"]["palace_reference"]["selected_palace"]["name"] == "蝎宫"
+    assert r["person1"]["calendar"]["date_support"]["utc_support_intervals"]
+    assert r["person2"]["calendar"]["date_support"]["utc_support_intervals"]
+    assert "candidate_relation_analysis" in r

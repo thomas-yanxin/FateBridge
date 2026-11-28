@@ -5,8 +5,8 @@ import copy
 import pytest
 
 import fatebridge.core.astro.astrology_election as election
-from fatebridge.core.response_models import Election
-from tests.unit_test.fixtures.western_event_cases import (
+from fatebridge.core.contracts.western import Election
+from tests.fixtures.western_event_cases import (
     event_result,
     synthetic_subject,
 )

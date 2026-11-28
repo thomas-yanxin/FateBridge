@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from pydantic import Field
 
-from fatebridge.core.metaphysics.common import SEXAGENARY_CYCLE
 from fatebridge.core.requests.base import AnalysisDateFields, FateBridgeBaseRequest
 from fatebridge.core.requests.birth import (
     OPTIONAL_UNKNOWN_BIRTH_HOUR_FIELD,
     BaziClockRequest,
     OptionalUnknownBirthHourMixin,
 )
+from fatebridge.utils.data import SEXAGENARY_CYCLE
 
 PILLAR_PATTERN = "^(?:" + "|".join(SEXAGENARY_CYCLE) + ")$"
 LITERAL_PILLAR_PATTERN = "^[甲乙丙丁戊己庚辛壬癸][子丑寅卯辰巳午未申酉戌亥]$"

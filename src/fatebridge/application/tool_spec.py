@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, NamedTuple, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Any, Literal, NamedTuple, Protocol, runtime_checkable
 
 from typing_extensions import NotRequired, TypedDict
 
@@ -140,6 +140,26 @@ class ExecutionHints:
         }
 
 
+@dataclass(frozen=True)
+class BatchInputPolicy:
+    """Declarative batch subject and shared context mapping policy for one tool."""
+
+    subject_mode: Literal[
+        "none",
+        "birth_fields",
+        "date_clock",
+        "exclusive_birth_record",
+        "subject_list",
+        "pair",
+    ] = "none"
+    list_field: str | None = None
+    pair_prefixes: tuple[str, str] | tuple[()] = ()
+    pair_style: Literal["birth_fields", "date_zone"] = "birth_fields"
+    context_prefixes: tuple[str, ...] = ("analysis_",)
+    context_clock_basis_field: str | None = None
+    solar_clock_bases: tuple[str, ...] = ()
+
+
 _UNSET_OUTPUT_MODEL: Any = object()
 _UNSET_REQUEST_MODEL: Any = object()
 
@@ -179,6 +199,7 @@ class ToolSpec:
     execution_wrapper: ExecutionWrapper | None = None
     evidence_views_builder: EvidenceViewsBuilder | None = None
     default_omit: tuple[str, ...] = ()
+    batch_policy: BatchInputPolicy = field(default_factory=BatchInputPolicy)
 
     def __getattribute__(self, name: str) -> Any:
         if name == "output_model":

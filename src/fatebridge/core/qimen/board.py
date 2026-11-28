@@ -7,12 +7,12 @@ from collections.abc import Mapping
 from typing import Any, Literal, TypedDict
 
 from fatebridge.core.divination import build_hexagram
-from fatebridge.core.metaphysics.common import (
+from fatebridge.core.qimen.calendar import QIMEN_FUHEAD_HEAVEN_STEM
+from fatebridge.utils.data import (
     rotate_sequence,
     sexagenary_index_for,
     xun_head_for_ganzhi,
 )
-from fatebridge.core.qimen.calendar import QIMEN_FUHEAD_HEAVEN_STEM
 
 LayoutMode = Literal["direct", "rotating", "fei"]
 LodgingPolicy = Literal["kun2", "gen8", "yin_gen_yang_kun"]

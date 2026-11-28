@@ -13,13 +13,13 @@ from fatebridge.core.almanac import (
     _solar_terms_for_context_year,
 )
 from fatebridge.core.bazi.calendar import BaZiCalendar, resolve_bazi_effective_date
-from fatebridge.core.metaphysics.common import (
-    MetaphysicsSeed,
+from fatebridge.core.metaphysics.common import MetaphysicsSeed
+from fatebridge.utils.civil_time import gregorian_date_parts, utc_calendar
+from fatebridge.utils.data import (
     ganzhi_text,
     sexagenary_index_for,
     sexagenary_text,
 )
-from fatebridge.utils.civil_time import gregorian_date_parts, utc_calendar
 from fatebridge.utils.errors import ParameterError
 
 QIMEN_ZHIRUN_MIN_LEAD_DAYS = 8

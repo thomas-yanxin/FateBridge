@@ -10,9 +10,7 @@ from dateutil import tz
 from fatebridge.core.almanac import (
     LUNAR_DAY_NAMES,
     LUNAR_MONTH_NAMES,
-    LUNAR_SUPPORTED_SOLAR_END,
-    LUNAR_SUPPORTED_SOLAR_START,
-    _lunar_date_from_solar,
+    fast_lunar_dict,
     get_bazi_month_context,
     get_bazi_year,
     localize_datetime,
@@ -31,7 +29,7 @@ from fatebridge.core.ziwei.tables import (
 from fatebridge.utils.birth_input import PersonInfo
 from fatebridge.utils.civil_clock import format_utc_offset, resolve_civil_clock
 from fatebridge.utils.civil_time import NominalClockLabel, ZonedCalendar, utc_calendar
-from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
+from fatebridge.utils.data import year_ganzhi
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 from fatebridge.utils.solar_time import (
     SOLAR_TIME_STRATEGY_APPARENT,
@@ -49,29 +47,7 @@ from fatebridge.utils.timezones import (
 
 def lunar_year_ganzhi(lunar_year: int) -> tuple[str, str]:
     """Derive the stem and branch of a lunar year (正月初一 boundary)."""
-    return (
-        HEAVENLY_STEMS[(lunar_year - 4) % len(HEAVENLY_STEMS)],
-        EARTHLY_BRANCHES[(lunar_year - 4) % len(EARTHLY_BRANCHES)],
-    )
-
-
-def fast_lunar_dict(solar_date: date) -> dict[str, Any]:
-    """Convert a Gregorian date to a Ziwei lunar dict without solar-term ephemeris."""
-    if (
-        solar_date < LUNAR_SUPPORTED_SOLAR_START
-        or solar_date > LUNAR_SUPPORTED_SOLAR_END
-    ):
-        raise ValueError(
-            f"农历换算仅支持公历 {LUNAR_SUPPORTED_SOLAR_START.isoformat()} "
-            f"至 {LUNAR_SUPPORTED_SOLAR_END.isoformat()}，收到 {solar_date.isoformat()}"
-        )
-    lunar = _lunar_date_from_solar(solar_date)
-    return {
-        "year": lunar.year,
-        "month": lunar.month,
-        "day": lunar.day,
-        "is_leap_month": lunar.isLeapMonth,
-    }
+    return year_ganzhi(lunar_year)
 
 
 def lunar_display_from_dict(lunar: dict[str, Any]) -> str:

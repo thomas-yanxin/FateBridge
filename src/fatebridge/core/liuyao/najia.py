@@ -11,28 +11,12 @@ from fatebridge.core.hexagram_relations import (
     HEXAGRAM_PALACE_LOOKUP,
 )
 from fatebridge.core.liuyao.casting import SIX_YAO_NAMES
-
-TRIGRAM_LOWER_BRANCHES = {
-    "乾": ("子", "寅", "辰"),
-    "坎": ("寅", "辰", "午"),
-    "艮": ("辰", "午", "申"),
-    "震": ("子", "寅", "辰"),
-    "巽": ("丑", "亥", "酉"),
-    "离": ("卯", "丑", "亥"),
-    "坤": ("未", "巳", "卯"),
-    "兑": ("巳", "卯", "丑"),
-}
-
-TRIGRAM_UPPER_BRANCHES = {
-    "乾": ("午", "申", "戌"),
-    "坎": ("申", "戌", "子"),
-    "艮": ("戌", "子", "寅"),
-    "震": ("午", "申", "戌"),
-    "巽": ("未", "巳", "卯"),
-    "离": ("酉", "未", "巳"),
-    "坤": ("丑", "亥", "酉"),
-    "兑": ("亥", "酉", "未"),
-}
+from fatebridge.utils.data import (
+    BRANCH_ELEMENTS,
+    TRIGRAM_LOWER_BRANCHES,
+    TRIGRAM_UPPER_BRANCHES,
+    branch_element_text,
+)
 
 TRIGRAM_STEMS = {
     "乾": ("甲", "壬"),
@@ -43,21 +27,6 @@ TRIGRAM_STEMS = {
     "离": ("己", "己"),
     "坤": ("乙", "癸"),
     "兑": ("丁", "丁"),
-}
-
-BRANCH_TO_ELEMENT = {
-    "寅": "木",
-    "卯": "木",
-    "巳": "火",
-    "午": "火",
-    "申": "金",
-    "酉": "金",
-    "亥": "水",
-    "子": "水",
-    "辰": "土",
-    "戌": "土",
-    "丑": "土",
-    "未": "土",
 }
 
 LIUSHEN_CYCLE = ("青龙", "朱雀", "勾陈", "腾蛇", "白虎", "玄武")
@@ -284,10 +253,14 @@ def build_sixyao_enrichment(
     enriched_lines: list[dict[str, Any]] = []
     for i in range(6):
         branch = branches[i]
-        element = BRANCH_TO_ELEMENT.get(branch, "")
+        element = BRANCH_ELEMENTS[branch][0].value if branch in BRANCH_ELEMENTS else ""
         liuqin = liuqin_against_palace(palace_element, element)
         changed_branch = changed_branches[i] or branch
-        changed_element = BRANCH_TO_ELEMENT.get(changed_branch, "")
+        changed_element = (
+            BRANCH_ELEMENTS[changed_branch][0].value
+            if changed_branch in BRANCH_ELEMENTS
+            else ""
+        )
         changed_liuqin = liuqin_against_palace(palace_element, changed_element)
         position_num = i + 1
         shi_ying = (
@@ -334,7 +307,7 @@ def compute_gua_shen(
     shi_value = int(lines[shi_line - 1]["value"])
     start_index = 0 if shi_value == 1 else 6
     branch = _BRANCHES[(start_index + shi_line - 1) % 12]
-    element = BRANCH_TO_ELEMENT[branch]
+    element = branch_element_text(branch)
     return {
         "branch": branch,
         "element": element,

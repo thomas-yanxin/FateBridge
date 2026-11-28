@@ -17,7 +17,6 @@ from fatebridge.core.astro.astrology_tables import (
 from fatebridge.core.astro.birth import AstroBirthInfo, require_resolved_birth_timezone
 from fatebridge.core.astro.geometry import _degree_in_sign, _sign_name, _week_ruler
 from fatebridge.core.astro.parts import _build_houses, _build_planet_record
-from fatebridge.core.bazi.calendar import BaZiCalendar
 from fatebridge.core.guolao import classical, ephemeris, moira
 from fatebridge.core.guolao.classical import (
     BRANCHES,
@@ -48,6 +47,7 @@ POLICIES = (
     "source_solar_days_winter_inclusive",
 )
 from fatebridge.utils.civil_time import utc_calendar
+from fatebridge.utils.data import year_ganzhi
 from fatebridge.utils.timezones import validate_local_clock
 
 RULESET = "guolao_classical_v8"
@@ -264,7 +264,7 @@ def build_chart(
 
     # Fast LiChun Year Pillar + 十干化曜 + 33 神煞
     selected_year = fast_lichun_year(birth.local_datetime, raw["julian_day_tt"])
-    year_stem, year_branch = BaZiCalendar.calculate_year_pillar(selected_year)
+    year_stem, year_branch = year_ganzhi(selected_year)
     month_branch = _jie_month_branch(raw["states"]["Sun"]["longitude"])
     is_day = raw["solar_altitude"] >= 0
     hua_yao = hua_yao_for_stem(year_stem)

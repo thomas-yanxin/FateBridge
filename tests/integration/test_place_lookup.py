@@ -11,7 +11,7 @@ from fastmcp import Client
 
 import fatebridge.mcp_server as mcp_module
 from fatebridge.cli import run as cli_run
-from fatebridge.services.places import calculate_place_lookup
+from fatebridge.utils.places import lookup_place as calculate_place_lookup
 from tests.support.transports import business, call_calculation, rest
 
 __all__ = ["rest"]

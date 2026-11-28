@@ -1,6 +1,9 @@
 """Explicit-source Mei Hua application service; never substitute the clock."""
 
-from pydantic import JsonValue
+from functools import lru_cache
+from typing import Any
+
+from pydantic import JsonValue, TypeAdapter
 
 from fatebridge.core.divination import build_meihua_interpretation
 from fatebridge.core.meihua.casting import cast_explicit_meihua
@@ -18,12 +21,30 @@ from fatebridge.core.meihua.topics import (
     apply_situational_responses,
     build_general_casting_readings,
     general_casting_summary,
-    normalize_day_qi_context,
     reported_day_qi_context,
 )
-from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
+from fatebridge.core.requests.meihua import (
+    MeihuaCasting,
+    MeihuaDayQiContext,
+    MeihuaInterpretationOptions,
+)
 from fatebridge.core.zhouyi import classical_hexagram
 from fatebridge.utils.errors import calculation_guard
+
+
+@lru_cache(maxsize=1)
+def _casting_adapter() -> TypeAdapter[Any]:
+    return TypeAdapter(MeihuaCasting)
+
+
+def normalize_day_qi_context(
+    context: dict[str, JsonValue] | None, topic: str
+) -> dict[str, Any] | None:
+    if context is None:
+        return None
+    if topic == "weather":
+        raise ValueError("所选日气体用条款仅用于人事分支，不能套用天时占")
+    return MeihuaDayQiContext.model_validate(context).model_dump(mode="json")
 
 
 @calculation_guard("梅花显式起卦")
@@ -63,7 +84,10 @@ def calculate_meihua_cast(
         else None
     )
     ensure_observation_method_context(casting.get("method"), normalized_observation)
-    cast, trace = cast_explicit_meihua(casting)
+    validated_casting = (
+        _casting_adapter().validate_python(casting).model_dump(mode="json")
+    )
+    cast, trace = cast_explicit_meihua(validated_casting)
     for key in ("base_hexagram", "changed_hexagram"):
         cast[key]["classical"] = classical_hexagram(cast[key]["binary_code"])
 

@@ -12,13 +12,10 @@ from __future__ import annotations
 import math
 from typing import Sequence
 
+from fatebridge.core.astro.cartesian import dot
 from fatebridge.utils.errors import EphemerisSourceError
 
 LIGHT_SPEED_AU_PER_DAY = 299792458.0 * 86400.0 / 149597870700.0
-
-
-def dot(a: Sequence[float], b: Sequence[float]) -> float:
-    return math.fsum(x * y for x, y in zip(a, b))
 
 
 def _lorentz_geometry(

@@ -2,8 +2,7 @@
 
 import json
 
-from fatebridge.core.contracts.output_jinkou_board import JinkouCourse
-from fatebridge.core.contracts.output_jinkou_year_fate import Jinkou
+from fatebridge.core.contracts.jinkou import Jinkou, JinkouCourse
 from fatebridge.core.metaphysics.jinkou import build_jinkou_board
 from fatebridge.core.metaphysics.jinkou.patterns import structural_patterns
 from fatebridge.core.metaphysics.jinkou.year_fate import (
@@ -138,3 +137,25 @@ def test_jinkou_full_contract_with_natal_and_year_fate_and_sunrise_mode() -> Non
     )
     full = {**board, "natal_course": natal_course, "year_fate": year_fate}
     Jinkou.model_validate(full)
+
+
+def test_jinkou_birth_date_mode_stays_within_10kb_and_keeps_diurnal_evidence() -> None:
+    from fatebridge.application.examples import example_input
+    from fatebridge.application.execution import execute_with_receipt
+    from fatebridge.application.response_delivery import deliver_response
+    from fatebridge.core.execution_context import ExecutionOptions
+    from fatebridge.services.tool_catalog import CATALOG
+
+    jinkou_spec = next(entry for entry in CATALOG if entry.name == "jinkou")
+    jinkou_req = jinkou_spec.request_model.model_validate(
+        {**dict(example_input(jinkou_spec) or {}), "birth_date": "1990-05-01"}
+    )
+    jinkou_raw = execute_with_receipt(
+        jinkou_spec,
+        jinkou_req,
+        options=ExecutionOptions(as_of="2026-10-22T12:00:00+08:00"),
+    )
+    jinkou_default = deliver_response(jinkou_raw, spec=jinkou_spec)
+    assert len(json.dumps(jinkou_default, ensure_ascii=False).encode("utf-8")) <= 10240
+    assert "diurnal_evidence" in jinkou_default["jinkou"]["overview"]
+    Jinkou.model_validate(jinkou_default)

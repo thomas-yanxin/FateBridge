@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 """FateBridge MCP discovery and deterministic calculation."""
 
-from __future__ import annotations
-
-import difflib
 import logging
-import os
 from functools import cache
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
 
 from fastmcp import FastMCP
 from fastmcp.exceptions import ValidationError as MCPValidationError
@@ -17,35 +13,15 @@ from mcp.types import CallToolRequestParams, ToolAnnotations
 from pydantic import Field, ValidationError
 
 from fatebridge import __version__ as APP_VERSION
-from fatebridge.application.batch import (
-    AnalysisContext,
-    BatchCall,
-    BatchRequest,
-    SubjectProfile,
-    execute_batch,
+from fatebridge.application.delivery_flags import (
+    FIELDS_FLAG_DESC,
+    INCLUDE_FLAG_DESC,
 )
-from fatebridge.application.discovery import (
-    DiscoveryDetail,
-    discover_specs,
-    select_mcp_specs,
-)
-from fatebridge.application.execution import execute_with_receipt, result_is_error
-from fatebridge.application.response_delivery import (
-    deliver_response,
-    validate_delivery_controls,
-)
-from fatebridge.application.tool_spec import ServiceResult, ToolSpec
-from fatebridge.core.execution_context import ExecutionOptions
-from fatebridge.mcp_transport import protocol_result
-from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.transports.flags import FIELDS_FLAG_DESC, INCLUDE_FLAG_DESC
-from fatebridge.utils.errors import (
-    ParameterError,
-    error_response_payload,
-    handle_calculation_error,
-    validation_error_result,
-)
-from fatebridge.utils.runtime import get_log_level, load_runtime_env
+from fatebridge.utils.errors import error_response_payload
+from fatebridge.utils.runtime import get_log_level, get_mcp_families, load_runtime_env
+
+if TYPE_CHECKING:
+    from fatebridge.application.tool_spec import ServiceResult, ToolSpec
 
 __all__ = ["app", "create_mcp_app", "main"]
 
@@ -64,29 +40,17 @@ MCP_INSTRUCTIONS = (
 )
 
 
-def _render_protocol_error(failure: ServiceResult, operation: str) -> ToolResult:
+def protocol_result(payload: "ServiceResult", *, failed: bool) -> ToolResult:
+    """Carry structured content and native MCP error status together."""
+    return ToolResult(
+        content=payload["error"] if failed else [],
+        structured_content=payload,
+        is_error=failed,
+    )
+
+
+def _render_protocol_error(failure: "ServiceResult", operation: str) -> ToolResult:
     return protocol_result(error_response_payload(failure, operation), failed=True)
-
-
-def _unknown_tool_result(
-    tool_name: str, operation: str, allowed_tools: set[str]
-) -> ToolResult:
-    suggestions = difflib.get_close_matches(
-        tool_name, sorted(allowed_tools), n=5, cutoff=0.4
-    )
-    issue: dict[str, object] = {"path": "tool", "code": "unknown_tool"}
-    if suggestions:
-        issue["constraints"] = {"suggestions": suggestions}
-    return _render_protocol_error(
-        {
-            "error": f"未知工具: {tool_name}",
-            "error_code": "unknown_tool",
-            "status_code": 404,
-            "retryable": False,
-            "issues": [issue],
-        },
-        operation,
-    )
 
 
 class _ToolValidationFeedback(Middleware):
@@ -98,18 +62,74 @@ class _ToolValidationFeedback(Middleware):
         try:
             return await call_next(context)
         except (MCPValidationError, ValidationError) as exc:
+            from pydantic_core import ErrorDetails
+
+            from fatebridge.application.batch import BatchRequest
+            from fatebridge.utils.errors import validation_issues_result
+
             cause = exc if isinstance(exc, ValidationError) else exc.__cause__
             if not isinstance(cause, ValidationError):
                 raise
-            root_model = BatchRequest if context.message.name == "run_batch" else None
+            tool_name = context.message.name
+            root_model = BatchRequest if tool_name == "run_batch" else None
+            allowed_fields = (
+                ("tool", "arguments", "include", "fields", "as_of")
+                if tool_name == "run_calculation"
+                else (
+                    BatchRequest.model_fields.keys()
+                    if tool_name == "run_batch"
+                    else (
+                        (
+                            "family",
+                            "q",
+                            "tool",
+                            "tools",
+                            "detail",
+                            "include_output_schema",
+                        )
+                        if tool_name == "discover_tools"
+                        else None
+                    )
+                )
+            )
+            entries: list[ErrorDetails] = [
+                (
+                    {
+                        **item,
+                        "type": "extra_forbidden",
+                        "msg": "Extra inputs are not permitted",
+                    }
+                    if item["type"] == "unexpected_keyword_argument"
+                    else item
+                )
+                for item in cause.errors(include_input=False, include_url=False)
+            ]
             return _render_protocol_error(
-                validation_error_result(cause, root_model=root_model),
-                context.message.name,
+                validation_issues_result(
+                    entries,
+                    allowed_fields=allowed_fields,
+                    root_model=root_model,
+                ),
+                tool_name,
             )
 
 
-def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
+def _register_mcp_tools(server: FastMCP, exposed: "list[ToolSpec]") -> None:
     """Register MCP discovery and calculation tools for the exposed catalog."""
+    from fatebridge.application.batch import (
+        AnalysisContext,
+        BatchCall,
+        BatchRequest,
+        SubjectProfile,
+        execute_batch,
+    )
+    from fatebridge.application.discovery import DiscoveryDetail, discover_specs
+    from fatebridge.application.execution import (
+        run_guarded_operation,
+        run_tool,
+    )
+    from fatebridge.utils.errors import ParameterError, unknown_tool_error
+
     server.add_middleware(_ToolValidationFeedback())
     exposed_by_name = {spec.name: spec for spec in exposed}
     allowed_tools = set(exposed_by_name)
@@ -137,7 +157,7 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
     ) -> ToolResult:
         try:
             manifest = discover_specs(
-                CATALOG,
+                exposed,
                 family=family,
                 q=q,
                 tool=tool,
@@ -171,36 +191,19 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
     ) -> ToolResult:
         spec = exposed_by_name.get(tool)
         if spec is None:
-            return _unknown_tool_result(tool, "run_calculation", allowed_tools)
-        try:
-            validate_delivery_controls(include, fields)
-            options = ExecutionOptions.model_validate({"as_of": as_of})
-            request = spec.request_model.model_validate(arguments or {})
-            result = execute_with_receipt(
-                spec,
-                request,
-                options=options,
-            )
-            if result_is_error(result):
-                return _render_protocol_error(result, spec.operation_label_zh)
-            payload = deliver_response(
-                result,
-                spec=spec,
-                include=include,
-                fields=fields,
-            )
-            return protocol_result(payload, failed=False)
-        except Exception as exc:
-            # note (mcp): The shared error boundary logs unexpected failures without exposing request values.
-            return _render_protocol_error(
-                handle_calculation_error(
-                    exc,
-                    spec.operation_label_zh,
-                    allowed_fields=spec.request_model.model_fields.keys(),
-                    root_model=spec.request_model,
-                ),
-                spec.operation_label_zh,
-            )
+            err = unknown_tool_error(tool, allowed_tools).as_result()
+            err["error_code"] = "unknown_tool"
+            return _render_protocol_error(err, "run_calculation")
+        outcome = run_tool(
+            spec,
+            arguments,
+            include=include,
+            fields=fields,
+            as_of=as_of,
+        )
+        if outcome.failed:
+            return _render_protocol_error(outcome.payload, outcome.operation)
+        return protocol_result(outcome.payload, failed=False)
 
     @server.tool(
         name="run_batch",
@@ -235,29 +238,27 @@ def _register_mcp_tools(server: FastMCP, exposed: list[ToolSpec]) -> None:
         as_of: str | None = None,
         stop_on_error: bool = False,
     ) -> ToolResult:
-        try:
-            batch_request = BatchRequest.model_validate(
-                {
-                    "subjects": subjects or {},
-                    "context": context,
-                    "defaults": defaults or {},
-                    "calls": calls,
-                    "as_of": as_of,
-                    "stop_on_error": stop_on_error,
-                }
-            )
-            payload = execute_batch(exposed_by_name, batch_request)
-            return protocol_result(payload, failed=False)
-        except Exception as exc:
-            return _render_protocol_error(
-                handle_calculation_error(
-                    exc,
-                    "run_batch",
-                    allowed_fields=BatchRequest.model_fields.keys(),
-                    root_model=BatchRequest,
+        outcome = run_guarded_operation(
+            "run_batch",
+            lambda: execute_batch(
+                exposed_by_name,
+                BatchRequest.model_validate(
+                    {
+                        "subjects": {} if subjects is None else subjects,
+                        "context": context,
+                        "defaults": {} if defaults is None else defaults,
+                        "calls": calls,
+                        "as_of": as_of,
+                        "stop_on_error": stop_on_error,
+                    }
                 ),
-                "run_batch",
-            )
+            ),
+            allowed_fields=BatchRequest.model_fields.keys(),
+            root_model=BatchRequest,
+        )
+        if outcome.failed:
+            return _render_protocol_error(outcome.payload, outcome.operation)
+        return protocol_result(outcome.payload, failed=False)
 
 
 @cache
@@ -272,8 +273,11 @@ def _configure_runtime() -> None:
 
 def create_mcp_app(families: str | None = None) -> FastMCP:
     """Expose the three public meta tools for the selected calculation families."""
+    from fatebridge.application.discovery import select_mcp_specs
+    from fatebridge.services.tool_catalog import all_catalog
+
     _configure_runtime()
-    exposed = select_mcp_specs(CATALOG, family=families)
+    exposed = select_mcp_specs(all_catalog(), family=families)
     if not exposed:
         raise ValueError("未找到所选分类的公开工具")
     server = FastMCP(
@@ -289,7 +293,7 @@ def create_mcp_app(families: str | None = None) -> FastMCP:
 @cache
 def _default_mcp_app() -> FastMCP:
     _configure_runtime()
-    return create_mcp_app(os.getenv("FATEBRIDGE_MCP_FAMILIES") or None)
+    return create_mcp_app(get_mcp_families())
 
 
 def __getattr__(name: str) -> FastMCP:

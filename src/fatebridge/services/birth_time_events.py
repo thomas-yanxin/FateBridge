@@ -12,9 +12,8 @@ from fatebridge.core.almanac import (
     require_calculated_solar_term,
 )
 from fatebridge.core.bazi.calendar import BaZiCalendar
-from fatebridge.utils.civil_clock import utc_instant
+from fatebridge.utils.civil_clock import birth_civil_clock_cuts, utc_instant
 from fatebridge.utils.civil_time import CivilPointRecord, ZonedCalendar, utc_calendar
-from fatebridge.utils.clock_events import birth_civil_clock_cuts
 from fatebridge.utils.solar_time import NormalizedBirthTime, rebase_birth_clock
 from fatebridge.utils.timezones import parse_timezone_name
 

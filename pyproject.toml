@@ -136,9 +136,35 @@ module = [
     "fastmcp",
     "fastmcp.*",
     "lunardate",
-    "lunardate.*",
     "pytz",
     "swisseph",
     "yaml",
 ]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "fatebridge",
+    "fatebridge.api",
+    "fatebridge.cli",
+    "fatebridge.cli_arguments",
+    "fatebridge.cli_inputs",
+    "fatebridge.diagnostics",
+    "fatebridge.fetch_ephe",
+    "fatebridge.transports",
+    "fatebridge.transports.*",
+    "fatebridge.core.response_models",
+    "fatebridge.core.compressed_ephemeris",
+    "fatebridge.core.astro.ephemeris_integrity",
+    "fatebridge.services.tool_catalog",
+    "fatebridge.services.catalog",
+    "fatebridge.services.catalog.*",
+]
+disallow_any_explicit = true
+warn_unused_ignores = true
+strict_equality = true
+no_implicit_reexport = true
+
+[[tool.mypy.overrides]]
+module = ["fatebridge.transports.http_runtime"]
+no_implicit_reexport = false

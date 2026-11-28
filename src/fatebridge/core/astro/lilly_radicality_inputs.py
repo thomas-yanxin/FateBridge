@@ -7,10 +7,10 @@ from typing import Any
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.classical import _resolve_planetary_hour
+from fatebridge.core.astro.native_chart import NativeSubject
 from fatebridge.core.astro.physical_sources import assert_physical_configuration
 from fatebridge.core.astro.ut1_epoch import UT1Instant
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
-from fatebridge.core.predictive.native_chart import NativeSubject
 
 
 @runtime.preserve_ephemeris_path()

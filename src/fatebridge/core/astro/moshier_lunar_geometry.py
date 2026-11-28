@@ -16,7 +16,7 @@ from functools import lru_cache
 from importlib.resources import files
 from typing import TypedDict
 
-from fatebridge.core.astro import reference_frames
+from fatebridge.core.astro import cartesian, reference_frames
 
 METHOD_ID = "moshier_full_lunar_secular_argument_precision_v1"
 
@@ -123,12 +123,10 @@ def equatorial(epoch: float, reception: float) -> list[Decimal]:
         radius * math.sin(latitude),
     )
     epsilon = reference_frames.pair(reception, "pepol", "peper")[0][1]
-    to_equator = reference_frames.transpose(
-        reference_frames.ecliptic_rotation(epsilon)[0]
-    )
-    date_equator = reference_frames.mv(to_equator, ecliptic)
-    fixed = reference_frames.mv(
-        reference_frames.transpose(reference_frames.native_precession_frame(epoch)),
+    to_equator = cartesian.transpose(reference_frames.ecliptic_rotation(epsilon)[0])
+    date_equator = cartesian.mv(to_equator, ecliptic)
+    fixed = cartesian.mv(
+        cartesian.transpose(reference_frames.native_precession_frame(epoch)),
         date_equator,
     )
     return [Decimal.from_float(value) for value in fixed]

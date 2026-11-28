@@ -17,9 +17,11 @@ from fatebridge.core.astro.angle_definitions import geographic_pole_angle_defini
 from fatebridge.core.astro.chart import build_core_chart_payload
 from fatebridge.core.astro.earth_attitude import analytic_earth_attitude
 from fatebridge.core.astro.geometry import _angles, _sign_name
+from fatebridge.core.astro.local_chart import (
+    build_local_astro_birth_info as _build_birth_info,
+)
+from fatebridge.core.astro.otherbu import build_otherbu_result
 from fatebridge.core.astro.time_scales import fallback_julian_day_tt, utc_clock
-from fatebridge.core.local_techniques.chart import _build_birth_info
-from fatebridge.core.local_techniques.otherbu import build_otherbu_result
 
 JD = 2460483.0
 TT = fallback_julian_day_tt(JD, None)
@@ -161,3 +163,41 @@ def test_pole_definition_cannot_be_mutated_for_later_calls() -> None:
     first = geographic_pole_angle_definition(90)
     first["dependent_quantities"].clear()
     assert len(geographic_pole_angle_definition(90)["dependent_quantities"]) == 5
+
+
+def test_astrology_dice_with_sky_omits_chart_under_10kb_and_restores_on_include() -> (
+    None
+):
+    import json
+
+    from fatebridge.application.examples import example_input
+    from fatebridge.application.execution import execute_with_receipt
+    from fatebridge.application.response_delivery import deliver_response
+    from fatebridge.core.execution_context import ExecutionOptions
+    from fatebridge.core.response_models import output_model_for
+    from fatebridge.services.tool_catalog import CATALOG
+
+    spec = next(entry for entry in CATALOG if entry.name == "interpret_astrology_dice")
+    req = spec.request_model.model_validate(
+        {
+            **dict(example_input(spec) or {}),
+            "date": "2024-05-20",
+            "time": "14:30",
+            "timezone": "Asia/Shanghai",
+            "latitude": 31.23,
+            "longitude": 121.47,
+        }
+    )
+    raw = execute_with_receipt(
+        spec, req, options=ExecutionOptions(as_of="2026-10-22T12:00:00+08:00")
+    )
+    default_out = deliver_response(raw, spec=spec)
+    assert len(json.dumps(default_out, ensure_ascii=False).encode("utf-8")) <= 10240
+    assert "chart" not in default_out
+    assert "chart" in default_out["run_metadata"]["omitted_fields"]
+
+    sky_out = deliver_response(raw, spec=spec, include=["astronomical_context"])
+    assert "chart" in sky_out
+    model = output_model_for("interpret_astrology_dice")
+    model.model_validate(default_out)
+    model.model_validate(sky_out)

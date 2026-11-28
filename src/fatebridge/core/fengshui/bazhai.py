@@ -373,9 +373,9 @@ def bazhai(req: BazhaiRequest) -> dict[str, Any]:
                 sitting = bearing["trigram"]
                 data["sitting_bearing"] = bearing
         elif data.get("facing_mountain") is not None:
-            bearing = sitting_from_mountain(data["facing_mountain"])
-            sitting = bearing["trigram"]
-            data["sitting_bearing"] = bearing
+            mountain_bearing = sitting_from_mountain(data["facing_mountain"])
+            sitting = mountain_bearing["trigram"]
+            data["sitting_bearing"] = mountain_bearing
         if sitting is not None and not house_candidates:
             house = {
                 **data,

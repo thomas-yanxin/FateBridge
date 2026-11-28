@@ -2,7 +2,7 @@
 
 from pydantic import Field, JsonValue
 
-from fatebridge.core.contracts.output_base import PartialOutput
+from fatebridge.core.contracts.base import PartialOutput
 
 Object = dict[str, JsonValue]
 

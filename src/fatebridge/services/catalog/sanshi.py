@@ -2,16 +2,42 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from fatebridge.application.bindings import (
     bind_kwargs,
     bind_person,
     request_model_ref,
     service_ref,
 )
-from fatebridge.application.domain_validators import validate_ren_output
-from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.application.tool_spec import (
+    BatchInputPolicy,
+    OutputContractError,
+    ServiceResult,
+    ToolSpec,
+)
+
+if TYPE_CHECKING:
+    from pydantic import BaseModel
 
 _SANSHI_REQ = "fatebridge.core.requests.sanshi"
+
+
+def validate_ren_anchors(
+    spec: ToolSpec,
+    result: ServiceResult,
+    _request: BaseModel | None,
+    _validated: BaseModel | None,
+) -> None:
+    from fatebridge.core.contracts.sanshi import (
+        require_complete_ren_anchors,
+    )
+
+    try:
+        require_complete_ren_anchors(spec.name, result)
+    except ValueError as exc:
+        raise OutputContractError("完整六壬金口诀输出缺少计算依据") from exc
+
 
 calculate_jinkou_analysis = service_ref(
     "fatebridge.services.sanshi", "calculate_jinkou_analysis"
@@ -53,13 +79,14 @@ SPECS: list[ToolSpec] = [
         name="liuren_chart",
         bind=bind_kwargs(calculate_liureng_gods),
         request_model_loader=request_model_ref(_SANSHI_REQ, "LiuRengGodsRequest"),
+        required_output_fields=("liuren",),
         summary="六壬起课：输出四课、九宗门三传、天将、旬遁与细课名；金口诀用 jinkou。",
         operation_label_zh="六壬课",
         family="metaphysics",
         cpu_bound=True,
         rest_path="/api/liuren/chart",
         default_omit=_LIUREN_DEFAULT_OMIT,
-        output_validators=(validate_ren_output,),
+        output_validators=(validate_ren_anchors,),
     ),
     ToolSpec(
         name="liuren_yearly_timing",
@@ -68,18 +95,21 @@ SPECS: list[ToolSpec] = [
             also_pass=("use_true_solar_time", "birth_utc_offset"),
         ),
         request_model_loader=request_model_ref(_SANSHI_REQ, "LiuRengRunyearRequest"),
+        required_output_fields=("liuren", "runyear"),
         summary="六壬行年：按农历虚岁推男女行年并起课；问具体单事用 liuren_chart。",
         operation_label_zh="六壬流年",
         family="metaphysics",
         cpu_bound=True,
         rest_path="/api/liuren/timing/yearly",
         default_omit=_LIUREN_DEFAULT_OMIT,
-        output_validators=(validate_ren_output,),
+        output_validators=(validate_ren_anchors,),
+        batch_policy=BatchInputPolicy(subject_mode="birth_fields"),
     ),
     ToolSpec(
         name="qimen",
         bind=bind_kwargs(calculate_qimen_analysis),
         request_model_loader=request_model_ref(_SANSHI_REQ, "QimenAnalysisRequest"),
+        required_output_fields=("qimen",),
         summary="奇门遁甲：方位选择、行动时机与谋略布局；单事成败用 liuyao，大势用 taiyi。",
         operation_label_zh="奇门遁甲",
         family="metaphysics",
@@ -103,6 +133,7 @@ SPECS: list[ToolSpec] = [
         name="taiyi",
         bind=bind_kwargs(calculate_taiyi_analysis),
         request_model_loader=request_model_ref(_SANSHI_REQ, "TaiyiAnalysisRequest"),
+        required_output_fields=("taiyi",),
         summary="太乙神数：年/月/日/时四计，返回二目、主客算、四将与规则路径；日计用金钥匙积日。",
         operation_label_zh="太乙",
         family="metaphysics",
@@ -127,6 +158,7 @@ SPECS: list[ToolSpec] = [
         name="jinkou",
         bind=bind_kwargs(calculate_jinkou_analysis),
         request_model_loader=request_model_ref(_SANSHI_REQ, "JinkouAnalysisRequest"),
+        required_output_fields=("jinkou",),
         summary="金口诀：按日干、月将、占时与地分起四位，含五动三动、六十四课钤及本命另课。",
         operation_label_zh="金口诀",
         family="metaphysics",
@@ -148,6 +180,6 @@ SPECS: list[ToolSpec] = [
             "jinkou.natal_course.course",
             "jinkou.year_fate.course",
         ),
-        output_validators=(validate_ren_output,),
+        output_validators=(validate_ren_anchors,),
     ),
 ]

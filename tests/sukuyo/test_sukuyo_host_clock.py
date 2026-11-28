@@ -263,7 +263,7 @@ def test_dst_invalid_clock_fails_on_all_public_surfaces(
 
 
 def test_known_clock_without_coordinates_stays_calendar_only() -> None:
-    from fatebridge.core.local_techniques.suzhan import build_suzhan_result
+    from fatebridge.core.sukuyo.suzhan import build_suzhan_result
     from fatebridge.core.sukuyo.suzhan_clock_input import require_clock_input_binding
 
     result = build_suzhan_result(date="2025-01-28", time="16:00:00", timezone="UTC")

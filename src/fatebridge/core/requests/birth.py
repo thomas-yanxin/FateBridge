@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import MAXYEAR, MINYEAR
-from typing import Annotated, Literal
+from typing import Annotated
 
 from pydantic import BaseModel, Field, model_validator
 from pydantic_core import PydanticCustomError

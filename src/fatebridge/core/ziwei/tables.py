@@ -152,15 +152,38 @@ ZIWEI_STAR_BRIGHTNESS: dict[str, list[str | None]] = {
 }
 
 
+_ZIWEI_SCHOOLS: tuple[ZiweiSchool, ...] = (
+    "default",
+    "zhongzhou",
+    "quanshu",
+    "feixing",
+)
+_ZIWEI_ASTRO_TYPES: tuple[ZiweiAstroType, ...] = ("heaven", "earth", "human")
+_ZIWEI_SIHUA_SOURCES: tuple[ZiweiSihuaSource, ...] = (
+    "rule_profile",
+    "iztro_2_5_8",
+    "quanshu_v2",
+    "naj_ming_v1",
+    "feixing_liang",
+    "qintian",
+)
+_ZIWEI_DAY_DIVIDES: tuple[ZiweiDayDivide, ...] = ("current", "forward")
+_ZIWEI_YEAR_DIVIDES: tuple[ZiweiYearDivide, ...] = ("normal", "exact")
+_ZIWEI_HOROSCOPE_DIVIDES: tuple[ZiweiHoroscopeDivide, ...] = ("normal", "exact")
+_ZIWEI_AGE_DIVIDES: tuple[ZiweiAgeDivide, ...] = ("normal", "birthday")
+
+
 def validate_school(school: str) -> ZiweiSchool:
-    if school in ("default", "zhongzhou", "quanshu", "feixing"):
-        return school  # type: ignore[return-value]
+    for valid in _ZIWEI_SCHOOLS:
+        if school == valid:
+            return valid
     raise ValueError(f"不支持的紫微流派：{school!r}")
 
 
 def validate_astro_type(astro_type: str) -> ZiweiAstroType:
-    if astro_type in ("heaven", "earth", "human"):
-        return astro_type  # type: ignore[return-value]
+    for valid in _ZIWEI_ASTRO_TYPES:
+        if astro_type == valid:
+            return valid
     raise ValueError(f"不支持的紫微盘式（天地人三盘）：{astro_type!r}")
 
 
@@ -173,32 +196,37 @@ def validate_rule_profile(profile: str) -> ZiweiRuleProfile:
 
 
 def validate_sihua_source(source: str) -> ZiweiSihuaSource:
-    if source in SIHUA_VARIANTS or source == "rule_profile":
-        return source  # type: ignore[return-value]
+    for valid in _ZIWEI_SIHUA_SOURCES:
+        if source == valid:
+            return valid
     raise ValueError(f"不支持的紫微四化来源：{source!r}")
 
 
 def validate_day_divide(day_divide: str) -> ZiweiDayDivide:
-    if day_divide in ("current", "forward"):
-        return day_divide  # type: ignore[return-value]
+    for valid in _ZIWEI_DAY_DIVIDES:
+        if day_divide == valid:
+            return valid
     raise ValueError(f"不支持的紫微晚子分日口径：{day_divide!r}")
 
 
 def validate_year_divide(year_divide: str) -> ZiweiYearDivide:
-    if year_divide in ("normal", "exact"):
-        return year_divide  # type: ignore[return-value]
+    for valid in _ZIWEI_YEAR_DIVIDES:
+        if year_divide == valid:
+            return valid
     raise ValueError(f"不支持的紫微年界口径：{year_divide!r}")
 
 
 def validate_horoscope_divide(horoscope_divide: str) -> ZiweiHoroscopeDivide:
-    if horoscope_divide in ("normal", "exact"):
-        return horoscope_divide  # type: ignore[return-value]
+    for valid in _ZIWEI_HOROSCOPE_DIVIDES:
+        if horoscope_divide == valid:
+            return valid
     raise ValueError(f"不支持的紫微流月分界口径：{horoscope_divide!r}")
 
 
 def validate_age_divide(age_divide: str) -> ZiweiAgeDivide:
-    if age_divide in ("normal", "birthday"):
-        return age_divide  # type: ignore[return-value]
+    for valid in _ZIWEI_AGE_DIVIDES:
+        if age_divide == valid:
+            return valid
     raise ValueError(f"不支持的紫微虚岁分界口径：{age_divide!r}")
 
 

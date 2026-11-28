@@ -76,18 +76,23 @@ def _precision_geometry(
     a = math.cos(phi) * math.cos(theta)
     if min(gap, 180 - gap) > 1.0 and abs(a) > SELECTOR_WORK_GATE:
         return None
+    attitude_errors: tuple[type[BaseException], ...] = (
+        *runtime.native_ephemeris_errors(),
+        ValueError,
+        TypeError,
+        ArithmeticError,
+    )
     try:
         attitude = earth_attitude(
             runtime.swe, julian_day_ut1, julian_day_tt=julian_day_tt
         )
         auxiliary_tt = attitude.equator.jd_tt
         eps = attitude.reduction.house_obliquity
-    except Exception as error:
-        if (
-            isinstance(error, EphemerisSourceError)
-            and error.reason != "earth_attitude_model_unavailable"
-        ):
+    except EphemerisSourceError as error:
+        if error.reason != "earth_attitude_model_unavailable":
             raise
+        raise EphemerisSourceError("horizon_direction_model_unavailable") from error
+    except attitude_errors as error:
         raise EphemerisSourceError("horizon_direction_model_unavailable") from error
     phi, theta, e = map(math.radians, (latitude, common[2], eps))
     a = math.cos(phi) * math.cos(theta)
@@ -107,7 +112,7 @@ def _precision_geometry(
         return None
     try:
         model = horizon_geometry(latitude, float(common[2]), eps)
-    except Exception as error:
+    except (ValueError, ArithmeticError) as error:
         raise EphemerisSourceError("horizon_direction_precision_unavailable") from error
     return model, {
         "method_id": METHOD_ID,

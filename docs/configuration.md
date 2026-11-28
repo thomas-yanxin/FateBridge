@@ -27,7 +27,7 @@ cp -n .env.example .env
 
 | 变量 | 默认值 | 用途 |
 | --- | --- | --- |
-| `FATEBRIDGE_MCP_FAMILIES` | 空 | 逗号分隔的 MCP 公开 `family` 列表；为空时公开全量 90 项能力，分类名无效会阻止启动；不影响 REST 与 CLI |
+| `FATEBRIDGE_MCP_FAMILIES` | 空 | 逗号分隔的 MCP 公开 `family` 列表；为空时公开全量 91 项能力，分类名无效会阻止启动；不影响 REST 与 CLI |
 
 ### 星历与太阳交节模型
 

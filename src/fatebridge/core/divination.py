@@ -20,10 +20,10 @@ from fatebridge.core.hexagram_relations import (
 from fatebridge.core.meihua.relations import meihua_traditional_readings
 from fatebridge.core.meihua.texts import render_yaoci_text
 from fatebridge.core.meihua.topics import (
+    ALL_TOPICS,
     build_topic_interpretation,
     build_weather_interpretation,
 )
-from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
 from fatebridge.core.zhouyi import _corpus, classical_hexagram
 from fatebridge.utils.data import EARTHLY_BRANCHES
 
@@ -340,19 +340,17 @@ def build_meihua_interpretation(
     interpretation_topic: str = "general",
     weather_context: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    options = MeihuaInterpretationOptions.model_validate(
-        {
-            "interpretation_topic": interpretation_topic,
-            "weather_context": weather_context,
-        }
-    )
-    if options.interpretation_topic == "weather":
+    if interpretation_topic not in ("general", "weather", *ALL_TOPICS):
+        raise ValueError(f"不支持的梅花占断主题：{interpretation_topic}")
+    if weather_context is not None and interpretation_topic != "weather":
+        raise ValueError("weather_context须与interpretation_topic=weather一起提供")
+    if interpretation_topic == "weather":
         interpretation = build_weather_interpretation(meihua, weather_context)
         interpretation["topic_reading"] = None
         interpretation["classical_text_reference"] = None
         return interpretation
-    if options.interpretation_topic != "general":
-        return build_topic_interpretation(meihua, options.interpretation_topic)
+    if interpretation_topic != "general":
+        return build_topic_interpretation(meihua, interpretation_topic)
     base = meihua["base_hexagram"]
     changed = meihua["changed_hexagram"]
     moving_line = meihua["seed"]["moving_line"]

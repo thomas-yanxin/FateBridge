@@ -19,7 +19,7 @@ from fatebridge.services.astrology import (
 )
 from fatebridge.services.guolao import calculate_guolao_chart
 from fatebridge.services.jyotish import calculate_vedic_chart
-from fatebridge.utils.places import KNOWN_BIRTH_PLACE_ENTRIES
+from fatebridge.utils.place_catalog import KNOWN_BIRTH_PLACE_ENTRIES
 from tests.fixtures.surface_payloads import astro_payload
 
 
@@ -1017,3 +1017,43 @@ def test_relative_chart_computes_only_selected_single_chart(
         assert result["chart"] == {}
     else:
         assert result["chart"]["planets"]
+
+
+def test_balance_excludes_lunar_nodes() -> None:
+    from fatebridge.core.astro.parts import _balance
+
+    planets = [
+        {"id": "Sun", "element": "Fire", "modality": "Mutable"},
+        {"id": "Moon", "element": "Air", "modality": "Mutable"},
+        {"id": "North Node", "element": "Water", "modality": "Cardinal"},
+        {"id": "South Node", "element": "Earth", "modality": "Fixed"},
+    ]
+    assert _balance(planets, "element") == {"Fire": 1, "Air": 1}
+    assert _balance(planets, "modality") == {"Mutable": 2}
+
+
+@pytest.mark.parametrize(
+    "degree, expected",
+    [
+        (0, ("conjunction", "合相")),
+        (60, ("sextile", "六合")),
+        (90, ("square", "刑")),
+        (120, ("trine", "拱")),
+        (180, ("opposition", "冲")),
+    ],
+)
+def test_known_aspect_degrees_map_to_their_meta(degree: int, expected) -> None:
+    from fatebridge.core.predictive.primary_directions import (
+        primary_direction_aspect_meta,
+    )
+
+    assert primary_direction_aspect_meta(degree) == expected
+
+
+def test_unknown_aspect_degree_falls_back_to_generic_label() -> None:
+    from fatebridge.core.predictive.primary_directions import (
+        primary_direction_aspect_meta,
+    )
+
+    assert primary_direction_aspect_meta(45) == ("45deg", "45°")
+    assert primary_direction_aspect_meta(150) == ("150deg", "150°")

@@ -489,3 +489,29 @@ def test_extra_forbidden_suggestions_and_projection_suggestions_across_transport
     proj_issue = proj_err.value.issues[0]
     assert proj_issue["code"] == "unknown_projection_path"
     assert proj_issue["constraints"]["suggestions"] == ["day_master"]
+
+
+def test_request_service_drift_is_not_silently_ignored() -> None:
+    from pydantic import BaseModel
+
+    from fatebridge.application.bindings import bind_kwargs
+    from fatebridge.application.execution import invoke_validated_service
+    from fatebridge.application.tool_spec import ToolSpec
+
+    class Request(BaseModel):
+        value: int
+        new_option: bool = True
+
+    def service(value: int) -> dict[str, int]:
+        return {"value": value}
+
+    spec = ToolSpec(
+        name="t",
+        bind=bind_kwargs(service),
+        request_model=Request,
+        summary="",
+        operation_label_zh="测试",
+        family="",
+    )
+    with pytest.raises(TypeError, match="new_option"):
+        invoke_validated_service(spec, Request(value=1))

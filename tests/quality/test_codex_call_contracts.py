@@ -10,7 +10,6 @@ from jsonschema import ValidationError, validate
 from fatebridge.application.examples import example_input, suggested_fields
 from fatebridge.services.tool_catalog import CATALOG
 from scripts import build_codex_call_contracts as builder
-from tests.fixtures.mcp_receipt import verified_inline_business
 from tests.support.transports import cached_mcp_app, call_calculation
 
 
@@ -240,7 +239,8 @@ async def test_fengshui_first_views_deliver_core_layers_without_audit_bloat() ->
                 },
             )
             assert not result.is_error
-            payload = await verified_inline_business(client, result.structured_content)
+            payload = result.structured_content
+            assert payload is not None and "result_delivery" not in payload
             assert payload["status"] in {"complete", "partial"}
             assert payload["coverage"]
             for forbidden in ("rulesets", "rule_trace", "source_catalog"):

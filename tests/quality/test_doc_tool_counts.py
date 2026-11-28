@@ -111,13 +111,39 @@ for _path in (
         ]
     )
 
-CHECKS.append(
-    (
-        "docs/algorithm-coverage.md",
-        "docs/algorithm-coverage.md REST 数",
-        r"REST\s*(?:公开|暴露)\s*\*{0,2}(\d+)\s*个工具",
-        LIVE_REST,
-    )
+CHECKS.extend(
+    [
+        (
+            "docs/algorithm-coverage.md",
+            "docs/algorithm-coverage.md REST 数",
+            r"REST\s*(?:公开|暴露)\s*\*{0,2}(\d+)\s*个工具",
+            LIVE_REST,
+        ),
+        (
+            "docs/README.md",
+            "docs/README.md REST 路由数",
+            r"(\d+)\s*个\s*REST\s*路由",
+            LIVE_REST,
+        ),
+        (
+            "docs/README.md",
+            "docs/README.md family 数",
+            r"(\d+)\s*个\s*family\s*/\s*\d+\s*项计算能力清单",
+            LIVE_FAMILIES,
+        ),
+        (
+            "docs/README.md",
+            "docs/README.md 能力清单数",
+            r"\d+\s*个\s*family\s*/\s*(\d+)\s*项计算能力清单",
+            LIVE_CATALOG,
+        ),
+        (
+            "docs/configuration.md",
+            "docs/configuration.md 全量能力数",
+            r"全量\s*(\d+)\s*项能力",
+            LIVE_CATALOG,
+        ),
+    ]
 )
 
 
@@ -215,3 +241,46 @@ def test_api_md_documents_every_live_rest_route() -> None:
         "docs/api-reference.md 漏列以下真实 REST 路由，请补到对应 §4 端点表：\n  "
         + "\n  ".join(missing)
     )
+
+
+def test_maintained_docs_reflect_three_mcp_tools_and_cli_dotenv() -> None:
+    """Ensure docs/README.md, configuration, getting-started, troubleshooting & CHANGELOG stay in sync."""
+    readme_text = (REPO_ROOT / "docs/README.md").read_text(encoding="utf-8")
+    assert "MCP 三工具面" in readme_text
+    for name in ("discover_tools", "run_calculation", "run_batch"):
+        assert name in readme_text, f"docs/README.md missing {name}"
+
+    config_text = (REPO_ROOT / "docs/configuration.md").read_text(encoding="utf-8")
+    assert "REST、MCP 与 CLI 启动时会读取源码仓库根目录的 `.env`" in config_text
+
+    getting_started = (REPO_ROOT / "docs/getting-started.md").read_text(
+        encoding="utf-8"
+    )
+    assert "CLI 不自动读取 .env" not in getting_started
+
+    troubleshooting = (REPO_ROOT / "docs/troubleshooting.md").read_text(
+        encoding="utf-8"
+    )
+    assert "CLI 未读取 .env" not in troubleshooting
+    for name in ("discover_tools", "run_calculation", "run_batch"):
+        assert name in troubleshooting, f"docs/troubleshooting.md missing {name}"
+
+    for rel in (
+        "README.md",
+        "README.en.md",
+        "CHANGELOG.md",
+        "docs/README.md",
+        "docs/architecture.md",
+        "docs/configuration.md",
+        "docs/troubleshooting.md",
+        "docs/getting-started.md",
+        "docs/agent-guide.md",
+        "docs/api-reference.md",
+        "docs/algorithm-coverage.md",
+        "docs/development-guide.md",
+    ):
+        text = (REPO_ROOT / rel).read_text(encoding="utf-8")
+        for stale in ("两工具", "两个入口", "detail=compact", "detail=audit"):
+            assert stale not in text, f"{rel} still contains stale term {stale!r}"
+        stale_90 = re.findall(r"\b90\s*(?:个|项)", text)
+        assert not stale_90, f"{rel} still contains stale 90 count: {stale_90}"

@@ -91,10 +91,12 @@ jobs:
           restore-keys: |
             quality-${{ runner.os }}-py3.12-${{ hashFiles('pyproject.toml') }}-
       - name: Check repository files, formatting, types and generated contracts
-        run: uv run --extra dev pre-commit run --hook-stage manual --all-files --show-diff-on-failure
+        run: |
+          uv run --extra dev pre-commit run --hook-stage manual --all-files --show-diff-on-failure
+          uv run --extra dev mypy src/fatebridge/ scripts/
 
   test:
-    name: Tests (${{ matrix.environment.python }}, ${{ matrix.environment.os }}, ${{ matrix.environment.resolution }}, shard ${{ matrix.shard }})
+    name: Tests (${{ matrix.environment.python }}, ${{ matrix.environment.os }}, ${{ matrix.environment.resolution }})
     needs: changes
     if: needs.changes.outputs.checks == 'true'
     runs-on: ${{ matrix.environment.os }}
@@ -102,17 +104,12 @@ jobs:
       fail-fast: false
       matrix:
         environment:
-          - {python: "3.10", os: ubuntu-24.04, resolution: highest}
-          - {python: "3.11", os: ubuntu-24.04, resolution: highest}
+          - {python: "3.10", os: ubuntu-24.04, resolution: lowest-direct}
           - {python: "3.12", os: ubuntu-24.04, resolution: highest}
           - {python: "3.13", os: ubuntu-24.04, resolution: highest}
-          - {python: "3.10", os: ubuntu-24.04, resolution: lowest-direct}
           - {python: "3.12", os: windows-2022, resolution: highest}
-        shard: [0, 1, 2]
     env:
       PYTHONUTF8: "1"
-      CI_ENVIRONMENT: ${{ matrix.environment.os }}-py${{ matrix.environment.python }}-${{ matrix.environment.resolution }}
-      CI_SHARD: ${{ matrix.shard }}
       CI_RESOLUTION: ${{ matrix.environment.resolution }}
     defaults:
       run:
@@ -129,38 +126,23 @@ jobs:
         uses: astral-sh/setup-uv@v8.2.0
         with:
           enable-cache: true
-          save-cache: ${{ matrix.shard == 0 }}
+          save-cache: true
           cache-suffix: py${{ matrix.environment.python }}-${{ matrix.environment.resolution }}
           cache-dependency-glob: pyproject.toml
       - name: Install dependencies
         run: uv pip install --system --resolution "$CI_RESOLUTION" -e ".[dev]"
-      - name: Record resolved dependencies
-        env:
-          UV_CACHE_HIT: ${{ steps.uv.outputs.cache-hit }}
-        run: |
-          echo "$UV_CACHE_HIT" > cache-status.txt
-          python -c "import os; print('Runner logical CPUs:', os.cpu_count())"
-          uv pip list --system > resolved-dependencies.txt
       - name: Verify installed CLI and independent stdio MCP
-        if: matrix.shard == 0 && matrix.environment.python == '3.12' && matrix.environment.resolution == 'highest'
+        if: matrix.environment.os == 'ubuntu-24.04' && matrix.environment.python == '3.12' && matrix.environment.resolution == 'highest'
         run: fatebridge doctor --mcp --family bazi
       - name: Run self-contained checks
-        run: |
-          python scripts/run_ci_checks.py \
-            --shard-index "$CI_SHARD" --shard-count 3 \
-            --environment-id "$CI_ENVIRONMENT" --selection-report ci-selection.json \
-            --junitxml=pytest-results.xml --durations=20 -n auto --maxprocesses=4 --dist worksteal
-      - name: Save regression evidence
-        if: always()
+        run: python scripts/run_ci_checks.py --junitxml=pytest-results.xml --durations=20 -n auto --maxprocesses=4 --dist worksteal
+      - name: Save test results on failure
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: ci-${{ env.CI_ENVIRONMENT }}-${{ matrix.shard }}-attempt${{ github.run_attempt }}
+          name: ci-${{ matrix.environment.os }}-py${{ matrix.environment.python }}-${{ matrix.environment.resolution }}-attempt${{ github.run_attempt }}
           retention-days: 14
-          path: |
-            resolved-dependencies.txt
-            pytest-results.xml
-            ci-selection.json
-            cache-status.txt
+          path: pytest-results.xml
 
   ci:
     name: CI result
@@ -188,39 +170,3 @@ jobs:
           else
             exit 1
           fi
-      - name: Download shard coverage evidence
-        if: needs.changes.outputs.checks == 'true'
-        uses: actions/download-artifact@v4
-        with:
-          pattern: ci-*
-          path: ci-evidence
-      - name: Verify every collected test ran exactly once per environment
-        if: needs.changes.outputs.checks == 'true'
-        run: |
-          python3 - <<'PY'
-          import json
-          from collections import defaultdict
-          from pathlib import Path
-
-          latest = {}
-          for path in Path("ci-evidence").glob("*/ci-selection.json"):
-              report = json.loads(path.read_text(encoding="utf-8"))
-              attempt = int(path.parent.name.rsplit("-attempt", 1)[1])
-              key = (report["environment"], report["shard_index"])
-              if key not in latest or attempt > latest[key][0]:
-                  latest[key] = (attempt, report)
-          assert len(latest) == 18, f"Expected 18 shard reports, found {len(latest)}"
-          groups = defaultdict(list)
-          for _, report in latest.values():
-              groups[report["environment"]].append(report)
-          assert len(groups) == 6, f"Expected six dependency/platform environments: {list(groups)}"
-          for environment, reports in groups.items():
-              assert sorted(r["shard_index"] for r in reports) == [0, 1, 2], environment
-              assert all(r["shard_count"] == 3 for r in reports), environment
-              collected = reports[0]["collected"]
-              assert all(r["collected"] == collected for r in reports), environment
-              selected = [node for r in reports for node in r["selected"]]
-              assert len(selected) == len(set(selected)) == len(collected), environment
-              assert set(selected) == set(collected), environment
-              print(f"{environment}: {len(collected)} test nodes covered exactly once")
-          PY

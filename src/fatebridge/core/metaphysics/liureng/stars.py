@@ -5,19 +5,22 @@ from __future__ import annotations
 from typing import Any
 
 from fatebridge.core.metaphysics.common import (
-    ELEMENT_CONTROLS,
-    ELEMENT_GENERATES,
     GUI_REN_SEQUENCE,
-    SEXAGENARY_INDEX,
-    branch_element_text,
-    kongwang_for_ganzhi,
     liuqin_against_day,
-    stem_element_text,
-    xun_head_for_ganzhi,
 )
 from fatebridge.core.metaphysics.ren_calendar import xun_dun_stems
 from fatebridge.core.metaphysics.ren_gods import GuirenProfile, noble_start
-from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
+from fatebridge.utils.data import (
+    EARTHLY_BRANCHES,
+    ELEMENT_CONTROLS,
+    ELEMENT_GENERATES,
+    HEAVENLY_STEMS,
+    SEXAGENARY_INDEX,
+    branch_element_text,
+    kongwang_for_ganzhi,
+    stem_element_text,
+    xun_head_for_ganzhi,
+)
 
 STEM_HOUSES = dict(zip(HEAVENLY_STEMS, "寅辰巳未巳未申戌亥丑"))
 

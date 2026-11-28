@@ -20,8 +20,6 @@ from fatebridge.core.astro import time_scales, utc_policy
 from fatebridge.core.bazi.calendar import BaZiCalendar, get_bazi_year
 from fatebridge.core.ephemeris_runtime import ephemeris_call
 from fatebridge.core.metaphysics.common import (
-    SEXAGENARY_CYCLE,
-    SEXAGENARY_INDEX,
     YUE_JIANG_NAMES,
     MetaphysicsSeed,
 )
@@ -29,6 +27,7 @@ from fatebridge.core.metaphysics.hko_term_dates import published_date_reference
 from fatebridge.core.solar_term_runtime import loaded_clock_profile_key
 from fatebridge.utils.civil_clock import format_utc_offset, resolve_civil_clock
 from fatebridge.utils.civil_time import NominalClockLabel, UTCCalendar, utc_calendar
+from fatebridge.utils.data import SEXAGENARY_CYCLE, SEXAGENARY_INDEX
 from fatebridge.utils.errors import EphemerisSourceError, ParameterError
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE, resolve_birth_place_context
 from fatebridge.utils.timezones import timezone_rules_metadata

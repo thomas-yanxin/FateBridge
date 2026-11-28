@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 import pytest
 from dateutil.relativedelta import relativedelta
 
-from fatebridge.services.dayun_boundary_clock_events import (
+from fatebridge.services.dayun_birth_events import (
     forward_gaps_for_wall_image,
     projected_wall_image,
 )

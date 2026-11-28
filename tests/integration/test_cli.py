@@ -164,9 +164,9 @@ def test_discover_multi_tool_brief_mode_and_lazy_catalog_parity(
     import subprocess
     import sys
 
-    from fatebridge.services.tool_catalog import _TOOL_MODULE_BY_NAME
+    from fatebridge.services.tool_catalog import known_tool_names
 
-    assert set(_TOOL_MODULE_BY_NAME) == {spec.name for spec in CATALOG}
+    assert set(known_tool_names()) == {spec.name for spec in CATALOG}
 
     assert (
         run(["discover", "qimen", "liuren_chart", "jinkou", "--detail", "brief"]) == 0
@@ -809,3 +809,15 @@ def test_discover_bazi_timing_examples_include_analysis_date_fields(
     assert run(["discover", "bazi_monthly_timing"]) == 0
     monthly_info = json.loads(capsys.readouterr().out)
     assert "analysis_month" in monthly_info["example_input"]
+
+
+@pytest.mark.parametrize("bad_flag", ["--includ", "--fiel", "--as-o"])
+def test_cli_rejects_abbreviated_misspelled_flags(
+    capsys: pytest.CaptureFixture[str],
+    bad_flag: str,
+) -> None:
+    code = run(["gua_lookup", "--queries", "乾", bad_flag, "*"])
+    payload = json.loads(capsys.readouterr().out)
+    assert code == 2
+    assert payload["error_code"] == "usage_error"
+    assert bad_flag in payload["error"]

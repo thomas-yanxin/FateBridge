@@ -1,7 +1,9 @@
 """Check relationship focus aliases and their selected directional facts."""
 
 import asyncio
+import json
 from pathlib import Path
+from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
@@ -164,3 +166,109 @@ def test_valid_focus_aliases_reach_all_public_transports(
     outputs = [response.json(), cli, mcp.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
     assert outputs[0]["relationship_profile"]["focus"]["focus"] == expected
+
+
+def _assert_compat_subset(subset: Any, superset: Any, path: str = "$") -> None:
+    if isinstance(subset, dict):
+        assert isinstance(superset, dict), f"{path}: expected dict"
+        for key, value in subset.items():
+            assert key in superset, f"{path}.{key}: missing from full canonical payload"
+            _assert_compat_subset(value, superset[key], f"{path}.{key}")
+    elif isinstance(subset, list):
+        assert isinstance(superset, list) and len(subset) == len(superset)
+        for index, (sub_item, super_item) in enumerate(zip(subset, superset)):
+            _assert_compat_subset(sub_item, super_item, f"{path}[{index}]")
+    else:
+        assert subset == superset, f"{path}: {subset!r} != {superset!r}"
+
+
+def test_bazi_compatibility_include_dotted_paths_and_wildcard_specialization() -> None:
+    from fatebridge.application.examples import example_input
+    from fatebridge.application.execution import execute_with_receipt
+    from fatebridge.application.response_delivery import deliver_response
+    from fatebridge.services.tool_catalog import CATALOG
+
+    spec = next(item for item in CATALOG if item.name == "bazi_compatibility")
+    req = spec.request_model(**(example_input(spec) or {}))
+    canonical = execute_with_receipt(spec, req)
+
+    with_p1_cal = deliver_response(
+        canonical, spec=spec, include=["natal_contexts.person1.calendar_context"]
+    )
+    assert "calendar_context" in with_p1_cal["natal_contexts"]["person1"]
+    assert "calendar_context" not in with_p1_cal["natal_contexts"]["person2"]
+    assert (
+        "natal_contexts.*.calendar_context"
+        in with_p1_cal["run_metadata"]["omitted_fields"]
+    )
+
+    with_p1_dm = deliver_response(
+        canonical, spec=spec, include=["natal_contexts.person1.day_master"]
+    )
+    assert "day_master" in with_p1_dm["natal_contexts"]["person1"]
+    assert "day_master" not in with_p1_dm["natal_contexts"]["person2"]
+    assert "natal_contexts.*.day_master" in with_p1_dm["run_metadata"]["omitted_fields"]
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {
+            "person1_name": "张三",
+            "person2_name": "李四",
+        },
+        {
+            "person1_name": "测试甲方超长姓名",
+            "person1_birth_second": 15,
+            "person2_name": "测试乙方超长姓名",
+            "person2_birth_second": 45,
+        },
+    ],
+)
+def test_bazi_compatibility_dense_cross_chart_adversarial_budget_and_isomorphism(
+    overrides: dict[str, Any],
+) -> None:
+    from fatebridge.application.execution import execute_with_receipt
+    from fatebridge.application.response_delivery import deliver_response
+    from fatebridge.services.tool_catalog import CATALOG
+
+    spec = next(item for item in CATALOG if item.name == "bazi_compatibility")
+    req = spec.request_model(
+        person1_birth_year=1984,
+        person1_birth_month=2,
+        person1_birth_day=4,
+        person1_birth_hour=23,
+        person1_birth_minute=30,
+        person1_birth_place="北京市朝阳区",
+        person1_birth_longitude=116.4,
+        person1_gender="男",
+        person2_birth_year=1990,
+        person2_birth_month=8,
+        person2_birth_day=8,
+        person2_birth_hour=11,
+        person2_birth_minute=45,
+        person2_birth_place="上海市浦东新区",
+        person2_birth_longitude=121.5,
+        person2_gender="女",
+        relationship_type="marriage",
+        **overrides,
+    )
+    canonical = execute_with_receipt(spec, req)
+
+    default_payload = deliver_response(canonical, spec=spec)
+    full_payload = deliver_response(canonical, spec=spec, include=["*"])
+    default_bytes = len(json.dumps(default_payload, ensure_ascii=False).encode("utf-8"))
+
+    assert (
+        default_bytes <= 9500
+    ), f"bazi_compatibility dense+district exceeded 9500 B: {default_bytes}"
+    _assert_compat_subset(
+        {k: v for k, v in default_payload.items() if k != "run_metadata"},
+        {k: v for k, v in full_payload.items() if k != "run_metadata"},
+    )
+    assert default_payload["run_metadata"]["omitted_fields"] == [
+        "natal_contexts.*.calendar_context",
+        "natal_contexts.*.day_master",
+        "cross_chart_relations.directional_punishments",
+        "directional_ten_gods",
+    ]

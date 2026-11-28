@@ -9,17 +9,17 @@ accuracy or prove an atomic read set.
 from __future__ import annotations
 
 import math
-import os
 import re
 import struct
 from pathlib import Path
 from typing import Any
 
 from fatebridge.utils.errors import EphemerisSourceError
+from fatebridge.utils.runtime import get_jpl_file
 
 
 def configured_jpl_file() -> str | None:
-    name = os.environ.get("FATEBRIDGE_JPL_FILE")
+    name = get_jpl_file()
     if not name:
         return None
     # swe_set_jpl_file discards directory components and truncates long input.

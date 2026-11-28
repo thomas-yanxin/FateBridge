@@ -27,6 +27,10 @@ from fatebridge.core.astro.chebyshev import chebyshev_eval_float, chebyshev_kine
 from fatebridge.core.astro.coefficient_storage import RecordBlock, unpack_records
 from fatebridge.core.astro.tdb import Parameters as TDBParameters
 from fatebridge.core.astro.tdb import fairhead_seconds
+from fatebridge.core.native_solar_loader import (
+    validate_crossing_inputs,
+    validate_forward_bracket,
+)
 from fatebridge.utils.errors import EphemerisSourceError
 
 MODEL_ID = "fatebridge_de440_solar_v1"
@@ -401,8 +405,13 @@ def _brent_crossing(
 def longitude_crossing_tt(
     target: float, low: float, high: float, *, profile_id: str = MODEL_ID
 ) -> dict[str, Any]:
-    if not all(math.isfinite(x) for x in (target, low, high)) or low >= high:
-        raise ValueError("DE440 crossing requires a finite increasing TT bracket")
+    validate_crossing_inputs(
+        target,
+        low,
+        high,
+        message="DE440 crossing requires a finite increasing TT bracket",
+        reject_bool=False,
+    )
 
     def residual(epoch: float) -> float:
         return math.remainder(
@@ -410,8 +419,11 @@ def longitude_crossing_tt(
         )
 
     flo, fhi = residual(low), residual(high)
-    if not flo < 0 <= fhi or fhi - flo >= 90:
-        raise ValueError("DE440 TT bracket does not contain a forward crossing")
+    validate_forward_bracket(
+        flo,
+        fhi,
+        message="DE440 TT bracket does not contain a forward crossing",
+    )
     low, high, iterations = _brent_crossing(
         residual, low, high, flo, fhi, max(1e-11, math.ulp(low) * 2.0)
     )
@@ -429,8 +441,13 @@ def longitude_crossing_tt_parts(
     target: float, low: float, high: float, *, profile_id: str = MODEL_ID
 ) -> dict[str, Any]:
     """Explicit two-part alternative; scalar/default callers stay unchanged."""
-    if not all(math.isfinite(v) for v in (target, low, high)) or low >= high:
-        raise ValueError("DE440 crossing requires a finite increasing TT bracket")
+    validate_crossing_inputs(
+        target,
+        low,
+        high,
+        message="DE440 crossing requires a finite increasing TT bracket",
+        reject_bool=False,
+    )
     base = float(math.floor(low))
     a, b = low - base, high - base
 
@@ -440,8 +457,11 @@ def longitude_crossing_tt_parts(
         )
 
     flo, fhi = residual(a), residual(b)
-    if not flo < 0 <= fhi or fhi - flo >= 90:
-        raise ValueError("DE440 TT bracket does not contain a forward crossing")
+    validate_forward_bracket(
+        flo,
+        fhi,
+        message="DE440 TT bracket does not contain a forward crossing",
+    )
     a, b, iterations = _brent_crossing(residual, a, b, flo, fhi, 1e-12)
     fraction = (a + b) / 2
     return {

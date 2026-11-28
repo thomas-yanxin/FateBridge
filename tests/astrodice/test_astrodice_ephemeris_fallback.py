@@ -11,8 +11,8 @@ from fatebridge.core.astro.orbits import (
     ORBITAL_MODEL,
     ApproximateEphemeris,
 )
+from fatebridge.core.astro.otherbu import build_otherbu_result
 from fatebridge.core.astro.reference import PLANET_SEQUENCE
-from fatebridge.core.local_techniques.otherbu import build_otherbu_result
 
 FACES = {"planet": "Jupiter", "sign": "Aries", "house": 0}
 SKY = {

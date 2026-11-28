@@ -1,7 +1,7 @@
 """Schema and compact capability descriptions derived from ToolSpec."""
 
 from types import UnionType
-from typing import Annotated, Any, Literal, get_args, get_origin
+from typing import Annotated, Literal, get_args, get_origin
 
 from pydantic import BaseModel
 from pydantic.fields import FieldInfo
@@ -71,18 +71,24 @@ def describe_spec(
     spec: ToolSpec, *, include_output_schema: bool = False
 ) -> ServiceResult:
     """Describe one tool's schema, capabilities and available transports."""
-    return _describe_contract(spec, include_output_schema=include_output_schema)
+    return _describe_contract(
+        spec,
+        include_output_fields=True,
+        include_output_schema=include_output_schema,
+    )
 
 
-def _describe_contract(spec: ToolSpec, *, include_output_schema: bool) -> ServiceResult:
+def _describe_contract(
+    spec: ToolSpec,
+    *,
+    include_output_fields: bool,
+    include_output_schema: bool,
+) -> ServiceResult:
     """Build requested contracts without generating schemas that are discarded."""
     example = example_input(spec)
     views = evidence_views(spec)
     guidance = call_guidance(spec)
     fields = suggested_fields(spec)
-    root_fields = list(spec.output_fields)
-    if not root_fields and spec.output_model:
-        root_fields = list(spec.output_model.model_fields)
     record: ServiceResult = {
         **({"example_input": example} if example is not None else {}),
         **({"evidence_views": views} if views is not None else {}),
@@ -98,9 +104,13 @@ def _describe_contract(spec: ToolSpec, *, include_output_schema: bool) -> Servic
         },
         "surfaces": _surfaces(spec),
         "input_schema": model_schema(spec.request_model),
-        "output_fields": root_fields,
         "cli_request_file": spec.cli_request_file,
     }
+    if include_output_fields:
+        root_fields = list(spec.output_fields)
+        if not root_fields and spec.output_model:
+            root_fields = list(spec.output_model.model_fields)
+        record["output_fields"] = root_fields
     if fields is not None:
         record["suggested_fields"] = fields
     if spec.default_omit:
@@ -123,13 +133,17 @@ def summarize_spec(spec: ToolSpec) -> ServiceResult:
 
 
 def describe_input_spec(spec: ToolSpec) -> ServiceResult:
-    """Call contract with input schema and output root names."""
-    return _describe_contract(spec, include_output_schema=False)
+    """Call contract with input schema without materializing output models."""
+    return _describe_contract(
+        spec,
+        include_output_fields=False,
+        include_output_schema=False,
+    )
 
 
-def _brief_field_descriptor(field_info: FieldInfo) -> dict[str, Any]:
+def _brief_field_descriptor(field_info: FieldInfo) -> dict[str, object]:
     """Return compact type, requirement, default, and enum metadata for one input field."""
-    entry: dict[str, Any] = {
+    entry: dict[str, object] = {
         "type": field_type_name(field_info.annotation),
         "required": field_info.is_required(),
     }

@@ -38,18 +38,12 @@ def find_artifacts(root: Path) -> list[Path]:
     if not dist.is_symlink():
         files.extend(dist.glob("*.whl"))
         files.extend(dist.glob("*.tar.gz"))
-    else:
-        pass
     for name in ("src", "scripts", "tests"):
         base = root / name
         if base.is_symlink() or not base.exists():
             continue
-        else:
-            pass
         if name == "src":
             directories.extend(base.glob("*.egg-info"))
-        else:
-            pass
         for current, subdirectories, filenames in os.walk(base, followlinks=False):
             parent = Path(current)
             subdirectories[:] = [
@@ -58,8 +52,6 @@ def find_artifacts(root: Path) -> list[Path]:
             if "__pycache__" in subdirectories:
                 directories.append(parent / "__pycache__")
                 subdirectories.remove("__pycache__")
-            else:
-                pass
             files.extend(
                 parent / item
                 for item in filenames
@@ -75,8 +67,6 @@ def tracked_artifacts(root: Path, candidates: list[Path]) -> list[str]:
     """Read the index before deleting anything; Git failures stop the cleanup."""
     if not (root / ".git").exists():
         raise ValueError("The cleanup root has no Git checkout metadata")
-    else:
-        pass
     result = subprocess.run(
         ["git", "-C", str(root), "ls-files", "--cached", "-z"],
         check=True,
@@ -106,8 +96,6 @@ def main(argv: list[str] | None = None) -> int:
         print("Tracked files found in cleanup candidates; no artifacts removed:")
         print("\n".join(protected))
         return 1
-    else:
-        pass
     for path in candidates:
         print(path.relative_to(ROOT))
         if options.apply:
@@ -115,8 +103,6 @@ def main(argv: list[str] | None = None) -> int:
                 shutil.rmtree(path)
             else:
                 path.unlink()
-        else:
-            pass
     print(
         f"{'Removed' if options.apply else 'Would remove'} {len(candidates)} artifacts."
     )
@@ -125,5 +111,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-else:
-    pass

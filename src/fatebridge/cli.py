@@ -158,7 +158,7 @@ def run(argv: list[str] | None = None) -> int:
     if args.command == "batch":
         from fatebridge.application.batch import BatchRequest, execute_batch
         from fatebridge.application.discovery import describe_batch_interface
-        from fatebridge.utils.errors import handle_calculation_error
+        from fatebridge.application.execution import run_guarded_operation
         from fatebridge.utils.formatting import format_json_response
 
         if args.schema:
@@ -197,7 +197,7 @@ def run(argv: list[str] | None = None) -> int:
                 2,
             )
 
-        try:
+        def _execute_cli_batch() -> ServiceResult:
             batch_request = BatchRequest.model_validate(batch_data)
             known = set(known_tool_names())
             requested_names = [call.tool for call in batch_request.calls]
@@ -206,24 +206,21 @@ def run(argv: list[str] | None = None) -> int:
                 if all(name in known for name in requested_names)
                 else all_catalog()
             )
-            payload = execute_batch(
+            return execute_batch(
                 {spec.name: spec for spec in batch_specs},
                 batch_request,
             )
-        except (
-            Exception
-        ) as exc:  # noqa: BLE001 - translate failures at the CLI boundary
-            return emit_error(
-                handle_calculation_error(
-                    exc,
-                    "batch",
-                    allowed_fields=BatchRequest.model_fields.keys(),
-                    root_model=BatchRequest,
-                ),
-                1,
-            )
 
-        print(format_json_response(payload, compact=False))
+        outcome = run_guarded_operation(
+            "batch",
+            _execute_cli_batch,
+            allowed_fields=BatchRequest.model_fields.keys(),
+            root_model=BatchRequest,
+        )
+        if outcome.failed:
+            return emit_error(outcome.payload, 1)
+
+        print(format_json_response(outcome.payload, compact=False))
         return 0
 
     if args.command in {"list", "discover"}:
@@ -333,13 +330,7 @@ def run(argv: list[str] | None = None) -> int:
         parser.error(f"未知工具: {args.command}")
         return 2
 
-    from fatebridge.application.execution import execute_with_receipt, result_is_error
-    from fatebridge.application.response_delivery import (
-        deliver_response,
-        validate_delivery_controls,
-    )
-    from fatebridge.core.execution_context import ExecutionOptions
-    from fatebridge.utils.errors import ParameterError, handle_calculation_error
+    from fatebridge.application.execution import run_tool
     from fatebridge.utils.formatting import format_json_response
 
     field_names = set(spec.request_model.model_fields)
@@ -350,43 +341,17 @@ def run(argv: list[str] | None = None) -> int:
         else explicit_fields
     )
 
-    try:
-        validate_delivery_controls(args.include, args.fields)
-        controls = {
-            name: getattr(args, name, None) for name in ExecutionOptions.model_fields
-        }
-        options = ExecutionOptions.model_validate(controls)
-        request = spec.request_model(**provided)
-        result = execute_with_receipt(
-            spec,
-            request,
-            options=options,
-        )
-    except Exception as exc:  # noqa: BLE001 - translate failures at the CLI boundary
-        return emit_error(
-            handle_calculation_error(
-                exc,
-                spec.operation_label_zh,
-                allowed_fields=spec.request_model.model_fields.keys(),
-                root_model=spec.request_model,
-            ),
-            1,
-        )
-
-    is_error = result_is_error(result)
-
-    try:
-        result = deliver_response(
-            result,
-            spec=spec,
-            include=args.include,
-            fields=args.fields,
-            failed=is_error,
-        )
-    except ParameterError as exc:
-        return emit_error(exc.as_result(), 1)
-    print(format_json_response(result, compact=False))
-    return 1 if is_error else 0
+    outcome = run_tool(
+        spec,
+        provided,
+        include=args.include,
+        fields=args.fields,
+        as_of=getattr(args, "as_of", None),
+    )
+    if outcome.failed:
+        return emit_error(outcome.payload, 1)
+    print(format_json_response(outcome.payload, compact=False))
+    return 0
 
 
 def main() -> None:

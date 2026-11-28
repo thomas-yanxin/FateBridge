@@ -29,7 +29,7 @@ western_timing_tools — this module stays computation-only.
 
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 from fractions import Fraction
 from typing import Any
 
@@ -38,14 +38,17 @@ from fatebridge.core.astro.astrology_tables import ELEMENT_BY_SIGN, SIGNS
 from fatebridge.core.astro.birth import AstroBirthInfo
 from fatebridge.core.astro.ephemeris import _swisseph_planet_state
 from fatebridge.core.astro.geometry import Angle, angle_fraction, longitude_float
+from fatebridge.core.astro.native_chart import NativeSubject
 from fatebridge.core.astro.physical_sources import (
     PhysicalEphemerisTrace,
     PhysicalSourceCohort,
 )
-from fatebridge.core.astro.time_scales import ephemeris_time, utc_point_from_tt
-from fatebridge.core.ephemeris_runtime import preserve_ephemeris_path
-from fatebridge.core.lunar_phase_events import phase_crossings_tt
-from fatebridge.core.predictive._common import (
+from fatebridge.core.astro.time_scales import (
+    ephemeris_time,
+    secondary_progression_clock_options,
+    utc_point_from_tt,
+)
+from fatebridge.core.astro.western_points import (
     TIMING_POINT_NAMES,
     collect_aspect_hits,
     longitude_to_point_dict,
@@ -55,8 +58,8 @@ from fatebridge.core.predictive._common import (
     sign_label,
     source_arc_positions,
 )
-from fatebridge.core.predictive.native_chart import NativeSubject
-from fatebridge.core.predictive.progressions import secondary_progression_clock_options
+from fatebridge.core.ephemeris_runtime import preserve_ephemeris_path
+from fatebridge.core.lunar_phase_events import phase_crossings_tt
 from fatebridge.utils.civil_time import nominal_calendar_bracket
 
 # Fixed classical tables.
@@ -758,8 +761,12 @@ def _balbillus_order(
     longitudes: dict[str, float | None], start_planet: str
 ) -> list[str]:
     """Seven planets sorted by natal longitude, rotated to start_planet."""
-    present = [p for p in BALBILLUS_PLANET_ORDER if longitudes.get(p) is not None]
-    ordered = sorted(present, key=lambda p: _wrap360(float(longitudes[p])))  # type: ignore[arg-type]
+    present = [
+        (p, lon)
+        for p in BALBILLUS_PLANET_ORDER
+        if (lon := longitudes.get(p)) is not None
+    ]
+    ordered = [p for p, _ in sorted(present, key=lambda item: _wrap360(item[1]))]
     if not ordered:
         ordered = list(BALBILLUS_PLANET_ORDER)
     if start_planet in ordered:
@@ -1127,7 +1134,7 @@ def build_persian_directed_payload(
     natal_longitudes: dict[str, float],
     house_cusps: list[float],
     *,
-    birth_datetime: Any = None,
+    birth_datetime: datetime | None = None,
     max_age_years: float = 90.0,
     limit: int | None = 120,
 ) -> dict[str, Any]:

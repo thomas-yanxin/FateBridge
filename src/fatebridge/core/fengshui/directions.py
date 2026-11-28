@@ -2,12 +2,109 @@
 
 from __future__ import annotations
 
-import json
 from bisect import bisect_right
 from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, cast
+from typing import Literal, TypedDict, overload
+
+from pydantic import TypeAdapter
+
+_Direction = Literal["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+
+
+class MountainEntry(TypedDict):
+    name: str
+    center_degrees: int
+    direction: _Direction
+    yuan: str
+    polarity: str
+
+
+class RulesetMeta(TypedDict):
+    version: str
+    method: str
+    source_ids: list[str]
+    scope: str
+
+
+class DirectionInfo(TypedDict):
+    direction: str
+    label: str
+    trigram: str
+    palace_number: int
+    element: str
+    center_degrees: int
+
+
+class BazhaiStarInfo(TypedDict):
+    name: str
+    polarity: str
+    element: str
+
+
+class AnnualStarInfo(TypedDict):
+    name: str
+    element: str
+
+
+class RulesBundle(TypedDict):
+    bundle_version: str
+    rulesets: dict[str, RulesetMeta]
+    directions: dict[str, DirectionInfo]
+    mountains: list[str]
+    bazhai_stars: dict[str, BazhaiStarInfo]
+    annual_stars: dict[str, AnnualStarInfo]
+    flight_path: list[str]
+    unavailable_layers: list[str]
+
+
+class SittingFromMountainResult(TypedDict):
+    facing_mountain: str
+    facing_direction: _Direction
+    facing_trigram: str
+    mountain: str
+    direction: _Direction
+    trigram: str
+
+
+class FacingBandResult(TypedDict):
+    mountain_index: int
+    mountain: MountainEntry
+    offset_degrees: float
+    facing_subband: str
+    adjacent_mountain: str | None
+    kongwang: str | None
+    kongwang_seam_degrees: float | None
+
+
+class BearingContextResult(TypedDict):
+    bearing_degrees: float
+    north_reference: str
+    direction: str
+    trigram: str
+    mountain: str
+    facing_subband: str
+    adjacent_mountain: str | None
+    kongwang: str | None
+    kongwang_seam_degrees: float | None
+    boundary_policy: str
+
+
+class SittingRegion(TypedDict):
+    from_facing_degrees_exact: str
+    until_facing_degrees_exact: str
+    endpoints_included: bool
+
+
+class SittingSupportCandidate(TypedDict):
+    sitting_direction: str
+    sitting_trigram: str
+    regions: list[SittingRegion]
+
+
+_RULES_BUNDLE_ADAPTER = TypeAdapter(RulesBundle)
+
 
 _KONGWANG_SEAM_HALF_WIDTH = 0.5
 _ZHENGXIANG_HALF_WIDTH = 1.5
@@ -16,7 +113,7 @@ _DIRECTION_BOUNDARIES = [22.5 + 45 * i for i in range(8)]
 _MOUNTAIN_BOUNDARIES = [7.5 + 15 * i for i in range(24)]
 
 # 24 mountains in clockwise order starting at 0° (子 center), with 3-yuan & polarity.
-MOUNTAINS_24: tuple[dict[str, Any], ...] = (
+MOUNTAINS_24: tuple[MountainEntry, ...] = (
     {
         "name": "子",
         "center_degrees": 0,
@@ -186,31 +283,68 @@ MOUNTAINS_24: tuple[dict[str, Any], ...] = (
         "polarity": "yang",
     },
 )
-MOUNTAIN_BY_NAME: dict[str, dict[str, Any]] = {m["name"]: m for m in MOUNTAINS_24}
+MOUNTAIN_BY_NAME: dict[str, MountainEntry] = {m["name"]: m for m in MOUNTAINS_24}
 
 
 @lru_cache(maxsize=1)
-def _bundle() -> dict[str, Any]:
+def _bundle() -> RulesBundle:
     path = Path(__file__).parents[2] / "data" / "fengshui" / "rules-v1.json"
-    return cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
+    return _RULES_BUNDLE_ADAPTER.validate_json(path.read_bytes())
 
 
-def raw_rule_data(key: str) -> Any:
+@overload
+def raw_rule_data(key: Literal["bundle_version"]) -> str: ...
+
+
+@overload
+def raw_rule_data(key: Literal["rulesets"]) -> dict[str, RulesetMeta]: ...
+
+
+@overload
+def raw_rule_data(key: Literal["directions"]) -> dict[str, DirectionInfo]: ...
+
+
+@overload
+def raw_rule_data(key: Literal["mountains"]) -> list[str]: ...
+
+
+@overload
+def raw_rule_data(key: Literal["bazhai_stars"]) -> dict[str, BazhaiStarInfo]: ...
+
+
+@overload
+def raw_rule_data(key: Literal["annual_stars"]) -> dict[str, AnnualStarInfo]: ...
+
+
+@overload
+def raw_rule_data(
+    key: Literal["flight_path", "unavailable_layers"],
+) -> list[str]: ...
+
+
+def raw_rule_data(key: str) -> object:
     """Read-only cached lookup into rules-v1.json without deep-copy overhead."""
-    return _bundle()[key]
+    bundle = _bundle()
+    if key == "bundle_version":
+        return bundle["bundle_version"]
+    if key == "rulesets":
+        return bundle["rulesets"]
+    if key == "directions":
+        return bundle["directions"]
+    if key == "mountains":
+        return bundle["mountains"]
+    if key == "bazhai_stars":
+        return bundle["bazhai_stars"]
+    if key == "annual_stars":
+        return bundle["annual_stars"]
+    if key == "flight_path":
+        return bundle["flight_path"]
+    if key == "unavailable_layers":
+        return bundle["unavailable_layers"]
+    raise KeyError(key)
 
 
-def rule_data(key: str) -> Any:
-    """Return a shallow copy of top-level mappings/lists from rules-v1.json."""
-    val = _bundle()[key]
-    if isinstance(val, dict):
-        return dict(val)
-    if isinstance(val, list):
-        return list(val)
-    return val
-
-
-def sitting_from_mountain(mountain: str) -> dict[str, Any]:
+def sitting_from_mountain(mountain: str) -> SittingFromMountainResult:
     directions = _bundle()["directions"]
     mountains = _bundle()["mountains"]
     idx = mountains.index(mountain)
@@ -232,7 +366,7 @@ def wrap9(number: int) -> int:
     return (number - 1) % 9 + 1
 
 
-def classify_facing_band(degrees: float | Fraction) -> dict[str, Any]:
+def classify_facing_band(degrees: float | Fraction) -> FacingBandResult:
     """Classify 24-mountain sub-band (zhengxiang/jianxiang) and KongWang void seams."""
     angle = float(degrees % 360) % 360
     index = bisect_right(_MOUNTAIN_BOUNDARIES, angle) % 24
@@ -278,7 +412,9 @@ def classify_facing_band(degrees: float | Fraction) -> dict[str, Any]:
     }
 
 
-def bearing_context(degrees: float | Fraction, north_reference: str) -> dict[str, Any]:
+def bearing_context(
+    degrees: float | Fraction, north_reference: str
+) -> BearingContextResult:
     angle = degrees % 360
     directions = _bundle()["directions"]
     index = bisect_right(_DIRECTION_BOUNDARIES, angle) % 8
@@ -298,7 +434,7 @@ def bearing_context(degrees: float | Fraction, north_reference: str) -> dict[str
     }
 
 
-def sitting_from_facing(degrees: float, north_reference: str) -> dict[str, Any]:
+def sitting_from_facing(degrees: float, north_reference: str) -> BearingContextResult:
     # Derive opposite sectors before adding 180 to avoid rounding edge flips.
     facing = bearing_context(degrees, north_reference)
     directions = _bundle()["directions"]
@@ -306,17 +442,22 @@ def sitting_from_facing(degrees: float, north_reference: str) -> dict[str, Any]:
     direction = dir_keys[(dir_keys.index(facing["direction"]) + 4) % 8]
     facing_m_idx = _bundle()["mountains"].index(facing["mountain"])
     return {
-        **facing,
         "bearing_degrees": (degrees + 180) % 360,
+        "north_reference": facing["north_reference"],
         "direction": direction,
         "trigram": directions[direction]["trigram"],
         "mountain": _bundle()["mountains"][(facing_m_idx + 12) % 24],
+        "facing_subband": facing["facing_subband"],
+        "adjacent_mountain": facing["adjacent_mountain"],
+        "kongwang": facing["kongwang"],
+        "kongwang_seam_degrees": facing["kongwang_seam_degrees"],
+        "boundary_policy": facing["boundary_policy"],
     }
 
 
 def sitting_support(
     degrees: float, radius: float, north_reference: str
-) -> list[dict[str, Any]]:
+) -> list[SittingSupportCandidate]:
     """Enumerate every intersecting eight-sector cell using exact input values."""
     directions_map = _bundle()["directions"]
     directions = list(directions_map)
@@ -331,7 +472,7 @@ def sitting_support(
         ]
     center = Fraction(degrees) % 360
     lower, upper = center - Fraction(radius), center + Fraction(radius)
-    found: dict[str, dict[str, Any]] = {}
+    found: dict[str, SittingSupportCandidate] = {}
     for index in range(-4, 13):
         start = max(lower, index * 45 - Fraction(45, 2))
         end = min(upper, index * 45 + Fraction(45, 2))

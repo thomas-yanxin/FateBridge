@@ -18,7 +18,6 @@ from fatebridge.core.bazi.shensha import (
     TIAN_XI_TARGETS,
     TIAN_YI_TABLES,
 )
-from fatebridge.core.metaphysics.common import kongwang_for_ganzhi
 from fatebridge.utils.data import (
     BRANCH_COMBINATIONS,
     BRANCH_CONFLICTS,
@@ -30,6 +29,7 @@ from fatebridge.utils.data import (
     Element,
     get_nayin,
     get_ten_god,
+    kongwang_for_ganzhi,
 )
 
 Pillars = Mapping[str, tuple[str, str]]

@@ -4,9 +4,18 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 from fractions import Fraction
-from typing import Any, TypedDict
+from typing import Any
 
 from fatebridge.core.astro.birth import AstroBirthInfo
+from fatebridge.core.astro.time_scales import (
+    SECONDARY_PROGRESSION_YEAR_KEY as SECONDARY_PROGRESSION_YEAR_KEY,
+)
+from fatebridge.core.astro.time_scales import (
+    ProgressionClockOptions as ProgressionClockOptions,
+)
+from fatebridge.core.astro.time_scales import (
+    secondary_progression_clock_options as secondary_progression_clock_options,
+)
 from fatebridge.core.predictive._common import (
     build_subject,
     collect_aspect_hits,
@@ -17,31 +26,9 @@ from fatebridge.core.predictive.native_chart import NativeSubject
 from fatebridge.utils.civil_time import UTCCalendar, ZonedCalendar, utc_calendar
 from fatebridge.utils.timezones import format_local_time_or_utc, parse_timezone_name
 
-SECONDARY_PROGRESSION_YEAR_KEY = Fraction(36524219, 100000)
-
-
-class ProgressionClockOptions(TypedDict):
-    method: str
-    year_basis: str
-    year_key_numerator: int
-    year_key_denominator: int
-    time_basis: str
-    timestamp_rounding: str
-
 
 class ProgressionCalculationOptions(ProgressionClockOptions):
     house_method: str
-
-
-def secondary_progression_clock_options() -> ProgressionClockOptions:
-    return {
-        "method": "direct_secondary_progression",
-        "year_basis": "fixed_365_24219_nominal_days",
-        "year_key_numerator": SECONDARY_PROGRESSION_YEAR_KEY.numerator,
-        "year_key_denominator": SECONDARY_PROGRESSION_YEAR_KEY.denominator,
-        "time_basis": "UTC_nominal_elapsed_days",
-        "timestamp_rounding": "nearest_microsecond_ties_to_even_from_birth",
-    }
 
 
 def calculate_secondary_progression_clock(

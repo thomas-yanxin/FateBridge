@@ -1,11 +1,11 @@
 """Configure one process-wide budget for heavy calculations."""
 
-import logging
 import os
 from dataclasses import dataclass
 from threading import BoundedSemaphore, Lock
 
-LOGGER = logging.getLogger(__name__)
+from fatebridge.utils.runtime import get_heavy_calc_max_concurrency
+
 DEFAULT_MAX_CONCURRENCY = min(4, max(1, os.cpu_count() or 1))
 
 
@@ -24,16 +24,7 @@ def heavy_calculation_budget() -> HeavyCalculationBudget:
     global _budget
     with BUDGET_LOCK:
         if _budget is None:
-            configured_limit = os.getenv(
-                "FATEBRIDGE_HEAVY_CALC_MAX_CONCURRENCY", str(DEFAULT_MAX_CONCURRENCY)
-            )
-            try:
-                max_concurrency = max(1, int(configured_limit))
-            except ValueError:
-                LOGGER.warning(
-                    f"Invalid heavy calculation limit; using {DEFAULT_MAX_CONCURRENCY}"
-                )
-                max_concurrency = DEFAULT_MAX_CONCURRENCY
+            max_concurrency = get_heavy_calc_max_concurrency(DEFAULT_MAX_CONCURRENCY)
             _budget = HeavyCalculationBudget(
                 max_concurrency=max_concurrency,
                 semaphore=BoundedSemaphore(max_concurrency),

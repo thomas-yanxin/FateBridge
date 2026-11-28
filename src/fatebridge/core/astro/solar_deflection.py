@@ -13,10 +13,14 @@ import json
 import math
 from functools import lru_cache
 from importlib.resources import files
-from typing import Sequence, TypedDict
+from typing import TypedDict
 
-from fatebridge.core.astro.aberration_math import dot
-from fatebridge.core.astro.cartesian import CartesianMotion, CartesianState, Vector3
+from fatebridge.core.astro.cartesian import (
+    CartesianMotion,
+    CartesianState,
+    cross,
+    dot,
+)
 
 DEFLECTION_LIMITER = 1e-11
 MODEL_ID = (
@@ -61,14 +65,6 @@ def effective_solar_mass(radius_fraction: float) -> tuple[float, float | None]:
     return m0 + (radius_fraction - r0) / (r1 - r0) * (m1 - m0), slope
 
 
-def _cross(a: Sequence[float], b: Sequence[float]) -> Vector3:
-    return (
-        a[1] * b[2] - a[2] * b[1],
-        a[2] * b[0] - a[0] * b[2],
-        a[0] * b[1] - a[1] * b[0],
-    )
-
-
 def finite_source_solar_deflection(
     ray: CartesianState,
     observer: CartesianState,
@@ -103,8 +99,8 @@ def finite_source_solar_deflection(
     em, em_d, e, ed = geometry[1]
     _, _, q, qd = geometry[2]
     solar_radius = math.radians(data["solar_radius_at_one_au_arcsec"] / 3600)
-    impact = _cross(p, e)
-    impact_d = tuple(a + b for a, b in zip(_cross(pd, e), _cross(p, ed)))
+    impact = cross(p, e)
+    impact_d = tuple(a + b for a, b in zip(cross(pd, e), cross(p, ed)))
     impact_length = math.hypot(*impact)
     if impact_length == 0:
         mass = mass_d = 0.0
@@ -127,7 +123,7 @@ def finite_source_solar_deflection(
     limited_d = denominator_d if denominator > DEFLECTION_LIMITER else 0.0
     srs = 2 * data["solar_GM_m3_s2"] / (299792458.0**2 * 149597870700.0)
     weight = mass * srs / em / limited
-    direction = _cross(p, _cross(e, q))
+    direction = cross(p, cross(e, q))
     x, y, z = (radius * (a + weight * b) for a, b in zip(p, direction))
     if any(direction) and (mass_corner or (mass != 0 and limiter_corner)):
         return CartesianMotion((x, y, z), None)
@@ -137,9 +133,9 @@ def finite_source_solar_deflection(
     direction_d = tuple(
         a + b + c
         for a, b, c in zip(
-            _cross(pd, _cross(e, q)),
-            _cross(p, _cross(ed, q)),
-            _cross(p, _cross(e, qd)),
+            cross(pd, cross(e, q)),
+            cross(p, cross(ed, q)),
+            cross(p, cross(e, qd)),
         )
     )
     vx, vy, vz = (

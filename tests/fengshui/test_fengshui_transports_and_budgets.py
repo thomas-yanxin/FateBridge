@@ -21,7 +21,7 @@ from fatebridge.core.schema_cache import model_schema
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.fengshui import payload
 from tests.support.fengshui_transports import SPECS, mcp_call
-from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import business as without_transport
 from tests.support.transports import rest_client
 
 AS_OF = "2026-10-12T12:00:00+08:00"

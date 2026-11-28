@@ -41,7 +41,6 @@ from fatebridge.core.bazi.shensha import (
     build_shensha_profile,
 )
 from fatebridge.core.bazi.timing import TimingAnalysis
-from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
 from fatebridge.services.birth_context import (
     BirthComputationContext,
     build_birth_computation_context,
@@ -54,6 +53,7 @@ from fatebridge.services.timing_state import (
 from fatebridge.utils.birth_input import PersonInfo, normalize_gender
 from fatebridge.utils.data import (
     BRANCH_HIDDEN_STEMS,
+    SEXAGENARY_INDEX,
     TenGod,
     get_ten_god,
     iter_pillar_gods,
@@ -61,7 +61,6 @@ from fatebridge.utils.data import (
 from fatebridge.utils.errors import (
     ParameterError,
     calculation_guard,
-    handle_calculation_error,
 )
 from fatebridge.utils.formatting import create_pillar_dict
 
@@ -599,78 +598,74 @@ def _run_bazi_dimension_analysis(
     changsheng_school: ChangshengSchool = "fire_earth_same_palace",
     duty_profile: DutyProfile = "sanming",
 ) -> dict[str, Any]:
-    try:
-        dayun = _parse_pillar_str(dayun_pillar, "dayun_pillar")
-        liunian = _parse_pillar_str(liunian_pillar, "liunian_pillar")
-        birth_context = build_birth_computation_context(
-            person,
-            zi_hour_policy=zi_hour_policy,
-            changsheng_school=changsheng_school,
-            duty_profile=duty_profile,
-        )
-        gender = normalize_gender(person.gender)
+    dayun = _parse_pillar_str(dayun_pillar, "dayun_pillar")
+    liunian = _parse_pillar_str(liunian_pillar, "liunian_pillar")
+    birth_context = build_birth_computation_context(
+        person,
+        zi_hour_policy=zi_hour_policy,
+        changsheng_school=changsheng_school,
+        duty_profile=duty_profile,
+    )
+    gender = normalize_gender(person.gender)
 
-        if dayun is None or liunian is None:
-            analysis_date = _resolve_analysis_date(
-                analysis_year,
-                analysis_month,
-                analysis_day,
-                timezone_name=birth_context.normalized_birth_time.timezone,
-            )
-            auto_dayun, auto_liunian, timing_context = _derive_current_pillars(
-                birth_context, analysis_date, gender
-            )
-            timing_context["overridden"] = {
-                "dayun_pillar": dayun is not None,
-                "liunian_pillar": liunian is not None,
-            }
-            if dayun is None:
-                dayun = auto_dayun
-            if liunian is None:
-                liunian = auto_liunian
-            timing_context["dayun_pillar"] = "".join(dayun) if dayun else None
-            timing_context["liunian_pillar"] = "".join(liunian) if liunian else None
-            if timing_context["overridden"]["dayun_pillar"]:
-                timing_context.update(
-                    dayun_status="explicit_override",
-                    dayun_selection_basis=None,
-                    dayun_start_at=None,
-                    dayun_end_at=None,
-                )
-        else:
-            timing_context = {
-                "dayun_pillar": "".join(dayun),
-                "liunian_pillar": "".join(liunian),
-                "source": "explicit_pillar_overrides",
-                "dayun_status": "explicit_override",
-                "overridden": {"dayun_pillar": True, "liunian_pillar": True},
-            }
-
-        topic_facts = _build_lean_topic_facts(
-            context=birth_context,
-            topic=topic,
-            gender=gender,
-            dayun=dayun,
-            liunian=liunian,
+    if dayun is None or liunian is None:
+        analysis_date = _resolve_analysis_date(
+            analysis_year,
+            analysis_month,
+            analysis_day,
+            timezone_name=birth_context.normalized_birth_time.timezone,
         )
-        return {
-            "analysis_type": analysis_type,
-            f"{topic}_analysis": {
-                "calendar_context": birth_context.birth_calendar_context,
-                "timing_context": timing_context,
-                "topic_facts": topic_facts,
-            },
+        auto_dayun, auto_liunian, timing_context = _derive_current_pillars(
+            birth_context, analysis_date, gender
+        )
+        timing_context["overridden"] = {
+            "dayun_pillar": dayun is not None,
+            "liunian_pillar": liunian is not None,
         }
-    except ParameterError as exc:
-        return exc.as_result()
-    except Exception as exc:
-        return handle_calculation_error(exc, analysis_type)
+        if dayun is None:
+            dayun = auto_dayun
+        if liunian is None:
+            liunian = auto_liunian
+        timing_context["dayun_pillar"] = "".join(dayun) if dayun else None
+        timing_context["liunian_pillar"] = "".join(liunian) if liunian else None
+        if timing_context["overridden"]["dayun_pillar"]:
+            timing_context.update(
+                dayun_status="explicit_override",
+                dayun_selection_basis=None,
+                dayun_start_at=None,
+                dayun_end_at=None,
+            )
+    else:
+        timing_context = {
+            "dayun_pillar": "".join(dayun),
+            "liunian_pillar": "".join(liunian),
+            "source": "explicit_pillar_overrides",
+            "dayun_status": "explicit_override",
+            "overridden": {"dayun_pillar": True, "liunian_pillar": True},
+        }
+
+    topic_facts = _build_lean_topic_facts(
+        context=birth_context,
+        topic=topic,
+        gender=gender,
+        dayun=dayun,
+        liunian=liunian,
+    )
+    return {
+        "analysis_type": analysis_type,
+        f"{topic}_analysis": {
+            "calendar_context": birth_context.birth_calendar_context,
+            "timing_context": timing_context,
+            "topic_facts": topic_facts,
+        },
+    }
 
 
 def _make_bazi_dimension_service(
     topic: str,
     analysis_type: str,
 ) -> Callable[..., dict[str, Any]]:
+    @calculation_guard(analysis_type)
     def service(
         person: PersonInfo,
         *,

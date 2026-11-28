@@ -1,13 +1,18 @@
 """Shared service execution, output validation and execution receipts."""
 
-import os
 import secrets
+from collections.abc import Callable, Collection, Mapping
 from contextlib import nullcontext
+from dataclasses import dataclass
 from time import perf_counter
 
 from pydantic import BaseModel, JsonValue, ValidationError
 
 from fatebridge.application.compute_limits import heavy_calculation_budget
+from fatebridge.application.response_delivery import (
+    deliver_response,
+    validate_delivery_controls,
+)
 from fatebridge.application.tool_spec import (
     BoundServiceCall,
     OutputContractError,
@@ -22,20 +27,25 @@ from fatebridge.services import replay_metadata, run_metadata
 from fatebridge.utils.errors import (
     DomainSourceError,
     ErrorEnvelope,
+    ParameterError,
     handle_calculation_error,
 )
+from fatebridge.utils.runtime import is_strict_output_validation_enabled
+
+
+@dataclass(frozen=True, kw_only=True)
+class ToolRunOutcome:
+    """Canonical execution, error-translation, and delivery result for one tool call."""
+
+    payload: ServiceResult
+    failed: bool
+    status_code: int
+    operation: str
 
 
 def strict_output_validation_enabled() -> bool:
     """Read the opt-in flag for full output and domain validation."""
-    return os.environ.get(
-        "FATEBRIDGE_STRICT_OUTPUT_VALIDATION", ""
-    ).strip().lower() in {
-        "1",
-        "true",
-        "yes",
-        "on",
-    }
+    return is_strict_output_validation_enabled()
 
 
 def invoke_validated_service(
@@ -186,3 +196,117 @@ def validate_output(
 def result_is_error(result: ServiceResult) -> bool:
     """Classify the shared error envelope identically on REST, MCP and CLI."""
     return "error" in result
+
+
+def run_tool(
+    spec: ToolSpec,
+    arguments: BaseModel | Mapping[str, object] | None = None,
+    *,
+    include: list[str] | None = None,
+    fields: list[str] | None = None,
+    as_of: str | None = None,
+    options: ExecutionOptions | None = None,
+    raise_parameter_error: bool = False,
+    executor: Callable[..., ServiceResult] | None = None,
+) -> ToolRunOutcome:
+    """Canonical pipeline: delivery check -> request/options validation -> execution -> delivery."""
+    try:
+        validate_delivery_controls(include, fields)
+    except ParameterError as exc:
+        if raise_parameter_error:
+            raise
+        failure = exc.as_result()
+        return ToolRunOutcome(
+            payload=failure,
+            failed=True,
+            status_code=int(failure.get("status_code", exc.status_code)),
+            operation=spec.operation_label_zh,
+        )
+
+    try:
+        resolved_options = (
+            options
+            if options is not None
+            else ExecutionOptions.model_validate({"as_of": as_of})
+        )
+        request = (
+            arguments
+            if isinstance(arguments, BaseModel)
+            else spec.request_model.model_validate(dict(arguments) if arguments else {})
+        )
+        result = (executor or execute_with_receipt)(
+            spec,
+            request,
+            options=resolved_options,
+        )
+    except Exception as exc:  # noqa: BLE001 - canonical surface error boundary
+        failure = handle_calculation_error(
+            exc,
+            spec.operation_label_zh,
+            allowed_fields=spec.request_model.model_fields.keys(),
+            root_model=spec.request_model,
+        )
+        return ToolRunOutcome(
+            payload=failure,
+            failed=True,
+            status_code=int(failure.get("status_code", 500)),
+            operation=spec.operation_label_zh,
+        )
+
+    failed = result_is_error(result)
+    try:
+        delivered = deliver_response(
+            result,
+            spec=spec,
+            include=include,
+            fields=fields,
+            failed=failed,
+        )
+    except ParameterError as exc:
+        if raise_parameter_error and not failed:
+            raise
+        failure = exc.as_result()
+        return ToolRunOutcome(
+            payload=failure,
+            failed=True,
+            status_code=int(failure.get("status_code", exc.status_code)),
+            operation=spec.operation_label_zh,
+        )
+
+    return ToolRunOutcome(
+        payload=delivered,
+        failed=failed,
+        status_code=int(result.get("status_code", 500)) if failed else 200,
+        operation=spec.operation_label_zh,
+    )
+
+
+def run_guarded_operation(
+    operation: str,
+    action: Callable[[], ServiceResult],
+    *,
+    allowed_fields: Collection[str] | None = None,
+    root_model: type[BaseModel] | None = None,
+) -> ToolRunOutcome:
+    """Execute a non-tool operation (e.g., batch) under the shared error boundary."""
+    try:
+        payload = action()
+    except Exception as exc:  # noqa: BLE001 - canonical surface error boundary
+        failure = handle_calculation_error(
+            exc,
+            operation,
+            allowed_fields=allowed_fields,
+            root_model=root_model,
+        )
+        return ToolRunOutcome(
+            payload=failure,
+            failed=True,
+            status_code=int(failure.get("status_code", 500)),
+            operation=operation,
+        )
+    return ToolRunOutcome(
+        payload=payload,
+        failed=False,
+        status_code=200,
+        operation=operation,
+    )

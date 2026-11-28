@@ -18,19 +18,13 @@ from typing import Protocol
 
 import erfa
 
-from fatebridge.core.astro.cartesian import CartesianState
+from fatebridge.core.astro.cartesian import CartesianState, dot, mm, mv, transpose
 from fatebridge.core.astro.earth_attitude import (
     EarthAttitude,
     PhysicalEquator,
     RotationSource,
 )
-from fatebridge.core.astro.reference_frames import (
-    dot,
-    mm,
-    mv,
-    native_precession_frame,
-    transpose,
-)
+from fatebridge.core.astro.reference_frames import native_precession_frame
 from fatebridge.utils.errors import EphemerisSourceError
 
 AU_METRES = 149_597_870_700.0

@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 from typing import Any
 
+from fatebridge.utils.coordinates import parse_geo_coordinate
 from fatebridge.utils.errors import ParameterError
 from fatebridge.utils.place_catalog import PLACE_SPECIFICITY as PLACE_SPECIFICITY
 from fatebridge.utils.place_catalog import (
@@ -27,28 +28,30 @@ from fatebridge.utils.place_catalog import (
     normalize_birth_place_text as normalize_birth_place_text,
 )
 
-_CATALOG_EXPORTS = frozenset(
-    {
-        "KNOWN_BIRTH_PLACE_ENTRIES",
-        "MAX_PLACE_ALIAS_LENGTH",
-        "PLACE_ALIAS_INDEX",
-        "PLACE_BY_ID",
-        "PLACE_CONTEXT_COMMAS",
-        "PLACE_CONTEXT_INDEX",
-        "PREFERRED_PLACE_ALIASES",
-    }
-)
-
-
-def __getattr__(name: str) -> object:
-    if name in _CATALOG_EXPORTS:
-        from fatebridge.utils import place_catalog
-
-        return getattr(place_catalog, name)
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
-
-
 DEFAULT_BIRTH_TIMEZONE = "Asia/Shanghai"
+DEFAULT_COORDINATE_LATITUDE = 31.2167
+DEFAULT_COORDINATE_LONGITUDE = 121.4667
+
+
+def resolve_coordinates(
+    *,
+    lat: object = None,
+    lon: object = None,
+    gps_lat: float | None = None,
+    gps_lon: float | None = None,
+) -> tuple[float, float]:
+    latitude = parse_geo_coordinate(
+        gps_lat if gps_lat is not None else lat, axis="latitude"
+    )
+    longitude = parse_geo_coordinate(
+        gps_lon if gps_lon is not None else lon, axis="longitude"
+    )
+    return (
+        DEFAULT_COORDINATE_LATITUDE if latitude is None else latitude,
+        DEFAULT_COORDINATE_LONGITUDE if longitude is None else longitude,
+    )
+
+
 # UPU United Kingdom addressing guide (11/2011), p. 2: Square and Walk
 # occur as thoroughfare fields before the post town.
 UK_STREET_ENDING = re.compile(

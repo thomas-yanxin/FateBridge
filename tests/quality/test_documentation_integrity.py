@@ -452,7 +452,7 @@ def test_guidance_and_interpretation_docs_have_no_stale_r4_symbols() -> None:
     assert "life_palace.clock_basis" in guolao_doc
     assert "地方平太阳时" not in guolao_doc
     liuren_board_py = (
-        root / "src" / "fatebridge" / "core" / "contracts" / "output_liuren_board.py"
+        root / "src" / "fatebridge" / "core" / "contracts" / "liuren.py"
     ).read_text(encoding="utf-8")
     assert "liureng.branch_relations" not in liuren_board_py
     assert not hits, "Found stale R4/R5 symbols:\n" + "\n".join(hits)

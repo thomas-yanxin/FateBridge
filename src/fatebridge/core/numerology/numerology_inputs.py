@@ -14,6 +14,11 @@ from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.utils.civil_clock import format_utc_offset, resolve_civil_clock
 from fatebridge.utils.civil_time import utc_calendar
 from fatebridge.utils.coordinates import parse_geo_coordinate
+from fatebridge.utils.data import (
+    EARTHLY_BRANCHES,
+    HEAVENLY_STEMS,
+    SEXAGENARY_CYCLE,
+)
 from fatebridge.utils.errors import NumerologySourceError
 from fatebridge.utils.timezones import parse_timezone_name, timezone_rules_metadata
 
@@ -50,9 +55,9 @@ PILLAR_RULESET_ID = "heluo_volume7_pillar_links_v1"
 PILLAR_SOURCE_PATH = (
     Path(__file__).resolve().parents[2] / "data/numerology/pillar-links-v1.json"
 )
-GAN = "甲乙丙丁戊己庚辛壬癸"
-ZHI = "子丑寅卯辰巳午未申酉戌亥"
-CYCLE = {GAN[i % 10] + ZHI[i % 12] for i in range(60)}
+GAN = "".join(HEAVENLY_STEMS)
+ZHI = "".join(EARTHLY_BRANCHES)
+CYCLE = set(SEXAGENARY_CYCLE)
 LINK_HEADS = {
     "month": ("丙寅", "戊寅", "庚寅", "壬寅", "甲寅") * 2,
     "hour": ("甲子", "丙子", "戊子", "庚子", "壬子") * 2,

@@ -166,9 +166,9 @@ def test_resolve_call_arguments_precedence_and_dynamic_mapping() -> None:
     assert minggua_args["timezone_name"] == "Asia/Shanghai"
 
     # Dynamic inspection works for renamed fengshui-ergo fields (gender / birth_year) too
-    from pydantic import BaseModel
+    from dataclasses import replace
 
-    from fatebridge.application.tool_spec import ToolSpec
+    from pydantic import BaseModel
 
     class ErgoOccupant(BaseModel):
         subject_id: str | None = None
@@ -181,14 +181,7 @@ def test_resolve_call_arguments_precedence_and_dynamic_mapping() -> None:
     class ErgoAssess(BaseModel):
         occupants: list[ErgoOccupant] = []
 
-    ergo_spec = ToolSpec(
-        name="fengshui_assess",
-        bind=SPECS["fengshui_assess"].bind,
-        summary="ergo",
-        operation_label_zh="风水",
-        family="fengshui",
-        request_model=ErgoAssess,
-    )
+    ergo_spec = replace(SPECS["fengshui_assess"], request_model=ErgoAssess)
     year_only_subjects = {
         "y": SubjectProfile.model_validate({"birth_year": 1988, "gender": "male"})
     }

@@ -1,6 +1,6 @@
 """Civil-time inputs for Human Design, without irrelevant house coordinates."""
 
-from typing import Any, Literal
+from typing import Literal
 
 from pydantic import Field, model_validator
 
@@ -47,7 +47,7 @@ class HumanDesignRequest(FateBridgeBaseRequest):
         default=None,
         description="可选带时区ISO行运时刻，叠加当前行运闸门与通道",
     )
-    partner: dict[str, Any] | None = Field(
+    partner: dict[str, object] | None = Field(
         default=None,
         description="可选合盘对象出生参数（含 birth_year..birth_timezone），计算关系合盘通道",
     )

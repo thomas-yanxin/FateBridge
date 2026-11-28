@@ -26,8 +26,9 @@ uv run --extra dev python -m pytest -q
 
 | 范围 | 目录 |
 | --- | --- |
+| 端到端黑盒回归、8 轴能力矩阵与跨端一致性 | [e2e/](e2e/) |
 | 请求校验、执行回执、输出投影与 REST/MCP/CLI 合同 | [integration/](integration/) |
-| 架构依赖边界、文档完整性、工具计数、生成合同、CI 与发布校验 | [quality/](quality/) |
+| 架构依赖边界、文档完整性、工具计数与生成合同校验 | [quality/](quality/) |
 | 八字、时运与双人关系 | [bazi/](bazi/) · [compatibility/](compatibility/) |
 | 星历、节气、时间尺度与太阳模型 | [astronomy/](astronomy/) |
 | 西方占星、推运与占星骰 | [western/](western/) · [astrodice/](astrodice/) |
@@ -37,10 +38,10 @@ uv run --extra dev python -m pytest -q
 | 六壬、金口诀、奇门与太乙 | [liuren/](liuren/) · [jinkou/](jinkou/) · [qimen/](qimen/) · [taiyi/](taiyi/) |
 | 家居风水、地磁、玄空与布局 | [fengshui/](fengshui/) |
 | 心理测量量表 | [psychometrics/](psychometrics/) |
-| 共享协议调用、时间冻结、星历上下文与夹具 | [support/](support/) · [fixtures/](fixtures/) · [unit_test/](unit_test/) |
+| 共享协议调用、时间冻结、星历上下文与夹具 | [support/](support/) · [fixtures/](fixtures/) |
 
 ## 测试约定
 
-- 跨领域共享辅助统一放入 `tests/support/`（如三端调用封装 `support/transports.py`、风水传输封装 `support/fengshui_transports.py`、MCP 回执断言 `support/mcp_result_assertions.py` 与空星历隔离 `support/ephemeris_context.py`）。
+- 跨领域共享辅助统一放入 `tests/support/`（如三端调用封装 `support/transports.py`、风水传输封装 `support/fengshui_transports.py` 与空星历隔离 `support/ephemeris_context.py`）。
 - 独立测试夹具放在 `tests/fixtures/`；不得通过运行当前生产计算重新生成测试期望值或放宽断言门槛。
 - 严格嵌套输出模型检查由 `FATEBRIDGE_STRICT_OUTPUT_VALIDATION=1` 控制，详见[开发指南](../docs/development-guide.md#设计与测试约束)。

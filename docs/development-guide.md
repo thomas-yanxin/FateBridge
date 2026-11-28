@@ -41,7 +41,7 @@ uv run --extra dev fatebridge doctor --mcp --family bazi
 | 单个算法或边界条件 | 对应领域测试（如 `tests/bazi`、`tests/fengshui`） |
 | 请求模型、输出模型或默认值 | `tests/integration/test_full_surface_validation.py`、`tests/integration/test_output_projection_contracts.py` |
 | 模块整理或导入依赖 | `tests/quality/test_architecture_boundaries.py`、`tests/integration/test_ci_regressions.py` |
-| 合同缓存与运行时配置 | `tests/integration/test_schema_cache.py`、`tests/integration/test_runtime_and_errors.py` |
+| 合同缓存与运行时配置 | `tests/integration/test_capability_discovery.py`、`tests/integration/test_runtime_and_errors.py` |
 | 文档与生成合同 | [文档维护与验证](#文档维护与验证)中的检查 |
 
 运行自包含 CI 测试集、代码格式化与静态类型检查：
@@ -50,7 +50,7 @@ uv run --extra dev fatebridge doctor --mcp --family bazi
 uv run --extra dev python scripts/run_ci_checks.py
 uv run --extra dev black --check src/fatebridge scripts tests
 uv run --extra dev isort --check-only src/fatebridge scripts tests
-uv run --extra dev mypy src/fatebridge/
+uv run --extra dev mypy src/fatebridge/ scripts/
 ```
 
 需要外部星历数值参考时，按[星历安装说明](ephemeris.md)准备数据，或运行 `uv run --extra dev python -m scripts.astronomy.prepare_reference_kernel`。
@@ -119,4 +119,4 @@ uv build
 uvx --from twine twine check dist/*
 ```
 
-CI 在 push 与 PR 中运行多平台（Linux Python 3.10–3.13 与 Windows Python 3.12）自包含分片测试、静态检查（Black / isort / Mypy / 生成合同）及文档完整性检查；版本递增并推送到主分支且 CI 通过后，由发布工作流通过 PyPI Trusted Publishing 上传并创建 `v<version>` GitHub Release。若仅 GitHub Release 同步失败，可使用 `scripts/sync_github_release.py` 补建对应版本的发布页。
+CI 在 push 与 PR 中运行多平台（Linux Python 3.10–3.13 与 Windows Python 3.12）自包含测试、静态检查（Black / isort / Mypy / 生成合同）及文档完整性检查；版本递增并推送到主分支且 CI 通过后，由发布工作流通过 PyPI Trusted Publishing 上传并创建 `v<version>` GitHub Release。若仅 GitHub Release 同步失败，可使用 `scripts/sync_github_release.py` 补建对应版本的发布页。

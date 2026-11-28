@@ -19,6 +19,7 @@ from fatebridge.application.description import describe_spec
 from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG, mcp_specs, rest_specs
+from fatebridge.utils.errors import ParameterError
 from tests.support.transports import cached_mcp_app, discover_capabilities, rest
 
 __all__ = ["rest"]
@@ -133,3 +134,166 @@ def test_reference_discovery_uses_public_names(
                 assert result.structured_content["error_code"] == "unknown_tool"
 
     asyncio.run(check_mcp_discovery())
+
+
+@pytest.mark.parametrize("blank_q", ["", "   "])
+def test_blank_q_with_full_detail_requires_filter_across_surfaces(
+    rest: TestClient,
+    capsys: pytest.CaptureFixture[str],
+    blank_q: str,
+) -> None:
+    import fatebridge
+
+    # 1. Python SDK
+    with pytest.raises(ParameterError) as py_err:
+        fatebridge.discover(q=blank_q, detail="full")
+    assert py_err.value.status_code == 422
+    assert py_err.value.issues[0]["code"] == "filter_required_for_full_detail"
+
+    # 2. REST GET /api/tools
+    rest_res = rest.get("/api/tools", params={"q": blank_q, "detail": "full"})
+    assert rest_res.status_code == 422
+    assert rest_res.json()["error_code"] == "validation_error"
+    assert rest_res.json()["issues"][0]["code"] == "filter_required_for_full_detail"
+
+    # 3. CLI discover --q
+    capsys.readouterr()
+    assert run(["discover", "--q", blank_q, "--detail", "full"]) == 1
+    cli_err = json.loads(capsys.readouterr().out)
+    assert cli_err["status_code"] == 422
+    assert cli_err["issues"][0]["code"] == "filter_required_for_full_detail"
+
+    # 4. MCP discover_tools
+    async def mcp_blank_q():
+        async with Client(cached_mcp_app()) as client:
+            return await client.call_tool(
+                "discover_tools",
+                {"q": blank_q, "detail": "full"},
+                raise_on_error=False,
+            )
+
+    mcp_res = asyncio.run(mcp_blank_q())
+    assert mcp_res.is_error
+    assert mcp_res.structured_content["status_code"] == 422
+    assert (
+        mcp_res.structured_content["issues"][0]["code"]
+        == "filter_required_for_full_detail"
+    )
+
+
+def test_calculate_knowledge_registry_and_read_match_reference_samples() -> None:
+    from fatebridge.services.knowledge import (
+        calculate_knowledge_read,
+        calculate_knowledge_registry,
+    )
+
+    registry = calculate_knowledge_registry(domain="astro")
+    liureng = calculate_knowledge_read(domain="liureng", category="shen", key="子")
+    qimen = calculate_knowledge_read(domain="qimen", category="door", key="休门")
+    astro = calculate_knowledge_read(
+        domain="astro",
+        category="aspect",
+        aspect_degree=90,
+        object_a="Sun",
+        object_b="Jupiter",
+    )
+
+    assert registry["domains"][0]["domain"] == "astro"
+    assert any(
+        category["name"] == "planet"
+        for category in registry["domains"][0]["categories"]
+    )
+    assert "snapshot_text" not in registry and "snapshot_export" not in registry
+    assert liureng["title"] == "神后子神"
+    assert "类象" in liureng["rendered_text"]
+    assert qimen["key"] == "休门"
+    assert "休门属水，本宫为坎" in qimen["rendered_text"]
+    assert "卷二·门迫宫迫" in qimen["citation"]
+    assert astro["title"].startswith("太阳 - 木星")
+    assert "相位角：90°" in astro["tips"]
+    assert "snapshot_text" not in qimen and "snapshot_export" not in qimen
+
+
+def test_knowledge_read_auto_resolves_category_and_reports_ambiguous_or_unknown() -> (
+    None
+):
+    from fatebridge.services.knowledge import (
+        calculate_knowledge_read,
+        calculate_knowledge_registry,
+    )
+
+    bazi = calculate_knowledge_read(domain="bazi", key="伤官见官")
+    assert "error" not in bazi
+    assert bazi["category"] == "education"
+    assert bazi["key"] == "伤官见官"
+
+    astro = calculate_knowledge_read(domain="astro", key="Mars")
+    assert astro["category"] == "planet"
+    assert astro["lines"] == ["入庙：白羊、天蝎", "擢升：摩羯"]
+    qimen = calculate_knowledge_read(domain="qimen", key="休门")
+    assert qimen["category"] == "door"
+
+    explicit = calculate_knowledge_read(
+        domain="bazi", category="education", key="伤官见官"
+    )
+    assert explicit["key"] == "伤官见官"
+
+    ambiguous = calculate_knowledge_read(domain="bazi", key="偏财")
+    assert ambiguous["code"] == "knowledge.bazi.ambiguous_key"
+    assert set(ambiguous["details"]["candidate_categories"]) == {"ten_gods", "wealth"}
+
+    unknown = calculate_knowledge_read(domain="bazi", key="不存在的词条")
+    assert unknown["code"] == "knowledge.bazi.unknown_key"
+    retired = calculate_knowledge_read(domain="astro", category="planet", key="Uranus")
+    assert retired["code"] == "knowledge.astro.unknown_key"
+    assert "education" in unknown["details"]["available_categories"]
+
+    registry = calculate_knowledge_registry()
+    assert [item["domain"] for item in registry["domains"]] == [
+        "astro",
+        "bazi",
+        "liureng",
+        "qimen",
+        "heluo",
+        "canping",
+        "human_design",
+    ]
+    sources = {item["domain"]: item["source"] for item in registry["domains"]}
+    assert sources["astro"] == sources["qimen"] == "fatebridge_rule_references"
+    assert sources["bazi"] == sources["liureng"] == "xingque_hover_docs"
+    assert all(
+        item["source"] == "fatebridge_numerology_references"
+        for item in registry["domains"][4:6]
+    )
+    assert registry["domains"][6]["source"] == "fatebridge_human_design_line_references"
+
+
+def test_knowledge_catalog_keys_sample_limit_and_mcp_payloads() -> None:
+    import fatebridge
+    from tests.fixtures.transports import mcp_payload
+
+    knowledge_registry_result = mcp_payload("knowledge_catalog", domain="astro")
+    knowledge_read_result = mcp_payload(
+        "knowledge_read",
+        domain="qimen",
+        category="door",
+        key="休门",
+    )
+    assert knowledge_registry_result["domains"][0]["domain"] == "astro"
+    assert knowledge_read_result["key"] == "休门"
+    assert "休门属水，本宫为坎" in knowledge_read_result["rendered_text"]
+
+    small = fatebridge.run("knowledge_catalog", {"keys_sample_limit": 2})
+    large = fatebridge.run("knowledge_catalog", {"keys_sample_limit": 10})
+    for dom_s, dom_l in zip(small["domains"], large["domains"], strict=True):
+        for cat_s, cat_l in zip(dom_s["categories"], dom_l["categories"], strict=True):
+            assert len(cat_s["keys_sample"]) <= 2
+            assert len(cat_l["keys_sample"]) <= 10
+            assert cat_s["keys_complete"] is (
+                len(cat_s["keys_sample"]) == cat_s["count"]
+            )
+            assert cat_l["keys_complete"] is (
+                len(cat_l["keys_sample"]) == cat_l["count"]
+            )
+            if cat_s["count"] >= 10:
+                assert len(cat_s["keys_sample"]) < len(cat_l["keys_sample"])

@@ -15,6 +15,7 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Any, Sequence
 
+from fatebridge.core.astro.cartesian import Vector, cross, dot, mv
 from fatebridge.core.astro.chebyshev import (
     ChebyshevKinematics,
     chebyshev_kinematics,
@@ -25,7 +26,6 @@ from fatebridge.utils.errors import EphemerisSourceError
 METHOD_ID = "de441_analytic_source_kinematics_v1"
 RECORD_BYTES = 8144
 FRAME_LINE = 2e-13
-Vector = tuple[float, ...]
 GROUPS = {
     "Mercury": 0,
     "Venus": 1,
@@ -196,9 +196,6 @@ def checked_fixed_acceleration(
     ):
         raise EphemerisSourceError("jpl_kinematics_invalid")
 
-    def dot(a: Sequence[float], b: Sequence[float]) -> float:
-        return math.fsum(x * y for x, y in zip(a, b))
-
     def basis(p: Sequence[float], v: Sequence[float]) -> tuple[Vector, ...]:
         size, speed = math.hypot(*p), math.hypot(*v)
         if size <= 0 or speed <= 0:
@@ -210,15 +207,7 @@ def checked_fixed_acceleration(
         if radius / speed < 0.5:
             raise EphemerisSourceError("jpl_kinematics_frame_mismatch")
         b = tuple(x / radius for x in normal)
-        return (
-            a,
-            b,
-            (
-                a[1] * b[2] - a[2] * b[1],
-                a[2] * b[0] - a[0] * b[2],
-                a[0] * b[1] - a[1] * b[0],
-            ),
-        )
+        return (a, b, cross(a, b))
 
     a, b = basis(raw[:3], raw[3:6]), basis(native[:3], native[3:6])
     matrix = tuple(
@@ -226,16 +215,13 @@ def checked_fixed_acceleration(
         for i in range(3)
     )
 
-    def rotate(v: Sequence[float]) -> Vector:
-        return tuple(dot(row, v) for row in matrix)
-
     errors = [
-        math.dist(rotate(raw[:3]), native[:3]),
-        math.dist(rotate(raw[3:6]), native[3:6]),
+        math.dist(mv(matrix, raw[:3]), native[:3]),
+        math.dist(mv(matrix, raw[3:6]), native[3:6]),
     ]
     if max(errors) > FRAME_LINE:
         raise EphemerisSourceError("jpl_kinematics_frame_mismatch")
-    return rotate(raw[6:9]), {
+    return mv(matrix, raw[6:9]), {
         "method_id": "checked_two_vector_fixed_rotation_v1",
         "matrix": [list(row) for row in matrix],
         "state_reproduction_errors_au_or_au_per_day": errors,

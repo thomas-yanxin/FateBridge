@@ -6,11 +6,15 @@ from itertools import combinations
 from typing import Any
 
 from fatebridge.core.metaphysics.common import (
-    ELEMENT_CONTROLS,
-    ELEMENT_GENERATES,
     GUI_REN_SEQUENCE,
     LIURENG_GUIREN_DAY,
     LIURENG_GUIREN_NIGHT,
+)
+from fatebridge.utils.data import (
+    EARTHLY_BRANCHES,
+    ELEMENT_CONTROLS,
+    ELEMENT_GENERATES,
+    HEAVENLY_STEMS,
     SEXAGENARY_INDEX,
     SIX_CLASH_BRANCHES,
     branch_element_text,
@@ -19,7 +23,6 @@ from fatebridge.core.metaphysics.common import (
     stem_element_text,
     xun_head_for_ganzhi,
 )
-from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
 
 TRINES = {
     frozenset(s): e

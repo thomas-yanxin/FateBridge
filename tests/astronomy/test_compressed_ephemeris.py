@@ -306,12 +306,15 @@ def test_retarded_sequence_retains_all_source_and_epoch_guards(
     sample = -1.0 if fault == "outside" else 49.0
     with c.audit_compressed_endpoints():
         if fault != "no_reception":
-            c._LAST_COORDINATE.set(
-                {
-                    "private_native_cache_reset": True,
-                    "physical_jd_tt": 50.0,
-                    "selected_windows": c._public_windows(windows),
-                }
+            c._CONTEXT.set(
+                c._CompressedEndpointState(
+                    audit=c._CONTEXT.get().audit,
+                    last_coordinate={
+                        "private_native_cache_reset": True,
+                        "physical_jd_tt": 50.0,
+                        "selected_windows": c._public_windows(windows),
+                    },
+                )
             )
         else:
             pass
@@ -344,7 +347,7 @@ def test_retarded_sequence_retains_all_source_and_epoch_guards(
             with pytest.raises(EphemerisSourceError) as error:
                 run()
             assert error.value.reason == "dependency_source_window_incoherent"
-        assert c._DEPENDENCY_CONTEXT.get() is None
+        assert c._CONTEXT.get().dependency_context is None
 
 
 @pytest.mark.parametrize("operation", ["calc", "calc_ut"])

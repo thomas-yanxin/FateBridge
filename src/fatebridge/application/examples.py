@@ -21,14 +21,6 @@ class AgentExamples(TypedDict):
     call_guidance: NotRequired[dict[str, dict[str, JsonValue]]]
 
 
-def validate_agent_examples() -> AgentExamples:
-    """Validate packaged examples against the AgentExamples TypedDict schema."""
-    from pydantic import TypeAdapter
-
-    path = Path(__file__).resolve().parents[1] / "data/agent_examples.json"
-    return TypeAdapter(AgentExamples).validate_json(path.read_bytes())
-
-
 @lru_cache(maxsize=1)
 def _examples() -> AgentExamples:
     path = Path(__file__).resolve().parents[1] / "data/agent_examples.json"
@@ -85,3 +77,120 @@ def evidence_views(spec: ToolSpec) -> EvidenceViews | None:
 def call_guidance(spec: ToolSpec) -> dict[str, JsonValue] | None:
     """Return an independent copy of the tool's published call guidance."""
     return deepcopy(_examples().get("call_guidance", {}).get(spec.name))
+
+
+def batch_example_input() -> dict[str, JsonValue]:
+    """Build a valid BatchRequest example dynamically from packaged agent examples."""
+    bundle = _examples()
+    subjects = bundle["subjects"]
+    tools = bundle["tools"]
+    suggested_map = bundle.get("suggested_fields", {})
+
+    subject_id, raw_subject = next(iter(subjects.items()))
+    subject_profile: dict[str, JsonValue] = {
+        ("timezone" if key == "birth_timezone" else key): deepcopy(value)
+        for key, value in raw_subject.items()
+    }
+
+    subject_tools = [name for name, source in tools.items() if source == subject_id][:2]
+    dict_tool_entry = next(
+        (
+            (name, source)
+            for name, source in tools.items()
+            if isinstance(source, dict)
+            and source
+            and not any(
+                key in {"date", "occupants"}
+                or key.startswith(
+                    (
+                        "birth_",
+                        "analysis_",
+                        "person1_",
+                        "inner_",
+                        "question_",
+                        "candidate_",
+                    )
+                )
+                for key in source
+            )
+        ),
+        None,
+    )
+
+    calls: list[JsonValue] = []
+    if subject_tools:
+        first_tool = subject_tools[0]
+        first_call: dict[str, JsonValue] = {
+            "id": "call_1",
+            "tool": first_tool,
+            "subject": subject_id,
+        }
+        if first_fields := suggested_map.get(first_tool):
+            first_call["fields"] = [first_fields[0]]
+        calls.append(first_call)
+    if dict_tool_entry is not None:
+        dict_tool_name, dict_args = dict_tool_entry
+        calls.append(
+            {
+                "id": f"call_{len(calls) + 1}",
+                "tool": dict_tool_name,
+                "arguments": deepcopy(dict_args),
+            }
+        )
+    if len(subject_tools) > 1:
+        calls.append(
+            {
+                "id": f"call_{len(calls) + 1}",
+                "tool": subject_tools[1],
+                "subject": subject_id,
+            }
+        )
+
+    analysis_source = next(
+        (
+            source
+            for source in [*subjects.values(), *tools.values()]
+            if isinstance(source, dict) and isinstance(source.get("analysis_year"), int)
+        ),
+        None,
+    )
+    analysis_year = (
+        analysis_source["analysis_year"]
+        if analysis_source and isinstance(analysis_source.get("analysis_year"), int)
+        else 2026
+    )
+    analysis_month = (
+        analysis_source["analysis_month"]
+        if analysis_source and isinstance(analysis_source.get("analysis_month"), int)
+        else 4
+    )
+    analysis_day = (
+        analysis_source["analysis_day"]
+        if analysis_source and isinstance(analysis_source.get("analysis_day"), int)
+        else 6
+    )
+    analysis_hour = (
+        analysis_source["analysis_hour"]
+        if analysis_source and isinstance(analysis_source.get("analysis_hour"), int)
+        else 9
+    )
+    analysis_minute = (
+        analysis_source["analysis_minute"]
+        if analysis_source and isinstance(analysis_source.get("analysis_minute"), int)
+        else 30
+    )
+    analysis_datetime = (
+        f"{analysis_year:04d}-{analysis_month:02d}-{analysis_day:02d}"
+        f"T{analysis_hour:02d}:{analysis_minute:02d}:00+08:00"
+    )
+    context_payload: dict[str, JsonValue] = {"analysis_datetime": analysis_datetime}
+    if isinstance(raw_subject.get("birth_place"), str):
+        context_payload["place"] = raw_subject["birth_place"]
+
+    return {
+        "subjects": {subject_id: subject_profile},
+        "context": context_payload,
+        "defaults": {"use_true_solar_time": True},
+        "calls": calls,
+        "as_of": analysis_datetime,
+    }

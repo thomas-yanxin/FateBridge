@@ -5,8 +5,8 @@ from copy import deepcopy
 import pytest
 
 from fatebridge.application.execution import OutputContractError, validate_output
-from fatebridge.core.local_techniques.suzhan import build_suzhan_result
 from fatebridge.core.requests.divination import SuZhanRequest
+from fatebridge.core.sukuyo.suzhan import build_suzhan_result
 from fatebridge.services.tool_catalog import CATALOG
 
 SPEC = next(s for s in CATALOG if s.name == "suzhan")

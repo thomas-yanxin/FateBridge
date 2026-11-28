@@ -11,7 +11,7 @@ from fatebridge import fetch_ephe
 from fatebridge.core.astro.ephemeris_integrity import (
     load_ephemeris_manifest,
 )
-from tests.fixtures.ephemeris_manifest import manifest_for_payloads
+from tests.support.ephemeris_context import manifest_for_payloads
 
 NAME = "sepl_96.se1"
 VALID = b"SW-referenced-planet-data"

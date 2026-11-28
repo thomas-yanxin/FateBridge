@@ -6,18 +6,40 @@ Earlier calendar labels are outside this scope. No Earth rotation is inferred.
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from fractions import Fraction
 from functools import lru_cache
 from importlib.resources import files
-from typing import Any, cast
+from typing import TypedDict
+
+from pydantic import TypeAdapter
+from typing_extensions import NotRequired
 
 from fatebridge.core.astro.julian_day import _datetime_from_julian_day
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.astro.utc_policy import leap_table
 from fatebridge.utils.civil_time import CivilPoint
+
+
+class HistoricalUTCEntry(TypedDict):
+    effective_date: str
+    offset_seconds: float
+    reference_mjd: int | float
+    rate_seconds_per_day: float
+
+
+class HistoricalUTCTable(TypedDict):
+    source_url: str
+    source_title: str
+    archive_url: NotRequired[str]
+    scope: str
+    formula: str
+    valid_until: str
+    entries: list[HistoricalUTCEntry]
+
+
+_UTC_TABLE_ADAPTER = TypeAdapter(HistoricalUTCTable)
 
 
 class HistoricalUTCAdjustment(ValueError):
@@ -36,30 +58,22 @@ class UTCDriftInterval:
 
 
 @lru_cache(maxsize=1)
-def historical_utc_table() -> dict[str, Any]:
-    return cast(
-        dict[str, Any],
-        json.loads(
-            files("fatebridge.data")
-            .joinpath("knowledge/western-historical-utc.json")
-            .read_text(encoding="utf-8")
-        ),
+def historical_utc_table() -> HistoricalUTCTable:
+    return _UTC_TABLE_ADAPTER.validate_json(
+        files("fatebridge.data")
+        .joinpath("knowledge/western-historical-utc.json")
+        .read_bytes()
     )
 
 
 @lru_cache(maxsize=1)
-def utc1960_table() -> dict[str, Any]:
-    return cast(
-        dict[str, Any],
-        json.loads(
-            files("fatebridge.data")
-            .joinpath("knowledge/western-utc1960.json")
-            .read_text(encoding="utf-8")
-        ),
+def utc1960_table() -> HistoricalUTCTable:
+    return _UTC_TABLE_ADAPTER.validate_json(
+        files("fatebridge.data").joinpath("knowledge/western-utc1960.json").read_bytes()
     )
 
 
-def historical_utc_source(moment: datetime) -> dict[str, Any]:
+def historical_utc_source(moment: datetime) -> HistoricalUTCTable:
     """Select the historical coefficient source by the UTC calendar year."""
     if moment.utcoffset() is None:
         raise ValueError("Historical UTC requires an aware datetime")

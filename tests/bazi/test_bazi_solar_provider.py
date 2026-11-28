@@ -11,10 +11,10 @@ from fatebridge.core.bazi.calendar import BaZiCalendar
 from fatebridge.core.bazi.timing import TimingAnalysis
 from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.errors import EphemerisSourceError
+from tests.fixtures.bazi_year_cases import TOPICS
 from tests.support.transports import SPECS, inputs, native
 from tests.support.transports import rest as _shared_rest
 from tests.support.transports import surface_calls
-from tests.unit_test.fixtures.bazi_year_cases import TOPICS
 
 
 def clear_solar_caches():

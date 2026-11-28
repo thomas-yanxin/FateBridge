@@ -14,7 +14,7 @@ from fatebridge.core.predictive.native_chart import (
     build_native_subject,
 )
 from fatebridge.services.astrology import calculate_core_chart_analysis
-from tests.unit_test.fixtures.western_natal import GREENWICH_EQUINOX_BIRTH as BIRTH
+from tests.fixtures.western_natal import GREENWICH_EQUINOX_BIRTH as BIRTH
 
 
 def separation(a: float, b: float) -> float:

@@ -7,7 +7,7 @@ from typing import Any
 from fatebridge.services.western_timing import (
     calculate_western_timing_module_analysis,
 )
-from fatebridge.utils.errors import handle_calculation_error
+from fatebridge.utils.errors import calculation_guard
 
 TOOL_SPECS: dict[str, dict[str, Any]] = {
     "solar_return": {
@@ -77,29 +77,30 @@ def _extract_path(payload: dict[str, Any], path: tuple[str, ...]) -> dict[str, A
     return current
 
 
+def _run_timing_tool(spec: dict[str, Any], **kwargs: Any) -> dict[str, Any]:
+    result = calculate_western_timing_module_analysis(
+        technique=spec["technique"],
+        **kwargs,
+    )
+    if "error" in result:
+        return result
+
+    payload = _extract_path(result, spec["path"])
+    return {
+        "analysis_type": spec["analysis_type"],
+        "engine": result.get("natal_reference", {})
+        .get("calculation_basis", {})
+        .get("engine_backend", "fatebridge-offline"),
+        "analysis_context": result.get("analysis_context"),
+        "natal_reference": result.get("natal_reference"),
+        spec["tool_name"]: payload,
+        "summary": result.get("summary"),
+    }
+
+
 def calculate_timing_tool(
     tool_name: str,
     **kwargs: Any,
 ) -> dict[str, Any]:
-    spec = TOOL_SPECS[tool_name]
-    try:
-        result = calculate_western_timing_module_analysis(
-            technique=spec["technique"],
-            **kwargs,
-        )
-        if "error" in result:
-            return result
-
-        payload = _extract_path(result, spec["path"])
-        return {
-            "analysis_type": spec["analysis_type"],
-            "engine": result.get("natal_reference", {})
-            .get("calculation_basis", {})
-            .get("engine_backend", "fatebridge-offline"),
-            "analysis_context": result.get("analysis_context"),
-            "natal_reference": result.get("natal_reference"),
-            tool_name: payload,
-            "summary": result.get("summary"),
-        }
-    except Exception as exc:
-        return handle_calculation_error(exc, spec["analysis_type"])
+    spec = {**TOOL_SPECS[tool_name], "tool_name": tool_name}
+    return calculation_guard(spec["analysis_type"])(_run_timing_tool)(spec, **kwargs)

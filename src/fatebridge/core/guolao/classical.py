@@ -3,10 +3,17 @@
 from __future__ import annotations
 
 import math
-from bisect import bisect_right
-from dataclasses import dataclass
 from fractions import Fraction
 from typing import Any
+
+from fatebridge.core.astro.lunar_mansions import (
+    MANSION_LORDS,
+    MANSIONS,
+    SEVEN_LUMINARIES_ZH,
+    SHOUSHI_1281,
+    SHOUSHI_EQUATORIAL_1281,
+    HistoricalMansions,
+)
 
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 STEMS = "甲乙丙丁戊己庚辛壬癸"
@@ -39,10 +46,6 @@ DONGWEI_ORDER: tuple[tuple[str, float], ...] = (
     ("兄弟", 5.0),
     ("财帛", 5.0),
 )
-MANSIONS = tuple("角亢氐房心尾箕斗牛女虚危室壁奎娄胃昴毕觜参井鬼柳星张翼轸")
-MANSION_LORDS: dict[str, str] = dict(
-    zip((name + "宿" for name in MANSIONS), list("木金土日月火水") * 4)
-)
 PALACE_BRANCHES = [
     "戌",
     "酉",
@@ -58,15 +61,7 @@ PALACE_BRANCHES = [
     "亥",
 ]
 PALACE_LORDS = ["火", "金", "水", "月", "日", "水", "金", "火", "木", "土", "土", "木"]
-CN = {
-    "Sun": "日",
-    "Moon": "月",
-    "Mercury": "水",
-    "Venus": "金",
-    "Mars": "火",
-    "Jupiter": "木",
-    "Saturn": "土",
-}
+CN = SEVEN_LUMINARIES_ZH
 
 GENERATES = dict(zip("木火土金水", "火土金水木"))
 OVERCOMES = dict(zip("木土水火金", "土水火金木"))
@@ -433,105 +428,3 @@ def dongwei_daxian(
             else {}
         ),
     }
-
-
-@dataclass(frozen=True)
-class HistoricalMansions:
-    source_id: str
-    circle_du: Fraction
-    widths_du: tuple[Fraction, ...]
-    coordinate_frame: str = "unspecified"
-
-    def __post_init__(self) -> None:
-        object.__setattr__(self, "widths_du", tuple(self.widths_du))
-        if sum(self.widths_du) != self.circle_du or len(self.widths_du) != 28:
-            raise ValueError("历史宿表须包含28个闭合宿宽")
-
-    def locate(self, angle_from_jiao_du: Fraction) -> tuple[str, Fraction, Fraction]:
-        starts = [sum(self.widths_du[:i], Fraction()) for i in range(28)]
-        angle = angle_from_jiao_du % self.circle_du
-        index = bisect_right(starts, angle) - 1
-        return MANSIONS[index], angle - starts[index], self.widths_du[index]
-
-
-SHOUSHI_1281 = HistoricalMansions(
-    source_id="yuanshi_054_shoushi_1281",
-    coordinate_frame="source_ecliptic",
-    circle_du=Fraction("365.2575"),
-    widths_du=tuple(
-        map(
-            Fraction,
-            (
-                "12.87",
-                "9.56",
-                "16.40",
-                "5.48",
-                "6.27",
-                "17.95",
-                "9.59",
-                "23.47",
-                "6.90",
-                "11.12",
-                "9.0075",
-                "15.95",
-                "18.32",
-                "9.34",
-                "17.87",
-                "12.36",
-                "15.81",
-                "11.08",
-                "16.50",
-                "0.05",
-                "10.28",
-                "31.03",
-                "2.11",
-                "13",
-                "6.31",
-                "17.79",
-                "20.09",
-                "18.75",
-            ),
-        )
-    ),
-)
-
-SHOUSHI_EQUATORIAL_1281 = HistoricalMansions(
-    source_id="yuanshi_054_nlc166_equatorial_mansions",
-    coordinate_frame="source_equatorial",
-    circle_du=Fraction("365.2575"),
-    widths_du=tuple(
-        map(
-            Fraction,
-            (
-                "12.10",
-                "9.20",
-                "16.30",
-                "5.60",
-                "6.50",
-                "19.10",
-                "10.40",
-                "25.20",
-                "7.20",
-                "11.35",
-                "8.9575",
-                "15.40",
-                "17.10",
-                "8.60",
-                "16.60",
-                "11.80",
-                "15.60",
-                "11.30",
-                "17.40",
-                "0.05",
-                "11.10",
-                "33.30",
-                "2.20",
-                "13.30",
-                "6.30",
-                "17.25",
-                "18.75",
-                "17.30",
-            ),
-        )
-    ),
-)

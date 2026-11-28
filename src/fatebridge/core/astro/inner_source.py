@@ -13,6 +13,13 @@ from decimal import localcontext
 from fractions import Fraction
 from typing import Any, Sequence
 
+from fatebridge.core.astro.cartesian import (
+    vec_add,
+    vec_cross,
+    vec_dot,
+    vec_scale,
+    vec_sub,
+)
 from fatebridge.core.astro.jpl_records import SourceRecords
 from fatebridge.core.astro.solar_decimal import (
     mass_profile,
@@ -85,19 +92,19 @@ Vector = Sequence[Dual]
 
 
 def dot(a: Vector, b: Vector) -> Dual:
-    return sum((x * y for x, y in zip(a, b)), Dual(0))
+    return vec_dot(a, b, Dual(0))
 
 
 def add(a: Vector, b: Vector) -> list[Dual]:
-    return [x + y for x, y in zip(a, b)]
+    return vec_add(a, b)
 
 
 def sub(a: Vector, b: Vector) -> list[Dual]:
-    return [x - y for x, y in zip(a, b)]
+    return vec_sub(a, b)
 
 
-def scale(a: Vector, c: Any) -> list[Dual]:
-    return [x * c for x in a]
+def scale(a: Vector, c: Dual | float | int | N) -> list[Dual]:
+    return vec_scale(a, Dual.cast(c))
 
 
 def norm(a: Vector) -> Dual:
@@ -110,11 +117,7 @@ def unit(a: Vector) -> list[Dual]:
 
 
 def cross(a: Vector, b: Vector) -> list[Dual]:
-    return [
-        a[1] * b[2] - a[2] * b[1],
-        a[2] * b[0] - a[0] * b[2],
-        a[0] * b[1] - a[1] * b[0],
-    ]
+    return vec_cross(a, b)
 
 
 def chebyshev(coefficients: Sequence[float], x: Dual) -> tuple[Dual, Dual]:

@@ -52,7 +52,7 @@ curl http://localhost:8011/health
 
 ### MCP 无法连接或只看到部分能力
 
-1. 运行 `fatebridge doctor --mcp` 验证独立 stdio 进程（MCP 默认仅提供 `discover_tools` 与 `run_calculation`，0 资源，不会自动开启 HTTP URL）。
+1. 运行 `fatebridge doctor --mcp` 验证独立 stdio 进程（MCP 默认提供 `discover_tools`、`run_calculation` 与 `run_batch` 三个工具，0 资源，不会自动开启 HTTP URL）。
 2. 检查客户端配置的 `command` 是否为 `doctor` 输出的 `executable` 绝对路径，以及是否将普通日志写到了 `stdout`（stdio 协议要求日志只写 `stderr`）。
 3. 检查启动环境中的 `FATEBRIDGE_MCP_FAMILIES` 是否限制了公开 `family`；需要 URL 接入时须按 [HTTP 与远程部署](mcp-deployment.md#http-与远程部署)启动 FastMCP HTTP runner，REST 的 `8010` 端口不提供 MCP。
 
@@ -75,7 +75,7 @@ curl http://localhost:8011/health
 | `ephemeris_calculation_failed` | HTTP 503 | 原生星历计算异常；核对运行时环境、`SE_EPHE_PATH` 与输入有效范围 |
 | `ephemeris_source_inconsistent` | HTTP 503 | 太阳交节模型与 `FATEBRIDGE_JPL_FILE` 冲突、SPK/VSOP2013/AA1996 清单或字节不一致、或计算期间文件发生变化（`retryable=false`） |
 | `de441_archive_missing` | HTTP 503 | 显式设置了 `FATEBRIDGE_DE441_DIR`（或直接调用 DE441 系数接口）但目录下缺少 DE441 连续行星系数分片；补齐对应分片或取消 `FATEBRIDGE_DE441_DIR` 改用内置降级后重启（`retryable=false`） |
-| `fengshui_calculation_inconsistent` / `numerology_source_inconsistent` / `jyotish_calculation_inconsistent` | HTTP 503 | 领域内部计算或来源校验矛盾，不能靠改用户输入绕过，需保留输入与版本反馈维护者（`retryable=false`） |
+| `numerology_source_inconsistent` | HTTP 503 | 河洛/参评来源校验矛盾，不能靠改用户输入绕过，需保留输入与版本反馈维护者（`retryable=false`） |
 | `timeout` / `internal_error` | HTTP 504 / 500 | 服务端超时或未预期内部异常（`retryable=true`，可原参数有限重试并附诊断上下文） |
 | `usage_error` | CLI exit 2 | CLI 未知 flag、参数语法或 `--request-file` 读取错误（MCP 客户端注意 `raise_on_error=False` 读取结构化 `issues`） |
 
@@ -89,7 +89,7 @@ curl http://localhost:8011/health
 
 ## 占星与星历排查
 
-同时核对 `chart_profile.engine_backend`、`engine_precision`、`ephemeris_model` 与 `run_metadata.engine_is_approximate`。若 `swisseph` 可用但仍回退 Moshier，通常是未设置 `SE_EPHE_PATH`、CLI 未读取 `.env`，或 `SE_EPHE_PATH` 超过 242 编码字节被底层静默忽略；按[星历安装指南](ephemeris.md)修正路径并重启进程即可。
+同时核对 `chart_profile.engine_backend`、`engine_precision`、`ephemeris_model` 与 `run_metadata.engine_is_approximate`。若 `swisseph` 可用但仍回退 Moshier，通常是未设置 `SE_EPHE_PATH`（或独立安装工具未在启动环境注入）、或 `SE_EPHE_PATH` 超过 242 编码字节被底层静默忽略；按[星历安装指南](ephemeris.md)修正路径并重启进程即可。
 
 ## 输出分级与字段投影
 

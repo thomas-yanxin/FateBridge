@@ -21,7 +21,7 @@ from fatebridge.core.numerology.numerology_knowledge import (
     build_registry,
     read_reference,
 )
-from fatebridge.utils.errors import handle_calculation_error
+from fatebridge.utils.errors import calculation_guard
 
 
 def _validation_error_payload(error: ToolValidationError) -> dict[str, JsonValue]:
@@ -140,6 +140,7 @@ def _cached_registry(
     }
 
 
+@calculation_guard("知识目录")
 def calculate_knowledge_registry(
     *,
     domain: str | None = None,
@@ -157,10 +158,9 @@ def calculate_knowledge_registry(
         return deepcopy(_cached_registry(lookup_domain, keys_sample_limit))
     except ToolValidationError as exc:
         return _validation_error_payload(exc)
-    except Exception as exc:
-        return handle_calculation_error(exc, "知识目录")
 
 
+@calculation_guard("知识读取")
 def calculate_knowledge_read(
     *,
     domain: str,
@@ -210,5 +210,3 @@ def calculate_knowledge_read(
         return entry
     except ToolValidationError as exc:
         return _validation_error_payload(exc)
-    except Exception as exc:
-        return handle_calculation_error(exc, "知识读取")

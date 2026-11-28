@@ -26,11 +26,19 @@ try:
 except ImportError:
     pass
 
+from fatebridge.core.astro.cartesian import (
+    Matrix,
+    Vector,
+    add,
+    cross,
+    dot,
+    madd,
+    mm,
+    mv,
+    transpose,
+)
 from fatebridge.core.astro.nutation import nutation
 from fatebridge.core.astro.tt_epoch import TTInstant
-
-Vector = tuple[float, ...]
-Matrix = tuple[Vector, ...]
 
 NATIVE_TROPICAL_MODEL = "vondrak_scalar_obliquity_full_simon77_iau2006_bias_v1"
 
@@ -58,30 +66,6 @@ DATA: ReferenceFrameParameters = json.loads(COEFFICIENT_BYTES)
 AS2R = math.pi / 648000.0
 
 
-def dot(a: Sequence[float], b: Sequence[float]) -> float:
-    return math.fsum(x * y for x, y in zip(a, b))
-
-
-def cross(a: Sequence[float], b: Sequence[float]) -> Vector:
-    return (
-        a[1] * b[2] - a[2] * b[1],
-        a[2] * b[0] - a[0] * b[2],
-        a[0] * b[1] - a[1] * b[0],
-    )
-
-
-def add(a: Sequence[float], b: Sequence[float]) -> Vector:
-    return tuple(x + y for x, y in zip(a, b))
-
-
-def transpose(a: Sequence[Sequence[float]]) -> Matrix:
-    return tuple(zip(*a))
-
-
-def mv(a: Sequence[Sequence[float]], v: Sequence[float]) -> Vector:
-    return tuple(dot(row, v) for row in a)
-
-
 def rotate_spherical(
     matrix: Matrix, longitude: float, latitude: float
 ) -> tuple[float, float]:
@@ -98,15 +82,6 @@ def rotate_spherical(
         longitude_degrees,
         math.degrees(math.atan2(z, math.hypot(x, y))),
     )
-
-
-def mm(a: Sequence[Sequence[float]], b: Sequence[Sequence[float]]) -> Matrix:
-    columns = transpose(b)
-    return tuple(tuple(dot(row, column) for column in columns) for row in a)
-
-
-def madd(a: Sequence[Sequence[float]], b: Sequence[Sequence[float]]) -> Matrix:
-    return tuple(add(x, y) for x, y in zip(a, b))
 
 
 def pair(

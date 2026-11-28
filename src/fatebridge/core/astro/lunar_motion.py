@@ -21,9 +21,9 @@ from fatebridge.core.astro.aberration_math import (
 )
 from fatebridge.core.astro.aberration_math import (
     aberration_position_jvp,
-    dot,
     longitude_rate_change,
 )
+from fatebridge.core.astro.cartesian import dot
 from fatebridge.core.astro.lunar_observer import lunar_observer_remainder
 from fatebridge.core.astro.native_identity import binding_distribution_version
 from fatebridge.core.astro.physical_sources import (

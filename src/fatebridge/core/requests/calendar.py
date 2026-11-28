@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pydantic import Field, field_validator, model_validator
 
-from fatebridge.core.requests.base import FateBridgeBaseRequest
+from fatebridge.core.requests.base import FateBridgeBaseRequest, apply_place_location
 from fatebridge.utils.coordinates import parse_geo_coordinate
 
 
@@ -42,23 +42,7 @@ class LocalLocationFields(FateBridgeBaseRequest):
 
     @model_validator(mode="after")
     def _resolve_local_place(self) -> "LocalLocationFields":
-        place_text = (self.place or "").strip()
-        if not place_text or place_text == "未提供":
-            return self
-        need_lon = self.longitude is None or "longitude" not in self.model_fields_set
-        need_lat = self.latitude is None or "latitude" not in self.model_fields_set
-        need_tz = self.timezone is None or "timezone" not in self.model_fields_set
-        if not (need_lon or need_lat or need_tz):
-            return self
-        from fatebridge.utils.places import resolve_place_location
-
-        resolved = resolve_place_location(place_text, place_field="place")
-        if need_lon:
-            self.longitude = resolved.longitude
-        if need_lat:
-            self.latitude = resolved.latitude
-        if need_tz and resolved.timezone is not None:
-            self.timezone = resolved.timezone
+        apply_place_location(self)
         return self
 
     def service_inputs(self) -> dict[str, object]:

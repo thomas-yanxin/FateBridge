@@ -183,7 +183,7 @@ DIAOHOU_TABLE: dict[str, dict[str, tuple[str, tuple[str, ...]]]] = {
         "丑": ("丙", ("辛",)),
     },
 }
-DIAOHOU_TABLE["壬"]["酉"] = ("甲", ("庚",))  # type: ignore[assignment]
+DIAOHOU_TABLE["壬"]["酉"] = ("甲", ("庚",))
 
 
 def seasonal_climate_god(

@@ -15,9 +15,8 @@ from fatebridge.core.astro.aberration_math import (
     aberration_beta_jvp,
     aberration_position,
     aberration_position_jvp,
-    dot,
 )
-from fatebridge.core.astro.cartesian import CartesianMotion, CartesianState
+from fatebridge.core.astro.cartesian import CartesianMotion, CartesianState, dot
 from fatebridge.core.astro.de441_source import SourceKinematics, mean_j2000_state
 from fatebridge.core.astro.light_cone import solve_light_cone
 from fatebridge.core.astro.solar_deflection import finite_source_solar_deflection

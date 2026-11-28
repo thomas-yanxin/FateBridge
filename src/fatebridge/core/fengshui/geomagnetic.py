@@ -7,7 +7,7 @@ from datetime import date, datetime
 from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
-from typing import Literal, cast
+from typing import Literal
 
 from pydantic import JsonValue, TypeAdapter
 from typing_extensions import TypedDict
@@ -24,11 +24,18 @@ from fatebridge.core.geomagnetic_field import (
 )
 
 
-class _GeomagneticData(TypedDict):
+class _WmmData(TypedDict):
     ruleset: dict[str, JsonValue]
     model_header: list[JsonValue]
     degree: int
-    coefficients: list[list[JsonValue]]
+    coefficients: list[WmmCoefficient]
+
+
+class _IgrfData(TypedDict):
+    ruleset: dict[str, JsonValue]
+    model_header: list[JsonValue]
+    degree: int
+    coefficients: list[IgrfCoefficient]
 
 
 @lru_cache(maxsize=1)
@@ -37,9 +44,8 @@ def _wmm_bundle() -> tuple[
     tuple[WmmCoefficient, ...],
 ]:
     path = Path(__file__).parents[2] / "data/fengshui/geomagnetic-wmm2025-v1.json"
-    data = TypeAdapter(_GeomagneticData).validate_json(path.read_bytes())
-    coeffs = tuple(cast(WmmCoefficient, tuple(row)) for row in data["coefficients"])
-    return data["model_header"], coeffs
+    data = TypeAdapter(_WmmData).validate_json(path.read_bytes())
+    return data["model_header"], tuple(data["coefficients"])
 
 
 @lru_cache(maxsize=1)
@@ -48,19 +54,8 @@ def _igrf_bundle() -> tuple[
     tuple[IgrfCoefficient, ...],
 ]:
     path = Path(__file__).parents[2] / "data/fengshui/geomagnetic-igrf14-v1.json"
-    data = TypeAdapter(_GeomagneticData).validate_json(path.read_bytes())
-    coeffs = tuple(
-        (
-            int(cast(int, row[0])),
-            int(cast(int, row[1])),
-            tuple(float(v) for v in cast(list[float], row[2])),
-            tuple(float(v) for v in cast(list[float], row[3])),
-            float(cast(float, row[4])),
-            float(cast(float, row[5])),
-        )
-        for row in data["coefficients"]
-    )
-    return data["model_header"], coeffs
+    data = TypeAdapter(_IgrfData).validate_json(path.read_bytes())
+    return data["model_header"], tuple(data["coefficients"])
 
 
 def _select_model(model_id: str, year: float) -> Literal["wmm2025_v1", "igrf14_v1"]:
@@ -83,7 +78,7 @@ def geomagnetic_reference(
     req: GeomagneticReference,
     bearing_degrees: float | None = None,
     north_reference: Literal["magnetic", "true"] | None = None,
-) -> dict[str, JsonValue]:
+) -> dict[str, object]:
     year = req.year_value()
     chosen = _select_model(req.model_id, year)
     if chosen == "wmm2025_v1":
@@ -137,7 +132,7 @@ def geomagnetic_reference(
         if pole
         else "magnetic_blackout" if zone == "blackout" else None
     )
-    conversion: dict[str, JsonValue] = {
+    conversion: dict[str, object] = {
         "status": "unavailable" if unavailable else "not_requested",
         "unavailable_reason": unavailable,
         "candidate": None,

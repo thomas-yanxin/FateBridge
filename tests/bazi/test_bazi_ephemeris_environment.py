@@ -14,9 +14,9 @@ from fatebridge.core import ephemeris_runtime as runtime
 from fatebridge.core.bazi import calendar, timing
 from fatebridge.core.bazi.calendar import BaZiCalendar
 from fatebridge.core.bazi.timing import TimingAnalysis
+from tests.fixtures.bazi_year_cases import TOPICS
 from tests.support.transports import SPECS, business, call_cli, inputs, native
 from tests.support.transports import rest as _shared_rest
-from tests.unit_test.fixtures.bazi_year_cases import TOPICS
 
 
 def clear_solar_caches() -> None:

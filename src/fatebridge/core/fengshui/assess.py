@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Any
 
 from fatebridge.core.fengshui.bazhai import placement_application
-from fatebridge.core.fengshui.directions import raw_rule_data
+from fatebridge.core.fengshui.directions import AnnualStarInfo, raw_rule_data
 from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.hexagram_relations import ELEMENT_CONTROLS, ELEMENT_GENERATES
 
@@ -67,7 +68,9 @@ def analyze_layout(req: AssessRequest, layers: dict[str, Any]) -> dict[str, Any]
                 )
             )
 
-    def add_element(entry: dict[str, Any], star: dict[str, Any]) -> None:
+    def add_element(
+        entry: dict[str, Any], star: AnnualStarInfo | Mapping[str, Any]
+    ) -> None:
         elements.append(
             {
                 "object_id": entry["object_id"],

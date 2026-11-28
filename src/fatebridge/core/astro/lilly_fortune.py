@@ -18,7 +18,7 @@ from fatebridge.core.astro.geometry import (
 )
 from fatebridge.core.astro.lilly import SIGNS, dignity_at
 from fatebridge.core.astro.lilly_house_assignment import assign_from_cusps
-from fatebridge.core.astro.lilly_star_orbs import STELLAR_ORB_DEGREES
+from fatebridge.core.astro.lilly_orbs import STELLAR_ORB_DEGREES
 from fatebridge.core.classical_western import combustion_state
 
 ROW_SPECS = (

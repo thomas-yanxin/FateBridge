@@ -8,7 +8,7 @@ from fatebridge.application.bindings import (
     request_model_ref,
     service_ref,
 )
-from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.application.tool_spec import BatchInputPolicy, ToolSpec
 from fatebridge.core.reproducibility import ReproducibilityPolicy
 
 _ZIWEI_REQ = "fatebridge.core.requests.ziwei"
@@ -29,6 +29,7 @@ SPECS: list[ToolSpec] = [
         name="ziwei_birth_chart",
         bind=bind_person(calculate_ziwei_birth, also_pass=("birth_utc_offset",)),
         request_model_loader=request_model_ref(_ZIWEI_REQ, "ZiweiBirthRequest"),
+        required_output_fields=("ziwei_birth",),
         summary="紫微斗数本命盘（支持三合/中州/全书/飞星流派、天地人三盘、12宫飞星四化矩阵、来因宫、子斗及36项古典格局）。",
         operation_label_zh="紫微命盘",
         family="metaphysics",
@@ -42,11 +43,13 @@ SPECS: list[ToolSpec] = [
             "ziwei_birth.calendar_basis",
             "ziwei_birth.calendar_cycles.year_branch_cycles",
         ),
+        batch_policy=BatchInputPolicy(subject_mode="birth_fields"),
     ),
     ToolSpec(
         name="ziwei_timing",
         bind=bind_person(calculate_ziwei_horoscope, also_pass=("birth_utc_offset",)),
         request_model_loader=request_model_ref(_ZIWEI_REQ, "ZiweiHoroscopeRequest"),
+        required_output_fields=("ziwei_horoscope",),
         summary="紫微斗数运限（大限/童限/小限/流年/流月/流日/流时、流年斗君、及可选大限/流年/流月批量列表）。",
         operation_label_zh="紫微运限",
         family="metaphysics",
@@ -76,11 +79,13 @@ SPECS: list[ToolSpec] = [
                 "analysis_minute",
             )
         ),
+        batch_policy=BatchInputPolicy(subject_mode="birth_fields"),
     ),
     ToolSpec(
         name="ziwei_rules",
         bind=bind_kwargs(calculate_ziwei_rules),
         request_model_loader=request_model_ref(_ZIWEI_REQ, "ZiweiRulesRequest"),
+        required_output_fields=("rule_catalogue",),
         summary="紫微斗数规则查表：按年干与流派返回四化及格局目录。",
         operation_label_zh="紫微规则",
         family="metaphysics",

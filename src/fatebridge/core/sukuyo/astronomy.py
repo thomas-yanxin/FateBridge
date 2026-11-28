@@ -8,8 +8,11 @@ from typing import Any
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import AstroBirthInfo
+from fatebridge.core.astro.lunar_mansions import (
+    mansion_at,
+    seven_luminary_mansion_positions,
+)
 from fatebridge.core.astro.native_coordinates import COORDINATE_FLAGS
-from fatebridge.core.guolao.guolao import mansion_at, positions
 from fatebridge.utils.errors import EphemerisSourceError
 
 METHOD = "modern_equatorial_research_anchors_v1"
@@ -99,7 +102,7 @@ def build_equatorial_mansions(birth: AstroBirthInfo) -> dict[str, Any]:
         raise ModuleNotFoundError(
             "天文不等宽宿度需要Swiss Ephemeris；不静默降级为等分示意。"
         )
-    raw = positions(
+    raw = seven_luminary_mansion_positions(
         birth,
         hsys=0,
         zodiacal=0,

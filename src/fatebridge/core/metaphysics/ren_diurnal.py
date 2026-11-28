@@ -7,9 +7,10 @@ from typing import Any, Literal
 
 import swisseph as swe
 
-from fatebridge.core.ephemeris_runtime import ephemeris_call
+from fatebridge.core.ephemeris_runtime import ephemeris_call, native_ephemeris_errors
 from fatebridge.utils.civil_time import utc_calendar
 from fatebridge.utils.data import EARTHLY_BRANCHES
+from fatebridge.utils.errors import EphemerisSourceError
 
 DAY_BRANCHES = "卯辰巳午未申"
 DiurnalMode = Literal["clock", "sunrise_sunset"]
@@ -37,7 +38,9 @@ def _latest_solar_event(
                 if rc2 == 0 and float(tret2[0]) <= jd_ut:
                     return float(tret2[0])
             return t1
-        except Exception:
+        except EphemerisSourceError:
+            raise
+        except native_ephemeris_errors(swe):
             continue
     return None
 

@@ -15,6 +15,7 @@ from typing import Any
 from mpmath import mp  # type: ignore[import-untyped]
 
 from fatebridge.core.astro.astrology_tables import (
+    CHALDEAN_ORDER,
     DOMICILE_RULERS,
     EGYPTIAN_BOUNDS_BY_SIGN,
     ELEMENT_BY_SIGN,
@@ -102,7 +103,7 @@ TRADITIONAL_PLANETS = frozenset(
 
 # Traditional ponderosity, not instantaneous angular-speed ranking. Lilly's
 # p.111 translator is lighter than both endpoints; p.126 collector is heavier.
-LIGHT_WEIGHT_ORDER = ("Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon")
+LIGHT_WEIGHT_ORDER = CHALDEAN_ORDER
 
 # Lilly 1647 p.113 definitions: cazimi 17', same-sign combustion 8.5°, beams 17°.
 # The page's Sun18/planet28 example contradicts its 8.5° definition and remains
@@ -415,10 +416,6 @@ def dignity_lords_at(
         "term": bound_lord(sign, degree_in_sign),
         "face": face_lord(sign, degree_in_sign),
     }
-
-
-# Chaldean (slowest-first) order — the deterministic tie-break for any almuten.
-CHALDEAN_ORDER = ["Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon"]
 
 
 def _almuten_winner(totals: dict[str, int]) -> str | None:

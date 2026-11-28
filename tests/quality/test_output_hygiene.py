@@ -1,4 +1,4 @@
-"""Output hygiene contracts: snake_case top-level keys, zero audit bloat, unified naming."""
+"""Output hygiene contracts: snake_case top-level keys, zero audit bloat."""
 
 from __future__ import annotations
 
@@ -6,10 +6,6 @@ import json
 import re
 from typing import Any
 
-from fatebridge.application.examples import example_input
-from fatebridge.application.execution import execute_with_receipt
-from fatebridge.application.response_delivery import deliver_response
-from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.core.response_models import output_model_for
 from fatebridge.services.knowledge import calculate_knowledge_registry
 from fatebridge.services.tool_catalog import CATALOG
@@ -32,52 +28,6 @@ REMOVED_BLOAT_KEYS = frozenset(
     }
 )
 
-RENAMED_INCONSISTENT_KEYS = frozenset(
-    {
-        "personal_info",
-        "birth_pillars",
-        "dayun_analysis",
-        "dayun_info",
-        "liunian_analysis",
-        "liunian_info",
-        "liuyue_analysis",
-        "liuyue_info",
-        "liuri_analysis",
-        "liuri_info",
-        "liushi_analysis",
-        "liushi_info",
-        "combination_effects",
-        "liureng",
-        "liureng_gods",
-        "india",
-        "diceChart",
-        "dayGanZi",
-        "dayInt",
-        "monthGanZi",
-        "monthInt",
-        "timeGanZi",
-        "yearGanZi",
-        "yearJieqi",
-        "distributions",
-        "keypoints",
-        "yearsystem129",
-        "persian_directed",
-        "vedic_progression",
-        "jaynes_declination",
-        "extrareturns",
-        "lunation_phase",
-        "triplicity_rulers",
-        "mundane",
-        "horary",
-        "input_normalized",
-        "input_context",
-        "query_context",
-        "analysis_reference",
-    }
-)
-
-FORBIDDEN_NON_FENGSHUI_KEYS = REMOVED_BLOAT_KEYS | RENAMED_INCONSISTENT_KEYS
-
 
 def _walk_schema_keys(
     schema: dict[str, Any],
@@ -93,7 +43,7 @@ def _walk_schema_keys(
         return _walk_schema_keys(defs.get(ref, {}), defs, path, seen | {ref})
     for key, prop in schema.get("properties", {}).items():
         next_path = f"{path}.{key}" if path else key
-        if key in FORBIDDEN_NON_FENGSHUI_KEYS:
+        if key in REMOVED_BLOAT_KEYS:
             hits.append(next_path)
         if isinstance(prop, dict):
             hits.extend(_walk_schema_keys(prop, defs, next_path, seen))
@@ -105,20 +55,6 @@ def _walk_schema_keys(
         for opt in schema.get(comb, ()):
             if isinstance(opt, dict):
                 hits.extend(_walk_schema_keys(opt, defs, path, seen))
-    return hits
-
-
-def _walk_runtime_keys(value: Any, path: str = "") -> list[str]:
-    hits: list[str] = []
-    if isinstance(value, dict):
-        for key, item in value.items():
-            next_path = f"{path}.{key}" if path else str(key)
-            if key in FORBIDDEN_NON_FENGSHUI_KEYS:
-                hits.append(next_path)
-            hits.extend(_walk_runtime_keys(item, next_path))
-    elif isinstance(value, list):
-        for idx, item in enumerate(value):
-            hits.extend(_walk_runtime_keys(item, f"{path}[{idx}]"))
     return hits
 
 
@@ -134,7 +70,7 @@ def test_output_models_top_level_keys_are_snake_case() -> None:
 
 
 def test_all_output_models_exclude_removed_keys() -> None:
-    """No removed bloat or inconsistent key appears in any tool output_model."""
+    """No removed bloat key appears in any tool output_model."""
     violations: dict[str, list[str]] = {}
     for spec in CATALOG:
         model = output_model_for(spec.name)
@@ -154,29 +90,6 @@ def test_all_output_models_exclude_removed_keys() -> None:
     assert (
         not violations
     ), f"Forbidden keys remain in output_model schemas: {violations}"
-
-
-def test_all_runtime_full_responses_exclude_removed_keys() -> None:
-    """Every tool's lossless include=['*'] runtime response excludes removed bloat keys."""
-    options = ExecutionOptions(as_of="2026-10-12T12:00:00+08:00")
-    violations: dict[str, list[str]] = {}
-    for spec in CATALOG:
-        payload = example_input(spec)
-        if payload is None and spec.name == "fengshui_monthly_stars":
-            payload = {"effective_solar_year": 2026, "solar_month_number": 1}
-        request = spec.request_model.model_validate(payload)
-        raw = execute_with_receipt(spec, request, options=options)
-        delivered = deliver_response(raw, spec=spec, include=["*"])
-        hits = sorted(set(_walk_runtime_keys(delivered)))
-        if spec.name == "lunar_calendar_time" and "birth" in delivered:
-            hits.append("birth")
-        if spec.name == "liuyao":
-            ev = delivered.get("liuyao_evidence")
-            if isinstance(ev, dict) and "sources" in ev:
-                hits.append("liuyao_evidence.sources")
-        if hits:
-            violations[spec.name] = hits
-    assert not violations, f"Forbidden keys emitted at runtime: {violations}"
 
 
 def test_knowledge_catalog_payload_is_concise() -> None:

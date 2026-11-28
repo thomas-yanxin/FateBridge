@@ -22,6 +22,7 @@ from fatebridge.core.astro.analytic_observer import (
     LIGHT_TIME_METHOD,
     AnalyticObserver,
 )
+from fatebridge.core.astro.cartesian import madd, mm, mv
 from fatebridge.core.astro.de441_source import (
     SOURCE_VERSION as PLANETARY_SOURCE_VERSION,
 )
@@ -38,9 +39,6 @@ from fatebridge.core.astro.nutation import nutation
 from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
 from fatebridge.core.astro.reference_frames import (
     ecliptic_rotation,
-    madd,
-    mm,
-    mv,
     pair,
     precession,
 )

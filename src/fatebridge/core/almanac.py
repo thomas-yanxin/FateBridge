@@ -353,6 +353,25 @@ def _lunar_date_from_solar(solar_date: date) -> _LunarDateValue:
     raise ValueError("农历日期超出当年月份表")
 
 
+def fast_lunar_dict(solar_date: date) -> dict[str, Any]:
+    """Convert a Gregorian date to a lunar dict without solar-term ephemeris."""
+    if (
+        solar_date < LUNAR_SUPPORTED_SOLAR_START
+        or solar_date > LUNAR_SUPPORTED_SOLAR_END
+    ):
+        raise ValueError(
+            f"农历换算仅支持公历 {LUNAR_SUPPORTED_SOLAR_START.isoformat()} "
+            f"至 {LUNAR_SUPPORTED_SOLAR_END.isoformat()}，收到 {solar_date.isoformat()}"
+        )
+    lunar = _lunar_date_from_solar(solar_date)
+    return {
+        "year": lunar.year,
+        "month": lunar.month,
+        "day": lunar.day,
+        "is_leap_month": lunar.isLeapMonth,
+    }
+
+
 DAY_GANZHI_JDN_OFFSET = 49
 
 

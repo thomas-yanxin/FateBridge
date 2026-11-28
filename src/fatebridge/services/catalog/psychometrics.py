@@ -43,7 +43,7 @@ SPECS: list[ToolSpec] = [
         name="ipip_big_five",
         bind=bind_kwargs(calculate_ipip_big_five),
         request_model_loader=request_model_ref(
-            "fatebridge.core.psychometrics.ipip_big_five", "IpipBigFiveRequest"
+            "fatebridge.core.requests.psychometrics", "IpipBigFiveRequest"
         ),
         required_output_fields=("mode", "scale_id", "provenance", "summary"),
         required_output_validator=_validate_ipip_output,

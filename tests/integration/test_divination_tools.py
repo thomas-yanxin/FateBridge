@@ -1,12 +1,10 @@
 import pytest
 
-from fatebridge.core.ephemeris_runtime import swe
-from fatebridge.core.local_techniques.chart import (
-    _build_local_chart_response,
-    _normalize_date_text,
-    _normalize_time_text,
+from fatebridge.core.astro.local_chart import (
+    build_local_chart_response as _build_local_chart_response,
 )
-from fatebridge.core.local_techniques.sixyao import build_sixyao_result
+from fatebridge.core.ephemeris_runtime import swe
+from fatebridge.core.liuyao.sixyao import build_sixyao_result
 from fatebridge.core.public_output import public_payload
 from fatebridge.services.divination import (
     calculate_gua_lookup,
@@ -17,6 +15,8 @@ from fatebridge.services.divination import (
     calculate_suzhan_analysis,
     calculate_tongshefa_analysis,
 )
+from fatebridge.utils.civil_time import normalize_date_text as _normalize_date_text
+from fatebridge.utils.civil_time import normalize_time_text as _normalize_time_text
 from tests.fixtures.transports import mcp_payload
 from tests.support.transports import SPECS, business, rest, surface_calls
 
@@ -396,7 +396,7 @@ def test_calculate_sixyao_coin_requires_six_tosses() -> None:
 
 def test_build_sixyao_result_raises_on_invalid_coins() -> None:
     """核心层（无守卫）对非法摇钱输入直接 fail-loud。"""
-    from fatebridge.core.local_techniques.sixyao import build_sixyao_result
+    from fatebridge.core.liuyao.sixyao import build_sixyao_result
 
     with pytest.raises(ValueError):
         build_sixyao_result(
@@ -571,6 +571,20 @@ def test_calculate_suzhan_analysis_applies_chart_modes_to_offline_output() -> No
     assert not any(
         item["id"] == "Uranus" for item in adjusted_result["chart"]["objects"]
     )
+    assert [item["id"] for item in adjusted_result["chart"]["objects"]] == [
+        "Sun",
+        "Moon",
+        "Mercury",
+        "Venus",
+        "Mars",
+        "Jupiter",
+        "Saturn",
+    ]
+    assert adjusted_result["validation"]["chart_source"] == {
+        "classical_acceptance_passed": False,
+        "full_marks_established": False,
+        "limitations": [],
+    }
     assert (
         default_result["chart"]["houses"][0]["lon"]
         != adjusted_result["chart"]["houses"][0]["lon"]
@@ -1130,7 +1144,7 @@ def test_local_offline_golden_samples_match_current_contract() -> None:
 
 
 def test_tongshefa_composes_all_hexagrams_in_lower_to_upper_order() -> None:
-    from fatebridge.core.local_techniques import tongshefa as _t
+    from fatebridge.core.meihua import tongshefa as _t
 
     names = ["乾", "兑", "离", "震", "巽", "坎", "艮", "坤"]
     codes = set()

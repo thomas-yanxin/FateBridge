@@ -8,7 +8,7 @@ from fatebridge import fetch_ephe
 from fatebridge.core import ephemeris_installation as install
 from fatebridge.core import ephemeris_runtime
 from fatebridge.core.fengshui.models import HousePeriod
-from tests.fixtures.ephemeris_manifest import manifest_for_payloads
+from tests.support.ephemeris_context import manifest_for_payloads
 
 
 @pytest.fixture

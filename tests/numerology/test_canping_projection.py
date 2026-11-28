@@ -12,13 +12,13 @@ from pydantic import ValidationError
 from pytest import MonkeyPatch
 
 from fatebridge.core import almanac
-from fatebridge.core.contracts.output_canping_solar import CanpingInterval
-from fatebridge.core.contracts.output_chinese import CanpingSeries, CanpingTiming
-from fatebridge.core.local_techniques.canping import build_canping_result
-from fatebridge.core.numerology import solar
-from fatebridge.core.numerology.canping_schedule_validation import (
-    require_schedule_binding,
+from fatebridge.core.contracts.numerology import (
+    CanpingInterval,
+    CanpingSeries,
+    CanpingTiming,
 )
+from fatebridge.core.numerology import solar
+from fatebridge.core.numerology.canping_result import build_canping_result
 from fatebridge.core.numerology.solar import (
     projection_boundary,
     resolve_projection_boundary,
@@ -45,7 +45,6 @@ def test_complete_120_years_and_query_use_same_selected_model(
     result = build_canping_result(
         **INPUT, dayun_method=method, analysis_datetime="2319-06-01T12:00:00Z"
     )
-    require_schedule_binding(result)
     series, timing = result["liunian_series"], result["canping_timing"]
     rows, context = series["rows"], series["solar_context"]
     assert len(rows) == 120

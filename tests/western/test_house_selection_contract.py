@@ -12,9 +12,9 @@ from fatebridge.utils.house_systems import (
     normalize_house_system,
     parse_house_code,
 )
-from tests.unit_test.fixtures.house_system import HOUSE_CODE_SPECS as CODE_SPECS
-from tests.unit_test.fixtures.house_system import HOUSE_SYSTEM_SPECS as HOUSE_SPECS
-from tests.unit_test.fixtures.house_system import house_system_payload as inputs
+from tests.fixtures.house_system import HOUSE_CODE_SPECS as CODE_SPECS
+from tests.fixtures.house_system import HOUSE_SYSTEM_SPECS as HOUSE_SPECS
+from tests.fixtures.house_system import house_system_payload as inputs
 
 
 @pytest.mark.parametrize(

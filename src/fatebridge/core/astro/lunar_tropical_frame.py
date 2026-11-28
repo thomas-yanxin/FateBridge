@@ -14,7 +14,7 @@ from collections.abc import Sequence
 from importlib.metadata import version
 from typing import Any
 
-from fatebridge.core.astro import reference_frames, runtime
+from fatebridge.core.astro import cartesian, reference_frames, runtime
 from fatebridge.core.astro.native_identity import binding_distribution_version
 from fatebridge.core.astro.nutation import nutation
 from fatebridge.utils.errors import EphemerisSourceError
@@ -102,9 +102,7 @@ def complete_lunar_tropical_rate(
     if max(model_errors + position_errors) > MODEL_POSITION_LINE_ARCSEC:
         return unavailable("declared_native_frame_not_reproduced")
     mean, derivative = reference_frames.mean_ecliptic_frame(epoch)
-    moving = reference_frames.mv(
-        reference_frames.mm(derivative, reference_frames.transpose(mean)), p
-    )
+    moving = cartesian.mv(cartesian.mm(derivative, cartesian.transpose(mean)), p)
     source_rate = (p[0] * v[1] - p[1] * v[0]) / rho2 * DEG
     frame_rate = (p[0] * moving[1] - p[1] * moving[0]) / rho2 * DEG
     complete = math.fsum((source_rate, frame_rate, psi_d))

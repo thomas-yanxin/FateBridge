@@ -6,12 +6,21 @@ from functools import partial
 from typing import TYPE_CHECKING
 
 from fatebridge.application.bindings import bind_request, service_ref
-from fatebridge.application.domain_validators import detect_fengshui_approximate
-from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.application.tool_spec import BatchInputPolicy, ServiceResult, ToolSpec
 from fatebridge.core.reproducibility import ReproducibilityPolicy
 
 if TYPE_CHECKING:
     from pydantic import BaseModel
+
+
+def detect_fengshui_approximate(record: ServiceResult) -> bool:
+    """Identify a degraded Feng Shui solar-term computation record."""
+    return (
+        record.get("approximate") is True
+        and isinstance(record.get("provider"), str)
+        and isinstance(record.get("moment"), str)
+        and "precision_scope" in record
+    )
 
 
 def _load_fengshui_model(model_name: str) -> type[BaseModel]:
@@ -144,12 +153,26 @@ def _build_fengshui_specs() -> list[ToolSpec]:
         ),
     ):
         tool_name = f"fengshui_{public_name}"
+        if public_name == "minggua":
+            batch_policy = BatchInputPolicy(subject_mode="exclusive_birth_record")
+        elif public_name in {"bazhai", "assess"}:
+            batch_policy = BatchInputPolicy(
+                subject_mode="subject_list", list_field="occupants"
+            )
+        else:
+            batch_policy = BatchInputPolicy()
+        required_output_fields = (
+            ("status", "coverage")
+            if public_name == "assess"
+            else ("status", "layers", "coverage")
+        )
         specs.append(
             ToolSpec(
                 name=tool_name,
                 bind=bind_request(service_ref("fatebridge.services.fengshui", service)),
                 request_model_loader=partial(_load_fengshui_model, req_model),
                 output_model_loader=partial(_load_fengshui_model, out_model),
+                required_output_fields=required_output_fields,
                 summary=summary,
                 operation_label_zh=label,
                 family="fengshui",
@@ -158,6 +181,7 @@ def _build_fengshui_specs() -> list[ToolSpec]:
                 default_omit=default_omit,
                 reproducibility=ReproducibilityPolicy(),
                 approximate_record=detect_fengshui_approximate,
+                batch_policy=batch_policy,
             )
         )
     return specs

@@ -11,10 +11,10 @@ from typing import Any
 
 from fatebridge.core.astro.birth_clock import SOLAR_BASES, resolve_solar_epoch
 from fatebridge.core.astro.iers_ut1 import ut1_reference
+from fatebridge.core.astro.native_chart import NativeSubject, build_native_subject
 from fatebridge.core.astro.solar_sources import SunSourceCohort
 from fatebridge.core.astro.source_session import source_session
-from fatebridge.core.predictive._common import build_subject
-from fatebridge.core.predictive.native_chart import NativeSubject
+from fatebridge.core.ephemeris_runtime import swe
 from fatebridge.utils.errors import EphemerisSourceError
 
 METHOD = "fatebridge.western_event_clock.v1"
@@ -101,7 +101,9 @@ def build_event_subject(
                     > 0.0002
                 ):
                     raise EphemerisSourceError("event_clock_source_mismatch")
-        subject = build_subject(
+        if swe is None:
+            raise ModuleNotFoundError("Swiss Ephemeris 未安装，无法启用西占推运能力。")
+        subject = build_native_subject(
             name=name,
             **(
                 {"physical_epoch": epoch}

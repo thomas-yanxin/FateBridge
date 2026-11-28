@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge import fetch_ephe
-from tests.fixtures.ephemeris_manifest import manifest_for_payloads
+from tests.support.ephemeris_context import manifest_for_payloads
 
 
 def _stub_manifest(monkeypatch: pytest.MonkeyPatch, payload: bytes) -> None:

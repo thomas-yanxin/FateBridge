@@ -13,7 +13,7 @@ from fastmcp import Client
 import fatebridge.api as api
 from fatebridge.application.examples import suggested_fields
 from fatebridge.cli import run
-from fatebridge.core.contracts.output_chinese import Taiyi
+from fatebridge.core.contracts.taiyi import Taiyi
 from fatebridge.core.ephemeris_runtime import ephemeris_call
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.divination import calculate_sanshiunited_analysis

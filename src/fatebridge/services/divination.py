@@ -14,23 +14,18 @@ from fatebridge.core.almanac import (
     build_calendar_context,
     get_day_ganzhi,
 )
+from fatebridge.core.astro.otherbu import build_otherbu_result
 from fatebridge.core.bazi.calendar import BaZiCalendar
 from fatebridge.core.divination import build_meihua_interpretation, lookup_gua
+from fatebridge.core.heluo.heluo import build_heluo_result
 from fatebridge.core.heluo.judgment import (
     DEFAULT_MONTH_ASSIGNMENT,
     MonthAssignmentMethod,
 )
-from fatebridge.core.local_techniques.canping import build_canping_result
-from fatebridge.core.local_techniques.heluo import build_heluo_result
-from fatebridge.core.local_techniques.otherbu import build_otherbu_result
-from fatebridge.core.local_techniques.sanshi import build_sanshiunited_result
-from fatebridge.core.local_techniques.sixyao import build_sixyao_result
-from fatebridge.core.local_techniques.suzhan import build_suzhan_result
-from fatebridge.core.local_techniques.tongshefa import build_tongshefa_result
+from fatebridge.core.liuyao.sixyao import build_sixyao_result
 from fatebridge.core.meihua.casting import (
     MeihuaUnspecifiedClockError,
     apply_clock_input_notice,
-    clock_components,
     resolve_meihua_cast_datetime,
     resolve_meihua_clock,
 )
@@ -40,6 +35,7 @@ from fatebridge.core.meihua.texts import (
     solar_reference_notice,
     solar_term_date_reference,
 )
+from fatebridge.core.meihua.tongshefa import build_tongshefa_result
 from fatebridge.core.meihua.topics import (
     apply_day_qi,
     apply_external_omens,
@@ -54,6 +50,8 @@ from fatebridge.core.meihua.topics import (
     apply_trigram_relation_symbols,
 )
 from fatebridge.core.metaphysics.ren_gods import DEFAULT_GUIREN_PROFILE, GuirenProfile
+from fatebridge.core.metaphysics.sanshi import build_sanshiunited_result
+from fatebridge.core.numerology.canping_result import build_canping_result
 from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
 from fatebridge.core.sukuyo.calendar import _basis_parameters as basis_parameters
 from fatebridge.core.sukuyo.calendar import calendar_mansion
@@ -62,6 +60,7 @@ from fatebridge.core.sukuyo.sanjiu import (
     candidate_relation_analysis,
     relation_between_su27,
 )
+from fatebridge.core.sukuyo.suzhan import build_suzhan_result
 from fatebridge.core.sukuyo.texts import (
     joint_reconstruction_contract,
     palace_reference,
@@ -124,7 +123,6 @@ def calculate_meihua_analysis(
     observation_context: dict[str, Any] | None = None,
     response_context: dict[str, Any] | None = None,
     reputation_context: dict[str, Any] | None = None,
-    _clock_supplied_components: list[str] | None = None,
 ) -> dict[str, Any]:
     """
     梅花时卦分析工具 - 按指定时刻生成本卦、变卦、互卦、错卦、综卦与体用关系。
@@ -157,9 +155,6 @@ def calculate_meihua_analysis(
             [{"path": "analysis_second", "code": "invalid_civil_second"}],
         ).as_result()
 
-    supplied_clock = clock_components(
-        analysis_minute, analysis_second, _clock_supplied_components
-    )
     analysis_datetime = datetime(
         analysis_year,
         analysis_month,
@@ -173,13 +168,9 @@ def calculate_meihua_analysis(
             analysis_datetime,
             timezone_name,
             analysis_utc_offset,
-            seconds_supplied="second" in supplied_clock,
-            minute_supplied="minute" in supplied_clock,
-            component_provenance=(
-                "bound_request_model_fields_set"
-                if _clock_supplied_components is not None
-                else "direct_service_optional_components"
-            ),
+            seconds_supplied=analysis_second is not None,
+            minute_supplied=analysis_minute is not None,
+            component_provenance="direct_service_optional_components",
         )
     except MeihuaUnspecifiedClockError as error:
         return ParameterError(

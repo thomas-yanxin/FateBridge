@@ -186,26 +186,41 @@ def test_analyze_liuri_effects_reuses_precomputed_liuri(
 async def test_heavy_api_routes_honor_shared_concurrency_limit(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    import fatebridge.api as api_module
+    from threading import BoundedSemaphore, Lock
+    from time import sleep
+
+    import fatebridge.application.execution as execution_module
+    from fatebridge.application.compute_limits import HeavyCalculationBudget
     from fatebridge.core.requests.timing import TimingAnalysisRequest
 
-    monkeypatch.setattr(api_module, "HEAVY_CALC_SEMAPHORE", asyncio.Semaphore(2))
-    monkeypatch.setattr(api_module, "HEAVY_CALC_SEMAPHORE_LOOP", None)
+    class _TrackingSemaphore:
+        def __init__(self, limit: int) -> None:
+            self._inner = BoundedSemaphore(limit)
+            self._lock = Lock()
+            self.in_flight = 0
+            self.max_in_flight = 0
+            self.entries = 0
 
-    in_flight = 0
-    max_in_flight = 0
-    run_in_threadpool = api_module.run_in_threadpool
+        def __enter__(self) -> bool:
+            acquired = self._inner.acquire()
+            with self._lock:
+                self.in_flight += 1
+                self.entries += 1
+                self.max_in_flight = max(self.max_in_flight, self.in_flight)
+            sleep(0.02)
+            return acquired
 
-    async def observe_threadpool(func, *args, **kwargs):
-        nonlocal in_flight, max_in_flight
-        in_flight += 1
-        max_in_flight = max(max_in_flight, in_flight)
-        try:
-            return await run_in_threadpool(func, *args, **kwargs)
-        finally:
-            in_flight -= 1
+        def __exit__(self, exc_type: object, exc: object, tb: object) -> None:
+            with self._lock:
+                self.in_flight -= 1
+            self._inner.release()
 
-    monkeypatch.setattr(api_module, "run_in_threadpool", observe_threadpool)
+    tracked_semaphore = _TrackingSemaphore(2)
+    budget = HeavyCalculationBudget(
+        max_concurrency=2,
+        semaphore=tracked_semaphore,  # type: ignore[arg-type]
+    )
+    monkeypatch.setattr(execution_module, "heavy_calculation_budget", lambda: budget)
 
     request = TimingAnalysisRequest(
         birth_year=1990,
@@ -227,6 +242,7 @@ async def test_heavy_api_routes_honor_shared_concurrency_limit(
         *(rest_handler("bazi_timing")(request) for _ in range(5))
     )
 
-    assert max_in_flight <= 2
+    assert tracked_semaphore.entries == 5
+    assert tracked_semaphore.max_in_flight <= 2
     assert all(result["analysis_type"] == "综合时运分析" for result in results)
     assert all("run_metadata" in result for result in results)

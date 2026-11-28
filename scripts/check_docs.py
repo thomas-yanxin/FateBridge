@@ -217,7 +217,7 @@ def check_interpretation_schema_paths(root: Path = ROOT) -> list[str]:
     interp_dir = root / "docs" / "interpretation"
     if not interp_dir.is_dir():
         return []
-    from fatebridge.core.contracts.output_qimen_board import Qimen, QimenPalace
+    from fatebridge.core.contracts.qimen import Qimen, QimenPalace
     from fatebridge.core.response_models import output_model_for
 
     qimen_output = output_model_for("qimen")

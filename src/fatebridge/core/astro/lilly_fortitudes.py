@@ -10,16 +10,16 @@ from __future__ import annotations
 from fractions import Fraction
 from typing import Any
 
+from fatebridge.core.astro.astrology_tables import CHALDEAN_ORDER as ORDER
 from fatebridge.core.astro.geometry import angle_fraction, angular_separation_fraction
 from fatebridge.core.astro.lilly import PLANETS, dignity_at, pair_reception
-from fatebridge.core.astro.lilly_star_orbs import (
+from fatebridge.core.astro.lilly_orbs import (
     STELLAR_ORB_DEGREES,
     STELLAR_ORB_SOURCE_PAGES,
 )
 from fatebridge.core.classical_western import combustion_state, solar_condition_policy
 
 RULESET = "lilly1647_p115_fortitudes_cusp_virtue_v3"
-ORDER = ("Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon")
 MEAN_MOTION_ARCSECONDS = {
     "Saturn": 121,
     "Jupiter": 299,

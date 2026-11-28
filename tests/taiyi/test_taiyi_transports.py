@@ -12,6 +12,8 @@ from fatebridge.application.examples import example_input, suggested_fields
 from fatebridge.cli import run
 from fatebridge.core.metaphysics.seed import build_analysis_seed
 from fatebridge.core.metaphysics.taiyi import (
+    HISTORICAL_YEAR_PROFILE,
+    QILIANG_YEAR_PROFILE,
     build_taiyi_board,
     conjunction,
     yearly_core,
@@ -333,3 +335,51 @@ def test_taiyi_day_minute_and_fate_modes() -> None:
     assert fate_b["fate_palaces"]["twelve_palaces"][0]["palace"] == "命宫"
     assert fate_b["fate_palaces"]["life_palace"] in "子丑寅卯辰巳午未申酉戌亥"
     assert fate_b["fate_palaces"]["body_palace"] in "子丑寅卯辰巳午未申酉戌亥"
+
+
+@pytest.mark.parametrize(
+    ("year", "profile", "expected_display"),
+    [
+        (381, HISTORICAL_YEAR_PROFILE, "381年5月22日（太元6年）"),
+        (501, QILIANG_YEAR_PROFILE, "501年5月28日"),
+    ],
+)
+def test_taiyi_historical_year_profiles_format_display_without_reign_label_keyerror(
+    year: int, profile: str, expected_display: str
+) -> None:
+    seed = build_analysis_seed(
+        analysis_year=year,
+        analysis_month=7,
+        analysis_day=1,
+        analysis_hour=12,
+        analysis_minute=0,
+        analysis_second=0,
+        analysis_timezone="+08:00",
+        use_true_solar_time=False,
+    )
+    board = build_taiyi_board(seed, "男", calculation_mode="year", year_profile=profile)
+    calendar_rules = board["calendar_rules"]
+    assert calendar_rules["year_profile"] == profile
+    historical = calendar_rules["historical_calendar"]
+    assert historical["year"] == year
+    assert historical["display"] == expected_display
+    assert board["calendar_summary"]["used_lunar_date"] == expected_display
+
+
+def test_taiyi_optional_modes_omit_solar_anchors_within_10kb_and_validate() -> None:
+    from fatebridge.application.execution import execute_with_receipt
+    from fatebridge.application.response_delivery import deliver_response
+    from fatebridge.core.contracts.taiyi import Taiyi
+    from fatebridge.core.execution_context import ExecutionOptions
+
+    taiyi_spec = next(entry for entry in CATALOG if entry.name == "taiyi")
+    taiyi_base = dict(example_input(taiyi_spec) or {})
+    opts = ExecutionOptions(as_of="2026-10-22T12:00:00+08:00")
+    for mode in ("day", "month", "hour"):
+        req = taiyi_spec.request_model.model_validate(
+            {**taiyi_base, "calculation_mode": mode}
+        )
+        raw = execute_with_receipt(taiyi_spec, req, options=opts)
+        out = deliver_response(raw, spec=taiyi_spec)
+        assert len(json.dumps(out, ensure_ascii=False).encode("utf-8")) <= 10240
+        Taiyi.model_validate(out)

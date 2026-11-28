@@ -16,6 +16,7 @@ from pydantic_core import PydanticCustomError
 from fatebridge.core.requests.base import (
     FateBridgeBaseRequest,
     OfflineHouseValidatorMixin,
+    apply_place_location,
 )
 from fatebridge.core.requests.calendar import LocalLocationFields
 from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
@@ -99,26 +100,13 @@ class MeihuaAnalysisRequest(MeihuaInterpretationOptions):
 
     @model_validator(mode="after")
     def _resolve_meihua_analysis_place(self) -> "MeihuaAnalysisRequest":
-        place_text = (self.analysis_place or "").strip()
-        if not place_text or place_text == "未提供":
-            return self
-        need_lon = (
-            self.analysis_longitude is None
-            or "analysis_longitude" not in self.model_fields_set
+        apply_place_location(
+            self,
+            place_field="analysis_place",
+            lon_field="analysis_longitude",
+            lat_field=None,
+            tz_field="analysis_timezone",
         )
-        need_tz = (
-            self.analysis_timezone is None
-            or "analysis_timezone" not in self.model_fields_set
-        )
-        if not (need_lon or need_tz):
-            return self
-        from fatebridge.utils.places import resolve_place_location
-
-        resolved = resolve_place_location(place_text, place_field="analysis_place")
-        if need_lon:
-            self.analysis_longitude = resolved.longitude
-        if need_tz and resolved.timezone is not None:
-            self.analysis_timezone = resolved.timezone
         return self
 
     def service_inputs(self) -> dict[str, object]:

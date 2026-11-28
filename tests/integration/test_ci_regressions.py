@@ -14,8 +14,7 @@ from fastmcp import Client
 from fatebridge.core import almanac, de441_solar, solar_term_clock
 from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.ephemeris_runtime import swe
-from fatebridge.core.local_techniques.chart import _resolve_coordinates
-from fatebridge.core.local_techniques.tongshefa import build_tongshefa_result
+from fatebridge.core.meihua.tongshefa import build_tongshefa_result
 from fatebridge.core.metaphysics.ren_calendar import require_ren_solar_term
 from fatebridge.services import run_metadata
 from fatebridge.services.run_metadata import (
@@ -26,6 +25,7 @@ from fatebridge.services.run_metadata import (
 from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.coordinates import parse_geo_coordinate
 from fatebridge.utils.errors import EphemerisSourceError
+from fatebridge.utils.places import resolve_coordinates as _resolve_coordinates
 from tests.support.output_facts import canonical_json
 from tests.support.transports import (
     SPECS,

@@ -10,7 +10,7 @@ import pytest
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.cli import build_parser as build_cli_parser
 from fatebridge.cli import run as cli_run
-from tests.fixtures.catalog import cli_specs_by_name
+from fatebridge.services.tool_catalog import CATALOG
 
 REFERENCES_ROOT = Path(__file__).resolve().parents[2] / "docs/interpretation"
 
@@ -84,7 +84,7 @@ def test_documented_examples_exist() -> None:
 
 def test_documented_cli_examples_use_real_flags() -> None:
     """Check that concrete commands use published tool names and flags."""
-    specs = cli_specs_by_name()
+    specs = {spec.name: spec for spec in CATALOG}
     problems: list[str] = []
     for example in documented_cli_examples():
         spec = specs.get(example.tool_name)

@@ -29,7 +29,6 @@ from fatebridge.utils.house_systems import (
     UnsupportedGauquelinError,
     normalize_house_system,
     normalize_zodiac_type,
-    parse_house_code,
     resolve_offline_house_code,
 )
 
@@ -41,6 +40,49 @@ def _allows_none(annotation: object) -> bool:
     if origin in (Union, types.UnionType):
         return any(_allows_none(arg) for arg in get_args(annotation))
     return annotation is type(None)
+
+
+def apply_place_location(
+    model: BaseModel,
+    *,
+    place_field: str = "place",
+    lon_field: str | None = "longitude",
+    lat_field: str | None = "latitude",
+    tz_field: str | None = "timezone",
+    resolve_tz: bool = True,
+) -> None:
+    """Fill missing coordinate and timezone fields lazily from offline place catalog."""
+    place_text = (getattr(model, place_field, None) or "").strip()
+    if not place_text or place_text == "未提供":
+        return
+    fields_set = model.model_fields_set
+    need_lon = (
+        lon_field is not None
+        and hasattr(model, lon_field)
+        and (getattr(model, lon_field) is None or lon_field not in fields_set)
+    )
+    need_lat = (
+        lat_field is not None
+        and hasattr(model, lat_field)
+        and (getattr(model, lat_field) is None or lat_field not in fields_set)
+    )
+    need_tz = (
+        resolve_tz
+        and tz_field is not None
+        and hasattr(model, tz_field)
+        and (getattr(model, tz_field) is None or tz_field not in fields_set)
+    )
+    if not (need_lon or need_lat or need_tz):
+        return
+    from fatebridge.utils.places import resolve_place_location
+
+    resolved = resolve_place_location(place_text, place_field=place_field)
+    if need_lon and lon_field is not None:
+        setattr(model, lon_field, resolved.longitude)
+    if need_lat and lat_field is not None:
+        setattr(model, lat_field, resolved.latitude)
+    if need_tz and tz_field is not None and resolved.timezone is not None:
+        setattr(model, tz_field, resolved.timezone)
 
 
 class FateBridgeBaseRequest(BaseModel):
@@ -251,33 +293,13 @@ class RequiredAnalysisClockFields(BaseModel):
 
     @model_validator(mode="after")
     def _resolve_analysis_place(self) -> "RequiredAnalysisClockFields":
-        place_text = (self.analysis_place or "").strip()
-        if not place_text or place_text == "未提供":
-            return self
-        need_lon = (
-            self.analysis_longitude is None
-            or "analysis_longitude" not in self.model_fields_set
+        apply_place_location(
+            self,
+            place_field="analysis_place",
+            lon_field="analysis_longitude",
+            lat_field="analysis_latitude",
+            tz_field="analysis_timezone",
         )
-        has_lat = hasattr(self, "analysis_latitude")
-        need_lat = has_lat and (
-            getattr(self, "analysis_latitude") is None
-            or "analysis_latitude" not in self.model_fields_set
-        )
-        need_tz = (
-            self.analysis_timezone is None
-            or "analysis_timezone" not in self.model_fields_set
-        )
-        if not (need_lon or need_lat or need_tz):
-            return self
-        from fatebridge.utils.places import resolve_place_location
-
-        resolved = resolve_place_location(place_text, place_field="analysis_place")
-        if need_lon:
-            self.analysis_longitude = resolved.longitude
-        if need_lat:
-            setattr(self, "analysis_latitude", resolved.latitude)
-        if need_tz and resolved.timezone is not None:
-            self.analysis_timezone = resolved.timezone
         return self
 
     def service_inputs(self) -> dict[str, object]:

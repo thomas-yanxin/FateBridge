@@ -2,26 +2,22 @@
 
 import inspect
 import logging
-from typing import Annotated, Protocol, cast
+from collections.abc import Callable
+from typing import Annotated, Protocol
 
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from pydantic import BaseModel, JsonValue
 from starlette.concurrency import run_in_threadpool
 
 from fatebridge.application.batch import BatchRequest, execute_batch
-from fatebridge.application.execution import result_is_error
-from fatebridge.application.response_delivery import (
-    deliver_response,
-    validate_delivery_controls,
+from fatebridge.application.delivery_flags import (
+    FIELDS_FLAG_DESC,
+    INCLUDE_FLAG_DESC,
 )
+from fatebridge.application.execution import run_guarded_operation
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
 from fatebridge.core.execution_context import ExecutionOptions
-from fatebridge.transports.flags import FIELDS_FLAG_DESC, INCLUDE_FLAG_DESC
-from fatebridge.utils.errors import (
-    ErrorEnvelope,
-    ParameterError,
-    handle_calculation_error,
-)
+from fatebridge.utils.errors import ErrorEnvelope, ParameterError
 
 logger = logging.getLogger(__name__)
 
@@ -30,21 +26,41 @@ REST_RESERVED_FIELDS = {
     "fields",
     *ExecutionOptions.model_fields,
 }
+CALC_ALLOWED_QUERY_PARAMS = ("include", "fields", *ExecutionOptions.model_fields)
 
 
-def _reject_removed_detail_query(
-    http_request: Request, *, allowed_fields: list[str] | None = None
-) -> None:
-    if "detail" not in http_request.query_params:
-        return
-    issue: dict[str, object] = {
-        "path": "detail",
-        "code": "extra_forbidden",
-        "message": "计算接口已移除 detail 参数，请改用 include 或 fields",
-    }
-    if allowed_fields is not None:
-        issue["constraints"] = {"allowed_fields": allowed_fields}
-    raise ParameterError("请求参数无效", [issue])
+def _require_allowed_query_params(
+    allowed_fields: tuple[str, ...],
+) -> Callable[[Request], None]:
+    allowed = set(allowed_fields)
+    allowed_list = list(allowed_fields)
+
+    def _validate_query_params(http_request: Request) -> None:
+        unexpected = [
+            name for name in http_request.query_params.keys() if name not in allowed
+        ]
+        if not unexpected:
+            return
+        issues: list[dict[str, object]] = [
+            {
+                "path": name,
+                "code": "extra_forbidden",
+                "message": "Extra inputs are not permitted",
+                "constraints": {"allowed_fields": allowed_list},
+            }
+            for name in unexpected
+        ]
+        failure = ParameterError("请求参数无效", issues).as_result()
+        raise HTTPException(
+            status_code=int(failure["status_code"]),
+            detail=failure,
+        )
+
+    return _validate_query_params
+
+
+_CALC_QUERY_GUARD = _require_allowed_query_params(CALC_ALLOWED_QUERY_PARAMS)
+_BATCH_QUERY_GUARD = _require_allowed_query_params(())
 
 
 class RestCalculationExecutor(Protocol):
@@ -53,7 +69,9 @@ class RestCalculationExecutor(Protocol):
         spec: ToolSpec,
         request: BaseModel,
         *,
-        options: ExecutionOptions,
+        include: list[str] | None = None,
+        fields: list[str] | None = None,
+        as_of: str | None = None,
     ) -> ServiceResult: ...
 
 
@@ -94,41 +112,16 @@ def register_rest_route(
         ] = None,
         fields: Annotated[list[str] | None, Query(description=FIELDS_FLAG_DESC)] = None,
         as_of: str | None = None,
-        http_request: Request = cast(Request, None),
+        _: None = Depends(_CALC_QUERY_GUARD),
     ) -> ServiceResult:
-        try:
-            if http_request is not None:
-                _reject_removed_detail_query(
-                    http_request, allowed_fields=["include", "fields", "as_of"]
-                )
-            logger.info(f"Processing {spec.name} request")
-            validate_delivery_controls(include, fields)
-            options = ExecutionOptions(as_of=as_of)
-            result = await execute_service(
-                spec,
-                request,
-                options=options,
-            )
-            return await run_in_threadpool(
-                deliver_response,
-                result,
-                spec=spec,
-                include=include,
-                fields=fields,
-                failed=result_is_error(result),
-            )
-        except HTTPException:
-            raise
-        except Exception as error:
-            failure = handle_calculation_error(
-                error,
-                spec.operation_label_zh,
-                allowed_fields=spec.request_model.model_fields.keys(),
-                root_model=spec.request_model,
-            )
-            raise HTTPException(
-                status_code=failure["status_code"], detail=failure
-            ) from None
+        logger.info(f"Processing {spec.name} request")
+        return await execute_service(
+            spec,
+            request,
+            include=include,
+            fields=fields,
+            as_of=as_of,
+        )
 
     calculation_route.__name__ = f"rest_{spec.name}"
     calculation_route.__doc__ = spec.summary
@@ -196,25 +189,19 @@ def register_batch_route(app: FastAPI, specs: list[ToolSpec]) -> None:
         },
     )
     async def batch_route(
-        request: BatchRequest, *, http_request: Request = cast(Request, None)
+        request: BatchRequest,
+        _: None = Depends(_BATCH_QUERY_GUARD),
     ) -> dict[str, JsonValue]:
-        try:
-            if http_request is not None:
-                _reject_removed_detail_query(http_request, allowed_fields=[])
-            return await run_in_threadpool(execute_batch, specs_by_name, request)
-        except ParameterError as exc:
+        outcome = await run_in_threadpool(
+            run_guarded_operation,
+            "batch",
+            lambda: execute_batch(specs_by_name, request),
+            allowed_fields=BatchRequest.model_fields.keys(),
+            root_model=BatchRequest,
+        )
+        if outcome.failed:
             raise HTTPException(
-                status_code=exc.status_code,
-                detail=exc.as_result(),
-            ) from None
-        except Exception as error:
-            failure = handle_calculation_error(
-                error,
-                "batch",
-                allowed_fields=BatchRequest.model_fields.keys(),
-                root_model=BatchRequest,
+                status_code=outcome.status_code,
+                detail=outcome.payload,
             )
-            raise HTTPException(
-                status_code=failure["status_code"],
-                detail=failure,
-            ) from None
+        return outcome.payload

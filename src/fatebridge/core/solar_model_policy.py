@@ -2,27 +2,23 @@
 
 from __future__ import annotations
 
-import os
 from typing import Any
 
 from fatebridge.core.aa1996_solar import MODEL_ID as AA1996_MODEL_ID
 from fatebridge.core.aa1996_solar import cache_key as aa1996_cache_key
-from fatebridge.core.aa1996_solar import source_receipt as aa1996_source_receipt
 from fatebridge.core.analytic_solar import MODEL_ID
 from fatebridge.core.astro import de441_source
 from fatebridge.core.de440_solar import EXTENDED_MODEL_ID
 from fatebridge.core.de440_solar import MODEL_ID as DE440_MODEL_ID
 from fatebridge.core.de440_solar import cache_key as de440_cache_key
-from fatebridge.core.de440_solar import source_receipt as de440_source_receipt
 from fatebridge.core.de441_solar import CACHE_IDENTITY
 from fatebridge.core.ephemeris_runtime import has_swiss_data_files
 from fatebridge.core.jpl_ephemeris import configured_jpl_file
 from fatebridge.core.spk_solar import MODEL_ID as SPK_MODEL_ID
 from fatebridge.core.spk_solar import cache_key as spk_cache_key
-from fatebridge.core.spk_solar import source_receipt as spk_source_receipt
 from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_MODEL_ID
 from fatebridge.core.vsop2013_solar import cache_key as vsop2013_cache_key
-from fatebridge.core.vsop2013_solar import source_receipt as vsop2013_source_receipt
+from fatebridge.utils.runtime import get_de441_dir, get_solar_term_model
 
 ENVIRONMENT_NAME = "FATEBRIDGE_SOLAR_TERM_MODEL"
 MODES = frozenset(
@@ -34,7 +30,7 @@ VSOP2013_SOFTWARE_YEARS = (1700, 2300)
 
 
 def solar_model_policy() -> str:
-    mode = os.environ.get(ENVIRONMENT_NAME, "auto").strip().lower()
+    mode = get_solar_term_model()
     if mode not in MODES:
         raise ValueError(
             f"{ENVIRONMENT_NAME} must be auto, native, swiss, analytic, spk, de440, aa1996, or vsop2013"
@@ -89,10 +85,11 @@ def solar_context_input_years(year: int) -> tuple[int, int]:
 
 
 def _de441_fallback_cache_token() -> tuple[Any, ...]:
+    de441_dir = get_de441_dir()
     if de441_source.coefficient_files_available():
-        return (*CACHE_IDENTITY, os.getenv("FATEBRIDGE_DE441_DIR") or "bundled")
+        return (*CACHE_IDENTITY, de441_dir or "bundled")
     if de441_source.de441_dir_explicitly_configured():
-        return (*CACHE_IDENTITY, "explicit_missing", os.getenv("FATEBRIDGE_DE441_DIR"))
+        return (*CACHE_IDENTITY, "explicit_missing", de441_dir)
     return ("moshier_or_analytic", MODEL_ID)
 
 

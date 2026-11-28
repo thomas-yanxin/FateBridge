@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from fractions import Fraction
 from pathlib import Path
+from typing import TypedDict
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.ephemeris import fast_swe_call
@@ -51,10 +52,17 @@ CARDINAL_INGRESS_LABELS: dict[str, str] = {
     "冬至": "冬至（摩羯入宫）",
 }
 
+
+class ReturnBodySpec(TypedDict):
+    planet_id: int
+    period_days: float
+    label: str
+
+
 # Geocentric return periods (days) used to bound the contiguous scan window.
 # Inner planets (Mercury/Venus) orbit the Sun and return geocentrically once per
 # ~365.25 days (with retrograde loops resolved via station splitting).
-RETURN_BODIES: dict[str, dict[str, object]] = {
+RETURN_BODIES: dict[str, ReturnBodySpec] = {
     "Pluto": {"planet_id": 9, "period_days": 90560.0, "label": "冥王星返照"},
     "Neptune": {"planet_id": 8, "period_days": 60195.0, "label": "海王星返照"},
     "Uranus": {"planet_id": 7, "period_days": 30688.5, "label": "天王星返照"},

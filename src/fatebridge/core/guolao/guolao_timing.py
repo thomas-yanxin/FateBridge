@@ -6,12 +6,12 @@ from dataclasses import replace
 from datetime import datetime, timezone
 from typing import Any, Literal
 
+from fatebridge.core.almanac import fast_lunar_dict
 from fatebridge.core.astro.birth import AstroBirthInfo, require_resolved_birth_timezone
 from fatebridge.core.astro.time_scales import ephemeris_time
-from fatebridge.core.bazi.calendar import BaZiCalendar
 from fatebridge.core.guolao import classical, ephemeris, guolao, moira
-from fatebridge.core.ziwei.calendar import fast_lunar_dict
 from fatebridge.utils.civil_time import ZonedCalendar, utc_calendar, utc_ordering_key
+from fatebridge.utils.data import year_ganzhi
 from fatebridge.utils.timezones import is_unspecified_local_time
 
 MonthBasis = Literal["jie_month", "chinese_lunar_utc8"]
@@ -77,7 +77,7 @@ def enrich_guolao_timing(
     target_jd_tt = target_scales.tt.as_float()
     birth_year_num = ephemeris.fast_lichun_year(recorded, g["profile"]["julian_day_tt"])
     target_year_num = ephemeris.fast_lichun_year(calendar_clock, target_jd_tt)
-    year_stem, year_branch = BaZiCalendar.calculate_year_pillar(target_year_num)
+    year_stem, year_branch = year_ganzhi(target_year_num)
 
     birth_gods = g["god_positions"]
     life = g["life_palace"]

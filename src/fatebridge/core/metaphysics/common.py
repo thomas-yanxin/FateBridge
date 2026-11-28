@@ -2,51 +2,12 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
 from fatebridge.utils.civil_time import ClockTimespec, NominalClockLabel
-from fatebridge.utils.data import (
-    BRANCH_COMBINATIONS,
-    BRANCH_CONFLICTS,
-    BRANCH_ELEMENTS,
-    BRANCH_HARMS,
-    DESTRUCTION_CYCLE,
-    EARTHLY_BRANCHES,
-    GENERATION_CYCLE,
-    HEAVENLY_STEMS,
-    STEM_ELEMENTS,
-)
-
-SEXAGENARY_CYCLE = [
-    f"{HEAVENLY_STEMS[index % 10]}{EARTHLY_BRANCHES[index % 12]}" for index in range(60)
-]
-SEXAGENARY_INDEX = {value: index for index, value in enumerate(SEXAGENARY_CYCLE)}
-
-ELEMENT_GENERATES = {
-    source.value: target.value for source, target in GENERATION_CYCLE.items()
-}
-ELEMENT_CONTROLS = {
-    source.value: target.value for source, target in DESTRUCTION_CYCLE.items()
-}
-
-XUN_HEADS = ("甲子", "甲戌", "甲申", "甲午", "甲辰", "甲寅")
-KONGWANG_BY_XUN_HEAD = {
-    "甲子": "戌亥空",
-    "甲戌": "申酉空",
-    "甲申": "午未空",
-    "甲午": "辰巳空",
-    "甲辰": "寅卯空",
-    "甲寅": "子丑空",
-}
-
-SIX_HARMONY_BRANCHES = BRANCH_COMBINATIONS
-
-SIX_CLASH_BRANCHES = BRANCH_CONFLICTS
-
-SIX_HARM_BRANCHES = BRANCH_HARMS
+from fatebridge.utils.data import ELEMENT_CONTROLS, ELEMENT_GENERATES
 
 # note (monthly generals): Liu Ren, Jin Kou and Taiyi share these names and noble profiles.
 YUE_JIANG_NAMES = {
@@ -160,49 +121,6 @@ def require_lunar_month_day(
         reason = support.get("reason") or "离线农历换算不可用"
         raise ValueError(f"{technique}需要农历月日，无法起盘：{reason}")
     return lunar, int(lunar["month"]), int(lunar["day"])
-
-
-def rotate_sequence(
-    values: Iterable[str], start_value: str, reverse: bool = False
-) -> list[str]:
-    ordered = list(values)
-    if not ordered:
-        return []
-    if reverse:
-        ordered = list(reversed(ordered))
-    if start_value not in ordered:
-        return ordered
-    start_index = ordered.index(start_value)
-    return ordered[start_index:] + ordered[:start_index]
-
-
-def stem_element_text(stem: str) -> str:
-    return STEM_ELEMENTS[stem][0].value
-
-
-def branch_element_text(branch: str) -> str:
-    return BRANCH_ELEMENTS[branch][0].value
-
-
-def ganzhi_text(pillar: tuple[str, str]) -> str:
-    return f"{pillar[0]}{pillar[1]}"
-
-
-def sexagenary_index_for(text: str) -> int:
-    return SEXAGENARY_INDEX[text]
-
-
-def sexagenary_text(index: int) -> str:
-    return SEXAGENARY_CYCLE[index % 60]
-
-
-def xun_head_for_ganzhi(text: str) -> str:
-    cycle_index = sexagenary_index_for(text)
-    return XUN_HEADS[cycle_index // 10]
-
-
-def kongwang_for_ganzhi(text: str) -> str:
-    return KONGWANG_BY_XUN_HEAD[xun_head_for_ganzhi(text)]
 
 
 def liuqin_against_day(day_element: str, target_element: str) -> str:

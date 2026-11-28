@@ -126,8 +126,15 @@ def bind_person(
 ) -> Bind:
     """Bind the birth input and forward the remaining validated request fields."""
     forwarded_person_fields = PERSON_FIELDS.difference(also_pass)
+    accepts_explicit_solar_time: bool | None = None
 
     def bind(request: BaseModel) -> BoundServiceCall:
+        nonlocal accepts_explicit_solar_time
+        resolved = resolve_service(service)
+        if accepts_explicit_solar_time is None:
+            accepts_explicit_solar_time = (
+                "true_solar_explicit" in signature(resolved).parameters
+            )
         arguments: dict[str, ServiceInput] = (
             dict(request.service_inputs())
             if isinstance(request, ServiceInputProvider)
@@ -138,15 +145,16 @@ def bind_person(
             true_solar_explicit="use_true_solar_time" in request.model_fields_set,
             supplied_fields=request.model_fields_set,
         )
-        return BoundServiceCall(
-            resolve_service(service),
-            (person,),
-            {
-                field: value
-                for field, value in arguments.items()
-                if field not in forwarded_person_fields
-            },
-        )
+        kwargs: dict[str, ServiceInput] = {
+            field: value
+            for field, value in arguments.items()
+            if field not in forwarded_person_fields
+        }
+        if accepts_explicit_solar_time:
+            kwargs["true_solar_explicit"] = (
+                "use_true_solar_time" in request.model_fields_set
+            )
+        return BoundServiceCall(resolved, (person,), kwargs)
 
     return bind
 
@@ -155,6 +163,7 @@ def bind_pair(
     service: ServiceRef | ResolvedService,
     *,
     relationship_field: str = "relationship_type",
+    extra_fields: tuple[str, ...] = (),
 ) -> Bind:
     """Bind each person with independent clock presence."""
 
@@ -181,9 +190,7 @@ def bind_pair(
         )
         relationship = arguments.get(relationship_field, "general")
         extra_kwargs: dict[str, ServiceInput] = {
-            k: arguments[k]
-            for k in ("person1_zi_hour_policy", "person2_zi_hour_policy")
-            if k in arguments
+            k: arguments[k] for k in extra_fields if k in arguments
         }
         return BoundServiceCall(
             resolve_service(service), (person1, person2, relationship), extra_kwargs

@@ -7,20 +7,9 @@ from typing import Any, TypedDict
 from fatebridge.core.almanac import localize_datetime
 from fatebridge.core.batch_cache import batch_cached, metaphysics_seed_key
 from fatebridge.core.metaphysics.common import (
-    ELEMENT_CONTROLS,
-    ELEMENT_GENERATES,
     GUI_REN_SEQUENCE,
-    SIX_CLASH_BRANCHES,
-    SIX_HARM_BRANCHES,
-    SIX_HARMONY_BRANCHES,
     MetaphysicsSeed,
-    branch_element_text,
-    ganzhi_text,
-    kongwang_for_ganzhi,
     liuqin_against_day,
-    rotate_sequence,
-    stem_element_text,
-    xun_head_for_ganzhi,
 )
 from fatebridge.core.metaphysics.liureng.stars import STEM_HOUSES as DAY_STEM_HOUSE
 from fatebridge.core.metaphysics.liureng.stars import (
@@ -56,7 +45,21 @@ from fatebridge.core.metaphysics.ren_gods import (
     GuirenProfile,
     noble_start,
 )
-from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
+from fatebridge.utils.data import (
+    EARTHLY_BRANCHES,
+    ELEMENT_CONTROLS,
+    ELEMENT_GENERATES,
+    HEAVENLY_STEMS,
+    SIX_CLASH_BRANCHES,
+    SIX_HARM_BRANCHES,
+    SIX_HARMONY_BRANCHES,
+    branch_element_text,
+    ganzhi_text,
+    kongwang_for_ganzhi,
+    rotate_sequence,
+    stem_element_text,
+    xun_head_for_ganzhi,
+)
 
 LIURENG_GUIREN_REVERSED_EARTH = frozenset("巳午未申酉戌")
 

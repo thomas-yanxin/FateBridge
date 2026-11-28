@@ -85,6 +85,11 @@ def _relative_house_layout(
         code = house_system_info.get("swisseph_code")
         if code is None:
             code = {"whole_sign": b"W", "equal": b"E"}[house_system_info["key"]]
+        sidereal_errors: tuple[type[BaseException], ...] = (
+            *runtime.native_ephemeris_errors(),
+            RuntimeError,
+            ValueError,
+        )
         try:
             return native_lahiri_houses(
                 julian_day_ut1=times.ut1,
@@ -95,7 +100,7 @@ def _relative_house_layout(
             )
         except EphemerisSourceError:
             raise
-        except Exception as error:
+        except sidereal_errors as error:
             if high_latitude_fallback in {"porphyry", "whole_sign"}:
                 fallback_code = b"W" if high_latitude_fallback == "whole_sign" else b"O"
                 try:
@@ -108,8 +113,10 @@ def _relative_house_layout(
                     )
                     fallback_layout["fallback_house_system"] = high_latitude_fallback
                     return fallback_layout
-                except Exception:
-                    pass
+                except sidereal_errors as fallback_error:
+                    runtime._log_swe_runtime_failure(
+                        "houses_ex(sidereal_fallback)", fallback_error
+                    )
             runtime._log_swe_runtime_failure("houses_ex(sidereal)", error)
             raise ValueError(
                 f"原生Lahiri {house_system_info['key']}宫头计算失败，不能冒用热带宫头"
@@ -179,6 +186,11 @@ def _relative_house_layout(
         }
 
     fallback_used: str | None = None
+    house_errors: tuple[type[BaseException], ...] = (
+        *runtime.native_ephemeris_errors(),
+        RuntimeError,
+        ValueError,
+    )
     try:
         with runtime.preserve_ephemeris_path():
             cusps, ascmc = runtime.ephemeris_call(
@@ -214,7 +226,7 @@ def _relative_house_layout(
             )
     except EphemerisSourceError:
         raise
-    except Exception as error:
+    except house_errors as error:
         if high_latitude_fallback in {"porphyry", "whole_sign"}:
             native_angles = _swisseph_angles(
                 julian_day,

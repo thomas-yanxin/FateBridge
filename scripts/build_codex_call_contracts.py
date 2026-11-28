@@ -73,8 +73,6 @@ async def call_contracts() -> list[dict[str, object]]:
             for field in ("call_guidance", "evidence_views", "default_omit"):
                 if contract.get(field):
                     record[field] = contract[field]
-                else:
-                    pass
             records.append(record)
     return records
 
@@ -131,8 +129,6 @@ async def main(argv: list[str] | None = None) -> None:
                 f"MCP call contracts are stale: {', '.join(stale)}; "
                 f"obsolete: {', '.join(sorted(obsolete))}"
             )
-        else:
-            pass
     else:
         TARGET.mkdir(parents=True, exist_ok=True)
         for name, text in files.items():
@@ -148,5 +144,3 @@ async def main(argv: list[str] | None = None) -> None:
 
 if __name__ == "__main__":
     asyncio.run(main())
-else:
-    pass

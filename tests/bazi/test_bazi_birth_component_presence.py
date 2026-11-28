@@ -5,14 +5,14 @@ from pathlib import Path
 
 import pytest
 
-from tests.support.transports import AS_OF, call_cli, native
-from tests.support.transports import rest as _shared_rest
-from tests.unit_test.fixtures.bazi_birth_clock import (
+from tests.fixtures.bazi_birth_clock import (
     SPECS,
     leaf,
     omitted_payload,
     receipt_path,
 )
+from tests.support.transports import AS_OF, call_cli, native
+from tests.support.transports import rest as _shared_rest
 
 rest = _shared_rest
 

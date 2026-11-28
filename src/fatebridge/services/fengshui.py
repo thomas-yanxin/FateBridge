@@ -22,6 +22,7 @@ from fatebridge.core.fengshui.models import (
     XuankongRequest,
 )
 from fatebridge.core.fengshui.xuankong import (
+    XuankongNatalResult,
     analyze_natal_interpretation,
     xuankong_natal,
 )
@@ -159,7 +160,7 @@ def calculate_monthly_stars(request: MonthlyRequest) -> dict[str, Any]:
 
 def _natal_layer(
     request: XuankongRequest, placements: list[Placement] | None = None
-) -> dict[str, Any]:
+) -> XuankongNatalResult:
     layer = xuankong_natal(request)
     if request.interpretation is not None:
         layer["interpretation"] = analyze_natal_interpretation(

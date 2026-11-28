@@ -213,6 +213,16 @@ def test_invalid_http_detail_uses_safe_validation_error(
     tools_resp = rest.get("/api/tools", params={"detail": "brief"})
     assert tools_resp.status_code == 200
 
+    unexpected_resp = rest.post(
+        "/api/divination/gua",
+        params={"unexpected_param": "secret-query-value"},
+        json={"queries": ["乾"]},
+    )
+    assert unexpected_resp.status_code == 422
+    assert unexpected_resp.json()["issues"][0]["path"] == "unexpected_param"
+    assert unexpected_resp.json()["issues"][0]["code"] == "extra_forbidden"
+    assert "secret-query-value" not in unexpected_resp.text
+
 
 @pytest.mark.parametrize("has_explicit_path", [False, True])
 def test_api_loads_dotenv_before_ephemeris_import(

@@ -1,6 +1,6 @@
 """Provide shared stem, branch, element and Ten God rules."""
 
-from collections.abc import Iterator, Mapping
+from collections.abc import Iterable, Iterator, Mapping
 from enum import Enum
 from typing import Literal, NamedTuple
 
@@ -433,16 +433,6 @@ def get_shishen(day_stem: str, other_stem: str) -> str:
     return SHISHEN_RELATIONS.get((day_stem, other_stem), "未知")
 
 
-def check_branch_conflict(branch1: str, branch2: str) -> bool:
-    """检查地支是否相冲"""
-    return BRANCH_CONFLICTS.get(branch1) == branch2
-
-
-def check_branch_combination(branch1: str, branch2: str) -> bool:
-    """检查地支是否六合"""
-    return BRANCH_COMBINATIONS.get(branch1) == branch2
-
-
 # 性别归一化 (Gender normalization)
 # 多个分析模块（子女 / 桃花 / 婚姻 / 生命维度）此前各自复制同一套 token 集合与
 # 归一化逻辑，这里集中为单一信源。
@@ -538,3 +528,107 @@ def count_ten_gods(
     for entry in iter_pillar_gods(pillars, day_stem, skip_day_pillar=skip_day_pillar):
         counts[entry.ten_god] += entry.weight
     return counts
+
+
+# ---------------------------------------------------------------------------
+# Sexagenary cycle, Xun/Kongwang, element string maps & trigram Najia branches
+# ---------------------------------------------------------------------------
+
+SEXAGENARY_CYCLE = [
+    f"{HEAVENLY_STEMS[index % 10]}{EARTHLY_BRANCHES[index % 12]}" for index in range(60)
+]
+SEXAGENARY_INDEX = {value: index for index, value in enumerate(SEXAGENARY_CYCLE)}
+
+ELEMENT_GENERATES = {
+    source.value: target.value for source, target in GENERATION_CYCLE.items()
+}
+ELEMENT_CONTROLS = {
+    source.value: target.value for source, target in DESTRUCTION_CYCLE.items()
+}
+
+XUN_HEADS = ("甲子", "甲戌", "甲申", "甲午", "甲辰", "甲寅")
+KONGWANG_BY_XUN_HEAD = {
+    "甲子": "戌亥空",
+    "甲戌": "申酉空",
+    "甲申": "午未空",
+    "甲午": "辰巳空",
+    "甲辰": "寅卯空",
+    "甲寅": "子丑空",
+}
+
+SIX_HARMONY_BRANCHES = BRANCH_COMBINATIONS
+SIX_CLASH_BRANCHES = BRANCH_CONFLICTS
+SIX_HARM_BRANCHES = BRANCH_HARMS
+
+TRIGRAM_LOWER_BRANCHES = {
+    "乾": ("子", "寅", "辰"),
+    "坎": ("寅", "辰", "午"),
+    "艮": ("辰", "午", "申"),
+    "震": ("子", "寅", "辰"),
+    "巽": ("丑", "亥", "酉"),
+    "离": ("卯", "丑", "亥"),
+    "坤": ("未", "巳", "卯"),
+    "兑": ("巳", "卯", "丑"),
+}
+
+TRIGRAM_UPPER_BRANCHES = {
+    "乾": ("午", "申", "戌"),
+    "坎": ("申", "戌", "子"),
+    "艮": ("戌", "子", "寅"),
+    "震": ("午", "申", "戌"),
+    "巽": ("未", "巳", "卯"),
+    "离": ("酉", "未", "巳"),
+    "坤": ("丑", "亥", "酉"),
+    "兑": ("亥", "酉", "未"),
+}
+
+
+def rotate_sequence(
+    values: Iterable[str], start_value: str, reverse: bool = False
+) -> list[str]:
+    ordered = list(values)
+    if not ordered:
+        return []
+    if reverse:
+        ordered = list(reversed(ordered))
+    if start_value not in ordered:
+        return ordered
+    start_index = ordered.index(start_value)
+    return ordered[start_index:] + ordered[:start_index]
+
+
+def stem_element_text(stem: str) -> str:
+    return STEM_ELEMENTS[stem][0].value
+
+
+def branch_element_text(branch: str) -> str:
+    return BRANCH_ELEMENTS[branch][0].value
+
+
+def ganzhi_text(pillar: tuple[str, str]) -> str:
+    return f"{pillar[0]}{pillar[1]}"
+
+
+def year_ganzhi(year: int) -> tuple[str, str]:
+    """Derive the heavenly stem and earthly branch for a nominal year."""
+    return (
+        HEAVENLY_STEMS[(year - 4) % len(HEAVENLY_STEMS)],
+        EARTHLY_BRANCHES[(year - 4) % len(EARTHLY_BRANCHES)],
+    )
+
+
+def sexagenary_index_for(text: str) -> int:
+    return SEXAGENARY_INDEX[text]
+
+
+def sexagenary_text(index: int) -> str:
+    return SEXAGENARY_CYCLE[index % 60]
+
+
+def xun_head_for_ganzhi(text: str) -> str:
+    cycle_index = sexagenary_index_for(text)
+    return XUN_HEADS[cycle_index // 10]
+
+
+def kongwang_for_ganzhi(text: str) -> str:
+    return KONGWANG_BY_XUN_HEAD[xun_head_for_ganzhi(text)]

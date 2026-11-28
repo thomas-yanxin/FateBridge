@@ -18,6 +18,7 @@ from fatebridge.core.astro.aberration_math import (
     aberration_position_jvp,
     longitude_rate_change,
 )
+from fatebridge.core.astro.cartesian import cross, dot
 from fatebridge.core.astro.jpl_kinematics import (
     checked_fixed_acceleration,
     source_kinematics,
@@ -135,18 +136,9 @@ def fixed_frame_source_remainder(
         raise EphemerisSourceError("coordinate_values_unavailable")
     unit = tuple(x / radius for x in apparent)
     native_unit = tuple(x / native_radius for x in native_apparent[:3])
-    cross = (
-        unit[1] * native_unit[2] - unit[2] * native_unit[1],
-        unit[2] * native_unit[0] - unit[0] * native_unit[2],
-        unit[0] * native_unit[1] - unit[1] * native_unit[0],
-    )
+    cross_vec = cross(unit, native_unit)
     error = (
-        math.degrees(
-            math.atan2(
-                math.hypot(*cross), math.fsum(a * b for a, b in zip(unit, native_unit))
-            )
-        )
-        * 3600
+        math.degrees(math.atan2(math.hypot(*cross_vec), dot(unit, native_unit))) * 3600
     )
     return remainder, {
         "full_fixed_frame_apparent_position_au": list(apparent),

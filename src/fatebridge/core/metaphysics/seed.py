@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from typing import TypedDict
+from typing import Any, TypedDict
 
 from fatebridge.core.almanac import (
     build_calendar_context,
@@ -15,9 +15,9 @@ from fatebridge.core.bazi.calendar import BaZiCalendar
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.ziwei.calendar import birth_clock_receipt
 from fatebridge.utils.birth_input import PersonInfo
-from fatebridge.utils.civil_clock import resolve_civil_clock
+from fatebridge.utils.civil_clock import parse_local_datetime, resolve_civil_clock
 from fatebridge.utils.civil_time import NominalClockLabel
-from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
+from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE, resolve_coordinates
 from fatebridge.utils.solar_time import (
     SOLAR_TIME_STRATEGY_APPARENT,
     calculate_solar_time_adjustment,
@@ -209,3 +209,40 @@ def build_analysis_seed(
         use_true_solar_time=use_true_solar_time,
         true_solar_explicit=true_solar_explicit,
     )
+
+
+def build_local_metaphysics_seed(
+    *,
+    date_text: str,
+    time_text: str,
+    timezone_name: str | None,
+    lat: Any = None,
+    lon: Any = None,
+    gps_lat: float | None = None,
+    gps_lon: float | None = None,
+    use_true_solar_time: bool = False,
+) -> MetaphysicsSeed:
+    timezone_value = timezone_name or DEFAULT_BIRTH_TIMEZONE
+    input_datetime = parse_local_datetime(
+        date_text, time_text, timezone_value, validate_wall=True
+    )
+    _, longitude = resolve_coordinates(
+        lat=lat,
+        lon=lon,
+        gps_lat=gps_lat,
+        gps_lon=gps_lon,
+    )
+    return build_metaphysics_seed(
+        civil=input_datetime,
+        timezone_name=timezone_value,
+        input_offset_visible=True,
+        longitude=longitude,
+        use_true_solar_time=use_true_solar_time,
+    )
+
+
+def build_metaphysics_analysis_context(seed: MetaphysicsSeed) -> dict[str, Any]:
+    return {
+        **_analysis_context_payload(seed),
+        "applied_true_solar": seed.applied_true_solar,
+    }

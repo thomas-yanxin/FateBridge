@@ -2,7 +2,6 @@
 
 import pytest
 
-from fatebridge.application.domain_validators import detect_fengshui_approximate
 from fatebridge.core.fengshui import calendar
 from fatebridge.core.fengshui.models import (
     AnnualRequest,
@@ -10,6 +9,7 @@ from fatebridge.core.fengshui.models import (
     MingguaRequest,
     XuankongRequest,
 )
+from fatebridge.services.catalog.fengshui import detect_fengshui_approximate
 from fatebridge.services.fengshui import (
     calculate_annual_stars as _calculate_annual_stars,
 )

@@ -173,7 +173,7 @@ def test_transit_timezone_conversion_preserves_the_instant(
 def test_native_subject_keeps_operator_path_even_on_failure(
     monkeypatch: pytest.MonkeyPatch, raises: bool, env_path: str | None
 ) -> None:
-    from fatebridge.core.predictive import native_chart
+    from fatebridge.core.astro import native_chart
 
     paths = []
     original_set_path = runtime.swe.set_ephe_path
@@ -298,7 +298,7 @@ def test_predictive_chart_does_not_change_subsequent_core_precision(
 def test_native_house_failure_preserves_source_and_programming_errors(
     monkeypatch: pytest.MonkeyPatch, failure
 ) -> None:
-    from fatebridge.core.predictive import native_chart
+    from fatebridge.core.astro import native_chart
 
     def fail(*args, **kwargs):
         raise failure
@@ -313,7 +313,7 @@ def test_native_house_failure_preserves_source_and_programming_errors(
 def test_predictive_house_source_error_reaches_rest_mcp_cli(
     monkeypatch: pytest.MonkeyPatch, surface_calls
 ) -> None:
-    from fatebridge.core.predictive import native_chart
+    from fatebridge.core.astro import native_chart
 
     def fail(*args, **kwargs):
         raise EphemerisSourceError("model_changed")

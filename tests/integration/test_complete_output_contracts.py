@@ -16,7 +16,7 @@ from fatebridge.application import execution
 from fatebridge.application.description import describe_input_spec, describe_spec
 from fatebridge.application.examples import example_input
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
-from fatebridge.core.contracts.output_civil_time import CivilPointEvidence
+from fatebridge.core.contracts.common import CivilPointEvidence
 from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.mcp_server import app as mcp_app
 from fatebridge.services.tool_catalog import CATALOG
@@ -218,3 +218,74 @@ def test_execution_skips_heavy_self_validation_by_default_and_runs_when_strict(
     monkeypatch.setenv("FATEBRIDGE_STRICT_OUTPUT_VALIDATION", "1")
     execution.invoke_validated_service(monitored, request)
     assert called_models == 1 and validator_calls == 1
+
+
+def test_public_boundary_preserves_facts_and_does_not_mutate_internal_evidence() -> (
+    None
+):
+    from copy import deepcopy
+
+    from fatebridge.application.projection import project_fields
+    from fatebridge.core.public_output import public_payload
+    from fatebridge.utils.errors import ParameterError
+
+    internal = {
+        "source": {
+            "title": "原典",
+            "author": "作者",
+            "url": "https://example.org/source",
+            "page": 7,
+            "version": "1.0",
+            "source_sha256": "a" * 64,
+        },
+        "facts": [
+            {"value": -0.0, "source_fingerprint": "internal"},
+            {"status": "partial", "unknown": None, "input_hash": "internal"},
+        ],
+        "numbers": [0, False, 1.2345678901234567],
+        "digest": "internal",
+        "run_metadata": {"run_id": "current-run", "environment_sha256": "b" * 64},
+    }
+    before = deepcopy(internal)
+    actual = public_payload(internal)
+    assert actual == {
+        "source": {
+            "title": "原典",
+            "author": "作者",
+            "url": "https://example.org/source",
+            "page": 7,
+            "version": "1.0",
+        },
+        "facts": [{"value": -0.0}, {"status": "partial", "unknown": None}],
+        "numbers": [0, False, 1.2345678901234567],
+        "run_metadata": {"run_id": "current-run"},
+    }
+    assert internal == before
+    assert str(actual["facts"][0]["value"]) == "-0.0"
+    with pytest.raises(ParameterError):
+        project_fields(actual, ["source.source_sha256"])
+
+
+def test_output_schema_hides_internal_fields_without_weakening_internal_validation() -> (
+    None
+):
+    from pydantic import Field
+
+    from fatebridge.core.contracts.base import PartialOutput
+
+    class Source(PartialOutput):
+        filename: str
+        sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    class Output(PartialOutput):
+        sources: list[Source]
+
+    schema = Output.model_json_schema()
+    source = schema["$defs"]["Source"]
+    assert set(source["properties"]) == {"filename"}
+    assert source["required"] == ["filename"]
+    assert Source.model_fields["sha256"].is_required()
+    with pytest.raises(ValueError):
+        Output.model_validate(
+            {"sources": [{"filename": "source.pdf", "sha256": "bad"}]}
+        )

@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.contracts.output_reference import HumanDesignKnowledgeDetails
+from fatebridge.core.contracts.knowledge import HumanDesignKnowledgeDetails
 from fatebridge.core.human_design import depth
 from fatebridge.core.human_design import knowledge as hd
 from fatebridge.services.knowledge import (

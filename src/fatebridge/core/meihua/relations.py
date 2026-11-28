@@ -5,12 +5,12 @@ from __future__ import annotations
 from typing import Any
 
 from fatebridge.core.hexagram_relations import ELEMENT_GENERATES, relationship_by_role
-from fatebridge.core.liuyao.najia import (
-    BRANCH_TO_ELEMENT,
+from fatebridge.core.meihua.texts import meihua_ruleset
+from fatebridge.utils.data import (
     TRIGRAM_LOWER_BRANCHES,
     TRIGRAM_UPPER_BRANCHES,
+    branch_element_text,
 )
-from fatebridge.core.meihua.texts import meihua_ruleset
 
 ROLES = ("use", "body_mutual", "use_mutual", "changed_use")
 
@@ -90,7 +90,7 @@ def compute_party_counts(meihua: dict[str, Any]) -> dict[str, Any]:
     lower_branches = TRIGRAM_LOWER_BRANCHES.get(base["lower"]["name"], ())
     upper_branches = TRIGRAM_UPPER_BRANCHES.get(base["upper"]["name"], ())
     line_elements = [
-        BRANCH_TO_ELEMENT[b] for b in (*lower_branches, *upper_branches) if b
+        branch_element_text(b) for b in (*lower_branches, *upper_branches) if b
     ]
     body_line_party = sum(
         1 for elem in line_elements if _is_party_element(elem, body_elem)[0]

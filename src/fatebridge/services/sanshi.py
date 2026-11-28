@@ -162,7 +162,7 @@ def calculate_liureng_runyear(
         analysis_utc_offset=analysis_utc_offset,
         analysis_longitude=analysis_longitude,
         use_true_solar_time=use_true_solar_time,
-        true_solar_explicit=true_solar_explicit,
+        true_solar_explicit=use_true_solar_time or true_solar_explicit,
     )
     birth_zone, birth_zone_source = resolve_runyear_birth_zone(
         person.birth_timezone, person.birth_place, person.birth_longitude

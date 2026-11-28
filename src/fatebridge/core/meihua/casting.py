@@ -4,10 +4,9 @@ from __future__ import annotations
 
 import re
 from datetime import date, datetime, timedelta, timezone
-from functools import lru_cache
 from typing import Any, Literal, NamedTuple, TypedDict
 
-from pydantic import JsonValue, TypeAdapter
+from pydantic import JsonValue
 from pydantic_core import PydanticCustomError
 from typing_extensions import NotRequired
 
@@ -20,14 +19,6 @@ from fatebridge.utils.civil_clock import (
 )
 from fatebridge.utils.errors import ParameterError
 from fatebridge.utils.timezones import LocalClockError, timezone_rules_metadata
-
-
-@lru_cache(maxsize=1)
-def _casting_adapter() -> TypeAdapter[Any]:
-    from fatebridge.core.requests.meihua import MeihuaCasting
-
-    return TypeAdapter(MeihuaCasting)
-
 
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 NUMBERS = {"乾": 1, "兑": 2, "离": 3, "震": 4, "巽": 5, "坎": 6, "艮": 7, "坤": 8}
@@ -255,32 +246,6 @@ def resolve_meihua_cast_datetime(
     }
 
 
-def clock_components(
-    minute: int | None,
-    second: int | None,
-    declared: list[str] | None,
-) -> list[str]:
-    """Return validated supplied clock component names."""
-    inferred = [*COMPONENTS[:4]]
-    if minute is not None:
-        inferred.append("minute")
-    if second is not None:
-        inferred.append("second")
-    if declared is None:
-        return inferred
-    if (
-        type(declared) is not list
-        or any(type(n) is not str or n not in COMPONENTS for n in declared)
-        or declared != [n for n in COMPONENTS if n in declared]
-        or declared[:4] != list(COMPONENTS[:4])
-        or any(n in declared and n not in inferred for n in COMPONENTS[4:])
-        or ("minute" not in declared and minute not in (None, 0))
-        or ("second" not in declared and second not in (None, 0))
-    ):
-        raise ValueError("钟时输入分量记录与实际计算参数冲突")
-    return list(declared)
-
-
 def clock_input_receipt(
     local: datetime,
     instant_utc: str,
@@ -467,7 +432,7 @@ def cast_explicit_meihua(
     """Cast an explicit Meihua hexagram across all 12 supported methods."""
     from fatebridge.core.divination import compose_meihua_hexagram
 
-    parameters = _casting_adapter().validate_python(casting).model_dump(mode="json")
+    parameters = dict(casting)
     method = parameters["method"]
     hour = (
         BRANCHES.index(parameters["hour_branch"]) + 1

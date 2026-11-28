@@ -8,7 +8,7 @@ from fatebridge.application.bindings import (
     request_model_ref,
     service_ref,
 )
-from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.application.tool_spec import BatchInputPolicy, ToolSpec
 
 _REQ_MODULE = "fatebridge.core.requests.western_lifespan"
 
@@ -83,6 +83,7 @@ def _western_lifespan_spec(
     model_name: str,
     label: str,
     *,
+    required_output_fields: tuple[str, ...] | None = None,
     summary: str | None = None,
     rest_path: str | None = None,
     default_omit: tuple[str, ...] = (),
@@ -92,12 +93,14 @@ def _western_lifespan_spec(
         name=name,
         bind=bind_kwargs(service),
         request_model_loader=request_model_ref(_REQ_MODULE, model_name),
+        required_output_fields=required_output_fields or (name,),
         summary=summary or f"{label}：古典全生命周期技法（不需目标时刻）。",
         operation_label_zh=label,
         family="western_lifespan",
         cpu_bound=True,
         rest_path=rest_path or "/api/astrology/timing/" + name.replace("_", "-"),
         default_omit=default_omit,
+        batch_policy=BatchInputPolicy(subject_mode="birth_fields"),
     )
 
 
@@ -149,6 +152,7 @@ SPECS: list[ToolSpec] = [
         calculate_balbillus,
         "AstroBalbillusRequest",
         "Balbillus 129年系统",
+        required_output_fields=("balbillus",),
         default_omit=(
             "natal_reference",
             "balbillus.reduction_model",
@@ -174,6 +178,7 @@ SPECS: list[ToolSpec] = [
         calculate_planetary_arc,
         "AstroPlanetaryArcRequest",
         "行星弧方向",
+        required_output_fields=("planetary_arc",),
         default_omit=("natal_reference",),
     ),
     _western_lifespan_spec(

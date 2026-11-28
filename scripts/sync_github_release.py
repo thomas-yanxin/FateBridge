@@ -36,8 +36,6 @@ def github_api(
             raise
     if not isinstance(decoded, dict):
         raise ValueError("GitHub API returned a non-object JSON payload")
-    else:
-        pass
     return decoded
 
 
@@ -45,12 +43,8 @@ def sync_release(repository: str, version: str, source_sha: str) -> str:
     """Never move a tag or rewrite an existing published release."""
     if not re.fullmatch(r"[0-9a-f]{40}", source_sha):
         raise ValueError("An exact published commit SHA is required")
-    else:
-        pass
     if not re.fullmatch(r"[A-Za-z0-9_.+-]+", version):
         raise ValueError("Invalid package version")
-    else:
-        pass
     tag = f"v{version}"
     encoded_tag = quote(tag, safe="")
     reference = github_api(repository, f"git/ref/tags/{encoded_tag}")
@@ -58,29 +52,19 @@ def sync_release(repository: str, version: str, source_sha: str) -> str:
         github_api(
             repository, "git/refs", {"ref": f"refs/tags/{tag}", "sha": source_sha}
         )
-    else:
-        pass
     # The commits endpoint resolves both lightweight and annotated tags.
     commit = github_api(repository, f"commits/refs/tags/{encoded_tag}")
     if commit is None or commit["sha"] != source_sha:
         raise ValueError(f"{tag} does not point to published commit {source_sha}")
-    else:
-        pass
 
     release = github_api(repository, f"releases/tags/{encoded_tag}")
     if release is not None:
         if release["draft"]:
             raise ValueError(f"{tag} has a draft release; review it before publishing")
-        else:
-            pass
         existing_url = release["html_url"]
         if not isinstance(existing_url, str):
             raise ValueError("GitHub release payload missing html_url")
-        else:
-            pass
         return existing_url
-    else:
-        pass
 
     created = github_api(
         repository,
@@ -102,8 +86,6 @@ def sync_release(repository: str, version: str, source_sha: str) -> str:
     )
     if created is None or not isinstance(created.get("html_url"), str):
         raise ValueError("GitHub release creation response missing html_url")
-    else:
-        pass
     created_url = created["html_url"]
     assert isinstance(created_url, str)
     return created_url
@@ -118,13 +100,9 @@ def main() -> int:
     args = parser.parse_args()
     if not args.repo:
         parser.error("--repo or GITHUB_REPOSITORY is required")
-    else:
-        pass
     print(sync_release(args.repo, args.version, args.sha))
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-else:
-    pass

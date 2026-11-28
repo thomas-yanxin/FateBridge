@@ -26,11 +26,13 @@ from fatebridge.core.almanac import (
 )
 from fatebridge.core.batch_cache import batch_cached, metaphysics_seed_key
 from fatebridge.core.ephemeris_runtime import swe
-from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX, MetaphysicsSeed
+from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.ren_calendar import compute_month_general
 from fatebridge.core.metaphysics.taiyi.core import (
     BRANCHES,
     DEFAULT_TABLE_POLICY,
+    TaiyiBoard,
+    TaiyiCoreSnapshot,
     TaiyiTablePolicy,
     assemble_board,
     attach_gate_board,
@@ -48,6 +50,7 @@ from fatebridge.utils.civil_time import (
     gregorian_date_parts,
     utc_calendar,
 )
+from fatebridge.utils.data import SEXAGENARY_INDEX
 from fatebridge.utils.solar_time import calculate_equation_of_time_minutes
 from fatebridge.utils.timezones import timezone_rules_metadata, validate_local_clock
 
@@ -263,12 +266,23 @@ def historical_year_context(
     row = data["months"][i]
     day = (civil_date - dates[i]).days + 1
     year = row["year"]
+    reign_label = row.get("reign_label")
+    if reign_label:
+        reign_suffix = f"（{reign_label}）"
+    elif (regnal_year := row.get("regnal_year")) is not None:
+        reign_suffix = (
+            f"（太元{regnal_year}年）"
+            if profile == HISTORICAL_YEAR_PROFILE
+            else f"（第{regnal_year}年）"
+        )
+    else:
+        reign_suffix = ""
     return {
         "year": year,
         "month": row["month"],
         "day": day,
         "is_leap_month": row["is_leap_month"],
-        "display": f"{year}年{'闰' if row['is_leap_month'] else ''}{row['month']}月{day}日（{row['reign_label']}）",
+        "display": f"{year}年{'闰' if row['is_leap_month'] else ''}{row['month']}月{day}日{reign_suffix}",
         "julian_month_start": row["julian_start"],
         "gregorian_month_start": dates[i].isoformat(),
     }
@@ -460,18 +474,16 @@ def yearly_core(
     *,
     shiji_profile: str | None = None,
     table_policy: TaiyiTablePolicy = DEFAULT_TABLE_POLICY,
-) -> dict[str, Any]:
+) -> TaiyiCoreSnapshot:
     if type(year) is not int or year < 1:
         raise ValueError("年计需要正整数公元年份")
     accumulation = 1937281 + year - 724
     core = cyclic_core(
         accumulation, shiji_profile=shiji_profile, table_policy=table_policy
     )
-    core.update(
-        kook_year=("理天", "理地", "理人")[(accumulation - 1) % 3],
-        suijun=BRANCHES[(year - 4) % 12],
-        heshen=BRANCHES[(1 - (year - 4)) % 12],
-    )
+    core["kook_year"] = ("理天", "理地", "理人")[(accumulation - 1) % 3]
+    core["suijun"] = BRANCHES[(year - 4) % 12]
+    core["heshen"] = BRANCHES[(1 - (year - 4)) % 12]
     return core
 
 
@@ -482,7 +494,7 @@ def build_year_board(
     *,
     shiji_profile: str | None = None,
     table_policy: TaiyiTablePolicy = DEFAULT_TABLE_POLICY,
-) -> dict[str, Any]:
+) -> TaiyiBoard:
     if year_profile is not None and (
         not isinstance(year_profile, str) or year_profile not in YEAR_PROFILES
     ):
@@ -505,48 +517,46 @@ def build_year_board(
         raise ValueError("太乙年计农历年份必须是整数")
     core = yearly_core(year, shiji_profile=shiji_profile, table_policy=table_policy)
     board = assemble_board(core, calculation_mode="year")
-    board.update(
-        style_label="太乙金镜式经·年计",
-        accumulation_label=f"年计积年数：{core['accumulation']}",
-        rotation="顺布",
-        life_method="年计",
-        calendar_rules={
-            "year": year,
-            "year_boundary": (
-                "historical_printed_lunar_new_year_civil_date"
-                if historical
-                else "lunar_new_year_civil_date"
-            ),
-            "year_boundary_status": "implemented",
-            "year_ganzhi": STEMS[(year - 4) % 10] + core["suijun"],
-            "civil_datetime": instant.isoformat(),
-            "timezone": seed.timezone,
-            "solar_correction_affects_year": False,
-            **(
-                {"year_profile": year_profile, "historical_calendar": historical}
-                if historical
-                else {}
-            ),
-        },
-        ruleset={
-            "id": YEAR_RULESET_ID,
-            "version": "2.0.0",
-            "author": "FateBridge contributors",
-            "classical_author": "唐·王希明",
-            "source_title": "太乙金镜式经（四库全书本）",
-            "time_granularity": "year",
-            "classical_conformance": "implemented",
-            "classical_acceptance_passed": True,
-        },
-        interpretation_scope={
-            "calculation": "年计太乙、二目、计神、主客算、四将及三门五将",
-            "gender_used": False,
-        },
-    )
-    if not historical:
-        board["calendar_rules"]["civil_lunar_calendar"] = civil_lunar_evidence(
+    calendar_rules: dict[str, object] = {
+        "year": year,
+        "year_boundary": (
+            "historical_printed_lunar_new_year_civil_date"
+            if historical
+            else "lunar_new_year_civil_date"
+        ),
+        "year_boundary_status": "implemented",
+        "year_ganzhi": STEMS[(year - 4) % 10] + core.get("suijun", ""),
+        "civil_datetime": instant.isoformat(),
+        "timezone": seed.timezone,
+        "solar_correction_affects_year": False,
+    }
+    if historical:
+        assert year_profile is not None
+        calendar_rules["year_profile"] = year_profile
+        calendar_rules["historical_calendar"] = historical
+    else:
+        calendar_rules["civil_lunar_calendar"] = civil_lunar_evidence(
             lunar, instant.date()
         )
+    board["style_label"] = "太乙金镜式经·年计"
+    board["accumulation_label"] = f"年计积年数：{core['accumulation']}"
+    board["rotation"] = "顺布"
+    board["life_method"] = "年计"
+    board["calendar_rules"] = calendar_rules
+    board["ruleset"] = {
+        "id": YEAR_RULESET_ID,
+        "version": "2.0.0",
+        "author": "FateBridge contributors",
+        "classical_author": "唐·王希明",
+        "source_title": "太乙金镜式经（四库全书本）",
+        "time_granularity": "year",
+        "classical_conformance": "implemented",
+        "classical_acceptance_passed": True,
+    }
+    board["interpretation_scope"] = {
+        "calculation": "年计太乙、二目、计神、主客算、四将及三门五将",
+        "gender_used": False,
+    }
     board["calendar_summary"] = calendar_summary(board)
     attach_long_cycles(board, year)
     attach_gate_board(board, "year", year)
@@ -560,7 +570,7 @@ def build_day_board(
     *,
     shiji_profile: str | None = None,
     table_policy: TaiyiTablePolicy = DEFAULT_TABLE_POLICY,
-) -> dict[str, Any]:
+) -> TaiyiBoard:
     profile = DEFAULT_DAY_PROFILE if day_profile is None else day_profile
     if profile not in DAY_PROFILES:
         raise ValueError("day_profile须选择jinjing_day_v1或key_day_winter_jiazi_v1")
@@ -593,69 +603,61 @@ def build_day_board(
     core = cyclic_core(
         count, yin=yin, shiji_profile=shiji_profile, table_policy=table_policy
     )
-    core.update(
-        ruler_branch=ruler,
-        ruler_label="日支",
-        heshen=BRANCHES[(1 - BRANCHES.index(ruler)) % 12],
-    )
+    core["ruler_branch"] = ruler
+    core["ruler_label"] = "日支"
+    core["heshen"] = BRANCHES[(1 - BRANCHES.index(ruler)) % 12]
     board = assemble_board(core, calculation_mode="day")
     clock_basis = (
         "local_apparent_solar" if seed.applied_true_solar else "civil_wall_clock"
     )
-    board.update(
-        style_label=style_label,
-        accumulation_label=f"日计积日：{count}",
-        rotation="逆布" if yin else "顺布",
-        life_method="日计",
-        solar_anchors={
-            "boundary": anchor.as_dict(),
-            **(
-                {"winter_origin": winter.as_dict()}
-                if profile == KEY_DAY_PROFILE
-                else {}
-            ),
-        },
-        solar_anchor_scope=SOLAR_ANCHOR_SCOPE,
-        calendar_rules={
-            "input_calendar": "proleptic_gregorian",
-            "calculation_mode": "day",
-            "day_profile": profile,
-            "day_origin": origin,
-            "civil_datetime": instant.isoformat(),
-            "timezone": seed.timezone,
-            "anchor_name": anchor.name,
-            "anchor_utc": anchor.calendar.utc.isoformat(),
-            "anchor_provider": anchor.resolution_provider,
-            "counter": count,
-            "palace_day_number": (count - 1) % 3 + 1,
-            "clock_basis": clock_basis,
-            "target_clock": target_clock.isoformat(),
-        },
-        ruleset={
-            "id": profile,
-            "version": "2.0.0",
-            "author": "FateBridge contributors",
-            "classical_author": classical_author,
-            "source_title": source_title,
-            "time_granularity": "selected_clock_day",
-            "classical_conformance": "implemented",
-            "classical_acceptance_passed": True,
-        },
-        interpretation_scope={
-            "calculation": "日计阴阳局、二目、计神、主客算及四将、三门五将",
-            "gender_used": False,
-        },
-        long_cycles={
-            "status": "not_computed_for_selected_mode",
-            "time_granularity": "year",
-        },
-        long_cycle_summary={"status": "not_computed_for_selected_mode"},
-        extra_palace_marks=[],
-    )
+    solar_anchors: dict[str, dict[str, object]] = {"boundary": anchor.as_dict()}
+    if profile == KEY_DAY_PROFILE:
+        solar_anchors["winter_origin"] = winter.as_dict()
+    board["style_label"] = style_label
+    board["accumulation_label"] = f"日计积日：{count}"
+    board["rotation"] = "逆布" if yin else "顺布"
+    board["life_method"] = "日计"
+    board["solar_anchors"] = solar_anchors
+    board["solar_anchor_scope"] = SOLAR_ANCHOR_SCOPE
+    board["calendar_rules"] = {
+        "input_calendar": "proleptic_gregorian",
+        "calculation_mode": "day",
+        "day_profile": profile,
+        "day_origin": origin,
+        "civil_datetime": instant.isoformat(),
+        "timezone": seed.timezone,
+        "anchor_name": anchor.name,
+        "anchor_utc": anchor.calendar.utc.isoformat(),
+        "anchor_provider": anchor.resolution_provider,
+        "counter": count,
+        "palace_day_number": (count - 1) % 3 + 1,
+        "clock_basis": clock_basis,
+        "target_clock": target_clock.isoformat(),
+    }
+    board["ruleset"] = {
+        "id": profile,
+        "version": "2.0.0",
+        "author": "FateBridge contributors",
+        "classical_author": classical_author,
+        "source_title": source_title,
+        "time_granularity": "selected_clock_day",
+        "classical_conformance": "implemented",
+        "classical_acceptance_passed": True,
+    }
+    board["interpretation_scope"] = {
+        "calculation": "日计阴阳局、二目、计神、主客算及四将、三门五将",
+        "gender_used": False,
+    }
+    board["long_cycles"] = {
+        "status": "not_computed_for_selected_mode",
+        "time_granularity": "year",
+    }
+    board["long_cycle_summary"] = {"status": "not_computed_for_selected_mode"}
+    board["extra_palace_marks"] = []
     if profile == KEY_DAY_PROFILE:
         board["ten_jing"] = key_ten_jing(count, yin)
         board["winter_origin_selection"] = winter_origin_selection(
-            origin, board["solar_anchors"]["winter_origin"], clock_basis
+            origin, solar_anchors["winter_origin"], clock_basis
         )
     attach_gate_board(board, "day")
     board["calendar_summary"] = calendar_summary(board)
@@ -763,7 +765,7 @@ def build_period_board(
     *,
     shiji_profile: str | None = None,
     table_policy: TaiyiTablePolicy = DEFAULT_TABLE_POLICY,
-) -> dict[str, Any]:
+) -> TaiyiBoard:
     instant = localize_datetime(seed.input_datetime, seed.timezone)
     frame = period_frame(seed, mode, hour_profile, month_profile)
     is_key_month = mode == "month" and month_profile == KEY_MONTH_PROFILE
@@ -840,49 +842,43 @@ def build_period_board(
             **({"hour_origin": frame["hour_origin"]} if is_key_hour else {}),
         )
 
-    board.update(
-        style_label=f"太乙·{label}",
-        accumulation_label=f"{label}积数：{frame['accumulation']}",
-        rotation="逆布" if frame["yin"] else "顺布",
-        life_method=label,
-        solar_anchors={
-            "boundary": term.as_dict(),
-            **(
-                {"winter_origin": frame["winter_anchor"].as_dict()}
-                if "winter_anchor" in frame
-                else {}
-            ),
-        },
-        solar_anchor_scope=SOLAR_ANCHOR_SCOPE,
-        calendar_rules=calendar,
-        ruleset={
-            "id": profile,
-            "version": "2.0.0",
-            "author": "FateBridge contributors",
-            "classical_author": (
-                "太乙金钥匙续集" if (is_key_month or is_key_hour) else "唐·王希明"
-            ),
-            "source_title": (
-                "太乙金钥匙续集" if (is_key_month or is_key_hour) else "太乙金镜式经"
-            ),
-            "time_granularity": granularity,
-            "classical_conformance": "implemented",
-            "classical_acceptance_passed": True,
-        },
-        interpretation_scope={
-            "calculation": f"{label}太乙阴阳局及三门五将",
-            "gender_used": False,
-        },
-        long_cycles={
-            "status": "not_computed_for_selected_mode",
-            "time_granularity": "year",
-        },
-        long_cycle_summary={"status": "not_computed_for_selected_mode"},
-        extra_palace_marks=[],
-    )
+    solar_anchors: dict[str, dict[str, object]] = {"boundary": term.as_dict()}
+    if "winter_anchor" in frame:
+        solar_anchors["winter_origin"] = frame["winter_anchor"].as_dict()
+    board["style_label"] = f"太乙·{label}"
+    board["accumulation_label"] = f"{label}积数：{frame['accumulation']}"
+    board["rotation"] = "逆布" if frame["yin"] else "顺布"
+    board["life_method"] = label
+    board["solar_anchors"] = solar_anchors
+    board["solar_anchor_scope"] = SOLAR_ANCHOR_SCOPE
+    board["calendar_rules"] = calendar
+    board["ruleset"] = {
+        "id": profile,
+        "version": "2.0.0",
+        "author": "FateBridge contributors",
+        "classical_author": (
+            "太乙金钥匙续集" if (is_key_month or is_key_hour) else "唐·王希明"
+        ),
+        "source_title": (
+            "太乙金钥匙续集" if (is_key_month or is_key_hour) else "太乙金镜式经"
+        ),
+        "time_granularity": granularity,
+        "classical_conformance": "implemented",
+        "classical_acceptance_passed": True,
+    }
+    board["interpretation_scope"] = {
+        "calculation": f"{label}太乙阴阳局及三门五将",
+        "gender_used": False,
+    }
+    board["long_cycles"] = {
+        "status": "not_computed_for_selected_mode",
+        "time_granularity": "year",
+    }
+    board["long_cycle_summary"] = {"status": "not_computed_for_selected_mode"}
+    board["extra_palace_marks"] = []
     if is_key_hour:
         board["winter_origin_selection"] = winter_origin_selection(
-            frame["hour_origin"], board["solar_anchors"]["winter_origin"], clock_basis
+            frame["hour_origin"], solar_anchors["winter_origin"], clock_basis
         )
     attach_gate_board(board, mode)
     board["calendar_summary"] = calendar_summary(board)
@@ -895,30 +891,40 @@ def build_fate_board(
     *,
     shiji_profile: str | None = None,
     table_policy: TaiyiTablePolicy = DEFAULT_TABLE_POLICY,
-) -> dict[str, Any]:
+) -> TaiyiBoard:
     """Build《太乙命法》board with annual base, 十二命宫, 命/身宫, and 天将/十六神."""
     board = build_year_board(
         seed, gender, shiji_profile=shiji_profile, table_policy=table_policy
     )
     instant = localize_datetime(seed.input_datetime, seed.timezone)
     general_info = compute_month_general(seed)
+    calendar_rules = board.get("calendar_rules", {})
+    lunar_year = calendar_rules["year"]
+    assert isinstance(lunar_year, int)
     fate_palaces = compute_taiyi_fate_palaces(
         month_general=general_info["branch"],
         birth_hour_branch=seed.pillars["hour"][1],
-        lunar_year=board["calendar_rules"]["year"],
+        lunar_year=lunar_year,
         gender=gender,
     )
     board["style_label"] = "太乙命法·先天十二宫"
     board["life_method"] = f"太乙命法（{gender}）"
     board["fate_palaces"] = fate_palaces
-    board["calendar_rules"]["calculation_mode"] = "fate"
+    calendar_rules["calculation_mode"] = "fate"
     board["calendar_summary"] = calendar_summary(board)
     board["interpretation_scope"] = {
         "calculation": "太乙命法出生盘（年计定局、十二命宫、身命宫与十六神）",
         "gender_used": True,
     }
-    board["ruleset"].update(id="taiyi_mingfa_v1", time_granularity="year")
-    board["long_cycles"]["ruleset"]["classical_acceptance_passed"] = True
+    ruleset = board.get("ruleset")
+    if ruleset is not None:
+        ruleset["id"] = "taiyi_mingfa_v1"
+        ruleset["time_granularity"] = "year"
+    long_cycles = board.get("long_cycles")
+    if long_cycles is not None:
+        long_ruleset = long_cycles.get("ruleset")
+        if long_ruleset is not None:
+            long_ruleset["classical_acceptance_passed"] = True
     return board
 
 
@@ -947,12 +953,7 @@ def _taiyi_board_cache_key(
     )
 
 
-@batch_cached(
-    "taiyi.build_taiyi_board",
-    _taiyi_board_cache_key,
-    copy_result=True,
-)
-def build_taiyi_board(
+def _build_taiyi_board_typed(
     seed: MetaphysicsSeed,
     gender: str,
     *,
@@ -963,7 +964,7 @@ def build_taiyi_board(
     day_profile: str | None = None,
     shiji_profile: str | None = None,
     table_policy: TaiyiTablePolicy = DEFAULT_TABLE_POLICY,
-) -> dict[str, Any]:
+) -> TaiyiBoard:
     """Build Taiyi board for year, month, day, hour, minute, or fate."""
     if year_profile is not None and calculation_mode != "year":
         raise ValueError("year_profile仅用于year年计")
@@ -1005,3 +1006,37 @@ def build_taiyi_board(
             table_policy=table_policy,
         )
     raise ValueError("Taiyi calculation_mode仅支持year/month/day/hour/minute/fate")
+
+
+@batch_cached(
+    "taiyi.build_taiyi_board",
+    _taiyi_board_cache_key,
+    copy_result=True,
+)
+def build_taiyi_board(
+    seed: MetaphysicsSeed,
+    gender: str,
+    *,
+    calculation_mode: str = "year",
+    hour_profile: str | None = None,
+    month_profile: str | None = None,
+    year_profile: str | None = None,
+    day_profile: str | None = None,
+    shiji_profile: str | None = None,
+    table_policy: TaiyiTablePolicy = DEFAULT_TABLE_POLICY,
+) -> dict[str, Any]:
+    """Build Taiyi board for year, month, day, hour, minute, or fate."""
+    board = _build_taiyi_board_typed(
+        seed,
+        gender,
+        calculation_mode=calculation_mode,
+        hour_profile=hour_profile,
+        month_profile=month_profile,
+        year_profile=year_profile,
+        day_profile=day_profile,
+        shiji_profile=shiji_profile,
+        table_policy=table_policy,
+    )
+    result: dict[str, Any] = {}
+    result.update(board)
+    return result

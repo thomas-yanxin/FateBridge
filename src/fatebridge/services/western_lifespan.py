@@ -20,7 +20,9 @@ from fatebridge.core.astro.astrology_lifespan import (
     build_vedic_progression_payload,
     build_yearsystem129_payload,
 )
+from fatebridge.core.astro.birth import AstroBirthInfo
 from fatebridge.core.astro.ephemeris import _swisseph_planet_state
+from fatebridge.core.astro.native_chart import NativeSubject
 from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
 from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.predictive._common import (
@@ -84,7 +86,7 @@ def _prepare_chart(
     house_system: str,
     zodiac_type: str,
     **birth_kwargs: Any,
-) -> tuple[Any, Any, dict[str, Any], str]:
+) -> tuple[AstroBirthInfo, NativeSubject, dict[str, dict[str, Any]], str]:
     """Build birth info, natal subject, natal reference, and sect from kwargs."""
     house_system = normalize_house_system(house_system)
     birth_info = build_predictive_birth_info(
@@ -110,11 +112,11 @@ def _prepare_chart(
 def _analysis_context(
     *,
     label: str,
-    birth_info: Any,
+    birth_info: AstroBirthInfo,
     sect: str,
     house_system: str,
     zodiac_type: str,
-) -> dict[str, Any]:
+) -> dict[str, object]:
     return {
         "tool": label,
         "birth_datetime": birth_info.local_datetime.isoformat(),
@@ -131,9 +133,9 @@ def _envelope(
     *,
     analysis_type: str,
     tool_name: str,
-    context: dict[str, Any],
-    natal_reference: dict[str, Any],
-    payload: dict[str, Any],
+    context: dict[str, object],
+    natal_reference: dict[str, dict[str, Any]],
+    payload: dict[str, object],
     summary: str,
 ) -> dict[str, Any]:
     return {

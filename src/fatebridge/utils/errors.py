@@ -5,7 +5,7 @@ from __future__ import annotations
 import difflib
 import logging
 import types
-from collections.abc import Collection, Mapping, Sequence
+from collections.abc import Collection, Iterable, Mapping, Sequence
 from functools import wraps
 from traceback import walk_tb
 from typing import Annotated, Any, Callable, ParamSpec, Union, get_args, get_origin
@@ -39,10 +39,7 @@ class NumerologySourceError(DomainSourceError, RuntimeError):
     """A source/configuration inconsistency cannot be fixed by changing a birth input."""
 
     MESSAGES = {
-        "invalid_source_data": "河洛纳甲来源数据未能通过一致性核对。",
         "invalid_month_source_data": "河洛卦月来源数据未能通过一致性核对。",
-        "invalid_line_condition_source_data": "河洛爻位原句来源数据未能通过一致性核对。",
-        "invalid_body_structure_source_data": "河洛卦体结构原例来源数据未能通过一致性核对。",
         "invalid_pillar_link_source_data": "河洛卷七起月起时来源数据未能通过一致性核对。",
         "invalid_heluo_header_collation": "河洛爻辞校勘来源缺失或未能通过一致性核对。",
         "invalid_heluo_commentary_collation": "河洛注文校勘来源缺失或未能通过一致性核对。",
@@ -50,19 +47,14 @@ class NumerologySourceError(DomainSourceError, RuntimeError):
         "invalid_canping_schedule_collation": "参评配运原句或版本出处未能通过来源一致性核对。",
         "invalid_canping_text_source": "参评文字来源缺失或无法解析，需维护者核查。",
         "invalid_canping_text_collation": "参评主本原文或校勘身份与已核修订不符，需维护者核查。",
-        "invalid_canping_witness_collation": "参评对读原文或独立书影身份与所存修订不符，需维护者核查。",
         "invalid_numerology_knowledge_sources": "河洛／参评知识来源目录或原文身份与所核修订不符，需维护者核查。",
-        "runtime_numerology_knowledge_binding_conflict": "河洛／参评知识回执与原始查询或所核来源不一致，需维护者核查。",
         "runtime_canping_schedule_profile_conflict": "参评配运来源回执与实际方法不一致，需维护者核查。",
         "runtime_canping_schedule_binding_conflict": "参评配运释文、来源角色或时钟回执不一致，需维护者核查。",
         "invalid_heluo_clock_source": "河洛卷一百刻与寄时原句来源未能通过一致性核对。",
-        "invalid_heluo_jiehou_source": "河洛卷一节卦与候卦原表未能通过来源一致性核对。",
         "runtime_heluo_jiehou_context_conflict": "内部节气名、象限或时刻证据不一致，需维护者核查节候上下文。",
         "runtime_heluo_year_context_conflict": "内部岁运年标签与出生年柱不一致，需维护者核查计算上下文。",
-        "invalid_heluo_opposition_source": "河洛元气相反原句与映射未能通过来源一致性核对。",
         "runtime_heluo_yuanqi_context_conflict": "内部年命元气映射或同阶段卦体不一致，需维护者核查计算上下文。",
         "runtime_heluo_solar_context_conflict": "河洛所用节气、至点或四立来源与当前历法上下文不一致，需维护者核查。",
-        "runtime_numerology_solar_source_conflict": "二数实际节气模型与来源索引不一致，需维护者核查。",
         "runtime_numerology_clock_input_conflict": "二数出生钟时分量回执与原始请求或实际计算不一致，需维护者核查。",
         "runtime_pillar_link_conflict": "内部四柱与所核起月起时规则不一致，需维护者核查计算来源。",
         "runtime_month_assignment_conflict": "卦属月计算表与已核原页冲突。",
@@ -86,77 +78,6 @@ class NumerologySourceError(DomainSourceError, RuntimeError):
         }
 
 
-class FengshuiCalculationError(DomainSourceError, RuntimeError):
-    """Internal plate contradictions cannot be resolved by changing user facts."""
-
-    MESSAGES = {
-        "natal_identity_mismatch": "玄空计算盘与本次选定的宅运或山向不一致。",
-        "natal_plate_inconsistent": "玄空计算盘的九宫数字、排列或逐宫表示不一致。",
-        "natal_trace_inconsistent": "玄空计算盘的种子、中心星或顺逆计算记录不一致。",
-        "natal_structure_inconsistent": "玄空派生数式、结构标签或合取结论与原盘数字不一致。",
-        "natal_mutual_geometry_inconsistent": "玄空先后天互用图位、来源或候选星数不一致。",
-        "natal_author_timeliness_inconsistent": "玄空作者基本时令或互用数字与原盘星数及评价运不一致。",
-        "natal_host_guest_inconsistent": "玄空主客盘层、星数、生克出入或原文对照不一致。",
-        "monthly_plate_inconsistent": "月紫白有效年、节月、原表入中数、九宫飞布或区间表示不一致。",
-    }
-
-    def __init__(self, reason: str) -> None:
-        if reason not in self.MESSAGES:
-            raise ValueError("Unknown Feng Shui calculation consistency reason")
-        self.reason = reason
-        super().__init__(self.MESSAGES[reason])
-
-    def as_result(self) -> dict[str, Any]:
-        return {
-            "error": str(self),
-            "error_code": "fengshui_calculation_inconsistent",
-            "status_code": 503,
-            "retryable": False,
-            "issues": [
-                {
-                    "path": (
-                        "runtime.fengshui.monthly_stars"
-                        if self.reason == "monthly_plate_inconsistent"
-                        else (
-                            "runtime.fengshui.interpretation"
-                            if self.reason
-                            in {
-                                "natal_mutual_geometry_inconsistent",
-                                "natal_author_timeliness_inconsistent",
-                                "natal_host_guest_inconsistent",
-                            }
-                            else "runtime.fengshui.natal_chart"
-                        )
-                    ),
-                    "code": self.reason,
-                }
-            ],
-        }
-
-
-class JyotishCalculationError(DomainSourceError, RuntimeError):
-    """An internal natal-evidence contradiction is not a bad birth input."""
-
-    MESSAGES = {
-        "drik_chain_inconsistent": "印占相位力证据与本次D1计算不一致，需维护者核查。",
-    }
-
-    def __init__(self, reason: str) -> None:
-        if reason not in self.MESSAGES:
-            raise ValueError("Unknown Jyotish calculation consistency reason")
-        self.reason = reason
-        super().__init__(self.MESSAGES[reason])
-
-    def as_result(self) -> dict[str, Any]:
-        return {
-            "error": str(self),
-            "error_code": "jyotish_calculation_inconsistent",
-            "status_code": 503,
-            "retryable": False,
-            "issues": [{"path": "runtime.jyotish.drik_bala", "code": self.reason}],
-        }
-
-
 class EphemerisCalculationError(RuntimeError):
     """A loaded native ephemeris calculation failed without a verified cause."""
 
@@ -173,10 +94,6 @@ class EphemerisSourceError(DomainSourceError, ValueError):
         "house_projection_precision_unavailable": "House-plane direction or its half-open house could not be resolved at the available working precision",
         "horizon_direction_precision_unavailable": "Eastern horizon endpoint direction could not be resolved at the available working precision",
         "swiss_dependency_unavailable": "A SWIEPH physical observation lacks complete observed planet and Moon file coverage; its top-level flag cannot exclude an analytical Moon dependency",
-        "required_data_files_fallback": "require_data_files rejects an analytical, orbital or unidentified physical-coordinate model",
-        "required_data_files_unavailable": "require_data_files could not obtain a requested physical coordinate or its data file",
-        "required_data_files_unverified": "require_data_files could not verify the observed physical source context or private-worker policy",
-        "ren_solar_term_longitude_inconsistent": "Consumed Liu Ren or Jin Kou solar-term name, numerical bracket or source does not match the declared model's forward solar-longitude crossing",
         "ren_solar_term_point_inconsistent": "Consumed Liu Ren or Jin Kou solar-term numerical TT evidence does not match its bracket or civil instant",
         "solar_de440_invalid": "Packaged DE440 solar coefficients are missing, corrupt, or inconsistent with their declared source",
         "solar_analytic_invalid": "Packaged analytic solar or frame coefficients are missing, corrupt, or differ from the reviewed ERFA source",
@@ -197,17 +114,10 @@ class EphemerisSourceError(DomainSourceError, ValueError):
         "solar_aa1996_changed": "Selected AA1996 manifest or library changed during calculation",
         "solar_aa1996_range": "Selected AA1996 model is outside its declared working TT interval",
         "solar_aa1996_calculation": "AA1996 Sun calculation returned non-finite values or unexpected physical options",
-        "auxiliary_changed_during": "Native time auxiliary search candidates changed during the calculation",
-        "auxiliary_unavailable": "Native time auxiliary source could not be inspected",
         "birth_clock_source_mismatch": "Birth-clock conversion and physical calculation use inconsistent Sun sources or time-scale mappings; resolve the original clock under one coherent configuration",
-        "timezone_rules_changed": "Named timezone data changed after its rules were loaded; restore consistent data and restart the runtime",
         "timezone_rules_unavailable": "Declared named timezone data could not be read",
         "timezone_rules_invalid": "Declared named timezone data is not a valid TZif rule set",
-        "design_origin_source_mismatch": "Human Design cycle source evidence disagrees with the calculated Design epoch or natal activations",
-        "human_design_reference_changed": "Human Design reference data changed after loading; restore consistent data and restart the runtime",
-        "human_design_reference_unavailable": "Human Design reference data could not be read",
         "human_design_reference_invalid": "Human Design reference data is not a valid unambiguous JSON object",
-        "human_design_reference_identity_mismatch": "Human Design reference bytes differ from the reviewed factual catalogue",
         "event_clock_source_mismatch": "Event-clock conversion and native chart use inconsistent observed Sun sources or physical time axes",
         "lunar_motion_position_mismatch": "Lunar motion correction could not reproduce the requested position frame and physical source",
         "lunar_motion_center_not_reproduced": "Lunar observer sampling could not reproduce the original center states and flags exactly",
@@ -224,8 +134,6 @@ class EphemerisSourceError(DomainSourceError, ValueError):
         "opaque_solar_requires_barycentric_files": "Opaque-Sun apparent positions require actual barycentric file states; analytical fallback is not accepted",
         "light_cone_not_bracketed": "Source light cone could not be bracketed at adjacent representable epochs",
         "coordinate_motion_unavailable": "Native ephemeris did not provide the requested finite longitude motion",
-        "point_mass_requires_barycentric_file_states": "Explicit Sun monopole comparison requires actual barycentric file states; analytical fallback is not accepted",
-        "point_mass_light_time_did_not_stabilize": "Explicit Sun monopole light time did not stabilize at the available TT precision",
         "jpl_filename_invalid": "Strict JPL kernel must be a short basename in the configured ephemeris search path",
         "jpl_file_unavailable": "Selected strict JPL kernel could not be opened",
         "jpl_kernel_invalid": "Selected strict JPL kernel is not a complete supported DE441 direct-access file",
@@ -306,6 +214,36 @@ class ParameterError(ValueError):
             "retryable": False,
             "issues": self.issues,
         }
+
+
+def unknown_tool_issue(
+    tool: str,
+    candidates: Iterable[str],
+    *,
+    path: str = "tool",
+) -> dict[str, object]:
+    """Build the shared unknown-tool diagnostic issue with fuzzy suggestions."""
+    suggestions = difflib.get_close_matches(
+        tool, sorted(set(candidates)), n=5, cutoff=0.4
+    )
+    issue: dict[str, object] = {"path": path, "code": "unknown_tool"}
+    if suggestions:
+        issue["constraints"] = {"suggestions": suggestions}
+    return issue
+
+
+def unknown_tool_error(
+    tool: str,
+    candidates: Iterable[str],
+    *,
+    path: str = "tool",
+) -> ParameterError:
+    """Build the shared 404 ParameterError for unknown tool names."""
+    return ParameterError(
+        f"未知工具: {tool}",
+        [unknown_tool_issue(tool, candidates, path=path)],
+        status_code=404,
+    )
 
 
 _EXTRA_FIELD_SYNONYMS: dict[str, tuple[str, ...]] = {

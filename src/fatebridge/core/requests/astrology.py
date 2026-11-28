@@ -10,7 +10,6 @@ from typing import Annotated, Literal
 from pydantic import (
     AwareDatetime,
     Field,
-    StrictInt,
     ValidatorFunctionWrapHandler,
     WrapValidator,
     model_validator,

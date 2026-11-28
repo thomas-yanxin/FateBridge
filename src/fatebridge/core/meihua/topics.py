@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from collections import Counter
+from collections.abc import Mapping
 from copy import deepcopy
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal, TypedDict, get_args
 
 from fatebridge.core.hexagram_relations import relationship_by_role
 from fatebridge.core.meihua.relations import (
@@ -31,6 +32,57 @@ ALL_TOPICS = (
 WEATHER_LABELS = {"thunder": "雷", "wind": "风", "rain": "雨", "clear": "晴"}
 NEW_MANIFESTATIONS = ("gold_silver_treasure", "weapon")
 CONTEXT_FIELDS = ("quiet_room", "nothing_heard", "nothing_seen")
+
+WeatherSeason = Literal["spring", "summer", "autumn", "winter"]
+WeatherPriorCondition = Literal[
+    "prolonged_rain", "prolonged_clear", "neither_prolonged"
+]
+_WEATHER_SEASONS: tuple[WeatherSeason, ...] = get_args(WeatherSeason)
+_WEATHER_PRIOR_CONDITIONS: tuple[WeatherPriorCondition, ...] = get_args(
+    WeatherPriorCondition
+)
+
+
+class WeatherContext(TypedDict):
+    season: WeatherSeason | None
+    prior_condition: WeatherPriorCondition | None
+    many_min_count: int | None
+
+
+def normalize_weather_context(
+    context: Mapping[str, object] | None,
+) -> WeatherContext:
+    raw = dict(context or {})
+    unknown = sorted(set(raw) - {"season", "prior_condition", "many_min_count"})
+    if unknown:
+        raise ValueError(f"weather_context 含未声明字段：{', '.join(unknown)}")
+    raw_season = raw.get("season")
+    season: WeatherSeason | None = None
+    if raw_season is not None:
+        matched_season = next((s for s in _WEATHER_SEASONS if s == raw_season), None)
+        if matched_season is None or not isinstance(raw_season, str):
+            raise ValueError(f"无效的 weather_context.season：{raw_season!r}")
+        season = matched_season
+    raw_prior = raw.get("prior_condition")
+    prior: WeatherPriorCondition | None = None
+    if raw_prior is not None:
+        matched_prior = next(
+            (p for p in _WEATHER_PRIOR_CONDITIONS if p == raw_prior), None
+        )
+        if matched_prior is None or not isinstance(raw_prior, str):
+            raise ValueError(f"无效的 weather_context.prior_condition：{raw_prior!r}")
+        prior = matched_prior
+    raw_many = raw.get("many_min_count")
+    many_min_count: int | None = None
+    if raw_many is not None:
+        if type(raw_many) is not int or not 2 <= raw_many <= 6:
+            raise ValueError("weather_context.many_min_count 须为 2 至 6 的整数")
+        many_min_count = raw_many
+    return {
+        "season": season,
+        "prior_condition": prior,
+        "many_min_count": many_min_count,
+    }
 
 
 def _topic_profile(topic: str) -> dict[str, Any]:
@@ -274,9 +326,7 @@ def _build_weather_one(
     *,
     fact_prefix: str = "meihua",
 ) -> dict[str, Any]:
-    from fatebridge.core.requests.meihua import MeihuaWeatherContext
-
-    confirmed = MeihuaWeatherContext.model_validate(context or {}).model_dump()
+    confirmed = normalize_weather_context(context)
     profile = load_meihua_json("weather-v1.json")
     hexagrams = [
         (key, meihua[key])
@@ -334,7 +384,11 @@ def _build_weather_one(
             )
         for name in ("season", "prior_condition"):
             if name in conditions:
-                actual = confirmed[name]
+                actual = (
+                    confirmed["season"]
+                    if name == "season"
+                    else confirmed["prior_condition"]
+                )
                 required = conditions[name]
                 checks.append(
                     {
@@ -648,18 +702,6 @@ def apply_observation_context(
             )
         ),
     }
-
-
-def normalize_day_qi_context(
-    context: dict[str, Any] | None, topic: str
-) -> dict[str, Any] | None:
-    if context is None:
-        return None
-    if topic == "weather":
-        raise ValueError("所选日气体用条款仅用于人事分支，不能套用天时占")
-    from fatebridge.core.requests.meihua_day_qi import MeihuaDayQiContext
-
-    return MeihuaDayQiContext.model_validate(context).model_dump(mode="json")
 
 
 def reported_day_qi_context(context: dict[str, Any]) -> dict[str, Any]:

@@ -1,8 +1,13 @@
 """Full-result clock binding, before any optional transport projection."""
 
-from typing import Any
+from typing import Any, Protocol, runtime_checkable
 
-from fatebridge.core.requests.divination import SuZhanRequest
+
+@runtime_checkable
+class SuZhanClockExpectation(Protocol):
+    time: str | None
+    latitude: float | str | None
+    longitude: float | str | None
 
 
 def require_clock_input_binding(
@@ -15,7 +20,7 @@ def require_clock_input_binding(
     has_coordinates = any(
         inputs.get(key) is not None for key in ("latitude", "longitude")
     )
-    if isinstance(request, SuZhanRequest) and (
+    if isinstance(request, SuZhanClockExpectation) and (
         clock_known != (request.time is not None)
         or has_coordinates
         != any(value is not None for value in (request.latitude, request.longitude))

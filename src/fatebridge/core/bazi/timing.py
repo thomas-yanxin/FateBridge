@@ -45,7 +45,6 @@ from fatebridge.core.bazi.relations import (
     collect_target_branch_relations,
 )
 from fatebridge.core.bazi.shensha import timing_shensha
-from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
 from fatebridge.utils.birth_input import normalize_gender
 from fatebridge.utils.civil_time import ZonedCalendar, utc_calendar
 from fatebridge.utils.data import (
@@ -60,6 +59,7 @@ from fatebridge.utils.data import (
     DESTRUCTION_CYCLE,
     EARTHLY_BRANCHES,
     HEAVENLY_STEMS,
+    SEXAGENARY_INDEX,
     STEM_COMBINATIONS,
     STEM_ELEMENTS,
     TRIPLE_COMBINATION_PEAK,

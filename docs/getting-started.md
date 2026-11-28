@@ -36,7 +36,7 @@ uv run --extra dev fatebridge doctor
 
 ## 完成首次 CLI 计算
 
-CLI 不自动读取 `.env`，也无需启动后台服务。运行以下虚构八字计算：
+源码环境下 CLI 会自动读取仓库根目录 `.env`（进程已有环境变量优先），也无需启动后台服务。运行以下虚构八字计算：
 
 ```bash
 fatebridge bazi_birth_chart \

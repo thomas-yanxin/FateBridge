@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import json
 from collections.abc import Mapping
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Literal, TypedDict
+from typing import Literal, TypedDict
 
+from pydantic import TypeAdapter
 from typing_extensions import NotRequired
 
 from fatebridge.core.metaphysics.common import chinese_numeral
@@ -64,9 +64,25 @@ TaiyiTablePolicy = Literal["computed", "printed_table"]
 DEFAULT_TABLE_POLICY: TaiyiTablePolicy = "computed"
 TAIYI_TABLE_POLICIES = ("computed", "printed_table")
 
+
 # Complete Siku Quanshu《太乙金镜式经》Vol. 3 printed table overrides where the
 # woodblock table diverges from pure Vol. 2 counting/rotation arithmetic.
-VOL3_PRINTED_TABLE_OVERRIDES: dict[tuple[bool, int], dict[str, Any]] = {
+class _TaiyiTableOverride(TypedDict, total=False):
+    main_count: int
+    guest_count: int
+    shiji: str
+
+
+class _YinVariant(TypedDict):
+    ju: int
+    profile: str
+    shiji: str
+    shiji_literal: str
+    guest_count: int
+    source: str
+
+
+VOL3_PRINTED_TABLE_OVERRIDES: dict[tuple[bool, int], _TaiyiTableOverride] = {
     (False, 39): {"main_count": 25},
     (False, 50): {"main_count": 6},
     (True, 11): {"guest_count": 36},
@@ -81,7 +97,7 @@ VOL3_PRINTED_TABLE_OVERRIDES: dict[tuple[bool, int], dict[str, Any]] = {
     (True, 70): {"main_count": 22},
 }
 
-YIN_37_43_44_VARIANTS: tuple[dict[str, Any], ...] = (
+YIN_37_43_44_VARIANTS: tuple[_YinVariant, ...] = (
     {
         "ju": 37,
         "profile": "jinjing_vol2_rotation_v1",
@@ -236,7 +252,385 @@ def count_labels(count: int) -> list[str]:
     return labels
 
 
-def rotate_shiji(wenchang: object, jishen: object) -> dict[str, Any]:
+class Vol5Row(TypedDict):
+    id: str
+    year_index: int
+    ganzhi: str
+    expected: dict[str, str]
+
+
+class Vol5Table(TypedDict):
+    schema_version: int
+    source: str
+    method: str
+    columns: list[str]
+    rows: list[Vol5Row]
+
+
+class NobleRow(TypedDict):
+    stem: str
+    morning_branch: str
+    evening_branch: str
+
+
+class NobleTable(TypedDict):
+    id: str
+    edition: str
+    url: str
+    page: int
+    rows: list[NobleRow]
+
+
+class DangshiCatalog(TypedDict):
+    id: str
+    version: str
+    author: str
+    tables: list[NobleTable]
+
+
+class ShijiRotationPair(TypedDict):
+    step: int
+    heaven_spirit: str
+    earth_spirit: str
+
+
+class ShijiRotation(TypedDict):
+    wenchang: str
+    jishen: str
+    earth_anchor: str
+    direction: str
+    step_count: int
+    pairs: list[ShijiRotationPair]
+    derived_shiji: str
+
+
+class ShijiVariantResolution(TypedDict):
+    profile: str
+    requested_profile: str
+    shiji: str
+    guest_count_override: int | None
+
+
+class TaiyiCoreSnapshot(TypedDict):
+    accumulation: int
+    yin_dun: bool
+    kook_number: int
+    main_calculation: str
+    table_policy: TaiyiTablePolicy
+    taiyi_number: int
+    taiyi_palace: str
+    wenchang_palace: str
+    jishen: str
+    shiji: str
+    shiji_profile: str
+    requested_shiji_profile: NotRequired[str]
+    main_count: int
+    guest_count: int
+    main_count_des: list[str]
+    guest_count_des: list[str]
+    main_general: int
+    guest_general: int
+    main_vice_general: int
+    guest_vice_general: int
+    kook_year: NotRequired[str]
+    suijun: NotRequired[str]
+    ruler_branch: NotRequired[str]
+    ruler_label: NotRequired[str]
+    heshen: NotRequired[str]
+
+
+class TaiyiCoreBoard(TypedDict):
+    accumulation: int
+    yin_dun: bool
+    kook_number: int
+    main_calculation: str
+    table_policy: TaiyiTablePolicy
+    taiyi_number: int
+    jishen: str
+    shiji: str
+    shiji_profile: str
+    requested_shiji_profile: NotRequired[str]
+    main_count: int
+    guest_count: int
+    main_count_des: list[str]
+    guest_count_des: list[str]
+    main_general: int
+    guest_general: int
+    main_vice_general: int
+    guest_vice_general: int
+    taiyi_position: str
+    wenchang_position: str
+    kook_year: NotRequired[str]
+    suijun: NotRequired[str]
+    ruler_branch: NotRequired[str]
+    ruler_label: NotRequired[str]
+    heshen: NotRequired[str]
+    dingmu: NotRequired[str]
+    set_count: NotRequired[int]
+    set_general: NotRequired[int]
+    set_vice_general: NotRequired[int]
+
+
+class PatternBasis(TypedDict):
+    field: str
+    value: str | int
+
+
+class TaiyiPattern(TypedDict):
+    name: str
+    subject: str
+    variant: str
+    basis: list[PatternBasis]
+    traditional_meaning: str
+
+
+class FiveGeneralBlocker(TypedDict):
+    source_path: str
+    name: str
+    subject: str
+    variant: str
+
+
+class FiveGeneralClause(TypedDict):
+    id: str
+    label: str
+    satisfied: bool
+    assessed_satisfied: bool
+    blockers: list[FiveGeneralBlocker]
+    unassessed: list[str]
+
+
+class FiveGeneralAssessment(TypedDict):
+    conditions_satisfied: bool
+    assessed_conditions_satisfied: bool
+    same_core_coverage_checked: bool
+    clauses: list[FiveGeneralClause]
+
+
+class GateCycle(TypedDict):
+    accumulation: int
+    cycle_length: int
+    cycle_unit: str
+    cycle_position: int
+    units_per_gate: int
+    gate_index: int
+    unit_in_gate: int
+    duty_gate: str
+    source_modulus: NotRequired[int]
+    remaining_units_after_current: NotRequired[int]
+
+
+class GateFrameRow(TypedDict):
+    number: int
+    palace: str
+    door: str
+    spirit_positions: list[str]
+
+
+class GateEntity(TypedDict):
+    label: str
+    source_path: str
+    position: str
+
+
+class GateCheck(TypedDict):
+    label: str
+    source_path: str
+    position: str
+    sector_number: int
+    door: str
+    gate_source_path: str
+    obstructs: bool
+    incomplete_kind: str | None
+
+
+class ThreeGatesCheck(TypedDict):
+    status: Literal["pending", "computed", "not_assessed"]
+    conditions_satisfied: bool | None
+    reason: NotRequired[str]
+    checks: NotRequired[list[GateCheck]]
+    frame_source_path: NotRequired[str]
+
+
+class GateFrame(TypedDict):
+    status: Literal["computed", "not_assessed"]
+    anchor_number: int
+    anchor_palace: str
+    anchor_source_path: str
+    anchor_source_value: int | str
+    duty_gate: NotRequired[str]
+    rows: NotRequired[list[GateFrameRow]]
+    reason: NotRequired[str]
+    three_gates: NotRequired[ThreeGatesCheck]
+
+
+class OldOpenSummaryEntry(TypedDict):
+    status: Literal["computed", "not_assessed"]
+    anchor_number: int
+    anchor_palace: str
+    anchor_source_path: str
+    anchor_source_value: int | str
+    duty_gate: NotRequired[str]
+    reason: NotRequired[str]
+    three_gates: NotRequired[ThreeGatesCheck]
+    source_path: str
+
+
+class TaiyiGates(TypedDict):
+    status: str
+    reason: str | None
+    calculation_mode: str
+    selected_profile: str
+    counter: GateCycle
+    moving_frame: GateFrame
+    old_open_frames: dict[str, GateFrame] | None
+    old_open_summary: dict[str, OldOpenSummaryEntry] | None
+    dingmu_comparison_frame: GateFrame | None
+    ruleset: dict[str, object]
+
+
+class DeterminateRotation(TypedDict):
+    ruler_branch: str
+    hegod: str
+    wenchang: str
+    forward_steps: int
+
+
+class DeterminateCalculation(TypedDict):
+    status: Literal["computed"]
+    marker: str
+    count: int
+    general: int
+    vice_general: int
+    rotation: DeterminateRotation
+
+
+class ConditionAssessment(TypedDict):
+    ruleset: dict[str, object]
+    five_generals: FiveGeneralAssessment
+    three_gates: ThreeGatesCheck
+    menju_jiangfa: bool | None
+    adjudication: str
+    summary: str
+
+
+class PalaceMarksRow(TypedDict):
+    palace: str
+    markers: list[str]
+
+
+class PatternConditionSummary(TypedDict):
+    name: str
+    subject: str
+    variant: str
+
+
+class PatternSummary(TypedDict):
+    conditions: list[PatternConditionSummary]
+    five_generals_satisfied: bool
+
+
+class KeyTenJingEntry(TypedDict):
+    label: str
+    status: Literal["computed", "not_assessed"]
+    palace: str | None
+    palace_number: int | None
+    yang_position: str
+    period: int
+    cycle_position: int
+    rule: str
+
+
+class KeyTenJingResult(TypedDict):
+    status: str
+    accumulation: int
+    yin: bool
+    records: dict[str, KeyTenJingEntry]
+    ruleset_id: str
+    version: str
+    author: str
+    classical_author: str
+    classical_acceptance_passed: bool
+
+
+class ShijiDerivation(TypedDict):
+    status: str
+    reason: NotRequired[str]
+    shiji_profile: NotRequired[str]
+    wenchang: NotRequired[str]
+    jishen: NotRequired[str]
+    earth_anchor: NotRequired[str]
+    direction: NotRequired[str]
+    step_count: NotRequired[int]
+    pairs: NotRequired[list[ShijiRotationPair]]
+    derived_shiji: NotRequired[str]
+    actual_shiji: NotRequired[str]
+    matches_actual: NotRequired[bool]
+
+
+class NobleComparison(TypedDict):
+    source_id: str
+    source_edition: str
+    source_branch: str
+    matches: bool
+
+
+class NobleSourceAssessment(TypedDict):
+    status: str
+    ruleset_id: str
+    ruleset_version: str
+    taiyi_mode: str
+    comparisons: list[NobleComparison]
+    reason: NotRequired[str]
+    day_stem: NotRequired[str]
+    is_diurnal: NotRequired[bool]
+    actual_start_branch: NotRequired[str]
+
+
+class TaiyiFatePalaceEntry(TypedDict):
+    palace: str
+    branch: str
+
+
+class TaiyiFatePalaces(TypedDict):
+    month_general: str
+    birth_hour_branch: str
+    life_palace: str
+    body_palace: str
+    twelve_palaces: list[TaiyiFatePalaceEntry]
+    run_year_origin_branch: str
+    birth_lunar_year: int
+
+
+class TaiyiCalendarSummary(TypedDict):
+    calculation_mode: str
+    civil_datetime: str
+    timezone: str
+    year: NotRequired[int]
+    year_boundary: NotRequired[str]
+    year_boundary_status: NotRequired[str]
+    used_lunar_date: NotRequired[str]
+    year_profile: NotRequired[str]
+    anchor_ephemeris_model: NotRequired[str]
+    winter_anchor_ephemeris_model: NotRequired[str]
+    anchor_name: NotRequired[str]
+    anchor_utc: NotRequired[str]
+    counter: NotRequired[int]
+    clock_basis: NotRequired[str]
+    hour_profile: NotRequired[str]
+    month_profile: NotRequired[str]
+    day_profile: NotRequired[str]
+    minute_profile: NotRequired[str]
+    ke_index: NotRequired[int]
+    input_calendar: NotRequired[str]
+    civil_clock_resolution: NotRequired[dict[str, object]]
+
+
+_VOL5_TABLE_ADAPTER = TypeAdapter(Vol5Table)
+_DANGSHI_CATALOG_ADAPTER = TypeAdapter(DangshiCatalog)
+
+
+def rotate_shiji(wenchang: object, jishen: object) -> ShijiRotation:
     """Place 計神 on 和德(艮) and advance along the 16-spirit ring to 文昌."""
     if (
         type(wenchang) is not str
@@ -250,7 +644,7 @@ def rotate_shiji(wenchang: object, jishen: object) -> dict[str, Any]:
     heaven_start = RING.index(jishen)
     earth_start = RING.index("艮")
     intervals = (RING.index(wenchang) - heaven_start) % len(RING)
-    pairs = [
+    pairs: list[ShijiRotationPair] = [
         {
             "step": step,
             "heaven_spirit": RING[(heaven_start + step) % len(RING)],
@@ -276,7 +670,7 @@ def resolve_shiji_variant(
     wenchang: str,
     jishen: str,
     shiji_profile: str | None = None,
-) -> dict[str, Any]:
+) -> ShijiVariantResolution:
     profile = DEFAULT_SHIJI_PROFILE if shiji_profile is None else shiji_profile
     if profile not in SHIJI_PROFILES:
         raise ValueError(f"shiji_profile须明确选择{'、'.join(SHIJI_PROFILES)}")
@@ -304,7 +698,7 @@ def cyclic_core(
     yin: bool = False,
     shiji_profile: str | None = None,
     table_policy: TaiyiTablePolicy = DEFAULT_TABLE_POLICY,
-) -> dict[str, Any]:
+) -> TaiyiCoreSnapshot:
     """Compute Taiyi 72-ju core with optional Vol. 3 printed-table policy."""
     if type(accumulation) is not int or accumulation < 1 or type(yin) is not bool:
         raise ValueError("太乙积数必须是正整数")
@@ -350,22 +744,9 @@ def cyclic_core(
     )
     guest_count = guest["count"] if printed_guest_count is None else printed_guest_count
 
-    home_trace: dict[str, Any] = dict(home)
-    if "main_count" in override:
-        home_trace.update(
-            selected_count=main_count,
-            selected_count_basis="卷三原表字面（printed_table）",
-        )
-    guest_trace: dict[str, Any] = dict(guest)
-    if printed_guest_count is not None:
-        guest_trace.update(
-            selected_count=guest_count,
-            selected_count_basis="卷三原表字面（printed_table）",
-        )
-
     main_general = general_for_count(main_count)
     guest_general = general_for_count(guest_count)
-    return {
+    result: TaiyiCoreSnapshot = {
         "accumulation": accumulation,
         "yin_dun": yin,
         "kook_number": ju,
@@ -377,11 +758,6 @@ def cyclic_core(
         "jishen": jishen,
         "shiji": shiji,
         "shiji_profile": starting_spirit["profile"],
-        **(
-            {"requested_shiji_profile": starting_spirit["requested_profile"]}
-            if starting_spirit["requested_profile"] != starting_spirit["profile"]
-            else {}
-        ),
         "main_count": main_count,
         "guest_count": guest_count,
         "main_count_des": count_labels(main_count),
@@ -391,6 +767,9 @@ def cyclic_core(
         "main_vice_general": main_general * 3 % 10,
         "guest_vice_general": guest_general * 3 % 10,
     }
+    if starting_spirit["requested_profile"] != starting_spirit["profile"]:
+        result["requested_shiji_profile"] = starting_spirit["requested_profile"]
+    return result
 
 
 GENERAL_FIELDS = {
@@ -401,29 +780,46 @@ GENERAL_FIELDS = {
 }
 
 
-def principal_enclosures(core: dict[str, Any]) -> list[dict[str, Any]]:
+def _general_values(core: TaiyiCoreSnapshot) -> tuple[tuple[str, str, int], ...]:
+    return (
+        ("main_general", "主大将", core["main_general"]),
+        ("main_vice_general", "主参将", core["main_vice_general"]),
+        ("guest_general", "客大将", core["guest_general"]),
+        ("guest_vice_general", "客参将", core["guest_vice_general"]),
+    )
+
+
+def principal_enclosures(core: TaiyiCoreSnapshot) -> list[TaiyiPattern]:
     ring = [PALACES[n] for n in PALACE_ORDER]
     taiyi = core["taiyi_palace"]
     index = ring.index(taiyi)
-    targets = {
+    general_vals = _general_values(core)
+    targets: dict[str, tuple[str, str]] = {
         "wenchang_palace": ("文昌", core["wenchang_palace"]),
         "shiji": ("始击", core["shiji"]),
-        **{f: (lbl, PALACES[core[f]]) for f, lbl in GENERAL_FIELDS.items()},
     }
+    raw_values: dict[str, str | int] = {
+        "taiyi_palace": taiyi,
+        "wenchang_palace": core["wenchang_palace"],
+        "shiji": core["shiji"],
+    }
+    for field, label, num in general_vals:
+        targets[field] = (label, PALACES[num])
+        raw_values[field] = num
 
-    def fact(field: str) -> dict[str, Any]:
+    def fact(field: str) -> PatternBasis:
         return {
             "field": (
                 field
                 if field in {"taiyi_palace", "wenchang_palace"}
                 else "core_board." + field
             ),
-            "value": core[field],
+            "value": raw_values[field],
         }
 
-    patterns = []
-    for field, label in GENERAL_FIELDS.items():
-        end = PALACES[core[field]]
+    patterns: list[TaiyiPattern] = []
+    for field, label, num in general_vals:
+        end = PALACES[num]
         if end not in ring:
             continue
         distance = (ring.index(end) - index) % 8
@@ -445,12 +841,11 @@ def principal_enclosures(core: dict[str, Any]) -> list[dict[str, Any]]:
     return patterns
 
 
-def eye_general_relations(core: dict[str, Any]) -> list[dict[str, Any]]:
-    patterns = []
-    for field, label in GENERAL_FIELDS.items():
-        number = core[field]
+def eye_general_relations(core: TaiyiCoreSnapshot) -> list[TaiyiPattern]:
+    patterns: list[TaiyiPattern] = []
+    for field, label, number in _general_values(core):
         palace = PALACES[number]
-        general = {"field": "core_board." + field, "value": number}
+        general: PatternBasis = {"field": "core_board." + field, "value": number}
         if palace == core["wenchang_palace"]:
             patterns.append(
                 {
@@ -474,7 +869,7 @@ def eye_general_relations(core: dict[str, Any]) -> list[dict[str, Any]]:
     return patterns
 
 
-def structural_patterns(core: dict[str, Any]) -> list[dict[str, Any]]:
+def structural_patterns(core: TaiyiCoreSnapshot) -> list[TaiyiPattern]:
     """Evaluate classical Taiyi spatial conditions (掩/囚/对/格/击/迫/关/提挟)."""
     taiyi = core["taiyi_palace"]
     center = RING.index(taiyi)
@@ -485,18 +880,24 @@ def structural_patterns(core: dict[str, Any]) -> list[dict[str, Any]]:
         "shiji": "始击",
         **GENERAL_FIELDS,
     }
-    for field in GENERAL_FIELDS:
-        positions[field] = PALACES[core[field]]
-    result: list[dict[str, Any]] = []
+    raw_values: dict[str, str | int] = {
+        "taiyi_palace": taiyi,
+        "wenchang_palace": core["wenchang_palace"],
+        "shiji": core["shiji"],
+    }
+    for field, _, num in _general_values(core):
+        positions[field] = PALACES[num]
+        raw_values[field] = num
+    result: list[TaiyiPattern] = []
 
-    def fact(field: str) -> dict[str, Any]:
+    def fact(field: str) -> PatternBasis:
         return {
             "field": (
                 field
                 if field in {"wenchang_palace", "taiyi_palace"}
                 else "core_board." + field
             ),
-            "value": core[field],
+            "value": raw_values[field],
         }
 
     def add(
@@ -588,12 +989,12 @@ def conjunction(*values: bool | None) -> bool | None:
 
 
 def five_general_conditions(
-    patterns: list[dict[str, Any]], *, core: dict[str, Any] | None = None
-) -> dict[str, Any]:
+    patterns: list[TaiyiPattern], *, core: TaiyiCoreSnapshot | None = None
+) -> FiveGeneralAssessment:
     """Complete Vol. 4 五将发 adjudication from evaluated spatial patterns."""
-    clauses: list[dict[str, Any]] = []
+    clauses: list[FiveGeneralClause] = []
     for key, label, subjects, names in CLAUSES:
-        blockers = [
+        blockers: list[FiveGeneralBlocker] = [
             {
                 "source_path": f"patterns.{i}",
                 "name": pattern["name"],
@@ -624,10 +1025,12 @@ def five_general_conditions(
 
 
 def _adjudication_label(
-    five_ok: bool | None, gates_ok: bool | None, core: dict[str, Any]
+    five_ok: bool | None, gates_ok: bool | None, core: Mapping[str, object]
 ) -> str:
-    du_sai = (core.get("main_count", 0) % 10 == 5) or (
-        core.get("guest_count", 0) % 10 == 5
+    main_count = core.get("main_count", 0)
+    guest_count = core.get("guest_count", 0)
+    du_sai = (isinstance(main_count, int) and main_count % 10 == 5) or (
+        isinstance(guest_count, int) and guest_count % 10 == 5
     )
     if five_ok is True and gates_ok is True:
         return "门具将发（数逢杜塞）" if du_sai else "门具将发"
@@ -641,7 +1044,7 @@ def _adjudication_label(
 
 
 def update_conjunction(
-    assessment: dict[str, Any], core: dict[str, Any] | None = None
+    assessment: ConditionAssessment, core: Mapping[str, object] | None = None
 ) -> None:
     five = assessment["five_generals"]["conditions_satisfied"]
     gates = assessment["three_gates"].get("conditions_satisfied")
@@ -655,7 +1058,7 @@ def update_conjunction(
     )
 
 
-def gate_cycle(accumulation: int) -> dict[str, Any]:
+def gate_cycle(accumulation: int) -> GateCycle:
     if type(accumulation) is not int or accumulation < 1:
         raise ValueError("太乙八门积数必须是正整数")
     phase = (accumulation - 1) % 240
@@ -672,7 +1075,7 @@ def gate_cycle(accumulation: int) -> dict[str, Any]:
     }
 
 
-def key_hour_gate_cycle(accumulation: int, yin: bool) -> dict[str, Any]:
+def key_hour_gate_cycle(accumulation: int, yin: bool) -> GateCycle:
     if type(accumulation) is not int or accumulation < 1 or type(yin) is not bool:
         raise ValueError("金钥匙四门须完整正整数积时及明确阴阳遁")
     phase = (accumulation - 1) % 120
@@ -690,15 +1093,16 @@ def key_hour_gate_cycle(accumulation: int, yin: bool) -> dict[str, Any]:
     }
 
 
-def key_day_gate_cycle(accumulation: int, yin: bool) -> dict[str, Any]:
+def key_day_gate_cycle(accumulation: int, yin: bool) -> GateCycle:
     result = key_hour_gate_cycle(accumulation, yin)
-    result.update(cycle_unit="day", source_modulus=240)
+    result["cycle_unit"] = "day"
+    result["source_modulus"] = 240
     return result
 
 
 def gate_frame(
     anchor: int, duty_gate: str, anchor_path: str, source_position: str | None = None
-) -> dict[str, Any]:
+) -> GateFrame:
     if type(anchor) is not int or anchor not in PALACES or duty_gate not in DOORS:
         raise ValueError("太乙门盘需要实际宫位和已知直门")
     if anchor == 5:
@@ -712,7 +1116,7 @@ def gate_frame(
         }
     start = PALACE_ORDER.index(anchor)
     door_start = DOORS.index(duty_gate)
-    rows = [
+    rows: list[GateFrameRow] = [
         {
             "number": number,
             "palace": PALACES[number],
@@ -735,24 +1139,26 @@ def gate_frame(
 
 
 def check_three_gates(
-    frame: dict[str, Any], entities: list[dict[str, Any]], path: str
-) -> dict[str, Any]:
+    frame: GateFrame, entities: list[GateEntity], path: str
+) -> ThreeGatesCheck:
     if frame["status"] != "computed":
         return {
             "status": "not_assessed",
-            "reason": frame["reason"],
+            "reason": frame.get("reason", ""),
             "conditions_satisfied": None,
             "frame_source_path": path,
         }
-    checks = []
-    rows = frame["rows"]
+    checks: list[GateCheck] = []
+    rows = frame.get("rows", [])
     for entity in entities:
         sector = SECTORS[entity["position"]]
         i, row = next((i, r) for i, r in enumerate(rows) if r["number"] == sector)
         door = row["door"]
         checks.append(
             {
-                **entity,
+                "label": entity["label"],
+                "source_path": entity["source_path"],
+                "position": entity["position"],
                 "sector_number": sector,
                 "door": door,
                 "gate_source_path": f"{path}.rows.{i}",
@@ -772,23 +1178,25 @@ def check_three_gates(
     }
 
 
-def determinate_calculation(board: dict[str, Any], mode: str) -> dict[str, Any]:
+def determinate_calculation(board: TaiyiBoard, mode: str) -> DeterminateCalculation:
     """Rotate 文昌 by (直支 - 合神) steps around the 16-spirit ring (定计/定目)."""
     core = board["core_board"]
-    ruler = core["suijun"] if mode in {"year", "fate"} else core["ruler_branch"]
-    hegod = core["heshen"]
+    ruler = (
+        core.get("suijun", "")
+        if mode in {"year", "fate"}
+        else core.get("ruler_branch", "")
+    )
+    hegod = core.get("heshen", "")
     eyes = board["wenchang_palace"]
     shift = (RING.index(ruler) - RING.index(hegod)) % 16
     marker = RING[(RING.index(eyes) + shift) % 16]
     trace = count_to_taiyi(marker, core["taiyi_number"])
     general = general_for_count(trace["count"])
     vice = general * 3 % 10
-    core.update(
-        dingmu=marker,
-        set_count=trace["count"],
-        set_general=general,
-        set_vice_general=vice,
-    )
+    core["dingmu"] = marker
+    core["set_count"] = trace["count"]
+    core["set_general"] = general
+    core["set_vice_general"] = vice
     return {
         "status": "computed",
         "marker": marker,
@@ -804,9 +1212,7 @@ def determinate_calculation(board: dict[str, Any], mode: str) -> dict[str, Any]:
     }
 
 
-def attach_gate_board(
-    board: dict[str, Any], mode: str, year: int | None = None
-) -> None:
+def attach_gate_board(board: TaiyiBoard, mode: str, year: int | None = None) -> None:
     if mode not in {"year", "month", "day", "hour", "minute", "fate"}:
         raise ValueError("太乙八门仅接受year/month/day/hour/minute/fate计法")
     core = board["core_board"]
@@ -834,7 +1240,7 @@ def attach_gate_board(
         mode == "hour" and rules.get("hour_profile") == "key_hour_winter_jiazi_v1"
     )
 
-    entities = [
+    entities: list[GateEntity] = [
         {
             "label": "太乙",
             "source_path": "taiyi.taiyi_palace",
@@ -859,13 +1265,11 @@ def attach_gate_board(
         )
         if is_key_month:
             counter = gate_cycle(core["accumulation"])
-            counter.update(
-                cycle_unit="solar_month",
-                remaining_units_after_current=30 - counter["unit_in_gate"],
-            )
+            counter["cycle_unit"] = "solar_month"
+            counter["remaining_units_after_current"] = 30 - counter["unit_in_gate"]
         else:
             counter = (key_day_gate_cycle if is_key_day else key_hour_gate_cycle)(
-                core["accumulation"], board["rotation"] == "逆布"
+                core["accumulation"], board.get("rotation") == "逆布"
             )
         moving = gate_frame(
             SECTORS[determinate["marker"]],
@@ -917,26 +1321,23 @@ def attach_gate_board(
         core["taiyi_number"], counter["duty_gate"], "taiyi.core_board.taiyi_number"
     )
     selected_check = check_three_gates(moving, entities, "taiyi.gates.moving_frame")
-    old_frames: dict[str, Any] = {}
+    old_frames: dict[str, GateFrame] = {}
     if mode in {"year", "fate"}:
-        for key, field, targets in (
-            ("taiyi", "taiyi_number", entities[1:]),
-            ("main", "main_general", entities),
-            (
-                "guest",
-                "guest_general",
-                [
-                    entities[0],
-                    {
-                        "label": "始击",
-                        "source_path": "taiyi.core_board.shiji",
-                        "position": core["shiji"],
-                    },
-                ],
-            ),
-            ("determinate", "set_general", entities),
+        guest_targets: list[GateEntity] = [
+            entities[0],
+            {
+                "label": "始击",
+                "source_path": "taiyi.core_board.shiji",
+                "position": core["shiji"],
+            },
+        ]
+        for key, field, anchor_val, targets in (
+            ("taiyi", "taiyi_number", core["taiyi_number"], entities[1:]),
+            ("main", "main_general", core["main_general"], entities),
+            ("guest", "guest_general", core["guest_general"], guest_targets),
+            ("determinate", "set_general", determinate["general"], entities),
         ):
-            frame = gate_frame(core[field], "开", "taiyi.core_board." + field)
+            frame = gate_frame(anchor_val, "开", "taiyi.core_board." + field)
             frame["three_gates"] = check_three_gates(
                 frame, targets, "taiyi.gates.old_open_frames." + key
             )
@@ -950,6 +1351,25 @@ def attach_gate_board(
         "hour": "wang_hour_240",
         "minute": "wang_minute_240",
     }
+    old_open_summary: dict[str, OldOpenSummaryEntry] | None = None
+    if old_frames:
+        old_open_summary = {}
+        for key, frame in old_frames.items():
+            summary_entry: OldOpenSummaryEntry = {
+                "status": frame["status"],
+                "anchor_number": frame["anchor_number"],
+                "anchor_palace": frame["anchor_palace"],
+                "anchor_source_path": frame["anchor_source_path"],
+                "anchor_source_value": frame["anchor_source_value"],
+                "source_path": "taiyi.gates.old_open_frames." + key,
+            }
+            if "duty_gate" in frame:
+                summary_entry["duty_gate"] = frame["duty_gate"]
+            if "reason" in frame:
+                summary_entry["reason"] = frame["reason"]
+            if "three_gates" in frame:
+                summary_entry["three_gates"] = frame["three_gates"]
+            old_open_summary[key] = summary_entry
     board["gates"] = {
         "status": "computed",
         "reason": None,
@@ -958,17 +1378,7 @@ def attach_gate_board(
         "counter": counter,
         "moving_frame": moving,
         "old_open_frames": old_frames or None,
-        "old_open_summary": (
-            {
-                key: {
-                    **{k: v for k, v in frame.items() if k != "rows"},
-                    "source_path": "taiyi.gates.old_open_frames." + key,
-                }
-                for key, frame in old_frames.items()
-            }
-            if old_frames
-            else None
-        ),
+        "old_open_summary": old_open_summary,
         "dingmu_comparison_frame": gate_frame(
             SECTORS[determinate["marker"]],
             counter["duty_gate"],
@@ -1129,14 +1539,63 @@ class AnnualMarker(TypedDict):
     table_disagreement: NotRequired[bool]
 
 
+class AnnualLongCycles(TypedDict):
+    status: str
+    time_granularity: str
+    year: NotRequired[int]
+    ruleset: NotRequired[dict[str, object]]
+    epochs: NotRequired[dict[str, dict[str, int]]]
+    counting_convention: NotRequired[str]
+    records: NotRequired[dict[str, AnnualMarker]]
+
+
+class LongCycleSummary(TypedDict):
+    status: str
+    time_granularity: NotRequired[str]
+    year: NotRequired[int]
+    ruleset_id: NotRequired[str]
+    positions: NotRequired[dict[str, str]]
+
+
+class TaiyiBoard(TypedDict):
+    engine: str
+    counter_cycles: CounterCycles
+    taiyi_palace: str
+    wenchang_palace: str
+    core_board: TaiyiCoreBoard
+    palace_marks: list[PalaceMarksRow]
+    center_marks: PalaceMarksRow
+    patterns: list[TaiyiPattern]
+    condition_assessment: ConditionAssessment
+    shiji_derivation: ShijiDerivation
+    pattern_summary: PatternSummary
+    determinate_calculation: NotRequired[DeterminateCalculation]
+    gates: NotRequired[TaiyiGates]
+    long_cycles: NotRequired[AnnualLongCycles]
+    long_cycle_summary: NotRequired[LongCycleSummary]
+    extra_palace_marks: NotRequired[list[PalaceMarksRow]]
+    style_label: NotRequired[str]
+    accumulation_label: NotRequired[str]
+    rotation: NotRequired[str]
+    life_method: NotRequired[str]
+    solar_anchors: NotRequired[dict[str, dict[str, object]]]
+    solar_anchor_scope: NotRequired[str]
+    calendar_rules: NotRequired[dict[str, object]]
+    calendar_summary: NotRequired[TaiyiCalendarSummary]
+    ruleset: NotRequired[dict[str, object]]
+    interpretation_scope: NotRequired[dict[str, object]]
+    ten_jing: NotRequired[KeyTenJingResult]
+    winter_origin_selection: NotRequired[dict[str, object]]
+    fate_palaces: NotRequired[TaiyiFatePalaces]
+
+
 @lru_cache(maxsize=1)
-def _vol5_table() -> dict[str, Any]:
+def _vol5_table() -> Vol5Table:
     path = (
         Path(__file__).resolve().parents[3]
         / "data/classical/taiyi-jinjing-vol5-v1.json"
     )
-    data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
-    return data
+    return _VOL5_TABLE_ADAPTER.validate_json(path.read_bytes())
 
 
 def _rotated(sequence: tuple[str, ...], start: str) -> tuple[str, ...]:
@@ -1179,7 +1638,7 @@ def _moving_marker(
     }
 
 
-def annual_long_cycles(year: int) -> dict[str, Any]:
+def annual_long_cycles(year: int) -> AnnualLongCycles:
     if type(year) is not int or not 1 <= year <= 9999:
         raise ValueError("太乙年运需要1至9999之间的整数公元年份")
     elapsed = year - REFERENCE_YEAR
@@ -1261,17 +1720,20 @@ def annual_long_cycles(year: int) -> dict[str, Any]:
     }
 
 
-def long_cycle_text(cycles: dict[str, Any] | None) -> str:
+def long_cycle_text(cycles: AnnualLongCycles | None) -> str:
     if cycles is None or cycles.get("status") == "not_computed_for_selected_mode":
         return "非年计未附年度十神。"
-    lines = [f"卷五年度巡行：{cycles['year']}。"]
-    for r in cycles["records"].values():
-        lines.append(f"{r['label']}：{r['palace']}（第{r['year_in_palace']}年）")
+    lines = [f"卷五年度巡行：{cycles.get('year')}。"]
+    for r in cycles.get("records", {}).values():
+        lines.append(
+            f"{r.get('label', '')}：{r['palace']}（第{r['year_in_palace']}年）"
+        )
     return "\n".join(lines)
 
 
-def attach_long_cycles(board: dict[str, Any], year: int) -> None:
+def attach_long_cycles(board: TaiyiBoard, year: int) -> None:
     cycles = annual_long_cycles(year)
+    records = cycles.get("records", {})
     board["long_cycles"] = cycles
     board["long_cycle_summary"] = {
         "status": "computed",
@@ -1279,15 +1741,15 @@ def attach_long_cycles(board: dict[str, Any], year: int) -> None:
         "year": year,
         "ruleset_id": LONG_RULESET_ID,
         "positions": {
-            r["label"]: f"{r['palace']}／第{r['year_in_palace']}年"
-            for r in cycles["records"].values()
+            r.get("label", ""): f"{r['palace']}／第{r['year_in_palace']}年"
+            for r in records.values()
         },
     }
     positions = {row["palace"]: row["markers"] for row in board["palace_marks"]}
     positions["中"] = board["center_marks"]["markers"]
     extra: dict[str, list[str]] = {}
-    for record in cycles["records"].values():
-        label = record["label"]
+    for record in records.values():
+        label = record.get("label", "")
         if record["palace"] in positions:
             positions[record["palace"]].append(label)
         else:
@@ -1311,7 +1773,7 @@ def _held_ring(start: str, held: str) -> tuple[str, ...]:
     )
 
 
-def key_ten_jing(accumulation: int, yin: bool) -> dict[str, Any]:
+def key_ten_jing(accumulation: int, yin: bool) -> KeyTenJingResult:
     if type(accumulation) is not int or accumulation < 1 or type(yin) is not bool:
         raise ValueError("金钥匙十精须正整数积数及明确阴阳遁")
     sequences = {
@@ -1345,7 +1807,7 @@ def key_ten_jing(accumulation: int, yin: bool) -> dict[str, Any]:
             "三七二六一五九四八",
         ),
     }
-    records: dict[str, Any] = {}
+    records: dict[str, KeyTenJingEntry] = {}
     numbers = {v: k for k, v in PALACES.items()}
     for key, (label, sequence, rule) in sequences.items():
         phase = (accumulation - 1) % len(sequence)
@@ -1376,18 +1838,18 @@ def key_ten_jing(accumulation: int, yin: bool) -> dict[str, Any]:
     }
 
 
-def ten_jing_text(ten_jing: dict[str, Any]) -> str:
+def ten_jing_text(ten_jing: KeyTenJingResult) -> str:
     return "；".join(
         f"{r['label']}:{r['palace'] or '中'}" for r in ten_jing["records"].values()
     )
 
 
 # ---------------------------------------------------------------------------
-# Shiji derivation text & Noble source check (used by local_techniques & core)
+# Shiji derivation text & Noble source check
 # ---------------------------------------------------------------------------
 
 
-def shiji_derivation(core: dict[str, Any]) -> dict[str, Any]:
+def shiji_derivation(core: Mapping[str, object]) -> ShijiDerivation:
     wenchang = core.get("wenchang_palace")
     jishen = core.get("jishen")
     actual = core.get("shiji")
@@ -1404,62 +1866,83 @@ def shiji_derivation(core: dict[str, Any]) -> dict[str, Any]:
     return {
         "status": "computed_from_actual_inputs",
         "shiji_profile": str(core.get("shiji_profile") or DEFAULT_SHIJI_PROFILE),
-        **rotation,
+        "wenchang": rotation["wenchang"],
+        "jishen": rotation["jishen"],
+        "earth_anchor": rotation["earth_anchor"],
+        "direction": rotation["direction"],
+        "step_count": rotation["step_count"],
+        "pairs": rotation["pairs"],
+        "derived_shiji": rotation["derived_shiji"],
         "actual_shiji": actual,
         "matches_actual": rotation["derived_shiji"] == actual,
     }
 
 
-def shiji_derivation_text(assessment: dict[str, Any]) -> str:
+def shiji_derivation_text(assessment: ShijiDerivation) -> str:
     if assessment.get("status") == "not_assessed":
         return str(assessment.get("reason", ""))
     return (
-        f"计神{assessment['jishen']}加和德艮顺行{assessment['step_count']}步至"
-        f"{assessment['wenchang']}得{assessment['derived_shiji']}（实取{assessment['actual_shiji']}）。"
+        f"计神{assessment.get('jishen', '')}加和德艮顺行{assessment.get('step_count', 0)}步至"
+        f"{assessment.get('wenchang', '')}得{assessment.get('derived_shiji', '')}（实取{assessment.get('actual_shiji', '')}）。"
     )
 
 
 @lru_cache(maxsize=1)
-def _dangshi_catalog() -> dict[str, Any]:
+def _dangshi_catalog() -> DangshiCatalog:
     path = (
         Path(__file__).resolve().parents[3]
         / "data/classical/taiyi-dangshi-nobles-v1.json"
     )
-    data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
-    return data
+    return _DANGSHI_CATALOG_ADAPTER.validate_json(path.read_bytes())
 
 
 def noble_source_assessment(
-    day_stem: str, liureng: dict[str, Any], *, taiyi_mode: str
-) -> dict[str, Any]:
+    day_stem: str, liureng: Mapping[str, object], *, taiyi_mode: str
+) -> NobleSourceAssessment:
     """Compare the run's Liuren noble start with 金镜当时贵人 tables."""
     catalog = _dangshi_catalog()
-    base: dict[str, Any] = {
-        "status": "not_assessed",
-        "ruleset_id": catalog["id"],
-        "ruleset_version": catalog["version"],
-        "taiyi_mode": taiyi_mode,
-        "comparisons": [],
-    }
     if day_stem not in tuple("甲乙丙丁戊己庚辛壬癸"):
-        return {**base, "reason": "日干无效"}
-    meta = liureng.get("meta") or {}
-    is_day = meta.get("is_diurnal")
+        return {
+            "status": "not_assessed",
+            "ruleset_id": catalog["id"],
+            "ruleset_version": catalog["version"],
+            "taiyi_mode": taiyi_mode,
+            "comparisons": [],
+            "reason": "日干无效",
+        }
+    meta = liureng.get("meta")
+    is_day = meta.get("is_diurnal") if isinstance(meta, Mapping) else None
     guiren_order = liureng.get("guiren_order")
     if type(is_day) is not bool or not isinstance(guiren_order, str):
-        return {**base, "reason": "缺少同盘贵人昼夜与起位信息"}
-    start = meta.get("guiren_start_branch")
+        return {
+            "status": "not_assessed",
+            "ruleset_id": catalog["id"],
+            "ruleset_version": catalog["version"],
+            "taiyi_mode": taiyi_mode,
+            "comparisons": [],
+            "reason": "缺少同盘贵人昼夜与起位信息",
+        }
+    start = meta.get("guiren_start_branch") if isinstance(meta, Mapping) else None
     if start not in tuple(BRANCHES):
-        for row in liureng.get("twelve_board") or []:
-            if row.get("god") == "贵人":
-                start = row.get("sky_branch")
-                break
-    if start not in tuple(BRANCHES):
-        return {**base, "reason": "未能定位贵人起位"}
-    comparisons = []
+        twelve_board = liureng.get("twelve_board")
+        if isinstance(twelve_board, list):
+            for row in twelve_board:
+                if isinstance(row, Mapping) and row.get("god") == "贵人":
+                    start = row.get("sky_branch")
+                    break
+    if not isinstance(start, str) or start not in tuple(BRANCHES):
+        return {
+            "status": "not_assessed",
+            "ruleset_id": catalog["id"],
+            "ruleset_version": catalog["version"],
+            "taiyi_mode": taiyi_mode,
+            "comparisons": [],
+            "reason": "未能定位贵人起位",
+        }
+    comparisons: list[NobleComparison] = []
     for table in catalog["tables"]:
-        row = next(r for r in table["rows"] if r["stem"] == day_stem)
-        expected = row["morning_branch" if is_day else "evening_branch"]
+        noble_row = next(r for r in table["rows"] if r["stem"] == day_stem)
+        expected = noble_row["morning_branch" if is_day else "evening_branch"]
         comparisons.append(
             {
                 "source_id": table["id"],
@@ -1469,21 +1952,23 @@ def noble_source_assessment(
             }
         )
     return {
-        **base,
         "status": "compared_noble_start_only",
+        "ruleset_id": catalog["id"],
+        "ruleset_version": catalog["version"],
+        "taiyi_mode": taiyi_mode,
+        "comparisons": comparisons,
         "day_stem": day_stem,
         "is_diurnal": is_day,
         "actual_start_branch": start,
-        "comparisons": comparisons,
     }
 
 
-def noble_source_text(assessment: dict[str, Any]) -> str:
+def noble_source_text(assessment: NobleSourceAssessment) -> str:
     if assessment.get("status") != "compared_noble_start_only":
         return str(assessment.get("reason", ""))
     return (
-        f"{assessment['day_stem']}日{'昼' if assessment['is_diurnal'] else '夜'}"
-        f"贵人起{assessment['actual_start_branch']}。"
+        f"{assessment.get('day_stem', '')}日{'昼' if assessment.get('is_diurnal') else '夜'}"
+        f"贵人起{assessment.get('actual_start_branch', '')}。"
     )
 
 
@@ -1493,46 +1978,67 @@ def noble_source_text(assessment: dict[str, Any]) -> str:
 
 
 def assemble_board(
-    core: dict[str, Any], *, calculation_mode: str | None = None
-) -> dict[str, Any]:
+    core: TaiyiCoreSnapshot, *, calculation_mode: str | None = None
+) -> TaiyiBoard:
     """Assemble the crisp Taiyi board without redundant *source_assessment bloat."""
     marks: dict[str, list[str]] = {palace: [] for palace in DISPLAY_ORDER + "中"}
-    placements = {
+    ruler_branch = (
+        core["ruler_branch"] if "ruler_branch" in core else core.get("suijun", "")
+    )
+    placements: dict[str, str] = {
         "太乙": core["taiyi_palace"],
         "文昌": core["wenchang_palace"],
         "始击": core["shiji"],
-        core.get("ruler_label", "太岁"): (
-            core["ruler_branch"] if "ruler_branch" in core else core["suijun"]
-        ),
-        "合神": core["heshen"],
+        core.get("ruler_label", "太岁"): ruler_branch,
+        "合神": core.get("heshen", ""),
         "计神": core["jishen"],
     }
-    for label, field in (
-        ("主大", "main_general"),
-        ("主参", "main_vice_general"),
-        ("客大", "guest_general"),
-        ("客参", "guest_vice_general"),
-    ):
-        placements[label] = PALACES[core[field]]
+    for label, _, num in _general_values(core):
+        placements[label] = PALACES[num]
     for label, palace in placements.items():
         marks[palace].append(label)
 
     patterns = structural_patterns(core)
     five_cond = five_general_conditions(patterns, core=core)
+    core_board: TaiyiCoreBoard = {
+        "accumulation": core["accumulation"],
+        "yin_dun": core["yin_dun"],
+        "kook_number": core["kook_number"],
+        "main_calculation": core["main_calculation"],
+        "table_policy": core["table_policy"],
+        "taiyi_number": core["taiyi_number"],
+        "jishen": core["jishen"],
+        "shiji": core["shiji"],
+        "shiji_profile": core["shiji_profile"],
+        "main_count": core["main_count"],
+        "guest_count": core["guest_count"],
+        "main_count_des": core["main_count_des"],
+        "guest_count_des": core["guest_count_des"],
+        "main_general": core["main_general"],
+        "guest_general": core["guest_general"],
+        "main_vice_general": core["main_vice_general"],
+        "guest_vice_general": core["guest_vice_general"],
+        "taiyi_position": f"太乙在{core['taiyi_palace']}宫（{core['taiyi_number']}）",
+        "wenchang_position": f"文昌在{core['wenchang_palace']}宫",
+    }
+    if "requested_shiji_profile" in core:
+        core_board["requested_shiji_profile"] = core["requested_shiji_profile"]
+    if "kook_year" in core:
+        core_board["kook_year"] = core["kook_year"]
+    if "suijun" in core:
+        core_board["suijun"] = core["suijun"]
+    if "ruler_branch" in core:
+        core_board["ruler_branch"] = core["ruler_branch"]
+    if "ruler_label" in core:
+        core_board["ruler_label"] = core["ruler_label"]
+    if "heshen" in core:
+        core_board["heshen"] = core["heshen"]
     return {
         "engine": "fatebridge-offline",
         "counter_cycles": counter_cycles(core, calculation_mode=calculation_mode),
         "taiyi_palace": core["taiyi_palace"],
         "wenchang_palace": core["wenchang_palace"],
-        "core_board": {
-            **{
-                k: v
-                for k, v in core.items()
-                if k not in {"taiyi_palace", "wenchang_palace", "count_trace"}
-            },
-            "taiyi_position": f"太乙在{core['taiyi_palace']}宫（{core['taiyi_number']}）",
-            "wenchang_position": f"文昌在{core['wenchang_palace']}宫",
-        },
+        "core_board": core_board,
         "palace_marks": [
             {"palace": palace, "markers": sorted(marks[palace])}
             for palace in DISPLAY_ORDER
@@ -1562,67 +2068,59 @@ def assemble_board(
     }
 
 
-def calendar_summary(board: dict[str, Any]) -> dict[str, Any]:
-    calendar = board["calendar_rules"]
-    mode = calendar.get("calculation_mode", "year")
-    common = {
+def calendar_summary(board: TaiyiBoard) -> TaiyiCalendarSummary:
+    calendar = board.get("calendar_rules", {})
+    mode = str(calendar.get("calculation_mode", "year"))
+    summary: TaiyiCalendarSummary = {
         "calculation_mode": mode,
-        "civil_datetime": calendar["civil_datetime"],
-        "timezone": calendar["timezone"],
+        "civil_datetime": str(calendar["civil_datetime"]),
+        "timezone": str(calendar["timezone"]),
     }
     if mode in {"year", "fate"}:
         used_lunar = calendar.get("historical_calendar") or calendar.get(
             "civil_lunar_calendar"
         )
-        return {
-            **common,
-            "year": calendar["year"],
-            "year_boundary": calendar["year_boundary"],
-            "year_boundary_status": calendar["year_boundary_status"],
-            **({"used_lunar_date": used_lunar["display"]} if used_lunar else {}),
-            **(
-                {"year_profile": calendar["year_profile"]}
-                if "year_profile" in calendar
-                else {}
-            ),
-        }
-    return {
-        **common,
-        **(
-            {
-                "anchor_ephemeris_model": board["solar_anchors"]["boundary"][
-                    "ephemeris_model"
-                ],
-                **(
-                    {
-                        "winter_anchor_ephemeris_model": board["solar_anchors"][
-                            "winter_origin"
-                        ]["ephemeris_model"]
-                    }
-                    if "winter_origin" in board["solar_anchors"]
-                    else {}
-                ),
-            }
-            if board.get("solar_anchors")
-            else {}
-        ),
-        **{
-            key: calendar[key]
-            for key in (
-                "anchor_name",
-                "anchor_utc",
-                "counter",
-                "clock_basis",
-                "hour_profile",
-                "month_profile",
-                "day_profile",
-                "minute_profile",
-                "ke_index",
-                "input_calendar",
+        year_val = calendar["year"]
+        assert isinstance(year_val, int)
+        summary["year"] = year_val
+        summary["year_boundary"] = str(calendar["year_boundary"])
+        summary["year_boundary_status"] = str(calendar["year_boundary_status"])
+        if isinstance(used_lunar, Mapping):
+            summary["used_lunar_date"] = str(used_lunar["display"])
+        if "year_profile" in calendar:
+            summary["year_profile"] = str(calendar["year_profile"])
+        return summary
+    solar_anchors = board.get("solar_anchors")
+    if solar_anchors:
+        boundary = solar_anchors.get("boundary")
+        if isinstance(boundary, Mapping) and "ephemeris_model" in boundary:
+            summary["anchor_ephemeris_model"] = str(boundary["ephemeris_model"])
+        winter_origin = solar_anchors.get("winter_origin")
+        if isinstance(winter_origin, Mapping) and "ephemeris_model" in winter_origin:
+            summary["winter_anchor_ephemeris_model"] = str(
+                winter_origin["ephemeris_model"]
             )
-            if key in calendar
-        },
-    }
+    if isinstance(v := calendar.get("anchor_name"), str):
+        summary["anchor_name"] = v
+    if isinstance(v := calendar.get("anchor_utc"), str):
+        summary["anchor_utc"] = v
+    if isinstance(c := calendar.get("counter"), int):
+        summary["counter"] = c
+    if isinstance(v := calendar.get("clock_basis"), str):
+        summary["clock_basis"] = v
+    if isinstance(v := calendar.get("hour_profile"), str):
+        summary["hour_profile"] = v
+    if isinstance(v := calendar.get("month_profile"), str):
+        summary["month_profile"] = v
+    if isinstance(v := calendar.get("day_profile"), str):
+        summary["day_profile"] = v
+    if isinstance(v := calendar.get("minute_profile"), str):
+        summary["minute_profile"] = v
+    if isinstance(c := calendar.get("ke_index"), int):
+        summary["ke_index"] = c
+    if isinstance(v := calendar.get("input_calendar"), str):
+        summary["input_calendar"] = v
+    return summary
 
 
 # ---------------------------------------------------------------------------
@@ -1651,7 +2149,7 @@ def compute_taiyi_fate_palaces(
     birth_hour_branch: str,
     lunar_year: int,
     gender: str,
-) -> dict[str, Any]:
+) -> TaiyiFatePalaces:
     """Compute《太乙命法》命宫/身宫, 十二命宫, and 行年."""
     mg_idx = BRANCHES.index(month_general)
     hr_idx = BRANCHES.index(birth_hour_branch)
@@ -1660,7 +2158,7 @@ def compute_taiyi_fate_palaces(
     body_idx = (mg_idx + (9 - hr_idx)) % 12
     life_branch = BRANCHES[life_idx]
     body_branch = BRANCHES[body_idx]
-    palaces = [
+    palaces: list[TaiyiFatePalaceEntry] = [
         {"palace": name, "branch": BRANCHES[(life_idx - i) % 12]}
         for i, name in enumerate(TWELVE_FATE_PALACE_NAMES)
     ]

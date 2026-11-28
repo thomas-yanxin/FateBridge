@@ -13,9 +13,9 @@ from fatebridge.core.astro.astrology_horary import (
 )
 from fatebridge.core.astro.astrology_tables import RULER_BY_SIGN
 from fatebridge.services.western_horary import calculate_horary
+from tests.fixtures.western_event_cases import QUESTION
 from tests.support.lunar_sampler import sampled_motion
 from tests.support.transports import AS_OF, SPECS, business
-from tests.unit_test.fixtures.western_event_cases import QUESTION
 
 
 def _state(planet: str, longitude: float, speed: float) -> dict:

@@ -9,9 +9,9 @@ from fastmcp import Client
 
 from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
+from tests.fixtures.astrodice_transports import SPEC, rest
 from tests.support.ephemeris_case_runtime import native_ephemeris_files
 from tests.support.transports import call_calculation
-from tests.unit_test.fixtures.astrodice_transports import SPEC, rest
 
 
 @pytest.mark.parametrize("zodiac_type", ["Tropic", "Sidereal"])

@@ -7,9 +7,9 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.utils.birth_input import PersonInfo
+from tests.fixtures.bazi_year_cases import TOPICS
 from tests.support.transports import SPECS, call_cli, native
 from tests.support.transports import rest as _shared_rest
-from tests.unit_test.fixtures.bazi_year_cases import TOPICS
 
 rest = _shared_rest
 

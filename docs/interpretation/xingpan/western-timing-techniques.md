@@ -49,4 +49,4 @@
 
 `mundane_ingress_chart` 用于年度节气入宫等世俗盘；`planetary_returns` 用于其他行星回归时点。仅在用户明确所问相关机制时选择，按其实际输入读取 `mundane_ingress_chart`／`planetary_returns`；不默认加入个人年运，不把世俗盘用于确定政治、金融或灾害结果。
 
-实现核对入口：`services/western_timing_tools.py`、`services/western_events.py`、`services/western_lifespan.py`、`core/requests/western_lifespan.py`、`core/astro/astrology_lifespan.py` 与 `core/contracts/output_western.py`。这是计算口径的复核索引，不替代具体传统解释来源。
+实现核对入口：`services/western_timing_tools.py`、`services/western_events.py`、`services/western_lifespan.py`、`core/requests/western_lifespan.py`、`core/astro/astrology_lifespan.py` 与 `core/contracts/western.py`。这是计算口径的复核索引，不替代具体传统解释来源。

@@ -12,8 +12,8 @@ from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.birth_clock import birth_clock_input_receipt
 from fatebridge.utils.birth_input import PersonInfo, create_person_info
 from fatebridge.utils.solar_time import normalize_birth_time
+from tests.fixtures.bazi_birth_clock import SPECS
 from tests.support.transports import inputs
-from tests.unit_test.fixtures.bazi_birth_clock import SPECS
 
 SHANGHAI = dict(
     birth_year=1991,

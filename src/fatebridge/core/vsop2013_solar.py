@@ -9,28 +9,64 @@ from __future__ import annotations
 
 import ctypes
 import math
-import os
 import platform
-import tempfile
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
 from threading import RLock
-from typing import Any
+from typing import Any, TypedDict
+
+from pydantic import JsonValue, TypeAdapter
 
 from fatebridge.core.native_solar_loader import (
+    NativeSolarSourceBase,
+    bisect_forward_crossing,
     file_signature,
     is_finite_number,
+    load_astronomy_json,
     load_validated_manifest_and_library,
+    select_env_backed_source,
+    validate_crossing_inputs,
+    validate_forward_bracket,
     verify_loaded_image,
 )
-from fatebridge.fetch_vsop2013 import MODEL_ID, source_profile
 from fatebridge.utils.errors import EphemerisSourceError
 
+MODEL_ID = "fatebridge_vsop2013_solar_v1"
 MANIFEST_ENV = "FATEBRIDGE_VSOP2013_MANIFEST"
 LOCK = RLock()
 
 _finite = is_finite_number
+
+
+class Vsop2013SourceProfile(TypedDict):
+    model_id: str
+    version: str
+    abi_version: int
+    native_core_version: str
+    software_input_years: list[int]
+    qualified_solar_term_years: list[int]
+    working_jd_tt: list[float]
+    reference: str
+    sources: dict[str, dict[str, str]]
+    native_source_files: list[str]
+    lunar_replacement_c: str
+    source_identity_scope: str
+    qualification_reference: str
+    accuracy_certified: bool
+    derived_lichun_scope: dict[str, JsonValue]
+
+
+@lru_cache(maxsize=1)
+def _profile_adapter() -> TypeAdapter[Vsop2013SourceProfile]:
+    return TypeAdapter(Vsop2013SourceProfile)
+
+
+def source_profile() -> Vsop2013SourceProfile:
+    raw = load_astronomy_json(
+        "vsop2013-solar-v1.json", label="VSOP2013 source profile key"
+    )
+    return _profile_adapter().validate_python(raw)
 
 
 def _signature(path: Path) -> tuple[int, ...]:
@@ -41,14 +77,19 @@ def _loaded_image(function: Any, expected: Path) -> None:
     verify_loaded_image(function, expected, "VSOP2013")
 
 
-class _Source:
+class _Source(NativeSolarSourceBase):
     def __init__(self, path: Path, signature: tuple[int, ...]) -> None:
-        self.path, self.signature = path, signature
+        super().__init__(
+            path,
+            signature,
+            manifest_env=MANIFEST_ENV,
+            unavailable_reason="solar_vsop2013_unavailable",
+            changed_reason="solar_vsop2013_changed",
+        )
         try:
             self.profile = source_profile()
         except (OSError, ValueError, TypeError) as profile_error:
             raise EphemerisSourceError("solar_vsop2013_invalid") from profile_error
-        self._temporary: tempfile.TemporaryDirectory[str] | None = None
         try:
             (
                 self.binary_path,
@@ -117,21 +158,8 @@ class _Source:
             UnicodeError,
             EphemerisSourceError,
         ) as error:
-            if self._temporary is not None:
-                self._temporary.cleanup()
+            self._cleanup_temporary()
             raise EphemerisSourceError("solar_vsop2013_invalid") from error
-
-    def check_unchanged(self, *, check_environment: bool = True) -> None:
-        try:
-            configured = Path(os.environ.get(MANIFEST_ENV, "")).expanduser().resolve()
-            if (
-                (check_environment and configured != self.path)
-                or _signature(self.path) != self.signature
-                or _signature(self.binary_path) != self.binary_signature
-            ):
-                raise EphemerisSourceError("solar_vsop2013_changed")
-        except (OSError, EphemerisSourceError) as error:
-            raise EphemerisSourceError("solar_vsop2013_changed") from error
 
     def position(self, jd_tt: float) -> tuple[float, ...]:
         low, high = self.profile["working_jd_tt"]
@@ -170,13 +198,6 @@ class _Source:
             accuracy_certified=False,
         )
 
-    def key(self) -> tuple[Any, ...]:
-        return (
-            str(self.path),
-            self.signature,
-            self.binary_signature,
-        )
-
 
 @lru_cache(maxsize=2)
 def _load(path: Path, signature: tuple[int, ...]) -> _Source:
@@ -184,20 +205,13 @@ def _load(path: Path, signature: tuple[int, ...]) -> _Source:
 
 
 def _selected() -> _Source:
-    configured = os.environ.get(MANIFEST_ENV, "").strip()
-    if not configured:
-        raise EphemerisSourceError("solar_vsop2013_unavailable")
-    path = Path(configured).expanduser().resolve()
-    source = _load(path, _signature(path))
-    try:
-        source.check_unchanged()
-    except EphemerisSourceError as error:
-        if error.reason != "solar_vsop2013_changed":
-            raise
-        _load.cache_clear()
-        source = _load(path, _signature(path))
-        source.check_unchanged()
-    return source
+    return select_env_backed_source(
+        MANIFEST_ENV,
+        _load,
+        "solar_vsop2013_unavailable",
+        retry_changed_reason="solar_vsop2013_changed",
+        clear_cache_fn=_load.cache_clear,
+    )
 
 
 def cache_key() -> tuple[Any, ...]:
@@ -229,10 +243,12 @@ def longitude_crossing_tt(
     *,
     expected_source_key: tuple[Any, ...] | None = None,
 ) -> dict[str, Any]:
-    if not all(_finite(value) for value in (target, low, high)) or low >= high:
-        raise ValueError(
-            "VSOP2013 crossing requires finite target and increasing TT bracket"
-        )
+    validate_crossing_inputs(
+        target,
+        low,
+        high,
+        message="VSOP2013 crossing requires finite target and increasing TT bracket",
+    )
     target, low, high = float(target), float(low), float(high)
     with LOCK:
         source = _selected()
@@ -244,10 +260,11 @@ def longitude_crossing_tt(
             return math.remainder(values[0] - target, 360.0), values[3]
 
         left, right = residual(low)[0], residual(high)[0]
-        if not left < 0 <= right or right - left >= 90:
-            raise ValueError(
-                "VSOP2013 bracket does not contain a forward solar crossing"
-            )
+        validate_forward_bracket(
+            left,
+            right,
+            message="VSOP2013 bracket does not contain a forward solar crossing",
+        )
         epoch = (low + high) / 2
         for _ in range(8):
             value, speed = residual(epoch)
@@ -273,14 +290,9 @@ def longitude_crossing_tt(
                     break
             epoch = trial if low < trial < high else (low + high) / 2
         # Preserve the exact binary64 termination, never a coarse time stop.
-        for _ in range(48):
-            middle = (low + high) / 2
-            if middle == low or middle == high:
-                break
-            if residual(middle)[0] < 0:
-                low = middle
-            else:
-                high = middle
+        low, high, _ = bisect_forward_crossing(
+            lambda point: residual(point)[0], low, high, 48
+        )
         if not residual(low)[0] < 0 <= residual(high)[0]:
             raise EphemerisSourceError("solar_vsop2013_calculation")
         source.check_unchanged()

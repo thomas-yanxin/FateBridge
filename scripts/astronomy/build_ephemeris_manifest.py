@@ -80,8 +80,6 @@ def build(commit: str, cache_dir: Path, output: Path) -> EphemerisManifest:
     """Fetch upstream .se1 entries at commit and write the manifest JSON."""
     if not re.fullmatch(r"[0-9a-f]{40}", commit):
         raise ValueError("An explicit full upstream commit SHA is required")
-    else:
-        pass
     tree_url = (
         f"https://api.github.com/repos/{REPOSITORY}/git/trees/{commit}?recursive=1"
     )
@@ -89,17 +87,11 @@ def build(commit: str, cache_dir: Path, output: Path) -> EphemerisManifest:
     tree_payload: object = json.loads(raw_tree)
     if not isinstance(tree_payload, dict):
         raise ValueError("Upstream tree response must be a JSON object")
-    else:
-        pass
     if tree_payload.get("truncated"):
         raise ValueError("Upstream tree is truncated; refusing an incomplete manifest")
-    else:
-        pass
     raw_entries = tree_payload.get("tree")
     if not isinstance(raw_entries, list):
         raise ValueError("Upstream tree response missing entry list")
-    else:
-        pass
     entries: list[TreeEntry] = []
     for row in raw_entries:
         if (
@@ -118,12 +110,8 @@ def build(commit: str, cache_dir: Path, output: Path) -> EphemerisManifest:
                     "sha": row["sha"],
                 }
             )
-        else:
-            pass
     if not entries:
         raise ValueError("No root ephemeris files found")
-    else:
-        pass
     base_url = f"https://raw.githubusercontent.com/{REPOSITORY}/{commit}/ephe"
     cache_dir.mkdir(parents=True, exist_ok=True)
     atomic_write(cache_dir / "upstream-tree.json", raw_tree)
@@ -139,16 +127,10 @@ def build(commit: str, cache_dir: Path, output: Path) -> EphemerisManifest:
         ).hexdigest()
         if len(data) != row["size"] or blob != row["sha"]:
             raise ValueError(f"{name}: bytes do not match pinned upstream Git blob")
-        else:
-            pass
         if not data.startswith(b"SW"):
             raise ValueError(f"{name}: upstream object is not ephemeris data")
-        else:
-            pass
         if not target.exists():
             atomic_write(target, data)
-        else:
-            pass
         return name, {
             "bytes": len(data),
         }
@@ -165,12 +147,8 @@ def build(commit: str, cache_dir: Path, output: Path) -> EphemerisManifest:
                 errors.append(f"{futures[future]}: {error}")
             if (len(files) + len(errors)) % 20 == 0:
                 print(f"Checked {len(files)} files; {len(errors)} errors", flush=True)
-            else:
-                pass
     if errors:
         raise ValueError("No manifest written:\n" + "\n".join(errors))
-    else:
-        pass
     manifest: EphemerisManifest = {
         "schema_version": 1,
         "id": "swiss_ephemeris_data_v1",
@@ -199,5 +177,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-else:
-    pass

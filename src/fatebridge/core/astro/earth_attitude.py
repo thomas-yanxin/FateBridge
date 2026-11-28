@@ -15,6 +15,7 @@ from typing import Protocol, Sequence
 
 import erfa
 
+from fatebridge.core.astro.cartesian import Matrix, dot, mm, transpose
 from fatebridge.core.astro.earth_rotation import (
     MODERN_HALF_WINDOW_DAYS,
     MODERN_REFERENCE_JD_TT,
@@ -25,14 +26,10 @@ from fatebridge.core.astro.earth_rotation import (
 from fatebridge.core.astro.iers_ut1 import active_ut1
 from fatebridge.core.astro.reference_frames import (
     EquatorialReduction,
-    Matrix,
     analytic_ecliptic_frame,
-    dot,
     equatorial_reduction,
     iau_equatorial_frame,
-    mm,
     native_equatorial_frame,
-    transpose,
 )
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.astro.ut1_epoch import UT1Instant
@@ -80,11 +77,22 @@ def _native_sidereal_degrees(module: RotationSource, ut1: UT1Instant) -> float:
 
 def _native_obliquity_nutation(module: RotationSource, jd_tt: float) -> Sequence[float]:
     """Read the source-frame angles independently of physical-body data policy."""
+    native_error = getattr(module, "Error", None)
+    caught_errors: tuple[type[BaseException], ...] = (
+        (
+            native_error,
+            TypeError,
+            ValueError,
+            ArithmeticError,
+        )
+        if isinstance(native_error, type) and issubclass(native_error, BaseException)
+        else (TypeError, ValueError, ArithmeticError)
+    )
     try:
         coordinates, flag = module.calc(jd_tt, module.ECL_NUT, module.FLG_SWIEPH)
     except EphemerisSourceError:
         raise
-    except Exception as error:
+    except caught_errors as error:
         raise EphemerisSourceError("earth_attitude_model_unavailable") from error
     if flag < 0 or not all(math.isfinite(value) for value in coordinates[:4]):
         raise EphemerisSourceError("earth_attitude_model_unavailable")

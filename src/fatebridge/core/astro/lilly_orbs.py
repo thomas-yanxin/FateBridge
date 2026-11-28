@@ -13,6 +13,8 @@ from typing import Literal
 
 OrbProfile = Literal["lilly_1647_p107_first", "lilly_1647_p107_second"]
 DEFAULT_ORB_PROFILE: OrbProfile = "lilly_1647_p107_first"
+STELLAR_ORB_DEGREES = {"Regulus": 6, "Spica": 5, "Algol": 5}
+STELLAR_ORB_SOURCE_PAGES = {"Regulus": [115, 179], "Spica": [115, 179], "Algol": [115]}
 FULL_ORBS = {
     "lilly_1647_p107_first": {
         "Saturn": 10.0,

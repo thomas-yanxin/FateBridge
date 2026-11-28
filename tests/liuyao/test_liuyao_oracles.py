@@ -233,7 +233,7 @@ def test_liuyao_audit_payload_budget_and_transports(surface_calls) -> None:
 def test_liuyao_retires_conditional_analysis_and_event_horizon() -> None:
     from pydantic import ValidationError
 
-    from fatebridge.core.contracts.output_divination import LiuyaoEvidence
+    from fatebridge.core.contracts.divination import LiuyaoEvidence
     from fatebridge.core.requests.divination import SixYaoRequest
 
     retired_evidence_fields = {

@@ -4,8 +4,12 @@ from __future__ import annotations
 
 from typing import Any, Literal, Mapping
 
-from fatebridge.core.metaphysics.common import kongwang_for_ganzhi
-from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS, get_nayin
+from fatebridge.utils.data import (
+    EARTHLY_BRANCHES,
+    HEAVENLY_STEMS,
+    get_nayin,
+    kongwang_for_ganzhi,
+)
 
 PEACH_BLOSSOM_TARGETS = (
     (("申", "子", "辰"), "酉"),

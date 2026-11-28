@@ -30,9 +30,15 @@ from fatebridge.core.ephemeris_installation import (
 )
 from fatebridge.core.ephemeris_paths import ephemeris_search_directories
 from fatebridge.core.ephemeris_runtime import effective_ephemeris_search_path
-from fatebridge.services.tool_catalog import CATALOG
+from fatebridge.services.tool_catalog import all_catalog
 from fatebridge.utils.errors import ParameterError
-from fatebridge.utils.runtime import load_runtime_env
+from fatebridge.utils.runtime import (
+    get_codex_cli_path,
+    get_de441_dir,
+    get_mcp_families,
+    is_codex_desktop_originator,
+    load_runtime_env,
+)
 
 STDIO_CALL_TIMEOUT_SECONDS = 30
 STDIO_PROBE_TIMEOUT_SECONDS = 40
@@ -71,14 +77,11 @@ class StdioFailureDetails(TypedDict):
 
 def resolve_codex_cli() -> CodexCliResolution:
     """Prefer the running desktop's CLI to an unrelated PATH installation."""
-    desktop = os.getenv("CODEX_CLI_PATH")
+    desktop = get_codex_cli_path()
     terminal = shutil.which("codex")
     if desktop and Path(desktop).is_file() and os.access(desktop, os.X_OK):
         return {"path": desktop, "source": "desktop", "path_cli": terminal or ""}
-    if (
-        not desktop
-        and os.getenv("CODEX_INTERNAL_ORIGINATOR_OVERRIDE") == "Codex Desktop"
-    ):
+    if not desktop and is_codex_desktop_originator():
         running = _running_desktop_cli()
         if running:
             return {
@@ -191,16 +194,16 @@ def diagnose(
 ) -> ServiceResult:
     if mcp:
         load_runtime_env()
-    family = family if family is not None else os.getenv("FATEBRIDGE_MCP_FAMILIES", "")
+    family = family if family is not None else (get_mcp_families() or "")
     try:
         selected = select_mcp_specs(
-            CATALOG,
+            all_catalog(),
             family=family or None,
         )
     except ParameterError as exc:
         return {"ok": False, **exc.as_result()}
     env = {"FATEBRIDGE_MCP_FAMILIES": family}
-    if archive_dir := os.getenv("FATEBRIDGE_DE441_DIR"):
+    if archive_dir := get_de441_dir():
         env["FATEBRIDGE_DE441_DIR"] = archive_dir
     dependencies: dict[str, DependencyStatus] = {}
     for dependency in importlib.metadata.requires("fatebridge") or []:
@@ -250,7 +253,7 @@ def diagnose(
             output["mcp"] = asyncio.run(
                 asyncio.wait_for(_probe_stdio(env), timeout=STDIO_PROBE_TIMEOUT_SECONDS)
             )
-        except Exception as exc:
+        except (_StdioProbeError, TimeoutError, OSError, RuntimeError) as exc:
             output["ok"] = False
             output["mcp"] = {
                 "ok": False,

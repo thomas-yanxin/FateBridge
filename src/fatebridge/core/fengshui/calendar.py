@@ -24,6 +24,7 @@ from fatebridge.core.solar_model_policy import solar_model_policy
 from fatebridge.core.solar_term_clock import native_solar_root_time_policy
 from fatebridge.core.solar_term_runtime import solar_term_cache_context
 from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_SOLAR_MODEL
+from fatebridge.utils.civil_clock import clock_offset_changes
 from fatebridge.utils.civil_time import (
     CivilPoint,
     CivilPointRecord,
@@ -31,7 +32,6 @@ from fatebridge.utils.civil_time import (
     nominal_calendar_bracket,
     utc_calendar,
 )
-from fatebridge.utils.clock_events import clock_offset_changes
 from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.utils.timezones import (
     format_local_time_or_utc,

@@ -13,10 +13,10 @@ import tempfile
 import urllib.request
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Any
 
 from fatebridge.core.astro.ephemeris_files import ephemeris_files_for_years
 from fatebridge.core.astro.ephemeris_integrity import (
+    EphemerisManifest,
     load_ephemeris_manifest,
     validate_file_name,
     verify_ephemeris_bytes,
@@ -64,7 +64,7 @@ def fetch_one(
     *,
     base_url: str | None = None,
     force: bool = False,
-    manifest: dict[str, Any] | None = None,
+    manifest: EphemerisManifest | None = None,
 ) -> Path:
     """Install one verified ephemeris file."""
     catalog = manifest if manifest is not None else load_ephemeris_manifest()
@@ -113,7 +113,7 @@ def fetch_ephemeris(
     *,
     base_url: str | None = None,
     force: bool = False,
-    manifest: dict[str, Any] | None = None,
+    manifest: EphemerisManifest | None = None,
 ) -> list[Path]:
     """Install the selected files using one edition manifest."""
     destination = dest if dest is not None else default_dest()

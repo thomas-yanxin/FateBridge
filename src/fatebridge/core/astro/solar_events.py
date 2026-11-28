@@ -17,11 +17,10 @@ import erfa
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.aberration_math import LIGHT_SPEED_AU_PER_DAY
-from fatebridge.core.astro.cartesian import CartesianState, Vector3
+from fatebridge.core.astro.cartesian import CartesianState, Vector3, dot, mv
 from fatebridge.core.astro.earth_attitude import earth_attitude, physical_equator
 from fatebridge.core.astro.iers_ut1 import active_ut1
 from fatebridge.core.astro.native_coordinates import require_spherical_coordinates
-from fatebridge.core.astro.reference_frames import dot, mv
 from fatebridge.core.astro.solar_altitude_search import solar_altitude_nodes
 from fatebridge.core.astro.solar_observer import (
     FileSolarSource,

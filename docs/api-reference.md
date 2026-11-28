@@ -39,13 +39,13 @@ OpenAPI 发布 91 个业务 REST 路由，另有 `/api/batch`（多主体多工�
 | `consultation_restricted` | 422 · `1` | 命中禁区（生死、灾祸、临床诊断或医疗择时），`retryable=false` |
 | `dependency_missing` / `ephemeris_calculation_failed` | 503 · `1` | 缺少运行时依赖或 Swiss Ephemeris 计算失败 |
 | `ephemeris_source_inconsistent` | 503 · `1` | 星历/时区/参考数据文件或配置在运行时不一致，`retryable=false` |
-| `fengshui_calculation_inconsistent` / `numerology_source_inconsistent` / `jyotish_calculation_inconsistent` | 503 · `1` | 玄空/月紫白、河洛参评或印占 Drik Bala 内部数据一致性校验失败，`retryable=false` |
+| `numerology_source_inconsistent` | 503 · `1` | 河洛参评原典对照数据内部一致性校验失败，`retryable=false` |
 | `timeout` / `internal_error` | 504 / 500 · `1` | 请求处理超时或服务端未预期异常 |
 | `usage_error` | — · `2` | 仅 CLI：未知 flag、参数语法或 `--request-file` 读取错误 |
 
 ### 2.2 三端能力边界
 
-目录共有 91 条记录。REST 和 MCP 默认公开全量，CLI 可执行 91 条目录命令（另有 `list`、`discover` 与 `doctor`）。三端共用规范工具名（`spec.name`）和业务输入合同，部分主要命名映射如下：
+目录共有 91 条记录。REST 和 MCP 默认公开全量，CLI 可执行 91 条目录命令（另有 `list`、`discover`、`batch` 与 `doctor`），Python SDK（`fatebridge.discover`、`fatebridge.run`、`fatebridge.batch`）与三端共用同一执行与交付管道。三端共用规范工具名（`spec.name`）和业务输入合同，部分主要命名映射如下：
 
 | 能力 | REST | MCP / CLI | 差异说明 |
 | --- | --- | --- | --- |
@@ -67,8 +67,8 @@ OpenAPI 发布 91 个业务 REST 路由，另有 `/api/batch`（多主体多工�
 REST 使用 `GET /api/tools`（查询参数 `detail=brief|summary|full`、`family`、`q`、`tool`、`tools`、`surface`、`include_output_schema=false|true`），CLI 使用 `list` / `discover [tool ...]`（支持 `--tools`、`--detail brief|summary|full`、`--include-output-schema`，也可直接通过 `python -m fatebridge` 调用），MCP 使用 `discover_tools`。
 
 - `detail=brief`：仅返回必填字段、`field_types`、一两行 `usage_hint` 与 `evidence_views` 名称列表，体积最小，适合多工具批量预检（例如 `fatebridge discover qimen liuren_chart jinkou --detail brief`）。
-- `detail=summary`（默认）：未传 `tool`/`tools` 时返回全局 `counts`、`families` 与工具摘要；指定单个 `tool` 时直接解包返回该工具的 `input_schema`、`output_fields`、`example_input`、`evidence_views`、`suggested_fields` 与 `default_omit`（不再多套一层目录列表）；指定多个 `tools` 时返回精简匹配列表。
-- `detail=full`：返回完整契约，必须配合 `tool`、`tools`、`family` 或 `q` 过滤（否则返回 `filter_required_for_full_detail`）；**`output_schema` 默认不返回，仅当显式传入 `include_output_schema=true`（MCP `include_output_schema=True`，CLI `--include-output-schema`）时才会附带**。
+- `detail=summary`（默认）：未传 `tool`/`tools` 时返回全局 `counts`、`families` 与工具摘要；指定单个 `tool` 时直接解包返回该工具的 `input_schema`、`example_input`、`evidence_views`、`suggested_fields` 与 `default_omit`（不再多套一层目录列表）；指定多个 `tools` 时返回精简匹配列表。
+- `detail=full`：返回完整契约（含 `output_fields`），必须配合 `tool`、`tools`、`family` 或 `q` 过滤（否则返回 `filter_required_for_full_detail`）；**`output_schema` 默认不返回，仅当显式传入 `include_output_schema=true`（MCP `include_output_schema=True`，CLI `--include-output-schema`）时才会附带**。
 - 所有 `extra_forbidden` 校验错误（包括 `BatchRequest`、`BatchCall`、`SubjectProfile`、`AnalysisContext` 与单工具参数）统一返回 `issues[].constraints.allowed_fields` 与近义 `suggestions`。
 
 ### 2.6 确定性与复现元数据
@@ -87,7 +87,7 @@ REST 使用 `GET /api/tools`（查询参数 `detail=brief|summary|full`、`famil
 | `birth_minute` | int | 否 | 默认 `0` |
 | `birth_second` | int / null | 否 | 八字与时运入口支持已确认整秒 `0..59`（需同时显式给出分钟） |
 | `birth_utc_offset` | string / null | 否 | 已确认民用偏移 `±HH:MM[:SS]`，用于消歧重复钟时 |
-| `birth_place` / `birth_timezone` | string | 否 | 内置离线 SQLite 索引解析或 IANA 时区；奇门/六壬/金口/梅花/西占事件盘同时支持 `analysis_place` / `place` 离线解析 |
+| `birth_place` / `birth_timezone` | string | 否 | 内置离线 SQLite 索引解析或 IANA 时区；`qimen`/`liuren_*`/`jinkou`/`taiyi`/`meihua_time_cast` 支持 `analysis_place`，`liuyao`/`canping`/`heluo`/`suzhan`/`interpret_astrology_dice`/`sanshi_combined_chart`/历法与部分西占事件盘支持 `place`（`planetary_returns` 使用 `birth_place`） |
 | `birth_longitude` | float | 否 | `-180..180` |
 | `use_true_solar_time` | bool | 否 | 中式出生家族默认 `true`（无经度回退钟表时间；显式 `true` 无经度报错） |
 
@@ -101,7 +101,7 @@ REST 使用 `GET /api/tools`（查询参数 `detail=brief|summary|full`、`famil
 
 `birth_longitude` 与 `birth_latitude` 必填，并支持 `analysis_year/month/day/hour/minute`（省略 `analysis_hour` / `analysis_minute` 时沿用出生时分）、`return_longitude/latitude/timezone`、`house_system`、`zodiac_type`，聚合入口及对应单项工具按各自契约提供 `pd_method/pd_time_key/pd_type/pd_aspects/show_pd_bounds`、`firdaria_night_order`（`nodes_at_end` / `nodes_after_mars`）、`firdaria_year_basis`（`fixed_365_2425` / `calendar_anniversary`）。
 
-### 3.4 本地技法请求约定
+### 3.4 占卜、历法与三式复合请求约定
 
 `solar_terms_for_year`、`lunar_calendar_time`、`liuyao`、`canping`、`heluo`、`suzhan`、`interpret_astrology_dice` 与 `sanshi_combined_chart` 等统一使用 `timezone`（常见默认 `+08:00`）、`latitude` / `longitude`；按工具契约配合 `date` / `time`（或 `year`）。`suzhan` 在省略 `time` 时仅做日期历法候选计算；已知钟时则需完整经纬度。`suzhan` 与 `interpret_astrology_dice` 同样支持 `house_system` 与 `zodiac_type`。
 

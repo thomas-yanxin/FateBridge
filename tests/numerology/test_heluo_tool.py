@@ -12,7 +12,7 @@ from fatebridge.core.heluo.chart import (
     sixty_jiazi_nayin_table,
     transform_houtian,
 )
-from fatebridge.core.local_techniques.heluo import build_heluo_result
+from fatebridge.core.heluo.heluo import build_heluo_result
 from fatebridge.services.divination import calculate_heluo_analysis
 
 _CASE1 = {"year": "甲子", "month": "丁卯", "day": "庚申", "hour": "庚辰"}

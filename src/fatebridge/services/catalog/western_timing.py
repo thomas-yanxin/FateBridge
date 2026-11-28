@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from fatebridge.application.bindings import bind_kwargs, request_model_ref, service_ref
-from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.application.tool_spec import BatchInputPolicy, ToolSpec
 
 _REQ_MODULE = "fatebridge.core.requests.western_timing"
 
@@ -28,12 +28,14 @@ def _western_module_spec(
         name=name,
         bind=bind_kwargs(calculate_timing_tool, fixed={"tool_name": name}),
         request_model_loader=request_model_ref(_REQ_MODULE, request_model_name),
+        required_output_fields=(name,),
         summary=f"{label}：单项西占行运（整合用 western_timing）。",
         operation_label_zh=label,
         family="western_timing",
         cpu_bound=True,
         rest_path="/api/astrology/timing/" + name.replace("_", "-"),
         default_omit=default_omit,
+        batch_policy=BatchInputPolicy(subject_mode="birth_fields"),
     )
 
 
@@ -42,6 +44,7 @@ SPECS: list[ToolSpec] = [
         name="western_timing",
         bind=bind_kwargs(calculate_western_timing_analysis),
         request_model_loader=request_model_ref(_REQ_MODULE, "WesternTimingRequest"),
+        required_output_fields=("analysis_context", "natal_reference", "summary"),
         summary="西占时运聚合分析：整合返照/行运/太阳弧/小限/法达；单项用对应工具。",
         operation_label_zh="西占时运",
         family="western_timing",
@@ -62,6 +65,7 @@ SPECS: list[ToolSpec] = [
             "time_lords.zodiacal_releasing",
             "time_lords.decennials",
         ),
+        batch_policy=BatchInputPolicy(subject_mode="birth_fields"),
     ),
     _western_module_spec(
         "solar_return",

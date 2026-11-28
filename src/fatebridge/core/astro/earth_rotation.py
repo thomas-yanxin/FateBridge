@@ -11,7 +11,7 @@ from fractions import Fraction
 
 import erfa
 
-from fatebridge.core.astro.reference_frames import Matrix
+from fatebridge.core.astro.cartesian import Matrix
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.astro.ut1_epoch import UT1Instant
 from fatebridge.core.iers2010_series import EECT_TERMS

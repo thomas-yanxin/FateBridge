@@ -9,9 +9,12 @@ from collections.abc import Sequence
 from types import UnionType
 from typing import TYPE_CHECKING, Annotated, Literal, NoReturn, get_args, get_origin
 
+from fatebridge.application.delivery_flags import (
+    FIELDS_FLAG_DESC,
+    INCLUDE_FLAG_DESC,
+)
 from fatebridge.application.tool_spec import ServiceResult
 from fatebridge.services.tool_catalog import all_catalog, get_spec
-from fatebridge.transports.flags import FIELDS_FLAG_DESC, INCLUDE_FLAG_DESC
 
 if TYPE_CHECKING:
     from pydantic.fields import FieldInfo
@@ -34,9 +37,13 @@ class _JsonErrorParser(argparse.ArgumentParser):
     """Write argparse usage errors as JSON on stdout and exit with status 2."""
 
     def __init__(
-        self, *, prog: str | None = None, description: str | None = None
+        self,
+        *,
+        prog: str | None = None,
+        description: str | None = None,
+        allow_abbrev: bool = False,
     ) -> None:
-        super().__init__(prog=prog, description=description)
+        super().__init__(prog=prog, description=description, allow_abbrev=allow_abbrev)
         # note (argparse): Accept negative scientific notation as a numeric argument.
         self._negative_number_matcher = re.compile(
             r"^-(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$"
@@ -365,6 +372,6 @@ def _add_transport_flags(parser: argparse.ArgumentParser) -> None:
 
 def _add_discovery_flags(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--family", help="工具分类，可用逗号指定多个分类")
-    parser.add_argument("--query", dest="q", help="按工具名称、分类和描述搜索")
+    parser.add_argument("--query", "--q", dest="q", help="按工具名称、分类和描述搜索")
     parser.add_argument("--tool", help="精确选择一个工具")
     parser.add_argument("--surface", choices=("rest", "mcp", "cli"))

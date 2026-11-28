@@ -22,9 +22,9 @@ from fatebridge.core.psychometrics.ipip_big_five import (
     ITEMS_BY_ID,
     METHOD_ID,
     SCALE_ID,
-    IpipBigFiveRequest,
     score_ipip_big_five,
 )
+from fatebridge.core.requests.psychometrics import IpipBigFiveRequest
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.transports import (
     call_calculation,

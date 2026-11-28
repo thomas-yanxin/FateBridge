@@ -33,6 +33,7 @@ from fatebridge.utils.data import (
     get_hour_branch,
     get_nayin,
     get_ten_god,
+    year_ganzhi,
 )
 
 LATE_ZI_HOUR = 23  # 23:00-23:59 属晚子时 / 夜子时
@@ -200,11 +201,12 @@ _PILLAR_LABELS = {
 
 
 def validate_zi_hour_policy(policy: str) -> ZiHourPolicy:
-    if policy not in ZI_HOUR_POLICIES:
-        raise ValueError(
-            f"不支持的早晚子时规则: {policy!r}；可选 {', '.join(ZI_HOUR_POLICIES)}"
-        )
-    return policy  # type: ignore[return-value]
+    for valid in ZI_HOUR_POLICIES:
+        if policy == valid:
+            return valid
+    raise ValueError(
+        f"不支持的早晚子时规则: {policy!r}；可选 {', '.join(ZI_HOUR_POLICIES)}"
+    )
 
 
 def resolve_bazi_effective_date(
@@ -247,11 +249,7 @@ class BaZiCalendar:
 
     @classmethod
     def calculate_year_pillar(cls, year: int) -> tuple[str, str]:
-        year_offset = year - cls.BASE_YEAR
-        return (
-            HEAVENLY_STEMS[year_offset % len(HEAVENLY_STEMS)],
-            EARTHLY_BRANCHES[year_offset % len(EARTHLY_BRANCHES)],
-        )
+        return year_ganzhi(year)
 
     @classmethod
     def calculate_month_pillar_by_branch(

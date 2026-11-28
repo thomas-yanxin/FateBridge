@@ -1,15 +1,11 @@
 """Serve FateBridge calculations and capability discovery over HTTP."""
 
-import asyncio
 import logging
-import os
 import time
 import warnings
 from collections.abc import Collection
 from copy import deepcopy
-from typing import Literal
 
-import uvicorn
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -25,7 +21,9 @@ from starlette.responses import Response
 from starlette.routing import Match, Mount, Route, WebSocketRoute
 
 from fatebridge.utils.runtime import (
+    get_api_host,
     get_api_key_header_name,
+    get_api_port,
     get_log_level,
     load_runtime_env,
     parse_allowed_origins,
@@ -38,16 +36,14 @@ load_runtime_env()
 # isort: split
 
 from fatebridge import __version__ as APP_VERSION
-from fatebridge.application.compute_limits import heavy_calculation_budget
 from fatebridge.application.discovery import (
     DiscoveryDetail,
     ToolSurface,
     discover_specs,
 )
-from fatebridge.application.execution import execute_with_receipt, result_is_error
+from fatebridge.application.execution import execute_with_receipt, run_tool
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
-from fatebridge.core.execution_context import ExecutionOptions
-from fatebridge.services.tool_catalog import CATALOG, rest_specs
+from fatebridge.services.tool_catalog import all_catalog, rest_specs
 from fatebridge.transports.http_runtime import (
     API_KEY_EXEMPT_PATHS,
     READINESS_METRICS_MEDIA_TYPE,
@@ -122,15 +118,10 @@ REQUEST_METRICS = RuntimeMetrics()
 HTTP_METHODS = frozenset(
     {"GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"}
 )
-HEAVY_CALC_SEMAPHORE: asyncio.Semaphore | None = None
-HEAVY_CALC_SEMAPHORE_LOOP: asyncio.AbstractEventLoop | None = None
 
 
 def _reset_runtime_state_for_tests() -> None:
-    global HEAVY_CALC_SEMAPHORE, HEAVY_CALC_SEMAPHORE_LOOP
     REQUEST_METRICS.reset()
-    HEAVY_CALC_SEMAPHORE = None
-    HEAVY_CALC_SEMAPHORE_LOOP = None
 
 
 def _metrics_route_path(request: Request) -> str:
@@ -274,48 +265,29 @@ async def _http_error_envelope(
     return JSONResponse(status_code=exception.status_code, content=response_body)
 
 
-def _get_heavy_calc_semaphore() -> asyncio.Semaphore:
-    global HEAVY_CALC_SEMAPHORE, HEAVY_CALC_SEMAPHORE_LOOP
-    event_loop = asyncio.get_running_loop()
-    if HEAVY_CALC_SEMAPHORE is None or (
-        HEAVY_CALC_SEMAPHORE_LOOP is not None
-        and HEAVY_CALC_SEMAPHORE_LOOP is not event_loop
-    ):
-        HEAVY_CALC_SEMAPHORE = asyncio.Semaphore(
-            heavy_calculation_budget().max_concurrency
-        )
-    HEAVY_CALC_SEMAPHORE_LOOP = event_loop
-    return HEAVY_CALC_SEMAPHORE
-
-
 async def _execute_service(
     spec: ToolSpec,
     request: BaseModel,
     *,
-    options: ExecutionOptions,
+    include: list[str] | None = None,
+    fields: list[str] | None = None,
+    as_of: str | None = None,
 ) -> ServiceResult:
-    if spec.cpu_bound:
-        async with _get_heavy_calc_semaphore():
-            result = await run_in_threadpool(
-                execute_with_receipt,
-                spec,
-                request,
-                options=options,
-            )
-    else:
-        result = await run_in_threadpool(
-            execute_with_receipt,
-            spec,
-            request,
-            options=options,
-        )
-    if result_is_error(result):
+    outcome = await run_in_threadpool(
+        run_tool,
+        spec,
+        request,
+        include=include,
+        fields=fields,
+        as_of=as_of,
+        executor=execute_with_receipt,
+    )
+    if outcome.failed:
         raise HTTPException(
-            status_code=int(result.get("status_code", 500)),
-            detail=_build_error_detail(result),
+            status_code=outcome.status_code,
+            detail=_build_error_detail(outcome.payload),
         )
-    else:
-        return result
+    return outcome.payload
 
 
 @app.get("/health", response_model=ServiceResult)
@@ -380,7 +352,7 @@ async def list_tools(
 ) -> ServiceResult:
     try:
         return discover_specs(
-            CATALOG,
+            all_catalog(),
             family=family,
             q=q,
             tool=tool,
@@ -396,10 +368,12 @@ async def list_tools(
 
 
 def main() -> None:
+    import uvicorn
+
     uvicorn.run(
         app,
-        host=os.getenv("API_HOST", "0.0.0.0"),
-        port=int(os.getenv("API_PORT", "8010")),
+        host=get_api_host(),
+        port=get_api_port(),
         log_level=get_log_level().lower(),
         access_log=False,
     )

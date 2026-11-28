@@ -4,9 +4,7 @@ from __future__ import annotations
 
 import ctypes
 import math
-import os
 import platform
-import tempfile
 from copy import deepcopy
 from datetime import date
 from functools import lru_cache
@@ -15,18 +13,31 @@ from threading import RLock
 from typing import Any
 
 from fatebridge.core.native_solar_loader import (
+    NativeSolarSourceBase,
+    bisect_forward_crossing,
     file_signature,
     is_finite_number,
+    load_astronomy_json,
     load_validated_manifest_and_library,
+    select_env_backed_source,
+    validate_crossing_inputs,
+    validate_forward_bracket,
     verify_loaded_image,
 )
-from fatebridge.fetch_aa1996 import MODEL_ID, source_profile
 from fatebridge.utils.errors import EphemerisSourceError
 
+MODEL_ID = "fatebridge_moshier_aa1996_solar_v1"
 MANIFEST_ENV = "FATEBRIDGE_AA1996_MANIFEST"
 LOCK = RLock()
 
 _finite = is_finite_number
+
+
+def source_profile() -> dict[str, Any]:
+    profile = load_astronomy_json("aa1996-solar-v1.json", label="AA1996 source profile")
+    if profile.get("model_id") != MODEL_ID or profile.get("abi_version") != 1:
+        raise ValueError("Invalid AA1996 source profile")
+    return profile
 
 
 @lru_cache(maxsize=1)
@@ -42,10 +53,15 @@ def _loaded_image(function: Any, expected_path: Path) -> None:
     verify_loaded_image(function, expected_path, "AA1996")
 
 
-class _Source:
+class _Source(NativeSolarSourceBase):
     def __init__(self, path: Path, signature: tuple[int, ...]) -> None:
-        self.path, self.signature = path, signature
-        self._temporary: tempfile.TemporaryDirectory[str] | None = None
+        super().__init__(
+            path,
+            signature,
+            manifest_env=MANIFEST_ENV,
+            unavailable_reason="solar_aa1996_unavailable",
+            changed_reason="solar_aa1996_changed",
+        )
         try:
             self.profile = _profile()
             (
@@ -92,23 +108,10 @@ class _Source:
             self.library.swe_set_ephe_path(self._temporary.name.encode())
             self.check_unchanged(check_environment=False)
         except Exception as error:
-            if self._temporary is not None:
-                self._temporary.cleanup()
+            self._cleanup_temporary()
             if isinstance(error, EphemerisSourceError):
                 raise
             raise EphemerisSourceError("solar_aa1996_invalid") from error
-
-    def check_unchanged(self, *, check_environment: bool = True) -> None:
-        try:
-            configured = Path(os.environ.get(MANIFEST_ENV, "")).expanduser().resolve()
-            if (
-                (check_environment and configured != self.path)
-                or _signature(self.path) != self.signature
-                or _signature(self.binary_path) != self.binary_signature
-            ):
-                raise EphemerisSourceError("solar_aa1996_changed")
-        except (OSError, EphemerisSourceError) as error:
-            raise EphemerisSourceError("solar_aa1996_changed") from error
 
     def longitude(self, jd_tt: float) -> tuple[float, int]:
         """Evaluate a TT point already qualified by the calling boundary."""
@@ -142,13 +145,6 @@ class _Source:
             accuracy_certified=False,
         )
 
-    def key(self) -> tuple[Any, ...]:
-        return (
-            str(self.path),
-            self.signature,
-            self.binary_signature,
-        )
-
 
 @lru_cache(maxsize=2)
 def _load(path: Path, signature: tuple[int, ...]) -> _Source:
@@ -156,22 +152,13 @@ def _load(path: Path, signature: tuple[int, ...]) -> _Source:
 
 
 def _selected() -> _Source:
-    configured = os.environ.get(MANIFEST_ENV, "").strip()
-    if not configured:
-        raise EphemerisSourceError("solar_aa1996_unavailable")
-    path = Path(configured).expanduser().resolve()
-    source = _load(path, _signature(path))
-    try:
-        source.check_unchanged()
-    except EphemerisSourceError as error:
-        if error.reason != "solar_aa1996_changed":
-            raise
-        # A new request may resolve a fresh build after an installation. A
-        # source already held by an active batch still fails on any drift.
-        _load.cache_clear()
-        source = _load(path, _signature(path))
-        source.check_unchanged()
-    return source
+    return select_env_backed_source(
+        MANIFEST_ENV,
+        _load,
+        "solar_aa1996_unavailable",
+        retry_changed_reason="solar_aa1996_changed",
+        clear_cache_fn=_load.cache_clear,
+    )
 
 
 def cache_key() -> tuple[Any, ...]:
@@ -209,10 +196,12 @@ def longitude_crossing_tt(
     expected_source_key: tuple[Any, ...] | None = None,
     projection_year: int | None = None,
 ) -> dict[str, Any]:
-    if not all(_finite(value) for value in [target, low, high]) or low >= high:
-        raise ValueError(
-            "AA1996 crossing requires finite target and increasing TT bracket"
-        )
+    validate_crossing_inputs(
+        target,
+        low,
+        high,
+        message="AA1996 crossing requires finite target and increasing TT bracket",
+    )
     with LOCK:
         source = _selected()
         if expected_source_key is not None and source.key() != expected_source_key:
@@ -239,16 +228,12 @@ def longitude_crossing_tt(
             return math.remainder(angle - target, 360.0)
 
         left, right = residual(low), residual(high)
-        if not left < 0 <= right or right - left >= 90:
-            raise ValueError("AA1996 bracket does not contain a forward solar crossing")
-        for _ in range(48):
-            middle = (low + high) / 2.0
-            if middle == low or middle == high:
-                break
-            if residual(middle) < 0:
-                low = middle
-            else:
-                high = middle
+        validate_forward_bracket(
+            left,
+            right,
+            message="AA1996 bracket does not contain a forward solar crossing",
+        )
+        low, high, _ = bisect_forward_crossing(residual, low, high, 48)
         source.check_unchanged()
         return dict(
             jd_tt=(low + high) / 2.0,

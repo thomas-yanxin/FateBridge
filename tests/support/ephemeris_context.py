@@ -11,6 +11,16 @@ _EMPTY_EPHEMERIS_DEPTH: ContextVar[int] = ContextVar(
 )
 
 
+def manifest_for_payloads(payloads: dict[str, bytes]) -> dict[str, object]:
+    """Small explicit file-identity fixture; never an astronomy reference."""
+    return {
+        "schema_version": 1,
+        "id": "synthetic_file_identity_fixture",
+        "base_url": "https://ephemeris-test.invalid",
+        "files": {name: {"bytes": len(data)} for name, data in payloads.items()},
+    }
+
+
 def _clear_ephemeris_dependent_caches() -> None:
     """Discard solar-term facts and derived caches when switching test models."""
     from fatebridge.core.almanac import get_solar_terms_for_year

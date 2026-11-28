@@ -10,11 +10,7 @@ from fatebridge.core.batch_cache import (
     metaphysics_seed_key,
 )
 from fatebridge.core.divination import build_hexagram
-from fatebridge.core.metaphysics.common import (
-    MetaphysicsSeed,
-    kongwang_for_ganzhi,
-    xun_head_for_ganzhi,
-)
+from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.qimen.board import (
     DEFAULT_GOD_PROFILE,
     DEFAULT_LODGING_POLICY,
@@ -39,6 +35,7 @@ from fatebridge.core.qimen.patterns import (
     enrich_qimen_evidence,
     validate_profiles,
 )
+from fatebridge.utils.data import kongwang_for_ganzhi, xun_head_for_ganzhi
 
 
 def build_ju_text(dun_type: str, ju_number: int, yuan: str) -> str:

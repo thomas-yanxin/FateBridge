@@ -5,10 +5,10 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, TypedDict
 
-from fatebridge.analysis.timing_effects import TimingEffectsAnalysis
-from fatebridge.analysis.timing_element_shares import (
+from fatebridge.analysis.timing_effects import (
     ElementShareChange,
     ElementShareCountingBasis,
+    TimingEffectsAnalysis,
     TimingElementEffects,
 )
 from fatebridge.core.bazi.policies import YearBoundaryPolicy

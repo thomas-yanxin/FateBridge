@@ -196,7 +196,6 @@ def test_restrictions_match_rest_mcp_cli_and_never_reach_services(
         pytest.fail("restricted request reached the shared executor")
 
     monkeypatch.setattr(api, "execute_with_receipt", forbidden_execute)
-    monkeypatch.setattr("fatebridge.mcp_server.execute_with_receipt", forbidden_execute)
     monkeypatch.setattr(execution, "execute_with_receipt", forbidden_execute)
     response = TestClient(api.app).post(spec.rest_path, json=inputs)
     args = [tool]
@@ -247,7 +246,7 @@ def test_health_is_cultural_and_has_no_disease_or_treatment_recommendations() ->
 def test_health_output_contract_rejects_reintroduced_clinical_claims() -> None:
     from jsonschema import Draft202012Validator
 
-    from fatebridge.core.contracts.output_bazi import DimensionOutput
+    from fatebridge.core.contracts.bazi import DimensionOutput
 
     schema = Draft202012Validator(DimensionOutput.model_json_schema())
     for invalid in (

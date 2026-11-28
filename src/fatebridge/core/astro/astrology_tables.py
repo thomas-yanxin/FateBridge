@@ -18,6 +18,17 @@ SIGNS = [
     "Pisces",
 ]
 
+# Chaldean (slowest-first) traditional planetary order.
+CHALDEAN_ORDER: tuple[str, ...] = (
+    "Saturn",
+    "Jupiter",
+    "Mars",
+    "Sun",
+    "Venus",
+    "Mercury",
+    "Moon",
+)
+
 
 SIGN_LABELS_ZH = {
     "Aries": "白羊",

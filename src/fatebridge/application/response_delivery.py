@@ -4,6 +4,8 @@ from collections.abc import Iterable
 
 from pydantic import JsonValue
 
+from fatebridge.application.delivery_flags import FIELDS_FLAG_DESC as FIELDS_FLAG_DESC
+from fatebridge.application.delivery_flags import INCLUDE_FLAG_DESC as INCLUDE_FLAG_DESC
 from fatebridge.application.examples import evidence_views
 from fatebridge.application.projection import (
     include_issues,

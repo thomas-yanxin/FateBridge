@@ -21,16 +21,17 @@ from pathlib import Path
 from typing import TypedDict
 
 from fatebridge.core.astro.coefficient_storage import RecordBlock, pack_records
-from fatebridge.core.astro.de441_source import (
-    FRAME_URL,
-    PAPER_URL,
-    SOURCE_URL,
-)
 from fatebridge.core.astro.de441_storage import BASENAME as DE441_BASENAME
 from fatebridge.core.astro.de441_storage import BINARY_ORDER as DE441_BINARY_ORDER
 from fatebridge.core.astro.de441_storage import MODEL_ID
 from fatebridge.core.astro.de441_storage import STORAGE as DE441_STORAGE
 from fatebridge.core.de440_solar import RecordSegment, SolarManifest
+
+SOURCE_URL = (
+    "https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de441/linux_m13000p17000.441"
+)
+PAPER_URL = "https://doi.org/10.3847/1538-3881/abd414"
+FRAME_URL = "https://github.com/liberfa/erfa/blob/v2.0.1/src/bp06.c"
 
 DE441_SOURCE_SHA256 = "88289997e437cf115a95fc60d787129f7213952ecae323035ce341325674eee1"
 DE441_DOWNLOAD_MANIFEST_SHA256 = (
@@ -73,15 +74,11 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
         data = gzip.decompress(packed)
         if (
             manifest["model_id"] not in SOLAR_SOURCE_SHA256
-            or manifest["uncompressed_sha256"]
+            or hashlib.sha256(data).hexdigest()
             != SOLAR_SOURCE_SHA256[manifest["model_id"]]
-            or hashlib.sha256(packed).hexdigest() != manifest["compressed_sha256"]
-            or hashlib.sha256(data).hexdigest() != manifest["uncompressed_sha256"]
             or len(data) != manifest["uncompressed_bytes"]
         ):
             raise ValueError("Staged DE440 records differ from their source commitment")
-        else:
-            pass
         profiles[metadata.name] = manifest
         for segment in manifest["segments"]:
             pair = segment["center"], segment["target"]
@@ -89,8 +86,6 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
             span = segment["interval_seconds"]
             if pair in formats and formats[pair] != (size, span):
                 raise ValueError("Inconsistent original DE440 source record layout")
-            else:
-                pass
             formats[pair] = size, span
             bucket = records.setdefault(pair, {})
             for index in range(segment["record_count"]):
@@ -102,8 +97,6 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
                     span / 2,
                 ) or (midpoint in bucket and bucket[midpoint] != raw):
                     raise ValueError("DE440 source grid or overlapping words differ")
-                else:
-                    pass
                 bucket[midpoint] = raw
     if (
         {m["model_id"] for m in profiles.values()} != set(SOLAR_SOURCE_SHA256)
@@ -111,8 +104,6 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
         or set(records) != {(0, 3), (3, 399), (0, 10)}
     ):
         raise ValueError("All five original solar source selections are required")
-    else:
-        pass
     logical = bytearray()
     segments: list[RecordSegment] = []
     offsets: dict[tuple[int, int], tuple[int, float, int, float]] = {}
@@ -121,8 +112,6 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
         times = sorted(bucket)
         if any(b - a != span for a, b in zip(times, times[1:])):
             raise ValueError("DE440 original record union is not continuous")
-        else:
-            pass
         raw = b"".join(bucket[t] for t in times)
         offset = len(logical)
         logical.extend(raw)
@@ -184,8 +173,6 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
             index = int((midpoint - first) / span)
             if first + index * span != midpoint:
                 raise ValueError("DE440 view does not follow its original source grid")
-            else:
-                pass
             segment["offset_bytes"] = base + index * size
             at = segment["offset_bytes"]
             segment_raw = logical_bytes[at : at + segment["bytes"]]
@@ -196,8 +183,6 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
                 and hashlib.sha256(segment_raw).hexdigest() != expected_segment_sha
             ):
                 raise ValueError("DE440 selected source-record words changed")
-            else:
-                pass
             cleaned_segments.append(segment_obj)
             selected.extend(segment_raw)
         view_obj["segments"] = cleaned_segments
@@ -208,8 +193,6 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
             and hashlib.sha256(selected).hexdigest() != expected_uncompressed_sha
         ):
             raise ValueError("DE440 logical profile changed during deduplication")
-        else:
-            pass
         outputs[filename] = encoded(view_obj)
     return outputs
 
@@ -223,8 +206,6 @@ def planetary_archive(
         != DE441_DOWNLOAD_MANIFEST_SHA256
     ):
         raise ValueError("DE441 source download commitment changed")
-    else:
-        pass
     groups: dict[str, SourceGroup] = {}
     words = bytearray()
     source_sha = hashlib.sha256()
@@ -247,8 +228,6 @@ def planetary_archive(
             au,
         ) != (1721392.5, 5373520.5, 32.0, 149597870.7):
             raise ValueError("Unexpected original DE441 source header")
-        else:
-            pass
         offset = 0
         for body, number in [
             ("Mercury", 0),
@@ -283,8 +262,6 @@ def planetary_archive(
                 start + (index + 1) * span,
             ):
                 raise ValueError("Incomplete or discontinuous original DE441 record")
-            else:
-                pass
             for group in groups.values():
                 at = (group["source_pointer"][0] - 1) * 8
                 count = 3 * group["coefficient_count"] * group["subintervals"]
@@ -310,12 +287,8 @@ def planetary_archive(
                 yield filename, packed
                 words = bytearray()
                 chunk_count = 0
-            else:
-                pass
         if stream.read() or source_sha.hexdigest() != DE441_SOURCE_SHA256:
             raise ValueError("The continuous DE441 source words changed")
-        else:
-            pass
     metadata = {
         "model_id": MODEL_ID,
         "source_version": "JPL DE441, Park-Folkner-Williams-Boggs 2021",
@@ -390,8 +363,6 @@ def main() -> int:
         if args.check:
             if path.read_bytes() != content:
                 raise SystemExit(f"Distributed coefficient product differs: {name}")
-            else:
-                pass
         else:
             args.output.mkdir(parents=True, exist_ok=True)
             path.write_bytes(content)
@@ -405,5 +376,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-else:
-    pass

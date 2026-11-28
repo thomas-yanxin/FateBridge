@@ -10,7 +10,7 @@ from fatebridge.core import ephemeris_installation as install
 from fatebridge.core import ephemeris_runtime
 from fatebridge.core.human_design.cycles import HORIZON_DAYS
 from fatebridge.core.requests.human_design import HumanDesignRequest
-from tests.fixtures.ephemeris_manifest import manifest_for_payloads
+from tests.support.ephemeris_context import manifest_for_payloads
 
 
 @pytest.fixture(autouse=True)

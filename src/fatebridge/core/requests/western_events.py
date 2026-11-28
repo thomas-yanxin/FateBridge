@@ -12,6 +12,7 @@ from fatebridge.core.requests.base import (
     AstroHouseValidatorMixin,
     FateBridgeBaseRequest,
     WesternChartSystemFields,
+    apply_place_location,
 )
 from fatebridge.core.requests.western_lifespan import AstroLifespanRequest
 from fatebridge.utils.house_systems import TWELVE_HOUSE_SYSTEM_NOTE
@@ -50,23 +51,7 @@ class AstroMundaneRequest(
 
     @model_validator(mode="after")
     def _resolve_mundane_place(self) -> "AstroMundaneRequest":
-        place_text = (self.place or "").strip()
-        if place_text and place_text != "未提供":
-            need_lon = (
-                self.longitude is None or "longitude" not in self.model_fields_set
-            )
-            need_lat = self.latitude is None or "latitude" not in self.model_fields_set
-            need_tz = "timezone_name" not in self.model_fields_set
-            if need_lon or need_lat or need_tz:
-                from fatebridge.utils.places import resolve_place_location
-
-                resolved = resolve_place_location(place_text, place_field="place")
-                if need_lon:
-                    self.longitude = resolved.longitude
-                if need_lat:
-                    self.latitude = resolved.latitude
-                if need_tz and resolved.timezone is not None:
-                    self.timezone_name = resolved.timezone
+        apply_place_location(self, tz_field="timezone_name")
         if self.longitude is None or self.latitude is None:
             missing_path = "longitude" if self.longitude is None else "latitude"
             raise PydanticCustomError(
@@ -150,31 +135,14 @@ class WesternEventClockFields(
 
     @model_validator(mode="after")
     def _resolve_event_place(self) -> "WesternEventClockFields":
-        place_text = (self.place or "").strip()
-        if place_text and place_text != "未提供":
-            clock_basis = getattr(
-                self,
-                "question_clock_basis",
-                getattr(self, "candidate_clock_basis", "civil"),
-            )
-            need_lon = (
-                self.longitude is None or "longitude" not in self.model_fields_set
-            )
-            need_lat = self.latitude is None or "latitude" not in self.model_fields_set
-            need_tz = clock_basis == "civil" and (
-                self.timezone_name is None
-                or "timezone_name" not in self.model_fields_set
-            )
-            if need_lon or need_lat or need_tz:
-                from fatebridge.utils.places import resolve_place_location
-
-                resolved = resolve_place_location(place_text, place_field="place")
-                if need_lon:
-                    self.longitude = resolved.longitude
-                if need_lat:
-                    self.latitude = resolved.latitude
-                if need_tz and resolved.timezone is not None:
-                    self.timezone_name = resolved.timezone
+        clock_basis = getattr(
+            self,
+            "question_clock_basis",
+            getattr(self, "candidate_clock_basis", "civil"),
+        )
+        apply_place_location(
+            self, tz_field="timezone_name", resolve_tz=clock_basis == "civil"
+        )
         if self.longitude is None or self.latitude is None:
             missing_path = "longitude" if self.longitude is None else "latitude"
             raise PydanticCustomError(

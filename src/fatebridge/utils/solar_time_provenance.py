@@ -71,15 +71,3 @@ def solar_time_receipt(
         },
         "scope": "均时差按UTC近似UT1；未引入实测DUT1，太阳标签不是转换后的另一个物理时刻",
     }
-
-
-def solar_time_evidence_lines(evidence: dict[str, Any]) -> list[str]:
-    if not evidence.get("applied"):
-        return []
-    if evidence.get("status") != "captured_at_seed_calculation":
-        return ["真太阳时修正：本种子未提供分项算法依据，不能从总修正量补写均时差方法"]
-    return [
-        f"真太阳时修正：经度差{evidence['longitude_correction_minutes']:.6f}分＋均时差{evidence['equation_of_time_minutes']:.6f}分－夏令时{evidence['daylight_saving_minutes']:.6f}分＝总修正{evidence['total_correction_minutes']:.6f}分；均时差方法{evidence['equation_of_time_method']}，UTC近似UT1，未认证亚秒精度",
-        f"原实际时刻{evidence['civil_input_instant_utc']}，太阳钟表标签{evidence['apparent_solar_label']}；标签供日时取用，不移动原交节时刻",
-        f"太阳标签距最近换时{evidence['boundary_distances_seconds']['nearest_double_hour_boundary']:.3f}秒、子初换日{evidence['boundary_distances_seconds']['day_boundary_23']:.3f}秒；距离不是误差界，不据此保证边界归属",
-    ]

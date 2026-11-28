@@ -6,23 +6,12 @@ from typing import Any
 
 from fatebridge.core.almanac import localize_datetime
 from fatebridge.core.metaphysics.common import (
-    ELEMENT_CONTROLS,
-    ELEMENT_GENERATES,
     GUI_REN_SEQUENCE,
     LIURENG_GUIREN_DAY,
     LIURENG_GUIREN_NIGHT,
-    SIX_CLASH_BRANCHES,
-    SIX_HARMONY_BRANCHES,
     YUE_JIANG_NAMES,
     MetaphysicsSeed,
-    branch_element_text,
-    ganzhi_text,
-    kongwang_for_ganzhi,
-    rotate_sequence,
-    sexagenary_index_for,
     status_against_anchor,
-    stem_element_text,
-    xun_head_for_ganzhi,
 )
 from fatebridge.core.metaphysics.jinkou.patterns import (
     GUISHEN_IDENTITIES,
@@ -44,7 +33,21 @@ from fatebridge.core.metaphysics.ren_calendar import (
     symbolic_calendar_policy,
 )
 from fatebridge.core.metaphysics.ren_diurnal import DiurnalMode, resolve_diurnal
-from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
+from fatebridge.utils.data import (
+    EARTHLY_BRANCHES,
+    ELEMENT_CONTROLS,
+    ELEMENT_GENERATES,
+    HEAVENLY_STEMS,
+    SIX_CLASH_BRANCHES,
+    SIX_HARMONY_BRANCHES,
+    branch_element_text,
+    ganzhi_text,
+    kongwang_for_ganzhi,
+    rotate_sequence,
+    sexagenary_index_for,
+    stem_element_text,
+    xun_head_for_ganzhi,
+)
 
 STEM_PAIRS = (
     ("甲己", "土"),

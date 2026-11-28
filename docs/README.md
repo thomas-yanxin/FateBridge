@@ -41,8 +41,8 @@ FateBridge 提供确定性的术数、占星与心理测量结构化计算；接
 
 | 文档 | 内容说明 |
 | --- | --- |
-| [API 参考](api-reference.md) | 90 个 REST 路由、MCP 两工具面（`discover_tools` / `run_calculation`）、[三端能力边界](api-reference.md#22-三端能力边界)与请求族 |
-| [算法与能力覆盖矩阵](algorithm-coverage.md) | 12 个 family / 90 项计算能力清单、实现状态与依赖矩阵 |
+| [API 参考](api-reference.md) | 91 个 REST 路由、MCP 三工具面（`discover_tools` / `run_calculation` / `run_batch`）、[三端能力边界](api-reference.md#22-三端能力边界)与请求族 |
+| [算法与能力覆盖矩阵](algorithm-coverage.md) | 12 个 family / 91 项计算能力清单、实现状态与依赖矩阵 |
 | [按需 MCP 调用合同](contracts/README.md) | 由代码生成的离线工具输入 Schema 与 `evidence_views` 索引 |
 | [家居风水参考](fengshui.md) | 8 个风水工具速查表、统一响应层、`WMM2025/IGRF-14` 地磁与四层紫白/玄空规则 |
 | [紫微斗数参考](ziwei.md) | 命盘、运限与规则库参数及返回结构 |

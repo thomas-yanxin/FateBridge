@@ -10,7 +10,7 @@ import pytest
 
 from fatebridge import fetch_ephe
 from fatebridge.core.astro.ephemeris_files import ephemeris_files_for_years
-from tests.fixtures.ephemeris_manifest import manifest_for_payloads
+from tests.support.ephemeris_context import manifest_for_payloads
 
 
 @pytest.fixture(autouse=True)

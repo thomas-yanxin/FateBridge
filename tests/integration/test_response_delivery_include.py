@@ -18,6 +18,7 @@ import fatebridge.api as api
 import fatebridge.cli as cli
 from fatebridge.application.batch import BatchCall, BatchRequest, execute_batch
 from fatebridge.application.description import describe_brief_spec, describe_spec
+from fatebridge.application.discovery import describe_batch_interface
 from fatebridge.application.examples import evidence_views, example_input
 from fatebridge.application.response_delivery import deliver_response
 from fatebridge.application.tool_spec import ToolSpec
@@ -451,14 +452,49 @@ def test_calculation_detail_rejected_and_discovery_detail_preserved(
                 {"calls": [{"tool": "gua_lookup"}], "detail": "compact"},
                 raise_on_error=False,
             )
+            typo_calc = await client.call_tool(
+                "run_calculation",
+                {
+                    "tool": "gua_lookup",
+                    "arguments": {"queries": ["乾"]},
+                    "includ": ["*"],
+                },
+                raise_on_error=False,
+            )
+            typo_batch = await client.call_tool(
+                "run_batch",
+                {"calls": [{"tool": "gua_lookup"}], "calz": []},
+                raise_on_error=False,
+            )
             disc = await client.call_tool(
                 "discover_tools", {"tool": "gua_lookup", "detail": "brief"}
             )
-            return bad_calc, bad_batch, disc
+            return bad_calc, bad_batch, typo_calc, typo_batch, disc
 
-    bad_calc, bad_batch, disc = asyncio.run(mcp_checks())
+    bad_calc, bad_batch, typo_calc, typo_batch, disc = asyncio.run(mcp_checks())
     assert bad_calc.is_error
+    assert bad_calc.structured_content["error_code"] == "validation_error"
+    assert bad_calc.structured_content["issues"][0]["code"] == "extra_forbidden"
+    assert bad_calc.structured_content["issues"][0]["constraints"][
+        "allowed_fields"
+    ] == ["arguments", "as_of", "fields", "include", "tool"]
     assert bad_batch.is_error
+    assert bad_batch.structured_content["error_code"] == "validation_error"
+    assert bad_batch.structured_content["issues"][0]["code"] == "extra_forbidden"
+    assert (
+        "calls"
+        in bad_batch.structured_content["issues"][0]["constraints"]["allowed_fields"]
+    )
+    assert typo_calc.is_error
+    assert (
+        "include"
+        in typo_calc.structured_content["issues"][0]["constraints"]["suggestions"]
+    )
+    assert typo_batch.is_error
+    assert (
+        "calls"
+        in typo_batch.structured_content["issues"][0]["constraints"]["suggestions"]
+    )
     assert not disc.is_error and disc.structured_content["detail"] == "brief"
 
 
@@ -527,3 +563,84 @@ def test_description_surfaces_default_omit_without_compact_fields() -> None:
     plain_desc = describe_spec(SPECS["gua_lookup"])
     assert "default_omit" not in plain_desc
     assert "compact_fields" not in plain_desc
+
+
+def test_python_sdk_parity_for_discover_run_and_batch() -> None:
+    """Python SDK exposes discover(tools/surface), run(allowed_fields), and batch."""
+    discovered = fatebridge.discover(
+        tools=["gua_lookup", "knowledge_read"], surface="mcp", detail="brief"
+    )
+    assert discovered["matched_count"] == 2
+    assert [item["tool"] for item in discovered["tools"]] == [
+        "gua_lookup",
+        "knowledge_read",
+    ]
+
+    bad_run = fatebridge.run("gua_lookup", {"queries": ["乾"], "queriez": ["乾"]})
+    assert bad_run["error_code"] == "validation_error"
+    assert bad_run["status_code"] == 422
+    issue = bad_run["issues"][0]
+    assert issue["code"] == "extra_forbidden"
+    assert "queries" in issue["constraints"]["allowed_fields"]
+    assert "queries" in issue["constraints"]["suggestions"]
+
+    ok_batch = fatebridge.batch(
+        calls=[
+            {
+                "id": "g1",
+                "tool": "gua_lookup",
+                "arguments": {"queries": ["乾"]},
+                "fields": ["analysis_type"],
+            }
+        ],
+        as_of="2026-10-12T12:00:00+08:00",
+    )
+    assert ok_batch["status"] == "ok"
+    assert ok_batch["succeeded"] == 1
+    assert ok_batch["results"][0]["result"]["analysis_type"] == "卦象查询"
+
+    bad_batch = fatebridge.batch(
+        calls=[{"tool": "gua_lookup", "params": {"queries": ["乾"]}}]
+    )
+    assert bad_batch["error_code"] == "validation_error"
+    assert bad_batch["status_code"] == 422
+    assert bad_batch["issues"][0]["code"] == "extra_forbidden"
+    assert "arguments" in bad_batch["issues"][0]["constraints"]["suggestions"]
+
+    for invalid_calls in (123, None):
+        non_iter_batch = fatebridge.batch(calls=invalid_calls)  # type: ignore[arg-type]
+        assert non_iter_batch["error_code"] == "validation_error"
+        assert non_iter_batch["status_code"] == 422
+
+    starter_batch = describe_batch_interface()["example_input"]
+    BatchRequest.model_validate(starter_batch)
+    starter_result = fatebridge.batch(**starter_batch)
+    assert starter_result["status"] == "ok", starter_result
+    assert starter_result["failed"] == 0
+    assert starter_result["succeeded"] == len(starter_batch["calls"])
+
+
+def test_python_sdk_rejects_falsy_non_dict_subjects_defaults_and_non_mapping_arguments() -> (
+    None
+):
+    valid_calls = [{"id": "c1", "tool": "gua_lookup", "arguments": {"queries": ["乾"]}}]
+    for bad_subjects in ([], "", 0):
+        res = fatebridge.batch(valid_calls, subjects=bad_subjects)  # type: ignore[arg-type]
+        assert res["status_code"] == 422
+        assert res["error_code"] == "validation_error"
+        assert res["issues"][0]["path"] == "subjects"
+        assert res["issues"][0]["code"] == "dict_type"
+
+    for bad_defaults in ("", [], 0):
+        res = fatebridge.batch(valid_calls, defaults=bad_defaults)  # type: ignore[arg-type]
+        assert res["status_code"] == 422
+        assert res["error_code"] == "validation_error"
+        assert res["issues"][0]["path"] == "defaults"
+        assert res["issues"][0]["code"] == "dict_type"
+
+    for bad_args in (["x"], [], "bad", 0):
+        with pytest.raises(ParameterError) as exc_info:
+            fatebridge.run("gua_lookup", bad_args)  # type: ignore[arg-type]
+        assert exc_info.value.status_code == 422
+        assert exc_info.value.issues[0]["path"] == "arguments"
+        assert exc_info.value.issues[0]["code"] == "dict_type"

@@ -36,10 +36,10 @@ flowchart TD
 | 工具声明 | `services/catalog/`、`services/tool_catalog.py`、`application/domain_plugin.py`、`application/tool_spec.py` | 领域插件装配与协议无关的工具描述 |
 | 应用编排 | `application/bindings.py`、`application/execution.py`、`application/projection.py`、`application/response_delivery.py` | 请求绑定、统一执行、输出校验、分级视图与严格字段投影 |
 | 能力发现 | `application/description.py`、`application/discovery.py` | 三端共用的工具摘要与按需 Schema 筛选 |
-| 协议传输 | `transports/rest.py`、`transports/flags.py`、`transports/http_runtime.py`、`api.py`、`mcp_server.py`、`mcp_transport.py`、`cli.py`、`cli_arguments.py`、`cli_inputs.py` | REST 路由注册、FastMCP 两工具协议与 CLI 参数解析 |
+| 协议传输 | `transports/rest.py`、`transports/http_runtime.py`、`api.py`、`mcp_server.py`、`cli.py`、`cli_arguments.py`、`cli_inputs.py` | REST 路由注册、FastMCP 三工具协议与 CLI 参数解析 |
 | 请求与响应模型 | `core/requests/`、`core/response_models.py`、`core/contracts/`、`core/receipt_models.py` | Pydantic 输入校验、输出根契约、`PartialOutput` 嵌套模型与执行回执模型 |
 | 服务与分析 | `services/*.py`、`analysis/*.py` | 领域编排、时运复合分析与 `run_metadata` / `replay` 构造 |
-| 核心计算与数据 | `core/*.py`、`core/{bazi,ziwei,fengshui,guolao,jyotish,human_design,qimen,liuyao,meihua,heluo,numerology,sukuyo,local_techniques,psychometrics}/`、`core/{astro,predictive,metaphysics}/`、`data/*` | 各体系独立领域计算、知识条目、规则表与内置数据 |
+| 核心计算与数据 | `core/*.py`、`core/{bazi,ziwei,fengshui,guolao,jyotish,human_design,qimen,liuyao,meihua,heluo,numerology,sukuyo,psychometrics}/`、`core/{astro,predictive,metaphysics}/`、`data/*` | 各体系独立领域计算、知识条目、规则表与内置数据 |
 | 公共基础 | `utils/*`、`core/ephemeris_runtime.py`、`core/execution_context.py`、`core/reproducibility.py` | 出生时间/地点/时区、星历共享锁、调用时钟、可复现策略与统一错误 |
 | 测试与工具 | `tests/`、`scripts/` | 领域回归、三端契约检查与文档/合同生成校验 |
 

@@ -7,7 +7,7 @@ from importlib.metadata import version
 from pathlib import Path
 from typing import Any, Sequence
 
-from fatebridge.core.astro import reference_frames, runtime
+from fatebridge.core.astro import cartesian, reference_frames, runtime
 from fatebridge.core.astro.continuous_lahiri import frame_state
 from fatebridge.core.astro.inner_source import (
     METHOD_ID,
@@ -120,10 +120,10 @@ def complete_inner_rate(
             ]
             _, rotation = checked_fixed_acceleration(raw, earth)
             policy["fixed_reception_rotation"] = rotation
-            p = reference_frames.mv(
+            p = cartesian.mv(
                 rotation["matrix"], [float(x) for x in source["direction_icrf"]]
             )
-            v = reference_frames.mv(
+            v = cartesian.mv(
                 rotation["matrix"],
                 [float(x) for x in source["derivative_per_native_argument_day"]],
             )
@@ -177,8 +177,8 @@ def complete_inner_rate(
                 return unavailable("declared_native_frame_not_reproduced")
             if max(position_errors) > POSITION_LINE_ARCSEC:
                 return unavailable("continuous_source_display_position_not_reproduced")
-            moving = reference_frames.mv(
-                reference_frames.mm(derivative, reference_frames.transpose(mean)), p
+            moving = cartesian.mv(
+                cartesian.mm(derivative, cartesian.transpose(mean)), p
             )
             source_rate = math.degrees((p[0] * v[1] - p[1] * v[0]) / rho2)
             frame_rate = math.degrees((p[0] * moving[1] - p[1] * moving[0]) / rho2)

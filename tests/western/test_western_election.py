@@ -12,7 +12,7 @@ from fatebridge.core.astro.astrology_election import (
     _dignity,
 )
 from fatebridge.services.western_election import calculate_election
-from tests.unit_test.fixtures.western_event_cases import CANDIDATE
+from tests.fixtures.western_event_cases import CANDIDATE
 
 VALID_VERDICTS = {"auspicious", "workable", "marginal", "avoid"}
 

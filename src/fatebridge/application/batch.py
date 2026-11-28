@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import difflib
-import re
 import types
 from collections.abc import Mapping
 from copy import deepcopy
@@ -21,27 +19,30 @@ from pydantic import (
 from pydantic.fields import FieldInfo
 from pydantic_core import PydanticCustomError
 
-from fatebridge.application.execution import execute_with_receipt, result_is_error
+from fatebridge.application.execution import (
+    execute_with_receipt,
+    result_is_error,
+)
 from fatebridge.application.response_delivery import (
     deliver_response,
     validate_delivery_controls,
 )
-from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.application.tool_spec import BatchInputPolicy, ToolSpec
 from fatebridge.core.batch_cache import batch_cache_scope
 from fatebridge.core.execution_context import ExecutionOptions
+from fatebridge.utils.civil_time import (
+    parse_strict_date_text,
+    parse_strict_datetime_text,
+    parse_strict_time_text,
+)
 from fatebridge.utils.errors import (
     ParameterError,
     error_response_payload,
     handle_calculation_error,
+    unknown_tool_error,
 )
 
 MAX_BATCH_CALLS = 32
-_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-_TIME_RE = re.compile(r"^(\d{2}):(\d{2})(?::(\d{2}))?$")
-_DATETIME_RE = re.compile(
-    r"^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?(Z|[+-]\d{2}:\d{2}(?::\d{2})?)?$"
-)
-_SOLAR_CLOCK_BASES = frozenset({"local_mean_solar", "local_apparent_solar"})
 _UNION_ORIGINS = (types.UnionType, get_origin(Annotated[int, "u"] | None))
 
 
@@ -71,34 +72,35 @@ class AnalysisContext(BaseModel):
     @model_validator(mode="after")
     def _normalize_clock_and_place(self) -> AnalysisContext:
         if self.analysis_datetime is not None:
-            dt_match = _DATETIME_RE.fullmatch(self.analysis_datetime.strip())
-            if dt_match is None:
-                raise PydanticCustomError(
-                    "invalid_analysis_datetime",
-                    "analysis_datetime 须为 YYYY-MM-DDTHH:MM[:SS][±HH:MM] 格式",
-                    {"path": "analysis_datetime"},
-                )
-            y_s, m_s, d_s, h_s, mi_s, s_s, offset_s = dt_match.groups()
-            date_str = f"{y_s}-{m_s}-{d_s}"
-            time_str = f"{h_s}:{mi_s}:{s_s}" if s_s is not None else f"{h_s}:{mi_s}"
             try:
-                date.fromisoformat(date_str)
+                parsed_dt_date, (hour_i, min_i, sec_i), offset_s = (
+                    parse_strict_datetime_text(self.analysis_datetime)
+                )
             except ValueError as exc:
+                message = str(exc)
+                if "格式" in message:
+                    raise PydanticCustomError(
+                        "invalid_analysis_datetime",
+                        "analysis_datetime 须为 YYYY-MM-DDTHH:MM[:SS][±HH:MM] 格式",
+                        {"path": "analysis_datetime"},
+                    ) from exc
+                if "范围" in message:
+                    raise PydanticCustomError(
+                        "invalid_analysis_time",
+                        "analysis_datetime 超出有效时分秒范围",
+                        {"path": "analysis_datetime"},
+                    ) from exc
                 raise PydanticCustomError(
                     "invalid_calendar_date",
                     "analysis_datetime 不是有效的公历日期",
                     {"path": "analysis_datetime"},
                 ) from exc
-            hour_i, min_i = int(h_s), int(mi_s)
-            sec_i = int(s_s) if s_s is not None else None
-            if not (0 <= hour_i <= 23 and 0 <= min_i <= 59) or (
-                sec_i is not None and not 0 <= sec_i <= 59
-            ):
-                raise PydanticCustomError(
-                    "invalid_analysis_time",
-                    "analysis_datetime 超出有效时分秒范围",
-                    {"path": "analysis_datetime"},
-                )
+            date_str = parsed_dt_date.isoformat()
+            time_str = (
+                f"{hour_i:02d}:{min_i:02d}:{sec_i:02d}"
+                if sec_i is not None
+                else f"{hour_i:02d}:{min_i:02d}"
+            )
             if self.date is None:
                 self.date = date_str
             elif self.date != date_str:
@@ -129,15 +131,15 @@ class AnalysisContext(BaseModel):
                     self.timezone = norm_offset
 
         if self.date is not None:
-            if not _DATE_RE.fullmatch(self.date):
-                raise PydanticCustomError(
-                    "invalid_analysis_date_format",
-                    "context.date 须为 YYYY-MM-DD 格式",
-                    {"path": "date"},
-                )
             try:
-                parsed_date = date.fromisoformat(self.date)
+                parsed_date = parse_strict_date_text(self.date)
             except ValueError as exc:
+                if "格式" in str(exc):
+                    raise PydanticCustomError(
+                        "invalid_analysis_date_format",
+                        "context.date 须为 YYYY-MM-DD 格式",
+                        {"path": "date"},
+                    ) from exc
                 raise PydanticCustomError(
                     "invalid_calendar_date",
                     "context.date 不是有效的公历日期",
@@ -183,24 +185,20 @@ class AnalysisContext(BaseModel):
                 ) from exc
 
         if self.time is not None:
-            t_match = _TIME_RE.fullmatch(self.time)
-            if t_match is None:
-                raise PydanticCustomError(
-                    "invalid_analysis_time_format",
-                    "context.time 须为 HH:MM 或 HH:MM:SS 格式",
-                    {"path": "time"},
-                )
-            hour_i = int(t_match.group(1))
-            min_i = int(t_match.group(2))
-            sec_i = int(t_match.group(3)) if t_match.group(3) is not None else None
-            if not (0 <= hour_i <= 23 and 0 <= min_i <= 59) or (
-                sec_i is not None and not 0 <= sec_i <= 59
-            ):
+            try:
+                hour_i, min_i, sec_i = parse_strict_time_text(self.time)
+            except ValueError as exc:
+                if "格式" in str(exc):
+                    raise PydanticCustomError(
+                        "invalid_analysis_time_format",
+                        "context.time 须为 HH:MM 或 HH:MM:SS 格式",
+                        {"path": "time"},
+                    ) from exc
                 raise PydanticCustomError(
                     "invalid_analysis_time",
                     "context.time 超出有效时分秒范围",
                     {"path": "time"},
-                )
+                ) from exc
             if self.hour is None:
                 self.hour = hour_i
             elif self.hour != hour_i:
@@ -274,15 +272,15 @@ class SubjectProfile(BaseModel):
     @model_validator(mode="after")
     def _parse_and_validate_birth_clock(self) -> SubjectProfile:
         if self.birth_date is not None:
-            if not _DATE_RE.fullmatch(self.birth_date):
-                raise PydanticCustomError(
-                    "invalid_birth_date_format",
-                    "birth_date 须为 YYYY-MM-DD 格式",
-                    {"path": "birth_date"},
-                )
             try:
-                parsed_date = date.fromisoformat(self.birth_date)
+                parsed_date = parse_strict_date_text(self.birth_date)
             except ValueError as exc:
+                if "格式" in str(exc):
+                    raise PydanticCustomError(
+                        "invalid_birth_date_format",
+                        "birth_date 须为 YYYY-MM-DD 格式",
+                        {"path": "birth_date"},
+                    ) from exc
                 raise PydanticCustomError(
                     "invalid_calendar_date",
                     "birth_date 不是有效的公历日期",
@@ -338,24 +336,20 @@ class SubjectProfile(BaseModel):
                 ) from exc
 
         if self.birth_time is not None:
-            match = _TIME_RE.fullmatch(self.birth_time)
-            if match is None:
-                raise PydanticCustomError(
-                    "invalid_birth_time_format",
-                    "birth_time 须为 HH:MM 或 HH:MM:SS 格式",
-                    {"path": "birth_time"},
-                )
-            hour = int(match.group(1))
-            minute = int(match.group(2))
-            second = int(match.group(3)) if match.group(3) is not None else None
-            if not (0 <= hour <= 23 and 0 <= minute <= 59) or (
-                second is not None and not 0 <= second <= 59
-            ):
+            try:
+                hour, minute, second = parse_strict_time_text(self.birth_time)
+            except ValueError as exc:
+                if "格式" in str(exc):
+                    raise PydanticCustomError(
+                        "invalid_birth_time_format",
+                        "birth_time 须为 HH:MM 或 HH:MM:SS 格式",
+                        {"path": "birth_time"},
+                    ) from exc
                 raise PydanticCustomError(
                     "invalid_birth_time",
                     "birth_time 超出有效时分秒范围",
                     {"path": "birth_time"},
-                )
+                ) from exc
             if self.birth_hour is None:
                 self.birth_hour = hour
                 if self.birth_minute is None:
@@ -481,25 +475,6 @@ def _subject_time_string(profile: SubjectProfile) -> str | None:
     return None
 
 
-def _is_minggua_like(target_fields: Mapping[str, FieldInfo]) -> bool:
-    return (
-        "birth_at" in target_fields
-        or "gender_convention" in target_fields
-        or "effective_birth_year" in target_fields
-        or ("birth_date" in target_fields and "timezone_name" in target_fields)
-    )
-
-
-def _is_pair_birth_tuple_tool(target_fields: Mapping[str, FieldInfo]) -> bool:
-    return (
-        "person1_birth_year" in target_fields and "person2_birth_year" in target_fields
-    ) or ("inner_birth_year" in target_fields and "outer_birth_year" in target_fields)
-
-
-def _is_sukuyo_pair_tool(target_fields: Mapping[str, FieldInfo]) -> bool:
-    return "person1_date" in target_fields and "person2_date" in target_fields
-
-
 def _unwrap_list_item_model(annotation: object) -> type[BaseModel] | None:
     while get_origin(annotation) is Annotated:
         annotation = get_args(annotation)[0]
@@ -592,13 +567,15 @@ def _map_single_subject(
     subject_key: str,
     profile: SubjectProfile,
     target_fields: Mapping[str, FieldInfo],
+    *,
+    policy: BatchInputPolicy,
 ) -> dict[str, object]:
-    if _is_minggua_like(target_fields):
+    if policy.subject_mode == "exclusive_birth_record":
         return _map_subject_to_minggua(
             subject_key, profile, target_fields, include_subject_id=False
         )
 
-    if "date" in target_fields and "birth_year" not in target_fields:
+    if policy.subject_mode == "date_clock":
         mapped: dict[str, object] = {}
         date_text = _subject_date_string(profile)
         time_text = _subject_time_string(profile)
@@ -635,24 +612,28 @@ def _map_multi_subjects(
     subjects: Mapping[str, SubjectProfile],
     target_fields: Mapping[str, FieldInfo],
 ) -> dict[str, object]:
-    if "occupants" in target_fields:
-        occupant_model = _unwrap_list_item_model(target_fields["occupants"].annotation)
-        occupant_fields = (
-            occupant_model.model_fields if occupant_model is not None else {}
-        )
+    policy = spec.batch_policy
+    if (
+        policy.subject_mode == "subject_list"
+        and policy.list_field is not None
+        and policy.list_field in target_fields
+    ):
+        list_field = policy.list_field
+        item_model = _unwrap_list_item_model(target_fields[list_field].annotation)
+        item_fields = item_model.model_fields if item_model is not None else {}
         return {
-            "occupants": [
+            list_field: [
                 _map_subject_to_minggua(
                     key,
                     subjects[key],
-                    occupant_fields,
+                    item_fields,
                     include_subject_id=True,
                 )
                 for key in subject_keys
             ]
         }
 
-    if _is_pair_birth_tuple_tool(target_fields):
+    if policy.subject_mode == "pair":
         if len(subject_keys) != 2:
             raise ParameterError(
                 f"工具 {spec.name} 需要恰好 2 个 subjects",
@@ -667,41 +648,20 @@ def _map_multi_subjects(
                     }
                 ],
             )
-        prefixes = (
-            ("person1_", "person2_")
-            if "person1_birth_year" in target_fields
-            else ("inner_", "outer_")
-        )
         merged: dict[str, object] = {}
-        for key, prefix in zip(subject_keys, prefixes, strict=True):
-            merged.update(
-                _map_subject_with_prefix(
-                    key,
-                    subjects[key],
-                    target_fields,
-                    prefix=prefix,
-                    require_name=True,
+        if policy.pair_style == "birth_fields":
+            for key, prefix in zip(subject_keys, policy.pair_prefixes, strict=True):
+                merged.update(
+                    _map_subject_with_prefix(
+                        key,
+                        subjects[key],
+                        target_fields,
+                        prefix=prefix,
+                        require_name=True,
+                    )
                 )
-            )
-        return merged
-
-    if _is_sukuyo_pair_tool(target_fields):
-        if len(subject_keys) != 2:
-            raise ParameterError(
-                f"工具 {spec.name} 需要恰好 2 个 subjects",
-                [
-                    {
-                        "path": "subjects",
-                        "code": "invalid_subject_count",
-                        "constraints": {
-                            "expected_count": 2,
-                            "actual_count": len(subject_keys),
-                        },
-                    }
-                ],
-            )
-        merged = {}
-        for key, prefix in zip(subject_keys, ("person1_", "person2_"), strict=True):
+            return merged
+        for key, prefix in zip(subject_keys, policy.pair_prefixes, strict=True):
             profile = subjects[key]
             date_text = _subject_date_string(profile)
             time_text = _subject_time_string(profile)
@@ -749,37 +709,30 @@ def _map_analysis_context(
     context: AnalysisContext,
     target_fields: Mapping[str, FieldInfo],
     *,
+    policy: BatchInputPolicy,
     is_birth_date_mapped: bool,
     explicit_args: Mapping[str, object],
     defaults: Mapping[str, object],
 ) -> dict[str, object]:
     """Map shared AnalysisContext clock and location fields to a tool's contract."""
     mapped: dict[str, object] = {}
-    candidate_values: dict[str, object | None] = {
-        "analysis_year": context.year,
-        "analysis_month": context.month,
-        "analysis_day": context.day,
-        "analysis_hour": context.hour,
-        "analysis_minute": context.minute,
-        "analysis_second": context.second,
-        "analysis_place": context.place,
-        "analysis_timezone": context.timezone,
-        "analysis_utc_offset": context.utc_offset,
-        "analysis_longitude": context.longitude,
-        "analysis_latitude": context.latitude,
-        "question_year": context.year,
-        "question_month": context.month,
-        "question_day": context.day,
-        "question_hour": context.hour,
-        "question_minute": context.minute,
-        "question_second": context.second,
-        "candidate_year": context.year,
-        "candidate_month": context.month,
-        "candidate_day": context.day,
-        "candidate_hour": context.hour,
-        "candidate_minute": context.minute,
-        "candidate_second": context.second,
-    }
+    candidate_values: dict[str, object | None] = {}
+    for prefix in policy.context_prefixes:
+        candidate_values.update(
+            {
+                f"{prefix}year": context.year,
+                f"{prefix}month": context.month,
+                f"{prefix}day": context.day,
+                f"{prefix}hour": context.hour,
+                f"{prefix}minute": context.minute,
+                f"{prefix}second": context.second,
+                f"{prefix}place": context.place,
+                f"{prefix}timezone": context.timezone,
+                f"{prefix}utc_offset": context.utc_offset,
+                f"{prefix}longitude": context.longitude,
+                f"{prefix}latitude": context.latitude,
+            }
+        )
     if not is_birth_date_mapped:
         candidate_values.update(
             {
@@ -793,12 +746,16 @@ def _map_analysis_context(
             }
         )
         clock_basis = (
-            explicit_args.get("question_clock_basis")
-            or explicit_args.get("candidate_clock_basis")
-            or defaults.get("question_clock_basis")
-            or defaults.get("candidate_clock_basis")
+            (
+                explicit_args.get(policy.context_clock_basis_field)
+                or defaults.get(policy.context_clock_basis_field)
+            )
+            if policy.context_clock_basis_field is not None
+            else None
         )
-        if not (isinstance(clock_basis, str) and clock_basis in _SOLAR_CLOCK_BASES):
+        if not (
+            isinstance(clock_basis, str) and clock_basis in policy.solar_clock_bases
+        ):
             candidate_values["timezone_name"] = context.timezone
 
     for key, value in candidate_values.items():
@@ -816,6 +773,7 @@ def resolve_call_arguments(
     context: AnalysisContext | None = None,
 ) -> dict[str, object]:
     """Resolve tool arguments with precedence defaults < context < subject(s) < call.arguments."""
+    policy = spec.batch_policy
     model_fields = spec.request_model.model_fields
     resolved: dict[str, object] = {
         key: deepcopy(value) for key, value in defaults.items() if key in model_fields
@@ -823,15 +781,13 @@ def resolve_call_arguments(
 
     if context is not None:
         is_birth_date_mapped = (
-            (call.subject is not None or call.subjects is not None)
-            and "date" in model_fields
-            and "birth_year" not in model_fields
-            and "analysis_year" not in model_fields
-        )
+            call.subject is not None or call.subjects is not None
+        ) and policy.subject_mode == "date_clock"
         resolved.update(
             _map_analysis_context(
                 context,
                 model_fields,
+                policy=policy,
                 is_birth_date_mapped=is_birth_date_mapped,
                 explicit_args=call.arguments,
                 defaults=defaults,
@@ -867,20 +823,20 @@ def resolve_call_arguments(
                     }
                 ],
             )
-        if _is_pair_birth_tuple_tool(model_fields) or _is_sukuyo_pair_tool(
-            model_fields
-        ):
+        if policy.subject_mode == "pair":
             raise ParameterError(
                 f"工具 {spec.name} 需要使用 subjects（2 个对象），不能使用单个 subject",
                 [{"path": "subject", "code": "pair_subjects_required"}],
             )
-        if "occupants" in model_fields:
+        if policy.subject_mode == "subject_list":
             resolved.update(
                 _map_multi_subjects(spec, [call.subject], subjects, model_fields)
             )
         else:
             resolved.update(
-                _map_single_subject(call.subject, subjects[call.subject], model_fields)
+                _map_single_subject(
+                    call.subject, subjects[call.subject], model_fields, policy=policy
+                )
             )
 
     for key, value in call.arguments.items():
@@ -916,28 +872,6 @@ def _validate_subject_references(request: BatchRequest) -> None:
         raise ParameterError("批量请求包含未知的 subject 引用", issues)
 
 
-def _unknown_tool_error(tool_name: str, allowed_tools: set[str]) -> JsonValue:
-    suggestions = difflib.get_close_matches(
-        tool_name, sorted(allowed_tools), n=5, cutoff=0.4
-    )
-    issue: dict[str, object] = {"path": "tool", "code": "unknown_tool"}
-    if suggestions:
-        issue["constraints"] = {"suggestions": suggestions}
-    return cast(
-        JsonValue,
-        error_response_payload(
-            {
-                "error": f"未知工具: {tool_name}",
-                "error_code": "unknown_tool",
-                "status_code": 404,
-                "retryable": False,
-                "issues": [issue],
-            },
-            tool_name,
-        ),
-    )
-
-
 def execute_batch(
     specs_by_name: Mapping[str, ToolSpec],
     request: BatchRequest,
@@ -960,12 +894,19 @@ def execute_batch(
             spec = specs_by_name.get(call.tool)
             if spec is None:
                 failed += 1
+                unknown_payload = unknown_tool_error(
+                    call.tool, allowed_tools
+                ).as_result()
+                unknown_payload["error_code"] = "unknown_tool"
                 results.append(
                     {
                         "id": call.id,
                         "tool": call.tool,
                         "ok": False,
-                        "error": _unknown_tool_error(call.tool, allowed_tools),
+                        "error": cast(
+                            JsonValue,
+                            error_response_payload(unknown_payload, call.tool),
+                        ),
                     }
                 )
                 if request.stop_on_error:

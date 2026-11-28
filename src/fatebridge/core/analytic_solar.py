@@ -9,16 +9,20 @@ explicit. The author comparison range is1900..2100, not every software epoch.
 
 from __future__ import annotations
 
-import json
 import math
 from collections.abc import Sequence
 from copy import deepcopy
-from fractions import Fraction
 from functools import lru_cache
-from importlib.resources import files
 from typing import Any
 
+from fatebridge.core.astro.cartesian import dot
 from fatebridge.core.astro.reference_frames import precession_angles, rotate
+from fatebridge.core.native_solar_loader import (
+    bisect_forward_crossing,
+    load_astronomy_json,
+    validate_crossing_inputs,
+    validate_forward_bracket,
+)
 from fatebridge.utils.errors import EphemerisSourceError
 
 Vector = tuple[float, float, float]
@@ -28,38 +32,35 @@ C_AU_DAY = 299792458.0 * 86400 / 149597870700.0
 MODEL_ID = "fatebridge_analytic_solar_v1"
 
 
-def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
-    result: dict[str, Any] = {}
-    for key, value in pairs:
-        if key in result:
-            raise ValueError("Duplicate analytic coefficient key")
-        result[key] = value
-    return result
-
-
 @lru_cache(maxsize=1)
 def _profile_data() -> dict[str, Any]:
     try:
-        raw = (
-            files("fatebridge")
-            .joinpath("data/astronomy/analytic-solar-v1.json")
-            .read_bytes()
-        )
-        data: dict[str, Any] = json.loads(raw, object_pairs_hook=_unique_object)
+        return load_astronomy_json("analytic-solar-v1.json", label="analytic key")
     except (OSError, ValueError, TypeError) as error:
         raise EphemerisSourceError("solar_analytic_invalid") from error
-    return data
 
 
-def profile() -> dict[str, Any]:
-    """Return a detached source view; callers cannot rewrite loaded mathematics."""
-    return deepcopy(_profile_data())
+class _ProfileAccessor:
+    """Typed callable accessor exposing cache controls without dynamic attributes."""
+
+    def __call__(self) -> dict[str, Any]:
+        """Return a detached source view; callers cannot rewrite loaded mathematics."""
+        return deepcopy(_profile_data())
+
+    @property
+    def cache_clear(self) -> Any:
+        return _profile_data.cache_clear
+
+    @property
+    def cache_info(self) -> Any:
+        return _profile_data.cache_info
+
+    @property
+    def cache_parameters(self) -> Any:
+        return _profile_data.cache_parameters
 
 
-# Preserve the existing explicit cache controls, without caching a public view.
-profile.cache_clear = _profile_data.cache_clear  # type: ignore[attr-defined]
-profile.cache_info = _profile_data.cache_info  # type: ignore[attr-defined]
-profile.cache_parameters = _profile_data.cache_parameters  # type: ignore[attr-defined]
+profile = _ProfileAccessor()
 
 
 def _epoch(date1: float, date2: float, scale: float) -> float:
@@ -151,13 +152,14 @@ def apparent_ecliptic(vector: Vector, date1: float, date2: float = 0.0) -> Vecto
 
 def aberration(natural: Vector, velocity_c: Vector, sun_distance: float) -> Vector:
     """ERFA ab: annual aberration and solar-potential term; no fitted offset."""
-    dot = math.fsum(a * b for a, b in zip(natural, velocity_c))
-    bm1 = math.sqrt(1 - math.fsum(v * v for v in velocity_c))
-    w1, w2 = 1 + dot / (1 + bm1), 1.97412574336e-8 / sun_distance
+    projection = dot(natural, velocity_c)
+    bm1 = math.sqrt(1 - dot(velocity_c, velocity_c))
+    w1, w2 = 1 + projection / (1 + bm1), 1.97412574336e-8 / sun_distance
     result = tuple(
-        p * bm1 + w1 * v + w2 * (v - dot * p) for p, v in zip(natural, velocity_c)
+        p * bm1 + w1 * v + w2 * (v - projection * p)
+        for p, v in zip(natural, velocity_c)
     )
-    norm = math.sqrt(math.fsum(v * v for v in result))
+    norm = math.sqrt(dot(result, result))
     return result[0] / norm, result[1] / norm, result[2] / norm
 
 
@@ -169,16 +171,16 @@ def solar_longitude(jd_tt: float) -> float:
     sun = _series("s", t)[0]
     vector = tuple(s - e for s, e in zip(sun, earth))
     for _ in range(3):
-        delay = math.sqrt(math.fsum(v * v for v in vector)) / C_AU_DAY
+        delay = math.sqrt(dot(vector, vector)) / C_AU_DAY
         sun = _series("s", ((jd_tt - 2451545.0) - delay) / 365.25)[0]
         vector = tuple(s - e for s, e in zip(sun, earth))
-    distance = math.sqrt(math.fsum(v * v for v in vector))
+    distance = math.sqrt(dot(vector, vector))
     natural = (vector[0] / distance, vector[1] / distance, vector[2] / distance)
     velocity = tuple(v / C_AU_DAY for v in bary[1])
     apparent = aberration(
         natural,
         (velocity[0], velocity[1], velocity[2]),
-        math.sqrt(math.fsum(v * v for v in helio[0])),
+        math.sqrt(dot(helio[0], helio[0])),
     )
     ecliptic = apparent_ecliptic(apparent, jd_tt)
     return math.degrees(math.atan2(ecliptic[1], ecliptic[0])) % 360
@@ -207,25 +209,23 @@ def longitude_crossing_tt(target: float, low: float, high: float) -> dict[str, A
     Forty bisections are capped by the representable JD grid; the bracket is
     a numerical receipt only. It does not establish physical timing accuracy.
     """
-    if not all(math.isfinite(x) for x in (target, low, high)) or low >= high:
-        raise ValueError("Solar crossing requires a finite increasing TT bracket")
+    validate_crossing_inputs(
+        target,
+        low,
+        high,
+        message="Solar crossing requires a finite increasing TT bracket",
+    )
 
     def residual(epoch: float) -> float:
         return math.remainder(solar_longitude(epoch) - target, 360)
 
     flo, fhi = residual(low), residual(high)
-    if not flo < 0 <= fhi or fhi - flo >= 90:
-        raise ValueError("TT bracket does not contain a forward solar crossing")
-    iterations = 0
-    for _ in range(40):
-        middle = (low + high) / 2
-        if middle == low or middle == high:
-            break
-        if residual(middle) < 0:
-            low = middle
-        else:
-            high = middle
-        iterations += 1
+    validate_forward_bracket(
+        flo,
+        fhi,
+        message="TT bracket does not contain a forward solar crossing",
+    )
+    low, high, iterations = bisect_forward_crossing(residual, low, high, 40)
     return {
         "jd_tt": (low + high) / 2,
         "bracket_tt": [low, high],

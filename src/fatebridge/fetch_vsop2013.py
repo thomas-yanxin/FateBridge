@@ -17,19 +17,11 @@ from importlib.resources import files
 from pathlib import Path
 from typing import TypedDict
 
-from pydantic import JsonValue
-
-MODEL_ID = "fatebridge_vsop2013_solar_v1"
-
-
-def _unique_object(pairs: list[tuple[str, JsonValue]]) -> dict[str, JsonValue]:
-    result: dict[str, JsonValue] = {}
-    for key, value in pairs:
-        if key in result:
-            raise ValueError("Duplicate VSOP2013 source profile key")
-        result[key] = value
-    return result
-
+from fatebridge.core.vsop2013_solar import (
+    MODEL_ID,
+    Vsop2013SourceProfile,
+    source_profile,
+)
 
 CORE = (
     "swedate.c",
@@ -82,24 +74,6 @@ CI1 = (
 )
 
 
-class Vsop2013SourceProfile(TypedDict):
-    model_id: str
-    version: str
-    abi_version: int
-    native_core_version: str
-    software_input_years: list[int]
-    qualified_solar_term_years: list[int]
-    working_jd_tt: list[float]
-    reference: str
-    sources: dict[str, dict[str, str]]
-    native_source_files: list[str]
-    lunar_replacement_c: str
-    source_identity_scope: str
-    qualification_reference: str
-    accuracy_certified: bool
-    derived_lichun_scope: dict[str, JsonValue]
-
-
 class RemovedSecularTerm(TypedDict):
     args: list[int]
     coefficients: list[float]
@@ -111,16 +85,6 @@ class SeriesPackingReceipt(TypedDict):
     removed_original_secular_term: list[RemovedSecularTerm]
     series: list[tuple[int, int, int]]
     amplitude_truncation: None
-
-
-def source_profile() -> Vsop2013SourceProfile:
-    raw = (
-        files("fatebridge")
-        .joinpath("data/astronomy/vsop2013-solar-v1.json")
-        .read_bytes()
-    )
-    profile: Vsop2013SourceProfile = json.loads(raw, object_pairs_hook=_unique_object)
-    return profile
 
 
 def _acquire(

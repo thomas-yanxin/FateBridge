@@ -10,7 +10,7 @@ from datetime import date, datetime, timedelta, timezone
 from functools import lru_cache
 from io import BytesIO
 from pathlib import Path
-from typing import Any, Sequence, cast
+from typing import Any, Sequence, TypedDict
 from zoneinfo import ZoneInfo
 
 import pytz
@@ -46,9 +46,8 @@ from fatebridge.core.sukuyo.texts import (
     taibai_direction_reference,
     travel_direction_evidence,
 )
-from fatebridge.utils.civil_time import UTCCalendar
+from fatebridge.utils.civil_time import UTCCalendar, parse_microsecond_iso_datetime
 from fatebridge.utils.errors import UNRESOLVED_OFFSET_MESSAGE
-from fatebridge.utils.iso_clock import parse_microsecond_iso_datetime
 from fatebridge.utils.timezones import (
     is_unspecified_local_time,
     parse_timezone_name,
@@ -167,7 +166,23 @@ def _fullmoon_anchors() -> dict[int, str]:
     }
 
 
-def fullmoon_calculation(month: int, day: int, order: Sequence[str]) -> dict[str, Any]:
+class FullmoonCalculation(TypedDict):
+    ruleset_id: str
+    lunar_month: int
+    lunar_day: int
+    fullmoon_day: int
+    fullmoon_mansion: str
+    signed_day_offset: int
+    direct_mansion: str
+    shortcut_inclusive_count: int
+    shortcut_one_based_remainder: int
+    shortcut_mansion: str
+    methods_agree: bool
+
+
+def fullmoon_calculation(
+    month: int, day: int, order: Sequence[str]
+) -> FullmoonCalculation:
     """Compute T1299 full-moon lunar mansion (exact match between direct & shortcut rules)."""
     if type(month) is not int or not 1 <= month <= 12:
         raise ValueError("农历月必须为1..12的整数")
@@ -200,7 +215,7 @@ def fullmoon_calculation(month: int, day: int, order: Sequence[str]) -> dict[str
 
 def lunar_mansion(month: int, day: int) -> str:
     """Return T1299 27-mansion name for `(lunar_month, lunar_day)`."""
-    return cast(str, fullmoon_calculation(month, day, SU27_ORDER)["direct_mansion"])
+    return fullmoon_calculation(month, day, SU27_ORDER)["direct_mansion"]
 
 
 def _select_profile(
@@ -224,7 +239,7 @@ def _select_profile(
         raise ValueError("闰月政策无效")
     bundle = load_source(PROFILES_SOURCE)
 
-    def _calc(m: int, d: int) -> dict[str, Any]:
+    def _calc(m: int, d: int) -> FullmoonCalculation:
         return fullmoon_calculation(m, d, order)
 
     host = _calc(month, day)

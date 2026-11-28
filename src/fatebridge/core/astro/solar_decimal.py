@@ -17,6 +17,14 @@ from typing import Any, Sequence, TypedDict
 
 from fatebridge.core import ephemeris_runtime
 from fatebridge.core.astro import moshier_lunar_geometry, reference_frames, runtime
+from fatebridge.core.astro.cartesian import (
+    mm,
+    vec_add,
+    vec_cross,
+    vec_dot,
+    vec_scale,
+    vec_sub,
+)
 from fatebridge.core.astro.native_coordinates import COORDINATE_FLAGS
 from fatebridge.core.astro.physical_sources import (
     PhysicalEphemerisTrace,
@@ -81,27 +89,23 @@ def mass_profile() -> list[tuple[Decimal, Decimal]]:
 
 
 def dot(a: Vector, b: Vector) -> Decimal:
-    return sum((x * y for x, y in zip(a, b)), Decimal(0))
+    return vec_dot(a, b, Decimal(0))
 
 
 def add(a: Vector, b: Vector) -> list[Decimal]:
-    return [x + y for x, y in zip(a, b)]
+    return vec_add(a, b)
 
 
 def sub(a: Vector, b: Vector) -> list[Decimal]:
-    return [x - y for x, y in zip(a, b)]
+    return vec_sub(a, b)
 
 
 def scale(a: Vector, value: Decimal) -> list[Decimal]:
-    return [x * value for x in a]
+    return vec_scale(a, value)
 
 
 def cross(a: Vector, b: Vector) -> list[Decimal]:
-    return [
-        a[1] * b[2] - a[2] * b[1],
-        a[2] * b[0] - a[0] * b[2],
-        a[0] * b[1] - a[1] * b[0],
-    ]
+    return vec_cross(a, b)
 
 
 def norm(a: Vector) -> Decimal:
@@ -454,7 +458,7 @@ def reduced_longitude(
         if returned < 0 or not all(math.isfinite(v) for v in angles[:4]):
             raise EphemerisSourceError("coordinate_values_unavailable")
         true_epsilon, mean_epsilon, psi, deps = angles[:4]
-        matrix = reference_frames.mm(
+        matrix = mm(
             reference_frames.ecliptic_rotation(
                 math.radians(mean_epsilon if sidereal else true_epsilon)
             )[0],
@@ -472,9 +476,7 @@ def reduced_longitude(
             if returned < 0 or not math.isfinite(ayanamsa):
                 raise EphemerisSourceError("coordinate_values_unavailable")
             c, s = math.cos(math.radians(ayanamsa)), math.sin(math.radians(ayanamsa))
-            matrix = reference_frames.mm(
-                ((c, s, 0.0), (-s, c, 0.0), (0.0, 0.0, 1.0)), matrix
-            )
+            matrix = mm(((c, s, 0.0), (-s, c, 0.0), (0.0, 0.0, 1.0)), matrix)
         decimal_matrix = [[Decimal.from_float(v) for v in row] for row in matrix]
         orthogonal = max(
             abs(

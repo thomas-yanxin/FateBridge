@@ -7,8 +7,13 @@ import pytest
 from fatebridge.core.almanac import get_solar_terms_for_year, localize_datetime
 from fatebridge.core.bazi.calendar import BaZiCalendar
 from fatebridge.core.bazi.timing import TimingAnalysis
-from fatebridge.core.local_techniques.chart import _build_metaphysics_seed
-from fatebridge.core.metaphysics.seed import _build_person_seed, build_analysis_seed
+from fatebridge.core.metaphysics.seed import (
+    _build_person_seed,
+    build_analysis_seed,
+)
+from fatebridge.core.metaphysics.seed import (
+    build_local_metaphysics_seed as _build_metaphysics_seed,
+)
 from fatebridge.services.bazi import _resolve_analysis_date, calculate_bazi_birth
 from fatebridge.services.birth_context import (
     build_birth_computation_context as _build_birth_computation_context,
@@ -184,3 +189,38 @@ def test_partial_analysis_date_keeps_default_clamping(
         lambda: datetime(2025, 2, 15),
     )
     assert _resolve_analysis_date(None, 2, 31) == datetime(2025, 2, 28)
+
+
+def _civil_pillars(
+    year: int, month: int, day: int, hour: int, minute: int
+) -> dict[str, str]:
+    from fatebridge.services.bazi import calculate_bazi_birth
+    from fatebridge.utils.birth_input import create_person_info
+
+    person = create_person_info(
+        birth_year=year,
+        birth_month=month,
+        birth_day=day,
+        birth_hour=hour,
+        birth_minute=minute,
+        name="边界",
+        gender="男",
+        birth_place="北京",
+        birth_timezone="Asia/Shanghai",
+        use_true_solar_time=False,
+    )
+    four = calculate_bazi_birth(person)["bazi_birth"]["four_pillars"]
+    return {key: value["stem"] + value["branch"] for key, value in four.items()}
+
+
+def test_year_pillar_uses_true_lichun_instant_not_civil_date() -> None:
+    """1972-02-04 23:00：立春(02-05 01:20)之前，年柱必须是「辛亥」而非「壬子」。"""
+    pillars = _civil_pillars(1972, 2, 4, 23, 0)
+    assert pillars["year"] == "辛亥"
+    assert pillars["month"] == "辛丑"
+
+
+def test_month_pillar_uses_true_xiaoshu_instant_not_civil_date() -> None:
+    """1936-07-07 05:05：小暑(07-07 15:58)之前约 11 小时，月柱必须是午月「甲午」。"""
+    pillars = _civil_pillars(1936, 7, 7, 5, 5)
+    assert pillars["month"] == "甲午"

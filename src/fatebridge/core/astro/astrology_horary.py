@@ -19,7 +19,7 @@ from fatebridge.core.astro.astrology_events import (
     FileContext,
     build_ephemeris_source_identity,
 )
-from fatebridge.core.astro.astrology_tables import RULER_BY_SIGN, SIGNS
+from fatebridge.core.astro.astrology_tables import CHALDEAN_ORDER, RULER_BY_SIGN, SIGNS
 from fatebridge.core.astro.event_reference import (
     reference_qualification,
     unresolved_ascendant,
@@ -50,17 +50,17 @@ from fatebridge.core.astro.lilly_radicality import evaluate_radicality
 from fatebridge.core.astro.lilly_radicality_inputs import collect_radicality_hour
 from fatebridge.core.astro.lilly_rays import METHOD_ID as LILLY_SIGN_RAYS_METHOD
 from fatebridge.core.astro.lilly_rays import directed_sign_relationship
-from fatebridge.core.classical_western import _aspect_phase, build_almuten_figuris
-from fatebridge.core.predictive._common import (
+from fatebridge.core.astro.western_points import (
     house_number,
     normalize_sign_name,
     planet_label,
     point_absolute_position,
     sign_label,
 )
+from fatebridge.core.classical_western import _aspect_phase, build_almuten_figuris
 
 # The seven traditional planets in Chaldean order.
-TRADITIONAL_PLANETS = ["Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon"]
+TRADITIONAL_PLANETS = list(CHALDEAN_ORDER)
 
 # Ptolemaic aspects only — horary does not judge by minor aspects.
 PTOLEMAIC_ASPECTS: list[tuple[str, str, float]] = [

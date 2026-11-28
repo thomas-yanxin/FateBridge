@@ -14,10 +14,8 @@ from fatebridge.services.timing import (
     calculate_liuyue_analysis,
 )
 from fatebridge.utils.birth_input import create_person_info
-from fatebridge.utils.places import (
-    KNOWN_BIRTH_PLACE_ENTRIES,
-    resolve_birth_place_context,
-)
+from fatebridge.utils.place_catalog import KNOWN_BIRTH_PLACE_ENTRIES
+from fatebridge.utils.places import resolve_birth_place_context
 from fatebridge.utils.solar_time import normalize_birth_time
 from fatebridge.utils.timezones import parse_timezone_name
 

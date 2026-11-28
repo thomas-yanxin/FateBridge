@@ -6,14 +6,13 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.contracts.output_liuren_board import Liuren
-from fatebridge.core.metaphysics.common import SEXAGENARY_CYCLE
+from fatebridge.core.contracts.liuren import Liuren
 from fatebridge.core.metaphysics.liureng import (
     build_liureng_board,
     derive_selection,
 )
 from fatebridge.core.metaphysics.seed import build_analysis_seed
-from fatebridge.utils.data import EARTHLY_BRANCHES
+from fatebridge.utils.data import EARTHLY_BRANCHES, SEXAGENARY_CYCLE
 
 CLASSIC_720_PATH = Path(
     "/Users/thomas/Desktop/self_data/06_EXE可读文档/阅读/6a0082fd3f49754c/正文.txt"

@@ -75,8 +75,8 @@ from fatebridge.core.astro.time_scales import fallback_julian_day_tt
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.astro.zodiac import native_lahiri_positions
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
-from fatebridge.core.guolao.guolao import build_chart
 from fatebridge.core.jpl_ephemeris import configured_jpl_file
+from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.utils.timezones import format_local_time_or_utc
 
 
@@ -90,7 +90,6 @@ def build_core_chart_payload(
     context_fortune_method: str = "sect_reversing",
     include_physical_source: bool = False,
     lot_longitudes: dict[str, Fraction] | None = None,
-    guolao_seasonal_anchor_policy: str | None = None,
     include_planetary_hours: bool = True,
     include_classical: bool = True,
     include_fixed_stars: bool = True,
@@ -102,8 +101,7 @@ def build_core_chart_payload(
     extra_bodies: tuple[str, ...] | list[str] = (),
 ) -> dict[str, Any]:
     """Keep one physical chart on one managed ephemeris configuration."""
-    if chart_variant != "guolao_chart":
-        require_resolved_birth_timezone(birth_info.timezone_source)
+    require_resolved_birth_timezone(birth_info.timezone_source)
     with runtime.preserve_ephemeris_path():
         selected = configured_ephemeris_path()
         result = _build_core_chart_payload(
@@ -115,7 +113,6 @@ def build_core_chart_payload(
             context_fortune_method=context_fortune_method,
             include_physical_source=include_physical_source,
             lot_longitudes=lot_longitudes,
-            guolao_seasonal_anchor_policy=guolao_seasonal_anchor_policy,
             include_planetary_hours=include_planetary_hours,
             include_classical=include_classical,
             include_fixed_stars=include_fixed_stars,
@@ -140,7 +137,6 @@ def _build_core_chart_payload(
     context_fortune_method: str = "sect_reversing",
     include_physical_source: bool = False,
     lot_longitudes: dict[str, Fraction] | None = None,
-    guolao_seasonal_anchor_policy: str | None = None,
     include_planetary_hours: bool = True,
     include_classical: bool = True,
     include_fixed_stars: bool = True,
@@ -151,17 +147,6 @@ def _build_core_chart_payload(
     max_aspects: int | None = None,
     extra_bodies: tuple[str, ...] | list[str] = (),
 ) -> dict[str, Any]:
-    if guolao_seasonal_anchor_policy is not None and chart_variant != "guolao_chart":
-        raise ValueError(
-            "guolao_seasonal_anchor_policy requires chart_variant=guolao_chart"
-        )
-    if chart_variant == "guolao_chart":
-        return build_chart(
-            birth_info,
-            hsys=hsys,
-            zodiacal=zodiacal,
-            seasonal_anchor_policy=guolao_seasonal_anchor_policy,
-        )
     times = birth_info.time_scales
     julian_day = times.ut1
     house_system_info = _resolve_core_chart_house_system(
@@ -271,6 +256,11 @@ def _build_core_chart_payload(
     )
     obliquity: float | None = None
     if runtime.swe is not None:
+        obliquity_errors: tuple[type[BaseException], ...] = (
+            *runtime.native_ephemeris_errors(),
+            TypeError,
+            ValueError,
+        )
         try:
             ecl_angles, ecl_flag = fast_swe_call(
                 "calc",
@@ -283,7 +273,10 @@ def _build_core_chart_payload(
             )
             if ecl_flag >= 0:
                 obliquity = float(ecl_angles[0])
-        except Exception:
+        except EphemerisSourceError:
+            raise
+        except obliquity_errors as error:
+            runtime._log_swe_runtime_failure("calc(ECL_NUT)", error)
             obliquity = None
     if obliquity is None:
         frame_tt = (
@@ -346,7 +339,7 @@ def _build_core_chart_payload(
             ayanamsha=ayanamsha,
             include_sector13=chart_variant == "chart13",
             include_nakshatra=chart_variant == "india_chart",
-            include_su28=chart_variant == "guolao_chart",
+            include_su28=False,
             zodiac_longitude=(
                 zodiac_states[planet]["longitude"]
                 if zodiac_states is not None
@@ -692,7 +685,7 @@ def _build_core_chart_payload(
                         backend_convention_sector=planet["sector13"],
                     )
                     planet["sector13"] = None
-    if chart_variant == "hellen_chart":
+    if chart_variant == "hellen_chart" and include_classical:
         fortune = result["classical"]["lots"].get("fortune")
         result["hellenistic"] = {
             "sect": chart_sect,

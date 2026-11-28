@@ -11,6 +11,7 @@ from typing import Any, SupportsAbs
 
 from fatebridge.core.astro.angle_definitions import is_ascendant_resolved
 from fatebridge.core.astro.birth import AstroBirthInfo
+from fatebridge.core.astro.cartesian import Matrix
 from fatebridge.core.astro.earth_attitude import earth_attitude
 from fatebridge.core.astro.ephemeris import fast_swe_call
 from fatebridge.core.astro.geometry import (
@@ -19,7 +20,7 @@ from fatebridge.core.astro.geometry import (
     normalize_angle,
 )
 from fatebridge.core.astro.reference import TRADITIONAL_PLANETS
-from fatebridge.core.astro.reference_frames import Matrix, rotate_spherical
+from fatebridge.core.astro.reference_frames import rotate_spherical
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.astro.ut1_epoch import UT1Instant
 from fatebridge.core.ephemeris_runtime import swe

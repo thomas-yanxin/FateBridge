@@ -8,7 +8,6 @@ from typing import Any, Literal, TypedDict
 
 from typing_extensions import NotRequired
 
-from fatebridge.core.metaphysics.common import sexagenary_index_for
 from fatebridge.core.ziwei.tables import (
     DEFAULT_ZIWEI_SCHOOL,
     IZTRO_SOURCE,
@@ -22,6 +21,7 @@ from fatebridge.utils.data import (
     EARTHLY_BRANCHES,
     HEAVENLY_STEMS,
     ZIWEI_BRANCH_SEQUENCE,
+    sexagenary_index_for,
 )
 
 ZIWEI_LUCUN_BY_STEM = dict(zip(HEAVENLY_STEMS, "寅卯巳午巳午申酉亥子"))

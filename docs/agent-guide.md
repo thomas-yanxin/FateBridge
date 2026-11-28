@@ -24,7 +24,7 @@
 | 需要完整输出 Schema | 传入 `detail=full` 并配合 `tool`、`family` 或 `q` 过滤，且显式设置 `include_output_schema=True` |
 
 - `detail="brief"`：仅返回必填字段、`field_types`、一两行 `usage_hint` 与 `evidence_views` 名称列表，适合批量预检多个工具。
-- `detail="summary"`（默认）：未传 `tool`/`tools` 时返回全局 `counts`、`families` 与工具摘要；指定单个 `tool` 时直接解包返回该工具的 `input_schema`、`output_fields`、`example_input`、`evidence_views`、`suggested_fields` 与 `default_omit`；指定多个 `tools` 时返回精简列表。
+- `detail="summary"`（默认）：未传 `tool`/`tools` 时返回全局 `counts`、`families` 与工具摘要；指定单个 `tool` 时直接解包返回该工具的 `input_schema`、`example_input`、`evidence_views`、`suggested_fields` 与 `default_omit`；指定多个 `tools` 时返回精简列表。
 - `detail="full"`：返回完整契约（包括 `output_fields` 等），**必须**配合 `tool`、`tools`、`family` 或 `q` 之一过滤（否则返回 `validation_error` / `filter_required_for_full_detail`）。**`output_schema` 默认不返回**，仅当显式传入 `include_output_schema=True`（REST `?include_output_schema=true`，CLI `--include-output-schema`）时才会附带。
 - 拼写错误时返回 `unknown_tool`（404）并在 `issues[].constraints.suggestions` 给出候选名称。
 
@@ -64,7 +64,7 @@ REST、MCP 与 CLI 共用三项正交控制参数：
 - `birth_year` / `birth_month` / `birth_day` / `birth_hour`：必填（公历）；不猜未知出生时刻。当用户确认未知出生时辰时，八字与 `liuren_yearly_timing` 支持显式传入 `birth_time_unknown=true`（不传 `birth_hour`），按三柱模式计算并在 `coverage` 声明边界与缺失项；`jinkou` 与 `liuren_chart` 可直接传入 `birth_date` 自动换算年命并附立春/春节边界提示。
 - `birth_minute`：可选，默认 `0`；八字与时运另支持 `birth_second`（`0..59`）与 `birth_utc_offset`（消歧夏令时重复钟时）。
 - `gender`：八字专项可选建议传入，`bazi_luck_cycles` 等必填，支持 `男`/`女`、`male`/`female`。
-- `birth_place` / `birth_timezone` / `birth_longitude` / `birth_latitude`：支持内置离线 SQLite 地名索引秒级解析（参见[离线城市目录](place-catalog.md)）；奇门、六壬、金口诀、梅花与西占事件盘同时支持 `analysis_place` / `place` 离线解析，批处理可在顶层 `context` 统一提供问事时刻与地点。高精度星盘建议显式传经纬度与 IANA 时区。
+- `birth_place` / `birth_timezone` / `birth_longitude` / `birth_latitude`：支持内置离线 SQLite 地名索引秒级解析（参见[离线城市目录](place-catalog.md)）；`qimen`、`liuren_chart`、`liuren_yearly_timing`、`jinkou`、`taiyi`、`meihua_time_cast` 支持 `analysis_place`（`meihua_cast` 无地点字段），`liuyao`、`canping`、`heluo`、`suzhan`、`interpret_astrology_dice`、`sanshi_combined_chart`、`solar_terms_for_year`、`lunar_calendar_time`、`mundane_ingress_chart`、`horary_chart`、`evaluate_election_time` 支持 `place`（`planetary_returns` 使用 `birth_place`），批处理可在顶层 `context` 统一提供问事时刻与地点。高精度星盘建议显式传经纬度与 IANA 时区。
 - `use_true_solar_time`：中式出生模型默认 `true`（无经度回退钟表时间并附提示，显式 `true` 无经度报错）；核心星盘默认 `false`。校正详情见 `person_info.time_adjustment`。
 
 ### 按通道接入
@@ -136,6 +136,22 @@ fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json
 
 全部目录命令均支持 `--request-file PATH` 读取 JSON 请求文件（命令行显式参数覆盖文件中的同名顶层字段），以及 `--include`、`--fields` 与 `--as-of`。
 
+#### Python SDK（进程内直接调用）
+
+```python
+import fatebridge
+
+info = fatebridge.discover(tools=["bazi_birth_chart", "firdaria"], surface="cli")
+chart = fatebridge.run("firdaria", {"birth_year": 1990, "birth_month": 5, "birth_day": 15, "birth_hour": 10, "birth_timezone": "Asia/Shanghai", "birth_longitude": 116.4, "birth_latitude": 39.9, "analysis_year": 2026, "analysis_month": 6, "analysis_day": 1})
+bundle = fatebridge.batch(
+    [{"id": "c1", "tool": "bazi_birth_chart", "subject": "p1"}],
+    subjects={"p1": {"birth_year": 1990, "birth_month": 5, "birth_day": 15, "birth_hour": 10, "gender": "男", "birth_place": "北京"}},
+    as_of="2026-10-12T12:00:00+08:00",
+)
+```
+
+Python SDK 与 REST、MCP、CLI 共用同一 `application/execution.py` 管道与 `default_omit` / `include` / `fields` / `as_of` 控制面。工具入参校验与批量计算错误返回统一错误包络（含 `constraints.allowed_fields` 与 `suggestions`）；`discover(...)` 及 `run(...)` 中的未知工具名或无效交付参数（`include` / `fields` / 非映射 `arguments`）直接抛出 `ParameterError`（可通过 `.as_result()` 与 `.issues` 读取同构错误包络）。
+
 ## 输出控制与结果读取
 
 ### 默认核心层与增量展开：`default_omit` 与 `include`
@@ -186,9 +202,7 @@ fatebridge bazi_birth_chart --birth-year 1990 --birth-month 6 --birth-day 15 \
 | `dependency_missing` | 503 · CLI `1` | `false` | 缺少必需运行时依赖（如 `swisseph`），需检查部署环境 |
 | `ephemeris_calculation_failed` | 503 · CLI `1` | `false` | 原生星历计算失败，检查星历环境与输入范围 |
 | `ephemeris_source_inconsistent` | 503 · CLI `1` | `false` | 星历/时区/参考数据文件或配置在运行时发生不一致，先核查数据文件完整性 |
-| `fengshui_calculation_inconsistent` | 503 · CLI `1` | `false` | 玄空或月紫白内部盘层数字一致性校验失败，需维护者排查，不可靠改输入重试 |
 | `numerology_source_inconsistent` | 503 · CLI `1` | `false` | 河洛/参评原典对照数据内部一致性失败，需维护者排查 |
-| `jyotish_calculation_inconsistent` | 503 · CLI `1` | `false` | 印占 Drik Bala 相位力证据内部一致性失败，需维护者排查 |
 | `timeout` | 504 · CLI `1` | `true` | 计算或请求处理超时，可按原参数适度退避重试 |
 | `internal_error` | 500 · CLI `1` | `true`（未捕获计算异常）/ `false` | 服务端内部未预期异常；检查日志与输入边界 |
 | `usage_error` | — · CLI `2` | `false` | 仅 CLI：`--request-file` 读取失败、未知命令行 flag 或参数语法错误 |

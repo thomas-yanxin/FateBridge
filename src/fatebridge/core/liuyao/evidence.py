@@ -30,7 +30,8 @@ from fatebridge.core.liuyao.strength import (
     month_strength,
     xunkong,
 )
-from fatebridge.utils.civil_intervals import METHOD_ID, local_interval_preimages
+from fatebridge.utils.civil_clock import LOCAL_INTERVAL_METHOD_ID as METHOD_ID
+from fatebridge.utils.civil_clock import local_interval_preimages
 from fatebridge.utils.civil_time import NominalClockLabel, UTCCalendar, ZonedCalendar
 from fatebridge.utils.errors import ParameterError
 from fatebridge.utils.timezones import is_unspecified_local_time

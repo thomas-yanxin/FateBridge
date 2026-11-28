@@ -1,4 +1,4 @@
-"""True solar arc and explicitly labelled natal/directed Hamburg geometry.
+"""Hamburg School / Uranian True Solar Arc biwheel (distinct from predictive/solar_arc.py).
 
 The symbolic key is declared: one TT ephemeris day per 365.25 UTC calendar
 days. Directed factors are rotations of natal factors, not future observations.

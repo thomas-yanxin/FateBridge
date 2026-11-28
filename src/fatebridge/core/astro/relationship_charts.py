@@ -29,6 +29,7 @@ from fatebridge.core.astro.relationship_geometry import (
     marks_birth,
     unique_midpoint,
 )
+from fatebridge.utils.errors import EphemerisSourceError
 
 
 def chart_angle(longitude_degrees: float) -> dict[str, float | str]:
@@ -122,7 +123,10 @@ def _composite_chart(
             )
             are_houses_resolved = True
             are_both_ascendants_resolved = True
-        except Exception:
+        except EphemerisSourceError:
+            raise
+        except runtime.native_ephemeris_errors() as error:
+            runtime._log_swe_runtime_failure("houses_armc(composite)", error)
             house_cusps = []
     if not house_cusps and are_houses_resolved and house_system != "whole_sign":
         house_cusps = _midpoint_house_cusps(

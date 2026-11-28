@@ -13,7 +13,6 @@ from fatebridge.cli import run
 from fatebridge.core.response_models import output_model_for
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from tests.fixtures.mcp_receipt import verified_inline_business
 from tests.support.transports import call_calculation
 
 BIRTH = dict(
@@ -370,7 +369,8 @@ def test_published_natal_reading_fits_default_mcp_budget_without_losing_stars(
                 },
             )
             assert not result.is_error
-            payload = await verified_inline_business(client, result.structured_content)
+            payload = result.structured_content
+            assert payload is not None and "result_delivery" not in payload
             reading = payload["ziwei_birth"]["reading_view"]
             assert len(reading["palaces"]) == 12
             assert sum(len(p["stars"]) for p in reading["palaces"]) == (

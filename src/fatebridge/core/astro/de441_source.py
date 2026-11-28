@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import json
 import math
-import os
 import sys
 import zlib
 from array import array
@@ -27,6 +26,7 @@ from fatebridge.core.astro.coefficient_storage import RecordBlock, unpack_record
 from fatebridge.core.astro.de441_storage import BASENAME, MODEL_ID
 from fatebridge.core.astro.tdb import geocentric_tdb_state
 from fatebridge.utils.errors import EphemerisSourceError
+from fatebridge.utils.runtime import get_de441_dir
 
 SOURCE_VERSION = "JPL DE441, Park-Folkner-Williams-Boggs 2021"
 
@@ -90,12 +90,12 @@ def _parameters() -> Parameters:
 
 def de441_dir_explicitly_configured() -> bool:
     """Return True when the caller explicitly configured FATEBRIDGE_DE441_DIR."""
-    return bool(os.getenv("FATEBRIDGE_DE441_DIR"))
+    return get_de441_dir() is not None
 
 
 def coefficient_files_available() -> bool:
     """Check whether every coefficient chunk is present before loading any."""
-    archive_dir = os.getenv("FATEBRIDGE_DE441_DIR")
+    archive_dir = get_de441_dir()
     base = (
         Path(archive_dir)
         if archive_dir
@@ -167,7 +167,7 @@ def barycentric_state(
         p["record_count"] - 1,
     )
     chunk, local = divmod(index, p["records_per_chunk"])
-    words = _coefficients(chunk, os.getenv("FATEBRIDGE_DE441_DIR") or None)
+    words = _coefficients(chunk, get_de441_dir())
     elapsed = epoch - Fraction(start + index * span)
     states = []
     names = (

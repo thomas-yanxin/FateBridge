@@ -8,7 +8,7 @@ from fatebridge.application.bindings import (
     request_model_ref,
     service_ref,
 )
-from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.application.tool_spec import BatchInputPolicy, ToolSpec
 
 _REQ_MODULE = "fatebridge.core.requests.western_events"
 
@@ -37,6 +37,8 @@ def _western_event_spec(
     model_name: str,
     label: str,
     *,
+    required_output_fields: tuple[str, ...] | None = None,
+    batch_policy: BatchInputPolicy | None = None,
     default_omit: tuple[str, ...] = (),
 ) -> ToolSpec:
     """Register a western ephemeris-event technique (ingress chart / planetary return)."""
@@ -44,6 +46,7 @@ def _western_event_spec(
         name=name,
         bind=bind_kwargs(service),
         request_model_loader=request_model_ref(_REQ_MODULE, model_name),
+        required_output_fields=required_output_fields or (name,),
         summary=(
             "按明确提问时刻起盘，核算月亮出宫前黄经事件与原典条件；禁生死/疾病/生育判断。"
             if name == "horary_chart"
@@ -59,6 +62,7 @@ def _western_event_spec(
         rest_path="/api/astrology/events/" + name.replace("_", "-"),
         cli_request_file=name == "horary_chart",
         default_omit=default_omit,
+        batch_policy=batch_policy or BatchInputPolicy(),
     )
 
 
@@ -77,6 +81,7 @@ SPECS: list[ToolSpec] = [
         calculate_extrareturns,
         "AstroExtraReturnsRequest",
         "多重回归",
+        batch_policy=BatchInputPolicy(subject_mode="birth_fields"),
         default_omit=(),
     ),
     _western_event_spec(
@@ -84,6 +89,11 @@ SPECS: list[ToolSpec] = [
         calculate_horary,
         "AstroHoraryRequest",
         "卜卦证据",
+        batch_policy=BatchInputPolicy(
+            context_prefixes=("question_",),
+            context_clock_basis_field="question_clock_basis",
+            solar_clock_bases=("local_mean_solar", "local_apparent_solar"),
+        ),
         default_omit=(
             "calendar_conversion",
             "clock_conversion",
@@ -115,6 +125,12 @@ SPECS: list[ToolSpec] = [
         calculate_election,
         "AstroElectionRequest",
         "择日",
+        required_output_fields=("election",),
+        batch_policy=BatchInputPolicy(
+            context_prefixes=("candidate_",),
+            context_clock_basis_field="candidate_clock_basis",
+            solar_clock_bases=("local_mean_solar", "local_apparent_solar"),
+        ),
         default_omit=(
             "calendar_conversion",
             "clock_conversion",

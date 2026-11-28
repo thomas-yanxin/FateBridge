@@ -21,11 +21,6 @@ from fatebridge.application.projection import project_fields
 from fatebridge.application.tool_spec import ServiceResult
 from fatebridge.cli import run
 from fatebridge.core.fengshui.models import Coverage
-from fatebridge.core.response_models import (
-    CHART_TOOL_FIELDS,
-    CHINESE_TOOL_FIELDS,
-    REFERENCE_TOOL_FIELDS,
-)
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.fengshui import PAYLOADS, payload
 from tests.support.current_outputs import current_business
@@ -45,14 +40,10 @@ class CurrentBusiness(Protocol):
 
 def test_tool_specific_nested_contracts_are_published_at_the_catalog_root() -> None:
     for spec in CATALOG:
-        for declarations in (
-            CHINESE_TOOL_FIELDS,
-            CHART_TOOL_FIELDS,
-            REFERENCE_TOOL_FIELDS,
-        ):
-            assert set(declarations.get(spec.name, {})) <= set(
-                spec.output_model.model_fields
-            ), spec.name
+        assert "run_metadata" in spec.output_model.model_fields, spec.name
+        assert set(spec.required_output_fields) <= set(
+            spec.output_model.model_fields
+        ), spec.name
 
 
 def projectable_objects(
@@ -371,3 +362,60 @@ def test_fengshui_invalid_paths_keep_same_diagnostics_on_all_surfaces(
         assert recorded["code"] == issue
         if issue == "unknown_projection_path":
             assert "status" in recorded["constraints"]["available"]
+
+
+def test_project_fields_whole_parent_overrides_dotted_regardless_of_order() -> None:
+    from fatebridge.application.projection import project_fields
+
+    payload = {
+        "bazi_birth": {
+            "day_master": {"stem": "壬", "strength": "弱"},
+            "favorable_elements": ["金", "水"],
+        },
+        "summary": "summary-text",
+        "run_metadata": {"run_id": "r"},
+    }
+    first = project_fields(payload, ["bazi_birth", "bazi_birth.day_master"])
+    second = project_fields(payload, ["bazi_birth.day_master", "bazi_birth"])
+    assert first["bazi_birth"] == payload["bazi_birth"]
+    assert second["bazi_birth"] == payload["bazi_birth"]
+
+
+def test_mcp_arguments_are_separate_from_delivery_controls() -> None:
+    from fastmcp import FastMCP
+    from pydantic import BaseModel
+
+    from fatebridge.application.bindings import bind_kwargs
+    from fatebridge.application.tool_spec import ToolSpec
+    from fatebridge.mcp_server import _register_mcp_tools
+
+    class Request(BaseModel):
+        fields: list[str]
+
+    spec = ToolSpec(
+        name="field_calculation",
+        bind=bind_kwargs(lambda fields: {"selection": fields, "other": 2}),
+        request_model=Request,
+        summary="",
+        operation_label_zh="",
+        family="",
+    )
+    server = FastMCP("test")
+    _register_mcp_tools(server, [spec])
+
+    async def call() -> CallToolResult:
+        async with Client(server) as client:
+            return await client.call_tool(
+                "run_calculation",
+                {
+                    "tool": spec.name,
+                    "arguments": {"fields": ["domain"]},
+                    "fields": ["selection"],
+                },
+                raise_on_error=False,
+            )
+
+    result = asyncio.run(call())
+    assert not result.is_error
+    assert result.structured_content["selection"] == ["domain"]
+    assert "other" not in result.structured_content

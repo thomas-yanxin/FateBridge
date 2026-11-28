@@ -121,26 +121,22 @@ def test_recursive_input_falls_back_to_valid_refs_and_remains_callable() -> None
         operation_label_zh="测试",
         family="test",
     )
-    import fatebridge.mcp_server as mcp_server
-
     app = FastMCP("recursive contract", dereference_schemas=False)
     _register_mcp_tools(app, [spec])
 
     async def call():
-        with pytest.MonkeyPatch.context() as mp:
-            mp.setattr(mcp_server, "CATALOG", [spec])
-            async with Client(app) as client:
-                schema = (await describe_capability(client, spec.name))["input_schema"]
-                Draft202012Validator.check_schema(schema)
-                assert "$defs" in schema  # cycles remain finite valid references
-                good = {"node": {"value": 2, "child": {"value": 1}}}
-                Draft202012Validator(schema).validate(good)
-                result = await call_calculation(client, "recursive", good)
-                assert result.structured_content["node"]["child"]["value"] == 1
-                invalid = await call_calculation(
-                    client, "recursive", {"node": {"value": -1}}, raise_on_error=False
-                )
-                assert invalid.is_error
+        async with Client(app) as client:
+            schema = (await describe_capability(client, spec.name))["input_schema"]
+            Draft202012Validator.check_schema(schema)
+            assert "$defs" in schema  # cycles remain finite valid references
+            good = {"node": {"value": 2, "child": {"value": 1}}}
+            Draft202012Validator(schema).validate(good)
+            result = await call_calculation(client, "recursive", good)
+            assert result.structured_content["node"]["child"]["value"] == 1
+            invalid = await call_calculation(
+                client, "recursive", {"node": {"value": -1}}, raise_on_error=False
+            )
+            assert invalid.is_error
 
     asyncio.run(call())
 

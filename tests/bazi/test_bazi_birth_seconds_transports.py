@@ -5,9 +5,9 @@ from pathlib import Path
 
 import pytest
 
+from tests.fixtures.bazi_birth_clock import BASE, SPECS, leaf, receipt_path
 from tests.support.transports import AS_OF, business, call_cli, inputs, native
 from tests.support.transports import rest as _shared_rest
-from tests.unit_test.fixtures.bazi_birth_clock import BASE, SPECS, leaf, receipt_path
 
 rest = _shared_rest
 

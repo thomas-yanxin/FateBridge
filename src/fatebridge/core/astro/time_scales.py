@@ -15,7 +15,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from fractions import Fraction
 from functools import lru_cache
-from typing import Any
+from typing import Any, TypedDict
 
 import astronomy
 
@@ -570,3 +570,26 @@ def _utc_tt_without_rotation(moment: datetime | UTCCalendar) -> float:
     if resolved is None:
         raise ValueError("No atomic UTC offset for this historical label")
     return resolved
+
+
+SECONDARY_PROGRESSION_YEAR_KEY = Fraction(36524219, 100000)
+
+
+class ProgressionClockOptions(TypedDict):
+    method: str
+    year_basis: str
+    year_key_numerator: int
+    year_key_denominator: int
+    time_basis: str
+    timestamp_rounding: str
+
+
+def secondary_progression_clock_options() -> ProgressionClockOptions:
+    return {
+        "method": "direct_secondary_progression",
+        "year_basis": "fixed_365_24219_nominal_days",
+        "year_key_numerator": SECONDARY_PROGRESSION_YEAR_KEY.numerator,
+        "year_key_denominator": SECONDARY_PROGRESSION_YEAR_KEY.denominator,
+        "time_basis": "UTC_nominal_elapsed_days",
+        "timestamp_rounding": "nearest_microsecond_ties_to_even_from_birth",
+    }
